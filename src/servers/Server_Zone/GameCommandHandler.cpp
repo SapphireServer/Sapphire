@@ -201,6 +201,12 @@ void Core::GameCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlayer
       pPlayer->teleport( aetheryteId );
    }
 
+   else if( ( subCommand == "unlockaetheryte" ) && ( params != "" ) )
+   {
+	   for( uint8_t i = 0; i < 255; i++ )
+		   pPlayer->registerAetheryte( i );
+   }
+
    else if( ( subCommand == "discovery" ) && ( params != "" ) )
    {
       int32_t map_id;
