@@ -2,7 +2,7 @@
 #define _COMMON_H
 
 #include <stdint.h>
-
+#include <cstdint>
 #include <vector>
 
 #include <boost/make_shared.hpp>

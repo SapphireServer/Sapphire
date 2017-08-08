@@ -91,6 +91,7 @@ int main()
 
    g_log.info( "Database: Connected to " + params.hostname + ":" + std::to_string( params.port ) );
    g_exdData.loadZoneInfo();
+   g_exdData.loadClassJobInfo();
 
    HttpServer server;
    server.config.port = stoi( m_pConfig->getValue< std::string >( "Settings.General.HttpPort", "80" ) );
