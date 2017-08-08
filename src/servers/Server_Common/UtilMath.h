@@ -29,9 +29,17 @@ template
 <typename T>
 T clamp( T val, T minimum, T maximum )
 {
-     // TODO: Lazy hack, do this properly...
-     return maximum;
-//   return std::max( std::min( val, maximum ), minimum );
+   if (val > maximum)
+   {
+      return maximum;
+   }
+   
+   if (val < minimum)
+   {
+      return minimum;
+   }
+
+   return val;
 }
 }
 }
