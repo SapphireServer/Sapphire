@@ -49,7 +49,7 @@ void print_request_info( shared_ptr<HttpServer::Request> request ) {
 
 int main()
 {
-   g_log.setLogPath( "SapphireAPI" );
+   g_log.setLogPath( "log\\SapphireAPI" );
    g_log.init();
 
    g_log.info( "===========================================================" );
