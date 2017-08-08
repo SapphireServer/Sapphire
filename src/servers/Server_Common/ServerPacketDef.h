@@ -786,7 +786,8 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    uint32_t charId;
    uint32_t restedExp;
    uint16_t unknown_12;
-   uint16_t unknown_13;
+   uint8_t expansion;
+   uint8_t unknown_13;
    uint8_t race;
    uint8_t tribe;
    uint8_t gender;
