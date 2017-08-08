@@ -31,6 +31,8 @@ namespace Core
          
          void deleteCharacter( std::string name, uint32_t accountId );
 
+		 bool insertSession( const uint32_t& accountId, std::string& sId );
+
          std::vector<Core::PlayerMinimal> getCharList( uint32_t accountId );
 
          bool checkNameTaken( std::string name );

@@ -289,6 +289,46 @@ int main()
 
    };
 
+   server.resource["^/sapphire-api/lobby/insertSession"]["POST"] = [&server]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
+	   print_request_info( request );
+
+	   try
+	   {
+		   using namespace boost::property_tree;
+		   ptree pt;
+		   read_json( request->content, pt );
+
+		   std::string sId = pt.get<string>( "sId" );
+		   uint32_t accountId = pt.get<uint32_t>( "accountId" );
+		   std::string secret = pt.get<string>( "secret" );
+
+		   auto m_pConfig = new Core::XMLConfig();
+
+		   if( !m_pConfig->loadConfig( "config/settings_rest.xml" ) )
+		   {
+			   g_log.fatal( "Error loading config settings_rest.xml" );
+			   return 1;
+		   }
+
+		   if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) {
+			   std::string json_string = "{\"result\":\"invalid_secret\"}";
+			   *response << "HTTP/1.1 403\r\nContent-Length: " << json_string.length() << "\r\n\r\n" << json_string;
+		   }
+		   else
+		   {
+			   g_sapphireAPI.insertSession( accountId, sId );
+			   std::string json_string = "{\"result\":\"success\"}";
+			   *response << "HTTP/1.1 200\r\nContent-Length: " << json_string.length() << "\r\n\r\n" << json_string;
+		   }
+	   }
+	   catch( exception& e )
+	   {
+		   *response << "HTTP/1.1 500\r\n\r\n";
+		   g_log.error( e.what() );
+	   }
+
+   };
+
    server.resource["^/sapphire-api/lobby/checkNameTaken"]["POST"] = [&server]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
       print_request_info( request );
 
