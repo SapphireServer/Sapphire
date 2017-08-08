@@ -1,4 +1,4 @@
-bin
+﻿bin
 .vs
 ﻿*.dat
 *.suo
@@ -63,6 +63,7 @@ bin
 /Debug
 /bin/s
 /bin/initui_1121.cpp
+/src/libraries
 /lib/xiv_dat_lib/.vs
 /Server_Common/.vs
 /Server_Common/.vs
