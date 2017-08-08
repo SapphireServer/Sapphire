@@ -186,7 +186,7 @@ bool Core::ServerZone::loadSettings( int argc, char* argv[] )
 void Core::ServerZone::run( int argc, char* argv[] )
 {
    // TODO: add more error checks for the entire initialisation
-   g_log.setLogPath( "SapphireZone_" + std::to_string( m_serverId ) + "_" );
+   g_log.setLogPath( "log\\SapphireZone_" + std::to_string( m_serverId ) + "_" );
    g_log.init();
 
    g_log.info( "===========================================================" );
