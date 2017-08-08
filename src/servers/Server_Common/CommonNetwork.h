@@ -255,8 +255,8 @@ namespace Packets {
       DiscoveryHandler         = 0x0109,// updated for sb
 
       SkillHandler             = 0x010B, // updated for sb
-      GMCommand1               = 0x010D,// updated for sb
-      GMCommand2               = 0x010E,// updated for sb
+      GMCommand1               = 0x010C,// updated for sb
+      GMCommand2               = 0x010D,// updated for sb
       UpdatePositionHandler    = 0x010F, // updated for sb
 
       InventoryModifyHandler   = 0x0116, // updated for sb
