@@ -6,6 +6,8 @@
 #include <Server_Common/UtilMath.h>
 #include "Player.h"
 #include "Forwards.h"
+#include "Inventory.h"
+#include "Item.h"
 
 namespace Core {
    namespace Network {
@@ -45,7 +47,9 @@ namespace Core {
                   //m_data.tPMax = 3000;
                   m_data.level = pPlayer->getLevel();
                   memcpy( m_data.look, pPlayer->getLookArray(), 26 );
-                  m_data.mainWeaponModel = pPlayer->getModelMainWeapon();
+                  auto item = pPlayer->getInvetory()->getItemAt( Inventory::GearSet0, 0 );
+                  if( item )
+                     m_data.mainWeaponModel = item->getModelId1();
                   m_data.secWeaponModel = pPlayer->getModelSubWeapon();
                   m_data.models[0] = pPlayer->getModelForSlot( Inventory::EquipSlot::Head );
                   m_data.models[1] = pPlayer->getModelForSlot( Inventory::EquipSlot::Body );

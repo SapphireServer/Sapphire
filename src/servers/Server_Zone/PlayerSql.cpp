@@ -129,6 +129,8 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
 
    field[11].getBinary( reinterpret_cast< char* >( m_customize ), 26 );
 
+   m_modelMainWeapon = field[12].getUInt64();
+
    field[14].getBinary( reinterpret_cast< char* >( m_modelEquip ), 40 );
 
    m_guardianDeity = field[15].getUInt8();
