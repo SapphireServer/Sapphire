@@ -1,0 +1,148 @@
+-- MySQL dump 10.13  Distrib 5.7.13, for Win64 (x86_64)
+--
+-- Host: localhost    Database: sapphire
+-- ------------------------------------------------------
+-- Server version	5.7.13-log
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `discoveryinfo`
+--
+
+DROP TABLE IF EXISTS `discoveryinfo`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `discoveryinfo` (
+  `id` int(10) NOT NULL,
+  `map_id` int(3) NOT NULL,
+  `discover_id` int(3) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `discoveryinfo`
+--
+
+LOCK TABLES `discoveryinfo` WRITE;
+/*!40000 ALTER TABLE `discoveryinfo` DISABLE KEYS */;
+INSERT INTO `discoveryinfo` VALUES (-858993460,-858993460,-858993460);
+INSERT INTO `discoveryinfo` VALUES (1367775,4,2);
+INSERT INTO `discoveryinfo` VALUES (1367776,4,2);
+INSERT INTO `discoveryinfo` VALUES (1367777,4,2);
+INSERT INTO `discoveryinfo` VALUES (1367778,4,1);
+INSERT INTO `discoveryinfo` VALUES (1367779,4,2);
+INSERT INTO `discoveryinfo` VALUES (1367780,4,3);
+INSERT INTO `discoveryinfo` VALUES (1367785,4,3);
+INSERT INTO `discoveryinfo` VALUES (1367795,4,4);
+INSERT INTO `discoveryinfo` VALUES (1367798,4,1);
+INSERT INTO `discoveryinfo` VALUES (1367800,4,2);
+INSERT INTO `discoveryinfo` VALUES (2052662,4,7);
+INSERT INTO `discoveryinfo` VALUES (2052665,4,7);
+INSERT INTO `discoveryinfo` VALUES (2052668,4,8);
+INSERT INTO `discoveryinfo` VALUES (2052672,4,13);
+INSERT INTO `discoveryinfo` VALUES (2052682,4,9);
+INSERT INTO `discoveryinfo` VALUES (2052693,4,12);
+INSERT INTO `discoveryinfo` VALUES (2052695,4,12);
+INSERT INTO `discoveryinfo` VALUES (2052699,4,10);
+INSERT INTO `discoveryinfo` VALUES (2052703,4,11);
+INSERT INTO `discoveryinfo` VALUES (2052705,4,11);
+INSERT INTO `discoveryinfo` VALUES (2052710,4,6);
+INSERT INTO `discoveryinfo` VALUES (2052711,4,6);
+INSERT INTO `discoveryinfo` VALUES (2052712,4,6);
+INSERT INTO `discoveryinfo` VALUES (2052714,4,5);
+INSERT INTO `discoveryinfo` VALUES (2052715,4,5);
+INSERT INTO `discoveryinfo` VALUES (2052716,4,5);
+INSERT INTO `discoveryinfo` VALUES (2052721,4,5);
+INSERT INTO `discoveryinfo` VALUES (2052722,4,5);
+INSERT INTO `discoveryinfo` VALUES (2052730,4,11);
+INSERT INTO `discoveryinfo` VALUES (2465005,4,4);
+INSERT INTO `discoveryinfo` VALUES (2465008,4,6);
+INSERT INTO `discoveryinfo` VALUES (2465009,4,6);
+INSERT INTO `discoveryinfo` VALUES (2465010,4,2);
+INSERT INTO `discoveryinfo` VALUES (2465013,4,2);
+INSERT INTO `discoveryinfo` VALUES (2465018,4,13);
+INSERT INTO `discoveryinfo` VALUES (2465020,4,12);
+INSERT INTO `discoveryinfo` VALUES (2496289,4,5);
+INSERT INTO `discoveryinfo` VALUES (2652480,4,1);
+INSERT INTO `discoveryinfo` VALUES (2652487,4,1);
+INSERT INTO `discoveryinfo` VALUES (2652490,4,1);
+INSERT INTO `discoveryinfo` VALUES (3907879,4,1);
+INSERT INTO `discoveryinfo` VALUES (3907888,4,1);
+INSERT INTO `discoveryinfo` VALUES (3907899,4,2);
+INSERT INTO `discoveryinfo` VALUES (3907901,4,2);
+INSERT INTO `discoveryinfo` VALUES (3907902,4,2);
+INSERT INTO `discoveryinfo` VALUES (3907903,4,2);
+INSERT INTO `discoveryinfo` VALUES (3907908,4,2);
+INSERT INTO `discoveryinfo` VALUES (3907909,4,2);
+INSERT INTO `discoveryinfo` VALUES (3975004,15,1);
+INSERT INTO `discoveryinfo` VALUES (3975007,15,2);
+INSERT INTO `discoveryinfo` VALUES (3975010,15,3);
+INSERT INTO `discoveryinfo` VALUES (3975011,15,4);
+INSERT INTO `discoveryinfo` VALUES (3975013,15,5);
+INSERT INTO `discoveryinfo` VALUES (3975015,15,6);
+INSERT INTO `discoveryinfo` VALUES (3975016,15,7);
+INSERT INTO `discoveryinfo` VALUES (4161435,15,1);
+INSERT INTO `discoveryinfo` VALUES (4161439,15,3);
+INSERT INTO `discoveryinfo` VALUES (4161440,15,3);
+INSERT INTO `discoveryinfo` VALUES (4161442,15,3);
+INSERT INTO `discoveryinfo` VALUES (4161449,15,4);
+INSERT INTO `discoveryinfo` VALUES (4161454,15,6);
+INSERT INTO `discoveryinfo` VALUES (4161456,15,6);
+INSERT INTO `discoveryinfo` VALUES (4161457,15,6);
+INSERT INTO `discoveryinfo` VALUES (4164846,18,2);
+INSERT INTO `discoveryinfo` VALUES (4164858,18,1);
+INSERT INTO `discoveryinfo` VALUES (4164861,18,1);
+INSERT INTO `discoveryinfo` VALUES (4164900,18,3);
+INSERT INTO `discoveryinfo` VALUES (4164905,18,3);
+INSERT INTO `discoveryinfo` VALUES (4164911,18,4);
+INSERT INTO `discoveryinfo` VALUES (4164912,18,4);
+INSERT INTO `discoveryinfo` VALUES (4164914,18,4);
+INSERT INTO `discoveryinfo` VALUES (4164917,18,5);
+INSERT INTO `discoveryinfo` VALUES (4164923,18,6);
+INSERT INTO `discoveryinfo` VALUES (4164924,18,7);
+INSERT INTO `discoveryinfo` VALUES (4164926,18,10);
+INSERT INTO `discoveryinfo` VALUES (4164929,18,7);
+INSERT INTO `discoveryinfo` VALUES (4164931,18,8);
+INSERT INTO `discoveryinfo` VALUES (4164934,18,8);
+INSERT INTO `discoveryinfo` VALUES (4164937,18,9);
+INSERT INTO `discoveryinfo` VALUES (4164938,18,9);
+INSERT INTO `discoveryinfo` VALUES (4164940,18,10);
+INSERT INTO `discoveryinfo` VALUES (4164942,18,11);
+INSERT INTO `discoveryinfo` VALUES (4164944,18,11);
+INSERT INTO `discoveryinfo` VALUES (4164945,18,12);
+INSERT INTO `discoveryinfo` VALUES (4164947,18,13);
+INSERT INTO `discoveryinfo` VALUES (4164953,18,17);
+INSERT INTO `discoveryinfo` VALUES (4164955,18,18);
+INSERT INTO `discoveryinfo` VALUES (4164956,18,18);
+INSERT INTO `discoveryinfo` VALUES (4164957,18,18);
+INSERT INTO `discoveryinfo` VALUES (4164958,18,19);
+INSERT INTO `discoveryinfo` VALUES (4242609,15,1);
+INSERT INTO `discoveryinfo` VALUES (4242610,15,1);
+INSERT INTO `discoveryinfo` VALUES (4248537,53,17);
+INSERT INTO `discoveryinfo` VALUES (4665752,18,11);
+INSERT INTO `discoveryinfo` VALUES (416144215,1,-858993460);
+INSERT INTO `discoveryinfo` VALUES (416494218,10,-858993460);
+/*!40000 ALTER TABLE `discoveryinfo` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2016-12-09 17:37:13

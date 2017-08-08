@@ -1,0 +1,158 @@
+body
+{
+	font-family: Verdana;
+	font-size: 10pt;
+	line-height: 14pt;
+	height: 100%;
+}
+
+
+div.contentContainer {    
+    width: 50%;
+    float: left;
+}
+
+
+div.info
+{
+	width: 320px;
+	height: 100%;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+	padding: 20px;
+	background-color: lightgrey;
+}
+
+div.infoFooter
+{
+	width: 400px;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: right;
+	padding: 5px;
+}
+
+div.edit
+{
+	width: 50%;
+	min-width: 600px;
+	margin-top: 20px;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+	padding: 20px;
+	background-color: lightgrey;
+}
+
+div.inner
+{
+	position: relative;
+	max-width: 1250px;
+	margin: 0px auto;
+}
+
+h1
+{
+	line-height: 23px;
+	font-size: 23px;
+	padding: 5px 0px;
+}
+
+h2
+{
+	line-height: 17px;
+	font-size: 14px;
+	font-weight: bold;
+	padding: 5px;
+}
+
+h3
+{
+	line-height: 14px;
+	font-size: 12px;
+	font-weight: bold;
+	padding: 5px;
+}
+
+header.top
+{
+	padding: 20px 0px;
+	background: none repeat scroll 0% 0% lavender;
+	position: relative;
+	z-index: 999;
+}
+
+table.center
+{
+	margin-left: auto;
+	margin-right: auto;
+}
+
+table.infoForm
+{
+	width: 100%;
+}
+
+table.editForm
+{
+	width: 100%;
+}
+
+table.editForm input
+{
+	width: 100%;
+}
+
+table.editForm select
+{
+	width: 100%;
+}
+
+td
+{
+	padding: 3px;
+}
+
+th
+{
+	padding: 3px;
+	text-decoration: underline;
+}
+
+p
+{
+	padding: 2px;
+}
+
+p.errorMessage
+{
+	color: darkred;
+	font-weight: bold;
+}
+
+p.pageTitle
+{
+	font-weight: bold;
+	font-size: 28px;
+	line-height: 20px;
+	padding: 0px 0px;
+}
+
+p.pageTitle a
+{
+	text-decoration: none;
+	color: black;
+}
+
+p.pageSubTitle
+{
+	font-size: 10px;
+	line-height: 18px;
+	padding: 0px 0px;
+}
+
+#recaptcha_area
+{
+    margin: 0 auto;
+}

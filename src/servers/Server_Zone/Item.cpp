@@ -1,0 +1,105 @@
+#include <Server_Common/Common.h>
+#include <Server_Common/ExdData.h>
+#include "Item.h"
+
+extern Core::Data::ExdData g_exdData;
+
+Core::Item::Item()
+{
+
+}
+
+Core::Item::Item( uint32_t catalogId ) :
+   m_id( catalogId ),
+   m_isHq( false )
+{
+
+}
+
+Core::Item::Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, Common::ItemCategory categoryId, bool isHq ) :
+   m_id( catalogId ),
+   m_uId( uId ),
+   m_category( categoryId ),
+   m_model1( model1 ),
+   m_model2( model2 ),
+   m_isHq( isHq )
+{
+   auto itemInfo = g_exdData.getItemInfo( catalogId );
+   m_delayMs = itemInfo->delayMs;
+}
+
+Core::Item::~Item()
+{
+
+}
+
+uint16_t Core::Item::getDelay() const
+{
+   return m_delayMs;
+}
+
+uint32_t Core::Item::getId() const
+{
+   return m_id;
+}
+
+void Core::Item::setId( uint32_t id )
+{
+   m_id = id;
+}
+
+uint64_t Core::Item::getUId() const
+{
+   return m_uId;
+}
+
+void Core::Item::setUId( uint64_t id )
+{
+   m_uId = id;
+}
+
+void Core::Item::setStackSize( uint32_t size )
+{
+   m_stackSize = size;
+}
+
+uint32_t Core::Item::getStackSize() const
+{
+   return m_stackSize;
+}
+
+void Core::Item::setCategory( Common::ItemCategory categoryId )
+{
+   m_category = categoryId;
+}
+
+Core::Common::ItemCategory Core::Item::getCategory() const
+{
+   return m_category;
+}
+
+void Core::Item::setModelIds( uint64_t model1, uint64_t model2 )
+{
+   m_model1 = model1;
+   m_model2 = model2;
+}
+
+uint64_t Core::Item::getModelId1() const
+{
+   return m_model1;
+}
+
+uint64_t Core::Item::getModelId2() const
+{
+   return m_model2;
+}
+
+bool Core::Item::isHq() const
+{
+   return m_isHq;
+}
+
+void Core::Item::setHq( bool isHq )
+{
+   m_isHq = isHq;
+}
