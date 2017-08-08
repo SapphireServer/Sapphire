@@ -14,7 +14,7 @@
 	  <!-- Secret used for server auth -->
       <ServerSecret>default</ServerSecret>
      <!-- Web server port -->
-     <HttpPort>8080</HttpPort>
+     <HttpPort>80</HttpPort>
       <Mysql>
          <Host>127.0.0.1</Host>
          <Port>3306</Port>
