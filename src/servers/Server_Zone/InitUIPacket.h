@@ -68,6 +68,7 @@ private:
 
       memcpy( m_data.howto, player->getHowToArray(), sizeof( m_data.howto ) );
 
+	  m_data.expansion = 2;
 
       //memset( m_data.unlockBitmask, 0xFF, sizeof( m_data.unlockBitmask )  );
       //memset( m_data.unknown_0344, 0xFF, sizeof( m_data.unknown_0344 ) );
