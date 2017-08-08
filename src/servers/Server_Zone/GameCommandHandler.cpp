@@ -226,10 +226,10 @@ void Core::GameCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlayer
       int32_t pos_id;
       sscanf( params.c_str(), "%i %i %i", &pos_id, &map_id, &discover_id );
 
-      std::string query2 = "UPDATE IGNORE `dbdiscoveryref` SET `discover_id` = '" + std::to_string( discover_id ) +
-         "' WHERE `dbdiscoveryref`.`id` = " + std::to_string( pos_id ) + ";";
+      std::string query2 = "UPDATE IGNORE `discoveryinfo` SET `discover_id` = '" + std::to_string( discover_id ) +
+         "' WHERE `discoveryinfo`.`id` = " + std::to_string( pos_id ) + ";";
 
-      std::string query1 = "INSERT IGNORE INTO `dbdiscoveryref` (`id`, `map_id`, `discover_id`) VALUES ('" + std::to_string( pos_id ) +
+      std::string query1 = "INSERT IGNORE INTO `discoveryinfo` (`id`, `map_id`, `discover_id`) VALUES ('" + std::to_string( pos_id ) +
          "', '" + std::to_string( map_id ) +
          "', '" + std::to_string( discover_id ) + "')";
 
