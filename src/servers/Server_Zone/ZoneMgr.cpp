@@ -26,7 +26,7 @@ namespace Core {
    void ZoneMgr::loadZonePositionMap()
    {
       auto pQR = g_database.query( "SELECT id, target_zone_id, pos_x, pos_y, pos_z, pos_o, radius " \
-                                   "FROM dbzonepositions;" );
+                                   "FROM zonepositions;" );
 
       if( !pQR )
          return;
