@@ -521,6 +521,88 @@ int main()
 
    };
 
+   server.resource["^(/frontier-api/ffxivsupport/view/get_init)(.*)"]["GET"] = [&server]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
+	   print_request_info( request );
+
+	   try
+	   {
+		   auto web_root_path = boost::filesystem::canonical( "web" );
+		   auto path = boost::filesystem::canonical( web_root_path / "news.xml" );
+		   //Check if path is within web_root_path
+		   if( distance( web_root_path.begin(), web_root_path.end() ) > distance( path.begin(), path.end() ) ||
+			   !equal( web_root_path.begin(), web_root_path.end(), path.begin() ) )
+			   throw invalid_argument( "path must be within root path" );
+		   if( !( boost::filesystem::exists( path ) && boost::filesystem::is_regular_file( path ) ) )
+			   throw invalid_argument( "file does not exist" );
+
+		   std::string cache_control, etag;
+
+		   // Uncomment the following line to enable Cache-Control
+		   // cache_control="Cache-Control: max-age=86400\r\n";
+
+		   auto ifs = make_shared<ifstream>();
+		   ifs->open( path.string(), ifstream::in | ios::binary | ios::ate );
+
+		   if( *ifs )
+		   {
+			   auto length = ifs->tellg();
+			   ifs->seekg( 0, ios::beg );
+
+			   *response << "HTTP/1.1 200 OK\r\n" << cache_control << etag << "Content-Length: " << length << "\r\n\r\n";
+			   default_resource_send( server, response, ifs );
+		   }
+		   else
+			   throw invalid_argument( "could not read file" );
+	   }
+	   catch( exception& e )
+	   {
+		   *response << "HTTP/1.1 500\r\n\r\n";
+		   g_log.error( e.what() );
+	   }
+
+   };
+
+   server.resource["^(/frontier-api/ffxivsupport/information/get_headline_all)(.*)"]["GET"] = [&server]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
+	   print_request_info( request );
+
+	   try
+	   {
+		   auto web_root_path = boost::filesystem::canonical( "web" );
+		   auto path = boost::filesystem::canonical( web_root_path / "headlines.xml" );
+		   //Check if path is within web_root_path
+		   if( distance( web_root_path.begin(), web_root_path.end() ) > distance( path.begin(), path.end() ) ||
+			   !equal( web_root_path.begin(), web_root_path.end(), path.begin() ) )
+			   throw invalid_argument( "path must be within root path" );
+		   if( !( boost::filesystem::exists( path ) && boost::filesystem::is_regular_file( path ) ) )
+			   throw invalid_argument( "file does not exist" );
+
+		   std::string cache_control, etag;
+
+		   // Uncomment the following line to enable Cache-Control
+		   // cache_control="Cache-Control: max-age=86400\r\n";
+
+		   auto ifs = make_shared<ifstream>();
+		   ifs->open( path.string(), ifstream::in | ios::binary | ios::ate );
+
+		   if( *ifs )
+		   {
+			   auto length = ifs->tellg();
+			   ifs->seekg( 0, ios::beg );
+
+			   *response << "HTTP/1.1 200 OK\r\n" << cache_control << etag << "Content-Length: " << length << "\r\n\r\n";
+			   default_resource_send( server, response, ifs );
+		   }
+		   else
+			   throw invalid_argument( "could not read file" );
+	   }
+	   catch( exception& e )
+	   {
+		   *response << "HTTP/1.1 500\r\n\r\n";
+		   g_log.error( e.what() );
+	   }
+
+   };
+
    //Default GET-example. If no other matches, this anonymous function will be called. 
    //Will respond with content in the web/-directory, and its subdirectories.
    //Default file: index.html

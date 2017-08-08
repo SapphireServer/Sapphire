@@ -12,7 +12,7 @@
       <!-- Port the world server listens for clients -->
       <ZonePort>54992</ZonePort>      
       <!-- Address to connect to the rest server -->
-	  <RestHost>127.0.0.1:8080</RestHost>      
+	  <RestHost>127.0.0.1:80</RestHost>      
       <!-- Secret for server authentication -->
 	  <ServerSecret>default</ServerSecret>      
       <!-- Connection settings for the mysql db -->
