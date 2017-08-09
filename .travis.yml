@@ -1,5 +1,6 @@
 language: c++
 sudo: enabled
+dist: precise
 before_install:
   - dpkg --get-selections | grep hold
   - sudo apt-get clean -qq
