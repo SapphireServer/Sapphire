@@ -181,7 +181,7 @@ public:
 
    bool isMob() const;
 
-   std::set< ActorPtr > getInRangeActors() const;
+   std::set< ActorPtr > getInRangeActors( bool includeSelf = false );
 
    bool face( const Common::FFXIVARR_POSITION3& p );
 
