@@ -639,7 +639,7 @@ namespace Core {
          Cutscene,
          ChocoPorter,
          Afk,
-		 CameraMode,
+         CameraMode,
          LfRepairs,
          LfRepair,
          LfMeld,
