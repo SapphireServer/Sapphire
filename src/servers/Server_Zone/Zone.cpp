@@ -226,14 +226,14 @@ uint8_t Zone::getNextWeather()
 {
    auto zoneInfo = g_exdData.m_zoneInfoMap[ getLayoutId() ];
 
-   uint32_t unix = static_cast< uint32_t >( time( nullptr ) );
+   uint32_t unixTime = static_cast< uint32_t >( time( nullptr ) );
    // Get Eorzea hour for weather start
-   uint32_t bell = unix / 175;
+   uint32_t bell = unixTime / 175;
    // Do the magic 'cause for calculations 16:00 is 0, 00:00 is 8 and 08:00 is 16
    int32_t increment = ( ( bell + 8 - ( bell % 8 ) ) ) % 24;
 
    // Take Eorzea days since unix epoch
-   uint32_t totalDays = ( unix / 4200 );
+   uint32_t totalDays = ( unixTime / 4200 );
 
    uint32_t calcBase = ( totalDays * 0x64 ) + increment;
 
