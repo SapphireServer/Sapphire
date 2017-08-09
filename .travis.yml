@@ -1,0 +1,28 @@
+language: c++
+sudo: enabled
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq libboost-all-dev:i368 libmysqlclient-dev:i368
+  
+compiler:
+  - gcc
+  
+install:
+  - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
+  - mkdir ${DEPS_DIR} && cd ${DEPS_DIR}
+  
+  - |
+    if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
+      CMAKE_URL="http://www.cmake.org/files/v3.3/cmake-3.3.2-Linux-x86_64.tar.gz"
+      mkdir cmake && travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
+      export PATH=${DEPS_DIR}/cmake/bin:${PATH}
+    fi
+  
+  # Go to the Root directory  
+  - cd ..
+
+# Build steps
+script:
+  - mkdir build
+  - cd build
+  - ${DEPS_DIR}/cmake/bin/cmake .. && make

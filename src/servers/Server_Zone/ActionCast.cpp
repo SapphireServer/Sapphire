@@ -9,6 +9,7 @@
 #include "ActorControlPacket142.h"
 #include "ActorControlPacket143.h"
 #include "Player.h"
+#include "ScriptManager.h"
 
 using namespace Core::Common;
 using namespace Core::Network;
@@ -17,6 +18,7 @@ using namespace Core::Network::Packets::Server;
 
 extern Core::Data::ExdData g_exdData;
 extern Core::Logger g_log;
+extern Core::Scripting::ScriptManager g_scriptMgr;
 
 Core::Action::ActionCast::ActionCast()
 {
@@ -89,6 +91,8 @@ void Core::Action::ActionCast::onFinish()
 
    pPlayer->sendToInRangeSet( effectPacket, true );
    m_pTarget->takeDamage( 30 );
+
+   g_scriptMgr.onCastFinish( pPlayer, m_pTarget, m_id );
 }
 
 void Core::Action::ActionCast::onInterrupt()
