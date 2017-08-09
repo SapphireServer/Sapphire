@@ -232,6 +232,10 @@ namespace Packets {
 
       FinishLoadingHandler     = 0x0069,// updated for sb
 
+      CFCommenceHandler        = 0x006F,
+      CFRegisterDuty           = 0x0071,
+      CFRegisterRoulette       = 0x0072,
+
       PlayTimeHandler          = 0x0073,// updated for sb
       LogoutHandler            = 0x0074,// updated for sb
 
