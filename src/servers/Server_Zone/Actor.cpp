@@ -14,6 +14,7 @@
 #include "UpdateHpMpTpPacket.h"
 
 #include "StatusEffectContainer.h"
+#include "StatusEffect.h"
 #include "ServerZone.h"
 #include "Session.h"
 #include "Player.h"
@@ -601,5 +602,12 @@ void Core::Entity::Actor::autoAttack( ActorPtr pTarget )
 void Core::Entity::Actor::addStatusEffect( StatusEffect::StatusEffectPtr pEffect )
 {
    m_pStatusEffectContainer->addStatusEffect( pEffect );
+}
+
+/*! \param StatusEffectPtr to be applied to the actor */
+void Core::Entity::Actor::addStatusEffectById( int32_t id, int32_t duration )
+{
+   StatusEffect::StatusEffectPtr effect( new StatusEffect::StatusEffect( id, shared_from_this(), shared_from_this(), duration, 3000 ) );
+   addStatusEffect( effect );
 }
 

@@ -1,0 +1,18 @@
+// Skill Name: Sprint
+// Skill ID: 3
+
+class skillDef_3Def
+{
+    def skillDef_3Def()
+    {
+
+    }
+
+    def onFinish( player, target )
+    {
+        player.addStatusEffectById(50, 20000);
+    }
+
+};
+
+GLOBAL skillDef_3 = skillDef_3Def();
