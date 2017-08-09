@@ -62,9 +62,14 @@ bool Core::Entity::Actor::isMob() const
 }
 
 /*! \return list of actors currently in range */
-std::set< Core::Entity::ActorPtr > Core::Entity::Actor::getInRangeActors() const
+std::set< Core::Entity::ActorPtr > Core::Entity::Actor::getInRangeActors( bool includeSelf )
 {
-   return m_inRangeActors;
+    auto tempInRange = m_inRangeActors;
+
+    if( includeSelf )
+        tempInRange.insert( shared_from_this() );
+
+    return tempInRange;
 }
 
 /*! \return current stance of the actors */

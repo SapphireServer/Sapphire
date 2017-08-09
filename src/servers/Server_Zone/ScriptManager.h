@@ -50,6 +50,8 @@ namespace Core
 
          bool onMobKill( Entity::PlayerPtr pPlayer, uint16_t nameId );
 
+         bool onCastFinish( Entity::PlayerPtr pPlayer, Entity::ActorPtr pTarget, uint32_t actionId );
+
          bool onZoneInit( ZonePtr pZone );
          
          bool onEventHandlerReturn( Entity::PlayerPtr pPlayer, uint32_t eventId, uint16_t subEvent, uint16_t param1, uint16_t param2, uint16_t param3 );

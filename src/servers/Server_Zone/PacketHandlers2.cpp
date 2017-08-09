@@ -62,7 +62,7 @@ void Core::Network::GameConnection::skillHandler( Core::Network::Packets::GamePa
    {
       std::string actionIdStr = boost::str( boost::format( "%|04X|" ) % action );
       pPlayer->sendDebug( "---------------------------------------" );
-      pPlayer->sendDebug( "ActionHandler ( " + actionIdStr + " | " + g_exdData.m_actionInfoMap[action].name + " )" );
+      pPlayer->sendDebug( "ActionHandler ( " + actionIdStr + " | " + g_exdData.m_actionInfoMap[action].name + " | " + std::to_string( targetId ) + " )" );
 
       if( action == 5 )
       {
@@ -76,7 +76,7 @@ void Core::Network::GameConnection::skillHandler( Core::Network::Packets::GamePa
       {
          Core::Entity::ActorPtr targetActor;
 
-         auto inRange = pPlayer->getInRangeActors();
+         auto inRange = pPlayer->getInRangeActors( true );
          for( auto actor : inRange )
          {
             if( actor->getId() == targetId )
