@@ -384,6 +384,14 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
    // only initialize the UI if the player in fact just logged in.
    if( isLogin() )
    {
+      GamePacketNew< FFXIVIpcCFAvailableContents > contentFinderList( getId() );
+      for( auto i = 0; i < 72; i++ )
+      {
+         // unlock all contents for now
+         contentFinderList.data().contents[i] = 0xFF;
+      }
+      queuePacket( contentFinderList );
+
       Server::InitUIPacket initUIPacket( pPlayer );
       queuePacket( initUIPacket );
 
@@ -702,8 +710,8 @@ uint8_t Core::Entity::Player::getLevel() const
 
 uint8_t Core::Entity::Player::getLevelForClass( Core::Common::ClassJob pClass ) const
 {
-	uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( pClass )].exp_idx;
-	return static_cast< uint8_t >( m_classArray[classJobIndex] );
+   uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( pClass )].exp_idx;
+   return static_cast< uint8_t >( m_classArray[classJobIndex] );
 }
 
 uint32_t Core::Entity::Player::getExp() const
