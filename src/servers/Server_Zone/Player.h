@@ -231,6 +231,8 @@ public:
    //////////////////////////////////////////////////////////////////////////////////////////////////////
    /*! returns the level of the currently active class / job */
    uint8_t getLevel() const override;
+   /*! returns the level of the provided class / job */
+   uint8_t getLevelForClass( Core::Common::ClassJob pClass ) const;
    /*! returns the exp of the currently active class / job */
    uint32_t getExp() const;
    /*! sets the exp of the currently active class / job */
@@ -241,6 +243,8 @@ public:
    void gainLevel();
    /*! set level on the currently active class / job to given level */
    void setLevel( uint8_t level );
+   /*! set level on the provided class / job to given level */
+   void setLevelForClass( uint8_t level, Core::Common::ClassJob classjob );
    /*! change class or job to given class / job */
    void setClassJob( Core::Common::ClassJob classJob );
    /*! returns a pointer to the class array */

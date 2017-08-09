@@ -642,6 +642,8 @@ void Core::Network::GameConnection::zoneLineHandler( Core::Network::Packets::Gam
 {
    uint32_t zoneLineId = pInPacket->getValAt< uint32_t >( 0x20 );
 
+   pPlayer->sendDebug( "Walking ZoneLine " + std::to_string( zoneLineId ) );
+
    auto pZone = pPlayer->getCurrentZone();
 
    auto pLine = g_zoneMgr.getZonePosition( zoneLineId );
@@ -652,7 +654,7 @@ void Core::Network::GameConnection::zoneLineHandler( Core::Network::Packets::Gam
 
    if( pLine != nullptr )
    {
-      g_log.debug( "ZoneLine " + std::to_string( zoneLineId ) + " found." );
+      pPlayer->sendDebug( "ZoneLine " + std::to_string( zoneLineId ) + " found." );
       targetPos = pLine->getTargetPosition();
       targetZone = pLine->getTargetZoneId();
       rotation = pLine->getTargetRotation();
@@ -667,7 +669,7 @@ void Core::Network::GameConnection::zoneLineHandler( Core::Network::Packets::Gam
    else
    {
       // No zoneline found, revert to last zone
-      g_log.debug( "ZoneLine " + std::to_string( zoneLineId ) + " not found." );
+      pPlayer->sendUrgent( "ZoneLine " + std::to_string( zoneLineId ) + " not found." );
       targetPos.x = 0;
       targetPos.y = 0;
       targetPos.z = 0;

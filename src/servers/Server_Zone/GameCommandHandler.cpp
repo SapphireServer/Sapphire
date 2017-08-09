@@ -243,6 +243,22 @@ void Core::GameCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlayer
       pPlayer->resetDiscovery();
       pPlayer->queuePacket( Network::Packets::Server::InitUIPacket( pPlayer ) );
    }
+   else if( subCommand == "classjob" )
+   {
+       int32_t id;
+
+       sscanf( params.c_str(), "%d", &id );
+
+       g_log.debug( std::to_string( pPlayer->getLevelForClass( static_cast<Core::Common::ClassJob> ( id ) ) ) );
+
+       if( pPlayer->getLevelForClass( static_cast<Core::Common::ClassJob> ( id ) ) == 0 )
+       {
+           pPlayer->setLevelForClass( 1, static_cast<Core::Common::ClassJob> ( id ) );
+           pPlayer->setClassJob( static_cast<Core::Common::ClassJob> ( id ) );
+       }
+       else
+           pPlayer->setClassJob( static_cast<Core::Common::ClassJob> ( id ) );
+   }
 
 
 }
