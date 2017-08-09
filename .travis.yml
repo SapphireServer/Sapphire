@@ -2,7 +2,7 @@ language: c++
 sudo: enabled
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -qq libboost-all-dev:i368 libmysqlclient-dev:i368
+  - sudo apt-get install -qq libboost-all-dev:i386 libmysqlclient-dev:i386
   
 compiler:
   - gcc
