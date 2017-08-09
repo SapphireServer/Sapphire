@@ -161,7 +161,7 @@ namespace Packets {
       NpcSpawn                   = 0x0111, // updated for sb
       ActorMove                  = 0x0112, // updated for sb
       HateList                   = 0x011A, // updated for sb borked
-      UpdateClassInfo            = 0x0117,
+      UpdateClassInfo            = 0x011D, // updated for sb
       InitUI                     = 0x011E, // updated for sb
       PlayerStats                = 0x011F, // updated for sb
       ActorOwner                 = 0x0120, // updated for sb
