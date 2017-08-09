@@ -1309,7 +1309,7 @@ struct FFXIVIpcPrepareZoning : FFXIVIpcBasePacket<PrepareZoning>
 struct FFXIVIpcCFNotify : FFXIVIpcBasePacket<CFNotify>
 {
     uint32_t state1; // 3 = cancelled, 4 = duty ready
-    uint32_t state2; // if state1 == 3, state2 is cancelled reason
+    uint32_t param; // if state1 == 3, state2 is cancelled reason
 
     uint8_t classJob; // classJobId you registered
     uint8_t unknown0[3];
@@ -1353,6 +1353,14 @@ struct FFXIVIpcCFDutyInfo : FFXIVIpcBasePacket<CFDutyInfo>
 {
     uint8_t penaltyTime;
     uint8_t unknown[7];
+};
+
+struct FFXIVIpcCFRegisterDuty : FFXIVIpcBasePacket<CFRegisterDuty>
+{
+    uint32_t unknown0; // 0x301
+    uint8_t rouletteId; // if it's a daily roulette
+    uint8_t unknown1; // 0xDB
+    uint16_t contentId;
 };
 
 
