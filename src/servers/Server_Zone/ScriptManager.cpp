@@ -375,6 +375,27 @@ bool Core::Scripting::ScriptManager::onMobKill( Entity::PlayerPtr pPlayer, uint1
    return true;
 }
 
+bool Core::Scripting::ScriptManager::onCastFinish( Entity::PlayerPtr pPlayer, Entity::ActorPtr pTarget, uint32_t actionId )
+{
+    std::string eventName = "onFinish";
+
+    try 
+    {
+        auto obj = m_pChaiHandler->eval( "skillDef_" + std::to_string( actionId ) );
+        std::string objName = "skillDef_" + std::to_string( actionId );
+
+        pPlayer->sendDebug( "Calling: " + objName + "." + eventName );
+        auto fn = m_pChaiHandler->eval< std::function< void( chaiscript::Boxed_Value &, Entity::Player& ) > >( eventName );
+        fn( obj, *pPlayer );
+    }
+    catch( std::exception& e )
+    {
+        pPlayer->sendUrgent( e.what() );
+    }
+
+    return true;
+}
+
 bool Core::Scripting::ScriptManager::onZoneInit( ZonePtr pZone )
 {
    std::string eventName = "onZoneInit_" + pZone->getInternalName();
