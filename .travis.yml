@@ -5,6 +5,8 @@ dist: trusty
 addons:
         apt:
           packages: &trusty_pocl_packages
+		    - libboost-all-dev:i386
+			- libmysqlclient-dev:i386
           sources: &trusty_pocl_sources
             - ubuntu-toolchain-r-test
   
