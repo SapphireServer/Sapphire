@@ -700,6 +700,12 @@ uint8_t Core::Entity::Player::getLevel() const
    return static_cast< uint8_t >( m_classArray[classJobIndex] );
 }
 
+uint8_t Core::Entity::Player::getLevelForClass( Core::Common::ClassJob pClass ) const
+{
+	uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( pClass )].exp_idx;
+	return static_cast< uint8_t >( m_classArray[classJobIndex] );
+}
+
 uint32_t Core::Entity::Player::getExp() const
 {
    uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( getClass() )].exp_idx;
@@ -753,6 +759,14 @@ void Core::Entity::Player::setLevel( uint8_t level )
    m_classArray[classJobIndex] = level;
 
    setSyncFlag( PlayerSyncFlags::ExpLevel );
+}
+
+void Core::Entity::Player::setLevelForClass( uint8_t level, Core::Common::ClassJob classjob )
+{
+    uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( classjob )].exp_idx;
+    m_classArray[classJobIndex] = level;
+
+    setSyncFlag( PlayerSyncFlags::ExpLevel );
 }
 
 uint8_t Core::Entity::Player::getUserLevel() const
