@@ -1,8 +1,11 @@
 language: c++
 sudo: enabled
+dist: precise
 before_install:
+  - dpkg --get-selections | grep hold
+  - sudo apt-get clean -qq
   - sudo apt-get update -qq
-  - sudo apt-get install -qq libboost-all-dev:i368 libmysqlclient-dev:i368
+  - sudo apt-get install -qq libboost-all-dev:i386 libmysqlclient-dev:i386
   
 compiler:
   - gcc
@@ -18,10 +21,10 @@ install:
       export PATH=${DEPS_DIR}/cmake/bin:${PATH}
     fi
   
-  # Go to the Root directory  
+  # Go to the Root directory
   - cd ..
 
-# Build steps
+# Build
 script:
   - mkdir build
   - cd build
