@@ -11,6 +11,7 @@
 #include "EventHelper.h"
 
 #include "ServerNoticePacket.h"
+#include "StatusEffect.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/shared_ptr.hpp>
@@ -32,6 +33,8 @@ int Core::Scripting::ScriptManager::init()
    m_pChaiHandler->add( chaiscript::fun( &Entity::Actor::getTp ), "getTp" );
    m_pChaiHandler->add( chaiscript::fun( &Entity::Actor::getLevel ), "getLevel" );
    m_pChaiHandler->add( chaiscript::fun( &Entity::Actor::getTargetId ), "getTargetId" );
+   m_pChaiHandler->add( chaiscript::fun( &Entity::Actor::addStatusEffect ), "addStatusEffect" );
+   m_pChaiHandler->add( chaiscript::fun( &Entity::Actor::addStatusEffectById ), "addStatusEffectById" );
 
    m_pChaiHandler->add( chaiscript::fun( &Entity::Player::forceZoneing ), "setZone" );
    m_pChaiHandler->add( chaiscript::fun( &Entity::Player::getClassAsInt ), "getClass" );
@@ -152,6 +155,7 @@ int Core::Scripting::ScriptManager::init()
    m_pChaiHandler->add( chaiscript::user_type< Entity::Actor >(), "Actor" );
    m_pChaiHandler->add( chaiscript::user_type< Entity::Player >(), "Player" );
    m_pChaiHandler->add( chaiscript::user_type< Entity::BattleNpc >(), "BattleNpc" );
+   m_pChaiHandler->add( chaiscript::user_type< StatusEffect::StatusEffect >(), "StatusEffect" );
 
    m_pChaiHandler->add( chaiscript::user_type< Zone >(), "Zone" );
    m_pChaiHandler->add( chaiscript::fun( &Zone::getName ), "getName" );

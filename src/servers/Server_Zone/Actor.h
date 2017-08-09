@@ -289,6 +289,9 @@ public:
    // add a status effect
    void addStatusEffect( StatusEffect::StatusEffectPtr pEffect );
 
+   // add a status effect by id
+   void addStatusEffectById( int32_t id, int32_t duration );
+
    // TODO: Why did i even declare them publicly here?!
    std::set< ActorPtr >            m_inRangeActors;
    std::set< PlayerPtr >           m_inRangePlayers;
