@@ -1,11 +1,12 @@
 language: c++
 sudo: enabled
-dist: precise
-before_install:
-  - dpkg --get-selections | grep hold
-  - sudo apt-get clean -qq
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq libboost-all-dev:i386 libmysqlclient-dev:i386
+os: linux
+dist: trusty
+addons:
+        apt:
+          packages: &trusty_pocl_packages
+          sources: &trusty_pocl_sources
+            - ubuntu-toolchain-r-test
   
 compiler:
   - gcc
