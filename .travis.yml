@@ -22,7 +22,7 @@ install:
       export PATH=${DEPS_DIR}/cmake/bin:${PATH}
     fi
   
-  # Go to the Root directory
+  # Go to the Root directoryasdasd
   - cd ..
 
 # Build
