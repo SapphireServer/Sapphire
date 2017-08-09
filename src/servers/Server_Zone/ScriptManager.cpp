@@ -385,8 +385,8 @@ bool Core::Scripting::ScriptManager::onCastFinish( Entity::PlayerPtr pPlayer, En
         std::string objName = "skillDef_" + std::to_string( actionId );
 
         pPlayer->sendDebug( "Calling: " + objName + "." + eventName );
-        auto fn = m_pChaiHandler->eval< std::function< void( chaiscript::Boxed_Value &, Entity::Player& ) > >( eventName );
-        fn( obj, *pPlayer );
+        auto fn = m_pChaiHandler->eval< std::function< void( chaiscript::Boxed_Value &, Entity::Player&, Entity::Actor& ) > >( eventName );
+        fn( obj, *pPlayer, *pTarget );
     }
     catch( std::exception& e )
     {
