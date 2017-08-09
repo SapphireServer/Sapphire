@@ -3,7 +3,7 @@ sudo: enabled
 before_install:
   - sudo add-apt-repository universe
   - sudo apt-get update 
-  - sudo apt-get install libboost-all-dev:i386 libmysqlclient-dev:i386
+  - sudo apt-get install libboost-all-dev libmysqlclient-dev
   
 compiler:
   - gcc
