@@ -1372,7 +1372,8 @@ struct FFXIVIpcCFMemberStatus : FFXIVIpcBasePacket<CFMemberStatus>
    uint8_t currentTank;
    uint8_t currentDps;
    uint8_t currentHealer;
-   uint32_t unknown2;
+   uint8_t estimatedTime;
+   uint8_t unknown2[3];
    uint32_t unknown3;
 };
 
