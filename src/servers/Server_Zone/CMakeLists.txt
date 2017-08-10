@@ -15,7 +15,7 @@ set(Boost_USE_STATIC_LIBS ON)
 if(UNIX)
   include_directories("/usr/include/mysql/")
   message(STATUS "Setting GCC flags")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -m32")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
   
   find_package(Boost ${SAPPHIRE_BOOST_VER} COMPONENTS log log_setup thread date_time filesystem system)
   if(Boost_FOUND)
