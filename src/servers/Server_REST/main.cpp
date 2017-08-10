@@ -21,6 +21,7 @@
 #include <fstream>
 #include <string>
 #include <boost/filesystem.hpp>
+#include <boost/make_shared.hpp>
 #include <vector>
 #include <algorithm>
 
@@ -43,35 +44,100 @@ typedef SimpleWeb::Client<SimpleWeb::HTTP> HttpClient;
 void default_resource_send( const HttpServer &server, const shared_ptr<HttpServer::Response> &response,
                             const shared_ptr<ifstream> &ifs );
 
+
+auto m_pConfig = boost::make_shared<Core::XMLConfig>();
+HttpServer server;
+std::string configPath("config/settings_rest.xml");
+
+void reloadConfig()
+{
+   m_pConfig = boost::make_shared<Core::XMLConfig>();
+
+   if (!m_pConfig->loadConfig(configPath))
+      throw std::exception( std::string("Error loading config " + configPath).c_str() );
+}
+
 void print_request_info( shared_ptr<HttpServer::Request> request ) {
    g_log.info( "Request from " + request->remote_endpoint_address + " (" + request->path + ")" );
 }
-
-int main()
+bool loadSettings( int argc, char* argv[] )
 {
-   g_log.setLogPath( "log\\SapphireAPI" );
-   g_log.init();
+   g_log.info( "Loading config " + configPath );
 
-   g_log.info( "===========================================================" );
-   g_log.info( "Sapphire API Server " );
-   g_log.info( "Version: 0.0.1" );
-   g_log.info( "Compiled: " __DATE__ " " __TIME__ );
-   g_log.info( "===========================================================" );
-
-   auto m_pConfig = new Core::XMLConfig();
-
-   g_log.info( "Loading config settings_rest.xml" );
-
-   if( !m_pConfig->loadConfig( "config/settings_rest.xml" ) )
+   if( !m_pConfig->loadConfig( configPath ) )
    {
-      g_log.fatal( "Error loading config settings_rest.xml" );
-      return 1;
+      g_log.fatal( "Error loading config " + configPath );
+      return false;
    }
 
-   if( !g_exdData.init( m_pConfig->getValue< std::string >( "Settings.General.DataPath" ) ) )
+   std::vector<std::string> args( argv + 1, argv + argc );
+   for( auto i = 0; i + 1 < args.size(); i += 2 )
+   {
+      std::string arg( "" );
+      std::string val( "" );
+
+      try
+      {
+         arg = boost::to_lower_copy( std::string( args[i] ) );
+         val = std::string( args[i + 1] );
+
+         // trim '-' from start of arg
+         arg = arg.erase( 0, arg.find_first_not_of( '-' ) );
+
+         if( arg == "ip" )
+         {
+            // todo: ip addr in config
+            m_pConfig->setValue< std::string >( "Settings.General.ListenIP", val );
+         }
+         else if( arg == "p" || arg == "port" )
+         {
+            m_pConfig->setValue< std::string >( "Settings.General.ListenPort", val );
+         }
+         else if( arg == "exdpath" || arg == "datapath" )
+         {
+            m_pConfig->setValue< std::string >( "Settings.General.DataPath", val );
+         }
+         else if( arg == "h" || arg == "dbhost" )
+         {
+            m_pConfig->setValue< std::string >( "Settings.General.Mysql.Host", val );
+         }
+         else if( arg == "dbport" )
+         {
+            m_pConfig->setValue< std::string >( "Settings.General.Mysql.Port", val );
+         }
+         else if( arg == "u" || arg == "user" || arg == "dbuser" )
+         {
+            m_pConfig->setValue< std::string >( "Settings.General.Mysql.Username", val );
+         }
+         else if( arg == "pass" || arg == "dbpass" )
+         {
+            m_pConfig->setValue< std::string >( "Settings.General.Mysql.Pass", val );
+         }
+         else if( arg == "d" || arg == "db" || arg == "database" )
+         {
+            m_pConfig->setValue< std::string >( "Settings.General.Mysql.Database", val );
+         }
+         else if ( arg == "lobbyip" || arg == "lobbyhost" )
+         {
+            m_pConfig->setValue< std::string >( "Settings.General.LobbyHost", val );
+         }
+         else if ( arg == "lobbyport" )
+         {
+            m_pConfig->setValue< std::string >( "Settings.General.LobbyPort", val );
+         }
+      }
+      catch( ... )
+      {
+         g_log.error( "Error parsing argument: " + arg + " " + "value: " + val + "\n" );
+         g_log.error( "Usage: <arg> <val> \n" );
+      }
+   }
+
+   g_log.info( "Setting up EXD data" );
+   if( !g_exdData.init( m_pConfig->getValue< std::string >( "Settings.General.DataPath", "" ) ) )
    {
       g_log.fatal( "Error setting up EXD data " );
-      return 1;
+      return false;
    }
 
    Core::Db::DatabaseParams params;
@@ -83,21 +149,42 @@ int main()
    params.port = m_pConfig->getValue< uint16_t >( "Settings.General.Mysql.Port", 3306 );
    params.username = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Username", "root" );
 
+   server.config.port = std::stoul( m_pConfig->getValue<std::string>( "Settings.General.HttpPort", "80" ) );
+
    if( !g_database.initialize( params ) )
    {
       std::this_thread::sleep_for( std::chrono::milliseconds( 5000 ) );
-      return -1;
+      return false;
    }
 
-   g_log.info( "Database: Connected to " + params.hostname + ":" + std::to_string( params.port ) );
+   g_log.info("Database: Connected to " + params.hostname + ":" + std::to_string(params.port));
+
+   return true;
+}
+
+int main(int argc, char* argv[])
+{
+   g_log.setLogPath( "log\\SapphireAPI" );
+   g_log.init();
+
+   g_log.info( "===========================================================" );
+   g_log.info( "Sapphire API Server " );
+   g_log.info( "Version: 0.0.1" );
+   g_log.info( "Compiled: " __DATE__ " " __TIME__ );
+   g_log.info( "===========================================================" );
+
+   if (!loadSettings(argc, argv))
+   {
+      throw std::exception();
+   }
+
    g_exdData.loadZoneInfo();
    g_exdData.loadClassJobInfo();
 
-   HttpServer server;
    server.config.port = stoi( m_pConfig->getValue< std::string >( "Settings.General.HttpPort", "80" ) );
    g_log.info( "Starting REST server at port " + m_pConfig->getValue< std::string >( "Settings.General.HttpPort", "80" ) + "..." );
 
-   server.resource["^/ZoneName/([0-9]+)$"]["GET"] = [&server]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
+   server.resource["^/ZoneName/([0-9]+)$"]["GET"] = [&]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
       string number = request->path_match[1];
       auto it = g_exdData.m_zoneInfoMap.find( atoi( number.c_str() ) );
       std::string responseStr = "Not found!";
@@ -110,7 +197,7 @@ int main()
 
 
    /* Create account */
-   server.resource["^/sapphire-api/lobby/createAccount"]["POST"] = [&server]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
+   server.resource["^/sapphire-api/lobby/createAccount"]["POST"] = [&]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
       print_request_info( request );
 
       std::string responseStr = "HTTP/1.1 400\r\n\r\n";
@@ -124,19 +211,11 @@ int main()
          std::string pass = pt.get<string>( "pass" );
          std::string user = pt.get<string>( "username" );
 
+         // reloadConfig();
+
          std::string sId;
          if( g_sapphireAPI.createAccount( user, pass, sId ) )
          {
-            auto m_pConfig = new Core::XMLConfig();
-
-            g_log.info( "Loading config settings_rest.xml" );
-
-            if( !m_pConfig->loadConfig( "config/settings_rest.xml" ) )
-            {
-               g_log.fatal( "Error loading config settings_rest.xml" );
-               return 1;
-            }
-
             std::string json_string = "{\"sId\":\"" + sId + "\", \"lobbyHost\":\"" + m_pConfig->getValue< std::string >( "Settings.General.LobbyHost" ) + "\", \"frontierHost\":\"" + m_pConfig->getValue< std::string >( "Settings.General.FrontierHost" ) + "\"}";
             *response << "HTTP/1.1 200 OK\r\n "
                       << "Content-Type: application/json\r\n"
@@ -155,7 +234,7 @@ int main()
    };
 
 
-   server.resource["^/sapphire-api/lobby/login"]["POST"] = [&server]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
+   server.resource["^/sapphire-api/lobby/login"]["POST"] = [&]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
       print_request_info( request );
 
       try
@@ -169,16 +248,10 @@ int main()
 
          std::string sId;
 
+         // reloadConfig();
+
          if( g_sapphireAPI.login( user, pass, sId ) )
          {
-            auto m_pConfig = new Core::XMLConfig();
-
-            if( !m_pConfig->loadConfig( "config/settings_rest.xml" ) )
-            {
-               g_log.fatal( "Error loading config settings_rest.xml" );
-               return 1;
-            }
-
             std::string json_string = "{\"sId\":\"" + sId + "\", \"lobbyHost\":\"" + m_pConfig->getValue< std::string >("Settings.General.LobbyHost") + "\", \"frontierHost\":\"" + m_pConfig->getValue< std::string >( "Settings.General.FrontierHost" ) + "\"}";
             *response << "HTTP/1.1 200\r\nContent-Length: " << json_string.length() << "\r\n\r\n" << json_string;
          }
@@ -194,7 +267,7 @@ int main()
 
    };
 
-   server.resource["^/sapphire-api/lobby/deleteCharacter"]["POST"] = [&server]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
+   server.resource["^/sapphire-api/lobby/deleteCharacter"]["POST"] = [&]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
       print_request_info( request );
 
       try
@@ -206,16 +279,10 @@ int main()
          std::string sId = pt.get<string>( "sId" );
          std::string secret = pt.get<string>( "secret" );
          std::string name = pt.get<string>( "name" );
+          
+         // reloadConfig();
 
          int accountId = g_sapphireAPI.checkSession( sId );
-         
-         auto m_pConfig = new Core::XMLConfig();
-
-         if( !m_pConfig->loadConfig( "config/settings_rest.xml" ) )
-         {
-            g_log.fatal( "Error loading config settings_rest.xml" );
-            return 1;
-         }
 
          if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) {
             std::string json_string = "{\"result\":\"invalid_secret\"}";
@@ -236,7 +303,7 @@ int main()
 
    };
 
-   server.resource["^/sapphire-api/lobby/createCharacter"]["POST"] = [&server]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
+   server.resource["^/sapphire-api/lobby/createCharacter"]["POST"] = [&]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
       print_request_info( request );
 
       try
@@ -252,18 +319,12 @@ int main()
 
          std::string finalJson = Core::Util::base64_decode( infoJson );
 
+         // reloadConfig();
+
          int result = g_sapphireAPI.checkSession( sId );
 
          if( result != -1 )
          {
-            auto m_pConfig = new Core::XMLConfig();
-
-            if( !m_pConfig->loadConfig( "config/settings_rest.xml" ) )
-            {
-               g_log.fatal( "Error loading config settings_rest.xml" );
-               return 1;
-            }
-
             if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) {
                std::string json_string = "{\"result\":\"invalid_secret\"}";
                *response << "HTTP/1.1 403\r\nContent-Length: " << json_string.length() << "\r\n\r\n" << json_string;
@@ -290,7 +351,7 @@ int main()
 
    };
 
-   server.resource["^/sapphire-api/lobby/insertSession"]["POST"] = [&server]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
+   server.resource["^/sapphire-api/lobby/insertSession"]["POST"] = [&]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
 	   print_request_info( request );
 
 	   try
@@ -303,13 +364,7 @@ int main()
 		   uint32_t accountId = pt.get<uint32_t>( "accountId" );
 		   std::string secret = pt.get<string>( "secret" );
 
-		   auto m_pConfig = new Core::XMLConfig();
-
-		   if( !m_pConfig->loadConfig( "config/settings_rest.xml" ) )
-		   {
-			   g_log.fatal( "Error loading config settings_rest.xml" );
-			   return 1;
-		   }
+         // reloadConfig();
 
 		   if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) {
 			   std::string json_string = "{\"result\":\"invalid_secret\"}";
@@ -330,7 +385,7 @@ int main()
 
    };
 
-   server.resource["^/sapphire-api/lobby/checkNameTaken"]["POST"] = [&server]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
+   server.resource["^/sapphire-api/lobby/checkNameTaken"]["POST"] = [&]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
       print_request_info( request );
 
       try
@@ -342,13 +397,7 @@ int main()
          std::string name = pt.get<string>( "name" );
          std::string secret = pt.get<string>( "secret" );
 
-         auto m_pConfig = new Core::XMLConfig();
-
-         if( !m_pConfig->loadConfig( "config/settings_rest.xml" ) )
-         {
-            g_log.fatal( "Error loading config settings_rest.xml" );
-            return 1;
-         }
+         // reloadConfig();
 
          if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) {
             std::string json_string = "{\"result\":\"invalid_secret\"}";
@@ -373,7 +422,7 @@ int main()
 
    };
 
-   server.resource["^/sapphire-api/lobby/checkSession"]["POST"] = [&server]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
+   server.resource["^/sapphire-api/lobby/checkSession"]["POST"] = [&]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
       print_request_info( request );
 
       try
@@ -387,16 +436,10 @@ int main()
 
          int result = g_sapphireAPI.checkSession( sId );
 
+         // reloadConfig();
+
          if( result != -1 )
          {
-            auto m_pConfig = new Core::XMLConfig();
-
-            if( !m_pConfig->loadConfig( "config/settings_rest.xml" ) )
-            {
-               g_log.fatal( "Error loading config settings_rest.xml" );
-               return 1;
-            }
-
             if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) {
                std::string json_string = "{\"result\":\"invalid_secret\"}";
                *response << "HTTP/1.1 403\r\nContent-Length: " << json_string.length() << "\r\n\r\n" << json_string;
@@ -421,7 +464,7 @@ int main()
 
    };
 
-   server.resource["^/sapphire-api/lobby/getNextCharId"]["POST"] = [&server]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
+   server.resource["^/sapphire-api/lobby/getNextCharId"]["POST"] = [&]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
       print_request_info( request );
 
       try
@@ -432,13 +475,7 @@ int main()
 
          std::string secret = pt.get<string>( "secret" );
 
-         auto m_pConfig = new Core::XMLConfig();
-
-         if( !m_pConfig->loadConfig( "config/settings_rest.xml" ) )
-         {
-            g_log.fatal( "Error loading config settings_rest.xml" );
-            return 1;
-         }
+         // reloadConfig();
 
          if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) {
             std::string json_string = "{\"result\":\"invalid_secret\"}";
@@ -458,7 +495,7 @@ int main()
 
    };
 
-   server.resource["^/sapphire-api/lobby/getNextContentId"]["POST"] = [&server]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
+   server.resource["^/sapphire-api/lobby/getNextContentId"]["POST"] = [&]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
       print_request_info( request );
 
       try
@@ -469,13 +506,7 @@ int main()
 
          std::string secret = pt.get<string>( "secret" );
 
-         auto m_pConfig = new Core::XMLConfig();
-
-         if( !m_pConfig->loadConfig( "config/settings_rest.xml" ) )
-         {
-            g_log.fatal( "Error loading config settings_rest.xml" );
-            return 1;
-         }
+         // reloadConfig();
 
          if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) {
             std::string json_string = "{\"result\":\"invalid_secret\"}";
@@ -495,7 +526,7 @@ int main()
 
    };
 
-   server.resource["^/sapphire-api/lobby/getCharacterList"]["POST"] = [&server]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
+   server.resource["^/sapphire-api/lobby/getCharacterList"]["POST"] = [&]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
       print_request_info( request );
 
       try
@@ -507,17 +538,12 @@ int main()
          std::string sId = pt.get<string>( "sId" );
          std::string secret = pt.get<string>( "secret" );
 
+         // reloadConfig();
+
          int result = g_sapphireAPI.checkSession( sId );
 
          if( result != -1 )
          {
-            auto m_pConfig = new Core::XMLConfig();
-
-            if( !m_pConfig->loadConfig( "config/settings_rest.xml" ) )
-            {
-               g_log.fatal( "Error loading config settings_rest.xml" );
-               return 1;
-            }
 
             if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) {
                std::string json_string = "{\"result\":\"invalid_secret\"}";
@@ -562,7 +588,7 @@ int main()
 
    };
 
-   server.resource["^(/frontier-api/ffxivsupport/view/get_init)(.*)"]["GET"] = [&server]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
+   server.resource["^(/frontier-api/ffxivsupport/view/get_init)(.*)"]["GET"] = [&]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
 	   print_request_info( request );
 
 	   try
@@ -603,7 +629,7 @@ int main()
 
    };
 
-   server.resource["^(/frontier-api/ffxivsupport/information/get_headline_all)(.*)"]["GET"] = [&server]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
+   server.resource["^(/frontier-api/ffxivsupport/information/get_headline_all)(.*)"]["GET"] = [&]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
 	   print_request_info( request );
 
 	   try
@@ -648,7 +674,7 @@ int main()
    //Will respond with content in the web/-directory, and its subdirectories.
    //Default file: index.html
    //Can for instance be used to retrieve an HTML 5 client that uses REST-resources on this server
-   server.default_resource["GET"] = [&server]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
+   server.default_resource["GET"] = [&]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
       print_request_info( request );
 
       try
@@ -690,7 +716,7 @@ int main()
       }
    };
 
-   thread server_thread( [&server]() {
+   thread server_thread( [&]() {
       //Start server
       server.start();
    } );
