@@ -67,6 +67,11 @@ uint32_t Core::StatusEffect::StatusEffect::getTargetActorId() const
    return m_targetActor->getId();
 }
 
+uint32_t Core::StatusEffect::StatusEffect::getPower() const
+{
+   return m_power;
+}
+
 void Core::StatusEffect::StatusEffect::applyStatus()
 {
    m_startTime = Util::getTimeMs();
@@ -128,6 +133,12 @@ void Core::StatusEffect::StatusEffect::setLastTick( uint64_t lastTick )
 {
    m_lastTick = lastTick;
 }
+
+void Core::StatusEffect::StatusEffect::setPower( uint32_t power )
+{
+   m_power = power;
+}
+
 
 const std::string& Core::StatusEffect::StatusEffect::getName() const
 {
