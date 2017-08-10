@@ -48,6 +48,7 @@ int Core::Scripting::ScriptManager::init()
    m_pChaiHandler->add( chaiscript::fun( &Entity::Player::learnAction ), "learnAction" );
    m_pChaiHandler->add( chaiscript::fun( &Entity::Player::getHomepoint ), "getHomepoint" );
    m_pChaiHandler->add( chaiscript::fun( &Entity::Player::setHomepoint ), "setHomepoint" );
+   m_pChaiHandler->add( chaiscript::fun( &Entity::Player::returnToHomepoint ), "returnToHomepoint" );
    m_pChaiHandler->add( chaiscript::fun( &Entity::Player::teleport ), "teleport" );
    m_pChaiHandler->add( chaiscript::fun( &Entity::Player::prepareZoning ), "prepareZoning" );
    

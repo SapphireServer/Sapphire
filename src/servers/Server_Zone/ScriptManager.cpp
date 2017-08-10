@@ -396,6 +396,69 @@ bool Core::Scripting::ScriptManager::onCastFinish( Entity::PlayerPtr pPlayer, En
     return true;
 }
 
+bool Core::Scripting::ScriptManager::onStatusReceive( Entity::ActorPtr pActor, uint32_t effectId )
+{
+   std::string eventName = "onReceive";
+
+   try
+   {
+      auto obj = m_pChaiHandler->eval( "statusDef_" + std::to_string( effectId ) );
+      std::string objName = "statusDef_" + std::to_string( effectId );
+
+      pActor->getAsPlayer()->sendDebug( "Calling: " + objName + "." + eventName );
+      auto fn = m_pChaiHandler->eval< std::function< void( chaiscript::Boxed_Value &, Entity::Actor&) > >( eventName );
+      fn( obj, *pActor );
+   }
+   catch( std::exception& e )
+   {
+      pActor->getAsPlayer()->sendUrgent( e.what() );
+   }
+
+   return true;
+}
+
+bool Core::Scripting::ScriptManager::onStatusTick( Entity::ActorPtr pActor, uint32_t effectId )
+{
+   std::string eventName = "onTick";
+
+   try
+   {
+      auto obj = m_pChaiHandler->eval( "statusDef_" + std::to_string( effectId ) );
+      std::string objName = "statusDef_" + std::to_string( effectId );
+
+      pActor->getAsPlayer()->sendDebug( "Calling: " + objName + "." + eventName );
+      auto fn = m_pChaiHandler->eval< std::function< void( chaiscript::Boxed_Value &, Entity::Actor& ) > >( eventName );
+      fn( obj, *pActor );
+   }
+   catch( std::exception& e )
+   {
+      pActor->getAsPlayer()->sendUrgent( e.what() );
+   }
+
+   return true;
+}
+
+bool Core::Scripting::ScriptManager::onStatusTimeOut( Entity::ActorPtr pActor, uint32_t effectId )
+{
+   std::string eventName = "onTimeOut";
+
+   try
+   {
+      auto obj = m_pChaiHandler->eval( "statusDef_" + std::to_string( effectId ) );
+      std::string objName = "statusDef_" + std::to_string( effectId );
+
+      pActor->getAsPlayer()->sendDebug( "Calling: " + objName + "." + eventName );
+      auto fn = m_pChaiHandler->eval< std::function< void( chaiscript::Boxed_Value &, Entity::Actor& ) > >( eventName );
+      fn( obj, *pActor );
+   }
+   catch( std::exception& e )
+   {
+      pActor->getAsPlayer()->sendUrgent( e.what() );
+   }
+
+   return true;
+}
+
 bool Core::Scripting::ScriptManager::onZoneInit( ZonePtr pZone )
 {
    std::string eventName = "onZoneInit_" + pZone->getInternalName();

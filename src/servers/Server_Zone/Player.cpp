@@ -341,6 +341,12 @@ void Core::Entity::Player::forceZoneing( uint32_t zoneId )
    //performZoning( zoneId, Common::ZoneingType::None, getPos() );
 }
 
+void Core::Entity::Player::returnToHomepoint()
+{
+   setZoningType( Common::ZoneingType::Return );
+   teleport( getHomepoint(), 3 );
+}
+
 void Core::Entity::Player::setZone( uint32_t zoneId )
 {
    auto pPlayer = getAsPlayer();
