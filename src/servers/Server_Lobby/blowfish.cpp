@@ -4,6 +4,7 @@
 // Revised code--3/20/94
 // Converted to C++ class 5/96, Jim Conger
 
+#include <cstdint>
 #include "blowfish.h"
 #include "blowfish.h2"	// holds the random digit tables
 
@@ -103,7 +104,7 @@ void BlowFish::initialize (BYTE key[], int keybytes)
 
 
   int v10 = keybytes;
-  int v9 = (int)key;
+  int v9 = (uintptr_t)key;
   int v8 = 0;
   int v11 = 0;
   do {
