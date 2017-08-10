@@ -452,6 +452,8 @@ public:
    void sendUrgent( const std::string& message );
    void sendDebug( const std::string& message );
 
+   // Player Battle Handling
+   //////////////////////////////////////////////////////////////////////////////////////////////////////
    void onMobAggro( BattleNpcPtr pBNpc );
    void onMobDeaggro( BattleNpcPtr pBNpc );
 
@@ -462,6 +464,10 @@ public:
    bool hateListHasMob( BattleNpcPtr pBNpc );
 
    void sendHateList();
+
+   bool actionHasCastTime( uint32_t actionId );
+
+   Core::Entity::ActorPtr lookupTargetById( uint64_t targetId );
 
    bool isLogin() const;
    void setIsLogin( bool bIsLogin );
