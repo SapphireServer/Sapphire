@@ -10,6 +10,7 @@
 #include "Actor.h"
 
 #include "StatusEffect.h"
+#include "ScriptManager.h"
 
 extern Core::Logger g_log;
 extern Core::Data::ExdData g_exdData;
@@ -17,6 +18,8 @@ extern Core::Data::ExdData g_exdData;
 using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
+extern Core::Scripting::ScriptManager g_scriptMgr;
+
 
 Core::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::ActorPtr sourceActor, Entity::ActorPtr targetActor,
                                                 uint32_t duration, uint32_t tickRate )
@@ -51,6 +54,7 @@ Core::StatusEffect::StatusEffect::~StatusEffect()
 void Core::StatusEffect::StatusEffect::onTick()
 {
    m_lastTick = Util::getTimeMs();
+   g_scriptMgr.onStatusTick( m_targetActor, m_id );
 }
 
 uint32_t Core::StatusEffect::StatusEffect::getSrcActorId() const
@@ -61,6 +65,11 @@ uint32_t Core::StatusEffect::StatusEffect::getSrcActorId() const
 uint32_t Core::StatusEffect::StatusEffect::getTargetActorId() const
 {
    return m_targetActor->getId();
+}
+
+uint32_t Core::StatusEffect::StatusEffect::getPower() const
+{
+   return m_power;
 }
 
 void Core::StatusEffect::StatusEffect::applyStatus()
@@ -86,11 +95,13 @@ void Core::StatusEffect::StatusEffect::applyStatus()
    //m_sourceActor->sendToInRangeSet( effectPacket, true );
 
    g_log.debug( "StatusEffect applied: " + m_name );
+   g_scriptMgr.onStatusReceive( m_targetActor, m_id );
 }
 
 void Core::StatusEffect::StatusEffect::removeStatus()
 {
    g_log.debug( "StatusEffect removed: " + m_name );
+   g_scriptMgr.onStatusTimeOut( m_targetActor, m_id );
 }
 
 uint32_t Core::StatusEffect::StatusEffect::getId() const
@@ -122,6 +133,12 @@ void Core::StatusEffect::StatusEffect::setLastTick( uint64_t lastTick )
 {
    m_lastTick = lastTick;
 }
+
+void Core::StatusEffect::StatusEffect::setPower( uint32_t power )
+{
+   m_power = power;
+}
+
 
 const std::string& Core::StatusEffect::StatusEffect::getName() const
 {

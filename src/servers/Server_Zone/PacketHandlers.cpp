@@ -842,8 +842,7 @@ void Core::Network::GameConnection::actionHandler( Core::Network::Packets::GameP
    }
    case 0xC8: // return dead
    {
-      pPlayer->setZoningType( Common::ZoneingType::Return );
-      pPlayer->teleport( pPlayer->getHomepoint(), 3 );
+      pPlayer->returnToHomepoint();
       break;
    }
    case 0xC9: // Finish zoning

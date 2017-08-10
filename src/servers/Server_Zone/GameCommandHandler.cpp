@@ -84,7 +84,7 @@ void Core::GameCommandHandler::execCommand( char * data, Core::Entity::PlayerPtr
 
    if( it == m_commandMap.end() )
       // no command found, do something... or not
-      g_log.error( "[" + std::to_string( pPlayer->getId() ) + "] " + "Command not found" );
+      pPlayer->sendUrgent( "Command not found." );
    // TODO Notify the client of the failed command
    else
    {
@@ -248,8 +248,6 @@ void Core::GameCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlayer
        int32_t id;
 
        sscanf( params.c_str(), "%d", &id );
-
-       g_log.debug( std::to_string( pPlayer->getLevelForClass( static_cast<Core::Common::ClassJob> ( id ) ) ) );
 
        if( pPlayer->getLevelForClass( static_cast<Core::Common::ClassJob> ( id ) ) == 0 )
        {
