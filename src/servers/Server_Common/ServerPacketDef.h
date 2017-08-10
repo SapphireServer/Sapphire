@@ -1364,6 +1364,20 @@ struct FFXIVIpcCFRegisterDuty : FFXIVIpcBasePacket<CFRegisterDuty>
 };
 
 
+struct FFXIVIpcCFMemberStatus : FFXIVIpcBasePacket<CFMemberStatus>
+{
+   uint16_t contentId;
+   uint16_t unknown1;
+   uint8_t status;
+   uint8_t currentTank;
+   uint8_t currentDps;
+   uint8_t currentHealer;
+   uint32_t unknown2;
+   uint32_t unknown3;
+};
+
+
+
 } /* Server */
 } /* Packets */
 } /* Network */
