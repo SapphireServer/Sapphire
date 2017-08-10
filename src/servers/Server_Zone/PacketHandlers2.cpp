@@ -74,21 +74,20 @@ void Core::Network::GameConnection::skillHandler( Core::Network::Packets::GamePa
       }
       else
       {
-         Core::Entity::ActorPtr targetActor;
-
-         auto inRange = pPlayer->getInRangeActors( true );
-         for( auto actor : inRange )
+         Core::Entity::ActorPtr targetActor = pPlayer;
+         if( targetId != pPlayer->getId() )
          {
-            if( actor->getId() == targetId )
-            {
-               targetActor = actor;
-            }
+            targetActor = pPlayer->lookupTargetById( targetId );
          }
 
-         if( targetActor )
+         if( pPlayer->actionHasCastTime( action ) )
+         {
+            g_scriptMgr.onCastFinish( pPlayer, targetActor, action );
+         }
+         else
          {
             Action::ActionCastPtr pActionCast( new Action::ActionCast( pPlayer, targetActor, action ) );
-            pPlayer->setCurrentAction(pActionCast);
+            pPlayer->setCurrentAction( pActionCast );
             pPlayer->sendDebug( "setCurrentAction()" );
             pPlayer->getCurrentAction()->onStart();
          }

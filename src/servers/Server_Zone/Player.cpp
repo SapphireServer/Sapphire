@@ -923,6 +923,20 @@ void Core::Entity::Player::despawn( Core::Entity::ActorPtr pTarget )
    pPlayer->queuePacket( ActorControlPacket143( getId(), DespawnZoneScreenMsg, 0x04, getId(), 0x01 ) );
 }
 
+Core::Entity::ActorPtr Core::Entity::Player::lookupTargetById( uint64_t targetId )
+{
+   Core::Entity::ActorPtr targetActor;
+   auto inRange = getInRangeActors( true );
+   for( auto actor : inRange )
+   {
+      if( actor->getId() == targetId )
+      {
+         targetActor = actor;
+      }
+   }
+   return targetActor;
+}
+
 void Core::Entity::Player::setLastPing( uint32_t ping )
 {
    m_lastPing = ping;
@@ -970,6 +984,11 @@ void Core::Entity::Player::setGcRankAt( uint8_t index, uint8_t rank )
 const uint8_t * Core::Entity::Player::getStateFlags() const
 {
    return m_stateFlags;
+}
+
+bool Core::Entity::Player::actionHasCastTime( uint32_t actionId ) //TODO: Add logic for special cases
+{
+   return g_exdData.m_actionInfoMap[actionId].is_instant;
 }
 
 bool Core::Entity::Player::hasStateFlag( Core::Common::PlayerStateFlag flag ) const
