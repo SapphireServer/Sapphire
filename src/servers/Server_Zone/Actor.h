@@ -290,7 +290,7 @@ public:
    void addStatusEffect( StatusEffect::StatusEffectPtr pEffect );
 
    // add a status effect by id
-   void addStatusEffectById( int32_t id, int32_t duration );
+   void addStatusEffectById( int32_t id, int32_t duration, uint32_t power = 0 );
 
    // TODO: Why did i even declare them publicly here?!
    std::set< ActorPtr >            m_inRangeActors;
