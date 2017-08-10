@@ -302,6 +302,8 @@ public:
    void setZone( uint32_t zoneId );
 
    void forceZoneing( uint32_t zoneId );
+   /*! return player to preset homepoint */
+   void returnToHomepoint();
    /*! change position, sends update too */
    void changePosition( float x, float y, float z, float o );
    /*! return the contentId */

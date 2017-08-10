@@ -1,0 +1,18 @@
+// Skill Name: Sprint
+// Skill ID: 3
+
+class skillDef_6Def
+{
+    def skillDef_6Def()
+    {
+
+    }
+
+    def onFinish( player, target )
+    {
+        player.returnToHomepoint();
+    }
+
+};
+
+GLOBAL skillDef_6 = skillDef_6Def();
