@@ -54,7 +54,7 @@ void reloadConfig()
    m_pConfig = boost::make_shared<Core::XMLConfig>();
 
    if (!m_pConfig->loadConfig(configPath))
-      throw std::exception( std::string("Error loading config " + configPath).c_str() );
+      throw "Error loading config ";
 }
 
 void print_request_info( shared_ptr<HttpServer::Request> request ) {
