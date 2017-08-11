@@ -3,7 +3,7 @@
       <!-- Port the lobby server accepts client connections on -->
       <ListenPort>54994</ListenPort> 
       <AuthPort>54998</AuthPort>
-	  <!-- Ip the lobby server listens on -->
+      <!-- Ip the lobby server listens on -->
       <ListenIp>127.0.0.1</ListenIp>
       <!-- Path of FFXIV dat files -->
       <DataPath>C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv</DataPath>
@@ -12,9 +12,9 @@
       <!-- Port the world server listens for clients -->
       <ZonePort>54992</ZonePort>      
       <!-- Address to connect to the rest server -->
-	  <RestHost>127.0.0.1:80</RestHost>      
+      <RestHost>127.0.0.1:80</RestHost>      
       <!-- Secret for server authentication -->
-	  <ServerSecret>default</ServerSecret>      
+      <ServerSecret>default</ServerSecret>      
       <!-- Connection settings for the mysql db -->
       <Mysql>
          <Host>127.0.0.1</Host>
@@ -24,4 +24,8 @@
          <Database>sapphire</Database>
       </Mysql>
    </General>
+   <Parameters>
+      <!-- Do not disconnect players without a session - this should be definitely disabled unless you are testing on a PS4 -->
+      <AllowNoSessionConnect>false</AllowNoSessionConnect>   
+    </Parameters>
 </Settings>
