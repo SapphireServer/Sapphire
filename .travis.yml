@@ -31,3 +31,4 @@ script:
   - mkdir build
   - cd build
   - ${DEPS_DIR}/cmake/bin/cmake .. -DSAPPHIRE_BOOST_VER="1.54.0" -DCMAKE_CXX_COMPILER=g++-4.9 -DCMAKE_C_COMPILER=gcc-4.9 && make
+  - sh ./sql_import.sh
