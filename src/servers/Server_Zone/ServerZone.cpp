@@ -106,7 +106,7 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
 
       try
       {
-         arg = std::string( args[i] );
+         arg = boost::to_lower_copy( std::string( args[i] ) );
          val = std::string( args[i + 1] );
 
          // trim '-' from start of arg
