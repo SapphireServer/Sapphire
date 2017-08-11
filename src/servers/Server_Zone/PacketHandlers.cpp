@@ -798,10 +798,13 @@ void Core::Network::GameConnection::actionHandler( Core::Network::Packets::GameP
    {
    case 0x01:
    {
-      if( param11 == 1 )
-         pPlayer->setStance( Entity::Actor::Stance::Active );
+      if (param11 == 1)
+         pPlayer->setStance(Entity::Actor::Stance::Active);
       else
-         pPlayer->setStance( Entity::Actor::Stance::Passive );
+      {
+         pPlayer->setStance(Entity::Actor::Stance::Passive);
+         pPlayer->setAutoattack(false);
+      }
 
       pPlayer->sendToInRangeSet( ActorControlPacket142( pPlayer->getId(), 0, param11, 1 ) );
 
@@ -810,7 +813,10 @@ void Core::Network::GameConnection::actionHandler( Core::Network::Packets::GameP
    case 0x02:
    {
       if (param11 == 1)
+      {
          pPlayer->setAutoattack( true );
+         pPlayer->setStance(Entity::Actor::Stance::Active);
+      }
       else
          pPlayer->setAutoattack( false );
 
