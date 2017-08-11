@@ -1,6 +1,5 @@
 #!/bin/bash
 cd sql
-mysql -u root -e 'drop database sapphire;'
 mysql -u root -e 'create database sapphire;'
 for f in *.sql
   do
@@ -10,6 +9,6 @@ for f in *.sql
     CODE=$?
     if [ $CODE -ne 0 ]; then exit $CODE; fi
 done
-mysql sapphire -u root < update.sql -f
+#mysql sapphire -u root < update.sql -f
 echo 'todo: test update sql'
 cd ..
