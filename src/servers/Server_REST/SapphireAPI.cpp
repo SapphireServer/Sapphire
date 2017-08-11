@@ -36,13 +36,13 @@ bool Core::Network::SapphireAPI::login( const std::string& username, const std::
       return false;
 
    // user found, proceed
-   int accountId = pQR->fetch()[0].getUInt32();
+   int32_t accountId = pQR->fetch()[0].getUInt32();
 
    // session id string generation
-   srand( ( unsigned int )time( NULL ) + 42 );
+   srand( ( uint32_t )time( NULL ) + 42 );
    uint8_t sid[58];
 
-   for( int i = 0; i < 56; i += 4 )
+   for( int32_t i = 0; i < 56; i += 4 )
    {
       short number = 0x1111 + rand() % 0xFFFF;
       sprintf( ( char* )sid + i, "%04hx", number );
@@ -96,7 +96,7 @@ bool Core::Network::SapphireAPI::createAccount( const std::string& username, con
    // we are clear and can create a new account
    // get the next free account id
    pQR = g_database.query( "SELECT MAX(account_id) FROM accounts;" );
-   int accountId = pQR->fetch()[0].getUInt32() + 1;
+   int32_t accountId = pQR->fetch()[0].getUInt32() + 1;
 
    // store the account to the db
    g_database.execute( "INSERT INTO accounts (account_Id, account_name, account_pass, account_created) VALUE(%i, '%s', '%s', %i);",
@@ -132,7 +132,7 @@ int Core::Network::SapphireAPI::createCharacter( const int& accountId, const std
    const char *ptr = infoJson.c_str() + 50;
 
    std::string lookPart( ptr );
-   int pos = lookPart.find_first_of( "]" );
+   int32_t pos = lookPart.find_first_of( "]" );
    if( pos != std::string::npos )
    {
       lookPart = lookPart.substr( 0, pos + 1 );
@@ -154,7 +154,7 @@ int Core::Network::SapphireAPI::createCharacter( const int& accountId, const std
          tmpVector2.push_back( std::stoi( v.second.data() ) );
    }
    std::vector<int32_t>::iterator it = tmpVector.begin();
-   for( int i = 0; it != tmpVector.end(); ++it, i++ )
+   for( int32_t i = 0; it != tmpVector.end(); ++it, i++ )
    {
       newPlayer.setLook( i, *it );
    }
@@ -187,7 +187,7 @@ void Core::Network::SapphireAPI::deleteCharacter( std::string name, uint32_t acc
       }
    }
 
-   int id = deletePlayer.getId();
+   int32_t id = deletePlayer.getId();
 
    g_database.execute( "DELETE FROM charabase WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
    g_database.execute( "DELETE FROM characlass WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
@@ -247,7 +247,7 @@ bool Core::Network::SapphireAPI::checkNameTaken( std::string name )
 
 uint32_t Core::Network::SapphireAPI::getNextCharId()
 {
-   int charId = 0;
+   int32_t charId = 0;
 
    boost::shared_ptr<Core::Db::QueryResult> pQR = g_database.query( "SELECT MAX(CharacterId) FROM charabase" );
 

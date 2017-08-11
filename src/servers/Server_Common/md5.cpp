@@ -247,7 +247,7 @@ void Core::Util::md5_finish( md5_context *ctx, uint8_t digest[16] )
 * those are the standard RFC 1321 test vectors
 */
 
-void Core::Util::md5( unsigned char *text, unsigned char *hash, int size )
+void Core::Util::md5( uint8_t *text, uint8_t *hash, int32_t size )
 {
    md5_context ctx;
    md5_starts( &ctx );

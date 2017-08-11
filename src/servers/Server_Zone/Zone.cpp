@@ -564,7 +564,7 @@ bool Zone::isCellActive( uint32_t x, uint32_t y )
    return false;
 }
 
-void Zone::updateCellActivity( uint32_t x, uint32_t y, int radius )
+void Zone::updateCellActivity( uint32_t x, uint32_t y, int32_t radius )
 {
 
    uint32_t endX = ( x + radius ) <= _sizeX ? x + radius : ( _sizeX - 1 );
@@ -692,8 +692,8 @@ void Zone::changeActorPosition( Entity::ActorPtr pActor )
          if( pOldCell != nullptr )
          {
             // only do the second check if theres -/+ 2 difference
-            if( abs( ( int ) cellX - ( int ) pOldCell->m_posX ) > 2 ||
-                abs( ( int ) cellY - ( int ) pOldCell->m_posY ) > 2 )
+            if( abs( ( int32_t ) cellX - ( int32_t ) pOldCell->m_posX ) > 2 ||
+                abs( ( int32_t ) cellY - ( int32_t ) pOldCell->m_posY ) > 2 )
                updateCellActivity( pOldCell->m_posX, pOldCell->m_posY, 2 );
          }
       }
@@ -728,7 +728,7 @@ void Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
    auto iter = pCell->m_actors.begin();
 
    float fRange = 70.0f;
-   int count = 0;
+   int32_t count = 0;
    while( iter != pCell->m_actors.end() )
    {
       pCurAct = *iter;

@@ -27,6 +27,7 @@
 #include "Forwards.h"
 #include <boost/foreach.hpp>
 #include <boost/make_shared.hpp>
+#include <boost/algorithm/string.hpp>
 
 
 Core::Logger g_log;
@@ -87,7 +88,7 @@ void Core::ServerZone::setServerId( uint16_t serverId )
    m_serverId = serverId;
 }
 
-bool Core::ServerZone::loadSettings( int argc, char* argv[] )
+bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
 {
    g_log.info( "Loading config " + m_configPath );
 
@@ -105,7 +106,7 @@ bool Core::ServerZone::loadSettings( int argc, char* argv[] )
 
       try
       {
-         arg = std::string( args[i] );
+         arg = boost::to_lower_copy( std::string( args[i] ) );
          val = std::string( args[i + 1] );
 
          // trim '-' from start of arg
@@ -120,7 +121,7 @@ bool Core::ServerZone::loadSettings( int argc, char* argv[] )
          {
             m_pConfig->setValue< std::string >( "Settings.General.ListenPort", val );
          }
-         else if( arg == "exdPath" || arg == "dataPath" )
+         else if( arg == "exdpath" || arg == "datapath" )
          {
             m_pConfig->setValue< std::string >( "Settings.General.DataPath", val );
          }
@@ -175,15 +176,15 @@ bool Core::ServerZone::loadSettings( int argc, char* argv[] )
    }
 
    m_serverId = m_serverId ? m_serverId : m_pConfig->getValue< uint16_t >( "Settings.General.ServerId" );
-   m_port = m_pConfig->getValue< uint16_t >( "Settings.General.ListenPort" );
-   m_ip = m_pConfig->getValue< std::string >( "Settings.General.ListenIp" );;
+   m_port = m_pConfig->getValue< uint16_t >( "Settings.General.ListenPort", 54992 );
+   m_ip = m_pConfig->getValue< std::string >( "Settings.General.ListenIp", "0.0.0.0" );;
 
    g_log.info( "Server ID: " + std::to_string( m_serverId ) );
 
    return true;
 }
 
-void Core::ServerZone::run( int argc, char* argv[] )
+void Core::ServerZone::run( int32_t argc, char* argv[] )
 {
    // TODO: add more error checks for the entire initialisation
    g_log.setLogPath( "log\\SapphireZone_" + std::to_string( m_serverId ) + "_" );

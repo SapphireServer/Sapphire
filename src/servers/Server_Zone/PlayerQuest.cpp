@@ -94,7 +94,7 @@ void Core::Entity::Player::finishQuest( uint16_t questId )
       setSyncFlag( PlayerSyncFlags::Quests );
       setSyncFlag( PlayerSyncFlags::QuestTracker );
 
-      for( int ii = 0; ii < 5; ii++ )
+      for( int32_t ii = 0; ii < 5; ii++ )
       {
          if( m_questTracking[ii] == idx )
             m_questTracking[ii] = -1;
@@ -143,7 +143,7 @@ void Core::Entity::Player::removeQuest( uint16_t questId )
       setSyncFlag( PlayerSyncFlags::Quests );
       setSyncFlag( PlayerSyncFlags::QuestTracker );
 
-      for( int ii = 0; ii < 5; ii++ )
+      for( int32_t ii = 0; ii < 5; ii++ )
       {
          if( m_questTracking[ii] == idx )
             m_questTracking[ii] = -1;
@@ -1015,7 +1015,7 @@ void Core::Entity::Player::updateQuest( uint16_t questId, uint16_t sequence )
       setSyncFlag( PlayerSyncFlags::Quests );
       setSyncFlag( PlayerSyncFlags::QuestTracker );
 
-      for( int ii = 0; ii < 5; ii++ )
+      for( int32_t ii = 0; ii < 5; ii++ )
       {
          if( m_questTracking[ii] == -1 )
          {
@@ -1033,7 +1033,7 @@ void Core::Entity::Player::sendQuestTracker()
 {
    GamePacketNew< FFXIVIpcQuestTracker > trackerPacket( getId() );
 
-   for( int ii = 0; ii < 5; ii++ )
+   for( int32_t ii = 0; ii < 5; ii++ )
    {
       if( m_questTracking[ii] >= 0 )
       {
@@ -1080,7 +1080,7 @@ void Core::Entity::Player::sendQuestInfo()
 {
    GamePacketNew< FFXIVIpcQuestActiveList > pe_qa( getId() );
 
-   for( int i = 0; i < 30; i++ )
+   for( int32_t i = 0; i < 30; i++ )
    {
       uint8_t offset = i * 12;
       if( m_activeQuests[i] != nullptr )

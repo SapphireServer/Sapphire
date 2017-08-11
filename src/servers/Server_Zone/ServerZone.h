@@ -18,7 +18,7 @@ namespace Core {
       ServerZone( const std::string& configPath, uint16_t serverId = 0 );
       ~ServerZone();
 
-      void run( int argc, char* argv[] );
+      void run( int32_t argc, char* argv[] );
 
       void setServerId( uint16_t serverId );
       uint16_t getServerId() const;
@@ -27,7 +27,7 @@ namespace Core {
       void removeSession( uint32_t sessionId );
       void removeSession( std::string playerName );
 
-      bool loadSettings( int argc, char* argv[] );
+      bool loadSettings( int32_t argc, char* argv[] );
 
       SessionPtr getSession( uint32_t id );
       SessionPtr getSession( std::string playerName );

@@ -7,9 +7,9 @@
 #define MAXKEYBYTES 	56		// 448 bits max
 #define NPASS           16		// SBox passes
 
-#define DWORD  		unsigned long
+#define DWORD  		uint32_t
 #define WORD  		unsigned short
-#define BYTE  		unsigned char
+#define BYTE  		uint8_t
 
 class BlowFish
 {
@@ -22,7 +22,7 @@ private:
 public:
 			BlowFish () ;
 			~BlowFish () ;
-	void 		initialize (BYTE key[], int keybytes) ;
+	void 		initialize (BYTE key[], int32_t keybytes) ;
 	DWORD		GetOutputLength (DWORD lInputLong) ;
 	DWORD		Encode (BYTE * pInput, BYTE * pOutput, DWORD lSize) ;
 	void		Decode (BYTE * pInput, BYTE * pOutput, DWORD lSize) ;
@@ -37,10 +37,10 @@ public:
 	  DWORD dword;
 	  BYTE byte [4];
 	  struct {
-	    unsigned int byte3:8;
-	    unsigned int byte2:8;
-	    unsigned int byte1:8;
-	    unsigned int byte0:8;
+	    uint32_t byte3:8;
+	    uint32_t byte2:8;
+	    uint32_t byte1:8;
+	    uint32_t byte0:8;
 	  } w;
 	};
 #endif
@@ -50,10 +50,10 @@ public:
 	  DWORD dword;
 	  BYTE byte [4];
 	  struct {
-	    unsigned int byte0:8;
-	    unsigned int byte1:8;
-	    unsigned int byte2:8;
-	    unsigned int byte3:8;
+	    uint32_t byte0:8;
+	    uint32_t byte1:8;
+	    uint32_t byte2:8;
+	    uint32_t byte3:8;
 	  } w;
 	};
 #endif
@@ -63,10 +63,10 @@ public:
 	  DWORD dword;
 	  BYTE byte [4];
 	  struct {
-	    unsigned int byte1:8;
-	    unsigned int byte0:8;
-	    unsigned int byte3:8;
-	    unsigned int byte2:8;
+	    uint32_t byte1:8;
+	    uint32_t byte0:8;
+	    uint32_t byte3:8;
+	    uint32_t byte2:8;
 	  } w;
 };
 #endif

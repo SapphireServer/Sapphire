@@ -32,7 +32,7 @@ namespace Core
          ScriptManager();
          ~ScriptManager();
 
-         int init();
+         int32_t init();
          void reload();
 
          const boost::shared_ptr< chaiscript::ChaiScript >& getHandler() const;

@@ -27,7 +27,7 @@ namespace Core
 
          bool createAccount( const std::string& username, const std::string& pass, std::string& sId );
 
-         int createCharacter( const int& accountId, const std::string& name, const std::string& infoJson );
+         int32_t createCharacter( const int& accountId, const std::string& name, const std::string& infoJson );
          
          void deleteCharacter( std::string name, uint32_t accountId );
 
@@ -41,7 +41,7 @@ namespace Core
 
          uint64_t getNextContentId();
 
-         int checkSession( const std::string& sId );
+         int32_t checkSession( const std::string& sId );
 
          bool removeSession( const std::string& sId );
 

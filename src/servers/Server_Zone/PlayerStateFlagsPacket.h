@@ -31,7 +31,7 @@ public:
 
       for( auto& flag : flags )
       {
-         int iFlag = static_cast< uint32_t >( flag );
+         int32_t iFlag = static_cast< uint32_t >( flag );
          uint8_t index = iFlag / 8;
          uint8_t bitIndex = iFlag % 8;
 
