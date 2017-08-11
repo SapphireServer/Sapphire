@@ -27,7 +27,7 @@ Core::Item::Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t mo
    auto itemInfo = g_exdData.getItemInfo( catalogId );
    m_delayMs = itemInfo->delayMs;
    m_physicalDmg = itemInfo->physical_damage;
-   m_autoAttackDmg = float(m_physicalDmg * m_delayMs) / 3000;
+   m_autoAttackDmg = float( m_physicalDmg * m_delayMs ) / 3000;
 }
 
 Core::Item::~Item()
