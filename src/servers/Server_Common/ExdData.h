@@ -201,20 +201,21 @@ namespace Core {
       struct ItemInfo
       {
          uint32_t id;
-         std::string name; //0
-         uint16_t item_level;//11
-         uint8_t required_level;//12
-         uint32_t stack_size;//19
-         uint16_t unknown_category;//15
-         uint16_t ui_category;//17
-         bool is_hqable;//20
-         uint64_t model_primary;//28
-         uint64_t model_secondary;//29
-         uint32_t class_job_requirement;//58
-         uint16_t delayMs; //59
-         bool is_unique;//72
-         bool is_untradeable;//73
-         uint32_t class_job_index;//86
+         std::string name;                //0
+         uint16_t item_level;             //11
+         uint8_t required_level;          //12
+         uint16_t unknown_category;       //15
+         uint16_t ui_category;            //17
+         uint32_t stack_size;             //19
+         bool is_hqable;                  //20
+         uint64_t model_primary;          //28
+         uint64_t model_secondary;        //29
+         uint16_t physical_damage;        //49
+         uint32_t class_job_requirement;  //58
+         uint16_t delayMs;                //59
+         bool is_unique;                  //72
+         bool is_untradeable;             //73
+         uint32_t class_job_index;        //86
       };
 
       struct ActionInfo

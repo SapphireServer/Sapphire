@@ -615,7 +615,7 @@ void Core::Entity::Player::gainExp( uint32_t amount )
 
    queuePacket( ActorControlPacket143( getId(), GainExpMsg, static_cast< uint8_t >( getClass() ), amount ) );
 
-   if( level >= 60 ) // temporary fix for leveling over levelcap
+   if( level >= 70 ) // temporary fix for leveling over levelcap
    {
       queuePacket( ActorControlPacket143( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), amount ) );
       return;
@@ -1085,7 +1085,9 @@ void Core::Entity::Player::update( int64_t currTime )
             if( isAutoattackOn() && 
                 actor->getId() == m_targetId &&
                 actor->isAlive() &&
-                mainWeap )
+                mainWeap &&
+                m_currentStance == Entity::Actor::Stance::Active
+               )
             {
                // default autoattack range
                // TODO make this dependant on bnpc size
@@ -1430,11 +1432,13 @@ void Core::Entity::Player::setIsLogin( bool bIsLogin )
 void Core::Entity::Player::autoAttack( ActorPtr pTarget )
 {
 
+   auto mainWeap = m_pInventory->getItemAt(Inventory::GearSet0, Inventory::EquipSlot::MainHand);
+
    pTarget->onActionHostile( shared_from_this() );
    //uint64_t tick = Util::getTimeMs();
-
    //srand(static_cast< uint32_t >(tick));
-   uint32_t damage = 10 + rand() % 12;
+
+   uint32_t damage = mainWeap->getAutoAttackDmg() + rand() % 12;   
    uint32_t variation = 0 + rand() % 3;
 
    if( getClass() == 5 || getClass() == 23 || getClass() == 31 )
