@@ -62,7 +62,7 @@ namespace Core {
 
       field[6].getBinary( (char*)m_modelEquip, 40 );
 
-      for( int i = 0; i < 26; i++ )
+      for( int32_t i = 0; i < 26; i++ )
       {
          m_lookMap[i] = m_look[i];
       }
@@ -179,7 +179,7 @@ namespace Core {
 
       uint16_t size = static_cast< uint16_t >( m_lookMap.size() );
 
-      for( int i = 0; i < m_lookMap.size(); i++ )
+      for( int32_t i = 0; i < m_lookMap.size(); i++ )
       {
          customize[i] = m_lookMap[i];
       }
@@ -189,7 +189,7 @@ namespace Core {
 
       uint32_t startZone;
       float x, y, z, o;
-      int startTown = 0;
+      int32_t startTown = 0;
 
       switch( m_class )
       {

@@ -614,7 +614,7 @@ void Core::Network::GameConnection::updatePositionHandler( Core::Network::Packet
    //	}
    default:
    {
-      if( static_cast< int >( IPC_OP_019A.moveBackward ) )
+      if( static_cast< int32_t >( IPC_OP_019A.moveBackward ) )
       {
          unk1 = 0xFF;
          unk2 = 0x06;
@@ -999,7 +999,7 @@ void Core::Network::GameConnection::socialListHandler( Core::Network::Packets::G
       listPacket.data().type = 2;
       listPacket.data().sequence = count;
 
-      int entrysizes = sizeof( listPacket.data().entries );
+      int32_t entrysizes = sizeof( listPacket.data().entries );
       memset( listPacket.data().entries, 0, sizeof( listPacket.data().entries ) );
 
       listPacket.data().entries[0].bytes[2] = pPlayer->getCurrentZone()->getId();
@@ -1046,7 +1046,7 @@ void Core::Network::GameConnection::socialListHandler( Core::Network::Packets::G
 
      std::set<CPlayer*>::iterator it;
 
-     int i = 0x30;
+     int32_t i = 0x30;
      for(it = tmpSet.begin(); it != tmpSet.end(); it++)
      {
      if((*it)->getId() == pPlayer->getId())

@@ -60,7 +60,7 @@ void reloadConfig()
 void print_request_info( shared_ptr<HttpServer::Request> request ) {
    g_log.info( "Request from " + request->remote_endpoint_address + " (" + request->path + ")" );
 }
-bool loadSettings( int argc, char* argv[] )
+bool loadSettings( int32_t argc, char* argv[] )
 {
    g_log.info( "Loading config " + configPath );
 
@@ -282,7 +282,7 @@ int main(int argc, char* argv[])
           
          // reloadConfig();
 
-         int accountId = g_sapphireAPI.checkSession( sId );
+         int32_t accountId = g_sapphireAPI.checkSession( sId );
 
          if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) {
             std::string json_string = "{\"result\":\"invalid_secret\"}";
@@ -321,7 +321,7 @@ int main(int argc, char* argv[])
 
          // reloadConfig();
 
-         int result = g_sapphireAPI.checkSession( sId );
+         int32_t result = g_sapphireAPI.checkSession( sId );
 
          if( result != -1 )
          {
@@ -331,7 +331,7 @@ int main(int argc, char* argv[])
             }
             else
             {
-               int charId = g_sapphireAPI.createCharacter( result, name, finalJson );
+               int32_t charId = g_sapphireAPI.createCharacter( result, name, finalJson );
 
                std::string json_string = "{\"result\":\"" + std::to_string( charId ) + "\"}";
                *response << "HTTP/1.1 200\r\nContent-Length: " << json_string.length() << "\r\n\r\n" << json_string;
@@ -434,7 +434,7 @@ int main(int argc, char* argv[])
          std::string sId = pt.get<string>( "sId" );
          std::string secret = pt.get<string>( "secret" );
 
-         int result = g_sapphireAPI.checkSession( sId );
+         int32_t result = g_sapphireAPI.checkSession( sId );
 
          // reloadConfig();
 
@@ -540,7 +540,7 @@ int main(int argc, char* argv[])
 
          // reloadConfig();
 
-         int result = g_sapphireAPI.checkSession( sId );
+         int32_t result = g_sapphireAPI.checkSession( sId );
 
          if( result != -1 )
          {
