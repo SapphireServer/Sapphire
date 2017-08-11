@@ -238,7 +238,7 @@ void Core::Network::GameConnection::injectPacket( const std::string& packetpath,
    fclose( fp );
 
    // cycle through the packet entries and queue each one
-   for( int k = 0x18; k < size;)
+   for( int32_t k = 0x18; k < size;)
    {
       uint32_t tmpId = pPlayer->getId();
       // replace ids in the entryheader if needed

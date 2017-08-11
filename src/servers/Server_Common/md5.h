@@ -16,7 +16,7 @@ namespace Core
       md5_context;
 
 
-      void md5( unsigned char *text, unsigned char *hash, int size );
+      void md5( uint8_t *text, uint8_t *hash, int32_t size );
       void md5_starts( md5_context *ctx );
       void md5_update( md5_context *ctx, uint8_t *input, uint32_t length );
       void md5_finish( md5_context *ctx, uint8_t digest[16] );

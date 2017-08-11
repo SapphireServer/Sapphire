@@ -306,7 +306,7 @@ bool Core::Network::RestConnector::deleteCharacter( char* sId, std::string name 
 
 int Core::Network::RestConnector::createCharacter( char * sId,  std::string name, std::string infoJson )
 {
-   std::string json_string = "{\"sId\": \"" + std::string( sId, 56 ) + "\",\"secret\": \"" + serverSecret + "\",\"name\": \"" + name + "\",\"infoJson\": \"" + Core::Util::base64_encode( (unsigned char *)infoJson.c_str(), infoJson.length() ) + "\"}";
+   std::string json_string = "{\"sId\": \"" + std::string( sId, 56 ) + "\",\"secret\": \"" + serverSecret + "\",\"name\": \"" + name + "\",\"infoJson\": \"" + Core::Util::base64_encode( (uint8_t *)infoJson.c_str(), infoJson.length() ) + "\"}";
 
    HttpResponse r = requestApi( "createCharacter", json_string );
 

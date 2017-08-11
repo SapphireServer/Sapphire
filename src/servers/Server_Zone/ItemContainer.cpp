@@ -68,7 +68,7 @@ const Core::ItemMap & Core::ItemContainer::getItemMap() const
 
 int16_t Core::ItemContainer::getFreeSlot()
 {
-   for( unsigned char slotId = 0; slotId < m_size; slotId++ )
+   for( uint8_t slotId = 0; slotId < m_size; slotId++ )
    {
       ItemMap::iterator it = m_itemMap.find( slotId );
       if( it == m_itemMap.end() ||

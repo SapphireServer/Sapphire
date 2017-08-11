@@ -269,7 +269,7 @@ namespace SimpleWeb {
                     //If content, read that as well
                     auto it=request->header.find("Content-Length");
                     if(it!=request->header.end()) {
-                        unsigned long long content_length;
+                        uint64_t content_length;
                         try {
                             content_length=stoull(it->second);
                         }
