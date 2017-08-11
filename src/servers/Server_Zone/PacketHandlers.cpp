@@ -796,25 +796,31 @@ void Core::Network::GameConnection::actionHandler( Core::Network::Packets::GameP
 
    switch( commandId )
    {
-   case 0x01:
+   case 0x01:  // Toggle sheathe
    {
-      if( param11 == 1 )
+      if ( param11 == 1 )
          pPlayer->setStance( Entity::Actor::Stance::Active );
       else
+      {
          pPlayer->setStance( Entity::Actor::Stance::Passive );
+         pPlayer->setAutoattack( false );
+      }
 
       pPlayer->sendToInRangeSet( ActorControlPacket142( pPlayer->getId(), 0, param11, 1 ) );
 
       break;
    }
-   case 0x02:
+   case 0x02:  // Toggle auto-attack
    {
-      if (param11 == 1)
+      if ( param11 == 1 )
+      {
          pPlayer->setAutoattack( true );
+         pPlayer->setStance( Entity::Actor::Stance::Active );
+      }
       else
          pPlayer->setAutoattack( false );
 
-      pPlayer->sendToInRangeSet(ActorControlPacket142(pPlayer->getId(), 1, param11, 1));
+      pPlayer->sendToInRangeSet( ActorControlPacket142( pPlayer->getId(), 1, param11, 1 ) );
 
       break;
    }

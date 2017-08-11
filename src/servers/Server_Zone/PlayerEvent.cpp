@@ -263,12 +263,14 @@ void Core::Entity::Player::onTick()
       return;
 
    int32_t addHp = getMaxHp() * 0.1f + 1;
-   int32_t addMp = 8 * 0.1f + 1;
+   int32_t addMp = getMaxMp() * 0.06f + 1;
+   int32_t addTp = 100;
 
    if( !m_actorIdTohateSlotMap.empty() )
    {
       addHp = getMaxHp() * 0.01f + 1;
-      addMp = getMaxHp() * 0.01f + 1;
+      addMp = getMaxHp() * 0.02f + 1;
+      addTp = 60;
    }
 
    if( m_hp < getMaxHp() )
@@ -295,7 +297,6 @@ void Core::Entity::Player::onTick()
 
    if( m_tp < 1000 )
    {
-      int32_t addTp = 100;
       if( m_tp + addTp < 1000 )
          m_tp += addTp;
       else
