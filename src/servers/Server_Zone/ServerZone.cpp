@@ -27,6 +27,7 @@
 #include "Forwards.h"
 #include <boost/foreach.hpp>
 #include <boost/make_shared.hpp>
+#include <boost/algorithm/string.hpp>
 
 
 Core::Logger g_log;
@@ -120,7 +121,7 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
          {
             m_pConfig->setValue< std::string >( "Settings.General.ListenPort", val );
          }
-         else if( arg == "exdPath" || arg == "dataPath" )
+         else if( arg == "exdpath" || arg == "datapath" )
          {
             m_pConfig->setValue< std::string >( "Settings.General.DataPath", val );
          }
@@ -175,8 +176,8 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
    }
 
    m_serverId = m_serverId ? m_serverId : m_pConfig->getValue< uint16_t >( "Settings.General.ServerId" );
-   m_port = m_pConfig->getValue< uint16_t >( "Settings.General.ListenPort" );
-   m_ip = m_pConfig->getValue< std::string >( "Settings.General.ListenIp" );;
+   m_port = m_pConfig->getValue< uint16_t >( "Settings.General.ListenPort", 54992 );
+   m_ip = m_pConfig->getValue< std::string >( "Settings.General.ListenIp", "0.0.0.0" );;
 
    g_log.info( "Server ID: " + std::to_string( m_serverId ) );
 
