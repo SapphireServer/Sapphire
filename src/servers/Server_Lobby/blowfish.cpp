@@ -74,7 +74,7 @@ void BlowFish::Blowfish_decipher (DWORD *xl, DWORD *xr)
 
 
 	// constructs the enctryption sieve
-void BlowFish::initialize (BYTE key[], int keybytes)
+void BlowFish::initialize (BYTE key[], int32_t keybytes)
 {
 	int  		i, j ;
 	DWORD  		 datal, datar ;
@@ -90,23 +90,23 @@ void BlowFish::initialize (BYTE key[], int keybytes)
 	 		SBoxes [i][j] = bf_S [i][j] ;
 	}
 
-  int v12; // eax@6
-  int v13; // ecx@6
-  int v14; // eax@8
-  int v15; // edx@8
-  int v16; // edx@8
-  int v17; // eax@10
-  int v18; // ecx@10
-  int v19; // ecx@10
-  int v20; // edx@12
-  int v21; // edx@12
+  int32_t v12; // eax@6
+  int32_t v13; // ecx@6
+  int32_t v14; // eax@8
+  int32_t v15; // edx@8
+  int32_t v16; // edx@8
+  int32_t v17; // eax@10
+  int32_t v18; // ecx@10
+  int32_t v19; // ecx@10
+  int32_t v20; // edx@12
+  int32_t v21; // edx@12
 
 
 
-  int v10 = keybytes;
-  int v9 = (uintptr_t)key;
-  int v8 = 0;
-  int v11 = 0;
+  int32_t v10 = keybytes;
+  int32_t v9 = (int32_t)key;
+  int32_t v8 = 0;
+  int32_t v11 = 0;
   do {
     v13 = (char)(*(BYTE *)(v8 + v9));
     v12 = v8 + 1;

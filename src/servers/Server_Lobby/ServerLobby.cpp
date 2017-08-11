@@ -46,7 +46,7 @@ namespace Core {
       return g_restConnector.getSession( sessionId );
    }
 
-   void ServerLobby::run( int argc, char* argv[] )
+   void ServerLobby::run( int32_t argc, char* argv[] )
    {
       g_log.setLogPath( "log\\SapphireLobby" );
       g_log.init();
@@ -74,7 +74,7 @@ namespace Core {
 
    }
 
-   bool ServerLobby::loadSettings( int argc, char* argv[] )
+   bool ServerLobby::loadSettings( int32_t argc, char* argv[] )
    {
       g_log.info( "Loading config " + m_configPath );
 

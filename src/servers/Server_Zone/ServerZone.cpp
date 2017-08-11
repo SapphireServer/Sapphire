@@ -87,7 +87,7 @@ void Core::ServerZone::setServerId( uint16_t serverId )
    m_serverId = serverId;
 }
 
-bool Core::ServerZone::loadSettings( int argc, char* argv[] )
+bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
 {
    g_log.info( "Loading config " + m_configPath );
 
@@ -183,7 +183,7 @@ bool Core::ServerZone::loadSettings( int argc, char* argv[] )
    return true;
 }
 
-void Core::ServerZone::run( int argc, char* argv[] )
+void Core::ServerZone::run( int32_t argc, char* argv[] )
 {
    // TODO: add more error checks for the entire initialisation
    g_log.setLogPath( "log\\SapphireZone_" + std::to_string( m_serverId ) + "_" );

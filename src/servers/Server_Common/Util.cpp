@@ -6,9 +6,9 @@ std::string Core::Util::binaryToHexString( uint8_t* pBinData, uint16_t size )
 
    std::string outStr;
 
-   for( unsigned int i = 0; i < size; i++ )
+   for( uint32_t i = 0; i < size; i++ )
    {
-      outStr += boost::str( boost::format( "%|02X|" ) % ( int ) ( pBinData[i] & 0xFF ) );
+      outStr += boost::str( boost::format( "%|02X|" ) % ( int32_t ) ( pBinData[i] & 0xFF ) );
    }
 
    return outStr;

@@ -4,7 +4,7 @@
 
 Core::ServerZone g_serverZone( "config/settings_zone.xml" );
 
-int main( int argc, char* argv[] )
+int main( int32_t argc, char* argv[] )
 {
    // i hate to do this, but we need to set this first...
    for(auto i = 1; i < argc; ++i )

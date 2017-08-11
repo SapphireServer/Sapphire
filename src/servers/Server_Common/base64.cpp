@@ -34,16 +34,16 @@ static const std::string base64_chars =
 "0123456789+/";
 
 
-static inline bool is_base64( unsigned char c ) {
+static inline bool is_base64( uint8_t c ) {
    return ( isalnum( c ) || ( c == '+' ) || ( c == '/' ) );
 }
 
-std::string Core::Util::base64_encode( unsigned char const* bytes_to_encode, unsigned int in_len ) {
+std::string Core::Util::base64_encode( uint8_t const* bytes_to_encode, uint32_t in_len ) {
    std::string ret;
-   int i = 0;
-   int j = 0;
-   unsigned char char_array_3[3];
-   unsigned char char_array_4[4];
+   int32_t i = 0;
+   int32_t j = 0;
+   uint8_t char_array_3[3];
+   uint8_t char_array_4[4];
 
    while( in_len-- ) {
       char_array_3[i++] = *( bytes_to_encode++ );
@@ -82,11 +82,11 @@ std::string Core::Util::base64_encode( unsigned char const* bytes_to_encode, uns
 }
 
 std::string Core::Util::base64_decode( std::string const& encoded_string ) {
-   int in_len = encoded_string.size();
-   int i = 0;
-   int j = 0;
-   int in_ = 0;
-   unsigned char char_array_4[4], char_array_3[3];
+   int32_t in_len = encoded_string.size();
+   int32_t i = 0;
+   int32_t j = 0;
+   int32_t in_ = 0;
+   uint8_t char_array_4[4], char_array_3[3];
    std::string ret;
 
    while( in_len-- && ( encoded_string[in_] != '=' ) && is_base64( encoded_string[in_] ) ) {

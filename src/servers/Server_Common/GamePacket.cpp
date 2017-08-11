@@ -98,9 +98,9 @@ std::string Core::Network::Packets::GamePacket::toString()
 {
 
    std::string str = "\n";
-   for( unsigned int i = 0; i < getSize(); i++ )
+   for( uint32_t i = 0; i < getSize(); i++ )
    {
-      str += boost::str( boost::format( "%|02X|" ) % ( int ) ( m_dataBuf[i] & 0xFF ) ) + " ";
+      str += boost::str( boost::format( "%|02X|" ) % ( int32_t ) ( m_dataBuf[i] & 0xFF ) ) + " ";
 
       if( ( i + 1 ) % 16 == 0 )
          str += "\n";

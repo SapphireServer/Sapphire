@@ -350,7 +350,7 @@ void Core::Entity::Player::createUpdateSql()
    {
       charaDetailSet.insert( " QuestCompleteFlags = UNHEX('" + std::string( Util::binaryToHexString( static_cast< uint8_t* >( m_questCompleteFlags ), 200 ) ) + "')" );
 
-      for( int i = 0; i < 30; i++ )
+      for( int32_t i = 0; i < 30; i++ )
       {
          if( m_activeQuests[i] != nullptr )
          {
