@@ -39,7 +39,12 @@ public:
    bool isHq() const;
 
    void setHq( bool isHq );
+
    uint16_t getDelay() const;
+
+   uint16_t getPhysicalDmg() const;
+
+   float getAutoAttackDmg() const;
 
 
 protected:
@@ -58,6 +63,8 @@ protected:
    bool                    m_isHq;
 
    uint16_t                m_delayMs;
+   uint16_t                m_physicalDmg;
+   float                   m_autoAttackDmg;
 
 };
 

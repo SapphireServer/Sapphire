@@ -425,6 +425,7 @@ boost::shared_ptr< Core::Data::ItemInfo >
       info->is_hqable = getField< bool >( row, 20 );
       info->model_primary = getField< uint64_t >( row, 45 );
       info->model_secondary = getField< uint64_t >( row, 46 );
+      info->physical_damage = getField< uint16_t >( row, 49 );
       info->delayMs = getField< uint16_t >( row, 51 );
       info->is_unique = getField< int16_t >( row, 64 ) != 0 ? true : false;
       info->is_untradeable = getField< uint8_t >( row, 65 ) != 0 ? true : false;

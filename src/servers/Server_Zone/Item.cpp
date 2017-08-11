@@ -26,6 +26,8 @@ Core::Item::Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t mo
 {
    auto itemInfo = g_exdData.getItemInfo( catalogId );
    m_delayMs = itemInfo->delayMs;
+   m_physicalDmg = itemInfo->physical_damage;
+   m_autoAttackDmg = float(m_physicalDmg * m_delayMs) / 3000;
 }
 
 Core::Item::~Item()
@@ -33,9 +35,19 @@ Core::Item::~Item()
 
 }
 
+float Core::Item::getAutoAttackDmg() const
+{
+   return m_autoAttackDmg;
+}
+
 uint16_t Core::Item::getDelay() const
 {
    return m_delayMs;
+}
+
+uint16_t Core::Item::getPhysicalDmg() const
+{
+   return m_physicalDmg;
 }
 
 uint32_t Core::Item::getId() const
