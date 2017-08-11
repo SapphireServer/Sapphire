@@ -223,6 +223,16 @@ void Core::Network::GameConnection::enterWorld( FFXIVARR_PACKET_RAW& packet, uin
 bool Core::Network::GameConnection::sendServiceAccountList( FFXIVARR_PACKET_RAW& packet, uint32_t tmpId )
 {
    LobbySessionPtr pSession = g_serverLobby.getSession( ( char* )&packet.data[0] + 0x20 );
+   
+   if( g_serverLobby.m_pConfig->getValue<bool>( "Settings.Parameters.AllowNoSessionConnect" ) && pSession == nullptr )
+   {
+      LobbySessionPtr session( new Core::LobbySession() );
+      session->setAccountID( 0 );
+      session->setSessionId( (uint8_t *)&packet.data[0] + 0x20 );
+      pSession = session;
+      g_log.Log( LoggingSeverity::info, "Allowed connection with no session: " + std::string( (char*)&packet.data[0] + 0x20 ) );
+   }
+
    if( pSession != nullptr )
    {
       g_log.Log( LoggingSeverity::info, "Found session linked to accountId: " + std::to_string( pSession->getAccountID() ) );
