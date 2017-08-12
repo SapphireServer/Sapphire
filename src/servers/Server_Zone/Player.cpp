@@ -462,7 +462,7 @@ void Core::Entity::Player::initSpawnIdQueue()
       m_freeSpawnIdQueue.pop();
    }
 
-   for( int i = 1; i < MAX_DISPLAYED_ACTORS; i++ )
+   for( int32_t i = 1; i < MAX_DISPLAYED_ACTORS; i++ )
    {
       m_freeSpawnIdQueue.push( i );
    }
@@ -993,7 +993,7 @@ bool Core::Entity::Player::actionHasCastTime( uint32_t actionId ) //TODO: Add lo
 
 bool Core::Entity::Player::hasStateFlag( Core::Common::PlayerStateFlag flag ) const
 {
-   int iFlag = static_cast< uint32_t >( flag );
+   int32_t iFlag = static_cast< uint32_t >( flag );
 
    uint16_t index;
    uint8_t value;
@@ -1004,7 +1004,7 @@ bool Core::Entity::Player::hasStateFlag( Core::Common::PlayerStateFlag flag ) co
 
 void Core::Entity::Player::setStateFlag( Core::Common::PlayerStateFlag flag )
 {
-   int iFlag = static_cast< uint32_t >( flag );
+   int32_t iFlag = static_cast< uint32_t >( flag );
 
    uint16_t index;
    uint8_t value;
@@ -1024,7 +1024,7 @@ void Core::Entity::Player::unsetStateFlag( Core::Common::PlayerStateFlag flag )
    if( !hasStateFlag( flag ) )
       return;
 
-   int iFlag = static_cast< uint32_t >( flag );
+   int32_t iFlag = static_cast< uint32_t >( flag );
 
    uint16_t index;
    uint8_t value;
@@ -1402,7 +1402,7 @@ bool Core::Entity::Player::hateListHasMob( Core::Entity::BattleNpcPtr pBNpc )
 void Core::Entity::Player::initHateSlotQueue()
 {
    m_freeHateSlotQueue = std::queue< uint8_t >();
-   for( int i = 1; i < 26; i++ )
+   for( int32_t i = 1; i < 26; i++ )
       m_freeHateSlotQueue.push( i );
 }
 
@@ -1411,7 +1411,7 @@ void Core::Entity::Player::sendHateList()
    GamePacketNew< FFXIVIpcHateList > hateListPacket( getId() );
    hateListPacket.data().numEntries = m_actorIdTohateSlotMap.size();
    auto it = m_actorIdTohateSlotMap.begin();
-   for( int i = 0; it != m_actorIdTohateSlotMap.end(); ++it, i++ )
+   for( int32_t i = 0; it != m_actorIdTohateSlotMap.end(); ++it, i++ )
    {
       hateListPacket.data().entry[i].actorId = it->first;
       hateListPacket.data().entry[i].hatePercent = 100;

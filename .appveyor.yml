@@ -1,0 +1,30 @@
+os:
+  - Visual Studio 2015
+
+configuration:
+  - Debug
+
+platform:
+  - Win32
+
+environment:
+  MSVC_DEFAULT_OPTIONS: ON
+  BOOST_ROOT_DIR: "C:\\Libraries\\boost_1_60_0"
+  BOOST_LIB_DIR: "C:\\Libraries\\boost_1_60_0\\lib32-msvc-14.0"
+  MYSQL_PWD: "Password12!"
+
+services:
+  - mysql
+
+before_build:
+  - set PATH="C:\\Program Files\\MySQL\\MySQL Server 5.7\\bin";%PATH%
+  - cd c:\projects\sapphire
+  - git submodule update --init
+  - mkdir build
+  - cd build
+  - cmake .. -G "Visual Studio 14 2015"
+  - cmake --build . --target ALL_BUILD --config Debug
+
+build_script:
+  - cd ..
+  - sh sql_import.sh

@@ -86,7 +86,7 @@ public:
 
    bool isCellActive( uint32_t x, uint32_t y );
 
-   void updateCellActivity( uint32_t x, uint32_t y, int radius );
+   void updateCellActivity( uint32_t x, uint32_t y, int32_t radius );
 
    void updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell );
 

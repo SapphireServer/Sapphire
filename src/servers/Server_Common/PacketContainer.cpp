@@ -65,9 +65,9 @@ std::string Core::Network::Packets::PacketContainer::toString()
    fillSendBuffer( tmpBuffer );
 
    std::string str = "\n";
-   for( unsigned int i = 0; i < m_ipcHdr.size; i++ )
+   for( uint32_t i = 0; i < m_ipcHdr.size; i++ )
    {
-      str += boost::str( boost::format( "%|02X|" ) % static_cast< int >( tmpBuffer[i] & 0xFF ) ) + " ";
+      str += boost::str( boost::format( "%|02X|" ) % static_cast< int32_t >( tmpBuffer[i] & 0xFF ) ) + " ";
 
       if( ( i + 1 ) % 16 == 0 )
          str += "\n";
