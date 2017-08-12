@@ -233,12 +233,9 @@ class ManFst002Def
 				   player.learnAction( 1 );
 				   ManFst002.Scene00051( player );
 				},
-				fun( player, eventId, additional )
-				{
-				   player.eventFinish( 0x050002, 0 );
-				   player.eventFinish( additional, 0 );
-				},
+				fun( player, eventId, additional ) {},
 				0x050002 );
+				player.unlock();
         }
         else if( actor == this.ACTOR2 )
         {

@@ -237,6 +237,7 @@ class ManFst003Def
 				},
 				fun( player, eventId, additional ) {},
 				eventId );
+			player.unlock();
         }
         else if( actor == this.ACTOR2 )
         {
