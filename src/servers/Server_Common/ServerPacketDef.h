@@ -1309,17 +1309,13 @@ struct FFXIVIpcPrepareZoning : FFXIVIpcBasePacket<PrepareZoning>
 struct FFXIVIpcCFNotify : FFXIVIpcBasePacket<CFNotify>
 {
     uint32_t state1; // 3 = cancelled, 4 = duty ready
-    uint32_t param; // if state1 == 3, state2 is cancelled reason
+    uint32_t state2; // if state1 == 3, state2 is cancelled reason
 
-    uint8_t classJob; // classJobId you registered
-    uint8_t unknown0[3];
-
-    uint32_t unknown1; // unknown, just used 0x20442 from the dumped packet
-
-    uint8_t languages;
-    uint8_t unknown2[3];
-
-    uint16_t unknown3;
+    uint32_t param1; // usually classJobId
+    uint32_t param2; // usually flag
+    uint32_t param3; // usually languages, sometimes join in progress timestamp
+    
+    uint16_t param4; // usually roulette id
     uint16_t contents[5];
 };
 
