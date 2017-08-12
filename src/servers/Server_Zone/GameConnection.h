@@ -95,6 +95,13 @@ public:
    DECLARE_HANDLER( discoveryHandler );
    DECLARE_HANDLER( eventHandler );
    DECLARE_HANDLER( logoutHandler );
+   
+   DECLARE_HANDLER( cfDutyInfoRequest );
+   DECLARE_HANDLER( cfRegisterDuty );
+   DECLARE_HANDLER( cfRegisterRoulette );
+   DECLARE_HANDLER( cfDutyAccepted );
+
+
    DECLARE_HANDLER( skillHandler );
 
    DECLARE_HANDLER( gm1Handler );
