@@ -255,7 +255,7 @@ std::string Database::escapeString( std::string Escape )
 
    DatabaseConnection * con = getFreeConnection();
    const char * ret;
-   if( mysql_real_escape_string( con->conn, a2, Escape.c_str(), ( unsigned long ) Escape.length() ) == 0 )
+   if( mysql_real_escape_string( con->conn, a2, Escape.c_str(), ( uint32_t ) Escape.length() ) == 0 )
    {
       ret = Escape.c_str();
    }
@@ -272,7 +272,7 @@ void Database::escapeLongString( const char * str, uint32_t len, std::stringstre
    char a2[65536 * 3] = { 0 };
 
    DatabaseConnection * con = getFreeConnection();
-   mysql_real_escape_string( con->conn, a2, str, ( unsigned long ) len );
+   mysql_real_escape_string( con->conn, a2, str, ( uint32_t ) len );
 
    out.write( a2, ( std::streamsize )strlen( a2 ) );
    con->lock.unlock();
@@ -282,7 +282,7 @@ std::string Database::escapeString( const char * esc, DatabaseConnection * con )
 {
    char a2[16384] = { 0 };
    const char * ret;
-   if( mysql_real_escape_string( con->conn, a2, ( char* ) esc, ( unsigned long ) strlen( esc ) ) == 0 )
+   if( mysql_real_escape_string( con->conn, a2, ( char* ) esc, ( uint32_t ) strlen( esc ) ) == 0 )
    {
       ret = esc;
    }
@@ -297,7 +297,7 @@ std::string Database::escapeString( const char * esc, DatabaseConnection * con )
 bool Database::_SendQuery( DatabaseConnection *con, const char* Sql, bool Self )
 {
    //dunno what it does ...leaving untouched 
-   int result = mysql_query( con->conn, Sql );
+   int32_t result = mysql_query( con->conn, Sql );
    if( result > 0 )
    {
       if( Self == false && _HandleError( con, mysql_errno( con->conn ) ) )

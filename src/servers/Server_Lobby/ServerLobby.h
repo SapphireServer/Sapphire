@@ -34,9 +34,9 @@ namespace Core
       ServerLobby( const std::string& configPath );
       ~ServerLobby( void );
 
-      void run( int argc, char* argv[] );
+      void run( int32_t argc, char* argv[] );
 
-      bool loadSettings( int argc, char* argv[] );
+      bool loadSettings( int32_t argc, char* argv[] );
 
       void addSession( char* sessionId, LobbySessionPtr pSession )
       {

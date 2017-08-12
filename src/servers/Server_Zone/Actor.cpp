@@ -109,7 +109,7 @@ Core::Common::ClassJob Core::Entity::Actor::getClass() const
    return m_class;
 }
 
-/*! \return current class or job as int ( this feels pointless ) */
+/*! \return current class or job as int32_t ( this feels pointless ) */
 uint8_t Core::Entity::Actor::getClassAsInt() const
 {
    return static_cast< uint8_t >( m_class );

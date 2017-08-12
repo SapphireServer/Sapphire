@@ -21,7 +21,7 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
-
+#include <boost/algorithm/string.hpp>
 #include <boost/foreach.hpp>
 
 Core::Logger g_log;
@@ -46,7 +46,7 @@ namespace Core {
       return g_restConnector.getSession( sessionId );
    }
 
-   void ServerLobby::run( int argc, char* argv[] )
+   void ServerLobby::run( int32_t argc, char* argv[] )
    {
       g_log.setLogPath( "log\\SapphireLobby" );
       g_log.init();
@@ -74,7 +74,7 @@ namespace Core {
 
    }
 
-   bool ServerLobby::loadSettings( int argc, char* argv[] )
+   bool ServerLobby::loadSettings( int32_t argc, char* argv[] )
    {
       g_log.info( "Loading config " + m_configPath );
 
@@ -91,7 +91,7 @@ namespace Core {
 
          try
          {
-            arg = std::string( args[i] );
+            arg = boost::to_lower_copy( std::string( args[i] ) );
             val = std::string( args[i + 1] );
 
             // trim '-' from start of arg
@@ -100,7 +100,7 @@ namespace Core {
             if( arg == "ip" )
             {
                // todo: ip addr in config
-               m_pConfig->setValue< std::string >( "Settings.General.ListenIP", val );
+               m_pConfig->setValue< std::string >( "Settings.General.ListenIp", val );
             }
             else if( arg == "p" || arg == "port" )
             {
@@ -110,11 +110,11 @@ namespace Core {
             {
                m_pConfig->setValue< std::string>( "Settings.General.AuthPort", val );
             }
-            else if( arg == "worldIP" || arg == "worldIp" )
+            else if( arg == "worldip" || arg == "worldip" )
             {
                m_pConfig->setValue < std::string >( "Settings.General.WorldIp", val );
             }
-            else if( arg == "worldPort" )
+            else if( arg == "worldport" )
             {
                m_pConfig->setValue< std::string >( "Settings.General.WorldPort", val );
             }
@@ -126,8 +126,8 @@ namespace Core {
          }
       }
 
-      m_port = m_pConfig->getValue< uint16_t >( "Settings.General.ListenPort" );
-      m_ip = m_pConfig->getValue< std::string >( "Settings.General.ListenIp" );
+      m_port = m_pConfig->getValue< uint16_t >( "Settings.General.ListenPort", 54994 );
+      m_ip = m_pConfig->getValue< std::string >( "Settings.General.ListenIp", "0.0.0.0" );
 
       g_restConnector.restHost = m_pConfig->getValue< std::string >( "Settings.General.RestHost" );
       g_restConnector.serverSecret = m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" );

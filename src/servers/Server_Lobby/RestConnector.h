@@ -27,7 +27,7 @@ namespace Core
 
          HttpResponse requestApi( std::string endpoint, std::string data );
          LobbySessionPtr getSession( char* sId );
-         int createCharacter( char * sId, std::string name, std::string infoJson );
+         int32_t createCharacter( char * sId, std::string name, std::string infoJson );
          std::vector<std::tuple<std::string, uint32_t, uint64_t, std::string>> getCharList( char * sId );
          bool deleteCharacter( char* sId, std::string name );
          bool checkNameTaken( std::string name );

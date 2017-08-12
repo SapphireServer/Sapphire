@@ -120,7 +120,7 @@ void Core::Network::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet, ui
 
    auto charList = g_restConnector.getCharList( ( char * )m_pSession->getSessionId() );
 
-   int charIndex = 0;
+   int32_t charIndex = 0;
 
    for( uint8_t i = 0; i < 4; i++ )
    {
@@ -465,7 +465,7 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
       {
          BlowFish blowfish;
          blowfish.initialize( m_encKey, 0x10 );
-         blowfish.Decode( ( unsigned char* )( &inPacket.data[0] ), ( unsigned char* )( &inPacket.data[0] ),
+         blowfish.Decode( ( uint8_t* )( &inPacket.data[0] ), ( uint8_t* )( &inPacket.data[0] ),
             ( inPacket.data.size() ) - 0x10 );
       }
 

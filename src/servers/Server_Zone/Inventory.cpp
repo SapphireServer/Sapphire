@@ -242,7 +242,7 @@ void Core::Inventory::updateCurrencyDb()
    int32_t firstItemPos = -1;
    std::string query = "UPDATE charaitemcurrency SET ";
 
-   for( int i = 0; i <= 11; i++ )
+   for( int32_t i = 0; i <= 11; i++ )
    {
       auto currItem = m_inventoryMap[Currency]->getItem( i );
 
@@ -269,7 +269,7 @@ void Core::Inventory::updateCrystalDb()
    int32_t firstItemPos = -1;
    std::string query = "UPDATE charaitemcrystal SET ";
 
-   for( int i = 0; i <= 11; i++ )
+   for( int32_t i = 0; i <= 11; i++ )
    {
       auto currItem = m_inventoryMap[Crystal]->getItem( i );
 
@@ -294,7 +294,7 @@ void Core::Inventory::updateBagDb( InventoryType type )
 {
    std::string query = "UPDATE charaiteminventory SET ";
 
-   for( int i = 0; i <= 34; i++ )
+   for( int32_t i = 0; i <= 34; i++ )
    {
       auto currItem = m_inventoryMap[type]->getItem( i );
 
@@ -377,7 +377,7 @@ void Core::Inventory::updateMannequinDb( InventoryType type )
 {
    std::string query = "UPDATE charaitemgearset SET ";
 
-   for( int i = 0; i <= 13; i++ )
+   for( int32_t i = 0; i <= 13; i++ )
    {
       auto currItem = m_inventoryMap[type]->getItem( i );
 
@@ -671,7 +671,7 @@ bool Core::Inventory::load()
    {
       uint16_t storageId = field[0].getUInt16();
 
-      for( int i = 1; i <= 14; i++ )
+      for( int32_t i = 1; i <= 14; i++ )
       {
          uint64_t uItemId = field[i].getUInt64();
          if( uItemId == 0 )
@@ -708,7 +708,7 @@ bool Core::Inventory::load()
    do
    {
       uint16_t storageId = bagField[0].getUInt16();
-      for( int i = 1; i <= 25; i++ )
+      for( int32_t i = 1; i <= 25; i++ )
       {
          uint64_t uItemId = bagField[i].getUInt64();
          if( uItemId == 0 )
@@ -741,7 +741,7 @@ bool Core::Inventory::load()
    do
    {
       uint16_t storageId = curField[0].getUInt16();
-      for( int i = 1; i <= 12; i++ )
+      for( int32_t i = 1; i <= 12; i++ )
       {
          uint64_t uItemId = curField[i].getUInt64();
          if( uItemId == 0 )
@@ -775,7 +775,7 @@ bool Core::Inventory::load()
    do
    {
       uint16_t storageId = crystalField[0].getUInt16();
-      for( int i = 1; i <= 17; i++ )
+      for( int32_t i = 1; i <= 17; i++ )
       {
          uint64_t uItemId = crystalField[i].getUInt64();
          if( uItemId == 0 )
@@ -798,7 +798,7 @@ void Core::Inventory::send()
 {
    InventoryMap::iterator it;
 
-   int count = 0;
+   int32_t count = 0;
    for( it = m_inventoryMap.begin(); it != m_inventoryMap.end(); ++it, count++ )
    {
 
