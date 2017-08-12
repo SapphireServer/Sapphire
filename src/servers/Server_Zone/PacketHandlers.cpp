@@ -1134,3 +1134,33 @@ void Core::Network::GameConnection::logoutHandler( Core::Network::Packets::GameP
    logoutPacket.data().flags2 = 0x2000;
    queueOutPacket( logoutPacket );
 }
+
+void Core::Network::GameConnection::cfDutyInfoRequest(Core::Network::Packets::GamePacketPtr pInPacket,
+   Core::Entity::PlayerPtr pPlayer)
+{
+   GamePacketNew< FFXIVIpcCFDutyInfo > dutyInfoPacket( pPlayer->getId() );
+   queueOutPacket( dutyInfoPacket );
+
+   GamePacketNew< FFXIVIpcCFPlayerInNeed > inNeedsPacket( pPlayer->getId() );
+   queueOutPacket( inNeedsPacket );
+
+}
+
+void Core::Network::GameConnection::cfRegisterDuty(Core::Network::Packets::GamePacketPtr pInPacket,
+   Core::Entity::PlayerPtr pPlayer)
+{
+   // TODO implment
+
+}
+
+void Core::Network::GameConnection::cfRegisterRoulette(Core::Network::Packets::GamePacketPtr pInPacket,
+   Core::Entity::PlayerPtr pPlayer)
+{
+
+}
+
+void Core::Network::GameConnection::cfDutyAccepted(Core::Network::Packets::GamePacketPtr pInPacket,
+   Core::Entity::PlayerPtr pPlayer)
+{
+
+}
