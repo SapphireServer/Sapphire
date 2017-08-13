@@ -10,7 +10,7 @@ class skillDef_3Def
 
     def onFinish( player, target )
     {
-        player.addStatusEffectById(50, 20000, 3791585310);
+        player.addStatusEffectById(50, 20000, 30, 65505);
     }
 
 };

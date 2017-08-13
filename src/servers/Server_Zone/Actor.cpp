@@ -605,10 +605,11 @@ void Core::Entity::Actor::addStatusEffect( StatusEffect::StatusEffectPtr pEffect
 }
 
 /*! \param StatusEffectPtr to be applied to the actor */
-void Core::Entity::Actor::addStatusEffectById( int32_t id, int32_t duration, uint32_t power )
+void Core::Entity::Actor::addStatusEffectById( int32_t id, int32_t duration, uint16_t power, uint16_t power_2 )
 {
    StatusEffect::StatusEffectPtr effect( new StatusEffect::StatusEffect( id, shared_from_this(), shared_from_this(), duration, 3000 ) );
    effect->setPower( power );
+   effect->setPower_2( power_2 );
    addStatusEffect( effect );
 }
 
