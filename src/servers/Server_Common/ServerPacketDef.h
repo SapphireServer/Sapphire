@@ -339,7 +339,8 @@ struct FFXIVIpcAddStatusEffect : FFXIVIpcBasePacket<AddStatusEffect>
    uint8_t effect_index; // which position do i display this
    uint8_t unknown3;
    uint16_t effect_id;
-   uint32_t power;
+   uint16_t unkpower1;
+   uint16_t unkpower2;
    float duration;
    uint32_t actor_id1;
    uint8_t unknown4[52];
