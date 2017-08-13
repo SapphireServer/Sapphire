@@ -164,6 +164,7 @@ void Core::Network::GameConnection::gm1Handler( Core::Network::Packets::GamePack
    g_log.debug( pPlayer->getName() + " used GM1 commandId: " + std::to_string( commandId ) + ", params: " + std::to_string( param1 ) + ", " + std::to_string( param2 ) + ", " + std::to_string( param3 ) );
 
    Core::Entity::ActorPtr targetActor;
+   
 
    if( pPlayer->getId() == param3 )
    {
@@ -174,11 +175,13 @@ void Core::Network::GameConnection::gm1Handler( Core::Network::Packets::GamePack
       for( auto actor : inRange )
       {
          if( actor->getId() == param3 )
-         {
             targetActor = actor;
-         }
       }
    }
+
+   if( !targetActor )
+      return;
+   auto targetPlayer = targetActor->getAsPlayer();
 
    switch( commandId )
    {
@@ -190,101 +193,101 @@ void Core::Network::GameConnection::gm1Handler( Core::Network::Packets::GamePack
    }
    case GmCommand::QuestSequence:
    {
-      targetActor->getAsPlayer()->updateQuest( param1, param2 );
+      targetPlayer->updateQuest( param1, param2 );
       break;
    }
    case GmCommand::QuestComplete:
    {
-      targetActor->getAsPlayer()->finishQuest( param1 );
+      targetPlayer->finishQuest( param1 );
       break;
    }
    case GmCommand::QuestAccept:
    {
-      targetActor->getAsPlayer()->updateQuest( param1, 1 );
+      targetPlayer->updateQuest( param1, 1 );
       break;
    }
    case GmCommand::QuestCancel:
    {
-      targetActor->getAsPlayer()->removeQuest( param1 );
+      targetPlayer->removeQuest( param1 );
       break;
    }
    case GmCommand::QuestIncomplete:
    {
-      targetActor->getAsPlayer()->unfinishQuest( param1 );
+      targetPlayer->unfinishQuest( param1 );
       break;
    }
    case GmCommand::Speed:
    {
-      targetActor->getAsPlayer()->queuePacket( ActorControlPacket143( pPlayer->getId(), Flee, param1 ) );
-      pPlayer->sendNotice( "Speed for " + targetActor->getAsPlayer()->getName() + " was set to " + std::to_string( param1 ) );
+      targetPlayer->queuePacket( ActorControlPacket143( pPlayer->getId(), Flee, param1 ) );
+      pPlayer->sendNotice( "Speed for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
       break;
    }
    case GmCommand::Gil:
    {
-      targetActor->getAsPlayer()->addCurrency( 1, param1 );
-      pPlayer->sendNotice( "Added  " + std::to_string( param1 ) + " Gil for " + targetActor->getAsPlayer()->getName() );
+      targetPlayer->addCurrency( 1, param1 );
+      pPlayer->sendNotice( "Added  " + std::to_string( param1 ) + " Gil for " + targetPlayer->getName() );
       break;
    }
    case GmCommand::Lv:
    {
-      targetActor->getAsPlayer()->setLevel( param1 );
-      pPlayer->sendNotice( "Level for " + targetActor->getAsPlayer()->getName() + " was set to " + std::to_string( param1 ) );
+      targetPlayer->setLevel( param1 );
+      pPlayer->sendNotice( "Level for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
       break;
    }
    case GmCommand::Hp:
    {
-      targetActor->getAsPlayer()->setHp( param1 );
-      pPlayer->sendNotice( "Tp for " + targetActor->getAsPlayer()->getName() + " was set to " + std::to_string( param1 ) );
+      targetPlayer->setHp( param1 );
+      pPlayer->sendNotice( "Tp for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
       break;
    }
    case GmCommand::Mp:
    {
-      targetActor->getAsPlayer()->setMp( param1 );
-      pPlayer->sendNotice( "Mp for " + targetActor->getAsPlayer()->getName() + " was set to " + std::to_string( param1 ) );
+      targetPlayer->setMp( param1 );
+      pPlayer->sendNotice( "Mp for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
       break;
    }
    case GmCommand::Gp:
    {
-      targetActor->getAsPlayer()->setHp( param1 );
-      pPlayer->sendNotice( "Gp for " + targetActor->getAsPlayer()->getName() + " was set to " + std::to_string( param1 ) );
+      targetPlayer->setHp( param1 );
+      pPlayer->sendNotice( "Gp for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
       break;
    }
    case GmCommand::Sex:
    {
-      targetActor->getAsPlayer()->setLookAt( CharaLook::Gender, param1 );
-      pPlayer->sendNotice( "Sex for " + targetActor->getAsPlayer()->getName() + " was set to " + std::to_string( param1 ) );
-      targetActor->spawn( targetActor->getAsPlayer() );
+      targetPlayer->setLookAt( CharaLook::Gender, param1 );
+      pPlayer->sendNotice( "Sex for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
+      targetPlayer->spawn( targetPlayer );
       auto inRange = targetActor->getInRangeActors();
       for( auto actor : inRange )
       {
-         targetActor->getAsPlayer()->despawn( actor->getAsPlayer() );
-         targetActor->getAsPlayer()->spawn( actor->getAsPlayer() );
+         targetPlayer->despawn( actor->getAsPlayer() );
+         targetPlayer->spawn( actor->getAsPlayer() );
       }
       break;
    }
    case GmCommand::Race:
    {
-      targetActor->getAsPlayer()->setLookAt( CharaLook::Race, param1 );
-      pPlayer->sendNotice( "Race for " + targetActor->getAsPlayer()->getName() + " was set to " + std::to_string( param1 ) );
-      targetActor->spawn( targetActor->getAsPlayer() );
-      auto inRange = targetActor->getInRangeActors();
+      targetPlayer->setLookAt( CharaLook::Race, param1 );
+      pPlayer->sendNotice( "Race for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
+      targetPlayer->spawn( targetPlayer );
+      auto inRange = targetPlayer->getInRangeActors();
       for( auto actor : inRange )
       {
-         targetActor->getAsPlayer()->despawn( actor->getAsPlayer() );
-         targetActor->getAsPlayer()->spawn( actor->getAsPlayer() );
+         targetPlayer->despawn( actor->getAsPlayer() );
+         targetPlayer->spawn( actor->getAsPlayer() );
       }
       break;
    }
    case GmCommand::Tribe:
    {
-      targetActor->getAsPlayer()->setLookAt( CharaLook::Tribe, param1 );
-      pPlayer->sendNotice( "Tribe for " + targetActor->getAsPlayer()->getName() + " was set to " + std::to_string( param1 ) );
-      targetActor->spawn( targetActor->getAsPlayer() );
-      auto inRange = targetActor->getInRangeActors();
+      targetPlayer->setLookAt( CharaLook::Tribe, param1 );
+      pPlayer->sendNotice( "Tribe for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
+      targetPlayer->spawn( targetPlayer );
+      auto inRange = targetPlayer->getInRangeActors();
       for( auto actor : inRange )
       {
-         targetActor->getAsPlayer()->despawn( actor->getAsPlayer() );
-         targetActor->getAsPlayer()->spawn( actor->getAsPlayer() );
+         targetPlayer->despawn( actor->getAsPlayer() );
+         targetPlayer->spawn( actor->getAsPlayer() );
       }
       break;
    }
@@ -301,20 +304,25 @@ void Core::Network::GameConnection::gm1Handler( Core::Network::Packets::GamePack
          return;
       }
 
-      if( !targetActor->getAsPlayer()->addItem( -1, param1, param2 ) )
+      if( !targetPlayer->addItem( -1, param1, param2 ) )
          pPlayer->sendUrgent( "Item " + std::to_string( param1 ) + " not found..." );
       break;
    }
    case GmCommand::Weather:
    {
-      targetActor->getAsPlayer()->getCurrentZone()->setWeatherOverride( param1 );
-      pPlayer->sendNotice( "Weather in Zone \"" + targetActor->getAsPlayer()->getCurrentZone()->getName() + "\" of " + targetActor->getAsPlayer()->getName() + " set in range." );
+      targetPlayer->getCurrentZone()->setWeatherOverride( param1 );
+      pPlayer->sendNotice( "Weather in Zone \"" + targetPlayer->getCurrentZone()->getName() + "\" of " + 
+                           targetPlayer->getName() + " set in range." );
       break;
    }
    case GmCommand::TeriInfo:
    {
-      pPlayer->sendNotice( "ZoneId: " + std::to_string( pPlayer->getZoneId() ) + "\nName: " + pPlayer->getCurrentZone()->getName() + "\nInternalName: " + pPlayer->getCurrentZone()->getInternalName() + "\nPopCount: " + std::to_string( pPlayer->getCurrentZone()->getPopCount() ) + 
-                           "\nCurrentWeather:" + std::to_string( pPlayer->getCurrentZone()->getCurrentWeather() ) + "\nNextWeather:" + std::to_string( pPlayer->getCurrentZone()->getNextWeather() ) );
+      pPlayer->sendNotice( "ZoneId: " + std::to_string( pPlayer->getZoneId() ) + "\nName: " + 
+                           pPlayer->getCurrentZone()->getName() + "\nInternalName: " + 
+                           pPlayer->getCurrentZone()->getInternalName() + "\nPopCount: " + 
+                           std::to_string( pPlayer->getCurrentZone()->getPopCount() ) + 
+                           "\nCurrentWeather:" + std::to_string( pPlayer->getCurrentZone()->getCurrentWeather() ) +
+                           "\nNextWeather:" + std::to_string( pPlayer->getCurrentZone()->getNextWeather() ) );
       break;
    }
    case GmCommand::Jump:
@@ -323,14 +331,15 @@ void Core::Network::GameConnection::gm1Handler( Core::Network::Packets::GamePack
       auto inRange = pPlayer->getInRangeActors();
       for( auto actor : inRange )
       {
-         pPlayer->changePosition( targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z, targetActor->getRotation() );
+         pPlayer->changePosition( targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z,
+                                  targetActor->getRotation() );
       }
-      pPlayer->sendNotice( "Jumping to " + targetActor->getAsPlayer()->getName() + " in range." );
+      pPlayer->sendNotice( "Jumping to " + targetPlayer->getName() + " in range." );
       break;
    }
    case GmCommand::Collect:
    {
-      uint32_t gil = targetActor->getAsPlayer()->getCurrency( 1 );
+      uint32_t gil = targetPlayer->getCurrency( 1 );
       
       if( gil < param1 )
       {
@@ -338,41 +347,46 @@ void Core::Network::GameConnection::gm1Handler( Core::Network::Packets::GamePack
       }
       else
       {
-         targetActor->getAsPlayer()->removeCurrency( 1, param1 );
-         pPlayer->sendNotice( "Removed " + std::to_string( param1 ) + " Gil from " + targetActor->getAsPlayer()->getName() + "(" + std::to_string( gil ) + " before)" );
+         targetPlayer->removeCurrency( 1, param1 );
+         pPlayer->sendNotice( "Removed " + std::to_string( param1 ) +
+                              " Gil from " + targetPlayer->getName() +
+                              "(" + std::to_string( gil ) + " before)" );
       }
       break;
    }
    case GmCommand::Icon:
    {
-      targetActor->getAsPlayer()->setOnlineStatusMask( param1 );
+      targetPlayer->setOnlineStatusMask( param1 );
 
-      GamePacketNew< FFXIVIpcSetOnlineStatus > statusPacket( targetActor->getAsPlayer()->getId() );
+      GamePacketNew< FFXIVIpcSetOnlineStatus > statusPacket( targetPlayer->getId() );
       statusPacket.data().onlineStatusFlags = param1;
       queueOutPacket( statusPacket );
 
-      GamePacketNew< FFXIVIpcSetSearchInfo > searchInfoPacket( targetActor->getAsPlayer()->getId() );
+      GamePacketNew< FFXIVIpcSetSearchInfo > searchInfoPacket( targetPlayer->getId() );
       searchInfoPacket.data().onlineStatusFlags = param1;
-      searchInfoPacket.data().selectRegion = targetActor->getAsPlayer()->getSearchSelectRegion();
-      sprintf( searchInfoPacket.data().searchMessage, targetActor->getAsPlayer()->getSearchMessage() );
-      targetActor->getAsPlayer()->queuePacket( searchInfoPacket );
+      searchInfoPacket.data().selectRegion = targetPlayer->getSearchSelectRegion();
+      sprintf( searchInfoPacket.data().searchMessage, targetPlayer->getSearchMessage() );
+      targetPlayer->queuePacket( searchInfoPacket );
 
-      targetActor->getAsPlayer()->sendToInRangeSet( ActorControlPacket142( pPlayer->getId(), SetStatusIcon,
-         static_cast< uint8_t >( pPlayer->getOnlineStatus() ) ),
-         true );
-      pPlayer->sendNotice( "Icon for " + targetActor->getAsPlayer()->getName() + " was set to " + std::to_string( param1 ) );
+      targetPlayer->sendToInRangeSet( ActorControlPacket142( pPlayer->getId(), SetStatusIcon,
+                                      static_cast< uint8_t >( pPlayer->getOnlineStatus() ) ),
+                                      true );
+      pPlayer->sendNotice( "Icon for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
       break;
    }
    case GmCommand::GC:
    {
-      targetActor->getAsPlayer()->setGc( param1 );
-      pPlayer->sendNotice( "GC for " + targetActor->getAsPlayer()->getName() + " was set to " + std::to_string( targetActor->getAsPlayer()->getGc() ) );
+      targetPlayer->setGc( param1 );
+      pPlayer->sendNotice( "GC for " + targetPlayer->getName() +
+                           " was set to " + std::to_string( targetPlayer->getGc() ) );
       break;
    }
    case GmCommand::GCRank:
    {
-      targetActor->getAsPlayer()->setGcRankAt( targetActor->getAsPlayer()->getGc() - 1, param1 );
-      pPlayer->sendNotice( "GC Rank for  " + targetActor->getAsPlayer()->getName() + " for GC " + std::to_string( targetActor->getAsPlayer()->getGc()) + " was set to " + std::to_string( targetActor->getAsPlayer()->getGcRankArray()[targetActor->getAsPlayer()->getGc() - 1] ) );
+      targetPlayer->setGcRankAt( targetPlayer->getGc() - 1, param1 );
+      pPlayer->sendNotice( "GC Rank for  " + targetPlayer->getName() +
+                           " for GC " + std::to_string( targetPlayer->getGc()) +
+                           " was set to " + std::to_string( targetPlayer->getGcRankArray()[targetPlayer->getGc() - 1] ) );
       break;
    }
 
@@ -411,45 +425,57 @@ void Core::Network::GameConnection::gm2Handler( Core::Network::Packets::GamePack
       }
    }
 
+   if( !targetActor )
+      return;
+   auto targetPlayer = targetActor->getAsPlayer();
+
    switch( commandId )
    {
    case GmCommand::Raise:
    {
-      targetActor->getAsPlayer()->resetHp();
-      targetActor->getAsPlayer()->resetMp();
-      targetActor->getAsPlayer()->setStatus( Entity::Actor::ActorStatus::Idle );
-      targetActor->getAsPlayer()->setSyncFlag( Status );
+      targetPlayer->resetHp();
+      targetPlayer->resetMp();
+      targetPlayer->setStatus( Entity::Actor::ActorStatus::Idle );
+      targetPlayer->setSyncFlag( Status );
 
-      targetActor->getAsPlayer()->sendToInRangeSet( ActorControlPacket143( pPlayer->getId(), ZoneIn, 0x01, 0x01, 0, 113 ), true );
-      targetActor->getAsPlayer()->sendToInRangeSet( ActorControlPacket142( pPlayer->getId(), SetStatus, static_cast< uint8_t >( Entity::Actor::ActorStatus::Idle ) ), true );
-      pPlayer->sendNotice( "Raised  " + targetActor->getAsPlayer()->getName());
+      targetPlayer->sendToInRangeSet( ActorControlPacket143( pPlayer->getId(), ZoneIn, 0x01, 0x01, 0, 113 ), true );
+      targetPlayer->sendToInRangeSet( ActorControlPacket142( pPlayer->getId(), SetStatus,
+                                                             static_cast< uint8_t >( Entity::Actor::ActorStatus::Idle ) ), true );
+      pPlayer->sendNotice( "Raised  " + targetPlayer->getName());
       break;
    }
    case GmCommand::Jump:
    {
-      if( targetActor->getAsPlayer()->getZoneId() != pPlayer->getZoneId() )
+      if( targetPlayer->getZoneId() != pPlayer->getZoneId() )
       {
-         pPlayer->setZone( targetActor->getAsPlayer()->getZoneId() );
+         pPlayer->setZone( targetPlayer->getZoneId() );
       }
-      pPlayer->changePosition( targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z, targetActor->getRotation() );
-      pPlayer->sendNotice( "Jumping to " + targetActor->getAsPlayer()->getName());
+      pPlayer->changePosition( targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z,
+                               targetActor->getRotation() );
+      pPlayer->sendNotice( "Jumping to " + targetPlayer->getName());
       break;
    }
    case GmCommand::Call:
    {
-      if( targetActor->getAsPlayer()->getZoneId() != pPlayer->getZoneId() )
-      {
-         targetActor->getAsPlayer()->setZone( pPlayer->getZoneId() );
-      }
-      targetActor->getAsPlayer()->changePosition( pPlayer->getPos().x, pPlayer->getPos().y, pPlayer->getPos().z, pPlayer->getRotation() );
-      pPlayer->sendNotice( "Calling " + targetActor->getAsPlayer()->getName() );
+      if( targetPlayer->getZoneId() != pPlayer->getZoneId() )
+         targetPlayer->setZone( pPlayer->getZoneId() );
+
+      targetPlayer->changePosition( pPlayer->getPos().x, pPlayer->getPos().y, pPlayer->getPos().z,
+                                    pPlayer->getRotation() );
+      pPlayer->sendNotice( "Calling " + targetPlayer->getName() );
       break;
    }
    case GmCommand::Inspect:
    {
-      pPlayer->sendNotice( "Name: " + targetActor->getAsPlayer()->getName() + "\nGil: " + std::to_string( targetActor->getAsPlayer()->getCurrency( 1 ) ) + "\nZone: " + targetActor->getAsPlayer()->getCurrentZone()->getName() + "(" + std::to_string( targetActor->getAsPlayer()->getZoneId() ) + ")" +
-         "\nClass: " + std::to_string( targetActor->getAsPlayer()->getClass() ) + "\nLevel: " + std::to_string( targetActor->getAsPlayer()->getLevel() ) + "\nExp: " + std::to_string( targetActor->getAsPlayer()->getExp() ) + "\nSearchMessage: " + targetActor->getAsPlayer()->getSearchMessage() +
-         "\nPlayTime: " + std::to_string( targetActor->getAsPlayer()->getPlayTime() ) );
+      pPlayer->sendNotice( "Name: " + targetPlayer->getName() +
+                           "\nGil: " + std::to_string( targetPlayer->getCurrency( 1 ) ) + 
+                           "\nZone: " + targetPlayer->getCurrentZone()->getName() + 
+                           "(" + std::to_string( targetPlayer->getZoneId() ) + ")" +
+                           "\nClass: " + std::to_string( targetPlayer->getClass() ) + 
+                           "\nLevel: " + std::to_string( targetPlayer->getLevel() ) + 
+                           "\nExp: " + std::to_string( targetPlayer->getExp() ) + 
+                           "\nSearchMessage: " + targetPlayer->getSearchMessage() +
+                           "\nPlayTime: " + std::to_string( targetPlayer->getPlayTime() ) );
       break;
    }
 
