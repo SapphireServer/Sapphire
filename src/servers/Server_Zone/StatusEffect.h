@@ -30,11 +30,9 @@ public:
    uint32_t getTargetActorId() const;
    uint64_t getLastTickMs() const;
    uint64_t getStartTimeMs() const;
-   uint16_t getPower() const;
-   uint16_t getPower_2() const;
+   uint16_t getParam() const;
    void setLastTick( uint64_t lastTick );
-   void setPower( uint16_t power );
-   void setPower_2( uint16_t power );
+   void setParam( uint16_t param );
    const std::string& getName() const;
 
 private:
@@ -45,8 +43,7 @@ private:
    uint64_t m_startTime;
    uint32_t m_tickRate;
    uint64_t m_lastTick;
-   uint16_t m_unkpower1;
-   uint16_t m_unkpower2;  //Figure out what this actually is supposed to be
+   uint16_t m_param;
    std::string m_name;
 
 };

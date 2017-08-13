@@ -67,14 +67,9 @@ uint32_t Core::StatusEffect::StatusEffect::getTargetActorId() const
    return m_targetActor->getId();
 }
 
-uint16_t Core::StatusEffect::StatusEffect::getPower() const
+uint16_t Core::StatusEffect::StatusEffect::getParam() const
 {
-   return m_unkpower1;
-}
-
-uint16_t Core::StatusEffect::StatusEffect::getPower_2() const
-{
-   return m_unkpower2;
+   return m_param;
 }
 
 void Core::StatusEffect::StatusEffect::applyStatus()
@@ -139,14 +134,9 @@ void Core::StatusEffect::StatusEffect::setLastTick( uint64_t lastTick )
    m_lastTick = lastTick;
 }
 
-void Core::StatusEffect::StatusEffect::setPower( uint16_t power )
+void Core::StatusEffect::StatusEffect::setParam( uint16_t param )
 {
-   m_unkpower1 = power;
-}
-
-void Core::StatusEffect::StatusEffect::setPower_2( uint16_t power )
-{
-   m_unkpower2 = power;
+   m_param = param;
 }
 
 const std::string& Core::StatusEffect::StatusEffect::getName() const

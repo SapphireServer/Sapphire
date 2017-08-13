@@ -69,8 +69,7 @@ void Core::StatusEffect::StatusEffectContainer::addStatusEffect( StatusEffectPtr
    statusEffectAdd.data().max_mp = m_pOwner->getMaxMp();
    statusEffectAdd.data().max_something = 1;
     //statusEffectAdd.data().unknown2 = 28;
-   statusEffectAdd.data().unkpower1 = pEffect->getPower();
-   statusEffectAdd.data().unkpower2 = pEffect->getPower_2();
+   statusEffectAdd.data().param = pEffect->getParam();
 
    bool sendToSelf = m_pOwner->isPlayer() ? true : false;
    m_pOwner->sendToInRangeSet( statusEffectAdd, sendToSelf );
