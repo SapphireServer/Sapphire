@@ -554,14 +554,14 @@ bool Core::Entity::Player::isNewAdventurer() const
 
 void Core::Entity::Player::setNewAdventurer( bool state )
 {
-   if( !state )
-   {
-      unsetStateFlag( PlayerStateFlag::NewAdventurer );
-   }
-   else
-   {
-      setStateFlag( PlayerStateFlag::NewAdventurer );
-   }
+   //if( !state )
+   //{
+   //   unsetStateFlag( PlayerStateFlag::NewAdventurer );
+   //}
+   //else
+   //{
+   //   setStateFlag( PlayerStateFlag::NewAdventurer );
+   //}
    sendStateFlags();
    m_bNewAdventurer = state;
    setSyncFlag( PlayerSyncFlags::NewAdventurer );
@@ -1012,6 +1012,20 @@ void Core::Entity::Player::setStateFlag( Core::Common::PlayerStateFlag flag )
 
    m_stateFlags[index] |= value;
 
+}
+
+void Core::Entity::Player::setStateFlags( std::vector< Common::PlayerStateFlag > flags )
+{
+   for( const auto& flag : flags )
+   {
+      int iFlag = static_cast< uint32_t >( flag );
+
+      uint16_t index;
+      uint8_t value;
+      Util::valueToFlagByteIndexValue( iFlag, value, index );
+
+      m_stateFlags[index] |= value;
+   }
 }
 
 void Core::Entity::Player::sendStateFlags()

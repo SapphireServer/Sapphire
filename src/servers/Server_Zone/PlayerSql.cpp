@@ -203,8 +203,8 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
    if( m_hp == 0 )
       m_status = ActorStatus::Dead;
 
-   if( m_bNewAdventurer )
-      setStateFlag( PlayerStateFlag::NewAdventurer );
+ //  if( m_bNewAdventurer )
+ //     setStateFlag( PlayerStateFlag::NewAdventurer );
 
    setStateFlag( PlayerStateFlag::BetweenAreas );
 

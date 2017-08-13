@@ -48,7 +48,7 @@ void Core::Action::EventAction::onStart()
    m_startTime = Util::getTimeMs();
 
    auto control = ActorControlPacket142( m_pSource->getId(), Common::ActorControlType::CastStart,
-                                         1, m_id, 0x4000002F );
+                                         1, m_id, 0x4000004E );
 
    if( m_pSource->isPlayer() )
    {
