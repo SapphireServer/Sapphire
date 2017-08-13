@@ -547,7 +547,6 @@ namespace Core {
 
       enum struct PlayerStateFlag : uint8_t
       {
-         NoFlag = 0,
          NoCombat,
          Combat,
          Casting,
@@ -560,11 +559,10 @@ namespace Core {
          Occupied3,
          BoundByDuty,
          Occupied4,
-         NewAdventurer,
+         DuelingArea,
          TradeOpen,
-         BrowsingBazaar,
+         Occupied5,
          HandlingItems,
-
          Crafting,
          PreparingToCraft,
          Gathering,
@@ -573,10 +571,9 @@ namespace Core {
          BetweenAreas,
          Stealthed,
          InnRoom,
-
          Jumping,
          AutoRun,
-         Occupied5,
+         Occupied6,
          BetweenAreas1,
          SystemError,
          LoggingOut,
@@ -607,7 +604,13 @@ namespace Core {
          WaitingForRaceOrMatch,
          WaitingForTripleTriadMatch,
          InFlight,
-         WatchingCutscene1
+         WatchingCutscene1,
+         DeepDungeon,
+         Swimming,
+         Diving,
+         RegisteringTripleTriad,
+         WaitingTripleTriad,
+         InCrossWorldParty
 
       };
 

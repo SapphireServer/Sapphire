@@ -386,6 +386,8 @@ public:
    const uint8_t* getStateFlags() const;
    /* set a specified state flag */
    void setStateFlag( Common::PlayerStateFlag flag );
+   /* set a specified state flag */
+   void setStateFlags( std::vector< Common::PlayerStateFlag > flags );
    /* check if a specified flag is set */
    bool hasStateFlag( Common::PlayerStateFlag flag ) const;
    /* reset a specified flag */
