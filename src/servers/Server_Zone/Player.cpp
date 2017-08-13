@@ -1057,7 +1057,7 @@ void Core::Entity::Player::update( int64_t currTime )
       Common::FFXIVARR_POSITION3 targetPos = m_queuedZoneing->m_targetPosition;
       if( getCurrentZone()->getId() != m_queuedZoneing->m_targetZone )
       {
-            performZoning( m_queuedZoneing->m_targetZone, targetPos, m_queuedZoneing->m_targetRotation);
+         performZoning( m_queuedZoneing->m_targetZone, targetPos, m_queuedZoneing->m_targetRotation);
       }
       else
       {
@@ -1374,13 +1374,13 @@ void Core::Entity::Player::onMobDeaggro( Core::Entity::BattleNpcPtr pBNpc )
 void Core::Entity::Player::hateListAdd( Core::Entity::BattleNpcPtr pBNpc )
 
 {
-   if( !m_freeHateSlotQueue.empty() )
-   {
-      uint8_t hateId = m_freeHateSlotQueue.front();
-      m_freeHateSlotQueue.pop();
-      m_actorIdTohateSlotMap[pBNpc->getId()] = hateId;
-      sendHateList();
-   }
+   if( m_freeHateSlotQueue.empty() )
+      return;
+   uint8_t hateId = m_freeHateSlotQueue.front();
+   m_freeHateSlotQueue.pop();
+   m_actorIdTohateSlotMap[pBNpc->getId()] = hateId;
+   sendHateList();
+
 }
 
 void Core::Entity::Player::hateListRemove( Core::Entity::BattleNpcPtr pBNpc )
