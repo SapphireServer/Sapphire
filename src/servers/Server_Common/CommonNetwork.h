@@ -145,10 +145,10 @@ namespace Packets {
       SocialRequestError         = 0x00AD,
       SocialRequestResponse      = 0x11AF,
       SocialList                 = 0x00B4, // updated for sb
-      UpdateSearchInfo           = 0x00B2,
+      UpdateSearchInfo           = 0x00B6, // updated for sb
       InitSearchInfo             = 0x00B7, // updated for sb
       ServerNotice               = 0x00BC, // updated for sb
-      SetOnlineStatus            = 0x00B9,
+      SetOnlineStatus            = 0x00BD, // updated for sb
       BlackList                  = 0x00CA, // updated for sb
       LinkshellList              = 0x00D1, // updated for sb
       StatusEffectList           = 0x00F0, // updated for sb
@@ -243,7 +243,7 @@ namespace Packets {
 
       SocialReqSendHandler     = 0x00A5,
       SocialListHandler        = 0x00AA,// updated for sb
-      SetSearchInfoHandler     = 0x00AC,
+      SetSearchInfoHandler     = 0x00AC,// updated for sb
 
       ReqSearchInfoHandler     = 0x00AD,
 
