@@ -363,10 +363,13 @@ void Core::GameCommandHandler::add( char * data, Core::Entity::PlayerPtr pPlayer
    {
       int32_t id;
       int32_t duration;
+      uint16_t param;
 
-      sscanf( params.c_str(), "%d %d", &id, &duration );
+      sscanf( params.c_str(), "%d %d %hd", &id, &duration, &param );
 
       StatusEffect::StatusEffectPtr effect( new StatusEffect::StatusEffect( id, pPlayer, pPlayer, duration, 3000 ) );
+      effect->setParam( param );
+
       pPlayer->addStatusEffect( effect );
    }
    else if( subCommand == "spawn" )
