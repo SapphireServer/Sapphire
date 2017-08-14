@@ -75,22 +75,7 @@ void Core::Action::ActionCast::onFinish()
    pPlayer->unsetStateFlag( PlayerStateFlag::Casting );
    pPlayer->sendStateFlags();
 
-   GamePacketNew< FFXIVIpcEffect > effectPacket( pPlayer->getId() );
-   effectPacket.data().targetId = m_pTarget->getId();
-   effectPacket.data().actionAnimationId = m_id;
-   effectPacket.data().unknown_2 = 0;
-//   effectPacket.data().unknown_3 = 1;
-   effectPacket.data().actionTextId = m_id;
-   effectPacket.data().numEffects = 1;
-   effectPacket.data().rotation = Math::Util::floatToUInt16Rot( pPlayer->getRotation() );
-   effectPacket.data().effectTarget = m_pTarget->getId();
-   effectPacket.data().effects[0].param1 = 30;
-   effectPacket.data().effects[0].unknown_1 = 3;
-   effectPacket.data().effects[0].unknown_2 = 1;
-   effectPacket.data().effects[0].unknown_3 = 7;
-
-   pPlayer->sendToInRangeSet( effectPacket, true );
-   m_pTarget->takeDamage( 30 );
+   
 
    g_scriptMgr.onCastFinish( pPlayer, m_pTarget, m_id );
 }
