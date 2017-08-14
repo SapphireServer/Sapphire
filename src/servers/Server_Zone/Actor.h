@@ -245,6 +245,7 @@ public:
    virtual uint8_t getLevel() const;
    virtual void sendStatusUpdate( bool toSelf = true );
    virtual void takeDamage( uint32_t damage );
+   virtual void heal( uint32_t amount );
    virtual bool checkAction();
    virtual void update( int64_t currTime ) {};
    
