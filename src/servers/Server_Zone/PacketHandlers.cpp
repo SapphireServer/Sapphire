@@ -237,7 +237,7 @@ void Core::Network::GameConnection::gm1Handler( Core::Network::Packets::GamePack
    case GmCommand::Hp:
    {
       targetPlayer->setHp( param1 );
-      pPlayer->sendNotice( "Tp for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
+      pPlayer->sendNotice( "Hp for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
       break;
    }
    case GmCommand::Mp:
