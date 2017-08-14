@@ -224,3 +224,10 @@ GLOBAL CURRENCY_MGP = 0X0B
 GLOBAL CURRENCY_TOMESTONELAW = 0X0C
 GLOBAL CURRENCY_TOMESTONEESO = 0X0D
 GLOBAL CURRENCY_TOMESTONELORE = 0X0E
+
+////////////////////////////////////////////////////////////
+// Skill handle types
+////////////////////////////////////////////////////////////
+GLOBAL STD_DAMAGE = 0X00
+GLOBAL STD_HEAL = 0X01
+GLOBAL STD_DOT = 0X02

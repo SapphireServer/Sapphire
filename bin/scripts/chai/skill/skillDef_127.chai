@@ -1,0 +1,18 @@
+// Skill Name: Sprint
+// Skill ID: 3
+
+class skillDef_127Def
+{
+    def skillDef_127Def()
+    {
+
+    }
+
+    def onFinish( player, target )
+    {
+        player.handleScriptSkill( STD_DAMAGE, 127, 1000, 0, target );
+    }
+
+};
+
+GLOBAL skillDef_127 = skillDef_127Def();

@@ -545,6 +545,13 @@ namespace Core {
 
       };
 
+      enum HandleSkillType : uint8_t
+      {
+         StdDamage,
+         StdHeal,
+         StdDot,
+      };
+
       enum struct PlayerStateFlag : uint8_t
       {
          NoCombat,
