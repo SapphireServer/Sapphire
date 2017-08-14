@@ -27,5 +27,7 @@
    <Parameters>
       <!-- Do not disconnect players without a session - this should be definitely disabled unless you are testing on a PS4 -->
       <AllowNoSessionConnect>false</AllowNoSessionConnect>   
+      <!-- The ID of the Sapphire world - this is what the game determines your datacenter with, check world.exh -->
+      <WorldID>67</WorldID>   
     </Parameters>
 </Settings>
