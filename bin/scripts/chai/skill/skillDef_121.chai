@@ -10,7 +10,7 @@ class skillDef_121Def
 
     def onFinish( player, target )
     {
-        target.addStatusEffectById(143, 20000, 0);
+        target.addStatusEffectByIdIfNotExist(143, 20000, 0);
     }
 
 };
