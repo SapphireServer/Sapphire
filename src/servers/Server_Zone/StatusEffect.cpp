@@ -50,11 +50,22 @@ Core::StatusEffect::StatusEffect::~StatusEffect()
 {
 }
 
+void Core::StatusEffect::StatusEffect::registerTickEffect( uint8_t type, uint32_t param )
+{
+   m_currTickEffect = std::make_pair( type, param );
+}
+
+std::pair< uint8_t, uint32_t> Core::StatusEffect::StatusEffect::getTickEffect()
+{
+   auto thisTick = m_currTickEffect;
+   m_currTickEffect = std::make_pair( 0, 0 );
+   return thisTick;
+}
 
 void Core::StatusEffect::StatusEffect::onTick()
 {
    m_lastTick = Util::getTimeMs();
-   g_scriptMgr.onStatusTick( m_targetActor, m_id );
+   g_scriptMgr.onStatusTick( m_targetActor, *this );
 }
 
 uint32_t Core::StatusEffect::StatusEffect::getSrcActorId() const

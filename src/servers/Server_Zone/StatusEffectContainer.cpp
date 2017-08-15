@@ -125,6 +125,9 @@ void Core::StatusEffect::StatusEffectContainer::update()
 {
    uint64_t currentTimeMs = Util::getTimeMs();
 
+   uint64_t thisTickDmg = 0;
+   uint64_t thisTickHeal = 0;
+
    for( auto effectIt : m_effectMap )
    {
       uint8_t effectIndex = effectIt.first;
@@ -147,7 +150,38 @@ void Core::StatusEffect::StatusEffectContainer::update()
       {
          effect->setLastTick( currentTimeMs );
          effect->onTick();
+
+         auto thisEffect = effect->getTickEffect();
+
+         switch( thisEffect.first )
+         {
+
+         case 1:
+         {
+            thisTickDmg += thisEffect.second;
+            break;
+         }
+
+         case 2:
+         {
+            thisTickHeal += thisEffect.second;
+            break;
+         }
+
+         }
       }
 
+   }
+
+   if( thisTickDmg != 0 )
+   {
+      m_pOwner->takeDamage( thisTickDmg );
+      m_pOwner->sendToInRangeSet( ActorControlPacket142( m_pOwner->getId(), HPFloatingText, 0, 3, thisTickDmg ) );
+   }
+
+   if( thisTickHeal != 0 )
+   {
+      m_pOwner->heal( thisTickDmg );
+      m_pOwner->sendToInRangeSet( ActorControlPacket142( m_pOwner->getId(), HPFloatingText, 0, 4, thisTickHeal ) );
    }
 }
