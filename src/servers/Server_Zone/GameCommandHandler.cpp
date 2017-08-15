@@ -257,7 +257,27 @@ void Core::GameCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlayer
        else
            pPlayer->setClassJob( static_cast<Core::Common::ClassJob> ( id ) );
    }
+   else if( subCommand == "no" )
+   {
+      int32_t id;
 
+      sscanf( params.c_str(), "%d", &id );
+
+     
+
+      uint8_t typeshift = 0x6;
+      uint8_t mask = 1 << typeshift;
+      id &= mask;
+      bool final = ( id & mask ) == mask;
+      pPlayer->sendDebug( std::to_string(final) );
+   }
+   else if( subCommand == "aaah" )
+   {
+      int32_t id;
+
+      sscanf( params.c_str(), "%d", &id );
+      pPlayer->sendDebug( std::to_string( pPlayer->actionHasCastTime( id ) ) );
+   }
 
 }
 

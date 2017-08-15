@@ -80,7 +80,7 @@ void Core::Network::GameConnection::skillHandler( Core::Network::Packets::GamePa
             targetActor = pPlayer->lookupTargetById( targetId );
          }
 
-         if( pPlayer->actionHasCastTime( action ) )
+         if( !pPlayer->actionHasCastTime( action ) )
          {
             g_scriptMgr.onCastFinish( pPlayer, targetActor, action );
          }
