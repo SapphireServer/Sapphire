@@ -160,6 +160,8 @@ int Core::Scripting::ScriptManager::init()
    m_pChaiHandler->add( chaiscript::user_type< Entity::BattleNpc >(), "BattleNpc" );
    m_pChaiHandler->add( chaiscript::user_type< StatusEffect::StatusEffect >(), "StatusEffect" );
 
+   m_pChaiHandler->add( chaiscript::fun( &StatusEffect::StatusEffect::registerTickEffect ), "registerTickEffect" );
+
    m_pChaiHandler->add( chaiscript::user_type< Zone >(), "Zone" );
    m_pChaiHandler->add( chaiscript::fun( &Zone::getName ), "getName" );
 

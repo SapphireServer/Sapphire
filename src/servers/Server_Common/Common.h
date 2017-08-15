@@ -702,6 +702,7 @@ namespace Core {
          StatusEffectGain = 0x14,
          StatusEffectLose = 0x15,
 
+         HPFloatingText = 0x17,
          UpdateRestedExp = 0x018,
          Unk2 = 0x19,
 

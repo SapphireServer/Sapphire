@@ -36,6 +36,7 @@ private:
    std::queue< uint8_t > m_freeEffectSlotQueue;
 
    std::vector< StatusEffectPtr > m_effectList;
+   std::vector< std::pair< uint8_t, uint32_t> > m_tickEffectList;
    std::map< uint8_t, StatusEffectPtr > m_effectMap;
 };
 

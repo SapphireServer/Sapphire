@@ -53,7 +53,7 @@ namespace Core
          bool onCastFinish( Entity::PlayerPtr pPlayer, Entity::ActorPtr pTarget, uint32_t actionId );
 
          bool onStatusReceive( Entity::ActorPtr pActor, uint32_t effectId );
-         bool onStatusTick( Entity::ActorPtr pActor, uint32_t effectId );
+         bool onStatusTick( Entity::ActorPtr pActor, Core::StatusEffect::StatusEffect& effect );
          bool onStatusTimeOut( Entity::ActorPtr pActor, uint32_t effectId );
 
          bool onZoneInit( ZonePtr pZone );
