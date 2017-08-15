@@ -23,6 +23,13 @@ uint64_t Core::Util::getTimeMs()
    return now_ms;
 }
 
+uint64_t Core::Util::getTimeSeconds()
+{
+   std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+   auto now = std::chrono::time_point_cast< std::chrono::seconds >( t1 ).time_since_epoch().count();
+   return now;
+}
+
 uint64_t Core::Util::getEorzeanTimeStamp()
 {
    std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
