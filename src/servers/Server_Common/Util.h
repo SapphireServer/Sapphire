@@ -11,6 +11,8 @@ std::string binaryToHexString( uint8_t* pBinData, uint16_t size );
 
 uint64_t getTimeMs();
 
+uint64_t getTimeSeconds();
+
 uint64_t getEorzeanTimeStamp();
 
 void valueToFlagByteIndexValue( uint32_t inVal, uint8_t& outVal, uint16_t& outIndex );
