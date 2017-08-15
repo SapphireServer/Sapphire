@@ -1,0 +1,19 @@
+// Status Name: Wind
+// Status ID: 143
+
+class statusDef_143Def
+{
+    def statusDef_143Def()
+    {
+
+    }
+
+    def onTick( actor, effect )
+    {
+    	print("tick");
+        effect.registerTickEffect( 1, 30 );
+    }
+
+};
+
+GLOBAL statusDef_143 = statusDef_143Def();

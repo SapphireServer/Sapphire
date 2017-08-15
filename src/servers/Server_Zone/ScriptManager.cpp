@@ -12,6 +12,7 @@
 #include "Event.h"
 #include "EventHelper.h"
 #include "ScriptManager.h"
+#include "StatusEffect.h"
 
 #include "ServerNoticePacket.h"
 
@@ -405,34 +406,40 @@ bool Core::Scripting::ScriptManager::onStatusReceive( Entity::ActorPtr pActor, u
       auto obj = m_pChaiHandler->eval( "statusDef_" + std::to_string( effectId ) );
       std::string objName = "statusDef_" + std::to_string( effectId );
 
-      pActor->getAsPlayer()->sendDebug( "Calling: " + objName + "." + eventName );
+      if( pActor->isPlayer() )
+         pActor->getAsPlayer()->sendDebug( "Calling: " + objName + "." + eventName );
+
       auto fn = m_pChaiHandler->eval< std::function< void( chaiscript::Boxed_Value &, Entity::Actor&) > >( eventName );
       fn( obj, *pActor );
    }
    catch( std::exception& e )
    {
-      pActor->getAsPlayer()->sendUrgent( e.what() );
+      if( pActor->isPlayer() )
+         pActor->getAsPlayer()->sendUrgent( e.what() );
    }
 
    return true;
 }
 
-bool Core::Scripting::ScriptManager::onStatusTick( Entity::ActorPtr pActor, uint32_t effectId )
+bool Core::Scripting::ScriptManager::onStatusTick( Entity::ActorPtr pActor, Core::StatusEffect::StatusEffect& effect )
 {
    std::string eventName = "onTick";
 
    try
    {
-      auto obj = m_pChaiHandler->eval( "statusDef_" + std::to_string( effectId ) );
-      std::string objName = "statusDef_" + std::to_string( effectId );
+      auto obj = m_pChaiHandler->eval( "statusDef_" + std::to_string( effect.getId() ) );
+      std::string objName = "statusDef_" + std::to_string( effect.getId() );
 
-      pActor->getAsPlayer()->sendDebug( "Calling: " + objName + "." + eventName );
-      auto fn = m_pChaiHandler->eval< std::function< void( chaiscript::Boxed_Value &, Entity::Actor& ) > >( eventName );
-      fn( obj, *pActor );
+      if( pActor->isPlayer() )
+         pActor->getAsPlayer()->sendDebug( "Calling: " + objName + "." + eventName );
+
+      auto fn = m_pChaiHandler->eval< std::function< void( chaiscript::Boxed_Value &, Entity::Actor&, Core::StatusEffect::StatusEffect& ) > >( eventName );
+      fn( obj, *pActor, effect );
    }
    catch( std::exception& e )
    {
-      pActor->getAsPlayer()->sendUrgent( e.what() );
+      if( pActor->isPlayer() )
+         pActor->getAsPlayer()->sendUrgent( e.what() );
    }
 
    return true;
@@ -447,13 +454,16 @@ bool Core::Scripting::ScriptManager::onStatusTimeOut( Entity::ActorPtr pActor, u
       auto obj = m_pChaiHandler->eval( "statusDef_" + std::to_string( effectId ) );
       std::string objName = "statusDef_" + std::to_string( effectId );
 
-      pActor->getAsPlayer()->sendDebug( "Calling: " + objName + "." + eventName );
+      if( pActor->isPlayer() )
+         pActor->getAsPlayer()->sendDebug( "Calling: " + objName + "." + eventName );
+
       auto fn = m_pChaiHandler->eval< std::function< void( chaiscript::Boxed_Value &, Entity::Actor& ) > >( eventName );
       fn( obj, *pActor );
    }
    catch( std::exception& e )
    {
-      pActor->getAsPlayer()->sendUrgent( e.what() );
+      if( pActor->isPlayer() )
+         pActor->getAsPlayer()->sendUrgent( e.what() );
    }
 
    return true;

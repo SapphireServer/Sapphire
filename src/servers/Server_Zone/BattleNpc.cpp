@@ -15,6 +15,7 @@
 #include "MoveActorPacket.h"
 #include "ActorControlPacket142.h"
 #include "ActorControlPacket143.h"
+#include "StatusEffectContainer.h"
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -84,6 +85,10 @@ Core::Entity::BattleNpc::BattleNpc( uint32_t modelId, uint32_t nameid, const Com
 
 }
 
+void Core::Entity::BattleNpc::initStatusEffectContainer()
+{
+   m_pStatusEffectContainer = StatusEffect::StatusEffectContainerPtr( new StatusEffect::StatusEffectContainer( shared_from_this() ) );
+}
 
 // spawn this player for pTarget
 void Core::Entity::BattleNpc::spawn( Core::Entity::PlayerPtr pTarget )
@@ -482,7 +487,7 @@ void Core::Entity::BattleNpc::update( int64_t currTime )
       return;
    }
 
-   //m_pStatusEffectContainer->update();
+   m_pStatusEffectContainer->update();
    float distance = Math::Util::distance( m_pos.x, m_pos.y, m_pos.z,
                                           m_posOrigin.x, m_posOrigin.y, m_posOrigin.z );
 

@@ -338,6 +338,25 @@ void Core::Entity::Actor::takeDamage( uint32_t damage )
 }
 
 /*!
+Let an actor get healed and perform necessary steps
+according to resulting hp, propagates new hp value to players
+in range
+
+\param amount of hp to be healed
+*/
+void Core::Entity::Actor::heal( uint32_t amount )
+{
+   if( ( m_hp + amount ) > getMaxHp() )
+   {
+      m_hp = getMaxHp();
+   }
+   else
+      m_hp += amount;
+
+   sendStatusUpdate( false );
+}
+
+/*!
 Send an HpMpTp update to players in range ( and potentially to self )
 TODO: poor naming, should be changed. Status is not HP. Also should be virtual
 so players can have their own version and we can abolish the param.
