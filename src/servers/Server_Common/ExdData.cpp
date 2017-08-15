@@ -345,13 +345,13 @@ bool Core::Data::ExdData::loadActionInfo()
       uint8_t points_type = getField< uint8_t >( fields, 30 );//28
       uint16_t points_cost = getField< uint16_t >( fields, 31 );//29
 
-      bool is_instant = getField< bool >( fields, 35 );
+      uint32_t instantval = getField< bool >( fields, 35 );
 
       uint8_t typeshift = 0x6;
       uint8_t mask = 1 << typeshift;
-      is_instant &= mask;
-      bool final = ( is_instant & mask ) == mask;
-      is_instant = final;
+      instantval &= mask;
+      bool final = ( instantval & mask ) == mask;
+      bool is_instant = final;
 
       uint16_t cast_time = getField< uint16_t >( fields, 36 );
       uint16_t recast_time = getField< uint16_t >( fields, 37 );
