@@ -988,7 +988,13 @@ const uint8_t * Core::Entity::Player::getStateFlags() const
 
 bool Core::Entity::Player::actionHasCastTime( uint32_t actionId ) //TODO: Add logic for special cases
 {
-   return g_exdData.m_actionInfoMap[actionId].is_instant;
+   if( g_exdData.m_actionInfoMap[actionId].is_instant )
+      return false;
+
+   if( g_exdData.m_actionInfoMap[actionId].cast_time == 0 )
+      return false;
+
+   return true;
 }
 
 bool Core::Entity::Player::hasStateFlag( Core::Common::PlayerStateFlag flag ) const
@@ -1528,6 +1534,7 @@ void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, 
       sendToInRangeSet( effectPacket, true );
 
       pTarget.takeDamage( param1 );
+      pTarget.onActionHostile( shared_from_this() );
       break;
    }
 

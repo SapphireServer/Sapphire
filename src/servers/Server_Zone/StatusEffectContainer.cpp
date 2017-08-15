@@ -185,3 +185,16 @@ void Core::StatusEffect::StatusEffectContainer::update()
       m_pOwner->sendToInRangeSet( ActorControlPacket142( m_pOwner->getId(), HPFloatingText, 0, 4, thisTickHeal ) );
    }
 }
+
+bool Core::StatusEffect::StatusEffectContainer::hasStatusEffect( uint32_t id )
+{
+   for( auto effectIt : m_effectMap )
+   {
+      if( effectIt.second->getId() == id )
+      {
+         return true;
+      }
+   }
+
+   return false;
+}

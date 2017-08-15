@@ -70,12 +70,8 @@ void Core::Action::ActionCast::onFinish()
    auto pPlayer = m_pSource->getAsPlayer();
    pPlayer->sendDebug( "onFinish()" );
 
-   m_pTarget->onActionHostile( pPlayer->shared_from_this() );
-
    pPlayer->unsetStateFlag( PlayerStateFlag::Casting );
    pPlayer->sendStateFlags();
-
-   
 
    g_scriptMgr.onCastFinish( pPlayer, m_pTarget, m_id );
 }
