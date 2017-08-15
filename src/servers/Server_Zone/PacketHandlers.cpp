@@ -164,7 +164,7 @@ void Core::Network::GameConnection::gm1Handler( Core::Network::Packets::GamePack
    g_log.debug( pPlayer->getName() + " used GM1 commandId: " + std::to_string( commandId ) + ", params: " + std::to_string( param1 ) + ", " + std::to_string( param2 ) + ", " + std::to_string( param3 ) );
 
    Core::Entity::ActorPtr targetActor;
-   
+
 
    if( pPlayer->getId() == param3 )
    {
@@ -311,23 +311,23 @@ void Core::Network::GameConnection::gm1Handler( Core::Network::Packets::GamePack
    case GmCommand::Weather:
    {
       targetPlayer->getCurrentZone()->setWeatherOverride( param1 );
-      pPlayer->sendNotice( "Weather in Zone \"" + targetPlayer->getCurrentZone()->getName() + "\" of " + 
+      pPlayer->sendNotice( "Weather in Zone \"" + targetPlayer->getCurrentZone()->getName() + "\" of " +
                            targetPlayer->getName() + " set in range." );
       break;
    }
    case GmCommand::TeriInfo:
    {
-      pPlayer->sendNotice( "ZoneId: " + std::to_string( pPlayer->getZoneId() ) + "\nName: " + 
-                           pPlayer->getCurrentZone()->getName() + "\nInternalName: " + 
-                           pPlayer->getCurrentZone()->getInternalName() + "\nPopCount: " + 
-                           std::to_string( pPlayer->getCurrentZone()->getPopCount() ) + 
+      pPlayer->sendNotice( "ZoneId: " + std::to_string( pPlayer->getZoneId() ) + "\nName: " +
+                           pPlayer->getCurrentZone()->getName() + "\nInternalName: " +
+                           pPlayer->getCurrentZone()->getInternalName() + "\nPopCount: " +
+                           std::to_string( pPlayer->getCurrentZone()->getPopCount() ) +
                            "\nCurrentWeather:" + std::to_string( pPlayer->getCurrentZone()->getCurrentWeather() ) +
                            "\nNextWeather:" + std::to_string( pPlayer->getCurrentZone()->getNextWeather() ) );
       break;
    }
    case GmCommand::Jump:
    {
-      
+
       auto inRange = pPlayer->getInRangeActors();
       for( auto actor : inRange )
       {
@@ -340,7 +340,7 @@ void Core::Network::GameConnection::gm1Handler( Core::Network::Packets::GamePack
    case GmCommand::Collect:
    {
       uint32_t gil = targetPlayer->getCurrency( 1 );
-      
+
       if( gil < param1 )
       {
          pPlayer->sendUrgent( "Player does not have enough Gil(" + std::to_string( gil ) + ")" );
@@ -418,7 +418,7 @@ void Core::Network::GameConnection::gm2Handler( Core::Network::Packets::GamePack
       {
          targetActor = pPlayer;
       }
-      else 
+      else
       {
          pPlayer->sendUrgent("Player " + param1 + " not found on this server.");
          return;
@@ -468,12 +468,12 @@ void Core::Network::GameConnection::gm2Handler( Core::Network::Packets::GamePack
    case GmCommand::Inspect:
    {
       pPlayer->sendNotice( "Name: " + targetPlayer->getName() +
-                           "\nGil: " + std::to_string( targetPlayer->getCurrency( 1 ) ) + 
-                           "\nZone: " + targetPlayer->getCurrentZone()->getName() + 
+                           "\nGil: " + std::to_string( targetPlayer->getCurrency( 1 ) ) +
+                           "\nZone: " + targetPlayer->getCurrentZone()->getName() +
                            "(" + std::to_string( targetPlayer->getZoneId() ) + ")" +
-                           "\nClass: " + std::to_string( targetPlayer->getClass() ) + 
-                           "\nLevel: " + std::to_string( targetPlayer->getLevel() ) + 
-                           "\nExp: " + std::to_string( targetPlayer->getExp() ) + 
+                           "\nClass: " + std::to_string( targetPlayer->getClass() ) +
+                           "\nLevel: " + std::to_string( targetPlayer->getLevel() ) +
+                           "\nExp: " + std::to_string( targetPlayer->getExp() ) +
                            "\nSearchMessage: " + targetPlayer->getSearchMessage() +
                            "\nPlayTime: " + std::to_string( targetPlayer->getPlayTime() ) );
       break;
@@ -751,7 +751,7 @@ void Core::Network::GameConnection::inventoryModifyHandler( Core::Network::Packe
    ackPacket.data().sequence = seq;
    ackPacket.data().type = 7;
    pPlayer->queuePacket( ackPacket );
-   
+
 
    g_log.debug( pInPacket->toString() );
    g_log.debug( "InventoryAction: " + std::to_string( action ) );
@@ -881,10 +881,10 @@ void Core::Network::GameConnection::actionHandler( Core::Network::Packets::GameP
    {
       switch( pPlayer->getZoningType() )
       {
-      case ZoneingType::None: 
-         pPlayer->sendToInRangeSet( ActorControlPacket143( pPlayer->getId(), ZoneIn, 0x01 ), true ); 
+      case ZoneingType::None:
+         pPlayer->sendToInRangeSet( ActorControlPacket143( pPlayer->getId(), ZoneIn, 0x01 ), true );
          break;
-      case ZoneingType::Teleport: 
+      case ZoneingType::Teleport:
          pPlayer->sendToInRangeSet( ActorControlPacket143( pPlayer->getId(), ZoneIn, 0x01, 0, 0, 110 ), true );
          break;
       case ZoneingType::Return:
@@ -905,10 +905,10 @@ void Core::Network::GameConnection::actionHandler( Core::Network::Packets::GameP
          break;
       case ZoneingType::FadeIn:
          break;
-      default: 
+      default:
          break;
       }
-    
+
       pPlayer->setZoningType( Common::ZoneingType::None );
 
       pPlayer->unsetStateFlag( PlayerStateFlag::BetweenAreas );
@@ -921,7 +921,7 @@ void Core::Network::GameConnection::actionHandler( Core::Network::Packets::GameP
    {
       // TODO: only register this action if enough gil is in possession
       auto targetAetheryte = g_exdData.getAetheryteInfo( param11 );
-      
+
       if( targetAetheryte )
       {
          auto fromAetheryte = g_exdData.getAetheryteInfo( g_exdData.m_zoneInfoMap[pPlayer->getZoneId()].aetheryte_index );
@@ -1170,6 +1170,15 @@ void Core::Network::GameConnection::cfDutyInfoRequest(Core::Network::Packets::Ga
    Core::Entity::PlayerPtr pPlayer)
 {
    GamePacketNew< FFXIVIpcCFDutyInfo > dutyInfoPacket( pPlayer->getId() );
+
+   auto penaltyMinutes = pPlayer->getPenaltyMinutes();
+   if (penaltyMinutes > 255)
+   {
+      // cap it since it's uint8_t in packets
+      penaltyMinutes = 255;
+   }
+
+   dutyInfoPacket.data().penaltyTime = penaltyMinutes;
    queueOutPacket( dutyInfoPacket );
 
    GamePacketNew< FFXIVIpcCFPlayerInNeed > inNeedsPacket( pPlayer->getId() );

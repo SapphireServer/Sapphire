@@ -77,6 +77,7 @@ CREATE TABLE charadetail (
   `ContentRetryTime` blob,
   `ContentJoinTime` int(10) DEFAULT NULL,
   `ContentClearFlag` blob,
+  `CFPenaltyUntil` int unsigned NOT NULL DEFAULT '0',
   `TownWarpFstFlags` binary(2) DEFAULT NULL,
   `PathId` int(10) DEFAULT NULL,
   `StepIndex` int(5) DEFAULT NULL,

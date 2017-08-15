@@ -25,9 +25,8 @@ uint64_t Core::Util::getTimeMs()
 
 uint64_t Core::Util::getTimeSeconds()
 {
-   std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
-   auto now = std::chrono::time_point_cast< std::chrono::seconds >( t1 ).time_since_epoch().count();
-   return now;
+   std::chrono::seconds epoch = std::chrono::duration_cast< std::chrono::seconds >(std::chrono::system_clock::now().time_since_epoch());
+   return epoch.count();
 }
 
 uint64_t Core::Util::getEorzeanTimeStamp()

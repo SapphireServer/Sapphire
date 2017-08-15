@@ -79,7 +79,7 @@ void Core::GameCommandHandler::execCommand( char * data, Core::Entity::PlayerPtr
       // no parameters, just get the command
       commandString = tmpCommand;
 
-   // try to retrieve the command 
+   // try to retrieve the command
    auto it = m_commandMap.find( commandString );
 
    if( it == m_commandMap.end() )
@@ -237,7 +237,6 @@ void Core::GameCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlayer
       g_database.execute( query2.c_str() );
 
    }
-
    else if( subCommand == "discovery_reset" )
    {
       pPlayer->resetDiscovery();
@@ -256,6 +255,13 @@ void Core::GameCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlayer
        }
        else
            pPlayer->setClassJob( static_cast<Core::Common::ClassJob> ( id ) );
+   }
+   else if( subCommand == "cfpenalty")
+   {
+      uint32_t minutes;
+      sscanf( params.c_str(), "%d", &minutes );
+
+      pPlayer->setPenaltyMinutes( minutes );
    }
 
 
@@ -411,7 +417,7 @@ void Core::GameCommandHandler::add( char * data, Core::Entity::PlayerPtr pPlayer
       sscanf( params.c_str(), "%x %x %x %x %x %x %x %x", &opcode, &param1, &param2, &param3, &param4, &param5, &param6, &playerId );
 
       pPlayer->sendNotice( "Injecting ACTOR_CONTROL " + std::to_string( opcode ) );
-      
+
       Network::Packets::GamePacketNew< Network::Packets::Server::FFXIVIpcActorControl143 > actorControl( playerId, pPlayer->getId() );
       actorControl.data().category = opcode;
       actorControl.data().param1 = param1;

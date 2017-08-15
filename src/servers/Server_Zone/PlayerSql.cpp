@@ -43,7 +43,8 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
    // TODO: can't help but think that the whole player loading could be handled better...
    const std::string char_id_str = std::to_string( charId );
 
-   auto pQR = g_database.query( "SELECT c.Name, "
+   auto pQR = g_database.query( "SELECT "
+      "c.Name, "
       "c.PrimaryTerritoryId, "
       "c.Hp, "
       "c.Mp, "
@@ -53,7 +54,7 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
       "c.Pos_0_1, "
       "c.Pos_0_2, "
       "c.Pos_0_3, "
-      "c.FirstLogin, "
+      "c.FirstLogin, " // 10
       "c.Customize, "
       "c.ModelMainWeapon, "
       "c.ModelSubWeapon, "
@@ -63,7 +64,7 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
       "cd.BirthMonth, "
       "cd.Status, "
       "cd.Class, "
-      "cd.Homepoint, "
+      "cd.Homepoint, " // 20
       "cd.HowTo, "
       "c.ContentId, "
       "c.Voice, "
@@ -73,11 +74,12 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
       "cd.Aetheryte, "
       "cd.unlocks, "
       "cd.Discovery, "
-      "cd.StartTown, "
+      "cd.StartTown, " // 30
       "cd.TotalPlayTime, "
       "c.IsNewAdventurer, "
       "cd.GrandCompany, "
-      "cd.GrandCompanyRank "
+      "cd.GrandCompanyRank, "
+      "cd.CFPenaltyUntil "
       "FROM charabase AS c "
       " INNER JOIN charadetail AS cd "
       " ON c.CharacterId = cd.CharacterId "
@@ -165,6 +167,8 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
 
    m_gc = field[33].getUInt8();
    field[34].getBinary( reinterpret_cast< char* >( m_gcRank ), 3 );
+
+   m_cfPenaltyUntil = field[35].getUInt32();
 
    m_pCell = nullptr;
 
@@ -386,6 +390,11 @@ void Core::Entity::Player::createUpdateSql()
       charaInfoSearchSet.insert( " SelectClassId = " + std::to_string( m_searchSelectClass ) );
       charaInfoSearchSet.insert( " SelectRegion = " + std::to_string( m_searchSelectRegion ) );
       charaInfoSearchSet.insert( " SearchComment = UNHEX('" + std::string( Util::binaryToHexString( reinterpret_cast< uint8_t* >( m_searchMessage ), sizeof( m_searchMessage ) ) + "')" ) );
+   }
+
+   if( m_updateFlags & PlayerSyncFlags::CFPenaltyTime )
+   {
+      charaDetailSet.insert( " CFPenaltyUntil = " + std::to_string( m_cfPenaltyUntil ) );
    }
 
    if( !charaInfoSearchSet.empty() )

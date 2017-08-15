@@ -78,7 +78,7 @@ public:
 
    void checkEvent( uint32_t eventId );
 
-   
+
 
    // Events
    //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -482,6 +482,14 @@ public:
    void setAutoattack( bool mode );
    bool isAutoattackOn() const;
 
+   // Player Content Finder Handling
+   //////////////////////////////////////////////////////////////////////////////////////////////////////
+   uint32_t getPenaltyTimestamp() const;
+   void setPenaltyTimestamp( uint32_t timestamp );
+
+   uint32_t getPenaltyMinutes() const;
+   void setPenaltyMinutes( uint32_t minutes );
+
 private:
    uint32_t m_lastWrite;
    uint32_t m_lastPing;
@@ -581,7 +589,7 @@ private:
    bool m_bAutoattack;
 
    Common::ZoneingType m_zoningType;
-      
+
    bool m_bMarkedForZoning;
    uint32_t m_updateFlags;
    bool m_bNewAdventurer;
@@ -597,6 +605,8 @@ private:
    uint8_t m_gc;
    uint8_t m_gcRank[3];
 
+   // content finder info
+   uint32_t m_cfPenaltyUntil;
 };
 
 }
