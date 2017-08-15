@@ -490,6 +490,9 @@ public:
    uint32_t getPenaltyMinutes() const;
    void setPenaltyMinutes( uint32_t minutes );
 
+   void handleScriptSkill( uint32_t type, uint32_t actionId, uint64_t param1, uint64_t param2, Entity::Actor& target );
+
+
 private:
    uint32_t m_lastWrite;
    uint32_t m_lastPing;

@@ -104,7 +104,7 @@ void Core::Network::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet, ui
    serverListPacket.data().seq = 1;
    serverListPacket.data().offset = 0;
    serverListPacket.data().numServers = 1;
-   serverListPacket.data().server[0].id = 1;
+   serverListPacket.data().server[0].id = g_serverLobby.m_pConfig->getValue<uint16_t>( "Settings.Parameters.WorldID", 1 );
    serverListPacket.data().server[0].index = 0;
    serverListPacket.data().final = 1;
    sprintf( serverListPacket.data().server[0].name, "Sapphire" );
@@ -141,7 +141,7 @@ void Core::Network::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet, ui
             auto& charEntry = charList[charIndex];
             details.uniqueId = get<1>( charEntry );
             details.contentId = get<2>( charEntry );
-            details.serverId = 1;
+            details.serverId = g_serverLobby.m_pConfig->getValue<uint16_t>( "Settings.Parameters.WorldID", 1 );
             details.index = charIndex;
             strcpy( details.charDetailJson, get<3>( charEntry ).c_str() );
             strcpy( details.nameChara, get<0>( charEntry ).c_str() );

@@ -1517,6 +1517,7 @@ void Core::Entity::Player::setPenaltyTimestamp( uint32_t timestamp )
    setSyncFlag( PlayerSyncFlags::CFPenaltyTime );
 }
 
+
 uint32_t Core::Entity::Player::getPenaltyMinutes() const
 {
    auto currentTimestamp = Core::Util::getTimeSeconds();
@@ -1536,5 +1537,64 @@ void Core::Entity::Player::setPenaltyMinutes( uint32_t minutes )
 {
    auto currentTimestamp = Core::Util::getTimeSeconds();
    setPenaltyTimestamp(currentTimestamp + minutes * 60);
+}
+
+void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, uint64_t param1, uint64_t param2, Entity::Actor& pTarget )
+{
+   sendDebug( std::to_string( pTarget.getId() ) );
+   sendDebug( "Handle script skill type: " + std::to_string( type ) );
+   
+   switch( type )
+   {
+
+   case Core::Common::HandleSkillType::StdDamage:
+   {
+      sendDebug( "STD_DAMAGE" );
+      GamePacketNew< FFXIVIpcEffect > effectPacket( getId() );
+      effectPacket.data().targetId = pTarget.getId();
+      effectPacket.data().actionAnimationId = actionId;
+      effectPacket.data().unknown_2 = 0;
+      //   effectPacket.data().unknown_3 = 1;
+      effectPacket.data().actionTextId = actionId;
+      effectPacket.data().numEffects = 1;
+      effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRotation() );
+      effectPacket.data().effectTarget = pTarget.getId();
+      effectPacket.data().effects[0].param1 = param1;
+      effectPacket.data().effects[0].unknown_1 = 3;
+      effectPacket.data().effects[0].unknown_2 = 1;
+      effectPacket.data().effects[0].unknown_3 = 7;
+
+      sendToInRangeSet( effectPacket, true );
+
+      pTarget.takeDamage( param1 );
+      break;
+   }
+
+   case Core::Common::HandleSkillType::StdHeal:
+   {
+      sendDebug( "STD_HEAL" );
+      GamePacketNew< FFXIVIpcEffect > effectPacket( getId() );
+      effectPacket.data().targetId = pTarget.getId();
+      effectPacket.data().actionAnimationId = actionId;
+      effectPacket.data().unknown_2 = 0;
+      //   effectPacket.data().unknown_3 = 1;
+      effectPacket.data().actionTextId = actionId;
+      effectPacket.data().numEffects = 1;
+      effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRotation() );
+      effectPacket.data().effectTarget = pTarget.getId();
+      effectPacket.data().effects[0].param1 = param1;
+      effectPacket.data().effects[0].unknown_1 = 4;
+      effectPacket.data().effects[0].unknown_2 = 1;
+      effectPacket.data().effects[0].unknown_3 = 7;
+
+      sendToInRangeSet( effectPacket, true );
+
+      pTarget.heal( param1 );
+      break;
+   }
+
+   default:
+   break;
+   }
 }
 
