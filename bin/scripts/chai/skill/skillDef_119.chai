@@ -1,0 +1,18 @@
+// Skill Name: Stone
+// Skill ID: 119
+
+class skillDef_119Def
+{
+    def skillDef_119Def()
+    {
+
+    }
+
+    def onFinish( player, target )
+    {
+        player.handleScriptSkill( STD_DAMAGE, 119, 30, 0, target );
+    }
+
+};
+
+GLOBAL skillDef_119 = skillDef_119Def();
