@@ -36,6 +36,8 @@ public:
    //           const Common::FFXIVARR_POSITION3& spawnPos,
    //           uint32_t type = 2,  uint32_t behaviour = 1, uint32_t mobType = 0 );
 
+   void initStatusEffectContainer();
+
    // send spawn packets to pTarget
    void spawn( PlayerPtr pTarget ) override;
 

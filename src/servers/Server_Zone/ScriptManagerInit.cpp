@@ -35,6 +35,7 @@ int Core::Scripting::ScriptManager::init()
    m_pChaiHandler->add( chaiscript::fun( &Entity::Actor::getTargetId ), "getTargetId" );
    m_pChaiHandler->add( chaiscript::fun( &Entity::Actor::addStatusEffect ), "addStatusEffect" );
    m_pChaiHandler->add( chaiscript::fun( &Entity::Actor::addStatusEffectById ), "addStatusEffectById" );
+   m_pChaiHandler->add( chaiscript::fun( &Entity::Actor::takeDamage ), "takeDamage" );
 
    m_pChaiHandler->add( chaiscript::fun( &Entity::Player::forceZoneing ), "setZone" );
    m_pChaiHandler->add( chaiscript::fun( &Entity::Player::getClassAsInt ), "getClass" );
@@ -65,6 +66,7 @@ int Core::Scripting::ScriptManager::init()
    m_pChaiHandler->add( chaiscript::fun( &Entity::Player::getQuestSeq ), "questGetSeq" );
    m_pChaiHandler->add( chaiscript::fun( &Entity::Player::hasQuest ), "hasQuest" );
    m_pChaiHandler->add( chaiscript::fun( &Entity::Player::getZoneId ), "getZoneId" );
+   m_pChaiHandler->add( chaiscript::fun( &Entity::Player::handleScriptSkill ), "handleScriptSkill" );
 
 
    m_pChaiHandler->add( chaiscript::fun( &Core::Event::mapEventActorToRealActor ), "mapActor" );
@@ -157,6 +159,8 @@ int Core::Scripting::ScriptManager::init()
    m_pChaiHandler->add( chaiscript::user_type< Entity::Player >(), "Player" );
    m_pChaiHandler->add( chaiscript::user_type< Entity::BattleNpc >(), "BattleNpc" );
    m_pChaiHandler->add( chaiscript::user_type< StatusEffect::StatusEffect >(), "StatusEffect" );
+
+   m_pChaiHandler->add( chaiscript::fun( &StatusEffect::StatusEffect::registerTickEffect ), "registerTickEffect" );
 
    m_pChaiHandler->add( chaiscript::user_type< Zone >(), "Zone" );
    m_pChaiHandler->add( chaiscript::fun( &Zone::getName ), "getName" );

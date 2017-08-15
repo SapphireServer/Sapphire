@@ -33,6 +33,8 @@ public:
    uint16_t getParam() const;
    void setLastTick( uint64_t lastTick );
    void setParam( uint16_t param );
+   void registerTickEffect( uint8_t type, uint32_t param );
+   std::pair< uint8_t, uint32_t> getTickEffect();
    const std::string& getName() const;
 
 private:
@@ -45,6 +47,7 @@ private:
    uint64_t m_lastTick;
    uint16_t m_param;
    std::string m_name;
+   std::pair< uint8_t, uint32_t> m_currTickEffect;
 
 };
 

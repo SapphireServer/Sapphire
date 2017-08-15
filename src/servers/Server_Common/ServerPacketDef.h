@@ -410,7 +410,7 @@ struct FFXIVIpcUpdateHpMpTp : FFXIVIpcBasePacket<UpdateHpMpTp>
 
 /**
 * Structural representation of the packet sent by the server
-* to update HP / MP / TP
+* for battle actions
 */
 struct effectEntry
 {
