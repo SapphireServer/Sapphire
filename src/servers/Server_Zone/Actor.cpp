@@ -631,3 +631,14 @@ void Core::Entity::Actor::addStatusEffectById( int32_t id, int32_t duration, uin
    addStatusEffect( effect );
 }
 
+/*! \param StatusEffectPtr to be applied to the actor */
+void Core::Entity::Actor::addStatusEffectByIdIfNotExist( int32_t id, int32_t duration, uint16_t param )
+{
+   if( !m_pStatusEffectContainer->hasStatusEffect( id ) )
+   {
+      StatusEffect::StatusEffectPtr effect( new StatusEffect::StatusEffect( id, shared_from_this(), shared_from_this(), duration, 3000 ) );
+      effect->setParam( param );
+      addStatusEffect( effect );
+   }
+}
+

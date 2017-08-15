@@ -35,6 +35,7 @@ int Core::Scripting::ScriptManager::init()
    m_pChaiHandler->add( chaiscript::fun( &Entity::Actor::getTargetId ), "getTargetId" );
    m_pChaiHandler->add( chaiscript::fun( &Entity::Actor::addStatusEffect ), "addStatusEffect" );
    m_pChaiHandler->add( chaiscript::fun( &Entity::Actor::addStatusEffectById ), "addStatusEffectById" );
+   m_pChaiHandler->add( chaiscript::fun( &Entity::Actor::addStatusEffectByIdIfNotExist ), "addStatusEffectByIdIfNotExist" );
    m_pChaiHandler->add( chaiscript::fun( &Entity::Actor::takeDamage ), "takeDamage" );
 
    m_pChaiHandler->add( chaiscript::fun( &Entity::Player::forceZoneing ), "setZone" );

@@ -23,6 +23,8 @@ public:
    void removeStatusEffect( uint8_t effectSlotId );
    void update();
 
+   bool hasStatusEffect( uint32_t id );
+
    int8_t getFreeSlot();
    void freeSlot( uint8_t slotId );
 
