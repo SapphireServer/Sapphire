@@ -698,38 +698,6 @@ void Core::Network::GameConnection::socialListHandler( Core::Network::Packets::G
    else if( type == 0x0e )
    { // player search result
      // TODO: implement player search
-     /*CGamePacket * pPE = new CGamePacket(0xCC, 0x3A0, pPlayer->getId(), pPlayer->getId());
-     pPE->setInt8At(0x2C, 0x0E);
-     pPE->setInt8At(0x2D, count);
-
-     std::set<CPlayer*> tmpSet = m_playerSearchResult;
-
-     std::set<CPlayer*>::iterator it;
-
-     int32_t i = 0x30;
-     for(it = tmpSet.begin(); it != tmpSet.end(); it++)
-     {
-     if((*it)->getId() == pPlayer->getId())
-     {
-     continue;
-     }
-     pPE->setInt64At(i, (*it)->getContentId());
-     pPE->setInt8At(i+0x16, 0x2);
-     pPE->setInt16At(i+0x0A, (*it)->getZone()->getLayoutId());
-     pPE->setInt16At(i+0x0C, (*it)->getZone()->getLayoutId());
-     pPE->setInt16At(i+0x0E, 0x46);
-     pPE->setInt16At(i+0x14, 0x100);
-
-     pPE->setInt16At(i+0x1A, 0x8000);
-     pPE->setInt16At(i + 0x20, static_cast<uint8_t>((*it)->getClass()));
-     pPE->setInt16At(i+0x22,(*it)->getLevel());
-     pPE->setStringAt(i+0x26, (*it)->getName());
-     i += 0x48;
-     }
-
-
-     pPlayer->queuePacket(pPE);*/
-
    }
 
 }
@@ -740,8 +708,7 @@ void Core::Network::GameConnection::chatHandler( Core::Network::Packets::GamePac
 
    std::string chatString( pInPacket->getStringAt( 0x3a ) );
 
-   uint32_t sourceId;
-   sourceId = pInPacket->getValAt< uint32_t >( 0x24 );
+   uint32_t sourceId = pInPacket->getValAt< uint32_t >( 0x24 );
 
    if( chatString.at( 0 ) == '@' )
    {
@@ -792,51 +759,4 @@ void Core::Network::GameConnection::logoutHandler( Core::Network::Packets::GameP
    logoutPacket.data().flags1 = 0x02;
    logoutPacket.data().flags2 = 0x2000;
    queueOutPacket( logoutPacket );
-}
-
-void Core::Network::GameConnection::cfDutyInfoRequest(Core::Network::Packets::GamePacketPtr pInPacket,
-   Core::Entity::PlayerPtr pPlayer)
-{
-   GamePacketNew< FFXIVIpcCFDutyInfo > dutyInfoPacket( pPlayer->getId() );
-   queueOutPacket( dutyInfoPacket );
-
-   GamePacketNew< FFXIVIpcCFPlayerInNeed > inNeedsPacket( pPlayer->getId() );
-   queueOutPacket( inNeedsPacket );
-
-}
-
-void Core::Network::GameConnection::cfRegisterDuty(Core::Network::Packets::GamePacketPtr pInPacket,
-   Core::Entity::PlayerPtr pPlayer)
-{
-   // TODO use for loop for this
-   auto contentId1 = pInPacket->getValAt< uint16_t >( 46 );
-   auto contentId2 = pInPacket->getValAt< uint16_t >( 48 );
-   auto contentId3 = pInPacket->getValAt< uint16_t >( 50 );
-   auto contentId4 = pInPacket->getValAt< uint16_t >( 52 );
-   auto contentId5 = pInPacket->getValAt< uint16_t >( 54 );
-
-   pPlayer->sendDebug("Duty register request");
-   pPlayer->sendDebug("ContentId1" + std::to_string(contentId1));
-   pPlayer->sendDebug("ContentId2" + std::to_string(contentId2));
-   pPlayer->sendDebug("ContentId3" + std::to_string(contentId3));
-   pPlayer->sendDebug("ContentId4" + std::to_string(contentId4));
-   pPlayer->sendDebug("ContentId5" + std::to_string(contentId5));
-
-   // let's cancel it because otherwise you can't register it again
-   GamePacketNew< FFXIVIpcCFNotify > cfCancelPacket( pPlayer->getId() );
-   cfCancelPacket.data().state1 = 3;
-   cfCancelPacket.data().state2 = 1; // Your registration is withdrawn.
-   queueOutPacket( cfCancelPacket );
-}
-
-void Core::Network::GameConnection::cfRegisterRoulette(Core::Network::Packets::GamePacketPtr pInPacket,
-   Core::Entity::PlayerPtr pPlayer)
-{
-   pPlayer->sendDebug("Roulette register");
-}
-
-void Core::Network::GameConnection::cfDutyAccepted(Core::Network::Packets::GamePacketPtr pInPacket,
-   Core::Entity::PlayerPtr pPlayer)
-{
-   pPlayer->sendDebug("TODO: Duty accept");
 }
