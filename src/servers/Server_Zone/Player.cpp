@@ -132,6 +132,7 @@ Core::Common::OnlineStatus Core::Entity::Player::getOnlineStatus()
    uint64_t dcMask = uint64_t( 1 ) << static_cast< uint32_t >( OnlineStatus::Disconnected );
    uint64_t meldMask = uint64_t( 1 ) << static_cast< uint32_t >( OnlineStatus::LfMeld );
    uint64_t ptMask = uint64_t( 1 ) << static_cast< uint32_t >( OnlineStatus::LfParty );
+   uint64_t rpMask = uint64_t( 1 ) << static_cast< uint32_t >( OnlineStatus::RolePlaying );
 
    OnlineStatus status = OnlineStatus::Online;
 
@@ -153,6 +154,9 @@ Core::Common::OnlineStatus Core::Entity::Player::getOnlineStatus()
 
    if( m_onlineStatus & ptMask )
       status = OnlineStatus::LfParty;
+
+   if( m_onlineStatus & rpMask )
+      status = OnlineStatus::RolePlaying;
 
    if( hasStateFlag( PlayerStateFlag::WatchingCutscene ) || hasStateFlag( PlayerStateFlag::WatchingCutscene1 ) )
       status = OnlineStatus::Cutscene;

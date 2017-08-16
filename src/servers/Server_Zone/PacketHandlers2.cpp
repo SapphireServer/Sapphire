@@ -57,12 +57,13 @@ void Core::Network::GameConnection::skillHandler( Core::Network::Packets::GamePa
 
    uint64_t targetId = pInPacket->getValAt< uint64_t >( 0x30 );
 
-
    if( action < 1000000 ) // normal action
    {
       std::string actionIdStr = boost::str( boost::format( "%|04X|" ) % action );
       pPlayer->sendDebug( "---------------------------------------" );
       pPlayer->sendDebug( "ActionHandler ( " + actionIdStr + " | " + g_exdData.m_actionInfoMap[action].name + " | " + std::to_string( targetId ) + " )" );
+      
+      pPlayer->queuePacket( ActorControlPacket142( pPlayer->getId(), ActorControlType::ActionStart, 0x01, action ) );
 
       if( action == 5 )
       {
