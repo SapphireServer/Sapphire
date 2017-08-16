@@ -691,13 +691,15 @@ namespace Core {
          ClassJobChange = 0x05,
          DefeatMsg = 0x06,
          GainExpMsg = 0x07,
-
+         
          LevelUpEffect = 0x0A,
 
          ExpChainMsg = 0x0C,
          HpSetStat = 0x0D,
          DeathAnimation = 0x0E,
          CastInterrupt = 0x0F,
+
+         ActionStart = 0x11,
 
          StatusEffectGain = 0x14,
          StatusEffectLose = 0x15,
