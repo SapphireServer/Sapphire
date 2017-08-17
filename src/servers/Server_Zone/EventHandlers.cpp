@@ -68,7 +68,7 @@ void Core::Network::GameConnection::eventHandler( const Core::Network::Packets::
 
       std::string eventName = Event::getEventName( eventId );
 
-      if( !g_scriptMgr.onEmote( pPlayer, actorId, eventId, emoteId ) )
+      if( !g_scriptMgr.onEmote( pPlayer, actorId, eventId, static_cast< uint8_t >( emoteId ) ) )
          abortEventFunc( pPlayer, actorId, eventId );
       break;
    }
