@@ -34,8 +34,6 @@ public:
    //void debug( char * data, Entity::PlayerPtr pPlayer, boost::shared_ptr<GameCommand> command );
    void scriptReload( char * data, Entity::PlayerPtr pPlayer, boost::shared_ptr<GameCommand> command );
 
-   void setQuestHandler( char * data, Entity::PlayerPtr pPlayer, boost::shared_ptr<GameCommand> command );
-
    void injectPacket( char * data, Entity::PlayerPtr pPlayer, boost::shared_ptr<GameCommand> command );
    void nudge( char* data, Entity::PlayerPtr pPlayer, boost::shared_ptr<GameCommand> command );
 
