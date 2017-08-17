@@ -92,8 +92,8 @@ enum GmCommand
     Jump = 0x025E,
     JumpNpc = 0x025F,
 };
-void Core::Network::GameConnection::gm1Handler( const Core::Network::Packets::GamePacket& inPacket,
-                                                Core::Entity::PlayerPtr pPlayer )
+void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPacket,
+                                                Entity::PlayerPtr pPlayer )
 {
     uint32_t commandId = inPacket.getValAt< uint32_t >( 0x20 );
     uint32_t param1 = inPacket.getValAt< uint32_t >( 0x24 );
@@ -338,8 +338,8 @@ void Core::Network::GameConnection::gm1Handler( const Core::Network::Packets::Ga
 
 }
 
-void Core::Network::GameConnection::gm2Handler( const Core::Network::Packets::GamePacket& inPacket,
-                                                Core::Entity::PlayerPtr pPlayer )
+void Core::Network::GameConnection::gm2Handler( const Packets::GamePacket& inPacket,
+                                                Entity::PlayerPtr pPlayer )
 {
     uint32_t commandId = inPacket.getValAt< uint32_t >( 0x20 );
     std::string param1 = inPacket.getStringAt( 0x34 );

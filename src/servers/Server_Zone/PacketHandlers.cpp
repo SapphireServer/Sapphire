@@ -53,16 +53,16 @@ using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-void Core::Network::GameConnection::fcInfoReqHandler( const Core::Network::Packets::GamePacket& inPacket,
-                                                      Core::Entity::PlayerPtr pPlayer )
+void Core::Network::GameConnection::fcInfoReqHandler( const Packets::GamePacket& inPacket,
+                                                      Entity::PlayerPtr pPlayer )
 {
    GamePacketPtr pPe( new GamePacket( 0xDD, 0x78, pPlayer->getId(), pPlayer->getId() ) );
    pPe->setValAt< uint8_t >( 0x48, 0x01 );
    queueOutPacket( pPe );
 }
 
-void Core::Network::GameConnection::setSearchInfoHandler( const Core::Network::Packets::GamePacket& inPacket,
-                                                          Core::Entity::PlayerPtr pPlayer )
+void Core::Network::GameConnection::setSearchInfoHandler( const Packets::GamePacket& inPacket,
+                                                          Entity::PlayerPtr pPlayer )
 {
    uint32_t inval = inPacket.getValAt< uint32_t >( 0x20 );
    uint32_t inval1 = inPacket.getValAt< uint32_t >( 0x24 );
@@ -96,8 +96,8 @@ void Core::Network::GameConnection::setSearchInfoHandler( const Core::Network::P
                               true );
 }
 
-void Core::Network::GameConnection::reqSearchInfoHandler( const Core::Network::Packets::GamePacket& inPacket,
-                                                          Core::Entity::PlayerPtr pPlayer )
+void Core::Network::GameConnection::reqSearchInfoHandler( const Packets::GamePacket& inPacket,
+                                                          Entity::PlayerPtr pPlayer )
 {
    GamePacketNew< FFXIVIpcInitSearchInfo > searchInfoPacket( pPlayer->getId() );
    searchInfoPacket.data().onlineStatusFlags = pPlayer->getOnlineStatusMask();
@@ -106,15 +106,15 @@ void Core::Network::GameConnection::reqSearchInfoHandler( const Core::Network::P
    queueOutPacket( searchInfoPacket );
 }
 
-void Core::Network::GameConnection::linkshellListHandler( const Core::Network::Packets::GamePacket& inPacket,
-                                                          Core::Entity::PlayerPtr pPlayer )
+void Core::Network::GameConnection::linkshellListHandler( const Packets::GamePacket& inPacket,
+                                                          Entity::PlayerPtr pPlayer )
 {
    GamePacketNew< FFXIVIpcLinkshellList > linkshellListPacket( pPlayer->getId() );
    queueOutPacket( linkshellListPacket );
 }
 
-void Core::Network::GameConnection::updatePositionHandler( const Core::Network::Packets::GamePacket& inPacket,
-                                                           Core::Entity::PlayerPtr pPlayer )
+void Core::Network::GameConnection::updatePositionHandler( const Packets::GamePacket& inPacket,
+                                                           Entity::PlayerPtr pPlayer )
 {
    // if the player is marked for zoning we no longer want to update his pos
    if( pPlayer->isMarkedForZoning() )
@@ -291,8 +291,8 @@ void Core::Network::GameConnection::updatePositionHandler( const Core::Network::
 
 
 
-void Core::Network::GameConnection::zoneLineHandler( const Core::Network::Packets::GamePacket& inPacket,
-                                                     Core::Entity::PlayerPtr pPlayer )
+void Core::Network::GameConnection::zoneLineHandler( const Packets::GamePacket& inPacket,
+                                                     Entity::PlayerPtr pPlayer )
 {
    uint32_t zoneLineId = inPacket.getValAt< uint32_t >( 0x20 );
 
@@ -336,8 +336,8 @@ void Core::Network::GameConnection::zoneLineHandler( const Core::Network::Packet
 }
 
 
-void Core::Network::GameConnection::discoveryHandler( const Core::Network::Packets::GamePacket& inPacket,
-                                                      Core::Entity::PlayerPtr pPlayer )
+void Core::Network::GameConnection::discoveryHandler( const Packets::GamePacket& inPacket,
+                                                      Entity::PlayerPtr pPlayer )
 {
    uint32_t ref_position_id = inPacket.getValAt< uint32_t >( 0x20 );
 
@@ -365,8 +365,8 @@ void Core::Network::GameConnection::discoveryHandler( const Core::Network::Packe
 }
 
 
-void Core::Network::GameConnection::playTimeHandler( const Core::Network::Packets::GamePacket& inPacket,
-                                                     Core::Entity::PlayerPtr pPlayer )
+void Core::Network::GameConnection::playTimeHandler( const Packets::GamePacket& inPacket,
+                                                     Entity::PlayerPtr pPlayer )
 {
    GamePacketNew< FFXIVIpcPlayTime > playTimePacket( pPlayer->getId() );
    playTimePacket.data().playTimeInMinutes = pPlayer->getPlayTime() / 60;
@@ -374,8 +374,8 @@ void Core::Network::GameConnection::playTimeHandler( const Core::Network::Packet
 }
 
 
-void Core::Network::GameConnection::initHandler( const Core::Network::Packets::GamePacket& inPacket,
-                                                 Core::Entity::PlayerPtr pPlayer )
+void Core::Network::GameConnection::initHandler( const Packets::GamePacket& inPacket,
+                                                 Entity::PlayerPtr pPlayer )
 {
    // init handler means this is a login procedure
    pPlayer->setIsLogin( true );
@@ -384,8 +384,8 @@ void Core::Network::GameConnection::initHandler( const Core::Network::Packets::G
 }
 
 
-void Core::Network::GameConnection::blackListHandler( const Core::Network::Packets::GamePacket& inPacket,
-                                                      Core::Entity::PlayerPtr pPlayer )
+void Core::Network::GameConnection::blackListHandler( const Packets::GamePacket& inPacket,
+                                                      Entity::PlayerPtr pPlayer )
 {
    uint8_t count = inPacket.getValAt< uint8_t >( 0x21 );
 
@@ -399,8 +399,8 @@ void Core::Network::GameConnection::blackListHandler( const Core::Network::Packe
 }
 
 
-void Core::Network::GameConnection::pingHandler( const Core::Network::Packets::GamePacket& inPacket,
-                                                 Core::Entity::PlayerPtr pPlayer )
+void Core::Network::GameConnection::pingHandler( const Packets::GamePacket& inPacket,
+                                                 Entity::PlayerPtr pPlayer )
 {
    int32_t inVal = inPacket.getValAt< int32_t >( 0x20 );
    PingPacket pingPacket( pPlayer, inVal );
@@ -410,8 +410,8 @@ void Core::Network::GameConnection::pingHandler( const Core::Network::Packets::G
 }
 
 
-void Core::Network::GameConnection::finishLoadingHandler( const Core::Network::Packets::GamePacket& inPacket,
-                                                          Core::Entity::PlayerPtr pPlayer )
+void Core::Network::GameConnection::finishLoadingHandler( const Packets::GamePacket& inPacket,
+                                                          Entity::PlayerPtr pPlayer )
 {
    // player is done zoning
    pPlayer->setLoadingComplete( true );
@@ -431,8 +431,8 @@ void Core::Network::GameConnection::finishLoadingHandler( const Core::Network::P
    pPlayer->getCurrentZone()->changeActorPosition( pPlayer );
 }
 
-void Core::Network::GameConnection::socialListHandler( const Core::Network::Packets::GamePacket& inPacket,
-                                                       Core::Entity::PlayerPtr pPlayer )
+void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket& inPacket,
+                                                       Entity::PlayerPtr pPlayer )
 {
 
    uint8_t type = inPacket.getValAt< uint8_t >( 0x2A );
@@ -489,8 +489,8 @@ void Core::Network::GameConnection::socialListHandler( const Core::Network::Pack
 
 }
 
-void Core::Network::GameConnection::chatHandler( const Core::Network::Packets::GamePacket& inPacket,
-                                                 Core::Entity::PlayerPtr pPlayer )
+void Core::Network::GameConnection::chatHandler( const Packets::GamePacket& inPacket,
+                                                 Entity::PlayerPtr pPlayer )
 {
 
    std::string chatString( inPacket.getStringAt( 0x3a ) );
@@ -539,8 +539,8 @@ void Core::Network::GameConnection::chatHandler( const Core::Network::Packets::G
 // currently we wait for the session to just time out after logout, this can be a problem is the user tries to
 // log right back in.
 // Also the packet needs to be converted to an ipc structure
-void Core::Network::GameConnection::logoutHandler( const Core::Network::Packets::GamePacket& inPacket,
-                                                   Core::Entity::PlayerPtr pPlayer )
+void Core::Network::GameConnection::logoutHandler( const Packets::GamePacket& inPacket,
+                                                   Entity::PlayerPtr pPlayer )
 {
    GamePacketNew< FFXIVIpcLogout > logoutPacket( pPlayer->getId() );
    logoutPacket.data().flags1 = 0x02;

@@ -54,8 +54,8 @@ using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
 
-void Core::Network::GameConnection::inventoryModifyHandler( const Core::Network::Packets::GamePacket& inPacket,
-                                                            Core::Entity::PlayerPtr pPlayer )
+void Core::Network::GameConnection::inventoryModifyHandler( const Packets::GamePacket& inPacket,
+                                                            Entity::PlayerPtr pPlayer )
 {
     uint32_t seq = inPacket.getValAt< uint32_t >( 0x20 );
     uint8_t action = inPacket.getValAt< uint8_t >( 0x24 );
