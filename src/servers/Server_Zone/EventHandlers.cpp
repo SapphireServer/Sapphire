@@ -1,22 +1,13 @@
 #include <Server_Common/Common.h>
 #include <Server_Common/CommonNetwork.h>
-#include <Server_Common/Database.h>
 #include <Server_Common/GamePacketNew.h>
 #include <Server_Common/PacketContainer.h>
 
 #include <boost/format.hpp>
 
-
 #include "GameConnection.h"
-
 #include "Session.h"
-#include "Zone.h"
-#include "ZonePosition.h"
 
-#include "InitUIPacket.h"
-#include "PingPacket.h"
-#include "MoveActorPacket.h"
-#include "ChatPacket.h"
 #include "ServerNoticePacket.h"
 #include "ActorControlPacket142.h"
 #include "ActorControlPacket143.h"
@@ -24,25 +15,15 @@
 #include "EventStartPacket.h"
 #include "EventFinishPacket.h"
 #include "PlayerStateFlagsPacket.h"
-
-
-#include "GameCommandHandler.h"
+#include "ScriptManager.h"
 
 #include "Player.h"
-#include "Inventory.h"
-
-#include "Globals.h"
 
 #include "Forwards.h"
 
 #include "EventHelper.h"
 
-#include "Action.h"
-#include "ActionTeleport.h"
-#include "ActionCast.h"
-
-
-extern Core::GameCommandHandler g_gameCommandMgr;
+extern Core::Scripting::ScriptManager g_scriptMgr;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
