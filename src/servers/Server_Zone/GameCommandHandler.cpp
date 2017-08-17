@@ -190,8 +190,6 @@ void Core::GameCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlayer
       pPlayer->sendToInRangeSet( control, true );
 
    }
-   else if( ( subCommand == "quest" ) && ( params != "" ) )
-      setQuestHandler( const_cast< char* >( params.c_str() ), pPlayer, command );
 
    else if( ( subCommand == "tele" ) && ( params != "" ) )
    {
@@ -279,47 +277,6 @@ void Core::GameCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlayer
       pPlayer->sendDebug( std::to_string( pPlayer->actionHasCastTime( id ) ) );
    }
 
-}
-
-void Core::GameCommandHandler::setQuestHandler( char * data, Core::Entity::PlayerPtr pPlayer, boost::shared_ptr<Core::GameCommand> command )
-{
-   std::string tmpCommand( data );
-   std::string subCommand;
-
-   std::size_t pos = tmpCommand.find_first_of( " " );
-
-   if( pos != std::string::npos )
-      // command has parameters, grab the first part
-      subCommand = tmpCommand.substr( 0, pos );
-   else
-   {
-      // no subcommand given
-      subCommand = tmpCommand;
-      return;
-   }
-
-   std::string params( data + pos );
-
-   if( subCommand == "seq" )
-   {
-      int32_t questId;
-      int32_t sequence;
-      sscanf( params.c_str(), "%i %i", &questId, &sequence );
-
-      if( sequence == -1 )
-         pPlayer->removeQuest( questId );
-      else
-         pPlayer->updateQuest( questId, sequence );
-   }
-   else if( subCommand == "var" )
-   {
-      int32_t questId;
-      int32_t varIdx;
-      int32_t varVal;
-      sscanf( params.c_str(), "%i %i %i", &questId, &varIdx, &varVal );
-
-      //pPlayer->updateQuestVar( questId, varIdx, varVal );
-   }
 }
 
 void Core::GameCommandHandler::add( char * data, Core::Entity::PlayerPtr pPlayer, boost::shared_ptr<Core::GameCommand> command )

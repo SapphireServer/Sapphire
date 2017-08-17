@@ -84,10 +84,10 @@ Core::Network::GameConnection::GameConnection( Core::Network::HivePtr pHive,
    setHandler( ClientIpcType::ReturnEventHandler,      "EventHandlerReturn",    &GameConnection::eventHandler );
    setHandler( ClientIpcType::TradeReturnEventHandler, "EventHandlerReturn",    &GameConnection::eventHandler );
 
-   setHandler(ClientIpcType::CFDutyInfoHandler, "CFDutyInfoRequest", &GameConnection::cfDutyInfoRequest );
-   setHandler(ClientIpcType::CFRegisterDuty, "CFRegisterDuty", &GameConnection::cfRegisterDuty );
-   setHandler(ClientIpcType::CFRegisterRoulette, "CFRegisterRoulette", &GameConnection::cfRegisterRoulette );
-   setHandler(ClientIpcType::CFCommenceHandler, "CFDutyAccepted", &GameConnection::cfDutyAccepted);
+   setHandler( ClientIpcType::CFDutyInfoHandler, "CFDutyInfoRequest",           &GameConnection::cfDutyInfoRequest );
+   setHandler( ClientIpcType::CFRegisterDuty, "CFRegisterDuty",                 &GameConnection::cfRegisterDuty );
+   setHandler( ClientIpcType::CFRegisterRoulette, "CFRegisterRoulette",         &GameConnection::cfRegisterRoulette );
+   setHandler( ClientIpcType::CFCommenceHandler, "CFDutyAccepted",              &GameConnection::cfDutyAccepted);
 
 }
 
