@@ -54,8 +54,8 @@ using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
 
-void Core::Network::GameConnection::cfDutyInfoRequest(Core::Network::Packets::GamePacketPtr pInPacket,
-                                                      Core::Entity::PlayerPtr pPlayer)
+void Core::Network::GameConnection::cfDutyInfoRequest( const Core::Network::Packets::GamePacket& inPacket,
+                                                       Core::Entity::PlayerPtr pPlayer )
 {
     GamePacketNew< FFXIVIpcCFDutyInfo > dutyInfoPacket( pPlayer->getId() );
     queueOutPacket( dutyInfoPacket );
@@ -65,15 +65,15 @@ void Core::Network::GameConnection::cfDutyInfoRequest(Core::Network::Packets::Ga
 
 }
 
-void Core::Network::GameConnection::cfRegisterDuty(Core::Network::Packets::GamePacketPtr pInPacket,
-                                                   Core::Entity::PlayerPtr pPlayer)
+void Core::Network::GameConnection::cfRegisterDuty( const Core::Network::Packets::GamePacket& inPacket,
+                                                    Core::Entity::PlayerPtr pPlayer)
 {
     // TODO use for loop for this
-    auto contentId1 = pInPacket->getValAt< uint16_t >( 46 );
-    auto contentId2 = pInPacket->getValAt< uint16_t >( 48 );
-    auto contentId3 = pInPacket->getValAt< uint16_t >( 50 );
-    auto contentId4 = pInPacket->getValAt< uint16_t >( 52 );
-    auto contentId5 = pInPacket->getValAt< uint16_t >( 54 );
+    auto contentId1 = inPacket.getValAt< uint16_t >( 46 );
+    auto contentId2 = inPacket.getValAt< uint16_t >( 48 );
+    auto contentId3 = inPacket.getValAt< uint16_t >( 50 );
+    auto contentId4 = inPacket.getValAt< uint16_t >( 52 );
+    auto contentId5 = inPacket.getValAt< uint16_t >( 54 );
 
     pPlayer->sendDebug("Duty register request");
     pPlayer->sendDebug("ContentId1" + std::to_string(contentId1));
@@ -89,14 +89,14 @@ void Core::Network::GameConnection::cfRegisterDuty(Core::Network::Packets::GameP
     queueOutPacket( cfCancelPacket );
 }
 
-void Core::Network::GameConnection::cfRegisterRoulette(Core::Network::Packets::GamePacketPtr pInPacket,
-                                                       Core::Entity::PlayerPtr pPlayer)
+void Core::Network::GameConnection::cfRegisterRoulette( const Core::Network::Packets::GamePacket& inPacket,
+                                                        Core::Entity::PlayerPtr pPlayer)
 {
     pPlayer->sendDebug("Roulette register");
 }
 
-void Core::Network::GameConnection::cfDutyAccepted(Core::Network::Packets::GamePacketPtr pInPacket,
-                                                   Core::Entity::PlayerPtr pPlayer)
+void Core::Network::GameConnection::cfDutyAccepted( const Core::Network::Packets::GamePacket& inPacket,
+                                                    Core::Entity::PlayerPtr pPlayer)
 {
     pPlayer->sendDebug("TODO: Duty accept");
 }

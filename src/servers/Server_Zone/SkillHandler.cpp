@@ -48,14 +48,14 @@ using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-void Core::Network::GameConnection::skillHandler( Core::Network::Packets::GamePacketPtr pInPacket,
+void Core::Network::GameConnection::skillHandler( const Core::Network::Packets::GamePacket& inPacket,
                                                   Core::Entity::PlayerPtr pPlayer )
 {
 
-    uint32_t action = pInPacket->getValAt< uint32_t >( 0x24 );
-    uint32_t useCount = pInPacket->getValAt< uint32_t >( 0x28 );
+    uint32_t action = inPacket.getValAt< uint32_t >( 0x24 );
+    uint32_t useCount = inPacket.getValAt< uint32_t >( 0x28 );
 
-    uint64_t targetId = pInPacket->getValAt< uint64_t >( 0x30 );
+    uint64_t targetId = inPacket.getValAt< uint64_t >( 0x30 );
 
     if( action < 1000000 ) // normal action
     {
