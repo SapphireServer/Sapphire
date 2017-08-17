@@ -1,61 +1,38 @@
 #include <Server_Common/Common.h>
 #include <Server_Common/CommonNetwork.h>
-#include <Server_Common/Database.h>
+
 #include <Server_Common/GamePacketNew.h>
 #include <Server_Common/Logger.h>
-#include <Server_Common/ExdData.h>
+
 #include <Server_Common/PacketContainer.h>
-
-#include <boost/format.hpp>
-
 
 #include "GameConnection.h"
 
 #include "Session.h"
-#include "Zone.h"
-#include "ZonePosition.h"
-#include "ServerZone.h"
-#include "ZoneMgr.h"
 
-#include "InitUIPacket.h"
-#include "PingPacket.h"
-#include "MoveActorPacket.h"
-#include "ChatPacket.h"
 #include "ServerNoticePacket.h"
 #include "ActorControlPacket142.h"
 #include "ActorControlPacket143.h"
 #include "ActorControlPacket144.h"
-#include "EventStartPacket.h"
-#include "EventFinishPacket.h"
+
 #include "PlayerStateFlagsPacket.h"
 
 
-#include "GameCommandHandler.h"
-
 #include "Player.h"
-#include "Inventory.h"
 
 #include "Forwards.h"
 
-#include "EventHelper.h"
 
-#include "Action.h"
-#include "ActionTeleport.h"
 
 extern Core::Logger g_log;
-extern Core::Db::Database g_database;
-extern Core::ServerZone g_serverZone;
-extern Core::ZoneMgr g_zoneMgr;
-extern Core::Data::ExdData g_exdData;
-extern Core::GameCommandHandler g_gameCommandMgr;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
 
-void Core::Network::GameConnection::cfDutyInfoRequest( const Core::Network::Packets::GamePacket& inPacket,
-                                                       Core::Entity::PlayerPtr pPlayer )
+void Core::Network::GameConnection::cfDutyInfoRequest( const Packets::GamePacket& inPacket,
+                                                       Entity::PlayerPtr pPlayer )
 {
     GamePacketNew< FFXIVIpcCFDutyInfo > dutyInfoPacket( pPlayer->getId() );
     queueOutPacket( dutyInfoPacket );
@@ -65,8 +42,8 @@ void Core::Network::GameConnection::cfDutyInfoRequest( const Core::Network::Pack
 
 }
 
-void Core::Network::GameConnection::cfRegisterDuty( const Core::Network::Packets::GamePacket& inPacket,
-                                                    Core::Entity::PlayerPtr pPlayer)
+void Core::Network::GameConnection::cfRegisterDuty( const Packets::GamePacket& inPacket,
+                                                    Entity::PlayerPtr pPlayer)
 {
     // TODO use for loop for this
     auto contentId1 = inPacket.getValAt< uint16_t >( 46 );
@@ -89,14 +66,14 @@ void Core::Network::GameConnection::cfRegisterDuty( const Core::Network::Packets
     queueOutPacket( cfCancelPacket );
 }
 
-void Core::Network::GameConnection::cfRegisterRoulette( const Core::Network::Packets::GamePacket& inPacket,
-                                                        Core::Entity::PlayerPtr pPlayer)
+void Core::Network::GameConnection::cfRegisterRoulette( const Packets::GamePacket& inPacket,
+                                                        Entity::PlayerPtr pPlayer)
 {
     pPlayer->sendDebug("Roulette register");
 }
 
-void Core::Network::GameConnection::cfDutyAccepted( const Core::Network::Packets::GamePacket& inPacket,
-                                                    Core::Entity::PlayerPtr pPlayer)
+void Core::Network::GameConnection::cfDutyAccepted( const Packets::GamePacket& inPacket,
+                                                    Entity::PlayerPtr pPlayer)
 {
     pPlayer->sendDebug("TODO: Duty accept");
 }

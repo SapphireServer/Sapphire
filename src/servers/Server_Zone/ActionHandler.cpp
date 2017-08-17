@@ -54,8 +54,8 @@ using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
 
-void Core::Network::GameConnection::actionHandler( const Core::Network::Packets::GamePacket& inPacket,
-                                                   Core::Entity::PlayerPtr pPlayer )
+void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& inPacket,
+                                                   Entity::PlayerPtr pPlayer )
 {
     uint16_t commandId = inPacket.getValAt< uint16_t >( 0x20 );
     uint64_t param1 = inPacket.getValAt< uint64_t >( 0x24 );

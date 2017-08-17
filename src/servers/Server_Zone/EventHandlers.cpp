@@ -29,8 +29,8 @@ using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-void Core::Network::GameConnection::eventHandler( const Core::Network::Packets::GamePacket& inPacket,
-                                                  Core::Entity::PlayerPtr pPlayer )
+void Core::Network::GameConnection::eventHandler( const Packets::GamePacket& inPacket,
+                                                  Entity::PlayerPtr pPlayer )
 {
    uint16_t eventHandlerId = inPacket.getValAt< uint16_t >( 0x12 );
 

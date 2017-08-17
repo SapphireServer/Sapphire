@@ -48,8 +48,8 @@ using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-void Core::Network::GameConnection::skillHandler( const Core::Network::Packets::GamePacket& inPacket,
-                                                  Core::Entity::PlayerPtr pPlayer )
+void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inPacket,
+                                                  Entity::PlayerPtr pPlayer )
 {
 
     uint32_t action = inPacket.getValAt< uint32_t >( 0x24 );
@@ -61,7 +61,9 @@ void Core::Network::GameConnection::skillHandler( const Core::Network::Packets::
     {
         std::string actionIdStr = boost::str( boost::format( "%|04X|" ) % action );
         pPlayer->sendDebug( "---------------------------------------" );
-        pPlayer->sendDebug( "ActionHandler ( " + actionIdStr + " | " + g_exdData.m_actionInfoMap[action].name + " | " + std::to_string( targetId ) + " )" );
+        pPlayer->sendDebug( "ActionHandler ( " + actionIdStr + " | " +
+                            g_exdData.m_actionInfoMap[action].name +
+                            " | " + std::to_string( targetId ) + " )" );
 
         pPlayer->queuePacket( ActorControlPacket142( pPlayer->getId(), ActorControlType::ActionStart, 0x01, action ) );
 
