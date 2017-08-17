@@ -92,15 +92,17 @@ enum GmCommand
     Jump = 0x025E,
     JumpNpc = 0x025F,
 };
-void Core::Network::GameConnection::gm1Handler( Core::Network::Packets::GamePacketPtr pInPacket,
+void Core::Network::GameConnection::gm1Handler( const Core::Network::Packets::GamePacket& inPacket,
                                                 Core::Entity::PlayerPtr pPlayer )
 {
-    uint32_t commandId = pInPacket->getValAt< uint32_t >( 0x20 );
-    uint32_t param1 = pInPacket->getValAt< uint32_t >( 0x24 );
-    uint32_t param2 = pInPacket->getValAt< uint32_t >( 0x28 );
-    uint32_t param3 = pInPacket->getValAt< uint32_t >( 0x38 );
+    uint32_t commandId = inPacket.getValAt< uint32_t >( 0x20 );
+    uint32_t param1 = inPacket.getValAt< uint32_t >( 0x24 );
+    uint32_t param2 = inPacket.getValAt< uint32_t >( 0x28 );
+    uint32_t param3 = inPacket.getValAt< uint32_t >( 0x38 );
 
-    g_log.debug( pPlayer->getName() + " used GM1 commandId: " + std::to_string( commandId ) + ", params: " + std::to_string( param1 ) + ", " + std::to_string( param2 ) + ", " + std::to_string( param3 ) );
+    g_log.debug( pPlayer->getName() + " used GM1 commandId: " + std::to_string( commandId ) +
+                                    ", params: " + std::to_string( param1 ) + ", " +
+                                    std::to_string( param2 ) + ", " + std::to_string( param3 ) );
 
     Core::Entity::ActorPtr targetActor;
 
@@ -336,11 +338,11 @@ void Core::Network::GameConnection::gm1Handler( Core::Network::Packets::GamePack
 
 }
 
-void Core::Network::GameConnection::gm2Handler( Core::Network::Packets::GamePacketPtr pInPacket,
+void Core::Network::GameConnection::gm2Handler( const Core::Network::Packets::GamePacket& inPacket,
                                                 Core::Entity::PlayerPtr pPlayer )
 {
-    uint32_t commandId = pInPacket->getValAt< uint32_t >( 0x20 );
-    std::string param1 = pInPacket->getStringAt( 0x34 );
+    uint32_t commandId = inPacket.getValAt< uint32_t >( 0x20 );
+    std::string param1 = inPacket.getStringAt( 0x34 );
 
     g_log.debug( pPlayer->getName() + " used GM2 commandId: " + std::to_string( commandId ) + ", params: " + param1 );
 

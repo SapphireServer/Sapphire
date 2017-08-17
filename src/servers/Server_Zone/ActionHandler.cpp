@@ -54,15 +54,15 @@ using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
 
-void Core::Network::GameConnection::actionHandler( Core::Network::Packets::GamePacketPtr pInPacket,
+void Core::Network::GameConnection::actionHandler( const Core::Network::Packets::GamePacket& inPacket,
                                                    Core::Entity::PlayerPtr pPlayer )
 {
-    uint16_t commandId = pInPacket->getValAt< uint16_t >( 0x20 );
-    uint64_t param1 = pInPacket->getValAt< uint64_t >( 0x24 );
-    uint32_t param11 = pInPacket->getValAt< uint32_t >( 0x24 );
-    uint32_t param12 = pInPacket->getValAt< uint32_t >( 0x28 );
-    uint32_t param2 = pInPacket->getValAt< uint32_t >( 0x2c );
-    uint64_t param3 = pInPacket->getValAt< uint64_t >( 0x38 );
+    uint16_t commandId = inPacket.getValAt< uint16_t >( 0x20 );
+    uint64_t param1 = inPacket.getValAt< uint64_t >( 0x24 );
+    uint32_t param11 = inPacket.getValAt< uint32_t >( 0x24 );
+    uint32_t param12 = inPacket.getValAt< uint32_t >( 0x28 );
+    uint32_t param2 = inPacket.getValAt< uint32_t >( 0x2c );
+    uint64_t param3 = inPacket.getValAt< uint64_t >( 0x38 );
 
     g_log.debug( "[" + std::to_string( m_pSession->getId() ) + "] Incoming action: " +
                  boost::str( boost::format( "%|04X|" ) % ( uint32_t ) ( commandId & 0xFFFF ) ) +
@@ -107,7 +107,7 @@ void Core::Network::GameConnection::actionHandler( Core::Network::Packets::GameP
         case 0x03: // Change target
         {
 
-            uint64_t targetId = pInPacket->getValAt< uint64_t >( 0x24 );
+            uint64_t targetId = inPacket.getValAt< uint64_t >( 0x24 );
             pPlayer->changeTarget( targetId );
             break;
         }
@@ -121,7 +121,7 @@ void Core::Network::GameConnection::actionHandler( Core::Network::Packets::GameP
         case 0x1F4: // emote
         {
             uint64_t targetId = pPlayer->getTargetId();
-            uint32_t emoteId = pInPacket->getValAt< uint32_t >( 0x24 );
+            uint32_t emoteId = inPacket.getValAt< uint32_t >( 0x24 );
 
             pPlayer->sendToInRangeSet( ActorControlPacket144( pPlayer->getId(), Emote, emoteId, 0, 0, 0, targetId ) );
             break;

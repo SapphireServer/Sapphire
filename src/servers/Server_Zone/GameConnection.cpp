@@ -155,7 +155,7 @@ void Core::Network::GameConnection::handleGamePacket( Core::Network::Packets::Ga
          g_log.debug( "[" + std::to_string( m_pSession->getId() ) + "] Handling packet : " + name + "( " +
                       boost::str( boost::format( "%|04X|" ) % static_cast< uint32_t >( pPacket->getSubType() & 0xFFFF ) )  + " )" );
 
-      ( this->*( it->second ) )( pPacket, m_pSession->getPlayer() );
+      ( this->*( it->second ) )( *pPacket, m_pSession->getPlayer() );
    }
    else
    {

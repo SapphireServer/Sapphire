@@ -12,7 +12,7 @@
 
 #include "Forwards.h"
 
-#define DECLARE_HANDLER( x ) void x( Packets::GamePacketPtr pInPacket, Entity::PlayerPtr pPlayer )
+#define DECLARE_HANDLER( x ) void x( const Packets::GamePacket& inPacket, Entity::PlayerPtr pPlayer )
 
 namespace Core {
 namespace Network {
@@ -28,7 +28,7 @@ class GameConnection : public Connection
 {
 
 private:
-   typedef void ( GameConnection::* Handler )( Packets::GamePacketPtr pInPacket, Entity::PlayerPtr pPlayer );
+   typedef void ( GameConnection::* Handler )( const Packets::GamePacket& inPacket, Entity::PlayerPtr pPlayer );
 
    typedef std::map< uint16_t, Handler > HandlerMap;
    typedef std::map< uint16_t, std::string > HandlerStrMap;
