@@ -336,7 +336,6 @@ void Core::Network::GameConnection::zoneLineHandler( Core::Network::Packets::Gam
 }
 
 
-
 void Core::Network::GameConnection::discoveryHandler( Core::Network::Packets::GamePacketPtr pInPacket,
                                                       Core::Entity::PlayerPtr pPlayer )
 {
@@ -362,68 +361,6 @@ void Core::Network::GameConnection::discoveryHandler( Core::Network::Packets::Ga
    pPlayer->sendNotice( "Discovery ref pos ID: " + std::to_string( ref_position_id ) );
 
    pPlayer->discover( field[1].getInt16(), field[2].getInt16() );
-
-}
-
-void Core::Network::GameConnection::inventoryModifyHandler( Core::Network::Packets::GamePacketPtr pInPacket,
-                                                            Core::Entity::PlayerPtr pPlayer )
-{
-   uint32_t seq = pInPacket->getValAt< uint32_t >( 0x20 );
-   uint8_t action = pInPacket->getValAt< uint8_t >( 0x24 );
-   uint8_t fromSlot = pInPacket->getValAt< uint8_t >( 0x30 );
-   uint8_t toSlot = pInPacket->getValAt< uint8_t >( 0x44 );
-   uint16_t fromContainer = pInPacket->getValAt< uint16_t >( 0x2C );
-   uint16_t toContainer = pInPacket->getValAt< uint16_t >( 0x40 );
-
-   GamePacketNew< FFXIVIpcInventoryActionAck > ackPacket( pPlayer->getId() );
-   ackPacket.data().sequence = seq;
-   ackPacket.data().type = 7;
-   pPlayer->queuePacket( ackPacket );
-   
-
-   g_log.debug( pInPacket->toString() );
-   g_log.debug( "InventoryAction: " + std::to_string( action ) );
-
-   // TODO: other inventory operations need to be implemented
-   switch( action )
-   {
-
-   case 0x07: // discard item action
-   {
-      pPlayer->getInvetory()->discardItem( fromContainer, fromSlot );
-   }
-   break;
-
-   case 0x08: // move item action
-   {
-      pPlayer->getInvetory()->moveItem( fromContainer, fromSlot, toContainer, toSlot );
-   }
-   break;
-
-   case 0x09: // swap item action
-   {
-      pPlayer->getInvetory()->swapItem( fromContainer, fromSlot, toContainer, toSlot );
-   }
-   break;
-
-   case 0x0C: // merge stack action
-   {
-
-   }
-   break;
-
-   case 0x0A: // split stack action
-   {
-
-   }
-   break;
-
-   default:
-
-      break;
-   }
-
-   pPlayer->setSyncFlag( PlayerSyncFlags::Status );
 
 }
 
