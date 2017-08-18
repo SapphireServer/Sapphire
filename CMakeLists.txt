@@ -1,3 +1,4 @@
+cmake_policy(SET CMP0014 NEW)
 cmake_minimum_required(VERSION 2.6)
 project (Sapphire)
 
