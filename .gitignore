@@ -69,6 +69,7 @@ src/libraries/external/boost_*
 # Cache
 .vs/
 .vscode/
+.idea/
 *.cache
 *.dat
 *.suo
