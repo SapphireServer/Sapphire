@@ -1,8 +1,8 @@
-#include <Server_Common/ServerPacketDef.h>
-#include <Server_Common/Database.h>
-#include <Server_Common/Common.h>
-#include <Server_Common/ExdData.h>
-#include <Server_Common/Logger.h>
+#include <src/servers/Server_Common/Network/PacketDef/ServerPacketDef.h>
+#include <src/servers/Server_Common/Database/Database.h>
+#include <src/servers/Server_Common/Common.h>
+#include <src/servers/Server_Common/Exd/ExdData.h>
+#include <src/servers/Server_Common/Logging/Logger.h>
 
 #include "Inventory.h"
 

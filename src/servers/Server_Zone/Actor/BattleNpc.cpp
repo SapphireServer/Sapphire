@@ -3,11 +3,11 @@
 #include <time.h>
 #include <stdint.h>
 
-#include <Server_Common/Database.h>
-#include <Server_Common/Logger.h>
-#include <Server_Common/ExdData.h>
-#include <Server_Common/Util.h>
-#include <Server_Common/UtilMath.h>
+#include <src/servers/Server_Common/Database/Database.h>
+#include <src/servers/Server_Common/Logging/Logger.h>
+#include <src/servers/Server_Common/Exd/ExdData.h>
+#include <src/servers/Server_Common/Util/Util.h>
+#include <src/servers/Server_Common/Util/UtilMath.h>
 
 #include "Player.h"
 #include "BattleNpc.h"

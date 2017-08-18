@@ -1,7 +1,7 @@
 #ifndef _EVENTACTION_H_
 #define _EVENTACTION_H_
 
-#include <Server_Common/Common.h>
+#include <src/servers/Server_Common/Common.h>
 
 #include "src/servers/Server_Zone/Forwards.h"
 #include "src/servers/Server_Zone/Action/Action.h"

@@ -4,7 +4,7 @@
 
 #include <map>
 
-#include <Server_Common/Common.h>
+#include <src/servers/Server_Common/Common.h>
 
 #include "../Forwards.h"
 

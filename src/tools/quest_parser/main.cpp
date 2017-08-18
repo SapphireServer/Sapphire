@@ -7,8 +7,8 @@
 #include <Exd.h>
 #include <iostream>
 #include <set>
-#include <Server_Common/ExdData.h>
-#include <Server_Common/Logger.h>
+#include <src/servers/Server_Common/Exd/ExdData.h>
+#include <src/servers/Server_Common/Logging/Logger.h>
 
 #include <fstream>
 

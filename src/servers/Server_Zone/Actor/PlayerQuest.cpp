@@ -1,9 +1,9 @@
-#include <Server_Common/Common.h>
-#include <Server_Common/Database.h>
-#include <Server_Common/ServerPacketDef.h>
-#include <Server_Common/GamePacket.h>
-#include <Server_Common/ExdData.h>
-#include <Server_Common/PacketContainer.h>
+#include <src/servers/Server_Common/Common.h>
+#include <src/servers/Server_Common/Database/Database.h>
+#include <src/servers/Server_Common/Network/PacketDef/ServerPacketDef.h>
+#include <src/servers/Server_Common/Network/GamePacket.h>
+#include <src/servers/Server_Common/Exd/ExdData.h>
+#include <src/servers/Server_Common/Network/PacketContainer.h>
 
 #include "src/servers/Server_Zone/Network/GameConnection.h"
 

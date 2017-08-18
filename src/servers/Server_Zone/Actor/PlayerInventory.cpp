@@ -1,11 +1,11 @@
-#include <Server_Common/Common.h>
+#include <src/servers/Server_Common/Common.h>
 
 #include "Player.h"
 
 #include "src/servers/Server_Zone/Zone/ZoneMgr.h"
 #include "src/servers/Server_Zone/Zone/Zone.h"
 
-#include <Server_Common/GamePacket.h>
+#include <src/servers/Server_Common/Network/GamePacket.h>
 
 #include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket143.h"
 

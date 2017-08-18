@@ -3,11 +3,11 @@
 #include <time.h>
 #include <map>
 
-#include <Server_Common/Hive.h>
-#include <Server_Common/Acceptor.h>
+#include <src/servers/Server_Common/Network/Hive.h>
+#include <src/servers/Server_Common/Network/Acceptor.h>
 
-#include <Server_Common/Logger.h>
-#include <Server_Common/XMLConfig.h>
+#include <src/servers/Server_Common/Logging/Logger.h>
+#include <src/servers/Server_Common/Config/XMLConfig.h>
 
 //#include "LobbySession.h"
 

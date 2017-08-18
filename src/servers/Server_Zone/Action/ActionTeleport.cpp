@@ -1,8 +1,8 @@
 #include "ActionTeleport.h"
 
-#include <Server_Common/Util.h>
-#include <Server_Common/ExdData.h>
-#include <Server_Common/Logger.h>
+#include <src/servers/Server_Common/Util/Util.h>
+#include <src/servers/Server_Common/Exd/ExdData.h>
+#include <src/servers/Server_Common/Logging/Logger.h>
 
 #include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket142.h"
 #include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket143.h"

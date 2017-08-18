@@ -1,7 +1,7 @@
-#include <Server_Common/Common.h>
-#include <Server_Common/GamePacket.h>
-#include <Server_Common/Logger.h>
-#include <Server_Common/PacketContainer.h>
+#include <src/servers/Server_Common/Common.h>
+#include <src/servers/Server_Common/Network/GamePacket.h>
+#include <src/servers/Server_Common/Logging/Logger.h>
+#include <src/servers/Server_Common/Network/PacketContainer.h>
 
 #include "Player.h"
 

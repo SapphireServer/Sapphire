@@ -1,12 +1,12 @@
-#include <Server_Common/Util.h>
-#include <Server_Common/UtilMath.h>
-#include <Server_Common/PacketContainer.h>
+#include <src/servers/Server_Common/Util/Util.h>
+#include <src/servers/Server_Common/Util/UtilMath.h>
+#include <src/servers/Server_Common/Network/PacketContainer.h>
 
 #include "src/servers/Server_Zone/Forwards.h"
 #include "src/servers/Server_Zone/Action/Action.h"
 #include "Actor.h"
 #include "src/servers/Server_Zone/Zone/Zone.h"
-#include <Server_Common/GamePacket.h>
+#include <src/servers/Server_Common/Network/GamePacket.h>
 #include "src/servers/Server_Zone/Network/GameConnection.h"
 #include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket142.h"
 #include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket143.h"

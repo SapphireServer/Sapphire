@@ -1,7 +1,7 @@
 #ifndef _ACTION_H_
 #define _ACTION_H_
 
-#include <Server_Common/Common.h>
+#include <src/servers/Server_Common/Common.h>
 #include "src/servers/Server_Zone/Forwards.h"
 
 namespace Core { namespace Action {

@@ -1,9 +1,9 @@
 #include "src/servers/Server_Zone/Forwards.h"
 #include "ItemContainer.h"
 
-#include <Server_Common/Common.h>
-#include <Server_Common/Logger.h>
-#include <Server_Common/Database.h>
+#include <src/servers/Server_Common/Common.h>
+#include <src/servers/Server_Common/Logging/Logger.h>
+#include <src/servers/Server_Common/Database/Database.h>
 
 #include "src/servers/Server_Zone/Actor/Player.h"
 

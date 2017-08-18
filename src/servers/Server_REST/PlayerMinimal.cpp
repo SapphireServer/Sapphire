@@ -1,10 +1,10 @@
 #include "PlayerMinimal.h"
 
 //#include "Core/Server_Game/CServerGame.h"
-#include <Server_Common/Util.h>
-#include <Server_Common/Database.h>
-#include <Server_Common/Common.h>
-#include <Server_Common/ExdData.h>
+#include <src/servers/Server_Common/Util/Util.h>
+#include <src/servers/Server_Common/Database/Database.h>
+#include <src/servers/Server_Common/Common.h>
+#include <src/servers/Server_Common/Exd/ExdData.h>
 
 
 extern Core::Db::Database g_database;

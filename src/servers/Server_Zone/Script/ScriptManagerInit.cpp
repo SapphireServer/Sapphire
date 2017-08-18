@@ -1,7 +1,7 @@
-#include <Server_Common/Logger.h>
+#include <src/servers/Server_Common/Logging/Logger.h>
 #include <chaiscript/chaiscript.hpp>
 
-#include <Server_Common/ChaiscriptStdLib.h>
+#include <src/servers/Server_Common/Script/ChaiscriptStdLib.h>
 
 #include "src/servers/Server_Zone/Script/ScriptManager.h"
 

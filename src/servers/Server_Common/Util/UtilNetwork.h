@@ -1,7 +1,7 @@
 #ifndef _UTILNETWORK_H
 #define _UTILNETWORK_H
 
-#include "CommonNetwork.h"
+#include "src/servers/Server_Common/Network/CommonNetwork.h"
 
 namespace Core {
 namespace Network {

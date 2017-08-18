@@ -2,16 +2,16 @@
 #include <vector>
 
 
-#include <Server_Common/Logger.h>
-#include <Server_Common/Util.h>
-#include <Server_Common/UtilMath.h>
-#include <Server_Common/GamePacket.h>
-#include <Server_Common/GamePacketNew.h>
-#include <Server_Common/Database.h>
-#include <Server_Common/ExdData.h>
-#include <Server_Common/CommonNetwork.h>
-#include <Server_Common/ServerPacketDef.h>
-#include <Server_Common/PacketContainer.h>
+#include <src/servers/Server_Common/Logging/Logger.h>
+#include <src/servers/Server_Common/Util/Util.h>
+#include <src/servers/Server_Common/Util/UtilMath.h>
+#include <src/servers/Server_Common/Network/GamePacket.h>
+#include <src/servers/Server_Common/Network/GamePacketNew.h>
+#include <src/servers/Server_Common/Database/Database.h>
+#include <src/servers/Server_Common/Exd/ExdData.h>
+#include <src/servers/Server_Common/Network/CommonNetwork.h>
+#include <src/servers/Server_Common/Network/PacketDef/ServerPacketDef.h>
+#include <src/servers/Server_Common/Network/PacketContainer.h>
 
 #include "Zone.h"
 #include "ZoneMgr.h"

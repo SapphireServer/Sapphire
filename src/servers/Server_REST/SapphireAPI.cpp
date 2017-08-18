@@ -1,8 +1,8 @@
 #include "SapphireAPI.h"
-#include <Server_Common/base64.h>
+#include <src/servers/Server_Common/Crypt/base64.h>
 #include "Session.h"
 #include "PlayerMinimal.h"
-#include <Server_Common/Database.h>
+#include <src/servers/Server_Common/Database/Database.h>
 #include <time.h>
 
 #define BOOST_SPIRIT_THREADSAFE
