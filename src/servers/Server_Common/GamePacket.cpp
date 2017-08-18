@@ -94,7 +94,7 @@ void Core::Network::Packets::GamePacket::savePacket()
 }
 
 
-std::string Core::Network::Packets::GamePacket::toString()
+std::string Core::Network::Packets::GamePacket::toString() const
 {
 
    std::string str = "\n";

@@ -20,17 +20,17 @@ public:
    GamePacket( void );
    ~GamePacket( void );
 
-   uint16_t getSize()
+   uint16_t getSize() const
    {
       return m_segHdr.size;
    }
 
-   uint16_t getType()
+   uint16_t getType() const
    {
       return m_segHdr.type;
    }
 
-   uint16_t getSubType()
+   uint16_t getSubType() const
    {
       return m_subType;
    }
@@ -42,9 +42,9 @@ public:
    }
 
    template<class T>
-   T getValAt( uint16_t pos )
+   T getValAt( uint16_t pos ) const
    {
-      return *reinterpret_cast< T* >( &m_dataBuf[0] + pos );
+      return *reinterpret_cast< const T* >( &m_dataBuf[0] + pos );
    }
 
    void setBytesAt( uint16_t offset, uint8_t * bytes, uint16_t length )
@@ -52,9 +52,9 @@ public:
       memcpy( reinterpret_cast< uint8_t* >( &m_dataBuf[0] + offset ), bytes, length );
    }
 
-   char * getStringAt( uint16_t pos )
+   const char * getStringAt( uint16_t pos ) const
    {
-      return reinterpret_cast< char* >( &m_dataBuf[0] + pos );
+      return reinterpret_cast< const char* >( &m_dataBuf[0] + pos );
    }
 
    void setStringAt( uint16_t pos, const std::string& str )
@@ -69,7 +69,7 @@ public:
 
    void setHeader( uint16_t size, uint16_t type, uint32_t id1, uint32_t id2, uint16_t subType, uint32_t unknown = 0xFED2E000 );
 
-   std::string toString();
+   std::string toString() const;
 
    void savePacket();
 

@@ -6,6 +6,8 @@
 #include <Server_Common/CommonNetwork.h>
 #include <Server_Common/UtilMath.h>
 #include <Server_Common/PacketContainer.h>
+#include <Server_Common/Logger.h>
+#include <Server_Common/ExdData.h>
 
 #include "GameCommand.h"
 #include "GameCommandHandler.h"
@@ -15,20 +17,24 @@
 #include "ActorControlPacket143.h"
 #include "InitUIPacket.h"
 #include "GameConnection.h"
-
+#include "ScriptManager.h"
 
 #include "Player.h"
 #include "BattleNpc.h"
 
 #include "Zone.h"
 
-#include "Globals.h"
 #include "ServerZone.h"
 
 #include "StatusEffect.h"
 #include "Session.h"
 #include <boost/make_shared.hpp>
 
+extern Core::Db::Database g_database;
+extern Core::Scripting::ScriptManager g_scriptMgr;
+extern Core::Data::ExdData g_exdData;
+extern Core::Logger g_log;
+extern Core::ServerZone g_serverZone;
 
 // instanciate and initialize commands
 Core::GameCommandHandler::GameCommandHandler()

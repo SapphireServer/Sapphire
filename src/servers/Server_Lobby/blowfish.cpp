@@ -104,7 +104,7 @@ void BlowFish::initialize (BYTE key[], int32_t keybytes)
 
 
   int32_t v10 = keybytes;
-  int32_t v9 = (uintptr_t)key;
+  uintptr_t v9 = (uintptr_t)key;
   int32_t v8 = 0;
   int32_t v11 = 0;
   do {
