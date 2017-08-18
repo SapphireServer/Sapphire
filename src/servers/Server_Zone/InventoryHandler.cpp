@@ -54,15 +54,15 @@ using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
 
-void Core::Network::GameConnection::inventoryModifyHandler( Core::Network::Packets::GamePacketPtr pInPacket,
-                                                            Core::Entity::PlayerPtr pPlayer )
+void Core::Network::GameConnection::inventoryModifyHandler( const Packets::GamePacket& inPacket,
+                                                            Entity::PlayerPtr pPlayer )
 {
-    uint32_t seq = pInPacket->getValAt< uint32_t >( 0x20 );
-    uint8_t action = pInPacket->getValAt< uint8_t >( 0x24 );
-    uint8_t fromSlot = pInPacket->getValAt< uint8_t >( 0x30 );
-    uint8_t toSlot = pInPacket->getValAt< uint8_t >( 0x44 );
-    uint16_t fromContainer = pInPacket->getValAt< uint16_t >( 0x2C );
-    uint16_t toContainer = pInPacket->getValAt< uint16_t >( 0x40 );
+    uint32_t seq = inPacket.getValAt< uint32_t >( 0x20 );
+    uint8_t action = inPacket.getValAt< uint8_t >( 0x24 );
+    uint8_t fromSlot = inPacket.getValAt< uint8_t >( 0x30 );
+    uint8_t toSlot = inPacket.getValAt< uint8_t >( 0x44 );
+    uint16_t fromContainer = inPacket.getValAt< uint16_t >( 0x2C );
+    uint16_t toContainer = inPacket.getValAt< uint16_t >( 0x40 );
 
     GamePacketNew< FFXIVIpcInventoryActionAck > ackPacket( pPlayer->getId() );
     ackPacket.data().sequence = seq;
@@ -70,7 +70,7 @@ void Core::Network::GameConnection::inventoryModifyHandler( Core::Network::Packe
     pPlayer->queuePacket( ackPacket );
 
 
-    g_log.debug( pInPacket->toString() );
+    g_log.debug( inPacket.toString() );
     g_log.debug( "InventoryAction: " + std::to_string( action ) );
 
     // TODO: other inventory operations need to be implemented

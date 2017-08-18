@@ -1,67 +1,59 @@
 #include <Server_Common/Common.h>
 #include <Server_Common/CommonNetwork.h>
-#include <Server_Common/Database.h>
+#include <Server_Common/ExdData.h>
 #include <Server_Common/GamePacketNew.h>
 #include <Server_Common/PacketContainer.h>
+#include <Server_Common/Logger.h>
 
 #include <boost/format.hpp>
-
 
 #include "GameConnection.h"
 
 #include "Session.h"
-#include "Zone.h"
-#include "ZonePosition.h"
 
-#include "InitUIPacket.h"
-#include "PingPacket.h"
-#include "MoveActorPacket.h"
-#include "ChatPacket.h"
 #include "ServerNoticePacket.h"
 #include "ActorControlPacket142.h"
 #include "ActorControlPacket143.h"
 #include "ActorControlPacket144.h"
-#include "EventStartPacket.h"
-#include "EventFinishPacket.h"
-#include "PlayerStateFlagsPacket.h"
 
+#include "PlayerStateFlagsPacket.h"
 
 #include "GameCommandHandler.h"
 
 #include "Player.h"
-#include "Inventory.h"
-
-#include "Globals.h"
 
 #include "Forwards.h"
-
-#include "EventHelper.h"
 
 #include "Action.h"
 #include "ActionTeleport.h"
 #include "ActionCast.h"
+#include "ScriptManager.h"
 
 
-extern Core::GameCommandHandler g_gameCommandMgr;
+extern Core::Scripting::ScriptManager g_scriptMgr;
+extern Core::Data::ExdData g_exdData;
+extern Core::Logger g_log;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-void Core::Network::GameConnection::skillHandler( Core::Network::Packets::GamePacketPtr pInPacket,
-                                                  Core::Entity::PlayerPtr pPlayer )
+void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inPacket,
+                                                  Entity::PlayerPtr pPlayer )
 {
 
-    uint32_t action = pInPacket->getValAt< uint32_t >( 0x24 );
-    uint32_t useCount = pInPacket->getValAt< uint32_t >( 0x28 );
+    uint32_t action = inPacket.getValAt< uint32_t >( 0x24 );
+    uint32_t useCount = inPacket.getValAt< uint32_t >( 0x28 );
 
-    uint64_t targetId = pInPacket->getValAt< uint64_t >( 0x30 );
+    uint64_t targetId = inPacket.getValAt< uint64_t >( 0x30 );
 
     if( action < 1000000 ) // normal action
     {
         std::string actionIdStr = boost::str( boost::format( "%|04X|" ) % action );
         pPlayer->sendDebug( "---------------------------------------" );
-        pPlayer->sendDebug( "ActionHandler ( " + actionIdStr + " | " + g_exdData.m_actionInfoMap[action].name + " | " + std::to_string( targetId ) + " )" );
+        pPlayer->sendDebug( "ActionHandler ( " + actionIdStr + " | " +
+                            g_exdData.m_actionInfoMap[action].name +
+                            " | " + std::to_string( targetId ) + " )" );
 
         pPlayer->queuePacket( ActorControlPacket142( pPlayer->getId(), ActorControlType::ActionStart, 0x01, action ) );
 

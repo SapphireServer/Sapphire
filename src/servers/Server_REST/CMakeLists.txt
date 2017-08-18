@@ -16,7 +16,7 @@ if(UNIX)
   include_directories("/usr/include/mysql/")
   message(STATUS "Setting GCC flags")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
-  
+
   find_package(Boost ${SAPPHIRE_BOOST_VER} COMPONENTS log log_setup thread date_time filesystem system)
   if(Boost_FOUND)
     set(BOOST_LIBRARY_DIR ${Boost_LIBRARY_DIR})
@@ -36,6 +36,7 @@ else()
   message(STATUS "Setting MSVC flags")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHc")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
 
   if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/${SAPPHIRE_BOOST_FOLDER_NAME})
     message(STATUS "Using boost in /src/lib")
