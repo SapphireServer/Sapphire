@@ -1,7 +1,7 @@
 #include <time.h>
 
-#include <Server_Common/Util.h>
-#include <Server_Common/PacketContainer.h>
+#include <src/servers/Server_Common/Util/Util.h>
+#include <src/servers/Server_Common/Network/PacketContainer.h>
 #include "src/servers/Server_Zone/Network/GameConnection.h"
 #include "Session.h"
 

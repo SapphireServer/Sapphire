@@ -1,8 +1,8 @@
 #ifndef _ACTORCONTROL143_H
 #define _ACTORCONTROL143_H
 
-#include <Server_Common/GamePacketNew.h>
-#include <Server_Common/ServerPacketDef.h>
+#include <src/servers/Server_Common/Network/GamePacketNew.h>
+#include <src/servers/Server_Common/Network/PacketDef/ServerPacketDef.h>
 #include "src/servers/Server_Zone/Forwards.h"
 
 

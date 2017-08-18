@@ -1,5 +1,5 @@
-#include <Server_Common/Common.h>
-#include <Server_Common/ExdData.h>
+#include <src/servers/Server_Common/Common.h>
+#include <src/servers/Server_Common/Exd/ExdData.h>
 #include "Item.h"
 
 extern Core::Data::ExdData g_exdData;

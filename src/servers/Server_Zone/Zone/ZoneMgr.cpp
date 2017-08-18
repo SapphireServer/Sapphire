@@ -1,6 +1,6 @@
-#include <Server_Common/Logger.h>
-#include <Server_Common/Database.h>
-#include <Server_Common/ExdData.h>
+#include <src/servers/Server_Common/Logging/Logger.h>
+#include <src/servers/Server_Common/Database/Database.h>
+#include <src/servers/Server_Common/Exd/ExdData.h>
 #include <boost/lexical_cast.hpp>
 
 #include "ZoneMgr.h"

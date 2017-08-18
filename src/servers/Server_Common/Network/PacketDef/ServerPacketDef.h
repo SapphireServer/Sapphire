@@ -7,8 +7,8 @@
 #ifndef _CORE_NETWORK_PACKETS_SERVER_IPC_H
 #define _CORE_NETWORK_PACKETS_SERVER_IPC_H
 
-#include "Common.h"
-#include "CommonNetwork.h"
+#include "src/servers/Server_Common/Common.h"
+#include "src/servers/Server_Common/Network/CommonNetwork.h"
 
 namespace Core {
 namespace Network {

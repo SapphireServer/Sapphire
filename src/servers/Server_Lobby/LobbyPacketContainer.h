@@ -1,13 +1,11 @@
-#pragma once
-
 #ifndef _LobbyPacketContainer_H_
 #define _LobbyPacketContainer_H_
 
 #include <vector>
 #include <string.h>
 
-#include <Server_Common/CommonNetwork.h>
-#include <Server_Common/Util.h>
+#include <src/servers/Server_Common/Network/CommonNetwork.h>
+#include <src/servers/Server_Common/Util/Util.h>
 
 #include "Forwards.h"
 

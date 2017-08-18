@@ -1,8 +1,8 @@
-#include <Server_Common/Common.h>
-#include <Server_Common/CommonNetwork.h>
-#include <Server_Common/GamePacketNew.h>
-#include <Server_Common/Logger.h>
-#include <Server_Common/PacketContainer.h>
+#include <src/servers/Server_Common/Common.h>
+#include <src/servers/Server_Common/Network/CommonNetwork.h>
+#include <src/servers/Server_Common/Network/GamePacketNew.h>
+#include <src/servers/Server_Common/Logging/Logger.h>
+#include <src/servers/Server_Common/Network/PacketContainer.h>
 
 #include "src/servers/Server_Zone/Network/GameConnection.h"
 #include "src/servers/Server_Zone/Session.h"

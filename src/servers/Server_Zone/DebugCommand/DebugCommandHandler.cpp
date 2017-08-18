@@ -1,13 +1,13 @@
 #include <boost/lexical_cast.hpp>
 
-#include <Server_Common/Common.h>
-#include <Server_Common/Database.h>
-#include <Server_Common/GamePacketNew.h>
-#include <Server_Common/CommonNetwork.h>
-#include <Server_Common/UtilMath.h>
-#include <Server_Common/PacketContainer.h>
-#include <Server_Common/Logger.h>
-#include <Server_Common/ExdData.h>
+#include <src/servers/Server_Common/Common.h>
+#include <src/servers/Server_Common/Database/Database.h>
+#include <src/servers/Server_Common/Network/GamePacketNew.h>
+#include <src/servers/Server_Common/Network/CommonNetwork.h>
+#include <src/servers/Server_Common/Util/UtilMath.h>
+#include <src/servers/Server_Common/Network/PacketContainer.h>
+#include <src/servers/Server_Common/Logging/Logger.h>
+#include <src/servers/Server_Common/Exd/ExdData.h>
 
 #include "DebugCommand.h"
 #include "DebugCommandHandler.h"

@@ -1,10 +1,10 @@
-#include <Server_Common/Common.h>
-#include <Server_Common/CommonNetwork.h>
-#include <Server_Common/Database.h>
-#include <Server_Common/Util.h>
-#include <Server_Common/UtilNetwork.h>
-#include <Server_Common/Logger.h>
-#include <Server_Common/PacketContainer.h>
+#include <src/servers/Server_Common/Common.h>
+#include <src/servers/Server_Common/Network/CommonNetwork.h>
+#include <src/servers/Server_Common/Database/Database.h>
+#include <src/servers/Server_Common/Util/Util.h>
+#include <src/servers/Server_Common/Util/UtilNetwork.h>
+#include <src/servers/Server_Common/Logging/Logger.h>
+#include <src/servers/Server_Common/Network/PacketContainer.h>
 #include <boost/format.hpp>
 
 #include "GameConnection.h"

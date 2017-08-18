@@ -1,8 +1,8 @@
-#include <Server_Common/Logger.h>
-#include <Server_Common/ExdData.h>
+#include <src/servers/Server_Common/Logging/Logger.h>
+#include <src/servers/Server_Common/Exd/ExdData.h>
 #include <chaiscript/chaiscript.hpp>
 
-#include <Server_Common/ChaiscriptStdLib.h>
+#include <src/servers/Server_Common/Script/ChaiscriptStdLib.h>
 
 #include "src/servers/Server_Zone/Zone/Zone.h"
 #include "src/servers/Server_Zone/Actor/Player.h"

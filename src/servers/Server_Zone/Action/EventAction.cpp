@@ -1,6 +1,6 @@
-#include <Server_Common/Util.h>
-#include <Server_Common/Logger.h>
-#include <Server_Common/ExdData.h>
+#include <src/servers/Server_Common/Util/Util.h>
+#include <src/servers/Server_Common/Logging/Logger.h>
+#include <src/servers/Server_Common/Exd/ExdData.h>
 
 #include "EventAction.h"
 #include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket142.h"

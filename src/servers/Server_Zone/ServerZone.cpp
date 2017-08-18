@@ -4,16 +4,16 @@
 
 #include "ServerZone.h"
 
-#include <Server_Common/Logger.h>
-#include <Server_Common/XMLConfig.h>
-#include <Server_Common/Database.h>
+#include <src/servers/Server_Common/Logging/Logger.h>
+#include <src/servers/Server_Common/Config/XMLConfig.h>
+#include <src/servers/Server_Common/Database/Database.h>
 
-#include <Server_Common/Connection.h>
-#include <Server_Common/Hive.h>
-#include <Server_Common/Acceptor.h>
+#include <src/servers/Server_Common/Network/Connection.h>
+#include <src/servers/Server_Common/Network/Hive.h>
+#include <src/servers/Server_Common/Network/Acceptor.h>
 
-#include <Server_Common/ExdData.h>
-#include <Server_Common/PacketContainer.h>
+#include <src/servers/Server_Common/Exd/ExdData.h>
+#include <src/servers/Server_Common/Network/PacketContainer.h>
 
 #include "src/servers/Server_Zone/Network/GameConnection.h"
 #include "Session.h"

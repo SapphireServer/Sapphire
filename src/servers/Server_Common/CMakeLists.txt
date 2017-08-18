@@ -49,7 +49,18 @@ set(Boost_USE_STATIC_LIBS ON)
 
 
 file(GLOB UTILS_PUBLIC_INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*")
-file(GLOB UTILS_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}*.cpp")
+file(GLOB UTILS_SOURCE_FILES
+        "${CMAKE_CURRENT_SOURCE_DIR}*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Config/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Crypt/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Database/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Exd/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Logging/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Network/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Network/PacketDef/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Script/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Util/*.cpp")
+
 
 find_package(Boost ${SAPPHIRE_BOOST_VER} COMPONENTS log log_setup thread date_time filesystem system)
 include_directories(${Boost_INCLUDE_DIR})

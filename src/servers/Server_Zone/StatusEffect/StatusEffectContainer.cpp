@@ -1,5 +1,5 @@
-#include <Server_Common/Util.h>
-#include <Server_Common/ServerPacketDef.h>
+#include <src/servers/Server_Common/Util/Util.h>
+#include <src/servers/Server_Common/Network/PacketDef/ServerPacketDef.h>
 
 #include "src/servers/Server_Zone/Actor/Actor.h"
 #include "StatusEffect.h"
