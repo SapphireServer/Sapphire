@@ -2,10 +2,10 @@
 
 #include <Server_Common/Util.h>
 #include <Server_Common/PacketContainer.h>
-#include "GameConnection.h"
+#include "src/servers/Server_Zone/Network/GameConnection.h"
 #include "Session.h"
 
-#include "Player.h"
+#include "src/servers/Server_Zone/Actor/Player.h"
 
 Core::Session::Session( uint32_t sessionId )
    : m_sessionId( sessionId )

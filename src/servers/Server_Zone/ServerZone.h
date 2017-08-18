@@ -8,7 +8,7 @@
 #include <map>
 
 #include "Forwards.h"
-#include "BattleNpcTemplate.h"
+#include "src/servers/Server_Zone/Actor/BattleNpcTemplate.h"
 
 namespace Core {
 

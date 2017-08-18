@@ -15,14 +15,14 @@
 #include <Server_Common/ExdData.h>
 #include <Server_Common/PacketContainer.h>
 
-#include "GameConnection.h"
+#include "src/servers/Server_Zone/Network/GameConnection.h"
 #include "Session.h"
 
-#include "ZoneMgr.h"
+#include "src/servers/Server_Zone/Zone/ZoneMgr.h"
 
-#include "GameCommandHandler.h"
+#include "src/servers/Server_Zone/DebugCommand/DebugCommandHandler.h"
 
-#include "ScriptManager.h"
+#include "Script/ScriptManager.h"
 
 #include "Forwards.h"
 #include <boost/foreach.hpp>
@@ -32,7 +32,7 @@
 
 Core::Logger g_log;
 Core::Db::Database g_database;
-Core::GameCommandHandler g_gameCommandMgr;
+Core::DebugCommandHandler g_gameCommandMgr;
 Core::Scripting::ScriptManager g_scriptMgr;
 Core::Data::ExdData g_exdData;
 Core::ZoneMgr g_zoneMgr;

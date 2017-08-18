@@ -1,13 +1,27 @@
 cmake_minimum_required(VERSION 2.6)
 cmake_policy(SET CMP0015 NEW)
+cmake_policy(SET CMP0014 OLD)
+
 project(Sapphire_Zone)
 
 include_directories("../../libraries/external/ChaiScript-6.0.0/include/")
 include_directories("../../libraries/sapphire/datReader/")
 include_directories("../")
 
-file(GLOB SERVER_PUBLIC_INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*")
-file(GLOB SERVER_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}*.c*")
+file(GLOB SERVER_PUBLIC_INCLUDE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/* ${CMAKE_CURRENT_SOURCE_DIR}/Script/*)
+file(GLOB SERVER_SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+        *.c*
+        Actor/*.c*
+        Action/*.c*
+        DebugCommand/*.c*
+        Event/*.c*
+        Inventory/*.c*
+        Network/*.c*
+        Network/Handlers/*.c*
+        Network/PacketWrappers/*.c*
+        Script/*.c*
+        StatusEffect/*.c*
+        Zone/*.c*)
 
 set(SERVER_COMMON_DIR ../Server_Common)
 set(Boost_USE_STATIC_LIBS ON)
@@ -55,6 +69,7 @@ else()
   endif()
 endif()
 
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Script)
 
 include_directories(${Boost_INCLUDE_DIR})
 
