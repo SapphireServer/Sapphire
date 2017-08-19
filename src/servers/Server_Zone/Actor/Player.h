@@ -78,7 +78,7 @@ public:
 
    void checkEvent( uint32_t eventId );
 
-   
+
 
    // Events
    //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -484,6 +484,16 @@ public:
 
    void handleScriptSkill( uint32_t type, uint32_t actionId, uint64_t param1, uint64_t param2, Entity::Actor& target );
 
+   // Content Finder handling
+   //////////////////////////////////////////////////////////////////////////////////////////////////////
+   /*! Get an unix time when the player can register into content finder again. */
+   uint32_t getCFPenaltyTimestamp() const;
+
+   /*! Set an unix time when the player can register into content finder again. */
+   void setCFPenaltyTimestamp( uint32_t timestamp );
+
+   uint32_t getCFPenaltyMinutes() const;
+   void setCFPenaltyMinutes( uint32_t minutes );
 private:
    uint32_t m_lastWrite;
    uint32_t m_lastPing;
@@ -583,7 +593,7 @@ private:
    bool m_bAutoattack;
 
    Common::ZoneingType m_zoningType;
-      
+
    bool m_bMarkedForZoning;
    uint32_t m_updateFlags;
    bool m_bNewAdventurer;
@@ -599,6 +609,8 @@ private:
    uint8_t m_gc;
    uint8_t m_gcRank[3];
 
+   // content finder info
+   uint32_t m_cfPenaltyUntil; // unix time
 };
 
 }
