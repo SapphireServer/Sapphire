@@ -194,7 +194,7 @@ void Core::Entity::Player::calculateStats()
    auto paramGrowthInfoIt = g_exdData.m_paramGrowthInfoMap.find( level );
 
    if( tribeInfoIt == g_exdData.m_tribeInfoMap.end() ||
-       classInfoIt == g_exdData.m_classJobInfoMap.end() || 
+       classInfoIt == g_exdData.m_classJobInfoMap.end() ||
        paramGrowthInfoIt == g_exdData.m_paramGrowthInfoMap.end() )
       return;
 
@@ -204,7 +204,7 @@ void Core::Entity::Player::calculateStats()
 
    // TODO: put formula somewhere else...
    float base = 0.0f;
-   
+
    if( level < 51 )
       base = 0.053f * ( level * level ) + ( 1.022f * level ) - 0.907f + 20;
    else
@@ -224,11 +224,11 @@ void Core::Entity::Player::calculateStats()
    m_baseStats.attackPotMagic = paramGrowthInfo.base_secondary;
    m_baseStats.healingPotMagic = paramGrowthInfo.base_secondary;
 
-   m_baseStats.max_mp = floor( 
-      floor( 
-      ( ( m_baseStats.pie - base ) * ( static_cast< float >( paramGrowthInfo.piety_scalar ) / 100 ) ) + paramGrowthInfo.mp_const ) * ( static_cast< float >( classInfo.mod_mpcpgp ) / 100 ) 
+   m_baseStats.max_mp = floor(
+      floor(
+      ( ( m_baseStats.pie - base ) * ( static_cast< float >( paramGrowthInfo.piety_scalar ) / 100 ) ) + paramGrowthInfo.mp_const ) * ( static_cast< float >( classInfo.mod_mpcpgp ) / 100 )
    );
-   
+
    m_baseStats.max_hp = floor(
       floor(
       ( ( m_baseStats.vit - base ) * ( ( static_cast< float >( paramGrowthInfo.piety_scalar )  ) / 100 ) ) + paramGrowthInfo.hp_mod ) * ( static_cast< float >( classInfo.mod_hp * 0.9f ) / 100 ) * 15
@@ -309,7 +309,7 @@ void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
          pos = z_pos->getTargetPosition();
          rot = z_pos->getTargetRotation();
       }
-         
+
 
       sendDebug( "Teleport: " + data->placename + " " + data->placename_aethernet +
                   "(" + std::to_string( data->levelId ) + ")" );
@@ -384,7 +384,7 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
 
    sendInventory();
 
-   // set flags, will be reset automatically by zoning ( only on client side though ) 
+   // set flags, will be reset automatically by zoning ( only on client side though )
    pPlayer->setStateFlag( PlayerStateFlag::BetweenAreas );
    pPlayer->setStateFlag( PlayerStateFlag::BetweenAreas1 );
    pPlayer->sendStateFlags();
@@ -522,7 +522,7 @@ void Core::Entity::Player::discover( int16_t map_id, int16_t sub_id )
    // map.exd field 12 -> index in one of the two discovery sections, if field 15 is false, need to use 2nd section
    // section 1 starts at 4 - 2 bytes each
 
-   // section to starts at 320 - 4 bytes long 
+   // section to starts at 320 - 4 bytes long
 
    int32_t offset = 4;
 
@@ -814,7 +814,7 @@ void Core::Entity::Player::eventActionStart( uint32_t eventId,
 
    setCurrentAction( pEventAction );
    auto pEvent = getEvent( eventId );
-   
+
    if( !pEvent && getEventCount() )
    {
       // We're trying to play a nested event, need to start it first.
@@ -1106,7 +1106,7 @@ void Core::Entity::Player::update( int64_t currTime )
 
          for( auto actor : m_inRangeActors )
          {
-            if( isAutoattackOn() && 
+            if( isAutoattackOn() &&
                 actor->getId() == m_targetId &&
                 actor->isAlive() &&
                 mainWeap &&
@@ -1462,7 +1462,7 @@ void Core::Entity::Player::autoAttack( ActorPtr pTarget )
    //uint64_t tick = Util::getTimeMs();
    //srand(static_cast< uint32_t >(tick));
 
-   uint32_t damage = mainWeap->getAutoAttackDmg() + rand() % 12;   
+   uint32_t damage = mainWeap->getAutoAttackDmg() + rand() % 12;
    uint32_t variation = 0 + rand() % 3;
 
    if( getClass() == 5 || getClass() == 23 || getClass() == 31 )
@@ -1507,14 +1507,14 @@ void Core::Entity::Player::autoAttack( ActorPtr pTarget )
    }
 
    pTarget->takeDamage(damage);
-   
+
 }
 
 void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, uint64_t param1, uint64_t param2, Entity::Actor& pTarget )
 {
    sendDebug( std::to_string( pTarget.getId() ) );
    sendDebug( "Handle script skill type: " + std::to_string( type ) );
-   
+
    switch( type )
    {
 
@@ -1568,4 +1568,40 @@ void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, 
    default:
    break;
    }
+}
+
+
+/////////////////////////////
+// Content Finder
+/////////////////////////////
+uint32_t Core::Entity::Player::getCFPenaltyTimestamp() const
+{
+   return m_cfPenaltyUntil;
+}
+
+void Core::Entity::Player::setCFPenaltyTimestamp( uint32_t timestamp )
+{
+   m_cfPenaltyUntil = timestamp;
+   setSyncFlag( PlayerSyncFlags::CFPenaltyTime );
+}
+
+uint32_t Core::Entity::Player::getCFPenaltyMinutes() const
+{
+   auto currentTimestamp = Core::Util::getTimeSeconds();
+   auto endTimestamp = getCFPenaltyTimestamp();
+
+   // check if penalty timestamp already passed current time
+   if (currentTimestamp > endTimestamp)
+   {
+      return 0;
+   }
+
+   auto deltaTime = endTimestamp - currentTimestamp;
+   return static_cast< uint32_t > ( ceil( static_cast< float > (deltaTime) / 60 ) );
+}
+
+void Core::Entity::Player::setCFPenaltyMinutes( uint32_t minutes )
+{
+   auto currentTimestamp = Core::Util::getTimeSeconds();
+   setCFPenaltyTimestamp(static_cast< uint32_t >( currentTimestamp + minutes * 60 ));
 }

@@ -85,7 +85,7 @@ void Core::DebugCommandHandler::execCommand( char * data, Core::Entity::PlayerPt
       // no parameters, just get the command
       commandString = tmpCommand;
 
-   // try to retrieve the command 
+   // try to retrieve the command
    auto it = m_commandMap.find( commandString );
 
    if( it == m_commandMap.end() )
@@ -102,7 +102,6 @@ void Core::DebugCommandHandler::execCommand( char * data, Core::Entity::PlayerPt
 
 
 }
-
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -267,8 +266,6 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
 
       sscanf( params.c_str(), "%d", &id );
 
-     
-
       uint8_t typeshift = 0x6;
       uint8_t mask = 1 << typeshift;
       id &= mask;
@@ -281,6 +278,14 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
 
       sscanf( params.c_str(), "%d", &id );
       pPlayer->sendDebug( std::to_string( pPlayer->actionHasCastTime( id ) ) );
+   }
+   else if ( subCommand == "cfpenalty" )
+   {
+      int32_t minutes;
+
+      sscanf( params.c_str(), "%d", &minutes );
+
+      pPlayer->setCFPenaltyMinutes( minutes );
    }
 
 }
@@ -394,7 +399,7 @@ void Core::DebugCommandHandler::add( char * data, Core::Entity::PlayerPtr pPlaye
       sscanf( params.c_str(), "%x %x %x %x %x %x %x %x", &opcode, &param1, &param2, &param3, &param4, &param5, &param6, &playerId );
 
       pPlayer->sendNotice( "Injecting ACTOR_CONTROL " + std::to_string( opcode ) );
-      
+
       Network::Packets::GamePacketNew< Network::Packets::Server::FFXIVIpcActorControl143 > actorControl( playerId, pPlayer->getId() );
       actorControl.data().category = opcode;
       actorControl.data().param1 = param1;
