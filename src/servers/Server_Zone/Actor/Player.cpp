@@ -1462,7 +1462,7 @@ void Core::Entity::Player::autoAttack( ActorPtr pTarget )
    //uint64_t tick = Util::getTimeMs();
    //srand(static_cast< uint32_t >(tick));
 
-   uint32_t damage = mainWeap->getAutoAttackDmg() + rand() % 12;
+   uint32_t damage = mainWeap->getAutoAttackDmg();
    uint32_t variation = 0 + rand() % 3;
 
    if( getClass() == 5 || getClass() == 23 || getClass() == 31 )

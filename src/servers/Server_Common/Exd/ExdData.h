@@ -211,8 +211,9 @@ namespace Core {
          uint64_t model_primary;          //28
          uint64_t model_secondary;        //29
          uint16_t physical_damage;        //49
+         uint16_t magical_damage;         //50
+         uint16_t delayMs;                //51
          uint32_t class_job_requirement;  //58
-         uint16_t delayMs;                //59
          bool is_unique;                  //72
          bool is_untradeable;             //73
          uint32_t class_job_index;        //86
