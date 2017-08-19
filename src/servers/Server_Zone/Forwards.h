@@ -7,9 +7,9 @@
 #define TYPE_FORWARD( x ) \
 class x; \
 typedef boost::shared_ptr< x > x ## Ptr; \
-typedef std::vector< x > x ## PtrList;     
+typedef std::vector< x > x ## PtrList;
 
-namespace Core 
+namespace Core
 {
    TYPE_FORWARD( Cell );
    TYPE_FORWARD( Zone );
@@ -60,6 +60,11 @@ namespace Core
       {
          TYPE_FORWARD( GamePacket );
       }
+   }
+
+   namespace ContentFinder
+   {
+      TYPE_FORWARD( ContentFinder );
    }
 
    namespace Scripting
