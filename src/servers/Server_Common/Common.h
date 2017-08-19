@@ -265,7 +265,7 @@ namespace Core {
          JOB_ASTROLOGIAN = 33,       // astro
          JOB_SAMURAI = 34,       // sam
          JOB_REDMAGE = 35,       // red mage
-         
+
       };
 
       enum PlayerSyncFlags : uint32_t
@@ -285,12 +285,14 @@ namespace Core {
          HpMp = 0x00000800,
          QuestTracker = 0x00001000,
          NewGame = 0x00002000,
-
+         // 0x4000 is missing here
          Unlocks = 0x00008000,
          PlayTime = 0x00010000,
          NewAdventurer = 0x00020000,
          SearchInfo = 0x00040000,
          GC = 0x00080000,
+
+         CFPenaltyTime = 0x00100000,
 
          All = 0xFFFFFFFF,
       };
@@ -691,7 +693,7 @@ namespace Core {
          ClassJobChange = 0x05,
          DefeatMsg = 0x06,
          GainExpMsg = 0x07,
-         
+
          LevelUpEffect = 0x0A,
 
          ExpChainMsg = 0x0C,

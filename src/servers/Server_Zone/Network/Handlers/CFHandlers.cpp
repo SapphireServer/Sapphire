@@ -27,46 +27,55 @@ using namespace Core::Network::Packets::Server;
 void Core::Network::GameConnection::cfDutyInfoRequest( const Packets::GamePacket& inPacket,
                                                        Entity::PlayerPtr pPlayer )
 {
-    GamePacketNew< FFXIVIpcCFDutyInfo > dutyInfoPacket( pPlayer->getId() );
-    queueOutPacket( dutyInfoPacket );
+   GamePacketNew< FFXIVIpcCFDutyInfo > dutyInfoPacket( pPlayer->getId() );
 
-    GamePacketNew< FFXIVIpcCFPlayerInNeed > inNeedsPacket( pPlayer->getId() );
-    queueOutPacket( inNeedsPacket );
+   auto penaltyMinutes = pPlayer->getCFPenaltyMinutes();
+   if (penaltyMinutes > 255)
+   {
+      // cap it since it's uint8_t in packets
+      penaltyMinutes = 255;
+   }
+   dutyInfoPacket.data().penaltyTime = penaltyMinutes;
+
+   queueOutPacket( dutyInfoPacket );
+
+   GamePacketNew< FFXIVIpcCFPlayerInNeed > inNeedsPacket( pPlayer->getId() );
+   queueOutPacket( inNeedsPacket );
 
 }
 
 void Core::Network::GameConnection::cfRegisterDuty( const Packets::GamePacket& inPacket,
                                                     Entity::PlayerPtr pPlayer)
 {
-    // TODO use for loop for this
-    auto contentId1 = inPacket.getValAt< uint16_t >( 46 );
-    auto contentId2 = inPacket.getValAt< uint16_t >( 48 );
-    auto contentId3 = inPacket.getValAt< uint16_t >( 50 );
-    auto contentId4 = inPacket.getValAt< uint16_t >( 52 );
-    auto contentId5 = inPacket.getValAt< uint16_t >( 54 );
+   // TODO use for loop for this
+   auto contentId1 = inPacket.getValAt< uint16_t >( 46 );
+   auto contentId2 = inPacket.getValAt< uint16_t >( 48 );
+   auto contentId3 = inPacket.getValAt< uint16_t >( 50 );
+   auto contentId4 = inPacket.getValAt< uint16_t >( 52 );
+   auto contentId5 = inPacket.getValAt< uint16_t >( 54 );
 
-    pPlayer->sendDebug("Duty register request");
-    pPlayer->sendDebug("ContentId1" + std::to_string(contentId1));
-    pPlayer->sendDebug("ContentId2" + std::to_string(contentId2));
-    pPlayer->sendDebug("ContentId3" + std::to_string(contentId3));
-    pPlayer->sendDebug("ContentId4" + std::to_string(contentId4));
-    pPlayer->sendDebug("ContentId5" + std::to_string(contentId5));
+   pPlayer->sendDebug("Duty register request");
+   pPlayer->sendDebug("ContentId1" + std::to_string(contentId1));
+   pPlayer->sendDebug("ContentId2" + std::to_string(contentId2));
+   pPlayer->sendDebug("ContentId3" + std::to_string(contentId3));
+   pPlayer->sendDebug("ContentId4" + std::to_string(contentId4));
+   pPlayer->sendDebug("ContentId5" + std::to_string(contentId5));
 
-    // let's cancel it because otherwise you can't register it again
-    GamePacketNew< FFXIVIpcCFNotify > cfCancelPacket( pPlayer->getId() );
-    cfCancelPacket.data().state1 = 3;
-    cfCancelPacket.data().state2 = 1; // Your registration is withdrawn.
-    queueOutPacket( cfCancelPacket );
+   // let's cancel it because otherwise you can't register it again
+   GamePacketNew< FFXIVIpcCFNotify > cfCancelPacket( pPlayer->getId() );
+   cfCancelPacket.data().state1 = 3;
+   cfCancelPacket.data().state2 = 1; // Your registration is withdrawn.
+   queueOutPacket( cfCancelPacket );
 }
 
 void Core::Network::GameConnection::cfRegisterRoulette( const Packets::GamePacket& inPacket,
                                                         Entity::PlayerPtr pPlayer)
 {
-    pPlayer->sendDebug("Roulette register");
+   pPlayer->sendDebug("Roulette register");
 }
 
 void Core::Network::GameConnection::cfDutyAccepted( const Packets::GamePacket& inPacket,
                                                     Entity::PlayerPtr pPlayer)
 {
-    pPlayer->sendDebug("TODO: Duty accept");
+   pPlayer->sendDebug("TODO: Duty accept");
 }
