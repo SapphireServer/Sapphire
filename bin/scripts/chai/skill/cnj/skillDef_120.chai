@@ -1,5 +1,5 @@
-// Skill Name: Sprint
-// Skill ID: 3
+// Skill Name: Cure
+// Skill ID: 120
 
 class skillDef_120Def
 {
@@ -10,7 +10,7 @@ class skillDef_120Def
 
     def onFinish( player, target )
     {
-        player.handleScriptSkill( STD_HEAL, 120, 1000, 0, target );
+        player.handleScriptSkill( STD_HEAL, 120, 450, 0, target );
     }
 
 };
