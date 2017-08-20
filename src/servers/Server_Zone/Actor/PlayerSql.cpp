@@ -128,8 +128,6 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
    m_pos.z = field[8].getFloat();
    setRotation( field[9].getFloat() );
 
-   m_bFirstLogin = field[10].getBool();
-
    field[11].getBinary( reinterpret_cast< char* >( m_customize ), 26 );
 
    m_modelMainWeapon = field[12].getUInt64();
@@ -321,9 +319,6 @@ void Core::Entity::Player::createUpdateSql()
 
    if( m_updateFlags & PlayerSyncFlags::NewGame )
       charaBaseSet.insert( " IsNewGame = " + std::to_string( static_cast< uint32_t >( m_bNewGame ) ) );
-
-   if( m_updateFlags & PlayerSyncFlags::FirstLogin )
-      charaBaseSet.insert( " FirstLogin = 0 " );
 
    if( m_updateFlags & PlayerSyncFlags::NewAdventurer )
       charaBaseSet.insert( " IsNewAdventurer = " + std::to_string( static_cast< uint32_t >( m_bNewAdventurer ) ) );
