@@ -178,7 +178,7 @@ uint64_t Core::Entity::Player::getOnlineStatusMask() const
 
 void Core::Entity::Player::prepareZoning( uint16_t targetZone, bool fadeOut )
 {
-   GamePacketNew< FFXIVIpcPrepareZoning > preparePacket( getId() );
+   GamePacketNew< FFXIVIpcPrepareZoning, ServerZoneIpcType > preparePacket( getId() );
    preparePacket.data().targetZone = targetZone;
    preparePacket.data().fadeOut = fadeOut == true ? 1 : 0;
    queuePacket( preparePacket );
@@ -260,7 +260,7 @@ bool Core::Entity::Player::isAutoattackOn() const
 
 void Core::Entity::Player::sendStats()
 {
-   GamePacketNew< FFXIVIpcPlayerStats > statPacket( getId() );
+   GamePacketNew< FFXIVIpcPlayerStats, ServerZoneIpcType > statPacket( getId() );
    statPacket.data().strength = m_baseStats.str;
    statPacket.data().dexterity = m_baseStats.dex;
    statPacket.data().vitality = m_baseStats.vit;
@@ -379,7 +379,7 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
    // mark the player for a position update in DB
    setSyncFlag( PlayerSyncFlags::Position );
 
-   GamePacketNew< FFXIVIpcInit > initPacket( getId() );
+   GamePacketNew< FFXIVIpcInit, ServerZoneIpcType > initPacket( getId() );
    initPacket.data().charId = getId();
    queuePacket( initPacket );
 
@@ -395,7 +395,7 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
    // only initialize the UI if the player in fact just logged in.
    if( isLogin() )
    {
-      GamePacketNew< FFXIVIpcCFAvailableContents > contentFinderList( getId() );
+      GamePacketNew< FFXIVIpcCFAvailableContents, ServerZoneIpcType > contentFinderList( getId() );
       for( auto i = 0; i < 72; i++ )
       {
          // unlock all contents for now
@@ -406,14 +406,14 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
       Server::InitUIPacket initUIPacket( pPlayer );
       queuePacket( initUIPacket );
 
-      GamePacketNew< FFXIVIpcPlayerClassInfo > classInfoPacket( getId() );
+      GamePacketNew< FFXIVIpcPlayerClassInfo, ServerZoneIpcType > classInfoPacket( getId() );
       classInfoPacket.data().classId = getClass();
       classInfoPacket.data().unknown = 1;
       classInfoPacket.data().level = getLevel();
       classInfoPacket.data().level1 = getLevel();
       queuePacket( classInfoPacket );
 
-      GamePacketNew< FFXIVGCAffiliation > gcAffPacket( getId() );
+      GamePacketNew< FFXIVGCAffiliation, ServerZoneIpcType > gcAffPacket( getId() );
       gcAffPacket.data().gcId = m_gc;
       gcAffPacket.data().gcRank[0] = m_gcRank[0];
       gcAffPacket.data().gcRank[1] = m_gcRank[1];
@@ -421,7 +421,7 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
       queuePacket( gcAffPacket );
    }
 
-   GamePacketNew< FFXIVIpcInitZone > initZonePacket( getId() );
+   GamePacketNew< FFXIVIpcInitZone, ServerZoneIpcType > initZonePacket( getId() );
    initZonePacket.data().zoneId = getCurrentZone()->getLayoutId();
    initZonePacket.data().weatherId = static_cast< uint8_t >( getCurrentZone()->getCurrentWeather() );
    initZonePacket.data().bitmask = 0x2A;
@@ -432,10 +432,10 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
 
    if( isLogin() )
    {
-      GamePacketNew< FFXIVARR_IPC_UNK322 > unk322( getId() );
+      GamePacketNew< FFXIVARR_IPC_UNK322, ServerZoneIpcType > unk322( getId() );
       queuePacket( unk322 );
 
-      GamePacketNew< FFXIVARR_IPC_UNK320 > unk320( getId() );
+      GamePacketNew< FFXIVARR_IPC_UNK320, ServerZoneIpcType > unk320( getId() );
       queuePacket( unk320 );
    }
 
@@ -656,7 +656,7 @@ void Core::Entity::Player::gainLevel()
    m_hp = getMaxHp();
    m_mp = getMaxMp();
 
-   GamePacketNew< FFXIVIpcStatusEffectList > effectListPacket( getId() );
+   GamePacketNew< FFXIVIpcStatusEffectList, ServerZoneIpcType > effectListPacket( getId() );
    effectListPacket.data().classId = getClass();
    effectListPacket.data().classId1 = getClass();
    effectListPacket.data().level = getLevel();
@@ -671,7 +671,7 @@ void Core::Entity::Player::gainLevel()
                                             getLevel(), getLevel() - 1 ), true );
 
 
-   GamePacketNew< FFXIVIpcUpdateClassInfo > classInfoPacket( getId() );
+   GamePacketNew< FFXIVIpcUpdateClassInfo, ServerZoneIpcType > classInfoPacket( getId() );
    classInfoPacket.data().classId = getClass();
    classInfoPacket.data().classId1 = getClass();
    classInfoPacket.data().level = getLevel();
@@ -761,7 +761,7 @@ void Core::Entity::Player::setClassJob( Core::Common::ClassJob classJob )
 
    m_tp = 0;
 
-   GamePacketNew< FFXIVIpcPlayerClassInfo > classInfoPacket( getId() );
+   GamePacketNew< FFXIVIpcPlayerClassInfo, ServerZoneIpcType > classInfoPacket( getId() );
    classInfoPacket.data().classId = getClass();
    classInfoPacket.data().level = getLevel();
    queuePacket( classInfoPacket );
@@ -951,7 +951,7 @@ void Core::Entity::Player::setGc( uint8_t gc )
 {
    m_gc = gc;
 
-   GamePacketNew< FFXIVGCAffiliation > gcAffPacket( getId() );
+   GamePacketNew< FFXIVGCAffiliation, ServerZoneIpcType > gcAffPacket( getId() );
    gcAffPacket.data().gcId = m_gc;
    gcAffPacket.data().gcRank[0] = m_gcRank[0];
    gcAffPacket.data().gcRank[1] = m_gcRank[1];
@@ -965,7 +965,7 @@ void Core::Entity::Player::setGcRankAt( uint8_t index, uint8_t rank )
 {
    m_gcRank[index] = rank;
 
-   GamePacketNew< FFXIVGCAffiliation > gcAffPacket( getId() );
+   GamePacketNew< FFXIVGCAffiliation, ServerZoneIpcType > gcAffPacket( getId() );
    gcAffPacket.data().gcId = m_gc;
    gcAffPacket.data().gcRank[0] = m_gcRank[0];
    gcAffPacket.data().gcRank[1] = m_gcRank[1];
@@ -1061,7 +1061,7 @@ void Core::Entity::Player::update( int64_t currTime )
       }
       else
       {
-         GamePacketNew< FFXIVIpcActorSetPos > setActorPosPacket( getId() );
+         GamePacketNew< FFXIVIpcActorSetPos, ServerZoneIpcType > setActorPosPacket( getId() );
          setActorPosPacket.data().r16 = Math::Util::floatToUInt16Rot( m_queuedZoneing->m_targetRotation );
          setActorPosPacket.data().waitForLoad = 0x04;
          setActorPosPacket.data().x = targetPos.x;
@@ -1155,7 +1155,7 @@ void Core::Entity::Player::freePlayerSpawnId( uint32_t actorId )
    m_playerIdToSpawnIdMap.erase( actorId );
    m_freeSpawnIdQueue.push( spawnId );
 
-   GamePacketNew< FFXIVIpcActorFreeSpawn > freeActorSpawnPacket( getId() );
+   GamePacketNew< FFXIVIpcActorFreeSpawn, ServerZoneIpcType > freeActorSpawnPacket( getId() );
    freeActorSpawnPacket.data().actorId = actorId;
    freeActorSpawnPacket.data().spawnId = spawnId;
    queuePacket( freeActorSpawnPacket );
@@ -1422,7 +1422,7 @@ void Core::Entity::Player::initHateSlotQueue()
 
 void Core::Entity::Player::sendHateList()
 {
-   GamePacketNew< FFXIVIpcHateList > hateListPacket( getId() );
+   GamePacketNew< FFXIVIpcHateList, ServerZoneIpcType > hateListPacket( getId() );
    hateListPacket.data().numEntries = m_actorIdTohateSlotMap.size();
    auto it = m_actorIdTohateSlotMap.begin();
    for( int32_t i = 0; it != m_actorIdTohateSlotMap.end(); ++it, i++ )
@@ -1459,7 +1459,7 @@ void Core::Entity::Player::autoAttack( ActorPtr pTarget )
       getClass() == JOB_BARD ||
       getClass() == CLASS_ARCHER)
    {
-      GamePacketNew< FFXIVIpcEffect > effectPacket(getId());
+      GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket(getId());
       effectPacket.data().targetId = pTarget->getId();
       effectPacket.data().actionAnimationId = 8;
      // effectPacket.data().unknown_2 = variation;
@@ -1480,7 +1480,7 @@ void Core::Entity::Player::autoAttack( ActorPtr pTarget )
    else
    {
 
-      GamePacketNew< FFXIVIpcEffect > effectPacket(getId());
+      GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket(getId());
       effectPacket.data().targetId = pTarget->getId();
       effectPacket.data().actionAnimationId = 7;
      // effectPacket.data().unknown_2 = variation;
@@ -1513,7 +1513,7 @@ void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, 
    case Core::Common::HandleSkillType::StdDamage:
    {
       sendDebug( "STD_DAMAGE" );
-      GamePacketNew< FFXIVIpcEffect > effectPacket( getId() );
+      GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket( getId() );
       effectPacket.data().targetId = pTarget.getId();
       effectPacket.data().actionAnimationId = actionId;
       effectPacket.data().unknown_2 = 0;
@@ -1539,8 +1539,12 @@ void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, 
       uint32_t calculatedHeal = CalcBattle::measureHeal( shared_from_this(), param1 );
 
       sendDebug( "STD_HEAL" );
+<<<<<<< HEAD
 
       GamePacketNew< FFXIVIpcEffect > effectPacket( getId() );
+=======
+      GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket( getId() );
+>>>>>>> 0e8a5c38209f993e65acfdd0e5e0cf1920089fb5
       effectPacket.data().targetId = pTarget.getId();
       effectPacket.data().actionAnimationId = actionId;
       effectPacket.data().unknown_2 = 0;

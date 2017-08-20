@@ -49,7 +49,7 @@ void Core::Action::EventItemAction::onStart()
 
    m_startTime = Util::getTimeMs();
 
-   GamePacketNew< FFXIVIpcActorCast > castPacket( m_pSource->getId() );
+   GamePacketNew< FFXIVIpcActorCast, ServerZoneIpcType > castPacket( m_pSource->getId() );
 
    castPacket.data().action_id = 1;
    castPacket.data().unknown = 3;
@@ -70,7 +70,7 @@ void Core::Action::EventItemAction::onFinish()
 
    try
    {
-      GamePacketNew< FFXIVIpcEffect > effectPacket( m_pSource->getId() );
+      GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket( m_pSource->getId() );
       effectPacket.data().targetId = static_cast< uint32_t >( m_additional );
       effectPacket.data().actionAnimationId = 1;
 //      effectPacket.data().unknown_3 = 3;

@@ -1,7 +1,7 @@
 #ifndef _PLAYERSPAWN_H
 #define _PLAYERSPAWN_H
 
-#include <src/servers/Server_Common/Network/PacketDef/ServerPacketDef.h>
+#include <src/servers/Server_Common/Network/PacketDef/Zone/ServerPacketDef.h>
 #include <src/servers/Server_Common/Network/GamePacketNew.h>
 #include <src/servers/Server_Common/Util/UtilMath.h>
 #include "src/servers/Server_Zone/Actor/Player.h"
@@ -18,11 +18,11 @@ namespace Server {
    * @brief The packet sent to spawn a player.
    */
    class PlayerSpawnPacket :
-      public GamePacketNew<FFXIVIpcPlayerSpawn>
+      public GamePacketNew< FFXIVIpcPlayerSpawn, ServerZoneIpcType >
    {
    public:
       PlayerSpawnPacket( Entity::PlayerPtr pPlayer, Entity::PlayerPtr pTarget ) :
-         GamePacketNew<FFXIVIpcPlayerSpawn>( pPlayer->getId(), pTarget->getId() )
+         GamePacketNew< FFXIVIpcPlayerSpawn, ServerZoneIpcType >( pPlayer->getId(), pTarget->getId() )
       {
          initialize( pPlayer, pTarget );
       };

@@ -1,4 +1,4 @@
-#include <src/servers/Server_Common/Network/PacketDef/ServerPacketDef.h>
+#include <src/servers/Server_Common/Network/PacketDef/Zone/ServerPacketDef.h>
 #include <src/servers/Server_Common/Database/Database.h>
 #include <src/servers/Server_Common/Common.h>
 #include <src/servers/Server_Common/Exd/ExdData.h>
@@ -486,7 +486,7 @@ int16_t Core::Inventory::addItem( uint16_t inventoryId, int8_t slotId, uint32_t 
                         " WHERE storageId = " + std::to_string( inventoryId ) +
                         " AND CharacterId = " + std::to_string( m_pOwner->getId() ) );
 
-      GamePacketNew< FFXIVIpcUpdateInventorySlot > invUpPacket( m_pOwner->getId() );
+      GamePacketNew< FFXIVIpcUpdateInventorySlot, ServerZoneIpcType > invUpPacket( m_pOwner->getId() );
       invUpPacket.data().containerId = inventoryId;
       invUpPacket.data().catalogId = catalogId;
       invUpPacket.data().quantity = item->getStackSize();
@@ -607,7 +607,7 @@ void Core::Inventory::discardItem( uint16_t fromInventoryId, uint8_t fromSlotId 
    m_inventoryMap[fromInventoryId]->removeItem( fromSlotId );
    updateContainer( fromInventoryId, fromSlotId, nullptr );
 
-   GamePacketNew< FFXIVIpcInventoryTransaction > invTransPacket( m_pOwner->getId() );
+   GamePacketNew< FFXIVIpcInventoryTransaction, ServerZoneIpcType > invTransPacket( m_pOwner->getId() );
    invTransPacket.data().transactionId = transactionId;
    invTransPacket.data().ownerId = m_pOwner->getId();
    invTransPacket.data().storageId = fromInventoryId;
@@ -617,7 +617,7 @@ void Core::Inventory::discardItem( uint16_t fromInventoryId, uint8_t fromSlotId 
    invTransPacket.data().type = 7;
    m_pOwner->queuePacket( invTransPacket );
 
-   GamePacketNew< FFXIVIpcInventoryTransactionFinish > invTransFinPacket( m_pOwner->getId() );
+   GamePacketNew< FFXIVIpcInventoryTransactionFinish, ServerZoneIpcType > invTransFinPacket( m_pOwner->getId() );
    invTransFinPacket.data().transactionId = transactionId;
    invTransFinPacket.data().transactionId1 = transactionId;
    m_pOwner->queuePacket( invTransFinPacket );
@@ -812,7 +812,7 @@ void Core::Inventory::send()
 
          if( it->second->getId() == InventoryType::Currency || it->second->getId() == InventoryType::Crystal )
          {
-            GamePacketNew< FFXIVIpcCurrencyCrystalInfo > currencyInfoPacket( m_pOwner->getId() );
+            GamePacketNew< FFXIVIpcCurrencyCrystalInfo, ServerZoneIpcType > currencyInfoPacket( m_pOwner->getId() );
             currencyInfoPacket.data().sequence = count;
             currencyInfoPacket.data().catalogId = itM->second->getId();
             currencyInfoPacket.data().unknown = 1;
@@ -823,7 +823,7 @@ void Core::Inventory::send()
          }
          else
          {
-            GamePacketNew< FFXIVIpcItemInfo > itemInfoPacket( m_pOwner->getId() );
+            GamePacketNew< FFXIVIpcItemInfo, ServerZoneIpcType > itemInfoPacket( m_pOwner->getId() );
             itemInfoPacket.data().sequence = count;
             itemInfoPacket.data().containerId = it->second->getId();
             itemInfoPacket.data().slot = itM->first;
@@ -836,7 +836,7 @@ void Core::Inventory::send()
          }
       }
 
-      GamePacketNew< FFXIVIpcContainerInfo > containerInfoPacket( m_pOwner->getId() );
+      GamePacketNew< FFXIVIpcContainerInfo, ServerZoneIpcType > containerInfoPacket( m_pOwner->getId() );
       containerInfoPacket.data().sequence = count;
       containerInfoPacket.data().numItems = it->second->getEntryCount();
       containerInfoPacket.data().containerId = it->second->getId();

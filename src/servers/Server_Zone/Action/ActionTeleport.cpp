@@ -45,7 +45,7 @@ void Core::Action::ActionTeleport::onStart()
 
    m_startTime = Util::getTimeMs();
 
-   GamePacketNew< FFXIVIpcActorCast > castPacket( getId() );
+   GamePacketNew< FFXIVIpcActorCast, ServerZoneIpcType > castPacket( getId() );
 
    castPacket.data().action_id = 5;
    castPacket.data().unknown = 1;
@@ -83,7 +83,7 @@ void Core::Action::ActionTeleport::onFinish()
 
    pPlayer->setZoningType( Common::ZoneingType::Teleport );
 
-   GamePacketNew< FFXIVIpcEffect > effectPacket( pPlayer->getId() );
+   GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket( pPlayer->getId() );
    effectPacket.data().targetId = pPlayer->getId();
    effectPacket.data().actionAnimationId = 5;
    //effectPacket.data().unknown_3 = 1;

@@ -594,7 +594,7 @@ void Core::Entity::Actor::autoAttack( ActorPtr pTarget )
       uint32_t damage = 10 + rand() % 12;
       uint32_t variation = 0 + rand() % 3;
 
-      GamePacketNew< FFXIVIpcEffect > effectPacket( getId() );
+      GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket( getId() );
       effectPacket.data().targetId = pTarget->getId();
       effectPacket.data().actionAnimationId = 0x366;
       effectPacket.data().unknown_2 = variation;

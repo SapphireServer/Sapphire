@@ -49,7 +49,7 @@ void Core::Action::ActionCast::onStart()
    m_pSource->getAsPlayer()->sendDebug( "onStart()" );
    m_startTime = Util::getTimeMs();
 
-   GamePacketNew< FFXIVIpcActorCast > castPacket( getId() );
+   GamePacketNew< FFXIVIpcActorCast, ServerZoneIpcType > castPacket( getId() );
 
    castPacket.data().action_id = m_id;
    castPacket.data().unknown = 1;

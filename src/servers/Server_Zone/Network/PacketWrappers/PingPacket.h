@@ -14,11 +14,11 @@ namespace Server {
 * @brief The Ping response packet.
 */
 class PingPacket :
-   public GamePacketNew<FFXIVIpcPing>
+   public GamePacketNew< FFXIVIpcPing, ServerZoneIpcType >
 {
 public:
    PingPacket( Entity::PlayerPtr player, int32_t inVal ) :
-      GamePacketNew<FFXIVIpcPing>( player->getId(), player->getId() )
+      GamePacketNew< FFXIVIpcPing, ServerZoneIpcType >( player->getId(), player->getId() )
    {
       initialize( player, inVal );
    };

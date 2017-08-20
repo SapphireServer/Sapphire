@@ -125,9 +125,9 @@ namespace Packets {
    // TODO: Include structures for the individual packet segment types
 
    /**
-   * Server IPC Type Codes.
+   * Server IPC Lobby Type Codes.
    */
-   enum ServerIpcType : uint16_t
+   enum ServerLobbyIpcType : uint16_t
    {
       LobbyError                 = 0x0002,
       LobbyServiceAccountList    = 0x000C,
@@ -137,6 +137,25 @@ namespace Packets {
       LobbyServerList            = 0x0015,
       LobbyRetainerList          = 0x0017,
 
+   };
+
+   /**
+   * Client IPC Lobby Type Codes.
+   */
+   enum ClientLobbyIpcType : uint16_t
+   {
+      ReqCharList                = 0x0003,
+      ReqEnterWorld              = 0x0004,
+      ReqServiceAccountList      = 0x0005,
+
+      ReqCharDelete              = 0x000A,
+      ReqCharCreate              = 0x000B,
+   };
+   /**
+   * Server IPC Zone Type Codes.
+   */
+   enum ServerZoneIpcType : uint16_t
+   {
       Ping                       = 0x0065, // updated for sb
       Init                       = 0x0066, // updated for sb
       Chat                       = 0x0067, // updated for sb
@@ -215,16 +234,12 @@ namespace Packets {
    // TODO: Include structures for the individual packet segment types
 
    /**
-   * Client IPC Type Codes.
+   * Client IPC Zone Type Codes.
    */
-   enum ClientIpcType : uint16_t
+   enum ClientZoneIpcType : uint16_t
    {
-      ReqCharList              = 0x0003,
-      ReqEnterWorld            = 0x0004,
-      ReqServiceAccountList    = 0x0005,
 
-      ReqCharDelete            = 0x000A,
-      ReqCharCreate            = 0x000B,
+      TellChatHandler          = 0x0064,// updated for sb
 
       PingHandler              = 0x0065,// updated for sb
       InitHandler              = 0x0066,// updated for sb
@@ -276,6 +291,22 @@ namespace Packets {
    };
 
 
+   /**
+   * Server IPC Chat Type Codes.
+   */
+   enum ServerChatIpcType : uint16_t
+   {
+      Tell                       = 0x0064, // updated for sb
+   };
+
+   /**
+   * Client IPC Chat Type Codes.
+   */
+   enum ClientChatIpcType : uint16_t
+   {
+      TellReq                    = 0x0064,
+   };
+
    struct FFXIVARR_PACKET_RAW
    {
       FFXIVARR_PACKET_SEGMENT_HEADER segHdr;
@@ -298,7 +329,7 @@ namespace Packets {
    struct FFXIVARR_IPC_HEADER
    {
       uint16_t reserved;
-      ServerIpcType type;
+      uint16_t type;
       uint16_t unknown_2;
       uint16_t serverId;
       uint32_t timestamp;
