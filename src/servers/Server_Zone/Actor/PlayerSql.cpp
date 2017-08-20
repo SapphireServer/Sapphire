@@ -79,7 +79,8 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
       "c.IsNewAdventurer, "
       "cd.GrandCompany, "
       "cd.GrandCompanyRank, "
-      "cd.CFPenaltyUntil "
+      "cd.CFPenaltyUntil, "
+      "cd.OpeningSequence "
       "FROM charabase AS c "
       " INNER JOIN charadetail AS cd "
       " ON c.CharacterId = cd.CharacterId "
@@ -169,6 +170,8 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
    field[34].getBinary( reinterpret_cast< char* >( m_gcRank ), 3 );
 
    m_cfPenaltyUntil = field[35].getUInt32();
+
+   m_openingSequence = field[36].getUInt32();
 
    m_pCell = nullptr;
 
@@ -351,6 +354,11 @@ void Core::Entity::Player::createUpdateSql()
       charaBaseSet.insert( " ModelEquip = UNHEX('" + std::string( Util::binaryToHexString( reinterpret_cast< uint8_t* >( m_modelEquip ), 40 ) ) + "')" );
       charaDetailSet.insert( " Class = " + std::to_string( static_cast< uint32_t >( getClass() ) ) );
       charaDetailSet.insert( " Status = " + std::to_string( static_cast< uint8_t >( getStatus() ) ) );
+   }
+
+   if( m_updateFlags & PlayerSyncFlags::OpeningSeq )
+   {
+      charaDetailSet.insert( " OpeningSequence = " + std::to_string( static_cast< uint8_t >( getOpeningSequence() ) ) );
    }
 
    if( m_updateFlags & PlayerSyncFlags::Quests )
