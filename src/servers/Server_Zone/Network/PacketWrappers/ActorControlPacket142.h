@@ -2,7 +2,7 @@
 #define _ACTORCONTROL142_H
 
 #include <src/servers/Server_Common/Network/GamePacketNew.h>
-#include <src/servers/Server_Common/Network/PacketDef/ServerPacketDef.h>
+#include <src/servers/Server_Common/Network/PacketDef/Zone/ServerPacketDef.h>
 #include "src/servers/Server_Zone/Forwards.h"
 
 namespace Core {
@@ -14,7 +14,7 @@ namespace Server {
 * @brief The Ping response packet.
 */
 class ActorControlPacket142 :
-   public GamePacketNew< FFXIVIpcActorControl142 >
+   public GamePacketNew< FFXIVIpcActorControl142, ServerZoneIpcType >
 {
 public:
    ActorControlPacket142( uint32_t actorId,
@@ -24,7 +24,7 @@ public:
                           uint32_t param3 = 0,
                           uint32_t param4 = 0,
                           uint32_t padding1 = 0 ) :
-      GamePacketNew< FFXIVIpcActorControl142 >( actorId, actorId )
+      GamePacketNew< FFXIVIpcActorControl142, ServerZoneIpcType >( actorId, actorId )
    {
       initialize( category, param1, param2, param3, param4 );
    };

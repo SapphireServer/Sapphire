@@ -1,5 +1,5 @@
 #include <src/servers/Server_Common/Util/Util.h>
-#include <src/servers/Server_Common/Network/PacketDef/ServerPacketDef.h>
+#include <src/servers/Server_Common/Network/PacketDef/Zone/ServerPacketDef.h>
 
 #include "src/servers/Server_Zone/Actor/Actor.h"
 #include "StatusEffect.h"
@@ -56,7 +56,7 @@ void Core::StatusEffect::StatusEffectContainer::addStatusEffect( StatusEffectPtr
    pEffect->applyStatus();
    m_effectMap[nextSlot] = pEffect;
 
-   GamePacketNew< Server::FFXIVIpcAddStatusEffect > statusEffectAdd( m_pOwner->getId() );
+   GamePacketNew< Server::FFXIVIpcAddStatusEffect, ServerZoneIpcType > statusEffectAdd( m_pOwner->getId() );
    statusEffectAdd.data().actor_id = m_pOwner->getId();
    statusEffectAdd.data().actor_id1 = m_pOwner->getId();
    statusEffectAdd.data().current_hp = m_pOwner->getHp();
@@ -99,7 +99,7 @@ void Core::StatusEffect::StatusEffectContainer::sendUpdate()
 {
    uint64_t currentTimeMs = Util::getTimeMs();
 
-   GamePacketNew< Server::FFXIVIpcStatusEffectList > statusEffectList( m_pOwner->getId() );
+   GamePacketNew< Server::FFXIVIpcStatusEffectList, ServerZoneIpcType > statusEffectList( m_pOwner->getId() );
 
    statusEffectList.data().current_hp = m_pOwner->getHp();
    statusEffectList.data().current_mp = m_pOwner->getMp();

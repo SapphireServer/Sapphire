@@ -37,7 +37,7 @@ private:
    AcceptorPtr m_pAcceptor;
 
    // handler for game packets (main type 0x03)
-   HandlerMap m_packetHandlerMap;
+   HandlerMap m_zoneHandlerMap;
    HandlerStrMap m_packetHandlerStrMap;
 
    SessionPtr m_pSession;

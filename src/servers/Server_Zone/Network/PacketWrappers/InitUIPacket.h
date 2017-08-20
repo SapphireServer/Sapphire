@@ -2,7 +2,7 @@
 #define _CORE_NETWORK_PACKETS_INITUIPACKET_H
 
 #include <src/servers/Server_Common/Network/GamePacketNew.h>
-#include <src/servers/Server_Common/Network/PacketDef/ServerPacketDef.h>
+#include <src/servers/Server_Common/Network/PacketDef/Zone/ServerPacketDef.h>
 #include "Server_Zone/Actor/Player.h"
 #include "Server_Zone/Forwards.h"
 
@@ -15,11 +15,11 @@ namespace Server {
 * @brief The Client UI Initialization packet. This must be sent to the client
 * once upon connection to configure the UI.
 */
-class InitUIPacket : public GamePacketNew< FFXIVIpcInitUI >
+class InitUIPacket : public GamePacketNew< FFXIVIpcInitUI, ServerZoneIpcType >
 {
 public:
    InitUIPacket( Entity::PlayerPtr player ) :
-      GamePacketNew< FFXIVIpcInitUI >( player->getId(), player->getId() )
+      GamePacketNew< FFXIVIpcInitUI, ServerZoneIpcType >( player->getId(), player->getId() )
    {
       initialize( player );
    };

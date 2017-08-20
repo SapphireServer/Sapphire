@@ -1,6 +1,6 @@
 #include <src/servers/Server_Common/Exd/ExdData.h>
 #include <src/servers/Server_Common/Util/Util.h>
-#include <src/servers/Server_Common/Network/PacketDef/ServerPacketDef.h>
+#include <src/servers/Server_Common/Network/PacketDef/Zone/ServerPacketDef.h>
 #include <src/servers/Server_Common/Logging/Logger.h>
 #include <src/servers/Server_Common/Exd/ExdData.h>
 

@@ -5,7 +5,7 @@
 #include <src/servers/Server_Common/Logging/Logger.h>
 #include <src/servers/Server_Common/Network/GamePacket.h>
 #include <src/servers/Server_Common/Network/GamePacketNew.h>
-#include <src/servers/Server_Common/Network/PacketDef/ServerPacketDef.h>
+#include <src/servers/Server_Common/Network/PacketDef/Zone/ServerPacketDef.h>
 #include <src/servers/Server_Common/Crypt/md5.h>
 
 #include <boost/format.hpp>
@@ -81,7 +81,7 @@ void Core::Network::GameConnection::OnError( const boost::system::error_code & e
 
 void Core::Network::GameConnection::sendError( uint64_t sequence, uint32_t errorcode, uint16_t messageId, uint32_t tmpId )
 {
-   GamePacketNew< FFXIVIpcLobbyError > errorPacket( tmpId );
+   GamePacketNew< FFXIVIpcLobbyError, ServerLobbyIpcType > errorPacket( tmpId );
 
    errorPacket.data().seq = sequence;
    errorPacket.data().error_id = errorcode;
@@ -100,7 +100,7 @@ void Core::Network::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet, ui
    g_log.info( "[" + std::to_string( m_pSession->getAccountID() ) + "] ReqCharList" );
    Packets::LobbyPacketContainer pRP( m_encKey );
 
-   GamePacketNew< FFXIVIpcServerList > serverListPacket( tmpId );
+   GamePacketNew< FFXIVIpcServerList, ServerLobbyIpcType > serverListPacket( tmpId );
    serverListPacket.data().seq = 1;
    serverListPacket.data().offset = 0;
    serverListPacket.data().numServers = 1;
@@ -111,7 +111,7 @@ void Core::Network::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet, ui
 
    pRP.addPacket( serverListPacket );
 
-   GamePacketNew< FFXIVIpcRetainerList > retainerListPacket( tmpId );
+   GamePacketNew< FFXIVIpcRetainerList, ServerLobbyIpcType > retainerListPacket( tmpId );
    retainerListPacket.data().padding[8] = 1;
 
    pRP.addPacket( retainerListPacket );
@@ -124,7 +124,7 @@ void Core::Network::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet, ui
 
    for( uint8_t i = 0; i < 4; i++ )
    {
-      GamePacketNew< FFXIVIpcCharList > charListPacket( tmpId );
+      GamePacketNew< FFXIVIpcCharList, ServerLobbyIpcType > charListPacket( tmpId );
 
       charListPacket.data().seq = sequence;
       charListPacket.data().numInPacket = 2;
@@ -206,7 +206,7 @@ void Core::Network::GameConnection::enterWorld( FFXIVARR_PACKET_RAW& packet, uin
 
    Packets::LobbyPacketContainer pRP( m_encKey );
 
-   GamePacketNew< FFXIVIpcEnterWorld > enterWorldPacket( tmpId );
+   GamePacketNew< FFXIVIpcEnterWorld, ServerLobbyIpcType > enterWorldPacket( tmpId );
 
    enterWorldPacket.data().contentId = lookupId;
 
@@ -237,7 +237,7 @@ bool Core::Network::GameConnection::sendServiceAccountList( FFXIVARR_PACKET_RAW&
    {
       g_log.Log( LoggingSeverity::info, "Found session linked to accountId: " + std::to_string( pSession->getAccountID() ) );
       m_pSession = pSession;
-      GamePacketNew< FFXIVIpcServiceIdInfo > serviceIdInfoPacket( tmpId );
+      GamePacketNew< FFXIVIpcServiceIdInfo, ServerLobbyIpcType > serviceIdInfoPacket( tmpId );
       sprintf( serviceIdInfoPacket.data().serviceAccount[0].name, "FINAL FANTASY XIV" );
       serviceIdInfoPacket.data().numServiceAccounts = 1;
 
@@ -288,7 +288,7 @@ bool Core::Network::GameConnection::createOrModifyChar( FFXIVARR_PACKET_RAW& pac
          return true;
       }
 
-      GamePacketNew< FFXIVIpcCharCreate > charCreatePacket( tmpId );
+      GamePacketNew< FFXIVIpcCharCreate, ServerLobbyIpcType > charCreatePacket( tmpId );
 
       charCreatePacket.data().content_id = newContentId;
       strcpy( charCreatePacket.data().name, name.c_str() );
@@ -312,7 +312,7 @@ bool Core::Network::GameConnection::createOrModifyChar( FFXIVARR_PACKET_RAW& pac
       {
          Packets::LobbyPacketContainer pRP( m_encKey );
 
-         GamePacketNew< FFXIVIpcCharCreate > charCreatePacket( tmpId );
+         GamePacketNew< FFXIVIpcCharCreate, ServerLobbyIpcType > charCreatePacket( tmpId );
 
          charCreatePacket.data().content_id = newContentId;
          strcpy( charCreatePacket.data().name, name.c_str() );
@@ -342,7 +342,7 @@ bool Core::Network::GameConnection::createOrModifyChar( FFXIVARR_PACKET_RAW& pac
       if( g_restConnector.deleteCharacter( ( char* )m_pSession->getSessionId(), name ) )
       {
 
-         GamePacketNew< FFXIVIpcCharCreate > charCreatePacket( tmpId );
+         GamePacketNew< FFXIVIpcCharCreate, ServerLobbyIpcType > charCreatePacket( tmpId );
 
          //charCreatePacket.data().content_id = deletePlayer.getContentId();
          charCreatePacket.data().content_id = 0;
