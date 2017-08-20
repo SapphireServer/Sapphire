@@ -292,10 +292,6 @@ public:
    void setGcRankAt( uint8_t index, uint8_t rank );
    /*! return a const pointer to the look array */
    const uint8_t * getLookArray() const;
-   /*! return true if the player is loggin in for the first time */
-   bool isFirstLogin() const;
-   /*! set first log in state */
-   void setFirstLogin( bool mode );
    /*! returns true if the player is currently in combat */
    bool isInCombat() const;
    /*! sets players combat state */
@@ -593,7 +589,7 @@ private:
    uint8_t m_stateFlags[7];
    uint8_t m_userLevel;
    uint16_t zoneId;
-   bool m_bFirstLogin;
+
    bool m_bInCombat;
    bool m_bLoadingComplete;
    bool m_bAutoattack;

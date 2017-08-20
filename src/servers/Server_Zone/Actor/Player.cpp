@@ -793,17 +793,6 @@ uint8_t Core::Entity::Player::getUserLevel() const
    return m_userLevel;
 }
 
-bool Core::Entity::Player::isFirstLogin() const
-{
-   return m_bFirstLogin;
-}
-
-void Core::Entity::Player::setFirstLogin( bool mode )
-{
-   m_bFirstLogin = mode;
-   setSyncFlag( PlayerSyncFlags::FirstLogin );
-}
-
 void Core::Entity::Player::eventActionStart( uint32_t eventId,
                                              uint32_t action,
                                              ActionCallback finishCallback,
