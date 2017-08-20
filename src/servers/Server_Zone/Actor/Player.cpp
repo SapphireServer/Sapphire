@@ -1611,3 +1611,14 @@ void Core::Entity::Player::setCFPenaltyMinutes( uint32_t minutes )
    auto currentTimestamp = Core::Util::getTimeSeconds();
    setCFPenaltyTimestamp(static_cast< uint32_t >( currentTimestamp + minutes * 60 ));
 }
+
+uint8_t Core::Entity::Player::getOpeningSequence() const
+{
+   return m_openingSequence;
+}
+
+void Core::Entity::Player::setOpeningSequence( uint8_t seq )
+{
+   setSyncFlag( OpeningSeq );
+   m_openingSequence = seq;
+}

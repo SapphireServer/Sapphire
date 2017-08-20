@@ -124,6 +124,10 @@ public:
    void updateQuestsCompleted( uint32_t questId );
    /*! remove a quest from the completed quest mask */
    void removeQuestsCompleted( uint32_t questId );
+   /*! get the curent opening sequence */
+   uint8_t getOpeningSequence() const;
+   /*! set te current opening sequence */
+   void setOpeningSequence( uint8_t seq );
 
    bool giveQuestRewards( uint32_t questId, uint32_t optionalChoice );
 
@@ -572,6 +576,8 @@ private:
    uint32_t m_expArray[25];
    uint8_t m_aetheryte[16];
    uint8_t m_unlocks[64];
+
+   uint8_t m_openingSequence;
 
    InventoryPtr m_pInventory;
    std::map< uint32_t, Event::EventPtr > m_eventMap;
