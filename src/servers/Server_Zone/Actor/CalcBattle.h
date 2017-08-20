@@ -2,6 +2,7 @@
 #define _CALCBATTLE_H
 
 #include <src/servers/Server_Common/Common.h>
+
 #include "Actor.h"
 
 namespace Core {
