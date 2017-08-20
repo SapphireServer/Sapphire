@@ -43,8 +43,6 @@ int Core::Scripting::ScriptManager::init()
    m_pChaiHandler->add( chaiscript::fun( &Entity::Player::getClassAsInt ), "getClass" );
    m_pChaiHandler->add( chaiscript::fun( &Entity::Player::getRace ), "getRace" );
    m_pChaiHandler->add( chaiscript::fun( &Entity::Player::getGender ), "getGender" );
-   m_pChaiHandler->add( chaiscript::fun( &Entity::Player::isFirstLogin ), "isFirstLogin" );
-   m_pChaiHandler->add( chaiscript::fun( &Entity::Player::setFirstLogin ), "setFirstLogin" );
    m_pChaiHandler->add( chaiscript::fun( &Entity::Player::gainExp ), "gainExp" );
    m_pChaiHandler->add( chaiscript::fun( &Entity::Player::unlock ), "unlock" );
    m_pChaiHandler->add( chaiscript::fun( &Entity::Player::registerAetheryte ), "aetheryteRegister" );
