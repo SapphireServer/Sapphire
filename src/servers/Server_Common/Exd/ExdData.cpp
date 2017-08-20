@@ -239,8 +239,8 @@ bool Core::Data::ExdData::loadParamGrowInfo()
       info.piety_scalar = getField< uint16_t >( fields, 3 ); // 3
       info.mp_const     = getField< int32_t >( fields, 4 );  // 4
       info.base_secondary = getField< int32_t >( fields, 5 );// 5
-      info.hp_mod       = getField< uint16_t >( fields, 8 ); // 8
       info.quest_exp_mod = getField< uint8_t >( fields, 7 ); // 7
+      info.hp_mod = getField< uint16_t >(fields, 8);         // 8
 
 
       m_paramGrowthInfoMap[id] = info;
