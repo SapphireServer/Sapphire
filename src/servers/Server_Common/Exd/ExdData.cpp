@@ -236,7 +236,7 @@ bool Core::Data::ExdData::loadParamGrowInfo()
       uint32_t id       = row.first;
       info.level        = id;
       info.needed_exp   = getField< int32_t >( fields, 0 );
-      info.piety_scalar = getField< uint16_t >( fields, 3 ); // 3
+      info.mp_mod = getField< uint16_t >( fields, 3 ); // 3
       info.mp_const     = getField< int32_t >( fields, 4 );  // 4
       info.base_secondary = getField< int32_t >( fields, 5 );// 5
       info.quest_exp_mod = getField< uint8_t >( fields, 7 ); // 7
