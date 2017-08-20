@@ -47,7 +47,7 @@ class OpeningLimsaLominsaDef
         player.eventPlay( this.id, 0, 0x04AC05, 0, 1, 
             fun( player, eventId, param1, param2, param3 )
             {
-                player.setFirstLogin( false );
+                player.setOpeningSequence( 1 );
                 OpeningLimsaLominsa.Scene00001( player );
             } );
     }
@@ -73,7 +73,7 @@ class OpeningLimsaLominsaDef
             fun( player, eventId, param1, param2, param3 )
             {
                 player.eventFinish( eventId, UNLOCK );
-                if( player.hasQuest( ManSea001.id ) )
+                if( player.getOpeningSequence() == 2 )
                 {
                     // update the instance boundaries
                     OpeningLimsaLominsa.Scene00030( player );
@@ -85,14 +85,14 @@ class OpeningLimsaLominsaDef
 
     def onEnterTerritory( eventId, player, param1, param2)
     {
-      //  if( player.isFirstLogin() == true )
-   //     {
+        if( player.getOpeningSequence() == 0 )
+        {
             this.Scene00000( player );
-   //     }
-        //else
-   //     {
-        //    this.Scene00040( player );
-   //     }
+        }
+        else
+        {
+            this.Scene00040( player );
+        }
     }
 
     def onWithinRange( eventId, player, param1, x, y, z)

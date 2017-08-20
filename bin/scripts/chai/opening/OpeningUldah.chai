@@ -38,7 +38,7 @@ class OpeningUldahDef
         player.eventPlay( this.id, 0, 0x2001, 0, 1, 
             fun( player, eventId, param1, param2, param3 )
             {
-                player.setFirstLogin( false );
+                player.setOpeningSequence( 1 );
                 OpeningUldah.Scene00001( player );
             } );
     }
@@ -63,7 +63,7 @@ class OpeningUldahDef
         player.eventPlay( this.id, 40, 1, 2, 1, 
             fun( player, eventId, param1, param2, param3 )
             {
-                if( player.hasQuest( ManWil001.id ) )
+                if( player.getOpeningSequence() == 2 )
                 {
                     // update the instance boundaries
                     OpeningUldah.Scene00030( player );
@@ -75,7 +75,7 @@ class OpeningUldahDef
 
     def onEnterTerritory( eventId, player, param1, param2)
     {
-        if( player.isFirstLogin() == true )
+        if( player.getOpeningSequence() == 0 )
         {
             this.Scene00000( player );
         }
