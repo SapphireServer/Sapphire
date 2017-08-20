@@ -226,6 +226,8 @@ namespace Packets {
       ReqCharDelete            = 0x000A,
       ReqCharCreate            = 0x000B,
 
+      TellChatHandler          = 0x0064,// updated for sb
+
       PingHandler              = 0x0065,// updated for sb
       InitHandler              = 0x0066,// updated for sb
       ChatHandler              = 0x0067,// updated for sb

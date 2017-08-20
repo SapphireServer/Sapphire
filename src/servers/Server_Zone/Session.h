@@ -18,7 +18,10 @@ namespace Core {
 
       void setZoneConnection( Network::GameConnectionPtr zoneCon );
 
+      void setChatConnection( Network::GameConnectionPtr chatCon );
+
       Network::GameConnectionPtr getZoneConnection() const;
+      Network::GameConnectionPtr getChatConnection() const;
 
       uint32_t getLastDataTime() const;
 
@@ -42,6 +45,7 @@ namespace Core {
       uint32_t m_lastDataTime;
 
       Network::GameConnectionPtr m_pZoneConnection;
+      Network::GameConnectionPtr m_pChatConnection;
 
    };
 

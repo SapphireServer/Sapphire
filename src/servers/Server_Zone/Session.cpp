@@ -27,10 +27,22 @@ void Core::Session::setZoneConnection( Core::Network::GameConnectionPtr pZoneCon
    m_pZoneConnection = pZoneCon;
 }
 
+void Core::Session::setChatConnection( Core::Network::GameConnectionPtr pChatCon )
+{
+    pChatCon->m_conType = Network::ConnectionType::Chat;
+    m_pChatConnection = pChatCon;
+}
+
 Core::Network::GameConnectionPtr Core::Session::getZoneConnection() const
 {
    return m_pZoneConnection;
 }
+
+Core::Network::GameConnectionPtr Core::Session::getChatConnection() const
+{
+    return m_pChatConnection;
+}
+
 
 bool Core::Session::loadPlayer()
 {
@@ -82,6 +94,12 @@ void Core::Session::update()
       m_pPlayer->createUpdateSql();
 
       m_pZoneConnection->processOutQueue();
+   }
+
+   if( m_pZoneConnection )
+   {
+       m_pChatConnection->processInQueue();
+       m_pChatConnection->processOutQueue();
    }
 
 }

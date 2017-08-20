@@ -17,10 +17,11 @@
 namespace Core {
 namespace Network {
 
-enum struct ConnectionType : uint8_t
+enum ConnectionType : uint8_t
 {
-   Zone,
-   Chat,
+   Zone = 1,
+   Chat = 2,
+   Lobby = 3,
    None
 };
 
