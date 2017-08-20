@@ -52,6 +52,7 @@ class ManFst001Def
             {
                 if( param2 == 1 ) // accept quest
                 {
+                    player.setOpeningSequence( 2 );
                     ManFst001.Scene00001( player );
                 }
             });
@@ -115,7 +116,6 @@ class ManFst001Def
             this.Scene00004( player );
         }
         
-        // Script content to be added here....
     }
 };
 
