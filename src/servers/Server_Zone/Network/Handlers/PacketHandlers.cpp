@@ -76,11 +76,11 @@ void Core::Network::GameConnection::setSearchInfoHandler( const Packets::GamePac
       // mark player as new adventurer
       pPlayer->setNewAdventurer( true );
 
-   GamePacketNew< FFXIVIpcSetOnlineStatus > statusPacket( pPlayer->getId() );
+   GamePacketNew< FFXIVIpcSetOnlineStatus, ServerZoneIpcType > statusPacket( pPlayer->getId() );
    statusPacket.data().onlineStatusFlags = status;
    queueOutPacket( statusPacket );
 
-   GamePacketNew< FFXIVIpcSetSearchInfo > searchInfoPacket( pPlayer->getId() );
+   GamePacketNew< FFXIVIpcSetSearchInfo, ServerZoneIpcType > searchInfoPacket( pPlayer->getId() );
    searchInfoPacket.data().onlineStatusFlags = status;
    searchInfoPacket.data().selectRegion = pPlayer->getSearchSelectRegion();
    sprintf( searchInfoPacket.data().searchMessage, pPlayer->getSearchMessage() );
@@ -94,7 +94,7 @@ void Core::Network::GameConnection::setSearchInfoHandler( const Packets::GamePac
 void Core::Network::GameConnection::reqSearchInfoHandler( const Packets::GamePacket& inPacket,
                                                           Entity::PlayerPtr pPlayer )
 {
-   GamePacketNew< FFXIVIpcInitSearchInfo > searchInfoPacket( pPlayer->getId() );
+   GamePacketNew< FFXIVIpcInitSearchInfo, ServerZoneIpcType > searchInfoPacket( pPlayer->getId() );
    searchInfoPacket.data().onlineStatusFlags = pPlayer->getOnlineStatusMask();
    searchInfoPacket.data().selectRegion = pPlayer->getSearchSelectRegion();
    sprintf( searchInfoPacket.data().searchMessage, pPlayer->getSearchMessage() );
@@ -104,7 +104,7 @@ void Core::Network::GameConnection::reqSearchInfoHandler( const Packets::GamePac
 void Core::Network::GameConnection::linkshellListHandler( const Packets::GamePacket& inPacket,
                                                           Entity::PlayerPtr pPlayer )
 {
-   GamePacketNew< FFXIVIpcLinkshellList > linkshellListPacket( pPlayer->getId() );
+   GamePacketNew< FFXIVIpcLinkshellList, ServerZoneIpcType > linkshellListPacket( pPlayer->getId() );
    queueOutPacket( linkshellListPacket );
 }
 
@@ -308,7 +308,7 @@ void Core::Network::GameConnection::zoneLineHandler( const Packets::GamePacket& 
       targetZone = pLine->getTargetZoneId();
       rotation = pLine->getTargetRotation();
 
-      GamePacketNew< FFXIVIpcPrepareZoning > preparePacket( pPlayer->getId() );
+      GamePacketNew< FFXIVIpcPrepareZoning, ServerZoneIpcType > preparePacket( pPlayer->getId() );
       preparePacket.data().targetZone = targetZone;
 
       //ActorControlPacket143 controlPacket( pPlayer, ActorControlType::DespawnZoneScreenMsg,
@@ -348,7 +348,7 @@ void Core::Network::GameConnection::discoveryHandler( const Packets::GamePacket&
 
    Db::Field *field = pQR->fetch();
 
-   GamePacketNew< FFXIVIpcDiscovery > discoveryPacket( pPlayer->getId() );
+   GamePacketNew< FFXIVIpcDiscovery, ServerZoneIpcType > discoveryPacket( pPlayer->getId() );
    discoveryPacket.data().map_id = field[1].getInt16();
    discoveryPacket.data().map_part_id = field[2].getInt16();
 
@@ -363,7 +363,7 @@ void Core::Network::GameConnection::discoveryHandler( const Packets::GamePacket&
 void Core::Network::GameConnection::playTimeHandler( const Packets::GamePacket& inPacket,
                                                      Entity::PlayerPtr pPlayer )
 {
-   GamePacketNew< FFXIVIpcPlayTime > playTimePacket( pPlayer->getId() );
+   GamePacketNew< FFXIVIpcPlayTime, ServerZoneIpcType > playTimePacket( pPlayer->getId() );
    playTimePacket.data().playTimeInMinutes = pPlayer->getPlayTime() / 60;
    pPlayer->queuePacket( playTimePacket );
 }
@@ -384,7 +384,7 @@ void Core::Network::GameConnection::blackListHandler( const Packets::GamePacket&
 {
    uint8_t count = inPacket.getValAt< uint8_t >( 0x21 );
 
-   GamePacketNew< FFXIVIpcBlackList > blackListPacket( pPlayer->getId() );
+   GamePacketNew< FFXIVIpcBlackList, ServerZoneIpcType > blackListPacket( pPlayer->getId() );
    blackListPacket.data().sequence = count;
    // TODO: Fill with actual blacklist data
    //blackListPacket.data().entry[0].contentId = 1;
@@ -436,7 +436,7 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
    if( type == 0x02 )
    { // party list
 
-      GamePacketNew< FFXIVIpcSocialList > listPacket( pPlayer->getId() );;
+      GamePacketNew< FFXIVIpcSocialList, ServerZoneIpcType > listPacket( pPlayer->getId() );;
 
       listPacket.data().type = 2;
       listPacket.data().sequence = count;
@@ -471,7 +471,7 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
    else if( type == 0x0b )
    { // friend list
 
-      GamePacketNew< FFXIVIpcSocialList > listPacket( pPlayer->getId() );
+      GamePacketNew< FFXIVIpcSocialList, ServerZoneIpcType > listPacket( pPlayer->getId() );
       listPacket.data().type = 0x0B;
       listPacket.data().sequence = count;
       memset( listPacket.data().entries, 0, sizeof( listPacket.data().entries ) );
@@ -537,7 +537,7 @@ void Core::Network::GameConnection::chatHandler( const Packets::GamePacket& inPa
 void Core::Network::GameConnection::logoutHandler( const Packets::GamePacket& inPacket,
                                                    Entity::PlayerPtr pPlayer )
 {
-   GamePacketNew< FFXIVIpcLogout > logoutPacket( pPlayer->getId() );
+   GamePacketNew< FFXIVIpcLogout, ServerZoneIpcType > logoutPacket( pPlayer->getId() );
    logoutPacket.data().flags1 = 0x02;
    logoutPacket.data().flags2 = 0x2000;
    queueOutPacket( logoutPacket );

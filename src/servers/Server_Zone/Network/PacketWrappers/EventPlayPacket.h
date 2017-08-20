@@ -12,7 +12,7 @@ namespace Server {
 /**
 * @brief The packet sent to play an event.
 */
-class EventPlayPacket :  public GamePacketNew< FFXIVIpcEventPlay >
+class EventPlayPacket :  public GamePacketNew< FFXIVIpcEventPlay, ServerZoneIpcType >
 {
 public:
    EventPlayPacket( uint32_t playerId,
@@ -23,7 +23,7 @@ public:
                     uint8_t param3,
                     uint32_t param4 = 0,
                     uint32_t param5 = 0 ) :
-      GamePacketNew< FFXIVIpcEventPlay >( playerId, playerId )
+      GamePacketNew< FFXIVIpcEventPlay, ServerZoneIpcType >( playerId, playerId )
    {
       initialize( actorId, eventId, scene, flags, param3, param4, param5 );
    };

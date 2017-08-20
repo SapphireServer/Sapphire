@@ -17,10 +17,11 @@
 namespace Core {
 namespace Network {
 
-enum struct ConnectionType : uint8_t
+enum ConnectionType : uint8_t
 {
-   Zone,
-   Chat,
+   Zone = 1,
+   Chat = 2,
+   Lobby = 3,
    None
 };
 
@@ -36,7 +37,7 @@ private:
    AcceptorPtr m_pAcceptor;
 
    // handler for game packets (main type 0x03)
-   HandlerMap m_packetHandlerMap;
+   HandlerMap m_zoneHandlerMap;
    HandlerStrMap m_packetHandlerStrMap;
 
    SessionPtr m_pSession;
