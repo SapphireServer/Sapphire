@@ -116,7 +116,7 @@ namespace Core {
          uint32_t needed_exp;
          int16_t hp_mod;
          int32_t mp_const;
-         int16_t piety_scalar;
+         int16_t mp_mod;
          int32_t base_secondary;
          uint16_t quest_exp_mod;
       };
@@ -211,8 +211,9 @@ namespace Core {
          uint64_t model_primary;          //28
          uint64_t model_secondary;        //29
          uint16_t physical_damage;        //49
+         uint16_t magical_damage;         //50
+         uint16_t delayMs;                //51
          uint32_t class_job_requirement;  //58
-         uint16_t delayMs;                //59
          bool is_unique;                  //72
          bool is_untradeable;             //73
          uint32_t class_job_index;        //86

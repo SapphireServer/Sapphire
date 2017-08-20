@@ -44,6 +44,10 @@ public:
 
    uint16_t getPhysicalDmg() const;
 
+   uint16_t getMagicalDmg() const;
+
+   uint16_t getWeaponDmg() const;
+
    float getAutoAttackDmg() const;
 
 
@@ -64,6 +68,8 @@ protected:
 
    uint16_t                m_delayMs;
    uint16_t                m_physicalDmg;
+   uint16_t                m_magicalDmg;
+   uint16_t                m_weaponDmg;
    float                   m_autoAttackDmg;
 
 };

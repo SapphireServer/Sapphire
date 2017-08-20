@@ -253,16 +253,16 @@ namespace Core {
          JOB_WARRIOR = 21,       // warrior
          JOB_DRAGON = 22,        // dragoon
          JOB_BARD = 23,          // bard
-         JOB_WHITE = 24,         // white mage
-         JOB_BLACK = 25,         // black mage
+         JOB_WHITEMAGE = 24,     // white mage
+         JOB_BLACKMAGE = 25,     // black mage
          CLASS_ARCANIST = 26,    // arcanist
          JOB_SUMMONER = 27,      // summoner
          JOB_SCHOLAR = 28,       // scholar
-         CLASS_ROGUE = 29,
-         JOB_NINJA = 30,
-         JOB_MACHINIST = 31,       // machinist
-         JOB_DARKKNIGHT = 32,       // darknight
-         JOB_ASTROLOGIAN = 33,       // astro
+         CLASS_ROGUE = 29,       // rogue
+         JOB_NINJA = 30,         // ninja
+         JOB_MACHINIST = 31,     // machinist
+         JOB_DARKKNIGHT = 32,    // darknight
+         JOB_ASTROLOGIAN = 33,   // astro
          JOB_SAMURAI = 34,       // sam
          JOB_REDMAGE = 35,       // red mage
 

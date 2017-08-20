@@ -79,6 +79,12 @@ Core::Entity::Actor::Stance Core::Entity::Actor::getStance() const
    return m_currentStance;
 }
 
+/*! \return actor stats */
+Core::Entity::Actor::ActorStats Core::Entity::Actor::getStats() const
+{
+   return m_baseStats;
+}
+
 /*! \return current HP */
 uint32_t Core::Entity::Actor::getHp() const
 {
@@ -207,11 +213,8 @@ void Core::Entity::Actor::die()
    // fire onDeath event
    onDeath();
 
-   bool selfNeedsUpdate = false;
-
    // if the actor is a player, the update needs to be send to himself too
-   if( isPlayer() )
-      selfNeedsUpdate = true;
+   bool selfNeedsUpdate = isPlayer();
 
    sendToInRangeSet( ActorControlPacket142( m_id, SetStatus, static_cast< uint8_t>( ActorStatus::Dead ) ), selfNeedsUpdate );
 

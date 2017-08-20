@@ -44,6 +44,7 @@
 #include "src/servers/Server_Zone/Action/EventAction.h"
 #include "src/servers/Server_Zone/Action/EventItemAction.h"
 #include "src/servers/Server_Zone/Zone/ZonePosition.h"
+#include "src/servers/Server_Zone/Actor/CalcBattle.h"
 #include <boost/make_shared.hpp>
 
 extern Core::Logger g_log;
@@ -203,12 +204,7 @@ void Core::Entity::Player::calculateStats()
    auto paramGrowthInfo = paramGrowthInfoIt->second;
 
    // TODO: put formula somewhere else...
-   float base = 0.0f;
-
-   if( level < 51 )
-      base = 0.053f * ( level * level ) + ( 1.022f * level ) - 0.907f + 20;
-   else
-      base = 1.627f * level + 120.773f;
+   float base = CalcBattle::calculateBaseStat( getAsPlayer() );
 
    m_baseStats.str =  base * ( static_cast< float >( classInfo.mod_str ) / 100 ) + tribeInfo.mod_str;
    m_baseStats.dex =  base * ( static_cast< float >( classInfo.mod_dex ) / 100 ) + tribeInfo.mod_dex;
@@ -224,15 +220,9 @@ void Core::Entity::Player::calculateStats()
    m_baseStats.attackPotMagic = paramGrowthInfo.base_secondary;
    m_baseStats.healingPotMagic = paramGrowthInfo.base_secondary;
 
-   m_baseStats.max_mp = floor(
-      floor(
-      ( ( m_baseStats.pie - base ) * ( static_cast< float >( paramGrowthInfo.piety_scalar ) / 100 ) ) + paramGrowthInfo.mp_const ) * ( static_cast< float >( classInfo.mod_mpcpgp ) / 100 )
-   );
+   m_baseStats.max_mp = CalcBattle::calculateMaxMp( getAsPlayer() );
 
-   m_baseStats.max_hp = floor(
-      floor(
-      ( ( m_baseStats.vit - base ) * ( ( static_cast< float >( paramGrowthInfo.piety_scalar )  ) / 100 ) ) + paramGrowthInfo.hp_mod ) * ( static_cast< float >( classInfo.mod_hp * 0.9f ) / 100 ) * 15
-   );
+   m_baseStats.max_hp = CalcBattle::calculateMaxHp( getAsPlayer() );
 
    if( m_mp > m_baseStats.max_mp )
       m_mp = m_baseStats.max_mp;
@@ -1451,10 +1441,12 @@ void Core::Entity::Player::autoAttack( ActorPtr pTarget )
    //uint64_t tick = Util::getTimeMs();
    //srand(static_cast< uint32_t >(tick));
 
-   uint32_t damage = mainWeap->getAutoAttackDmg() + rand() % 12;
+   uint32_t damage = mainWeap->getAutoAttackDmg();
    uint32_t variation = 0 + rand() % 3;
 
-   if( getClass() == 5 || getClass() == 23 || getClass() == 31 )
+   if (getClass() == JOB_MACHINIST ||
+      getClass() == JOB_BARD ||
+      getClass() == CLASS_ARCHER)
    {
       GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket(getId());
       effectPacket.data().targetId = pTarget->getId();
@@ -1533,7 +1525,10 @@ void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, 
 
    case Core::Common::HandleSkillType::StdHeal:
    {
+      uint32_t calculatedHeal = CalcBattle::calculateHealValue( getAsPlayer(), param1 );
+
       sendDebug( "STD_HEAL" );
+
       GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket( getId() );
       effectPacket.data().targetId = pTarget.getId();
       effectPacket.data().actionAnimationId = actionId;
@@ -1543,14 +1538,14 @@ void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, 
       effectPacket.data().numEffects = 1;
       effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRotation() );
       effectPacket.data().effectTarget = pTarget.getId();
-      effectPacket.data().effects[0].param1 = param1;
+      effectPacket.data().effects[0].param1 = calculatedHeal;
       effectPacket.data().effects[0].unknown_1 = 4;
       effectPacket.data().effects[0].unknown_2 = 1;
       effectPacket.data().effects[0].unknown_3 = 7;
 
       sendToInRangeSet( effectPacket, true );
 
-      pTarget.heal( param1 );
+      pTarget.heal( calculatedHeal );
       break;
    }
 
