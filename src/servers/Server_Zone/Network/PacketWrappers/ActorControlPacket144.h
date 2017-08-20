@@ -2,7 +2,7 @@
 #define _ACTORCONTROL144_H
 
 #include <src/servers/Server_Common/Network/GamePacketNew.h>
-#include <src/servers/Server_Common/Network/PacketDef/Zone/ServerPacketDef.h>
+#include <src/servers/Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
 
 namespace Core {
 namespace Network {
