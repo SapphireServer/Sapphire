@@ -106,7 +106,11 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
             pPlayer->changeTarget( targetId );
             break;
         }
-
+        case 0x69: // Cancel cast
+        {
+           pPlayer->getCurrentAction()->setInterrupted();
+           break;
+        }
         case 0x133: // Update howtos seen
         {
             uint32_t howToId = static_cast< uint32_t >( param1 );

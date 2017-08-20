@@ -1,5 +1,5 @@
-// Skill Name: Sprint
-// Skill ID: 3
+// Skill Name: Stone II
+// Skill ID: 127
 
 class skillDef_127Def
 {
@@ -10,7 +10,7 @@ class skillDef_127Def
 
     def onFinish( player, target )
     {
-        player.handleScriptSkill( STD_DAMAGE, 127, 1000, 0, target );
+        player.handleScriptSkill( STD_DAMAGE, 127, 200, 0, target );
     }
 
 };

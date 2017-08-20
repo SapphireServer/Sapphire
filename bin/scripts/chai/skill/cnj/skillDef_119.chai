@@ -10,7 +10,7 @@ class skillDef_119Def
 
     def onFinish( player, target )
     {
-        player.handleScriptSkill( STD_DAMAGE, 119, 30, 0, target );
+        player.handleScriptSkill( STD_DAMAGE, 119, 140, 0, target );
     }
 
 };

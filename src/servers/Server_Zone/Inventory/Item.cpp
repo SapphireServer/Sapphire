@@ -27,7 +27,9 @@ Core::Item::Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t mo
    auto itemInfo = g_exdData.getItemInfo( catalogId );
    m_delayMs = itemInfo->delayMs;
    m_physicalDmg = itemInfo->physical_damage;
-   m_autoAttackDmg = float( m_physicalDmg * m_delayMs ) / 3000;
+   m_magicalDmg = itemInfo->magical_damage;
+   m_weaponDmg = ( m_physicalDmg != 0 ) ? m_physicalDmg : m_magicalDmg;
+   m_autoAttackDmg = static_cast< float >( m_weaponDmg * m_delayMs ) / 3000;
 }
 
 Core::Item::~Item()
@@ -48,6 +50,16 @@ uint16_t Core::Item::getDelay() const
 uint16_t Core::Item::getPhysicalDmg() const
 {
    return m_physicalDmg;
+}
+
+uint16_t Core::Item::getMagicalDmg() const
+{
+   return m_magicalDmg;
+}
+
+uint16_t Core::Item::getWeaponDmg() const
+{
+   return m_weaponDmg;
 }
 
 uint32_t Core::Item::getId() const
