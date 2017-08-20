@@ -124,6 +124,12 @@ namespace Packets {
 
    // TODO: Include structures for the individual packet segment types
 
+   template <int T> struct FFXIVIpcBasePacket
+   {
+      /** Creates a constant representing the IPC type */
+      enum { _ServerIpcType = T };
+   };
+
    /**
    * Server IPC Lobby Type Codes.
    */

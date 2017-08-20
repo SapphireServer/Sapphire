@@ -10,7 +10,7 @@
 #include <src/servers/Server_Common/Database/Database.h>
 #include <src/servers/Server_Common/Exd/ExdData.h>
 #include <src/servers/Server_Common/Network/CommonNetwork.h>
-#include <src/servers/Server_Common/Network/PacketDef/Zone/ServerPacketDef.h>
+#include <src/servers/Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
 #include <src/servers/Server_Common/Network/PacketContainer.h>
 
 #include "Zone.h"

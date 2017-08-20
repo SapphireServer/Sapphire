@@ -1,7 +1,7 @@
 #ifndef _PLAYERSPAWN_H
 #define _PLAYERSPAWN_H
 
-#include <src/servers/Server_Common/Network/PacketDef/Zone/ServerPacketDef.h>
+#include <src/servers/Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
 #include <src/servers/Server_Common/Network/GamePacketNew.h>
 #include <src/servers/Server_Common/Util/UtilMath.h>
 #include "src/servers/Server_Zone/Actor/Player.h"
