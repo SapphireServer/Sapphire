@@ -11,8 +11,10 @@ namespace Entity {
    {
    public:
 
-      static uint32_t measureHp( ActorPtr Player );
-      static uint32_t measureHeal( ActorPtr Player, uint32_t potency );
+      static uint32_t calculateBaseStat( PlayerPtr pPlayer );
+      static uint32_t calculateMaxMp( PlayerPtr pPlayer );
+      static uint32_t calculateMaxHp( PlayerPtr pPlayer );
+      static uint32_t calculateHealValue( PlayerPtr pPlayer, uint32_t potency );
 
    private:
 

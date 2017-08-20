@@ -116,7 +116,7 @@ namespace Core {
          uint32_t needed_exp;
          int16_t hp_mod;
          int32_t mp_const;
-         int16_t piety_scalar;
+         int16_t mp_mod;
          int32_t base_secondary;
          uint16_t quest_exp_mod;
       };
