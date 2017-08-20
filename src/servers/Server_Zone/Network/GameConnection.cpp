@@ -297,16 +297,16 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
             m_pSession = session;
 
          // main connection, assinging it to the session
-         if( ipcHeader.connectionType == 1 )
+         if( ipcHeader.connectionType == ConnectionType::Zone )
          {
             g_log.info( "[" + std::string( id ) + "] Setting session for zone connection" );
             session->setZoneConnection( pCon );
          }
          // chat connection, assinging it to the session
-         else if( ipcHeader.connectionType == 2 )
+         else if( ipcHeader.connectionType == ConnectionType::Chat )
          {
             g_log.info( "[" + std::string( id ) + "] Setting session for chat connection" );
-           // session->setClientChatConnection( pCon );
+            session->setChatConnection( pCon );
          }
 
          GamePacket pPe( 0x00, 0x18, 0, 0, 0x07 );
