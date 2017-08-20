@@ -56,13 +56,13 @@ void Core::Entity::Player::equipWeapon( Core::ItemPtr pItem )
    case ItemCategory::ThmWep:
    case ItemCategory::Thm2Wep:
       if( currentClass != ClassJob::CLASS_THAUMATURGE &&
-          currentClass != ClassJob::JOB_BLACK )
+          currentClass != ClassJob::JOB_BLACKMAGE )
          setClassJob( ClassJob::CLASS_THAUMATURGE );
       break;
    case ItemCategory::CnjWep:
    case ItemCategory::Cnj2Wep:
       if( currentClass != ClassJob::CLASS_CONJURER &&
-          currentClass != ClassJob::JOB_WHITE )
+          currentClass != ClassJob::JOB_WHITEMAGE )
          setClassJob( ClassJob::CLASS_CONJURER );
       break;
    case ItemCategory::ArnWep:

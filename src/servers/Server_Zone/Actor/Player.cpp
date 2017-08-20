@@ -44,6 +44,7 @@
 #include "src/servers/Server_Zone/Action/EventAction.h"
 #include "src/servers/Server_Zone/Action/EventItemAction.h"
 #include "src/servers/Server_Zone/Zone/ZonePosition.h"
+#include "src/servers/Server_Zone/Actor/CalcBattle.h"
 #include <boost/make_shared.hpp>
 
 extern Core::Logger g_log;
@@ -1465,7 +1466,9 @@ void Core::Entity::Player::autoAttack( ActorPtr pTarget )
    uint32_t damage = mainWeap->getAutoAttackDmg();
    uint32_t variation = 0 + rand() % 3;
 
-   if( getClass() == 5 || getClass() == 23 || getClass() == 31 )
+   if (getClass() == JOB_MACHINIST ||
+      getClass() == JOB_BARD ||
+      getClass() == CLASS_ARCHER)
    {
       GamePacketNew< FFXIVIpcEffect > effectPacket(getId());
       effectPacket.data().targetId = pTarget->getId();
@@ -1544,7 +1547,10 @@ void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, 
 
    case Core::Common::HandleSkillType::StdHeal:
    {
+      uint32_t calculatedHeal = CalcBattle::measureHeal( shared_from_this(), param1 );
+
       sendDebug( "STD_HEAL" );
+
       GamePacketNew< FFXIVIpcEffect > effectPacket( getId() );
       effectPacket.data().targetId = pTarget.getId();
       effectPacket.data().actionAnimationId = actionId;
@@ -1554,14 +1560,14 @@ void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, 
       effectPacket.data().numEffects = 1;
       effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRotation() );
       effectPacket.data().effectTarget = pTarget.getId();
-      effectPacket.data().effects[0].param1 = param1;
+      effectPacket.data().effects[0].param1 = calculatedHeal;
       effectPacket.data().effects[0].unknown_1 = 4;
       effectPacket.data().effects[0].unknown_2 = 1;
       effectPacket.data().effects[0].unknown_3 = 7;
 
       sendToInRangeSet( effectPacket, true );
 
-      pTarget.heal( param1 );
+      pTarget.heal( calculatedHeal );
       break;
    }
 
