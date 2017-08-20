@@ -16,15 +16,16 @@ namespace Packets {
 // Must forward define these in order to enable the compiler to produce the
 // correct template functions.
 
-template <typename T>
+template <typename T, typename T1>
 class GamePacketNew;
 
-template <typename T>
-std::ostream& operator<< ( std::ostream& os, const GamePacketNew<T>& packet );
+template <typename T, typename T1>
+std::ostream& operator<< ( std::ostream& os, const GamePacketNew<T, T1>& packet );
 
 /**
 * The base implementation of a game packet. Needed for parsing packets.
 */
+template <typename T1>
 class GamePacketNewBase
 {
 public:
@@ -33,7 +34,7 @@ public:
    * @brief Gets the IPC type of this packet. (Useful for determining the
    * type of a parsed packet.)
    */
-   virtual ServerIpcType ipcType( void ) = 0;
+   virtual T1 ipcType( void ) = 0;
 };
 
 /**
@@ -42,8 +43,8 @@ public:
 * type that represents just the IPC data portion (the bytes after the initial
 * 32 byte header information.)
 */
-template <typename T>
-class GamePacketNew : public GamePacketNewBase
+template <typename T, typename T1>
+class GamePacketNew : public GamePacketNewBase<T1>
 {
 public:
    /**
@@ -51,7 +52,7 @@ public:
    * @param sourceActorId The source actor id.
    * @param targetActorId The target actor id.
    */
-   GamePacketNew<T>( uint32_t sourceActorId, uint32_t targetActorId )
+   GamePacketNew<T, T1>( uint32_t sourceActorId, uint32_t targetActorId )
    {
       initialize();
       m_segHdr.source_actor = sourceActorId;
@@ -62,7 +63,7 @@ public:
    * @brief Constructs a new game packet with the specified actors.
    * @param sourceActorId The source and target actor id.
    */
-   GamePacketNew<T>( uint32_t bothActorId )
+   GamePacketNew<T, T1>( uint32_t bothActorId )
    {
       initialize();
       m_segHdr.source_actor = bothActorId;
@@ -85,13 +86,13 @@ protected:
       // Game packets (IPC) are type 3.
       m_segHdr.type = 3;
       // The IPC type itself.
-      m_ipcHdr.type = static_cast< ServerIpcType >( m_data._ServerIpcType );
+      m_ipcHdr.type = static_cast< ServerZoneIpcType >( m_data._ServerIpcType );
    };
 
 public:
-   virtual ServerIpcType ipcType( void )
+   virtual T1 ipcType( void )
    {
-      return static_cast< ServerIpcType >( m_data._ServerIpcType );
+      return static_cast< T1 >( m_data._ServerIpcType );
    };
 
    /** Gets a reference to the underlying IPC data structure. */
@@ -102,7 +103,7 @@ public:
    * @param actorId The source actor id.
    * @return This IPC packet object (can be used for chaining).
    */
-   GamePacketNew<T> sourceActor( uint32_t actorId )
+   GamePacketNew<T, T1> sourceActor( uint32_t actorId )
    {
       m_segHdr.source_actor = actorId;
       return this;
@@ -122,7 +123,7 @@ public:
    * @param actorId The target actor id.
    * @return This IPC packet object (can be used for chaining).
    */
-   GamePacketNew<T> targetActor( uint32_t actorId )
+   GamePacketNew<T, T1> targetActor( uint32_t actorId )
    {
       m_segHdr.target_actor = actorId;
       return this;
@@ -137,7 +138,7 @@ public:
       return m_segHdr.target_actor;
    };
 
-   friend std::ostream& operator<< <> ( std::ostream& os, const GamePacketNew<T>& packet );
+   friend std::ostream& operator<< <> ( std::ostream& os, const GamePacketNew<T, T1>& packet );
 
    friend class GamePacketFactory;
 
@@ -198,8 +199,8 @@ private:
    };
 };
 
-template <typename T>
-std::ostream& operator<<( std::ostream& os, const GamePacketNew<T>& packet )
+template <typename T, typename T1>
+std::ostream& operator<<( std::ostream& os, const GamePacketNew<T, T1>& packet )
 {
 #if 0
    // Since the packet itself is constant, we need to make a copy of the IPC

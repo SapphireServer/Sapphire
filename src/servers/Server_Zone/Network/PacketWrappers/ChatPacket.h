@@ -2,7 +2,7 @@
 #define _CHATPACKET_H
 
 #include <src/servers/Server_Common/Network/GamePacketNew.h>
-#include <src/servers/Server_Common/Network/PacketDef/ServerPacketDef.h>
+#include <src/servers/Server_Common/Network/PacketDef/Zone/ServerPacketDef.h>
 #include "src/servers/Server_Zone/Forwards.h"
 
 
@@ -15,11 +15,11 @@ namespace Server {
 * @brief The Chat packet.
 */
 class ChatPacket :
-   public GamePacketNew< FFXIVIpcChat >
+   public GamePacketNew< FFXIVIpcChat, ServerZoneIpcType >
 {
 public:
    ChatPacket( Entity::PlayerPtr player, Common::ChatType chatType, const std::string& msg ) :
-      GamePacketNew<FFXIVIpcChat>( player->getId(), player->getId() )
+      GamePacketNew< FFXIVIpcChat, ServerZoneIpcType >( player->getId(), player->getId() )
    {
       initialize( player, chatType, msg );
    };

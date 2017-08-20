@@ -13,11 +13,11 @@ namespace Server {
 * @brief The Ping response packet.
 */
 class UpdateHpMpTpPacket :
-   public GamePacketNew< FFXIVIpcUpdateHpMpTp >
+   public GamePacketNew< FFXIVIpcUpdateHpMpTp, ServerZoneIpcType >
 {
 public:
    UpdateHpMpTpPacket( Entity::ActorPtr pActor ) :
-      GamePacketNew< FFXIVIpcUpdateHpMpTp >( pActor->getId(), pActor->getId() )
+      GamePacketNew< FFXIVIpcUpdateHpMpTp, ServerZoneIpcType >( pActor->getId(), pActor->getId() )
    {
       initialize( pActor );
    };

@@ -2,7 +2,7 @@
 #define _MOVEACTORPACKET_H
 
 #include <src/servers/Server_Common/Network/GamePacketNew.h>
-#include <src/servers/Server_Common/Network/PacketDef/ServerPacketDef.h>
+#include <src/servers/Server_Common/Network/PacketDef/Zone/ServerPacketDef.h>
 #include <src/servers/Server_Common/Util/UtilMath.h>
 #include "src/servers/Server_Zone/Actor/Player.h"
 #include "src/servers/Server_Zone/Forwards.h"
@@ -18,11 +18,11 @@ namespace Server {
 * once upon connection to configure the UI.
 */
 class MoveActorPacket :
-   public GamePacketNew<FFXIVIpcActorMove>
+   public GamePacketNew< FFXIVIpcActorMove, ServerZoneIpcType >
 {
 public:
    MoveActorPacket( Entity::ActorPtr actor, uint8_t unk1, uint8_t unk2, uint8_t unk3, uint16_t unk4 ) :
-      GamePacketNew<FFXIVIpcActorMove>( actor->getId(), actor->getId() )
+      GamePacketNew< FFXIVIpcActorMove, ServerZoneIpcType >( actor->getId(), actor->getId() )
    {
       initialize( actor, unk1, unk2, unk3, unk4 );
    };

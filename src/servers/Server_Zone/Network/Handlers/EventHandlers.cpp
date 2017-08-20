@@ -46,7 +46,7 @@ void Core::Network::GameConnection::eventHandler( const Packets::GamePacket& inP
    switch( eventHandlerId )
    {
    
-   case ClientIpcType::TalkEventHandler: // Talk event
+   case ClientZoneIpcType::TalkEventHandler: // Talk event
    {
       uint64_t actorId = inPacket.getValAt< uint64_t >( 0x20 );
       uint32_t eventId = inPacket.getValAt< uint32_t >( 0x28 );
@@ -56,7 +56,7 @@ void Core::Network::GameConnection::eventHandler( const Packets::GamePacket& inP
       break;
    }
 
-   case ClientIpcType::EmoteEventHandler: // Emote event
+   case ClientZoneIpcType::EmoteEventHandler: // Emote event
    {
       uint64_t actorId = inPacket.getValAt< uint64_t >( 0x20 );
       uint32_t eventId = inPacket.getValAt< uint32_t >( 0x28 );
@@ -70,7 +70,7 @@ void Core::Network::GameConnection::eventHandler( const Packets::GamePacket& inP
    }
 
 
-   case ClientIpcType::WithinRangeEventHandler:
+   case ClientZoneIpcType::WithinRangeEventHandler:
    {
       uint32_t eventId = inPacket.getValAt< uint32_t >( 0x24 );
       uint32_t eventParam1 = inPacket.getValAt< uint32_t >( 0x20 );
@@ -85,7 +85,7 @@ void Core::Network::GameConnection::eventHandler( const Packets::GamePacket& inP
       break;
    }
 
-   case ClientIpcType::OutOfRangeEventHandler:
+   case ClientZoneIpcType::OutOfRangeEventHandler:
    {
       uint32_t eventId = inPacket.getValAt< uint32_t >( 0x24 );
       uint32_t eventParam1 = inPacket.getValAt< uint32_t >( 0x20 );
@@ -100,7 +100,7 @@ void Core::Network::GameConnection::eventHandler( const Packets::GamePacket& inP
       break;
    }
 
-   case ClientIpcType::EnterTeriEventHandler: 
+   case ClientZoneIpcType::EnterTeriEventHandler:
    {
       uint32_t eventId = inPacket.getValAt< uint32_t >( 0x20 );
       uint16_t eventParam1 = inPacket.getValAt< uint16_t >( 0x24 );
@@ -113,8 +113,8 @@ void Core::Network::GameConnection::eventHandler( const Packets::GamePacket& inP
       break;
    }
 
-   case ClientIpcType::ReturnEventHandler: 
-   case ClientIpcType::TradeReturnEventHandler: 
+   case ClientZoneIpcType::ReturnEventHandler:
+   case ClientZoneIpcType::TradeReturnEventHandler:
    {
       uint32_t eventId = inPacket.getValAt< uint32_t >( 0x20 );
       uint16_t subEvent = inPacket.getValAt< uint16_t >( 0x24 );

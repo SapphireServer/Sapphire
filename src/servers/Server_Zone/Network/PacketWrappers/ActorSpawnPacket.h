@@ -15,11 +15,11 @@ namespace Server {
 * @brief The packet sent to spawn an actor.
 */
 class ActorSpawnPacket :
-   public GamePacketNew<FFXIVIpcActorSpawn>
+   public GamePacketNew< FFXIVIpcActorSpawn, ServerZoneIpcType >
 {
 public:
    ActorSpawnPacket( Entity::PlayerPtr pPlayer, Entity::PlayerPtr pTarget ) :
-      GamePacketNew<FFXIVIpcActorSpawn>( pPlayer->getId(), pTarget->getId() )
+      GamePacketNew< FFXIVIpcActorSpawn, ServerZoneIpcType >( pPlayer->getId(), pTarget->getId() )
    {
       initialize( pPlayer, pTarget );
    };

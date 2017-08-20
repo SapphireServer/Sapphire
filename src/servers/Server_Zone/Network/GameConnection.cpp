@@ -31,58 +31,58 @@ Core::Network::GameConnection::GameConnection( Core::Network::HivePtr pHive,
    , m_pAcceptor( pAcceptor )
    , m_conType( ConnectionType::None )
 {
-   auto setHandler = [=]( uint16_t opcode, std::string handlerName, GameConnection::Handler pHandler )
+   auto setZoneHandler = [=]( uint16_t opcode, std::string handlerName, GameConnection::Handler pHandler )
    {
-      m_packetHandlerMap[opcode] = pHandler;
+      m_zoneHandlerMap[opcode] = pHandler;
       m_packetHandlerStrMap[opcode] = handlerName;
    };
 
-   setHandler( ClientIpcType::PingHandler,          "PingHandler",              &GameConnection::pingHandler ); 
-   setHandler( ClientIpcType::InitHandler,          "InitHandler",              &GameConnection::initHandler );
-   setHandler( ClientIpcType::ChatHandler,          "ChatHandler",              &GameConnection::chatHandler ); 
+   setZoneHandler( ClientZoneIpcType::PingHandler,          "PingHandler",              &GameConnection::pingHandler );
+   setZoneHandler( ClientZoneIpcType::InitHandler,          "InitHandler",              &GameConnection::initHandler );
+   setZoneHandler( ClientZoneIpcType::ChatHandler,          "ChatHandler",              &GameConnection::chatHandler );
 
-   setHandler( ClientIpcType::FinishLoadingHandler, "FinishLoadingHandler",     &GameConnection::finishLoadingHandler ); 
+   setZoneHandler( ClientZoneIpcType::FinishLoadingHandler, "FinishLoadingHandler",     &GameConnection::finishLoadingHandler );
 
-   setHandler( ClientIpcType::PlayTimeHandler,      "PlayTimeHandler",          &GameConnection::playTimeHandler );
-   setHandler( ClientIpcType::LogoutHandler,        "LogoutHandler",            &GameConnection::logoutHandler );
+   setZoneHandler( ClientZoneIpcType::PlayTimeHandler,      "PlayTimeHandler",          &GameConnection::playTimeHandler );
+   setZoneHandler( ClientZoneIpcType::LogoutHandler,        "LogoutHandler",            &GameConnection::logoutHandler );
 
-   setHandler( ClientIpcType::SocialListHandler,    "SocialListHandler",        &GameConnection::socialListHandler );
-   setHandler( ClientIpcType::SetSearchInfoHandler, "SetSearchInfoHandler",     &GameConnection::setSearchInfoHandler );
-   setHandler( ClientIpcType::ReqSearchInfoHandler, "ReqSearchInfoHandler",     &GameConnection::reqSearchInfoHandler );
+   setZoneHandler( ClientZoneIpcType::SocialListHandler,    "SocialListHandler",        &GameConnection::socialListHandler );
+   setZoneHandler( ClientZoneIpcType::SetSearchInfoHandler, "SetSearchInfoHandler",     &GameConnection::setSearchInfoHandler );
+   setZoneHandler( ClientZoneIpcType::ReqSearchInfoHandler, "ReqSearchInfoHandler",     &GameConnection::reqSearchInfoHandler );
 
-   setHandler( ClientIpcType::BlackListHandler,     "BlackListHandler",         &GameConnection::blackListHandler );
+   setZoneHandler( ClientZoneIpcType::BlackListHandler,     "BlackListHandler",         &GameConnection::blackListHandler );
 
-   setHandler( ClientIpcType::LinkshellListHandler, "LinkshellListHandler",     &GameConnection::linkshellListHandler );
+   setZoneHandler( ClientZoneIpcType::LinkshellListHandler, "LinkshellListHandler",     &GameConnection::linkshellListHandler );
 
-   setHandler( ClientIpcType::FcInfoReqHandler,     "FcInfoReqHandler",         &GameConnection::fcInfoReqHandler );
+   setZoneHandler( ClientZoneIpcType::FcInfoReqHandler,     "FcInfoReqHandler",         &GameConnection::fcInfoReqHandler );
 
-   setHandler( ClientIpcType::ZoneLineHandler,      "ZoneLineHandler",          &GameConnection::zoneLineHandler );
-   setHandler( ClientIpcType::ActionHandler,        "ActionHandler",            &GameConnection::actionHandler );
+   setZoneHandler( ClientZoneIpcType::ZoneLineHandler,      "ZoneLineHandler",          &GameConnection::zoneLineHandler );
+   setZoneHandler( ClientZoneIpcType::ActionHandler,        "ActionHandler",            &GameConnection::actionHandler );
 
-   setHandler( ClientIpcType::DiscoveryHandler,     "DiscoveryHandler",         &GameConnection::discoveryHandler );
+   setZoneHandler( ClientZoneIpcType::DiscoveryHandler,     "DiscoveryHandler",         &GameConnection::discoveryHandler );
 
-   setHandler( ClientIpcType::SkillHandler,         "SkillHandler",             &GameConnection::skillHandler );
+   setZoneHandler( ClientZoneIpcType::SkillHandler,         "SkillHandler",             &GameConnection::skillHandler );
 
-   setHandler( ClientIpcType::GMCommand1,           "GMCommand1",               &GameConnection::gm1Handler );
-   setHandler( ClientIpcType::GMCommand2,           "GMCommand2",               &GameConnection::gm2Handler );
+   setZoneHandler( ClientZoneIpcType::GMCommand1,           "GMCommand1",               &GameConnection::gm1Handler );
+   setZoneHandler( ClientZoneIpcType::GMCommand2,           "GMCommand2",               &GameConnection::gm2Handler );
 
-   setHandler( ClientIpcType::UpdatePositionHandler,"UpdatePositionHandler",    &GameConnection::updatePositionHandler );
+   setZoneHandler( ClientZoneIpcType::UpdatePositionHandler,"UpdatePositionHandler",    &GameConnection::updatePositionHandler );
 
-   setHandler( ClientIpcType::InventoryModifyHandler,"InventoryModifyHandler",  &GameConnection::inventoryModifyHandler );
+   setZoneHandler( ClientZoneIpcType::InventoryModifyHandler,"InventoryModifyHandler",  &GameConnection::inventoryModifyHandler );
 
-   setHandler( ClientIpcType::TalkEventHandler,     "EventHandler",             &GameConnection::eventHandler );
-   setHandler( ClientIpcType::EmoteEventHandler,    "EventHandler",             &GameConnection::eventHandler );
-   setHandler( ClientIpcType::WithinRangeEventHandler, "EventHandler",          &GameConnection::eventHandler );
-   setHandler( ClientIpcType::OutOfRangeEventHandler, "EventHandler",           &GameConnection::eventHandler );
-   setHandler( ClientIpcType::EnterTeriEventHandler, "EventHandler",            &GameConnection::eventHandler );
+   setZoneHandler( ClientZoneIpcType::TalkEventHandler,     "EventHandler",             &GameConnection::eventHandler );
+   setZoneHandler( ClientZoneIpcType::EmoteEventHandler,    "EventHandler",             &GameConnection::eventHandler );
+   setZoneHandler( ClientZoneIpcType::WithinRangeEventHandler, "EventHandler",          &GameConnection::eventHandler );
+   setZoneHandler( ClientZoneIpcType::OutOfRangeEventHandler, "EventHandler",           &GameConnection::eventHandler );
+   setZoneHandler( ClientZoneIpcType::EnterTeriEventHandler, "EventHandler",            &GameConnection::eventHandler );
 
-   setHandler( ClientIpcType::ReturnEventHandler,      "EventHandlerReturn",    &GameConnection::eventHandler );
-   setHandler( ClientIpcType::TradeReturnEventHandler, "EventHandlerReturn",    &GameConnection::eventHandler );
+   setZoneHandler( ClientZoneIpcType::ReturnEventHandler,      "EventHandlerReturn",    &GameConnection::eventHandler );
+   setZoneHandler( ClientZoneIpcType::TradeReturnEventHandler, "EventHandlerReturn",    &GameConnection::eventHandler );
 
-   setHandler( ClientIpcType::CFDutyInfoHandler, "CFDutyInfoRequest",           &GameConnection::cfDutyInfoRequest );
-   setHandler( ClientIpcType::CFRegisterDuty, "CFRegisterDuty",                 &GameConnection::cfRegisterDuty );
-   setHandler( ClientIpcType::CFRegisterRoulette, "CFRegisterRoulette",         &GameConnection::cfRegisterRoulette );
-   setHandler( ClientIpcType::CFCommenceHandler, "CFDutyAccepted",              &GameConnection::cfDutyAccepted);
+   setZoneHandler( ClientZoneIpcType::CFDutyInfoHandler, "CFDutyInfoRequest",           &GameConnection::cfDutyInfoRequest );
+   setZoneHandler( ClientZoneIpcType::CFRegisterDuty, "CFRegisterDuty",                 &GameConnection::cfRegisterDuty );
+   setZoneHandler( ClientZoneIpcType::CFRegisterRoulette, "CFRegisterRoulette",         &GameConnection::cfRegisterRoulette );
+   setZoneHandler( ClientZoneIpcType::CFCommenceHandler, "CFDutyAccepted",              &GameConnection::cfDutyAccepted);
 
 }
 
@@ -139,14 +139,23 @@ void Core::Network::GameConnection::handleGamePacket( Core::Network::Packets::Ga
    if( !m_pSession )
       return;
 
-   auto it = m_packetHandlerMap.find( pPacket->getSubType() );
+   /*if( m_conType == Network::ConnectionType::Zone )
+   {
+      g_log.debug( "Zone Packet" );
+   }
+   else if( m_conType == Network::ConnectionType::Chat )
+   {
+      g_log.debug( "Chat Packet" );
+   }*/
 
-   if( it != m_packetHandlerMap.end() )
+   auto it = m_zoneHandlerMap.find( pPacket->getSubType() );
+
+   if( it != m_zoneHandlerMap.end() )
    {
       auto name = m_packetHandlerStrMap[pPacket->getSubType()];
       // dont display packet notification if it is a ping or pos update, don't want the spam
-      if( pPacket->getSubType() != ClientIpcType::PingHandler 
-          && pPacket->getSubType() != ClientIpcType::UpdatePositionHandler )
+      if( pPacket->getSubType() != ClientZoneIpcType::PingHandler &&
+          pPacket->getSubType() != ClientZoneIpcType::UpdatePositionHandler )
          g_log.debug( "[" + std::to_string( m_pSession->getId() ) + "] Handling packet : " + name + "( " +
                       boost::str( boost::format( "%|04X|" ) % static_cast< uint32_t >( pPacket->getSubType() & 0xFFFF ) )  + " )" );
 
@@ -264,7 +273,6 @@ void Core::Network::GameConnection::injectPacket( const std::string& packetpath,
 void Core::Network::GameConnection::handlePackets( const Core::Network::Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
                                                    const std::vector<Core::Network::Packets::FFXIVARR_PACKET_RAW>& packetData )
 {
-
    // if a session is set, update the last time it recieved a game packet
    if( m_pSession )
       m_pSession->updateLastDataTime();

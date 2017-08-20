@@ -14,12 +14,12 @@ namespace Server {
 * @brief Packet to display a quest specific info message.
 */
 class QuestMessagePacket :
-   public GamePacketNew< FFXIVIpcQuestMessage >
+   public GamePacketNew< FFXIVIpcQuestMessage, ServerZoneIpcType >
 {
 public:
    QuestMessagePacket( Entity::ActorPtr pActor, uint32_t questId, int8_t msgId,
                        uint8_t type = 0, uint32_t var1 = 0, uint32_t var2 = 0 ) :
-      GamePacketNew< FFXIVIpcQuestMessage >( pActor->getId(), pActor->getId() )
+      GamePacketNew< FFXIVIpcQuestMessage, ServerZoneIpcType >( pActor->getId(), pActor->getId() )
    {
       initialize( questId, msgId, type, var1, var2 );
    };
