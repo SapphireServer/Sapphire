@@ -5,7 +5,7 @@
 #include <src/servers/Server_Common/Logging/Logger.h>
 #include <src/servers/Server_Common/Network/GamePacket.h>
 #include <src/servers/Server_Common/Network/GamePacketNew.h>
-#include <src/servers/Server_Common/Network/PacketDef/Zone/ServerPacketDef.h>
+#include <src/servers/Server_Common/Network/PacketDef/Lobby/ServerLobbyDef.h>
 #include <src/servers/Server_Common/Crypt/md5.h>
 
 #include <boost/format.hpp>

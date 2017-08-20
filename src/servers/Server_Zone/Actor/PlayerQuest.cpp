@@ -1,6 +1,6 @@
 #include <src/servers/Server_Common/Common.h>
 #include <src/servers/Server_Common/Database/Database.h>
-#include <src/servers/Server_Common/Network/PacketDef/Zone/ServerPacketDef.h>
+#include <src/servers/Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
 #include <src/servers/Server_Common/Network/GamePacket.h>
 #include <src/servers/Server_Common/Exd/ExdData.h>
 #include <src/servers/Server_Common/Network/PacketContainer.h>
