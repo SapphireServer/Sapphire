@@ -46,6 +46,7 @@ Core::DebugCommandHandler::DebugCommandHandler()
    registerCommand( "add", &DebugCommandHandler::add, "Loads and injects a premade Packet.", Common::UserLevel::all );
    //registerCommand( "debug", &DebugCommandHandler::debug, "Loads and injects a premade Packet.", Common::UserLevel::all );
    registerCommand( "inject", &DebugCommandHandler::injectPacket, "Loads and injects a premade Packet.", Common::UserLevel::all );
+   registerCommand( "injectc", &DebugCommandHandler::injectChatPacket, "Loads and injects a premade Packet.", Common::UserLevel::all );
    registerCommand( "script_reload", &DebugCommandHandler::scriptReload, "Loads and injects a premade Packet.", Common::UserLevel::all );
    registerCommand( "nudge", &DebugCommandHandler::nudge, "Nudges you forward/up/down", Common::UserLevel::all );
 
@@ -471,6 +472,13 @@ void Core::DebugCommandHandler::injectPacket( char * data, Core::Entity::PlayerP
    auto pSession = g_serverZone.getSession( pPlayer->getId() );
    if( pSession )
       pSession->getZoneConnection()->injectPacket( data + 7, pPlayer );
+}
+
+void Core::DebugCommandHandler::injectChatPacket( char * data, Core::Entity::PlayerPtr pPlayer, boost::shared_ptr< Core::DebugCommand > command )
+{
+   auto pSession = g_serverZone.getSession( pPlayer->getId() );
+   if( pSession )
+      pSession->getChatConnection()->injectPacket( data + 8, pPlayer );
 }
 
 void Core::DebugCommandHandler::nudge( char * data, Entity::PlayerPtr pPlayer, boost::shared_ptr<DebugCommand> command )
