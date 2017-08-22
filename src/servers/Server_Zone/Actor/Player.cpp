@@ -1255,6 +1255,19 @@ void Core::Entity::Player::queuePacket( Core::Network::Packets::GamePacketPtr pP
    }
 }
 
+void Core::Entity::Player::queueChatPacket( Core::Network::Packets::GamePacketPtr pPacket )
+{
+   auto pSession = g_serverZone.getSession( m_id );
+
+   if( pSession )
+   {
+      auto pChatCon = pSession->getChatConnection();
+
+      if( pChatCon )
+         pChatCon->queueOutPacket( pPacket );
+   }
+}
+
 bool Core::Entity::Player::isLoadingComplete() const
 {
    return m_bLoadingComplete;

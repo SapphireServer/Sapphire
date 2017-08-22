@@ -5,6 +5,7 @@
 #include <src/servers/Server_Common/Logging/Logger.h>
 #include <src/servers/Server_Common/Exd/ExdData.h>
 #include <src/servers/Server_Common/Network/PacketContainer.h>
+#include <src/servers/Server_Common/Network/PacketDef/Chat/ServerChatDef.h>
 
 #include <boost/format.hpp>
 
@@ -547,6 +548,48 @@ void Core::Network::GameConnection::logoutHandler( const Packets::GamePacket& in
 void Core::Network::GameConnection::tellHandler( const Packets::GamePacket& inPacket,
                                                  Entity::PlayerPtr pPlayer )
 {
+   std::string targetPcName = inPacket.getStringAt( 0x21 );
+   std::string msg = inPacket.getStringAt( 0x41 );
 
+   auto pSession = g_serverZone.getSession( targetPcName );
+
+   if( !pSession )
+   {
+      GamePacketNew< FFXIVIpcTellErrNotFound, ServerChatIpcType > tellErrPacket( pPlayer->getId() );
+      strcpy( tellErrPacket.data().receipientName, targetPcName.c_str() );
+      pPlayer->queueChatPacket( tellErrPacket );
+      g_log.debug( "TargetPc not found" );
+      return;
+   }
+
+   auto pTargetPlayer = pSession->getPlayer();
+
+   if( pTargetPlayer->hasStateFlag( PlayerStateFlag::BetweenAreas ) ||
+       pTargetPlayer->hasStateFlag( PlayerStateFlag::BetweenAreas1 ) )
+   {
+      // send error for player between areas
+      return;
+   }
+
+   if( pTargetPlayer->hasStateFlag( PlayerStateFlag::BoundByDuty ) ||
+       pTargetPlayer->hasStateFlag( PlayerStateFlag::BoundByDuty1 ) )
+   {
+      // send error for player bound by duty
+      return;
+   }
+
+   if( pTargetPlayer->getOnlineStatus() == OnlineStatus::Busy )
+   {
+      // send error for player being busy
+      return;
+   }
+
+   GamePacketNew< FFXIVIpcTell, ServerChatIpcType > tellPacket( pPlayer->getId() );
+   strcpy( tellPacket.data().msg, msg.c_str() );
+   strcpy( tellPacket.data().receipientName, targetPcName.c_str() );
+   //tellPacket.data().u1 = 0x92CD7337;
+   //tellPacket.data().u2a = 0x2E;
+   //tellPacket.data().u2b = 0x40;
+   pTargetPlayer->queueChatPacket( tellPacket );
 
 }

@@ -433,6 +433,8 @@ public:
    void sendQuestMessage( uint32_t questId, int8_t msgId, uint8_t type, uint32_t var1, uint32_t var2 );
    /*! queue a packet for the player */
    void queuePacket( Network::Packets::GamePacketPtr pPacket );
+   /*! queue a char connection packet for the player */
+   void queueChatPacket( Network::Packets::GamePacketPtr pPacket );
    /*! returns true if loading is complete ( 0x69 has been received ) */
    bool isLoadingComplete() const;
    /*! set the loading complete bool */

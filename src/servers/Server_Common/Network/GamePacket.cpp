@@ -46,6 +46,7 @@ Core::Network::Packets::GamePacket::GamePacket( char * pData, uint16_t size, boo
    if( bWriteStamp && size > 0x18 )
    {
       m_timeStamp = static_cast< uint32_t >( time( nullptr ) );
+      *reinterpret_cast< uint16_t* >( &m_dataBuf[0] + 0x10 ) = 0x14;
       *reinterpret_cast< uint32_t* >( &m_dataBuf[0] + 0x18 ) = m_timeStamp;
    }
 

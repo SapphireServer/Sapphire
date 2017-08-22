@@ -186,6 +186,7 @@ namespace Packets {
    enum ServerChatIpcType : uint16_t
    {
       Tell                     = 0x0064, // updated for sb
+      TellErrNotFound          = 0x0066,
    };
 
    /**

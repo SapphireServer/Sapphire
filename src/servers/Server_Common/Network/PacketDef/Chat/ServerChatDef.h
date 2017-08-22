@@ -11,7 +11,7 @@ namespace Server {
 
 /**
 * Structural representation of the packet sent by the server as response
-* to a ping packet
+* to a tell request
 */
 struct FFXIVIpcTell : FFXIVIpcBasePacket<Tell>
 {
@@ -23,6 +23,14 @@ struct FFXIVIpcTell : FFXIVIpcBasePacket<Tell>
    char msg[1031];
 };
 
+   /**
+* Structural representation of the packet sent by the server as response
+* to a failed tell because of unavailable target player
+*/
+struct FFXIVIpcTellErrNotFound : FFXIVIpcBasePacket<TellErrNotFound>
+{
+   char receipientName[32];
+};
 
 } /* Server */
 } /* Packets */
