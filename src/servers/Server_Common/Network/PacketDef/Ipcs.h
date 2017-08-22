@@ -114,7 +114,7 @@ namespace Packets {
 
       // Unknown IPC types that still need to be sent
       // TODO: figure all these out properly
-              IPCTYPE_UNK_320             = 0x1FB,
+      IPCTYPE_UNK_320             = 0x1FB,
       IPCTYPE_UNK_322             = 0x1FD,
 
    };
@@ -185,7 +185,7 @@ namespace Packets {
    */
    enum ServerChatIpcType : uint16_t
    {
-      Tell                       = 0x0064, // updated for sb
+      Tell                     = 0x0064, // updated for sb
    };
 
    /**
@@ -193,7 +193,7 @@ namespace Packets {
    */
    enum ClientChatIpcType : uint16_t
    {
-      TellReq                    = 0x0064,
+      TellReq                  = 0x0064,
    };
 
 

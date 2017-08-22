@@ -36,9 +36,13 @@ private:
 
    AcceptorPtr m_pAcceptor;
 
-   // handler for game packets (main type 0x03)
+   // handler for game packets (main type 0x03, connection type 1)
    HandlerMap m_zoneHandlerMap;
-   HandlerStrMap m_packetHandlerStrMap;
+   HandlerStrMap m_zoneHandlerStrMap;
+
+   // handler for game packets (main type 0x03, connection type 2)
+   HandlerMap m_chatHandlerMap;
+   HandlerStrMap m_chatHandlerStrMap;
 
    SessionPtr m_pSession;
 
@@ -70,7 +74,11 @@ public:
    void processInQueue();
    void processOutQueue();
 
-   void handleGamePacket( Packets::GamePacketPtr pPacket );
+   void handlePacket( Packets::GamePacketPtr pPacket );
+
+   void handleZonePacket( const Packets::GamePacket& pPacket );
+
+   void handleChatPacket( const Packets::GamePacket& pPacket );
 
    void sendPackets( Packets::PacketContainer * pPacket );
 
@@ -107,6 +115,8 @@ public:
 
    DECLARE_HANDLER( gm1Handler );
    DECLARE_HANDLER( gm2Handler );
+
+   DECLARE_HANDLER( tellHandler );
 
 
 

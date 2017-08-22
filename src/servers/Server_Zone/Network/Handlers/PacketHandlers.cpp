@@ -542,3 +542,11 @@ void Core::Network::GameConnection::logoutHandler( const Packets::GamePacket& in
    logoutPacket.data().flags2 = 0x2000;
    queueOutPacket( logoutPacket );
 }
+
+
+void Core::Network::GameConnection::tellHandler( const Packets::GamePacket& inPacket,
+                                                 Entity::PlayerPtr pPlayer )
+{
+
+
+}
