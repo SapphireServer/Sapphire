@@ -66,7 +66,7 @@ public:
 
    void handleGamePacket( Packets::FFXIVARR_PACKET_RAW &pPacket );
 
-   void handleGamePacket( Packets::GamePacketPtr pPacket );
+   void handlePacket( Packets::GamePacketPtr pPacket );
 
    void sendPackets( Packets::PacketContainer * pPacket );
 
