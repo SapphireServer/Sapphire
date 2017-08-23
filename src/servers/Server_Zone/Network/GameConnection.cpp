@@ -110,13 +110,32 @@ void Core::Network::GameConnection::OnDisconnect()
 
 void Core::Network::GameConnection::OnRecv( std::vector< uint8_t > & buffer )
 {
+   // This is assumed packet always start with valid FFXIVARR_PACKET_HEADER for now.
+
+   // not enough bytes for packet header, drop connection for now.
+   // TODO: buffer it
+
+   // Dissect packet header
    Packets::FFXIVARR_PACKET_HEADER ipcHeader;
+   if ( !Network::Util::bufferToPacketHeader( buffer, ipcHeader ) )
+   {
+      g_log.info("FIXME: Dropping connection due to incomplete packet header.");
+      g_log.info("See https://github.com/SapphireMordred/Sapphire/issues/24 for more info.");
+      Disconnect();
+      return;
+   }
+
+   // Dissect packet list
    std::vector< Packets::FFXIVARR_PACKET_RAW > packetList;
+   if ( !Network::Util::bufferToPacketList( buffer, ipcHeader, packetList ) )
+   {
+      g_log.info("Dropping connection due to incomplete message.");
+      Disconnect();
+      return;
+   }
 
-   Network::Util::bufferToPacketList( buffer, ipcHeader, packetList );
-
+   // Handle it
    handlePackets( ipcHeader, packetList );
-
 }
 
 void Core::Network::GameConnection::OnError( const boost::system::error_code & error )
@@ -167,7 +186,7 @@ void Core::Network::GameConnection::handleGamePacket( Core::Network::Packets::Ga
                    boost::str( boost::format( "%|04X|" ) % static_cast< uint32_t >( pPacket->getSubType() & 0xFFFF ) ) + " )" );
       g_log.debug( pPacket->toString() );
    }
-      
+
 
 }
 
@@ -388,7 +407,7 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
       //   }
       //   // place this connection in the session
       //   session->setZoneConnection( pCon );
-      //   // actually perform the zoning 
+      //   // actually perform the zoning
       //   session->getPlayer()->setZone( *reinterpret_cast< uint16_t* >( &inPacket.data[16] ) );
       //}
       //else
