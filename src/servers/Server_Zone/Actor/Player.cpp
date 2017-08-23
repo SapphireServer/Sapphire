@@ -413,7 +413,8 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
    GamePacketNew< FFXIVIpcInitZone, ServerZoneIpcType > initZonePacket( getId() );
    initZonePacket.data().zoneId = getCurrentZone()->getLayoutId();
    initZonePacket.data().weatherId = static_cast< uint8_t >( getCurrentZone()->getCurrentWeather() );
-   initZonePacket.data().bitmask = 0x2A;
+   initZonePacket.data().bitmask = 0x1;
+   initZonePacket.data().unknown5 = 0x2A;
    initZonePacket.data().pos.x = getPos().x;
    initZonePacket.data().pos.y = getPos().y;
    initZonePacket.data().pos.z = getPos().z;

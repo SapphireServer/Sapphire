@@ -351,27 +351,37 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
          if( !m_pSession && session )
             m_pSession = session;
 
+         GamePacket pPe( 0x00, 0x18, 0, 0, 0x07 );
+         //pPe.setValAt< uint32_t >( 0x10, 0xE0000005 );
+         pPe.setValAt< uint32_t >( 0x10, 0xE0037603 );
+         pPe.setValAt< uint32_t >( 0x14, static_cast< uint32_t >( time( nullptr ) ) );
+         sendSinglePacket( &pPe );
+
+
+
          // main connection, assinging it to the session
          if( ipcHeader.connectionType == ConnectionType::Zone )
          {
+            pPe = GamePacket( 0x00, 0x38, 0, 0, 0x02 );
+            pPe.setValAt< uint32_t >( 0x10, playerId );
+            sendSinglePacket( &pPe );
             g_log.info( "[" + std::string( id ) + "] Setting session for zone connection" );
             session->setZoneConnection( pCon );
          }
          // chat connection, assinging it to the session
          else if( ipcHeader.connectionType == ConnectionType::Chat )
          {
+            pPe = GamePacket( 0x00, 0x38, 0, 0, 0x02 );
+            pPe.setValAt< uint32_t >( 0x10, playerId );
+            sendSinglePacket( &pPe );
+
             g_log.info( "[" + std::string( id ) + "] Setting session for chat connection" );
             session->setChatConnection( pCon );
+            pPe = GamePacket( 0x02, 0x28, playerId, playerId, 0x03 );
+            sendSinglePacket( &pPe );
          }
 
-         GamePacket pPe( 0x00, 0x18, 0, 0, 0x07 );
-         pPe.setValAt< uint32_t >( 0x10, 0xE0000005 );
-         pPe.setValAt< uint32_t >( 0x14, static_cast< uint32_t >( time( nullptr ) ) );
-         sendSinglePacket( &pPe );
 
-         pPe = GamePacket( 0x00, 0x38, 0, 0, 0x02 );
-         pPe.setValAt< uint32_t >( 0x10, playerId );
-         sendSinglePacket( &pPe );
 
          break;
 
