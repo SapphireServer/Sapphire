@@ -53,8 +53,8 @@ uint32_t CalcBattle::calculateMaxHp( PlayerPtr pPlayer )
    auto classInfoIt = g_exdData.m_classJobInfoMap.find( pPlayer->getClass() );
    auto paramGrowthInfoIt = g_exdData.m_paramGrowthInfoMap.find( pPlayer->getLevel() );
 
-   if (classInfoIt == g_exdData.m_classJobInfoMap.end() ||
-      paramGrowthInfoIt == g_exdData.m_paramGrowthInfoMap.end())
+   if ( classInfoIt == g_exdData.m_classJobInfoMap.end() ||
+      paramGrowthInfoIt == g_exdData.m_paramGrowthInfoMap.end() )
       return 0;
 
    uint8_t level = pPlayer->getLevel();
@@ -87,8 +87,8 @@ uint32_t CalcBattle::calculateMaxMp( PlayerPtr pPlayer )
    auto classInfoIt = g_exdData.m_classJobInfoMap.find( pPlayer->getClass() );
    auto paramGrowthInfoIt = g_exdData.m_paramGrowthInfoMap.find( pPlayer->getLevel() );
 
-   if (classInfoIt == g_exdData.m_classJobInfoMap.end() ||
-      paramGrowthInfoIt == g_exdData.m_paramGrowthInfoMap.end())
+   if ( classInfoIt == g_exdData.m_classJobInfoMap.end() ||
+      paramGrowthInfoIt == g_exdData.m_paramGrowthInfoMap.end() )
       return 0;
 
    float baseStat = calculateBaseStat( pPlayer );
