@@ -108,7 +108,8 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
         }
         case 0x69: // Cancel cast
         {
-           pPlayer->getCurrentAction()->setInterrupted();
+           if( pPlayer->checkAction() )
+               pPlayer->getCurrentAction()->setInterrupted();
            break;
         }
         case 0x133: // Update howtos seen
