@@ -127,43 +127,39 @@ namespace Packets {
    enum ClientZoneIpcType : uint16_t
    {
 
-      TellChatHandler          = 0x0064,// updated for sb
+      PingHandler              = 0x0065, // updated for sb
+      InitHandler              = 0x0066, // updated for sb
+      ChatHandler              = 0x0067, // updated for sb
 
-      PingHandler              = 0x0065,// updated for sb
-      InitHandler              = 0x0066,// updated for sb
-      ChatHandler              = 0x0067,// updated for sb
-
-      FinishLoadingHandler     = 0x0069,// updated for sb
+      FinishLoadingHandler     = 0x0069, // updated for sb
 
       CFCommenceHandler        = 0x006F,
       CFRegisterDuty           = 0x0071,
       CFRegisterRoulette       = 0x0072,
-
-      PlayTimeHandler          = 0x0073,// updated for sb
-      LogoutHandler            = 0x0074,// updated for sb
+      PlayTimeHandler          = 0x0073, // updated for sb
+      LogoutHandler            = 0x0074, // updated for sb
 
       CFDutyInfoHandler        = 0x0078,
 
       SocialReqSendHandler     = 0x00A5,
-      SocialListHandler        = 0x00AA,// updated for sb
-      SetSearchInfoHandler     = 0x00AC,// updated for sb
+      SocialListHandler        = 0x00AA, // updated for sb
+      SetSearchInfoHandler     = 0x00AC, // updated for sb
 
       ReqSearchInfoHandler     = 0x00AD,
 
-      BlackListHandler         = 0x00B7,// updated for sb
+      BlackListHandler         = 0x00B7, // updated for sb
 
-      LinkshellListHandler     = 0x00BF,// updated for sb
+      LinkshellListHandler     = 0x00BF, // updated for sb
 
-      FcInfoReqHandler         = 0x0100,// updated for sb
+      FcInfoReqHandler         = 0x0100, // updated for sb
 
       ZoneLineHandler          = 0x0107, // updated for sb
-      ActionHandler            = 0x0108,// updated for sb
-
-      DiscoveryHandler         = 0x0109,// updated for sb
+      ActionHandler            = 0x0108, // updated for sb
+      DiscoveryHandler         = 0x0109, // updated for sb
 
       SkillHandler             = 0x010B, // updated for sb
-      GMCommand1               = 0x010C,// updated for sb
-      GMCommand2               = 0x010D,// updated for sb
+      GMCommand1               = 0x010C, // updated for sb
+      GMCommand2               = 0x010D, // updated for sb
       UpdatePositionHandler    = 0x010F, // updated for sb
 
       InventoryModifyHandler   = 0x0116, // updated for sb
@@ -176,6 +172,8 @@ namespace Packets {
 
       ReturnEventHandler       = 0x0128,
       TradeReturnEventHandler  = 0x0129,
+
+      LinkshellEventHandler    = 0x013C,
    };
 
    ////////////////////////////////////////////////////////////////////////////////

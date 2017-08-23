@@ -85,6 +85,8 @@ Core::Network::GameConnection::GameConnection( Core::Network::HivePtr pHive,
    setZoneHandler( ClientZoneIpcType::ReturnEventHandler,      "EventHandlerReturn",    &GameConnection::eventHandler );
    setZoneHandler( ClientZoneIpcType::TradeReturnEventHandler, "EventHandlerReturn",    &GameConnection::eventHandler );
 
+   setZoneHandler( ClientZoneIpcType::LinkshellEventHandler, "LinkshellEventHandler",   &GameConnection::eventHandler );
+
    setZoneHandler( ClientZoneIpcType::CFDutyInfoHandler, "CFDutyInfoRequest",           &GameConnection::cfDutyInfoRequest );
    setZoneHandler( ClientZoneIpcType::CFRegisterDuty, "CFRegisterDuty",                 &GameConnection::cfRegisterDuty );
    setZoneHandler( ClientZoneIpcType::CFRegisterRoulette, "CFRegisterRoulette",         &GameConnection::cfRegisterRoulette );
