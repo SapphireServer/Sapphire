@@ -569,6 +569,7 @@ void Core::Network::GameConnection::tellHandler( const Packets::GamePacket& inPa
        pTargetPlayer->hasStateFlag( PlayerStateFlag::BetweenAreas1 ) )
    {
       // send error for player between areas
+      // TODO: implement me
       return;
    }
 
@@ -576,18 +577,21 @@ void Core::Network::GameConnection::tellHandler( const Packets::GamePacket& inPa
        pTargetPlayer->hasStateFlag( PlayerStateFlag::BoundByDuty1 ) )
    {
       // send error for player bound by duty
+      // TODO: implement me
       return;
    }
 
    if( pTargetPlayer->getOnlineStatus() == OnlineStatus::Busy )
    {
       // send error for player being busy
+      // TODO: implement me ( i've seen this done with packet type 67 i think )
       return;
    }
 
    GamePacketNew< FFXIVIpcTell, ServerChatIpcType > tellPacket( pPlayer->getId() );
    strcpy( tellPacket.data().msg, msg.c_str() );
    strcpy( tellPacket.data().receipientName, targetPcName.c_str() );
+   // TODO: do these have a meaning?
    //tellPacket.data().u1 = 0x92CD7337;
    //tellPacket.data().u2a = 0x2E;
    //tellPacket.data().u2b = 0x40;
