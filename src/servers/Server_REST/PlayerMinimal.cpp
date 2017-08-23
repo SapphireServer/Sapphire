@@ -247,7 +247,7 @@ namespace Core {
          " UPDATE_DATE ) "
          " VALUES (100, 100, " + std::to_string( m_iD ) + ", " + std::to_string( m_contentId ) + ", " +
          " UNHEX('" + std::string( Util::binaryToHexString( (uint8_t*)customize, size ) ) + "'), " +
-         "'" + std::string( m_name ) + "', " + std::to_string( m_voice ) + ", 1, 1, " +
+         "'" + g_database.escapeString( std::string( m_name ) ) + "', " + std::to_string( m_voice ) + ", 1, 1, " +
          std::to_string( startZone ) + ", " + std::to_string( x ) + ", " +
          std::to_string( y ) + ", " + std::to_string( z ) + ", " + std::to_string( o ) + ", " +
          std::to_string( m_accountId ) + ", UNHEX('" + std::string( Util::binaryToHexString( (uint8_t*)equipModel, 40 ) ) + "'), 1, NOW());" );
