@@ -557,7 +557,8 @@ void Core::Network::GameConnection::tellHandler( const Packets::GamePacket& inPa
    {
       GamePacketNew< FFXIVIpcTellErrNotFound, ServerChatIpcType > tellErrPacket( pPlayer->getId() );
       strcpy( tellErrPacket.data().receipientName, targetPcName.c_str() );
-      pPlayer->queueChatPacket( tellErrPacket );
+      sendSinglePacket( tellErrPacket );
+
       g_log.debug( "TargetPc not found" );
       return;
    }
