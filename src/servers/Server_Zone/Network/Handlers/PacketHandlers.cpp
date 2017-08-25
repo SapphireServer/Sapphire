@@ -590,7 +590,7 @@ void Core::Network::GameConnection::tellHandler( const Packets::GamePacket& inPa
 
    GamePacketNew< FFXIVIpcTell, ServerChatIpcType > tellPacket( pPlayer->getId() );
    strcpy( tellPacket.data().msg, msg.c_str() );
-   strcpy( tellPacket.data().receipientName, targetPcName.c_str() );
+   strcpy( tellPacket.data().receipientName, pPlayer->getName().c_str() );
    // TODO: do these have a meaning?
    //tellPacket.data().u1 = 0x92CD7337;
    //tellPacket.data().u2a = 0x2E;
