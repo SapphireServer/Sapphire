@@ -34,7 +34,13 @@ Core::Network::GameConnection::GameConnection( Core::Network::HivePtr pHive,
    auto setZoneHandler = [=]( uint16_t opcode, std::string handlerName, GameConnection::Handler pHandler )
    {
       m_zoneHandlerMap[opcode] = pHandler;
-      m_packetHandlerStrMap[opcode] = handlerName;
+      m_zoneHandlerStrMap[opcode] = handlerName;
+   };
+
+   auto setChatHandler = [=]( uint16_t opcode, std::string handlerName, GameConnection::Handler pHandler )
+   {
+      m_chatHandlerMap[opcode] = pHandler;
+      m_chatHandlerStrMap[opcode] = handlerName;
    };
 
    setZoneHandler( ClientZoneIpcType::PingHandler,          "PingHandler",              &GameConnection::pingHandler );
@@ -79,10 +85,15 @@ Core::Network::GameConnection::GameConnection( Core::Network::HivePtr pHive,
    setZoneHandler( ClientZoneIpcType::ReturnEventHandler,      "EventHandlerReturn",    &GameConnection::eventHandler );
    setZoneHandler( ClientZoneIpcType::TradeReturnEventHandler, "EventHandlerReturn",    &GameConnection::eventHandler );
 
+   setZoneHandler( ClientZoneIpcType::LinkshellEventHandler, "LinkshellEventHandler",   &GameConnection::eventHandler );
+
    setZoneHandler( ClientZoneIpcType::CFDutyInfoHandler, "CFDutyInfoRequest",           &GameConnection::cfDutyInfoRequest );
    setZoneHandler( ClientZoneIpcType::CFRegisterDuty, "CFRegisterDuty",                 &GameConnection::cfRegisterDuty );
    setZoneHandler( ClientZoneIpcType::CFRegisterRoulette, "CFRegisterRoulette",         &GameConnection::cfRegisterRoulette );
    setZoneHandler( ClientZoneIpcType::CFCommenceHandler, "CFDutyAccepted",              &GameConnection::cfDutyAccepted);
+
+
+   setChatHandler( ClientChatIpcType::TellReq, "TellReq",              &GameConnection::tellHandler);
 
 }
 
@@ -168,40 +179,78 @@ void Core::Network::GameConnection::queueOutPacket( Core::Network::Packets::Game
    m_outQueue.push( outPacket );
 }
 
-void Core::Network::GameConnection::handleGamePacket( Core::Network::Packets::GamePacketPtr pPacket )
+void Core::Network::GameConnection::handleZonePacket( const Packets::GamePacket& pPacket )
+{
+   auto it = m_zoneHandlerMap.find( pPacket.getSubType() );
+
+   std::string sessionStr = "[" + std::to_string( m_pSession->getId() ) + "]";
+
+   if( it != m_zoneHandlerMap.end() )
+   {
+      auto itStr = m_zoneHandlerStrMap.find( pPacket.getSubType() );
+      std::string name = itStr != m_zoneHandlerStrMap.end() ? itStr->second : "unknown";
+      // dont display packet notification if it is a ping or pos update, don't want the spam
+      if( pPacket.getSubType() != PingHandler &&
+          pPacket.getSubType() != UpdatePositionHandler )
+
+         g_log.debug( sessionStr + " Handling Zone IPC : " + name + "( " +
+                      boost::str( boost::format( "%|04X|" ) %
+                                         static_cast< uint32_t >( pPacket.getSubType() & 0xFFFF ) ) + " )" );
+
+      ( this->*( it->second ) )( pPacket, m_pSession->getPlayer() );
+   }
+   else
+   {
+      g_log.debug( sessionStr + " Undefined Zone IPC : Unknown ( " +
+                   boost::str( boost::format( "%|04X|" ) %
+                                      static_cast< uint32_t >( pPacket.getSubType() & 0xFFFF ) ) + " )" );
+      g_log.debug( pPacket.toString() );
+   }
+}
+
+
+void Core::Network::GameConnection::handleChatPacket( const Packets::GamePacket& pPacket )
+{
+   auto it = m_chatHandlerMap.find( pPacket.getSubType() );
+
+   std::string sessionStr = "[" + std::to_string( m_pSession->getId() ) + "]";
+
+   if( it != m_chatHandlerMap.end() )
+   {
+      auto itStr = m_chatHandlerStrMap.find( pPacket.getSubType() );
+      std::string name = itStr != m_chatHandlerStrMap.end() ? itStr->second : "unknown";
+      // dont display packet notification if it is a ping or pos update, don't want the spam
+
+      g_log.debug( sessionStr + " Handling Chat IPC : " + name + "( " +
+                   boost::str( boost::format( "%|04X|" ) %
+                                      static_cast< uint32_t >( pPacket.getSubType() & 0xFFFF ) ) + " )" );
+
+      ( this->*( it->second ) )( pPacket, m_pSession->getPlayer() );
+   }
+   else
+   {
+      g_log.debug( sessionStr + " Undefined Chat IPC : Unknown ( " +
+                  boost::str( boost::format( "%|04X|" ) %
+                                     static_cast< uint32_t >( pPacket.getSubType() & 0xFFFF ) ) + " )" );
+      g_log.debug( pPacket.toString() );
+   }
+}
+
+void Core::Network::GameConnection::handlePacket( Core::Network::Packets::GamePacketPtr pPacket )
 {
    if( !m_pSession )
       return;
 
-   /*if( m_conType == Network::ConnectionType::Zone )
+   switch( m_conType )
    {
-      g_log.debug( "Zone Packet" );
+      case Network::ConnectionType::Zone:
+         handleZonePacket( *pPacket );
+         break;
+
+      case Network::ConnectionType::Chat:
+         handleChatPacket( *pPacket );
+         break;
    }
-   else if( m_conType == Network::ConnectionType::Chat )
-   {
-      g_log.debug( "Chat Packet" );
-   }*/
-
-   auto it = m_zoneHandlerMap.find( pPacket->getSubType() );
-
-   if( it != m_zoneHandlerMap.end() )
-   {
-      auto name = m_packetHandlerStrMap[pPacket->getSubType()];
-      // dont display packet notification if it is a ping or pos update, don't want the spam
-      if( pPacket->getSubType() != ClientZoneIpcType::PingHandler &&
-          pPacket->getSubType() != ClientZoneIpcType::UpdatePositionHandler )
-         g_log.debug( "[" + std::to_string( m_pSession->getId() ) + "] Handling packet : " + name + "( " +
-                      boost::str( boost::format( "%|04X|" ) % static_cast< uint32_t >( pPacket->getSubType() & 0xFFFF ) )  + " )" );
-
-      ( this->*( it->second ) )( *pPacket, m_pSession->getPlayer() );
-   }
-   else
-   {
-      g_log.debug( "[" + std::to_string( m_pSession->getId() ) + "] Undefined packet : Unknown ( " +
-                   boost::str( boost::format( "%|04X|" ) % static_cast< uint32_t >( pPacket->getSubType() & 0xFFFF ) ) + " )" );
-      g_log.debug( pPacket->toString() );
-   }
-
 
 }
 
@@ -219,7 +268,7 @@ void Core::Network::GameConnection::processInQueue()
    // handle the incoming game packets
    while( auto pPacket = m_inQueue.pop() )
    {
-      handleGamePacket( pPacket );
+      handlePacket(pPacket);
    }
 }
 
@@ -338,27 +387,37 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
          if( !m_pSession && session )
             m_pSession = session;
 
+         GamePacket pPe( 0x00, 0x18, 0, 0, 0x07 );
+         //pPe.setValAt< uint32_t >( 0x10, 0xE0000005 );
+         pPe.setValAt< uint32_t >( 0x10, 0xE0037603 );
+         pPe.setValAt< uint32_t >( 0x14, static_cast< uint32_t >( time( nullptr ) ) );
+         sendSinglePacket( &pPe );
+
+
+
          // main connection, assinging it to the session
          if( ipcHeader.connectionType == ConnectionType::Zone )
          {
+            pPe = GamePacket( 0x00, 0x38, 0, 0, 0x02 );
+            pPe.setValAt< uint32_t >( 0x10, playerId );
+            sendSinglePacket( &pPe );
             g_log.info( "[" + std::string( id ) + "] Setting session for zone connection" );
             session->setZoneConnection( pCon );
          }
          // chat connection, assinging it to the session
          else if( ipcHeader.connectionType == ConnectionType::Chat )
          {
+            pPe = GamePacket( 0x00, 0x38, 0, 0, 0x02 );
+            pPe.setValAt< uint32_t >( 0x10, playerId );
+            sendSinglePacket( &pPe );
+
             g_log.info( "[" + std::string( id ) + "] Setting session for chat connection" );
             session->setChatConnection( pCon );
+            pPe = GamePacket( 0x02, 0x28, playerId, playerId, 0x03 );
+            sendSinglePacket( &pPe );
          }
 
-         GamePacket pPe( 0x00, 0x18, 0, 0, 0x07 );
-         pPe.setValAt< uint32_t >( 0x10, 0xE0000005 );
-         pPe.setValAt< uint32_t >( 0x14, static_cast< uint32_t >( time( nullptr ) ) );
-         sendSinglePacket( &pPe );
 
-         pPe = GamePacket( 0x00, 0x38, 0, 0, 0x02 );
-         pPe.setValAt< uint32_t >( 0x10, playerId );
-         sendSinglePacket( &pPe );
 
          break;
 

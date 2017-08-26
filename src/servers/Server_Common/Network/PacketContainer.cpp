@@ -35,6 +35,8 @@ void Core::Network::Packets::PacketContainer::fillSendBuffer( std::vector< uint8
    using namespace std::chrono;
    auto ms = duration_cast< milliseconds >( system_clock::now().time_since_epoch() );
    uint64_t tick = ms.count();
+   m_ipcHdr.unknown_0 = 0xE2465DFF41a05252;
+   m_ipcHdr.unknown_8 = 0x75C4997B4D642A7F;
    m_ipcHdr.timestamp = tick;
    m_ipcHdr.unknown_20 = 1;
 

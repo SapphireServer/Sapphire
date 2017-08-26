@@ -235,7 +235,7 @@ std::vector<Core::PlayerMinimal> Core::Network::SapphireAPI::getCharList( uint32
 
 bool Core::Network::SapphireAPI::checkNameTaken( std::string name )
 {
-   std::string query = "SELECT * FROM charabase WHERE Name = '" + name + "';";
+   std::string query = "SELECT * FROM charabase WHERE Name = '" + g_database.escapeString( name ) + "';";
 
    auto pQR = g_database.query( query );
 
