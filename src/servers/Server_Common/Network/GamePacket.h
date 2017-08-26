@@ -38,27 +38,32 @@ public:
    template<class T>
    void setValAt( uint16_t pos, T value )
    {
+      assert( m_segHdr.size > pos );
       memcpy( reinterpret_cast< uint8_t* >( &m_dataBuf[0] + pos ), &value, sizeof( T ) );
    }
 
    template<class T>
    T getValAt( uint16_t pos ) const
    {
+      assert(m_segHdr.size > pos);
       return *reinterpret_cast< const T* >( &m_dataBuf[0] + pos );
    }
 
    void setBytesAt( uint16_t offset, uint8_t * bytes, uint16_t length )
    {
+      assert(m_segHdr.size > offset);
       memcpy( reinterpret_cast< uint8_t* >( &m_dataBuf[0] + offset ), bytes, length );
    }
 
    const char * getStringAt( uint16_t pos ) const
    {
+      assert(m_segHdr.size > pos);
       return reinterpret_cast< const char* >( &m_dataBuf[0] + pos );
    }
 
    void setStringAt( uint16_t pos, const std::string& str )
    {
+      assert(m_segHdr.size > pos);
       memcpy( reinterpret_cast< uint8_t* >( &m_dataBuf[0] + pos ), str.c_str(), str.length() );
    }
 
