@@ -2,9 +2,9 @@
 #include <src/servers/Server_Common/Network/CommonNetwork.h>
 #include <src/servers/Server_Common/Database/Database.h>
 #include <src/servers/Server_Common/Util/Util.h>
-#include <src/servers/Server_Common/Util/UtilNetwork.h>
 #include <src/servers/Server_Common/Logging/Logger.h>
 #include <src/servers/Server_Common/Network/PacketContainer.h>
+#include <src/servers/Server_Common/Network/GamePacketParser.h>
 #include <boost/format.hpp>
 
 #include "GameConnection.h"
@@ -112,30 +112,45 @@ void Core::Network::GameConnection::OnRecv( std::vector< uint8_t > & buffer )
 {
    // This is assumed packet always start with valid FFXIVARR_PACKET_HEADER for now.
 
-   // not enough bytes for packet header, drop connection for now.
-   // TODO: buffer it
+   Packets::FFXIVARR_PACKET_HEADER packetHeader;   
+   const auto headerResult = Packets::getHeader(buffer, 0, packetHeader);
 
-   // Dissect packet header
-   Packets::FFXIVARR_PACKET_HEADER ipcHeader;
-   if ( !Network::Util::bufferToPacketHeader( buffer, ipcHeader ) )
+   if (headerResult == Incomplete)
    {
-      g_log.info("FIXME: Dropping connection due to incomplete packet header.");
-      g_log.info("See https://github.com/SapphireMordred/Sapphire/issues/24 for more info.");
+      g_log.info("Dropping connection due to incomplete packet header.");
+      g_log.info("FIXME: Packet message bounary is not implemented.");
       Disconnect();
       return;
    }
-
+   
+   if (headerResult == Malformed)
+   {
+      g_log.info("Dropping connection due to malformed packet header.");
+      Disconnect();
+      return;
+   }
+   
    // Dissect packet list
    std::vector< Packets::FFXIVARR_PACKET_RAW > packetList;
-   if ( !Network::Util::bufferToPacketList( buffer, ipcHeader, packetList ) )
+   const auto packetResult = Packets::getPackets(buffer, sizeof(struct FFXIVARR_PACKET_HEADER), packetHeader, packetList);
+   
+   if (packetResult == Incomplete)
    {
-      g_log.info("Dropping connection due to incomplete message.");
+      g_log.info("Dropping connection due to incomplete packets.");
+      g_log.info("FIXME: Packet message bounary is not implemented.");
       Disconnect();
       return;
    }
 
+   if (packetResult == Malformed)
+   {
+      g_log.info("Dropping connection due to malformed packets.");
+      Disconnect();
+      return;
+   }
+   
    // Handle it
-   handlePackets( ipcHeader, packetList );
+   handlePackets( packetHeader, packetList );
 }
 
 void Core::Network::GameConnection::OnError( const boost::system::error_code & error )
