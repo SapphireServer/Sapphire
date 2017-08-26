@@ -35,6 +35,7 @@ public:
    void scriptReload( char * data, Entity::PlayerPtr pPlayer, boost::shared_ptr<DebugCommand> command );
 
    void injectPacket( char * data, Entity::PlayerPtr pPlayer, boost::shared_ptr<DebugCommand> command );
+   void injectChatPacket( char * data, Entity::PlayerPtr pPlayer, boost::shared_ptr<DebugCommand> command );
    void nudge( char* data, Entity::PlayerPtr pPlayer, boost::shared_ptr<DebugCommand> command );
 
 };

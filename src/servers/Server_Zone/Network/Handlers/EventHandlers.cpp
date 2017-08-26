@@ -129,6 +129,16 @@ void Core::Network::GameConnection::eventHandler( const Packets::GamePacket& inP
       break;
    }
 
+   case ClientZoneIpcType::LinkshellEventHandler:
+   {
+      uint32_t eventId = inPacket.getValAt< uint32_t >( 0x20 );
+      uint16_t subEvent = inPacket.getValAt< uint16_t >( 0x24 );
+      std::string lsName = inPacket.getStringAt( 0x27 );
+
+      abortEventFunc( pPlayer, 0, eventId );
+      break;
+   }
+
    }
 
 }
