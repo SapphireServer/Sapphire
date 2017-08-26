@@ -1,6 +1,9 @@
 #include "CommonNetwork.h"
 #include "GamePacketParser.h"
 
+#include <string>   // memcpy
+#include <stdlib.h> //realloc
+
 using namespace Core::Network::Packets;
 
 namespace Core
