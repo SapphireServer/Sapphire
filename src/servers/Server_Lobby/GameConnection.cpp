@@ -1,11 +1,11 @@
 #include <src/servers/Server_Common/Common.h>
 #include <src/servers/Server_Common/Network/CommonNetwork.h>
 #include <src/servers/Server_Common/Util/Util.h>
-#include <src/servers/Server_Common/Util/UtilNetwork.h>
 #include <src/servers/Server_Common/Logging/Logger.h>
 #include <src/servers/Server_Common/Network/GamePacket.h>
 #include <src/servers/Server_Common/Network/GamePacketNew.h>
 #include <src/servers/Server_Common/Network/PacketDef/Lobby/ServerLobbyDef.h>
+#include "Server_Common/Network/GamePacketParser.h"
 #include <src/servers/Server_Common/Crypt/md5.h>
 
 #include <boost/format.hpp>
@@ -22,7 +22,6 @@
 #include "LobbySession.h"
 #include "Forwards.h"
 #include "src/servers/Server_Common/Crypt/blowfish.h"
-
 
 
 
@@ -65,12 +64,45 @@ void Core::Network::GameConnection::OnDisconnect()
 
 void Core::Network::GameConnection::OnRecv( std::vector< uint8_t > & buffer )
 {
-   Packets::FFXIVARR_PACKET_HEADER ipcHeader;
+   Packets::FFXIVARR_PACKET_HEADER packetHeader;
+   const auto headerResult = Packets::getHeader(buffer, 0, packetHeader);
+
+   if (headerResult == Incomplete)
+   {
+      g_log.info("Dropping connection due to incomplete packet header.");
+      g_log.info("FIXME: Packet message bounary is not implemented.");
+      Disconnect();
+      return;
+   }
+
+   if (headerResult == Malformed)
+   {
+      g_log.info("Dropping connection due to malformed packet header.");
+      Disconnect();
+      return;
+   }
+
+   // Dissect packet list
    std::vector< Packets::FFXIVARR_PACKET_RAW > packetList;
+   const auto packetResult = Packets::getPackets(buffer, sizeof(struct FFXIVARR_PACKET_HEADER), packetHeader, packetList);
 
-   Network::Util::bufferToPacketList( buffer, ipcHeader, packetList );
+   if (packetResult == Incomplete)
+   {
+      g_log.info("Dropping connection due to incomplete packets.");
+      g_log.info("FIXME: Packet message bounary is not implemented.");
+      Disconnect();
+      return;
+   }
 
-   handlePackets( ipcHeader, packetList );
+   if (packetResult == Malformed)
+   {
+      g_log.info("Dropping connection due to malformed packets.");
+      Disconnect();
+      return;
+   }
+
+   // Handle it
+   handlePackets(packetHeader, packetList);
 
 }
 
