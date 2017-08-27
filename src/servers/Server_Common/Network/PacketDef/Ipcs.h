@@ -98,6 +98,9 @@ namespace Packets {
       EventPlay                  = 0x0154, // updated for sb
       EventStart                 = 0x015D, // updated for sb
       EventFinish                = 0x015E, // updated for sb
+
+      EventLinkshell             = 0x0169,
+
       QuestActiveList            = 0x0171, // updated for sb
       QuestUpdate                = 0x0172, // updated for sb
       QuestCompleteList          = 0x0173, // updated for sb
@@ -173,7 +176,8 @@ namespace Packets {
       ReturnEventHandler       = 0x0128,
       TradeReturnEventHandler  = 0x0129,
 
-      LinkshellEventHandler    = 0x013C,
+      LinkshellEventHandler    = 0x013B,
+      LinkshellEventHandler1   = 0x013C,
    };
 
    ////////////////////////////////////////////////////////////////////////////////
