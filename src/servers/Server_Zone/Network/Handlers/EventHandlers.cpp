@@ -2,6 +2,7 @@
 #include <src/servers/Server_Common/Network/CommonNetwork.h>
 #include <src/servers/Server_Common/Network/GamePacketNew.h>
 #include <src/servers/Server_Common/Network/PacketContainer.h>
+#include <src/servers/Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
 
 #include <boost/format.hpp>
 
@@ -130,12 +131,22 @@ void Core::Network::GameConnection::eventHandler( const Packets::GamePacket& inP
    }
 
    case ClientZoneIpcType::LinkshellEventHandler:
+   case ClientZoneIpcType::LinkshellEventHandler1:
    {
       uint32_t eventId = inPacket.getValAt< uint32_t >( 0x20 );
       uint16_t subEvent = inPacket.getValAt< uint16_t >( 0x24 );
       std::string lsName = inPacket.getStringAt( 0x27 );
 
-      abortEventFunc( pPlayer, 0, eventId );
+
+
+      GamePacketNew< FFXIVIpcEventLinkshell, ServerZoneIpcType > linkshellEvent( pPlayer->getId() );
+      linkshellEvent.data().eventId = eventId;
+      linkshellEvent.data().scene = subEvent;
+      linkshellEvent.data().param3 = 1;
+      linkshellEvent.data().unknown1 = 0x15a;
+      pPlayer->queuePacket( linkshellEvent );
+
+//      abortEventFunc( pPlayer, 0, eventId );
       break;
    }
 

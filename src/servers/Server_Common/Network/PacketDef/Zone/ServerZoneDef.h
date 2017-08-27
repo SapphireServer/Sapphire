@@ -1050,6 +1050,24 @@ struct FFXIVIpcEventFinish : FFXIVIpcBasePacket<EventFinish>
    /* 000C */ uint32_t padding1;
 };
 
+
+/**
+* Structural representation of the packet sent by the server
+* to respond to a linkshell creation event
+*/
+struct FFXIVIpcEventLinkshell : FFXIVIpcBasePacket<EventLinkshell>
+{
+   uint32_t eventId;
+   uint8_t scene;
+   uint8_t param1;
+   uint8_t param2;
+   uint8_t param3;
+   uint32_t unknown1;
+   uint32_t unknown2;
+   uint32_t unknown3;
+   uint32_t unknown4;
+};
+
 /**
 * Structural representation of the packet sent by the server
 * to send the active quests
