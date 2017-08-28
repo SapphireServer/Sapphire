@@ -41,8 +41,7 @@ Core::LinkshellMgr g_linkshellMgr;
 
 
 Core::ServerZone::ServerZone( const std::string& configPath, uint16_t serverId )
-   : m_serverId( serverId )
-   , m_configPath( configPath )
+   : m_configPath( configPath )
 {
    m_pConfig = XMLConfigPtr( new XMLConfig );
 }
@@ -82,12 +81,6 @@ Core::Entity::BattleNpcTemplatePtr Core::ServerZone::getBnpcTemplate( std::strin
       return nullptr;
 
    return it->second;
-}
-
-
-void Core::ServerZone::setServerId( uint16_t serverId )
-{
-   m_serverId = serverId;
 }
 
 bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
@@ -177,11 +170,8 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
       return false;
    }
 
-   m_serverId = m_serverId ? m_serverId : m_pConfig->getValue< uint16_t >( "Settings.General.ServerId" );
    m_port = m_pConfig->getValue< uint16_t >( "Settings.General.ListenPort", 54992 );
    m_ip = m_pConfig->getValue< std::string >( "Settings.General.ListenIp", "0.0.0.0" );;
-
-   g_log.info( "Server ID: " + std::to_string( m_serverId ) );
 
    return true;
 }
@@ -189,7 +179,7 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
 void Core::ServerZone::run( int32_t argc, char* argv[] )
 {
    // TODO: add more error checks for the entire initialisation
-   g_log.setLogPath( "log\\SapphireZone_" + std::to_string( m_serverId ) + "_" );
+   g_log.setLogPath( "log\\SapphireZone_" );
    g_log.init();
 
    g_log.info( "===========================================================" );
@@ -368,10 +358,4 @@ void Core::ServerZone::updateSession( std::string playerName )
    if( it != m_playerSessionMap.end() )
       it->second->loadPlayer();
 }
-
-uint16_t  Core::ServerZone::getServerId() const
-{
-   return m_serverId;
-}
-
 
