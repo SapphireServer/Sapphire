@@ -23,6 +23,12 @@ namespace Core {
             m_pValue = value;
          }
 
+         // set value
+         __inline void setLength( uint32_t value )
+         {
+            m_size = value;
+         }
+
          // return as string
          __inline const char *getString()
          {
@@ -91,6 +97,11 @@ namespace Core {
             return m_pValue ? static_cast< int32_t >( atol( m_pValue ) ) : 0;
          }
 
+         __inline uint32_t getLength()
+         {
+            return m_size;
+         }
+
          // return as unsigned 64 bit integer
          uint64_t getUInt64()
          {
@@ -113,6 +124,7 @@ namespace Core {
 
       private:
          char *m_pValue;
+         uint32_t m_size;
       };
 
 

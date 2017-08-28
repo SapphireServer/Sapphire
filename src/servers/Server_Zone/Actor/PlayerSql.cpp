@@ -128,11 +128,11 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
    m_pos.z = field[8].getFloat();
    setRotation( field[9].getFloat() );
 
-   field[11].getBinary( reinterpret_cast< char* >( m_customize ), 26 );
+   field[11].getBinary( reinterpret_cast< char* >( m_customize ), sizeof( m_customize ) );
 
    m_modelMainWeapon = field[12].getUInt64();
 
-   field[14].getBinary( reinterpret_cast< char* >( m_modelEquip ), 40 );
+   field[14].getBinary( reinterpret_cast< char* >( m_modelEquip ), sizeof( m_modelEquip ) );
 
    m_guardianDeity = field[15].getUInt8();
    m_birthDay = field[16].getUInt8();
@@ -147,15 +147,15 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
 
    m_voice = field[23].getUInt32();
 
-   field[24].getBinary( reinterpret_cast< char* >( m_questCompleteFlags ), 200 );
+   field[24].getBinary( reinterpret_cast< char* >( m_questCompleteFlags ), sizeof( m_questCompleteFlags ) );
 
-   field[25].getBinary( reinterpret_cast< char* >( m_questTracking ), 10 );
+   field[25].getBinary( reinterpret_cast< char* >( m_questTracking ), sizeof( m_questTracking ) );
 
    m_bNewGame = field[26].getBool();
 
    field[27].getBinary( reinterpret_cast< char* >( m_aetheryte ), sizeof( m_aetheryte ) );
 
-   field[28].getBinary( reinterpret_cast< char* >( m_unlocks ), 64 );
+   field[28].getBinary( reinterpret_cast< char* >( m_unlocks ), sizeof( m_unlocks ) );
 
    field[29].getBinary( reinterpret_cast< char* >( m_discovery ), sizeof( m_discovery ) );
 
@@ -165,7 +165,7 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
    m_bNewAdventurer = field[32].getBool();
 
    m_gc = field[33].getUInt8();
-   field[34].getBinary( reinterpret_cast< char* >( m_gcRank ), 3 );
+   field[34].getBinary( reinterpret_cast< char* >( m_gcRank ), sizeof( m_gcRank ) );
 
    m_cfPenaltyUntil = field[35].getUInt32();
 

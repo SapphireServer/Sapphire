@@ -47,16 +47,24 @@ namespace Packets {
       Ping                       = 0x0065, // updated for sb
       Init                       = 0x0066, // updated for sb
       Chat                       = 0x0067, // updated for sb
+
       Logout                     = 0x0077, // updated for sb
+      CFNotify                   = 0x0078,
+      CFMemberStatus             = 0x0079,
+      CFDutyInfo                 = 0x007A,
+      CFPlayerInNeed             = 0x007F,
+
       Playtime                   = 0x00AF, // updated for sb
       SocialRequestError         = 0x00AD,
       SocialRequestResponse      = 0x11AF,
+      CFRegistered               = 0x00B0,
       SocialList                 = 0x00B4, // updated for sb
       UpdateSearchInfo           = 0x00B6, // updated for sb
       InitSearchInfo             = 0x00B7, // updated for sb
       ServerNotice               = 0x00BC, // updated for sb
       SetOnlineStatus            = 0x00BD, // updated for sb
       BlackList                  = 0x00CA, // updated for sb
+      LogMessage                 = 0x00D0, // updated for sb
       LinkshellList              = 0x00D1, // updated for sb
       StatusEffectList           = 0x00F0, // updated for sb
       Effect                     = 0x00F1, // updated for sb
@@ -77,10 +85,10 @@ namespace Packets {
       ModelEquip                 = 0x0124, // updated for sb
       ItemInfo                   = 0x0139, // updated for sb
       ContainerInfo              = 0x013A, // updated for sb
-      InventoryTransactionFinish = 0x013B,
-      InventoryTransaction       = 0x012A,
+      InventoryTransactionFinish = 0x013B, // updated for sb
+      InventoryTransaction       = 0x013C, // updated for sb
       CurrencyCrystalInfo        = 0x013D,
-      InventoryActionAck         = 0x0139,
+      InventoryActionAck         = 0x1139,
       UpdateInventorySlot        = 0x0140, // updated for sb
       AddStatusEffect            = 0x0141,
       ActorControl142            = 0x0142, // unchanged for sb
@@ -88,12 +96,7 @@ namespace Packets {
       ActorControl144            = 0x0144, // unchanged for sb
       UpdateHpMpTp               = 0x0145, // unchanged for sb
 
-      CFNotify                   = 0x0078,
-      CFMemberStatus             = 0x0079,
-      CFDutyInfo                 = 0x007A,
-      CFPlayerInNeed             = 0x007F,
-      CFRegistered               = 0x00B0,
-      CFAvailableContents        = 0x01CF,
+
 
       EventPlay                  = 0x0154, // updated for sb
       EventStart                 = 0x015D, // updated for sb
@@ -112,6 +115,9 @@ namespace Packets {
       InitZone                   = 0x019A, // unchanged for sb
       WeatherChange              = 0x01AF, // updated for sb
       Discovery                  = 0x01B2, // updated for sb
+
+
+      CFAvailableContents        = 0x01CF,
 
       PrepareZoning              = 0x0239, // updated for sb
 
