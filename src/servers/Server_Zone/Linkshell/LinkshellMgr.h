@@ -15,6 +15,9 @@ private:
    std::map< uint32_t, LinkshellPtr > m_linkshellIdMap;
    std::map< std::string, LinkshellPtr > m_linkshellNameMap;
 
+   LinkshellPtr getLinkshellByName( const std::string& name );
+   LinkshellPtr getLinkshellById( uint64_t lsId );
+
 public:
    LinkshellMgr();
 
