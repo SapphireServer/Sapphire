@@ -60,3 +60,21 @@ bool Core::LinkshellMgr::loadLinkshells()
    return true;
 
 }
+
+Core::LinkshellPtr Core::LinkshellMgr::getLinkshellByName( const std::string& name )
+{
+   auto it = m_linkshellNameMap.find( name );
+   if( it == m_linkshellNameMap.end() )
+      return nullptr;
+   else
+      return it->second;
+}
+
+Core::LinkshellPtr Core::LinkshellMgr::getLinkshellById( uint64_t lsId )
+{
+   auto it = m_linkshellIdMap.find( lsId );
+   if( it == m_linkshellIdMap.end() )
+      return nullptr;
+   else
+      return it->second;
+}
