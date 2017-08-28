@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdint.h>
+#include <cmath>
 
 #include <src/servers/Server_Common/Database/Database.h>
 #include <src/servers/Server_Common/Logging/Logger.h>

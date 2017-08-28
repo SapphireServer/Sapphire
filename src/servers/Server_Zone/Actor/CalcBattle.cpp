@@ -3,6 +3,7 @@
 #include "CalcBattle.h"
 #include "Actor.h"
 #include "Player.h"
+#include <cmath>
 
 using namespace Core::Entity;
 
