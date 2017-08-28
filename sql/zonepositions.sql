@@ -11,7 +11,19 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
--- Dumping data for table sapphire.zonepositions: 110 rows
+-- Dumping structure for table sapphire.zonepositions
+CREATE TABLE IF NOT EXISTS `zonepositions` (
+  `id` int(11) NOT NULL,
+  `target_zone_id` int(11) NOT NULL,
+  `pos_x` float NOT NULL,
+  `pos_y` float NOT NULL,
+  `pos_z` float NOT NULL,
+  `pos_o` float NOT NULL,
+  `radius` int(11) NOT NULL DEFAULT '2',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
+
+-- Dumping data for table sapphire.zonepositions: 121 rows
 DELETE FROM `zonepositions`;
 /*!40000 ALTER TABLE `zonepositions` DISABLE KEYS */;
 INSERT INTO `zonepositions` (`id`, `target_zone_id`, `pos_x`, `pos_y`, `pos_z`, `pos_o`, `radius`) VALUES
