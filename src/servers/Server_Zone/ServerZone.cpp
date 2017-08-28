@@ -23,6 +23,7 @@
 #include "src/servers/Server_Zone/DebugCommand/DebugCommandHandler.h"
 
 #include "Script/ScriptManager.h"
+#include "Linkshell/LinkshellMgr.h"
 
 #include "Forwards.h"
 #include <boost/foreach.hpp>
@@ -36,6 +37,7 @@ Core::DebugCommandHandler g_gameCommandMgr;
 Core::Scripting::ScriptManager g_scriptMgr;
 Core::Data::ExdData g_exdData;
 Core::ZoneMgr g_zoneMgr;
+Core::LinkshellMgr g_linkshellMgr;
 
 
 Core::ServerZone::ServerZone( const std::string& configPath, uint16_t serverId )
@@ -211,12 +213,19 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
    g_exdData.loadAetheryteInfo();
    g_exdData.loadTribeInfo();
 
+   g_log.info( "LinkshellMgr: Caching linkshells" );
+   if( !g_linkshellMgr.loadLinkshells() )
+   {
+      g_log.fatal( "Unable to load linkshells!" );
+      return;
+   }
+
    Network::HivePtr hive( new Network::Hive() );
    Network::addServerToHive< Network::GameConnection >( m_ip, m_port, hive );
 
    g_scriptMgr.init();
 
-   g_log.info( "ZoneHandler: Setting up zones" );
+   g_log.info( "ZoneMgr: Setting up zones" );
    g_zoneMgr.createZones();
 
    std::vector< std::thread > thread_list;

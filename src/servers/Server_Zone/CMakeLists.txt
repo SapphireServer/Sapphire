@@ -16,6 +16,7 @@ file(GLOB SERVER_SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
         DebugCommand/*.c*
         Event/*.c*
         Inventory/*.c*
+        Linkshell/*.c*
         Network/*.c*
         Network/Handlers/*.c*
         Network/PacketWrappers/*.c*
@@ -89,7 +90,7 @@ endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_CURRENT_SOURCE_DIR}/../../../bin/")
 
-add_executable(server_zone ${SERVER_PUBLIC_INCLUDE_FILES} ${SERVER_SOURCE_FILES})
+add_executable(server_zone ${SERVER_PUBLIC_INCLUDE_FILES} ${SERVER_SOURCE_FILES} Linkshell/Linkshell.cpp Linkshell/Linkshell.h)
 add_dependencies(server_zone Common xivdat)
 
 set_target_properties(server_zone PROPERTIES

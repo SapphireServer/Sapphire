@@ -152,6 +152,20 @@ struct FFXIVIpcBlackList : FFXIVIpcBasePacket<BlackList>
    uint32_t padding2;
 };
 
+struct FFXIVIpcLogMessage : FFXIVIpcBasePacket<LogMessage>
+{
+   uint32_t field_0;
+   uint32_t field_4;
+   uint32_t field_8;
+   uint32_t field_12;
+   uint32_t category;
+   uint32_t logMessage;
+   uint8_t field_24;
+   uint8_t field_25;
+   uint8_t field_26[32];
+   uint32_t field_58;
+};
+
 struct FFXIVIpcLinkshellList : FFXIVIpcBasePacket<LinkshellList>
 {
    struct LsEntry

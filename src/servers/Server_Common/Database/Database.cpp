@@ -30,7 +30,9 @@ QueryResult::~QueryResult()
 
 bool QueryResult::nextRow()
 {
+
    MYSQL_ROW row = mysql_fetch_row( m_result );
+   auto length = mysql_fetch_lengths( m_result );
    if( row == NULL )
    {
       return false;
@@ -39,6 +41,9 @@ bool QueryResult::nextRow()
    for( uint32_t i = 0; i < m_fieldCount; ++i )
    {
       m_currentRow[i].setValue( row[i] );
+      m_currentRow[i].setLength( 0 );
+      if( length )
+         m_currentRow[i].setLength( length[i] );
    }
 
    return true;
