@@ -30,23 +30,26 @@ bool Core::LinkshellMgr::loadLinkshells()
    {
       uint32_t linkshellId = field[0].getUInt32();
       uint32_t masterId = field[1].getUInt32();
-
       std::string name = field[3].getString();
 
-      std::vector< uint64_t > characterIdList( field[2].getLength() / 8 );
-      field[2].getBinary( reinterpret_cast< char* >( &characterIdList[0] ), field[2].getLength() );
-      std::set< uint64_t > members( characterIdList.begin(), characterIdList.end() );
+      auto func = []( std::set< uint64_t >& outList, Db::Field * pField )
+      {
+         if( pField->getLength() )
+         {
+            std::vector< uint64_t > list( pField->getLength() / 8 );
+            pField->getBinary( reinterpret_cast< char * >( &list[0] ), pField->getLength() );
+            outList.insert( list.begin(), list.end() );
+         }
+      };
 
-      //std::vector< uint64_t > leaderIdList( field[4].getLength() / 8 );
-      //field[4].getBinary( reinterpret_cast< char* >( &leaderIdList[0] ), field[4].getLength() );
-      //std::set< uint64_t > leaders( leaderIdList.begin(), leaderIdList.end() );
+      std::set< uint64_t > members;
+      func( members, &field[2] );
 
       std::set< uint64_t > leaders;
+      func( members, &field[4] );
 
-      //std::vector< uint64_t > inviteIdList( field[5].getLength() / 8 );
-      //field[5].getBinary( reinterpret_cast< char* >( &leaderIdList[0] ), field[5].getLength() );
-      //std::set< uint64_t > invites( inviteIdList.begin(), inviteIdList.end() );
       std::set< uint64_t > invites;
+      func( members, &field[5] );
 
       auto lsPtr = boost::make_shared< Linkshell >( linkshellId, name, masterId, members, leaders, invites );
       m_linkshellIdMap[linkshellId] = lsPtr;

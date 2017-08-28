@@ -44,7 +44,6 @@ namespace Core {
 
    private:
 
-      uint16_t m_serverId;
       uint16_t m_port;
       std::string m_ip;
 
