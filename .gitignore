@@ -1,6 +1,10 @@
 ﻿# Output Directory
 [Bb]in/
 
+# Script Directory
+# TODO: Sperate script directory from bin
+!bin/scripts/**/*
+
 # Build Directory
 build/
 
