@@ -216,7 +216,7 @@ void Core::Entity::Actor::die()
    // if the actor is a player, the update needs to be send to himself too
    bool selfNeedsUpdate = isPlayer();
 
-   sendToInRangeSet( ActorControlPacket142( m_id, SetStatus, static_cast< uint8_t>( ActorStatus::Dead ) ), selfNeedsUpdate );
+   sendToInRangeSet( ActorControlPacket142( m_id, SetStatus, static_cast< uint8_t >( ActorStatus::Dead ) ), selfNeedsUpdate );
 
    // TODO: not all actor show the death animation when they die, some quest npcs might just despawn
    //       although that might be handled by setting the HP to 1 and doing some script magic

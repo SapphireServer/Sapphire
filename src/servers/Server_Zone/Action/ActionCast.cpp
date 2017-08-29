@@ -56,7 +56,7 @@ void Core::Action::ActionCast::onStart()
    castPacket.data().cast_time = m_castTime;
    castPacket.data().target_id = m_pTarget->getId();
 
-   m_pSource->sendToInRangeSet( castPacket, true );
+   m_pSource->sendToInRangeSet( castPacket, false );
    m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::Casting );
    m_pSource->getAsPlayer()->sendStateFlags();
 
