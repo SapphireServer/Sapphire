@@ -1,11 +1,9 @@
 <Settings>
 
    <General>
-      <!-- ID of this server -->
-      <ServerId>100</ServerId> 
       <!-- Port the zone server accepts game conenctions on -->
       <ListenPort>54992</ListenPort> 
-	  <!-- Ip the zone server conenctions on -->
+      <!-- Ip the zone server conenctions on -->
       <ListenIp>127.0.0.1</ListenIp>
       <!-- Path of FFXIV dat files -->
       <DataPath>C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv</DataPath>
