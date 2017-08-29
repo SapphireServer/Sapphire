@@ -20,9 +20,6 @@ namespace Core {
 
       void run( int32_t argc, char* argv[] );
 
-      void setServerId( uint16_t serverId );
-      uint16_t getServerId() const;
-
       bool createSession( uint32_t sessionId );
       void removeSession( uint32_t sessionId );
       void removeSession( std::string playerName );
