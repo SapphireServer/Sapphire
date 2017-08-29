@@ -1,4 +1,4 @@
-#include <math.h>
+#include <cmath>
 #include "UtilMath.h"
 
 float Core::Math::Util::distanceSq( float x, float y, float z, float x1, float y1, float z1 )
