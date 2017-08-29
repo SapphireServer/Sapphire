@@ -27,7 +27,6 @@ bool Core::LinkshellMgr::loadLinkshells()
 
    Db::Field *field = res->fetch();
 
-
    do
    {
       uint32_t linkshellId = field[0].getUInt32();
