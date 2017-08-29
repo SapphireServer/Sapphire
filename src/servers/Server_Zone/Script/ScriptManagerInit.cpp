@@ -174,7 +174,7 @@ int Core::Scripting::ScriptManager::init()
    std::set< std::string > chaiFiles;
 
    g_log.info( "ScriptEngine: Loading Scripts..." );
-   loadDir( "scripts/chai", chaiFiles );
+   loadDir( "../scripts/chai", chaiFiles );
 
    uint16_t scriptCount = 0;
    uint16_t errorCount = 0;
