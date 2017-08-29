@@ -20,8 +20,10 @@ bool Core::LinkshellMgr::loadLinkshells()
                                         "LinkshellName, LeaderIdList, InviteIdList "
                                         "FROM infolinkshell "
                                 "ORDER BY LinkshellId ASC;" );
+
+   // we do not really need linkshells to function...
    if( !res )
-      return false;
+      return true;
 
    Db::Field *field = res->fetch();
 
