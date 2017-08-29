@@ -116,7 +116,7 @@ void Core::StatusEffect::StatusEffectContainer::sendUpdate()
       slot++;
    }
 
-   bool sendToSelf = m_pOwner->isPlayer() ? true : false;
+   bool sendToSelf = m_pOwner->isPlayer();
    m_pOwner->sendToInRangeSet( statusEffectList, sendToSelf );
 
 }
