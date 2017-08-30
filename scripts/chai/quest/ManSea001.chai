@@ -113,7 +113,7 @@ class ManSea001Def
 				if( param2 == 1 )
 				{
 					player.questUpdate( ManSea001.id, ManSea001.SEQ_FINISH );
-					player.prepareZoning( player.getZoneId(), true );
+					player.prepareZoning( player.getZoneId(), true, 1, 0 );
 					player.changePos( 9, 40, 14, 2 );
 				}
             });

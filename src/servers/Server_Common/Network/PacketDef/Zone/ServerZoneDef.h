@@ -1192,12 +1192,14 @@ struct FFXIVIpcPrepareZoning : FFXIVIpcBasePacket<PrepareZoning>
 {
    uint32_t logMessage;
    uint16_t targetZone;
-   uint16_t param3;
+   uint16_t animation;
    uint8_t param4;
    uint8_t hideChar;
    uint8_t fadeOut;
    uint8_t param7;
-   uint32_t padding;
+   uint8_t fadeOutTime;
+   uint8_t unknown;
+   uint16_t padding;
 };
 
 /**
