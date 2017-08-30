@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `zonepositions` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
 
--- Dumping data for table sapphire.zonepositions: 135 rows
+-- Dumping data for table sapphire.zonepositions: 144 rows
 DELETE FROM `zonepositions`;
 /*!40000 ALTER TABLE `zonepositions` DISABLE KEYS */;
 INSERT INTO `zonepositions` (`id`, `target_zone_id`, `pos_x`, `pos_y`, `pos_z`, `pos_o`, `radius`) VALUES
@@ -170,7 +170,20 @@ INSERT INTO `zonepositions` (`id`, `target_zone_id`, `pos_x`, `pos_y`, `pos_z`, 
 	(5877731, 398, 527.068, -51.275, 44.389, 2.778, 2),
 	(5877743, 398, -295.193, -21.131, 30.783, -1.449, 2),
 	(5877767, 400, 244.675, -42.223, 589.172, 1.071, 2),
-	(5877776, 400, -577.575, 48.808, 305.611, -0.752, 2);
+	(5877776, 400, -577.575, 48.808, 305.611, -0.752, 2),
+	(4168380, 130, 65.298, 4, -118.459, -0.312, 2),
+	(4168385, 130, -154.348, 14.005, 70.563, -0.192, 2),
+	(4169078, 131, -52.238, 10, 10.248, -0.679, 2),
+	(4203093, 131, -20.026, 14.049, 74.811, 2.875, 2),
+	(4169094, 131, 30.708, 12.056, 111.8, 1.098, 2),
+	(4194547, 131, 91.638, 12, 59.42, -2.105, 2),
+	(6953712, 131, 131.552, 4, -31.932, 0.23, 2),
+	(4203094, 131, 3.728, 29.999, -23.907, 1.886, 2),
+	(4169099, 131, -99.958, 41, 88.312, 1.483, 2),
+	(6390350, 130, -26.465, 83, -17.332, -0.148, 2),
+	(4169491, 140, 467.013, 96.62, 159.009, -1.692, 2),
+	(4169494, 141, -115.018, 18.377, 333.546, 2.882, 2),
+	(4169496, 141, 18.549, 18.377, 565.206, 1.345, 2);
 /*!40000 ALTER TABLE `zonepositions` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
