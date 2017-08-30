@@ -1516,10 +1516,11 @@ void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, 
    case Core::Common::HandleSkillType::StdDamage:
    {
       sendDebug( "STD_DAMAGE" );
+
       GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket( getId() );
       effectPacket.data().targetId = pTarget.getId();
       effectPacket.data().actionAnimationId = actionId;
-      effectPacket.data().unknown_2 = 0;
+      effectPacket.data().unknown_2 = 1;  // This seems to have an effect on the "double-cast finish" animation
       //   effectPacket.data().unknown_3 = 1;
       effectPacket.data().actionTextId = actionId;
       effectPacket.data().numEffects = 1;
@@ -1531,6 +1532,9 @@ void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, 
       effectPacket.data().effects[0].unknown_3 = 7;
 
       sendToInRangeSet( effectPacket, true );
+
+      if (!pTarget.isAlive())
+         break;
 
       pTarget.takeDamage( param1 );
       pTarget.onActionHostile( shared_from_this() );
@@ -1546,7 +1550,7 @@ void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, 
       GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket( getId() );
       effectPacket.data().targetId = pTarget.getId();
       effectPacket.data().actionAnimationId = actionId;
-      effectPacket.data().unknown_2 = 0;
+      effectPacket.data().unknown_2 = 1;  // This seems to have an effect on the "double-cast finish" animation
       //   effectPacket.data().unknown_3 = 1;
       effectPacket.data().actionTextId = actionId;
       effectPacket.data().numEffects = 1;
@@ -1558,6 +1562,9 @@ void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, 
       effectPacket.data().effects[0].unknown_3 = 7;
 
       sendToInRangeSet( effectPacket, true );
+
+      if ( !pTarget.isAlive() )
+         break;
 
       pTarget.heal( calculatedHeal );
       break;

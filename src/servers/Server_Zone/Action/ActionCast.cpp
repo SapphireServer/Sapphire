@@ -53,7 +53,7 @@ void Core::Action::ActionCast::onStart()
 
    castPacket.data().action_id = m_id;
    castPacket.data().unknown = 1;
-   castPacket.data().cast_time = m_castTime;
+   castPacket.data().cast_time = m_castTime / 1000; // This is used for the cast bar above the target bar of the caster.
    castPacket.data().target_id = m_pTarget->getId();
 
    m_pSource->sendToInRangeSet( castPacket, false );
