@@ -114,6 +114,13 @@ namespace Core {
          FadeIn = 5,
       };
 
+      enum struct ResurrectType : uint8_t
+      {
+         None = 0,
+         RaiseSpell = 5,
+         Return = 8
+      };
+
       enum Tribe : uint8_t
       {
          Midlander = 1,

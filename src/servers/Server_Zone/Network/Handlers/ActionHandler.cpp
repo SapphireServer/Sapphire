@@ -128,8 +128,19 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
         }
         case 0xC8: // return dead
         {
-            pPlayer->returnToHomepoint();
-            break;
+           switch ( static_cast < ResurrectType >( param1 ) )
+           {
+              case ResurrectType::RaiseSpell:
+                 // todo: handle raise case (set position to raiser, apply weakness status, set hp/mp/tp as well as packet)
+                 pPlayer->returnToHomepoint();
+                 break;
+              case ResurrectType::Return:
+                 pPlayer->returnToHomepoint();
+                 break;
+              default:
+                 break;
+           }
+            
         }
         case 0xC9: // Finish zoning
         {
