@@ -104,11 +104,11 @@ void Core::Action::ActionTeleport::onInterrupt()
    if( !m_pSource )
       return;
 
-   m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied1 );
+   m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Casting );
    m_pSource->getAsPlayer()->sendStateFlags();
 
    auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt,
-                                          0x219, 0x04, m_id, 1 );
+                                          0x219, 0x04, m_id, 0 );
    m_pSource->sendToInRangeSet( control, true );
 
 }
