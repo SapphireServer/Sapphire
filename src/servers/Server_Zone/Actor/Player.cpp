@@ -176,10 +176,12 @@ uint64_t Core::Entity::Player::getOnlineStatusMask() const
    return m_onlineStatus;
 }
 
-void Core::Entity::Player::prepareZoning( uint16_t targetZone, bool fadeOut )
+void Core::Entity::Player::prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadeOutTime, uint16_t animation )
 {
    GamePacketNew< FFXIVIpcPrepareZoning, ServerZoneIpcType > preparePacket( getId() );
    preparePacket.data().targetZone = targetZone;
+   preparePacket.data().fadeOutTime = fadeOutTime;
+   preparePacket.data().animation = animation;
    preparePacket.data().fadeOut = fadeOut == true ? 1 : 0;
    queuePacket( preparePacket );
 }
@@ -307,31 +309,31 @@ void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
       // TODO: this should be simplified and a type created in server_common/common.h.
       if( type == 1 ) // teleport
       {
-         prepareZoning( data->target_zone, true );
+         prepareZoning( data->target_zone, true, 1, 112 );
          sendToInRangeSet( ActorControlPacket142( getId(), ActorDespawnEffect, 0x04 ) );
          setZoningType( Common::ZoneingType::Teleport );
       }
       else if( type == 2 ) // aethernet
       {
-         prepareZoning( data->target_zone, true );
+         prepareZoning( data->target_zone, true, 1, 112 );
          sendToInRangeSet( ActorControlPacket142( getId(), ActorDespawnEffect, 0x04 ) );
          setZoningType( Common::ZoneingType::Teleport );
       }
       else if( type == 3 ) // return
       {
-         prepareZoning( data->target_zone, true );
+         prepareZoning( data->target_zone, true, 1, 111 );
          sendToInRangeSet( ActorControlPacket142( getId(), ActorDespawnEffect, 0x03 ) );
          setZoningType( Common::ZoneingType::Return );
       }
 
-      m_queuedZoneing = boost::make_shared<QueuedZoning>( data->target_zone, pos, Util::getTimeMs(), rot );
+      m_queuedZoneing = boost::make_shared< QueuedZoning >( data->target_zone, pos, Util::getTimeMs(), rot );
 
    }
 }
 
 void Core::Entity::Player::forceZoneing( uint32_t zoneId )
 {
-   m_queuedZoneing = boost::make_shared<QueuedZoning>( zoneId, getPos(), Util::getTimeMs(), 0 );
+   m_queuedZoneing = boost::make_shared< QueuedZoning >( zoneId, getPos(), Util::getTimeMs(), 0 );
    //performZoning( zoneId, Common::ZoneingType::None, getPos() );
 }
 

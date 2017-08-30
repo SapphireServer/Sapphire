@@ -325,7 +325,7 @@ public:
    /*! perform a teleport of a specified type ( teleport,return,aethernet ) */
    void teleport( uint16_t aetheryteId, uint8_t type = 1 );
    /*! prepares zoning / fades out the screen */
-   void prepareZoning( uint16_t targetZone, bool fadeOut );
+   void prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadoutTime = 0, uint16_t animation = 0 );
 
    void calculateStats() override;
    void sendStats();
