@@ -1533,7 +1533,7 @@ void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, 
 
       sendToInRangeSet( effectPacket, true );
 
-      if (!pTarget.isAlive())
+      if ( !pTarget.isAlive() )
          break;
 
       pTarget.takeDamage( param1 );
