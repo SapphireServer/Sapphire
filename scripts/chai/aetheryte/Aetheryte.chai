@@ -29,7 +29,6 @@ class AetheryteDef
                         }
                         else if ( param1 == 512 && param2 == 4 ) // aethernet
                         {
-                           player.setTeleporting( true );
                            player.teleport( param3, 2 );
                         }
 
