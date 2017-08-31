@@ -99,11 +99,11 @@ bool Core::Network::SapphireAPI::createAccount( const std::string& username, con
    int32_t accountId = pQR->fetch()[0].getUInt32() + 1;
 
    // store the account to the db
-   g_database.execute( "INSERT INTO accounts (account_Id, account_name, account_pass, account_created) VALUE(%i, '%s', '%s', %i);",
-                        accountId,
-                        username.c_str(),
-                        pass.c_str(),
-                        time( NULL ) );
+   g_database.execute( "INSERT INTO accounts (account_Id, account_name, account_pass, account_created) VALUE( " +
+                        std::to_string( accountId ) + ", '" +
+                        username + "', '" +
+                        pass + "', " + 
+                        std::to_string( time( nullptr ) ) + ");");
 
    
    if( !login( username, pass, sId ) )

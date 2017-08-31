@@ -404,7 +404,7 @@ void Core::Entity::Player::createUpdateSql()
          updateCharaInfoSearch += entry + ", ";
 
       updateCharaInfoSearch += condition;
-      g_database.execute( updateCharaInfoSearch.c_str() );
+      g_database.execute( updateCharaInfoSearch );
    }
 
    if( !charaBaseSet.empty() )
@@ -413,7 +413,7 @@ void Core::Entity::Player::createUpdateSql()
          updateCharaBase += entry + ", ";
 
       updateCharaBase += condition;
-      g_database.execute( updateCharaBase.c_str() );
+      g_database.execute( updateCharaBase );
    }
 
    if( !charaDetailSet.empty() )
@@ -422,7 +422,7 @@ void Core::Entity::Player::createUpdateSql()
          updateCharaDetail += entry + ", ";
 
       updateCharaDetail += condition;
-      g_database.execute( updateCharaDetail.c_str() );
+      g_database.execute( updateCharaDetail );
    }
 
    if( !charaClassSet.empty() )
@@ -431,7 +431,7 @@ void Core::Entity::Player::createUpdateSql()
          updateCharaClass += entry + ", ";
 
       updateCharaClass += condition;
-      g_database.execute( updateCharaClass.c_str() );
+      g_database.execute( updateCharaClass );
    }
 
    if( !charaQuestSet.empty() )
@@ -440,7 +440,7 @@ void Core::Entity::Player::createUpdateSql()
          updateCharaQuest += entry + ", ";
 
       updateCharaQuest += condition;
-      g_database.execute( updateCharaQuest.c_str() );
+      g_database.execute( updateCharaQuest );
    }
 
    m_updateFlags = PlayerSyncFlags::None;

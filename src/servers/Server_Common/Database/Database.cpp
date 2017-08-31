@@ -116,7 +116,7 @@ bool Database::initialize( const DatabaseParams& params )
 
 uint64_t Database::getNextUId()
 {
-   execute( "INSERT INTO uniqueiddata( IdName ) VALUES( 'NOT_SET' );" );
+   execute( std::string( "INSERT INTO uniqueiddata( IdName ) VALUES( 'NOT_SET' );" ) );
    auto res = query( "SELECT LAST_INSERT_ID();" );
 
    if( !res )
@@ -193,51 +193,9 @@ QueryResult * Database::fQuery( const char * QueryString, DatabaseConnection * c
    return qResult;
 }
 
-void Database::fWaitExecute( const char * QueryString, DatabaseConnection * con )
-{
-   // Send the query
-   _SendQuery( con, QueryString, false );
-}
-
-
-bool Database::execute( const char* QueryString, ... ) {
-   char query[16384];
-
-   va_list vlist;
-   va_start( vlist, QueryString );
-   vsnprintf( query, 16384, QueryString, vlist );
-   va_end( vlist );
-
-
-   return waitExecuteNA( query );
-
-}
-
 bool Database::execute( const std::string& QueryString )
 {
    return waitExecuteNA( QueryString.c_str() );
-}
-
-bool Database::executeNA( const char* QueryString )
-{
-
-   return waitExecuteNA( QueryString );
-
-}
-
-//this will wait for completion
-bool Database::waitExecute( const char* QueryString, ... )
-{
-   char sql[16384];
-   va_list vlist;
-   va_start( vlist, QueryString );
-   vsnprintf( sql, 16384, QueryString, vlist );
-   va_end( vlist );
-
-   DatabaseConnection * con = getFreeConnection();
-   bool Result = _SendQuery( con, sql, false );
-   con->lock.unlock();
-   return Result;
 }
 
 bool Database::waitExecuteNA( const char* QueryString )
@@ -301,7 +259,6 @@ std::string Database::escapeString( const char * esc, DatabaseConnection * con )
 
 bool Database::_SendQuery( DatabaseConnection *con, const char* Sql, bool Self )
 {
-   //dunno what it does ...leaving untouched 
    int32_t result = mysql_query( con->conn, Sql );
    if( result > 0 )
    {
