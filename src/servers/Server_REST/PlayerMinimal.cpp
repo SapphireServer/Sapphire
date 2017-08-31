@@ -56,7 +56,7 @@ namespace Core {
 
       memset( m_name, 0, 32 );
 
-      strcpy( m_name, field[0].getString() );
+      strcpy( m_name, field[0].getString().c_str() );
 
       field[1].getBinary( (char*)m_look, 26 );
 
@@ -67,11 +67,11 @@ namespace Core {
          m_lookMap[i] = m_look[i];
       }
 
-      setBirthDay( field[2].getInt8(), field[3].getInt8() );
-      m_guardianDeity = field[4].getInt8();
-      m_class = field[5].getInt8();
-      m_contentId = field[7].getUInt64();
-      m_zoneId = field[8].getUInt16();
+      setBirthDay( field[2].get< int8_t >(), field[3].get< int8_t >() );
+      m_guardianDeity = field[4].get< int8_t >();
+      m_class = field[5].get< int8_t >();
+      m_contentId = field[7].get< uint64_t >();
+      m_zoneId = field[8].get< uint16_t >();
 
       auto pQR2 = g_database.query( "SELECT * FROM characlass WHERE CharacterId = " + std::to_string( charId ) + ";" );
 
@@ -80,7 +80,7 @@ namespace Core {
       for( uint8_t i = 0; i < 25; i++ )
       {
          uint8_t index = i * 2;
-         m_classMap[i] = field2[index].getUInt8();
+         m_classMap[i] = field2[index].get< uint8_t >();
          //m_expArray[i] = 
       }
    }

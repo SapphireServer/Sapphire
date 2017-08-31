@@ -30,10 +30,11 @@ namespace Core {
          }
 
          // return as string
-         __inline const char *getString()
+         __inline std::string getString()
          {
-
-            return m_pValue ? m_pValue : "";
+            if( !m_pValue )
+               return "";
+            return std::string( m_pValue );
          }
 
          // return as string
@@ -89,10 +90,6 @@ namespace Core {
          ~QueryResult();
 
          bool nextRow();
-         void Delete()
-         {
-            delete this;
-         }
 
          __inline Field* fetch()
          {
@@ -177,14 +174,14 @@ namespace Core {
       protected:
 
          // actual query function
-         bool _SendQuery( DatabaseConnection *con, const char* Sql, bool Self );
+         bool sendQuery( DatabaseConnection *con, const std::string &sql, bool Self );
          QueryResult * _StoreQueryResult( DatabaseConnection * con );
-         bool _HandleError( DatabaseConnection *conn, uint32_t ErrorNumber );
+         bool handleError( DatabaseConnection *conn, uint32_t ErrorNumber );
          bool _Reconnect( DatabaseConnection *conn );
 
          DatabaseConnection *m_pConnections;
 
-         uint32_t _counter;
+         uint32_t m_counter;
          ///////////////////////////////
 
          int32_t m_connectionCount;

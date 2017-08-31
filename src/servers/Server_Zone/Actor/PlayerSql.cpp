@@ -97,7 +97,7 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
 
    Db::Field *field = pQR->fetch();
 
-   strcpy( m_name, field[0].getString() );
+   strcpy( m_name, field[0].getString().c_str() );
 
    ZonePtr pCurrZone = g_zoneMgr.getZone( field[1].get< int32_t >() );
    m_zoneId = field[1].get< int32_t >();
@@ -258,7 +258,7 @@ bool Core::Entity::Player::loadSearchInfo()
 
    m_searchSelectClass = field[1].get< uint8_t >();
    m_searchSelectRegion = field[2].get< uint8_t >();
-   sprintf( m_searchMessage, field[3].getString() );
+   sprintf( m_searchMessage, field[3].getString().c_str() );
 
    return true;
 }

@@ -33,7 +33,7 @@ bool QueryResult::nextRow()
 
    MYSQL_ROW row = mysql_fetch_row( m_result );
    auto length = mysql_fetch_lengths( m_result );
-   if( row == NULL )
+   if( row == nullptr )
    {
       return false;
    }
@@ -52,7 +52,7 @@ bool QueryResult::nextRow()
 Database::Database()
 {
    m_port = 0;
-   _counter = 0;
+   m_counter = 0;
    m_pConnections = nullptr;
    m_connectionCount = -1;   // Not connected.
 }
@@ -77,20 +77,21 @@ bool Database::initialize( const DatabaseParams& params )
    MYSQL * temp2;
    my_bool my_true = true;
 
-   g_log.Log( Core::LoggingSeverity::info, "Database: Connecting to " + params.hostname + ", database " + params.databaseName + "..." );
+   g_log.info( "Database: Connecting to " + params.hostname + ", database " + params.databaseName + "..." );
 
    m_pConnections = new DatabaseConnection[params.connectionCount];
    for( i = 0; i < params.connectionCount; ++i )
    {
-      temp = mysql_init( NULL );
+      temp = mysql_init( nullptr );
       if( mysql_options( temp, MYSQL_SET_CHARSET_NAME, "utf8" ) )
       {
-         g_log.Log( Core::LoggingSeverity::error, "Database: Could not set utf8 character set." );
+         g_log.error( "Database: Could not set utf8 character set." );
       }
 
       if( mysql_options( temp, MYSQL_OPT_RECONNECT, &my_true ) )
       {
-         g_log.Log( Core::LoggingSeverity::error, "Database: MYSQL_OPT_RECONNECT could not be set, connection drops may occur but will be counteracted." );
+         g_log.error( "Database: MYSQL_OPT_RECONNECT could not be set, "
+                      "connection drops may occur but will be counteracted." );
       }
 
       temp2 = mysql_real_connect( temp,
@@ -103,7 +104,7 @@ bool Database::initialize( const DatabaseParams& params )
                                   0 );
       if( temp2 == NULL )
       {
-         g_log.Log( Core::LoggingSeverity::fatal, "Database: Connection failed due to: `%s`" + std::string( mysql_error( temp ) ) );
+         g_log.fatal( "Database: Connection failed due to: `%s`" + std::string( mysql_error( temp ) ) );
          return false;
       }
 
@@ -158,7 +159,7 @@ boost::shared_ptr<QueryResult> Database::query( const std::string& QueryString )
    boost::shared_ptr<QueryResult> qResult( nullptr );
    DatabaseConnection * con = getFreeConnection();
 
-   if( _SendQuery( con, QueryString.c_str(), false ) )
+   if( sendQuery(con, QueryString.c_str(), false) )
    {
       qResult = boost::shared_ptr<QueryResult>( _StoreQueryResult( con ) );
    }
@@ -170,17 +171,11 @@ boost::shared_ptr<QueryResult> Database::query( const std::string& QueryString )
 
 bool Database::execute( const std::string& QueryString )
 {
-   return waitExecuteNA( QueryString.c_str() );
-}
-
-bool Database::waitExecuteNA( const char* QueryString )
-{
    DatabaseConnection * con = getFreeConnection();
-   bool Result = _SendQuery( con, QueryString, false );
+   bool Result = sendQuery(con, QueryString, false);
    con->lock.unlock();
    return Result;
 }
-
 
 void Database::freeQueryResult( QueryResult * p )
 {
@@ -232,29 +227,29 @@ std::string Database::escapeString( const char * esc, DatabaseConnection * con )
    return std::string( ret );
 }
 
-bool Database::_SendQuery( DatabaseConnection *con, const char* Sql, bool Self )
+bool Database::sendQuery( DatabaseConnection *con, const std::string &sql, bool Self )
 {
-   int32_t result = mysql_query( con->conn, Sql );
+   int32_t result = mysql_query( con->conn, sql.c_str() );
    if( result > 0 )
    {
-      if( Self == false && _HandleError( con, mysql_errno( con->conn ) ) )
+      if( Self == false && handleError( con, mysql_errno( con->conn ) ) )
       {
          // Re-send the query, the connection was successful.
          // The true on the end will prevent an endless loop here, as it will
          // stop after sending the query twice.
-         result = _SendQuery( con, Sql, true );
+         result = sendQuery(con, sql, true);
       }
       else
       {
-         g_log.Log( Core::LoggingSeverity::error, "Database: query failed " + std::string( mysql_error( con->conn ) ) );
-         g_log.Log( Core::LoggingSeverity::error, "\t" + std::string( Sql ) );
+         g_log.error( "Database: query failed " + std::string( mysql_error( con->conn ) ) );
+         g_log.error( "\t" + std::string( sql ) );
       }
    }
 
    return ( result == 0 ? true : false );
 }
 
-bool Database::_HandleError( DatabaseConnection * con, uint32_t ErrorNumber )
+bool Database::handleError( DatabaseConnection *con, uint32_t ErrorNumber )
 {
    // Handle errors that should cause a reconnect to the CDatabase.
    switch( ErrorNumber ) {
@@ -311,7 +306,7 @@ bool Database::_Reconnect( DatabaseConnection * conn )
                                0 );
    if( temp2 == NULL )
    {
-      g_log.Log( Core::LoggingSeverity::error, "Database: Could not reconnect to database because of " + std::string( mysql_error( temp ) ) );
+      g_log.error( "Database: Could not reconnect to database because of " + std::string( mysql_error( temp ) ) );
       mysql_close( temp );
       return false;
    }
