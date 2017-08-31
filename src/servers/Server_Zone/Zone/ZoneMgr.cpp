@@ -34,14 +34,14 @@ namespace Core {
       do
       {
          Db::Field *field = pQR->fetch();
-         uint32_t id = field[0].getUInt32();
-         uint32_t targetZoneId = field[1].getUInt32();
+         uint32_t id = field[0].get< uint32_t >();
+         uint32_t targetZoneId = field[1].get< uint32_t >();
          Common::FFXIVARR_POSITION3 pos;
          pos.x = field[2].getFloat();
          pos.y = field[3].getFloat();
          pos.z = field[4].getFloat();
          float posO = field[5].getFloat();
-         uint32_t radius = field[6].getUInt32();
+         uint32_t radius = field[6].get< uint32_t >();
          
          m_zonePositionMap[id] = ZonePositionPtr( new ZonePosition( id, targetZoneId, pos, radius, posO ) );
 

@@ -61,40 +61,13 @@ namespace Core {
             return m_pValue ? atoi( m_pValue ) > 0 : false;
          }
 
-         // return as unsigned 8 bit integer
-         __inline uint8_t getUInt8()
+         template< class T >
+         __inline T get()
          {
-            return m_pValue ? static_cast< uint8_t >( atol( m_pValue ) ) : 0;
-         }
+            if( !m_pValue )
+               return 0;
 
-         // return as signed 8 bit integer
-         __inline int8_t getInt8()
-         {
-            return m_pValue ? static_cast< int8_t >( atol( m_pValue ) ) : 0;
-         }
-
-         // return as unsigned 16 bit integer
-         __inline uint16_t getUInt16()
-         {
-            return m_pValue ? static_cast< uint16_t >( atol( m_pValue ) ) : 0;
-         }
-
-         // return as signed 16 bit integer
-         __inline int16_t getInt16()
-         {
-            return m_pValue ? static_cast< int16_t >( atol( m_pValue ) ) : 0;
-         }
-
-         // return as unsigned 32 bit integer
-         __inline uint32_t getUInt32()
-         {
-            return m_pValue ? static_cast< uint32_t >( atol( m_pValue ) ) : 0;
-         }
-
-         // return as signed 8 bit integer
-         __inline int32_t getInt32()
-         {
-            return m_pValue ? static_cast< int32_t >( atol( m_pValue ) ) : 0;
+            return static_cast< T >( atol( m_pValue ) );
          }
 
          __inline uint32_t getLength()
@@ -102,25 +75,6 @@ namespace Core {
             return m_size;
          }
 
-         // return as unsigned 64 bit integer
-         uint64_t getUInt64()
-         {
-            if( m_pValue )
-            {
-		#ifdef _WIN32
-               uint64_t value;
-               sscanf( m_pValue, "%I64d", &value );
-               return value;
-		#else
-	       uint64_t value;
-               sscanf( m_pValue, "%Lu", &value );
-               return value;
-
-		#endif
-            }
-            else
-               return 0;
-         }
 
       private:
          char *m_pValue;
@@ -191,14 +145,9 @@ namespace Core {
          void shutdown();
 
          boost::shared_ptr<QueryResult> query( const std::string& QueryString );
-         QueryResult* queryNA( const char* QueryString );
-         QueryResult* fQuery( const char * QueryString, DatabaseConnection *con );
-         void fWaitExecute( const char * QueryString, DatabaseConnection *con );
-         bool waitExecute( const char* QueryString, ... );//Wait For Request Completion
          bool waitExecuteNA( const char* QueryString );//Wait For Request Completion
          bool execute( const char* QueryString, ... );
          bool execute( const std::string& QueryString );
-         bool executeNA( const char* QueryString );
 
          __inline const std::string& getHostName()
          {

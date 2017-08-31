@@ -162,24 +162,24 @@ void Zone::loadCellCache()
    do
    {
       Db::Field *field = pQR->fetch();
-      uint32_t id = field[0].getUInt32();
-      uint32_t targetZoneId = field[1].getUInt32();
-      uint32_t nameId = field[2].getUInt32();
-      uint32_t sizeId = field[3].getUInt32();
-      uint32_t classJob = field[4].getUInt32();
-      uint32_t displayFlags1 = field[5].getUInt32();
-      uint32_t displayFlags2 = field[6].getUInt32();
-      uint32_t level = field[7].getUInt32();
+      uint32_t id = field[0].get< uint32_t >();
+      uint32_t targetZoneId = field[1].get< uint32_t >();
+      uint32_t nameId = field[2].get< uint32_t >();
+      uint32_t sizeId = field[3].get< uint32_t >();
+      uint32_t classJob = field[4].get< uint32_t >();
+      uint32_t displayFlags1 = field[5].get< uint32_t >();
+      uint32_t displayFlags2 = field[6].get< uint32_t >();
+      uint32_t level = field[7].get< uint32_t >();
       float posX = field[8].getFloat();
       float posY = field[9].getFloat();
       float posZ = field[10].getFloat();
-      uint32_t rotation = field[11].getUInt32();
-      uint32_t mobType = field[12].getUInt32();
-      uint32_t behaviour = field[13].getUInt32();
-      uint64_t modelMainWeapon = field[14].getUInt32();
-      uint64_t modelSubWeapon = field[15].getUInt32();
-      uint32_t modelId = field[16].getUInt32();
-      uint32_t type = field[17].getUInt32();
+      uint32_t rotation = field[11].get< uint32_t >();
+      uint32_t mobType = field[12].get< uint32_t >();
+      uint32_t behaviour = field[13].get< uint32_t >();
+      uint64_t modelMainWeapon = field[14].get< uint32_t >();
+      uint64_t modelSubWeapon = field[15].get< uint32_t >();
+      uint32_t modelId = field[16].get< uint32_t >();
+      uint32_t type = field[17].get< uint32_t >();
 
 
       Common::FFXIVARR_POSITION3 pos;

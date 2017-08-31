@@ -126,7 +126,7 @@ uint64_t Database::getNextUId()
 
    Db::Field *field = res->fetch();
 
-   return field[0].getUInt64();
+   return field[0].get< uint64_t >();
 }
 
 DatabaseConnection * Database::getFreeConnection()
@@ -167,31 +167,6 @@ boost::shared_ptr<QueryResult> Database::query( const std::string& QueryString )
    return qResult;
 }
 
-QueryResult * Database::queryNA( const char* QueryString )
-{
-   // Send the query
-   QueryResult * qResult = NULL;
-   DatabaseConnection * con = getFreeConnection();
-
-   if( _SendQuery( con, QueryString, false ) )
-   {
-      qResult = _StoreQueryResult( con );
-   }
-
-   con->lock.unlock();
-   return qResult;
-}
-
-QueryResult * Database::fQuery( const char * QueryString, DatabaseConnection * con ) {
-   // Send the query
-   QueryResult * qResult = NULL;
-   if( _SendQuery( con, QueryString, false ) )
-   {
-      qResult = _StoreQueryResult( con );
-   }
-
-   return qResult;
-}
 
 bool Database::execute( const std::string& QueryString )
 {
