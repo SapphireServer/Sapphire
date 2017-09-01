@@ -13,6 +13,8 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 
+#include <sodium.h>
+
 extern Core::Db::Database g_database;
 
 Core::Network::SapphireAPI::SapphireAPI()
@@ -27,13 +29,22 @@ Core::Network::SapphireAPI::~SapphireAPI()
 
 bool Core::Network::SapphireAPI::login( const std::string& username, const std::string& pass, std::string& sId )
 {
-   std::string query = "SELECT account_id FROM accounts WHERE account_name = '" + username + "' AND account_pass = '" + pass + "';";
+   std::string query = "SELECT account_id, account_pass FROM accounts WHERE account_name = '" + username + "';";
    
    // check if a user with that name / password exists
    auto pQR = g_database.query( query );
    // found?
    if( !pQR )
       return false;
+
+   // id is assumed to be verified with SQL
+   // check password here
+   auto const accountPass = pQR->fetch()[1].getString();
+   if ( crypto_pwhash_argon2i_str_verify( accountPass, pass.c_str(), pass.length()) != 0 )
+   {
+      return false;
+   }
+
 
    // user found, proceed
    int32_t accountId = pQR->fetch()[0].getUInt32();
@@ -73,14 +84,14 @@ bool Core::Network::SapphireAPI::login( const std::string& username, const std::
 
 bool Core::Network::SapphireAPI::insertSession( const uint32_t& accountId, std::string& sId )
 {
-	// create session for the new sessionid and store to sessionlist
-	auto pSession = boost::make_shared< Session >();
-	pSession->setAccountId( accountId );
-	pSession->setSessionId( (uint8_t *)sId.c_str() );
+   // create session for the new sessionid and store to sessionlist
+   auto pSession = boost::make_shared< Session >();
+   pSession->setAccountId( accountId );
+   pSession->setSessionId( (uint8_t *)sId.c_str() );
 
-	m_sessionMap[sId] = pSession;
+   m_sessionMap[sId] = pSession;
 
-	return true;
+   return true;
 
 }
 
@@ -98,11 +109,19 @@ bool Core::Network::SapphireAPI::createAccount( const std::string& username, con
    pQR = g_database.query( "SELECT MAX(account_id) FROM accounts;" );
    int32_t accountId = pQR->fetch()[0].getUInt32() + 1;
 
+
+   char hash[crypto_pwhash_STRBYTES];
+   if (crypto_pwhash_argon2i_str(hash, pass.c_str(), pass.length(), crypto_pwhash_OPSLIMIT_INTERACTIVE, crypto_pwhash_MEMLIMIT_INTERACTIVE) != 0)
+   {
+      // Failed to allocate memory
+      return false;
+   }
+
    // store the account to the db
    g_database.execute( "INSERT INTO accounts (account_Id, account_name, account_pass, account_created) VALUE(%i, '%s', '%s', %i);",
                         accountId,
                         username.c_str(),
-                        pass.c_str(),
+                        hash,
                         time( NULL ) );
 
    

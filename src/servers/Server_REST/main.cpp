@@ -29,6 +29,8 @@
 #include "SapphireAPI.h"
 
 
+#include <sodium.h>
+
 Core::Logger g_log;
 Core::Db::Database g_database;
 Core::Data::ExdData g_exdData;
@@ -173,6 +175,12 @@ int main(int argc, char* argv[])
    g_log.info( "Compiled: " __DATE__ " " __TIME__ );
    g_log.info( "===========================================================" );
 
+   if ( sodium_init() == -1 )
+   {
+      g_log.fatal("Failed to initialize libsodium");
+   }
+   g_log.info("Initialized libsodium");
+
    if (!loadSettings(argc, argv))
    {
       throw std::exception();
@@ -279,7 +287,7 @@ int main(int argc, char* argv[])
          std::string sId = pt.get<string>( "sId" );
          std::string secret = pt.get<string>( "secret" );
          std::string name = pt.get<string>( "name" );
-          
+
          // reloadConfig();
 
          int32_t accountId = g_sapphireAPI.checkSession( sId );
@@ -352,36 +360,36 @@ int main(int argc, char* argv[])
    };
 
    server.resource["^/sapphire-api/lobby/insertSession"]["POST"] = [&]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
-	   print_request_info( request );
+      print_request_info( request );
 
-	   try
-	   {
-		   using namespace boost::property_tree;
-		   ptree pt;
-		   read_json( request->content, pt );
+      try
+      {
+         using namespace boost::property_tree;
+         ptree pt;
+         read_json( request->content, pt );
 
-		   std::string sId = pt.get<string>( "sId" );
-		   uint32_t accountId = pt.get<uint32_t>( "accountId" );
-		   std::string secret = pt.get<string>( "secret" );
+         std::string sId = pt.get<string>( "sId" );
+         uint32_t accountId = pt.get<uint32_t>( "accountId" );
+         std::string secret = pt.get<string>( "secret" );
 
          // reloadConfig();
 
-		   if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) {
-			   std::string json_string = "{\"result\":\"invalid_secret\"}";
-			   *response << "HTTP/1.1 403\r\nContent-Length: " << json_string.length() << "\r\n\r\n" << json_string;
-		   }
-		   else
-		   {
-			   g_sapphireAPI.insertSession( accountId, sId );
-			   std::string json_string = "{\"result\":\"success\"}";
-			   *response << "HTTP/1.1 200\r\nContent-Length: " << json_string.length() << "\r\n\r\n" << json_string;
-		   }
-	   }
-	   catch( exception& e )
-	   {
-		   *response << "HTTP/1.1 500\r\n\r\n";
-		   g_log.error( e.what() );
-	   }
+         if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) {
+            std::string json_string = "{\"result\":\"invalid_secret\"}";
+            *response << "HTTP/1.1 403\r\nContent-Length: " << json_string.length() << "\r\n\r\n" << json_string;
+         }
+         else
+         {
+            g_sapphireAPI.insertSession( accountId, sId );
+            std::string json_string = "{\"result\":\"success\"}";
+            *response << "HTTP/1.1 200\r\nContent-Length: " << json_string.length() << "\r\n\r\n" << json_string;
+         }
+      }
+      catch( exception& e )
+      {
+         *response << "HTTP/1.1 500\r\n\r\n";
+         g_log.error( e.what() );
+      }
 
    };
 
@@ -589,88 +597,88 @@ int main(int argc, char* argv[])
    };
 
    server.resource["^(/frontier-api/ffxivsupport/view/get_init)(.*)"]["GET"] = [&]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
-	   print_request_info( request );
+      print_request_info( request );
 
-	   try
-	   {
-		   auto web_root_path = boost::filesystem::canonical( "web" );
-		   auto path = boost::filesystem::canonical( web_root_path / "news.xml" );
-		   //Check if path is within web_root_path
-		   if( distance( web_root_path.begin(), web_root_path.end() ) > distance( path.begin(), path.end() ) ||
-			   !equal( web_root_path.begin(), web_root_path.end(), path.begin() ) )
-			   throw invalid_argument( "path must be within root path" );
-		   if( !( boost::filesystem::exists( path ) && boost::filesystem::is_regular_file( path ) ) )
-			   throw invalid_argument( "file does not exist" );
+      try
+      {
+         auto web_root_path = boost::filesystem::canonical( "web" );
+         auto path = boost::filesystem::canonical( web_root_path / "news.xml" );
+         //Check if path is within web_root_path
+         if( distance( web_root_path.begin(), web_root_path.end() ) > distance( path.begin(), path.end() ) ||
+            !equal( web_root_path.begin(), web_root_path.end(), path.begin() ) )
+            throw invalid_argument( "path must be within root path" );
+         if( !( boost::filesystem::exists( path ) && boost::filesystem::is_regular_file( path ) ) )
+            throw invalid_argument( "file does not exist" );
 
-		   std::string cache_control, etag;
+         std::string cache_control, etag;
 
-		   // Uncomment the following line to enable Cache-Control
-		   // cache_control="Cache-Control: max-age=86400\r\n";
+         // Uncomment the following line to enable Cache-Control
+         // cache_control="Cache-Control: max-age=86400\r\n";
 
-		   auto ifs = make_shared<ifstream>();
-		   ifs->open( path.string(), ifstream::in | ios::binary | ios::ate );
+         auto ifs = make_shared<ifstream>();
+         ifs->open( path.string(), ifstream::in | ios::binary | ios::ate );
 
-		   if( *ifs )
-		   {
-			   auto length = ifs->tellg();
-			   ifs->seekg( 0, ios::beg );
+         if( *ifs )
+         {
+            auto length = ifs->tellg();
+            ifs->seekg( 0, ios::beg );
 
-			   *response << "HTTP/1.1 200 OK\r\n" << cache_control << etag << "Content-Length: " << length << "\r\n\r\n";
-			   default_resource_send( server, response, ifs );
-		   }
-		   else
-			   throw invalid_argument( "could not read file" );
-	   }
-	   catch( exception& e )
-	   {
-		   *response << "HTTP/1.1 500\r\n\r\n";
-		   g_log.error( e.what() );
-	   }
+            *response << "HTTP/1.1 200 OK\r\n" << cache_control << etag << "Content-Length: " << length << "\r\n\r\n";
+            default_resource_send( server, response, ifs );
+         }
+         else
+            throw invalid_argument( "could not read file" );
+      }
+      catch( exception& e )
+      {
+         *response << "HTTP/1.1 500\r\n\r\n";
+         g_log.error( e.what() );
+      }
 
    };
 
    server.resource["^(/frontier-api/ffxivsupport/information/get_headline_all)(.*)"]["GET"] = [&]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
-	   print_request_info( request );
+      print_request_info( request );
 
-	   try
-	   {
-		   auto web_root_path = boost::filesystem::canonical( "web" );
-		   auto path = boost::filesystem::canonical( web_root_path / "headlines.xml" );
-		   //Check if path is within web_root_path
-		   if( distance( web_root_path.begin(), web_root_path.end() ) > distance( path.begin(), path.end() ) ||
-			   !equal( web_root_path.begin(), web_root_path.end(), path.begin() ) )
-			   throw invalid_argument( "path must be within root path" );
-		   if( !( boost::filesystem::exists( path ) && boost::filesystem::is_regular_file( path ) ) )
-			   throw invalid_argument( "file does not exist" );
+      try
+      {
+         auto web_root_path = boost::filesystem::canonical( "web" );
+         auto path = boost::filesystem::canonical( web_root_path / "headlines.xml" );
+         //Check if path is within web_root_path
+         if( distance( web_root_path.begin(), web_root_path.end() ) > distance( path.begin(), path.end() ) ||
+            !equal( web_root_path.begin(), web_root_path.end(), path.begin() ) )
+            throw invalid_argument( "path must be within root path" );
+         if( !( boost::filesystem::exists( path ) && boost::filesystem::is_regular_file( path ) ) )
+            throw invalid_argument( "file does not exist" );
 
-		   std::string cache_control, etag;
+         std::string cache_control, etag;
 
-		   // Uncomment the following line to enable Cache-Control
-		   // cache_control="Cache-Control: max-age=86400\r\n";
+         // Uncomment the following line to enable Cache-Control
+         // cache_control="Cache-Control: max-age=86400\r\n";
 
-		   auto ifs = make_shared<ifstream>();
-		   ifs->open( path.string(), ifstream::in | ios::binary | ios::ate );
+         auto ifs = make_shared<ifstream>();
+         ifs->open( path.string(), ifstream::in | ios::binary | ios::ate );
 
-		   if( *ifs )
-		   {
-			   auto length = ifs->tellg();
-			   ifs->seekg( 0, ios::beg );
+         if( *ifs )
+         {
+            auto length = ifs->tellg();
+            ifs->seekg( 0, ios::beg );
 
-			   *response << "HTTP/1.1 200 OK\r\n" << cache_control << etag << "Content-Length: " << length << "\r\n\r\n";
-			   default_resource_send( server, response, ifs );
-		   }
-		   else
-			   throw invalid_argument( "could not read file" );
-	   }
-	   catch( exception& e )
-	   {
-		   *response << "HTTP/1.1 500\r\n\r\n";
-		   g_log.error( e.what() );
-	   }
+            *response << "HTTP/1.1 200 OK\r\n" << cache_control << etag << "Content-Length: " << length << "\r\n\r\n";
+            default_resource_send( server, response, ifs );
+         }
+         else
+            throw invalid_argument( "could not read file" );
+      }
+      catch( exception& e )
+      {
+         *response << "HTTP/1.1 500\r\n\r\n";
+         g_log.error( e.what() );
+      }
 
    };
 
-   //Default GET-example. If no other matches, this anonymous function will be called. 
+   //Default GET-example. If no other matches, this anonymous function will be called.
    //Will respond with content in the web/-directory, and its subdirectories.
    //Default file: index.html
    //Can for instance be used to retrieve an HTML 5 client that uses REST-resources on this server
@@ -723,7 +731,7 @@ int main(int argc, char* argv[])
 
    //Wait for server to start so that the client can connect
    this_thread::sleep_for( chrono::seconds( 1 ) );
-   
+
    server_thread.join();
    g_log.info( "Started REST server at port " + std::to_string( server.config.port ) );
 

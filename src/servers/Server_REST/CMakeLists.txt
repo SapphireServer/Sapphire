@@ -30,6 +30,7 @@ if(UNIX)
     endif()
   endif()
 else()
+  add_definitions(-DSODIUM_STATIC)
   add_definitions(-D_WIN32_WINNT=0x601)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
   include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/MySQL/")
@@ -57,10 +58,13 @@ endif()
 
 
 include_directories(${Boost_INCLUDE_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/libsodium/include)
 
 link_directories(${BOOST_LIBRARYDIR})
 link_directories(${SERVER_COMMON_DIR})
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/sapphire/datReader)
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/libsodium/x64/Release/v141/static)
+
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 4)
   # 32 bit link
@@ -89,7 +93,7 @@ set_target_properties(server_rest PROPERTIES
 if (UNIX)
   target_link_libraries (server_rest Common xivdat pthread mysqlclient dl z)
 else()
-  target_link_libraries (server_rest Common xivdat libmysql zlib1)
+  target_link_libraries (server_rest Common xivdat libmysql zlib1 libsodium)
 endif()
 
 target_link_libraries( server_rest ${Boost_LIBRARIES} ${Boost_LIBRARIES} )
