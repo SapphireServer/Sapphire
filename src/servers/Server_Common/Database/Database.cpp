@@ -49,7 +49,22 @@ bool QueryResult::nextRow()
    return true;
 }
 
-Database::Database()
+Field *QueryResult::fetch()
+{
+   return m_currentRow;
+}
+
+uint32_t QueryResult::getFieldCount() const
+{
+   return m_fieldCount;
+}
+
+uint32_t QueryResult::getRowCount() const
+{
+   return m_rowCount;
+}
+
+   Database::Database()
 {
    m_port = 0;
    m_counter = 0;
@@ -337,6 +352,60 @@ void Database::shutdown()
          m_pConnections[i].conn = NULL;
       }
    }
+}
+
+const std::string &Database::getHostName()
+{
+   return m_hostname;
+}
+
+const std::string &Database::getDatabaseName()
+{
+   return m_databaseName;
+}
+
+   void Field::setValue( char *value )
+{
+   m_pValue = value;
+}
+
+void Field::setLength( uint32_t value )
+{
+   m_size = value;
+}
+
+std::string Field::getString() const
+{
+   if( !m_pValue )
+      return "";
+   return std::string( m_pValue );
+}
+
+void Field::getBinary( char *dstBuf, uint16_t size ) const
+{
+   if( m_pValue )
+   {
+      memcpy( dstBuf, m_pValue, size );
+   }
+   else
+   {
+      dstBuf = NULL;
+   }
+}
+
+float Field::getFloat() const
+{
+   return m_pValue ? static_cast< float >( atof( m_pValue ) ) : 0;
+}
+
+bool Field::getBool() const
+{
+   return m_pValue ? atoi( m_pValue ) > 0 : false;
+}
+
+uint32_t Field::getLength() const
+{
+   return m_size;
 }
 
 }
