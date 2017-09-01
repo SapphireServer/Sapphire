@@ -29,6 +29,7 @@ Core::Network::SapphireAPI::~SapphireAPI()
 
 bool Core::Network::SapphireAPI::login( const std::string& username, const std::string& pass, std::string& sId )
 {
+   // FIXME: username is vuln to SQLi
    std::string query = "SELECT account_id, account_pass FROM accounts WHERE account_name = '" + username + "';";
    
    // check if a user with that name / password exists
@@ -39,12 +40,11 @@ bool Core::Network::SapphireAPI::login( const std::string& username, const std::
 
    // id is assumed to be verified with SQL
    // check password here
-   auto const accountPass = pQR->fetch()[1].getString();
-   if ( crypto_pwhash_argon2i_str_verify( accountPass, pass.c_str(), pass.length()) != 0 )
+   auto accountPass = pQR->fetch()[1].getString();
+   if ( crypto_pwhash_argon2i_str_verify( accountPass, pass.c_str(), pass.length() ) != 0 )
    {
       return false;
    }
-
 
    // user found, proceed
    int32_t accountId = pQR->fetch()[0].getUInt32();
@@ -109,11 +109,11 @@ bool Core::Network::SapphireAPI::createAccount( const std::string& username, con
    pQR = g_database.query( "SELECT MAX(account_id) FROM accounts;" );
    int32_t accountId = pQR->fetch()[0].getUInt32() + 1;
 
-
+   // Hash password
    char hash[crypto_pwhash_STRBYTES];
-   if (crypto_pwhash_argon2i_str(hash, pass.c_str(), pass.length(), crypto_pwhash_OPSLIMIT_INTERACTIVE, crypto_pwhash_MEMLIMIT_INTERACTIVE) != 0)
+   if ( crypto_pwhash_argon2i_str( hash, pass.c_str(), pass.length(), crypto_pwhash_OPSLIMIT_INTERACTIVE, crypto_pwhash_MEMLIMIT_INTERACTIVE ) != 0 )
    {
-      // Failed to allocate memory
+      // Failed to allocate a memory
       return false;
    }
 
