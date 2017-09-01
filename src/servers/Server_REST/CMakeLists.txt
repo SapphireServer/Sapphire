@@ -68,13 +68,28 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 4)
   # 32 bit link
   link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/MySQL/x86)
   link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/zlib/x86)
-  link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/libsodium/Win32/Release/v141/static)
 else()
 # 64 bit link
   link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/MySQL/x64)
   link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/zlib/x64)
-  link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/libsodium/x64/Release/v141/static)
 
+endif()
+
+# Link libsodium
+if(NOT UNIX)
+  if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+    if (MSVC_VERSION EQUAL 1900) # Visual Studio 2015
+      link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/libsodium/Win32/Release/v140/static)
+    else()
+      link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/libsodium/Win32/Release/v141/static)
+    endif()
+  else()
+    if (MSVC_VERSION EQUAL 1900) # Visual Studio 2015
+    link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/libsodium/x64/Release/v140/static)
+    else()
+      link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/libsodium/x64/Release/v141/static)
+    endif()
+  endif()
 endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_CURRENT_SOURCE_DIR}/../../../bin/")
