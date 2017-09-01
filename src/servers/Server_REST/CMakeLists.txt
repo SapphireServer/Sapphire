@@ -92,7 +92,7 @@ set_target_properties(server_rest PROPERTIES
 )
 
 if (UNIX)
-  target_link_libraries (server_rest Common xivdat pthread mysqlclient dl z)
+  target_link_libraries (server_rest Common xivdat pthread mysqlclient dl z sodium)
 else()
   target_link_libraries (server_rest Common xivdat libmysql zlib1 libsodium)
 endif()
