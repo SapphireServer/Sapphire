@@ -63,17 +63,18 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/libsodi
 link_directories(${BOOST_LIBRARYDIR})
 link_directories(${SERVER_COMMON_DIR})
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/sapphire/datReader)
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/libsodium/x64/Release/v141/static)
-
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 4)
   # 32 bit link
   link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/MySQL/x86)
   link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/zlib/x86)
+  link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/libsodium/Win32/Release/v141/static)
 else()
 # 64 bit link
   link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/MySQL/x64)
   link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/zlib/x64)
+  link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/libsodium/x64/Release/v141/static)
+
 endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_CURRENT_SOURCE_DIR}/../../../bin/")
