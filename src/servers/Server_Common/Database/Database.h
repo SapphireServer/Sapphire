@@ -30,7 +30,7 @@ namespace Core {
          }
 
          // return as string
-         __inline std::string getString()
+         __inline std::string getString() const
          {
             if( !m_pValue )
                return "";
@@ -38,7 +38,7 @@ namespace Core {
          }
 
          // return as string
-         __inline void getBinary( char* dstBuf, uint16_t size )
+         __inline void getBinary( char* dstBuf, uint16_t size ) const
          {
             if( m_pValue )
             {
@@ -51,19 +51,19 @@ namespace Core {
          }
 
          //  return as float
-         __inline float getFloat()
+         __inline float getFloat() const
          {
             return m_pValue ? static_cast< float >( atof( m_pValue ) ) : 0;
          }
 
          // return as bool
-         __inline bool getBool()
+         __inline bool getBool() const
          {
             return m_pValue ? atoi( m_pValue ) > 0 : false;
          }
 
          template< class T >
-         __inline T get()
+         __inline T get() const
          {
             if( !m_pValue )
                return 0;
@@ -71,7 +71,7 @@ namespace Core {
             return static_cast< T >( atol( m_pValue ) );
          }
 
-         __inline uint32_t getLength()
+         __inline uint32_t getLength() const
          {
             return m_size;
          }
@@ -175,9 +175,9 @@ namespace Core {
 
          // actual query function
          bool sendQuery( DatabaseConnection *con, const std::string &sql, bool Self );
-         QueryResult * _StoreQueryResult( DatabaseConnection * con );
+         QueryResult * storeQueryResult( DatabaseConnection * con );
          bool handleError( DatabaseConnection *conn, uint32_t ErrorNumber );
-         bool _Reconnect( DatabaseConnection *conn );
+         bool reconnect( DatabaseConnection *conn );
 
          DatabaseConnection *m_pConnections;
 

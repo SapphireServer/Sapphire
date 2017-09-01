@@ -161,7 +161,7 @@ boost::shared_ptr<QueryResult> Database::query( const std::string& QueryString )
 
    if( sendQuery(con, QueryString.c_str(), false) )
    {
-      qResult = boost::shared_ptr<QueryResult>( _StoreQueryResult( con ) );
+      qResult = boost::shared_ptr<QueryResult>( storeQueryResult( con ) );
    }
 
    con->lock.unlock();
@@ -259,14 +259,14 @@ bool Database::handleError( DatabaseConnection *con, uint32_t ErrorNumber )
    case 2055:  // Lost connection to sql server - system error
    {
       // Let's instruct a reconnect to the db when we encounter these errors.
-      return _Reconnect( con );
+      return reconnect( con );
    }break;
    }
 
    return false;
 }
 
-QueryResult * Database::_StoreQueryResult( DatabaseConnection * con )
+QueryResult * Database::storeQueryResult( DatabaseConnection * con )
 {
    QueryResult *res;
    MYSQL_RES * pRes = mysql_store_result( con->conn );
@@ -289,7 +289,7 @@ QueryResult * Database::_StoreQueryResult( DatabaseConnection * con )
    return res;
 }
 
-bool Database::_Reconnect( DatabaseConnection * conn )
+bool Database::reconnect( DatabaseConnection * conn )
 {
    MYSQL * temp;
    MYSQL * temp2;
