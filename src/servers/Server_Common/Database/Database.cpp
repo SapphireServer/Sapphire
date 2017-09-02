@@ -34,9 +34,7 @@ bool QueryResult::nextRow()
    MYSQL_ROW row = mysql_fetch_row( m_result );
    auto length = mysql_fetch_lengths( m_result );
    if( row == nullptr )
-   {
       return false;
-   }
 
    for( uint32_t i = 0; i < m_fieldCount; ++i )
    {
@@ -77,9 +75,7 @@ Database::~Database()
    for( int32_t i = 0; i < m_connectionCount; ++i )
    {
       if( m_pConnections[i].conn != nullptr )
-      {
          mysql_close( m_pConnections[i].conn );
-      }
    }
 
    delete[] m_pConnections;
@@ -99,15 +95,11 @@ bool Database::initialize( const DatabaseParams& params )
    {
       temp = mysql_init( nullptr );
       if( mysql_options( temp, MYSQL_SET_CHARSET_NAME, "utf8" ) )
-      {
          g_log.error( "Database: Could not set utf8 character set." );
-      }
 
       if( mysql_options( temp, MYSQL_OPT_RECONNECT, &my_true ) )
-      {
          g_log.error( "Database: MYSQL_OPT_RECONNECT could not be set, "
                       "connection drops may occur but will be counteracted." );
-      }
 
       temp2 = mysql_real_connect( temp,
                                   params.hostname.c_str(),
@@ -115,9 +107,9 @@ bool Database::initialize( const DatabaseParams& params )
                                   params.password.c_str(),
                                   params.databaseName.c_str(),
                                   params.port,
-                                  NULL,
+                                  nullptr,
                                   0 );
-      if( temp2 == NULL )
+      if( temp2 == nullptr )
       {
          g_log.fatal( "Database: Connection failed due to: `%s`" + std::string( mysql_error( temp ) ) );
          return false;
@@ -136,9 +128,7 @@ uint64_t Database::getNextUId()
    auto res = query( "SELECT LAST_INSERT_ID();" );
 
    if( !res )
-   {
       return 0;
-   }
 
    Db::Field *field = res->fetch();
 
@@ -148,36 +138,27 @@ uint64_t Database::getNextUId()
 DatabaseConnection * Database::getFreeConnection()
 {
    uint32_t i = 0;
-   for( ;;)
+   while( true )
    {
       DatabaseConnection * con = &m_pConnections[( ( i++ ) % m_connectionCount )];
       if( con->lock.try_lock() )
-      {
          return con;
-      }
 
       // sleep every 20 iterations, otherwise this can cause 100% cpu if the db link goes dead
       if( !( i % 20 ) )
-      {
          std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );
-      }
    }
-
-   // shouldn't be reached
-   return NULL;
 }
 
 boost::shared_ptr<QueryResult> Database::query( const std::string& QueryString )
 {
 
    // Send the query
-   boost::shared_ptr<QueryResult> qResult( nullptr );
+   boost::shared_ptr< QueryResult > qResult( nullptr );
    DatabaseConnection * con = getFreeConnection();
 
-   if( sendQuery(con, QueryString.c_str(), false) )
-   {
-      qResult = boost::shared_ptr<QueryResult>( storeQueryResult( con ) );
-   }
+   if( sendQuery( con, QueryString.c_str(), false ) )
+      qResult = boost::shared_ptr< QueryResult >( storeQueryResult( con ) );
 
    con->lock.unlock();
    return qResult;
@@ -187,7 +168,7 @@ boost::shared_ptr<QueryResult> Database::query( const std::string& QueryString )
 bool Database::execute( const std::string& QueryString )
 {
    DatabaseConnection * con = getFreeConnection();
-   bool Result = sendQuery(con, QueryString, false);
+   bool Result = sendQuery( con, QueryString, false );
    con->lock.unlock();
    return Result;
 }
@@ -204,13 +185,10 @@ std::string Database::escapeString( std::string Escape )
    DatabaseConnection * con = getFreeConnection();
    const char * ret;
    if( mysql_real_escape_string( con->conn, a2, Escape.c_str(), ( uint32_t ) Escape.length() ) == 0 )
-   {
       ret = Escape.c_str();
-   }
-   else {
+   else
       ret = a2;
-   }
-
+   
    con->lock.unlock();
    return std::string( ret );
 }
@@ -231,13 +209,9 @@ std::string Database::escapeString( const char * esc, DatabaseConnection * con )
    char a2[16384] = { 0 };
    const char * ret;
    if( mysql_real_escape_string( con->conn, a2, ( char* ) esc, ( uint32_t ) strlen( esc ) ) == 0 )
-   {
       ret = esc;
-   }
    else
-   {
       ret = a2;
-   }
 
    return std::string( ret );
 }
@@ -275,7 +249,7 @@ bool Database::handleError( DatabaseConnection *con, uint32_t ErrorNumber )
    {
       // Let's instruct a reconnect to the db when we encounter these errors.
       return reconnect( con );
-   }break;
+   }
    }
 
    return false;
@@ -290,12 +264,10 @@ QueryResult * Database::storeQueryResult( DatabaseConnection * con )
 
    if( uRows == 0 || uFields == 0 || pRes == 0 )
    {
-      if( pRes != NULL )
-      {
+      if( pRes != nullptr )
          mysql_free_result( pRes );
-      }
 
-      return NULL;
+      return nullptr;
    }
 
    res = new QueryResult( pRes, uFields, uRows );
@@ -309,7 +281,7 @@ bool Database::reconnect( DatabaseConnection * conn )
    MYSQL * temp;
    MYSQL * temp2;
 
-   temp = mysql_init( NULL );
+   temp = mysql_init( nullptr );
 
    temp2 = mysql_real_connect( temp,
                                m_hostname.c_str(),
@@ -317,16 +289,16 @@ bool Database::reconnect( DatabaseConnection * conn )
                                m_password.c_str(),
                                m_databaseName.c_str(),
                                m_port,
-                               NULL,
+                               nullptr,
                                0 );
-   if( temp2 == NULL )
+   if( temp2 == nullptr )
    {
       g_log.error( "Database: Could not reconnect to database because of " + std::string( mysql_error( temp ) ) );
       mysql_close( temp );
       return false;
    }
 
-   if( conn->conn != NULL )
+   if( conn->conn != nullptr )
    {
       mysql_close( conn->conn );
    }
@@ -346,10 +318,10 @@ void Database::shutdown()
 {
    for( int32_t i = 0; i < m_connectionCount; ++i )
    {
-      if( m_pConnections[i].conn != NULL )
+      if( m_pConnections[i].conn != nullptr )
       {
          mysql_close( m_pConnections[i].conn );
-         m_pConnections[i].conn = NULL;
+         m_pConnections[i].conn = nullptr;
       }
    }
 }
@@ -389,7 +361,7 @@ void Field::getBinary( char *dstBuf, uint16_t size ) const
    }
    else
    {
-      dstBuf = NULL;
+      dstBuf = nullptr;
    }
 }
 
