@@ -222,30 +222,33 @@ namespace Core {
       struct ActionInfo
       {
          uint32_t id;
-         std::string name; //0
-         uint16_t category;//3
+         std::string name;          // 0
+         uint16_t category;         // 3
 
-         int8_t class_job;//9
-         uint8_t unlock_level;//10
-         int8_t range;//11
-         bool can_target_self;//12
-         bool can_target_party;//13
-         bool can_target_friendly;//14
-         bool can_target_enemy;//15
+         int8_t class_job;          // 10
+         uint8_t unlock_level;      // 11
+         int8_t range;              // 13
+         bool can_target_self;      // 14
+         bool can_target_party;     // 15
+         bool can_target_friendly;  // 16
+         bool can_target_enemy;     // 17
 
-         bool is_aoe;//18
+         bool is_aoe;               // 20
 
-         bool can_target_ko;//22
+         bool can_target_ko;        // 24
 
-         uint8_t aoe_type;//24
-         uint8_t radius;//25
+         uint8_t aoe_type;          // 26
+         uint8_t radius;            // 27
 
-         uint8_t points_type;//28
-         uint16_t points_cost;//29
+         uint8_t points_type;       // 30
+         uint16_t points_cost;      // 31
 
-         bool is_instant;//33
-         uint32_t cast_time;//34
-         uint32_t recast_time;//35
+         bool is_instant;           // 35
+         uint32_t cast_time;        // 36
+         uint32_t recast_time;      // 37
+
+         uint8_t type;              // 39
+         uint8_t aspect;            // 40
       };
 
       struct EventItemInfo

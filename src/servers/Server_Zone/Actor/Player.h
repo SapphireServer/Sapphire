@@ -207,7 +207,7 @@ public:
    /*! equip a weapon, possibly forcing a job change */
    void equipWeapon( ItemPtr pItem );
    /*! get a const pointer to the inventory object */
-   InventoryPtr getInvetory() const;
+   InventoryPtr getInventory() const;
    /*! get the current main hand model */
    uint64_t getModelMainWeapon() const;
    /*! get the current off hand model */
