@@ -37,10 +37,14 @@ else()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHc")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
-
+  # edit and continue
+  if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    message(STATUS "Disabling /SAFESEH")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO")
+  endif()
   if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/${SAPPHIRE_BOOST_FOLDER_NAME})
     message(STATUS "Using boost in /libraries/external")
-	  set(Boost_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/${SAPPHIRE_BOOST_FOLDER_NAME})
+    set(Boost_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/${SAPPHIRE_BOOST_FOLDER_NAME})
     set(BOOST_LIBRARYDIR ${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/${SAPPHIRE_BOOST_FOLDER_NAME}/lib32-msvc-14.0)
   else()
       find_package(Boost ${SAPPHIRE_BOOST_VER} COMPONENTS log log_setup thread date_time filesystem system)
@@ -48,7 +52,7 @@ else()
         set(BOOST_LIBRARY_DIR ${Boost_LIBRARY_DIR})
       elseif ((EXISTS $ENV{BOOST_ROOT_DIR}) AND (EXISTS $ENV{BOOST_LIB_DIR}))
         set(Boost_INCLUDE_DIR $ENV{BOOST_ROOT_DIR})
-	      set(BOOST_LIBRARYDIR $ENV{BOOST_LIB_DIR})
+        set(BOOST_LIBRARYDIR $ENV{BOOST_LIB_DIR})
       else()
         message(FATAL_ERROR "SapphireError: Unable to find boost ${SAPPHIRE_BOOST_VER} package and environment variables BOOST_ROOT_DIR and BOOST_LIB_DIR not set!")
       endif()
@@ -86,6 +90,11 @@ set_target_properties(server_lobby PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_CURRENT_SOURCE_DIR}/../../../bin/"
     RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_CURRENT_SOURCE_DIR}/../../../bin/"
 )
+
+if(MSVC)
+    message(STATUS "Enabling Edit and Continue..")
+    set_property(TARGET server_lobby APPEND_STRING PROPERTY COMPILE_FLAGS " /INCREMENTAL /ZI")
+endif()
 
 if (UNIX)
   target_link_libraries(server_lobby Common xivdat pthread mysqlclient dl z)
