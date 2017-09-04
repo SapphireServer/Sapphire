@@ -298,6 +298,9 @@ public:
    // add a status effect by id if it doesn't exist
    void addStatusEffectByIdIfNotExist( int32_t id, int32_t duration, uint16_t param = 0 );
 
+   // remove a status effect by id
+   void removeSingleStatusEffectFromId( int32_t id );
+
    // TODO: Why did i even declare them publicly here?!
    std::set< ActorPtr >            m_inRangeActors;
    std::set< PlayerPtr >           m_inRangePlayers;

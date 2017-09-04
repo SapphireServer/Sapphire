@@ -1460,9 +1460,9 @@ void Core::Entity::Player::autoAttack( ActorPtr pTarget )
    uint32_t damage = mainWeap->getAutoAttackDmg();
    uint32_t variation = 0 + rand() % 3;
 
-   if (getClass() == JOB_MACHINIST ||
+   if ( getClass() == JOB_MACHINIST ||
       getClass() == JOB_BARD ||
-      getClass() == CLASS_ARCHER)
+      getClass() == CLASS_ARCHER )
    {
       GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket(getId());
       effectPacket.data().targetId = pTarget->getId();
