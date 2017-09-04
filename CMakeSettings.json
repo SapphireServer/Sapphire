@@ -6,7 +6,7 @@
       "generator": "Visual Studio 14 2015",
       "configurationType": "Debug",
       "buildRoot": "${env.USERPROFILE}\\CMakeBuild\\${workspaceHash}\\build\\${name}",
-      "cmakeCommandArgs": "",
+      "cmakeCommandArgs": "-DCMAKE_BUILD_TYPE=\"Debug\"",
       "buildCommandArgs": "-m -v:minimal",
       "variables": [
         {
@@ -34,7 +34,7 @@
       "generator": "Visual Studio 14 2015 Win64",
       "configurationType": "Debug",
       "buildRoot": "${env.USERPROFILE}\\CMakeBuild\\${workspaceHash}\\build\\${name}",
-      "cmakeCommandArgs": "",
+      "cmakeCommandArgs": "-DCMAKE_BUILD_TYPE=\"Debug\"",
       "buildCommandArgs": "-m -v:minimal",
       "variables": [
         {
