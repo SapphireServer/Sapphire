@@ -247,7 +247,7 @@ namespace Core {
          uint32_t cast_time;        // 36
          uint32_t recast_time;      // 37
 
-         uint8_t type;              // 39
+         int8_t model;              // 39
          uint8_t aspect;            // 40
       };
 

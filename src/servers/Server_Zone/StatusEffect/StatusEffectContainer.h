@@ -21,6 +21,7 @@ public:
 
    void addStatusEffect( StatusEffectPtr pEffect );
    void removeStatusEffect( uint8_t effectSlotId );
+   void removeSingleStatusEffectFromId( uint32_t id );
    void update();
 
    bool hasStatusEffect( uint32_t id );

@@ -299,7 +299,7 @@ struct effectEntry
    uint8_t unknown_2;
    uint8_t unknown_3;
    int8_t bonusPercent;
-   int16_t param1;
+   int16_t dmgValue;
    uint8_t unknown_5;
    uint8_t unknown_6;
 };

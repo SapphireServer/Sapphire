@@ -346,11 +346,11 @@ bool Core::Data::ExdData::loadActionInfo()
       uint16_t points_cost = getField< uint16_t >( fields, 31 );  // 31
 
       uint32_t instantval = getField< bool >( fields, 35 );       // 35
-      uint16_t cast_time = getField< uint16_t >(fields, 36);      // 36
-      uint16_t recast_time = getField< uint16_t >(fields, 37);    // 37
+      uint16_t cast_time = getField< uint16_t >( fields, 36 );    // 36
+      uint16_t recast_time = getField< uint16_t >( fields, 37 );  // 37
 
-      uint16_t type = getField< uint16_t >(fields, 39);           // 39: Action type
-      uint16_t aspect = getField< uint16_t >(fields, 40);         // 40: Action aspect
+      int8_t model = getField< int8_t >( fields, 39 );            // 39: Action model
+      uint8_t aspect = getField< uint8_t >( fields, 40 );          // 40: Action aspect
 
       uint8_t typeshift = 0x6;
       uint8_t mask = 1 << typeshift;
@@ -385,6 +385,9 @@ bool Core::Data::ExdData::loadActionInfo()
       info.is_instant = is_instant;
       info.cast_time = cast_time * 100;
       info.recast_time = recast_time * 100;
+
+      info.model = model;
+      info.aspect = aspect;
 
       m_actionInfoMap[id] = info;
 
