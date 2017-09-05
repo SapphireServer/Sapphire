@@ -28,6 +28,8 @@ public:
    int8_t getFreeSlot();
    void freeSlot( uint8_t slotId );
 
+   std::map< uint8_t, Core::StatusEffect::StatusEffectPtr > getEffectMap() const;
+
    void sendUpdate();
 
 
@@ -37,7 +39,6 @@ private:
    Entity::ActorPtr m_pOwner;
    std::queue< uint8_t > m_freeEffectSlotQueue;
 
-   std::vector< StatusEffectPtr > m_effectList;
    std::vector< std::pair< uint8_t, uint32_t> > m_tickEffectList;
    std::map< uint8_t, StatusEffectPtr > m_effectMap;
 };

@@ -645,3 +645,8 @@ void Core::Entity::Actor::addStatusEffectByIdIfNotExist( int32_t id, int32_t dur
    }
 }
 
+Core::StatusEffect::StatusEffectContainerPtr Core::Entity::Actor::getStatusEffectContainer() const
+{
+   return m_pStatusEffectContainer;
+}
+
