@@ -22,14 +22,14 @@ extern Core::Scripting::ScriptManager g_scriptMgr;
 
 Core::Action::ActionCast::ActionCast()
 {
-   m_actionType = Common::ActionType::Event;
+   m_handleActionType = Common::HandleActionType::Event;
 }
 
 Core::Action::ActionCast::ActionCast( Entity::ActorPtr pActor, Entity::ActorPtr pTarget, uint32_t actionId )
 {
    m_startTime = 0;
    m_id = actionId;
-   m_actionType = ActionType::Spell;
+   m_handleActionType = HandleActionType::Spell;
    m_castTime = g_exdData.m_actionInfoMap[actionId].cast_time; // TODO: Add security checks.
    m_pSource = pActor;
    m_pTarget = pTarget;
