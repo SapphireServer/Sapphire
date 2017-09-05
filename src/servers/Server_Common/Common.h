@@ -557,21 +557,21 @@ namespace Core {
          Unaspected = 7    // Doesn't imply magical unaspected damage - could be unaspected physical
       };
 
-      enum struct ActionModel : int8_t
+      enum struct ActionType : int8_t
       {
-         Physical = -1,
-         Unknown_0 = 0, // Very likely actions that only deals with status effects and nothing else
-         Unknown_1 = 1, // Related to actions that deal with player movement (knockbacks, gapclosers etc)
-         Unknown_2 = 2, // Possibly attacks that bypass calculation (deal raw damage)
-         Unknown_3 = 3, // Possibly AoEs without marker
-         Unknown_4 = 4,
+         WeaponOverride = -1, // Needs more investigation (takes the damage type of the equipped weapon)?
+         Unknown_0 = 0,
+         Slashing = 1, 
+         Piercing = 2, 
+         Blunt = 3,
+         Unknown_4 = 4, 
          Magical = 5,
-         Unknown_6 = 6, // Possibly breath, eye & song attacks
+         Darkness = 6,
          Unknown_7 = 7,
          LimitBreak = 8,
       };
 
-      enum ActionType : uint8_t
+      enum HandleActionType : uint8_t
       {
          Event,
          Spell,

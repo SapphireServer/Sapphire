@@ -18,14 +18,14 @@ using namespace Core::Network::Packets::Server;
 
 Core::Action::EventAction::EventAction()
 {
-   m_actionType = Common::ActionType::Event;
+   m_handleActionType = Common::HandleActionType::Event;
 }
 
 Core::Action::EventAction::EventAction( Entity::ActorPtr pActor, uint32_t eventId, uint16_t action,
                                         ActionCallback finishRef, ActionCallback interruptRef, uint64_t additional )
 {
    m_additional = additional;
-   m_actionType = ActionType::Event;
+   m_handleActionType = HandleActionType::Event;
    m_eventId = eventId;
    m_id = action;
    m_castTime = g_exdData.m_EventActionInfoMap[action].castTime; // TODO: Add security checks.
