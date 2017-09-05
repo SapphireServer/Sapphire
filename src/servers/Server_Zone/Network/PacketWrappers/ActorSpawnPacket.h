@@ -5,6 +5,8 @@
 #include <src/servers/Server_Common/Util/UtilMath.h>
 #include "src/servers/Server_Zone/Actor/Player.h"
 #include "src/servers/Server_Zone/Forwards.h"
+#include "src/servers/Server_Zone/StatusEffect/StatusEffectContainer.h"
+#include "src/servers/Server_Zone/StatusEffect/StatusEffect.h"
 
 namespace Core {
 namespace Network {
@@ -78,6 +80,14 @@ private:
       //m_data.unknown_38 = 0x70;
       //m_data.unknown_60 = 3;
       //m_data.unknown_61 = 7;
+
+
+      for( auto const& effect : pPlayer->getStatusEffectContainer()->getEffectMap() )
+      {
+         m_data.effect[effect.first].effect_id = effect.second->getId();
+         m_data.effect[effect.first].duration = effect.second->getDuration();
+         m_data.effect[effect.first].sourceActorId = effect.second->getSrcActorId();
+      }
 
 
    };
