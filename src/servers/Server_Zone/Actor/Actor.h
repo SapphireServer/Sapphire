@@ -301,6 +301,9 @@ public:
    // remove a status effect by id
    void removeSingleStatusEffectFromId( int32_t id );
 
+   //get the status effect container
+   StatusEffect::StatusEffectContainerPtr getStatusEffectContainer() const;
+
    // TODO: Why did i even declare them publicly here?!
    std::set< ActorPtr >            m_inRangeActors;
    std::set< PlayerPtr >           m_inRangePlayers;
