@@ -16,7 +16,7 @@ using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-Core::InventoryPtr Core::Entity::Player::getInvetory() const
+Core::InventoryPtr Core::Entity::Player::getInventory() const
 {
    return m_pInventory;
 }

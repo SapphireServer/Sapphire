@@ -76,6 +76,18 @@ void Core::StatusEffect::StatusEffectContainer::addStatusEffect( StatusEffectPtr
 
 }
 
+void Core::StatusEffect::StatusEffectContainer::removeSingleStatusEffectFromId( uint32_t id )
+{
+   for (auto effectIt : m_effectMap)
+   {
+      if (effectIt.second->getId() == id)
+      {
+         removeStatusEffect( effectIt.first );
+         break;
+      }
+   }
+}
+
 void Core::StatusEffect::StatusEffectContainer::removeStatusEffect( uint8_t effectSlotId )
 {
    auto pEffectIt = m_effectMap.find( effectSlotId );

@@ -19,14 +19,14 @@ using namespace Core::Network::Packets::Server;
 
 Core::Action::EventItemAction::EventItemAction()
 {
-   m_actionType = Common::ActionType::Event;
+   m_handleActionType = Common::HandleActionType::Event;
 }
 
 Core::Action::EventItemAction::EventItemAction( Entity::ActorPtr pActor, uint32_t eventId, uint32_t action,
                                                 ActionCallback finishRef, ActionCallback interruptRef, uint64_t additional )
 {
    m_additional = additional;
-   m_actionType = ActionType::Event;
+   m_handleActionType = HandleActionType::Event;
    m_eventId = eventId;
    m_id = action;
    // TODO: read the cast time from the action itself

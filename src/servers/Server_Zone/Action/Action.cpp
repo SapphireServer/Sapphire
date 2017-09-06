@@ -17,9 +17,9 @@ uint32_t Core::Action::Action::getId() const
    return m_id;
 }
 
-Core::Common::ActionType Core::Action::Action::getActionType() const
+Core::Common::HandleActionType Core::Action::Action::getHandleActionType() const
 {
-   return m_actionType;
+   return m_handleActionType;
 }
 
 Core::Entity::ActorPtr Core::Action::Action::getTargetActor() const

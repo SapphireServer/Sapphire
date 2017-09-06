@@ -18,14 +18,14 @@ extern Core::Logger g_log;
 
 Core::Action::ActionTeleport::ActionTeleport()
 {
-   m_actionType = Common::ActionType::Event;
+   m_handleActionType = Common::HandleActionType::Event;
 }
 
 Core::Action::ActionTeleport::ActionTeleport( Entity::ActorPtr pActor, uint16_t targetZone, uint16_t cost )
 {
    m_startTime = 0;
    m_id = 5;
-   m_actionType = ActionType::Teleport;
+   m_handleActionType = HandleActionType::Teleport;
    m_castTime = g_exdData.m_actionInfoMap[5].cast_time; // TODO: Add security checks.
    m_pSource = pActor;
    m_bInterrupt = false;
