@@ -93,6 +93,14 @@ namespace Server {
          //m_data.unknown_60 = 3;
          //m_data.unknown_61 = 7;
 
+         for( auto const& effect : pPlayer->getStatusEffectContainer()->getEffectMap() )
+         {
+            m_data.effect[effect.first].effect_id = effect.second->getId();
+            m_data.effect[effect.first].duration = effect.second->getDuration();
+            m_data.effect[effect.first].sourceActorId = effect.second->getSrcActorId();
+            m_data.effect[effect.first].unknown1 = effect.second->getParam();
+         }
+
 
       };
    };
