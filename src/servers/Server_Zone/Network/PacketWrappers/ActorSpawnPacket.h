@@ -5,6 +5,8 @@
 #include <src/servers/Server_Common/Util/UtilMath.h>
 #include "src/servers/Server_Zone/Actor/Player.h"
 #include "src/servers/Server_Zone/Forwards.h"
+#include "src/servers/Server_Zone/StatusEffect/StatusEffectContainer.h"
+#include "src/servers/Server_Zone/StatusEffect/StatusEffect.h"
 
 namespace Core {
 namespace Network {

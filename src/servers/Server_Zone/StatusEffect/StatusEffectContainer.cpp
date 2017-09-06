@@ -40,6 +40,11 @@ void Core::StatusEffect::StatusEffectContainer::freeSlot( uint8_t slotId )
    m_freeEffectSlotQueue.push( slotId );
 }
 
+std::map< uint8_t, Core::StatusEffect::StatusEffectPtr > Core::StatusEffect::StatusEffectContainer::getEffectMap() const
+{
+   return m_effectMap;
+}
+
 
 Core::StatusEffect::StatusEffectContainer::~StatusEffectContainer()
 {
