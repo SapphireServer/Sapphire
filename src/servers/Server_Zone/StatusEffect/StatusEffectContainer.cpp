@@ -107,6 +107,11 @@ void Core::StatusEffect::StatusEffectContainer::removeStatusEffect( uint8_t effe
    sendUpdate();
 }
 
+std::map< uint8_t, Core::StatusEffect::StatusEffectPtr > Core::StatusEffect::StatusEffectContainer::getEffectMap() const
+{
+   return m_effectMap;
+}
+
 void Core::StatusEffect::StatusEffectContainer::sendUpdate()
 {
    uint64_t currentTimeMs = Util::getTimeMs();
