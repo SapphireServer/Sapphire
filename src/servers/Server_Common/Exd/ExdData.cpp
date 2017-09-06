@@ -324,28 +324,33 @@ bool Core::Data::ExdData::loadActionInfo()
          continue;
       }
 
-      std::string name = getField< std::string >( fields, 0 );
-      uint8_t category = getField< uint8_t >( fields, 3 );
+      std::string name = getField< std::string >( fields, 0 );    // 0
+      uint8_t category = getField< uint8_t >( fields, 3 );        // 3
 
-      int8_t class_job = getField< int8_t >( fields, 10 );//9
-      uint8_t unlock_level = getField< uint8_t >( fields, 11 );//10
-      int8_t range = getField< int8_t >( fields, 13 );//11
-      bool can_target_self = getField< bool >( fields, 14 );//12
-      bool can_target_party = getField< bool>( fields, 15 );//13
-      bool can_target_friendly = getField< bool >( fields, 16 );//14
-      bool can_target_enemy = getField< bool >( fields, 17 );//15
+      int8_t class_job = getField< int8_t >( fields, 10 );        // 10
+      uint8_t unlock_level = getField< uint8_t >( fields, 11 );   // 11
+      int8_t range = getField< int8_t >( fields, 13 );            // 13
+      bool can_target_self = getField< bool >( fields, 14 );      // 14
+      bool can_target_party = getField< bool>( fields, 15 );      // 15
+      bool can_target_friendly = getField< bool >( fields, 16 );  // 16
+      bool can_target_enemy = getField< bool >( fields, 17 );     // 17
 
-      bool is_aoe = getField< bool >( fields, 20 );//18
+      bool is_aoe = getField< bool >( fields, 20 );               // 20
+      // Column 23: Seems to be related to raising skills (Raise, Resurrection, Reanimate)
+      bool can_target_ko = getField< bool >( fields, 24 );        // 24
 
-      bool can_target_ko = getField< bool >( fields, 24 );//22
+      uint8_t aoe_type = getField< uint8_t >( fields, 26 );       // 26
+      uint8_t radius = getField< uint8_t >( fields, 27 );         // 27
 
-      uint8_t aoe_type = getField< uint8_t >( fields, 26 );//24
-      uint8_t radius = getField< uint8_t >( fields, 27 );//25
+      uint8_t points_type = getField< uint8_t >( fields, 30 );    // 30
+      uint16_t points_cost = getField< uint16_t >( fields, 31 );  // 31
 
-      uint8_t points_type = getField< uint8_t >( fields, 30 );//28
-      uint16_t points_cost = getField< uint16_t >( fields, 31 );//29
+      uint32_t instantval = getField< bool >( fields, 35 );       // 35
+      uint16_t cast_time = getField< uint16_t >( fields, 36 );    // 36
+      uint16_t recast_time = getField< uint16_t >( fields, 37 );  // 37
 
-      uint32_t instantval = getField< bool >( fields, 35 );
+      int8_t model = getField< int8_t >( fields, 39 );            // 39: Action model
+      uint8_t aspect = getField< uint8_t >( fields, 40 );          // 40: Action aspect
 
       uint8_t typeshift = 0x6;
       uint8_t mask = 1 << typeshift;
@@ -353,8 +358,7 @@ bool Core::Data::ExdData::loadActionInfo()
       bool final = ( instantval & mask ) == mask;
       bool is_instant = final;
 
-      uint16_t cast_time = getField< uint16_t >( fields, 36 );
-      uint16_t recast_time = getField< uint16_t >( fields, 37 );
+      
 
       info.id = id;
       info.name = name;
@@ -381,6 +385,9 @@ bool Core::Data::ExdData::loadActionInfo()
       info.is_instant = is_instant;
       info.cast_time = cast_time * 100;
       info.recast_time = recast_time * 100;
+
+      info.model = model;
+      info.aspect = aspect;
 
       m_actionInfoMap[id] = info;
 

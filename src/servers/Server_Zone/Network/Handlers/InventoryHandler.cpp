@@ -63,19 +63,19 @@ void Core::Network::GameConnection::inventoryModifyHandler( const Packets::GameP
 
         case 0x07: // discard item action
         {
-            pPlayer->getInvetory()->discardItem( fromContainer, fromSlot );
+            pPlayer->getInventory()->discardItem( fromContainer, fromSlot );
         }
             break;
 
         case 0x08: // move item action
         {
-            pPlayer->getInvetory()->moveItem( fromContainer, fromSlot, toContainer, toSlot );
+            pPlayer->getInventory()->moveItem( fromContainer, fromSlot, toContainer, toSlot );
         }
             break;
 
         case 0x09: // swap item action
         {
-            pPlayer->getInvetory()->swapItem( fromContainer, fromSlot, toContainer, toSlot );
+            pPlayer->getInventory()->swapItem( fromContainer, fromSlot, toContainer, toSlot );
         }
             break;
 
