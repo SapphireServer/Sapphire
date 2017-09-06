@@ -1,0 +1,65 @@
+div#TopDiv{
+  padding:10px;
+}
+
+img{
+  display:block;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+h2.text-center{
+  color:#fff;
+}
+
+h1.text-center{
+  color:#FFF;
+}
+
+div.login-card{
+  background-color:#282828;
+}
+
+p{
+  color:#fff;
+}
+
+input.input-sm{
+  display:block;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+div#Conttwo.container{
+  display:block;
+  width:300px;
+  background-color:rgba(17, 17, 17, 0.77);
+}
+
+div#Split{
+  padding:2px;
+}
+
+p{
+  display:block;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+input{
+  display:block;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+button.btn.btn-default{
+  display:block;
+  margin-left:auto;
+  margin-right:auto;
+  color:#000;
+}
+
+div#space{
+  padding:3px;
+}
+
