@@ -645,8 +645,13 @@ void Core::Entity::Actor::addStatusEffectByIdIfNotExist( int32_t id, int32_t dur
    }
 }
 
+/*! \param Status that should be removed, based on its ID. */
+void Core::Entity::Actor::removeSingleStatusEffectFromId( int32_t id )
+{
+   m_pStatusEffectContainer->removeSingleStatusEffectFromId( id );
+}
+
 Core::StatusEffect::StatusEffectContainerPtr Core::Entity::Actor::getStatusEffectContainer() const
 {
    return m_pStatusEffectContainer;
 }
-

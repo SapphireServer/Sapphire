@@ -15,7 +15,7 @@ namespace Core { namespace Action {
 
       uint32_t getId() const;
 
-      Common::ActionType getActionType() const;
+      Common::HandleActionType getHandleActionType() const;
 
       Entity::ActorPtr getTargetActor() const;
 
@@ -42,7 +42,7 @@ namespace Core { namespace Action {
 
    protected:
       uint32_t	m_id;
-      Common::ActionType m_actionType;
+      Common::HandleActionType m_handleActionType;
 
       uint64_t	m_startTime;
       uint32_t	m_castTime;

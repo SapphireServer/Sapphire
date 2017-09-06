@@ -1,10 +1,14 @@
-<!DOCTYPE HTML>
-<html xmlns="http://www.w3.org/1999/xhtml">
-	<head>
-		<title>FFXIV 1.0 Login</title>
-		<link rel="stylesheet" type="text/css" href="css/reset.css" />	
-		<link rel="stylesheet" type="text/css" href="css/global.css" />	
-		<script src="//cdnjs.cloudflare.com/ajax/libs/json3/3.3.2/json3.min.js"></script>
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sapphire Create Account</title>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/global.css">
+			<script src="//cdnjs.cloudflare.com/ajax/libs/json3/3.3.2/json3.min.js"></script>
 		<script>
 			function doLogin(){
 				var url = "sapphire-api/lobby/createAccount";
@@ -19,7 +23,7 @@
 							var parsed = JSON.parse(response);
 							window.external.Boot(parsed.sId, parsed.lobbyHost, parsed.frontierHost);
 						}catch(err){
-							document.getElementById("errorMessage").innerHTML = "Login failed.";
+							document.getElementById("Error").innerHTML = "Create User failed.";
 						}
 					}
 				}
@@ -39,35 +43,28 @@
 				return data;
 			}	
 		</script>
-	</head>
-	<body oncontextmenu="return false;">
-			<div style="width: 80%; height: 300px; margin-left: auto; margin-right: auto; margin-top: 20%">
-				<div class="contentContainer" >
-					<img style="width: 100%;" src="./sapphire_logo.png" />
-				</div>
-				
-				<div class="contentContainer">
-					<div class="info">
-						<br />
-						<table class="infoForm">
-								<tr>
-									<td>Username:</td>
-									<td><input type="text" name="username" /></td>
-								</tr>
-								<tr>
-									<td>Password:</td>
-									<td><input type="password" name="password" /></td>
-								</tr>
-								<tr>
-									<td colspan="2">
-										<input id="submitButton" type="button" value="Create User" onclick="doLogin();" />
-									</td>
-								</tr>
-							</table>
-						<p class="errorMessage" id="errorMessage"></p>
-					</div>
-				</div>
-			</div>
-	
-	</body>
+</head>
+
+<body>
+    <div id="TopDiv"></div>
+    <div class="container"><img src="assets/img/sapphire_logo.png" width="40%" height="40%"></div>
+    <div class="container" id="Conttwo">
+        <div></div>
+        <h1 class="text-center">Create Account</h1>
+        <p class="text-center">Username: </p>
+        <td><input type="text" name="username" /></td>
+        <div id="Split"></div>
+        <p class="text-center">Password: </p>
+        <td><input type="password" name="password" /></td>
+        <div id="space"></div>
+		<button class="btn btn-default" input id="submitButton" onclick="doLogin()">Create User</button>
+		<p id="Error" class="text-center"></p>
+        <div id="Split">
+            <p id="CreateUser"><a href="login.html"><span style="text-decoration: underline;">Back to Login</span></a></p>
+        </div>
+    </div>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+</body>
+
 </html>

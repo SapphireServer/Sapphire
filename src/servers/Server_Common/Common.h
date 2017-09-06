@@ -545,13 +545,37 @@ namespace Core {
          FcTalk = 0x001F,
       };
 
-      enum ActionType : uint8_t
+      enum struct ActionAspect : uint8_t
       {
+         None = 0,   // Doesn't imply unaspected
+         Fire = 1,
+         Ice = 2,
+         Wind = 3,
+         Stone = 4,
+         Lightning = 5,
+         Water = 6,
+         Unaspected = 7    // Doesn't imply magical unaspected damage - could be unaspected physical
+      };
 
+      enum struct ActionType : int8_t
+      {
+         WeaponOverride = -1, // Needs more investigation (takes the damage type of the equipped weapon)?
+         Unknown_0 = 0,
+         Slashing = 1, 
+         Piercing = 2, 
+         Blunt = 3,
+         Unknown_4 = 4, 
+         Magical = 5,
+         Darkness = 6,
+         Unknown_7 = 7,
+         LimitBreak = 8,
+      };
+
+      enum HandleActionType : uint8_t
+      {
          Event,
          Spell,
          Teleport
-
       };
 
       enum HandleSkillType : uint8_t

@@ -47,7 +47,7 @@ namespace Server {
          //m_data.tPMax = 3000;
          m_data.level = pPlayer->getLevel();
          memcpy( m_data.look, pPlayer->getLookArray(), 26 );
-         auto item = pPlayer->getInvetory()->getItemAt( Inventory::GearSet0, 0 );
+         auto item = pPlayer->getInventory()->getItemAt( Inventory::GearSet0, Inventory::EquipSlot::MainHand );
          if( item )
             m_data.mainWeaponModel = item->getModelId1();
          m_data.secWeaponModel = pPlayer->getModelSubWeapon();
