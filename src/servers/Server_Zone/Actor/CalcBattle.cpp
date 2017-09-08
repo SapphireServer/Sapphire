@@ -45,9 +45,9 @@ uint32_t CalcBattle::calculateBaseStat( PlayerPtr pPlayer )
    // ARR Base Stat Formula (Off by one in several cases)
    else
       // Old: base = 0.053f * ( level * level ) + ( 1.022f * level ) - 0.907f + 20;
-      // V1: base = 0.0523f * ( level * level ) + ( 1.04f * level ) + 19.405;
-      // V2: base = 0.05223f * ( level * level ) + ( 1.0405f * level ) + 19.405;
-      base = 0.052602 * ( level * level ) + ( 1.0179f * level ) + 19.6;
+      // V1: base = 0.0523f * ( level * level ) + ( 1.04f * level ) + 19.405f;
+      // V2: base = 0.05223f * ( level * level ) + ( 1.0405f * level ) + 19.405f;
+      base = 0.052602f * ( level * level ) + ( 1.0179f * level ) + 19.6f;
 
    return base;
 }
