@@ -26,7 +26,7 @@ extern Core::Data::ExdData g_exdData;
 
 */
 
-// Don't know too much about this formula, but seems to work for some of the levels tested.
+// 3 Versions. SB and HW are linear, ARR is polynomial.
 // Originally from Player.cpp, calculateStats().
 
 uint32_t CalcBattle::calculateBaseStat( PlayerPtr pPlayer )
@@ -34,10 +34,20 @@ uint32_t CalcBattle::calculateBaseStat( PlayerPtr pPlayer )
    float base = 0.0f;
    uint8_t level = pPlayer->getLevel();
 
-   if (level < 51)
-      base = 0.053f * ( level * level ) + ( 1.022f * level ) - 0.907f + 20;
+   // SB Base Stat Formula  (Aligned)
+   if ( level > 60 )
+   { 
+      base = ( ( ( level == 61) ? 224 : 220 ) + ( level - 61 ) * 8);
+   }
+   // HW Base Stat Formula  (Aligned)
+   else if ( level > 50 )
+      base = 1.63f * level + 121.02f;
+   // ARR Base Stat Formula (Off by one in several cases)
    else
-      base = 1.627f * level + 120.773f;
+      // Old: base = 0.053f * ( level * level ) + ( 1.022f * level ) - 0.907f + 20;
+      // V1: base = 0.0523f * ( level * level ) + ( 1.04f * level ) + 19.405;
+      // V2: base = 0.05223f * ( level * level ) + ( 1.0405f * level ) + 19.405;
+      base = 0.052602 * ( level * level ) + ( 1.0179f * level ) + 19.6;
 
    return base;
 }
