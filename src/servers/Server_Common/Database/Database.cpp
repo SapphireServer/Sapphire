@@ -62,7 +62,7 @@ uint32_t QueryResult::getRowCount() const
    return m_rowCount;
 }
 
-   Database::Database()
+Database::Database()
 {
    m_port = 0;
    m_counter = 0;
@@ -150,9 +150,8 @@ DatabaseConnection * Database::getFreeConnection()
    }
 }
 
-boost::shared_ptr<QueryResult> Database::query( const std::string& QueryString )
+boost::shared_ptr< QueryResult > Database::query( const std::string& QueryString )
 {
-
    // Send the query
    boost::shared_ptr< QueryResult > qResult( nullptr );
    DatabaseConnection * con = getFreeConnection();
@@ -188,7 +187,7 @@ std::string Database::escapeString( std::string Escape )
       ret = Escape.c_str();
    else
       ret = a2;
-   
+
    con->lock.unlock();
    return std::string( ret );
 }
@@ -257,10 +256,10 @@ bool Database::handleError( DatabaseConnection *con, uint32_t ErrorNumber )
 
 QueryResult * Database::storeQueryResult( DatabaseConnection * con )
 {
-   QueryResult *res;
-   MYSQL_RES * pRes = mysql_store_result( con->conn );
-   uint32_t uRows = ( uint32_t ) mysql_affected_rows( con->conn );
-   uint32_t uFields = ( uint32_t ) mysql_field_count( con->conn );
+   QueryResult* res;
+   MYSQL_RES* pRes = mysql_store_result( con->conn );
+   auto uRows = mysql_affected_rows( con->conn );
+   auto uFields = mysql_field_count( con->conn );
 
    if( uRows == 0 || uFields == 0 || pRes == 0 )
    {
@@ -270,7 +269,9 @@ QueryResult * Database::storeQueryResult( DatabaseConnection * con )
       return nullptr;
    }
 
-   res = new QueryResult( pRes, uFields, uRows );
+   res = new QueryResult( pRes,
+                          static_cast< uint32_t >( uFields ),
+                          static_cast< uint32_t >( uRows ) );
    res->nextRow();
 
    return res;
@@ -293,15 +294,13 @@ bool Database::reconnect( DatabaseConnection * conn )
                                0 );
    if( temp2 == nullptr )
    {
-      g_log.error( "Database: Could not reconnect to database because of " + std::string( mysql_error( temp ) ) );
+      g_log.error( "Database: Could not reconnect to database -> " + std::string( mysql_error( temp ) ) );
       mysql_close( temp );
       return false;
    }
 
    if( conn->conn != nullptr )
-   {
       mysql_close( conn->conn );
-   }
 
    conn->conn = temp;
    return true;
@@ -356,13 +355,9 @@ std::string Field::getString() const
 void Field::getBinary( char *dstBuf, uint16_t size ) const
 {
    if( m_pValue )
-   {
       memcpy( dstBuf, m_pValue, size );
-   }
    else
-   {
       dstBuf = nullptr;
-   }
 }
 
 float Field::getFloat() const
