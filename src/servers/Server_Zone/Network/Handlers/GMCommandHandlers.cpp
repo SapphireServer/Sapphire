@@ -330,6 +330,9 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
             break;
     }
 
+    pPlayer->setSyncFlag( Common::PlayerSyncFlags::All );
+    targetPlayer->setSyncFlag( Common::PlayerSyncFlags::All );
+
 }
 
 void Core::Network::GameConnection::gm2Handler( const Packets::GamePacket& inPacket,
@@ -418,4 +421,8 @@ void Core::Network::GameConnection::gm2Handler( const Packets::GamePacket& inPac
             pPlayer->sendUrgent( "GM2 Command not implemented: " + std::to_string( commandId ) );
             break;
     }
+
+    pPlayer->setSyncFlag( Common::PlayerSyncFlags::All );
+    targetPlayer->setSyncFlag( Common::PlayerSyncFlags::All );
+
 }
