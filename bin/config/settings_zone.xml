@@ -18,7 +18,11 @@
    </General>
 
    <Parameters>
-	  <!-- Message players see upon logging in -->
-      <MotD>&lt;&lt;&lt;Welcome to Sapphire&gt;&gt;&gt;</MotD>
+	  <!-- Messages players see upon logging in - These *must* be smaller than 307 characters -->
+      <MotDArray>
+         <MotD>&lt;&lt;&lt;Welcome to Sapphire&gt;&gt;&gt;</MotD>
+         <MotD>This is a very good server</MotD>
+         <MotD>You can change these messages by editing MotDArray in config/settings_zone.xml</MotD>
+      </MotdArray>
    </Parameters>
 </Settings>
