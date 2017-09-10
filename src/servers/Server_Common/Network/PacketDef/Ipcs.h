@@ -47,7 +47,7 @@ namespace Packets {
       Ping                       = 0x0065, // updated for sb
       Init                       = 0x0066, // updated for sb
       Chat                       = 0x0067, // updated for sb
-
+      ChatBanned                 = 0x006B,
       Logout                     = 0x0077, // updated for sb
       CFNotify                   = 0x0078,
       CFMemberStatus             = 0x0079,
