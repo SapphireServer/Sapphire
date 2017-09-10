@@ -48,6 +48,12 @@ struct FFXIVIpcChat : FFXIVIpcBasePacket<Chat>
    char msg[1012];
 };
 
+struct FFXIVIpcChatBanned : FFXIVIpcBasePacket<ChatBanned>
+{
+   uint8_t padding[4]; // I was not sure reinterpreting ZST is valid behavior in C++.
+                     // client doesn't care about the data (zero sized) for this opcode anyway.
+};
+
 /**
 * Structural representation of the packet sent by the server
 * carrying chat messages
@@ -1216,7 +1222,7 @@ struct FFXIVIpcCFNotify : FFXIVIpcBasePacket<CFNotify>
     uint32_t param1; // usually classJobId
     uint32_t param2; // usually flag
     uint32_t param3; // usually languages, sometimes join in progress timestamp
-    
+
     uint16_t param4; // usually roulette id
     uint16_t contents[5];
 };
