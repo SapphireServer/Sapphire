@@ -29,5 +29,8 @@
       <AllowNoSessionConnect>false</AllowNoSessionConnect>   
       <!-- The ID of the Sapphire world - this is what the game determines your datacenter with, check world.exh -->
       <WorldID>67</WorldID>   
+	  <!-- The name of the world -->
+	  <!-- TODO: Allow multiple world servers -->
+      <WorldName>Sapphire</WorldName>   
     </Parameters>
 </Settings>

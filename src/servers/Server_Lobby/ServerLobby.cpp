@@ -46,6 +46,11 @@ namespace Core {
       return g_restConnector.getSession( sessionId );
    }
 
+   XMLConfigPtr ServerLobby::getConfig() const
+   {
+      return m_pConfig;
+   }
+
    void ServerLobby::run( int32_t argc, char* argv[] )
    {
       g_log.setLogPath( "log\\SapphireLobby" );

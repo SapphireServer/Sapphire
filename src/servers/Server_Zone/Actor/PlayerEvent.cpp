@@ -2,6 +2,7 @@
 #include <src/servers/Server_Common/Network/GamePacket.h>
 #include <src/servers/Server_Common/Logging/Logger.h>
 #include <src/servers/Server_Common/Network/PacketContainer.h>
+#include <src/servers/Server_Common/Config/XMLConfig.h>
 
 #include "Player.h"
 
@@ -18,8 +19,10 @@
 #include "src/servers/Server_Zone/Network/PacketWrappers/EventFinishPacket.h"
 
 #include "src/servers/Server_Zone/Event/Event.h"
+#include "Server_Zone/ServerZone.h"
 
 extern Core::Logger g_log;
+extern Core::ServerZone g_serverZone;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -231,10 +234,9 @@ void Core::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlayer )
 
 void Core::Entity::Player::onLogin()
 {
-
+   ;
    // TODO: Replace this with MoTD from config
-   sendNotice( "<<<Welcome to Sapphire>>>\nCompiled: " __DATE__ " " __TIME__ "\n"
-              "Mind you, character data is going to be wiped regulary!" );
+   sendNotice( g_serverZone.getConfig()->getValue< std::string >( "Settings.Parameters.MotD", " <<<Welcome to Sapphire >>>" ) );
 }
 
 void Core::Entity::Player::onZoneStart()

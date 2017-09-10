@@ -17,4 +17,8 @@
       </Mysql>
    </General>
 
+   <Parameters>
+	  <!-- Message players see upon logging in -->
+      <MotD>&lt;&lt;&lt;Welcome to Sapphire&gt;&gt;&gt;</MotD>
+   </Parameters>
 </Settings>
