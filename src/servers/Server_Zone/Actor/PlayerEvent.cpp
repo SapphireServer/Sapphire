@@ -234,9 +234,9 @@ void Core::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlayer )
 
 void Core::Entity::Player::onLogin()
 {
-   ;
-   // TODO: Replace this with MoTD from config
-   sendNotice( g_serverZone.getConfig()->getValue< std::string >( "Settings.Parameters.MotD", " <<<Welcome to Sapphire >>>" ) );
+   for( auto& child : g_serverZone.getConfig()->getChild( "Settings.Parameters.MotDArray" ) ) {
+      sendNotice( child.second.data() );
+   }
 }
 
 void Core::Entity::Player::onZoneStart()
