@@ -30,6 +30,8 @@ namespace Core
       uint16_t m_port;
       std::string m_ip;
 
+      boost::shared_ptr<XMLConfig> m_pConfig;
+
    public:
       ServerLobby( const std::string& configPath );
       ~ServerLobby( void );
@@ -42,10 +44,11 @@ namespace Core
       {
          m_sessionMap[std::string( sessionId )] = pSession;
       }
+      
+      boost::shared_ptr<XMLConfig> getConfig() const;
 
       LobbySessionPtr getSession( char* sessionId );
       uint32_t m_numConnections;
-      boost::shared_ptr<XMLConfig> m_pConfig;
 
    };
 
