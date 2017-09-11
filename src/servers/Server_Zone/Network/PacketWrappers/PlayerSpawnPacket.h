@@ -45,7 +45,7 @@ namespace Server {
          m_data.tPCurr = pPlayer->getTp();
          m_data.hPMax = pPlayer->getMaxHp();
          m_data.mPMax = pPlayer->getMaxMp();
-         m_data.gmRank = 0xff;
+         m_data.gmRank = pPlayer->getGmRank();
          //m_data.tPMax = 3000;
          m_data.level = pPlayer->getLevel();
          memcpy( m_data.look, pPlayer->getLookArray(), 26 );

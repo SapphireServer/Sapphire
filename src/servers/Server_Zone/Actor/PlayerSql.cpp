@@ -80,7 +80,8 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
       "cd.GrandCompany, "
       "cd.GrandCompanyRank, "
       "cd.CFPenaltyUntil, "
-      "cd.OpeningSequence "
+      "cd.OpeningSequence, "
+      "cd.GMRank "
       "FROM charabase AS c "
       " INNER JOIN charadetail AS cd "
       " ON c.CharacterId = cd.CharacterId "
@@ -171,12 +172,12 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
 
    m_openingSequence = field[36].getUInt32();
 
+   m_gmRank = field[37].getUInt8();
+
    m_pCell = nullptr;
 
    if( !loadActiveQuests() || !loadClassData() || !loadSearchInfo() )
       g_log.error( "Player id " + char_id_str + " data corrupt!" );
-
-   m_userLevel = 1;
 
    m_maxHp = getMaxHp();
    m_maxMp = getMaxMp();

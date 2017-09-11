@@ -478,6 +478,9 @@ public:
 
    uint16_t getZoneId() const;
 
+   uint8_t getGmRank() const;
+   void setGmRank( uint8_t rank );
+
    uint8_t getMode() const;
    void setMode( uint8_t mode );
 
@@ -589,7 +592,7 @@ private:
    boost::shared_ptr< Common::QuestActive > m_activeQuests[30];
    int16_t m_questTracking[5];
    uint8_t m_stateFlags[7];
-   uint8_t m_userLevel;
+   uint8_t m_gmRank;
    uint16_t zoneId;
 
    bool m_bInCombat;
