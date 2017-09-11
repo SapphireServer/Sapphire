@@ -110,6 +110,16 @@ uint16_t Core::Entity::Player::getZoneId() const
    return m_zoneId;
 }
 
+uint8_t Core::Entity::Player::getGmRank() const
+{
+   return m_gmRank;
+}
+
+void Core::Entity::Player::setGmRank( uint8_t rank )
+{
+   m_gmRank = rank;
+}
+
 uint8_t Core::Entity::Player::getMode() const
 {
    return m_mode;
@@ -778,11 +788,6 @@ void Core::Entity::Player::setLevelForClass( uint8_t level, Core::Common::ClassJ
     m_classArray[classJobIndex] = level;
 
     setSyncFlag( PlayerSyncFlags::ExpLevel );
-}
-
-uint8_t Core::Entity::Player::getUserLevel() const
-{
-   return m_userLevel;
 }
 
 void Core::Entity::Player::eventActionStart( uint32_t eventId,

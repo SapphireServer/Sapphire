@@ -331,7 +331,7 @@ int main(int argc, char* argv[])
             }
             else
             {
-               int32_t charId = g_sapphireAPI.createCharacter( result, name, finalJson );
+               int32_t charId = g_sapphireAPI.createCharacter( result, name, finalJson, m_pConfig->getValue< uint8_t >( "Settings.Parameters.DefaultGMRank", 255 ) );
 
                std::string json_string = "{\"result\":\"" + std::to_string( charId ) + "\"}";
                *response << "HTTP/1.1 200\r\nContent-Length: " << json_string.length() << "\r\n\r\n" << json_string;

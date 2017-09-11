@@ -140,6 +140,16 @@ namespace Core {
          m_tribe = tribe;
       }
 
+      uint8_t getGmRank()
+      {
+         return m_birthMonth;
+      }
+
+      void setGmRank( uint8_t rank )
+      {
+         m_gmRank = rank;
+      }
+
       uint32_t						m_modelEquip[10];
 
    private:
@@ -161,6 +171,8 @@ namespace Core {
       std::map<uint8_t, uint32_t>		m_lookMap;
       std::map<uint8_t, uint16_t>		m_classMap;
       uint8_t							m_look[26];
+
+      uint8_t							m_gmRank;
 
       char							m_name[34];
 
