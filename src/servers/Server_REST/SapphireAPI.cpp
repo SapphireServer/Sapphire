@@ -113,7 +113,7 @@ bool Core::Network::SapphireAPI::createAccount( const std::string& username, con
  
 }
 
-int Core::Network::SapphireAPI::createCharacter( const int& accountId, const std::string& name, const std::string& infoJson )
+int Core::Network::SapphireAPI::createCharacter( const int& accountId, const std::string& name, const std::string& infoJson, const int& gmRank )
 {
    Core::PlayerMinimal newPlayer;
 
@@ -166,6 +166,7 @@ int Core::Network::SapphireAPI::createCharacter( const int& accountId, const std
    newPlayer.setBirthDay( tmpVector2.at( 3 ), tmpVector2.at( 2 ) );
    newPlayer.setClass( tmpVector2.at( 4 ) );
    newPlayer.setTribe( tmpVector2.at( 5 ) );
+   newPlayer.setGmRank( gmRank );
 
    newPlayer.saveAsNew();
 
