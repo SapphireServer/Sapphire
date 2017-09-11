@@ -4,8 +4,9 @@ cmake_policy(SET CMP0014 OLD)
 
 project(Sapphire_Zone)
 
-include_directories("../../libraries/external/ChaiScript-6.0.0/include/")
-include_directories("../../libraries/sapphire/datReader/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/ChaiScript-6.0.0/include/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/sapphire/datReader/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/MySQLpp/include/")
 include_directories("../")
 
 file(GLOB SERVER_PUBLIC_INCLUDE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/* ${CMAKE_CURRENT_SOURCE_DIR}/Script/*)
@@ -77,6 +78,7 @@ include_directories(${Boost_INCLUDE_DIR})
 link_directories(${BOOST_LIBRARYDIR})
 link_directories(${SERVER_COMMON_DIR})
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/sapphire/datReader)
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/MySQLpp/lib/opt)
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 4)
   # 32 bit link
@@ -104,9 +106,9 @@ set_target_properties(server_zone PROPERTIES
 )
 
 if (UNIX)
-  target_link_libraries (server_zone Common xivdat pthread mysqlclient dl z)
+  target_link_libraries ( server_zone Common xivdat pthread mysqlclient dl z )
 else()
-  target_link_libraries (server_zone Common xivdat libmysql zlib1)
+  target_link_libraries ( server_zone Common xivdat libmysql zlib1 mysqlcppconn )
 endif()
 
 target_link_libraries(server_zone ${Boost_LIBRARIES} ${Boost_LIBRARIES})

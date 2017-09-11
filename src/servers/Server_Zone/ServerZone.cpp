@@ -7,6 +7,7 @@
 #include <src/servers/Server_Common/Logging/Logger.h>
 #include <src/servers/Server_Common/Config/XMLConfig.h>
 #include <src/servers/Server_Common/Database/Database.h>
+#include <src/servers/Server_Common/Database/DatabaseNew.h>
 
 #include <src/servers/Server_Common/Network/Connection.h>
 #include <src/servers/Server_Common/Network/Hive.h>
@@ -33,6 +34,7 @@
 
 Core::Logger g_log;
 Core::Db::Database g_database;
+Core::Db::DatabaseNew g_dbNew;
 Core::DebugCommandHandler g_gameCommandMgr;
 Core::Scripting::ScriptManager g_scriptMgr;
 Core::Data::ExdData g_exdData;
@@ -163,6 +165,22 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
    params.password = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Pass", "" );
    params.port = m_pConfig->getValue< uint16_t >( "Settings.General.Mysql.Port", 3306 );
    params.username = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Username", "root" );
+
+   Db::DbParams params1;
+   params1.bufferSize = 16384;
+   params1.connectionCount = 3;
+   params1.databaseName = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Database", "sapphire" );
+   params1.hostname = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Host", "127.0.0.1" );
+   params1.password = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Pass", "" );
+   params1.port = m_pConfig->getValue< uint16_t >( "Settings.General.Mysql.Port", 3306 );
+   params1.username = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Username", "root" );
+
+
+   if( !g_dbNew.initialize( params1 ) )
+   {
+      std::this_thread::sleep_for( std::chrono::milliseconds( 5000 ) );
+      return false;
+   }
 
    if( !g_database.initialize( params ) )
    {
