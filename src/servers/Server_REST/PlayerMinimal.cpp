@@ -270,6 +270,7 @@ namespace Core {
          " unlocks, "
          " QuestTracking, "
          " Aetheryte, "
+         " GMRank, "
          " UPDATE_DATE ) "
          " VALUES (" + std::to_string( m_iD ) + ", "
          + std::to_string( m_guardianDeity ) + ", "
@@ -283,7 +284,8 @@ namespace Core {
          + "UNHEX('" + std::string( Util::binaryToHexString( (uint8_t*)questComplete, 200 ) ) + "'), "
          + "UNHEX('" + std::string( Util::binaryToHexString( (uint8_t*)unlocks, 64 ) ) + "'), "
          + "UNHEX('" + std::string( Util::binaryToHexString( (uint8_t*)questTracking, 10 ) ) + "'), "
-         + "UNHEX('" + std::string( Util::binaryToHexString( (uint8_t*)aetherytes, 12 ) ) + "'), NOW());" );
+         + "UNHEX('" + std::string( Util::binaryToHexString( (uint8_t*)aetherytes, 12 ) ) + "'),"
+         + std::to_string( m_gmRank ) + ", NOW());" );
 
 
       g_database.execute( "INSERT INTO characlass  (CharacterId, Lv_" + std::to_string( g_exdData.m_classJobInfoMap[m_class].exp_idx ) + ", UPDATE_DATE ) "
