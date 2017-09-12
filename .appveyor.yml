@@ -23,7 +23,6 @@ before_build:
   - cmake --version
   - git clone https://github.com/mysql/mysql-connector-cpp
   - cd mysql-connector-cpp
-  - git checkout 1.1
   - cd ..
   - cmake mysql-connector-cpp/. -DBOOST_ROOT=C:\\Libraries\\boost_1_60_0
   - cmake --build . --target INSTALL --config RelWithDebInfo
