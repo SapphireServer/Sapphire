@@ -7,20 +7,9 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/ChaiSc
 
 if(UNIX)
   include_directories("/usr/include/mysql/")
-  message(STATUS "Setting GCC flags")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
-
 else()
-  add_definitions(-D_WIN32_WINNT=0x601)
   include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/MySQL/")
-  include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/MySQLpp/")
-  include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/MySQLpp/includes/")
   message(STATUS "Using boost in /libraries/external")
-  message(STATUS "Setting MSVC flags")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHc")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
-
 endif()
 
 
@@ -42,7 +31,7 @@ link_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/sapphire/datReader
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_library(Common ${UTILS_PUBLIC_INCLUDE_FILES} ${UTILS_SOURCE_FILES} Network/PacketDef/Lobby/ServerLobbyDef.h)
+add_library(Common ${UTILS_PUBLIC_INCLUDE_FILES} ${UTILS_SOURCE_FILES})
 
 set_target_properties(Common PROPERTIES
     CXX_STANDARD 14

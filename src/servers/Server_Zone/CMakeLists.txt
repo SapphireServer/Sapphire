@@ -26,21 +26,11 @@ file(GLOB SERVER_SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
         Zone/*.c*)
 
 set(SERVER_COMMON_DIR ../Server_Common)
-set(Boost_USE_STATIC_LIBS ON)
 
 if(UNIX)
   include_directories("/usr/include/mysql/")
-  message(STATUS "Setting GCC flags")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 else()
-  add_definitions(-D_WIN32_WINNT=0x601)
-  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
   include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/MySQL/")
-  message(STATUS "Setting MSVC flags")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHc")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
-
 endif()
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Script)
@@ -61,7 +51,7 @@ endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_CURRENT_SOURCE_DIR}/../../../bin/")
 
-add_executable(server_zone ${SERVER_PUBLIC_INCLUDE_FILES} ${SERVER_SOURCE_FILES} Linkshell/Linkshell.cpp Linkshell/Linkshell.h)
+add_executable(server_zone ${SERVER_PUBLIC_INCLUDE_FILES} ${SERVER_SOURCE_FILES} )
 add_dependencies(server_zone Common xivdat)
 
 set_target_properties(server_zone PROPERTIES
