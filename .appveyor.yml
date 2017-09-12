@@ -28,7 +28,7 @@ before_build:
   - git submodule update --init
   - mkdir build
   - cd build
-  - cmake .. -G "Visual Studio 14 2015"
+  - cmake .. -G "Visual Studio 14 2015" -DMYSQLCONNECTORCPP_ROOT_DIR=C:\\projects\\mysqlcpp\\mysql-connector-cpp
   - cmake --build . --target ALL_BUILD --config Debug
 
 build_script:
