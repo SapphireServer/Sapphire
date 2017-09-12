@@ -25,6 +25,7 @@ before_build:
   - cd mysqlcpp
   - cmake --version
   - git clone https://github.com/mysql/mysql-connector-cpp
+  - git checkout 1.1
   - cd mysql-connector-cpp
   - cd ..
   - xcopy c:\projects\sapphire\src\libraries\external\MySQL c:\MySQL\ /s /e /h
