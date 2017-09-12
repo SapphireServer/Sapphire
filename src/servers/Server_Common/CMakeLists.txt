@@ -8,7 +8,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/ChaiSc
 if(UNIX)
   include_directories("/usr/include/mysql/")
   message(STATUS "Setting GCC flags")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -m32")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
 else()
   add_definitions(-D_WIN32_WINNT=0x601)
