@@ -18,7 +18,13 @@ services:
 
 before_build:
   - set PATH="C:\\Program Files\\MySQL\\MySQL Server 5.7\\bin";%PATH%
-  - cd c:\projects\sapphire
+  - mkdir myqlcpp
+  - cd mysqlcpp
+  - cmake --version
+  - git clone https://github.com/mysql/mysql-connector-cpp
+  - cmake mysql-connector-cpp/.
+  - devenv MYSQLCPPCONN.sln /build RelWithDebInfo
+  - cpack -G ZIP --config CPackConfig.cmake -C RelWithDebInfo- cd c:\projects\sapphire
   - git submodule update --init
   - mkdir build
   - cd build
