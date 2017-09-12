@@ -25,8 +25,8 @@ before_build:
   - cd mysql-connector-cpp
   - git checkout 1.1
   - cd ..
-  - cmake mysql-connector-cpp/. -DWITH_BOOST=C:\\Libraries\\boost_1_60_0
-  - cmake --build . --target ALL_BUILD  --config RelWithDebInfo
+  - cmake mysql-connector-cpp/. -DBOOST_ROOT=C:\\Libraries\\boost_1_60_0
+  - cmake --build . --target INSTALL --config RelWithDebInfo
   - cd c:\projects\sapphire
   - git submodule update --init
   - mkdir build
