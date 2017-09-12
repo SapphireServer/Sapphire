@@ -19,9 +19,24 @@ endif()
 set(SAPPHIRE_BOOST_FOLDER_NAME boost_1_60_0)
 set(SERVER_COMMON_DIR ${CMAKE_SOURCE_DIR}/src/servers/Server_Common)
 
-
 include( "cmake/boost.cmake" )
 include( "cmake/compiler.cmake" )
+
+
+if(UNIX)
+    include_directories("/usr/include/mysql/")
+else()
+    include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/libraries/external/MySQL/")
+    if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+        # 32 bit link
+        link_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/libraries/external/MySQL/x86)
+        link_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/libraries/external/zlib/x86)
+    else()
+        # 64 bit link
+        link_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/libraries/external/MySQL/x64)
+        link_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/libraries/external/zlib/x64)
+    endif()
+endif()
 
 if( NOT $MYSQLCONNECTORCPP_ROOT_DIR )
     set( MYSQLCONNECTORCPP_ROOT_DIR "G:\\programming\\libs\\MySQL1.1.9" )
@@ -32,8 +47,10 @@ FIND_PACKAGE(MySQLConnectorCPP)
 if( MYSQLCONNECTORCPP_FOUND )
     message( "Found Mysql C++ Connector at ${MYSQLCONNECTORCPP_INCLUDE_DIR}" )
 else()
-    message( FATAL_ERROR "You are missing the Mysql C++ Connector 1.1" )
+    message( FATAL_ERROR "Missing Mysql C++ Connector 1.1" )
 endif()
+
+
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/libraries/external/ChaiScript-6.0.0/include/")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/libraries/sapphire/datReader/")

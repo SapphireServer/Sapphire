@@ -1,14 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 project(Sapphire)
 
-if(UNIX)
-  include_directories("/usr/include/mysql/")
-else()
-  include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/MySQL/")
-  message(STATUS "Using boost in /libraries/external")
-endif()
-
-
 file(GLOB UTILS_PUBLIC_INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*")
 file(GLOB UTILS_SOURCE_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}*.cpp"

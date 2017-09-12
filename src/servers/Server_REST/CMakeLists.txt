@@ -6,22 +6,6 @@ file(GLOB SERVER_PUBLIC_INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*")
 file(GLOB SERVER_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}*.c*")
 
 
-if(UNIX)
-  include_directories("/usr/include/mysql/")
-else()
-  include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/MySQL/")
-endif()
-
-if(CMAKE_SIZEOF_VOID_P EQUAL 4)
-  # 32 bit link
-  link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/MySQL/x86)
-  link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/zlib/x86)
-else()
-# 64 bit link
-  link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/MySQL/x64)
-  link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/zlib/x64)
-endif()
-
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_CURRENT_SOURCE_DIR}/../../../bin/")
 add_executable(server_rest ${SERVER_PUBLIC_INCLUDE_FILES} ${SERVER_SOURCE_FILES})
 add_dependencies(server_rest Common xivdat)
