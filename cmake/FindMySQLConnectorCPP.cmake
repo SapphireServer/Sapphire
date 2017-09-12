@@ -10,6 +10,9 @@
 
 set(MYSQLCONNECTORCPP_ROOT_DIR
         "${MYSQLCONNECTORCPP_ROOT_DIR}"
+        "C:\\Program Files (x86)\\MySQL\\Connector.C++ 1.1\\"
+        "C:\\Program Files\\MySQL\\Connector.C++ 1.1\\"
+        "G:\\programming\\libs\\MySQL1.1.9\\"
         CACHE
         PATH
         "Where to start looking for this component.")

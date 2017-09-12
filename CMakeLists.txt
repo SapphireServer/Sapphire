@@ -38,10 +38,6 @@ else()
     endif()
 endif()
 
-if( NOT $MYSQLCONNECTORCPP_ROOT_DIR )
-    set( MYSQLCONNECTORCPP_ROOT_DIR "G:\\programming\\libs\\MySQL1.1.9" )
-endif()
-
 FIND_PACKAGE(MySQLConnectorCPP)
 
 if( MYSQLCONNECTORCPP_FOUND )
