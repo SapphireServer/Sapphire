@@ -28,7 +28,10 @@ before_build:
   - cd mysql-connector-cpp
   - git checkout 1.1
   - cd ..
-  - xcopy c:\projects\sapphire\src\libraries\external\MySQL c:\MySQL\ /s /e /h
+  - mkdir c:\MySQL
+  - mkdir c:\MySQL\mysql
+  - xcopy c:\projects\sapphire\src\libraries\external\MySQL c:\MySQL\mysql\ /s /e /h
+  - xcopy c:\projects\sapphire\src\libraries\external\MySQL c:\MySQL\mysql\includes\ /s /e /h
   - cmake mysql-connector-cpp/. -DBOOST_ROOT=C:\\Libraries\\boost_1_60_0
   - cmake --build . --target INSTALL --config RelWithDebInfo
   - cd c:\projects\sapphire
