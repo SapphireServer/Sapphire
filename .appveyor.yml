@@ -30,6 +30,12 @@ before_build:
   - cd ..
   - mkdir c:\MySQL
   - mkdir c:\MySQL\mysql
+  - mkdir c:\MySQL\x86
+  - mkdir c:\MySQL\x86\lib
+  - mkdir c:\MySQL\x64
+  - mkdir c:\MySQL\x64\lib
+  - copy c:\projects\sapphire\src\libraries\external\MySQL\x86\libmysql.lib c:\MySQL\x86\lib\
+  - copy c:\projects\sapphire\src\libraries\external\MySQL\x64\libmysql.lib c:\MySQL\x64\lib\
   - xcopy c:\projects\sapphire\src\libraries\external\MySQL c:\MySQL\mysql\ /s /e /h
   - xcopy c:\projects\sapphire\src\libraries\external\MySQL c:\MySQL\mysql\include\ /s /e /h
   - cmake mysql-connector-cpp/. -DBOOST_ROOT=C:\\Libraries\\boost_1_60_0
