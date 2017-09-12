@@ -23,7 +23,7 @@ before_build:
   - cmake --version
   - git clone https://github.com/mysql/mysql-connector-cpp
   - cmake mysql-connector-cpp/. -DWITH_BOOST=C:\\Libraries\\boost_1_60_0
-  - devenv MYSQLCPPCONN.sln /build RelWithDebInfo
+  - cmake --build . --target ALL_BUILD --config RelWithDebInfo
   - cd c:\projects\sapphire
   - git submodule update --init
   - mkdir build
