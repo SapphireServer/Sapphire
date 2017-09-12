@@ -18,7 +18,7 @@ services:
 
 before_build:
   - set PATH="C:\\Program Files\\MySQL\\MySQL Server 5.7\\bin";%PATH%
-  - mkdir myqlcpp
+  - mkdir mysqlcpp
   - cd mysqlcpp
   - cmake --version
   - git clone https://github.com/mysql/mysql-connector-cpp
