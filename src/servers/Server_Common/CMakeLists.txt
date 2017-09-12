@@ -1,10 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 project(Sapphire)
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/sapphire/datReader/")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/MySQLpp/include/")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/ChaiScript-6.0.0/include/")
-
 if(UNIX)
   include_directories("/usr/include/mysql/")
 else()

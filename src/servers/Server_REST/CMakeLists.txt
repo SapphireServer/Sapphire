@@ -2,10 +2,6 @@ cmake_minimum_required(VERSION 2.6)
 cmake_policy(SET CMP0015 NEW)
 project(Sapphire)
 
-include_directories("../../libraries/external/ChaiScript-6.0.0/include/")
-include_directories("../../libraries/sapphire/datReader/")
-include_directories("../")
-
 file(GLOB SERVER_PUBLIC_INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*")
 file(GLOB SERVER_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}*.c*")
 

@@ -4,11 +4,6 @@ cmake_policy(SET CMP0014 OLD)
 
 project(Sapphire_Zone)
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/ChaiScript-6.0.0/include/")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/sapphire/datReader/")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/MySQLpp/include/")
-include_directories("../")
-
 file(GLOB SERVER_PUBLIC_INCLUDE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/* ${CMAKE_CURRENT_SOURCE_DIR}/Script/*)
 file(GLOB SERVER_SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
         *.c*
