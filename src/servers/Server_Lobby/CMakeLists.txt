@@ -5,20 +5,11 @@ project(Sapphire)
 file(GLOB SERVER_PUBLIC_INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*")
 file(GLOB SERVER_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}*.c*")
 
-set(SERVER_COMMON_DIR ../Server_Common)
-set(Boost_USE_STATIC_LIBS ON)
-
 if(UNIX)
   include_directories("/usr/include/mysql/")
 else()
-  add_definitions(-D_WIN32_WINNT=0x601)
-  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
   include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external/MySQL/")
 endif()
-
-
-link_directories(${SERVER_COMMON_DIR})
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/sapphire/datReader)
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 4)
   # 32 bit link

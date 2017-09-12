@@ -34,6 +34,17 @@ if(WIN32)
             PATH_SUFFIXES
             lib)
 
+    if( NOT $MYSQLCONNECTORCPP_LIBRARY )
+            find_library(MYSQLCONNECTORCPP_LIBRARY
+                  NAMES
+                  mysqlcppconn
+                  mysqlcppconn-static
+                  HINTS
+                  ${MYSQLCONNECTORCPP_ROOT_DIR}
+                  PATH_SUFFIXES
+                  lib/opt)
+    endif()
+
 else()
     find_path(MYSQLCONNECTORCPP_INCLUDE_DIR
             mysql_connection.h

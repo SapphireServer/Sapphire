@@ -22,9 +22,6 @@ file(GLOB UTILS_SOURCE_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/Script/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Util/*.cpp")
 
-
-link_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/sapphire/datReader/")
-
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(Common ${UTILS_PUBLIC_INCLUDE_FILES} ${UTILS_SOURCE_FILES})
