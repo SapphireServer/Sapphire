@@ -1,0 +1,18 @@
+os:
+  - Visual Studio 2015
+
+build:
+  verbosity: detailed
+
+configuration:
+  - Debug
+
+branches:
+  except:
+    - /pr\/.+/
+
+install:
+
+
+
+
