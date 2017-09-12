@@ -17,6 +17,8 @@ if(NOT SAPPHIRE_BOOST_VER)
 endif()
 set(SAPPHIRE_BOOST_FOLDER_NAME boost_1_60_0)
 
+include( "boost.cmake" )
+
 include_directories("${PROJECT_INCLUDE_DIR}")
 include_directories("${PROJECT_SOURCE_DIR}")
 
