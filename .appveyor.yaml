@@ -14,6 +14,10 @@ branches:
 install:
 
 before_build:
-  mkdir mysqlcpp
-  cd mysqlcpp
-  cmake --version
+  - mkdir mysqlcpp
+  - cd mysqlcpp
+  - cmake --version
+  - git clone https://github.com/mysql/mysql-connector-cpp
+  - cmake .
+  - devenv MYSQLCPPCONN.sln /build RelWithDebInfo
+  - cpack -G ZIP --config CPackConfig.cmake -C RelWithDebInfo
