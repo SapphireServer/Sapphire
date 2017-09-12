@@ -13,6 +13,7 @@ branches:
 
 install:
 
-
-
-
+before_build:
+  mkdir mysqlcpp
+  cd mysqlcpp
+  cmake --version
