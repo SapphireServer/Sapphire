@@ -20,30 +20,9 @@ before_build:
   - set PATH="C:\\Program Files\\MySQL\\MySQL Server 5.7\\bin";%PATH%
   - cd c:\projects\sapphire
   - git submodule update --init
-  - cd ..
-  - mkdir mysqlcpp
-  - cd mysqlcpp
-  - cmake --version
-  - git clone https://github.com/mysql/mysql-connector-cpp
-  - cd mysql-connector-cpp
-  - git checkout 1.1
-  - cd ..
-  - mkdir c:\MySQL
-  - mkdir c:\MySQL\mysql
-  - mkdir c:\MySQL\x86
-  - mkdir c:\MySQL\x86\lib
-  - mkdir c:\MySQL\x64
-  - mkdir c:\MySQL\x64\lib
-  - copy c:\projects\sapphire\src\libraries\external\MySQL\x86\libmysql.lib c:\MySQL\x86\lib\
-  - copy c:\projects\sapphire\src\libraries\external\MySQL\x64\libmysql.lib c:\MySQL\x64\lib\
-  - xcopy c:\projects\sapphire\src\libraries\external\MySQL c:\MySQL\mysql\ /s /e /h
-  - xcopy c:\projects\sapphire\src\libraries\external\MySQL c:\MySQL\mysql\include\ /s /e /h
-  - cmake mysql-connector-cpp/. -DBOOST_ROOT=C:\\Libraries\\boost_1_60_0
-  - cmake --build . --target INSTALL --config RelWithDebInfo
-  - cd c:\projects\sapphire
   - mkdir build
   - cd build
-  - cmake .. -G "Visual Studio 14 2015" -DMYSQLCONNECTORCPP_ROOT_DIR=C:\\projects\\mysqlcpp\\mysql-connector-cpp
+  - cmake .. -G "Visual Studio 14 2015" -DMYSQLCONNECTORCPP_ROOT_DIR="C:\\Program Files (x86)\\MySQL\\Connector.C++ 1.1\\"
   - cmake --build . --target ALL_BUILD --config Debug
 
 build_script:
