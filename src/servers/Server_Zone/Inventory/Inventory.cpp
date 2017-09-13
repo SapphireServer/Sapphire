@@ -633,15 +633,15 @@ Core::ItemPtr Core::Inventory::loadItem( uint64_t uId )
    try
    {
       Db::Field *itemField = itemRes->fetch();
-      auto itemInfo = g_exdData.getItemInfo( itemField[0].getUInt32() );
-      bool isHq = itemField[2].getUInt8() == 1 ? true : false;
+      auto itemInfo = g_exdData.getItemInfo( itemField[0].get< uint32_t >() );
+      bool isHq = itemField[2].get< uint8_t >() == 1 ? true : false;
       ItemPtr pItem( new Item( uId, 
                                itemInfo->id, 
                                itemInfo->model_primary,
                                itemInfo->model_secondary, 
                                static_cast< ItemCategory >( itemInfo->ui_category ),
                                isHq ) );
-      pItem->setStackSize( itemField[1].getUInt32() );
+      pItem->setStackSize( itemField[1].get< uint32_t >() );
 
       return pItem;
    }
@@ -669,11 +669,11 @@ bool Core::Inventory::load()
 
    do
    {
-      uint16_t storageId = field[0].getUInt16();
+      uint16_t storageId = field[0].get< uint16_t >();
 
       for( int32_t i = 1; i <= 14; i++ )
       {
-         uint64_t uItemId = field[i].getUInt64();
+         uint64_t uItemId = field[i].get< uint64_t >();
          if( uItemId == 0 )
             continue;
 
@@ -707,10 +707,10 @@ bool Core::Inventory::load()
 
    do
    {
-      uint16_t storageId = bagField[0].getUInt16();
+      uint16_t storageId = bagField[0].get< uint16_t >();
       for( int32_t i = 1; i <= 25; i++ )
       {
-         uint64_t uItemId = bagField[i].getUInt64();
+         uint64_t uItemId = bagField[i].get< uint64_t >();
          if( uItemId == 0 )
             continue;
 
@@ -740,10 +740,10 @@ bool Core::Inventory::load()
 
    do
    {
-      uint16_t storageId = curField[0].getUInt16();
+      uint16_t storageId = curField[0].get< uint16_t >();
       for( int32_t i = 1; i <= 12; i++ )
       {
-         uint64_t uItemId = curField[i].getUInt64();
+         uint64_t uItemId = curField[i].get< uint64_t >();
          if( uItemId == 0 )
             continue;
 
@@ -774,10 +774,10 @@ bool Core::Inventory::load()
 
    do
    {
-      uint16_t storageId = crystalField[0].getUInt16();
+      uint16_t storageId = crystalField[0].get< uint16_t >();
       for( int32_t i = 1; i <= 17; i++ )
       {
-         uint64_t uItemId = crystalField[i].getUInt64();
+         uint64_t uItemId = crystalField[i].get< uint64_t >();
          if( uItemId == 0 )
             continue;
 

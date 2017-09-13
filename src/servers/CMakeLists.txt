@@ -9,7 +9,6 @@ set(PROJECT_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 include_directories("${PROJECT_INCLUDE_DIR}")
 include_directories("${PROJECT_SOURCE_DIR}")
 
- 
 add_subdirectory(${PROJECT_SOURCE_DIR}/Server_Common)
 add_subdirectory(${PROJECT_SOURCE_DIR}/Server_Lobby)
 add_subdirectory(${PROJECT_SOURCE_DIR}/Server_REST)
