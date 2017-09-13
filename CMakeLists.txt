@@ -8,8 +8,11 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
 set(PROJECT_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
 
-# boost stuff
+##########################################################################
+# Boost stuff
+
 # set(Boost_DEBUG 1)
 
 if(NOT SAPPHIRE_BOOST_VER)
@@ -17,8 +20,31 @@ if(NOT SAPPHIRE_BOOST_VER)
 endif()
 set(SAPPHIRE_BOOST_FOLDER_NAME boost_1_60_0)
 
+##########################################################################
+# Common and library path
+set(SERVER_COMMON_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/servers/Server_Common")
+set(LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/libraries")
+
+##########################################################################
+# Dependencies and compiler settings
+include( "cmake/boost.cmake" )
+include( "cmake/mysql.cmake" )
+include( "cmake/compiler.cmake" )
+
+##########################################################################
+# Common include folders
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/libraries/external/ChaiScript-6.0.0/include/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/libraries/sapphire/datReader/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
+
 include_directories("${PROJECT_INCLUDE_DIR}")
 include_directories("${PROJECT_SOURCE_DIR}")
+
+##########################################################################
+# Common lib folders
+link_directories(${MYSQLCONNECTORCPP_LIBRARIES})
+link_directories(${SERVER_COMMON_DIR})
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/libraries/sapphire/datReader)
 
 add_subdirectory("src/servers")
 add_subdirectory("src/libraries/sapphire/datReader")

@@ -42,9 +42,8 @@ void Core::ItemContainer::removeItem( uint8_t slotId )
    {
 
 
-      g_database.execute( "DELETE FROM charaglobalitem " \
-                          "WHERE itemId = %i ",
-                          it->second->getUId() );
+      g_database.execute( "DELETE FROM charaglobalitem WHERE itemId = " + 
+                          std::to_string( it->second->getUId() ) );
 
       m_itemMap.erase( it );
 
