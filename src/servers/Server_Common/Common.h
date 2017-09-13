@@ -561,10 +561,10 @@ namespace Core {
       {
          WeaponOverride = -1, // Needs more investigation (takes the damage type of the equipped weapon)?
          Unknown_0 = 0,
-         Slashing = 1, 
-         Piercing = 2, 
+         Slashing = 1,
+         Piercing = 2,
          Blunt = 3,
-         Unknown_4 = 4, 
+         Unknown_4 = 4,
          Magical = 5,
          Darkness = 6,
          Unknown_7 = 7,
@@ -765,6 +765,7 @@ namespace Core {
          DamageEffect = 0x50,
          RaiseAnimation = 0x51,
          TreasureScreenMsg = 0x57,
+         SetOwnerId = 0x59,
          ItemRepairMsg = 0x5C,
 
          LeveStartAnim = 0x66,
