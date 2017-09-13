@@ -218,7 +218,7 @@ void Core::Network::GameConnection::enterWorld( FFXIVARR_PACKET_RAW& packet, uin
 
    uint64_t lookupId = *reinterpret_cast< uint64_t* >( &packet.data[0] + 0x18 );
 
-   uint32_t logInCharId;
+   uint32_t logInCharId = -1;
    std::string logInCharName;
    auto charList = g_restConnector.getCharList( ( char * )m_pSession->getSessionId() );
    for( uint32_t i = 0; i < charList.size(); i++ )
@@ -233,6 +233,8 @@ void Core::Network::GameConnection::enterWorld( FFXIVARR_PACKET_RAW& packet, uin
       }
    }
 
+   if( logInCharId == -1 )
+      return;
 
    g_log.info( "[" + std::to_string( m_pSession->getAccountID() ) + "] Logging in as " + logInCharName + "(" + std::to_string( logInCharId ) + ")" );
 
