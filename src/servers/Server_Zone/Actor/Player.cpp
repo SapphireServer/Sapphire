@@ -292,53 +292,54 @@ void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
 {
    auto data = g_exdData.getAetheryteInfo( aetheryteId );
 
-   if( data != nullptr )
+   if( data == nullptr )
    {
-
-      setStateFlag( PlayerStateFlag::BetweenAreas );
-      sendStateFlags();
-
-      auto z_pos = g_zoneMgr.getZonePosition( data->levelId );
-
-      Common::FFXIVARR_POSITION3 pos;
-      pos.x = 0;
-      pos.y = 0;
-      pos.z = 0;
-      float rot = 0;
-
-      if( z_pos != nullptr )
-      {
-         pos = z_pos->getTargetPosition();
-         rot = z_pos->getTargetRotation();
-      }
-
-
-      sendDebug( "Teleport: " + data->placename + " " + data->placename_aethernet +
-                  "(" + std::to_string( data->levelId ) + ")" );
-
-      // TODO: this should be simplified and a type created in server_common/common.h.
-      if( type == 1 ) // teleport
-      {
-         prepareZoning( data->target_zone, true, 1, 112 );
-         sendToInRangeSet( ActorControlPacket142( getId(), ActorDespawnEffect, 0x04 ) );
-         setZoningType( Common::ZoneingType::Teleport );
-      }
-      else if( type == 2 ) // aethernet
-      {
-         prepareZoning( data->target_zone, true, 1, 112 );
-         sendToInRangeSet( ActorControlPacket142( getId(), ActorDespawnEffect, 0x04 ) );
-         setZoningType( Common::ZoneingType::Teleport );
-      }
-      else if( type == 3 ) // return
-      {
-         prepareZoning( data->target_zone, true, 1, 111 );
-         sendToInRangeSet( ActorControlPacket142( getId(), ActorDespawnEffect, 0x03 ) );
-         setZoningType( Common::ZoneingType::Return );
-      }
-
-      m_queuedZoneing = boost::make_shared< QueuedZoning >( data->target_zone, pos, Util::getTimeMs(), rot );
-
+      return;
    }
+
+   setStateFlag( PlayerStateFlag::BetweenAreas );
+   sendStateFlags();
+
+   auto z_pos = g_zoneMgr.getZonePosition( data->levelId );
+
+   Common::FFXIVARR_POSITION3 pos;
+   pos.x = 0;
+   pos.y = 0;
+   pos.z = 0;
+   float rot = 0;
+
+   if( z_pos != nullptr )
+   {
+      pos = z_pos->getTargetPosition();
+      rot = z_pos->getTargetRotation();
+   }
+
+   sendDebug( "Teleport: " + data->placename + " " + data->placename_aethernet +
+               "(" + std::to_string( data->levelId ) + ")" );
+
+   // TODO: this should be simplified and a type created in server_common/common.h.
+   if( type == 1 ) // teleport
+   {
+      prepareZoning( data->target_zone, true, 1, 112 );
+      sendToInRangeSet( ActorControlPacket142( getId(), ActorDespawnEffect, 0x04 ) );
+      setZoningType( Common::ZoneingType::Teleport );
+   }
+   else if( type == 2 ) // aethernet
+   {
+      prepareZoning( data->target_zone, true, 1, 112 );
+      sendToInRangeSet( ActorControlPacket142( getId(), ActorDespawnEffect, 0x04 ) );
+      setZoningType( Common::ZoneingType::Teleport );
+   }
+   else if( type == 3 ) // return
+   {
+      prepareZoning( data->target_zone, true, 1, 111 );
+      sendToInRangeSet( ActorControlPacket142( getId(), ActorDespawnEffect, 0x03 ) );
+      setZoningType( Common::ZoneingType::Return );
+   }
+
+   m_queuedZoneing = boost::make_shared< QueuedZoning >( data->target_zone, pos, Util::getTimeMs(), rot );
+
+
 }
 
 void Core::Entity::Player::forceZoneing( uint32_t zoneId )
