@@ -11,7 +11,7 @@
       <LobbyHost>127.0.0.1</LobbyHost>
 	  <!-- IP of the frontier server -->
       <FrontierHost>127.0.0.1</FrontierHost>
-	  <!-- Secret used for server auth -->
+	  <!-- Secret used for server auth - you *must* change this for public servers -->
       <ServerSecret>default</ServerSecret>
      <!-- Web server port -->
      <HttpPort>80</HttpPort>
@@ -23,4 +23,9 @@
          <Database>sapphire</Database>
       </Mysql>
    </General>
+
+   <Parameters>
+      <!-- GM Rank for newly created characters - should be changed to 0 for public servers -->
+      <DefaultGMRank>255</DefaultGMRank>
+   </Parameters>
 </Settings>

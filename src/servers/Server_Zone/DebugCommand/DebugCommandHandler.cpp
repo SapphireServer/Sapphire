@@ -70,6 +70,12 @@ void Core::DebugCommandHandler::registerCommand( const std::string& n, Core::Deb
 void Core::DebugCommandHandler::execCommand( char * data, Core::Entity::PlayerPtr pPlayer )
 {
 
+   if( pPlayer->getGmRank() <= 0 )
+   {
+      pPlayer->sendUrgent( "You are not allowed to use debug commands." );
+      return;
+   }
+
    // define callback pointer
    void ( DebugCommandHandler::*pf )( char *, Entity::PlayerPtr, boost::shared_ptr< DebugCommand > );
 
