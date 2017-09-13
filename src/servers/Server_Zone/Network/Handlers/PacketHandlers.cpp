@@ -350,13 +350,13 @@ void Core::Network::GameConnection::discoveryHandler( const Packets::GamePacket&
    Db::Field *field = pQR->fetch();
 
    GamePacketNew< FFXIVIpcDiscovery, ServerZoneIpcType > discoveryPacket( pPlayer->getId() );
-   discoveryPacket.data().map_id = field[1].getInt16();
-   discoveryPacket.data().map_part_id = field[2].getInt16();
+   discoveryPacket.data().map_id = field[1].get< int16_t >();
+   discoveryPacket.data().map_part_id = field[2].get< int16_t >();
 
    pPlayer->queuePacket( discoveryPacket );
    pPlayer->sendNotice( "Discovery ref pos ID: " + std::to_string( ref_position_id ) );
 
-   pPlayer->discover( field[1].getInt16(), field[2].getInt16() );
+   pPlayer->discover( field[1].get< int16_t >(), field[2].get< int16_t >() );
 
 }
 

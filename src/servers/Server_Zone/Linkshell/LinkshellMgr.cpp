@@ -29,8 +29,8 @@ bool Core::LinkshellMgr::loadLinkshells()
 
    do
    {
-      uint32_t linkshellId = field[0].getUInt32();
-      uint32_t masterId = field[1].getUInt32();
+      uint32_t linkshellId = field[0].get< uint32_t >();
+      uint32_t masterId = field[1].get< uint32_t >();
       std::string name = field[3].getString();
 
       auto func = []( std::set< uint64_t >& outList, Db::Field * pField )

@@ -36,7 +36,7 @@ bool Core::Network::SapphireAPI::login( const std::string& username, const std::
       return false;
 
    // user found, proceed
-   int32_t accountId = pQR->fetch()[0].getUInt32();
+   int32_t accountId = pQR->fetch()[0].get< uint32_t >();
 
    // session id string generation
    srand( ( uint32_t )time( NULL ) + 42 );
@@ -96,14 +96,14 @@ bool Core::Network::SapphireAPI::createAccount( const std::string& username, con
    // we are clear and can create a new account
    // get the next free account id
    pQR = g_database.query( "SELECT MAX(account_id) FROM accounts;" );
-   int32_t accountId = pQR->fetch()[0].getUInt32() + 1;
+   int32_t accountId = pQR->fetch()[0].get< uint32_t >() + 1;
 
    // store the account to the db
-   g_database.execute( "INSERT INTO accounts (account_Id, account_name, account_pass, account_created) VALUE(%i, '%s', '%s', %i);",
-                        accountId,
-                        username.c_str(),
-                        pass.c_str(),
-                        time( NULL ) );
+   g_database.execute( "INSERT INTO accounts (account_Id, account_name, account_pass, account_created) VALUE( " +
+                        std::to_string( accountId ) + ", '" +
+                        username + "', '" +
+                        pass + "', " + 
+                        std::to_string( time( nullptr ) ) + ");");
 
    
    if( !login( username, pass, sId ) )
@@ -223,7 +223,7 @@ std::vector<Core::PlayerMinimal> Core::Network::SapphireAPI::getCharList( uint32
 
       Core::Db::Field *field = pQR->fetch();
 
-      uint32_t charId = field[0].getInt32();
+      uint32_t charId = field[0].get< uint32_t >();
 
       player.load( charId );
 
@@ -257,7 +257,7 @@ uint32_t Core::Network::SapphireAPI::getNextCharId()
       return 0x00200001;
    }
 
-   charId = pQR->fetch()[0].getUInt32() + 1;
+   charId = pQR->fetch()[0].get< uint32_t >() + 1;
    if( charId < 0x00200001 )
    {
       return 0x00200001;
@@ -277,7 +277,7 @@ uint64_t Core::Network::SapphireAPI::getNextContentId()
       return 0x0040000001000001;
    }
 
-   contentId = pQR->fetch()[0].getUInt64() + 1;
+   contentId = pQR->fetch()[0].get< uint64_t >() + 1;
    if( contentId < 0x0040000001000001 )
    {
       return 0x0040000001000001;

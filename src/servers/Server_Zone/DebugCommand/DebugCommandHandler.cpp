@@ -243,8 +243,8 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
          "', '" + std::to_string( map_id ) +
          "', '" + std::to_string( discover_id ) + "')";
 
-      g_database.execute( query1.c_str() );
-      g_database.execute( query2.c_str() );
+      g_database.execute( query1 );
+      g_database.execute( query2 );
 
    }
 

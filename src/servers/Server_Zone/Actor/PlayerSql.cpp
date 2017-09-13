@@ -98,15 +98,15 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
 
    Db::Field *field = pQR->fetch();
 
-   strcpy( m_name, field[0].getString() );
+   strcpy( m_name, field[0].getString().c_str() );
 
-   ZonePtr pCurrZone = g_zoneMgr.getZone( field[1].getInt32() );
-   m_zoneId = field[1].getInt32();
+   ZonePtr pCurrZone = g_zoneMgr.getZone( field[1].get< int32_t >() );
+   m_zoneId = field[1].get< int32_t >();
 
    // see if a valid zone could be found for the character
    if( !pCurrZone )
    {
-      g_log.error( "[" + char_id_str + "] Zone " + std::to_string( field[1].getInt32() ) + "not found!" );
+      g_log.error( "[" + char_id_str + "] Zone " + std::to_string( field[1].get< int32_t >() ) + "not found!" );
       g_log.error( "[" + char_id_str + "] Setting default zone instead" );
 
       // default to new gridania
@@ -119,9 +119,9 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
       setRotation( 0.0f );
    }
 
-   m_hp = field[2].getUInt32();
+   m_hp = field[2].get< uint16_t >();
 
-   m_mp = field[3].getUInt32();
+   m_mp = field[3].get< uint16_t >();
    m_tp = 0;
 
    m_pos.x = field[6].getFloat();
@@ -131,22 +131,22 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
 
    field[11].getBinary( reinterpret_cast< char* >( m_customize ), sizeof( m_customize ) );
 
-   m_modelMainWeapon = field[12].getUInt64();
+   m_modelMainWeapon = field[12].get< uint64_t >();
 
    field[14].getBinary( reinterpret_cast< char* >( m_modelEquip ), sizeof( m_modelEquip ) );
 
-   m_guardianDeity = field[15].getUInt8();
-   m_birthDay = field[16].getUInt8();
-   m_birthMonth = field[17].getUInt8();
-   m_status = static_cast< ActorStatus >( field[18].getUInt8() );
-   m_class = static_cast< ClassJob >( field[19].getUInt8() );
-   m_homePoint = field[20].getUInt8();
+   m_guardianDeity = field[15].get< uint8_t >();
+   m_birthDay = field[16].get< uint8_t >();
+   m_birthMonth = field[17].get< uint8_t >();
+   m_status = static_cast< ActorStatus >( field[18].get< uint8_t >() );
+   m_class = static_cast< ClassJob >( field[19].get< uint8_t >() );
+   m_homePoint = field[20].get< uint8_t >();
 
    field[21].getBinary( reinterpret_cast< char* >( m_howTo ), sizeof( m_howTo ) );
 
-   m_contentId = field[22].getUInt64();
+   m_contentId = field[22].get< uint64_t >();
 
-   m_voice = field[23].getUInt32();
+   m_voice = field[23].get< uint32_t >();
 
    field[24].getBinary( reinterpret_cast< char* >( m_questCompleteFlags ), sizeof( m_questCompleteFlags ) );
 
@@ -160,19 +160,19 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
 
    field[29].getBinary( reinterpret_cast< char* >( m_discovery ), sizeof( m_discovery ) );
 
-   m_startTown = field[30].getInt8();
-   m_playTime = field[31].getUInt32();
+   m_startTown = field[30].get< int8_t >();
+   m_playTime = field[31].get< uint32_t >();
 
    m_bNewAdventurer = field[32].getBool();
 
-   m_gc = field[33].getUInt8();
+   m_gc = field[33].get< uint8_t >();
    field[34].getBinary( reinterpret_cast< char* >( m_gcRank ), sizeof( m_gcRank ) );
 
-   m_cfPenaltyUntil = field[35].getUInt32();
+   m_cfPenaltyUntil = field[35].get< uint32_t >();
 
-   m_openingSequence = field[36].getUInt32();
+   m_openingSequence = field[36].get< uint32_t >();
 
-   m_gmRank = field[37].getUInt8();
+   m_gmRank = field[37].get< uint8_t >();
 
    m_pCell = nullptr;
 
@@ -241,8 +241,8 @@ bool Core::Entity::Player::loadClassData()
    for( uint8_t i = 0; i < 25; i++ )
    {
       uint8_t index = i * 2;
-      m_classArray[i] = field[index].getUInt8();
-      m_expArray[i] = field[index + 1].getUInt32();
+      m_classArray[i] = field[index].get< uint8_t >();
+      m_expArray[i] = field[index + 1].get< uint32_t >();
    }
 
    return true;
@@ -257,9 +257,9 @@ bool Core::Entity::Player::loadSearchInfo()
 
    Db::Field* field = pQR->fetch();
 
-   m_searchSelectClass = field[1].getUInt8();
-   m_searchSelectRegion = field[2].getUInt8();
-   sprintf( m_searchMessage, field[3].getString() );
+   m_searchSelectClass = field[1].get< uint8_t >();
+   m_searchSelectRegion = field[2].get< uint8_t >();
+   sprintf( m_searchMessage, field[3].getString().c_str() );
 
    return true;
 }
@@ -405,7 +405,7 @@ void Core::Entity::Player::createUpdateSql()
          updateCharaInfoSearch += entry + ", ";
 
       updateCharaInfoSearch += condition;
-      g_database.execute( updateCharaInfoSearch.c_str() );
+      g_database.execute( updateCharaInfoSearch );
    }
 
    if( !charaBaseSet.empty() )
@@ -414,7 +414,7 @@ void Core::Entity::Player::createUpdateSql()
          updateCharaBase += entry + ", ";
 
       updateCharaBase += condition;
-      g_database.execute( updateCharaBase.c_str() );
+      g_database.execute( updateCharaBase );
    }
 
    if( !charaDetailSet.empty() )
@@ -423,7 +423,7 @@ void Core::Entity::Player::createUpdateSql()
          updateCharaDetail += entry + ", ";
 
       updateCharaDetail += condition;
-      g_database.execute( updateCharaDetail.c_str() );
+      g_database.execute( updateCharaDetail );
    }
 
    if( !charaClassSet.empty() )
@@ -432,7 +432,7 @@ void Core::Entity::Player::createUpdateSql()
          updateCharaClass += entry + ", ";
 
       updateCharaClass += condition;
-      g_database.execute( updateCharaClass.c_str() );
+      g_database.execute( updateCharaClass );
    }
 
    if( !charaQuestSet.empty() )
@@ -441,7 +441,7 @@ void Core::Entity::Player::createUpdateSql()
          updateCharaQuest += entry + ", ";
 
       updateCharaQuest += condition;
-      g_database.execute( updateCharaQuest.c_str() );
+      g_database.execute( updateCharaQuest );
    }
 
    m_updateFlags = PlayerSyncFlags::None;
