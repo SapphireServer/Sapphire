@@ -97,3 +97,5 @@ src/libraries/external/boost_*
 *.iobj
 *.filters
 
+# sapphire version
+src/servers/Server_Common/Version\.cpp
