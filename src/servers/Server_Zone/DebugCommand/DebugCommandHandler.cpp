@@ -50,7 +50,7 @@ Core::DebugCommandHandler::DebugCommandHandler()
    registerCommand( "injectc", &DebugCommandHandler::injectChatPacket, "Loads and injects a premade Packet.", Common::UserLevel::all );
    registerCommand( "script_reload", &DebugCommandHandler::scriptReload, "Loads and injects a premade Packet.", Common::UserLevel::all );
    registerCommand( "nudge", &DebugCommandHandler::nudge, "Nudges you forward/up/down", Common::UserLevel::all );
-   registerCommand("info", &DebugCommandHandler::serverInfo, "Send server info", Common::UserLevel::all);
+   registerCommand( "info", &DebugCommandHandler::serverInfo, "Send server info", Common::UserLevel::all );
 
 }
 
@@ -88,9 +88,9 @@ void Core::DebugCommandHandler::execCommand( char * data, Core::Entity::PlayerPt
       // no parameters, just get the command
       commandString = tmpCommand;
 
-   if (pPlayer->getGmRank() <= 0  && commandString != "info")
+   if ( pPlayer->getGmRank() <= 0  && commandString != "info" )
    {
-      pPlayer->sendUrgent("You are not allowed to use debug commands.");
+      pPlayer->sendUrgent( "You are not allowed to use debug commands." );
       return;
    }
 
@@ -536,7 +536,7 @@ void Core::DebugCommandHandler::nudge( char * data, Entity::PlayerPtr pPlayer, b
    }
 }
 
-void Core::DebugCommandHandler::serverInfo(char * data, Core::Entity::PlayerPtr pPlayer, boost::shared_ptr< Core::DebugCommand > command)
+void Core::DebugCommandHandler::serverInfo( char * data, Core::Entity::PlayerPtr pPlayer, boost::shared_ptr< Core::DebugCommand > command )
 {
    pPlayer->sendDebug( "SapphireServer " + Version::VERSION + " - " + Version::GIT_HASH );
    pPlayer->sendDebug( "Sessions: " + std::to_string( g_serverZone.getSessionCount() ) );
