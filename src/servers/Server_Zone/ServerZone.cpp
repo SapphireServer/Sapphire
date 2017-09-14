@@ -55,6 +55,11 @@ Core::XMLConfigPtr Core::ServerZone::getConfig() const
    return m_pConfig;
 }
 
+size_t Core::ServerZone::getSessionCount() const
+{
+   return m_sessionMap.size();
+}
+
 bool Core::ServerZone::registerBnpcTemplate( std::string templateName, uint32_t bnpcBaseId, 
                                              uint32_t bnpcNameId, uint32_t modelId, std::string aiName )
 {
