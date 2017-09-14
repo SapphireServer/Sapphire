@@ -34,20 +34,18 @@ namespace Db
       virtual ~Connection();
 
       void close();
-      bool isClosed();
+      bool isClosed() const;
       
       void setOption( enum mysql_option option, const void *arg );
       void setOption( enum mysql_option option, uint32_t arg );
       void setOption( enum mysql_option option, const std::string& arg );
 
-      MySqlBase *getMySqlBase();
+      MySqlBase *getMySqlBase() const;
 
       void setAutoCommit( bool autoCommit );
-
-      //// implemented up to this point
-
       bool getAutoCommit();
 
+      //// implemented up to this point
 
       void beginTransaction();
       void commitTransaction();
@@ -56,8 +54,6 @@ namespace Db
       //Statement * createStatement();
 
       std::string escapeString( const std::string& );
-
-
 
       std::string getSchema();
       void setSchema( const std::string& catalog );
