@@ -26,6 +26,8 @@ Core::Db::Connection::Connection( MySqlBase * pBase,
     m_pBase( pBase )
 {
    m_pRawCon = mysql_init( nullptr );
+   // Different mysql versions support different options, for now whatever was unsupporter here was commented out
+   // but left there.
    for( auto entry : options )
    {
       switch( entry.first )
@@ -46,7 +48,7 @@ Core::Db::Connection::Connection( MySqlBase * pBase,
       break;
 
       // bool based options
-      //case MYSQL_ENABLE_CLEARTEXT_PLUGIN:
+      //    case MYSQL_ENABLE_CLEARTEXT_PLUGIN:
       //    case MYSQL_OPT_CAN_HANDLE_EXPIRED_PASSWORDS:
       case MYSQL_OPT_COMPRESS:
       case MYSQL_OPT_GUESS_CONNECTION:
@@ -65,7 +67,7 @@ Core::Db::Connection::Connection( MySqlBase * pBase,
       break;
 
       // string based options
-      //case MYSQL_DEFAULT_AUTH:
+      //    case MYSQL_DEFAULT_AUTH:
       //    case MYSQL_OPT_BIND:
       //    case MYSQL_OPT_SSL_CA:
       //    case MYSQL_OPT_SSL_CAPATH:
@@ -75,7 +77,7 @@ Core::Db::Connection::Connection( MySqlBase * pBase,
       //    case MYSQL_OPT_SSL_CRLPATH:
       //    case MYSQL_OPT_SSL_KEY:
       //    case MYSQL_OPT_TLS_VERSION:
-      //case MYSQL_PLUGIN_DIR:
+      //    case MYSQL_PLUGIN_DIR:
       case MYSQL_READ_DEFAULT_FILE:
       case MYSQL_READ_DEFAULT_GROUP:
       //    case MYSQL_SERVER_PUBLIC_KEY:
@@ -138,25 +140,26 @@ void Core::Db::Connection::close()
    m_bConnected = false;
 }
 
-bool Core::Db::Connection::isClosed()
+bool Core::Db::Connection::isClosed() const
 {
    return !m_bConnected;
 }
 
-Core::Db::MySqlBase* Core::Db::Connection::getMySqlBase()
+Core::Db::MySqlBase* Core::Db::Connection::getMySqlBase() const
 {
    return m_pBase;
 }
 
 void Core::Db::Connection::setAutoCommit( bool autoCommit )
 {
-   my_bool b = autoCommit == true ? 1 : 0;
+   auto b = static_cast< my_bool >( autoCommit == true ? 1 : 0 );
    if( mysql_autocommit( m_pRawCon, b ) != 0 )
       throw std::runtime_error( "Connection::setAutoCommit failed!" );
 }
 
 bool Core::Db::Connection::getAutoCommit()
 {
+   // TODO: should be replaced with wrapped sql query function once available
    std::string query("SELECT @@autocommit");
    auto res = mysql_real_query( m_pRawCon, query.c_str(), query.length() );
 
@@ -168,6 +171,6 @@ bool Core::Db::Connection::getAutoCommit()
 
    uint32_t ac = atoi( row[0] );
 
-   return ac == 0 ? false : true;
+   return ac != 0;
 }
 
