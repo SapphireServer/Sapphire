@@ -8,6 +8,9 @@
 #include <src/servers/Server_Common/Config/XMLConfig.h>
 #include <src/servers/Server_Common/Database/Database.h>
 
+#include <src/servers/Server_Common/Database/MySqlBase.h>
+#include <src/servers/Server_Common/Database/Connection.h>
+
 #include <src/servers/Server_Common/Network/Connection.h>
 #include <src/servers/Server_Common/Network/Hive.h>
 #include <src/servers/Server_Common/Network/Acceptor.h>
@@ -154,6 +157,37 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
       g_log.fatal( "Error setting up EXD data " );
       return false;
    }
+
+   try
+   {
+      Core::Db::MySqlBase base;
+      g_log.info( base.getVersionInfo() );
+
+      Core::Db::optionMap options;
+      options[ MYSQL_OPT_RECONNECT ] = "1";
+
+      auto con = base.connect( "127.0.0.1", "root", "", options );
+
+      if( con->getAutoCommit() )
+         g_log.info( "autocommit active" );
+
+      con->setAutoCommit( false );
+
+      if( !con->getAutoCommit() )
+         g_log.info( "autocommit inactive" );
+
+      con->setAutoCommit( true );
+
+      if( con->getAutoCommit() )
+         g_log.info( "autocommit active" );
+
+
+   }
+   catch( std::runtime_error e )
+   {
+      g_log.error( e.what() );
+   }
+
 
    Db::DatabaseParams params;
    params.bufferSize = 16384;
