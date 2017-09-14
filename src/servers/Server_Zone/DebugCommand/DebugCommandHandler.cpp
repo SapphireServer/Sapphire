@@ -1,6 +1,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include <src/servers/Server_Common/Common.h>
+#include <src/servers/Server_Common/Version.h>
 #include <src/servers/Server_Common/Database/Database.h>
 #include <src/servers/Server_Common/Network/GamePacketNew.h>
 #include <src/servers/Server_Common/Network/CommonNetwork.h>
@@ -49,6 +50,7 @@ Core::DebugCommandHandler::DebugCommandHandler()
    registerCommand( "injectc", &DebugCommandHandler::injectChatPacket, "Loads and injects a premade Packet.", Common::UserLevel::all );
    registerCommand( "script_reload", &DebugCommandHandler::scriptReload, "Loads and injects a premade Packet.", Common::UserLevel::all );
    registerCommand( "nudge", &DebugCommandHandler::nudge, "Nudges you forward/up/down", Common::UserLevel::all );
+   registerCommand( "info", &DebugCommandHandler::serverInfo, "Send server info", Common::UserLevel::all );
 
 }
 
@@ -70,12 +72,6 @@ void Core::DebugCommandHandler::registerCommand( const std::string& n, Core::Deb
 void Core::DebugCommandHandler::execCommand( char * data, Core::Entity::PlayerPtr pPlayer )
 {
 
-   if( pPlayer->getGmRank() <= 0 )
-   {
-      pPlayer->sendUrgent( "You are not allowed to use debug commands." );
-      return;
-   }
-
    // define callback pointer
    void ( DebugCommandHandler::*pf )( char *, Entity::PlayerPtr, boost::shared_ptr< DebugCommand > );
 
@@ -92,13 +88,18 @@ void Core::DebugCommandHandler::execCommand( char * data, Core::Entity::PlayerPt
       // no parameters, just get the command
       commandString = tmpCommand;
 
+   if ( pPlayer->getGmRank() <= 0  && commandString != "info" )
+   {
+      pPlayer->sendUrgent( "You are not allowed to use debug commands." );
+      return;
+   }
+
    // try to retrieve the command
    auto it = m_commandMap.find( commandString );
 
    if( it == m_commandMap.end() )
       // no command found, do something... or not
       pPlayer->sendUrgent( "Command not found." );
-   // TODO Notify the client of the failed command
    else
    {
       // command found, call the callback function and pass parameters if present.
@@ -534,3 +535,10 @@ void Core::DebugCommandHandler::nudge( char * data, Entity::PlayerPtr pPlayer, b
       pPlayer->queuePacket( setActorPosPacket );
    }
 }
+
+void Core::DebugCommandHandler::serverInfo( char * data, Core::Entity::PlayerPtr pPlayer, boost::shared_ptr< Core::DebugCommand > command )
+{
+   pPlayer->sendDebug( "SapphireServer " + Version::VERSION + " - " + Version::GIT_HASH );
+   pPlayer->sendDebug( "Sessions: " + std::to_string( g_serverZone.getSessionCount() ) );
+}
+
