@@ -346,7 +346,7 @@ bool Core::Scripting::ScriptManager::onMobKill( Entity::PlayerPtr pPlayer, uint1
    // loop through all active quests and try to call available onMobKill callbacks
    for( size_t i = 0; i < 30; i++ )
    {
-      auto activeQuests = pPlayer->getQuestActive( i );
+      auto activeQuests = pPlayer->getQuestActive( static_cast< uint16_t >( i ) );
       if( !activeQuests )
          continue;
 

@@ -99,7 +99,7 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
    }
 
    std::vector<std::string> args( argv + 1, argv + argc );
-   for( auto i = 0; i + 1 < args.size(); i += 2 )
+   for( uint32_t i = 0; i + 1 < args.size(); i += 2 )
    {
       std::string arg( "" );
       std::string val( "" );

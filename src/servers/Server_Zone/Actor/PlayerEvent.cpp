@@ -264,14 +264,14 @@ void Core::Entity::Player::onTick()
    if( !isAlive() || !isLoadingComplete() )
       return;
 
-   int32_t addHp = getMaxHp() * 0.1f + 1;
-   int32_t addMp = getMaxMp() * 0.06f + 1;
-   int32_t addTp = 100;
+   uint32_t addHp = static_cast< uint32_t >( getMaxHp() * 0.1f + 1 );
+   uint32_t addMp = static_cast< uint32_t >( getMaxMp() * 0.06f + 1 );
+   uint32_t addTp = 100;
 
    if( !m_actorIdTohateSlotMap.empty() )
    {
-      addHp = getMaxHp() * 0.01f + 1;
-      addMp = getMaxHp() * 0.02f + 1;
+      addHp = static_cast< uint32_t >( getMaxHp() * 0.01f + 1 );
+      addMp = static_cast< uint32_t >( getMaxMp() * 0.02f + 1 );
       addTp = 60;
    }
 
