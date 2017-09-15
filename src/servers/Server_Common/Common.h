@@ -743,7 +743,7 @@ namespace Core {
 
          Flee = 0x1B,
 
-         Unk3 = 0x20,
+         Unk3 = 0x20,                  // Animation related?
 
          CombatIndicationShow = 0x22,
 
@@ -769,7 +769,7 @@ namespace Core {
          ItemRepairMsg = 0x5C,
 
          LeveStartAnim = 0x66,
-         Unk4 = 0x67,
+         LeveStartError = 0x67,
          PlayerNameGrayout = 0x6A,
 
          ItemObtainMsg = 0x75,
@@ -869,7 +869,7 @@ namespace Core {
 
          AchievementPopup = 0x203,
 
-         Unk7 = 0x205,
+         Unk7 = 0x205,                 // LogMessage?
          AchievementMsg = 0x206,
 
          SetItemLevel = 0x209,
