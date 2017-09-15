@@ -29,7 +29,7 @@ extern Core::Data::ExdData g_exdData;
 // 3 Versions. SB and HW are linear, ARR is polynomial.
 // Originally from Player.cpp, calculateStats().
 
-uint32_t CalcBattle::calculateBaseStat( PlayerPtr pPlayer )
+float CalcBattle::calculateBaseStat( PlayerPtr pPlayer )
 {
    float base = 0.0f;
    uint8_t level = pPlayer->getLevel();
@@ -37,7 +37,7 @@ uint32_t CalcBattle::calculateBaseStat( PlayerPtr pPlayer )
    // SB Base Stat Formula  (Aligned)
    if ( level > 60 )
    { 
-      base = ( ( ( level == 61) ? 224 : 220 ) + ( level - 61 ) * 8);
+      base = ( ( ( level == 61 ) ? 224 : 220 ) + ( level - 61 ) * 8);
    }
    // HW Base Stat Formula  (Aligned)
    else if ( level > 50 )
@@ -85,7 +85,7 @@ uint32_t CalcBattle::calculateMaxHp( PlayerPtr pPlayer )
    else
       approxBaseHp = paramGrowthInfoIt->second.mp_const * 0.7596f;
 
-   uint16_t result = floor( jobModHp * ( approxBaseHp / 100.0f ) ) + floor( hpMod / 100.0f * ( vitStat - baseStat ) );
+   uint16_t result = static_cast< uint16_t >( floor( jobModHp * ( approxBaseHp / 100.0f ) ) + floor( hpMod / 100.0f * ( vitStat - baseStat ) ) );
 
    return result;
 }
@@ -108,7 +108,7 @@ uint32_t CalcBattle::calculateMaxMp( PlayerPtr pPlayer )
    uint16_t jobModMp = classInfoIt->second.mod_mpcpgp;
    uint16_t baseMp = paramGrowthInfoIt->second.mp_const;
 
-   uint16_t result = floor( floor( piety - baseStat ) * ( pietyScalar / 100 ) + baseMp ) * jobModMp / 100;
+   uint16_t result = static_cast< uint16_t >( floor( floor( piety - baseStat ) * ( pietyScalar / 100 ) + baseMp ) * jobModMp / 100 );
 
    return result;
 }

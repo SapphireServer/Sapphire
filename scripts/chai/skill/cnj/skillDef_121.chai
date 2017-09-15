@@ -11,7 +11,7 @@ class skillDef_121Def
     def onFinish( player, target )
     {
     	player.handleScriptSkill( STD_DAMAGE, 121, 50, 0, target );
-        target.addStatusEffectByIdIfNotExist(143, 20000, 0);
+        target.addStatusEffectByIdIfNotExist(143, 20000, player, 0);
     }
 
 };

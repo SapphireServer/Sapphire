@@ -109,7 +109,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
         case 0x68: // Remove status (clicking it off)
         {
            // todo: check if status can be removed by client from exd
-           pPlayer->removeSingleStatusEffectFromId( param1 );
+           pPlayer->removeSingleStatusEffectFromId( static_cast< uint32_t >( param1 ) );
            break;
         }
         case 0x69: // Cancel cast

@@ -74,7 +74,7 @@ bool Core::Entity::Player::loadActiveQuests()
 void Core::Entity::Player::finishQuest( uint16_t questId )
 {
 
-   int8_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( static_cast< uint16_t >( questId ) );
 
    if( ( idx != -1 ) && ( m_activeQuests[idx] != nullptr ) )
    {
@@ -123,7 +123,7 @@ void Core::Entity::Player::unfinishQuest( uint16_t questId )
 void Core::Entity::Player::removeQuest( uint16_t questId )
 {
 
-   int8_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( static_cast< uint16_t >( questId ) );
 
    if( ( idx != -1 ) && ( m_activeQuests[idx] != nullptr ) )
    {

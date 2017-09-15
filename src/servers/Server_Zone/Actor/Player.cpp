@@ -218,12 +218,12 @@ void Core::Entity::Player::calculateStats()
    // TODO: put formula somewhere else...
    float base = CalcBattle::calculateBaseStat( getAsPlayer() );
 
-   m_baseStats.str =  base * ( static_cast< float >( classInfo.mod_str ) / 100 ) + tribeInfo.mod_str;
-   m_baseStats.dex =  base * ( static_cast< float >( classInfo.mod_dex ) / 100 ) + tribeInfo.mod_dex;
-   m_baseStats.vit =  base * ( static_cast< float >( classInfo.mod_vit ) / 100 ) + tribeInfo.mod_vit;
-   m_baseStats.inte = base * ( static_cast< float >( classInfo.mod_int ) / 100 ) + tribeInfo.mod_int;
-   m_baseStats.mnd =  base * ( static_cast< float >( classInfo.mod_mnd ) / 100 ) + tribeInfo.mod_mnd;
-   m_baseStats.pie =  base * ( static_cast< float >( classInfo.mod_pie ) / 100 ) + tribeInfo.mod_pie;
+   m_baseStats.str =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_str ) / 100 ) + tribeInfo.mod_str );
+   m_baseStats.dex =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_dex ) / 100 ) + tribeInfo.mod_dex );
+   m_baseStats.vit =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_vit ) / 100 ) + tribeInfo.mod_vit );
+   m_baseStats.inte = static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_int ) / 100 ) + tribeInfo.mod_int );
+   m_baseStats.mnd =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_mnd ) / 100 ) + tribeInfo.mod_mnd );
+   m_baseStats.pie =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_pie ) / 100 ) + tribeInfo.mod_pie );
 
    m_baseStats.skillSpeed = paramGrowthInfo.base_secondary;
    m_baseStats.spellSpeed = paramGrowthInfo.base_secondary;
@@ -243,7 +243,7 @@ void Core::Entity::Player::calculateStats()
       m_hp = m_baseStats.max_hp;
 
 
-   m_baseStats.determination = base;
+   m_baseStats.determination = static_cast< uint32_t >( base );
 
 }
 
@@ -513,7 +513,7 @@ bool Core::Entity::Player::isAetheryteRegistered( uint8_t aetheryteId ) const
    uint8_t value;
    Util::valueToFlagByteIndexValue( aetheryteId, value, index );
 
-   return m_aetheryte[index] & value;
+   return ( m_aetheryte[index] & value ) != 0;
 }
 
 uint8_t * Core::Entity::Player::getDiscoveryBitmask()
@@ -608,7 +608,7 @@ bool Core::Entity::Player::isActionLearned( uint8_t actionId ) const
    uint8_t value;
    Util::valueToFlagByteIndexValue( actionId, value, index );
 
-   return m_unlocks[index] & value;
+   return ( m_unlocks[index] & value ) != 0;
 }
 
 void Core::Entity::Player::gainExp( uint32_t amount )
@@ -997,7 +997,7 @@ bool Core::Entity::Player::hasStateFlag( Core::Common::PlayerStateFlag flag ) co
    uint8_t value;
    Util::valueToFlagByteIndexValue( iFlag, value, index );
 
-   return m_stateFlags[index] & value;
+   return ( m_stateFlags[index] & value ) != 0;
 }
 
 void Core::Entity::Player::setStateFlag( Core::Common::PlayerStateFlag flag )
@@ -1463,7 +1463,7 @@ void Core::Entity::Player::autoAttack( ActorPtr pTarget )
    //uint64_t tick = Util::getTimeMs();
    //srand(static_cast< uint32_t >(tick));
 
-   uint32_t damage = mainWeap->getAutoAttackDmg();
+   uint32_t damage = static_cast< uint32_t >( mainWeap->getAutoAttackDmg() );
    uint32_t variation = 0 + rand() % 3;
 
    if ( getClass() == JOB_MACHINIST ||
@@ -1534,7 +1534,7 @@ void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, 
       effectPacket.data().numEffects = 1;
       effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRotation() );
       effectPacket.data().effectTarget = pTarget.getId();
-      effectPacket.data().effects[0].param1 = param1;
+      effectPacket.data().effects[0].param1 = static_cast< int16_t >( param1 );
       effectPacket.data().effects[0].unknown_1 = 3;
       effectPacket.data().effects[0].unknown_2 = 1;
       effectPacket.data().effects[0].unknown_3 = 7;
@@ -1544,14 +1544,14 @@ void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, 
       if ( !pTarget.isAlive() )
          break;
 
-      pTarget.takeDamage( param1 );
+      pTarget.takeDamage( static_cast< uint32_t >( param1 ) );
       pTarget.onActionHostile( shared_from_this() );
       break;
    }
 
    case Core::Common::HandleSkillType::StdHeal:
    {
-      uint32_t calculatedHeal = CalcBattle::calculateHealValue( getAsPlayer(), param1 );
+      uint32_t calculatedHeal = CalcBattle::calculateHealValue( getAsPlayer(), static_cast< uint32_t >( param1 ) );
 
       sendDebug( "STD_HEAL" );
 
