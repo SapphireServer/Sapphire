@@ -293,13 +293,13 @@ public:
    void addStatusEffect( StatusEffect::StatusEffectPtr pEffect );
 
    // add a status effect by id
-   void addStatusEffectById( int32_t id, int32_t duration, uint16_t param = 0 );
+   void addStatusEffectById( uint32_t id, int32_t duration, Entity::Actor& pSource, uint16_t param = 0 );
 
    // add a status effect by id if it doesn't exist
-   void addStatusEffectByIdIfNotExist( int32_t id, int32_t duration, uint16_t param = 0 );
+   void addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Actor& pSource, uint16_t param = 0 );
 
    // remove a status effect by id
-   void removeSingleStatusEffectFromId( int32_t id );
+   void removeSingleStatusEffectFromId( uint32_t id );
 
    //get the status effect container
    StatusEffect::StatusEffectContainerPtr getStatusEffectContainer() const;

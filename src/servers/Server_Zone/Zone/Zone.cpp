@@ -189,7 +189,7 @@ void Zone::loadCellCache()
       Entity::BattleNpcPtr pBNpc( new Entity::BattleNpc( modelId, nameId, 
                                                          pos,
                                                          sizeId, type, level, behaviour, mobType ) );
-      pBNpc->setRotation( rotation );
+      pBNpc->setRotation( static_cast< float >( rotation ) );
       cache.push_back( pBNpc );
 
       //pushActor( pBNpc );
