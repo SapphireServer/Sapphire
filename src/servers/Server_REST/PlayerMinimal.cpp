@@ -70,7 +70,7 @@ namespace Core {
       setBirthDay( field[2].get< int8_t >(), field[3].get< int8_t >() );
       m_guardianDeity = field[4].get< int8_t >();
       m_class = field[5].get< int8_t >();
-      m_contentId = field[7].get< uint64_t >();
+      m_contentId = field[7].getUInt64();
       m_zoneId = field[8].get< uint16_t >();
 
       auto pQR2 = g_database.query( "SELECT * FROM characlass WHERE CharacterId = " + std::to_string( charId ) + ";" );
