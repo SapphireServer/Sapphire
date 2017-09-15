@@ -33,7 +33,26 @@ namespace Db {
 
          return static_cast< T >( atol( m_pValue ) );
       }
+	  
+         uint64_t getUInt64()
+         {
+            if( m_pValue )
+            {
+        #ifdef _WIN32
+               uint64_t value;
+               sscanf( m_pValue, "%I64d", &value );
+               return value;
+        #else
+           uint64_t value;
+               sscanf( m_pValue, "%Lu", &value );
+               return value;
 
+        #endif
+            }
+            else
+               return 0;
+         }
+		 
       uint32_t getLength() const;
 
    private:
