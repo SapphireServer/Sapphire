@@ -673,7 +673,7 @@ bool Core::Inventory::load()
 
       for( int32_t i = 1; i <= 14; i++ )
       {
-         uint64_t uItemId = field[i].get< uint64_t >();
+         uint64_t uItemId = field[i].getUInt64();
          if( uItemId == 0 )
             continue;
 
@@ -710,7 +710,7 @@ bool Core::Inventory::load()
       uint16_t storageId = bagField[0].get< uint16_t >();
       for( int32_t i = 1; i <= 25; i++ )
       {
-         uint64_t uItemId = bagField[i].get< uint64_t >();
+         uint64_t uItemId = bagField[i].getUInt64();
          if( uItemId == 0 )
             continue;
 
@@ -743,7 +743,7 @@ bool Core::Inventory::load()
       uint16_t storageId = curField[0].get< uint16_t >();
       for( int32_t i = 1; i <= 12; i++ )
       {
-         uint64_t uItemId = curField[i].get< uint64_t >();
+         uint64_t uItemId = curField[i].getUInt64();
          if( uItemId == 0 )
             continue;
 
@@ -777,7 +777,7 @@ bool Core::Inventory::load()
       uint16_t storageId = crystalField[0].get< uint16_t >();
       for( int32_t i = 1; i <= 17; i++ )
       {
-         uint64_t uItemId = crystalField[i].get< uint64_t >();
+         uint64_t uItemId = crystalField[i].getUInt64();
          if( uItemId == 0 )
             continue;
 
