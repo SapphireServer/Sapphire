@@ -62,7 +62,7 @@ namespace Core {
       }
 
       // return the actors name
-      char * getName() const
+      char * getName()
       {
          return m_name;
       }
