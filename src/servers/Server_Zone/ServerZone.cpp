@@ -10,6 +10,8 @@
 
 #include <src/servers/Server_Common/Database/MySqlBase.h>
 #include <src/servers/Server_Common/Database/Connection.h>
+#include <src/servers/Server_Common/Database/Statement.h>
+#include <src/servers/Server_Common/Database/ResultSet.h>
 
 #include <src/servers/Server_Common/Network/Connection.h>
 #include <src/servers/Server_Common/Network/Hive.h>
@@ -160,13 +162,14 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
 
    try
    {
+      // bunch of test cases for db wrapper
       Core::Db::MySqlBase base;
       g_log.info( base.getVersionInfo() );
 
       Core::Db::optionMap options;
       options[ MYSQL_OPT_RECONNECT ] = "1";
 
-      auto con = base.connect( "127.0.0.1", "root", "", options );
+      boost::scoped_ptr< Core::Db::Connection > con( base.connect( "127.0.0.1", "root", "", options ) );
 
       if( con->getAutoCommit() )
          g_log.info( "autocommit active" );
@@ -181,6 +184,34 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
       if( con->getAutoCommit() )
          g_log.info( "autocommit active" );
 
+      con->setSchema( "sapphire" );
+
+      boost::scoped_ptr< Core::Db::Statement > stmt( con->createStatement() );
+      bool t1 = stmt->execute( "DELETE FROM zoneservers WHERE id = 101" );
+      t1 = stmt->execute( "INSERT INTO zoneservers ( id, ip, port ) VALUES ( 101, '127.0.0.1', 54555);" );
+      // t1 = stmt->execute( "INSERT INTO zoneservers ( id, ip, port ) VALUES ( 101, '127.0.0.1', 54555);" ); // throws duplicate entry
+      t1 = stmt->execute( "DELETE FROM zoneservers WHERE id = 101" );
+      t1 = stmt->execute( "INSERT INTO zoneservers ( id, ip, port ) VALUES ( 101, '127.0.0.1', 54555);" );
+      //t1 = stmt->execute( "DELETE FROM zoneservers WHERE id = 101" );
+
+      //boost::scoped_ptr< Core::Db::Statement > stmt1( con->createStatement() );
+      //bool t2 = stmt1->execute( "INSERT INTO BLARGH!" ); // throws error
+
+      boost::scoped_ptr< Core::Db::Statement > stmt2( con->createStatement() );
+      boost::scoped_ptr< Core::Db::ResultSet > res( stmt2->executeQuery( "SELECT id,ip,port FROM zoneservers"  ) );
+
+      while( res->next() )
+      {
+         g_log.info( "id: " + std::to_string( res->getUInt( "id" ) ) );
+         g_log.info( "ip: " + res->getString( "ip" ) );
+         g_log.info( "port: " + std::to_string( res->getUInt( "port" ) ) );
+
+         // alternatively ( slightly faster )
+         // g_log.info( "id: " + std::to_string( res->getUInt( 1 ) ) );
+         // g_log.info( "ip: " + res->getString( 2 ) );
+         // g_log.info( "port: " + std::to_string( res->getUInt( 3 ) ) );
+
+      }
 
    }
    catch( std::runtime_error e )

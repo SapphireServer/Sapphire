@@ -1,5 +1,9 @@
 #include "Connection.h"
 #include "MySqlBase.h"
+#include "Statement.h"
+
+#include <vector>
+#include <boost/scoped_array.hpp>
 
 Core::Db::Connection::Connection( MySqlBase * pBase, 
                                   const std::string& hostName, 
@@ -172,5 +176,54 @@ bool Core::Db::Connection::getAutoCommit()
    uint32_t ac = atoi( row[0] );
 
    return ac != 0;
+}
+
+void Core::Db::Connection::beginTransaction()
+{
+
+}
+
+void Core::Db::Connection::commitTransaction()
+{
+
+}
+
+void Core::Db::Connection::rollbackTransaction()
+{
+
+}
+
+std::string Core::Db::Connection::escapeString( const std::string &inData )
+{
+   boost::scoped_array< char > buffer( new char[inData.length() * 2 + 1] );
+   if( !buffer.get() )
+      return "";
+   unsigned long return_len = mysql_real_escape_string( m_pRawCon, buffer.get(),
+                                                        inData.c_str(), static_cast< unsigned long > ( inData.length() ) );
+   return std::string( buffer.get(), return_len );
+}
+
+void Core::Db::Connection::setSchema( const std::string &schema )
+{
+   if( mysql_select_db( m_pRawCon, schema.c_str() ) != 0 )
+      throw std::runtime_error( "Current database could not be changed to " + schema );
+}
+
+Core::Db::Statement *Core::Db::Connection::createStatement()
+{
+   return new Statement( this );
+}
+
+MYSQL *Core::Db::Connection::getRawCon()
+{
+   return m_pRawCon;
+}
+
+std::string Core::Db::Connection::getError()
+{
+   auto mysqlError = mysql_error( m_pRawCon );
+   if( mysqlError )
+      return std::string( mysqlError );
+   return "";
 }
 

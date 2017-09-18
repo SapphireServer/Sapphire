@@ -28,8 +28,8 @@ public:
    std::string getVersionInfo();
 
 private:
-   MySqlBase(const MySqlBase &);
-   void operator=(MySqlBase &);
+   MySqlBase( const MySqlBase& );
+   void operator=( MySqlBase& );
 };
 
 }

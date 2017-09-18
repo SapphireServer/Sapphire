@@ -6,6 +6,7 @@
 #include <mysql.h>
 #include <map>
 
+
 namespace Core
 {
 namespace Db
@@ -13,6 +14,7 @@ namespace Db
 
    typedef std::map< enum mysql_option, std::string > optionMap;
    class MySqlBase;
+   class Statement;
 
    class Connection
    {
@@ -45,28 +47,27 @@ namespace Db
       void setAutoCommit( bool autoCommit );
       bool getAutoCommit();
 
+      std::string escapeString( const std::string& inData );
+
+      void setSchema( const std::string& catalog );
+
+      Statement * createStatement();
+
       //// implemented up to this point
 
       void beginTransaction();
       void commitTransaction();
       void rollbackTransaction();
 
-      //Statement * createStatement();
 
-      std::string escapeString( const std::string& );
 
       std::string getSchema();
-      void setSchema( const std::string& catalog );
-
-      void getOption( enum mysql_option option, void * optionValue );
-
-      std::string getOption( enum mysql_option option );
 
       //DatabaseMetaData * getMetaData();
 
       //enum_transaction_isolation getTransactionIsolation();
 
-      //const SQLWarning * getWarnings();
+      std::string getError();
 
       bool isReadOnly();
       void setReadOnly( bool readOnly );
@@ -89,7 +90,9 @@ namespace Db
 
       std::string getLastStatementInfo();
 
-      private:
+      MYSQL * getRawCon();
+
+   private:
       MySqlBase * m_pBase;
       MYSQL * m_pRawCon;
       bool m_bConnected;
