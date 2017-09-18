@@ -29,14 +29,14 @@ namespace Core {
       std::string m_helpText; 
 
       // userlevel needed to execute the command
-      Common::UserLevel m_userLevel;
+      uint8_t m_gmLevel;
 
-      DebugCommand( const std::string& n, pFunc functionPtr, const std::string& hText, Common::UserLevel uLevel )
+      DebugCommand( const std::string& n, pFunc functionPtr, const std::string& hText, uint8_t uLevel )
       {
          m_commandName = n;
          m_pFunc = functionPtr;
          m_helpText = hText;
-         m_userLevel = uLevel;
+         m_gmLevel = uLevel;
       }
 
       ~DebugCommand()
@@ -54,9 +54,9 @@ namespace Core {
          return m_helpText;
       }
 
-      Common::UserLevel getUserLevel() const
+      uint8_t getRequiredGmLevel() const
       {
-         return m_userLevel;
+         return m_gmLevel;
       }
 
    };
