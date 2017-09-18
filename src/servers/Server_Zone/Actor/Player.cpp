@@ -980,10 +980,11 @@ const uint8_t * Core::Entity::Player::getStateFlags() const
 
 bool Core::Entity::Player::actionHasCastTime( uint32_t actionId ) //TODO: Add logic for special cases
 {
-   if( g_exdData.m_actionInfoMap[actionId].is_instant )
+   auto actionInfoPtr = g_exdData.getActionInfo( actionId );
+   if( actionInfoPtr->is_instant )
       return false;
 
-   if( g_exdData.m_actionInfoMap[actionId].cast_time == 0 )
+   if( actionInfoPtr->cast_time == 0 )
       return false;
 
    return true;
@@ -1517,6 +1518,9 @@ void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, 
 {
    sendDebug( std::to_string( pTarget.getId() ) );
    sendDebug( "Handle script skill type: " + std::to_string( type ) );
+   
+   auto actionInfoPtr = g_exdData.getActionInfo( actionId );
+
 
    switch( type )
    {
@@ -1573,6 +1577,18 @@ void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, 
 
       if ( !pTarget.isAlive() )
          break;
+
+      // todo: on AoE, send effect to heal all affected actors instead of just the caster
+      // this includes: calculating heal for every single actor. meaning we'd need to two-step the base heal from actor, and the value received
+
+      if ( actionInfoPtr->is_aoe ) 
+      {
+         for ( auto pCurAct : m_inRangePlayers )
+         {
+            assert( pCurAct );
+            pCurAct->heal( calculatedHeal );
+         }
+      }
 
       pTarget.heal( calculatedHeal );
       break;

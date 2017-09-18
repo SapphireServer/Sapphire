@@ -299,7 +299,7 @@ namespace Core {
          std::map<uint8_t, ClassJobInfo> m_classJobInfoMap;
          std::map<uint32_t, ParamGrowthInfo> m_paramGrowthInfoMap;
          std::map<uint16_t, EventActionInfo> m_EventActionInfoMap;
-         std::map<uint16_t, ActionInfo> m_actionInfoMap;
+         std::map<uint16_t, boost::shared_ptr< ActionInfo > > m_actionInfoMap;
          std::map<uint16_t, StatusEffectInfo> m_statusEffectInfoMap;
          std::map<uint32_t, boost::shared_ptr< AetheryteInfo > > m_aetheryteInfoMap;
          std::map<uint32_t, TribeInfo > m_tribeInfoMap;
@@ -317,6 +317,7 @@ namespace Core {
          boost::shared_ptr< OpeningInfo > getOpeningInfo( uint32_t openingId );
          boost::shared_ptr< CustomTalkInfo > getCustomTalkInfo( uint32_t customTalkId );
          boost::shared_ptr< AetheryteInfo > getAetheryteInfo( uint32_t aetheryteId );
+         boost::shared_ptr< ActionInfo > getActionInfo( uint32_t actionId );
          boost::shared_ptr< PlaceNameInfo > getPlaceNameInfo( uint32_t placeNameId );
          boost::shared_ptr< ItemInfo > getItemInfo( uint32_t catalogId );
          boost::shared_ptr< RaceInfo > getRaceInfo( uint32_t raceId );
