@@ -48,11 +48,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #ifndef _WIN32
 #  ifndef HAVE_FUNCTION_STRTOLL
-#    define strtoll(__a, __b, __c)  static_cast<long long>(sql::mysql::util::strtold((__a), NULL))
+#    define strtoll(__a, __b, __c)  static_cast<long long>(strtold((__a), NULL))
 #    define HAVE_FUNCTION_STRTOLL 1
 #  endif
 #  ifndef HAVE_FUNCTION_STRTOULL
-#    define strtoull(__a, __b, __c)  static_cast<unsigned long long>(sql::mysql::util::strtold((__a), NULL))
+#    define strtoull(__a, __b, __c)  static_cast<unsigned long long>(strtold((__a), NULL))
 #    define HAVE_FUNCTION_STRTOULL 1
 #  endif
 #else
@@ -106,5 +106,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
                                     (((uint32_t) (((unsigned char*) (A))[0])) << 24))) <<\
                                     32))
 
+long double strtold(const char *nptr, char **endptr);
 long double strtonum( const std::string &str, int radix = 10);
 #endif //SAPPHIRE_MYSQL_UTIL_H
