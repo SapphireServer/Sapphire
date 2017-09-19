@@ -15,9 +15,7 @@ Core::Db::Connection::Connection( MySqlBase * pBase,
    m_pRawCon = mysql_init( nullptr );
    if( mysql_real_connect( m_pRawCon, hostName.c_str(), userName.c_str(), password.c_str(),
                           nullptr, 3306, nullptr, 0) == nullptr )
-   {
       throw std::runtime_error( mysql_error( m_pRawCon ) );
-   }
    m_bConnected = true;
 
 }
@@ -103,9 +101,7 @@ Core::Db::Connection::Connection( MySqlBase * pBase,
 
    if( mysql_real_connect( m_pRawCon, hostName.c_str(), userName.c_str(), password.c_str(),
                            nullptr, 3306, nullptr, 0) == nullptr )
-   {
       throw std::runtime_error( mysql_error( m_pRawCon ) );
-   }
 
 }
 
@@ -180,17 +176,20 @@ bool Core::Db::Connection::getAutoCommit()
 
 void Core::Db::Connection::beginTransaction()
 {
-
+   boost::scoped_ptr< Statement > stmt( createStatement() );
+   stmt->execute( "START TRANSACTION;" );
 }
 
 void Core::Db::Connection::commitTransaction()
 {
-
+   boost::scoped_ptr< Statement > stmt( createStatement() );
+   stmt->execute( "COMMIT" );
 }
 
 void Core::Db::Connection::rollbackTransaction()
 {
-
+   boost::scoped_ptr< Statement > stmt( createStatement() );
+   stmt->execute( "ROLLBACK" );
 }
 
 std::string Core::Db::Connection::escapeString( const std::string &inData )
