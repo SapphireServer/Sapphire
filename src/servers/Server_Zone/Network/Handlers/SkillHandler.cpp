@@ -52,7 +52,7 @@ void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inP
         std::string actionIdStr = boost::str( boost::format( "%|04X|" ) % action );
         pPlayer->sendDebug( "---------------------------------------" );
         pPlayer->sendDebug( "ActionHandler ( " + actionIdStr + " | " +
-                            g_exdData.m_actionInfoMap[action].name +
+                            g_exdData.getActionInfo( action )->name +
                             " | " + std::to_string( targetId ) + " )" );
 
         pPlayer->queuePacket( ActorControlPacket142( pPlayer->getId(), ActorControlType::ActionStart, 0x01, action ) );

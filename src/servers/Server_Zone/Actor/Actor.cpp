@@ -595,7 +595,7 @@ void Core::Entity::Actor::autoAttack( ActorPtr pTarget )
       srand( static_cast< uint32_t >( tick ) );
 
       uint32_t damage = 10 + rand() % 12;
-      uint32_t variation = 0 + rand() % 3;
+      uint32_t variation = 0 + rand() % 4;
 
       GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket( getId() );
       effectPacket.data().targetId = pTarget->getId();
@@ -606,9 +606,9 @@ void Core::Entity::Actor::autoAttack( ActorPtr pTarget )
       effectPacket.data().numEffects = 1;
       effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRotation() );
       effectPacket.data().effectTarget = pTarget->getId();
-      effectPacket.data().effects[0].param1 = damage;
-      effectPacket.data().effects[0].unknown_1 = 3;
-      effectPacket.data().effects[0].unknown_2 = 1;
+      effectPacket.data().effects[0].value = damage;
+      effectPacket.data().effects[0].effectType = ActionEffectType::Damage;
+      effectPacket.data().effects[0].hitSeverity = static_cast< ActionHitSeverityType >( variation );
       effectPacket.data().effects[0].unknown_3 = 7;
 
       sendToInRangeSet( effectPacket );

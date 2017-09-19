@@ -31,7 +31,7 @@ Core::Action::ActionCast::ActionCast( Entity::ActorPtr pActor, Entity::ActorPtr 
    m_startTime = 0;
    m_id = actionId;
    m_handleActionType = HandleActionType::Spell;
-   m_castTime = g_exdData.m_actionInfoMap[actionId].cast_time; // TODO: Add security checks.
+   m_castTime = g_exdData.getActionInfo( actionId )->cast_time; // TODO: Add security checks.
    m_pSource = pActor;
    m_pTarget = pTarget;
    m_bInterrupt = false;
