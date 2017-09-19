@@ -424,15 +424,6 @@ namespace Core {
          Land = 0x200,
       };
 
-      enum UserLevel : uint8_t
-      {
-         all = 0xff,
-         player = 0x01,
-         gm = 0x02,
-         dev = 0x04,
-         admin = 0x08
-      };
-
       struct QuestActive
       {
          QuestActive()
