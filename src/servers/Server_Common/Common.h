@@ -590,12 +590,14 @@ namespace Core {
          GpGain = 14
       };
 
-      enum ActionEffectSeverityType : uint8_t
+      enum ActionHitSeverityType : uint8_t
       {
-         Normal = 0,
-         Crit = 1,
-         DirectHit = 2,
-         CritDirectHit = 3
+         NormalDamage = 0,
+         CritHeal = 0,
+         CritDamage = 1,
+         NormalHeal = 1,
+         DirectHitDamage = 2,
+         CritDirectHitDamage = 3
       };
 
       enum HandleActionType : uint8_t

@@ -1482,9 +1482,9 @@ void Core::Entity::Player::autoAttack( ActorPtr pTarget )
       effectPacket.data().rotation = Math::Util::floatToUInt16Rot(getRotation());
       effectPacket.data().effectTargetId = pTarget->getId();
       effectPacket.data().effectTarget = pTarget->getId();
-      effectPacket.data().effects[0].param1 = damage;
-      effectPacket.data().effects[0].unknown_1 = 3;
-      effectPacket.data().effects[0].unknown_2 = 1;
+      effectPacket.data().effects[0].value = damage;
+      effectPacket.data().effects[0].effectType = Common::ActionEffectType::Damage;
+      effectPacket.data().effects[0].hitSeverity = Common::ActionHitSeverityType::NormalDamage;
       effectPacket.data().effects[0].unknown_3 = 7;
 
       sendToInRangeSet(effectPacket, true);
@@ -1502,9 +1502,9 @@ void Core::Entity::Player::autoAttack( ActorPtr pTarget )
       effectPacket.data().actionTextId = 7;
       effectPacket.data().rotation = Math::Util::floatToUInt16Rot(getRotation());
       effectPacket.data().effectTarget = pTarget->getId();
-      effectPacket.data().effects[0].param1 = damage;
-      effectPacket.data().effects[0].unknown_1 = 3;
-      effectPacket.data().effects[0].unknown_2 = 2;
+      effectPacket.data().effects[0].value = damage;
+      effectPacket.data().effects[0].effectType = Common::ActionEffectType::Damage;
+      effectPacket.data().effects[0].hitSeverity = Common::ActionHitSeverityType::NormalDamage;
       effectPacket.data().effects[0].unknown_3 = 71;
 
       sendToInRangeSet(effectPacket, true);
@@ -1538,9 +1538,9 @@ void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, 
       effectPacket.data().numEffects = 1;
       effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRotation() );
       effectPacket.data().effectTarget = pTarget.getId();
-      effectPacket.data().effects[0].param1 = static_cast< int16_t >( param1 );
-      effectPacket.data().effects[0].unknown_1 = 3;
-      effectPacket.data().effects[0].unknown_2 = 1;
+      effectPacket.data().effects[0].value = static_cast< int16_t >( param1 );
+      effectPacket.data().effects[0].effectType = ActionEffectType::Damage;
+      effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::NormalDamage;
       effectPacket.data().effects[0].unknown_3 = 7;
 
       sendToInRangeSet( effectPacket, true );
@@ -1568,9 +1568,9 @@ void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, 
       effectPacket.data().numEffects = 1;
       effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRotation() );
       effectPacket.data().effectTarget = pTarget.getId();
-      effectPacket.data().effects[0].param1 = calculatedHeal;
-      effectPacket.data().effects[0].unknown_1 = 4;
-      effectPacket.data().effects[0].unknown_2 = 1;
+      effectPacket.data().effects[0].value = calculatedHeal;
+      effectPacket.data().effects[0].effectType = ActionEffectType::Heal;
+      effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::NormalHeal;
       effectPacket.data().effects[0].unknown_3 = 7;
 
       sendToInRangeSet( effectPacket, true );
@@ -1578,8 +1578,8 @@ void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, 
       if ( !pTarget.isAlive() )
          break;
 
-      // todo: on AoE, send effect to heal all affected actors instead of just the caster
-      // this includes: calculating heal for every single actor. meaning we'd need to two-step the base heal from actor, and the value received
+      // todo: get proper packets: the following was just kind of thrown together from what we know
+      // also toss AoE to another spot and make it generic
 
       if ( actionInfoPtr->is_aoe ) 
       {
@@ -1591,19 +1591,19 @@ void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, 
 
             if ( Math::Util::distance( pTarget.getPos().x, pTarget.getPos().y, pTarget.getPos().z, pCurAct->getPos().x, pCurAct->getPos().y, pCurAct->getPos().z ) <= actionInfoPtr->radius )
             {
-               GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket( getId() );
+               GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket( pCurAct->getId() );
                effectPacket.data().targetId = pCurAct->getId();
-               
                effectPacket.data().unknown_1 = 1;  // the magic trick for getting it to work
                effectPacket.data().unknown_2 = 1;
                effectPacket.data().unknown_8 = 1;
                effectPacket.data().unknown_5 = 1;
+               effectPacket.data().actionAnimationId = actionId;
                effectPacket.data().actionTextId = 0;
                effectPacket.data().numEffects = 1;
                effectPacket.data().effectTarget = pCurAct->getId();
-               effectPacket.data().effects[0].param1 = calculatedHeal;
-               effectPacket.data().effects[0].unknown_1 = 4;   // 0: nothing, 1: miss, 2: full resist, 3: dmg, 4: heal, 5: blocked, 6: parry, 7: invuln, 8: noeffect (text), 9: unknown, 10: mp loss, 11: mp gain, 12: tp loss, 13: tp gain, 14: gp win,  floating text type (heal, dmg, blocked etc), 
-               effectPacket.data().effects[0].unknown_2 = 3;   // crit? 0 normal, 1 crit, 2 direct hit, 3 crit+dh
+               effectPacket.data().effects[0].value = calculatedHeal;
+               effectPacket.data().effects[0].effectType = ActionEffectType::Heal;
+               effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::NormalHeal;
                effectPacket.data().effects[0].unknown_3 = 7;
 
                pCurAct->sendToInRangeSet( effectPacket, true );
