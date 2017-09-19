@@ -197,7 +197,7 @@ long double Core::Db::ResultSet::getDouble( uint32_t columnIndex ) const
    if( getFieldMeta(columnIndex)->type == MYSQL_TYPE_BIT )
       return static_cast< long double >( getInt64( columnIndex ) );
 
-   return strtonum( m_row[columnIndex - 1] );
+   return Util::strtonum( m_row[columnIndex - 1] );
 }
 
 long double Core::Db::ResultSet::getDouble( const std::string &columnLabel ) const

@@ -1,6 +1,6 @@
 #include "mysql_util.h"
 
-long double strtold(const char *nptr, char **endptr)
+long double Util::strtold(const char *nptr, char **endptr)
 {
    /*
   * Experienced odd compilation errors on one of windows build hosts -
@@ -29,7 +29,7 @@ long double strtold(const char *nptr, char **endptr)
 
 }
 
-long double strtonum( const std::string &str, int radix )
+long double Util::strtonum( const std::string &str, int radix )
 {
    typedef std::istreambuf_iterator< char > iter_t;
    static std::locale c_locale( "C" );
