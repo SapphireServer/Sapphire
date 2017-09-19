@@ -22,7 +22,7 @@ public:
    ~DebugCommandHandler();
 
    // register command to command map
-   void registerCommand( const std::string& n, DebugCommand::pFunc, const std::string& hText, Common::UserLevel uLevel );
+   void registerCommand( const std::string& n, DebugCommand::pFunc, const std::string& hText, uint8_t uLevel );
 
    // execute command if registered
    void execCommand( char * data, Entity::PlayerPtr pPlayer );

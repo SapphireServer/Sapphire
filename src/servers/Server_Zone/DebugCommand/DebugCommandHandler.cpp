@@ -41,16 +41,15 @@ extern Core::ServerZone g_serverZone;
 Core::DebugCommandHandler::DebugCommandHandler()
 {
 
-   // Push all commands onto the register map
-   registerCommand( "set", &DebugCommandHandler::set, "Loads and injects a premade Packet.", Common::UserLevel::all );
-   registerCommand( "get", &DebugCommandHandler::get, "Loads and injects a premade Packet.", Common::UserLevel::all );
-   registerCommand( "add", &DebugCommandHandler::add, "Loads and injects a premade Packet.", Common::UserLevel::all );
-   //registerCommand( "debug", &DebugCommandHandler::debug, "Loads and injects a premade Packet.", Common::UserLevel::all );
-   registerCommand( "inject", &DebugCommandHandler::injectPacket, "Loads and injects a premade Packet.", Common::UserLevel::all );
-   registerCommand( "injectc", &DebugCommandHandler::injectChatPacket, "Loads and injects a premade Packet.", Common::UserLevel::all );
-   registerCommand( "script_reload", &DebugCommandHandler::scriptReload, "Loads and injects a premade Packet.", Common::UserLevel::all );
-   registerCommand( "nudge", &DebugCommandHandler::nudge, "Nudges you forward/up/down", Common::UserLevel::all );
-   registerCommand( "info", &DebugCommandHandler::serverInfo, "Send server info", Common::UserLevel::all );
+   // Push all commands onto the register map ( command name - function - description - required GM level )
+   registerCommand( "set", &DebugCommandHandler::set, "Loads and injects a premade Packet.", 1 );
+   registerCommand( "get", &DebugCommandHandler::get, "Loads and injects a premade Packet.", 1 );
+   registerCommand( "add", &DebugCommandHandler::add, "Loads and injects a premade Packet.", 1 );
+   registerCommand( "inject", &DebugCommandHandler::injectPacket, "Loads and injects a premade Packet.", 1 );
+   registerCommand( "injectc", &DebugCommandHandler::injectChatPacket, "Loads and injects a premade Packet.", 1 );
+   registerCommand( "script_reload", &DebugCommandHandler::scriptReload, "Loads and injects a premade Packet.", 1 );
+   registerCommand( "nudge", &DebugCommandHandler::nudge, "Nudges you forward/up/down", 1 );
+   registerCommand( "info", &DebugCommandHandler::serverInfo, "Send server info", 0 );
 
 }
 
@@ -63,7 +62,7 @@ Core::DebugCommandHandler::~DebugCommandHandler()
 
 // add a command set to the register map
 void Core::DebugCommandHandler::registerCommand( const std::string& n, Core::DebugCommand::pFunc functionPtr,
-                                                const std::string& hText, Core::Common::UserLevel uLevel )
+                                                const std::string& hText, uint8_t uLevel )
 {
    m_commandMap[std::string( n )] = boost::make_shared<DebugCommand>( n, functionPtr, hText, uLevel );
 }
@@ -88,12 +87,6 @@ void Core::DebugCommandHandler::execCommand( char * data, Core::Entity::PlayerPt
       // no parameters, just get the command
       commandString = tmpCommand;
 
-   if ( pPlayer->getGmRank() <= 0  && commandString != "info" )
-   {
-      pPlayer->sendUrgent( "You are not allowed to use debug commands." );
-      return;
-   }
-
    // try to retrieve the command
    auto it = m_commandMap.find( commandString );
 
@@ -102,6 +95,12 @@ void Core::DebugCommandHandler::execCommand( char * data, Core::Entity::PlayerPt
       pPlayer->sendUrgent( "Command not found." );
    else
    {
+      if( pPlayer->getGmRank() < it->second->getRequiredGmLevel() )
+      {
+         pPlayer->sendUrgent( "You are not allowed to use this command." );
+         return;
+      }
+
       // command found, call the callback function and pass parameters if present.
       pf = ( *it ).second->m_pFunc;
       ( this->*pf )( data, pPlayer, ( *it ).second );
