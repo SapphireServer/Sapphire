@@ -571,6 +571,33 @@ namespace Core {
          LimitBreak = 8,
       };
 
+      enum ActionEffectType : uint8_t
+      {
+         Nothing = 0,
+         Miss = 1,
+         FullResist = 2,
+         Damage = 3,
+         Heal = 4,
+         BlockedDamage = 5,
+         ParriedDamage = 6,
+         Invulnerable = 7,
+         NoEffectText = 8,
+         Unknown_0 = 9,
+         MpLoss = 10,
+         MpGain = 11,
+         TpLoss = 12,
+         TpGain = 13,
+         GpGain = 14
+      };
+
+      enum ActionEffectSeverityType : uint8_t
+      {
+         Normal = 0,
+         Crit = 1,
+         DirectHit = 2,
+         CritDirectHit = 3
+      };
+
       enum HandleActionType : uint8_t
       {
          Event,

@@ -1586,7 +1586,30 @@ void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, 
          for ( auto pCurAct : m_inRangePlayers )
          {
             assert( pCurAct );
-            pCurAct->heal( calculatedHeal );
+            if ( !pCurAct->isAlive() )
+               break;
+
+            if ( Math::Util::distance( pTarget.getPos().x, pTarget.getPos().y, pTarget.getPos().z, pCurAct->getPos().x, pCurAct->getPos().y, pCurAct->getPos().z ) <= actionInfoPtr->radius )
+            {
+               GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket( getId() );
+               effectPacket.data().targetId = pCurAct->getId();
+               
+               effectPacket.data().unknown_1 = 1;  // the magic trick for getting it to work
+               effectPacket.data().unknown_2 = 1;
+               effectPacket.data().unknown_8 = 1;
+               effectPacket.data().unknown_5 = 1;
+               effectPacket.data().actionTextId = 0;
+               effectPacket.data().numEffects = 1;
+               effectPacket.data().effectTarget = pCurAct->getId();
+               effectPacket.data().effects[0].param1 = calculatedHeal;
+               effectPacket.data().effects[0].unknown_1 = 4;   // 0: nothing, 1: miss, 2: full resist, 3: dmg, 4: heal, 5: blocked, 6: parry, 7: invuln, 8: noeffect (text), 9: unknown, 10: mp loss, 11: mp gain, 12: tp loss, 13: tp gain, 14: gp win,  floating text type (heal, dmg, blocked etc), 
+               effectPacket.data().effects[0].unknown_2 = 3;   // crit? 0 normal, 1 crit, 2 direct hit, 3 crit+dh
+               effectPacket.data().effects[0].unknown_3 = 7;
+
+               pCurAct->sendToInRangeSet( effectPacket, true );
+               pCurAct->heal( calculatedHeal );
+               sendDebug( "AoE hit actor " + pCurAct->getName() );
+            }
          }
       }
 
