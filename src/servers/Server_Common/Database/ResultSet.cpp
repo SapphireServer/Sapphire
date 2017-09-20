@@ -6,6 +6,7 @@
 #include <clocale>
 #include <vector>
 #include <boost/scoped_ptr.hpp>
+#include <string.h>
 
 Core::Db::ResultSet::ResultSet( MYSQL_RES *res, Core::Db::Statement *par )
 {
