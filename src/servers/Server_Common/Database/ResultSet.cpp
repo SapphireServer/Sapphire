@@ -280,7 +280,6 @@ std::vector< char > Core::Db::ResultSet::getBlobVector( uint32_t columnIndex ) c
 
    boost::scoped_ptr< std::istream > inStr( getBlob( columnIndex ) );
    char buff[4196];
-   std::string s;
    std::vector< char > data;
    inStr->read( buff, sizeof( buff ) );
    if( inStr->gcount() )
