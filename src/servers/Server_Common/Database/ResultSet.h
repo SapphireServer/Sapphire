@@ -4,6 +4,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/weak_ptr.hpp>
+#include <vector>
 
 #include "ResultSetBase.h"
 #include <mysql.h>
@@ -51,6 +52,9 @@ namespace Core
 
          std::istream * getBlob( uint32_t columnIndex ) const;
          std::istream * getBlob( const std::string& columnLabel ) const;
+
+         std::vector< char > getBlobVector( uint32_t columnIndex ) const;
+         std::vector< char > getBlobVector( const std::string& columnLabel ) const;
 
          bool getBoolean( uint32_t columnIndex ) const;
          bool getBoolean( const std::string& columnLabel ) const;

@@ -213,6 +213,15 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
 
       }
 
+      boost::scoped_ptr< Core::Db::Statement > stmt3( con->createStatement() );
+      boost::scoped_ptr< Core::Db::ResultSet > res1( stmt3->executeQuery( "SELECT * FROM charabase"  ) );
+
+      while( res1->next() )
+      {
+         auto blob = res1->getBlobVector( "Customize" );
+      }
+
+
    }
    catch( std::runtime_error e )
    {

@@ -5,6 +5,7 @@
 #include <cctype>
 #include <clocale>
 #include <vector>
+#include <boost/scoped_ptr.hpp>
 
 Core::Db::ResultSet::ResultSet( MYSQL_RES *res, Core::Db::Statement *par )
 {
@@ -272,3 +273,25 @@ std::istream* Core::Db::ResultSet::getBlob( const std::string& columnLabel ) con
    return new std::istringstream( getString( columnLabel ) );
 }
 
+std::vector< char > Core::Db::ResultSet::getBlobVector( uint32_t columnIndex ) const
+{
+   if( columnIndex == 0 || columnIndex > m_numFields )
+      throw std::runtime_error( "ResultSet::getBlobVector: invalid value of 'columnIndex'" );
+
+   boost::scoped_ptr< std::istream > inStr( getBlob( columnIndex ) );
+   char buff[4196];
+   std::string s;
+   std::vector< char > data;
+   inStr->read( buff, sizeof( buff ) );
+   if( inStr->gcount() )
+   {
+      data.resize( inStr->gcount() );
+      memcpy( data.data(), buff, inStr->gcount() );
+   }
+   return data;
+}
+
+std::vector< char > Core::Db::ResultSet::getBlobVector( const std::string& columnLabel ) const
+{
+   return getBlobVector( findColumn( columnLabel ) );
+}

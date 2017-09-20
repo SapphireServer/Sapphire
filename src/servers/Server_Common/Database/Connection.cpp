@@ -8,13 +8,14 @@
 Core::Db::Connection::Connection( MySqlBase * pBase, 
                                   const std::string& hostName, 
                                   const std::string& userName,
-                                  const std::string& password ) : 
+                                  const std::string& password,
+                                  uint16_t port ) :
     m_pBase( pBase ),
     m_bConnected( false )
 {
    m_pRawCon = mysql_init( nullptr );
    if( mysql_real_connect( m_pRawCon, hostName.c_str(), userName.c_str(), password.c_str(),
-                          nullptr, 3306, nullptr, 0) == nullptr )
+                          nullptr, port, nullptr, 0) == nullptr )
       throw std::runtime_error( mysql_error( m_pRawCon ) );
    m_bConnected = true;
 
@@ -24,7 +25,8 @@ Core::Db::Connection::Connection( MySqlBase * pBase,
                                   const std::string& hostName,
                                   const std::string& userName,
                                   const std::string& password,
-                                  const optionMap& options ) : 
+                                  const optionMap& options,
+                                  uint16_t port ) :
     m_pBase( pBase )
 {
    m_pRawCon = mysql_init( nullptr );
@@ -100,7 +102,7 @@ Core::Db::Connection::Connection( MySqlBase * pBase,
 
 
    if( mysql_real_connect( m_pRawCon, hostName.c_str(), userName.c_str(), password.c_str(),
-                           nullptr, 3306, nullptr, 0) == nullptr )
+                           nullptr, port, nullptr, 0) == nullptr )
       throw std::runtime_error( mysql_error( m_pRawCon ) );
 
 }
