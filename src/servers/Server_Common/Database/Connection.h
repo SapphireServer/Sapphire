@@ -18,20 +18,19 @@ namespace Db
 
    class Connection
    {
-      //Statement * createServiceStmt();
-
-      public:
-
+   public:
       Connection( MySqlBase * pBase,
                   const std::string& hostName,
                   const std::string& userName,
-                  const std::string& password );
+                  const std::string& password,
+                  uint16_t port = 3306);
 
       Connection( MySqlBase * pBase,
                   const std::string& hostName,
                   const std::string& userName,
                   const std::string& password,
-                  const optionMap& options );
+                  const optionMap& options,
+                  uint16_t port = 3306 );
 
       virtual ~Connection();
 
@@ -53,19 +52,13 @@ namespace Db
 
       Statement * createStatement();
 
-      //// implemented up to this point
-
       void beginTransaction();
       void commitTransaction();
       void rollbackTransaction();
 
-
-
       std::string getSchema();
 
       //DatabaseMetaData * getMetaData();
-
-      //enum_transaction_isolation getTransactionIsolation();
 
       std::string getError();
 
@@ -90,11 +83,11 @@ namespace Db
 
       std::string getLastStatementInfo();
 
-      MYSQL * getRawCon();
+      MYSQL* getRawCon();
 
    private:
-      MySqlBase * m_pBase;
-      MYSQL * m_pRawCon;
+      MySqlBase* m_pBase;
+      MYSQL* m_pRawCon;
       bool m_bConnected;
 
       Connection( const Connection& );
