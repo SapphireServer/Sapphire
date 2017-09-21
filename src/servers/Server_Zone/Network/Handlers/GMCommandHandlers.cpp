@@ -69,6 +69,7 @@ enum GmCommand
    Mp = 0x0065,
    Tp = 0x0066,
    Gp = 0x0067,
+   EXP = 0x0068,
 
    Item = 0x00C8,
    Gil = 0x00C9,
@@ -187,6 +188,12 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    {
       targetPlayer->setHp( param1 );
       pPlayer->sendNotice( "Gp for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
+      break;
+   }
+   case GmCommand::EXP:
+   {
+      targetPlayer->gainExp(param1);
+      pPlayer->sendNotice(std::to_string(param1) + " EXP was added to " + targetPlayer->getName());
       break;
    }
    case GmCommand::Sex:
