@@ -278,7 +278,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       {
          targetPlayer->setPosition( targetPlayer->getPos() );
          targetPlayer->performZoning( param1, targetPlayer->getPos(), 0 );
-         pPlayer->sendNotice( targetPlayer->getName() + " was warped to Zone " + std::to_string(param1) );
+         pPlayer->sendNotice( targetPlayer->getName() + " was warped to Zone " + std::to_string( param1 ) );
       }
       break;
    }
