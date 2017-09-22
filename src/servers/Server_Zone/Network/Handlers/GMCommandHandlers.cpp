@@ -84,6 +84,7 @@ enum GmCommand
    GC = 0x0154,
    GCRank = 0x0155,
    TeriInfo = 0x025D,
+   Teri = 0x0258,
    Jump = 0x025E,
    JumpNpc = 0x025F,
 };
@@ -267,6 +268,18 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
          std::to_string( pPlayer->getCurrentZone()->getPopCount() ) +
          "\nCurrentWeather:" + std::to_string( pPlayer->getCurrentZone()->getCurrentWeather() ) +
          "\nNextWeather:" + std::to_string( pPlayer->getCurrentZone()->getNextWeather() ) );
+      break;
+   }
+   case GmCommand::Teri:
+   {
+      if( param1 < 128 )
+         pPlayer->sendUrgent( "Zone ID out of range." );
+      else
+      {
+         targetPlayer->setPosition( targetPlayer->getPos() );
+         targetPlayer->performZoning( param1, targetPlayer->getPos(), 0 );
+         pPlayer->sendNotice( targetPlayer->getName() + " was warped to Zone " + std::to_string(param1) );
+      }
       break;
    }
    case GmCommand::Jump:
