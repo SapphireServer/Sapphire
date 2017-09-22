@@ -254,17 +254,24 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
    else if( subCommand == "aaah" )
    {
       int32_t id;
-
       sscanf( params.c_str(), "%d", &id );
+      
       pPlayer->sendDebug( std::to_string( pPlayer->actionHasCastTime( id ) ) );
    }
    else if ( subCommand == "cfpenalty" )
    {
       int32_t minutes;
-
       sscanf( params.c_str(), "%d", &minutes );
 
       pPlayer->setCFPenaltyMinutes( minutes );
+   }
+   else if ( subCommand == "eorzeatime" )
+   {
+      uint64_t timestamp;
+      sscanf(params.c_str(), "%llu", &timestamp);
+
+      pPlayer->setEorzeaTimeOffset( timestamp );
+      pPlayer->sendNotice( "Eorzea time offset: " + std::to_string( timestamp ) );
    }
 
 }
