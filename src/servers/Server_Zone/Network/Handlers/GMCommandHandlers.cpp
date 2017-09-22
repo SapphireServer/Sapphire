@@ -83,8 +83,8 @@ enum GmCommand
    QuestInspect = 0x0131,
    GC = 0x0154,
    GCRank = 0x0155,
-   TeriInfo = 0x025D,
    Teri = 0x0258,
+   TeriInfo = 0x025D,
    Jump = 0x025E,
    JumpNpc = 0x025F,
 };
