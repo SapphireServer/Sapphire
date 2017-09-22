@@ -253,6 +253,12 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
          pPlayer->sendUrgent( "Item " + std::to_string( param1 ) + " not found..." );
       break;
    }
+   case GmCommand::Time:
+   {
+      pPlayer->setEorzeaTimeOffset( param2 );
+      pPlayer->sendNotice( "Eorzea time offset: " + std::to_string( param2 ) );
+      break;
+   }
    case GmCommand::Weather:
    {
       targetPlayer->getCurrentZone()->setWeatherOverride( param1 );
