@@ -268,7 +268,7 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
    else if ( subCommand == "eorzeatime" )
    {
       uint64_t timestamp;
-      sscanf(params.c_str(), "%llu", &timestamp);
+      sscanf( params.c_str(), "%llu", &timestamp );
 
       pPlayer->setEorzeaTimeOffset( timestamp );
       pPlayer->sendNotice( "Eorzea time offset: " + std::to_string( timestamp ) );
