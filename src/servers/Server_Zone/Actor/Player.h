@@ -499,6 +499,10 @@ public:
 
    uint32_t getCFPenaltyMinutes() const;
    void setCFPenaltyMinutes( uint32_t minutes );
+
+   void setEorzeaTimeOffset( uint64_t timestamp );
+   
+
 private:
    uint32_t m_lastWrite;
    uint32_t m_lastPing;
