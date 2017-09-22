@@ -1668,3 +1668,14 @@ void Core::Entity::Player::setOpeningSequence( uint8_t seq )
    setSyncFlag( OpeningSeq );
    m_openingSequence = seq;
 }
+
+/// Tells client to offset their eorzean time by given timestamp.
+void Core::Entity::Player::setEorzeaTimeOffset( uint64_t timestamp )
+{
+   // TODO: maybe change to persistent?
+   GamePacketNew< FFXIVIpcEorzeaTimeOffset, ServerZoneIpcType > packet ( getId() );
+   packet.data().timestamp = timestamp;
+
+   // Send to single player
+   queuePacket( packet );
+}

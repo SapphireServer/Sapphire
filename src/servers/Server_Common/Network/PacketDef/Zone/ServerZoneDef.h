@@ -1281,6 +1281,11 @@ struct FFXIVIpcCFMemberStatus : FFXIVIpcBasePacket<CFMemberStatus>
    uint32_t unknown3;
 };
 
+struct FFXIVIpcEorzeaTimeOffset : FFXIVIpcBasePacket<EorzeaTimeOffset>
+{
+   uint64_t timestamp;
+};
+
 
 
 } /* Server */
