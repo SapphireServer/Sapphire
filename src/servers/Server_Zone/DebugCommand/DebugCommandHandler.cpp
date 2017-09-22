@@ -40,7 +40,6 @@ extern Core::ServerZone g_serverZone;
 // instanciate and initialize commands
 Core::DebugCommandHandler::DebugCommandHandler()
 {
-
    // Push all commands onto the register map ( command name - function - description - required GM level )
    registerCommand( "set", &DebugCommandHandler::set, "Loads and injects a premade Packet.", 1 );
    registerCommand( "get", &DebugCommandHandler::get, "Loads and injects a premade Packet.", 1 );
@@ -186,8 +185,8 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
 
    else if( ( subCommand == "unlockaetheryte" ) && ( params != "" ) )
    {
-	   for( uint8_t i = 0; i < 255; i++ )
-		   pPlayer->registerAetheryte( i );
+      for( uint8_t i = 0; i < 255; i++ )
+         pPlayer->registerAetheryte( i );
    }
 
    else if( ( subCommand == "discovery" ) && ( params != "" ) )
@@ -255,14 +254,13 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
    else if( subCommand == "aaah" )
    {
       int32_t id;
-
       sscanf( params.c_str(), "%d", &id );
+      
       pPlayer->sendDebug( std::to_string( pPlayer->actionHasCastTime( id ) ) );
    }
    else if ( subCommand == "cfpenalty" )
    {
       int32_t minutes;
-
       sscanf( params.c_str(), "%d", &minutes );
 
       pPlayer->setCFPenaltyMinutes( minutes );
