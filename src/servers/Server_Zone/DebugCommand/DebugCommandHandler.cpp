@@ -176,33 +176,6 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
       pPlayer->queuePacket( setActorPosPacket );
 
    }
-   else if( ( subCommand == "zone" ) && ( params != "" ) )
-   {
-      int32_t zoneId;
-      sscanf( params.c_str(), "%i", &zoneId );
-
-      if( zoneId < 1 )
-         pPlayer->sendUrgent( "Zone id out of range." );
-      else
-      {
-         pPlayer->setPosition( pPlayer->getPos() );
-         pPlayer->performZoning( zoneId, pPlayer->getPos(), 0);
-      }
-
-   }
-   else if( ( subCommand == "hp" ) && ( params != "" ) )
-   {
-      int32_t hp;
-      sscanf( params.c_str(), "%i", &hp );
-
-      pPlayer->setHp( hp );
-
-      auto control = Network::Packets::Server::ActorControlPacket142( pPlayer->getId(), Common::ActorControlType::HpSetStat, 1, pPlayer->getHp() );
-
-      pPlayer->sendToInRangeSet( control, true );
-
-   }
-
    else if( ( subCommand == "tele" ) && ( params != "" ) )
    {
       int32_t aetheryteId;
@@ -324,37 +297,7 @@ void Core::DebugCommandHandler::add( char * data, Core::Entity::PlayerPtr pPlaye
                 "subCommand " + subCommand + " params: " + params );
 
 
-   if( ( subCommand == "item" ) && ( params != "" ) )
-   {
-      int32_t catalogId;
-      int32_t amount;
-
-      sscanf( params.c_str(), "%d %d", &catalogId, &amount );
-
-      if( amount < 1 || amount > 99 )
-      {
-         amount = 1;
-      }
-
-      if( ( catalogId == 0xcccccccc ) )
-      {
-         pPlayer->sendUrgent( "Syntaxerror." );
-         return;
-      }
-
-      if( !pPlayer->addItem( -1, catalogId, amount ) )
-         pPlayer->sendUrgent( "Item " + std::to_string( catalogId ) + " not found..." );
-
-   }
-   else if( subCommand == "exp" )
-   {
-      int32_t amount;
-
-      sscanf( params.c_str(), "%d", &amount );
-
-      pPlayer->gainExp( amount );
-   }
-   else if( subCommand == "status" )
+   if( subCommand == "status" )
    {
       int32_t id;
       int32_t duration;
@@ -540,4 +483,3 @@ void Core::DebugCommandHandler::serverInfo( char * data, Core::Entity::PlayerPtr
    pPlayer->sendDebug( "SapphireServer " + Version::VERSION + " - " + Version::GIT_HASH );
    pPlayer->sendDebug( "Sessions: " + std::to_string( g_serverZone.getSessionCount() ) );
 }
-
