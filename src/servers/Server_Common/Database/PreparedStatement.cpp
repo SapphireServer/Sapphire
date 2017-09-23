@@ -31,7 +31,7 @@ public:
    {
    }
 
-   bool operator()(std::istream * my_blob) const
+   bool operator()(std::istream* my_blob) const
    {
       if (my_blob == NULL)
          return false;
@@ -147,17 +147,17 @@ public:
 };
 
 
-void resetBlobBind(MYSQL_BIND & param)
+void resetBlobBind( MYSQL_BIND& param )
 {
-   delete [] static_cast<char *>(param.buffer);
+   delete [] static_cast<char *>( param.buffer );
 
    param.buffer_type = MYSQL_TYPE_LONG_BLOB;
    param.buffer = nullptr;
-   param.buffer_length =	0;
-   param.is_null_value =	0;
+   param.buffer_length = 0;
+   param.is_null_value = 0;
 
    delete param.length;
-   param.length = new unsigned long(0);
+   param.length = new unsigned long( 0 );
 }
 
 
@@ -174,26 +174,26 @@ private:
    boost::scoped_array< bool > value_set;
    boost::scoped_array< bool > delete_blob_after_execute;
 
-   typedef std::map<unsigned int, Blob_t > Blobs;
+   typedef std::map< uint32_t, Blob_t > Blobs;
 
    Blobs blob_bind;
 
 public:
 
-   ParamBind(unsigned int paramCount)
-           : m_paramCount( paramCount ),
-             bind( nullptr ),
-             value_set( nullptr ),
-             delete_blob_after_execute( nullptr )
+   ParamBind( uint32_t paramCount )
+           :  m_paramCount( paramCount ),
+              bind( nullptr ),
+              value_set( nullptr ),
+              delete_blob_after_execute( nullptr )
    {
-      if (m_paramCount)
+      if( m_paramCount )
       {
-         bind.reset(new MYSQL_BIND[paramCount]);
-         memset(bind.get(), 0, sizeof(MYSQL_BIND) * paramCount);
+         bind.reset( new MYSQL_BIND[paramCount] );
+         memset( bind.get(), 0, sizeof( MYSQL_BIND ) * paramCount );
 
-         value_set.reset(new bool[paramCount]);
-         delete_blob_after_execute.reset(new bool[paramCount]);
-         for (unsigned int i = 0; i < paramCount; ++i)
+         value_set.reset( new bool[paramCount] );
+         delete_blob_after_execute.reset( new bool[paramCount] );
+         for( uint32_t i = 0; i < paramCount; ++i )
          {
             bind[i].is_null_value = 1;
             value_set[i] = false;
@@ -208,7 +208,7 @@ public:
 
       for( Blobs::iterator it = blob_bind.begin(); it != blob_bind.end(); ++it )
       {
-         if (delete_blob_after_execute[it->first])
+         if( delete_blob_after_execute[it->first] )
          {
             delete_blob_after_execute[it->first] = false;
             boost::apply_visitor( BlobBindDeleter(), it->second );
@@ -216,24 +216,24 @@ public:
       }
    }
 
-   void set( unsigned int position )
+   void set( uint32_t position )
    {
       value_set[position] = true;
    }
 
-   void unset( unsigned int position )
+   void unset( uint32_t position )
    {
       value_set[position] = false;
       if( delete_blob_after_execute[position] )
       {
          delete_blob_after_execute[position] = false;
-         boost::apply_visitor( BlobBindDeleter(),blob_bind[position] );
+         boost::apply_visitor( BlobBindDeleter(), blob_bind[position] );
          blob_bind.erase( position );
       }
    }
 
 
-   void setBlob( unsigned int position, Blob_t & blob, bool delete_after_execute )
+   void setBlob( uint32_t position, Blob_t & blob, bool delete_after_execute )
    {
       set( position );
 
@@ -246,7 +246,7 @@ public:
       if( boost::apply_visitor( BlobIsNull(), blob ) )
       {
          if( it != blob_bind.end() )
-            blob_bind.erase(it);
+            blob_bind.erase( it );
 
          delete_blob_after_execute[position] = false;
       }
@@ -262,7 +262,7 @@ public:
    {
       for( uint32_t i = 0; i < m_paramCount; ++i )
       {
-         if (!value_set[i])
+         if( !value_set[i] )
             return false;
       }
       return true;
@@ -299,7 +299,7 @@ public:
 
    boost::variant< std::istream*, std::string* > getBlobObject( uint32_t position )
    {
-      Blobs::iterator it= blob_bind.find( position );
+      Blobs::iterator it = blob_bind.find( position );
 
       if( it != blob_bind.end() )
          return it->second;
@@ -345,7 +345,7 @@ uint32_t Core::Db::PreparedStatement::getWarningCount()
 
 uint64_t Core::Db::PreparedStatement::getUpdateCount()
 {
-   throw std::runtime_error("PreparedStatement::getUpdateCount() Not implemented");
+   throw std::runtime_error( "PreparedStatement::getUpdateCount() Not implemented" );
    return 0;
 }
 
@@ -405,6 +405,7 @@ bool Core::Db::PreparedStatement::execute( const std::string &sql )
 
 Core::Db::ResultSet* Core::Db::PreparedStatement::executeQuery( const std::string &sql )
 {
+   // not to be implemented for prepared statements
    return nullptr;
 }
 
