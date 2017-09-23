@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 #include <string>
-#include "StatementBase.h"
 
 namespace Core
 {
@@ -12,7 +11,7 @@ namespace Db
    class Connection;
    class ResultSet;
 
-   class Statement : public StatementBase
+   class Statement
    {
    protected:
       Connection * m_pConnection;
@@ -28,19 +27,19 @@ namespace Db
 
       virtual ~Statement() {};
 
-      Connection * getConnection() override;
+      virtual Connection * getConnection();
 
-      bool execute( const std::string& sql ) override;
+      virtual bool execute( const std::string& sql );
 
-      ResultSet * executeQuery( const std::string& sql ) override;
+      virtual ResultSet * executeQuery( const std::string& sql );
 
-      ResultSet * getResultSet() override;
+      virtual ResultSet * getResultSet();
 
-      uint64_t getUpdateCount() override;
+      virtual uint64_t getUpdateCount();
 
-      uint32_t getWarningCount() override;
+      virtual uint32_t getWarningCount();
 
-      uint32_t errNo() override;
+      virtual uint32_t errNo();
 
    private:
       /* Prevent use of these */

@@ -12,6 +12,8 @@
 #include <src/servers/Server_Common/Database/Connection.h>
 #include <src/servers/Server_Common/Database/Statement.h>
 #include <src/servers/Server_Common/Database/ResultSet.h>
+#include <src/servers/Server_Common/Database/PreparedStatement.h>
+#include <src/servers/Server_Common/Database/PreparedResultSet.h>
 
 #include <src/servers/Server_Common/Network/Connection.h>
 #include <src/servers/Server_Common/Network/Hive.h>
@@ -213,6 +215,7 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
 
       }
 
+      // binary data test
       boost::scoped_ptr< Core::Db::Statement > stmt3( con->createStatement() );
       boost::scoped_ptr< Core::Db::ResultSet > res1( stmt3->executeQuery( "SELECT * FROM charabase"  ) );
 
@@ -221,6 +224,30 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
          auto blob = res1->getBlobVector( "Customize" );
       }
 
+      boost::scoped_ptr< Core::Db::PreparedStatement > pstmt2( con->prepareStatement( "DELETE FROM zoneservers WHERE id = ?" ) );
+      pstmt2->setInt( 1, 1021 );
+      pstmt2->execute();
+
+      pstmt2->setInt( 1, 1001 );
+      pstmt2->execute();
+
+      boost::scoped_ptr< Core::Db::PreparedStatement > pstmt( con->prepareStatement( "INSERT INTO zoneservers ( id, ip, port ) VALUES ( ?, ?, ?);" ) );
+      pstmt->setInt( 1, 1001 );
+      pstmt->setString( 2, "123.123.123.123" );
+      pstmt->setInt( 3, 5454 );
+      pstmt->execute();
+
+      pstmt->setInt( 1, 1021 );
+      pstmt->setString( 2, "173.173.173.173" );
+      pstmt->setInt( 3, 5151 );
+      pstmt->execute();
+
+      boost::scoped_ptr< Core::Db::PreparedStatement > pstmt1( con->prepareStatement( "DELETE FROM zoneservers WHERE id = ?" ) );
+      pstmt->setInt( 1, 1021 );
+      pstmt->execute();
+
+      pstmt->setInt( 1, 1001 );
+      pstmt->execute();
 
    }
    catch( std::runtime_error e )

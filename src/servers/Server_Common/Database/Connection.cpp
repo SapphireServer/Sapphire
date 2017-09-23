@@ -1,6 +1,7 @@
 #include "Connection.h"
 #include "MySqlBase.h"
 #include "Statement.h"
+#include "PreparedStatement.h"
 
 #include <vector>
 #include <boost/scoped_array.hpp>
@@ -226,5 +227,18 @@ std::string Core::Db::Connection::getError()
    if( mysqlError )
       return std::string( mysqlError );
    return "";
+}
+
+Core::Db::PreparedStatement* Core::Db::Connection::prepareStatement( const std::string &sql )
+{
+   MYSQL_STMT* stmt = mysql_stmt_init( getRawCon() );
+
+   if( !stmt )
+      throw std::runtime_error( "Could not init prepared statement: " + this->getError() );
+
+   if( mysql_stmt_prepare( stmt, sql.c_str(), sql.size() ) )
+      throw std::runtime_error( "Could not prepare statement: " + this->getError() );
+
+   return new PreparedStatement( stmt, this );
 }
 

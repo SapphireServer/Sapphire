@@ -27,6 +27,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <iostream>
 #include <sstream>
+#include <mysql.h>
 
 #ifndef UL64
 #ifdef _WIN32
@@ -107,7 +108,23 @@ with this program; if not, write to the Free Software Foundation, Inc.,
                                     32))
 namespace Util
 {
-   long double strtold(const char *nptr, char **endptr);
-   long double strtonum( const std::string &str, int radix = 10);
+   long double strtold( const char *nptr, char **endptr );
+   long double strtonum( const std::string &str, int radix = 10 );
+   int32_t mysql_type_to_datatype( const MYSQL_FIELD * const field );
+
+   typedef struct st_our_charset
+   {
+      unsigned int	nr;
+      const char		*name;
+      const char		*collation;
+      unsigned int	char_minlen;
+      unsigned int	char_maxlen;
+      const char		*comment;
+      unsigned int 	(*mb_charlen)(unsigned int c);
+      unsigned int 	(*mb_valid)(const char *start, const char *end);
+   } OUR_CHARSET;
+
+   const OUR_CHARSET * find_charset(unsigned int charsetnr);
+
 }
 #endif //SAPPHIRE_MYSQL_UTIL_H
