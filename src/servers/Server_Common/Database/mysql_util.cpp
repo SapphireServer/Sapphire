@@ -1,6 +1,7 @@
 #include "mysql_util.h"
 #include "DataType.h"
 #include <mysql.h>
+#include <vector>
 
 long double Util::strtold(const char *nptr, char **endptr)
 {

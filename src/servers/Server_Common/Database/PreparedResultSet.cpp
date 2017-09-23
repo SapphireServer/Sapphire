@@ -4,6 +4,7 @@
 #include <string>
 #include <cctype>
 #include <clocale>
+#include <string.h>
 
 namespace
 {
