@@ -16,13 +16,13 @@ Core::Db::ResultSet::ResultSet( MYSQL_RES *res, Core::Db::Statement *par )
    m_pStmt = par;
    m_rowPosition = 1;
 
-   for (unsigned int i = 0; i < m_numFields; ++i)
+   for( uint32_t i = 0; i < m_numFields; ++i )
    {
 
       std::string fieldName( getFieldMeta(i + 1)->name );
 
       std::transform( fieldName.begin(), fieldName.end(), fieldName.begin(),
-                      [](unsigned char c){ return std::toupper(c); } );
+                      []( unsigned char c ){ return std::toupper(c); } );
 
       m_fieldNameToIndex[fieldName] = i;
    }
@@ -34,7 +34,7 @@ Core::Db::ResultSet::~ResultSet()
    mysql_free_result( m_pRes );
 }
 
-MYSQL_FIELD* Core::Db::ResultSet::getFieldMeta( unsigned int columnIndex ) const
+MYSQL_FIELD* Core::Db::ResultSet::getFieldMeta( uint32_t columnIndex ) const
 {
    return mysql_fetch_field_direct( m_pRes, columnIndex - 1 );
 }
