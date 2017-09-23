@@ -18,7 +18,7 @@ namespace Core
       //class ResultSetMetaData;
 
 
-      class ResultSet : public ResultSetBase
+      class ResultSet
       {
          MYSQL_ROW m_row;
 
@@ -48,50 +48,50 @@ namespace Core
 
          virtual ~ResultSet();
 
-         uint32_t findColumn( const std::string& columnLabel ) const;
+         virtual uint32_t findColumn( const std::string& columnLabel ) const;
 
-         std::istream * getBlob( uint32_t columnIndex ) const;
-         std::istream * getBlob( const std::string& columnLabel ) const;
+         virtual std::istream * getBlob( uint32_t columnIndex ) const;
+         virtual std::istream * getBlob( const std::string& columnLabel ) const;
 
-         std::vector< char > getBlobVector( uint32_t columnIndex ) const;
-         std::vector< char > getBlobVector( const std::string& columnLabel ) const;
+         virtual std::vector< char > getBlobVector( uint32_t columnIndex ) const;
+         virtual std::vector< char > getBlobVector( const std::string& columnLabel ) const;
 
-         bool getBoolean( uint32_t columnIndex ) const;
-         bool getBoolean( const std::string& columnLabel ) const;
+         virtual bool getBoolean( uint32_t columnIndex ) const;
+         virtual bool getBoolean( const std::string& columnLabel ) const;
 
-         long double getDouble( uint32_t columnIndex ) const;
-         long double getDouble( const std::string& columnLabel ) const;
+         virtual long double getDouble( uint32_t columnIndex ) const;
+         virtual long double getDouble( const std::string& columnLabel ) const;
 
-         int32_t getInt( uint32_t columnIndex ) const;
-         int32_t getInt( const std::string& columnLabel ) const;
+         virtual int32_t getInt( uint32_t columnIndex ) const;
+         virtual int32_t getInt( const std::string& columnLabel ) const;
 
-         uint32_t getUInt( uint32_t columnIndex ) const;
-         uint32_t getUInt( const std::string& columnLabel ) const;
+         virtual uint32_t getUInt( uint32_t columnIndex ) const;
+         virtual uint32_t getUInt( const std::string& columnLabel ) const;
 
-         int64_t getInt64( uint32_t columnIndex ) const;
-         int64_t getInt64( const std::string& columnLabel ) const;
+         virtual int64_t getInt64( uint32_t columnIndex ) const;
+         virtual int64_t getInt64( const std::string& columnLabel ) const;
 
-         uint64_t getUInt64( uint32_t columnIndex ) const;
-         uint64_t getUInt64( const std::string& columnLabel ) const;
+         virtual uint64_t getUInt64( uint32_t columnIndex ) const;
+         virtual uint64_t getUInt64( const std::string& columnLabel ) const;
 
          //sql::ResultSetMetaData * getMetaData() const;
 
-         size_t getRow() const;
+         virtual size_t getRow() const;
 
-         const Statement * getStatement() const;
+         virtual const Statement * getStatement() const;
 
-         std::string getString( uint32_t columnIndex ) const;
-         std::string getString( const std::string& columnLabel ) const;
+         virtual std::string getString( uint32_t columnIndex ) const;
+         virtual std::string getString( const std::string& columnLabel ) const;
 
-         bool isFirst() const;
+         virtual bool isFirst() const;
 
-         bool isLast() const;
+         virtual bool isLast() const;
 
-         bool isNull( uint32_t columnIndex ) const;
+         virtual bool isNull( uint32_t columnIndex ) const;
 
-         bool isNull( const std::string& columnLabel ) const;
+         virtual bool isNull( const std::string& columnLabel ) const;
 
-         bool next();
+         virtual bool next();
 
          size_t rowsCount() const;
       private:
