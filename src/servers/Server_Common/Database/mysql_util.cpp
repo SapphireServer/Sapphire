@@ -2,6 +2,7 @@
 #include "DataType.h"
 #include <mysql.h>
 #include <vector>
+#include <stdexcept>
 
 long double Util::strtold(const char *nptr, char **endptr)
 {
