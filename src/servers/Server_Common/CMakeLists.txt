@@ -29,7 +29,7 @@ set_target_properties(Common PROPERTIES
 )
 
 if (UNIX)
-  target_link_libraries( Common xivdat mysqlclient )
+  target_link_libraries( Common xivdat mysqlclient mysqlConnector )
 else()
-  target_link_libraries( Common xivdat libmysql )
+  target_link_libraries( Common xivdat mysqlConnector libmysql )
 endif()

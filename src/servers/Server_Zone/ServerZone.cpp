@@ -8,12 +8,12 @@
 #include <src/servers/Server_Common/Config/XMLConfig.h>
 #include <src/servers/Server_Common/Database/Database.h>
 
-#include <src/servers/Server_Common/Database/MySqlBase.h>
-#include <src/servers/Server_Common/Database/Connection.h>
-#include <src/servers/Server_Common/Database/Statement.h>
-#include <src/servers/Server_Common/Database/ResultSet.h>
-#include <src/servers/Server_Common/Database/PreparedStatement.h>
-#include <src/servers/Server_Common/Database/PreparedResultSet.h>
+#include <MySqlBase.h>
+#include <Connection.h>
+#include <Statement.h>
+#include <ResultSet.h>
+#include <PreparedStatement.h>
+#include <PreparedResultSet.h>
 
 #include <src/servers/Server_Common/Network/Connection.h>
 #include <src/servers/Server_Common/Network/Hive.h>

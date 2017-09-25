@@ -23,7 +23,7 @@ file(GLOB SERVER_SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_CURRENT_SOURCE_DIR}/../../../bin/")
 
 add_executable(server_zone ${SERVER_PUBLIC_INCLUDE_FILES} ${SERVER_SOURCE_FILES} )
-add_dependencies(server_zone Common xivdat)
+add_dependencies(server_zone Common xivdat mysqlConnector )
 
 set_target_properties(server_zone PROPERTIES
     CXX_STANDARD 14
@@ -41,9 +41,9 @@ if(MSVC)
 endif()
 
 if (UNIX)
-  target_link_libraries ( server_zone Common xivdat pthread mysqlclient dl z )
+  target_link_libraries ( server_zone Common xivdat pthread mysqlclient mysqlConnector dl z )
 else()
-  target_link_libraries ( server_zone Common xivdat libmysql zlib1 )
+  target_link_libraries ( server_zone Common xivdat libmysql zlib1 mysqlConnector )
 endif()
 
 target_link_libraries(server_zone ${Boost_LIBRARIES} ${Boost_LIBRARIES} )

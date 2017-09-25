@@ -25,9 +25,9 @@ if(MSVC)
 endif()
 
 if (UNIX)
-  target_link_libraries (server_rest Common xivdat pthread mysqlclient dl z)
+  target_link_libraries (server_rest Common xivdat pthread mysqlclient mysqlConnector dl z)
 else()
-  target_link_libraries (server_rest Common xivdat libmysql zlib1)
+  target_link_libraries (server_rest Common xivdat libmysql mysqlConnector zlib1)
 endif()
 
 target_link_libraries( server_rest ${Boost_LIBRARIES} ${Boost_LIBRARIES} )
