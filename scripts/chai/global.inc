@@ -228,6 +228,9 @@ global CURRENCY_TOMESTONELORE = 0X0E
 ////////////////////////////////////////////////////////////
 // Skill handle types
 ////////////////////////////////////////////////////////////
-global STD_DAMAGE = 0X00
-global STD_HEAL = 0X01
-global STD_DOT = 0X02
+global STD_DAMAGE = 0X03
+global STD_HEAL = 0X04
+global STD_MP_LOSS = 0X0A
+global STD_MP_GAIN = 0X0B
+global STD_TP_LOSS = 0X0C
+global STD_TP_GAIN = 0X0D
