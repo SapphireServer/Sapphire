@@ -194,13 +194,13 @@ void Core::StatusEffect::StatusEffectContainer::update()
    if( thisTickDmg != 0 )
    {
       m_pOwner->takeDamage( thisTickDmg );
-      m_pOwner->sendToInRangeSet( ActorControlPacket142( m_pOwner->getId(), HPFloatingText, 0, 3, thisTickDmg ) );
+      m_pOwner->sendToInRangeSet( ActorControlPacket142( m_pOwner->getId(), HPFloatingText, 0, static_cast< uint8_t >( ActionEffectType::Damage ), thisTickDmg ) );
    }
 
    if( thisTickHeal != 0 )
    {
       m_pOwner->heal( thisTickDmg );
-      m_pOwner->sendToInRangeSet( ActorControlPacket142( m_pOwner->getId(), HPFloatingText, 0, 4, thisTickHeal ) );
+      m_pOwner->sendToInRangeSet( ActorControlPacket142( m_pOwner->getId(), HPFloatingText, 0, static_cast< uint8_t >( ActionEffectType::Heal ), thisTickHeal ) );
    }
 }
 

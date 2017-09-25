@@ -1518,30 +1518,35 @@ void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, 
 {
    sendDebug( std::to_string( pTarget.getId() ) );
    sendDebug( "Handle script skill type: " + std::to_string( type ) );
-   
+
    auto actionInfoPtr = g_exdData.getActionInfo( actionId );
 
+   sendDebug( actionInfoPtr->name );
+   if ( actionInfoPtr->is_aoe )
+      sendDebug( "is aoe: " + std::to_string( actionInfoPtr->is_aoe ) );
 
-   switch( type )
+   GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket( getId() );
+   effectPacket.data().targetId = pTarget.getId();
+   effectPacket.data().actionAnimationId = actionId;
+   effectPacket.data().unknown_2 = 1;  // This seems to have an effect on the "double-cast finish" animation
+                                       //   effectPacket.data().unknown_3 = 1;
+   effectPacket.data().actionTextId = actionId;
+   effectPacket.data().numEffects = 1;
+   effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRotation() );
+   effectPacket.data().effectTarget = pTarget.getId();
+   effectPacket.data().effects[0].value = 0;
+   effectPacket.data().effects[0].effectType = static_cast < ActionEffectType >( type );
+   effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::NormalDamage;
+   effectPacket.data().effects[0].unknown_3 = 7;
+
+   switch ( type )
    {
 
-   case Core::Common::HandleSkillType::StdDamage:
+   case 3:
    {
       sendDebug( "STD_DAMAGE" );
 
-      GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket( getId() );
-      effectPacket.data().targetId = pTarget.getId();
-      effectPacket.data().actionAnimationId = actionId;
-      effectPacket.data().unknown_2 = 1;  // This seems to have an effect on the "double-cast finish" animation
-      //   effectPacket.data().unknown_3 = 1;
-      effectPacket.data().actionTextId = actionId;
-      effectPacket.data().numEffects = 1;
-      effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRotation() );
-      effectPacket.data().effectTarget = pTarget.getId();
       effectPacket.data().effects[0].value = static_cast< int16_t >( param1 );
-      effectPacket.data().effects[0].effectType = ActionEffectType::Damage;
-      effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::NormalDamage;
-      effectPacket.data().effects[0].unknown_3 = 7;
 
       sendToInRangeSet( effectPacket, true );
 
@@ -1553,25 +1558,15 @@ void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, 
       break;
    }
 
-   case Core::Common::HandleSkillType::StdHeal:
+   case 4:
    {
       uint32_t calculatedHeal = CalcBattle::calculateHealValue( getAsPlayer(), static_cast< uint32_t >( param1 ) );
 
-      sendDebug( "STD_HEAL" );
-
-      GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket( getId() );
-      effectPacket.data().targetId = pTarget.getId();
-      effectPacket.data().actionAnimationId = actionId;
-      effectPacket.data().unknown_2 = 1;  // This seems to have an effect on the "double-cast finish" animation
-      //   effectPacket.data().unknown_3 = 1;
-      effectPacket.data().actionTextId = actionId;
-      effectPacket.data().numEffects = 1;
-      effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRotation() );
-      effectPacket.data().effectTarget = pTarget.getId();
-      effectPacket.data().effects[0].value = calculatedHeal;
+      effectPacket.data().effects[0].value = static_cast< int16_t >( calculatedHeal );
       effectPacket.data().effects[0].effectType = ActionEffectType::Heal;
       effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::NormalHeal;
-      effectPacket.data().effects[0].unknown_3 = 7;
+
+      sendDebug( "STD_HEAL" );
 
       sendToInRangeSet( effectPacket, true );
 
@@ -1580,9 +1575,10 @@ void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, 
 
       // todo: get proper packets: the following was just kind of thrown together from what we know
       // also toss AoE to another spot and make it generic
-
-      if ( actionInfoPtr->is_aoe ) 
+      sendDebug( actionInfoPtr->name );
+      if ( actionInfoPtr->is_aoe )
       {
+         sendDebug( "IS AOE LOL" );
          for ( auto pCurAct : m_inRangePlayers )
          {
             assert( pCurAct );
@@ -1591,20 +1587,12 @@ void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, 
 
             if ( Math::Util::distance( pTarget.getPos().x, pTarget.getPos().y, pTarget.getPos().z, pCurAct->getPos().x, pCurAct->getPos().y, pCurAct->getPos().z ) <= actionInfoPtr->radius )
             {
-               GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket( pCurAct->getId() );
                effectPacket.data().targetId = pCurAct->getId();
                effectPacket.data().unknown_1 = 1;  // the magic trick for getting it to work
-               effectPacket.data().unknown_2 = 1;
                effectPacket.data().unknown_8 = 1;
                effectPacket.data().unknown_5 = 1;
-               effectPacket.data().actionAnimationId = actionId;
                effectPacket.data().actionTextId = 0;
-               effectPacket.data().numEffects = 1;
                effectPacket.data().effectTarget = pCurAct->getId();
-               effectPacket.data().effects[0].value = calculatedHeal;
-               effectPacket.data().effects[0].effectType = ActionEffectType::Heal;
-               effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::NormalHeal;
-               effectPacket.data().effects[0].unknown_3 = 7;
 
                pCurAct->sendToInRangeSet( effectPacket, true );
                pCurAct->heal( calculatedHeal );
@@ -1618,7 +1606,7 @@ void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, 
    }
 
    default:
-   break;
+      break;
    }
 }
 
