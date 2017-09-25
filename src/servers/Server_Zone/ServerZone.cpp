@@ -165,13 +165,13 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
    try
    {
       // bunch of test cases for db wrapper
-      Core::Db::MySqlBase base;
+      Mysql::MySqlBase base;
       g_log.info( base.getVersionInfo() );
 
-      Core::Db::optionMap options;
+      Mysql::optionMap options;
       options[ MYSQL_OPT_RECONNECT ] = "1";
 
-      boost::scoped_ptr< Core::Db::Connection > con( base.connect( "127.0.0.1", "root", "", options ) );
+      boost::scoped_ptr< Mysql::Connection > con( base.connect( "127.0.0.1", "root", "", options ) );
 
       if( con->getAutoCommit() )
          g_log.info( "autocommit active" );
@@ -188,7 +188,7 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
 
       con->setSchema( "sapphire" );
 
-      boost::scoped_ptr< Core::Db::Statement > stmt( con->createStatement() );
+      boost::scoped_ptr< Mysql::Statement > stmt( con->createStatement() );
       bool t1 = stmt->execute( "DELETE FROM zoneservers WHERE id = 101" );
       t1 = stmt->execute( "INSERT INTO zoneservers ( id, ip, port ) VALUES ( 101, '127.0.0.1', 54555);" );
       // t1 = stmt->execute( "INSERT INTO zoneservers ( id, ip, port ) VALUES ( 101, '127.0.0.1', 54555);" ); // throws duplicate entry
@@ -196,11 +196,11 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
       t1 = stmt->execute( "INSERT INTO zoneservers ( id, ip, port ) VALUES ( 101, '127.0.0.1', 54555);" );
       //t1 = stmt->execute( "DELETE FROM zoneservers WHERE id = 101" );
 
-      //boost::scoped_ptr< Core::Db::Statement > stmt1( con->createStatement() );
+      //boost::scoped_ptr< Mysql::Statement > stmt1( con->createStatement() );
       //bool t2 = stmt1->execute( "INSERT INTO BLARGH!" ); // throws error
 
-      boost::scoped_ptr< Core::Db::Statement > stmt2( con->createStatement() );
-      boost::scoped_ptr< Core::Db::ResultSet > res( stmt2->executeQuery( "SELECT id,ip,port FROM zoneservers"  ) );
+      boost::scoped_ptr< Mysql::Statement > stmt2( con->createStatement() );
+      boost::scoped_ptr< Mysql::ResultSet > res( stmt2->executeQuery( "SELECT id,ip,port FROM zoneservers"  ) );
 
       while( res->next() )
       {
@@ -216,22 +216,22 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
       }
 
       // binary data test
-      boost::scoped_ptr< Core::Db::Statement > stmt3( con->createStatement() );
-      boost::scoped_ptr< Core::Db::ResultSet > res1( stmt3->executeQuery( "SELECT * FROM charabase"  ) );
+      boost::scoped_ptr< Mysql::Statement > stmt3( con->createStatement() );
+      boost::scoped_ptr< Mysql::ResultSet > res1( stmt3->executeQuery( "SELECT * FROM charabase"  ) );
 
       while( res1->next() )
       {
          auto blob = res1->getBlobVector( "Customize" );
       }
 
-      boost::scoped_ptr< Core::Db::PreparedStatement > pstmt2( con->prepareStatement( "DELETE FROM zoneservers WHERE id = ?" ) );
+      boost::scoped_ptr< Mysql::PreparedStatement > pstmt2( con->prepareStatement( "DELETE FROM zoneservers WHERE id = ?" ) );
       pstmt2->setInt( 1, 1021 );
       pstmt2->execute();
 
       pstmt2->setInt( 1, 1001 );
       pstmt2->execute();
 
-      boost::scoped_ptr< Core::Db::PreparedStatement > pstmt( con->prepareStatement( "INSERT INTO zoneservers ( id, ip, port ) VALUES ( ?, ?, ?);" ) );
+      boost::scoped_ptr< Mysql::PreparedStatement > pstmt( con->prepareStatement( "INSERT INTO zoneservers ( id, ip, port ) VALUES ( ?, ?, ?);" ) );
       pstmt->setInt( 1, 1001 );
       pstmt->setString( 2, "123.123.123.123" );
       pstmt->setInt( 3, 5454 );
@@ -242,7 +242,7 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
       pstmt->setInt( 3, 5151 );
       pstmt->execute();
 
-      boost::scoped_ptr< Core::Db::PreparedStatement > pstmt1( con->prepareStatement( "DELETE FROM zoneservers WHERE id = ?" ) );
+      boost::scoped_ptr< Mysql::PreparedStatement > pstmt1( con->prepareStatement( "DELETE FROM zoneservers WHERE id = ?" ) );
       pstmt->setInt( 1, 1021 );
       pstmt->execute();
 
