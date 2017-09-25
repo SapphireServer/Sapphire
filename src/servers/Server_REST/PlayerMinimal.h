@@ -30,7 +30,7 @@ namespace Core {
       std::string getClassString();
 
       // return the id of the actor
-      uint32_t getId()
+      uint32_t getId() const
       {
          return m_iD;
       }
@@ -45,13 +45,13 @@ namespace Core {
          m_contentId = id;
       }
 
-      uint64_t getContentId()
+      uint64_t getContentId() const
       {
          return m_contentId;
       }
 
 
-      uint32_t getAccountId()
+      uint32_t getAccountId() const
       {
          return m_accountId;
       }
@@ -84,12 +84,12 @@ namespace Core {
          m_class = classId;
       }
 
-      uint8_t getClass()
+      uint8_t getClass() const
       {
          return m_class;
       }
 
-      uint8_t getGuardianDeity()
+      uint8_t getGuardianDeity() const
       {
          return m_guardianDeity;
       }
@@ -105,17 +105,17 @@ namespace Core {
          m_birthMonth = month;
       }
 
-      uint8_t getBirthDay()
+      uint8_t getBirthDay() const
       {
          return m_birthDay;
       }
 
-      uint8_t getBirthMonth()
+      uint8_t getBirthMonth() const
       {
          return m_birthMonth;
       }
 
-      uint8_t getVoice()
+      uint8_t getVoice() const
       {
          return m_birthMonth;
       }
@@ -125,12 +125,12 @@ namespace Core {
          m_voice = voice;
       }
 
-      uint32_t getZoneId()
+      uint32_t getZoneId() const
       {
          return m_zoneId;
       }
 
-      uint32_t getTribe()
+      uint32_t getTribe() const
       {
          return m_tribe;
       }
@@ -140,9 +140,9 @@ namespace Core {
          m_tribe = tribe;
       }
 
-      uint8_t getGmRank()
+      uint8_t getGmRank() const
       {
-         return m_birthMonth;
+         return m_gmRank;
       }
 
       void setGmRank( uint8_t rank )

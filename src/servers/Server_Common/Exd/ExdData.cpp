@@ -315,8 +315,7 @@ bool Core::Data::ExdData::loadActionInfo()
    for( auto row : rows )
    {
       auto& fields = row.second;
-
-      ActionInfo info{ 0 };
+      auto info = boost::make_shared< ActionInfo >();
 
       uint32_t id = row.first;
       if( id == 0 )
@@ -350,7 +349,7 @@ bool Core::Data::ExdData::loadActionInfo()
       uint16_t recast_time = getField< uint16_t >( fields, 37 );  // 37
 
       int8_t model = getField< int8_t >( fields, 39 );            // 39: Action model
-      uint8_t aspect = getField< uint8_t >( fields, 40 );          // 40: Action aspect
+      uint8_t aspect = getField< uint8_t >( fields, 40 );         // 40: Action aspect
 
       uint8_t typeshift = 0x6;
       uint8_t mask = 1 << typeshift;
@@ -360,36 +359,36 @@ bool Core::Data::ExdData::loadActionInfo()
 
       
 
-      info.id = id;
-      info.name = name;
-      info.category = category;
+      info->id = id;
+      info->name = name;
+      info->category = category;
 
-      info.class_job = class_job;
-      info.unlock_level = unlock_level;
-      info.range = range;
-      info.can_target_self = can_target_self;
-      info.can_target_party = can_target_party;
-      info.can_target_friendly = can_target_friendly;
-      info.can_target_enemy = can_target_enemy;
+      info->class_job = class_job;
+      info->unlock_level = unlock_level;
+      info->range = range;
+      info->can_target_self = can_target_self;
+      info->can_target_party = can_target_party;
+      info->can_target_friendly = can_target_friendly;
+      info->can_target_enemy = can_target_enemy;
 
-      info.can_target_ko = can_target_ko;
+      info->can_target_ko = can_target_ko;
 
-      info.is_aoe = is_aoe;
+      info->is_aoe = is_aoe;
 
-      info.aoe_type = aoe_type;
-      info.radius = radius;
+      info->aoe_type = aoe_type;
+      info->radius = radius;
 
-      info.points_type = points_type;
-      info.points_cost = points_cost;
+      info->points_type = points_type;
+      info->points_cost = points_cost;
 
-      info.is_instant = is_instant;
-      info.cast_time = cast_time * 100;
-      info.recast_time = recast_time * 100;
+      info->is_instant = is_instant;
+      info->cast_time = cast_time * 100;
+      info->recast_time = recast_time * 100;
 
-      info.model = model;
-      info.aspect = aspect;
+      info->model = model;
+      info->aspect = aspect;
 
-      m_actionInfoMap[id] = info;
+      m_actionInfoMap.emplace( std::make_pair( info->id, info ) );
 
    }
 
@@ -456,6 +455,22 @@ boost::shared_ptr< Core::Data::AetheryteInfo >
       return m_aetheryteInfoMap[aetheryteId];
    }
    catch( ... )
+   {
+      return nullptr;
+   }
+
+   return nullptr;
+
+}
+
+boost::shared_ptr< Core::Data::ActionInfo >
+Core::Data::ExdData::getActionInfo( uint32_t actionId )
+{
+   try
+   {
+      return m_actionInfoMap[actionId];
+   }
+   catch ( ... )
    {
       return nullptr;
    }

@@ -31,6 +31,14 @@ include( "cmake/boost.cmake" )
 include( "cmake/mysql.cmake" )
 include( "cmake/compiler.cmake" )
 
+##############################
+#             Git            #
+##############################
+include(GetGitRevisionDescription)
+get_git_head_revision(GIT_REFSPEC GIT_SHA1)
+git_describe(VERSION --tags --dirty=-d)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/servers/Server_Common/Version.cpp.in" "${CMAKE_CURRENT_SOURCE_DIR}/src/servers/Server_Common/Version.cpp" @ONLY)
+
 ##########################################################################
 # Common include folders
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/libraries/external/ChaiScript-6.0.0/include/")

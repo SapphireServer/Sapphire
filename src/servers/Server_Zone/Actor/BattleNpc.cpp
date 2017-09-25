@@ -425,7 +425,7 @@ void Core::Entity::BattleNpc::onDeath()
          // todo: check for companion
          if( pHateEntry->m_pActor->isPlayer()  ) // && pHateEntry->m_hateAmount >= plsBeHatedThisMuchAtLeast )
          {
-            auto level = pHateEntry->m_pActor->getLevel();
+            uint8_t level = pHateEntry->m_pActor->getLevel();
             auto levelDiff = (int)this->m_level - (int)level;
             auto cappedLevelDiff = Math::Util::clamp( levelDiff, 1, 6 );
 

@@ -131,7 +131,7 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
 
    field[11].getBinary( reinterpret_cast< char* >( m_customize ), sizeof( m_customize ) );
 
-   m_modelMainWeapon = field[12].get< uint64_t >();
+   m_modelMainWeapon = field[12].getUInt64();
 
    field[14].getBinary( reinterpret_cast< char* >( m_modelEquip ), sizeof( m_modelEquip ) );
 
@@ -144,7 +144,7 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
 
    field[21].getBinary( reinterpret_cast< char* >( m_howTo ), sizeof( m_howTo ) );
 
-   m_contentId = field[22].get< uint64_t >();
+   m_contentId = field[22].getUInt64();
 
    m_voice = field[23].get< uint32_t >();
 

@@ -277,7 +277,7 @@ uint64_t Core::Network::SapphireAPI::getNextContentId()
       return 0x0040000001000001;
    }
 
-   contentId = pQR->fetch()[0].get< uint64_t >() + 1;
+   contentId = pQR->fetch()[0].getUInt64() + 1;
    if( contentId < 0x0040000001000001 )
    {
       return 0x0040000001000001;

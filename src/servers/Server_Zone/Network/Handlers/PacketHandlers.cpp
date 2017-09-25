@@ -493,7 +493,7 @@ void Core::Network::GameConnection::chatHandler( const Packets::GamePacket& inPa
 
    uint32_t sourceId = inPacket.getValAt< uint32_t >( 0x24 );
 
-   if( chatString.at( 0 ) == '@' )
+   if( chatString.at( 0 ) == '!' )
    {
       // execute game console command
       g_gameCommandMgr.execCommand( const_cast< char * >( chatString.c_str() ) + 1, pPlayer );

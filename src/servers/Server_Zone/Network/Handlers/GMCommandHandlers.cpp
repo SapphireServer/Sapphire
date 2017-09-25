@@ -69,6 +69,7 @@ enum GmCommand
    Mp = 0x0065,
    Tp = 0x0066,
    Gp = 0x0067,
+   Exp = 0x0068,
 
    Item = 0x00C8,
    Gil = 0x00C9,
@@ -82,6 +83,7 @@ enum GmCommand
    QuestInspect = 0x0131,
    GC = 0x0154,
    GCRank = 0x0155,
+   Teri = 0x0258,
    TeriInfo = 0x025D,
    Jump = 0x025E,
    JumpNpc = 0x025F,
@@ -189,6 +191,12 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       pPlayer->sendNotice( "Gp for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
       break;
    }
+   case GmCommand::Exp:
+   {
+      targetPlayer->gainExp( param1 );
+      pPlayer->sendNotice( std::to_string( param1 ) + " Exp was added to " + targetPlayer->getName() );
+      break;
+   }
    case GmCommand::Sex:
    {
       targetPlayer->setLookAt( CharaLook::Gender, param1 );
@@ -245,6 +253,12 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
          pPlayer->sendUrgent( "Item " + std::to_string( param1 ) + " not found..." );
       break;
    }
+   case GmCommand::Time:
+   {
+      pPlayer->setEorzeaTimeOffset( param2 );
+      pPlayer->sendNotice( "Eorzea time offset: " + std::to_string( param2 ) );
+      break;
+   }
    case GmCommand::Weather:
    {
       targetPlayer->getCurrentZone()->setWeatherOverride( param1 );
@@ -260,6 +274,18 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
          std::to_string( pPlayer->getCurrentZone()->getPopCount() ) +
          "\nCurrentWeather:" + std::to_string( pPlayer->getCurrentZone()->getCurrentWeather() ) +
          "\nNextWeather:" + std::to_string( pPlayer->getCurrentZone()->getNextWeather() ) );
+      break;
+   }
+   case GmCommand::Teri:
+   {
+      if( param1 < 128 )
+         pPlayer->sendUrgent( "Zone ID out of range." );
+      else
+      {
+         targetPlayer->setPosition( targetPlayer->getPos() );
+         targetPlayer->performZoning( param1, targetPlayer->getPos(), 0 );
+         pPlayer->sendNotice( targetPlayer->getName() + " was warped to Zone " + std::to_string( param1 ) );
+      }
       break;
    }
    case GmCommand::Jump:
