@@ -1,6 +1,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include <src/servers/Server_Common/Common.h>
+#include <src/servers/Server_Common/Version.h>
 #include <src/servers/Server_Common/Database/Database.h>
 #include <src/servers/Server_Common/Network/GamePacketNew.h>
 #include <src/servers/Server_Common/Network/CommonNetwork.h>
@@ -39,16 +40,15 @@ extern Core::ServerZone g_serverZone;
 // instanciate and initialize commands
 Core::DebugCommandHandler::DebugCommandHandler()
 {
-
-   // Push all commands onto the register map
-   registerCommand( "set", &DebugCommandHandler::set, "Loads and injects a premade Packet.", Common::UserLevel::all );
-   registerCommand( "get", &DebugCommandHandler::get, "Loads and injects a premade Packet.", Common::UserLevel::all );
-   registerCommand( "add", &DebugCommandHandler::add, "Loads and injects a premade Packet.", Common::UserLevel::all );
-   //registerCommand( "debug", &DebugCommandHandler::debug, "Loads and injects a premade Packet.", Common::UserLevel::all );
-   registerCommand( "inject", &DebugCommandHandler::injectPacket, "Loads and injects a premade Packet.", Common::UserLevel::all );
-   registerCommand( "injectc", &DebugCommandHandler::injectChatPacket, "Loads and injects a premade Packet.", Common::UserLevel::all );
-   registerCommand( "script_reload", &DebugCommandHandler::scriptReload, "Loads and injects a premade Packet.", Common::UserLevel::all );
-   registerCommand( "nudge", &DebugCommandHandler::nudge, "Nudges you forward/up/down", Common::UserLevel::all );
+   // Push all commands onto the register map ( command name - function - description - required GM level )
+   registerCommand( "set", &DebugCommandHandler::set, "Loads and injects a premade Packet.", 1 );
+   registerCommand( "get", &DebugCommandHandler::get, "Loads and injects a premade Packet.", 1 );
+   registerCommand( "add", &DebugCommandHandler::add, "Loads and injects a premade Packet.", 1 );
+   registerCommand( "inject", &DebugCommandHandler::injectPacket, "Loads and injects a premade Packet.", 1 );
+   registerCommand( "injectc", &DebugCommandHandler::injectChatPacket, "Loads and injects a premade Packet.", 1 );
+   registerCommand( "script_reload", &DebugCommandHandler::scriptReload, "Loads and injects a premade Packet.", 1 );
+   registerCommand( "nudge", &DebugCommandHandler::nudge, "Nudges you forward/up/down", 1 );
+   registerCommand( "info", &DebugCommandHandler::serverInfo, "Send server info", 0 );
 
 }
 
@@ -61,7 +61,7 @@ Core::DebugCommandHandler::~DebugCommandHandler()
 
 // add a command set to the register map
 void Core::DebugCommandHandler::registerCommand( const std::string& n, Core::DebugCommand::pFunc functionPtr,
-                                                const std::string& hText, Core::Common::UserLevel uLevel )
+                                                const std::string& hText, uint8_t uLevel )
 {
    m_commandMap[std::string( n )] = boost::make_shared<DebugCommand>( n, functionPtr, hText, uLevel );
 }
@@ -69,12 +69,6 @@ void Core::DebugCommandHandler::registerCommand( const std::string& n, Core::Deb
 // try to retrieve the command in question, execute if found
 void Core::DebugCommandHandler::execCommand( char * data, Core::Entity::PlayerPtr pPlayer )
 {
-
-   if( pPlayer->getGmRank() <= 0 )
-   {
-      pPlayer->sendUrgent( "You are not allowed to use debug commands." );
-      return;
-   }
 
    // define callback pointer
    void ( DebugCommandHandler::*pf )( char *, Entity::PlayerPtr, boost::shared_ptr< DebugCommand > );
@@ -98,9 +92,14 @@ void Core::DebugCommandHandler::execCommand( char * data, Core::Entity::PlayerPt
    if( it == m_commandMap.end() )
       // no command found, do something... or not
       pPlayer->sendUrgent( "Command not found." );
-   // TODO Notify the client of the failed command
    else
    {
+      if( pPlayer->getGmRank() < it->second->getRequiredGmLevel() )
+      {
+         pPlayer->sendUrgent( "You are not allowed to use this command." );
+         return;
+      }
+
       // command found, call the callback function and pass parameters if present.
       pf = ( *it ).second->m_pFunc;
       ( this->*pf )( data, pPlayer, ( *it ).second );
@@ -176,33 +175,6 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
       pPlayer->queuePacket( setActorPosPacket );
 
    }
-   else if( ( subCommand == "zone" ) && ( params != "" ) )
-   {
-      int32_t zoneId;
-      sscanf( params.c_str(), "%i", &zoneId );
-
-      if( zoneId < 1 )
-         pPlayer->sendUrgent( "Zone id out of range." );
-      else
-      {
-         pPlayer->setPosition( pPlayer->getPos() );
-         pPlayer->performZoning( zoneId, pPlayer->getPos(), 0);
-      }
-
-   }
-   else if( ( subCommand == "hp" ) && ( params != "" ) )
-   {
-      int32_t hp;
-      sscanf( params.c_str(), "%i", &hp );
-
-      pPlayer->setHp( hp );
-
-      auto control = Network::Packets::Server::ActorControlPacket142( pPlayer->getId(), Common::ActorControlType::HpSetStat, 1, pPlayer->getHp() );
-
-      pPlayer->sendToInRangeSet( control, true );
-
-   }
-
    else if( ( subCommand == "tele" ) && ( params != "" ) )
    {
       int32_t aetheryteId;
@@ -213,8 +185,8 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
 
    else if( ( subCommand == "unlockaetheryte" ) && ( params != "" ) )
    {
-	   for( uint8_t i = 0; i < 255; i++ )
-		   pPlayer->registerAetheryte( i );
+      for( uint8_t i = 0; i < 255; i++ )
+         pPlayer->registerAetheryte( i );
    }
 
    else if( ( subCommand == "discovery" ) && ( params != "" ) )
@@ -282,17 +254,24 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
    else if( subCommand == "aaah" )
    {
       int32_t id;
-
       sscanf( params.c_str(), "%d", &id );
+      
       pPlayer->sendDebug( std::to_string( pPlayer->actionHasCastTime( id ) ) );
    }
    else if ( subCommand == "cfpenalty" )
    {
       int32_t minutes;
-
       sscanf( params.c_str(), "%d", &minutes );
 
       pPlayer->setCFPenaltyMinutes( minutes );
+   }
+   else if ( subCommand == "eorzeatime" )
+   {
+      uint64_t timestamp;
+      sscanf( params.c_str(), "%llu", &timestamp );
+
+      pPlayer->setEorzeaTimeOffset( timestamp );
+      pPlayer->sendNotice( "Eorzea time offset: " + std::to_string( timestamp ) );
    }
 
 }
@@ -324,37 +303,7 @@ void Core::DebugCommandHandler::add( char * data, Core::Entity::PlayerPtr pPlaye
                 "subCommand " + subCommand + " params: " + params );
 
 
-   if( ( subCommand == "item" ) && ( params != "" ) )
-   {
-      int32_t catalogId;
-      int32_t amount;
-
-      sscanf( params.c_str(), "%d %d", &catalogId, &amount );
-
-      if( amount < 1 || amount > 99 )
-      {
-         amount = 1;
-      }
-
-      if( ( catalogId == 0xcccccccc ) )
-      {
-         pPlayer->sendUrgent( "Syntaxerror." );
-         return;
-      }
-
-      if( !pPlayer->addItem( -1, catalogId, amount ) )
-         pPlayer->sendUrgent( "Item " + std::to_string( catalogId ) + " not found..." );
-
-   }
-   else if( subCommand == "exp" )
-   {
-      int32_t amount;
-
-      sscanf( params.c_str(), "%d", &amount );
-
-      pPlayer->gainExp( amount );
-   }
-   else if( subCommand == "status" )
+   if( subCommand == "status" )
    {
       int32_t id;
       int32_t duration;
@@ -533,4 +482,10 @@ void Core::DebugCommandHandler::nudge( char * data, Entity::PlayerPtr pPlayer, b
       setActorPosPacket.data().r16 = Math::Util::floatToUInt16Rot( pPlayer->getRotation() );
       pPlayer->queuePacket( setActorPosPacket );
    }
+}
+
+void Core::DebugCommandHandler::serverInfo( char * data, Core::Entity::PlayerPtr pPlayer, boost::shared_ptr< Core::DebugCommand > command )
+{
+   pPlayer->sendDebug( "SapphireServer " + Version::VERSION + " - " + Version::GIT_HASH );
+   pPlayer->sendDebug( "Sessions: " + std::to_string( g_serverZone.getSessionCount() ) );
 }

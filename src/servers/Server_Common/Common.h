@@ -424,15 +424,6 @@ namespace Core {
          Land = 0x200,
       };
 
-      enum UserLevel : uint8_t
-      {
-         all = 0xff,
-         player = 0x01,
-         gm = 0x02,
-         dev = 0x04,
-         admin = 0x08
-      };
-
       struct QuestActive
       {
          QuestActive()
@@ -569,6 +560,35 @@ namespace Core {
          Darkness = 6,
          Unknown_7 = 7,
          LimitBreak = 8,
+      };
+
+      enum ActionEffectType : uint8_t
+      {
+         Nothing = 0,
+         Miss = 1,
+         FullResist = 2,
+         Damage = 3,
+         Heal = 4,
+         BlockedDamage = 5,
+         ParriedDamage = 6,
+         Invulnerable = 7,
+         NoEffectText = 8,
+         Unknown_0 = 9,
+         MpLoss = 10,
+         MpGain = 11,
+         TpLoss = 12,
+         TpGain = 13,
+         GpGain = 14
+      };
+
+      enum ActionHitSeverityType : uint8_t
+      {
+         NormalDamage = 0,
+         CritHeal = 0,
+         CritDamage = 1,
+         NormalHeal = 1,
+         DirectHitDamage = 2,
+         CritDirectHitDamage = 3
       };
 
       enum HandleActionType : uint8_t
@@ -743,7 +763,7 @@ namespace Core {
 
          Flee = 0x1B,
 
-         Unk3 = 0x20,
+         Unk3 = 0x20,                  // Animation related?
 
          CombatIndicationShow = 0x22,
 
@@ -769,7 +789,7 @@ namespace Core {
          ItemRepairMsg = 0x5C,
 
          LeveStartAnim = 0x66,
-         Unk4 = 0x67,
+         LeveStartError = 0x67,
          PlayerNameGrayout = 0x6A,
 
          ItemObtainMsg = 0x75,
@@ -869,7 +889,7 @@ namespace Core {
 
          AchievementPopup = 0x203,
 
-         Unk7 = 0x205,
+         Unk7 = 0x205,                 // LogMessage?
          AchievementMsg = 0x206,
 
          SetItemLevel = 0x209,

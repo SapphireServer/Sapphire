@@ -62,6 +62,11 @@ Core::XMLConfigPtr Core::ServerZone::getConfig() const
    return m_pConfig;
 }
 
+size_t Core::ServerZone::getSessionCount() const
+{
+   return m_sessionMap.size();
+}
+
 bool Core::ServerZone::registerBnpcTemplate( std::string templateName, uint32_t bnpcBaseId, 
                                              uint32_t bnpcNameId, uint32_t modelId, std::string aiName )
 {
@@ -101,7 +106,7 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
    }
 
    std::vector<std::string> args( argv + 1, argv + argc );
-   for( auto i = 0; i + 1 < args.size(); i += 2 )
+   for( uint32_t i = 0; i + 1 < args.size(); i += 2 )
    {
       std::string arg( "" );
       std::string val( "" );

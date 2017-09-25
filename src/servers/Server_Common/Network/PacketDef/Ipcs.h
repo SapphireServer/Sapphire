@@ -116,6 +116,7 @@ namespace Packets {
       WeatherChange              = 0x01AF, // updated for sb
       Discovery                  = 0x01B2, // updated for sb
 
+      EorzeaTimeOffset           = 0x01B4,
 
       CFAvailableContents        = 0x01CF,
 

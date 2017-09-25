@@ -218,12 +218,12 @@ void Core::Entity::Player::calculateStats()
    // TODO: put formula somewhere else...
    float base = CalcBattle::calculateBaseStat( getAsPlayer() );
 
-   m_baseStats.str =  base * ( static_cast< float >( classInfo.mod_str ) / 100 ) + tribeInfo.mod_str;
-   m_baseStats.dex =  base * ( static_cast< float >( classInfo.mod_dex ) / 100 ) + tribeInfo.mod_dex;
-   m_baseStats.vit =  base * ( static_cast< float >( classInfo.mod_vit ) / 100 ) + tribeInfo.mod_vit;
-   m_baseStats.inte = base * ( static_cast< float >( classInfo.mod_int ) / 100 ) + tribeInfo.mod_int;
-   m_baseStats.mnd =  base * ( static_cast< float >( classInfo.mod_mnd ) / 100 ) + tribeInfo.mod_mnd;
-   m_baseStats.pie =  base * ( static_cast< float >( classInfo.mod_pie ) / 100 ) + tribeInfo.mod_pie;
+   m_baseStats.str =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_str ) / 100 ) + tribeInfo.mod_str );
+   m_baseStats.dex =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_dex ) / 100 ) + tribeInfo.mod_dex );
+   m_baseStats.vit =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_vit ) / 100 ) + tribeInfo.mod_vit );
+   m_baseStats.inte = static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_int ) / 100 ) + tribeInfo.mod_int );
+   m_baseStats.mnd =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_mnd ) / 100 ) + tribeInfo.mod_mnd );
+   m_baseStats.pie =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_pie ) / 100 ) + tribeInfo.mod_pie );
 
    m_baseStats.skillSpeed = paramGrowthInfo.base_secondary;
    m_baseStats.spellSpeed = paramGrowthInfo.base_secondary;
@@ -243,7 +243,7 @@ void Core::Entity::Player::calculateStats()
       m_hp = m_baseStats.max_hp;
 
 
-   m_baseStats.determination = base;
+   m_baseStats.determination = static_cast< uint32_t >( base );
 
 }
 
@@ -513,7 +513,7 @@ bool Core::Entity::Player::isAetheryteRegistered( uint8_t aetheryteId ) const
    uint8_t value;
    Util::valueToFlagByteIndexValue( aetheryteId, value, index );
 
-   return m_aetheryte[index] & value;
+   return ( m_aetheryte[index] & value ) != 0;
 }
 
 uint8_t * Core::Entity::Player::getDiscoveryBitmask()
@@ -608,7 +608,7 @@ bool Core::Entity::Player::isActionLearned( uint8_t actionId ) const
    uint8_t value;
    Util::valueToFlagByteIndexValue( actionId, value, index );
 
-   return m_unlocks[index] & value;
+   return ( m_unlocks[index] & value ) != 0;
 }
 
 void Core::Entity::Player::gainExp( uint32_t amount )
@@ -980,10 +980,11 @@ const uint8_t * Core::Entity::Player::getStateFlags() const
 
 bool Core::Entity::Player::actionHasCastTime( uint32_t actionId ) //TODO: Add logic for special cases
 {
-   if( g_exdData.m_actionInfoMap[actionId].is_instant )
+   auto actionInfoPtr = g_exdData.getActionInfo( actionId );
+   if( actionInfoPtr->is_instant )
       return false;
 
-   if( g_exdData.m_actionInfoMap[actionId].cast_time == 0 )
+   if( actionInfoPtr->cast_time == 0 )
       return false;
 
    return true;
@@ -997,7 +998,7 @@ bool Core::Entity::Player::hasStateFlag( Core::Common::PlayerStateFlag flag ) co
    uint8_t value;
    Util::valueToFlagByteIndexValue( iFlag, value, index );
 
-   return m_stateFlags[index] & value;
+   return ( m_stateFlags[index] & value ) != 0;
 }
 
 void Core::Entity::Player::setStateFlag( Core::Common::PlayerStateFlag flag )
@@ -1463,7 +1464,7 @@ void Core::Entity::Player::autoAttack( ActorPtr pTarget )
    //uint64_t tick = Util::getTimeMs();
    //srand(static_cast< uint32_t >(tick));
 
-   uint32_t damage = mainWeap->getAutoAttackDmg();
+   uint32_t damage = static_cast< uint32_t >( mainWeap->getAutoAttackDmg() );
    uint32_t variation = 0 + rand() % 3;
 
    if ( getClass() == JOB_MACHINIST ||
@@ -1481,9 +1482,9 @@ void Core::Entity::Player::autoAttack( ActorPtr pTarget )
       effectPacket.data().rotation = Math::Util::floatToUInt16Rot(getRotation());
       effectPacket.data().effectTargetId = pTarget->getId();
       effectPacket.data().effectTarget = pTarget->getId();
-      effectPacket.data().effects[0].param1 = damage;
-      effectPacket.data().effects[0].unknown_1 = 3;
-      effectPacket.data().effects[0].unknown_2 = 1;
+      effectPacket.data().effects[0].value = damage;
+      effectPacket.data().effects[0].effectType = Common::ActionEffectType::Damage;
+      effectPacket.data().effects[0].hitSeverity = Common::ActionHitSeverityType::NormalDamage;
       effectPacket.data().effects[0].unknown_3 = 7;
 
       sendToInRangeSet(effectPacket, true);
@@ -1501,9 +1502,9 @@ void Core::Entity::Player::autoAttack( ActorPtr pTarget )
       effectPacket.data().actionTextId = 7;
       effectPacket.data().rotation = Math::Util::floatToUInt16Rot(getRotation());
       effectPacket.data().effectTarget = pTarget->getId();
-      effectPacket.data().effects[0].param1 = damage;
-      effectPacket.data().effects[0].unknown_1 = 3;
-      effectPacket.data().effects[0].unknown_2 = 2;
+      effectPacket.data().effects[0].value = damage;
+      effectPacket.data().effects[0].effectType = Common::ActionEffectType::Damage;
+      effectPacket.data().effects[0].hitSeverity = Common::ActionHitSeverityType::NormalDamage;
       effectPacket.data().effects[0].unknown_3 = 71;
 
       sendToInRangeSet(effectPacket, true);
@@ -1517,6 +1518,9 @@ void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, 
 {
    sendDebug( std::to_string( pTarget.getId() ) );
    sendDebug( "Handle script skill type: " + std::to_string( type ) );
+   
+   auto actionInfoPtr = g_exdData.getActionInfo( actionId );
+
 
    switch( type )
    {
@@ -1534,9 +1538,9 @@ void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, 
       effectPacket.data().numEffects = 1;
       effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRotation() );
       effectPacket.data().effectTarget = pTarget.getId();
-      effectPacket.data().effects[0].param1 = param1;
-      effectPacket.data().effects[0].unknown_1 = 3;
-      effectPacket.data().effects[0].unknown_2 = 1;
+      effectPacket.data().effects[0].value = static_cast< int16_t >( param1 );
+      effectPacket.data().effects[0].effectType = ActionEffectType::Damage;
+      effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::NormalDamage;
       effectPacket.data().effects[0].unknown_3 = 7;
 
       sendToInRangeSet( effectPacket, true );
@@ -1544,14 +1548,14 @@ void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, 
       if ( !pTarget.isAlive() )
          break;
 
-      pTarget.takeDamage( param1 );
+      pTarget.takeDamage( static_cast< uint32_t >( param1 ) );
       pTarget.onActionHostile( shared_from_this() );
       break;
    }
 
    case Core::Common::HandleSkillType::StdHeal:
    {
-      uint32_t calculatedHeal = CalcBattle::calculateHealValue( getAsPlayer(), param1 );
+      uint32_t calculatedHeal = CalcBattle::calculateHealValue( getAsPlayer(), static_cast< uint32_t >( param1 ) );
 
       sendDebug( "STD_HEAL" );
 
@@ -1564,15 +1568,50 @@ void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, 
       effectPacket.data().numEffects = 1;
       effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRotation() );
       effectPacket.data().effectTarget = pTarget.getId();
-      effectPacket.data().effects[0].param1 = calculatedHeal;
-      effectPacket.data().effects[0].unknown_1 = 4;
-      effectPacket.data().effects[0].unknown_2 = 1;
+      effectPacket.data().effects[0].value = calculatedHeal;
+      effectPacket.data().effects[0].effectType = ActionEffectType::Heal;
+      effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::NormalHeal;
       effectPacket.data().effects[0].unknown_3 = 7;
 
       sendToInRangeSet( effectPacket, true );
 
       if ( !pTarget.isAlive() )
          break;
+
+      // todo: get proper packets: the following was just kind of thrown together from what we know
+      // also toss AoE to another spot and make it generic
+
+      if ( actionInfoPtr->is_aoe ) 
+      {
+         for ( auto pCurAct : m_inRangePlayers )
+         {
+            assert( pCurAct );
+            if ( !pCurAct->isAlive() )
+               break;
+
+            if ( Math::Util::distance( pTarget.getPos().x, pTarget.getPos().y, pTarget.getPos().z, pCurAct->getPos().x, pCurAct->getPos().y, pCurAct->getPos().z ) <= actionInfoPtr->radius )
+            {
+               GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket( pCurAct->getId() );
+               effectPacket.data().targetId = pCurAct->getId();
+               effectPacket.data().unknown_1 = 1;  // the magic trick for getting it to work
+               effectPacket.data().unknown_2 = 1;
+               effectPacket.data().unknown_8 = 1;
+               effectPacket.data().unknown_5 = 1;
+               effectPacket.data().actionAnimationId = actionId;
+               effectPacket.data().actionTextId = 0;
+               effectPacket.data().numEffects = 1;
+               effectPacket.data().effectTarget = pCurAct->getId();
+               effectPacket.data().effects[0].value = calculatedHeal;
+               effectPacket.data().effects[0].effectType = ActionEffectType::Heal;
+               effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::NormalHeal;
+               effectPacket.data().effects[0].unknown_3 = 7;
+
+               pCurAct->sendToInRangeSet( effectPacket, true );
+               pCurAct->heal( calculatedHeal );
+               sendDebug( "AoE hit actor " + pCurAct->getName() );
+            }
+         }
+      }
 
       pTarget.heal( calculatedHeal );
       break;
@@ -1628,4 +1667,15 @@ void Core::Entity::Player::setOpeningSequence( uint8_t seq )
 {
    setSyncFlag( OpeningSeq );
    m_openingSequence = seq;
+}
+
+/// Tells client to offset their eorzean time by given timestamp.
+void Core::Entity::Player::setEorzeaTimeOffset( uint64_t timestamp )
+{
+   // TODO: maybe change to persistent?
+   GamePacketNew< FFXIVIpcEorzeaTimeOffset, ServerZoneIpcType > packet ( getId() );
+   packet.data().timestamp = timestamp;
+
+   // Send to single player
+   queuePacket( packet );
 }

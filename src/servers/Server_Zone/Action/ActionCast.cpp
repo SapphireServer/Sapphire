@@ -8,6 +8,7 @@
 
 #include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket142.h"
 #include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket143.h"
+#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket144.h"
 #include "src/servers/Server_Zone/Actor/Player.h"
 #include "src/servers/Server_Zone/Script/ScriptManager.h"
 
@@ -30,7 +31,7 @@ Core::Action::ActionCast::ActionCast( Entity::ActorPtr pActor, Entity::ActorPtr 
    m_startTime = 0;
    m_id = actionId;
    m_handleActionType = HandleActionType::Spell;
-   m_castTime = g_exdData.m_actionInfoMap[actionId].cast_time; // TODO: Add security checks.
+   m_castTime = g_exdData.getActionInfo( actionId )->cast_time; // TODO: Add security checks.
    m_pSource = pActor;
    m_pTarget = pTarget;
    m_bInterrupt = false;
@@ -53,10 +54,11 @@ void Core::Action::ActionCast::onStart()
 
    castPacket.data().action_id = m_id;
    castPacket.data().unknown = 1;
-   castPacket.data().cast_time = m_castTime / 1000; // This is used for the cast bar above the target bar of the caster.
+   castPacket.data().unknown_1 = m_id;
+   castPacket.data().cast_time = static_cast< float >( m_castTime / 1000 ); // This is used for the cast bar above the target bar of the caster.
    castPacket.data().target_id = m_pTarget->getId();
 
-   m_pSource->sendToInRangeSet( castPacket, false );
+   m_pSource->sendToInRangeSet( castPacket, true );
    m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::Casting );
    m_pSource->getAsPlayer()->sendStateFlags();
 
@@ -73,6 +75,10 @@ void Core::Action::ActionCast::onFinish()
    pPlayer->unsetStateFlag( PlayerStateFlag::Casting );
    pPlayer->sendStateFlags();
 
+   /*auto control = ActorControlPacket143( m_pTarget->getId(), ActorControlType::Unk7,
+                                         0x219, m_id, m_id, m_id, m_id );
+   m_pSource->sendToInRangeSet( control, true );*/
+
    g_scriptMgr.onCastFinish( pPlayer, m_pTarget, m_id );
 }
 
@@ -86,7 +92,7 @@ void Core::Action::ActionCast::onInterrupt()
    m_pSource->getAsPlayer()->sendStateFlags();
 
    auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt,
-                                          0x219, 0x04, m_id, 1 );
+                                          0x219, 1, m_id, 1 );
    m_pSource->sendToInRangeSet( control, true );
 
 }

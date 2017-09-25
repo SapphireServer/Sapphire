@@ -33,6 +33,8 @@ namespace Core {
 
       XMLConfigPtr getConfig() const;
 
+      size_t getSessionCount() const;
+
       bool registerBnpcTemplate( std::string templateName, uint32_t bnpcBaseId,
                                  uint32_t bnpcNameId, uint32_t modelId, std::string aiName );
 

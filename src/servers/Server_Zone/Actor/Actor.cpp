@@ -595,7 +595,7 @@ void Core::Entity::Actor::autoAttack( ActorPtr pTarget )
       srand( static_cast< uint32_t >( tick ) );
 
       uint32_t damage = 10 + rand() % 12;
-      uint32_t variation = 0 + rand() % 3;
+      uint32_t variation = 0 + rand() % 4;
 
       GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket( getId() );
       effectPacket.data().targetId = pTarget->getId();
@@ -606,9 +606,9 @@ void Core::Entity::Actor::autoAttack( ActorPtr pTarget )
       effectPacket.data().numEffects = 1;
       effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRotation() );
       effectPacket.data().effectTarget = pTarget->getId();
-      effectPacket.data().effects[0].param1 = damage;
-      effectPacket.data().effects[0].unknown_1 = 3;
-      effectPacket.data().effects[0].unknown_2 = 1;
+      effectPacket.data().effects[0].value = damage;
+      effectPacket.data().effects[0].effectType = ActionEffectType::Damage;
+      effectPacket.data().effects[0].hitSeverity = static_cast< ActionHitSeverityType >( variation );
       effectPacket.data().effects[0].unknown_3 = 7;
 
       sendToInRangeSet( effectPacket );
@@ -627,26 +627,26 @@ void Core::Entity::Actor::addStatusEffect( StatusEffect::StatusEffectPtr pEffect
 }
 
 /*! \param StatusEffectPtr to be applied to the actor */
-void Core::Entity::Actor::addStatusEffectById( int32_t id, int32_t duration, uint16_t param )
+void Core::Entity::Actor::addStatusEffectById( uint32_t id, int32_t duration, Entity::Actor& pSource, uint16_t param )
 {
-   StatusEffect::StatusEffectPtr effect( new StatusEffect::StatusEffect( id, shared_from_this(), shared_from_this(), duration, 3000 ) );
+   StatusEffect::StatusEffectPtr effect( new StatusEffect::StatusEffect( id, pSource.shared_from_this(), shared_from_this(), duration, 3000 ) );
    effect->setParam( param );
    addStatusEffect( effect );
 }
 
 /*! \param StatusEffectPtr to be applied to the actor */
-void Core::Entity::Actor::addStatusEffectByIdIfNotExist( int32_t id, int32_t duration, uint16_t param )
+void Core::Entity::Actor::addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Actor& pSource, uint16_t param )
 {
    if( !m_pStatusEffectContainer->hasStatusEffect( id ) )
    {
-      StatusEffect::StatusEffectPtr effect( new StatusEffect::StatusEffect( id, shared_from_this(), shared_from_this(), duration, 3000 ) );
+      StatusEffect::StatusEffectPtr effect( new StatusEffect::StatusEffect( id, pSource.shared_from_this(), shared_from_this(), duration, 3000 ) );
       effect->setParam( param );
       addStatusEffect( effect );
    }
 }
 
 /*! \param Status that should be removed, based on its ID. */
-void Core::Entity::Actor::removeSingleStatusEffectFromId( int32_t id )
+void Core::Entity::Actor::removeSingleStatusEffectFromId( uint32_t id )
 {
    m_pStatusEffectContainer->removeSingleStatusEffectFromId( id );
 }

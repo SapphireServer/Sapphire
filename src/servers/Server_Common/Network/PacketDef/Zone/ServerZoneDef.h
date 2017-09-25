@@ -301,12 +301,12 @@ struct FFXIVIpcUpdateHpMpTp : FFXIVIpcBasePacket<UpdateHpMpTp>
 */
 struct effectEntry
 {
-   uint8_t unknown_1;
-   uint8_t unknown_2;
+   Common::ActionEffectType effectType;
+   Common::ActionHitSeverityType hitSeverity;
    uint8_t unknown_3;
    int8_t bonusPercent;
-   int16_t param1;
-   uint8_t unknown_5;
+   int16_t value;
+   uint8_t valueMultiplier;      // This multiplies whatever value is in the 'value' param by 10. Possibly a workaround for big numbers
    uint8_t unknown_6;
 };
 
@@ -1279,6 +1279,11 @@ struct FFXIVIpcCFMemberStatus : FFXIVIpcBasePacket<CFMemberStatus>
    uint8_t estimatedTime;
    uint8_t unknown2[3];
    uint32_t unknown3;
+};
+
+struct FFXIVIpcEorzeaTimeOffset : FFXIVIpcBasePacket<EorzeaTimeOffset>
+{
+   uint64_t timestamp;
 };
 
 

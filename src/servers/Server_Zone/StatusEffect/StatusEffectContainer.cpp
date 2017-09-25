@@ -57,8 +57,8 @@ void Core::StatusEffect::StatusEffectContainer::addStatusEffect( StatusEffectPtr
    m_effectMap[nextSlot] = pEffect;
 
    GamePacketNew< Server::FFXIVIpcAddStatusEffect, ServerZoneIpcType > statusEffectAdd( m_pOwner->getId() );
-   statusEffectAdd.data().actor_id = m_pOwner->getId();
-   statusEffectAdd.data().actor_id1 = m_pOwner->getId();
+   statusEffectAdd.data().actor_id = pEffect->getTargetActorId();
+   statusEffectAdd.data().actor_id1 = pEffect->getSrcActorId(); 
    statusEffectAdd.data().current_hp = m_pOwner->getHp();
    statusEffectAdd.data().current_mp = m_pOwner->getMp();
    statusEffectAdd.data().current_tp = m_pOwner->getTp();
@@ -70,6 +70,7 @@ void Core::StatusEffect::StatusEffectContainer::addStatusEffect( StatusEffectPtr
    statusEffectAdd.data().max_something = 1;
     //statusEffectAdd.data().unknown2 = 28;
    statusEffectAdd.data().param = pEffect->getParam();
+
 
    bool sendToSelf = m_pOwner->isPlayer() ? true : false;
    m_pOwner->sendToInRangeSet( statusEffectAdd, sendToSelf );
@@ -142,8 +143,8 @@ void Core::StatusEffect::StatusEffectContainer::update()
 {
    uint64_t currentTimeMs = Util::getTimeMs();
 
-   uint64_t thisTickDmg = 0;
-   uint64_t thisTickHeal = 0;
+   uint32_t thisTickDmg = 0;
+   uint32_t thisTickHeal = 0;
 
    for( auto effectIt : m_effectMap )
    {
