@@ -239,25 +239,6 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
        else
            pPlayer->setClassJob( static_cast<Core::Common::ClassJob> ( id ) );
    }
-   else if( subCommand == "no" )
-   {
-      int32_t id;
-
-      sscanf( params.c_str(), "%d", &id );
-
-      uint8_t typeshift = 0x6;
-      uint8_t mask = 1 << typeshift;
-      id &= mask;
-      bool final = ( id & mask ) == mask;
-      pPlayer->sendDebug( std::to_string(final) );
-   }
-   else if( subCommand == "aaah" )
-   {
-      int32_t id;
-      sscanf( params.c_str(), "%d", &id );
-      
-      pPlayer->sendDebug( std::to_string( pPlayer->actionHasCastTime( id ) ) );
-   }
    else if ( subCommand == "cfpenalty" )
    {
       int32_t minutes;
@@ -486,6 +467,7 @@ void Core::DebugCommandHandler::nudge( char * data, Entity::PlayerPtr pPlayer, b
 
 void Core::DebugCommandHandler::serverInfo( char * data, Core::Entity::PlayerPtr pPlayer, boost::shared_ptr< Core::DebugCommand > command )
 {
-   pPlayer->sendDebug( "SapphireServer " + Version::VERSION + " - " + Version::GIT_HASH );
+   pPlayer->sendDebug( "SapphireServer " + Version::VERSION + "\nRev: " + Version::GIT_HASH );
+   pPlayer->sendDebug( "Compiled: " __DATE__ " " __TIME__ );
    pPlayer->sendDebug( "Sessions: " + std::to_string( g_serverZone.getSessionCount() ) );
 }
