@@ -390,7 +390,7 @@ namespace Core {
          Inn = 2,
          Dungeon = 3,
          JailArea = 5,
-         Opening = 6,
+         OpeningArea = 6,
          BeforeTrialDung = 7,
          AllianceRaid = 8,
          OpenWorldInstanceBattle = 9,
