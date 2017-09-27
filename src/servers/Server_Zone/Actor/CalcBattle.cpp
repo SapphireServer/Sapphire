@@ -5,6 +5,7 @@
 #include "Player.h"
 #include <cmath>
 
+using namespace Core::Data;
 using namespace Core::Entity;
 
 extern Core::Data::ExdData g_exdData;

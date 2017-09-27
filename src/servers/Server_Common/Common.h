@@ -562,7 +562,7 @@ namespace Core {
          LimitBreak = 8,
       };
 
-      enum class ActionEffectType : uint8_t
+      enum ActionEffectType : uint8_t
       {
          Nothing = 0,
          Miss = 1,
@@ -591,16 +591,17 @@ namespace Core {
          CritDirectHitDamage = 3
       };
 
-      enum class AoeType
+      enum class ActionCollisionType : uint8_t
       {
          None,
          SingleTarget,
-         TargetCircle,
+         Circle,
          Cone,
-         Line,
+         Box,
          Unknown,
          Unknown2,
-         GroundCircle, // for when you set aoe like asylum
+         PersistentArea, // for when you set aoe like asylum
+         Unknown3
       };
 
       enum HandleActionType : uint8_t
