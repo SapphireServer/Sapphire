@@ -21,24 +21,29 @@ bool ActionCollision::isActorCollisionValid( ActorPtr actorPtr, AoeFilter aoeFil
    case AoeFilter::All:
    {
       collisionApplicable = true;
+      break;
    }
    case AoeFilter::Players:
    {
       collisionApplicable = actorPtr->isPlayer();
+      break;
    }
    case AoeFilter::Allies:
    {
       // todo: implement ally NPCs
       collisionApplicable = !actorPtr->isMob();
+      break;
    }
    case AoeFilter::Party:
    {
       // todo: implement party
       collisionApplicable = actorPtr->isPlayer();
+      break;
    }
    case AoeFilter::Enemies:
    {
       collisionApplicable = actorPtr->isMob();
+      break;
    }
    }
 
