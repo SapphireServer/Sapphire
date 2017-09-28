@@ -383,6 +383,29 @@ namespace Core {
          instance,
       };
 
+      enum TerritoryIntendedUseType : uint8_t //ToDo: Add The Rest of The Territory Types and Have Better Names For Them
+      {
+         Town = 0,
+         OpenWorld = 1,
+         Inn = 2,
+         Dungeon = 3,
+         JailArea = 5,
+         OpeningArea = 6,
+         BeforeTrialDung = 7,
+         AllianceRaid = 8,
+         OpenWorldInstanceBattle = 9,
+         Trial = 10,
+         HousingArea = 13,
+         HousingPrivateArea = 14,
+         MSQPrivateArea = 15,
+         Raids = 16,
+         RaidFights = 17,
+         ChocoboTutorial = 21,
+         Wedding = 22,
+         BeginnerTutorial = 27,
+         PalaceOfTheDead = 31,
+      };
+
       enum CharaLook : uint8_t
       {
          Race = 0x00,

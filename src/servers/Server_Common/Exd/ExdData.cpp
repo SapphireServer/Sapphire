@@ -345,6 +345,7 @@ bool Core::Data::ExdData::loadActionInfo()
       uint8_t points_type       = getField< uint8_t >( fields, 30 );     // 30
       uint16_t points_cost      = getField< uint16_t >( fields, 31 );    // 31
 
+<<<<<<< HEAD
       bool is_instant           = getField< bool >( fields, 35 );        // 35
       uint16_t cast_time        = getField< uint16_t >( fields, 36 );    // 36
       uint16_t recast_time      = getField< uint16_t >( fields, 37 );    // 37
@@ -356,6 +357,18 @@ bool Core::Data::ExdData::loadActionInfo()
       info->id                  = id;
       info->name                = name;
       info->category            = category;
+=======
+      bool is_instant = getField< bool >( fields, 35 );       // 35
+      uint16_t cast_time = getField< uint16_t >( fields, 36 );    // 36
+      uint16_t recast_time = getField< uint16_t >( fields, 37 );  // 37
+
+      int8_t model = getField< int8_t >( fields, 39 );            // 39: Action model
+      uint8_t aspect = getField< uint8_t >( fields, 40 );         // 40: Action aspect
+
+      info->id = id;
+      info->name = name;
+      info->category = category;
+>>>>>>> 08f4c7651fafdaf8f4d98868a94ab4688eb71379
 
       info->class_job           = class_job;
       info->unlock_level        = unlock_level;
