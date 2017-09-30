@@ -109,6 +109,12 @@ uint16_t Core::Entity::Actor::getGp() const
    return m_gp;
 }
 
+/*! \return current GP */
+InvincibilityType Core::Entity::Actor::getInvincibilityType() const
+{
+   return m_invincibilityType;
+}
+
 /*! \return current class or job */
 Core::Common::ClassJob Core::Entity::Actor::getClass() const
 {
@@ -161,18 +167,21 @@ uint32_t Core::Entity::Actor::getMaxMp() const
 void Core::Entity::Actor::resetHp()
 {
    m_hp = getMaxHp();
+   sendStatusUpdate( true );
 }
 
 /*! \return reset mp to current max mp */
 void Core::Entity::Actor::resetMp()
 {
    m_mp = getMaxMp();
+   sendStatusUpdate(true);
 }
 
 /*! \param hp amount to set ( caps to maxHp ) */
 void Core::Entity::Actor::setHp( uint32_t hp )
 {
    m_hp = hp < getMaxHp() ? hp : getMaxHp();
+   sendStatusUpdate(true);
 }
 
 /*! \param mp amount to set ( caps to maxMp ) */
@@ -181,11 +190,18 @@ void Core::Entity::Actor::setMp( uint32_t mp )
    m_mp = mp < getMaxMp() ? mp : getMaxMp();
 }
 
-/*! \param mp amount to set ( caps to maxMp ) */
+/*! \param gp amount to set*/
 void Core::Entity::Actor::setGp( uint32_t gp )
 {
    m_gp = gp;
 }
+
+/*! \param type invincibility type to set */
+void Core::Entity::Actor::setInvincibilityType( Common::InvincibilityType type )
+{
+   m_invincibilityType = type;
+}
+
 
 /*! \return current status of the actor */
 Core::Entity::Actor::ActorStatus Core::Entity::Actor::getStatus() const
@@ -331,8 +347,18 @@ void Core::Entity::Actor::takeDamage( uint32_t damage )
 {
    if( damage >= m_hp )
    {
-      m_hp = 0;
-      die();
+      switch( m_invincibilityType ) { 
+         case InvincibilityNone: 
+            setHp( 0 );
+            die();
+            break;
+         case InvincibilityRefill:
+            resetHp();
+            break;
+         case InvincibilityStayAlive:
+            setHp( 0 );
+            break;
+      }
    }
    else
       m_hp -= damage;

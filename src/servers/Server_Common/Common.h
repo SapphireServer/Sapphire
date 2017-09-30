@@ -628,6 +628,13 @@ namespace Core {
          StdDot,
       };
 
+      enum InvincibilityType : uint8_t
+      {
+         InvincibilityNone = 0,
+         InvincibilityRefill = 1,
+         InvincibilityStayAlive = 2,
+      };
+
       enum struct PlayerStateFlag : uint8_t
       {
          NoCombat,
