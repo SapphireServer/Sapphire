@@ -9,11 +9,11 @@
 // Start NPC: 1001140
 // End NPC: 1000100
 
-class ManFst003Def 
+class ManFst003Def
 {
     def ManFst003Def()
     {
-        // Basic quest information 
+        // Basic quest information
         this.name = "Close to Home";
         this.id = 65659;
 
@@ -24,13 +24,13 @@ class ManFst003Def
         // GetQuestUI8BL
         // GetQuestUI8CH
 
-        // Steps in this quest ( 0 is before accepting, 
+        // Steps in this quest ( 0 is before accepting,
         // 1 is first, 255 means ready for turning it in
         this.SEQ_0 = 0;
         this.SEQ_1 = 1;
         this.SEQ_FINISH = 255;
 
-        // Quest rewards 
+        // Quest rewards
         this.RewardExpFactor = 100;
         this.RewardGil = 107;
 
@@ -74,7 +74,6 @@ class ManFst003Def
     def checkQuestCompletion( player, varIdx )
     {
 
-		print( varIdx );
         if (varIdx == 3)
         {
             player.questMessage(this.id, 1, 0, 0, 0 );
@@ -118,8 +117,8 @@ class ManFst003Def
         player.eventPlay( this.id, 1, 0x0EFB/*flags*/, 0/*unk*/, 0/*unk*/,
             fun( player, eventId, param1, param2, param3 )
             {
-                player.setQuestUI8AL( ManFst004.id, 1 );
-                ManFst003.checkQuestCompletion( player, 1 );
+                player.setQuestUI8AL( ManFst003.id, 1 );
+                ManFst003.checkQuestCompletion( player, 0 );
             });
     }
 
@@ -128,7 +127,7 @@ class ManFst003Def
         player.eventPlay( this.id, 2, 0, 0, 0,
             fun( player, eventId, param1, param2, param3 )
             {
-                player.setQuestUI8BH( ManFst004.id, 1 );
+                player.setQuestUI8BH( ManFst003.id, 1 );
                 ManFst003.checkQuestCompletion( player, 3 );
             });
     }
@@ -207,8 +206,8 @@ class ManFst003Def
         player.eventPlay( this.id, 100, 0x0EFB, 0, 0,
             fun( player, eventId, param1, param2, param3 )
             {
-                player.setQuestUI8CH( ManFst004.id, 0 ); // remove key item, since we have just traded it
-                player.setQuestUI8BL( ManFst004.id, 1 );
+                player.setQuestUI8CH( ManFst003.id, 0 ); // remove key item, since we have just traded it
+                player.setQuestUI8BL( ManFst003.id, 1 );
                 ManFst003.checkQuestCompletion(player, 2 );
             });
     }
@@ -237,7 +236,6 @@ class ManFst003Def
 				},
 				fun( player, eventId, additional ) {},
 				eventId );
-			player.unlock();
         }
         else if( actor == this.ACTOR2 )
         {
@@ -257,4 +255,3 @@ class ManFst003Def
 };
 
 GLOBAL ManFst003 = ManFst003Def();
-
