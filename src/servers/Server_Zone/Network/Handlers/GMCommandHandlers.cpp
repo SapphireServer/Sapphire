@@ -70,6 +70,7 @@ enum GmCommand
    Tp = 0x0066,
    Gp = 0x0067,
    Exp = 0x0068,
+   Inv = 0x006A,
 
    Item = 0x00C8,
    Gil = 0x00C9,
@@ -350,6 +351,17 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       pPlayer->sendNotice( "GC Rank for  " + targetPlayer->getName() +
          " for GC " + std::to_string( targetPlayer->getGc() ) +
          " was set to " + std::to_string( targetPlayer->getGcRankArray()[targetPlayer->getGc() - 1] ) );
+      break;
+   }
+   case GmCommand::Inv:
+   {
+      if( targetActor->getInvincibilityType() == Common::InvincibilityType::InvincibilityRefill )
+         targetActor->setInvincibilityType( Common::InvincibilityType::InvincibilityNone );
+      else
+         targetActor->setInvincibilityType( Common::InvincibilityType::InvincibilityRefill );
+
+      pPlayer->sendNotice( "Invincibility for " + targetPlayer->getName() +
+         " was was switched." );
       break;
    }
 
