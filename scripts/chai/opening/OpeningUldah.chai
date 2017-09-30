@@ -35,7 +35,7 @@ class OpeningUldahDef
 
     def Scene00000( player )
     {
-        player.eventPlay( this.id, 0, 0x2001, 0, 1, 
+        player.eventPlay( this.id, 0, 0x04AC05, 0, 1, 
             fun( player, eventId, param1, param2, param3 )
             {
                 player.setOpeningSequence( 1 );
