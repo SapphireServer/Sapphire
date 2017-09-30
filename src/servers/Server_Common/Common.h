@@ -630,9 +630,9 @@ namespace Core {
 
       enum InvincibilityType : uint8_t
       {
-         InvincibilityNone = 0,
-         InvincibilityRefill = 1,
-         InvincibilityStayAlive = 2,
+         InvincibilityNone,
+         InvincibilityRefill,
+         InvincibilityStayAlive,
       };
 
       enum struct PlayerStateFlag : uint8_t
