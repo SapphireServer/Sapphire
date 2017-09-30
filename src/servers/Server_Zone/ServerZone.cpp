@@ -7,6 +7,7 @@
 #include <src/servers/Server_Common/Logging/Logger.h>
 #include <src/servers/Server_Common/Config/XMLConfig.h>
 #include <src/servers/Server_Common/Database/Database.h>
+#include <src/servers/Server_Common/Version.h>
 
 #include <MySqlBase.h>
 #include <Connection.h>
@@ -37,6 +38,11 @@
 #include <boost/make_shared.hpp>
 #include <boost/algorithm/string.hpp>
 
+#include <Server_Common/Database/DbLoader.h>
+#include <Server_Common/Database/CharaDbConnection.h>
+#include <Server_Common/Database/DbWorkerPool.h>
+#include <Server_Common/Database/PreparedStatement.h>
+
 
 Core::Logger g_log;
 Core::Db::Database g_database;
@@ -45,7 +51,7 @@ Core::Scripting::ScriptManager g_scriptMgr;
 Core::Data::ExdData g_exdData;
 Core::ZoneMgr g_zoneMgr;
 Core::LinkshellMgr g_linkshellMgr;
-
+Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > CharacterDatabase;
 
 Core::ServerZone::ServerZone( const std::string& configPath, uint16_t serverId )
    : m_configPath( configPath )
@@ -167,98 +173,136 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
       return false;
    }
 
-   try
+   Core::Db::DbLoader loader;
+
+   Core::Db::ConnectionInfo info;
+   info.password = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Pass", "" );
+   info.host = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Host", "127.0.0.1" );
+   info.database = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Database", "sapphire" );
+   info.port = m_pConfig->getValue< uint16_t >( "Settings.General.Mysql.Port", 3306 );
+   info.user = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Username", "root" );
+   info.syncThreads = m_pConfig->getValue< uint8_t >( "Settings.General.Mysql.SyncThreads", 2 );
+   info.asyncThreads = m_pConfig->getValue< uint8_t >( "Settings.General.Mysql.AsyncThreads", 2 );
+
+   loader.addDb( CharacterDatabase, info );
+   if( !loader.initDbs() )
+      return false;
+
+   // execute() runs asynchronous
+   CharacterDatabase.execute( "INSERT INTO zoneservers ( id, ip, port ) VALUES ( 101, '127.0.0.1', 54555);" );
+   CharacterDatabase.execute( "DELETE FROM zoneservers WHERE id = 101" );
+
+   // query runs synchronous
+   boost::scoped_ptr< Mysql::ResultSet > res( CharacterDatabase.query( "SELECT id,ip,port FROM zoneservers" ) );
+   while( res->next() )
    {
-      // bunch of test cases for db wrapper
-      Mysql::MySqlBase base;
-      g_log.info( base.getVersionInfo() );
-
-      Mysql::optionMap options;
-      options[ MYSQL_OPT_RECONNECT ] = "1";
-
-      boost::scoped_ptr< Mysql::Connection > con( base.connect( "127.0.0.1", "root", "", options ) );
-
-      if( con->getAutoCommit() )
-         g_log.info( "autocommit active" );
-
-      con->setAutoCommit( false );
-
-      if( !con->getAutoCommit() )
-         g_log.info( "autocommit inactive" );
-
-      con->setAutoCommit( true );
-
-      if( con->getAutoCommit() )
-         g_log.info( "autocommit active" );
-
-      con->setSchema( "sapphire" );
-
-      boost::scoped_ptr< Mysql::Statement > stmt( con->createStatement() );
-      bool t1 = stmt->execute( "DELETE FROM zoneservers WHERE id = 101" );
-      t1 = stmt->execute( "INSERT INTO zoneservers ( id, ip, port ) VALUES ( 101, '127.0.0.1', 54555);" );
-      // t1 = stmt->execute( "INSERT INTO zoneservers ( id, ip, port ) VALUES ( 101, '127.0.0.1', 54555);" ); // throws duplicate entry
-      t1 = stmt->execute( "DELETE FROM zoneservers WHERE id = 101" );
-      t1 = stmt->execute( "INSERT INTO zoneservers ( id, ip, port ) VALUES ( 101, '127.0.0.1', 54555);" );
-      //t1 = stmt->execute( "DELETE FROM zoneservers WHERE id = 101" );
-
-      //boost::scoped_ptr< Mysql::Statement > stmt1( con->createStatement() );
-      //bool t2 = stmt1->execute( "INSERT INTO BLARGH!" ); // throws error
-
-      boost::scoped_ptr< Mysql::Statement > stmt2( con->createStatement() );
-      boost::scoped_ptr< Mysql::ResultSet > res( stmt2->executeQuery( "SELECT id,ip,port FROM zoneservers"  ) );
-
-      while( res->next() )
-      {
-         g_log.info( "id: " + std::to_string( res->getUInt( "id" ) ) );
-         g_log.info( "ip: " + res->getString( "ip" ) );
-         g_log.info( "port: " + std::to_string( res->getUInt( "port" ) ) );
-
-         // alternatively ( slightly faster )
-         // g_log.info( "id: " + std::to_string( res->getUInt( 1 ) ) );
-         // g_log.info( "ip: " + res->getString( 2 ) );
-         // g_log.info( "port: " + std::to_string( res->getUInt( 3 ) ) );
-
-      }
-
-      // binary data test
-      boost::scoped_ptr< Mysql::Statement > stmt3( con->createStatement() );
-      boost::scoped_ptr< Mysql::ResultSet > res1( stmt3->executeQuery( "SELECT * FROM charabase"  ) );
-
-      while( res1->next() )
-      {
-         auto blob = res1->getBlobVector( "Customize" );
-      }
-
-      boost::scoped_ptr< Mysql::PreparedStatement > pstmt2( con->prepareStatement( "DELETE FROM zoneservers WHERE id = ?" ) );
-      pstmt2->setInt( 1, 1021 );
-      pstmt2->execute();
-
-      pstmt2->setInt( 1, 1001 );
-      pstmt2->execute();
-
-      boost::scoped_ptr< Mysql::PreparedStatement > pstmt( con->prepareStatement( "INSERT INTO zoneservers ( id, ip, port ) VALUES ( ?, ?, ?);" ) );
-      pstmt->setInt( 1, 1001 );
-      pstmt->setString( 2, "123.123.123.123" );
-      pstmt->setInt( 3, 5454 );
-      pstmt->execute();
-
-      pstmt->setInt( 1, 1021 );
-      pstmt->setString( 2, "173.173.173.173" );
-      pstmt->setInt( 3, 5151 );
-      pstmt->execute();
-
-      boost::scoped_ptr< Mysql::PreparedStatement > pstmt1( con->prepareStatement( "DELETE FROM zoneservers WHERE id = ?" ) );
-      pstmt->setInt( 1, 1021 );
-      pstmt->execute();
-
-      pstmt->setInt( 1, 1001 );
-      pstmt->execute();
-
+      g_log.info( "id: " + std::to_string( res->getUInt( "id" ) ) );
+      g_log.info( "ip: " + res->getString( "ip" ) );
+      g_log.info( "port: " + std::to_string( res->getUInt( "port" ) ) );
    }
-   catch( std::runtime_error e )
-   {
-      g_log.error( e.what() );
-   }
+
+   auto stmt = CharacterDatabase.getPreparedStatement( Core::Db::CharaDbStatements::CHAR_INS_TEST );
+   stmt->setUInt( 1, 2345 );
+   stmt->setString( 2, "123.123.123.123" );
+   stmt->setUInt( 3, 3306 );
+   CharacterDatabase.execute( stmt );
+
+   //stmt->setUInt( 1, 245 );
+   //stmt->setString( 2, "12.12.12.12" );
+   //stmt->setUInt( 3, 3306 );
+   //CharacterDatabase.execute( stmt );
+   //try
+   //{
+   //   // bunch of test cases for db wrapper
+   //   Mysql::MySqlBase base;
+   //   g_log.info( base.getVersionInfo() );
+
+   //   Mysql::optionMap options;
+   //   options[ MYSQL_OPT_RECONNECT ] = "1";
+
+   //   boost::scoped_ptr< Mysql::Connection > con( base.connect( "127.0.0.1", "root", "", options, 3306 ) );
+
+   //   if( con->getAutoCommit() )
+   //      g_log.info( "autocommit active" );
+
+   //   con->setAutoCommit( false );
+
+   //   if( !con->getAutoCommit() )
+   //      g_log.info( "autocommit inactive" );
+
+   //   con->setAutoCommit( true );
+
+   //   if( con->getAutoCommit() )
+   //      g_log.info( "autocommit active" );
+
+   //   con->setSchema( "sapphire" );
+
+   //   boost::scoped_ptr< Mysql::Statement > stmt( con->createStatement() );
+   //   bool t1 = stmt->execute( "DELETE FROM zoneservers WHERE id = 101" );
+   //   t1 = stmt->execute( "INSERT INTO zoneservers ( id, ip, port ) VALUES ( 101, '127.0.0.1', 54555);" );
+   //   // t1 = stmt->execute( "INSERT INTO zoneservers ( id, ip, port ) VALUES ( 101, '127.0.0.1', 54555);" ); // throws duplicate entry
+   //   t1 = stmt->execute( "DELETE FROM zoneservers WHERE id = 101" );
+   //   t1 = stmt->execute( "INSERT INTO zoneservers ( id, ip, port ) VALUES ( 101, '127.0.0.1', 54555);" );
+   //   //t1 = stmt->execute( "DELETE FROM zoneservers WHERE id = 101" );
+
+   //   //boost::scoped_ptr< Mysql::Statement > stmt1( con->createStatement() );
+   //   //bool t2 = stmt1->execute( "INSERT INTO BLARGH!" ); // throws error
+
+   //   boost::scoped_ptr< Mysql::Statement > stmt2( con->createStatement() );
+   //   boost::scoped_ptr< Mysql::ResultSet > res( stmt2->executeQuery( "SELECT id,ip,port FROM zoneservers"  ) );
+
+   //   while( res->next() )
+   //   {
+   //      g_log.info( "id: " + std::to_string( res->getUInt( "id" ) ) );
+   //      g_log.info( "ip: " + res->getString( "ip" ) );
+   //      g_log.info( "port: " + std::to_string( res->getUInt( "port" ) ) );
+
+   //      // alternatively ( slightly faster )
+   //      // g_log.info( "id: " + std::to_string( res->getUInt( 1 ) ) );
+   //      // g_log.info( "ip: " + res->getString( 2 ) );
+   //      // g_log.info( "port: " + std::to_string( res->getUInt( 3 ) ) );
+
+   //   }
+
+   //   // binary data test
+   //   boost::scoped_ptr< Mysql::Statement > stmt3( con->createStatement() );
+   //   boost::scoped_ptr< Mysql::ResultSet > res1( stmt3->executeQuery( "SELECT * FROM charabase"  ) );
+
+   //   while( res1->next() )
+   //   {
+   //      auto blob = res1->getBlobVector( "Customize" );
+   //   }
+
+   //   boost::scoped_ptr< Mysql::PreparedStatement > pstmt2( con->prepareStatement( "DELETE FROM zoneservers WHERE id = ?" ) );
+   //   pstmt2->setInt( 1, 1021 );
+   //   pstmt2->execute();
+
+   //   pstmt2->setInt( 1, 1001 );
+   //   pstmt2->execute();
+
+   //   boost::scoped_ptr< Mysql::PreparedStatement > pstmt( con->prepareStatement( "INSERT INTO zoneservers ( id, ip, port ) VALUES ( ?, ?, ?);" ) );
+   //   pstmt->setInt( 1, 1001 );
+   //   pstmt->setString( 2, "123.123.123.123" );
+   //   pstmt->setInt( 3, 5454 );
+   //   pstmt->execute();
+
+   //   pstmt->setInt( 1, 1021 );
+   //   pstmt->setString( 2, "173.173.173.173" );
+   //   pstmt->setInt( 3, 5151 );
+   //   pstmt->execute();
+
+   //   boost::scoped_ptr< Mysql::PreparedStatement > pstmt1( con->prepareStatement( "DELETE FROM zoneservers WHERE id = ?" ) );
+   //   pstmt->setInt( 1, 1021 );
+   //   pstmt->execute();
+
+   //   pstmt->setInt( 1, 1001 );
+   //   pstmt->execute();
+
+   //}
+   //catch( std::runtime_error e )
+   //{
+   //   g_log.error( e.what() );
+   //}
 
 
    Db::DatabaseParams params;
@@ -290,7 +334,8 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
 
    g_log.info( "===========================================================" );
    g_log.info( "Sapphire Server Project " );
-   g_log.info( "Version: x.y.z" );
+   g_log.info( "Version: " + Core::Version::VERSION );
+   g_log.info( "GitHash: " + Core::Version::GIT_HASH );
    g_log.info( "Compiled: " __DATE__ " " __TIME__ );
    g_log.info( "===========================================================" );
 
