@@ -109,7 +109,7 @@ uint16_t Core::Entity::Actor::getGp() const
    return m_gp;
 }
 
-/*! \return current GP */
+/*! \return current invincibility type */
 InvincibilityType Core::Entity::Actor::getInvincibilityType() const
 {
    return m_invincibilityType;
