@@ -14,6 +14,8 @@
          <Username>root</Username>
          <Pass></Pass>
          <Database>sapphire</Database>
+		 <SyncThreads>2</SyncThreads>
+		 <AsyncThreads>2</AsyncThreads>
       </Mysql>
    </General>
 

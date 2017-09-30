@@ -6,6 +6,7 @@
 #include <queue>
 #include <atomic>
 #include <type_traits>
+#include <utility>
 
 namespace Core 
 {
@@ -35,7 +36,7 @@ public:
     {
         std::lock_guard< std::mutex > lock( m_queueLock );
 
-        return _queue.empty();
+        return m_queue.empty();
     }
 
     bool pop( T& value )
@@ -80,17 +81,17 @@ public:
             m_queue.pop();
         }
 
-        _shutdown = true;
+        m_shutdown = true;
 
-        _condition.notify_all();
+        m_condition.notify_all();
     }
 
 private:
     template< typename E = T >
-    typename std::enable_if<std::is_pointer<E>::value>::type deleteQueuedObject( E& obj ) { delete obj; }
+    typename std::enable_if< std::is_pointer< E >::value >::type deleteQueuedObject( E& obj ) { delete obj; }
 
     template< typename E = T >
-    typename std::enable_if<!std::is_pointer<E>::value>::type deleteQueuedObject( E const& ) { }
+    typename std::enable_if< !std::is_pointer< E >::value >::type deleteQueuedObject( E const& ) { }
 };
 }
 
