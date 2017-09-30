@@ -361,7 +361,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
          targetActor->setInvincibilityType( Common::InvincibilityType::InvincibilityRefill );
 
       pPlayer->sendNotice( "Invincibility for " + targetPlayer->getName() +
-         " was was switched." );
+         " was switched." );
       break;
    }
 
