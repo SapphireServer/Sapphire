@@ -9,25 +9,25 @@
 // Start NPC: 1003987
 // End NPC: 1003988
 
-class ManWil001Def 
+class ManWil001Def
 {
     //////////////////////////////////////////////////////////////////////
     // default ctor
     def ManWil001Def()
     {
-        // Basic quest information 
+        // Basic quest information
         this.name = "Coming to Ul'dah";
         this.id = 66130;
 
         // Quest vars / flags used
         // GetQuestUI8AL
 
-        // Steps in this quest ( 0 is before accepting, 
+        // Steps in this quest ( 0 is before accepting,
         // 1 is first, 255 means ready for turning it in
         this.SEQ_0 = 0;
         this.SEQ_FINISH = 255;
 
-        // Quest rewards 
+        // Quest rewards
         this.RewardExpFactor = 50;
         this.RewardGil = 103;
 
@@ -49,11 +49,12 @@ class ManWil001Def
     // Available Scenes in this quest, not necessarly all are used
     def Scene00000( player )
     {
-        player.eventPlay( this.id, 0, 0, 0, 0,
+        player.eventPlay( this.id, 0, 0x2000, 0, 0,
             fun( player, eventId, param1, param2, param3 )
             {
                 if( param2 == 1 ) // accept quest
                 {
+                    player.setOpeningSequence( 2 );
                     ManWil001.Scene00001( player );
                 }
             });
@@ -61,7 +62,7 @@ class ManWil001Def
 
     def Scene00001( player )
     {
-        player.eventPlay( this.id, 1, 0, 0, 0,
+        player.eventPlay( this.id, 1, 0xF8482EFB, 0, 0,
             fun( player, eventId, param1, param2, param3 )
             {
                 ManWil001.Scene00002( player );
@@ -70,11 +71,11 @@ class ManWil001Def
 
     def Scene00002( player )
     {
-        player.eventPlay( this.id, 2, 0, 0, 0,
+        player.eventPlay( this.id, 2, NONE, 0, 0,
             fun( player, eventId, param1, param2, param3 )
             {
-                player.questUpdate( ManWil001.id, ManWil001Obj.SEQ_FINISH );// add quest to player.
-                player.eventPlay( ManWil001.OPENING_EVENT_HANDLER, 0x1E, 0x2001, 0, 0 ); 
+                player.questUpdate( ManWil001.id, ManWil001.SEQ_FINISH );// add quest to player.
+                player.eventPlay( ManWil001.OPENING_EVENT_HANDLER, 0x1E, 0x2001, 0, 0 );
             });
     }
 
@@ -85,7 +86,7 @@ class ManWil001Def
 
     def Scene00004( player )
     {
-        player.eventPlay( this.id, 4, 0, 0, 0,
+        player.eventPlay( this.id, 4, 0x2c02, 0, 0,
             fun( player, eventId, param1, param2, param3 )
             {
                 ManWil001.Scene00005( player );
@@ -94,7 +95,7 @@ class ManWil001Def
 
     def Scene00005( player )
     {
-        player.eventPlay( this.id, 5, 0/*flags*/, 0/*unk*/, 0/*unk*/,
+        player.eventPlay( this.id, 5, 0x20/*flags*/, 0/*unk*/, 0/*unk*/,
             fun( player, eventId, param1, param2, param3 )
             {
                 if( param2 == 1 ) // clicked finish button
