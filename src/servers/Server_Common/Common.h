@@ -630,6 +630,7 @@ namespace Core {
 
       enum struct PlayerStateFlag : uint8_t
       {
+         SomeFlag,
          NoCombat,
          Combat,
          Casting,
