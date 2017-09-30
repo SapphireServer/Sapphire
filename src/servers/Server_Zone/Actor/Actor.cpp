@@ -174,26 +174,28 @@ void Core::Entity::Actor::resetHp()
 void Core::Entity::Actor::resetMp()
 {
    m_mp = getMaxMp();
-   sendStatusUpdate(true);
+   sendStatusUpdate( true );
 }
 
 /*! \param hp amount to set ( caps to maxHp ) */
 void Core::Entity::Actor::setHp( uint32_t hp )
 {
    m_hp = hp < getMaxHp() ? hp : getMaxHp();
-   sendStatusUpdate(true);
+   sendStatusUpdate( true );
 }
 
 /*! \param mp amount to set ( caps to maxMp ) */
 void Core::Entity::Actor::setMp( uint32_t mp )
 {
    m_mp = mp < getMaxMp() ? mp : getMaxMp();
+   sendStatusUpdate( true );
 }
 
 /*! \param gp amount to set*/
 void Core::Entity::Actor::setGp( uint32_t gp )
 {
    m_gp = gp;
+   sendStatusUpdate( true );
 }
 
 /*! \param type invincibility type to set */
