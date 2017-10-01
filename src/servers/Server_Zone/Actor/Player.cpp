@@ -192,7 +192,7 @@ void Core::Entity::Player::prepareZoning( uint16_t targetZone, bool fadeOut, uin
    preparePacket.data().targetZone = targetZone;
    preparePacket.data().fadeOutTime = fadeOutTime;
    preparePacket.data().animation = animation;
-   preparePacket.data().fadeOut = fadeOut == true ? 1 : 0;
+   preparePacket.data().fadeOut = static_cast< uint8_t >( fadeOut ? 1 : 0 );
    queuePacket( preparePacket );
 }
 
@@ -398,7 +398,7 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
    if( isLogin() )
    {
       GamePacketNew< FFXIVIpcCFAvailableContents, ServerZoneIpcType > contentFinderList( getId() );
-      for( auto i = 0; i < 72; i++ )
+      for( auto i = 0; i < sizeof( contentFinderList.data().contents ); i++ )
       {
          // unlock all contents for now
          contentFinderList.data().contents[i] = 0xFF;
@@ -632,7 +632,9 @@ void Core::Entity::Player::gainExp( uint32_t amount )
    if( ( currentExp + amount ) >= neededExpToLevel )
    {
       // levelup
-      amount = ( currentExp + amount - neededExpToLevel ) > neededExpToLevelplus1 ? neededExpToLevelplus1 - 1 : ( currentExp + amount - neededExpToLevel );
+      amount = ( currentExp + amount - neededExpToLevel ) > neededExpToLevelplus1 ?
+               neededExpToLevelplus1 - 1 :
+               ( currentExp + amount - neededExpToLevel );
       setExp( amount );
       gainLevel();
       queuePacket( ActorControlPacket143( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), amount ) );
@@ -791,50 +793,6 @@ void Core::Entity::Player::setLevelForClass( uint8_t level, Core::Common::ClassJ
     setSyncFlag( PlayerSyncFlags::ExpLevel );
 }
 
-void Core::Entity::Player::eventActionStart( uint32_t eventId,
-                                             uint32_t action,
-                                             ActionCallback finishCallback,
-                                             ActionCallback interruptCallback,
-                                             uint64_t additional )
-{
-   Action::ActionPtr pEventAction( new Action::EventAction( shared_from_this(), eventId, action,
-                                                            finishCallback, interruptCallback, additional ) );
-
-   setCurrentAction( pEventAction );
-   auto pEvent = getEvent( eventId );
-
-   if( !pEvent && getEventCount() )
-   {
-      // We're trying to play a nested event, need to start it first.
-      eventStart( getId(), eventId, Event::Event::Nest, 0, 0 );
-      pEvent = getEvent( eventId );
-   }
-   else if( !pEvent )
-   {
-      g_log.error( "Could not find event " + std::to_string( eventId ) + ", event has not been started!" );
-      return;
-   }
-
-   if( pEvent )
-      pEvent->setPlayedScene( true );
-   pEventAction->onStart();
-}
-
-
-void Core::Entity::Player::eventItemActionStart( uint32_t eventId,
-                                                 uint32_t action,
-                                                 ActionCallback finishCallback,
-                                                 ActionCallback interruptCallback,
-                                                 uint64_t additional )
-{
-   Action::ActionPtr pEventItemAction( new Action::EventItemAction( shared_from_this(), eventId, action,
-                                                                    finishCallback, interruptCallback, additional ) );
-
-   setCurrentAction( pEventItemAction );
-
-   pEventItemAction->onStart();
-}
-
 void Core::Entity::Player::sendModel()
 {
    ModelEquipPacket modelEquip( getAsPlayer() );
@@ -973,7 +931,7 @@ void Core::Entity::Player::setGcRankAt( uint8_t index, uint8_t rank )
    setSyncFlag( PlayerSyncFlags::GC );
 }
 
-const uint8_t * Core::Entity::Player::getStateFlags() const
+const uint8_t* Core::Entity::Player::getStateFlags() const
 {
    return m_stateFlags;
 }
@@ -1086,21 +1044,16 @@ void Core::Entity::Player::update( int64_t currTime )
 
    m_lastUpdate = currTime;
 
-   // @TODO needs to happen in a if check. Don't want autoattacking while an action is being performed.
    if( !checkAction() )
    {
-      if( m_targetId )
+      if( m_targetId && m_currentStance == Entity::Actor::Stance::Active && isAutoattackOn() )
       {
          auto mainWeap = m_pInventory->getItemAt( Inventory::GearSet0, Inventory::EquipSlot::MainHand );
 
+         // @TODO i dislike this, iterating over all in range actors when you already know the id of the actor you need...
          for( auto actor : m_inRangeActors )
          {
-            if( isAutoattackOn() &&
-                actor->getId() == m_targetId &&
-                actor->isAlive() &&
-                mainWeap &&
-                m_currentStance == Entity::Actor::Stance::Active
-               )
+            if( actor->getId() == m_targetId && actor->isAlive() && mainWeap )
             {
                // default autoattack range
                // TODO make this dependant on bnpc size
@@ -1644,9 +1597,7 @@ uint32_t Core::Entity::Player::getCFPenaltyMinutes() const
 
    // check if penalty timestamp already passed current time
    if (currentTimestamp > endTimestamp)
-   {
       return 0;
-   }
 
    auto deltaTime = endTimestamp - currentTimestamp;
    return static_cast< uint32_t > ( ceil( static_cast< float > (deltaTime) / 60 ) );

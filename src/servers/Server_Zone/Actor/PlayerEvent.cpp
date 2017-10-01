@@ -18,6 +18,10 @@
 #include "src/servers/Server_Zone/Network/PacketWrappers/EventPlayPacket.h"
 #include "src/servers/Server_Zone/Network/PacketWrappers/EventFinishPacket.h"
 
+#include "src/servers/Server_Zone/Action/EventAction.h"
+#include "src/servers/Server_Zone/Action/EventItemAction.h"
+
+#include "src/servers/Server_Zone/Event/Event.h"
 #include "src/servers/Server_Zone/Event/Event.h"
 #include "Server_Zone/ServerZone.h"
 
@@ -228,6 +232,50 @@ void Core::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlayer )
       unsetStateFlag( PlayerStateFlag::Occupied2 );
       sendStateFlags();
    }
+}
+
+void Core::Entity::Player::eventActionStart( uint32_t eventId,
+                                             uint32_t action,
+                                             ActionCallback finishCallback,
+                                             ActionCallback interruptCallback,
+                                             uint64_t additional )
+{
+   Action::ActionPtr pEventAction( new Action::EventAction( shared_from_this(), eventId, action,
+                                                            finishCallback, interruptCallback, additional ) );
+
+   setCurrentAction( pEventAction );
+   auto pEvent = getEvent( eventId );
+
+   if( !pEvent && getEventCount() )
+   {
+      // We're trying to play a nested event, need to start it first.
+      eventStart( getId(), eventId, Event::Event::Nest, 0, 0 );
+      pEvent = getEvent( eventId );
+   }
+   else if( !pEvent )
+   {
+      g_log.error( "Could not find event " + std::to_string( eventId ) + ", event has not been started!" );
+      return;
+   }
+
+   if( pEvent )
+      pEvent->setPlayedScene( true );
+   pEventAction->onStart();
+}
+
+
+void Core::Entity::Player::eventItemActionStart( uint32_t eventId,
+                                                 uint32_t action,
+                                                 ActionCallback finishCallback,
+                                                 ActionCallback interruptCallback,
+                                                 uint64_t additional )
+{
+   Action::ActionPtr pEventItemAction( new Action::EventItemAction( shared_from_this(), eventId, action,
+                                                                    finishCallback, interruptCallback, additional ) );
+
+   setCurrentAction( pEventItemAction );
+
+   pEventItemAction->onStart();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

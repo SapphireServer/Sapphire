@@ -54,6 +54,7 @@ Core::Entity::BattleNpc::BattleNpc( uint32_t modelId, uint32_t nameid, const Com
    m_type = ActorType::BattleNpc;
 
    m_mode = MODE_IDLE;
+   m_targetId = INVALID_GAME_OBJECT_ID;
 
    m_maxHp = 150;
    m_maxMp = 100;
@@ -229,7 +230,7 @@ void Core::Entity::BattleNpc::setOwner( Core::Entity::PlayerPtr pPlayer )
    }
    else
    {
-      GamePacketNew< FFXIVIpcActorOwner, ServerZoneIpcType > setOwnerPacket(getId(), INVALID_GAME_OBJECT_ID);
+      GamePacketNew< FFXIVIpcActorOwner, ServerZoneIpcType > setOwnerPacket(getId(), INVALID_GAME_OBJECT_ID );
       setOwnerPacket.data().type = 0x01;
       setOwnerPacket.data().actorId = INVALID_GAME_OBJECT_ID;
       sendToInRangeSet( setOwnerPacket );
@@ -251,15 +252,15 @@ bool Core::Entity::BattleNpc::moveTo( Common::FFXIVARR_POSITION3& pos )
       // reached destination
       return true;
 
-   float rot = Math::Util::calcAngFrom(getPos().x, getPos().z, pos.x, pos.z);
+   float rot = Math::Util::calcAngFrom( getPos().x, getPos().z, pos.x, pos.z );
    float newRot = PI - rot + (PI / 2);
 
    face( pos );
    float angle = Math::Util::calcAngFrom( getPos().x, getPos().z, pos.x, pos.z ) + PI;
    
-   float x = static_cast< float >( cosf(angle) * 1.1f );
+   float x = static_cast< float >( cosf( angle ) * 1.1f );
    float y = ( getPos().y + pos.y ) * 0.5f; // fake value while there is no collision
-   float z = static_cast< float >( sinf(angle) * 1.1f );
+   float z = static_cast< float >( sinf( angle ) * 1.1f );
 
    Common::FFXIVARR_POSITION3 newPos;
 
