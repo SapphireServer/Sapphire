@@ -53,13 +53,13 @@ std::string Core::Entity::Actor::getName() const
 /*! \return true if the actor is of type player */
 bool Core::Entity::Actor::isPlayer() const
 {
-   return ( m_type == ActorType::Player ? true : false );
+   return m_type == ActorType::Player;
 }
 
 /*! \return true if the actor is of type mob */
 bool Core::Entity::Actor::isMob() const
 {
-   return ( m_type == ActorType::BattleNpc ? true : false );
+   return m_type == ActorType::BattleNpc;
 }
 
 /*! \return list of actors currently in range */
@@ -240,10 +240,7 @@ bool Core::Entity::Actor::face( const Common::FFXIVARR_POSITION3& p )
 
    setRotation( newRot );
 
-   if( oldRot != newRot )
-      return true;
-
-   return false;
+   return oldRot != newRot ? true : false;
 }
 
 /*!
@@ -629,7 +626,8 @@ void Core::Entity::Actor::addStatusEffect( StatusEffect::StatusEffectPtr pEffect
 /*! \param StatusEffectPtr to be applied to the actor */
 void Core::Entity::Actor::addStatusEffectById( uint32_t id, int32_t duration, Entity::Actor& pSource, uint16_t param )
 {
-   StatusEffect::StatusEffectPtr effect( new StatusEffect::StatusEffect( id, pSource.shared_from_this(), shared_from_this(), duration, 3000 ) );
+   StatusEffect::StatusEffectPtr effect( new StatusEffect::StatusEffect( id, pSource.shared_from_this(),
+                                                                         shared_from_this(), duration, 3000 ) );
    effect->setParam( param );
    addStatusEffect( effect );
 }
@@ -639,7 +637,8 @@ void Core::Entity::Actor::addStatusEffectByIdIfNotExist( uint32_t id, int32_t du
 {
    if( !m_pStatusEffectContainer->hasStatusEffect( id ) )
    {
-      StatusEffect::StatusEffectPtr effect( new StatusEffect::StatusEffect( id, pSource.shared_from_this(), shared_from_this(), duration, 3000 ) );
+      StatusEffect::StatusEffectPtr effect( new StatusEffect::StatusEffect( id, pSource.shared_from_this(),
+                                                                            shared_from_this(), duration, 3000 ) );
       effect->setParam( param );
       addStatusEffect( effect );
    }
