@@ -41,7 +41,8 @@ Core::LinkshellMgr g_linkshellMgr;
 
 
 Core::ServerZone::ServerZone( const std::string& configPath, uint16_t serverId )
-   : m_configPath( configPath )
+   : m_configPath( configPath ),
+     m_bRunning( true )
 {
    m_pConfig = XMLConfigPtr( new XMLConfig );
 }
@@ -224,18 +225,32 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
    g_zoneMgr.createZones();
 
    std::vector< std::thread > thread_list;
-   thread_list.push_back( std::thread( std::bind( &Network::Hive::Run, hive.get() ) ) );
+   thread_list.emplace_back( std::thread( std::bind( &Network::Hive::Run, hive.get() ) ) );
    
    g_log.info( "Server listening on port: " + std::to_string( m_port ) );
    g_log.info( "Ready for connections..." );
 
-   while( true )
+   mainLoop();
+
+   for( auto& thread_entry : thread_list )
    {
-      std::this_thread::sleep_for( std::chrono::milliseconds( 50 ) );
+      thread_entry.join();
+   }
+
+}
+
+void Core::ServerZone::mainLoop()
+{
+   while( isRunning() )
+   {
+      this_thread::sleep_for( chrono::milliseconds( 50 ) );
 
       g_zoneMgr.updateZones();
-      std::lock_guard<std::mutex> lock( m_sessionMutex );
-      for( auto sessionIt : m_sessionMap )
+
+      auto currTime = static_cast< uint32_t >( time( nullptr ) );
+
+      lock_guard< std::mutex > lock( this->m_sessionMutex );
+      for( auto sessionIt : this->m_sessionMap )
       {
          auto session = sessionIt.second;
          if( session && session->getPlayer() )
@@ -247,9 +262,9 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
          }
       }
 
-      uint32_t currTime = static_cast< uint32_t >( time( nullptr ) );
-      auto it = m_sessionMap.begin();
-      for( ; it != m_sessionMap.end(); )
+
+      auto it = this->m_sessionMap.begin();
+      for( ; it != this->m_sessionMap.end(); )
       {
          uint32_t diff = currTime - it->second->getLastDataTime();
 
@@ -257,11 +272,11 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
 
          if( diff > 20 )
          {
-            g_log.info( "[" + std::to_string( it->second->getId() ) + "] Session time out" );
+            g_log.info("[" + std::to_string(it->second->getId() ) + "] Session time out" );
             it->second->close();
             // if( it->second.unique() )
             {
-               it = m_sessionMap.erase( it );
+               it = this->m_sessionMap.erase(it );
             }
          }
          else
@@ -272,13 +287,6 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
       }
 
    }
-
-   // currently never reached, need a "stopServer" variable to break out of the above while loop
-   /*for( auto& thread_entry : thread_list )
-   {
-      thread_entry.join();
-   }*/
-
 }
 
 bool Core::ServerZone::createSession( uint32_t sessionId )
@@ -362,5 +370,10 @@ void Core::ServerZone::updateSession( std::string playerName )
 
    if( it != m_playerSessionMap.end() )
       it->second->loadPlayer();
+}
+
+bool Core::ServerZone::isRunning() const
+{
+   return m_bRunning;
 }
 
