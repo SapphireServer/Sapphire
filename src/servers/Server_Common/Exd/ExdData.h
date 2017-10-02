@@ -250,6 +250,12 @@ namespace Core {
 
          int8_t model;              // 39
          uint8_t aspect;            // 40
+         
+         uint16_t toggle_status_id; // 42
+
+         bool affects_position;     // 47
+
+         bool is_aoe;               // Internal only
       };
 
       struct EventItemInfo

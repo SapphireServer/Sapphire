@@ -9,7 +9,7 @@
 namespace Core {
    namespace Entity {
 
-      enum class AoeFilter
+      enum class TargetFilter
       {
          All,        // All actors in the AoE are applicable for collision
          Players,    // Only players
@@ -22,8 +22,8 @@ namespace Core {
       {
       public:
 
-         static bool isActorCollisionValid( ActorPtr actorPtr, AoeFilter aoeFilter );
-         static std::set< ActorPtr > getActorsHitFromAction( Common::FFXIVARR_POSITION3 aoePosition, std::set< ActorPtr > actorsInRange, boost::shared_ptr< Data::ActionInfo > actionInfo, AoeFilter aoeFilter );
+         static bool isActorApplicable( ActorPtr actorPtr, TargetFilter targetFilter );
+         static std::set< ActorPtr > getActorsHitFromAction( Common::FFXIVARR_POSITION3 aoePosition, std::set< ActorPtr > actorsInRange, boost::shared_ptr< Data::ActionInfo > actionInfo, TargetFilter targetFilter );
          
       private:
          static bool radiusCollision( Common::FFXIVARR_POSITION3 actorPosition, Common::FFXIVARR_POSITION3 aoePosition, uint16_t radius );
