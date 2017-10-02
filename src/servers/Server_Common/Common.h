@@ -571,7 +571,7 @@ namespace Core {
          Unaspected = 7    // Doesn't imply magical unaspected damage - could be unaspected physical
       };
 
-      enum struct ActionType : int8_t
+      enum class ActionType : int8_t
       {
          WeaponOverride = -1, // Needs more investigation (takes the damage type of the equipped weapon)?
          Unknown_0 = 0,
@@ -604,7 +604,7 @@ namespace Core {
          GpGain = 14
       };
 
-      enum ActionHitSeverityType : uint8_t
+      enum class ActionHitSeverityType : uint8_t
       {
          NormalDamage = 0,
          CritHeal = 0,
@@ -612,6 +612,19 @@ namespace Core {
          NormalHeal = 1,
          DirectHitDamage = 2,
          CritDirectHitDamage = 3
+      };
+
+      enum class ActionCollisionType : uint8_t
+      {
+         None,
+         SingleTarget,
+         Circle,
+         Cone,
+         Box,
+         Unknown,
+         Unknown2,
+         PersistentArea, // for when you set aoe like asylum
+         Unknown3
       };
 
       enum HandleActionType : uint8_t
@@ -634,7 +647,7 @@ namespace Core {
          InvincibilityRefill,
          InvincibilityStayAlive,
       };
-
+     
       enum struct PlayerStateFlag : uint8_t
       {
          SomeFlag,

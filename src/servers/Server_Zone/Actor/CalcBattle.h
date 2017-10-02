@@ -5,8 +5,10 @@
 
 #include "Actor.h"
 
+using namespace Core::Entity;
+
 namespace Core {
-namespace Entity {
+namespace Data {
 
    class CalcBattle
    {

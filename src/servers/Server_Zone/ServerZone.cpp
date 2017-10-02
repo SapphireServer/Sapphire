@@ -219,10 +219,10 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
    Network::HivePtr hive( new Network::Hive() );
    Network::addServerToHive< Network::GameConnection >( m_ip, m_port, hive );
 
-   g_scriptMgr.init();
-
    g_log.info( "ZoneMgr: Setting up zones" );
    g_zoneMgr.createZones();
+
+   g_scriptMgr.init();
 
    std::vector< std::thread > thread_list;
    thread_list.emplace_back( std::thread( std::bind( &Network::Hive::Run, hive.get() ) ) );
