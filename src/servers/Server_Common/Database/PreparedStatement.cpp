@@ -3,6 +3,7 @@
 
 #include <MySqlConnector.h>
 
+#include <string.h>
 #include <sstream>
 
 Core::Db::PreparedStatement::PreparedStatement( uint32_t index ) :
