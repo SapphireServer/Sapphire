@@ -53,8 +53,7 @@ void Core::Action::EventAction::onStart()
    if( m_pSource->isPlayer() )
    {
       m_pSource->sendToInRangeSet( control, true );
-      m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::NoCombat );
-      m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::Occupied1 );
+      m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::SomeFlag );
       m_pSource->getAsPlayer()->sendStateFlags();
    }
    else
@@ -85,8 +84,7 @@ void Core::Action::EventAction::onFinish()
 
       if( m_pSource->isPlayer() )
       {
-         m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::NoCombat );
-         m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied1 );
+         m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::SomeFlag );
          m_pSource->getAsPlayer()->sendStateFlags();
          m_pSource->sendToInRangeSet( control, true );
       }
