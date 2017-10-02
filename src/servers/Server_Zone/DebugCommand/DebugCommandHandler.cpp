@@ -254,6 +254,20 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
       pPlayer->setEorzeaTimeOffset( timestamp );
       pPlayer->sendNotice( "Eorzea time offset: " + std::to_string( timestamp ) );
    }
+   else if ( subCommand == "model" )
+   {
+      uint32_t slot;
+      uint32_t val;
+      sscanf( params.c_str(), "%d %d %d", &slot, &val );
+
+      pPlayer->setModelForSlot( static_cast<Inventory::EquipSlot>( slot ), val );
+      pPlayer->sendModel();
+      pPlayer->sendDebug( "Model updated" );
+   }
+   else
+   {
+      pPlayer->sendUrgent( subCommand + " is not a valid SET command." );
+   }
 
 }
 
@@ -359,6 +373,10 @@ void Core::DebugCommandHandler::add( char * data, Core::Entity::PlayerPtr pPlaye
       pPlayer->queuePacket(controlPacket);*/
 
    }
+   else
+   {
+      pPlayer->sendUrgent( subCommand + " is not a valid ADD command." );
+   }
 
 
 }
@@ -399,6 +417,10 @@ void Core::DebugCommandHandler::get( char * data, Core::Entity::PlayerPtr pPlaye
                            std::to_string( pPlayer->getRotation() ) + "\nMapId: " +
                            std::to_string( map_id ) + "\nZoneID: " +
                            std::to_string( pPlayer->getCurrentZone()->getId() ) + "\n" );
+   }
+   else
+   {
+      pPlayer->sendUrgent( subCommand + " is not a valid GET command." );
    }
 
 }
