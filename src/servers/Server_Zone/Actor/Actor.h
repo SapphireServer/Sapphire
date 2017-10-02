@@ -150,6 +150,8 @@ protected:
    Action::ActionPtr    m_pCurrentAction;
    /*! Container for status effects */
    StatusEffect::StatusEffectContainerPtr m_pStatusEffectContainer;
+   /*! Invincibility type */
+   Common::InvincibilityType m_invincibilityType;
 
 public:
    Actor();
@@ -199,6 +201,8 @@ public:
 
    uint16_t getGp() const;
 
+   Common::InvincibilityType getInvincibilityType() const;
+
    Common::ClassJob getClass() const;
 
    uint8_t getClassAsInt() const;
@@ -224,6 +228,8 @@ public:
    void setMp( uint32_t mp );
 
    void setGp( uint32_t gp );
+
+   void setInvincibilityType( Common::InvincibilityType type );
 
    void die();
 

@@ -83,6 +83,8 @@ Core::Entity::BattleNpc::BattleNpc( uint32_t modelId, uint32_t nameid, const Com
 
    m_mobType = mobType;
 
+   m_invincibilityType = InvincibilityType::InvincibilityNone;
+
    //m_type = static_cast< Common::ActorType >( type );
 
 }
