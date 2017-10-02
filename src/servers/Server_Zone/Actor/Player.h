@@ -218,6 +218,8 @@ public:
    const uint32_t * getModelArray() const;
    /*! return the equipment model in a specified equipment slot */
    uint32_t getModelForSlot( Inventory::EquipSlot slot );
+   /*! set the equipment model in a specified equipment slot */
+   void setModelForSlot( Inventory::EquipSlot slot, uint32_t val );
    /*! return the current amount of currency of type */
    uint32_t getCurrency( uint8_t type ) const;
    /*! add amount to the currency of type */

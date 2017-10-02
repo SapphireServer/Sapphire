@@ -805,6 +805,12 @@ uint32_t Core::Entity::Player::getModelForSlot( Inventory::EquipSlot slot )
    return m_modelEquip[slot];
 }
 
+void Core::Entity::Player::setModelForSlot( Inventory::EquipSlot slot, uint32_t val )
+{
+   m_modelEquip[slot] = val;
+   setSyncFlag( PlayerSyncFlags::Status );
+}
+
 uint64_t Core::Entity::Player::getModelMainWeapon() const
 {
    return m_modelMainWeapon;
