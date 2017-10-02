@@ -634,6 +634,20 @@ namespace Core {
          Teleport
       };
 
+      enum HandleSkillType : uint8_t
+      {
+         StdDamage,
+         StdHeal,
+         StdDot,
+      };
+
+      enum InvincibilityType : uint8_t
+      {
+         InvincibilityNone,
+         InvincibilityRefill,
+         InvincibilityStayAlive,
+      };
+     
       enum struct PlayerStateFlag : uint8_t
       {
          SomeFlag,
