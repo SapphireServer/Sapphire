@@ -258,7 +258,7 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
    {
       uint32_t slot;
       uint32_t val;
-      sscanf( params.c_str(), "%d %d %d", &slot, &val );
+      sscanf( params.c_str(), "%d %d", &slot, &val );
 
       pPlayer->setModelForSlot( static_cast<Inventory::EquipSlot>( slot ), val );
       pPlayer->sendModel();
