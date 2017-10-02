@@ -74,7 +74,7 @@ bool Core::Entity::Player::loadActiveQuests()
 void Core::Entity::Player::finishQuest( uint16_t questId )
 {
 
-   int8_t idx = getQuestIndex( static_cast< uint16_t >( questId ) );
+   int16_t idx = getQuestIndex( questId );
 
    if( ( idx != -1 ) && ( m_activeQuests[idx] != nullptr ) )
    {
@@ -100,7 +100,7 @@ void Core::Entity::Player::finishQuest( uint16_t questId )
             m_questTracking[ii] = -1;
       }
 
-      boost::shared_ptr<QuestActive> pQuest = m_activeQuests[idx];
+      boost::shared_ptr< QuestActive > pQuest = m_activeQuests[idx];
       m_activeQuests[idx].reset();
 
       m_freeQuestIdxQueue.push( idx );
@@ -123,7 +123,7 @@ void Core::Entity::Player::unfinishQuest( uint16_t questId )
 void Core::Entity::Player::removeQuest( uint16_t questId )
 {
 
-   int8_t idx = getQuestIndex( static_cast< uint16_t >( questId ) );
+   int16_t idx = getQuestIndex( questId );
 
    if( ( idx != -1 ) && ( m_activeQuests[idx] != nullptr ) )
    {
@@ -973,7 +973,7 @@ uint8_t Core::Entity::Player::getQuestSeq( uint16_t questId )
    return 0;
 }
 
-void Core::Entity::Player::updateQuest( uint16_t questId, uint16_t sequence )
+void Core::Entity::Player::updateQuest( uint16_t questId, uint8_t sequence )
 {
    if( hasQuest( questId ) )
    {

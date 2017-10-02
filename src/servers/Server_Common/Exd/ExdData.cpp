@@ -345,30 +345,20 @@ bool Core::Data::ExdData::loadActionInfo()
       uint8_t points_type       = getField< uint8_t >( fields, 30 );     // 30
       uint16_t points_cost      = getField< uint16_t >( fields, 31 );    // 31
 
-<<<<<<< HEAD
+
       bool is_instant           = getField< bool >( fields, 35 );        // 35
       uint16_t cast_time        = getField< uint16_t >( fields, 36 );    // 36
       uint16_t recast_time      = getField< uint16_t >( fields, 37 );    // 37
 
       int8_t model              = getField< int8_t >( fields, 39 );      // 39
       uint8_t aspect            = getField< uint8_t >( fields, 40 );     // 40
-      
+
+      uint16_t toggle_status_id = getField< uint16_t >( fields, 42 );    // 42
+      bool affects_position     = getField< bool >( fields, 47 );        // 47
 
       info->id                  = id;
       info->name                = name;
       info->category            = category;
-=======
-      bool is_instant = getField< bool >( fields, 35 );       // 35
-      uint16_t cast_time = getField< uint16_t >( fields, 36 );    // 36
-      uint16_t recast_time = getField< uint16_t >( fields, 37 );  // 37
-
-      int8_t model = getField< int8_t >( fields, 39 );            // 39: Action model
-      uint8_t aspect = getField< uint8_t >( fields, 40 );         // 40: Action aspect
-
-      info->id = id;
-      info->name = name;
-      info->category = category;
->>>>>>> 08f4c7651fafdaf8f4d98868a94ab4688eb71379
 
       info->class_job           = class_job;
       info->unlock_level        = unlock_level;
@@ -381,6 +371,7 @@ bool Core::Data::ExdData::loadActionInfo()
       info->can_target_ko       = can_target_ko;
 
       info->is_ground_aoe       = is_ground_aoe;
+
 
       info->aoe_type            = aoe_type;
       info->aoe_range           = aoe_range;
@@ -395,6 +386,12 @@ bool Core::Data::ExdData::loadActionInfo()
 
       info->model               = model;
       info->aspect              = aspect;
+
+      info->toggle_status_id    = toggle_status_id;
+      info->affects_position    = affects_position;
+
+      // If action type is SingleTarget with an AoE radius set, or if action type isn't SingleTarget
+      info->is_aoe              = ( info->aoe_type == 1 && info->aoe_width != 0 ) || ( info->aoe_type != 1 );
 
       m_actionInfoMap.emplace( std::make_pair( info->id, info ) );
 

@@ -638,54 +638,67 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint32_t actionId, u
       getAsPlayer()->sendDebug( std::to_string( pTarget.getId() ) );
       getAsPlayer()->sendDebug( "Handle script skill type: " + std::to_string( type ) );
    }
-   
 
    auto actionInfoPtr = g_exdData.getActionInfo( actionId );
 
+   // Todo: Effect packet generator. 90% of this is basically setting params and it's basically unreadable.
    // Prepare packet. This is seemingly common for all packets in the action handler.
 
    GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket( getId() );
    effectPacket.data().targetId = pTarget.getId();
    effectPacket.data().actionAnimationId = actionId;
+   effectPacket.data().unknown_62 = 1; // Affects displaying action name next to number in floating text
    effectPacket.data().unknown_2 = 1;  // This seems to have an effect on the "double-cast finish" animation
-                                       //   effectPacket.data().unknown_3 = 1;
    effectPacket.data().actionTextId = actionId;
    effectPacket.data().numEffects = 1;
    effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRotation() );
    effectPacket.data().effectTarget = pTarget.getId();
-   effectPacket.data().effects[0].value = 0;
-   effectPacket.data().effects[0].effectType = ActionEffectType::Damage;
-   effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::NormalDamage;
-   effectPacket.data().effects[0].unknown_3 = 7;
 
+   // Todo: for each actor, calculate how much damage the calculated value should deal to them - 2-step damage calc. we only have 1-step
    switch ( type )
    {
 
    case ActionEffectType::Damage:
    {
-
-      effectPacket.data().effects[0].value = static_cast< int16_t >( param1 );
+      effectPacket.data().effects[0].value = param1;
       effectPacket.data().effects[0].effectType = ActionEffectType::Damage;
       effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::NormalDamage;
+      effectPacket.data().effects[0].unknown_3 = 7;
 
-      std::set< ActorPtr > actorsCollided = ActionCollision::getActorsHitFromAction( pTarget.getPos(), getInRangeActors( true ), actionInfoPtr, AoeFilter::Enemies );
-
-      for ( auto pHitActor : actorsCollided )
+      if ( !actionInfoPtr->is_aoe )
       {
-         effectPacket.data().targetId = pHitActor->getId();
-         effectPacket.data().unknown_1 = 1;  // the magic trick for getting it to work
-         effectPacket.data().unknown_5 = 1;
-         effectPacket.data().unknown_8 = 1;
-         effectPacket.data().actionTextId = 0;
-         effectPacket.data().effectTarget = pHitActor->getId();
-         effectPacket.data().effects[0].value = param1 + ( rand() % 15 );
+         // If action on this specific target is valid...
+         if ( isPlayer() && !ActionCollision::isActorApplicable( pTarget.shared_from_this(), TargetFilter::Enemies ) )
+            break;
 
-         pHitActor->sendToInRangeSet( effectPacket, true ); // todo: send to range of what? ourselves? when mob script hits this is going to be lacking
-         pHitActor->takeDamage( static_cast< uint32_t >( param1 ) );
-         pHitActor->onActionHostile( shared_from_this() );
+         pTarget.takeDamage( static_cast< uint32_t >( param1 ) );
+         pTarget.onActionHostile( shared_from_this() );
+         sendToInRangeSet( effectPacket, true );
+      }
+      else
+      {
 
-         if ( isPlayer() )
-            getAsPlayer()->sendDebug( "AoE hit actor " + pHitActor->getName() );
+         std::set< ActorPtr > actorsCollided = ActionCollision::getActorsHitFromAction( pTarget.getPos(), getInRangeActors( true ), actionInfoPtr, TargetFilter::Enemies );
+
+         for ( auto pHitActor : actorsCollided )
+         {
+            effectPacket.data().targetId = pHitActor->getId();
+            effectPacket.data().effectTarget = pHitActor->getId();
+
+            sendToInRangeSet( effectPacket, true ); // todo: send to range of what? ourselves? when mob script hits this is going to be lacking
+            pHitActor->takeDamage( static_cast< uint32_t >( param1 ) );
+            pHitActor->onActionHostile( shared_from_this() );
+
+            // Debug
+            if ( isPlayer() ) 
+            {
+               if ( pHitActor->isPlayer() ) {
+                  getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) + " (" + pHitActor->getName() + ")" );
+               }
+               else
+                  getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) );
+            }  
+         }
       }
 
       break;
@@ -699,29 +712,39 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint32_t actionId, u
       effectPacket.data().effects[0].effectType = ActionEffectType::Heal;
       effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::NormalHeal;
 
-      sendToInRangeSet( effectPacket, true );
-
-      // todo: get proper packets: the following was just kind of thrown together from what we know
-
-      std::set< ActorPtr > actorsCollided = ActionCollision::getActorsHitFromAction( pTarget.getPos(), getInRangeActors( true ), actionInfoPtr, AoeFilter::Allies );
-
-      for ( auto pHitActor : actorsCollided )
+      if ( !actionInfoPtr->is_aoe )
       {
-         effectPacket.data().targetId = pHitActor->getId();
-         effectPacket.data().unknown_1 = 1;  // the magic trick for getting it to work
-         effectPacket.data().unknown_5 = 1;
-         effectPacket.data().unknown_8 = 1;
-         effectPacket.data().actionTextId = 0;
-         effectPacket.data().effectTarget = pHitActor->getId();
-         effectPacket.data().effects[0].value = calculatedHeal + ( rand() % 15 );
+         if ( isPlayer() && !ActionCollision::isActorApplicable( pTarget.shared_from_this(), TargetFilter::Allies ) )
+            break;
 
-         pHitActor->sendToInRangeSet( effectPacket, true );
-         pHitActor->heal( calculatedHeal );
-
-         if ( isPlayer() )
-            getAsPlayer()->sendDebug( "AoE hit actor " + pHitActor->getName() );
+         sendToInRangeSet( effectPacket, true );
+         pTarget.heal( calculatedHeal );
       }
+      else
+      {
+         // todo: get proper packets: the following was just kind of thrown together from what we know. atm buggy (packets look "delayed" from client)
 
+         std::set< ActorPtr > actorsCollided = ActionCollision::getActorsHitFromAction( pTarget.getPos(), getInRangeActors( true ), actionInfoPtr, TargetFilter::Allies );
+
+         for ( auto pHitActor : actorsCollided )
+         {
+            effectPacket.data().targetId = pTarget.getId();
+            effectPacket.data().effectTarget = pHitActor->getId();
+
+            sendToInRangeSet( effectPacket, true );
+            pHitActor->heal( calculatedHeal );
+
+            // Debug
+            if ( isPlayer() )
+            {
+               if ( pHitActor->isPlayer() ) {
+                  getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) + " (" + pHitActor->getName() + ")" );
+               }
+               else
+                  getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) );
+            }
+         }
+      }
       break;
    }
 

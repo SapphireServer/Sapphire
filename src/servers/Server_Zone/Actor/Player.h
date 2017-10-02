@@ -103,7 +103,7 @@ public:
    /*! load data for currently active quests */
    bool loadActiveQuests();
    /*! update quest ( register it as active quest if new ) */
-   void updateQuest( uint16_t questId, uint16_t sequence );
+   void updateQuest( uint16_t questId, uint8_t sequence );
    /*! return true if quest is currently active */
    bool hasQuest( uint16_t questId );
    /*! return the current quest sequence */

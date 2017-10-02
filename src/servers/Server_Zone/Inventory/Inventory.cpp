@@ -440,14 +440,14 @@ bool Core::Inventory::removeCrystal( CrystalType type, uint32_t amount )
    return true;
 }
 
-bool Core::Inventory::isObtainable( uint32_t catalogId, uint16_t quantity )
+bool Core::Inventory::isObtainable( uint32_t catalogId, uint8_t quantity )
 {
    
    return true;
 }
 
 
-int16_t Core::Inventory::addItem( uint16_t inventoryId, int8_t slotId, uint32_t catalogId, uint16_t quantity )
+int16_t Core::Inventory::addItem( uint16_t inventoryId, int8_t slotId, uint32_t catalogId, uint8_t quantity )
 {
 
    auto itemInfo = g_exdData.getItemInfo( catalogId );
@@ -587,7 +587,7 @@ void Core::Inventory::swapItem( uint16_t fromInventoryId, uint8_t fromSlotId, ui
    {
       updateContainer( fromInventoryId, fromSlotId, nullptr );
       fromInventoryId = getArmoryToEquipSlot( toSlot );
-      fromSlotId = m_inventoryMap[fromInventoryId]->getFreeSlot();
+      fromSlotId = static_cast < uint8_t >( m_inventoryMap[fromInventoryId]->getFreeSlot() );
    }
 
    auto containerTypeFrom = getContainerType( fromInventoryId );
