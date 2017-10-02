@@ -40,11 +40,17 @@ namespace Core {
 
       Entity::BattleNpcTemplatePtr getBnpcTemplate( std::string templateName );
 
+      void mainLoop();
+
+      bool isRunning() const;
+
 
    private:
 
       uint16_t m_port;
       std::string m_ip;
+
+      bool m_bRunning;
 
       std::string m_configPath;
 

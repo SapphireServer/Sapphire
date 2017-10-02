@@ -636,6 +636,7 @@ namespace Core {
 
       enum struct PlayerStateFlag : uint8_t
       {
+         SomeFlag,
          NoCombat,
          Combat,
          Casting,
@@ -643,9 +644,9 @@ namespace Core {
          StatusAffliction1,
          Occupied,
          Occupied1,
-
          Occupied2,
          Occupied3,
+
          BoundByDuty,
          Occupied4,
          DuelingArea,
@@ -656,6 +657,7 @@ namespace Core {
          PreparingToCraft,
          Gathering,
          Fishing,
+
          BeingRaised,
          BetweenAreas,
          Stealthed,
@@ -666,9 +668,9 @@ namespace Core {
          BetweenAreas1,
          SystemError,
          LoggingOut,
+
          InvalidLocation,
          WaitingForDuty,
-
          BoundByDuty1,
          Mounting,
          WatchingCutscene,
@@ -686,9 +688,9 @@ namespace Core {
          FreeTrail,
          BeingMoved,
          Mounting2,
-
          StatusAffliction3,
          StatusAffliction4,
+
          RegisteringRaceOrMatch,
          WaitingForRaceOrMatch,
          WaitingForTripleTriadMatch,
