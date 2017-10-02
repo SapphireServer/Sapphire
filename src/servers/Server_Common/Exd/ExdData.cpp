@@ -345,7 +345,6 @@ bool Core::Data::ExdData::loadActionInfo()
       uint8_t points_type       = getField< uint8_t >( fields, 30 );     // 30
       uint16_t points_cost      = getField< uint16_t >( fields, 31 );    // 31
 
-
       bool is_instant           = getField< bool >( fields, 35 );        // 35
       uint16_t cast_time        = getField< uint16_t >( fields, 36 );    // 36
       uint16_t recast_time      = getField< uint16_t >( fields, 37 );    // 37

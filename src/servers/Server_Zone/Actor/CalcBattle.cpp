@@ -111,7 +111,6 @@ uint32_t CalcBattle::calculateMaxMp( PlayerPtr pPlayer )
    return result;
 }
 
-
 uint32_t CalcBattle::calculateHealValue( PlayerPtr pPlayer, uint32_t potency )
 {
    auto classInfoIt = g_exdData.m_classJobInfoMap.find( pPlayer->getClass() );
