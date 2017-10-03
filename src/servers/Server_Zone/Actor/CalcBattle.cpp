@@ -5,6 +5,7 @@
 #include "Player.h"
 #include <cmath>
 
+using namespace Core::Data;
 using namespace Core::Entity;
 
 extern Core::Data::ExdData g_exdData;
@@ -44,9 +45,6 @@ float CalcBattle::calculateBaseStat( PlayerPtr pPlayer )
       base = 1.63f * level + 121.02f;
    // ARR Base Stat Formula (Off by one in several cases)
    else
-      // Old: base = 0.053f * ( level * level ) + ( 1.022f * level ) - 0.907f + 20;
-      // V1: base = 0.0523f * ( level * level ) + ( 1.04f * level ) + 19.405f;
-      // V2: base = 0.05223f * ( level * level ) + ( 1.0405f * level ) + 19.405f;
       base = 0.052602f * ( level * level ) + ( 1.0179f * level ) + 19.6f;
 
    return base;
@@ -83,7 +81,7 @@ uint32_t CalcBattle::calculateMaxHp( PlayerPtr pPlayer )
    else if ( level >= 50 )
       approxBaseHp = 1700 + ( ( level - 50 ) * ( 1700 * 1.04325f ) );
    else
-      approxBaseHp = paramGrowthInfoIt->second.mp_const * 0.7596f;
+      approxBaseHp = paramGrowthInfoIt->second.mp_const * 0.7667f;
 
    uint16_t result = static_cast< uint16_t >( floor( jobModHp * ( approxBaseHp / 100.0f ) ) + floor( hpMod / 100.0f * ( vitStat - baseStat ) ) );
 
@@ -112,7 +110,6 @@ uint32_t CalcBattle::calculateMaxMp( PlayerPtr pPlayer )
 
    return result;
 }
-
 
 uint32_t CalcBattle::calculateHealValue( PlayerPtr pPlayer, uint32_t potency )
 {

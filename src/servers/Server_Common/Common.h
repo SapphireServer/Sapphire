@@ -383,6 +383,29 @@ namespace Core {
          instance,
       };
 
+      enum TerritoryIntendedUseType : uint8_t //ToDo: Add The Rest of The Territory Types and Have Better Names For Them
+      {
+         Town = 0,
+         OpenWorld = 1,
+         Inn = 2,
+         Dungeon = 3,
+         JailArea = 5,
+         OpeningArea = 6,
+         BeforeTrialDung = 7,
+         AllianceRaid = 8,
+         OpenWorldInstanceBattle = 9,
+         Trial = 10,
+         HousingArea = 13,
+         HousingPrivateArea = 14,
+         MSQPrivateArea = 15,
+         Raids = 16,
+         RaidFights = 17,
+         ChocoboTutorial = 21,
+         Wedding = 22,
+         BeginnerTutorial = 27,
+         PalaceOfTheDead = 31,
+      };
+
       enum CharaLook : uint8_t
       {
          Race = 0x00,
@@ -548,7 +571,7 @@ namespace Core {
          Unaspected = 7    // Doesn't imply magical unaspected damage - could be unaspected physical
       };
 
-      enum struct ActionType : int8_t
+      enum class ActionType : int8_t
       {
          WeaponOverride = -1, // Needs more investigation (takes the damage type of the equipped weapon)?
          Unknown_0 = 0,
@@ -581,7 +604,7 @@ namespace Core {
          GpGain = 14
       };
 
-      enum ActionHitSeverityType : uint8_t
+      enum class ActionHitSeverityType : uint8_t
       {
          NormalDamage = 0,
          CritHeal = 0,
@@ -589,6 +612,19 @@ namespace Core {
          NormalHeal = 1,
          DirectHitDamage = 2,
          CritDirectHitDamage = 3
+      };
+
+      enum class ActionCollisionType : uint8_t
+      {
+         None,
+         SingleTarget,
+         Circle,
+         Cone,
+         Box,
+         Unknown,
+         Unknown2,
+         PersistentArea, // for when you set aoe like asylum
+         Unknown3
       };
 
       enum HandleActionType : uint8_t
@@ -605,8 +641,16 @@ namespace Core {
          StdDot,
       };
 
+      enum InvincibilityType : uint8_t
+      {
+         InvincibilityNone,
+         InvincibilityRefill,
+         InvincibilityStayAlive,
+      };
+     
       enum struct PlayerStateFlag : uint8_t
       {
+         SomeFlag,
          NoCombat,
          Combat,
          Casting,
@@ -614,9 +658,9 @@ namespace Core {
          StatusAffliction1,
          Occupied,
          Occupied1,
-
          Occupied2,
          Occupied3,
+
          BoundByDuty,
          Occupied4,
          DuelingArea,
@@ -627,6 +671,7 @@ namespace Core {
          PreparingToCraft,
          Gathering,
          Fishing,
+
          BeingRaised,
          BetweenAreas,
          Stealthed,
@@ -637,9 +682,9 @@ namespace Core {
          BetweenAreas1,
          SystemError,
          LoggingOut,
+
          InvalidLocation,
          WaitingForDuty,
-
          BoundByDuty1,
          Mounting,
          WatchingCutscene,
@@ -657,9 +702,9 @@ namespace Core {
          FreeTrail,
          BeingMoved,
          Mounting2,
-
          StatusAffliction3,
          StatusAffliction4,
+
          RegisteringRaceOrMatch,
          WaitingForRaceOrMatch,
          WaitingForTripleTriadMatch,

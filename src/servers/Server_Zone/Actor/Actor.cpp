@@ -1,6 +1,7 @@
 #include <src/servers/Server_Common/Util/Util.h>
 #include <src/servers/Server_Common/Util/UtilMath.h>
 #include <src/servers/Server_Common/Network/PacketContainer.h>
+#include <src/servers/Server_Common/Exd/ExdData.h>
 
 #include "src/servers/Server_Zone/Forwards.h"
 #include "src/servers/Server_Zone/Action/Action.h"
@@ -15,11 +16,14 @@
 
 #include "src/servers/Server_Zone/StatusEffect/StatusEffectContainer.h"
 #include "src/servers/Server_Zone/StatusEffect/StatusEffect.h"
+#include "src/servers/Server_Zone/Action/ActionCollision.h"
 #include "src/servers/Server_Zone/ServerZone.h"
 #include "src/servers/Server_Zone/Session.h"
+#include "CalcBattle.h"
 #include "Player.h"
 
 extern Core::ServerZone g_serverZone;
+extern Core::Data::ExdData g_exdData;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -53,13 +57,13 @@ std::string Core::Entity::Actor::getName() const
 /*! \return true if the actor is of type player */
 bool Core::Entity::Actor::isPlayer() const
 {
-   return ( m_type == ActorType::Player ? true : false );
+   return m_type == ActorType::Player;
 }
 
 /*! \return true if the actor is of type mob */
 bool Core::Entity::Actor::isMob() const
 {
-   return ( m_type == ActorType::BattleNpc ? true : false );
+   return m_type == ActorType::BattleNpc;
 }
 
 /*! \return list of actors currently in range */
@@ -107,6 +111,12 @@ uint16_t Core::Entity::Actor::getTp() const
 uint16_t Core::Entity::Actor::getGp() const
 {
    return m_gp;
+}
+
+/*! \return current invincibility type */
+InvincibilityType Core::Entity::Actor::getInvincibilityType() const
+{
+   return m_invincibilityType;
 }
 
 /*! \return current class or job */
@@ -161,31 +171,43 @@ uint32_t Core::Entity::Actor::getMaxMp() const
 void Core::Entity::Actor::resetHp()
 {
    m_hp = getMaxHp();
+   sendStatusUpdate( true );
 }
 
 /*! \return reset mp to current max mp */
 void Core::Entity::Actor::resetMp()
 {
    m_mp = getMaxMp();
+   sendStatusUpdate( true );
 }
 
 /*! \param hp amount to set ( caps to maxHp ) */
 void Core::Entity::Actor::setHp( uint32_t hp )
 {
    m_hp = hp < getMaxHp() ? hp : getMaxHp();
+   sendStatusUpdate( true );
 }
 
 /*! \param mp amount to set ( caps to maxMp ) */
 void Core::Entity::Actor::setMp( uint32_t mp )
 {
    m_mp = mp < getMaxMp() ? mp : getMaxMp();
+   sendStatusUpdate( true );
 }
 
-/*! \param mp amount to set ( caps to maxMp ) */
+/*! \param gp amount to set*/
 void Core::Entity::Actor::setGp( uint32_t gp )
 {
    m_gp = gp;
+   sendStatusUpdate( true );
 }
+
+/*! \param type invincibility type to set */
+void Core::Entity::Actor::setInvincibilityType( Common::InvincibilityType type )
+{
+   m_invincibilityType = type;
+}
+
 
 /*! \return current status of the actor */
 Core::Entity::Actor::ActorStatus Core::Entity::Actor::getStatus() const
@@ -240,10 +262,7 @@ bool Core::Entity::Actor::face( const Common::FFXIVARR_POSITION3& p )
 
    setRotation( newRot );
 
-   if( oldRot != newRot )
-      return true;
-
-   return false;
+   return oldRot != newRot ? true : false;
 }
 
 /*!
@@ -331,8 +350,18 @@ void Core::Entity::Actor::takeDamage( uint32_t damage )
 {
    if( damage >= m_hp )
    {
-      m_hp = 0;
-      die();
+      switch( m_invincibilityType ) { 
+         case InvincibilityNone: 
+            setHp( 0 );
+            die();
+            break;
+         case InvincibilityRefill:
+            resetHp();
+            break;
+         case InvincibilityStayAlive:
+            setHp( 0 );
+            break;
+      }
    }
    else
       m_hp -= damage;
@@ -620,6 +649,135 @@ void Core::Entity::Actor::autoAttack( ActorPtr pTarget )
    }
 }
 
+/*!
+ChaiScript Skill Handler.
+
+\param GamePacketPtr to send
+\param bool should be send to self?
+*/
+void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint32_t actionId, uint64_t param1, uint64_t param2, Entity::Actor& pTarget )
+{
+
+   if ( isPlayer() )
+   {
+      getAsPlayer()->sendDebug( std::to_string( pTarget.getId() ) );
+      getAsPlayer()->sendDebug( "Handle script skill type: " + std::to_string( type ) );
+   }
+
+   auto actionInfoPtr = g_exdData.getActionInfo( actionId );
+
+   // Todo: Effect packet generator. 90% of this is basically setting params and it's basically unreadable.
+   // Prepare packet. This is seemingly common for all packets in the action handler.
+
+   GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket( getId() );
+   effectPacket.data().targetId = pTarget.getId();
+   effectPacket.data().actionAnimationId = actionId;
+   effectPacket.data().unknown_62 = 1; // Affects displaying action name next to number in floating text
+   effectPacket.data().unknown_2 = 1;  // This seems to have an effect on the "double-cast finish" animation
+   effectPacket.data().actionTextId = actionId;
+   effectPacket.data().numEffects = 1;
+   effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRotation() );
+   effectPacket.data().effectTarget = pTarget.getId();
+
+   // Todo: for each actor, calculate how much damage the calculated value should deal to them - 2-step damage calc. we only have 1-step
+   switch ( type )
+   {
+
+   case ActionEffectType::Damage:
+   {
+      effectPacket.data().effects[0].value = param1;
+      effectPacket.data().effects[0].effectType = ActionEffectType::Damage;
+      effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::NormalDamage;
+      effectPacket.data().effects[0].unknown_3 = 7;
+
+      if ( !actionInfoPtr->is_aoe )
+      {
+         // If action on this specific target is valid...
+         if ( isPlayer() && !ActionCollision::isActorApplicable( pTarget.shared_from_this(), TargetFilter::Enemies ) )
+            break;
+
+         pTarget.takeDamage( static_cast< uint32_t >( param1 ) );
+         pTarget.onActionHostile( shared_from_this() );
+         sendToInRangeSet( effectPacket, true );
+      }
+      else
+      {
+
+         std::set< ActorPtr > actorsCollided = ActionCollision::getActorsHitFromAction( pTarget.getPos(), getInRangeActors( true ), actionInfoPtr, TargetFilter::Enemies );
+
+         for ( auto pHitActor : actorsCollided )
+         {
+            effectPacket.data().targetId = pHitActor->getId();
+            effectPacket.data().effectTarget = pHitActor->getId();
+
+            sendToInRangeSet( effectPacket, true ); // todo: send to range of what? ourselves? when mob script hits this is going to be lacking
+            pHitActor->takeDamage( static_cast< uint32_t >( param1 ) );
+            pHitActor->onActionHostile( shared_from_this() );
+
+            // Debug
+            if ( isPlayer() ) 
+            {
+               if ( pHitActor->isPlayer() ) {
+                  getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) + " (" + pHitActor->getName() + ")" );
+               }
+               else
+                  getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) );
+            }  
+         }
+      }
+
+      break;
+   }
+
+   case ActionEffectType::Heal:
+   {
+      uint32_t calculatedHeal = Data::CalcBattle::calculateHealValue( getAsPlayer(), static_cast< uint32_t >( param1 ) );
+
+      effectPacket.data().effects[0].value = calculatedHeal;
+      effectPacket.data().effects[0].effectType = ActionEffectType::Heal;
+      effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::NormalHeal;
+
+      if ( !actionInfoPtr->is_aoe )
+      {
+         if ( isPlayer() && !ActionCollision::isActorApplicable( pTarget.shared_from_this(), TargetFilter::Allies ) )
+            break;
+
+         sendToInRangeSet( effectPacket, true );
+         pTarget.heal( calculatedHeal );
+      }
+      else
+      {
+         // todo: get proper packets: the following was just kind of thrown together from what we know. atm buggy (packets look "delayed" from client)
+
+         std::set< ActorPtr > actorsCollided = ActionCollision::getActorsHitFromAction( pTarget.getPos(), getInRangeActors( true ), actionInfoPtr, TargetFilter::Allies );
+
+         for ( auto pHitActor : actorsCollided )
+         {
+            effectPacket.data().targetId = pTarget.getId();
+            effectPacket.data().effectTarget = pHitActor->getId();
+
+            sendToInRangeSet( effectPacket, true );
+            pHitActor->heal( calculatedHeal );
+
+            // Debug
+            if ( isPlayer() )
+            {
+               if ( pHitActor->isPlayer() ) {
+                  getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) + " (" + pHitActor->getName() + ")" );
+               }
+               else
+                  getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) );
+            }
+         }
+      }
+      break;
+   }
+
+   default:
+      break;
+   }
+}
+
 /*! \param StatusEffectPtr to be applied to the actor */
 void Core::Entity::Actor::addStatusEffect( StatusEffect::StatusEffectPtr pEffect )
 {
@@ -629,7 +787,8 @@ void Core::Entity::Actor::addStatusEffect( StatusEffect::StatusEffectPtr pEffect
 /*! \param StatusEffectPtr to be applied to the actor */
 void Core::Entity::Actor::addStatusEffectById( uint32_t id, int32_t duration, Entity::Actor& pSource, uint16_t param )
 {
-   StatusEffect::StatusEffectPtr effect( new StatusEffect::StatusEffect( id, pSource.shared_from_this(), shared_from_this(), duration, 3000 ) );
+   StatusEffect::StatusEffectPtr effect( new StatusEffect::StatusEffect( id, pSource.shared_from_this(),
+                                                                         shared_from_this(), duration, 3000 ) );
    effect->setParam( param );
    addStatusEffect( effect );
 }
@@ -639,7 +798,8 @@ void Core::Entity::Actor::addStatusEffectByIdIfNotExist( uint32_t id, int32_t du
 {
    if( !m_pStatusEffectContainer->hasStatusEffect( id ) )
    {
-      StatusEffect::StatusEffectPtr effect( new StatusEffect::StatusEffect( id, pSource.shared_from_this(), shared_from_this(), duration, 3000 ) );
+      StatusEffect::StatusEffectPtr effect( new StatusEffect::StatusEffect( id, pSource.shared_from_this(),
+                                                                            shared_from_this(), duration, 3000 ) );
       effect->setParam( param );
       addStatusEffect( effect );
    }

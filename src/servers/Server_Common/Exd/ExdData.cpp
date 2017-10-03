@@ -323,70 +323,74 @@ bool Core::Data::ExdData::loadActionInfo()
          continue;
       }
 
-      std::string name = getField< std::string >( fields, 0 );    // 0
-      uint8_t category = getField< uint8_t >( fields, 3 );        // 3
+      std::string name          = getField< std::string >( fields, 0 );  // 0
+      uint8_t category          = getField< uint8_t >( fields, 3 );      // 3
 
-      int8_t class_job = getField< int8_t >( fields, 10 );        // 10
-      uint8_t unlock_level = getField< uint8_t >( fields, 11 );   // 11
-      int8_t range = getField< int8_t >( fields, 13 );            // 13
-      bool can_target_self = getField< bool >( fields, 14 );      // 14
-      bool can_target_party = getField< bool>( fields, 15 );      // 15
-      bool can_target_friendly = getField< bool >( fields, 16 );  // 16
-      bool can_target_enemy = getField< bool >( fields, 17 );     // 17
+      int8_t class_job          = getField< int8_t >( fields, 10 );      // 10
+      uint8_t unlock_level      = getField< uint8_t >( fields, 11 );     // 11
+      int8_t range              = getField< int8_t >( fields, 13 );      // 13
+      bool can_target_self      = getField< bool >( fields, 14 );        // 14
+      bool can_target_party     = getField< bool>( fields, 15 );         // 15
+      bool can_target_friendly  = getField< bool >( fields, 16 );        // 16
+      bool can_target_enemy     = getField< bool >( fields, 17 );        // 17
 
-      bool is_aoe = getField< bool >( fields, 20 );               // 20
+      bool is_ground_aoe        = getField< bool >( fields, 20 );        // 20
       // Column 23: Seems to be related to raising skills (Raise, Resurrection, Reanimate)
-      bool can_target_ko = getField< bool >( fields, 24 );        // 24
+      bool can_target_ko        = getField< bool >( fields, 24 );        // 24
 
-      uint8_t aoe_type = getField< uint8_t >( fields, 26 );       // 26
-      uint8_t radius = getField< uint8_t >( fields, 27 );         // 27
+      uint8_t aoe_type          = getField< uint8_t >( fields, 26 );     // 26
+      uint8_t aoe_range         = getField< uint8_t >( fields, 27 );     // 27
+      uint8_t aoe_width         = getField< uint8_t >( fields, 28 );     // 28
 
-      uint8_t points_type = getField< uint8_t >( fields, 30 );    // 30
-      uint16_t points_cost = getField< uint16_t >( fields, 31 );  // 31
+      uint8_t points_type       = getField< uint8_t >( fields, 30 );     // 30
+      uint16_t points_cost      = getField< uint16_t >( fields, 31 );    // 31
 
-      uint32_t instantval = getField< bool >( fields, 35 );       // 35
-      uint16_t cast_time = getField< uint16_t >( fields, 36 );    // 36
-      uint16_t recast_time = getField< uint16_t >( fields, 37 );  // 37
+      bool is_instant           = getField< bool >( fields, 35 );        // 35
+      uint16_t cast_time        = getField< uint16_t >( fields, 36 );    // 36
+      uint16_t recast_time      = getField< uint16_t >( fields, 37 );    // 37
 
-      int8_t model = getField< int8_t >( fields, 39 );            // 39: Action model
-      uint8_t aspect = getField< uint8_t >( fields, 40 );         // 40: Action aspect
+      int8_t model              = getField< int8_t >( fields, 39 );      // 39
+      uint8_t aspect            = getField< uint8_t >( fields, 40 );     // 40
 
-      uint8_t typeshift = 0x6;
-      uint8_t mask = 1 << typeshift;
-      instantval &= mask;
-      bool final = ( instantval & mask ) == mask;
-      bool is_instant = final;
+      uint16_t toggle_status_id = getField< uint16_t >( fields, 42 );    // 42
+      bool affects_position     = getField< bool >( fields, 47 );        // 47
 
-      
+      info->id                  = id;
+      info->name                = name;
+      info->category            = category;
 
-      info->id = id;
-      info->name = name;
-      info->category = category;
-
-      info->class_job = class_job;
-      info->unlock_level = unlock_level;
-      info->range = range;
-      info->can_target_self = can_target_self;
-      info->can_target_party = can_target_party;
+      info->class_job           = class_job;
+      info->unlock_level        = unlock_level;
+      info->range               = range;
+      info->can_target_self     = can_target_self;
+      info->can_target_party    = can_target_party;
       info->can_target_friendly = can_target_friendly;
-      info->can_target_enemy = can_target_enemy;
+      info->can_target_enemy    = can_target_enemy;
 
-      info->can_target_ko = can_target_ko;
+      info->can_target_ko       = can_target_ko;
 
-      info->is_aoe = is_aoe;
+      info->is_ground_aoe       = is_ground_aoe;
 
-      info->aoe_type = aoe_type;
-      info->radius = radius;
 
-      info->points_type = points_type;
-      info->points_cost = points_cost;
+      info->aoe_type            = aoe_type;
+      info->aoe_range           = aoe_range;
+      info->aoe_width           = aoe_width;
 
-      info->is_instant = is_instant;
-      info->cast_time = cast_time * 100;
-      info->recast_time = recast_time * 100;
+      info->points_type         = points_type;
+      info->points_cost         = points_cost;
 
-      info->model = model;
-      info->aspect = aspect;
+      info->is_instant          = is_instant;
+      info->cast_time           = cast_time * 100;
+      info->recast_time         = recast_time * 100;
+
+      info->model               = model;
+      info->aspect              = aspect;
+
+      info->toggle_status_id    = toggle_status_id;
+      info->affects_position    = affects_position;
+
+      // If action type is SingleTarget with an AoE radius set, or if action type isn't SingleTarget
+      info->is_aoe              = ( info->aoe_type == 1 && info->aoe_width != 0 ) || ( info->aoe_type != 1 );
 
       m_actionInfoMap.emplace( std::make_pair( info->id, info ) );
 

@@ -104,7 +104,7 @@ private:
    uint32_t m_unk2;
    std::set< HateListEntry* > m_hateList;
    ActorPtr m_pOwner;
-   int32_t m_timeOfDeath;
+   uint32_t m_timeOfDeath;
    uint32_t m_mobType;
 
 };

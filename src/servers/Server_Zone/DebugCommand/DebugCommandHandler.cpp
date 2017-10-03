@@ -239,25 +239,6 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
        else
            pPlayer->setClassJob( static_cast<Core::Common::ClassJob> ( id ) );
    }
-   else if( subCommand == "no" )
-   {
-      int32_t id;
-
-      sscanf( params.c_str(), "%d", &id );
-
-      uint8_t typeshift = 0x6;
-      uint8_t mask = 1 << typeshift;
-      id &= mask;
-      bool final = ( id & mask ) == mask;
-      pPlayer->sendDebug( std::to_string(final) );
-   }
-   else if( subCommand == "aaah" )
-   {
-      int32_t id;
-      sscanf( params.c_str(), "%d", &id );
-      
-      pPlayer->sendDebug( std::to_string( pPlayer->actionHasCastTime( id ) ) );
-   }
    else if ( subCommand == "cfpenalty" )
    {
       int32_t minutes;
@@ -272,6 +253,20 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
 
       pPlayer->setEorzeaTimeOffset( timestamp );
       pPlayer->sendNotice( "Eorzea time offset: " + std::to_string( timestamp ) );
+   }
+   else if ( subCommand == "model" )
+   {
+      uint32_t slot;
+      uint32_t val;
+      sscanf( params.c_str(), "%d %d", &slot, &val );
+
+      pPlayer->setModelForSlot( static_cast<Inventory::EquipSlot>( slot ), val );
+      pPlayer->sendModel();
+      pPlayer->sendDebug( "Model updated" );
+   }
+   else
+   {
+      pPlayer->sendUrgent( subCommand + " is not a valid SET command." );
    }
 
 }
@@ -378,6 +373,10 @@ void Core::DebugCommandHandler::add( char * data, Core::Entity::PlayerPtr pPlaye
       pPlayer->queuePacket(controlPacket);*/
 
    }
+   else
+   {
+      pPlayer->sendUrgent( subCommand + " is not a valid ADD command." );
+   }
 
 
 }
@@ -418,6 +417,10 @@ void Core::DebugCommandHandler::get( char * data, Core::Entity::PlayerPtr pPlaye
                            std::to_string( pPlayer->getRotation() ) + "\nMapId: " +
                            std::to_string( map_id ) + "\nZoneID: " +
                            std::to_string( pPlayer->getCurrentZone()->getId() ) + "\n" );
+   }
+   else
+   {
+      pPlayer->sendUrgent( subCommand + " is not a valid GET command." );
    }
 
 }
@@ -486,6 +489,7 @@ void Core::DebugCommandHandler::nudge( char * data, Entity::PlayerPtr pPlayer, b
 
 void Core::DebugCommandHandler::serverInfo( char * data, Core::Entity::PlayerPtr pPlayer, boost::shared_ptr< Core::DebugCommand > command )
 {
-   pPlayer->sendDebug( "SapphireServer " + Version::VERSION + " - " + Version::GIT_HASH );
+   pPlayer->sendDebug( "SapphireServer " + Version::VERSION + "\nRev: " + Version::GIT_HASH );
+   pPlayer->sendDebug( "Compiled: " __DATE__ " " __TIME__ );
    pPlayer->sendDebug( "Sessions: " + std::to_string( g_serverZone.getSessionCount() ) );
 }

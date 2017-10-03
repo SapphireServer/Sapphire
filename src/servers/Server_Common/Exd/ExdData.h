@@ -233,12 +233,13 @@ namespace Core {
          bool can_target_friendly;  // 16
          bool can_target_enemy;     // 17
 
-         bool is_aoe;               // 20
+         bool is_ground_aoe;        // 20
 
          bool can_target_ko;        // 24
 
          uint8_t aoe_type;          // 26
-         uint8_t radius;            // 27
+         uint8_t aoe_range;         // 27
+         uint8_t aoe_width;         // 28
 
          uint8_t points_type;       // 30
          uint16_t points_cost;      // 31
@@ -249,6 +250,12 @@ namespace Core {
 
          int8_t model;              // 39
          uint8_t aspect;            // 40
+         
+         uint16_t toggle_status_id; // 42
+
+         bool affects_position;     // 47
+
+         bool is_aoe;               // Internal only
       };
 
       struct EventItemInfo
