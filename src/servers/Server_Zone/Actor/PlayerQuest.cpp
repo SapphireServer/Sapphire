@@ -91,8 +91,6 @@ void Core::Entity::Player::finishQuest( uint16_t questId )
       queuePacket( questFinishPacket );
 
       updateQuestsCompleted( questId );
-      setSyncFlag( PlayerSyncFlags::Quests );
-      setSyncFlag( PlayerSyncFlags::QuestTracker );
 
       for( int32_t ii = 0; ii < 5; ii++ )
       {
@@ -116,7 +114,6 @@ void Core::Entity::Player::finishQuest( uint16_t questId )
 void Core::Entity::Player::unfinishQuest( uint16_t questId )
 {
    removeQuestsCompleted( questId );
-   setSyncFlag( PlayerSyncFlags::Quests );
    sendQuestInfo();
 }
 
@@ -139,9 +136,6 @@ void Core::Entity::Player::removeQuest( uint16_t questId )
       questFinishPacket.data().flag1 = 1;
       questFinishPacket.data().flag2 = 1;
       queuePacket( questFinishPacket );
-
-      setSyncFlag( PlayerSyncFlags::Quests );
-      setSyncFlag( PlayerSyncFlags::QuestTracker );
 
       for( int32_t ii = 0; ii < 5; ii++ )
       {
@@ -550,7 +544,6 @@ void Core::Entity::Player::setQuestUI8A( uint16_t questId, uint8_t val )
       pNewQuest->c.UI8A = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
-      setSyncFlag( PlayerSyncFlags::Quests );
    }
 }
 
@@ -565,7 +558,6 @@ void Core::Entity::Player::setQuestUI8B( uint16_t questId, uint8_t val )
       pNewQuest->c.UI8B = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
-      setSyncFlag( PlayerSyncFlags::Quests );
    }
 }
 
@@ -580,7 +572,6 @@ void Core::Entity::Player::setQuestUI8C( uint16_t questId, uint8_t val )
       pNewQuest->c.UI8C = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
-      setSyncFlag( PlayerSyncFlags::Quests );
    }
 }
 
@@ -595,7 +586,6 @@ void Core::Entity::Player::setQuestUI8D( uint16_t questId, uint8_t val )
       pNewQuest->c.UI8D = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
-      setSyncFlag( PlayerSyncFlags::Quests );
    }
 }
 
@@ -610,7 +600,6 @@ void Core::Entity::Player::setQuestUI8E( uint16_t questId, uint8_t val )
       pNewQuest->c.UI8E = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
-      setSyncFlag( PlayerSyncFlags::Quests );
    }
 }
 
@@ -625,7 +614,6 @@ void Core::Entity::Player::setQuestUI8F( uint16_t questId, uint8_t val )
       pNewQuest->c.UI8F = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
-      setSyncFlag( PlayerSyncFlags::Quests );
    }
 }
 
@@ -640,7 +628,6 @@ void Core::Entity::Player::setQuestUI8AH( uint16_t questId, uint8_t val )
       pNewQuest->b.UI8AH = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
-      setSyncFlag( PlayerSyncFlags::Quests );
    }
 }
 
@@ -655,7 +642,6 @@ void Core::Entity::Player::setQuestUI8BH( uint16_t questId, uint8_t val )
       pNewQuest->b.UI8BH = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
-      setSyncFlag( PlayerSyncFlags::Quests );
    }
 }
 
@@ -670,7 +656,6 @@ void Core::Entity::Player::setQuestUI8CH( uint16_t questId, uint8_t val )
       pNewQuest->b.UI8CH = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
-      setSyncFlag( PlayerSyncFlags::Quests );
    }
 }
 
@@ -685,7 +670,6 @@ void Core::Entity::Player::setQuestUI8DH( uint16_t questId, uint8_t val )
       pNewQuest->b.UI8DH = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
-      setSyncFlag( PlayerSyncFlags::Quests );
    }
 }
 
@@ -700,7 +684,6 @@ void Core::Entity::Player::setQuestUI8EH( uint16_t questId, uint8_t val )
       pNewQuest->b.UI8EH = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
-      setSyncFlag( PlayerSyncFlags::Quests );
    }
 }
 
@@ -715,7 +698,6 @@ void Core::Entity::Player::setQuestUI8FH( uint16_t questId, uint8_t val )
       pNewQuest->b.UI8FH = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
-      setSyncFlag( PlayerSyncFlags::Quests );
    }
 }
 
@@ -730,7 +712,6 @@ void Core::Entity::Player::setQuestUI8AL( uint16_t questId, uint8_t val )
       pNewQuest->b.UI8AL = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
-      setSyncFlag( PlayerSyncFlags::Quests );
    }
 }
 
@@ -745,7 +726,6 @@ void Core::Entity::Player::setQuestUI8BL( uint16_t questId, uint8_t val )
       pNewQuest->b.UI8BL = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
-      setSyncFlag( PlayerSyncFlags::Quests );
    }
 }
 
@@ -760,7 +740,6 @@ void Core::Entity::Player::setQuestUI8CL( uint16_t questId, uint8_t val )
       pNewQuest->b.UI8CL = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
-      setSyncFlag( PlayerSyncFlags::Quests );
    }
 }
 
@@ -775,7 +754,6 @@ void Core::Entity::Player::setQuestUI8DL( uint16_t questId, uint8_t val )
       pNewQuest->b.UI8DL = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
-      setSyncFlag( PlayerSyncFlags::Quests );
    }
 }
 
@@ -790,7 +768,6 @@ void Core::Entity::Player::setQuestUI8EL( uint16_t questId, uint8_t val )
       pNewQuest->b.UI8EL = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
-      setSyncFlag( PlayerSyncFlags::Quests );
    }
 }
 
@@ -805,7 +782,6 @@ void Core::Entity::Player::setQuestUI8FL( uint16_t questId, uint8_t val )
       pNewQuest->b.UI8FL = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
-      setSyncFlag( PlayerSyncFlags::Quests );
    }
 }
 
@@ -820,7 +796,6 @@ void Core::Entity::Player::setQuestUI16A( uint16_t questId, uint16_t val )
    //   pNewQuest->d.UI16A = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
-      setSyncFlag( PlayerSyncFlags::Quests );
    }
 }
 
@@ -836,7 +811,6 @@ void Core::Entity::Player::setQuestUI16B( uint16_t questId, uint16_t val )
     //  pNewQuest->d.UI16B = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
-      setSyncFlag( PlayerSyncFlags::Quests );
    }
 }
 
@@ -851,7 +825,6 @@ void Core::Entity::Player::setQuestUI16C( uint16_t questId, uint16_t val )
 //      pNewQuest->d.UI16C = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
-      setSyncFlag( PlayerSyncFlags::Quests );
    }
 }
 
@@ -866,7 +839,6 @@ void Core::Entity::Player::setQuestUI32A( uint16_t questId, uint32_t val )
      // pNewQuest->e.UI32A = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
-      setSyncFlag( PlayerSyncFlags::Quests );
    }
 }
 
@@ -881,7 +853,6 @@ void Core::Entity::Player::setQuestBitFlag8( uint16_t questId, uint8_t val )
       pNewQuest->a.BitFlag8 = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
-      setSyncFlag( PlayerSyncFlags::Quests );
    }
 }
 
@@ -896,7 +867,6 @@ void Core::Entity::Player::setQuestBitFlag16( uint16_t questId, uint8_t val )
       pNewQuest->a.BitFlag16 = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
-      setSyncFlag( PlayerSyncFlags::Quests );
    }
 }
 
@@ -911,7 +881,6 @@ void Core::Entity::Player::setQuestBitFlag24( uint16_t questId, uint8_t val )
       pNewQuest->a.BitFlag24 = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
-      setSyncFlag( PlayerSyncFlags::Quests );
    }
 }
 void Core::Entity::Player::setQuestBitFlag32( uint16_t questId, uint8_t val )
@@ -925,7 +894,6 @@ void Core::Entity::Player::setQuestBitFlag32( uint16_t questId, uint8_t val )
       pNewQuest->a.BitFlag32 = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
-      setSyncFlag( PlayerSyncFlags::Quests );
    }
 }
 
@@ -940,7 +908,6 @@ void Core::Entity::Player::setQuestBitFlag40( uint16_t questId, uint8_t val )
       pNewQuest->a.BitFlag40 = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
-      setSyncFlag( PlayerSyncFlags::Quests );
    }
 }
 
@@ -955,7 +922,6 @@ void Core::Entity::Player::setQuestBitFlag48( uint16_t questId, uint8_t val )
       pNewQuest->a.BitFlag48 = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
-      setSyncFlag( PlayerSyncFlags::Quests );
    }
 }
 
@@ -985,8 +951,6 @@ void Core::Entity::Player::updateQuest( uint16_t questId, uint8_t sequence )
       pe_qa.data().questInfo = *pNewQuest;
       queuePacket( pe_qa );
 
-      setSyncFlag( PlayerSyncFlags::Quests );
-
    }
    else
    {
@@ -1011,9 +975,6 @@ void Core::Entity::Player::updateQuest( uint16_t questId, uint8_t sequence )
 
 
       queuePacket( pe_qa );
-
-      setSyncFlag( PlayerSyncFlags::Quests );
-      setSyncFlag( PlayerSyncFlags::QuestTracker );
 
       for( int32_t ii = 0; ii < 5; ii++ )
       {
@@ -1071,8 +1032,6 @@ void Core::Entity::Player::setQuestTracker( uint16_t index, int16_t flag )
       }
    }
 
-   setSyncFlag( PlayerSyncFlags::QuestTracker );
-
 }
 
 
@@ -1115,8 +1074,6 @@ void Core::Entity::Player::updateQuestsCompleted( uint32_t questId )
    uint8_t value = 0x80 >> bitIndex;
 
    m_questCompleteFlags[index] |= value;
-
-   setSyncFlag( PlayerSyncFlags::Quests );
 }
 
 void Core::Entity::Player::removeQuestsCompleted( uint32_t questId )
@@ -1128,7 +1085,6 @@ void Core::Entity::Player::removeQuestsCompleted( uint32_t questId )
 
    m_questCompleteFlags[index] ^= value;
 
-   setSyncFlag( PlayerSyncFlags::Quests );
 }
 
 bool Core::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t optionalChoice )

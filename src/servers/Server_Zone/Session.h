@@ -24,8 +24,10 @@ namespace Core {
       Network::GameConnectionPtr getChatConnection() const;
 
       uint32_t getLastDataTime() const;
+      uint32_t getLastSqlTime() const;
 
       void updateLastDataTime();
+      void updateLastSqlTime();
 
       void close();
 
@@ -43,6 +45,8 @@ namespace Core {
       Entity::PlayerPtr m_pPlayer;
 
       uint32_t m_lastDataTime;
+
+      uint32_t m_lastSqlTime;
 
       Network::GameConnectionPtr m_pZoneConnection;
       Network::GameConnectionPtr m_pChatConnection;

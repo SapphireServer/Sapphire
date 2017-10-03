@@ -333,7 +333,6 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
    g_log.setLogPath( "log\\SapphireZone_" );
    g_log.init();
 
-
    printBanner();
 
    if( !loadSettings( argc, argv ) )

@@ -370,9 +370,6 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       break;
    }
 
-   pPlayer->setSyncFlag( Common::PlayerSyncFlags::All );
-   targetPlayer->setSyncFlag( Common::PlayerSyncFlags::All );
-
 }
 
 void Core::Network::GameConnection::gm2Handler( const Packets::GamePacket& inPacket, Entity::PlayerPtr pPlayer )
@@ -416,7 +413,6 @@ void Core::Network::GameConnection::gm2Handler( const Packets::GamePacket& inPac
       targetPlayer->resetHp();
       targetPlayer->resetMp();
       targetPlayer->setStatus( Entity::Actor::ActorStatus::Idle );
-      targetPlayer->setSyncFlag( Status );
 
       targetPlayer->sendToInRangeSet( ActorControlPacket143( pPlayer->getId(), ZoneIn, 0x01, 0x01, 0, 113 ), true );
       targetPlayer->sendToInRangeSet( ActorControlPacket142( pPlayer->getId(), SetStatus,
@@ -463,8 +459,5 @@ void Core::Network::GameConnection::gm2Handler( const Packets::GamePacket& inPac
       pPlayer->sendUrgent( "GM2 Command not implemented: " + std::to_string( commandId ) );
       break;
    }
-
-   pPlayer->setSyncFlag( Common::PlayerSyncFlags::All );
-   targetPlayer->setSyncFlag( Common::PlayerSyncFlags::All );
 
 }

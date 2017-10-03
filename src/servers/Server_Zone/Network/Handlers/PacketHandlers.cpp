@@ -190,8 +190,6 @@ void Core::Network::GameConnection::updatePositionHandler( const Packets::GamePa
                          inPacket.getValAt< float >( 0x30 ),
                          inPacket.getValAt< float >( 0x34 ) );
 
-   pPlayer->setSyncFlag( PlayerSyncFlags::Position );
-
    if( ( pPlayer->getCurrentAction() != nullptr ) && bPosChanged )
       pPlayer->getCurrentAction()->setInterrupted();
 
@@ -327,8 +325,6 @@ void Core::Network::GameConnection::zoneLineHandler( const Packets::GamePacket& 
    }
 
    pPlayer->performZoning( targetZone, targetPos, rotation);
-   pPlayer->setSyncFlag( PlayerSyncFlags::Position );
-
 }
 
 
