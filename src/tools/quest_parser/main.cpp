@@ -12,7 +12,6 @@
 
 #include <fstream>
 
-#include <windows.h>
 
 Core::Logger g_log;
 Core::Data::ExdData g_exdData;

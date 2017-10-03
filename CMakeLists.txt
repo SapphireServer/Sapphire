@@ -37,7 +37,8 @@ include( "cmake/compiler.cmake" )
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 git_describe(VERSION --tags --dirty=-d)
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/servers/Server_Common/Version.cpp.in" "${CMAKE_CURRENT_SOURCE_DIR}/src/servers/Server_Common/Version.cpp" @ONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/servers/Server_Common/Version.cpp.in"
+               "${CMAKE_CURRENT_SOURCE_DIR}/src/servers/Server_Common/Version.cpp" @ONLY)
 
 ##########################################################################
 # Common include folders
@@ -56,5 +57,10 @@ link_directories(${SERVER_COMMON_DIR})
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/libraries/sapphire/datReader)
 
 add_subdirectory("src/servers")
+
 add_subdirectory("src/libraries/sapphire/datReader")
 add_subdirectory("src/libraries/sapphire/mysqlConnector")
+
+add_subdirectory("src/tools/exd_common_gen")
+add_subdirectory("src/tools/quest_parser")
+

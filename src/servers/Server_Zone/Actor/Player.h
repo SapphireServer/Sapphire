@@ -103,7 +103,7 @@ public:
    /*! load data for currently active quests */
    bool loadActiveQuests();
    /*! update quest ( register it as active quest if new ) */
-   void updateQuest( uint16_t questId, uint16_t sequence );
+   void updateQuest( uint16_t questId, uint8_t sequence );
    /*! return true if quest is currently active */
    bool hasQuest( uint16_t questId );
    /*! return the current quest sequence */
@@ -218,6 +218,8 @@ public:
    const uint32_t * getModelArray() const;
    /*! return the equipment model in a specified equipment slot */
    uint32_t getModelForSlot( Inventory::EquipSlot slot );
+   /*! set the equipment model in a specified equipment slot */
+   void setModelForSlot( Inventory::EquipSlot slot, uint32_t val );
    /*! return the current amount of currency of type */
    uint32_t getCurrency( uint8_t type ) const;
    /*! add amount to the currency of type */
@@ -486,8 +488,6 @@ public:
 
    void setAutoattack( bool mode );
    bool isAutoattackOn() const;
-
-   void handleScriptSkill( uint32_t type, uint32_t actionId, uint64_t param1, uint64_t param2, Entity::Actor& target );
 
    // Content Finder handling
    //////////////////////////////////////////////////////////////////////////////////////////////////////

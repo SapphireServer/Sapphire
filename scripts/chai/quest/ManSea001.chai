@@ -51,11 +51,12 @@ class ManSea001Def
     // Available Scenes in this quest, not necessarly all are used
     def Scene00000( player )
     {
-        player.eventPlay( this.id, 0, HIDE_HOTBAR, 0/*unk*/, 0/*unk*/,
+        player.eventPlay( this.id, 0, 0x2000, 0, 0,
             fun( player, eventId, param1, param2, param3 )
             {
 				if( param2 == 1 )
 				{
+					player.setOpeningSequence( 2 );
 					ManSea001.Scene00001( player );	
 				}
             });
@@ -63,7 +64,7 @@ class ManSea001Def
 
     def Scene00001( player )
     {
-        player.eventPlay( this.id, 1, HIDE_HOTBAR, 0/*unk*/, 0/*unk*/,
+        player.eventPlay( this.id, 1, 0xF8482EFB, 0, 0,
             fun( player, eventId, param1, param2, param3 )
             {
                 ManSea001.Scene00002( player );
@@ -81,13 +82,13 @@ class ManSea001Def
 
     def Scene00003( player )
     {
-        player.eventPlay( this.id, 3, NONE, 0/*unk*/, 0/*unk*/,
+        player.eventPlay( this.id, 3, NONE, 0, 0,
             fun( player, eventId, param1, param2, param3 )
             {
 				player.questUpdate( ManSea001.id, 0x01 ); // add quest to player.
 				
                 // update the instance boundaries, call to the opening event
-				//player.eventPlay( ManSea001.OPENING_EVENT_HANDLER, 0x1E, HIDE_HOTBAR, 1, 0); 
+				player.eventPlay( ManSea001.OPENING_EVENT_HANDLER, 0x1E, 0x2001, 1, 0); 
             });
     }
 
@@ -107,7 +108,7 @@ class ManSea001Def
 
     def Scene00006( player )
     {
-        player.eventPlay( this.id, 6, NONE, 0/*unk*/, 0/*unk*/,
+        player.eventPlay( this.id, 6, 0x20, 0/*unk*/, 0/*unk*/,
             fun( player, eventId, param1, param2, param3 )
             {
 				if( param2 == 1 )
@@ -141,7 +142,7 @@ class ManSea001Def
 
     def Scene00011( player )
     {
-        player.eventPlay( this.id, 11, NONE, 0, 0,
+        player.eventPlay( this.id, 11, 0x2c02, 0, 0,
             fun( player, eventId, param1, param2, param3 )
             {
                 ManSea001.Scene00012( player );
@@ -150,7 +151,7 @@ class ManSea001Def
 
     def Scene00012( player )
     {
-        player.eventPlay( this.id, 12, NONE, 0, 0,
+        player.eventPlay( this.id, 12, 0x20, 0, 0,
             fun( player, eventId, param1, param2, param3 )
             {
 				if( param2 == 1 )

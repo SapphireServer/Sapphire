@@ -82,6 +82,7 @@ Core::Entity::Player::Player() :
    m_onlineStatus = 0;
    m_queuedZoneing = nullptr;
    m_status = ActorStatus::Idle;
+   m_invincibilityType = InvincibilityType::InvincibilityNone;
 
    memset( m_questTracking, 0, sizeof( m_questTracking ) );
    memset( m_name, 0, sizeof( m_name ) );
@@ -192,7 +193,7 @@ void Core::Entity::Player::prepareZoning( uint16_t targetZone, bool fadeOut, uin
    preparePacket.data().targetZone = targetZone;
    preparePacket.data().fadeOutTime = fadeOutTime;
    preparePacket.data().animation = animation;
-   preparePacket.data().fadeOut = fadeOut == true ? 1 : 0;
+   preparePacket.data().fadeOut = static_cast< uint8_t >( fadeOut ? 1 : 0 );
    queuePacket( preparePacket );
 }
 
@@ -216,7 +217,7 @@ void Core::Entity::Player::calculateStats()
    auto paramGrowthInfo = paramGrowthInfoIt->second;
 
    // TODO: put formula somewhere else...
-   float base = CalcBattle::calculateBaseStat( getAsPlayer() );
+   float base = Data::CalcBattle::calculateBaseStat( getAsPlayer() );
 
    m_baseStats.str =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_str ) / 100 ) + tribeInfo.mod_str );
    m_baseStats.dex =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_dex ) / 100 ) + tribeInfo.mod_dex );
@@ -232,9 +233,9 @@ void Core::Entity::Player::calculateStats()
    m_baseStats.attackPotMagic = paramGrowthInfo.base_secondary;
    m_baseStats.healingPotMagic = paramGrowthInfo.base_secondary;
 
-   m_baseStats.max_mp = CalcBattle::calculateMaxMp( getAsPlayer() );
+   m_baseStats.max_mp = Data::CalcBattle::calculateMaxMp( getAsPlayer() );
 
-   m_baseStats.max_hp = CalcBattle::calculateMaxHp( getAsPlayer() );
+   m_baseStats.max_hp = Data::CalcBattle::calculateMaxHp( getAsPlayer() );
 
    if( m_mp > m_baseStats.max_mp )
       m_mp = m_baseStats.max_mp;
@@ -398,7 +399,7 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
    if( isLogin() )
    {
       GamePacketNew< FFXIVIpcCFAvailableContents, ServerZoneIpcType > contentFinderList( getId() );
-      for( auto i = 0; i < 72; i++ )
+      for( auto i = 0; i < sizeof( contentFinderList.data().contents ); i++ )
       {
          // unlock all contents for now
          contentFinderList.data().contents[i] = 0xFF;
@@ -632,7 +633,9 @@ void Core::Entity::Player::gainExp( uint32_t amount )
    if( ( currentExp + amount ) >= neededExpToLevel )
    {
       // levelup
-      amount = ( currentExp + amount - neededExpToLevel ) > neededExpToLevelplus1 ? neededExpToLevelplus1 - 1 : ( currentExp + amount - neededExpToLevel );
+      amount = ( currentExp + amount - neededExpToLevel ) > neededExpToLevelplus1 ?
+               neededExpToLevelplus1 - 1 :
+               ( currentExp + amount - neededExpToLevel );
       setExp( amount );
       gainLevel();
       queuePacket( ActorControlPacket143( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), amount ) );
@@ -791,50 +794,6 @@ void Core::Entity::Player::setLevelForClass( uint8_t level, Core::Common::ClassJ
     setSyncFlag( PlayerSyncFlags::ExpLevel );
 }
 
-void Core::Entity::Player::eventActionStart( uint32_t eventId,
-                                             uint32_t action,
-                                             ActionCallback finishCallback,
-                                             ActionCallback interruptCallback,
-                                             uint64_t additional )
-{
-   Action::ActionPtr pEventAction( new Action::EventAction( shared_from_this(), eventId, action,
-                                                            finishCallback, interruptCallback, additional ) );
-
-   setCurrentAction( pEventAction );
-   auto pEvent = getEvent( eventId );
-
-   if( !pEvent && getEventCount() )
-   {
-      // We're trying to play a nested event, need to start it first.
-      eventStart( getId(), eventId, Event::Event::Nest, 0, 0 );
-      pEvent = getEvent( eventId );
-   }
-   else if( !pEvent )
-   {
-      g_log.error( "Could not find event " + std::to_string( eventId ) + ", event has not been started!" );
-      return;
-   }
-
-   if( pEvent )
-      pEvent->setPlayedScene( true );
-   pEventAction->onStart();
-}
-
-
-void Core::Entity::Player::eventItemActionStart( uint32_t eventId,
-                                                 uint32_t action,
-                                                 ActionCallback finishCallback,
-                                                 ActionCallback interruptCallback,
-                                                 uint64_t additional )
-{
-   Action::ActionPtr pEventItemAction( new Action::EventItemAction( shared_from_this(), eventId, action,
-                                                                    finishCallback, interruptCallback, additional ) );
-
-   setCurrentAction( pEventItemAction );
-
-   pEventItemAction->onStart();
-}
-
 void Core::Entity::Player::sendModel()
 {
    ModelEquipPacket modelEquip( getAsPlayer() );
@@ -844,6 +803,12 @@ void Core::Entity::Player::sendModel()
 uint32_t Core::Entity::Player::getModelForSlot( Inventory::EquipSlot slot )
 {
    return m_modelEquip[slot];
+}
+
+void Core::Entity::Player::setModelForSlot( Inventory::EquipSlot slot, uint32_t val )
+{
+   m_modelEquip[slot] = val;
+   setSyncFlag( PlayerSyncFlags::Status );
 }
 
 uint64_t Core::Entity::Player::getModelMainWeapon() const
@@ -973,7 +938,7 @@ void Core::Entity::Player::setGcRankAt( uint8_t index, uint8_t rank )
    setSyncFlag( PlayerSyncFlags::GC );
 }
 
-const uint8_t * Core::Entity::Player::getStateFlags() const
+const uint8_t* Core::Entity::Player::getStateFlags() const
 {
    return m_stateFlags;
 }
@@ -1086,21 +1051,16 @@ void Core::Entity::Player::update( int64_t currTime )
 
    m_lastUpdate = currTime;
 
-   // @TODO needs to happen in a if check. Don't want autoattacking while an action is being performed.
    if( !checkAction() )
    {
-      if( m_targetId )
+      if( m_targetId && m_currentStance == Entity::Actor::Stance::Active && isAutoattackOn() )
       {
          auto mainWeap = m_pInventory->getItemAt( Inventory::GearSet0, Inventory::EquipSlot::MainHand );
 
+         // @TODO i dislike this, iterating over all in range actors when you already know the id of the actor you need...
          for( auto actor : m_inRangeActors )
          {
-            if( isAutoattackOn() &&
-                actor->getId() == m_targetId &&
-                actor->isAlive() &&
-                mainWeap &&
-                m_currentStance == Entity::Actor::Stance::Active
-               )
+            if( actor->getId() == m_targetId && actor->isAlive() && mainWeap )
             {
                // default autoattack range
                // TODO make this dependant on bnpc size
@@ -1514,114 +1474,6 @@ void Core::Entity::Player::autoAttack( ActorPtr pTarget )
 
 }
 
-void Core::Entity::Player::handleScriptSkill( uint32_t type, uint32_t actionId, uint64_t param1, uint64_t param2, Entity::Actor& pTarget )
-{
-   sendDebug( std::to_string( pTarget.getId() ) );
-   sendDebug( "Handle script skill type: " + std::to_string( type ) );
-   
-   auto actionInfoPtr = g_exdData.getActionInfo( actionId );
-
-
-   switch( type )
-   {
-
-   case Core::Common::HandleSkillType::StdDamage:
-   {
-      sendDebug( "STD_DAMAGE" );
-
-      GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket( getId() );
-      effectPacket.data().targetId = pTarget.getId();
-      effectPacket.data().actionAnimationId = actionId;
-      effectPacket.data().unknown_2 = 1;  // This seems to have an effect on the "double-cast finish" animation
-      //   effectPacket.data().unknown_3 = 1;
-      effectPacket.data().actionTextId = actionId;
-      effectPacket.data().numEffects = 1;
-      effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRotation() );
-      effectPacket.data().effectTarget = pTarget.getId();
-      effectPacket.data().effects[0].value = static_cast< int16_t >( param1 );
-      effectPacket.data().effects[0].effectType = ActionEffectType::Damage;
-      effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::NormalDamage;
-      effectPacket.data().effects[0].unknown_3 = 7;
-
-      sendToInRangeSet( effectPacket, true );
-
-      if ( !pTarget.isAlive() )
-         break;
-
-      pTarget.takeDamage( static_cast< uint32_t >( param1 ) );
-      pTarget.onActionHostile( shared_from_this() );
-      break;
-   }
-
-   case Core::Common::HandleSkillType::StdHeal:
-   {
-      uint32_t calculatedHeal = CalcBattle::calculateHealValue( getAsPlayer(), static_cast< uint32_t >( param1 ) );
-
-      sendDebug( "STD_HEAL" );
-
-      GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket( getId() );
-      effectPacket.data().targetId = pTarget.getId();
-      effectPacket.data().actionAnimationId = actionId;
-      effectPacket.data().unknown_2 = 1;  // This seems to have an effect on the "double-cast finish" animation
-      //   effectPacket.data().unknown_3 = 1;
-      effectPacket.data().actionTextId = actionId;
-      effectPacket.data().numEffects = 1;
-      effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRotation() );
-      effectPacket.data().effectTarget = pTarget.getId();
-      effectPacket.data().effects[0].value = calculatedHeal;
-      effectPacket.data().effects[0].effectType = ActionEffectType::Heal;
-      effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::NormalHeal;
-      effectPacket.data().effects[0].unknown_3 = 7;
-
-      sendToInRangeSet( effectPacket, true );
-
-      if ( !pTarget.isAlive() )
-         break;
-
-      // todo: get proper packets: the following was just kind of thrown together from what we know
-      // also toss AoE to another spot and make it generic
-
-      if ( actionInfoPtr->is_aoe ) 
-      {
-         for ( auto pCurAct : m_inRangePlayers )
-         {
-            assert( pCurAct );
-            if ( !pCurAct->isAlive() )
-               break;
-
-            if ( Math::Util::distance( pTarget.getPos().x, pTarget.getPos().y, pTarget.getPos().z, pCurAct->getPos().x, pCurAct->getPos().y, pCurAct->getPos().z ) <= actionInfoPtr->radius )
-            {
-               GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket( pCurAct->getId() );
-               effectPacket.data().targetId = pCurAct->getId();
-               effectPacket.data().unknown_1 = 1;  // the magic trick for getting it to work
-               effectPacket.data().unknown_2 = 1;
-               effectPacket.data().unknown_8 = 1;
-               effectPacket.data().unknown_5 = 1;
-               effectPacket.data().actionAnimationId = actionId;
-               effectPacket.data().actionTextId = 0;
-               effectPacket.data().numEffects = 1;
-               effectPacket.data().effectTarget = pCurAct->getId();
-               effectPacket.data().effects[0].value = calculatedHeal;
-               effectPacket.data().effects[0].effectType = ActionEffectType::Heal;
-               effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::NormalHeal;
-               effectPacket.data().effects[0].unknown_3 = 7;
-
-               pCurAct->sendToInRangeSet( effectPacket, true );
-               pCurAct->heal( calculatedHeal );
-               sendDebug( "AoE hit actor " + pCurAct->getName() );
-            }
-         }
-      }
-
-      pTarget.heal( calculatedHeal );
-      break;
-   }
-
-   default:
-   break;
-   }
-}
-
 
 /////////////////////////////
 // Content Finder
@@ -1644,9 +1496,7 @@ uint32_t Core::Entity::Player::getCFPenaltyMinutes() const
 
    // check if penalty timestamp already passed current time
    if (currentTimestamp > endTimestamp)
-   {
       return 0;
-   }
 
    auto deltaTime = endTimestamp - currentTimestamp;
    return static_cast< uint32_t > ( ceil( static_cast< float > (deltaTime) / 60 ) );

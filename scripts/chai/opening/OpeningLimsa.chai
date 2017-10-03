@@ -72,7 +72,6 @@ class OpeningLimsaLominsaDef
         player.eventPlay( this.id, 40, 1, 2, 1, 
             fun( player, eventId, param1, param2, param3 )
             {
-                player.eventFinish( eventId, UNLOCK );
                 if( player.getOpeningSequence() == 2 )
                 {
                     // update the instance boundaries

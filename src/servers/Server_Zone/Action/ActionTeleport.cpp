@@ -45,7 +45,7 @@ void Core::Action::ActionTeleport::onStart()
 
    m_startTime = Util::getTimeMs();
 
-   GamePacketNew< FFXIVIpcActorCast, ServerZoneIpcType > castPacket( getId() );
+   GamePacketNew< FFXIVIpcActorCast, ServerZoneIpcType > castPacket( m_pSource->getId() );
 
    castPacket.data().action_id = 5;
    castPacket.data().unknown = 1;
