@@ -44,6 +44,8 @@ namespace Core {
 
       bool isRunning() const;
 
+      void printBanner() const;
+
 
    private:
 

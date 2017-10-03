@@ -188,11 +188,7 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
    g_log.setLogPath( "log\\SapphireZone_" );
    g_log.init();
 
-   g_log.info( "===========================================================" );
-   g_log.info( "Sapphire Server Project " );
-   g_log.info( "Version: x.y.z" );
-   g_log.info( "Compiled: " __DATE__ " " __TIME__ );
-   g_log.info( "===========================================================" );
+   printBanner();
 
    if( !loadSettings( argc, argv ) )
    {
@@ -237,6 +233,15 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
       thread_entry.join();
    }
 
+}
+
+void Core::ServerZone::printBanner() const
+{
+   g_log.info("===========================================================" );
+   g_log.info( "Sapphire Server Project " );
+   g_log.info( "Version: x.y.z" );
+   g_log.info( "Compiled: " __DATE__ " " __TIME__ );
+   g_log.info( "===========================================================" );
 }
 
 void Core::ServerZone::mainLoop()
