@@ -95,8 +95,5 @@ void Core::Network::GameConnection::inventoryModifyHandler( const Packets::GameP
 
             break;
     }
-
-    pPlayer->setSyncFlag( PlayerSyncFlags::Status );
-
 }
 

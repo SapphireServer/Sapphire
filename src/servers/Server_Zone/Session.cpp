@@ -9,7 +9,8 @@
 
 Core::Session::Session( uint32_t sessionId )
    : m_sessionId( sessionId )
-   , m_lastDataTime( static_cast< uint32_t >( time( nullptr ) ) )
+   , m_lastDataTime( static_cast< uint32_t >( Util::getTimeSeconds() ) )
+   , m_lastSqlTime( static_cast< uint32_t >( Util::getTimeSeconds() ) )
 {
 
    //   boost::posix_time::ptime now = boost::date_time::not_a_date_time;
@@ -49,10 +50,7 @@ bool Core::Session::loadPlayer()
 
    m_pPlayer = Entity::PlayerPtr( new Entity::Player() );
 
-   if( !m_pPlayer->load( m_sessionId, shared_from_this() ) )
-      return false;
-
-   return true;
+   return m_pPlayer->load(m_sessionId, shared_from_this() );
 
 }
 
@@ -77,9 +75,19 @@ uint32_t Core::Session::getLastDataTime() const
    return m_lastDataTime;
 }
 
+uint32_t Core::Session::getLastSqlTime() const
+{
+   return m_lastSqlTime;
+}
+
 void Core::Session::updateLastDataTime()
 {
-   m_lastDataTime = static_cast< uint32_t >( time( nullptr ) );
+   m_lastDataTime = static_cast< uint32_t >( Util::getTimeSeconds() );
+}
+
+void Core::Session::updateLastSqlTime()
+{
+   m_lastSqlTime = static_cast< uint32_t >( Util::getTimeSeconds() );
 }
 
 void Core::Session::update()
@@ -91,7 +99,11 @@ void Core::Session::update()
       // SESSION LOGIC
       m_pPlayer->update( Util::getTimeMs() );
 
-      m_pPlayer->createUpdateSql();
+      if( ( static_cast< uint32_t >( Util::getTimeSeconds() ) - static_cast< uint32_t >( getLastSqlTime() ) ) > 10  )
+      {
+         updateLastSqlTime();
+         m_pPlayer->updateSql();
+      }
 
       m_pZoneConnection->processOutQueue();
    }

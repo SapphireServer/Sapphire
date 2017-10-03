@@ -379,9 +379,6 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
    m_pCurrentZone = pZone;
    m_pCurrentZone->pushActor( shared_from_this() );
 
-   // mark the player for a position update in DB
-   setSyncFlag( PlayerSyncFlags::Position );
-
    GamePacketNew< FFXIVIpcInit, ServerZoneIpcType > initPacket( getId() );
    initPacket.data().charId = getId();
    queuePacket( initPacket );
@@ -501,9 +498,6 @@ void Core::Entity::Player::registerAetheryte( uint8_t aetheryteId )
    Util::valueToFlagByteIndexValue( aetheryteId, value, index );
 
    m_aetheryte[index] |= value;
-
-   setSyncFlag( Aetherytes );
-
    queuePacket( ActorControlPacket143( getId(), LearnTeleport, aetheryteId, 1 ) );
 
 }
@@ -544,8 +538,6 @@ void Core::Entity::Player::discover( int16_t map_id, int16_t sub_id )
 
    m_discovery[index] |= value;
 
-   setSyncFlag( PlayerSyncFlags::Discovery );
-
    uint16_t level = getLevel();
 
    uint32_t exp = ( g_exdData.m_paramGrowthInfoMap[level].needed_exp * 5 / 100 );
@@ -573,13 +565,11 @@ void Core::Entity::Player::setNewAdventurer( bool state )
    //}
    sendStateFlags();
    m_bNewAdventurer = state;
-   setSyncFlag( PlayerSyncFlags::NewAdventurer );
 }
 
 void Core::Entity::Player::resetDiscovery()
 {
    memset( m_discovery, 0, sizeof( m_discovery ) );
-   setSyncFlag( PlayerSyncFlags::Discovery );
 }
 
 void Core::Entity::Player::changePosition( float x, float y, float z, float o )
@@ -599,7 +589,6 @@ void Core::Entity::Player::learnAction( uint8_t actionId )
 
    m_unlocks[index] |= value;
 
-   setSyncFlag( Unlocks );
    queuePacket( ActorControlPacket143( getId(), ToggleActionUnlock, actionId, 1 ) );
 }
 
@@ -648,7 +637,6 @@ void Core::Entity::Player::gainExp( uint32_t amount )
    }
 
    sendStatusUpdate();
-   setSyncFlag( PlayerSyncFlags::ExpLevel );
 }
 
 void Core::Entity::Player::gainLevel()
@@ -774,7 +762,6 @@ void Core::Entity::Player::setClassJob( Core::Common::ClassJob classJob )
 
    sendToInRangeSet( ActorControlPacket142( getId(), ClassJobChange, 0x04 ), true );
 
-   setSyncFlag( Status );
    sendStatusUpdate( true );
 }
 
@@ -782,16 +769,12 @@ void Core::Entity::Player::setLevel( uint8_t level )
 {
    uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( getClass() )].exp_idx;
    m_classArray[classJobIndex] = level;
-
-   setSyncFlag( PlayerSyncFlags::ExpLevel );
 }
 
 void Core::Entity::Player::setLevelForClass( uint8_t level, Core::Common::ClassJob classjob )
 {
     uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( classjob )].exp_idx;
     m_classArray[classJobIndex] = level;
-
-    setSyncFlag( PlayerSyncFlags::ExpLevel );
 }
 
 void Core::Entity::Player::sendModel()
@@ -808,7 +791,6 @@ uint32_t Core::Entity::Player::getModelForSlot( Inventory::EquipSlot slot )
 void Core::Entity::Player::setModelForSlot( Inventory::EquipSlot slot, uint32_t val )
 {
    m_modelEquip[slot] = val;
-   setSyncFlag( PlayerSyncFlags::Status );
 }
 
 uint64_t Core::Entity::Player::getModelMainWeapon() const
@@ -856,7 +838,6 @@ uint8_t Core::Entity::Player::getLookAt( uint8_t index ) const
 void Core::Entity::Player::setLookAt( uint8_t index, uint8_t value )
 {
    m_customize[index] = value;
-   setSyncFlag( PlayerSyncFlags::Look );
 }
 
 // spawn this player for pTarget
@@ -920,8 +901,6 @@ void Core::Entity::Player::setGc( uint8_t gc )
    gcAffPacket.data().gcRank[1] = m_gcRank[1];
    gcAffPacket.data().gcRank[2] = m_gcRank[2];
    queuePacket( gcAffPacket );
-
-   setSyncFlag( PlayerSyncFlags::GC );
 }
 
 void Core::Entity::Player::setGcRankAt( uint8_t index, uint8_t rank )
@@ -934,8 +913,6 @@ void Core::Entity::Player::setGcRankAt( uint8_t index, uint8_t rank )
    gcAffPacket.data().gcRank[1] = m_gcRank[1];
    gcAffPacket.data().gcRank[2] = m_gcRank[2];
    queuePacket( gcAffPacket );
-
-   setSyncFlag( PlayerSyncFlags::GC );
 }
 
 const uint8_t* Core::Entity::Player::getStateFlags() const
@@ -1039,10 +1016,7 @@ void Core::Entity::Player::update( int64_t currTime )
    }
 
    if( m_hp <= 0 && m_status != ActorStatus::Dead )
-   {
       die();
-      setSyncFlag( PlayerSyncFlags::Status );
-   }
 
    if( !isAlive() )
       return;
@@ -1093,14 +1067,9 @@ void Core::Entity::Player::update( int64_t currTime )
    {
       // add 3 seconds to total play time
       m_playTime += 3;
-      setSyncFlag( PlayerSyncFlags::PlayTime );
-
       m_lastTickTime = currTime;
       onTick();
    }
-
-   createUpdateSql();
-
 }
 
 void Core::Entity::Player::onMobKill( uint16_t nameId )
@@ -1121,11 +1090,6 @@ void Core::Entity::Player::freePlayerSpawnId( uint32_t actorId )
 
 }
 
-void Core::Entity::Player::setSyncFlag( uint32_t updateFlag )
-{
-   m_updateFlags |= updateFlag;
-}
-
 uint8_t * Core::Entity::Player::getAetheryteArray()
 {
    return m_aetheryte;
@@ -1137,8 +1101,6 @@ void Core::Entity::Player::setHomepoint( uint8_t aetheryteId )
    m_homePoint = aetheryteId;
 
    queuePacket( ActorControlPacket143( getId(), SetHomepoint, aetheryteId ) );
-
-   setSyncFlag( HomePoint );
 }
 
 /*! get homepoint */
@@ -1254,9 +1216,6 @@ void Core::Entity::Player::performZoning(uint16_t zoneId, const Common::FFXIVARR
    m_zoneId = zoneId;
    m_bMarkedForZoning = true;
    setRotation( rotation );
-
-   // mark the player for a position update in DB
-   setSyncFlag( PlayerSyncFlags::Position );
    setZone( zoneId );
 }
 
@@ -1281,8 +1240,6 @@ void Core::Entity::Player::setSearchInfo( uint8_t selectRegion, uint8_t selectCl
    m_searchSelectClass = selectClass;
    memset( &m_searchMessage[0], 0, sizeof( searchMessage ) );
    strcpy( &m_searchMessage[0], searchMessage );
-
-   setSyncFlag( PlayerSyncFlags::SearchInfo );
 }
 
 const char* Core::Entity::Player::getSearchMessage() const
@@ -1323,8 +1280,6 @@ void Core::Entity::Player::updateHowtosSeen( uint32_t howToId )
    uint8_t value = 1 << bitIndex;
 
    m_howTo[index] |= value;
-
-   setSyncFlag( PlayerSyncFlags::HowTo );
 }
 
 
@@ -1486,7 +1441,6 @@ uint32_t Core::Entity::Player::getCFPenaltyTimestamp() const
 void Core::Entity::Player::setCFPenaltyTimestamp( uint32_t timestamp )
 {
    m_cfPenaltyUntil = timestamp;
-   setSyncFlag( PlayerSyncFlags::CFPenaltyTime );
 }
 
 uint32_t Core::Entity::Player::getCFPenaltyMinutes() const
@@ -1515,7 +1469,6 @@ uint8_t Core::Entity::Player::getOpeningSequence() const
 
 void Core::Entity::Player::setOpeningSequence( uint8_t seq )
 {
-   setSyncFlag( OpeningSeq );
    m_openingSequence = seq;
 }
 

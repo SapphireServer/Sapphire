@@ -409,9 +409,7 @@ public:
    // Player Database Handling
    //////////////////////////////////////////////////////////////////////////////////////////////////////
    /*! generate the update sql based on update flags */
-   void createUpdateSql();
-   /*! set an update flag */
-   void setSyncFlag( uint32_t updateFlag );
+   void updateSql();
    /*! load player from db, by id */
    bool load( uint32_t charId, SessionPtr pSession );
    /*! load active class data */
@@ -606,7 +604,6 @@ private:
    Common::ZoneingType m_zoningType;
 
    bool m_bMarkedForZoning;
-   uint32_t m_updateFlags;
    bool m_bNewAdventurer;
    uint64_t m_onlineStatus;
    boost::shared_ptr< QueuedZoning > m_queuedZoneing;

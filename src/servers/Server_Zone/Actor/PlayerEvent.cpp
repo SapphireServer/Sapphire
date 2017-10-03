@@ -356,8 +356,5 @@ void Core::Entity::Player::onTick()
    }
 
    if( sendUpdate )
-   {
       sendStatusUpdate();
-      setSyncFlag( PlayerSyncFlags::Status );
-   }
 }

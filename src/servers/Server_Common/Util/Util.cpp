@@ -29,10 +29,7 @@ uint64_t Core::Util::getTimeSeconds()
 
 uint64_t Core::Util::getEorzeanTimeStamp()
 {
-   std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
-   auto now = std::chrono::time_point_cast< std::chrono::seconds >( t1 ).time_since_epoch().count();
-
-   return static_cast< uint64_t >( now * 20.571428571428573f );
+   return static_cast< uint64_t >( getTimeSeconds() * 20.571428571428573f );
 }
 
 void Core::Util::valueToFlagByteIndexValue( uint32_t inVal, uint8_t& outVal, uint16_t& outIndex )

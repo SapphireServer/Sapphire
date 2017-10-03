@@ -166,7 +166,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
                         pPlayer->resetHp();
                         pPlayer->resetMp();
                         pPlayer->setStatus( Entity::Actor::ActorStatus::Idle );
-                        pPlayer->setSyncFlag( Status );
+
                         pPlayer->sendToInRangeSet( ActorControlPacket143( pPlayer->getId(), ZoneIn, 0x01, 0x01, 0, 111 ), true );
                         pPlayer->sendToInRangeSet( ActorControlPacket142( pPlayer->getId(), SetStatus, static_cast< uint8_t >( Entity::Actor::ActorStatus::Idle ) ), true );
                     }

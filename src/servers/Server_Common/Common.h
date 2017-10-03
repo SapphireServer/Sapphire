@@ -275,35 +275,6 @@ namespace Core {
 
       };
 
-      enum PlayerSyncFlags : uint32_t
-      {
-         None = 0x00000000,
-         Position = 0x00000001, // x,y,z,zone
-         Status = 0x00000002, // hp,mp,tp,class
-         Look = 0x00000004, // models to display
-         ExpLevel = 0x00000008, // exp,level
-         Quests = 0x00000010, // quest status
-         Achievements = 0x00000020, // achievements
-         Discovery = 0x00000040, // Discovered places
-         Aetherytes = 0x00000080, // Attuned aetherytes
-         HomePoint = 0x00000100, // Current homepoint
-         HowTo = 0x00000200,
-
-         HpMp = 0x00000800,
-         QuestTracker = 0x00001000,
-         NewGame = 0x00002000,
-         OpeningSeq = 0x00004000,
-         Unlocks = 0x00008000,
-         PlayTime = 0x00010000,
-         NewAdventurer = 0x00020000,
-         SearchInfo = 0x00040000,
-         GC = 0x00080000,
-
-         CFPenaltyTime = 0x00100000,
-
-         All = 0xFFFFFFFF,
-      };
-
       /**
       * Structural representation of the packet sent by the server
       * Send the entire StatusEffect list
