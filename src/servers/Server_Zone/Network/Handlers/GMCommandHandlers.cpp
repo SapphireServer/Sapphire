@@ -373,7 +373,8 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
          {
             for( uint8_t i = 0; i < 255; i++ )
                targetActor->getAsPlayer()->registerAetheryte( i );
-               pPlayer->sendNotice( "All Aetherytes for " + targetPlayer->getName() +
+            
+            pPlayer->sendNotice( "All Aetherytes for " + targetPlayer->getName() +
                   " were turned on." );
          }
          else
