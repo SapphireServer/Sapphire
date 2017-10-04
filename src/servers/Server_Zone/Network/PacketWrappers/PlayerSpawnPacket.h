@@ -70,7 +70,7 @@ namespace Server {
 
          //m_data.u23 = 0x04;
          //m_data.u24 = 256;
-         m_data.state = (pPlayer->getHp() > 0) ? 1 : 2;
+         m_data.state = static_cast< uint8_t >( pPlayer->getStatus() );
          m_data.type = 1;
          if( pTarget == pPlayer )
          {
