@@ -13,6 +13,11 @@
 
 #include <time.h>
 
+#include <Server_Common/Database/DbLoader.h>
+#include <Server_Common/Database/CharaDbConnection.h>
+#include <Server_Common/Database/DbWorkerPool.h>
+#include <Server_Common/Database/PreparedStatement.h>
+
 #include "Player.h"
 
 #include "src/servers/Server_Zone/Zone/ZoneMgr.h"
@@ -27,11 +32,15 @@
 #include "src/servers/Server_Zone/StatusEffect/StatusEffectContainer.h"
 #include "src/servers/Server_Zone/Inventory/Inventory.h"
 
+#include "src/libraries/sapphire/mysqlConnector/MySqlConnector.h"
+
+
 extern Core::Logger g_log;
 extern Core::Db::Database g_database;
 extern Core::ServerZone g_serverZone;
 extern Core::ZoneMgr g_zoneMgr;
 extern Core::Data::ExdData g_exdData;
+extern Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -40,72 +49,30 @@ using namespace Core::Network::Packets::Server;
 // load player from the db
 bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
 {
-   // TODO: can't help but think that the whole player loading could be handled better...
    const std::string char_id_str = std::to_string( charId );
 
-   auto pQR = g_database.query( "SELECT "
-      "c.Name, "
-      "c.PrimaryTerritoryId, "
-      "c.Hp, "
-      "c.Mp, "
-      "c.Gp, "
-      "c.Mode, "
-      "c.Pos_0_0, "
-      "c.Pos_0_1, "
-      "c.Pos_0_2, "
-      "c.Pos_0_3, "
-      "c.FirstLogin, " // 10
-      "c.Customize, "
-      "c.ModelMainWeapon, "
-      "c.ModelSubWeapon, "
-      "c.ModelEquip, "
-      "cd.GuardianDeity, "
-      "cd.BirthDay, "
-      "cd.BirthMonth, "
-      "cd.Status, "
-      "cd.Class, "
-      "cd.Homepoint, " // 20
-      "cd.HowTo, "
-      "c.ContentId, "
-      "c.Voice, "
-      "cd.QuestCompleteFlags, "
-      "cd.QuestTracking, "
-      "c.IsNewGame, "
-      "cd.Aetheryte, "
-      "cd.unlocks, "
-      "cd.Discovery, "
-      "cd.StartTown, " // 30
-      "cd.TotalPlayTime, "
-      "c.IsNewAdventurer, "
-      "cd.GrandCompany, "
-      "cd.GrandCompanyRank, "
-      "cd.CFPenaltyUntil, "
-      "cd.OpeningSequence, "
-      "cd.GMRank "
-      "FROM charabase AS c "
-      " INNER JOIN charadetail AS cd "
-      " ON c.CharacterId = cd.CharacterId "
-      "WHERE c.CharacterId = " + char_id_str + ";" );
+   boost::scoped_ptr< Core::Db::PreparedStatement > stmt( g_charaDb.getPreparedStatement( Core::Db::CharaDbStatements::CHAR_SEL_LOAD ) );
+   stmt->setUInt( 1, charId );
 
-   if( !pQR )
-   {
-      g_log.error( "Player id " + char_id_str + " does not exist!" );
+   auto res = dynamic_cast< Mysql::PreparedResultSet* >( g_charaDb.query( stmt.get() ) );
+   
+   if( !res->next() )
       return false;
-   }
 
    m_id = charId;
 
-   Db::Field *field = pQR->fetch();
+   auto name = res->getString( "Name" );
+   strcpy( m_name, name.c_str() );
 
-   strcpy( m_name, field[0].getString().c_str() );
+   auto zoneId = res->getUInt( "PrimaryTerritoryId" );
 
-   ZonePtr pCurrZone = g_zoneMgr.getZone( field[1].get< int32_t >() );
-   m_zoneId = field[1].get< int32_t >();
+   ZonePtr pCurrZone = g_zoneMgr.getZone( zoneId );
+   m_zoneId = zoneId;
 
    // see if a valid zone could be found for the character
    if( !pCurrZone )
    {
-      g_log.error( "[" + char_id_str + "] Zone " + std::to_string( field[1].get< int32_t >() ) + "not found!" );
+      g_log.error( "[" + char_id_str + "] Zone " + std::to_string( zoneId ) + " not found!" );
       g_log.error( "[" + char_id_str + "] Setting default zone instead" );
 
       // default to new gridania
@@ -118,60 +85,125 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
       setRotation( 0.0f );
    }
 
-   m_hp = field[2].get< uint16_t >();
-
-   m_mp = field[3].get< uint16_t >();
+   m_hp = res->getUInt( "Hp" );
+   m_mp = res->getUInt( "Mp" );
    m_tp = 0;
 
-   m_pos.x = field[6].getFloat();
-   m_pos.y = field[7].getFloat();
-   m_pos.z = field[8].getFloat();
-   setRotation( field[9].getFloat() );
+   m_pos.x = res->getFloat( "Pos_0_0" );
+   m_pos.y = res->getFloat( "Pos_0_1" );
+   m_pos.z = res->getFloat( "Pos_0_2" );
+   setRotation( res->getFloat( "Pos_0_3" ) );
 
-   field[11].getBinary( reinterpret_cast< char* >( m_customize ), sizeof( m_customize ) );
+   auto custom = res->getBlobVector( "Customize" );
+   memcpy( reinterpret_cast< char* >( m_customize ), custom.data(), custom.size() );
 
-   m_modelMainWeapon = field[12].getUInt64();
+   m_modelMainWeapon = res->getUInt64( "ModelMainWeapon" );
 
-   field[14].getBinary( reinterpret_cast< char* >( m_modelEquip ), sizeof( m_modelEquip ) );
+   auto modelEq = res->getBlobVector( "ModelEquip" );
+   memcpy( reinterpret_cast< char* >( m_modelEquip ), modelEq.data(), modelEq.size() );
 
-   m_guardianDeity = field[15].get< uint8_t >();
-   m_birthDay = field[16].get< uint8_t >();
-   m_birthMonth = field[17].get< uint8_t >();
-   m_status = static_cast< ActorStatus >( field[18].get< uint8_t >() );
-   m_class = static_cast< ClassJob >( field[19].get< uint8_t >() );
-   m_homePoint = field[20].get< uint8_t >();
+   m_guardianDeity = res->getUInt( "GuardianDeity" );
+   m_birthDay = res->getUInt( "BirthDay" );
+   m_birthMonth = res->getUInt( "BirthMonth" );
+   m_status = static_cast< ActorStatus >( res->getUInt( "Status" ) );
+   m_class = static_cast< ClassJob >( res->getUInt( "Class" ) );
+   m_homePoint = res->getUInt( "Homepoint" );
 
-   field[21].getBinary( reinterpret_cast< char* >( m_howTo ), sizeof( m_howTo ) );
+   auto howTo = res->getBlobVector( "HowTo" );
+   memcpy( reinterpret_cast< char* >( m_howTo ), howTo.data(), howTo.size() );
 
-   m_contentId = field[22].getUInt64();
+   m_contentId = res->getUInt64( "ContentId" );
 
-   m_voice = field[23].get< uint32_t >();
+   m_voice = res->getUInt( "Voice" );
 
-   field[24].getBinary( reinterpret_cast< char* >( m_questCompleteFlags ), sizeof( m_questCompleteFlags ) );
+   auto questCompleteFlags = res->getBlobVector( "QuestCompleteFlags" );
+   memcpy( reinterpret_cast< char* >( m_questCompleteFlags ), questCompleteFlags.data(), questCompleteFlags.size() );
 
-   field[25].getBinary( reinterpret_cast< char* >( m_questTracking ), sizeof( m_questTracking ) );
+   auto questTracking = res->getBlobVector( "QuestTracking" );
+   memcpy( reinterpret_cast< char* >( m_questTracking ), questTracking.data(), questTracking.size() );
 
-   m_bNewGame = field[26].getBool();
+   m_bNewGame = res->getBoolean( "IsNewGame" );
 
-   field[27].getBinary( reinterpret_cast< char* >( m_aetheryte ), sizeof( m_aetheryte ) );
+   auto aetheryte = res->getBlobVector( "Aetheryte" );
+   memcpy( reinterpret_cast< char* >( m_aetheryte ), aetheryte.data(), aetheryte.size() );
 
-   field[28].getBinary( reinterpret_cast< char* >( m_unlocks ), sizeof( m_unlocks ) );
+   auto unlocks = res->getBlobVector( "unlocks" );
+   memcpy( reinterpret_cast< char* >( m_unlocks ), unlocks.data(), unlocks.size() );
 
-   field[29].getBinary( reinterpret_cast< char* >( m_discovery ), sizeof( m_discovery ) );
+   auto discovery = res->getBlobVector( "Discovery" );
+   memcpy( reinterpret_cast< char* >( m_discovery ), discovery.data(), discovery.size() );
 
-   m_startTown = field[30].get< int8_t >();
-   m_playTime = field[31].get< uint32_t >();
+   m_startTown = res->getUInt( "StartTown" );
+   m_playTime = res->getUInt( "TotalPlayTime" );
 
-   m_bNewAdventurer = field[32].getBool();
+   m_bNewAdventurer = res->getBoolean( "IsNewAdventurer" );
 
-   m_gc = field[33].get< uint8_t >();
-   field[34].getBinary( reinterpret_cast< char* >( m_gcRank ), sizeof( m_gcRank ) );
+   m_gc = res->getUInt( "GrandCompany" );
+   auto gcRank = res->getBlobVector( "GrandCompanyRank" );
+   memcpy( reinterpret_cast< char* >( m_gcRank ), gcRank.data(), gcRank.size() );
 
-   m_cfPenaltyUntil = field[35].get< uint32_t >();
+   m_cfPenaltyUntil = res->getUInt( "CFPenaltyUntil" );
 
-   m_openingSequence = field[36].get< uint32_t >();
+   m_openingSequence = res->getUInt( "OpeningSequence" );
 
-   m_gmRank = field[37].get< uint8_t >();
+   m_gmRank = res->getUInt( "GMRank" );
+   
+   //auto pQR = g_database.query( "SELECT "
+   //   "c.Name, "
+   //   "c.PrimaryTerritoryId, "
+   //   "c.Hp, "
+   //   "c.Mp, "
+   //   "c.Gp, "
+   //   "c.Mode, "
+   //   "c.Pos_0_0, "
+   //   "c.Pos_0_1, "
+   //   "c.Pos_0_2, "
+   //   "c.Pos_0_3, "
+   //   "c.FirstLogin, " // 10
+   //   "c.Customize, "
+   //   "c.ModelMainWeapon, "
+   //   "c.ModelSubWeapon, "
+   //   "c.ModelEquip, "
+   //   "cd.GuardianDeity, "
+   //   "cd.BirthDay, "
+   //   "cd.BirthMonth, "
+   //   "cd.Status, "
+   //   "cd.Class, "
+   //   "cd.Homepoint, " // 20
+   //   "cd.HowTo, "
+   //   "c.ContentId, "
+   //   "c.Voice, "
+   //   "cd.QuestCompleteFlags, "
+   //   "cd.QuestTracking, "
+   //   "c.IsNewGame, "
+   //   "cd.Aetheryte, "
+   //   "cd.unlocks, "
+   //   "cd.Discovery, "
+   //   "cd.StartTown, " // 30
+   //   "cd.TotalPlayTime, "
+   //   "c.IsNewAdventurer, "
+   //   "cd.GrandCompany, "
+   //   "cd.GrandCompanyRank, "
+   //   "cd.CFPenaltyUntil, "
+   //   "cd.OpeningSequence, "
+   //   "cd.GMRank "
+   //   "FROM charabase AS c "
+   //   " INNER JOIN charadetail AS cd "
+   //   " ON c.CharacterId = cd.CharacterId "
+   //   "WHERE c.CharacterId = " + char_id_str + ";" );
+
+   //if( !pQR )
+   //{
+   //   g_log.error( "Player id " + char_id_str + " does not exist!" );
+   //   return false;
+   //}
+   // 
+
+   //Db::Field *field = pQR->fetch();
+
+
+
+
 
    m_pCell = nullptr;
 

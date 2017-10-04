@@ -11,6 +11,7 @@ class DbConnectionInfo;
 
 enum CharaDbStatements : uint32_t
 {
+   CHAR_SEL_LOAD,
    CHAR_INS_TEST,
 
    MAX_STATEMENTS

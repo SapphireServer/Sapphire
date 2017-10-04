@@ -51,7 +51,7 @@ Core::Scripting::ScriptManager g_scriptMgr;
 Core::Data::ExdData g_exdData;
 Core::ZoneMgr g_zoneMgr;
 Core::LinkshellMgr g_linkshellMgr;
-Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > CharacterDatabase;
+Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
 
 Core::ServerZone::ServerZone( const std::string& configPath, uint16_t serverId )
    : m_configPath( configPath ),
@@ -185,16 +185,16 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
    info.syncThreads = m_pConfig->getValue< uint8_t >( "Settings.General.Mysql.SyncThreads", 2 );
    info.asyncThreads = m_pConfig->getValue< uint8_t >( "Settings.General.Mysql.AsyncThreads", 2 );
 
-   loader.addDb( CharacterDatabase, info );
+   loader.addDb( g_charaDb, info );
    if( !loader.initDbs() )
       return false;
 
    // execute() runs asynchronous
-   CharacterDatabase.execute( "INSERT INTO zoneservers ( id, ip, port ) VALUES ( 101, '127.0.0.1', 54555);" );
-   CharacterDatabase.execute( "DELETE FROM zoneservers WHERE id = 101" );
+   g_charaDb.execute( "INSERT INTO zoneservers ( id, ip, port ) VALUES ( 101, '127.0.0.1', 54555);" );
+   g_charaDb.execute( "DELETE FROM zoneservers WHERE id = 101" );
 
    // query runs synchronous
-   boost::scoped_ptr< Mysql::ResultSet > res( CharacterDatabase.query( "SELECT id,ip,port FROM zoneservers" ) );
+   boost::scoped_ptr< Mysql::ResultSet > res( g_charaDb.query( "SELECT id,ip,port FROM zoneservers" ) );
    while( res->next() )
    {
       g_log.info( "id: " + std::to_string( res->getUInt( "id" ) ) );
@@ -202,26 +202,26 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
       g_log.info( "port: " + std::to_string( res->getUInt( "port" ) ) );
    }
 
-   auto stmt = CharacterDatabase.getPreparedStatement( Core::Db::CharaDbStatements::CHAR_INS_TEST );
+   auto stmt = g_charaDb.getPreparedStatement( Core::Db::CharaDbStatements::CHAR_INS_TEST );
    stmt->setUInt( 1, 2345 );
    stmt->setString( 2, "123.123.123.123" );
    stmt->setUInt( 3, 3306 );
-   CharacterDatabase.execute( stmt );
+   g_charaDb.execute( stmt );
 
    //stmt->setUInt( 1, 245 );
    //stmt->setString( 2, "12.12.12.12" );
    //stmt->setUInt( 3, 3306 );
    //CharacterDatabase.execute( stmt );
-   //try
-   //{
+   try
+   {
    //   // bunch of test cases for db wrapper
-   //   Mysql::MySqlBase base;
-   //   g_log.info( base.getVersionInfo() );
+      Mysql::MySqlBase base;
+      g_log.info( base.getVersionInfo() );
 
-   //   Mysql::optionMap options;
-   //   options[ MYSQL_OPT_RECONNECT ] = "1";
+      Mysql::optionMap options;
+      options[ MYSQL_OPT_RECONNECT ] = "1";
 
-   //   boost::scoped_ptr< Mysql::Connection > con( base.connect( "127.0.0.1", "root", "", options, 3306 ) );
+      boost::scoped_ptr< Mysql::Connection > con( base.connect( "127.0.0.1", "root", "", options, 3306 ) );
 
    //   if( con->getAutoCommit() )
    //      g_log.info( "autocommit active" );
@@ -236,7 +236,7 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
    //   if( con->getAutoCommit() )
    //      g_log.info( "autocommit active" );
 
-   //   con->setSchema( "sapphire" );
+      con->setSchema( "sapphire" );
 
    //   boost::scoped_ptr< Mysql::Statement > stmt( con->createStatement() );
    //   bool t1 = stmt->execute( "DELETE FROM zoneservers WHERE id = 101" );
@@ -274,10 +274,6 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
    //      auto blob = res1->getBlobVector( "Customize" );
    //   }
 
-   //   boost::scoped_ptr< Mysql::PreparedStatement > pstmt2( con->prepareStatement( "DELETE FROM zoneservers WHERE id = ?" ) );
-   //   pstmt2->setInt( 1, 1021 );
-   //   pstmt2->execute();
-
    //   pstmt2->setInt( 1, 1001 );
    //   pstmt2->execute();
 
@@ -299,11 +295,11 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
    //   pstmt->setInt( 1, 1001 );
    //   pstmt->execute();
 
-   //}
-   //catch( std::runtime_error e )
-   //{
-   //   g_log.error( e.what() );
-   //}
+   }
+   catch( std::runtime_error e )
+   {
+      g_log.error( e.what() );
+   }
 
 
    Db::DatabaseParams params;
