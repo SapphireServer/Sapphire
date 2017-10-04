@@ -84,6 +84,7 @@ enum GmCommand
    QuestInspect = 0x0131,
    GC = 0x0154,
    GCRank = 0x0155,
+   Aetheryte = 0x015E,
    Teri = 0x0258,
    TeriInfo = 0x025D,
    Jump = 0x025E,
@@ -362,6 +363,28 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
 
       pPlayer->sendNotice( "Invincibility for " + targetPlayer->getName() +
          " was switched." );
+      break;
+   }
+   case GmCommand::Aetheryte:
+   {
+      if( param1 == 0 )
+      {
+         if( param2 == 0 )
+         {
+            for( uint8_t i = 0; i < 255; i++ )
+               targetActor->getAsPlayer()->registerAetheryte( i );
+               pPlayer->sendNotice( "All Aetherytes for " + targetPlayer->getName() +
+                  " were turned on." );
+         }
+         else
+         {
+            targetActor->getAsPlayer()->registerAetheryte( param2 );
+            pPlayer->sendNotice( "Aetheryte " + std::to_string( param2 ) + " for " + targetPlayer->getName() +
+               " was turned on." );
+         }
+      }
+
+      
       break;
    }
 
