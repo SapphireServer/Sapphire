@@ -330,6 +330,10 @@ public:
    void prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadoutTime = 0, uint16_t animation = 0 );
    /*! change player's title */
    void setTitle( uint16_t titleId );
+   /*! change gear param state */
+   void setCharaGearParamState( uint8_t state );
+   /*! get gear param state and send update to inRangeSet */
+   uint8_t getCharaGearParamState() const;
 
    void calculateStats() override;
    void sendStats();
@@ -601,6 +605,8 @@ private:
    uint8_t m_stateFlags[7];
    uint8_t m_gmRank;
    uint16_t zoneId;
+
+   uint8_t m_charaGearParamState;
 
    bool m_bInCombat;
    bool m_bLoadingComplete;

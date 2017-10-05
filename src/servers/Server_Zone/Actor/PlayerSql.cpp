@@ -81,7 +81,8 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
       "cd.GrandCompanyRank, "
       "cd.CFPenaltyUntil, "
       "cd.OpeningSequence, "
-      "cd.GMRank "
+      "cd.GMRank, "
+      "cd.CharaGearParamState "
       "FROM charabase AS c "
       " INNER JOIN charadetail AS cd "
       " ON c.CharacterId = cd.CharacterId "
@@ -173,6 +174,7 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
    m_openingSequence = field[36].get< uint32_t >();
 
    m_gmRank = field[37].get< uint8_t >();
+   m_charaGearParamState = field[38].get< uint8_t >();
 
    m_pCell = nullptr;
 
@@ -350,6 +352,7 @@ void Core::Entity::Player::createUpdateSql()
       charaBaseSet.insert( " ModelEquip = UNHEX('" + std::string( Util::binaryToHexString( reinterpret_cast< uint8_t* >( m_modelEquip ), 40 ) ) + "')" );
       charaDetailSet.insert( " Class = " + std::to_string( static_cast< uint32_t >( getClass() ) ) );
       charaDetailSet.insert( " Status = " + std::to_string( static_cast< uint8_t >( getStatus() ) ) );
+      charaDetailSet.insert( " CharaGearParamState = " + std::to_string( static_cast< uint8_t >( getCharaGearParamState() ) ) );
    }
 
    if( m_updateFlags & PlayerSyncFlags::OpeningSeq )

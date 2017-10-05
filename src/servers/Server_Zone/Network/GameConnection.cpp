@@ -93,8 +93,9 @@ Core::Network::GameConnection::GameConnection( Core::Network::HivePtr pHive,
    setZoneHandler( ClientZoneIpcType::CFRegisterRoulette, "CFRegisterRoulette",         &GameConnection::cfRegisterRoulette );
    setZoneHandler( ClientZoneIpcType::CFCommenceHandler, "CFDutyAccepted",              &GameConnection::cfDutyAccepted);
 
+   setZoneHandler( ClientZoneIpcType::ReqCharaGearParamChange, "ReqCharaGearParamChange",&GameConnection::reqCharaGearParamHandler);
 
-   setChatHandler( ClientChatIpcType::TellReq, "TellReq",              &GameConnection::tellHandler);
+   setChatHandler( ClientChatIpcType::TellReq, "TellReq",                               &GameConnection::tellHandler);
 
 }
 
