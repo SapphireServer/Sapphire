@@ -331,9 +331,9 @@ public:
    /*! change player's title */
    void setTitle( uint16_t titleId );
    /*! change gear param state */
-   void setCharaGearParamState( uint8_t state );
+   void setEquipDisplayFlags( uint8_t state );
    /*! get gear param state and send update to inRangeSet */
-   uint8_t getCharaGearParamState() const;
+   uint8_t getEquipDisplayFlags() const;
 
    void calculateStats() override;
    void sendStats();
@@ -606,7 +606,7 @@ private:
    uint8_t m_gmRank;
    uint16_t zoneId;
 
-   uint8_t m_charaGearParamState;
+   uint8_t m_equipDisplayFlags;
 
    bool m_bInCombat;
    bool m_bLoadingComplete;

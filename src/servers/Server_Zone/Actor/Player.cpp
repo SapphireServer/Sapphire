@@ -390,7 +390,7 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
 
    if( isLogin() )
    {
-      queuePacket(ActorControlPacket143( getId(), SetCharaGearParamUI, m_charaGearParamState, 1 ) );
+      queuePacket(ActorControlPacket143( getId(), SetCharaGearParamUI, m_equipDisplayFlags, 1 ) );
    }
 
    // set flags, will be reset automatically by zoning ( only on client side though )
@@ -1426,18 +1426,18 @@ void Core::Entity::Player::setTitle( uint16_t titleId )
    sendToInRangeSet( ActorControlPacket142( getId(), SetTitle, titleId ), true );
 }
 
-void Core::Entity::Player::setCharaGearParamState( uint8_t state )
+void Core::Entity::Player::setEquipDisplayFlags( uint8_t state )
 {
-   m_charaGearParamState = state;
+   m_equipDisplayFlags = state;
    GamePacketNew< FFXIVIpcCharaGearParams, ServerZoneIpcType > paramPacket( getId() );
-   paramPacket.data().bitmask = m_charaGearParamState;
+   paramPacket.data().bitmask = m_equipDisplayFlags;
    sendToInRangeSet( paramPacket, true );
    setSyncFlag( PlayerSyncFlags::Status );
 }
 
-uint8_t Core::Entity::Player::getCharaGearParamState() const
+uint8_t Core::Entity::Player::getEquipDisplayFlags() const
 {
-   return m_charaGearParamState;
+   return m_equipDisplayFlags;
 }
 
 void Core::Entity::Player::autoAttack( ActorPtr pTarget )

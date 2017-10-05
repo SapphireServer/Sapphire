@@ -61,6 +61,9 @@ void Core::Session::close()
    if( m_pZoneConnection )
       m_pZoneConnection->Disconnect();
 
+   if( m_pChatConnection )
+      m_pChatConnection->Disconnect();
+
    // remove the session from the player
    if( m_pPlayer )
       // reset the zone, so the zone handler knows to remove the actor

@@ -93,7 +93,7 @@ Core::Network::GameConnection::GameConnection( Core::Network::HivePtr pHive,
    setZoneHandler( ClientZoneIpcType::CFRegisterRoulette, "CFRegisterRoulette",         &GameConnection::cfRegisterRoulette );
    setZoneHandler( ClientZoneIpcType::CFCommenceHandler, "CFDutyAccepted",              &GameConnection::cfDutyAccepted);
 
-   setZoneHandler( ClientZoneIpcType::ReqCharaGearParamChange, "ReqCharaGearParamChange",&GameConnection::reqCharaGearParamHandler);
+   setZoneHandler( ClientZoneIpcType::ReqEquipDisplayFlagsChange, "ReqEquipDisplayFlagsChange",&GameConnection::reqEquipDisplayFlagsHandler);
 
    setChatHandler( ClientChatIpcType::TellReq, "TellReq",                               &GameConnection::tellHandler);
 
@@ -117,7 +117,7 @@ void Core::Network::GameConnection::OnAccept( const std::string & host, uint16_t
 
 void Core::Network::GameConnection::OnDisconnect()
 {
-   g_log.debug( "DISCONNECT" );
+   g_log.debug( "GameConnection DISCONNECT" );
    m_pSession = nullptr;
 }
 
@@ -168,7 +168,7 @@ void Core::Network::GameConnection::OnRecv( std::vector< uint8_t > & buffer )
 
 void Core::Network::GameConnection::OnError( const boost::system::error_code & error )
 {
-   g_log.debug( "ERROR" );
+   g_log.debug( "GameConnection ERROR: " + error.message() );
 }
 
 void Core::Network::GameConnection::queueInPacket( Core::Network::Packets::GamePacketPtr inPacket )
@@ -381,7 +381,11 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
          {
             g_log.info( "[" + std::string( id ) + "] Session not registered, creating" );
             // return;
-            g_serverZone.createSession( playerId );
+            if( !g_serverZone.createSession( playerId ) )
+            {
+               Disconnect();
+               return;
+            }
             session = g_serverZone.getSession( playerId );
          }
 
