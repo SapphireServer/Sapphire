@@ -1290,7 +1290,7 @@ struct FFXIVIpcEorzeaTimeOffset : FFXIVIpcBasePacket<EorzeaTimeOffset>
 * Structural representation of the packet sent by the server
 * to set the gear show/hide status of a character
 */
-struct FFXIVIpcCharaGearParams : FFXIVIpcBasePacket<CharaGearParams>
+struct FFXIVIpcEquipDisplayFlags : FFXIVIpcBasePacket<EquipDisplayFlags>
 {
    uint8_t bitmask;
 };
