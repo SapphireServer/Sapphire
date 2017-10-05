@@ -257,6 +257,13 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
       pPlayer->sendModel();
       pPlayer->sendDebug( "Model updated" );
    }
+   else if ( subCommand == "title" )
+   {
+      uint32_t titleId;
+      sscanf( params.c_str(), "%d", &titleId );
+
+      pPlayer->setTitle( titleId );
+   }
    else
    {
       pPlayer->sendUrgent( subCommand + " is not a valid SET command." );

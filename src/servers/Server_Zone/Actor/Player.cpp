@@ -1415,6 +1415,12 @@ void Core::Entity::Player::setIsLogin( bool bIsLogin )
    m_bIsLogin = bIsLogin;
 }
 
+void Core::Entity::Player::setTitle( uint16_t titleId )
+{
+   m_title = titleId;
+   sendToInRangeSet( ActorControlPacket142( getId(), SetTitle, titleId ), true );
+}
+
 void Core::Entity::Player::autoAttack( ActorPtr pTarget )
 {
 

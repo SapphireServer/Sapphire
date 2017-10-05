@@ -92,7 +92,11 @@ void Core::Action::ActionCast::onInterrupt()
    m_pSource->getAsPlayer()->sendStateFlags();
 
    auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt,
-                                          0x219, 1, m_id, 1 );
+                                          0x219, 1, m_id, 0 );
+
+   // Note: When cast interrupt from taking too much damage, set the last value to 1. This enables the cast interrupt effect. Example:
+   // auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt, 0x219, 1, m_id, 0 );
+
    m_pSource->sendToInRangeSet( control, true );
 
 }
