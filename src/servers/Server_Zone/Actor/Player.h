@@ -329,7 +329,7 @@ public:
    /*! prepares zoning / fades out the screen */
    void prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadoutTime = 0, uint16_t animation = 0 );
    /*! change player's title */
-   void setTitle( uint8_t titleId );
+   void setTitle( uint16_t titleId );
 
    void calculateStats() override;
    void sendStats();
@@ -567,8 +567,8 @@ private:
       uint8_t status;
    } m_retainerInfo[8];
 
-   uint8_t m_title;
-   uint8_t m_titleList[32];
+   uint16_t m_title;
+   uint16_t m_titleList[32];
    uint8_t m_achievement[16];
    uint8_t m_howTo[33];
    uint8_t m_homePoint;
