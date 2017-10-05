@@ -285,7 +285,11 @@ void Core::Network::GameConnection::updatePositionHandler( const Packets::GamePa
 
 }
 
-
+void Core::Network::GameConnection::reqCharaGearParamHandler( const Packets::GamePacket& inPacket,
+                                                     Entity::PlayerPtr pPlayer )
+{
+   pPlayer->setCharaGearParamState( inPacket.getValAt< uint8_t >( 0x20 ) );
+}
 
 void Core::Network::GameConnection::zoneLineHandler( const Packets::GamePacket& inPacket,
                                                      Entity::PlayerPtr pPlayer )

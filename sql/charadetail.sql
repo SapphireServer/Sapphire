@@ -70,6 +70,7 @@ CREATE TABLE IF NOT EXISTS `charadetail` (
   `StepIndex` int(5) DEFAULT NULL,
   `ChocoboTaxiStandFlags` binary(8) DEFAULT NULL,
   `GMRank` int(3) DEFAULT '0',
+  `CharaGearParamState` int(3) DEFAULT '0',
   `unlocks` binary(64) DEFAULT NULL,
   `CharacterId` int(20) NOT NULL DEFAULT '0',
   `IS_DELETE` int(3) DEFAULT '0',

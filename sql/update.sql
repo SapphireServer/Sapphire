@@ -23,3 +23,5 @@
 -- ALTER TABLE `charadetail` CHANGE `OpeningSequence` `OpeningSequence` INT(3) NULL DEFAULT '0';
 -- -------------------------------------------
 -- update.sql Before Merge into Other SQL's 30/08/2017
+
+ALTER TABLE `charadetail` ADD `CharaGearParamState` int(3) DEFAULT '0' AFTER `GMRank`;

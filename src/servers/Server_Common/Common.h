@@ -946,7 +946,7 @@ namespace Core {
 
          SetMaxGearSets = 0x230,
 
-         ToggleDisplayHeadAndWeapon = 0x260,
+         SetCharaGearParamUI = 0x260,
 
          GearSetEquipMsg = 0x321
       };
