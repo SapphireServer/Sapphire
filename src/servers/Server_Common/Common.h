@@ -1056,6 +1056,15 @@ namespace Core {
          Unused100
       };
 
+      enum CharaGearParamValues : uint8_t
+      {
+         HideNothing = 0x0,
+         HideHead = 0x1,
+         HideWeapon = 0x2,
+
+         Visor = 0x40,
+      };
+
       struct ServerEntry
       {
          uint32_t serverId;
