@@ -85,7 +85,22 @@ namespace Server {
 
          if( pPlayer->getZoningType() != Common::ZoneingType::None )
          {
-            m_data.displayFlags |= 0x20;
+            m_data.displayFlags |= Entity::Actor::DisplayFlags::Invisible;
+         }
+
+         if( pPlayer->getEquipDisplayFlags() & Core::Common::EquipDisplayFlags::HideHead )
+         {
+            m_data.displayFlags |= Entity::Actor::DisplayFlags::HideHead;
+         }
+
+         if( pPlayer->getEquipDisplayFlags() & Core::Common::EquipDisplayFlags::HideWeapon )
+         {
+            m_data.displayFlags |= Entity::Actor::DisplayFlags::HideWeapon;
+         }
+
+         if( pPlayer->getEquipDisplayFlags() & Core::Common::EquipDisplayFlags::Visor )
+         {
+            m_data.displayFlags |= Entity::Actor::DisplayFlags::Visor;
          }
 
          m_data.targetId = pPlayer->getTargetId();

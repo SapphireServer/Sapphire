@@ -188,7 +188,7 @@ namespace Packets {
       LinkshellEventHandler    = 0x013B,
       LinkshellEventHandler1   = 0x013C,
 
-      ReqCharaGearParamChange  = 0x0143,
+      ReqEquipDisplayFlagsChange  = 0x0143,
    };
 
    ////////////////////////////////////////////////////////////////////////////////

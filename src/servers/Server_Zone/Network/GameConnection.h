@@ -116,7 +116,7 @@ public:
    DECLARE_HANDLER( gm1Handler );
    DECLARE_HANDLER( gm2Handler );
 
-   DECLARE_HANDLER( reqCharaGearParamHandler );
+   DECLARE_HANDLER( reqEquipDisplayFlagsHandler );
 
    DECLARE_HANDLER( tellHandler );
 

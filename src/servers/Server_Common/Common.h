@@ -1056,7 +1056,7 @@ namespace Core {
          Unused100
       };
 
-      enum CharaGearParamValues : uint8_t
+      enum EquipDisplayFlags : uint8_t
       {
          HideNothing = 0x0,
          HideHead = 0x1,

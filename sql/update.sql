@@ -24,4 +24,4 @@
 -- -------------------------------------------
 -- update.sql Before Merge into Other SQL's 30/08/2017
 
-ALTER TABLE `charadetail` ADD `CharaGearParamState` int(3) DEFAULT '0' AFTER `GMRank`;
+ALTER TABLE `charadetail` ADD `EquipDisplayFlags` int(3) DEFAULT '0' AFTER `GMRank`;
