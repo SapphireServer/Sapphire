@@ -34,4 +34,14 @@ void Core::Db::CharaDbConnection::doPrepareStatements()
                                            " ON c.CharacterId = cd.CharacterId "
                                            "WHERE c.CharacterId = ?;", CONNECTION_SYNCH );
 
+   prepareStatement( CHAR_SEL_LOAD_CLASSINFO, "SELECT * FROM characlass WHERE CharacterId = ?;", CONNECTION_SYNCH );
+   prepareStatement( CHAR_SEL_LOAD_SEARCHINFO, "SELECT * FROM charainfosearch WHERE CharacterId = ?;", CONNECTION_SYNCH );
+   prepareStatement( CHAR_SEL_LOAD_QUESTINFO, "SELECT * FROM charaquest WHERE CharacterId = ?;", CONNECTION_SYNCH );
+
+
+
+
+
+
+
 }

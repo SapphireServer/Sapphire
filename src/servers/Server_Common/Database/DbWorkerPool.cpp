@@ -108,10 +108,10 @@ Mysql::ResultSet* Core::Db::DbWorkerPool<T>::query( const std::string& sql, T* c
 }
 
 template< class T >
-Mysql::ResultSet* Core::Db::DbWorkerPool<T>::query( PreparedStatement* stmt )
+Mysql::PreparedResultSet* Core::Db::DbWorkerPool<T>::query( PreparedStatement* stmt )
 {
    auto connection = getFreeConnection();
-   Mysql::ResultSet* ret = connection->query( stmt );
+   auto ret = dynamic_cast< Mysql::PreparedResultSet* >( connection->query( stmt ) );
    connection->unlock();
 
    return ret;
