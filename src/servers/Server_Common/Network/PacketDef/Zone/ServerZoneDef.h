@@ -368,8 +368,8 @@ struct FFXIVIpcPlayerSpawn : FFXIVIpcBasePacket<PlayerSpawn>
    uint32_t u20;
    uint32_t ownerId;
    uint32_t u22;
-   uint32_t hPCurr;
    uint32_t hPMax;
+   uint32_t hPCurr;
    uint32_t displayFlags;
    uint16_t fateID;
    uint16_t mPCurr;
