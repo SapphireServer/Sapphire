@@ -13,8 +13,6 @@
 #include "Player.h"
 #include "src/servers/Server_Zone/Inventory/Inventory.h"
 
-
-
 extern Core::Db::Database g_database;
 extern Core::Data::ExdData g_exdData;
 
@@ -22,54 +20,6 @@ using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-bool Core::Entity::Player::loadActiveQuests()
-{
-
-   auto pQR = g_database.query( "SELECT * FROM charaquest WHERE CharacterId = " + std::to_string( m_id ) + ";" );
-
-   if( !pQR )
-      return false;
-
-   Db::Field* field = pQR->fetch();
-
-   for( uint8_t i = 0; i < 30; i++ )
-   {
-
-      uint16_t index = i * 10;
-
-      //g_log.debug( " QUEST_ID: " + std::to_string( field[index].getInt16() ) + " INDEX: " + std::to_string( index ) );
-
-      if( field[index].get< int16_t >() != 0 )
-      {
-         
-         boost::shared_ptr<QuestActive> pActiveQuest( new QuestActive() );
-         pActiveQuest->c.questId = field[index].get< int16_t >();
-         pActiveQuest->c.sequence = field[index + 1].get< uint8_t >();
-         pActiveQuest->c.flags = field[index + 2].get< uint8_t >();
-         pActiveQuest->c.UI8A = field[index + 3].get< uint8_t >();
-         pActiveQuest->c.UI8B = field[index + 4].get< uint8_t >();
-         pActiveQuest->c.UI8C = field[index + 5].get< uint8_t >();
-         pActiveQuest->c.UI8D = field[index + 6].get< uint8_t >();
-         pActiveQuest->c.UI8E = field[index + 7].get< uint8_t >();
-         pActiveQuest->c.UI8F = field[index + 8].get< uint8_t >();
-         pActiveQuest->c.padding1 = field[index + 9].get< uint8_t >();
-         m_activeQuests[i] = pActiveQuest;
-
-         m_questIdToQuestIdx[pActiveQuest->c.questId] = i;
-         m_questIdxToQuestId[i] = pActiveQuest->c.questId;
-
-      }
-      else
-      {
-         m_activeQuests[i] = nullptr;
-         m_freeQuestIdxQueue.push( i );
-      }
-
-   }
-
-   return true;
-
-}
 
 void Core::Entity::Player::finishQuest( uint16_t questId )
 {

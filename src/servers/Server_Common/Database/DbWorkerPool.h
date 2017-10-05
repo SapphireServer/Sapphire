@@ -55,7 +55,7 @@ public:
    void directExecute( const std::string& sql );
    void directExecute( PreparedStatement* stmt );
    Mysql::ResultSet* query( const std::string& sql, T* connection = nullptr );
-   Mysql::ResultSet* query( PreparedStatement* stmt );
+   Mysql::PreparedResultSet* query( PreparedStatement* stmt );
 
    typedef typename T::Statements PreparedStatementIndex;
 

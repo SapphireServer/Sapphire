@@ -51,10 +51,11 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
 {
    const std::string char_id_str = std::to_string( charId );
 
-   boost::scoped_ptr< Core::Db::PreparedStatement > stmt( g_charaDb.getPreparedStatement( Core::Db::CharaDbStatements::CHAR_SEL_LOAD ) );
-   stmt->setUInt( 1, charId );
+   Core::Db::PreparedStmtScopedPtr stmt( g_charaDb.getPreparedStatement(
+           Core::Db::CharaDbStatements::CHAR_SEL_LOAD ) );
 
-   auto res = dynamic_cast< Mysql::PreparedResultSet* >( g_charaDb.query( stmt.get() ) );
+   stmt->setUInt( 1, charId );
+   Mysql::PreparedResultSetScopedPtr res( g_charaDb.query( stmt.get() ) );
    
    if( !res->next() )
       return false;
@@ -69,6 +70,7 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
    ZonePtr pCurrZone = g_zoneMgr.getZone( zoneId );
    m_zoneId = zoneId;
 
+   // TODO: logic for instances needs to be added here
    // see if a valid zone could be found for the character
    if( !pCurrZone )
    {
@@ -102,19 +104,19 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
    auto modelEq = res->getBlobVector( "ModelEquip" );
    memcpy( reinterpret_cast< char* >( m_modelEquip ), modelEq.data(), modelEq.size() );
 
-   m_guardianDeity = res->getUInt( "GuardianDeity" );
-   m_birthDay = res->getUInt( "BirthDay" );
-   m_birthMonth = res->getUInt( "BirthMonth" );
+   m_guardianDeity = res->getUInt8( "GuardianDeity" );
+   m_birthDay = res->getUInt8( "BirthDay" );
+   m_birthMonth = res->getUInt8( "BirthMonth" );
    m_status = static_cast< ActorStatus >( res->getUInt( "Status" ) );
    m_class = static_cast< ClassJob >( res->getUInt( "Class" ) );
-   m_homePoint = res->getUInt( "Homepoint" );
+   m_homePoint = res->getUInt8( "Homepoint" );
 
    auto howTo = res->getBlobVector( "HowTo" );
    memcpy( reinterpret_cast< char* >( m_howTo ), howTo.data(), howTo.size() );
 
    m_contentId = res->getUInt64( "ContentId" );
 
-   m_voice = res->getUInt( "Voice" );
+   m_voice = res->getUInt8( "Voice" );
 
    auto questCompleteFlags = res->getBlobVector( "QuestCompleteFlags" );
    memcpy( reinterpret_cast< char* >( m_questCompleteFlags ), questCompleteFlags.data(), questCompleteFlags.size() );
@@ -133,77 +135,22 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
    auto discovery = res->getBlobVector( "Discovery" );
    memcpy( reinterpret_cast< char* >( m_discovery ), discovery.data(), discovery.size() );
 
-   m_startTown = res->getUInt( "StartTown" );
+   m_startTown = res->getUInt8( "StartTown" );
    m_playTime = res->getUInt( "TotalPlayTime" );
 
    m_bNewAdventurer = res->getBoolean( "IsNewAdventurer" );
 
-   m_gc = res->getUInt( "GrandCompany" );
+   m_gc = res->getUInt8( "GrandCompany" );
    auto gcRank = res->getBlobVector( "GrandCompanyRank" );
    memcpy( reinterpret_cast< char* >( m_gcRank ), gcRank.data(), gcRank.size() );
 
    m_cfPenaltyUntil = res->getUInt( "CFPenaltyUntil" );
 
-   m_openingSequence = res->getUInt( "OpeningSequence" );
+   m_openingSequence = res->getUInt8( "OpeningSequence" );
 
-   m_gmRank = res->getUInt( "GMRank" );
-   
-   //auto pQR = g_database.query( "SELECT "
-   //   "c.Name, "
-   //   "c.PrimaryTerritoryId, "
-   //   "c.Hp, "
-   //   "c.Mp, "
-   //   "c.Gp, "
-   //   "c.Mode, "
-   //   "c.Pos_0_0, "
-   //   "c.Pos_0_1, "
-   //   "c.Pos_0_2, "
-   //   "c.Pos_0_3, "
-   //   "c.FirstLogin, " // 10
-   //   "c.Customize, "
-   //   "c.ModelMainWeapon, "
-   //   "c.ModelSubWeapon, "
-   //   "c.ModelEquip, "
-   //   "cd.GuardianDeity, "
-   //   "cd.BirthDay, "
-   //   "cd.BirthMonth, "
-   //   "cd.Status, "
-   //   "cd.Class, "
-   //   "cd.Homepoint, " // 20
-   //   "cd.HowTo, "
-   //   "c.ContentId, "
-   //   "c.Voice, "
-   //   "cd.QuestCompleteFlags, "
-   //   "cd.QuestTracking, "
-   //   "c.IsNewGame, "
-   //   "cd.Aetheryte, "
-   //   "cd.unlocks, "
-   //   "cd.Discovery, "
-   //   "cd.StartTown, " // 30
-   //   "cd.TotalPlayTime, "
-   //   "c.IsNewAdventurer, "
-   //   "cd.GrandCompany, "
-   //   "cd.GrandCompanyRank, "
-   //   "cd.CFPenaltyUntil, "
-   //   "cd.OpeningSequence, "
-   //   "cd.GMRank "
-   //   "FROM charabase AS c "
-   //   " INNER JOIN charadetail AS cd "
-   //   " ON c.CharacterId = cd.CharacterId "
-   //   "WHERE c.CharacterId = " + char_id_str + ";" );
+   m_gmRank = res->getUInt8( "GMRank" );
 
-   //if( !pQR )
-   //{
-   //   g_log.error( "Player id " + char_id_str + " does not exist!" );
-   //   return false;
-   //}
-   // 
-
-   //Db::Field *field = pQR->fetch();
-
-
-
-
+   res->free();
 
    m_pCell = nullptr;
 
@@ -258,21 +205,78 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
    return true;
 }
 
-
-bool Core::Entity::Player::loadClassData()
+bool Core::Entity::Player::loadActiveQuests()
 {
-   auto pQR = g_database.query( "SELECT * FROM characlass WHERE CharacterId = " + std::to_string( m_id ) + ";" );
+
+   Core::Db::PreparedStmtScopedPtr stmt( g_charaDb.getPreparedStatement(
+      Core::Db::CharaDbStatements::CHAR_SEL_LOAD_QUESTINFO ) );
+
+   stmt->setUInt( 1, m_id );
+   Mysql::PreparedResultSetScopedPtr res( g_charaDb.query( stmt.get() ) );
+
+   if( !res->next() )
+      return false;
+
+   auto pQR = g_database.query( "SELECT * FROM charaquest WHERE CharacterId = " + std::to_string( m_id ) + ";" );
 
    if( !pQR )
       return false;
 
    Db::Field* field = pQR->fetch();
 
+   for( uint8_t i = 0; i < 30; i++ )
+   {
+
+      uint16_t index = i * 10 + 1;
+
+      if( res->getUInt16( index ) != 0 )
+      {
+
+         boost::shared_ptr<QuestActive> pActiveQuest( new QuestActive() );
+         pActiveQuest->c.questId = res->getUInt16( index );
+         pActiveQuest->c.sequence = res->getUInt8( index + 1 );
+         pActiveQuest->c.flags = res->getUInt8( index + 2 );
+         pActiveQuest->c.UI8A = res->getUInt8( index + 3 );
+         pActiveQuest->c.UI8B = res->getUInt8( index + 4 );
+         pActiveQuest->c.UI8C = res->getUInt8( index + 5 );
+         pActiveQuest->c.UI8D = res->getUInt8( index + 6 );
+         pActiveQuest->c.UI8E = res->getUInt8( index + 7 );
+         pActiveQuest->c.UI8F = res->getUInt8( index + 8 );
+         pActiveQuest->c.padding1 = res->getUInt8( index + 9 );
+         m_activeQuests[i] = pActiveQuest;
+
+         m_questIdToQuestIdx[pActiveQuest->c.questId] = i;
+         m_questIdxToQuestId[i] = pActiveQuest->c.questId;
+
+      }
+      else
+      {
+         m_activeQuests[i] = nullptr;
+         m_freeQuestIdxQueue.push( i );
+      }
+
+   }
+
+   return true;
+
+}
+
+bool Core::Entity::Player::loadClassData()
+{
+
+   Core::Db::PreparedStmtScopedPtr stmt( g_charaDb.getPreparedStatement(
+           Core::Db::CharaDbStatements::CHAR_SEL_LOAD_CLASSINFO ) );
+   stmt->setUInt( 1, m_id );
+   Mysql::PreparedResultSetScopedPtr res( g_charaDb.query( stmt.get() ) );
+
+   if( !res->next() )
+      return false;
+
    for( uint8_t i = 0; i < 25; i++ )
    {
       uint8_t index = i * 2;
-      m_classArray[i] = field[index].get< uint8_t >();
-      m_expArray[i] = field[index + 1].get< uint32_t >();
+      m_classArray[i] = res->getUInt16( index + 1 );
+      m_expArray[i] = res->getUInt( index + 2 );
    }
 
    return true;
@@ -280,16 +284,17 @@ bool Core::Entity::Player::loadClassData()
 
 bool Core::Entity::Player::loadSearchInfo()
 {
-   auto pQR = g_database.query( "SELECT * FROM charainfosearch WHERE CharacterId = " + std::to_string( m_id ) + ";" );
+   Core::Db::PreparedStmtScopedPtr stmt( g_charaDb.getPreparedStatement(
+           Core::Db::CharaDbStatements::CHAR_SEL_LOAD_SEARCHINFO ) );
+   stmt->setUInt( 1, m_id );
+   Mysql::PreparedResultSetScopedPtr res( g_charaDb.query( stmt.get() ) );
 
-   if( !pQR )
+   if( !res->next() )
       return false;
 
-   Db::Field* field = pQR->fetch();
-
-   m_searchSelectClass = field[1].get< uint8_t >();
-   m_searchSelectRegion = field[2].get< uint8_t >();
-   sprintf( m_searchMessage, field[3].getString().c_str() );
+   m_searchSelectClass = res->getUInt8( 1 );
+   m_searchSelectRegion = res->getUInt8( 2 );
+   sprintf( m_searchMessage, res->getString( 3 ).c_str() );
 
    return true;
 }
@@ -297,8 +302,6 @@ bool Core::Entity::Player::loadSearchInfo()
 
 void Core::Entity::Player::updateSql()
 {
-
-   g_log.info( "Updating Player Data to SQL DB " );
 
    std::set< std::string > charaBaseSet;
    std::set< std::string > charaDetailSet;

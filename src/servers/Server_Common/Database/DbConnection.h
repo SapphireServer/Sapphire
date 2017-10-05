@@ -8,6 +8,7 @@
 #include <vector>
 #include "src/servers/Server_Common/Util/LockedWaitQueue.h"
 #include <Server_Common/Util/LockedWaitQueue.h>
+#include <boost/scoped_ptr.hpp>
 
 namespace Mysql
 {
@@ -25,6 +26,8 @@ namespace Db
    class PreparedStatement;
    class Operation;
    class DbWorker;
+
+   typedef boost::scoped_ptr< PreparedStatement > PreparedStmtScopedPtr;
 
    enum ConnectionFlags
    {

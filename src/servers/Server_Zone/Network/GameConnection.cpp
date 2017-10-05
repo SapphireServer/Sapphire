@@ -394,8 +394,6 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
          pPe.setValAt< uint32_t >( 0x14, static_cast< uint32_t >( time( nullptr ) ) );
          sendSinglePacket( &pPe );
 
-
-
          // main connection, assinging it to the session
          if( ipcHeader.connectionType == ConnectionType::Zone )
          {
