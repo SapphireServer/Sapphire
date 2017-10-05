@@ -1429,7 +1429,7 @@ void Core::Entity::Player::setTitle( uint16_t titleId )
 void Core::Entity::Player::setEquipDisplayFlags( uint8_t state )
 {
    m_equipDisplayFlags = state;
-   GamePacketNew< FFXIVIpcCharaGearParams, ServerZoneIpcType > paramPacket( getId() );
+   GamePacketNew< FFXIVIpcEquipDisplayFlags, ServerZoneIpcType > paramPacket( getId() );
    paramPacket.data().bitmask = m_equipDisplayFlags;
    sendToInRangeSet( paramPacket, true );
    setSyncFlag( PlayerSyncFlags::Status );

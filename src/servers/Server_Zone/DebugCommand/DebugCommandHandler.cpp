@@ -375,13 +375,7 @@ void Core::DebugCommandHandler::add( char * data, Core::Entity::PlayerPtr pPlaye
    }
    else
    {
-      int32_t opcode;
-      sscanf(params.c_str(), "%x", &opcode);
-
-      Network::Packets::GamePacketNew<Network::Packets::Server::FFXIVIpcCharaGearParams, Network::Packets::ServerZoneIpcType > paramPacket(pPlayer->getId());
-      paramPacket.data().bitmask = opcode;
-      pPlayer->sendToInRangeSet(paramPacket, true);
-      pPlayer->sendUrgent( subCommand + " is not a valid ADD command." + std::to_string(opcode) );
+      pPlayer->sendUrgent( subCommand + " is not a valid ADD command." );
    }
 
 

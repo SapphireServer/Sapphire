@@ -118,7 +118,7 @@ namespace Packets {
 
       EorzeaTimeOffset           = 0x01B4,
 
-      CharaGearParams            = 0x01C0,
+      EquipDisplayFlags            = 0x01C0,
 
       CFAvailableContents        = 0x01CF,
 

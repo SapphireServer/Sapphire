@@ -90,7 +90,7 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
 
    if( !pQR )
    {
-      g_log.error( "[SQL] Failed loading Player ID " + char_id_str );
+      g_log.error( "[DB] Failed loading Player ID " + char_id_str );
       return false;
    }
 
