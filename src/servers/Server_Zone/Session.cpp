@@ -9,6 +9,7 @@
 
 Core::Session::Session( uint32_t sessionId )
    : m_sessionId( sessionId )
+   , m_isValid( false )
    , m_lastDataTime( static_cast< uint32_t >( time( nullptr ) ) )
 {
 
@@ -50,7 +51,12 @@ bool Core::Session::loadPlayer()
    m_pPlayer = Entity::PlayerPtr( new Entity::Player() );
 
    if( !m_pPlayer->load( m_sessionId, shared_from_this() ) )
+   {
+      m_isValid = false;
       return false;
+   }
+   
+   m_isValid = true;
 
    return true;
 
@@ -78,6 +84,11 @@ uint32_t Core::Session::getId() const
 uint32_t Core::Session::getLastDataTime() const
 {
    return m_lastDataTime;
+}
+
+bool Core::Session::isValid() const
+{
+   return m_isValid;
 }
 
 void Core::Session::updateLastDataTime()
