@@ -389,6 +389,13 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
             session = g_serverZone.getSession( playerId );
          }
 
+         if( !session->isValid() ) //TODO: Catch more things in lobby and send real errors
+         {
+            g_log.error( "[" + std::string(id) + "] Session INVALID, disconnecting" );
+            Disconnect();
+            return;
+         }
+
          // if not set, set the session for this connection
          if( !m_pSession && session )
             m_pSession = session;
@@ -422,8 +429,6 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
             pPe = GamePacket( 0x02, 0x28, playerId, playerId, 0x03 );
             sendSinglePacket( &pPe );
          }
-
-
 
          break;
 
