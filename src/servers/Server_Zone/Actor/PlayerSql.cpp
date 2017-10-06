@@ -82,7 +82,7 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
       "cd.CFPenaltyUntil, "
       "cd.OpeningSequence, "
       "cd.GMRank, "
-      "cd.EquipDisplayFlags "
+      "cd.EquipDisplayFlags"
       "FROM charabase AS c "
       " INNER JOIN charadetail AS cd "
       " ON c.CharacterId = cd.CharacterId "
