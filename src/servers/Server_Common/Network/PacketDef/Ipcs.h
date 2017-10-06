@@ -119,6 +119,8 @@ namespace Packets {
 
       EorzeaTimeOffset           = 0x01B4,
 
+      EquipDisplayFlags            = 0x01C0,
+
       CFAvailableContents        = 0x01CF,
 
       PrepareZoning              = 0x0239, // updated for sb
@@ -186,6 +188,8 @@ namespace Packets {
 
       LinkshellEventHandler    = 0x013B,
       LinkshellEventHandler1   = 0x013C,
+
+      ReqEquipDisplayFlagsChange  = 0x0143,
    };
 
    ////////////////////////////////////////////////////////////////////////////////
