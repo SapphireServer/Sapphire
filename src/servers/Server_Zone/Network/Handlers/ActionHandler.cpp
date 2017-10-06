@@ -118,6 +118,16 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
                pPlayer->getCurrentAction()->setInterrupted();
            break;
         }
+        case 0x12F: // Get title list
+        {
+           g_log.debug( "for real" );
+           /*
+           GamePacketNew< FFXIVIpcPlayerTitleList, ServerZoneIpcType > titleListPacket( pPlayer->getId() );
+           titleListPacket.data().bitmask = 0;
+           titleListPacket.data().bitmask |= 1;
+           pPlayer->queuePacket( titleListPacket );
+           */
+        }
         case 0x133: // Update howtos seen
         {
             uint32_t howToId = static_cast< uint32_t >( param1 );
