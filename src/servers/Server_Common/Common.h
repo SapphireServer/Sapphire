@@ -946,7 +946,7 @@ namespace Core {
 
          SetMaxGearSets = 0x230,
 
-         ToggleDisplayHeadAndWeapon = 0x260,
+         SetCharaGearParamUI = 0x260,
 
          GearSetEquipMsg = 0x321
       };
@@ -1054,6 +1054,15 @@ namespace Core {
          Unused98,
          Unused99,
          Unused100
+      };
+
+      enum EquipDisplayFlags : uint8_t
+      {
+         HideNothing = 0x0,
+         HideHead = 0x1,
+         HideWeapon = 0x2,
+
+         Visor = 0x40,
       };
 
       struct ServerEntry
