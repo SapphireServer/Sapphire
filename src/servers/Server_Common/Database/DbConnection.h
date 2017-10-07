@@ -9,7 +9,6 @@
 #include "src/servers/Server_Common/Util/LockedWaitQueue.h"
 #include <Server_Common/Util/LockedWaitQueue.h>
 #include <boost/scoped_ptr.hpp>
-#include <boost/move/unique_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
 namespace Mysql
