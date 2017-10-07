@@ -12,9 +12,11 @@ class DbConnectionInfo;
 enum CharaDbStatements : uint32_t
 {
    CHAR_SEL_LOAD,
+   CHAR_SEL_LOAD_MINIMAL,
    CHAR_SEL_LOAD_CLASSINFO,
    CHAR_SEL_LOAD_SEARCHINFO,
    CHAR_SEL_LOAD_QUESTINFO,
+   CHAR_INS_CHARINFO,
    CHAR_INS_TEST,
 
    MAX_STATEMENTS
@@ -26,7 +28,7 @@ public:
    typedef CharaDbStatements Statements;
 
    CharaDbConnection( ConnectionInfo& connInfo );
-   CharaDbConnection( Core::LockedWaitQueue< Operation* >* q, ConnectionInfo &connInfo );
+   CharaDbConnection( Core::LockedWaitQueue< boost::shared_ptr< Operation > >* q, ConnectionInfo &connInfo );
 
    ~CharaDbConnection();
 

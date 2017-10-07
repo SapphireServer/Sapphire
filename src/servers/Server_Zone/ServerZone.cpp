@@ -194,7 +194,7 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
    g_charaDb.execute( "DELETE FROM zoneservers WHERE id = 101" );
 
    // query runs synchronous
-   boost::scoped_ptr< Mysql::ResultSet > res( g_charaDb.query( "SELECT id,ip,port FROM zoneservers" ) );
+   auto res = g_charaDb.query( "SELECT id,ip,port FROM zoneservers" );
    while( res->next() )
    {
       g_log.info( "id: " + std::to_string( res->getUInt( "id" ) ) );
@@ -215,13 +215,13 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
    try
    {
    //   // bunch of test cases for db wrapper
-      Mysql::MySqlBase base;
-      g_log.info( base.getVersionInfo() );
+      boost::shared_ptr< Mysql::MySqlBase > base( new Mysql::MySqlBase() );
+      g_log.info( base->getVersionInfo() );
 
       Mysql::optionMap options;
       options[ MYSQL_OPT_RECONNECT ] = "1";
 
-      boost::scoped_ptr< Mysql::Connection > con( base.connect( "127.0.0.1", "root", "", options, 3306 ) );
+      auto con = base->connect( "127.0.0.1", "root", "", options, 3306 );
 
    //   if( con->getAutoCommit() )
    //      g_log.info( "autocommit active" );

@@ -39,7 +39,7 @@ bool Core::Db::StatementTask::execute()
 
 
 
-Core::Db::PreparedStatementTask::PreparedStatementTask( Core::Db::PreparedStatement *stmt, bool async ) :
+Core::Db::PreparedStatementTask::PreparedStatementTask( boost::shared_ptr< Core::Db::PreparedStatement > stmt, bool async ) :
         m_stmt(stmt)
         //, m_result(nullptr)
 {
@@ -48,7 +48,6 @@ Core::Db::PreparedStatementTask::PreparedStatementTask( Core::Db::PreparedStatem
 
 Core::Db::PreparedStatementTask::~PreparedStatementTask()
 {
-   delete m_stmt;
    //if (m_has_result && m_result != nullptr)
    //   delete m_result;
 }

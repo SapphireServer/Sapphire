@@ -51,11 +51,10 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
 {
    const std::string char_id_str = std::to_string( charId );
 
-   Core::Db::PreparedStmtScopedPtr stmt( g_charaDb.getPreparedStatement(
-           Core::Db::CharaDbStatements::CHAR_SEL_LOAD ) );
+   auto stmt = g_charaDb.getPreparedStatement( Core::Db::CharaDbStatements::CHAR_SEL_LOAD );
 
    stmt->setUInt( 1, charId );
-   Mysql::PreparedResultSetScopedPtr res( g_charaDb.query( stmt.get() ) );
+   auto res = g_charaDb.query( stmt );
    
    if( !res->next() )
       return false;
@@ -65,7 +64,7 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
    auto name = res->getString( "Name" );
    strcpy( m_name, name.c_str() );
 
-   auto zoneId = res->getUInt( "PrimaryTerritoryId" );
+   auto zoneId = res->getUInt( "TerritoryId" );
 
    ZonePtr pCurrZone = g_zoneMgr.getZone( zoneId );
    m_zoneId = zoneId;
@@ -91,10 +90,10 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
    m_mp = res->getUInt( "Mp" );
    m_tp = 0;
 
-   m_pos.x = res->getFloat( "Pos_0_0" );
-   m_pos.y = res->getFloat( "Pos_0_1" );
-   m_pos.z = res->getFloat( "Pos_0_2" );
-   setRotation( res->getFloat( "Pos_0_3" ) );
+   m_pos.x = res->getFloat( "PosX" );
+   m_pos.y = res->getFloat( "PosY" );
+   m_pos.z = res->getFloat( "PosZ" );
+   setRotation( res->getFloat( "PosR" ) );
 
    auto custom = res->getBlobVector( "Customize" );
    memcpy( reinterpret_cast< char* >( m_customize ), custom.data(), custom.size() );
@@ -129,7 +128,7 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
    auto aetheryte = res->getBlobVector( "Aetheryte" );
    memcpy( reinterpret_cast< char* >( m_aetheryte ), aetheryte.data(), aetheryte.size() );
 
-   auto unlocks = res->getBlobVector( "unlocks" );
+   auto unlocks = res->getBlobVector( "Unlocks" );
    memcpy( reinterpret_cast< char* >( m_unlocks ), unlocks.data(), unlocks.size() );
 
    auto discovery = res->getBlobVector( "Discovery" );
@@ -208,11 +207,10 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
 bool Core::Entity::Player::loadActiveQuests()
 {
 
-   Core::Db::PreparedStmtScopedPtr stmt( g_charaDb.getPreparedStatement(
-      Core::Db::CharaDbStatements::CHAR_SEL_LOAD_QUESTINFO ) );
+   auto stmt = g_charaDb.getPreparedStatement( Core::Db::CharaDbStatements::CHAR_SEL_LOAD_QUESTINFO );
 
    stmt->setUInt( 1, m_id );
-   Mysql::PreparedResultSetScopedPtr res( g_charaDb.query( stmt.get() ) );
+   auto res = g_charaDb.query( stmt );
 
    if( !res->next() )
       return false;
@@ -264,10 +262,9 @@ bool Core::Entity::Player::loadActiveQuests()
 bool Core::Entity::Player::loadClassData()
 {
 
-   Core::Db::PreparedStmtScopedPtr stmt( g_charaDb.getPreparedStatement(
-           Core::Db::CharaDbStatements::CHAR_SEL_LOAD_CLASSINFO ) );
+   auto stmt = g_charaDb.getPreparedStatement( Core::Db::CharaDbStatements::CHAR_SEL_LOAD_CLASSINFO );
    stmt->setUInt( 1, m_id );
-   Mysql::PreparedResultSetScopedPtr res( g_charaDb.query( stmt.get() ) );
+   auto res = g_charaDb.query( stmt );
 
    if( !res->next() )
       return false;
@@ -284,10 +281,9 @@ bool Core::Entity::Player::loadClassData()
 
 bool Core::Entity::Player::loadSearchInfo()
 {
-   Core::Db::PreparedStmtScopedPtr stmt( g_charaDb.getPreparedStatement(
-           Core::Db::CharaDbStatements::CHAR_SEL_LOAD_SEARCHINFO ) );
+   auto stmt = g_charaDb.getPreparedStatement( Core::Db::CharaDbStatements::CHAR_SEL_LOAD_SEARCHINFO );
    stmt->setUInt( 1, m_id );
-   Mysql::PreparedResultSetScopedPtr res( g_charaDb.query( stmt.get() ) );
+   auto res = g_charaDb.query( stmt );
 
    if( !res->next() )
       return false;

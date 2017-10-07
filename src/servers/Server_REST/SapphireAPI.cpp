@@ -209,7 +209,7 @@ std::vector<Core::PlayerMinimal> Core::Network::SapphireAPI::getCharList( uint32
 
    std::vector<Core::PlayerMinimal> charList;
 
-   boost::shared_ptr<Core::Db::QueryResult> pQR = g_database.query( "SELECT CharacterId, ContentId FROM charabase WHERE AccountId = " + std::to_string( accountId ) + ";" );
+   boost::shared_ptr<Core::Db::QueryResult> pQR = g_database.query( "SELECT CharacterId, ContentId FROM charainfo WHERE AccountId = " + std::to_string( accountId ) + ";" );
 
    if( !pQR )
    {
@@ -236,7 +236,7 @@ std::vector<Core::PlayerMinimal> Core::Network::SapphireAPI::getCharList( uint32
 
 bool Core::Network::SapphireAPI::checkNameTaken( std::string name )
 {
-   std::string query = "SELECT * FROM charabase WHERE Name = '" + g_database.escapeString( name ) + "';";
+   std::string query = "SELECT * FROM charainfo WHERE Name = '" + g_database.escapeString( name ) + "';";
 
    auto pQR = g_database.query( query );
 
@@ -250,7 +250,7 @@ uint32_t Core::Network::SapphireAPI::getNextCharId()
 {
    int32_t charId = 0;
 
-   boost::shared_ptr<Core::Db::QueryResult> pQR = g_database.query( "SELECT MAX(CharacterId) FROM charabase" );
+   boost::shared_ptr<Core::Db::QueryResult> pQR = g_database.query( "SELECT MAX(CharacterId) FROM charainfo" );
 
    if( !pQR )
    {
@@ -270,7 +270,7 @@ uint64_t Core::Network::SapphireAPI::getNextContentId()
 {
    uint64_t contentId = 0;
 
-   boost::shared_ptr<Core::Db::QueryResult> pQR = g_database.query( "SELECT MAX(ContentId) FROM charabase" );
+   boost::shared_ptr<Core::Db::QueryResult> pQR = g_database.query( "SELECT MAX(ContentId) FROM charainfo" );
 
    if( !pQR )
    {
