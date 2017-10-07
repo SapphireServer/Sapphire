@@ -2,6 +2,7 @@
 #define SAPPHIRE_STATEMENTTASK_H
 
 #include <string>
+#include <boost/shared_ptr.hpp>
 #include "Operation.h"
 
 namespace Core
@@ -31,18 +32,17 @@ namespace Db
 //      QueryResultPromise *m_result;
    };
 
-   //- Lower-level class, enqueuable operation
    class PreparedStatementTask : public Operation
    {
    public:
-      PreparedStatementTask( PreparedStatement* stmt, bool async = false);
+      PreparedStatementTask( boost::shared_ptr< PreparedStatement > stmt, bool async = false);
       ~PreparedStatementTask();
 
       bool execute() override;
       //PreparedQueryResultFuture getFuture() { return m_result->get_future(); }
 
    protected:
-      PreparedStatement* m_stmt;
+      boost::shared_ptr< PreparedStatement > m_stmt;
       bool m_hasResult;
       //PreparedQueryResultPromise* m_result;
    };

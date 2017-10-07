@@ -5,6 +5,7 @@
 #include "StatementTask.h"
 #include "Operation.h"
 #include "CharaDbConnection.h"
+#include <boost/make_shared.hpp>
 
 #include <Server_Common/Logging/Logger.h>
 extern Core::Logger g_log;
@@ -20,7 +21,7 @@ class PingOperation : public Core::Db::Operation
 
 template< class T >
 Core::Db::DbWorkerPool<T>::DbWorkerPool()
-        : m_queue( new Core::LockedWaitQueue< Operation* >() ),
+        : m_queue( new Core::LockedWaitQueue< boost::shared_ptr< Operation > >() ),
           m_asyncThreads( 0 ),
           m_synchThreads( 0 )
 {
@@ -33,9 +34,9 @@ Core::Db::DbWorkerPool< T >::~DbWorkerPool()
 }
 
 template< class T >
-void Core::Db::DbWorkerPool<T>::setConnectionInfo( const ConnectionInfo& info,
-                                                   uint8_t asyncThreads,
-                                                   uint8_t synchThreads)
+void Core::Db::DbWorkerPool< T >::setConnectionInfo( const ConnectionInfo& info,
+                                                     uint8_t asyncThreads,
+                                                     uint8_t synchThreads)
 {
    m_connectionInfo = info;
    m_asyncThreads = asyncThreads;
@@ -96,31 +97,31 @@ bool Core::Db::DbWorkerPool<T>::prepareStatements()
 }
 
 template< class T >
-Mysql::ResultSet* Core::Db::DbWorkerPool<T>::query( const std::string& sql, T* connection )
+boost::shared_ptr< Mysql::ResultSet > Core::Db::DbWorkerPool< T >::query( const std::string& sql, boost::shared_ptr< T > connection )
 {
    if( !connection )
       connection = getFreeConnection();
 
-   Mysql::ResultSet* result = connection->query( sql );
+   boost::shared_ptr< Mysql::ResultSet > result = connection->query( sql );
    connection->unlock();
 
    return result;
 }
 
 template< class T >
-Mysql::PreparedResultSet* Core::Db::DbWorkerPool<T>::query( PreparedStatement* stmt )
+boost::shared_ptr< Mysql::PreparedResultSet > Core::Db::DbWorkerPool< T >::query( boost::shared_ptr< PreparedStatement > stmt )
 {
    auto connection = getFreeConnection();
-   auto ret = dynamic_cast< Mysql::PreparedResultSet* >( connection->query( stmt ) );
+   auto ret = boost::static_pointer_cast< Mysql::PreparedResultSet >( connection->query( stmt ) );
    connection->unlock();
 
    return ret;
 }
 
 template< class T >
-Core::Db::PreparedStatement* Core::Db::DbWorkerPool< T >::getPreparedStatement( PreparedStatementIndex index )
+boost::shared_ptr< Core::Db::PreparedStatement > Core::Db::DbWorkerPool< T >::getPreparedStatement( PreparedStatementIndex index )
 {
-   return new PreparedStatement( index );
+   return boost::make_shared< PreparedStatement >( index );
 }
 
 template< class T >
@@ -149,7 +150,7 @@ void Core::Db::DbWorkerPool< T >::keepAlive()
 
    const auto count = m_connections[IDX_ASYNC].size();
    for( uint8_t i = 0; i < count; ++i )
-      enqueue( new PingOperation );
+      enqueue( boost::make_shared< PingOperation >() );
 }
 
 template< class T >
@@ -162,11 +163,11 @@ uint32_t Core::Db::DbWorkerPool< T >::openConnections( InternalIndex type, uint8
          switch (type)
          {
             case IDX_ASYNC:
-               return std::unique_ptr<T>( new T( m_queue.get(), m_connectionInfo ) );
+               return boost::make_shared< T >( m_queue.get(), m_connectionInfo );
             case IDX_SYNCH:
-               return std::unique_ptr<T>( new T( m_connectionInfo ) );
+               return boost::make_shared< T >( m_connectionInfo );
             default:
-               return std::unique_ptr<T>();
+               return boost::shared_ptr< T >( nullptr );
          }
       }();
 
@@ -176,10 +177,7 @@ uint32_t Core::Db::DbWorkerPool< T >::openConnections( InternalIndex type, uint8
          m_connections[type].clear();
          return error;
       }
-      else
-      {
-         m_connections[type].push_back( std::move( connection ) );
-      }
+      m_connections[type].push_back( connection );
    }
 
    return 0;
@@ -188,29 +186,29 @@ uint32_t Core::Db::DbWorkerPool< T >::openConnections( InternalIndex type, uint8
 template< class T >
 unsigned long Core::Db::DbWorkerPool< T >::escapeString( char *to, const char *from, unsigned long length )
 {
-   if (!to || !from || !length)
+   if( !to || !from || !length )
       return 0;
 
    return mysql_real_escape_string(
-           m_connections[IDX_SYNCH].front()->getConnection()->getRawCon(), to, from, length);
+           m_connections[IDX_SYNCH].front()->getConnection()->getRawCon(), to, from, length );
 }
 
 template< class T >
-void Core::Db::DbWorkerPool< T >::enqueue( Operation* op )
+void Core::Db::DbWorkerPool< T >::enqueue( boost::shared_ptr< Operation > op )
 {
    m_queue->push( op );
 }
 
 template< class T >
-T* Core::Db::DbWorkerPool< T >::getFreeConnection()
+boost::shared_ptr< T > Core::Db::DbWorkerPool< T >::getFreeConnection()
 {
    uint8_t i = 0;
    const auto numCons = m_connections[IDX_SYNCH].size();
-   T* connection = nullptr;
+   boost::shared_ptr< T > connection = nullptr;
 
    while( true )
    {
-      connection = m_connections[IDX_SYNCH][i++ % numCons].get();
+      connection = m_connections[IDX_SYNCH][i++ % numCons];
 
       if (connection->lockIfReady())
          break;
@@ -228,34 +226,31 @@ const std::string& Core::Db::DbWorkerPool< T >::getDatabaseName() const
 template< class T >
 void Core::Db::DbWorkerPool< T >::execute( const std::string& sql )
 {
-   StatementTask* task = new StatementTask( sql );
+   auto task = boost::make_shared< StatementTask >( sql );
    enqueue( task );
 }
 
 template< class T >
-void Core::Db::DbWorkerPool< T >::execute( PreparedStatement* stmt )
+void Core::Db::DbWorkerPool< T >::execute( boost::shared_ptr< PreparedStatement > stmt )
 {
-   PreparedStatementTask* task = new PreparedStatementTask(stmt);
+   auto task = boost::make_shared< PreparedStatementTask >( stmt );
    enqueue( task );
 }
 
 template< class T >
 void Core::Db::DbWorkerPool< T >::directExecute( const std::string& sql )
 {
-   T* connection = getFreeConnection();
+   auto connection = getFreeConnection();
    connection->execute( sql );
    connection->unlock();
 }
 
 template< class T >
-void Core::Db::DbWorkerPool< T >::directExecute( PreparedStatement* stmt )
+void Core::Db::DbWorkerPool< T >::directExecute( boost::shared_ptr< PreparedStatement > stmt )
 {
-   T* connection = getFreeConnection();
+   auto connection = getFreeConnection();
    connection->execute( stmt );
    connection->unlock();
-
-   //! Delete proxy-class. Not needed anymore
-   delete stmt;
 }
 
 /*
@@ -279,6 +274,3 @@ void DatabaseWorkerPool<T>::ExecuteOrAppend(SQLTransaction& trans, PreparedState
 */
 
 template class Core::Db::DbWorkerPool< Core::Db::CharaDbConnection >;
-//template class TC_DATABASE_API DatabaseWorkerPool<LoginDatabaseConnection>;
-//template class TC_DATABASE_API DatabaseWorkerPool<WorldDatabaseConnection>;
-//template class TC_DATABASE_API DatabaseWorkerPool<CharacterDatabaseConnection>;

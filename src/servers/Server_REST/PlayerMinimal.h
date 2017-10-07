@@ -32,12 +32,12 @@ namespace Core {
       // return the id of the actor
       uint32_t getId() const
       {
-         return m_iD;
+         return m_id;
       }
 
       void setId( uint32_t id )
       {
-         m_iD = id;
+         m_id = id;
       }
 
       void setContentId( uint64_t id )
@@ -154,7 +154,7 @@ namespace Core {
 
    private:
       uint32_t						m_accountId;
-      uint32_t						m_iD;
+      uint32_t						m_id;
       uint64_t						m_contentId;
 
       uint8_t							m_guardianDeity;

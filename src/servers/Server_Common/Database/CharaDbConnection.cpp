@@ -5,7 +5,7 @@ Core::Db::CharaDbConnection::CharaDbConnection( ConnectionInfo& connInfo ) : DbC
 {
 }
 
-Core::Db::CharaDbConnection::CharaDbConnection( Core::LockedWaitQueue< Operation * >* q,
+Core::Db::CharaDbConnection::CharaDbConnection( Core::LockedWaitQueue< boost::shared_ptr< Operation > >* q,
                                                 ConnectionInfo& connInfo) : DbConnection( q, connInfo )
 {
 }
@@ -21,22 +21,36 @@ void Core::Db::CharaDbConnection::doPrepareStatements()
 
    prepareStatement( CHAR_INS_TEST, "INSERT INTO zoneservers ( id, ip, port ) VALUES ( ?, ?, ?);", CONNECTION_BOTH );
 
-   prepareStatement( CHAR_SEL_LOAD, "SELECT c.Name, c.PrimaryTerritoryId, c.Hp, c.Mp, c.Gp, c.Mode, "
-                                           "c.Pos_0_0, c.Pos_0_1, c.Pos_0_2, c.Pos_0_3, c.FirstLogin, "
-                                           "c.Customize, c.ModelMainWeapon, c.ModelSubWeapon, c.ModelEquip, "
-                                           "cd.GuardianDeity, cd.BirthDay, cd.BirthMonth, cd.Status, cd.Class, "
-                                           "cd.Homepoint, cd.HowTo, c.ContentId, c.Voice, cd.QuestCompleteFlags, "
-                                           "cd.QuestTracking, c.IsNewGame, cd.Aetheryte, cd.unlocks, cd.Discovery, "
-                                           "cd.StartTown, cd.TotalPlayTime, c.IsNewAdventurer, cd.GrandCompany, "
-                                           "cd.GrandCompanyRank, cd.CFPenaltyUntil, cd.OpeningSequence, cd.GMRank "
-                                           "FROM charabase AS c "
-                                           " INNER JOIN charadetail AS cd "
-                                           " ON c.CharacterId = cd.CharacterId "
-                                           "WHERE c.CharacterId = ?;", CONNECTION_SYNCH );
+   prepareStatement( CHAR_SEL_LOAD, "SELECT ContentId, Name, Hp, Mp, Tp, Gp, Mode, Mount, InvincibleGM, Voice, "
+                                           "Customize, ModelMainWeapon, ModelSubWeapon, ModelSystemWeapon, "
+                                           "ModelEquip, EmoteModeType, FirstLoginTime, Language, IsNewGame, "
+                                           "IsNewAdventurer, TerritoryType, TerritoryId, PosX, PosY, PosZ, PosR, "
+                                           "OTerritoryType, OTerritoryId, OPosX, OPosY, OPosZ, OPosR, GuardianDeity, "
+                                           "BirthDay, BirthMonth, Class, Status, TotalPlayTime, FirstClass, HomePoint, "
+                                           "FavoritePoint, RestPoint, StartTown, ActiveTitle, TitleList, Achievement, "
+                                           "Aetheryte, HowTo, Minions, Mounts, EquippedMannequin, ConfigFlags, "
+                                           "QuestCompleteFlags, OpeningSequence, QuestTracking, GrandCompany, "
+                                           "GrandCompanyRank, Discovery, GMRank, Unlocks, CFPenaltyUntil "
+                                           "FROM charainfo WHERE CharacterId = ?;", CONNECTION_SYNCH );
+
+
+   prepareStatement( CHAR_SEL_LOAD_MINIMAL, "SELECT Name, Customize, ModelEquip, TerritoryId, GuardianDeity, "
+                                            "Class, ContentId, BirthDay, BirthMonth "
+                                            "FROM charainfo WHERE CharacterId = ?;", CONNECTION_SYNCH );
 
    prepareStatement( CHAR_SEL_LOAD_CLASSINFO, "SELECT * FROM characlass WHERE CharacterId = ?;", CONNECTION_SYNCH );
    prepareStatement( CHAR_SEL_LOAD_SEARCHINFO, "SELECT * FROM charainfosearch WHERE CharacterId = ?;", CONNECTION_SYNCH );
    prepareStatement( CHAR_SEL_LOAD_QUESTINFO, "SELECT * FROM charaquest WHERE CharacterId = ?;", CONNECTION_SYNCH );
+
+   prepareStatement( CHAR_INS_CHARINFO, "INSERT INTO charainfo (AccountId, CharacterId, ContentId, Name, Hp, Mp, "
+                                        "Customize, Voice, IsNewGame, TerritoryId, PosX, PosY, PosZ, PosR, ModelEquip, "
+                                        "IsNewAdventurer, GuardianDeity, Birthday, BirthMonth, Class, Status, FirstClass, "
+                                        "HomePoint, StartTown, Discovery, HowTo, QuestCompleteFlags, Unlocks, QuestTracking, "
+                                        "Aetheryte, GMRank, UPDATE_DATE ) "
+                                        "VALUES ( ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW() );",
+                     CONNECTION_SYNCH );
+
+
 
 
 

@@ -4,6 +4,7 @@
 #include <atomic>
 #include <thread>
 #include <Server_Common/Util/LockedWaitQueue.h>
+#include <boost/shared_ptr.hpp>
 
 namespace Core
 {
@@ -15,11 +16,11 @@ namespace Db
    class DbWorker
    {
    public:
-      DbWorker( LockedWaitQueue< Operation* >* newQueue, DbConnection* connection );
+      DbWorker( LockedWaitQueue< boost::shared_ptr< Operation > >* newQueue, DbConnection* connection );
       ~DbWorker();
 
    private:
-      LockedWaitQueue< Operation* >* m_queue;
+      LockedWaitQueue< boost::shared_ptr< Operation > >* m_queue;
       DbConnection* m_pConn;
 
       void workerThread();

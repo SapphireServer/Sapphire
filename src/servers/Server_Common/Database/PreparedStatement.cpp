@@ -44,10 +44,12 @@ void Core::Db::PreparedStatement::bindParameters()
             break;
          case TYPE_BINARY:
             {
-               std::stringstream is;
-               is.rdbuf()->pubsetbuf( reinterpret_cast< char* >( &m_statementData[i].binary[0] ),
-                                                                 m_statementData[i].binary.size() );
-               m_stmt->setBlob( i, &is );
+               std::stringstream *is = new std::stringstream;
+            
+               for( auto entry : m_statementData[i].binary )
+                  is->rdbuf()->sputc( static_cast< char > ( entry ) );
+
+               m_stmt->setBlob( i, is );
             }
             break;
          case TYPE_NULL:
@@ -97,7 +99,7 @@ void Core::Db::PreparedStatement::setInt( uint8_t index, int32_t value )
 void Core::Db::PreparedStatement::setInt64( uint8_t index, int64_t value )
 {
    if( index >= m_statementData.size() )
-      m_statementData.resize(index+1);
+      m_statementData.resize( index + 1);
 
    m_statementData[index].data.i64 = value;
    m_statementData[index].type = TYPE_I64;
@@ -144,7 +146,7 @@ uint32_t Core::Db::PreparedStatement::getIndex() const
    return m_index;
 }
 
-void Core::Db::PreparedStatement::setMysqlPS( Mysql::PreparedStatement* pStmt )
+void Core::Db::PreparedStatement::setMysqlPS( boost::shared_ptr< Mysql::PreparedStatement> pStmt )
 {
    m_stmt = pStmt;
 }

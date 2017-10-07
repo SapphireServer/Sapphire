@@ -17,6 +17,12 @@
 #include <src/servers/Server_Common/Exd/ExdData.h>
 #include <src/servers/Server_Common/Crypt/base64.h>
 
+
+#include <Server_Common/Database/DbLoader.h>
+#include <Server_Common/Database/CharaDbConnection.h>
+#include <Server_Common/Database/DbWorkerPool.h>
+#include <Server_Common/Database/PreparedStatement.h>
+
 //Added for the default_resource example
 #include <fstream>
 #include <string>
@@ -31,6 +37,7 @@
 
 Core::Logger g_log;
 Core::Db::Database g_database;
+Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
 Core::Data::ExdData g_exdData;
 Core::Network::SapphireAPI g_sapphireAPI;
 
@@ -139,6 +146,21 @@ bool loadSettings( int32_t argc, char* argv[] )
       g_log.fatal( "Error setting up EXD data " );
       return false;
    }
+
+   Core::Db::DbLoader loader;
+
+   Core::Db::ConnectionInfo info;
+   info.password = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Pass", "" );
+   info.host = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Host", "127.0.0.1" );
+   info.database = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Database", "sapphire" );
+   info.port = m_pConfig->getValue< uint16_t >( "Settings.General.Mysql.Port", 3306 );
+   info.user = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Username", "root" );
+   info.syncThreads = m_pConfig->getValue< uint8_t >( "Settings.General.Mysql.SyncThreads", 2 );
+   info.asyncThreads = m_pConfig->getValue< uint8_t >( "Settings.General.Mysql.AsyncThreads", 2 );
+
+   loader.addDb( g_charaDb, info );
+   if( !loader.initDbs() )
+      return false;
 
    Core::Db::DatabaseParams params;
    params.bufferSize = 16384;

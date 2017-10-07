@@ -49,17 +49,17 @@ public:
 
    // Async execution
    void execute( const std::string& sql );
-   void execute( PreparedStatement* stmt );
+   void execute( boost::shared_ptr< PreparedStatement > stmt );
 
    // Sync execution
    void directExecute( const std::string& sql );
-   void directExecute( PreparedStatement* stmt );
-   Mysql::ResultSet* query( const std::string& sql, T* connection = nullptr );
-   Mysql::PreparedResultSet* query( PreparedStatement* stmt );
+   void directExecute( boost::shared_ptr< PreparedStatement > stmt );
+   boost::shared_ptr< Mysql::ResultSet > query( const std::string& sql, boost::shared_ptr< T > connection = nullptr );
+   boost::shared_ptr< Mysql::PreparedResultSet > query( boost::shared_ptr< PreparedStatement > stmt );
 
    typedef typename T::Statements PreparedStatementIndex;
 
-   PreparedStatement* getPreparedStatement( PreparedStatementIndex index );
+   boost::shared_ptr< PreparedStatement > getPreparedStatement( PreparedStatementIndex index );
 
    void escapeString( std::string& str );
 
@@ -70,14 +70,14 @@ private:
 
    unsigned long escapeString( char *to, const char *from, unsigned long length );
 
-   void enqueue( Operation* op );
+   void enqueue( boost::shared_ptr< Operation > op );
 
-   T* getFreeConnection();
+   boost::shared_ptr< T > getFreeConnection();
 
    const std::string& getDatabaseName() const;
 
-   std::unique_ptr< Core::LockedWaitQueue< Operation* > > m_queue;
-   std::array< std::vector< std::unique_ptr< T > >, IDX_SIZE > m_connections;
+   std::unique_ptr< Core::LockedWaitQueue< boost::shared_ptr< Operation > > > m_queue;
+   std::array< std::vector< boost::shared_ptr< T > >, IDX_SIZE > m_connections;
    ConnectionInfo m_connectionInfo;
    uint8_t m_asyncThreads;
    uint8_t m_synchThreads;

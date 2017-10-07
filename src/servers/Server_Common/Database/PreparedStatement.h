@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <vector>
 #include <string>
+#include <boost/shared_ptr.hpp>
 #include "Operation.h"
 
 namespace Mysql
@@ -61,12 +62,12 @@ namespace Db
       void setNull( uint8_t index );
 
       uint32_t getIndex() const;
-      void setMysqlPS( Mysql::PreparedStatement* pStmt );
+      void setMysqlPS( boost::shared_ptr< Mysql::PreparedStatement > pStmt );
 
       void bindParameters();
 
    protected:
-      Mysql::PreparedStatement* m_stmt;
+      boost::shared_ptr< Mysql::PreparedStatement > m_stmt;
       uint32_t m_index;
       std::vector< PreparedStatementData > m_statementData;
 
