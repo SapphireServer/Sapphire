@@ -38,11 +38,10 @@ namespace Core {
    void PlayerMinimal::load( uint32_t charId )
    {
 
-      Core::Db::PreparedStmtScopedPtr stmt( g_charaDb.getPreparedStatement(
-              Core::Db::CharaDbStatements::CHAR_SEL_LOAD_MINIMAL ) );
+      auto stmt = g_charaDb.getPreparedStatement( Db::CharaDbStatements::CHAR_SEL_LOAD_MINIMAL );
 
       stmt->setUInt( 1, charId );
-      Mysql::PreparedResultSetScopedPtr res( g_charaDb.query( stmt.get() ) );
+      auto res = g_charaDb.query( stmt );
 
       if( !res->next() )
          return;
@@ -224,8 +223,7 @@ namespace Core {
       //        "HomePoint, StartTown, Discovery, HowTo, QuestCompleteFlags, Unlocks, QuestTracking, "
       //        "Aetheryte, GMRank, UPDATE_DATE )
 
-      Core::Db::PreparedStatement* stmt( g_charaDb.getPreparedStatement(
-         Core::Db::CharaDbStatements::CHAR_INS_CHARINFO ) );
+      auto stmt = g_charaDb.getPreparedStatement( Db::CharaDbStatements::CHAR_INS_CHARINFO );
 
       stmt->setInt( 1, m_accountId );
       stmt->setInt( 2, m_id );
