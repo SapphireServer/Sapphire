@@ -1,0 +1,26 @@
+
+class CmnDefInnBedDef
+{
+
+	def CmnDefInnBedDef() 
+	{
+		this.id = 720916;
+	}
+	
+	def Scene00100( player )
+	{
+		player.eventPlay( this.id, 100, 0xF32E48F8/*flags*/, 0/*unk*/, 0/*unk*/,
+            fun( player, eventId, param1, param2, param3 )
+            {
+
+            });
+	}
+
+	def onEnterTerritory( eventId, player, param1, param2 )
+	{
+		this.Scene00100( player );
+	}
+
+};
+
+GLOBAL CmnDefInnBed = CmnDefInnBedDef();
