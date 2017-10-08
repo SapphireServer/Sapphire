@@ -121,12 +121,12 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
         case 0x12F: // Get title list
         {
            g_log.debug( "for real" );
-           /*
+           
            GamePacketNew< FFXIVIpcPlayerTitleList, ServerZoneIpcType > titleListPacket( pPlayer->getId() );
+           //titleListPacket.data().padding = 3;
            titleListPacket.data().bitmask = 0;
-           titleListPacket.data().bitmask |= 1;
            pPlayer->queuePacket( titleListPacket );
-           */
+            
         }
         case 0x133: // Update howtos seen
         {
