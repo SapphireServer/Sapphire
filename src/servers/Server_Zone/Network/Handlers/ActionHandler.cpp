@@ -121,10 +121,39 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
         case 0x12F: // Get title list
         {
            g_log.debug( "for real" );
-           
+
            GamePacketNew< FFXIVIpcPlayerTitleList, ServerZoneIpcType > titleListPacket( pPlayer->getId() );
            //titleListPacket.data().padding = 3;
-           titleListPacket.data().bitmask = 0;
+           /*
+           titleListPacket.data().titleList[0] |= (1 << 1);
+           titleListPacket.data().titleList[0] |= ( 1 << 2 );
+           titleListPacket.data().titleList[0] |= ( 1 << 4 );
+           titleListPacket.data().titleList[0] |= ( 1 << 8 );
+           titleListPacket.data().titleList[16] |= ( 1 << 2 );
+           titleListPacket.data().titleList[20] |= ( 1 << 2 );
+           titleListPacket.data().titleList[0x2F] = 0xFF;*/
+
+           uint32_t titleId = 182;
+           uint32_t arrayAcc = titleId / 8;
+
+           uint32_t maskVal;
+           
+           if ( titleId < 8 ) 
+           {
+              maskVal = titleId;
+           }
+           else if ( titleId < 16 )
+           {
+              maskVal = ( (titleId) % 8 );
+           }
+           else
+           {
+              maskVal = ( titleId % arrayAcc ) + 1;
+           }
+              
+           titleListPacket.data().titleList[arrayAcc] |= ( maskVal );
+
+           //titleListPacket.data().titleList[6] |= (1 << 1);
            pPlayer->queuePacket( titleListPacket );
             
         }
