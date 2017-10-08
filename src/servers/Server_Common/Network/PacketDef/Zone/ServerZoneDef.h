@@ -638,14 +638,15 @@ struct FFXIVIpcUpdateClassInfo : FFXIVIpcBasePacket<UpdateClassInfo>
    uint32_t currentExp;
    uint32_t restedExp;
 };
+
 /**
  * Structural representation of the packet sent by the server
  * to send the titles available to the player
  */
 struct FFXIVIpcPlayerTitleList : FFXIVIpcBasePacket<PlayerTitleList>
 {
-   char padding;
-   uint32_t bitmask;
+   uint16_t bitmask;
+   //uint16_t padding;
 };
 
 /**
