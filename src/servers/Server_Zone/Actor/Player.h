@@ -334,7 +334,7 @@ public:
    uint16_t Core::Entity::Player::getTitle();
    /*! add title to player title list */
    void addTitle( uint16_t titleId );
-   /*! change player's title */
+   /*! change player's active title */
    void setTitle( uint16_t titleId );
    /*! change gear param state */
    void setEquipDisplayFlags( uint8_t state );
