@@ -608,6 +608,18 @@ void Core::Entity::Player::learnAction( uint8_t actionId )
    queuePacket( ActorControlPacket143( getId(), ToggleActionUnlock, actionId, 1 ) );
 }
 
+void Core::Entity::Player::learnSong( uint8_t songId )
+{
+   uint16_t index;
+   uint8_t value;
+   Util::valueToFlagByteIndexValue( songId, value, index );
+
+   m_orchestrion[index] |= value;
+
+   setSyncFlag( Unlocks );
+   queuePacket( ActorControlPacket143( getId(), ToggleOrchestrionUnlock, songId, 1 ) );
+}
+
 bool Core::Entity::Player::isActionLearned( uint8_t actionId ) const
 {
    uint16_t index;
@@ -1195,6 +1207,11 @@ const uint8_t * Core::Entity::Player::getHowToArray() const
 const uint8_t * Core::Entity::Player::getUnlockBitmask() const
 {
    return m_unlocks;
+}
+
+const uint8_t * Core::Entity::Player::getOrchestrionBitmask() const
+{
+   return m_orchestrion;
 }
 
 uint64_t Core::Entity::Player::getContentId() const
