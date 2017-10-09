@@ -257,13 +257,6 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
       pPlayer->sendModel();
       pPlayer->sendDebug( "Model updated" );
    }
-   else if ( subCommand == "title" )
-   {
-      uint32_t titleId;
-      sscanf( params.c_str(), "%d", &titleId );
-
-      pPlayer->setTitle( titleId );
-   }
    else
    {
       pPlayer->sendUrgent( subCommand + " is not a valid SET command." );
@@ -317,6 +310,7 @@ void Core::DebugCommandHandler::add( char * data, Core::Entity::PlayerPtr pPlaye
       sscanf( params.c_str(), "%d", &titleId );
 
       pPlayer->addTitle( titleId );
+      pPlayer->sendNotice( "Added title (ID: " + std::to_string( titleId ) + ")" );
    }
    else if( subCommand == "spawn" )
    {
