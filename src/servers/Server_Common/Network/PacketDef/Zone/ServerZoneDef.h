@@ -646,7 +646,6 @@ struct FFXIVIpcUpdateClassInfo : FFXIVIpcBasePacket<UpdateClassInfo>
 struct FFXIVIpcPlayerTitleList : FFXIVIpcBasePacket<PlayerTitleList>
 {
    uint8_t titleList[0x30];
-   //uint16_t padding;
 };
 
 /**

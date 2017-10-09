@@ -288,6 +288,7 @@ namespace Core {
          Aetherytes = 0x00000080, // Attuned aetherytes
          HomePoint = 0x00000100, // Current homepoint
          HowTo = 0x00000200,
+         Title = 0x00000400,
 
          HpMp = 0x00000800,
          QuestTracker = 0x00001000,
