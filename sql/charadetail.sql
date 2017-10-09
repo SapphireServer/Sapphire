@@ -72,6 +72,7 @@ CREATE TABLE IF NOT EXISTS `charadetail` (
   `GMRank` int(3) DEFAULT '0',
   `EquipDisplayFlags` int(3) DEFAULT '0',
   `unlocks` binary(64) DEFAULT NULL,
+  `Orchestrion` binary(38) DEFAULT NULL,
   `CharacterId` int(20) NOT NULL DEFAULT '0',
   `IS_DELETE` int(3) DEFAULT '0',
   `IS_NOT_ACTIVE_FLG` int(3) DEFAULT '0',
