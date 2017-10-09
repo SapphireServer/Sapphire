@@ -1425,6 +1425,11 @@ uint8_t * Core::Entity::Player::getTitleList()
    return m_titleList;
 }
 
+uint16_t Core::Entity::Player::getTitle()
+{
+   return m_title;
+}
+
 void Core::Entity::Player::addTitle( uint16_t titleId )
 {
    uint16_t index;

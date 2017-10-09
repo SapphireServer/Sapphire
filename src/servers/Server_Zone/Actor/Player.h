@@ -330,6 +330,8 @@ public:
    void prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadoutTime = 0, uint16_t animation = 0 );
    /*! get player's title list (available titles) */
    uint8_t * getTitleList();
+   /*! get player's active title */
+   uint16_t Core::Entity::Player::getTitle();
    /*! add title to player title list */
    void addTitle( uint16_t titleId );
    /*! change player's title */
