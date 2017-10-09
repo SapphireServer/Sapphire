@@ -2,33 +2,36 @@
 class CmnDefCutSceneReplayDef
 {
 
-	def CmnDefCutSceneReplayDef() 
-	{
-		this.id = 721028;
-	}
-	
-	def Scene00000( player )
-	{
-		player.eventPlay( this.id, 0, 0x2000/*flags*/, 0/*unk*/, 1/*unk*/,
+   def CmnDefCutSceneReplayDef() 
+   {
+      this.id = 721028;
+   }
+   
+   def Scene00000( player )
+   {
+      player.eventPlay( this.id, 0, 0x2000/*flags*/, 0/*unk*/, 1/*unk*/,
             fun( player, eventId, param1, param2, param3 )
             {
-            	CmnDefCutSceneReplay.Scene00001( player, param2 );
+               if( param2 != 0 )
+               {
+                  CmnDefCutSceneReplay.Scene00001( player, param2 );
+               }
             });
-	}
+   }
 
-	def Scene00001( player, returnScene )
-	{
-		player.eventPlay( this.id, 1, 0xFB2EC8F8/*flags*/, 0/*unk*/, 1, returnScene,
+   def Scene00001( player, returnScene )
+   {
+      player.eventPlay( this.id, 1, 0xFB2EC8F8/*flags*/, 0/*unk*/, 1, returnScene,
             fun( player, eventId, param1, param2, param3 )
             {
 
             });
-	}
+   }
 
-	def onTalk( eventId, player, actorId )
-	{
-		this.Scene00000( player );
-	}
+   def onTalk( eventId, player, actorId )
+   {
+      this.Scene00000( player );
+   }
 
 };
 
