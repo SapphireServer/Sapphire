@@ -1427,27 +1427,27 @@ uint8_t * Core::Entity::Player::getTitleList()
 
 void Core::Entity::Player::addTitle( uint16_t titleId )
 {
-   uint8_t index = titleId / 8; // Find what index of uint8_t array this title will fit in
+   uint16_t index;
+   uint8_t value;
+   Util::valueToFlagByteIndexValue( titleId, value, index );
 
-   uint8_t bitVal;
-
-   if ( titleId < 8 )
-   {
-      bitVal = titleId;
-   }
-   else
-   {
-      bitVal = 1 << ( titleId % ( index * 8 ) );
-   }
-
-   m_titleList[index] |= bitVal;
+   m_titleList[index] |= value;
+   setSyncFlag( PlayerSyncFlags::Title );
 }
 
 void Core::Entity::Player::setTitle( uint16_t titleId )
 {
-   // todo: add check to see if player actually has title from titlelist. packet injection n stuff
+   uint16_t index;
+   uint8_t value;
+   Util::valueToFlagByteIndexValue( titleId, value, index );
+
+   if ( ( m_titleList[index] & value ) == 0 )   // Player doesn't have title - bail
+      return;
+
    m_title = titleId;
+
    sendToInRangeSet( ActorControlPacket142( getId(), SetTitle, titleId ), true );
+   setSyncFlag( PlayerSyncFlags::Title );
 }
 
 void Core::Entity::Player::setEquipDisplayFlags( uint8_t state )
