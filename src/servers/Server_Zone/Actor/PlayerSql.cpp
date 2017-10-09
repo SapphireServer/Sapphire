@@ -318,7 +318,7 @@ void Core::Entity::Player::createUpdateSql()
    if( m_updateFlags & PlayerSyncFlags::Unlocks )
    {
       charaDetailSet.insert( " unlocks = UNHEX('" + Util::binaryToHexString( static_cast< uint8_t* >( m_unlocks ), sizeof( m_unlocks ) ) + "')");
-      charaDetailSet.insert(" Orchestrion = UNHEX('" + Util::binaryToHexString( static_cast< uint8_t* >( m_orchestrion ), sizeof( m_orchestrion ) ) + "')" );
+      charaDetailSet.insert( " Orchestrion = UNHEX('" + Util::binaryToHexString( static_cast< uint8_t* >( m_orchestrion ), sizeof( m_orchestrion ) ) + "')" );
    }
       
 
