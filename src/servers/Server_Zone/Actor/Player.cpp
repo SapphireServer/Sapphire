@@ -1425,7 +1425,7 @@ uint8_t * Core::Entity::Player::getTitleList()
    return m_titleList;
 }
 
-uint16_t Core::Entity::Player::getTitle()
+uint16_t Core::Entity::Player::getTitle() const
 {
    return m_title;
 }
