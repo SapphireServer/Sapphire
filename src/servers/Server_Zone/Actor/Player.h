@@ -566,6 +566,8 @@ private:
    uint8_t m_titleList[32];
    uint8_t m_achievement[16];
    uint8_t m_howTo[33];
+   uint8_t m_minions[33];
+   uint8_t m_mounts[13];
    uint8_t m_homePoint;
    uint8_t m_startTown;
    uint8_t m_favoritePoint[3];

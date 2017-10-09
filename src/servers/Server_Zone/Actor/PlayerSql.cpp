@@ -51,7 +51,7 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
 {
    const std::string char_id_str = std::to_string( charId );
 
-   auto stmt = g_charaDb.getPreparedStatement( Core::Db::CharaDbStatements::CHAR_SEL_LOAD );
+   auto stmt = g_charaDb.getPreparedStatement( Core::Db::CharaDbStatements::CHARA_SEL );
 
    stmt->setUInt( 1, charId );
    auto res = g_charaDb.query( stmt );
@@ -207,7 +207,7 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
 bool Core::Entity::Player::loadActiveQuests()
 {
 
-   auto stmt = g_charaDb.getPreparedStatement( Core::Db::CharaDbStatements::CHAR_SEL_LOAD_QUESTINFO );
+   auto stmt = g_charaDb.getPreparedStatement( Core::Db::CharaDbStatements::CHARA_QUESTINFO_SEL_LOAD );
 
    stmt->setUInt( 1, m_id );
    auto res = g_charaDb.query( stmt );
@@ -262,7 +262,7 @@ bool Core::Entity::Player::loadActiveQuests()
 bool Core::Entity::Player::loadClassData()
 {
 
-   auto stmt = g_charaDb.getPreparedStatement( Core::Db::CharaDbStatements::CHAR_SEL_LOAD_CLASSINFO );
+   auto stmt = g_charaDb.getPreparedStatement( Core::Db::CharaDbStatements::CHARA_CLASSINFO_SEL_LOAD );
    stmt->setUInt( 1, m_id );
    auto res = g_charaDb.query( stmt );
 
@@ -281,7 +281,7 @@ bool Core::Entity::Player::loadClassData()
 
 bool Core::Entity::Player::loadSearchInfo()
 {
-   auto stmt = g_charaDb.getPreparedStatement( Core::Db::CharaDbStatements::CHAR_SEL_LOAD_SEARCHINFO );
+   auto stmt = g_charaDb.getPreparedStatement( Core::Db::CharaDbStatements::CHARA_SEACHINFO_SEL_LOAD );
    stmt->setUInt( 1, m_id );
    auto res = g_charaDb.query( stmt );
 
@@ -299,6 +299,124 @@ bool Core::Entity::Player::loadSearchInfo()
 void Core::Entity::Player::updateSql()
 {
 
+           /*"Hp 1, Mp 2, Tp 3, Gp 4, Mode 5, Mount 6, InvincibleGM 7, Voice 8, "
+           "Customize 9, ModelMainWeapon 10, ModelSubWeapon 11, ModelSystemWeapon 12, "
+           "ModelEquip 13, EmoteModeType 14, Language 15, IsNewGame 16, IsNewAdventurer 17, "
+           "TerritoryType 18, TerritoryId 19, PosX 20, PosY 21, PosZ 22, PosR 23, "
+           "OTerritoryType 24, OTerritoryId 25, OPosX 26, OPosY 27, OPosZ 28, OPosR 29, "
+           "Class 30, Status 31, TotalPlayTime 32, HomePoint 33, FavoritePoint 34, RestPoint 35, "
+           "ActiveTitle 36, TitleList 37, Achievement 38, Aetheryte 39, HowTo 40, Minions 41, Mounts 42, "
+           "EquippedMannequin 43, ConfigFlags 44, QuestCompleteFlags 45, OpeningSequence 46, "
+           "QuestTracking 47, GrandCompany 48, GrandCompanyRank 49, Discovery 50, GMRank 51, Unlocks 52, "
+           "CFPenaltyUntil 53"*/
+   auto stmt = g_charaDb.getPreparedStatement( Core::Db::CharaDbStatements::CHARA_UP );
+
+   stmt->setInt( 1, getHp() );
+   stmt->setInt( 2, getMp() );
+   stmt->setInt( 3, 0 ); // TP
+   stmt->setInt( 4, 0 ); // GP
+   stmt->setInt( 5, 0 ); // Mode
+   stmt->setInt( 6, 0 ); // Mount
+   stmt->setInt( 7, 0 ); // InvicibleGM
+   stmt->setInt( 8, m_voice );
+
+   std::vector< uint8_t > customVec( sizeof( m_customize ) );
+   memcpy( customVec.data(), m_customize, sizeof( m_customize ) );
+   stmt->setBinary( 9, customVec );
+
+   stmt->setInt64( 10, m_modelMainWeapon );
+   stmt->setInt64( 11, m_modelSubWeapon );
+   stmt->setInt64( 12, m_modelSystemWeapon );
+
+   std::vector< uint8_t > modelVec( sizeof( m_modelEquip ) );
+   memcpy( modelVec.data(), m_modelEquip, sizeof( m_modelEquip ) );
+   stmt->setBinary( 13, modelVec );
+
+   stmt->setInt( 14, 0 ); // EmodeModeType
+   stmt->setInt( 15, 0 ); // Language
+
+   stmt->setInt( 16, static_cast< uint32_t >( m_bNewGame ) );
+   stmt->setInt( 17, static_cast< uint32_t >( m_bNewAdventurer ) );
+
+   stmt->setInt( 18, 0 ); // TerritoryType
+   stmt->setInt( 19, m_zoneId ); // TerritoryId
+   stmt->setDouble( 20, m_pos.x );
+   stmt->setDouble( 21, m_pos.y );
+   stmt->setDouble( 22, m_pos.z );
+   stmt->setDouble( 23, getRotation() );
+
+   stmt->setInt( 24, 0 ); // OTerritoryType
+   stmt->setInt( 25, 0 ); // OTerritoryId
+   stmt->setDouble( 26, 0.0f );
+   stmt->setDouble( 27, 0.0f );
+   stmt->setDouble( 28, 0.0f );
+   stmt->setDouble( 29, 0.0f );
+
+   stmt->setInt( 30, static_cast< uint8_t >( getClass() ) );
+   stmt->setInt( 31, static_cast< uint8_t >( getStatus() ) );
+   stmt->setInt( 32, m_playTime );
+   stmt->setInt( 33, m_homePoint );
+
+   stmt->setBinary( 34, { 0, 0, 0 } ); // FavoritePoint
+   stmt->setInt( 35, 0 ); // RestPoint
+   stmt->setInt( 36, 0 ); // ActiveTitle
+
+   std::vector< uint8_t > titleListVec( 32 );
+   stmt->setBinary( 37, titleListVec );
+
+   std::vector< uint8_t > achievementVec( 16 );
+   stmt->setBinary( 38, achievementVec );
+
+   std::vector< uint8_t > aetheryteVec( sizeof( m_aetheryte ) );
+   memcpy( aetheryteVec.data(), m_aetheryte, sizeof( m_aetheryte ) );
+   stmt->setBinary( 39, aetheryteVec );
+
+   std::vector< uint8_t > howToVec( sizeof( m_howTo ) );
+   memcpy( howToVec.data(), m_howTo, sizeof( m_howTo ) );
+   stmt->setBinary( 40, howToVec );
+
+   std::vector< uint8_t > minionsVec( sizeof( m_minions ) );
+   memcpy( minionsVec.data(), m_minions, sizeof( m_minions ) );
+   stmt->setBinary( 41, minionsVec );
+
+   std::vector< uint8_t > mountsVec( sizeof( m_mounts ) );
+   memcpy( mountsVec.data(), m_mounts, sizeof( m_mounts ) );
+   stmt->setBinary( 42, mountsVec );
+
+   stmt->setInt( 43, 0 ); // EquippedMannequin
+
+   stmt->setInt( 44, 0 ); // DisplayFlags
+
+   std::vector< uint8_t > questCompleteVec( sizeof( m_questCompleteFlags ) );
+   memcpy( questCompleteVec.data(), m_questCompleteFlags, sizeof( m_questCompleteFlags ) );
+   stmt->setBinary( 45, questCompleteVec );
+
+   stmt->setInt( 46, m_openingSequence );
+
+   std::vector< uint8_t > questTrackerVec( sizeof( m_questTracking ) );
+   memcpy( questTrackerVec.data(), m_questTracking, sizeof( m_questTracking ) );
+   stmt->setBinary( 47, questTrackerVec );
+
+   stmt->setInt( 48, m_gc ); // DisplayFlags
+
+   stmt->setBinary( 49, { m_gcRank[0], m_gcRank[1], m_gcRank[2] } );
+
+   std::vector< uint8_t > discoveryVec( sizeof( m_discovery ) );
+   memcpy( discoveryVec.data(), m_discovery, sizeof( m_discovery ) );
+   stmt->setBinary( 50, discoveryVec );
+
+   stmt->setInt( 51, m_gmRank );
+
+   std::vector< uint8_t > unlockVec( sizeof( m_unlocks ) );
+   memcpy( unlockVec.data(), m_unlocks, sizeof( m_unlocks ) );
+   stmt->setBinary( 52, unlockVec );
+
+   stmt->setInt( 53, m_cfPenaltyUntil );
+
+   stmt->setInt( 54, m_id );
+
+   g_charaDb.execute( stmt );
+
    std::set< std::string > charaBaseSet;
    std::set< std::string > charaDetailSet;
    std::set< std::string > charaClassSet;
@@ -306,40 +424,11 @@ void Core::Entity::Player::updateSql()
    std::set< std::string > charaInfoSearchSet;
 
    std::string dbName = g_serverZone.getConfig()->getValue< std::string >( "Settings.General.Mysql.Database", "sapphire" );
-   std::string updateCharaBase = "UPDATE " + dbName + ".charabase SET ";
-   std::string updateCharaDetail = "UPDATE " + dbName + ".charadetail SET ";
    std::string updateCharaClass = "UPDATE " + dbName + ".characlass SET ";
    std::string updateCharaQuest = "UPDATE " + dbName + ".charaquest SET ";
    std::string updateCharaInfoSearch = "UPDATE " + dbName + ".charainfosearch SET ";
 
    std::string condition = " UPDATE_DATE = NOW() WHERE CharacterId = " + std::to_string( m_id ) + ";";
-
-   charaBaseSet.insert( " Pos_0_0 = " + std::to_string( m_pos.x ) );
-   charaBaseSet.insert( " Pos_0_1 = " + std::to_string( m_pos.y ) );
-   charaBaseSet.insert( " Pos_0_2 = " + std::to_string( m_pos.z ) );
-   charaBaseSet.insert( " Pos_0_3 = " + std::to_string( getRotation() ) );
-   charaBaseSet.insert( " PrimaryTerritoryId = " + std::to_string( m_zoneId ) );
-   charaBaseSet.insert( " IsNewGame = " + std::to_string( static_cast< uint32_t >( m_bNewGame ) ) );
-   charaBaseSet.insert( " IsNewAdventurer = " + std::to_string( static_cast< uint32_t >( m_bNewAdventurer ) ) );
-   charaBaseSet.insert( " Hp = " + std::to_string( getHp() ) );
-   charaBaseSet.insert( " Mp = " + std::to_string( getMp() ) );
-   charaBaseSet.insert( " Mode = " + std::to_string( static_cast< uint32_t >( getStance() ) ) );
-   charaBaseSet.insert( " ModelEquip = UNHEX('" + std::string( Util::binaryToHexString( reinterpret_cast< uint8_t* >( m_modelEquip ), 40 ) ) + "')" );
-
-   charaDetailSet.insert( " Homepoint = " + std::to_string( m_homePoint ) );
-   charaDetailSet.insert( " Discovery = UNHEX('" + std::string( Util::binaryToHexString( static_cast< uint8_t* >( m_discovery ), sizeof( m_discovery ) ) ) + "')" );
-   charaDetailSet.insert( " TotalPlayTime = " + std::to_string( m_playTime ) );
-   charaDetailSet.insert( " unlocks = UNHEX('" + std::string( Util::binaryToHexString( static_cast< uint8_t* >( m_unlocks ), sizeof( m_unlocks ) ) ) + "')" );
-   charaDetailSet.insert( " QuestTracking = UNHEX('" + std::string( Util::binaryToHexString( reinterpret_cast< uint8_t* >( m_questTracking ), sizeof( m_questTracking ) ) ) + "')" );
-   charaDetailSet.insert( " HowTo = UNHEX('" + std::string( Util::binaryToHexString( static_cast< uint8_t* >( m_howTo ), sizeof( m_howTo ) ) ) + "')" );
-   charaDetailSet.insert( " Aetheryte = UNHEX('" + std::string( Util::binaryToHexString( reinterpret_cast< uint8_t* >( m_aetheryte ), sizeof( m_aetheryte ) ) ) + "')" );
-   charaDetailSet.insert( " GrandCompany = " + std::to_string( m_gc ) );
-   charaDetailSet.insert( " GrandCompanyRank = UNHEX('" + std::string( Util::binaryToHexString( reinterpret_cast< uint8_t* >( m_gcRank ), sizeof( m_gcRank ) ) ) + "')" );
-   charaDetailSet.insert( " CFPenaltyUntil = " + std::to_string( m_cfPenaltyUntil ) );
-   charaDetailSet.insert( " Class = " + std::to_string( static_cast< uint32_t >( getClass() ) ) );
-   charaDetailSet.insert( " Status = " + std::to_string( static_cast< uint8_t >( getStatus() ) ) );
-   charaDetailSet.insert( " OpeningSequence = " + std::to_string( static_cast< uint8_t >( getOpeningSequence() ) ) );
-   charaDetailSet.insert( " QuestCompleteFlags = UNHEX('" + std::string( Util::binaryToHexString( static_cast< uint8_t* >( m_questCompleteFlags ), 200 ) ) + "')" );
 
    uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( getClass() )].exp_idx;
    charaClassSet.insert( " Lv_" + std::to_string( classJobIndex ) + " = " + std::to_string( static_cast< uint32_t >( getLevel() ) ) );
@@ -386,24 +475,6 @@ void Core::Entity::Player::updateSql()
 
       updateCharaInfoSearch += condition;
       g_database.execute( updateCharaInfoSearch );
-   }
-
-   if( !charaBaseSet.empty() )
-   {
-      for( auto entry : charaBaseSet )
-         updateCharaBase += entry + ", ";
-
-      updateCharaBase += condition;
-      g_database.execute( updateCharaBase );
-   }
-
-   if( !charaDetailSet.empty() )
-   {
-      for( auto entry : charaDetailSet )
-         updateCharaDetail += entry + ", ";
-
-      updateCharaDetail += condition;
-      g_database.execute( updateCharaDetail );
    }
 
    if( !charaClassSet.empty() )

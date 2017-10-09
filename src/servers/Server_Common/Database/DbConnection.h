@@ -33,8 +33,8 @@ namespace Db
    enum ConnectionFlags
    {
       CONNECTION_ASYNC = 0x1,
-      CONNECTION_SYNCH = 0x2,
-      CONNECTION_BOTH = CONNECTION_ASYNC | CONNECTION_SYNCH
+      CONNECTION_SYNC = 0x2,
+      CONNECTION_BOTH = CONNECTION_ASYNC | CONNECTION_SYNC
    };
 
    struct ConnectionInfo
