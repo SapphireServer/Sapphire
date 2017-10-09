@@ -328,6 +328,10 @@ public:
    void teleport( uint16_t aetheryteId, uint8_t type = 1 );
    /*! prepares zoning / fades out the screen */
    void prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadoutTime = 0, uint16_t animation = 0 );
+   /*! get player's title list (available titles) */
+   uint8_t * getTitleList();
+   /*! add title to player title list */
+   void addTitle( uint16_t titleId );
    /*! change player's title */
    void setTitle( uint16_t titleId );
    /*! change gear param state */
@@ -572,7 +576,7 @@ private:
    } m_retainerInfo[8];
 
    uint16_t m_title;
-   uint16_t m_titleList[32];
+   uint8_t m_titleList[30];
    uint8_t m_achievement[16];
    uint8_t m_howTo[33];
    uint8_t m_homePoint;

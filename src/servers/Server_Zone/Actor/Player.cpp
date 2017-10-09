@@ -1420,8 +1420,32 @@ void Core::Entity::Player::setIsLogin( bool bIsLogin )
    m_bIsLogin = bIsLogin;
 }
 
+uint8_t * Core::Entity::Player::getTitleList()
+{
+   return m_titleList;
+}
+
+void Core::Entity::Player::addTitle( uint16_t titleId )
+{
+   uint8_t index = titleId / 8; // Find what index of uint8_t array this title will fit in
+
+   uint8_t bitVal;
+
+   if ( titleId < 8 )
+   {
+      bitVal = titleId;
+   }
+   else
+   {
+      bitVal = 1 << ( titleId % ( index * 8 ) );
+   }
+
+   m_titleList[index] |= bitVal;
+}
+
 void Core::Entity::Player::setTitle( uint16_t titleId )
 {
+   // todo: add check to see if player actually has title from titlelist. packet injection n stuff
    m_title = titleId;
    sendToInRangeSet( ActorControlPacket142( getId(), SetTitle, titleId ), true );
 }
