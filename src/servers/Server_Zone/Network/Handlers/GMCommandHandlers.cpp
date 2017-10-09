@@ -397,14 +397,14 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
          if( param2 == 0 )
          {
             for( uint8_t i = 0; i < 255; i++ )
-               targetActor->getAsPlayer()->learnSong( i );
+               targetActor->getAsPlayer()->learnSong( i, 0 );
             
             pPlayer->sendNotice( "All Songs for " + targetPlayer->getName() +
                   " were turned on." );
          }
          else
          {
-            targetActor->getAsPlayer()->learnSong( param2 );
+            targetActor->getAsPlayer()->learnSong( param2, 0 );
             pPlayer->sendNotice( "Song " + std::to_string( param2 ) + " for " + targetPlayer->getName() +
                " was turned on." );
          }
