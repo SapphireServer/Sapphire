@@ -82,7 +82,9 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
       "cd.CFPenaltyUntil, "
       "cd.OpeningSequence, "
       "cd.GMRank, "
-      "cd.EquipDisplayFlags "
+      "cd.EquipDisplayFlags, "
+      "cd.ActiveTitle, "
+      "cd.TitleList " // 40
       "FROM charabase AS c "
       " INNER JOIN charadetail AS cd "
       " ON c.CharacterId = cd.CharacterId "
@@ -175,6 +177,9 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
 
    m_gmRank = field[37].get< uint8_t >();
    m_equipDisplayFlags = field[38].get< uint8_t >();
+
+   m_title = field[39].get< uint8_t >();
+   field[40].getBinary( reinterpret_cast< char* >( m_titleList ), sizeof( m_titleList ) );
 
    m_pCell = nullptr;
 
@@ -315,6 +320,12 @@ void Core::Entity::Player::createUpdateSql()
 
    if( m_updateFlags & PlayerSyncFlags::HowTo )
       charaDetailSet.insert( " HowTo = UNHEX('" + std::string( Util::binaryToHexString( static_cast< uint8_t* >( m_howTo ), sizeof( m_howTo ) ) ) + "')" );
+
+   if ( m_updateFlags & PlayerSyncFlags::Title )
+   {
+      charaDetailSet.insert( " ActiveTitle = " + std::to_string( m_title ) );
+      charaDetailSet.insert( " TitleList = UNHEX('" + std::string( Util::binaryToHexString( reinterpret_cast< uint8_t* >( m_titleList ), sizeof( m_titleList ) ) ) + "')" );
+   }
 
    if( m_updateFlags & PlayerSyncFlags::Aetherytes )
       charaDetailSet.insert( " Aetheryte = UNHEX('" + std::string( Util::binaryToHexString( reinterpret_cast< uint8_t* >( m_aetheryte ), sizeof( m_aetheryte ) ) ) + "')" );
