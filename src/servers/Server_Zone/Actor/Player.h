@@ -576,7 +576,7 @@ private:
    } m_retainerInfo[8];
 
    uint16_t m_title;
-   uint8_t m_titleList[30];
+   uint8_t m_titleList[48];
    uint8_t m_achievement[16];
    uint8_t m_howTo[33];
    uint8_t m_homePoint;
