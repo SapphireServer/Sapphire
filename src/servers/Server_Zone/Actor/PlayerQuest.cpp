@@ -13,13 +13,11 @@
 #include "Player.h"
 #include "src/servers/Server_Zone/Inventory/Inventory.h"
 
-extern Core::Db::Database g_database;
 extern Core::Data::ExdData g_exdData;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
-
 
 void Core::Entity::Player::finishQuest( uint16_t questId )
 {

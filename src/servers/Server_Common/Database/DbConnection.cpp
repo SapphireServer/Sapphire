@@ -15,7 +15,7 @@ Core::Db::DbConnection::DbConnection( ConnectionInfo &connInfo ) :
    m_queue( nullptr ),
    m_pConnection( nullptr ),
    m_connectionInfo( connInfo ),
-   m_connectionFlags( CONNECTION_SYNCH )
+   m_connectionFlags( CONNECTION_SYNC )
 {
 
 }

@@ -202,11 +202,6 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
       g_log.info( "port: " + std::to_string( res->getUInt( "port" ) ) );
    }
 
-   auto stmt = g_charaDb.getPreparedStatement( Core::Db::CharaDbStatements::CHAR_INS_TEST );
-   stmt->setUInt( 1, 2345 );
-   stmt->setString( 2, "123.123.123.123" );
-   stmt->setUInt( 3, 3306 );
-   g_charaDb.execute( stmt );
 
    //stmt->setUInt( 1, 245 );
    //stmt->setString( 2, "12.12.12.12" );
