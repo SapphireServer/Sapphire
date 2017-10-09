@@ -36,35 +36,41 @@ namespace Server {
          // TODO: temporary gm rank
          //m_data.gmRank = 0xff;
 
-
-         m_data.currentMount = 0;
          m_data.classJob = pPlayer->getClass();
          //m_data.status = static_cast< uint8_t >( pPlayer->getStatus() );
+
          m_data.hPCurr = pPlayer->getHp();
          m_data.mPCurr = pPlayer->getMp();
          m_data.tPCurr = pPlayer->getTp();
          m_data.hPMax = pPlayer->getMaxHp();
          m_data.mPMax = pPlayer->getMaxMp();
-         m_data.gmRank = pPlayer->getGmRank();
+         
          //m_data.tPMax = 3000;
          m_data.level = pPlayer->getLevel();
+         m_data.gmRank = pPlayer->getGmRank();
          memcpy( m_data.look, pPlayer->getLookArray(), 26 );
+
          auto item = pPlayer->getInventory()->getItemAt( Inventory::GearSet0, Inventory::EquipSlot::MainHand );
          if( item )
             m_data.mainWeaponModel = item->getModelId1();
          m_data.secWeaponModel = pPlayer->getModelSubWeapon();
+
          m_data.models[0] = pPlayer->getModelForSlot( Inventory::EquipSlot::Head );
          m_data.models[1] = pPlayer->getModelForSlot( Inventory::EquipSlot::Body );
          m_data.models[2] = pPlayer->getModelForSlot( Inventory::EquipSlot::Hands );
          m_data.models[3] = pPlayer->getModelForSlot( Inventory::EquipSlot::Legs );
          m_data.models[4] = pPlayer->getModelForSlot( Inventory::EquipSlot::Feet );
          strcpy( m_data.name, pPlayer->getName().c_str() );
+
          m_data.pos.x = pPlayer->getPos().x;
          m_data.pos.y = pPlayer->getPos().y;
          m_data.pos.z = pPlayer->getPos().z;
-         m_data.voice = pPlayer->getVoiceId();
-
          m_data.rotation = Math::Util::floatToUInt16Rot( pPlayer->getRotation() );
+         
+
+         m_data.title = pPlayer->getTitle();
+         m_data.voice = pPlayer->getVoiceId();
+         m_data.currentMount = 0;
 
          m_data.onlineStatus = static_cast< uint8_t >( pPlayer->getOnlineStatus() );
 
