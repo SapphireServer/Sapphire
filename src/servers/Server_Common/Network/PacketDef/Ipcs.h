@@ -114,6 +114,7 @@ namespace Packets {
       ActorFreeSpawn             = 0x0191, // unchanged for sb
       InitZone                   = 0x019A, // unchanged for sb
       WeatherChange              = 0x01AF, // updated for sb
+      PlayerTitleList            = 0x01B1, // updated for 4.06
       Discovery                  = 0x01B2, // updated for sb
 
       EorzeaTimeOffset           = 0x01B4,

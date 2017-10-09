@@ -1420,10 +1420,39 @@ void Core::Entity::Player::setIsLogin( bool bIsLogin )
    m_bIsLogin = bIsLogin;
 }
 
+uint8_t * Core::Entity::Player::getTitleList()
+{
+   return m_titleList;
+}
+
+uint16_t Core::Entity::Player::getTitle() const
+{
+   return m_title;
+}
+
+void Core::Entity::Player::addTitle( uint16_t titleId )
+{
+   uint16_t index;
+   uint8_t value;
+   Util::valueToFlagByteIndexValue( titleId, value, index );
+
+   m_titleList[index] |= value;
+   setSyncFlag( PlayerSyncFlags::Title );
+}
+
 void Core::Entity::Player::setTitle( uint16_t titleId )
 {
+   uint16_t index;
+   uint8_t value;
+   Util::valueToFlagByteIndexValue( titleId, value, index );
+
+   if ( ( m_titleList[index] & value ) == 0 )   // Player doesn't have title - bail
+      return;
+
    m_title = titleId;
+
    sendToInRangeSet( ActorControlPacket142( getId(), SetTitle, titleId ), true );
+   setSyncFlag( PlayerSyncFlags::Title );
 }
 
 void Core::Entity::Player::setEquipDisplayFlags( uint8_t state )
