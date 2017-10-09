@@ -297,7 +297,7 @@ void Core::DebugCommandHandler::add( char * data, Core::Entity::PlayerPtr pPlaye
       int32_t duration;
       uint16_t param;
 
-      sscanf( params.c_str(), "%d %d %hd", &id, &duration, &param );
+      sscanf( params.c_str(), "%d %d %hu", &id, &duration, &param );
 
       StatusEffect::StatusEffectPtr effect( new StatusEffect::StatusEffect( id, pPlayer, pPlayer, duration, 3000 ) );
       effect->setParam( param );
@@ -307,7 +307,7 @@ void Core::DebugCommandHandler::add( char * data, Core::Entity::PlayerPtr pPlaye
    else if ( subCommand == "title" )
    {
       uint32_t titleId;
-      sscanf( params.c_str(), "%d", &titleId );
+      sscanf( params.c_str(), "%u", &titleId );
 
       pPlayer->addTitle( titleId );
       pPlayer->sendNotice( "Added title (ID: " + std::to_string( titleId ) + ")" );

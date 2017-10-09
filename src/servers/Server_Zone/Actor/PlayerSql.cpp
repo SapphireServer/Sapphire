@@ -307,28 +307,28 @@ void Core::Entity::Player::createUpdateSql()
       charaDetailSet.insert( " Homepoint = " + std::to_string( m_homePoint ) );
 
    if( m_updateFlags & PlayerSyncFlags::Discovery )
-      charaDetailSet.insert( " Discovery = UNHEX('" + std::string( Util::binaryToHexString( static_cast< uint8_t* >( m_discovery ), sizeof( m_discovery ) ) ) + "')" );
+      charaDetailSet.insert( " Discovery = UNHEX('" + Util::binaryToHexString( static_cast< uint8_t* >( m_discovery ), sizeof( m_discovery ) )  + "')" );
 
    if( m_updateFlags & PlayerSyncFlags::PlayTime )
       charaDetailSet.insert( " TotalPlayTime = " + std::to_string( m_playTime ) );
 
    if( m_updateFlags & PlayerSyncFlags::Unlocks )
-      charaDetailSet.insert( " unlocks = UNHEX('" + std::string( Util::binaryToHexString( static_cast< uint8_t* >( m_unlocks ), sizeof( m_unlocks ) ) ) + "')" );
+      charaDetailSet.insert( " unlocks = UNHEX('" + Util::binaryToHexString( static_cast< uint8_t* >( m_unlocks ), sizeof( m_unlocks ) )  + "')" );
 
    if( m_updateFlags & PlayerSyncFlags::QuestTracker )
-      charaDetailSet.insert( " QuestTracking = UNHEX('" + std::string( Util::binaryToHexString( reinterpret_cast< uint8_t* >( m_questTracking ), sizeof( m_questTracking ) ) ) + "')" );
+      charaDetailSet.insert( " QuestTracking = UNHEX('" + Util::binaryToHexString( reinterpret_cast< uint8_t* >( m_questTracking ), sizeof( m_questTracking ) )  + "')" );
 
    if( m_updateFlags & PlayerSyncFlags::HowTo )
-      charaDetailSet.insert( " HowTo = UNHEX('" + std::string( Util::binaryToHexString( static_cast< uint8_t* >( m_howTo ), sizeof( m_howTo ) ) ) + "')" );
+      charaDetailSet.insert( " HowTo = UNHEX('" + Util::binaryToHexString( static_cast< uint8_t* >( m_howTo ), sizeof( m_howTo ) ) + "')" );
 
    if ( m_updateFlags & PlayerSyncFlags::Title )
    {
       charaDetailSet.insert( " ActiveTitle = " + std::to_string( m_title ) );
-      charaDetailSet.insert( " TitleList = UNHEX('" + std::string( Util::binaryToHexString( reinterpret_cast< uint8_t* >( m_titleList ), sizeof( m_titleList ) ) ) + "')" );
+      charaDetailSet.insert( " TitleList = UNHEX('" + Util::binaryToHexString( reinterpret_cast< uint8_t* >( m_titleList ), sizeof( m_titleList ) )  + "')" );
    }
 
    if( m_updateFlags & PlayerSyncFlags::Aetherytes )
-      charaDetailSet.insert( " Aetheryte = UNHEX('" + std::string( Util::binaryToHexString( reinterpret_cast< uint8_t* >( m_aetheryte ), sizeof( m_aetheryte ) ) ) + "')" );
+      charaDetailSet.insert( " Aetheryte = UNHEX('" + Util::binaryToHexString( reinterpret_cast< uint8_t* >( m_aetheryte ), sizeof( m_aetheryte ) )  + "')" );
 
 
    if( m_updateFlags & PlayerSyncFlags::NewGame )
@@ -340,7 +340,7 @@ void Core::Entity::Player::createUpdateSql()
    if( m_updateFlags & PlayerSyncFlags::GC )
    {
       charaDetailSet.insert( " GrandCompany = " + std::to_string( m_gc ) );
-      charaDetailSet.insert( " GrandCompanyRank = UNHEX('" + std::string( Util::binaryToHexString( reinterpret_cast< uint8_t* >( m_gcRank ), sizeof( m_gcRank ) ) ) + "')" );
+      charaDetailSet.insert( " GrandCompanyRank = UNHEX('" + Util::binaryToHexString( reinterpret_cast< uint8_t* >( m_gcRank ), sizeof( m_gcRank ) )  + "')" );
    }
 
    if( m_updateFlags & PlayerSyncFlags::CFPenaltyTime )
@@ -360,7 +360,7 @@ void Core::Entity::Player::createUpdateSql()
       charaBaseSet.insert( " Hp = " + std::to_string( getHp() ) );
       charaBaseSet.insert( " Mp = " + std::to_string( getMp() ) );
       charaBaseSet.insert( " Mode = " + std::to_string( static_cast< uint32_t >( getStance() ) ) );
-      charaBaseSet.insert( " ModelEquip = UNHEX('" + std::string( Util::binaryToHexString( reinterpret_cast< uint8_t* >( m_modelEquip ), 40 ) ) + "')" );
+      charaBaseSet.insert( " ModelEquip = UNHEX('" + Util::binaryToHexString( reinterpret_cast< uint8_t* >( m_modelEquip ), 40 ) + "')" );
       charaDetailSet.insert( " Class = " + std::to_string( static_cast< uint32_t >( getClass() ) ) );
       charaDetailSet.insert( " Status = " + std::to_string( static_cast< uint8_t >( getStatus() ) ) );
       charaDetailSet.insert( " EquipDisplayFlags = " + std::to_string( static_cast< uint8_t >( getEquipDisplayFlags() ) ) );
@@ -373,7 +373,7 @@ void Core::Entity::Player::createUpdateSql()
 
    if( m_updateFlags & PlayerSyncFlags::Quests )
    {
-      charaDetailSet.insert( " QuestCompleteFlags = UNHEX('" + std::string( Util::binaryToHexString( static_cast< uint8_t* >( m_questCompleteFlags ), 200 ) ) + "')" );
+      charaDetailSet.insert( " QuestCompleteFlags = UNHEX('" + Util::binaryToHexString( static_cast< uint8_t* >( m_questCompleteFlags ), 200 ) + "')" );
 
       for( int32_t i = 0; i < 30; i++ )
       {
@@ -410,7 +410,7 @@ void Core::Entity::Player::createUpdateSql()
    {
       charaInfoSearchSet.insert( " SelectClassId = " + std::to_string( m_searchSelectClass ) );
       charaInfoSearchSet.insert( " SelectRegion = " + std::to_string( m_searchSelectRegion ) );
-      charaInfoSearchSet.insert( " SearchComment = UNHEX('" + std::string( Util::binaryToHexString( reinterpret_cast< uint8_t* >( m_searchMessage ), sizeof( m_searchMessage ) ) + "')" ) );
+      charaInfoSearchSet.insert( " SearchComment = UNHEX('" + Util::binaryToHexString( reinterpret_cast< uint8_t* >( m_searchMessage ), sizeof( m_searchMessage ) ) + "')" );
    }
 
    if( !charaInfoSearchSet.empty() )
