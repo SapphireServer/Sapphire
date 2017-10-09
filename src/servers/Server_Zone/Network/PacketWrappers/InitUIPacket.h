@@ -42,7 +42,7 @@ private:
       m_data.namedayMonth = player->getBirthMonth();
       m_data.namedayDay = player->getBirthDay();
       // TODO: Support grand company status.
-      m_data.grandCompany = static_cast< Common::GrandCompany >( player->getStartTown() );
+      m_data.grandCompany = static_cast< Common::GrandCompany >( player->getGc() );
       //m_data.gcRank = GCRank::None;
 
       // TODO: Support starting city.
@@ -61,6 +61,8 @@ private:
          m_data.levels[i] = player->getClassArray()[i];
          m_data.exp[i] = player->getExpArray()[i];
       }
+
+      memcpy( m_data.orchestrionMask, player->getOrchestrionBitmask(), sizeof( m_data.orchestrionMask ) );
 
       memcpy( m_data.unlockBitmask, player->getUnlockBitmask(), sizeof( m_data.unlockBitmask ) );
 

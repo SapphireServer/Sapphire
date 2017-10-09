@@ -72,6 +72,8 @@ enum GmCommand
    Exp = 0x0068,
    Inv = 0x006A,
 
+   Orchestrion = 0x0074,
+
    Item = 0x00C8,
    Gil = 0x00C9,
    Collect = 0x00CA,
@@ -381,6 +383,29 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
          {
             targetActor->getAsPlayer()->registerAetheryte( param2 );
             pPlayer->sendNotice( "Aetheryte " + std::to_string( param2 ) + " for " + targetPlayer->getName() +
+               " was turned on." );
+         }
+      }
+
+      
+      break;
+   }
+   case GmCommand::Orchestrion:
+   {
+      if( param1 == 1 )
+      {
+         if( param2 == 0 )
+         {
+            for( uint8_t i = 0; i < 255; i++ )
+               targetActor->getAsPlayer()->learnSong( i );
+            
+            pPlayer->sendNotice( "All Songs for " + targetPlayer->getName() +
+                  " were turned on." );
+         }
+         else
+         {
+            targetActor->getAsPlayer()->learnSong( param2 );
+            pPlayer->sendNotice( "Song " + std::to_string( param2 ) + " for " + targetPlayer->getName() +
                " was turned on." );
          }
       }

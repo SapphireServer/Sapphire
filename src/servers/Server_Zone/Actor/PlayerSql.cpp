@@ -84,7 +84,8 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
       "cd.GMRank, "
       "cd.EquipDisplayFlags, "
       "cd.ActiveTitle, "
-      "cd.TitleList " // 40
+      "cd.TitleList, " // 40
+      "cd.Orchestrion "
       "FROM charabase AS c "
       " INNER JOIN charadetail AS cd "
       " ON c.CharacterId = cd.CharacterId "
@@ -180,6 +181,8 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
 
    m_title = field[39].get< uint8_t >();
    field[40].getBinary( reinterpret_cast< char* >( m_titleList ), sizeof( m_titleList ) );
+
+   field[41].getBinary( reinterpret_cast< char* >( m_orchestrion ), sizeof( m_orchestrion ) );
 
    m_pCell = nullptr;
 
@@ -313,7 +316,11 @@ void Core::Entity::Player::createUpdateSql()
       charaDetailSet.insert( " TotalPlayTime = " + std::to_string( m_playTime ) );
 
    if( m_updateFlags & PlayerSyncFlags::Unlocks )
-      charaDetailSet.insert( " unlocks = UNHEX('" + Util::binaryToHexString( static_cast< uint8_t* >( m_unlocks ), sizeof( m_unlocks ) )  + "')" );
+   {
+      charaDetailSet.insert( " unlocks = UNHEX('" + Util::binaryToHexString( static_cast< uint8_t* >( m_unlocks ), sizeof( m_unlocks ) ) + "')");
+      charaDetailSet.insert(" Orchestrion = UNHEX('" + Util::binaryToHexString( static_cast< uint8_t* >( m_orchestrion ), sizeof( m_orchestrion ) ) + "')" );
+   }
+      
 
    if( m_updateFlags & PlayerSyncFlags::QuestTracker )
       charaDetailSet.insert( " QuestTracking = UNHEX('" + Util::binaryToHexString( reinterpret_cast< uint8_t* >( m_questTracking ), sizeof( m_questTracking ) )  + "')" );

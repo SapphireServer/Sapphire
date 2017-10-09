@@ -949,7 +949,9 @@ namespace Core {
 
          SetCharaGearParamUI = 0x260,
 
-         GearSetEquipMsg = 0x321
+         GearSetEquipMsg = 0x321,
+
+         ToggleOrchestrionUnlock = 0x396
       };
 
       enum struct ChatType : uint32_t
