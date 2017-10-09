@@ -331,7 +331,7 @@ public:
    /*! get player's title list (available titles) */
    uint8_t * getTitleList();
    /*! get player's active title */
-   uint16_t Core::Entity::Player::getTitle();
+   uint16_t getTitle() const;
    /*! add title to player title list */
    void addTitle( uint16_t titleId );
    /*! change player's active title */
