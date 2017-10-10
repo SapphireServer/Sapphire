@@ -29,3 +29,4 @@
 -- update.sql before titles added 09/10/2017
 
 ALTER TABLE `charadetail` CHANGE `TitleList` `Titlelist` BINARY(48) NULL DEFAULT NULL;
+ALTER TABLE `charadetail` ADD COLUMN `Orchestrion` BINARY(38) DEFAULT NULL AFTER `unlocks`;

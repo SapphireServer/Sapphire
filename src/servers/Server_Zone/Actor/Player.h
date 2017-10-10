@@ -373,10 +373,14 @@ public:
    void updateHowtosSeen( uint32_t howToId );
    /*! learn an action / update the unlock bitmask. */
    void learnAction( uint8_t actionId );
+   /*! learn a song / update the unlock bitmask. */
+   void learnSong( uint8_t songId, uint32_t itemId );
    /*! check if an action is already unlocked in the bitmask. */
    bool isActionLearned( uint8_t actionId ) const;
    /*! return a const pointer to the unlock bitmask array */
    const uint8_t * getUnlockBitmask() const;
+   /*! return a const pointer to the orchestrion bitmask array */
+   const uint8_t * getOrchestrionBitmask() const;
 
 
    // Spawn handling
@@ -594,6 +598,7 @@ private:
    uint32_t m_expArray[25];
    uint8_t m_aetheryte[16];
    uint8_t m_unlocks[64];
+   uint8_t m_orchestrion[38];
 
    uint8_t m_openingSequence;
 
