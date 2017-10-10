@@ -229,6 +229,10 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
             }
             break;
         }
-
+        default:
+        {
+           g_log.debug( "[" + std::to_string( m_pSession->getId() ) + "] Unhandled action: " +
+              boost::str( boost::format( "%|04X|" ) % (uint32_t) ( commandId & 0xFFFF ) ) );
+        }
     }
 }

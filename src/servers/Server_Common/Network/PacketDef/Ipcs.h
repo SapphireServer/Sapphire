@@ -66,7 +66,7 @@ namespace Packets {
       BlackList                  = 0x00D4, // updated 4.1
       LogMessage                 = 0x00D0,
       LinkshellList              = 0x00D1,
-      StatusEffectList           = 0x00F0,
+      StatusEffectList           = 0x00FA,
       Effect                     = 0x00F1,
       GCAffiliation              = 0x00FC,
 
@@ -78,9 +78,9 @@ namespace Packets {
       HateList                   = 0x011A,
       UpdateClassInfo            = 0x011D,
       InitUI                     = 0x012B, // updated 4.1
-      PlayerStats                = 0x012C, // updated 4.1
       ActorOwner                 = 0x012D, // updated 4.1
       PlayerStateFlags           = 0x013A, // updated 4.1
+      PlayerStats                = 0x0138, // updated 4.1
       PlayerClassInfo            = 0x013B, // updated 4.1
       ModelEquip                 = 0x013C, // updated 4.1
       ItemInfo                   = 0x014C, // updated 4.1
@@ -115,7 +115,7 @@ namespace Packets {
       ActorFreeSpawn             = 0x0191, // unchanged for sb
       InitZone                   = 0x019A, // unchanged for sb
       WeatherChange              = 0x01AF, // updated for sb
-      PlayerTitleList            = 0x01B1, // updated for 4.06
+      PlayerTitleList            = 0x01BD, // updated for 4.1
       Discovery                  = 0x01B2, // updated for sb
 
       EorzeaTimeOffset           = 0x01B4,

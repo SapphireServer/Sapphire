@@ -48,6 +48,8 @@ namespace Server {
          //m_data.tPMax = 3000;
          m_data.level = pPlayer->getLevel();
          m_data.gmRank = pPlayer->getGmRank();
+         m_data.pose = 0;
+
          memcpy( m_data.look, pPlayer->getLookArray(), 26 );
 
          auto item = pPlayer->getInventory()->getItemAt( Inventory::GearSet0, Inventory::EquipSlot::MainHand );
