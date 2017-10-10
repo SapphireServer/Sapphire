@@ -696,9 +696,13 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint32_t actionId, u
          if ( isPlayer() && !ActionCollision::isActorApplicable( pTarget.shared_from_this(), TargetFilter::Enemies ) )
             break;
 
-         pTarget.takeDamage( static_cast< uint32_t >( param1 ) );
-         pTarget.onActionHostile( shared_from_this() );
          sendToInRangeSet( effectPacket, true );
+
+         pTarget.takeDamage( static_cast< uint32_t >( param1 ) );
+
+         if ( pTarget.isAlive() )
+            pTarget.onActionHostile( shared_from_this() );
+         
       }
       else
       {
@@ -711,8 +715,11 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint32_t actionId, u
             effectPacket.data().effectTarget = pHitActor->getId();
 
             sendToInRangeSet( effectPacket, true ); // todo: send to range of what? ourselves? when mob script hits this is going to be lacking
+
             pHitActor->takeDamage( static_cast< uint32_t >( param1 ) );
-            pHitActor->onActionHostile( shared_from_this() );
+
+            if( pHitActor->isAlive() )
+               pHitActor->onActionHostile( shared_from_this() );
 
             // Debug
             if ( isPlayer() ) 

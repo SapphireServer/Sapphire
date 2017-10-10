@@ -43,6 +43,16 @@ public:
       Active = 1,
    };
 
+   enum DisplayFlags : uint16_t
+   {
+      ActiveStance = 0x001,
+      Invisible = 0x020,
+      HideHead = 0x040,
+      HideWeapon = 0x080,
+      Faded = 0x100,
+      Visor = 0x800,
+   };
+
    enum struct ActorStatus : uint8_t
    {
       Idle = 0x01,

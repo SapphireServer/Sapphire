@@ -328,6 +328,18 @@ public:
    void teleport( uint16_t aetheryteId, uint8_t type = 1 );
    /*! prepares zoning / fades out the screen */
    void prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadoutTime = 0, uint16_t animation = 0 );
+   /*! get player's title list (available titles) */
+   uint8_t * getTitleList();
+   /*! get player's active title */
+   uint16_t getTitle() const;
+   /*! add title to player title list */
+   void addTitle( uint16_t titleId );
+   /*! change player's active title */
+   void setTitle( uint16_t titleId );
+   /*! change gear param state */
+   void setEquipDisplayFlags( uint8_t state );
+   /*! get gear param state and send update to inRangeSet */
+   uint8_t getEquipDisplayFlags() const;
 
    void calculateStats() override;
    void sendStats();
@@ -361,10 +373,14 @@ public:
    void updateHowtosSeen( uint32_t howToId );
    /*! learn an action / update the unlock bitmask. */
    void learnAction( uint8_t actionId );
+   /*! learn a song / update the unlock bitmask. */
+   void learnSong( uint8_t songId, uint32_t itemId );
    /*! check if an action is already unlocked in the bitmask. */
    bool isActionLearned( uint8_t actionId ) const;
    /*! return a const pointer to the unlock bitmask array */
    const uint8_t * getUnlockBitmask() const;
+   /*! return a const pointer to the orchestrion bitmask array */
+   const uint8_t * getOrchestrionBitmask() const;
 
 
    // Spawn handling
@@ -565,7 +581,8 @@ private:
       uint8_t status;
    } m_retainerInfo[8];
 
-   uint8_t m_titleList[32];
+   uint16_t m_title;
+   uint8_t m_titleList[48];
    uint8_t m_achievement[16];
    uint8_t m_howTo[33];
    uint8_t m_homePoint;
@@ -581,6 +598,7 @@ private:
    uint32_t m_expArray[25];
    uint8_t m_aetheryte[16];
    uint8_t m_unlocks[64];
+   uint8_t m_orchestrion[38];
 
    uint8_t m_openingSequence;
 
@@ -598,6 +616,8 @@ private:
    uint8_t m_stateFlags[7];
    uint8_t m_gmRank;
    uint16_t zoneId;
+
+   uint8_t m_equipDisplayFlags;
 
    bool m_bInCombat;
    bool m_bLoadingComplete;

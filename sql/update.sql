@@ -23,3 +23,10 @@
 -- ALTER TABLE `charadetail` CHANGE `OpeningSequence` `OpeningSequence` INT(3) NULL DEFAULT '0';
 -- -------------------------------------------
 -- update.sql Before Merge into Other SQL's 30/08/2017
+-- -------------------------------------------
+-- ALTER TABLE `charadetail` ADD `EquipDisplayFlags` int(3) DEFAULT '0' AFTER `GMRank`;
+-- -------------------------------------------
+-- update.sql before titles added 09/10/2017
+
+ALTER TABLE `charadetail` CHANGE `TitleList` `Titlelist` BINARY(48) NULL DEFAULT NULL;
+ALTER TABLE `charadetail` ADD COLUMN `Orchestrion` BINARY(38) DEFAULT NULL AFTER `unlocks`;

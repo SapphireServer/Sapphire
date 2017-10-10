@@ -175,6 +175,12 @@ namespace Core {
       char unlocks[64];
       memset( unlocks, 0, 64 );
 
+      char titleList[48];
+      memset( titleList, 0, 48 );
+
+      char orchestrion[38];
+      memset( orchestrion, 0, 38 );
+
       int16_t questTracking[5] = { -1, -1, -1, -1, -1 };
 
       uint16_t size = static_cast< uint16_t >( m_lookMap.size() );
@@ -270,6 +276,8 @@ namespace Core {
          " unlocks, "
          " QuestTracking, "
          " Aetheryte, "
+         " TitleList, "
+         " Orchestrion, "
          " GMRank, "
          " UPDATE_DATE ) "
          " VALUES (" + std::to_string( m_iD ) + ", "
@@ -285,6 +293,8 @@ namespace Core {
          + "UNHEX('" + std::string( Util::binaryToHexString( (uint8_t*)unlocks, 64 ) ) + "'), "
          + "UNHEX('" + std::string( Util::binaryToHexString( (uint8_t*)questTracking, 10 ) ) + "'), "
          + "UNHEX('" + std::string( Util::binaryToHexString( (uint8_t*)aetherytes, 12 ) ) + "'),"
+         + "UNHEX('" + std::string( Util::binaryToHexString( (uint8_t*)titleList, 48 ) ) + "'),"
+         + "UNHEX('" + std::string( Util::binaryToHexString( (uint8_t*)orchestrion, 38 ) ) + "'),"
          + std::to_string( m_gmRank ) + ", NOW());" );
 
 

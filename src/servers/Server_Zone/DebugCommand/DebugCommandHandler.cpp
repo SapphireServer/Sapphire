@@ -118,6 +118,7 @@ void Core::DebugCommandHandler::scriptReload( char * data, Core::Entity::PlayerP
                                              boost::shared_ptr<Core::DebugCommand> command )
 {
    g_scriptMgr.reload();
+   pPlayer->sendDebug( "Scripts reloaded." );
 }
 
 void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlayer, boost::shared_ptr<Core::DebugCommand> command )
@@ -182,13 +183,6 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
 
       pPlayer->teleport( aetheryteId );
    }
-
-   else if( ( subCommand == "unlockaetheryte" ) && ( params != "" ) )
-   {
-      for( uint8_t i = 0; i < 255; i++ )
-         pPlayer->registerAetheryte( i );
-   }
-
    else if( ( subCommand == "discovery" ) && ( params != "" ) )
    {
       int32_t map_id;
@@ -304,12 +298,20 @@ void Core::DebugCommandHandler::add( char * data, Core::Entity::PlayerPtr pPlaye
       int32_t duration;
       uint16_t param;
 
-      sscanf( params.c_str(), "%d %d %hd", &id, &duration, &param );
+      sscanf( params.c_str(), "%d %d %hu", &id, &duration, &param );
 
       StatusEffect::StatusEffectPtr effect( new StatusEffect::StatusEffect( id, pPlayer, pPlayer, duration, 3000 ) );
       effect->setParam( param );
 
       pPlayer->addStatusEffect( effect );
+   }
+   else if ( subCommand == "title" )
+   {
+      uint32_t titleId;
+      sscanf( params.c_str(), "%u", &titleId );
+
+      pPlayer->addTitle( titleId );
+      pPlayer->sendNotice( "Added title (ID: " + std::to_string( titleId ) + ")" );
    }
    else if( subCommand == "spawn" )
    {
@@ -333,7 +335,6 @@ void Core::DebugCommandHandler::add( char * data, Core::Entity::PlayerPtr pPlaye
       pPlayer->queuePacket( pPe );
    }
    else if( subCommand == "actrl" )
-
    {
 
       // temporary research packet
