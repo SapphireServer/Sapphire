@@ -33,7 +33,7 @@ namespace Core {
          uint16_t map_id;
          int16_t discovery_index;
          bool is_two_byte;
-         uint8_t weather_rate;
+         uint16_t weather_rate;
          std::map< uint8_t, int32_t> weather_rate_map;
 
          int32_t aetheryte_index;
