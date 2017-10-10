@@ -109,14 +109,18 @@ namespace Packets {
       QuestCompleteList          = 0x017F, // updated 4.1
       QuestFinish                = 0x0180, // updated 4.1
       QuestMessage               = 0x0179,
-      QuestTracker               = 0x0181,
-      ActorSpawn                 = 0x0190,
-      ActorFreeSpawn             = 0x0191,
-      InitZone                   = 0x019A,
-      WeatherChange              = 0x01AF,
-      Discovery                  = 0x01B2,
+
+      QuestTracker               = 0x0181, // updated for sb
+      ActorSpawn                 = 0x0190, // todo: split into playerspawn/actorspawn and use opcode 0x110/0x111
+      ActorFreeSpawn             = 0x0191, // unchanged for sb
+      InitZone                   = 0x019A, // unchanged for sb
+      WeatherChange              = 0x01AF, // updated for sb
+      PlayerTitleList            = 0x01B1, // updated for 4.06
+      Discovery                  = 0x01B2, // updated for sb
 
       EorzeaTimeOffset           = 0x01B4,
+
+      EquipDisplayFlags            = 0x01C0,
 
       CFAvailableContents        = 0x01CF,
 
@@ -183,8 +187,12 @@ namespace Packets {
       ReturnEventHandler       = 0x0131, // updated 4.1
       TradeReturnEventHandler  = 0x0132, // updated 4.1
 
+
       LinkshellEventHandler    = 0x0144, // updated 4.1 ??
       LinkshellEventHandler1   = 0x0145, // updated 4.1 ??
+
+      ReqEquipDisplayFlagsChange  = 0x014C, // updated 4.1 ??
+
    };
 
    ////////////////////////////////////////////////////////////////////////////////

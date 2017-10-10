@@ -114,8 +114,21 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
         }
         case 0x69: // Cancel cast
         {
-           if( pPlayer->checkAction() )
+           if( pPlayer->getCurrentAction() != nullptr )
                pPlayer->getCurrentAction()->setInterrupted();
+           break;
+        }
+        case 0x12E: // Set player title
+        {
+           pPlayer->setTitle( param1 );
+           break;
+        }
+        case 0x12F: // Get title list
+        {
+           GamePacketNew< FFXIVIpcPlayerTitleList, ServerZoneIpcType > titleListPacket( pPlayer->getId() );
+           memcpy( titleListPacket.data().titleList, pPlayer->getTitleList(), sizeof( titleListPacket.data().titleList ) );
+
+           pPlayer->queuePacket( titleListPacket );
            break;
         }
         case 0x133: // Update howtos seen
