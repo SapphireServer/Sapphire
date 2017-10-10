@@ -102,7 +102,7 @@ namespace Packets {
       EventStart                 = 0x0169, // updated 4.1
       EventFinish                = 0x016A, // updated 4.1
 
-      EventLinkshell             = 0x0169,
+      EventLinkshell             = 0x1169,
 
       QuestActiveList            = 0x017D, // updated 4.1
       QuestUpdate                = 0x017E, // updated 4.1
