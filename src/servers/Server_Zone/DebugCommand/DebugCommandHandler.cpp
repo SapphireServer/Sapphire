@@ -118,6 +118,7 @@ void Core::DebugCommandHandler::scriptReload( char * data, Core::Entity::PlayerP
                                              boost::shared_ptr<Core::DebugCommand> command )
 {
    g_scriptMgr.reload();
+   pPlayer->sendDebug( "Scripts reloaded." );
 }
 
 void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlayer, boost::shared_ptr<Core::DebugCommand> command )

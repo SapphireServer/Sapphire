@@ -789,7 +789,7 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    uint8_t unknownRest[32];
    uint8_t tripleTriadCards[26];
    uint8_t unknownRest1[21];
-   uint8_t orchestrionMask[19];
+   uint8_t orchestrionMask[38];
    uint8_t hallOfNoviceCompleteMask[3];
    uint8_t unknownMask2[11];
    uint8_t unknownMask3[16];
