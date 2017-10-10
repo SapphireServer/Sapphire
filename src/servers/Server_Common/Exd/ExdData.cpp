@@ -85,7 +85,7 @@ bool Core::Data::ExdData::loadZoneInfo()
       int16_t map_index          = getField< int16_t >( mapDataFields, 12 );
       bool is_two_bytes          = getField< bool >( mapDataFields, 15 );
 
-      uint8_t weather_rate       = getField< uint8_t >( fields, 10 ) > 75 ? 0 : getField< uint8_t >( fields, 10 );
+      uint16_t weather_rate       = getField< uint16_t >( fields, 10 ) > 75 ? 0 : getField< uint16_t >( fields, 10 );
       auto weatherRateFields     = weatherRate.get_row( weather_rate );
 
       int32_t aetheryte_index = getField< int32_t >( fields, 20 );
@@ -520,26 +520,26 @@ boost::shared_ptr< Core::Data::QuestInfo >
 
       info->quest_level = getField< uint16_t >( row, 4 );
 
-      info->enpc_resident_start = getField< uint32_t >( row, 38 );
-      info->enpc_resident_end = getField< uint32_t >( row, 40 );
+      info->enpc_resident_start = getField< uint32_t >( row, 40 );
+      info->enpc_resident_end = getField< uint32_t >( row, 42 );
 
-      info->reward_exp_factor = getField< uint16_t >( row, 1437 );
-      info->reward_gil = getField< uint32_t >( row, 1438 );
-      info->reward_gc_seals = getField< uint16_t >( row, 1440 );
+      info->reward_exp_factor = getField< uint16_t >( row, 1439 );
+      info->reward_gil = getField< uint32_t >( row, 1440 );
+      info->reward_gc_seals = getField< uint16_t >( row, 1442 );
 
-      info->reward_item_type = getField< uint8_t >( row, 1447 );
+      info->reward_item_type = getField< uint8_t >( row, 1449 );
 
       for( uint32_t i = 0; i < 6; i++ )
       {
-         uint32_t entry = getField< uint32_t >( row, i + 1448 );
+         uint32_t entry = getField< uint32_t >( row, i + 1450 );
          if( entry > 0 )
             info->reward_item.push_back( entry );
 
-         uint8_t entry1 = getField< uint8_t >( row, i + 1455 );
+         uint8_t entry1 = getField< uint8_t >( row, i + 1457 );
          if( entry1 > 0 )
             info->reward_item_count.push_back( entry1 );
 
-         uint8_t entry2 = getField< uint8_t >( row, i + 1462 );
+         uint8_t entry2 = getField< uint8_t >( row, i + 1464 );
          if( entry2 > 0 )
             info->reward_item_stain.push_back( entry2 );
 
@@ -547,39 +547,39 @@ boost::shared_ptr< Core::Data::QuestInfo >
 
       for( uint32_t i = 0; i < 5; i++ )
       {
-         uint32_t entry = getField< uint32_t >( row, i + 1469 );
+         uint32_t entry = getField< uint32_t >( row, i + 1471 );
          if( entry > 0 )
             info->reward_item_optional.push_back( entry );
 
-         uint8_t entry1 = getField< uint8_t >( row, i + 1474 );
+         uint8_t entry1 = getField< uint8_t >( row, i + 1476 );
          if( entry1 > 0 )
             info->reward_item_optional_count.push_back( entry1 );
 
-         uint8_t entry2 = getField< uint8_t >( row, i + 1484 );
+         uint8_t entry2 = getField< uint8_t >( row, i + 1486 );
          if( entry2 > 0 )
             info->reward_item_optional_stain.push_back( entry2 );
       }
 
-      info->reward_emote = getField< uint8_t >( row, 1489 );
-      info->reward_action = getField< uint16_t >( row, 1490 );
-      info->reward_action_general1 = getField< uint8_t >( row, 1491 );
-      info->reward_action_general2 = getField< uint8_t >( row, 1492 );
-      info->reward_other = getField< uint8_t >( row, 1494 );
+      info->reward_emote = getField< uint8_t >( row, 1491 );
+      info->reward_action = getField< uint16_t >( row, 1492 );
+      info->reward_action_general1 = getField< uint8_t >( row, 1493 );
+      info->reward_action_general2 = getField< uint8_t >( row, 1494 );
+      info->reward_other = getField< uint8_t >( row, 1496 );
 
-      info->instanced_content_unlock = getField< uint32_t >( row, 1497 );
+      info->instanced_content_unlock = getField< uint32_t >( row, 1499 );
 
-      info->reward_tome_type = getField< uint8_t >( row, 1499 );
-      info->reward_tome_count = getField< uint8_t >( row, 1500 );
+      info->reward_tome_type = getField< uint8_t >( row, 1501 );
+      info->reward_tome_count = getField< uint8_t >( row, 1502 );
 
-      info->reward_reputation = getField< uint8_t >( row, 1501 );
+      info->reward_reputation = getField< uint8_t >( row, 1503 );
 
       for( uint32_t i = 0; i < 50; i++ )
       {
-         std::string entry = getField< std::string >( row, i + 47 );
+         std::string entry = getField< std::string >( row, i + 49 );
          if( entry.size() > 0 )
          {
             info->script_entity.push_back( entry );
-            uint32_t entry1 = getField< uint32_t >( row, i + 97 );
+            uint32_t entry1 = getField< uint32_t >( row, i + 99 );
             info->script_value.push_back( entry1 );
          }
       }
