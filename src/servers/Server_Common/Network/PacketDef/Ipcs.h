@@ -78,7 +78,7 @@ namespace Packets {
       HateList                   = 0x011A,
       UpdateClassInfo            = 0x011D,
       InitUI                     = 0x012B, // updated 4.1
-      PlayerStats                = 0x012C, // updated 4.1
+      PlayerStats                = 0x0138, // updated 4.1
       ActorOwner                 = 0x012D, // updated 4.1
       PlayerStateFlags           = 0x013A, // updated 4.1
       PlayerClassInfo            = 0x013B, // updated 4.1
