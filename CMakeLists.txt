@@ -62,5 +62,6 @@ add_subdirectory("src/libraries/sapphire/datReader")
 add_subdirectory("src/libraries/sapphire/mysqlConnector")
 
 add_subdirectory("src/tools/exd_common_gen")
+add_subdirectory("src/tools/exd_struct_gen")
 add_subdirectory("src/tools/quest_parser")
 
