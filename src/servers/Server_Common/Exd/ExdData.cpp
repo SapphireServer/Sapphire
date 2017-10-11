@@ -136,6 +136,16 @@ bool Core::Data::ExdData::loadStatusEffectInfo()
       StatusEffectInfo info { 0 };
       info.id = id;
       info.name = getField< std::string >( fields, 0 );
+      info.lock_movement =      getField< bool >( fields, 7 );  // 7
+      info.lock_actions =       getField< bool >( fields, 9 );  // 9
+      info.lock_control =       getField< bool >( fields, 10 ); // 10
+      info.transfiguration =    getField< bool >( fields, 11 ); // 11
+      info.can_dispel =         getField< bool >( fields, 13 ); // 13
+      info.is_permanent =       getField< bool >( fields, 15 ); // 15
+      info.inflicted_by_actor = getField< bool >( fields, 17 ); // 17
+      info.is_fc_buff =         getField< bool >( fields, 21 ); // 21
+      info.invisibility =       getField< bool >( fields, 22 ); // 22
+
       m_statusEffectInfoMap[id] = info;
    }
 
@@ -355,6 +365,9 @@ bool Core::Data::ExdData::loadActionInfo()
       uint16_t toggle_status_id = getField< uint16_t >( fields, 42 );    // 42
       bool affects_position     = getField< bool >( fields, 47 );        // 47
 
+      bool no_effect_in_battle  = getField< bool >( fields, 60 );        // 60
+
+
       info->id                  = id;
       info->name                = name;
       info->category            = category;
@@ -388,6 +401,8 @@ bool Core::Data::ExdData::loadActionInfo()
 
       info->toggle_status_id    = toggle_status_id;
       info->affects_position    = affects_position;
+
+      info->no_effect_in_battle = no_effect_in_battle;
 
       // If action type is SingleTarget with an AoE radius set, or if action type isn't SingleTarget
       info->is_aoe              = ( info->aoe_type == 1 && info->aoe_width != 0 ) || ( info->aoe_type != 1 );

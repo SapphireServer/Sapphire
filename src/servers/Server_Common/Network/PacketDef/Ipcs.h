@@ -66,8 +66,8 @@ namespace Packets {
       BlackList                  = 0x00D4, // updated 4.1
       LogMessage                 = 0x00D0,
       LinkshellList              = 0x00D1,
-      StatusEffectList           = 0x00FA,
-      Effect                     = 0x00F1,
+      StatusEffectList           = 0x00FA, // updated 4.1
+      Effect                     = 0x00FB, // updated 4.1
       GCAffiliation              = 0x00FC,
 
       ActorSetPos                = 0x0114,
@@ -94,7 +94,7 @@ namespace Packets {
       ActorControl142            = 0x0142,
       ActorControl143            = 0x0143,
       ActorControl144            = 0x0144,
-      UpdateHpMpTp               = 0x0145,
+      UpdateHpMpTp               = 0x0145, // updated 4.1
 
 
 
