@@ -1,0 +1,48 @@
+#ifndef _EXDDATA_H
+#define _EXDDATA_H
+
+/* This file has been automatically generated.
+   Changes will be lost upon regeneration.
+   To change the content edit tools/exd_struct_gen */
+
+#include <GameData.h>
+#include <File.h>
+#include <ExdData.h>
+#include <ExdCat.h>
+#include <Exd.h>
+
+namespace Core {
+namespace Data {
+
+STRUCTS
+
+  class ExdData
+  {
+  public:
+     ExdData();
+     ~ExdData();
+
+     bool init( const std::string& path );
+
+     xiv::exd::Exd setupDatAccess( const std::string& name, xiv::exd::Language lang );
+
+     template< class T >
+     T getField( std::vector< xiv::exd::Field >& fields, uint32_t index )
+     {
+        return *boost::get< T >( &fields.at( index ) );
+     }
+
+     boost::shared_ptr< xiv::dat::GameData > m_data;
+     boost::shared_ptr< xiv::exd::ExdData > m_exd_data;
+
+DATACCESS
+
+DIRECTGETTERS
+
+  };
+
+}
+}
+
+#endif
+

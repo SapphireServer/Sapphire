@@ -1,0 +1,42 @@
+#include "ExdData.h"
+#include <boost/make_shared.hpp>
+
+#include <boost/variant.hpp>
+
+Core::Data::ExdData::ExdData()
+{
+}
+
+Core::Data::ExdData::~ExdData()
+{
+}
+
+xiv::exd::Exd Core::Data::ExdData::setupDatAccess( const std::string& name, xiv::exd::Language lang )
+{
+   auto& cat = m_exd_data->get_category( name );
+   return static_cast< xiv::exd::Exd >( cat.get_data_ln( lang ) );
+};
+
+bool Core::Data::ExdData::init( const std::string& path )
+{
+   try
+   {
+      m_data = boost::make_shared< xiv::dat::GameData >( path );
+      m_exd_data = boost::make_shared< xiv::exd::ExdData >( *m_data );
+
+SETUPDATACCESS
+   }
+   catch( std::runtime_error )
+   {
+      return false;
+   }
+
+   return true;
+}
+
+///////////////////////////////////////////////////////////////
+// DIRECT GETTERS
+DIRECTGETTERS
+
+
+
