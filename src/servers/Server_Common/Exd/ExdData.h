@@ -33,7 +33,7 @@ namespace Core {
          uint16_t map_id;
          int16_t discovery_index;
          bool is_two_byte;
-         uint8_t weather_rate;
+         uint16_t weather_rate;
          std::map< uint8_t, int32_t> weather_rate_map;
 
          int32_t aetheryte_index;
@@ -255,7 +255,11 @@ namespace Core {
 
          bool affects_position;     // 47
 
+         bool no_effect_in_battle;  // 60
+
+
          bool is_aoe;               // Internal only
+
       };
 
       struct EventItemInfo
@@ -269,7 +273,16 @@ namespace Core {
       struct StatusEffectInfo
       {
          uint32_t id;
-         std::string name; //0
+         std::string name;        // 0
+         bool lock_movement;      // 7
+         bool lock_actions;       // 9
+         bool lock_control;       // 10
+         bool transfiguration;    // 11
+         bool can_dispel;         // 13
+         bool is_permanent;       // 15
+         bool inflicted_by_actor; // 17
+         bool is_fc_buff;         // 21
+         bool invisibility;       // 22
       };
 
       class ExdData
