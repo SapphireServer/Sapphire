@@ -69,7 +69,7 @@ namespace Packets {
       LinkshellList              = 0x00DC, // updated 4.1
       StatusEffectList           = 0x00FA, // updated 4.1
 
-      Effect                     = 0x00F1,
+      Effect                     = 0x00FB, // updated 4.1
       GCAffiliation              = 0x00FC,
 
       ActorSetPos                = 0x0114,
@@ -80,8 +80,8 @@ namespace Packets {
       HateList                   = 0x011A,
       UpdateClassInfo            = 0x011D,
       InitUI                     = 0x012B, // updated 4.1
-      PlayerStats                = 0x0138, // updated 4.1
       ActorOwner                 = 0x012D, // updated 4.1
+      PlayerStats                = 0x0138, // updated 4.1
       PlayerStateFlags           = 0x013A, // updated 4.1
       PlayerClassInfo            = 0x013B, // updated 4.1
       ModelEquip                 = 0x013C, // updated 4.1
