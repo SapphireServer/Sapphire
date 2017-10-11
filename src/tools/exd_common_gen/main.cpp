@@ -20,8 +20,8 @@ Core::Logger g_log;
 Core::Data::ExdData g_exdData;
 
 
-//const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
-const std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv" );
+const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
+//const std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv" );
 
 std::string generateEnum( const std::string& exd, int8_t nameIndex, const std::string& type, bool useLang = true )
 {
@@ -33,7 +33,7 @@ std::string generateEnum( const std::string& exd, int8_t nameIndex, const std::s
    
    std::string result = "\n   ///////////////////////////////////////////////////////////\n"; 
    result += "   //" + exd + ".exd\n";
-   result += "   enum " + exd + " : " + type + "\n";
+   result += "   enum class " + exd + " : " + type + "\n";
    result += "   {\n";
    auto lang = useLang ? xiv::exd::Language::en : xiv::exd::Language::none;
    auto access = g_exdData.setupDatAccess( exd, lang );
@@ -67,7 +67,9 @@ std::string generateEnum( const std::string& exd, int8_t nameIndex, const std::s
 
    }
    result += "   };\n";
-   
+   result += 
+   "   bool operator==( const " + exd + "& t, const " + type + "& g ) { return static_cast< " + type + " >( t ) == g; }\n"
+   "   bool operator==( const " + type + "& g, const " + exd + "& t ) { return static_cast< " + type + " >( t ) == g; }\n";   
    return result;
 
 }
