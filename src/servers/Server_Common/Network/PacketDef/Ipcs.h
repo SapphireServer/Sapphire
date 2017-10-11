@@ -120,9 +120,9 @@ namespace Packets {
       PlayerTitleList            = 0x01BD, // updated for 4.1
       Discovery                  = 0x01B2, // updated for sb
 
-      EorzeaTimeOffset           = 0x01B4,
+      EorzeaTimeOffset           = 0x01C0, // updated 4.1
 
-      EquipDisplayFlags          = 0x01C0,
+      EquipDisplayFlags          = 0x01CC, // updated 4.1
 
       CFAvailableContents        = 0x01CF,
 
