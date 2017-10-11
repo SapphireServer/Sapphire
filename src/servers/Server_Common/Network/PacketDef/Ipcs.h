@@ -78,7 +78,7 @@ namespace Packets {
       NpcSpawn                   = 0x011D, // updated 4.1
       ActorMove                  = 0x011E, // updated 4.1
       HateList                   = 0x0126, // updated 4.1
-      UpdateClassInfo            = 0x011D,
+      UpdateClassInfo            = 0x012A, // updated 4.1
       InitUI                     = 0x012B, // updated 4.1
       ActorOwner                 = 0x012D, // updated 4.1
       PlayerStats                = 0x0138, // updated 4.1
