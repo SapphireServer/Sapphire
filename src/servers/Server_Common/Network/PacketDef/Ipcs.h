@@ -73,7 +73,7 @@ namespace Packets {
       GCAffiliation              = 0x00FC,
 
       ActorSetPos                = 0x0114,
-      ActorCast                  = 0x0116,
+      ActorCast                  = 0x0123, // updated 4.1
       PlayerSpawn                = 0x011C, // updated 4.1
       NpcSpawn                   = 0x011D, // updated 4.1
       ActorMove                  = 0x011E, // updated 4.1
