@@ -44,88 +44,94 @@ namespace Packets {
    */
    enum ServerZoneIpcType : uint16_t
    {
-      Ping                       = 0x0065, // updated for sb
-      Init                       = 0x0066, // updated for sb
-      Chat                       = 0x0067, // updated for sb
+      Ping                       = 0x0065,
+      Init                       = 0x0066,
+      Chat                       = 0x0067,
       ChatBanned                 = 0x006B,
-      Logout                     = 0x0077, // updated for sb
+      Logout                     = 0x0077,
       CFNotify                   = 0x0078,
       CFMemberStatus             = 0x0079,
       CFDutyInfo                 = 0x007A,
       CFPlayerInNeed             = 0x007F,
 
-      Playtime                   = 0x00AF, // updated for sb
+      Playtime                   = 0x00B7, // updated 4.1
       SocialRequestError         = 0x00AD,
-      SocialRequestResponse      = 0x11AF,
-      CFRegistered               = 0x00B0,
-      SocialList                 = 0x00B4, // updated for sb
-      UpdateSearchInfo           = 0x00B6, // updated for sb
-      InitSearchInfo             = 0x00B7, // updated for sb
-      ServerNotice               = 0x00BC, // updated for sb
-      SetOnlineStatus            = 0x00BD, // updated for sb
-      BlackList                  = 0x00CA, // updated for sb
-      LogMessage                 = 0x00D0, // updated for sb
-      LinkshellList              = 0x00D1, // updated for sb
-      StatusEffectList           = 0x00F0, // updated for sb
-      Effect                     = 0x00F1, // updated for sb
+      SocialRequestResponse      = 0x00BB, // updated 4.1
+      CFRegistered               = 0x00B8, // updated 4.1
+      SocialList                 = 0x00BE, // updated 4.1
+      UpdateSearchInfo           = 0x10BB,
+      InitSearchInfo             = 0x00C1, // updated 4.1
+      ServerNotice               = 0x00C6, // updated 4.1
+      SetOnlineStatus            = 0x00C7, // test update
+      BlackList                  = 0x00D4, // updated 4.1
+      LogMessage                 = 0x00D0,
+
+      LinkshellList              = 0x00DC, // updated 4.1
+      StatusEffectList           = 0x00FA, // updated 4.1
+
+      Effect                     = 0x00FB, // updated 4.1
       GCAffiliation              = 0x00FC,
 
-      ActorSetPos                = 0x0114, // updated for sb
-      ActorCast                  = 0x0116, // updated for sb
-      PlayerSpawn                = 0x0110, // updated for sb
-      NpcSpawn                   = 0x0111, // updated for sb
-      ActorMove                  = 0x0112, // updated for sb
-      HateList                   = 0x011A, // updated for sb borked
-      UpdateClassInfo            = 0x011D, // updated for sb
-      InitUI                     = 0x011E, // updated for sb
-      PlayerStats                = 0x011F, // updated for sb
-      ActorOwner                 = 0x0120, // updated for sb
-      PlayerStateFlags           = 0x0121, // updated for sb
-      PlayerClassInfo            = 0x0123, // updated for sb
-      ModelEquip                 = 0x0124, // updated for sb
-      ItemInfo                   = 0x0139, // updated for sb
-      ContainerInfo              = 0x013A, // updated for sb
-      InventoryTransactionFinish = 0x013B, // updated for sb
-      InventoryTransaction       = 0x013C, // updated for sb
-      CurrencyCrystalInfo        = 0x013D,
+      ActorSetPos                = 0x0120, // updated 4.1
+      ActorCast                  = 0x0123, // updated 4.1
+      PlayerSpawn                = 0x011C, // updated 4.1
+      NpcSpawn                   = 0x011D, // updated 4.1
+      ActorMove                  = 0x011E, // updated 4.1
+      HateList                   = 0x011A,
+      UpdateClassInfo            = 0x011D,
+      InitUI                     = 0x012B, // updated 4.1
+      ActorOwner                 = 0x012D, // updated 4.1
+      PlayerStats                = 0x0138, // updated 4.1
+      PlayerStateFlags           = 0x013A, // updated 4.1
+      PlayerClassInfo            = 0x013B, // updated 4.1
+      ModelEquip                 = 0x013C, // updated 4.1
+      ItemInfo                   = 0x014C, // updated 4.1
+      ContainerInfo              = 0x014D, // updated 4.1
+      InventoryTransactionFinish = 0x014E, // updated 4.1
+      InventoryTransaction       = 0x014F, // updated 4.1
+      CurrencyCrystalInfo        = 0x0150, // updated 4.1
       InventoryActionAck         = 0x1139,
-      UpdateInventorySlot        = 0x0140, // updated for sb
+      UpdateInventorySlot        = 0x0153, // updated 4.1
       AddStatusEffect            = 0x0141,
-      ActorControl142            = 0x0142, // unchanged for sb
-      ActorControl143            = 0x0143, // unchanged for sb
-      ActorControl144            = 0x0144, // unchanged for sb
-      UpdateHpMpTp               = 0x0145, // unchanged for sb
+      ActorControl142            = 0x0142, // updated 4.1
+      ActorControl143            = 0x0143, // updated 4.1
+      ActorControl144            = 0x0144, // updated 4.1
+      UpdateHpMpTp               = 0x0145, // updated 4.1
 
 
 
-      EventPlay                  = 0x0154, // updated for sb
-      EventStart                 = 0x015D, // updated for sb
-      EventFinish                = 0x015E, // updated for sb
+      EventPlay                  = 0x0160, // updated 4.1
+      EventStart                 = 0x0169, // updated 4.1
+      EventFinish                = 0x016A, // updated 4.1
 
-      EventLinkshell             = 0x0169,
+      EventLinkshell             = 0x1169,
 
-      QuestActiveList            = 0x0171, // updated for sb
-      QuestUpdate                = 0x0172, // updated for sb
-      QuestCompleteList          = 0x0173, // updated for sb
-      QuestFinish                = 0x0174, // updated for sb
+      QuestActiveList            = 0x017D, // updated 4.1
+      QuestUpdate                = 0x017E, // updated 4.1
+      QuestCompleteList          = 0x017F, // updated 4.1
+      QuestFinish                = 0x0180, // updated 4.1
       QuestMessage               = 0x0179,
-      QuestTracker               = 0x0181, // updated for sb
+
+      QuestTracker               = 0x018D, // updated 4.1
       ActorSpawn                 = 0x0190, // todo: split into playerspawn/actorspawn and use opcode 0x110/0x111
       ActorFreeSpawn             = 0x0191, // unchanged for sb
       InitZone                   = 0x019A, // unchanged for sb
       WeatherChange              = 0x01AF, // updated for sb
-      Discovery                  = 0x01B2, // updated for sb
+      PlayerTitleList            = 0x01BD, // updated for 4.1
+      Discovery                  = 0x01BE, // updated for 4.1
 
-      EorzeaTimeOffset           = 0x01B4,
+      EorzeaTimeOffset           = 0x01C0, // updated 4.1
+
+      EquipDisplayFlags          = 0x01CC, // updated 4.1
 
       CFAvailableContents        = 0x01CF,
 
-      PrepareZoning              = 0x0239, // updated for sb
+      PrepareZoning              = 0x0248, // updated 4.1
 
       // Unknown IPC types that still need to be sent
       // TODO: figure all these out properly
-      IPCTYPE_UNK_320             = 0x1FB,
-      IPCTYPE_UNK_322             = 0x1FD,
+      IPCTYPE_UNK_320            = 0x0207, // updated 4.1
+      IPCTYPE_UNK_322            = 0x0209, // updated 4.1
 
    };
 
@@ -138,53 +144,57 @@ namespace Packets {
    {
 
       PingHandler              = 0x0065, // updated for sb
-      InitHandler              = 0x0066, // updated for sb
-      ChatHandler              = 0x0067, // updated for sb
+      InitHandler              = 0x0066, // updated 4.1
+      ChatHandler              = 0x00AD, // updated 4.1
 
-      FinishLoadingHandler     = 0x0069, // updated for sb
+      FinishLoadingHandler     = 0x0069, // updated 4.1
 
       CFCommenceHandler        = 0x006F,
       CFRegisterDuty           = 0x0071,
       CFRegisterRoulette       = 0x0072,
-      PlayTimeHandler          = 0x0073, // updated for sb
-      LogoutHandler            = 0x0074, // updated for sb
+      PlayTimeHandler          = 0x0073, // updated 4.1
+      LogoutHandler            = 0x0074, // updated 4.1
 
-      CFDutyInfoHandler        = 0x0078,
+      CFDutyInfoHandler        = 0x0078, // updated 4.1 ??
 
-      SocialReqSendHandler     = 0x00A5,
-      SocialListHandler        = 0x00AA, // updated for sb
-      SetSearchInfoHandler     = 0x00AC, // updated for sb
+      SocialReqSendHandler     = 0x00AE, // updated 4.1
+      SocialListHandler        = 0x00B3, // updated 4.1
+      SetSearchInfoHandler     = 0x00B5, // updated 4.1
 
-      ReqSearchInfoHandler     = 0x00AD,
+      ReqSearchInfoHandler     = 0x00B6, // updated 4.1
 
-      BlackListHandler         = 0x00B7, // updated for sb
+      BlackListHandler         = 0x00C0, // updated 4.1
 
-      LinkshellListHandler     = 0x00BF, // updated for sb
+      LinkshellListHandler     = 0x00C8, // updated 4.1
 
-      FcInfoReqHandler         = 0x0100, // updated for sb
+      FcInfoReqHandler         = 0x0109, // updated 4.1
 
-      ZoneLineHandler          = 0x0107, // updated for sb
-      ActionHandler            = 0x0108, // updated for sb
-      DiscoveryHandler         = 0x0109, // updated for sb
+      ZoneLineHandler          = 0x0110, // updated 4.1
+      ActionHandler            = 0x0111, // updated 4.1
+      DiscoveryHandler         = 0x0112, // updated 4.1
 
-      SkillHandler             = 0x010B, // updated for sb
-      GMCommand1               = 0x010C, // updated for sb
-      GMCommand2               = 0x010D, // updated for sb
-      UpdatePositionHandler    = 0x010F, // updated for sb
+      SkillHandler             = 0x0114, // updated 4.1
+      GMCommand1               = 0x0115, // updated 4.1 ??
+      GMCommand2               = 0x0116, // updated 4.1 ??
+      UpdatePositionHandler    = 0x0118, // updated 4.1
 
-      InventoryModifyHandler   = 0x0116, // updated for sb
+      InventoryModifyHandler   = 0x011F, // updated 4.1
 
-      TalkEventHandler         = 0x011F, // updated for sb
-      EmoteEventHandler        = 0x0120, // updated for sb
-      WithinRangeEventHandler  = 0x0121, // updated for sb
-      OutOfRangeEventHandler   = 0x0122, // updated for sb
-      EnterTeriEventHandler    = 0x0123, // updated for sb
+      TalkEventHandler         = 0x0128, // updated 4.1
+      EmoteEventHandler        = 0x0129, // updated 4.1
+      WithinRangeEventHandler  = 0x012A, // updated 4.1
+      OutOfRangeEventHandler   = 0x012B, // updated 4.1
+      EnterTeriEventHandler    = 0x012C, // updated 4.1
 
-      ReturnEventHandler       = 0x0128,
-      TradeReturnEventHandler  = 0x0129,
+      ReturnEventHandler       = 0x0131, // updated 4.1
+      TradeReturnEventHandler  = 0x0132, // updated 4.1
 
-      LinkshellEventHandler    = 0x013B,
-      LinkshellEventHandler1   = 0x013C,
+
+      LinkshellEventHandler    = 0x0144, // updated 4.1 ??
+      LinkshellEventHandler1   = 0x0145, // updated 4.1 ??
+
+      ReqEquipDisplayFlagsChange  = 0x014C, // updated 4.1 ??
+
    };
 
    ////////////////////////////////////////////////////////////////////////////////

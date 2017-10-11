@@ -37,6 +37,8 @@ namespace Core {
 
       void update();
 
+      bool isValid() const;
+
       Entity::PlayerPtr getPlayer() const;
 
    private:
@@ -47,6 +49,7 @@ namespace Core {
       uint32_t m_lastDataTime;
 
       uint32_t m_lastSqlTime;
+      bool m_isValid;
 
       Network::GameConnectionPtr m_pZoneConnection;
       Network::GameConnectionPtr m_pChatConnection;

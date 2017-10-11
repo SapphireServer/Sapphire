@@ -11,6 +11,7 @@ Core::Session::Session( uint32_t sessionId )
    : m_sessionId( sessionId )
    , m_lastDataTime( static_cast< uint32_t >( Util::getTimeSeconds() ) )
    , m_lastSqlTime( static_cast< uint32_t >( Util::getTimeSeconds() ) )
+   , m_isValid( false )
 {
 
    //   boost::posix_time::ptime now = boost::date_time::not_a_date_time;
@@ -50,7 +51,15 @@ bool Core::Session::loadPlayer()
 
    m_pPlayer = Entity::PlayerPtr( new Entity::Player() );
 
-   return m_pPlayer->load(m_sessionId, shared_from_this() );
+   if( !m_pPlayer->load( m_sessionId, shared_from_this() ) )
+   {
+      m_isValid = false;
+      return false;
+   }
+   
+   m_isValid = true;
+
+   return true;
 
 }
 
@@ -58,6 +67,9 @@ void Core::Session::close()
 {
    if( m_pZoneConnection )
       m_pZoneConnection->Disconnect();
+
+   if( m_pChatConnection )
+      m_pChatConnection->Disconnect();
 
    // remove the session from the player
    if( m_pPlayer )
@@ -78,6 +90,11 @@ uint32_t Core::Session::getLastDataTime() const
 uint32_t Core::Session::getLastSqlTime() const
 {
    return m_lastSqlTime;
+}
+
+bool Core::Session::isValid() const
+{
+   return m_isValid;
 }
 
 void Core::Session::updateLastDataTime()

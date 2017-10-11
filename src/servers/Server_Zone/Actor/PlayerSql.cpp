@@ -386,7 +386,6 @@ void Core::Entity::Player::updateSql()
    stmt->setInt( 43, 0 ); // EquippedMannequin
 
    stmt->setInt( 44, 0 ); // DisplayFlags
-
    std::vector< uint8_t > questCompleteVec( sizeof( m_questCompleteFlags ) );
    memcpy( questCompleteVec.data(), m_questCompleteFlags, sizeof( m_questCompleteFlags ) );
    stmt->setBinary( 45, questCompleteVec );
@@ -417,8 +416,6 @@ void Core::Entity::Player::updateSql()
 
    g_charaDb.execute( stmt );
 
-   std::set< std::string > charaBaseSet;
-   std::set< std::string > charaDetailSet;
    std::set< std::string > charaClassSet;
    std::set< std::string > charaQuestSet;
    std::set< std::string > charaInfoSearchSet;

@@ -340,15 +340,15 @@ struct FFXIVIpcPlayerSpawn : FFXIVIpcBasePacket<PlayerSpawn>
 {
    uint16_t title;
    uint16_t u1b;
-   uint8_t gmRank;
-   uint8_t u2ab;
    uint8_t u2b;
+   uint8_t u2ab;
+   uint8_t gmRank;
    uint8_t onlineStatus;
 
-   uint8_t pose;
+   uint8_t u3a;
    uint8_t u3b;
    uint8_t u3c;
-   uint8_t u3d;
+   uint8_t pose;
 
    uint32_t u4;
 
@@ -368,8 +368,8 @@ struct FFXIVIpcPlayerSpawn : FFXIVIpcBasePacket<PlayerSpawn>
    uint32_t u20;
    uint32_t ownerId;
    uint32_t u22;
-   uint32_t hPCurr;
    uint32_t hPMax;
+   uint32_t hPCurr;
    uint32_t displayFlags;
    uint16_t fateID;
    uint16_t mPCurr;
@@ -639,6 +639,14 @@ struct FFXIVIpcUpdateClassInfo : FFXIVIpcBasePacket<UpdateClassInfo>
    uint32_t restedExp;
 };
 
+/**
+ * Structural representation of the packet sent by the server
+ * to send the titles available to the player
+ */
+struct FFXIVIpcPlayerTitleList : FFXIVIpcBasePacket<PlayerTitleList>
+{
+   uint8_t titleList[48];
+};
 
 /**
 * Structural representation of the packet sent by the server
@@ -718,7 +726,7 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    uint16_t unknown_005;
    uint8_t unknown_114;
    uint8_t padding_114;
-   uint8_t unknown_1141[52];
+   uint8_t unknown_1141[61];
    uint8_t preNamePadding;
    char name[32];
    uint8_t unknown_54[16];
@@ -781,7 +789,7 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    uint8_t unknownRest[32];
    uint8_t tripleTriadCards[26];
    uint8_t unknownRest1[21];
-   uint8_t orchestrionMask[19];
+   uint8_t orchestrionMask[38];
    uint8_t hallOfNoviceCompleteMask[3];
    uint8_t unknownMask2[11];
    uint8_t unknownMask3[16];
@@ -1286,6 +1294,14 @@ struct FFXIVIpcEorzeaTimeOffset : FFXIVIpcBasePacket<EorzeaTimeOffset>
    uint64_t timestamp;
 };
 
+/**
+* Structural representation of the packet sent by the server
+* to set the gear show/hide status of a character
+*/
+struct FFXIVIpcEquipDisplayFlags : FFXIVIpcBasePacket<EquipDisplayFlags>
+{
+   uint8_t bitmask;
+};
 
 
 } /* Server */

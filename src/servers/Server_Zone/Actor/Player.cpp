@@ -385,6 +385,11 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
 
    sendInventory();
 
+   if( isLogin() )
+   {
+      queuePacket(ActorControlPacket143( getId(), SetCharaGearParamUI, m_equipDisplayFlags, 1 ) );
+   }
+
    // set flags, will be reset automatically by zoning ( only on client side though )
    pPlayer->setStateFlag( PlayerStateFlag::BetweenAreas );
    pPlayer->setStateFlag( PlayerStateFlag::BetweenAreas1 );
@@ -590,6 +595,17 @@ void Core::Entity::Player::learnAction( uint8_t actionId )
    m_unlocks[index] |= value;
 
    queuePacket( ActorControlPacket143( getId(), ToggleActionUnlock, actionId, 1 ) );
+}
+
+void Core::Entity::Player::learnSong( uint8_t songId, uint32_t itemId )
+{
+   uint16_t index;
+   uint8_t value;
+   Util::valueToFlagByteIndexValue( songId, value, index );
+
+   m_orchestrion[index] |= value;
+
+   queuePacket( ActorControlPacket143( getId(), ToggleOrchestrionUnlock, songId, 1, itemId ) );
 }
 
 bool Core::Entity::Player::isActionLearned( uint8_t actionId ) const
@@ -1154,6 +1170,11 @@ const uint8_t * Core::Entity::Player::getUnlockBitmask() const
    return m_unlocks;
 }
 
+const uint8_t * Core::Entity::Player::getOrchestrionBitmask() const
+{
+   return m_orchestrion;
+}
+
 uint64_t Core::Entity::Player::getContentId() const
 {
    return m_contentId;
@@ -1368,6 +1389,52 @@ bool Core::Entity::Player::isLogin() const
 void Core::Entity::Player::setIsLogin( bool bIsLogin )
 {
    m_bIsLogin = bIsLogin;
+}
+
+uint8_t * Core::Entity::Player::getTitleList()
+{
+   return m_titleList;
+}
+
+uint16_t Core::Entity::Player::getTitle() const
+{
+   return m_title;
+}
+
+void Core::Entity::Player::addTitle( uint16_t titleId )
+{
+   uint16_t index;
+   uint8_t value;
+   Util::valueToFlagByteIndexValue( titleId, value, index );
+
+   m_titleList[index] |= value;
+}
+
+void Core::Entity::Player::setTitle( uint16_t titleId )
+{
+   uint16_t index;
+   uint8_t value;
+   Util::valueToFlagByteIndexValue( titleId, value, index );
+
+   if ( ( m_titleList[index] & value ) == 0 )   // Player doesn't have title - bail
+      return;
+
+   m_title = titleId;
+
+   sendToInRangeSet( ActorControlPacket142( getId(), SetTitle, titleId ), true );
+}
+
+void Core::Entity::Player::setEquipDisplayFlags( uint8_t state )
+{
+   m_equipDisplayFlags = state;
+   GamePacketNew< FFXIVIpcEquipDisplayFlags, ServerZoneIpcType > paramPacket( getId() );
+   paramPacket.data().bitmask = m_equipDisplayFlags;
+   sendToInRangeSet( paramPacket, true );
+}
+
+uint8_t Core::Entity::Player::getEquipDisplayFlags() const
+{
+   return m_equipDisplayFlags;
 }
 
 void Core::Entity::Player::autoAttack( ActorPtr pTarget )
