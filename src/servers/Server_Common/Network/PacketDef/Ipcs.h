@@ -72,7 +72,7 @@ namespace Packets {
       Effect                     = 0x00FB, // updated 4.1
       GCAffiliation              = 0x00FC,
 
-      ActorSetPos                = 0x0114,
+      ActorSetPos                = 0x0120, // updated 4.1
       ActorCast                  = 0x0123, // updated 4.1
       PlayerSpawn                = 0x011C, // updated 4.1
       NpcSpawn                   = 0x011D, // updated 4.1
