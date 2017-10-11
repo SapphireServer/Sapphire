@@ -118,7 +118,7 @@ namespace Packets {
       InitZone                   = 0x019A, // unchanged for sb
       WeatherChange              = 0x01AF, // updated for sb
       PlayerTitleList            = 0x01BD, // updated for 4.1
-      Discovery                  = 0x01B2, // updated for sb
+      Discovery                  = 0x01BE, // updated for 4.1
 
       EorzeaTimeOffset           = 0x01C0, // updated 4.1
 
