@@ -25,6 +25,8 @@ Core::Data::ExdData g_exdData;
 
 const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
 //const std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv" );
+std::map< uint8_t, std::string > g_typeMap;
+
 
 std::string generateEnum( const std::string& exd )
 {
@@ -32,17 +34,44 @@ std::string generateEnum( const std::string& exd )
    auto& cat = g_exdData.m_exd_data->get_category( exd );
    auto exh = cat.get_header();
    auto exhMem = exh.get_exh_members();
+  
+   int count = 0;
+
+   std::string result = "struct " + exd +"\n{\n";
 
    for( auto member : exhMem )
    {
-      g_log.info( std::to_string( static_cast< uint8_t >( member.type ) ) + "\n" ); 
+      auto typei = static_cast< uint8_t >( member.type );
+      auto it = g_typeMap.find( typei );
+
+      std::string type;
+      if( it != g_typeMap.end() )
+         type = it->second; 
+      else
+         type = "bool(" + std::to_string( static_cast< uint8_t >( member.type ) ) + ")"; 
+     
+      result += "   " + type + " field" + std::to_string( count ) + ";\n";
+   
+      count++;
    }
    
-   return "";
+   result += "};\n";
+   
+   return result;
 }
 
 int main()
 {
+   g_typeMap[0] = "char";
+   g_typeMap[1] = "bool";
+   g_typeMap[2] = "int8_t";
+   g_typeMap[3] = "uint8_t";
+   g_typeMap[4] = "int16_t";
+   g_typeMap[5] = "uint16_t";
+   g_typeMap[6] = "int32";
+   g_typeMap[7] = "uint32_t";
+   g_typeMap[9] = "float";
+   g_typeMap[11] = "uint64_t";
 
    g_log.init();
 
@@ -57,7 +86,7 @@ int main()
    std::string result = 
    "/* This file has been automatically generated.\n   Changes will be lost upon regeneration.\n   To change the content edit tools/exd_struct_gen */\n";
 
-   result += generateEnum( "Quest" );      
+   result += generateEnum( "TerritoryType" );      
    g_log.info( result );
    return 0;
 }
