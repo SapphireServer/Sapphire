@@ -31,8 +31,8 @@ Core::Logger g_log;
 Core::Data::ExdData g_exdData;
 bool skipUnmapped = true;
 
-const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
-//const std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv" );
+//const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
+const std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv" );
 std::map< uint8_t, std::string > g_typeMap;
 
 
@@ -155,7 +155,7 @@ std::string generateStruct( const std::string &exd )
          fieldName = indexToNameMap[count];
       }
       fieldName[0] = std::tolower( fieldName[0] );
-      fieldName.erase( boost::remove_if( fieldName, boost::is_any_of(",-':!(){}<> \x02\x1f\x01\x03") ), fieldName.end() );   
+      fieldName.erase( boost::remove_if( fieldName, boost::is_any_of(",-':![](){}<>% \x02\x1f\x01\x03") ), fieldName.end() );   
       indexToNameMap[count] = fieldName;
       indexToTypeMap[count] = type;
      
@@ -164,7 +164,7 @@ std::string generateStruct( const std::string &exd )
       count++;
    }
 
-   result += "\n   " + exd + "( uint32_t id, Core::Data::ExdDataGenerated* exdData );\n";
+   result += "\n   " + exd + "( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );\n";
    result += "};\n\n";
    
    return result;
@@ -181,10 +181,10 @@ std::string generateConstructorsDecl( const std::string& exd )
    int count = 0;
 
 
-   result += "\n      Core::Data::" + exd + "::" + exd + "( uint32_t id, Core::Data::ExdDataGenerated* exdData )\n";
+   result += "\n      Core::Data::" + exd + "::" + exd + "( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )\n";
    result += "      {\n";
    std::string indent = "         ";
-   result += indent + "auto row = exdData->m_" + exd + "Dat.get_row( id );\n";
+   result += indent + "auto row = exdData->m_" + exd + "Dat.get_row( row_id );\n";
    for( auto member : exhMem )
    {  
       if( indexToNameMap.find( count ) == indexToNameMap.end() )
