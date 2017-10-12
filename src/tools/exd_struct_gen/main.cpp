@@ -85,6 +85,9 @@ std::string generateDirectGetterDef( const std::string& exd )
 }
 std::map< uint32_t, std::string > indexToNameMap;
 std::map< uint32_t, std::string > indexToTypeMap;
+std::map< uint32_t, std::string > indexToTarget;
+
+std::map< std::string, std::string > nameTaken;
 
 std::string generateStruct( const std::string &exd )
 {
@@ -103,11 +106,11 @@ std::string generateStruct( const std::string &exd )
       std::string name = sheet.second.get< std::string >( "sheet" );
       if( name != exd )
          continue;
-//      g_log.info( name + " ---- " );
 
       BOOST_FOREACH( boost::property_tree::ptree::value_type &show, sheet.second.get_child( "definitions" ) )
       {
          uint32_t index;
+         std::string converterTarget = "";
          try
          {
             index = show.second.get< uint32_t >("index");
@@ -116,13 +119,23 @@ std::string generateStruct( const std::string &exd )
          {
             index = 0;
          }
-         try {
+         try 
+         {
             std::string fieldName = show.second.get< std::string >( "name" );
             indexToNameMap[index] = fieldName;
          }
-         catch(...){}
-//         g_log.info( std::to_string( index ) );
-         
+         catch( ... ) {}
+
+         try
+         {
+            converterTarget = show.second.get< std::string >( "converter.target" );
+            if( nameTaken.find( converterTarget ) != nameTaken.end() )
+               indexToTarget[index] = converterTarget;
+         }
+         catch( ... ) {}
+
+
+
       }
    }
 
@@ -158,8 +171,10 @@ std::string generateStruct( const std::string &exd )
       fieldName.erase( boost::remove_if( fieldName, boost::is_any_of(",-':![](){}<>% \x02\x1f\x01\x03") ), fieldName.end() );   
       indexToNameMap[count] = fieldName;
       indexToTypeMap[count] = type;
-     
-      result += "   " + type + " " + fieldName + ";\n";
+      if( indexToTarget.find( count ) != indexToTarget.end() )
+         result += "   boost::shared_ptr< " + indexToTarget[count] + "> " + fieldName + ";\n";
+      else
+         result += "   " + type + " " + fieldName + ";\n";
    
       count++;
    }
@@ -189,13 +204,18 @@ std::string generateConstructorsDecl( const std::string& exd )
    {  
       if( indexToNameMap.find( count ) == indexToNameMap.end() )
       { count++; continue; }
-      result += indent + indexToNameMap[count] + " = exdData->getField< " + indexToTypeMap[count] + " >( row, " + std::to_string( count) + " );\n";
+      if( indexToTarget.find( count ) != indexToTarget.end() )
+         result += indent + indexToNameMap[count] + " = boost::make_shared< " + indexToTarget[count] + ">( exdData->getField< " +
+                   indexToTypeMap[count] + " >( row, " + std::to_string( count ) + " ), exdData );\n";
+      else
+         result += indent + indexToNameMap[count] + " = exdData->getField< " + indexToTypeMap[count] + " >( row, " + std::to_string( count ) + " );\n";
       count++;
    }
    result += "      }\n";
 
    indexToNameMap.clear();
    indexToTypeMap.clear();
+   indexToTarget.clear();
    return result;
 }
 
@@ -239,12 +259,19 @@ int main()
    std::string datAccCall;
    std::string getterDef;
    std::string constructorDecl;
+   std::string forwards;
 
+   //BOOST_FOREACH( boost::property_tree::ptree::value_type &sheet, m_propTree.get_child( "sheets" ) )
+   //{
+      //std::string name = sheet.second.get< std::string >( "sheet" );
+      //nameTaken[name] = "1";
+   //}
 
-   BOOST_FOREACH(boost::property_tree::ptree::value_type &sheet, m_propTree.get_child("sheets"))
+   BOOST_FOREACH( boost::property_tree::ptree::value_type &sheet, m_propTree.get_child( "sheets" ) )
    {
-      std::string name = sheet.second.get<std::string>("sheet");
+      std::string name = sheet.second.get< std::string >( "sheet" );
     
+      forwards += "struct " + name +";\n";
       structDefs += generateStruct( name );
       dataDecl += generateDatAccessDecl( name );
       getterDecl += generateDirectGetters( name );
@@ -256,7 +283,8 @@ int main()
    // for all sheets in the json i guess....
 
    std::string result;
-   result = std::regex_replace( exdH, std::regex( "\\STRUCTS" ), structDefs );
+   result = std::regex_replace( exdH, std::regex( "\\FORWARDS" ), forwards );
+   result = std::regex_replace( result, std::regex( "\\STRUCTS" ), structDefs );
    result = std::regex_replace( result, std::regex( "\\DATACCESS" ), dataDecl );
    result = std::regex_replace( result, std::regex( "\\DIRECTGETTERS" ), getterDecl );
 
