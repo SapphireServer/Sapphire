@@ -25,8 +25,8 @@ Core::Logger g_log;
 Core::Data::ExdDataGenerated g_exdData;
 
 
-//const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
-const std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv" );
+const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
+//const std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv" );
 
 
 int main()

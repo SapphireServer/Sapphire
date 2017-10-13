@@ -31,8 +31,8 @@ Core::Logger g_log;
 Core::Data::ExdData g_exdData;
 bool skipUnmapped = true;
 
-//const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
-const std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv" );
+const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
+//const std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv" );
 std::map< uint8_t, std::string > g_typeMap;
 
 
@@ -56,7 +56,7 @@ std::string generateSetDatAccessCall( const std::string &exd )
    if( langs.size() > 1 )
       lang = "xiv::exd::Language::en";
 
-   return "      m_" + exd + "Dat = setupDatAccess( \"" + exd + "\", " + lang + " );";
+   return "      m_" + exd + "Dat = setupDatAccess( \"" + exd + "\", " + lang + " );\n";
 }
 
 std::string generateDirectGetterDef( const std::string& exd )
@@ -70,22 +70,21 @@ std::string generateDirectGetterDef( const std::string& exd )
       "   {\n"
       "      auto row = m_" + exd + "Dat.get_row( " + exd + "Id );\n"
       "      auto info = boost::make_shared< " + exd + " >( " + exd + "Id, this );\n"
-
       "      return info;\n"
       "   }\n"
       "   catch( ... )\n"
       "   {\n"
       "      return nullptr;\n"
       "   }\n"
-
       "   return nullptr;\n"
-
       "}\n";
    return result;
 }
 std::map< uint32_t, std::string > indexToNameMap;
 std::map< uint32_t, std::string > indexToTypeMap;
 std::map< uint32_t, std::string > indexToTarget;
+std::map< uint32_t, bool > indexIsArrayMap;
+std::map< uint32_t, uint32_t > indexCountMap;
 
 std::map< std::string, std::string > nameTaken;
 
@@ -111,6 +110,8 @@ std::string generateStruct( const std::string &exd )
       {
          uint32_t index;
          std::string converterTarget = "";
+         bool isRepeat = false;
+         int num = 0;
          try
          {
             index = show.second.get< uint32_t >("index");
@@ -133,8 +134,18 @@ std::string generateStruct( const std::string &exd )
                indexToTarget[index] = converterTarget;
          }
          catch( ... ) {}
-
-
+         
+         try
+         {
+            show.second.get< std::string >( "type" );
+            num = show.second.get< uint8_t >( "count" );
+            isRepeat = true;
+            indexIsArrayMap[index] = true;
+            indexCountMap[index] = num;
+            std::string fName = show.second.get< std::string >( "definition.name" );
+            indexToNameMap[index] = fName;
+         }
+         catch( ... ) {}
 
       }
    }
@@ -174,7 +185,14 @@ std::string generateStruct( const std::string &exd )
       if( indexToTarget.find( count ) != indexToTarget.end() )
          result += "   boost::shared_ptr< " + indexToTarget[count] + "> " + fieldName + ";\n";
       else
+      {
+         if( indexIsArrayMap.find( count ) != indexIsArrayMap.end() )
+         {
+            type = "std::vector< " + type + " >";
+         }
          result += "   " + type + " " + fieldName + ";\n";
+        
+      }
    
       count++;
    }
@@ -208,7 +226,23 @@ std::string generateConstructorsDecl( const std::string& exd )
          result += indent + indexToNameMap[count] + " = boost::make_shared< " + indexToTarget[count] + ">( exdData->getField< " +
                    indexToTypeMap[count] + " >( row, " + std::to_string( count ) + " ), exdData );\n";
       else
-         result += indent + indexToNameMap[count] + " = exdData->getField< " + indexToTypeMap[count] + " >( row, " + std::to_string( count ) + " );\n";
+      {
+         if( indexIsArrayMap.find( count ) == indexIsArrayMap.end() )
+            result += indent + indexToNameMap[count] + " = exdData->getField< " + indexToTypeMap[count] + " >( row, " + std::to_string( count ) + " );\n";
+         else
+         {
+
+            uint32_t amount = indexCountMap[count];
+            for( int i = 0; i < amount; i++ )
+            {
+            
+               result += indent + indexToNameMap[count] + ".push_back( exdData->getField< " + indexToTypeMap[count] + " >( row, " + std::to_string( count + i ) + " ) );\n";
+ 
+            }
+
+
+         }
+      }
       count++;
    }
    result += "      }\n";
@@ -216,6 +250,8 @@ std::string generateConstructorsDecl( const std::string& exd )
    indexToNameMap.clear();
    indexToTypeMap.clear();
    indexToTarget.clear();
+   indexIsArrayMap.clear();
+   indexCountMap.clear();
    return result;
 }
 
