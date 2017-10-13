@@ -11,19 +11,16 @@
 */
 .s-left-half {
   left: 0;
-  background: #003d65 ; /* Old browsers */
-  background: -webkit-linear-gradient(#053250 0%, #13143F 100%);
-  background: -o-linear-gradient(#053250 0%, #13143F 100%);
-  background: linear-gradient(#053250 0%, #13143F 100%);
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#053250', endColorstr='#13143F',GradientType=0 );
-  box-shadow: inset -4px 0px 4px -3px #1a1a1ab3;
+  background: #232326;
+  /* box-shadow: inset -4px 0px 4px -3px #1a1a1ab3; */
   color: white;
 }
 
 .s-right-half {
   right: 0;
-  background: #232326;
-  border-left: 6px solid #1a1a20;
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00233B', endColorstr='#090915',GradientType=0 );
+  background: linear-gradient(#00233B 0%, #090915 100%);
+  border-left: 6px solid #16161b;
   padding: 0;
 }
 
@@ -36,7 +33,7 @@
 }
 
 .s-login-box {
-  background: #1a1a20;
+  background: #16161b;
   position: relative;
   z-index: 15;
   padding: 0;
@@ -67,7 +64,7 @@
   padding: 7px 0 7px 7px;
   width: 100%;
   margin-top: 8px;
-  font-size: 13px;
+  font-size: 13.5px;
   color: white;
 }
 
@@ -168,7 +165,7 @@ h2.text-center{
   font-size: 17px;
   margin-top: 25px;
   color: white;
-  border-bottom: 3px solid #443C6B;
+  border-bottom: 3px solid #43348D;
   margin-bottom: 15px;
 }
 
@@ -180,7 +177,7 @@ h2.text-center{
 .s-link-badge-github {
   background: #fff url("../img/github-icon.png") 10px 7px no-repeat;
   color: #333;
-  border-bottom-color: #474747;
+  border-bottom-color: #808080;
 }
 
 div.login-card{
