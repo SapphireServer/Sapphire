@@ -212,46 +212,27 @@ bool Core::Entity::Player::loadActiveQuests()
    stmt->setUInt( 1, m_id );
    auto res = g_charaDb.query( stmt );
 
-   if( !res->next() )
-      return false;
-
-   auto pQR = g_database.query( "SELECT * FROM charaquest WHERE CharacterId = " + std::to_string( m_id ) + ";" );
-
-   if( !pQR )
-      return false;
-
-   Db::Field* field = pQR->fetch();
-
-   for( uint8_t i = 0; i < 30; i++ )
+   while( res->next() )
    {
 
-      uint16_t index = i * 10 + 1;
+      auto slotId = res->getUInt8( 1 );
 
-      if( res->getUInt16( index ) != 0 )
-      {
+      boost::shared_ptr<QuestActive> pActiveQuest( new QuestActive() );
+      pActiveQuest->c.questId = res->getUInt16( 3 );
+      pActiveQuest->c.sequence = res->getUInt8( 4 );
+      pActiveQuest->c.flags = res->getUInt8( 5 );
+      pActiveQuest->c.UI8A = res->getUInt8( 6 );
+      pActiveQuest->c.UI8B = res->getUInt8( 7 );
+      pActiveQuest->c.UI8C = res->getUInt8( 8 );
+      pActiveQuest->c.UI8D = res->getUInt8( 9 );
+      pActiveQuest->c.UI8E = res->getUInt8( 10 );
+      pActiveQuest->c.UI8F = res->getUInt8( 11 );
+      pActiveQuest->c.padding1 = res->getUInt8( 12 );
+      m_activeQuests[slotId] = pActiveQuest;
 
-         boost::shared_ptr<QuestActive> pActiveQuest( new QuestActive() );
-         pActiveQuest->c.questId = res->getUInt16( index );
-         pActiveQuest->c.sequence = res->getUInt8( index + 1 );
-         pActiveQuest->c.flags = res->getUInt8( index + 2 );
-         pActiveQuest->c.UI8A = res->getUInt8( index + 3 );
-         pActiveQuest->c.UI8B = res->getUInt8( index + 4 );
-         pActiveQuest->c.UI8C = res->getUInt8( index + 5 );
-         pActiveQuest->c.UI8D = res->getUInt8( index + 6 );
-         pActiveQuest->c.UI8E = res->getUInt8( index + 7 );
-         pActiveQuest->c.UI8F = res->getUInt8( index + 8 );
-         pActiveQuest->c.padding1 = res->getUInt8( index + 9 );
-         m_activeQuests[i] = pActiveQuest;
+      m_questIdToQuestIdx[pActiveQuest->c.questId] = slotId;
+      m_questIdxToQuestId[slotId] = pActiveQuest->c.questId;
 
-         m_questIdToQuestIdx[pActiveQuest->c.questId] = i;
-         m_questIdxToQuestId[i] = pActiveQuest->c.questId;
-
-      }
-      else
-      {
-         m_activeQuests[i] = nullptr;
-         m_freeQuestIdxQueue.push( i );
-      }
 
    }
 
@@ -281,7 +262,7 @@ bool Core::Entity::Player::loadClassData()
 
 bool Core::Entity::Player::loadSearchInfo()
 {
-   auto stmt = g_charaDb.getPreparedStatement( Core::Db::CharaDbStatements::CHARA_SEACHINFO_SEL_LOAD );
+   auto stmt = g_charaDb.getPreparedStatement( Core::Db::CharaDbStatements::CHARA_SEARCHINFO_SEL_LOAD );
    stmt->setUInt( 1, m_id );
    auto res = g_charaDb.query( stmt );
 
@@ -416,14 +397,29 @@ void Core::Entity::Player::updateSql()
 
    g_charaDb.execute( stmt );
 
+   ////// Searchinfo
+   auto stmtS = g_charaDb.getPreparedStatement( Core::Db::CharaDbStatements::CHARA_SEARCHINFO_UP_SELECTCLASS );
+   stmtS->setInt( 1, m_searchSelectClass );
+   stmtS->setInt( 2, m_id );
+   g_charaDb.execute( stmtS );
+
+   auto stmtS1 = g_charaDb.getPreparedStatement( Core::Db::CharaDbStatements::CHARA_SEARCHINFO_UP_SELECTREGION );
+   stmtS1->setInt( 1, m_searchSelectRegion );
+   stmtS1->setInt( 2, m_id );
+   g_charaDb.execute( stmtS1 );
+
+   auto stmtS2 = g_charaDb.getPreparedStatement( Core::Db::CharaDbStatements::CHARA_SEARCHINFO_UP_SELECTREGION );
+   stmtS2->setString( 1, std::string( m_searchMessage != nullptr ? m_searchMessage : "" ) );
+   stmtS2->setInt( 2, m_id );
+   g_charaDb.execute( stmtS2 );
+
+   ////// QUESTS
+   updateAllQuests();
+
    std::set< std::string > charaClassSet;
-   std::set< std::string > charaQuestSet;
-   std::set< std::string > charaInfoSearchSet;
 
    std::string dbName = g_serverZone.getConfig()->getValue< std::string >( "Settings.General.Mysql.Database", "sapphire" );
    std::string updateCharaClass = "UPDATE " + dbName + ".characlass SET ";
-   std::string updateCharaQuest = "UPDATE " + dbName + ".charaquest SET ";
-   std::string updateCharaInfoSearch = "UPDATE " + dbName + ".charainfosearch SET ";
 
    std::string condition = " UPDATE_DATE = NOW() WHERE CharacterId = " + std::to_string( m_id ) + ";";
 
@@ -431,48 +427,6 @@ void Core::Entity::Player::updateSql()
    charaClassSet.insert( " Lv_" + std::to_string( classJobIndex ) + " = " + std::to_string( static_cast< uint32_t >( getLevel() ) ) );
    charaClassSet.insert( " Exp_" + std::to_string( classJobIndex ) + " = " + std::to_string( getExp() ) );
 
-   for( int32_t i = 0; i < 30; i++ )
-   {
-      if( m_activeQuests[i] != nullptr )
-      {
-         charaQuestSet.insert( " QuestId_" + std::to_string( i ) + " = " + std::to_string( m_activeQuests[i]->c.questId ) );
-         charaQuestSet.insert( " Sequence_" + std::to_string( i ) + " = " + std::to_string( static_cast< uint32_t >( m_activeQuests[i]->c.sequence ) ) );
-         charaQuestSet.insert( " Flags_" + std::to_string( i ) + " = " + std::to_string( static_cast< uint32_t >( m_activeQuests[i]->c.flags ) ) );
-         charaQuestSet.insert( " Variables_" + std::to_string( i ) + "_0 = " + std::to_string( static_cast< uint32_t >( m_activeQuests[i]->c.UI8A ) ) );
-         charaQuestSet.insert( " Variables_" + std::to_string( i ) + "_1 = " + std::to_string( static_cast< uint32_t >( m_activeQuests[i]->c.UI8B ) ) );
-         charaQuestSet.insert( " Variables_" + std::to_string( i ) + "_2 = " + std::to_string( static_cast< uint32_t >( m_activeQuests[i]->c.UI8C ) ) );
-         charaQuestSet.insert( " Variables_" + std::to_string( i ) + "_3 = " + std::to_string( static_cast< uint32_t >( m_activeQuests[i]->c.UI8D ) ) );
-         charaQuestSet.insert( " Variables_" + std::to_string( i ) + "_4 = " + std::to_string( static_cast< uint32_t >( m_activeQuests[i]->c.UI8E ) ) );
-         charaQuestSet.insert( " Variables_" + std::to_string( i ) + "_5 = " + std::to_string( static_cast< uint32_t >( m_activeQuests[i]->c.UI8F ) ) );
-         charaQuestSet.insert( " Variables_" + std::to_string( i ) + "_6 = " + std::to_string( static_cast< uint32_t >( m_activeQuests[i]->c.padding1 ) ) );
-      }
-      else
-      {
-         charaQuestSet.insert( " QuestId_" + std::to_string( i ) + " = 0" );
-         charaQuestSet.insert( " Sequence_" + std::to_string( i ) + " = 0" );
-         charaQuestSet.insert( " Flags_" + std::to_string( i ) + " = 0" );
-         charaQuestSet.insert( " Variables_" + std::to_string( i ) + "_0 = 0" );
-         charaQuestSet.insert( " Variables_" + std::to_string( i ) + "_1 = 0" );
-         charaQuestSet.insert( " Variables_" + std::to_string( i ) + "_2 = 0" );
-         charaQuestSet.insert( " Variables_" + std::to_string( i ) + "_3 = 0" );
-         charaQuestSet.insert( " Variables_" + std::to_string( i ) + "_4 = 0" );
-         charaQuestSet.insert( " Variables_" + std::to_string( i ) + "_5 = 0" );
-         charaQuestSet.insert( " Variables_" + std::to_string( i ) + "_6 = 0" );
-      }
-   }
-
-   charaInfoSearchSet.insert( " SelectClassId = " + std::to_string( m_searchSelectClass ) );
-   charaInfoSearchSet.insert( " SelectRegion = " + std::to_string( m_searchSelectRegion ) );
-   charaInfoSearchSet.insert( " SearchComment = UNHEX('" + std::string( Util::binaryToHexString( reinterpret_cast< uint8_t* >( m_searchMessage ), sizeof( m_searchMessage ) ) + "')" ) );
-
-   if( !charaInfoSearchSet.empty() )
-   {
-      for( auto entry : charaInfoSearchSet )
-         updateCharaInfoSearch += entry + ", ";
-
-      updateCharaInfoSearch += condition;
-      g_database.execute( updateCharaInfoSearch );
-   }
 
    if( !charaClassSet.empty() )
    {
@@ -482,15 +436,54 @@ void Core::Entity::Player::updateSql()
       updateCharaClass += condition;
       g_database.execute( updateCharaClass );
    }
-
-   if( !charaQuestSet.empty() )
-   {
-      for( auto entry : charaQuestSet )
-         updateCharaQuest += entry + ", ";
-
-      updateCharaQuest += condition;
-      g_database.execute( updateCharaQuest );
-   }
-
 }
+
+void Core::Entity::Player::updateAllQuests() const
+{
+   for( int32_t i = 0; i < 30; i++ )
+   {
+      if( m_activeQuests[i] != nullptr )
+      {
+         auto stmtS3 = g_charaDb.getPreparedStatement( Core::Db::CHARA_QUEST_UP );
+         stmtS3->setInt( 1, m_activeQuests[i]->c.sequence );
+         stmtS3->setInt( 2, m_activeQuests[i]->c.flags );
+         stmtS3->setInt( 3, m_activeQuests[i]->c.UI8A );
+         stmtS3->setInt( 4, m_activeQuests[i]->c.UI8B );
+         stmtS3->setInt( 5, m_activeQuests[i]->c.UI8C );
+         stmtS3->setInt( 6, m_activeQuests[i]->c.UI8D );
+         stmtS3->setInt( 7, m_activeQuests[i]->c.UI8E );
+         stmtS3->setInt( 8, m_activeQuests[i]->c.UI8F );
+         stmtS3->setInt( 9, m_id);
+         stmtS3->setInt( 10, m_activeQuests[i]->c.questId );
+         g_charaDb.execute( stmtS3 );
+      }
+   }
+}
+
+void Core::Entity::Player::deleteQuest( uint16_t questId ) const
+{
+   auto stmt = g_charaDb.getPreparedStatement( Core::Db::CHARA_QUEST_DEL );
+   stmt->setInt( 1, m_id );
+   stmt->setInt( 2, questId );
+   g_charaDb.execute( stmt );
+}
+
+void Core::Entity::Player::insertQuest( uint16_t questId, uint8_t index, uint8_t seq ) const
+{
+   auto stmt = g_charaDb.getPreparedStatement( Core::Db::CHARA_QUEST_INS );
+   stmt->setInt( 1, m_id );
+   stmt->setInt( 2, index );
+   stmt->setInt( 3, questId );
+   stmt->setInt( 4, seq );
+   stmt->setInt( 5, 0 );
+   stmt->setInt( 6, 0 );
+   stmt->setInt( 7, 0 );
+   stmt->setInt( 8, 0 );
+   stmt->setInt( 9, 0 );
+   stmt->setInt( 10, 0 );
+   stmt->setInt( 11, 0 );
+   stmt->setInt( 12, 0 );
+   g_charaDb.execute( stmt );
+}
+
 

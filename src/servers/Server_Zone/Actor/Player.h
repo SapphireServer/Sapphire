@@ -113,7 +113,7 @@ public:
    /*! set quest tracker flag for a specified slot */
    void setQuestTracker( uint16_t index, int16_t flag );
    /*! return the index of a given quest in the players quest list */
-   int16_t getQuestIndex( uint16_t questId );
+   int8_t getQuestIndex( uint16_t questId );
    /*! finish a given quest */
    void finishQuest( uint16_t questId );
    /*! finish a given quest */
@@ -515,7 +515,13 @@ public:
    void setCFPenaltyMinutes( uint32_t minutes );
 
    void setEorzeaTimeOffset( uint64_t timestamp );
-   
+
+
+   // Database
+   void updateAllQuests() const;
+   void deleteQuest( uint16_t questId ) const;
+   void insertQuest( uint16_t questId, uint8_t index, uint8_t seq ) const;
+
 
 private:
    uint32_t m_lastWrite;
@@ -608,8 +614,8 @@ private:
    std::queue< uint8_t > m_freeSpawnIdQueue; // queue with spawn ids free to be assigned
    std::queue< uint8_t > m_freeHateSlotQueue; // queue with "hate slots" free to be assigned
    std::map< uint32_t, uint8_t > m_actorIdTohateSlotMap;
-   std::map< uint32_t, uint16_t > m_questIdToQuestIdx; // quest mapping, quest id to quest container index
-   std::map< uint16_t, uint32_t > m_questIdxToQuestId; // quest mapping, quest container index to questId
+   std::map< uint32_t, uint8_t > m_questIdToQuestIdx; // quest mapping, quest id to quest container index
+   std::map< uint8_t, uint32_t > m_questIdxToQuestId; // quest mapping, quest container index to questId
    std::queue< uint8_t > m_freeQuestIdxQueue; // queue with quest indices free to be assigned
    boost::shared_ptr< Common::QuestActive > m_activeQuests[30];
    int16_t m_questTracking[5];
