@@ -54,37 +54,47 @@ namespace Packets {
       CFDutyInfo                 = 0x007A,
       CFPlayerInNeed             = 0x007F,
 
-      Playtime                   = 0x00B7, // updated 4.1
+
       SocialRequestError         = 0x00AD,
-      SocialRequestResponse      = 0x00BB, // updated 4.1
+      Playtime                   = 0x00B7, // updated 4.1
       CFRegistered               = 0x00B8, // updated 4.1
+      SocialRequestResponse      = 0x00BB, // updated 4.1
       SocialList                 = 0x00BE, // updated 4.1
       UpdateSearchInfo           = 0x10BB,
       InitSearchInfo             = 0x00C1, // updated 4.1
       ServerNotice               = 0x00C6, // updated 4.1
-      SetOnlineStatus            = 0x00C7, // test update
-      BlackList                  = 0x00D4, // updated 4.1
+      SetOnlineStatus            = 0x00C7, // updated 4.1
+
       LogMessage                 = 0x00D0,
+      BlackList                  = 0x00D4, // updated 4.1
 
       LinkshellList              = 0x00DC, // updated 4.1
       StatusEffectList           = 0x00FA, // updated 4.1
-
       Effect                     = 0x00FB, // updated 4.1
       GCAffiliation              = 0x00FC,
 
-      ActorSetPos                = 0x0120, // updated 4.1
-      ActorCast                  = 0x0123, // updated 4.1
+      HateList                   = 0x011A,
       PlayerSpawn                = 0x011C, // updated 4.1
       NpcSpawn                   = 0x011D, // updated 4.1
       ActorMove                  = 0x011E, // updated 4.1
-      HateList                   = 0x011A,
-      UpdateClassInfo            = 0x011D,
+
+      UpdateClassInfo            = 0x111D,
+
+      ActorSetPos                = 0x0120, // updated 4.1
+      ActorCast                  = 0x0123, // updated 4.1
       InitUI                     = 0x012B, // updated 4.1
       ActorOwner                 = 0x012D, // updated 4.1
       PlayerStats                = 0x0138, // updated 4.1
       PlayerStateFlags           = 0x013A, // updated 4.1
       PlayerClassInfo            = 0x013B, // updated 4.1
       ModelEquip                 = 0x013C, // updated 4.1
+
+      AddStatusEffect            = 0x0141,
+      ActorControl142            = 0x0142, // updated 4.1
+      ActorControl143            = 0x0143, // updated 4.1
+      ActorControl144            = 0x0144, // updated 4.1
+      UpdateHpMpTp               = 0x0145, // updated 4.1
+
       ItemInfo                   = 0x014C, // updated 4.1
       ContainerInfo              = 0x014D, // updated 4.1
       InventoryTransactionFinish = 0x014E, // updated 4.1
@@ -92,11 +102,7 @@ namespace Packets {
       CurrencyCrystalInfo        = 0x0150, // updated 4.1
       InventoryActionAck         = 0x1139,
       UpdateInventorySlot        = 0x0153, // updated 4.1
-      AddStatusEffect            = 0x0141,
-      ActorControl142            = 0x0142, // updated 4.1
-      ActorControl143            = 0x0143, // updated 4.1
-      ActorControl144            = 0x0144, // updated 4.1
-      UpdateHpMpTp               = 0x0145, // updated 4.1
+
 
 
 
@@ -106,11 +112,13 @@ namespace Packets {
 
       EventLinkshell             = 0x1169,
 
+      QuestMessage               = 0x0179,
       QuestActiveList            = 0x017D, // updated 4.1
       QuestUpdate                = 0x017E, // updated 4.1
       QuestCompleteList          = 0x017F, // updated 4.1
+
       QuestFinish                = 0x0180, // updated 4.1
-      QuestMessage               = 0x0179,
+
 
       QuestTracker               = 0x018D, // updated 4.1
       ActorSpawn                 = 0x0190, // todo: split into playerspawn/actorspawn and use opcode 0x110/0x111

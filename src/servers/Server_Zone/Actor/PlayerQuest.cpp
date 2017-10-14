@@ -22,38 +22,10 @@ using namespace Core::Network::Packets::Server;
 void Core::Entity::Player::finishQuest( uint16_t questId )
 {
 
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
 
-   if( ( idx != -1 ) && ( m_activeQuests[idx] != nullptr ) )
-   {
-      GamePacketNew< FFXIVIpcQuestUpdate, ServerZoneIpcType > questUpdatePacket( getId() );
-      questUpdatePacket.data().slot = idx;
-      questUpdatePacket.data().questInfo.c.questId = 0;
-      questUpdatePacket.data().questInfo.c.sequence = 0xFF;
-      queuePacket( questUpdatePacket );
-
-      GamePacketNew< FFXIVIpcQuestFinish, ServerZoneIpcType > questFinishPacket( getId() );
-      questFinishPacket.data().questId = questId;
-      questFinishPacket.data().flag1 = 1;
-      questFinishPacket.data().flag2 = 1;
-      queuePacket( questFinishPacket );
-
-      updateQuestsCompleted( questId );
-
-      for( int32_t ii = 0; ii < 5; ii++ )
-      {
-         if( m_questTracking[ii] == idx )
-            m_questTracking[ii] = -1;
-      }
-
-      boost::shared_ptr< QuestActive > pQuest = m_activeQuests[idx];
-      m_activeQuests[idx].reset();
-
-      m_freeQuestIdxQueue.push( idx );
-      m_questIdToQuestIdx.erase( questId );
-      m_questIdxToQuestId.erase( idx );
-   }
-
+   removeQuest( questId );
+   updateQuestsCompleted( questId );
 
    sendQuestTracker();
 
@@ -68,7 +40,7 @@ void Core::Entity::Player::unfinishQuest( uint16_t questId )
 void Core::Entity::Player::removeQuest( uint16_t questId )
 {
 
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
 
    if( ( idx != -1 ) && ( m_activeQuests[idx] != nullptr ) )
    {
@@ -97,6 +69,8 @@ void Core::Entity::Player::removeQuest( uint16_t questId )
       m_freeQuestIdxQueue.push( idx );
       m_questIdToQuestIdx.erase( questId );
       m_questIdxToQuestId.erase( idx );
+
+      deleteQuest( questId );
    }
 
    sendQuestTracker();
@@ -108,7 +82,7 @@ bool Core::Entity::Player::hasQuest( uint16_t questId )
    return ( getQuestIndex( questId ) > -1 );
 }
 
-int16_t Core::Entity::Player::getQuestIndex( uint16_t questId )
+int8_t Core::Entity::Player::getQuestIndex( uint16_t questId )
 {
    auto it = m_questIdToQuestIdx.find( questId );
    if( it != m_questIdToQuestIdx.end() )
@@ -119,7 +93,7 @@ int16_t Core::Entity::Player::getQuestIndex( uint16_t questId )
 
 uint8_t Core::Entity::Player::getQuestBitFlag8( uint16_t questId )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
    uint8_t value = 0;
    if( idx != -1 )
    {
@@ -132,7 +106,7 @@ uint8_t Core::Entity::Player::getQuestBitFlag8( uint16_t questId )
 
 uint8_t Core::Entity::Player::getQuestBitFlag16( uint16_t questId )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
    uint8_t value = 0;
    if( idx != -1 )
    {
@@ -145,7 +119,7 @@ uint8_t Core::Entity::Player::getQuestBitFlag16( uint16_t questId )
 
 uint8_t Core::Entity::Player::getQuestBitFlag24( uint16_t questId )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
    uint8_t value = 0;
    if( idx != -1 )
    {
@@ -158,7 +132,7 @@ uint8_t Core::Entity::Player::getQuestBitFlag24( uint16_t questId )
 
 uint8_t Core::Entity::Player::getQuestBitFlag32( uint16_t questId )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
    uint8_t value = 0;
    if( idx != -1 )
    {
@@ -171,7 +145,7 @@ uint8_t Core::Entity::Player::getQuestBitFlag32( uint16_t questId )
 
 uint8_t Core::Entity::Player::getQuestBitFlag40( uint16_t questId )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
    uint8_t value = 0;
    if( idx != -1 )
    {
@@ -184,7 +158,7 @@ uint8_t Core::Entity::Player::getQuestBitFlag40( uint16_t questId )
 
 uint8_t Core::Entity::Player::getQuestBitFlag48( uint16_t questId )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
    uint8_t value = 0;
    if( idx != -1 )
    {
@@ -197,7 +171,7 @@ uint8_t Core::Entity::Player::getQuestBitFlag48( uint16_t questId )
 
 uint8_t Core::Entity::Player::getQuestUI8A( uint16_t questId )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
    uint8_t value = 0;
    if( idx != -1 )
    {
@@ -210,7 +184,7 @@ uint8_t Core::Entity::Player::getQuestUI8A( uint16_t questId )
 
 uint8_t Core::Entity::Player::getQuestUI8B( uint16_t questId )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
    uint8_t value = 0;
    if( idx != -1 )
    {
@@ -223,7 +197,7 @@ uint8_t Core::Entity::Player::getQuestUI8B( uint16_t questId )
 
 uint8_t Core::Entity::Player::getQuestUI8C( uint16_t questId )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
    uint8_t value = 0;
    if( idx != -1 )
    {
@@ -236,7 +210,7 @@ uint8_t Core::Entity::Player::getQuestUI8C( uint16_t questId )
 
 uint8_t Core::Entity::Player::getQuestUI8D( uint16_t questId )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
    uint8_t value = 0;
    if( idx != -1 )
    {
@@ -249,7 +223,7 @@ uint8_t Core::Entity::Player::getQuestUI8D( uint16_t questId )
 
 uint8_t Core::Entity::Player::getQuestUI8E( uint16_t questId )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
    uint8_t value = 0;
    if( idx != -1 )
    {
@@ -262,7 +236,7 @@ uint8_t Core::Entity::Player::getQuestUI8E( uint16_t questId )
 
 uint8_t Core::Entity::Player::getQuestUI8F( uint16_t questId )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
    uint8_t value = 0;
    if( idx != -1 )
    {
@@ -275,7 +249,7 @@ uint8_t Core::Entity::Player::getQuestUI8F( uint16_t questId )
 
 uint8_t Core::Entity::Player::getQuestUI8AH( uint16_t questId )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
    uint8_t value = 0;
    if( idx != -1 )
    {
@@ -288,7 +262,7 @@ uint8_t Core::Entity::Player::getQuestUI8AH( uint16_t questId )
 
 uint8_t Core::Entity::Player::getQuestUI8BH( uint16_t questId )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
    uint8_t value = 0;
    if( idx != -1 )
    {
@@ -301,7 +275,7 @@ uint8_t Core::Entity::Player::getQuestUI8BH( uint16_t questId )
 
 uint8_t Core::Entity::Player::getQuestUI8CH( uint16_t questId )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
    uint8_t value = 0;
    if( idx != -1 )
    {
@@ -314,7 +288,7 @@ uint8_t Core::Entity::Player::getQuestUI8CH( uint16_t questId )
 
 uint8_t Core::Entity::Player::getQuestUI8DH( uint16_t questId )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
    uint8_t value = 0;
    if( idx != -1 )
    {
@@ -327,7 +301,7 @@ uint8_t Core::Entity::Player::getQuestUI8DH( uint16_t questId )
 
 uint8_t Core::Entity::Player::getQuestUI8EH( uint16_t questId )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
    uint8_t value = 0;
    if( idx != -1 )
    {
@@ -340,7 +314,7 @@ uint8_t Core::Entity::Player::getQuestUI8EH( uint16_t questId )
 
 uint8_t Core::Entity::Player::getQuestUI8FH( uint16_t questId )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
    uint8_t value = 0;
    if( idx != -1 )
    {
@@ -353,7 +327,7 @@ uint8_t Core::Entity::Player::getQuestUI8FH( uint16_t questId )
 
 uint8_t Core::Entity::Player::getQuestUI8AL( uint16_t questId )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
    uint8_t value = 0;
    if( idx != -1 )
    {
@@ -366,7 +340,7 @@ uint8_t Core::Entity::Player::getQuestUI8AL( uint16_t questId )
 
 uint8_t Core::Entity::Player::getQuestUI8BL( uint16_t questId )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
    uint8_t value = 0;
    if( idx != -1 )
    {
@@ -379,7 +353,7 @@ uint8_t Core::Entity::Player::getQuestUI8BL( uint16_t questId )
 
 uint8_t Core::Entity::Player::getQuestUI8CL( uint16_t questId )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
    uint8_t value = 0;
    if( idx != -1 )
    {
@@ -392,7 +366,7 @@ uint8_t Core::Entity::Player::getQuestUI8CL( uint16_t questId )
 
 uint8_t Core::Entity::Player::getQuestUI8DL( uint16_t questId )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
    uint8_t value = 0;
    if( idx != -1 )
    {
@@ -405,7 +379,7 @@ uint8_t Core::Entity::Player::getQuestUI8DL( uint16_t questId )
 
 uint8_t Core::Entity::Player::getQuestUI8EL( uint16_t questId )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
    uint8_t value = 0;
    if( idx != -1 )
    {
@@ -418,7 +392,7 @@ uint8_t Core::Entity::Player::getQuestUI8EL( uint16_t questId )
 
 uint8_t Core::Entity::Player::getQuestUI8FL( uint16_t questId )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
    uint8_t value = 0;
    if( idx != -1 )
    {
@@ -431,7 +405,7 @@ uint8_t Core::Entity::Player::getQuestUI8FL( uint16_t questId )
 
 uint16_t Core::Entity::Player::getQuestUI16A( uint16_t questId )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
    uint16_t value = 0;
    if( idx != -1 )
    {
@@ -444,7 +418,7 @@ uint16_t Core::Entity::Player::getQuestUI16A( uint16_t questId )
 
 uint16_t Core::Entity::Player::getQuestUI16B( uint16_t questId )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
    uint16_t value = 0;
    if( idx != -1 )
    {
@@ -457,7 +431,7 @@ uint16_t Core::Entity::Player::getQuestUI16B( uint16_t questId )
 
 uint16_t Core::Entity::Player::getQuestUI16C( uint16_t questId )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
    uint16_t value = 0;
    if( idx != -1 )
    {
@@ -470,7 +444,7 @@ uint16_t Core::Entity::Player::getQuestUI16C( uint16_t questId )
 
 uint32_t Core::Entity::Player::getQuestUI32A( uint16_t questId )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
    uint32_t value = 0;
    if( idx != -1 )
    {
@@ -483,7 +457,7 @@ uint32_t Core::Entity::Player::getQuestUI32A( uint16_t questId )
 
 void Core::Entity::Player::setQuestUI8A( uint16_t questId, uint8_t val )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
 
    if( idx != -1 )
    {
@@ -497,7 +471,7 @@ void Core::Entity::Player::setQuestUI8A( uint16_t questId, uint8_t val )
 
 void Core::Entity::Player::setQuestUI8B( uint16_t questId, uint8_t val )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
 
    if( idx != -1 )
    {
@@ -511,7 +485,7 @@ void Core::Entity::Player::setQuestUI8B( uint16_t questId, uint8_t val )
 
 void Core::Entity::Player::setQuestUI8C( uint16_t questId, uint8_t val )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
 
    if( idx != -1 )
    {
@@ -525,7 +499,7 @@ void Core::Entity::Player::setQuestUI8C( uint16_t questId, uint8_t val )
 
 void Core::Entity::Player::setQuestUI8D( uint16_t questId, uint8_t val )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
 
    if( idx != -1 )
    {
@@ -539,7 +513,7 @@ void Core::Entity::Player::setQuestUI8D( uint16_t questId, uint8_t val )
 
 void Core::Entity::Player::setQuestUI8E( uint16_t questId, uint8_t val )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
 
    if( idx != -1 )
    {
@@ -553,7 +527,7 @@ void Core::Entity::Player::setQuestUI8E( uint16_t questId, uint8_t val )
 
 void Core::Entity::Player::setQuestUI8F( uint16_t questId, uint8_t val )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
 
    if( idx != -1 )
    {
@@ -567,7 +541,7 @@ void Core::Entity::Player::setQuestUI8F( uint16_t questId, uint8_t val )
 
 void Core::Entity::Player::setQuestUI8AH( uint16_t questId, uint8_t val )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
 
    if( idx != -1 )
    {
@@ -581,7 +555,7 @@ void Core::Entity::Player::setQuestUI8AH( uint16_t questId, uint8_t val )
 
 void Core::Entity::Player::setQuestUI8BH( uint16_t questId, uint8_t val )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
 
    if( idx != -1 )
    {
@@ -595,7 +569,7 @@ void Core::Entity::Player::setQuestUI8BH( uint16_t questId, uint8_t val )
 
 void Core::Entity::Player::setQuestUI8CH( uint16_t questId, uint8_t val )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
 
    if( idx != -1 )
    {
@@ -609,7 +583,7 @@ void Core::Entity::Player::setQuestUI8CH( uint16_t questId, uint8_t val )
 
 void Core::Entity::Player::setQuestUI8DH( uint16_t questId, uint8_t val )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
 
    if( idx != -1 )
    {
@@ -623,7 +597,7 @@ void Core::Entity::Player::setQuestUI8DH( uint16_t questId, uint8_t val )
 
 void Core::Entity::Player::setQuestUI8EH( uint16_t questId, uint8_t val )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
 
    if( idx != -1 )
    {
@@ -637,7 +611,7 @@ void Core::Entity::Player::setQuestUI8EH( uint16_t questId, uint8_t val )
 
 void Core::Entity::Player::setQuestUI8FH( uint16_t questId, uint8_t val )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
 
    if( idx != -1 )
    {
@@ -651,7 +625,7 @@ void Core::Entity::Player::setQuestUI8FH( uint16_t questId, uint8_t val )
 
 void Core::Entity::Player::setQuestUI8AL( uint16_t questId, uint8_t val )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
 
    if( idx != -1 )
    {
@@ -665,7 +639,7 @@ void Core::Entity::Player::setQuestUI8AL( uint16_t questId, uint8_t val )
 
 void Core::Entity::Player::setQuestUI8BL( uint16_t questId, uint8_t val )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
 
    if( idx != -1 )
    {
@@ -679,7 +653,7 @@ void Core::Entity::Player::setQuestUI8BL( uint16_t questId, uint8_t val )
 
 void Core::Entity::Player::setQuestUI8CL( uint16_t questId, uint8_t val )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
 
    if( idx != -1 )
    {
@@ -693,7 +667,7 @@ void Core::Entity::Player::setQuestUI8CL( uint16_t questId, uint8_t val )
 
 void Core::Entity::Player::setQuestUI8DL( uint16_t questId, uint8_t val )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
 
    if( idx != -1 )
    {
@@ -707,7 +681,7 @@ void Core::Entity::Player::setQuestUI8DL( uint16_t questId, uint8_t val )
 
 void Core::Entity::Player::setQuestUI8EL( uint16_t questId, uint8_t val )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
 
    if( idx != -1 )
    {
@@ -721,7 +695,7 @@ void Core::Entity::Player::setQuestUI8EL( uint16_t questId, uint8_t val )
 
 void Core::Entity::Player::setQuestUI8FL( uint16_t questId, uint8_t val )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
 
    if( idx != -1 )
    {
@@ -735,7 +709,7 @@ void Core::Entity::Player::setQuestUI8FL( uint16_t questId, uint8_t val )
 
 void Core::Entity::Player::setQuestUI16A( uint16_t questId, uint16_t val )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
 
    if( idx != -1 )
    {
@@ -750,7 +724,7 @@ void Core::Entity::Player::setQuestUI16A( uint16_t questId, uint16_t val )
 void Core::Entity::Player::setQuestUI16B( uint16_t questId, uint16_t val )
 
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
 
    if( idx != -1 )
    {
@@ -764,7 +738,7 @@ void Core::Entity::Player::setQuestUI16B( uint16_t questId, uint16_t val )
 
 void Core::Entity::Player::setQuestUI16C( uint16_t questId, uint16_t val )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
 
    if( idx != -1 )
    {
@@ -778,7 +752,7 @@ void Core::Entity::Player::setQuestUI16C( uint16_t questId, uint16_t val )
 
 void Core::Entity::Player::setQuestUI32A( uint16_t questId, uint32_t val )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
 
    if( idx != -1 )
    {
@@ -792,7 +766,7 @@ void Core::Entity::Player::setQuestUI32A( uint16_t questId, uint32_t val )
 
 void Core::Entity::Player::setQuestBitFlag8( uint16_t questId, uint8_t val )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
 
    if( idx != -1 )
    {
@@ -806,7 +780,7 @@ void Core::Entity::Player::setQuestBitFlag8( uint16_t questId, uint8_t val )
 
 void Core::Entity::Player::setQuestBitFlag16( uint16_t questId, uint8_t val )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
 
    if( idx != -1 )
    {
@@ -820,7 +794,7 @@ void Core::Entity::Player::setQuestBitFlag16( uint16_t questId, uint8_t val )
 
 void Core::Entity::Player::setQuestBitFlag24( uint16_t questId, uint8_t val )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
 
    if( idx != -1 )
    {
@@ -833,7 +807,7 @@ void Core::Entity::Player::setQuestBitFlag24( uint16_t questId, uint8_t val )
 }
 void Core::Entity::Player::setQuestBitFlag32( uint16_t questId, uint8_t val )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
 
    if( idx != -1 )
    {
@@ -847,7 +821,7 @@ void Core::Entity::Player::setQuestBitFlag32( uint16_t questId, uint8_t val )
 
 void Core::Entity::Player::setQuestBitFlag40( uint16_t questId, uint8_t val )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
 
    if( idx != -1 )
    {
@@ -861,7 +835,7 @@ void Core::Entity::Player::setQuestBitFlag40( uint16_t questId, uint8_t val )
 
 void Core::Entity::Player::setQuestBitFlag48( uint16_t questId, uint8_t val )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
 
    if( idx != -1 )
    {
@@ -877,7 +851,7 @@ void Core::Entity::Player::setQuestBitFlag48( uint16_t questId, uint8_t val )
 
 uint8_t Core::Entity::Player::getQuestSeq( uint16_t questId )
 {
-   int16_t idx = getQuestIndex( questId );
+   int8_t idx = getQuestIndex( questId );
 
    if( idx != -1 )
    {
@@ -891,11 +865,12 @@ void Core::Entity::Player::updateQuest( uint16_t questId, uint8_t sequence )
 {
    if( hasQuest( questId ) )
    {
-      GamePacketNew< FFXIVIpcQuestUpdate, ServerZoneIpcType > pe_qa( getId() );
+
       int16_t index = getQuestIndex( questId );
       auto pNewQuest = m_activeQuests[index];
-      pe_qa.data().slot = index;
+      GamePacketNew< FFXIVIpcQuestUpdate, ServerZoneIpcType > pe_qa( getId() );
       pNewQuest->c.sequence = sequence;
+      pe_qa.data().slot = index;
       pe_qa.data().questInfo = *pNewQuest;
       queuePacket( pe_qa );
 
@@ -903,25 +878,22 @@ void Core::Entity::Player::updateQuest( uint16_t questId, uint8_t sequence )
    else
    {
 
-      int8_t idx = m_freeQuestIdxQueue.front();
+      uint8_t idx = m_freeQuestIdxQueue.front();
       m_freeQuestIdxQueue.pop();
 
-      GamePacketNew< FFXIVIpcQuestUpdate, ServerZoneIpcType > pe_qa( getId() );
+
 
       boost::shared_ptr< QuestActive > pNewQuest( new QuestActive() );
       pNewQuest->c.questId = questId;
       pNewQuest->c.sequence = sequence;
       pNewQuest->c.padding = 0;
       m_activeQuests[idx] = pNewQuest;
-
       m_questIdToQuestIdx[questId] = idx;
       m_questIdxToQuestId[idx] = questId;
 
+      GamePacketNew< FFXIVIpcQuestUpdate, ServerZoneIpcType > pe_qa( getId() );
       pe_qa.data().slot = idx;
-      pNewQuest->c.sequence = sequence;
       pe_qa.data().questInfo = *pNewQuest;
-
-
       queuePacket( pe_qa );
 
       for( int32_t ii = 0; ii < 5; ii++ )
@@ -933,6 +905,7 @@ void Core::Entity::Player::updateQuest( uint16_t questId, uint8_t sequence )
          }
       }
 
+      insertQuest( questId, idx, sequence );
       sendQuestTracker();
 
    }
