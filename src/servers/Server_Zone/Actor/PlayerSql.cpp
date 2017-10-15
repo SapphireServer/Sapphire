@@ -17,6 +17,7 @@
 #include <Server_Common/Database/CharaDbConnection.h>
 #include <Server_Common/Database/DbWorkerPool.h>
 #include <Server_Common/Database/PreparedStatement.h>
+#include <servers/Server_Common/Common.h>
 
 #include "Player.h"
 
@@ -215,9 +216,9 @@ bool Core::Entity::Player::loadActiveQuests()
    while( res->next() )
    {
 
-      auto slotId = res->getUInt8( 1 );
+      auto slotId = res->getUInt8( 2 );
 
-      boost::shared_ptr<QuestActive> pActiveQuest( new QuestActive() );
+      boost::shared_ptr< QuestActive > pActiveQuest( new QuestActive() );
       pActiveQuest->c.questId = res->getUInt16( 3 );
       pActiveQuest->c.sequence = res->getUInt8( 4 );
       pActiveQuest->c.flags = res->getUInt8( 5 );
@@ -440,6 +441,7 @@ void Core::Entity::Player::updateSql()
 
 void Core::Entity::Player::updateAllQuests() const
 {
+
    for( int32_t i = 0; i < 30; i++ )
    {
       if( m_activeQuests[i] != nullptr )
@@ -453,8 +455,9 @@ void Core::Entity::Player::updateAllQuests() const
          stmtS3->setInt( 6, m_activeQuests[i]->c.UI8D );
          stmtS3->setInt( 7, m_activeQuests[i]->c.UI8E );
          stmtS3->setInt( 8, m_activeQuests[i]->c.UI8F );
-         stmtS3->setInt( 9, m_id);
-         stmtS3->setInt( 10, m_activeQuests[i]->c.questId );
+         stmtS3->setInt( 9, m_activeQuests[i]->c.padding1 );
+         stmtS3->setInt( 10, m_id);
+         stmtS3->setInt( 11, m_activeQuests[i]->c.questId );
          g_charaDb.execute( stmtS3 );
       }
    }

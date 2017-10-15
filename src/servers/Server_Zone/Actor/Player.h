@@ -616,7 +616,6 @@ private:
    std::map< uint32_t, uint8_t > m_actorIdTohateSlotMap;
    std::map< uint32_t, uint8_t > m_questIdToQuestIdx; // quest mapping, quest id to quest container index
    std::map< uint8_t, uint32_t > m_questIdxToQuestId; // quest mapping, quest container index to questId
-   std::queue< uint8_t > m_freeQuestIdxQueue; // queue with quest indices free to be assigned
    boost::shared_ptr< Common::QuestActive > m_activeQuests[30];
    int16_t m_questTracking[5];
    uint8_t m_stateFlags[7];
