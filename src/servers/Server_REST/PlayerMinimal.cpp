@@ -262,8 +262,6 @@ namespace Core {
       g_charaDb.execute( "INSERT INTO characlass  (CharacterId, Lv_" + std::to_string( g_exdData.m_classJobInfoMap[m_class].exp_idx ) + ", UPDATE_DATE ) "
          " VALUES (" + std::to_string( m_id ) + ", 1, NOW());" );
 
-      g_charaDb.execute( "INSERT INTO charaquest (CharacterId, UPDATE_DATE ) VALUES (" + std::to_string( m_id ) + ", NOW());" );
-
       g_charaDb.execute( "INSERT INTO charainfosearch (CharacterId, UPDATE_DATE ) VALUES (" + std::to_string( m_id ) + ", NOW());" );
 
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
