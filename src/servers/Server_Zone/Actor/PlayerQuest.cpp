@@ -66,7 +66,6 @@ void Core::Entity::Player::removeQuest( uint16_t questId )
       boost::shared_ptr<QuestActive> pQuest = m_activeQuests[idx];
       m_activeQuests[idx].reset();
 
-      m_freeQuestIdxQueue.push( idx );
       m_questIdToQuestIdx.erase( questId );
       m_questIdxToQuestId.erase( idx );
 
@@ -866,7 +865,7 @@ void Core::Entity::Player::updateQuest( uint16_t questId, uint8_t sequence )
    if( hasQuest( questId ) )
    {
 
-      int16_t index = getQuestIndex( questId );
+      uint8_t index = getQuestIndex( questId );
       auto pNewQuest = m_activeQuests[index];
       GamePacketNew< FFXIVIpcQuestUpdate, ServerZoneIpcType > pe_qa( getId() );
       pNewQuest->c.sequence = sequence;
@@ -878,10 +877,17 @@ void Core::Entity::Player::updateQuest( uint16_t questId, uint8_t sequence )
    else
    {
 
-      uint8_t idx = m_freeQuestIdxQueue.front();
-      m_freeQuestIdxQueue.pop();
+      uint8_t idx = 0;
+      bool hasFreeSlot = false;
+      for( ; idx < 30; idx++ )
+         if( !m_activeQuests[idx] )
+         {
+            hasFreeSlot = true;
+            break;
+         }
 
-
+      if( !hasFreeSlot )
+         return;
 
       boost::shared_ptr< QuestActive > pNewQuest( new QuestActive() );
       pNewQuest->c.questId = questId;

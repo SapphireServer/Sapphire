@@ -110,7 +110,7 @@ void Core::Db::CharaDbConnection::doPrepareStatements()
    prepareStatement( CHARA_SEARCHINFO_UP_SEARCHCOMMENT, "UPDATE charainfosearch SET SearchComment = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
 
    /// QUEST
-   prepareStatement( CHARA_QUEST_INS, "INSERT INTO charaquestnew ( CharacterId, SlotId, QuestId, Sequence, Flags, Variables_0 "
+   prepareStatement( CHARA_QUEST_INS, "INSERT INTO charaquestnew ( CharacterId, SlotId, QuestId, Sequence, Flags, Variables_0, "
                                                                   "Variables_1, Variables_2, Variables_3, Variables_4, "
                                                                   "Variables_5, Variables_6 ) VALUES( ?,?,?,?,?,?,?,?,?,?,?,? );", CONNECTION_ASYNC );
 
