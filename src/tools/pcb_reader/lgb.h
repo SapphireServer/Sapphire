@@ -1,6 +1,8 @@
 #ifndef _LGB_H
 #define _LGB_H
 
+#include "matrix4.h"
+#include "vec3.h"
 #include <memory>
 #include <cstdint>
 #include <iostream>
@@ -15,11 +17,6 @@ struct LGB_FILE;
 struct LGB_FILE_HEADER;
 struct LGB_GROUP;
 struct LGB_GROUP_HEADER;
-
-struct vec3
-{
-   float x, y, z;
-};
 
 enum class LgbEntryType : uint32_t
 {
@@ -174,7 +171,7 @@ struct LGB_GROUP
      entries.resize(header.entryCount);
      //std::cout << name << std::endl;
      auto entriesOffset = offset + header.entriesOffset;
-     for( auto i = 0; i < header.entryCount; ++i)
+     for( auto i = 0; i < header.entryCount; ++i )
      {
        auto entryOffset = entriesOffset + *reinterpret_cast<int32_t*>(buf + (entriesOffset + i * 4));
 
@@ -190,10 +187,14 @@ struct LGB_GROUP
          {
             entries[i] = std::make_shared<LGB_GIMMICK_ENTRY>(buf, entryOffset);
          }
+         else
+         {
+            entries[i] = nullptr;
+         }
        }
        catch (std::exception& e)
        {
-         std::cout << e.what() << std::endl;
+         std::cout << name << " " << e.what() << std::endl;
        }
      }
    };
