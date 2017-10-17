@@ -1490,7 +1490,7 @@ void Core::Entity::Player::mount( uint32_t id )
 {
    GamePacketNew< FFXIVIpcMount, ServerZoneIpcType > mountPacket( getId() );
    mountPacket.data().id = id;
-   sendToInRangeSet(mountPacket, true );
+   sendToInRangeSet( mountPacket, true );
 }
 
 void Core::Entity::Player::autoAttack( ActorPtr pTarget )

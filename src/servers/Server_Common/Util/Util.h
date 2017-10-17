@@ -9,7 +9,7 @@ namespace Util {
 
 std::string binaryToHexString( uint8_t* pBinData, uint16_t size );
 
-std::string binaryToHexDump(uint8_t* pBinData, uint16_t size);
+std::string binaryToHexDump( uint8_t* pBinData, uint16_t size );
 
 uint64_t getTimeMs();
 

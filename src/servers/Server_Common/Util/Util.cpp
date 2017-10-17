@@ -2,7 +2,7 @@
 #include <chrono>
 #include <boost/variant/detail/substitute.hpp>
 
-std::string Core::Util::binaryToHexString(uint8_t* pBinData, uint16_t size)
+std::string Core::Util::binaryToHexString( uint8_t* pBinData, uint16_t size )
 {
    std::string outStr;
 
