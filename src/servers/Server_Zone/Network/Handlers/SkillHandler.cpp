@@ -42,9 +42,6 @@ using namespace Core::Network::Packets::Server;
 void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inPacket,
                                                   Entity::PlayerPtr pPlayer )
 {
-
-    g_log.debug( inPacket.toString() );
-
     uint8_t type = inPacket.getValAt< uint32_t >( 0x21 );
 
     uint32_t action = inPacket.getValAt< uint32_t >( 0x24 );
