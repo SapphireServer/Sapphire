@@ -130,10 +130,11 @@ void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inP
     effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::CritDamage;
     effectPacket.data().effects[0].value = action;
 
+    pPlayer->sendToInRangeSet( ActorControlPacket142( pPlayer->getId(), ActorControlType::SetStatus, 4 ), true ); //?
+    pPlayer->sendToInRangeSet( ActorControlPacket143( pPlayer->getId(), 0x39e, 12 ), true ); //?
     pPlayer->mount( action );
     pPlayer->sendToInRangeSet( effectPacket, true );
-
-
+    
     break;
 
     }
