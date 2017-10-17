@@ -18,7 +18,7 @@ std::string Core::Util::binaryToHexString(uint8_t* pBinData, uint16_t size)
 std::string Core::Util::binaryToHexDump( uint8_t* pBinData, uint16_t size )
 {
    int bytesPerLine = 16;
-   std::string hexChars = "0123456789ABCDEF";
+   constexpr char hexChars[] = "0123456789ABCDEF";
    
    int offsetBlock = 8 + 3;
    int byteBlock = offsetBlock + bytesPerLine * 3 + ( bytesPerLine - 1 ) / 8 + 2;
@@ -62,7 +62,7 @@ std::string Core::Util::binaryToHexDump( uint8_t* pBinData, uint16_t size )
             uint8_t by = pBinData[i + j];
             line[hexColumn] = hexChars[( by >> 4 ) & 0xF];
             line[hexColumn + 1] = hexChars[by & 0xF];
-            line[charColumn] = by < 32 ? '.' : static_cast<char>(by);
+            line[charColumn] = by < 32 ? '.' : static_cast<char>( by );
          }
 
          hexColumn += 3;
