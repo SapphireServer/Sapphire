@@ -57,6 +57,26 @@ enum class LgbEntryType : uint32_t
    SphereCastRange = 75,
 };
 
+class LGB_MODEL_ENTRY
+{
+public:
+   char* m_buf;
+   uint32_t m_offset;
+
+   LGB_MODEL_ENTRY()
+   {
+      m_buf = nullptr;
+      m_offset = 0;
+   };
+   LGB_MODEL_ENTRY( char* buf, uint32_t offset )
+   {
+      m_buf = buf;
+      m_offset = offset;
+   };
+   virtual ~LGB_MODEL_ENTRY() {};
+};
+
+
 struct LGB_BGPARTS_HEADER
 {
    LgbEntryType type;
@@ -75,25 +95,6 @@ struct LGB_BGPARTS_HEADER
    uint32_t unknown9;
 };
 
-class LGB_MODEL_ENTRY
-{
-public:
-   char* m_buf;
-   uint32_t m_offset;
-
-   LGB_MODEL_ENTRY()
-   {
-      m_buf = nullptr;
-      m_offset = 0;
-   };
-   LGB_MODEL_ENTRY(char* buf, uint32_t offset)
-   {
-      m_buf = buf;
-      m_offset = offset;
-   };
-   virtual ~LGB_MODEL_ENTRY(){};
-};
-
 class LGB_BGPARTS_ENTRY : public LGB_MODEL_ENTRY
 {
 public:
@@ -101,13 +102,13 @@ public:
    std::string name;
    std::string modelFileName;
    std::string collisionFileName;
-   LGB_BGPARTS_ENTRY(){};
-   LGB_BGPARTS_ENTRY(char* buf, uint32_t offset)
+   LGB_BGPARTS_ENTRY() {};
+   LGB_BGPARTS_ENTRY( char* buf, uint32_t offset )
    {
       header = *reinterpret_cast<LGB_BGPARTS_HEADER*>(buf + offset);
-      name = std::string(buf + offset + header.nameOffset);
-      modelFileName = std::string(buf + offset + header.modelFileOffset);
-      collisionFileName = std::string(buf + offset + header.collisionFileOffset);
+      name = std::string( buf + offset + header.nameOffset );
+      modelFileName = std::string( buf + offset + header.modelFileOffset );
+      collisionFileName = std::string( buf + offset + header.collisionFileOffset );
       //std::cout << "BGPARTS_ENTRY " << name << "\n";
       //std::cout << "  " << modelFileName << "\n";
       //std::cout << "  " << collisionFileName << "\n";
@@ -132,10 +133,10 @@ public:
    LGB_GIMMICK_HEADER header;
    std::string name;
 
-   LGB_GIMMICK_ENTRY(char* buf, uint32_t offset)
+   LGB_GIMMICK_ENTRY( char* buf, uint32_t offset )
    {
       header = *reinterpret_cast<LGB_GIMMICK_HEADER*>(buf + offset);
-      name = std::string(buf + offset + header.nameOffset);
+      name = std::string( buf + offset + header.nameOffset );
    };
 };
 
@@ -163,40 +164,40 @@ struct LGB_GROUP
    std::string name;
    std::vector<std::shared_ptr<LGB_MODEL_ENTRY>> entries;
 
-   LGB_GROUP(char* buf, LGB_FILE* parentStruct, uint32_t offset)
+   LGB_GROUP( char* buf, LGB_FILE* parentStruct, uint32_t offset )
    {
-     parent = parentStruct;
-     header = *reinterpret_cast<LGB_GROUP_HEADER*>(buf + offset);
-     name = std::string(buf + offset + header.groupNameOffset);
-     entries.resize(header.entryCount);
-     //std::cout << name << std::endl;
-     auto entriesOffset = offset + header.entriesOffset;
-     for( auto i = 0; i < header.entryCount; ++i )
-     {
-       auto entryOffset = entriesOffset + *reinterpret_cast<int32_t*>(buf + (entriesOffset + i * 4));
+      parent = parentStruct;
+      header = *reinterpret_cast<LGB_GROUP_HEADER*>(buf + offset);
+      name = std::string( buf + offset + header.groupNameOffset );
+      entries.resize( header.entryCount );
+      //std::cout << name << std::endl;
+      auto entriesOffset = offset + header.entriesOffset;
+      for( auto i = 0; i < header.entryCount; ++i )
+      {
+         auto entryOffset = entriesOffset + *reinterpret_cast<int32_t*>(buf + (entriesOffset + i * 4));
 
-       try
-       {
-         auto type  = *reinterpret_cast<LgbEntryType*>(buf + entryOffset);
-         LGB_MODEL_ENTRY* entry;
-         if (type == LgbEntryType::BgParts)
+         try
          {
-            entries[i] = std::make_shared<LGB_BGPARTS_ENTRY>(buf, entryOffset);
+            auto type = *reinterpret_cast<LgbEntryType*>(buf + entryOffset);
+            LGB_MODEL_ENTRY* entry;
+            if( type == LgbEntryType::BgParts )
+            {
+               entries[i] = std::make_shared<LGB_BGPARTS_ENTRY>( buf, entryOffset );
+            }
+            else if( type == LgbEntryType::Gimmick )
+            {
+               entries[i] = std::make_shared<LGB_GIMMICK_ENTRY>( buf, entryOffset );
+            }
+            else
+            {
+               entries[i] = nullptr;
+            }
          }
-         else if (type == LgbEntryType::Gimmick)
+         catch( std::exception& e )
          {
-            entries[i] = std::make_shared<LGB_GIMMICK_ENTRY>(buf, entryOffset);
+            std::cout << name << " " << e.what() << std::endl;
          }
-         else
-         {
-            entries[i] = nullptr;
-         }
-       }
-       catch (std::exception& e)
-       {
-         std::cout << name << " " << e.what() << std::endl;
-       }
-     }
+      }
    };
 };
 
@@ -218,46 +219,46 @@ struct LGB_FILE
    LGB_FILE_HEADER header;
    std::vector<LGB_GROUP> groups;
 
-   LGB_FILE(char* buf)
+   LGB_FILE( char* buf )
    {
       header = *reinterpret_cast<LGB_FILE_HEADER*>(buf);
-      if (strncmp(&header.magic[0], "LGB1", 4) != 0 || strncmp(&header.magic2[0], "LGP1", 4) != 0)
-        throw std::exception("Invalid LGB file!");
+      if( strncmp( &header.magic[0], "LGB1", 4 ) != 0 || strncmp( &header.magic2[0], "LGP1", 4 ) != 0 )
+         throw std::exception( "Invalid LGB file!" );
 
       //groups.resize(header.groupCount);
 
-      auto baseOffset = sizeof(header);
-      for(auto i = 0; i < header.groupCount; ++i)
+      auto baseOffset = sizeof( header );
+      for( auto i = 0; i < header.groupCount; ++i )
       {
          auto groupOffset = baseOffset + *reinterpret_cast<int32_t*>(buf + (baseOffset + i * 4));
-         auto group = LGB_GROUP(buf, this, groupOffset);
-         groups.push_back(group);
+         auto group = LGB_GROUP( buf, this, groupOffset );
+         groups.push_back( group );
       }
    };
 };
 
-std::map<std::string, LGB_FILE> getLgbFiles(const std::string& dir)
+std::map<std::string, LGB_FILE> getLgbFiles( const std::string& dir )
 {
    namespace fs = std::experimental::filesystem;
    std::map<std::string, LGB_FILE> fileMap;
-   for (const auto& path : fs::recursive_directory_iterator(dir))
+   for( const auto& path : fs::recursive_directory_iterator( dir ) )
    {
-      if (path.path().extension() == ".lgb")
+      if( path.path().extension() == ".lgb" )
       {
          auto strPath = path.path().string();
-         auto f = fopen(strPath.c_str(), "rb");
-         fseek(f, 0, SEEK_END);
-         auto size = ftell(f);
-         std::vector<char> bytes(size);
-         rewind(f);
-         fread(bytes.data(), 1, size, f);
-         fclose(f);
+         auto f = fopen( strPath.c_str(), "rb" );
+         fseek( f, 0, SEEK_END );
+         auto size = ftell( f );
+         std::vector<char> bytes( size );
+         rewind( f );
+         fread( bytes.data(), 1, size, f );
+         fclose( f );
          try
          {
-            LGB_FILE lgbFile(bytes.data());
-            fileMap.insert(std::make_pair(strPath, lgbFile));
+            LGB_FILE lgbFile( bytes.data() );
+            fileMap.insert( std::make_pair( strPath, lgbFile ) );
          }
-         catch (std::exception& e)
+         catch( std::exception& e )
          {
             std::cout << "Unable to load " << strPath << std::endl;
          }
