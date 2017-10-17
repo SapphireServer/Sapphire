@@ -46,7 +46,7 @@ namespace Packets {
    {
       Ping                       = 0x0065,
       Init                       = 0x0066,
-      Chat                       = 0x0067,
+      Chat                       = 0x00B9,
       ChatBanned                 = 0x006B,
       Logout                     = 0x0077,
       CFNotify                   = 0x0078,
