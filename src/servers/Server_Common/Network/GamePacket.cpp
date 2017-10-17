@@ -98,5 +98,5 @@ void Core::Network::Packets::GamePacket::savePacket()
 
 std::string Core::Network::Packets::GamePacket::toString() const
 {
-   return Core::Util::binaryToHexDump( const_cast<uint8_t *>(&m_dataBuf[0]), getSize() );
+   return Core::Util::binaryToHexString( const_cast<uint8_t *>(&m_dataBuf[0]), getSize() );
 }

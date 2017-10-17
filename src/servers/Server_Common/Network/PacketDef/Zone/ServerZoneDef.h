@@ -1303,6 +1303,15 @@ struct FFXIVIpcEquipDisplayFlags : FFXIVIpcBasePacket<EquipDisplayFlags>
    uint8_t bitmask;
 };
 
+/**
+* Structural representation of the packet sent by the server
+* to mount a player
+*/
+struct FFXIVIpcMount : FFXIVIpcBasePacket<Mount>
+{
+   uint32_t id;
+};
+
 
 } /* Server */
 } /* Packets */

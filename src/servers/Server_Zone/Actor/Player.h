@@ -340,6 +340,8 @@ public:
    void setEquipDisplayFlags( uint8_t state );
    /*! get gear param state and send update to inRangeSet */
    uint8_t getEquipDisplayFlags() const;
+   /*! mount the specified mount and send the packet */
+   void mount( uint32_t id );
 
    void calculateStats() override;
    void sendStats();
