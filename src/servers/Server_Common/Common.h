@@ -602,7 +602,8 @@ namespace Core {
          MpGain = 11,
          TpLoss = 12,
          TpGain = 13,
-         GpGain = 14
+         GpGain = 14,
+         Mount = 38
       };
 
       enum class ActionHitSeverityType : uint8_t
@@ -1066,6 +1067,12 @@ namespace Core {
          HideWeapon = 0x2,
 
          Visor = 0x40,
+      };
+
+      enum SkillType : uint8_t
+      {
+         Normal = 0x1,
+         MountSkill = 0xD,
       };
 
       struct ServerEntry

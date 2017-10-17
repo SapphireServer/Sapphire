@@ -28,6 +28,7 @@
 #include "src/servers/Server_Zone/Action/ActionTeleport.h"
 #include "src/servers/Server_Zone/Action/ActionCast.h"
 #include "src/servers/Server_Zone/Script/ScriptManager.h"
+#include "Server_Zone/Network/PacketWrappers/MoveActorPacket.h"
 
 
 extern Core::Scripting::ScriptManager g_scriptMgr;
@@ -42,10 +43,20 @@ void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inP
                                                   Entity::PlayerPtr pPlayer )
 {
 
+    g_log.debug( inPacket.toString() );
+
+    uint8_t type = inPacket.getValAt< uint32_t >( 0x21 );
+
     uint32_t action = inPacket.getValAt< uint32_t >( 0x24 );
     uint32_t useCount = inPacket.getValAt< uint32_t >( 0x28 );
 
     uint64_t targetId = inPacket.getValAt< uint64_t >( 0x30 );
+
+    pPlayer->sendDebug( "Skill type:" + std::to_string( type ) );
+
+    switch( type )
+    {
+    case Common::SkillType::Normal:
 
     if( action < 1000000 ) // normal action
     {
@@ -101,6 +112,32 @@ void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inP
     }
     else if( action > 3000000 ) // unknown
     {
+
+    }
+
+    break;
+
+    case Common::SkillType::MountSkill:
+
+    pPlayer->sendDebug( "Request mount " + std::to_string( action ) );
+
+    GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket(pPlayer->getId());
+    effectPacket.data().targetId = pPlayer->getId();
+    effectPacket.data().actionAnimationId = action;
+    effectPacket.data().unknown_62 = 13; // Affects displaying action name next to number in floating text
+    effectPacket.data().actionTextId = 4;
+    effectPacket.data().numEffects = 1;
+    effectPacket.data().rotation = Math::Util::floatToUInt16Rot(pPlayer->getRotation());
+    effectPacket.data().effectTarget = INVALID_GAME_OBJECT_ID;
+    effectPacket.data().effects[0].effectType = ActionEffectType::Mount;
+    effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::CritDamage;
+    effectPacket.data().effects[0].value = action;
+
+    pPlayer->mount( action );
+    pPlayer->sendToInRangeSet( effectPacket, true );
+
+
+    break;
 
     }
 

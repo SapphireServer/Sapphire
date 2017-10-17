@@ -116,6 +116,7 @@ namespace Packets {
       ActorSpawn                 = 0x0190, // todo: split into playerspawn/actorspawn and use opcode 0x110/0x111
       ActorFreeSpawn             = 0x0191, // unchanged for sb
       InitZone                   = 0x019A, // unchanged for sb
+      Mount                   = 0x019F, // unchanged for sb
       WeatherChange              = 0x01AF, // updated for sb
       PlayerTitleList            = 0x01BD, // updated for 4.1
       Discovery                  = 0x01BE, // updated for 4.1

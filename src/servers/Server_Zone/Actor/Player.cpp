@@ -1486,6 +1486,13 @@ uint8_t Core::Entity::Player::getEquipDisplayFlags() const
    return m_equipDisplayFlags;
 }
 
+void Core::Entity::Player::mount( uint32_t id )
+{
+   GamePacketNew< FFXIVIpcMount, ServerZoneIpcType > mountPacket( getId() );
+   mountPacket.data().id = id;
+   sendToInRangeSet(mountPacket, true );
+}
+
 void Core::Entity::Player::autoAttack( ActorPtr pTarget )
 {
 
