@@ -10,19 +10,19 @@ struct matrix4
    float grid[16];
    matrix4()
    {
-      memset(&grid[0], 0, sizeof(grid));
+      memset( &grid[0], 0, sizeof( grid ) );
    }
 
-   float operator()(int row, int col) const
+   float operator()( int row, int col ) const
 	{
 		return grid[(row * 4) + col];
 	}
 
-	float& operator()(int row, int col)
+   float& operator()( int row, int col )
 	{
 		return grid[(row * 4) + col];
 	}
-	static matrix4 rotateX(float angle)
+   static matrix4 rotateX( float angle )
 	{
 		matrix4 ret = matrix4();
 		ret(0, 0) = 1.000000000f;
@@ -34,7 +34,7 @@ struct matrix4
 		return ret;
 	}
 
-	static matrix4 rotateY(float angle)
+   static matrix4 rotateY( float angle )
 	{
 		matrix4 ret = matrix4();
 		ret(0, 0) = cos(angle);
@@ -46,7 +46,7 @@ struct matrix4
 		return ret;
 	}
 
-	static matrix4 rotateZ(float angle)
+   static matrix4 rotateZ( float angle )
 	{
 		matrix4 ret = matrix4();
 		ret(0, 0) = cos(angle);
@@ -58,7 +58,7 @@ struct matrix4
 		return ret;
    }
 
-   static matrix4 scale(float x, float y, float z)
+   static matrix4 scale( float x, float y, float z )
 	{
 		matrix4 ret = matrix4();
 		ret(0, 0) = x;
@@ -69,7 +69,7 @@ struct matrix4
 		return ret;
 	}
 
-	static matrix4 translate(float x, float y, float z)
+   static matrix4 translate( float x, float y, float z )
 	{
 		matrix4 ret = matrix4();
 		ret(0, 0) = 1;
@@ -82,5 +82,18 @@ struct matrix4
 		ret(3, 2) = z;
 		return ret;
 	}
+
+   matrix4 operator *( const matrix4& rhs ) const
+   {
+      matrix4 ret;
+      for( unsigned int i = 0; i < 4; i++ )
+      {
+         ret( i, 0 ) = (*this)(i, 0) * rhs( 0, 0 ) + (*this)(i, 1) * rhs( 1, 0 ) + (*this)(i, 2) * rhs( 2, 0 ) + (*this)(i, 3) * rhs( 3, 0 );
+         ret( i, 1 ) = (*this)(i, 0) * rhs( 0, 1 ) + (*this)(i, 1) * rhs( 1, 1 ) + (*this)(i, 2) * rhs( 2, 1 ) + (*this)(i, 3) * rhs( 3, 1 );
+         ret( i, 2 ) = (*this)(i, 0) * rhs( 0, 2 ) + (*this)(i, 1) * rhs( 1, 2 ) + (*this)(i, 2) * rhs( 2, 2 ) + (*this)(i, 3) * rhs( 3, 2 );
+         ret( i, 3 ) = (*this)(i, 0) * rhs( 0, 3 ) + (*this)(i, 1) * rhs( 1, 3 ) + (*this)(i, 2) * rhs( 2, 3 ) + (*this)(i, 3) * rhs( 3, 3 );
+      }
+      return ret;
+   }
 };
 #endif
