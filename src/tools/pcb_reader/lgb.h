@@ -169,7 +169,7 @@ struct LGB_GROUP
       parent = parentStruct;
       header = *reinterpret_cast<LGB_GROUP_HEADER*>(buf + offset);
       name = std::string( buf + offset + header.groupNameOffset );
-      entries.resize( header.entryCount );
+      //entries.resize( header.entryCount );
       //std::cout << name << std::endl;
       auto entriesOffset = offset + header.entriesOffset;
       for( auto i = 0; i < header.entryCount; ++i )
@@ -179,19 +179,20 @@ struct LGB_GROUP
          try
          {
             auto type = *reinterpret_cast<LgbEntryType*>(buf + entryOffset);
-            LGB_MODEL_ENTRY* entry;
             if( type == LgbEntryType::BgParts )
             {
-               entries[i] = std::make_shared<LGB_BGPARTS_ENTRY>( buf, entryOffset );
+               entries.push_back(std::make_shared<LGB_BGPARTS_ENTRY>( buf, entryOffset ));
             }
+            /*
             else if( type == LgbEntryType::Gimmick )
             {
-               entries[i] = std::make_shared<LGB_GIMMICK_ENTRY>( buf, entryOffset );
+               //entries[i] = std::make_shared<LGB_GIMMICK_ENTRY>( buf, entryOffset );
             }
             else
             {
-               entries[i] = nullptr;
+               //entries[i] = nullptr;
             }
+            */
          }
          catch( std::exception& e )
          {
