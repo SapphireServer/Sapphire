@@ -190,9 +190,8 @@ void Core::Network::SapphireAPI::deleteCharacter( std::string name, uint32_t acc
 
    int32_t id = deletePlayer.getId();
 
-   g_database.execute( "DELETE FROM charabase WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
+   g_database.execute( "DELETE FROM charainfo WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
    g_database.execute( "DELETE FROM characlass WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
-   g_database.execute( "DELETE FROM charadetail WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
    g_database.execute( "DELETE FROM charaglobalitem WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
    g_database.execute( "DELETE FROM charainfoblacklist WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
    g_database.execute( "DELETE FROM charainfofriendlist WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );

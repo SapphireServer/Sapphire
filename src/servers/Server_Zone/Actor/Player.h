@@ -518,10 +518,11 @@ public:
 
 
    // Database
-   void updateAllQuests() const;
+   void updateDbAllQuests() const;
    void deleteQuest( uint16_t questId ) const;
    void insertQuest( uint16_t questId, uint8_t index, uint8_t seq ) const;
-
+   void updateDbSearchInfo() const;
+   void updateDbClass() const;
 
 private:
    uint32_t m_lastWrite;
@@ -529,15 +530,12 @@ private:
 
    bool m_bIsLogin;
 
-   // ==== CHARABASE
    uint64_t m_contentId; // This id will be the name of the folder for character settings in "My Games"
 
    uint8_t m_mode;
 
 private:
-   uint8_t m_mount;
-   uint8_t m_ignore;
-   uint8_t m_invincibleGM;
+
    uint8_t m_voice;
 
    uint64_t m_modelMainWeapon;
@@ -546,31 +544,8 @@ private:
 
    uint32_t m_modelEquip[10];
 
-   uint8_t m_emoteModeType;
-
-   // timestamp of first login
-   uint32_t m_firstLogin;
-
-   // id of initial language
-   uint32_t m_language;
-
    bool m_bNewGame;
 
-   uint32_t m_primaryTerritoryType;
-   uint32_t m_primaryTerritoryId;
-   uint32_t m_primaryLayoutId;
-   uint32_t m_primaryExclusiveId;
-   uint32_t m_primaryMoveType;
-   uint32_t m_primaryContentId;
-
-   uint32_t m_secondaryTerritoryType;
-   uint32_t m_secondaryTerritoryId;
-   Common::FFXIVARR_POSITION3 m_secondaryPos;
-   float m_secondaryRot;
-   uint32_t m_secondaryLayoutId;
-   // !! END CHARABASE
-
-   // ==== CHARADETAIL
    uint8_t m_guardianDeity;
    uint8_t m_birthDay;
    uint8_t m_birthMonth;
@@ -587,16 +562,13 @@ private:
 
    uint16_t m_title;
    uint8_t m_titleList[48];
-   uint8_t m_achievement[16];
    uint8_t m_howTo[33];
    uint8_t m_minions[33];
    uint8_t m_mounts[13];
    uint8_t m_homePoint;
    uint8_t m_startTown;
-   uint8_t m_favoritePoint[3];
    uint16_t m_townWarpFstFlags;
    uint8_t m_questCompleteFlags[200];
-   uint8_t m_chocoboTaxiStandFlags[8];
    uint8_t m_discovery[420];
    uint32_t m_playTime;
 
