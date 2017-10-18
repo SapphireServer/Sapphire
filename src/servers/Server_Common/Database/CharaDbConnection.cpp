@@ -51,10 +51,6 @@ void Core::Db::CharaDbConnection::doPrepareStatements()
                                                "Class, ContentId, BirthDay, BirthMonth "
                                                 "FROM charainfo WHERE CharacterId = ?;", CONNECTION_SYNC );
 
-   prepareStatement( CHARA_CLASSINFO_SEL_LOAD, "SELECT * FROM characlass WHERE CharacterId = ?;", CONNECTION_SYNC );
-   prepareStatement( CHARA_SEARCHINFO_SEL_LOAD, "SELECT * FROM charainfosearch WHERE CharacterId = ?;", CONNECTION_SYNC );
-   prepareStatement( CHARA_QUESTINFO_SEL_LOAD, "SELECT * FROM charaquestnew WHERE CharacterId = ?;", CONNECTION_SYNC );
-
    prepareStatement( CHARA_INS, "INSERT INTO charainfo (AccountId, CharacterId, ContentId, Name, Hp, Mp, "
                                         "Customize, Voice, IsNewGame, TerritoryId, PosX, PosY, PosZ, PosR, ModelEquip, "
                                         "IsNewAdventurer, GuardianDeity, Birthday, BirthMonth, Class, Status, FirstClass, "
@@ -104,12 +100,13 @@ void Core::Db::CharaDbConnection::doPrepareStatements()
    prepareStatement( CHARA_UP_UNLOCKS, "UPDATE charainfo SET Unlocks = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
    prepareStatement( CHARA_UP_CFPENATLY, "UPDATE charainfo SET CFPenaltyUntil = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
 
-   /// SEARCHINFO
+   /// SEARCH INFO
    prepareStatement( CHARA_SEARCHINFO_UP_SELECTCLASS, "UPDATE charainfosearch SET SelectClassId = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
    prepareStatement( CHARA_SEARCHINFO_UP_SELECTREGION, "UPDATE charainfosearch SET SelectRegion = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
    prepareStatement( CHARA_SEARCHINFO_UP_SEARCHCOMMENT, "UPDATE charainfosearch SET SearchComment = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
+   prepareStatement( CHARA_SEARCHINFO_SEL, "SELECT * FROM charainfosearch WHERE CharacterId = ?;", CONNECTION_SYNC );
 
-   /// QUEST
+   /// QUEST INFO
    prepareStatement( CHARA_QUEST_INS, "INSERT INTO charaquestnew ( CharacterId, SlotId, QuestId, Sequence, Flags, Variables_0, "
                                                                   "Variables_1, Variables_2, Variables_3, Variables_4, "
                                                                   "Variables_5, Variables_6 ) VALUES( ?,?,?,?,?,?,?,?,?,?,?,? );", CONNECTION_ASYNC );
@@ -120,6 +117,15 @@ void Core::Db::CharaDbConnection::doPrepareStatements()
                                                               "WHERE CharacterId = ? AND QuestId = ?;", CONNECTION_ASYNC );
 
    prepareStatement( CHARA_QUEST_DEL, "DELETE FROM charaquestnew WHERE CharacterId = ? AND QuestId = ?;", CONNECTION_ASYNC );
+
+   prepareStatement( CHARA_QUEST_SEL, "SELECT * FROM charaquestnew WHERE CharacterId = ?;", CONNECTION_SYNC );
+
+
+   /// CLASS INFO
+   prepareStatement( CHARA_CLASS_SEL, "SELECT ClassIdx, Exp, Lvl FROM characlass WHERE CharacterId = ?;", CONNECTION_SYNC );
+   prepareStatement( CHARA_CLASS_INS, "INSERT INTO characlass ( CharacterId, ClassIdx, Exp, Lvl ) VALUES( ?,?,?,?);", CONNECTION_ASYNC );
+   prepareStatement( CHARA_CLASS_UP, "UPDATE characlass SET Exp = ?, SET Lvl = ? ) WHERE CharacterId = ? AND ClassIdx = ?;", CONNECTION_ASYNC );
+   prepareStatement( CHARA_CLASS_DEL, "DELETE FROM characlass WHERE CharacterId = ?;", CONNECTION_ASYNC );
 
 
 

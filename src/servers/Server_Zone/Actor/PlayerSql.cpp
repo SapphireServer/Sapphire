@@ -208,7 +208,7 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
 bool Core::Entity::Player::loadActiveQuests()
 {
 
-   auto stmt = g_charaDb.getPreparedStatement( Core::Db::CharaDbStatements::CHARA_QUESTINFO_SEL_LOAD );
+   auto stmt = g_charaDb.getPreparedStatement( Core::Db::CharaDbStatements::CHARA_QUEST_SEL );
 
    stmt->setUInt( 1, m_id );
    auto res = g_charaDb.query( stmt );
@@ -244,18 +244,19 @@ bool Core::Entity::Player::loadActiveQuests()
 bool Core::Entity::Player::loadClassData()
 {
 
-   auto stmt = g_charaDb.getPreparedStatement( Core::Db::CharaDbStatements::CHARA_CLASSINFO_SEL_LOAD );
+   // ClassIdx, Exp, Lvl
+   auto stmt = g_charaDb.getPreparedStatement( Core::Db::CharaDbStatements::CHARA_CLASS_SEL );
    stmt->setUInt( 1, m_id );
    auto res = g_charaDb.query( stmt );
 
-   if( !res->next() )
-      return false;
-
-   for( uint8_t i = 0; i < 25; i++ )
+   while( res->next() )
    {
-      uint8_t index = i * 2;
-      m_classArray[i] = res->getUInt16( index + 1 );
-      m_expArray[i] = res->getUInt( index + 2 );
+      auto index = res->getUInt16( 1 );
+      auto exp = res->getUInt( 2 );
+      auto lvl = res->getUInt8( 3 );
+
+      m_classArray[index] = lvl;
+      m_expArray[index] = exp;
    }
 
    return true;
@@ -263,7 +264,7 @@ bool Core::Entity::Player::loadClassData()
 
 bool Core::Entity::Player::loadSearchInfo()
 {
-   auto stmt = g_charaDb.getPreparedStatement( Core::Db::CharaDbStatements::CHARA_SEARCHINFO_SEL_LOAD );
+   auto stmt = g_charaDb.getPreparedStatement( Core::Db::CharaDbStatements::CHARA_SEARCHINFO_SEL );
    stmt->setUInt( 1, m_id );
    auto res = g_charaDb.query( stmt );
 
@@ -399,67 +400,68 @@ void Core::Entity::Player::updateSql()
    g_charaDb.execute( stmt );
 
    ////// Searchinfo
-   auto stmtS = g_charaDb.getPreparedStatement( Core::Db::CharaDbStatements::CHARA_SEARCHINFO_UP_SELECTCLASS );
+   updateDbSearchInfo();
+
+   ////// QUESTS
+   updateDbAllQuests();
+
+   ////// Class
+   updateDbClass();
+
+}
+
+void Core::Entity::Player::updateDbClass() const
+{
+   uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( getClass() )].exp_idx;
+
+   auto stmtS = g_charaDb.getPreparedStatement( Core::Db::CHARA_CLASS_UP );
+   stmtS->setInt( 1, getLevel() );
+   stmtS->setInt( 2, getExp() );
+   stmtS->setInt( 3, m_id );
+   stmtS->setInt( 4, classJobIndex );
+   g_charaDb.execute( stmtS );
+}
+
+void Core::Entity::Player::updateDbSearchInfo() const
+{
+   auto stmtS = g_charaDb.getPreparedStatement( Core::Db::CHARA_SEARCHINFO_UP_SELECTCLASS );
    stmtS->setInt( 1, m_searchSelectClass );
    stmtS->setInt( 2, m_id );
    g_charaDb.execute( stmtS );
 
-   auto stmtS1 = g_charaDb.getPreparedStatement( Core::Db::CharaDbStatements::CHARA_SEARCHINFO_UP_SELECTREGION );
+   auto stmtS1 = g_charaDb.getPreparedStatement( Core::Db::CHARA_SEARCHINFO_UP_SELECTREGION );
    stmtS1->setInt( 1, m_searchSelectRegion );
    stmtS1->setInt( 2, m_id );
    g_charaDb.execute( stmtS1 );
 
-   auto stmtS2 = g_charaDb.getPreparedStatement( Core::Db::CharaDbStatements::CHARA_SEARCHINFO_UP_SELECTREGION );
-   stmtS2->setString( 1, std::string( m_searchMessage != nullptr ? m_searchMessage : "" ) );
+   auto stmtS2 = g_charaDb.getPreparedStatement( Core::Db::CHARA_SEARCHINFO_UP_SELECTREGION );
+   stmtS2->setString( 1, string( m_searchMessage != nullptr ? m_searchMessage : "" ) );
    stmtS2->setInt( 2, m_id );
    g_charaDb.execute( stmtS2 );
-
-   ////// QUESTS
-   updateAllQuests();
-
-   std::set< std::string > charaClassSet;
-
-   std::string dbName = g_serverZone.getConfig()->getValue< std::string >( "Settings.General.Mysql.Database", "sapphire" );
-   std::string updateCharaClass = "UPDATE " + dbName + ".characlass SET ";
-
-   std::string condition = " UPDATE_DATE = NOW() WHERE CharacterId = " + std::to_string( m_id ) + ";";
-
-   uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( getClass() )].exp_idx;
-   charaClassSet.insert( " Lv_" + std::to_string( classJobIndex ) + " = " + std::to_string( static_cast< uint32_t >( getLevel() ) ) );
-   charaClassSet.insert( " Exp_" + std::to_string( classJobIndex ) + " = " + std::to_string( getExp() ) );
-
-
-   if( !charaClassSet.empty() )
-   {
-      for( auto entry : charaClassSet )
-         updateCharaClass += entry + ", ";
-
-      updateCharaClass += condition;
-      g_database.execute( updateCharaClass );
-   }
 }
 
-void Core::Entity::Player::updateAllQuests() const
+void Core::Entity::Player::updateDbAllQuests() const
 {
 
    for( int32_t i = 0; i < 30; i++ )
    {
-      if( m_activeQuests[i] != nullptr )
-      {
-         auto stmtS3 = g_charaDb.getPreparedStatement( Core::Db::CHARA_QUEST_UP );
-         stmtS3->setInt( 1, m_activeQuests[i]->c.sequence );
-         stmtS3->setInt( 2, m_activeQuests[i]->c.flags );
-         stmtS3->setInt( 3, m_activeQuests[i]->c.UI8A );
-         stmtS3->setInt( 4, m_activeQuests[i]->c.UI8B );
-         stmtS3->setInt( 5, m_activeQuests[i]->c.UI8C );
-         stmtS3->setInt( 6, m_activeQuests[i]->c.UI8D );
-         stmtS3->setInt( 7, m_activeQuests[i]->c.UI8E );
-         stmtS3->setInt( 8, m_activeQuests[i]->c.UI8F );
-         stmtS3->setInt( 9, m_activeQuests[i]->c.padding1 );
-         stmtS3->setInt( 10, m_id);
-         stmtS3->setInt( 11, m_activeQuests[i]->c.questId );
-         g_charaDb.execute( stmtS3 );
-      }
+      if( !m_activeQuests[i] )
+         continue;
+
+      auto stmtS3 = g_charaDb.getPreparedStatement( Core::Db::CHARA_QUEST_UP );
+      stmtS3->setInt( 1, m_activeQuests[i]->c.sequence );
+      stmtS3->setInt( 2, m_activeQuests[i]->c.flags );
+      stmtS3->setInt( 3, m_activeQuests[i]->c.UI8A );
+      stmtS3->setInt( 4, m_activeQuests[i]->c.UI8B );
+      stmtS3->setInt( 5, m_activeQuests[i]->c.UI8C );
+      stmtS3->setInt( 6, m_activeQuests[i]->c.UI8D );
+      stmtS3->setInt( 7, m_activeQuests[i]->c.UI8E );
+      stmtS3->setInt( 8, m_activeQuests[i]->c.UI8F );
+      stmtS3->setInt( 9, m_activeQuests[i]->c.padding1 );
+      stmtS3->setInt( 10, m_id);
+      stmtS3->setInt( 11, m_activeQuests[i]->c.questId );
+      g_charaDb.execute( stmtS3 );
+
    }
 }
 
