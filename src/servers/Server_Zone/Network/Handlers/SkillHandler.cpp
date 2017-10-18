@@ -118,8 +118,8 @@ void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inP
 
     pPlayer->sendDebug( "Request mount " + std::to_string( action ) );
 
-    Action::ActionMountPtr pActionMount(new Action::ActionMount(pPlayer, pPlayer, action));
-    pPlayer->setCurrentAction(pActionMount);
+    Action::ActionMountPtr pActionMount( new Action::ActionMount(pPlayer, action) );
+    pPlayer->setCurrentAction( pActionMount );
     pPlayer->sendDebug("setCurrentAction()");
     pPlayer->getCurrentAction()->onStart();
     

@@ -952,7 +952,8 @@ namespace Core {
 
          GearSetEquipMsg = 0x321,
 
-         ToggleOrchestrionUnlock = 0x396
+         ToggleOrchestrionUnlock = 0x396,
+         Dismount = 0x3a0
       };
 
       enum struct ChatType : uint16_t

@@ -26,14 +26,13 @@ Core::Action::ActionMount::ActionMount()
    m_handleActionType = Common::HandleActionType::Event;
 }
 
-Core::Action::ActionMount::ActionMount( Entity::ActorPtr pActor, Entity::ActorPtr pTarget, uint32_t actionId )
+Core::Action::ActionMount::ActionMount( Entity::ActorPtr pActor, uint32_t mountId )
 {
    m_startTime = 0;
-   m_id = actionId;
+   m_id = mountId;
    m_handleActionType = HandleActionType::Spell;
    m_castTime = 1000;
    m_pSource = pActor;
-   m_pTarget = pTarget;
    m_bInterrupt = false;
 }
 
@@ -56,7 +55,7 @@ void Core::Action::ActionMount::onStart()
    castPacket.data().skillType = Common::SkillType::MountSkill;
    castPacket.data().unknown_1 = m_id;
    castPacket.data().cast_time = static_cast< float >( m_castTime / 1000 ); // This is used for the cast bar above the target bar of the caster.
-   castPacket.data().target_id = m_pTarget->getId();
+   castPacket.data().target_id = m_pSource->getAsPlayer()->getId();
 
    m_pSource->sendToInRangeSet( castPacket, true );
    m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::Casting );
@@ -88,9 +87,6 @@ void Core::Action::ActionMount::onFinish()
    effectPacket.data().effects[0].value = m_id;
 
    pPlayer->sendToInRangeSet(effectPacket, true);
-
-   pPlayer->sendToInRangeSet(ActorControlPacket142(pPlayer->getId(), ActorControlType::SetStatus, 4), true); //?
-   pPlayer->sendToInRangeSet(ActorControlPacket143(pPlayer->getId(), 0x39e, 12), true); //?
 
    pPlayer->mount( m_id );
 }

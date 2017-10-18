@@ -108,8 +108,8 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
         }
         case 0x65:
         {
-           pPlayer->sendToInRangeSet( ActorControlPacket142(pPlayer->getId(), ActorControlType::SetStatus, 1 ), true ); //?
-           pPlayer->sendToInRangeSet( ActorControlPacket143( pPlayer->getId(), 0x393, 1 ), true ); //?
+           pPlayer->dismount();
+           break;
         }
         case 0x68: // Remove status (clicking it off)
         {

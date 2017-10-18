@@ -14,7 +14,7 @@ namespace Core { namespace Action {
       ActionMount();
       ~ActionMount();
       
-      ActionMount( Entity::ActorPtr pActor, Entity::ActorPtr pTarget, uint32_t actionId );
+      ActionMount( Entity::ActorPtr pActor, uint32_t mountId );
 
       void onStart() override;
       void onFinish() override;
