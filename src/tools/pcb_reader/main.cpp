@@ -303,7 +303,7 @@ int main( int argc, char* argv[] )
                         index.index[1] + max_index + 1,
                         index.index[2] + max_index + 1 );
                   }
-                  //std::cout << std::to_string( index.unknown[0] )<< " " << std::to_string( index.unknown[1] )<< " " << std::to_string( index.unknown[2]) << std::endl;
+//                  std::cout << std::to_string( index.unknown[0] )<< " " << std::to_string( index.unknown[1] )<< " " << std::to_string( index.unknown[2]) << std::endl;
                }
                max_index += entry.data.vertices.size() + entry.data.vertices_i16.size();
             }
@@ -315,34 +315,42 @@ int main( int argc, char* argv[] )
             pushVerts( pcbFiles[fileName], fileName );
          }
          std::cout << "Writing obj file " << "\n";
-         std::cout << bgLgb.groups.size() << " entries " << "\n";
+         std::cout << bgLgb.groups.size() << " groups " << "\n";
+         uint32_t totalGroups = 0;
+         uint32_t totalGroupEntries = 0;
          for( const auto& group : bgLgb.groups )
          {
+            //std::cout << "\t" << group.name << " Size " << group.header.entryCount << "\n";
+            totalGroups++;
             for( const auto pEntry : group.entries )
             {
-               if( !pEntry )
-                  continue;
-
                auto pBgParts = dynamic_cast<LGB_BGPARTS_ENTRY*>(pEntry.get());
-               if( pBgParts && pBgParts->collisionFileName.empty() )
+
+               auto& fileName = pBgParts->collisionFileName;
+               if( pBgParts )
                {
-                  pBgParts->collisionFileName = pBgParts->modelFileName;
-                  boost::replace_all( pBgParts->collisionFileName, "bgparts", "collision" );
-                  boost::replace_all( pBgParts->collisionFileName, ".mdl", ".pcb" );
-                  //std::cout << pBgParts->collisionFileName << " renamed\n";
+                  if ( fileName.empty() )
+                     fileName = pBgParts->modelFileName;
+                  boost::replace_all( fileName, "bgparts", "collision" );
+                  boost::replace_all( fileName, ".mdl", ".pcb" );
                }
-               if( !pBgParts || pBgParts->collisionFileName.empty() )
-                  //|| std::find( stringList.begin(), stringList.end(), pBgParts->collisionFileName ) != stringList.end() )
+
+               if( !pBgParts || fileName.empty() )
                   continue;
 
-               auto it = pcbFiles.find( pBgParts->collisionFileName );
-               if( it == pcbFiles.end() )
                {
-                  loadPcbFile( pBgParts->collisionFileName );
-                  //std::cout << "\t\tLoaded PCB File " << pBgParts->collisionFileName << "\n";
+                  const auto& it = pcbFiles.find( fileName );
+                  if( it == pcbFiles.end() )
+                  {
+                     loadPcbFile( fileName );
+                     //std::cout << "\t\tLoaded PCB File " << pBgParts->collisionFileName << "\n";
+                  }
                }
+               const auto& it = pcbFiles.find( fileName );
                if( it != pcbFiles.end() )
                {
+                  totalGroupEntries++;
+
                   //std::cout << pBgParts->collisionFileName << "\n";
 
                   const auto* scale = &pBgParts->header.scale;
@@ -350,10 +358,12 @@ int main( int argc, char* argv[] )
                   const auto* translation = &pBgParts->header.translation;
 
                   const auto& pcb_file = it->second;
-                  pushVerts( pcb_file, pBgParts->collisionFileName, scale, rotation, translation );
+                  pushVerts( pcb_file, fileName, scale, rotation, translation );
                }
             }
          }
+         std::cout << "\n\nLoaded " << pcbFiles.size() << " PCB Files \n";
+         std::cout << "Total Groups " << totalGroups << " Total entries " << totalGroupEntries << "\n";
       }
       std::cout << "Finished exporting " << zoneName << " in " <<
          std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - startTime).count() << " seconds\n";
