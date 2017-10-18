@@ -604,7 +604,8 @@ struct FFXIVIpcActorSetPos : FFXIVIpcBasePacket<ActorSetPos>
 struct FFXIVIpcActorCast : FFXIVIpcBasePacket<ActorCast>
 {
    uint16_t action_id;
-   uint16_t unknown;
+   Common::SkillType skillType;
+   uint8_t unknown;
    uint32_t unknown_1; // Also action id
    float cast_time;
    uint32_t target_id;
