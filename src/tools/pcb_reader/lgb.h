@@ -1,14 +1,16 @@
 #ifndef _LGB_H
 #define _LGB_H
 
-#include "matrix4.h"
-#include "vec3.h"
+#include <cstring>
 #include <memory>
 #include <cstdint>
 #include <iostream>
 #include <vector>
 #include <map>
-#include <experimental/filesystem>
+#include <string>
+
+#include "matrix4.h"
+#include "vec3.h"
 
 // all credit to
 // https://github.com/ufx/SaintCoinach/blob/master/SaintCoinach/Graphics/Lgb/
@@ -105,7 +107,7 @@ public:
    LGB_BGPARTS_ENTRY() {};
    LGB_BGPARTS_ENTRY( char* buf, uint32_t offset )
    {
-      header = *reinterpret_cast<LGB_BGPARTS_HEADER*>(buf + offset);
+      header = *reinterpret_cast<LGB_BGPARTS_HEADER*>( buf + offset );
       name = std::string( buf + offset + header.nameOffset );
       modelFileName = std::string( buf + offset + header.modelFileOffset );
       collisionFileName = std::string( buf + offset + header.collisionFileOffset );
@@ -135,7 +137,7 @@ public:
 
    LGB_GIMMICK_ENTRY( char* buf, uint32_t offset )
    {
-      header = *reinterpret_cast<LGB_GIMMICK_HEADER*>(buf + offset);
+      header = *reinterpret_cast<LGB_GIMMICK_HEADER*>( buf + offset );
       name = std::string( buf + offset + header.nameOffset );
    };
 };
@@ -167,21 +169,21 @@ struct LGB_GROUP
    LGB_GROUP( char* buf, LGB_FILE* parentStruct, uint32_t offset )
    {
       parent = parentStruct;
-      header = *reinterpret_cast<LGB_GROUP_HEADER*>(buf + offset);
+      header = *reinterpret_cast<LGB_GROUP_HEADER*>( buf + offset );
       name = std::string( buf + offset + header.groupNameOffset );
       //entries.resize( header.entryCount );
       //std::cout << name << std::endl;
-      auto entriesOffset = offset + header.entriesOffset;
+      const auto entriesOffset = offset + header.entriesOffset;
       for( auto i = 0; i < header.entryCount; ++i )
       {
-         auto entryOffset = entriesOffset + *reinterpret_cast<int32_t*>(buf + (entriesOffset + i * 4));
+         const auto entryOffset = entriesOffset + *reinterpret_cast<int32_t*>( buf + ( entriesOffset + i * 4 ) );
 
          try
          {
-            auto type = *reinterpret_cast<LgbEntryType*>(buf + entryOffset);
+            const auto type = *reinterpret_cast<LgbEntryType*>( buf + entryOffset );
             if( type == LgbEntryType::BgParts )
             {
-               entries.push_back(std::make_shared<LGB_BGPARTS_ENTRY>( buf, entryOffset ));
+               entries.push_back( std::make_shared<LGB_BGPARTS_ENTRY>( buf, entryOffset ) );
             }
             /*
             else if( type == LgbEntryType::Gimmick )
@@ -222,22 +224,25 @@ struct LGB_FILE
 
    LGB_FILE( char* buf )
    {
-      header = *reinterpret_cast<LGB_FILE_HEADER*>(buf);
+      header = *reinterpret_cast<LGB_FILE_HEADER*>( buf );
       if( strncmp( &header.magic[0], "LGB1", 4 ) != 0 || strncmp( &header.magic2[0], "LGP1", 4 ) != 0 )
-         throw std::exception( "Invalid LGB file!" );
+         throw std::runtime_error( "Invalid LGB file!" );
 
       //groups.resize(header.groupCount);
 
-      auto baseOffset = sizeof( header );
+      constexpr auto baseOffset = sizeof( header );
       for( auto i = 0; i < header.groupCount; ++i )
       {
-         auto groupOffset = baseOffset + *reinterpret_cast<int32_t*>(buf + (baseOffset + i * 4));
-         auto group = LGB_GROUP( buf, this, groupOffset );
+         const auto groupOffset = baseOffset + *reinterpret_cast<int32_t*>( buf + ( baseOffset + i * 4 ) );
+         const auto group = LGB_GROUP( buf, this, groupOffset );
          groups.push_back( group );
       }
    };
 };
 
+/*
+#if __cplusplus >= 201703L
+#include <experimental/filesystem>
 std::map<std::string, LGB_FILE> getLgbFiles( const std::string& dir )
 {
    namespace fs = std::experimental::filesystem;
@@ -246,10 +251,10 @@ std::map<std::string, LGB_FILE> getLgbFiles( const std::string& dir )
    {
       if( path.path().extension() == ".lgb" )
       {
-         auto strPath = path.path().string();
+         const auto& strPath = path.path().string();
          auto f = fopen( strPath.c_str(), "rb" );
          fseek( f, 0, SEEK_END );
-         auto size = ftell( f );
+         const auto size = ftell( f );
          std::vector<char> bytes( size );
          rewind( f );
          fread( bytes.data(), 1, size, f );
@@ -267,4 +272,6 @@ std::map<std::string, LGB_FILE> getLgbFiles( const std::string& dir )
    }
    return fileMap;
 }
+#endif
+*/
 #endif

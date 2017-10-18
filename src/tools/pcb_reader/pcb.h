@@ -74,19 +74,19 @@ struct PCB_FILE
 
 struct PCB_LIST_ENTRY
 {
-    uint32_t id;
-    float x, y, z, x2, y2, z2, rot;
+   uint32_t id;
+   float x, y, z, x2, y2, z2, rot;
 };
 
 struct PCB_LIST_BASE_ENTRY
 {
-    float x, y, z, x2, y2, z2, rot;
+   float x, y, z, x2, y2, z2, rot;
 };
 
 struct PCB_LIST_FILE
 {
-    uint32_t count;
-    PCB_LIST_BASE_ENTRY entry;
-    std::vector<PCB_LIST_ENTRY> entries;
+   uint32_t count;
+   PCB_LIST_BASE_ENTRY entry;
+   std::vector<PCB_LIST_ENTRY> entries;
 };
 #endif

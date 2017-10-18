@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <cstdint>
 #include <string>
-#include <experimental/filesystem>
 
 #include "pcb.h"
 #include "lgb.h"
@@ -18,7 +17,7 @@
 #include <chrono>
 
 using namespace std::chrono_literals;
-namespace fs = std::experimental::filesystem;
+
 struct face
 {
    int32_t f1, f2, f3;
@@ -141,15 +140,15 @@ int main( int argc, char* argv[] )
 
       const xiv::dat::Cat& test = data1.get_category( "bg" );
 
-      auto &test_file = data1.get_file( "bg/ffxiv/" + zonePath + "/level/bg.lgb" );
-      auto &section = test_file->access_data_sections().at( 0 );
+      auto test_file = data1.get_file( "bg/ffxiv/" + zonePath + "/level/bg.lgb" );
+      auto section = test_file->access_data_sections().at( 0 );
       int32_t list_offset = *(uint32_t*)&section[0x18];
       int32_t size = *(uint32_t*)&section[4];
 
       std::vector<std::string> stringList;
 
-      auto &test_file1 = data1.get_file( "bg/ffxiv/" + zonePath + "/collision/list.pcb" );
-      auto &section1 = test_file1->access_data_sections().at( 0 );
+      auto test_file1 = data1.get_file( "bg/ffxiv/" + zonePath + "/collision/list.pcb" );
+      auto section1 = test_file1->access_data_sections().at( 0 );
       std::string path = "bg/ffxiv/" + zonePath + "/collision/";
       int offset1 = 0x20;
       for( ; ; )
@@ -180,7 +179,7 @@ int main( int argc, char* argv[] )
       int counter = 0;
 
       // dont bother if we cant write to a file
-      auto fp_out = fopen( (zoneName + ".obj").c_str(), "w" );
+      auto fp_out = fopen( ( zoneName + ".obj" ).c_str(), "w" );
       if( fp_out )
       {
          fprintf( fp_out, "\n" );
@@ -191,11 +190,11 @@ int main( int argc, char* argv[] )
          std::string errorMessage( "Cannot create " + zoneName + ".obj\n" +
             " Check no programs have a handle to file and run as admin.\n" );
          std::cout << errorMessage;
-         throw std::exception( errorMessage.c_str() );
+         throw std::runtime_error( errorMessage.c_str() );
          return 0;
       }
 
-      fp_out = fopen( (zoneName + ".obj").c_str(), "ab+" );
+      fp_out = fopen( ( zoneName + ".obj" ).c_str(), "ab+" );
       if( fp_out )
       {
          std::map<std::string, PCB_FILE> pcbFiles;
@@ -212,7 +211,6 @@ int main( int argc, char* argv[] )
                //std::cout << sections.size() << "\n";
 
                uint32_t offset = 0;
-               uint32_t groupCount = 0;
                PCB_FILE pcb_file;
                memcpy( &pcb_file.header, &dataSection[0], sizeof( pcb_file.header ) );
                offset += sizeof( pcb_file.header );
@@ -235,7 +233,6 @@ int main( int argc, char* argv[] )
                   {
                      parseBlockEntry( &dataSection[0] + offset, pcb_file.entries, offset );
                   }
-                  groupCount++;
                }
                pcbFiles.insert( std::make_pair( fileName, pcb_file ) );
             }
@@ -246,10 +243,10 @@ int main( int argc, char* argv[] )
          };
          auto pushVerts = [&]( const PCB_FILE& pcb_file, const std::string& name, const vec3* scale = nullptr, const vec3* rotation = nullptr, const vec3* translation = nullptr )
          {
-            std::string name2 = (name + "_" + std::to_string( objCount[name]++ ));
+            std::string name2 = ( name + "_" + std::to_string( objCount[name]++ ) );
             fprintf( fp_out, "o %s\n", name2.c_str() );
             uint32_t groupCount = 0;
-            for( auto &entry : pcb_file.entries )
+            for( const auto &entry : pcb_file.entries )
             {
                float x_base = abs( float( entry.header.x1 - entry.header.x ) );
                float y_base = abs( float( entry.header.y1 - entry.header.y ) );
@@ -303,7 +300,7 @@ int main( int argc, char* argv[] )
                         index.index[1] + max_index + 1,
                         index.index[2] + max_index + 1 );
                   }
-//                  std::cout << std::to_string( index.unknown[0] )<< " " << std::to_string( index.unknown[1] )<< " " << std::to_string( index.unknown[2]) << std::endl;
+                  // std::cout << std::to_string( index.unknown[0] )<< " " << std::to_string( index.unknown[1] )<< " " << std::to_string( index.unknown[2]) << std::endl;
                }
                max_index += entry.data.vertices.size() + entry.data.vertices_i16.size();
             }
@@ -324,19 +321,16 @@ int main( int argc, char* argv[] )
             totalGroups++;
             for( const auto pEntry : group.entries )
             {
-               auto pBgParts = dynamic_cast<LGB_BGPARTS_ENTRY*>(pEntry.get());
-
+               auto pBgParts = static_cast<LGB_BGPARTS_ENTRY*>( pEntry.get() );
                auto& fileName = pBgParts->collisionFileName;
-               if( pBgParts )
-               {
-                  if ( fileName.empty() )
-                     fileName = pBgParts->modelFileName;
-                  boost::replace_all( fileName, "bgparts", "collision" );
-                  boost::replace_all( fileName, ".mdl", ".pcb" );
-               }
 
-               if( !pBgParts || fileName.empty() )
+               if( fileName.empty() )
                   continue;
+
+               {
+                  //boost::replace_all( fileName, "bgparts", "collision" );
+                  //boost::replace_all( fileName, ".mdl", ".pcb" );
+               }
 
                {
                   const auto& it = pcbFiles.find( fileName );
@@ -351,8 +345,6 @@ int main( int argc, char* argv[] )
                {
                   totalGroupEntries++;
 
-                  //std::cout << pBgParts->collisionFileName << "\n";
-
                   const auto* scale = &pBgParts->header.scale;
                   const auto* rotation = &pBgParts->header.rotation;
                   const auto* translation = &pBgParts->header.translation;
@@ -366,7 +358,7 @@ int main( int argc, char* argv[] )
          std::cout << "Total Groups " << totalGroups << " Total entries " << totalGroupEntries << "\n";
       }
       std::cout << "Finished exporting " << zoneName << " in " <<
-         std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - startTime).count() << " seconds\n";
+         std::chrono::duration_cast<std::chrono::seconds>( std::chrono::system_clock::now() - startTime ).count() << " seconds\n";
    }
    catch( std::exception& e )
    {

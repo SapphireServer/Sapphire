@@ -2,6 +2,7 @@
 #define _MATRIX4_H
 
 #include <cstdint>
+#include <cmath>
 
 // https://github.com/jpd002/Play--Framework/tree/master/include/math
 struct matrix4
