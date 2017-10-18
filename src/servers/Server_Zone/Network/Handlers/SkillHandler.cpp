@@ -25,8 +25,8 @@
 #include "src/servers/Server_Zone/Forwards.h"
 
 #include "src/servers/Server_Zone/Action/Action.h"
-#include "src/servers/Server_Zone/Action/ActionTeleport.h"
 #include "src/servers/Server_Zone/Action/ActionCast.h"
+#include "src/servers/Server_Zone/Action/ActionMount.h"
 #include "src/servers/Server_Zone/Script/ScriptManager.h"
 #include "Server_Zone/Network/PacketWrappers/MoveActorPacket.h"
 
@@ -118,22 +118,10 @@ void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inP
 
     pPlayer->sendDebug( "Request mount " + std::to_string( action ) );
 
-    GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket(pPlayer->getId());
-    effectPacket.data().targetId = pPlayer->getId();
-    effectPacket.data().actionAnimationId = action;
-    effectPacket.data().unknown_62 = 13; // Affects displaying action name next to number in floating text
-    effectPacket.data().actionTextId = 4;
-    effectPacket.data().numEffects = 1;
-    effectPacket.data().rotation = Math::Util::floatToUInt16Rot(pPlayer->getRotation());
-    effectPacket.data().effectTarget = INVALID_GAME_OBJECT_ID;
-    effectPacket.data().effects[0].effectType = ActionEffectType::Mount;
-    effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::CritDamage;
-    effectPacket.data().effects[0].value = action;
-
-    pPlayer->sendToInRangeSet( ActorControlPacket142( pPlayer->getId(), ActorControlType::SetStatus, 4 ), true ); //?
-    pPlayer->sendToInRangeSet( ActorControlPacket143( pPlayer->getId(), 0x39e, 12 ), true ); //?
-    pPlayer->mount( action );
-    pPlayer->sendToInRangeSet( effectPacket, true );
+    Action::ActionMountPtr pActionMount(new Action::ActionMount(pPlayer, pPlayer, action));
+    pPlayer->setCurrentAction(pActionMount);
+    pPlayer->sendDebug("setCurrentAction()");
+    pPlayer->getCurrentAction()->onStart();
     
     break;
 
