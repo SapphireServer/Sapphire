@@ -81,7 +81,7 @@ struct FFXIVIpcPlayTime : FFXIVIpcBasePacket<Playtime>
 */
 struct PlayerEntry {
    uint64_t contentId;
-   unsigned char bytes[12];
+   uint8_t bytes[12];
    uint16_t zoneId;
    uint16_t zoneId1;
    char bytes1[8];
