@@ -345,7 +345,7 @@ void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
 
 void Core::Entity::Player::forceZoneing( uint32_t zoneId )
 {
-   m_queuedZoneing = boost::make_shared< QueuedZoning >( zoneId, getPos(), Util::getTimeMs(), 0 );
+   m_queuedZoneing = boost::make_shared< QueuedZoning >( zoneId, getPos(), Util::getTimeMs(), 0.f );
    //performZoning( zoneId, Common::ZoneingType::None, getPos() );
 }
 
