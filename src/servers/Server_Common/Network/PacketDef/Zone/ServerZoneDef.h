@@ -42,8 +42,8 @@ struct FFXIVIpcInit : FFXIVIpcBasePacket<Init>
 */
 struct FFXIVIpcChat : FFXIVIpcBasePacket<Chat>
 {
-   /* 0000 */  Common::ChatType chatType;
-   uint8_t padding[16]; //Maybe this is SubCode, or some kind of talker ID...
+   /* 0000 */  uint8_t padding[14]; //Maybe this is SubCode, or some kind of talker ID...
+   Common::ChatType chatType;
    char name[32];
    char msg[1012];
 };
@@ -81,7 +81,7 @@ struct FFXIVIpcPlayTime : FFXIVIpcBasePacket<Playtime>
 */
 struct PlayerEntry {
    uint64_t contentId;
-   char bytes[12];
+   uint8_t bytes[12];
    uint16_t zoneId;
    uint16_t zoneId1;
    char bytes1[8];
