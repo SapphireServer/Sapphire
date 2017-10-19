@@ -604,7 +604,8 @@ struct FFXIVIpcActorSetPos : FFXIVIpcBasePacket<ActorSetPos>
 struct FFXIVIpcActorCast : FFXIVIpcBasePacket<ActorCast>
 {
    uint16_t action_id;
-   uint16_t unknown;
+   Common::SkillType skillType;
+   uint8_t unknown;
    uint32_t unknown_1; // Also action id
    float cast_time;
    uint32_t target_id;
@@ -1301,6 +1302,15 @@ struct FFXIVIpcEorzeaTimeOffset : FFXIVIpcBasePacket<EorzeaTimeOffset>
 struct FFXIVIpcEquipDisplayFlags : FFXIVIpcBasePacket<EquipDisplayFlags>
 {
    uint8_t bitmask;
+};
+
+/**
+* Structural representation of the packet sent by the server
+* to mount a player
+*/
+struct FFXIVIpcMount : FFXIVIpcBasePacket<Mount>
+{
+   uint32_t id;
 };
 
 

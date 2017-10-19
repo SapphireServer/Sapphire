@@ -1,4 +1,4 @@
-#include "ActionCast.h"
+#include "ActionMount.h"
 
 #include <src/servers/Server_Common/Common.h>
 #include <src/servers/Server_Common/Util/Util.h>
@@ -21,42 +21,41 @@ extern Core::Data::ExdData g_exdData;
 extern Core::Logger g_log;
 extern Core::Scripting::ScriptManager g_scriptMgr;
 
-Core::Action::ActionCast::ActionCast()
+Core::Action::ActionMount::ActionMount()
 {
    m_handleActionType = Common::HandleActionType::Event;
 }
 
-Core::Action::ActionCast::ActionCast( Entity::ActorPtr pActor, Entity::ActorPtr pTarget, uint32_t actionId )
+Core::Action::ActionMount::ActionMount( Entity::ActorPtr pActor, uint32_t mountId )
 {
    m_startTime = 0;
-   m_id = actionId;
+   m_id = mountId;
    m_handleActionType = HandleActionType::Spell;
-   m_castTime = g_exdData.getActionInfo( actionId )->cast_time; // TODO: Add security checks.
+   m_castTime = 1000;
    m_pSource = pActor;
-   m_pTarget = pTarget;
    m_bInterrupt = false;
 }
 
-Core::Action::ActionCast::~ActionCast()
+Core::Action::ActionMount::~ActionMount()
 {
 
 }
 
-void Core::Action::ActionCast::onStart()
+void Core::Action::ActionMount::onStart()
 {
    if( !m_pSource )
       return;
 
-   m_pSource->getAsPlayer()->sendDebug( "onStart()" );
+   m_pSource->getAsPlayer()->sendDebug( "ActionMount::onStart()" );
    m_startTime = Util::getTimeMs();
 
    GamePacketNew< FFXIVIpcActorCast, ServerZoneIpcType > castPacket( m_pSource->getId() );
 
    castPacket.data().action_id = m_id;
-   castPacket.data().skillType = Common::SkillType::Normal;
+   castPacket.data().skillType = Common::SkillType::MountSkill;
    castPacket.data().unknown_1 = m_id;
    castPacket.data().cast_time = static_cast< float >( m_castTime / 1000 ); // This is used for the cast bar above the target bar of the caster.
-   castPacket.data().target_id = m_pTarget->getId();
+   castPacket.data().target_id = m_pSource->getAsPlayer()->getId();
 
    m_pSource->sendToInRangeSet( castPacket, true );
    m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::Casting );
@@ -64,25 +63,35 @@ void Core::Action::ActionCast::onStart()
 
 }
 
-void Core::Action::ActionCast::onFinish()
+void Core::Action::ActionMount::onFinish()
 {
    if( !m_pSource )
       return;
 
    auto pPlayer = m_pSource->getAsPlayer();
-   pPlayer->sendDebug( "onFinish()" );
+   pPlayer->sendDebug( "ActionMount::onFinish()" );
 
    pPlayer->unsetStateFlag( PlayerStateFlag::Casting );
    pPlayer->sendStateFlags();
 
-   /*auto control = ActorControlPacket143( m_pTarget->getId(), ActorControlType::Unk7,
-                                         0x219, m_id, m_id, m_id, m_id );
-   m_pSource->sendToInRangeSet( control, true );*/
+   GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket(pPlayer->getId());
+   effectPacket.data().targetId = pPlayer->getId();
+   effectPacket.data().actionAnimationId = m_id;
+   effectPacket.data().unknown_62 = 13; // Affects displaying action name next to number in floating text
+   effectPacket.data().actionTextId = 4;
+   effectPacket.data().numEffects = 1;
+   effectPacket.data().rotation = Math::Util::floatToUInt16Rot(pPlayer->getRotation());
+   effectPacket.data().effectTarget = INVALID_GAME_OBJECT_ID;
+   effectPacket.data().effects[0].effectType = ActionEffectType::Mount;
+   effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::CritDamage;
+   effectPacket.data().effects[0].value = m_id;
 
-   g_scriptMgr.onCastFinish( pPlayer, m_pTarget, m_id );
+   pPlayer->sendToInRangeSet(effectPacket, true);
+
+   pPlayer->mount( m_id );
 }
 
-void Core::Action::ActionCast::onInterrupt()
+void Core::Action::ActionMount::onInterrupt()
 {
    if( !m_pSource )
       return;
