@@ -11,6 +11,7 @@
 
 #include "matrix4.h"
 #include "vec3.h"
+#include "sgb.h"
 
 // all credit to
 // https://github.com/ufx/SaintCoinach/blob/master/SaintCoinach/Graphics/Lgb/
@@ -134,11 +135,13 @@ class LGB_GIMMICK_ENTRY : public LGB_MODEL_ENTRY
 public:
    LGB_GIMMICK_HEADER header;
    std::string name;
-
+   std::string gimmickFileName;
+   
    LGB_GIMMICK_ENTRY( char* buf, uint32_t offset )
    {
       header = *reinterpret_cast<LGB_GIMMICK_HEADER*>( buf + offset );
       name = std::string( buf + offset + header.nameOffset );
+      gimmickFileName = std::string( buf + offset + header.gimmickFileOffset );
    };
 };
 
@@ -184,12 +187,12 @@ struct LGB_GROUP
             if( type == LgbEntryType::BgParts )
             {
                entries.push_back( std::make_shared<LGB_BGPARTS_ENTRY>( buf, entryOffset ) );
-            }
-            /*
+            }     
             else if( type == LgbEntryType::Gimmick )
             {
-               //entries[i] = std::make_shared<LGB_GIMMICK_ENTRY>( buf, entryOffset );
+               entries.push_back( std::make_shared<LGB_GIMMICK_ENTRY>( buf, entryOffset ) );
             }
+            /*
             else
             {
                //entries[i] = nullptr;
