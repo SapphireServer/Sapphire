@@ -106,6 +106,11 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
             pPlayer->changeTarget( targetId );
             break;
         }
+        case 0x65:
+        {
+           pPlayer->dismount();
+           break;
+        }
         case 0x68: // Remove status (clicking it off)
         {
            // todo: check if status can be removed by client from exd

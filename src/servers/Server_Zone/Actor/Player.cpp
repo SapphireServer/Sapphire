@@ -1486,6 +1486,31 @@ uint8_t Core::Entity::Player::getEquipDisplayFlags() const
    return m_equipDisplayFlags;
 }
 
+void Core::Entity::Player::mount( uint32_t id )
+{
+   m_mount = id;
+   sendToInRangeSet( ActorControlPacket142( getId(), ActorControlType::SetStatus, static_cast< uint8_t >( Entity::Actor::ActorStatus::Mounted )), true );
+   sendToInRangeSet( ActorControlPacket143( getId(), 0x39e, 12 ), true ); //?
+
+   GamePacketNew< FFXIVIpcMount, ServerZoneIpcType > mountPacket( getId() );
+   mountPacket.data().id = m_mount;
+   sendToInRangeSet( mountPacket, true );
+   setSyncFlag( PlayerSyncFlags::Status );
+}
+
+void Core::Entity::Player::dismount()
+{
+   sendToInRangeSet( ActorControlPacket142( getId(), ActorControlType::SetStatus, static_cast< uint8_t >( Entity::Actor::ActorStatus::Idle )), true );
+   sendToInRangeSet( ActorControlPacket143( getId(), ActorControlType::Dismount, 1 ), true );
+   m_mount = 0;
+   setSyncFlag( PlayerSyncFlags::Status );
+}
+
+uint8_t Core::Entity::Player::getCurrentMount() const
+{
+   return m_mount;
+}
+
 void Core::Entity::Player::autoAttack( ActorPtr pTarget )
 {
 

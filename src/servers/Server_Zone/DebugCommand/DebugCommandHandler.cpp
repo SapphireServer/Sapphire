@@ -258,6 +258,14 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
       pPlayer->sendModel();
       pPlayer->sendDebug( "Model updated" );
    }
+   else if ( subCommand == "mount" )
+   {
+      int32_t id;
+      sscanf( params.c_str(), "%d", &id );
+
+      pPlayer->dismount();
+      pPlayer->mount( id );
+   }
    else
    {
       pPlayer->sendUrgent( subCommand + " is not a valid SET command." );

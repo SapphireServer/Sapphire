@@ -338,8 +338,14 @@ public:
    void setTitle( uint16_t titleId );
    /*! change gear param state */
    void setEquipDisplayFlags( uint8_t state );
-   /*! get gear param state and send update to inRangeSet */
+   /*! get gear param state */
    uint8_t getEquipDisplayFlags() const;
+   /*! mount the specified mount and send the packets */
+   void mount( uint32_t id );
+   /*! dismount the current mount and send the packets */
+   void dismount();
+   /*! get the current mount */
+   uint8_t getCurrentMount() const;
 
    void calculateStats() override;
    void sendStats();

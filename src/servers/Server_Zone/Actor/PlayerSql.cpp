@@ -85,7 +85,8 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
       "cd.EquipDisplayFlags, "
       "cd.ActiveTitle, "
       "cd.TitleList, " // 40
-      "cd.Orchestrion "
+      "cd.Orchestrion, "
+      "c.Mount "
       "FROM charabase AS c "
       " INNER JOIN charadetail AS cd "
       " ON c.CharacterId = cd.CharacterId "
@@ -180,9 +181,12 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
    m_equipDisplayFlags = field[38].get< uint8_t >();
 
    m_title = field[39].get< uint8_t >();
+
    field[40].getBinary( reinterpret_cast< char* >( m_titleList ), sizeof( m_titleList ) );
 
    field[41].getBinary( reinterpret_cast< char* >( m_orchestrion ), sizeof( m_orchestrion ) );
+
+   m_mount = field[42].get< uint8_t >();
 
    m_pCell = nullptr;
 
@@ -371,6 +375,7 @@ void Core::Entity::Player::createUpdateSql()
       charaDetailSet.insert( " Class = " + std::to_string( static_cast< uint32_t >( getClass() ) ) );
       charaDetailSet.insert( " Status = " + std::to_string( static_cast< uint8_t >( getStatus() ) ) );
       charaDetailSet.insert( " EquipDisplayFlags = " + std::to_string( static_cast< uint8_t >( getEquipDisplayFlags() ) ) );
+      charaBaseSet.insert( " Mount = " + std::to_string( getCurrentMount() ) );
    }
 
    if( m_updateFlags & PlayerSyncFlags::OpeningSeq )

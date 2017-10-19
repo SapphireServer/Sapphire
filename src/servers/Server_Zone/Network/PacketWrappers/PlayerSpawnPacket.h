@@ -111,6 +111,8 @@ namespace Server {
             m_data.displayFlags |= Entity::Actor::DisplayFlags::Visor;
          }
 
+         m_data.currentMount = pPlayer->getCurrentMount();
+
          m_data.targetId = pPlayer->getTargetId();
          //m_data.type = 1;
          //m_data.unknown_33 = 4;
