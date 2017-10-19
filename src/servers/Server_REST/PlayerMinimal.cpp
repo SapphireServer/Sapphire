@@ -185,7 +185,7 @@ namespace Core {
 
       uint16_t size = static_cast< uint16_t >( m_lookMap.size() );
 
-      for( int32_t i = 0; i < m_lookMap.size(); i++ )
+      for( uint32_t i = 0; i < m_lookMap.size(); i++ )
       {
          customize[i] = m_lookMap[i];
       }

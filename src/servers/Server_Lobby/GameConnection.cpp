@@ -152,7 +152,7 @@ void Core::Network::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet, ui
 
    auto charList = g_restConnector.getCharList( ( char * )m_pSession->getSessionId() );
 
-   int32_t charIndex = 0;
+   uint32_t charIndex = 0;
 
    for( uint8_t i = 0; i < 4; i++ )
    {
