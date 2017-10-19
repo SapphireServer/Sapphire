@@ -4,6 +4,7 @@
 
 #include "ServerZone.h"
 
+#include <src/servers/Server_Common/Version.h>
 #include <src/servers/Server_Common/Logging/Logger.h>
 #include <src/servers/Server_Common/Config/XMLConfig.h>
 #include <src/servers/Server_Common/Database/Database.h>
@@ -239,7 +240,8 @@ void Core::ServerZone::printBanner() const
 {
    g_log.info("===========================================================" );
    g_log.info( "Sapphire Server Project " );
-   g_log.info( "Version: x.y.z" );
+   g_log.info( "Version: " + Version::VERSION );
+   g_log.info( "Git Hash: " + Version::GIT_HASH );
    g_log.info( "Compiled: " __DATE__ " " __TIME__ );
    g_log.info( "===========================================================" );
 }
