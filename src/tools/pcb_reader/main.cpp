@@ -350,7 +350,7 @@ int main( int argc, char* argv[] )
                if( pBgParts && pBgParts->header.type != LgbEntryType::BgParts )
                   pBgParts = nullptr;
 
-               auto& fileName = pBgParts ? pBgParts->collisionFileName : "";
+               auto& fileName = pBgParts ? pBgParts->collisionFileName : std::string();
 
                if( pBgParts && fileName.empty() )
                   continue;
