@@ -954,7 +954,7 @@ namespace Core {
          ToggleOrchestrionUnlock = 0x396
       };
 
-      enum struct ChatType : uint32_t
+      enum struct ChatType : uint16_t
       {
          LogKindError,
          ServerDebug,
