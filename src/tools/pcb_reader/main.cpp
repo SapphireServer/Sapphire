@@ -4,6 +4,7 @@
 
 #include "pcb.h"
 #include "lgb.h"
+#include "sgb.h"
 
 #include <GameData.h>
 #include <File.h>
@@ -198,8 +199,9 @@ int main( int argc, char* argv[] )
       if( fp_out )
       {
          std::map<std::string, PCB_FILE> pcbFiles;
+         std::map<std::string, SGB_FILE> sgbFiles;
          std::map<std::string, uint32_t> objCount;
-         auto loadPcbFile = [&]( const std::string& fileName )
+         auto loadPcbFile = [&]( const std::string& fileName ) -> bool
          {
             try
             {
@@ -214,7 +216,7 @@ int main( int argc, char* argv[] )
                PCB_FILE pcb_file;
                memcpy( &pcb_file.header, &dataSection[0], sizeof( pcb_file.header ) );
                offset += sizeof( pcb_file.header );
-
+               pcb_file.entries.resize( pcb_file.header.num_entries );
                bool isgroup = true;
                while( isgroup )
                {
@@ -235,16 +237,38 @@ int main( int argc, char* argv[] )
                   }
                }
                pcbFiles.insert( std::make_pair( fileName, pcb_file ) );
+               return true;
             }
             catch( std::exception& e )
             {
                std::cout << "Unable to load collision mesh " << fileName << "\n\tError:\n\t" << e.what() << "\n";
+               return false;
+            }
+         };
+
+         auto loadSgbFile = [&]( const std::string& fileName ) -> bool
+         {
+            try
+            {
+               auto file = data1.get_file( fileName );
+               auto sections = file->get_data_sections();
+               auto dataSection = &sections.at( 0 )[0];
+               SGB_FILE sgbFile = SGB_FILE( &dataSection[0] );
+               sgbFiles.insert( std::make_pair( fileName, sgbFile ) );
+               return true;
+            }
+            catch( std::exception& e )
+            {
+               std::cout << "Unable to load SGB " << fileName << "\n\tError:\n\t" << e.what() << "\n";
+               return false;
             }
          };
          auto pushVerts = [&]( const PCB_FILE& pcb_file, const std::string& name, const vec3* scale = nullptr, const vec3* rotation = nullptr, const vec3* translation = nullptr )
          {
-            std::string name2 = ( name + "_" + std::to_string( objCount[name]++ ) );
-            fprintf( fp_out, "o %s\n", name2.c_str() );
+            char name2[0x7F];
+            memset( name2, 0, 0x7F );
+            sprintf(&name2[0], "%s_%u", &name[0], objCount[name]++ );
+            fprintf( fp_out, "o %s\n", &name2[0] );
             uint32_t groupCount = 0;
             for( const auto &entry : pcb_file.entries )
             {
@@ -321,37 +345,76 @@ int main( int argc, char* argv[] )
             totalGroups++;
             for( const auto pEntry : group.entries )
             {
-               auto pBgParts = static_cast<LGB_BGPARTS_ENTRY*>( pEntry.get() );
-               auto& fileName = pBgParts->collisionFileName;
+               LGB_GIMMICK_ENTRY* pGimmick = nullptr;
+               auto pBgParts = dynamic_cast<LGB_BGPARTS_ENTRY*>( pEntry.get() );
+               if( pBgParts && pBgParts->header.type != LgbEntryType::BgParts )
+                  pBgParts = nullptr;
 
-               if( fileName.empty() )
+               auto& fileName = pBgParts ? pBgParts->collisionFileName : "";
+
+               if( pBgParts && fileName.empty() )
                   continue;
 
+               // write files
+               auto writeOutput = [&]()
                {
-                  //boost::replace_all( fileName, "bgparts", "collision" );
-                  //boost::replace_all( fileName, ".mdl", ".pcb" );
-               }
-
-               {
-                  const auto& it = pcbFiles.find( fileName );
-                  if( it == pcbFiles.end() )
                   {
-                     loadPcbFile( fileName );
-                     //std::cout << "\t\tLoaded PCB File " << pBgParts->collisionFileName << "\n";
+                     const auto& it = pcbFiles.find( fileName );
+                     if( it == pcbFiles.end() )
+                     {
+                        if( !fileName.empty() )
+                           loadPcbFile( fileName );
+                        //std::cout << "\t\tLoaded PCB File " << pBgParts->collisionFileName << "\n";
+                     }
                   }
-               }
-               const auto& it = pcbFiles.find( fileName );
-               if( it != pcbFiles.end() )
+                  const auto& it = pcbFiles.find( fileName );
+                  if( it != pcbFiles.end() )
+                  {
+                     totalGroupEntries++;
+
+                     const auto* scale = pBgParts ? &pBgParts->header.scale : &pGimmick->header.scale;
+                     const auto* rotation = pBgParts ? &pBgParts->header.rotation : &pGimmick->header.rotation;
+                     const auto* translation = pBgParts ? &pBgParts->header.translation : &pGimmick->header.translation;
+
+                     const auto& pcb_file = it->second;
+                     pushVerts( pcb_file, fileName, scale, rotation, translation );
+                  }
+               };
+
+               // gimmick entry
+               if( !pBgParts )
                {
-                  totalGroupEntries++;
+                  pGimmick = dynamic_cast<LGB_GIMMICK_ENTRY*>( pEntry.get() );
+                  {
+                     const auto& it = sgbFiles.find( pGimmick->gimmickFileName );
+                     if( it == sgbFiles.end() )
+                     {
+                        loadSgbFile( pGimmick->gimmickFileName );
+                     }
+                  }
+                  const auto& it = sgbFiles.find( pGimmick->gimmickFileName );
+                  if( it != sgbFiles.end() )
+                  {
+                     totalGroupEntries++;
+                     const auto& sgbFile = it->second;
 
-                  const auto* scale = &pBgParts->header.scale;
-                  const auto* rotation = &pBgParts->header.rotation;
-                  const auto* translation = &pBgParts->header.translation;
-
-                  const auto& pcb_file = it->second;
-                  pushVerts( pcb_file, fileName, scale, rotation, translation );
+                     for( const auto& group : sgbFile.entries )
+                     {
+                        for( const auto& pEntry : group.entries )
+                        {
+                           auto pModel = dynamic_cast<SGB_MODEL_ENTRY*>( pEntry.get() );
+                           if( !pModel->collisionFileName.empty() )
+                           {
+                              fileName = pModel->collisionFileName;
+                              writeOutput();
+                           }
+                        }
+                     }
+                  }
+                  continue;
                }
+               // bgparts
+               writeOutput();
             }
          }
          std::cout << "\n\nLoaded " << pcbFiles.size() << " PCB Files \n";
