@@ -6,6 +6,7 @@
 #include <src/servers/Server_Common/Network/Hive.h>
 #include <src/servers/Server_Common/Network/Acceptor.h>
 
+#include <src/servers/Server_Common/Version.h>
 #include <src/servers/Server_Common/Logging/Logger.h>
 #include <src/servers/Server_Common/Config/XMLConfig.h>
 
@@ -58,7 +59,8 @@ namespace Core {
 
       g_log.info( "===========================================================" );
       g_log.info( "Sapphire Server Project " );
-      g_log.info( "Version: x.y.z" );
+      g_log.info( "Version: " + Version::VERSION );
+      g_log.info( "Git Hash: " + Version::GIT_HASH );
       g_log.info( "Compiled: " __DATE__ " " __TIME__ );
       g_log.info( "===========================================================" );
 
