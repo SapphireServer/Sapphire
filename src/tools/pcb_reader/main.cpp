@@ -151,7 +151,7 @@ int main( int argc, char* argv[] )
       auto test_file1 = data1.get_file( "bg/ffxiv/" + zonePath + "/collision/list.pcb" );
       auto section1 = test_file1->access_data_sections().at( 0 );
       std::string path = "bg/ffxiv/" + zonePath + "/collision/";
-      int offset1 = 0x20;
+      uint32_t offset1 = 0x20;
       for( ; ; )
       {
 
@@ -171,13 +171,10 @@ int main( int argc, char* argv[] )
 
       LGB_FILE bgLgb( &section[0] );
 
-      int max_index = 0;
+      uint32_t max_index = 0;
 
       std::vector<std::string> vertices;
       std::vector<std::string> indices;
-
-      char *data;
-      int counter = 0;
 
       // dont bother if we cant write to a file
       auto fp_out = fopen( ( zoneName + ".obj" ).c_str(), "w" );
@@ -265,10 +262,11 @@ int main( int argc, char* argv[] )
          };
          auto pushVerts = [&]( const PCB_FILE& pcb_file, const std::string& name, const vec3* scale = nullptr, const vec3* rotation = nullptr, const vec3* translation = nullptr )
          {
-            char name2[0x7F];
-            memset( name2, 0, 0x7F );
+            char name2[0x100];
+            memset( name2, 0, 0x100 );
             sprintf(&name2[0], "%s_%u", &name[0], objCount[name]++ );
             fprintf( fp_out, "o %s\n", &name2[0] );
+            
             uint32_t groupCount = 0;
             for( const auto &entry : pcb_file.entries )
             {
@@ -317,7 +315,6 @@ int main( int argc, char* argv[] )
                //fprintf( fp_out, "g %s_", (name2 + "_" + std::to_string( groupCount++ )).c_str() );
                for( const auto &index : entry.data.indices )
                {
-                  //if( index.index[0] != 0 || index.index[1] != 0 || index.index[2] != 0 )
                   {
                      fprintf( fp_out, "f %i %i %i\n",
                         index.index[0] + max_index + 1,
@@ -343,17 +340,25 @@ int main( int argc, char* argv[] )
          {
             //std::cout << "\t" << group.name << " Size " << group.header.entryCount << "\n";
             totalGroups++;
-            for( const auto pEntry : group.entries )
+            for( const auto& pEntry : group.entries )
             {
                LGB_GIMMICK_ENTRY* pGimmick = nullptr;
                auto pBgParts = dynamic_cast<LGB_BGPARTS_ENTRY*>( pEntry.get() );
                if( pBgParts && pBgParts->header.type != LgbEntryType::BgParts )
                   pBgParts = nullptr;
 
-               auto fileName = pBgParts ? pBgParts->collisionFileName : std::string("");
-
-               if( pBgParts && fileName.empty() )
-                  continue;
+               std::string fileName;
+               fileName.resize( 256 );
+               if( pBgParts )
+               {
+                  fileName = pBgParts->collisionFileName;
+                  if( fileName.empty() )
+                  {
+                     //fileName = pBgParts->modelFileName;
+                     //boost::replace_all( fileName, "bgparts", "collision" );
+                     //boost::replace_all( fileName, ".mdl", ".pcb" );
+                  }
+               }
 
                // write files
                auto writeOutput = [&]()
@@ -389,6 +394,7 @@ int main( int argc, char* argv[] )
                      const auto& it = sgbFiles.find( pGimmick->gimmickFileName );
                      if( it == sgbFiles.end() )
                      {
+                        //std::cout << "\tGIMMICK:\n\t\t" << pGimmick->name << " " << pGimmick->gimmickFileName << "\n";
                         loadSgbFile( pGimmick->gimmickFileName );
                      }
                   }
@@ -403,11 +409,14 @@ int main( int argc, char* argv[] )
                         for( const auto& pEntry : group.entries )
                         {
                            auto pModel = dynamic_cast<SGB_MODEL_ENTRY*>( pEntry.get() );
-                           if( !pModel->collisionFileName.empty() )
+                           fileName = pModel->collisionFileName;
+                           if( fileName.empty() )
                            {
-                              fileName = pModel->collisionFileName;
-                              writeOutput();
+                              //fileName = pModel->modelFileName;
+                              //boost::replace_all( fileName, "bgparts", "collision" );
+                              //boost::replace_all( fileName, ".mdl", ".pcb" );
                            }
+                           writeOutput();
                         }
                      }
                   }
