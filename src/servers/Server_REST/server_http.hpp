@@ -282,7 +282,7 @@ namespace SimpleWeb {
                             //Set timeout on the following boost::asio::async-read or write function
                             auto timer=this->get_timeout_timer(socket, config.timeout_content);
                             boost::asio::async_read(*socket, request->streambuf,
-                                    boost::asio::transfer_exactly(static_cast<size_t>(content_length-num_additional_bytes)),
+                                    boost::asio::transfer_exactly(static_cast< size_t >(content_length-num_additional_bytes)),
                                     [this, socket, request, timer]
                                     (const boost::system::error_code& ec, size_t /*bytes_transferred*/) {
                                 if(timer)
