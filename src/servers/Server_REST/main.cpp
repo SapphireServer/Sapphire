@@ -149,7 +149,7 @@ bool loadSettings( int32_t argc, char* argv[] )
    params.port = m_pConfig->getValue< uint16_t >( "Settings.General.Mysql.Port", 3306 );
    params.username = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Username", "root" );
 
-   server.config.port = std::stoul( m_pConfig->getValue<std::string>( "Settings.General.HttpPort", "80" ) );
+   server.config.port = static_cast< unsigned short >( std::stoul( m_pConfig->getValue<std::string>( "Settings.General.HttpPort", "80" ) ) );
 
    if( !g_database.initialize( params ) )
    {

@@ -451,7 +451,7 @@ void Core::Entity::BattleNpc::onDeath()
             
 
             // todo: this is actually retarded, we need real rand()
-            srand( time( NULL ) );
+            srand( static_cast< unsigned int> ( time( NULL ) ) );
 
             auto pPlayer = pHateEntry->m_pActor->getAsPlayer();
             pPlayer->gainExp( exp );
