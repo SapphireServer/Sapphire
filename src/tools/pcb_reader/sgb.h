@@ -172,6 +172,10 @@ struct SGB_FILE
    SGB_HEADER header;
    std::vector<SGB_GROUP> entries;
 
+   SGB_FILE()
+   {
+      memset( &header, 0, sizeof( header ) );
+   }
    SGB_FILE( char* buf )
    {
       constexpr int baseOffset = 0x14;
@@ -180,10 +184,17 @@ struct SGB_FILE
       if( strncmp( &header.magic[0], "SGB1", 4 ) != 0 || strncmp( &header.magic2[0], "SCN1", 4 ) != 0 )
          throw std::runtime_error( "Unable to load SGB File!" );
 
-      auto group = SGB_GROUP( buf, this, header.fileSize, baseOffset + header.sharedOffset );
-      auto group2 = SGB_GROUP( buf, this, header.fileSize, baseOffset + header.offset1C );
-      entries.push_back( group );
-      entries.push_back( group2 );
+      try
+      {
+         auto group = SGB_GROUP( buf, this, header.fileSize, baseOffset + header.sharedOffset );
+         entries.push_back( group );
+         auto group2 = SGB_GROUP( buf, this, header.fileSize, baseOffset + header.offset1C );
+         entries.push_back( group2 );
+      }
+      catch( std::exception& e )
+      {
+         std::cout << e.what() << "\n";
+      }
    };
 };
 
