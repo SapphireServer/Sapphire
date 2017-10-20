@@ -266,7 +266,7 @@ namespace SimpleWeb {
 						if( content_length>num_additional_bytes ) {
 							auto timer = get_timeout_timer();
 							boost::asio::async_read( *socket, response->content_buffer,
-								boost::asio::transfer_exactly( static_cast<size_t>( content_length - num_additional_bytes ) ),
+								boost::asio::transfer_exactly( static_cast< size_t >( content_length - num_additional_bytes ) ),
 								[this, timer]( const boost::system::error_code& ec, size_t /*bytes_transferred*/ ) {
 								if( timer )
 									timer->cancel();
@@ -332,7 +332,7 @@ namespace SimpleWeb {
 					if( ( 2 + length )>num_additional_bytes ) {
 						auto timer = get_timeout_timer();
 						boost::asio::async_read( *socket, response->content_buffer,
-							boost::asio::transfer_exactly( static_cast<size_t>( 2 + length - num_additional_bytes ) ),
+							boost::asio::transfer_exactly( static_cast< size_t >( 2 + length - num_additional_bytes ) ),
 							[this, post_process, timer]( const boost::system::error_code& ec, size_t /*bytes_transferred*/ ) {
 							if( timer )
 								timer->cancel();

@@ -38,7 +38,7 @@ float CalcBattle::calculateBaseStat( PlayerPtr pPlayer )
    // SB Base Stat Formula  (Aligned)
    if ( level > 60 )
    { 
-      base = static_cast<float>( ( ( ( level == 61 ) ? 224 : 220 ) + ( level - 61 ) * 8) );
+      base = static_cast< float >( ( ( ( level == 61 ) ? 224 : 220 ) + ( level - 61 ) * 8) );
    }
    // HW Base Stat Formula  (Aligned)
    else if ( level > 50 )
@@ -77,7 +77,7 @@ uint32_t CalcBattle::calculateMaxHp( PlayerPtr pPlayer )
    // These values are not precise.
 
    if ( level >= 60 )
-      approxBaseHp = static_cast<float>( 2600 + ( level - 60 ) * 100 );
+      approxBaseHp = static_cast< float >( 2600 + ( level - 60 ) * 100 );
    else if ( level >= 50 )
       approxBaseHp = 1700 + ( ( level - 50 ) * ( 1700 * 1.04325f ) );
    else
