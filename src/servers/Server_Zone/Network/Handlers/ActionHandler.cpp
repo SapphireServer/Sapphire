@@ -125,7 +125,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
         }
         case 0x12E: // Set player title
         {
-           pPlayer->setTitle( param1 );
+           pPlayer->setTitle( static_cast< uint16_t >( param1 ) );
            break;
         }
         case 0x12F: // Get title list
