@@ -88,7 +88,7 @@ bool Core::Data::ExdData::loadZoneInfo()
       uint16_t weather_rate       = getField< uint16_t >( fields, 10 ) > 75 ? 0 : getField< uint16_t >( fields, 10 );
       auto weatherRateFields     = weatherRate.get_row( weather_rate );
 
-      int32_t aetheryte_index = getField< int32_t >( fields, 20 );
+      int32_t aetheryte_index = getField< int32_t >( fields, 23 );
 
 
       ZoneInfo info{ 0 };
