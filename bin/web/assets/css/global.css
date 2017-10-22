@@ -7,6 +7,7 @@ body {
   font-size: 12px;
   line-height: 14px;
   height: 100%;
+  overflow: hidden;
 }
 
 .contentContainer{
@@ -137,3 +138,26 @@ p.pageSubTitle{
   margin:0 auto;
 }
 
+.commit-history {
+  padding-left: 20px;
+}
+
+.commit-history li a {
+  color: #fff;
+}
+
+.commit-history li a:hover {
+  color: #bbb;
+}
+
+.s-left-half {
+  overflow-y: auto;
+}
+
+.s-link-badge {
+  font-size: 15px;
+}
+
+h2 { 
+  font-size: 19px;
+}
