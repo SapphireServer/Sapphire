@@ -10,6 +10,10 @@ else()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
 
   if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    # disabling SAFESEH
+    message(STATUS "Disabling Safe Exception Handlers..")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO")
+
     # edit and continue
     message(STATUS "Enabling Edit and Continue..")
     add_definitions(/ZI)
