@@ -12,7 +12,6 @@ else()
   if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     # edit and continue
     message(STATUS "Enabling Edit and Continue..")
-    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /ZI")
     add_definitions(/ZI)
 
     # incremental linking
