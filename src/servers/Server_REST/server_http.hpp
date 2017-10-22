@@ -273,7 +273,7 @@ namespace SimpleWeb {
                         try {
                             content_length=stoull(it->second);
                         }
-                        catch(const std::exception &e) {
+                        catch( const std::exception & ) {
                             if(on_error)
                                 on_error(request, boost::system::error_code(boost::system::errc::protocol_error, boost::system::generic_category()));
                             return;
@@ -388,7 +388,7 @@ namespace SimpleWeb {
                         try {
                             http_version=stof(request->http_version);
                         }
-                        catch(const std::exception &e){
+                        catch( const std::exception & ){
                             if(on_error)
                                 on_error(request, boost::system::error_code(boost::system::errc::protocol_error, boost::system::generic_category()));
                             return;
@@ -410,7 +410,7 @@ namespace SimpleWeb {
             try {
                 resource_function(response, request);
             }
-            catch(const std::exception &e) {
+            catch( const std::exception & ) {
                 if(on_error)
                     on_error(request, boost::system::error_code(boost::system::errc::operation_canceled, boost::system::generic_category()));
                 return;
