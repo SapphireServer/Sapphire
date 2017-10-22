@@ -709,7 +709,7 @@ int main(int argc, char* argv[])
          else
             throw invalid_argument( "could not read file" );
       }
-      catch( const exception &e )
+      catch( const exception & )
       {
          string content = "Path not found: " + request->path;
          *response << "HTTP/1.1 400 Bad Request\r\nContent-Length: " << content.length() << "\r\n\r\n" << content;
