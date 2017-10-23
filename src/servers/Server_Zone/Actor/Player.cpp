@@ -88,6 +88,8 @@ Core::Entity::Player::Player() :
    memset( m_name, 0, sizeof( m_name ) );
    memset( m_stateFlags, 0, sizeof( m_stateFlags ) );
    memset( m_searchMessage, 0, sizeof( m_searchMessage ) );
+   memset( m_classArray, 0, sizeof( m_classArray ) );
+   memset( m_expArray, 0, sizeof( m_expArray ) );
 }
 
 Core::Entity::Player::~Player()
