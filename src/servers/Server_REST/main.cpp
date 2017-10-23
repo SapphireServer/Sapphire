@@ -597,7 +597,7 @@ int main(int argc, char* argv[])
 		   auto path = boost::filesystem::canonical( web_root_path / "news.xml" );
 		   //Check if path is within web_root_path
 		   if( distance( web_root_path.begin(), web_root_path.end() ) > distance( path.begin(), path.end() ) ||
-			   !equal( web_root_path.begin(), web_root_path.end(), path.begin() ) )
+			   !std::equal( web_root_path.begin(), web_root_path.end(), path.begin(), path.end() ) )
 			   throw invalid_argument( "path must be within root path" );
 		   if( !( boost::filesystem::exists( path ) && boost::filesystem::is_regular_file( path ) ) )
 			   throw invalid_argument( "file does not exist" );
@@ -638,7 +638,7 @@ int main(int argc, char* argv[])
 		   auto path = boost::filesystem::canonical( web_root_path / "headlines.xml" );
 		   //Check if path is within web_root_path
 		   if( distance( web_root_path.begin(), web_root_path.end() ) > distance( path.begin(), path.end() ) ||
-			   !equal( web_root_path.begin(), web_root_path.end(), path.begin() ) )
+			   !std::equal( web_root_path.begin(), web_root_path.end(), path.begin(), path.end() ) )
 			   throw invalid_argument( "path must be within root path" );
 		   if( !( boost::filesystem::exists( path ) && boost::filesystem::is_regular_file( path ) ) )
 			   throw invalid_argument( "file does not exist" );
@@ -683,7 +683,7 @@ int main(int argc, char* argv[])
          auto path = boost::filesystem::canonical( web_root_path / request->path );
          //Check if path is within web_root_path
          if( distance( web_root_path.begin(), web_root_path.end() ) > distance( path.begin(), path.end() ) ||
-             !equal( web_root_path.begin(), web_root_path.end(), path.begin() ) )
+             !std::equal( web_root_path.begin(), web_root_path.end(), path.begin(), path.end() ) )
             throw invalid_argument( "path must be within root path" );
          if( boost::filesystem::is_directory( path ) )
             path /= "index.html";

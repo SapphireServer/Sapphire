@@ -27,6 +27,9 @@ if (UNIX)
   target_link_libraries (exd_common_gen Common xivdat pthread mysqlclient dl z)
 else()
   target_link_libraries (exd_common_gen Common xivdat libmysql zlib1)
+
+  # ignore unchecked iterators warnings from msvc
+  add_definitions(-D_SCL_SECURE_NO_WARNINGS)
 endif()
 
 target_link_libraries(exd_common_gen ${Boost_LIBRARIES} ${Boost_LIBRARIES})
