@@ -69,15 +69,15 @@ namespace Core {
       m_contentId = res->getUInt64( "ContentId" );
       m_zoneId = res->getUInt8( "TerritoryId" );
 
-      auto pQR2 = g_database.query( "SELECT * FROM characlass WHERE CharacterId = " + std::to_string( charId ) + ";" );
+      // SELECT ClassIdx, Exp, Lvl
+      auto stmtClass = g_charaDb.getPreparedStatement( Db::CharaDbStatements::CHARA_SEL_MINIMAL );
+      stmtClass->setInt( 1, m_id );
 
-      Db::Field* field2 = pQR2->fetch();
+      auto resClass = g_charaDb.query( stmt );
 
-      for( uint8_t i = 0; i < 25; i++ )
+      while( resClass->next() )
       {
-         uint8_t index = i * 2;
-         m_classMap[i] = field2[index].get< uint8_t >();
-         //m_expArray[i] = 
+         m_classMap[resClass->getUInt( 1 )] = resClass->getUInt( 3 );
       }
    }
 
@@ -165,6 +165,8 @@ namespace Core {
       std::vector< uint8_t > questTracking8(10);
       std::vector< int16_t > questTracking = { -1, -1, -1, -1, -1 };
 
+      memset( questComplete.data(), 0, questComplete.size() );
+
       memcpy( questTracking8.data(), questTracking.data(), questTracking8.size() );
 
       uint16_t size = static_cast< uint16_t >( m_lookMap.size() );
@@ -223,6 +225,14 @@ namespace Core {
       //        "HomePoint, StartTown, Discovery, HowTo, QuestCompleteFlags, Unlocks, QuestTracking, "
       //        "Aetheryte, GMRank, UPDATE_DATE )
 
+      // CharacterId, ClassIdx, Exp, Lvl
+      auto stmtClass = g_charaDb.getPreparedStatement( Db::CharaDbStatements::CHARA_CLASS_INS );
+      stmtClass->setInt( 1, m_id );
+      stmtClass->setInt( 2, g_exdData.m_classJobInfoMap[m_class].exp_idx );
+      stmtClass->setInt( 3, 0 );
+      stmtClass->setInt( 4, 1 );
+      g_charaDb.directExecute( stmtClass );
+
       auto stmt = g_charaDb.getPreparedStatement( Db::CharaDbStatements::CHARA_INS );
 
       stmt->setInt( 1, m_accountId );
@@ -256,11 +266,9 @@ namespace Core {
       stmt->setBinary( 29, questTracking8 );
       stmt->setBinary( 30, aetherytes );
       stmt->setInt( 31, m_gmRank );
-
       g_charaDb.directExecute( stmt );
 
-      g_charaDb.execute( "INSERT INTO characlass  (CharacterId, Lv_" + std::to_string( g_exdData.m_classJobInfoMap[m_class].exp_idx ) + ", UPDATE_DATE ) "
-         " VALUES (" + std::to_string( m_id ) + ", 1, NOW());" );
+
 
       g_charaDb.execute( "INSERT INTO charainfosearch (CharacterId, UPDATE_DATE ) VALUES (" + std::to_string( m_id ) + ", NOW());" );
 

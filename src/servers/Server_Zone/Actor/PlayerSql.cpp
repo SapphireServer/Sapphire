@@ -414,9 +414,10 @@ void Core::Entity::Player::updateDbClass() const
 {
    uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( getClass() )].exp_idx;
 
+   //Exp = ?, Lvl = ? WHERE CharacterId = ? AND ClassIdx = ?
    auto stmtS = g_charaDb.getPreparedStatement( Core::Db::CHARA_CLASS_UP );
-   stmtS->setInt( 1, getLevel() );
-   stmtS->setInt( 2, getExp() );
+   stmtS->setInt( 1, getExp() );
+   stmtS->setInt( 2, getLevel() );
    stmtS->setInt( 3, m_id );
    stmtS->setInt( 4, classJobIndex );
    g_charaDb.execute( stmtS );
