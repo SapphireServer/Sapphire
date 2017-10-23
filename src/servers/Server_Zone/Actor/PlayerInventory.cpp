@@ -189,10 +189,10 @@ void Core::Entity::Player::removeCrystal( uint8_t type, uint32_t amount )
    queuePacket( invUpPacket );
 }
 
-bool Core::Entity::Player::tryAddItem( uint16_t catalogId, uint16_t quantity )
+bool Core::Entity::Player::tryAddItem( uint16_t catalogId, uint32_t quantity )
 {
 
-   for( uint8_t i = 0; i < 4; i++ )
+   for( uint16_t i = 0; i < 4; i++ )
    {
       if( m_pInventory->addItem( i, -1, catalogId, quantity ) != -1 )
       {
@@ -202,7 +202,7 @@ bool Core::Entity::Player::tryAddItem( uint16_t catalogId, uint16_t quantity )
    return false;
 }
 
-bool Core::Entity::Player::addItem( uint16_t containerId, uint16_t catalogId, uint16_t quantity )
+bool Core::Entity::Player::addItem( uint16_t containerId, uint16_t catalogId, uint32_t quantity )
 {
    if( m_pInventory->addItem( containerId, -1, catalogId, quantity ) != -1 )
       return true;
