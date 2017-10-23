@@ -29,7 +29,7 @@ bool Core::LinkshellMgr::loadLinkshells()
 
    do
    {
-      uint32_t linkshellId = field[0].get< uint32_t >();
+      uint64_t linkshellId = field[0].get< uint64_t >();
       uint32_t masterId = field[1].get< uint32_t >();
       std::string name = field[3].getString();
 
@@ -71,7 +71,7 @@ Core::LinkshellPtr Core::LinkshellMgr::getLinkshellByName( const std::string& na
       return it->second;
 }
 
-Core::LinkshellPtr Core::LinkshellMgr::getLinkshellById( uint32_t lsId )
+Core::LinkshellPtr Core::LinkshellMgr::getLinkshellById( uint64_t lsId )
 {
    auto it = m_linkshellIdMap.find( lsId );
    if( it == m_linkshellIdMap.end() )

@@ -12,11 +12,11 @@ typedef boost::shared_ptr< Linkshell > LinkshellPtr;
 class LinkshellMgr
 {
 private:
-   std::map< uint32_t, LinkshellPtr > m_linkshellIdMap;
+   std::map< uint64_t, LinkshellPtr > m_linkshellIdMap;
    std::map< std::string, LinkshellPtr > m_linkshellNameMap;
 
    LinkshellPtr getLinkshellByName( const std::string& name );
-   LinkshellPtr getLinkshellById( uint32_t lsId );
+   LinkshellPtr getLinkshellById( uint64_t lsId );
 
 public:
    LinkshellMgr();
