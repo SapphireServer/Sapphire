@@ -71,7 +71,7 @@ Core::LinkshellPtr Core::LinkshellMgr::getLinkshellByName( const std::string& na
       return it->second;
 }
 
-Core::LinkshellPtr Core::LinkshellMgr::getLinkshellById( uint64_t lsId )
+Core::LinkshellPtr Core::LinkshellMgr::getLinkshellById( uint32_t lsId )
 {
    auto it = m_linkshellIdMap.find( lsId );
    if( it == m_linkshellIdMap.end() )
