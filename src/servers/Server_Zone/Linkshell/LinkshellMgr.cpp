@@ -29,7 +29,7 @@ bool Core::LinkshellMgr::loadLinkshells()
 
    do
    {
-      uint32_t linkshellId = field[0].get< uint32_t >();
+      uint64_t linkshellId = field[0].get< uint64_t >();
       uint32_t masterId = field[1].get< uint32_t >();
       std::string name = field[3].getString();
 
