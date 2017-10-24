@@ -91,7 +91,7 @@ bool Core::Scripting::ScriptManager::onTalk( Core::Entity::PlayerPtr pPlayer, ui
    std::string objName = Event::getEventName( eventId );
 
    pPlayer->sendDebug("Actor: " +
-                              std::to_string( actorId ) +
+                              std::to_string( actorId ) + " -> " + std::to_string( Core::Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) ) ) +
                               " \neventId: " +
                               std::to_string( eventId ) +
                               " (0x" + boost::str( boost::format( "%|08X|" ) 
@@ -114,18 +114,18 @@ bool Core::Scripting::ScriptManager::onTalk( Core::Entity::PlayerPtr pPlayer, ui
    }
    catch( std::exception& e )
    {
+      pPlayer->sendDebug( e.what( ) );
 
       if( eventType == Common::EventType::Quest )
       {
          auto questInfo = g_exdData.getQuestInfo( eventId );
          if( questInfo )
          {
-            pPlayer->sendDebug( "Quest not implemented: " + questInfo->name + "\n" + e.what() );
+            pPlayer->sendUrgent( "Quest not implemented: " + questInfo->name );
             return false;
          }
       }
 
-      pPlayer->sendDebug( e.what() );
       return false;
    }
    return true;

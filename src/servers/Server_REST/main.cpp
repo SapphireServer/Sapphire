@@ -149,7 +149,7 @@ bool loadSettings( int32_t argc, char* argv[] )
    params.port = m_pConfig->getValue< uint16_t >( "Settings.General.Mysql.Port", 3306 );
    params.username = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Username", "root" );
 
-   server.config.port = std::stoul( m_pConfig->getValue<std::string>( "Settings.General.HttpPort", "80" ) );
+   server.config.port = static_cast< unsigned short >( std::stoul( m_pConfig->getValue<std::string>( "Settings.General.HttpPort", "80" ) ) );
 
    if( !g_database.initialize( params ) )
    {
@@ -597,7 +597,7 @@ int main(int argc, char* argv[])
 		   auto path = boost::filesystem::canonical( web_root_path / "news.xml" );
 		   //Check if path is within web_root_path
 		   if( distance( web_root_path.begin(), web_root_path.end() ) > distance( path.begin(), path.end() ) ||
-			   !equal( web_root_path.begin(), web_root_path.end(), path.begin() ) )
+			   !std::equal( web_root_path.begin(), web_root_path.end(), path.begin(), path.end() ) )
 			   throw invalid_argument( "path must be within root path" );
 		   if( !( boost::filesystem::exists( path ) && boost::filesystem::is_regular_file( path ) ) )
 			   throw invalid_argument( "file does not exist" );
@@ -638,7 +638,7 @@ int main(int argc, char* argv[])
 		   auto path = boost::filesystem::canonical( web_root_path / "headlines.xml" );
 		   //Check if path is within web_root_path
 		   if( distance( web_root_path.begin(), web_root_path.end() ) > distance( path.begin(), path.end() ) ||
-			   !equal( web_root_path.begin(), web_root_path.end(), path.begin() ) )
+			   !std::equal( web_root_path.begin(), web_root_path.end(), path.begin(), path.end() ) )
 			   throw invalid_argument( "path must be within root path" );
 		   if( !( boost::filesystem::exists( path ) && boost::filesystem::is_regular_file( path ) ) )
 			   throw invalid_argument( "file does not exist" );
@@ -683,7 +683,7 @@ int main(int argc, char* argv[])
          auto path = boost::filesystem::canonical( web_root_path / request->path );
          //Check if path is within web_root_path
          if( distance( web_root_path.begin(), web_root_path.end() ) > distance( path.begin(), path.end() ) ||
-             !equal( web_root_path.begin(), web_root_path.end(), path.begin() ) )
+             !std::equal( web_root_path.begin(), web_root_path.end(), path.begin(), path.end() ) )
             throw invalid_argument( "path must be within root path" );
          if( boost::filesystem::is_directory( path ) )
             path /= "index.html";
@@ -709,7 +709,7 @@ int main(int argc, char* argv[])
          else
             throw invalid_argument( "could not read file" );
       }
-      catch( const exception &e )
+      catch( const exception & )
       {
          string content = "Path not found: " + request->path;
          *response << "HTTP/1.1 400 Bad Request\r\nContent-Length: " << content.length() << "\r\n\r\n" << content;

@@ -197,9 +197,9 @@ public:
    // Inventory / Item / Currency
    //////////////////////////////////////////////////////////////////////////////////////////////////////
    /*! add an item to the first free slot in one of the 4 main containers */
-   bool tryAddItem( uint16_t catalogId, uint16_t quantity );
+   bool tryAddItem( uint16_t catalogId, uint32_t quantity );
    /*! add an item to a given container */
-   bool addItem( uint16_t containerId, uint16_t catalogId, uint16_t quantity );
+   bool addItem( uint16_t containerId, uint16_t catalogId, uint32_t quantity );
    /*! equip an item to a specified slot */
    void equipItem( Inventory::EquipSlot equipSlotId, ItemPtr pItem, bool sendModel );
    /*! remove an item from an equipment slot */

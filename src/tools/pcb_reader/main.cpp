@@ -258,12 +258,16 @@ int main( int argc, char* argv[] )
             }
             return false;
          };
-         auto pushVerts = [&]( const PCB_FILE& pcb_file, const std::string& name, const vec3* scale = nullptr, const vec3* rotation = nullptr, const vec3* translation = nullptr )
+         auto pushVerts = [&]( const PCB_FILE& pcb_file, const std::string& name,
+            const vec3* scale = nullptr,
+            const vec3* rotation = nullptr,
+            const vec3* translation = nullptr,
+            const SGB_MODEL_ENTRY* pSgbEntry = nullptr)
          {
             char name2[0x100];
             memset( name2, 0, 0x100 );
             sprintf( &name2[0], "%s_%u", &name[0], objCount[name]++ );
-            //fprintf( fp_out, "o %s\n", &name2[0] );
+            fprintf( fp_out, "o %s\n", &name2[0] );
 
             uint32_t groupCount = 0;
             for( const auto &entry : pcb_file.entries )
@@ -274,6 +278,20 @@ int main( int argc, char* argv[] )
 
                auto makeTranslation = [&]( vec3& v )
                {
+                  if( pSgbEntry )
+                  {
+                     v.x *= pSgbEntry->header.scale.x;
+                     v.y *= pSgbEntry->header.scale.y;
+                     v.z *= pSgbEntry->header.scale.z;
+
+                     v = v * matrix4::rotateX( pSgbEntry->header.rotation.x );
+                     v = v * matrix4::rotateY( pSgbEntry->header.rotation.y );
+                     v = v * matrix4::rotateZ( pSgbEntry->header.rotation.z );
+
+                     v.x += pSgbEntry->header.translation.x;
+                     v.y += pSgbEntry->header.translation.y;
+                     v.z += pSgbEntry->header.translation.z;
+                  }
                   if( scale )
                   {
                      v.x *= scale->x;
@@ -338,7 +356,7 @@ int main( int argc, char* argv[] )
             totalGroups++;
             for( const auto& pEntry : group.entries )
             {
-               LGB_GIMMICK_ENTRY* pGimmick = dynamic_cast<LGB_GIMMICK_ENTRY*>( pEntry.get() );
+               auto pGimmick = dynamic_cast<LGB_GIMMICK_ENTRY*>( pEntry.get() );
                auto pBgParts = dynamic_cast<LGB_BGPARTS_ENTRY*>( pEntry.get() );
 
                std::string fileName( "" );
@@ -346,7 +364,7 @@ int main( int argc, char* argv[] )
                totalGroupEntries++;
 
                // write files
-               auto writeOutput = [&]( const std::string& fileName, const vec3* scale, const vec3* rotation, const vec3* translation ) -> bool
+               auto writeOutput = [&]( const std::string& fileName, const vec3* scale, const vec3* rotation, const vec3* translation, const SGB_MODEL_ENTRY* pModel  = nullptr) -> bool
                {
                   {
                      const auto& it = pcbFiles.find( fileName );
@@ -361,7 +379,7 @@ int main( int argc, char* argv[] )
                   if( it != pcbFiles.end() )
                   {
                      const auto& pcb_file = it->second;
-                     pushVerts( pcb_file, fileName, scale, rotation, translation );
+                     pushVerts( pcb_file, fileName, scale, rotation, translation, pModel );
                   }
                   return true;
                };
@@ -369,14 +387,7 @@ int main( int argc, char* argv[] )
                if( pBgParts )
                {
                   fileName = pBgParts->collisionFileName;
-
-                  if( !writeOutput( fileName, &pBgParts->header.scale, &pBgParts->header.rotation, &pBgParts->header.translation ) )
-                  {
-                     fileName = pBgParts->modelFileName;
-                     boost::replace_all( fileName, "bgparts", "collision" );
-                     boost::replace_all( fileName, ".mdl", ".pcb" );
-                     writeOutput( fileName, &pBgParts->header.scale, &pBgParts->header.rotation, &pBgParts->header.translation );
-                  }
+                  writeOutput( fileName, &pBgParts->header.scale, &pBgParts->header.rotation, &pBgParts->header.translation );
                }
 
                // gimmick entry
@@ -401,13 +412,7 @@ int main( int argc, char* argv[] )
                         {
                            auto pModel = dynamic_cast<SGB_MODEL_ENTRY*>( pEntry.get() );
                            fileName = pModel->collisionFileName;
-                           if( !writeOutput( fileName, &pGimmick->header.scale, &pGimmick->header.rotation, &pGimmick->header.translation ) )
-                           {
-                              fileName = pModel->modelFileName;
-                              boost::replace_all( fileName, "bgparts", "collision" );
-                              boost::replace_all( fileName, ".mdl", ".pcb" );
-                              writeOutput( fileName, &pGimmick->header.scale, &pGimmick->header.rotation, &pGimmick->header.translation );
-                           }
+                           writeOutput( fileName, &pGimmick->header.scale, &pGimmick->header.rotation, &pGimmick->header.translation, pModel );
                         }
                      }
                   }
