@@ -74,7 +74,7 @@ bool Core::Entity::Player::loadActiveQuests()
 void Core::Entity::Player::finishQuest( uint16_t questId )
 {
 
-   int16_t idx = getQuestIndex( questId );
+   auto idx = static_cast< uint8_t >( getQuestIndex( questId ) );
 
    if( ( idx != -1 ) && ( m_activeQuests[idx] != nullptr ) )
    {
@@ -123,7 +123,7 @@ void Core::Entity::Player::unfinishQuest( uint16_t questId )
 void Core::Entity::Player::removeQuest( uint16_t questId )
 {
 
-   int16_t idx = getQuestIndex( questId );
+   auto idx = static_cast< uint8_t >( getQuestIndex( questId ) );
 
    if( ( idx != -1 ) && ( m_activeQuests[idx] != nullptr ) )
    {
@@ -978,7 +978,7 @@ void Core::Entity::Player::updateQuest( uint16_t questId, uint8_t sequence )
    if( hasQuest( questId ) )
    {
       GamePacketNew< FFXIVIpcQuestUpdate, ServerZoneIpcType > pe_qa( getId() );
-      int16_t index = getQuestIndex( questId );
+      auto index = static_cast< uint8_t >( getQuestIndex( questId ) );
       auto pNewQuest = m_activeQuests[index];
       pe_qa.data().slot = index;
       pNewQuest->c.sequence = sequence;
@@ -1038,7 +1038,7 @@ void Core::Entity::Player::sendQuestTracker()
       if( m_questTracking[ii] >= 0 )
       {
          trackerPacket.data().entry[ii].active = 1;
-         trackerPacket.data().entry[ii].questIndex = m_questTracking[ii];
+         trackerPacket.data().entry[ii].questIndex = static_cast< uint8_t >( m_questTracking[ii] );
       }
    }
    queuePacket( trackerPacket );
@@ -1147,7 +1147,7 @@ bool Core::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t optional
 
    exp = questInfo->reward_exp_factor;
 
-   uint16_t rewardItemCount = questInfo->reward_item.size();
+   auto rewardItemCount = questInfo->reward_item.size();
    uint16_t optionalItemCount = questInfo->reward_item_optional.size() > 0 ? 1 : 0;
 
    uint32_t gilReward = questInfo->reward_gil;
