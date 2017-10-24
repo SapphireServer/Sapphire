@@ -141,7 +141,7 @@ void Core::Network::GameConnection::eventHandler( const Packets::GamePacket& inP
 
       GamePacketNew< FFXIVIpcEventLinkshell, ServerZoneIpcType > linkshellEvent( pPlayer->getId() );
       linkshellEvent.data().eventId = eventId;
-      linkshellEvent.data().scene = subEvent;
+      linkshellEvent.data().scene = static_cast< uint8_t >(subEvent);
       linkshellEvent.data().param3 = 1;
       linkshellEvent.data().unknown1 = 0x15a;
       pPlayer->queuePacket( linkshellEvent );
