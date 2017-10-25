@@ -150,32 +150,33 @@ namespace Core {
          m_gmRank = rank;
       }
 
-      uint32_t						m_modelEquip[10];
+      void createInvDbContainer( uint8_t slot ) const;
+
+      uint32_t m_modelEquip[10];
 
    private:
-      uint32_t						m_accountId;
-      uint32_t						m_id;
-      uint64_t						m_contentId;
+      uint32_t m_accountId;
+      uint32_t m_id;
+      uint64_t m_contentId;
 
-      uint8_t							m_guardianDeity;
-      uint8_t							m_birthMonth;
-      uint8_t							m_birthDay;
-      uint8_t							m_class;
+      uint8_t m_guardianDeity;
+      uint8_t m_birthMonth;
+      uint8_t m_birthDay;
+      uint8_t m_class;
 
-      uint8_t							m_voice;
+      uint8_t m_voice;
 
-      uint8_t                    m_tribe;
+      uint8_t m_tribe;
 
-      uint16_t                        m_zoneId;
+      uint16_t m_zoneId;
 
-      std::map<uint8_t, uint32_t>		m_lookMap;
-      std::map<uint8_t, uint16_t>		m_classMap;
-      uint8_t							m_look[26];
+      std::map< uint8_t, uint32_t > m_lookMap;
+      std::map< uint8_t, uint16_t > m_classMap;
+      uint8_t m_look[26];
 
-      uint8_t							m_gmRank;
+      uint8_t m_gmRank;
 
-      char							m_name[34];
-
+      char m_name[34];
 
    };
 
