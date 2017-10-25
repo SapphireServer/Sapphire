@@ -154,6 +154,8 @@ namespace Core {
 
       uint32_t m_modelEquip[10];
 
+      uint64_t getNextUId64() const;
+
    private:
       uint32_t m_accountId;
       uint32_t m_id;
@@ -170,7 +172,7 @@ namespace Core {
 
       uint16_t m_zoneId;
 
-      std::map< uint8_t, uint32_t > m_lookMap;
+      std::map< uint8_t, uint8_t > m_lookMap;
       std::map< uint8_t, uint16_t > m_classMap;
       uint8_t m_look[26];
 
@@ -178,6 +180,7 @@ namespace Core {
 
       char m_name[34];
 
+      void insertDbGlobalItem( uint32_t weaponId, uint64_t uniqueId ) const;
    };
 
 }
