@@ -155,14 +155,14 @@ namespace Core {
    void PlayerMinimal::saveAsNew()
    {
 
-      std::vector< uint8_t > customize( 32 );
+      std::vector< uint8_t > customize( 26 );
       std::vector< uint8_t > howTo( 32 );
       std::vector< uint8_t > aetherytes( 12 );
       std::vector< uint8_t > discovery( 411 );
       std::vector< uint8_t > questComplete( 200 );
       std::vector< uint8_t > unlocks( 64 );
       std::vector< uint8_t > modelEquip( 40 );
-      std::vector< uint8_t > questTracking8(10);
+      std::vector< uint8_t > questTracking8( 10 );
       std::vector< int16_t > questTracking = { -1, -1, -1, -1, -1 };
 
       memset( questComplete.data(), 0, questComplete.size() );
@@ -234,7 +234,6 @@ namespace Core {
       g_charaDb.directExecute( stmtClass );
 
       auto stmt = g_charaDb.getPreparedStatement( Db::CharaDbStatements::CHARA_INS );
-
       stmt->setInt( 1, m_accountId );
       stmt->setInt( 2, m_id );
       stmt->setInt64( 3, m_contentId );
@@ -268,69 +267,39 @@ namespace Core {
       stmt->setInt( 31, m_gmRank );
       g_charaDb.directExecute( stmt );
 
-
-
-      g_charaDb.execute( "INSERT INTO charainfosearch (CharacterId, UPDATE_DATE ) VALUES (" + std::to_string( m_id ) + ", NOW());" );
+      auto stmtSearchInfo = g_charaDb.getPreparedStatement( Db::CharaDbStatements::CHARA_SEARCHINFO_INS );
+      stmtSearchInfo->setInt( 1, m_id );
+      g_charaDb.directExecute( stmtSearchInfo );
 
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      // SET UP INVENTORIES
+      /// SET UP INVENTORIES
 
-      g_charaDb.execute( "INSERT INTO charaiteminventory (storageId, CharacterId, UPDATE_DATE ) "
-         "VALUES ( " + std::to_string( InventoryType::Bag0 ) + ", " + std::to_string( m_id ) + ", NOW());" );
+      createInvDbContainer( InventoryType::Bag0 );
+      createInvDbContainer( InventoryType::Bag1 );
+      createInvDbContainer( InventoryType::Bag2 );
+      createInvDbContainer( InventoryType::Bag3 );
 
-      g_charaDb.execute( "INSERT INTO charaiteminventory (storageId, CharacterId, UPDATE_DATE ) "
-         "VALUES ( " + std::to_string( InventoryType::Bag1 ) + ", " + std::to_string( m_id ) + ", NOW());" );
+      createInvDbContainer( InventoryType::ArmoryOff );
 
-      g_charaDb.execute( "INSERT INTO charaiteminventory (storageId, CharacterId, UPDATE_DATE ) "
-         "VALUES ( " + std::to_string( InventoryType::Bag2 ) + ", " + std::to_string( m_id ) + ", NOW());" );
+      createInvDbContainer( InventoryType::ArmoryHead );
+      createInvDbContainer( InventoryType::ArmoryBody );
+      createInvDbContainer( InventoryType::ArmoryHand );
+      createInvDbContainer( InventoryType::ArmoryWaist );
+      createInvDbContainer( InventoryType::ArmoryLegs );
+      createInvDbContainer( InventoryType::ArmoryFeet );
 
-      g_charaDb.execute( "INSERT INTO charaiteminventory (storageId, CharacterId, UPDATE_DATE ) "
-         "VALUES ( " + std::to_string( InventoryType::Bag3 ) + ", " + std::to_string( m_id ) + ", NOW());" );
+      createInvDbContainer( InventoryType::ArmotyNeck );
+      createInvDbContainer( InventoryType::ArmoryEar );
+      createInvDbContainer( InventoryType::ArmoryWrist );
+      createInvDbContainer( InventoryType::ArmoryRing );
+      createInvDbContainer( InventoryType::ArmoryMain );
 
-      g_charaDb.execute( "INSERT INTO charaiteminventory (storageId, CharacterId, UPDATE_DATE ) "
-         "VALUES ( " + std::to_string( InventoryType::ArmoryOff ) + ", " + std::to_string( m_id ) + ", NOW());" );
+      createInvDbContainer( InventoryType::Currency );
+      createInvDbContainer( InventoryType::Crystal );
 
-      g_charaDb.execute( "INSERT INTO charaiteminventory (storageId, CharacterId, UPDATE_DATE ) "
-         "VALUES ( " + std::to_string( InventoryType::ArmoryHead ) + ", " + std::to_string( m_id ) + ", NOW());" );
-
-      g_charaDb.execute( "INSERT INTO charaiteminventory (storageId, CharacterId, UPDATE_DATE ) "
-         "VALUES ( " + std::to_string( InventoryType::ArmoryBody ) + ", " + std::to_string( m_id ) + ", NOW());" );
-
-      g_charaDb.execute( "INSERT INTO charaiteminventory (storageId, CharacterId, UPDATE_DATE ) "
-         "VALUES ( " + std::to_string( InventoryType::ArmoryHand ) + ", " + std::to_string( m_id ) + ", NOW());" );
-
-      g_charaDb.execute( "INSERT INTO charaiteminventory (storageId, CharacterId, UPDATE_DATE ) "
-         "VALUES ( " + std::to_string( InventoryType::ArmoryWaist ) + ", " + std::to_string( m_id ) + ", NOW());" );
-
-      g_charaDb.execute( "INSERT INTO charaiteminventory (storageId, CharacterId, UPDATE_DATE ) "
-         "VALUES ( " + std::to_string( InventoryType::ArmoryLegs ) + ", " + std::to_string( m_id ) + ", NOW());" );
-
-      g_charaDb.execute( "INSERT INTO charaiteminventory (storageId, CharacterId, UPDATE_DATE ) "
-         "VALUES ( " + std::to_string( InventoryType::ArmoryFeet ) + ", " + std::to_string( m_id ) + ", NOW());" );
-
-      g_charaDb.execute( "INSERT INTO charaiteminventory (storageId, CharacterId, UPDATE_DATE ) "
-         "VALUES ( " + std::to_string( InventoryType::ArmotyNeck ) + ", " + std::to_string( m_id ) + ", NOW());" );
-
-      g_charaDb.execute( "INSERT INTO charaiteminventory (storageId, CharacterId, UPDATE_DATE ) "
-         "VALUES ( " + std::to_string( InventoryType::ArmoryEar ) + ", " + std::to_string( m_id ) + ", NOW());" );
-
-      g_charaDb.execute( "INSERT INTO charaiteminventory (storageId, CharacterId, UPDATE_DATE )"
-         "VALUES ( " + std::to_string( InventoryType::ArmoryWrist ) + ", " + std::to_string( m_id ) + ", NOW());" );
-
-      g_charaDb.execute( "INSERT INTO charaiteminventory (storageId, CharacterId, UPDATE_DATE ) "
-         "VALUES ( " + std::to_string( InventoryType::ArmoryRing ) + ", " + std::to_string( m_id ) + ", NOW());" );
-
-      g_charaDb.execute( "INSERT INTO charaiteminventory (storageId, CharacterId, UPDATE_DATE ) "
-         "VALUES ( " + std::to_string( InventoryType::ArmoryMain ) + ", " + std::to_string( m_id ) + ", NOW());" );
-
-      g_charaDb.execute( "INSERT INTO charaiteminventory  (storageId, CharacterId, UPDATE_DATE ) "
-         "VALUES ( " + std::to_string( InventoryType::Currency ) + ", " + std::to_string( m_id ) + ", NOW());" );
-
-      g_charaDb.execute( "INSERT INTO charaiteminventory  (storageId, CharacterId, UPDATE_DATE ) "
-         "VALUES ( " + std::to_string( InventoryType::Crystal ) + ", " + std::to_string( m_id ) + ", NOW());" );
 
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      // SETUP EQUIPMENT / STARTING GEAR
+      /// SETUP EQUIPMENT / STARTING GEAR
       auto classJobInfo = g_exdData.m_classJobInfoMap[m_class];
       uint32_t weaponId = classJobInfo.start_weapon_id;
       uint64_t uniqueId = g_database.getNextUId();
@@ -379,6 +348,7 @@ namespace Core {
       g_charaDb.execute( "INSERT INTO charaglobalitem (CharacterId, ItemId, catalogId, UPDATE_DATE ) "
          "VALUES ( " + std::to_string( m_id ) + ", " + std::to_string( feetUid ) + ", " +
          std::to_string( feet ) + ", NOW());" );
+
       g_charaDb.execute( "INSERT INTO charaitemgearset (storageId, CharacterId, "
          "container_" + std::to_string( EquipSlot::MainHand ) + ", "
          "container_" + std::to_string( EquipSlot::Body ) + ", "
@@ -393,5 +363,13 @@ namespace Core {
          std::to_string( legsUid ) + ", " +
          std::to_string( feetUid ) + ", NOW());" );
 
+   }
+
+   void PlayerMinimal::createInvDbContainer( uint8_t slot ) const
+   {
+      auto stmtCreateInv = g_charaDb.getPreparedStatement( Db::CHARA_ITEMINV_INS );
+      stmtCreateInv->setInt( 1, m_id );
+      stmtCreateInv->setInt( 2, slot );
+      g_charaDb.directExecute( stmtCreateInv );
    }
 }

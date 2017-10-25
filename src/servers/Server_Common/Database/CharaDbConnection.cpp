@@ -101,6 +101,7 @@ void Core::Db::CharaDbConnection::doPrepareStatements()
    prepareStatement( CHARA_UP_CFPENATLY, "UPDATE charainfo SET CFPenaltyUntil = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
 
    /// SEARCH INFO
+   prepareStatement( CHARA_SEARCHINFO_INS, "INSERT INTO charainfosearch (CharacterId, UPDATE_DATE ) VALUES ( ?, NOW() );", CONNECTION_BOTH );
    prepareStatement( CHARA_SEARCHINFO_UP_SELECTCLASS, "UPDATE charainfosearch SET SelectClassId = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
    prepareStatement( CHARA_SEARCHINFO_UP_SELECTREGION, "UPDATE charainfosearch SET SelectRegion = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
    prepareStatement( CHARA_SEARCHINFO_UP_SEARCHCOMMENT, "UPDATE charainfosearch SET SearchComment = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
@@ -125,5 +126,9 @@ void Core::Db::CharaDbConnection::doPrepareStatements()
    prepareStatement( CHARA_CLASS_INS, "INSERT INTO characlass ( CharacterId, ClassIdx, Exp, Lvl ) VALUES( ?,?,?,?);", CONNECTION_BOTH );
    prepareStatement( CHARA_CLASS_UP, "UPDATE characlass SET Exp = ?, Lvl = ? WHERE CharacterId = ? AND ClassIdx = ?;", CONNECTION_ASYNC );
    prepareStatement( CHARA_CLASS_DEL, "DELETE FROM characlass WHERE CharacterId = ?;", CONNECTION_ASYNC );
+
+   /// INVENTORY INFO
+   prepareStatement( CHARA_ITEMINV_INS, "INSERT INTO charaiteminventory ( CharacterId, storageId, UPDATE_DATE ) VALUES ( ?, ?, NOW());", CONNECTION_BOTH );
+
 
 }
