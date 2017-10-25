@@ -169,8 +169,6 @@ namespace Core {
 
       memcpy( questTracking8.data(), questTracking.data(), questTracking8.size() );
 
-      uint16_t size = static_cast< uint16_t >( m_lookMap.size() );
-
       for( uint32_t i = 0; i < m_lookMap.size(); i++ )
       {
          customize[i] = m_lookMap[i];
@@ -273,7 +271,6 @@ namespace Core {
 
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       /// SET UP INVENTORIES
-
       createInvDbContainer( InventoryType::Bag0 );
       createInvDbContainer( InventoryType::Bag1 );
       createInvDbContainer( InventoryType::Bag2 );
@@ -297,26 +294,25 @@ namespace Core {
       createInvDbContainer( InventoryType::Currency );
       createInvDbContainer( InventoryType::Crystal );
 
-
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       /// SETUP EQUIPMENT / STARTING GEAR
       auto classJobInfo = g_exdData.m_classJobInfoMap[m_class];
       uint32_t weaponId = classJobInfo.start_weapon_id;
-      uint64_t uniqueId = g_database.getNextUId();
+      uint64_t uniqueId = getNextUId64();
 
       uint8_t race = customize[CharaLook::Race];
       uint8_t gender = customize[CharaLook::Gender];
 
       auto raceInfo = g_exdData.getRaceInfo( race );
 
-      int32_t body;
-      int32_t hands;
-      int32_t legs;
-      int32_t feet;
-      uint64_t bodyUid = g_database.getNextUId();
-      uint64_t handsUid = g_database.getNextUId();
-      uint64_t legsUid = g_database.getNextUId();
-      uint64_t feetUid = g_database.getNextUId();
+      uint32_t body;
+      uint32_t hands;
+      uint32_t legs;
+      uint32_t feet;
+      uint64_t bodyUid = getNextUId64();
+      uint64_t handsUid = getNextUId64();
+      uint64_t legsUid = getNextUId64();
+      uint64_t feetUid = getNextUId64();
 
       if( gender == 0 )
       {
@@ -333,21 +329,11 @@ namespace Core {
          feet = raceInfo->female_feet;
       }
 
-      g_charaDb.execute( "INSERT INTO charaglobalitem (CharacterId, ItemId, catalogId, UPDATE_DATE ) "
-         "VALUES ( " + std::to_string( m_id ) + ", " + std::to_string( uniqueId ) + ", " +
-         std::to_string( weaponId ) + ", NOW());" );
-      g_charaDb.execute( "INSERT INTO charaglobalitem (CharacterId, ItemId, catalogId, UPDATE_DATE ) "
-         "VALUES ( " + std::to_string( m_id ) + ", " + std::to_string( bodyUid ) + ", " +
-         std::to_string( body ) + ", NOW());" );
-      g_charaDb.execute( "INSERT INTO charaglobalitem (CharacterId, ItemId, catalogId, UPDATE_DATE ) "
-         "VALUES ( " + std::to_string( m_id ) + ", " + std::to_string( handsUid ) + ", " +
-         std::to_string( hands ) + ", NOW());" );
-      g_charaDb.execute( "INSERT INTO charaglobalitem (CharacterId, ItemId, catalogId, UPDATE_DATE ) "
-         "VALUES ( " + std::to_string( m_id ) + ", " + std::to_string( legsUid ) + ", " +
-         std::to_string( legs ) + ", NOW());" );
-      g_charaDb.execute( "INSERT INTO charaglobalitem (CharacterId, ItemId, catalogId, UPDATE_DATE ) "
-         "VALUES ( " + std::to_string( m_id ) + ", " + std::to_string( feetUid ) + ", " +
-         std::to_string( feet ) + ", NOW());" );
+      insertDbGlobalItem( weaponId, uniqueId );
+      insertDbGlobalItem( body, bodyUid );
+      insertDbGlobalItem( hands, handsUid );
+      insertDbGlobalItem( legs, legsUid );
+      insertDbGlobalItem( feet, feetUid );
 
       g_charaDb.execute( "INSERT INTO charaitemgearset (storageId, CharacterId, "
          "container_" + std::to_string( EquipSlot::MainHand ) + ", "
@@ -365,11 +351,31 @@ namespace Core {
 
    }
 
+   void PlayerMinimal::insertDbGlobalItem( uint32_t weaponId, uint64_t uniqueId ) const
+   {
+      auto stmtItemGlobal = g_charaDb.getPreparedStatement(Db::CHARA_ITEMGLOBAL_INS );
+      stmtItemGlobal->setInt(1, m_id);
+      stmtItemGlobal->setInt64( 2, uniqueId );
+      stmtItemGlobal->setInt( 3, weaponId );
+      g_charaDb.directExecute( stmtItemGlobal );
+   }
+
    void PlayerMinimal::createInvDbContainer( uint8_t slot ) const
    {
       auto stmtCreateInv = g_charaDb.getPreparedStatement( Db::CHARA_ITEMINV_INS );
       stmtCreateInv->setInt( 1, m_id );
       stmtCreateInv->setInt( 2, slot );
       g_charaDb.directExecute( stmtCreateInv );
+   }
+
+   uint64_t PlayerMinimal::getNextUId64() const
+   {
+      g_charaDb.execute( std::string( "INSERT INTO uniqueiddata( IdName ) VALUES( 'NOT_SET' );" ) );
+      auto res = g_charaDb.query( "SELECT LAST_INSERT_ID();" );
+
+      if( !res )
+         return 0;
+
+      return res->getUInt64( 1 );
    }
 }

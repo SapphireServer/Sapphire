@@ -73,6 +73,8 @@ enum CharaDbStatements : uint32_t
 
    CHARA_ITEMINV_INS,
 
+   CHARA_ITEMGLOBAL_INS,
+
    MAX_STATEMENTS
 };
 

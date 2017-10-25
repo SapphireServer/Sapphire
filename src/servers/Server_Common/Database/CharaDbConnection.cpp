@@ -123,12 +123,17 @@ void Core::Db::CharaDbConnection::doPrepareStatements()
 
    /// CLASS INFO
    prepareStatement( CHARA_CLASS_SEL, "SELECT ClassIdx, Exp, Lvl FROM characlass WHERE CharacterId = ?;", CONNECTION_SYNC );
-   prepareStatement( CHARA_CLASS_INS, "INSERT INTO characlass ( CharacterId, ClassIdx, Exp, Lvl ) VALUES( ?,?,?,?);", CONNECTION_BOTH );
+   prepareStatement( CHARA_CLASS_INS, "INSERT INTO characlass ( CharacterId, ClassIdx, Exp, Lvl ) VALUES( ?,?,?,? );", CONNECTION_BOTH );
    prepareStatement( CHARA_CLASS_UP, "UPDATE characlass SET Exp = ?, Lvl = ? WHERE CharacterId = ? AND ClassIdx = ?;", CONNECTION_ASYNC );
    prepareStatement( CHARA_CLASS_DEL, "DELETE FROM characlass WHERE CharacterId = ?;", CONNECTION_ASYNC );
 
    /// INVENTORY INFO
-   prepareStatement( CHARA_ITEMINV_INS, "INSERT INTO charaiteminventory ( CharacterId, storageId, UPDATE_DATE ) VALUES ( ?, ?, NOW());", CONNECTION_BOTH );
+   prepareStatement( CHARA_ITEMINV_INS, "INSERT INTO charaiteminventory ( CharacterId, storageId, UPDATE_DATE ) VALUES ( ?, ?, NOW() );", CONNECTION_BOTH );
+
+   /// ITEM GLOBAL
+   prepareStatement( CHARA_ITEMGLOBAL_INS, "INSERT INTO charaglobalitem ( CharacterId, ItemId, catalogId, UPDATE_DATE ) VALUES ( ?, ?, ?, NOW() );", CONNECTION_BOTH );
+
+
 
 
 }
