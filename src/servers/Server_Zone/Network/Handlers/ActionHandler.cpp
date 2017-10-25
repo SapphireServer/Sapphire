@@ -106,6 +106,11 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
             pPlayer->changeTarget( targetId );
             break;
         }
+        case 0x65:
+        {
+           pPlayer->dismount();
+           break;
+        }
         case 0x68: // Remove status (clicking it off)
         {
            // todo: check if status can be removed by client from exd
@@ -120,7 +125,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
         }
         case 0x12E: // Set player title
         {
-           pPlayer->setTitle( param1 );
+           pPlayer->setTitle( static_cast< uint16_t >( param1 ) );
            break;
         }
         case 0x12F: // Get title list
@@ -211,8 +216,8 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
                 auto fromAetheryte = g_exdData.getAetheryteInfo( g_exdData.m_zoneInfoMap[pPlayer->getZoneId()].aetheryte_index );
 
                 // calculate cost - does not apply for favorite points or homepoints neither checks for aether tickets
-                auto cost = ( sqrt( pow( fromAetheryte->map_coord_x - targetAetheryte->map_coord_x, 2 ) +
-                                    pow( fromAetheryte->map_coord_y - targetAetheryte->map_coord_y, 2 ) ) / 2 ) + 100;
+                auto cost = static_cast< uint16_t > ( ( sqrt( pow( fromAetheryte->map_coord_x - targetAetheryte->map_coord_x, 2 ) +
+                                    pow( fromAetheryte->map_coord_y - targetAetheryte->map_coord_y, 2 ) ) / 2 ) + 100 );
 
                 // cap at 999 gil
                 cost = cost > 999 ? 999 : cost;

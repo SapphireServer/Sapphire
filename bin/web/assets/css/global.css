@@ -1,18 +1,21 @@
-body{
-  font-family:Verdana;
-  font-size:10pt;
-  line-height:14pt;
-  height:100%;
-  background-image:url(../../assets/img/background.png);
-  background-color:#282828;
+html {
+  min-height: 100%;
 }
 
-div.contentContainer{
+body { 
+  font-family: Meiryo, Verdana, sans-serif;
+  font-size: 12px;
+  line-height: 14px;
+  height: 100%;
+  overflow: hidden;
+}
+
+.contentContainer{
   width:50%;
   float:left;
 }
 
-div.info{
+.info{
   width:320px;
   height:100%;
   margin-left:auto;
@@ -22,7 +25,7 @@ div.info{
   background-color:lightgrey;
 }
 
-div.infoFooter{
+.infoFooter{
   width:400px;
   margin-left:auto;
   margin-right:auto;
@@ -135,3 +138,26 @@ p.pageSubTitle{
   margin:0 auto;
 }
 
+.commit-history {
+  padding-left: 20px;
+}
+
+.commit-history li a {
+  color: #fff;
+}
+
+.commit-history li a:hover {
+  color: #bbb;
+}
+
+.s-left-half {
+  overflow-y: auto;
+}
+
+.s-link-badge {
+  font-size: 15px;
+}
+
+h2 { 
+  font-size: 19px;
+}

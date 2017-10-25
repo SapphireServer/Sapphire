@@ -19,11 +19,6 @@ set_target_properties(server_rest PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_CURRENT_SOURCE_DIR}/../../../bin/"
 )
 
-if(MSVC)
-    message(STATUS "Enabling Edit and Continue..")
-    set_property(TARGET server_rest APPEND_STRING PROPERTY COMPILE_FLAGS " /INCREMENTAL /ZI")
-endif()
-
 if (UNIX)
   target_link_libraries (server_rest Common xivdat pthread mysqlclient mysqlConnector dl z)
 else()

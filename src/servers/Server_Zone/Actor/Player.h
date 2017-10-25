@@ -197,9 +197,9 @@ public:
    // Inventory / Item / Currency
    //////////////////////////////////////////////////////////////////////////////////////////////////////
    /*! add an item to the first free slot in one of the 4 main containers */
-   bool tryAddItem( uint16_t catalogId, uint16_t quantity );
+   bool tryAddItem( uint16_t catalogId, uint32_t quantity );
    /*! add an item to a given container */
-   bool addItem( uint16_t containerId, uint16_t catalogId, uint16_t quantity );
+   bool addItem( uint16_t containerId, uint16_t catalogId, uint32_t quantity );
    /*! equip an item to a specified slot */
    void equipItem( Inventory::EquipSlot equipSlotId, ItemPtr pItem, bool sendModel );
    /*! remove an item from an equipment slot */
@@ -338,8 +338,14 @@ public:
    void setTitle( uint16_t titleId );
    /*! change gear param state */
    void setEquipDisplayFlags( uint8_t state );
-   /*! get gear param state and send update to inRangeSet */
+   /*! get gear param state */
    uint8_t getEquipDisplayFlags() const;
+   /*! mount the specified mount and send the packets */
+   void mount( uint32_t id );
+   /*! dismount the current mount and send the packets */
+   void dismount();
+   /*! get the current mount */
+   uint8_t getCurrentMount() const;
 
    void calculateStats() override;
    void sendStats();

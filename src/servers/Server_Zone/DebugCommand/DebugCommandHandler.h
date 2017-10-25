@@ -27,6 +27,9 @@ public:
    // execute command if registered
    void execCommand( char * data, Entity::PlayerPtr pPlayer );
 
+   // help command
+   void help( char* data, Entity::PlayerPtr pPlayer, boost::shared_ptr<DebugCommand> command );
+
    // command handler callbacks
    void set( char * data, Entity::PlayerPtr pPlayer, boost::shared_ptr<DebugCommand> command );
    void get( char * data, Entity::PlayerPtr pPlayer, boost::shared_ptr<DebugCommand> command );
@@ -38,6 +41,9 @@ public:
    void injectChatPacket( char * data, Entity::PlayerPtr pPlayer, boost::shared_ptr<DebugCommand> command );
    void nudge( char* data, Entity::PlayerPtr pPlayer, boost::shared_ptr<DebugCommand> command );
    void serverInfo( char * data, Entity::PlayerPtr pPlayer, boost::shared_ptr<DebugCommand> command );
+
+   void unlockCharacter( char* data, Entity::PlayerPtr pPlayer, boost::shared_ptr<DebugCommand> command );
+   void targetInfo( char* data, Entity::PlayerPtr pPlayer, boost::shared_ptr<DebugCommand> command );
 
 };
 

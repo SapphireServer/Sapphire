@@ -347,7 +347,7 @@ void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
 
 void Core::Entity::Player::forceZoneing( uint32_t zoneId )
 {
-   m_queuedZoneing = boost::make_shared< QueuedZoning >( zoneId, getPos(), Util::getTimeMs(), 0 );
+   m_queuedZoneing = boost::make_shared< QueuedZoning >( zoneId, getPos(), Util::getTimeMs(), 0.f );
    //performZoning( zoneId, Common::ZoneingType::None, getPos() );
 }
 
@@ -1437,6 +1437,33 @@ void Core::Entity::Player::setEquipDisplayFlags( uint8_t state )
 uint8_t Core::Entity::Player::getEquipDisplayFlags() const
 {
    return m_equipDisplayFlags;
+}
+
+void Core::Entity::Player::mount( uint32_t id )
+{
+// TODO: Fix me for SQL rewrite
+/*   m_mount = id;
+   sendToInRangeSet( ActorControlPacket142( getId(), ActorControlType::SetStatus, static_cast< uint8_t >( Entity::Actor::ActorStatus::Mounted )), true );
+   sendToInRangeSet( ActorControlPacket143( getId(), 0x39e, 12 ), true ); //?
+
+   GamePacketNew< FFXIVIpcMount, ServerZoneIpcType > mountPacket( getId() );
+   mountPacket.data().id = m_mount;
+   sendToInRangeSet( mountPacket, true );*/
+}
+
+void Core::Entity::Player::dismount()
+{
+// TODO: Fix me for SQL rewrite
+/*   sendToInRangeSet( ActorControlPacket142( getId(), ActorControlType::SetStatus, static_cast< uint8_t >( Entity::Actor::ActorStatus::Idle )), true );
+   sendToInRangeSet( ActorControlPacket143( getId(), ActorControlType::Dismount, 1 ), true );
+   m_mount = 0;*/
+}
+
+uint8_t Core::Entity::Player::getCurrentMount() const
+{
+// TODO: Fix me for SQL rewrite
+//   return m_mount;
+   return 0;
 }
 
 void Core::Entity::Player::autoAttack( ActorPtr pTarget )

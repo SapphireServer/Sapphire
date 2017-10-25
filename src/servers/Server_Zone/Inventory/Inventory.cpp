@@ -108,7 +108,7 @@ Core::Inventory::InvSlotPairVec Core::Inventory::getSlotsOfItemsInInventory( uin
       for( auto item : inv->getItemMap() )
       {
          if( item.second && item.second->getId() == catalogId )
-            outVec.push_back( std::make_pair( i, item.first ) );
+            outVec.push_back( std::make_pair( i, static_cast< int8_t >( item.first ) ) );
       }
    }
    return outVec;
@@ -118,7 +118,7 @@ Core::Inventory::InvSlotPair Core::Inventory::getFreeBagSlot()
 {
    for( auto i : { Bag0, Bag1, Bag2, Bag3 } )
    {
-      int16_t freeSlot = m_inventoryMap[i]->getFreeSlot();
+      auto freeSlot = static_cast< int8_t >( m_inventoryMap[i]->getFreeSlot() );
 
       if( freeSlot != -1 )
          return std::make_pair( i, freeSlot );
@@ -457,7 +457,7 @@ int16_t Core::Inventory::addItem( uint16_t inventoryId, int8_t slotId, uint32_t 
       return -1;
    }
 
-   int16_t rSlotId = -1;
+   int8_t rSlotId = -1;
 
    //if( itemInfo->stack_size > 1 )
    //{

@@ -40,7 +40,7 @@ class CmnDefInnBedDef
 
    def Scene00100( player ) //Wake up
    {
-      player.eventPlay( this.id, 100, 0xF32E48F8/*flags*/, 0/*unk*/, 0/*unk*/,
+      player.eventPlay( this.id, 100, 0x800/*flags*/, 0/*unk*/, 0/*unk*/,
          fun( player, eventId, param1, param2, param3 )
          {
 

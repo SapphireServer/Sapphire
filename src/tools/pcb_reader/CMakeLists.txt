@@ -1,23 +1,39 @@
-set( CMAKE_CXX_FLAGS "-std=c++11 -m32")
+cmake_minimum_required(VERSION 2.6)
+cmake_policy(SET CMP0015 NEW)
+project(Tool_pcb_reader2)
 
-include_directories("../../")
+set(SAPPHIRE_BOOST_VER 1.63.0)
+set(SAPPHIRE_BOOST_FOLDER_NAME boost_1_63_0)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_CURRENT_SOURCE_DIR}/../bin/")
+
+include_directories("../../lib/ChaiScript-6.0.0/include/")
+
+include_directories("../../sapphire/datReader/")
+include_directories("../../sapphire/")
 include_directories("../")
 
 file(GLOB SERVER_PUBLIC_INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*")
-file(GLOB SERVER_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}*.cpp")
+file(GLOB SERVER_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}*.c*")
 
-SET(Boost_USE_STATIC_LIBS ON)
-set(Boost_INCLUDE_DIR /opt/build_libs/boost_1_60_0)
-set(Boost_LIBRARY_DIR /opt/build_libs/boost_1_60_0/stage/lib)
-set(SERVER_COMMON_DIR ../../servers/Server_Common)
-find_package(Boost COMPONENTS log log_setup thread date_time filesystem system  REQUIRED)
-include_directories(${Boost_INCLUDE_DIR})
 
-link_directories(${Boost_LIBRARY_DIR})
-link_directories(${SERVER_COMMON_DIR})
-#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ".")
-add_executable(pcb_parser2 ${SERVER_PUBLIC_INCLUDE_FILES} ${SERVER_SOURCE_FILES})
+#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "../bin/")
+add_executable(pcb_reader2 ${SERVER_PUBLIC_INCLUDE_FILES} ${SERVER_SOURCE_FILES})
 
-target_link_libraries (pcb_parser2 server_common.a pthread mysqlclient dl z)
-target_link_libraries(pcb_parser2 ${Boost_LIBRARIES} ${Boost_LIBRARIES})
+set_target_properties(pcb_reader2 PROPERTIES
+    CXX_STANDARD 14
+    CXX_STANDARD_REQUIRED ON
+    CXX_EXTENSIONS ON
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_SOURCE_DIR}/../bin/"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/../bin/"
+    RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_CURRENT_SOURCE_DIR}/../bin/"
+    RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_CURRENT_SOURCE_DIR}/../bin/"
+)
+
+if (UNIX)
+  target_link_libraries (pcb_reader2 Common xivdat pthread mysqlclient dl z)
+else()
+  target_link_libraries (pcb_reader2 Common xivdat libmysql zlib1)
+endif()
+
+target_link_libraries(pcb_reader2 ${Boost_LIBRARIES} ${Boost_LIBRARIES})
 

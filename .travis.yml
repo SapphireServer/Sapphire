@@ -6,17 +6,19 @@ before_install:
   - sudo apt-get update 
   - sudo apt-get install -y software-properties-common
   - sudo apt-get update
-  - sudo apt-get install gcc-4.9 g++-4.9 gcc-4.9-multilib g++-4.9-multilib cmake3 -y
+  - sudo apt-get install gcc-7 g++-7 gcc-7-multilib g++-7-multilib cmake3 -y
   - sudo apt-get install libboost-dev libboost-all-dev libmysqlclient-dev -y
-  - sudo apt-get install libmysqlcppconn-dev -y  
+  - sudo apt-get install libmysqlcppconn-dev -y
+
 compiler:
-  - gcc
+  - g++
   
  
 # Build steps
 script:
+  - g++ --version
   - mkdir build
   - cd build
-  - cmake .. -DSAPPHIRE_BOOST_VER="1.54.0" -DCMAKE_CXX_COMPILER=g++-4.9 -DCMAKE_C_COMPILER=gcc-4.9 && make -j 3
+  - cmake .. -DSAPPHIRE_BOOST_VER="1.54.0" -DCMAKE_CXX_COMPILER=g++-7 && make -j 3
   - cd ..
   - bash sql_import.sh

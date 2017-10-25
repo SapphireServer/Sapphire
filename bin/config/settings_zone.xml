@@ -25,6 +25,6 @@
          <MotD>&lt;&lt;&lt;Welcome to Sapphire&gt;&gt;&gt;</MotD>
          <MotD>This is a very good server</MotD>
          <MotD>You can change these messages by editing MotDArray in config/settings_zone.xml</MotD>
-      </MotdArray>
+      </MotDArray>
    </Parameters>
 </Settings>

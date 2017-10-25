@@ -44,6 +44,10 @@ build/
 *.out
 *.app
 
+# Projects and Solutions
+*.vcxproj
+*.sln
+
 # CMake
 CMakeCache.txt
 CMakeFiles
@@ -96,6 +100,10 @@ src/libraries/external/boost_*
 *.ipdb
 *.iobj
 *.filters
+*.idb
 
 # sapphire version
 src/servers/Server_Common/Version\.cpp
+
+# edit and continue files
+/enc_temp_folder

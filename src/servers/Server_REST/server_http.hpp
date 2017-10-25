@@ -273,7 +273,7 @@ namespace SimpleWeb {
                         try {
                             content_length=stoull(it->second);
                         }
-                        catch(const std::exception &e) {
+                        catch( const std::exception & ) {
                             if(on_error)
                                 on_error(request, boost::system::error_code(boost::system::errc::protocol_error, boost::system::generic_category()));
                             return;
@@ -282,7 +282,7 @@ namespace SimpleWeb {
                             //Set timeout on the following boost::asio::async-read or write function
                             auto timer=this->get_timeout_timer(socket, config.timeout_content);
                             boost::asio::async_read(*socket, request->streambuf,
-                                    boost::asio::transfer_exactly(content_length-num_additional_bytes),
+                                    boost::asio::transfer_exactly(static_cast< size_t >(content_length-num_additional_bytes)),
                                     [this, socket, request, timer]
                                     (const boost::system::error_code& ec, size_t /*bytes_transferred*/) {
                                 if(timer)
@@ -388,7 +388,7 @@ namespace SimpleWeb {
                         try {
                             http_version=stof(request->http_version);
                         }
-                        catch(const std::exception &e){
+                        catch( const std::exception & ){
                             if(on_error)
                                 on_error(request, boost::system::error_code(boost::system::errc::protocol_error, boost::system::generic_category()));
                             return;
@@ -410,7 +410,7 @@ namespace SimpleWeb {
             try {
                 resource_function(response, request);
             }
-            catch(const std::exception &e) {
+            catch( const std::exception & ) {
                 if(on_error)
                     on_error(request, boost::system::error_code(boost::system::errc::operation_canceled, boost::system::generic_category()));
                 return;

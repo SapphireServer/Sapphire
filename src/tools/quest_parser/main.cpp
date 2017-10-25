@@ -91,7 +91,7 @@ void createScript( boost::shared_ptr< Core::Data::QuestInfo > pQuestData, std::s
    if( pQuestData->reward_item.size() > 0 )
    {
       rewards += "        this.RewardItem = [";
-      for( int ca = 0; ca < pQuestData->reward_item.size(); ca++ )
+      for( size_t ca = 0; ca < pQuestData->reward_item.size(); ca++ )
       {
          rewards += std::to_string( pQuestData->reward_item.at( ca ) );
          if( ca != pQuestData->reward_item.size() - 1 )
@@ -105,7 +105,7 @@ void createScript( boost::shared_ptr< Core::Data::QuestInfo > pQuestData, std::s
    if( pQuestData->reward_item.size() > 0 )
    {
       rewards += "        this.RewardItemCount = [";
-      for( int ca = 0; ca < pQuestData->reward_item_count.size(); ca++ )
+      for( size_t ca = 0; ca < pQuestData->reward_item_count.size(); ca++ )
       {
          rewards += std::to_string( pQuestData->reward_item_count.at( ca ) );
          if( ca != pQuestData->reward_item_count.size() - 1 )
@@ -119,7 +119,7 @@ void createScript( boost::shared_ptr< Core::Data::QuestInfo > pQuestData, std::s
    if( pQuestData->reward_item_optional.size() > 0 )
    {
       rewards += "        this.RewardItemOptional = [";
-      for( int ca = 0; ca < pQuestData->reward_item_optional.size(); ca++ )
+      for( size_t ca = 0; ca < pQuestData->reward_item_optional.size(); ca++ )
       {
          rewards += std::to_string( pQuestData->reward_item_optional.at( ca ) );
          if( ca != pQuestData->reward_item_optional.size() - 1 )
@@ -133,7 +133,7 @@ void createScript( boost::shared_ptr< Core::Data::QuestInfo > pQuestData, std::s
    if( pQuestData->reward_item_optional_count.size() > 0 )
    {
       rewards += "        this.RewardItemOptionalCount = [";
-      for( int ca = 0; ca < pQuestData->reward_item_optional_count.size(); ca++ )
+      for( size_t ca = 0; ca < pQuestData->reward_item_optional_count.size(); ca++ )
       {
          rewards += std::to_string( pQuestData->reward_item_optional_count.at( ca ) );
          if( ca != pQuestData->reward_item_optional_count.size() - 1 )
@@ -151,7 +151,7 @@ void createScript( boost::shared_ptr< Core::Data::QuestInfo > pQuestData, std::s
    std::vector< std::string > script_entities;
    std::string sentities = "        // Entities found in the script data of the quest\n";
    
-   for( int ca = 0; ca < pQuestData->script_entity.size(); ca ++ )
+   for( size_t ca = 0; ca < pQuestData->script_entity.size(); ca ++ )
    {
      if( ( pQuestData->script_entity.at( ca ).find( "HOWTO" ) != std::string::npos ) || ( pQuestData->script_entity.at( ca ).find( "HOW_TO" ) != std::string::npos ) )
         continue;
