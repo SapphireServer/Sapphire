@@ -46,7 +46,7 @@ namespace Packets {
    {
       Ping                       = 0x0065,
       Init                       = 0x0066,
-      Chat                       = 0x0067,
+      Chat                       = 0x00B9,
       ChatBanned                 = 0x006B,
       Logout                     = 0x0077,
       CFNotify                   = 0x0078,
@@ -73,15 +73,13 @@ namespace Packets {
       Effect                     = 0x00FB, // updated 4.1
       GCAffiliation              = 0x00FC,
 
-      HateList                   = 0x011A,
       PlayerSpawn                = 0x011C, // updated 4.1
       NpcSpawn                   = 0x011D, // updated 4.1
       ActorMove                  = 0x011E, // updated 4.1
-
-      UpdateClassInfo            = 0x111D,
-
       ActorSetPos                = 0x0120, // updated 4.1
       ActorCast                  = 0x0123, // updated 4.1
+      HateList                   = 0x0126, // updated 4.1
+      UpdateClassInfo            = 0x012A, // updated 4.1
       InitUI                     = 0x012B, // updated 4.1
       ActorOwner                 = 0x012D, // updated 4.1
       PlayerStats                = 0x0138, // updated 4.1
@@ -103,9 +101,6 @@ namespace Packets {
       InventoryActionAck         = 0x1139,
       UpdateInventorySlot        = 0x0153, // updated 4.1
 
-
-
-
       EventPlay                  = 0x0160, // updated 4.1
       EventStart                 = 0x0169, // updated 4.1
       EventFinish                = 0x016A, // updated 4.1
@@ -119,11 +114,11 @@ namespace Packets {
 
       QuestFinish                = 0x0180, // updated 4.1
 
-
       QuestTracker               = 0x018D, // updated 4.1
       ActorSpawn                 = 0x0190, // todo: split into playerspawn/actorspawn and use opcode 0x110/0x111
       ActorFreeSpawn             = 0x0191, // unchanged for sb
       InitZone                   = 0x019A, // unchanged for sb
+      Mount                      = 0x019F,
       WeatherChange              = 0x01AF, // updated for sb
       PlayerTitleList            = 0x01BD, // updated for 4.1
       Discovery                  = 0x01BE, // updated for 4.1

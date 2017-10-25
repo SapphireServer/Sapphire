@@ -685,7 +685,7 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint32_t actionId, u
 
    case ActionEffectType::Damage:
    {
-      effectPacket.data().effects[0].value = param1;
+      effectPacket.data().effects[0].value = static_cast< uint16_t >( param1 );
       effectPacket.data().effects[0].effectType = ActionEffectType::Damage;
       effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::NormalDamage;
       effectPacket.data().effects[0].unknown_3 = 7;

@@ -282,13 +282,16 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    }
    case GmCommand::Teri:
    {
-      if( param1 < 128 )
-         pPlayer->sendUrgent( "Zone ID out of range." );
+      auto zoneInfo = g_zoneMgr.getZone( param1 );
+      if ( !zoneInfo )
+      {
+         pPlayer->sendUrgent( "Invalid zone " + std::to_string( param1 ) );
+      }
       else
       {
          targetPlayer->setPosition( targetPlayer->getPos() );
          targetPlayer->performZoning( param1, targetPlayer->getPos(), 0 );
-         pPlayer->sendNotice( targetPlayer->getName() + " was warped to Zone " + std::to_string( param1 ) );
+         pPlayer->sendNotice( targetPlayer->getName() + " was warped to zone " + std::to_string( param1 ) + " (" + zoneInfo->getName( ) + ")" );
       }
       break;
    }

@@ -6,6 +6,7 @@
 #include <src/servers/Server_Common/Network/Hive.h>
 #include <src/servers/Server_Common/Network/Acceptor.h>
 
+#include <src/servers/Server_Common/Version.h>
 #include <src/servers/Server_Common/Logging/Logger.h>
 #include <src/servers/Server_Common/Config/XMLConfig.h>
 
@@ -58,7 +59,8 @@ namespace Core {
 
       g_log.info( "===========================================================" );
       g_log.info( "Sapphire Server Project " );
-      g_log.info( "Version: x.y.z" );
+      g_log.info( "Version: " + Version::VERSION );
+      g_log.info( "Git Hash: " + Version::GIT_HASH );
       g_log.info( "Compiled: " __DATE__ " " __TIME__ );
       g_log.info( "===========================================================" );
 
@@ -89,7 +91,7 @@ namespace Core {
          return false;
       }
       std::vector<std::string> args( argv + 1, argv + argc );
-      for( auto i = 0; i + 1 < args.size(); i += 2 )
+      for( size_t i = 0; i + 1 < args.size(); i += 2 )
       {
          std::string arg( "" );
          std::string val( "" );

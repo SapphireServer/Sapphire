@@ -25,9 +25,10 @@
 #include "src/servers/Server_Zone/Forwards.h"
 
 #include "src/servers/Server_Zone/Action/Action.h"
-#include "src/servers/Server_Zone/Action/ActionTeleport.h"
 #include "src/servers/Server_Zone/Action/ActionCast.h"
+#include "src/servers/Server_Zone/Action/ActionMount.h"
 #include "src/servers/Server_Zone/Script/ScriptManager.h"
+#include "Server_Zone/Network/PacketWrappers/MoveActorPacket.h"
 
 
 extern Core::Scripting::ScriptManager g_scriptMgr;
@@ -41,11 +42,18 @@ using namespace Core::Network::Packets::Server;
 void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inPacket,
                                                   Entity::PlayerPtr pPlayer )
 {
+    uint8_t type = inPacket.getValAt< uint32_t >( 0x21 );
 
     uint32_t action = inPacket.getValAt< uint32_t >( 0x24 );
     uint32_t useCount = inPacket.getValAt< uint32_t >( 0x28 );
 
     uint64_t targetId = inPacket.getValAt< uint64_t >( 0x30 );
+
+    pPlayer->sendDebug( "Skill type:" + std::to_string( type ) );
+
+    switch( type )
+    {
+    case Common::SkillType::Normal:
 
     if( action < 1000000 ) // normal action
     {
@@ -101,6 +109,21 @@ void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inP
     }
     else if( action > 3000000 ) // unknown
     {
+
+    }
+
+    break;
+
+    case Common::SkillType::MountSkill:
+
+    pPlayer->sendDebug( "Request mount " + std::to_string( action ) );
+
+    Action::ActionMountPtr pActionMount( new Action::ActionMount(pPlayer, action) );
+    pPlayer->setCurrentAction( pActionMount );
+    pPlayer->sendDebug("setCurrentAction()");
+    pPlayer->getCurrentAction()->onStart();
+    
+    break;
 
     }
 

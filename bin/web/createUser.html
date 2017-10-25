@@ -23,7 +23,7 @@
 							var parsed = JSON.parse(response);
 							window.external.Boot(parsed.sId, parsed.lobbyHost, parsed.frontierHost);
 						}catch(err){
-							document.getElementById("Error").innerHTML = "Create User failed.";
+							document.getElementById("Error").innerHTML = "User creation failed.";
 						}
 					}
 				}
@@ -46,25 +46,55 @@
 </head>
 
 <body scroll="no">
-    <div id="TopDiv"></div>
-    <div class="container"><img src="assets/img/sapphire_logo.png" width="40%" height="40%"></div>
-    <div class="container" id="Conttwo">
-        <div></div>
-        <h1 class="text-center">Create Account</h1>
-        <p class="text-center">Username: </p>
-        <td><input type="text" name="username" /></td>
-        <div id="Split"></div>
-        <p class="text-center">Password: </p>
-        <td><input type="password" name="password" /></td>
-        <div id="space"></div>
-		<button class="btn btn-default" input id="submitButton" onclick="doLogin()">Create User</button>
-		<p id="Error" class="text-center"></p>
-        <div id="Split">
-            <p id="CreateUser"><a href="login.html"><span style="text-decoration: underline;">Back to Login</span></a></p>
-        </div>
-    </div>
+	<div class="s-full-split s-left-half col-xs-7">
+		<div class="clearfix s-link-badge-wrapper">
+			<a href="https://discord.gg/KfrZCkx" class="s-link-badge s-link-badge-discord col-xs-5">
+				Join us on Discord!
+			</a>
+			<a href="https://github.com/SapphireMordred/Sapphire" class="s-link-badge s-link-badge-github col-xs-5 pull-left">
+				Our Github repository
+			</a>
+		</div>
+		<h2>Github stuff here soon!</h2>
+	</div>
+	<div class="s-full-split s-right-half col-xs-5">
+		<div class="s-logo">
+			<img src="assets/img/sapphire_logo_resize.png">
+		</div>
+		<div class="s-login-box col-xs-12">
+			<div class="s-login-box-form">
+		        <h1 class="text-center s-login-call">Account Creation</h1>
+		        <div class="input-control">
+		        	<label class="s-login-input-wrapper">
+		        		Username
+		        		<input type="text" name="username" autofocus>
+		        	</label>
+		        </div>
+		        <div class="input-control">
+		        	<label class="s-login-input-wrapper">
+		        		Password
+		        		<input type="password" name="password">
+		        	</label>
+		        </div>
+		        <button class="btn btn-default s-login-btn pull-right" id="CreateUser" onclick="doLogin()">Create Account</button>
+		        <p id="Error" class="s-error-text"></p>
+	        </div>
+	        <a class="btn btn-default s-acc-btn" href="login.html">Back to Login</a>
+	    </div>
+	    <div class="s-gears">
+	    	<img class="s-gears" src="assets/img/graffletopia-gears.png" alt="">
+	    </div>
+	</div>
     <script src="assets/js/jquery.min.js"></script>
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+
+    <script> // Run only after jq and bootstrap have finished loading
+
+    	// Work around non-HTML5 compliant IE autofocus
+    	$(function() {
+			$('[autofocus]:not(:focus)').eq(0).focus();
+		});
+    </script>
 </body>
 
 </html>

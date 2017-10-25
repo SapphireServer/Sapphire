@@ -5,6 +5,7 @@
 #include <time.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
+#include "Server_Common/Util/Util.h"
 
 Core::Network::Packets::GamePacket::GamePacket( uint16_t subType, uint16_t size, uint32_t id1, uint32_t id2, uint16_t type )
 {
@@ -97,16 +98,5 @@ void Core::Network::Packets::GamePacket::savePacket()
 
 std::string Core::Network::Packets::GamePacket::toString() const
 {
-
-   std::string str = "\n";
-   for( uint32_t i = 0; i < getSize(); i++ )
-   {
-      str += boost::str( boost::format( "%|02X|" ) % ( int32_t ) ( m_dataBuf[i] & 0xFF ) ) + " ";
-
-      if( ( i + 1 ) % 16 == 0 )
-         str += "\n";
-   }
-   str += "\n";
-
-   return str;
+   return Core::Util::binaryToHexDump( const_cast<uint8_t *>( &m_dataBuf[0] ), getSize() );
 }

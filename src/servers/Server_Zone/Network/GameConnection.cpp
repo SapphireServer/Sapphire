@@ -206,7 +206,7 @@ void Core::Network::GameConnection::handleZonePacket( const Packets::GamePacket&
       g_log.debug( sessionStr + " Undefined Zone IPC : Unknown ( " +
                    boost::str( boost::format( "%|04X|" ) %
                                       static_cast< uint32_t >( pPacket.getSubType() & 0xFFFF ) ) + " )" );
-      g_log.debug( pPacket.toString() );
+      g_log.debug( "\n" + pPacket.toString() );
    }
 }
 
