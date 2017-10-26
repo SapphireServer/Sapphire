@@ -1,7 +1,6 @@
 #include "PlayerMinimal.h"
 
 #include <Server_Common/Util/Util.h>
-#include <Server_Common/Database/Database.h>
 #include <Server_Common/Common.h>
 #include <Server_Common/Exd/ExdData.h>
 
@@ -12,7 +11,6 @@
 
 #include "src/libraries/sapphire/mysqlConnector/MySqlConnector.h"
 
-extern Core::Db::Database g_database;
 extern Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
 extern Core::Data::ExdData g_exdData;
 
