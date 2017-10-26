@@ -188,7 +188,7 @@ bool Core::Db::DbConnection::execute( boost::shared_ptr< Core::Db::PreparedState
    catch( std::runtime_error& e )
    {
       g_log.error( e.what() );
-      return nullptr;
+      return false;
    }
 }
 

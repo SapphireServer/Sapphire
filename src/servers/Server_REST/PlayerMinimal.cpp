@@ -360,7 +360,7 @@ namespace Core {
       g_charaDb.directExecute( stmtItemGlobal );
    }
 
-   void PlayerMinimal::createInvDbContainer( uint8_t slot ) const
+   void PlayerMinimal::createInvDbContainer( uint16_t slot ) const
    {
       auto stmtCreateInv = g_charaDb.getPreparedStatement( Db::CHARA_ITEMINV_INS );
       stmtCreateInv->setInt( 1, m_id );

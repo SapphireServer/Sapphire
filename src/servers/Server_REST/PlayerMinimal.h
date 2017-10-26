@@ -150,7 +150,7 @@ namespace Core {
          m_gmRank = rank;
       }
 
-      void createInvDbContainer( uint8_t slot ) const;
+      void createInvDbContainer( uint16_t slot ) const;
 
       uint32_t m_modelEquip[10];
 
