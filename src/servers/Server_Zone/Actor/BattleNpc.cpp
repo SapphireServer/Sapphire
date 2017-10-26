@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <cmath>
 
-#include <src/servers/Server_Common/Database/Database.h>
 #include <src/servers/Server_Common/Logging/Logger.h>
 #include <src/servers/Server_Common/Exd/ExdData.h>
 #include <src/servers/Server_Common/Util/Util.h>
@@ -23,7 +22,6 @@ using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
 extern Core::Logger g_log;
-extern Core::Db::Database g_database;
 extern Core::Data::ExdData g_exdData;
 
 uint32_t Core::Entity::BattleNpc::m_nextID = 1149241694;
