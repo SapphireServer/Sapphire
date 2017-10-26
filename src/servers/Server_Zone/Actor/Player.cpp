@@ -1,5 +1,4 @@
 #include <src/servers/Server_Common/Common.h>
-#include <src/servers/Server_Common/Database/Database.h>
 #include <src/servers/Server_Common/Util/Util.h>
 #include <src/servers/Server_Common/Util/UtilMath.h>
 #include <src/servers/Server_Common/Config/XMLConfig.h>
@@ -12,12 +11,10 @@
 #include "Player.h"
 #include "BattleNpc.h"
 
-
 #include "src/servers/Server_Zone/Zone/ZoneMgr.h"
 #include "src/servers/Server_Zone/Zone/Zone.h"
 
 #include "src/servers/Server_Zone/ServerZone.h"
-
 
 #include "src/servers/Server_Zone/Network/GameConnection.h"
 
@@ -48,7 +45,6 @@
 #include <boost/make_shared.hpp>
 
 extern Core::Logger g_log;
-extern Core::Db::Database g_database;
 extern Core::ServerZone g_serverZone;
 extern Core::ZoneMgr g_zoneMgr;
 extern Core::Data::ExdData g_exdData;
