@@ -8,7 +8,6 @@
 
 #include <src/servers/Server_Common/Logging/Logger.h>
 #include <src/servers/Server_Common/Config/XMLConfig.h>
-#include <src/servers/Server_Common/Database/Database.h>
 
 #include <src/servers/Server_Common/Network/Connection.h>
 #include <src/servers/Server_Common/Network/Hive.h>
@@ -36,7 +35,6 @@
 
 
 Core::Logger g_log;
-Core::Db::Database g_database;
 Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
 Core::Data::ExdData g_exdData;
 Core::Network::SapphireAPI g_sapphireAPI;
@@ -44,29 +42,31 @@ Core::Network::SapphireAPI g_sapphireAPI;
 using namespace std;
 using namespace boost::property_tree;
 
-typedef SimpleWeb::Server<SimpleWeb::HTTP> HttpServer;
-typedef SimpleWeb::Client<SimpleWeb::HTTP> HttpClient;
+typedef SimpleWeb::Server< SimpleWeb::HTTP > HttpServer;
+typedef SimpleWeb::Client< SimpleWeb::HTTP > HttpClient;
 
 //Added for the default_resource example
-void default_resource_send( const HttpServer &server, const shared_ptr<HttpServer::Response> &response,
-                            const shared_ptr<ifstream> &ifs );
+void default_resource_send( const HttpServer &server, const shared_ptr< HttpServer::Response > &response,
+                            const shared_ptr< ifstream > &ifs );
 
 
-auto m_pConfig = boost::make_shared<Core::XMLConfig>();
+auto m_pConfig = boost::make_shared< Core::XMLConfig >();
 HttpServer server;
-std::string configPath("config/settings_rest.xml");
+std::string configPath( "config/settings_rest.xml" );
 
 void reloadConfig()
 {
-   m_pConfig = boost::make_shared<Core::XMLConfig>();
+   m_pConfig = boost::make_shared< Core::XMLConfig >();
 
-   if (!m_pConfig->loadConfig(configPath))
+   if( !m_pConfig->loadConfig( configPath ) )
       throw "Error loading config ";
 }
 
-void print_request_info( shared_ptr<HttpServer::Request> request ) {
+void print_request_info( shared_ptr< HttpServer::Request > request ) 
+{
    g_log.info( "Request from " + request->remote_endpoint_address + " (" + request->path + ")" );
 }
+
 bool loadSettings( int32_t argc, char* argv[] )
 {
    g_log.info( "Loading config " + configPath );
@@ -162,29 +162,14 @@ bool loadSettings( int32_t argc, char* argv[] )
    if( !loader.initDbs() )
       return false;
 
-   Core::Db::DatabaseParams params;
-   params.bufferSize = 16384;
-   params.connectionCount = 3;
-   params.databaseName = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Database", "sapphire" );
-   params.hostname = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Host", "127.0.0.1" );
-   params.password = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Pass", "" );
-   params.port = m_pConfig->getValue< uint16_t >( "Settings.General.Mysql.Port", 3306 );
-   params.username = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Username", "root" );
+   server.config.port = static_cast< uint16_t >( std::stoul( m_pConfig->getValue< std::string >( "Settings.General.HttpPort", "80" ) ) );
 
-   server.config.port = static_cast< unsigned short >( std::stoul( m_pConfig->getValue<std::string>( "Settings.General.HttpPort", "80" ) ) );
-
-   if( !g_database.initialize( params ) )
-   {
-      std::this_thread::sleep_for( std::chrono::milliseconds( 5000 ) );
-      return false;
-   }
-
-   g_log.info("Database: Connected to " + params.hostname + ":" + std::to_string(params.port));
+   g_log.info( "Database: Connected to " + info.host + ":" + std::to_string( info.port ) );
 
    return true;
 }
 
-int main(int argc, char* argv[])
+int main( int argc, char* argv[] )
 {
    g_log.setLogPath( "log\\SapphireAPI" );
    g_log.init();

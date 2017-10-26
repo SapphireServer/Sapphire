@@ -2,7 +2,6 @@
 #include <src/servers/Server_Common/Crypt/base64.h>
 #include "Session.h"
 #include "PlayerMinimal.h"
-#include <src/servers/Server_Common/Database/Database.h>
 #include <time.h>
 
 #define BOOST_SPIRIT_THREADSAFE
@@ -11,9 +10,15 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
 #include <boost/shared_ptr.hpp>
+#include <Server_Common/Database/DbLoader.h>
+#include <Server_Common/Database/CharaDbConnection.h>
+#include <Server_Common/Database/DbWorkerPool.h>
+#include <Server_Common/Database/PreparedStatement.h>
+
+#include "src/libraries/sapphire/mysqlConnector/MySqlConnector.h"
 #include <boost/make_shared.hpp>
 
-extern Core::Db::Database g_database;
+extern Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
 
 Core::Network::SapphireAPI::SapphireAPI()
 {
@@ -30,13 +35,13 @@ bool Core::Network::SapphireAPI::login( const std::string& username, const std::
    std::string query = "SELECT account_id FROM accounts WHERE account_name = '" + username + "' AND account_pass = '" + pass + "';";
    
    // check if a user with that name / password exists
-   auto pQR = g_database.query( query );
+   auto pQR = g_charaDb.query( query );
    // found?
-   if( !pQR )
+   if( !pQR->next() )
       return false;
 
    // user found, proceed
-   int32_t accountId = pQR->fetch()[0].get< uint32_t >();
+   uint32_t accountId = pQR->getUInt( 1 );
 
    // session id string generation
    srand( ( uint32_t )time( NULL ) + 42 );
@@ -87,23 +92,24 @@ bool Core::Network::SapphireAPI::insertSession( const uint32_t& accountId, std::
 bool Core::Network::SapphireAPI::createAccount( const std::string& username, const std::string& pass, std::string& sId )
 {
    // get account from login name
-   auto pQR = g_database.query( "SELECT account_id FROM accounts WHERE account_name = '" + username + "';" );
-
-   // if account was found
-   if( pQR )
+   auto pQR = g_charaDb.query( "SELECT account_id FROM accounts WHERE account_name = '" + username + "';" );
+   // found?
+   if( !pQR->next() )
       return false;
 
    // we are clear and can create a new account
    // get the next free account id
-   pQR = g_database.query( "SELECT MAX(account_id) FROM accounts;" );
-   int32_t accountId = pQR->fetch()[0].get< uint32_t >() + 1;
+   pQR = g_charaDb.query( "SELECT MAX(account_id) FROM accounts;" );
+   if( !pQR->next() )
+      return false;
+   uint32_t accountId = pQR->getUInt( 1 ) + 1;
 
    // store the account to the db
-   g_database.execute( "INSERT INTO accounts (account_Id, account_name, account_pass, account_created) VALUE( " +
-                        std::to_string( accountId ) + ", '" +
-                        username + "', '" +
-                        pass + "', " + 
-                        std::to_string( time( nullptr ) ) + ");");
+   g_charaDb.execute( "INSERT INTO accounts (account_Id, account_name, account_pass, account_created) VALUE( " +
+                      std::to_string( accountId ) + ", '" +
+                      username + "', '" +
+                      pass + "', " + 
+                      std::to_string( time( nullptr ) ) + ");");
 
    
    if( !login( username, pass, sId ) )
@@ -138,8 +144,8 @@ int Core::Network::SapphireAPI::createCharacter( const int& accountId, const std
       lookPart = lookPart.substr( 0, pos + 1 );
    }
 
-   std::vector<int32_t> tmpVector;
-   std::vector<int32_t> tmpVector2;
+   std::vector< int32_t > tmpVector;
+   std::vector< int32_t > tmpVector2;
 
    BOOST_FOREACH( boost::property_tree::ptree::value_type &v, pt.get_child( "content" ) )
    {
@@ -153,7 +159,7 @@ int Core::Network::SapphireAPI::createCharacter( const int& accountId, const std
       if( !v.second.data().empty() )
          tmpVector2.push_back( std::stoi( v.second.data() ) );
    }
-   std::vector<int32_t>::iterator it = tmpVector.begin();
+   std::vector< int32_t >::iterator it = tmpVector.begin();
    for( int32_t i = 0; it != tmpVector.end(); ++it, i++ )
    {
       newPlayer.setLook( i, *it );
@@ -190,56 +196,48 @@ void Core::Network::SapphireAPI::deleteCharacter( std::string name, uint32_t acc
 
    int32_t id = deletePlayer.getId();
 
-   g_database.execute( "DELETE FROM charainfo WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
-   g_database.execute( "DELETE FROM characlass WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
-   g_database.execute( "DELETE FROM charaglobalitem WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
-   g_database.execute( "DELETE FROM charainfoblacklist WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
-   g_database.execute( "DELETE FROM charainfofriendlist WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
-   g_database.execute( "DELETE FROM charainfolinkshell WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
-   g_database.execute( "DELETE FROM charainfosearch WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
-   g_database.execute( "DELETE FROM charaitemcrystal WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
-   g_database.execute( "DELETE FROM charaiteminventory WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
-   g_database.execute( "DELETE FROM charaitemgearset WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
-   g_database.execute( "DELETE FROM charaquest WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
+   g_charaDb.execute( "DELETE FROM charainfo WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
+   g_charaDb.execute( "DELETE FROM characlass WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
+   g_charaDb.execute( "DELETE FROM charaglobalitem WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
+   g_charaDb.execute( "DELETE FROM charainfoblacklist WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
+   g_charaDb.execute( "DELETE FROM charainfofriendlist WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
+   g_charaDb.execute( "DELETE FROM charainfolinkshell WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
+   g_charaDb.execute( "DELETE FROM charainfosearch WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
+   g_charaDb.execute( "DELETE FROM charaitemcrystal WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
+   g_charaDb.execute( "DELETE FROM charaiteminventory WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
+   g_charaDb.execute( "DELETE FROM charaitemgearset WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
+   g_charaDb.execute( "DELETE FROM charaquest WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
 }
 
-std::vector<Core::PlayerMinimal> Core::Network::SapphireAPI::getCharList( uint32_t accountId )
+std::vector< Core::PlayerMinimal > Core::Network::SapphireAPI::getCharList( uint32_t accountId )
 {
 
-   std::vector<Core::PlayerMinimal> charList;
+   std::vector< Core::PlayerMinimal > charList;
 
-   boost::shared_ptr<Core::Db::QueryResult> pQR = g_database.query( "SELECT CharacterId, ContentId FROM charainfo WHERE AccountId = " + std::to_string( accountId ) + ";" );
+   auto pQR = g_charaDb.query( "SELECT CharacterId, ContentId FROM charainfo WHERE AccountId = " + std::to_string( accountId ) + ";" );
 
-   if( !pQR )
-   {
-      // no chars found for the account
-      return charList;
-   }
-
-   do
+   while( pQR->next() )  
    {
       Core::PlayerMinimal player;
 
-      Core::Db::Field *field = pQR->fetch();
-
-      uint32_t charId = field[0].get< uint32_t >();
+      uint32_t charId = pQR->getUInt( 1 );
 
       player.load( charId );
 
       charList.push_back( player );
-
-   } while( pQR->nextRow() );
-
+   } 
    return charList;
 }
 
 bool Core::Network::SapphireAPI::checkNameTaken( std::string name )
 {
-   std::string query = "SELECT * FROM charainfo WHERE Name = '" + g_database.escapeString( name ) + "';";
+  
+   g_charaDb.escapeString( name ); 
+   std::string query = "SELECT * FROM charainfo WHERE Name = '" + name + "';";
 
-   auto pQR = g_database.query( query );
+   auto pQR = g_charaDb.query( query );
 
-   if( !pQR )
+   if( !pQR->next() )
       return false;
    else
       return true;
@@ -247,20 +245,16 @@ bool Core::Network::SapphireAPI::checkNameTaken( std::string name )
 
 uint32_t Core::Network::SapphireAPI::getNextCharId()
 {
-   int32_t charId = 0;
+   uint32_t charId = 0;
 
-   boost::shared_ptr<Core::Db::QueryResult> pQR = g_database.query( "SELECT MAX(CharacterId) FROM charainfo" );
+   auto pQR = g_charaDb.query( "SELECT MAX(CharacterId) FROM charainfo" );
 
-   if( !pQR )
-   {
+   if( !pQR->next() )
       return 0x00200001;
-   }
 
-   charId = pQR->fetch()[0].get< uint32_t >() + 1;
+   charId = pQR->getUInt( 1 ) + 1;
    if( charId < 0x00200001 )
-   {
       return 0x00200001;
-   }
 
    return charId;
 }
@@ -269,19 +263,14 @@ uint64_t Core::Network::SapphireAPI::getNextContentId()
 {
    uint64_t contentId = 0;
 
-   boost::shared_ptr<Core::Db::QueryResult> pQR = g_database.query( "SELECT MAX(ContentId) FROM charainfo" );
+   auto pQR = g_charaDb.query( "SELECT MAX(ContentId) FROM charainfo" );
 
-   if( !pQR )
-   {
+   if( !pQR->next() )
       return 0x0040000001000001;
-   }
 
-   contentId = pQR->fetch()[0].getUInt64() + 1;
+   contentId = pQR->getUInt64( 1 ) + 1;
    if( contentId < 0x0040000001000001 )
-   {
       return 0x0040000001000001;
-   }
-
 
    return contentId;
 }
