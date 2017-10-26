@@ -2,7 +2,6 @@
 
 #include <src/servers/Server_Common/Common.h>
 #include <src/servers/Server_Common/Version.h>
-#include <src/servers/Server_Common/Database/Database.h>
 #include <src/servers/Server_Common/Network/GamePacketNew.h>
 #include <src/servers/Server_Common/Network/CommonNetwork.h>
 #include <src/servers/Server_Common/Util/UtilMath.h>
@@ -31,7 +30,13 @@
 #include "src/servers/Server_Zone/Session.h"
 #include <boost/make_shared.hpp>
 
-extern Core::Db::Database g_database;
+#include "src/libraries/sapphire/mysqlConnector/MySqlConnector.h"
+#include <Server_Common/Database/DbLoader.h>
+#include <Server_Common/Database/CharaDbConnection.h>
+#include <Server_Common/Database/DbWorkerPool.h>
+#include <Server_Common/Database/PreparedStatement.h>
+
+extern Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
 extern Core::Scripting::ScriptManager g_scriptMgr;
 extern Core::Data::ExdData g_exdData;
 extern Core::Logger g_log;
@@ -222,8 +227,8 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
          "', '" + std::to_string( map_id ) +
          "', '" + std::to_string( discover_id ) + "')";
 
-      g_database.execute( query1 );
-      g_database.execute( query2 );
+      g_charaDb.execute( query1 );
+      g_charaDb.execute( query2 );
 
    }
 
