@@ -12,10 +12,7 @@
 
 #include <time.h>
 
-#include <Server_Common/Database/DbLoader.h>
-#include <Server_Common/Database/CharaDbConnection.h>
-#include <Server_Common/Database/DbWorkerPool.h>
-#include <Server_Common/Database/PreparedStatement.h>
+
 #include <servers/Server_Common/Common.h>
 
 #include "Player.h"
@@ -32,14 +29,18 @@
 #include "src/servers/Server_Zone/StatusEffect/StatusEffectContainer.h"
 #include "src/servers/Server_Zone/Inventory/Inventory.h"
 
+#include <Server_Common/Database/DbLoader.h>
+#include <Server_Common/Database/CharaDbConnection.h>
+#include <Server_Common/Database/DbWorkerPool.h>
+#include <Server_Common/Database/PreparedStatement.h>
 #include "src/libraries/sapphire/mysqlConnector/MySqlConnector.h"
 
-
+extern Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
 extern Core::Logger g_log;
 extern Core::ServerZone g_serverZone;
 extern Core::ZoneMgr g_zoneMgr;
 extern Core::Data::ExdData g_exdData;
-extern Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
+
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;

@@ -31,8 +31,14 @@
 
 #include <time.h>
 
+#include <Server_Common/Database/DbLoader.h>
+#include <Server_Common/Database/CharaDbConnection.h>
+#include <Server_Common/Database/DbWorkerPool.h>
+#include <Server_Common/Database/PreparedStatement.h>
+#include "src/libraries/sapphire/mysqlConnector/MySqlConnector.h"
+
+extern Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
 extern Core::Logger g_log;
-extern Core::Db::Database g_database;
 extern Core::ServerZone g_serverZone;
 extern Core::Data::ExdData g_exdData;
 extern Core::Scripting::ScriptManager g_scriptMgr;
@@ -132,55 +138,50 @@ CellCache* Zone::getCellCacheAndCreate( uint32_t cellx, uint32_t celly )
 
 void Zone::loadCellCache()
 {
-   auto pQR = g_database.query( "SELECT Id,"
-                                "Zoneid,"
-                                "NameId,"
-                                "SizeId,"
-                                "ClassJob,"
-                                "DisplayFlags1,"
-                                "DisplayFlags2,"
-                                "Level,"
-                                "Pos_0_0,"
-                                "Pos_0_1,"
-                                "Pos_0_2,"
-                                "Rotation,"
-                                "MobType,"
-                                "Behaviour,"
-                                "ModelMainWeapon,"
-                                "ModelSubWeapon,"
-                                "ModelId,"
-                                "Look,"
-                                "Models,"
-                                "type "
-                                "FROM battlenpc WHERE ZoneId = " + std::to_string( getId() ) + ";" );
-
-   if( !pQR )
-      return;
+   auto pQR = g_charaDb.query( "SELECT Id,"
+                               "Zoneid,"
+                               "NameId,"
+                               "SizeId,"
+                               "ClassJob,"
+                               "DisplayFlags1,"
+                               "DisplayFlags2,"
+                               "Level,"
+                               "Pos_0_0,"
+                               "Pos_0_1,"
+                               "Pos_0_2,"
+                               "Rotation,"
+                               "MobType,"
+                               "Behaviour,"
+                               "ModelMainWeapon,"
+                               "ModelSubWeapon,"
+                               "ModelId,"
+                               "Look,"
+                               "Models,"
+                               "type "
+                               "FROM battlenpc WHERE ZoneId = " + std::to_string( getId() ) + ";" );
 
    std::vector< Entity::BattleNpcPtr > cache;
 
-   do
+   while( pQR->next() )
    {
-      Db::Field *field = pQR->fetch();
-      uint32_t id = field[0].get< uint32_t >();
-      uint32_t targetZoneId = field[1].get< uint32_t >();
-      uint32_t nameId = field[2].get< uint32_t >();
-      uint32_t sizeId = field[3].get< uint32_t >();
-      uint32_t classJob = field[4].get< uint32_t >();
-      uint32_t displayFlags1 = field[5].get< uint32_t >();
-      uint32_t displayFlags2 = field[6].get< uint32_t >();
-      uint32_t level = field[7].get< uint32_t >();
-      float posX = field[8].getFloat();
-      float posY = field[9].getFloat();
-      float posZ = field[10].getFloat();
-      uint32_t rotation = field[11].get< uint32_t >();
-      uint32_t mobType = field[12].get< uint32_t >();
-      uint32_t behaviour = field[13].get< uint32_t >();
-      uint64_t modelMainWeapon = field[14].get< uint32_t >();
-      uint64_t modelSubWeapon = field[15].get< uint32_t >();
-      uint32_t modelId = field[16].get< uint32_t >();
-      uint32_t type = field[17].get< uint32_t >();
-
+      uint32_t id = pQR->getUInt( 1 );
+      uint32_t targetZoneId = pQR->getUInt( 2 );
+      uint32_t nameId = pQR->getUInt( 3 );
+      uint32_t sizeId = pQR->getUInt( 4 );
+      uint32_t classJob = pQR->getUInt( 5 );
+      uint32_t displayFlags1 = pQR->getUInt( 6 );
+      uint32_t displayFlags2 = pQR->getUInt( 7 );
+      uint32_t level = pQR->getUInt( 8 );
+      float posX = pQR->getFloat( 9 );
+      float posY = pQR->getFloat( 10 );
+      float posZ = pQR->getFloat( 11 );
+      uint32_t rotation = pQR->getUInt( 12 );
+      uint32_t mobType = pQR->getUInt( 13 );
+      uint32_t behaviour = pQR->getUInt( 14 );
+      uint64_t modelMainWeapon = pQR->getUInt( 15 );
+      uint64_t modelSubWeapon = pQR->getUInt( 16 );
+      uint32_t modelId = pQR->getUInt( 17 );
+      uint32_t type = pQR->getUInt( 18 );
 
       Common::FFXIVARR_POSITION3 pos;
       pos.x = posX;
@@ -196,7 +197,7 @@ void Zone::loadCellCache()
 
       //m_zonePositionMap[id] = ZonePositionPtr( new ZonePosition( id, targetZoneId, Position( posX, posY, posZ, posO ), radius ) );
 
-   } while( pQR->nextRow() );
+   }
 
 
 

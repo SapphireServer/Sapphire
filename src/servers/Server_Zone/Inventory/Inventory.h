@@ -187,6 +187,9 @@ public:
 
    ContainerType getContainerType( uint32_t containerId );
 
+   uint32_t getNextUId();
+
+
 private:
    Entity::PlayerPtr m_pOwner;
    InventoryMap m_inventoryMap;
