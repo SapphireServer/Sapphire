@@ -1,6 +1,5 @@
 #include <src/servers/Server_Common/Common.h>
 #include <src/servers/Server_Common/Network/CommonNetwork.h>
-#include <src/servers/Server_Common/Database/Database.h>
 #include <src/servers/Server_Common/Network/GamePacketNew.h>
 #include <src/servers/Server_Common/Logging/Logger.h>
 #include <src/servers/Server_Common/Exd/ExdData.h>
@@ -38,8 +37,14 @@
 #include "src/servers/Server_Zone/Action/Action.h"
 #include "src/servers/Server_Zone/Action/ActionTeleport.h"
 
+#include <Server_Common/Database/DbLoader.h>
+#include <Server_Common/Database/CharaDbConnection.h>
+#include <Server_Common/Database/DbWorkerPool.h>
+#include <Server_Common/Database/PreparedStatement.h>
+#include "src/libraries/sapphire/mysqlConnector/MySqlConnector.h"
+
+extern Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
 extern Core::Logger g_log;
-extern Core::Db::Database g_database;
 extern Core::ServerZone g_serverZone;
 extern Core::ZoneMgr g_zoneMgr;
 extern Core::Data::ExdData g_exdData;
@@ -337,26 +342,24 @@ void Core::Network::GameConnection::discoveryHandler( const Packets::GamePacket&
 {
    uint32_t ref_position_id = inPacket.getValAt< uint32_t >( 0x20 );
 
-   auto pQR = g_database.query( "SELECT id, map_id, discover_id "
-                                "FROM discoveryinfo "
-                                "WHERE id = " + std::to_string( ref_position_id ) + ";" );
+   auto pQR = g_charaDb.query( "SELECT id, map_id, discover_id "
+                               "FROM discoveryinfo "
+                               "WHERE id = " + std::to_string( ref_position_id ) + ";" );
 
-   if( !pQR )
+   if( !pQR->next() )
    {
       pPlayer->sendNotice( "Discovery ref pos ID: " + std::to_string( ref_position_id ) + " not found. " );
       return;
    }
 
-   Db::Field *field = pQR->fetch();
-
    GamePacketNew< FFXIVIpcDiscovery, ServerZoneIpcType > discoveryPacket( pPlayer->getId() );
-   discoveryPacket.data().map_id = field[1].get< int16_t >();
-   discoveryPacket.data().map_part_id = field[2].get< int16_t >();
+   discoveryPacket.data().map_id = pQR->getUInt( 2 );
+   discoveryPacket.data().map_part_id = pQR->getUInt( 3 );
 
    pPlayer->queuePacket( discoveryPacket );
    pPlayer->sendNotice( "Discovery ref pos ID: " + std::to_string( ref_position_id ) );
 
-   pPlayer->discover( field[1].get< int16_t >(), field[2].get< int16_t >() );
+   pPlayer->discover( pQR->getUInt16( 2 ), pQR->getUInt16( 3 ) );
 
 }
 

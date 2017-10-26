@@ -3,14 +3,19 @@
 
 #include <src/servers/Server_Common/Common.h>
 #include <src/servers/Server_Common/Logging/Logger.h>
-#include <src/servers/Server_Common/Database/Database.h>
 
 #include "src/servers/Server_Zone/Actor/Player.h"
 
 #include "Item.h"
 
+#include <Server_Common/Database/DbLoader.h>
+#include <Server_Common/Database/CharaDbConnection.h>
+#include <Server_Common/Database/DbWorkerPool.h>
+#include <Server_Common/Database/PreparedStatement.h>
+#include "src/libraries/sapphire/mysqlConnector/MySqlConnector.h"
+
+extern Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
 extern Core::Logger g_log;
-extern Core::Db::Database g_database;
 
 Core::ItemContainer::ItemContainer( uint16_t locationId ) : 
    m_id( locationId ),
@@ -40,10 +45,7 @@ void Core::ItemContainer::removeItem( uint8_t slotId )
 
    if( it != m_itemMap.end() )
    {
-
-
-      g_database.execute( "DELETE FROM charaglobalitem WHERE itemId = " + 
-                          std::to_string( it->second->getUId() ) );
+      g_charaDb.execute( "DELETE FROM charaglobalitem WHERE itemId = " + std::to_string( it->second->getUId() ) );
 
       m_itemMap.erase( it );
 

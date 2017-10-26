@@ -1,5 +1,4 @@
 #include <src/servers/Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
-#include <src/servers/Server_Common/Database/Database.h>
 #include <src/servers/Server_Common/Common.h>
 #include <src/servers/Server_Common/Exd/ExdData.h>
 #include <src/servers/Server_Common/Logging/Logger.h>
@@ -18,8 +17,14 @@
 #include "src/servers/Server_Zone/Forwards.h"
 #include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket143.h"
 
+#include <Server_Common/Database/DbLoader.h>
+#include <Server_Common/Database/CharaDbConnection.h>
+#include <Server_Common/Database/DbWorkerPool.h>
+#include <Server_Common/Database/PreparedStatement.h>
+#include "src/libraries/sapphire/mysqlConnector/MySqlConnector.h"
+
+extern Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
 extern Core::Logger g_log;
-extern Core::Db::Database g_database;
 extern Core::Data::ExdData g_exdData;
 
 using namespace Core::Common;
@@ -139,9 +144,7 @@ Core::ItemPtr Core::Inventory::createItem( uint32_t catalogId, uint8_t quantity 
    uint8_t itemAmount = quantity;
 
    if( itemInfo->stack_size == 1 )
-   {
       itemAmount = 1;
-   }
 
    if( !itemInfo )
       return nullptr;
@@ -153,16 +156,16 @@ Core::ItemPtr Core::Inventory::createItem( uint32_t catalogId, uint8_t quantity 
    ItemPtr pItem( new Item( catalogId ) );
 
    pItem->setStackSize( itemAmount );
-   pItem->setUId( g_database.getNextUId() );
+   pItem->setUId( getNextUId() );
    pItem->setModelIds( itemInfo->model_primary, itemInfo->model_secondary );
    pItem->setCategory( static_cast< ItemCategory >( itemInfo->ui_category ) );
 
-   g_database.query( " INSERT INTO charaglobalitem ( CharacterId, itemId, catalogId, stack, flags ) VALUES ( " +
-                     std::to_string( m_pOwner->getId() ) + ", " +
-                     std::to_string( pItem->getUId() ) + ", " +
-                     std::to_string( pItem->getId() ) + ", " + 
-                     std::to_string( itemAmount ) + ", " +
-                     std::to_string( flags ) + ");" );
+   g_charaDb.execute( "INSERT INTO charaglobalitem ( CharacterId, itemId, catalogId, stack, flags ) VALUES ( " +
+                      std::to_string( m_pOwner->getId() ) + ", " +
+                      std::to_string( pItem->getUId() ) + ", " +
+                      std::to_string( pItem->getId() ) + ", " +
+                      std::to_string( itemAmount ) + ", " +
+                      std::to_string( flags ) + ");" );
 
    return pItem;
 
@@ -260,7 +263,7 @@ void Core::Inventory::updateCurrencyDb()
 
    query += " WHERE CharacterId = " + std::to_string( m_pOwner->getId() );
 
-   auto curRes = g_database.query( query );
+   g_charaDb.execute( query );
 }
 
 
@@ -287,7 +290,7 @@ void Core::Inventory::updateCrystalDb()
 
    query += " WHERE CharacterId = " + std::to_string( m_pOwner->getId() );
 
-   auto curRes = g_database.query( query );
+   g_charaDb.execute( query );
 }
 
 void Core::Inventory::updateBagDb( InventoryType type )
@@ -307,7 +310,7 @@ void Core::Inventory::updateBagDb( InventoryType type )
    query += " WHERE CharacterId = " + std::to_string( m_pOwner->getId() ) +
       " AND storageId = " + std::to_string( static_cast< uint16_t >( type ) );
 
-   auto curRes = g_database.query( query );
+   g_charaDb.execute( query );
 }
 
 bool Core::Inventory::isArmory( uint16_t containerId )
@@ -391,13 +394,13 @@ void Core::Inventory::updateMannequinDb( InventoryType type )
       " AND storageId = " + std::to_string( static_cast< uint16_t >( type ) );
 
    g_log.Log( LoggingSeverity::debug, query );
-   auto curRes = g_database.query( query );
+   g_charaDb.execute( query );
 }
 
 
 void Core::Inventory::updateItemDb( Core::ItemPtr pItem ) const
 {
-   g_database.query( "UPDATE charaglobalitem SET stack = " + std::to_string( pItem->getStackSize() ) + " " +
+   g_charaDb.execute( "UPDATE charaglobalitem SET stack = " + std::to_string( pItem->getStackSize() ) + " " +
                      // TODO: add other attributes
                      " WHERE itemId = " + std::to_string( pItem->getUId() ) );
 }
@@ -482,9 +485,9 @@ int16_t Core::Inventory::addItem( uint16_t inventoryId, int8_t slotId, uint32_t 
 
       m_inventoryMap[inventoryId]->setItem( rSlotId, item );
 
-      g_database.query( "UPDATE charaiteminventory SET container_" + std::to_string( rSlotId ) + " = " + std::to_string( item->getUId() ) +
-                        " WHERE storageId = " + std::to_string( inventoryId ) +
-                        " AND CharacterId = " + std::to_string( m_pOwner->getId() ) );
+      g_charaDb.execute( "UPDATE charaiteminventory SET container_" + std::to_string( rSlotId ) + " = " + std::to_string( item->getUId() ) +
+                         " WHERE storageId = " + std::to_string( inventoryId ) +
+                         " AND CharacterId = " + std::to_string( m_pOwner->getId() ) );
 
       GamePacketNew< FFXIVIpcUpdateInventorySlot, ServerZoneIpcType > invUpPacket( m_pOwner->getId() );
       invUpPacket.data().containerId = inventoryId;
@@ -626,22 +629,21 @@ void Core::Inventory::discardItem( uint16_t fromInventoryId, uint8_t fromSlotId 
 Core::ItemPtr Core::Inventory::loadItem( uint64_t uId )
 {
    // load actual item 
-   auto itemRes = g_database.query( "SELECT catalogId, stack, flags FROM charaglobalitem WHERE itemId = " + std::to_string( uId ) + ";" );
-   if( !itemRes )
+   auto itemRes = g_charaDb.query( "SELECT catalogId, stack, flags FROM charaglobalitem WHERE itemId = " + std::to_string( uId ) + ";" );
+   if( !itemRes->next() )
       return nullptr;
 
    try
    {
-      Db::Field *itemField = itemRes->fetch();
-      auto itemInfo = g_exdData.getItemInfo( itemField[0].get< uint32_t >() );
-      bool isHq = itemField[2].get< uint8_t >() == 1 ? true : false;
+      auto itemInfo = g_exdData.getItemInfo( itemRes->getUInt( 1 ) );
+      bool isHq = itemRes->getUInt( 3 ) == 1 ? true : false;
       ItemPtr pItem( new Item( uId, 
                                itemInfo->id, 
                                itemInfo->model_primary,
                                itemInfo->model_secondary, 
                                static_cast< ItemCategory >( itemInfo->ui_category ),
                                isHq ) );
-      pItem->setStackSize( itemField[1].get< uint32_t >() );
+      pItem->setStackSize( itemRes->getUInt( 2 ) );
 
       return pItem;
    }
@@ -655,25 +657,21 @@ bool Core::Inventory::load()
 {
    //////////////////////////////////////////////////////////////////////////////////////////////////////
    // load active gearset
-   auto res = g_database.query( "SELECT storageId, container_0, container_1, container_2, container_3, "
-                                "container_4, container_5, container_6, container_7, "
-                                "container_8, container_9, container_10, container_11, "
-                                "container_12, container_13 "
-                                "FROM charaitemgearset " \
-                                "WHERE CharacterId =  " + std::to_string( m_pOwner->getId() ) + " " \
-                                "ORDER BY storageId ASC;" );
-   if( !res )
-      return false;
+   auto res = g_charaDb.query( "SELECT storageId, container_0, container_1, container_2, container_3, "
+                               "container_4, container_5, container_6, container_7, "
+                               "container_8, container_9, container_10, container_11, "
+                               "container_12, container_13 "
+                               "FROM charaitemgearset " \
+                               "WHERE CharacterId =  " + std::to_string( m_pOwner->getId() ) + " " \
+                               "ORDER BY storageId ASC;" );
 
-   Db::Field *field = res->fetch();
-
-   do
+   while( res->next() )
    {
-      uint16_t storageId = field[0].get< uint16_t >();
+      uint16_t storageId = res->getUInt16( 1 );
 
-      for( int32_t i = 1; i <= 14; i++ )
+      for( uint32_t i = 1; i <= 14; i++ )
       {
-         uint64_t uItemId = field[i].getUInt64();
+         uint64_t uItemId = res->getUInt64( i + 1 );
          if( uItemId == 0 )
             continue;
 
@@ -685,32 +683,28 @@ bool Core::Inventory::load()
          m_inventoryMap[storageId]->getItemMap()[i - 1] = pItem;
          m_pOwner->equipItem( static_cast< EquipSlot >( i - 1 ), pItem, false );
       }
-   } while( res->nextRow() );
+   }
 
    ///////////////////////////////////////////////////////////////////////////////////////////////////////
    // Load Bags
-   auto bagRes = g_database.query( "SELECT storageId, "
-                                   "container_0, container_1, container_2, container_3, container_4, "
-                                   "container_5, container_6, container_7, container_8, container_9, "
-                                   "container_10, container_11, container_12, container_13, container_14, "
-                                   "container_15, container_16, container_17, container_18, container_19, "
-                                   "container_20, container_21, container_22, container_23, container_24, "
-                                   "container_25, container_26, container_27, container_28, container_29, "
-                                   "container_30, container_31, container_32, container_33, container_34 "
-                                   "FROM charaiteminventory " \
-                                   "WHERE CharacterId =  " + std::to_string( m_pOwner->getId() ) + " " \
-                                   "ORDER BY storageId ASC;" );
-   if( !bagRes )
-      return false;
+   auto bagRes = g_charaDb.query( "SELECT storageId, "
+                                  "container_0, container_1, container_2, container_3, container_4, "
+                                  "container_5, container_6, container_7, container_8, container_9, "
+                                  "container_10, container_11, container_12, container_13, container_14, "
+                                  "container_15, container_16, container_17, container_18, container_19, "
+                                  "container_20, container_21, container_22, container_23, container_24, "
+                                  "container_25, container_26, container_27, container_28, container_29, "
+                                  "container_30, container_31, container_32, container_33, container_34 "
+                                  "FROM charaiteminventory " \
+                                  "WHERE CharacterId =  " + std::to_string( m_pOwner->getId() ) + " " \
+                                  "ORDER BY storageId ASC;" );
 
-   Db::Field *bagField = bagRes->fetch();
-
-   do
+   while( bagRes->next() )
    {
-      uint16_t storageId = bagField[0].get< uint16_t >();
-      for( int32_t i = 1; i <= 25; i++ )
+      uint16_t storageId = bagRes->getUInt16( 1 );
+      for( uint32_t i = 1; i <= 25; i++ )
       {
-         uint64_t uItemId = bagField[i].getUInt64();
+         uint64_t uItemId = bagRes->getUInt64( i + 1 );
          if( uItemId == 0 )
             continue;
 
@@ -721,29 +715,25 @@ bool Core::Inventory::load()
 
          m_inventoryMap[storageId]->getItemMap()[i - 1] = pItem;
       }
-   } while( bagRes->nextRow() );
+   }
 
 
    ///////////////////////////////////////////////////////////////////////////////////////////////////////
    // Load Currency
-   auto curRes = g_database.query( "SELECT storageId, "
-                                   "container_0, container_1, container_2, container_3, container_4, "
-                                   "container_5, container_6, container_7, container_8, container_9, "
-                                   "container_10, container_11 "
-                                   "FROM charaitemcurrency " \
-                                   "WHERE CharacterId =  " + std::to_string( m_pOwner->getId() ) + " " \
-                                   "ORDER BY storageId ASC;" );
-   if( !curRes )
-      return false;
+   auto curRes = g_charaDb.query( "SELECT storageId, "
+                                  "container_0, container_1, container_2, container_3, container_4, "
+                                  "container_5, container_6, container_7, container_8, container_9, "
+                                  "container_10, container_11 "
+                                  "FROM charaitemcurrency " \
+                                  "WHERE CharacterId =  " + std::to_string( m_pOwner->getId() ) + " " \
+                                  "ORDER BY storageId ASC;" );
 
-   Db::Field *curField = curRes->fetch();
-
-   do
+   while( curRes->next() )
    {
-      uint16_t storageId = curField[0].get< uint16_t >();
-      for( int32_t i = 1; i <= 12; i++ )
+      uint16_t storageId = curRes->getUInt16( 1 );
+      for( uint32_t i = 1; i <= 12; i++ )
       {
-         uint64_t uItemId = curField[i].getUInt64();
+         uint64_t uItemId = curRes->getUInt64( i + 1 );
          if( uItemId == 0 )
             continue;
 
@@ -754,30 +744,26 @@ bool Core::Inventory::load()
 
          m_inventoryMap[storageId]->getItemMap()[i - 1] = pItem;
       }
-   } while( curRes->nextRow() );
+   }
 
 
    ///////////////////////////////////////////////////////////////////////////////////////////////////////
    // Load Crystals
-   auto crystalRes = g_database.query( "SELECT storageId, "
-                                       "container_0, container_1, container_2, container_3, container_4, "
-                                       "container_5, container_6, container_7, container_8, container_9, "
-                                       "container_10, container_11, container_12, container_13, container_14, "
-                                       "container_15, container_16, container_17 "
-                                       "FROM charaitemcrystal " \
-                                       "WHERE CharacterId =  " + std::to_string( m_pOwner->getId() ) + " " \
-                                       "ORDER BY storageId ASC;" );
-   if( !crystalRes )
-      return false;
+   auto crystalRes = g_charaDb.query( "SELECT storageId, "
+                                      "container_0, container_1, container_2, container_3, container_4, "
+                                      "container_5, container_6, container_7, container_8, container_9, "
+                                      "container_10, container_11, container_12, container_13, container_14, "
+                                      "container_15, container_16, container_17 "
+                                      "FROM charaitemcrystal " \
+                                      "WHERE CharacterId =  " + std::to_string( m_pOwner->getId() ) + " " \
+                                      "ORDER BY storageId ASC;" );
 
-   Db::Field *crystalField = crystalRes->fetch();
-
-   do
+   while( crystalRes->next() )
    {
-      uint16_t storageId = crystalField[0].get< uint16_t >();
+      uint16_t storageId = crystalRes->getUInt16( 1 );
       for( int32_t i = 1; i <= 17; i++ )
       {
-         uint64_t uItemId = crystalField[i].getUInt64();
+         uint64_t uItemId = crystalRes->getUInt64( i + 1 );
          if( uItemId == 0 )
             continue;
 
@@ -788,7 +774,7 @@ bool Core::Inventory::load()
 
          m_inventoryMap[storageId]->getItemMap()[i - 1] = pItem;
       }
-   } while( crystalRes->nextRow() );
+   }
 
    return true;
 }
@@ -880,4 +866,20 @@ Core::Inventory::ContainerType Core::Inventory::getContainerType( uint32_t conta
    {
       return Unknown;
    }
+}
+
+uint32_t Core::Inventory::getNextUId()
+{
+   uint32_t charId = 0;
+
+   auto pQR = g_charaDb.query( "SELECT MAX(ItemId) FROM charaglobalitem" );
+
+   if( !pQR->next() )
+      return 0x00500001;
+
+   charId = pQR->getUInt( 1 ) + 1;
+   if( charId < 0x00500001 )
+      return 0x00500001;
+
+   return charId;
 }

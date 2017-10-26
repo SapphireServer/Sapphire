@@ -1,5 +1,4 @@
 #include <src/servers/Server_Common/Logging/Logger.h>
-#include <src/servers/Server_Common/Database/Database.h>
 #include <src/servers/Server_Common/Exd/ExdData.h>
 #include <boost/lexical_cast.hpp>
 
@@ -8,9 +7,14 @@
 
 #include "ZonePosition.h"
 
+#include <Server_Common/Database/DbLoader.h>
+#include <Server_Common/Database/CharaDbConnection.h>
+#include <Server_Common/Database/DbWorkerPool.h>
+#include <Server_Common/Database/PreparedStatement.h>
+#include "src/libraries/sapphire/mysqlConnector/MySqlConnector.h"
 
+extern Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
 extern Core::Logger g_log;
-extern Core::Db::Database g_database;
 extern Core::Data::ExdData g_exdData;
 
 namespace Core {
@@ -25,27 +29,21 @@ namespace Core {
 
    void ZoneMgr::loadZonePositionMap()
    {
-      auto pQR = g_database.query( "SELECT id, target_zone_id, pos_x, pos_y, pos_z, pos_o, radius " \
-                                   "FROM zonepositions;" );
+      auto pQR = g_charaDb.query( "SELECT id, target_zone_id, pos_x, pos_y, pos_z, pos_o, radius FROM zonepositions;" );
 
-      if( !pQR )
-         return;
-
-      do
+      while( pQR->next() )
       {
-         Db::Field *field = pQR->fetch();
-         uint32_t id = field[0].get< uint32_t >();
-         uint32_t targetZoneId = field[1].get< uint32_t >();
+         uint32_t id = pQR->getUInt( 1 );
+         uint32_t targetZoneId = pQR->getUInt( 2 );
          Common::FFXIVARR_POSITION3 pos;
-         pos.x = field[2].getFloat();
-         pos.y = field[3].getFloat();
-         pos.z = field[4].getFloat();
-         float posO = field[5].getFloat();
-         uint32_t radius = field[6].get< uint32_t >();
+         pos.x = pQR->getFloat( 3 );
+         pos.y = pQR->getFloat( 4 );
+         pos.z = pQR->getFloat( 5 );
+         float posO = pQR->getFloat( 6 );
+         uint32_t radius = pQR->getUInt( 7 );
          
          m_zonePositionMap[id] = ZonePositionPtr( new ZonePosition( id, targetZoneId, pos, radius, posO ) );
-
-      } while( pQR->nextRow() );
+      }
    }
 
    ZonePositionPtr ZoneMgr::getZonePosition( uint32_t zonePositionId )
