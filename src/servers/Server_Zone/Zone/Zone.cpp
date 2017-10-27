@@ -1,13 +1,11 @@
 #include <stdio.h>
 #include <vector>
 
-
 #include <src/servers/Server_Common/Logging/Logger.h>
 #include <src/servers/Server_Common/Util/Util.h>
 #include <src/servers/Server_Common/Util/UtilMath.h>
 #include <src/servers/Server_Common/Network/GamePacket.h>
 #include <src/servers/Server_Common/Network/GamePacketNew.h>
-#include <src/servers/Server_Common/Database/Database.h>
 #include <src/servers/Server_Common/Exd/ExdData.h>
 #include <src/servers/Server_Common/Network/CommonNetwork.h>
 #include <src/servers/Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
