@@ -1,6 +1,5 @@
 #include <src/servers/Server_Common/Common.h>
 #include <src/servers/Server_Common/Network/CommonNetwork.h>
-#include <src/servers/Server_Common/Database/Database.h>
 #include <src/servers/Server_Common/Util/Util.h>
 #include <src/servers/Server_Common/Logging/Logger.h>
 #include <src/servers/Server_Common/Network/PacketContainer.h>
