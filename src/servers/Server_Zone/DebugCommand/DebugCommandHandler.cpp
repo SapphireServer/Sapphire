@@ -30,13 +30,8 @@
 #include "src/servers/Server_Zone/Session.h"
 #include <boost/make_shared.hpp>
 
-#include "src/libraries/sapphire/mysqlConnector/MySqlConnector.h"
-#include <Server_Common/Database/DbLoader.h>
-#include <Server_Common/Database/CharaDbConnection.h>
-#include <Server_Common/Database/DbWorkerPool.h>
-#include <Server_Common/Database/PreparedStatement.h>
+#include <Server_Common/Database/DatabaseDef.h>
 
-extern Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
 extern Core::Scripting::ScriptManager g_scriptMgr;
 extern Core::Data::ExdData g_exdData;
 extern Core::Logger g_log;

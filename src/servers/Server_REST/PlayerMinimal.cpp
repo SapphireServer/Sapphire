@@ -4,14 +4,8 @@
 #include <Server_Common/Common.h>
 #include <Server_Common/Exd/ExdData.h>
 
-#include <Server_Common/Database/DbLoader.h>
-#include <Server_Common/Database/CharaDbConnection.h>
-#include <Server_Common/Database/DbWorkerPool.h>
-#include <Server_Common/Database/PreparedStatement.h>
+#include <Server_Common/Database/DatabaseDef.h>
 
-#include "src/libraries/sapphire/mysqlConnector/MySqlConnector.h"
-
-extern Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
 extern Core::Data::ExdData g_exdData;
 
 namespace Core {

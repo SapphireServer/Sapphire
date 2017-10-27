@@ -7,13 +7,8 @@
 
 #include "ZonePosition.h"
 
-#include <Server_Common/Database/DbLoader.h>
-#include <Server_Common/Database/CharaDbConnection.h>
-#include <Server_Common/Database/DbWorkerPool.h>
-#include <Server_Common/Database/PreparedStatement.h>
-#include "src/libraries/sapphire/mysqlConnector/MySqlConnector.h"
+#include <Server_Common/Database/DatabaseDef.h>
 
-extern Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
 extern Core::Logger g_log;
 extern Core::Data::ExdData g_exdData;
 
