@@ -10,15 +10,9 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
 #include <boost/shared_ptr.hpp>
-#include <Server_Common/Database/DbLoader.h>
-#include <Server_Common/Database/CharaDbConnection.h>
-#include <Server_Common/Database/DbWorkerPool.h>
-#include <Server_Common/Database/PreparedStatement.h>
 
-#include "src/libraries/sapphire/mysqlConnector/MySqlConnector.h"
+#include <Server_Common/Database/DatabaseDef.h>
 #include <boost/make_shared.hpp>
-
-extern Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
 
 Core::Network::SapphireAPI::SapphireAPI()
 {
