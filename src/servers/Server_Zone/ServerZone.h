@@ -15,7 +15,7 @@ namespace Core {
    class ServerZone
    {
    public:
-      ServerZone( const std::string& configPath, uint16_t serverId = 0 );
+      ServerZone( const std::string& configPath );
       ~ServerZone();
 
       void run( int32_t argc, char* argv[] );
