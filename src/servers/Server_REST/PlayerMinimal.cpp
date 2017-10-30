@@ -362,7 +362,7 @@ namespace Core {
 
    uint64_t PlayerMinimal::getNextUId64() const
    {
-      g_charaDb.execute( std::string( "INSERT INTO uniqueiddata( IdName ) VALUES( 'NOT_SET' );" ) );
+      g_charaDb.directExecute( std::string( "INSERT INTO uniqueiddata( IdName ) VALUES( 'NOT_SET' );" ) );
       auto res = g_charaDb.query( "SELECT LAST_INSERT_ID();" );
 
       if( !res )
