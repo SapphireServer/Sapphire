@@ -22,6 +22,9 @@ set_target_properties(server_rest PROPERTIES
 if (UNIX)
   target_link_libraries (server_rest Common xivdat pthread mysqlclient dl z)
 else()
+  # ignore unchecked iterators warnings from msvc
+  add_definitions(-D_SCL_SECURE_NO_WARNINGS)
+
   target_link_libraries (server_rest Common xivdat libmysql zlib1)
 endif()
 
