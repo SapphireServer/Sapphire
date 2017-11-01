@@ -365,7 +365,7 @@ namespace Core {
       g_charaDb.directExecute( std::string( "INSERT INTO uniqueiddata( IdName ) VALUES( 'NOT_SET' );" ) );
       auto res = g_charaDb.query( "SELECT LAST_INSERT_ID();" );
 
-      if( !res )
+      if( !res->next() )
          return 0;
 
       return res->getUInt64( 1 );
