@@ -31,6 +31,8 @@
 #include "src/servers/Server_Zone/Session.h"
 #include <boost/make_shared.hpp>
 
+#include <cinttypes>
+
 extern Core::Db::Database g_database;
 extern Core::Scripting::ScriptManager g_scriptMgr;
 extern Core::Data::ExdData g_exdData;
@@ -256,7 +258,7 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
    else if ( subCommand == "eorzeatime" )
    {
       uint64_t timestamp;
-      sscanf( params.c_str(), "%llu", &timestamp );
+      sscanf( params.c_str(), "%" SCNu64, &timestamp );
 
       pPlayer->setEorzeaTimeOffset( timestamp );
       pPlayer->sendNotice( "Eorzea time offset: " + std::to_string( timestamp ) );
