@@ -84,7 +84,7 @@ void Core::Network::GameConnection::setSearchInfoHandler( const Packets::GamePac
    GamePacketNew< FFXIVIpcSetSearchInfo, ServerZoneIpcType > searchInfoPacket( pPlayer->getId() );
    searchInfoPacket.data().onlineStatusFlags = status;
    searchInfoPacket.data().selectRegion = pPlayer->getSearchSelectRegion();
-   sprintf( searchInfoPacket.data().searchMessage, pPlayer->getSearchMessage() );
+   strcpy( searchInfoPacket.data().searchMessage, pPlayer->getSearchMessage() );
    queueOutPacket( searchInfoPacket );
 
    pPlayer->sendToInRangeSet( ActorControlPacket142( pPlayer->getId(), SetStatusIcon,
@@ -98,7 +98,7 @@ void Core::Network::GameConnection::reqSearchInfoHandler( const Packets::GamePac
    GamePacketNew< FFXIVIpcInitSearchInfo, ServerZoneIpcType > searchInfoPacket( pPlayer->getId() );
    searchInfoPacket.data().onlineStatusFlags = pPlayer->getOnlineStatusMask();
    searchInfoPacket.data().selectRegion = pPlayer->getSearchSelectRegion();
-   sprintf( searchInfoPacket.data().searchMessage, pPlayer->getSearchMessage() );
+   strcpy( searchInfoPacket.data().searchMessage, pPlayer->getSearchMessage() );
    queueOutPacket( searchInfoPacket );
 }
 

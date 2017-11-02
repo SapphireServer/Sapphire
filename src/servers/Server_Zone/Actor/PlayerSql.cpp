@@ -273,7 +273,7 @@ bool Core::Entity::Player::loadSearchInfo()
 
    m_searchSelectClass = field[1].get< uint8_t >();
    m_searchSelectRegion = field[2].get< uint8_t >();
-   sprintf( m_searchMessage, field[3].getString().c_str() );
+   strcpy( m_searchMessage, field[3].getString().c_str() );
 
    return true;
 }

@@ -3,6 +3,7 @@
 
 #include <mutex>
 #include <stdio.h>
+#include <cinttypes>
 
 #include <mysql.h>
 
@@ -38,18 +39,11 @@ namespace Db {
       {
          if( m_pValue )
          {
-      #ifdef _WIN32
             uint64_t value;
-            sscanf( m_pValue, "%I64d", &value );
+            sscanf( m_pValue, "%" SCNu64, &value );
             return value;
-      #else
-            uint64_t value;
-            sscanf( m_pValue, "%Lu", &value );
-            return value;
-
-      #endif
-          }
-          else
+         }
+         else
             return 0;
       }
 		 

@@ -329,7 +329,11 @@ void Core::Network::GameConnection::injectPacket( const std::string& packetpath,
    fseek( fp, 0, SEEK_END );
    int32_t size = ftell( fp );
    rewind( fp );
-   fread( packet, sizeof( char ), size, fp );
+   if ( fread( packet, sizeof( char ), size, fp ) != size )
+   {
+      g_log.error( "Packet " + packetpath + " did not read full size: " + std::to_string( size ) );
+      return;
+   }
    fclose( fp );
 
    // cycle through the packet entries and queue each one
