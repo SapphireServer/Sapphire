@@ -1396,7 +1396,7 @@ uint8_t * Core::Entity::Player::getTitleList()
 
 uint16_t Core::Entity::Player::getTitle() const
 {
-   return m_title;
+   return m_activeTitle;
 }
 
 void Core::Entity::Player::addTitle( uint16_t titleId )
@@ -1417,7 +1417,7 @@ void Core::Entity::Player::setTitle( uint16_t titleId )
    if ( ( m_titleList[index] & value ) == 0 )   // Player doesn't have title - bail
       return;
 
-   m_title = titleId;
+   m_activeTitle = titleId;
 
    sendToInRangeSet( ActorControlPacket142( getId(), SetTitle, titleId ), true );
 }
