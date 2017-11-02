@@ -81,14 +81,20 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
       setRotation( 0.0f );
    }
 
+   // Stats
+
    m_hp = res->getUInt( "Hp" );
    m_mp = res->getUInt( "Mp" );
    m_tp = 0;
+
+   // Position
 
    m_pos.x = res->getFloat( "PosX" );
    m_pos.y = res->getFloat( "PosY" );
    m_pos.z = res->getFloat( "PosZ" );
    setRotation( res->getFloat( "PosR" ) );
+
+   // Model
 
    auto custom = res->getBlobVector( "Customize" );
    memcpy( reinterpret_cast< char* >( m_customize ), custom.data(), custom.size() );
@@ -98,6 +104,8 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
    auto modelEq = res->getBlobVector( "ModelEquip" );
    memcpy( reinterpret_cast< char* >( m_modelEquip ), modelEq.data(), modelEq.size() );
 
+   // Minimal info
+
    m_guardianDeity = res->getUInt8( "GuardianDeity" );
    m_birthDay = res->getUInt8( "BirthDay" );
    m_birthMonth = res->getUInt8( "BirthMonth" );
@@ -105,20 +113,33 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
    m_class = static_cast< ClassJob >( res->getUInt( "Class" ) );
    m_homePoint = res->getUInt8( "Homepoint" );
 
-   auto howTo = res->getBlobVector( "HowTo" );
-   memcpy( reinterpret_cast< char* >( m_howTo ), howTo.data(), howTo.size() );
+   // Additional data
 
    m_contentId = res->getUInt64( "ContentId" );
-
    m_voice = res->getUInt8( "Voice" );
+   m_startTown = res->getUInt8( "StartTown" );
+   m_playTime = res->getUInt( "TotalPlayTime" );
+
+   m_bNewGame = res->getBoolean( "IsNewGame" );
+   m_bNewAdventurer = res->getBoolean( "IsNewAdventurer" );
+   m_openingSequence = res->getUInt8( "OpeningSequence" );
+
+   m_gc = res->getUInt8( "GrandCompany" );
+   m_cfPenaltyUntil = res->getUInt( "CFPenaltyUntil" );
+   m_activeTitle = res->getUInt16( "ActiveTitle" );
+
+   m_gmRank = res->getUInt8( "GMRank" );
+
+   // Blobs
+
+   auto howTo = res->getBlobVector( "HowTo" );
+   memcpy( reinterpret_cast< char* >( m_howTo ), howTo.data(), howTo.size() );
 
    auto questCompleteFlags = res->getBlobVector( "QuestCompleteFlags" );
    memcpy( reinterpret_cast< char* >( m_questCompleteFlags ), questCompleteFlags.data(), questCompleteFlags.size() );
 
    auto questTracking = res->getBlobVector( "QuestTracking" );
    memcpy( reinterpret_cast< char* >( m_questTracking ), questTracking.data(), questTracking.size() );
-
-   m_bNewGame = res->getBoolean( "IsNewGame" );
 
    auto aetheryte = res->getBlobVector( "Aetheryte" );
    memcpy( reinterpret_cast< char* >( m_aetheryte ), aetheryte.data(), aetheryte.size() );
@@ -129,20 +150,11 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
    auto discovery = res->getBlobVector( "Discovery" );
    memcpy( reinterpret_cast< char* >( m_discovery ), discovery.data(), discovery.size() );
 
-   m_startTown = res->getUInt8( "StartTown" );
-   m_playTime = res->getUInt( "TotalPlayTime" );
-
-   m_bNewAdventurer = res->getBoolean( "IsNewAdventurer" );
-
-   m_gc = res->getUInt8( "GrandCompany" );
+   auto titleList = res->getBlobVector( "TitleList" );
+   memcpy( reinterpret_cast< char* >( m_titleList ), titleList.data(), titleList.size() );
+   
    auto gcRank = res->getBlobVector( "GrandCompanyRank" );
    memcpy( reinterpret_cast< char* >( m_gcRank ), gcRank.data(), gcRank.size() );
-
-   m_cfPenaltyUntil = res->getUInt( "CFPenaltyUntil" );
-
-   m_openingSequence = res->getUInt8( "OpeningSequence" );
-
-   m_gmRank = res->getUInt8( "GMRank" );
 
    res->free();
 
@@ -338,7 +350,7 @@ void Core::Entity::Player::updateSql()
    stmt->setInt( 35, 0 ); // RestPoint
    stmt->setInt( 36, 0 ); // ActiveTitle
 
-   std::vector< uint8_t > titleListVec( 32 );
+   std::vector< uint8_t > titleListVec( sizeof ( m_titleList ) );
    stmt->setBinary( 37, titleListVec );
 
    std::vector< uint8_t > achievementVec( 16 );
@@ -485,5 +497,3 @@ void Core::Entity::Player::insertQuest( uint16_t questId, uint8_t index, uint8_t
    stmt->setInt( 12, 0 );
    g_charaDb.execute( stmt );
 }
-
-
