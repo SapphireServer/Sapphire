@@ -345,8 +345,8 @@ namespace Core {
 
    void PlayerMinimal::insertDbGlobalItem( uint32_t weaponId, uint64_t uniqueId ) const
    {
-      auto stmtItemGlobal = g_charaDb.getPreparedStatement(Db::CHARA_ITEMGLOBAL_INS );
-      stmtItemGlobal->setInt(1, m_id);
+      auto stmtItemGlobal = g_charaDb.getPreparedStatement( Db::CHARA_ITEMGLOBAL_INS );
+      stmtItemGlobal->setInt( 1, m_id );
       stmtItemGlobal->setInt64( 2, uniqueId );
       stmtItemGlobal->setInt( 3, weaponId );
       g_charaDb.directExecute( stmtItemGlobal );

@@ -566,7 +566,7 @@ private:
       uint8_t status;
    } m_retainerInfo[8];
 
-   uint16_t m_title;
+   uint16_t m_activeTitle;
    uint8_t m_titleList[48];
    uint8_t m_howTo[33];
    uint8_t m_minions[33];
