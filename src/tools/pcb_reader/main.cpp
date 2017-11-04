@@ -88,7 +88,7 @@ std::string zoneNameToPath( const std::string& name )
    char region = name[1];
    char type = name[2];
    char zone = name[3];
-   static std::map<char, std::string> teriMap
+   static std::map< char, std::string > teriMap
    {
       { 'r', "roc" },
       { 'w', "wil" },
@@ -100,7 +100,7 @@ std::string zoneNameToPath( const std::string& name )
       { 'z', "zon" }
    };
 
-   static std::map<char, std::string> typeMap
+   static std::map< char, std::string > typeMap
    {
       { 'f', "fld" },
       { 't', "twn" },
@@ -158,7 +158,7 @@ int main( int argc, char* argv[] )
    {
       std::string listPcbPath( "bg/ffxiv/" + zonePath + "/collision/list.pcb" );
       std::string bgLgbPath( "bg/ffxiv/" + zonePath + "/level/bg.lgb" );
-      std::string collisionFilePath = "bg/ffxiv/" + zonePath + "/collision/";
+      std::string collisionFilePath( "bg/ffxiv/" + zonePath + "/collision/" );
       std::vector< char > section;
       std::vector< char > section1;
 
@@ -183,7 +183,7 @@ int main( int argc, char* argv[] )
       int32_t list_offset = *( uint32_t* )&section[0x18];
       int32_t size = *( uint32_t* )&section[4];
 
-      std::vector<std::string> stringList;
+      std::vector< std::string > stringList;
 
       uint32_t offset1 = 0x20;
       for( ; ; )
@@ -225,9 +225,9 @@ int main( int argc, char* argv[] )
       fp_out = fopen( ( zoneName + ".obj" ).c_str(), "ab+" );
       if( fp_out )
       {
-         std::map<std::string, PCB_FILE> pcbFiles;
-         std::map<std::string, SGB_FILE> sgbFiles;
-         std::map<std::string, uint32_t> objCount;
+         std::map< std::string, PCB_FILE > pcbFiles;
+         std::map< std::string, SGB_FILE > sgbFiles;
+         std::map< std::string, uint32_t > objCount;
          auto loadPcbFile = [&]( const std::string& fileName ) -> bool
          {
             try
@@ -404,8 +404,8 @@ int main( int argc, char* argv[] )
             totalGroups++;
             for( const auto& pEntry : group.entries )
             {
-               auto pGimmick = dynamic_cast<LGB_GIMMICK_ENTRY*>( pEntry.get() );
-               auto pBgParts = dynamic_cast<LGB_BGPARTS_ENTRY*>( pEntry.get() );
+               auto pGimmick = dynamic_cast< LGB_GIMMICK_ENTRY* >( pEntry.get() );
+               auto pBgParts = dynamic_cast< LGB_BGPARTS_ENTRY* >( pEntry.get() );
 
                std::string fileName( "" );
                fileName.resize( 256 );
@@ -458,7 +458,7 @@ int main( int argc, char* argv[] )
                      {
                         for( const auto& pEntry : group.entries )
                         {
-                           auto pModel = dynamic_cast<SGB_MODEL_ENTRY*>( pEntry.get() );
+                           auto pModel = dynamic_cast< SGB_MODEL_ENTRY* >( pEntry.get() );
                            fileName = pModel->collisionFileName;
                            writeOutput( fileName, &pGimmick->header.scale, &pGimmick->header.rotation, &pGimmick->header.translation, pModel );
                         }
@@ -471,7 +471,7 @@ int main( int argc, char* argv[] )
          std::cout << "Total Groups " << totalGroups << " Total entries " << totalGroupEntries << "\n";
       }
       std::cout << "Finished exporting " << zoneName << " in " <<
-         std::chrono::duration_cast<std::chrono::seconds>( std::chrono::system_clock::now() - startTime ).count() << " seconds\n";
+         std::chrono::duration_cast< std::chrono::seconds >( std::chrono::system_clock::now() - startTime ).count() << " seconds\n";
    }
    catch( std::exception& e )
    {
