@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <cstdint>
 #include <string>
+#include <iostream>
+#include <chrono>
+#include <fstream>
 
 #include "pcb.h"
 #include "lgb.h"
@@ -13,13 +16,8 @@
 #include <ExdData.h>
 #include <ExdCat.h>
 #include <Exd.h>
-#include <boost/algorithm/string.hpp>
-#else
-#include <fstream>
+//#include <boost/algorithm/string.hpp>
 #endif
-
-#include <iostream>
-#include <chrono>
 
 using namespace std::chrono_literals;
 
