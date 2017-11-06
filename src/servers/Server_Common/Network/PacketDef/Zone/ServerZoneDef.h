@@ -1314,6 +1314,12 @@ struct FFXIVIpcMount : FFXIVIpcBasePacket<Mount>
 };
 
 
+struct FFXIVIpcActorGauge : FFXIVIpcBasePacket<ActorGauge>
+{
+   uint8_t classJobId;
+   uint8_t data[15]; // depends on classJobId
+};
+
 } /* Server */
 } /* Packets */
 } /* Network */
