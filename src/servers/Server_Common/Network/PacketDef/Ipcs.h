@@ -134,6 +134,7 @@ namespace Packets {
       IPCTYPE_UNK_320            = 0x0207, // updated 4.1
       IPCTYPE_UNK_322            = 0x0209, // updated 4.1
 
+      ActorGauge                 = 0x249
    };
 
    // TODO: Include structures for the individual packet segment types
