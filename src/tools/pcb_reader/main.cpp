@@ -1,21 +1,23 @@
 #include <stdio.h>
 #include <cstdint>
 #include <string>
+#include <iostream>
+#include <chrono>
+#include <fstream>
 
 #include "pcb.h"
 #include "lgb.h"
 #include "sgb.h"
 
+#ifndef STANDALONE
 #include <GameData.h>
 #include <File.h>
 #include <DatCat.h>
 #include <ExdData.h>
 #include <ExdCat.h>
 #include <Exd.h>
-
-#include <iostream>
-#include <boost/algorithm/string.hpp>
-#include <chrono>
+//#include <boost/algorithm/string.hpp>
+#endif
 
 using namespace std::chrono_literals;
 
@@ -86,7 +88,7 @@ std::string zoneNameToPath( const std::string& name )
    char region = name[1];
    char type = name[2];
    char zone = name[3];
-   static std::map<char, std::string> teriMap
+   static std::map< char, std::string > teriMap
    {
       { 'r', "roc" },
       { 'w', "wil" },
@@ -98,7 +100,7 @@ std::string zoneNameToPath( const std::string& name )
       { 'z', "zon" }
    };
 
-   static std::map<char, std::string> typeMap
+   static std::map< char, std::string > typeMap
    {
       { 'f', "fld" },
       { 't', "twn" },
@@ -115,6 +117,24 @@ std::string zoneNameToPath( const std::string& name )
    ret += region;
    ret += "/" + typeRet + "/" + name;
    return ret;
+}
+
+void readFileToBuffer( const std::string& path, std::vector< char >& buf )
+{
+   auto inFile = std::ifstream( path, std::ios::binary );
+   if( inFile.good() )
+   {
+      inFile.seekg( 0, inFile.end );
+      int32_t fileSize = inFile.tellg();
+      buf.resize( fileSize );
+      inFile.seekg( 0, inFile.beg );
+      inFile.read( &buf[0], fileSize );
+      inFile.close();
+   }
+   else
+   {
+      throw std::runtime_error( "Unable to open " + path );
+   }
 }
 
 int main( int argc, char* argv[] )
@@ -136,21 +156,35 @@ int main( int argc, char* argv[] )
 
    try
    {
+      std::string listPcbPath( "bg/ffxiv/" + zonePath + "/collision/list.pcb" );
+      std::string bgLgbPath( "bg/ffxiv/" + zonePath + "/level/bg.lgb" );
+      std::string collisionFilePath( "bg/ffxiv/" + zonePath + "/collision/" );
+      std::vector< char > section;
+      std::vector< char > section1;
+
+      #ifndef STANDALONE
       xiv::dat::GameData data1( gamePath );
       xiv::exd::ExdData eData( data1 );
 
       const xiv::dat::Cat& test = data1.get_category( "bg" );
 
-      auto test_file = data1.get_file( "bg/ffxiv/" + zonePath + "/level/bg.lgb" );
-      auto section = test_file->access_data_sections().at( 0 );
-      int32_t list_offset = *(uint32_t*)&section[0x18];
-      int32_t size = *(uint32_t*)&section[4];
+      auto test_file = data1.get_file( bgLgbPath );
+      section = test_file->access_data_sections().at( 0 );
 
-      std::vector<std::string> stringList;
+      auto test_file1 = data1.get_file( listPcbPath );
+      section1 = test_file1->access_data_sections().at( 0 );
+      #else
+      {
+         readFileToBuffer( bgLgbPath, section );
+         readFileToBuffer( listPcbPath, section1 );
+      }
+      #endif
 
-      auto test_file1 = data1.get_file( "bg/ffxiv/" + zonePath + "/collision/list.pcb" );
-      auto section1 = test_file1->access_data_sections().at( 0 );
-      std::string path = "bg/ffxiv/" + zonePath + "/collision/";
+      int32_t list_offset = *( uint32_t* )&section[0x18];
+      int32_t size = *( uint32_t* )&section[4];
+
+      std::vector< std::string > stringList;
+
       uint32_t offset1 = 0x20;
       for( ; ; )
       {
@@ -158,7 +192,7 @@ int main( int argc, char* argv[] )
          uint16_t trId = *(uint16_t*)&section1[offset1];
 
          char someString[200];
-         sprintf( someString, "%str%04d.pcb", path.c_str(), trId );
+         sprintf( someString, "%str%04d.pcb", collisionFilePath.c_str(), trId );
          stringList.push_back( std::string( someString ) );
          //std::cout << someString << "\n";
          offset1 += 0x20;
@@ -191,18 +225,24 @@ int main( int argc, char* argv[] )
       fp_out = fopen( ( zoneName + ".obj" ).c_str(), "ab+" );
       if( fp_out )
       {
-         std::map<std::string, PCB_FILE> pcbFiles;
-         std::map<std::string, SGB_FILE> sgbFiles;
-         std::map<std::string, uint32_t> objCount;
+         std::map< std::string, PCB_FILE > pcbFiles;
+         std::map< std::string, SGB_FILE > sgbFiles;
+         std::map< std::string, uint32_t > objCount;
          auto loadPcbFile = [&]( const std::string& fileName ) -> bool
          {
             try
             {
+               char* dataSection = nullptr;
                //std::cout << fileName << " ";
+               #ifndef STANDALONE
                auto file = data1.get_file( fileName );
                auto sections = file->get_data_sections();
-               auto dataSection = &sections.at( 0 )[0];
-
+               dataSection = &sections.at( 0 )[0];
+               #else
+               std::vector< char > buf;
+               readFileToBuffer( fileName, buf );
+               dataSection = &buf[0];
+               #endif
                //std::cout << sections.size() << "\n";
 
                uint32_t offset = 0;
@@ -244,9 +284,17 @@ int main( int argc, char* argv[] )
             SGB_FILE sgbFile;
             try
             {
+               char* dataSection = nullptr;
+               //std::cout << fileName << " ";
+               #ifndef STANDALONE
                auto file = data1.get_file( fileName );
                auto sections = file->get_data_sections();
-               auto dataSection = &sections.at( 0 )[0];
+               dataSection = &sections.at( 0 )[0];
+               #else
+               std::vector< char > buf;
+               readFileToBuffer( fileName, buf );
+               dataSection = &buf[0];
+               #endif
                sgbFile = SGB_FILE( &dataSection[0] );
                sgbFiles.insert( std::make_pair( fileName, sgbFile ) );
                return true;
@@ -356,8 +404,8 @@ int main( int argc, char* argv[] )
             totalGroups++;
             for( const auto& pEntry : group.entries )
             {
-               auto pGimmick = dynamic_cast<LGB_GIMMICK_ENTRY*>( pEntry.get() );
-               auto pBgParts = dynamic_cast<LGB_BGPARTS_ENTRY*>( pEntry.get() );
+               auto pGimmick = dynamic_cast< LGB_GIMMICK_ENTRY* >( pEntry.get() );
+               auto pBgParts = dynamic_cast< LGB_BGPARTS_ENTRY* >( pEntry.get() );
 
                std::string fileName( "" );
                fileName.resize( 256 );
@@ -410,7 +458,7 @@ int main( int argc, char* argv[] )
                      {
                         for( const auto& pEntry : group.entries )
                         {
-                           auto pModel = dynamic_cast<SGB_MODEL_ENTRY*>( pEntry.get() );
+                           auto pModel = dynamic_cast< SGB_MODEL_ENTRY* >( pEntry.get() );
                            fileName = pModel->collisionFileName;
                            writeOutput( fileName, &pGimmick->header.scale, &pGimmick->header.rotation, &pGimmick->header.translation, pModel );
                         }
@@ -423,7 +471,7 @@ int main( int argc, char* argv[] )
          std::cout << "Total Groups " << totalGroups << " Total entries " << totalGroupEntries << "\n";
       }
       std::cout << "Finished exporting " << zoneName << " in " <<
-         std::chrono::duration_cast<std::chrono::seconds>( std::chrono::system_clock::now() - startTime ).count() << " seconds\n";
+         std::chrono::duration_cast< std::chrono::seconds >( std::chrono::system_clock::now() - startTime ).count() << " seconds\n";
    }
    catch( std::exception& e )
    {
