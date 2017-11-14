@@ -414,6 +414,8 @@ void Core::Entity::Player::updateSql()
    ////// Class
    updateDbClass();
 
+   memset( m_orchestrion, 0, sizeof( m_orchestrion ) );
+
 }
 
 void Core::Entity::Player::updateDbClass() const

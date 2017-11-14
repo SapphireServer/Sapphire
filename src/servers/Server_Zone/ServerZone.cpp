@@ -263,10 +263,12 @@ void Core::ServerZone::mainLoop()
          auto session = sessionIt.second;
          if( session && session->getPlayer() )
          {
+
             // if the player is in a zone, let the zone handler take care of his updates
             // else do it here.
             if( !session->getPlayer()->getCurrentZone() )
                session->update();
+
          }
       }
 
@@ -277,6 +279,16 @@ void Core::ServerZone::mainLoop()
          uint32_t diff = currTime - it->second->getLastDataTime();
 
          auto pPlayer = it->second->getPlayer();
+
+         if( pPlayer->isMarkedForRemoval() && diff > 1 )
+         {
+            it->second->close();
+            // if( it->second.unique() )
+            {
+               it = this->m_sessionMap.erase( it );
+               continue;
+            }
+         }
 
          if( diff > 20 )
          {
