@@ -530,6 +530,9 @@ public:
    void updateDbSearchInfo() const;
    void updateDbClass() const;
 
+   void setMarkedForRemoval();
+   bool isMarkedForRemoval() const;
+
 private:
    uint32_t m_lastWrite;
    uint32_t m_lastPing;
@@ -539,6 +542,8 @@ private:
    uint64_t m_contentId; // This id will be the name of the folder for character settings in "My Games"
 
    uint8_t m_mode;
+
+   bool m_markedForRemoval;
 
 private:
 

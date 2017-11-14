@@ -540,6 +540,8 @@ void Core::Network::GameConnection::logoutHandler( const Packets::GamePacket& in
    logoutPacket.data().flags1 = 0x02;
    logoutPacket.data().flags2 = 0x2000;
    queueOutPacket( logoutPacket );
+
+   pPlayer->setMarkedForRemoval();
 }
 
 
