@@ -13,6 +13,7 @@
 #include "src/servers/Server_Zone/Network/PacketWrappers/ServerNoticePacket.h"
 
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/clamp.hpp>
 
 #include "src/servers/Server_Zone/Forwards.h"
 #include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket143.h"
@@ -827,6 +828,30 @@ void Core::Inventory::send()
    }
 
 }
+
+uint16_t Core::Inventory::calculateEquippedGearItemLevel()
+{
+   uint32_t iLvlResult = 0;
+
+   for ( uint16_t i = 0; i < sizeof( m_inventoryMap[GearSet0] ); i++ )
+   {
+      auto currItem = m_inventoryMap[GearSet0]->getItem( i );
+
+      if ( currItem )
+      {
+         g_log.debug( std::to_string( currItem->getId() ) + " ilvl: " +  std::to_string( currItem->getItemLevel() ) );
+         iLvlResult += currItem->getItemLevel();
+
+         // If weapon isn't one-handed
+         if ( currItem->getCategory() != ItemCategory::CnjWep ||
+              currItem->getCategory() !=  ItemCategory::ThmWep )
+            iLvlResult += currItem->getItemLevel();
+      }
+   }
+
+   return boost::algorithm::clamp( iLvlResult / 12, 0, 9999 );
+}
+
 
 uint8_t Core::Inventory::getFreeSlotsInBags()
 {
