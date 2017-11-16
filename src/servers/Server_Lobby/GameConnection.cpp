@@ -139,7 +139,7 @@ void Core::Network::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet, ui
    serverListPacket.data().server[0].id = g_serverLobby.getConfig()->getValue<uint16_t>( "Settings.Parameters.WorldID", 1 );
    serverListPacket.data().server[0].index = 0;
    serverListPacket.data().final = 1;
-   sprintf( serverListPacket.data().server[0].name, g_serverLobby.getConfig()->getValue< std::string >( "Settings.Parameters.WorldName", "Sapphire" ).c_str() );
+   strcpy( serverListPacket.data().server[0].name, g_serverLobby.getConfig()->getValue< std::string >( "Settings.Parameters.WorldName", "Sapphire" ).c_str() );
 
    pRP.addPacket( serverListPacket );
 
