@@ -910,7 +910,6 @@ uint32_t Core::Entity::Player::getLastPing() const
    return m_lastPing;
 }
 
-
 void Core::Entity::Player::setVoiceId( uint8_t voiceId )
 {
    m_voice = voiceId;

@@ -280,16 +280,19 @@ void Core::ServerZone::mainLoop()
 
          auto pPlayer = it->second->getPlayer();
 
+         // remove session of players marked for removel ( logoff / kick )
          if( pPlayer->isMarkedForRemoval() && diff > 1 )
          {
             it->second->close();
             // if( it->second.unique() )
             {
+               g_log.info("[" + std::to_string(it->second->getId() ) + "] Session removal" );
                it = this->m_sessionMap.erase( it );
                continue;
             }
          }
 
+         // remove sessions that simply timed out
          if( diff > 20 )
          {
             g_log.info("[" + std::to_string(it->second->getId() ) + "] Session time out" );
