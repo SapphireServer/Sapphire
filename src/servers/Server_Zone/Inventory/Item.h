@@ -48,6 +48,8 @@ public:
 
    uint16_t getWeaponDmg() const;
 
+   bool isWeapon() const;
+
    float getAutoAttackDmg() const;
 
    uint16_t getItemLevel() const;

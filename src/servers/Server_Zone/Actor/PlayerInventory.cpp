@@ -86,7 +86,7 @@ void Core::Entity::Player::equipWeapon( Core::ItemPtr pItem )
 }
 
 // equip an item
-void Core::Entity::Player::equipItem( Inventory::EquipSlot equipSlotId, Core::ItemPtr pItem, bool sendModel )
+void Core::Entity::Player::equipItem( Inventory::EquipSlot equipSlotId, Core::ItemPtr pItem, bool sendUpdate )
 {
 
    //g_log.debug( "Equipping into slot " + std::to_string( equipSlotId ) );
@@ -118,11 +118,12 @@ void Core::Entity::Player::equipItem( Inventory::EquipSlot equipSlotId, Core::It
 
    }
 
-   if( sendModel )
+   if( sendUpdate )
+   { 
       this->sendModel();
-   
-   m_itemLevel = getInventory()->calculateEquippedGearItemLevel();
-   sendItemLevel();
+      m_itemLevel = getInventory()->calculateEquippedGearItemLevel();
+      sendItemLevel();
+   }
 }
 
 void Core::Entity::Player::unequipItem( Inventory::EquipSlot equipSlotId, ItemPtr pItem )

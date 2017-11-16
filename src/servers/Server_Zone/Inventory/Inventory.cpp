@@ -833,20 +833,26 @@ uint16_t Core::Inventory::calculateEquippedGearItemLevel()
 {
    uint32_t iLvlResult = 0;
 
-   for ( uint16_t i = 0; i < sizeof( m_inventoryMap[GearSet0] ); i++ )
+   auto gearSetMap = m_inventoryMap[GearSet0]->getItemMap();
+
+   auto it = gearSetMap.begin();
+
+   while ( it != gearSetMap.end() )
    {
-      auto currItem = m_inventoryMap[GearSet0]->getItem( i );
+      auto currItem = it->second;
 
       if ( currItem )
       {
-         g_log.debug( std::to_string( currItem->getId() ) + " ilvl: " +  std::to_string( currItem->getItemLevel() ) );
          iLvlResult += currItem->getItemLevel();
 
-         // If weapon isn't one-handed
-         if ( currItem->getCategory() != ItemCategory::CnjWep ||
-              currItem->getCategory() !=  ItemCategory::ThmWep )
+         // If item is weapon and isn't one-handed
+         if ( currItem->isWeapon() &&
+             ( currItem->getCategory() != ItemCategory::CnjWep ||
+               currItem->getCategory() !=  ItemCategory::ThmWep  ) )
             iLvlResult += currItem->getItemLevel();
       }
+
+      it++;
    }
 
    return boost::algorithm::clamp( iLvlResult / 12, 0, 9999 );

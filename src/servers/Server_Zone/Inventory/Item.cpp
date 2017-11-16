@@ -68,6 +68,11 @@ uint16_t Core::Item::getWeaponDmg() const
    return m_weaponDmg;
 }
 
+bool Core::Item::isWeapon() const
+{
+   return (m_weaponDmg != 0);
+}
+
 uint32_t Core::Item::getId() const
 {
    return m_id;
