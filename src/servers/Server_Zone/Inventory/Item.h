@@ -50,6 +50,8 @@ public:
 
    float getAutoAttackDmg() const;
 
+   uint16_t getItemLevel() const;
+
 
 protected:
    uint32_t                m_id;
@@ -71,6 +73,7 @@ protected:
    uint16_t                m_magicalDmg;
    uint16_t                m_weaponDmg;
    float                   m_autoAttackDmg;
+   uint16_t                m_itemLevel;
 
 };
 
