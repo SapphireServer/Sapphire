@@ -387,8 +387,7 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
             }
             session = g_serverZone.getSession( playerId );
          }
-
-         if( !session->isValid() ) //TODO: Catch more things in lobby and send real errors
+         else if( !session->isValid() || ( session->getPlayer() && session->getPlayer()->getLastPing() != 0 ) ) //TODO: Catch more things in lobby and send real errors
          {
             g_log.error( "[" + std::string(id) + "] Session INVALID, disconnecting" );
             Disconnect();
