@@ -303,7 +303,11 @@ int main()
       outputFile1.write(&section[0], section.size());
       outputFile1.close();
       std::string command= std::string("java -jar unluac_2015_06_13.jar ") + "generated/" + questInfo->name_intern + ".luab" + ">> " + "generated/" + questInfo->name_intern + ".lua";
-      system(command.c_str());
+      if ( system( command.c_str() ) == -1 )
+      {
+         g_log.error( "Error executing java command:\n" + command + "\nerrno: " + std::strerror( errno ) );
+         return errno;
+      }
       for( ; ; )
       {
          
