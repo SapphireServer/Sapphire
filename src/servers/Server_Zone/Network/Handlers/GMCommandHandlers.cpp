@@ -333,7 +333,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       GamePacketNew< FFXIVIpcSetSearchInfo, ServerZoneIpcType > searchInfoPacket( targetPlayer->getId() );
       searchInfoPacket.data().onlineStatusFlags = param1;
       searchInfoPacket.data().selectRegion = targetPlayer->getSearchSelectRegion();
-      sprintf( searchInfoPacket.data().searchMessage, targetPlayer->getSearchMessage() );
+      strcpy( searchInfoPacket.data().searchMessage, targetPlayer->getSearchMessage() );
       targetPlayer->queuePacket( searchInfoPacket );
 
       targetPlayer->sendToInRangeSet( ActorControlPacket142( pPlayer->getId(), SetStatusIcon,
