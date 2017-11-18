@@ -28,6 +28,7 @@ namespace Common {
       Glamour = 13,
       ItemManipulation = 14,
       AdrenalineRush = 15,
+   };
 
    ///////////////////////////////////////////////////////////
    //BeastReputationRank.exd
@@ -42,11 +43,13 @@ namespace Common {
       Honored = 6,
       Sworn = 7,
       Allied = 8,
+   };
 
    ///////////////////////////////////////////////////////////
    //BeastTribe.exd
    enum class BeastTribe : uint8_t
    {
+   };
 
    ///////////////////////////////////////////////////////////
    //ClassJob.exd
@@ -88,6 +91,7 @@ namespace Common {
       Astrologian = 33,
       Samurai = 34,
       Redmage = 35,
+   };
 
    ///////////////////////////////////////////////////////////
    //ContentType.exd
@@ -115,6 +119,7 @@ namespace Common {
       DeepDungeons = 21,
       WondrousTails = 24,
       CustomDeliveries = 25,
+   };
 
    ///////////////////////////////////////////////////////////
    //EmoteCategory.exd
@@ -123,6 +128,7 @@ namespace Common {
       General = 1,
       Persistent = 2,
       Expressions = 3,
+   };
 
    ///////////////////////////////////////////////////////////
    //ExVersion.exd
@@ -131,6 +137,7 @@ namespace Common {
       ARealmReborn = 0,
       Heavensward = 1,
       Stormblood = 2,
+   };
 
    ///////////////////////////////////////////////////////////
    //GrandCompany.exd
@@ -140,6 +147,7 @@ namespace Common {
       Maelstrom = 1,
       OrderoftheTwinAdder = 2,
       ImmortalFlames = 3,
+   };
 
    ///////////////////////////////////////////////////////////
    //GuardianDeity.exd
@@ -157,6 +165,7 @@ namespace Common {
       NaldthaltheTraders = 10,
       NophicatheMatron = 11,
       AlthyktheKeeper = 12,
+   };
 
    ///////////////////////////////////////////////////////////
    //ItemUICategory.exd
@@ -262,6 +271,7 @@ namespace Common {
       ScholarsArm = 98,
       FishersSecondaryTool = 99,
       Currency = 100,
+   };
 
    ///////////////////////////////////////////////////////////
    //ItemSearchCategory.exd
@@ -352,6 +362,7 @@ namespace Common {
       SamuraisArms = 83,
       RedMagesArms = 84,
       ScholarsArms = 85,
+   };
 
    ///////////////////////////////////////////////////////////
    //OnlineStatus.exd
@@ -404,6 +415,7 @@ namespace Common {
       FreeCompany = 45,
       GrandCompany = 46,
       Online = 47,
+   };
 
    ///////////////////////////////////////////////////////////
    //Race.exd
@@ -415,6 +427,7 @@ namespace Common {
       Miqote = 4,
       Roegadyn = 5,
       AuRa = 6,
+   };
 
    ///////////////////////////////////////////////////////////
    //Tribe.exd
@@ -432,6 +445,7 @@ namespace Common {
       Hellsguard = 10,
       Raen = 11,
       Xaela = 12,
+   };
 
    ///////////////////////////////////////////////////////////
    //Town.exd
@@ -443,6 +457,7 @@ namespace Common {
       Uldah = 3,
       Ishgard = 4,
       Kugane = 7,
+   };
 
    ///////////////////////////////////////////////////////////
    //Weather.exd
@@ -538,6 +553,7 @@ namespace Common {
       Thunder3 = 88,
       DimensionalDisruption3 = 89,
       FairSkies9 = 90,
+   };
 }
 }
 #endif

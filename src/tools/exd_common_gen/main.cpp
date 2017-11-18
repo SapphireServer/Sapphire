@@ -71,9 +71,10 @@ std::string generateEnum( const std::string& exd, int8_t nameIndex, const std::s
    result +=
            "      bool operator==( const " + exd + "& t, const " + type + "& g ) { return static_cast< " + type + " >( t ) == g; }\n"
            "      bool operator==( const " + type + "& g, const " + exd + "& t ) { return static_cast< " + type + " >( t ) == g; }\n";
+   */
+
    result += "   };\n";
 
-   */
    return result;
 
 }
