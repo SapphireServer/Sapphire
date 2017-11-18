@@ -1,5 +1,8 @@
 #ifndef _COMMON_GEN_H_
 #define _COMMON_GEN_H_
+
+#include <stdint.h>
+
 /* This file has been automatically generated.
    Changes will be lost upon regeneration.
    To change the content edit tools/exd_common_gen */
@@ -26,8 +29,6 @@ namespace Common {
       ItemManipulation = 14,
       AdrenalineRush = 15,
 
-   };
-
    ///////////////////////////////////////////////////////////
    //BeastReputationRank.exd
    enum class BeastReputationRank : uint8_t
@@ -42,14 +43,10 @@ namespace Common {
       Sworn = 7,
       Allied = 8,
 
-   };
-
    ///////////////////////////////////////////////////////////
    //BeastTribe.exd
    enum class BeastTribe : uint8_t
    {
-
-   };
 
    ///////////////////////////////////////////////////////////
    //ClassJob.exd
@@ -92,8 +89,6 @@ namespace Common {
       Samurai = 34,
       Redmage = 35,
 
-   };
-
    ///////////////////////////////////////////////////////////
    //ContentType.exd
    enum class ContentType : uint8_t
@@ -121,8 +116,6 @@ namespace Common {
       WondrousTails = 24,
       CustomDeliveries = 25,
 
-   };
-
    ///////////////////////////////////////////////////////////
    //EmoteCategory.exd
    enum class EmoteCategory : uint8_t
@@ -130,8 +123,6 @@ namespace Common {
       General = 1,
       Persistent = 2,
       Expressions = 3,
-
-   };
 
    ///////////////////////////////////////////////////////////
    //ExVersion.exd
@@ -141,8 +132,6 @@ namespace Common {
       Heavensward = 1,
       Stormblood = 2,
 
-   };
-
    ///////////////////////////////////////////////////////////
    //GrandCompany.exd
    enum class GrandCompany : uint8_t
@@ -151,8 +140,6 @@ namespace Common {
       Maelstrom = 1,
       OrderoftheTwinAdder = 2,
       ImmortalFlames = 3,
-
-   };
 
    ///////////////////////////////////////////////////////////
    //GuardianDeity.exd
@@ -170,8 +157,6 @@ namespace Common {
       NaldthaltheTraders = 10,
       NophicatheMatron = 11,
       AlthyktheKeeper = 12,
-
-   };
 
    ///////////////////////////////////////////////////////////
    //ItemUICategory.exd
@@ -278,8 +263,6 @@ namespace Common {
       FishersSecondaryTool = 99,
       Currency = 100,
 
-   };
-
    ///////////////////////////////////////////////////////////
    //ItemSearchCategory.exd
    enum class ItemSearchCategory : uint8_t
@@ -370,8 +353,6 @@ namespace Common {
       RedMagesArms = 84,
       ScholarsArms = 85,
 
-   };
-
    ///////////////////////////////////////////////////////////
    //OnlineStatus.exd
    enum class OnlineStatus : uint8_t
@@ -424,8 +405,6 @@ namespace Common {
       GrandCompany = 46,
       Online = 47,
 
-   };
-
    ///////////////////////////////////////////////////////////
    //Race.exd
    enum class Race : uint8_t
@@ -436,8 +415,6 @@ namespace Common {
       Miqote = 4,
       Roegadyn = 5,
       AuRa = 6,
-
-   };
 
    ///////////////////////////////////////////////////////////
    //Tribe.exd
@@ -456,8 +433,6 @@ namespace Common {
       Raen = 11,
       Xaela = 12,
 
-   };
-
    ///////////////////////////////////////////////////////////
    //Town.exd
    enum class Town : uint8_t
@@ -468,8 +443,6 @@ namespace Common {
       Uldah = 3,
       Ishgard = 4,
       Kugane = 7,
-
-   };
 
    ///////////////////////////////////////////////////////////
    //Weather.exd
@@ -565,9 +538,6 @@ namespace Common {
       Thunder3 = 88,
       DimensionalDisruption3 = 89,
       FairSkies9 = 90,
-
-   };
-
 }
 }
 #endif
