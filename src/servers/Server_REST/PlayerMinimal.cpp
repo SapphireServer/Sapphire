@@ -174,7 +174,7 @@ namespace Core {
       float x, y, z, o;
       int32_t startTown = 0;
 
-      switch( m_class )
+      switch( static_cast< Core::Common::ClassJob >( m_class ) )
       {
       case Core::Common::ClassJob::Conjurer:
       case Core::Common::ClassJob::Lancer:
