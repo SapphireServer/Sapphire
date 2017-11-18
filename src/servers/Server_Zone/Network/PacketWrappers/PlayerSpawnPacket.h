@@ -36,7 +36,7 @@ namespace Server {
          // TODO: temporary gm rank
          //m_data.gmRank = 0xff;
 
-         m_data.classJob = pPlayer->getClass();
+         m_data.classJob = static_cast< uint8_t >( pPlayer->getClass() );
          //m_data.status = static_cast< uint8_t >( pPlayer->getStatus() );
 
          m_data.hPCurr = pPlayer->getHp();

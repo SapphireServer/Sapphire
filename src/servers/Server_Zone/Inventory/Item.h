@@ -11,7 +11,7 @@ class Item
 public:
    Item();
    Item( uint32_t catalogId );
-   Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, Common::ItemCategory categoryId, bool isHq = false );
+   Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, Common::ItemUICategory categoryId, bool isHq = false );
    ~Item();
 
    uint32_t getId() const;
@@ -26,9 +26,9 @@ public:
 
    uint32_t getStackSize() const;
 
-   void setCategory( Common::ItemCategory categoryId );
+   void setCategory( Common::ItemUICategory categoryId );
 
-   Common::ItemCategory getCategory() const;
+   Common::ItemUICategory getCategory() const;
 
    void setModelIds( uint64_t model1, uint64_t model2 );
 
@@ -56,7 +56,7 @@ protected:
 
    uint64_t                m_uId;
    
-   Common::ItemCategory    m_category;
+   Common::ItemUICategory  m_category;
 
    uint32_t                m_stackSize;
    std::vector< uint8_t >  m_classJobList;

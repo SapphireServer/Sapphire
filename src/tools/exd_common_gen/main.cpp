@@ -20,8 +20,8 @@ Core::Logger g_log;
 Core::Data::ExdData g_exdData;
 
 
-const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
-//const std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv" );
+//const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
+const std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv" );
 
 std::string generateEnum( const std::string& exd, int8_t nameIndex, const std::string& type, bool useLang = true )
 {
@@ -66,10 +66,11 @@ std::string generateEnum( const std::string& exd, int8_t nameIndex, const std::s
       result += "      " + str + " = " + std::to_string( id  ) + ",\n";
 
    }
+   result +=
+           "      bool operator==( const " + exd + "& t, const " + type + "& g ) { return static_cast< " + type + " >( t ) == g; }\n"
+           "      bool operator==( const " + type + "& g, const " + exd + "& t ) { return static_cast< " + type + " >( t ) == g; }\n";
    result += "   };\n";
-   result += 
-   "   bool operator==( const " + exd + "& t, const " + type + "& g ) { return static_cast< " + type + " >( t ) == g; }\n"
-   "   bool operator==( const " + type + "& g, const " + exd + "& t ) { return static_cast< " + type + " >( t ) == g; }\n";   
+
    return result;
 
 }
@@ -87,7 +88,9 @@ int main()
       return 0;
    }
   
-   std::string result = 
+   std::string result = "#ifndef _COMMON_GEN_H_\n#define _COMMON_GEN_H_\n";
+
+   result +=
    "/* This file has been automatically generated.\n   Changes will be lost upon regeneration.\n   To change the content edit tools/exd_common_gen */\n";
 
 
@@ -110,7 +113,7 @@ int main()
    result += generateEnum( "Town", 0, "uint8_t" );      
    result += generateEnum( "Weather", 1, "uint8_t" );      
    result += "}\n";
-   result += "}\n";
+   result += "}\n#endif\n";
    g_log.info( result );
    return 0;
 }

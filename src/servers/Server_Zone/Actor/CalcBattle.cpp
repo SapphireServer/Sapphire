@@ -59,7 +59,7 @@ uint32_t CalcBattle::calculateMaxHp( PlayerPtr pPlayer )
    // Is there any way to pull BaseHP without having to manually use a pet for every level, and using the values from a table?
    // More info here: https://docs.google.com/spreadsheets/d/1de06KGT0cNRUvyiXNmjNgcNvzBCCQku7jte5QxEQRbs/edit?usp=sharing
    
-   auto classInfoIt = g_exdData.m_classJobInfoMap.find( pPlayer->getClass() );
+   auto classInfoIt = g_exdData.m_classJobInfoMap.find( static_cast< uint8_t >( pPlayer->getClass() ) );
    auto paramGrowthInfoIt = g_exdData.m_paramGrowthInfoMap.find( pPlayer->getLevel() );
 
    if ( classInfoIt == g_exdData.m_classJobInfoMap.end() ||
@@ -93,7 +93,7 @@ uint32_t CalcBattle::calculateMaxHp( PlayerPtr pPlayer )
 
 uint32_t CalcBattle::calculateMaxMp( PlayerPtr pPlayer )
 {
-   auto classInfoIt = g_exdData.m_classJobInfoMap.find( pPlayer->getClass() );
+   auto classInfoIt = g_exdData.m_classJobInfoMap.find( static_cast< uint8_t >( pPlayer->getClass() ) );
    auto paramGrowthInfoIt = g_exdData.m_paramGrowthInfoMap.find( pPlayer->getLevel() );
 
    if ( classInfoIt == g_exdData.m_classJobInfoMap.end() ||
@@ -113,7 +113,7 @@ uint32_t CalcBattle::calculateMaxMp( PlayerPtr pPlayer )
 
 uint32_t CalcBattle::calculateHealValue( PlayerPtr pPlayer, uint32_t potency )
 {
-   auto classInfoIt = g_exdData.m_classJobInfoMap.find( pPlayer->getClass() );
+   auto classInfoIt = g_exdData.m_classJobInfoMap.find( static_cast< uint8_t >( pPlayer->getClass() ) );
    auto paramGrowthInfoIt = g_exdData.m_paramGrowthInfoMap.find( pPlayer->getLevel() );
 
    if ( classInfoIt == g_exdData.m_classJobInfoMap.end() ||
