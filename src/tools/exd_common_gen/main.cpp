@@ -104,7 +104,7 @@ int main()
    result += "namespace Common {\n";
    result += generateEnum( "ActionCategory", 0, "uint8_t" );      
    result += generateEnum( "BeastReputationRank", 1, "uint8_t" );
-   result += generateEnum( "BeastTribe", 10, "uint8_t" );      
+   result += generateEnum( "BeastTribe", 11, "uint8_t" );
    result += generateEnum( "ClassJob", 0, "uint8_t" );      
    result += generateEnum( "ContentType", 0, "uint8_t" );
    result += generateEnum( "EmoteCategory", 0, "uint8_t" );
