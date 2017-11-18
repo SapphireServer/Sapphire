@@ -48,7 +48,7 @@ Core::StatusEffect::StatusEffectContainer::~StatusEffectContainer()
 
 void Core::StatusEffect::StatusEffectContainer::addStatusEffect( StatusEffectPtr pEffect )
 {
-   uint8_t nextSlot = getFreeSlot();
+   int8_t nextSlot = getFreeSlot();
    // if there is no slot left, do not add the effect
    if( nextSlot == -1 )
       return;
