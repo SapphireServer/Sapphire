@@ -65,7 +65,7 @@ Core::Entity::BattleNpc::BattleNpc( uint32_t modelId, uint32_t nameid, const Com
 
    m_currentStance = Stance::Passive;
 
-   m_class = ClassJob::CLASS_GLADIATOR;
+   m_class = ClassJob::Gladiator;
    m_level = level > 0 ? level : 60;
 
    m_modelId = modelId;

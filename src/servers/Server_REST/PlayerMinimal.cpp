@@ -176,9 +176,9 @@ namespace Core {
 
       switch( m_class )
       {
-      case Core::Common::ClassJob::CLASS_CONJURER:
-      case Core::Common::ClassJob::CLASS_LANCER:
-      case Core::Common::ClassJob::CLASS_ARCHER:
+      case Core::Common::ClassJob::Conjurer:
+      case Core::Common::ClassJob::Lancer:
+      case Core::Common::ClassJob::Archer:
          x = 127.0f;
          y = -13.0f;
          z = 147.0f;
@@ -187,8 +187,8 @@ namespace Core {
          startTown = 2;
          break;
 
-      case Core::Common::ClassJob::CLASS_MARAUDER:
-      case Core::Common::ClassJob::CLASS_ARCANIST:
+      case Core::Common::ClassJob::Marauder:
+      case Core::Common::ClassJob::Arcanist:
          x = -53.0f;
          y = 18.0f;
          z = 0.0f;
@@ -197,9 +197,9 @@ namespace Core {
          startZone = 181;
          break;
 
-      case Core::Common::ClassJob::CLASS_THAUMATURGE:
-      case Core::Common::ClassJob::CLASS_PUGILIST:
-      case Core::Common::ClassJob::CLASS_GLADIATOR:
+      case Core::Common::ClassJob::Thaumaturge:
+      case Core::Common::ClassJob::Pugilist:
+      case Core::Common::ClassJob::Gladiator:
          x = 42.0f;
          y = 4.0f;
          z = -157.6f;

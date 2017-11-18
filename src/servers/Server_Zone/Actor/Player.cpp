@@ -148,12 +148,12 @@ bool Core::Entity::Player::isMarkedForRemoval() const
 Core::Common::OnlineStatus Core::Entity::Player::getOnlineStatus()
 {
    uint64_t newMask = uint64_t( 1 ) << static_cast< uint32_t >( OnlineStatus::NewAdventurer );
-   uint64_t afkMask = uint64_t( 1 ) << static_cast< uint32_t >( OnlineStatus::Afk );
+   uint64_t afkMask = uint64_t( 1 ) << static_cast< uint32_t >( OnlineStatus::AwayfromKeyboard );
    uint64_t busyMask = uint64_t( 1 ) << static_cast< uint32_t >( OnlineStatus::Busy );
    uint64_t dcMask = uint64_t( 1 ) << static_cast< uint32_t >( OnlineStatus::Disconnected );
-   uint64_t meldMask = uint64_t( 1 ) << static_cast< uint32_t >( OnlineStatus::LfMeld );
-   uint64_t ptMask = uint64_t( 1 ) << static_cast< uint32_t >( OnlineStatus::LfParty );
-   uint64_t rpMask = uint64_t( 1 ) << static_cast< uint32_t >( OnlineStatus::RolePlaying );
+   uint64_t meldMask = uint64_t( 1 ) << static_cast< uint32_t >( OnlineStatus::LookingtoMeldMateria );
+   uint64_t ptMask = uint64_t( 1 ) << static_cast< uint32_t >( OnlineStatus::LookingforParty );
+   uint64_t rpMask = uint64_t( 1 ) << static_cast< uint32_t >( OnlineStatus::Roleplaying );
 
    OnlineStatus status = OnlineStatus::Online;
 
@@ -162,7 +162,7 @@ Core::Common::OnlineStatus Core::Entity::Player::getOnlineStatus()
       status = OnlineStatus::NewAdventurer;
 
    if( m_onlineStatus & afkMask )
-      status = OnlineStatus::Afk;
+      status = OnlineStatus::AwayfromKeyboard;
 
    if( m_onlineStatus & busyMask )
       status = OnlineStatus::Busy;
@@ -171,16 +171,16 @@ Core::Common::OnlineStatus Core::Entity::Player::getOnlineStatus()
       status = OnlineStatus::Disconnected;
 
    if( m_onlineStatus & meldMask )
-      status = OnlineStatus::LfMeld;
+      status = OnlineStatus::LookingtoMeldMateria;
 
    if( m_onlineStatus & ptMask )
-      status = OnlineStatus::LfParty;
+      status = OnlineStatus::LookingforParty;
 
    if( m_onlineStatus & rpMask )
-      status = OnlineStatus::RolePlaying;
+      status = OnlineStatus::Roleplaying;
 
    if( hasStateFlag( PlayerStateFlag::WatchingCutscene ) || hasStateFlag( PlayerStateFlag::WatchingCutscene1 ) )
-      status = OnlineStatus::Cutscene;
+      status = OnlineStatus::ViewingCutscene;
 
    // TODO: add all the logic for returning the proper online status, there probably is a better way for this alltogether
    return status;
@@ -210,7 +210,7 @@ void Core::Entity::Player::calculateStats()
 {
    uint8_t tribe = getLookAt( Common::CharaLook::Tribe );
    uint8_t level = getLevel();
-   uint8_t job = getClass();
+   uint8_t job = static_cast< uint8_t >( getClass() );
 
    auto classInfoIt = g_exdData.m_classJobInfoMap.find( job );
    auto tribeInfoIt = g_exdData.m_tribeInfoMap.find( tribe );
@@ -421,7 +421,7 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
       queuePacket( initUIPacket );
 
       GamePacketNew< FFXIVIpcPlayerClassInfo, ServerZoneIpcType > classInfoPacket( getId() );
-      classInfoPacket.data().classId = getClass();
+      classInfoPacket.data().classId = static_cast< uint8_t >( getClass() );
       classInfoPacket.data().unknown = 1;
       classInfoPacket.data().level = getLevel();
       classInfoPacket.data().level1 = getLevel();
@@ -676,8 +676,8 @@ void Core::Entity::Player::gainLevel()
    m_mp = getMaxMp();
 
    GamePacketNew< FFXIVIpcStatusEffectList, ServerZoneIpcType > effectListPacket( getId() );
-   effectListPacket.data().classId = getClass();
-   effectListPacket.data().classId1 = getClass();
+   effectListPacket.data().classId = static_cast< uint8_t > ( getClass() );
+   effectListPacket.data().classId1 = static_cast< uint8_t > ( getClass() );
    effectListPacket.data().level = getLevel();
    effectListPacket.data().current_hp = getMaxHp();
    effectListPacket.data().current_mp = getMaxMp();
@@ -691,8 +691,8 @@ void Core::Entity::Player::gainLevel()
 
 
    GamePacketNew< FFXIVIpcUpdateClassInfo, ServerZoneIpcType > classInfoPacket( getId() );
-   classInfoPacket.data().classId = getClass();
-   classInfoPacket.data().classId1 = getClass();
+   classInfoPacket.data().classId = static_cast< uint8_t > ( getClass() );
+   classInfoPacket.data().classId1 = static_cast< uint8_t > ( getClass() );
    classInfoPacket.data().level = getLevel();
    classInfoPacket.data().nextLevelIndex = getLevel();
    classInfoPacket.data().currentExp = getExp();
@@ -781,7 +781,7 @@ void Core::Entity::Player::setClassJob( Core::Common::ClassJob classJob )
    m_tp = 0;
 
    GamePacketNew< FFXIVIpcPlayerClassInfo, ServerZoneIpcType > classInfoPacket( getId() );
-   classInfoPacket.data().classId = getClass();
+   classInfoPacket.data().classId = static_cast< uint8_t >( getClass() );
    classInfoPacket.data().level = getLevel();
    queuePacket( classInfoPacket );
 
@@ -792,7 +792,7 @@ void Core::Entity::Player::setClassJob( Core::Common::ClassJob classJob )
 
 void Core::Entity::Player::setLevel( uint8_t level )
 {
-   uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( getClass() )].exp_idx;
+   uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( static_cast< uint8_t >( getClass() ) )].exp_idx;
    m_classArray[classJobIndex] = level;
 }
 
@@ -1065,9 +1065,9 @@ void Core::Entity::Player::update( int64_t currTime )
                uint32_t range = 7;
 
                // default autoattack range for ranged classes
-               if( getClass() == JOB_MACHINIST ||
-                   getClass() == JOB_BARD ||
-                   getClass() == CLASS_ARCHER )
+               if( getClass() == ClassJob::Machinist ||
+                   getClass() == ClassJob::Bard ||
+                   getClass() == ClassJob::Archer )
                   range = 25;
 
 
@@ -1484,9 +1484,9 @@ void Core::Entity::Player::autoAttack( ActorPtr pTarget )
    uint32_t damage = static_cast< uint32_t >( mainWeap->getAutoAttackDmg() );
    uint32_t variation = 0 + rand() % 3;
 
-   if ( getClass() == JOB_MACHINIST ||
-      getClass() == JOB_BARD ||
-      getClass() == CLASS_ARCHER )
+   if ( getClass() == ClassJob::Machinist||
+      getClass() == ClassJob::Bard ||
+      getClass() == ClassJob::Archer )
    {
       GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket(getId());
       effectPacket.data().targetId = pTarget->getId();
