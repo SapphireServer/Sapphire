@@ -21,7 +21,7 @@ Core::Data::ExdData g_exdData;
 
 
 //const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
-const std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv" );
+const std::string datLocation( "C:\\Data\\Games\\Final Fantasy XIV\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv" );
 
 std::string generateEnum( const std::string& exd, int8_t nameIndex, const std::string& type, bool useLang = true )
 {
@@ -46,7 +46,7 @@ std::string generateEnum( const std::string& exd, int8_t nameIndex, const std::s
       auto test = boost::get< std::string >( &fields.at( nameIndex ) );
       if( !test )
          continue;
-      auto str = *test ;
+      auto str = *test;
       str.erase( boost::remove_if( str, boost::is_any_of(",_-':!(){} \x02\x1f\x01\x03") ), str.end() );
       if( str.empty() )
          continue;
@@ -66,9 +66,13 @@ std::string generateEnum( const std::string& exd, int8_t nameIndex, const std::s
       result += "      " + str + " = " + std::to_string( id  ) + ",\n";
 
    }
+
+   /*
    result +=
            "      bool operator==( const " + exd + "& t, const " + type + "& g ) { return static_cast< " + type + " >( t ) == g; }\n"
            "      bool operator==( const " + type + "& g, const " + exd + "& t ) { return static_cast< " + type + " >( t ) == g; }\n";
+   */
+
    result += "   };\n";
 
    return result;
@@ -85,10 +89,12 @@ int main()
    if( !g_exdData.init( datLocation  ) )
    {
       g_log.fatal( "Error setting up EXD data " );
-      return 0;
+      return 1;
    }
   
    std::string result = "#ifndef _COMMON_GEN_H_\n#define _COMMON_GEN_H_\n";
+
+   result += "\n#include <stdint.h>\n\n";
 
    result +=
    "/* This file has been automatically generated.\n   Changes will be lost upon regeneration.\n   To change the content edit tools/exd_common_gen */\n";

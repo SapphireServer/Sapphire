@@ -1,5 +1,7 @@
 #include "CommonGen.h"
 
+#include <stdint.h>
+
 namespace Core {
 namespace Common {
 

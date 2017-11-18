@@ -1,5 +1,8 @@
 #ifndef _COMMON_GEN_H_
 #define _COMMON_GEN_H_
+
+#include <stdint.h>
+
 /* This file has been automatically generated.
    Changes will be lost upon regeneration.
    To change the content edit tools/exd_common_gen */
@@ -25,7 +28,6 @@ namespace Common {
       Glamour = 13,
       ItemManipulation = 14,
       AdrenalineRush = 15,
-
    };
 
    ///////////////////////////////////////////////////////////
@@ -41,14 +43,12 @@ namespace Common {
       Honored = 6,
       Sworn = 7,
       Allied = 8,
-
    };
 
    ///////////////////////////////////////////////////////////
    //BeastTribe.exd
    enum class BeastTribe : uint8_t
    {
-
    };
 
    ///////////////////////////////////////////////////////////
@@ -91,7 +91,6 @@ namespace Common {
       Astrologian = 33,
       Samurai = 34,
       Redmage = 35,
-
    };
 
    ///////////////////////////////////////////////////////////
@@ -120,7 +119,6 @@ namespace Common {
       DeepDungeons = 21,
       WondrousTails = 24,
       CustomDeliveries = 25,
-
    };
 
    ///////////////////////////////////////////////////////////
@@ -130,7 +128,6 @@ namespace Common {
       General = 1,
       Persistent = 2,
       Expressions = 3,
-
    };
 
    ///////////////////////////////////////////////////////////
@@ -140,7 +137,6 @@ namespace Common {
       ARealmReborn = 0,
       Heavensward = 1,
       Stormblood = 2,
-
    };
 
    ///////////////////////////////////////////////////////////
@@ -151,7 +147,6 @@ namespace Common {
       Maelstrom = 1,
       OrderoftheTwinAdder = 2,
       ImmortalFlames = 3,
-
    };
 
    ///////////////////////////////////////////////////////////
@@ -170,7 +165,6 @@ namespace Common {
       NaldthaltheTraders = 10,
       NophicatheMatron = 11,
       AlthyktheKeeper = 12,
-
    };
 
    ///////////////////////////////////////////////////////////
@@ -277,7 +271,6 @@ namespace Common {
       ScholarsArm = 98,
       FishersSecondaryTool = 99,
       Currency = 100,
-
    };
 
    ///////////////////////////////////////////////////////////
@@ -369,7 +362,6 @@ namespace Common {
       SamuraisArms = 83,
       RedMagesArms = 84,
       ScholarsArms = 85,
-
    };
 
    ///////////////////////////////////////////////////////////
@@ -423,7 +415,6 @@ namespace Common {
       FreeCompany = 45,
       GrandCompany = 46,
       Online = 47,
-
    };
 
    ///////////////////////////////////////////////////////////
@@ -436,7 +427,6 @@ namespace Common {
       Miqote = 4,
       Roegadyn = 5,
       AuRa = 6,
-
    };
 
    ///////////////////////////////////////////////////////////
@@ -455,7 +445,6 @@ namespace Common {
       Hellsguard = 10,
       Raen = 11,
       Xaela = 12,
-
    };
 
    ///////////////////////////////////////////////////////////
@@ -468,7 +457,6 @@ namespace Common {
       Uldah = 3,
       Ishgard = 4,
       Kugane = 7,
-
    };
 
    ///////////////////////////////////////////////////////////
@@ -565,9 +553,7 @@ namespace Common {
       Thunder3 = 88,
       DimensionalDisruption3 = 89,
       FairSkies9 = 90,
-
    };
-
 }
 }
 #endif
