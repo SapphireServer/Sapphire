@@ -16,10 +16,10 @@ Core::Item::Item( uint32_t catalogId ) :
 
 }
 
-Core::Item::Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, Common::ItemCategory categoryId, bool isHq ) :
+Core::Item::Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, Common::ItemUICategory categoryId, bool isHq ) :
    m_id( catalogId ),
    m_uId( uId ),
-   m_category( categoryId ),
+   m_category( static_cast< Common::ItemUICategory >( categoryId ) ),
    m_model1( model1 ),
    m_model2( model2 ),
    m_isHq( isHq )
@@ -92,12 +92,12 @@ uint32_t Core::Item::getStackSize() const
    return m_stackSize;
 }
 
-void Core::Item::setCategory( Common::ItemCategory categoryId )
+void Core::Item::setCategory( Common::ItemUICategory categoryId )
 {
    m_category = categoryId;
 }
 
-Core::Common::ItemCategory Core::Item::getCategory() const
+Core::Common::ItemUICategory Core::Item::getCategory() const
 {
    return m_category;
 }

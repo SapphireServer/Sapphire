@@ -28,48 +28,48 @@ void Core::Entity::Player::equipWeapon( Core::ItemPtr pItem )
 
    switch( pItem->getCategory() )
    {
-   case ItemCategory::PugWep:
-      if( currentClass != ClassJob::CLASS_PUGILIST &&
-          currentClass != ClassJob::JOB_MONK )
-         setClassJob( ClassJob::CLASS_PUGILIST );
+   case ItemUICategory::PugilistsArm:
+      if( currentClass != ClassJob::Pugilist &&
+          currentClass != ClassJob::Monk )
+         setClassJob( ClassJob::Pugilist );
       break;
-   case ItemCategory::GlaWep:
-      if( currentClass != ClassJob::CLASS_GLADIATOR &&
-          currentClass != ClassJob::JOB_KNIGHT )
-         setClassJob( ClassJob::CLASS_GLADIATOR );
+   case ItemUICategory::GladiatorsArm:
+      if( currentClass != ClassJob::Gladiator &&
+          currentClass != ClassJob::Paladin )
+         setClassJob( ClassJob::Gladiator );
       break;
-   case ItemCategory::MrdWep:
-      if( currentClass != ClassJob::CLASS_MARAUDER &&
-          currentClass != ClassJob::JOB_WARRIOR )
-         setClassJob( ClassJob::CLASS_MARAUDER );
+   case ItemUICategory::MaraudersArm:
+      if( currentClass != ClassJob::Marauder &&
+          currentClass != ClassJob::Warrior )
+         setClassJob( ClassJob::Marauder );
       break;
-   case ItemCategory::ArcWep:
-      if( currentClass != ClassJob::CLASS_ARCHER &&
-          currentClass != ClassJob::JOB_BARD )
-         setClassJob( ClassJob::CLASS_ARCHER );
+   case ItemUICategory::ArchersArm:
+      if( currentClass != ClassJob::Archer &&
+          currentClass != ClassJob::Bard )
+         setClassJob( ClassJob::Archer );
       break;
-   case ItemCategory::LncWep:
-      if( currentClass != ClassJob::CLASS_LANCER &&
-          currentClass != ClassJob::JOB_DRAGON )
-         setClassJob( ClassJob::CLASS_LANCER );
+   case ItemUICategory::LancersArm:
+      if( currentClass != ClassJob::Lancer &&
+          currentClass != ClassJob::Dragoon )
+         setClassJob( ClassJob::Lancer );
       break;
-   case ItemCategory::ThmWep:
-   case ItemCategory::Thm2Wep:
-      if( currentClass != ClassJob::CLASS_THAUMATURGE &&
-          currentClass != ClassJob::JOB_BLACKMAGE )
-         setClassJob( ClassJob::CLASS_THAUMATURGE );
+   case ItemUICategory::OnehandedThaumaturgesArm:
+   case ItemUICategory::TwohandedThaumaturgesArm:
+      if( currentClass != ClassJob::Thaumaturge &&
+          currentClass != ClassJob::Blackmage )
+         setClassJob( ClassJob::Thaumaturge );
       break;
-   case ItemCategory::CnjWep:
-   case ItemCategory::Cnj2Wep:
-      if( currentClass != ClassJob::CLASS_CONJURER &&
-          currentClass != ClassJob::JOB_WHITEMAGE )
-         setClassJob( ClassJob::CLASS_CONJURER );
+   case ItemUICategory::OnehandedConjurersArm:
+   case ItemUICategory::TwohandedConjurersArm:
+      if( currentClass != ClassJob::Conjurer &&
+          currentClass != ClassJob::Whitemage )
+         setClassJob( ClassJob::Conjurer );
       break;
-   case ItemCategory::ArnWep:
-      if( currentClass != ClassJob::CLASS_ARCANIST &&
-          currentClass != ClassJob::JOB_SUMMONER &&
-          currentClass != ClassJob::JOB_SCHOLAR )
-         setClassJob( ClassJob::CLASS_ARCANIST );
+   case ItemUICategory::ArcanistsGrimoire:
+      if( currentClass != ClassJob::Arcanist &&
+          currentClass != ClassJob::Summoner &&
+          currentClass != ClassJob::Scholar )
+         setClassJob( ClassJob::Arcanist );
       break;
    default:
       break;

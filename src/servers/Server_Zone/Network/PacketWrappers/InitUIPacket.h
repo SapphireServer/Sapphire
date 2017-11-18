@@ -36,9 +36,9 @@ private:
       m_data.race = player->getLookAt( Common::CharaLook::Race );
       m_data.tribe = player->getLookAt( Common::CharaLook::Tribe );
       m_data.gender = player->getLookAt( Common::CharaLook::Gender );
-      m_data.currentClass = static_cast< Common::ClassJob >( player->getClass() );
-      m_data.currentJob = static_cast< Common::ClassJob >( player->getClass() );
-      m_data.deity = static_cast< Common::GuardianDeity >( player->getGuardianDeity() );
+      m_data.currentClass = static_cast< uint8_t >( player->getClass() );
+      m_data.currentJob = static_cast< uint8_t >( player->getClass() );
+      m_data.deity = static_cast< uint8_t >( player->getGuardianDeity() );
       m_data.namedayMonth = player->getBirthMonth();
       m_data.namedayDay = player->getBirthDay();
       // TODO: Support grand company status.
