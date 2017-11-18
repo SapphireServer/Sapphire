@@ -497,7 +497,7 @@ void Core::Network::GameConnection::gm2Handler( const Packets::GamePacket& inPac
          "\nGil: " + std::to_string( targetPlayer->getCurrency( 1 ) ) +
          "\nZone: " + targetPlayer->getCurrentZone()->getName() +
          "(" + std::to_string( targetPlayer->getZoneId() ) + ")" +
-         "\nClass: " + std::to_string( targetPlayer->getClass() ) +
+         "\nClass: " + std::to_string( static_cast< uint8_t >( targetPlayer->getClass() ) ) +
          "\nLevel: " + std::to_string( targetPlayer->getLevel() ) +
          "\nExp: " + std::to_string( targetPlayer->getExp() ) +
          "\nSearchMessage: " + targetPlayer->getSearchMessage() +

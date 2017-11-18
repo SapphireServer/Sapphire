@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `charadetail` (
   `RentalTimer` float DEFAULT NULL,
   `StartTown` int(3) DEFAULT NULL,
   `ActiveTitle` int(5) DEFAULT NULL,
-  `TitleList` binary(32) DEFAULT NULL,
+  `TitleList` binary(48) DEFAULT NULL,
   `Achievement` binary(16) DEFAULT NULL,
   `Aetheryte` binary(16) DEFAULT NULL,
   `HowTo` binary(33) DEFAULT NULL,

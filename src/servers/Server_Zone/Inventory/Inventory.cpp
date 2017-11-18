@@ -153,7 +153,7 @@ Core::ItemPtr Core::Inventory::createItem( uint32_t catalogId, uint8_t quantity 
    pItem->setStackSize( itemAmount );
    pItem->setUId( getNextUId() );
    pItem->setModelIds( itemInfo->model_primary, itemInfo->model_secondary );
-   pItem->setCategory( static_cast< ItemCategory >( itemInfo->ui_category ) );
+   pItem->setCategory( static_cast< ItemUICategory >( itemInfo->ui_category ) );
 
    g_charaDb.execute( "INSERT INTO charaglobalitem ( CharacterId, itemId, catalogId, stack, flags ) VALUES ( " +
                       std::to_string( m_pOwner->getId() ) + ", " +
@@ -636,7 +636,7 @@ Core::ItemPtr Core::Inventory::loadItem( uint64_t uId )
                                itemInfo->id, 
                                itemInfo->model_primary,
                                itemInfo->model_secondary, 
-                               static_cast< ItemCategory >( itemInfo->ui_category ),
+                               static_cast< ItemUICategory >( itemInfo->ui_category ),
                                isHq ) );
       pItem->setStackSize( itemRes->getUInt( 2 ) );
 

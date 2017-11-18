@@ -46,7 +46,7 @@ Zone::Zone()
    , m_layoutId( 0 )
    , m_bPrivate( false )
    , m_type( Common::RegionType::normal )
-   , m_currentWeather( static_cast<uint8_t>( Common::Weather::Fair ) )
+   , m_currentWeather( static_cast<uint8_t>( Common::Weather::FairSkies ) )
    , m_weatherOverride( 0 )
    , m_lastMobUpdate( 0 )
 {
@@ -54,7 +54,7 @@ Zone::Zone()
 
 Zone::Zone( uint16_t zoneId, uint32_t layoutId, std::string name, std::string interName, bool bPrivate = false )
    : m_type( Common::RegionType::normal )
-   , m_currentWeather( static_cast<uint8_t>( Common::Weather::Fair ) )
+   , m_currentWeather( static_cast<uint8_t>( Common::Weather::FairSkies ) )
 {
    m_layoutId = layoutId;
 
