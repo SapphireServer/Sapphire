@@ -58,7 +58,7 @@ CREATE TABLE `charainfo` (
   `RestPoint` int(10) DEFAULT '0',
   `StartTown` int(3) DEFAULT '0',
   `ActiveTitle` int(5) DEFAULT '0',
-  `TitleList` binary(48) DEFAULT NULL,
+  `TitleList` binary(32) DEFAULT NULL,
   `Achievement` binary(16) DEFAULT NULL,
   `Aetheryte` binary(16) DEFAULT NULL,
   `HowTo` binary(33) DEFAULT NULL,
