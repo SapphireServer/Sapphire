@@ -17,7 +17,7 @@ namespace Core {
    { 
    public:
 
-      typedef void ( DebugCommandHandler::*pFunc )( char *, Entity::PlayerPtr, boost::shared_ptr< DebugCommand > );
+      using pFunc = void ( DebugCommandHandler::* )( char *, Entity::PlayerPtr, boost::shared_ptr< DebugCommand > );
 
       // String for the command
       std::string m_commandName;

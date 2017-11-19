@@ -57,7 +57,7 @@ public:
    boost::shared_ptr< Mysql::ResultSet > query( const std::string& sql, boost::shared_ptr< T > connection = nullptr );
    boost::shared_ptr< Mysql::PreparedResultSet > query( boost::shared_ptr< PreparedStatement > stmt );
 
-   typedef typename T::Statements PreparedStatementIndex;
+   using PreparedStatementIndex = typename T::Statements;
 
    boost::shared_ptr< PreparedStatement > getPreparedStatement( PreparedStatementIndex index );
 

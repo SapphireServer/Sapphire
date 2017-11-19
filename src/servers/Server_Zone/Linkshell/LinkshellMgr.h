@@ -7,7 +7,7 @@
 namespace Core
 {
 class Linkshell;
-typedef boost::shared_ptr< Linkshell > LinkshellPtr;
+using LinkshellPtr = boost::shared_ptr< Linkshell >;
 
 class LinkshellMgr
 {

@@ -42,8 +42,8 @@ Core::Network::SapphireAPI g_sapphireAPI;
 using namespace std;
 using namespace boost::property_tree;
 
-typedef SimpleWeb::Server< SimpleWeb::HTTP > HttpServer;
-typedef SimpleWeb::Client< SimpleWeb::HTTP > HttpClient;
+using HttpServer = SimpleWeb::Server< SimpleWeb::HTTP >;
+using HttpClient = SimpleWeb::Client< SimpleWeb::HTTP >;
 
 //Added for the default_resource example
 void default_resource_send( const HttpServer &server, const shared_ptr< HttpServer::Response > &response,

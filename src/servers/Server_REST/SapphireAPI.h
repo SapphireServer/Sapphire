@@ -21,7 +21,7 @@ namespace Core
          SapphireAPI();
          ~SapphireAPI();
 
-         typedef std::map< std::string, boost::shared_ptr< Session > > SessionMap;
+         using SessionMap = std::map< std::string, boost::shared_ptr< Session > >;
 
          bool login( const std::string& username, const std::string& pass, std::string& sId );
 

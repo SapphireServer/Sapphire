@@ -28,7 +28,7 @@ namespace Db
    class Operation;
    class DbWorker;
 
-   typedef boost::scoped_ptr< PreparedStatement > PreparedStmtScopedPtr;
+   using PreparedStmtScopedPtr = boost::scoped_ptr< PreparedStatement >;
 
    enum ConnectionFlags
    {
@@ -48,7 +48,7 @@ namespace Db
       uint8_t asyncThreads;
    };
 
-   typedef std::map< uint32_t, std::pair< std::string, ConnectionFlags > > PreparedStatementMap;
+   using PreparedStatementMap = std::map< uint32_t, std::pair< std::string, ConnectionFlags > >;
 
    class DbConnection : public boost::enable_shared_from_this< DbConnection >
    {

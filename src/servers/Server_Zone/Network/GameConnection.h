@@ -31,8 +31,8 @@ class GameConnection : public Connection
 private:
    typedef void ( GameConnection::* Handler )( const Packets::GamePacket& inPacket, Entity::PlayerPtr pPlayer );
 
-   typedef std::map< uint16_t, Handler > HandlerMap;
-   typedef std::map< uint16_t, std::string > HandlerStrMap;
+   using HandlerMap = std::map< uint16_t, Handler >;
+   using HandlerStrMap = std::map< uint16_t, std::string >;
 
    AcceptorPtr m_pAcceptor;
 
