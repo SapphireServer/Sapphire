@@ -8,7 +8,7 @@
 
 namespace Core {
 
-   typedef std::unordered_map<uint32_t, ZonePtr> ZoneMap;
+   using ZoneMap = std::unordered_map< uint32_t, ZonePtr >;
 
    class ZoneMgr
    {

@@ -9,7 +9,7 @@ namespace Core
 
 class ItemContainer;
 
-typedef std::map< uint16_t, ItemContainerPtr > InventoryMap;
+using InventoryMap = std::map< uint16_t, ItemContainerPtr >;
 class Inventory
 {
 public:
@@ -135,7 +135,7 @@ public:
       Ring2 = 12,
       SoulCrystal = 13,
    };
-   typedef std::pair< uint16_t, int8_t > InvSlotPair;
+   using InvSlotPair = std::pair< uint16_t, int8_t >;
    typedef std::vector< InvSlotPair > InvSlotPairVec;
 
    InvSlotPairVec getSlotsOfItemsInInventory( uint32_t catalogId );

@@ -81,7 +81,7 @@ enum CharaDbStatements : uint32_t
 class  CharaDbConnection : public DbConnection
 {
 public:
-   typedef CharaDbStatements Statements;
+   using Statements = CharaDbStatements;
 
    CharaDbConnection( ConnectionInfo& connInfo );
    CharaDbConnection( Core::LockedWaitQueue< boost::shared_ptr< Operation > >* q, ConnectionInfo &connInfo );

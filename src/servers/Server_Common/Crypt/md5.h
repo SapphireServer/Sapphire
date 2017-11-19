@@ -7,13 +7,12 @@ namespace Core
 {
    namespace Util
    {
-      typedef struct
+      using md5_context = struct
       {
          uint32_t total[2];
          uint32_t state[4];
          uint8_t buffer[64];
-      }
-      md5_context;
+      };
 
 
       void md5( uint8_t *text, uint8_t *hash, int32_t size );
