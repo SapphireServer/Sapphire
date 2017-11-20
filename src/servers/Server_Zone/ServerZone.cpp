@@ -44,7 +44,8 @@ Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
 
 Core::ServerZone::ServerZone( const std::string& configPath )
    : m_configPath( configPath ),
-     m_bRunning( true )
+     m_bRunning( true ),
+     m_lastDBPingTime( 0 )
 {
    m_pConfig = XMLConfigPtr( new XMLConfig );
 }
@@ -270,6 +271,12 @@ void Core::ServerZone::mainLoop()
                session->update();
 
          }
+      }
+
+      if( currTime - m_lastDBPingTime > 3 )
+      {
+         g_charaDb.keepAlive();
+         m_lastDBPingTime = currTime;
       }
 
 

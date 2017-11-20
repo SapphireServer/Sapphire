@@ -51,6 +51,7 @@ namespace Core {
 
       uint16_t m_port;
       std::string m_ip;
+      uint32_t m_lastDBPingTime;
 
       bool m_bRunning;
 
