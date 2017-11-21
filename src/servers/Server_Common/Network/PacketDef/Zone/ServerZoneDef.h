@@ -1314,6 +1314,12 @@ struct FFXIVIpcMount : FFXIVIpcBasePacket<Mount>
 };
 
 
+struct FFXIVIpcPerformNote : FFXIVIpcBasePacket<PerformNote>
+{
+   uint8_t data[32];
+};
+
+
 } /* Server */
 } /* Packets */
 } /* Network */
