@@ -1,5 +1,5 @@
 ﻿# Sapphire - FINAL FANTASY XIV Server Emulator
-[![Discord Server](https://img.shields.io/badge/discord-Sapphire-7289DA.svg)](https://discord.gg/KfrZCkx)
+[![Discord Server](https://img.shields.io/badge/discord-Sapphire-7289DA.svg)](https://discord.gg/xxcdCER)
 [![Linux Build Status](https://travis-ci.org/SapphireMordred/Sapphire.svg?branch=master)](https://travis-ci.org/SapphireMordred/Sapphire)
 [![Windows Build Status](https://ci.appveyor.com/api/projects/status/lil7lxa3ty165emm?svg=true)](https://ci.appveyor.com/project/SapphireMordred/Sapphire)
 ![FFXIV Sapphire](http://i.imgur.com/I4bj1tR.png)
