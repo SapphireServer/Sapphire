@@ -48,7 +48,6 @@ Core::Network::Packets::GamePacketPtr Core::Entity::Group::Group::addMember( Pla
       member.role = 0;
       member.pPlayer = pRecipient;
       m_members.emplace( recipientId, member );
-      reload();
    }
    else
    {
@@ -72,12 +71,37 @@ void Core::Entity::Group::Group::sendPacketToMembers( Core::Network::Packets::Ga
    }
 }
 
-void Core::Entity::Group::Group::reload()
+bool Core::Entity::Group::Group::isParty() const
 {
-   m_reloadGroup = true;
+   return m_type == GroupType::Party;
 }
 
-bool Core::Entity::Group::Group::canReload() const
+bool Core::Entity::Group::Group::isFriendList() const
 {
-   return m_reloadGroup;
+   return m_type == GroupType::FriendList;
+}
+
+bool Core::Entity::Group::Group::isFreeCompany() const
+{
+   return m_type == GroupType::FreeCompany;
+}
+
+bool Core::Entity::Group::Group::isLinkshell() const
+{
+   return m_type == GroupType::Linkshell;
+}
+
+bool Core::Entity::Group::Group::isFreeCompanyPetition() const
+{
+   return m_type == GroupType::FreeCompanyPetition;
+}
+
+bool Core::Entity::Group::Group::isBlacklist() const
+{
+   return m_type == GroupType::Blacklist;
+}
+
+bool Core::Entity::Group::Group::isContentGroup() const
+{
+   return m_type == GroupType::ContentGroup;
 }

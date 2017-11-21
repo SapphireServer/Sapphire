@@ -13,6 +13,9 @@ namespace Core {
 namespace Entity {
 namespace Group {
 
+class Group;
+using GroupPtr = boost::shared_ptr< Group >;
+
 struct GroupMember
 {
    uint64_t inviterId;
@@ -24,7 +27,7 @@ enum class GroupType : uint8_t
 {
    None,
    Party,
-   Friends,
+   FriendList,
    FreeCompany,
    Linkshell,
 
@@ -44,19 +47,7 @@ private:
    time_point m_createTime{ std::chrono::steady_clock::now() };
    std::map< uint64_t, GroupMember > m_members;
    std::map< uint64_t, uint64_t > m_invites; // <recipient, sender>
-   bool m_reloadGroup;
 
-   void addMember( uint64_t senderId = 0, uint64_t recipientId = 0 );
-   void inviteMember( uint64_t senderId, uint64_t recipientId = 0 );
-   void removeMember( uint64_t id = 0 );
-public:
-   Group( uint64_t id, uint64_t ownerId, uint32_t maxCapacity, time_point createTime ) :
-      m_id( id ), m_ownerId( m_ownerId ), m_maxCapacity( maxCapacity ),  m_createTime( createTime ){};
-   ~Group(){};
-
-   virtual void load() = 0;
-   virtual void update() = 0;
-   virtual void disband() = 0;
 
    virtual Core::Network::Packets::GamePacketPtr addMember( PlayerPtr pSender, PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
    virtual Core::Network::Packets::GamePacketPtr inviteMember( PlayerPtr pSender, PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
@@ -64,8 +55,21 @@ public:
    virtual Core::Network::Packets::GamePacketPtr kickMember( PlayerPtr pSender, PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
    virtual void sendPacketToMembers( Core::Network::Packets::GamePacketPtr pPacket, bool invitesToo = false );
 
-   void reload();
-   bool canReload() const;
+   virtual void load();
+   virtual void update();
+   virtual void disband();
+public:
+   Group( uint64_t id, uint64_t ownerId, uint32_t maxCapacity, time_point createTime ) :
+      m_id( id ), m_ownerId( m_ownerId ), m_maxCapacity( maxCapacity ),  m_createTime( createTime ){};
+   ~Group(){};
+
+   bool isParty() const;
+   bool isFriendList() const;
+   bool isFreeCompany() const;
+   bool isLinkshell() const;
+   bool isFreeCompanyPetition() const;
+   bool isBlacklist() const;
+   bool isContentGroup() const;
 };
 
 }
