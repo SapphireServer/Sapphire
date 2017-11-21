@@ -1,11 +1,14 @@
-#include <src/servers/Server_Common/Exd/ExdData.h>
-
-#include "CalcBattle.h"
-#include "Actor.h"
-#include "Player.h"
 #include <cmath>
 
-using namespace Core::Data;
+#include <Server_Common/Exd/ExdData.h>
+#include <Server_Common/Common.h>
+#include <Server_Zone/Actor/Actor.h>
+#include <Server_Zone/Actor/Player.h>
+
+#include "CalcStats.h"
+
+
+using namespace Core::Math;
 using namespace Core::Entity;
 
 extern Core::Data::ExdData g_exdData;
@@ -22,15 +25,14 @@ extern Core::Data::ExdData g_exdData;
    TODO:
 
    Base HP val modifier. I can only find values for levels 50~70.
-   Attack power (and healing power). Needs more research on this.
-   Damage outgoing calculations. This includes auto-attacks, etc.
-
+   Dereferencing the actor (Player right now) for stats seem meh, perhaps consider a structure purely for stats?
+   Reduce repeated code (more specifically the data we pull from exd)
 */
 
 // 3 Versions. SB and HW are linear, ARR is polynomial.
 // Originally from Player.cpp, calculateStats().
 
-float CalcBattle::calculateBaseStat( PlayerPtr pPlayer )
+float CalcStats::calculateBaseStat( PlayerPtr pPlayer )
 {
    float base = 0.0f;
    uint8_t level = pPlayer->getLevel();
@@ -53,10 +55,10 @@ float CalcBattle::calculateBaseStat( PlayerPtr pPlayer )
 // Leggerless' HP Formula
 // ROUNDDOWN(JobModHP * (BaseHP / 100)) + ROUNDDOWN(VitHPMod / 100 * (VIT - BaseDET))
 
-uint32_t CalcBattle::calculateMaxHp( PlayerPtr pPlayer )
+uint32_t CalcStats::calculateMaxHp( PlayerPtr pPlayer )
 {
    // TODO: Replace ApproxBaseHP with something that can get us an accurate BaseHP.
-   // Is there any way to pull BaseHP without having to manually use a pet for every level, and using the values from a table?
+   // Is there any way to pull reliable BaseHP without having to manually use a pet for every level, and using the values from a table?
    // More info here: https://docs.google.com/spreadsheets/d/1de06KGT0cNRUvyiXNmjNgcNvzBCCQku7jte5QxEQRbs/edit?usp=sharing
    
    auto classInfoIt = g_exdData.m_classJobInfoMap.find( static_cast< uint8_t >( pPlayer->getClass() ) );
@@ -91,7 +93,7 @@ uint32_t CalcBattle::calculateMaxHp( PlayerPtr pPlayer )
 // Leggerless' MP Formula
 // ROUNDDOWN(((ROUNDDOWN(((PIE - BaseDET) * PieMPMod/100),0) + BaseMP) * JobModMP / 100),0)
 
-uint32_t CalcBattle::calculateMaxMp( PlayerPtr pPlayer )
+uint32_t CalcStats::calculateMaxMp( PlayerPtr pPlayer )
 {
    auto classInfoIt = g_exdData.m_classJobInfoMap.find( static_cast< uint8_t >( pPlayer->getClass() ) );
    auto paramGrowthInfoIt = g_exdData.m_paramGrowthInfoMap.find( pPlayer->getLevel() );
@@ -109,19 +111,4 @@ uint32_t CalcBattle::calculateMaxMp( PlayerPtr pPlayer )
    uint16_t result = static_cast< uint16_t >( floor( floor( piety - baseStat ) * ( pietyScalar / 100 ) + baseMp ) * jobModMp / 100 );
 
    return result;
-}
-
-uint32_t CalcBattle::calculateHealValue( PlayerPtr pPlayer, uint32_t potency )
-{
-   auto classInfoIt = g_exdData.m_classJobInfoMap.find( static_cast< uint8_t >( pPlayer->getClass() ) );
-   auto paramGrowthInfoIt = g_exdData.m_paramGrowthInfoMap.find( pPlayer->getLevel() );
-
-   if ( classInfoIt == g_exdData.m_classJobInfoMap.end() ||
-      paramGrowthInfoIt == g_exdData.m_paramGrowthInfoMap.end())
-      return 0;
-
-   auto jobModVal = classInfoIt->second;
-
-   // consider 3% variation
-   return potency / 10;
 }
