@@ -7,6 +7,8 @@ project(Sapphire_Zone)
 file(GLOB SERVER_PUBLIC_INCLUDE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
         /*.h
         Actor/*.h
+        Actor/Group/*.h
+        Actor/Group/Manager/*.h
         Action/*.h
         DebugCommand/*.h
         Event/*.h
@@ -22,6 +24,8 @@ file(GLOB SERVER_PUBLIC_INCLUDE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 file(GLOB SERVER_SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
         *.c*
         Actor/*.c*
+        Actor/Group/*.c*
+        Actor/Group/Manager/*.c*
         Action/*.c*
         DebugCommand/*.c*
         Event/*.c*

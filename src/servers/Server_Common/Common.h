@@ -802,6 +802,30 @@ namespace Common {
       MountSkill = 0xD,
    };
 
+   enum SocialCategory : uint8_t
+   {
+      Party = 1,
+      Friends = 2,
+      FreeCompanyPetition = 4,
+      FreeCompany = 5,
+   };
+
+   // todo: rename SocialRequestAction and SocialRequestResponse cause they seem ambiguous
+   enum class SocialRequestAction : uint8_t
+   {
+      Invite = 1,
+      Cancel = 2,
+      Accept = 3,
+      Decline = 4,
+   };
+
+   enum class SocialRequestResponse : uint8_t
+   {
+      Decline,
+      Accept,
+      Cancel,
+   };
+
    struct ServerEntry
    {
       uint32_t serverId;

@@ -51,6 +51,7 @@ Core::Network::GameConnection::GameConnection( Core::Network::HivePtr pHive,
    setZoneHandler( ClientZoneIpcType::PlayTimeHandler,      "PlayTimeHandler",          &GameConnection::playTimeHandler );
    setZoneHandler( ClientZoneIpcType::LogoutHandler,        "LogoutHandler",            &GameConnection::logoutHandler );
 
+   setZoneHandler( ClientZoneIpcType::SocialReqSendHandler, "SocialReqSendHandler",     &GameConnection::socialReqSendHandler );
    setZoneHandler( ClientZoneIpcType::SocialListHandler,    "SocialListHandler",        &GameConnection::socialListHandler );
    setZoneHandler( ClientZoneIpcType::SetSearchInfoHandler, "SetSearchInfoHandler",     &GameConnection::setSearchInfoHandler );
    setZoneHandler( ClientZoneIpcType::ReqSearchInfoHandler, "ReqSearchInfoHandler",     &GameConnection::reqSearchInfoHandler );

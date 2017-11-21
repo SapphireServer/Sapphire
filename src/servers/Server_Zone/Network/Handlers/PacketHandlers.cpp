@@ -452,16 +452,15 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
       listPacket.data().entries[0].contentId = pPlayer->getContentId();
       listPacket.data().entries[0].level = pPlayer->getLevel();
       listPacket.data().entries[0].zoneId = pPlayer->getCurrentZone()->getId();
-      listPacket.data().entries[0].zoneId1 = 0x0100;
+      listPacket.data().entries[0].grandCompany = pPlayer->getGc();
+      memcpy( &listPacket.data().entries[0].fcTag[0], "Sapphire", sizeof( "Sapphire" ) );
+      listPacket.data().entries[0].clientLanguage = 2;
+      listPacket.data().entries[0].knownLanguages = 0x0F;
       // TODO: no idea what this does
       //listPacket.data().entries[0].one = 1;
 
       memcpy( listPacket.data().entries[0].name, pPlayer->getName().c_str(), strlen( pPlayer->getName().c_str() ) );
 
-      // TODO: actually store and read language from somewhere
-      listPacket.data().entries[0].bytes1[0] = 0x01;//flags (lang)
-                                                    // TODO: these flags need to be figured out
-                                                    //listPacket.data().entries[0].bytes1[1] = 0x00;//flags
       listPacket.data().entries[0].onlineStatusMask = pPlayer->getOnlineStatusMask();
 
       queueOutPacket( listPacket );

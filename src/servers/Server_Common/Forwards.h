@@ -2,6 +2,11 @@
 #define _COMMON_FORWARDS_H
 
 #include <boost/shared_ptr.hpp>
+#include <chrono>
+
+using namespace std::chrono_literals;
+using time_point = std::chrono::steady_clock::time_point;
+using duration = std::chrono::steady_clock::duration;
 
 namespace Core 
 {

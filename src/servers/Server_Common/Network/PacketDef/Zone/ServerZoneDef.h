@@ -83,17 +83,34 @@ struct PlayerEntry {
    uint64_t contentId;
    uint8_t bytes[12];
    uint16_t zoneId;
-   uint16_t zoneId1;
-   char bytes1[8];
+   uint8_t grandCompany;
+   uint8_t clientLanguage;
+   uint8_t knownLanguages; // bitmask, J 0x01, E 0x02, D 0x04, F 0x08
+   uint8_t searchComment; // bool
+   char bytes1[6];
    uint64_t onlineStatusMask;
    uint8_t classJob;
    uint8_t padding;
-   uint8_t level;
-   uint8_t padding1;
+   uint16_t level;
    uint16_t padding2;
    uint8_t one;
    char name[0x20];
    char fcTag[9];
+};
+
+struct FFXIVIpcSocialRequestError : FFXIVIpcBasePacket<SocialRequestError>
+{
+
+};
+
+struct FFXIVIpcSocialRequestResponse : FFXIVIpcBasePacket<SocialRequestResponse>
+{
+   uint64_t contentId;
+   uint32_t unknown;
+   uint8_t category; // Common::SocialCategory
+   uint8_t response; // Common::SocialRequestResponse
+   char name[0x20];
+   uint16_t padding;
 };
 
 struct FFXIVIpcSocialList : FFXIVIpcBasePacket<SocialList>
