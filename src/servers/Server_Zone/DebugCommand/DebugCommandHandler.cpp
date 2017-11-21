@@ -183,7 +183,7 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
                                pPlayer->getPos().y + static_cast< float >( posY ),
                                pPlayer->getPos().z + static_cast< float >( posZ ) );
 
-      Network::Packets::GamePacketNew< Network::Packets::Server::FFXIVIpcActorSetPos, Network::Packets::ServerZoneIpcType >
+      Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcActorSetPos >
          setActorPosPacket( pPlayer->getId() );
       setActorPosPacket.data().x = pPlayer->getPos().x;
       setActorPosPacket.data().y = pPlayer->getPos().y;
@@ -204,7 +204,7 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
       int32_t discover_id;
       sscanf( params.c_str(), "%i %i", &map_id, &discover_id );
 
-      Network::Packets::GamePacketNew< Network::Packets::Server::FFXIVIpcDiscovery, Network::Packets::ServerZoneIpcType > discoveryPacket( pPlayer->getId() );
+      Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcDiscovery > discoveryPacket( pPlayer->getId() );
       discoveryPacket.data().map_id = map_id;
       discoveryPacket.data().map_part_id = discover_id;
       pPlayer->queuePacket( discoveryPacket );
@@ -375,7 +375,7 @@ void Core::DebugCommandHandler::add( char * data, Core::Entity::PlayerPtr pPlaye
 
       pPlayer->sendNotice( "Injecting ACTOR_CONTROL " + std::to_string( opcode ) );
 
-      Network::Packets::GamePacketNew< Network::Packets::Server::FFXIVIpcActorControl143, Network::Packets::ServerZoneIpcType > actorControl( playerId, pPlayer->getId() );
+      Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcActorControl143 > actorControl( playerId, pPlayer->getId() );
       actorControl.data().category = opcode;
       actorControl.data().param1 = param1;
       actorControl.data().param2 = param2;
@@ -501,7 +501,7 @@ void Core::DebugCommandHandler::nudge( char * data, Entity::PlayerPtr pPlayer, b
    }
    if( offset != 0 )
    {
-      Network::Packets::GamePacketNew< Network::Packets::Server::FFXIVIpcActorSetPos, Network::Packets::ServerZoneIpcType >
+      Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcActorSetPos >
          setActorPosPacket( pPlayer->getId() );
       setActorPosPacket.data().x = pPlayer->getPos().x;
       setActorPosPacket.data().y = pPlayer->getPos().y;

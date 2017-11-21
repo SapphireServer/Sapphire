@@ -225,11 +225,11 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    {
       targetPlayer->setOnlineStatusMask( param1 );
 
-      GamePacketNew< FFXIVIpcSetOnlineStatus, ServerZoneIpcType > statusPacket( targetPlayer->getId() );
+      ZoneChannelPacket< FFXIVIpcSetOnlineStatus > statusPacket( targetPlayer->getId() );
       statusPacket.data().onlineStatusFlags = param1;
       queueOutPacket( statusPacket );
 
-      GamePacketNew< FFXIVIpcSetSearchInfo, ServerZoneIpcType > searchInfoPacket( targetPlayer->getId() );
+      ZoneChannelPacket< FFXIVIpcSetSearchInfo > searchInfoPacket( targetPlayer->getId() );
       searchInfoPacket.data().onlineStatusFlags = param1;
       searchInfoPacket.data().selectRegion = targetPlayer->getSearchSelectRegion();
       strcpy( searchInfoPacket.data().searchMessage, targetPlayer->getSearchMessage() );

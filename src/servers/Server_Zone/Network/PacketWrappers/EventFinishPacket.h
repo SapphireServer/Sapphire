@@ -11,14 +11,14 @@ namespace Server {
 /**
 * @brief The packet sent to finish an event.
 */
-class EventFinishPacket : public GamePacketNew< FFXIVIpcEventFinish, ServerZoneIpcType >
+class EventFinishPacket : public ZoneChannelPacket< FFXIVIpcEventFinish >
 {
 public:
    EventFinishPacket( uint32_t playerId,
                       uint32_t eventId,
                       uint8_t param1,
                       uint32_t param3 ) :
-      GamePacketNew< FFXIVIpcEventFinish, ServerZoneIpcType >( playerId, playerId )
+      ZoneChannelPacket< FFXIVIpcEventFinish >( playerId, playerId )
    {
       initialize( eventId, param1, param3 );
    };

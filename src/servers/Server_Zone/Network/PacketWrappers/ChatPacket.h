@@ -15,11 +15,11 @@ namespace Server {
 * @brief The Chat packet.
 */
 class ChatPacket :
-   public GamePacketNew< FFXIVIpcChat, ServerZoneIpcType >
+   public ZoneChannelPacket< FFXIVIpcChat >
 {
 public:
    ChatPacket( Entity::PlayerPtr player, Common::ChatType chatType, const std::string& msg ) :
-      GamePacketNew< FFXIVIpcChat, ServerZoneIpcType >( player->getId(), player->getId() )
+      ZoneChannelPacket< FFXIVIpcChat >( player->getId(), player->getId() )
    {
       initialize( player, chatType, msg );
    };

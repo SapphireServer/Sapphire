@@ -14,11 +14,11 @@ namespace Server {
 * @brief The Ping response packet.
 */
 class ServerNoticePacket :
-   public GamePacketNew<FFXIVIpcServerNotice, ServerZoneIpcType>
+   public ZoneChannelPacket< FFXIVIpcServerNotice >
 {
 public:
    ServerNoticePacket( uint32_t playerId, const std::string& message ) :
-      GamePacketNew<FFXIVIpcServerNotice, ServerZoneIpcType>( playerId, playerId )
+      ZoneChannelPacket< FFXIVIpcServerNotice >( playerId, playerId )
    {
       initialize( message );
    };

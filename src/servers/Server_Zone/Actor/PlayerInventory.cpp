@@ -130,7 +130,7 @@ void Core::Entity::Player::addCurrency( uint8_t type, uint32_t amount )
    if( !m_pInventory->addCurrency( static_cast< Inventory::CurrencyType >( type ), amount ) )
       return;
 
-   GamePacketNew< FFXIVIpcUpdateInventorySlot, ServerZoneIpcType > invUpPacket( getId() );
+   ZoneChannelPacket< FFXIVIpcUpdateInventorySlot > invUpPacket( getId() );
    invUpPacket.data().containerId = Inventory::InventoryType::Currency;
    invUpPacket.data().catalogId = 1;
    invUpPacket.data().quantity = m_pInventory->getCurrency( static_cast< Inventory::CurrencyType >( type ) );
@@ -144,7 +144,7 @@ void Core::Entity::Player::removeCurrency( uint8_t type, uint32_t amount )
    if( !m_pInventory->removeCurrency( static_cast< Inventory::CurrencyType >( type ), amount ) )
       return;
 
-   GamePacketNew< FFXIVIpcUpdateInventorySlot, ServerZoneIpcType > invUpPacket( getId() );
+   ZoneChannelPacket< FFXIVIpcUpdateInventorySlot > invUpPacket( getId() );
    invUpPacket.data().containerId = Inventory::InventoryType::Currency;
    invUpPacket.data().catalogId = 1;
    invUpPacket.data().quantity = m_pInventory->getCurrency( static_cast< Inventory::CurrencyType >( type ) );
@@ -164,7 +164,7 @@ void Core::Entity::Player::addCrystal( uint8_t type, uint32_t amount )
    if( !m_pInventory->addCrystal( static_cast< Inventory::CrystalType >( type ), amount ) )
       return;
 
-   GamePacketNew< FFXIVIpcUpdateInventorySlot, ServerZoneIpcType > invUpPacket( getId() );
+   ZoneChannelPacket< FFXIVIpcUpdateInventorySlot > invUpPacket( getId() );
    invUpPacket.data().containerId = Inventory::InventoryType::Crystal;
    invUpPacket.data().catalogId = static_cast< uint8_t >( type ) + 1;
    invUpPacket.data().quantity = m_pInventory->getCrystal( static_cast< Inventory::CrystalType >( type ) );
@@ -180,7 +180,7 @@ void Core::Entity::Player::removeCrystal( uint8_t type, uint32_t amount )
    if( !m_pInventory->removeCrystal( static_cast< Inventory::CrystalType >( type ), amount ) )
       return;
 
-   GamePacketNew< FFXIVIpcUpdateInventorySlot, ServerZoneIpcType > invUpPacket( getId() );
+   ZoneChannelPacket< FFXIVIpcUpdateInventorySlot > invUpPacket( getId() );
    invUpPacket.data().containerId = Inventory::InventoryType::Crystal;
    invUpPacket.data().catalogId = static_cast< uint8_t >( type ) + 1;
    invUpPacket.data().quantity = m_pInventory->getCrystal( static_cast< Inventory::CrystalType >( type ) );

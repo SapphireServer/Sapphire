@@ -49,7 +49,7 @@ void Core::Action::ActionMount::onStart()
    m_pSource->getAsPlayer()->sendDebug( "ActionMount::onStart()" );
    m_startTime = Util::getTimeMs();
 
-   GamePacketNew< FFXIVIpcActorCast, ServerZoneIpcType > castPacket( m_pSource->getId() );
+   ZoneChannelPacket< FFXIVIpcActorCast > castPacket( m_pSource->getId() );
 
    castPacket.data().action_id = m_id;
    castPacket.data().skillType = Common::SkillType::MountSkill;
@@ -74,7 +74,7 @@ void Core::Action::ActionMount::onFinish()
    pPlayer->unsetStateFlag( PlayerStateFlag::Casting );
    pPlayer->sendStateFlags();
 
-   GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket(pPlayer->getId());
+   ZoneChannelPacket< FFXIVIpcEffect > effectPacket(pPlayer->getId());
    effectPacket.data().targetId = pPlayer->getId();
    effectPacket.data().actionAnimationId = m_id;
    effectPacket.data().unknown_62 = 13; // Affects displaying action name next to number in floating text

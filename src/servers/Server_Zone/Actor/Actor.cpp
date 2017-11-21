@@ -628,7 +628,7 @@ void Core::Entity::Actor::autoAttack( ActorPtr pTarget )
       uint32_t damage = 10 + rand() % 12;
       uint32_t variation = 0 + rand() % 4;
 
-      GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket( getId() );
+      ZoneChannelPacket< FFXIVIpcEffect > effectPacket( getId() );
       effectPacket.data().targetId = pTarget->getId();
       effectPacket.data().actionAnimationId = 0x366;
       effectPacket.data().unknown_2 = variation;
@@ -671,7 +671,7 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint32_t actionId, u
    // Todo: Effect packet generator. 90% of this is basically setting params and it's basically unreadable.
    // Prepare packet. This is seemingly common for all packets in the action handler.
 
-   GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket( getId() );
+   ZoneChannelPacket< FFXIVIpcEffect > effectPacket( getId() );
    effectPacket.data().targetId = pTarget.getId();
    effectPacket.data().actionAnimationId = actionId;
    effectPacket.data().unknown_62 = 1; // Affects displaying action name next to number in floating text

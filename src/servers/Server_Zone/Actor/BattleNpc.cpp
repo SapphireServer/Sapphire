@@ -125,7 +125,7 @@ void Core::Entity::BattleNpc::spawn( Core::Entity::PlayerPtr pTarget )
 
    //pTarget->queuePacket( spawnPacket );
 
-   GamePacketNew< FFXIVIpcNpcSpawn, ServerZoneIpcType > spawnPacket( getId(), pTarget->getId() );
+   ZoneChannelPacket< FFXIVIpcNpcSpawn > spawnPacket( getId(), pTarget->getId() );
 
 
    spawnPacket.data().pos.x = m_pos.x;
@@ -223,14 +223,14 @@ void Core::Entity::BattleNpc::setOwner( Core::Entity::PlayerPtr pPlayer )
 
    if( pPlayer != nullptr )
    {
-      GamePacketNew< FFXIVIpcActorOwner, ServerZoneIpcType > setOwnerPacket( getId(), pPlayer->getId() );
+      ZoneChannelPacket< FFXIVIpcActorOwner > setOwnerPacket( getId(), pPlayer->getId() );
       setOwnerPacket.data().type = 0x01;
       setOwnerPacket.data().actorId = pPlayer->getId();
       sendToInRangeSet( setOwnerPacket );
    }
    else
    {
-      GamePacketNew< FFXIVIpcActorOwner, ServerZoneIpcType > setOwnerPacket(getId(), INVALID_GAME_OBJECT_ID );
+      ZoneChannelPacket< FFXIVIpcActorOwner > setOwnerPacket(getId(), INVALID_GAME_OBJECT_ID );
       setOwnerPacket.data().type = 0x01;
       setOwnerPacket.data().actorId = INVALID_GAME_OBJECT_ID;
       sendToInRangeSet( setOwnerPacket );

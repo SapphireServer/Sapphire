@@ -14,17 +14,17 @@ namespace Server {
 * @brief Packet sent to set a players state, this impacts which actions he can perform.
 */
 class PlayerStateFlagsPacket :
-   public GamePacketNew< FFXIVIpcPlayerStateFlags, ServerZoneIpcType >
+   public ZoneChannelPacket< FFXIVIpcPlayerStateFlags >
 {
 public:
    PlayerStateFlagsPacket( Entity::PlayerPtr pActor ) :
-      GamePacketNew< FFXIVIpcPlayerStateFlags, ServerZoneIpcType >( pActor->getId(), pActor->getId() )
+      ZoneChannelPacket< FFXIVIpcPlayerStateFlags >( pActor->getId(), pActor->getId() )
    {
       initialize( pActor->getStateFlags() );
    }
 
    PlayerStateFlagsPacket( Entity::PlayerPtr pActor, std::vector< Common::PlayerStateFlag > flags ) :
-      GamePacketNew< FFXIVIpcPlayerStateFlags, ServerZoneIpcType >( pActor->getId(), pActor->getId() )
+      ZoneChannelPacket< FFXIVIpcPlayerStateFlags >( pActor->getId(), pActor->getId() )
    {
       uint8_t newFlags[7];
       memset( newFlags, 0, 7 );

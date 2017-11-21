@@ -14,11 +14,11 @@ namespace Server {
 * @brief The update model packet.
 */
 class ModelEquipPacket :
-   public GamePacketNew< FFXIVIpcModelEquip, ServerZoneIpcType >
+   public ZoneChannelPacket< FFXIVIpcModelEquip >
 {
 public:
    ModelEquipPacket( Entity::PlayerPtr player ) :
-      GamePacketNew< FFXIVIpcModelEquip, ServerZoneIpcType >( player->getId(), player->getId() )
+      ZoneChannelPacket< FFXIVIpcModelEquip >( player->getId(), player->getId() )
    {
       initialize( player );
    };

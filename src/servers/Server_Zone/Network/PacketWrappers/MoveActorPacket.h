@@ -18,11 +18,11 @@ namespace Server {
 * once upon connection to configure the UI.
 */
 class MoveActorPacket :
-   public GamePacketNew< FFXIVIpcActorMove, ServerZoneIpcType >
+   public ZoneChannelPacket< FFXIVIpcActorMove >
 {
 public:
    MoveActorPacket( Entity::ActorPtr actor, uint8_t unk1, uint8_t unk2, uint8_t unk3, uint16_t unk4 ) :
-      GamePacketNew< FFXIVIpcActorMove, ServerZoneIpcType >( actor->getId(), actor->getId() )
+      ZoneChannelPacket< FFXIVIpcActorMove >( actor->getId(), actor->getId() )
    {
       initialize( actor, unk1, unk2, unk3, unk4 );
    };
