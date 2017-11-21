@@ -66,7 +66,7 @@ Core::Entity::BattleNpc::BattleNpc( uint32_t modelId, uint32_t nameid, const Com
    m_currentStance = Stance::Passive;
 
    m_class = ClassJob::Gladiator;
-   m_level = level > 0 ? level : 60;
+   m_level = level > 0 ? level : 70;
 
    m_modelId = modelId;
    m_nameId = nameid;
@@ -489,6 +489,8 @@ void Core::Entity::BattleNpc::update( int64_t currTime )
       return;
    }
 
+   if ( !m_pStatusEffectContainer )
+      initStatusEffectContainer();
    m_pStatusEffectContainer->update();
    float distance = Math::Util::distance( m_pos.x, m_pos.y, m_pos.z,
                                           m_posOrigin.x, m_posOrigin.y, m_posOrigin.z );
