@@ -1,35 +1,29 @@
-#include <thread>
-#include <chrono>
-#include <boost/lexical_cast.hpp>
-
 #include "ServerZone.h"
 
 #include <src/servers/Server_Common/Version.h>
 #include <src/servers/Server_Common/Logging/Logger.h>
 #include <src/servers/Server_Common/Config/XMLConfig.h>
-#include <src/servers/Server_Common/Database/Database.h>
 #include <src/servers/Server_Common/Version.h>
 
 #include <MySqlBase.h>
 #include <Connection.h>
-#include <Statement.h>
-#include <ResultSet.h>
-#include <PreparedStatement.h>
-#include <PreparedResultSet.h>
 
-#include <src/servers/Server_Common/Network/Connection.h>
-#include <src/servers/Server_Common/Network/Hive.h>
-#include <src/servers/Server_Common/Network/Acceptor.h>
+#include <Server_Common/Network/Connection.h>
+#include <Server_Common/Network/Hive.h>
 
-#include <src/servers/Server_Common/Exd/ExdData.h>
-#include <src/servers/Server_Common/Network/PacketContainer.h>
+#include <Server_Common/Exd/ExdData.h>
+#include <Server_Common/Network/PacketContainer.h>
+#include <Server_Common/Database/DbLoader.h>
+#include <Server_Common/Database/CharaDbConnection.h>
+#include <Server_Common/Database/DbWorkerPool.h>
+#include <Server_Common/Database/PreparedStatement.h>
 
-#include "src/servers/Server_Zone/Network/GameConnection.h"
+#include "Network/GameConnection.h"
 #include "Session.h"
 
-#include "src/servers/Server_Zone/Zone/ZoneMgr.h"
+#include "Zone/ZoneMgr.h"
 
-#include "src/servers/Server_Zone/DebugCommand/DebugCommandHandler.h"
+#include "DebugCommand/DebugCommandHandler.h"
 
 #include "Script/ScriptManager.h"
 #include "Linkshell/LinkshellMgr.h"
@@ -38,15 +32,9 @@
 #include <boost/foreach.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/algorithm/string.hpp>
-
-#include <Server_Common/Database/DbLoader.h>
-#include <Server_Common/Database/CharaDbConnection.h>
-#include <Server_Common/Database/DbWorkerPool.h>
-#include <Server_Common/Database/PreparedStatement.h>
-
+#include <thread>
 
 Core::Logger g_log;
-Core::Db::Database g_database;
 Core::DebugCommandHandler g_gameCommandMgr;
 Core::Scripting::ScriptManager g_scriptMgr;
 Core::Data::ExdData g_exdData;
@@ -54,7 +42,7 @@ Core::ZoneMgr g_zoneMgr;
 Core::LinkshellMgr g_linkshellMgr;
 Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
 
-Core::ServerZone::ServerZone( const std::string& configPath, uint16_t serverId )
+Core::ServerZone::ServerZone( const std::string& configPath )
    : m_configPath( configPath ),
      m_bRunning( true )
 {
@@ -95,7 +83,7 @@ bool Core::ServerZone::registerBnpcTemplate( std::string templateName, uint32_t 
 
 Core::Entity::BattleNpcTemplatePtr Core::ServerZone::getBnpcTemplate( std::string templateName )
 {
-   auto it = m_bnpcTemplates.find(templateName);
+   auto it = m_bnpcTemplates.find( templateName );
 
    if (it != m_bnpcTemplates.end())
       return nullptr;
@@ -190,131 +178,8 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
    if( !loader.initDbs() )
       return false;
 
-   // execute() runs asynchronous
-   g_charaDb.execute( "INSERT INTO zoneservers ( id, ip, port ) VALUES ( 101, '127.0.0.1', 54555);" );
-   g_charaDb.execute( "DELETE FROM zoneservers WHERE id = 101" );
-
-   // query runs synchronous
-   auto res = g_charaDb.query( "SELECT id,ip,port FROM zoneservers" );
-   while( res->next() )
-   {
-      g_log.info( "id: " + std::to_string( res->getUInt( "id" ) ) );
-      g_log.info( "ip: " + res->getString( "ip" ) );
-      g_log.info( "port: " + std::to_string( res->getUInt( "port" ) ) );
-   }
-
-
-   //stmt->setUInt( 1, 245 );
-   //stmt->setString( 2, "12.12.12.12" );
-   //stmt->setUInt( 3, 3306 );
-   //CharacterDatabase.execute( stmt );
-   try
-   {
-   //   // bunch of test cases for db wrapper
-      boost::shared_ptr< Mysql::MySqlBase > base( new Mysql::MySqlBase() );
-      g_log.info( base->getVersionInfo() );
-
-      Mysql::optionMap options;
-      options[ MYSQL_OPT_RECONNECT ] = "1";
-
-      auto con = base->connect( "127.0.0.1", "root", "", options, 3306 );
-
-   //   if( con->getAutoCommit() )
-   //      g_log.info( "autocommit active" );
-
-   //   con->setAutoCommit( false );
-
-   //   if( !con->getAutoCommit() )
-   //      g_log.info( "autocommit inactive" );
-
-   //   con->setAutoCommit( true );
-
-   //   if( con->getAutoCommit() )
-   //      g_log.info( "autocommit active" );
-
-      con->setSchema( "sapphire" );
-
-   //   boost::scoped_ptr< Mysql::Statement > stmt( con->createStatement() );
-   //   bool t1 = stmt->execute( "DELETE FROM zoneservers WHERE id = 101" );
-   //   t1 = stmt->execute( "INSERT INTO zoneservers ( id, ip, port ) VALUES ( 101, '127.0.0.1', 54555);" );
-   //   // t1 = stmt->execute( "INSERT INTO zoneservers ( id, ip, port ) VALUES ( 101, '127.0.0.1', 54555);" ); // throws duplicate entry
-   //   t1 = stmt->execute( "DELETE FROM zoneservers WHERE id = 101" );
-   //   t1 = stmt->execute( "INSERT INTO zoneservers ( id, ip, port ) VALUES ( 101, '127.0.0.1', 54555);" );
-   //   //t1 = stmt->execute( "DELETE FROM zoneservers WHERE id = 101" );
-
-   //   //boost::scoped_ptr< Mysql::Statement > stmt1( con->createStatement() );
-   //   //bool t2 = stmt1->execute( "INSERT INTO BLARGH!" ); // throws error
-
-   //   boost::scoped_ptr< Mysql::Statement > stmt2( con->createStatement() );
-   //   boost::scoped_ptr< Mysql::ResultSet > res( stmt2->executeQuery( "SELECT id,ip,port FROM zoneservers"  ) );
-
-   //   while( res->next() )
-   //   {
-   //      g_log.info( "id: " + std::to_string( res->getUInt( "id" ) ) );
-   //      g_log.info( "ip: " + res->getString( "ip" ) );
-   //      g_log.info( "port: " + std::to_string( res->getUInt( "port" ) ) );
-
-   //      // alternatively ( slightly faster )
-   //      // g_log.info( "id: " + std::to_string( res->getUInt( 1 ) ) );
-   //      // g_log.info( "ip: " + res->getString( 2 ) );
-   //      // g_log.info( "port: " + std::to_string( res->getUInt( 3 ) ) );
-
-   //   }
-
-   //   // binary data test
-   //   boost::scoped_ptr< Mysql::Statement > stmt3( con->createStatement() );
-   //   boost::scoped_ptr< Mysql::ResultSet > res1( stmt3->executeQuery( "SELECT * FROM charabase"  ) );
-
-   //   while( res1->next() )
-   //   {
-   //      auto blob = res1->getBlobVector( "Customize" );
-   //   }
-
-   //   pstmt2->setInt( 1, 1001 );
-   //   pstmt2->execute();
-
-   //   boost::scoped_ptr< Mysql::PreparedStatement > pstmt( con->prepareStatement( "INSERT INTO zoneservers ( id, ip, port ) VALUES ( ?, ?, ?);" ) );
-   //   pstmt->setInt( 1, 1001 );
-   //   pstmt->setString( 2, "123.123.123.123" );
-   //   pstmt->setInt( 3, 5454 );
-   //   pstmt->execute();
-
-   //   pstmt->setInt( 1, 1021 );
-   //   pstmt->setString( 2, "173.173.173.173" );
-   //   pstmt->setInt( 3, 5151 );
-   //   pstmt->execute();
-
-   //   boost::scoped_ptr< Mysql::PreparedStatement > pstmt1( con->prepareStatement( "DELETE FROM zoneservers WHERE id = ?" ) );
-   //   pstmt->setInt( 1, 1021 );
-   //   pstmt->execute();
-
-   //   pstmt->setInt( 1, 1001 );
-   //   pstmt->execute();
-
-   }
-   catch( std::runtime_error e )
-   {
-      g_log.error( e.what() );
-   }
-
-
-   Db::DatabaseParams params;
-   params.bufferSize = 16384;
-   params.connectionCount = 3;
-   params.databaseName = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Database", "sapphire" );
-   params.hostname = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Host", "127.0.0.1" );
-   params.password = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Pass", "" );
-   params.port = m_pConfig->getValue< uint16_t >( "Settings.General.Mysql.Port", 3306 );
-   params.username = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Username", "root" );
-
-   if( !g_database.initialize( params ) )
-   {
-      std::this_thread::sleep_for( std::chrono::milliseconds( 5000 ) );
-      return false;
-   }
-
    m_port = m_pConfig->getValue< uint16_t >( "Settings.General.ListenPort", 54992 );
-   m_ip = m_pConfig->getValue< std::string >( "Settings.General.ListenIp", "0.0.0.0" );;
+   m_ip = m_pConfig->getValue< std::string >( "Settings.General.ListenIp", "0.0.0.0" );
 
    return true;
 }
@@ -398,10 +263,12 @@ void Core::ServerZone::mainLoop()
          auto session = sessionIt.second;
          if( session && session->getPlayer() )
          {
+
             // if the player is in a zone, let the zone handler take care of his updates
             // else do it here.
             if( !session->getPlayer()->getCurrentZone() )
                session->update();
+
          }
       }
 
@@ -413,6 +280,19 @@ void Core::ServerZone::mainLoop()
 
          auto pPlayer = it->second->getPlayer();
 
+         // remove session of players marked for removel ( logoff / kick )
+         if( pPlayer->isMarkedForRemoval() && diff > 1 )
+         {
+            it->second->close();
+            // if( it->second.unique() )
+            {
+               g_log.info("[" + std::to_string(it->second->getId() ) + "] Session removal" );
+               it = this->m_sessionMap.erase( it );
+               continue;
+            }
+         }
+
+         // remove sessions that simply timed out
          if( diff > 20 )
          {
             g_log.info("[" + std::to_string(it->second->getId() ) + "] Session time out" );

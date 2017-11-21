@@ -88,7 +88,7 @@ bool Core::Network::SapphireAPI::createAccount( const std::string& username, con
    // get account from login name
    auto pQR = g_charaDb.query( "SELECT account_id FROM accounts WHERE account_name = '" + username + "';" );
    // found?
-   if( !pQR->next() )
+   if( pQR->next() )
       return false;
 
    // we are clear and can create a new account
@@ -99,7 +99,7 @@ bool Core::Network::SapphireAPI::createAccount( const std::string& username, con
    uint32_t accountId = pQR->getUInt( 1 ) + 1;
 
    // store the account to the db
-   g_charaDb.execute( "INSERT INTO accounts (account_Id, account_name, account_pass, account_created) VALUE( " +
+   g_charaDb.directExecute( "INSERT INTO accounts (account_Id, account_name, account_pass, account_created) VALUE( " +
                       std::to_string( accountId ) + ", '" +
                       username + "', '" +
                       pass + "', " + 

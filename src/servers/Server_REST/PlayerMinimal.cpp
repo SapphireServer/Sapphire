@@ -345,8 +345,8 @@ namespace Core {
 
    void PlayerMinimal::insertDbGlobalItem( uint32_t weaponId, uint64_t uniqueId ) const
    {
-      auto stmtItemGlobal = g_charaDb.getPreparedStatement(Db::CHARA_ITEMGLOBAL_INS );
-      stmtItemGlobal->setInt(1, m_id);
+      auto stmtItemGlobal = g_charaDb.getPreparedStatement( Db::CHARA_ITEMGLOBAL_INS );
+      stmtItemGlobal->setInt( 1, m_id );
       stmtItemGlobal->setInt64( 2, uniqueId );
       stmtItemGlobal->setInt( 3, weaponId );
       g_charaDb.directExecute( stmtItemGlobal );
@@ -362,10 +362,10 @@ namespace Core {
 
    uint64_t PlayerMinimal::getNextUId64() const
    {
-      g_charaDb.execute( std::string( "INSERT INTO uniqueiddata( IdName ) VALUES( 'NOT_SET' );" ) );
+      g_charaDb.directExecute( std::string( "INSERT INTO uniqueiddata( IdName ) VALUES( 'NOT_SET' );" ) );
       auto res = g_charaDb.query( "SELECT LAST_INSERT_ID();" );
 
-      if( !res )
+      if( !res->next() )
          return 0;
 
       return res->getUInt64( 1 );

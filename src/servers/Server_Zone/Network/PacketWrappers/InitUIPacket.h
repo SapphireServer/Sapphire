@@ -51,7 +51,7 @@ private:
 
       memset( &m_data.name[0], 0, sizeof( m_data.name ) );
 
-      sprintf( &m_data.name[0], player->getName().c_str() );
+      strcpy( &m_data.name[0], player->getName().c_str() );
 
       memcpy( m_data.aetheryte, player->getAetheryteArray(), sizeof ( m_data.aetheryte ) );
 

@@ -530,6 +530,9 @@ public:
    void updateDbSearchInfo() const;
    void updateDbClass() const;
 
+   void setMarkedForRemoval();
+   bool isMarkedForRemoval() const;
+
 private:
    uint32_t m_lastWrite;
    uint32_t m_lastPing;
@@ -539,6 +542,8 @@ private:
    uint64_t m_contentId; // This id will be the name of the folder for character settings in "My Games"
 
    uint8_t m_mode;
+
+   bool m_markedForRemoval;
 
 private:
 
@@ -566,7 +571,7 @@ private:
       uint8_t status;
    } m_retainerInfo[8];
 
-   uint16_t m_title;
+   uint16_t m_activeTitle;
    uint8_t m_titleList[48];
    uint8_t m_howTo[33];
    uint8_t m_minions[33];

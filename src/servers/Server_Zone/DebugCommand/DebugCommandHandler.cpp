@@ -32,6 +32,8 @@
 
 #include <Server_Common/Database/DatabaseDef.h>
 
+#include <cinttypes>
+
 extern Core::Scripting::ScriptManager g_scriptMgr;
 extern Core::Data::ExdData g_exdData;
 extern Core::Logger g_log;
@@ -256,7 +258,7 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
    else if ( subCommand == "eorzeatime" )
    {
       uint64_t timestamp;
-      sscanf( params.c_str(), "%llu", &timestamp );
+      sscanf( params.c_str(), "%" SCNu64, &timestamp );
 
       pPlayer->setEorzeaTimeOffset( timestamp );
       pPlayer->sendNotice( "Eorzea time offset: " + std::to_string( timestamp ) );

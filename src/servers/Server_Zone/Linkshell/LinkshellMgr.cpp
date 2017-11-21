@@ -1,12 +1,11 @@
 #include "LinkshellMgr.h"
-#include <Server_Common/Database/Database.h>
 #include <Server_Common/Logging/Logger.h>
 #include <boost/make_shared.hpp>
+#include <servers/Server_Common/Database/DatabaseDef.h>
 
 #include "Linkshell.h"
 
 extern Core::Logger g_log;
-extern Core::Db::Database g_database;
 
 Core::LinkshellMgr::LinkshellMgr()
 {
@@ -16,47 +15,47 @@ Core::LinkshellMgr::LinkshellMgr()
 bool Core::LinkshellMgr::loadLinkshells()
 {
 
-   auto res = g_database.query( "SELECT LinkshellId, MasterCharacterId, CharacterIdList, "
-                                        "LinkshellName, LeaderIdList, InviteIdList "
-                                        "FROM infolinkshell "
-                                "ORDER BY LinkshellId ASC;" );
+   auto res = g_charaDb.query( "SELECT LinkshellId, MasterCharacterId, CharacterIdList, "
+                                      "LinkshellName, LeaderIdList, InviteIdList "
+                                      "FROM infolinkshell "
+                               "ORDER BY LinkshellId ASC;" );
 
-   // we do not really need linkshells to function...
-   if( !res )
-      return true;
 
-   Db::Field *field = res->fetch();
-
-   do
+   while( res->next() )
    {
-      uint64_t linkshellId = field[0].get< uint64_t >();
-      uint32_t masterId = field[1].get< uint32_t >();
-      std::string name = field[3].getString();
+      uint64_t linkshellId = res->getUInt64( 1 );
+      uint32_t masterId = res->getUInt( 2 );
+      std::string name = res->getString( 4 );
 
-      auto func = []( std::set< uint64_t >& outList, Db::Field * pField )
+      auto func = []( std::set< uint64_t >& outList, std::vector< char >& inData )
       {
-         if( pField->getLength() )
+         if( inData.size() )
          {
-            std::vector< uint64_t > list( pField->getLength() / 8 );
-            pField->getBinary( reinterpret_cast< char * >( &list[0] ), pField->getLength() );
+            std::vector< uint64_t > list( inData.size() / 8 );
             outList.insert( list.begin(), list.end() );
          }
       };
 
       std::set< uint64_t > members;
-      func( members, &field[2] );
+      std::vector< char > membersBin;
+      membersBin = res->getBlobVector( 3 );
+      func( members, membersBin );
 
       std::set< uint64_t > leaders;
-      func( members, &field[4] );
+      std::vector< char > leadersBin;
+      leadersBin = res->getBlobVector( 5 );
+      func( members, leadersBin );
 
       std::set< uint64_t > invites;
-      func( members, &field[5] );
+      std::vector< char > invitesBin;
+      invitesBin = res->getBlobVector( 6 );
+      func( members, invitesBin );
 
       auto lsPtr = boost::make_shared< Linkshell >( linkshellId, name, masterId, members, leaders, invites );
       m_linkshellIdMap[linkshellId] = lsPtr;
       m_linkshellNameMap[name] = lsPtr;
 
-   } while( res->nextRow() );
+   }
 
    return true;
 

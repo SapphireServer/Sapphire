@@ -4,7 +4,21 @@ cmake_policy(SET CMP0014 OLD)
 
 project(Sapphire_Zone)
 
-file(GLOB SERVER_PUBLIC_INCLUDE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/* ${CMAKE_CURRENT_SOURCE_DIR}/Script/*)
+file(GLOB SERVER_PUBLIC_INCLUDE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+        /*.h
+        Actor/*.h
+        Action/*.h
+        DebugCommand/*.h
+        Event/*.h
+        Inventory/*.h
+        Linkshell/*.h
+        Network/*.h
+        Network/Handlers/*.h
+        Network/PacketWrappers/*.h
+        Script/*.h
+        StatusEffect/*.h
+        Zone/*.h)
+
 file(GLOB SERVER_SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
         *.c*
         Actor/*.c*
@@ -33,6 +47,7 @@ set_target_properties(server_zone PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/../../../bin/"
     RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_CURRENT_SOURCE_DIR}/../../../bin/"
     RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_CURRENT_SOURCE_DIR}/../../../bin/"
+    VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../../../bin/"
 )
 
 if (UNIX)
@@ -41,4 +56,4 @@ else()
   target_link_libraries ( server_zone Common xivdat libmysql zlib1 mysqlConnector )
 endif()
 
-target_link_libraries(server_zone ${Boost_LIBRARIES} ${Boost_LIBRARIES} )
+target_link_libraries(server_zone ${Boost_LIBRARIES} )
