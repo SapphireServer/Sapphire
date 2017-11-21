@@ -3,6 +3,7 @@
 
 #include <src/servers/Server_Common/Network/GamePacketNew.h>
 #include "src/servers/Server_Zone/Forwards.h"
+#include "Actor.h"
 
 namespace Core {
 namespace Network {

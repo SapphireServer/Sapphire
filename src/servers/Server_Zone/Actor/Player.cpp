@@ -41,7 +41,8 @@
 #include "src/servers/Server_Zone/Action/EventAction.h"
 #include "src/servers/Server_Zone/Action/EventItemAction.h"
 #include "src/servers/Server_Zone/Zone/ZonePosition.h"
-#include "src/servers/Server_Zone/Actor/CalcBattle.h"
+#include "src/servers/Server_Zone/Math/CalcStats.h"
+#include "src/servers/Server_Zone/Math/CalcBattle.h"
 #include <boost/make_shared.hpp>
 
 extern Core::Logger g_log;
@@ -226,7 +227,7 @@ void Core::Entity::Player::calculateStats()
    auto paramGrowthInfo = paramGrowthInfoIt->second;
 
    // TODO: put formula somewhere else...
-   float base = Data::CalcBattle::calculateBaseStat( getAsPlayer() );
+   float base = Math::CalcStats::calculateBaseStat( getAsPlayer() );
 
    m_baseStats.str =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_str ) / 100 ) + tribeInfo.mod_str );
    m_baseStats.dex =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_dex ) / 100 ) + tribeInfo.mod_dex );
@@ -242,9 +243,9 @@ void Core::Entity::Player::calculateStats()
    m_baseStats.attackPotMagic = paramGrowthInfo.base_secondary;
    m_baseStats.healingPotMagic = paramGrowthInfo.base_secondary;
 
-   m_baseStats.max_mp = Data::CalcBattle::calculateMaxMp( getAsPlayer() );
+   m_baseStats.max_mp = Math::CalcStats::calculateMaxMp( getAsPlayer() );
 
-   m_baseStats.max_hp = Data::CalcBattle::calculateMaxHp( getAsPlayer() );
+   m_baseStats.max_hp = Math::CalcStats::calculateMaxHp( getAsPlayer() );
 
    if( m_mp > m_baseStats.max_mp )
       m_mp = m_baseStats.max_mp;

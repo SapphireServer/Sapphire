@@ -2,12 +2,13 @@
 #include <src/servers/Server_Common/Util/UtilMath.h>
 #include <src/servers/Server_Common/Network/PacketContainer.h>
 #include <src/servers/Server_Common/Exd/ExdData.h>
+#include <src/servers/Server_Common/Network/GamePacket.h>
 
 #include "src/servers/Server_Zone/Forwards.h"
 #include "src/servers/Server_Zone/Action/Action.h"
-#include "Actor.h"
+
 #include "src/servers/Server_Zone/Zone/Zone.h"
-#include <src/servers/Server_Common/Network/GamePacket.h>
+
 #include "src/servers/Server_Zone/Network/GameConnection.h"
 #include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket142.h"
 #include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket143.h"
@@ -19,7 +20,8 @@
 #include "src/servers/Server_Zone/Action/ActionCollision.h"
 #include "src/servers/Server_Zone/ServerZone.h"
 #include "src/servers/Server_Zone/Session.h"
-#include "CalcBattle.h"
+#include "src/servers/Server_Zone/Math/CalcBattle.h"
+#include "Actor.h"
 #include "Player.h"
 
 extern Core::ServerZone g_serverZone;
@@ -738,7 +740,7 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint32_t actionId, u
 
    case ActionEffectType::Heal:
    {
-      uint32_t calculatedHeal = Data::CalcBattle::calculateHealValue( getAsPlayer(), static_cast< uint32_t >( param1 ) );
+      uint32_t calculatedHeal = Math::CalcBattle::calculateHealValue( getAsPlayer(), static_cast< uint32_t >( param1 ) );
 
       effectPacket.data().effects[0].value = calculatedHeal;
       effectPacket.data().effects[0].effectType = ActionEffectType::Heal;
