@@ -125,7 +125,7 @@ void Core::Session::update()
       m_pZoneConnection->processOutQueue();
    }
 
-   if( m_pZoneConnection )
+   if( m_pChatConnection )
    {
        m_pChatConnection->processInQueue();
        m_pChatConnection->processOutQueue();

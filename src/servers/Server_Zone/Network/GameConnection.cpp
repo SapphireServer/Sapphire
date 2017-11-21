@@ -330,7 +330,11 @@ void Core::Network::GameConnection::injectPacket( const std::string& packetpath,
    fseek( fp, 0, SEEK_END );
    int32_t size = ftell( fp );
    rewind( fp );
-   fread( packet, sizeof( char ), size, fp );
+   if ( fread( packet, sizeof( char ), size, fp ) != size )
+   {
+      g_log.error( "Packet " + packetpath + " did not read full size: " + std::to_string( size ) );
+      return;
+   }
    fclose( fp );
 
    // cycle through the packet entries and queue each one
@@ -389,8 +393,7 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
             }
             session = g_serverZone.getSession( playerId );
          }
-
-         if( !session->isValid() ) //TODO: Catch more things in lobby and send real errors
+         else if( !session->isValid() || ( session->getPlayer() && session->getPlayer()->getLastPing() != 0 ) ) //TODO: Catch more things in lobby and send real errors
          {
             g_log.error( "[" + std::string(id) + "] Session INVALID, disconnecting" );
             Disconnect();

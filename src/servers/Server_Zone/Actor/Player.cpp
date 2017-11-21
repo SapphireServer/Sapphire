@@ -70,7 +70,8 @@ Core::Entity::Player::Player() :
    m_bLoadingComplete( false ),
    m_bMarkedForZoning( false ),
    m_zoningType( Common::ZoneingType::None ),
-   m_bAutoattack( false )
+   m_bAutoattack( false ),
+   m_markedForRemoval( false )
 {
    m_id = 0;
    m_type = ActorType::Player;
@@ -90,7 +91,7 @@ Core::Entity::Player::Player() :
 
 Core::Entity::Player::~Player()
 {
-
+   g_log.debug( "PlayerObj destroyed" );
 }
 
 // TODO: add a proper calculation based on race / job / level / gear
@@ -132,6 +133,16 @@ void Core::Entity::Player::setMode( uint8_t mode )
 uint8_t Core::Entity::Player::getStartTown() const
 {
    return m_startTown;
+}
+
+void Core::Entity::Player::setMarkedForRemoval()
+{
+   m_markedForRemoval = true;
+}
+
+bool Core::Entity::Player::isMarkedForRemoval() const
+{
+   return m_markedForRemoval;
 }
 
 Core::Common::OnlineStatus Core::Entity::Player::getOnlineStatus()
@@ -899,7 +910,6 @@ uint32_t Core::Entity::Player::getLastPing() const
    return m_lastPing;
 }
 
-
 void Core::Entity::Player::setVoiceId( uint8_t voiceId )
 {
    m_voice = voiceId;
@@ -1396,7 +1406,7 @@ uint8_t * Core::Entity::Player::getTitleList()
 
 uint16_t Core::Entity::Player::getTitle() const
 {
-   return m_title;
+   return m_activeTitle;
 }
 
 void Core::Entity::Player::addTitle( uint16_t titleId )
@@ -1417,7 +1427,7 @@ void Core::Entity::Player::setTitle( uint16_t titleId )
    if ( ( m_titleList[index] & value ) == 0 )   // Player doesn't have title - bail
       return;
 
-   m_title = titleId;
+   m_activeTitle = titleId;
 
    sendToInRangeSet( ActorControlPacket142( getId(), SetTitle, titleId ), true );
 }
