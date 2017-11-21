@@ -71,7 +71,8 @@ Core::Entity::Player::Player() :
    m_bMarkedForZoning( false ),
    m_zoningType( Common::ZoneingType::None ),
    m_bAutoattack( false ),
-   m_markedForRemoval( false )
+   m_markedForRemoval( false ),
+   m_mount( 0 )
 {
    m_id = 0;
    m_type = ActorType::Player;
@@ -1447,29 +1448,25 @@ uint8_t Core::Entity::Player::getEquipDisplayFlags() const
 
 void Core::Entity::Player::mount( uint32_t id )
 {
-// TODO: Fix me for SQL rewrite
-/*   m_mount = id;
+   m_mount = id;
    sendToInRangeSet( ActorControlPacket142( getId(), ActorControlType::SetStatus, static_cast< uint8_t >( Entity::Actor::ActorStatus::Mounted )), true );
    sendToInRangeSet( ActorControlPacket143( getId(), 0x39e, 12 ), true ); //?
 
    GamePacketNew< FFXIVIpcMount, ServerZoneIpcType > mountPacket( getId() );
-   mountPacket.data().id = m_mount;
-   sendToInRangeSet( mountPacket, true );*/
+   mountPacket.data().id = id;
+   sendToInRangeSet( mountPacket, true );
 }
 
 void Core::Entity::Player::dismount()
 {
-// TODO: Fix me for SQL rewrite
-/*   sendToInRangeSet( ActorControlPacket142( getId(), ActorControlType::SetStatus, static_cast< uint8_t >( Entity::Actor::ActorStatus::Idle )), true );
+   sendToInRangeSet( ActorControlPacket142( getId(), ActorControlType::SetStatus, static_cast< uint8_t >( Entity::Actor::ActorStatus::Idle )), true );
    sendToInRangeSet( ActorControlPacket143( getId(), ActorControlType::Dismount, 1 ), true );
-   m_mount = 0;*/
+   m_mount = 0;
 }
 
 uint8_t Core::Entity::Player::getCurrentMount() const
 {
-// TODO: Fix me for SQL rewrite
-//   return m_mount;
-   return 0;
+   return m_mount;
 }
 
 void Core::Entity::Player::autoAttack( ActorPtr pTarget )

@@ -166,6 +166,8 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
    m_maxHp = getMaxHp();
    m_maxMp = getMaxMp();
 
+   m_mount = res->getUInt8( "Mount" );
+
    m_modelSubWeapon = 0;
    m_lastTickTime = 0;
 
@@ -305,7 +307,7 @@ void Core::Entity::Player::updateSql()
    stmt->setInt( 3, 0 ); // TP
    stmt->setInt( 4, 0 ); // GP
    stmt->setInt( 5, 0 ); // Mode
-   stmt->setInt( 6, 0 ); // Mount
+   stmt->setInt( 6, m_mount ); // Mount
    stmt->setInt( 7, 0 ); // InvicibleGM
    stmt->setInt( 8, m_voice );
 
