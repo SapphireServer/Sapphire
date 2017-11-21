@@ -517,8 +517,7 @@ bool Zone::runZoneLogic()
 
       if( changedWeather )
       {
-         Network::Packets::GamePacketNew< Network::Packets::Server::FFXIVIpcWeatherChange,
-                                          Network::Packets::ServerZoneIpcType >
+         Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcWeatherChange  >
                  weatherChangePacket( pSession->getPlayer()->getId() );
          weatherChangePacket.data().weatherId = m_currentWeather;
          weatherChangePacket.data().delay = 5.0f;

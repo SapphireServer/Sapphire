@@ -13,7 +13,7 @@ namespace Server {
 * @brief The Ping response packet.
 */
 class ActorControlPacket144 :
-   public GamePacketNew< FFXIVIpcActorControl144, ServerZoneIpcType >
+   public ZoneChannelPacket< FFXIVIpcActorControl144 >
 {
 public:
    ActorControlPacket144( uint32_t actorId,
@@ -24,7 +24,7 @@ public:
                           uint32_t param4 = 0,
                           uint64_t targetId = 0,
                           uint32_t padding1 = 0 ) :
-      GamePacketNew< FFXIVIpcActorControl144, ServerZoneIpcType >( actorId, actorId )
+      ZoneChannelPacket< FFXIVIpcActorControl144 >( actorId, actorId )
    {
       initialize( category, param1, param2, param3, param4, targetId );
    };

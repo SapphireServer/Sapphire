@@ -27,7 +27,7 @@ using namespace Core::Network::Packets::Server;
 void Core::Network::GameConnection::cfDutyInfoRequest( const Packets::GamePacket& inPacket,
                                                        Entity::PlayerPtr pPlayer )
 {
-   GamePacketNew< FFXIVIpcCFDutyInfo, ServerZoneIpcType > dutyInfoPacket( pPlayer->getId() );
+   ZoneChannelPacket< FFXIVIpcCFDutyInfo > dutyInfoPacket( pPlayer->getId() );
 
    auto penaltyMinutes = pPlayer->getCFPenaltyMinutes();
    if (penaltyMinutes > 255)
@@ -39,7 +39,7 @@ void Core::Network::GameConnection::cfDutyInfoRequest( const Packets::GamePacket
 
    queueOutPacket( dutyInfoPacket );
 
-   GamePacketNew< FFXIVIpcCFPlayerInNeed, ServerZoneIpcType > inNeedsPacket( pPlayer->getId() );
+   ZoneChannelPacket< FFXIVIpcCFPlayerInNeed > inNeedsPacket( pPlayer->getId() );
    queueOutPacket( inNeedsPacket );
 
 }
@@ -62,7 +62,7 @@ void Core::Network::GameConnection::cfRegisterDuty( const Packets::GamePacket& i
    pPlayer->sendDebug("ContentId5" + std::to_string(contentId5));
 
    // let's cancel it because otherwise you can't register it again
-   GamePacketNew< FFXIVIpcCFNotify, ServerZoneIpcType > cfCancelPacket( pPlayer->getId() );
+   ZoneChannelPacket< FFXIVIpcCFNotify > cfCancelPacket( pPlayer->getId() );
    cfCancelPacket.data().state1 = 3;
    cfCancelPacket.data().state2 = 1; // Your registration is withdrawn.
    queueOutPacket( cfCancelPacket );
