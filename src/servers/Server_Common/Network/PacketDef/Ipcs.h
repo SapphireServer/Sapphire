@@ -136,6 +136,7 @@ namespace Packets {
       IPCTYPE_UNK_320            = 0x0207, // updated 4.1
       IPCTYPE_UNK_322            = 0x0209, // updated 4.1
 
+      PerformNote                = 0x0252,
    };
 
    // TODO: Include structures for the individual packet segment types
@@ -198,6 +199,7 @@ namespace Packets {
 
       ReqEquipDisplayFlagsChange  = 0x014C, // updated 4.1 ??
 
+      PerformNoteHandler       = 0x0160,
    };
 
    ////////////////////////////////////////////////////////////////////////////////
