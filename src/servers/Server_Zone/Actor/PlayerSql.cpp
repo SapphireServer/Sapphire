@@ -10,7 +10,7 @@
 #include <set>
 #include <stdio.h>
 
-#include <boost/date_time/posix_time/posix_time.hpp>
+#include <time.h>
 
 
 #include <servers/Server_Common/Common.h>
@@ -403,16 +403,7 @@ void Core::Entity::Player::updateSql()
 
    stmt->setInt( 53, m_cfPenaltyUntil );
 
-   // 54 = UPDATE_DATE
-   auto date_time = boost::posix_time::microsec_clock::universal_time();
-   std::string time_out = boost::str(
-      boost::format{ "%1%-%2%-%3% %4%:%5%:%6%" }
-         % date_time.date().year() % date_time.date().month().as_number() % date_time.date().day().as_number()
-         % date_time.time_of_day().hours() % date_time.time_of_day().minutes() % date_time.time_of_day().seconds()
-   );
-   stmt->setString( 54, time_out );
-
-   stmt->setInt( 55, m_id );
+   stmt->setInt( 54, m_id );
 
    g_charaDb.execute( stmt );
 

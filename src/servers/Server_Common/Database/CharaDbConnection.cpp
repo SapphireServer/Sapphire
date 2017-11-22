@@ -44,7 +44,7 @@ void Core::Db::CharaDbConnection::doPrepareStatements()
                      "ActiveTitle = ?, TitleList = ?, Achievement = ?, Aetheryte = ?, HowTo = ?, Minions = ?, Mounts = ?, "
                      "EquippedMannequin = ?, ConfigFlags = ?, QuestCompleteFlags = ?, OpeningSequence = ?, "
                      "QuestTracking = ?, GrandCompany = ?, GrandCompanyRank = ?, Discovery = ?, GMRank = ?, Unlocks = ?, "
-                     "CFPenaltyUntil = ?, UPDATE_DATE = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
+                     "CFPenaltyUntil = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
 
 
    prepareStatement( CHARA_SEL_MINIMAL, "SELECT Name, Customize, ModelEquip, TerritoryId, GuardianDeity, "
