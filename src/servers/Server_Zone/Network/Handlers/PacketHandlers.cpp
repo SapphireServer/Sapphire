@@ -598,3 +598,14 @@ void Core::Network::GameConnection::tellHandler( const Packets::GamePacket& inPa
    pTargetPlayer->queueChatPacket( tellPacket );
 
 }
+
+void Core::Network::GameConnection::performNoteHandler( const Packets::GamePacket& inPacket,
+                                                        Entity::PlayerPtr pPlayer )
+{
+   GamePacketNew< FFXIVIpcPerformNote, ServerZoneIpcType > performPacket( pPlayer->getId() );
+
+   uint8_t inVal = inPacket.getValAt< uint8_t >( 0x20 );
+   memcpy( &performPacket.data().data[0], &inVal, 32 );
+
+   pPlayer->sendToInRangeSet( performPacket );
+}
