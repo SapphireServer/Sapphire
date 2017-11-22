@@ -604,7 +604,7 @@ void Core::Network::GameConnection::performNoteHandler( const Packets::GamePacke
 {
    GamePacketNew< FFXIVIpcPerformNote, ServerZoneIpcType > performPacket( pPlayer->getId() );
 
-   uint8_t inVal = inPacket.getValAt< uint8_t >( 20 );
+   uint8_t inVal = inPacket.getValAt< uint8_t >( 0x20 );
    memcpy( &performPacket.data().data[0], &inVal, 32 );
 
    pPlayer->sendToInRangeSet( performPacket );
