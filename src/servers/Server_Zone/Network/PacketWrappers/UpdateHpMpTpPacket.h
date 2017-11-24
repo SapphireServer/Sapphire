@@ -2,6 +2,7 @@
 #define _UPDATEHPMPTP_H
 
 #include <src/servers/Server_Common/Network/GamePacketNew.h>
+#include <src/servers/Server_Zone/Actor/Actor.h>
 #include "src/servers/Server_Zone/Forwards.h"
 
 namespace Core {
@@ -13,11 +14,11 @@ namespace Server {
 * @brief The Ping response packet.
 */
 class UpdateHpMpTpPacket :
-   public GamePacketNew< FFXIVIpcUpdateHpMpTp, ServerZoneIpcType >
+   public ZoneChannelPacket< FFXIVIpcUpdateHpMpTp >
 {
 public:
    UpdateHpMpTpPacket( Entity::ActorPtr pActor ) :
-      GamePacketNew< FFXIVIpcUpdateHpMpTp, ServerZoneIpcType >( pActor->getId(), pActor->getId() )
+      ZoneChannelPacket< FFXIVIpcUpdateHpMpTp >( pActor->getId(), pActor->getId() )
    {
       initialize( pActor );
    };

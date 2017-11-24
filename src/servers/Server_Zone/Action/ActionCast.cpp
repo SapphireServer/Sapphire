@@ -50,7 +50,7 @@ void Core::Action::ActionCast::onStart()
    m_pSource->getAsPlayer()->sendDebug( "onStart()" );
    m_startTime = Util::getTimeMs();
 
-   GamePacketNew< FFXIVIpcActorCast, ServerZoneIpcType > castPacket( m_pSource->getId() );
+   ZoneChannelPacket< FFXIVIpcActorCast > castPacket( m_pSource->getId() );
 
    castPacket.data().action_id = m_id;
    castPacket.data().skillType = Common::SkillType::Normal;

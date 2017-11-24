@@ -22,6 +22,12 @@ class GamePacketNew;
 template <typename T, typename T1>
 std::ostream& operator<< ( std::ostream& os, const GamePacketNew<T, T1>& packet );
 
+template< class T >
+using ZoneChannelPacket = GamePacketNew< T, ServerZoneIpcType >;
+
+template< class T >
+using ChatChannelPacket = GamePacketNew< T, ServerChatIpcType >;
+
 /**
 * The base implementation of a game packet. Needed for parsing packets.
 */

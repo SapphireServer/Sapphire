@@ -44,13 +44,13 @@ void Core::Entity::Player::removeQuest( uint16_t questId )
    if( ( idx != -1 ) && ( m_activeQuests[idx] != nullptr ) )
    {
 
-      GamePacketNew< FFXIVIpcQuestUpdate, ServerZoneIpcType > questUpdatePacket( getId() );
+      ZoneChannelPacket< FFXIVIpcQuestUpdate > questUpdatePacket( getId() );
       questUpdatePacket.data().slot = idx;
       questUpdatePacket.data().questInfo.c.questId = 0;
       questUpdatePacket.data().questInfo.c.sequence = 0xFF;
       queuePacket( questUpdatePacket );
 
-      GamePacketNew< FFXIVIpcQuestFinish, ServerZoneIpcType > questFinishPacket( getId() );
+      ZoneChannelPacket< FFXIVIpcQuestFinish > questFinishPacket( getId() );
       questFinishPacket.data().questId = questId;
       questFinishPacket.data().flag1 = 1;
       questFinishPacket.data().flag2 = 1;
@@ -865,7 +865,7 @@ void Core::Entity::Player::updateQuest( uint16_t questId, uint8_t sequence )
    {
       uint8_t index = getQuestIndex( questId );
       auto pNewQuest = m_activeQuests[index];
-      GamePacketNew< FFXIVIpcQuestUpdate, ServerZoneIpcType > pe_qa( getId() );
+      ZoneChannelPacket< FFXIVIpcQuestUpdate > pe_qa( getId() );
       pNewQuest->c.sequence = sequence;
       pe_qa.data().slot = index;
       pe_qa.data().questInfo = *pNewQuest;
@@ -895,7 +895,7 @@ void Core::Entity::Player::updateQuest( uint16_t questId, uint8_t sequence )
       m_questIdToQuestIdx[questId] = idx;
       m_questIdxToQuestId[idx] = questId;
 
-      GamePacketNew< FFXIVIpcQuestUpdate, ServerZoneIpcType > pe_qa( getId() );
+      ZoneChannelPacket< FFXIVIpcQuestUpdate > pe_qa( getId() );
       pe_qa.data().slot = idx;
       pe_qa.data().questInfo = *pNewQuest;
       queuePacket( pe_qa );
@@ -917,7 +917,7 @@ void Core::Entity::Player::updateQuest( uint16_t questId, uint8_t sequence )
 
 void Core::Entity::Player::sendQuestTracker()
 {
-   GamePacketNew< FFXIVIpcQuestTracker, ServerZoneIpcType > trackerPacket( getId() );
+   ZoneChannelPacket< FFXIVIpcQuestTracker > trackerPacket( getId() );
 
    for( int32_t ii = 0; ii < 5; ii++ )
    {
@@ -962,7 +962,7 @@ void Core::Entity::Player::setQuestTracker( uint16_t index, int16_t flag )
 
 void Core::Entity::Player::sendQuestInfo()
 {
-   GamePacketNew< FFXIVIpcQuestActiveList, ServerZoneIpcType > pe_qa( getId() );
+   ZoneChannelPacket< FFXIVIpcQuestActiveList > pe_qa( getId() );
 
    for( int32_t i = 0; i < 30; i++ )
    {
@@ -978,7 +978,7 @@ void Core::Entity::Player::sendQuestInfo()
 
    queuePacket( pe_qa );
 
-   GamePacketNew< FFXIVIpcQuestCompleteList, ServerZoneIpcType > pe_qc( getId() );
+   ZoneChannelPacket< FFXIVIpcQuestCompleteList > pe_qc( getId() );
    memcpy( pe_qc.data().questCompleteMask, m_questCompleteFlags, 200 );
    queuePacket( pe_qc );
 

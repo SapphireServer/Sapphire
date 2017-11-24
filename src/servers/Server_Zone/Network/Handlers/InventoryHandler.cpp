@@ -46,7 +46,7 @@ void Core::Network::GameConnection::inventoryModifyHandler( const Packets::GameP
     uint16_t fromContainer = inPacket.getValAt< uint16_t >( 0x2C );
     uint16_t toContainer = inPacket.getValAt< uint16_t >( 0x40 );
 
-    GamePacketNew< FFXIVIpcInventoryActionAck, ServerZoneIpcType > ackPacket( pPlayer->getId() );
+    ZoneChannelPacket< FFXIVIpcInventoryActionAck > ackPacket( pPlayer->getId() );
     ackPacket.data().sequence = seq;
     ackPacket.data().type = 7;
     pPlayer->queuePacket( ackPacket );

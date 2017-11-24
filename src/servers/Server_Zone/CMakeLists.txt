@@ -14,6 +14,7 @@ file(GLOB SERVER_PUBLIC_INCLUDE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
         Event/*.h
         Inventory/*.h
         Linkshell/*.h
+		Math/*.h
         Network/*.h
         Network/Handlers/*.h
         Network/PacketWrappers/*.h
@@ -31,6 +32,7 @@ file(GLOB SERVER_SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
         Event/*.c*
         Inventory/*.c*
         Linkshell/*.c*
+		Math/*.c*
         Network/*.c*
         Network/Handlers/*.c*
         Network/PacketWrappers/*.c*

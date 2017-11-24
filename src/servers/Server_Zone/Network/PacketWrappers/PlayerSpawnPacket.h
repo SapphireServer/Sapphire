@@ -72,7 +72,7 @@ namespace Server {
 
          m_data.title = pPlayer->getTitle();
          m_data.voice = pPlayer->getVoiceId();
-         m_data.currentMount = 0;
+         m_data.currentMount = pPlayer->getCurrentMount();
 
          m_data.onlineStatus = static_cast< uint8_t >( pPlayer->getOnlineStatus() );
 

@@ -15,11 +15,11 @@ namespace Server {
 * @brief The Client UI Initialization packet. This must be sent to the client
 * once upon connection to configure the UI.
 */
-class InitUIPacket : public GamePacketNew< FFXIVIpcInitUI, ServerZoneIpcType >
+class InitUIPacket : public ZoneChannelPacket< FFXIVIpcInitUI >
 {
 public:
    InitUIPacket( Entity::PlayerPtr player ) :
-      GamePacketNew< FFXIVIpcInitUI, ServerZoneIpcType >( player->getId(), player->getId() )
+      ZoneChannelPacket< FFXIVIpcInitUI >( player->getId(), player->getId() )
    {
       initialize( player );
    };

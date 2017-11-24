@@ -210,7 +210,7 @@ boost::shared_ptr< T > Core::Db::DbWorkerPool< T >::getFreeConnection()
    {
       connection = m_connections[IDX_SYNCH][i++ % numCons];
 
-      if (connection->lockIfReady())
+      if( connection->lockIfReady() )
          break;
    }
 

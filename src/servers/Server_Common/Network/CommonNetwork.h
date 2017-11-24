@@ -169,6 +169,8 @@ inline istream& operator>>(istream& is, FFXIVARR_IPC_HEADER& hdr)
    return is.read(reinterpret_cast<char*>(&hdr), sizeof hdr);
 }
 
+
+
 } /* Packets */
 } /* Network */
 } /* Core */

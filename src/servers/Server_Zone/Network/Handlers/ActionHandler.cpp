@@ -126,7 +126,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
         }
         case 0x12F: // Get title list
         {
-           GamePacketNew< FFXIVIpcPlayerTitleList, ServerZoneIpcType > titleListPacket( pPlayer->getId() );
+           ZoneChannelPacket< FFXIVIpcPlayerTitleList > titleListPacket( pPlayer->getId() );
            memcpy( titleListPacket.data().titleList, pPlayer->getTitleList(), sizeof( titleListPacket.data().titleList ) );
 
            pPlayer->queuePacket( titleListPacket );

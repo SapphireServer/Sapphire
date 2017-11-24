@@ -41,7 +41,8 @@
 #include "src/servers/Server_Zone/Action/EventAction.h"
 #include "src/servers/Server_Zone/Action/EventItemAction.h"
 #include "src/servers/Server_Zone/Zone/ZonePosition.h"
-#include "src/servers/Server_Zone/Actor/CalcBattle.h"
+#include "src/servers/Server_Zone/Math/CalcStats.h"
+#include "src/servers/Server_Zone/Math/CalcBattle.h"
 #include <boost/make_shared.hpp>
 
 extern Core::Logger g_log;
@@ -71,7 +72,8 @@ Core::Entity::Player::Player() :
    m_bMarkedForZoning( false ),
    m_zoningType( Common::ZoneingType::None ),
    m_bAutoattack( false ),
-   m_markedForRemoval( false )
+   m_markedForRemoval( false ),
+   m_mount( 0 )
 {
    m_id = 0;
    m_type = ActorType::Player;
@@ -198,7 +200,7 @@ uint64_t Core::Entity::Player::getOnlineStatusMask() const
 
 void Core::Entity::Player::prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadeOutTime, uint16_t animation )
 {
-   GamePacketNew< FFXIVIpcPrepareZoning, ServerZoneIpcType > preparePacket( getId() );
+   ZoneChannelPacket< FFXIVIpcPrepareZoning > preparePacket( getId() );
    preparePacket.data().targetZone = targetZone;
    preparePacket.data().fadeOutTime = fadeOutTime;
    preparePacket.data().animation = animation;
@@ -226,7 +228,7 @@ void Core::Entity::Player::calculateStats()
    auto paramGrowthInfo = paramGrowthInfoIt->second;
 
    // TODO: put formula somewhere else...
-   float base = Data::CalcBattle::calculateBaseStat( getAsPlayer() );
+   float base = Math::CalcStats::calculateBaseStat( getAsPlayer() );
 
    m_baseStats.str =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_str ) / 100 ) + tribeInfo.mod_str );
    m_baseStats.dex =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_dex ) / 100 ) + tribeInfo.mod_dex );
@@ -242,9 +244,9 @@ void Core::Entity::Player::calculateStats()
    m_baseStats.attackPotMagic = paramGrowthInfo.base_secondary;
    m_baseStats.healingPotMagic = paramGrowthInfo.base_secondary;
 
-   m_baseStats.max_mp = Data::CalcBattle::calculateMaxMp( getAsPlayer() );
+   m_baseStats.max_mp = Math::CalcStats::calculateMaxMp( getAsPlayer() );
 
-   m_baseStats.max_hp = Data::CalcBattle::calculateMaxHp( getAsPlayer() );
+   m_baseStats.max_hp = Math::CalcStats::calculateMaxHp( getAsPlayer() );
 
    if( m_mp > m_baseStats.max_mp )
       m_mp = m_baseStats.max_mp;
@@ -271,7 +273,7 @@ bool Core::Entity::Player::isAutoattackOn() const
 
 void Core::Entity::Player::sendStats()
 {
-   GamePacketNew< FFXIVIpcPlayerStats, ServerZoneIpcType > statPacket( getId() );
+   ZoneChannelPacket< FFXIVIpcPlayerStats > statPacket( getId() );
    statPacket.data().strength = m_baseStats.str;
    statPacket.data().dexterity = m_baseStats.dex;
    statPacket.data().vitality = m_baseStats.vit;
@@ -388,7 +390,7 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
    m_pCurrentZone = pZone;
    m_pCurrentZone->pushActor( shared_from_this() );
 
-   GamePacketNew< FFXIVIpcInit, ServerZoneIpcType > initPacket( getId() );
+   ZoneChannelPacket< FFXIVIpcInit > initPacket( getId() );
    initPacket.data().charId = getId();
    queuePacket( initPacket );
 
@@ -409,7 +411,7 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
    // only initialize the UI if the player in fact just logged in.
    if( isLogin() )
    {
-      GamePacketNew< FFXIVIpcCFAvailableContents, ServerZoneIpcType > contentFinderList( getId() );
+      ZoneChannelPacket< FFXIVIpcCFAvailableContents > contentFinderList( getId() );
       for( auto i = 0; i < sizeof( contentFinderList.data().contents ); i++ )
       {
          // unlock all contents for now
@@ -420,14 +422,14 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
       Server::InitUIPacket initUIPacket( pPlayer );
       queuePacket( initUIPacket );
 
-      GamePacketNew< FFXIVIpcPlayerClassInfo, ServerZoneIpcType > classInfoPacket( getId() );
+      ZoneChannelPacket< FFXIVIpcPlayerClassInfo > classInfoPacket( getId() );
       classInfoPacket.data().classId = static_cast< uint8_t >( getClass() );
       classInfoPacket.data().unknown = 1;
       classInfoPacket.data().level = getLevel();
       classInfoPacket.data().level1 = getLevel();
       queuePacket( classInfoPacket );
 
-      GamePacketNew< FFXIVGCAffiliation, ServerZoneIpcType > gcAffPacket( getId() );
+      ZoneChannelPacket< FFXIVGCAffiliation > gcAffPacket( getId() );
       gcAffPacket.data().gcId = m_gc;
       gcAffPacket.data().gcRank[0] = m_gcRank[0];
       gcAffPacket.data().gcRank[1] = m_gcRank[1];
@@ -435,7 +437,7 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
       queuePacket( gcAffPacket );
    }
 
-   GamePacketNew< FFXIVIpcInitZone, ServerZoneIpcType > initZonePacket( getId() );
+   ZoneChannelPacket< FFXIVIpcInitZone > initZonePacket( getId() );
    initZonePacket.data().zoneId = getCurrentZone()->getLayoutId();
    initZonePacket.data().weatherId = static_cast< uint8_t >( getCurrentZone()->getCurrentWeather() );
    initZonePacket.data().bitmask = 0x1;
@@ -447,10 +449,10 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
 
    if( isLogin() )
    {
-      GamePacketNew< FFXIVARR_IPC_UNK322, ServerZoneIpcType > unk322( getId() );
+      ZoneChannelPacket< FFXIVARR_IPC_UNK322 > unk322( getId() );
       queuePacket( unk322 );
 
-      GamePacketNew< FFXIVARR_IPC_UNK320, ServerZoneIpcType > unk320( getId() );
+      ZoneChannelPacket< FFXIVARR_IPC_UNK320 > unk320( getId() );
       queuePacket( unk320 );
    }
 
@@ -675,7 +677,7 @@ void Core::Entity::Player::gainLevel()
    m_hp = getMaxHp();
    m_mp = getMaxMp();
 
-   GamePacketNew< FFXIVIpcStatusEffectList, ServerZoneIpcType > effectListPacket( getId() );
+   ZoneChannelPacket< FFXIVIpcStatusEffectList > effectListPacket( getId() );
    effectListPacket.data().classId = static_cast< uint8_t > ( getClass() );
    effectListPacket.data().classId1 = static_cast< uint8_t > ( getClass() );
    effectListPacket.data().level = getLevel();
@@ -690,7 +692,7 @@ void Core::Entity::Player::gainLevel()
                                             getLevel(), getLevel() - 1 ), true );
 
 
-   GamePacketNew< FFXIVIpcUpdateClassInfo, ServerZoneIpcType > classInfoPacket( getId() );
+   ZoneChannelPacket< FFXIVIpcUpdateClassInfo > classInfoPacket( getId() );
    classInfoPacket.data().classId = static_cast< uint8_t > ( getClass() );
    classInfoPacket.data().classId1 = static_cast< uint8_t > ( getClass() );
    classInfoPacket.data().level = getLevel();
@@ -780,7 +782,7 @@ void Core::Entity::Player::setClassJob( Core::Common::ClassJob classJob )
 
    m_tp = 0;
 
-   GamePacketNew< FFXIVIpcPlayerClassInfo, ServerZoneIpcType > classInfoPacket( getId() );
+   ZoneChannelPacket< FFXIVIpcPlayerClassInfo > classInfoPacket( getId() );
    classInfoPacket.data().classId = static_cast< uint8_t >( getClass() );
    classInfoPacket.data().level = getLevel();
    queuePacket( classInfoPacket );
@@ -919,7 +921,7 @@ void Core::Entity::Player::setGc( uint8_t gc )
 {
    m_gc = gc;
 
-   GamePacketNew< FFXIVGCAffiliation, ServerZoneIpcType > gcAffPacket( getId() );
+   ZoneChannelPacket< FFXIVGCAffiliation > gcAffPacket( getId() );
    gcAffPacket.data().gcId = m_gc;
    gcAffPacket.data().gcRank[0] = m_gcRank[0];
    gcAffPacket.data().gcRank[1] = m_gcRank[1];
@@ -931,7 +933,7 @@ void Core::Entity::Player::setGcRankAt( uint8_t index, uint8_t rank )
 {
    m_gcRank[index] = rank;
 
-   GamePacketNew< FFXIVGCAffiliation, ServerZoneIpcType > gcAffPacket( getId() );
+   ZoneChannelPacket< FFXIVGCAffiliation > gcAffPacket( getId() );
    gcAffPacket.data().gcId = m_gc;
    gcAffPacket.data().gcRank[0] = m_gcRank[0];
    gcAffPacket.data().gcRank[1] = m_gcRank[1];
@@ -1026,7 +1028,7 @@ void Core::Entity::Player::update( int64_t currTime )
       }
       else
       {
-         GamePacketNew< FFXIVIpcActorSetPos, ServerZoneIpcType > setActorPosPacket( getId() );
+         ZoneChannelPacket< FFXIVIpcActorSetPos > setActorPosPacket( getId() );
          setActorPosPacket.data().r16 = Math::Util::floatToUInt16Rot( m_queuedZoneing->m_targetRotation );
          setActorPosPacket.data().waitForLoad = 0x04;
          setActorPosPacket.data().x = targetPos.x;
@@ -1107,7 +1109,7 @@ void Core::Entity::Player::freePlayerSpawnId( uint32_t actorId )
    m_playerIdToSpawnIdMap.erase( actorId );
    m_freeSpawnIdQueue.push( spawnId );
 
-   GamePacketNew< FFXIVIpcActorFreeSpawn, ServerZoneIpcType > freeActorSpawnPacket( getId() );
+   ZoneChannelPacket< FFXIVIpcActorFreeSpawn > freeActorSpawnPacket( getId() );
    freeActorSpawnPacket.data().actorId = actorId;
    freeActorSpawnPacket.data().spawnId = spawnId;
    queuePacket( freeActorSpawnPacket );
@@ -1378,7 +1380,7 @@ void Core::Entity::Player::initHateSlotQueue()
 
 void Core::Entity::Player::sendHateList()
 {
-   GamePacketNew< FFXIVIpcHateList, ServerZoneIpcType > hateListPacket( getId() );
+   ZoneChannelPacket< FFXIVIpcHateList > hateListPacket( getId() );
    hateListPacket.data().numEntries = m_actorIdTohateSlotMap.size();
    auto it = m_actorIdTohateSlotMap.begin();
    for( int32_t i = 0; it != m_actorIdTohateSlotMap.end(); ++it, i++ )
@@ -1435,7 +1437,7 @@ void Core::Entity::Player::setTitle( uint16_t titleId )
 void Core::Entity::Player::setEquipDisplayFlags( uint8_t state )
 {
    m_equipDisplayFlags = state;
-   GamePacketNew< FFXIVIpcEquipDisplayFlags, ServerZoneIpcType > paramPacket( getId() );
+   ZoneChannelPacket< FFXIVIpcEquipDisplayFlags > paramPacket( getId() );
    paramPacket.data().bitmask = m_equipDisplayFlags;
    sendToInRangeSet( paramPacket, true );
 }
@@ -1447,29 +1449,25 @@ uint8_t Core::Entity::Player::getEquipDisplayFlags() const
 
 void Core::Entity::Player::mount( uint32_t id )
 {
-// TODO: Fix me for SQL rewrite
-/*   m_mount = id;
+   m_mount = id;
    sendToInRangeSet( ActorControlPacket142( getId(), ActorControlType::SetStatus, static_cast< uint8_t >( Entity::Actor::ActorStatus::Mounted )), true );
    sendToInRangeSet( ActorControlPacket143( getId(), 0x39e, 12 ), true ); //?
 
-   GamePacketNew< FFXIVIpcMount, ServerZoneIpcType > mountPacket( getId() );
-   mountPacket.data().id = m_mount;
-   sendToInRangeSet( mountPacket, true );*/
+   ZoneChannelPacket< FFXIVIpcMount > mountPacket( getId() );
+   mountPacket.data().id = id;
+   sendToInRangeSet( mountPacket, true );
 }
 
 void Core::Entity::Player::dismount()
 {
-// TODO: Fix me for SQL rewrite
-/*   sendToInRangeSet( ActorControlPacket142( getId(), ActorControlType::SetStatus, static_cast< uint8_t >( Entity::Actor::ActorStatus::Idle )), true );
+   sendToInRangeSet( ActorControlPacket142( getId(), ActorControlType::SetStatus, static_cast< uint8_t >( Entity::Actor::ActorStatus::Idle )), true );
    sendToInRangeSet( ActorControlPacket143( getId(), ActorControlType::Dismount, 1 ), true );
-   m_mount = 0;*/
+   m_mount = 0;
 }
 
 uint8_t Core::Entity::Player::getCurrentMount() const
 {
-// TODO: Fix me for SQL rewrite
-//   return m_mount;
-   return 0;
+   return m_mount;
 }
 
 void Core::Entity::Player::autoAttack( ActorPtr pTarget )
@@ -1488,7 +1486,7 @@ void Core::Entity::Player::autoAttack( ActorPtr pTarget )
       getClass() == ClassJob::Bard ||
       getClass() == ClassJob::Archer )
    {
-      GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket(getId());
+      ZoneChannelPacket< FFXIVIpcEffect > effectPacket(getId());
       effectPacket.data().targetId = pTarget->getId();
       effectPacket.data().actionAnimationId = 8;
      // effectPacket.data().unknown_2 = variation;
@@ -1509,7 +1507,7 @@ void Core::Entity::Player::autoAttack( ActorPtr pTarget )
    else
    {
 
-      GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket(getId());
+      ZoneChannelPacket< FFXIVIpcEffect > effectPacket(getId());
       effectPacket.data().targetId = pTarget->getId();
       effectPacket.data().actionAnimationId = 7;
      // effectPacket.data().unknown_2 = variation;
@@ -1578,7 +1576,7 @@ void Core::Entity::Player::setOpeningSequence( uint8_t seq )
 void Core::Entity::Player::setEorzeaTimeOffset( uint64_t timestamp )
 {
    // TODO: maybe change to persistent?
-   GamePacketNew< FFXIVIpcEorzeaTimeOffset, ServerZoneIpcType > packet ( getId() );
+   ZoneChannelPacket< FFXIVIpcEorzeaTimeOffset > packet ( getId() );
    packet.data().timestamp = timestamp;
 
    // Send to single player

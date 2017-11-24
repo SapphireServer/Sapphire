@@ -86,10 +86,12 @@ enum GmCommand
    GCRank = 0x0155,
    Aetheryte = 0x015E,
    Teri = 0x0258,
+   Kick = 0x025C,
    TeriInfo = 0x025D,
    Jump = 0x025E,
    JumpNpc = 0x025F,
 };
+
 void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPacket, Entity::PlayerPtr pPlayer )
 {
    if( pPlayer->getGmRank() <= 0 )
@@ -126,35 +128,85 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
 
    switch( commandId )
    {
-   case GmCommand::Kill:
+   case GmCommand::Lv:
    {
-      targetActor->takeDamage( 9999999 );
-      pPlayer->sendNotice( "Killed " + std::to_string( targetActor->getId() ) );
+      targetPlayer->setLevel( param1 );
+      pPlayer->sendNotice( "Level for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
       break;
    }
-   case GmCommand::QuestSequence:
+   case GmCommand::Race:
    {
-      targetPlayer->updateQuest( param1, param2 );
+      targetPlayer->setLookAt( CharaLook::Race, param1 );
+      pPlayer->sendNotice( "Race for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
+      targetPlayer->spawn( targetPlayer );
+      auto inRange = targetPlayer->getInRangeActors();
+      for ( auto actor : inRange )
+      {
+         targetPlayer->despawn( actor->getAsPlayer() );
+         targetPlayer->spawn( actor->getAsPlayer() );
+      }
       break;
    }
-   case GmCommand::QuestComplete:
+   case GmCommand::Tribe:
    {
-      targetPlayer->finishQuest( param1 );
+      targetPlayer->setLookAt( CharaLook::Tribe, param1 );
+      pPlayer->sendNotice( "Tribe for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
+      targetPlayer->spawn( targetPlayer );
+      auto inRange = targetPlayer->getInRangeActors();
+      for ( auto actor : inRange )
+      {
+         targetPlayer->despawn( actor->getAsPlayer() );
+         targetPlayer->spawn( actor->getAsPlayer() );
+      }
       break;
    }
-   case GmCommand::QuestAccept:
+   case GmCommand::Sex:
    {
-      targetPlayer->updateQuest( param1, 1 );
+      targetPlayer->setLookAt( CharaLook::Gender, param1 );
+      pPlayer->sendNotice( "Sex for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
+      targetPlayer->spawn( targetPlayer );
+      auto inRange = targetActor->getInRangeActors();
+      for ( auto actor : inRange )
+      {
+         targetPlayer->despawn( actor->getAsPlayer() );
+         targetPlayer->spawn( actor->getAsPlayer() );
+      }
       break;
    }
-   case GmCommand::QuestCancel:
+   case GmCommand::Time:
    {
-      targetPlayer->removeQuest( param1 );
+      pPlayer->setEorzeaTimeOffset( param2 );
+      pPlayer->sendNotice( "Eorzea time offset: " + std::to_string( param2 ) );
       break;
    }
-   case GmCommand::QuestIncomplete:
+   case GmCommand::Weather:
    {
-      targetPlayer->unfinishQuest( param1 );
+      targetPlayer->getCurrentZone()->setWeatherOverride( param1 );
+      pPlayer->sendNotice( "Weather in Zone \"" + targetPlayer->getCurrentZone()->getName() + "\" of " +
+         targetPlayer->getName() + " set in range." );
+      break;
+   }
+   case GmCommand::Call:
+   {
+      if ( targetPlayer->getZoneId() != pPlayer->getZoneId() )
+         targetPlayer->setZone( pPlayer->getZoneId() );
+
+      targetPlayer->changePosition( pPlayer->getPos().x, pPlayer->getPos().y, pPlayer->getPos().z,
+         pPlayer->getRotation() );
+      pPlayer->sendNotice( "Calling " + targetPlayer->getName() );
+      break;
+   }
+   case GmCommand::Inspect:
+   {
+      pPlayer->sendNotice( "Name: " + targetPlayer->getName() +
+         "\nGil: " + std::to_string( targetPlayer->getCurrency( 1 ) ) +
+         "\nZone: " + targetPlayer->getCurrentZone()->getName() +
+         "(" + std::to_string( targetPlayer->getZoneId() ) + ")" +
+         "\nClass: " + std::to_string( static_cast< uint8_t >( targetPlayer->getClass() ) ) +
+         "\nLevel: " + std::to_string( targetPlayer->getLevel() ) +
+         "\nExp: " + std::to_string( targetPlayer->getExp() ) +
+         "\nSearchMessage: " + targetPlayer->getSearchMessage() +
+         "\nPlayTime: " + std::to_string( targetPlayer->getPlayTime() ) );
       break;
    }
    case GmCommand::Speed:
@@ -163,16 +215,30 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       pPlayer->sendNotice( "Speed for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
       break;
    }
-   case GmCommand::Gil:
+   case GmCommand::Kill:
    {
-      targetPlayer->addCurrency( 1, param1 );
-      pPlayer->sendNotice( "Added  " + std::to_string( param1 ) + " Gil for " + targetPlayer->getName() );
+      targetActor->takeDamage( 9999999 );
+      pPlayer->sendNotice( "Killed " + std::to_string( targetActor->getId() ) );
       break;
    }
-   case GmCommand::Lv:
+   case GmCommand::Icon:
    {
-      targetPlayer->setLevel( param1 );
-      pPlayer->sendNotice( "Level for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
+      targetPlayer->setOnlineStatusMask( param1 );
+
+      ZoneChannelPacket< FFXIVIpcSetOnlineStatus > statusPacket( targetPlayer->getId() );
+      statusPacket.data().onlineStatusFlags = param1;
+      queueOutPacket( statusPacket );
+
+      ZoneChannelPacket< FFXIVIpcSetSearchInfo > searchInfoPacket( targetPlayer->getId() );
+      searchInfoPacket.data().onlineStatusFlags = param1;
+      searchInfoPacket.data().selectRegion = targetPlayer->getSearchSelectRegion();
+      strcpy( searchInfoPacket.data().searchMessage, targetPlayer->getSearchMessage() );
+      targetPlayer->queuePacket( searchInfoPacket );
+
+      targetPlayer->sendToInRangeSet( ActorControlPacket142( pPlayer->getId(), SetStatusIcon,
+         static_cast< uint8_t >( pPlayer->getOnlineStatus() ) ),
+         true );
+      pPlayer->sendNotice( "Icon for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
       break;
    }
    case GmCommand::Hp:
@@ -199,43 +265,37 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       pPlayer->sendNotice( std::to_string( param1 ) + " Exp was added to " + targetPlayer->getName() );
       break;
    }
-   case GmCommand::Sex:
+   case GmCommand::Inv:
    {
-      targetPlayer->setLookAt( CharaLook::Gender, param1 );
-      pPlayer->sendNotice( "Sex for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
-      targetPlayer->spawn( targetPlayer );
-      auto inRange = targetActor->getInRangeActors();
-      for( auto actor : inRange )
-      {
-         targetPlayer->despawn( actor->getAsPlayer() );
-         targetPlayer->spawn( actor->getAsPlayer() );
-      }
+      if ( targetActor->getInvincibilityType() == Common::InvincibilityType::InvincibilityRefill )
+         targetActor->setInvincibilityType( Common::InvincibilityType::InvincibilityNone );
+      else
+         targetActor->setInvincibilityType( Common::InvincibilityType::InvincibilityRefill );
+
+      pPlayer->sendNotice( "Invincibility for " + targetPlayer->getName() +
+         " was switched." );
       break;
    }
-   case GmCommand::Race:
+   case GmCommand::Orchestrion:
    {
-      targetPlayer->setLookAt( CharaLook::Race, param1 );
-      pPlayer->sendNotice( "Race for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
-      targetPlayer->spawn( targetPlayer );
-      auto inRange = targetPlayer->getInRangeActors();
-      for( auto actor : inRange )
+      if ( param1 == 1 )
       {
-         targetPlayer->despawn( actor->getAsPlayer() );
-         targetPlayer->spawn( actor->getAsPlayer() );
+         if ( param2 == 0 )
+         {
+            for ( uint8_t i = 0; i < 255; i++ )
+               targetActor->getAsPlayer()->learnSong( i, 0 );
+
+            pPlayer->sendNotice( "All Songs for " + targetPlayer->getName() +
+               " were turned on." );
+         }
+         else
+         {
+            targetActor->getAsPlayer()->learnSong( param2, 0 );
+            pPlayer->sendNotice( "Song " + std::to_string( param2 ) + " for " + targetPlayer->getName() +
+               " was turned on." );
+         }
       }
-      break;
-   }
-   case GmCommand::Tribe:
-   {
-      targetPlayer->setLookAt( CharaLook::Tribe, param1 );
-      pPlayer->sendNotice( "Tribe for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
-      targetPlayer->spawn( targetPlayer );
-      auto inRange = targetPlayer->getInRangeActors();
-      for( auto actor : inRange )
-      {
-         targetPlayer->despawn( actor->getAsPlayer() );
-         targetPlayer->spawn( actor->getAsPlayer() );
-      }
+
       break;
    }
    case GmCommand::Item:
@@ -255,61 +315,17 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
          pPlayer->sendUrgent( "Item " + std::to_string( param1 ) + " not found..." );
       break;
    }
-   case GmCommand::Time:
+   case GmCommand::Gil:
    {
-      pPlayer->setEorzeaTimeOffset( param2 );
-      pPlayer->sendNotice( "Eorzea time offset: " + std::to_string( param2 ) );
-      break;
-   }
-   case GmCommand::Weather:
-   {
-      targetPlayer->getCurrentZone()->setWeatherOverride( param1 );
-      pPlayer->sendNotice( "Weather in Zone \"" + targetPlayer->getCurrentZone()->getName() + "\" of " +
-         targetPlayer->getName() + " set in range." );
-      break;
-   }
-   case GmCommand::TeriInfo:
-   {
-      pPlayer->sendNotice( "ZoneId: " + std::to_string( pPlayer->getZoneId() ) + "\nName: " +
-         pPlayer->getCurrentZone()->getName() + "\nInternalName: " +
-         pPlayer->getCurrentZone()->getInternalName() + "\nPopCount: " +
-         std::to_string( pPlayer->getCurrentZone()->getPopCount() ) +
-         "\nCurrentWeather:" + std::to_string( pPlayer->getCurrentZone()->getCurrentWeather() ) +
-         "\nNextWeather:" + std::to_string( pPlayer->getCurrentZone()->getNextWeather() ) );
-      break;
-   }
-   case GmCommand::Teri:
-   {
-      auto zoneInfo = g_zoneMgr.getZone( param1 );
-      if ( !zoneInfo )
-      {
-         pPlayer->sendUrgent( "Invalid zone " + std::to_string( param1 ) );
-      }
-      else
-      {
-         targetPlayer->setPosition( targetPlayer->getPos() );
-         targetPlayer->performZoning( param1, targetPlayer->getPos(), 0 );
-         pPlayer->sendNotice( targetPlayer->getName() + " was warped to zone " + std::to_string( param1 ) + " (" + zoneInfo->getName( ) + ")" );
-      }
-      break;
-   }
-   case GmCommand::Jump:
-   {
-
-      auto inRange = pPlayer->getInRangeActors();
-      for( auto actor : inRange )
-      {
-         pPlayer->changePosition( targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z,
-            targetActor->getRotation() );
-      }
-      pPlayer->sendNotice( "Jumping to " + targetPlayer->getName() + " in range." );
+      targetPlayer->addCurrency( 1, param1 );
+      pPlayer->sendNotice( "Added  " + std::to_string( param1 ) + " Gil for " + targetPlayer->getName() );
       break;
    }
    case GmCommand::Collect:
    {
       uint32_t gil = targetPlayer->getCurrency( 1 );
 
-      if( gil < param1 )
+      if ( gil < param1 )
       {
          pPlayer->sendUrgent( "Player does not have enough Gil(" + std::to_string( gil ) + ")" );
       }
@@ -322,24 +338,29 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       }
       break;
    }
-   case GmCommand::Icon:
+   case GmCommand::QuestAccept:
    {
-      targetPlayer->setOnlineStatusMask( param1 );
-
-      GamePacketNew< FFXIVIpcSetOnlineStatus, ServerZoneIpcType > statusPacket( targetPlayer->getId() );
-      statusPacket.data().onlineStatusFlags = param1;
-      queueOutPacket( statusPacket );
-
-      GamePacketNew< FFXIVIpcSetSearchInfo, ServerZoneIpcType > searchInfoPacket( targetPlayer->getId() );
-      searchInfoPacket.data().onlineStatusFlags = param1;
-      searchInfoPacket.data().selectRegion = targetPlayer->getSearchSelectRegion();
-      strcpy( searchInfoPacket.data().searchMessage, targetPlayer->getSearchMessage() );
-      targetPlayer->queuePacket( searchInfoPacket );
-
-      targetPlayer->sendToInRangeSet( ActorControlPacket142( pPlayer->getId(), SetStatusIcon,
-         static_cast< uint8_t >( pPlayer->getOnlineStatus() ) ),
-         true );
-      pPlayer->sendNotice( "Icon for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
+      targetPlayer->updateQuest( param1, 1 );
+      break;
+   }
+   case GmCommand::QuestCancel:
+   {
+      targetPlayer->removeQuest( param1 );
+      break;
+   }
+   case GmCommand::QuestComplete:
+   {
+      targetPlayer->finishQuest( param1 );
+      break;
+   }
+   case GmCommand::QuestIncomplete:
+   {
+      targetPlayer->unfinishQuest( param1 );
+      break;
+   }
+   case GmCommand::QuestSequence:
+   {
+      targetPlayer->updateQuest( param1, param2 );
       break;
    }
    case GmCommand::GC:
@@ -357,28 +378,17 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
          " was set to " + std::to_string( targetPlayer->getGcRankArray()[targetPlayer->getGc() - 1] ) );
       break;
    }
-   case GmCommand::Inv:
-   {
-      if( targetActor->getInvincibilityType() == Common::InvincibilityType::InvincibilityRefill )
-         targetActor->setInvincibilityType( Common::InvincibilityType::InvincibilityNone );
-      else
-         targetActor->setInvincibilityType( Common::InvincibilityType::InvincibilityRefill );
-
-      pPlayer->sendNotice( "Invincibility for " + targetPlayer->getName() +
-         " was switched." );
-      break;
-   }
    case GmCommand::Aetheryte:
    {
-      if( param1 == 0 )
+      if ( param1 == 0 )
       {
-         if( param2 == 0 )
+         if ( param2 == 0 )
          {
-            for( uint8_t i = 0; i < 255; i++ )
+            for ( uint8_t i = 0; i < 255; i++ )
                targetActor->getAsPlayer()->registerAetheryte( i );
-            
+
             pPlayer->sendNotice( "All Aetherytes for " + targetPlayer->getName() +
-                  " were turned on." );
+               " were turned on." );
          }
          else
          {
@@ -388,33 +398,46 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
          }
       }
 
-      
       break;
    }
-   case GmCommand::Orchestrion:
+   case GmCommand::Teri:
    {
-      if( param1 == 1 )
+      auto zoneInfo = g_zoneMgr.getZone( param1 );
+      if ( !zoneInfo )
       {
-         if( param2 == 0 )
-         {
-            for( uint8_t i = 0; i < 255; i++ )
-               targetActor->getAsPlayer()->learnSong( i, 0 );
-            
-            pPlayer->sendNotice( "All Songs for " + targetPlayer->getName() +
-                  " were turned on." );
-         }
-         else
-         {
-            targetActor->getAsPlayer()->learnSong( param2, 0 );
-            pPlayer->sendNotice( "Song " + std::to_string( param2 ) + " for " + targetPlayer->getName() +
-               " was turned on." );
-         }
+         pPlayer->sendUrgent( "Invalid zone " + std::to_string( param1 ) );
       }
-
-      
+      else
+      {
+         targetPlayer->setPosition( targetPlayer->getPos() );
+         targetPlayer->performZoning( param1, targetPlayer->getPos(), 0 );
+         pPlayer->sendNotice( targetPlayer->getName() + " was warped to zone " + std::to_string( param1 ) + " (" + zoneInfo->getName( ) + ")" );
+      }
       break;
    }
+   case GmCommand::TeriInfo:
+   {
+      pPlayer->sendNotice( "ZoneId: " + std::to_string( pPlayer->getZoneId() ) + "\nName: " +
+         pPlayer->getCurrentZone()->getName() + "\nInternalName: " +
+         pPlayer->getCurrentZone()->getInternalName() + "\nPopCount: " +
+         std::to_string( pPlayer->getCurrentZone()->getPopCount() ) +
+         "\nCurrentWeather:" + std::to_string( pPlayer->getCurrentZone()->getCurrentWeather() ) +
+         "\nNextWeather:" + std::to_string( pPlayer->getCurrentZone()->getNextWeather() ) );
+      break;
+   }
+   case GmCommand::Jump:
+   {
 
+      auto inRange = pPlayer->getInRangeActors();
+      for( auto actor : inRange )
+      {
+         pPlayer->changePosition( targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z,
+            targetActor->getRotation() );
+      }
+      pPlayer->sendNotice( "Jumping to " + targetPlayer->getName() + " in range." );
+      break;
+   }
+  
    default:
       pPlayer->sendUrgent( "GM1 Command not implemented: " + std::to_string( commandId ) );
       break;
@@ -454,6 +477,7 @@ void Core::Network::GameConnection::gm2Handler( const Packets::GamePacket& inPac
 
    if( !targetActor )
       return;
+
    auto targetPlayer = targetActor->getAsPlayer();
 
    switch( commandId )
@@ -481,30 +505,6 @@ void Core::Network::GameConnection::gm2Handler( const Packets::GamePacket& inPac
       pPlayer->sendNotice( "Jumping to " + targetPlayer->getName() );
       break;
    }
-   case GmCommand::Call:
-   {
-      if( targetPlayer->getZoneId() != pPlayer->getZoneId() )
-         targetPlayer->setZone( pPlayer->getZoneId() );
-
-      targetPlayer->changePosition( pPlayer->getPos().x, pPlayer->getPos().y, pPlayer->getPos().z,
-         pPlayer->getRotation() );
-      pPlayer->sendNotice( "Calling " + targetPlayer->getName() );
-      break;
-   }
-   case GmCommand::Inspect:
-   {
-      pPlayer->sendNotice( "Name: " + targetPlayer->getName() +
-         "\nGil: " + std::to_string( targetPlayer->getCurrency( 1 ) ) +
-         "\nZone: " + targetPlayer->getCurrentZone()->getName() +
-         "(" + std::to_string( targetPlayer->getZoneId() ) + ")" +
-         "\nClass: " + std::to_string( static_cast< uint8_t >( targetPlayer->getClass() ) ) +
-         "\nLevel: " + std::to_string( targetPlayer->getLevel() ) +
-         "\nExp: " + std::to_string( targetPlayer->getExp() ) +
-         "\nSearchMessage: " + targetPlayer->getSearchMessage() +
-         "\nPlayTime: " + std::to_string( targetPlayer->getPlayTime() ) );
-      break;
-   }
-
    default:
       pPlayer->sendUrgent( "GM2 Command not implemented: " + std::to_string( commandId ) );
       break;
