@@ -48,7 +48,11 @@ public:
 
    uint16_t getWeaponDmg() const;
 
+   bool isWeapon() const;
+
    float getAutoAttackDmg() const;
+
+   uint16_t getItemLevel() const;
 
 
 protected:
@@ -71,6 +75,7 @@ protected:
    uint16_t                m_magicalDmg;
    uint16_t                m_weaponDmg;
    float                   m_autoAttackDmg;
+   uint16_t                m_itemLevel;
 
 };
 

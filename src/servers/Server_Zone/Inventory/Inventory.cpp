@@ -13,6 +13,7 @@
 #include "src/servers/Server_Zone/Network/PacketWrappers/ServerNoticePacket.h"
 
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/clamp.hpp>
 
 #include "src/servers/Server_Zone/Forwards.h"
 #include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket143.h"
@@ -438,6 +439,30 @@ bool Core::Inventory::removeCrystal( CrystalType type, uint32_t amount )
    return true;
 }
 
+bool Core::Inventory::isOneHandedWeapon( ItemCategory weaponCategory )
+{
+   switch ( weaponCategory )
+   {
+      case ItemCategory::AlcPri:
+      case ItemCategory::ArmPri:
+      case ItemCategory::BotPri:
+      case ItemCategory::ClnPri:
+      case ItemCategory::CnjWep:
+      case ItemCategory::CrpPri:
+      case ItemCategory::FshPri:
+      case ItemCategory::GlaWep:
+      case ItemCategory::GldPri: // Goldsmith
+      case ItemCategory::LtwPri:
+      case ItemCategory::MinPri:
+      case ItemCategory::ThmWep:
+      case ItemCategory::WvrPri:
+      case ItemCategory::BlmPri: // Blacksmith
+         return true;
+      default:
+         return false;
+   }
+}
+
 bool Core::Inventory::isObtainable( uint32_t catalogId, uint8_t quantity )
 {
    
@@ -827,6 +852,40 @@ void Core::Inventory::send()
    }
 
 }
+
+uint16_t Core::Inventory::calculateEquippedGearItemLevel()
+{
+   uint32_t iLvlResult = 0;
+
+   auto gearSetMap = m_inventoryMap[GearSet0]->getItemMap();
+
+   auto it = gearSetMap.begin();
+
+   while ( it != gearSetMap.end() )
+   {
+      auto currItem = it->second;
+
+      if ( currItem )
+      {
+         iLvlResult += currItem->getItemLevel();
+
+         // If item is weapon and isn't one-handed
+         if ( currItem->isWeapon() && !isOneHandedWeapon( currItem->getCategory() ) )
+         {
+            iLvlResult += currItem->getItemLevel();
+         }
+         else
+         {
+            g_log.debug( "Is one handed" );
+         }
+      }
+
+      it++;
+   }
+
+   return boost::algorithm::clamp( iLvlResult / 12, 0, 9999 );
+}
+
 
 uint8_t Core::Inventory::getFreeSlotsInBags()
 {

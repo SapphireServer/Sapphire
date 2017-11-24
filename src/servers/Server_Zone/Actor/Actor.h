@@ -77,7 +77,7 @@ public:
       uint32_t mnd = 0;
       uint32_t pie = 0;
 
-      uint32_t parry = 0;
+      uint32_t tenacity = 0;
       uint32_t attack = 0;
       uint32_t defense = 0;
       uint32_t accuracy = 0;
