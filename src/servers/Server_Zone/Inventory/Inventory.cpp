@@ -439,27 +439,27 @@ bool Core::Inventory::removeCrystal( CrystalType type, uint32_t amount )
    return true;
 }
 
-bool Core::Inventory::isOneHandedWeapon( ItemCategory weaponCategory )
+bool Core::Inventory::isOneHandedWeapon( ItemUICategory weaponCategory )
 {
    switch ( weaponCategory )
    {
-      case ItemCategory::AlcPri:
-      case ItemCategory::ArmPri:
-      case ItemCategory::BotPri:
-      case ItemCategory::ClnPri:
-      case ItemCategory::CnjWep:
-      case ItemCategory::CrpPri:
-      case ItemCategory::FshPri:
-      case ItemCategory::GlaWep:
-      case ItemCategory::GldPri: // Goldsmith
-      case ItemCategory::LtwPri:
-      case ItemCategory::MinPri:
-      case ItemCategory::ThmWep:
-      case ItemCategory::WvrPri:
-      case ItemCategory::BlmPri: // Blacksmith
-         return true;
-      default:
-         return false;
+   case ItemUICategory::AlchemistsPrimaryTool:
+   case ItemUICategory::ArmorersPrimaryTool:
+   case ItemUICategory::BotanistsPrimaryTool:
+   case ItemUICategory::CulinariansPrimaryTool:
+   case ItemUICategory::OnehandedConjurersArm:
+   case ItemUICategory::CarpentersPrimaryTool:
+   case ItemUICategory::FishersPrimaryTool:
+   case ItemUICategory::GladiatorsArm:
+   case ItemUICategory::GoldsmithsPrimaryTool:
+   case ItemUICategory::LeatherworkersPrimaryTool:
+   case ItemUICategory::MinersPrimaryTool:
+   case ItemUICategory::OnehandedThaumaturgesArm:
+   case ItemUICategory::WeaversPrimaryTool:
+   case ItemUICategory::BlacksmithsPrimaryTool:
+      return true;
+   default:
+      return false;
    }
 }
 
@@ -475,7 +475,8 @@ int16_t Core::Inventory::addItem( uint16_t inventoryId, int8_t slotId, uint32_t 
 
    auto itemInfo = g_exdData.getItemInfo( catalogId );
 
-   if( !itemInfo )
+   // if item data doesn't exist or it's a blank field
+   if( !itemInfo || itemInfo->item_level == 0 )
    {
       return -1;
    }

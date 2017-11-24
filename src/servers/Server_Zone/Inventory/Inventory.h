@@ -154,7 +154,7 @@ public:
    bool updateContainer( uint16_t containerId, uint8_t slotId, ItemPtr pItem );
 
    /*! heck if weapon category qualifies the weapon as onehanded */
-   bool isOneHandedWeapon( Common::ItemCategory weaponCategory );
+   bool isOneHandedWeapon( Common::ItemUICategory weaponCategory );
    /*! calculate and return player ilvl based off equipped gear */
    uint16_t calculateEquippedGearItemLevel();
    /*! return the current amount of currency of type */
