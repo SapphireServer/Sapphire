@@ -118,6 +118,8 @@ public:
 
    DECLARE_HANDLER( reqEquipDisplayFlagsHandler );
 
+   DECLARE_HANDLER( performNoteHandler );
+
    DECLARE_HANDLER( tellHandler );
 
 };
