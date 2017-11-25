@@ -1,7 +1,10 @@
 #include <chaiscript/chaiscript.hpp>
 
+#include <Server_Common/Config/XMLConfig.h>
 #include <Server_Common/Logging/Logger.h>
 #include <Server_Common/Script/ChaiscriptStdLib.h>
+
+#include "src/servers/Server_Zone/ServerZone.h"
 
 #include "src/servers/Server_Zone/Script/ScriptManager.h"
 
@@ -17,6 +20,7 @@
 #include <boost/lexical_cast.hpp>
 
 extern Core::Logger g_log;
+extern Core::ServerZone g_serverZone;
 
 int Core::Scripting::ScriptManager::init()
 {
@@ -169,8 +173,7 @@ int Core::Scripting::ScriptManager::init()
 
    std::set< std::string > chaiFiles;
 
-   g_log.info( "ScriptEngine: Loading Scripts..." );
-   loadDir( "../scripts/chai", chaiFiles );
+   loadDir( g_serverZone.getConfig()->getValue< std::string >( "Settings.General.ScriptPath", "../scripts/chai" ), chaiFiles );
 
    uint16_t scriptCount = 0;
    uint16_t errorCount = 0;
