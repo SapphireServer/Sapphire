@@ -38,6 +38,8 @@ Core::Scripting::ScriptManager::~ScriptManager()
 void Core::Scripting::ScriptManager::loadDir( std::string dirname, std::set<std::string>& chaiFiles )
 {
 
+   g_log.info( "ScriptEngine: loading scripts from " + dirname );
+
    boost::filesystem::path targetDir( dirname );
 
    boost::filesystem::recursive_directory_iterator iter( targetDir ), eod;
