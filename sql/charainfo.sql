@@ -75,7 +75,7 @@ CREATE TABLE `charainfo` (
   `GMRank` int(3) DEFAULT '0',
   `Unlocks` binary(64) DEFAULT NULL,
   `CFPenaltyUntil` int(11) DEFAULT NULL,
-  `UPDATE_DATE` datetime DEFAULT NULL
+  `UPDATE_DATE` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- Dumping data for table sapphire.charainfo: 0 rows

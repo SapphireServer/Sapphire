@@ -29,7 +29,7 @@ CREATE TABLE `charainfosearch` (
   `SearchComment` binary(193) DEFAULT "",
   `IS_DELETE` int(3) DEFAULT '0',
   `IS_NOT_ACTIVE_FLG` int(3) DEFAULT '0',
-  `UPDATE_DATE` date DEFAULT NULL
+  `UPDATE_DATE` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
