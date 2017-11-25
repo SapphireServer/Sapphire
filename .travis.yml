@@ -1,24 +1,44 @@
+---
 language: c++
-sudo: enabled
-before_install:
-  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-  - sudo add-apt-repository universe
-  - sudo apt-get update 
-  - sudo apt-get install -y software-properties-common
-  - sudo apt-get update
-  - sudo apt-get install gcc-7 g++-7 gcc-7-multilib g++-7-multilib cmake3 -y
-  - sudo apt-get install libboost-dev libboost-all-dev libmysqlclient-dev -y
-  - sudo apt-get install libmysqlcppconn-dev -y
 
-compiler:
-  - g++
-  
- 
+sudo: enabled
+
+git:
+  depth: 5
+
+matrix:
+  include:
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - gcc-7
+            - g++-7
+      env:
+        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+
+# Setup cache
+cache:
+  directories:
+    - build
+    - .mtime_cache
+
+# Setup build matrix and dependencies
+before_install:
+  - eval "${MATRIX_EVAL}"
+  - gem install --no-ri --no-rdoc mtime_cache
+  - sudo apt-get update
+  - sudo apt-get install -y libboost-dev libboost-all-dev
+  - sudo apt-get install -y libmysqlclient-dev libmysqlcppconn-dev
+
 # Build steps
 script:
-  - g++ --version
-  - mkdir build
+  - $CXX --version
+  - mtime_cache src/**/*.{%{cpp}} -c .mtime_cache/cache.json
+  - mkdir -p build
   - cd build
-  - cmake .. -DSAPPHIRE_BOOST_VER="1.54.0" -DCMAKE_CXX_COMPILER=g++-7 && make -j 3
+  - cmake .. -DSAPPHIRE_BOOST_VER="1.54.0" && make -j 3
   - cd ..
   - bash sql_import.sh
