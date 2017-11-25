@@ -129,6 +129,10 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
          {
             m_pConfig->setValue< std::string >( "Settings.General.DataPath", val );
          }
+         else if( arg == "s" || arg == "scriptpath" )
+         {
+            m_pConfig->setValue< std::string >( "Settings.General.ScriptPath", val );
+         }
          else if( arg == "h" || arg == "dbhost" )
          {
             m_pConfig->setValue< std::string >( "Settings.General.Mysql.Host", val );
