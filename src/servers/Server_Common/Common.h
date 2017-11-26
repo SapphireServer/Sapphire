@@ -802,10 +802,14 @@ namespace Common {
       MountSkill = 0xD,
    };
 
-   struct ServerEntry
+   /*! ModelType as found in eventsystemdefine.exd */
+   enum ModelType : uint8_t
    {
-      uint32_t serverId;
-      uint32_t flags;
+      Human = 1,
+      DemiHuman = 2,
+      Monster = 3,
+      SharedGroup = 4,
+      Parts = 5
    };
 
    typedef std::vector< PlayerStateFlag > PlayerStateFlagList;

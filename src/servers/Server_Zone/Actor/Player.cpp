@@ -76,7 +76,7 @@ Core::Entity::Player::Player() :
    m_mount( 0 )
 {
    m_id = 0;
-   m_type = ActorType::Player;
+   m_objKind = ObjKind::Player;
    m_currentStance = Stance::Passive;
    m_onlineStatus = 0;
    m_queuedZoneing = nullptr;

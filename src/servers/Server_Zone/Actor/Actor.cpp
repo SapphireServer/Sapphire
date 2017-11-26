@@ -59,13 +59,13 @@ std::string Core::Entity::Actor::getName() const
 /*! \return true if the actor is of type player */
 bool Core::Entity::Actor::isPlayer() const
 {
-   return m_type == ActorType::Player;
+   return m_objKind == ObjKind::Player;
 }
 
 /*! \return true if the actor is of type mob */
 bool Core::Entity::Actor::isMob() const
 {
-   return m_type == ActorType::BattleNpc;
+   return m_objKind == ObjKind::BattleNpc;
 }
 
 /*! \return list of actors currently in range */
