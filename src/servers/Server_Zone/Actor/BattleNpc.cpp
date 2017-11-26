@@ -29,7 +29,7 @@ uint32_t Core::Entity::BattleNpc::m_nextID = 1149241694;
 Core::Entity::BattleNpc::BattleNpc()
 {
    m_id = 0;
-   m_type = ActorType::BattleNpc;
+   m_objKind = ObjKind::BattleNpc;
    m_status = ActorStatus::Idle;
 }
 
@@ -49,7 +49,7 @@ Core::Entity::BattleNpc::BattleNpc( uint32_t modelId, uint32_t nameid, const Com
    m_pos = spawnPos;
    m_posOrigin = spawnPos;
 
-   m_type = ActorType::BattleNpc;
+   m_objKind = ObjKind::BattleNpc;
 
    m_mode = MODE_IDLE;
    m_targetId = INVALID_GAME_OBJECT_ID;
@@ -83,7 +83,7 @@ Core::Entity::BattleNpc::BattleNpc( uint32_t modelId, uint32_t nameid, const Com
 
    m_invincibilityType = InvincibilityType::InvincibilityNone;
 
-   //m_type = static_cast< Common::ActorType >( type );
+   //m_type = static_cast< Common::ObjKind >( type );
 
 }
 
@@ -147,7 +147,7 @@ void Core::Entity::BattleNpc::spawn( Core::Entity::PlayerPtr pTarget )
 
    spawnPacket.data().rotation = Math::Util::floatToUInt16Rot( getRotation() );
 
-   spawnPacket.data().type = static_cast< uint8_t >( m_type );
+   spawnPacket.data().type = static_cast< uint8_t >( m_objKind );
 
    spawnPacket.data().state = static_cast< uint8_t >( m_status );
 
