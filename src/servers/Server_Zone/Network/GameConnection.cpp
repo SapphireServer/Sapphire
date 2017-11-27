@@ -126,7 +126,7 @@ void Core::Network::GameConnection::OnRecv( std::vector< uint8_t > & buffer )
 {
    // This is assumed packet always start with valid FFXIVARR_PACKET_HEADER for now.
 
-   Packets::FFXIVARR_PACKET_HEADER packetHeader;   
+   Packets::FFXIVARR_PACKET_HEADER packetHeader{};
    const auto headerResult = Packets::getHeader(buffer, 0, packetHeader);
 
    if (headerResult == Incomplete)
@@ -271,7 +271,7 @@ void Core::Network::GameConnection::processInQueue()
    // handle the incoming game packets
    while( auto pPacket = m_inQueue.pop() )
    {
-      handlePacket(pPacket);
+      handlePacket( pPacket );
    }
 }
 
@@ -338,7 +338,7 @@ void Core::Network::GameConnection::injectPacket( const std::string& packetpath,
    fclose( fp );
 
    // cycle through the packet entries and queue each one
-   for( int32_t k = 0x18; k < size;)
+   for( int32_t k = 0x18; k < size; )
    {
       uint32_t tmpId = pPlayer->getId();
       // replace ids in the entryheader if needed
@@ -361,7 +361,7 @@ void Core::Network::GameConnection::injectPacket( const std::string& packetpath,
 }
 
 void Core::Network::GameConnection::handlePackets( const Core::Network::Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
-                                                   const std::vector<Core::Network::Packets::FFXIVARR_PACKET_RAW>& packetData )
+                                                   const std::vector< Core::Network::Packets::FFXIVARR_PACKET_RAW >& packetData )
 {
    // if a session is set, update the last time it recieved a game packet
    if( m_pSession )
@@ -369,8 +369,6 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
 
    for( auto inPacket : packetData )
    {
-
-
       switch( inPacket.segHdr.type )
       {
       case 1:
@@ -459,58 +457,5 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
       }
       }
 
-
-      //// try to retrieve the session for this id
-      //auto session = g_serverZone.getSession( inPacket.segHdr.source_actor );
-      //auto pCon = boost::static_pointer_cast< GameConnection, Connection >( shared_from_this() );
-
-      //// check if this is a zoning notification
-      //if( *reinterpret_cast< uint16_t* >( &inPacket.data[2] ) == 0x9999 )
-      //{
-
-      //   // if we already have a session in this connection, reload the player
-      //   if( session )
-      //      g_serverZone.updateSession( inPacket.segHdr.source_actor );
-      //   else
-      //   {
-      //      // if not, create a new session
-      //      g_serverZone.createSession( inPacket.segHdr.source_actor );
-      //      session = g_serverZone.getSession( inPacket.segHdr.source_actor );
-      //   }
-
-      //   // set the zoneingType for the player so the correct animation can be played
-      //   auto pPlayer = session->getPlayer();
-      //   ZoneingType zoneType = static_cast< ZoneingType >( *reinterpret_cast< uint16_t* >( &inPacket.data[18] ) );
-      //   switch( zoneType )
-      //   {
-      //   case ZoneingType::Teleport:
-      //      pPlayer->setTeleporting( true );
-      //      break;
-      //   case ZoneingType::Return:
-      //      pPlayer->setReturning( true );
-      //      break;
-      //   default:
-      //      break;
-      //   }
-      //   // place this connection in the session
-      //   session->setZoneConnection( pCon );
-      //   // actually perform the zoning
-      //   session->getPlayer()->setZone( *reinterpret_cast< uint16_t* >( &inPacket.data[16] ) );
-      //}
-      //else
-      //{
-      //   if( !session )
-      //   {
-      //      g_serverZone.createSession( inPacket.segHdr.source_actor );
-      //      session = g_serverZone.getSession( inPacket.segHdr.source_actor );
-      //      session->setZoneConnection( pCon );
-      //   }
-
-      //   queueInPacket( GamePacketPtr( new GamePacket( inPacket ) ) );
-      //}
-
-      //// if not set, set the session for this connection
-      //if( !m_pSession && session )
-      //   m_pSession = session;
    }
 }

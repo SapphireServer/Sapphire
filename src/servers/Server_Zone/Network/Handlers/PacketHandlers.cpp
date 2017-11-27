@@ -300,7 +300,7 @@ void Core::Network::GameConnection::zoneLineHandler( const Packets::GamePacket& 
 
    auto pLine = g_zoneMgr.getZonePosition( zoneLineId );
 
-   Common::FFXIVARR_POSITION3 targetPos;
+   Common::FFXIVARR_POSITION3 targetPos{};
    uint32_t targetZone;
    float rotation = 0.0f;
 

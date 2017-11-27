@@ -27,7 +27,8 @@ public:
    BattleNpc();
    ~BattleNpc();
 
-   BattleNpc( uint32_t modelId, uint32_t nameid, const Common::FFXIVARR_POSITION3& spawnPos, uint32_t sizeId = 0, uint32_t type = 2, uint32_t level = 0, uint32_t behaviour = 1, uint32_t mobType = 0 );
+   BattleNpc( uint16_t modelId, uint16_t nameid, const Common::FFXIVARR_POSITION3& spawnPos, uint16_t bnpcBaseId = 0,
+              uint32_t type = 2, uint8_t level = 0, uint8_t behaviour = 1, uint32_t mobType = 0 );
 
    //BattleNpc( uint32_t modelId, 
    //           uint32_t nameId,
