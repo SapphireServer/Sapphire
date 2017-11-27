@@ -14,13 +14,9 @@ extern Core::Data::ExdData g_exdData;
 
 namespace Core {
 
-   ZoneMgr::ZoneMgr()
-   {
-   }
+   ZoneMgr::ZoneMgr() = default;
 
-   ZoneMgr::~ZoneMgr()
-   {
-   }
+   ZoneMgr::~ZoneMgr() = default;
 
    void ZoneMgr::loadZonePositionMap()
    {

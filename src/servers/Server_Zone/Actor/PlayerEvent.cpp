@@ -69,9 +69,9 @@ void Core::Entity::Player::removeEvent( uint32_t eventId )
 void Core::Entity::Player::checkEvent( uint32_t eventId )
 {
    auto pEvent = getEvent( eventId );
-   if( pEvent )
-      if( !pEvent->hasPlayedScene() )
-         eventFinish( eventId, 1 );         
+
+   if( pEvent && !pEvent->hasPlayedScene() )
+      eventFinish( eventId, 1 );
 }
 
 
@@ -282,7 +282,8 @@ void Core::Entity::Player::eventItemActionStart( uint32_t eventId,
 
 void Core::Entity::Player::onLogin()
 {
-   for( auto& child : g_serverZone.getConfig()->getChild( "Settings.Parameters.MotDArray" ) ) {
+   for( auto& child : g_serverZone.getConfig()->getChild( "Settings.Parameters.MotDArray" ) )
+   {
       sendNotice( child.second.data() );
    }
 }

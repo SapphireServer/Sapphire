@@ -195,9 +195,7 @@ bool Core::Entity::Player::tryAddItem( uint16_t catalogId, uint32_t quantity )
    for( uint16_t i = 0; i < 4; i++ )
    {
       if( m_pInventory->addItem( i, -1, catalogId, quantity ) != -1 )
-      {
          return true;
-      }
    }
    return false;
 }
