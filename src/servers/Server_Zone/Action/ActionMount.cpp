@@ -26,7 +26,7 @@ Core::Action::ActionMount::ActionMount()
    m_handleActionType = Common::HandleActionType::Event;
 }
 
-Core::Action::ActionMount::ActionMount( Entity::ActorPtr pActor, uint32_t mountId )
+Core::Action::ActionMount::ActionMount( Entity::ActorPtr pActor, uint16_t mountId )
 {
    m_startTime = 0;
    m_id = mountId;
@@ -54,7 +54,8 @@ void Core::Action::ActionMount::onStart()
    castPacket.data().action_id = m_id;
    castPacket.data().skillType = Common::SkillType::MountSkill;
    castPacket.data().unknown_1 = m_id;
-   castPacket.data().cast_time = static_cast< float >( m_castTime / 1000 ); // This is used for the cast bar above the target bar of the caster.
+   // This is used for the cast bar above the target bar of the caster.
+   castPacket.data().cast_time = static_cast< float >( m_castTime / 1000 );
    castPacket.data().target_id = m_pSource->getAsPlayer()->getId();
 
    m_pSource->sendToInRangeSet( castPacket, true );
@@ -101,7 +102,7 @@ void Core::Action::ActionMount::onInterrupt()
    m_pSource->getAsPlayer()->sendStateFlags();
 
    auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt,
-                                          0x219, 1, m_id, 0 );
+                                         0x219, 1, m_id, 0 );
 
    // Note: When cast interrupt from taking too much damage, set the last value to 1. This enables the cast interrupt effect. Example:
    // auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt, 0x219, 1, m_id, 0 );

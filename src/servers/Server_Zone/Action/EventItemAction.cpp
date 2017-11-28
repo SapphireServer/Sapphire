@@ -22,7 +22,7 @@ Core::Action::EventItemAction::EventItemAction()
    m_handleActionType = Common::HandleActionType::Event;
 }
 
-Core::Action::EventItemAction::EventItemAction( Entity::ActorPtr pActor, uint32_t eventId, uint32_t action,
+Core::Action::EventItemAction::EventItemAction( Entity::ActorPtr pActor, uint32_t eventId, uint16_t action,
                                                 ActionCallback finishRef, ActionCallback interruptRef, uint64_t additional )
 {
    m_additional = additional;
@@ -37,10 +37,7 @@ Core::Action::EventItemAction::EventItemAction( Entity::ActorPtr pActor, uint32_
    m_bInterrupt = false;
 }
 
-Core::Action::EventItemAction::~EventItemAction()
-{
-
-}
+Core::Action::EventItemAction::~EventItemAction() = default;
 
 void Core::Action::EventItemAction::onStart()
 {

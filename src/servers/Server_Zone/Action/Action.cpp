@@ -12,7 +12,7 @@ Core::Action::Action::~Action()
 
 }
 
-uint32_t Core::Action::Action::getId() const
+uint16_t Core::Action::Action::getId() const
 {
    return m_id;
 }

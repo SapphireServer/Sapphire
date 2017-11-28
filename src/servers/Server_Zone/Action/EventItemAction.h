@@ -13,7 +13,7 @@ namespace Core { namespace Action {
       EventItemAction();
       ~EventItemAction();
       
-      EventItemAction( Entity::ActorPtr pActor, uint32_t eventId, uint32_t action,
+      EventItemAction( Entity::ActorPtr pActor, uint32_t eventId, uint16_t action,
                        ActionCallback finishRef, ActionCallback interruptRef, uint64_t additional );
 
       void onStart() override;
