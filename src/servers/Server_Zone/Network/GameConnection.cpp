@@ -100,10 +100,7 @@ Core::Network::GameConnection::GameConnection( Core::Network::HivePtr pHive,
 
 }
 
-Core::Network::GameConnection::~GameConnection()
-{
-
-}
+Core::Network::GameConnection::~GameConnection() = default;
 
 
 // overwrite the parents onConnect for our game socket needs
@@ -127,38 +124,39 @@ void Core::Network::GameConnection::OnRecv( std::vector< uint8_t > & buffer )
    // This is assumed packet always start with valid FFXIVARR_PACKET_HEADER for now.
 
    Packets::FFXIVARR_PACKET_HEADER packetHeader{};
-   const auto headerResult = Packets::getHeader(buffer, 0, packetHeader);
+   const auto headerResult = Packets::getHeader( buffer, 0, packetHeader );
 
-   if (headerResult == Incomplete)
+   if( headerResult == Incomplete )
    {
-      g_log.info("Dropping connection due to incomplete packet header.");
-      g_log.info("FIXME: Packet message bounary is not implemented.");
+      g_log.info( "Dropping connection due to incomplete packet header." );
+      g_log.info( "FIXME: Packet message bounary is not implemented." );
       Disconnect();
       return;
    }
    
-   if (headerResult == Malformed)
+   if( headerResult == Malformed )
    {
-      g_log.info("Dropping connection due to malformed packet header.");
+      g_log.info( "Dropping connection due to malformed packet header." );
       Disconnect();
       return;
    }
    
    // Dissect packet list
    std::vector< Packets::FFXIVARR_PACKET_RAW > packetList;
-   const auto packetResult = Packets::getPackets(buffer, sizeof(struct FFXIVARR_PACKET_HEADER), packetHeader, packetList);
+   const auto packetResult = Packets::getPackets( buffer, sizeof( struct FFXIVARR_PACKET_HEADER ),
+                                                  packetHeader, packetList );
    
-   if (packetResult == Incomplete)
+   if( packetResult == Incomplete )
    {
-      g_log.info("Dropping connection due to incomplete packets.");
-      g_log.info("FIXME: Packet message bounary is not implemented.");
+      g_log.info( "Dropping connection due to incomplete packets." );
+      g_log.info( "FIXME: Packet message bounary is not implemented." );
       Disconnect();
       return;
    }
 
    if (packetResult == Malformed)
    {
-      g_log.info("Dropping connection due to malformed packets.");
+      g_log.info( "Dropping connection due to malformed packets." );
       Disconnect();
       return;
    }
@@ -257,7 +255,7 @@ void Core::Network::GameConnection::handlePacket( Core::Network::Packets::GamePa
 
 }
 
-void Core::Network::GameConnection::sendPackets( Packets::PacketContainer * pPacket )
+void Core::Network::GameConnection::sendPackets( Packets::PacketContainer* pPacket )
 {
    //g_log.Log(LoggingSeverity::info, pPacket->toString());
    std::vector< uint8_t > sendBuffer;
@@ -304,7 +302,7 @@ void Core::Network::GameConnection::processOutQueue()
 
 }
 
-void Core::Network::GameConnection::sendSinglePacket( Packets::GamePacket * pPacket )
+void Core::Network::GameConnection::sendSinglePacket( Packets::GamePacket* pPacket )
 {
    PacketContainer pRP = PacketContainer();
    pRP.addPacket( *pPacket );
@@ -391,7 +389,8 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
             }
             session = g_serverZone.getSession( playerId );
          }
-         else if( !session->isValid() || ( session->getPlayer() && session->getPlayer()->getLastPing() != 0 ) ) //TODO: Catch more things in lobby and send real errors
+         //TODO: Catch more things in lobby and send real errors
+         else if( !session->isValid() || ( session->getPlayer() && session->getPlayer()->getLastPing() != 0 ) )
          {
             g_log.error( "[" + std::string(id) + "] Session INVALID, disconnecting" );
             Disconnect();
