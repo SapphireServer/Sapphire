@@ -555,7 +555,7 @@ void Core::Network::GameConnection::tellHandler( const Packets::GamePacket& inPa
 
    if( !pSession )
    {
-      GamePacketNew< FFXIVIpcTellErrNotFound, ServerChatIpcType > tellErrPacket( pPlayer->getId() );
+      ChatChannelPacket< FFXIVIpcTellErrNotFound > tellErrPacket( pPlayer->getId() );
       strcpy( tellErrPacket.data().receipientName, targetPcName.c_str() );
       sendSinglePacket( tellErrPacket );
 
@@ -588,7 +588,7 @@ void Core::Network::GameConnection::tellHandler( const Packets::GamePacket& inPa
       return;
    }
 
-   GamePacketNew< FFXIVIpcTell, ServerChatIpcType > tellPacket( pPlayer->getId() );
+   ChatChannelPacket< FFXIVIpcTell > tellPacket( pPlayer->getId() );
    strcpy( tellPacket.data().msg, msg.c_str() );
    strcpy( tellPacket.data().receipientName, pPlayer->getName().c_str() );
    // TODO: do these have a meaning?
