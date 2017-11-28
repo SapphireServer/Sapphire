@@ -14,7 +14,7 @@ namespace Core { namespace Action {
       ActionCast();
       ~ActionCast();
       
-      ActionCast( Entity::ActorPtr pActor, Entity::ActorPtr pTarget, uint32_t actionId );
+      ActionCast( Entity::ActorPtr pActor, Entity::ActorPtr pTarget, uint16_t actionId );
 
       void onStart() override;
       void onFinish() override;

@@ -249,7 +249,7 @@ public:
 
    void setStatus( ActorStatus  status );
 
-   void handleScriptSkill( uint32_t type, uint32_t actionId, uint64_t param1, uint64_t param2, Entity::Actor& target );
+   void handleScriptSkill( uint32_t type, uint16_t actionId, uint64_t param1, uint64_t param2, Entity::Actor& target );
 
    virtual void autoAttack( ActorPtr pTarget );
 

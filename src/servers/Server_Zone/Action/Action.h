@@ -13,7 +13,7 @@ namespace Core { namespace Action {
       Action();
       virtual ~Action();
 
-      uint32_t getId() const;
+      uint16_t getId() const;
 
       Common::HandleActionType getHandleActionType() const;
 
@@ -41,7 +41,7 @@ namespace Core { namespace Action {
       virtual bool update();
 
    protected:
-      uint32_t	m_id;
+      uint16_t	m_id;
       Common::HandleActionType m_handleActionType;
 
       uint64_t	m_startTime;

@@ -50,7 +50,10 @@ bool ActionCollision::isActorApplicable( ActorPtr actorPtr, TargetFilter targetF
    return ( actorApplicable && actorPtr->isAlive() );
 }
 
-std::set< Core::Entity::ActorPtr > ActionCollision::getActorsHitFromAction( FFXIVARR_POSITION3 aoePosition, std::set< ActorPtr > actorsInRange, boost::shared_ptr< Core::Data::ActionInfo > actionInfo, TargetFilter targetFilter )
+std::set< Core::Entity::ActorPtr > ActionCollision::getActorsHitFromAction( FFXIVARR_POSITION3 aoePosition,
+                                                                            std::set< ActorPtr > actorsInRange,
+                                                                            boost::shared_ptr< Core::Data::ActionInfo > actionInfo,
+                                                                            TargetFilter targetFilter )
 {
    std::set< ActorPtr > actorsCollided;
 
