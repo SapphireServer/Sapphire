@@ -80,7 +80,7 @@ std::string generateDirectGetterDef( const std::string& exd )
    std::string result = "";
    result =
       "boost::shared_ptr< Core::Data::" + exd + " >\n"
-      "   get" + exd + "( uint32_t " + exd + "Id )\n"
+      "   Core::Data::ExdDataGenerated::get" + exd + "( uint32_t " + exd + "Id )\n"
       "{\n"
       "   try\n"
       "   {\n"
