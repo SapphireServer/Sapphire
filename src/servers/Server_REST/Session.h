@@ -20,8 +20,8 @@ namespace Core {
 
       std::string newCharName;
 
-      Session( void );
-      ~Session( void );
+      Session();
+      ~Session();
 
       uint32_t getIp() const;
 
