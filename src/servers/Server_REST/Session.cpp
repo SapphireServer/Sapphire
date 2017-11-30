@@ -1,11 +1,11 @@
 #include "Session.h"
 namespace Core {
-   Session::Session( void )
+   Session::Session()
    {
 
    }
 
-   Session::~Session( void )
+   Session::~Session()
    {
 
    }

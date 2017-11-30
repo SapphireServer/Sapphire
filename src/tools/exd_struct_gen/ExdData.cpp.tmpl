@@ -20,6 +20,18 @@ xiv::exd::Exd Core::Data::ExdDataGenerated::setupDatAccess( const std::string& n
    return static_cast< xiv::exd::Exd >( cat.get_data_ln( lang ) );
 };
 
+
+void Core::Data::ExdDataGenerated::loadIdList( xiv::exd::Exd& data, std::set< uint32_t >& outIdList )
+{
+   auto pDataRows = data.get_rows();
+
+   for( auto row : pDataRows )
+   {
+      uint32_t id = row.first;
+      outIdList.insert( id );
+   }
+}
+
 bool Core::Data::ExdDataGenerated::init( const std::string& path )
 {
    try

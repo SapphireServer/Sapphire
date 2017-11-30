@@ -1,5 +1,5 @@
 {
-  "version": "2017.10.05.0000.0000",
+  "version": "2017.11.15.0000.0000",
   "sheets": [
     {
       "sheet": "Achievement",
@@ -189,7 +189,7 @@
           "index": 30,
           "name": "Cost{Type}"
         },
-        { 
+        {
           "index": 31,
           "name": "Cost"
         },
@@ -2868,7 +2868,7 @@
     },
     {
       "sheet": "DeepDungeonItem",
-      "defaultcolumn": "Name",
+      "defaultColumn": "Name",
       "definitions": [
         {
           "name": "Icon",
@@ -2877,7 +2877,7 @@
           }
         },
         {
-          "index": 2,
+          "index": 1,
           "name": "Singular"
         },
         {
@@ -3473,6 +3473,42 @@
         {
           "index": 9,
           "name": "Data"
+        }
+      ]
+    },
+    {
+      "sheet": "EquipRaceCategory",
+      "definitions": [
+        {
+          "name": "Hyur"
+        },
+        {
+          "index": 1,
+          "name": "Elezen"
+        },
+        {
+          "index": 2,
+          "name": "Lalafell"
+        },
+        {
+          "index": 3,
+          "name": "Miqo'te"
+        },
+        {
+          "index": 4,
+          "name": "Roegadyn"
+        },
+        {
+          "index": 5,
+          "name": "Au Ra"
+        },
+        {
+          "index": 6,
+          "name": "Male"
+        },
+        {
+          "index": 7,
+          "name": "Female"
         }
       ]
     },
@@ -4501,6 +4537,26 @@
       ]
     },
     {
+      "sheet": "GCScripShopCategory",
+      "definitions": [
+        {
+          "name": "GrandCompany",
+          "converter": {
+            "type": "link",
+            "target": "GrandCompany"
+          }
+        },
+        {
+          "index": 1,
+          "name": "Tier"
+        },
+        {
+          "index": 2,
+          "name": "SubCategory"
+        }
+      ]
+    },
+    {
       "sheet": "GCScripShopItem",
       "defaultColumn": "Item",
       "definitions": [
@@ -4513,11 +4569,19 @@
         },
         {
           "index": 1,
-          "name": "Required{Rank}"
+          "name": "Required{GrandCompanyRank}",
+          "converter": {
+            "type": "link",
+            "target": "GrandCompanyRank"
+          }
         },
         {
           "index": 2,
           "name": "Cost{GCSeals}"
+        },
+        {
+          "index": 3,
+          "name": "SortKey"
         }
       ]
     },
@@ -6207,6 +6271,26 @@
                 "name": "Stars"
               }
             ]
+          }
+        }
+      ]
+    },
+    {
+      "sheet": "MasterpieceSupplyMultiplier",
+      "definitions": [
+        {
+          "type": "repeat",
+          "count": 2,
+          "definition": {
+            "name": "XpMultiplier"
+          }
+        },
+        {
+          "index": 4,
+          "type": "repeat",
+          "count": 2,
+          "definition": {
+            "name": "CurrencyMultiplier"
           }
         }
       ]
@@ -7935,7 +8019,7 @@
       ]
     },
     {
-      "sheet":  "Salvage",
+      "sheet": "Salvage",
       "defaultColumn": "OptimalSkill",
       "definitions": [
         {
