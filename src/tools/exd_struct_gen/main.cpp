@@ -53,7 +53,7 @@ std::string generateDirectGetters( const std::string& exd )
 
 std::string generateIdListGetter( const std::string &exd )
 {
-   std::string IdListGetter = "const std::set< uint32_t >& ExdDataGenerated::get" + exd + "IdList()\n"
+   std::string IdListGetter = "const std::set< uint32_t >& get" + exd + "IdList()\n"
                               "{\n"
                               "   if( m_" + exd + "IdList.size() == 0 )\n"
                               "      loadIdList( m_" + exd + "Dat, m_" + exd + "IdList );\n"
