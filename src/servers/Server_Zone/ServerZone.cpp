@@ -294,7 +294,6 @@ void Core::ServerZone::mainLoop()
          // remove session of players marked for removel ( logoff / kick )
          if( pPlayer->isMarkedForRemoval() && diff > 1 )
          {
-            it->second->close();
             // if( it->second.unique() )
             {
                g_log.info("[" + std::to_string(it->second->getId() ) + "] Session removal" );
