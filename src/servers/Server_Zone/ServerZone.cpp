@@ -292,7 +292,7 @@ void Core::ServerZone::mainLoop()
          auto pPlayer = it->second->getPlayer();
 
          // remove session of players marked for removel ( logoff / kick )
-         if( pPlayer->isMarkedForRemoval() && diff > 1 )
+         if( pPlayer->isMarkedForRemoval() && diff > 5 )
          {
             it->second->close();
             // if( it->second.unique() )

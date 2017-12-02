@@ -286,6 +286,7 @@ void Core::Network::GameConnection::updatePositionHandler( const Packets::GamePa
 void Core::Network::GameConnection::reqEquipDisplayFlagsHandler( const Packets::GamePacket& inPacket,
                                                      Entity::PlayerPtr pPlayer )
 {
+   g_log.info( "[" + std::to_string( pPlayer->getId() ) + "] Setting EquipDisplayFlags to " + std::to_string( inPacket.getValAt< uint8_t >( 0x20 ) ) );
    pPlayer->setEquipDisplayFlags( inPacket.getValAt< uint8_t >( 0x20 ) );
 }
 
