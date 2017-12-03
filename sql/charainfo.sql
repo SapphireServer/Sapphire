@@ -64,7 +64,6 @@ CREATE TABLE `charainfo` (
   `HowTo` binary(33) DEFAULT NULL,
   `Minions` binary(33) DEFAULT NULL,
   `Mounts` binary(13) DEFAULT NULL,
-  `Orchestrion` binary(38) DEFAULT NULL,
   `EquippedMannequin` int(5) DEFAULT '0',
   `ConfigFlags` smallint(5) NOT NULL DEFAULT '0',
   `QuestCompleteFlags` binary(200) DEFAULT NULL,
@@ -76,7 +75,7 @@ CREATE TABLE `charainfo` (
   `GMRank` int(3) DEFAULT '0',
   `Unlocks` binary(64) DEFAULT NULL,
   `CFPenaltyUntil` int(11) DEFAULT NULL,
-  `UPDATE_DATE` datetime DEFAULT NULL,
+  `UPDATE_DATE` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`CharacterId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
