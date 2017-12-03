@@ -177,15 +177,9 @@ public:
    void setPosition( const Common::FFXIVARR_POSITION3& pos );
    void setPosition( float x, float y, float z );
 
-   void setRotation( float rot )
-   {
-      m_rot = rot;
-   }
+   void setRotation( float rot );
 
-   float getRotation() const
-   {
-      return m_rot;
-   }
+   float getRotation() const;
 
    Common::FFXIVARR_POSITION3& getPos();
 

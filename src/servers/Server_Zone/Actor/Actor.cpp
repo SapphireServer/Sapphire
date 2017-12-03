@@ -828,3 +828,13 @@ Core::StatusEffect::StatusEffectContainerPtr Core::Entity::Actor::getStatusEffec
 {
    return m_pStatusEffectContainer;
 }
+
+float Core::Entity::Actor::getRotation() const
+{
+   return m_rot;
+}
+
+void Core::Entity::Actor::setRotation( float rot )
+{
+   m_rot = rot;
+}
