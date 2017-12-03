@@ -387,6 +387,8 @@ public:
    const uint8_t* getUnlockBitmask() const;
    /*! return a const pointer to the orchestrion bitmask array */
    const uint8_t* getOrchestrionBitmask() const;
+   /*! return a const pointer to the mount guide bitmask array */
+   const uint8_t* getMountGuideBitmask() const;
 
 
    // Spawn handling
@@ -574,7 +576,7 @@ private:
    uint8_t m_titleList[48];
    uint8_t m_howTo[33];
    uint8_t m_minions[33];
-   uint8_t m_mounts[13];
+   uint8_t m_mountGuide[13];
    uint8_t m_homePoint;
    uint8_t m_startTown;
    uint16_t m_townWarpFstFlags;
