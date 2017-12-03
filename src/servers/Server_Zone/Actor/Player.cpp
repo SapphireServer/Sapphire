@@ -1183,6 +1183,11 @@ const uint8_t * Core::Entity::Player::getOrchestrionBitmask() const
    return m_orchestrion;
 }
 
+const uint8_t * Core::Entity::Player::getMountGuideBitmask() const
+{
+   return m_mountGuide;
+}
+
 uint64_t Core::Entity::Player::getContentId() const
 {
    return m_contentId;
