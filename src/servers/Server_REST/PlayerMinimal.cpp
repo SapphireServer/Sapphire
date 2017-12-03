@@ -153,6 +153,8 @@ namespace Core {
       std::vector< uint8_t > discovery( 411 );
       std::vector< uint8_t > questComplete( 200 );
       std::vector< uint8_t > unlocks( 64 );
+      std::vector< uint8_t > mountGuide( 13 );
+      std::vector< uint8_t > orchestrion( 38 );
       std::vector< uint8_t > modelEquip( 40 );
       std::vector< uint8_t > questTracking8( 10 );
       std::vector< int16_t > questTracking = { -1, -1, -1, -1, -1 };
@@ -255,6 +257,8 @@ namespace Core {
       stmt->setBinary( 29, questTracking8 );
       stmt->setBinary( 30, aetherytes );
       stmt->setInt( 31, m_gmRank );
+      stmt->setBinary( 32, mountGuide );
+      stmt->setBinary( 33, orchestrion );
       g_charaDb.directExecute( stmt );
 
       auto stmtSearchInfo = g_charaDb.getPreparedStatement( Db::CharaDbStatements::CHARA_SEARCHINFO_INS );

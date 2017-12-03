@@ -27,7 +27,7 @@ void Core::Db::CharaDbConnection::doPrepareStatements()
                                        "OTerritoryType, OTerritoryId, OPosX, OPosY, OPosZ, OPosR, GuardianDeity, "
                                        "BirthDay, BirthMonth, Class, Status, TotalPlayTime, FirstClass, HomePoint, "
                                        "FavoritePoint, RestPoint, StartTown, ActiveTitle, TitleList, Achievement, "
-                                       "Aetheryte, HowTo, Minions, Mounts, EquippedMannequin, ConfigFlags, "
+                                       "Aetheryte, HowTo, Minions, Mounts, Orchestrion, EquippedMannequin, ConfigFlags, "
                                        "QuestCompleteFlags, OpeningSequence, QuestTracking, GrandCompany, "
                                        "GrandCompanyRank, Discovery, GMRank, Unlocks, CFPenaltyUntil "
                                        "FROM charainfo WHERE CharacterId = ?;", CONNECTION_SYNC );
@@ -41,7 +41,7 @@ void Core::Db::CharaDbConnection::doPrepareStatements()
                      "TerritoryType = ?, TerritoryId = ?, PosX = ?, PosY = ?, PosZ = ?, PosR = ?, "
                      "OTerritoryType = ?, OTerritoryId = ?, OPosX = ?, OPosY = ?, OPosZ = ?, OPosR = ?, "
                      "Class = ?, Status = ?, TotalPlayTime = ?, HomePoint = ?, FavoritePoint = ?, RestPoint = ?, "
-                     "ActiveTitle = ?, TitleList = ?, Achievement = ?, Aetheryte = ?, HowTo = ?, Minions = ?, Mounts = ?, "
+                     "ActiveTitle = ?, TitleList = ?, Achievement = ?, Aetheryte = ?, HowTo = ?, Minions = ?, Mounts = ?, Orchestrion = ?, "
                      "EquippedMannequin = ?, ConfigFlags = ?, QuestCompleteFlags = ?, OpeningSequence = ?, "
                      "QuestTracking = ?, GrandCompany = ?, GrandCompanyRank = ?, Discovery = ?, GMRank = ?, Unlocks = ?, "
                      "CFPenaltyUntil = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
@@ -55,8 +55,8 @@ void Core::Db::CharaDbConnection::doPrepareStatements()
                                         "Customize, Voice, IsNewGame, TerritoryId, PosX, PosY, PosZ, PosR, ModelEquip, "
                                         "IsNewAdventurer, GuardianDeity, Birthday, BirthMonth, Class, Status, FirstClass, "
                                         "HomePoint, StartTown, Discovery, HowTo, QuestCompleteFlags, Unlocks, QuestTracking, "
-                                        "Aetheryte, GMRank, UPDATE_DATE ) "
-                                        "VALUES ( ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW() );",
+                                        "Aetheryte, GMRank, Mounts, Orchestrion, UPDATE_DATE ) "
+                                        "VALUES ( ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW() );",
                      CONNECTION_SYNC );
 
    prepareStatement( CHARA_UP_NAME, "UPDATE charainfo SET Name = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
