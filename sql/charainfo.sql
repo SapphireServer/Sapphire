@@ -15,7 +15,7 @@ CREATE TABLE `charainfo` (
   `AccountId` int(11) NOT NULL,
   `CharacterId` decimal(20,0) NOT NULL,
   `ContentId` bigint(20) DEFAULT NULL,
-  `Name` varchar(32) COLLATE latin1_general_ci DEFAULT NULL,
+  `Name` varchar(32) CHARACTER SET latin1 COLLATE latin1_general_ci DEFAULT NULL,
   `Hp` bigint(20) DEFAULT '200',
   `Mp` bigint(20) DEFAULT '200',
   `Tp` bigint(20) DEFAULT '0',
@@ -64,6 +64,7 @@ CREATE TABLE `charainfo` (
   `HowTo` binary(33) DEFAULT NULL,
   `Minions` binary(33) DEFAULT NULL,
   `Mounts` binary(13) DEFAULT NULL,
+  `Orchestrion` binary(38) DEFAULT NULL,
   `EquippedMannequin` int(5) DEFAULT '0',
   `ConfigFlags` smallint(5) NOT NULL DEFAULT '0',
   `QuestCompleteFlags` binary(200) DEFAULT NULL,
@@ -75,7 +76,8 @@ CREATE TABLE `charainfo` (
   `GMRank` int(3) DEFAULT '0',
   `Unlocks` binary(64) DEFAULT NULL,
   `CFPenaltyUntil` int(11) DEFAULT NULL,
-  `UPDATE_DATE` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `UPDATE_DATE` datetime DEFAULT NULL,
+  PRIMARY KEY (`CharacterId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- Dumping data for table sapphire.charainfo: 0 rows
