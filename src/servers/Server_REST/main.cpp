@@ -169,6 +169,575 @@ bool loadSettings( int32_t argc, char* argv[] )
    return true;
 }
 
+using ContentType = enum 
+{
+   NONE,
+   TEXT_PLAIN,
+   JSON,
+   XML,
+};
+
+std::string buildHttpResponse( uint16_t rCode, const std::string& content = "", ContentType type = NONE )
+{
+   std::string result{""};
+   std::string httpHead{"HTTP/1.1 "};
+   std::string contentHeader{"Content-Length: "};
+   std::string contentTypeHeader{"Content-Type: "};
+
+   switch( type )
+   {
+      case NONE:
+         contentTypeHeader = "";
+      break;
+      case TEXT_PLAIN:
+         contentTypeHeader += "text/plain\r\n";
+      break;
+      case JSON:
+         contentTypeHeader += "application/json\r\n";
+      break;
+      case XML:
+         contentTypeHeader += "text/xml\r\n";
+      break;
+      
+   }
+   
+   switch( rCode )
+   {
+      case 200:
+         result += httpHead + "200 OK\r\n";
+         if( content.size() > 0 )
+         {
+            result += contentTypeHeader;
+            result += contentHeader + std::to_string( content.size() ) + "\r\n";
+         }
+         break;
+      case 400:
+      case 401:
+      case 402:
+      case 403:
+         result += httpHead + std::to_string( rCode ) + "\r\n";
+         if( content.size() > 0 )
+         {
+            result += contentTypeHeader;
+            result += contentHeader + std::to_string( content.size() ) + "\r\n";
+         }
+         break;
+      case 500:
+         result += httpHead + "500 Internal Server Error\r\n";
+         break;
+      default:
+         result += httpHead + std::to_string( rCode ) + "\r\n";
+      
+      
+
+    
+   }
+   result += "\r\n";
+   if( content.size() > 0 )
+      result += content; 
+   
+   return result;
+}
+
+void getZoneName( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) 
+{
+   string number = request->path_match[1];
+   auto it = g_exdData.m_zoneInfoMap.find( atoi( number.c_str() ) );
+   std::string responseStr = "Not found!";
+   if( it != g_exdData.m_zoneInfoMap.end() )
+      responseStr = it->second.zone_name + ", " + it->second.zone_str;
+   *response << buildHttpResponse( 200, responseStr );
+}
+
+void createAccount( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) 
+{
+   print_request_info( request );
+   try
+   {
+
+      using namespace boost::property_tree;
+      ptree pt;
+      read_json( request->content, pt );
+
+      std::string pass = pt.get<string>( "pass" );
+      std::string user = pt.get<string>( "username" );
+      // reloadConfig();
+
+      std::string sId;
+      if( g_sapphireAPI.createAccount( user, pass, sId ) )
+      {
+         std::string json_string = "{\"sId\":\"" + sId + 
+                                    "\", \"lobbyHost\":\"" + m_pConfig->getValue< std::string >( "Settings.General.LobbyHost" ) + 
+                                    "\", \"frontierHost\":\"" + m_pConfig->getValue< std::string >( "Settings.General.FrontierHost" ) + "\"}";
+         *response << buildHttpResponse( 200, json_string, JSON );
+      }
+      else
+         *response << buildHttpResponse( 400 );
+   }
+   catch( exception& e )
+   {
+      *response << buildHttpResponse( 500 );
+      g_log.error( e.what() );
+   }
+}
+
+void login( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) 
+{
+   print_request_info( request );
+   try
+   {
+      using namespace boost::property_tree;
+      ptree pt;
+      read_json( request->content, pt );
+
+      std::string pass = pt.get<string>( "pass" );
+      std::string user = pt.get<string>( "username" );
+
+      std::string sId;
+
+      // reloadConfig();
+      if( g_sapphireAPI.login( user, pass, sId ) )
+      {
+         std::string json_string = "{\"sId\":\"" + sId + 
+                                    "\", \"lobbyHost\":\"" + m_pConfig->getValue< std::string >("Settings.General.LobbyHost") + 
+                                    "\", \"frontierHost\":\"" + m_pConfig->getValue< std::string >( "Settings.General.FrontierHost" ) + "\"}";
+         *response << buildHttpResponse( 200, json_string, JSON );
+      }
+      else
+         *response << buildHttpResponse( 400 );
+
+   }
+   catch( exception& e )
+   { 
+      *response << buildHttpResponse( 500 );
+      g_log.error( e.what() );
+   }
+
+}
+
+void deleteCharacter( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) 
+{
+   print_request_info( request );
+   try
+   {
+      using namespace boost::property_tree;
+      ptree pt;
+      read_json( request->content, pt );
+      std::string sId = pt.get<string>( "sId" );
+      std::string secret = pt.get<string>( "secret" );
+      std::string name = pt.get<string>( "name" );
+          
+      // reloadConfig();
+
+      int32_t accountId = g_sapphireAPI.checkSession( sId );
+
+      if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret )
+      {
+         std::string json_string = "{\"result\":\"invalid_secret\"}";
+         *response << buildHttpResponse( 403, json_string, JSON );
+      }
+      else
+      {
+         g_sapphireAPI.deleteCharacter( name, accountId );
+         std::string json_string = "{\"result\":\"success\"}";
+         *response << buildHttpResponse( 200, json_string, JSON );
+      }
+   }
+   catch( exception& e )
+   {
+      *response << buildHttpResponse( 500 );
+      g_log.error( e.what() );
+   }
+
+}
+
+void createCharacter( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) 
+{
+   print_request_info( request );
+   try
+   {
+      using namespace boost::property_tree;
+      ptree pt;
+      read_json( request->content, pt );
+      std::string sId = pt.get<string>( "sId" );
+      std::string secret = pt.get<string>( "secret" );
+      std::string name = pt.get<string>( "name" );
+      std::string infoJson = pt.get<string>( "infoJson" );
+
+      std::string finalJson = Core::Util::base64_decode( infoJson );
+
+      // reloadConfig();
+
+      int32_t result = g_sapphireAPI.checkSession( sId );
+
+      if( result != -1 )
+      {
+         if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) 
+         {
+            std::string json_string = "{\"result\":\"invalid_secret\"}";
+            *response << buildHttpResponse( 403, json_string, JSON );
+         }
+         else
+         {
+            int32_t charId = g_sapphireAPI.createCharacter( result, name, finalJson, m_pConfig->getValue< uint8_t >( "Settings.Parameters.DefaultGMRank", 255 ) );
+
+            std::string json_string = "{\"result\":\"" + std::to_string( charId ) + "\"}";
+            *response << buildHttpResponse( 200, json_string, JSON );
+         }
+      }
+      else
+      {
+         std::string json_string = "{\"result\":\"invalid\"}";
+         *response << buildHttpResponse( 200, json_string, JSON );
+      }
+   }
+   catch( exception& e )
+   {
+      *response << buildHttpResponse( 500 );
+      g_log.error( e.what() );
+   }
+
+}
+
+void insertSession( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) 
+{
+   print_request_info( request );
+
+   try
+   {
+      using namespace boost::property_tree;
+      ptree pt;
+      read_json( request->content, pt );
+      std::string sId = pt.get<string>( "sId" );
+      uint32_t accountId = pt.get<uint32_t>( "accountId" );
+      std::string secret = pt.get<string>( "secret" );
+         // reloadConfig();
+      if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) 
+      {
+         std::string json_string = "{\"result\":\"invalid_secret\"}";
+         *response << buildHttpResponse( 403, json_string, JSON );
+      }
+      else
+      {
+         g_sapphireAPI.insertSession( accountId, sId );
+          std::string json_string = "{\"result\":\"success\"}";
+         *response << buildHttpResponse( 200, json_string, JSON );
+      }
+   }
+   catch( exception& e )
+   {
+      *response << buildHttpResponse( 500 );
+      g_log.error( e.what() );
+   }
+}
+
+void checkNameTaken( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) 
+{
+   print_request_info( request );
+
+   try
+   {
+      using namespace boost::property_tree;
+      ptree pt;
+      read_json( request->content, pt );
+
+      std::string name = pt.get<string>( "name" );
+      std::string secret = pt.get<string>( "secret" );
+
+      // reloadConfig();
+
+      if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) 
+      {
+         std::string json_string = "{\"result\":\"invalid_secret\"}";
+         *response << buildHttpResponse( 403, json_string, JSON );
+      }
+      else
+      {
+         std::string json_string;
+         if( !g_sapphireAPI.checkNameTaken( name ) )
+            json_string = "{\"result\":\"false\"}";
+         else
+            json_string = "{\"result\":\"true\"}";
+         *response << buildHttpResponse( 200, json_string, JSON );
+      }
+   }
+   catch( exception& e )
+   {
+      *response << buildHttpResponse( 500 );
+      g_log.error( e.what() );
+   }
+}
+
+void checkSession( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) 
+{
+   print_request_info( request );
+   try
+   {
+      using namespace boost::property_tree;
+      ptree pt;
+      read_json( request->content, pt );
+      std::string sId = pt.get<string>( "sId" );
+      std::string secret = pt.get<string>( "secret" );
+      int32_t result = g_sapphireAPI.checkSession( sId );
+
+      // reloadConfig();
+
+      if( result != -1 )
+      {
+         if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) 
+         {
+            std::string json_string = "{\"result\":\"invalid_secret\"}";
+            *response << buildHttpResponse( 403, json_string, JSON );
+         }
+         else
+         {
+            std::string json_string = "{\"result\":\"" + std::to_string( result ) + "\"}";
+            *response << buildHttpResponse( 200, json_string, JSON );
+         }
+      }
+      else
+      {
+         std::string json_string = "{\"result\":\"invalid\"}";
+         *response << buildHttpResponse( 200, json_string, JSON );
+      }
+   }
+   catch( exception& e )
+   {
+      *response << buildHttpResponse( 500 );
+      g_log.error( e.what() );
+   }
+
+}
+
+void getNextCharId( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) 
+{
+   print_request_info( request );
+   try
+   {
+      using namespace boost::property_tree;
+      ptree pt;
+      read_json( request->content, pt );
+      std::string secret = pt.get<string>( "secret" );
+
+      // reloadConfig();
+
+      if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) 
+      {
+         std::string json_string = "{\"result\":\"invalid_secret\"}";
+         *response << buildHttpResponse( 403, json_string, JSON );
+      }
+      else
+      {
+         std::string json_string = "{\"result\":\"" + std::to_string( g_sapphireAPI.getNextCharId() ) + "\"}";
+         *response << buildHttpResponse( 200, json_string, JSON );
+      }
+   }
+   catch( exception& e )
+   {
+      *response << buildHttpResponse( 500 );
+      g_log.error( e.what() );
+   }
+
+}
+
+void getNextContentId( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) 
+{
+   print_request_info( request );
+
+   try
+   {
+      using namespace boost::property_tree;
+      ptree pt;
+      read_json( request->content, pt );
+      std::string secret = pt.get<string>( "secret" );
+
+      // reloadConfig();
+
+      if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) 
+      {
+         std::string json_string = "{\"result\":\"invalid_secret\"}";
+         *response << buildHttpResponse( 403, json_string, JSON );
+      }
+      else
+      {
+         std::string json_string = "{\"result\":\"" + std::to_string( g_sapphireAPI.getNextContentId() ) + "\"}";
+         *response << buildHttpResponse( 200, json_string, JSON );
+      }
+   }
+   catch( exception& e )
+   {
+      *response << buildHttpResponse( 500 );
+      g_log.error( e.what() );
+   }
+
+}
+
+void getCharacterList( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) 
+{
+   print_request_info( request );
+   try
+   {
+      using namespace boost::property_tree;
+      ptree pt;
+      read_json( request->content, pt );
+      std::string sId = pt.get<string>( "sId" );
+      std::string secret = pt.get<string>( "secret" );
+
+      // reloadConfig();
+
+      int32_t result = g_sapphireAPI.checkSession( sId );
+
+      if( result != -1 )
+      {
+         if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) 
+         {
+            std::string json_string = "{\"result\":\"invalid_secret\"}";
+            *response << buildHttpResponse( 403, json_string, JSON );
+         }
+         else
+         {
+            auto charList = g_sapphireAPI.getCharList( result );
+            using boost::property_tree::ptree;
+            ptree pt;
+            ptree char_tree;
+
+            for( auto entry : charList )
+            {
+               ptree tree_entry;
+               tree_entry.put( "name", std::string( entry.getName() ) );
+               tree_entry.put( "charId", std::to_string( entry.getId() ) );
+               tree_entry.put( "contentId", std::to_string( entry.getContentId() ) );
+               tree_entry.put( "infoJson", std::string( entry.getInfoJson() ) );
+               char_tree.push_back( std::make_pair( "", tree_entry ) );
+            }
+
+            pt.add_child( "charArray", char_tree );
+            pt.put( "result", "success" );
+            std::ostringstream oss;
+            write_json( oss, pt );
+            std::string responseStr = oss.str();
+            *response << buildHttpResponse( 200, responseStr, JSON );
+         }
+      }
+      else
+      {
+         std::string json_string = "{\"result\":\"invalid\"}";
+         *response << buildHttpResponse( 200, json_string, JSON );
+      }
+   }
+   catch( exception& e )
+   {
+      *response << buildHttpResponse( 500 );
+      g_log.error( e.what() );
+   }
+}
+
+void get_init( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) 
+{
+   print_request_info( request );
+   try
+   {
+      auto web_root_path = boost::filesystem::canonical( "web" );
+      auto path = boost::filesystem::canonical( web_root_path / "news.xml" );
+      //Check if path is within web_root_path
+      if( distance( web_root_path.begin(), web_root_path.end() ) > distance( path.begin(), path.end() ) ||
+          !std::equal( web_root_path.begin(), web_root_path.end(), path.begin() ) )
+         throw invalid_argument( "path must be within root path" );
+      if( !( boost::filesystem::exists( path ) && boost::filesystem::is_regular_file( path ) ) )
+         throw invalid_argument( "file does not exist" );
+
+      auto ifs = make_shared<ifstream>();
+      ifs->open( path.string(), ifstream::in | ios::binary | ios::ate );
+
+      if( *ifs )
+      {
+         auto length = ifs->tellg();
+         ifs->seekg( 0, ios::beg );
+
+         *response << "HTTP/1.1 200 OK\r\n" << "Content-Length: " << length << "\r\n\r\n";
+         default_resource_send( server, response, ifs );
+      }
+      else
+         throw invalid_argument( "could not read file" );
+   }
+   catch( exception& e )
+   {
+      *response << buildHttpResponse( 500 );
+      g_log.error( e.what() );
+   }
+}
+
+void get_headline_all( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) 
+{
+   print_request_info( request );
+   try
+   {
+      auto web_root_path = boost::filesystem::canonical( "web" );
+      auto path = boost::filesystem::canonical( web_root_path / "headlines.xml" );
+      //Check if path is within web_root_path
+      if( distance( web_root_path.begin(), web_root_path.end() ) > distance( path.begin(), path.end() ) ||
+          !std::equal( web_root_path.begin(), web_root_path.end(), path.begin() ) )
+         throw invalid_argument( "path must be within root path" );
+      if( !( boost::filesystem::exists( path ) && boost::filesystem::is_regular_file( path ) ) )
+         throw invalid_argument( "file does not exist" );
+
+      auto ifs = make_shared<ifstream>();
+      ifs->open( path.string(), ifstream::in | ios::binary | ios::ate );
+
+      if( *ifs )
+      {
+         auto length = ifs->tellg();
+         ifs->seekg( 0, ios::beg );
+         *response << "HTTP/1.1 200 OK\r\n" << "Content-Length: " << length << "\r\n\r\n";
+         default_resource_send( server, response, ifs );
+      }
+      else
+         throw invalid_argument( "could not read file" );
+   }
+   catch( exception& e )
+   {
+      *response << buildHttpResponse( 500 );
+      g_log.error( e.what() );
+   }
+}
+
+void defaultGet( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) 
+{
+   print_request_info( request );
+   try
+   {
+      auto web_root_path = boost::filesystem::canonical( "web" );
+      auto path = boost::filesystem::canonical( web_root_path / request->path );
+      //Check if path is within web_root_path
+      if( distance( web_root_path.begin(), web_root_path.end() ) > distance( path.begin(), path.end() ) ||
+          !std::equal( web_root_path.begin(), web_root_path.end(), path.begin() ) )
+         throw invalid_argument( "path must be within root path" );
+      if( boost::filesystem::is_directory( path ) )
+         path /= "index.html";
+      if( !( boost::filesystem::exists( path ) && boost::filesystem::is_regular_file( path ) ) )
+         throw invalid_argument( "file does not exist" );
+
+      auto ifs = make_shared<ifstream>();
+      ifs->open( path.string(), ifstream::in | ios::binary | ios::ate );
+
+      if( *ifs )
+      {
+         auto length = ifs->tellg();
+         ifs->seekg( 0, ios::beg );
+
+         *response << "HTTP/1.1 200 OK\r\n" << "Content-Length: " << length << "\r\n\r\n";
+         default_resource_send( server, response, ifs );
+      }
+      else
+         throw invalid_argument( "could not read file" );
+   }
+   catch( const exception & )
+   {
+      string content = "Path not found: " + request->path;
+      *response << buildHttpResponse( 400, content );
+   }
+}
+
 int main( int argc, char* argv[] )
 {
    g_log.setLogPath( "log\\SapphireAPI" );
@@ -180,550 +749,33 @@ int main( int argc, char* argv[] )
    g_log.info( "Compiled: " __DATE__ " " __TIME__ );
    g_log.info( "===========================================================" );
 
-   if (!loadSettings(argc, argv))
-   {
+   if( !loadSettings( argc, argv ) )
       throw std::exception();
-   }
 
    g_exdData.loadZoneInfo();
    g_exdData.loadClassJobInfo();
 
    server.config.port = stoi( m_pConfig->getValue< std::string >( "Settings.General.HttpPort", "80" ) );
-   g_log.info( "Starting REST server at port " + m_pConfig->getValue< std::string >( "Settings.General.HttpPort", "80" ) + "..." );
-
-   server.resource["^/ZoneName/([0-9]+)$"]["GET"] = [&]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
-      string number = request->path_match[1];
-      auto it = g_exdData.m_zoneInfoMap.find( atoi( number.c_str() ) );
-      std::string responseStr = "Not found!";
-      if( it != g_exdData.m_zoneInfoMap.end() )
-      {
-         responseStr = it->second.zone_name + ", " + it->second.zone_str;
-      }
-      *response << "HTTP/1.1 200 OK\r\nContent-Length: " << responseStr.length() << "\r\n\r\n" << responseStr;
-   };
-
-
-   /* Create account */
-   server.resource["^/sapphire-api/lobby/createAccount"]["POST"] = [&]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
-      print_request_info( request );
-
-      std::string responseStr = "HTTP/1.1 400\r\n\r\n";
-      try
-      {
-
-         using namespace boost::property_tree;
-         ptree pt;
-         read_json( request->content, pt );
-
-         std::string pass = pt.get<string>( "pass" );
-         std::string user = pt.get<string>( "username" );
-
-         // reloadConfig();
-
-         std::string sId;
-         if( g_sapphireAPI.createAccount( user, pass, sId ) )
-         {
-            std::string json_string = "{\"sId\":\"" + sId + "\", \"lobbyHost\":\"" + m_pConfig->getValue< std::string >( "Settings.General.LobbyHost" ) + "\", \"frontierHost\":\"" + m_pConfig->getValue< std::string >( "Settings.General.FrontierHost" ) + "\"}";
-            *response << "HTTP/1.1 200 OK\r\n "
-                      << "Content-Type: application/json\r\n"
-                      << "Content-Length: " << json_string.length() << "\r\n\r\n"
-                      << json_string;
-         }
-         else
-            *response << "HTTP/1.1 400\r\n\r\n";
-      }
-      catch( exception& e )
-      {
-         *response << "HTTP/1.1 500\r\n\r\n";
-         g_log.error( e.what() );
-      }
-      *response << "HTTP/1.1 200 OK\r\nContent-Length: " << responseStr.length() << "\r\nContent-Type: text/xml\r\n\r\n" << responseStr;
-   };
-
-
-   server.resource["^/sapphire-api/lobby/login"]["POST"] = [&]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
-      print_request_info( request );
-
-      try
-      {
-         using namespace boost::property_tree;
-         ptree pt;
-         read_json( request->content, pt );
-
-         std::string pass = pt.get<string>( "pass" );
-         std::string user = pt.get<string>( "username" );
-
-         std::string sId;
-
-         // reloadConfig();
-
-         if( g_sapphireAPI.login( user, pass, sId ) )
-         {
-            std::string json_string = "{\"sId\":\"" + sId + "\", \"lobbyHost\":\"" + m_pConfig->getValue< std::string >("Settings.General.LobbyHost") + "\", \"frontierHost\":\"" + m_pConfig->getValue< std::string >( "Settings.General.FrontierHost" ) + "\"}";
-            *response << "HTTP/1.1 200\r\nContent-Length: " << json_string.length() << "\r\n\r\n" << json_string;
-         }
-         else
-            *response << "HTTP/1.1 400\r\n\r\n";
-
-      }
-      catch( exception& e )
-      {
-         *response << "HTTP/1.1 500\r\n\r\n";
-         g_log.error( e.what() );
-      }
-
-   };
-
-   server.resource["^/sapphire-api/lobby/deleteCharacter"]["POST"] = [&]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
-      print_request_info( request );
-
-      try
-      {
-         using namespace boost::property_tree;
-         ptree pt;
-         read_json( request->content, pt );
-
-         std::string sId = pt.get<string>( "sId" );
-         std::string secret = pt.get<string>( "secret" );
-         std::string name = pt.get<string>( "name" );
-          
-         // reloadConfig();
-
-         int32_t accountId = g_sapphireAPI.checkSession( sId );
-
-         if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) {
-            std::string json_string = "{\"result\":\"invalid_secret\"}";
-            *response << "HTTP/1.1 403\r\nContent-Length: " << json_string.length() << "\r\n\r\n" << json_string;
-         }
-         else
-         {
-            g_sapphireAPI.deleteCharacter( name, accountId );
-            std::string json_string = "{\"result\":\"success\"}";
-            *response << "HTTP/1.1 200\r\nContent-Length: " << json_string.length() << "\r\n\r\n" << json_string;
-         }
-      }
-      catch( exception& e )
-      {
-         *response << "HTTP/1.1 500\r\n\r\n";
-         g_log.error( e.what() );
-      }
-
-   };
-
-   server.resource["^/sapphire-api/lobby/createCharacter"]["POST"] = [&]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
-      print_request_info( request );
-
-      try
-      {
-         using namespace boost::property_tree;
-         ptree pt;
-         read_json( request->content, pt );
-
-         std::string sId = pt.get<string>( "sId" );
-         std::string secret = pt.get<string>( "secret" );
-         std::string name = pt.get<string>( "name" );
-         std::string infoJson = pt.get<string>( "infoJson" );
-
-         std::string finalJson = Core::Util::base64_decode( infoJson );
-
-         // reloadConfig();
-
-         int32_t result = g_sapphireAPI.checkSession( sId );
-
-         if( result != -1 )
-         {
-            if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) {
-               std::string json_string = "{\"result\":\"invalid_secret\"}";
-               *response << "HTTP/1.1 403\r\nContent-Length: " << json_string.length() << "\r\n\r\n" << json_string;
-            }
-            else
-            {
-               int32_t charId = g_sapphireAPI.createCharacter( result, name, finalJson, m_pConfig->getValue< uint8_t >( "Settings.Parameters.DefaultGMRank", 255 ) );
-
-               std::string json_string = "{\"result\":\"" + std::to_string( charId ) + "\"}";
-               *response << "HTTP/1.1 200\r\nContent-Length: " << json_string.length() << "\r\n\r\n" << json_string;
-            }
-         }
-         else
-         {
-            std::string json_string = "{\"result\":\"invalid\"}";
-            *response << "HTTP/1.1 200\r\nContent-Length: " << json_string.length() << "\r\n\r\n" << json_string;
-         }
-      }
-      catch( exception& e )
-      {
-         *response << "HTTP/1.1 500\r\n\r\n";
-         g_log.error( e.what() );
-      }
-
-   };
-
-   server.resource["^/sapphire-api/lobby/insertSession"]["POST"] = [&]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
-	   print_request_info( request );
-
-	   try
-	   {
-		   using namespace boost::property_tree;
-		   ptree pt;
-		   read_json( request->content, pt );
-
-		   std::string sId = pt.get<string>( "sId" );
-		   uint32_t accountId = pt.get<uint32_t>( "accountId" );
-		   std::string secret = pt.get<string>( "secret" );
-
-         // reloadConfig();
-
-		   if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) {
-			   std::string json_string = "{\"result\":\"invalid_secret\"}";
-			   *response << "HTTP/1.1 403\r\nContent-Length: " << json_string.length() << "\r\n\r\n" << json_string;
-		   }
-		   else
-		   {
-			   g_sapphireAPI.insertSession( accountId, sId );
-			   std::string json_string = "{\"result\":\"success\"}";
-			   *response << "HTTP/1.1 200\r\nContent-Length: " << json_string.length() << "\r\n\r\n" << json_string;
-		   }
-	   }
-	   catch( exception& e )
-	   {
-		   *response << "HTTP/1.1 500\r\n\r\n";
-		   g_log.error( e.what() );
-	   }
-
-   };
-
-   server.resource["^/sapphire-api/lobby/checkNameTaken"]["POST"] = [&]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
-      print_request_info( request );
-
-      try
-      {
-         using namespace boost::property_tree;
-         ptree pt;
-         read_json( request->content, pt );
-
-         std::string name = pt.get<string>( "name" );
-         std::string secret = pt.get<string>( "secret" );
-
-         // reloadConfig();
-
-         if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) {
-            std::string json_string = "{\"result\":\"invalid_secret\"}";
-            *response << "HTTP/1.1 403\r\nContent-Length: " << json_string.length() << "\r\n\r\n" << json_string;
-         }
-         else
-         {
-            std::string json_string;
-            if( !g_sapphireAPI.checkNameTaken( name ) )
-               json_string = "{\"result\":\"false\"}";
-            else
-               json_string = "{\"result\":\"true\"}";
-
-            *response << "HTTP/1.1 200\r\nContent-Length: " << json_string.length() << "\r\n\r\n" << json_string;
-         }
-      }
-      catch( exception& e )
-      {
-         *response << "HTTP/1.1 500\r\n\r\n";
-         g_log.error( e.what() );
-      }
-
-   };
-
-   server.resource["^/sapphire-api/lobby/checkSession"]["POST"] = [&]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
-      print_request_info( request );
-
-      try
-      {
-         using namespace boost::property_tree;
-         ptree pt;
-         read_json( request->content, pt );
-
-         std::string sId = pt.get<string>( "sId" );
-         std::string secret = pt.get<string>( "secret" );
-
-         int32_t result = g_sapphireAPI.checkSession( sId );
-
-         // reloadConfig();
-
-         if( result != -1 )
-         {
-            if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) {
-               std::string json_string = "{\"result\":\"invalid_secret\"}";
-               *response << "HTTP/1.1 403\r\nContent-Length: " << json_string.length() << "\r\n\r\n" << json_string;
-            }
-            else
-            {
-               std::string json_string = "{\"result\":\"" + std::to_string( result ) + "\"}";
-               *response << "HTTP/1.1 200\r\nContent-Length: " << json_string.length() << "\r\n\r\n" << json_string;
-            }
-         }
-         else
-         {
-            std::string json_string = "{\"result\":\"invalid\"}";
-            *response << "HTTP/1.1 200\r\nContent-Length: " << json_string.length() << "\r\n\r\n" << json_string;
-         }
-      }
-      catch( exception& e )
-      {
-         *response << "HTTP/1.1 500\r\n\r\n";
-         g_log.error( e.what() );
-      }
-
-   };
-
-   server.resource["^/sapphire-api/lobby/getNextCharId"]["POST"] = [&]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
-      print_request_info( request );
-
-      try
-      {
-         using namespace boost::property_tree;
-         ptree pt;
-         read_json( request->content, pt );
-
-         std::string secret = pt.get<string>( "secret" );
-
-         // reloadConfig();
-
-         if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) {
-            std::string json_string = "{\"result\":\"invalid_secret\"}";
-            *response << "HTTP/1.1 403\r\nContent-Length: " << json_string.length() << "\r\n\r\n" << json_string;
-         }
-         else
-         {
-            std::string json_string = "{\"result\":\"" + std::to_string( g_sapphireAPI.getNextCharId() ) + "\"}";
-            *response << "HTTP/1.1 200\r\nContent-Length: " << json_string.length() << "\r\n\r\n" << json_string;
-         }
-      }
-      catch( exception& e )
-      {
-         *response << "HTTP/1.1 500\r\n\r\n";
-         g_log.error( e.what() );
-      }
-
-   };
-
-   server.resource["^/sapphire-api/lobby/getNextContentId"]["POST"] = [&]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
-      print_request_info( request );
-
-      try
-      {
-         using namespace boost::property_tree;
-         ptree pt;
-         read_json( request->content, pt );
-
-         std::string secret = pt.get<string>( "secret" );
-
-         // reloadConfig();
-
-         if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) {
-            std::string json_string = "{\"result\":\"invalid_secret\"}";
-            *response << "HTTP/1.1 403\r\nContent-Length: " << json_string.length() << "\r\n\r\n" << json_string;
-         }
-         else
-         {
-            std::string json_string = "{\"result\":\"" + std::to_string( g_sapphireAPI.getNextContentId() ) + "\"}";
-            *response << "HTTP/1.1 200\r\nContent-Length: " << json_string.length() << "\r\n\r\n" << json_string;
-         }
-      }
-      catch( exception& e )
-      {
-         *response << "HTTP/1.1 500\r\n\r\n";
-         g_log.error( e.what() );
-      }
-
-   };
-
-   server.resource["^/sapphire-api/lobby/getCharacterList"]["POST"] = [&]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
-      print_request_info( request );
-
-      try
-      {
-         using namespace boost::property_tree;
-         ptree pt;
-         read_json( request->content, pt );
-
-         std::string sId = pt.get<string>( "sId" );
-         std::string secret = pt.get<string>( "secret" );
-
-         // reloadConfig();
-
-         int32_t result = g_sapphireAPI.checkSession( sId );
-
-         if( result != -1 )
-         {
-
-            if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) {
-               std::string json_string = "{\"result\":\"invalid_secret\"}";
-               *response << "HTTP/1.1 403\r\nContent-Length: " << json_string.length() << "\r\n\r\n" << json_string;
-            }
-            else
-            {
-               auto charList = g_sapphireAPI.getCharList( result );
-               using boost::property_tree::ptree;
-               ptree pt;
-               ptree char_tree;
-
-               for( auto entry : charList )
-               {
-                  ptree tree_entry;
-                  tree_entry.put( "name", std::string( entry.getName() ) );
-                  tree_entry.put( "charId", std::to_string( entry.getId() ) );
-                  tree_entry.put( "contentId", std::to_string( entry.getContentId() ) );
-                  tree_entry.put( "infoJson", std::string( entry.getInfoJson() ) );
-                  char_tree.push_back( std::make_pair( "", tree_entry ) );
-               }
-
-               pt.add_child( "charArray", char_tree );
-               pt.put( "result", "success" );
-               std::ostringstream oss;
-               write_json( oss, pt );
-               std::string responseStr = oss.str();
-               *response << "HTTP/1.1 200\r\nContent-Length: " << responseStr.length() << "\r\n\r\n" << responseStr;
-            }
-         }
-         else
-         {
-            std::string json_string = "{\"result\":\"invalid\"}";
-            *response << "HTTP/1.1 200\r\nContent-Length: " << json_string.length() << "\r\n\r\n" << json_string;
-         }
-      }
-      catch( exception& e )
-      {
-         *response << "HTTP/1.1 500\r\n\r\n";
-         g_log.error( e.what() );
-      }
-
-   };
-
-   server.resource["^(/frontier-api/ffxivsupport/view/get_init)(.*)"]["GET"] = [&]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
-	   print_request_info( request );
-
-	   try
-	   {
-		   auto web_root_path = boost::filesystem::canonical( "web" );
-		   auto path = boost::filesystem::canonical( web_root_path / "news.xml" );
-		   //Check if path is within web_root_path
-		   if( distance( web_root_path.begin(), web_root_path.end() ) > distance( path.begin(), path.end() ) ||
-			   !std::equal( web_root_path.begin(), web_root_path.end(), path.begin() ) )
-			   throw invalid_argument( "path must be within root path" );
-		   if( !( boost::filesystem::exists( path ) && boost::filesystem::is_regular_file( path ) ) )
-			   throw invalid_argument( "file does not exist" );
-
-		   std::string cache_control, etag;
-
-		   // Uncomment the following line to enable Cache-Control
-		   // cache_control="Cache-Control: max-age=86400\r\n";
-
-		   auto ifs = make_shared<ifstream>();
-		   ifs->open( path.string(), ifstream::in | ios::binary | ios::ate );
-
-		   if( *ifs )
-		   {
-			   auto length = ifs->tellg();
-			   ifs->seekg( 0, ios::beg );
-
-			   *response << "HTTP/1.1 200 OK\r\n" << cache_control << etag << "Content-Length: " << length << "\r\n\r\n";
-			   default_resource_send( server, response, ifs );
-		   }
-		   else
-			   throw invalid_argument( "could not read file" );
-	   }
-	   catch( exception& e )
-	   {
-		   *response << "HTTP/1.1 500\r\n\r\n";
-		   g_log.error( e.what() );
-	   }
-
-   };
-
-   server.resource["^(/frontier-api/ffxivsupport/information/get_headline_all)(.*)"]["GET"] = [&]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
-	   print_request_info( request );
-
-	   try
-	   {
-		   auto web_root_path = boost::filesystem::canonical( "web" );
-		   auto path = boost::filesystem::canonical( web_root_path / "headlines.xml" );
-		   //Check if path is within web_root_path
-		   if( distance( web_root_path.begin(), web_root_path.end() ) > distance( path.begin(), path.end() ) ||
-			   !std::equal( web_root_path.begin(), web_root_path.end(), path.begin() ) )
-			   throw invalid_argument( "path must be within root path" );
-		   if( !( boost::filesystem::exists( path ) && boost::filesystem::is_regular_file( path ) ) )
-			   throw invalid_argument( "file does not exist" );
-
-		   std::string cache_control, etag;
-
-		   // Uncomment the following line to enable Cache-Control
-		   // cache_control="Cache-Control: max-age=86400\r\n";
-
-		   auto ifs = make_shared<ifstream>();
-		   ifs->open( path.string(), ifstream::in | ios::binary | ios::ate );
-
-		   if( *ifs )
-		   {
-			   auto length = ifs->tellg();
-			   ifs->seekg( 0, ios::beg );
-
-			   *response << "HTTP/1.1 200 OK\r\n" << cache_control << etag << "Content-Length: " << length << "\r\n\r\n";
-			   default_resource_send( server, response, ifs );
-		   }
-		   else
-			   throw invalid_argument( "could not read file" );
-	   }
-	   catch( exception& e )
-	   {
-		   *response << "HTTP/1.1 500\r\n\r\n";
-		   g_log.error( e.what() );
-	   }
-
-   };
-
-   //Default GET-example. If no other matches, this anonymous function will be called. 
-   //Will respond with content in the web/-directory, and its subdirectories.
-   //Default file: index.html
-   //Can for instance be used to retrieve an HTML 5 client that uses REST-resources on this server
-   server.default_resource["GET"] = [&]( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) {
-      print_request_info( request );
-
-      try
-      {
-         auto web_root_path = boost::filesystem::canonical( "web" );
-         auto path = boost::filesystem::canonical( web_root_path / request->path );
-         //Check if path is within web_root_path
-         if( distance( web_root_path.begin(), web_root_path.end() ) > distance( path.begin(), path.end() ) ||
-             !std::equal( web_root_path.begin(), web_root_path.end(), path.begin() ) )
-            throw invalid_argument( "path must be within root path" );
-         if( boost::filesystem::is_directory( path ) )
-            path /= "index.html";
-         if( !( boost::filesystem::exists( path ) && boost::filesystem::is_regular_file( path ) ) )
-            throw invalid_argument( "file does not exist" );
-
-         std::string cache_control, etag;
-
-         // Uncomment the following line to enable Cache-Control
-         // cache_control="Cache-Control: max-age=86400\r\n";
-
-         auto ifs = make_shared<ifstream>();
-         ifs->open( path.string(), ifstream::in | ios::binary | ios::ate );
-
-         if( *ifs )
-         {
-            auto length = ifs->tellg();
-            ifs->seekg( 0, ios::beg );
-
-            *response << "HTTP/1.1 200 OK\r\n" << cache_control << etag << "Content-Length: " << length << "\r\n\r\n";
-            default_resource_send( server, response, ifs );
-         }
-         else
-            throw invalid_argument( "could not read file" );
-      }
-      catch( const exception & )
-      {
-         string content = "Path not found: " + request->path;
-         *response << "HTTP/1.1 400 Bad Request\r\nContent-Length: " << content.length() << "\r\n\r\n" << content;
-      }
-   };
-
-   thread server_thread( [&]() {
+   g_log.info( "Starting API server at port " + m_pConfig->getValue< std::string >( "Settings.General.HttpPort", "80" ) + "..." );
+
+   server.resource["^/ZoneName/([0-9]+)$"]["GET"] = &getZoneName; 
+   server.resource["^/sapphire-api/lobby/createAccount"]["POST"] = &createAccount;
+   server.resource["^/sapphire-api/lobby/login"]["POST"] = &login;
+   server.resource["^/sapphire-api/lobby/deleteCharacter"]["POST"] = &deleteCharacter;
+   server.resource["^/sapphire-api/lobby/createCharacter"]["POST"] = &createCharacter; 
+   server.resource["^/sapphire-api/lobby/insertSession"]["POST"] = &insertSession;
+   server.resource["^/sapphire-api/lobby/checkNameTaken"]["POST"] = &checkNameTaken;
+   server.resource["^/sapphire-api/lobby/checkSession"]["POST"] = &checkSession;
+   server.resource["^/sapphire-api/lobby/getNextCharId"]["POST"] = &getNextCharId;
+   server.resource["^/sapphire-api/lobby/getNextContentId"]["POST"] = &getNextContentId;
+   server.resource["^/sapphire-api/lobby/getCharacterList"]["POST"] = &getCharacterList;
+   server.resource["^(/frontier-api/ffxivsupport/view/get_init)(.*)"]["GET"] = &get_init;
+   server.resource["^(/frontier-api/ffxivsupport/information/get_headline_all)(.*)"]["GET"] = &get_headline_all;
+   
+   server.default_resource["GET"] = &defaultGet;
+   
+   thread server_thread( [&]() 
+   {
       //Start server
       server.start();
    } );
@@ -732,8 +784,6 @@ int main( int argc, char* argv[] )
    this_thread::sleep_for( chrono::seconds( 1 ) );
    
    server_thread.join();
-   g_log.info( "Started REST server at port " + std::to_string( server.config.port ) );
-
    return 0;
 }
 
