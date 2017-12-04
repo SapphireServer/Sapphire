@@ -397,14 +397,14 @@ void Core::DebugCommandHandler::add( char * data, Core::Entity::PlayerPtr pPlaye
       pPlayer->queuePacket(controlPacket);*/
 
    }
-   else if (subCommand == "unlock")
+   else if ( subCommand == "unlock" )
    {
       int32_t id;
       sscanf( params.c_str(), "%d", &id );
 
       pPlayer->learnAction( id );
    }
-   else if (subCommand == "enablecompanion")
+   else if ( subCommand == "enablecompanion" )
    {
       pPlayer->learnAction( 17 );
    }
@@ -440,7 +440,7 @@ void Core::DebugCommandHandler::get( char * data, Core::Entity::PlayerPtr pPlaye
                 "subCommand " + subCommand + " params: " + params );
 
 
-   if( ( subCommand == "pos" ) )
+   if( subCommand == "pos" )
    {
 
       int16_t map_id = g_exdData.m_zoneInfoMap[pPlayer->getCurrentZone()->getId()].map_id;

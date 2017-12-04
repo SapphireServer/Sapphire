@@ -301,7 +301,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    }
    case GmCommand::Mount:
    {
-      if (param2 == 0)
+      if ( param2 == 0 )
       {
          for (uint8_t i = 0; i < 255; i++)
             targetActor->getAsPlayer()->learnMount( i );
