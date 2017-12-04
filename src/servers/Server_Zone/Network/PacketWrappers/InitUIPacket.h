@@ -64,8 +64,7 @@ private:
 
       memcpy( m_data.orchestrionMask, player->getOrchestrionBitmask(), sizeof( m_data.orchestrionMask ) );
 
-      memset( m_data.mountGuideMask, 0xFF, sizeof( m_data.mountGuideMask) );
-      memset( m_data.fishingGuideMask, 0xFF, sizeof( m_data.fishingGuideMask ) );
+      memcpy( m_data.mountGuideMask, player->getMountGuideBitmask(), sizeof( m_data.mountGuideMask) );
 
       memcpy( m_data.unlockBitmask, player->getUnlockBitmask(), sizeof( m_data.unlockBitmask ) );
 

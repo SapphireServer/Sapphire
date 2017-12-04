@@ -23,11 +23,17 @@ namespace Core {
       public:
 
          static bool isActorApplicable( ActorPtr actorPtr, TargetFilter targetFilter );
-         static std::set< ActorPtr > getActorsHitFromAction( Common::FFXIVARR_POSITION3 aoePosition, std::set< ActorPtr > actorsInRange, boost::shared_ptr< Data::ActionInfo > actionInfo, TargetFilter targetFilter );
+         static std::set< ActorPtr > getActorsHitFromAction( Common::FFXIVARR_POSITION3 aoePosition,
+                                                             std::set< ActorPtr > actorsInRange,
+                                                             boost::shared_ptr< Data::ActionInfo > actionInfo,
+                                                             TargetFilter targetFilter );
          
       private:
-         static bool radiusCollision( Common::FFXIVARR_POSITION3 actorPosition, Common::FFXIVARR_POSITION3 aoePosition, uint16_t radius );
-         static bool boxCollision( Common::FFXIVARR_POSITION3 actorPosition, Common::FFXIVARR_POSITION3 aoePosition, uint16_t width, uint16_t height );
+         static bool radiusCollision( Common::FFXIVARR_POSITION3 actorPosition, Common::FFXIVARR_POSITION3 aoePosition,
+                                      uint16_t radius );
+
+         static bool boxCollision( Common::FFXIVARR_POSITION3 actorPosition, Common::FFXIVARR_POSITION3 aoePosition,
+                                   uint16_t width, uint16_t height );
          
       };
 

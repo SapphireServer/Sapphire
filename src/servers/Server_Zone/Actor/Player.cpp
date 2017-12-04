@@ -76,7 +76,7 @@ Core::Entity::Player::Player() :
    m_mount( 0 )
 {
    m_id = 0;
-   m_type = ActorType::Player;
+   m_objKind = ObjKind::Player;
    m_currentStance = Stance::Passive;
    m_onlineStatus = 0;
    m_queuedZoneing = nullptr;
@@ -895,9 +895,7 @@ Core::Entity::ActorPtr Core::Entity::Player::lookupTargetById( uint64_t targetId
    for( auto actor : inRange )
    {
       if( actor->getId() == targetId )
-      {
          targetActor = actor;
-      }
    }
    return targetActor;
 }
@@ -1185,6 +1183,11 @@ const uint8_t * Core::Entity::Player::getOrchestrionBitmask() const
    return m_orchestrion;
 }
 
+const uint8_t * Core::Entity::Player::getMountGuideBitmask() const
+{
+   return m_mountGuide;
+}
+
 uint64_t Core::Entity::Player::getContentId() const
 {
    return m_contentId;
@@ -1209,26 +1212,27 @@ void Core::Entity::Player::queuePacket( Core::Network::Packets::GamePacketPtr pP
 {
    auto pSession = g_serverZone.getSession( m_id );
 
-   if( pSession )
-   {
-      auto pZoneCon = pSession->getZoneConnection();
+   if( !pSession )
+      return;
 
-      if( pZoneCon )
-         pZoneCon->queueOutPacket( pPacket );
-   }
+   auto pZoneCon = pSession->getZoneConnection();
+
+   if( pZoneCon )
+      pZoneCon->queueOutPacket( pPacket );
+
 }
 
 void Core::Entity::Player::queueChatPacket( Core::Network::Packets::GamePacketPtr pPacket )
 {
    auto pSession = g_serverZone.getSession( m_id );
 
-   if( pSession )
-   {
-      auto pChatCon = pSession->getChatConnection();
+   if( !pSession )
+      return;
 
-      if( pChatCon )
-         pChatCon->queueOutPacket( pPacket );
-   }
+   auto pChatCon = pSession->getChatConnection();
+
+   if( pChatCon )
+      pChatCon->queueOutPacket( pPacket );
 }
 
 bool Core::Entity::Player::isLoadingComplete() const
@@ -1460,7 +1464,8 @@ void Core::Entity::Player::mount( uint32_t id )
 
 void Core::Entity::Player::dismount()
 {
-   sendToInRangeSet( ActorControlPacket142( getId(), ActorControlType::SetStatus, static_cast< uint8_t >( Entity::Actor::ActorStatus::Idle )), true );
+   sendToInRangeSet( ActorControlPacket142( getId(), ActorControlType::SetStatus,
+                                            static_cast< uint8_t >( Entity::Actor::ActorStatus::Idle )), true );
    sendToInRangeSet( ActorControlPacket143( getId(), ActorControlType::Dismount, 1 ), true );
    m_mount = 0;
 }
@@ -1473,7 +1478,8 @@ uint8_t Core::Entity::Player::getCurrentMount() const
 void Core::Entity::Player::autoAttack( ActorPtr pTarget )
 {
 
-   auto mainWeap = m_pInventory->getItemAt(Inventory::GearSet0, Inventory::EquipSlot::MainHand);
+   auto mainWeap = m_pInventory->getItemAt( Inventory::GearSet0,
+                                            Inventory::EquipSlot::MainHand );
 
    pTarget->onActionHostile( shared_from_this() );
    //uint64_t tick = Util::getTimeMs();
@@ -1482,9 +1488,9 @@ void Core::Entity::Player::autoAttack( ActorPtr pTarget )
    uint32_t damage = static_cast< uint32_t >( mainWeap->getAutoAttackDmg() );
    uint32_t variation = 0 + rand() % 3;
 
-   if ( getClass() == ClassJob::Machinist||
-      getClass() == ClassJob::Bard ||
-      getClass() == ClassJob::Archer )
+   if( getClass() == ClassJob::Machinist ||
+       getClass() == ClassJob::Bard ||
+       getClass() == ClassJob::Archer )
    {
       ZoneChannelPacket< FFXIVIpcEffect > effectPacket(getId());
       effectPacket.data().targetId = pTarget->getId();
@@ -1510,7 +1516,7 @@ void Core::Entity::Player::autoAttack( ActorPtr pTarget )
       ZoneChannelPacket< FFXIVIpcEffect > effectPacket(getId());
       effectPacket.data().targetId = pTarget->getId();
       effectPacket.data().actionAnimationId = 7;
-     // effectPacket.data().unknown_2 = variation;
+      // effectPacket.data().unknown_2 = variation;
       effectPacket.data().numEffects = 1;
       effectPacket.data().unknown_61 = 1;
       effectPacket.data().unknown_62 = 1;
@@ -1549,7 +1555,7 @@ uint32_t Core::Entity::Player::getCFPenaltyMinutes() const
    auto endTimestamp = getCFPenaltyTimestamp();
 
    // check if penalty timestamp already passed current time
-   if (currentTimestamp > endTimestamp)
+   if( currentTimestamp > endTimestamp )
       return 0;
 
    auto deltaTime = endTimestamp - currentTimestamp;
@@ -1559,7 +1565,7 @@ uint32_t Core::Entity::Player::getCFPenaltyMinutes() const
 void Core::Entity::Player::setCFPenaltyMinutes( uint32_t minutes )
 {
    auto currentTimestamp = Core::Util::getTimeSeconds();
-   setCFPenaltyTimestamp(static_cast< uint32_t >( currentTimestamp + minutes * 60 ));
+   setCFPenaltyTimestamp( static_cast< uint32_t >( currentTimestamp + minutes * 60 ) );
 }
 
 uint8_t Core::Entity::Player::getOpeningSequence() const

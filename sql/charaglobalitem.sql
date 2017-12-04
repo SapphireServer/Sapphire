@@ -48,7 +48,7 @@ CREATE TABLE `charaglobalitem` (
   `buffer_4` int(3) DEFAULT '0',
   `IS_DELETE` int(3) DEFAULT '0',
   `IS_NOT_ACTIVE_FLG` int(3) DEFAULT '0',
-  `UPDATE_DATE` datetime DEFAULT CURRENT_TIMESTAMP,
+  `UPDATE_DATE` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`itemId`),
   KEY `CharacterId` (`CharacterId`),
   KEY `storageId` (`storageId`),

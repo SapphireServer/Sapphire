@@ -31,8 +31,8 @@ Core::Logger g_log;
 Core::Data::ExdData g_exdData;
 bool skipUnmapped = true;
 
-const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
-//const std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv" );
+//const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
+const std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv" );
 std::map< uint8_t, std::string > g_typeMap;
 
 
@@ -41,9 +41,25 @@ std::string generateDatAccessDecl( const std::string &exd )
    return "     xiv::exd::Exd m_" + exd + "Dat;\n";
 }
 
+std::string generateIdListDecl( const std::string &exd )
+{
+   return "     std::set< uint32_t > m_" + exd + "IdList;\n";
+}
+
 std::string generateDirectGetters( const std::string& exd )
 {
-   return "     boost::shared_ptr< " + exd + " > get" + exd + "( uint32_t " + exd + "Id );";
+   return "     boost::shared_ptr< " + exd + " > get" + exd + "( uint32_t " + exd + "Id );\n";
+}
+
+std::string generateIdListGetter( const std::string &exd )
+{
+   std::string IdListGetter = "const std::set< uint32_t >& get" + exd + "IdList()\n"
+                              "{\n"
+                              "   if( m_" + exd + "IdList.size() == 0 )\n"
+                              "      loadIdList( m_" + exd + "Dat, m_" + exd + "IdList );\n"
+                              "   return m_" + exd + "IdList;\n"
+                              "}\n";
+   return IdListGetter;
 }
 
 std::string generateSetDatAccessCall( const std::string &exd )
@@ -288,14 +304,18 @@ int main()
       g_log.fatal( "Error setting up EXD data " );
       return 0;
    }
+   g_log.info( "Generating structs, this may take several minutes..." );
+   g_log.info( "Go grab a coffee..." );
   
    std::string structDefs;
+   std::string idListsDecl;
    std::string dataDecl;
    std::string getterDecl;
    std::string datAccCall;
    std::string getterDef;
    std::string constructorDecl;
    std::string forwards;
+   std::string idListGetters;
 
    //BOOST_FOREACH( boost::property_tree::ptree::value_type &sheet, m_propTree.get_child( "sheets" ) )
    //{
@@ -310,10 +330,12 @@ int main()
       forwards += "struct " + name +";\n";
       structDefs += generateStruct( name );
       dataDecl += generateDatAccessDecl( name );
+      idListsDecl += generateIdListDecl( name );
       getterDecl += generateDirectGetters( name );
       datAccCall += generateSetDatAccessCall( name );
       getterDef += generateDirectGetterDef( name );
       constructorDecl += generateConstructorsDecl( name );
+      idListGetters += generateIdListGetter( name );
    }
 
    // for all sheets in the json i guess....
@@ -322,7 +344,10 @@ int main()
    result = std::regex_replace( exdH, std::regex( "\\FORWARDS" ), forwards );
    result = std::regex_replace( result, std::regex( "\\STRUCTS" ), structDefs );
    result = std::regex_replace( result, std::regex( "\\DATACCESS" ), dataDecl );
+   result = std::regex_replace( result, std::regex( "\\IDLISTS" ), idListsDecl );
    result = std::regex_replace( result, std::regex( "\\DIRECTGETTERS" ), getterDecl );
+   result = std::regex_replace( result, std::regex( "\\IDLISTGETTERS" ), idListGetters );
+
 
 //   g_log.info( result );
 

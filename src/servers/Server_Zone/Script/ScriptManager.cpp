@@ -23,7 +23,6 @@
 extern Core::Logger g_log;
 extern Core::Data::ExdData g_exdData;
 extern Core::ServerZone g_serverZone;
-extern Core::Scripting::ScriptManager g_scriptManager;
 
 Core::Scripting::ScriptManager::ScriptManager()
 {
@@ -37,6 +36,8 @@ Core::Scripting::ScriptManager::~ScriptManager()
 
 void Core::Scripting::ScriptManager::loadDir( std::string dirname, std::set<std::string>& chaiFiles )
 {
+
+   g_log.info( "ScriptEngine: loading scripts from " + dirname );
 
    boost::filesystem::path targetDir( dirname );
 
@@ -67,7 +68,8 @@ void Core::Scripting::ScriptManager::onPlayerFirstEnterWorld( Core::Entity::Play
    }
 }
 
-bool Core::Scripting::ScriptManager::registerBnpcTemplate( std::string templateName, uint32_t bnpcBaseId, uint32_t bnpcNameId, uint32_t modelId, std::string aiName )
+bool Core::Scripting::ScriptManager::registerBnpcTemplate( std::string templateName, uint32_t bnpcBaseId,
+                                                           uint32_t bnpcNameId, uint32_t modelId, std::string aiName )
 {
    return g_serverZone.registerBnpcTemplate( templateName, bnpcBaseId, bnpcNameId, modelId, aiName );
 }
@@ -79,7 +81,7 @@ void Core::Scripting::ScriptManager::reload()
    init();
 }
 
-const boost::shared_ptr<chaiscript::ChaiScript>& Core::Scripting::ScriptManager::getHandler() const
+const boost::shared_ptr< chaiscript::ChaiScript >& Core::Scripting::ScriptManager::getHandler() const
 {
    return m_pChaiHandler;
 }
@@ -90,12 +92,13 @@ bool Core::Scripting::ScriptManager::onTalk( Core::Entity::PlayerPtr pPlayer, ui
    std::string eventName = "onTalk";
    std::string objName = Event::getEventName( eventId );
 
-   pPlayer->sendDebug("Actor: " +
-                              std::to_string( actorId ) + " -> " + std::to_string( Core::Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) ) ) +
-                              " \neventId: " +
-                              std::to_string( eventId ) +
-                              " (0x" + boost::str( boost::format( "%|08X|" ) 
-                                                   % static_cast< uint64_t >( eventId & 0xFFFFFFF ) ) + ")" );
+   pPlayer->sendDebug( "Actor: " +
+                       std::to_string( actorId ) + " -> " +
+                       std::to_string( Core::Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) ) ) +
+                       " \neventId: " +
+                       std::to_string( eventId ) +
+                       " (0x" + boost::str( boost::format( "%|08X|" )
+                                            % static_cast< uint64_t >( eventId & 0xFFFFFFF ) ) + ")" );
 
    uint16_t eventType = eventId >> 16;
 
@@ -107,7 +110,8 @@ bool Core::Scripting::ScriptManager::onTalk( Core::Entity::PlayerPtr pPlayer, ui
 
       pPlayer->eventStart( actorId, eventId, Event::Event::Talk, 0, 0 );
 
-      auto fn = m_pChaiHandler->eval< std::function< void( chaiscript::Boxed_Value &, uint32_t, Entity::Player&, uint64_t ) > >( eventName );
+      auto fn = m_pChaiHandler->eval< std::function< void( chaiscript::Boxed_Value &,
+                                                           uint32_t, Entity::Player&, uint64_t ) > >( eventName );
       fn( obj, eventId, *pPlayer, actorId );
 
       pPlayer->checkEvent( eventId );
@@ -146,7 +150,8 @@ bool Core::Scripting::ScriptManager::onEnterTerritory( Core::Entity::PlayerPtr p
 
       pPlayer->eventStart( pPlayer->getId(), eventId, Event::Event::EnterTerritory, 0, pPlayer->getZoneId() );
 
-      auto fn = m_pChaiHandler->eval< std::function< void( chaiscript::Boxed_Value &, uint32_t, Entity::Player&, uint16_t, uint16_t ) > >( eventName );
+      auto fn = m_pChaiHandler->eval< std::function< void( chaiscript::Boxed_Value &, uint32_t,
+                                                           Entity::Player&, uint16_t, uint16_t ) > >( eventName );
       fn( obj, eventId, *pPlayer, param1, param2 );
 
       pPlayer->checkEvent( eventId );
@@ -159,7 +164,8 @@ bool Core::Scripting::ScriptManager::onEnterTerritory( Core::Entity::PlayerPtr p
    return true;
 }
 
-bool Core::Scripting::ScriptManager::onWithinRange( Entity::PlayerPtr pPlayer, uint32_t eventId, uint32_t param1, float x, float y, float z )
+bool Core::Scripting::ScriptManager::onWithinRange( Entity::PlayerPtr pPlayer, uint32_t eventId, uint32_t param1,
+                                                    float x, float y, float z )
 {
    std::string eventName = "onWithinRange";
    std::string objName = Event::getEventName( eventId );
@@ -173,7 +179,8 @@ bool Core::Scripting::ScriptManager::onWithinRange( Entity::PlayerPtr pPlayer, u
 
       pPlayer->eventStart( pPlayer->getId(), eventId, Event::Event::WithinRange, 1, param1 );
 
-      auto fn = m_pChaiHandler->eval< std::function< void( chaiscript::Boxed_Value &, uint32_t, Entity::Player&, uint32_t, float, float, float ) > >( eventName );
+      auto fn = m_pChaiHandler->eval< std::function< void( chaiscript::Boxed_Value &, uint32_t, Entity::Player&, uint32_t,
+                                                           float, float, float ) > >( eventName );
       fn( obj, eventId, *pPlayer, param1, x, y, z );
 
       pPlayer->checkEvent( eventId );
@@ -186,7 +193,8 @@ bool Core::Scripting::ScriptManager::onWithinRange( Entity::PlayerPtr pPlayer, u
    return true;
 }
 
-bool Core::Scripting::ScriptManager::onOutsideRange( Entity::PlayerPtr pPlayer, uint32_t eventId, uint32_t param1, float x, float y, float z )
+bool Core::Scripting::ScriptManager::onOutsideRange( Entity::PlayerPtr pPlayer, uint32_t eventId, uint32_t param1,
+                                                     float x, float y, float z )
 {
    std::string eventName = "onOutsideRange";
    std::string objName = Event::getEventName( eventId );
@@ -200,7 +208,8 @@ bool Core::Scripting::ScriptManager::onOutsideRange( Entity::PlayerPtr pPlayer, 
 
       pPlayer->eventStart( pPlayer->getId(), eventId, Event::Event::OutsideRange, 1, param1 );
 
-      auto fn = m_pChaiHandler->eval< std::function< void( chaiscript::Boxed_Value &, uint32_t, Entity::Player&, uint32_t, float, float, float ) > >( eventName );
+      auto fn = m_pChaiHandler->eval< std::function< void( chaiscript::Boxed_Value &, uint32_t, Entity::Player&, uint32_t,
+                                                           float, float, float ) > >( eventName );
       fn( obj, eventId, *pPlayer, param1, x, y, z );
 
       pPlayer->checkEvent( eventId );
@@ -227,7 +236,8 @@ bool Core::Scripting::ScriptManager::onEmote( Core::Entity::PlayerPtr pPlayer, u
 
       pPlayer->eventStart( actorId, eventId, Event::Event::Emote, 0, emoteId );
 
-      auto fn = m_pChaiHandler->eval< std::function< void( chaiscript::Boxed_Value &, uint32_t, Entity::Player&, uint64_t, uint8_t ) > >( eventName );
+      auto fn = m_pChaiHandler->eval< std::function< void( chaiscript::Boxed_Value &, uint32_t, Entity::Player&,
+                                                           uint64_t, uint8_t ) > >( eventName );
       fn( obj, eventId, *pPlayer, actorId, emoteId );
 
       pPlayer->checkEvent( eventId );
@@ -250,17 +260,18 @@ bool Core::Scripting::ScriptManager::onEmote( Core::Entity::PlayerPtr pPlayer, u
    return true;
 }
 
-bool Core::Scripting::ScriptManager::onEventHandlerReturn( Core::Entity::PlayerPtr pPlayer, uint32_t eventId, uint16_t subEvent,
-                                                           uint16_t param1, uint16_t param2, uint16_t param3 )
+bool Core::Scripting::ScriptManager::onEventHandlerReturn( Core::Entity::PlayerPtr pPlayer, uint32_t eventId,
+                                                           uint16_t subEvent, uint16_t param1, uint16_t param2,
+                                                           uint16_t param3 )
 {
 
-   pPlayer->sendDebug("eventId: " +
-                        std::to_string( eventId ) +
-                        " ( 0x" + boost::str( boost::format( "%|08X|" ) % ( uint64_t ) ( eventId & 0xFFFFFFF ) ) + " ) " +
-                        " scene: " + std::to_string( subEvent ) +
-                        " p1: " + std::to_string( param1 ) +
-                        " p2: " + std::to_string( param2 ) +
-                        " p3: " + std::to_string( param3 ) );
+   pPlayer->sendDebug( "eventId: " +
+                       std::to_string( eventId ) +
+                       " ( 0x" + boost::str( boost::format( "%|08X|" ) % ( uint64_t ) ( eventId & 0xFFFFFFF ) ) + " ) " +
+                       " scene: " + std::to_string( subEvent ) +
+                       " p1: " + std::to_string( param1 ) +
+                       " p2: " + std::to_string( param2 ) +
+                       " p3: " + std::to_string( param3 ) );
 
    try
    {
@@ -300,7 +311,8 @@ bool Core::Scripting::ScriptManager::onEventHandlerTradeReturn( Core::Entity::Pl
 
    try
    {
-      auto fn = m_pChaiHandler->eval< std::function< void( Entity::Player&, uint32_t, uint16_t, uint16_t, uint32_t ) > >( eventName );
+      auto fn = m_pChaiHandler->eval< std::function< void( Entity::Player&, uint32_t,
+                                                           uint16_t, uint16_t, uint32_t ) > >( eventName );
       fn( *pPlayer, eventId, subEvent, param, catalogId );
    }
    catch( ... )
@@ -312,7 +324,7 @@ bool Core::Scripting::ScriptManager::onEventHandlerTradeReturn( Core::Entity::Pl
 }
 
 bool Core::Scripting::ScriptManager::onEventItem( Entity::PlayerPtr pPlayer, uint32_t eventItemId,
-                                                     uint32_t eventId, uint32_t castTime, uint64_t targetId )
+                                                  uint32_t eventId, uint32_t castTime, uint64_t targetId )
 {
    std::string eventName = "onEventItem";
    std::string objName = Event::getEventName( eventId );
@@ -325,7 +337,8 @@ bool Core::Scripting::ScriptManager::onEventItem( Entity::PlayerPtr pPlayer, uin
 
       pPlayer->eventStart( targetId, eventId, Event::Event::Item, 0, 0 );
       
-      auto fn = m_pChaiHandler->eval< std::function< void( chaiscript::Boxed_Value &, uint32_t, Entity::Player&, uint32_t, uint32_t, uint64_t ) > >( eventName );
+      auto fn = m_pChaiHandler->eval< std::function< void( chaiscript::Boxed_Value &, uint32_t, Entity::Player&,
+                                                           uint32_t, uint32_t, uint64_t ) > >( eventName );
       fn( obj, eventId, *pPlayer, eventItemId, castTime, targetId );
    }
    catch( std::exception& e )
@@ -384,7 +397,8 @@ bool Core::Scripting::ScriptManager::onCastFinish( Entity::PlayerPtr pPlayer, En
         std::string objName = "skillDef_" + std::to_string( actionId );
 
         pPlayer->sendDebug( "Calling: " + objName + "." + eventName );
-        auto fn = m_pChaiHandler->eval< std::function< void( chaiscript::Boxed_Value &, Entity::Player&, Entity::Actor& ) > >( eventName );
+        auto fn = m_pChaiHandler->eval< std::function< void( chaiscript::Boxed_Value &, Entity::Player&,
+                                                             Entity::Actor& ) > >( eventName );
         fn( obj, *pPlayer, *pTarget );
     }
     catch( std::exception& e )
@@ -431,7 +445,8 @@ bool Core::Scripting::ScriptManager::onStatusTick( Entity::ActorPtr pActor, Core
       if( pActor->isPlayer() )
          pActor->getAsPlayer()->sendDebug( "Calling: " + objName + "." + eventName );
 
-      auto fn = m_pChaiHandler->eval< std::function< void( chaiscript::Boxed_Value &, Entity::Actor&, Core::StatusEffect::StatusEffect& ) > >( eventName );
+      auto fn = m_pChaiHandler->eval< std::function< void( chaiscript::Boxed_Value &, Entity::Actor&,
+                                                           Core::StatusEffect::StatusEffect& ) > >( eventName );
       fn( obj, *pActor, effect );
    }
    catch( std::exception& e )

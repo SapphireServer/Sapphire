@@ -52,7 +52,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
     uint64_t param1 = inPacket.getValAt< uint64_t >( 0x24 );
     uint32_t param11 = inPacket.getValAt< uint32_t >( 0x24 );
     uint32_t param12 = inPacket.getValAt< uint32_t >( 0x28 );
-    uint32_t param2 = inPacket.getValAt< uint32_t >( 0x2c );
+    uint32_t param2 = inPacket.getValAt< uint32_t >( 0x2C );
     uint64_t param3 = inPacket.getValAt< uint64_t >( 0x38 );
 
     g_log.debug( "[" + std::to_string( m_pSession->getId() ) + "] Incoming action: " +
@@ -115,7 +115,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
         }
         case 0x69: // Cancel cast
         {
-           if( pPlayer->getCurrentAction() != nullptr )
+           if( pPlayer->getCurrentAction() )
                pPlayer->getCurrentAction()->setInterrupted();
            break;
         }
@@ -190,8 +190,6 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
                     break;
                 case ZoneingType::FadeIn:
                     break;
-                default:
-                    break;
             }
 
             pPlayer->setZoningType( Common::ZoneingType::None );
@@ -216,7 +214,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
                                     pow( fromAetheryte->map_coord_y - targetAetheryte->map_coord_y, 2 ) ) / 2 ) + 100 );
 
                 // cap at 999 gil
-                cost = cost > 999 ? 999 : cost;
+                cost = cost > uint16_t{999} ? uint16_t{999} : cost;
 
                 bool insufficientGil = pPlayer->getCurrency( Inventory::CurrencyType::Gil ) < cost;
                 // todo: figure out what param1 really does

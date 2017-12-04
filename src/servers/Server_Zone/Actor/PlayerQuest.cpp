@@ -45,7 +45,7 @@ void Core::Entity::Player::removeQuest( uint16_t questId )
    {
 
       ZoneChannelPacket< FFXIVIpcQuestUpdate > questUpdatePacket( getId() );
-      questUpdatePacket.data().slot = idx;
+      questUpdatePacket.data().slot = static_cast< uint8_t >( idx );
       questUpdatePacket.data().questInfo.c.questId = 0;
       questUpdatePacket.data().questInfo.c.sequence = 0xFF;
       queuePacket( questUpdatePacket );
@@ -62,7 +62,7 @@ void Core::Entity::Player::removeQuest( uint16_t questId )
             m_questTracking[ii] = -1;
       }
 
-      boost::shared_ptr<QuestActive> pQuest = m_activeQuests[idx];
+      boost::shared_ptr< QuestActive > pQuest = m_activeQuests[idx];
       m_activeQuests[idx].reset();
 
       m_questIdToQuestIdx.erase( questId );
@@ -1023,6 +1023,7 @@ bool Core::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t optional
 
    auto paramGrowth = g_exdData.m_paramGrowthInfoMap[questInfo->quest_level];
 
+   // TODO: use the correct formula, this one is wrong
    uint32_t exp = ( questInfo->reward_exp_factor * paramGrowth.quest_exp_mod * ( 45 + 5 * questInfo->quest_level) ) / 100;
    exp = exp + ( questInfo->reward_exp_factor / 100 ) * 10000;
 

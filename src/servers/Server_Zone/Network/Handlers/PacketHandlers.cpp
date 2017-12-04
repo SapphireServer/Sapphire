@@ -286,6 +286,7 @@ void Core::Network::GameConnection::updatePositionHandler( const Packets::GamePa
 void Core::Network::GameConnection::reqEquipDisplayFlagsHandler( const Packets::GamePacket& inPacket,
                                                      Entity::PlayerPtr pPlayer )
 {
+   g_log.info( "[" + std::to_string( pPlayer->getId() ) + "] Setting EquipDisplayFlags to " + std::to_string( inPacket.getValAt< uint8_t >( 0x20 ) ) );
    pPlayer->setEquipDisplayFlags( inPacket.getValAt< uint8_t >( 0x20 ) );
 }
 
@@ -300,7 +301,7 @@ void Core::Network::GameConnection::zoneLineHandler( const Packets::GamePacket& 
 
    auto pLine = g_zoneMgr.getZonePosition( zoneLineId );
 
-   Common::FFXIVARR_POSITION3 targetPos;
+   Common::FFXIVARR_POSITION3 targetPos{};
    uint32_t targetZone;
    float rotation = 0.0f;
 
@@ -482,6 +483,12 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
 
 }
 
+void Core::Network::GameConnection::socialReqSendHandler(const Packets::GamePacket& inPacket,
+   Entity::PlayerPtr pPlayer)
+{
+   g_log.debug("send");
+}
+
 void Core::Network::GameConnection::chatHandler( const Packets::GamePacket& inPacket,
                                                  Entity::PlayerPtr pPlayer )
 {
@@ -554,7 +561,7 @@ void Core::Network::GameConnection::tellHandler( const Packets::GamePacket& inPa
 
    if( !pSession )
    {
-      GamePacketNew< FFXIVIpcTellErrNotFound, ServerChatIpcType > tellErrPacket( pPlayer->getId() );
+      ChatChannelPacket< FFXIVIpcTellErrNotFound > tellErrPacket( pPlayer->getId() );
       strcpy( tellErrPacket.data().receipientName, targetPcName.c_str() );
       sendSinglePacket( tellErrPacket );
 
@@ -587,7 +594,7 @@ void Core::Network::GameConnection::tellHandler( const Packets::GamePacket& inPa
       return;
    }
 
-   GamePacketNew< FFXIVIpcTell, ServerChatIpcType > tellPacket( pPlayer->getId() );
+   ChatChannelPacket< FFXIVIpcTell > tellPacket( pPlayer->getId() );
    strcpy( tellPacket.data().msg, msg.c_str() );
    strcpy( tellPacket.data().receipientName, pPlayer->getName().c_str() );
    // TODO: do these have a meaning?
@@ -596,4 +603,15 @@ void Core::Network::GameConnection::tellHandler( const Packets::GamePacket& inPa
    //tellPacket.data().u2b = 0x40;
    pTargetPlayer->queueChatPacket( tellPacket );
 
+}
+
+void Core::Network::GameConnection::performNoteHandler( const Packets::GamePacket& inPacket,
+                                                        Entity::PlayerPtr pPlayer )
+{
+   GamePacketNew< FFXIVIpcPerformNote, ServerZoneIpcType > performPacket( pPlayer->getId() );
+
+   uint8_t inVal = inPacket.getValAt< uint8_t >( 0x20 );
+   memcpy( &performPacket.data().data[0], &inVal, 32 );
+
+   pPlayer->sendToInRangeSet( performPacket );
 }

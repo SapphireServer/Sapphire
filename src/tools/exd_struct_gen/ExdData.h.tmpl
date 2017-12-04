@@ -10,6 +10,7 @@
 #include <ExdData.h>
 #include <ExdCat.h>
 #include <Exd.h>
+#include <set>
 
 namespace Core {
 namespace Data {
@@ -36,12 +37,18 @@ STRUCTS
         return *boost::get< T >( &fields.at( index ) );
      }
 
+     void loadIdList( xiv::exd::Exd& data, std::set< uint32_t >& outIdList );
+
      boost::shared_ptr< xiv::dat::GameData > m_data;
      boost::shared_ptr< xiv::exd::ExdData > m_exd_data;
 
 DATACCESS
 
 DIRECTGETTERS
+
+IDLISTS
+
+IDLISTGETTERS
 
   };
 

@@ -66,7 +66,7 @@ public:
    void OnError( const boost::system::error_code & error ) override;
 
    void handlePackets( const Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
-                       const std::vector<Packets::FFXIVARR_PACKET_RAW>& packetData );
+                       const std::vector< Packets::FFXIVARR_PACKET_RAW >& packetData );
 
    void queueInPacket( Packets::GamePacketPtr inPacket );
    void queueOutPacket( Packets::GamePacketPtr outPacket );
@@ -118,6 +118,8 @@ public:
    DECLARE_HANDLER( gm2Handler );
 
    DECLARE_HANDLER( reqEquipDisplayFlagsHandler );
+
+   DECLARE_HANDLER( performNoteHandler );
 
    DECLARE_HANDLER( tellHandler );
 };

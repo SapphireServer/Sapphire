@@ -20,21 +20,23 @@ namespace Entity {
 class Actor : public boost::enable_shared_from_this< Actor >
 {
 public:
-   enum ActorType : uint8_t
+   enum ObjKind : uint8_t
    {
       None = 0x00,
       Player = 0x01,
       BattleNpc = 0x02,
       EventNpc = 0x03,
-      unk1 = 0x04,
-      AetheryteNpc = 0x05,
-      ResourceNode = 0x06,
+      Treasure = 0x04,
+      Aetheryte = 0x05,
+      GatheringPoint = 0x06,
       EventObj = 0x07,
       Mount = 0x08,
-      Minion = 0x09,
+      Companion = 0x09,
       Retainer = 0x0A,
-      unk2 = 0x0B,
-      Furniture = 0x0C,
+      Area = 0x0B,
+      Housing = 0x0C,
+      Cutscene = 0x0D,
+      CardStand = 0x0E,
    };
 
    enum Stance : uint8_t
@@ -125,7 +127,7 @@ protected:
    /*! Id of the actor */
    uint32_t             m_id;
    /*! Type of the actor */
-   ActorType            m_type;
+   ObjKind              m_objKind;
    /*! Ptr to the ZoneObj the actor belongs to */
    ZonePtr              m_pCurrentZone;
    /*! Last tick time for the actor  ( in ms ) */
@@ -175,15 +177,9 @@ public:
    void setPosition( const Common::FFXIVARR_POSITION3& pos );
    void setPosition( float x, float y, float z );
 
-   void setRotation( float rot )
-   {
-      m_rot = rot;
-   }
+   void setRotation( float rot );
 
-   float getRotation() const
-   {
-      return m_rot;
-   }
+   float getRotation() const;
 
    Common::FFXIVARR_POSITION3& getPos();
 
@@ -247,7 +243,7 @@ public:
 
    void setStatus( ActorStatus  status );
 
-   void handleScriptSkill( uint32_t type, uint32_t actionId, uint64_t param1, uint64_t param2, Entity::Actor& target );
+   void handleScriptSkill( uint32_t type, uint16_t actionId, uint64_t param1, uint64_t param2, Entity::Actor& target );
 
    virtual void autoAttack( ActorPtr pTarget );
 

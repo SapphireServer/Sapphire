@@ -29,7 +29,7 @@ uint32_t Core::Entity::BattleNpc::m_nextID = 1149241694;
 Core::Entity::BattleNpc::BattleNpc()
 {
    m_id = 0;
-   m_type = ActorType::BattleNpc;
+   m_objKind = ObjKind::BattleNpc;
    m_status = ActorStatus::Idle;
 }
 
@@ -38,8 +38,8 @@ Core::Entity::BattleNpc::~BattleNpc()
 
 }
 
-Core::Entity::BattleNpc::BattleNpc( uint32_t modelId, uint32_t nameid, const Common::FFXIVARR_POSITION3& spawnPos,
-                                    uint32_t sizeId, uint32_t type, uint32_t level, uint32_t behaviour,
+Core::Entity::BattleNpc::BattleNpc( uint16_t modelId, uint16_t nameid, const Common::FFXIVARR_POSITION3& spawnPos,
+                                    uint16_t bnpcBaseId, uint32_t type, uint8_t level, uint8_t behaviour,
                                     uint32_t mobType )
 {
    BattleNpc::m_nextID++;
@@ -49,10 +49,10 @@ Core::Entity::BattleNpc::BattleNpc( uint32_t modelId, uint32_t nameid, const Com
    m_pos = spawnPos;
    m_posOrigin = spawnPos;
 
-   m_type = ActorType::BattleNpc;
+   m_objKind = ObjKind::BattleNpc;
 
    m_mode = MODE_IDLE;
-   m_targetId = INVALID_GAME_OBJECT_ID;
+   m_targetId = static_cast< uint64_t >( INVALID_GAME_OBJECT_ID );
 
    m_maxHp = 150;
    m_maxMp = 100;
@@ -66,14 +66,14 @@ Core::Entity::BattleNpc::BattleNpc( uint32_t modelId, uint32_t nameid, const Com
    m_currentStance = Stance::Passive;
 
    m_class = ClassJob::Gladiator;
-   m_level = level > 0 ? level : 70;
+   m_level = level > uint8_t{0} ? level : uint8_t{70};
 
    m_modelId = modelId;
    m_nameId = nameid;
 
    m_behavior = behaviour;
 
-   m_bnpcBaseId = sizeId;
+   m_bnpcBaseId = bnpcBaseId;
 
    m_status = ActorStatus::Idle;
 
@@ -83,7 +83,7 @@ Core::Entity::BattleNpc::BattleNpc( uint32_t modelId, uint32_t nameid, const Com
 
    m_invincibilityType = InvincibilityType::InvincibilityNone;
 
-   //m_type = static_cast< Common::ActorType >( type );
+   //m_type = static_cast< Common::ObjKind >( type );
 
 }
 
@@ -147,7 +147,7 @@ void Core::Entity::BattleNpc::spawn( Core::Entity::PlayerPtr pTarget )
 
    spawnPacket.data().rotation = Math::Util::floatToUInt16Rot( getRotation() );
 
-   spawnPacket.data().type = static_cast< uint8_t >( m_type );
+   spawnPacket.data().type = static_cast< uint8_t >( m_objKind );
 
    spawnPacket.data().state = static_cast< uint8_t >( m_status );
 
@@ -189,7 +189,7 @@ uint8_t Core::Entity::BattleNpc::getbehavior() const
 
 void Core::Entity::BattleNpc::hateListAdd( Core::Entity::ActorPtr pActor, int32_t hateAmount )
 {
-   HateListEntry* hateEntry = new HateListEntry();
+   auto hateEntry = new HateListEntry();
    hateEntry->m_hateAmount = hateAmount;
    hateEntry->m_pActor = pActor;
 
@@ -253,7 +253,7 @@ bool Core::Entity::BattleNpc::moveTo( Common::FFXIVARR_POSITION3& pos )
       return true;
 
    float rot = Math::Util::calcAngFrom( getPos().x, getPos().z, pos.x, pos.z );
-   float newRot = PI - rot + (PI / 2);
+   float newRot = PI - rot + ( PI / 2 );
 
    face( pos );
    float angle = Math::Util::calcAngFrom( getPos().x, getPos().z, pos.x, pos.z ) + PI;
@@ -262,7 +262,7 @@ bool Core::Entity::BattleNpc::moveTo( Common::FFXIVARR_POSITION3& pos )
    float y = ( getPos().y + pos.y ) * 0.5f; // fake value while there is no collision
    float z = static_cast< float >( sinf( angle ) * 1.1f );
 
-   Common::FFXIVARR_POSITION3 newPos;
+   Common::FFXIVARR_POSITION3 newPos{};
 
    newPos.x = getPos().x + x;
    newPos.y = y;
@@ -270,13 +270,11 @@ bool Core::Entity::BattleNpc::moveTo( Common::FFXIVARR_POSITION3& pos )
 
    setPosition( newPos );
 
-   Common::FFXIVARR_POSITION3 tmpPos;
+   Common::FFXIVARR_POSITION3 tmpPos{};
    tmpPos.x = getPos().x + x;
    tmpPos.y = y;
    tmpPos.z = getPos().z + z;
 
-   
-   angle = angle * 2;
    setPosition( tmpPos );
    setRotation(newRot);
 
@@ -384,7 +382,7 @@ void Core::Entity::BattleNpc::hateListUpdate( Core::Entity::ActorPtr pActor, int
       }
    }
 
-   HateListEntry* hateEntry = new HateListEntry();
+   auto hateEntry = new HateListEntry();
    hateEntry->m_hateAmount = hateAmount;
    hateEntry->m_pActor = pActor;
    m_hateList.insert( hateEntry );
@@ -427,7 +425,7 @@ void Core::Entity::BattleNpc::onDeath()
          if( pHateEntry->m_pActor->isPlayer()  ) // && pHateEntry->m_hateAmount >= plsBeHatedThisMuchAtLeast )
          {
             uint8_t level = pHateEntry->m_pActor->getLevel();
-            auto levelDiff = (int)this->m_level - (int)level;
+            auto levelDiff = static_cast< int32_t >( this->m_level ) - level;
             auto cappedLevelDiff = Math::Util::clamp( levelDiff, 1, 6 );
 
             auto expNeeded = g_exdData.m_paramGrowthInfoMap[m_level + cappedLevelDiff - 1].needed_exp;
@@ -449,7 +447,7 @@ void Core::Entity::BattleNpc::onDeath()
             
 
             // todo: this is actually retarded, we need real rand()
-            srand( static_cast< unsigned int> ( time( NULL ) ) );
+            srand( static_cast< uint32_t > ( time( nullptr ) ) );
 
             auto pPlayer = pHateEntry->m_pActor->getAsPlayer();
             pPlayer->gainExp( exp );
@@ -517,7 +515,7 @@ void Core::Entity::BattleNpc::update( int64_t currTime )
    {
       ActorPtr pClosestActor = getClosestActor();
 
-      if( ( pClosestActor != nullptr ) && pClosestActor->isAlive() )
+      if( pClosestActor && pClosestActor->isAlive() )
       {
          distance = Math::Util::distance( getPos().x, getPos().y, getPos().z,
                                           pClosestActor->getPos().x,
@@ -543,9 +541,9 @@ void Core::Entity::BattleNpc::update( int64_t currTime )
       if( pClosestActor != nullptr )
       {
          distance = Math::Util::distance( getPos().x, getPos().y, getPos().z,
-                                                pClosestActor->getPos().x,
-                                                pClosestActor->getPos().y,
-                                                pClosestActor->getPos().z );
+                                          pClosestActor->getPos().x,
+                                          pClosestActor->getPos().y,
+                                          pClosestActor->getPos().z );
 
          if( distance > 4 )
             moveTo( pClosestActor->getPos() );

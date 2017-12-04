@@ -1337,6 +1337,12 @@ struct FFXIVIpcActorGauge : FFXIVIpcBasePacket<ActorGauge>
    uint8_t data[15]; // depends on classJobId
 };
 
+struct FFXIVIpcPerformNote : FFXIVIpcBasePacket<PerformNote>
+{
+   uint8_t data[32];
+};
+
+
 } /* Server */
 } /* Packets */
 } /* Network */

@@ -46,7 +46,7 @@ Zone::Zone()
    , m_layoutId( 0 )
    , m_bPrivate( false )
    , m_type( Common::RegionType::normal )
-   , m_currentWeather( static_cast<uint8_t>( Common::Weather::FairSkies ) )
+   , m_currentWeather( static_cast< uint8_t >( Common::Weather::FairSkies ) )
    , m_weatherOverride( 0 )
    , m_lastMobUpdate( 0 )
 {
@@ -54,7 +54,7 @@ Zone::Zone()
 
 Zone::Zone( uint16_t zoneId, uint32_t layoutId, std::string name, std::string interName, bool bPrivate = false )
    : m_type( Common::RegionType::normal )
-   , m_currentWeather( static_cast<uint8_t>( Common::Weather::FairSkies ) )
+   , m_currentWeather( static_cast< uint8_t >( Common::Weather::FairSkies ) )
 {
    m_layoutId = layoutId;
 
@@ -197,8 +197,8 @@ void Zone::loadCellCache()
    for( auto entry : cache )
    {
       // get cell position
-      uint32_t cellX = CellHandler<ZoneMgr>::getPosX( entry->getPos().x );
-      uint32_t cellY = CellHandler<ZoneMgr>::getPosY( entry->getPos().z );
+      uint32_t cellX = CellHandler< ZoneMgr >::getPosX( entry->getPos().x );
+      uint32_t cellY = CellHandler< ZoneMgr >::getPosY( entry->getPos().z );
 
       // find the right cell, create it if not existing yet
       if( m_pCellCache[cellX] == nullptr )
@@ -313,7 +313,6 @@ void Zone::pushActor( Entity::ActorPtr pActor )
 
 void Zone::removeActor( Entity::ActorPtr pActor )
 {
-
 
    if( pActor->m_pCell )
    {

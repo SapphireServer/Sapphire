@@ -7,6 +7,8 @@
       <ListenIp>127.0.0.1</ListenIp>
       <!-- Path of FFXIV dat files -->
       <DataPath>C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv</DataPath>
+      <!-- Path of Chai script files -->
+      <ScriptPath>../scripts/chai</ScriptPath>
       <!-- Connection settings for the mysql db -->
       <Mysql>
          <Host>127.0.0.1</Host>
