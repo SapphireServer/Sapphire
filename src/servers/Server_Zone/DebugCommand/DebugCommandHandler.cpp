@@ -64,7 +64,7 @@ Core::DebugCommandHandler::~DebugCommandHandler()
 
 // add a command set to the register map
 void Core::DebugCommandHandler::registerCommand( const std::string& n, Core::DebugCommand::pFunc functionPtr,
-   const std::string& hText, uint8_t uLevel )
+                                                 const std::string& hText, uint8_t uLevel )
 {
    m_commandMap[std::string( n )] = boost::make_shared<DebugCommand>( n, functionPtr, hText, uLevel );
 }
@@ -118,7 +118,7 @@ void Core::DebugCommandHandler::execCommand( char * data, Core::Entity::PlayerPt
 ///////////////////////////////////////////////////////////////////////////////////////
 
 void Core::DebugCommandHandler::scriptReload( char * data, Core::Entity::PlayerPtr pPlayer,
-   boost::shared_ptr<Core::DebugCommand> command )
+                                              boost::shared_ptr<Core::DebugCommand> command )
 {
    g_scriptMgr.reload();
    pPlayer->sendDebug( "Scripts reloaded." );
@@ -157,7 +157,7 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
       params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
    g_log.debug( "[" + std::to_string( pPlayer->getId() ) + "] " +
-      "subCommand " + subCommand + " params: " + params );
+                "subCommand " + subCommand + " params: " + params );
 
 
    if( ( ( subCommand == "pos" ) || ( subCommand == "posr" ) ) && ( params != "" ) )
@@ -176,12 +176,12 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
 
       if( subCommand == "pos" )
          pPlayer->setPosition( static_cast< float >( posX ),
-            static_cast< float >( posY ),
-            static_cast< float >( posZ ) );
+                               static_cast< float >( posY ),
+                               static_cast< float >( posZ ) );
       else
          pPlayer->setPosition( pPlayer->getPos().x + static_cast< float >( posX ),
-            pPlayer->getPos().y + static_cast< float >( posY ),
-            pPlayer->getPos().z + static_cast< float >( posZ ) );
+                               pPlayer->getPos().y + static_cast< float >( posY ),
+                               pPlayer->getPos().z + static_cast< float >( posZ ) );
 
       Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcActorSetPos >
          setActorPosPacket( pPlayer->getId() );
@@ -312,7 +312,7 @@ void Core::DebugCommandHandler::add( char * data, Core::Entity::PlayerPtr pPlaye
       params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
    g_log.debug( "[" + std::to_string( pPlayer->getId() ) + "] " +
-      "subCommand " + subCommand + " params: " + params );
+                "subCommand " + subCommand + " params: " + params );
 
 
    if( subCommand == "status" )
@@ -437,7 +437,7 @@ void Core::DebugCommandHandler::get( char * data, Core::Entity::PlayerPtr pPlaye
       params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
    g_log.debug( "[" + std::to_string( pPlayer->getId() ) + "] " +
-      "subCommand " + subCommand + " params: " + params );
+                "subCommand " + subCommand + " params: " + params );
 
 
    if( subCommand == "pos" )
@@ -446,12 +446,12 @@ void Core::DebugCommandHandler::get( char * data, Core::Entity::PlayerPtr pPlaye
       int16_t map_id = g_exdData.m_zoneInfoMap[pPlayer->getCurrentZone()->getId()].map_id;
 
       pPlayer->sendNotice( "Pos:\n" +
-         std::to_string( pPlayer->getPos().x ) + "\n" +
-         std::to_string( pPlayer->getPos().y ) + "\n" +
-         std::to_string( pPlayer->getPos().z ) + "\n" +
-         std::to_string( pPlayer->getRotation() ) + "\nMapId: " +
-         std::to_string( map_id ) + "\nZoneID: " +
-         std::to_string( pPlayer->getCurrentZone()->getId() ) + "\n" );
+                           std::to_string( pPlayer->getPos().x ) + "\n" +
+                           std::to_string( pPlayer->getPos().y ) + "\n" +
+                           std::to_string( pPlayer->getPos().z ) + "\n" +
+                           std::to_string( pPlayer->getRotation() ) + "\nMapId: " +
+                           std::to_string( map_id ) + "\nZoneID: " +
+                           std::to_string( pPlayer->getCurrentZone()->getId() ) + "\n" );
    }
    else
    {
