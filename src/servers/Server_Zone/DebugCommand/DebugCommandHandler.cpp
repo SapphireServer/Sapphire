@@ -397,6 +397,17 @@ void Core::DebugCommandHandler::add( char * data, Core::Entity::PlayerPtr pPlaye
       pPlayer->queuePacket(controlPacket);*/
 
    }
+   else if (subCommand == "unlock")
+   {
+      int32_t id;
+      sscanf( params.c_str(), "%d", &id );
+
+      pPlayer->learnAction( id );
+   }
+   else if (subCommand == "enablecompanion")
+   {
+      pPlayer->learnAction( 17 );
+   }
    else
    {
       pPlayer->sendUrgent( subCommand + " is not a valid ADD command." );

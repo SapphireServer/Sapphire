@@ -678,7 +678,9 @@ namespace Common {
 
       GearSetEquipMsg = 0x321,
 
+      ToggleMountUnlock = 0x387,
       ToggleOrchestrionUnlock = 0x396,
+
       Dismount = 0x3a0
    };
 

@@ -70,6 +70,7 @@ enum GmCommand
    Exp = 0x0068,
    Inv = 0x006A,
 
+   Mount = 0x0071,
    Orchestrion = 0x0074,
 
    Item = 0x00C8,
@@ -294,6 +295,25 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
             pPlayer->sendNotice( "Song " + std::to_string( param2 ) + " for " + targetPlayer->getName() +
                " was turned on." );
          }
+      }
+
+      break;
+   }
+   case GmCommand::Mount:
+   {
+      if (param2 == 0)
+      {
+         for (uint8_t i = 0; i < 255; i++)
+            targetActor->getAsPlayer()->learnMount( i );
+
+         pPlayer->sendNotice( "All mounts for " + targetPlayer->getName() +
+            " were turned on." );
+      }
+      else
+      {
+         targetActor->getAsPlayer()->learnMount( param1 );
+         pPlayer->sendNotice( "Mount " + std::to_string( param1 ) + " for " + targetPlayer->getName() +
+            " was turned on." );
       }
 
       break;
