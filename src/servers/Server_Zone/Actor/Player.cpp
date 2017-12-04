@@ -625,7 +625,7 @@ void Core::Entity::Player::learnMount( uint8_t mountId )
    uint8_t value;
    Util::valueToFlagByteIndexValue( mountId, value, index );
 
-   m_orchestrion[index] |= value;
+   m_mountGuide[index] |= value;
 
    queuePacket( ActorControlPacket143( getId(), ToggleMountUnlock, mountId, 1 ) );
 }
