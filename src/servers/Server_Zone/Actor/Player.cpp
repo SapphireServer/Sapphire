@@ -31,8 +31,6 @@
 
 #include "src/servers/Server_Zone/Script/ScriptManager.h"
 
-#include "src/servers/Server_Zone/StatusEffect/StatusEffectContainer.h"
-
 #include "src/servers/Server_Zone/Inventory/Item.h"
 
 #include "src/servers/Server_Zone/Inventory/Inventory.h"
@@ -57,6 +55,7 @@ using namespace Core::Network::Packets::Server;
 
 // player constructor
 Core::Entity::Player::Player() :
+   Actor(),
    m_lastWrite( 0 ),
    m_lastPing( 0 ),
    m_bIsLogin( false ),
@@ -1045,7 +1044,7 @@ void Core::Entity::Player::update( int64_t currTime )
    if( !isAlive() )
       return;
 
-   m_pStatusEffectContainer->update();
+   updateStatusEffects();
 
    m_lastUpdate = currTime;
 

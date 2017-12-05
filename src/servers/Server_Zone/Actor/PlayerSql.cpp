@@ -26,7 +26,6 @@
 
 #include "src/servers/Server_Zone/Network/GameConnection.h"
 #include "src/servers/Server_Zone/Network/PacketWrappers/InitUIPacket.h"
-#include "src/servers/Server_Zone/StatusEffect/StatusEffectContainer.h"
 #include "src/servers/Server_Zone/Inventory/Inventory.h"
 
 #include <Server_Common/Database/DatabaseDef.h>
@@ -210,8 +209,6 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
    initHateSlotQueue();
 
    initSpawnIdQueue();
-
-   m_pStatusEffectContainer = StatusEffect::StatusEffectContainerPtr( new StatusEffect::StatusEffectContainer( shared_from_this() ) );
 
    if( !m_playerIdToSpawnIdMap.empty() )
       m_playerIdToSpawnIdMap.clear();

@@ -15,7 +15,6 @@
 #include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket144.h"
 #include "src/servers/Server_Zone/Network/PacketWrappers/UpdateHpMpTpPacket.h"
 
-#include "src/servers/Server_Zone/StatusEffect/StatusEffectContainer.h"
 #include "src/servers/Server_Zone/StatusEffect/StatusEffect.h"
 #include "src/servers/Server_Zone/Action/ActionCollision.h"
 #include "src/servers/Server_Zone/ServerZone.h"
@@ -33,6 +32,11 @@ using namespace Core::Network::Packets::Server;
 
 Core::Entity::Actor::Actor()
 {
+   // initialize the free slot queue
+   for( uint8_t i = 0; i < MAX_STATUS_EFFECTS; i++ )
+   {
+      m_statusEffectFreeSlotQueue.push( i );
+   }
 }
 
 Core::Entity::Actor::~Actor()
@@ -794,7 +798,30 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
 /*! \param StatusEffectPtr to be applied to the actor */
 void Core::Entity::Actor::addStatusEffect( StatusEffect::StatusEffectPtr pEffect )
 {
-   m_pStatusEffectContainer->addStatusEffect( pEffect );
+   int8_t nextSlot = getStatusEffectFreeSlot();
+   // if there is no slot left, do not add the effect
+   if( nextSlot == -1 )
+      return;
+
+   pEffect->applyStatus();
+   m_statusEffectMap[nextSlot] = pEffect;
+
+   ZoneChannelPacket< Server::FFXIVIpcAddStatusEffect > statusEffectAdd( getId() );
+   statusEffectAdd.data().actor_id = pEffect->getTargetActorId();
+   statusEffectAdd.data().actor_id1 = pEffect->getSrcActorId(); 
+   statusEffectAdd.data().current_hp = getHp();
+   statusEffectAdd.data().current_mp = getMp();
+   statusEffectAdd.data().current_tp = getTp();
+   statusEffectAdd.data().duration = static_cast< float >( pEffect->getDuration() ) / 1000;
+   statusEffectAdd.data().effect_id = pEffect->getId();
+   statusEffectAdd.data().effect_index = nextSlot;
+   statusEffectAdd.data().max_hp = getMaxHp();
+   statusEffectAdd.data().max_mp = getMaxMp();
+   statusEffectAdd.data().max_something = 1;
+    //statusEffectAdd.data().unknown2 = 28;
+   statusEffectAdd.data().param = pEffect->getParam();
+
+   sendToInRangeSet( statusEffectAdd, isPlayer() );
 }
 
 /*! \param StatusEffectPtr to be applied to the actor */
@@ -809,24 +836,13 @@ void Core::Entity::Actor::addStatusEffectById( uint32_t id, int32_t duration, En
 /*! \param StatusEffectPtr to be applied to the actor */
 void Core::Entity::Actor::addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Actor& pSource, uint16_t param )
 {
-   if( !m_pStatusEffectContainer->hasStatusEffect( id ) )
+   if( !hasStatusEffect( id ) )
    {
       StatusEffect::StatusEffectPtr effect( new StatusEffect::StatusEffect( id, pSource.shared_from_this(),
                                                                             shared_from_this(), duration, 3000 ) );
       effect->setParam( param );
       addStatusEffect( effect );
    }
-}
-
-/*! \param Status that should be removed, based on its ID. */
-void Core::Entity::Actor::removeSingleStatusEffectFromId( uint32_t id )
-{
-   m_pStatusEffectContainer->removeSingleStatusEffectFromId( id );
-}
-
-Core::StatusEffect::StatusEffectContainerPtr Core::Entity::Actor::getStatusEffectContainer() const
-{
-   return m_pStatusEffectContainer;
 }
 
 float Core::Entity::Actor::getRotation() const
@@ -837,4 +853,155 @@ float Core::Entity::Actor::getRotation() const
 void Core::Entity::Actor::setRotation( float rot )
 {
    m_rot = rot;
+}
+
+int8_t Core::Entity::Actor::getStatusEffectFreeSlot()
+{
+   int8_t freeEffectSlot = -1;
+
+   if( m_statusEffectFreeSlotQueue.empty() )
+      return freeEffectSlot;
+
+   freeEffectSlot = m_statusEffectFreeSlotQueue.front();
+   m_statusEffectFreeSlotQueue.pop();
+
+   return freeEffectSlot;
+}
+
+void Core::Entity::Actor::statusEffectFreeSlot( uint8_t slotId )
+{
+   m_statusEffectFreeSlotQueue.push( slotId );
+}
+
+void Core::Entity::Actor::removeSingleStatusEffectById( uint32_t id )
+{
+   for( auto effectIt : m_statusEffectMap )
+   {
+      if( effectIt.second->getId() == id )
+      {
+         removeStatusEffect( effectIt.first );
+         break;
+      }
+   }
+}
+
+void Core::Entity::Actor::removeStatusEffect( uint8_t effectSlotId )
+{
+   auto pEffectIt = m_statusEffectMap.find( effectSlotId );
+   if( pEffectIt == m_statusEffectMap.end() )
+      return;
+
+   statusEffectFreeSlot( effectSlotId );
+
+   auto pEffect = pEffectIt->second;
+   pEffect->removeStatus();
+
+   sendToInRangeSet( ActorControlPacket142( getId(), StatusEffectLose, pEffect->getId() ), isPlayer() );
+
+   m_statusEffectMap.erase( effectSlotId );
+
+   sendStatusEffectUpdate();
+}
+
+std::map< uint8_t, Core::StatusEffect::StatusEffectPtr > Core::Entity::Actor::getStatusEffectMap() const
+{
+   return m_statusEffectMap;
+}
+
+void Core::Entity::Actor::sendStatusEffectUpdate()
+{
+   uint64_t currentTimeMs = Util::getTimeMs();
+
+   ZoneChannelPacket< Server::FFXIVIpcStatusEffectList > statusEffectList( getId() );
+
+   statusEffectList.data().current_hp = getHp();
+   statusEffectList.data().current_mp = getMp();
+   statusEffectList.data().currentTp = getTp();
+   statusEffectList.data().max_hp = getMaxHp();
+   statusEffectList.data().max_mp = getMaxMp();
+   uint8_t slot = 0;
+   for( auto effectIt : m_statusEffectMap )
+   {
+      float timeLeft = static_cast< float >( effectIt.second->getDuration() - 
+                                             ( currentTimeMs - effectIt.second->getStartTimeMs() ) ) / 1000;
+      statusEffectList.data().effect[slot].duration = timeLeft;
+      statusEffectList.data().effect[slot].effect_id = effectIt.second->getId();
+      statusEffectList.data().effect[slot].sourceActorId = effectIt.second->getSrcActorId();
+      slot++;
+   }
+
+   sendToInRangeSet( statusEffectList, isPlayer() );
+
+}
+
+void Core::Entity::Actor::updateStatusEffects()
+{
+   uint64_t currentTimeMs = Util::getTimeMs();
+
+   uint32_t thisTickDmg = 0;
+   uint32_t thisTickHeal = 0;
+
+   for( auto effectIt : m_statusEffectMap )
+   {
+      uint8_t effectIndex = effectIt.first;
+      auto effect = effectIt.second;
+
+      uint64_t lastTick = effect->getLastTickMs();
+      uint64_t startTime = effect->getStartTimeMs();
+      uint32_t duration = effect->getDuration();
+      uint32_t tickRate = effect->getTickRate();
+
+      if( ( currentTimeMs - startTime ) > duration )
+      {
+         // remove status effect
+         removeStatusEffect( effectIndex );
+         // break because removing invalidates iterators
+         break;
+      }
+
+      if( ( currentTimeMs - lastTick ) > tickRate )
+      {
+         effect->setLastTick( currentTimeMs );
+         effect->onTick();
+
+         auto thisEffect = effect->getTickEffect();
+
+         switch( thisEffect.first )
+         {
+
+         case 1:
+         {
+            thisTickDmg += thisEffect.second;
+            break;
+         }
+
+         case 2:
+         {
+            thisTickHeal += thisEffect.second;
+            break;
+         }
+
+         }
+      }
+
+   }
+
+   if( thisTickDmg != 0 )
+   {
+      takeDamage( thisTickDmg );
+      sendToInRangeSet( ActorControlPacket142( getId(), HPFloatingText, 0, static_cast< uint8_t >( ActionEffectType::Damage ), thisTickDmg ) );
+   }
+
+   if( thisTickHeal != 0 )
+   {
+      heal( thisTickDmg );
+      sendToInRangeSet( ActorControlPacket142( getId(), HPFloatingText, 0, static_cast< uint8_t >( ActionEffectType::Heal ), thisTickHeal ) );
+   }
+}
+
+bool Core::Entity::Actor::hasStatusEffect( uint32_t id )
+{
+   if( m_statusEffectMap.find( id ) != m_statusEffectMap.end() )
+      return true;
+   return false;
 }

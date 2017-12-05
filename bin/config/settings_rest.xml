@@ -6,7 +6,8 @@
 	  <!-- Ip the lobby server listens on -->
       <ListenIp>127.0.0.1</ListenIp>
       <!-- Path of FFXIV dat files -->
-      <DataPath>C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv</DataPath>
+      <!-- <DataPath>C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv</DataPath> -->
+      <DataPath>/opt/sapphire_3_15_0/bin/sqpack</DataPath> 
       <!-- IP of the lobby server -->
       <LobbyHost>127.0.0.1</LobbyHost>
 	  <!-- IP of the frontier server -->
@@ -16,10 +17,10 @@
      <!-- Web server port -->
      <HttpPort>80</HttpPort>
       <Mysql>
-         <Host>127.0.0.1</Host>
+         <Host>localhost</Host>
          <Port>3306</Port>
          <Username>root</Username>
-         <Pass></Pass>
+         <Pass>viridis0!</Pass>
          <Database>sapphire</Database>
       </Mysql>
    </General>
