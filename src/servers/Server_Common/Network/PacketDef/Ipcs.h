@@ -58,7 +58,8 @@ namespace Packets {
       SocialRequestError         = 0x00AD,
       Playtime                   = 0x00B7, // updated 4.1
       CFRegistered               = 0x00B8, // updated 4.1
-      SocialRequestResponse      = 0x00BB, // updated 4.1
+      SocialRequestResponse      = 0x00BC, // updated 4.1
+      SocialRequestReceive       = 0x00BD,
       SocialList                 = 0x00BE, // updated 4.1
       UpdateSearchInfo           = 0x10BB,
       InitSearchInfo             = 0x00C1, // updated 4.1

@@ -4,6 +4,7 @@
 #include "src/servers/Server_Zone/Forwards.h"
 
 #include <src/servers/Server_Common/Common.h>
+#include <src/servers/Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
 
 #include "Actor.h"
 #include "src/servers/Server_Zone/Inventory/Inventory.h"
@@ -479,6 +480,9 @@ public:
    void sendNotice( const std::string& message );
    void sendUrgent( const std::string& message );
    void sendDebug( const std::string& message );
+
+   /*! generates a player entry used for lists (social, etc) */
+   Core::Network::Packets::Server::PlayerEntry generatePlayerEntry();
 
    // Player Battle Handling
    //////////////////////////////////////////////////////////////////////////////////////////////////////

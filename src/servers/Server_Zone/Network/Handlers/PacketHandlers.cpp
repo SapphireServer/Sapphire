@@ -444,25 +444,7 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
       int32_t entrysizes = sizeof( listPacket.data().entries );
       memset( listPacket.data().entries, 0, sizeof( listPacket.data().entries ) );
 
-      listPacket.data().entries[0].bytes[2] = pPlayer->getCurrentZone()->getId();
-      listPacket.data().entries[0].bytes[3] = 0x80;
-      listPacket.data().entries[0].bytes[4] = 0x02;
-      listPacket.data().entries[0].bytes[6] = 0x3B;
-      listPacket.data().entries[0].bytes[11] = 0x10;
-      listPacket.data().entries[0].classJob = static_cast< uint8_t >( pPlayer->getClass() );
-      listPacket.data().entries[0].contentId = pPlayer->getContentId();
-      listPacket.data().entries[0].level = pPlayer->getLevel();
-      listPacket.data().entries[0].zoneId = pPlayer->getCurrentZone()->getId();
-      listPacket.data().entries[0].grandCompany = pPlayer->getGc();
-      memcpy( &listPacket.data().entries[0].fcTag[0], "Sapphire", sizeof( "Sapphire" ) );
-      listPacket.data().entries[0].clientLanguage = 2;
-      listPacket.data().entries[0].knownLanguages = 0x0F;
-      // TODO: no idea what this does
-      //listPacket.data().entries[0].one = 1;
-
-      memcpy( listPacket.data().entries[0].name, pPlayer->getName().c_str(), strlen( pPlayer->getName().c_str() ) );
-
-      listPacket.data().entries[0].onlineStatusMask = pPlayer->getOnlineStatusMask();
+      listPacket.data().entries[0] = pPlayer->generatePlayerEntry();
 
       queueOutPacket( listPacket );
 
@@ -474,6 +456,29 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
       listPacket.data().type = 0x0B;
       listPacket.data().sequence = count;
       memset( listPacket.data().entries, 0, sizeof( listPacket.data().entries ) );
+      
+      // todo: for now.. just grab all actors in range and add them in. just replace logic later by using manager
+
+      uint8_t i = 0;
+
+      for( auto actor : pPlayer->getInRangeActors() )
+      {
+         auto pFriend = actor->getAsPlayer();
+         if( pFriend )
+         {
+            listPacket.data().entries[i] = pFriend->generatePlayerEntry();
+            i++;
+         }
+
+         // todo: remove this branch entirely when using manager. physically hurts
+         if( i >= 200 )
+         {
+            break;
+         }
+         
+      }
+
+      queueOutPacket( listPacket );
 
    }
    else if( type == 0x0e )
@@ -483,10 +488,200 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
 
 }
 
-void Core::Network::GameConnection::socialReqSendHandler(const Packets::GamePacket& inPacket,
-   Entity::PlayerPtr pPlayer)
+void Core::Network::GameConnection::socialReqResponseHandler( const Packets::GamePacket& inPacket,
+                                                              Entity::PlayerPtr pPlayer )
 {
-   g_log.debug("send");
+   auto targetId = inPacket.getValAt< uint32_t >( 0x20 );
+   auto category = inPacket.getValAt< Common::SocialCategory >( 0x28 );
+   auto action = inPacket.getValAt< Common::SocialRequestAction >( 0x29 );
+
+   ZoneChannelPacket< FFXIVIpcSocialRequestError > info( targetId, pPlayer->getId() );
+   ZoneChannelPacket< FFXIVIpcSocialRequestResponse > response( targetId, pPlayer->getId() );
+
+   info.data().category = category;
+   response.data().category = category;
+
+   //auto pQR = g_database.query( "SELECT Name FROM dbchara WHERE CharacterId = " + to_string( targetId ) );
+   auto name = pPlayer->getName();
+   /*
+   if( pQR->getRowCount() > 0 )
+   {
+      name = pQR->fetch()->getString();
+   }
+   else
+   {
+      // todo: enumerate these messages
+      std::array< uint32_t, 5> categoryError = { 0,
+         320, // Unable to process party command.
+         310, // Unable to process friend list command.
+         3035, // Unable to reply. Free company invite invalid. // todo: find actual message
+         3035, // Unable to reply. Free company invite invalid.
+      };
+
+      response.data().messageId = categoryError[category];
+      response.data().category = category; // client only uses messageId if this is 1 for some reason
+      pPlayer->queuePacket( response );
+      return;
+   }*/
+
+   g_log.debug( std::to_string( static_cast<uint8_t>( action ) ) );
+
+   auto pSession = g_serverZone.getSession( targetId );
+
+   // todo: notify both inviter/invitee with 0x00CB packet
+
+   if( pSession )
+   {
+      g_log.debug( std::to_string(static_cast<uint8_t>(action)) );
+   }
+   response.data().response = Common::SocialRequestResponse::Accept;
+   memcpy( &( response.data().name ), name.c_str(), 32 );
+   pPlayer->queuePacket( response );
+}
+
+void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePacket& inPacket,
+                                                          Entity::PlayerPtr pPlayer )
+{
+      // todo: handle all social request packets here
+   auto category = inPacket.getValAt< Common::SocialCategory >( 0x20 );
+   auto name = std::string( inPacket.getStringAt( 0x21 ) );
+
+   auto pSession = g_serverZone.getSession( name );
+
+   // only the requester needs the response
+   ZoneChannelPacket< FFXIVIpcSocialRequestError > response( pPlayer->getId() );
+   memcpy( &( response.data().name ), name.c_str(), 32 );
+
+   // todo: enumerate log messages
+   response.data().messageId = 319; // That name does not exist. Please confirm the spelling.
+   response.data().category = category;
+
+   // todo: enumerate and move each of these cases into their classes?
+   if( pSession )
+   {
+      bool successful = false;
+      Entity::PlayerPtr pRecipient = pSession->getPlayer();
+
+      std::array<std::string, 5> typeVar{ "", "PartyInvite", "FriendInvite", "FreeCompanyPetition", "FreeCompanyInvite" };
+
+      // todo: proper handling of invites already sent
+      // todo: move this to world server
+      // check if an invite has already been sent by me
+      /*
+      if( pRecipient->getTempVariable( typeVar[category] + "Id" ) )
+      {
+         if( pRecipient->getTempVariable( typeVar[category] + "Id" ) == pPlayer->getId() )
+         {
+            response.data().messageId = 328; // That player has already been invited.
+            pPlayer->queuePacket( response );
+         }
+         return;
+      }*/
+
+      if( pRecipient->getId() == pPlayer->getId() )
+      {
+         response.data().messageId = 321; // Unable to invite.
+      }
+
+      switch( category )
+      {
+         // party invite
+         case Core::Common::SocialCategory::Party:
+         {
+            /*
+            if( pRecipient->getParty() )
+            {
+               response.data().messageId = 326; // That player is already in another party.
+            }
+            else if( pRecipient->getTempVariable( "PartyInviteId" ) == pPlayer->getId() )
+            {
+               response.data().messageId = 328; // That player has already been invited.
+            }
+            else if( pPlayer->getParty() && pPlayer->getParty()->getPartyMemberCount() >= pPlayer->getParty()->getType() )
+            {
+               response.data().messageId = 329; // Unable to invite. The party is full.
+            }*/
+            if( !pRecipient->isLoadingComplete() ) // || pRecipient->getDuty() )
+            {
+               response.data().messageId = 331; // Unable to invite. That player is currently bound by duty or in a different area.
+            }
+            else if( pRecipient->getOnlineStatus() == Common::OnlineStatus::Busy )
+            {
+               response.data().messageId = 334; // Unable to send party invite. Player's online status is set to Busy.
+            }
+            else if( pRecipient->getOnlineStatus() == Common::OnlineStatus::ViewingCutscene )
+            {
+               response.data().messageId = 336; // Unable to invite. That player is currently watching a cutscene.
+            }
+            else
+            {
+               successful = true;
+            }
+            // response.data().messageId = 62; // <name> declines the party invite.
+         }
+         break;
+
+         case Common::SocialCategory::Friends:
+         {
+            // todo: check if already on friends list or invite pending
+            /*
+            if( pPlayer->getFriendList()->find(name) )
+            {
+            response.data().messageId = 312; // That player is already a friend or has been sent a request.
+            }
+            else if( pRecipient->getFriendList()->getSize() >= 200 )
+            {
+            response.data().messageId = 314; // Unable to send friend request. The other player's friend list is full.
+            }
+            else if( pPlayer->getFriendList()->getSize() >= 200 )
+            {
+            response.data().messageId = 313; // Your friend list is full.
+            }
+            */
+            successful = true;
+         }
+         break;
+
+         default:
+            break;
+      }
+
+      if( successful )
+      {
+         ZoneChannelPacket< FFXIVIpcSocialRequestReceive > packet( pPlayer->getId(), pRecipient->getId() );
+
+         std::array<uint16_t, 5> typeMessage{ 0,
+            1, // You invite <name> to a party.
+            10, // You send a friend request to <name>.
+            1884, // You invite <name> to your free company.
+            3044, // Free company petition signature request sent to <name>
+         };
+
+         // TODO: confirm the timers on retail
+         auto expireTime = time( nullptr ) + 120;
+
+         // todo: fix this for cross zone parties (move to world server)
+         /*
+         pRecipient->setTempVariable( typeVar[category] + "Id", pPlayer->getId() );
+         pRecipient->setTempVariable( typeVar[category] + "Timer", expireTime );*/
+
+         packet.data().actorId = pPlayer->getId();
+         packet.data().category = category;
+         packet.data().action = Core::Common::SocialRequestAction::Invite;
+         packet.data().unknown3 = 80;
+         packet.data().unknown = 46;
+         packet.data().unknown2 = 64;
+         memcpy( &( packet.data().name ), pPlayer->getName().c_str(), 32 );
+
+         pRecipient->queuePacket( packet );
+         pRecipient->sendDebug( "ding ding" );
+         response.data().messageId = typeMessage[category];
+      }
+   }
+
+   pPlayer->queuePacket( response );
+   // todo: handle party, friend request
+   g_log.debug("sent to " + name);
 }
 
 void Core::Network::GameConnection::chatHandler( const Packets::GamePacket& inPacket,
