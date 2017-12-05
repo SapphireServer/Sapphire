@@ -8,7 +8,6 @@
 #include "src/servers/Server_Zone/Forwards.h"
 #include "src/servers/Server_Zone/Inventory/Inventory.h"
 #include "src/servers/Server_Zone/Inventory/Item.h"
-#include "src/servers/Server_Zone/StatusEffect/StatusEffectContainer.h"
 #include "src/servers/Server_Zone/StatusEffect/StatusEffect.h"
 
 namespace Core {
@@ -122,10 +121,11 @@ namespace Server {
 
          uint64_t currentTimeMs = Util::getTimeMs();
 
-         for( auto const& effect : pPlayer->getStatusEffectContainer()->getEffectMap() )
+         for( auto const& effect : pPlayer->getStatusEffectMap() )
          {
             m_data.effect[effect.first].effect_id = effect.second->getId();
-            m_data.effect[effect.first].duration = static_cast< float >( effect.second->getDuration() - ( currentTimeMs - effect.second->getStartTimeMs() ) ) / 1000;
+            m_data.effect[effect.first].duration = static_cast< float >( effect.second->getDuration() -
+                                                                         ( currentTimeMs - effect.second->getStartTimeMs() ) ) / 1000;
             m_data.effect[effect.first].sourceActorId = effect.second->getSrcActorId();
             m_data.effect[effect.first].unknown1 = effect.second->getParam();
          }
