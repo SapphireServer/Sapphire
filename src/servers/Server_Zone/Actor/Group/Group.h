@@ -19,7 +19,8 @@ using GroupPtr = boost::shared_ptr< Group >;
 struct GroupMember
 {
    uint64_t inviterId;
-   PlayerPtr pPlayer;
+   uint64_t contentId;
+   std::string name;
    uint32_t role;
 };
 
@@ -49,11 +50,7 @@ private:
    std::map< uint64_t, uint64_t > m_invites; // <recipient, sender>
 
 
-   virtual Core::Network::Packets::GamePacketPtr addMember( PlayerPtr pSender, PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
-   virtual Core::Network::Packets::GamePacketPtr inviteMember( PlayerPtr pSender, PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
-   virtual Core::Network::Packets::GamePacketPtr removeMember( PlayerPtr pSender, PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
-   virtual Core::Network::Packets::GamePacketPtr kickMember( PlayerPtr pSender, PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
-   virtual void sendPacketToMembers( Core::Network::Packets::GamePacketPtr pPacket, bool invitesToo = false );
+   
 
    virtual void load();
    virtual void update();
@@ -70,6 +67,12 @@ public:
    bool isFreeCompanyPetition() const;
    bool isBlacklist() const;
    bool isContentGroup() const;
+
+   virtual Core::Network::Packets::GamePacketPtr addMember(PlayerPtr pSender, PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0);
+   virtual Core::Network::Packets::GamePacketPtr inviteMember(PlayerPtr pSender, PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0);
+   virtual Core::Network::Packets::GamePacketPtr removeMember(PlayerPtr pSender, PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0);
+   virtual Core::Network::Packets::GamePacketPtr kickMember(PlayerPtr pSender, PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0);
+   virtual void sendPacketToMembers(Core::Network::Packets::GamePacketPtr pPacket, bool invitesToo = false);
 };
 
 }

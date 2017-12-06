@@ -429,7 +429,7 @@ void Core::Network::GameConnection::finishLoadingHandler( const Packets::GamePac
 void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket& inPacket,
                                                        Entity::PlayerPtr pPlayer )
 {
-
+    
    uint8_t type = inPacket.getValAt< uint8_t >( 0x2A );
    uint8_t count = inPacket.getValAt< uint8_t >( 0x2B );
 
