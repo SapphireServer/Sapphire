@@ -433,7 +433,7 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
    uint8_t type = inPacket.getValAt< uint8_t >( 0x2A );
    uint8_t count = inPacket.getValAt< uint8_t >( 0x2B );
 
-   if( type == 0x02 )
+   if( type == SocialListType::PartyList )
    { // party list
 
       ZoneChannelPacket< FFXIVIpcSocialList > listPacket( pPlayer->getId() );;
@@ -449,7 +449,7 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
       queueOutPacket( listPacket );
 
    }
-   else if( type == 0x0b )
+   else if( type == SocialListType::FriendList )
    { // friend list
 
       ZoneChannelPacket< FFXIVIpcSocialList > listPacket( pPlayer->getId() );
@@ -466,8 +466,8 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
          auto pFriend = actor->getAsPlayer();
          if( pFriend )
          {
-            listPacket.data().entries[i] = pFriend->generatePlayerEntry();
-            i++;
+            /*listPacket.data().entries[i] = pFriend->generatePlayerEntry();
+            i++;*/
          }
 
          // todo: remove this branch entirely when using manager. physically hurts
@@ -481,7 +481,7 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
       queueOutPacket( listPacket );
 
    }
-   else if( type == 0x0e )
+   else if( type == SocialListType::SearchList )
    { // player search result
      // TODO: implement player search
    }

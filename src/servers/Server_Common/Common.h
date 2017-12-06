@@ -802,8 +802,6 @@ namespace Core {
          Normal = 0x1,
          MountSkill = 0xD,
       };
-
-      /*! ModelType as found in eventsystemdefine.exd */
       
       enum SocialCategory : uint8_t
       {
@@ -812,6 +810,14 @@ namespace Core {
          FreeCompanyPetition = 4,
          FreeCompany = 5,
       };
+
+      enum SocialListType : uint8_t
+      {
+         PartyList = 0x02,
+         FriendList = 0x0b,
+         SearchList = 0x0e,
+      };
+
 
       // todo: rename SocialRequestAction and SocialRequestResponse cause they seem ambiguous
       enum class SocialRequestAction : uint8_t
