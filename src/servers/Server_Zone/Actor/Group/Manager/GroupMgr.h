@@ -32,7 +32,7 @@ private:
    friend virtual void load();
    friend virtual void update();
    friend virtual void disband();
-   //*/
+   */
 public:
    GroupMgr( GroupType type, uint32_t maxEntries ) :
       m_type( type ), m_maxEntries( maxEntries ){};

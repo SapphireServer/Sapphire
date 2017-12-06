@@ -1,6 +1,7 @@
 #include <cassert>
 #include <boost/shared_ptr.hpp>
 
+#include <Server_Zone/Session.h>
 #include <Server_Common/Network/PacketDef/Ipcs.h>
 #include <Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Server_Zone/Actor/Actor.h>
@@ -8,6 +9,8 @@
 #include <Server_Zone/ServerZone.h>
 #include <Server_Common/Network/GamePacketNew.h>
 #include "Group.h"
+
+extern Core::ServerZone g_serverZone;
 
 // todo: i fuckin have no fuckin clue how to use group manager classes, why not just have a map of <id, group>?
 // todo: invite map in g_serverZone.getGroupMgr(GroupType) and look up
@@ -46,7 +49,7 @@ Core::Network::Packets::GamePacketPtr Core::Entity::Group::Group::addMember( Pla
       GroupMember member;
       member.inviterId = senderId;
       member.role = 0;
-      member.pPlayer = pRecipient;
+      member.contentId = recipientId;
       m_members.emplace( recipientId, member );
    }
    else
@@ -59,14 +62,12 @@ Core::Network::Packets::GamePacketPtr Core::Entity::Group::Group::addMember( Pla
 void Core::Entity::Group::Group::sendPacketToMembers( Core::Network::Packets::GamePacketPtr pPacket, bool invitesToo )
 {
    assert( pPacket );
-   if( pPacket )
+   for( const auto& member : m_members )
    {
-      for( const auto& member : m_members )
+      auto pSession = g_serverZone.getSession( member.second.name );
+      if( pSession )
       {
-         if( member.second.pPlayer )
-         {
-            member.second.pPlayer->queuePacket( pPacket );
-         }
+         pSession->getPlayer()->queuePacket( pPacket );
       }
    }
 }
