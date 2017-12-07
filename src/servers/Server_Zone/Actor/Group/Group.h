@@ -59,7 +59,11 @@ public:
    virtual void sendPacketToMembers( Core::Network::Packets::GamePacketPtr pPacket, bool invitesToo = false );
 
    /*! generates a player entry used for lists (social, etc) */
-   Core::Network::Packets::Server::PlayerEntry generatePlayerEntry( GroupMember groupMember );
+   static Core::Network::Packets::Server::PlayerEntry generatePlayerEntry( GroupMember groupMember );
+
+   /*! access GroupMember vector */
+
+   std::map< uint64_t, GroupMember > getMembers() const;
 
    /*! get container limit */
    uint32_t getCapacity() const;

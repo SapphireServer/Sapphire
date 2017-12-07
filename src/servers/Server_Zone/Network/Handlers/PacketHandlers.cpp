@@ -452,7 +452,24 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
    else if( type == SocialListType::FriendList )
    { // friend list
 
-      ZoneChannelPacket< FFXIVIpcSocialList > listPacket = pPlayer->getFriendsList()->generateFriendsListPacket( pPlayer );
+      ZoneChannelPacket< FFXIVIpcSocialList > listPacket( pPlayer->getId() );
+      listPacket.data().type = 0x0B;
+      listPacket.data().sequence = 10;
+      memset( listPacket.data().entries, 0, sizeof( listPacket.data().entries ) );
+
+      uint16_t i = 0;
+
+      g_log.debug( std::to_string( pPlayer->getFriendsList()->getMembers().size() ) );
+
+      for ( auto member : pPlayer->getFriendsList()->getMembers() )
+      {
+         if ( i == 10 )
+            break;
+
+         g_log.debug( "aaa" + std::to_string( i ) + ": " + member.second.name );
+         listPacket.data().entries[i] = Core::Entity::Group::Group::generatePlayerEntry( member.second );
+         i++;
+      }
 
       queueOutPacket( listPacket );
 

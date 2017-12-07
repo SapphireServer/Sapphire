@@ -113,6 +113,11 @@ Core::Network::Packets::Server::PlayerEntry Group::generatePlayerEntry( GroupMem
    return entry;
 }
 
+std::map< uint64_t, GroupMember > Group::getMembers() const
+{
+   return m_members;
+}
+
 uint32_t Group::getCapacity() const
 {
    return m_maxCapacity;
