@@ -18,7 +18,7 @@ using namespace Core::Entity::Group;
 // todo: i fuckin have no fuckin clue how to use group manager classes, why not just have a map of <id, group>?
 // todo: invite map in g_serverZone.getGroupMgr(GroupType) and look up
 
-Core::Network::Packets::GamePacketPtr Group::addMember( PlayerPtr pSender, PlayerPtr pRecipient, uint64_t senderId, uint64_t recipientId )
+Core::Network::Packets::GamePacketPtr Group::addMember( Core::Entity::PlayerPtr pSender, Core::Entity::PlayerPtr pRecipient, uint64_t senderId, uint64_t recipientId )
 {
    constexpr uint32_t logMessages[] = {
       0, // 

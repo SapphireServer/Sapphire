@@ -28,10 +28,12 @@ std::vector< PlayerEntry > Core::Entity::Group::FriendList::getFriendListEntries
       entryList.push_back( generatePlayerEntry( member.second ) );
       limit++;
    }
+
+   return entryList;
 }
 
 //todo: make this function generic for all groups, and override if needed?
-ZoneChannelPacket< FFXIVIpcSocialList > Core::Entity::Group::FriendList::generateFriendsListPacket( PlayerPtr pPlayer )
+Core::Network::Packets::ZoneChannelPacket< FFXIVIpcSocialList > Core::Entity::Group::FriendList::generateFriendsListPacket( PlayerPtr pPlayer )
 {
    ZoneChannelPacket< FFXIVIpcSocialList > listPacket( pPlayer->getId() );
    listPacket.data().type = 0x0B;
@@ -48,4 +50,6 @@ ZoneChannelPacket< FFXIVIpcSocialList > Core::Entity::Group::FriendList::generat
       listPacket.data().entries[i] = generatePlayerEntry( member.second );
       i++;
    }
+
+   return listPacket;
 }

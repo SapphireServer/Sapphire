@@ -3,6 +3,7 @@
 
 #include <src/servers/Server_Common/Common.h>
 #include <Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
+#include <Server_Common/Network/GamePacketNew.h>
 #include <Server_Common/Forwards.h>
 #include <Server_Zone/Actor/Group/Group.h>
 #include <Server_Zone/Forwards.h>
@@ -49,9 +50,11 @@ public:
    bool isBlacklist() const;
    bool isContentGroup() const;
 
+   Core::Network::Packets::ZoneChannelPacket< FFXIVIpcSocialList > generateFriendsListPacket( PlayerPtr pPlayer );
+
    std::vector< Core::Network::Packets::Server::PlayerEntry > getFriendListEntries( uint16_t entryAmount );
 
-   Core::Network::Packets::ZoneChannelPacket< FFXIVIpcSocialList > generateFriendsListPacket( PlayerPtr pPlayer );
+   
 
 private:
    GroupType m_type{ GroupType::FriendList };
