@@ -5,6 +5,7 @@
 
 #include <src/servers/Server_Common/Common.h>
 #include <src/servers/Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
+#include <src/servers/Server_Zone/Actor/Group/FriendList.h>
 
 #include "Actor.h"
 #include "src/servers/Server_Zone/Inventory/Inventory.h"
@@ -351,6 +352,11 @@ public:
    void calculateStats() override;
    void sendStats();
 
+   // Social-based
+   //////////////////////////////////////////////////////////////////////////////////////////////////////
+
+   Group::FriendListPtr getFriendsList() const;
+
 
    // Aetheryte / Action / Attribute bitmasks
    //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -481,9 +487,6 @@ public:
    void sendUrgent( const std::string& message );
    void sendDebug( const std::string& message );
 
-   /*! generates a player entry used for lists (social, etc) */
-   Core::Network::Packets::Server::PlayerEntry generatePlayerEntry();
-
    // Player Battle Handling
    //////////////////////////////////////////////////////////////////////////////////////////////////////
    void onMobAggro( BattleNpcPtr pBNpc );
@@ -609,6 +612,10 @@ private:
    uint8_t m_stateFlags[7];
    uint8_t m_gmRank;
    uint16_t zoneId;
+
+   // Social-based
+
+   Group::FriendListPtr m_friendsList;
 
    uint8_t m_equipDisplayFlags;
 

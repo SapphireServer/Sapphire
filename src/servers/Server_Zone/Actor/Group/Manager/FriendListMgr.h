@@ -16,6 +16,15 @@ namespace Group {
 
 class FriendListMgr : public GroupMgr
 {
+public:
+   FriendListMgr( GroupType type, uint32_t maxEntries ) :
+      GroupMgr( type, maxEntries ),
+      m_type( type ), m_maxEntries( maxEntries ) {};
+   ~FriendListMgr() {};
+
+   GroupPtr findGroupByInviteIdForPlayer( uint64_t playerId ) const;
+   GroupPtr findGroupById( uint64_t groupId ) const;
+
 private:
    GroupType m_type{ GroupType::None };
    uint64_t m_groupCount{ 0 };
@@ -24,13 +33,6 @@ private:
    std::map< uint64_t, uint64_t > m_invites; // < recipient, groupid >
    virtual GroupPtr createGroup( PlayerPtr pOwner ) = 0;
 
-public:
-   FriendListMgr( GroupType type, uint32_t maxEntries ) :
-      m_type( type ), m_maxEntries( maxEntries ){};
-   ~FriendListMgr(){};
-
-   GroupPtr findGroupByInviteIdForPlayer( uint64_t playerId ) const;
-   GroupPtr findGroupById( uint64_t groupId ) const;
 };
 
 }

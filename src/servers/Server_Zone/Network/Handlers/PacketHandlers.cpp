@@ -436,7 +436,7 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
    if( type == SocialListType::PartyList )
    { // party list
 
-      ZoneChannelPacket< FFXIVIpcSocialList > listPacket( pPlayer->getId() );;
+      /*ZoneChannelPacket< FFXIVIpcSocialList > listPacket( pPlayer->getId() );;
 
       listPacket.data().type = 2;
       listPacket.data().sequence = count;
@@ -446,37 +446,13 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
 
       listPacket.data().entries[0] = pPlayer->generatePlayerEntry();
 
-      queueOutPacket( listPacket );
+      queueOutPacket( listPacket );*/
 
    }
    else if( type == SocialListType::FriendList )
    { // friend list
 
-      ZoneChannelPacket< FFXIVIpcSocialList > listPacket( pPlayer->getId() );
-      listPacket.data().type = 0x0B;
-      listPacket.data().sequence = count;
-      memset( listPacket.data().entries, 0, sizeof( listPacket.data().entries ) );
-      
-      // todo: for now.. just grab all actors in range and add them in. just replace logic later by using manager
-
-      uint8_t i = 0;
-
-      for( auto actor : pPlayer->getInRangeActors() )
-      {
-         auto pFriend = actor->getAsPlayer();
-         if( pFriend )
-         {
-            /*listPacket.data().entries[i] = pFriend->generatePlayerEntry();
-            i++;*/
-         }
-
-         // todo: remove this branch entirely when using manager. physically hurts
-         if( i >= 200 )
-         {
-            break;
-         }
-         
-      }
+      ZoneChannelPacket< FFXIVIpcSocialList > listPacket = pPlayer->getFriendsList()->generateFriendsListPacket( pPlayer );
 
       queueOutPacket( listPacket );
 
@@ -675,6 +651,9 @@ void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePac
 
          pRecipient->queuePacket( packet );
          pRecipient->sendDebug( "ding ding" );
+
+         pRecipient->getFriendsList()->addMember( pPlayer, pRecipient, pPlayer->getId(), pRecipient->getId() );
+
          response.data().messageId = typeMessage[category];
       }
    }
@@ -803,7 +782,7 @@ void Core::Network::GameConnection::tellHandler( const Packets::GamePacket& inPa
 void Core::Network::GameConnection::performNoteHandler( const Packets::GamePacket& inPacket,
                                                         Entity::PlayerPtr pPlayer )
 {
-   GamePacketNew< FFXIVIpcPerformNote, ServerZoneIpcType > performPacket( pPlayer->getId() );
+   GamePacketNew< FFXIVIpcPerformNote, ServerZoneIpcType > performPacket( pPlayer->getId() ); // todo: change to zonepacket
 
    uint8_t inVal = inPacket.getValAt< uint8_t >( 0x20 );
    memcpy( &performPacket.data().data[0], &inVal, 32 );

@@ -300,6 +300,11 @@ void Core::Entity::Player::sendStats()
    queuePacket( statPacket );
 }
 
+Group::FriendListPtr Core::Entity::Player::getFriendsList() const
+{
+   return m_friendsList;
+}
+
 void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
 {
    auto data = g_exdData.getAetheryteInfo( aetheryteId );
@@ -898,33 +903,6 @@ Core::Entity::ActorPtr Core::Entity::Player::lookupTargetById( uint64_t targetId
          targetActor = actor;
    }
    return targetActor;
-}
-
-Core::Network::Packets::Server::PlayerEntry Core::Entity::Player::generatePlayerEntry()
-{
-   Core::Network::Packets::Server::PlayerEntry entry = {};
-
-   entry.bytes[2] = getCurrentZone()->getId();
-   entry.bytes[3] = 0x80;
-   entry.bytes[4] = 0x02;
-   entry.bytes[6] = 0x3B;
-   entry.bytes[11] = 0x10;
-   entry.classJob = getClass();
-   entry.contentId = getContentId();
-   entry.level = getLevel();
-   entry.zoneId = getCurrentZone()->getId();
-   entry.grandCompany = getGc();
-   memcpy( &entry.fcTag[0], "Meme", 9 );
-   entry.clientLanguage = 2;
-   entry.knownLanguages = 0x0F;
-   // TODO: no idea what this does - me neither
-   //listPacket.data().entries[0].one = 1;
-
-   memcpy( entry.name, getName().c_str(), strlen( getName().c_str() ) );
-
-   entry.onlineStatusMask = getOnlineStatusMask();
-
-   return entry;
 }
 
 void Core::Entity::Player::setLastPing( uint32_t ping )

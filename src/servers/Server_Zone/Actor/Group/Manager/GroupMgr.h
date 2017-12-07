@@ -14,6 +14,14 @@ namespace Group {
 
 class GroupMgr : public boost::enable_shared_from_this< GroupMgr >
 {
+public:
+   GroupMgr( GroupType type, uint32_t maxEntries ) :
+      m_type( type ), m_maxEntries( maxEntries ) {};
+   ~GroupMgr() {};
+
+   GroupPtr findGroupByInviteIdForPlayer( uint64_t playerId ) const;
+   GroupPtr findGroupById( uint64_t groupId ) const;
+
 private:
    GroupType m_type{ GroupType::None };
    uint64_t m_groupCount{ 0 };
@@ -33,13 +41,7 @@ private:
    friend virtual void update();
    friend virtual void disband();
    */
-public:
-   GroupMgr( GroupType type, uint32_t maxEntries ) :
-      m_type( type ), m_maxEntries( maxEntries ){};
-   ~GroupMgr(){};
 
-   GroupPtr findGroupByInviteIdForPlayer( uint64_t playerId ) const;
-   GroupPtr findGroupById( uint64_t groupId ) const;
 };
 
 }
