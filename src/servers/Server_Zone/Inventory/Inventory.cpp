@@ -27,7 +27,7 @@ using namespace Core::Network;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-Core::Inventory::Inventory( Core::Entity::PlayerPtr pOwner )
+Core::Inventory::Inventory( Core::Entity::Player* pOwner )
 {
 
    m_pOwner = pOwner;

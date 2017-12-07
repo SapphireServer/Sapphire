@@ -13,7 +13,7 @@ using InventoryMap = std::map< uint16_t, ItemContainerPtr >;
 class Inventory
 {
 public:
-   Inventory( Entity::PlayerPtr pOwner );
+   Inventory( Entity::Player* pOwner );
    ~Inventory();
 
    enum ContainerType : uint16_t
@@ -191,7 +191,7 @@ public:
 
 
 private:
-   Entity::PlayerPtr m_pOwner;
+   Entity::Player* m_pOwner;
    InventoryMap m_inventoryMap;
 };
 

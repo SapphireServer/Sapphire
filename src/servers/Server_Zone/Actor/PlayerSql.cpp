@@ -177,7 +177,8 @@ bool Core::Entity::Player::load( uint32_t charId, Core::SessionPtr pSession )
    m_lastTickTime = 0;
 
    auto pPlayer = getAsPlayer();
-   m_pInventory = InventoryPtr( new Inventory( pPlayer ) );
+   // TODO: remove Inventory and actually inline it in Player class
+   m_pInventory = InventoryPtr( new Inventory( pPlayer.get() ) );
 
    pPlayer->calculateStats();
 
