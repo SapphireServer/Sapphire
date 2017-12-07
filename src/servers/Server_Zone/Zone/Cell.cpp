@@ -47,7 +47,6 @@ namespace Core
       {
 
          entry->setCurrentZone( m_pZone );
-         entry->getAsBattleNpc()->initStatusEffectContainer();
          m_pZone->pushActor( entry );
 
       }

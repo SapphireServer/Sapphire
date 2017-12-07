@@ -13,6 +13,7 @@
 #include "src/servers/Server_Zone/Network/PacketWrappers/ServerNoticePacket.h"
 
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/clamp.hpp>
 
 #include "src/servers/Server_Zone/Forwards.h"
 #include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket143.h"
@@ -27,7 +28,7 @@ using namespace Core::Network;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-Core::Inventory::Inventory( Core::Entity::PlayerPtr pOwner )
+Core::Inventory::Inventory( Core::Entity::Player* pOwner )
 {
 
    m_pOwner = pOwner;
@@ -438,6 +439,30 @@ bool Core::Inventory::removeCrystal( CrystalType type, uint32_t amount )
    return true;
 }
 
+bool Core::Inventory::isOneHandedWeapon( ItemUICategory weaponCategory )
+{
+   switch ( weaponCategory )
+   {
+   case ItemUICategory::AlchemistsPrimaryTool:
+   case ItemUICategory::ArmorersPrimaryTool:
+   case ItemUICategory::BotanistsPrimaryTool:
+   case ItemUICategory::CulinariansPrimaryTool:
+   case ItemUICategory::OnehandedConjurersArm:
+   case ItemUICategory::CarpentersPrimaryTool:
+   case ItemUICategory::FishersPrimaryTool:
+   case ItemUICategory::GladiatorsArm:
+   case ItemUICategory::GoldsmithsPrimaryTool:
+   case ItemUICategory::LeatherworkersPrimaryTool:
+   case ItemUICategory::MinersPrimaryTool:
+   case ItemUICategory::OnehandedThaumaturgesArm:
+   case ItemUICategory::WeaversPrimaryTool:
+   case ItemUICategory::BlacksmithsPrimaryTool:
+      return true;
+   default:
+      return false;
+   }
+}
+
 bool Core::Inventory::isObtainable( uint32_t catalogId, uint8_t quantity )
 {
    
@@ -450,7 +475,8 @@ int16_t Core::Inventory::addItem( uint16_t inventoryId, int8_t slotId, uint32_t 
 
    auto itemInfo = g_exdData.getItemInfo( catalogId );
 
-   if( !itemInfo )
+   // if item data doesn't exist or it's a blank field
+   if( !itemInfo || itemInfo->item_level == 0 )
    {
       return -1;
    }
@@ -827,6 +853,40 @@ void Core::Inventory::send()
    }
 
 }
+
+uint16_t Core::Inventory::calculateEquippedGearItemLevel()
+{
+   uint32_t iLvlResult = 0;
+
+   auto gearSetMap = m_inventoryMap[GearSet0]->getItemMap();
+
+   auto it = gearSetMap.begin();
+
+   while ( it != gearSetMap.end() )
+   {
+      auto currItem = it->second;
+
+      if ( currItem )
+      {
+         iLvlResult += currItem->getItemLevel();
+
+         // If item is weapon and isn't one-handed
+         if ( currItem->isWeapon() && !isOneHandedWeapon( currItem->getCategory() ) )
+         {
+            iLvlResult += currItem->getItemLevel();
+         }
+         else
+         {
+            g_log.debug( "Is one handed" );
+         }
+      }
+
+      it++;
+   }
+
+   return boost::algorithm::clamp( iLvlResult / 12, 0, 9999 );
+}
+
 
 uint8_t Core::Inventory::getFreeSlotsInBags()
 {

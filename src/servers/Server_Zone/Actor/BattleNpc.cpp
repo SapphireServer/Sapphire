@@ -15,7 +15,6 @@
 #include "src/servers/Server_Zone/Network/PacketWrappers/MoveActorPacket.h"
 #include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket142.h"
 #include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket143.h"
-#include "src/servers/Server_Zone/StatusEffect/StatusEffectContainer.h"
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -40,7 +39,7 @@ Core::Entity::BattleNpc::~BattleNpc()
 
 Core::Entity::BattleNpc::BattleNpc( uint16_t modelId, uint16_t nameid, const Common::FFXIVARR_POSITION3& spawnPos,
                                     uint16_t bnpcBaseId, uint32_t type, uint8_t level, uint8_t behaviour,
-                                    uint32_t mobType )
+                                    uint32_t mobType ) : Actor()
 {
    BattleNpc::m_nextID++;
    m_id = BattleNpc::m_nextID;
@@ -85,11 +84,6 @@ Core::Entity::BattleNpc::BattleNpc( uint16_t modelId, uint16_t nameid, const Com
 
    //m_type = static_cast< Common::ObjKind >( type );
 
-}
-
-void Core::Entity::BattleNpc::initStatusEffectContainer()
-{
-   m_pStatusEffectContainer = StatusEffect::StatusEffectContainerPtr( new StatusEffect::StatusEffectContainer( shared_from_this() ) );
 }
 
 // spawn this player for pTarget
@@ -487,9 +481,7 @@ void Core::Entity::BattleNpc::update( int64_t currTime )
       return;
    }
 
-   if ( !m_pStatusEffectContainer )
-      initStatusEffectContainer();
-   m_pStatusEffectContainer->update();
+   updateStatusEffects();
    float distance = Math::Util::distance( m_pos.x, m_pos.y, m_pos.z,
                                           m_posOrigin.x, m_posOrigin.y, m_posOrigin.z );
 

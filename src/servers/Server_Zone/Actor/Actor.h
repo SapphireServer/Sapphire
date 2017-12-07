@@ -7,6 +7,7 @@
 #include "src/servers/Server_Zone/Forwards.h"
 #include <set>
 #include <map>
+#include <queue>
 
 namespace Core {
 namespace Entity {
@@ -79,7 +80,7 @@ public:
       uint32_t mnd = 0;
       uint32_t pie = 0;
 
-      uint32_t parry = 0;
+      uint32_t tenacity = 0;
       uint32_t attack = 0;
       uint32_t defense = 0;
       uint32_t accuracy = 0;
@@ -160,10 +161,14 @@ protected:
    uint64_t             m_targetId;
    /*! Ptr to a queued action */
    Action::ActionPtr    m_pCurrentAction;
-   /*! Container for status effects */
-   StatusEffect::StatusEffectContainerPtr m_pStatusEffectContainer;
    /*! Invincibility type */
    Common::InvincibilityType m_invincibilityType;
+
+   /*! Status effects */
+   const uint8_t MAX_STATUS_EFFECTS = 30;
+   std::queue< uint8_t > m_statusEffectFreeSlotQueue;
+   std::vector< std::pair< uint8_t, uint32_t> > m_statusEffectList;
+   std::map< uint8_t, StatusEffect::StatusEffectPtr > m_statusEffectMap;
 
 public:
    Actor();
@@ -173,6 +178,30 @@ public:
    virtual void calculateStats() {};
 
    uint32_t getId() const;
+
+   /// Status effect functions 
+   void addStatusEffect( StatusEffect::StatusEffectPtr pEffect );
+   void removeStatusEffect( uint8_t effectSlotId );
+   void removeSingleStatusEffectById( uint32_t id );
+   void updateStatusEffects();
+
+   bool hasStatusEffect( uint32_t id );
+
+   int8_t getStatusEffectFreeSlot();
+   void statusEffectFreeSlot( uint8_t slotId );
+
+   std::map< uint8_t, Core::StatusEffect::StatusEffectPtr > getStatusEffectMap() const;
+
+   void sendStatusEffectUpdate();
+   // add a status effect by id
+   void addStatusEffectById( uint32_t id, int32_t duration, Entity::Actor& pSource, uint16_t param = 0 );
+
+   // add a status effect by id if it doesn't exist
+   void addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Actor& pSource, uint16_t param = 0 );
+
+   // remove a status effect by id
+   void removeSingleStatusEffectFromId( uint32_t id );
+   /// End Status Effect Functions
 
    void setPosition( const Common::FFXIVARR_POSITION3& pos );
    void setPosition( float x, float y, float z );
@@ -303,20 +332,6 @@ public:
    // set the current cell
    void setCell( Cell* pCell );
 
-   // add a status effect
-   void addStatusEffect( StatusEffect::StatusEffectPtr pEffect );
-
-   // add a status effect by id
-   void addStatusEffectById( uint32_t id, int32_t duration, Entity::Actor& pSource, uint16_t param = 0 );
-
-   // add a status effect by id if it doesn't exist
-   void addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Actor& pSource, uint16_t param = 0 );
-
-   // remove a status effect by id
-   void removeSingleStatusEffectFromId( uint32_t id );
-
-   //get the status effect container
-   StatusEffect::StatusEffectContainerPtr getStatusEffectContainer() const;
 
    // TODO: Why did i even declare them publicly here?!
    std::set< ActorPtr >            m_inRangeActors;

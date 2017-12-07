@@ -3,15 +3,16 @@
       <!-- Port the lobby server accepts client connections on -->
       <ListenPort>54994</ListenPort> 
       <AuthPort>54998</AuthPort>
-	  <!-- Ip the lobby server listens on -->
+      <!-- Ip the lobby server listens on -->
       <ListenIp>127.0.0.1</ListenIp>
       <!-- Path of FFXIV dat files -->
       <DataPath>C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv</DataPath>
+      <!-- <DataPath>/opt/sapphire_3_15_0/bin/sqpack</DataPath> -->
       <!-- IP of the lobby server -->
       <LobbyHost>127.0.0.1</LobbyHost>
-	  <!-- IP of the frontier server -->
+      <!-- IP of the frontier server -->
       <FrontierHost>127.0.0.1</FrontierHost>
-	  <!-- Secret used for server auth - you *must* change this for public servers -->
+      <!-- Secret used for server auth - you *must* change this for public servers -->
       <ServerSecret>default</ServerSecret>
      <!-- Web server port -->
      <HttpPort>80</HttpPort>

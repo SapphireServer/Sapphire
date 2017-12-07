@@ -31,8 +31,6 @@
 
 #include "src/servers/Server_Zone/Script/ScriptManager.h"
 
-#include "src/servers/Server_Zone/StatusEffect/StatusEffectContainer.h"
-
 #include "src/servers/Server_Zone/Inventory/Item.h"
 
 #include "src/servers/Server_Zone/Inventory/Inventory.h"
@@ -57,6 +55,7 @@ using namespace Core::Network::Packets::Server;
 
 // player constructor
 Core::Entity::Player::Player() :
+   Actor(),
    m_lastWrite( 0 ),
    m_lastPing( 0 ),
    m_bIsLogin( false ),
@@ -237,12 +236,13 @@ void Core::Entity::Player::calculateStats()
    m_baseStats.mnd =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_mnd ) / 100 ) + tribeInfo.mod_mnd );
    m_baseStats.pie =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_pie ) / 100 ) + tribeInfo.mod_pie );
 
-   m_baseStats.skillSpeed = paramGrowthInfo.base_secondary;
-   m_baseStats.spellSpeed = paramGrowthInfo.base_secondary;
-   m_baseStats.accuracy = paramGrowthInfo.base_secondary;
-   m_baseStats.critHitRate = paramGrowthInfo.base_secondary;
-   m_baseStats.attackPotMagic = paramGrowthInfo.base_secondary;
+   m_baseStats.skillSpeed      = paramGrowthInfo.base_secondary;
+   m_baseStats.spellSpeed      = paramGrowthInfo.base_secondary;
+   m_baseStats.accuracy        = paramGrowthInfo.base_secondary;
+   m_baseStats.critHitRate     = paramGrowthInfo.base_secondary;
+   m_baseStats.attackPotMagic  = paramGrowthInfo.base_secondary;
    m_baseStats.healingPotMagic = paramGrowthInfo.base_secondary;
+   m_baseStats.tenacity        = paramGrowthInfo.base_secondary;
 
    m_baseStats.max_mp = Math::CalcStats::calculateMaxMp( getAsPlayer() );
 
@@ -440,6 +440,9 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
       gcAffPacket.data().gcRank[1] = m_gcRank[1];
       gcAffPacket.data().gcRank[2] = m_gcRank[2];
       queuePacket( gcAffPacket );
+
+      m_itemLevel = getInventory()->calculateEquippedGearItemLevel();
+      sendItemLevel();
    }
 
    ZoneChannelPacket< FFXIVIpcInitZone > initZonePacket( getId() );
@@ -1050,7 +1053,7 @@ void Core::Entity::Player::update( int64_t currTime )
    if( !isAlive() )
       return;
 
-   m_pStatusEffectContainer->update();
+   updateStatusEffects();
 
    m_lastUpdate = currTime;
 
@@ -1581,6 +1584,11 @@ uint8_t Core::Entity::Player::getOpeningSequence() const
 void Core::Entity::Player::setOpeningSequence( uint8_t seq )
 {
    m_openingSequence = seq;
+}
+
+uint16_t Core::Entity::Player::getItemLevel() const
+{
+   return m_itemLevel;
 }
 
 /// Tells client to offset their eorzean time by given timestamp.

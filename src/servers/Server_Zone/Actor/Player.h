@@ -208,6 +208,10 @@ public:
    void unequipItem( Inventory::EquipSlot equipSlotId, ItemPtr pItem );
    /*! equip a weapon, possibly forcing a job change */
    void equipWeapon( ItemPtr pItem );
+   /*! get player ilvl */
+   uint16_t getItemLevel() const;
+   /*! send player ilvl */
+   void sendItemLevel();
    /*! get a const pointer to the inventory object */
    InventoryPtr getInventory() const;
    /*! get the current main hand model */
@@ -599,16 +603,20 @@ private:
 
    uint8_t m_openingSequence;
 
+   uint16_t m_itemLevel;
    InventoryPtr m_pInventory;
+
    std::map< uint32_t, Event::EventPtr > m_eventMap;
    std::map< uint32_t, uint8_t > m_playerIdToSpawnIdMap; // maps player to spawn id
    std::queue< uint8_t > m_freeSpawnIdQueue; // queue with spawn ids free to be assigned
    std::queue< uint8_t > m_freeHateSlotQueue; // queue with "hate slots" free to be assigned
    std::map< uint32_t, uint8_t > m_actorIdTohateSlotMap;
+
    std::map< uint32_t, uint8_t > m_questIdToQuestIdx; // quest mapping, quest id to quest container index
    std::map< uint8_t, uint32_t > m_questIdxToQuestId; // quest mapping, quest container index to questId
    boost::shared_ptr< Common::QuestActive > m_activeQuests[30];
    int16_t m_questTracking[5];
+
    uint8_t m_stateFlags[7];
    uint8_t m_gmRank;
    uint16_t zoneId;

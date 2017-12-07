@@ -855,7 +855,7 @@ struct FFXIVIpcPlayerStats : FFXIVIpcBasePacket<PlayerStats>
    uint32_t unknown;
    uint32_t unknown_1;
    uint32_t unknown_2;
-   uint32_t parry;
+   uint32_t tenacity;
    uint32_t attack;
    uint32_t defense;
    uint32_t accuracy;
@@ -877,7 +877,11 @@ struct FFXIVIpcPlayerStats : FFXIVIpcBasePacket<PlayerStats>
    uint32_t skillSpeed;
    uint32_t spellSpeed1;
    uint32_t spellSpeedMod;
-   uint32_t unknown_6[5];
+   uint32_t unknown_6;
+   uint32_t craftsmanship;
+   uint32_t control;
+   uint32_t gathering;
+   uint32_t perception;
    uint32_t resistanceSlow;
    uint32_t resistanceSilence;
    uint32_t resistanceBlind;
@@ -886,7 +890,7 @@ struct FFXIVIpcPlayerStats : FFXIVIpcBasePacket<PlayerStats>
    uint32_t resistanceSleep;
    uint32_t resistanceBind;
    uint32_t resistanceHeavy;
-   uint32_t unknown_7[9];
+   uint32_t unknown_7[9]; // possibly level sync stats.
 };
 
 /**
@@ -921,10 +925,11 @@ struct FFXIVIpcPlayerStateFlags : FFXIVIpcBasePacket<PlayerStateFlags>
 struct FFXIVIpcPlayerClassInfo : FFXIVIpcBasePacket<PlayerClassInfo>
 {
    uint16_t classId;
-   uint16_t unknown;
-   uint16_t level;
-   uint16_t level1;
-   uint8_t unknownFields[48];
+   uint8_t unknown;
+   uint8_t isSpecialist;
+   uint16_t level;   // Locks actions, equipment, prob more
+   uint16_t level1;  // Locks roles, prob more
+   uint32_t roleActions[10];
 };
 
 /**

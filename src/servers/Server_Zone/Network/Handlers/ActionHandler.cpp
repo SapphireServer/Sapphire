@@ -110,7 +110,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
         case 0x68: // Remove status (clicking it off)
         {
            // todo: check if status can be removed by client from exd
-           pPlayer->removeSingleStatusEffectFromId( static_cast< uint32_t >( param1 ) );
+           pPlayer->removeSingleStatusEffectById( static_cast< uint32_t >( param1 ) );
            break;
         }
         case 0x69: // Cancel cast
@@ -228,10 +228,15 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
             }
             break;
         }
+        case 0x1B5: // Dye item
+        {
+           break;
+        }
         default:
         {
            g_log.debug( "[" + std::to_string( m_pSession->getId() ) + "] Unhandled action: " +
               boost::str( boost::format( "%|04X|" ) % (uint32_t) ( commandId & 0xFFFF ) ) );
+           break;
         }
     }
 }

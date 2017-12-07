@@ -13,7 +13,7 @@ using InventoryMap = std::map< uint16_t, ItemContainerPtr >;
 class Inventory
 {
 public:
-   Inventory( Entity::PlayerPtr pOwner );
+   Inventory( Entity::Player* pOwner );
    ~Inventory();
 
    enum ContainerType : uint16_t
@@ -153,6 +153,10 @@ public:
 
    bool updateContainer( uint16_t containerId, uint8_t slotId, ItemPtr pItem );
 
+   /*! heck if weapon category qualifies the weapon as onehanded */
+   bool isOneHandedWeapon( Common::ItemUICategory weaponCategory );
+   /*! calculate and return player ilvl based off equipped gear */
+   uint16_t calculateEquippedGearItemLevel();
    /*! return the current amount of currency of type */
    uint32_t getCurrency( CurrencyType type );
    /*! add amount to the current of type */
@@ -191,7 +195,7 @@ public:
 
 
 private:
-   Entity::PlayerPtr m_pOwner;
+   Entity::Player* m_pOwner;
    InventoryMap m_inventoryMap;
 };
 
