@@ -30,6 +30,7 @@ Core::Item::Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t mo
    m_magicalDmg = itemInfo->magical_damage;
    m_weaponDmg = ( m_physicalDmg != 0 ) ? m_physicalDmg : m_magicalDmg;
    m_autoAttackDmg = static_cast< float >( m_weaponDmg * m_delayMs ) / 3000;
+   m_itemLevel = itemInfo->item_level;
 }
 
 Core::Item::~Item()
@@ -57,9 +58,19 @@ uint16_t Core::Item::getMagicalDmg() const
    return m_magicalDmg;
 }
 
+uint16_t Core::Item::getItemLevel() const
+{
+   return m_itemLevel;
+}
+
 uint16_t Core::Item::getWeaponDmg() const
 {
    return m_weaponDmg;
+}
+
+bool Core::Item::isWeapon() const
+{
+   return (m_weaponDmg != 0);
 }
 
 uint32_t Core::Item::getId() const
