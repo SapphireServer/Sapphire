@@ -840,7 +840,7 @@ uint64_t Core::Entity::Player::getModelSystemWeapon() const
 
 int8_t Core::Entity::Player::getAetheryteMaskAt( uint8_t index ) const
 {
-   if( index > 11 )
+   if( index > sizeof( m_aetheryte ) )
       return 0;
    return m_aetheryte[index];
 }
@@ -953,10 +953,8 @@ bool Core::Entity::Player::actionHasCastTime( uint32_t actionId ) //TODO: Add lo
    if( actionInfoPtr->is_instant )
       return false;
 
-   if( actionInfoPtr->cast_time == 0 )
-      return false;
+   return actionInfoPtr->cast_time != 0;
 
-   return true;
 }
 
 bool Core::Entity::Player::hasStateFlag( Core::Common::PlayerStateFlag flag ) const
@@ -1075,7 +1073,7 @@ void Core::Entity::Player::update( int64_t currTime )
 
 
                if( Math::Util::distance(getPos().x, getPos().y, getPos().z,
-                  actor->getPos().x, actor->getPos().y, actor->getPos().z) <= range )
+                   actor->getPos().x, actor->getPos().y, actor->getPos().z) <= range )
                {
 
                   if( ( currTime - m_lastAttack ) > mainWeap->getDelay() )
@@ -1136,57 +1134,57 @@ uint8_t Core::Entity::Player::getHomepoint() const
    return m_homePoint;
 }
 
-uint16_t * Core::Entity::Player::getClassArray()
+uint16_t* Core::Entity::Player::getClassArray()
 {
    return m_classArray;
 }
 
-const uint16_t * Core::Entity::Player::getClassArray() const
+const uint16_t* Core::Entity::Player::getClassArray() const
 {
    return m_classArray;
 }
 
-const uint8_t * Core::Entity::Player::getLookArray() const
+const uint8_t* Core::Entity::Player::getLookArray() const
 {
    return m_customize;
 }
 
-const uint32_t * Core::Entity::Player::getModelArray() const
+const uint32_t* Core::Entity::Player::getModelArray() const
 {
    return m_modelEquip;
 }
 
-uint32_t * Core::Entity::Player::getExpArray()
+uint32_t* Core::Entity::Player::getExpArray()
 {
    return m_expArray;
 }
 
-const uint32_t * Core::Entity::Player::getExpArray() const
+const uint32_t* Core::Entity::Player::getExpArray() const
 {
    return m_expArray;
 }
 
-uint8_t * Core::Entity::Player::getHowToArray()
+uint8_t* Core::Entity::Player::getHowToArray()
 {
    return m_howTo;
 }
 
-const uint8_t * Core::Entity::Player::getHowToArray() const
+const uint8_t* Core::Entity::Player::getHowToArray() const
 {
    return m_howTo;
 }
 
-const uint8_t * Core::Entity::Player::getUnlockBitmask() const
+const uint8_t* Core::Entity::Player::getUnlockBitmask() const
 {
    return m_unlocks;
 }
 
-const uint8_t * Core::Entity::Player::getOrchestrionBitmask() const
+const uint8_t* Core::Entity::Player::getOrchestrionBitmask() const
 {
    return m_orchestrion;
 }
 
-const uint8_t * Core::Entity::Player::getMountGuideBitmask() const
+const uint8_t* Core::Entity::Player::getMountGuideBitmask() const
 {
    return m_mountGuide;
 }
@@ -1206,7 +1204,7 @@ uint8_t Core::Entity::Player::getGc() const
    return m_gc;
 }
 
-const uint8_t * Core::Entity::Player::getGcRankArray() const
+const uint8_t* Core::Entity::Player::getGcRankArray() const
 {
    return m_gcRank;
 }
