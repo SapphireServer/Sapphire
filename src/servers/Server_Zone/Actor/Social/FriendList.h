@@ -32,23 +32,17 @@ public:
 
    ~FriendList() {};
 
-   virtual Core::Network::Packets::GamePacketPtr addMember( PlayerPtr pSender, PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
-   virtual Core::Network::Packets::GamePacketPtr inviteMember( PlayerPtr pSender, PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
-   virtual Core::Network::Packets::GamePacketPtr removeMember( PlayerPtr pSender, PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
-   virtual Core::Network::Packets::GamePacketPtr kickMember( PlayerPtr pSender, PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
-   virtual void sendPacketToMembers( Core::Network::Packets::GamePacketPtr pPacket, bool invitesToo = false );
-
-   virtual void load();
+   /*virtual void load();
    virtual void update();
-   virtual void disband();
+   virtual void disband();*/
 
    bool isParty() const;
    bool isFriendList() const;
    bool isFreeCompany() const;
    bool isLinkshell() const;
    bool isFreeCompanyPetition() const;
-   bool isBlacklist() const;
-   bool isContentGroup() const;
+   /*bool isBlacklist() const;
+   bool isContentGroup() const;*/
 
    std::vector< Core::Network::Packets::Server::PlayerEntry > getFriendListEntries( uint16_t entryAmount );
 

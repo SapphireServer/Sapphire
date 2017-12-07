@@ -10,6 +10,7 @@
 #include <Server_Zone/ServerZone.h>
 #include <Server_Common/Network/GamePacketNew.h>
 #include "FriendList.h"
+#include "Group.h"
 
 extern Core::ServerZone g_serverZone;
 extern Core::Logger g_log;
