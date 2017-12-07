@@ -52,8 +52,6 @@ extern Core::ZoneMgr g_zoneMgr;
 extern Core::Data::ExdData g_exdData;
 extern Core::Scripting::ScriptManager g_scriptMgr;
 
-extern Core::Entity::Social::FriendListMgr g_friendListMgr;
-
 using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
@@ -446,7 +444,10 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
       gcAffPacket.data().gcRank[2] = m_gcRank[2];
       queuePacket( gcAffPacket );
 
-      m_friendsList = g_friendListMgr.getPlayerFriendsList( getId() );
+      //todo: change this to extern, global obj
+      Core::Entity::Social::FriendListMgr fListMgr = {};
+
+      m_friendsList = fListMgr.getPlayerFriendsList( getId() );
 
       m_itemLevel = getInventory()->calculateEquippedGearItemLevel();
       sendItemLevel();

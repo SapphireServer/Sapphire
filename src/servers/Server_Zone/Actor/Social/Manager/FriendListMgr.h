@@ -10,6 +10,7 @@
 #include <Server_Zone/Actor/Social/FriendList.h>
 
 #include <Server_Zone/Actor/Social/Manager/GroupMgr.h>
+#include <Server_Zone/Forwards.h>
 
 namespace Core {
 namespace Entity {
@@ -19,6 +20,9 @@ class FriendListMgr
 {
 public:
    FriendListMgr();
+   ~FriendListMgr();
+
+   bool init();
 
    FriendListPtr getPlayerFriendsList( uint32_t playerId );
 

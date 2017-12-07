@@ -53,6 +53,7 @@ Core::Network::Packets::GamePacketPtr Group::addMember( Core::Entity::PlayerPtr 
       member.inviterId = senderId;
       member.role = 0;
       member.contentId = recipientId;
+      member.name = pSender->getName();
       m_members.emplace( recipientId, member );
    }
    else
@@ -85,17 +86,17 @@ Core::Network::Packets::Server::PlayerEntry Group::generatePlayerEntry( GroupMem
    // We check if player is online. If so, we can pull more data - otherwise just name
    // todo: set as offline in one of the unknown values, if session does not exist
 
-   auto pSession = g_serverZone.getSession( groupMember.name ); // todo: aa i don't like this. maybe just store their ID instead of contentID???
-
+   auto pSession = g_serverZone.getSession( groupMember.contentId ); // todo: aa i don't like this. maybe just store their ID instead of contentID???
+   entry.bytes[3] = 0x80;
+   entry.bytes[4] = 0x02;
+   entry.bytes[6] = 0x3B;
+   entry.bytes[11] = 0x10;
    if( pSession )
    {
       auto pPlayer = pSession->getPlayer();
-
+      entry.contentId = pPlayer->getContentId();
       entry.bytes[2] = pPlayer->getCurrentZone()->getId();
-      entry.bytes[3] = 0x80;
-      entry.bytes[4] = 0x02;
-      entry.bytes[6] = 0x3B;
-      entry.bytes[11] = 0x10;
+      
       entry.classJob = pPlayer->getClass();
       
       entry.level = pPlayer->getLevel();

@@ -454,7 +454,7 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
 
       ZoneChannelPacket< FFXIVIpcSocialList > listPacket( pPlayer->getId() );
       listPacket.data().type = 0x0B;
-      listPacket.data().sequence = 10;
+      listPacket.data().sequence = count;
       memset( listPacket.data().entries, 0, sizeof( listPacket.data().entries ) );
 
       uint16_t i = 0;

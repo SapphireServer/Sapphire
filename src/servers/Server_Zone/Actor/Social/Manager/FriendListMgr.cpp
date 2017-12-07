@@ -11,9 +11,19 @@ extern Core::Logger g_log;
 
 using namespace Core::Entity;
 
-Social::FriendListMgr::FriendListMgr()
+Core::Entity::Social::FriendListMgr::FriendListMgr()
 {
-   
+
+}
+
+Core::Entity::Social::FriendListMgr::~FriendListMgr()
+{
+
+}
+
+bool Social::FriendListMgr::init()
+{
+   return true;
 }
 
 Social::FriendListPtr Social::FriendListMgr::getPlayerFriendsList( uint32_t playerId )
