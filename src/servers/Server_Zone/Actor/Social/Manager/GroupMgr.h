@@ -6,18 +6,16 @@
 
 #include <boost/enable_shared_from_this.hpp>
 #include <Server_Zone/Forwards.h>
-#include <Server_Zone/Actor/Group/Group.h>
+#include <Server_Zone/Actor/Social/Group.h>
 
 namespace Core {
 namespace Entity {
-namespace Group {
+namespace Social {
 
 class GroupMgr : public boost::enable_shared_from_this< GroupMgr >
 {
 public:
-   GroupMgr( GroupType type, uint32_t maxEntries ) :
-      m_type( type ), m_maxEntries( maxEntries ) {};
-   ~GroupMgr() {};
+   GroupMgr();
 
    GroupPtr findGroupByInviteIdForPlayer( uint64_t playerId ) const;
    GroupPtr findGroupById( uint64_t groupId ) const;
@@ -28,7 +26,7 @@ private:
    uint32_t m_maxEntries{ 0xFFFFFFFF };
    std::map< uint64_t, GroupPtr > m_groups;
    std::map< uint64_t, uint64_t > m_invites; // < recipient, groupid >
-   virtual GroupPtr createGroup( PlayerPtr pOwner ) = 0;
+   //virtual GroupPtr createGroup( PlayerPtr pOwner ) = 0;
 
    /*
    friend virtual Core::Network::Packets::GamePacketPtr Core::Entity::Group::Group::addMember( PlayerPtr pSender, PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );

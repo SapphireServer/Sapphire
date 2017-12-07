@@ -13,7 +13,7 @@
 
 extern Core::ServerZone g_serverZone;
 
-using namespace Core::Entity::Group;
+using namespace Core::Entity::Social;
 
 // todo: i fuckin have no fuckin clue how to use group manager classes, why not just have a map of <id, group>?
 // todo: invite map in g_serverZone.getGroupMgr(GroupType) and look up

@@ -12,7 +12,7 @@
 
 namespace Core {
 namespace Entity {
-namespace Group {
+namespace Social {
 
 class Group;
 using GroupPtr = boost::shared_ptr< Group >;

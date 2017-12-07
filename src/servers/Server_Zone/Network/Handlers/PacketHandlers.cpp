@@ -467,7 +467,7 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
             break;
 
          g_log.debug( "aaa" + std::to_string( i ) + ": " + member.second.name );
-         listPacket.data().entries[i] = Core::Entity::Group::Group::generatePlayerEntry( member.second );
+         listPacket.data().entries[i] = Core::Entity::Social::Group::generatePlayerEntry( member.second );
          i++;
       }
 

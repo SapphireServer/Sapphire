@@ -5,7 +5,8 @@
 
 #include <src/servers/Server_Common/Common.h>
 #include <src/servers/Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
-#include <src/servers/Server_Zone/Actor/Group/FriendList.h>
+#include <src/servers/Server_Zone/Actor/Social/FriendList.h>
+#include <src/servers/Server_Zone/Actor/Social/Manager/FriendListMgr.h>
 
 #include "Actor.h"
 #include "src/servers/Server_Zone/Inventory/Inventory.h"
@@ -359,7 +360,7 @@ public:
    // Social-based
    //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-   Group::FriendListPtr getFriendsList() const;
+   Social::FriendListPtr getFriendsList() const;
 
 
    // Aetheryte / Action / Attribute bitmasks
@@ -623,7 +624,7 @@ private:
 
    // Social-based
 
-   Group::FriendListPtr m_friendsList;
+   Social::FriendListPtr m_friendsList;
 
    uint8_t m_equipDisplayFlags;
 

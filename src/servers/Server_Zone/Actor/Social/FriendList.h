@@ -5,7 +5,7 @@
 #include <Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Server_Common/Network/GamePacketNew.h>
 #include <Server_Common/Forwards.h>
-#include <Server_Zone/Actor/Group/Group.h>
+#include <Server_Zone/Actor/Social/Group.h>
 #include <Server_Zone/Forwards.h>
 #include <boost/enable_shared_from_this.hpp>
 #include <set>
@@ -17,7 +17,7 @@ using namespace Core::Network::Packets::Server;
 
 namespace Core {
 namespace Entity {
-namespace Group {
+namespace Social {
 
 class FriendList;
 using FriendListPtr = boost::shared_ptr< FriendList >;
@@ -28,7 +28,7 @@ class FriendList : public Group
 public:
    FriendList( uint64_t id, uint64_t ownerId, uint32_t maxCapacity, time_point createTime ) :
       Group( id, ownerId, maxCapacity, createTime ),
-      m_id( id ), m_ownerId( m_ownerId ), m_maxCapacity( maxCapacity ), m_createTime( createTime ) {};
+      m_id( id ), m_ownerId( ownerId ), m_maxCapacity( maxCapacity ), m_createTime( createTime ) {};
 
    ~FriendList() {};
 
@@ -49,8 +49,6 @@ public:
    bool isFreeCompanyPetition() const;
    bool isBlacklist() const;
    bool isContentGroup() const;
-
-   Core::Network::Packets::ZoneChannelPacket< FFXIVIpcSocialList > generateFriendsListPacket( PlayerPtr pPlayer );
 
    std::vector< Core::Network::Packets::Server::PlayerEntry > getFriendListEntries( uint16_t entryAmount );
 

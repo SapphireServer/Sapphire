@@ -1,7 +1,14 @@
 #include "../Group.h"
 #include "GroupMgr.h"
 
-Core::Entity::Group::GroupPtr Core::Entity::Group::GroupMgr::findGroupByInviteIdForPlayer( uint64_t playerId ) const
+using namespace Core::Entity;
+
+Social::GroupMgr::GroupMgr()
+{
+
+}
+
+Social::GroupPtr Social::GroupMgr::findGroupByInviteIdForPlayer( uint64_t playerId ) const
 {
    auto it = m_invites.find( playerId );
    if( it != m_invites.end() )
@@ -11,7 +18,7 @@ Core::Entity::Group::GroupPtr Core::Entity::Group::GroupMgr::findGroupByInviteId
    return nullptr;
 }
 
-Core::Entity::Group::GroupPtr Core::Entity::Group::GroupMgr::findGroupById( uint64_t groupId ) const
+Social::GroupPtr Core::Entity::Social::GroupMgr::findGroupById( uint64_t groupId ) const
 {
    auto it = m_groups.find( groupId );
    if( it != m_groups.end() )

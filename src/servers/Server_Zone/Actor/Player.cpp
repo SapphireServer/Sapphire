@@ -29,6 +29,9 @@
 #include "src/servers/Server_Zone/Network/PacketWrappers/PlayerStateFlagsPacket.h"
 #include "src/servers/Server_Zone/Network/PacketWrappers/PlayerSpawnPacket.h"
 
+#include "src/servers/Server_Zone/Actor/Social/FriendList.h"
+#include "src/servers/Server_Zone/Actor/Social/Manager/FriendListMgr.h"
+
 #include "src/servers/Server_Zone/Script/ScriptManager.h"
 
 #include "src/servers/Server_Zone/Inventory/Item.h"
@@ -48,6 +51,8 @@ extern Core::ServerZone g_serverZone;
 extern Core::ZoneMgr g_zoneMgr;
 extern Core::Data::ExdData g_exdData;
 extern Core::Scripting::ScriptManager g_scriptMgr;
+
+extern Core::Entity::Social::FriendListMgr g_friendListMgr;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -300,7 +305,7 @@ void Core::Entity::Player::sendStats()
    queuePacket( statPacket );
 }
 
-Group::FriendListPtr Core::Entity::Player::getFriendsList() const
+Social::FriendListPtr Core::Entity::Player::getFriendsList() const
 {
    return m_friendsList;
 }
@@ -440,6 +445,8 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
       gcAffPacket.data().gcRank[1] = m_gcRank[1];
       gcAffPacket.data().gcRank[2] = m_gcRank[2];
       queuePacket( gcAffPacket );
+
+      m_friendsList = g_friendListMgr.getPlayerFriendsList( getId() );
 
       m_itemLevel = getInventory()->calculateEquippedGearItemLevel();
       sendItemLevel();
