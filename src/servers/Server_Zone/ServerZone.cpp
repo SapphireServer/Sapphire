@@ -61,7 +61,7 @@ Core::XMLConfigPtr Core::ServerZone::getConfig() const
 
 size_t Core::ServerZone::getSessionCount() const
 {
-   return m_sessionMap.size();
+   return m_sessionMapById.size();
 }
 
 bool Core::ServerZone::registerBnpcTemplate( std::string templateName, uint32_t bnpcBaseId, 
@@ -263,7 +263,7 @@ void Core::ServerZone::mainLoop()
       auto currTime = static_cast< uint32_t >( time( nullptr ) );
 
       lock_guard< std::mutex > lock( this->m_sessionMutex );
-      for( auto sessionIt : this->m_sessionMap )
+      for( auto sessionIt : this->m_sessionMapById )
       {
          auto session = sessionIt.second;
          if( session && session->getPlayer() )
@@ -284,8 +284,8 @@ void Core::ServerZone::mainLoop()
       }
 
 
-      auto it = this->m_sessionMap.begin();
-      for( ; it != this->m_sessionMap.end(); )
+      auto it = this->m_sessionMapById.begin();
+      for( ; it != this->m_sessionMapById.end(); )
       {
          uint32_t diff = currTime - it->second->getLastDataTime();
 
@@ -298,7 +298,8 @@ void Core::ServerZone::mainLoop()
             // if( it->second.unique() )
             {
                g_log.info("[" + std::to_string(it->second->getId() ) + "] Session removal" );
-               it = this->m_sessionMap.erase( it );
+               it = this->m_sessionMapById.erase( it );
+               removeSession( pPlayer->getName() );
                continue;
             }
          }
@@ -310,7 +311,8 @@ void Core::ServerZone::mainLoop()
             it->second->close();
             // if( it->second.unique() )
             {
-               it = this->m_sessionMap.erase(it );
+               it = this->m_sessionMapById.erase( it );
+               removeSession( pPlayer->getName() );
             }
          }
          else
@@ -329,9 +331,9 @@ bool Core::ServerZone::createSession( uint32_t sessionId )
 
    const std::string session_id_str = std::to_string( sessionId );
 
-   auto it = m_sessionMap.find( sessionId );
+   auto it = m_sessionMapById.find( sessionId );
 
-   if( it != m_sessionMap.end() )
+   if( it != m_sessionMapById.end() )
    {
       g_log.error( "[" + session_id_str + "] Error creating session" );
       return false;
@@ -340,7 +342,7 @@ bool Core::ServerZone::createSession( uint32_t sessionId )
    g_log.info( "[" + session_id_str + "] Creating new session" );
 
    boost::shared_ptr<Session> newSession( new Session( sessionId ) );
-   m_sessionMap[sessionId] = newSession;
+   m_sessionMapById[sessionId] = newSession;
 
    if( !newSession->loadPlayer() )
    {
@@ -348,7 +350,7 @@ bool Core::ServerZone::createSession( uint32_t sessionId )
       return false;
    }
 
-   m_playerSessionMap[newSession->getPlayer()->getName()] = newSession;
+   m_sessionMapByName[newSession->getPlayer()->getName()] = newSession;
 
    return true;
 
@@ -356,15 +358,15 @@ bool Core::ServerZone::createSession( uint32_t sessionId )
 
 void Core::ServerZone::removeSession( uint32_t sessionId )
 {
-   m_sessionMap.erase( sessionId );
+   m_sessionMapById.erase( sessionId );
 }
 
 void Core::ServerZone::updateSession( uint32_t id )
 {
    std::lock_guard< std::mutex > lock( m_sessionMutex );
-   auto it = m_sessionMap.find( id );
+   auto it = m_sessionMapById.find( id );
 
-   if( it != m_sessionMap.end() )
+   if( it != m_sessionMapById.end() )
       it->second->loadPlayer();
 }
 
@@ -372,9 +374,9 @@ Core::SessionPtr Core::ServerZone::getSession( uint32_t id )
 {
    //std::lock_guard<std::mutex> lock( m_sessionMutex );
 
-   auto it = m_sessionMap.find( id );
+   auto it = m_sessionMapById.find( id );
 
-   if( it != m_sessionMap.end() )
+   if( it != m_sessionMapById.end() )
       return ( it->second );
 
    return nullptr;
@@ -384,9 +386,9 @@ Core::SessionPtr Core::ServerZone::getSession( std::string playerName )
 {
    //std::lock_guard<std::mutex> lock( m_sessionMutex );
 
-   auto it = m_playerSessionMap.find( playerName );
+   auto it = m_sessionMapByName.find( playerName );
 
-   if (it != m_playerSessionMap.end())
+   if (it != m_sessionMapByName.end())
       return (it->second);
 
    return nullptr;
@@ -394,15 +396,15 @@ Core::SessionPtr Core::ServerZone::getSession( std::string playerName )
 
 void Core::ServerZone::removeSession( std::string playerName )
 {
-   m_playerSessionMap.erase( playerName );
+   m_sessionMapByName.erase( playerName );
 }
 
 void Core::ServerZone::updateSession( std::string playerName )
 {
    std::lock_guard< std::mutex > lock( m_sessionMutex );
-   auto it = m_playerSessionMap.find( playerName );
+   auto it = m_sessionMapByName.find( playerName );
 
-   if( it != m_playerSessionMap.end() )
+   if( it != m_sessionMapByName.end() )
       it->second->loadPlayer();
 }
 

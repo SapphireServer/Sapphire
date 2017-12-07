@@ -61,8 +61,8 @@ namespace Core {
 
       std::mutex m_sessionMutex;
 
-      std::map< uint32_t, SessionPtr > m_sessionMap;
-      std::map< std::string, SessionPtr > m_playerSessionMap;
+      std::map< uint32_t, SessionPtr > m_sessionMapById;
+      std::map< std::string, SessionPtr > m_sessionMapByName;
 
       std::map< uint32_t, uint32_t > m_zones;
 
