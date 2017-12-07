@@ -113,7 +113,8 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    {
       targetActor = pPlayer;
    }
-   else {
+   else
+   {
       auto inRange = pPlayer->getInRangeActors();
       for( auto actor : inRange )
       {
