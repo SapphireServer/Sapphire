@@ -76,7 +76,7 @@ void Core::Action::ActionCast::onFinish()
                                          0x219, m_id, m_id, m_id, m_id );
    m_pSource->sendToInRangeSet( control, true );*/
 
-   g_scriptMgr.onCastFinish( pPlayer, m_pTarget, m_id );
+   g_scriptMgr.onCastFinish( *pPlayer, m_pTarget, m_id );
 }
 
 void Core::Action::ActionCast::onInterrupt()

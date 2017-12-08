@@ -50,15 +50,15 @@ using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
 void Core::Network::GameConnection::fcInfoReqHandler( const Packets::GamePacket& inPacket,
-                                                      Entity::PlayerPtr pPlayer )
+                                                      Entity::Player& player )
 {
-   GamePacketPtr pPe( new GamePacket( 0xDD, 0x78, pPlayer->getId(), pPlayer->getId() ) );
+   GamePacketPtr pPe( new GamePacket( 0xDD, 0x78, player.getId(), player.getId() ) );
    pPe->setValAt< uint8_t >( 0x48, 0x01 );
    queueOutPacket( pPe );
 }
 
 void Core::Network::GameConnection::setSearchInfoHandler( const Packets::GamePacket& inPacket,
-                                                          Entity::PlayerPtr pPlayer )
+                                                          Entity::Player& player )
 {
    uint32_t inval = inPacket.getValAt< uint32_t >( 0x20 );
    uint32_t inval1 = inPacket.getValAt< uint32_t >( 0x24 );
@@ -66,54 +66,53 @@ void Core::Network::GameConnection::setSearchInfoHandler( const Packets::GamePac
 
    uint8_t selectRegion = inPacket.getValAt< uint8_t >( 0x31 );
 
-   pPlayer->setSearchInfo( selectRegion, 0, inPacket.getStringAt( 0x32 ) );
+   player.setSearchInfo( selectRegion, 0, inPacket.getStringAt( 0x32 ) );
 
-   pPlayer->setOnlineStatusMask( status );
+   player.setOnlineStatusMask( status );
 
-   if( pPlayer->isNewAdventurer() && !( inval & 0x01000000 ) )
+   if( player.isNewAdventurer() && !( inval & 0x01000000 ) )
       // mark player as not new adventurer anymore
-      pPlayer->setNewAdventurer( false );
+      player.setNewAdventurer( false );
    else if( inval & 0x01000000 )
       // mark player as new adventurer
-      pPlayer->setNewAdventurer( true );
+      player.setNewAdventurer( true );
 
-   ZoneChannelPacket< FFXIVIpcSetOnlineStatus > statusPacket( pPlayer->getId() );
+   ZoneChannelPacket< FFXIVIpcSetOnlineStatus > statusPacket( player.getId() );
    statusPacket.data().onlineStatusFlags = status;
    queueOutPacket( statusPacket );
 
-   ZoneChannelPacket< FFXIVIpcSetSearchInfo > searchInfoPacket( pPlayer->getId() );
+   ZoneChannelPacket< FFXIVIpcSetSearchInfo > searchInfoPacket( player.getId() );
    searchInfoPacket.data().onlineStatusFlags = status;
-   searchInfoPacket.data().selectRegion = pPlayer->getSearchSelectRegion();
-   strcpy( searchInfoPacket.data().searchMessage, pPlayer->getSearchMessage() );
+   searchInfoPacket.data().selectRegion = player.getSearchSelectRegion();
+   strcpy( searchInfoPacket.data().searchMessage, player.getSearchMessage() );
    queueOutPacket( searchInfoPacket );
 
-   pPlayer->sendToInRangeSet( ActorControlPacket142( pPlayer->getId(), SetStatusIcon,
-                                                     static_cast< uint8_t >( pPlayer->getOnlineStatus() ) ),
-                              true );
+   player.sendToInRangeSet( ActorControlPacket142( player.getId(), SetStatusIcon,
+                                                   static_cast< uint8_t >( player.getOnlineStatus() ) ), true );
 }
 
 void Core::Network::GameConnection::reqSearchInfoHandler( const Packets::GamePacket& inPacket,
-                                                          Entity::PlayerPtr pPlayer )
+                                                          Entity::Player& player )
 {
-   ZoneChannelPacket< FFXIVIpcInitSearchInfo > searchInfoPacket( pPlayer->getId() );
-   searchInfoPacket.data().onlineStatusFlags = pPlayer->getOnlineStatusMask();
-   searchInfoPacket.data().selectRegion = pPlayer->getSearchSelectRegion();
-   strcpy( searchInfoPacket.data().searchMessage, pPlayer->getSearchMessage() );
+   ZoneChannelPacket< FFXIVIpcInitSearchInfo > searchInfoPacket( player.getId() );
+   searchInfoPacket.data().onlineStatusFlags = player.getOnlineStatusMask();
+   searchInfoPacket.data().selectRegion = player.getSearchSelectRegion();
+   strcpy( searchInfoPacket.data().searchMessage, player.getSearchMessage() );
    queueOutPacket( searchInfoPacket );
 }
 
 void Core::Network::GameConnection::linkshellListHandler( const Packets::GamePacket& inPacket,
-                                                          Entity::PlayerPtr pPlayer )
+                                                          Entity::Player& player )
 {
-   ZoneChannelPacket< FFXIVIpcLinkshellList > linkshellListPacket( pPlayer->getId() );
+   ZoneChannelPacket< FFXIVIpcLinkshellList > linkshellListPacket( player.getId() );
    queueOutPacket( linkshellListPacket );
 }
 
 void Core::Network::GameConnection::updatePositionHandler( const Packets::GamePacket& inPacket,
-                                                           Entity::PlayerPtr pPlayer )
+                                                           Entity::Player& player )
 {
    // if the player is marked for zoning we no longer want to update his pos
-   if( pPlayer->isMarkedForZoning() )
+   if( player.isMarkedForZoning() )
       return;
 
    struct testMov
@@ -178,23 +177,23 @@ void Core::Network::GameConnection::updatePositionHandler( const Packets::GamePa
    //pInPacket->debugPrint();
 
    bool bPosChanged = false;
-   if( ( pPlayer->getPos().x != inPacket.getValAt< float >( 0x2c ) ) ||
-       ( pPlayer->getPos().y != inPacket.getValAt< float >( 0x30 ) ) ||
-       ( pPlayer->getPos().z != inPacket.getValAt< float >( 0x34 ) ) )
+   if( ( player.getPos().x != inPacket.getValAt< float >( 0x2c ) ) ||
+       ( player.getPos().y != inPacket.getValAt< float >( 0x30 ) ) ||
+       ( player.getPos().z != inPacket.getValAt< float >( 0x34 ) ) )
       bPosChanged = true;
-   if( !bPosChanged  && pPlayer->getRotation() == inPacket.getValAt< float >( 0x20 ) )
+   if( !bPosChanged  && player.getRotation() == inPacket.getValAt< float >( 0x20 ) )
       return;
 
-   pPlayer->setRotation( inPacket.getValAt< float >( 0x20 ) );
-   pPlayer->setPosition( inPacket.getValAt< float >( 0x2c ),
-                         inPacket.getValAt< float >( 0x30 ),
-                         inPacket.getValAt< float >( 0x34 ) );
+   player.setRotation( inPacket.getValAt< float >( 0x20 ) );
+   player.setPosition( inPacket.getValAt< float >( 0x2c ),
+                       inPacket.getValAt< float >( 0x30 ),
+                       inPacket.getValAt< float >( 0x34 ) );
 
-   if( ( pPlayer->getCurrentAction() != nullptr ) && bPosChanged )
-      pPlayer->getCurrentAction()->setInterrupted();
+   if( ( player.getCurrentAction() != nullptr ) && bPosChanged )
+      player.getCurrentAction()->setInterrupted();
 
    // if no one is in range, don't bother trying to send a position update
-   if( !pPlayer->hasInRangeActor() )
+   if( !player.hasInRangeActor() )
       return;
 
    uint8_t unk = inPacket.getValAt< uint8_t >( 0x29 );
@@ -278,26 +277,26 @@ void Core::Network::GameConnection::updatePositionHandler( const Packets::GamePa
    }
    }
 
-   MoveActorPacket movePacket( pPlayer, unk1, unk2, unk3, unk4 );
-   pPlayer->sendToInRangeSet( movePacket );
+   MoveActorPacket movePacket( player, unk1, unk2, unk3, unk4 );
+   player.sendToInRangeSet( movePacket );
 
 }
 
 void Core::Network::GameConnection::reqEquipDisplayFlagsHandler( const Packets::GamePacket& inPacket,
-                                                     Entity::PlayerPtr pPlayer )
+                                                                 Entity::Player& player )
 {
-   g_log.info( "[" + std::to_string( pPlayer->getId() ) + "] Setting EquipDisplayFlags to " + std::to_string( inPacket.getValAt< uint8_t >( 0x20 ) ) );
-   pPlayer->setEquipDisplayFlags( inPacket.getValAt< uint8_t >( 0x20 ) );
+   g_log.info( "[" + std::to_string( player.getId() ) + "] Setting EquipDisplayFlags to " + std::to_string( inPacket.getValAt< uint8_t >( 0x20 ) ) );
+   player.setEquipDisplayFlags( inPacket.getValAt< uint8_t >( 0x20 ) );
 }
 
 void Core::Network::GameConnection::zoneLineHandler( const Packets::GamePacket& inPacket,
-                                                     Entity::PlayerPtr pPlayer )
+                                                     Entity::Player& player )
 {
    uint32_t zoneLineId = inPacket.getValAt< uint32_t >( 0x20 );
 
-   pPlayer->sendDebug( "Walking ZoneLine " + std::to_string( zoneLineId ) );
+   player.sendDebug( "Walking ZoneLine " + std::to_string( zoneLineId ) );
 
-   auto pZone = pPlayer->getCurrentZone();
+   auto pZone = player.getCurrentZone();
 
    auto pLine = g_zoneMgr.getZonePosition( zoneLineId );
 
@@ -307,34 +306,34 @@ void Core::Network::GameConnection::zoneLineHandler( const Packets::GamePacket& 
 
    if( pLine != nullptr )
    {
-      pPlayer->sendDebug( "ZoneLine " + std::to_string( zoneLineId ) + " found." );
+      player.sendDebug( "ZoneLine " + std::to_string( zoneLineId ) + " found." );
       targetPos = pLine->getTargetPosition();
       targetZone = pLine->getTargetZoneId();
       rotation = pLine->getTargetRotation();
 
-      ZoneChannelPacket< FFXIVIpcPrepareZoning > preparePacket( pPlayer->getId() );
+      ZoneChannelPacket< FFXIVIpcPrepareZoning > preparePacket( player.getId() );
       preparePacket.data().targetZone = targetZone;
 
       //ActorControlPacket143 controlPacket( pPlayer, ActorControlType::DespawnZoneScreenMsg,
-      //                                     0x03, pPlayer->getId(), 0x01, targetZone );
-      pPlayer->queuePacket( preparePacket );
+      //                                     0x03, player.getId(), 0x01, targetZone );
+      player.queuePacket( preparePacket );
    }
    else
    {
       // No zoneline found, revert to last zone
-      pPlayer->sendUrgent( "ZoneLine " + std::to_string( zoneLineId ) + " not found." );
+      player.sendUrgent( "ZoneLine " + std::to_string( zoneLineId ) + " not found." );
       targetPos.x = 0;
       targetPos.y = 0;
       targetPos.z = 0;
       targetZone = pZone->getId();
    }
 
-   pPlayer->performZoning( targetZone, targetPos, rotation);
+   player.performZoning( targetZone, targetPos, rotation);
 }
 
 
 void Core::Network::GameConnection::discoveryHandler( const Packets::GamePacket& inPacket,
-                                                      Entity::PlayerPtr pPlayer )
+                                                      Entity::Player& player )
 {
    uint32_t ref_position_id = inPacket.getValAt< uint32_t >( 0x20 );
 
@@ -344,47 +343,47 @@ void Core::Network::GameConnection::discoveryHandler( const Packets::GamePacket&
 
    if( !pQR->next() )
    {
-      pPlayer->sendNotice( "Discovery ref pos ID: " + std::to_string( ref_position_id ) + " not found. " );
+      player.sendNotice( "Discovery ref pos ID: " + std::to_string( ref_position_id ) + " not found. " );
       return;
    }
 
-   ZoneChannelPacket< FFXIVIpcDiscovery > discoveryPacket( pPlayer->getId() );
+   ZoneChannelPacket< FFXIVIpcDiscovery > discoveryPacket( player.getId() );
    discoveryPacket.data().map_id = pQR->getUInt( 2 );
    discoveryPacket.data().map_part_id = pQR->getUInt( 3 );
 
-   pPlayer->queuePacket( discoveryPacket );
-   pPlayer->sendNotice( "Discovery ref pos ID: " + std::to_string( ref_position_id ) );
+   player.queuePacket( discoveryPacket );
+   player.sendNotice( "Discovery ref pos ID: " + std::to_string( ref_position_id ) );
 
-   pPlayer->discover( pQR->getUInt16( 2 ), pQR->getUInt16( 3 ) );
+   player.discover( pQR->getUInt16( 2 ), pQR->getUInt16( 3 ) );
 
 }
 
 
 void Core::Network::GameConnection::playTimeHandler( const Packets::GamePacket& inPacket,
-                                                     Entity::PlayerPtr pPlayer )
+                                                     Entity::Player& player )
 {
-   ZoneChannelPacket< FFXIVIpcPlayTime > playTimePacket( pPlayer->getId() );
-   playTimePacket.data().playTimeInMinutes = pPlayer->getPlayTime() / 60;
-   pPlayer->queuePacket( playTimePacket );
+   ZoneChannelPacket< FFXIVIpcPlayTime > playTimePacket( player.getId() );
+   playTimePacket.data().playTimeInMinutes = player.getPlayTime() / 60;
+   player.queuePacket( playTimePacket );
 }
 
 
 void Core::Network::GameConnection::initHandler( const Packets::GamePacket& inPacket,
-                                                 Entity::PlayerPtr pPlayer )
+                                                 Entity::Player& player )
 {
    // init handler means this is a login procedure
-   pPlayer->setIsLogin( true );
+   player.setIsLogin( true );
 
-   pPlayer->setZone( pPlayer->getZoneId() );
+   player.setZone( player.getZoneId() );
 }
 
 
 void Core::Network::GameConnection::blackListHandler( const Packets::GamePacket& inPacket,
-                                                      Entity::PlayerPtr pPlayer )
+                                                      Entity::Player& player )
 {
    uint8_t count = inPacket.getValAt< uint8_t >( 0x21 );
 
-   ZoneChannelPacket< FFXIVIpcBlackList > blackListPacket( pPlayer->getId() );
+   ZoneChannelPacket< FFXIVIpcBlackList > blackListPacket( player.getId() );
    blackListPacket.data().sequence = count;
    // TODO: Fill with actual blacklist data
    //blackListPacket.data().entry[0].contentId = 1;
@@ -395,39 +394,39 @@ void Core::Network::GameConnection::blackListHandler( const Packets::GamePacket&
 
 
 void Core::Network::GameConnection::pingHandler( const Packets::GamePacket& inPacket,
-                                                 Entity::PlayerPtr pPlayer )
+                                                 Entity::Player& player )
 {
    int32_t inVal = inPacket.getValAt< int32_t >( 0x20 );
-   PingPacket pingPacket( pPlayer, inVal );
+   PingPacket pingPacket( player, inVal );
    queueOutPacket( pingPacket );
 
-   pPlayer->setLastPing( static_cast< uint32_t >( time( nullptr ) ) );
+   player.setLastPing( static_cast< uint32_t >( time( nullptr ) ) );
 }
 
 
 void Core::Network::GameConnection::finishLoadingHandler( const Packets::GamePacket& inPacket,
-                                                          Entity::PlayerPtr pPlayer )
+                                                          Entity::Player& player )
 {
    // player is done zoning
-   pPlayer->setLoadingComplete( true );
+   player.setLoadingComplete( true );
 
    // if this is a login event
-   if( pPlayer->isLogin() )
+   if( player.isLogin() )
    {
       // fire the onLogin Event
-      pPlayer->onLogin();
-      pPlayer->setIsLogin( false );
+      player.onLogin();
+      player.setIsLogin( false );
    }
 
    // spawn the player for himself
-   pPlayer->spawn( pPlayer );
+   player.spawn( player.getAsPlayer() );
 
    // notify the zone of a change in position to force an "inRangeActor" update
-   pPlayer->getCurrentZone()->changeActorPosition( pPlayer );
+   player.getCurrentZone()->changeActorPosition( player.getAsPlayer() );
 }
 
 void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket& inPacket,
-                                                       Entity::PlayerPtr pPlayer )
+                                                       Entity::Player& player )
 {
 
    uint8_t type = inPacket.getValAt< uint8_t >( 0x2A );
@@ -436,7 +435,7 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
    if( type == 0x02 )
    { // party list
 
-      ZoneChannelPacket< FFXIVIpcSocialList > listPacket( pPlayer->getId() );;
+      ZoneChannelPacket< FFXIVIpcSocialList > listPacket( player.getId() );
 
       listPacket.data().type = 2;
       listPacket.data().sequence = count;
@@ -444,26 +443,26 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
       int32_t entrysizes = sizeof( listPacket.data().entries );
       memset( listPacket.data().entries, 0, sizeof( listPacket.data().entries ) );
 
-      listPacket.data().entries[0].bytes[2] = pPlayer->getCurrentZone()->getId();
+      listPacket.data().entries[0].bytes[2] = player.getCurrentZone()->getId();
       listPacket.data().entries[0].bytes[3] = 0x80;
       listPacket.data().entries[0].bytes[4] = 0x02;
       listPacket.data().entries[0].bytes[6] = 0x3B;
       listPacket.data().entries[0].bytes[11] = 0x10;
-      listPacket.data().entries[0].classJob = static_cast< uint8_t >( pPlayer->getClass() );
-      listPacket.data().entries[0].contentId = pPlayer->getContentId();
-      listPacket.data().entries[0].level = pPlayer->getLevel();
-      listPacket.data().entries[0].zoneId = pPlayer->getCurrentZone()->getId();
+      listPacket.data().entries[0].classJob = static_cast< uint8_t >( player.getClass() );
+      listPacket.data().entries[0].contentId = player.getContentId();
+      listPacket.data().entries[0].level = player.getLevel();
+      listPacket.data().entries[0].zoneId = player.getCurrentZone()->getId();
       listPacket.data().entries[0].zoneId1 = 0x0100;
       // TODO: no idea what this does
       //listPacket.data().entries[0].one = 1;
 
-      memcpy( listPacket.data().entries[0].name, pPlayer->getName().c_str(), strlen( pPlayer->getName().c_str() ) );
+      memcpy( listPacket.data().entries[0].name, player.getName().c_str(), strlen( player.getName().c_str() ) );
 
       // TODO: actually store and read language from somewhere
       listPacket.data().entries[0].bytes1[0] = 0x01;//flags (lang)
                                                     // TODO: these flags need to be figured out
                                                     //listPacket.data().entries[0].bytes1[1] = 0x00;//flags
-      listPacket.data().entries[0].onlineStatusMask = pPlayer->getOnlineStatusMask();
+      listPacket.data().entries[0].onlineStatusMask = player.getOnlineStatusMask();
 
       queueOutPacket( listPacket );
 
@@ -471,7 +470,7 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
    else if( type == 0x0b )
    { // friend list
 
-      ZoneChannelPacket< FFXIVIpcSocialList > listPacket( pPlayer->getId() );
+      ZoneChannelPacket< FFXIVIpcSocialList > listPacket( player.getId() );
       listPacket.data().type = 0x0B;
       listPacket.data().sequence = count;
       memset( listPacket.data().entries, 0, sizeof( listPacket.data().entries ) );
@@ -485,7 +484,7 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
 }
 
 void Core::Network::GameConnection::chatHandler( const Packets::GamePacket& inPacket,
-                                                 Entity::PlayerPtr pPlayer )
+                                                 Entity::Player& player )
 {
 
    std::string chatString( inPacket.getStringAt( 0x3a ) );
@@ -495,35 +494,35 @@ void Core::Network::GameConnection::chatHandler( const Packets::GamePacket& inPa
    if( chatString.at( 0 ) == '!' )
    {
       // execute game console command
-      g_gameCommandMgr.execCommand( const_cast< char * >( chatString.c_str() ) + 1, pPlayer );
+      g_gameCommandMgr.execCommand( const_cast< char * >( chatString.c_str() ) + 1, player );
       return;
    }
 
-   ChatType chatType = static_cast<ChatType>( inPacket.getValAt< uint8_t >( 0x38 ) );
+   ChatType chatType = static_cast< ChatType >( inPacket.getValAt< uint8_t >( 0x38 ) );
 
    //ToDo, need to implement sending GM chat types.
-   ChatPacket chatPacket( pPlayer, chatType, chatString );
+   ChatPacket chatPacket( player, chatType, chatString );
 
    switch( chatType )
    {
    case ChatType::Say:
    {
-      pPlayer->getCurrentZone()->queueOutPacketForRange( pPlayer, 50, chatPacket );
+      player.getCurrentZone()->queueOutPacketForRange( player, 50, chatPacket );
       break;
    }
    case ChatType::Yell:
    {
-      pPlayer->getCurrentZone()->queueOutPacketForRange(pPlayer, 6000, chatPacket);
+      player.getCurrentZone()->queueOutPacketForRange( player, 6000, chatPacket );
       break;
    }
    case ChatType::Shout:
    {
-      pPlayer->getCurrentZone()->queueOutPacketForRange( pPlayer, 6000, chatPacket );
+      player.getCurrentZone()->queueOutPacketForRange( player, 6000, chatPacket );
       break;
    }
    default:
    {
-      pPlayer->getCurrentZone()->queueOutPacketForRange( pPlayer, 50, chatPacket );
+      player.getCurrentZone()->queueOutPacketForRange( player, 50, chatPacket );
       break;
    }
    }
@@ -535,19 +534,19 @@ void Core::Network::GameConnection::chatHandler( const Packets::GamePacket& inPa
 // log right back in.
 // Also the packet needs to be converted to an ipc structure
 void Core::Network::GameConnection::logoutHandler( const Packets::GamePacket& inPacket,
-                                                   Entity::PlayerPtr pPlayer )
+                                                   Entity::Player& player )
 {
-   ZoneChannelPacket< FFXIVIpcLogout > logoutPacket( pPlayer->getId() );
+   ZoneChannelPacket< FFXIVIpcLogout > logoutPacket( player.getId() );
    logoutPacket.data().flags1 = 0x02;
    logoutPacket.data().flags2 = 0x2000;
    queueOutPacket( logoutPacket );
 
-   pPlayer->setMarkedForRemoval();
+   player.setMarkedForRemoval();
 }
 
 
 void Core::Network::GameConnection::tellHandler( const Packets::GamePacket& inPacket,
-                                                 Entity::PlayerPtr pPlayer )
+                                                 Entity::Player& player )
 {
    std::string targetPcName = inPacket.getStringAt( 0x21 );
    std::string msg = inPacket.getStringAt( 0x41 );
@@ -556,7 +555,7 @@ void Core::Network::GameConnection::tellHandler( const Packets::GamePacket& inPa
 
    if( !pSession )
    {
-      ChatChannelPacket< FFXIVIpcTellErrNotFound > tellErrPacket( pPlayer->getId() );
+      ChatChannelPacket< FFXIVIpcTellErrNotFound > tellErrPacket( player.getId() );
       strcpy( tellErrPacket.data().receipientName, targetPcName.c_str() );
       sendSinglePacket( tellErrPacket );
 
@@ -589,9 +588,9 @@ void Core::Network::GameConnection::tellHandler( const Packets::GamePacket& inPa
       return;
    }
 
-   ChatChannelPacket< FFXIVIpcTell > tellPacket( pPlayer->getId() );
+   ChatChannelPacket< FFXIVIpcTell > tellPacket( player.getId() );
    strcpy( tellPacket.data().msg, msg.c_str() );
-   strcpy( tellPacket.data().receipientName, pPlayer->getName().c_str() );
+   strcpy( tellPacket.data().receipientName, player.getName().c_str() );
    // TODO: do these have a meaning?
    //tellPacket.data().u1 = 0x92CD7337;
    //tellPacket.data().u2a = 0x2E;
@@ -601,12 +600,12 @@ void Core::Network::GameConnection::tellHandler( const Packets::GamePacket& inPa
 }
 
 void Core::Network::GameConnection::performNoteHandler( const Packets::GamePacket& inPacket,
-                                                        Entity::PlayerPtr pPlayer )
+                                                        Entity::Player& player )
 {
-   GamePacketNew< FFXIVIpcPerformNote, ServerZoneIpcType > performPacket( pPlayer->getId() );
+   GamePacketNew< FFXIVIpcPerformNote, ServerZoneIpcType > performPacket( player.getId() );
 
    uint8_t inVal = inPacket.getValAt< uint8_t >( 0x20 );
    memcpy( &performPacket.data().data[0], &inVal, 32 );
 
-   pPlayer->sendToInRangeSet( performPacket );
+   player.sendToInRangeSet( performPacket );
 }
