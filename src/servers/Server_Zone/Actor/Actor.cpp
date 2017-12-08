@@ -704,11 +704,11 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
 
          sendToInRangeSet( effectPacket, true );
 
-         pTarget.takeDamage( static_cast< uint32_t >( param1 ) );
-
          if ( pTarget.isAlive() )
             pTarget.onActionHostile( shared_from_this() );
-         
+
+         pTarget.takeDamage( static_cast< uint32_t >( param1 ) );
+
       }
       else
       {
@@ -724,10 +724,11 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
             // todo: send to range of what? ourselves? when mob script hits this is going to be lacking
             sendToInRangeSet( effectPacket, true );
 
-            pHitActor->takeDamage( static_cast< uint32_t >( param1 ) );
 
             if( pHitActor->isAlive() )
                pHitActor->onActionHostile( shared_from_this() );
+
+            pHitActor->takeDamage( static_cast< uint32_t >( param1 ) );
 
             // Debug
             if ( isPlayer() ) 
