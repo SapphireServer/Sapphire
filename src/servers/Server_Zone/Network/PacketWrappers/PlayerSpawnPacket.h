@@ -1,14 +1,14 @@
 #ifndef _PLAYERSPAWN_H
 #define _PLAYERSPAWN_H
 
-#include <src/servers/Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
-#include <src/servers/Server_Common/Network/GamePacketNew.h>
-#include <src/servers/Server_Common/Util/UtilMath.h>
-#include "src/servers/Server_Zone/Actor/Player.h"
-#include "src/servers/Server_Zone/Forwards.h"
-#include "src/servers/Server_Zone/Inventory/Inventory.h"
-#include "src/servers/Server_Zone/Inventory/Item.h"
-#include "src/servers/Server_Zone/StatusEffect/StatusEffect.h"
+#include <Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
+#include <Server_Common/Network/GamePacketNew.h>
+#include <Server_Common/Util/UtilMath.h>
+#include "Actor/Player.h"
+#include "Forwards.h"
+#include "Inventory/Inventory.h"
+#include "Inventory/Item.h"
+#include "StatusEffect/StatusEffect.h"
 
 namespace Core {
 namespace Network {

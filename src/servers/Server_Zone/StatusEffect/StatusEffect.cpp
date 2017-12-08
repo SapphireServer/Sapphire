@@ -1,16 +1,16 @@
-#include <src/servers/Server_Common/Exd/ExdData.h>
-#include <src/servers/Server_Common/Util/Util.h>
-#include <src/servers/Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
-#include <src/servers/Server_Common/Logging/Logger.h>
-#include <src/servers/Server_Common/Exd/ExdData.h>
+#include <Server_Common/Exd/ExdData.h>
+#include <Server_Common/Util/Util.h>
+#include <Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
+#include <Server_Common/Logging/Logger.h>
+#include <Server_Common/Exd/ExdData.h>
 
 #include <boost/algorithm/string.hpp>
 #include <algorithm>
 
-#include "src/servers/Server_Zone/Actor/Actor.h"
+#include "Actor/Actor.h"
 
 #include "StatusEffect.h"
-#include "src/servers/Server_Zone/Script/ScriptManager.h"
+#include "Script/ScriptManager.h"
 
 extern Core::Logger g_log;
 extern Core::Data::ExdData g_exdData;

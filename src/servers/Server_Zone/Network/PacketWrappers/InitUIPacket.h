@@ -1,10 +1,10 @@
 #ifndef _CORE_NETWORK_PACKETS_INITUIPACKET_H
 #define _CORE_NETWORK_PACKETS_INITUIPACKET_H
 
-#include <src/servers/Server_Common/Network/GamePacketNew.h>
-#include <src/servers/Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
-#include "Server_Zone/Actor/Player.h"
-#include "Server_Zone/Forwards.h"
+#include <Server_Common/Network/GamePacketNew.h>
+#include <Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
+#include "Actor/Player.h"
+#include "Forwards.h"
 
 namespace Core {
 namespace Network {

@@ -1,9 +1,9 @@
 #ifndef _MODELEQUIPPACKET_H
 #define _MODELEQUIPPACKET_H
 
-#include <src/servers/Server_Common/Network/GamePacketNew.h>
-#include "src/servers/Server_Zone/Actor/Player.h"
-#include "src/servers/Server_Zone/Forwards.h"
+#include <Server_Common/Network/GamePacketNew.h>
+#include "Actor/Player.h"
+#include "Forwards.h"
 
 namespace Core {
 namespace Network {
