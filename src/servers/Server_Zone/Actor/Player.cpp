@@ -419,7 +419,7 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
       }
       queuePacket( contentFinderList );
 
-      Server::InitUIPacket initUIPacket( pPlayer );
+      Server::InitUIPacket initUIPacket( *pPlayer );
       queuePacket( initUIPacket );
 
       ZoneChannelPacket< FFXIVIpcPlayerClassInfo > classInfoPacket( getId() );
@@ -707,7 +707,7 @@ void Core::Entity::Player::gainLevel()
 
 void Core::Entity::Player::unlock()
 {
-   queuePacket( PlayerStateFlagsPacket( getAsPlayer(), PlayerStateFlagList{} ) );
+   queuePacket( PlayerStateFlagsPacket( *getAsPlayer(), PlayerStateFlagList{} ) );
 }
 
 void Core::Entity::Player::sendStatusUpdate( bool toSelf )
@@ -809,7 +809,7 @@ void Core::Entity::Player::setLevelForClass( uint8_t level, Core::Common::ClassJ
 
 void Core::Entity::Player::sendModel()
 {
-   ModelEquipPacket modelEquip( getAsPlayer() );
+   ModelEquipPacket modelEquip( *getAsPlayer() );
    sendToInRangeSet( modelEquip, true );
 }
 
@@ -877,7 +877,7 @@ void Core::Entity::Player::spawn( Core::Entity::PlayerPtr pTarget )
                 getName() + " for " +
                 pTarget->getName() );
 
-   PlayerSpawnPacket spawnActor( getAsPlayer(), pTarget );
+   PlayerSpawnPacket spawnActor( *getAsPlayer(), *pTarget );
    pTarget->queuePacket( spawnActor );
 }
 
@@ -996,7 +996,7 @@ void Core::Entity::Player::setStateFlags( std::vector< Common::PlayerStateFlag >
 
 void Core::Entity::Player::sendStateFlags()
 {
-   queuePacket( PlayerStateFlagsPacket( getAsPlayer() ) );
+   queuePacket( PlayerStateFlagsPacket( *getAsPlayer() ) );
 }
 
 void Core::Entity::Player::unsetStateFlag( Core::Common::PlayerStateFlag flag )
@@ -1099,7 +1099,7 @@ void Core::Entity::Player::update( int64_t currTime )
 
 void Core::Entity::Player::onMobKill( uint16_t nameId )
 {
-   g_scriptMgr.onMobKill( getAsPlayer(), nameId );
+   g_scriptMgr.onMobKill( *getAsPlayer(), nameId );
 }
 
 void Core::Entity::Player::freePlayerSpawnId( uint32_t actorId )
@@ -1300,12 +1300,12 @@ void Core::Entity::Player::sendNotice( const std::string& message ) //Purple Tex
 
 void Core::Entity::Player::sendUrgent( const std::string& message ) //Red Text
 {
-   queuePacket( ChatPacket( getAsPlayer(), ChatType::ServerUrgent, message ) );
+   queuePacket( ChatPacket( *getAsPlayer(), ChatType::ServerUrgent, message ) );
 }
 
 void Core::Entity::Player::sendDebug( const std::string& message ) //Grey Text
 {
-   queuePacket( ChatPacket( getAsPlayer(), ChatType::ServerDebug, message ) );
+   queuePacket( ChatPacket( *getAsPlayer(), ChatType::ServerDebug, message ) );
 }
 
 void Core::Entity::Player::updateHowtosSeen( uint32_t howToId )

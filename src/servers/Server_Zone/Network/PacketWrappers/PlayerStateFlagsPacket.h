@@ -17,14 +17,14 @@ class PlayerStateFlagsPacket :
    public ZoneChannelPacket< FFXIVIpcPlayerStateFlags >
 {
 public:
-   PlayerStateFlagsPacket( Entity::PlayerPtr pActor ) :
-      ZoneChannelPacket< FFXIVIpcPlayerStateFlags >( pActor->getId(), pActor->getId() )
+   PlayerStateFlagsPacket( Entity::Player& player ) :
+      ZoneChannelPacket< FFXIVIpcPlayerStateFlags >( player.getId(), player.getId() )
    {
-      initialize( pActor->getStateFlags() );
+      initialize( player.getStateFlags() );
    }
 
-   PlayerStateFlagsPacket( Entity::PlayerPtr pActor, std::vector< Common::PlayerStateFlag > flags ) :
-      ZoneChannelPacket< FFXIVIpcPlayerStateFlags >( pActor->getId(), pActor->getId() )
+   PlayerStateFlagsPacket( Entity::Player& player, std::vector< Common::PlayerStateFlag > flags ) :
+      ZoneChannelPacket< FFXIVIpcPlayerStateFlags >( player.getId(), player.getId() )
    {
       uint8_t newFlags[7];
       memset( newFlags, 0, 7 );

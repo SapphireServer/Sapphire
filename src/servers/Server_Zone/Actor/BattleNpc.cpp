@@ -234,7 +234,7 @@ void Core::Entity::BattleNpc::setOwner( Core::Entity::PlayerPtr pPlayer )
 
 void Core::Entity::BattleNpc::sendPositionUpdate()
 {
-   MoveActorPacket movePacket( shared_from_this(), 0x3A, 0x00, 0, 0x5A );
+   MoveActorPacket movePacket( *this, 0x3A, 0x00, 0, 0x5A );
    sendToInRangeSet( movePacket );
 }
 

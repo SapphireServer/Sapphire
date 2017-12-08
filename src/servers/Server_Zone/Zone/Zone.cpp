@@ -354,18 +354,18 @@ void Zone::removeActor( Entity::ActorPtr pActor )
 
 }
 
-void Zone::queueOutPacketForRange( Entity::PlayerPtr pSourcePlayer, uint32_t range, Network::Packets::GamePacketPtr pPacketEntry )
+void Zone::queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range, Network::Packets::GamePacketPtr pPacketEntry )
 {
    for( auto it = m_playerMap.begin(); it != m_playerMap.end(); ++it )
    {
-      float distance = Math::Util::distance( pSourcePlayer->getPos().x,
-                                             pSourcePlayer->getPos().y,
-                                             pSourcePlayer->getPos().z,
+      float distance = Math::Util::distance( sourcePlayer.getPos().x,
+                                             sourcePlayer.getPos().y,
+                                             sourcePlayer.getPos().z,
                                              ( *it ).second->getPos().x,
                                              ( *it ).second->getPos().y,
                                              ( *it ).second->getPos().z );
 
-      if( ( distance < range ) && pSourcePlayer->getId() != ( *it ).second->getId() )
+      if( ( distance < range ) && sourcePlayer.getId() != ( *it ).second->getId() )
       {
          auto pSession = g_serverZone.getSession( ( *it ).second->getId() );
          pPacketEntry->setValAt<uint32_t>( 0x08, ( *it ).second->getId() );

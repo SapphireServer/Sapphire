@@ -37,7 +37,7 @@ using namespace Core::Network::Packets::Server;
 
 
 void Core::Network::GameConnection::inventoryModifyHandler( const Packets::GamePacket& inPacket,
-                                                            Entity::PlayerPtr pPlayer )
+                                                            Entity::Player& player )
 {
    uint32_t seq = inPacket.getValAt< uint32_t >( 0x20 );
    uint8_t action = inPacket.getValAt< uint8_t >( 0x24 );
@@ -46,10 +46,10 @@ void Core::Network::GameConnection::inventoryModifyHandler( const Packets::GameP
    uint16_t fromContainer = inPacket.getValAt< uint16_t >( 0x2C );
    uint16_t toContainer = inPacket.getValAt< uint16_t >( 0x40 );
 
-   ZoneChannelPacket< FFXIVIpcInventoryActionAck > ackPacket( pPlayer->getId() );
+   ZoneChannelPacket< FFXIVIpcInventoryActionAck > ackPacket( player.getId() );
    ackPacket.data().sequence = seq;
    ackPacket.data().type = 7;
-   pPlayer->queuePacket( ackPacket );
+   player.queuePacket( ackPacket );
 
 
    g_log.debug( inPacket.toString() );
@@ -61,19 +61,19 @@ void Core::Network::GameConnection::inventoryModifyHandler( const Packets::GameP
 
       case 0x07: // discard item action
       {
-         pPlayer->getInventory()->discardItem( fromContainer, fromSlot );
+         player.getInventory()->discardItem( fromContainer, fromSlot );
       }
       break;
 
       case 0x08: // move item action
       {
-         pPlayer->getInventory()->moveItem( fromContainer, fromSlot, toContainer, toSlot );
+         player.getInventory()->moveItem( fromContainer, fromSlot, toContainer, toSlot );
       }
       break;
 
       case 0x09: // swap item action
       {
-         pPlayer->getInventory()->swapItem( fromContainer, fromSlot, toContainer, toSlot );
+         player.getInventory()->swapItem( fromContainer, fromSlot, toContainer, toSlot );
       }
       break;
 

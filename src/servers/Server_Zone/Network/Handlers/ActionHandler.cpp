@@ -46,7 +46,7 @@ using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
 void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& inPacket,
-                                                   Entity::PlayerPtr pPlayer )
+                                                   Entity::Player& player )
 {
     uint16_t commandId = inPacket.getValAt< uint16_t >( 0x20 );
     uint64_t param1 = inPacket.getValAt< uint64_t >( 0x24 );
@@ -70,14 +70,14 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
         case 0x01:  // Toggle sheathe
         {
             if ( param11 == 1 )
-                pPlayer->setStance( Entity::Actor::Stance::Active );
+                player.setStance( Entity::Actor::Stance::Active );
             else
             {
-                pPlayer->setStance( Entity::Actor::Stance::Passive );
-                pPlayer->setAutoattack( false );
+                player.setStance( Entity::Actor::Stance::Passive );
+                player.setAutoattack( false );
             }
 
-            pPlayer->sendToInRangeSet( ActorControlPacket142( pPlayer->getId(), 0, param11, 1 ) );
+            player.sendToInRangeSet( ActorControlPacket142( player.getId(), 0, param11, 1 ) );
 
             break;
         }
@@ -85,13 +85,13 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
         {
             if ( param11 == 1 )
             {
-                pPlayer->setAutoattack( true );
-                pPlayer->setStance( Entity::Actor::Stance::Active );
+                player.setAutoattack( true );
+                player.setStance( Entity::Actor::Stance::Active );
             }
             else
-                pPlayer->setAutoattack( false );
+                player.setAutoattack( false );
 
-            pPlayer->sendToInRangeSet( ActorControlPacket142( pPlayer->getId(), 1, param11, 1 ) );
+            player.sendToInRangeSet( ActorControlPacket142( player.getId(), 1, param11, 1 ) );
 
             break;
         }
@@ -99,51 +99,51 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
         {
 
             uint64_t targetId = inPacket.getValAt< uint64_t >( 0x24 );
-            pPlayer->changeTarget( targetId );
+            player.changeTarget( targetId );
             break;
         }
         case 0x65:
         {
-           pPlayer->dismount();
+           player.dismount();
            break;
         }
         case 0x68: // Remove status (clicking it off)
         {
            // todo: check if status can be removed by client from exd
-           pPlayer->removeSingleStatusEffectById( static_cast< uint32_t >( param1 ) );
+           player.removeSingleStatusEffectById( static_cast< uint32_t >( param1 ) );
            break;
         }
         case 0x69: // Cancel cast
         {
-           if( pPlayer->getCurrentAction() )
-               pPlayer->getCurrentAction()->setInterrupted();
+           if( player.getCurrentAction() )
+               player.getCurrentAction()->setInterrupted();
            break;
         }
         case 0x12E: // Set player title
         {
-           pPlayer->setTitle( static_cast< uint16_t >( param1 ) );
+           player.setTitle( static_cast< uint16_t >( param1 ) );
            break;
         }
         case 0x12F: // Get title list
         {
-           ZoneChannelPacket< FFXIVIpcPlayerTitleList > titleListPacket( pPlayer->getId() );
-           memcpy( titleListPacket.data().titleList, pPlayer->getTitleList(), sizeof( titleListPacket.data().titleList ) );
+           ZoneChannelPacket< FFXIVIpcPlayerTitleList > titleListPacket( player.getId() );
+           memcpy( titleListPacket.data().titleList, player.getTitleList(), sizeof( titleListPacket.data().titleList ) );
 
-           pPlayer->queuePacket( titleListPacket );
+           player.queuePacket( titleListPacket );
            break;
         }
         case 0x133: // Update howtos seen
         {
             uint32_t howToId = static_cast< uint32_t >( param1 );
-            pPlayer->updateHowtosSeen( howToId );
+            player.updateHowtosSeen( howToId );
             break;
         }
         case 0x1F4: // emote
         {
-            uint64_t targetId = pPlayer->getTargetId();
+            uint64_t targetId = player.getTargetId();
             uint32_t emoteId = inPacket.getValAt< uint32_t >( 0x24 );
 
-            pPlayer->sendToInRangeSet( ActorControlPacket144( pPlayer->getId(), Emote, emoteId, 0, 0, 0, targetId ) );
+            player.sendToInRangeSet( ActorControlPacket144( player.getId(), Emote, emoteId, 0, 0, 0, targetId ) );
             break;
         }
         case 0xC8: // return dead
@@ -152,10 +152,10 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
            {
               case ResurrectType::RaiseSpell:
                  // todo: handle raise case (set position to raiser, apply weakness status, set hp/mp/tp as well as packet)
-                 pPlayer->returnToHomepoint();
+                 player.returnToHomepoint();
                  break;
               case ResurrectType::Return:
-                 pPlayer->returnToHomepoint();
+                 player.returnToHomepoint();
                  break;
               default:
                  break;
@@ -164,39 +164,39 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
         }
         case 0xC9: // Finish zoning
         {
-            switch( pPlayer->getZoningType() )
+            switch( player.getZoningType() )
             {
                 case ZoneingType::None:
-                    pPlayer->sendToInRangeSet( ActorControlPacket143( pPlayer->getId(), ZoneIn, 0x01 ), true );
+                    player.sendToInRangeSet( ActorControlPacket143( player.getId(), ZoneIn, 0x01 ), true );
                     break;
                 case ZoneingType::Teleport:
-                    pPlayer->sendToInRangeSet( ActorControlPacket143( pPlayer->getId(), ZoneIn, 0x01, 0, 0, 110 ), true );
+                    player.sendToInRangeSet( ActorControlPacket143( player.getId(), ZoneIn, 0x01, 0, 0, 110 ), true );
                     break;
                 case ZoneingType::Return:
                 case ZoneingType::ReturnDead:
                 {
-                    if( pPlayer->getStatus() == Entity::Actor::ActorStatus::Dead )
+                    if( player.getStatus() == Entity::Actor::ActorStatus::Dead )
                     {
-                        pPlayer->resetHp();
-                        pPlayer->resetMp();
-                        pPlayer->setStatus( Entity::Actor::ActorStatus::Idle );
+                        player.resetHp();
+                        player.resetMp();
+                        player.setStatus( Entity::Actor::ActorStatus::Idle );
 
-                        pPlayer->sendToInRangeSet( ActorControlPacket143( pPlayer->getId(), ZoneIn, 0x01, 0x01, 0, 111 ), true );
-                        pPlayer->sendToInRangeSet( ActorControlPacket142( pPlayer->getId(), SetStatus, static_cast< uint8_t >( Entity::Actor::ActorStatus::Idle ) ), true );
+                        player.sendToInRangeSet( ActorControlPacket143( player.getId(), ZoneIn, 0x01, 0x01, 0, 111 ), true );
+                        player.sendToInRangeSet( ActorControlPacket142( player.getId(), SetStatus, static_cast< uint8_t >( Entity::Actor::ActorStatus::Idle ) ), true );
                     }
                     else
-                        pPlayer->sendToInRangeSet( ActorControlPacket143( pPlayer->getId(), ZoneIn, 0x01, 0x00, 0, 111 ), true );
+                        player.sendToInRangeSet( ActorControlPacket143( player.getId(), ZoneIn, 0x01, 0x00, 0, 111 ), true );
                 }
                     break;
                 case ZoneingType::FadeIn:
                     break;
             }
 
-            pPlayer->setZoningType( Common::ZoneingType::None );
+            player.setZoningType( Common::ZoneingType::None );
 
-            pPlayer->unsetStateFlag( PlayerStateFlag::BetweenAreas );
-            pPlayer->unsetStateFlag( PlayerStateFlag::BetweenAreas1 );
-            pPlayer->sendStateFlags();
+            player.unsetStateFlag( PlayerStateFlag::BetweenAreas );
+            player.unsetStateFlag( PlayerStateFlag::BetweenAreas1 );
+            player.sendStateFlags();
             break;
         }
 
@@ -207,7 +207,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
 
             if( targetAetheryte )
             {
-                auto fromAetheryte = g_exdData.getAetheryteInfo( g_exdData.m_zoneInfoMap[pPlayer->getZoneId()].aetheryte_index );
+                auto fromAetheryte = g_exdData.getAetheryteInfo( g_exdData.m_zoneInfoMap[player.getZoneId()].aetheryte_index );
 
                 // calculate cost - does not apply for favorite points or homepoints neither checks for aether tickets
                 auto cost = static_cast< uint16_t > ( ( sqrt( pow( fromAetheryte->map_coord_x - targetAetheryte->map_coord_x, 2 ) +
@@ -216,14 +216,14 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
                 // cap at 999 gil
                 cost = cost > uint16_t{999} ? uint16_t{999} : cost;
 
-                bool insufficientGil = pPlayer->getCurrency( Inventory::CurrencyType::Gil ) < cost;
+                bool insufficientGil = player.getCurrency( Inventory::CurrencyType::Gil ) < cost;
                 // todo: figure out what param1 really does
-                pPlayer->queuePacket( ActorControlPacket143( pPlayer->getId(), TeleportStart, insufficientGil ? 2 : 0, param11 ) );
+                player.queuePacket( ActorControlPacket143( player.getId(), TeleportStart, insufficientGil ? 2 : 0, param11 ) );
 
                 if( !insufficientGil )
                 {
-                    Action::ActionTeleportPtr pActionTeleport( new Action::ActionTeleport( pPlayer, param11, cost ) );
-                    pPlayer->setCurrentAction( pActionTeleport );
+                    Action::ActionTeleportPtr pActionTeleport( new Action::ActionTeleport( player.getAsPlayer(), param11, cost ) );
+                    player.setCurrentAction( pActionTeleport );
                 }
             }
             break;

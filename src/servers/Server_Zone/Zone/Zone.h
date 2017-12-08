@@ -90,7 +90,7 @@ public:
 
    void updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell );
 
-   void queueOutPacketForRange( Entity::PlayerPtr pSourcePlayer, uint32_t range, Network::Packets::GamePacketPtr pPacketEntry );
+   void queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range, Network::Packets::GamePacketPtr pPacketEntry );
 
    virtual uint32_t getId();
 
