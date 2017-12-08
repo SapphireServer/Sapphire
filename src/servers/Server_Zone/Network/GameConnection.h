@@ -1,16 +1,13 @@
-
 #ifndef GAMECONNECTION_H
 #define GAMECONNECTION_H
 
-#include <src/servers/Server_Common/Network/Connection.h>
-#include <src/servers/Server_Common/Network/Acceptor.h>
-#include <src/servers/Server_Common/Network/CommonNetwork.h>
+#include <Server_Common/Network/Connection.h>
+#include <Server_Common/Network/Acceptor.h>
+#include <Server_Common/Network/CommonNetwork.h>
+#include <Server_Common/Network/GamePacket.h>
+#include <Server_Common/Util/LockedQueue.h>
 
-#include <src/servers/Server_Common/Network/GamePacket.h>
-
-#include <src/servers/Server_Common/Util/LockedQueue.h>
-
-#include "src/servers/Server_Zone/Forwards.h"
+#include "Forwards.h"
 
 #define DECLARE_HANDLER( x ) void x( const Packets::GamePacket& inPacket, Entity::Player& player )
 

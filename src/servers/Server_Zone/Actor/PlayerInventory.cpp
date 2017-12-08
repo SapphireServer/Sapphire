@@ -1,18 +1,18 @@
-#include <src/servers/Server_Common/Common.h>
-#include <src/servers/Server_Common/Exd/ExdData.h>
-#include <src/servers/Server_Common/Network/GamePacket.h>
-#include <src/servers/Server_Common/Logging/Logger.h>
+#include <Server_Common/Common.h>
+#include <Server_Common/Exd/ExdData.h>
+#include <Server_Common/Network/GamePacket.h>
+#include <Server_Common/Logging/Logger.h>
 
 #include "Player.h"
 
-#include "src/servers/Server_Zone/Zone/ZoneMgr.h"
-#include "src/servers/Server_Zone/Zone/Zone.h"
+#include "Zone/ZoneMgr.h"
+#include "Zone/Zone.h"
 
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket142.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket143.h"
+#include "Network/PacketWrappers/ActorControlPacket142.h"
+#include "Network/PacketWrappers/ActorControlPacket143.h"
 
-#include "src/servers/Server_Zone/Inventory/Inventory.h"
-#include "src/servers/Server_Zone/Inventory/Item.h"
+#include "Inventory/Inventory.h"
+#include "Inventory/Item.h"
 
 extern Core::Logger g_log;
 
@@ -31,7 +31,7 @@ void Core::Entity::Player::sendItemLevel()
 }
 
 // TODO: This has to be redone and simplified
-void Core::Entity::Player::equipWeapon( Core::ItemPtr pItem )
+void Core::Entity::Player::equipWeapon( ItemPtr pItem )
 {
    ClassJob currentClass = static_cast< ClassJob >( getClass() );
 
@@ -86,7 +86,7 @@ void Core::Entity::Player::equipWeapon( Core::ItemPtr pItem )
 }
 
 // equip an item
-void Core::Entity::Player::equipItem( Inventory::EquipSlot equipSlotId, Core::ItemPtr pItem, bool sendUpdate )
+void Core::Entity::Player::equipItem( Inventory::EquipSlot equipSlotId, ItemPtr pItem, bool sendUpdate )
 {
 
    //g_log.debug( "Equipping into slot " + std::to_string( equipSlotId ) );

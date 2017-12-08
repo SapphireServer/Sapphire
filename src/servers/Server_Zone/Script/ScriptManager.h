@@ -5,8 +5,8 @@
 #include <mutex>
 #include <set>
 
-#include <src/servers/Server_Common/Common.h>
-#include "../Forwards.h"
+#include <Server_Common/Common.h>
+#include "Forwards.h"
 
 
 namespace chaiscript

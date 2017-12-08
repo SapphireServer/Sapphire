@@ -1,9 +1,9 @@
 #include "ServerZone.h"
 
-#include <src/servers/Server_Common/Version.h>
-#include <src/servers/Server_Common/Logging/Logger.h>
-#include <src/servers/Server_Common/Config/XMLConfig.h>
-#include <src/servers/Server_Common/Version.h>
+#include <Server_Common/Version.h>
+#include <Server_Common/Logging/Logger.h>
+#include <Server_Common/Config/XMLConfig.h>
+#include <Server_Common/Version.h>
 
 #include <MySqlBase.h>
 #include <Connection.h>

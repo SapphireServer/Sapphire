@@ -1,16 +1,16 @@
 #include "ActionMount.h"
 
-#include <src/servers/Server_Common/Common.h>
-#include <src/servers/Server_Common/Util/Util.h>
-#include <src/servers/Server_Common/Util/UtilMath.h>
-#include <src/servers/Server_Common/Exd/ExdData.h>
-#include <src/servers/Server_Common/Logging/Logger.h>
+#include <Server_Common/Common.h>
+#include <Server_Common/Util/Util.h>
+#include <Server_Common/Util/UtilMath.h>
+#include <Server_Common/Exd/ExdData.h>
+#include <Server_Common/Logging/Logger.h>
 
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket142.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket143.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket144.h"
-#include "src/servers/Server_Zone/Actor/Player.h"
-#include "src/servers/Server_Zone/Script/ScriptManager.h"
+#include "Network/PacketWrappers/ActorControlPacket142.h"
+#include "Network/PacketWrappers/ActorControlPacket143.h"
+#include "Network/PacketWrappers/ActorControlPacket144.h"
+#include "Actor/Player.h"
+#include "Script/ScriptManager.h"
 
 using namespace Core::Common;
 using namespace Core::Network;
@@ -23,7 +23,7 @@ extern Core::Scripting::ScriptManager g_scriptMgr;
 
 Core::Action::ActionMount::ActionMount()
 {
-   m_handleActionType = Common::HandleActionType::Event;
+   m_handleActionType = HandleActionType::Event;
 }
 
 Core::Action::ActionMount::ActionMount( Entity::ActorPtr pActor, uint16_t mountId )
@@ -75,19 +75,20 @@ void Core::Action::ActionMount::onFinish()
    pPlayer->unsetStateFlag( PlayerStateFlag::Casting );
    pPlayer->sendStateFlags();
 
-   ZoneChannelPacket< FFXIVIpcEffect > effectPacket(pPlayer->getId());
+   ZoneChannelPacket< FFXIVIpcEffect > effectPacket( pPlayer->getId() );
    effectPacket.data().targetId = pPlayer->getId();
    effectPacket.data().actionAnimationId = m_id;
-   effectPacket.data().unknown_62 = 13; // Affects displaying action name next to number in floating text
+   // Affects displaying action name next to number in floating text
+   effectPacket.data().unknown_62 = 13; 
    effectPacket.data().actionTextId = 4;
    effectPacket.data().numEffects = 1;
-   effectPacket.data().rotation = Math::Util::floatToUInt16Rot(pPlayer->getRotation());
+   effectPacket.data().rotation = Math::Util::floatToUInt16Rot( pPlayer->getRotation() );
    effectPacket.data().effectTarget = INVALID_GAME_OBJECT_ID;
    effectPacket.data().effects[0].effectType = ActionEffectType::Mount;
    effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::CritDamage;
    effectPacket.data().effects[0].value = m_id;
 
-   pPlayer->sendToInRangeSet(effectPacket, true);
+   pPlayer->sendToInRangeSet( effectPacket, true );
 
    pPlayer->mount( m_id );
 }

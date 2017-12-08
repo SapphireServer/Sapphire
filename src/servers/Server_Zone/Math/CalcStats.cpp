@@ -2,8 +2,8 @@
 
 #include <Server_Common/Exd/ExdData.h>
 #include <Server_Common/Common.h>
-#include <Server_Zone/Actor/Actor.h>
-#include <Server_Zone/Actor/Player.h>
+#include "Actor/Actor.h"
+#include "Actor/Player.h"
 
 #include "CalcStats.h"
 

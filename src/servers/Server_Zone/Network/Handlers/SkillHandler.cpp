@@ -1,34 +1,34 @@
-#include <src/servers/Server_Common/Common.h>
-#include <src/servers/Server_Common/Network/CommonNetwork.h>
-#include <src/servers/Server_Common/Exd/ExdData.h>
-#include <src/servers/Server_Common/Network/GamePacketNew.h>
-#include <src/servers/Server_Common/Network/PacketContainer.h>
-#include <src/servers/Server_Common/Logging/Logger.h>
+#include <Server_Common/Common.h>
+#include <Server_Common/Network/CommonNetwork.h>
+#include <Server_Common/Exd/ExdData.h>
+#include <Server_Common/Network/GamePacketNew.h>
+#include <Server_Common/Network/PacketContainer.h>
+#include <Server_Common/Logging/Logger.h>
 
 #include <boost/format.hpp>
 
-#include "src/servers/Server_Zone/Network/GameConnection.h"
+#include "Network/GameConnection.h"
 
-#include "src/servers/Server_Zone/Session.h"
+#include "Session.h"
 
-#include "src/servers/Server_Zone/Network/PacketWrappers/ServerNoticePacket.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket142.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket143.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket144.h"
+#include "Network/PacketWrappers/ServerNoticePacket.h"
+#include "Network/PacketWrappers/ActorControlPacket142.h"
+#include "Network/PacketWrappers/ActorControlPacket143.h"
+#include "Network/PacketWrappers/ActorControlPacket144.h"
+#include "Network/PacketWrappers/MoveActorPacket.h"
 
-#include "src/servers/Server_Zone/Network/PacketWrappers/PlayerStateFlagsPacket.h"
+#include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
 
-#include "src/servers/Server_Zone/DebugCommand/DebugCommandHandler.h"
+#include "DebugCommand/DebugCommandHandler.h"
 
-#include "src/servers/Server_Zone/Actor/Player.h"
+#include "Actor/Player.h"
 
-#include "src/servers/Server_Zone/Forwards.h"
+#include "Forwards.h"
 
-#include "src/servers/Server_Zone/Action/Action.h"
-#include "src/servers/Server_Zone/Action/ActionCast.h"
-#include "src/servers/Server_Zone/Action/ActionMount.h"
-#include "src/servers/Server_Zone/Script/ScriptManager.h"
-#include "Server_Zone/Network/PacketWrappers/MoveActorPacket.h"
+#include "Action/Action.h"
+#include "Action/ActionCast.h"
+#include "Action/ActionMount.h"
+#include "Script/ScriptManager.h"
 
 
 extern Core::Scripting::ScriptManager g_scriptMgr;

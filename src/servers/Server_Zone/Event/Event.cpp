@@ -56,7 +56,7 @@ Core::Scripting::EventReturnCallback Core::Event::Event::getEventReturnCallback(
    return m_callback;
 }
 
-void Core::Event::Event::setEventReturnCallback( Core::Scripting::EventReturnCallback callback )
+void Core::Event::Event::setEventReturnCallback( Scripting::EventReturnCallback callback )
 {
    m_callback = callback;
 }

@@ -1,9 +1,9 @@
 #ifndef _ACTIONCOLLISION_H
 #define _ACTIONCOLLISION_H
 
-#include <src/servers/Server_Common/Common.h>
+#include <Server_Common/Common.h>
 
-#include <src/servers/Server_Zone/Actor/Actor.h>
+#include "Actor/Actor.h"
 #include "Action.h"
 
 namespace Core {

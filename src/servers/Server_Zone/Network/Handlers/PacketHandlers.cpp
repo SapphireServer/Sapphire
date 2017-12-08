@@ -1,43 +1,42 @@
-#include <src/servers/Server_Common/Common.h>
-#include <src/servers/Server_Common/Network/CommonNetwork.h>
-#include <src/servers/Server_Common/Network/GamePacketNew.h>
-#include <src/servers/Server_Common/Logging/Logger.h>
-#include <src/servers/Server_Common/Exd/ExdData.h>
-#include <src/servers/Server_Common/Network/PacketContainer.h>
-#include <src/servers/Server_Common/Network/PacketDef/Chat/ServerChatDef.h>
+#include <Server_Common/Common.h>
+#include <Server_Common/Network/CommonNetwork.h>
+#include <Server_Common/Network/GamePacketNew.h>
+#include <Server_Common/Logging/Logger.h>
+#include <Server_Common/Exd/ExdData.h>
+#include <Server_Common/Network/PacketContainer.h>
+#include <Server_Common/Network/PacketDef/Chat/ServerChatDef.h>
+#include <Server_Common/Database/DatabaseDef.h>
 
 #include <boost/format.hpp>
 
+#include "Network/GameConnection.h"
 
-#include "src/servers/Server_Zone/Network/GameConnection.h"
+#include "Session.h"
+#include "Zone/Zone.h"
+#include "Zone/ZonePosition.h"
+#include "ServerZone.h"
+#include "Zone/ZoneMgr.h"
 
-#include "src/servers/Server_Zone/Session.h"
-#include "src/servers/Server_Zone/Zone/Zone.h"
-#include "src/servers/Server_Zone/Zone/ZonePosition.h"
-#include "src/servers/Server_Zone/ServerZone.h"
-#include "src/servers/Server_Zone/Zone/ZoneMgr.h"
+#include "Network/PacketWrappers/InitUIPacket.h"
+#include "Network/PacketWrappers/PingPacket.h"
+#include "Network/PacketWrappers/MoveActorPacket.h"
+#include "Network/PacketWrappers/ChatPacket.h"
+#include "Network/PacketWrappers/ServerNoticePacket.h"
+#include "Network/PacketWrappers/ActorControlPacket142.h"
+#include "Network/PacketWrappers/ActorControlPacket143.h"
+#include "Network/PacketWrappers/ActorControlPacket144.h"
+#include "Network/PacketWrappers/EventStartPacket.h"
+#include "Network/PacketWrappers/EventFinishPacket.h"
+#include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
 
-#include "src/servers/Server_Zone/Network/PacketWrappers/InitUIPacket.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/PingPacket.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/MoveActorPacket.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ChatPacket.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ServerNoticePacket.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket142.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket143.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket144.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/EventStartPacket.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/EventFinishPacket.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/PlayerStateFlagsPacket.h"
+#include "DebugCommand/DebugCommandHandler.h"
+#include "Actor/Player.h"
+#include "Inventory/Inventory.h"
+#include "Forwards.h"
+#include "Event/EventHelper.h"
+#include "Action/Action.h"
+#include "Action/ActionTeleport.h"
 
-#include "src/servers/Server_Zone/DebugCommand/DebugCommandHandler.h"
-#include "src/servers/Server_Zone/Actor/Player.h"
-#include "src/servers/Server_Zone/Inventory/Inventory.h"
-#include "src/servers/Server_Zone/Forwards.h"
-#include "src/servers/Server_Zone/Event/EventHelper.h"
-#include "src/servers/Server_Zone/Action/Action.h"
-#include "src/servers/Server_Zone/Action/ActionTeleport.h"
-
-#include <Server_Common/Database/DatabaseDef.h>
 
 extern Core::Logger g_log;
 extern Core::ServerZone g_serverZone;

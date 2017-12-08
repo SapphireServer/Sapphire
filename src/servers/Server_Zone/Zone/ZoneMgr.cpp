@@ -4,7 +4,6 @@
 
 #include "ZoneMgr.h"
 #include "Zone.h"
-
 #include "ZonePosition.h"
 
 #include <Server_Common/Database/DatabaseDef.h>
@@ -64,51 +63,6 @@ namespace Core {
          pZone->init();
          m_zoneMap[info.id] = pZone;
       }
-
-      //do
-      //{
-      //   Db::Field *field = pQR->fetch();
-      //   uint16_t id = field[0].getUInt16();
-      //   std::string inName = field[1].getString();
-      //   std::string name = field[2].getString();
-      //   uint32_t layoutId = field[3].getUInt32();
-      //   bool isPrivate = field[4].getBool();
-
-      //   if(!isPrivate)
-      //   {
-      //      g_log.Log(LoggingSeverity::info, std::to_string(id) + "\t" + inName + " - " + name);
-
-      //      ZonePtr pZone( new Zone( id, layoutId, name, inName, isPrivate ) );
-
-      //      m_zoneMap[id] = pZone;
-
-      //      // start the region worker
-      //      // ThreadPool->executeTask(pRegion);
-      //   }
-      //   else
-      //   {
-      //      //Console->outTime(" --> %s", inName.c_str());
-      //      //Console->outTime("\tCached private instance...", name.c_str());
-
-      //      //// write the instance data into the instance cache for later use
-      //      //InstanceCacheEntry * pICE = new InstanceCacheEntry();
-      //      //pICE->id		= id;
-      //      //pICE->inName	= inName;
-      //      //pICE->minX		= minX;
-      //      //pICE->maxX		= maxX;
-      //      //pICE->minY		= minY;
-      //      //pICE->maxY		= maxY;
-      //      //pICE->name		= name;
-      //      //pICE->layoutId  = layoutId;
-      //      //pICE->isPrivate	= isPrivate;
-
-      //      //m_instanceCache[pICE->id] = pICE;
-      //      //m_instanceCacheName[inName] = pICE;
-
-      //      //createInstance(pICE);
-      //   }
-
-      //} while(pQR->nextRow());
 
       return true;
    }

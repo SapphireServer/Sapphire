@@ -1,8 +1,7 @@
 #include "EventHelper.h"
 #include "Event.h"
-#include <src/servers/Server_Common/Common.h>
-
-#include <src/servers/Server_Common/Exd/ExdData.h>
+#include <Server_Common/Common.h>
+#include <Server_Common/Exd/ExdData.h>
 
 extern Core::Data::ExdData g_exdData;
 

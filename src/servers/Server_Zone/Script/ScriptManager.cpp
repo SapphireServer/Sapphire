@@ -1,18 +1,18 @@
-#include <src/servers/Server_Common/Logging/Logger.h>
-#include <src/servers/Server_Common/Exd/ExdData.h>
+#include <Server_Common/Logging/Logger.h>
+#include <Server_Common/Exd/ExdData.h>
 #include <chaiscript/chaiscript.hpp>
 
-#include <src/servers/Server_Common/Script/ChaiscriptStdLib.h>
+#include <Server_Common/Script/ChaiscriptStdLib.h>
 
-#include "src/servers/Server_Zone/Zone/Zone.h"
-#include "src/servers/Server_Zone/Actor/Player.h"
-#include "src/servers/Server_Zone/Actor/BattleNpc.h"
-#include "src/servers/Server_Zone/ServerZone.h"
-#include "src/servers/Server_Zone/Event/Event.h"
-#include "src/servers/Server_Zone/Event/EventHelper.h"
-#include "src/servers/Server_Zone/StatusEffect/StatusEffect.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ServerNoticePacket.h"
-#include "src/servers/Server_Zone/Script/ScriptManager.h"
+#include "Zone/Zone.h"
+#include "Actor/Player.h"
+#include "Actor/BattleNpc.h"
+#include "ServerZone.h"
+#include "Event/Event.h"
+#include "Event/EventHelper.h"
+#include "StatusEffect/StatusEffect.h"
+#include "Network/PacketWrappers/ServerNoticePacket.h"
+#include "Script/ScriptManager.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/shared_ptr.hpp>
@@ -55,7 +55,7 @@ void Core::Scripting::ScriptManager::loadDir( std::string dirname, std::set<std:
 
 }
 
-void Core::Scripting::ScriptManager::onPlayerFirstEnterWorld( Core::Entity::Player& player )
+void Core::Scripting::ScriptManager::onPlayerFirstEnterWorld( Entity::Player& player )
 {
    try
    {
@@ -87,14 +87,14 @@ const boost::shared_ptr< chaiscript::ChaiScript >& Core::Scripting::ScriptManage
 }
 
 
-bool Core::Scripting::ScriptManager::onTalk( Core::Entity::Player& player, uint64_t actorId, uint32_t eventId )
+bool Core::Scripting::ScriptManager::onTalk( Entity::Player& player, uint64_t actorId, uint32_t eventId )
 {
    std::string eventName = "onTalk";
    std::string objName = Event::getEventName( eventId );
 
    player.sendDebug( "Actor: " +
                      std::to_string( actorId ) + " -> " +
-                     std::to_string( Core::Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) ) ) +
+                     std::to_string( Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) ) ) +
                      " \neventId: " +
                      std::to_string( eventId ) +
                      " (0x" + boost::str( boost::format( "%|08X|" )
@@ -135,7 +135,7 @@ bool Core::Scripting::ScriptManager::onTalk( Core::Entity::Player& player, uint6
    return true;
 }
 
-bool Core::Scripting::ScriptManager::onEnterTerritory( Core::Entity::Player& player, uint32_t eventId,
+bool Core::Scripting::ScriptManager::onEnterTerritory( Entity::Player& player, uint32_t eventId,
                                                        uint16_t param1, uint16_t param2 )
 {
    std::string eventName = "onEnterTerritory";
@@ -222,7 +222,7 @@ bool Core::Scripting::ScriptManager::onOutsideRange( Entity::Player& player, uin
    return true;
 }
 
-bool Core::Scripting::ScriptManager::onEmote( Core::Entity::Player& player, uint64_t actorId,
+bool Core::Scripting::ScriptManager::onEmote( Entity::Player& player, uint64_t actorId,
                                               uint32_t eventId, uint8_t emoteId )
 {
    std::string eventName = "onEmote";
@@ -260,7 +260,7 @@ bool Core::Scripting::ScriptManager::onEmote( Core::Entity::Player& player, uint
    return true;
 }
 
-bool Core::Scripting::ScriptManager::onEventHandlerReturn( Core::Entity::Player& player, uint32_t eventId,
+bool Core::Scripting::ScriptManager::onEventHandlerReturn( Entity::Player& player, uint32_t eventId,
                                                            uint16_t subEvent, uint16_t param1, uint16_t param2,
                                                            uint16_t param3 )
 {
@@ -304,7 +304,7 @@ bool Core::Scripting::ScriptManager::onEventHandlerReturn( Core::Entity::Player&
    return true;
 }
 
-bool Core::Scripting::ScriptManager::onEventHandlerTradeReturn( Core::Entity::Player& player, uint32_t eventId,
+bool Core::Scripting::ScriptManager::onEventHandlerTradeReturn( Entity::Player& player, uint32_t eventId,
                                                                 uint16_t subEvent, uint16_t param, uint32_t catalogId )
 {
    std::string eventName = Event::getEventName( eventId ) + "_TRADE";
@@ -446,7 +446,7 @@ bool Core::Scripting::ScriptManager::onStatusTick( Entity::ActorPtr pActor, Core
          pActor->getAsPlayer()->sendDebug( "Calling: " + objName + "." + eventName );
 
       auto fn = m_pChaiHandler->eval< std::function< void( chaiscript::Boxed_Value &, Entity::Actor&,
-                                                           Core::StatusEffect::StatusEffect& ) > >( eventName );
+                                                           StatusEffect::StatusEffect& ) > >( eventName );
       fn( obj, *pActor, effect );
    }
    catch( std::exception& e )
