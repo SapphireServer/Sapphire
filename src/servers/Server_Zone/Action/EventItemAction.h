@@ -1,10 +1,11 @@
 #ifndef _EVENTITEMACTION_H_
 #define _EVENTITEMACTION_H_
 
-#include "src/servers/Server_Zone/Forwards.h"
-#include "src/servers/Server_Zone/Action/Action.h"
+#include "../Forwards.h"
+#include "Action.h"
 
-namespace Core { namespace Action {
+namespace Core {
+namespace Action {
 
    class EventItemAction : public Action 
    {

@@ -1,36 +1,36 @@
 #include <boost/lexical_cast.hpp>
 
-#include <src/servers/Server_Common/Common.h>
-#include <src/servers/Server_Common/Version.h>
-#include <src/servers/Server_Common/Network/GamePacketNew.h>
-#include <src/servers/Server_Common/Network/CommonNetwork.h>
-#include <src/servers/Server_Common/Util/UtilMath.h>
-#include <src/servers/Server_Common/Network/PacketContainer.h>
-#include <src/servers/Server_Common/Logging/Logger.h>
-#include <src/servers/Server_Common/Exd/ExdData.h>
+#include <Server_Common/Common.h>
+#include <Server_Common/Version.h>
+#include <Server_Common/Network/GamePacketNew.h>
+#include <Server_Common/Network/CommonNetwork.h>
+#include <Server_Common/Util/UtilMath.h>
+#include <Server_Common/Network/PacketContainer.h>
+#include <Server_Common/Logging/Logger.h>
+#include <Server_Common/Exd/ExdData.h>
+#include <Server_Common/Database/DatabaseDef.h>
 
 #include "DebugCommand.h"
 #include "DebugCommandHandler.h"
 
-#include "src/servers/Server_Zone/Network/PacketWrappers/ServerNoticePacket.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket142.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket143.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/InitUIPacket.h"
-#include "src/servers/Server_Zone/Network/GameConnection.h"
-#include "src/servers/Server_Zone/Script/ScriptManager.h"
+#include "Network/PacketWrappers/ServerNoticePacket.h"
+#include "Network/PacketWrappers/ActorControlPacket142.h"
+#include "Network/PacketWrappers/ActorControlPacket143.h"
+#include "Network/PacketWrappers/InitUIPacket.h"
+#include "Network/GameConnection.h"
+#include "Script/ScriptManager.h"
 
-#include "src/servers/Server_Zone/Actor/Player.h"
-#include "src/servers/Server_Zone/Actor/BattleNpc.h"
+#include "Actor/Player.h"
+#include "Actor/BattleNpc.h"
 
-#include "src/servers/Server_Zone/Zone/Zone.h"
+#include "Zone/Zone.h"
 
-#include "src/servers/Server_Zone/ServerZone.h"
+#include "ServerZone.h"
 
-#include "src/servers/Server_Zone/StatusEffect/StatusEffect.h"
-#include "src/servers/Server_Zone/Session.h"
+#include "StatusEffect/StatusEffect.h"
+#include "Session.h"
 #include <boost/make_shared.hpp>
 
-#include <Server_Common/Database/DatabaseDef.h>
 
 #include <cinttypes>
 
@@ -63,18 +63,18 @@ Core::DebugCommandHandler::~DebugCommandHandler()
 }
 
 // add a command set to the register map
-void Core::DebugCommandHandler::registerCommand( const std::string& n, Core::DebugCommand::pFunc functionPtr,
-                                                const std::string& hText, uint8_t uLevel )
+void Core::DebugCommandHandler::registerCommand( const std::string& n, DebugCommand::pFunc functionPtr,
+                                                 const std::string& hText, uint8_t uLevel )
 {
-   m_commandMap[std::string( n )] = boost::make_shared<DebugCommand>( n, functionPtr, hText, uLevel );
+   m_commandMap[std::string( n )] = boost::make_shared< DebugCommand >( n, functionPtr, hText, uLevel );
 }
 
 // try to retrieve the command in question, execute if found
-void Core::DebugCommandHandler::execCommand( char * data, Core::Entity::PlayerPtr pPlayer )
+void Core::DebugCommandHandler::execCommand( char * data, Entity::Player& player )
 {
 
    // define callback pointer
-   void ( DebugCommandHandler::*pf )( char *, Entity::PlayerPtr, boost::shared_ptr< DebugCommand > );
+   void ( DebugCommandHandler::*pf )( char *, Entity::Player&, boost::shared_ptr< DebugCommand > );
 
    std::string commandString;
 
@@ -94,18 +94,18 @@ void Core::DebugCommandHandler::execCommand( char * data, Core::Entity::PlayerPt
 
    if( it == m_commandMap.end() )
       // no command found, do something... or not
-      pPlayer->sendUrgent( "Command not found." );
+      player.sendUrgent( "Command not found." );
    else
    {
-      if( pPlayer->getGmRank() < it->second->getRequiredGmLevel() )
+      if( player.getGmRank() < it->second->getRequiredGmLevel() )
       {
-         pPlayer->sendUrgent( "You are not allowed to use this command." );
+         player.sendUrgent( "You are not allowed to use this command." );
          return;
       }
 
       // command found, call the callback function and pass parameters if present.
       pf = ( *it ).second->m_pFunc;
-      ( this->*pf )( data, pPlayer, ( *it ).second );
+      ( this->*pf )( data, player, ( *it ).second );
       return;
    }
 
@@ -117,26 +117,26 @@ void Core::DebugCommandHandler::execCommand( char * data, Core::Entity::PlayerPt
 // Definition of the commands
 ///////////////////////////////////////////////////////////////////////////////////////
 
-void Core::DebugCommandHandler::scriptReload( char * data, Core::Entity::PlayerPtr pPlayer,
-                                             boost::shared_ptr<Core::DebugCommand> command )
+void Core::DebugCommandHandler::scriptReload( char * data, Entity::Player& player,
+                                              boost::shared_ptr< DebugCommand > command )
 {
    g_scriptMgr.reload();
-   pPlayer->sendDebug( "Scripts reloaded." );
+   player.sendDebug( "Scripts reloaded." );
 }
 
-void Core::DebugCommandHandler::help( char* data, Entity::PlayerPtr pPlayer, boost::shared_ptr< Core::DebugCommand > command )
+void Core::DebugCommandHandler::help( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
 {
-   pPlayer->sendDebug( "Registered debug commands:" );
+   player.sendDebug( "Registered debug commands:" );
    for ( auto cmd : m_commandMap )
    {
-      if ( pPlayer->getGmRank( ) >= cmd.second->m_gmLevel )
+      if ( player.getGmRank( ) >= cmd.second->m_gmLevel )
       {
-         pPlayer->sendDebug( " - " + cmd.first + " - " + cmd.second->getHelpText( ) );
+         player.sendDebug( " - " + cmd.first + " - " + cmd.second->getHelpText( ) );
       }
    }
 }
 
-void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlayer, boost::shared_ptr<Core::DebugCommand> command )
+void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
 {
    std::string subCommand = "";
    std::string params = "";
@@ -156,7 +156,7 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
    if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
       params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-   g_log.debug( "[" + std::to_string( pPlayer->getId() ) + "] " +
+   g_log.debug( "[" + std::to_string( player.getId() ) + "] " +
                 "subCommand " + subCommand + " params: " + params );
 
 
@@ -170,25 +170,25 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
 
       if( ( posX == 0xcccccccc ) || ( posY == 0xcccccccc ) || ( posZ == 0xcccccccc ) )
       {
-         pPlayer->sendUrgent( "Syntaxerror." );
+         player.sendUrgent( "Syntaxerror." );
          return;
       }
 
       if( subCommand == "pos" )
-         pPlayer->setPosition( static_cast< float >( posX ),
-                               static_cast< float >( posY ),
-                               static_cast< float >( posZ ) );
+         player.setPosition( static_cast< float >( posX ),
+                             static_cast< float >( posY ),
+                             static_cast< float >( posZ ) );
       else
-         pPlayer->setPosition( pPlayer->getPos().x + static_cast< float >( posX ),
-                               pPlayer->getPos().y + static_cast< float >( posY ),
-                               pPlayer->getPos().z + static_cast< float >( posZ ) );
+         player.setPosition( player.getPos().x + static_cast< float >( posX ),
+                             player.getPos().y + static_cast< float >( posY ),
+                             player.getPos().z + static_cast< float >( posZ ) );
 
       Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcActorSetPos >
-         setActorPosPacket( pPlayer->getId() );
-      setActorPosPacket.data().x = pPlayer->getPos().x;
-      setActorPosPacket.data().y = pPlayer->getPos().y;
-      setActorPosPacket.data().z = pPlayer->getPos().z;
-      pPlayer->queuePacket( setActorPosPacket );
+         setActorPosPacket( player.getId() );
+      setActorPosPacket.data().x = player.getPos().x;
+      setActorPosPacket.data().y = player.getPos().y;
+      setActorPosPacket.data().z = player.getPos().z;
+      player.queuePacket( setActorPosPacket );
 
    }
    else if( ( subCommand == "tele" ) && ( params != "" ) )
@@ -196,7 +196,7 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
       int32_t aetheryteId;
       sscanf( params.c_str(), "%i", &aetheryteId );
 
-      pPlayer->teleport( aetheryteId );
+      player.teleport( aetheryteId );
    }
    else if( ( subCommand == "discovery" ) && ( params != "" ) )
    {
@@ -204,10 +204,10 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
       int32_t discover_id;
       sscanf( params.c_str(), "%i %i", &map_id, &discover_id );
 
-      Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcDiscovery > discoveryPacket( pPlayer->getId() );
+      Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcDiscovery > discoveryPacket( player.getId() );
       discoveryPacket.data().map_id = map_id;
       discoveryPacket.data().map_part_id = discover_id;
-      pPlayer->queuePacket( discoveryPacket );
+      player.queuePacket( discoveryPacket );
    }
 
    else if( ( subCommand == "discovery_pos" ) && ( params != "" ) )
@@ -231,8 +231,8 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
 
    else if( subCommand == "discovery_reset" )
    {
-      pPlayer->resetDiscovery();
-      pPlayer->queuePacket( Network::Packets::Server::InitUIPacket( pPlayer ) );
+      player.resetDiscovery();
+      player.queuePacket( Network::Packets::Server::InitUIPacket( player ) );
    }
    else if( subCommand == "classjob" )
    {
@@ -240,28 +240,28 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
 
        sscanf( params.c_str(), "%d", &id );
 
-       if( pPlayer->getLevelForClass( static_cast<Core::Common::ClassJob> ( id ) ) == 0 )
+       if( player.getLevelForClass( static_cast< Common::ClassJob > ( id ) ) == 0 )
        {
-           pPlayer->setLevelForClass( 1, static_cast<Core::Common::ClassJob> ( id ) );
-           pPlayer->setClassJob( static_cast<Core::Common::ClassJob> ( id ) );
+           player.setLevelForClass( 1, static_cast< Common::ClassJob > ( id ) );
+           player.setClassJob( static_cast< Common::ClassJob > ( id ) );
        }
        else
-           pPlayer->setClassJob( static_cast<Core::Common::ClassJob> ( id ) );
+           player.setClassJob( static_cast< Common::ClassJob > ( id ) );
    }
    else if ( subCommand == "cfpenalty" )
    {
       int32_t minutes;
       sscanf( params.c_str(), "%d", &minutes );
 
-      pPlayer->setCFPenaltyMinutes( minutes );
+      player.setCFPenaltyMinutes( minutes );
    }
    else if ( subCommand == "eorzeatime" )
    {
       uint64_t timestamp;
       sscanf( params.c_str(), "%" SCNu64, &timestamp );
 
-      pPlayer->setEorzeaTimeOffset( timestamp );
-      pPlayer->sendNotice( "Eorzea time offset: " + std::to_string( timestamp ) );
+      player.setEorzeaTimeOffset( timestamp );
+      player.sendNotice( "Eorzea time offset: " + std::to_string( timestamp ) );
    }
    else if ( subCommand == "model" )
    {
@@ -269,26 +269,26 @@ void Core::DebugCommandHandler::set( char * data, Core::Entity::PlayerPtr pPlaye
       uint32_t val;
       sscanf( params.c_str(), "%d %d", &slot, &val );
 
-      pPlayer->setModelForSlot( static_cast<Inventory::EquipSlot>( slot ), val );
-      pPlayer->sendModel();
-      pPlayer->sendDebug( "Model updated" );
+      player.setModelForSlot( static_cast< Inventory::EquipSlot >( slot ), val );
+      player.sendModel();
+      player.sendDebug( "Model updated" );
    }
    else if ( subCommand == "mount" )
    {
       int32_t id;
       sscanf( params.c_str(), "%d", &id );
 
-      pPlayer->dismount();
-      pPlayer->mount( id );
+      player.dismount();
+      player.mount( id );
    }
    else
    {
-      pPlayer->sendUrgent( subCommand + " is not a valid SET command." );
+      player.sendUrgent( subCommand + " is not a valid SET command." );
    }
 
 }
 
-void Core::DebugCommandHandler::add( char * data, Core::Entity::PlayerPtr pPlayer, boost::shared_ptr<Core::DebugCommand> command )
+void Core::DebugCommandHandler::add( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
 {
    std::string subCommand;
    std::string params = "";
@@ -311,7 +311,7 @@ void Core::DebugCommandHandler::add( char * data, Core::Entity::PlayerPtr pPlaye
    if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
       params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-   g_log.debug( "[" + std::to_string( pPlayer->getId() ) + "] " +
+   g_log.debug( "[" + std::to_string( player.getId() ) + "] " +
                 "subCommand " + subCommand + " params: " + params );
 
 
@@ -323,18 +323,18 @@ void Core::DebugCommandHandler::add( char * data, Core::Entity::PlayerPtr pPlaye
 
       sscanf( params.c_str(), "%d %d %hu", &id, &duration, &param );
 
-      StatusEffect::StatusEffectPtr effect( new StatusEffect::StatusEffect( id, pPlayer, pPlayer, duration, 3000 ) );
+      StatusEffect::StatusEffectPtr effect( new StatusEffect::StatusEffect( id, player.getAsPlayer(), player.getAsPlayer(), duration, 3000 ) );
       effect->setParam( param );
 
-      pPlayer->addStatusEffect( effect );
+      player.addStatusEffect( effect );
    }
-   else if ( subCommand == "title" )
+   else if( subCommand == "title" )
    {
       uint32_t titleId;
       sscanf( params.c_str(), "%u", &titleId );
 
-      pPlayer->addTitle( titleId );
-      pPlayer->sendNotice( "Added title (ID: " + std::to_string( titleId ) + ")" );
+      player.addTitle( titleId );
+      player.sendNotice( "Added title (ID: " + std::to_string( titleId ) + ")" );
    }
    else if( subCommand == "spawn" )
    {
@@ -342,9 +342,9 @@ void Core::DebugCommandHandler::add( char * data, Core::Entity::PlayerPtr pPlaye
 
       sscanf( params.c_str(), "%d %d", &model, &name );
 
-      Entity::BattleNpcPtr pBNpc( new Entity::BattleNpc( model, name, pPlayer->getPos() ) );
+      Entity::BattleNpcPtr pBNpc( new Entity::BattleNpc( model, name, player.getPos() ) );
 
-      auto pZone = pPlayer->getCurrentZone();
+      auto pZone = player.getCurrentZone();
       pBNpc->setCurrentZone( pZone );
       pZone->pushActor( pBNpc );
 
@@ -354,8 +354,8 @@ void Core::DebugCommandHandler::add( char * data, Core::Entity::PlayerPtr pPlaye
       // temporary research packet
       int32_t opcode;
       sscanf( params.c_str(), "%x", &opcode );
-      Network::Packets::GamePacketPtr pPe( new Network::Packets::GamePacket( opcode, 0x30, pPlayer->getId(), pPlayer->getId() ) );
-      pPlayer->queuePacket( pPe );
+      Network::Packets::GamePacketPtr pPe( new Network::Packets::GamePacket( opcode, 0x30, player.getId(), player.getId() ) );
+      player.queuePacket( pPe );
    }
    else if( subCommand == "actrl" )
    {
@@ -373,9 +373,9 @@ void Core::DebugCommandHandler::add( char * data, Core::Entity::PlayerPtr pPlaye
 
       sscanf( params.c_str(), "%x %x %x %x %x %x %x %x", &opcode, &param1, &param2, &param3, &param4, &param5, &param6, &playerId );
 
-      pPlayer->sendNotice( "Injecting ACTOR_CONTROL " + std::to_string( opcode ) );
+      player.sendNotice( "Injecting ACTOR_CONTROL " + std::to_string( opcode ) );
 
-      Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcActorControl143 > actorControl( playerId, pPlayer->getId() );
+      Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcActorControl143 > actorControl( playerId, player.getId() );
       actorControl.data().category = opcode;
       actorControl.data().param1 = param1;
       actorControl.data().param2 = param2;
@@ -383,29 +383,29 @@ void Core::DebugCommandHandler::add( char * data, Core::Entity::PlayerPtr pPlaye
       actorControl.data().param4 = param4;
       actorControl.data().param5 = param5;
       actorControl.data().param6 = param6;
-      pPlayer->queuePacket( actorControl );
+      player.queuePacket( actorControl );
 
 
       /*sscanf(params.c_str(), "%x %x %x %x %x %x %x", &opcode, &param1, &param2, &param3, &param4, &param5, &param6, &playerId);
 
-      Network::Packets::Server::ServerNoticePacket noticePacket(pPlayer, "Injecting ACTOR_CONTROL " + std::to_string(opcode));
+      Network::Packets::Server::ServerNoticePacket noticePacket( player, "Injecting ACTOR_CONTROL " + std::to_string( opcode ) );
 
-      pPlayer->queuePacket(noticePacket);
+      player.queuePacket( noticePacket );
 
-      Network::Packets::Server::ActorControlPacket143 controlPacket(pPlayer, opcode,
-      param1, param2, param3, param4, param5, param6, playerId);
-      pPlayer->queuePacket(controlPacket);*/
+      Network::Packets::Server::ActorControlPacket143 controlPacket( player, opcode,
+      param1, param2, param3, param4, param5, param6, playerId );
+      player.queuePacket( controlPacket );*/
 
    }
    else
    {
-      pPlayer->sendUrgent( subCommand + " is not a valid ADD command." );
+      player.sendUrgent( subCommand + " is not a valid ADD command." );
    }
 
 
 }
 
-void Core::DebugCommandHandler::get( char * data, Core::Entity::PlayerPtr pPlayer, boost::shared_ptr<Core::DebugCommand> command )
+void Core::DebugCommandHandler::get( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
 {
    std::string subCommand;
    std::string params = "";
@@ -425,45 +425,45 @@ void Core::DebugCommandHandler::get( char * data, Core::Entity::PlayerPtr pPlaye
    if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
       params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-   g_log.debug( "[" + std::to_string( pPlayer->getId() ) + "] " +
+   g_log.debug( "[" + std::to_string( player.getId() ) + "] " +
                 "subCommand " + subCommand + " params: " + params );
 
 
    if( ( subCommand == "pos" ) )
    {
 
-      int16_t map_id = g_exdData.m_zoneInfoMap[pPlayer->getCurrentZone()->getId()].map_id;
+      int16_t map_id = g_exdData.m_zoneInfoMap[player.getCurrentZone()->getId()].map_id;
 
-      pPlayer->sendNotice( "Pos:\n" +
-                           std::to_string( pPlayer->getPos().x ) + "\n" +
-                           std::to_string( pPlayer->getPos().y ) + "\n" +
-                           std::to_string( pPlayer->getPos().z ) + "\n" +
-                           std::to_string( pPlayer->getRotation() ) + "\nMapId: " +
-                           std::to_string( map_id ) + "\nZoneID: " +
-                           std::to_string( pPlayer->getCurrentZone()->getId() ) + "\n" );
+      player.sendNotice( "Pos:\n" +
+                         std::to_string( player.getPos().x ) + "\n" +
+                         std::to_string( player.getPos().y ) + "\n" +
+                         std::to_string( player.getPos().z ) + "\n" +
+                         std::to_string( player.getRotation() ) + "\nMapId: " +
+                         std::to_string( map_id ) + "\nZoneID: " +
+                         std::to_string( player.getCurrentZone()->getId() ) + "\n" );
    }
    else
    {
-      pPlayer->sendUrgent( subCommand + " is not a valid GET command." );
+      player.sendUrgent( subCommand + " is not a valid GET command." );
    }
 
 }
 
-void Core::DebugCommandHandler::injectPacket( char * data, Core::Entity::PlayerPtr pPlayer, boost::shared_ptr< Core::DebugCommand > command )
+void Core::DebugCommandHandler::injectPacket( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
 {
-   auto pSession = g_serverZone.getSession( pPlayer->getId() );
+   auto pSession = g_serverZone.getSession( player.getId() );
    if( pSession )
-      pSession->getZoneConnection()->injectPacket( data + 7, pPlayer );
+      pSession->getZoneConnection()->injectPacket( data + 7, player );
 }
 
-void Core::DebugCommandHandler::injectChatPacket( char * data, Core::Entity::PlayerPtr pPlayer, boost::shared_ptr< Core::DebugCommand > command )
+void Core::DebugCommandHandler::injectChatPacket( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
 {
-   auto pSession = g_serverZone.getSession( pPlayer->getId() );
+   auto pSession = g_serverZone.getSession( player.getId() );
    if( pSession )
-      pSession->getChatConnection()->injectPacket( data + 8, pPlayer );
+      pSession->getChatConnection()->injectPacket( data + 8, player );
 }
 
-void Core::DebugCommandHandler::nudge( char * data, Entity::PlayerPtr pPlayer, boost::shared_ptr<DebugCommand> command )
+void Core::DebugCommandHandler::nudge( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
 {
    std::string subCommand;
 
@@ -472,7 +472,7 @@ void Core::DebugCommandHandler::nudge( char * data, Entity::PlayerPtr pPlayer, b
 
    std::size_t spos = tmpCommand.find_first_of( " " );
 
-   auto& pos = pPlayer->getPos();
+   auto& pos = player.getPos();
 
    int32_t offset = 0;
    char direction[20];
@@ -480,45 +480,44 @@ void Core::DebugCommandHandler::nudge( char * data, Entity::PlayerPtr pPlayer, b
 
    sscanf( tmpCommand.c_str(), "%d %s", &offset, direction );
 
-
    if( direction[0] == 'u' || direction[0] == '+' )
    {
       pos.y += offset;
-      pPlayer->sendNotice( "nudge: Placing up " + std::to_string( offset ) + " yalms" );
+      player.sendNotice( "nudge: Placing up " + std::to_string( offset ) + " yalms" );
    }
    else if( direction[0] == 'd' || direction[0] == '-' )
    {
       pos.y -= offset;
-      pPlayer->sendNotice( "nudge: Placing down " + std::to_string( offset ) + " yalms" );
+      player.sendNotice( "nudge: Placing down " + std::to_string( offset ) + " yalms" );
 
    }
    else
    {
-      float angle = pPlayer->getRotation() + ( PI / 2 );
+      float angle = player.getRotation() + ( PI / 2 );
       pos.x -= offset * cos( angle );
       pos.z += offset * sin( angle );
-      pPlayer->sendNotice( "nudge: Placing forward " + std::to_string( offset ) + " yalms" );
+      player.sendNotice( "nudge: Placing forward " + std::to_string( offset ) + " yalms" );
    }
    if( offset != 0 )
    {
       Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcActorSetPos >
-         setActorPosPacket( pPlayer->getId() );
-      setActorPosPacket.data().x = pPlayer->getPos().x;
-      setActorPosPacket.data().y = pPlayer->getPos().y;
-      setActorPosPacket.data().z = pPlayer->getPos().z;
-      setActorPosPacket.data().r16 = Math::Util::floatToUInt16Rot( pPlayer->getRotation() );
-      pPlayer->queuePacket( setActorPosPacket );
+         setActorPosPacket( player.getId() );
+      setActorPosPacket.data().x = player.getPos().x;
+      setActorPosPacket.data().y = player.getPos().y;
+      setActorPosPacket.data().z = player.getPos().z;
+      setActorPosPacket.data().r16 = Math::Util::floatToUInt16Rot( player.getRotation() );
+      player.queuePacket( setActorPosPacket );
    }
 }
 
-void Core::DebugCommandHandler::serverInfo( char * data, Core::Entity::PlayerPtr pPlayer, boost::shared_ptr< Core::DebugCommand > command )
+void Core::DebugCommandHandler::serverInfo( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
 {
-   pPlayer->sendDebug( "SapphireServer " + Version::VERSION + "\nRev: " + Version::GIT_HASH );
-   pPlayer->sendDebug( "Compiled: " __DATE__ " " __TIME__ );
-   pPlayer->sendDebug( "Sessions: " + std::to_string( g_serverZone.getSessionCount() ) );
+   player.sendDebug( "SapphireServer " + Version::VERSION + "\nRev: " + Version::GIT_HASH );
+   player.sendDebug( "Compiled: " __DATE__ " " __TIME__ );
+   player.sendDebug( "Sessions: " + std::to_string( g_serverZone.getSessionCount() ) );
 }
 
-void Core::DebugCommandHandler::unlockCharacter( char* data, Entity::PlayerPtr pPlayer, boost::shared_ptr< Core::DebugCommand > command )
+void Core::DebugCommandHandler::unlockCharacter( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
 {
-   pPlayer->unlock( );
+   player.unlock( );
 }

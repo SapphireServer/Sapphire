@@ -1,10 +1,9 @@
-#pragma once
 #ifndef _ITEMCONTAINER_H_
 #define _ITEMCONTAINER_H_
 
 #include <map>
 
-#include <src/servers/Server_Common/Common.h>
+#include <Server_Common/Common.h>
 
 #include "../Forwards.h"
 
@@ -17,7 +16,7 @@ namespace Core
    {
 
    public:
-      ItemContainer(uint16_t locationId);
+      ItemContainer( uint16_t locationId );
       ~ItemContainer();
 
       uint16_t getId() const;
@@ -30,9 +29,9 @@ namespace Core
 
       const ItemMap& getItemMap() const;
 
-      ItemPtr getItem(uint8_t slotId);
+      ItemPtr getItem( uint8_t slotId );
 
-      void setItem(uint8_t slotId, ItemPtr item);
+      void setItem( uint8_t slotId, ItemPtr item );
 
       int16_t getFreeSlot();
 

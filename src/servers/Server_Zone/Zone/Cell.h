@@ -4,7 +4,7 @@
 
 #include <stdint.h>
 
-#include "src/servers/Server_Zone/Forwards.h"
+#include "Forwards.h"
 #include <set>
 
 namespace Core {

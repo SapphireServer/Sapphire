@@ -1,14 +1,14 @@
-#include "src/servers/Server_Zone/Forwards.h"
+#include "../Forwards.h"
 #include "ItemContainer.h"
 
-#include <src/servers/Server_Common/Common.h>
-#include <src/servers/Server_Common/Logging/Logger.h>
+#include <Server_Common/Common.h>
+#include <Server_Common/Logging/Logger.h>
+#include <Server_Common/Database/DatabaseDef.h>
 
-#include "src/servers/Server_Zone/Actor/Player.h"
+#include "Actor/Player.h"
 
 #include "Item.h"
 
-#include <Server_Common/Database/DatabaseDef.h>
 
 extern Core::Logger g_log;
 
@@ -86,7 +86,7 @@ Core::ItemPtr Core::ItemContainer::getItem( uint8_t slotId )
    return m_itemMap[slotId];
 }
 
-void Core::ItemContainer::setItem( uint8_t slotId, Core::ItemPtr pItem )
+void Core::ItemContainer::setItem( uint8_t slotId, ItemPtr pItem )
 {
    if( ( slotId > m_size ) )
       return;

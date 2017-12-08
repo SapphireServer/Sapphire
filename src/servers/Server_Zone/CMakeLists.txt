@@ -3,6 +3,7 @@ cmake_policy(SET CMP0015 NEW)
 cmake_policy(SET CMP0014 OLD)
 
 project(Sapphire_Zone)
+include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
 
 file(GLOB SERVER_PUBLIC_INCLUDE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
         /*.h

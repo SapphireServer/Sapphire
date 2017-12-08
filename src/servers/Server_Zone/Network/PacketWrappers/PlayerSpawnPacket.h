@@ -1,14 +1,14 @@
 #ifndef _PLAYERSPAWN_H
 #define _PLAYERSPAWN_H
 
-#include <src/servers/Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
-#include <src/servers/Server_Common/Network/GamePacketNew.h>
-#include <src/servers/Server_Common/Util/UtilMath.h>
-#include "src/servers/Server_Zone/Actor/Player.h"
-#include "src/servers/Server_Zone/Forwards.h"
-#include "src/servers/Server_Zone/Inventory/Inventory.h"
-#include "src/servers/Server_Zone/Inventory/Item.h"
-#include "src/servers/Server_Zone/StatusEffect/StatusEffect.h"
+#include <Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
+#include <Server_Common/Network/GamePacketNew.h>
+#include <Server_Common/Util/UtilMath.h>
+#include "Actor/Player.h"
+#include "Forwards.h"
+#include "Inventory/Inventory.h"
+#include "Inventory/Item.h"
+#include "StatusEffect/StatusEffect.h"
 
 namespace Core {
 namespace Network {
@@ -22,97 +22,97 @@ namespace Server {
       public GamePacketNew< FFXIVIpcPlayerSpawn, ServerZoneIpcType >
    {
    public:
-      PlayerSpawnPacket( Entity::PlayerPtr pPlayer, Entity::PlayerPtr pTarget ) :
-         GamePacketNew< FFXIVIpcPlayerSpawn, ServerZoneIpcType >( pPlayer->getId(), pTarget->getId() )
+      PlayerSpawnPacket( Entity::Player& player, Entity::Player& target ) :
+         GamePacketNew< FFXIVIpcPlayerSpawn, ServerZoneIpcType >( player.getId(), target.getId() )
       {
-         initialize( pPlayer, pTarget );
+         initialize( player, target );
       };
 
    private:
-      void initialize( Entity::PlayerPtr pPlayer, Entity::PlayerPtr pTarget )
+      void initialize( Entity::Player& player, Entity::Player& target )
       {
          // todo: figure out unkown offsets
          // TODO: temporary gm rank
          //m_data.gmRank = 0xff;
 
-         m_data.classJob = static_cast< uint8_t >( pPlayer->getClass() );
+         m_data.classJob = static_cast< uint8_t >( player.getClass() );
          //m_data.status = static_cast< uint8_t >( pPlayer->getStatus() );
 
-         m_data.hPCurr = pPlayer->getHp();
-         m_data.mPCurr = pPlayer->getMp();
-         m_data.tPCurr = pPlayer->getTp();
-         m_data.hPMax = pPlayer->getMaxHp();
-         m_data.mPMax = pPlayer->getMaxMp();
+         m_data.hPCurr = player.getHp();
+         m_data.mPCurr = player.getMp();
+         m_data.tPCurr = player.getTp();
+         m_data.hPMax = player.getMaxHp();
+         m_data.mPMax = player.getMaxMp();
          
          //m_data.tPMax = 3000;
-         m_data.level = pPlayer->getLevel();
-         m_data.gmRank = pPlayer->getGmRank();
+         m_data.level = player.getLevel();
+         m_data.gmRank = player.getGmRank();
          m_data.pose = 0;
 
-         memcpy( m_data.look, pPlayer->getLookArray(), 26 );
+         memcpy( m_data.look, player.getLookArray(), 26 );
 
-         auto item = pPlayer->getInventory()->getItemAt( Inventory::GearSet0, Inventory::EquipSlot::MainHand );
+         auto item = player.getInventory()->getItemAt( Inventory::GearSet0, Inventory::EquipSlot::MainHand );
          if( item )
             m_data.mainWeaponModel = item->getModelId1();
-         m_data.secWeaponModel = pPlayer->getModelSubWeapon();
+         m_data.secWeaponModel = player.getModelSubWeapon();
 
-         m_data.models[0] = pPlayer->getModelForSlot( Inventory::EquipSlot::Head );
-         m_data.models[1] = pPlayer->getModelForSlot( Inventory::EquipSlot::Body );
-         m_data.models[2] = pPlayer->getModelForSlot( Inventory::EquipSlot::Hands );
-         m_data.models[3] = pPlayer->getModelForSlot( Inventory::EquipSlot::Legs );
-         m_data.models[4] = pPlayer->getModelForSlot( Inventory::EquipSlot::Feet );
-         strcpy( m_data.name, pPlayer->getName().c_str() );
+         m_data.models[0] = player.getModelForSlot( Inventory::EquipSlot::Head );
+         m_data.models[1] = player.getModelForSlot( Inventory::EquipSlot::Body );
+         m_data.models[2] = player.getModelForSlot( Inventory::EquipSlot::Hands );
+         m_data.models[3] = player.getModelForSlot( Inventory::EquipSlot::Legs );
+         m_data.models[4] = player.getModelForSlot( Inventory::EquipSlot::Feet );
+         strcpy( m_data.name, player.getName().c_str() );
 
-         m_data.pos.x = pPlayer->getPos().x;
-         m_data.pos.y = pPlayer->getPos().y;
-         m_data.pos.z = pPlayer->getPos().z;
-         m_data.rotation = Math::Util::floatToUInt16Rot( pPlayer->getRotation() );
+         m_data.pos.x = player.getPos().x;
+         m_data.pos.y = player.getPos().y;
+         m_data.pos.z = player.getPos().z;
+         m_data.rotation = Math::Util::floatToUInt16Rot( player.getRotation() );
          
 
-         m_data.title = pPlayer->getTitle();
-         m_data.voice = pPlayer->getVoiceId();
-         m_data.currentMount = pPlayer->getCurrentMount();
+         m_data.title = player.getTitle();
+         m_data.voice = player.getVoiceId();
+         m_data.currentMount = player.getCurrentMount();
 
-         m_data.onlineStatus = static_cast< uint8_t >( pPlayer->getOnlineStatus() );
+         m_data.onlineStatus = static_cast< uint8_t >( player.getOnlineStatus() );
 
          //m_data.u23 = 0x04;
          //m_data.u24 = 256;
-         m_data.state = static_cast< uint8_t >( pPlayer->getStatus() );
+         m_data.state = static_cast< uint8_t >( player.getStatus() );
          m_data.type = 1;
-         if( pTarget == pPlayer )
+         if( target.getId() == player.getId() )
          {
             m_data.spawnIndex = 0x00;
          }
          else
          {
-            m_data.spawnIndex = pTarget->getSpawnIdForActorId( pPlayer->getId() );
+            m_data.spawnIndex = target.getSpawnIdForActorId( player.getId() );
          }
          // 0x20 == spawn hidden to be displayed by the spawneffect control
-         m_data.displayFlags = pPlayer->getStance();
+         m_data.displayFlags = player.getStance();
 
-         if( pPlayer->getZoningType() != Common::ZoneingType::None )
+         if( player.getZoningType() != Common::ZoneingType::None )
          {
             m_data.displayFlags |= Entity::Actor::DisplayFlags::Invisible;
          }
 
-         if( pPlayer->getEquipDisplayFlags() & Core::Common::EquipDisplayFlags::HideHead )
+         if( player.getEquipDisplayFlags() & Core::Common::EquipDisplayFlags::HideHead )
          {
             m_data.displayFlags |= Entity::Actor::DisplayFlags::HideHead;
          }
 
-         if( pPlayer->getEquipDisplayFlags() & Core::Common::EquipDisplayFlags::HideWeapon )
+         if( player.getEquipDisplayFlags() & Core::Common::EquipDisplayFlags::HideWeapon )
          {
             m_data.displayFlags |= Entity::Actor::DisplayFlags::HideWeapon;
          }
 
-         if( pPlayer->getEquipDisplayFlags() & Core::Common::EquipDisplayFlags::Visor )
+         if( player.getEquipDisplayFlags() & Core::Common::EquipDisplayFlags::Visor )
          {
             m_data.displayFlags |= Entity::Actor::DisplayFlags::Visor;
          }
 
-         m_data.currentMount = pPlayer->getCurrentMount();
+         m_data.currentMount = player.getCurrentMount();
 
-         m_data.targetId = pPlayer->getTargetId();
+         m_data.targetId = player.getTargetId();
          //m_data.type = 1;
          //m_data.unknown_33 = 4;
          //m_data.unknown_38 = 0x70;
@@ -121,11 +121,11 @@ namespace Server {
 
          uint64_t currentTimeMs = Util::getTimeMs();
 
-         for( auto const& effect : pPlayer->getStatusEffectMap() )
+         for( auto const& effect : player.getStatusEffectMap() )
          {
             m_data.effect[effect.first].effect_id = effect.second->getId();
             m_data.effect[effect.first].duration = static_cast< float >( effect.second->getDuration() -
-                                                                         ( currentTimeMs - effect.second->getStartTimeMs() ) ) / 1000;
+                                                                       ( currentTimeMs - effect.second->getStartTimeMs() ) ) / 1000;
             m_data.effect[effect.first].sourceActorId = effect.second->getSrcActorId();
             m_data.effect[effect.first].unknown1 = effect.second->getParam();
          }

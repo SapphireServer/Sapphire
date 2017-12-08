@@ -1,16 +1,16 @@
-#include <src/servers/Server_Common/Common.h>
-#include <src/servers/Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
-#include <src/servers/Server_Common/Network/GamePacket.h>
-#include <src/servers/Server_Common/Exd/ExdData.h>
-#include <src/servers/Server_Common/Network/PacketContainer.h>
+#include <Server_Common/Common.h>
+#include <Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
+#include <Server_Common/Network/GamePacket.h>
+#include <Server_Common/Exd/ExdData.h>
+#include <Server_Common/Network/PacketContainer.h>
 
-#include "src/servers/Server_Zone/Network/GameConnection.h"
+#include "Network/GameConnection.h"
 
-#include "src/servers/Server_Zone/Network/PacketWrappers/QuestMessagePacket.h"
+#include "Network/PacketWrappers/QuestMessagePacket.h"
 
-#include "src/servers/Server_Zone/Session.h"
+#include "Server_Zone/Session.h"
 #include "Player.h"
-#include "src/servers/Server_Zone/Inventory/Inventory.h"
+#include "Server_Zone/Inventory/Inventory.h"
 
 extern Core::Data::ExdData g_exdData;
 

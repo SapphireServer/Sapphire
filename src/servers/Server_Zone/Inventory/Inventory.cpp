@@ -1,22 +1,22 @@
-#include <src/servers/Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
-#include <src/servers/Server_Common/Common.h>
-#include <src/servers/Server_Common/Exd/ExdData.h>
-#include <src/servers/Server_Common/Logging/Logger.h>
+#include <Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
+#include <Server_Common/Common.h>
+#include <Server_Common/Exd/ExdData.h>
+#include <Server_Common/Logging/Logger.h>
 
 #include "Inventory.h"
 
-#include "src/servers/Server_Zone/Actor/Player.h"
+#include "Actor/Player.h"
 
 #include "ItemContainer.h"
 #include "Item.h"
 
-#include "src/servers/Server_Zone/Network/PacketWrappers/ServerNoticePacket.h"
+#include "Network/PacketWrappers/ServerNoticePacket.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/clamp.hpp>
 
-#include "src/servers/Server_Zone/Forwards.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket143.h"
+#include "../Forwards.h"
+#include "Network/PacketWrappers/ActorControlPacket143.h"
 
 #include <Server_Common/Database/DatabaseDef.h>
 

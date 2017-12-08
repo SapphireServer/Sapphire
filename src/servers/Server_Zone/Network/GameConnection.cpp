@@ -1,20 +1,20 @@
-#include <src/servers/Server_Common/Common.h>
-#include <src/servers/Server_Common/Network/CommonNetwork.h>
-#include <src/servers/Server_Common/Util/Util.h>
-#include <src/servers/Server_Common/Logging/Logger.h>
-#include <src/servers/Server_Common/Network/PacketContainer.h>
-#include <src/servers/Server_Common/Network/GamePacketParser.h>
+#include <Server_Common/Common.h>
+#include <Server_Common/Network/CommonNetwork.h>
+#include <Server_Common/Util/Util.h>
+#include <Server_Common/Logging/Logger.h>
+#include <Server_Common/Network/PacketContainer.h>
+#include <Server_Common/Network/GamePacketParser.h>
 #include <boost/format.hpp>
 
 #include "GameConnection.h"
 
-#include "src/servers/Server_Zone/ServerZone.h"
-#include "src/servers/Server_Zone/Session.h"
-#include "src/servers/Server_Zone/Zone/Zone.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/InitUIPacket.h"
-#include "src/servers/Server_Zone/DebugCommand/DebugCommandHandler.h"
-#include "src/servers/Server_Zone/Actor/Player.h"
-#include "src/servers/Server_Zone/Forwards.h"
+#include "ServerZone.h"
+#include "Session.h"
+#include "Zone/Zone.h"
+#include "Network/PacketWrappers/InitUIPacket.h"
+#include "DebugCommand/DebugCommandHandler.h"
+#include "Actor/Player.h"
+#include "Forwards.h"
 
 extern Core::DebugCommandHandler g_gameCommandMgr;
 extern Core::Logger g_log;
@@ -134,8 +134,7 @@ void Core::Network::GameConnection::OnRecv( std::vector< uint8_t > & buffer )
       Disconnect();
       return;
    }
-   
-   if( headerResult == Malformed )
+   else if( headerResult == Malformed )
    {
       g_log.info( "Dropping connection due to malformed packet header." );
       Disconnect();
@@ -154,8 +153,7 @@ void Core::Network::GameConnection::OnRecv( std::vector< uint8_t > & buffer )
       Disconnect();
       return;
    }
-
-   if (packetResult == Malformed)
+   else if( packetResult == Malformed )
    {
       g_log.info( "Dropping connection due to malformed packets." );
       Disconnect();
@@ -199,7 +197,7 @@ void Core::Network::GameConnection::handleZonePacket( const Packets::GamePacket&
                       boost::str( boost::format( "%|04X|" ) %
                                          static_cast< uint32_t >( pPacket.getSubType() & 0xFFFF ) ) + " )" );
 
-      ( this->*( it->second ) )( pPacket, m_pSession->getPlayer() );
+      ( this->*( it->second ) )( pPacket, *m_pSession->getPlayer() );
    }
    else
    {
@@ -227,7 +225,7 @@ void Core::Network::GameConnection::handleChatPacket( const Packets::GamePacket&
                    boost::str( boost::format( "%|04X|" ) %
                                       static_cast< uint32_t >( pPacket.getSubType() & 0xFFFF ) ) + " )" );
 
-      ( this->*( it->second ) )( pPacket, m_pSession->getPlayer() );
+      ( this->*( it->second ) )( pPacket, *m_pSession->getPlayer() );
    }
    else
    {
@@ -310,7 +308,7 @@ void Core::Network::GameConnection::sendSinglePacket( Packets::GamePacket* pPack
    sendPackets( &pRP );
 }
 
-void Core::Network::GameConnection::injectPacket( const std::string& packetpath, Core::Entity::PlayerPtr pPlayer )
+void Core::Network::GameConnection::injectPacket( const std::string& packetpath, Core::Entity::Player& pPlayer )
 {
 
    char packet[0x11570];
@@ -339,7 +337,7 @@ void Core::Network::GameConnection::injectPacket( const std::string& packetpath,
    // cycle through the packet entries and queue each one
    for( int32_t k = 0x18; k < size; )
    {
-      uint32_t tmpId = pPlayer->getId();
+      uint32_t tmpId = pPlayer.getId();
       // replace ids in the entryheader if needed
       if( !memcmp( packet + k + 0x04, packet + k + 0x08, 4 ) )
       {

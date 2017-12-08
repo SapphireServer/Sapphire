@@ -1,8 +1,8 @@
 #ifndef INVENTORY_H_
 #define INVENTORY_H_
 #include <map>
-#include <src/servers/Server_Common/Common.h>
-#include "src/servers/Server_Zone/Forwards.h"
+#include <Server_Common/Common.h>
+#include "../Forwards.h"
 
 namespace Core
 {

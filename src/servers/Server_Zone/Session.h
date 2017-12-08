@@ -5,10 +5,7 @@
 
 #include "Forwards.h"
 
-
-
 namespace Core {
-
 
    class Session : public boost::enable_shared_from_this< Session >
    {

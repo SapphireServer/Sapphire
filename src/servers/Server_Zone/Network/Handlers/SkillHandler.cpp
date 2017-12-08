@@ -1,34 +1,34 @@
-#include <src/servers/Server_Common/Common.h>
-#include <src/servers/Server_Common/Network/CommonNetwork.h>
-#include <src/servers/Server_Common/Exd/ExdData.h>
-#include <src/servers/Server_Common/Network/GamePacketNew.h>
-#include <src/servers/Server_Common/Network/PacketContainer.h>
-#include <src/servers/Server_Common/Logging/Logger.h>
+#include <Server_Common/Common.h>
+#include <Server_Common/Network/CommonNetwork.h>
+#include <Server_Common/Exd/ExdData.h>
+#include <Server_Common/Network/GamePacketNew.h>
+#include <Server_Common/Network/PacketContainer.h>
+#include <Server_Common/Logging/Logger.h>
 
 #include <boost/format.hpp>
 
-#include "src/servers/Server_Zone/Network/GameConnection.h"
+#include "Network/GameConnection.h"
 
-#include "src/servers/Server_Zone/Session.h"
+#include "Session.h"
 
-#include "src/servers/Server_Zone/Network/PacketWrappers/ServerNoticePacket.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket142.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket143.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket144.h"
+#include "Network/PacketWrappers/ServerNoticePacket.h"
+#include "Network/PacketWrappers/ActorControlPacket142.h"
+#include "Network/PacketWrappers/ActorControlPacket143.h"
+#include "Network/PacketWrappers/ActorControlPacket144.h"
+#include "Network/PacketWrappers/MoveActorPacket.h"
 
-#include "src/servers/Server_Zone/Network/PacketWrappers/PlayerStateFlagsPacket.h"
+#include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
 
-#include "src/servers/Server_Zone/DebugCommand/DebugCommandHandler.h"
+#include "DebugCommand/DebugCommandHandler.h"
 
-#include "src/servers/Server_Zone/Actor/Player.h"
+#include "Actor/Player.h"
 
-#include "src/servers/Server_Zone/Forwards.h"
+#include "Forwards.h"
 
-#include "src/servers/Server_Zone/Action/Action.h"
-#include "src/servers/Server_Zone/Action/ActionCast.h"
-#include "src/servers/Server_Zone/Action/ActionMount.h"
-#include "src/servers/Server_Zone/Script/ScriptManager.h"
-#include "Server_Zone/Network/PacketWrappers/MoveActorPacket.h"
+#include "Action/Action.h"
+#include "Action/ActionCast.h"
+#include "Action/ActionMount.h"
+#include "Script/ScriptManager.h"
 
 
 extern Core::Scripting::ScriptManager g_scriptMgr;
@@ -40,7 +40,7 @@ using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
 void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inPacket,
-                                                  Entity::PlayerPtr pPlayer )
+                                                  Entity::Player& player )
 {
     uint8_t type = inPacket.getValAt< uint32_t >( 0x21 );
 
@@ -49,7 +49,7 @@ void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inP
 
     uint64_t targetId = inPacket.getValAt< uint64_t >( 0x30 );
 
-    pPlayer->sendDebug( "Skill type:" + std::to_string( type ) );
+    player.sendDebug( "Skill type:" + std::to_string( type ) );
 
     switch( type )
     {
@@ -58,16 +58,16 @@ void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inP
     if( action < 1000000 ) // normal action
     {
         std::string actionIdStr = boost::str( boost::format( "%|04X|" ) % action );
-        pPlayer->sendDebug( "---------------------------------------" );
-        pPlayer->sendDebug( "ActionHandler ( " + actionIdStr + " | " +
-                            g_exdData.getActionInfo( action )->name +
-                            " | " + std::to_string( targetId ) + " )" );
+        player.sendDebug( "---------------------------------------" );
+        player.sendDebug( "ActionHandler ( " + actionIdStr + " | " +
+                          g_exdData.getActionInfo( action )->name +
+                          " | " + std::to_string( targetId ) + " )" );
 
-        pPlayer->queuePacket( ActorControlPacket142( pPlayer->getId(), ActorControlType::ActionStart, 0x01, action ) );
+        player.queuePacket( ActorControlPacket142( player.getId(), ActorControlType::ActionStart, 0x01, action ) );
 
         if( action == 5 )
         {
-            auto currentAction = pPlayer->getCurrentAction();
+            auto currentAction = player.getCurrentAction();
 
             // we should always have an action here, if not there is a bug
             assert( currentAction );
@@ -75,22 +75,22 @@ void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inP
         }
         else
         {
-            Core::Entity::ActorPtr targetActor = pPlayer;
-            if( targetId != pPlayer->getId() )
+            Core::Entity::ActorPtr targetActor = player.getAsPlayer();
+            if( targetId != player.getId() )
             {
-                targetActor = pPlayer->lookupTargetById( targetId );
+                targetActor = player.lookupTargetById( targetId );
             }
 
-            if( !pPlayer->actionHasCastTime( action ) )
+            if( !player.actionHasCastTime( action ) )
             {
-                g_scriptMgr.onCastFinish( pPlayer, targetActor, action );
+                g_scriptMgr.onCastFinish( player, targetActor, action );
             }
             else
             {
-                Action::ActionCastPtr pActionCast( new Action::ActionCast( pPlayer, targetActor, action ) );
-                pPlayer->setCurrentAction( pActionCast );
-                pPlayer->sendDebug( "setCurrentAction()" );
-                pPlayer->getCurrentAction()->onStart();
+                Action::ActionCastPtr pActionCast( new Action::ActionCast( player.getAsPlayer(), targetActor, action ) );
+                player.setCurrentAction( pActionCast );
+                player.sendDebug( "setCurrentAction()" );
+                player.getCurrentAction()->onStart();
             }
         }
     }
@@ -104,7 +104,7 @@ void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inP
         if( info )
         {
             g_log.debug( info->name );
-            g_scriptMgr.onEventItem( pPlayer, action, info->eventId, info->castTime, targetId );
+            g_scriptMgr.onEventItem( player, action, info->eventId, info->castTime, targetId );
         }
     }
     else if( action > 3000000 ) // unknown
@@ -116,12 +116,12 @@ void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inP
 
     case Common::SkillType::MountSkill:
 
-    pPlayer->sendDebug( "Request mount " + std::to_string( action ) );
+    player.sendDebug( "Request mount " + std::to_string( action ) );
 
-    Action::ActionMountPtr pActionMount( new Action::ActionMount(pPlayer, action) );
-    pPlayer->setCurrentAction( pActionMount );
-    pPlayer->sendDebug("setCurrentAction()");
-    pPlayer->getCurrentAction()->onStart();
+    Action::ActionMountPtr pActionMount( new Action::ActionMount( player.getAsPlayer(), action ) );
+    player.setCurrentAction( pActionMount );
+    player.sendDebug( "setCurrentAction()" );
+    player.getCurrentAction()->onStart();
     
     break;
 

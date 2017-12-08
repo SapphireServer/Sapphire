@@ -1,9 +1,9 @@
 #ifndef _PLAYERSTATE_H
 #define _PLAYERSTATE_H
 
-#include <src/servers/Server_Common/Network/GamePacketNew.h>
-#include "src/servers/Server_Zone/Actor/Player.h"
-#include "src/servers/Server_Zone/Forwards.h"
+#include <Server_Common/Network/GamePacketNew.h>
+#include "Actor/Player.h"
+#include "Forwards.h"
 
 namespace Core {
 namespace Network {
@@ -17,14 +17,14 @@ class PlayerStateFlagsPacket :
    public ZoneChannelPacket< FFXIVIpcPlayerStateFlags >
 {
 public:
-   PlayerStateFlagsPacket( Entity::PlayerPtr pActor ) :
-      ZoneChannelPacket< FFXIVIpcPlayerStateFlags >( pActor->getId(), pActor->getId() )
+   PlayerStateFlagsPacket( Entity::Player& player ) :
+      ZoneChannelPacket< FFXIVIpcPlayerStateFlags >( player.getId(), player.getId() )
    {
-      initialize( pActor->getStateFlags() );
+      initialize( player.getStateFlags() );
    }
 
-   PlayerStateFlagsPacket( Entity::PlayerPtr pActor, std::vector< Common::PlayerStateFlag > flags ) :
-      ZoneChannelPacket< FFXIVIpcPlayerStateFlags >( pActor->getId(), pActor->getId() )
+   PlayerStateFlagsPacket( Entity::Player& player, std::vector< Common::PlayerStateFlag > flags ) :
+      ZoneChannelPacket< FFXIVIpcPlayerStateFlags >( player.getId(), player.getId() )
    {
       uint8_t newFlags[7];
       memset( newFlags, 0, 7 );

@@ -1,9 +1,9 @@
 #ifndef _CORE_NETWORK_PACKETS_PINGPACKET_H
 #define _CORE_NETWORK_PACKETS_PINGPACKET_H
 
-#include <src/servers/Server_Common/Network/GamePacketNew.h>
+#include <Server_Common/Network/GamePacketNew.h>
 
-#include "src/servers/Server_Zone/Forwards.h"
+#include "Forwards.h"
 
 namespace Core {
 namespace Network {
@@ -17,14 +17,14 @@ class PingPacket :
    public ZoneChannelPacket< FFXIVIpcPing >
 {
 public:
-   PingPacket( Entity::PlayerPtr player, int32_t inVal ) :
-      ZoneChannelPacket< FFXIVIpcPing >( player->getId(), player->getId() )
+   PingPacket( Entity::Player& player, int32_t inVal ) :
+      ZoneChannelPacket< FFXIVIpcPing >( player.getId(), player.getId() )
    {
       initialize( player, inVal );
    };
 
 private:
-   void initialize( Entity::PlayerPtr player, int32_t inVal )
+   void initialize( Entity::Player& player, int32_t inVal )
    {
       m_data.timeInMilliseconds = 0x000014D00000000 + inVal;
    };

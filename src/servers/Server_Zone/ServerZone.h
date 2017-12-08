@@ -1,14 +1,14 @@
 #ifndef __GAMESERVER_H
 #define __GAMESERVER_H
 
-#include <src/servers/Server_Common/Common.h>
+#include <Server_Common/Common.h>
 
 #include <boost/shared_ptr.hpp>
 #include <mutex>
 #include <map>
 
 #include "Forwards.h"
-#include "src/servers/Server_Zone/Actor/BattleNpcTemplate.h"
+#include "Actor/BattleNpcTemplate.h"
 
 namespace Core {
 

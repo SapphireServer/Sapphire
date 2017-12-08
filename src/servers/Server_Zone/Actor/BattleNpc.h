@@ -4,7 +4,6 @@
 #include "Actor.h"
 
 namespace Core {
-
 namespace Entity {
 
 enum StateMode
@@ -76,7 +75,7 @@ public:
 
    void onDeath() override;
 
-   void onActionHostile( Core::Entity::ActorPtr pSource ) override;
+   void onActionHostile( ActorPtr pSource ) override;
 
    ActorPtr getClaimer() const;
 

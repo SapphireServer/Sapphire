@@ -1,35 +1,34 @@
 #include <stdio.h>
 #include <vector>
 
-#include <src/servers/Server_Common/Logging/Logger.h>
-#include <src/servers/Server_Common/Util/Util.h>
-#include <src/servers/Server_Common/Util/UtilMath.h>
-#include <src/servers/Server_Common/Network/GamePacket.h>
-#include <src/servers/Server_Common/Network/GamePacketNew.h>
-#include <src/servers/Server_Common/Exd/ExdData.h>
-#include <src/servers/Server_Common/Network/CommonNetwork.h>
-#include <src/servers/Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
-#include <src/servers/Server_Common/Network/PacketContainer.h>
+#include <Server_Common/Logging/Logger.h>
+#include <Server_Common/Util/Util.h>
+#include <Server_Common/Util/UtilMath.h>
+#include <Server_Common/Network/GamePacket.h>
+#include <Server_Common/Network/GamePacketNew.h>
+#include <Server_Common/Exd/ExdData.h>
+#include <Server_Common/Network/CommonNetwork.h>
+#include <Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
+#include <Server_Common/Network/PacketContainer.h>
+#include <Server_Common/Database/DatabaseDef.h>
 
 #include "Zone.h"
 #include "ZoneMgr.h"
 
-#include "src/servers/Server_Zone/Session.h"
-#include "src/servers/Server_Zone/Actor/Actor.h"
-#include "src/servers/Server_Zone/Actor/Player.h"
-#include "src/servers/Server_Zone/Actor/BattleNpc.h"
+#include "Session.h"
+#include "Actor/Actor.h"
+#include "Actor/Player.h"
+#include "Actor/BattleNpc.h"
 
-#include "src/servers/Server_Zone/Forwards.h"
+#include "Forwards.h"
 
-#include "src/servers/Server_Zone/Network/GameConnection.h"
-#include "src/servers/Server_Zone/ServerZone.h"
-#include "src/servers/Server_Zone/Script/ScriptManager.h"
+#include "Network/GameConnection.h"
+#include "ServerZone.h"
+#include "Script/ScriptManager.h"
 
 #include "CellHandler.h"
 
 #include <time.h>
-
-#include <Server_Common/Database/DatabaseDef.h>
 
 extern Core::Logger g_log;
 extern Core::ServerZone g_serverZone;
@@ -180,16 +179,10 @@ void Zone::loadCellCache()
       pos.x = posX;
       pos.y = posY;
       pos.z = posZ;
-      Entity::BattleNpcPtr pBNpc( new Entity::BattleNpc( modelId, nameId, 
-                                                         pos,
+      Entity::BattleNpcPtr pBNpc( new Entity::BattleNpc( modelId, nameId, pos,
                                                          sizeId, type, level, behaviour, mobType ) );
       pBNpc->setRotation( static_cast< float >( rotation ) );
       cache.push_back( pBNpc );
-
-      //pushActor( pBNpc );
-
-      //m_zonePositionMap[id] = ZonePositionPtr( new ZonePosition( id, targetZoneId, Position( posX, posY, posZ, posO ), radius ) );
-
    }
 
 
@@ -290,9 +283,6 @@ void Zone::pushActor( Entity::ActorPtr pActor )
       g_log.debug( "[Zone:" + m_zoneCode + "] Adding player [" + std::to_string( pActor->getId() ) + "]" );
       auto pPlayer = pActor->getAsPlayer();
 
-      // fire the onEnter Lua event
-      //LuaManager->onRegionEnter(this, pPlayer);
-
       auto pSession = g_serverZone.getSession( pPlayer->getId() );
       if( pSession )
          m_sessionSet.insert( pSession );
@@ -343,7 +333,7 @@ void Zone::removeActor( Entity::ActorPtr pActor )
    {
       Entity::ActorPtr pCurAct;
 
-      for( auto iter = pActor->m_inRangeActors.begin(); iter != pActor->m_inRangeActors.end();)
+      for( auto iter = pActor->m_inRangeActors.begin(); iter != pActor->m_inRangeActors.end(); )
       {
          pCurAct = *iter;
          auto iter2 = iter++;
@@ -354,21 +344,21 @@ void Zone::removeActor( Entity::ActorPtr pActor )
 
 }
 
-void Zone::queueOutPacketForRange( Entity::PlayerPtr pSourcePlayer, uint32_t range, Network::Packets::GamePacketPtr pPacketEntry )
+void Zone::queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range, Network::Packets::GamePacketPtr pPacketEntry )
 {
    for( auto it = m_playerMap.begin(); it != m_playerMap.end(); ++it )
    {
-      float distance = Math::Util::distance( pSourcePlayer->getPos().x,
-                                             pSourcePlayer->getPos().y,
-                                             pSourcePlayer->getPos().z,
+      float distance = Math::Util::distance( sourcePlayer.getPos().x,
+                                             sourcePlayer.getPos().y,
+                                             sourcePlayer.getPos().z,
                                              ( *it ).second->getPos().x,
                                              ( *it ).second->getPos().y,
                                              ( *it ).second->getPos().z );
 
-      if( ( distance < range ) && pSourcePlayer->getId() != ( *it ).second->getId() )
+      if( ( distance < range ) && sourcePlayer.getId() != ( *it ).second->getId() )
       {
          auto pSession = g_serverZone.getSession( ( *it ).second->getId() );
-         pPacketEntry->setValAt<uint32_t>( 0x08, ( *it ).second->getId() );
+         pPacketEntry->setValAt< uint32_t >( 0x08, ( *it ).second->getId() );
          if( pSession )
             pSession->getZoneConnection()->queueOutPacket( pPacketEntry );
       }

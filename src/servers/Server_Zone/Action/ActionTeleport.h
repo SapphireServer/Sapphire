@@ -1,10 +1,11 @@
 #ifndef _ACTIONTELEPORT_H_
 #define _ACTIONTELEPORT_H_
 
-#include "src/servers/Server_Zone/Forwards.h"
+#include "../Forwards.h"
 #include "Action.h"
 
-namespace Core { namespace Action {
+namespace Core {
+namespace Action {
 
    class ActionTeleport : public Action
    {

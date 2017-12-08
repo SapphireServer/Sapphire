@@ -1,25 +1,25 @@
-#include <src/servers/Server_Common/Util/Util.h>
-#include <src/servers/Server_Common/Util/UtilMath.h>
-#include <src/servers/Server_Common/Network/PacketContainer.h>
-#include <src/servers/Server_Common/Exd/ExdData.h>
-#include <src/servers/Server_Common/Network/GamePacket.h>
+#include <Server_Common/Util/Util.h>
+#include <Server_Common/Util/UtilMath.h>
+#include <Server_Common/Network/PacketContainer.h>
+#include <Server_Common/Exd/ExdData.h>
+#include <Server_Common/Network/GamePacket.h>
 
-#include "src/servers/Server_Zone/Forwards.h"
-#include "src/servers/Server_Zone/Action/Action.h"
+#include "Forwards.h"
+#include "Action/Action.h"
 
-#include "src/servers/Server_Zone/Zone/Zone.h"
+#include "Zone/Zone.h"
 
-#include "src/servers/Server_Zone/Network/GameConnection.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket142.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket143.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket144.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/UpdateHpMpTpPacket.h"
+#include "Network/GameConnection.h"
+#include "Network/PacketWrappers/ActorControlPacket142.h"
+#include "Network/PacketWrappers/ActorControlPacket143.h"
+#include "Network/PacketWrappers/ActorControlPacket144.h"
+#include "Network/PacketWrappers/UpdateHpMpTpPacket.h"
 
-#include "src/servers/Server_Zone/StatusEffect/StatusEffect.h"
-#include "src/servers/Server_Zone/Action/ActionCollision.h"
-#include "src/servers/Server_Zone/ServerZone.h"
-#include "src/servers/Server_Zone/Session.h"
-#include "src/servers/Server_Zone/Math/CalcBattle.h"
+#include "StatusEffect/StatusEffect.h"
+#include "Action/ActionCollision.h"
+#include "ServerZone.h"
+#include "Session.h"
+#include "Math/CalcBattle.h"
 #include "Actor.h"
 #include "Player.h"
 
@@ -664,7 +664,7 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
                                              uint64_t param2, Entity::Actor& pTarget )
 {
 
-   if ( isPlayer() )
+   if( isPlayer() )
    {
       getAsPlayer()->sendDebug( std::to_string( pTarget.getId() ) );
       getAsPlayer()->sendDebug( "Handle script skill type: " + std::to_string( type ) );
@@ -686,7 +686,7 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
    effectPacket.data().effectTarget = pTarget.getId();
 
    // Todo: for each actor, calculate how much damage the calculated value should deal to them - 2-step damage calc. we only have 1-step
-   switch ( type )
+   switch( type )
    {
 
    case ActionEffectType::Damage:
@@ -696,7 +696,7 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
       effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::NormalDamage;
       effectPacket.data().effects[0].unknown_3 = 7;
 
-      if ( !actionInfoPtr->is_aoe )
+      if( !actionInfoPtr->is_aoe )
       {
          // If action on this specific target is valid...
          if ( isPlayer() && !ActionCollision::isActorApplicable( pTarget.shared_from_this(), TargetFilter::Enemies ) )
@@ -704,11 +704,11 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
 
          sendToInRangeSet( effectPacket, true );
 
-         pTarget.takeDamage( static_cast< uint32_t >( param1 ) );
-
          if ( pTarget.isAlive() )
             pTarget.onActionHostile( shared_from_this() );
-         
+
+         pTarget.takeDamage( static_cast< uint32_t >( param1 ) );
+
       }
       else
       {
@@ -716,7 +716,7 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
          auto actorsCollided = ActionCollision::getActorsHitFromAction( pTarget.getPos(), getInRangeActors( true ),
                                                                         actionInfoPtr, TargetFilter::Enemies );
 
-         for ( const auto& pHitActor : actorsCollided )
+         for( const auto& pHitActor : actorsCollided )
          {
             effectPacket.data().targetId = pHitActor->getId();
             effectPacket.data().effectTarget = pHitActor->getId();
@@ -724,17 +724,17 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
             // todo: send to range of what? ourselves? when mob script hits this is going to be lacking
             sendToInRangeSet( effectPacket, true );
 
-            pHitActor->takeDamage( static_cast< uint32_t >( param1 ) );
 
             if( pHitActor->isAlive() )
                pHitActor->onActionHostile( shared_from_this() );
 
+            pHitActor->takeDamage( static_cast< uint32_t >( param1 ) );
+
             // Debug
             if ( isPlayer() ) 
             {
-               if ( pHitActor->isPlayer() ) {
+               if ( pHitActor->isPlayer() )
                   getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) + " (" + pHitActor->getName() + ")" );
-               }
                else
                   getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) );
             }  
@@ -752,9 +752,9 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
       effectPacket.data().effects[0].effectType = ActionEffectType::Heal;
       effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::NormalHeal;
 
-      if ( !actionInfoPtr->is_aoe )
+      if( !actionInfoPtr->is_aoe )
       {
-         if ( isPlayer() && !ActionCollision::isActorApplicable( pTarget.shared_from_this(), TargetFilter::Allies ) )
+         if( isPlayer() && !ActionCollision::isActorApplicable( pTarget.shared_from_this(), TargetFilter::Allies ) )
             break;
 
          sendToInRangeSet( effectPacket, true );
@@ -768,7 +768,7 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
          auto actorsCollided = ActionCollision::getActorsHitFromAction( pTarget.getPos(), getInRangeActors( true ),
                                                                         actionInfoPtr, TargetFilter::Allies );
 
-         for ( auto pHitActor : actorsCollided )
+         for( auto pHitActor : actorsCollided )
          {
             effectPacket.data().targetId = pTarget.getId();
             effectPacket.data().effectTarget = pHitActor->getId();
@@ -777,11 +777,10 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
             pHitActor->heal( calculatedHeal );
 
             // Debug
-            if ( isPlayer() )
+            if( isPlayer() )
             {
-               if ( pHitActor->isPlayer() ) {
+               if( pHitActor->isPlayer() )
                   getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) + " (" + pHitActor->getName() + ")" );
-               }
                else
                   getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) );
             }
@@ -836,13 +835,14 @@ void Core::Entity::Actor::addStatusEffectById( uint32_t id, int32_t duration, En
 /*! \param StatusEffectPtr to be applied to the actor */
 void Core::Entity::Actor::addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Actor& pSource, uint16_t param )
 {
-   if( !hasStatusEffect( id ) )
-   {
-      StatusEffect::StatusEffectPtr effect( new StatusEffect::StatusEffect( id, pSource.shared_from_this(),
-                                                                            shared_from_this(), duration, 3000 ) );
-      effect->setParam( param );
-      addStatusEffect( effect );
-   }
+   if( hasStatusEffect( id ) )
+      return;
+
+   StatusEffect::StatusEffectPtr effect( new StatusEffect::StatusEffect( id, pSource.shared_from_this(),
+                                                                         shared_from_this(), duration, 3000 ) );
+   effect->setParam( param );
+   addStatusEffect( effect );
+
 }
 
 float Core::Entity::Actor::getRotation() const
