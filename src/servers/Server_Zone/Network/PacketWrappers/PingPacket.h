@@ -1,9 +1,9 @@
 #ifndef _CORE_NETWORK_PACKETS_PINGPACKET_H
 #define _CORE_NETWORK_PACKETS_PINGPACKET_H
 
-#include <src/servers/Server_Common/Network/GamePacketNew.h>
+#include <Server_Common/Network/GamePacketNew.h>
 
-#include "src/servers/Server_Zone/Forwards.h"
+#include "Forwards.h"
 
 namespace Core {
 namespace Network {

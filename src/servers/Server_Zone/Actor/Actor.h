@@ -1,7 +1,7 @@
 #ifndef _ACTOR_H_
 #define _ACTOR_H_
 
-#include <src/servers/Server_Common/Common.h>
+#include <Server_Common/Common.h>
 #include <boost/enable_shared_from_this.hpp>
 
 #include "Forwards.h"

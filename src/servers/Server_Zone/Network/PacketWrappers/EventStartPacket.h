@@ -1,8 +1,8 @@
 #ifndef _EVENTSTART_H
 #define _EVENTSTART_H
 
-#include <src/servers/Server_Common/Network/GamePacketNew.h>
-#include "src/servers/Server_Zone/Forwards.h"
+#include <Server_Common/Network/GamePacketNew.h>
+#include "Forwards.h"
 
 namespace Core {
 namespace Network {

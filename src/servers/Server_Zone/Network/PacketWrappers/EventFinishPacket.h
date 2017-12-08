@@ -1,7 +1,7 @@
 #ifndef _EVENTFINISH_H
 #define _EVENTFINISH_H
 
-#include <src/servers/Server_Common/Network/GamePacketNew.h>
+#include <Server_Common/Network/GamePacketNew.h>
 
 namespace Core {
 namespace Network {

@@ -1,9 +1,9 @@
 #ifndef _CHATPACKET_H
 #define _CHATPACKET_H
 
-#include <src/servers/Server_Common/Network/GamePacketNew.h>
-#include <src/servers/Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
-#include "src/servers/Server_Zone/Forwards.h"
+#include <Server_Common/Network/GamePacketNew.h>
+#include <Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
+#include "Forwards.h"
 
 
 namespace Core {
