@@ -1,10 +1,11 @@
 #ifndef _ACTIONMOUNT_H_
 #define _ACTIONMOUNT_H_
 
-#include "src/servers/Server_Zone/Forwards.h"
+#include "../Forwards.h"
 #include "Action.h"
 
-namespace Core { namespace Action {
+namespace Core {
+namespace Action {
 
    class ActionMount : public Action
    {

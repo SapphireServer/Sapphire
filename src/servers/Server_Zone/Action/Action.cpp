@@ -1,6 +1,6 @@
 #include "Action.h"
 
-#include <src/servers/Server_Common/Util/Util.h>
+#include <Server_Common/Util/Util.h>
 
 
 Core::Action::Action::Action()

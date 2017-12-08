@@ -1,29 +1,29 @@
-#include <src/servers/Server_Common/Common.h>
-#include <src/servers/Server_Common/Network/GamePacket.h>
-#include <src/servers/Server_Common/Logging/Logger.h>
-#include <src/servers/Server_Common/Network/PacketContainer.h>
-#include <src/servers/Server_Common/Config/XMLConfig.h>
+#include <Server_Common/Common.h>
+#include <Server_Common/Network/GamePacket.h>
+#include <Server_Common/Logging/Logger.h>
+#include <Server_Common/Network/PacketContainer.h>
+#include <Server_Common/Config/XMLConfig.h>
 
 #include "Player.h"
 
-#include "src/servers/Server_Zone/Zone/Zone.h"
+#include "Zone/Zone.h"
 
-#include "src/servers/Server_Zone/Forwards.h"
+#include "Forwards.h"
 
-#include "src/servers/Server_Zone/Network/GameConnection.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket142.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/InitUIPacket.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ServerNoticePacket.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/EventStartPacket.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/EventPlayPacket.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/EventFinishPacket.h"
+#include "Network/GameConnection.h"
+#include "Network/PacketWrappers/ActorControlPacket142.h"
+#include "Network/PacketWrappers/InitUIPacket.h"
+#include "Network/PacketWrappers/ServerNoticePacket.h"
+#include "Network/PacketWrappers/EventStartPacket.h"
+#include "Network/PacketWrappers/EventPlayPacket.h"
+#include "Network/PacketWrappers/EventFinishPacket.h"
 
-#include "src/servers/Server_Zone/Action/EventAction.h"
-#include "src/servers/Server_Zone/Action/EventItemAction.h"
+#include "Action/EventAction.h"
+#include "Action/EventItemAction.h"
 
-#include "src/servers/Server_Zone/Event/Event.h"
-#include "src/servers/Server_Zone/Event/Event.h"
-#include "Server_Zone/ServerZone.h"
+#include "Event/Event.h"
+#include "Event/Event.h"
+#include "ServerZone.h"
 
 extern Core::Logger g_log;
 extern Core::ServerZone g_serverZone;

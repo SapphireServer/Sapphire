@@ -1,25 +1,25 @@
-#include <src/servers/Server_Common/Util/Util.h>
-#include <src/servers/Server_Common/Util/UtilMath.h>
-#include <src/servers/Server_Common/Network/PacketContainer.h>
-#include <src/servers/Server_Common/Exd/ExdData.h>
-#include <src/servers/Server_Common/Network/GamePacket.h>
+#include <Server_Common/Util/Util.h>
+#include <Server_Common/Util/UtilMath.h>
+#include <Server_Common/Network/PacketContainer.h>
+#include <Server_Common/Exd/ExdData.h>
+#include <Server_Common/Network/GamePacket.h>
 
-#include "src/servers/Server_Zone/Forwards.h"
-#include "src/servers/Server_Zone/Action/Action.h"
+#include "Forwards.h"
+#include "Action/Action.h"
 
-#include "src/servers/Server_Zone/Zone/Zone.h"
+#include "Zone/Zone.h"
 
-#include "src/servers/Server_Zone/Network/GameConnection.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket142.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket143.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket144.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/UpdateHpMpTpPacket.h"
+#include "Network/GameConnection.h"
+#include "Network/PacketWrappers/ActorControlPacket142.h"
+#include "Network/PacketWrappers/ActorControlPacket143.h"
+#include "Network/PacketWrappers/ActorControlPacket144.h"
+#include "Network/PacketWrappers/UpdateHpMpTpPacket.h"
 
-#include "src/servers/Server_Zone/StatusEffect/StatusEffect.h"
-#include "src/servers/Server_Zone/Action/ActionCollision.h"
-#include "src/servers/Server_Zone/ServerZone.h"
-#include "src/servers/Server_Zone/Session.h"
-#include "src/servers/Server_Zone/Math/CalcBattle.h"
+#include "StatusEffect/StatusEffect.h"
+#include "Action/ActionCollision.h"
+#include "ServerZone.h"
+#include "Session.h"
+#include "Math/CalcBattle.h"
 #include "Actor.h"
 #include "Player.h"
 

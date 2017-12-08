@@ -1,12 +1,13 @@
 #ifndef _EVENTACTION_H_
 #define _EVENTACTION_H_
 
-#include <src/servers/Server_Common/Common.h>
+#include <Server_Common/Common.h>
 
-#include "src/servers/Server_Zone/Forwards.h"
-#include "src/servers/Server_Zone/Action/Action.h"
+#include "../Forwards.h"
+#include "Action.h"
 
-namespace Core { namespace Action {
+namespace Core {
+namespace Action {
 
    class EventAction : public Action 
    {

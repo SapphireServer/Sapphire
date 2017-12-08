@@ -1,24 +1,24 @@
-#include <src/servers/Server_Common/Common.h>
-#include <src/servers/Server_Common/Network/CommonNetwork.h>
-#include <src/servers/Server_Common/Network/GamePacketNew.h>
-#include <src/servers/Server_Common/Network/PacketContainer.h>
-#include <src/servers/Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
+#include <Server_Common/Common.h>
+#include <Server_Common/Network/CommonNetwork.h>
+#include <Server_Common/Network/GamePacketNew.h>
+#include <Server_Common/Network/PacketContainer.h>
+#include <Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
 
 #include <boost/format.hpp>
 
-#include "src/servers/Server_Zone/Network/GameConnection.h"
-#include "src/servers/Server_Zone/Session.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ServerNoticePacket.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket142.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket143.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket144.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/EventStartPacket.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/EventFinishPacket.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/PlayerStateFlagsPacket.h"
-#include "src/servers/Server_Zone/Script/ScriptManager.h"
-#include "src/servers/Server_Zone/Actor/Player.h"
-#include "src/servers/Server_Zone/Forwards.h"
-#include "src/servers/Server_Zone/Event/EventHelper.h"
+#include "Network/GameConnection.h"
+#include "Session.h"
+#include "Network/PacketWrappers/ServerNoticePacket.h"
+#include "Network/PacketWrappers/ActorControlPacket142.h"
+#include "Network/PacketWrappers/ActorControlPacket143.h"
+#include "Network/PacketWrappers/ActorControlPacket144.h"
+#include "Network/PacketWrappers/EventStartPacket.h"
+#include "Network/PacketWrappers/EventFinishPacket.h"
+#include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
+#include "Script/ScriptManager.h"
+#include "Actor/Player.h"
+#include "Forwards.h"
+#include "Event/EventHelper.h"
 
 extern Core::Scripting::ScriptManager g_scriptMgr;
 

@@ -1,10 +1,11 @@
-#include <src/servers/Server_Common/Util/Util.h>
-#include <src/servers/Server_Common/Exd/ExdData.h>
-#include <src/servers/Server_Common/Util/UtilMath.h>
+#include <Server_Common/Util/Util.h>
+#include <Server_Common/Exd/ExdData.h>
+#include <Server_Common/Util/UtilMath.h>
 
 #include "ActionCollision.h"
-#include <src/servers/Server_Zone/Actor/Actor.h>
-#include <src/servers/Server_Zone/Actor/Player.h>
+#include "Actor/Actor.h"
+#include "Actor/Player.h"
+
 #include <cmath>
 #include <boost/make_shared.hpp>
 

@@ -1,46 +1,45 @@
-#include <src/servers/Server_Common/Common.h>
-#include <src/servers/Server_Common/Util/Util.h>
-#include <src/servers/Server_Common/Util/UtilMath.h>
-#include <src/servers/Server_Common/Config/XMLConfig.h>
-#include <src/servers/Server_Common/Network/GamePacket.h>
-#include <src/servers/Server_Common/Logging/Logger.h>
-#include <src/servers/Server_Common/Exd/ExdData.h>
-#include <src/servers/Server_Common/Network/PacketContainer.h>
+#include <Server_Common/Common.h>
+#include <Server_Common/Util/Util.h>
+#include <Server_Common/Util/UtilMath.h>
+#include <Server_Common/Config/XMLConfig.h>
+#include <Server_Common/Network/GamePacket.h>
+#include <Server_Common/Logging/Logger.h>
+#include <Server_Common/Exd/ExdData.h>
+#include <Server_Common/Network/PacketContainer.h>
 
-#include "src/servers/Server_Zone/Session.h"
+#include "Session.h"
 #include "Player.h"
 #include "BattleNpc.h"
 
-#include "src/servers/Server_Zone/Zone/ZoneMgr.h"
-#include "src/servers/Server_Zone/Zone/Zone.h"
+#include "Zone/ZoneMgr.h"
+#include "Zone/Zone.h"
 
-#include "src/servers/Server_Zone/ServerZone.h"
+#include "ServerZone.h"
 
-#include "src/servers/Server_Zone/Network/GameConnection.h"
+#include "Network/GameConnection.h"
+#include "Network/PacketWrappers/ActorControlPacket142.h"
+#include "Network/PacketWrappers/ActorControlPacket143.h"
+#include "Network/PacketWrappers/InitUIPacket.h"
+#include "Network/PacketWrappers/ServerNoticePacket.h"
+#include "Network/PacketWrappers/ChatPacket.h"
+#include "Network/PacketWrappers/ModelEquipPacket.h"
+#include "Network/PacketWrappers/ActorSpawnPacket.h"
+#include "Network/PacketWrappers/UpdateHpMpTpPacket.h"
+#include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
+#include "Network/PacketWrappers/PlayerSpawnPacket.h"
 
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket142.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket143.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/InitUIPacket.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ServerNoticePacket.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ChatPacket.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ModelEquipPacket.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorSpawnPacket.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/UpdateHpMpTpPacket.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/PlayerStateFlagsPacket.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/PlayerSpawnPacket.h"
+#include "Script/ScriptManager.h"
 
-#include "src/servers/Server_Zone/Script/ScriptManager.h"
+#include "Inventory/Item.h"
 
-#include "src/servers/Server_Zone/Inventory/Item.h"
-
-#include "src/servers/Server_Zone/Inventory/Inventory.h"
-#include "src/servers/Server_Zone/Event/Event.h"
-#include "src/servers/Server_Zone/Action/Action.h"
-#include "src/servers/Server_Zone/Action/EventAction.h"
-#include "src/servers/Server_Zone/Action/EventItemAction.h"
-#include "src/servers/Server_Zone/Zone/ZonePosition.h"
-#include "src/servers/Server_Zone/Math/CalcStats.h"
-#include "src/servers/Server_Zone/Math/CalcBattle.h"
+#include "Inventory/Inventory.h"
+#include "Event/Event.h"
+#include "Action/Action.h"
+#include "Action/EventAction.h"
+#include "Action/EventItemAction.h"
+#include "Zone/ZonePosition.h"
+#include "Math/CalcStats.h"
+#include "Math/CalcBattle.h"
 #include <boost/make_shared.hpp>
 
 extern Core::Logger g_log;
@@ -743,7 +742,7 @@ uint8_t Core::Entity::Player::getLevel() const
    return static_cast< uint8_t >( m_classArray[classJobIndex] );
 }
 
-uint8_t Core::Entity::Player::getLevelForClass( Core::Common::ClassJob pClass ) const
+uint8_t Core::Entity::Player::getLevelForClass( Common::ClassJob pClass ) const
 {
    uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( pClass )].exp_idx;
    return static_cast< uint8_t >( m_classArray[classJobIndex] );
@@ -772,7 +771,7 @@ void Core::Entity::Player::setInCombat( bool mode )
    m_bInCombat = mode;
 }
 
-void Core::Entity::Player::setClassJob( Core::Common::ClassJob classJob )
+void Core::Entity::Player::setClassJob( Common::ClassJob classJob )
 {
    m_class = classJob;
    uint8_t level = getLevel();
@@ -801,7 +800,7 @@ void Core::Entity::Player::setLevel( uint8_t level )
    m_classArray[classJobIndex] = level;
 }
 
-void Core::Entity::Player::setLevelForClass( uint8_t level, Core::Common::ClassJob classjob )
+void Core::Entity::Player::setLevelForClass( uint8_t level, Common::ClassJob classjob )
 {
     uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( classjob )].exp_idx;
     m_classArray[classJobIndex] = level;
@@ -871,7 +870,7 @@ void Core::Entity::Player::setLookAt( uint8_t index, uint8_t value )
 }
 
 // spawn this player for pTarget
-void Core::Entity::Player::spawn( Core::Entity::PlayerPtr pTarget )
+void Core::Entity::Player::spawn( Entity::PlayerPtr pTarget )
 {
    g_log.debug( "[" + std::to_string( pTarget->getId() ) + "] Spawning " +
                 getName() + " for " +
@@ -882,7 +881,7 @@ void Core::Entity::Player::spawn( Core::Entity::PlayerPtr pTarget )
 }
 
 // despawn
-void Core::Entity::Player::despawn( Core::Entity::ActorPtr pTarget )
+void Core::Entity::Player::despawn( Entity::ActorPtr pTarget )
 {
    auto pPlayer = pTarget->getAsPlayer();
 
@@ -893,7 +892,7 @@ void Core::Entity::Player::despawn( Core::Entity::ActorPtr pTarget )
 
 Core::Entity::ActorPtr Core::Entity::Player::lookupTargetById( uint64_t targetId )
 {
-   Core::Entity::ActorPtr targetActor;
+   ActorPtr targetActor;
    auto inRange = getInRangeActors( true );
    for( auto actor : inRange )
    {
@@ -957,7 +956,7 @@ bool Core::Entity::Player::actionHasCastTime( uint32_t actionId ) //TODO: Add lo
 
 }
 
-bool Core::Entity::Player::hasStateFlag( Core::Common::PlayerStateFlag flag ) const
+bool Core::Entity::Player::hasStateFlag( Common::PlayerStateFlag flag ) const
 {
    int32_t iFlag = static_cast< uint32_t >( flag );
 
@@ -968,7 +967,7 @@ bool Core::Entity::Player::hasStateFlag( Core::Common::PlayerStateFlag flag ) co
    return ( m_stateFlags[index] & value ) != 0;
 }
 
-void Core::Entity::Player::setStateFlag( Core::Common::PlayerStateFlag flag )
+void Core::Entity::Player::setStateFlag( Common::PlayerStateFlag flag )
 {
    int32_t iFlag = static_cast< uint32_t >( flag );
 
@@ -999,7 +998,7 @@ void Core::Entity::Player::sendStateFlags()
    queuePacket( PlayerStateFlagsPacket( *getAsPlayer() ) );
 }
 
-void Core::Entity::Player::unsetStateFlag( Core::Common::PlayerStateFlag flag )
+void Core::Entity::Player::unsetStateFlag( Common::PlayerStateFlag flag )
 {
    if( !hasStateFlag( flag ) )
       return;
@@ -1209,7 +1208,7 @@ const uint8_t* Core::Entity::Player::getGcRankArray() const
    return m_gcRank;
 }
 
-void Core::Entity::Player::queuePacket( Core::Network::Packets::GamePacketPtr pPacket )
+void Core::Entity::Player::queuePacket( Network::Packets::GamePacketPtr pPacket )
 {
    auto pSession = g_serverZone.getSession( m_id );
 
@@ -1223,7 +1222,7 @@ void Core::Entity::Player::queuePacket( Core::Network::Packets::GamePacketPtr pP
 
 }
 
-void Core::Entity::Player::queueChatPacket( Core::Network::Packets::GamePacketPtr pPacket )
+void Core::Entity::Player::queueChatPacket( Network::Packets::GamePacketPtr pPacket )
 {
    auto pSession = g_serverZone.getSession( m_id );
 
@@ -1246,7 +1245,7 @@ void Core::Entity::Player::setLoadingComplete( bool bComplete )
    m_bLoadingComplete = bComplete;
 }
 
-void Core::Entity::Player::performZoning(uint16_t zoneId, const Common::FFXIVARR_POSITION3 &pos, float rotation)
+void Core::Entity::Player::performZoning( uint16_t zoneId, const Common::FFXIVARR_POSITION3 &pos, float rotation )
 {
    m_pos = pos;
    m_zoneId = zoneId;
@@ -1319,14 +1318,14 @@ void Core::Entity::Player::updateHowtosSeen( uint32_t howToId )
 }
 
 
-void Core::Entity::Player::onMobAggro( Core::Entity::BattleNpcPtr pBNpc )
+void Core::Entity::Player::onMobAggro( BattleNpcPtr pBNpc )
 {
    hateListAdd( pBNpc );
 
    queuePacket( ActorControlPacket142( getId(), ToggleAggro, 1 ) );
 }
 
-void Core::Entity::Player::onMobDeaggro( Core::Entity::BattleNpcPtr pBNpc )
+void Core::Entity::Player::onMobDeaggro( BattleNpcPtr pBNpc )
 {
    hateListRemove( pBNpc );
 
@@ -1334,7 +1333,7 @@ void Core::Entity::Player::onMobDeaggro( Core::Entity::BattleNpcPtr pBNpc )
       queuePacket( ActorControlPacket142( getId(), ToggleAggro ) );
 }
 
-void Core::Entity::Player::hateListAdd( Core::Entity::BattleNpcPtr pBNpc )
+void Core::Entity::Player::hateListAdd( BattleNpcPtr pBNpc )
 
 {
    if( m_freeHateSlotQueue.empty() )
@@ -1346,7 +1345,7 @@ void Core::Entity::Player::hateListAdd( Core::Entity::BattleNpcPtr pBNpc )
 
 }
 
-void Core::Entity::Player::hateListRemove( Core::Entity::BattleNpcPtr pBNpc )
+void Core::Entity::Player::hateListRemove( BattleNpcPtr pBNpc )
 {
 
    auto it = m_actorIdTohateSlotMap.begin();
@@ -1364,7 +1363,7 @@ void Core::Entity::Player::hateListRemove( Core::Entity::BattleNpcPtr pBNpc )
    }
 }
 
-bool Core::Entity::Player::hateListHasMob( Core::Entity::BattleNpcPtr pBNpc )
+bool Core::Entity::Player::hateListHasMob( BattleNpcPtr pBNpc )
 {
 
    auto it = m_actorIdTohateSlotMap.begin();
@@ -1406,7 +1405,7 @@ void Core::Entity::Player::setIsLogin( bool bIsLogin )
    m_bIsLogin = bIsLogin;
 }
 
-uint8_t * Core::Entity::Player::getTitleList()
+uint8_t* Core::Entity::Player::getTitleList()
 {
    return m_titleList;
 }

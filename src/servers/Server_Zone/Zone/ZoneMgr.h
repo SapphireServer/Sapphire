@@ -4,7 +4,7 @@
 
 #include <unordered_map>
 #include <map>
-#include "src/servers/Server_Zone/Forwards.h"
+#include "Forwards.h"
 
 namespace Core {
 

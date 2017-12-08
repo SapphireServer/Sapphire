@@ -1,12 +1,12 @@
-#include <src/servers/Server_Common/Util/Util.h>
-#include <src/servers/Server_Common/Logging/Logger.h>
-#include <src/servers/Server_Common/Exd/ExdData.h>
+#include <Server_Common/Util/Util.h>
+#include <Server_Common/Logging/Logger.h>
+#include <Server_Common/Exd/ExdData.h>
 
 #include "EventAction.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket142.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket143.h"
-#include "src/servers/Server_Zone/Actor/Player.h"
-#include "src/servers/Server_Zone/Event/Event.h"
+#include "Network/PacketWrappers/ActorControlPacket142.h"
+#include "Network/PacketWrappers/ActorControlPacket143.h"
+#include "Server_Zone/Actor/Player.h"
+#include "Server_Zone/Event/Event.h"
 
 extern Core::Logger g_log;
 extern Core::Data::ExdData g_exdData;
@@ -18,7 +18,7 @@ using namespace Core::Network::Packets::Server;
 
 Core::Action::EventAction::EventAction()
 {
-   m_handleActionType = Common::HandleActionType::Event;
+   m_handleActionType = HandleActionType::Event;
 }
 
 Core::Action::EventAction::EventAction( Entity::ActorPtr pActor, uint32_t eventId, uint16_t action,
@@ -75,7 +75,6 @@ void Core::Action::EventAction::onFinish()
          m_onActionFinishClb( *m_pSource->getAsPlayer(), m_eventId, m_additional );
 
       auto control = ActorControlPacket142( m_pSource->getId(), Common::ActorControlType::CastStart, 0, m_id );
-
       
       if( !pEvent->hasPlayedScene() )
          m_pSource->getAsPlayer()->eventFinish( m_eventId, 1 );
