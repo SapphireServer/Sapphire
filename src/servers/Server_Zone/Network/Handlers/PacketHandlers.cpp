@@ -447,11 +447,11 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
       listPacket.data().entries[0].bytes[4] = 0x02;
       listPacket.data().entries[0].bytes[6] = 0x3B;
       listPacket.data().entries[0].bytes[11] = 0x10;
-      listPacket.data().entries[0].classJob = static_cast< uint8_t >( player.getClass() );
+      listPacket.data().entries[0].classJob = player.getClass();
       listPacket.data().entries[0].contentId = player.getContentId();
       listPacket.data().entries[0].level = player.getLevel();
       listPacket.data().entries[0].zoneId = player.getCurrentZone()->getId();
-      listPacket.data().entries[0].zoneId1 = 0x0100;
+      //listPacket.data().entries[0].zoneId1 = 0x0100;
       // TODO: no idea what this does
       //listPacket.data().entries[0].one = 1;
 
@@ -476,9 +476,9 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
 
       uint16_t i = 0;
 
-      g_log.debug( std::to_string( pPlayer->getFriendsList()->getMembers().size() ) );
+      g_log.debug( std::to_string( player.getFriendsList()->getMembers().size() ) );
 
-      for ( auto member : pPlayer->getFriendsList()->getMembers() )
+      for ( auto member : player.getFriendsList()->getMembers() )
       {
          if ( i == 10 )
             break;
@@ -499,20 +499,20 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
 }
 
 void Core::Network::GameConnection::socialReqResponseHandler( const Packets::GamePacket& inPacket,
-                                                              Entity::PlayerPtr pPlayer )
+                                                              Entity::Player& player )
 {
    auto targetId = inPacket.getValAt< uint32_t >( 0x20 );
    auto category = inPacket.getValAt< Common::SocialCategory >( 0x28 );
    auto action = inPacket.getValAt< Common::SocialRequestAction >( 0x29 );
 
-   ZoneChannelPacket< FFXIVIpcSocialRequestError > info( targetId, pPlayer->getId() );
-   ZoneChannelPacket< FFXIVIpcSocialRequestResponse > response( targetId, pPlayer->getId() );
+   ZoneChannelPacket< FFXIVIpcSocialRequestError > info( targetId, player.getId() );
+   ZoneChannelPacket< FFXIVIpcSocialRequestResponse > response( targetId, player.getId() );
 
    info.data().category = category;
    response.data().category = category;
 
    //auto pQR = g_database.query( "SELECT Name FROM dbchara WHERE CharacterId = " + to_string( targetId ) );
-   auto name = pPlayer->getName();
+   auto name = player.getName();
    /*
    if( pQR->getRowCount() > 0 )
    {
@@ -546,11 +546,11 @@ void Core::Network::GameConnection::socialReqResponseHandler( const Packets::Gam
    }
    response.data().response = Common::SocialRequestResponse::Accept;
    memcpy( &( response.data().name ), name.c_str(), 32 );
-   pPlayer->queuePacket( response );
+   player.queuePacket( response );
 }
 
 void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePacket& inPacket,
-                                                          Entity::PlayerPtr pPlayer )
+                                                          Entity::Player& player )
 {
       // todo: handle all social request packets here
    auto category = inPacket.getValAt< Common::SocialCategory >( 0x20 );
@@ -559,7 +559,7 @@ void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePac
    auto pSession = g_serverZone.getSession( name );
 
    // only the requester needs the response
-   ZoneChannelPacket< FFXIVIpcSocialRequestError > response( pPlayer->getId() );
+   ZoneChannelPacket< FFXIVIpcSocialRequestError > response( player.getId() );
    memcpy( &( response.data().name ), name.c_str(), 32 );
 
    // todo: enumerate log messages
@@ -588,7 +588,7 @@ void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePac
          return;
       }*/
 
-      if( pRecipient->getId() == pPlayer->getId() )
+      if( pRecipient->getId() == player.getId() )
       {
          response.data().messageId = 321; // Unable to invite.
       }
@@ -658,7 +658,7 @@ void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePac
 
       if( successful )
       {
-         ZoneChannelPacket< FFXIVIpcSocialRequestReceive > packet( pPlayer->getId(), pRecipient->getId() );
+         ZoneChannelPacket< FFXIVIpcSocialRequestReceive > packet( player.getId(), pRecipient->getId() );
 
          std::array<uint16_t, 5> typeMessage{ 0,
             1, // You invite <name> to a party.
@@ -675,24 +675,24 @@ void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePac
          pRecipient->setTempVariable( typeVar[category] + "Id", pPlayer->getId() );
          pRecipient->setTempVariable( typeVar[category] + "Timer", expireTime );*/
 
-         packet.data().actorId = pPlayer->getId();
+         packet.data().actorId = player.getId();
          packet.data().category = category;
          packet.data().action = Core::Common::SocialRequestAction::Invite;
          packet.data().unknown3 = 80;
          packet.data().unknown = 46;
          packet.data().unknown2 = 64;
-         memcpy( &( packet.data().name ), pPlayer->getName().c_str(), 32 );
+         memcpy( &( packet.data().name ), player.getName().c_str(), 32 );
 
          pRecipient->queuePacket( packet );
          pRecipient->sendDebug( "ding ding" );
 
-         pRecipient->getFriendsList()->addMember( pPlayer, pRecipient, pPlayer->getId(), pRecipient->getId() );
+         pRecipient->getFriendsList()->addMember( player.getAsPlayer(), pRecipient, player.getId(), pRecipient->getId() );
 
          response.data().messageId = typeMessage[category];
       }
    }
 
-   pPlayer->queuePacket( response );
+   player.queuePacket( response );
    // todo: handle party, friend request
    g_log.debug("sent to " + name);
 }

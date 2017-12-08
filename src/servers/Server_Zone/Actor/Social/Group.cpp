@@ -87,9 +87,9 @@ Core::Network::Packets::Server::PlayerEntry Group::generatePlayerEntry( GroupMem
    // todo: set as offline in one of the unknown values, if session does not exist
 
    auto pSession = g_serverZone.getSession( groupMember.contentId ); // todo: aa i don't like this. maybe just store their ID instead of contentID???
-   entry.bytes[3] = 0x80;
-   entry.bytes[4] = 0x02;
-   entry.bytes[6] = 0x3B;
+   entry.bytes[3] = 0x10;
+   entry.bytes[4] = 0x00;
+   entry.bytes[6] = 0x3F;
    entry.bytes[11] = 0x10;
    if( pSession )
    {

@@ -3,17 +3,16 @@
 
 #include "Forwards.h"
 
-<<<<<<< HEAD
-#include <src/servers/Server_Common/Common.h>
-#include <src/servers/Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
-#include <src/servers/Server_Zone/Actor/Social/FriendList.h>
-#include <src/servers/Server_Zone/Actor/Social/Manager/FriendListMgr.h>
-=======
+
 #include <Server_Common/Common.h>
->>>>>>> d84d3be97820f596f748daefbdf8b472df002c61
+#include <Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
+#include <Server_Zone/Actor/Social/FriendList.h>
+#include <Server_Zone/Actor/Social/Manager/FriendListMgr.h>
+#include <Server_Common/Common.h>
 
 #include "Actor.h"
 #include "Inventory/Inventory.h"
+
 #include <map>
 #include <queue>
 
