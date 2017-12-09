@@ -601,7 +601,7 @@ void Core::Network::GameConnection::tellHandler( const Packets::GamePacket& inPa
 void Core::Network::GameConnection::performNoteHandler( const Packets::GamePacket& inPacket,
                                                         Entity::Player& player )
 {
-   GamePacketNew< FFXIVIpcPerformNote, ServerZoneIpcType > performPacket( player.getId() );
+   ZoneChannelPacket< FFXIVIpcPerformNote > performPacket( player.getId() );
 
    auto inVal = inPacket.getDataAt( 0x20 );
    memcpy( &performPacket.data().data[0], inVal, 32 );
