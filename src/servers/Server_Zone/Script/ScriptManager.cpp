@@ -1,6 +1,5 @@
 #include <Server_Common/Logging/Logger.h>
 #include <Server_Common/Exd/ExdData.h>
-#include <chaiscript/chaiscript.hpp>
 
 #include "NativeScript.h"
 
@@ -44,14 +43,13 @@ void Core::Scripting::ScriptManager::loadDir( std::string dirname, std::set<std:
    boost::filesystem::recursive_directory_iterator iter( targetDir ), eod;
 
    BOOST_FOREACH( boost::filesystem::path const& i, make_pair( iter, eod ) )
-            {
-
-               if( is_regular_file( i ) && boost::filesystem::extension( i.string() ) == ".chai" ||
-                   boost::filesystem::extension( i.string() ) == ".inc" )
-               {
-                  chaiFiles.insert( i.string() );
-               }
-            }
+   {
+      if( is_regular_file( i ) && boost::filesystem::extension( i.string() ) == ".chai" ||
+          boost::filesystem::extension( i.string() ) == ".inc" )
+      {
+         chaiFiles.insert( i.string() );
+      }
+   }
 
 }
 
