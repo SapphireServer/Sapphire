@@ -64,7 +64,7 @@ size_t Core::ServerZone::getSessionCount() const
    return m_sessionMapById.size();
 }
 
-bool Core::ServerZone::registerBnpcTemplate( std::string templateName, uint32_t bnpcBaseId, 
+bool Core::ServerZone::registerBnpcTemplate( std::string templateName, uint32_t bnpcBaseId,
                                              uint32_t bnpcNameId, uint32_t modelId, std::string aiName )
 {
 
@@ -225,11 +225,11 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
    g_log.info( "ZoneMgr: Setting up zones" );
    g_zoneMgr.createZones();
 
-   g_scriptMgr.init();
+//   g_scriptMgr.init();
 
    std::vector< std::thread > thread_list;
    thread_list.emplace_back( std::thread( std::bind( &Network::Hive::Run, hive.get() ) ) );
-   
+
    g_log.info( "Server listening on port: " + std::to_string( m_port ) );
    g_log.info( "Ready for connections..." );
 
