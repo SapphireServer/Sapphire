@@ -3,7 +3,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "Forwards.h"
+#include "../Forwards.h"
 
 namespace Core
 {
