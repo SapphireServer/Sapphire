@@ -1,12 +1,12 @@
 #ifndef _PLAYER_H
 #define _PLAYER_H
 
-#include "Forwards.h"
+#include "../Forwards.h"
 
 #include <Server_Common/Common.h>
 
 #include "Actor.h"
-#include "Inventory/Inventory.h"
+#include "../Inventory/Inventory.h"
 #include <map>
 #include <queue>
 

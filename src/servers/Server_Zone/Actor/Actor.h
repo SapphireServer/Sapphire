@@ -4,7 +4,7 @@
 #include <Server_Common/Common.h>
 #include <boost/enable_shared_from_this.hpp>
 
-#include "Forwards.h"
+#include "../Forwards.h"
 #include <set>
 #include <map>
 #include <queue>
