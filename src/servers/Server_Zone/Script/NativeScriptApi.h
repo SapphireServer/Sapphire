@@ -7,7 +7,7 @@
 #include <StatusEffect/StatusEffect.h>
 
 #define EXPORT_SCRIPTOBJECT( type, base ) \
-extern "C" __declspec( dllexport ) __cdecl base* get##base() \
+extern "C" __declspec( dllexport ) base* get##base() \
 { return static_cast< base* >( new type ); }
 
 #define EXPORT_STATUSEFFECTSCRIPT( type ) EXPORT_SCRIPTOBJECT( type, StatusEffectScript )
@@ -33,7 +33,7 @@ public:
 };
 
 
-class StatusEffectScript : ScriptObject
+class StatusEffectScript : public ScriptObject
 {
 protected:
     const uint32_t m_effectId;
@@ -49,20 +49,18 @@ public:
       return m_effectId;
    }
 
-
-   virtual Core::StatusEffect::StatusEffect applyEffect( Core::Entity::Actor sourceActor, Core::Entity::Actor targetActor ) { }
-   virtual void onTick(Core::Entity::ActorPtr actor) { }
-   virtual void onApply(Core::Entity::ActorPtr actor) { }
-   virtual void onRemove( Core::Entity::Actor actor ) { }
+   virtual void onTick( Core::Entity::ActorPtr actor ) { }
+   virtual void onApply( Core::Entity::ActorPtr actor ) { }
+   virtual void onRemove( Core::Entity::ActorPtr actor ) { }
    virtual void onExpire(Core::Entity::ActorPtr actor) { }
-   virtual void onPlayerCollision( Core::Entity::Actor actor, Core::Entity::Actor actorHit ) { }
-   virtual void onPlayerFinishCast( Core::Entity::Actor actor ) { }
-   virtual void onPlayerDamaged( Core::Entity::Actor actor ) { }
-   virtual bool onPlayerDeath( Core::Entity::Actor actor ) { }
+   virtual void onPlayerCollision( Core::Entity::ActorPtr actor, Core::Entity::ActorPtr actorHit ) { }
+   virtual void onPlayerFinishCast( Core::Entity::ActorPtr actor ) { }
+   virtual void onPlayerDamaged( Core::Entity::ActorPtr actor ) { }
+   virtual void onPlayerDeath( Core::Entity::ActorPtr actor ) { }
 };
 
 
-class AbilityScript : ScriptObject
+class AbilityScript : public ScriptObject
 {
 protected:
     const uint32_t m_abilityId;
@@ -79,12 +77,12 @@ public:
    }
 
    virtual void onStart( Core::Entity::Actor sourceActor, Core::Entity::Actor targetActor ) { }
-   virtual bool onCastFinish(Core::Entity::Player player, Core::Entity::ActorPtr targetActor) { }
+   virtual void onCastFinish(Core::Entity::Player player, Core::Entity::ActorPtr targetActor) { }
    virtual void onInterrupt( Core::Entity::Actor sourceActor/*, Core::Entity::Actor targetActor*/ ) { }
 };
 
 
-class QuestScript : ScriptObject
+class QuestScript : public ScriptObject
 {
 protected:
    const uint32_t m_questId;
@@ -106,7 +104,7 @@ public:
 };
 
 
-class BattleNpcScript : ScriptObject
+class BattleNpcScript : public ScriptObject
 {
 protected:
     const uint32_t m_npcId;
@@ -123,7 +121,7 @@ public:
    }
 };
 
-class ZoneScript : ScriptObject
+class ZoneScript : public ScriptObject
 {
 protected:
    const uint32_t m_zoneId;
