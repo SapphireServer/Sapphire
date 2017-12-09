@@ -74,8 +74,8 @@ public:
 
    const uint8_t * getDataAt(uint16_t pos) const
    {
-      assert(m_segHdr.size > pos);
-      return reinterpret_cast< const uint8_t* >(&m_dataBuf[0] + pos);
+      assert( m_segHdr.size > pos );
+      return reinterpret_cast< const uint8_t* >( &m_dataBuf[0] + pos );
    }
 
    void setHeader( uint16_t size, uint16_t type, uint32_t id1, uint32_t id2, uint16_t subType, uint32_t unknown = 0xFED2E000 );
