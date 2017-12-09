@@ -35,8 +35,6 @@ namespace Core
          int32_t init();
          void reload();
 
-         const boost::shared_ptr< chaiscript::ChaiScript >& getHandler() const;
-
          void onPlayerFirstEnterWorld( Entity::Player& player );
 
          static bool registerBnpcTemplate( std::string templateName, uint32_t bnpcBaseId, uint32_t bnpcNameId, uint32_t modelId, std::string aiName );

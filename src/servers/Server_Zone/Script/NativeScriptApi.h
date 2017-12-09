@@ -2,9 +2,9 @@
 #define NATIVE_SCRIPT_API
 
 #include <string>
-#include <Server_Zone/Actor/Actor.h>
-#include <Server_Zone/Actor/Player.h>
-#include <Server_Zone/StatusEffect/StatusEffect.h>
+#include <Actor/Actor.h>
+#include <Actor/Player.h>
+#include <StatusEffect/StatusEffect.h>
 
 #define EXPORT_SCRIPTOBJECT( type, base ) \
 extern "C" __declspec( dllexport ) __cdecl base* get##base() \
