@@ -19,19 +19,17 @@ extern "C" __declspec( dllexport ) __cdecl base* get##base() \
 class ScriptObject
 {
 protected:
-    const std::string m_scriptName;
+   const std::string m_scriptName;
 
 public:
-    ScriptObject( std::string name ) :
-       m_scriptName( name )
-    { }
+   ScriptObject( std::string name ) :
+      m_scriptName( name )
+   { }
 
-    std::string getName() const
-    {
-       return m_scriptName;
-    }
-
-    virtual void onScriptUnload( ) { }
+   const std::string getName()
+   {
+      return m_scriptName;
+   }
 };
 
 
@@ -39,91 +37,106 @@ class StatusEffectScript : ScriptObject
 {
 protected:
     const uint32_t m_effectId;
-    const uint32_t m_baseDuration;
+
 public:
-    StatusEffectScript( std::string name, uint32_t effectId, uint32_t duration ) :
-       ScriptObject( name ),
-       m_effectId( effectId ),
-       m_baseDuration( duration )
-    { }
+   StatusEffectScript( std::string name, uint32_t effectId ) :
+      ScriptObject( name ),
+      m_effectId( effectId )
+   { }
 
-    uint32_t getEffectId( ) const
-    {
-       return m_effectId;
-    }
+   const uint32_t getEffectId( )
+   {
+      return m_effectId;
+   }
 
-    uint32_t getBaseDuration( ) const
-    {
-       return m_baseDuration;
-    }
 
-    virtual Core::StatusEffect::StatusEffect applyEffect( Core::Entity::Actor sourceActor, Core::Entity::Actor targetActor ) { }
-    virtual void onTick(Core::Entity::ActorPtr actor) { }
-    virtual void onApply(Core::Entity::ActorPtr actor) { }
-    virtual void onRemove( Core::Entity::Actor actor ) { }
-    virtual void onExpire(Core::Entity::ActorPtr actor) { }
-    virtual void onPlayerCollision( Core::Entity::Actor actor, Core::Entity::Actor actorHit ) { }
-    virtual void onPlayerFinishCast( Core::Entity::Actor actor ) { }
-    virtual void onPlayerDamaged( Core::Entity::Actor actor ) { }
-    virtual bool onPlayerDeath( Core::Entity::Actor actor ) { }
+   virtual Core::StatusEffect::StatusEffect applyEffect( Core::Entity::Actor sourceActor, Core::Entity::Actor targetActor ) { }
+   virtual void onTick(Core::Entity::ActorPtr actor) { }
+   virtual void onApply(Core::Entity::ActorPtr actor) { }
+   virtual void onRemove( Core::Entity::Actor actor ) { }
+   virtual void onExpire(Core::Entity::ActorPtr actor) { }
+   virtual void onPlayerCollision( Core::Entity::Actor actor, Core::Entity::Actor actorHit ) { }
+   virtual void onPlayerFinishCast( Core::Entity::Actor actor ) { }
+   virtual void onPlayerDamaged( Core::Entity::Actor actor ) { }
+   virtual bool onPlayerDeath( Core::Entity::Actor actor ) { }
 };
 
 
 class AbilityScript : ScriptObject
 {
 protected:
-    uint32_t m_abilityId;
+    const uint32_t m_abilityId;
 
 public:
-    AbilityScript( std::string name, uint32_t abilityId ) :
-       ScriptObject( name ),
-       m_abilityId( abilityId )
-    { }
+   AbilityScript( std::string name, uint32_t abilityId ) :
+      ScriptObject( name ),
+      m_abilityId( abilityId )
+   { }
 
-    uint32_t GetAbilityId( )
-    {
-       return m_abilityId;
-    }
+   const uint32_t GetAbilityId( )
+   {
+      return m_abilityId;
+   }
 
-    virtual void onStart( Core::Entity::Actor sourceActor, Core::Entity::Actor targetActor ) { }
-    virtual bool onCastFinish(Core::Entity::Player player, Core::Entity::ActorPtr targetActor) { }
-    virtual void onInterrupt( Core::Entity::Actor sourceActor/*, Core::Entity::Actor targetActor*/ ) { }
+   virtual void onStart( Core::Entity::Actor sourceActor, Core::Entity::Actor targetActor ) { }
+   virtual bool onCastFinish(Core::Entity::Player player, Core::Entity::ActorPtr targetActor) { }
+   virtual void onInterrupt( Core::Entity::Actor sourceActor/*, Core::Entity::Actor targetActor*/ ) { }
 };
 
 
 class QuestScript : ScriptObject
 {
 protected:
-    uint32_t QuestId;
-public:
-    QuestScript( std::string name, uint32_t questId ) :
-       ScriptObject( name ),
-       QuestId( questId )
-    { }
+   const uint32_t m_questId;
 
-    virtual void onTalk(uint32_t eventId, Core::Entity::Player player, uint64_t actorId) { }
-    virtual void onNpcKill( uint32_t npcId, Core::Entity::Player player ) { }
-    virtual void onEmote( uint64_t actorId, uint32_t eventId, uint32_t emoteId, Core::Entity::Player player ) { }
+public:
+   QuestScript( std::string name, uint32_t questId ) :
+      ScriptObject( name ),
+      m_questId( questId )
+   { }
+
+   const uint32_t getQuestId()
+   {
+      return m_questId;
+   }
+
+   virtual void onTalk(uint32_t eventId, Core::Entity::Player player, uint64_t actorId) { }
+   virtual void onNpcKill( uint32_t npcId, Core::Entity::Player player ) { }
+   virtual void onEmote( uint64_t actorId, uint32_t eventId, uint32_t emoteId, Core::Entity::Player player ) { }
 };
 
 
 class BattleNpcScript : ScriptObject
 {
+protected:
+    const uint32_t m_npcId;
+
 public:
-    BattleNpcScript( std::string name ) :
-       ScriptObject( name )
-    { }
+   BattleNpcScript( std::string name, uint32_t npcId ) :
+      ScriptObject( name ),
+      m_npcId( npcId )
+   { }
+
+   const uint32_t getNpcId()
+   {
+      return m_npcId;
+   }
 };
 
 class ZoneScript : ScriptObject
 {
-public:
-    ZoneScript( std::string name ) :
-       ScriptObject( name )
-    { }
+protected:
+   const uint32_t m_zoneId;
 
-    virtual void onZoneInit() { }
-    virtual void onEnterZone( Core::Entity::Player pPlayer, uint32_t eventId, uint16_t param1, uint16_t param2 ) { }
+public:
+   ZoneScript( std::string name, uint32_t zoneId ) :
+      ScriptObject( name ),
+      m_zoneId( zoneId )
+   { }
+
+
+   virtual void onZoneInit() { }
+   virtual void onEnterZone( Core::Entity::Player pPlayer, uint32_t eventId, uint16_t param1, uint16_t param2 ) { }
 };
 
 #endif
