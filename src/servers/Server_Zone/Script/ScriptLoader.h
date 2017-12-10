@@ -3,10 +3,10 @@
 
 #include <string>
 #include "NativeScriptApi.h"
+#include <unordered_map>
 
 #ifdef _WIN32
 #include <windows.h>
-#include <unordered_map>
 
 typedef HMODULE ModuleHandle;
 #else
