@@ -10,6 +10,7 @@
 #include <Server_Common/Crypt/md5.h>
 
 #include "NativeScriptApi.h"
+#include "ScriptLoader.h"
 
 namespace Core {
     namespace Scripting {
@@ -18,16 +19,18 @@ namespace Core {
         {
         protected:
             std::unordered_map< uint32_t, StatusEffectScript* > m_statusEffectScripts;
-            std::unordered_map< uint32_t, AbilityScript* > m_abilityScripts;
+            std::unordered_map< uint32_t, ActionScript* > m_actionScripts;
             std::unordered_map< uint32_t, QuestScript* > m_questScripts;
             std::unordered_map< uint32_t, BattleNpcScript* > m_battleNpcScripts;
             std::unordered_map< uint32_t, ZoneScript* > m_zoneScripts;
+
+            ScriptLoader m_loader;
 
         public:
             NativeScript( );
 
             StatusEffectScript* getStatusEffectScript( uint32_t statusId );
-            AbilityScript* getAbilityScript( uint32_t abilityId );
+            ActionScript* getAbilityScript( uint32_t abilityId );
             QuestScript* getQuestScript( uint32_t questId );
             BattleNpcScript* getBattleNpcScript( uint32_t npcId );
             ZoneScript* getZoneScript( uint32_t zoneId );
@@ -38,6 +41,8 @@ namespace Core {
             void removeBattleNpcScript( uint32_t npcId );
 
 
+            void loadScript( std::string );
+            void unloadScript( std::string );
             void clearAllScripts();
         };
 

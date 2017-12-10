@@ -11,9 +11,9 @@ namespace Core {
            return m_statusEffectScripts.at( statusId );
         }
 
-        AbilityScript* NativeScript::getAbilityScript( uint32_t abilityId )
+        ActionScript* NativeScript::getAbilityScript( uint32_t abilityId )
         {
-           return m_abilityScripts.at( abilityId );
+           return m_actionScripts.at( abilityId );
         }
 
         QuestScript* NativeScript::getQuestScript( uint32_t questId )
@@ -38,7 +38,7 @@ namespace Core {
 
         void NativeScript::removeAbilityScript( uint32_t abilityId )
         {
-           m_abilityScripts.erase( abilityId );
+           m_actionScripts.erase( abilityId );
         }
 
         void NativeScript::removeQuestScript( uint32_t questId )
@@ -51,8 +51,39 @@ namespace Core {
            m_battleNpcScripts.erase( npcId );
         }
 
-
-
+        void NativeScript::loadScript( std::string path )
+        {
+//           auto handle = m_loader.loadModule( path );
+//           if( handle )
+//           {
+//              // todo: this is shit
+//              if( auto script = m_loader.getScriptObject< StatusEffectScript >( handle ) )
+//              {
+//                 m_statusEffectScripts.insert( std::make_pair( script->getEffectId(), script ) );
+//              }
+//              else if( auto script = m_loader.getScriptObject< ActionScript >( handle ) )
+//              {
+//                 m_actionScripts.insert( std::make_pair( script->getActionId(), script ) );
+//              }
+//              else if( auto script = m_loader.getScriptObject< QuestScript >( handle ) )
+//              {
+//                 m_questScripts.insert( std::make_pair( script->getQuestId(), script ) );
+//              }
+//              else if( auto script = m_loader.getScriptObject< BattleNpcScript >( handle ) )
+//              {
+//                  m_battleNpcScripts.insert( std::make_pair( script->getNpcId(), script ) );
+//              }
+//              else if( auto script = m_loader.getScriptObject< ZoneScript >( handle ) )
+//              {
+//                  m_zoneScripts.insert( std::make_pair( script->getZoneId(), script ) );
+//              }
+//              else
+//              {
+//                 // unload anything which doesn't have a suitable export
+//                 m_loader.unloadScript( handle );
+//              }
+//           }
+        }
 
 
         boost::shared_ptr< NativeScript > create_script_engine( )
