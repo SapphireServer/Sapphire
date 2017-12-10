@@ -6,8 +6,14 @@
 #include <Actor/Player.h>
 #include <StatusEffect/StatusEffect.h>
 
+#ifdef _MSC_VER
+#define EXPORT __declspec( dllexport )
+#else
+#define EXPORT __attribute__((visibility("default")))
+#endif
+
 #define EXPORT_SCRIPTOBJECT( type, base ) \
-extern "C" __declspec( dllexport ) base* get##base() \
+extern "C" EXPORT base* get##base() \
 { return static_cast< base* >( new type ); }
 
 #define EXPORT_STATUSEFFECTSCRIPT( type ) EXPORT_SCRIPTOBJECT( type, StatusEffectScript )
