@@ -601,10 +601,10 @@ void Core::Network::GameConnection::tellHandler( const Packets::GamePacket& inPa
 void Core::Network::GameConnection::performNoteHandler( const Packets::GamePacket& inPacket,
                                                         Entity::Player& player )
 {
-   GamePacketNew< FFXIVIpcPerformNote, ServerZoneIpcType > performPacket( player.getId() );
+   ZoneChannelPacket< FFXIVIpcPerformNote > performPacket( player.getId() );
 
-   uint8_t inVal = inPacket.getValAt< uint8_t >( 0x20 );
-   memcpy( &performPacket.data().data[0], &inVal, 32 );
+   auto inVal = inPacket.getDataAt( 0x20 );
+   memcpy( &performPacket.data().data[0], inVal, 32 );
 
    player.sendToInRangeSet( performPacket );
 }

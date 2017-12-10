@@ -45,31 +45,37 @@ public:
    template<class T>
    T getValAt( uint16_t pos ) const
    {
-      assert(m_segHdr.size > pos);
+      assert( m_segHdr.size > pos );
       return *reinterpret_cast< const T* >( &m_dataBuf[0] + pos );
    }
 
    void setBytesAt( uint16_t offset, uint8_t * bytes, uint16_t length )
    {
-      assert(m_segHdr.size > offset);
+      assert( m_segHdr.size > offset );
       memcpy( reinterpret_cast< uint8_t* >( &m_dataBuf[0] + offset ), bytes, length );
    }
 
    const char * getStringAt( uint16_t pos ) const
    {
-      assert(m_segHdr.size > pos);
+      assert( m_segHdr.size > pos );
       return reinterpret_cast< const char* >( &m_dataBuf[0] + pos );
    }
 
    void setStringAt( uint16_t pos, const std::string& str )
    {
-      assert(m_segHdr.size > pos);
+      assert( m_segHdr.size > pos );
       memcpy( reinterpret_cast< uint8_t* >( &m_dataBuf[0] + pos ), str.c_str(), str.length() );
    }
 
-   uint8_t * getData()
+   const uint8_t * getData() const
    {
-      return reinterpret_cast< uint8_t* >( &m_dataBuf[0] );
+      return reinterpret_cast< const uint8_t* >( &m_dataBuf[0] );
+   }
+
+   const uint8_t * getDataAt(uint16_t pos) const
+   {
+      assert( m_segHdr.size > pos );
+      return reinterpret_cast< const uint8_t* >( &m_dataBuf[0] + pos );
    }
 
    void setHeader( uint16_t size, uint16_t type, uint32_t id1, uint32_t id2, uint16_t subType, uint32_t unknown = 0xFED2E000 );
