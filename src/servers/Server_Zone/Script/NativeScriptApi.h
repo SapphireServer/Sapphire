@@ -17,7 +17,7 @@ extern "C" EXPORT base* get##base() \
 { return static_cast< base* >( new type ); }
 
 #define EXPORT_STATUSEFFECTSCRIPT( type ) EXPORT_SCRIPTOBJECT( type, StatusEffectScript )
-#define EXPORT_ABILITYSCRIPT( type ) EXPORT_SCRIPTOBJECT( type, AbilityScript )
+#define EXPORT_ACTIONSCRIPT( type ) EXPORT_SCRIPTOBJECT( type, ActionScript )
 #define EXPORT_QUESTSCRIPT( type ) EXPORT_SCRIPTOBJECT( type, QuestScript )
 #define EXPORT_BATTLENPCSCRIPT( type ) EXPORT_SCRIPTOBJECT( type, BattleNpcScript )
 #define EXPORT_ZONESCRIPT( type ) EXPORT_SCRIPTOBJECT( type, ZoneScript )
