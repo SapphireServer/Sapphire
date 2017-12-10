@@ -884,7 +884,7 @@ uint16_t Core::Inventory::calculateEquippedGearItemLevel()
       it++;
    }
 
-   return boost::algorithm::clamp( iLvlResult / 12, 0, 9999 );
+   return boost::algorithm::clamp( iLvlResult / 13, 0, 9999 );
 }
 
 
