@@ -8,27 +8,47 @@ namespace Core {
 
         StatusEffectScript* NativeScript::getStatusEffectScript( uint32_t statusId )
         {
-           return m_statusEffectScripts.at( statusId );
+           auto script = m_statusEffectScripts.find( statusId );
+           if( script == m_statusEffectScripts.end() )
+              return nullptr;
+
+           return script->second;
         }
 
         ActionScript* NativeScript::getAbilityScript( uint32_t abilityId )
         {
-           return m_actionScripts.at( abilityId );
+           auto script = m_actionScripts.find( abilityId );
+           if( script == m_actionScripts.end() )
+              return nullptr;
+
+           return script->second;
         }
 
         QuestScript* NativeScript::getQuestScript( uint32_t questId )
         {
-           return m_questScripts.at( questId );
+           auto script = m_questScripts.find( questId );
+           if( script == m_questScripts.end() )
+              return nullptr;
+
+           return script->second;
         }
 
         BattleNpcScript* NativeScript::getBattleNpcScript( uint32_t npcId )
         {
-           return m_battleNpcScripts.at( npcId );
+           auto script = m_battleNpcScripts.find( npcId );
+           if( script == m_battleNpcScripts.end() )
+              return nullptr;
+
+           return script->second;
         }
 
         ZoneScript* NativeScript::getZoneScript( uint32_t zoneId )
         {
-           return m_zoneScripts.at( zoneId );
+           auto script = m_zoneScripts.find( zoneId );
+           if( script == m_zoneScripts.end() )
+              return nullptr;
+
+           return script->second;
         }
 
         void NativeScript::removeStatusEffectScript( uint32_t statusId )
