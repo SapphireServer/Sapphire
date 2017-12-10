@@ -22,4 +22,9 @@ foreach(_sourcefile ${SCRIPT_FILES})
         LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_CURRENT_SOURCE_DIR}/../../bin/compiledscripts/"
         LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_CURRENT_SOURCE_DIR}/../../bin/compiledscripts/"
     )
+
+    add_custom_command(TARGET "${_file}" POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E remove "${CMAKE_CURRENT_SOURCE_DIR}/../../bin/${_file}.exp"
+        COMMAND ${CMAKE_COMMAND} -E remove "${CMAKE_CURRENT_SOURCE_DIR}/../../bin/${_file}.lib"
+    )
 endforeach(_sourcefile ${SCRIPT_FILES})

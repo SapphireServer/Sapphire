@@ -19,6 +19,8 @@
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
 
+#include <Server_Common/Config/XMLConfig.h>
+
 extern Core::Logger g_log;
 extern Core::Data::ExdData g_exdData;
 extern Core::ServerZone g_serverZone;
@@ -33,7 +35,24 @@ Core::Scripting::ScriptManager::~ScriptManager()
 
 }
 
-void Core::Scripting::ScriptManager::loadDir( std::string dirname, std::set<std::string>& chaiFiles )
+bool Core::Scripting::ScriptManager::init()
+{
+   std::set< std::string > files;
+
+   loadDir( g_serverZone.getConfig()->getValue< std::string >( "Settings.General.ScriptPath", "./compiledscripts/" ),
+            files, m_nativeScriptHandler->getModuleExtension() );
+
+   for( auto itr = files.begin(); itr != files.end(); ++itr )
+   {
+      auto& path = *itr;
+
+      g_log.debug( "got module: " + path );
+   }
+
+   return true;
+}
+
+void Core::Scripting::ScriptManager::loadDir( std::string dirname, std::set<std::string>& files, std::string ext )
 {
 
    g_log.info( "ScriptEngine: loading scripts from " + dirname );
@@ -44,10 +63,9 @@ void Core::Scripting::ScriptManager::loadDir( std::string dirname, std::set<std:
 
    BOOST_FOREACH( boost::filesystem::path const& i, make_pair( iter, eod ) )
    {
-      if( is_regular_file( i ) && boost::filesystem::extension( i.string() ) == ".chai" ||
-          boost::filesystem::extension( i.string() ) == ".inc" )
+      if( is_regular_file( i ) && boost::filesystem::extension( i.string() ) == ext )
       {
-         chaiFiles.insert( i.string() );
+         files.insert( i.string() );
       }
    }
 

@@ -105,6 +105,11 @@ namespace Core {
            }
         }
 
+        const std::string NativeScript::getModuleExtension()
+        {
+           return m_loader.getModuleExtension();
+        }
+
 
         boost::shared_ptr< NativeScript > create_script_engine( )
         {

@@ -32,7 +32,7 @@ namespace Core
          ScriptManager();
          ~ScriptManager();
 
-         int32_t init();
+         bool init();
          void reload();
 
          void onPlayerFirstEnterWorld( Entity::Player& player );
@@ -60,7 +60,7 @@ namespace Core
          bool onEventHandlerTradeReturn( Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param, uint32_t catalogId );
 
 
-         void loadDir( std::string dirname, std::set<std::string>& chaiFiles );
+         void loadDir( std::string dirname, std::set<std::string>& files, std::string ext );
 
 
       };

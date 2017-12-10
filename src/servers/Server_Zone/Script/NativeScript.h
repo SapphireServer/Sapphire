@@ -44,6 +44,8 @@ namespace Core {
             void loadScript( std::string );
             void unloadScript( std::string );
             void clearAllScripts();
+
+            const std::string getModuleExtension();
         };
 
 
