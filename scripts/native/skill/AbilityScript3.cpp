@@ -1,9 +1,9 @@
 //#include "../ScriptObject.h"
 //
-//class AbilityScript3 : public AbilityScript
+//class ActionScript3 : public ActionScript
 //{
 //public:
-//    AbilityScript3() : AbilityScript( "AbilityScript3", 3 )
+//    ActionScript3() : ActionScript( "AbilityScript3", 3 )
 //    {}
 //
 //    virtual void onCastFinish( Core::Entity::Player player, Core::Entity::ActorPtr targetActor )
@@ -12,4 +12,4 @@
 //    }
 //};
 //
-//EXPORT_ABILITYSCRIPT( AbilityScript3 )
+//EXPORT_ACTIONSCRIPT( ActionScript3 )
