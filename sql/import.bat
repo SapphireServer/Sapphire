@@ -32,13 +32,13 @@ FOR %%X IN (*.sql) DO (
 		REM handle update.sql last
 	) ELSE (
 		ECHO Importing %%X
-		%PATH_MYSQL% %DBNAME% -h %DBADDRESS% -u %USER% < %%X
+		%PATH_MYSQL% %DBNAME% -h %DBADDRESS% -u %USER% %PASSWORD% < %%X
 	)
 )
 
 IF EXIST "update.sql" (
 	ECHO Importing update.sql
-	%PATH_MYSQL% %DBNAME% -h %DBADDRESS% -u %USER% < update.sql
+	%PATH_MYSQL% %DBNAME% -h %DBADDRESS% -u %USER% %PASSWORD% < update.sql
 )
 
 ECHO Finished!
