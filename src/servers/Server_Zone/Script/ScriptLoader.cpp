@@ -60,12 +60,11 @@ ModuleHandle Core::Scripting::ScriptLoader::loadModule( std::string path )
    return handle;
 }
 
-template< typename T >
-T* Core::Scripting::ScriptLoader::getScriptObject( ModuleHandle handle )
+ScriptObject* Core::Scripting::ScriptLoader::getScriptObject( ModuleHandle handle, std::string name )
 {
-   typedef T* (*getScriptObjectType)();
+   typedef ScriptObject* (*getScriptObjectType)();
+   auto fn = boost::str( boost::format( "get%1%" ) % name );
 
-   auto fn = boost::str( boost::format( "get%1%" ) % typeid( T ).name() );
    g_log.info( "getting symbol: " + fn  );
 
 #ifdef _WIN32
