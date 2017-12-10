@@ -7,7 +7,6 @@
 
 #ifdef _WIN32
 #include <windows.h>
-
 typedef HMODULE ModuleHandle;
 #else
 #include <dlfcn.h>
@@ -31,8 +30,13 @@ namespace Scripting {
        bool unloadScript( std::string );
        bool unloadScript( ModuleHandle );
 
+       ScriptObject* getScriptObject( ModuleHandle handle, std::string name );
+
        template< typename T >
-       T* getScriptObject( ModuleHandle );
+       T* getScriptObject( ModuleHandle handle )
+       {
+          return static_cast< T* >( getScriptObject( handle, typeid( T ).name() ) );
+       }
    };
 
 }
