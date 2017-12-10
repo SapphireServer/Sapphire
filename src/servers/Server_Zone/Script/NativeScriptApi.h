@@ -60,24 +60,24 @@ public:
 };
 
 
-class AbilityScript : public ScriptObject
+class ActionScript : public ScriptObject
 {
 protected:
-    const uint32_t m_abilityId;
+    const uint32_t m_actionId;
 
 public:
-   AbilityScript( std::string name, uint32_t abilityId ) :
+    ActionScript( std::string name, uint32_t abilityId ) :
       ScriptObject( name ),
-      m_abilityId( abilityId )
+      m_actionId( abilityId )
    { }
 
-   const uint32_t GetAbilityId( )
+   const uint32_t getActionId()
    {
-      return m_abilityId;
+      return m_actionId;
    }
 
-   virtual void onStart( Core::Entity::Actor sourceActor, Core::Entity::Actor targetActor ) { }
-   virtual void onCastFinish(Core::Entity::Player player, Core::Entity::ActorPtr targetActor) { }
+   virtual void onStart( Core::Entity::Actor sourceActor, Core::Entity::ActorPtr targetActor ) { }
+   virtual void onCastFinish( Core::Entity::Player player, Core::Entity::ActorPtr targetActor ) { }
    virtual void onInterrupt( Core::Entity::Actor sourceActor/*, Core::Entity::Actor targetActor*/ ) { }
 };
 
@@ -132,6 +132,10 @@ public:
       m_zoneId( zoneId )
    { }
 
+   const uint32_t getZoneId()
+   {
+      return m_zoneId;
+   }
 
    virtual void onZoneInit() { }
    virtual void onEnterZone( Core::Entity::Player pPlayer, uint32_t eventId, uint16_t param1, uint16_t param2 ) { }
