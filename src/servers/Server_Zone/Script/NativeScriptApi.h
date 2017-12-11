@@ -86,7 +86,7 @@ public:
       ScriptObject( name, questId )
    { }
 
-   virtual void onTalk(uint32_t eventId, Entity::Player& player, uint64_t actorId) { }
+   virtual void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) { }
    virtual void onNpcKill( uint32_t npcId, Entity::Player& player ) { }
    virtual void onEmote( uint64_t actorId, uint32_t eventId, uint32_t emoteId, Entity::Player& player ) { }
 };
