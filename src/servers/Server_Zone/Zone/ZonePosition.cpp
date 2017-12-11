@@ -1,13 +1,11 @@
 #include "ZonePosition.h"
 
-Core::ZonePosition::ZonePosition()
-   : m_id(0)
-   , m_targetZoneId(0)
-   , m_radius(0)
+Core::ZonePosition::ZonePosition() : m_id( 0 ), m_targetZoneId( 0 ), m_radius( 0 )
 {
 }
 
-Core::ZonePosition::ZonePosition( uint32_t id, uint32_t targetZoneId, const Common::FFXIVARR_POSITION3& targetPosition, uint32_t radius, float rotation )
+Core::ZonePosition::ZonePosition( uint32_t id, uint32_t targetZoneId, const Common::FFXIVARR_POSITION3& targetPosition,
+                                  uint32_t radius, float rotation )
 {
    m_id = id;
    m_targetZoneId = targetZoneId;
@@ -30,7 +28,7 @@ uint32_t Core::ZonePosition::getTargetZoneId() const
    return m_targetZoneId;
 }
 
-const Core::Common::FFXIVARR_POSITION3 & Core::ZonePosition::getTargetPosition() const
+const Core::Common::FFXIVARR_POSITION3& Core::ZonePosition::getTargetPosition() const
 {
    return m_targetPos;
 }
@@ -39,5 +37,3 @@ float Core::ZonePosition::getTargetRotation() const
 {
    return m_rotation;
 }
-
-

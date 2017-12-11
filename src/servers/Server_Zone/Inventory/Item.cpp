@@ -1,28 +1,25 @@
+#include "Item.h"
 #include <Server_Common/Common.h>
 #include <Server_Common/Exd/ExdData.h>
-#include "Item.h"
 
 extern Core::Data::ExdData g_exdData;
 
 Core::Item::Item()
 {
-
 }
 
-Core::Item::Item( uint32_t catalogId ) :
-   m_id( catalogId ),
-   m_isHq( false )
+Core::Item::Item( uint32_t catalogId ) : m_id( catalogId ), m_isHq( false )
 {
-
 }
 
-Core::Item::Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, Common::ItemUICategory categoryId, bool isHq ) :
-   m_id( catalogId ),
-   m_uId( uId ),
-   m_category( static_cast< Common::ItemUICategory >( categoryId ) ),
-   m_model1( model1 ),
-   m_model2( model2 ),
-   m_isHq( isHq )
+Core::Item::Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, Common::ItemUICategory categoryId,
+                  bool isHq ) :
+    m_id( catalogId ),
+    m_uId( uId ),
+    m_category( static_cast< Common::ItemUICategory >( categoryId ) ),
+    m_model1( model1 ),
+    m_model2( model2 ),
+    m_isHq( isHq )
 {
    auto itemInfo = g_exdData.getItemInfo( catalogId );
    m_delayMs = itemInfo->delayMs;
@@ -35,7 +32,6 @@ Core::Item::Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t mo
 
 Core::Item::~Item()
 {
-
 }
 
 float Core::Item::getAutoAttackDmg() const
@@ -70,7 +66,7 @@ uint16_t Core::Item::getWeaponDmg() const
 
 bool Core::Item::isWeapon() const
 {
-   return (m_weaponDmg != 0);
+   return ( m_weaponDmg != 0 );
 }
 
 uint32_t Core::Item::getId() const

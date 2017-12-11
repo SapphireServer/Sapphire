@@ -2,14 +2,12 @@
 
 #include <Server_Common/Util/Util.h>
 
-
 Core::Action::Action::Action()
 {
 }
 
 Core::Action::Action::~Action()
 {
-
 }
 
 uint16_t Core::Action::Action::getId() const

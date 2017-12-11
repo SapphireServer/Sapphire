@@ -1,20 +1,20 @@
+#include <cmath>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <stdint.h>
-#include <cmath>
 
-#include <Server_Common/Logging/Logger.h>
 #include <Server_Common/Exd/ExdData.h>
+#include <Server_Common/Logging/Logger.h>
 #include <Server_Common/Util/Util.h>
 #include <Server_Common/Util/UtilMath.h>
 
-#include "Player.h"
 #include "BattleNpc.h"
+#include "Player.h"
 
-#include "Network/PacketWrappers/MoveActorPacket.h"
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
+#include "Network/PacketWrappers/MoveActorPacket.h"
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -34,16 +34,16 @@ Core::Entity::BattleNpc::BattleNpc()
 
 Core::Entity::BattleNpc::~BattleNpc()
 {
-
 }
 
 Core::Entity::BattleNpc::BattleNpc( uint16_t modelId, uint16_t nameid, const Common::FFXIVARR_POSITION3& spawnPos,
                                     uint16_t bnpcBaseId, uint32_t type, uint8_t level, uint8_t behaviour,
-                                    uint32_t mobType ) : Actor()
+                                    uint32_t mobType ) :
+    Actor()
 {
    BattleNpc::m_nextID++;
    m_id = BattleNpc::m_nextID;
-   //strcpy( m_name, pBNpc->m_name.c_str() );
+   // strcpy( m_name, pBNpc->m_name.c_str() );
 
    m_pos = spawnPos;
    m_posOrigin = spawnPos;
@@ -65,7 +65,7 @@ Core::Entity::BattleNpc::BattleNpc( uint16_t modelId, uint16_t nameid, const Com
    m_currentStance = Stance::Passive;
 
    m_class = ClassJob::Gladiator;
-   m_level = level > uint8_t{0} ? level : uint8_t{70};
+   m_level = level > uint8_t{ 0 } ? level : uint8_t{ 70 };
 
    m_modelId = modelId;
    m_nameId = nameid;
@@ -82,45 +82,43 @@ Core::Entity::BattleNpc::BattleNpc( uint16_t modelId, uint16_t nameid, const Com
 
    m_invincibilityType = InvincibilityType::InvincibilityNone;
 
-   //m_type = static_cast< Common::ObjKind >( type );
-
+   // m_type = static_cast< Common::ObjKind >( type );
 }
 
 // spawn this player for pTarget
 void Core::Entity::BattleNpc::spawn( PlayerPtr pTarget )
 {
-   //GamePacketNew< FFXIVIpcActorSpawn > spawnPacket( getId(), pTarget->getId() );
+   // GamePacketNew< FFXIVIpcActorSpawn > spawnPacket( getId(), pTarget->getId() );
 
-   //spawnPacket.data().unknown_0 = 0;
-   //spawnPacket.data().ownerId = m_pOwner == nullptr ? INVALID_GAME_OBJECT_ID : m_pOwner->getId();
-   //spawnPacket.data().targetId = INVALID_GAME_OBJECT_ID & 0xFFFFFFFF;
-   //spawnPacket.data().hPCurr = m_hp;
-   //spawnPacket.data().hPMax = m_baseStats.max_hp;
-   //spawnPacket.data().level = m_level;
+   // spawnPacket.data().unknown_0 = 0;
+   // spawnPacket.data().ownerId = m_pOwner == nullptr ? INVALID_GAME_OBJECT_ID : m_pOwner->getId();
+   // spawnPacket.data().targetId = INVALID_GAME_OBJECT_ID & 0xFFFFFFFF;
+   // spawnPacket.data().hPCurr = m_hp;
+   // spawnPacket.data().hPMax = m_baseStats.max_hp;
+   // spawnPacket.data().level = m_level;
    ////spawnPacket.data().tPCurr = 1000;
-   //spawnPacket.data().model = m_modelId;
-   //spawnPacket.data().bnpcBaseId = m_bnpcBaseId;
-   //spawnPacket.data().nameId = m_nameId;
-   //spawnPacket.data().spawnIndex = pTarget->getSpawnIdForActorId( getId() );
-   //g_log.info(std::to_string(spawnPacket.data().spawnIndex) + " " + std::to_string(getId()));
-   //spawnPacket.data().status = static_cast< uint8_t >( m_status );
-   //spawnPacket.data().mobAgressive = m_behavior;
-   //spawnPacket.data().type = static_cast< uint8_t >( m_type );
-   //spawnPacket.data().mobTypeIcon = m_mobType;
-   //spawnPacket.data().unknown_33 = 5;
-   //spawnPacket.data().typeFlags = 4;
-   //spawnPacket.data().pos.x = m_pos.x;
-   //spawnPacket.data().pos.y = m_pos.y;
-   //spawnPacket.data().pos.z = m_pos.z;
-   //spawnPacket.data().rotation = Math::Util::floatToUInt16Rot( getRotation() );
+   // spawnPacket.data().model = m_modelId;
+   // spawnPacket.data().bnpcBaseId = m_bnpcBaseId;
+   // spawnPacket.data().nameId = m_nameId;
+   // spawnPacket.data().spawnIndex = pTarget->getSpawnIdForActorId( getId() );
+   // g_log.info(std::to_string(spawnPacket.data().spawnIndex) + " " + std::to_string(getId()));
+   // spawnPacket.data().status = static_cast< uint8_t >( m_status );
+   // spawnPacket.data().mobAgressive = m_behavior;
+   // spawnPacket.data().type = static_cast< uint8_t >( m_type );
+   // spawnPacket.data().mobTypeIcon = m_mobType;
+   // spawnPacket.data().unknown_33 = 5;
+   // spawnPacket.data().typeFlags = 4;
+   // spawnPacket.data().pos.x = m_pos.x;
+   // spawnPacket.data().pos.y = m_pos.y;
+   // spawnPacket.data().pos.z = m_pos.z;
+   // spawnPacket.data().rotation = Math::Util::floatToUInt16Rot( getRotation() );
    ////spawnPacket.data().unknown_B0[11] = 1;
    ////spawnPacket.data().unknown_B0[12] = 4;
    ////spawnPacket.data().unknown_B0[14] = 20;
 
-   //pTarget->queuePacket( spawnPacket );
+   // pTarget->queuePacket( spawnPacket );
 
    ZoneChannelPacket< FFXIVIpcNpcSpawn > spawnPacket( getId(), pTarget->getId() );
-
 
    spawnPacket.data().pos.x = m_pos.x;
    spawnPacket.data().pos.y = m_pos.y;
@@ -158,7 +156,6 @@ void Core::Entity::BattleNpc::despawn( ActorPtr pTarget )
 
    ActorControlPacket143 controlPacket( m_id, DespawnZoneScreenMsg, 0x04, getId(), 0x01 );
    pPlayer->queuePacket( controlPacket );
-
 }
 
 uint8_t Core::Entity::BattleNpc::getLevel() const
@@ -224,12 +221,11 @@ void Core::Entity::BattleNpc::setOwner( PlayerPtr pPlayer )
    }
    else
    {
-      ZoneChannelPacket< FFXIVIpcActorOwner > setOwnerPacket(getId(), INVALID_GAME_OBJECT_ID );
+      ZoneChannelPacket< FFXIVIpcActorOwner > setOwnerPacket( getId(), INVALID_GAME_OBJECT_ID );
       setOwnerPacket.data().type = 0x01;
       setOwnerPacket.data().actorId = INVALID_GAME_OBJECT_ID;
       sendToInRangeSet( setOwnerPacket );
    }
-
 }
 
 void Core::Entity::BattleNpc::sendPositionUpdate()
@@ -241,8 +237,7 @@ void Core::Entity::BattleNpc::sendPositionUpdate()
 bool Core::Entity::BattleNpc::moveTo( Common::FFXIVARR_POSITION3& pos )
 {
 
-   if( Math::Util::distance( getPos().x, getPos().y, getPos().z, 
-                             pos.x, pos.y, pos.z ) <= 4 )
+   if( Math::Util::distance( getPos().x, getPos().y, getPos().z, pos.x, pos.y, pos.z ) <= 4 )
       // reached destination
       return true;
 
@@ -251,7 +246,7 @@ bool Core::Entity::BattleNpc::moveTo( Common::FFXIVARR_POSITION3& pos )
 
    face( pos );
    float angle = Math::Util::calcAngFrom( getPos().x, getPos().z, pos.x, pos.z ) + PI;
-   
+
    float x = static_cast< float >( cosf( angle ) * 1.1f );
    float y = ( getPos().y + pos.y ) * 0.5f; // fake value while there is no collision
    float z = static_cast< float >( sinf( angle ) * 1.1f );
@@ -270,12 +265,11 @@ bool Core::Entity::BattleNpc::moveTo( Common::FFXIVARR_POSITION3& pos )
    tmpPos.z = getPos().z + z;
 
    setPosition( tmpPos );
-   setRotation(newRot);
+   setRotation( newRot );
 
    sendPositionUpdate();
 
    return false;
-
 }
 
 void Core::Entity::BattleNpc::aggro( ActorPtr pActor )
@@ -320,7 +314,6 @@ void Core::Entity::BattleNpc::hateListClear()
    }
    m_hateList.clear();
 }
-
 
 void Core::Entity::BattleNpc::hateListRemove( ActorPtr pActor )
 {
@@ -384,7 +377,7 @@ void Core::Entity::BattleNpc::hateListUpdate( ActorPtr pActor, int32_t hateAmoun
 
 void Core::Entity::BattleNpc::onDeath()
 {
-   //LuaManager->onMobDeath( this );
+   // LuaManager->onMobDeath( this );
 
    setTimeOfDeath( static_cast< uint32_t >( time( nullptr ) ) );
    setTargetId( INVALID_GAME_OBJECT_ID );
@@ -410,13 +403,13 @@ void Core::Entity::BattleNpc::onDeath()
          totalHate += pHateEntry->m_hateAmount;
       }
 
-      //uint32_t plsBeHatedThisMuchAtLeast = totalHate / ( maxHate + 2 ) / clamp( m_hateList.size(), 1.0f, 1.5f );
+      // uint32_t plsBeHatedThisMuchAtLeast = totalHate / ( maxHate + 2 ) / clamp( m_hateList.size(), 1.0f, 1.5f );
 
       for( auto& pHateEntry : m_hateList )
       {
          // todo: this is pure retarded
          // todo: check for companion
-         if( pHateEntry->m_pActor->isPlayer()  ) // && pHateEntry->m_hateAmount >= plsBeHatedThisMuchAtLeast )
+         if( pHateEntry->m_pActor->isPlayer() ) // && pHateEntry->m_hateAmount >= plsBeHatedThisMuchAtLeast )
          {
             uint8_t level = pHateEntry->m_pActor->getLevel();
             auto levelDiff = static_cast< int32_t >( this->m_level ) - level;
@@ -427,21 +420,26 @@ void Core::Entity::BattleNpc::onDeath()
 
             // todo: arbitrary numbers pulled out of my ass
             if( m_level <= 14 )
-               exp = ( expNeeded / ( 100 - levelDiff) ) + cappedLevelDiff + ( cappedLevelDiff * ( ( rand() % ( cappedLevelDiff * 9 ) ) + 1 ) );
+               exp = ( expNeeded / ( 100 - levelDiff ) ) + cappedLevelDiff +
+                     ( cappedLevelDiff * ( ( rand() % ( cappedLevelDiff * 9 ) ) + 1 ) );
             else if( m_level <= 24 )
-               exp = ( expNeeded / ( 150 - levelDiff) ) + cappedLevelDiff + ( cappedLevelDiff * ( ( rand() % ( cappedLevelDiff * 8 ) ) + 1 ) );
+               exp = ( expNeeded / ( 150 - levelDiff ) ) + cappedLevelDiff +
+                     ( cappedLevelDiff * ( ( rand() % ( cappedLevelDiff * 8 ) ) + 1 ) );
             else if( m_level <= 34 )
-               exp = ( expNeeded / ( 350 - levelDiff ) ) + cappedLevelDiff + ( cappedLevelDiff * ( ( rand() % ( cappedLevelDiff * 7 ) ) + 1 ) );
+               exp = ( expNeeded / ( 350 - levelDiff ) ) + cappedLevelDiff +
+                     ( cappedLevelDiff * ( ( rand() % ( cappedLevelDiff * 7 ) ) + 1 ) );
             else if( m_level <= 44 )
-               exp = ( expNeeded / ( 550 - levelDiff ) ) + cappedLevelDiff + ( cappedLevelDiff *  ( ( rand() % ( cappedLevelDiff * 6  ) ) + 1 ) );
+               exp = ( expNeeded / ( 550 - levelDiff ) ) + cappedLevelDiff +
+                     ( cappedLevelDiff * ( ( rand() % ( cappedLevelDiff * 6 ) ) + 1 ) );
             else if( m_level <= 50 )
-               exp = ( expNeeded / ( 750 - levelDiff ) ) + cappedLevelDiff + ( cappedLevelDiff * ( ( rand() % ( cappedLevelDiff * 5 ) ) + 1 ) );
+               exp = ( expNeeded / ( 750 - levelDiff ) ) + cappedLevelDiff +
+                     ( cappedLevelDiff * ( ( rand() % ( cappedLevelDiff * 5 ) ) + 1 ) );
             else
-               exp = ( expNeeded / ( 1200 - levelDiff ) ) + cappedLevelDiff + ( cappedLevelDiff * ( ( rand() % ( cappedLevelDiff * 4 ) ) + 1 ) );
-            
+               exp = ( expNeeded / ( 1200 - levelDiff ) ) + cappedLevelDiff +
+                     ( cappedLevelDiff * ( ( rand() % ( cappedLevelDiff * 4 ) ) + 1 ) );
 
             // todo: this is actually retarded, we need real rand()
-            srand( static_cast< uint32_t > ( time( nullptr ) ) );
+            srand( static_cast< uint32_t >( time( nullptr ) ) );
 
             auto pPlayer = pHateEntry->m_pActor->getAsPlayer();
             pPlayer->gainExp( exp );
@@ -467,9 +465,8 @@ Core::Entity::ActorPtr Core::Entity::BattleNpc::getClaimer() const
    return m_pOwner;
 }
 
-
 // HACK: this is highly experimental code, will have to be changed eventually
-// since there are different types of mobs... (stationary, moving...) likely to be 
+// since there are different types of mobs... (stationary, moving...) likely to be
 // handled by scripts entirely.
 void Core::Entity::BattleNpc::update( int64_t currTime )
 {
@@ -482,8 +479,7 @@ void Core::Entity::BattleNpc::update( int64_t currTime )
    }
 
    updateStatusEffects();
-   float distance = Math::Util::distance( m_pos.x, m_pos.y, m_pos.z,
-                                          m_posOrigin.x, m_posOrigin.y, m_posOrigin.z );
+   float distance = Math::Util::distance( m_pos.x, m_pos.y, m_pos.z, m_posOrigin.x, m_posOrigin.y, m_posOrigin.z );
 
    if( ( distance > 70 ) && m_mode != MODE_RETREAT )
    {
@@ -509,12 +505,10 @@ void Core::Entity::BattleNpc::update( int64_t currTime )
 
       if( pClosestActor && pClosestActor->isAlive() )
       {
-         distance = Math::Util::distance( getPos().x, getPos().y, getPos().z,
-                                          pClosestActor->getPos().x,
-                                          pClosestActor->getPos().y,
-                                          pClosestActor->getPos().z );
+         distance = Math::Util::distance( getPos().x, getPos().y, getPos().z, pClosestActor->getPos().x,
+                                          pClosestActor->getPos().y, pClosestActor->getPos().z );
 
-         //if( distance < 8 && getbehavior() == 2 )
+         // if( distance < 8 && getbehavior() == 2 )
          //   aggro( pClosestActor );
       }
    }
@@ -532,10 +526,8 @@ void Core::Entity::BattleNpc::update( int64_t currTime )
 
       if( pClosestActor != nullptr )
       {
-         distance = Math::Util::distance( getPos().x, getPos().y, getPos().z,
-                                          pClosestActor->getPos().x,
-                                          pClosestActor->getPos().y,
-                                          pClosestActor->getPos().z );
+         distance = Math::Util::distance( getPos().x, getPos().y, getPos().z, pClosestActor->getPos().x,
+                                          pClosestActor->getPos().y, pClosestActor->getPos().z );
 
          if( distance > 4 )
             moveTo( pClosestActor->getPos() );
@@ -554,11 +546,9 @@ void Core::Entity::BattleNpc::update( int64_t currTime )
          setOwner( nullptr );
          m_mode = MODE_RETREAT;
       }
-
    }
    break;
    }
-
 }
 
 uint32_t Core::Entity::BattleNpc::getTimeOfDeath() const
@@ -570,4 +560,3 @@ void Core::Entity::BattleNpc::setTimeOfDeath( uint32_t tod )
 {
    m_timeOfDeath = tod;
 }
-

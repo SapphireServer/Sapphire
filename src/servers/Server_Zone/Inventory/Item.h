@@ -11,7 +11,8 @@ class Item
 public:
    Item();
    Item( uint32_t catalogId );
-   Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, Common::ItemUICategory categoryId, bool isHq = false );
+   Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, Common::ItemUICategory categoryId,
+         bool isHq = false );
    ~Item();
 
    uint32_t getId() const;
@@ -54,31 +55,29 @@ public:
 
    uint16_t getItemLevel() const;
 
-
 protected:
-   uint32_t                m_id;
+   uint32_t m_id;
 
-   uint64_t                m_uId;
-   
-   Common::ItemUICategory  m_category;
+   uint64_t m_uId;
 
-   uint32_t                m_stackSize;
-   std::vector< uint8_t >  m_classJobList;
+   Common::ItemUICategory m_category;
 
-   uint64_t                m_model1;
-   uint64_t                m_model2;
+   uint32_t m_stackSize;
+   std::vector< uint8_t > m_classJobList;
 
-   bool                    m_isHq;
+   uint64_t m_model1;
+   uint64_t m_model2;
 
-   uint16_t                m_delayMs;
-   uint16_t                m_physicalDmg;
-   uint16_t                m_magicalDmg;
-   uint16_t                m_weaponDmg;
-   float                   m_autoAttackDmg;
-   uint16_t                m_itemLevel;
+   bool m_isHq;
 
+   uint16_t m_delayMs;
+   uint16_t m_physicalDmg;
+   uint16_t m_magicalDmg;
+   uint16_t m_weaponDmg;
+   float m_autoAttackDmg;
+   uint16_t m_itemLevel;
 };
 
-}
+} // namespace Core
 
 #endif

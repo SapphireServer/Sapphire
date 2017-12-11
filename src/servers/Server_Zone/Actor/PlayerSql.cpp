@@ -1,13 +1,12 @@
 #include <Server_Common/Common.h>
+#include <Server_Common/Config/XMLConfig.h>
+#include <Server_Common/Database/DatabaseDef.h>
+#include <Server_Common/Exd/ExdData.h>
+#include <Server_Common/Logging/Logger.h>
 #include <Server_Common/Network/GamePacket.h>
+#include <Server_Common/Network/PacketContainer.h>
 #include <Server_Common/Util/Util.h>
 #include <Server_Common/Util/UtilMath.h>
-#include <Server_Common/Config/XMLConfig.h>
-#include <Server_Common/Logging/Logger.h>
-#include <Server_Common/Exd/ExdData.h>
-#include <Server_Common/Network/PacketContainer.h>
-#include <Server_Common/Common.h>
-#include <Server_Common/Database/DatabaseDef.h>
 
 #include <set>
 #include <stdio.h>
@@ -16,23 +15,21 @@
 
 #include "Player.h"
 
-#include "Zone/ZoneMgr.h"
 #include "Zone/Zone.h"
+#include "Zone/ZoneMgr.h"
 
 #include "ServerZone.h"
 
 #include "Forwards.h"
 
+#include "Inventory/Inventory.h"
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/InitUIPacket.h"
-#include "Inventory/Inventory.h"
-
 
 extern Core::Logger g_log;
 extern Core::ServerZone g_serverZone;
 extern Core::ZoneMgr g_zoneMgr;
 extern Core::Data::ExdData g_exdData;
-
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -47,7 +44,7 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
 
    stmt->setUInt( 1, charId );
    auto res = g_charaDb.query( stmt );
-   
+
    if( !res->next() )
       return false;
 
@@ -155,7 +152,7 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
 
    auto orchestrion = res->getBlobVector( "Orchestrion" );
    memcpy( reinterpret_cast< char* >( m_orchestrion ), orchestrion.data(), orchestrion.size() );
-   
+
    auto gcRank = res->getBlobVector( "GrandCompanyRank" );
    memcpy( reinterpret_cast< char* >( m_gcRank ), gcRank.data(), gcRank.size() );
 
@@ -183,7 +180,7 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
    // first login, run the script event
    if( m_bNewGame )
    {
-      //g_scriptMgr.onPlayerFirstEnterWorld( pPlayer );
+      // g_scriptMgr.onPlayerFirstEnterWorld( pPlayer );
       m_bNewGame = false;
       m_hp = getMaxHp();
       m_mp = getMaxMp();
@@ -198,8 +195,8 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
    if( m_hp == 0 )
       m_status = ActorStatus::Dead;
 
- //  if( m_bNewAdventurer )
- //     setStateFlag( PlayerStateFlag::NewAdventurer );
+   //  if( m_bNewAdventurer )
+   //     setStateFlag( PlayerStateFlag::NewAdventurer );
 
    setStateFlag( PlayerStateFlag::BetweenAreas );
 
@@ -243,12 +240,9 @@ bool Core::Entity::Player::loadActiveQuests()
 
       m_questIdToQuestIdx[pActiveQuest->c.questId] = slotId;
       m_questIdxToQuestId[slotId] = pActiveQuest->c.questId;
-
-
    }
 
    return true;
-
 }
 
 bool Core::Entity::Player::loadClassData()
@@ -288,29 +282,28 @@ bool Core::Entity::Player::loadSearchInfo()
    return true;
 }
 
-
 void Core::Entity::Player::updateSql()
 {
 
-           /*"Hp 1, Mp 2, Tp 3, Gp 4, Mode 5, Mount 6, InvincibleGM 7, Voice 8, "
-           "Customize 9, ModelMainWeapon 10, ModelSubWeapon 11, ModelSystemWeapon 12, "
-           "ModelEquip 13, EmoteModeType 14, Language 15, IsNewGame 16, IsNewAdventurer 17, "
-           "TerritoryType 18, TerritoryId 19, PosX 20, PosY 21, PosZ 22, PosR 23, "
-           "OTerritoryType 24, OTerritoryId 25, OPosX 26, OPosY 27, OPosZ 28, OPosR 29, "
-           "Class 30, Status 31, TotalPlayTime 32, HomePoint 33, FavoritePoint 34, RestPoint 35, "
-           "ActiveTitle 36, TitleList 37, Achievement 38, Aetheryte 39, HowTo 40, Minions 41, Mounts 42, Orchestrion 43, "
-           "EquippedMannequin 44, ConfigFlags 45, QuestCompleteFlags 46, OpeningSequence 47, "
-           "QuestTracking 48, GrandCompany 49, GrandCompanyRank 50, Discovery 51, GMRank 52, Unlocks 53, "
-           "CFPenaltyUntil 54"*/
+   /*"Hp 1, Mp 2, Tp 3, Gp 4, Mode 5, Mount 6, InvincibleGM 7, Voice 8, "
+   "Customize 9, ModelMainWeapon 10, ModelSubWeapon 11, ModelSystemWeapon 12, "
+   "ModelEquip 13, EmoteModeType 14, Language 15, IsNewGame 16, IsNewAdventurer 17, "
+   "TerritoryType 18, TerritoryId 19, PosX 20, PosY 21, PosZ 22, PosR 23, "
+   "OTerritoryType 24, OTerritoryId 25, OPosX 26, OPosY 27, OPosZ 28, OPosR 29, "
+   "Class 30, Status 31, TotalPlayTime 32, HomePoint 33, FavoritePoint 34, RestPoint 35, "
+   "ActiveTitle 36, TitleList 37, Achievement 38, Aetheryte 39, HowTo 40, Minions 41, Mounts 42, Orchestrion 43, "
+   "EquippedMannequin 44, ConfigFlags 45, QuestCompleteFlags 46, OpeningSequence 47, "
+   "QuestTracking 48, GrandCompany 49, GrandCompanyRank 50, Discovery 51, GMRank 52, Unlocks 53, "
+   "CFPenaltyUntil 54"*/
    auto stmt = g_charaDb.getPreparedStatement( Db::CharaDbStatements::CHARA_UP );
 
    stmt->setInt( 1, getHp() );
    stmt->setInt( 2, getMp() );
-   stmt->setInt( 3, 0 ); // TP
-   stmt->setInt( 4, 0 ); // GP
-   stmt->setInt( 5, 0 ); // Mode
+   stmt->setInt( 3, 0 );       // TP
+   stmt->setInt( 4, 0 );       // GP
+   stmt->setInt( 5, 0 );       // Mode
    stmt->setInt( 6, m_mount ); // Mount
-   stmt->setInt( 7, 0 ); // InvicibleGM
+   stmt->setInt( 7, 0 );       // InvicibleGM
    stmt->setInt( 8, m_voice );
 
    std::vector< uint8_t > customVec( sizeof( m_customize ) );
@@ -331,7 +324,7 @@ void Core::Entity::Player::updateSql()
    stmt->setInt( 16, static_cast< uint32_t >( m_bNewGame ) );
    stmt->setInt( 17, static_cast< uint32_t >( m_bNewAdventurer ) );
 
-   stmt->setInt( 18, 0 ); // TerritoryType
+   stmt->setInt( 18, 0 );        // TerritoryType
    stmt->setInt( 19, m_zoneId ); // TerritoryId
    stmt->setDouble( 20, m_pos.x );
    stmt->setDouble( 21, m_pos.y );
@@ -351,10 +344,10 @@ void Core::Entity::Player::updateSql()
    stmt->setInt( 33, m_homePoint );
 
    stmt->setBinary( 34, { 0, 0, 0 } ); // FavoritePoint
-   stmt->setInt( 35, 0 ); // RestPoint
-   stmt->setInt( 36, 0 ); // ActiveTitle
+   stmt->setInt( 35, 0 );              // RestPoint
+   stmt->setInt( 36, 0 );              // ActiveTitle
 
-   std::vector< uint8_t > titleListVec( sizeof ( m_titleList ) );
+   std::vector< uint8_t > titleListVec( sizeof( m_titleList ) );
    stmt->setBinary( 37, titleListVec );
 
    std::vector< uint8_t > achievementVec( 16 );
@@ -421,14 +414,13 @@ void Core::Entity::Player::updateSql()
 
    ////// Class
    updateDbClass();
-
 }
 
 void Core::Entity::Player::updateDbClass() const
 {
    uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( getClass() )].exp_idx;
 
-   //Exp = ?, Lvl = ? WHERE CharacterId = ? AND ClassIdx = ?
+   // Exp = ?, Lvl = ? WHERE CharacterId = ? AND ClassIdx = ?
    auto stmtS = g_charaDb.getPreparedStatement( Db::CHARA_CLASS_UP );
    stmtS->setInt( 1, getExp() );
    stmtS->setInt( 2, getLevel() );
@@ -473,10 +465,9 @@ void Core::Entity::Player::updateDbAllQuests() const
       stmtS3->setInt( 7, m_activeQuests[i]->c.UI8E );
       stmtS3->setInt( 8, m_activeQuests[i]->c.UI8F );
       stmtS3->setInt( 9, m_activeQuests[i]->c.padding1 );
-      stmtS3->setInt( 10, m_id);
+      stmtS3->setInt( 10, m_id );
       stmtS3->setInt( 11, m_activeQuests[i]->c.questId );
       g_charaDb.execute( stmtS3 );
-
    }
 }
 

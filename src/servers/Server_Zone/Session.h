@@ -7,53 +7,51 @@
 
 namespace Core {
 
-   class Session : public boost::enable_shared_from_this< Session >
-   {
-   public:
-      Session( uint32_t sessionId );
-      ~Session();
+class Session : public boost::enable_shared_from_this< Session >
+{
+public:
+   Session( uint32_t sessionId );
+   ~Session();
 
-      void setZoneConnection( Network::GameConnectionPtr zoneCon );
+   void setZoneConnection( Network::GameConnectionPtr zoneCon );
 
-      void setChatConnection( Network::GameConnectionPtr chatCon );
+   void setChatConnection( Network::GameConnectionPtr chatCon );
 
-      Network::GameConnectionPtr getZoneConnection() const;
-      Network::GameConnectionPtr getChatConnection() const;
+   Network::GameConnectionPtr getZoneConnection() const;
+   Network::GameConnectionPtr getChatConnection() const;
 
-      uint32_t getLastDataTime() const;
-      uint32_t getLastSqlTime() const;
+   uint32_t getLastDataTime() const;
+   uint32_t getLastSqlTime() const;
 
-      void updateLastDataTime();
-      void updateLastSqlTime();
+   void updateLastDataTime();
+   void updateLastSqlTime();
 
-      void close();
+   void close();
 
-      uint32_t getId() const;
+   uint32_t getId() const;
 
-      bool loadPlayer();
+   bool loadPlayer();
 
-      void update();
+   void update();
 
-      bool isValid() const;
+   bool isValid() const;
 
-      Entity::PlayerPtr getPlayer() const;
+   Entity::PlayerPtr getPlayer() const;
 
-   private:
-      uint32_t m_sessionId;
+private:
+   uint32_t m_sessionId;
 
-      Entity::PlayerPtr m_pPlayer;
+   Entity::PlayerPtr m_pPlayer;
 
-      uint32_t m_lastDataTime;
+   uint32_t m_lastDataTime;
 
-      uint32_t m_lastSqlTime;
-      bool m_isValid;
+   uint32_t m_lastSqlTime;
+   bool m_isValid;
 
-      Network::GameConnectionPtr m_pZoneConnection;
-      Network::GameConnectionPtr m_pChatConnection;
+   Network::GameConnectionPtr m_pZoneConnection;
+   Network::GameConnectionPtr m_pChatConnection;
+};
 
-   };
-
-}
+} // namespace Core
 
 #endif
-

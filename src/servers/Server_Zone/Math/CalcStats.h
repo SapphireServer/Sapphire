@@ -1,14 +1,14 @@
 #ifndef _CALCSTATS_H
 #define _CALCSTATS_H
 
-#include <Server_Common/Common.h>
 #include "Actor/Actor.h"
+#include <Server_Common/Common.h>
 
 using namespace Core::Entity;
 
 namespace Core {
 namespace Math {
-   
+
    class CalcStats
    {
    public:
@@ -17,10 +17,9 @@ namespace Math {
       static uint32_t calculateMaxHp( PlayerPtr pPlayer );
 
    private:
-
    };
 
-}
-}
+} // namespace Math
+} // namespace Core
 
 #endif

@@ -1,45 +1,45 @@
 #include <Server_Common/Common.h>
+#include <Server_Common/Config/XMLConfig.h>
+#include <Server_Common/Exd/ExdData.h>
+#include <Server_Common/Logging/Logger.h>
+#include <Server_Common/Network/GamePacket.h>
+#include <Server_Common/Network/PacketContainer.h>
 #include <Server_Common/Util/Util.h>
 #include <Server_Common/Util/UtilMath.h>
-#include <Server_Common/Config/XMLConfig.h>
-#include <Server_Common/Network/GamePacket.h>
-#include <Server_Common/Logging/Logger.h>
-#include <Server_Common/Exd/ExdData.h>
-#include <Server_Common/Network/PacketContainer.h>
 
-#include "Session.h"
-#include "Player.h"
 #include "BattleNpc.h"
+#include "Player.h"
+#include "Session.h"
 
-#include "Zone/ZoneMgr.h"
 #include "Zone/Zone.h"
+#include "Zone/ZoneMgr.h"
 
 #include "ServerZone.h"
 
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
-#include "Network/PacketWrappers/InitUIPacket.h"
-#include "Network/PacketWrappers/ServerNoticePacket.h"
-#include "Network/PacketWrappers/ChatPacket.h"
-#include "Network/PacketWrappers/ModelEquipPacket.h"
 #include "Network/PacketWrappers/ActorSpawnPacket.h"
-#include "Network/PacketWrappers/UpdateHpMpTpPacket.h"
-#include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
+#include "Network/PacketWrappers/ChatPacket.h"
+#include "Network/PacketWrappers/InitUIPacket.h"
+#include "Network/PacketWrappers/ModelEquipPacket.h"
 #include "Network/PacketWrappers/PlayerSpawnPacket.h"
+#include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
+#include "Network/PacketWrappers/ServerNoticePacket.h"
+#include "Network/PacketWrappers/UpdateHpMpTpPacket.h"
 
 #include "Script/ScriptManager.h"
 
 #include "Inventory/Item.h"
 
-#include "Inventory/Inventory.h"
-#include "Event/Event.h"
 #include "Action/Action.h"
 #include "Action/EventAction.h"
 #include "Action/EventItemAction.h"
-#include "Zone/ZonePosition.h"
-#include "Math/CalcStats.h"
+#include "Event/Event.h"
+#include "Inventory/Inventory.h"
 #include "Math/CalcBattle.h"
+#include "Math/CalcStats.h"
+#include "Zone/ZonePosition.h"
 #include <boost/make_shared.hpp>
 
 extern Core::Logger g_log;
@@ -54,24 +54,24 @@ using namespace Core::Network::Packets::Server;
 
 // player constructor
 Core::Entity::Player::Player() :
-   Actor(),
-   m_lastWrite( 0 ),
-   m_lastPing( 0 ),
-   m_bIsLogin( false ),
-   m_contentId( 0 ),
-   m_modelMainWeapon( 0 ),
-   m_modelSubWeapon( 0 ),
-   m_homePoint( 0 ),
-   m_startTown( 0 ),
-   m_townWarpFstFlags( 0 ),
-   m_playTime( 0 ),
-   m_bInCombat( false ),
-   m_bLoadingComplete( false ),
-   m_bMarkedForZoning( false ),
-   m_zoningType( Common::ZoneingType::None ),
-   m_bAutoattack( false ),
-   m_markedForRemoval( false ),
-   m_mount( 0 )
+    Actor(),
+    m_lastWrite( 0 ),
+    m_lastPing( 0 ),
+    m_bIsLogin( false ),
+    m_contentId( 0 ),
+    m_modelMainWeapon( 0 ),
+    m_modelSubWeapon( 0 ),
+    m_homePoint( 0 ),
+    m_startTown( 0 ),
+    m_townWarpFstFlags( 0 ),
+    m_playTime( 0 ),
+    m_bInCombat( false ),
+    m_bLoadingComplete( false ),
+    m_bMarkedForZoning( false ),
+    m_zoningType( Common::ZoneingType::None ),
+    m_bAutoattack( false ),
+    m_markedForRemoval( false ),
+    m_mount( 0 )
 {
    m_id = 0;
    m_objKind = ObjKind::Player;
@@ -157,7 +157,7 @@ Core::Common::OnlineStatus Core::Entity::Player::getOnlineStatus()
 
    OnlineStatus status = OnlineStatus::Online;
 
-   //if( hasStateFlag( Common::PlayerStateFlag::NewAdventurer ) )
+   // if( hasStateFlag( Common::PlayerStateFlag::NewAdventurer ) )
    if( m_onlineStatus & newMask )
       status = OnlineStatus::NewAdventurer;
 
@@ -182,7 +182,8 @@ Core::Common::OnlineStatus Core::Entity::Player::getOnlineStatus()
    if( hasStateFlag( PlayerStateFlag::WatchingCutscene ) || hasStateFlag( PlayerStateFlag::WatchingCutscene1 ) )
       status = OnlineStatus::ViewingCutscene;
 
-   // TODO: add all the logic for returning the proper online status, there probably is a better way for this alltogether
+   // TODO: add all the logic for returning the proper online status, there probably is a better way for this
+   // alltogether
    return status;
 }
 
@@ -216,8 +217,7 @@ void Core::Entity::Player::calculateStats()
    auto tribeInfoIt = g_exdData.m_tribeInfoMap.find( tribe );
    auto paramGrowthInfoIt = g_exdData.m_paramGrowthInfoMap.find( level );
 
-   if( tribeInfoIt == g_exdData.m_tribeInfoMap.end() ||
-       classInfoIt == g_exdData.m_classJobInfoMap.end() ||
+   if( tribeInfoIt == g_exdData.m_tribeInfoMap.end() || classInfoIt == g_exdData.m_classJobInfoMap.end() ||
        paramGrowthInfoIt == g_exdData.m_paramGrowthInfoMap.end() )
       return;
 
@@ -228,20 +228,26 @@ void Core::Entity::Player::calculateStats()
    // TODO: put formula somewhere else...
    float base = Math::CalcStats::calculateBaseStat( getAsPlayer() );
 
-   m_baseStats.str =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_str ) / 100 ) + tribeInfo.mod_str );
-   m_baseStats.dex =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_dex ) / 100 ) + tribeInfo.mod_dex );
-   m_baseStats.vit =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_vit ) / 100 ) + tribeInfo.mod_vit );
-   m_baseStats.inte = static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_int ) / 100 ) + tribeInfo.mod_int );
-   m_baseStats.mnd =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_mnd ) / 100 ) + tribeInfo.mod_mnd );
-   m_baseStats.pie =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_pie ) / 100 ) + tribeInfo.mod_pie );
+   m_baseStats.str =
+       static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_str ) / 100 ) + tribeInfo.mod_str );
+   m_baseStats.dex =
+       static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_dex ) / 100 ) + tribeInfo.mod_dex );
+   m_baseStats.vit =
+       static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_vit ) / 100 ) + tribeInfo.mod_vit );
+   m_baseStats.inte =
+       static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_int ) / 100 ) + tribeInfo.mod_int );
+   m_baseStats.mnd =
+       static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_mnd ) / 100 ) + tribeInfo.mod_mnd );
+   m_baseStats.pie =
+       static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_pie ) / 100 ) + tribeInfo.mod_pie );
 
-   m_baseStats.skillSpeed      = paramGrowthInfo.base_secondary;
-   m_baseStats.spellSpeed      = paramGrowthInfo.base_secondary;
-   m_baseStats.accuracy        = paramGrowthInfo.base_secondary;
-   m_baseStats.critHitRate     = paramGrowthInfo.base_secondary;
-   m_baseStats.attackPotMagic  = paramGrowthInfo.base_secondary;
+   m_baseStats.skillSpeed = paramGrowthInfo.base_secondary;
+   m_baseStats.spellSpeed = paramGrowthInfo.base_secondary;
+   m_baseStats.accuracy = paramGrowthInfo.base_secondary;
+   m_baseStats.critHitRate = paramGrowthInfo.base_secondary;
+   m_baseStats.attackPotMagic = paramGrowthInfo.base_secondary;
    m_baseStats.healingPotMagic = paramGrowthInfo.base_secondary;
-   m_baseStats.tenacity        = paramGrowthInfo.base_secondary;
+   m_baseStats.tenacity = paramGrowthInfo.base_secondary;
 
    m_baseStats.max_mp = Math::CalcStats::calculateMaxMp( getAsPlayer() );
 
@@ -253,13 +259,10 @@ void Core::Entity::Player::calculateStats()
    if( m_hp > m_baseStats.max_hp )
       m_hp = m_baseStats.max_hp;
 
-
    m_baseStats.determination = static_cast< uint32_t >( base );
-
 }
 
-
-void Core::Entity::Player::setAutoattack(bool mode)
+void Core::Entity::Player::setAutoattack( bool mode )
 {
    m_bAutoattack = mode;
    m_lastAttack = Util::getTimeMs();
@@ -325,8 +328,8 @@ void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
       rot = z_pos->getTargetRotation();
    }
 
-   sendDebug( "Teleport: " + data->placename + " " + data->placename_aethernet +
-               "(" + std::to_string( data->levelId ) + ")" );
+   sendDebug( "Teleport: " + data->placename + " " + data->placename_aethernet + "(" + std::to_string( data->levelId ) +
+              ")" );
 
    // TODO: this should be simplified and a type created in server_common/common.h.
    if( type == 1 ) // teleport
@@ -349,14 +352,12 @@ void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
    }
 
    m_queuedZoneing = boost::make_shared< QueuedZoning >( data->target_zone, pos, Util::getTimeMs(), rot );
-
-
 }
 
 void Core::Entity::Player::forceZoneing( uint32_t zoneId )
 {
    m_queuedZoneing = boost::make_shared< QueuedZoning >( zoneId, getPos(), Util::getTimeMs(), 0.f );
-   //performZoning( zoneId, Common::ZoneingType::None, getPos() );
+   // performZoning( zoneId, Common::ZoneingType::None, getPos() );
 }
 
 void Core::Entity::Player::returnToHomepoint()
@@ -370,7 +371,6 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
    auto pPlayer = getAsPlayer();
 
    auto pZone = g_zoneMgr.getZone( zoneId );
-
 
    if( !pZone /*|| ( ( pZone == m_pCurrentZone ) && m_lastPing )*/ )
    {
@@ -397,7 +397,7 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
 
    if( isLogin() )
    {
-      queuePacket(ActorControlPacket143( getId(), SetCharaGearParamUI, m_equipDisplayFlags, 1 ) );
+      queuePacket( ActorControlPacket143( getId(), SetCharaGearParamUI, m_equipDisplayFlags, 1 ) );
    }
 
    // set flags, will be reset automatically by zoning ( only on client side though )
@@ -517,7 +517,6 @@ void Core::Entity::Player::registerAetheryte( uint8_t aetheryteId )
 
    m_aetheryte[index] |= value;
    queuePacket( ActorControlPacket143( getId(), LearnTeleport, aetheryteId, 1 ) );
-
 }
 
 bool Core::Entity::Player::isAetheryteRegistered( uint8_t aetheryteId ) const
@@ -529,7 +528,7 @@ bool Core::Entity::Player::isAetheryteRegistered( uint8_t aetheryteId ) const
    return ( m_aetheryte[index] & value ) != 0;
 }
 
-uint8_t * Core::Entity::Player::getDiscoveryBitmask()
+uint8_t* Core::Entity::Player::getDiscoveryBitmask()
 {
    return m_discovery;
 }
@@ -561,9 +560,6 @@ void Core::Entity::Player::discover( int16_t map_id, int16_t sub_id )
    uint32_t exp = ( g_exdData.m_paramGrowthInfoMap[level].needed_exp * 5 / 100 );
 
    gainExp( exp );
-
-
-
 }
 
 bool Core::Entity::Player::isNewAdventurer() const
@@ -573,11 +569,11 @@ bool Core::Entity::Player::isNewAdventurer() const
 
 void Core::Entity::Player::setNewAdventurer( bool state )
 {
-   //if( !state )
+   // if( !state )
    //{
    //   unsetStateFlag( PlayerStateFlag::NewAdventurer );
    //}
-   //else
+   // else
    //{
    //   setStateFlag( PlayerStateFlag::NewAdventurer );
    //}
@@ -596,7 +592,7 @@ void Core::Entity::Player::changePosition( float x, float y, float z, float o )
    pos.x = x;
    pos.y = y;
    pos.z = z;
-   m_queuedZoneing = boost::make_shared<QueuedZoning>( getZoneId(), pos, Util::getTimeMs(), o );
+   m_queuedZoneing = boost::make_shared< QueuedZoning >( getZoneId(), pos, Util::getTimeMs(), o );
 }
 
 void Core::Entity::Player::learnAction( uint8_t actionId )
@@ -652,16 +648,16 @@ void Core::Entity::Player::gainExp( uint32_t amount )
    {
       // levelup
       amount = ( currentExp + amount - neededExpToLevel ) > neededExpToLevelplus1 ?
-               neededExpToLevelplus1 - 1 :
-               ( currentExp + amount - neededExpToLevel );
+                   neededExpToLevelplus1 - 1 :
+                   ( currentExp + amount - neededExpToLevel );
       setExp( amount );
       gainLevel();
       queuePacket( ActorControlPacket143( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), amount ) );
-
    }
    else
    {
-      queuePacket( ActorControlPacket143( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), currentExp + amount ) );
+      queuePacket(
+          ActorControlPacket143( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), currentExp + amount ) );
       setExp( currentExp + amount );
    }
 
@@ -680,8 +676,8 @@ void Core::Entity::Player::gainLevel()
    m_mp = getMaxMp();
 
    ZoneChannelPacket< FFXIVIpcStatusEffectList > effectListPacket( getId() );
-   effectListPacket.data().classId = static_cast< uint8_t > ( getClass() );
-   effectListPacket.data().classId1 = static_cast< uint8_t > ( getClass() );
+   effectListPacket.data().classId = static_cast< uint8_t >( getClass() );
+   effectListPacket.data().classId1 = static_cast< uint8_t >( getClass() );
    effectListPacket.data().level = getLevel();
    effectListPacket.data().current_hp = getMaxHp();
    effectListPacket.data().current_mp = getMaxMp();
@@ -690,18 +686,17 @@ void Core::Entity::Player::gainLevel()
    effectListPacket.data().max_mp = getMaxMp();
    sendToInRangeSet( effectListPacket, true );
 
-   sendToInRangeSet( ActorControlPacket142( getId(), LevelUpEffect, static_cast< uint8_t >( getClass() ),
-                                            getLevel(), getLevel() - 1 ), true );
-
+   sendToInRangeSet( ActorControlPacket142( getId(), LevelUpEffect, static_cast< uint8_t >( getClass() ), getLevel(),
+                                            getLevel() - 1 ),
+                     true );
 
    ZoneChannelPacket< FFXIVIpcUpdateClassInfo > classInfoPacket( getId() );
-   classInfoPacket.data().classId = static_cast< uint8_t > ( getClass() );
-   classInfoPacket.data().classId1 = static_cast< uint8_t > ( getClass() );
+   classInfoPacket.data().classId = static_cast< uint8_t >( getClass() );
+   classInfoPacket.data().classId1 = static_cast< uint8_t >( getClass() );
    classInfoPacket.data().level = getLevel();
    classInfoPacket.data().nextLevelIndex = getLevel();
    classInfoPacket.data().currentExp = getExp();
    queuePacket( classInfoPacket );
-
 }
 
 void Core::Entity::Player::unlock()
@@ -713,7 +708,7 @@ void Core::Entity::Player::sendStatusUpdate( bool toSelf )
 {
    //   CGamePacket* pPE = new CGamePacket(0x140, 0x0128, getId(), getId());
 
-   //pPE->setInt8At(0x20, static_cast<uint8_t>(getClass()));
+   // pPE->setInt8At(0x20, static_cast<uint8_t>(getClass()));
 
    //   pPE->setInt8At(0x21, getLevel());
    //   pPE->setInt8At(0x22, getLevel());
@@ -733,7 +728,6 @@ void Core::Entity::Player::sendStatusUpdate( bool toSelf )
    //   sendToInRangeSet(pPE, toSelf);
 
    sendToInRangeSet( UpdateHpMpTpPacket( shared_from_this() ), true );
-
 }
 
 uint8_t Core::Entity::Player::getLevel() const
@@ -767,7 +761,7 @@ bool Core::Entity::Player::isInCombat() const
 
 void Core::Entity::Player::setInCombat( bool mode )
 {
-   //m_lastAttack = GetTickCount();
+   // m_lastAttack = GetTickCount();
    m_bInCombat = mode;
 }
 
@@ -796,14 +790,15 @@ void Core::Entity::Player::setClassJob( Common::ClassJob classJob )
 
 void Core::Entity::Player::setLevel( uint8_t level )
 {
-   uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( static_cast< uint8_t >( getClass() ) )].exp_idx;
+   uint8_t classJobIndex =
+       g_exdData.m_classJobInfoMap[static_cast< uint8_t >( static_cast< uint8_t >( getClass() ) )].exp_idx;
    m_classArray[classJobIndex] = level;
 }
 
 void Core::Entity::Player::setLevelForClass( uint8_t level, Common::ClassJob classjob )
 {
-    uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( classjob )].exp_idx;
-    m_classArray[classJobIndex] = level;
+   uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( classjob )].exp_idx;
+   m_classArray[classJobIndex] = level;
 }
 
 void Core::Entity::Player::sendModel()
@@ -872,9 +867,7 @@ void Core::Entity::Player::setLookAt( uint8_t index, uint8_t value )
 // spawn this player for pTarget
 void Core::Entity::Player::spawn( Entity::PlayerPtr pTarget )
 {
-   g_log.debug( "[" + std::to_string( pTarget->getId() ) + "] Spawning " +
-                getName() + " for " +
-                pTarget->getName() );
+   g_log.debug( "[" + std::to_string( pTarget->getId() ) + "] Spawning " + getName() + " for " + pTarget->getName() );
 
    PlayerSpawnPacket spawnActor( *getAsPlayer(), *pTarget );
    pTarget->queuePacket( spawnActor );
@@ -946,14 +939,13 @@ const uint8_t* Core::Entity::Player::getStateFlags() const
    return m_stateFlags;
 }
 
-bool Core::Entity::Player::actionHasCastTime( uint32_t actionId ) //TODO: Add logic for special cases
+bool Core::Entity::Player::actionHasCastTime( uint32_t actionId ) // TODO: Add logic for special cases
 {
    auto actionInfoPtr = g_exdData.getActionInfo( actionId );
    if( actionInfoPtr->is_instant )
       return false;
 
    return actionInfoPtr->cast_time != 0;
-
 }
 
 bool Core::Entity::Player::hasStateFlag( Common::PlayerStateFlag flag ) const
@@ -976,7 +968,6 @@ void Core::Entity::Player::setStateFlag( Common::PlayerStateFlag flag )
    Util::valueToFlagByteIndexValue( iFlag, value, index );
 
    m_stateFlags[index] |= value;
-
 }
 
 void Core::Entity::Player::setStateFlags( std::vector< Common::PlayerStateFlag > flags )
@@ -1010,7 +1001,6 @@ void Core::Entity::Player::unsetStateFlag( Common::PlayerStateFlag flag )
    Util::valueToFlagByteIndexValue( iFlag, value, index );
 
    m_stateFlags[index] ^= value;
-
 }
 
 void Core::Entity::Player::update( int64_t currTime )
@@ -1022,7 +1012,7 @@ void Core::Entity::Player::update( int64_t currTime )
       Common::FFXIVARR_POSITION3 targetPos = m_queuedZoneing->m_targetPosition;
       if( getCurrentZone()->getId() != m_queuedZoneing->m_targetZone )
       {
-         performZoning( m_queuedZoneing->m_targetZone, targetPos, m_queuedZoneing->m_targetRotation);
+         performZoning( m_queuedZoneing->m_targetZone, targetPos, m_queuedZoneing->m_targetRotation );
       }
       else
       {
@@ -1055,7 +1045,8 @@ void Core::Entity::Player::update( int64_t currTime )
       {
          auto mainWeap = m_pInventory->getItemAt( Inventory::GearSet0, Inventory::EquipSlot::MainHand );
 
-         // @TODO i dislike this, iterating over all in range actors when you already know the id of the actor you need...
+         // @TODO i dislike this, iterating over all in range actors when you already know the id of the actor you
+         // need...
          for( auto actor : m_inRangeActors )
          {
             if( actor->getId() == m_targetId && actor->isAlive() && mainWeap )
@@ -1065,14 +1056,11 @@ void Core::Entity::Player::update( int64_t currTime )
                uint32_t range = 7;
 
                // default autoattack range for ranged classes
-               if( getClass() == ClassJob::Machinist ||
-                   getClass() == ClassJob::Bard ||
-                   getClass() == ClassJob::Archer )
+               if( getClass() == ClassJob::Machinist || getClass() == ClassJob::Bard || getClass() == ClassJob::Archer )
                   range = 25;
 
-
-               if( Math::Util::distance(getPos().x, getPos().y, getPos().z,
-                   actor->getPos().x, actor->getPos().y, actor->getPos().z) <= range )
+               if( Math::Util::distance( getPos().x, getPos().y, getPos().z, actor->getPos().x, actor->getPos().y,
+                                         actor->getPos().z ) <= range )
                {
 
                   if( ( currTime - m_lastAttack ) > mainWeap->getDelay() )
@@ -1080,7 +1068,6 @@ void Core::Entity::Player::update( int64_t currTime )
                      m_lastAttack = currTime;
                      autoAttack( actor );
                   }
-
                }
             }
          }
@@ -1111,10 +1098,9 @@ void Core::Entity::Player::freePlayerSpawnId( uint32_t actorId )
    freeActorSpawnPacket.data().actorId = actorId;
    freeActorSpawnPacket.data().spawnId = spawnId;
    queuePacket( freeActorSpawnPacket );
-
 }
 
-uint8_t * Core::Entity::Player::getAetheryteArray()
+uint8_t* Core::Entity::Player::getAetheryteArray()
 {
    return m_aetheryte;
 }
@@ -1219,7 +1205,6 @@ void Core::Entity::Player::queuePacket( Network::Packets::GamePacketPtr pPacket 
 
    if( pZoneCon )
       pZoneCon->queueOutPacket( pPacket );
-
 }
 
 void Core::Entity::Player::queueChatPacket( Network::Packets::GamePacketPtr pPacket )
@@ -1245,7 +1230,7 @@ void Core::Entity::Player::setLoadingComplete( bool bComplete )
    m_bLoadingComplete = bComplete;
 }
 
-void Core::Entity::Player::performZoning( uint16_t zoneId, const Common::FFXIVARR_POSITION3 &pos, float rotation )
+void Core::Entity::Player::performZoning( uint16_t zoneId, const Common::FFXIVARR_POSITION3& pos, float rotation )
 {
    m_pos = pos;
    m_zoneId = zoneId;
@@ -1292,17 +1277,17 @@ uint8_t Core::Entity::Player::getSearchSelectClass() const
    return m_searchSelectClass;
 }
 
-void Core::Entity::Player::sendNotice( const std::string& message ) //Purple Text
+void Core::Entity::Player::sendNotice( const std::string& message ) // Purple Text
 {
    queuePacket( ServerNoticePacket( getId(), message ) );
 }
 
-void Core::Entity::Player::sendUrgent( const std::string& message ) //Red Text
+void Core::Entity::Player::sendUrgent( const std::string& message ) // Red Text
 {
    queuePacket( ChatPacket( *getAsPlayer(), ChatType::ServerUrgent, message ) );
 }
 
-void Core::Entity::Player::sendDebug( const std::string& message ) //Grey Text
+void Core::Entity::Player::sendDebug( const std::string& message ) // Grey Text
 {
    queuePacket( ChatPacket( *getAsPlayer(), ChatType::ServerDebug, message ) );
 }
@@ -1316,7 +1301,6 @@ void Core::Entity::Player::updateHowtosSeen( uint32_t howToId )
 
    m_howTo[index] |= value;
 }
-
 
 void Core::Entity::Player::onMobAggro( BattleNpcPtr pBNpc )
 {
@@ -1342,7 +1326,6 @@ void Core::Entity::Player::hateListAdd( BattleNpcPtr pBNpc )
    m_freeHateSlotQueue.pop();
    m_actorIdTohateSlotMap[pBNpc->getId()] = hateId;
    sendHateList();
-
 }
 
 void Core::Entity::Player::hateListRemove( BattleNpcPtr pBNpc )
@@ -1430,7 +1413,7 @@ void Core::Entity::Player::setTitle( uint16_t titleId )
    uint8_t value;
    Util::valueToFlagByteIndexValue( titleId, value, index );
 
-   if ( ( m_titleList[index] & value ) == 0 )   // Player doesn't have title - bail
+   if( ( m_titleList[index] & value ) == 0 ) // Player doesn't have title - bail
       return;
 
    m_activeTitle = titleId;
@@ -1454,7 +1437,9 @@ uint8_t Core::Entity::Player::getEquipDisplayFlags() const
 void Core::Entity::Player::mount( uint32_t id )
 {
    m_mount = id;
-   sendToInRangeSet( ActorControlPacket142( getId(), ActorControlType::SetStatus, static_cast< uint8_t >( Entity::Actor::ActorStatus::Mounted )), true );
+   sendToInRangeSet( ActorControlPacket142( getId(), ActorControlType::SetStatus,
+                                            static_cast< uint8_t >( Entity::Actor::ActorStatus::Mounted ) ),
+                     true );
    sendToInRangeSet( ActorControlPacket143( getId(), 0x39e, 12 ), true ); //?
 
    ZoneChannelPacket< FFXIVIpcMount > mountPacket( getId() );
@@ -1465,7 +1450,8 @@ void Core::Entity::Player::mount( uint32_t id )
 void Core::Entity::Player::dismount()
 {
    sendToInRangeSet( ActorControlPacket142( getId(), ActorControlType::SetStatus,
-                                            static_cast< uint8_t >( Entity::Actor::ActorStatus::Idle )), true );
+                                            static_cast< uint8_t >( Entity::Actor::ActorStatus::Idle ) ),
+                     true );
    sendToInRangeSet( ActorControlPacket143( getId(), ActorControlType::Dismount, 1 ), true );
    m_mount = 0;
 }
@@ -1478,29 +1464,26 @@ uint8_t Core::Entity::Player::getCurrentMount() const
 void Core::Entity::Player::autoAttack( ActorPtr pTarget )
 {
 
-   auto mainWeap = m_pInventory->getItemAt( Inventory::GearSet0,
-                                            Inventory::EquipSlot::MainHand );
+   auto mainWeap = m_pInventory->getItemAt( Inventory::GearSet0, Inventory::EquipSlot::MainHand );
 
    pTarget->onActionHostile( shared_from_this() );
-   //uint64_t tick = Util::getTimeMs();
-   //srand(static_cast< uint32_t >(tick));
+   // uint64_t tick = Util::getTimeMs();
+   // srand(static_cast< uint32_t >(tick));
 
    uint32_t damage = static_cast< uint32_t >( mainWeap->getAutoAttackDmg() );
    uint32_t variation = 0 + rand() % 3;
 
-   if( getClass() == ClassJob::Machinist ||
-       getClass() == ClassJob::Bard ||
-       getClass() == ClassJob::Archer )
+   if( getClass() == ClassJob::Machinist || getClass() == ClassJob::Bard || getClass() == ClassJob::Archer )
    {
-      ZoneChannelPacket< FFXIVIpcEffect > effectPacket(getId());
+      ZoneChannelPacket< FFXIVIpcEffect > effectPacket( getId() );
       effectPacket.data().targetId = pTarget->getId();
       effectPacket.data().actionAnimationId = 8;
-     // effectPacket.data().unknown_2 = variation;
+      // effectPacket.data().unknown_2 = variation;
       effectPacket.data().numEffects = 1;
       effectPacket.data().unknown_61 = 1;
       effectPacket.data().unknown_62 = 1;
       effectPacket.data().actionTextId = 8;
-      effectPacket.data().rotation = Math::Util::floatToUInt16Rot(getRotation());
+      effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRotation() );
       effectPacket.data().effectTargetId = pTarget->getId();
       effectPacket.data().effectTarget = pTarget->getId();
       effectPacket.data().effects[0].value = damage;
@@ -1508,12 +1491,12 @@ void Core::Entity::Player::autoAttack( ActorPtr pTarget )
       effectPacket.data().effects[0].hitSeverity = Common::ActionHitSeverityType::NormalDamage;
       effectPacket.data().effects[0].unknown_3 = 7;
 
-      sendToInRangeSet(effectPacket, true);
+      sendToInRangeSet( effectPacket, true );
    }
    else
    {
 
-      ZoneChannelPacket< FFXIVIpcEffect > effectPacket(getId());
+      ZoneChannelPacket< FFXIVIpcEffect > effectPacket( getId() );
       effectPacket.data().targetId = pTarget->getId();
       effectPacket.data().actionAnimationId = 7;
       // effectPacket.data().unknown_2 = variation;
@@ -1521,20 +1504,18 @@ void Core::Entity::Player::autoAttack( ActorPtr pTarget )
       effectPacket.data().unknown_61 = 1;
       effectPacket.data().unknown_62 = 1;
       effectPacket.data().actionTextId = 7;
-      effectPacket.data().rotation = Math::Util::floatToUInt16Rot(getRotation());
+      effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRotation() );
       effectPacket.data().effectTarget = pTarget->getId();
       effectPacket.data().effects[0].value = damage;
       effectPacket.data().effects[0].effectType = Common::ActionEffectType::Damage;
       effectPacket.data().effects[0].hitSeverity = Common::ActionHitSeverityType::NormalDamage;
       effectPacket.data().effects[0].unknown_3 = 71;
 
-      sendToInRangeSet(effectPacket, true);
+      sendToInRangeSet( effectPacket, true );
    }
 
-   pTarget->takeDamage(damage);
-
+   pTarget->takeDamage( damage );
 }
-
 
 /////////////////////////////
 // Content Finder
@@ -1559,7 +1540,7 @@ uint32_t Core::Entity::Player::getCFPenaltyMinutes() const
       return 0;
 
    auto deltaTime = endTimestamp - currentTimestamp;
-   return static_cast< uint32_t > ( ceil( static_cast< float > (deltaTime) / 60 ) );
+   return static_cast< uint32_t >( ceil( static_cast< float >( deltaTime ) / 60 ) );
 }
 
 void Core::Entity::Player::setCFPenaltyMinutes( uint32_t minutes )
@@ -1587,7 +1568,7 @@ uint16_t Core::Entity::Player::getItemLevel() const
 void Core::Entity::Player::setEorzeaTimeOffset( uint64_t timestamp )
 {
    // TODO: maybe change to persistent?
-   ZoneChannelPacket< FFXIVIpcEorzeaTimeOffset > packet ( getId() );
+   ZoneChannelPacket< FFXIVIpcEorzeaTimeOffset > packet( getId() );
    packet.data().timestamp = timestamp;
 
    // Send to single player

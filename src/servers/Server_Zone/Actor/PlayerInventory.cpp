@@ -1,12 +1,12 @@
 #include <Server_Common/Common.h>
 #include <Server_Common/Exd/ExdData.h>
-#include <Server_Common/Network/GamePacket.h>
 #include <Server_Common/Logging/Logger.h>
+#include <Server_Common/Network/GamePacket.h>
 
 #include "Player.h"
 
-#include "Zone/ZoneMgr.h"
 #include "Zone/Zone.h"
+#include "Zone/ZoneMgr.h"
 
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
@@ -38,45 +38,37 @@ void Core::Entity::Player::equipWeapon( ItemPtr pItem )
    switch( pItem->getCategory() )
    {
    case ItemUICategory::PugilistsArm:
-      if( currentClass != ClassJob::Pugilist &&
-          currentClass != ClassJob::Monk )
+      if( currentClass != ClassJob::Pugilist && currentClass != ClassJob::Monk )
          setClassJob( ClassJob::Pugilist );
       break;
    case ItemUICategory::GladiatorsArm:
-      if( currentClass != ClassJob::Gladiator &&
-          currentClass != ClassJob::Paladin )
+      if( currentClass != ClassJob::Gladiator && currentClass != ClassJob::Paladin )
          setClassJob( ClassJob::Gladiator );
       break;
    case ItemUICategory::MaraudersArm:
-      if( currentClass != ClassJob::Marauder &&
-          currentClass != ClassJob::Warrior )
+      if( currentClass != ClassJob::Marauder && currentClass != ClassJob::Warrior )
          setClassJob( ClassJob::Marauder );
       break;
    case ItemUICategory::ArchersArm:
-      if( currentClass != ClassJob::Archer &&
-          currentClass != ClassJob::Bard )
+      if( currentClass != ClassJob::Archer && currentClass != ClassJob::Bard )
          setClassJob( ClassJob::Archer );
       break;
    case ItemUICategory::LancersArm:
-      if( currentClass != ClassJob::Lancer &&
-          currentClass != ClassJob::Dragoon )
+      if( currentClass != ClassJob::Lancer && currentClass != ClassJob::Dragoon )
          setClassJob( ClassJob::Lancer );
       break;
    case ItemUICategory::OnehandedThaumaturgesArm:
    case ItemUICategory::TwohandedThaumaturgesArm:
-      if( currentClass != ClassJob::Thaumaturge &&
-          currentClass != ClassJob::Blackmage )
+      if( currentClass != ClassJob::Thaumaturge && currentClass != ClassJob::Blackmage )
          setClassJob( ClassJob::Thaumaturge );
       break;
    case ItemUICategory::OnehandedConjurersArm:
    case ItemUICategory::TwohandedConjurersArm:
-      if( currentClass != ClassJob::Conjurer &&
-          currentClass != ClassJob::Whitemage )
+      if( currentClass != ClassJob::Conjurer && currentClass != ClassJob::Whitemage )
          setClassJob( ClassJob::Conjurer );
       break;
    case ItemUICategory::ArcanistsGrimoire:
-      if( currentClass != ClassJob::Arcanist &&
-          currentClass != ClassJob::Summoner &&
+      if( currentClass != ClassJob::Arcanist && currentClass != ClassJob::Summoner &&
           currentClass != ClassJob::Scholar )
          setClassJob( ClassJob::Arcanist );
       break;
@@ -89,7 +81,7 @@ void Core::Entity::Player::equipWeapon( ItemPtr pItem )
 void Core::Entity::Player::equipItem( Inventory::EquipSlot equipSlotId, ItemPtr pItem, bool sendUpdate )
 {
 
-   //g_log.debug( "Equipping into slot " + std::to_string( equipSlotId ) );
+   // g_log.debug( "Equipping into slot " + std::to_string( equipSlotId ) );
 
    uint64_t model = pItem->getModelId1();
    uint64_t model2 = pItem->getModelId2();
@@ -115,11 +107,10 @@ void Core::Entity::Player::equipItem( Inventory::EquipSlot equipSlotId, ItemPtr 
    default: // any other slot
       m_modelEquip[static_cast< uint8_t >( equipSlotId )] = static_cast< uint32_t >( model );
       break;
-
    }
 
    if( sendUpdate )
-   { 
+   {
       this->sendModel();
       m_itemLevel = getInventory()->calculateEquippedGearItemLevel();
       sendItemLevel();
@@ -168,7 +159,6 @@ void Core::Entity::Player::removeCurrency( uint8_t type, uint32_t amount )
 
    queuePacket( invUpPacket );
 }
-
 
 uint32_t Core::Entity::Player::getCrystal( uint8_t type ) const
 {
@@ -228,4 +218,3 @@ void Core::Entity::Player::sendInventory() const
 {
    m_pInventory->send();
 }
-

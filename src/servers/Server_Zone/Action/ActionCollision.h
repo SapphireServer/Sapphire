@@ -3,25 +3,24 @@
 
 #include <Server_Common/Common.h>
 
-#include "Actor/Actor.h"
 #include "Action.h"
+#include "Actor/Actor.h"
 
 namespace Core {
 namespace Entity {
 
    enum class TargetFilter
    {
-      All,        // All actors in the AoE are applicable for collision
-      Players,    // Only players
-      Allies,     // Only allies (players, ally NPCs)
-      Party,      // Only party members
-      Enemies     // Only enemies
+      All,     // All actors in the AoE are applicable for collision
+      Players, // Only players
+      Allies,  // Only allies (players, ally NPCs)
+      Party,   // Only party members
+      Enemies  // Only enemies
    };
 
    class ActionCollision
    {
    public:
-
       static bool isActorApplicable( ActorPtr actorPtr, TargetFilter targetFilter );
       static std::set< ActorPtr > getActorsHitFromAction( Common::FFXIVARR_POSITION3 aoePosition,
                                                           std::set< ActorPtr > actorsInRange,
@@ -34,10 +33,9 @@ namespace Entity {
 
       static bool boxCollision( Common::FFXIVARR_POSITION3 actorPosition, Common::FFXIVARR_POSITION3 aoePosition,
                                 uint16_t width, uint16_t height );
-
    };
 
-}
-}
+} // namespace Entity
+} // namespace Core
 
 #endif

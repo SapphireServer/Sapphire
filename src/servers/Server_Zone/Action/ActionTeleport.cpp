@@ -1,12 +1,12 @@
 #include "ActionTeleport.h"
 
-#include <Server_Common/Util/Util.h>
 #include <Server_Common/Exd/ExdData.h>
 #include <Server_Common/Logging/Logger.h>
+#include <Server_Common/Util/Util.h>
 
+#include "Actor/Player.h"
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
-#include "Actor/Player.h"
 
 using namespace Core::Common;
 using namespace Core::Network;
@@ -26,7 +26,7 @@ Core::Action::ActionTeleport::ActionTeleport( Entity::ActorPtr pActor, uint16_t 
    m_startTime = 0;
    m_id = 5;
    m_handleActionType = HandleActionType::Teleport;
-   m_castTime = g_exdData.getActionInfo(5)->cast_time; // TODO: Add security checks.
+   m_castTime = g_exdData.getActionInfo( 5 )->cast_time; // TODO: Add security checks.
    m_pSource = pActor;
    m_bInterrupt = false;
    m_targetAetheryte = targetZone;
@@ -35,7 +35,6 @@ Core::Action::ActionTeleport::ActionTeleport( Entity::ActorPtr pActor, uint16_t 
 
 Core::Action::ActionTeleport::~ActionTeleport()
 {
-
 }
 
 void Core::Action::ActionTeleport::onStart()
@@ -55,7 +54,6 @@ void Core::Action::ActionTeleport::onStart()
    m_pSource->sendToInRangeSet( castPacket, true );
    m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::Casting );
    m_pSource->getAsPlayer()->sendStateFlags();
-
 }
 
 void Core::Action::ActionTeleport::onFinish()
@@ -73,30 +71,30 @@ void Core::Action::ActionTeleport::onFinish()
    }
 
    pPlayer->removeCurrency( Inventory::CurrencyType::Gil, m_cost );
- 
+
    pPlayer->unsetStateFlag( PlayerStateFlag::Casting );
    pPlayer->sendStateFlags();
 
    // TODO: not sure if this ever gets sent
-   //auto control = Network::Packets::Server::ActorControlPacket142( m_pSource->getId(), Common::ActorControlType::TeleportDone );
-   //m_pSource->sendToInRangeSet( control, false );
+   // auto control = Network::Packets::Server::ActorControlPacket142( m_pSource->getId(),
+   // Common::ActorControlType::TeleportDone
+   // );  m_pSource->sendToInRangeSet( control, false );
 
    pPlayer->setZoningType( ZoneingType::Teleport );
 
    ZoneChannelPacket< FFXIVIpcEffect > effectPacket( pPlayer->getId() );
    effectPacket.data().targetId = pPlayer->getId();
    effectPacket.data().actionAnimationId = 5;
-   //effectPacket.data().unknown_3 = 1;
+   // effectPacket.data().unknown_3 = 1;
    effectPacket.data().actionTextId = 5;
    effectPacket.data().unknown_5 = 1;
    effectPacket.data().numEffects = 1;
-   effectPacket.data().rotation = static_cast< uint16_t >( 0x8000 * ( ( pPlayer->getRotation() + 3.1415926 ) ) / 3.1415926 );
+   effectPacket.data().rotation =
+       static_cast< uint16_t >( 0x8000 * ( ( pPlayer->getRotation() + 3.1415926 ) ) / 3.1415926 );
    effectPacket.data().effectTarget = pPlayer->getId();
    pPlayer->sendToInRangeSet( effectPacket, true );
 
    pPlayer->teleport( m_targetAetheryte );
-
-
 }
 
 void Core::Action::ActionTeleport::onInterrupt()
@@ -107,8 +105,6 @@ void Core::Action::ActionTeleport::onInterrupt()
    m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Casting );
    m_pSource->getAsPlayer()->sendStateFlags();
 
-   auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt,
-                                         0x219, 0x04, m_id, 0 );
+   auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt, 0x219, 0x04, m_id, 0 );
    m_pSource->sendToInRangeSet( control, true );
-
 }

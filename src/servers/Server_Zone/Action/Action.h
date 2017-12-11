@@ -1,12 +1,13 @@
 #ifndef _ACTION_H_
 #define _ACTION_H_
 
-#include <Server_Common/Common.h>
 #include "../Forwards.h"
+#include <Server_Common/Common.h>
 
-namespace Core { namespace Action {
+namespace Core {
+namespace Action {
 
-   class Action 
+   class Action
    {
 
    public:
@@ -33,28 +34,29 @@ namespace Core { namespace Action {
 
       Entity::ActorPtr getActionSource() const;
 
+      // clang-format off
       virtual void onStart() {};
       virtual void onFinish() {};
       virtual void onInterrupt() {};
+      // clang-format on
 
       // update action, if returns true, action is done and has to be removed from the actor
       virtual bool update();
 
    protected:
-      uint16_t	m_id;
+      uint16_t m_id;
       Common::HandleActionType m_handleActionType;
 
-      uint64_t	m_startTime;
-      uint32_t	m_castTime;
+      uint64_t m_startTime;
+      uint32_t m_castTime;
 
       Entity::ActorPtr m_pSource;
       Entity::ActorPtr m_pTarget;
 
       bool m_bInterrupt;
-
    };
 
-}
-}
+} // namespace Action
+} // namespace Core
 
 #endif

@@ -1,22 +1,21 @@
 #include <time.h>
 
-#include <Server_Common/Util/Util.h>
-#include <Server_Common/Network/PacketContainer.h>
 #include "Network/GameConnection.h"
 #include "Session.h"
+#include <Server_Common/Network/PacketContainer.h>
+#include <Server_Common/Util/Util.h>
 
 #include "Actor/Player.h"
 
-Core::Session::Session( uint32_t sessionId )
-   : m_sessionId( sessionId )
-   , m_lastDataTime( static_cast< uint32_t >( Util::getTimeSeconds() ) )
-   , m_lastSqlTime( static_cast< uint32_t >( Util::getTimeSeconds() ) )
-   , m_isValid( false )
+Core::Session::Session( uint32_t sessionId ) :
+    m_sessionId( sessionId ),
+    m_lastDataTime( static_cast< uint32_t >( Util::getTimeSeconds() ) ),
+    m_lastSqlTime( static_cast< uint32_t >( Util::getTimeSeconds() ) ),
+    m_isValid( false )
 {
 
    //   boost::posix_time::ptime now = boost::date_time::not_a_date_time;
    //   now = boost::posix_time::microsec_clock::universal_time();
-
 }
 
 Core::Session::~Session()
@@ -31,8 +30,8 @@ void Core::Session::setZoneConnection( Network::GameConnectionPtr pZoneCon )
 
 void Core::Session::setChatConnection( Network::GameConnectionPtr pChatCon )
 {
-    pChatCon->m_conType = Network::ConnectionType::Chat;
-    m_pChatConnection = pChatCon;
+   pChatCon->m_conType = Network::ConnectionType::Chat;
+   m_pChatConnection = pChatCon;
 }
 
 Core::Network::GameConnectionPtr Core::Session::getZoneConnection() const
@@ -42,9 +41,8 @@ Core::Network::GameConnectionPtr Core::Session::getZoneConnection() const
 
 Core::Network::GameConnectionPtr Core::Session::getChatConnection() const
 {
-    return m_pChatConnection;
+   return m_pChatConnection;
 }
-
 
 bool Core::Session::loadPlayer()
 {
@@ -56,11 +54,10 @@ bool Core::Session::loadPlayer()
       m_isValid = false;
       return false;
    }
-   
+
    m_isValid = true;
 
    return true;
-
 }
 
 void Core::Session::close()
@@ -112,11 +109,11 @@ void Core::Session::update()
    if( m_pZoneConnection )
    {
       m_pZoneConnection->processInQueue();
-      
+
       // SESSION LOGIC
       m_pPlayer->update( Util::getTimeMs() );
 
-      if( ( static_cast< uint32_t >( Util::getTimeSeconds() ) - static_cast< uint32_t >( getLastSqlTime() ) ) > 10  )
+      if( ( static_cast< uint32_t >( Util::getTimeSeconds() ) - static_cast< uint32_t >( getLastSqlTime() ) ) > 10 )
       {
          updateLastSqlTime();
          m_pPlayer->updateSql();
@@ -127,14 +124,12 @@ void Core::Session::update()
 
    if( m_pChatConnection )
    {
-       m_pChatConnection->processInQueue();
-       m_pChatConnection->processOutQueue();
+      m_pChatConnection->processInQueue();
+      m_pChatConnection->processOutQueue();
    }
-
 }
 
 Core::Entity::PlayerPtr Core::Session::getPlayer() const
 {
    return m_pPlayer;
 }
-

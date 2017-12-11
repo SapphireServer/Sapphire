@@ -1,16 +1,16 @@
 #include <Server_Common/Common.h>
-#include <Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
-#include <Server_Common/Network/GamePacket.h>
 #include <Server_Common/Exd/ExdData.h>
+#include <Server_Common/Network/GamePacket.h>
 #include <Server_Common/Network/PacketContainer.h>
+#include <Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
 
 #include "Network/GameConnection.h"
 
 #include "Network/PacketWrappers/QuestMessagePacket.h"
 
-#include "Server_Zone/Session.h"
 #include "Player.h"
 #include "Server_Zone/Inventory/Inventory.h"
+#include "Server_Zone/Session.h"
 
 extern Core::Data::ExdData g_exdData;
 
@@ -27,7 +27,6 @@ void Core::Entity::Player::finishQuest( uint16_t questId )
    updateQuestsCompleted( questId );
 
    sendQuestTracker();
-
 }
 
 void Core::Entity::Player::unfinishQuest( uint16_t questId )
@@ -72,7 +71,6 @@ void Core::Entity::Player::removeQuest( uint16_t questId )
    }
 
    sendQuestTracker();
-
 }
 
 bool Core::Entity::Player::hasQuest( uint16_t questId )
@@ -408,7 +406,7 @@ uint16_t Core::Entity::Player::getQuestUI16A( uint16_t questId )
    if( idx != -1 )
    {
       boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[idx];
-   //   value = pNewQuest->d.UI16A;
+      //   value = pNewQuest->d.UI16A;
    }
 
    return value;
@@ -421,7 +419,7 @@ uint16_t Core::Entity::Player::getQuestUI16B( uint16_t questId )
    if( idx != -1 )
    {
       boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[idx];
-   //   value = pNewQuest->d.UI16B;
+      //   value = pNewQuest->d.UI16B;
    }
 
    return value;
@@ -434,7 +432,7 @@ uint16_t Core::Entity::Player::getQuestUI16C( uint16_t questId )
    if( idx != -1 )
    {
       boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[idx];
-    //  value = pNewQuest->d.UI16C;
+      //  value = pNewQuest->d.UI16C;
    }
 
    return value;
@@ -447,7 +445,7 @@ uint32_t Core::Entity::Player::getQuestUI32A( uint16_t questId )
    if( idx != -1 )
    {
       boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[idx];
-     // value = pNewQuest->e.UI32A;
+      // value = pNewQuest->e.UI32A;
    }
 
    return value;
@@ -713,7 +711,7 @@ void Core::Entity::Player::setQuestUI16A( uint16_t questId, uint16_t val )
    {
       boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[idx];
 
-   //   pNewQuest->d.UI16A = val;
+      //   pNewQuest->d.UI16A = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
    }
@@ -728,7 +726,7 @@ void Core::Entity::Player::setQuestUI16B( uint16_t questId, uint16_t val )
    {
       boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[idx];
 
-    //  pNewQuest->d.UI16B = val;
+      //  pNewQuest->d.UI16B = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
    }
@@ -742,7 +740,7 @@ void Core::Entity::Player::setQuestUI16C( uint16_t questId, uint16_t val )
    {
       boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[idx];
 
-//      pNewQuest->d.UI16C = val;
+      //      pNewQuest->d.UI16C = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
    }
@@ -756,7 +754,7 @@ void Core::Entity::Player::setQuestUI32A( uint16_t questId, uint32_t val )
    {
       boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[idx];
 
-     // pNewQuest->e.UI32A = val;
+      // pNewQuest->e.UI32A = val;
 
       updateQuest( questId, pNewQuest->c.sequence );
    }
@@ -845,8 +843,6 @@ void Core::Entity::Player::setQuestBitFlag48( uint16_t questId, uint8_t val )
    }
 }
 
-
-
 uint8_t Core::Entity::Player::getQuestSeq( uint16_t questId )
 {
    int8_t idx = getQuestIndex( questId );
@@ -870,7 +866,6 @@ void Core::Entity::Player::updateQuest( uint16_t questId, uint8_t sequence )
       pe_qa.data().slot = index;
       pe_qa.data().questInfo = *pNewQuest;
       queuePacket( pe_qa );
-
    }
    else
    {
@@ -911,7 +906,6 @@ void Core::Entity::Player::updateQuest( uint16_t questId, uint8_t sequence )
 
       insertQuest( questId, idx, sequence );
       sendQuestTracker();
-
    }
 }
 
@@ -934,7 +928,7 @@ void Core::Entity::Player::setQuestTracker( uint16_t index, int16_t flag )
 {
    if( flag == 0 )
    {
-      //remove
+      // remove
       for( uint8_t ii = 0; ii < 5; ii++ )
       {
          if( m_questTracking[ii] == index )
@@ -946,7 +940,7 @@ void Core::Entity::Player::setQuestTracker( uint16_t index, int16_t flag )
    }
    else
    {
-      //add
+      // add
       for( uint8_t ii = 0; ii < 5; ii++ )
       {
          if( m_questTracking[ii] == -1 )
@@ -956,9 +950,7 @@ void Core::Entity::Player::setQuestTracker( uint16_t index, int16_t flag )
          }
       }
    }
-
 }
-
 
 void Core::Entity::Player::sendQuestInfo()
 {
@@ -972,7 +964,6 @@ void Core::Entity::Player::sendQuestInfo()
 
          auto& quest = pe_qa.data().activeQuests[i];
          quest = *m_activeQuests[i];
-
       }
    }
 
@@ -985,11 +976,11 @@ void Core::Entity::Player::sendQuestInfo()
    sendQuestTracker();
 }
 
-void Core::Entity::Player::sendQuestMessage( uint32_t questId, int8_t msgId, uint8_t type, uint32_t var1, uint32_t var2 )
+void Core::Entity::Player::sendQuestMessage( uint32_t questId, int8_t msgId, uint8_t type, uint32_t var1,
+                                             uint32_t var2 )
 {
    queuePacket( QuestMessagePacket( getAsPlayer(), questId, msgId, type, var1, var2 ) );
 }
-
 
 void Core::Entity::Player::updateQuestsCompleted( uint32_t questId )
 {
@@ -1009,14 +1000,12 @@ void Core::Entity::Player::removeQuestsCompleted( uint32_t questId )
    uint8_t value = 0x80 >> bitIndex;
 
    m_questCompleteFlags[index] ^= value;
-
 }
 
 bool Core::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t optionalChoice )
 {
    uint32_t playerLevel = getLevel();
    auto questInfo = g_exdData.getQuestInfo( questId );
-   
 
    if( !questInfo )
       return false;
@@ -1024,7 +1013,8 @@ bool Core::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t optional
    auto paramGrowth = g_exdData.m_paramGrowthInfoMap[questInfo->quest_level];
 
    // TODO: use the correct formula, this one is wrong
-   uint32_t exp = ( questInfo->reward_exp_factor * paramGrowth.quest_exp_mod * ( 45 + 5 * questInfo->quest_level) ) / 100;
+   uint32_t exp =
+       ( questInfo->reward_exp_factor * paramGrowth.quest_exp_mod * ( 45 + 5 * questInfo->quest_level ) ) / 100;
    exp = exp + ( questInfo->reward_exp_factor / 100 ) * 10000;
 
    exp = questInfo->reward_exp_factor;
@@ -1053,15 +1043,14 @@ bool Core::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t optional
       // TODO: add the correct amount of items instead of 1
       addItem( -1, itemId, questInfo->reward_item_optional_count.at( optionalChoice ) );
    }
-   
+
    if( gilReward > 0 )
       addCurrency( 1, gilReward );
 
    return true;
 }
 
-boost::shared_ptr<QuestActive> Core::Entity::Player::getQuestActive( uint16_t index )
+boost::shared_ptr< QuestActive > Core::Entity::Player::getQuestActive( uint16_t index )
 {
    return m_activeQuests[index];
 }
-

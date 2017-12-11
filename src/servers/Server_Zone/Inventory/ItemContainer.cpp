@@ -1,27 +1,22 @@
-#include "../Forwards.h"
 #include "ItemContainer.h"
+#include "../Forwards.h"
 
 #include <Server_Common/Common.h>
-#include <Server_Common/Logging/Logger.h>
 #include <Server_Common/Database/DatabaseDef.h>
+#include <Server_Common/Logging/Logger.h>
 
 #include "Actor/Player.h"
 
 #include "Item.h"
 
-
 extern Core::Logger g_log;
 
-Core::ItemContainer::ItemContainer( uint16_t locationId ) : 
-   m_id( locationId ),
-   m_size( 25 )
+Core::ItemContainer::ItemContainer( uint16_t locationId ) : m_id( locationId ), m_size( 25 )
 {
-
 }
 
 Core::ItemContainer::~ItemContainer()
 {
-
 }
 
 uint16_t Core::ItemContainer::getId() const
@@ -52,12 +47,12 @@ void Core::ItemContainer::removeItem( uint8_t slotId )
    }
 }
 
-Core::ItemMap & Core::ItemContainer::getItemMap()
+Core::ItemMap& Core::ItemContainer::getItemMap()
 {
    return m_itemMap;
 }
 
-const Core::ItemMap & Core::ItemContainer::getItemMap() const
+const Core::ItemMap& Core::ItemContainer::getItemMap() const
 {
    return m_itemMap;
 }
@@ -67,8 +62,7 @@ int16_t Core::ItemContainer::getFreeSlot()
    for( uint8_t slotId = 0; slotId < m_size; slotId++ )
    {
       ItemMap::iterator it = m_itemMap.find( slotId );
-      if( it == m_itemMap.end() ||
-          it->second == nullptr )
+      if( it == m_itemMap.end() || it->second == nullptr )
          return slotId;
    }
    return -1;

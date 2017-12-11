@@ -1,8 +1,8 @@
 #include "EventItemAction.h"
 
+#include <Server_Common/Logging/Logger.h>
 #include <Server_Common/Util/Util.h>
 #include <Server_Common/Util/UtilMath.h>
-#include <Server_Common/Logging/Logger.h>
 
 #include <string.h>
 
@@ -23,7 +23,8 @@ Core::Action::EventItemAction::EventItemAction()
 }
 
 Core::Action::EventItemAction::EventItemAction( Entity::ActorPtr pActor, uint32_t eventId, uint16_t action,
-                                                ActionCallback finishRef, ActionCallback interruptRef, uint64_t additional )
+                                                ActionCallback finishRef, ActionCallback interruptRef,
+                                                uint64_t additional )
 {
    m_additional = additional;
    m_handleActionType = HandleActionType::Event;
@@ -57,7 +58,6 @@ void Core::Action::EventItemAction::onStart()
    m_pSource->sendToInRangeSet( castPacket, true );
    m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::Casting );
    m_pSource->getAsPlayer()->sendStateFlags();
-
 }
 
 void Core::Action::EventItemAction::onFinish()
@@ -70,7 +70,7 @@ void Core::Action::EventItemAction::onFinish()
       GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket( m_pSource->getId() );
       effectPacket.data().targetId = static_cast< uint32_t >( m_additional );
       effectPacket.data().actionAnimationId = 1;
-//      effectPacket.data().unknown_3 = 3;
+      // effectPacket.data().unknown_3 = 3;
       effectPacket.data().actionTextId = m_id;
       effectPacket.data().unknown_5 = 2;
       effectPacket.data().numEffects = 1;
@@ -88,7 +88,6 @@ void Core::Action::EventItemAction::onFinish()
    {
       g_log.error( e.what() );
    }
-
 }
 
 void Core::Action::EventItemAction::onInterrupt()
@@ -99,8 +98,7 @@ void Core::Action::EventItemAction::onInterrupt()
    try
    {
 
-      auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt,
-                                            0x219, 0x04, m_id );
+      auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt, 0x219, 0x04, m_id );
       if( m_pSource->isPlayer() )
       {
          m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Casting );
@@ -112,11 +110,9 @@ void Core::Action::EventItemAction::onInterrupt()
 
       if( m_onActionInterruptClb )
          m_onActionInterruptClb( *m_pSource->getAsPlayer(), m_eventId, m_additional );
-
    }
    catch( std::exception& e )
    {
       g_log.error( e.what() );
    }
-
 }

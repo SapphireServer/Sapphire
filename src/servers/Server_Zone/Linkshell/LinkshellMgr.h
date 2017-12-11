@@ -4,8 +4,7 @@
 #include <boost/shared_ptr.hpp>
 #include <map>
 
-namespace Core
-{
+namespace Core {
 class Linkshell;
 using LinkshellPtr = boost::shared_ptr< Linkshell >;
 
@@ -24,5 +23,5 @@ public:
    bool loadLinkshells();
 };
 
-}
-#endif //CORE_LINKSHELLMGR_H
+} // namespace Core
+#endif // CORE_LINKSHELLMGR_H

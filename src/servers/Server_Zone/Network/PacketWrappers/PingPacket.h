@@ -7,32 +7,31 @@
 
 namespace Core {
 namespace Network {
-namespace Packets {
-namespace Server {
+   namespace Packets {
+      namespace Server {
 
-/**
-* @brief The Ping response packet.
-*/
-class PingPacket :
-   public ZoneChannelPacket< FFXIVIpcPing >
-{
-public:
-   PingPacket( Entity::Player& player, int32_t inVal ) :
-      ZoneChannelPacket< FFXIVIpcPing >( player.getId(), player.getId() )
-   {
-      initialize( player, inVal );
-   };
+         /**
+          * @brief The Ping response packet.
+          */
+         class PingPacket : public ZoneChannelPacket< FFXIVIpcPing >
+         {
+         public:
+            PingPacket( Entity::Player& player, int32_t inVal ) :
+                ZoneChannelPacket< FFXIVIpcPing >( player.getId(), player.getId() )
+            {
+               initialize( player, inVal );
+            };
 
-private:
-   void initialize( Entity::Player& player, int32_t inVal )
-   {
-      m_data.timeInMilliseconds = 0x000014D00000000 + inVal;
-   };
-};
+         private:
+            void initialize( Entity::Player& player, int32_t inVal )
+            {
+               m_data.timeInMilliseconds = 0x000014D00000000 + inVal;
+            };
+         };
 
-}
-}
-}
-}
+      } // namespace Server
+   }    // namespace Packets
+} // namespace Network
+} // namespace Core
 
 #endif /*_CORE_NETWORK_PACKETS_CPINGPACKET_H*/

@@ -1,8 +1,8 @@
 #include <Server_Common/Common.h>
-#include <Server_Common/Network/GamePacket.h>
-#include <Server_Common/Logging/Logger.h>
-#include <Server_Common/Network/PacketContainer.h>
 #include <Server_Common/Config/XMLConfig.h>
+#include <Server_Common/Logging/Logger.h>
+#include <Server_Common/Network/GamePacket.h>
+#include <Server_Common/Network/PacketContainer.h>
 
 #include "Player.h"
 
@@ -12,16 +12,15 @@
 
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ActorControlPacket142.h"
+#include "Network/PacketWrappers/EventFinishPacket.h"
+#include "Network/PacketWrappers/EventPlayPacket.h"
+#include "Network/PacketWrappers/EventStartPacket.h"
 #include "Network/PacketWrappers/InitUIPacket.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
-#include "Network/PacketWrappers/EventStartPacket.h"
-#include "Network/PacketWrappers/EventPlayPacket.h"
-#include "Network/PacketWrappers/EventFinishPacket.h"
 
 #include "Action/EventAction.h"
 #include "Action/EventItemAction.h"
 
-#include "Event/Event.h"
 #include "Event/Event.h"
 #include "ServerZone.h"
 
@@ -74,9 +73,7 @@ void Core::Entity::Player::checkEvent( uint32_t eventId )
       eventFinish( eventId, 1 );
 }
 
-
-void Core::Entity::Player::eventStart( uint64_t actorId, uint32_t eventId, 
-                                       uint8_t eventType, uint8_t eventParam1, 
+void Core::Entity::Player::eventStart( uint64_t actorId, uint32_t eventId, uint8_t eventType, uint8_t eventParam1,
                                        uint32_t eventParam2 )
 {
    Event::EventPtr newEvent( new Event::Event( actorId, eventId, eventType, eventParam1, eventParam2 ) );
@@ -86,20 +83,18 @@ void Core::Entity::Player::eventStart( uint64_t actorId, uint32_t eventId,
    sendStateFlags();
 
    EventStartPacket eventStart( getId(), actorId, eventId, eventType, eventParam1, eventParam2 );
-   
+
    queuePacket( eventStart );
-   
 }
 
-void Core::Entity::Player::eventPlay( uint32_t eventId, uint32_t scene,
-                                      uint32_t flags, uint32_t eventParam2,
+void Core::Entity::Player::eventPlay( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t eventParam2,
                                       uint32_t eventParam3 )
 {
    eventPlay( eventId, scene, flags, eventParam2, eventParam3, nullptr );
 }
 
-void Core::Entity::Player::eventPlay( uint32_t eventId, uint32_t scene,
-                                      uint32_t flags, Scripting::EventReturnCallback eventCallback )
+void Core::Entity::Player::eventPlay( uint32_t eventId, uint32_t scene, uint32_t flags,
+                                      Scripting::EventReturnCallback eventCallback )
 {
    eventPlay( eventId, scene, flags, 0, 0, eventCallback );
 }
@@ -109,15 +104,14 @@ void Core::Entity::Player::eventPlay( uint32_t eventId, uint32_t scene, uint32_t
    eventPlay( eventId, scene, flags, 0, 0, nullptr );
 }
 
-void Core::Entity::Player::eventPlay( uint32_t eventId, uint32_t scene,
-                                      uint32_t flags, uint32_t eventParam2,
+void Core::Entity::Player::eventPlay( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t eventParam2,
                                       uint32_t eventParam3, Scripting::EventReturnCallback eventCallback )
 {
    if( flags & 0x02 )
    {
       setStateFlag( PlayerStateFlag::WatchingCutscene );
-      sendToInRangeSet( ActorControlPacket142( getId(), SetStatusIcon,
-                                               static_cast< uint8_t >( getOnlineStatus() ) ), true );
+      sendToInRangeSet( ActorControlPacket142( getId(), SetStatusIcon, static_cast< uint8_t >( getOnlineStatus() ) ),
+                        true );
    }
 
    auto pEvent = getEvent( eventId );
@@ -135,21 +129,20 @@ void Core::Entity::Player::eventPlay( uint32_t eventId, uint32_t scene,
 
    pEvent->setPlayedScene( true );
    pEvent->setEventReturnCallback( eventCallback );
-   EventPlayPacket eventPlay( getId(), pEvent->getActorId(), pEvent->getId(),
-                              scene, flags, eventParam2, eventParam3 );
+   EventPlayPacket eventPlay( getId(), pEvent->getActorId(), pEvent->getId(), scene, flags, eventParam2, eventParam3 );
 
    queuePacket( eventPlay );
 }
 
-void Core::Entity::Player::eventPlay( uint32_t eventId, uint32_t scene,
-                                      uint32_t flags, uint32_t eventParam2,
-                                      uint32_t eventParam3, uint32_t eventParam4, Scripting::EventReturnCallback eventCallback )
+void Core::Entity::Player::eventPlay( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t eventParam2,
+                                      uint32_t eventParam3, uint32_t eventParam4,
+                                      Scripting::EventReturnCallback eventCallback )
 {
    if( flags & 0x02 )
    {
       setStateFlag( PlayerStateFlag::WatchingCutscene );
-      sendToInRangeSet( ActorControlPacket142( getId(), SetStatusIcon,
-                                               static_cast< uint8_t >( getOnlineStatus() ) ), true );
+      sendToInRangeSet( ActorControlPacket142( getId(), SetStatusIcon, static_cast< uint8_t >( getOnlineStatus() ) ),
+                        true );
    }
 
    auto pEvent = getEvent( eventId );
@@ -167,8 +160,8 @@ void Core::Entity::Player::eventPlay( uint32_t eventId, uint32_t scene,
 
    pEvent->setPlayedScene( true );
    pEvent->setEventReturnCallback( eventCallback );
-   EventPlayPacket eventPlay( getId(), pEvent->getActorId(), pEvent->getId(),
-                              scene, flags, eventParam2, eventParam3, eventParam4 );
+   EventPlayPacket eventPlay( getId(), pEvent->getActorId(), pEvent->getId(), scene, flags, eventParam2, eventParam3,
+                              eventParam4 );
 
    queuePacket( eventPlay );
 }
@@ -204,7 +197,8 @@ void Core::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlayer )
          if( it.second->hasPlayedScene() == false )
          {
             // TODO: not happy with this, this is also prone to break wit more than one remaining event in there
-            queuePacket( EventFinishPacket( getId(), it.second->getId(), it.second->getEventType(), it.second->getEventParam3() ) );
+            queuePacket( EventFinishPacket( getId(), it.second->getId(), it.second->getEventType(),
+                                            it.second->getEventParam3() ) );
             removeEvent( it.second->getId() );
          }
       }
@@ -221,8 +215,8 @@ void Core::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlayer )
    if( hasStateFlag( PlayerStateFlag::WatchingCutscene ) )
    {
       unsetStateFlag( PlayerStateFlag::WatchingCutscene );
-      sendToInRangeSet( ActorControlPacket142( getId(), SetStatusIcon,
-                                               static_cast< uint8_t >( getOnlineStatus() ) ), true );
+      sendToInRangeSet( ActorControlPacket142( getId(), SetStatusIcon, static_cast< uint8_t >( getOnlineStatus() ) ),
+                        true );
    }
 
    removeEvent( pEvent->getId() );
@@ -234,14 +228,11 @@ void Core::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlayer )
    }
 }
 
-void Core::Entity::Player::eventActionStart( uint32_t eventId,
-                                             uint32_t action,
-                                             ActionCallback finishCallback,
-                                             ActionCallback interruptCallback,
-                                             uint64_t additional )
+void Core::Entity::Player::eventActionStart( uint32_t eventId, uint32_t action, ActionCallback finishCallback,
+                                             ActionCallback interruptCallback, uint64_t additional )
 {
-   Action::ActionPtr pEventAction( new Action::EventAction( shared_from_this(), eventId, action,
-                                                            finishCallback, interruptCallback, additional ) );
+   Action::ActionPtr pEventAction(
+       new Action::EventAction( shared_from_this(), eventId, action, finishCallback, interruptCallback, additional ) );
 
    setCurrentAction( pEventAction );
    auto pEvent = getEvent( eventId );
@@ -263,15 +254,11 @@ void Core::Entity::Player::eventActionStart( uint32_t eventId,
    pEventAction->onStart();
 }
 
-
-void Core::Entity::Player::eventItemActionStart( uint32_t eventId,
-                                                 uint32_t action,
-                                                 ActionCallback finishCallback,
-                                                 ActionCallback interruptCallback,
-                                                 uint64_t additional )
+void Core::Entity::Player::eventItemActionStart( uint32_t eventId, uint32_t action, ActionCallback finishCallback,
+                                                 ActionCallback interruptCallback, uint64_t additional )
 {
-   Action::ActionPtr pEventItemAction( new Action::EventItemAction( shared_from_this(), eventId, action,
-                                                                    finishCallback, interruptCallback, additional ) );
+   Action::ActionPtr pEventItemAction( new Action::EventItemAction( shared_from_this(), eventId, action, finishCallback,
+                                                                    interruptCallback, additional ) );
 
    setCurrentAction( pEventItemAction );
 
@@ -290,24 +277,20 @@ void Core::Entity::Player::onLogin()
 
 void Core::Entity::Player::onZoneStart()
 {
-
 }
 
 void Core::Entity::Player::onZoneDone()
 {
-
 }
 
 void Core::Entity::Player::onDeath()
 {
-
 }
-
 
 // TODO: slightly ugly here and way too static. Needs too be done properly
 void Core::Entity::Player::onTick()
 {
-   
+
    bool sendUpdate = false;
 
    if( !isAlive() || !isLoadingComplete() )

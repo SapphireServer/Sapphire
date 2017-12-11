@@ -5,67 +5,63 @@
 #include <mutex>
 #include <set>
 
-#include <Server_Common/Common.h>
 #include "Forwards.h"
+#include <Server_Common/Common.h>
 
-
-namespace chaiscript
-{
-   class ChaiScript;
+namespace chaiscript {
+class ChaiScript;
 }
 
-namespace Core
-{
-   namespace Scripting
+namespace Core {
+namespace Scripting {
+
+   class ScriptManager
    {
+   private:
+      boost::shared_ptr< chaiscript::ChaiScript > m_pChaiHandler;
 
-      class ScriptManager
-      {
-      private:
+      std::function< std::string( Entity::Player& ) > m_onFirstEnterWorld;
+      // auto fn = m_pChaiHandler->eval< std::function<const std::string( Entity::Player ) > >( "onFirstEnterWorld" );
 
-         boost::shared_ptr< chaiscript::ChaiScript > m_pChaiHandler;
+   public:
+      ScriptManager();
+      ~ScriptManager();
 
-         std::function< std::string( Entity::Player& ) > m_onFirstEnterWorld;
-        // auto fn = m_pChaiHandler->eval< std::function<const std::string( Entity::Player ) > >( "onFirstEnterWorld" );
+      int32_t init();
+      void reload();
 
-      public:
-         ScriptManager();
-         ~ScriptManager();
+      const boost::shared_ptr< chaiscript::ChaiScript >& getHandler() const;
 
-         int32_t init();
-         void reload();
+      void onPlayerFirstEnterWorld( Entity::Player& player );
 
-         const boost::shared_ptr< chaiscript::ChaiScript >& getHandler() const;
+      static bool registerBnpcTemplate( std::string templateName, uint32_t bnpcBaseId, uint32_t bnpcNameId,
+                                        uint32_t modelId, std::string aiName );
 
-         void onPlayerFirstEnterWorld( Entity::Player& player );
+      bool onTalk( Entity::Player& player, uint64_t actorId, uint32_t eventId );
+      bool onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 );
+      bool onWithinRange( Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z );
+      bool onOutsideRange( Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z );
+      bool onEmote( Entity::Player& player, uint64_t actorId, uint32_t eventId, uint8_t emoteId );
+      bool onEventItem( Entity::Player& player, uint32_t eventItemId, uint32_t eventId, uint32_t castTime,
+                        uint64_t targetId );
 
-         static bool registerBnpcTemplate( std::string templateName, uint32_t bnpcBaseId, uint32_t bnpcNameId, uint32_t modelId, std::string aiName );
+      bool onMobKill( Entity::Player& player, uint16_t nameId );
 
-         bool onTalk( Entity::Player& player, uint64_t actorId, uint32_t eventId );
-         bool onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 );
-         bool onWithinRange( Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z );
-         bool onOutsideRange( Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z );
-         bool onEmote( Entity::Player& player, uint64_t actorId, uint32_t eventId, uint8_t emoteId );
-         bool onEventItem( Entity::Player& player, uint32_t eventItemId, uint32_t eventId, uint32_t castTime, uint64_t targetId );
+      bool onCastFinish( Entity::Player& pPlayer, Entity::ActorPtr pTarget, uint32_t actionId );
 
-         bool onMobKill( Entity::Player& player, uint16_t nameId );
+      bool onStatusReceive( Entity::ActorPtr pActor, uint32_t effectId );
+      bool onStatusTick( Entity::ActorPtr pActor, Core::StatusEffect::StatusEffect& effect );
+      bool onStatusTimeOut( Entity::ActorPtr pActor, uint32_t effectId );
 
-         bool onCastFinish( Entity::Player& pPlayer, Entity::ActorPtr pTarget, uint32_t actionId );
+      bool onZoneInit( ZonePtr pZone );
 
-         bool onStatusReceive( Entity::ActorPtr pActor, uint32_t effectId );
-         bool onStatusTick( Entity::ActorPtr pActor, Core::StatusEffect::StatusEffect& effect );
-         bool onStatusTimeOut( Entity::ActorPtr pActor, uint32_t effectId );
+      bool onEventHandlerReturn( Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param1,
+                                 uint16_t param2, uint16_t param3 );
+      bool onEventHandlerTradeReturn( Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param,
+                                      uint32_t catalogId );
 
-         bool onZoneInit( ZonePtr pZone );
-         
-         bool onEventHandlerReturn( Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param1, uint16_t param2, uint16_t param3 );
-         bool onEventHandlerTradeReturn( Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param, uint32_t catalogId );
-         
-
-         void loadDir( std::string dirname, std::set<std::string>& chaiFiles );
-
-          
-      };
-   }
-}
+      void loadDir( std::string dirname, std::set< std::string >& chaiFiles );
+   };
+} // namespace Scripting
+} // namespace Core
 #endif
