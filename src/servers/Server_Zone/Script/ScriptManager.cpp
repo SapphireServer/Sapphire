@@ -388,7 +388,7 @@ bool Core::Scripting::ScriptManager::onCastFinish( Entity::Player& player, Entit
    auto script = m_nativeScriptHandler->getAbilityScript( actionId );
 
    if( script )
-      script->onCastFinish( player, pTarget );
+      script->onCastFinish( player, *pTarget );
 
    return true;
 }
@@ -399,9 +399,9 @@ bool Core::Scripting::ScriptManager::onStatusReceive( Entity::ActorPtr pActor, u
    if( script )
    {
       if( pActor->isPlayer() )
-         pActor->getAsPlayer()->sendDebug( "Calling status recieve for statusid: " + effectId );
+         pActor->getAsPlayer()->sendDebug( "Calling status receive for statusid: " + std::to_string( effectId ) );
 
-      script->onApply( pActor );
+      script->onApply( *pActor );
 
       return true;
    }
@@ -415,9 +415,9 @@ bool Core::Scripting::ScriptManager::onStatusTick( Entity::ActorPtr pActor, Core
    if( script )
    {
       if( pActor->isPlayer() )
-         pActor->getAsPlayer()->sendDebug( "Calling status tick for statusid: " + effect.getId() );
+         pActor->getAsPlayer()->sendDebug( "Calling status tick for statusid: " + std::to_string( effect.getId() ) );
 
-      script->onTick( pActor );
+      script->onTick( *pActor );
 
       return true;
    }
@@ -431,9 +431,9 @@ bool Core::Scripting::ScriptManager::onStatusTimeOut( Entity::ActorPtr pActor, u
    if( script )
    {
       if( pActor->isPlayer() )
-         pActor->getAsPlayer()->sendDebug( "Calling status tick for statusid: " + effectId );
+         pActor->getAsPlayer()->sendDebug( "Calling status timeout for statusid: " + std::to_string( effectId ) );
 
-      script->onExpire( pActor );
+      script->onExpire( *pActor );
 
       return true;
    }

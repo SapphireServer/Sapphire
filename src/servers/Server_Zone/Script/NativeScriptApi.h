@@ -55,14 +55,14 @@ public:
       ScriptObject( name, effectId )
    { }
 
-   virtual void onTick( Entity::ActorPtr actor ) { }
-   virtual void onApply( Entity::ActorPtr actor ) { }
-   virtual void onRemove( Entity::ActorPtr actor ) { }
-   virtual void onExpire(Entity::ActorPtr actor) { }
-   virtual void onPlayerCollision( Entity::ActorPtr actor, Entity::ActorPtr actorHit ) { }
-   virtual void onPlayerFinishCast( Entity::ActorPtr actor ) { }
-   virtual void onPlayerDamaged( Entity::ActorPtr actor ) { }
-   virtual void onPlayerDeath( Entity::ActorPtr actor ) { }
+   virtual void onTick( Entity::Actor& actor ) { }
+   virtual void onApply( Entity::Actor& actor ) { }
+   virtual void onRemove( Entity::Actor& actor ) { }
+   virtual void onExpire( Entity::Actor& actor ) { }
+   virtual void onPlayerCollision( Entity::Actor& actor, Entity::Actor& actorHit ) { }
+   virtual void onPlayerFinishCast( Entity::Actor& actor ) { }
+   virtual void onPlayerDamaged( Entity::Actor& actor ) { }
+   virtual void onPlayerDeath( Entity::Actor& actor ) { }
 };
 
 
@@ -73,9 +73,9 @@ public:
       ScriptObject( name, abilityId )
    { }
 
-   virtual void onStart( Entity::Actor sourceActor, Entity::ActorPtr targetActor ) { }
-   virtual void onCastFinish( Entity::Player& player, Entity::ActorPtr targetActor ) { }
-   virtual void onInterrupt( Entity::ActorPtr sourceActor/*, Core::Entity::Actor targetActor*/ ) { }
+   virtual void onStart( Entity::Actor& sourceActor, Entity::Actor& targetActor ) { }
+   virtual void onCastFinish( Entity::Player& player, Entity::Actor& targetActor ) { }
+   virtual void onInterrupt( Entity::Actor& sourceActor/*, Core::Entity::Actor targetActor*/ ) { }
 };
 
 
