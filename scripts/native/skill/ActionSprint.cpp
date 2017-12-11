@@ -3,7 +3,7 @@
 class ActionSprint : public ActionScript
 {
 public:
-    ActionSprint() : ActionScript( "ActionSprint", 3 )
+   ActionSprint() : ActionScript( "ActionSprint", 3 )
    {}
 
    virtual void onCastFinish( Core::Entity::Player& player, Core::Entity::Actor& targetActor )

@@ -71,38 +71,49 @@ namespace Core {
            m_battleNpcScripts.erase( npcId );
         }
 
-        void NativeScript::loadScript( std::string path )
+        bool NativeScript::loadScript( std::string path )
         {
-           auto handle = m_loader.loadModule( path );
-           if( handle )
+           auto info = m_loader.loadModule( path );
+           if( info )
            {
               // todo: this is shit
-              if( auto script = m_loader.getScriptObject< StatusEffectScript >( handle, "StatusEffectScript" ) )
+              if( auto script = m_loader.getScriptObject< StatusEffectScript >( info->handle, "StatusEffectScript" ) )
               {
+                 info->script = script;
                  m_statusEffectScripts[ script->getId() ] = script;
               }
-              else if( auto script = m_loader.getScriptObject< ActionScript >( handle, "ActionScript" ) )
+              else if( auto script = m_loader.getScriptObject< ActionScript >( info->handle, "ActionScript" ) )
               {
+                 info->script = script;
                  m_actionScripts[ script->getId() ] = script;
               }
-              else if( auto script = m_loader.getScriptObject< QuestScript >( handle, "QuestScript" ) )
+              else if( auto script = m_loader.getScriptObject< QuestScript >( info->handle, "QuestScript" ) )
               {
+                 info->script = script;
                  m_questScripts[ script->getId() ] = script;
               }
-              else if( auto script = m_loader.getScriptObject< BattleNpcScript >( handle, "BattleNpcScript" ) )
+              else if( auto script = m_loader.getScriptObject< BattleNpcScript >( info->handle, "BattleNpcScript" ) )
               {
+                 info->script = script;
                  m_battleNpcScripts[ script->getId() ] = script;
               }
-              else if( auto script = m_loader.getScriptObject< ZoneScript >( handle, "ZoneScript" ) )
+              else if( auto script = m_loader.getScriptObject< ZoneScript >( info->handle, "ZoneScript" ) )
               {
+                 info->script = script;
                  m_zoneScripts[ script->getId() ] = script;
               }
               else
               {
                  // unload anything which doesn't have a suitable export
-                 m_loader.unloadScript( handle );
+                 m_loader.unloadScript( info->handle );
+
+                 return false;
               }
            }
+           else
+              return false;
+
+           return true;
         }
 
         const std::string NativeScript::getModuleExtension()
@@ -110,10 +121,15 @@ namespace Core {
            return m_loader.getModuleExtension();
         }
 
+        bool NativeScript::unloadScript( std::string name )
+        {
+           return m_loader.unloadScript( name );
+        }
+
 
         boost::shared_ptr< NativeScript > create_script_engine( )
         {
-           return boost::make_shared< NativeScript >( );
+           return boost::make_shared< NativeScript >();
         }
     }
 }

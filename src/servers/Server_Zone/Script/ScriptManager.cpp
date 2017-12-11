@@ -453,3 +453,8 @@ bool Core::Scripting::ScriptManager::onZoneInit( ZonePtr pZone )
 
    return false;
 }
+
+Scripting::NativeScript& Core::Scripting::ScriptManager::getNativeScriptHandler()
+{
+   return *m_nativeScriptHandler;
+}
