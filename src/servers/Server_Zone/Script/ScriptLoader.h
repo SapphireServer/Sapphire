@@ -30,12 +30,12 @@ namespace Scripting {
        bool unloadScript( std::string );
        bool unloadScript( ModuleHandle );
 
-       ScriptObject* getScriptObject( ModuleHandle handle, std::string name );
+       ScriptObject* getScriptObjectExport( ModuleHandle handle, std::string name );
 
        template< typename T >
-       T* getScriptObject( ModuleHandle handle )
+       T* getScriptObject( ModuleHandle handle, std::string name )
        {
-          return static_cast< T* >( getScriptObject( handle, typeid( T ).name() ) );
+          return static_cast< T* >( getScriptObjectExport( handle, name ) );
        }
    };
 

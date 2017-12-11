@@ -47,6 +47,8 @@ bool Core::Scripting::ScriptManager::init()
       auto& path = *itr;
 
       g_log.debug( "got module: " + path );
+
+      m_nativeScriptHandler->loadScript( path );
    }
 
    return true;

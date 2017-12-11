@@ -77,25 +77,25 @@ namespace Core {
            if( handle )
            {
               // todo: this is shit
-              if( auto script = m_loader.getScriptObject< StatusEffectScript >( handle ) )
+              if( auto script = m_loader.getScriptObject< StatusEffectScript >( handle, "StatusEffectScript" ) )
               {
-                 m_statusEffectScripts.insert( std::make_pair( script->getEffectId(), script ) );
+                 m_statusEffectScripts[ script->getId() ] = script;
               }
-              else if( auto script = m_loader.getScriptObject< ActionScript >( handle ) )
+              else if( auto script = m_loader.getScriptObject< ActionScript >( handle, "ActionScript" ) )
               {
-                 m_actionScripts.insert( std::make_pair( script->getActionId(), script ) );
+                 m_actionScripts[ script->getId() ] = script;
               }
-              else if( auto script = m_loader.getScriptObject< QuestScript >( handle ) )
+              else if( auto script = m_loader.getScriptObject< QuestScript >( handle, "QuestScript" ) )
               {
-                 m_questScripts.insert( std::make_pair( script->getQuestId(), script ) );
+                 m_questScripts[ script->getId() ] = script;
               }
-              else if( auto script = m_loader.getScriptObject< BattleNpcScript >( handle ) )
+              else if( auto script = m_loader.getScriptObject< BattleNpcScript >( handle, "BattleNpcScript" ) )
               {
-                  m_battleNpcScripts.insert( std::make_pair( script->getNpcId(), script ) );
+                 m_battleNpcScripts[ script->getId() ] = script;
               }
-              else if( auto script = m_loader.getScriptObject< ZoneScript >( handle ) )
+              else if( auto script = m_loader.getScriptObject< ZoneScript >( handle, "ZoneScript" ) )
               {
-                  m_zoneScripts.insert( std::make_pair( script->getZoneId(), script ) );
+                 m_zoneScripts[ script->getId() ] = script;
               }
               else
               {

@@ -60,12 +60,12 @@ ModuleHandle Core::Scripting::ScriptLoader::loadModule( std::string path )
    return handle;
 }
 
-ScriptObject* Core::Scripting::ScriptLoader::getScriptObject( ModuleHandle handle, std::string name )
+ScriptObject* Core::Scripting::ScriptLoader::getScriptObjectExport( ModuleHandle handle, std::string name )
 {
    typedef ScriptObject* (*getScriptObjectType)();
    auto fn = boost::str( boost::format( "get%1%" ) % name );
 
-   g_log.info( "getting symbol: " + fn  );
+   g_log.debug( "getting symbol: " + fn  );
 
 #ifdef _WIN32
    getScriptObjectType func = reinterpret_cast< getScriptObjectType >( GetProcAddress( handle, fn.c_str() ) );
@@ -74,7 +74,14 @@ ScriptObject* Core::Scripting::ScriptLoader::getScriptObject( ModuleHandle handl
 #endif
 
    if( func )
-      return func();
+   {
+      auto ptr = func();
+
+      g_log.debug( "got ScriptObject @ 0x" + boost::str( boost::format( "%|08X|" ) % ptr ) );
+      g_log.debug( "script info -> name: " + std::string( ptr->getName() ) + ", id: " + std::to_string( ptr->getId() ) );
+
+      return ptr;
+   }
    else
       return nullptr;
 }

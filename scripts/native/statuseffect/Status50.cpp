@@ -11,6 +11,19 @@ public:
       if( actor->isPlayer() )
          actor->getAsPlayer()->sendDebug( "tick tock bitch" );
    }
+
+   virtual void onApply( Entity::ActorPtr actor )
+   {
+      if( actor->isPlayer() )
+         actor->getAsPlayer()->sendDebug( "status50 applied" );
+   }
+
+   virtual void onExpire( Entity::ActorPtr actor )
+   {
+      if( actor->isPlayer() )
+         actor->getAsPlayer()->sendDebug( "status50 timed out" );
+   }
+
 };
 
 EXPORT_STATUSEFFECTSCRIPT( Status50 )
