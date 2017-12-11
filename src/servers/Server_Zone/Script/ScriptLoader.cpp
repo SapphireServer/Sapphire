@@ -6,6 +6,9 @@
 
 extern Core::Logger g_log;
 
+Core::Scripting::ScriptLoader::ScriptLoader()
+{}
+
 const std::string Core::Scripting::ScriptLoader::getModuleExtension()
 {
 #ifdef _WIN32
@@ -37,7 +40,7 @@ bool Core::Scripting::ScriptLoader::unloadModule( ModuleHandle handle )
    return true;
 }
 
-ModuleHandle Core::Scripting::ScriptLoader::loadModule( std::string path )
+Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::loadModule( std::string path )
 {
 #ifdef _WIN32
    ModuleHandle handle = LoadLibrary( path.c_str() );
@@ -49,15 +52,20 @@ ModuleHandle Core::Scripting::ScriptLoader::loadModule( std::string path )
    {
       g_log.error( "Failed to load module from: " + path );
 
-      return NULL;
+      return nullptr;
    }
 
    g_log.info( "Loaded module from '" + path + "' @ 0x" + boost::str( boost::format( "%|08X|" ) % handle ) );
 
    boost::filesystem::path f( path );
-   m_moduleMap.insert( std::make_pair( f.stem().string(), handle ) );
 
-   return handle;
+   auto info = new ScriptInfo;
+   info->handle = handle;
+   info->library_name = f.stem().string();
+
+   m_scriptMap.insert( std::make_pair( f.stem().string(), info ) );
+
+   return info;
 }
 
 ScriptObject* Core::Scripting::ScriptLoader::getScriptObjectExport( ModuleHandle handle, std::string name )
@@ -88,26 +96,39 @@ ScriptObject* Core::Scripting::ScriptLoader::getScriptObjectExport( ModuleHandle
 
 bool Core::Scripting::ScriptLoader::unloadScript( std::string name )
 {
-   auto moduleHandle = m_moduleMap.at( name );
-   if( moduleHandle )
-   {
-      return unloadModule( moduleHandle );
-   }
+   auto info = m_scriptMap.find( name );
+   if( info == m_scriptMap.end() )
+      return false;
 
-   g_log.info( "Module '" + name + "' is not loaded" );
-   return false;
+   return unloadScript( info->second->handle );
 }
 
 bool Core::Scripting::ScriptLoader::unloadScript( ModuleHandle handle )
 {
-   for( auto it = m_moduleMap.begin(); it != m_moduleMap.end(); ++it )
+   for( auto it = m_scriptMap.begin(); it != m_scriptMap.end(); ++it )
    {
-      if( it->second == handle )
+      if( it->second->handle == handle )
       {
-         m_moduleMap.erase( it );
+         delete it->second;
+         m_scriptMap.erase( it );
+
          return unloadModule( handle );
       }
    }
 
    return false;
+}
+
+const std::string& Core::Scripting::ScriptLoader::getModuleNameFromHandle( ModuleHandle handle ) const
+{
+   for( auto it = m_scriptMap.begin(); it != m_scriptMap.end(); ++it )
+   {
+      if( it->second->handle == handle )
+      {
+         return it->first;
+      }
+   }
+
+   // nb: i'm not sure how this would ever be reached but you know
+   return "";
 }

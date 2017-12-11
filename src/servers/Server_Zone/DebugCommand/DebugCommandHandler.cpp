@@ -31,6 +31,8 @@
 #include "Session.h"
 #include <boost/make_shared.hpp>
 
+#include "Script/NativeScript.h"
+
 
 #include <cinttypes>
 
@@ -48,11 +50,11 @@ Core::DebugCommandHandler::DebugCommandHandler()
    registerCommand( "add", &DebugCommandHandler::add, "Loads and injects a premade Packet.", 1 );
    registerCommand( "inject", &DebugCommandHandler::injectPacket, "Loads and injects a premade packet.", 1 );
    registerCommand( "injectc", &DebugCommandHandler::injectChatPacket, "Loads and injects a premade chat packet.", 1 );
-   registerCommand( "script_reload", &DebugCommandHandler::scriptReload, "Reload all server scripts", 1 );
    registerCommand( "nudge", &DebugCommandHandler::nudge, "Nudges you forward/up/down", 1 );
    registerCommand( "info", &DebugCommandHandler::serverInfo, "Send server info", 0 );
    registerCommand( "unlock", &DebugCommandHandler::unlockCharacter, "Unlock character", 1 );
    registerCommand( "help", &DebugCommandHandler::help, "Shows registered commands", 0 );
+   registerCommand( "script", &DebugCommandHandler::script, "Server script utilities", 1 );
 }
 
 // clear all loaded commands
@@ -116,13 +118,6 @@ void Core::DebugCommandHandler::execCommand( char * data, Entity::Player& player
 ///////////////////////////////////////////////////////////////////////////////////////
 // Definition of the commands
 ///////////////////////////////////////////////////////////////////////////////////////
-
-void Core::DebugCommandHandler::scriptReload( char * data, Entity::Player& player,
-                                              boost::shared_ptr< DebugCommand > command )
-{
-   g_scriptMgr.reload();
-   player.sendDebug( "Scripts reloaded." );
-}
 
 void Core::DebugCommandHandler::help( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
 {
@@ -519,5 +514,73 @@ void Core::DebugCommandHandler::serverInfo( char * data, Entity::Player& player,
 
 void Core::DebugCommandHandler::unlockCharacter( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
 {
-   player.unlock( );
+   player.unlock();
+}
+
+void Core::DebugCommandHandler::script( char* data, Entity::Player &player, boost::shared_ptr< DebugCommand > command )
+{
+   std::string subCommand;
+   std::string params = "";
+
+   // check if the command has parameters
+   std::string tmpCommand = std::string( data + command->getName().length() + 1 );
+
+   std::size_t pos = tmpCommand.find_first_of( " " );
+
+   if( pos != std::string::npos )
+      // command has parameters, grab the first part
+      subCommand = tmpCommand.substr( 0, pos );
+   else
+      // no subcommand given
+      subCommand = tmpCommand;
+
+   // todo: fix params so it's empty if there's no params
+   if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
+      params = std::string( data + command->getName().length() + 1 + pos + 1 );
+
+   g_log.debug( "[" + std::to_string( player.getId() ) + "] " +
+                "subCommand " + subCommand + " params: " + params );
+
+   if( subCommand == "unload" )
+   {
+      if ( subCommand == params )
+         player.sendDebug( "Command failed: requires name of script" );
+      else
+         g_scriptMgr.getNativeScriptHandler().unloadScript( params );
+   }
+   else if( subCommand == "find" || subCommand == "f" )
+   {
+      if( subCommand == params )
+         player.sendDebug( "Because reasons of filling chat with nonsense, please enter a search term" );
+      else
+      {
+
+      }
+   }
+   else if( subCommand == "load" || subCommand == "l" )
+   {
+      if( subCommand == params )
+         player.sendDebug( "Command failed: requires relative path to script" );
+      else
+      {
+         if ( g_scriptMgr.getNativeScriptHandler().loadScript( params ) )
+            player.sendDebug( "Loaded '" + params + "' successfully" );
+         else
+            player.sendDebug( "Failed to load '" + params + "'" );
+      }
+
+   }
+   else if( subCommand == "build" || subCommand == "b" )
+   {
+      if( subCommand == params )
+         player.sendDebug( "Command failed: requires name of cmake target" );
+      else
+      {
+
+      }
+   }
+   else
+   {
+      player.sendDebug( "Unknown script subcommand: " + subCommand );
+   }
 }

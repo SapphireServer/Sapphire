@@ -3,6 +3,7 @@
 
 #include <string>
 #include "NativeScriptApi.h"
+#include "ScriptInfo.h"
 #include <unordered_map>
 
 #ifdef _WIN32
@@ -18,17 +19,19 @@ namespace Scripting {
 
    class ScriptLoader {
    protected:
-       std::unordered_map< std::string, ModuleHandle > m_moduleMap;
+       std::unordered_map< std::string, ScriptInfo* > m_scriptMap;
 
        bool unloadModule( ModuleHandle );
 
    public:
-       ScriptLoader() = default;
+       ScriptLoader();
 
        const std::string getModuleExtension();
-       ModuleHandle loadModule( std::string );
+       ScriptInfo* loadModule( std::string );
        bool unloadScript( std::string );
        bool unloadScript( ModuleHandle );
+
+       const std::string& getModuleNameFromHandle( ModuleHandle handle ) const;
 
        ScriptObject* getScriptObjectExport( ModuleHandle handle, std::string name );
 

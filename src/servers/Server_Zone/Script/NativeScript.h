@@ -9,7 +9,6 @@
 
 #include <Server_Common/Crypt/md5.h>
 
-#include "NativeScriptApi.h"
 #include "ScriptLoader.h"
 
 namespace Core {
@@ -41,11 +40,12 @@ namespace Core {
             void removeBattleNpcScript( uint32_t npcId );
 
 
-            void loadScript( std::string );
-            void unloadScript( std::string );
+            bool loadScript( std::string );
+            bool unloadScript( std::string );
             void clearAllScripts();
 
             const std::string getModuleExtension();
+
         };
 
 

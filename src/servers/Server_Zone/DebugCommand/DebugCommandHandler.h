@@ -45,6 +45,8 @@ public:
    void unlockCharacter( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command );
    void targetInfo( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command );
 
+   void script( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command );
+
 };
 
 }

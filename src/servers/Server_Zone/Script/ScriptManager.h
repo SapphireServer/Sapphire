@@ -62,7 +62,7 @@ namespace Core
 
          void loadDir( std::string dirname, std::set<std::string>& files, std::string ext );
 
-
+         NativeScript& getNativeScriptHandler();
       };
    }
 }
