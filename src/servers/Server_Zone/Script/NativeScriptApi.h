@@ -22,129 +22,93 @@ extern "C" EXPORT base* get##base() \
 #define EXPORT_BATTLENPCSCRIPT( type ) EXPORT_SCRIPTOBJECT( type, BattleNpcScript )
 #define EXPORT_ZONESCRIPT( type ) EXPORT_SCRIPTOBJECT( type, ZoneScript )
 
+using namespace Core;
+
 class ScriptObject
 {
 protected:
-   const std::string m_scriptName;
+   std::string m_scriptName;
+   uint32_t m_id;
 
 public:
-   ScriptObject( std::string name ) :
-      m_scriptName( name )
+   ScriptObject( std::string name, uint32_t id ) :
+      m_scriptName( name ),
+      m_id( id )
    { }
 
-   const std::string getName()
+   virtual const std::string& getName() const
    {
       return m_scriptName;
+   }
+
+   virtual uint32_t getId() const
+   {
+      return m_id;
    }
 };
 
 
 class StatusEffectScript : public ScriptObject
 {
-protected:
-    const uint32_t m_effectId;
-
 public:
    StatusEffectScript( std::string name, uint32_t effectId ) :
-      ScriptObject( name ),
-      m_effectId( effectId )
+      ScriptObject( name, effectId )
    { }
 
-   const uint32_t getEffectId( )
-   {
-      return m_effectId;
-   }
-
-   virtual void onTick( Core::Entity::ActorPtr actor ) { }
-   virtual void onApply( Core::Entity::ActorPtr actor ) { }
-   virtual void onRemove( Core::Entity::ActorPtr actor ) { }
-   virtual void onExpire(Core::Entity::ActorPtr actor) { }
-   virtual void onPlayerCollision( Core::Entity::ActorPtr actor, Core::Entity::ActorPtr actorHit ) { }
-   virtual void onPlayerFinishCast( Core::Entity::ActorPtr actor ) { }
-   virtual void onPlayerDamaged( Core::Entity::ActorPtr actor ) { }
-   virtual void onPlayerDeath( Core::Entity::ActorPtr actor ) { }
+   virtual void onTick( Entity::ActorPtr actor ) { }
+   virtual void onApply( Entity::ActorPtr actor ) { }
+   virtual void onRemove( Entity::ActorPtr actor ) { }
+   virtual void onExpire(Entity::ActorPtr actor) { }
+   virtual void onPlayerCollision( Entity::ActorPtr actor, Entity::ActorPtr actorHit ) { }
+   virtual void onPlayerFinishCast( Entity::ActorPtr actor ) { }
+   virtual void onPlayerDamaged( Entity::ActorPtr actor ) { }
+   virtual void onPlayerDeath( Entity::ActorPtr actor ) { }
 };
 
 
 class ActionScript : public ScriptObject
 {
-protected:
-    const uint32_t m_actionId;
-
 public:
     ActionScript( std::string name, uint32_t abilityId ) :
-      ScriptObject( name ),
-      m_actionId( abilityId )
+      ScriptObject( name, abilityId )
    { }
 
-   const uint32_t getActionId()
-   {
-      return m_actionId;
-   }
-
-   virtual void onStart( Core::Entity::Actor sourceActor, Core::Entity::ActorPtr targetActor ) { }
-   virtual void onCastFinish( Core::Entity::Player player, Core::Entity::ActorPtr targetActor ) { }
-   virtual void onInterrupt( Core::Entity::Actor sourceActor/*, Core::Entity::Actor targetActor*/ ) { }
+   virtual void onStart( Entity::Actor sourceActor, Entity::ActorPtr targetActor ) { }
+   virtual void onCastFinish( Entity::Player& player, Entity::ActorPtr targetActor ) { }
+   virtual void onInterrupt( Entity::ActorPtr sourceActor/*, Core::Entity::Actor targetActor*/ ) { }
 };
 
 
 class QuestScript : public ScriptObject
 {
-protected:
-   const uint32_t m_questId;
-
 public:
    QuestScript( std::string name, uint32_t questId ) :
-      ScriptObject( name ),
-      m_questId( questId )
+      ScriptObject( name, questId )
    { }
 
-   const uint32_t getQuestId()
-   {
-      return m_questId;
-   }
-
-   virtual void onTalk(uint32_t eventId, Core::Entity::Player player, uint64_t actorId) { }
-   virtual void onNpcKill( uint32_t npcId, Core::Entity::Player player ) { }
-   virtual void onEmote( uint64_t actorId, uint32_t eventId, uint32_t emoteId, Core::Entity::Player player ) { }
+   virtual void onTalk(uint32_t eventId, Entity::Player& player, uint64_t actorId) { }
+   virtual void onNpcKill( uint32_t npcId, Entity::Player& player ) { }
+   virtual void onEmote( uint64_t actorId, uint32_t eventId, uint32_t emoteId, Entity::Player& player ) { }
 };
 
 
 class BattleNpcScript : public ScriptObject
 {
-protected:
-    const uint32_t m_npcId;
-
 public:
    BattleNpcScript( std::string name, uint32_t npcId ) :
-      ScriptObject( name ),
-      m_npcId( npcId )
+      ScriptObject( name, npcId )
    { }
-
-   const uint32_t getNpcId()
-   {
-      return m_npcId;
-   }
 };
 
 class ZoneScript : public ScriptObject
 {
-protected:
-   const uint32_t m_zoneId;
-
 public:
    ZoneScript( std::string name, uint32_t zoneId ) :
-      ScriptObject( name ),
-      m_zoneId( zoneId )
+      ScriptObject( name, zoneId )
    { }
 
-   const uint32_t getZoneId()
-   {
-      return m_zoneId;
-   }
-
    virtual void onZoneInit() { }
-   virtual void onEnterZone( Core::Entity::Player pPlayer, uint32_t eventId, uint16_t param1, uint16_t param2 ) { }
+   virtual void onEnterZone( Entity::Player& pPlayer, uint32_t eventId, uint16_t param1, uint16_t param2 ) { }
 };
 
 #endif
