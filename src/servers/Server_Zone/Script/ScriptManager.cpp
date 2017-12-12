@@ -385,7 +385,7 @@ bool Core::Scripting::ScriptManager::onMobKill( Entity::Player& player, uint16_t
 
 bool Core::Scripting::ScriptManager::onCastFinish( Entity::Player& player, Entity::ActorPtr pTarget, uint32_t actionId )
 {
-   auto script = m_nativeScriptHandler->getAbilityScript( actionId );
+   auto script = m_nativeScriptHandler->getActionScript( actionId );
 
    if( script )
       script->onCastFinish( player, *pTarget );
