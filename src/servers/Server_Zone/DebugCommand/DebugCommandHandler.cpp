@@ -36,8 +36,6 @@
 
 #include <cinttypes>
 
-using DebugCommandPtr = boost::shared_ptr< DebugCommand >;
-
 extern Core::Scripting::ScriptManager g_scriptMgr;
 extern Core::Data::ExdData g_exdData;
 extern Core::Logger g_log;
@@ -121,7 +119,7 @@ void Core::DebugCommandHandler::execCommand( char * data, Entity::Player& player
 // Definition of the commands
 ///////////////////////////////////////////////////////////////////////////////////////
 
-void Core::DebugCommandHandler::help( char* data, Entity::Player& player, DebugCommandPtr command )
+void Core::DebugCommandHandler::help( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
 {
    player.sendDebug( "Registered debug commands:" );
    for ( auto cmd : m_commandMap )
@@ -133,7 +131,7 @@ void Core::DebugCommandHandler::help( char* data, Entity::Player& player, DebugC
    }
 }
 
-void Core::DebugCommandHandler::set( char * data, Entity::Player& player, DebugCommandPtr command )
+void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
 {
    std::string subCommand = "";
    std::string params = "";
@@ -285,7 +283,7 @@ void Core::DebugCommandHandler::set( char * data, Entity::Player& player, DebugC
 
 }
 
-void Core::DebugCommandHandler::add( char * data, Entity::Player& player, DebugCommandPtr command )
+void Core::DebugCommandHandler::add( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
 {
    std::string subCommand;
    std::string params = "";
@@ -402,7 +400,7 @@ void Core::DebugCommandHandler::add( char * data, Entity::Player& player, DebugC
 
 }
 
-void Core::DebugCommandHandler::get( char * data, Entity::Player& player, DebugCommandPtr command )
+void Core::DebugCommandHandler::get( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
 {
    std::string subCommand;
    std::string params = "";
@@ -446,21 +444,21 @@ void Core::DebugCommandHandler::get( char * data, Entity::Player& player, DebugC
 
 }
 
-void Core::DebugCommandHandler::injectPacket( char * data, Entity::Player& player, DebugCommandPtr command )
+void Core::DebugCommandHandler::injectPacket( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
 {
    auto pSession = g_serverZone.getSession( player.getId() );
    if( pSession )
       pSession->getZoneConnection()->injectPacket( data + 7, player );
 }
 
-void Core::DebugCommandHandler::injectChatPacket( char * data, Entity::Player& player, DebugCommandPtr command )
+void Core::DebugCommandHandler::injectChatPacket( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
 {
    auto pSession = g_serverZone.getSession( player.getId() );
    if( pSession )
       pSession->getChatConnection()->injectPacket( data + 8, player );
 }
 
-void Core::DebugCommandHandler::nudge( char * data, Entity::Player& player, DebugCommandPtr command )
+void Core::DebugCommandHandler::nudge( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
 {
    std::string subCommand;
 
@@ -507,19 +505,19 @@ void Core::DebugCommandHandler::nudge( char * data, Entity::Player& player, Debu
    }
 }
 
-void Core::DebugCommandHandler::serverInfo( char * data, Entity::Player& player, DebugCommandPtr command )
+void Core::DebugCommandHandler::serverInfo( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
 {
    player.sendDebug( "SapphireServer " + Version::VERSION + "\nRev: " + Version::GIT_HASH );
    player.sendDebug( "Compiled: " __DATE__ " " __TIME__ );
    player.sendDebug( "Sessions: " + std::to_string( g_serverZone.getSessionCount() ) );
 }
 
-void Core::DebugCommandHandler::unlockCharacter( char* data, Entity::Player& player, DebugCommandPtr command )
+void Core::DebugCommandHandler::unlockCharacter( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
 {
    player.unlock();
 }
 
-void Core::DebugCommandHandler::script( char* data, Entity::Player &player, DebugCommandPtr command )
+void Core::DebugCommandHandler::script( char* data, Entity::Player &player, boost::shared_ptr< DebugCommand > command )
 {
    std::string subCommand;
    std::string params = "";

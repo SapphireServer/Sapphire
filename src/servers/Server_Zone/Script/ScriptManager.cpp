@@ -113,19 +113,21 @@ bool Core::Scripting::ScriptManager::onTalk( Entity::Player& player, uint64_t ac
                                           % static_cast< uint64_t >( eventId & 0xFFFFFFF ) ) + ")" );
 
    uint16_t eventType = eventId >> 16;
+   uint32_t scriptId = eventId;
 
    // aethernet/aetherytes need to be handled separately
-   // todo: probably a nicer way to do this would be to switch the param for getQuestScript
    if( eventType == Common::EventType::Aetheryte )
    {
       auto aetherInfo = g_exdData.getAetheryteInfo( eventId & 0xFFFF );
-      auto scriptId = 0x50000;
+      scriptId = 0x50000;
       if( !aetherInfo->isAetheryte )
          scriptId = 0x50001;
+   }
 
-      auto script = m_nativeScriptHandler->getQuestScript( scriptId );
-      if( !script )
-         return false;
+   auto script = m_nativeScriptHandler->getQuestScript( scriptId );
+   if( script )
+   {
+      player.sendDebug( "Calling: " + objName + "." + eventName );
 
       player.eventStart( actorId, eventId, Event::Event::Talk, 0, 0 );
 
@@ -135,31 +137,17 @@ bool Core::Scripting::ScriptManager::onTalk( Entity::Player& player, uint64_t ac
    }
    else
    {
-      auto script = m_nativeScriptHandler->getQuestScript( eventId );
-      if( script )
+      if ( eventType == Common::EventType::Quest )
       {
-         player.sendDebug( "Calling: " + objName + "." + eventName );
-
-         player.eventStart( actorId, eventId, Event::Event::Talk, 0, 0 );
-
-         script->onTalk( eventId, player, actorId );
-
-         player.checkEvent( eventId );
-      }
-      else
-      {
-         if ( eventType == Common::EventType::Quest )
+         auto questInfo = g_exdData.getQuestInfo( eventId );
+         if ( questInfo )
          {
-            auto questInfo = g_exdData.getQuestInfo( eventId );
-            if ( questInfo )
-            {
-               player.sendUrgent( "Quest not implemented: " + questInfo->name );
+            player.sendUrgent( "Quest not implemented: " + questInfo->name );
 
-            }
          }
-
-         return false;
       }
+
+      return false;
    }
 
    return true;

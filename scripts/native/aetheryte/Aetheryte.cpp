@@ -29,18 +29,19 @@ public:
             }
             else if( param1 == 512 ) // aethernet access
             {
-               if( param2 == 2 ) // register favored destination
-               {
-
-               }
-               else if( param2 == 0xC3E1 ) // register free destination
-               {
-                  
-               }
-               else if( param2 == 4 )
+               if( param2 == 4 )
                {
                   player.teleport( param3, 2 );
                }
+               else if( param2 == 2 ) // register favored destination
+               {
+
+               }
+//               else if( param2 == 0xC3E1 ) // register free destination
+//               {
+//
+//               }
+
             }
          } );
       }
@@ -60,7 +61,7 @@ public:
                player.learnAction( ACTION_TELEPORT );
             }
          },
-         [] ( Entity::Player& ply, uint32_t evntId, uint64_t additional )
+         [] ( Entity::Player& player, uint32_t eventId, uint64_t additional )
          {}, 0 );
       }
    }
