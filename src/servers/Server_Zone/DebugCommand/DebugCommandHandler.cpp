@@ -31,6 +31,7 @@
 #include "StatusEffect/StatusEffect.h"
 #include "Session.h"
 #include <boost/make_shared.hpp>
+#include <boost/format.hpp>
 
 
 #include <cinttypes>
@@ -558,7 +559,23 @@ void Core::DebugCommandHandler::script( char* data, Entity::Player &player, Debu
          player.sendDebug( "Because reasons of filling chat with nonsense, please enter a search term" );
       else
       {
+         std::set< Core::Scripting::ScriptInfo* > scripts;
+         g_scriptMgr.getNativeScriptHandler().findScripts( scripts, params );
 
+         if( scripts.size() > 0 )
+         {
+            player.sendDebug( "Found " + std::to_string( scripts.size() ) + " scripts" );
+
+            for( auto it = scripts.begin(); it != scripts.end(); ++it )
+            {
+               auto script = *it;
+               player.sendDebug( " - '" + script->script_name + "' loaded at @ 0x" +
+                                 boost::str( boost::format( "%|X|" ) % script->handle ) +
+                                 ", script ptr: 0x" + boost::str( boost::format( "%|X|" ) % script->script ) );
+            }
+         }
+         else
+            player.sendDebug( "No scripts found with search term: " + params );
       }
    }
    else if( subCommand == "load" || subCommand == "l" )

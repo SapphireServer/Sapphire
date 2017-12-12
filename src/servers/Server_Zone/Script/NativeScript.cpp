@@ -8,11 +8,11 @@ namespace Core {
 
    StatusEffectScript* NativeScript::getStatusEffectScript( uint32_t statusId )
    {
-   auto script = m_statusEffectScripts.find( statusId );
-   if( script == m_statusEffectScripts.end() )
-      return nullptr;
+      auto script = m_statusEffectScripts.find( statusId );
+      if( script == m_statusEffectScripts.end() )
+         return nullptr;
 
-   return script->second;
+      return script->second;
    }
 
    ActionScript* NativeScript::getActionScript( uint32_t actionId )
@@ -138,6 +138,12 @@ namespace Core {
 
       return false;
    }
+
+   void NativeScript::findScripts( std::set< Core::Scripting::ScriptInfo* >& scripts, const std::string& search )
+   {
+      return m_loader.findScripts( scripts, search );
+   }
+
 
 
    boost::shared_ptr< NativeScript > create_script_engine( )

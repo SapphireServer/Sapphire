@@ -2,9 +2,11 @@
 #define SAPPHIRE_SCRIPTLOADER_H
 
 #include <string>
+#include <unordered_map>
+#include <set>
+
 #include "NativeScriptApi.h"
 #include "ScriptInfo.h"
-#include <unordered_map>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -33,6 +35,8 @@ namespace Scripting {
        ScriptInfo* getScriptInfo( std::string name );
        ScriptObject* getScriptObject( ModuleHandle handle );
        bool isModuleLoaded( std::string name );
+
+       void findScripts( std::set< Core::Scripting::ScriptInfo* >& scripts, const std::string& search );
    };
 
 }

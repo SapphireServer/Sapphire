@@ -114,10 +114,18 @@ bool Core::Scripting::ScriptManager::onTalk( Entity::Player& player, uint64_t ac
 
    uint16_t eventType = eventId >> 16;
 
-   auto script = m_nativeScriptHandler->getQuestScript( eventId );
-   if( script )
+   // aethernet/aetherytes need to be handled separately
+   // todo: probably a nicer way to do this would be to switch the param for getQuestScript
+   if( eventType == Common::EventType::Aetheryte )
    {
-      player.sendDebug( "Calling: " + objName + "." + eventName );
+      auto aetherInfo = g_exdData.getAetheryteInfo( eventId & 0xFFFF );
+      auto scriptId = 0x50000;
+      if( !aetherInfo->isAetheryte )
+         scriptId = 0x50001;
+
+      auto script = m_nativeScriptHandler->getQuestScript( scriptId );
+      if( !script )
+         return false;
 
       player.eventStart( actorId, eventId, Event::Event::Talk, 0, 0 );
 
@@ -127,17 +135,31 @@ bool Core::Scripting::ScriptManager::onTalk( Entity::Player& player, uint64_t ac
    }
    else
    {
-      if ( eventType == Common::EventType::Quest )
+      auto script = m_nativeScriptHandler->getQuestScript( eventId );
+      if( script )
       {
-         auto questInfo = g_exdData.getQuestInfo( eventId );
-         if ( questInfo )
-         {
-            player.sendUrgent( "Quest not implemented: " + questInfo->name );
+         player.sendDebug( "Calling: " + objName + "." + eventName );
 
-         }
+         player.eventStart( actorId, eventId, Event::Event::Talk, 0, 0 );
+
+         script->onTalk( eventId, player, actorId );
+
+         player.checkEvent( eventId );
       }
+      else
+      {
+         if ( eventType == Common::EventType::Quest )
+         {
+            auto questInfo = g_exdData.getQuestInfo( eventId );
+            if ( questInfo )
+            {
+               player.sendUrgent( "Quest not implemented: " + questInfo->name );
 
-      return false;
+            }
+         }
+
+         return false;
+      }
    }
 
    return true;
