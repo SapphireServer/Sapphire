@@ -26,4 +26,4 @@ public:
 
 };
 
-EXPORT_STATUSEFFECTSCRIPT( StatusSprint )
+EXPORT_SCRIPTOBJECT( StatusSprint )

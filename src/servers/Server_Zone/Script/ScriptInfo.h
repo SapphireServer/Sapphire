@@ -22,6 +22,7 @@ namespace Scripting {
         std::string script_name;
         ModuleHandle handle;
         ScriptObject* script;
+        ScriptType type;
     };
 }
 }

@@ -12,4 +12,4 @@ public:
    }
 };
 
-EXPORT_ACTIONSCRIPT( ActionSprint )
+EXPORT_SCRIPTOBJECT( ActionSprint )

@@ -41,7 +41,7 @@ bool Core::Scripting::ScriptLoader::unloadModule( ModuleHandle handle )
    return true;
 }
 
-Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::loadModule( std::string path )
+Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::loadModule( const std::string& path )
 {
    boost::filesystem::path f( path );
 
@@ -76,17 +76,14 @@ Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::loadModule( std::str
    return info;
 }
 
-ScriptObject* Core::Scripting::ScriptLoader::getScriptObjectExport( ModuleHandle handle, std::string name )
+ScriptObject* Core::Scripting::ScriptLoader::getScriptObject( ModuleHandle handle )
 {
    typedef ScriptObject* (*getScriptObjectType)();
-   auto fn = boost::str( boost::format( "get%1%" ) % name );
-
-   g_log.debug( "getting symbol: " + fn  );
 
 #ifdef _WIN32
-   getScriptObjectType func = reinterpret_cast< getScriptObjectType >( GetProcAddress( handle, fn.c_str() ) );
+   getScriptObjectType func = reinterpret_cast< getScriptObjectType >( GetProcAddress( handle, "getScript" ) );
 #else
-   getScriptObjectType func = reinterpret_cast< getScriptObjectType >( dlsym( handle, fn.c_str() ) );
+   getScriptObjectType func = reinterpret_cast< getScriptObjectType >( dlsym( handle, "getScript" ) );
 #endif
 
    if( func )

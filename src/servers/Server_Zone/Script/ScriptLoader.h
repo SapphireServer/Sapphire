@@ -27,18 +27,12 @@ namespace Scripting {
        ScriptLoader();
 
        const std::string getModuleExtension();
-       ScriptInfo* loadModule( std::string );
+       ScriptInfo* loadModule( const std::string& );
        bool unloadScript( ScriptInfo* );
        bool unloadScript( ModuleHandle );
        ScriptInfo* getScriptInfo( std::string name );
-       ScriptObject* getScriptObjectExport( ModuleHandle handle, std::string name );
+       ScriptObject* getScriptObject(ModuleHandle handle);
        bool isModuleLoaded( std::string name );
-
-       template< typename T >
-       T* getScriptObject( ModuleHandle handle, std::string name )
-       {
-          return static_cast< T* >( getScriptObjectExport( handle, name ) );
-       }
    };
 
 }
