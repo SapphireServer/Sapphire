@@ -19,20 +19,20 @@ public:
    {
       if( player.isAetheryteRegistered( eventId & 0xFFFF ) )
       {
-         player.eventPlay( eventId, 2, 0, []( Entity::Player& ply, uint32_t evntId, uint16_t p1, uint16_t p2, uint16_t p3 )
+         player.eventPlay( eventId, 2, 0, []( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
          {
-            if( p1 == 256 )
+            if( param1 == 256 )
             {
-               ply.teleport( p2, 2 );
+               player.teleport( param2, 2 );
             }
          } );
       }
       else
       {
-         player.eventActionStart( eventId, ACTION_ATTUNE, []( Entity::Player& ply, uint32_t evntId, uint64_t additional )
+         player.eventActionStart( eventId, ACTION_ATTUNE, []( Entity::Player& player, uint32_t eventId, uint64_t additional )
          {
-            ply.registerAetheryte( evntId & 0xFFFF );
-            ply.eventPlay( evntId, 3, 0, 0, 0 );
+            player.registerAetheryte( eventId & 0xFFFF );
+            player.eventPlay( eventId, 3, 0, 0, 0 );
          },
          [] ( Entity::Player& ply, uint32_t evntId, uint64_t additional )
          {
