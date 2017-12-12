@@ -15,7 +15,7 @@ namespace Core {
            return script->second;
         }
 
-        ActionScript* NativeScript::getAbilityScript( uint32_t abilityId )
+        ActionScript* NativeScript::getActionScript(uint32_t abilityId)
         {
            auto script = m_actionScripts.find( abilityId );
            if( script == m_actionScripts.end() )
@@ -51,26 +51,6 @@ namespace Core {
            return script->second;
         }
 
-        void NativeScript::removeStatusEffectScript( uint32_t statusId )
-        {
-           m_statusEffectScripts.erase( statusId );
-        }
-
-        void NativeScript::removeAbilityScript( uint32_t abilityId )
-        {
-           m_actionScripts.erase( abilityId );
-        }
-
-        void NativeScript::removeQuestScript( uint32_t questId )
-        {
-           m_questScripts.erase( questId );
-        }
-
-        void NativeScript::removeBattleNpcScript( uint32_t npcId )
-        {
-           m_battleNpcScripts.erase( npcId );
-        }
-
         bool NativeScript::loadScript( std::string path )
         {
            auto info = m_loader.loadModule( path );
@@ -79,27 +59,33 @@ namespace Core {
               // todo: this is shit
               if( auto script = m_loader.getScriptObject< StatusEffectScript >( info->handle, "StatusEffectScript" ) )
               {
+                 // todo: make this a define or something
                  info->script = script;
+                 info->script_name = script->getName();
                  m_statusEffectScripts[ script->getId() ] = script;
               }
               else if( auto script = m_loader.getScriptObject< ActionScript >( info->handle, "ActionScript" ) )
               {
                  info->script = script;
+                 info->script_name = script->getName();
                  m_actionScripts[ script->getId() ] = script;
               }
               else if( auto script = m_loader.getScriptObject< QuestScript >( info->handle, "QuestScript" ) )
               {
                  info->script = script;
+                 info->script_name = script->getName();
                  m_questScripts[ script->getId() ] = script;
               }
               else if( auto script = m_loader.getScriptObject< BattleNpcScript >( info->handle, "BattleNpcScript" ) )
               {
                  info->script = script;
+                 info->script_name = script->getName();
                  m_battleNpcScripts[ script->getId() ] = script;
               }
               else if( auto script = m_loader.getScriptObject< ZoneScript >( info->handle, "ZoneScript" ) )
               {
                  info->script = script;
+                 info->script_name = script->getName();
                  m_zoneScripts[ script->getId() ] = script;
               }
               else
@@ -123,7 +109,25 @@ namespace Core {
 
         bool NativeScript::unloadScript( std::string name )
         {
-           return m_loader.unloadScript( name );
+           auto info = m_loader.getScriptInfo( name );
+           if( info )
+           {
+              auto ptr = info->script;
+
+              if( removeValueFromMap< uint32_t, StatusEffectScript* >( ptr, m_statusEffectScripts ) )
+                 return m_loader.unloadScript( info );
+              else if( removeValueFromMap< uint32_t, ActionScript* >( ptr, m_actionScripts ) )
+                 return m_loader.unloadScript( info );
+              else if( removeValueFromMap< uint32_t, QuestScript* >( ptr, m_questScripts ) )
+                 return m_loader.unloadScript( info );
+              else if( removeValueFromMap< uint32_t, BattleNpcScript* >( ptr, m_battleNpcScripts ) )
+                 return m_loader.unloadScript( info );
+              else if( removeValueFromMap< uint32_t, ZoneScript* >( ptr, m_zoneScripts ) )
+                 return m_loader.unloadScript( info );
+
+           }
+
+           return false;
         }
 
 

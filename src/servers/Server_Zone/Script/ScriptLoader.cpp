@@ -3,6 +3,7 @@
 #include <Server_Common/Logging/Logger.h>
 #include <boost/format.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 
 extern Core::Logger g_log;
 
@@ -42,6 +43,15 @@ bool Core::Scripting::ScriptLoader::unloadModule( ModuleHandle handle )
 
 Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::loadModule( std::string path )
 {
+   boost::filesystem::path f( path );
+
+   if ( isModuleLoaded( f.stem().string() ) )
+   {
+      g_log.error( "Unable to load module '" + f.stem().string() + "' as it is already loaded" );
+      return nullptr;
+   }
+
+
 #ifdef _WIN32
    ModuleHandle handle = LoadLibrary( path.c_str() );
 #else
@@ -56,8 +66,6 @@ Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::loadModule( std::str
    }
 
    g_log.info( "Loaded module from '" + path + "' @ 0x" + boost::str( boost::format( "%|08X|" ) % handle ) );
-
-   boost::filesystem::path f( path );
 
    auto info = new ScriptInfo;
    info->handle = handle;
@@ -94,13 +102,9 @@ ScriptObject* Core::Scripting::ScriptLoader::getScriptObjectExport( ModuleHandle
       return nullptr;
 }
 
-bool Core::Scripting::ScriptLoader::unloadScript( std::string name )
+bool Core::Scripting::ScriptLoader::unloadScript( Core::Scripting::ScriptInfo* info )
 {
-   auto info = m_scriptMap.find( name );
-   if( info == m_scriptMap.end() )
-      return false;
-
-   return unloadScript( info->second->handle );
+   return unloadScript( info->handle );
 }
 
 bool Core::Scripting::ScriptLoader::unloadScript( ModuleHandle handle )
@@ -119,16 +123,26 @@ bool Core::Scripting::ScriptLoader::unloadScript( ModuleHandle handle )
    return false;
 }
 
-const std::string& Core::Scripting::ScriptLoader::getModuleNameFromHandle( ModuleHandle handle ) const
+bool Core::Scripting::ScriptLoader::isModuleLoaded( std::string name )
 {
    for( auto it = m_scriptMap.begin(); it != m_scriptMap.end(); ++it )
    {
-      if( it->second->handle == handle )
+      if( boost::iequals( it->second->library_name, name ) )
+         return true;
+   }
+
+   return false;
+}
+
+Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::getScriptInfo( std::string name )
+{
+   for( auto it = m_scriptMap.begin(); it != m_scriptMap.end(); ++it )
+   {
+      if( it->second->script_name == name )
       {
-         return it->first;
+         return it->second;
       }
    }
 
-   // nb: i'm not sure how this would ever be reached but you know
-   return "";
+   return nullptr;
 }
