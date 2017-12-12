@@ -12,28 +12,33 @@
 #define EXPORT __attribute__((visibility("default")))
 #endif
 
-#define EXPORT_SCRIPTOBJECT( type, base ) \
-extern "C" EXPORT base* get##base() \
-{ return static_cast< base* >( new type ); }
-
-#define EXPORT_STATUSEFFECTSCRIPT( type ) EXPORT_SCRIPTOBJECT( type, StatusEffectScript )
-#define EXPORT_ACTIONSCRIPT( type ) EXPORT_SCRIPTOBJECT( type, ActionScript )
-#define EXPORT_QUESTSCRIPT( type ) EXPORT_SCRIPTOBJECT( type, QuestScript )
-#define EXPORT_BATTLENPCSCRIPT( type ) EXPORT_SCRIPTOBJECT( type, BattleNpcScript )
-#define EXPORT_ZONESCRIPT( type ) EXPORT_SCRIPTOBJECT( type, ZoneScript )
+#define EXPORT_SCRIPTOBJECT( type ) \
+extern "C" EXPORT ScriptObject* getScript() \
+{ return static_cast< ScriptObject* >( new type ); }
 
 using namespace Core;
+
+enum ScriptType
+{
+    StatusEffect,
+    Action,
+    Quest,
+    BattleNpc,
+    Zone
+};
 
 class ScriptObject
 {
 protected:
    std::string m_scriptName;
    uint32_t m_id;
+   ScriptType m_type;
 
 public:
-   ScriptObject( std::string name, uint32_t id ) :
+   ScriptObject( std::string name, uint32_t id, ScriptType type ) :
       m_scriptName( name ),
-      m_id( id )
+      m_id( id ),
+      m_type( type )
    { }
 
    virtual const std::string& getName() const
@@ -45,6 +50,11 @@ public:
    {
       return m_id;
    }
+
+   virtual ScriptType getType() const
+   {
+      return m_type;
+   }
 };
 
 
@@ -52,7 +62,7 @@ class StatusEffectScript : public ScriptObject
 {
 public:
    StatusEffectScript( std::string name, uint32_t effectId ) :
-      ScriptObject( name, effectId )
+      ScriptObject( name, effectId, ScriptType::StatusEffect )
    { }
 
    virtual void onTick( Entity::Actor& actor ) { }
@@ -70,7 +80,7 @@ class ActionScript : public ScriptObject
 {
 public:
     ActionScript( std::string name, uint32_t abilityId ) :
-      ScriptObject( name, abilityId )
+      ScriptObject( name, abilityId, ScriptType::Action )
    { }
 
    virtual void onStart( Entity::Actor& sourceActor, Entity::Actor& targetActor ) { }
@@ -83,7 +93,7 @@ class QuestScript : public ScriptObject
 {
 public:
    QuestScript( std::string name, uint32_t questId ) :
-      ScriptObject( name, questId )
+      ScriptObject( name, questId, ScriptType::Quest )
    { }
 
    virtual void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) { }
@@ -96,7 +106,7 @@ class BattleNpcScript : public ScriptObject
 {
 public:
    BattleNpcScript( std::string name, uint32_t npcId ) :
-      ScriptObject( name, npcId )
+      ScriptObject( name, npcId, ScriptType::BattleNpc )
    { }
 };
 
@@ -104,7 +114,7 @@ class ZoneScript : public ScriptObject
 {
 public:
    ZoneScript( std::string name, uint32_t zoneId ) :
-      ScriptObject( name, zoneId )
+      ScriptObject( name, zoneId, ScriptType::Zone )
    { }
 
    virtual void onZoneInit() { }
