@@ -546,7 +546,10 @@ void Core::DebugCommandHandler::script( char* data, Entity::Player &player, boos
       if ( subCommand == params )
          player.sendDebug( "Command failed: requires name of script" );
       else
-         g_scriptMgr.getNativeScriptHandler().unloadScript( params );
+         if( g_scriptMgr.getNativeScriptHandler().unloadScript( params ) )
+            player.sendDebug( "Unloaded script successfully." );
+         else
+            player.sendDebug( "Failed to unload script: " + params );
    }
    else if( subCommand == "find" || subCommand == "f" )
    {

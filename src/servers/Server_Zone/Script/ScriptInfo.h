@@ -19,6 +19,7 @@ namespace Scripting {
         ScriptInfo() = default;
 
         std::string library_name;
+        std::string script_name;
         ModuleHandle handle;
         ScriptObject* script;
     };

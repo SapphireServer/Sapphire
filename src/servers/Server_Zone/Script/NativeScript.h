@@ -29,23 +29,30 @@ namespace Core {
             NativeScript( );
 
             StatusEffectScript* getStatusEffectScript( uint32_t statusId );
-            ActionScript* getAbilityScript( uint32_t abilityId );
+            ActionScript* getActionScript(uint32_t abilityId);
             QuestScript* getQuestScript( uint32_t questId );
             BattleNpcScript* getBattleNpcScript( uint32_t npcId );
             ZoneScript* getZoneScript( uint32_t zoneId );
 
-            void removeStatusEffectScript( uint32_t statusId );
-            void removeAbilityScript( uint32_t abilityId );
-            void removeQuestScript( uint32_t questId );
-            void removeBattleNpcScript( uint32_t npcId );
-
-
             bool loadScript( std::string );
             bool unloadScript( std::string );
-            void clearAllScripts();
 
             const std::string getModuleExtension();
 
+            template< typename key, typename val >
+            bool removeValueFromMap( ScriptObject* ptr, std::unordered_map< key, val >& map )
+            {
+               for( typename std::unordered_map< key, val >::iterator it = map.begin(); it != map.end(); ++it )
+               {
+                  if( ptr == static_cast< ScriptObject* >( it->second ) )
+                  {
+                     map.erase( it );
+                     return true;
+                  }
+               }
+
+               return false;
+            }
         };
 
 
