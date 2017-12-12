@@ -133,9 +133,11 @@ bool Core::Scripting::ScriptManager::onTalk( Entity::Player& player, uint64_t ac
          if ( questInfo )
          {
             player.sendUrgent( "Quest not implemented: " + questInfo->name );
-            return false;
+
          }
       }
+
+      return false;
    }
 
    return true;
