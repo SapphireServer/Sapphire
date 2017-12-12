@@ -2,6 +2,7 @@
 #define NATIVE_SCRIPT_H
 
 #include <unordered_map>
+#include <set>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
@@ -36,6 +37,7 @@ namespace Scripting {
 
       bool loadScript( const std::string& path );
       bool unloadScript( const std::string& name );
+      void findScripts( std::set< Core::Scripting::ScriptInfo* >& scripts, const std::string& search );
 
       const std::string getModuleExtension();
 

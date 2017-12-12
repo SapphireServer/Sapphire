@@ -143,3 +143,14 @@ Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::getScriptInfo( std::
 
    return nullptr;
 }
+
+void Core::Scripting::ScriptLoader::findScripts( std::set< Core::Scripting::ScriptInfo* >& scripts, const std::string& search )
+{
+   for( auto it = m_scriptMap.begin(); it != m_scriptMap.end(); ++it )
+   {
+      if( it->second->script_name.find( search ) != std::string::npos )
+      {
+         scripts.insert( it->second );
+      }
+   }
+}
