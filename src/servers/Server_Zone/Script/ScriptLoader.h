@@ -31,7 +31,7 @@ namespace Scripting {
        bool unloadScript( ScriptInfo* );
        bool unloadScript( ModuleHandle );
        ScriptInfo* getScriptInfo( std::string name );
-       ScriptObject* getScriptObject(ModuleHandle handle);
+       ScriptObject* getScriptObject( ModuleHandle handle );
        bool isModuleLoaded( std::string name );
    };
 
