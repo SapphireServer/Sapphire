@@ -119,9 +119,9 @@ bool Core::Scripting::ScriptManager::onTalk( Entity::Player& player, uint64_t ac
    if( eventType == Common::EventType::Aetheryte )
    {
       auto aetherInfo = g_exdData.getAetheryteInfo( eventId & 0xFFFF );
-      scriptId = 0x50000;
+      scriptId = EVENTSCRIPT_AETHERYTE_ID;
       if( !aetherInfo->isAetheryte )
-         scriptId = 0x50001;
+         scriptId = EVENTSCRIPT_AETHERNET_ID;
    }
 
    auto script = m_nativeScriptHandler->getQuestScript( scriptId );

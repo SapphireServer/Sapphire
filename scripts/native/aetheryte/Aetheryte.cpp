@@ -13,7 +13,7 @@
 class Aetheryte : public QuestScript
 {
 public:
-   Aetheryte() : QuestScript( "Aetheryte", 0x50000 )
+   Aetheryte() : QuestScript( "Aetheryte", EVENTSCRIPT_AETHERYTE_ID )
    {}
 
    virtual void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId )
