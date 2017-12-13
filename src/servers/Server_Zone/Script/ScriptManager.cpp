@@ -39,14 +39,12 @@ bool Core::Scripting::ScriptManager::init()
 {
    std::set< std::string > files;
 
-   loadDir( g_serverZone.getConfig()->getValue< std::string >( "Settings.General.ScriptPath", "./compiledscripts/" ),
+   loadDir( g_serverZone.getConfig()->getValue< std::string >( "Settings.General.Scripts.Path", "./compiledscripts/" ),
             files, m_nativeScriptManager->getModuleExtension() );
 
    for( auto itr = files.begin(); itr != files.end(); ++itr )
    {
       auto& path = *itr;
-
-      g_log.debug( "got module: " + path );
 
       m_nativeScriptManager->loadScript( path );
    }
@@ -124,7 +122,7 @@ bool Core::Scripting::ScriptManager::onTalk( Entity::Player& player, uint64_t ac
          scriptId = EVENTSCRIPT_AETHERNET_ID;
    }
 
-   auto script = m_nativeScriptManager->getQuestScript( scriptId );
+   auto script = m_nativeScriptManager->getEventScript( scriptId );
    if( script )
    {
       player.sendDebug( "Calling: " + objName + "." + eventName );
@@ -159,11 +157,11 @@ bool Core::Scripting::ScriptManager::onEnterTerritory( Entity::Player& player, u
    std::string eventName = "onEnterTerritory";
    std::string objName = Event::getEventName( eventId );
 
-   auto script = m_nativeScriptManager->getZoneScript( player.getZoneId() );
+   player.sendDebug( "Calling: " + objName + "." + eventName + " - " + std::to_string( eventId ) );
+
+   auto script = m_nativeScriptManager->getEventScript( eventId );
    if( script )
    {
-      player.sendDebug( "Calling: " + objName + "." + eventName );
-
       player.eventStart( player.getId(), eventId, Event::Event::EnterTerritory, 0, player.getZoneId() );
 
       script->onEnterZone( player, eventId, param1, param2 );
@@ -179,30 +177,22 @@ bool Core::Scripting::ScriptManager::onEnterTerritory( Entity::Player& player, u
 bool Core::Scripting::ScriptManager::onWithinRange( Entity::Player& player, uint32_t eventId, uint32_t param1,
                                                     float x, float y, float z )
 {
-//   std::string eventName = "onWithinRange";
-//   std::string objName = Event::getEventName( eventId );
-//
-//   try
-//   {
-//      // Get object from engine
-//      auto obj = m_pChaiHandler->eval( Event::getEventName( eventId )  );
-//
-//      player.sendDebug( "Calling: " + objName + "." + eventName );
-//
-//      player.eventStart( player.getId(), eventId, Event::Event::WithinRange, 1, param1 );
-//
-//      auto fn = m_pChaiHandler->eval< std::function< void( chaiscript::Boxed_Value &, uint32_t, Entity::Player&, uint32_t,
-//                                                           float, float, float ) > >( eventName );
-//      fn( obj, eventId, player, param1, x, y, z );
-//
-//      player.checkEvent( eventId );
-//   }
-//   catch( std::exception& e )
-//   {
-//      player.sendDebug( e.what() );
-//      return false;
-//   }
-//   return true;
+
+   std::string eventName = "onWithinRange";
+   std::string objName = Event::getEventName( eventId );
+   player.sendDebug( "Calling: " + objName + "." + eventName + " - " + std::to_string( eventId ) + " p1: " + std::to_string( param1 ) );
+
+   auto script = m_nativeScriptManager->getEventScript( eventId );
+   if( script )
+   {
+      player.eventStart( player.getId(), eventId, Event::Event::WithinRange, 1, param1 );
+
+      script->onWithinRange( player, eventId, param1, x, y, z );
+
+      player.checkEvent( eventId );
+
+      return true;
+   }
 
    return false;
 }
@@ -210,30 +200,21 @@ bool Core::Scripting::ScriptManager::onWithinRange( Entity::Player& player, uint
 bool Core::Scripting::ScriptManager::onOutsideRange( Entity::Player& player, uint32_t eventId, uint32_t param1,
                                                      float x, float y, float z )
 {
-//   std::string eventName = "onOutsideRange";
-//   std::string objName = Event::getEventName( eventId );
-//
-//   try
-//   {
-//      // Get object from engine
-//      auto obj = m_pChaiHandler->eval( Event::getEventName( eventId ) );
-//
-//      player.sendDebug( "Calling: " + objName + "." + eventName );
-//
-//      player.eventStart( player.getId(), eventId, Event::Event::OutsideRange, 1, param1 );
-//
-//      auto fn = m_pChaiHandler->eval< std::function< void( chaiscript::Boxed_Value &, uint32_t, Entity::Player&, uint32_t,
-//                                                           float, float, float ) > >( eventName );
-//      fn( obj, eventId, player, param1, x, y, z );
-//
-//      player.checkEvent( eventId );
-//   }
-//   catch( std::exception& e )
-//   {
-//      player.sendDebug( e.what() );
-//      return false;
-//   }
-//   return true;
+   std::string eventName = "onOutsideRange";
+   std::string objName = Event::getEventName( eventId );
+   player.sendDebug( "Calling: " + objName + "." + eventName + " - " + std::to_string( eventId ) );
+
+   auto script = m_nativeScriptManager->getEventScript( eventId );
+   if( script )
+   {
+      player.eventStart( player.getId(), eventId, Event::Event::WithinRange, 1, param1 );
+
+      script->onOutsideRange( player, eventId, param1, x, y, z );
+
+      player.checkEvent( eventId );
+
+      return true;
+   }
 
    return false;
 }
@@ -244,7 +225,7 @@ bool Core::Scripting::ScriptManager::onEmote( Entity::Player& player, uint64_t a
    std::string eventName = "onEmote";
    std::string objName = Event::getEventName( eventId );
 
-   auto script = m_nativeScriptManager->getQuestScript( eventId );
+   auto script = m_nativeScriptManager->getEventScript( eventId );
    if( script )
    {
       player.sendDebug( "Calling: " + objName + "." + eventName );
@@ -321,20 +302,13 @@ bool Core::Scripting::ScriptManager::onEventHandlerReturn( Entity::Player& playe
 bool Core::Scripting::ScriptManager::onEventHandlerTradeReturn( Entity::Player& player, uint32_t eventId,
                                                                 uint16_t subEvent, uint16_t param, uint32_t catalogId )
 {
-//   std::string eventName = Event::getEventName( eventId ) + "_TRADE";
-//
-//   try
-//   {
-//      auto fn = m_pChaiHandler->eval< std::function< void( Entity::Player&, uint32_t,
-//                                                           uint16_t, uint16_t, uint32_t ) > >( eventName );
-//      fn( player, eventId, subEvent, param, catalogId );
-//   }
-//   catch( ... )
-//   {
-//      return false;
-//   }
-//
-//   return true;
+   auto script = m_nativeScriptManager->getEventScript( eventId );
+   if( script )
+   {
+      script->onEventHandlerTradeReturn( player, eventId, subEvent, param, catalogId );
+
+      return true;
+   }
 
    return false;
 }
@@ -342,28 +316,20 @@ bool Core::Scripting::ScriptManager::onEventHandlerTradeReturn( Entity::Player& 
 bool Core::Scripting::ScriptManager::onEventItem( Entity::Player& player, uint32_t eventItemId,
                                                   uint32_t eventId, uint32_t castTime, uint64_t targetId )
 {
-//   std::string eventName = "onEventItem";
-//   std::string objName = Event::getEventName( eventId );
-//
-//   try
-//   {
-//      auto obj = m_pChaiHandler->eval( Event::getEventName( eventId ) );
-//
-//      player.sendDebug( "Calling: " + objName + "." + eventName );
-//
-//      player.eventStart( targetId, eventId, Event::Event::Item, 0, 0 );
-//
-//      auto fn = m_pChaiHandler->eval< std::function< void( chaiscript::Boxed_Value &, uint32_t, Entity::Player&,
-//                                                           uint32_t, uint32_t, uint64_t ) > >( eventName );
-//      fn( obj, eventId, player, eventItemId, castTime, targetId );
-//   }
-//   catch( std::exception& e )
-//   {
-//      player.sendNotice( e.what() );
-//      return false;
-//   }
-//
-//   return true;
+   std::string eventName = "onEventItem";
+   std::string objName = Event::getEventName( eventId );
+   player.sendDebug( "Calling: " + objName + "." + eventName + " - " + std::to_string( eventId ) );
+
+   auto script = m_nativeScriptManager->getEventScript( eventId );
+   if( script )
+   {
+      player.eventStart( targetId, eventId, Event::Event::Item, 0, 0 );
+
+      script->onEventItem( player, eventItemId, eventId, castTime, targetId );
+
+      return true;
+   }
+
    return false;
 }
 
@@ -381,7 +347,7 @@ bool Core::Scripting::ScriptManager::onMobKill( Entity::Player& player, uint16_t
 
       uint16_t questId = activeQuests->c.questId;
 
-      auto script = m_nativeScriptManager->getQuestScript( questId );
+      auto script = m_nativeScriptManager->getEventScript( questId );
       if( script )
       {
          std::string objName = Event::getEventName( 0x00010000 | questId );

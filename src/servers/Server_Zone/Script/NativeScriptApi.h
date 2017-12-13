@@ -93,16 +93,21 @@ public:
 };
 
 
-class QuestScript : public ScriptObject
+class EventScript : public ScriptObject
 {
 public:
-   QuestScript( std::string name, uint32_t questId ) :
+   EventScript( std::string name, uint32_t questId ) :
       ScriptObject( name, questId, ScriptType::Quest )
    { }
 
    virtual void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) { }
    virtual void onNpcKill( uint32_t npcId, Entity::Player& player ) { }
    virtual void onEmote( uint64_t actorId, uint32_t eventId, uint32_t emoteId, Entity::Player& player ) { }
+   virtual void onEnterZone( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 ) { }
+   virtual void onWithinRange( Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z ) { }
+   virtual void onOutsideRange( Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z ) { }
+   virtual void onEventItem( Entity::Player& player, uint32_t eventItemId, uint32_t eventId, uint32_t castTime, uint64_t targetId ) { }
+   virtual void onEventHandlerTradeReturn( Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param, uint32_t catalogId ) { }
 };
 
 
@@ -122,7 +127,6 @@ public:
    { }
 
    virtual void onZoneInit() { }
-   virtual void onEnterZone( Entity::Player& pPlayer, uint32_t eventId, uint16_t param1, uint16_t param2 ) { }
 };
 
 #endif

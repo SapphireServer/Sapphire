@@ -24,10 +24,10 @@ namespace Core {
       return script->second;
    }
 
-   QuestScript* NativeScriptManager::getQuestScript( uint32_t questId )
+   EventScript* NativeScriptManager::getEventScript( uint32_t questId )
    {
-      auto script = m_questScripts.find( questId );
-      if( script == m_questScripts.end() )
+      auto script = m_eventScripts.find( questId );
+      if( script == m_eventScripts.end() )
          return nullptr;
 
       return script->second;
@@ -59,7 +59,10 @@ namespace Core {
 
       auto script = m_loader.getScriptObject( module->handle );
       if( !script )
+      {
+         m_loader.unloadScript( module );
          return false;
+      }
 
       module->script = script;
       module->script_name = script->getName();
@@ -74,7 +77,7 @@ namespace Core {
             m_actionScripts[ script->getId() ] = dynamic_cast< ActionScript* >( script );
             break;
          case ScriptType::Quest:
-            m_questScripts[ script->getId() ] = dynamic_cast< QuestScript* >( script );
+            m_eventScripts[ script->getId() ] = dynamic_cast< EventScript* >( script );
             break;
          case ScriptType::BattleNpc:
             m_battleNpcScripts[ script->getId() ] = dynamic_cast< BattleNpcScript* >( script );
@@ -113,7 +116,7 @@ namespace Core {
             removeValueFromMap< uint32_t, ActionScript* >( ptr, m_actionScripts );
             break;
          case ScriptType::Quest:
-            removeValueFromMap< uint32_t, QuestScript* >( ptr, m_questScripts );
+            removeValueFromMap< uint32_t, EventScript* >( ptr, m_eventScripts );
             break;
          case ScriptType::BattleNpc:
             removeValueFromMap< uint32_t, BattleNpcScript* >( ptr, m_battleNpcScripts );

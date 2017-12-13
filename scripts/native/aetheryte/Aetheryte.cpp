@@ -10,13 +10,13 @@
 #define AETHERYTE_MENU_FAVORITE_POINT 4
 #define AETHERYTE_MENU_FAVORITE_POINT_SECURITY_TOKEN 5
 
-class Aetheryte : public QuestScript
+class Aetheryte : public EventScript
 {
 public:
-   Aetheryte() : QuestScript( "Aetheryte", EVENTSCRIPT_AETHERYTE_ID )
+   Aetheryte() : EventScript( "Aetheryte", EVENTSCRIPT_AETHERYTE_ID )
    {}
 
-   virtual void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId )
+   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
       if( player.isAetheryteRegistered( eventId & 0xFFFF ) )
       {

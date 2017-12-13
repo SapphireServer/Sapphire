@@ -20,7 +20,7 @@ namespace Scripting {
    protected:
       std::unordered_map< uint32_t, StatusEffectScript* > m_statusEffectScripts;
       std::unordered_map< uint32_t, ActionScript* > m_actionScripts;
-      std::unordered_map< uint32_t, QuestScript* > m_questScripts;
+      std::unordered_map< uint32_t, EventScript* > m_eventScripts;
       std::unordered_map< uint32_t, BattleNpcScript* > m_battleNpcScripts;
       std::unordered_map< uint32_t, ZoneScript* > m_zoneScripts;
 
@@ -31,7 +31,7 @@ namespace Scripting {
 
       StatusEffectScript* getStatusEffectScript( uint32_t statusId );
       ActionScript* getActionScript( uint32_t actionId );
-      QuestScript* getQuestScript( uint32_t questId );
+      EventScript* getEventScript( uint32_t questId );
       BattleNpcScript* getBattleNpcScript( uint32_t npcId );
       ZoneScript* getZoneScript( uint32_t zoneId );
 
