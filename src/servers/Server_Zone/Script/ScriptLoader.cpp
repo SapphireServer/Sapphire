@@ -31,7 +31,7 @@ bool Core::Scripting::ScriptLoader::unloadModule( ModuleHandle handle )
 
    if( !success )
    {
-      g_log.fatal( "Failed to unload module @ 0x" + boost::str( boost::format( "%|08X|" ) % handle ) );
+      g_log.error( "Failed to unload module @ 0x" + boost::str( boost::format( "%|08X|" ) % handle ) );
 
       return false;
    }
@@ -78,12 +78,12 @@ Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::loadModule( const st
 
 ScriptObject* Core::Scripting::ScriptLoader::getScriptObject( ModuleHandle handle )
 {
-   typedef ScriptObject* (*getScriptObjectType)();
+   using getScript = ScriptObject*(*)();
 
 #ifdef _WIN32
-   getScriptObjectType func = reinterpret_cast< getScriptObjectType >( GetProcAddress( handle, "getScript" ) );
+   getScript func = reinterpret_cast< getScript >( GetProcAddress( handle, "getScript" ) );
 #else
-   getScriptObjectType func = reinterpret_cast< getScriptObjectType >( dlsym( handle, "getScript" ) );
+   getScript func = reinterpret_cast< getScript >( dlsym( handle, "getScript" ) );
 #endif
 
    if( func )

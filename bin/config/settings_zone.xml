@@ -1,12 +1,11 @@
 <Settings>
-
    <General>
       <!-- Port the zone server accepts game conenctions on -->
       <ListenPort>54992</ListenPort> 
       <!-- Ip the zone server conenctions on -->
       <ListenIp>127.0.0.1</ListenIp>
       <!-- Path of FFXIV dat files -->
-      <DataPath>C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv</DataPath>
+      <DataPath>H:\\SteamLibrary\\steamapps\\common\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv</DataPath>
       <!-- Path of Chai script files -->
       <ScriptPath>./compiledscripts/</ScriptPath>
       <!-- Connection settings for the mysql db -->
