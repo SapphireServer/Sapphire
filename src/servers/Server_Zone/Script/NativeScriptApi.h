@@ -18,6 +18,10 @@ extern "C" EXPORT ScriptObject* getScript() \
 
 using namespace Core;
 
+// constant script ids for certain events
+#define EVENTSCRIPT_AETHERYTE_ID 0x50000
+#define EVENTSCRIPT_AETHERNET_ID 0x50001
+
 enum ScriptType
 {
     StatusEffect,

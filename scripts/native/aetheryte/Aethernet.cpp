@@ -12,7 +12,7 @@
 class Aethernet : public QuestScript
 {
 public:
-   Aethernet() : QuestScript( "Aethernet", 0x50001 )
+   Aethernet() : QuestScript( "Aethernet", EVENTSCRIPT_AETHERNET_ID )
    {}
 
    virtual void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId )
