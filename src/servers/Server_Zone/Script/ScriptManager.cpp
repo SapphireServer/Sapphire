@@ -1,7 +1,7 @@
 #include <Server_Common/Logging/Logger.h>
 #include <Server_Common/Exd/ExdData.h>
 
-#include "NativeScript.h"
+#include "NativeScriptManager.h"
 
 #include "Zone/Zone.h"
 #include "Actor/Player.h"
@@ -27,7 +27,7 @@ extern Core::ServerZone g_serverZone;
 
 Core::Scripting::ScriptManager::ScriptManager()
 {
-   m_nativeScriptHandler = create_script_engine();
+   m_nativeScriptManager = createNativeScriptMgr();
 }
 
 Core::Scripting::ScriptManager::~ScriptManager()
@@ -40,7 +40,7 @@ bool Core::Scripting::ScriptManager::init()
    std::set< std::string > files;
 
    loadDir( g_serverZone.getConfig()->getValue< std::string >( "Settings.General.ScriptPath", "./compiledscripts/" ),
-            files, m_nativeScriptHandler->getModuleExtension() );
+            files, m_nativeScriptManager->getModuleExtension() );
 
    for( auto itr = files.begin(); itr != files.end(); ++itr )
    {
@@ -48,7 +48,7 @@ bool Core::Scripting::ScriptManager::init()
 
       g_log.debug( "got module: " + path );
 
-      m_nativeScriptHandler->loadScript( path );
+      m_nativeScriptManager->loadScript( path );
    }
 
    return true;
@@ -124,7 +124,7 @@ bool Core::Scripting::ScriptManager::onTalk( Entity::Player& player, uint64_t ac
          scriptId = EVENTSCRIPT_AETHERNET_ID;
    }
 
-   auto script = m_nativeScriptHandler->getQuestScript( scriptId );
+   auto script = m_nativeScriptManager->getQuestScript( scriptId );
    if( script )
    {
       player.sendDebug( "Calling: " + objName + "." + eventName );
@@ -159,7 +159,7 @@ bool Core::Scripting::ScriptManager::onEnterTerritory( Entity::Player& player, u
    std::string eventName = "onEnterTerritory";
    std::string objName = Event::getEventName( eventId );
 
-   auto script = m_nativeScriptHandler->getZoneScript( player.getZoneId() );
+   auto script = m_nativeScriptManager->getZoneScript( player.getZoneId() );
    if( script )
    {
       player.sendDebug( "Calling: " + objName + "." + eventName );
@@ -244,7 +244,7 @@ bool Core::Scripting::ScriptManager::onEmote( Entity::Player& player, uint64_t a
    std::string eventName = "onEmote";
    std::string objName = Event::getEventName( eventId );
 
-   auto script = m_nativeScriptHandler->getQuestScript( eventId );
+   auto script = m_nativeScriptManager->getQuestScript( eventId );
    if( script )
    {
       player.sendDebug( "Calling: " + objName + "." + eventName );
@@ -381,7 +381,7 @@ bool Core::Scripting::ScriptManager::onMobKill( Entity::Player& player, uint16_t
 
       uint16_t questId = activeQuests->c.questId;
 
-      auto script = m_nativeScriptHandler->getQuestScript( questId );
+      auto script = m_nativeScriptManager->getQuestScript( questId );
       if( script )
       {
          std::string objName = Event::getEventName( 0x00010000 | questId );
@@ -397,7 +397,7 @@ bool Core::Scripting::ScriptManager::onMobKill( Entity::Player& player, uint16_t
 
 bool Core::Scripting::ScriptManager::onCastFinish( Entity::Player& player, Entity::ActorPtr pTarget, uint32_t actionId )
 {
-   auto script = m_nativeScriptHandler->getActionScript( actionId );
+   auto script = m_nativeScriptManager->getActionScript( actionId );
 
    if( script )
       script->onCastFinish( player, *pTarget );
@@ -407,7 +407,7 @@ bool Core::Scripting::ScriptManager::onCastFinish( Entity::Player& player, Entit
 
 bool Core::Scripting::ScriptManager::onStatusReceive( Entity::ActorPtr pActor, uint32_t effectId )
 {
-   auto script = m_nativeScriptHandler->getStatusEffectScript( effectId );
+   auto script = m_nativeScriptManager->getStatusEffectScript( effectId );
    if( script )
    {
       if( pActor->isPlayer() )
@@ -423,7 +423,7 @@ bool Core::Scripting::ScriptManager::onStatusReceive( Entity::ActorPtr pActor, u
 
 bool Core::Scripting::ScriptManager::onStatusTick( Entity::ActorPtr pActor, Core::StatusEffect::StatusEffect& effect )
 {
-   auto script = m_nativeScriptHandler->getStatusEffectScript( effect.getId() );
+   auto script = m_nativeScriptManager->getStatusEffectScript( effect.getId() );
    if( script )
    {
       if( pActor->isPlayer() )
@@ -439,7 +439,7 @@ bool Core::Scripting::ScriptManager::onStatusTick( Entity::ActorPtr pActor, Core
 
 bool Core::Scripting::ScriptManager::onStatusTimeOut( Entity::ActorPtr pActor, uint32_t effectId )
 {
-   auto script = m_nativeScriptHandler->getStatusEffectScript( effectId );
+   auto script = m_nativeScriptManager->getStatusEffectScript( effectId );
    if( script )
    {
       if( pActor->isPlayer() )
@@ -455,7 +455,7 @@ bool Core::Scripting::ScriptManager::onStatusTimeOut( Entity::ActorPtr pActor, u
 
 bool Core::Scripting::ScriptManager::onZoneInit( ZonePtr pZone )
 {
-   auto script = m_nativeScriptHandler->getZoneScript( pZone->getId() );
+   auto script = m_nativeScriptManager->getZoneScript( pZone->getId() );
    if( script )
    {
       script->onZoneInit();
@@ -466,7 +466,7 @@ bool Core::Scripting::ScriptManager::onZoneInit( ZonePtr pZone )
    return false;
 }
 
-Scripting::NativeScript& Core::Scripting::ScriptManager::getNativeScriptHandler()
+Scripting::NativeScriptManager& Core::Scripting::ScriptManager::getNativeScriptHandler()
 {
-   return *m_nativeScriptHandler;
+   return *m_nativeScriptManager;
 }

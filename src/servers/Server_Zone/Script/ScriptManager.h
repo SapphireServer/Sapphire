@@ -8,12 +8,6 @@
 #include <Server_Common/Common.h>
 #include "Forwards.h"
 
-
-namespace chaiscript
-{
-   class ChaiScript;
-}
-
 namespace Core
 {
    namespace Scripting
@@ -23,7 +17,7 @@ namespace Core
       {
       private:
 
-          boost::shared_ptr< NativeScript > m_nativeScriptHandler;
+          boost::shared_ptr< NativeScriptManager > m_nativeScriptManager;
 
          std::function< std::string( Entity::Player& ) > m_onFirstEnterWorld;
         // auto fn = m_pChaiHandler->eval< std::function<const std::string( Entity::Player ) > >( "onFirstEnterWorld" );
@@ -62,7 +56,7 @@ namespace Core
 
          void loadDir( std::string dirname, std::set<std::string>& files, std::string ext );
 
-         NativeScript& getNativeScriptHandler();
+         NativeScriptManager& getNativeScriptHandler();
       };
    }
 }

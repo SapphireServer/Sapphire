@@ -15,7 +15,7 @@
 namespace Core {
 namespace Scripting {
 
-   class NativeScript
+   class NativeScriptManager
    {
    protected:
       std::unordered_map< uint32_t, StatusEffectScript* > m_statusEffectScripts;
@@ -27,7 +27,7 @@ namespace Scripting {
       ScriptLoader m_loader;
 
    public:
-      NativeScript( );
+      NativeScriptManager( );
 
       StatusEffectScript* getStatusEffectScript( uint32_t statusId );
       ActionScript* getActionScript( uint32_t actionId );
@@ -59,7 +59,7 @@ namespace Scripting {
 
 
 
-   boost::shared_ptr< NativeScript > create_script_engine( );
+   boost::shared_ptr< NativeScriptManager > createNativeScriptMgr();
 } }
 
 
