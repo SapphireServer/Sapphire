@@ -13,17 +13,19 @@ typedef void* ModuleHandle;
 namespace Core {
 namespace Scripting {
 
-    class ScriptInfo
-    {
-    public:
-        ScriptInfo() = default;
+   class ScriptInfo
+   {
+   public:
+      ScriptInfo() = default;
 
-        std::string library_name;
-        std::string script_name;
-        ModuleHandle handle;
-        ScriptObject* script;
-        ScriptType type;
-    };
+      std::string library_name;
+      std::string library_path;
+
+      std::string script_name;
+      ModuleHandle handle;
+      ScriptObject* script;
+      ScriptType type;
+   };
 }
 }
 

@@ -1,11 +1,15 @@
 #include "ScriptLoader.h"
 
 #include <Server_Common/Logging/Logger.h>
+#include <Server_Common/Config/XMLConfig.h>
+#include "ServerZone.h"
+
 #include <boost/format.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 
 extern Core::Logger g_log;
+extern Core::ServerZone g_serverZone;
 
 Core::Scripting::ScriptLoader::ScriptLoader()
 {}
@@ -51,11 +55,16 @@ Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::loadModule( const st
       return nullptr;
    }
 
+   // copy to temp dir
+   boost::filesystem::path cacheDir( f.parent_path() /= g_serverZone.getConfig()->getValue< std::string >( "Settings.General.Scripts.CachePath", "./cache/" ) );
+   boost::filesystem::create_directories( cacheDir );
+   boost::filesystem::path dest( cacheDir /= f.filename().string() );
+   boost::filesystem::copy_file( f, dest, boost::filesystem::copy_option::overwrite_if_exists );
 
 #ifdef _WIN32
-   ModuleHandle handle = LoadLibrary( path.c_str() );
+   ModuleHandle handle = LoadLibrary( dest.string().c_str() );
 #else
-   ModuleHandle handle = dlopen( path.c_str(), RTLD_LAZY );
+   ModuleHandle handle = dlopen( dest.string().c_str(), RTLD_LAZY );
 #endif
 
    if( !handle )
@@ -70,6 +79,7 @@ Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::loadModule( const st
    auto info = new ScriptInfo;
    info->handle = handle;
    info->library_name = f.stem().string();
+   info->library_path = dest.string();
 
    m_scriptMap.insert( std::make_pair( f.stem().string(), info ) );
 
@@ -110,10 +120,18 @@ bool Core::Scripting::ScriptLoader::unloadScript( ModuleHandle handle )
    {
       if( it->second->handle == handle )
       {
-         delete it->second;
+         auto info = it->second;
          m_scriptMap.erase( it );
 
-         return unloadModule( handle );
+         if( unloadModule( handle ) )
+         {
+            // remove cached file
+            boost::filesystem::remove( info->library_path );
+
+            return true;
+         }
+
+         return false;
       }
    }
 

@@ -6,6 +6,20 @@
       <ListenIp>127.0.0.1</ListenIp>
       <!-- Path of FFXIV dat files -->
       <DataPath>H:\\SteamLibrary\\steamapps\\common\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv</DataPath>
+
+      <Scripts>
+      	<!-- where compiled scripts are placed -->
+      	<Path>./compiledscripts/</Path>
+      	<!-- path relative to the path above, stores where scripts are when loaded -->
+      	<CachePath>./cache/</CachePath>
+      	
+      	<HotSwap>
+      		<Enabled>1</Enabled>
+      		<BuildDir>../cmake-build-debug/</BuildDir>
+      		<BuildCmd>nmake %1%</BuildCmd>
+      	</HotSwap>
+      </Scripts>
+
       <!-- Path of Chai script files -->
       <ScriptPath>./compiledscripts/</ScriptPath>
       <!-- Connection settings for the mysql db -->
