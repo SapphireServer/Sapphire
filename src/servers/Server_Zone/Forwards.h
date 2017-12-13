@@ -70,7 +70,7 @@ namespace Core
 
    namespace Scripting
    {
-      class NativeScript;
+      class NativeScriptManager;
       typedef std::function< void( Entity::Player&, uint32_t, uint16_t, uint16_t, uint16_t ) > EventReturnCallback;
    }
 

@@ -19,7 +19,7 @@
 #include "Network/PacketWrappers/InitUIPacket.h"
 #include "Network/GameConnection.h"
 #include "Script/ScriptManager.h"
-#include "Script/NativeScript.h"
+#include "Script/NativeScriptManager.h"
 
 #include "Actor/Player.h"
 #include "Actor/BattleNpc.h"
