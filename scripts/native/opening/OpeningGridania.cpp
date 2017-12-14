@@ -63,6 +63,8 @@ public:
             Scene00030( player );
          }
       };
+
+      player.eventPlay( getId(), 40, 1, 2, 1, callback );
    }
 
    ///////////////////////////////

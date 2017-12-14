@@ -154,13 +154,23 @@ namespace Core {
 
    void NativeScriptManager::processLoadQueue()
    {
+      std::vector< std::string > deferredLoads;
+
       while( !m_scriptLoadQueue.empty() )
       {
          auto item = m_scriptLoadQueue.front();
 
-         loadScript( item );
+         // if it fails, we defer the loading to the next tick
+         if( !loadScript( item ) )
+            deferredLoads.push_back( item );
 
          m_scriptLoadQueue.pop();
+      }
+
+      if( !deferredLoads.empty() )
+      {
+         for( auto& item : deferredLoads )
+            m_scriptLoadQueue.push( item );
       }
    }
 
