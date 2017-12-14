@@ -560,7 +560,7 @@ void Core::DebugCommandHandler::script( char* data, Entity::Player &player, boos
          std::set< Core::Scripting::ScriptInfo* > scripts;
          g_scriptMgr.getNativeScriptHandler().findScripts( scripts, params );
 
-         if( scripts.size() > 0 )
+         if( !scripts.empty() )
          {
             player.sendDebug( "Found " + std::to_string( scripts.size() ) + " scripts" );
 
@@ -588,6 +588,16 @@ void Core::DebugCommandHandler::script( char* data, Entity::Player &player, boos
             player.sendDebug( "Failed to load '" + params + "'" );
       }
 
+   }
+   else if( subCommand == "reload" || subCommand == "rl" )
+   {
+      if( subCommand == params )
+         player.sendDebug( "Command failed: requires name of script to reload" );
+      else
+         if( g_scriptMgr.getNativeScriptHandler().reloadScript( params ) )
+            player.sendDebug( "Reloaded '" + params + "' successfully" );
+         else
+            player.sendDebug( "Failed to reload '" + params + "'" );
    }
    else if( subCommand == "build" || subCommand == "b" )
    {
