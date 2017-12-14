@@ -105,6 +105,11 @@ namespace Core {
       if( !info )
          return false;
 
+      return unloadScript( info );
+   }
+
+   bool NativeScriptManager::unloadScript( ScriptInfo* info )
+   {
       auto ptr = info->script;
 
       switch( info->type )
@@ -130,6 +135,21 @@ namespace Core {
       }
 
       return m_loader.unloadScript( info );
+   }
+
+   bool NativeScriptManager::reloadScript( const std::string& name )
+   {
+      auto info = m_loader.getScriptInfo( name );
+      if( !info )
+         return false;
+
+      // backup actual lib path
+      std::string libPath( info->library_path );
+
+      if( !unloadScript( info ) )
+         return false;
+
+      return loadScript( libPath );
    }
 
    void NativeScriptManager::findScripts( std::set< Core::Scripting::ScriptInfo* >& scripts, const std::string& search )

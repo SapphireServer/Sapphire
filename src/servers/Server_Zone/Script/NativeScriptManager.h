@@ -26,6 +26,8 @@ namespace Scripting {
 
       ScriptLoader m_loader;
 
+      bool unloadScript( ScriptInfo* info );
+
    public:
       NativeScriptManager( );
 
@@ -37,6 +39,7 @@ namespace Scripting {
 
       bool loadScript( const std::string& path );
       bool unloadScript( const std::string& name );
+      bool reloadScript( const std::string& name );
       void findScripts( std::set< Core::Scripting::ScriptInfo* >& scripts, const std::string& search );
 
       const std::string getModuleExtension();

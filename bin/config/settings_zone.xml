@@ -10,11 +10,12 @@
       <Scripts>
       	<!-- where compiled scripts are placed -->
       	<Path>./compiledscripts/</Path>
+      	<CachePath>./cache/</CachePath>
 
       	<HotSwap>
       		<Enabled>1</Enabled>
       		<BuildDir>../cmake-build-debug/</BuildDir>
-      		<BuildCmd>make %1%</BuildCmd>
+      		<BuildCmd>cmake --build %1% --target %2%</BuildCmd>
       	</HotSwap>
       </Scripts>
 

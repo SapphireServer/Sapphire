@@ -19,6 +19,7 @@ namespace Scripting {
       ScriptInfo() = default;
 
       std::string library_name;
+      std::string cache_path;
       std::string library_path;
 
       std::string script_name;

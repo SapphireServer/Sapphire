@@ -90,13 +90,6 @@ bool Core::Scripting::ScriptManager::registerBnpcTemplate( std::string templateN
    return g_serverZone.registerBnpcTemplate( templateName, bnpcBaseId, bnpcNameId, modelId, aiName );
 }
 
-void Core::Scripting::ScriptManager::reload()
-{
-//   auto handler = create_chaiscript();
-//   m_pChaiHandler.swap( handler );
-//   init();
-}
-
 bool Core::Scripting::ScriptManager::onTalk( Entity::Player& player, uint64_t actorId, uint32_t eventId )
 {
    std::string eventName = "onTalk";
