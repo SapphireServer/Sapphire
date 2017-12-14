@@ -5,13 +5,13 @@
 #include "ServerZone.h"
 
 #include <boost/format.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/algorithm/string/predicate.hpp>
+#include <experimental/filesystem>
 
 extern Core::Logger g_log;
 extern Core::ServerZone g_serverZone;
 
-namespace fs = boost::filesystem;
+namespace fs = std::experimental::filesystem;
 
 Core::Scripting::ScriptLoader::ScriptLoader()
 {}
@@ -49,7 +49,7 @@ bool Core::Scripting::ScriptLoader::unloadModule( ModuleHandle handle )
 
 Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::loadModule( const std::string& path )
 {
-   boost::filesystem::path f( path );
+   fs::path f( path );
 
    if ( isModuleLoaded( f.stem().string() ) )
    {
