@@ -42,7 +42,7 @@ namespace Scripting {
 
       bool loadScript( const std::string& path );
       bool unloadScript( const std::string& name );
-      void reloadScript( const std::string &name );
+      void queueScriptReload( const std::string& name );
       void findScripts( std::set< Core::Scripting::ScriptInfo* >& scripts, const std::string& search );
 
       void processLoadQueue();

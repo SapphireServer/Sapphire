@@ -137,7 +137,7 @@ namespace Core {
       return m_loader.unloadScript( info );
    }
 
-   void NativeScriptManager::reloadScript( const std::string &name )
+   void NativeScriptManager::queueScriptReload( const std::string &name )
    {
       auto info = m_loader.getScriptInfo( name );
       if( !info )
