@@ -91,7 +91,7 @@ void Core::Scripting::ScriptManager::watchDirectories()
          {
             g_log.debug( "Reloading changed script: " + path.stem().string() );
 
-            m_nativeScriptManager->reloadScript( path.stem().string() );
+            m_nativeScriptManager->queueScriptReload( path.stem( ).string( ));
          }
          else
          {
@@ -103,14 +103,15 @@ void Core::Scripting::ScriptManager::watchDirectories()
    });
 }
 
-void Core::Scripting::ScriptManager::loadDir( std::string dirname, std::set<std::string>& files, std::string ext )
+void Core::Scripting::ScriptManager::loadDir( const std::string& dirname, std::set<std::string> &files, const std::string& ext )
 {
 
    g_log.info( "ScriptEngine: loading scripts from " + dirname );
 
    boost::filesystem::path targetDir( dirname );
 
-   boost::filesystem::directory_iterator iter( targetDir ), eod;
+   boost::filesystem::directory_iterator iter( targetDir );
+   boost::filesystem::directory_iterator eod;
 
    BOOST_FOREACH( boost::filesystem::path const& i, make_pair( iter, eod ) )
    {
