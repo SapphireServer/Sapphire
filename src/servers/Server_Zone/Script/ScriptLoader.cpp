@@ -6,12 +6,12 @@
 
 #include <boost/format.hpp>
 #include <boost/algorithm/string/predicate.hpp>
-#include <experimental/filesystem>
+#include <boost/filesystem.hpp>
 
 extern Core::Logger g_log;
 extern Core::ServerZone g_serverZone;
 
-namespace fs = std::experimental::filesystem;
+namespace fs = boost::filesystem;
 
 Core::Scripting::ScriptLoader::ScriptLoader()
 {}
