@@ -22,12 +22,18 @@ namespace Core
          std::function< std::string( Entity::Player& ) > m_onFirstEnterWorld;
         // auto fn = m_pChaiHandler->eval< std::function<const std::string( Entity::Player ) > >( "onFirstEnterWorld" );
 
+         bool m_firstScriptChangeNotificiation;
+
       public:
          ScriptManager();
          ~ScriptManager();
 
          bool init();
          void reload();
+
+         void update();
+
+         void watchDirectories();
 
          void onPlayerFirstEnterWorld( Entity::Player& player );
 
@@ -54,7 +60,7 @@ namespace Core
          bool onEventHandlerTradeReturn( Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param, uint32_t catalogId );
 
 
-         void loadDir( std::string dirname, std::set<std::string>& files, std::string ext );
+         void loadDir( const std::string& dirname, std::set<std::string> &files, const std::string& ext );
 
          NativeScriptManager& getNativeScriptHandler();
       };

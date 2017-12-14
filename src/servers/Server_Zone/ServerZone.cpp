@@ -260,6 +260,8 @@ void Core::ServerZone::mainLoop()
 
       g_zoneMgr.updateZones();
 
+      g_scriptMgr.update();
+
       auto currTime = static_cast< uint32_t >( time( nullptr ) );
 
       lock_guard< std::mutex > lock( this->m_sessionMutex );

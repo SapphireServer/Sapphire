@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <set>
+#include <queue>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
@@ -26,6 +27,8 @@ namespace Scripting {
 
       ScriptLoader m_loader;
 
+      std::queue< std::string > m_scriptLoadQueue;
+
       bool unloadScript( ScriptInfo* info );
 
    public:
@@ -39,10 +42,13 @@ namespace Scripting {
 
       bool loadScript( const std::string& path );
       bool unloadScript( const std::string& name );
-      bool reloadScript( const std::string& name );
+      void queueScriptReload( const std::string& name );
       void findScripts( std::set< Core::Scripting::ScriptInfo* >& scripts, const std::string& search );
 
+      void processLoadQueue();
+
       const std::string getModuleExtension();
+      bool isModuleLoaded( const std::string& name );
 
       template< typename key, typename val >
       bool removeValueFromMap( ScriptObject* ptr, std::unordered_map< key, val >& map )
