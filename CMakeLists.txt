@@ -4,8 +4,9 @@ project (Sapphire)
 
 set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin)
 
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
-set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
+set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
+set(EXECUTABLE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 set(PROJECT_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
@@ -42,7 +43,6 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/servers/Server_Common/Version.cp
 
 ##########################################################################
 # Common include folders
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/libraries/external/ChaiScript-6.0.0/include/")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/libraries/sapphire/datReader/")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/libraries/sapphire/mysqlConnector/")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
@@ -66,3 +66,5 @@ add_subdirectory("src/tools/exd_struct_gen")
 add_subdirectory("src/tools/exd_struct_test")
 add_subdirectory("src/tools/quest_parser")
 add_subdirectory("src/tools/pcb_reader")
+
+add_subdirectory("scripts/native")

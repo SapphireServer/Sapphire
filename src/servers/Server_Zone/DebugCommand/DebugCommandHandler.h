@@ -35,7 +35,6 @@ public:
    void get( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command );
    void add( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command );
    //void debug( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command );
-   void scriptReload( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command );
 
    void injectPacket( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command );
    void injectChatPacket( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command );
@@ -43,7 +42,8 @@ public:
    void serverInfo( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command );
 
    void unlockCharacter( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command );
-   void targetInfo( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command );
+
+   void script( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command );
 
 };
 
