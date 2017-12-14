@@ -21,18 +21,28 @@
 
 #include <Server_Common/Config/XMLConfig.h>
 
+// enable the ambiguity fix for every platform to avoid #define nonsense
+#define WIN_AMBIGUITY_FIX
+#include <libraries/external/watchdog/Watchdog.h>
+
 extern Core::Logger g_log;
 extern Core::Data::ExdData g_exdData;
 extern Core::ServerZone g_serverZone;
 
-Core::Scripting::ScriptManager::ScriptManager()
+Core::Scripting::ScriptManager::ScriptManager() :
+   m_firstScriptChangeNotificiation( false )
 {
    m_nativeScriptManager = createNativeScriptMgr();
 }
 
 Core::Scripting::ScriptManager::~ScriptManager()
 {
+   Watchdog::unwatchAll();
+}
 
+void Core::Scripting::ScriptManager::update()
+{
+   m_nativeScriptManager->processLoadQueue();
 }
 
 bool Core::Scripting::ScriptManager::init()
@@ -42,14 +52,55 @@ bool Core::Scripting::ScriptManager::init()
    loadDir( g_serverZone.getConfig()->getValue< std::string >( "Settings.General.Scripts.Path", "./compiledscripts/" ),
             files, m_nativeScriptManager->getModuleExtension() );
 
+   uint32_t scriptsFound = 0;
+   uint32_t scriptsLoaded = 0;
+
    for( auto itr = files.begin(); itr != files.end(); ++itr )
    {
       auto& path = *itr;
 
-      m_nativeScriptManager->loadScript( path );
+      scriptsFound++;
+
+      if( m_nativeScriptManager->loadScript( path ) )
+         scriptsLoaded++;
    }
 
+   g_log.info( "ScriptManager: Loaded " + std::to_string( scriptsLoaded ) + "/" + std::to_string( scriptsFound ) + " scripts successfully" );
+
+   watchDirectories();
+
    return true;
+}
+
+void Core::Scripting::ScriptManager::watchDirectories()
+{
+   Watchdog::watchMany( g_serverZone.getConfig()->getValue< std::string >( "Settings.General.Scripts.Path", "./compiledscripts/" ) + "*" + m_nativeScriptManager->getModuleExtension(),
+   [ this ]( const std::vector< ci::fs::path >& paths )
+   {
+      if( !m_firstScriptChangeNotificiation )
+      {
+         // for whatever reason, the first time this runs, it detects every file as changed
+         // so we're always going to ignore the first notification
+         m_firstScriptChangeNotificiation = true;
+         return;
+      }
+
+      for( auto path : paths )
+      {
+         if( m_nativeScriptManager->isModuleLoaded( path.stem().string() ) )
+         {
+            g_log.debug( "Reloading changed script: " + path.stem().string() );
+
+            m_nativeScriptManager->reloadScript( path.stem().string() );
+         }
+         else
+         {
+            g_log.debug( "Loading new script: " + path.stem().string() );
+
+            m_nativeScriptManager->loadScript( path.string() );
+         }
+      }
+   });
 }
 
 void Core::Scripting::ScriptManager::loadDir( std::string dirname, std::set<std::string>& files, std::string ext )
@@ -59,7 +110,7 @@ void Core::Scripting::ScriptManager::loadDir( std::string dirname, std::set<std:
 
    boost::filesystem::path targetDir( dirname );
 
-   boost::filesystem::recursive_directory_iterator iter( targetDir ), eod;
+   boost::filesystem::directory_iterator iter( targetDir ), eod;
 
    BOOST_FOREACH( boost::filesystem::path const& i, make_pair( iter, eod ) )
    {

@@ -137,24 +137,41 @@ namespace Core {
       return m_loader.unloadScript( info );
    }
 
-   bool NativeScriptManager::reloadScript( const std::string& name )
+   void NativeScriptManager::reloadScript( const std::string &name )
    {
       auto info = m_loader.getScriptInfo( name );
       if( !info )
-         return false;
+         return;
 
       // backup actual lib path
       std::string libPath( info->library_path );
 
       if( !unloadScript( info ) )
-         return false;
+         return;
 
-      return loadScript( libPath );
+      m_scriptLoadQueue.push( libPath );
+   }
+
+   void NativeScriptManager::processLoadQueue()
+   {
+      while( !m_scriptLoadQueue.empty() )
+      {
+         auto item = m_scriptLoadQueue.front();
+
+         loadScript( item );
+
+         m_scriptLoadQueue.pop();
+      }
    }
 
    void NativeScriptManager::findScripts( std::set< Core::Scripting::ScriptInfo* >& scripts, const std::string& search )
    {
       return m_loader.findScripts( scripts, search );
+   }
+
+   bool NativeScriptManager::isModuleLoaded( const std::string &name )
+   {
+      return m_loader.isModuleLoaded( name );
    }
 
 

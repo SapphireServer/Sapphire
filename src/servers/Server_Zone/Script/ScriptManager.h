@@ -22,12 +22,18 @@ namespace Core
          std::function< std::string( Entity::Player& ) > m_onFirstEnterWorld;
         // auto fn = m_pChaiHandler->eval< std::function<const std::string( Entity::Player ) > >( "onFirstEnterWorld" );
 
+         bool m_firstScriptChangeNotificiation;
+
       public:
          ScriptManager();
          ~ScriptManager();
 
          bool init();
          void reload();
+
+         void update();
+
+         void watchDirectories();
 
          void onPlayerFirstEnterWorld( Entity::Player& player );
 
