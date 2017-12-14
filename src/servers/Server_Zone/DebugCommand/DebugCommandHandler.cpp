@@ -594,10 +594,10 @@ void Core::DebugCommandHandler::script( char* data, Entity::Player &player, boos
       if( subCommand == params )
          player.sendDebug( "Command failed: requires name of script to reload" );
       else
-         if( g_scriptMgr.getNativeScriptHandler().reloadScript( params ) )
-            player.sendDebug( "Reloaded '" + params + "' successfully" );
-         else
-            player.sendDebug( "Failed to reload '" + params + "'" );
+      {
+         g_scriptMgr.getNativeScriptHandler().reloadScript( params );
+         player.sendDebug( "Attempting to reload script: " + params );
+      }
    }
    else if( subCommand == "build" || subCommand == "b" )
    {

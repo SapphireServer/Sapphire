@@ -14,6 +14,7 @@
 
       	<HotSwap>
       		<Enabled>1</Enabled>
+            <ScriptsDir>../scripts/native/</ScriptsDir>
       		<BuildDir>../cmake-build-debug/</BuildDir>
       		<BuildCmd>cmake --build %1% --target %2%</BuildCmd>
       	</HotSwap>

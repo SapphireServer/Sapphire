@@ -5,6 +5,7 @@
 #include <Forwards.h>
 #include <Actor/Actor.h>
 #include <Actor/Player.h>
+#include <Event/EventHelper.h>
 
 
 #endif //SAPPHIRE_SCRIPTOBJECT_H

@@ -62,12 +62,17 @@ Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::loadModule( const st
    fs::create_directories( cacheDir );
    fs::path dest( cacheDir /= f.filename().string() );
 
-   if ( fs::exists( dest ) )
+   try
    {
-      fs::remove( dest );
+      fs::copy_file( f, dest, fs::copy_option::overwrite_if_exists );
+   }
+   catch( const boost::filesystem::filesystem_error& err )
+   {
+      g_log.error( "Error copying file to cache: " + err.code().message() );
+
+      return nullptr;
    }
 
-   fs::copy_file( f, dest );
 
 #ifdef _WIN32
    ModuleHandle handle = LoadLibrary( dest.string().c_str() );
@@ -82,7 +87,7 @@ Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::loadModule( const st
       return nullptr;
    }
 
-   g_log.info( "Loaded module '" + f.filename().string() + "' @ 0x" + boost::str( boost::format( "%|08X|" ) % handle ) );
+   g_log.debug( "Loaded module '" + f.filename().string() + "' @ 0x" + boost::str( boost::format( "%|08X|" ) % handle ) );
 
    auto info = new ScriptInfo;
    info->handle = handle;
