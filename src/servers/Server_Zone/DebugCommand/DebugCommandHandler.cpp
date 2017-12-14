@@ -595,7 +595,7 @@ void Core::DebugCommandHandler::script( char* data, Entity::Player &player, boos
          player.sendDebug( "Command failed: requires name of script to reload" );
       else
       {
-         g_scriptMgr.getNativeScriptHandler( ).queueScriptReload( params );
+         g_scriptMgr.getNativeScriptHandler().queueScriptReload( params );
          player.sendDebug( "Queued script reload for script: " + params );
       }
    }
