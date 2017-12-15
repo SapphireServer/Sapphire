@@ -71,7 +71,7 @@ private:
       memcpy( m_data.howto, player.getHowToArray(), sizeof( m_data.howto ) );
 
       // possibly max level or current level
-      m_data.unknown1A = 0x46;
+      m_data.maxLevel = 0x46;
       m_data.expansion = 2;
 
    };
