@@ -42,11 +42,9 @@ private:
       m_data.namedayMonth = player.getBirthMonth();
       m_data.namedayDay = player.getBirthDay();
       // TODO: Support grand company status.
-      m_data.grandCompany = static_cast< Common::GrandCompany >( player.getGc() );
+      m_data.cityState = player.getStartTown();
       //m_data.gcRank = GCRank::None;
 
-      // TODO: Support starting city.
-      //m_data.startCity = Town::Gridania;
       m_data.homepoint = player.getHomepoint();
 
       memset( &m_data.name[0], 0, sizeof( m_data.name ) );
@@ -72,15 +70,9 @@ private:
 
       memcpy( m_data.howto, player.getHowToArray(), sizeof( m_data.howto ) );
 
-      m_data.unknown_13 = 0x46;
+      // possibly max level or current level
+      m_data.unknown1A = 0x46;
       m_data.expansion = 2;
-
-      //memset( m_data.unlockBitmask, 0xFF, sizeof( m_data.unlockBitmask )  );
-      //memset( m_data.unknown_0344, 0xFF, sizeof( m_data.unknown_0344 ) );
-      //memset( m_data.unknown_F4, 0xFF, sizeof( m_data.unknown_F4 ) );
-      //m_data.pos.x = player->getPos().getX();
-      //m_data.pos.y = player->getPos().getY();
-      //m_data.pos.z = player->getPos().getZ();
 
    };
 };

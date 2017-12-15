@@ -579,8 +579,8 @@ private:
    uint16_t m_activeTitle;
    uint8_t m_titleList[48];
    uint8_t m_howTo[33];
-   uint8_t m_minions[33];
-   uint8_t m_mountGuide[13];
+   uint8_t m_minions[35];
+   uint8_t m_mountGuide[14];
    uint8_t m_homePoint;
    uint8_t m_startTown;
    uint16_t m_townWarpFstFlags;
@@ -592,7 +592,7 @@ private:
    uint32_t m_expArray[25];
    uint8_t m_aetheryte[16];
    uint8_t m_unlocks[64];
-   uint8_t m_orchestrion[38];
+   uint8_t m_orchestrion[40];
 
    uint8_t m_openingSequence;
 
