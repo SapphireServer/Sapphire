@@ -437,6 +437,16 @@ void Core::Entity::Player::updateDbClass() const
    g_charaDb.execute( stmtS );
 }
 
+void Core::Entity::Player::insertDbClass( const uint8_t classJobIndex ) const
+{
+   auto stmtClass = g_charaDb.getPreparedStatement( Db::CHARA_CLASS_INS );
+   stmtClass->setInt( 1, getId() );
+   stmtClass->setInt( 2, classJobIndex );
+   stmtClass->setInt( 3, 0 );
+   stmtClass->setInt( 4, 1 );
+   g_charaDb.directExecute( stmtClass );
+}
+
 void Core::Entity::Player::updateDbSearchInfo() const
 {
    auto stmtS = g_charaDb.getPreparedStatement( Db::CHARA_SEARCHINFO_UP_SELECTCLASS );
