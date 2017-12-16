@@ -120,7 +120,6 @@ void Core::Scripting::ScriptManager::loadDir( const std::string& dirname, std::s
          files.insert( i.string() );
       }
    }
-
 }
 
 void Core::Scripting::ScriptManager::onPlayerFirstEnterWorld( Entity::Player& player )
@@ -185,7 +184,7 @@ bool Core::Scripting::ScriptManager::onTalk( Entity::Player& player, uint64_t ac
          auto questInfo = g_exdData.getQuestInfo( eventId );
          if ( questInfo )
          {
-            player.sendUrgent( "Quest not implemented: " + questInfo->name );
+            player.sendUrgent( "Quest not implemented: " + questInfo->name + " (" + questInfo->name_intern + ")" );
 
          }
       }
