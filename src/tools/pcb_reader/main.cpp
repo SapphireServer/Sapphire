@@ -20,6 +20,8 @@
 //#include <boost/algorithm/string.hpp>
 #endif
 
+std::string gamePath( "C:\\Program Files (x86)\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv" );
+
 using namespace std::chrono_literals;
 
 struct face
@@ -90,7 +92,7 @@ std::string zoneNameToPath( const std::string& name )
    if( inFile.good() )
    {
       std::string line;
-      std::regex re("(\\d+),\"(.*)\",\"(.*)\",.*");
+      std::regex re( "(\\d+),\"(.*)\",\"(.*)\",.*" );
       while( std::getline( inFile, line ) )
       {
          std::smatch match;
@@ -103,18 +105,19 @@ std::string zoneNameToPath( const std::string& name )
             }
          }
       }
+      inFile.close();
    }
    if( !path.empty() )
    {
       //path = path.substr( path.find_first_of( "/" ) + 1, path.size() - path.find_first_of( "/" ));
-      //path = std::string( "ffxiv/" ) + path; 
-      path = std::string( "bg" ) + path.substr( 0, path.find( "/level/" ) );
+      //path = std::string( "ffxiv/" ) + path;
+      path = std::string( "bg/" ) + path.substr( 0, path.find( "/level/" ) );
       std::cout << "[Info] " << "Found path for " << name << ": " << path << std::endl;
    }
    else
    {
       throw std::runtime_error( "Unable to find path for " + name +
-      ".\n\tPlease open 0a0000.win32.index with FFXIV Explorer and extract territorytype.exh as CSV\n\tand copy territorytype.exh.csv into pcb_reader.exe directory" );
+      ".\n\tPlease double check spelling or open 0a0000.win32.index with FFXIV Explorer and extract territorytype.exh as CSV\n\tand copy territorytype.exh.csv into pcb_reader.exe directory if using standalone" );
    }
    return path;
 }
@@ -142,7 +145,6 @@ int main( int argc, char* argv[] )
    auto startTime = std::chrono::system_clock::now();
 
    // todo: support expansions
-   std::string gamePath = "C:\\Program Files (x86)\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv";
    std::string zoneName = "r1f1";
 
    if( argc > 1 )
@@ -163,10 +165,9 @@ int main( int argc, char* argv[] )
       std::vector< char > section;
       std::vector< char > section1;
 
-      #ifndef STANDALONE
+#ifndef STANDALONE
       xiv::dat::GameData data1( gamePath );
       xiv::exd::ExdData eData( data1 );
-
       const xiv::dat::Cat& test = data1.get_category( "bg" );
 
       auto test_file = data1.get_file( bgLgbPath );
@@ -174,12 +175,12 @@ int main( int argc, char* argv[] )
 
       auto test_file1 = data1.get_file( listPcbPath );
       section1 = test_file1->access_data_sections().at( 0 );
-      #else
+#else
       {
          readFileToBuffer( bgLgbPath, section );
          readFileToBuffer( listPcbPath, section1 );
       }
-      #endif
+#endif
 
       int32_t list_offset = *( uint32_t* )&section[0x18];
       int32_t size = *( uint32_t* )&section[4];
@@ -235,15 +236,15 @@ int main( int argc, char* argv[] )
             {
                char* dataSection = nullptr;
                //std::cout << fileName << " ";
-               #ifndef STANDALONE
+#ifndef STANDALONE
                auto file = data1.get_file( fileName );
                auto sections = file->get_data_sections();
                dataSection = &sections.at( 0 )[0];
-               #else
+#else
                std::vector< char > buf;
                readFileToBuffer( fileName, buf );
                dataSection = &buf[0];
-               #endif
+#endif
                //std::cout << sections.size() << "\n";
 
                uint32_t offset = 0;
@@ -287,15 +288,15 @@ int main( int argc, char* argv[] )
             {
                char* dataSection = nullptr;
                //std::cout << fileName << " ";
-               #ifndef STANDALONE
+#ifndef STANDALONE
                auto file = data1.get_file( fileName );
                auto sections = file->get_data_sections();
                dataSection = &sections.at( 0 )[0];
-               #else
+#else
                std::vector< char > buf;
                readFileToBuffer( fileName, buf );
                dataSection = &buf[0];
-               #endif
+#endif
                sgbFile = SGB_FILE( &dataSection[0] );
                sgbFiles.insert( std::make_pair( fileName, sgbFile ) );
                return true;
