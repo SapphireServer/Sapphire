@@ -133,7 +133,7 @@ public:
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
-      auto actor = Event::mapEventActorToRealActor( actorId );
+      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
       if( actor == ACTOR0 )
          Scene00000( player );
