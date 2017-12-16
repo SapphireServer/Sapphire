@@ -24,7 +24,7 @@ foreach(_sourcefile ${SCRIPT_FILES})
 
     if(MSVC)
         set_source_files_properties("${_file}" PROPERTIES
-            COMPILE_FLAGS "/Yc${CMAKE_CURRENT_SOURCE_DIR}/ScriptObject.h"
+            COMPILE_FLAGS "/YuScriptObject.h"
         )
         set_target_properties(${_file} PROPERTIES
             CXX_STANDARD 14
