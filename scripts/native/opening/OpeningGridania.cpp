@@ -40,17 +40,17 @@ public:
 
    void Scene00001( Entity::Player& player )
    {
-      player.eventPlay( getId(), 1, 0x2001, 1, 0x32 );
+      player.eventPlay( getId(), 1, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 1, 0x32 );
    }
 
    void Scene00020( Entity::Player& player )
    {
-      player.eventPlay( getId(), 20, 0x2001, 0, 1 );
+      player.eventPlay( getId(), 20, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 0, 1 );
    }
 
    void Scene00030( Entity::Player& player )
    {
-      player.eventPlay( getId(), 30, 0x2001, 0, 0 );
+      player.eventPlay( getId(), 30, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 0, 0 );
    }
 
    void Scene00040( Entity::Player& player )
