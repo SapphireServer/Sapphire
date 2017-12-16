@@ -6,7 +6,7 @@
 
 class OpeningLimsa : public EventScript
 {
-private:;
+private:
    static constexpr auto ERANGE_HOWTO_ANN_AND_QUEST = 4101831;
    static constexpr auto ERANGE_HOWTO_QUEST_REWARD = 4102066;
    static constexpr auto ERANGE_SEQ_1_CLOSED_1 = 4101785;
