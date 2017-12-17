@@ -1136,8 +1136,8 @@ struct FFXIVIpcQuestActiveList : FFXIVIpcBasePacket<QuestActiveList>
 */
 struct FFXIVIpcQuestUpdate : FFXIVIpcBasePacket<QuestUpdate>
 {
-   /* 0000 */ uint8_t slot;
-   /* 0001 */ uint8_t padding[3];
+   uint16_t slot;
+   uint16_t padding;
    Common::QuestActive questInfo;
 };
 
