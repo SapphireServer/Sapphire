@@ -128,7 +128,7 @@ void readFileToBuffer( const std::string& path, std::vector< char >& buf )
    if( inFile.good() )
    {
       inFile.seekg( 0, inFile.end );
-      int32_t fileSize = inFile.tellg();
+      int32_t fileSize = (int32_t)inFile.tellg();
       buf.resize( fileSize );
       inFile.seekg( 0, inFile.beg );
       inFile.read( &buf[0], fileSize );

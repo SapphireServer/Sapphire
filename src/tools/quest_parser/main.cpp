@@ -1,39 +1,42 @@
-
-#include <GameData.h>
-#include <File.h>
-#include <DatCat.h>
-#include <ExdData.h>
-#include <ExdCat.h>
-#include <Exd.h>
+#include <cstdint>
+#include <fstream>
 #include <iostream>
+#include <locale>
 #include <set>
-#include <src/servers/Server_Common/Exd/ExdData.h>
-#include <src/servers/Server_Common/Logging/Logger.h>
+#include <string>
+
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 
-#include <locale>
-#include <fstream>
+#include <Exd.h>
+#include <ExdCat.h>
+#include <ExdData.h>
+#include <File.h>
+#include <GameData.h>
+#include <DatCat.h>
+
+#include <src/servers/Server_Common/Exd/ExdData.h>
+#include <src/servers/Server_Common/Logging/Logger.h>
 
 
 Core::Logger g_log;
 Core::Data::ExdData g_exdData;
 
 const std::string onTalkStr(
-   "   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId )\n"
+   "   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override\n"
    "   {\n"
    "      auto actor = Core::Event::mapEventActorToRealActor( actorId );\n"
    "   }\n\n"
 );
 
 const std::string onWithinRangeStr(
-   "   void onWithinRange( uint32_t eventId, Entity::Player& player, uint64_t eRangeId, float x, float y, float z )\n"
+   "   void onWithinRange( uint32_t eventId, Entity::Player& player, uint64_t eRangeId, float x, float y, float z ) override\n"
    "   {\n"
    "   }\n\n"
 );
 
 const std::string onEmoteStr(
-   "   void onEmote( uint32_t eventId, Entity::Player& player, uint64_t actorId, uint32_t emoteId )\n"
+   "   void onEmote( uint32_t eventId, Entity::Player& player, uint64_t actorId, uint32_t emoteId ) override\n"
    "   {\n"
    "   }\n\n"
 );
@@ -242,12 +245,12 @@ void createScript( boost::shared_ptr< Core::Data::QuestInfo >& pQuestData, std::
 
    if( hasERange )
    {
-     scriptEntry += onWithinRangeStr;
+      scriptEntry += onWithinRangeStr;
    }
 
    if( hasEmote )
    {
-     scriptEntry += onEmoteStr;
+      scriptEntry += onEmoteStr;
    }
 
    for( auto enemy : enemy_ids )
@@ -276,8 +279,9 @@ void createScript( boost::shared_ptr< Core::Data::QuestInfo >& pQuestData, std::
       "{\n" +
       constructor +
       "\n" +
-      sceneStr +
       scriptEntry +
+      "   private:\n" +
+      sceneStr +
       "};\n\n"
    );
 
