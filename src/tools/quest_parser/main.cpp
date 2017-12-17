@@ -25,7 +25,7 @@ Core::Data::ExdData g_exdData;
 const std::string onTalkStr(
    "   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override\n"
    "   {\n"
-   "      auto actor = Core::Event::mapEventActorToRealActor( actorId );\n"
+   "      auto actor = Event::mapEventActorToRealActor( actorId );\n"
    "   }\n\n"
 );
 
