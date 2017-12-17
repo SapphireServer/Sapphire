@@ -23,7 +23,6 @@
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/ChatPacket.h"
 #include "Network/PacketWrappers/ModelEquipPacket.h"
-#include "Network/PacketWrappers/ActorSpawnPacket.h"
 #include "Network/PacketWrappers/UpdateHpMpTpPacket.h"
 #include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
 #include "Network/PacketWrappers/PlayerSpawnPacket.h"
