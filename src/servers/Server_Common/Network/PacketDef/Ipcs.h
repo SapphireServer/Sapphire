@@ -107,7 +107,7 @@ namespace Packets {
 
       EventLinkshell             = 0x1169,
 
-      QuestMessage               = 0x0179,
+      QuestMessage               = 0x0188, // updated 4.1
       QuestActiveList            = 0x017D, // updated 4.1
       QuestUpdate                = 0x017E, // updated 4.1
       QuestCompleteList          = 0x017F, // updated 4.1
