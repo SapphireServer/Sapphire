@@ -7,7 +7,7 @@ file(GLOB SERVER_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}*.c*")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_CURRENT_SOURCE_DIR}/../../../bin/")
 add_executable(server_rest ${SERVER_PUBLIC_INCLUDE_FILES} ${SERVER_SOURCE_FILES})
-add_dependencies(server_rest Common xivdat)
+add_dependencies(server_rest common xivdat)
 
 set_target_properties(server_rest PROPERTIES
     CXX_STANDARD 14
@@ -21,12 +21,12 @@ set_target_properties(server_rest PROPERTIES
 )
 
 if (UNIX)
-  target_link_libraries (server_rest Common xivdat pthread mysqlclient mysqlConnector dl z)
+  target_link_libraries (server_rest common xivdat pthread mysqlclient mysqlConnector dl z)
 else()
   # ignore unchecked iterators warnings from msvc
   add_definitions(-D_SCL_SECURE_NO_WARNINGS)
 
-  target_link_libraries (server_rest Common xivdat libmysql mysqlConnector zlib1)
+  target_link_libraries (server_rest common xivdat libmysql mysqlConnector zlib1)
 
 endif()
 

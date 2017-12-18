@@ -1,6 +1,6 @@
 #include "PacketContainer.h"
 #include "GamePacket.h"
-#include "src/servers/Server_Common/Common.h"
+#include <common/Common.h>
 
 #include <boost/format.hpp>
 

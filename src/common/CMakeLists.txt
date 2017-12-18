@@ -7,7 +7,7 @@ file(GLOB UTILS_PUBLIC_INCLUDE_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}"
         "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 file(GLOB UTILS_SOURCE_FILES
-        "${CMAKE_CURRENT_SOURCE_DIR}*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Config/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Crypt/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Database/*.cpp"
@@ -17,12 +17,13 @@ file(GLOB UTILS_SOURCE_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/Network/PacketDef/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Script/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Util/*.cpp")
+      
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_library(Common ${UTILS_PUBLIC_INCLUDE_FILES} ${UTILS_SOURCE_FILES})
+add_library(common ${UTILS_PUBLIC_INCLUDE_FILES} ${UTILS_SOURCE_FILES})
 
-set_target_properties(Common PROPERTIES
+set_target_properties(common PROPERTIES
     CXX_STANDARD 14
     CXX_STANDARD_REQUIRED ON
     CXX_EXTENSIONS ON
@@ -33,7 +34,7 @@ set_target_properties(Common PROPERTIES
 )
 
 if (UNIX)
-  target_link_libraries( Common xivdat mysqlclient mysqlConnector )
+  target_link_libraries( common xivdat mysqlclient mysqlConnector )
 else()
-  target_link_libraries( Common xivdat mysqlConnector libmysql )
+  target_link_libraries( common xivdat mysqlConnector libmysql )
 endif()

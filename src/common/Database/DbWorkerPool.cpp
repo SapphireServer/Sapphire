@@ -7,7 +7,7 @@
 #include "CharaDbConnection.h"
 #include <boost/make_shared.hpp>
 
-#include <Server_Common/Logging/Logger.h>
+#include <common/Logging/Logger.h>
 extern Core::Logger g_log;
 
 class PingOperation : public Core::Db::Operation

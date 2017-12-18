@@ -1,6 +1,6 @@
-#include "src/servers/Server_Common/Network/Hive.h"
+#include <common/Network/Hive.h>
 #include "Acceptor.h"
-#include "src/servers/Server_Common/Network/Connection.h"
+#include <common/Network/Connection.h>
 #include <boost/interprocess/detail/atomic.hpp>
 #include <boost/bind.hpp>
 
