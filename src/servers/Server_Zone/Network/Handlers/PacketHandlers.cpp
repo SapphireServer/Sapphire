@@ -1,11 +1,11 @@
-#include <Server_Common/Common.h>
-#include <Server_Common/Network/CommonNetwork.h>
-#include <Server_Common/Network/GamePacketNew.h>
-#include <Server_Common/Logging/Logger.h>
-#include <Server_Common/Exd/ExdData.h>
-#include <Server_Common/Network/PacketContainer.h>
-#include <Server_Common/Network/PacketDef/Chat/ServerChatDef.h>
-#include <Server_Common/Database/DatabaseDef.h>
+#include <common/Common.h>
+#include <common/Network/CommonNetwork.h>
+#include <common/Network/GamePacketNew.h>
+#include <common/Logging/Logger.h>
+#include <common/Exd/ExdData.h>
+#include <common/Network/PacketContainer.h>
+#include <common/Network/PacketDef/Chat/ServerChatDef.h>
+#include <common/Database/DatabaseDef.h>
 
 #include <boost/format.hpp>
 

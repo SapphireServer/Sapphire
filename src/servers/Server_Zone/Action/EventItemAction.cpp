@@ -1,8 +1,8 @@
 #include "EventItemAction.h"
 
-#include <Server_Common/Util/Util.h>
-#include <Server_Common/Util/UtilMath.h>
-#include <Server_Common/Logging/Logger.h>
+#include <common/Util/Util.h>
+#include <common/Util/UtilMath.h>
+#include <common/Logging/Logger.h>
 
 #include <string.h>
 

@@ -9,7 +9,7 @@
 #include <boost/make_shared.hpp>
 #include <boost/filesystem.hpp>
 
-#include <Server_Common/Crypt/md5.h>
+#include <common/Crypt/md5.h>
 
 #include "ScriptLoader.h"
 

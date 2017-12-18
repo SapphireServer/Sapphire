@@ -1,7 +1,7 @@
 #include "LinkshellMgr.h"
-#include <Server_Common/Logging/Logger.h>
 #include <boost/make_shared.hpp>
-#include <servers/Server_Common/Database/DatabaseDef.h>
+#include <common/Logging/Logger.h>
+#include <common/Database/DatabaseDef.h>
 
 #include "Linkshell.h"
 

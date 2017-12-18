@@ -1,7 +1,7 @@
 #ifndef _GAMECOMMAND_H_
 #define _GAMECOMMAND_H_
 
-#include <Server_Common/Common.h>
+#include <common/Common.h>
 
 #include "Actor/Player.h"
 #include "Forwards.h"

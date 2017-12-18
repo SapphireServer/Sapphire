@@ -1,7 +1,7 @@
 #include <cmath>
 
-#include <Server_Common/Exd/ExdData.h>
-#include <Server_Common/Common.h>
+#include <common/Exd/ExdData.h>
+#include <common/Common.h>
 #include "Actor/Actor.h"
 #include "Actor/Player.h"
 #include "CalcBattle.h"

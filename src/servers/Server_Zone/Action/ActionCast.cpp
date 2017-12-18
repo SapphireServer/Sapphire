@@ -1,10 +1,10 @@
 #include "ActionCast.h"
 
-#include <Server_Common/Common.h>
-#include <Server_Common/Util/Util.h>
-#include <Server_Common/Util/UtilMath.h>
-#include <Server_Common/Exd/ExdData.h>
-#include <Server_Common/Logging/Logger.h>
+#include <common/Common.h>
+#include <common/Util/Util.h>
+#include <common/Util/UtilMath.h>
+#include <common/Exd/ExdData.h>
+#include <common/Logging/Logger.h>
 
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"

@@ -4,10 +4,10 @@
 #include <stdint.h>
 #include <cmath>
 
-#include <Server_Common/Logging/Logger.h>
-#include <Server_Common/Exd/ExdData.h>
-#include <Server_Common/Util/Util.h>
-#include <Server_Common/Util/UtilMath.h>
+#include <common/Logging/Logger.h>
+#include <common/Exd/ExdData.h>
+#include <common/Util/Util.h>
+#include <common/Util/UtilMath.h>
 
 #include "Player.h"
 #include "BattleNpc.h"

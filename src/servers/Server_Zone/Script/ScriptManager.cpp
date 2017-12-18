@@ -1,5 +1,6 @@
-#include <Server_Common/Logging/Logger.h>
-#include <Server_Common/Exd/ExdData.h>
+#include <common/Logging/Logger.h>
+#include <common/Exd/ExdData.h>
+#include <common/Config/XMLConfig.h>
 
 #include "NativeScriptManager.h"
 
@@ -19,7 +20,6 @@
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
 
-#include <Server_Common/Config/XMLConfig.h>
 
 // enable the ambiguity fix for every platform to avoid #define nonsense
 #define WIN_AMBIGUITY_FIX

@@ -1,10 +1,10 @@
 #include "PlayerMinimal.h"
 
-#include <Server_Common/Util/Util.h>
-#include <Server_Common/Common.h>
-#include <Server_Common/Exd/ExdData.h>
+#include <common/Util/Util.h>
+#include <common/Common.h>
+#include <common/Exd/ExdData.h>
 
-#include <Server_Common/Database/DatabaseDef.h>
+#include <common/Database/DatabaseDef.h>
 
 extern Core::Data::ExdData g_exdData;
 

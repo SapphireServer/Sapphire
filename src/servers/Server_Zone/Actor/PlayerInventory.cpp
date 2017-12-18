@@ -1,7 +1,7 @@
-#include <Server_Common/Common.h>
-#include <Server_Common/Exd/ExdData.h>
-#include <Server_Common/Network/GamePacket.h>
-#include <Server_Common/Logging/Logger.h>
+#include <common/Common.h>
+#include <common/Exd/ExdData.h>
+#include <common/Network/GamePacket.h>
+#include <common/Logging/Logger.h>
 
 #include "Player.h"
 

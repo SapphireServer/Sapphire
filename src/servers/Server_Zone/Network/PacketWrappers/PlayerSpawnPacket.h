@@ -1,9 +1,9 @@
 #ifndef _PLAYERSPAWN_H
 #define _PLAYERSPAWN_H
 
-#include <Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
-#include <Server_Common/Network/GamePacketNew.h>
-#include <Server_Common/Util/UtilMath.h>
+#include <common/Network/PacketDef/Zone/ServerZoneDef.h>
+#include <common/Network/GamePacketNew.h>
+#include <common/Util/UtilMath.h>
 #include "Actor/Player.h"
 #include "Forwards.h"
 #include "Inventory/Inventory.h"

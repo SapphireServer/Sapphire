@@ -10,7 +10,7 @@
 #include <cctype>
 #include <set>
 #include "ExdDataGenerated.h"
-#include <src/servers/Server_Common/Logging/Logger.h>
+#include <common/Logging/Logger.h>
 #include <boost/range/algorithm/remove_if.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/shared_ptr.hpp>

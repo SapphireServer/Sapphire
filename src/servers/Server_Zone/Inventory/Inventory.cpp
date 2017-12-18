@@ -1,7 +1,8 @@
-#include <Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
-#include <Server_Common/Common.h>
-#include <Server_Common/Exd/ExdData.h>
-#include <Server_Common/Logging/Logger.h>
+#include <common/Network/PacketDef/Zone/ServerZoneDef.h>
+#include <common/Common.h>
+#include <common/Exd/ExdData.h>
+#include <common/Logging/Logger.h>
+#include <common/Database/DatabaseDef.h>
 
 #include "Inventory.h"
 
@@ -18,7 +19,6 @@
 #include "../Forwards.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 
-#include <Server_Common/Database/DatabaseDef.h>
 
 extern Core::Logger g_log;
 extern Core::Data::ExdData g_exdData;

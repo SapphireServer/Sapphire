@@ -6,8 +6,7 @@
 #include <mutex>
 #include <string>
 #include <vector>
-#include "src/servers/Server_Common/Util/LockedWaitQueue.h"
-#include <Server_Common/Util/LockedWaitQueue.h>
+#include <common/Util/LockedWaitQueue.h>
 #include <boost/scoped_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 

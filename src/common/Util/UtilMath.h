@@ -1,7 +1,7 @@
 #ifndef _UTILMATH_H
 #define _UTILMATH_H
 
-#include "src/servers/Server_Common/Common.h"
+#include <common/Common.h>
 
 #define PI 3.14159265358979323846f
 

@@ -3,7 +3,7 @@
 
 #include "Forwards.h"
 
-#include <Server_Common/Common.h>
+#include <common/Common.h>
 
 #include "Actor.h"
 #include "Inventory/Inventory.h"

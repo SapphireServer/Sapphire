@@ -1,11 +1,11 @@
-#include <Server_Common/Common.h>
-#include <Server_Common/Util/Util.h>
-#include <Server_Common/Util/UtilMath.h>
-#include <Server_Common/Config/XMLConfig.h>
-#include <Server_Common/Network/GamePacket.h>
-#include <Server_Common/Logging/Logger.h>
-#include <Server_Common/Exd/ExdData.h>
-#include <Server_Common/Network/PacketContainer.h>
+#include <common/Common.h>
+#include <common/Util/Util.h>
+#include <common/Util/UtilMath.h>
+#include <common/Config/XMLConfig.h>
+#include <common/Network/GamePacket.h>
+#include <common/Logging/Logger.h>
+#include <common/Exd/ExdData.h>
+#include <common/Network/PacketContainer.h>
 
 #include "Session.h"
 #include "Player.h"

@@ -1,12 +1,12 @@
-#include <Server_Common/Util/Util.h>
-#include <Server_Common/Logging/Logger.h>
-#include <Server_Common/Exd/ExdData.h>
+#include <common/Util/Util.h>
+#include <common/Logging/Logger.h>
+#include <common/Exd/ExdData.h>
 
 #include "EventAction.h"
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
-#include "Server_Zone/Actor/Player.h"
-#include "Server_Zone/Event/Event.h"
+#include "Actor/Player.h"
+#include "Event/Event.h"
 
 extern Core::Logger g_log;
 extern Core::Data::ExdData g_exdData;

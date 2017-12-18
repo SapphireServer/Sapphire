@@ -1,11 +1,11 @@
 #ifndef GAMECONNECTION_H
 #define GAMECONNECTION_H
 
-#include <Server_Common/Network/Connection.h>
-#include <Server_Common/Network/Acceptor.h>
-#include <Server_Common/Network/CommonNetwork.h>
-#include <Server_Common/Network/GamePacket.h>
-#include <Server_Common/Util/LockedQueue.h>
+#include <common/Network/Connection.h>
+#include <common/Network/Acceptor.h>
+#include <common/Network/CommonNetwork.h>
+#include <common/Network/GamePacket.h>
+#include <common/Util/LockedQueue.h>
 
 #include "Forwards.h"
 

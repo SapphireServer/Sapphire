@@ -1,7 +1,7 @@
 #ifndef _CORE_NETWORK_PACKETS_PINGPACKET_H
 #define _CORE_NETWORK_PACKETS_PINGPACKET_H
 
-#include <Server_Common/Network/GamePacketNew.h>
+#include <common/Network/GamePacketNew.h>
 
 #include "Forwards.h"
 

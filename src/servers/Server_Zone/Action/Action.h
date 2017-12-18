@@ -1,10 +1,11 @@
 #ifndef _ACTION_H_
 #define _ACTION_H_
 
-#include <Server_Common/Common.h>
+#include <common/Common.h>
 #include "../Forwards.h"
 
-namespace Core { namespace Action {
+namespace Core {
+namespace Action {
 
    class Action 
    {

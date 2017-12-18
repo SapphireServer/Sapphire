@@ -6,7 +6,7 @@
 #include <map>
 
 #include <boost/shared_ptr.hpp>
-#include <src/servers/Server_Common/Config/XMLConfig.h>
+#include <common/Config/XMLConfig.h>
 
 #include "Forwards.h"
 

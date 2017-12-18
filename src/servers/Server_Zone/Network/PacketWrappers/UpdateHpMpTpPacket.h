@@ -1,7 +1,7 @@
 #ifndef _UPDATEHPMPTP_H
 #define _UPDATEHPMPTP_H
 
-#include <Server_Common/Network/GamePacketNew.h>
+#include <common/Network/GamePacketNew.h>
 #include <Actor/Actor.h>
 #include "Forwards.h"
 

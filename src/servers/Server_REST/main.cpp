@@ -6,21 +6,20 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
-#include <src/servers/Server_Common/Logging/Logger.h>
-#include <src/servers/Server_Common/Config/XMLConfig.h>
+#include <common/Logging/Logger.h>
+#include <common/Config/XMLConfig.h>
 
-#include <src/servers/Server_Common/Network/Connection.h>
-#include <src/servers/Server_Common/Network/Hive.h>
-#include <src/servers/Server_Common/Network/Acceptor.h>
+#include <common/Network/Connection.h>
+#include <common/Network/Hive.h>
+#include <common/Network/Acceptor.h>
 
-#include <src/servers/Server_Common/Exd/ExdData.h>
-#include <src/servers/Server_Common/Crypt/base64.h>
+#include <common/Exd/ExdData.h>
+#include <common/Crypt/base64.h>
 
-
-#include <Server_Common/Database/DbLoader.h>
-#include <Server_Common/Database/CharaDbConnection.h>
-#include <Server_Common/Database/DbWorkerPool.h>
-#include <Server_Common/Database/PreparedStatement.h>
+#include <common/Database/DbLoader.h>
+#include <common/Database/CharaDbConnection.h>
+#include <common/Database/DbWorkerPool.h>
+#include <common/Database/PreparedStatement.h>
 
 //Added for the default_resource example
 #include <fstream>

@@ -9,7 +9,7 @@
 #include <list>
 #include <boost/cstdint.hpp>
 
-#include "src/servers/Server_Common/Forwards.h"
+#include <common/Forwards.h>
 #include "Acceptor.h"
 
 
