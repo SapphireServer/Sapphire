@@ -1,12 +1,13 @@
-#include <src/servers/Server_Common/Common.h>
-#include <src/servers/Server_Common/Network/CommonNetwork.h>
-#include <src/servers/Server_Common/Util/Util.h>
-#include <src/servers/Server_Common/Logging/Logger.h>
-#include <src/servers/Server_Common/Network/GamePacket.h>
-#include <src/servers/Server_Common/Network/GamePacketNew.h>
-#include <src/servers/Server_Common/Network/PacketDef/Lobby/ServerLobbyDef.h>
-#include "Server_Common/Network/GamePacketParser.h"
-#include <src/servers/Server_Common/Crypt/md5.h>
+#include <common/Common.h>
+#include <common/Network/CommonNetwork.h>
+#include <common/Util/Util.h>
+#include <common/Logging/Logger.h>
+#include <common/Network/GamePacket.h>
+#include <common/Network/GamePacketNew.h>
+#include <common/Network/PacketDef/Lobby/ServerLobbyDef.h>
+#include <common/Network/GamePacketParser.h>
+#include <common/Crypt/md5.h>
+#include <common/Crypt/blowfish.h>
 
 #include <boost/format.hpp>
 #include <boost/property_tree/ptree.hpp>
@@ -21,7 +22,6 @@
 #include "RestConnector.h"
 #include "LobbySession.h"
 #include "Forwards.h"
-#include "src/servers/Server_Common/Crypt/blowfish.h"
 
 
 

@@ -1,7 +1,7 @@
 #include "ScriptLoader.h"
 
-#include <Server_Common/Logging/Logger.h>
-#include <Server_Common/Config/XMLConfig.h>
+#include <common/Logging/Logger.h>
+#include <common/Config/XMLConfig.h>
 #include "ServerZone.h"
 
 #include <boost/format.hpp>

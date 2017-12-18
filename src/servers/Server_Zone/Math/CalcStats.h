@@ -1,7 +1,7 @@
 #ifndef _CALCSTATS_H
 #define _CALCSTATS_H
 
-#include <Server_Common/Common.h>
+#include <common/Common.h>
 #include "Actor/Actor.h"
 
 using namespace Core::Entity;

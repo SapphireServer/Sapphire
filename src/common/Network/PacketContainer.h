@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "src/servers/Server_Common/Common.h"
+#include <common/Common.h>
 #include "CommonNetwork.h"
 #include "GamePacket.h"
 

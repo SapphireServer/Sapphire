@@ -1,8 +1,8 @@
-#include <Server_Common/Util/Util.h>
-#include <Server_Common/Util/UtilMath.h>
-#include <Server_Common/Network/PacketContainer.h>
-#include <Server_Common/Exd/ExdData.h>
-#include <Server_Common/Network/GamePacket.h>
+#include <common/Util/Util.h>
+#include <common/Util/UtilMath.h>
+#include <common/Network/PacketContainer.h>
+#include <common/Exd/ExdData.h>
+#include <common/Network/GamePacket.h>
 
 #include "Forwards.h"
 #include "Action/Action.h"

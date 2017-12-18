@@ -1,8 +1,8 @@
-#include <Server_Common/Exd/ExdData.h>
-#include <Server_Common/Util/Util.h>
-#include <Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
-#include <Server_Common/Logging/Logger.h>
-#include <Server_Common/Exd/ExdData.h>
+#include <common/Exd/ExdData.h>
+#include <common/Util/Util.h>
+#include <common/Network/PacketDef/Zone/ServerZoneDef.h>
+#include <common/Logging/Logger.h>
+#include <common/Exd/ExdData.h>
 
 #include <boost/algorithm/string.hpp>
 #include <algorithm>

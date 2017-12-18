@@ -1,7 +1,7 @@
 #ifndef __GAMESERVER_H
 #define __GAMESERVER_H
 
-#include <Server_Common/Common.h>
+#include <common/Common.h>
 
 #include <boost/shared_ptr.hpp>
 #include <mutex>

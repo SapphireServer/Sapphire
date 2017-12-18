@@ -1,8 +1,8 @@
 #ifndef _CORE_NETWORK_PACKETS_INITUIPACKET_H
 #define _CORE_NETWORK_PACKETS_INITUIPACKET_H
 
-#include <Server_Common/Network/GamePacketNew.h>
-#include <Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
+#include <common/Network/GamePacketNew.h>
+#include <common/Network/PacketDef/Zone/ServerZoneDef.h>
 #include "Actor/Player.h"
 #include "Forwards.h"
 

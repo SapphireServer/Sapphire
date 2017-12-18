@@ -23,7 +23,7 @@ set(SAPPHIRE_BOOST_FOLDER_NAME boost_1_60_0)
 
 ##########################################################################
 # Common and library path
-set(SERVER_COMMON_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/servers/Server_Common")
+set(SERVER_COMMON_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/common")
 set(LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/libraries")
 
 ##########################################################################
@@ -38,8 +38,8 @@ include( "cmake/compiler.cmake" )
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 git_describe(VERSION --tags --dirty=-d)
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/servers/Server_Common/Version.cpp.in"
-               "${CMAKE_CURRENT_SOURCE_DIR}/src/servers/Server_Common/Version.cpp" @ONLY)
+configure_file("${SERVER_COMMON_DIR}/Version.cpp.in"
+               "${SERVER_COMMON_DIR}/Version.cpp" @ONLY)
 
 ##########################################################################
 # Common include folders
@@ -65,6 +65,6 @@ add_subdirectory("src/tools/exd_common_gen")
 add_subdirectory("src/tools/exd_struct_gen")
 add_subdirectory("src/tools/exd_struct_test")
 add_subdirectory("src/tools/quest_parser")
-add_subdirectory("src/tools/pcb_reader")
+#add_subdirectory("src/tools/pcb_reader")
 
 add_subdirectory("scripts/native")

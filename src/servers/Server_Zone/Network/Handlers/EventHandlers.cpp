@@ -1,8 +1,8 @@
-#include <Server_Common/Common.h>
-#include <Server_Common/Network/CommonNetwork.h>
-#include <Server_Common/Network/GamePacketNew.h>
-#include <Server_Common/Network/PacketContainer.h>
-#include <Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
+#include <common/Common.h>
+#include <common/Network/CommonNetwork.h>
+#include <common/Network/GamePacketNew.h>
+#include <common/Network/PacketContainer.h>
+#include <common/Network/PacketDef/Zone/ServerZoneDef.h>
 
 #include <boost/format.hpp>
 

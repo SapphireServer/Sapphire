@@ -1,12 +1,12 @@
-#include <src/servers/Server_Common/Logging/Logger.h>
-#include <src/servers/Server_Common/Exd/ExdData.h>
+#include <common/Logging/Logger.h>
+#include <common/Exd/ExdData.h>
+#include <common/Database/DatabaseDef.h>
 #include <boost/lexical_cast.hpp>
 
 #include "ZoneMgr.h"
 #include "Zone.h"
 #include "ZonePosition.h"
 
-#include <Server_Common/Database/DatabaseDef.h>
 
 extern Core::Logger g_log;
 extern Core::Data::ExdData g_exdData;

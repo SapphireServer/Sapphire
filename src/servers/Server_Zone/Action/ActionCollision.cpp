@@ -1,6 +1,6 @@
-#include <Server_Common/Util/Util.h>
-#include <Server_Common/Exd/ExdData.h>
-#include <Server_Common/Util/UtilMath.h>
+#include <common/Util/Util.h>
+#include <common/Exd/ExdData.h>
+#include <common/Util/UtilMath.h>
 
 #include "ActionCollision.h"
 #include "Actor/Actor.h"

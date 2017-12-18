@@ -1,7 +1,7 @@
 #include "LobbyPacketContainer.h"
-#include <src/servers/Server_Common/Network/GamePacket.h>
-#include <src/servers/Server_Common/Network/GamePacketNew.h>
-#include <src/servers/Server_Common/Crypt/blowfish.h>
+#include <common/Network/GamePacket.h>
+#include <common/Network/GamePacketNew.h>
+#include <common/Crypt/blowfish.h>
 
 namespace Core {
    namespace Network {

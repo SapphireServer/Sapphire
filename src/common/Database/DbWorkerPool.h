@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 #include <ResultSet.h>
-#include <Server_Common/Util/LockedWaitQueue.h>
+#include <common/Util/LockedWaitQueue.h>
 #include "DbConnection.h"
 namespace Core
 {

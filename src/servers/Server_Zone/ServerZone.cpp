@@ -1,22 +1,22 @@
 #include "ServerZone.h"
 
-#include <Server_Common/Version.h>
-#include <Server_Common/Logging/Logger.h>
-#include <Server_Common/Config/XMLConfig.h>
-#include <Server_Common/Version.h>
+#include <common/Version.h>
+#include <common/Logging/Logger.h>
+#include <common/Config/XMLConfig.h>
+#include <common/Version.h>
 
 #include <MySqlBase.h>
 #include <Connection.h>
 
-#include <Server_Common/Network/Connection.h>
-#include <Server_Common/Network/Hive.h>
+#include <common/Network/Connection.h>
+#include <common/Network/Hive.h>
 
-#include <Server_Common/Exd/ExdData.h>
-#include <Server_Common/Network/PacketContainer.h>
-#include <Server_Common/Database/DbLoader.h>
-#include <Server_Common/Database/CharaDbConnection.h>
-#include <Server_Common/Database/DbWorkerPool.h>
-#include <Server_Common/Database/PreparedStatement.h>
+#include <common/Exd/ExdData.h>
+#include <common/Network/PacketContainer.h>
+#include <common/Database/DbLoader.h>
+#include <common/Database/CharaDbConnection.h>
+#include <common/Database/DbWorkerPool.h>
+#include <common/Database/PreparedStatement.h>
 
 #include "Network/GameConnection.h"
 #include "Session.h"

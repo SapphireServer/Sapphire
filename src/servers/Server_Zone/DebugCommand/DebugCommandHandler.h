@@ -4,7 +4,7 @@
 #include <map>
 
 #include "DebugCommand.h"
-#include <Server_Common/Common.h>
+#include <common/Common.h>
 #include "Forwards.h"
 
 namespace Core {
