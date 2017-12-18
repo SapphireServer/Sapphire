@@ -1,7 +1,6 @@
-#include <stdint.h>
-
 #ifndef _MD52_H
 #define _MD52_H
+#include <stdint.h>
 
 namespace Core
 {

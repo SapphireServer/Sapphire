@@ -1,3 +1,5 @@
+#ifndef _BLOWFISH_H
+#define _BLOWFISH_H
 // blowfish.h     interface file for blowfish.cpp
 // _THE BLOWFISH ENCRYPTION ALGORITHM_
 // by Bruce Schneier
@@ -7,7 +9,7 @@
 #define MAXKEYBYTES 	56		// 448 bits max
 #define NPASS           16		// SBox passes
 
-#define DWORD  		uint32_t
+#define DWORD  	uint32_t
 #define WORD  		unsigned short
 #define BYTE  		uint8_t
 
@@ -69,4 +71,5 @@ public:
 	    uint32_t byte2:8;
 	  } w;
 };
+#endif
 #endif

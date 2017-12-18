@@ -1,3 +1,5 @@
+#include "GameConnection.h"
+
 #include <common/Common.h>
 #include <common/Network/CommonNetwork.h>
 #include <common/Util/Util.h>
@@ -9,21 +11,11 @@
 #include <common/Crypt/md5.h>
 #include <common/Crypt/blowfish.h>
 
-#include <boost/format.hpp>
-#include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
-#include <boost/foreach.hpp>
-
-#include "GameConnection.h"
 
 #include "ServerLobby.h"
-#include "LobbyPacketContainer.h"
-
 #include "RestConnector.h"
 #include "LobbySession.h"
-#include "Forwards.h"
-
-
 
 extern Core::Logger g_log;
 extern Core::ServerLobby g_serverLobby;
