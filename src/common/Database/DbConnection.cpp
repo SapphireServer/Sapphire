@@ -2,7 +2,7 @@
 #include "DbWorker.h"
 #include "src/libraries/sapphire/mysqlConnector/MySqlConnector.h"
 
-#include "src/servers/Server_Common/Logging/Logger.h"
+#include <common/Logging/Logger.h>
 #include "PreparedStatement.h"
 #include <boost/make_shared.hpp>
 
