@@ -6,10 +6,11 @@ file(GLOB SERVER_PUBLIC_INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*")
 file(GLOB SERVER_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}*.c*")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_CURRENT_SOURCE_DIR}/../../../bin/")
-add_executable(server_rest ${SERVER_PUBLIC_INCLUDE_FILES} ${SERVER_SOURCE_FILES})
-add_dependencies(server_rest common xivdat)
 
-set_target_properties(server_rest PROPERTIES
+add_executable(sapphire_lobby ${SERVER_PUBLIC_INCLUDE_FILES} ${SERVER_SOURCE_FILES})
+add_dependencies(sapphire_lobby common xivdat)
+
+set_target_properties(sapphire_lobby PROPERTIES
     CXX_STANDARD 14
     CXX_STANDARD_REQUIRED ON
     CXX_EXTENSIONS ON
@@ -21,13 +22,9 @@ set_target_properties(server_rest PROPERTIES
 )
 
 if (UNIX)
-  target_link_libraries (server_rest common xivdat pthread mysqlclient mysqlConnector dl z)
+  target_link_libraries(sapphire_lobby common xivdat pthread mysqlclient mysqlConnector dl z)
 else()
-  # ignore unchecked iterators warnings from msvc
-  add_definitions(-D_SCL_SECURE_NO_WARNINGS)
-
-  target_link_libraries (server_rest common xivdat libmysql mysqlConnector zlib1)
-
+  target_link_libraries(sapphire_lobby common xivdat libmysql mysqlConnector zlib1)
 endif()
 
-target_link_libraries( server_rest ${Boost_LIBRARIES} ${Boost_LIBRARIES} )
+target_link_libraries(sapphire_lobby ${Boost_LIBRARIES} ${Boost_LIBRARIES})

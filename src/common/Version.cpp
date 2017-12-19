@@ -3,7 +3,7 @@
 namespace Core { 
     namespace Version {
 
-    const std::string GIT_HASH = "4606e83d151f02fa17e98e832c01b3680987b5f5";
+    const std::string GIT_HASH = "232d9cd1addda0a363375b86054cc479fc69b2ef";
     const std::string VERSION = "-128-NOTFOUND";
 
    } /* Version */
