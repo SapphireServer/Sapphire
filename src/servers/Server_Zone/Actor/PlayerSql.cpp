@@ -378,7 +378,7 @@ void Core::Entity::Player::updateSql()
 
    std::vector< uint8_t > orchestrionVec( sizeof( m_orchestrion ) );
    memcpy( orchestrionVec.data(), m_orchestrion, sizeof( m_orchestrion ) );
-   stmt->setBinary( 42, mountsVec );
+   stmt->setBinary( 43, orchestrionVec );
 
    stmt->setInt( 44, 0 ); // EquippedMannequin
 
