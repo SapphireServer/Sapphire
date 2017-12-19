@@ -8,9 +8,9 @@
 
 #include "Network/PacketWrappers/QuestMessagePacket.h"
 
-#include "Server_Zone/Session.h"
+#include "Session.h"
+#include "Inventory/Inventory.h"
 #include "Player.h"
-#include "Server_Zone/Inventory/Inventory.h"
 
 extern Core::Data::ExdData g_exdData;
 
