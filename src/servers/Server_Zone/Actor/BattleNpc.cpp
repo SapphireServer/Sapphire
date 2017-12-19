@@ -4,18 +4,17 @@
 #include <stdint.h>
 #include <cmath>
 
-#include <src/servers/Server_Common/Logging/Logger.h>
-#include <src/servers/Server_Common/Exd/ExdData.h>
-#include <src/servers/Server_Common/Util/Util.h>
-#include <src/servers/Server_Common/Util/UtilMath.h>
+#include <Server_Common/Logging/Logger.h>
+#include <Server_Common/Exd/ExdData.h>
+#include <Server_Common/Util/Util.h>
+#include <Server_Common/Util/UtilMath.h>
 
 #include "Player.h"
 #include "BattleNpc.h"
 
-#include "src/servers/Server_Zone/Network/PacketWrappers/MoveActorPacket.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket142.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket143.h"
-#include "src/servers/Server_Zone/StatusEffect/StatusEffectContainer.h"
+#include "Network/PacketWrappers/MoveActorPacket.h"
+#include "Network/PacketWrappers/ActorControlPacket142.h"
+#include "Network/PacketWrappers/ActorControlPacket143.h"
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -40,7 +39,7 @@ Core::Entity::BattleNpc::~BattleNpc()
 
 Core::Entity::BattleNpc::BattleNpc( uint16_t modelId, uint16_t nameid, const Common::FFXIVARR_POSITION3& spawnPos,
                                     uint16_t bnpcBaseId, uint32_t type, uint8_t level, uint8_t behaviour,
-                                    uint32_t mobType )
+                                    uint32_t mobType ) : Actor()
 {
    BattleNpc::m_nextID++;
    m_id = BattleNpc::m_nextID;
@@ -87,13 +86,8 @@ Core::Entity::BattleNpc::BattleNpc( uint16_t modelId, uint16_t nameid, const Com
 
 }
 
-void Core::Entity::BattleNpc::initStatusEffectContainer()
-{
-   m_pStatusEffectContainer = StatusEffect::StatusEffectContainerPtr( new StatusEffect::StatusEffectContainer( shared_from_this() ) );
-}
-
 // spawn this player for pTarget
-void Core::Entity::BattleNpc::spawn( Core::Entity::PlayerPtr pTarget )
+void Core::Entity::BattleNpc::spawn( PlayerPtr pTarget )
 {
    //GamePacketNew< FFXIVIpcActorSpawn > spawnPacket( getId(), pTarget->getId() );
 
@@ -155,7 +149,7 @@ void Core::Entity::BattleNpc::spawn( Core::Entity::PlayerPtr pTarget )
 }
 
 // despawn
-void Core::Entity::BattleNpc::despawn( Core::Entity::ActorPtr pTarget )
+void Core::Entity::BattleNpc::despawn( ActorPtr pTarget )
 {
 
    auto pPlayer = pTarget->getAsPlayer();
@@ -177,7 +171,7 @@ Core::Entity::StateMode Core::Entity::BattleNpc::getMode() const
    return m_mode;
 }
 
-void Core::Entity::BattleNpc::setMode( Core::Entity::StateMode mode )
+void Core::Entity::BattleNpc::setMode( StateMode mode )
 {
    m_mode = mode;
 }
@@ -187,7 +181,7 @@ uint8_t Core::Entity::BattleNpc::getbehavior() const
    return m_behavior;
 }
 
-void Core::Entity::BattleNpc::hateListAdd( Core::Entity::ActorPtr pActor, int32_t hateAmount )
+void Core::Entity::BattleNpc::hateListAdd( ActorPtr pActor, int32_t hateAmount )
 {
    auto hateEntry = new HateListEntry();
    hateEntry->m_hateAmount = hateAmount;
@@ -217,7 +211,7 @@ Core::Entity::ActorPtr Core::Entity::BattleNpc::hateListGetHighest()
    return nullptr;
 }
 
-void Core::Entity::BattleNpc::setOwner( Core::Entity::PlayerPtr pPlayer )
+void Core::Entity::BattleNpc::setOwner( PlayerPtr pPlayer )
 {
    m_pOwner = pPlayer;
 
@@ -240,7 +234,7 @@ void Core::Entity::BattleNpc::setOwner( Core::Entity::PlayerPtr pPlayer )
 
 void Core::Entity::BattleNpc::sendPositionUpdate()
 {
-   MoveActorPacket movePacket( shared_from_this(), 0x3A, 0x00, 0, 0x5A );
+   MoveActorPacket movePacket( *this, 0x3A, 0x00, 0, 0x5A );
    sendToInRangeSet( movePacket );
 }
 
@@ -284,7 +278,7 @@ bool Core::Entity::BattleNpc::moveTo( Common::FFXIVARR_POSITION3& pos )
 
 }
 
-void Core::Entity::BattleNpc::aggro( Core::Entity::ActorPtr pActor )
+void Core::Entity::BattleNpc::aggro( ActorPtr pActor )
 {
 
    m_lastAttack = Util::getTimeMs();
@@ -302,7 +296,7 @@ void Core::Entity::BattleNpc::aggro( Core::Entity::ActorPtr pActor )
    }
 }
 
-void Core::Entity::BattleNpc::deaggro( Core::Entity::ActorPtr pActor )
+void Core::Entity::BattleNpc::deaggro( ActorPtr pActor )
 {
    if( !hateListHasActor( pActor ) )
       hateListRemove( pActor );
@@ -328,7 +322,7 @@ void Core::Entity::BattleNpc::hateListClear()
 }
 
 
-void Core::Entity::BattleNpc::hateListRemove( Core::Entity::ActorPtr pActor )
+void Core::Entity::BattleNpc::hateListRemove( ActorPtr pActor )
 {
    auto it = m_hateList.begin();
    for( ; it != m_hateList.end(); ++it )
@@ -348,7 +342,7 @@ void Core::Entity::BattleNpc::hateListRemove( Core::Entity::ActorPtr pActor )
    }
 }
 
-bool Core::Entity::BattleNpc::hateListHasActor( Core::Entity::ActorPtr pActor )
+bool Core::Entity::BattleNpc::hateListHasActor( ActorPtr pActor )
 {
    auto it = m_hateList.begin();
    for( ; it != m_hateList.end(); ++it )
@@ -369,7 +363,7 @@ uint32_t Core::Entity::BattleNpc::getNameId() const
    return m_nameId;
 }
 
-void Core::Entity::BattleNpc::hateListUpdate( Core::Entity::ActorPtr pActor, int32_t hateAmount )
+void Core::Entity::BattleNpc::hateListUpdate( ActorPtr pActor, int32_t hateAmount )
 {
 
    auto it = m_hateList.begin();
@@ -458,7 +452,7 @@ void Core::Entity::BattleNpc::onDeath()
    hateListClear();
 }
 
-void Core::Entity::BattleNpc::onActionHostile( Core::Entity::ActorPtr pSource )
+void Core::Entity::BattleNpc::onActionHostile( ActorPtr pSource )
 {
 
    if( hateListGetHighest() == nullptr )
@@ -487,9 +481,7 @@ void Core::Entity::BattleNpc::update( int64_t currTime )
       return;
    }
 
-   if ( !m_pStatusEffectContainer )
-      initStatusEffectContainer();
-   m_pStatusEffectContainer->update();
+   updateStatusEffects();
    float distance = Math::Util::distance( m_pos.x, m_pos.y, m_pos.z,
                                           m_posOrigin.x, m_posOrigin.y, m_posOrigin.z );
 

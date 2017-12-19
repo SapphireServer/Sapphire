@@ -1,16 +1,20 @@
-#include <src/servers/Server_Common/Common.h>
+#include <Server_Common/Common.h>
+#include <Server_Common/Exd/ExdData.h>
+#include <Server_Common/Network/GamePacket.h>
+#include <Server_Common/Logging/Logger.h>
 
 #include "Player.h"
 
-#include "src/servers/Server_Zone/Zone/ZoneMgr.h"
-#include "src/servers/Server_Zone/Zone/Zone.h"
+#include "Zone/ZoneMgr.h"
+#include "Zone/Zone.h"
 
-#include <src/servers/Server_Common/Network/GamePacket.h>
+#include "Network/PacketWrappers/ActorControlPacket142.h"
+#include "Network/PacketWrappers/ActorControlPacket143.h"
 
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket143.h"
+#include "Inventory/Inventory.h"
+#include "Inventory/Item.h"
 
-#include "src/servers/Server_Zone/Inventory/Inventory.h"
-#include "src/servers/Server_Zone/Inventory/Item.h"
+extern Core::Logger g_log;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -21,8 +25,13 @@ Core::InventoryPtr Core::Entity::Player::getInventory() const
    return m_pInventory;
 }
 
+void Core::Entity::Player::sendItemLevel()
+{
+   queuePacket( ActorControlPacket142( getId(), SetItemLevel, getItemLevel(), 0 ) );
+}
+
 // TODO: This has to be redone and simplified
-void Core::Entity::Player::equipWeapon( Core::ItemPtr pItem )
+void Core::Entity::Player::equipWeapon( ItemPtr pItem )
 {
    ClassJob currentClass = static_cast< ClassJob >( getClass() );
 
@@ -77,10 +86,10 @@ void Core::Entity::Player::equipWeapon( Core::ItemPtr pItem )
 }
 
 // equip an item
-void Core::Entity::Player::equipItem( Inventory::EquipSlot equipSlotId, Core::ItemPtr pItem, bool sendModel )
+void Core::Entity::Player::equipItem( Inventory::EquipSlot equipSlotId, ItemPtr pItem, bool sendUpdate )
 {
 
-   //  Console->outDebOnly("Equipping into slot %i", equipSlotID);
+   //g_log.debug( "Equipping into slot " + std::to_string( equipSlotId ) );
 
    uint64_t model = pItem->getModelId1();
    uint64_t model2 = pItem->getModelId2();
@@ -109,14 +118,21 @@ void Core::Entity::Player::equipItem( Inventory::EquipSlot equipSlotId, Core::It
 
    }
 
-   if( sendModel )
+   if( sendUpdate )
+   { 
       this->sendModel();
+      m_itemLevel = getInventory()->calculateEquippedGearItemLevel();
+      sendItemLevel();
+   }
 }
 
 void Core::Entity::Player::unequipItem( Inventory::EquipSlot equipSlotId, ItemPtr pItem )
 {
    m_modelEquip[static_cast< uint8_t >( equipSlotId )] = 0;
    sendModel();
+
+   m_itemLevel = getInventory()->calculateEquippedGearItemLevel();
+   sendItemLevel();
 }
 
 uint32_t Core::Entity::Player::getCurrency( uint8_t type ) const

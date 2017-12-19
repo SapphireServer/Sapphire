@@ -1,14 +1,14 @@
 #include "EventItemAction.h"
 
-#include <src/servers/Server_Common/Util/Util.h>
-#include <src/servers/Server_Common/Util/UtilMath.h>
-#include <src/servers/Server_Common/Logging/Logger.h>
+#include <Server_Common/Util/Util.h>
+#include <Server_Common/Util/UtilMath.h>
+#include <Server_Common/Logging/Logger.h>
 
 #include <string.h>
 
-#include "src/servers/Server_Zone/Actor/Player.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket142.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket143.h"
+#include "Actor/Player.h"
+#include "Network/PacketWrappers/ActorControlPacket142.h"
+#include "Network/PacketWrappers/ActorControlPacket143.h"
 
 extern Core::Logger g_log;
 
@@ -19,7 +19,7 @@ using namespace Core::Network::Packets::Server;
 
 Core::Action::EventItemAction::EventItemAction()
 {
-   m_handleActionType = Common::HandleActionType::Event;
+   m_handleActionType = HandleActionType::Event;
 }
 
 Core::Action::EventItemAction::EventItemAction( Entity::ActorPtr pActor, uint32_t eventId, uint16_t action,

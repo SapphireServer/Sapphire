@@ -2,12 +2,12 @@
 #define _ZONE_H
 
 #include <unordered_map>
-#include <src/servers/Server_Common/Common.h>
+#include <Server_Common/Common.h>
 
 #include "Cell.h"
 #include "CellHandler.h"
 
-#include "src/servers/Server_Zone/Forwards.h"
+#include "Forwards.h"
 
 #include <set>
 #include <boost/enable_shared_from_this.hpp>
@@ -15,11 +15,10 @@
 #include <stdio.h>
 #include <string.h>
 namespace Core {
-
 namespace Entity
 {
-class Actor;
-class Player;
+   class Actor;
+   class Player;
 }
 
 class Session;
@@ -39,8 +38,8 @@ protected:
 
    bool m_bPrivate;
 
-   std::unordered_map<int32_t, Entity::PlayerPtr > m_playerMap;
-   std::unordered_map<int32_t, Entity::BattleNpcPtr > m_BattleNpcMap;
+   std::unordered_map< int32_t, Entity::PlayerPtr > m_playerMap;
+   std::unordered_map< int32_t, Entity::BattleNpcPtr > m_BattleNpcMap;
 
    std::set< Entity::BattleNpcPtr > m_BattleNpcDeadMap;
 
@@ -90,7 +89,7 @@ public:
 
    void updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell );
 
-   void queueOutPacketForRange( Entity::PlayerPtr pSourcePlayer, uint32_t range, Network::Packets::GamePacketPtr pPacketEntry );
+   void queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range, Network::Packets::GamePacketPtr pPacketEntry );
 
    virtual uint32_t getId();
 

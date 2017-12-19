@@ -4,18 +4,17 @@
 #include <Server_Common/Logging/Logger.h>
 #include <Server_Common/Script/ChaiscriptStdLib.h>
 
-#include "src/servers/Server_Zone/ServerZone.h"
+#include "ServerZone.h"
 
-#include "src/servers/Server_Zone/Script/ScriptManager.h"
+#include "Script/ScriptManager.h"
 
-#include "src/servers/Server_Zone/Zone/Zone.h"
-#include "src/servers/Server_Zone/Actor/Player.h"
-#include "src/servers/Server_Zone/Actor/BattleNpc.h"
-#include "src/servers/Server_Zone/Event/Event.h"
-#include "src/servers/Server_Zone/Event/EventHelper.h"
-
-#include "src/servers/Server_Zone/Network/PacketWrappers/ServerNoticePacket.h"
-#include "src/servers/Server_Zone/StatusEffect/StatusEffect.h"
+#include "Zone/Zone.h"
+#include "Actor/Player.h"
+#include "Actor/BattleNpc.h"
+#include "Event/Event.h"
+#include "Event/EventHelper.h"
+#include "Network/PacketWrappers/ServerNoticePacket.h"
+#include "StatusEffect/StatusEffect.h"
 
 #include <boost/lexical_cast.hpp>
 

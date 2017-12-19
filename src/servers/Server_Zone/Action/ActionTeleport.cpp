@@ -1,12 +1,12 @@
 #include "ActionTeleport.h"
 
-#include <src/servers/Server_Common/Util/Util.h>
-#include <src/servers/Server_Common/Exd/ExdData.h>
-#include <src/servers/Server_Common/Logging/Logger.h>
+#include <Server_Common/Util/Util.h>
+#include <Server_Common/Exd/ExdData.h>
+#include <Server_Common/Logging/Logger.h>
 
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket142.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket143.h"
-#include "src/servers/Server_Zone/Actor/Player.h"
+#include "Network/PacketWrappers/ActorControlPacket142.h"
+#include "Network/PacketWrappers/ActorControlPacket143.h"
+#include "Actor/Player.h"
 
 using namespace Core::Common;
 using namespace Core::Network;
@@ -18,7 +18,7 @@ extern Core::Logger g_log;
 
 Core::Action::ActionTeleport::ActionTeleport()
 {
-   m_handleActionType = Common::HandleActionType::Event;
+   m_handleActionType = HandleActionType::Event;
 }
 
 Core::Action::ActionTeleport::ActionTeleport( Entity::ActorPtr pActor, uint16_t targetZone, uint16_t cost )
@@ -81,7 +81,7 @@ void Core::Action::ActionTeleport::onFinish()
    //auto control = Network::Packets::Server::ActorControlPacket142( m_pSource->getId(), Common::ActorControlType::TeleportDone );
    //m_pSource->sendToInRangeSet( control, false );
 
-   pPlayer->setZoningType( Common::ZoneingType::Teleport );
+   pPlayer->setZoningType( ZoneingType::Teleport );
 
    ZoneChannelPacket< FFXIVIpcEffect > effectPacket( pPlayer->getId() );
    effectPacket.data().targetId = pPlayer->getId();
@@ -90,7 +90,7 @@ void Core::Action::ActionTeleport::onFinish()
    effectPacket.data().actionTextId = 5;
    effectPacket.data().unknown_5 = 1;
    effectPacket.data().numEffects = 1;
-   effectPacket.data().rotation = static_cast< uint16_t >( 0x8000 * ( (pPlayer->getRotation() + 3.1415926) ) / 3.1415926 );
+   effectPacket.data().rotation = static_cast< uint16_t >( 0x8000 * ( ( pPlayer->getRotation() + 3.1415926 ) ) / 3.1415926 );
    effectPacket.data().effectTarget = pPlayer->getId();
    pPlayer->sendToInRangeSet( effectPacket, true );
 

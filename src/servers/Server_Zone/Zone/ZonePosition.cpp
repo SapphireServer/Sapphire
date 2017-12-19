@@ -7,7 +7,7 @@ Core::ZonePosition::ZonePosition()
 {
 }
 
-Core::ZonePosition::ZonePosition( uint32_t id, uint32_t targetZoneId, const Core::Common::FFXIVARR_POSITION3& targetPosition, uint32_t radius, float rotation )
+Core::ZonePosition::ZonePosition( uint32_t id, uint32_t targetZoneId, const Common::FFXIVARR_POSITION3& targetPosition, uint32_t radius, float rotation )
 {
    m_id = id;
    m_targetZoneId = targetZoneId;

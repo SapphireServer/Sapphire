@@ -1,18 +1,15 @@
-
 #ifndef GAMECONNECTION_H
 #define GAMECONNECTION_H
 
-#include <src/servers/Server_Common/Network/Connection.h>
-#include <src/servers/Server_Common/Network/Acceptor.h>
-#include <src/servers/Server_Common/Network/CommonNetwork.h>
+#include <Server_Common/Network/Connection.h>
+#include <Server_Common/Network/Acceptor.h>
+#include <Server_Common/Network/CommonNetwork.h>
+#include <Server_Common/Network/GamePacket.h>
+#include <Server_Common/Util/LockedQueue.h>
 
-#include <src/servers/Server_Common/Network/GamePacket.h>
+#include "Forwards.h"
 
-#include <src/servers/Server_Common/Util/LockedQueue.h>
-
-#include "src/servers/Server_Zone/Forwards.h"
-
-#define DECLARE_HANDLER( x ) void x( const Packets::GamePacket& inPacket, Entity::PlayerPtr pPlayer )
+#define DECLARE_HANDLER( x ) void x( const Packets::GamePacket& inPacket, Entity::Player& player )
 
 namespace Core {
 namespace Network {
@@ -29,18 +26,18 @@ class GameConnection : public Connection
 {
 
 private:
-   typedef void ( GameConnection::* Handler )( const Packets::GamePacket& inPacket, Entity::PlayerPtr pPlayer );
+   typedef void ( GameConnection::* Handler )( const Packets::GamePacket& inPacket, Entity::Player& player );
 
    using HandlerMap = std::map< uint16_t, Handler >;
    using HandlerStrMap = std::map< uint16_t, std::string >;
 
    AcceptorPtr m_pAcceptor;
 
-   // handler for game packets (main type 0x03, connection type 1)
+   // handler for game packets ( main type 0x03, connection type 1 )
    HandlerMap m_zoneHandlerMap;
    HandlerStrMap m_zoneHandlerStrMap;
 
-   // handler for game packets (main type 0x03, connection type 2)
+   // handler for game packets ( main type 0x03, connection type 2 )
    HandlerMap m_chatHandlerMap;
    HandlerStrMap m_chatHandlerStrMap;
 
@@ -80,11 +77,11 @@ public:
 
    void handleChatPacket( const Packets::GamePacket& pPacket );
 
-   void sendPackets( Packets::PacketContainer * pPacket );
+   void sendPackets( Packets::PacketContainer* pPacket );
 
-   void sendSinglePacket( Packets::GamePacket * pPacket );
+   void sendSinglePacket( Packets::GamePacket* pPacket );
 
-   void injectPacket( const std::string& packetpath, Entity::PlayerPtr pPlayer );
+   void injectPacket( const std::string& packetpath, Entity::Player& player );
 
    DECLARE_HANDLER( initHandler );
    DECLARE_HANDLER( finishLoadingHandler );

@@ -1,26 +1,25 @@
-#include <src/servers/Server_Common/Util/Util.h>
-#include <src/servers/Server_Common/Util/UtilMath.h>
-#include <src/servers/Server_Common/Network/PacketContainer.h>
-#include <src/servers/Server_Common/Exd/ExdData.h>
-#include <src/servers/Server_Common/Network/GamePacket.h>
+#include <Server_Common/Util/Util.h>
+#include <Server_Common/Util/UtilMath.h>
+#include <Server_Common/Network/PacketContainer.h>
+#include <Server_Common/Exd/ExdData.h>
+#include <Server_Common/Network/GamePacket.h>
 
-#include "src/servers/Server_Zone/Forwards.h"
-#include "src/servers/Server_Zone/Action/Action.h"
+#include "Forwards.h"
+#include "Action/Action.h"
 
-#include "src/servers/Server_Zone/Zone/Zone.h"
+#include "Zone/Zone.h"
 
-#include "src/servers/Server_Zone/Network/GameConnection.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket142.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket143.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket144.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/UpdateHpMpTpPacket.h"
+#include "Network/GameConnection.h"
+#include "Network/PacketWrappers/ActorControlPacket142.h"
+#include "Network/PacketWrappers/ActorControlPacket143.h"
+#include "Network/PacketWrappers/ActorControlPacket144.h"
+#include "Network/PacketWrappers/UpdateHpMpTpPacket.h"
 
-#include "src/servers/Server_Zone/StatusEffect/StatusEffectContainer.h"
-#include "src/servers/Server_Zone/StatusEffect/StatusEffect.h"
-#include "src/servers/Server_Zone/Action/ActionCollision.h"
-#include "src/servers/Server_Zone/ServerZone.h"
-#include "src/servers/Server_Zone/Session.h"
-#include "src/servers/Server_Zone/Math/CalcBattle.h"
+#include "StatusEffect/StatusEffect.h"
+#include "Action/ActionCollision.h"
+#include "ServerZone.h"
+#include "Session.h"
+#include "Math/CalcBattle.h"
 #include "Actor.h"
 #include "Player.h"
 
@@ -33,6 +32,11 @@ using namespace Core::Network::Packets::Server;
 
 Core::Entity::Actor::Actor()
 {
+   // initialize the free slot queue
+   for( uint8_t i = 0; i < MAX_STATUS_EFFECTS; i++ )
+   {
+      m_statusEffectFreeSlotQueue.push( i );
+   }
 }
 
 Core::Entity::Actor::~Actor()
@@ -660,7 +664,7 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
                                              uint64_t param2, Entity::Actor& pTarget )
 {
 
-   if ( isPlayer() )
+   if( isPlayer() )
    {
       getAsPlayer()->sendDebug( std::to_string( pTarget.getId() ) );
       getAsPlayer()->sendDebug( "Handle script skill type: " + std::to_string( type ) );
@@ -682,7 +686,7 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
    effectPacket.data().effectTarget = pTarget.getId();
 
    // Todo: for each actor, calculate how much damage the calculated value should deal to them - 2-step damage calc. we only have 1-step
-   switch ( type )
+   switch( type )
    {
 
    case ActionEffectType::Damage:
@@ -692,7 +696,7 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
       effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::NormalDamage;
       effectPacket.data().effects[0].unknown_3 = 7;
 
-      if ( !actionInfoPtr->is_aoe )
+      if( !actionInfoPtr->is_aoe )
       {
          // If action on this specific target is valid...
          if ( isPlayer() && !ActionCollision::isActorApplicable( pTarget.shared_from_this(), TargetFilter::Enemies ) )
@@ -700,11 +704,11 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
 
          sendToInRangeSet( effectPacket, true );
 
-         pTarget.takeDamage( static_cast< uint32_t >( param1 ) );
-
          if ( pTarget.isAlive() )
             pTarget.onActionHostile( shared_from_this() );
-         
+
+         pTarget.takeDamage( static_cast< uint32_t >( param1 ) );
+
       }
       else
       {
@@ -712,7 +716,7 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
          auto actorsCollided = ActionCollision::getActorsHitFromAction( pTarget.getPos(), getInRangeActors( true ),
                                                                         actionInfoPtr, TargetFilter::Enemies );
 
-         for ( const auto& pHitActor : actorsCollided )
+         for( const auto& pHitActor : actorsCollided )
          {
             effectPacket.data().targetId = pHitActor->getId();
             effectPacket.data().effectTarget = pHitActor->getId();
@@ -720,17 +724,17 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
             // todo: send to range of what? ourselves? when mob script hits this is going to be lacking
             sendToInRangeSet( effectPacket, true );
 
-            pHitActor->takeDamage( static_cast< uint32_t >( param1 ) );
 
             if( pHitActor->isAlive() )
                pHitActor->onActionHostile( shared_from_this() );
 
+            pHitActor->takeDamage( static_cast< uint32_t >( param1 ) );
+
             // Debug
             if ( isPlayer() ) 
             {
-               if ( pHitActor->isPlayer() ) {
+               if ( pHitActor->isPlayer() )
                   getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) + " (" + pHitActor->getName() + ")" );
-               }
                else
                   getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) );
             }  
@@ -748,9 +752,9 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
       effectPacket.data().effects[0].effectType = ActionEffectType::Heal;
       effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::NormalHeal;
 
-      if ( !actionInfoPtr->is_aoe )
+      if( !actionInfoPtr->is_aoe )
       {
-         if ( isPlayer() && !ActionCollision::isActorApplicable( pTarget.shared_from_this(), TargetFilter::Allies ) )
+         if( isPlayer() && !ActionCollision::isActorApplicable( pTarget.shared_from_this(), TargetFilter::Allies ) )
             break;
 
          sendToInRangeSet( effectPacket, true );
@@ -764,7 +768,7 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
          auto actorsCollided = ActionCollision::getActorsHitFromAction( pTarget.getPos(), getInRangeActors( true ),
                                                                         actionInfoPtr, TargetFilter::Allies );
 
-         for ( auto pHitActor : actorsCollided )
+         for( auto pHitActor : actorsCollided )
          {
             effectPacket.data().targetId = pTarget.getId();
             effectPacket.data().effectTarget = pHitActor->getId();
@@ -773,11 +777,10 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
             pHitActor->heal( calculatedHeal );
 
             // Debug
-            if ( isPlayer() )
+            if( isPlayer() )
             {
-               if ( pHitActor->isPlayer() ) {
+               if( pHitActor->isPlayer() )
                   getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) + " (" + pHitActor->getName() + ")" );
-               }
                else
                   getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) );
             }
@@ -794,7 +797,30 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
 /*! \param StatusEffectPtr to be applied to the actor */
 void Core::Entity::Actor::addStatusEffect( StatusEffect::StatusEffectPtr pEffect )
 {
-   m_pStatusEffectContainer->addStatusEffect( pEffect );
+   int8_t nextSlot = getStatusEffectFreeSlot();
+   // if there is no slot left, do not add the effect
+   if( nextSlot == -1 )
+      return;
+
+   pEffect->applyStatus();
+   m_statusEffectMap[nextSlot] = pEffect;
+
+   ZoneChannelPacket< Server::FFXIVIpcAddStatusEffect > statusEffectAdd( getId() );
+   statusEffectAdd.data().actor_id = pEffect->getTargetActorId();
+   statusEffectAdd.data().actor_id1 = pEffect->getSrcActorId(); 
+   statusEffectAdd.data().current_hp = getHp();
+   statusEffectAdd.data().current_mp = getMp();
+   statusEffectAdd.data().current_tp = getTp();
+   statusEffectAdd.data().duration = static_cast< float >( pEffect->getDuration() ) / 1000;
+   statusEffectAdd.data().effect_id = pEffect->getId();
+   statusEffectAdd.data().effect_index = nextSlot;
+   statusEffectAdd.data().max_hp = getMaxHp();
+   statusEffectAdd.data().max_mp = getMaxMp();
+   statusEffectAdd.data().max_something = 1;
+    //statusEffectAdd.data().unknown2 = 28;
+   statusEffectAdd.data().param = pEffect->getParam();
+
+   sendToInRangeSet( statusEffectAdd, isPlayer() );
 }
 
 /*! \param StatusEffectPtr to be applied to the actor */
@@ -809,22 +835,173 @@ void Core::Entity::Actor::addStatusEffectById( uint32_t id, int32_t duration, En
 /*! \param StatusEffectPtr to be applied to the actor */
 void Core::Entity::Actor::addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Actor& pSource, uint16_t param )
 {
-   if( !m_pStatusEffectContainer->hasStatusEffect( id ) )
+   if( hasStatusEffect( id ) )
+      return;
+
+   StatusEffect::StatusEffectPtr effect( new StatusEffect::StatusEffect( id, pSource.shared_from_this(),
+                                                                         shared_from_this(), duration, 3000 ) );
+   effect->setParam( param );
+   addStatusEffect( effect );
+
+}
+
+float Core::Entity::Actor::getRotation() const
+{
+   return m_rot;
+}
+
+void Core::Entity::Actor::setRotation( float rot )
+{
+   m_rot = rot;
+}
+
+int8_t Core::Entity::Actor::getStatusEffectFreeSlot()
+{
+   int8_t freeEffectSlot = -1;
+
+   if( m_statusEffectFreeSlotQueue.empty() )
+      return freeEffectSlot;
+
+   freeEffectSlot = m_statusEffectFreeSlotQueue.front();
+   m_statusEffectFreeSlotQueue.pop();
+
+   return freeEffectSlot;
+}
+
+void Core::Entity::Actor::statusEffectFreeSlot( uint8_t slotId )
+{
+   m_statusEffectFreeSlotQueue.push( slotId );
+}
+
+void Core::Entity::Actor::removeSingleStatusEffectById( uint32_t id )
+{
+   for( auto effectIt : m_statusEffectMap )
    {
-      StatusEffect::StatusEffectPtr effect( new StatusEffect::StatusEffect( id, pSource.shared_from_this(),
-                                                                            shared_from_this(), duration, 3000 ) );
-      effect->setParam( param );
-      addStatusEffect( effect );
+      if( effectIt.second->getId() == id )
+      {
+         removeStatusEffect( effectIt.first );
+         break;
+      }
    }
 }
 
-/*! \param Status that should be removed, based on its ID. */
-void Core::Entity::Actor::removeSingleStatusEffectFromId( uint32_t id )
+void Core::Entity::Actor::removeStatusEffect( uint8_t effectSlotId )
 {
-   m_pStatusEffectContainer->removeSingleStatusEffectFromId( id );
+   auto pEffectIt = m_statusEffectMap.find( effectSlotId );
+   if( pEffectIt == m_statusEffectMap.end() )
+      return;
+
+   statusEffectFreeSlot( effectSlotId );
+
+   auto pEffect = pEffectIt->second;
+   pEffect->removeStatus();
+
+   sendToInRangeSet( ActorControlPacket142( getId(), StatusEffectLose, pEffect->getId() ), isPlayer() );
+
+   m_statusEffectMap.erase( effectSlotId );
+
+   sendStatusEffectUpdate();
 }
 
-Core::StatusEffect::StatusEffectContainerPtr Core::Entity::Actor::getStatusEffectContainer() const
+std::map< uint8_t, Core::StatusEffect::StatusEffectPtr > Core::Entity::Actor::getStatusEffectMap() const
 {
-   return m_pStatusEffectContainer;
+   return m_statusEffectMap;
+}
+
+void Core::Entity::Actor::sendStatusEffectUpdate()
+{
+   uint64_t currentTimeMs = Util::getTimeMs();
+
+   ZoneChannelPacket< Server::FFXIVIpcStatusEffectList > statusEffectList( getId() );
+
+   statusEffectList.data().current_hp = getHp();
+   statusEffectList.data().current_mp = getMp();
+   statusEffectList.data().currentTp = getTp();
+   statusEffectList.data().max_hp = getMaxHp();
+   statusEffectList.data().max_mp = getMaxMp();
+   uint8_t slot = 0;
+   for( auto effectIt : m_statusEffectMap )
+   {
+      float timeLeft = static_cast< float >( effectIt.second->getDuration() - 
+                                             ( currentTimeMs - effectIt.second->getStartTimeMs() ) ) / 1000;
+      statusEffectList.data().effect[slot].duration = timeLeft;
+      statusEffectList.data().effect[slot].effect_id = effectIt.second->getId();
+      statusEffectList.data().effect[slot].sourceActorId = effectIt.second->getSrcActorId();
+      slot++;
+   }
+
+   sendToInRangeSet( statusEffectList, isPlayer() );
+
+}
+
+void Core::Entity::Actor::updateStatusEffects()
+{
+   uint64_t currentTimeMs = Util::getTimeMs();
+
+   uint32_t thisTickDmg = 0;
+   uint32_t thisTickHeal = 0;
+
+   for( auto effectIt : m_statusEffectMap )
+   {
+      uint8_t effectIndex = effectIt.first;
+      auto effect = effectIt.second;
+
+      uint64_t lastTick = effect->getLastTickMs();
+      uint64_t startTime = effect->getStartTimeMs();
+      uint32_t duration = effect->getDuration();
+      uint32_t tickRate = effect->getTickRate();
+
+      if( ( currentTimeMs - startTime ) > duration )
+      {
+         // remove status effect
+         removeStatusEffect( effectIndex );
+         // break because removing invalidates iterators
+         break;
+      }
+
+      if( ( currentTimeMs - lastTick ) > tickRate )
+      {
+         effect->setLastTick( currentTimeMs );
+         effect->onTick();
+
+         auto thisEffect = effect->getTickEffect();
+
+         switch( thisEffect.first )
+         {
+
+         case 1:
+         {
+            thisTickDmg += thisEffect.second;
+            break;
+         }
+
+         case 2:
+         {
+            thisTickHeal += thisEffect.second;
+            break;
+         }
+
+         }
+      }
+
+   }
+
+   if( thisTickDmg != 0 )
+   {
+      takeDamage( thisTickDmg );
+      sendToInRangeSet( ActorControlPacket142( getId(), HPFloatingText, 0, static_cast< uint8_t >( ActionEffectType::Damage ), thisTickDmg ) );
+   }
+
+   if( thisTickHeal != 0 )
+   {
+      heal( thisTickDmg );
+      sendToInRangeSet( ActorControlPacket142( getId(), HPFloatingText, 0, static_cast< uint8_t >( ActionEffectType::Heal ), thisTickHeal ) );
+   }
+}
+
+bool Core::Entity::Actor::hasStatusEffect( uint32_t id )
+{
+   if( m_statusEffectMap.find( id ) != m_statusEffectMap.end() )
+      return true;
+   return false;
 }

@@ -1,10 +1,11 @@
-#include <src/servers/Server_Common/Util/Util.h>
-#include <src/servers/Server_Common/Exd/ExdData.h>
-#include <src/servers/Server_Common/Util/UtilMath.h>
+#include <Server_Common/Util/Util.h>
+#include <Server_Common/Exd/ExdData.h>
+#include <Server_Common/Util/UtilMath.h>
 
 #include "ActionCollision.h"
-#include <src/servers/Server_Zone/Actor/Actor.h>
-#include <src/servers/Server_Zone/Actor/Player.h>
+#include "Actor/Actor.h"
+#include "Actor/Player.h"
+
 #include <cmath>
 #include <boost/make_shared.hpp>
 
@@ -16,7 +17,7 @@ using namespace Core::Common;
 bool ActionCollision::isActorApplicable( ActorPtr actorPtr, TargetFilter targetFilter )
 {
    bool actorApplicable = false;
-   switch ( targetFilter )
+   switch( targetFilter )
    {
    case TargetFilter::All:
    {
@@ -57,14 +58,14 @@ std::set< Core::Entity::ActorPtr > ActionCollision::getActorsHitFromAction( FFXI
 {
    std::set< ActorPtr > actorsCollided;
 
-   switch ( static_cast< ActionCollisionType >( actionInfo->aoe_type ) )
+   switch( static_cast< ActionCollisionType >( actionInfo->aoe_type ) )
    {
    case ActionCollisionType::None:
    case ActionCollisionType::SingleTarget:
    {
       // This is actually needed. There is "splash damage" in actions marked as single target.
       // Notice how we're using aoe_width. How collision works for SingleTarget is unknown as of now.
-      for ( auto pActor : actorsInRange )
+      for( auto pActor : actorsInRange )
       {
          // Make sure actor exists. If it doesn't we done goofed.
          assert( pActor );
@@ -84,7 +85,7 @@ std::set< Core::Entity::ActorPtr > ActionCollision::getActorsHitFromAction( FFXI
    }
    case ActionCollisionType::Circle:
    {
-      for ( auto pActor : actorsInRange )
+      for( auto pActor : actorsInRange )
       {
          assert( pActor );
 
@@ -92,15 +93,13 @@ std::set< Core::Entity::ActorPtr > ActionCollision::getActorsHitFromAction( FFXI
             continue;
 
          if ( radiusCollision( pActor->getPos(), aoePosition, actionInfo->aoe_range ) )
-         {
             actorsCollided.insert( pActor );
-         }
       }
       break;
    }
    case ActionCollisionType::Box:
    {
-      for ( auto pActor : actorsInRange )
+      for( auto pActor : actorsInRange )
       {
          assert( pActor );
 

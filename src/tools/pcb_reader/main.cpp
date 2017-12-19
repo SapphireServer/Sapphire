@@ -4,6 +4,7 @@
 #include <iostream>
 #include <chrono>
 #include <fstream>
+#include <regex>
 
 #include "pcb.h"
 #include "lgb.h"
@@ -84,39 +85,38 @@ int parseBlockEntry( char* data, std::vector<PCB_BLOCK_ENTRY>& entries, int gOff
 
 std::string zoneNameToPath( const std::string& name )
 {
-   char teri = name[0];
-   char region = name[1];
-   char type = name[2];
-   char zone = name[3];
-   static std::map< char, std::string > teriMap
+   std::string path;
+   auto inFile = std::ifstream( "territorytype.exh.csv" );
+   if( inFile.good() )
    {
-      { 'r', "roc" },
-      { 'w', "wil" },
-      { 'l', "lak" },
-      { 'o', "ocn" },
-      { 'f', "fst" },
-      { 'a', "air" },
-      { 's', "sea" },
-      { 'z', "zon" }
-   };
-
-   static std::map< char, std::string > typeMap
+      std::string line;
+      std::regex re("(\\d+),\"(.*)\",\"(.*)\",.*");
+      while( std::getline( inFile, line ) )
+      {
+         std::smatch match;
+         if( std::regex_match( line, match, re ) )
+         {
+            if( name == match[2].str() )
+            {
+               path = match[3].str();
+               break;
+            }
+         }
+      }
+   }
+   if( !path.empty() )
    {
-      { 'f', "fld" },
-      { 't', "twn" },
-      { 'd', "dun" },
-      { 'b', "bah" },
-      { 'i', "ind" },
-      { 'e', "evt" },
-   };
-   std::string ret;
-   const auto& teriRet = teriMap[teri];
-   const auto& typeRet = typeMap[type];
-   ret += teriRet + "_";
-   ret += teri;
-   ret += region;
-   ret += "/" + typeRet + "/" + name;
-   return ret;
+      //path = path.substr( path.find_first_of( "/" ) + 1, path.size() - path.find_first_of( "/" ));
+      //path = std::string( "ffxiv/" ) + path; 
+      path = std::string( "bg" ) + path.substr( 0, path.find( "/level/" ) );
+      std::cout << "[Info] " << "Found path for " << name << ": " << path << std::endl;
+   }
+   else
+   {
+      throw std::runtime_error( "Unable to find path for " + name +
+      ".\n\tPlease open 0a0000.win32.index with FFXIV Explorer and extract territorytype.exh as CSV\n\tand copy territorytype.exh.csv into pcb_reader.exe directory" );
+   }
+   return path;
 }
 
 void readFileToBuffer( const std::string& path, std::vector< char >& buf )
@@ -141,24 +141,25 @@ int main( int argc, char* argv[] )
 {
    auto startTime = std::chrono::system_clock::now();
 
-   std::string gamePath = "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv";
+   // todo: support expansions
+   std::string gamePath = "C:\\Program Files (x86)\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv";
    std::string zoneName = "r1f1";
 
    if( argc > 1 )
    {
-      gamePath = argv[1];
+      zoneName = argv[1];
       if( argc > 2 )
       {
-         zoneName = argv[2];
+         gamePath = argv[2];
       }
    }
-   const auto& zonePath = zoneNameToPath( zoneName );
 
    try
    {
-      std::string listPcbPath( "bg/ffxiv/" + zonePath + "/collision/list.pcb" );
-      std::string bgLgbPath( "bg/ffxiv/" + zonePath + "/level/bg.lgb" );
-      std::string collisionFilePath( "bg/ffxiv/" + zonePath + "/collision/" );
+      const auto& zonePath = zoneNameToPath( zoneName );
+      std::string listPcbPath( zonePath + "/collision/list.pcb" );
+      std::string bgLgbPath( zonePath + "/level/bg.lgb" );
+      std::string collisionFilePath( zonePath + "/collision/" );
       std::vector< char > section;
       std::vector< char > section1;
 
@@ -274,7 +275,7 @@ int main( int argc, char* argv[] )
             }
             catch( std::exception& e )
             {
-               std::cout << "Unable to load collision mesh " << fileName << "\n\tError:\n\t" << e.what() << "\n";
+               std::cout << "[Error] " << "Unable to load collision mesh " << fileName << "\n\tError:\n\t" << e.what() << "\n";
                return false;
             }
          };
@@ -301,7 +302,7 @@ int main( int argc, char* argv[] )
             }
             catch( std::exception& e )
             {
-               std::cout << "Unable to load SGB " << fileName << "\n\tError:\n\t" << e.what() << "\n";
+               std::cout << "[Error] " << "Unable to load SGB " << fileName << "\n\tError:\n\t" << e.what() << "\n";
                sgbFiles.insert( std::make_pair( fileName, sgbFile ) );
             }
             return false;
@@ -394,8 +395,8 @@ int main( int argc, char* argv[] )
             loadPcbFile( fileName );
             pushVerts( pcbFiles[fileName], fileName );
          }
-         std::cout << "Writing obj file " << "\n";
-         std::cout << bgLgb.groups.size() << " groups " << "\n";
+         std::cout << "[Info] " << "Writing obj file " << "\n";
+         std::cout << "[Info] " << bgLgb.groups.size() << " groups " << "\n";
          uint32_t totalGroups = 0;
          uint32_t totalGroupEntries = 0;
          for( const auto& group : bgLgb.groups )
@@ -467,15 +468,18 @@ int main( int argc, char* argv[] )
                }
             }
          }
-         std::cout << "\n\nLoaded " << pcbFiles.size() << " PCB Files \n";
-         std::cout << "Total Groups " << totalGroups << " Total entries " << totalGroupEntries << "\n";
+         std::cout << "\n[Info] " << "Loaded " << pcbFiles.size() << " PCB Files \n";
+         std::cout << "[Info] " << "Total Groups " << totalGroups << " Total entries " << totalGroupEntries << "\n";
       }
-      std::cout << "Finished exporting " << zoneName << " in " <<
+      std::cout << "[Success] " << "Finished exporting " << zoneName << " in " <<
          std::chrono::duration_cast< std::chrono::seconds >( std::chrono::system_clock::now() - startTime ).count() << " seconds\n";
    }
    catch( std::exception& e )
    {
-      std::cout << e.what() << std::endl;
+      std::cout << "[Error] " << e.what() << std::endl;
+      std::cout << "[Error] " << "Unable to extract collision data.\n\tIf using standalone ensure your working directory folder layout is \n\tbg/[ffxiv|ex1|ex2]/teri/type/zone/[level|collision]" << std::endl;
+      std::cout << std::endl;
+      std::cout << "[Info] " << "Usage: pcb_reader2 territory \"path/to/game/sqpack/ffxiv\" " << std::endl;
    }
    return 0;
 }

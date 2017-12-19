@@ -1,9 +1,9 @@
 #ifndef _ACTORCONTROL142_H
 #define _ACTORCONTROL142_H
 
-#include <src/servers/Server_Common/Network/GamePacketNew.h>
-#include <src/servers/Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
-#include "src/servers/Server_Zone/Forwards.h"
+#include <Server_Common/Network/GamePacketNew.h>
+#include <Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
+#include "Forwards.h"
 
 namespace Core {
 namespace Network {

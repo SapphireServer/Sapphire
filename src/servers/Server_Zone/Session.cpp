@@ -1,11 +1,11 @@
 #include <time.h>
 
-#include <src/servers/Server_Common/Util/Util.h>
-#include <src/servers/Server_Common/Network/PacketContainer.h>
-#include "src/servers/Server_Zone/Network/GameConnection.h"
+#include <Server_Common/Util/Util.h>
+#include <Server_Common/Network/PacketContainer.h>
+#include "Network/GameConnection.h"
 #include "Session.h"
 
-#include "src/servers/Server_Zone/Actor/Player.h"
+#include "Actor/Player.h"
 
 Core::Session::Session( uint32_t sessionId )
    : m_sessionId( sessionId )
@@ -23,13 +23,13 @@ Core::Session::~Session()
 {
 }
 
-void Core::Session::setZoneConnection( Core::Network::GameConnectionPtr pZoneCon )
+void Core::Session::setZoneConnection( Network::GameConnectionPtr pZoneCon )
 {
    pZoneCon->m_conType = Network::ConnectionType::Zone;
    m_pZoneConnection = pZoneCon;
 }
 
-void Core::Session::setChatConnection( Core::Network::GameConnectionPtr pChatCon )
+void Core::Session::setChatConnection( Network::GameConnectionPtr pChatCon )
 {
     pChatCon->m_conType = Network::ConnectionType::Chat;
     m_pChatConnection = pChatCon;

@@ -1,9 +1,8 @@
-
 #include "Cell.h"
 
-#include "src/servers/Server_Zone/Actor/Actor.h"
-#include "src/servers/Server_Zone/Actor/BattleNpc.h"
-#include "src/servers/Server_Zone/Forwards.h"
+#include "Actor/Actor.h"
+#include "Actor/BattleNpc.h"
+#include "Forwards.h"
 #include "Zone.h"
 
 
@@ -47,7 +46,6 @@ namespace Core
       {
 
          entry->setCurrentZone( m_pZone );
-         entry->getAsBattleNpc()->initStatusEffectContainer();
          m_pZone->pushActor( entry );
 
       }

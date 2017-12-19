@@ -1,23 +1,20 @@
 #ifndef _GAMECOMMAND_H_
 #define _GAMECOMMAND_H_
 
-#include <src/servers/Server_Common/Common.h>
+#include <Server_Common/Common.h>
 
-#include "src/servers/Server_Zone/Actor/Player.h"
-#include "src/servers/Server_Zone/Forwards.h"
+#include "Actor/Player.h"
+#include "Forwards.h"
 
 namespace Core {
 
    class DebugCommandHandler;
 
-   // CGameCommand is used to define in game text command callbacks
-   // TODO it should probably be renamed to something more intuitive
-   // TODO the command identifier, currently '@' should probably be defined in here aswell so it is easily replaced
    class DebugCommand
    { 
    public:
 
-      using pFunc = void ( DebugCommandHandler::* )( char *, Entity::PlayerPtr, boost::shared_ptr< DebugCommand > );
+      using pFunc = void ( DebugCommandHandler::* )( char *, Entity::Player&, boost::shared_ptr< DebugCommand > );
 
       // String for the command
       std::string m_commandName;

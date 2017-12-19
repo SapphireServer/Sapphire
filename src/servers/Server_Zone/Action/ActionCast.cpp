@@ -1,16 +1,16 @@
 #include "ActionCast.h"
 
-#include <src/servers/Server_Common/Common.h>
-#include <src/servers/Server_Common/Util/Util.h>
-#include <src/servers/Server_Common/Util/UtilMath.h>
-#include <src/servers/Server_Common/Exd/ExdData.h>
-#include <src/servers/Server_Common/Logging/Logger.h>
+#include <Server_Common/Common.h>
+#include <Server_Common/Util/Util.h>
+#include <Server_Common/Util/UtilMath.h>
+#include <Server_Common/Exd/ExdData.h>
+#include <Server_Common/Logging/Logger.h>
 
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket142.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket143.h"
-#include "src/servers/Server_Zone/Network/PacketWrappers/ActorControlPacket144.h"
-#include "src/servers/Server_Zone/Actor/Player.h"
-#include "src/servers/Server_Zone/Script/ScriptManager.h"
+#include "Network/PacketWrappers/ActorControlPacket142.h"
+#include "Network/PacketWrappers/ActorControlPacket143.h"
+#include "Network/PacketWrappers/ActorControlPacket144.h"
+#include "Actor/Player.h"
+#include "Script/ScriptManager.h"
 
 using namespace Core::Common;
 using namespace Core::Network;
@@ -52,7 +52,8 @@ void Core::Action::ActionCast::onStart()
    castPacket.data().action_id = m_id;
    castPacket.data().skillType = Common::SkillType::Normal;
    castPacket.data().unknown_1 = m_id;
-   castPacket.data().cast_time = static_cast< float >( m_castTime / 1000 ); // This is used for the cast bar above the target bar of the caster.
+   // This is used for the cast bar above the target bar of the caster.
+   castPacket.data().cast_time = static_cast< float >( m_castTime / 1000 );
    castPacket.data().target_id = m_pTarget->getId();
 
    m_pSource->sendToInRangeSet( castPacket, true );
@@ -73,10 +74,10 @@ void Core::Action::ActionCast::onFinish()
    pPlayer->sendStateFlags();
 
    /*auto control = ActorControlPacket143( m_pTarget->getId(), ActorControlType::Unk7,
-                                         0x219, m_id, m_id, m_id, m_id );
+                                           0x219, m_id, m_id, m_id, m_id );
    m_pSource->sendToInRangeSet( control, true );*/
 
-   g_scriptMgr.onCastFinish( pPlayer, m_pTarget, m_id );
+   g_scriptMgr.onCastFinish( *pPlayer, m_pTarget, m_id );
 }
 
 void Core::Action::ActionCast::onInterrupt()
@@ -89,7 +90,7 @@ void Core::Action::ActionCast::onInterrupt()
    m_pSource->getAsPlayer()->sendStateFlags();
 
    auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt,
-                                          0x219, 1, m_id, 0 );
+                                         0x219, 1, m_id, 0 );
 
    // Note: When cast interrupt from taking too much damage, set the last value to 1. This enables the cast interrupt effect. Example:
    // auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt, 0x219, 1, m_id, 0 );
