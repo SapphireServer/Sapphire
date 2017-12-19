@@ -126,12 +126,12 @@ void Core::DebugCommandHandler::scriptReload( char * data, Entity::Player& playe
 
 void Core::DebugCommandHandler::help( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
 {
-   pPlayer->sendDebug( "Registered debug commands:" );
+   player.sendDebug( "Registered debug commands:" );
    for( auto cmd : m_commandMap )
    {
-      if( pPlayer->getGmRank() >= cmd.second->m_gmLevel )
+      if( player.getGmRank() >= cmd.second->m_gmLevel )
       {
-         pPlayer->sendDebug( " - " + cmd.first + " - " + cmd.second->getHelpText() );
+         player.sendDebug( " - " + cmd.first + " - " + cmd.second->getHelpText() );
 
       }
    }
@@ -403,11 +403,11 @@ void Core::DebugCommandHandler::add( char * data, Entity::Player& player, boost:
       int32_t id;
       sscanf( params.c_str(), "%d", &id );
 
-      pPlayer->learnAction( id );
+      player.learnAction( id );
    }
    else if( subCommand == "enablecompanion" )
    {
-      pPlayer->learnAction( 17 );
+      player.learnAction( 17 );
    }
    else
    {
@@ -531,5 +531,5 @@ void Core::DebugCommandHandler::serverInfo( char * data, Entity::Player& player,
 
 void Core::DebugCommandHandler::unlockCharacter( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
 {
-   pPlayer->unlock();
+   player.unlock();
 }

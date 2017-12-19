@@ -190,8 +190,8 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    }
    case GmCommand::Call:
    {
-      if( targetPlayer->getZoneId() != pPlayer->getZoneId() )
-         targetPlayer->setZone( pPlayer->getZoneId() );
+      if( targetPlayer->getZoneId() != player.getZoneId() )
+         targetPlayer->setZone( player.getZoneId() );
 
       targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z,
          player.getRotation() );
@@ -307,13 +307,13 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
          for( uint8_t i = 0; i < 255; i++ )
             targetActor->getAsPlayer()->learnMount( i );
 
-         pPlayer->sendNotice( "All mounts for " + targetPlayer->getName() +
+         player.sendNotice( "All mounts for " + targetPlayer->getName() +
             " were turned on." );
       }
       else
       {
          targetActor->getAsPlayer()->learnMount( param1 );
-         pPlayer->sendNotice( "Mount " + std::to_string( param1 ) + " for " + targetPlayer->getName() +
+         player.sendNotice( "Mount " + std::to_string( param1 ) + " for " + targetPlayer->getName() +
             " was turned on." );
       }
 
@@ -433,7 +433,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
          targetPlayer->setPosition( targetPlayer->getPos() );
          targetPlayer->performZoning( param1, targetPlayer->getPos(), 0 );
          
-         pPlayer->sendNotice( targetPlayer->getName() + " was warped to zone " + std::to_string( param1 ) + " (" + zoneInfo->getName() + ")" );
+         player.sendNotice( targetPlayer->getName() + " was warped to zone " + std::to_string( param1 ) + " (" + zoneInfo->getName() + ")" );
       }
       break;
    }
