@@ -8,6 +8,11 @@ Social::GroupMgr::GroupMgr()
 
 }
 
+Social::GroupMgr::~GroupMgr()
+{
+
+}
+
 Social::GroupPtr Social::GroupMgr::findGroupByInviteIdForPlayer( uint64_t playerId ) const
 {
    auto it = m_invites.find( playerId );
@@ -18,7 +23,7 @@ Social::GroupPtr Social::GroupMgr::findGroupByInviteIdForPlayer( uint64_t player
    return nullptr;
 }
 
-Social::GroupPtr Core::Entity::Social::GroupMgr::findGroupById( uint64_t groupId ) const
+Social::GroupPtr Social::GroupMgr::findGroupById( uint64_t groupId ) const
 {
    auto it = m_groups.find( groupId );
    if( it != m_groups.end() )
@@ -26,4 +31,20 @@ Social::GroupPtr Core::Entity::Social::GroupMgr::findGroupById( uint64_t groupId
       return it->second;
    }
    return nullptr;
+}
+
+uint64_t Social::GroupMgr::generateGroupId()
+{
+   m_lastGroupId++;
+   return m_lastGroupId;
+}
+
+bool Social::GroupMgr::hasInvite( uint64_t playerId ) const
+{
+   auto it = m_invites.find( playerId );
+   if ( it != m_invites.end() )
+   {
+      return true;
+   }
+   return false;
 }

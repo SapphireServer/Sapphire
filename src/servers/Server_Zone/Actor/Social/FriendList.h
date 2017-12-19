@@ -26,11 +26,9 @@ class FriendList : public Group
 {
 
 public:
-   FriendList( uint64_t id, uint64_t ownerId, uint32_t maxCapacity, time_point createTime ) :
-      Group( id, ownerId, maxCapacity, createTime ),
-      m_id( id ), m_ownerId( ownerId ), m_maxCapacity( maxCapacity ), m_createTime( createTime ) {};
-
-   ~FriendList() {};
+   FriendList( uint64_t id, uint64_t ownerId ) :
+      Group( id, ownerId ),
+      m_id( id ), m_ownerId( ownerId ) {};
 
    /*virtual void load();
    virtual void update();
@@ -48,16 +46,11 @@ public:
 
    
 
-private:
-   GroupType m_type{ GroupType::FriendList };
+protected:
    uint64_t m_id{ 0 };
    uint64_t m_ownerId{ 0 };
+   GroupType m_type{ GroupType::FriendList };
    uint32_t m_maxCapacity{ 200 };
-   uint32_t m_maxRoles{ 8 };
-   time_point m_createTime{ std::chrono::steady_clock::now() };
-   std::map< uint64_t, GroupMember > m_members;
-   std::map< uint64_t, uint64_t > m_invites; // <recipient, sender>
-
 
    
 

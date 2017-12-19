@@ -363,7 +363,7 @@ public:
    // Social-based
    //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-   Social::FriendListPtr getFriendsList() const;
+   uint64_t getFriendsListId() const;
 
 
    // Aetheryte / Action / Attribute bitmasks
@@ -627,7 +627,7 @@ private:
 
    // Social-based
 
-   Social::FriendListPtr m_friendsList;
+   uint64_t m_friendsListId;
 
    uint8_t m_equipDisplayFlags;
 

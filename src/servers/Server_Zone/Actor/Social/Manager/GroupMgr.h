@@ -12,20 +12,38 @@ namespace Core {
 namespace Entity {
 namespace Social {
 
-class GroupMgr : public boost::enable_shared_from_this< GroupMgr >
+class GroupMgr
 {
 public:
    GroupMgr();
+   virtual ~GroupMgr();
 
-   GroupPtr findGroupByInviteIdForPlayer( uint64_t playerId ) const;
-   GroupPtr findGroupById( uint64_t groupId ) const;
+   virtual GroupPtr findGroupByInviteIdForPlayer( uint64_t playerId ) const;
+   virtual GroupPtr findGroupById( uint64_t groupId ) const;
+   /*
+   template <typename GroupPtr>
+   GroupPtr findGroup( uint64_t arg )
+   {
+      auto it = m_groups.find( groupId );
+      if ( it != m_groups.end() )
+      {
+         return it->second;
+      }
+      return nullptr;
+   }*/
 
-private:
+   bool hasInvite( uint64_t playerId ) const;
+
+protected:
    GroupType m_type{ GroupType::None };
    uint64_t m_groupCount{ 0 };
    uint32_t m_maxEntries{ 0xFFFFFFFF };
-   std::map< uint64_t, GroupPtr > m_groups;
-   std::map< uint64_t, uint64_t > m_invites; // < recipient, groupid >
+   
+   std::map< uint64_t, uint64_t > m_invites;
+
+   uint64_t m_lastGroupId{ 0 };
+
+   // < recipient, groupid >
    //virtual GroupPtr createGroup( PlayerPtr pOwner ) = 0;
 
    /*
@@ -39,6 +57,11 @@ private:
    friend virtual void update();
    friend virtual void disband();
    */
+
+   virtual uint64_t generateGroupId();
+
+private:
+   std::map< uint64_t, GroupPtr > m_groups;
 
 };
 

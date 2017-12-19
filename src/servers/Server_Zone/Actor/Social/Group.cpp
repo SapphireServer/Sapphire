@@ -1,5 +1,6 @@
 #include <cassert>
 #include <boost/shared_ptr.hpp>
+#include <Server_Common/Logging/Logger.h>
 
 #include <Server_Zone/Session.h>
 #include <Server_Common/Network/PacketDef/Ipcs.h>
@@ -12,6 +13,7 @@
 #include "Group.h"
 
 extern Core::ServerZone g_serverZone;
+extern Core::Logger g_log;
 
 using namespace Core::Entity::Social;
 
@@ -43,6 +45,7 @@ Core::Network::Packets::GamePacketPtr Group::addMember( Core::Entity::PlayerPtr 
 
    auto packet = GamePacketNew< Server::FFXIVIpcSocialRequestResponse, ServerZoneIpcType >( recipientId, senderId );
    packet.data().contentId = recipientContentId;
+   packet.data().category = Common::SocialCategory::Friends;
 
    if( m_members.size() < m_maxCapacity )
    {
@@ -59,6 +62,40 @@ Core::Network::Packets::GamePacketPtr Group::addMember( Core::Entity::PlayerPtr 
    else
    {
    }
+
+   return packet;
+}
+
+Core::Network::Packets::GamePacketPtr Group::inviteMember( Core::Entity::PlayerPtr pSender, Core::Entity::PlayerPtr pRecipient, uint64_t senderId, uint64_t recipientId )
+{
+   assert( pSender != nullptr || senderId != 0 );
+
+   auto packet = GamePacketNew< Server::FFXIVIpcSocialRequestResponse, ServerZoneIpcType >( recipientId, senderId );
+   packet.data().contentId = recipientId;
+   packet.data().category = Common::SocialCategory::Friends;
+
+   if ( m_invites.size() < m_maxCapacity )
+   {
+      GroupMember member;
+      member.inviterId = senderId;
+      member.role = 0;
+      member.contentId = recipientId;
+      member.name = pSender->getName();
+
+      m_invites.emplace( recipientId, member );
+   }
+
+   return packet;
+}
+
+// todo: fix
+Core::Network::Packets::GamePacketPtr Group::removeMember( Core::Entity::PlayerPtr pSender, Core::Entity::PlayerPtr pRecipient, uint64_t senderId, uint64_t recipientId )
+{
+   assert( pSender != nullptr || senderId != 0 );
+
+   auto packet = GamePacketNew< Server::FFXIVIpcSocialRequestResponse, ServerZoneIpcType >( recipientId, senderId );
+   packet.data().contentId = recipientId;
+   packet.data().category = Common::SocialCategory::Friends;
 
    return packet;
 }
@@ -86,31 +123,41 @@ Core::Network::Packets::Server::PlayerEntry Group::generatePlayerEntry( GroupMem
    // We check if player is online. If so, we can pull more data - otherwise just name
    // todo: set as offline in one of the unknown values, if session does not exist
 
-   auto pSession = g_serverZone.getSession( groupMember.contentId ); // todo: aa i don't like this. maybe just store their ID instead of contentID???
-   entry.bytes[3] = 0x10;
-   entry.bytes[4] = 0x00;
-   entry.bytes[6] = 0x3F;
-   entry.bytes[11] = 0x10;
+   auto pSession = g_serverZone.getSession( groupMember.name ); // todo: aa i don't like this. maybe just store their ID instead of contentID???
+
+   entry.timestamp = 1512799339;
+   entry.status = 2;
+   entry.unknown = 0;
+   //entry.entryIcon = 0xf;  
+   entry.unavailable = 0;    // unavailable (other world)
+   entry.one = 0;
+
    if( pSession )
    {
       auto pPlayer = pSession->getPlayer();
       entry.contentId = pPlayer->getContentId();
-      entry.bytes[2] = pPlayer->getCurrentZone()->getId();
+      //entry.bytes[2] = pPlayer->getCurrentZone()->getId();
       
       entry.classJob = pPlayer->getClass();
       
       entry.level = pPlayer->getLevel();
       entry.zoneId = pPlayer->getCurrentZone()->getId();
       entry.grandCompany = pPlayer->getGc();
-      memcpy( &entry.fcTag[0], "Meme", 9 );
+      memcpy( &entry.fcTag[0], "Meme", 4 );
       entry.clientLanguage = 2;
       entry.knownLanguages = 0x0F;
       entry.onlineStatusMask = pPlayer->getOnlineStatusMask();
+
+      g_log.debug( std::to_string( pPlayer->getContentId() ) );
    }
 
    // TODO: no idea what this does - me neither
    //listPacket.data().entries[0].one = 1;
 
+   g_log.debug( std::to_string(groupMember.contentId) );
+
+   g_log.debug( std::to_string( entry.contentId ) );
+   
    return entry;
 }
 

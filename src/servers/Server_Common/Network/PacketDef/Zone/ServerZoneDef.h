@@ -81,7 +81,12 @@ struct FFXIVIpcPlayTime : FFXIVIpcBasePacket<Playtime>
 */
 struct PlayerEntry {
    uint64_t contentId;
-   uint8_t bytes[12];
+   uint32_t timestamp;
+   uint8_t bytes[4];
+   uint8_t status;      // bitmask. friend: if it's a request, if added, recipient/sender
+   uint8_t unknown;     // maybe bitmask? a value of 4 sets it to linkshell request
+   uint8_t entryIcon;   // observed in friend group icon, sideffects for displaying text
+   uint8_t unavailable; // bool
    uint16_t zoneId;
    uint8_t grandCompany;
    uint8_t clientLanguage;
@@ -95,7 +100,7 @@ struct PlayerEntry {
    uint16_t padding2;
    uint8_t one;
    char name[0x20];
-   char fcTag[9];
+   char fcTag[5];
 };
 
 struct FFXIVIpcSocialRequestReceive : FFXIVIpcBasePacket<SocialRequestReceive>

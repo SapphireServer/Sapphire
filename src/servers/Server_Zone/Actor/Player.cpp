@@ -303,9 +303,9 @@ void Core::Entity::Player::sendStats()
    queuePacket( statPacket );
 }
 
-Social::FriendListPtr Core::Entity::Player::getFriendsList() const
+uint64_t Core::Entity::Player::getFriendsListId() const
 {
-   return m_friendsList;
+   return m_friendsListId;
 }
 
 void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
@@ -447,7 +447,7 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
       //todo: change this to extern, global obj
       Core::Entity::Social::FriendListMgr fListMgr = {};
 
-      m_friendsList = fListMgr.getPlayerFriendsList( getId() );
+      m_friendsListId = fListMgr.fetchPlayerFriendsList( getId() );
 
       m_itemLevel = getInventory()->calculateEquippedGearItemLevel();
       sendItemLevel();

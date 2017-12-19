@@ -16,22 +16,23 @@ namespace Core {
 namespace Entity {
 namespace Social {
 
-class FriendListMgr
+class FriendListMgr : public GroupMgr
 {
 public:
    FriendListMgr();
-   ~FriendListMgr();
 
    bool init();
 
-   FriendListPtr getPlayerFriendsList( uint32_t playerId );
-
+   uint64_t fetchPlayerFriendsList( uint32_t playerId );
+   /*
+   FriendListPtr findGroupByInviteIdForPlayer( uint64_t playerId ) const;
+   FriendListPtr findGroupById( uint64_t groupId ) const;
+   */
+   std::map< uint64_t, FriendListPtr > m_groups;
 private:
+   // todo: can we handle this m_groups grouptype better..?
+   
    GroupType m_type{ GroupType::FriendList };
-   uint64_t m_groupCount{ 0 };
-   uint32_t m_maxEntries{ 0xFFFFFFFF };
-   std::map< uint64_t, GroupPtr > m_groups;  // < groupid, groupPtr >
-   std::map< uint64_t, uint64_t > m_invites; // < recipient, groupid >
 
 };
 

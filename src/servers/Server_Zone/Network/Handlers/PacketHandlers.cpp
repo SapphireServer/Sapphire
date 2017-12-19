@@ -36,6 +36,7 @@
 #include "Event/EventHelper.h"
 #include "Action/Action.h"
 #include "Action/ActionTeleport.h"
+#include "Actor/Social/Manager/FriendListMgr.h"
 
 
 extern Core::Logger g_log;
@@ -43,6 +44,7 @@ extern Core::ServerZone g_serverZone;
 extern Core::ZoneMgr g_zoneMgr;
 extern Core::Data::ExdData g_exdData;
 extern Core::DebugCommandHandler g_gameCommandMgr;
+extern Core::Entity::Social::FriendListMgr g_friendListMgr;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -476,10 +478,12 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
 
       uint16_t i = 0;
 
-      g_log.debug( std::to_string( player.getFriendsList()->getMembers().size() ) );
+      auto playerFriendsList = g_friendListMgr.findGroupById( player.getFriendsListId() );
 
-      for ( auto member : player.getFriendsList()->getMembers() )
+      // todo: move this garbage else fucking where
+      for ( auto member : playerFriendsList->getMembers() )
       {
+         // more elegant way to break over list entries pls
          if ( i == 10 )
             break;
 
@@ -686,7 +690,16 @@ void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePac
          pRecipient->queuePacket( packet );
          pRecipient->sendDebug( "ding ding" );
 
-         pRecipient->getFriendsList()->addMember( player.getAsPlayer(), pRecipient, player.getId(), pRecipient->getId() );
+         auto recipientFriendsList = g_friendListMgr.findGroupById( pRecipient->getFriendsListId() );
+
+         auto senderResultPacket = recipientFriendsList->inviteMember( player.getAsPlayer(), pRecipient, player.getId(), pRecipient->getId() );
+
+         player.queuePacket( senderResultPacket );
+
+         if ( recipientFriendsList->isFriendList() )
+         {
+            g_log.debug( "he HAA HAAA" );
+         }
 
          response.data().messageId = typeMessage[category];
       }

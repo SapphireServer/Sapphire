@@ -14,27 +14,22 @@ using namespace Core::Entity;
 Core::Entity::Social::FriendListMgr::FriendListMgr()
 {
 
-}
-
-Core::Entity::Social::FriendListMgr::~FriendListMgr()
-{
-
-}
+}  
 
 bool Social::FriendListMgr::init()
 {
    return true;
 }
 
-Social::FriendListPtr Social::FriendListMgr::getPlayerFriendsList( uint32_t playerId )
+uint64_t Social::FriendListMgr::fetchPlayerFriendsList( uint32_t playerId )
 {
-   std::mt19937_64 engine( std::random_device{}( ) );
-   std::uniform_int_distribution<uint64_t> distribution;
-   auto ui64 = distribution( engine );
+   uint64_t newGroupId = generateGroupId();
 
-   FriendList nFriendList( ui64, playerId, 200, std::chrono::steady_clock::now() );
+   auto pFriendList = boost::make_shared< FriendList >( newGroupId, playerId );
 
-   FriendListPtr pFriendList = boost::make_shared< FriendList >( nFriendList );
-   pFriendList->getCapacity();
-   return pFriendList;
+   m_groups.emplace( newGroupId, pFriendList );
+
+   g_log.debug( std::to_string( m_groups.size() ) );
+
+   return newGroupId;
 }
