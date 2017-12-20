@@ -37,7 +37,9 @@ include( "cmake/compiler.cmake" )
 ##############################
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
-git_describe(VERSION --tags --dirty=-d)
+git_describe(VERSION --all --dirty=-d)
+message(${GIT_REFSPEC})
+message(${VERSION})
 configure_file("${SERVER_COMMON_DIR}/Version.cpp.in"
                "${SERVER_COMMON_DIR}/Version.cpp" @ONLY)
 
