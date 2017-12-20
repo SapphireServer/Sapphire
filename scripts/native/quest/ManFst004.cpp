@@ -117,11 +117,11 @@ class ManFst004 : public EventScript
 
    void checkQuestCompletion( Entity::Player& player, uint32_t varIdx )
    {
-      if ( varIdx == 3 )
+      if( varIdx == 3 )
       {
          player.sendQuestMessage( m_id, 1, 0, 0, 0 );
       }
-      else if ( varIdx == 2 )
+      else if( varIdx == 2 )
       {
          player.sendQuestMessage( m_id, 2, 0, 0, 0 );
       }
@@ -136,7 +136,7 @@ class ManFst004 : public EventScript
       auto QUEST_VAR_CLASS = player.getQuestUI8BH( questId );
       auto QUEST_VAR_TRADE = player.getQuestUI8BL( questId );
 
-      if ( QUEST_VAR_ATTUNE == 1 && QUEST_VAR_CLASS == 1 && QUEST_VAR_TRADE == 1 )
+      if( QUEST_VAR_ATTUNE == 1 && QUEST_VAR_CLASS == 1 && QUEST_VAR_TRADE == 1 )
       {
          player.updateQuest( questId, SeqFinish );
       }
@@ -180,7 +180,7 @@ class ManFst004 : public EventScript
       player.eventPlay( m_id, 3, 0,
          [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
          {
-            if ( param2 == 1 )
+            if( param2 == 1 )
             {
                Scene00100( player );
             }
