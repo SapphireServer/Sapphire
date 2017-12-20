@@ -15,8 +15,8 @@
 #include <GameData.h>
 #include <DatCat.h>
 
-#include <src/servers/Server_Common/Exd/ExdData.h>
-#include <src/servers/Server_Common/Logging/Logger.h>
+#include <common/Exd/ExdData.h>
+#include <common/Logging/Logger.h>
 
 
 Core::Logger g_log;
