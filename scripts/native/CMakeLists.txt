@@ -6,9 +6,10 @@ file(GLOB_RECURSE SCRIPT_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 
 include_directories("${CMAKE_SOURCE_DIR}/src/servers/")
 include_directories("${CMAKE_SOURCE_DIR}/src/servers/sapphire_zone/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
 if(MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Yc${CMAKE_CURRENT_SOURCE_DIR}/ScriptObject.h /FI${CMAKE_CURRENT_SOURCE_DIR}/ScriptObject.h")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Yc\"${CMAKE_CURRENT_SOURCE_DIR}/ScriptObject.h\" /FI\"${CMAKE_CURRENT_SOURCE_DIR}/ScriptObject.h\"")
 endif()
 
 message( "exec: ${EXECUTABLE_OUTPUT_DIRECTORY}" )

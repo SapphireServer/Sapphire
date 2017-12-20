@@ -1,7 +1,7 @@
 #ifndef _EVENTHELPER_H
 #define _EVENTHELPER_H
 
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 
 namespace Core {
@@ -10,7 +10,6 @@ namespace Core {
       std::string getEventName( uint32_t eventId );
 
       uint32_t mapEventActorToRealActor( uint32_t eventActorId );
-
    }
 }
 #endif
