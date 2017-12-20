@@ -24,9 +24,9 @@ set_target_properties(exd_struct_gen PROPERTIES
 )
 
 if (UNIX)
-  target_link_libraries (exd_struct_gen Common xivdat pthread mysqlclient dl z)
+  target_link_libraries (exd_struct_gen common xivdat pthread mysqlclient dl z)
 else()
-  target_link_libraries (exd_struct_gen Common xivdat libmysql zlib1)
+  target_link_libraries (exd_struct_gen common xivdat libmysql zlib1)
 endif()
 
 target_link_libraries(exd_struct_gen ${Boost_LIBRARIES} ${Boost_LIBRARIES})
