@@ -1,4 +1,5 @@
 #include <boost/lexical_cast.hpp>
+#include <random>
 
 #include <Server_Common/Common.h>
 #include <Server_Common/Version.h>
@@ -347,6 +348,30 @@ void Core::DebugCommandHandler::add( char * data, Entity::Player& player, boost:
       auto pZone = player.getCurrentZone();
       pBNpc->setCurrentZone( pZone );
       pZone->pushActor( pBNpc );
+
+   }
+   else if( subCommand == "sspawn" )
+   {
+      int32_t model, name, count, distCoefficient, i;
+
+      sscanf( params.c_str(), "%d %d %d %d", &model, &name, &count, &distCoefficient );
+
+      for ( i = 0; i < count; i++ )
+      {
+         Common::FFXIVARR_POSITION3 posC = player.getPos();
+         std::mt19937 gen( rand() * 1000 );
+         std::uniform_int_distribution<int> dis( distCoefficient * -1, distCoefficient );
+
+         posC.x += dis( gen );
+         posC.z += dis( gen );
+
+         Entity::BattleNpcPtr pBNpc( new Entity::BattleNpc( model, name, posC ) );
+
+         auto pZone = player.getCurrentZone();
+         pBNpc->setCurrentZone( pZone );
+         pZone->pushActor( pBNpc );
+
+      }
 
    }
    else if( subCommand == "op" )

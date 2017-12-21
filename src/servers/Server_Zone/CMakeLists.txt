@@ -8,8 +8,6 @@ include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
 file(GLOB SERVER_PUBLIC_INCLUDE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
         /*.h
         Actor/*.h
-        Actor/Social/*.h
-        Actor/Social/Manager/*.h
         Action/*.h
         DebugCommand/*.h
         Event/*.h
@@ -19,6 +17,8 @@ file(GLOB SERVER_PUBLIC_INCLUDE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
         Network/*.h
         Network/Handlers/*.h
         Network/PacketWrappers/*.h
+		Social/*.h
+        Social/Manager/*.h
         Script/*.h
         StatusEffect/*.h
         Zone/*.h)
@@ -37,6 +37,8 @@ file(GLOB SERVER_SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
         Network/*.c*
         Network/Handlers/*.c*
         Network/PacketWrappers/*.c*
+		Social/*.c*
+        Social/Manager/*.c*
         Script/*.c*
         StatusEffect/*.c*
         Zone/*.c*)

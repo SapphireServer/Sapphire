@@ -220,7 +220,7 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
       return;
    }
 
-   g_friendListMgr.init();
+   g_friendListMgr = Core::Social::SocialMgr<Common::SocialListType::FriendList>();
 
    Network::HivePtr hive( new Network::Hive() );
    Network::addServerToHive< Network::GameConnection >( m_ip, m_port, hive );

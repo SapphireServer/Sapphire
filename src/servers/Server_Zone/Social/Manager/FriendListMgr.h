@@ -6,17 +6,16 @@
 
 #include <boost/enable_shared_from_this.hpp>
 #include <Server_Zone/Forwards.h>
-#include <Server_Zone/Actor/Social/Group.h>
-#include <Server_Zone/Actor/Social/FriendList.h>
+#include <Server_Zone/Social/Group.h>
+#include <Server_Zone/Social/FriendList.h>
 
-#include <Server_Zone/Actor/Social/Manager/GroupMgr.h>
+#include <Server_Zone/Social/Manager/SocialMgr.h>
 #include <Server_Zone/Forwards.h>
 
 namespace Core {
-namespace Entity {
 namespace Social {
 
-class FriendListMgr : public GroupMgr
+class FriendListMgr
 {
 public:
    FriendListMgr();
@@ -32,7 +31,7 @@ public:
 private:
    // todo: can we handle this m_groups grouptype better..?
    
-   GroupType m_type{ GroupType::FriendList };
+   //GroupType m_type{ GroupType::FriendList };
 
 };
 

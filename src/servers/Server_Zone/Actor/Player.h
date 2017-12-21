@@ -6,8 +6,8 @@
 
 #include <Server_Common/Common.h>
 #include <Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
-#include <Server_Zone/Actor/Social/FriendList.h>
-#include <Server_Zone/Actor/Social/Manager/FriendListMgr.h>
+#include <Server_Zone/Social/FriendList.h>
+#include <Server_Zone/Social/Manager/FriendListMgr.h>
 #include <Server_Common/Common.h>
 
 #include "Actor.h"

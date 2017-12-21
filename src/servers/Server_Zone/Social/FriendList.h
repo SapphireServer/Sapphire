@@ -5,7 +5,7 @@
 #include <Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Server_Common/Network/GamePacketNew.h>
 #include <Server_Common/Forwards.h>
-#include <Server_Zone/Actor/Social/Group.h>
+#include <Server_Zone/Social/Group.h>
 #include <Server_Zone/Forwards.h>
 #include <boost/enable_shared_from_this.hpp>
 #include <set>

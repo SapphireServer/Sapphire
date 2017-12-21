@@ -1,19 +1,19 @@
 #include "../Group.h"
-#include "GroupMgr.h"
+#include "SocialMgr.h"
 
-using namespace Core::Entity;
 
-Social::GroupMgr::GroupMgr()
+template< class T >
+Core::Social::SocialMgr::GroupMgr()
 {
 
 }
 
-Social::GroupMgr::~GroupMgr()
+Core::Social::SocialMgr::~GroupMgr()
 {
 
 }
 
-Social::GroupPtr Social::GroupMgr::findGroupByInviteIdForPlayer( uint64_t playerId ) const
+T Core::Social::SocialMgr::findGroupByInviteIdForPlayer( uint64_t playerId ) const
 {
    auto it = m_invites.find( playerId );
    if( it != m_invites.end() )
@@ -23,7 +23,7 @@ Social::GroupPtr Social::GroupMgr::findGroupByInviteIdForPlayer( uint64_t player
    return nullptr;
 }
 
-Social::GroupPtr Social::GroupMgr::findGroupById( uint64_t groupId ) const
+T Core::Social::SocialMgr::findGroupById( uint64_t groupId ) const
 {
    auto it = m_groups.find( groupId );
    if( it != m_groups.end() )
@@ -33,13 +33,13 @@ Social::GroupPtr Social::GroupMgr::findGroupById( uint64_t groupId ) const
    return nullptr;
 }
 
-uint64_t Social::GroupMgr::generateGroupId()
+uint64_t Core::Social::SocialMgr::GroupMgr::generateGroupId()
 {
    m_lastGroupId++;
    return m_lastGroupId;
 }
 
-bool Social::GroupMgr::hasInvite( uint64_t playerId ) const
+bool Core::Social::SocialMgr::hasInvite( uint64_t playerId ) const
 {
    auto it = m_invites.find( playerId );
    if ( it != m_invites.end() )

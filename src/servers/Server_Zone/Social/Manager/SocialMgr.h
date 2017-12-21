@@ -6,23 +6,23 @@
 
 #include <boost/enable_shared_from_this.hpp>
 #include <Server_Zone/Forwards.h>
-#include <Server_Zone/Actor/Social/Group.h>
+#include <Social/Group.h>
 
 namespace Core {
-namespace Entity {
 namespace Social {
 
-class GroupMgr
+template< class T >
+class SocialMgr
 {
 public:
-   GroupMgr();
-   virtual ~GroupMgr();
+   SocialMgr();
+   virtual ~SocialMgr();
 
-   virtual GroupPtr findGroupByInviteIdForPlayer( uint64_t playerId ) const;
-   virtual GroupPtr findGroupById( uint64_t groupId ) const;
+   T findGroupByInviteIdForPlayer( uint64_t playerId ) const;
+   T findGroupById( uint64_t groupId ) const;
    /*
-   template <typename GroupPtr>
-   GroupPtr findGroup( uint64_t arg )
+
+   T findGroup( uint64_t groupId )
    {
       auto it = m_groups.find( groupId );
       if ( it != m_groups.end() )
@@ -35,10 +35,11 @@ public:
    bool hasInvite( uint64_t playerId ) const;
 
 protected:
-   GroupType m_type{ GroupType::None };
-   uint64_t m_groupCount{ 0 };
-   uint32_t m_maxEntries{ 0xFFFFFFFF };
-   
+// those would be implemented in T, so you'd have T.m_type and T.m_maxEntries
+//   GroupType m_type{ GroupType::None };
+//   uint32_t m_maxEntries{ 0xFFFFFFFF };
+
+   uint64_t m_groupCount{ 0 };   
    std::map< uint64_t, uint64_t > m_invites;
 
    uint64_t m_lastGroupId{ 0 };
@@ -61,11 +62,10 @@ protected:
    virtual uint64_t generateGroupId();
 
 private:
-   std::map< uint64_t, GroupPtr > m_groups;
+   std::map< uint64_t, T > m_groups;
 
 };
 
 }
 }
-};
 #endif /* ! _GROUPMGR_H */
