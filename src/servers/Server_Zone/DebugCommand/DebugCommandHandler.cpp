@@ -302,11 +302,8 @@ void Core::DebugCommandHandler::add( char * data, Entity::Player& player, boost:
       // command has parameters, grab the first part
       subCommand = tmpCommand.substr( 0, pos );
    else
-   {
       // no subcommand given
       subCommand = tmpCommand;
-      return;
-   }
 
    if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
       params = std::string( data + command->getName().length() + 1 + pos + 1 );
