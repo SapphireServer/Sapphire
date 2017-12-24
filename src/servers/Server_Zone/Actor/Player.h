@@ -385,6 +385,8 @@ public:
    void learnAction( uint8_t actionId );
    /*! learn a song / update the unlock bitmask. */
    void learnSong( uint8_t songId, uint32_t itemId );
+   /*! get a mount / update the unlock bitmask. */
+   void learnMount( uint8_t mountId );
    /*! check if an action is already unlocked in the bitmask. */
    bool isActionLearned( uint8_t actionId ) const;
    /*! return a const pointer to the unlock bitmask array */

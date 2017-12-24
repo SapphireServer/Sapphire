@@ -70,6 +70,7 @@ enum GmCommand
    Exp = 0x0068,
    Inv = 0x006A,
 
+   Mount = 0x0071,
    Orchestrion = 0x0074,
 
    Item = 0x00C8,
@@ -141,7 +142,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       player.sendNotice( "Race for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
       targetPlayer->spawn( targetPlayer );
       auto inRange = targetPlayer->getInRangeActors();
-      for ( auto actor : inRange )
+      for( auto actor : inRange )
       {
          targetPlayer->despawn( actor->getAsPlayer() );
          targetPlayer->spawn( actor->getAsPlayer() );
@@ -154,7 +155,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       player.sendNotice( "Tribe for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
       targetPlayer->spawn( targetPlayer );
       auto inRange = targetPlayer->getInRangeActors();
-      for ( auto actor : inRange )
+      for( auto actor : inRange )
       {
          targetPlayer->despawn( actor->getAsPlayer() );
          targetPlayer->spawn( actor->getAsPlayer() );
@@ -167,7 +168,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       player.sendNotice( "Sex for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
       targetPlayer->spawn( targetPlayer );
       auto inRange = targetActor->getInRangeActors();
-      for ( auto actor : inRange )
+      for( auto actor : inRange )
       {
          targetPlayer->despawn( actor->getAsPlayer() );
          targetPlayer->spawn( actor->getAsPlayer() );
@@ -189,7 +190,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    }
    case GmCommand::Call:
    {
-      if ( targetPlayer->getZoneId() != player.getZoneId() )
+      if( targetPlayer->getZoneId() != player.getZoneId() )
          targetPlayer->setZone( player.getZoneId() );
 
       targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z,
@@ -268,7 +269,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    }
    case GmCommand::Inv:
    {
-      if ( targetActor->getInvincibilityType() == Common::InvincibilityType::InvincibilityRefill )
+      if( targetActor->getInvincibilityType() == Common::InvincibilityType::InvincibilityRefill )
          targetActor->setInvincibilityType( Common::InvincibilityType::InvincibilityNone );
       else
          targetActor->setInvincibilityType( Common::InvincibilityType::InvincibilityRefill );
@@ -279,11 +280,11 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    }
    case GmCommand::Orchestrion:
    {
-      if ( param1 == 1 )
+      if( param1 == 1 )
       {
-         if ( param2 == 0 )
+         if( param2 == 0 )
          {
-            for ( uint8_t i = 0; i < 255; i++ )
+            for( uint8_t i = 0; i < 255; i++ )
                targetActor->getAsPlayer()->learnSong( i, 0 );
 
             player.sendNotice( "All Songs for " + targetPlayer->getName() +
@@ -299,6 +300,25 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
 
       break;
    }
+   case GmCommand::Mount:
+   {
+      if( param2 == 0 )
+      {
+         for( uint8_t i = 0; i < 255; i++ )
+            targetActor->getAsPlayer()->learnMount( i );
+
+         player.sendNotice( "All mounts for " + targetPlayer->getName() +
+            " were turned on." );
+      }
+      else
+      {
+         targetActor->getAsPlayer()->learnMount( param1 );
+         player.sendNotice( "Mount " + std::to_string( param1 ) + " for " + targetPlayer->getName() +
+            " was turned on." );
+      }
+
+      break;
+   }
    case GmCommand::Item:
    {
       if( param2 < 1 || param2 > 99 )
@@ -306,7 +326,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
          param2 = 1;
       }
 
-      if( ( param1 == 0xcccccccc ) )
+      if( param1 == 0xcccccccc )
       {
          player.sendUrgent( "Syntaxerror." );
          return;
@@ -326,7 +346,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    {
       uint32_t gil = targetPlayer->getCurrency( 1 );
 
-      if ( gil < param1 )
+      if( gil < param1 )
       {
          player.sendUrgent( "Player does not have enough Gil(" + std::to_string( gil ) + ")" );
       }
@@ -381,11 +401,11 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    }
    case GmCommand::Aetheryte:
    {
-      if ( param1 == 0 )
+      if( param1 == 0 )
       {
-         if ( param2 == 0 )
+         if( param2 == 0 )
          {
-            for ( uint8_t i = 0; i < 255; i++ )
+            for( uint8_t i = 0; i < 255; i++ )
                targetActor->getAsPlayer()->registerAetheryte( i );
 
             player.sendNotice( "All Aetherytes for " + targetPlayer->getName() +
@@ -404,7 +424,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    case GmCommand::Teri:
    {
       auto zoneInfo = g_zoneMgr.getZone( param1 );
-      if ( !zoneInfo )
+      if( !zoneInfo )
       {
          player.sendUrgent( "Invalid zone " + std::to_string( param1 ) );
       }
@@ -412,7 +432,8 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       {
          targetPlayer->setPosition( targetPlayer->getPos() );
          targetPlayer->performZoning( param1, targetPlayer->getPos(), 0 );
-         player.sendNotice( targetPlayer->getName() + " was warped to zone " + std::to_string( param1 ) + " (" + zoneInfo->getName( ) + ")" );
+         
+         player.sendNotice( targetPlayer->getName() + " was warped to zone " + std::to_string( param1 ) + " (" + zoneInfo->getName() + ")" );
       }
       break;
    }
@@ -438,7 +459,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       player.sendNotice( "Jumping to " + targetPlayer->getName() + " in range." );
       break;
    }
-  
+
    default:
       player.sendUrgent( "GM1 Command not implemented: " + std::to_string( commandId ) );
       break;

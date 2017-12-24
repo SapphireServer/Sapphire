@@ -127,11 +127,12 @@ void Core::DebugCommandHandler::scriptReload( char * data, Entity::Player& playe
 void Core::DebugCommandHandler::help( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
 {
    player.sendDebug( "Registered debug commands:" );
-   for ( auto cmd : m_commandMap )
+   for( auto cmd : m_commandMap )
    {
-      if ( player.getGmRank( ) >= cmd.second->m_gmLevel )
+      if( player.getGmRank() >= cmd.second->m_gmLevel )
       {
-         player.sendDebug( " - " + cmd.first + " - " + cmd.second->getHelpText( ) );
+         player.sendDebug( " - " + cmd.first + " - " + cmd.second->getHelpText() );
+
       }
    }
 }
@@ -236,26 +237,26 @@ void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost:
    }
    else if( subCommand == "classjob" )
    {
-       int32_t id;
+      int32_t id;
 
-       sscanf( params.c_str(), "%d", &id );
+      sscanf( params.c_str(), "%d", &id );
 
-       if( player.getLevelForClass( static_cast< Common::ClassJob > ( id ) ) == 0 )
-       {
-           player.setLevelForClass( 1, static_cast< Common::ClassJob > ( id ) );
-           player.setClassJob( static_cast< Common::ClassJob > ( id ) );
-       }
-       else
-           player.setClassJob( static_cast< Common::ClassJob > ( id ) );
+      if( player.getLevelForClass( static_cast< Common::ClassJob > ( id ) ) == 0 )
+      {
+          player.setLevelForClass( 1, static_cast< Common::ClassJob > ( id ) );
+          player.setClassJob( static_cast< Common::ClassJob > ( id ) );
+      }
+      else
+          player.setClassJob( static_cast< Common::ClassJob > ( id ) );
    }
-   else if ( subCommand == "cfpenalty" )
+   else if( subCommand == "cfpenalty" )
    {
       int32_t minutes;
       sscanf( params.c_str(), "%d", &minutes );
 
       player.setCFPenaltyMinutes( minutes );
    }
-   else if ( subCommand == "eorzeatime" )
+   else if( subCommand == "eorzeatime" )
    {
       uint64_t timestamp;
       sscanf( params.c_str(), "%" SCNu64, &timestamp );
@@ -263,7 +264,7 @@ void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost:
       player.setEorzeaTimeOffset( timestamp );
       player.sendNotice( "Eorzea time offset: " + std::to_string( timestamp ) );
    }
-   else if ( subCommand == "model" )
+   else if( subCommand == "model" )
    {
       uint32_t slot;
       uint32_t val;
@@ -273,7 +274,7 @@ void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost:
       player.sendModel();
       player.sendDebug( "Model updated" );
    }
-   else if ( subCommand == "mount" )
+   else if( subCommand == "mount" )
    {
       int32_t id;
       sscanf( params.c_str(), "%d", &id );
@@ -394,6 +395,17 @@ void Core::DebugCommandHandler::add( char * data, Entity::Player& player, boost:
       player.queuePacket( controlPacket );*/
 
    }
+   else if( subCommand == "unlock" )
+   {
+      int32_t id;
+      sscanf( params.c_str(), "%d", &id );
+
+      player.learnAction( id );
+   }
+   else if( subCommand == "enablecompanion" )
+   {
+      player.learnAction( 17 );
+   }
    else
    {
       player.sendUrgent( subCommand + " is not a valid ADD command." );
@@ -426,7 +438,7 @@ void Core::DebugCommandHandler::get( char * data, Entity::Player& player, boost:
                 "subCommand " + subCommand + " params: " + params );
 
 
-   if( ( subCommand == "pos" ) )
+   if( subCommand == "pos" )
    {
 
       int16_t map_id = g_exdData.m_zoneInfoMap[player.getCurrentZone()->getId()].map_id;
@@ -516,5 +528,5 @@ void Core::DebugCommandHandler::serverInfo( char * data, Entity::Player& player,
 
 void Core::DebugCommandHandler::unlockCharacter( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
 {
-   player.unlock( );
+   player.unlock();
 }

@@ -621,6 +621,17 @@ void Core::Entity::Player::learnSong( uint8_t songId, uint32_t itemId )
    queuePacket( ActorControlPacket143( getId(), ToggleOrchestrionUnlock, songId, 1, itemId ) );
 }
 
+void Core::Entity::Player::learnMount( uint8_t mountId )
+{
+   uint16_t index;
+   uint8_t value;
+   Util::valueToFlagByteIndexValue( mountId, value, index );
+
+   m_mountGuide[index] |= value;
+
+   queuePacket( ActorControlPacket143( getId(), ToggleMountUnlock, mountId, 1 ) );
+}
+
 bool Core::Entity::Player::isActionLearned( uint8_t actionId ) const
 {
    uint16_t index;
