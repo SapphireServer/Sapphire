@@ -6,19 +6,19 @@
 
 #include <boost/format.hpp>
 
+#include "Actor/Player.h"
+#include "Event/EventHelper.h"
+#include "Forwards.h"
 #include "Network/GameConnection.h"
-#include "Session.h"
-#include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 #include "Network/PacketWrappers/ActorControlPacket144.h"
-#include "Network/PacketWrappers/EventStartPacket.h"
 #include "Network/PacketWrappers/EventFinishPacket.h"
+#include "Network/PacketWrappers/EventStartPacket.h"
 #include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
+#include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Script/ScriptManager.h"
-#include "Actor/Player.h"
-#include "Forwards.h"
-#include "Event/EventHelper.h"
+#include "Session.h"
 
 extern Core::Scripting::ScriptManager g_scriptMgr;
 
@@ -26,27 +26,26 @@ using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-void Core::Network::GameConnection::eventHandler( const Packets::GamePacket& inPacket,
-                                                  Entity::Player& player )
+void Core::Network::GameConnection::eventHandler( const Packets::GamePacket& inPacket, Entity::Player& player )
 {
    uint16_t eventHandlerId = inPacket.getValAt< uint16_t >( 0x12 );
 
    // we need to abort the event in case it has not been scripted so the player wont be locked up
-   auto abortEventFunc = []( Core::Entity::Player& player, uint64_t actorId, uint32_t eventId )
-   {
+   auto abortEventFunc = []( Core::Entity::Player& player, uint64_t actorId, uint32_t eventId ) {
       player.queuePacket( EventStartPacket( player.getId(), actorId, eventId, 1, 0, 0 ) );
       player.queuePacket( EventFinishPacket( player.getId(), eventId, 1, 0 ) );
       // this isn't ideal as it will also reset any other status that might be active
       player.queuePacket( PlayerStateFlagsPacket( player, PlayerStateFlagList{} ) );
    };
 
-   std::string eventIdStr = boost::str( boost::format( "%|04X|" ) % static_cast< uint32_t >( eventHandlerId & 0xFFFF ) );
+   std::string eventIdStr =
+       boost::str( boost::format( "%|04X|" ) % static_cast< uint32_t >( eventHandlerId & 0xFFFF ) );
    player.sendDebug( "---------------------------------------" );
    player.sendDebug( "EventHandler ( " + eventIdStr + " )" );
 
    switch( eventHandlerId )
    {
-   
+
    case ClientZoneIpcType::TalkEventHandler: // Talk event
    {
       uint64_t actorId = inPacket.getValAt< uint64_t >( 0x20 );
@@ -69,7 +68,6 @@ void Core::Network::GameConnection::eventHandler( const Packets::GamePacket& inP
          abortEventFunc( player, actorId, eventId );
       break;
    }
-
 
    case ClientZoneIpcType::WithinRangeEventHandler:
    {
@@ -144,14 +142,8 @@ void Core::Network::GameConnection::eventHandler( const Packets::GamePacket& inP
       linkshellEvent.data().unknown1 = 0x15a;
       player.queuePacket( linkshellEvent );
 
-//      abortEventFunc( pPlayer, 0, eventId );
+      //      abortEventFunc( pPlayer, 0, eventId );
       break;
    }
-
    }
-
 }
-
-
-
-

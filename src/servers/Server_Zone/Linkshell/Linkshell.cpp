@@ -1,20 +1,15 @@
 #include "Linkshell.h"
 
-
-Core::Linkshell::Linkshell( uint64_t id,
-                            const std::string &name,
-                            uint64_t masterId,
-                            const std::set<uint64_t> &members,
-                            const std::set<uint64_t> &leaders,
-                            const std::set<uint64_t> &invites ) :
-  m_linkshellId( id ),
-  m_name( name ),
-  m_masterCharacterId( masterId ),
-  m_memberIds( members ),
-  m_leaderIds( leaders ),
-  m_inviteIds( invites )
+Core::Linkshell::Linkshell( uint64_t id, const std::string& name, uint64_t masterId,
+                            const std::set< uint64_t >& members, const std::set< uint64_t >& leaders,
+                            const std::set< uint64_t >& invites ) :
+    m_linkshellId( id ),
+    m_name( name ),
+    m_masterCharacterId( masterId ),
+    m_memberIds( members ),
+    m_leaderIds( leaders ),
+    m_inviteIds( invites )
 {
-
 }
 
 uint64_t Core::Linkshell::getId() const
@@ -57,7 +52,7 @@ const std::set< uint64_t >& Core::Linkshell::getInviteIdList() const
    return m_inviteIds;
 }
 
-std::set< uint64_t > &Core::Linkshell::getInviteIdList()
+std::set< uint64_t >& Core::Linkshell::getInviteIdList()
 {
    return m_inviteIds;
 }
@@ -91,6 +86,3 @@ void Core::Linkshell::removeInvite( uint64_t memberId )
 {
    m_inviteIds.erase( memberId );
 }
-
-
-

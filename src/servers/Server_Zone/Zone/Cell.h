@@ -9,120 +9,77 @@
 
 namespace Core {
 
+struct CellCache
+{
+   std::vector< Entity::BattleNpcPtr > battleNpcCache;
+};
 
-   struct CellCache
-   {
-      std::vector< Entity::BattleNpcPtr > battleNpcCache;
-   };
+typedef std::set< Entity::ActorPtr > ActorSet;
 
-   typedef std::set< Entity::ActorPtr > ActorSet;
+class Cell
+{
+   friend class Zone;
 
-   class Cell 
-   {
-      friend class Zone;
+private:
+   bool m_bForcedActive;
+   uint16_t m_posX;
+   uint16_t m_posY;
+   ActorSet m_actors;
+   bool m_bActive;
+   bool m_bLoaded;
+   bool m_bUnloadPending;
 
-   private:
-      bool m_bForcedActive;
-      uint16_t m_posX;
-      uint16_t m_posY;
-      ActorSet m_actors;
-      bool m_bActive;
-      bool  m_bLoaded;
-      bool m_bUnloadPending;
+   uint16_t m_playerCount;
+   ZonePtr m_pZone;
 
-      uint16_t m_playerCount;
-      ZonePtr m_pZone;
+public:
+   Cell();
+   ~Cell();
 
-   public:
-      Cell();
-      ~Cell();
+   void init( uint32_t x, uint32_t y, ZonePtr pZone );
 
-      void init(uint32_t x, uint32_t y, ZonePtr pZone);
+   void addActor( Entity::ActorPtr pAct );
 
-      void addActor(Entity::ActorPtr pAct); 
+   void removeActor( Entity::ActorPtr pAct );
 
-      void removeActor(Entity::ActorPtr pAct);
+   void loadActors( CellCache* pCC );
 
-      void loadActors(CellCache* pCC);
+   bool hasActor( Entity::ActorPtr pAct ) { return ( m_actors.find( pAct ) != m_actors.end() ); }
 
-      bool hasActor(Entity::ActorPtr pAct) 
-      { 
-         return (m_actors.find(pAct) != m_actors.end()); 
-      }
+   bool hasPlayers() const { return ( ( m_playerCount > 0 ) ? true : false ); }
 
-      bool hasPlayers() const
-      { 
-         return ((m_playerCount > 0) ? true : false); 
-      }
+   size_t getActorCount() const { return m_actors.size(); }
 
-      size_t getActorCount() const
-      { 
-         return m_actors.size(); 
-      }
+   void removeActors();
 
-      void removeActors();
+   ActorSet::iterator begin() { return m_actors.begin(); }
 
-      ActorSet::iterator begin() 
-      {
-         return m_actors.begin(); 
-      }
+   ActorSet::iterator end() { return m_actors.end(); }
 
-      ActorSet::iterator end() 
-      {
-         return m_actors.end(); 
-      }
+   void setActivity( bool state );
 
-      void setActivity(bool state);
+   bool isActive() const { return m_bActive; }
 
-      bool isActive() const
-      {
-         return m_bActive; 
-      }
+   bool isLoaded() const { return m_bLoaded; }
 
-      bool isLoaded() const
-      { 
-         return m_bLoaded; 
-      }
+   uint32_t getPlayerCount() const { return m_playerCount; }
 
-      uint32_t getPlayerCount() const
-      {
-         return m_playerCount; 
-      }
+   bool isUnloadPending() const { return m_bUnloadPending; }
 
-      bool isUnloadPending() const
-      {
-         return m_bUnloadPending; 
-      }
+   void setUnloadPending( bool up ) { m_bUnloadPending = up; }
 
-      void setUnloadPending(bool up) 
-      {
-         m_bUnloadPending = up; 
-      }
+   void queueUnloadPending();
+   void cancelPendingUnload();
+   void unload();
 
-      void queueUnloadPending();
-      void cancelPendingUnload();
-      void unload();
+   void setPermanentActivity( bool val ) { m_bForcedActive = val; }
 
-      void setPermanentActivity(bool val) 
-      {
-         m_bForcedActive = val; 
-      }
+   bool isForcedActive() const { return m_bForcedActive; }
 
-      bool isForcedActive() const
-      {
-         return m_bForcedActive; 
-      }
+   uint16_t getPosX() const { return m_posX; }
 
-      uint16_t getPosX() const
-      { 
-         return m_posX; 
-      }
+   uint16_t getPosY() const { return m_posY; }
+};
 
-      uint16_t getPosY() const
-      { 
-         return m_posY; 
-      }
-   };
-
-}
+} // namespace Core
 #endif

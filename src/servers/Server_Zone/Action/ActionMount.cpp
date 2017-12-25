@@ -1,15 +1,15 @@
 #include "ActionMount.h"
 
 #include <Server_Common/Common.h>
-#include <Server_Common/Util/Util.h>
-#include <Server_Common/Util/UtilMath.h>
 #include <Server_Common/Exd/ExdData.h>
 #include <Server_Common/Logging/Logger.h>
+#include <Server_Common/Util/Util.h>
+#include <Server_Common/Util/UtilMath.h>
 
+#include "Actor/Player.h"
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 #include "Network/PacketWrappers/ActorControlPacket144.h"
-#include "Actor/Player.h"
 #include "Script/ScriptManager.h"
 
 using namespace Core::Common;
@@ -38,7 +38,6 @@ Core::Action::ActionMount::ActionMount( Entity::ActorPtr pActor, uint16_t mountI
 
 Core::Action::ActionMount::~ActionMount()
 {
-
 }
 
 void Core::Action::ActionMount::onStart()
@@ -61,7 +60,6 @@ void Core::Action::ActionMount::onStart()
    m_pSource->sendToInRangeSet( castPacket, true );
    m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::Casting );
    m_pSource->getAsPlayer()->sendStateFlags();
-
 }
 
 void Core::Action::ActionMount::onFinish()
@@ -79,7 +77,7 @@ void Core::Action::ActionMount::onFinish()
    effectPacket.data().targetId = pPlayer->getId();
    effectPacket.data().actionAnimationId = m_id;
    // Affects displaying action name next to number in floating text
-   effectPacket.data().unknown_62 = 13; 
+   effectPacket.data().unknown_62 = 13;
    effectPacket.data().actionTextId = 4;
    effectPacket.data().numEffects = 1;
    effectPacket.data().rotation = Math::Util::floatToUInt16Rot( pPlayer->getRotation() );
@@ -102,12 +100,11 @@ void Core::Action::ActionMount::onInterrupt()
    m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Casting );
    m_pSource->getAsPlayer()->sendStateFlags();
 
-   auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt,
-                                         0x219, 1, m_id, 0 );
+   auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt, 0x219, 1, m_id, 0 );
 
-   // Note: When cast interrupt from taking too much damage, set the last value to 1. This enables the cast interrupt effect. Example:
-   // auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt, 0x219, 1, m_id, 0 );
+   // Note: When cast interrupt from taking too much damage, set the last value to 1. This enables the cast interrupt
+   // effect. Example: auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt, 0x219,
+   // 1, m_id, 0 );
 
    m_pSource->sendToInRangeSet( control, true );
-
 }

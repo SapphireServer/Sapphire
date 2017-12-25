@@ -9,23 +9,22 @@ namespace Action {
 
    class ActionTeleport : public Action
    {
-   private: 
+   private:
       uint16_t m_targetAetheryte;
       uint16_t m_cost;
 
    public:
       ActionTeleport();
       ~ActionTeleport();
-      
+
       ActionTeleport( Entity::ActorPtr pActor, uint16_t action, uint16_t cost );
 
       void onStart() override;
       void onFinish() override;
       void onInterrupt() override;
-
    };
 
-}
-}
+} // namespace Action
+} // namespace Core
 
 #endif

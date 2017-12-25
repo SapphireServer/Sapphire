@@ -1,25 +1,24 @@
 #ifndef _ZONE_H
 #define _ZONE_H
 
-#include <unordered_map>
 #include <Server_Common/Common.h>
+#include <unordered_map>
 
 #include "Cell.h"
 #include "CellHandler.h"
 
 #include "Forwards.h"
 
-#include <set>
 #include <boost/enable_shared_from_this.hpp>
+#include <set>
 
 #include <stdio.h>
 #include <string.h>
 namespace Core {
-namespace Entity
-{
+namespace Entity {
    class Actor;
    class Player;
-}
+} // namespace Entity
 
 class Session;
 
@@ -27,11 +26,13 @@ class ZonePosition;
 
 typedef std::set< SessionPtr > SessionSet;
 
-class Zone : public CellHandler< Cell >, public boost::enable_shared_from_this< Zone >
+class Zone
+    : public CellHandler< Cell >
+    , public boost::enable_shared_from_this< Zone >
 {
 protected:
-   uint32_t	m_zoneId;
-   uint32_t	m_layoutId;
+   uint32_t m_zoneId;
+   uint32_t m_layoutId;
 
    std::string m_zoneName;
    std::string m_zoneCode;
@@ -89,7 +90,8 @@ public:
 
    void updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell );
 
-   void queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range, Network::Packets::GamePacketPtr pPacketEntry );
+   void queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range,
+                                Network::Packets::GamePacketPtr pPacketEntry );
 
    virtual uint32_t getId();
 
@@ -108,9 +110,8 @@ public:
    void updateBnpcs( int64_t tickCount );
 
    bool runZoneLogic();
-
 };
 
-}
+} // namespace Core
 
 #endif

@@ -1,11 +1,10 @@
 #ifndef INVENTORY_H_
 #define INVENTORY_H_
-#include <map>
-#include <Server_Common/Common.h>
 #include "../Forwards.h"
+#include <Server_Common/Common.h>
+#include <map>
 
-namespace Core
-{
+namespace Core {
 
 class ItemContainer;
 
@@ -37,10 +36,10 @@ public:
 
       Currency = 2000,
       Crystal = 2001,
-      //UNKNOWN_0 = 2003,
+      // UNKNOWN_0 = 2003,
       KeyItem = 2004,
       DamagedGear = 2007,
-      //UNKNOWN_1 = 2008,
+      // UNKNOWN_1 = 2008,
 
       ArmoryOff = 3200,
       ArmoryHead = 3201,
@@ -193,11 +192,10 @@ public:
 
    uint32_t getNextUId();
 
-
 private:
    Entity::Player* m_pOwner;
    InventoryMap m_inventoryMap;
 };
 
-}
+} // namespace Core
 #endif

@@ -1,22 +1,21 @@
 #include "ServerZone.h"
 
-#include <Server_Common/Version.h>
-#include <Server_Common/Logging/Logger.h>
 #include <Server_Common/Config/XMLConfig.h>
+#include <Server_Common/Logging/Logger.h>
 #include <Server_Common/Version.h>
 
-#include <MySqlBase.h>
 #include <Connection.h>
+#include <MySqlBase.h>
 
 #include <Server_Common/Network/Connection.h>
 #include <Server_Common/Network/Hive.h>
 
-#include <Server_Common/Exd/ExdData.h>
-#include <Server_Common/Network/PacketContainer.h>
-#include <Server_Common/Database/DbLoader.h>
 #include <Server_Common/Database/CharaDbConnection.h>
+#include <Server_Common/Database/DbLoader.h>
 #include <Server_Common/Database/DbWorkerPool.h>
 #include <Server_Common/Database/PreparedStatement.h>
+#include <Server_Common/Exd/ExdData.h>
+#include <Server_Common/Network/PacketContainer.h>
 
 #include "Network/GameConnection.h"
 #include "Session.h"
@@ -25,13 +24,13 @@
 
 #include "DebugCommand/DebugCommandHandler.h"
 
-#include "Script/ScriptManager.h"
 #include "Linkshell/LinkshellMgr.h"
+#include "Script/ScriptManager.h"
 
 #include "Forwards.h"
+#include <boost/algorithm/string.hpp>
 #include <boost/foreach.hpp>
 #include <boost/make_shared.hpp>
-#include <boost/algorithm/string.hpp>
 #include <thread>
 
 Core::Logger g_log;
@@ -42,10 +41,10 @@ Core::ZoneMgr g_zoneMgr;
 Core::LinkshellMgr g_linkshellMgr;
 Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
 
-Core::ServerZone::ServerZone( const std::string& configPath )
-   : m_configPath( configPath ),
-     m_bRunning( true ),
-     m_lastDBPingTime( 0 )
+Core::ServerZone::ServerZone( const std::string& configPath ) :
+    m_configPath( configPath ),
+    m_bRunning( true ),
+    m_lastDBPingTime( 0 )
 {
    m_pConfig = XMLConfigPtr( new XMLConfig );
 }
@@ -64,8 +63,8 @@ size_t Core::ServerZone::getSessionCount() const
    return m_sessionMapById.size();
 }
 
-bool Core::ServerZone::registerBnpcTemplate( std::string templateName, uint32_t bnpcBaseId, 
-                                             uint32_t bnpcNameId, uint32_t modelId, std::string aiName )
+bool Core::ServerZone::registerBnpcTemplate( std::string templateName, uint32_t bnpcBaseId, uint32_t bnpcNameId,
+                                             uint32_t modelId, std::string aiName )
 {
 
    auto it = m_bnpcTemplates.find( templateName );
@@ -76,7 +75,8 @@ bool Core::ServerZone::registerBnpcTemplate( std::string templateName, uint32_t 
       return false;
    }
 
-   Entity::BattleNpcTemplatePtr pNpcTemplate( new Entity::BattleNpcTemplate( templateName, bnpcBaseId, bnpcNameId, modelId, aiName ) );
+   Entity::BattleNpcTemplatePtr pNpcTemplate(
+       new Entity::BattleNpcTemplate( templateName, bnpcBaseId, bnpcNameId, modelId, aiName ) );
    m_bnpcTemplates[templateName] = pNpcTemplate;
 
    return true;
@@ -86,7 +86,7 @@ Core::Entity::BattleNpcTemplatePtr Core::ServerZone::getBnpcTemplate( std::strin
 {
    auto it = m_bnpcTemplates.find( templateName );
 
-   if (it != m_bnpcTemplates.end())
+   if( it != m_bnpcTemplates.end() )
       return nullptr;
 
    return it->second;
@@ -102,7 +102,7 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
       return false;
    }
 
-   std::vector<std::string> args( argv + 1, argv + argc );
+   std::vector< std::string > args( argv + 1, argv + argc );
    for( uint32_t i = 0; i + 1 < args.size(); i += 2 )
    {
       std::string arg( "" );
@@ -229,7 +229,7 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
 
    std::vector< std::thread > thread_list;
    thread_list.emplace_back( std::thread( std::bind( &Network::Hive::Run, hive.get() ) ) );
-   
+
    g_log.info( "Server listening on port: " + std::to_string( m_port ) );
    g_log.info( "Ready for connections..." );
 
@@ -239,12 +239,11 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
    {
       thread_entry.join();
    }
-
 }
 
 void Core::ServerZone::printBanner() const
 {
-   g_log.info("===========================================================" );
+   g_log.info( "===========================================================" );
    g_log.info( "Sapphire Server Project " );
    g_log.info( "Version: " + Version::VERSION );
    g_log.info( "Git Hash: " + Version::GIT_HASH );
@@ -273,7 +272,6 @@ void Core::ServerZone::mainLoop()
             // else do it here.
             if( !session->getPlayer()->getCurrentZone() )
                session->update();
-
          }
       }
 
@@ -282,7 +280,6 @@ void Core::ServerZone::mainLoop()
          g_charaDb.keepAlive();
          m_lastDBPingTime = currTime;
       }
-
 
       auto it = this->m_sessionMapById.begin();
       for( ; it != this->m_sessionMapById.end(); )
@@ -297,7 +294,7 @@ void Core::ServerZone::mainLoop()
             it->second->close();
             // if( it->second.unique() )
             {
-               g_log.info("[" + std::to_string(it->second->getId() ) + "] Session removal" );
+               g_log.info( "[" + std::to_string( it->second->getId() ) + "] Session removal" );
                it = this->m_sessionMapById.erase( it );
                removeSession( pPlayer->getName() );
                continue;
@@ -307,7 +304,7 @@ void Core::ServerZone::mainLoop()
          // remove sessions that simply timed out
          if( diff > 20 )
          {
-            g_log.info("[" + std::to_string(it->second->getId() ) + "] Session time out" );
+            g_log.info( "[" + std::to_string( it->second->getId() ) + "] Session time out" );
             it->second->close();
             // if( it->second.unique() )
             {
@@ -319,9 +316,7 @@ void Core::ServerZone::mainLoop()
          {
             ++it;
          }
-
       }
-
    }
 }
 
@@ -341,7 +336,7 @@ bool Core::ServerZone::createSession( uint32_t sessionId )
 
    g_log.info( "[" + session_id_str + "] Creating new session" );
 
-   boost::shared_ptr<Session> newSession( new Session( sessionId ) );
+   boost::shared_ptr< Session > newSession( new Session( sessionId ) );
    m_sessionMapById[sessionId] = newSession;
 
    if( !newSession->loadPlayer() )
@@ -353,7 +348,6 @@ bool Core::ServerZone::createSession( uint32_t sessionId )
    m_sessionMapByName[newSession->getPlayer()->getName()] = newSession;
 
    return true;
-
 }
 
 void Core::ServerZone::removeSession( uint32_t sessionId )
@@ -372,7 +366,7 @@ void Core::ServerZone::updateSession( uint32_t id )
 
 Core::SessionPtr Core::ServerZone::getSession( uint32_t id )
 {
-   //std::lock_guard<std::mutex> lock( m_sessionMutex );
+   // std::lock_guard<std::mutex> lock( m_sessionMutex );
 
    auto it = m_sessionMapById.find( id );
 
@@ -384,12 +378,12 @@ Core::SessionPtr Core::ServerZone::getSession( uint32_t id )
 
 Core::SessionPtr Core::ServerZone::getSession( std::string playerName )
 {
-   //std::lock_guard<std::mutex> lock( m_sessionMutex );
+   // std::lock_guard<std::mutex> lock( m_sessionMutex );
 
    auto it = m_sessionMapByName.find( playerName );
 
-   if (it != m_sessionMapByName.end())
-      return (it->second);
+   if( it != m_sessionMapByName.end() )
+      return ( it->second );
 
    return nullptr;
 }
@@ -412,4 +406,3 @@ bool Core::ServerZone::isRunning() const
 {
    return m_bRunning;
 }
-

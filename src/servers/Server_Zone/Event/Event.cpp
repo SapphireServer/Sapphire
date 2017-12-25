@@ -1,11 +1,12 @@
 #include "Event.h"
 
-Core::Event::Event::Event( uint64_t actorId, uint32_t eventId, uint8_t eventType, uint8_t eventParam2, uint32_t eventParam3 )
-   : m_actorId( actorId ),
-     m_eventId( eventId ),
-     m_playedScene( false )
+Core::Event::Event::Event( uint64_t actorId, uint32_t eventId, uint8_t eventType, uint8_t eventParam2,
+                           uint32_t eventParam3 ) :
+    m_actorId( actorId ),
+    m_eventId( eventId ),
+    m_playedScene( false )
 {
-  
+
    m_param1 = static_cast< uint16_t >( eventId );
    m_param2 = static_cast< uint16_t >( eventId >> 16 );
 
@@ -60,7 +61,6 @@ void Core::Event::Event::setEventReturnCallback( Scripting::EventReturnCallback 
 {
    m_callback = callback;
 }
-
 
 bool Core::Event::Event::hasPlayedScene() const
 {

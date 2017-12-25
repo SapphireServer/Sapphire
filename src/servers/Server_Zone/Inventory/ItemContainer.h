@@ -7,41 +7,40 @@
 
 #include "../Forwards.h"
 
-namespace Core
+namespace Core {
+
+typedef std::map< uint8_t, ItemPtr > ItemMap;
+
+class ItemContainer
 {
 
-   typedef std::map< uint8_t, ItemPtr > ItemMap;
+public:
+   ItemContainer( uint16_t locationId );
+   ~ItemContainer();
 
-   class ItemContainer 
-   {
+   uint16_t getId() const;
 
-   public:
-      ItemContainer( uint16_t locationId );
-      ~ItemContainer();
+   uint8_t getEntryCount() const;
 
-      uint16_t getId() const;
+   void removeItem( uint8_t slotId );
 
-      uint8_t getEntryCount() const;
+   ItemMap& getItemMap();
 
-      void removeItem( uint8_t slotId );
+   const ItemMap& getItemMap() const;
 
-      ItemMap& getItemMap();
+   ItemPtr getItem( uint8_t slotId );
 
-      const ItemMap& getItemMap() const;
+   void setItem( uint8_t slotId, ItemPtr item );
 
-      ItemPtr getItem( uint8_t slotId );
+   int16_t getFreeSlot();
 
-      void setItem( uint8_t slotId, ItemPtr item );
+private:
+   uint16_t m_id;
+   uint8_t m_size;
+   ItemMap m_itemMap;
+   Entity::PlayerPtr m_pOwner;
+};
 
-      int16_t getFreeSlot();
-
-   private:
-      uint16_t m_id;
-      uint8_t m_size;
-      ItemMap m_itemMap;
-      Entity::PlayerPtr m_pOwner;
-   };
-
-}
+} // namespace Core
 
 #endif

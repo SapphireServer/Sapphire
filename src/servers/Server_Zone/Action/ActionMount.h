@@ -9,21 +9,19 @@ namespace Action {
 
    class ActionMount : public Action
    {
-   private: 
-
+   private:
    public:
       ActionMount();
       ~ActionMount();
-      
+
       ActionMount( Entity::ActorPtr pActor, uint16_t mountId );
 
       void onStart() override;
       void onFinish() override;
       void onInterrupt() override;
-
    };
 
-}
-}
+} // namespace Action
+} // namespace Core
 
 #endif

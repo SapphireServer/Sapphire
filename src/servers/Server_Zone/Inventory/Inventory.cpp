@@ -1,19 +1,19 @@
-#include <Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Server_Common/Common.h>
 #include <Server_Common/Exd/ExdData.h>
 #include <Server_Common/Logging/Logger.h>
+#include <Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
 
 #include "Inventory.h"
 
 #include "Actor/Player.h"
 
-#include "ItemContainer.h"
 #include "Item.h"
+#include "ItemContainer.h"
 
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 
-#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/clamp.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include "../Forwards.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
@@ -35,8 +35,9 @@ Core::Inventory::Inventory( Core::Entity::Player* pOwner )
 
    // shortcut for setting up inventory
    // TODO: use a loop to set theese up?
-   auto setupContainer = []( InventoryMap& map, InventoryType type )
-   { map[type] = ItemContainerPtr( new ItemContainer( type ) ); };
+   auto setupContainer = []( InventoryMap& map, InventoryType type ) {
+      map[type] = ItemContainerPtr( new ItemContainer( type ) );
+   };
 
    // main bags
    setupContainer( m_inventoryMap, Bag0 );
@@ -52,8 +53,8 @@ Core::Inventory::Inventory( Core::Entity::Player* pOwner )
 
    // crystals??
    setupContainer( m_inventoryMap, Crystal );
-   //m_inventoryMap[0x07D3] = ItemContainerPtr( new ItemContainer( UNKNOWN_0 ) );
-   //m_inventoryMap[0x07D8] = ItemContainerPtr( new ItemContainer( UNKNOWN_1 ) );
+   // m_inventoryMap[0x07D3] = ItemContainerPtr( new ItemContainer( UNKNOWN_0 ) );
+   // m_inventoryMap[0x07D8] = ItemContainerPtr( new ItemContainer( UNKNOWN_1 ) );
 
    // armory weapons - 0
    setupContainer( m_inventoryMap, ArmoryMain );
@@ -61,40 +62,39 @@ Core::Inventory::Inventory( Core::Entity::Player* pOwner )
    // armory offhand - 1
    setupContainer( m_inventoryMap, ArmoryOff );
 
-   //armory head - 2
+   // armory head - 2
    setupContainer( m_inventoryMap, ArmoryHead );
 
-   //armory body - 3
+   // armory body - 3
    setupContainer( m_inventoryMap, ArmoryBody );
 
-   //armory hand - 4
+   // armory hand - 4
    setupContainer( m_inventoryMap, ArmoryHand );
 
-   //armory waist - 5
+   // armory waist - 5
    setupContainer( m_inventoryMap, ArmoryWaist );
 
-   //armory legs - 6
+   // armory legs - 6
    setupContainer( m_inventoryMap, ArmoryLegs );
 
-   //armory feet - 7
+   // armory feet - 7
    setupContainer( m_inventoryMap, ArmoryFeet );
 
-   //neck
+   // neck
    setupContainer( m_inventoryMap, ArmotyNeck );
 
-   //earring
+   // earring
    setupContainer( m_inventoryMap, ArmoryEar );
 
-   //wrist
+   // wrist
    setupContainer( m_inventoryMap, ArmoryWrist );
 
-   //armory rings - 11
+   // armory rings - 11
    setupContainer( m_inventoryMap, ArmoryRing );
 
-   //soul crystals - 13
+   // soul crystals - 13
    setupContainer( m_inventoryMap, ArmorySoulCrystal );
 }
-
 
 Core::Inventory::~Inventory()
 {
@@ -157,16 +157,12 @@ Core::ItemPtr Core::Inventory::createItem( uint32_t catalogId, uint8_t quantity 
    pItem->setCategory( static_cast< ItemUICategory >( itemInfo->ui_category ) );
 
    g_charaDb.execute( "INSERT INTO charaglobalitem ( CharacterId, itemId, catalogId, stack, flags ) VALUES ( " +
-                      std::to_string( m_pOwner->getId() ) + ", " +
-                      std::to_string( pItem->getUId() ) + ", " +
-                      std::to_string( pItem->getId() ) + ", " +
-                      std::to_string( itemAmount ) + ", " +
+                      std::to_string( m_pOwner->getId() ) + ", " + std::to_string( pItem->getUId() ) + ", " +
+                      std::to_string( pItem->getId() ) + ", " + std::to_string( itemAmount ) + ", " +
                       std::to_string( flags ) + ");" );
 
    return pItem;
-
 }
-
 
 uint32_t Core::Inventory::getCurrency( CurrencyType type )
 {
@@ -177,7 +173,6 @@ uint32_t Core::Inventory::getCurrency( CurrencyType type )
       return 0;
 
    return currItem->getStackSize();
-
 }
 
 uint32_t Core::Inventory::getCrystal( CrystalType type )
@@ -189,7 +184,6 @@ uint32_t Core::Inventory::getCrystal( CrystalType type )
       return 0;
 
    return currItem->getStackSize();
-
 }
 
 bool Core::Inventory::addCrystal( CrystalType type, uint32_t amount )
@@ -211,7 +205,6 @@ bool Core::Inventory::addCrystal( CrystalType type, uint32_t amount )
    updateItemDb( currItem );
 
    return true;
-
 }
 
 bool Core::Inventory::addCurrency( CurrencyType type, uint32_t amount )
@@ -233,7 +226,6 @@ bool Core::Inventory::addCurrency( CurrencyType type, uint32_t amount )
    updateItemDb( currItem );
 
    return true;
-
 }
 
 void Core::Inventory::updateCurrencyDb()
@@ -261,7 +253,6 @@ void Core::Inventory::updateCurrencyDb()
 
    g_charaDb.execute( query );
 }
-
 
 void Core::Inventory::updateCrystalDb()
 {
@@ -304,25 +295,17 @@ void Core::Inventory::updateBagDb( InventoryType type )
    }
 
    query += " WHERE CharacterId = " + std::to_string( m_pOwner->getId() ) +
-      " AND storageId = " + std::to_string( static_cast< uint16_t >( type ) );
+            " AND storageId = " + std::to_string( static_cast< uint16_t >( type ) );
 
    g_charaDb.execute( query );
 }
 
 bool Core::Inventory::isArmory( uint16_t containerId )
 {
-   return 
-      containerId == ArmoryBody ||
-      containerId == ArmoryEar ||
-      containerId == ArmoryFeet ||
-      containerId == ArmoryHand ||
-      containerId == ArmoryHead ||
-      containerId == ArmoryLegs ||
-      containerId == ArmoryMain ||
-      containerId == ArmoryOff ||
-      containerId == ArmoryRing ||
-      containerId == ArmoryWaist ||
-      containerId == ArmoryWrist;
+   return containerId == ArmoryBody || containerId == ArmoryEar || containerId == ArmoryFeet ||
+          containerId == ArmoryHand || containerId == ArmoryHead || containerId == ArmoryLegs ||
+          containerId == ArmoryMain || containerId == ArmoryOff || containerId == ArmoryRing ||
+          containerId == ArmoryWaist || containerId == ArmoryWrist;
 }
 
 uint16_t Core::Inventory::getArmoryToEquipSlot( uint8_t slotId )
@@ -364,13 +347,10 @@ uint16_t Core::Inventory::getArmoryToEquipSlot( uint8_t slotId )
    return 0;
 }
 
-
-
 bool Core::Inventory::isEquipment( uint16_t containerId )
 {
    return containerId == GearSet0;
 }
-
 
 void Core::Inventory::updateMannequinDb( InventoryType type )
 {
@@ -387,18 +367,17 @@ void Core::Inventory::updateMannequinDb( InventoryType type )
    }
 
    query += " WHERE CharacterId = " + std::to_string( m_pOwner->getId() ) +
-      " AND storageId = " + std::to_string( static_cast< uint16_t >( type ) );
+            " AND storageId = " + std::to_string( static_cast< uint16_t >( type ) );
 
    g_log.Log( LoggingSeverity::debug, query );
    g_charaDb.execute( query );
 }
 
-
 void Core::Inventory::updateItemDb( Core::ItemPtr pItem ) const
 {
    g_charaDb.execute( "UPDATE charaglobalitem SET stack = " + std::to_string( pItem->getStackSize() ) + " " +
-                     // TODO: add other attributes
-                     " WHERE itemId = " + std::to_string( pItem->getUId() ) );
+                      // TODO: add other attributes
+                      " WHERE itemId = " + std::to_string( pItem->getUId() ) );
 }
 
 bool Core::Inventory::removeCurrency( CurrencyType type, uint32_t amount )
@@ -441,7 +420,7 @@ bool Core::Inventory::removeCrystal( CrystalType type, uint32_t amount )
 
 bool Core::Inventory::isOneHandedWeapon( ItemUICategory weaponCategory )
 {
-   switch ( weaponCategory )
+   switch( weaponCategory )
    {
    case ItemUICategory::AlchemistsPrimaryTool:
    case ItemUICategory::ArmorersPrimaryTool:
@@ -465,10 +444,9 @@ bool Core::Inventory::isOneHandedWeapon( ItemUICategory weaponCategory )
 
 bool Core::Inventory::isObtainable( uint32_t catalogId, uint8_t quantity )
 {
-   
+
    return true;
 }
-
 
 int16_t Core::Inventory::addItem( uint16_t inventoryId, int8_t slotId, uint32_t catalogId, uint8_t quantity )
 {
@@ -483,13 +461,13 @@ int16_t Core::Inventory::addItem( uint16_t inventoryId, int8_t slotId, uint32_t 
 
    int8_t rSlotId = -1;
 
-   //if( itemInfo->stack_size > 1 )
+   // if( itemInfo->stack_size > 1 )
    //{
    //   auto itemList = this->getSlotsOfItemsInInventory( catalogId );
    //   // TODO: this is a stacked item so we need to see if the item is already in inventory and
    //   //       check how much free space we have on existing stacks before looking for empty slots.
    //}
-   //else
+   // else
    {
       auto freeSlot = this->getFreeBagSlot();
       inventoryId = freeSlot.first;
@@ -500,14 +478,14 @@ int16_t Core::Inventory::addItem( uint16_t inventoryId, int8_t slotId, uint32_t 
    }
 
    auto item = createItem( catalogId, quantity );
-   
+
    if( rSlotId != -1 )
    {
 
       m_inventoryMap[inventoryId]->setItem( rSlotId, item );
 
-      g_charaDb.execute( "UPDATE charaiteminventory SET container_" + std::to_string( rSlotId ) + " = " + std::to_string( item->getUId() ) +
-                         " WHERE storageId = " + std::to_string( inventoryId ) +
+      g_charaDb.execute( "UPDATE charaiteminventory SET container_" + std::to_string( rSlotId ) + " = " +
+                         std::to_string( item->getUId() ) + " WHERE storageId = " + std::to_string( inventoryId ) +
                          " AND CharacterId = " + std::to_string( m_pOwner->getId() ) );
 
       ZoneChannelPacket< FFXIVIpcUpdateInventorySlot > invUpPacket( m_pOwner->getId() );
@@ -519,12 +497,11 @@ int16_t Core::Inventory::addItem( uint16_t inventoryId, int8_t slotId, uint32_t 
       invUpPacket.data().condition = 30000;
       m_pOwner->queuePacket( invUpPacket );
 
-      m_pOwner->queuePacket( ActorControlPacket143( m_pOwner->getId(), ItemObtainIcon, catalogId, item->getStackSize() ) );
-
+      m_pOwner->queuePacket(
+          ActorControlPacket143( m_pOwner->getId(), ItemObtainIcon, catalogId, item->getStackSize() ) );
    }
 
    return rSlotId;
-
 }
 
 void Core::Inventory::moveItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot )
@@ -557,8 +534,6 @@ void Core::Inventory::moveItem( uint16_t fromInventoryId, uint8_t fromSlotId, ui
       m_pOwner->unequipItem( static_cast< EquipSlot >( fromSlotId ), tmpItem );
       updateMannequinDb( static_cast< InventoryType >( fromInventoryId ) );
    }
-
-
 }
 
 bool Core::Inventory::updateContainer( uint16_t containerId, uint8_t slotId, ItemPtr pItem )
@@ -569,26 +544,26 @@ bool Core::Inventory::updateContainer( uint16_t containerId, uint8_t slotId, Ite
 
    switch( containerType )
    {
-      case Armory:
-      case CurrencyCrystal:
-      case Bag:
-      {
-         updateBagDb( static_cast< InventoryType >( containerId ) );
-         break;
-      }
+   case Armory:
+   case CurrencyCrystal:
+   case Bag:
+   {
+      updateBagDb( static_cast< InventoryType >( containerId ) );
+      break;
+   }
 
-      case GearSet:
-      {
-         if( pItem )
-            m_pOwner->equipItem( static_cast< EquipSlot >( slotId ), pItem, true );
-         else
-            m_pOwner->unequipItem( static_cast< EquipSlot >( slotId ), pItem );
+   case GearSet:
+   {
+      if( pItem )
+         m_pOwner->equipItem( static_cast< EquipSlot >( slotId ), pItem, true );
+      else
+         m_pOwner->unequipItem( static_cast< EquipSlot >( slotId ), pItem );
 
-         updateMannequinDb( static_cast< InventoryType >( containerId ) );
-         break;
-      }
-      default:
-         break;
+      updateMannequinDb( static_cast< InventoryType >( containerId ) );
+      break;
+   }
+   default:
+      break;
    }
 
    return true;
@@ -605,13 +580,11 @@ void Core::Inventory::swapItem( uint16_t fromInventoryId, uint8_t fromSlotId, ui
 
    // An item is being moved from bag0-3 to equippment, meaning
    // the swapped out item will be placed in the matching armory.
-   if( isEquipment( toInventoryId ) 
-       && !isEquipment( fromInventoryId )
-       && !isArmory( fromInventoryId ) )
+   if( isEquipment( toInventoryId ) && !isEquipment( fromInventoryId ) && !isArmory( fromInventoryId ) )
    {
       updateContainer( fromInventoryId, fromSlotId, nullptr );
       fromInventoryId = getArmoryToEquipSlot( toSlot );
-      fromSlotId = static_cast < uint8_t >( m_inventoryMap[fromInventoryId]->getFreeSlot() );
+      fromSlotId = static_cast< uint8_t >( m_inventoryMap[fromInventoryId]->getFreeSlot() );
    }
 
    auto containerTypeFrom = getContainerType( fromInventoryId );
@@ -649,8 +622,9 @@ void Core::Inventory::discardItem( uint16_t fromInventoryId, uint8_t fromSlotId 
 
 Core::ItemPtr Core::Inventory::loadItem( uint64_t uId )
 {
-   // load actual item 
-   auto itemRes = g_charaDb.query( "SELECT catalogId, stack, flags FROM charaglobalitem WHERE itemId = " + std::to_string( uId ) + ";" );
+   // load actual item
+   auto itemRes = g_charaDb.query(
+       "SELECT catalogId, stack, flags FROM charaglobalitem WHERE itemId = " + std::to_string( uId ) + ";" );
    if( !itemRes->next() )
       return nullptr;
 
@@ -658,12 +632,8 @@ Core::ItemPtr Core::Inventory::loadItem( uint64_t uId )
    {
       auto itemInfo = g_exdData.getItemInfo( itemRes->getUInt( 1 ) );
       bool isHq = itemRes->getUInt( 3 ) == 1 ? true : false;
-      ItemPtr pItem( new Item( uId, 
-                               itemInfo->id, 
-                               itemInfo->model_primary,
-                               itemInfo->model_secondary, 
-                               static_cast< ItemUICategory >( itemInfo->ui_category ),
-                               isHq ) );
+      ItemPtr pItem( new Item( uId, itemInfo->id, itemInfo->model_primary, itemInfo->model_secondary,
+                               static_cast< ItemUICategory >( itemInfo->ui_category ), isHq ) );
       pItem->setStackSize( itemRes->getUInt( 2 ) );
 
       return pItem;
@@ -682,8 +652,10 @@ bool Core::Inventory::load()
                                "container_4, container_5, container_6, container_7, "
                                "container_8, container_9, container_10, container_11, "
                                "container_12, container_13 "
-                               "FROM charaitemgearset " \
-                               "WHERE CharacterId =  " + std::to_string( m_pOwner->getId() ) + " " \
+                               "FROM charaitemgearset "
+                               "WHERE CharacterId =  " +
+                               std::to_string( m_pOwner->getId() ) +
+                               " "
                                "ORDER BY storageId ASC;" );
 
    while( res->next() )
@@ -716,8 +688,10 @@ bool Core::Inventory::load()
                                   "container_20, container_21, container_22, container_23, container_24, "
                                   "container_25, container_26, container_27, container_28, container_29, "
                                   "container_30, container_31, container_32, container_33, container_34 "
-                                  "FROM charaiteminventory " \
-                                  "WHERE CharacterId =  " + std::to_string( m_pOwner->getId() ) + " " \
+                                  "FROM charaiteminventory "
+                                  "WHERE CharacterId =  " +
+                                  std::to_string( m_pOwner->getId() ) +
+                                  " "
                                   "ORDER BY storageId ASC;" );
 
    while( bagRes->next() )
@@ -738,15 +712,16 @@ bool Core::Inventory::load()
       }
    }
 
-
    ///////////////////////////////////////////////////////////////////////////////////////////////////////
    // Load Currency
    auto curRes = g_charaDb.query( "SELECT storageId, "
                                   "container_0, container_1, container_2, container_3, container_4, "
                                   "container_5, container_6, container_7, container_8, container_9, "
                                   "container_10, container_11 "
-                                  "FROM charaitemcurrency " \
-                                  "WHERE CharacterId =  " + std::to_string( m_pOwner->getId() ) + " " \
+                                  "FROM charaitemcurrency "
+                                  "WHERE CharacterId =  " +
+                                  std::to_string( m_pOwner->getId() ) +
+                                  " "
                                   "ORDER BY storageId ASC;" );
 
    while( curRes->next() )
@@ -767,7 +742,6 @@ bool Core::Inventory::load()
       }
    }
 
-
    ///////////////////////////////////////////////////////////////////////////////////////////////////////
    // Load Crystals
    auto crystalRes = g_charaDb.query( "SELECT storageId, "
@@ -775,8 +749,10 @@ bool Core::Inventory::load()
                                       "container_5, container_6, container_7, container_8, container_9, "
                                       "container_10, container_11, container_12, container_13, container_14, "
                                       "container_15, container_16, container_17 "
-                                      "FROM charaitemcrystal " \
-                                      "WHERE CharacterId =  " + std::to_string( m_pOwner->getId() ) + " " \
+                                      "FROM charaitemcrystal "
+                                      "WHERE CharacterId =  " +
+                                      std::to_string( m_pOwner->getId() ) +
+                                      " "
                                       "ORDER BY storageId ASC;" );
 
    while( crystalRes->next() )
@@ -799,7 +775,6 @@ bool Core::Inventory::load()
 
    return true;
 }
-
 
 void Core::Inventory::send()
 {
@@ -848,10 +823,7 @@ void Core::Inventory::send()
       containerInfoPacket.data().numItems = it->second->getEntryCount();
       containerInfoPacket.data().containerId = it->second->getId();
       m_pOwner->queuePacket( containerInfoPacket );
-
-
    }
-
 }
 
 uint16_t Core::Inventory::calculateEquippedGearItemLevel()
@@ -862,16 +834,16 @@ uint16_t Core::Inventory::calculateEquippedGearItemLevel()
 
    auto it = gearSetMap.begin();
 
-   while ( it != gearSetMap.end() )
+   while( it != gearSetMap.end() )
    {
       auto currItem = it->second;
 
-      if ( currItem )
+      if( currItem )
       {
          iLvlResult += currItem->getItemLevel();
 
          // If item is weapon and isn't one-handed
-         if ( currItem->isWeapon() && !isOneHandedWeapon( currItem->getCategory() ) )
+         if( currItem->isWeapon() && !isOneHandedWeapon( currItem->getCategory() ) )
          {
             iLvlResult += currItem->getItemLevel();
          }
@@ -887,7 +859,6 @@ uint16_t Core::Inventory::calculateEquippedGearItemLevel()
    return boost::algorithm::clamp( iLvlResult / 13, 0, 9999 );
 }
 
-
 uint8_t Core::Inventory::getFreeSlotsInBags()
 {
    uint8_t slots = 0;
@@ -897,7 +868,6 @@ uint8_t Core::Inventory::getFreeSlotsInBags()
    }
    return slots;
 }
-
 
 Core::Inventory::ContainerType Core::Inventory::getContainerType( uint32_t containerId )
 {

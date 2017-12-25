@@ -3,23 +3,23 @@
 
 #define TilesCount 32
 #define TileSize 250.0f
-#define _minY (-TilesCount*TileSize/2)
-#define _minX (-TilesCount*TileSize/2)
+#define _minY ( -TilesCount * TileSize / 2 )
+#define _minX ( -TilesCount * TileSize / 2 )
 
-#define _maxY (TilesCount*TileSize/2)
-#define _maxX (TilesCount*TileSize/2)
+#define _maxY ( TilesCount * TileSize / 2 )
+#define _maxX ( TilesCount * TileSize / 2 )
 
 #define CellsPerTile 4
-#define _cellSize (TileSize/CellsPerTile)
-#define _sizeX (TilesCount*CellsPerTile)
-#define _sizeY (TilesCount*CellsPerTile)
+#define _cellSize ( TileSize / CellsPerTile )
+#define _sizeX ( TilesCount * CellsPerTile )
+#define _sizeY ( TilesCount * CellsPerTile )
 
-#define GetRelatCoord(Coord,CellCoord) ((_maxX-Coord)-CellCoord*_cellSize)
+#define GetRelatCoord( Coord, CellCoord ) ( ( _maxX - Coord ) - CellCoord * _cellSize )
 namespace Core {
 
 class Zone;
 
-template<class T>
+template< class T >
 class CellHandler
 {
 public:
@@ -32,10 +32,7 @@ public:
    T* createByCoords( float x, float y );
    void remove( uint32_t x, uint32_t y );
 
-   bool allocated( uint32_t x, uint32_t y )
-   {
-      return m_pCells[x][y] != nullptr;
-   }
+   bool allocated( uint32_t x, uint32_t y ) { return m_pCells[x][y] != nullptr; }
 
    static uint32_t getPosX( float x );
    static uint32_t getPosY( float y );
@@ -43,21 +40,18 @@ public:
 protected:
    void _init();
 
-
-   T *** m_pCells;
-
+   T*** m_pCells;
 };
 
-template <class T>
-CellHandler<T>::CellHandler()
+template< class T >
+CellHandler< T >::CellHandler()
 {
 
    _init();
 }
 
-
-template <class T>
-void CellHandler<T>::_init()
+template< class T >
+void CellHandler< T >::_init()
 {
    m_pCells = new T**[_sizeX];
 
@@ -66,11 +60,10 @@ void CellHandler<T>::_init()
    {
       m_pCells[i] = nullptr;
    }
-
 }
 
-template <class T>
-CellHandler<T>::~CellHandler()
+template< class T >
+CellHandler< T >::~CellHandler()
 {
    if( m_pCells )
    {
@@ -94,8 +87,8 @@ CellHandler<T>::~CellHandler()
    }
 }
 
-template <class T>
-T* CellHandler<T>::create( uint32_t x, uint32_t y )
+template< class T >
+T* CellHandler< T >::create( uint32_t x, uint32_t y )
 {
    if( x >= _sizeX || y >= _sizeY )
    {
@@ -105,25 +98,25 @@ T* CellHandler<T>::create( uint32_t x, uint32_t y )
    if( !m_pCells[x] )
    {
       m_pCells[x] = new T*[_sizeY];
-      memset( m_pCells[x], 0, sizeof( T* )*_sizeY );
+      memset( m_pCells[x], 0, sizeof( T* ) * _sizeY );
    }
 
    assert( m_pCells[x][y] == nullptr );
 
-   T *cls = new T;
+   T* cls = new T;
    m_pCells[x][y] = cls;
 
    return cls;
 }
 
-template <class T>
-T* CellHandler<T>::createByCoords( float x, float y )
+template< class T >
+T* CellHandler< T >::createByCoords( float x, float y )
 {
    return create( getPosX( x ), getPosY( y ) );
 }
 
-template <class T>
-void CellHandler<T>::remove( uint32_t x, uint32_t y )
+template< class T >
+void CellHandler< T >::remove( uint32_t x, uint32_t y )
 {
    if( x >= _sizeX || y >= _sizeY )
    {
@@ -137,14 +130,14 @@ void CellHandler<T>::remove( uint32_t x, uint32_t y )
 
    assert( m_pCells[x][y] != nullptr );
 
-   T *cls = m_pCells[x][y];
+   T* cls = m_pCells[x][y];
    m_pCells[x][y] = nullptr;
 
    delete cls;
 }
 
-template <class T>
-T* CellHandler<T>::getCell( uint32_t x, uint32_t y )
+template< class T >
+T* CellHandler< T >::getCell( uint32_t x, uint32_t y )
 {
    if( !m_pCells[x] )
    {
@@ -154,25 +147,25 @@ T* CellHandler<T>::getCell( uint32_t x, uint32_t y )
    return m_pCells[x][y];
 }
 
-template <class T>
-T* CellHandler<T>::getCellByCoords( float x, float y )
+template< class T >
+T* CellHandler< T >::getCellByCoords( float x, float y )
 {
    return getCell( getPosX( x ), getPosY( y ) );
 }
 
-template <class T>
-uint32_t CellHandler<T>::getPosX( float x )
+template< class T >
+uint32_t CellHandler< T >::getPosX( float x )
 {
    assert( ( x >= _minX ) && ( x <= _maxX ) );
-   return ( uint32_t ) ( ( _maxX - x ) / _cellSize );
+   return ( uint32_t )( ( _maxX - x ) / _cellSize );
 }
 
-template <class T>
-uint32_t CellHandler<T>::getPosY( float y )
+template< class T >
+uint32_t CellHandler< T >::getPosY( float y )
 {
    assert( ( y >= _minY ) && ( y <= _maxY ) );
-   return ( uint32_t ) ( ( _maxY - y ) / _cellSize );
+   return ( uint32_t )( ( _maxY - y ) / _cellSize );
 }
 
-}
+} // namespace Core
 #endif

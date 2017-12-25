@@ -1,6 +1,6 @@
-#include <Server_Common/Util/Util.h>
-#include <Server_Common/Logging/Logger.h>
 #include <Server_Common/Exd/ExdData.h>
+#include <Server_Common/Logging/Logger.h>
+#include <Server_Common/Util/Util.h>
 
 #include "EventAction.h"
 #include "Network/PacketWrappers/ActorControlPacket142.h"
@@ -37,7 +37,6 @@ Core::Action::EventAction::EventAction( Entity::ActorPtr pActor, uint32_t eventI
 
 Core::Action::EventAction::~EventAction()
 {
-
 }
 
 void Core::Action::EventAction::onStart()
@@ -47,8 +46,7 @@ void Core::Action::EventAction::onStart()
 
    m_startTime = Util::getTimeMs();
 
-   auto control = ActorControlPacket142( m_pSource->getId(), Common::ActorControlType::CastStart,
-                                         1, m_id, 0x4000004E );
+   auto control = ActorControlPacket142( m_pSource->getId(), Common::ActorControlType::CastStart, 1, m_id, 0x4000004E );
 
    if( m_pSource->isPlayer() )
    {
@@ -75,7 +73,7 @@ void Core::Action::EventAction::onFinish()
          m_onActionFinishClb( *m_pSource->getAsPlayer(), m_eventId, m_additional );
 
       auto control = ActorControlPacket142( m_pSource->getId(), Common::ActorControlType::CastStart, 0, m_id );
-      
+
       if( !pEvent->hasPlayedScene() )
          m_pSource->getAsPlayer()->eventFinish( m_eventId, 1 );
       else
@@ -94,7 +92,6 @@ void Core::Action::EventAction::onFinish()
    {
       g_log.error( e.what() );
    }
-
 }
 
 void Core::Action::EventAction::onInterrupt()
@@ -105,8 +102,7 @@ void Core::Action::EventAction::onInterrupt()
    try
    {
 
-      auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt,
-                                            0x219, 0x04, m_id );
+      auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt, 0x219, 0x04, m_id );
 
       if( m_pSource->isPlayer() )
       {
@@ -121,18 +117,15 @@ void Core::Action::EventAction::onInterrupt()
          m_pSource->getAsPlayer()->queuePacket( control1 );
          m_pSource->getAsPlayer()->queuePacket( control );
          m_pSource->getAsPlayer()->eventFinish( m_eventId, 1 );
-
       }
       else
          m_pSource->sendToInRangeSet( control );
 
       if( m_onActionInterruptClb )
          m_onActionInterruptClb( *m_pSource->getAsPlayer(), m_eventId, m_additional );
-
    }
    catch( std::exception& e )
    {
       g_log.error( e.what() );
    }
-
 }

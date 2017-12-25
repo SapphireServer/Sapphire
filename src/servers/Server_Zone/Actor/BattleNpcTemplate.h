@@ -14,7 +14,8 @@ namespace Entity {
    {
    public:
       BattleNpcTemplate();
-      BattleNpcTemplate( std::string templateName, uint32_t bnpcBaseId, uint32_t bnpcNameId, uint32_t modelId, std::string aiName );
+      BattleNpcTemplate( std::string templateName, uint32_t bnpcBaseId, uint32_t bnpcNameId, uint32_t modelId,
+                         std::string aiName );
 
       ~BattleNpcTemplate();
 
@@ -28,11 +29,9 @@ namespace Entity {
       uint32_t m_bnpcBaseId = 0;
       uint32_t m_bnpcNameId = 0;
       uint32_t m_modelId = 0;
- 
-
    };
 
-}
-}
+} // namespace Entity
+} // namespace Core
 
 #endif

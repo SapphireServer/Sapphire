@@ -1,58 +1,54 @@
 #ifndef _PLAYERSTATE_H
 #define _PLAYERSTATE_H
 
-#include <Server_Common/Network/GamePacketNew.h>
 #include "Actor/Player.h"
 #include "Forwards.h"
+#include <Server_Common/Network/GamePacketNew.h>
 
 namespace Core {
 namespace Network {
-namespace Packets {
-namespace Server {
+   namespace Packets {
+      namespace Server {
 
-/**
-* @brief Packet sent to set a players state, this impacts which actions he can perform.
-*/
-class PlayerStateFlagsPacket :
-   public ZoneChannelPacket< FFXIVIpcPlayerStateFlags >
-{
-public:
-   PlayerStateFlagsPacket( Entity::Player& player ) :
-      ZoneChannelPacket< FFXIVIpcPlayerStateFlags >( player.getId(), player.getId() )
-   {
-      initialize( player.getStateFlags() );
-   }
+         /**
+          * @brief Packet sent to set a players state, this impacts which actions he can perform.
+          */
+         class PlayerStateFlagsPacket : public ZoneChannelPacket< FFXIVIpcPlayerStateFlags >
+         {
+         public:
+            PlayerStateFlagsPacket( Entity::Player& player ) :
+                ZoneChannelPacket< FFXIVIpcPlayerStateFlags >( player.getId(), player.getId() )
+            {
+               initialize( player.getStateFlags() );
+            }
 
-   PlayerStateFlagsPacket( Entity::Player& player, std::vector< Common::PlayerStateFlag > flags ) :
-      ZoneChannelPacket< FFXIVIpcPlayerStateFlags >( player.getId(), player.getId() )
-   {
-      uint8_t newFlags[7];
-      memset( newFlags, 0, 7 );
+            PlayerStateFlagsPacket( Entity::Player& player, std::vector< Common::PlayerStateFlag > flags ) :
+                ZoneChannelPacket< FFXIVIpcPlayerStateFlags >( player.getId(), player.getId() )
+            {
+               uint8_t newFlags[7];
+               memset( newFlags, 0, 7 );
 
-      for( auto& flag : flags )
-      {
-         int32_t iFlag = static_cast< uint32_t >( flag );
-         uint8_t index = iFlag / 8;
-         uint8_t bitIndex = iFlag % 8;
+               for( auto& flag : flags )
+               {
+                  int32_t iFlag = static_cast< uint32_t >( flag );
+                  uint8_t index = iFlag / 8;
+                  uint8_t bitIndex = iFlag % 8;
 
-         uint8_t value = 1 << bitIndex;
+                  uint8_t value = 1 << bitIndex;
 
-         newFlags[index] |= value;
-      }
+                  newFlags[index] |= value;
+               }
 
-      initialize( newFlags );
-   }
+               initialize( newFlags );
+            }
 
-private:
-   void initialize( const uint8_t* flags )
-   {
-      memcpy( m_data.flags, flags, 7 );
-   };
-};
+         private:
+            void initialize( const uint8_t* flags ) { memcpy( m_data.flags, flags, 7 ); };
+         };
 
-}
-}
-}
-}
+      } // namespace Server
+   }    // namespace Packets
+} // namespace Network
+} // namespace Core
 
 #endif /*_PLAYERSTATE_H*/

@@ -1,11 +1,11 @@
-#include <Server_Common/Util/Util.h>
-#include <Server_Common/Util/UtilMath.h>
-#include <Server_Common/Network/PacketContainer.h>
 #include <Server_Common/Exd/ExdData.h>
 #include <Server_Common/Network/GamePacket.h>
+#include <Server_Common/Network/PacketContainer.h>
+#include <Server_Common/Util/Util.h>
+#include <Server_Common/Util/UtilMath.h>
 
-#include "Forwards.h"
 #include "Action/Action.h"
+#include "Forwards.h"
 
 #include "Zone/Zone.h"
 
@@ -15,13 +15,13 @@
 #include "Network/PacketWrappers/ActorControlPacket144.h"
 #include "Network/PacketWrappers/UpdateHpMpTpPacket.h"
 
-#include "StatusEffect/StatusEffect.h"
 #include "Action/ActionCollision.h"
+#include "Actor.h"
+#include "Math/CalcBattle.h"
+#include "Player.h"
 #include "ServerZone.h"
 #include "Session.h"
-#include "Math/CalcBattle.h"
-#include "Actor.h"
-#include "Player.h"
+#include "StatusEffect/StatusEffect.h"
 
 extern Core::ServerZone g_serverZone;
 extern Core::Data::ExdData g_exdData;
@@ -75,12 +75,12 @@ bool Core::Entity::Actor::isMob() const
 /*! \return list of actors currently in range */
 std::set< Core::Entity::ActorPtr > Core::Entity::Actor::getInRangeActors( bool includeSelf )
 {
-    auto tempInRange = m_inRangeActors;
+   auto tempInRange = m_inRangeActors;
 
-    if( includeSelf )
-        tempInRange.insert( shared_from_this() );
+   if( includeSelf )
+      tempInRange.insert( shared_from_this() );
 
-    return tempInRange;
+   return tempInRange;
 }
 
 /*! \return current stance of the actors */
@@ -243,12 +243,12 @@ void Core::Entity::Actor::die()
    // if the actor is a player, the update needs to be send to himself too
    bool selfNeedsUpdate = isPlayer();
 
-   sendToInRangeSet( ActorControlPacket142( m_id, SetStatus, static_cast< uint8_t >( ActorStatus::Dead ) ), selfNeedsUpdate );
+   sendToInRangeSet( ActorControlPacket142( m_id, SetStatus, static_cast< uint8_t >( ActorStatus::Dead ) ),
+                     selfNeedsUpdate );
 
    // TODO: not all actor show the death animation when they die, some quest npcs might just despawn
    //       although that might be handled by setting the HP to 1 and doing some script magic
    sendToInRangeSet( ActorControlPacket142( m_id, DeathAnimation, 0, 0, 0, 0x20 ), selfNeedsUpdate );
-
 }
 
 /*!
@@ -318,7 +318,6 @@ bool Core::Entity::Actor::checkAction()
       m_pCurrentAction.reset();
 
    return true;
-
 }
 
 /*!
@@ -330,8 +329,7 @@ void Core::Entity::Actor::changeTarget( uint64_t targetId )
 {
    setTargetId( targetId );
 
-   sendToInRangeSet( ActorControlPacket144( m_id, SetTarget,
-                                            0, 0, 0, 0, targetId ) );
+   sendToInRangeSet( ActorControlPacket144( m_id, SetTarget, 0, 0, 0, 0, targetId ) );
 }
 
 /*!
@@ -355,17 +353,18 @@ void Core::Entity::Actor::takeDamage( uint32_t damage )
 {
    if( damage >= m_hp )
    {
-      switch( m_invincibilityType ) { 
-         case InvincibilityNone: 
-            setHp( 0 );
-            die();
-            break;
-         case InvincibilityRefill:
-            resetHp();
-            break;
-         case InvincibilityStayAlive:
-            setHp( 0 );
-            break;
+      switch( m_invincibilityType )
+      {
+      case InvincibilityNone:
+         setHp( 0 );
+         die();
+         break;
+      case InvincibilityRefill:
+         resetHp();
+         break;
+      case InvincibilityStayAlive:
+         setHp( 0 );
+         break;
       }
    }
    else
@@ -455,12 +454,8 @@ Core::Entity::ActorPtr Core::Entity::Actor::getClosestActor()
 
    for( const auto& pCurAct : m_inRangeActors )
    {
-      float distance = Math::Util::distance( getPos().x,
-                                             getPos().y,
-                                             getPos().z,
-                                             pCurAct->getPos().x,
-                                             pCurAct->getPos().y,
-                                             pCurAct->getPos().z );
+      float distance = Math::Util::distance( getPos().x, getPos().y, getPos().z, pCurAct->getPos().x,
+                                             pCurAct->getPos().y, pCurAct->getPos().z );
 
       if( distance < minDistance )
       {
@@ -495,7 +490,7 @@ void Core::Entity::Actor::sendToInRangeSet( Network::Packets::GamePacketPtr pPac
    if( m_inRangePlayers.empty() )
       return;
 
-   for( const auto &pCurAct : m_inRangePlayers )
+   for( const auto& pCurAct : m_inRangePlayers )
    {
       assert( pCurAct );
       pPacket->setValAt< uint32_t >( 0x04, m_id );
@@ -593,7 +588,7 @@ Get the current cell of a region the actor is in
 
 \return Cell*
 */
-Core::Cell * Core::Entity::Actor::getCell() const
+Core::Cell* Core::Entity::Actor::getCell() const
 {
    return m_pCell;
 }
@@ -603,7 +598,7 @@ Set the current cell the actor is in
 
 \param Cell* for the cell to be set
 */
-void Core::Entity::Actor::setCell( Cell * pCell )
+void Core::Entity::Actor::setCell( Cell* pCell )
 {
    m_pCell = pCell;
 }
@@ -635,7 +630,7 @@ void Core::Entity::Actor::autoAttack( ActorPtr pTarget )
       effectPacket.data().targetId = pTarget->getId();
       effectPacket.data().actionAnimationId = 0x366;
       effectPacket.data().unknown_2 = variation;
-//      effectPacket.data().unknown_3 = 1;
+      // effectPacket.data().unknown_3 = 1;
       effectPacket.data().actionTextId = 0x366;
       effectPacket.data().numEffects = 1;
       effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRotation() );
@@ -660,8 +655,8 @@ ChaiScript Skill Handler.
 \param GamePacketPtr to send
 \param bool should be send to self?
 */
-void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, uint64_t param1,
-                                             uint64_t param2, Entity::Actor& pTarget )
+void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, uint64_t param1, uint64_t param2,
+                                             Entity::Actor& pTarget )
 {
 
    if( isPlayer() )
@@ -685,7 +680,8 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
    effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRotation() );
    effectPacket.data().effectTarget = pTarget.getId();
 
-   // Todo: for each actor, calculate how much damage the calculated value should deal to them - 2-step damage calc. we only have 1-step
+   // Todo: for each actor, calculate how much damage the calculated value should deal to them - 2-step damage calc. we
+   // only have 1-step
    switch( type )
    {
 
@@ -699,16 +695,15 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
       if( !actionInfoPtr->is_aoe )
       {
          // If action on this specific target is valid...
-         if ( isPlayer() && !ActionCollision::isActorApplicable( pTarget.shared_from_this(), TargetFilter::Enemies ) )
+         if( isPlayer() && !ActionCollision::isActorApplicable( pTarget.shared_from_this(), TargetFilter::Enemies ) )
             break;
 
          sendToInRangeSet( effectPacket, true );
 
-         if ( pTarget.isAlive() )
+         if( pTarget.isAlive() )
             pTarget.onActionHostile( shared_from_this() );
 
          pTarget.takeDamage( static_cast< uint32_t >( param1 ) );
-
       }
       else
       {
@@ -724,20 +719,20 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
             // todo: send to range of what? ourselves? when mob script hits this is going to be lacking
             sendToInRangeSet( effectPacket, true );
 
-
             if( pHitActor->isAlive() )
                pHitActor->onActionHostile( shared_from_this() );
 
             pHitActor->takeDamage( static_cast< uint32_t >( param1 ) );
 
             // Debug
-            if ( isPlayer() ) 
+            if( isPlayer() )
             {
-               if ( pHitActor->isPlayer() )
-                  getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) + " (" + pHitActor->getName() + ")" );
+               if( pHitActor->isPlayer() )
+                  getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) + " (" +
+                                            pHitActor->getName() + ")" );
                else
                   getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) );
-            }  
+            }
          }
       }
 
@@ -746,7 +741,8 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
 
    case ActionEffectType::Heal:
    {
-      uint32_t calculatedHeal = Math::CalcBattle::calculateHealValue( getAsPlayer(), static_cast< uint32_t >( param1 ) );
+      uint32_t calculatedHeal =
+          Math::CalcBattle::calculateHealValue( getAsPlayer(), static_cast< uint32_t >( param1 ) );
 
       effectPacket.data().effects[0].value = calculatedHeal;
       effectPacket.data().effects[0].effectType = ActionEffectType::Heal;
@@ -780,7 +776,8 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
             if( isPlayer() )
             {
                if( pHitActor->isPlayer() )
-                  getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) + " (" + pHitActor->getName() + ")" );
+                  getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) + " (" +
+                                            pHitActor->getName() + ")" );
                else
                   getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) );
             }
@@ -807,7 +804,7 @@ void Core::Entity::Actor::addStatusEffect( StatusEffect::StatusEffectPtr pEffect
 
    ZoneChannelPacket< Server::FFXIVIpcAddStatusEffect > statusEffectAdd( getId() );
    statusEffectAdd.data().actor_id = pEffect->getTargetActorId();
-   statusEffectAdd.data().actor_id1 = pEffect->getSrcActorId(); 
+   statusEffectAdd.data().actor_id1 = pEffect->getSrcActorId();
    statusEffectAdd.data().current_hp = getHp();
    statusEffectAdd.data().current_mp = getMp();
    statusEffectAdd.data().current_tp = getTp();
@@ -817,7 +814,7 @@ void Core::Entity::Actor::addStatusEffect( StatusEffect::StatusEffectPtr pEffect
    statusEffectAdd.data().max_hp = getMaxHp();
    statusEffectAdd.data().max_mp = getMaxMp();
    statusEffectAdd.data().max_something = 1;
-    //statusEffectAdd.data().unknown2 = 28;
+   // statusEffectAdd.data().unknown2 = 28;
    statusEffectAdd.data().param = pEffect->getParam();
 
    sendToInRangeSet( statusEffectAdd, isPlayer() );
@@ -826,23 +823,23 @@ void Core::Entity::Actor::addStatusEffect( StatusEffect::StatusEffectPtr pEffect
 /*! \param StatusEffectPtr to be applied to the actor */
 void Core::Entity::Actor::addStatusEffectById( uint32_t id, int32_t duration, Entity::Actor& pSource, uint16_t param )
 {
-   StatusEffect::StatusEffectPtr effect( new StatusEffect::StatusEffect( id, pSource.shared_from_this(),
-                                                                         shared_from_this(), duration, 3000 ) );
+   StatusEffect::StatusEffectPtr effect(
+       new StatusEffect::StatusEffect( id, pSource.shared_from_this(), shared_from_this(), duration, 3000 ) );
    effect->setParam( param );
    addStatusEffect( effect );
 }
 
 /*! \param StatusEffectPtr to be applied to the actor */
-void Core::Entity::Actor::addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Actor& pSource, uint16_t param )
+void Core::Entity::Actor::addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Actor& pSource,
+                                                         uint16_t param )
 {
    if( hasStatusEffect( id ) )
       return;
 
-   StatusEffect::StatusEffectPtr effect( new StatusEffect::StatusEffect( id, pSource.shared_from_this(),
-                                                                         shared_from_this(), duration, 3000 ) );
+   StatusEffect::StatusEffectPtr effect(
+       new StatusEffect::StatusEffect( id, pSource.shared_from_this(), shared_from_this(), duration, 3000 ) );
    effect->setParam( param );
    addStatusEffect( effect );
-
 }
 
 float Core::Entity::Actor::getRotation() const
@@ -922,8 +919,9 @@ void Core::Entity::Actor::sendStatusEffectUpdate()
    uint8_t slot = 0;
    for( auto effectIt : m_statusEffectMap )
    {
-      float timeLeft = static_cast< float >( effectIt.second->getDuration() - 
-                                             ( currentTimeMs - effectIt.second->getStartTimeMs() ) ) / 1000;
+      float timeLeft = static_cast< float >( effectIt.second->getDuration() -
+                                             ( currentTimeMs - effectIt.second->getStartTimeMs() ) ) /
+                       1000;
       statusEffectList.data().effect[slot].duration = timeLeft;
       statusEffectList.data().effect[slot].effect_id = effectIt.second->getId();
       statusEffectList.data().effect[slot].sourceActorId = effectIt.second->getSrcActorId();
@@ -931,7 +929,6 @@ void Core::Entity::Actor::sendStatusEffectUpdate()
    }
 
    sendToInRangeSet( statusEffectList, isPlayer() );
-
 }
 
 void Core::Entity::Actor::updateStatusEffects()
@@ -980,22 +977,22 @@ void Core::Entity::Actor::updateStatusEffects()
             thisTickHeal += thisEffect.second;
             break;
          }
-
          }
       }
-
    }
 
    if( thisTickDmg != 0 )
    {
       takeDamage( thisTickDmg );
-      sendToInRangeSet( ActorControlPacket142( getId(), HPFloatingText, 0, static_cast< uint8_t >( ActionEffectType::Damage ), thisTickDmg ) );
+      sendToInRangeSet( ActorControlPacket142( getId(), HPFloatingText, 0,
+                                               static_cast< uint8_t >( ActionEffectType::Damage ), thisTickDmg ) );
    }
 
    if( thisTickHeal != 0 )
    {
       heal( thisTickDmg );
-      sendToInRangeSet( ActorControlPacket142( getId(), HPFloatingText, 0, static_cast< uint8_t >( ActionEffectType::Heal ), thisTickHeal ) );
+      sendToInRangeSet( ActorControlPacket142( getId(), HPFloatingText, 0,
+                                               static_cast< uint8_t >( ActionEffectType::Heal ), thisTickHeal ) );
    }
 }
 

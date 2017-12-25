@@ -9,21 +9,19 @@ namespace Action {
 
    class ActionCast : public Action
    {
-   private: 
-
+   private:
    public:
       ActionCast();
       ~ActionCast();
-      
+
       ActionCast( Entity::ActorPtr pActor, Entity::ActorPtr pTarget, uint16_t actionId );
 
       void onStart() override;
       void onFinish() override;
       void onInterrupt() override;
-
    };
 
-}
-}
+} // namespace Action
+} // namespace Core
 
 #endif

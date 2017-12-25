@@ -8,13 +8,13 @@
 
 #include "Script/ScriptManager.h"
 
-#include "Zone/Zone.h"
-#include "Actor/Player.h"
 #include "Actor/BattleNpc.h"
+#include "Actor/Player.h"
 #include "Event/Event.h"
 #include "Event/EventHelper.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "StatusEffect/StatusEffect.h"
+#include "Zone/Zone.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -34,7 +34,8 @@ int Core::Scripting::ScriptManager::init()
    m_pChaiHandler->add( chaiscript::fun( &Entity::Actor::getTargetId ), "getTargetId" );
    m_pChaiHandler->add( chaiscript::fun( &Entity::Actor::addStatusEffect ), "addStatusEffect" );
    m_pChaiHandler->add( chaiscript::fun( &Entity::Actor::addStatusEffectById ), "addStatusEffectById" );
-   m_pChaiHandler->add( chaiscript::fun( &Entity::Actor::addStatusEffectByIdIfNotExist ), "addStatusEffectByIdIfNotExist" );
+   m_pChaiHandler->add( chaiscript::fun( &Entity::Actor::addStatusEffectByIdIfNotExist ),
+                        "addStatusEffectByIdIfNotExist" );
    m_pChaiHandler->add( chaiscript::fun( &Entity::Actor::takeDamage ), "takeDamage" );
 
    m_pChaiHandler->add( chaiscript::fun( &Entity::Player::forceZoneing ), "setZone" );
@@ -51,7 +52,7 @@ int Core::Scripting::ScriptManager::init()
    m_pChaiHandler->add( chaiscript::fun( &Entity::Player::teleport ), "teleport" );
    m_pChaiHandler->add( chaiscript::fun( &Entity::Player::prepareZoning ), "prepareZoning" );
    m_pChaiHandler->add( chaiscript::fun( &Entity::Player::isInCombat ), "isInCombat" );
-   
+
    m_pChaiHandler->add( chaiscript::fun( &Entity::Player::getCurrency ), "getCurrency" );
    m_pChaiHandler->add( chaiscript::fun( &Entity::Player::addCurrency ), "addCurrency" );
    m_pChaiHandler->add( chaiscript::fun( &Entity::Player::removeCurrency ), "removeCurrency" );
@@ -137,13 +138,24 @@ int Core::Scripting::ScriptManager::init()
    m_pChaiHandler->add( chaiscript::fun( &Entity::Player::setQuestBitFlag40 ), "setQuestBitFlag40" );
    m_pChaiHandler->add( chaiscript::fun( &Entity::Player::setQuestBitFlag48 ), "setQuestBitFlag48" );
 
-   m_pChaiHandler->add(chaiscript::fun(&Entity::Player::giveQuestRewards), "giveQuestRewards");
+   m_pChaiHandler->add( chaiscript::fun( &Entity::Player::giveQuestRewards ), "giveQuestRewards" );
 
-   m_pChaiHandler->add( chaiscript::fun< void, Entity::Player, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t >( &Entity::Player::eventPlay ), "eventPlay" );
-   m_pChaiHandler->add( chaiscript::fun< void, Entity::Player, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, EventReturnCallback >( &Entity::Player::eventPlay ), "eventPlay" );
-   m_pChaiHandler->add( chaiscript::fun< void, Entity::Player, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, EventReturnCallback >( &Entity::Player::eventPlay ), "eventPlay" );
-   m_pChaiHandler->add( chaiscript::fun< void, Entity::Player, uint32_t, uint32_t, uint32_t, EventReturnCallback >( &Entity::Player::eventPlay ), "eventPlay" );
-   m_pChaiHandler->add( chaiscript::fun< void, Entity::Player, uint32_t, uint32_t, uint32_t >( &Entity::Player::eventPlay ), "eventPlay" );
+   m_pChaiHandler->add( chaiscript::fun< void, Entity::Player, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t >(
+                            &Entity::Player::eventPlay ),
+                        "eventPlay" );
+   m_pChaiHandler->add(
+       chaiscript::fun< void, Entity::Player, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, EventReturnCallback >(
+           &Entity::Player::eventPlay ),
+       "eventPlay" );
+   m_pChaiHandler->add( chaiscript::fun< void, Entity::Player, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t,
+                                         uint32_t, EventReturnCallback >( &Entity::Player::eventPlay ),
+                        "eventPlay" );
+   m_pChaiHandler->add( chaiscript::fun< void, Entity::Player, uint32_t, uint32_t, uint32_t, EventReturnCallback >(
+                            &Entity::Player::eventPlay ),
+                        "eventPlay" );
+   m_pChaiHandler->add(
+       chaiscript::fun< void, Entity::Player, uint32_t, uint32_t, uint32_t >( &Entity::Player::eventPlay ),
+       "eventPlay" );
    m_pChaiHandler->add( chaiscript::fun( &Entity::Player::eventActionStart ), "eventActionStart" );
    m_pChaiHandler->add( chaiscript::fun( &Entity::Player::eventItemActionStart ), "eventItemActionStart" );
    m_pChaiHandler->add( chaiscript::fun( &Entity::Player::changePosition ), "changePos" );
@@ -172,7 +184,8 @@ int Core::Scripting::ScriptManager::init()
 
    std::set< std::string > chaiFiles;
 
-   loadDir( g_serverZone.getConfig()->getValue< std::string >( "Settings.General.ScriptPath", "../scripts/chai" ), chaiFiles );
+   loadDir( g_serverZone.getConfig()->getValue< std::string >( "Settings.General.ScriptPath", "../scripts/chai" ),
+            chaiFiles );
 
    uint16_t scriptCount = 0;
    uint16_t errorCount = 0;
@@ -190,18 +203,14 @@ int Core::Scripting::ScriptManager::init()
          g_log.Log( LoggingSeverity::error, e.what() );
          errorCount++;
       }
-
    }
 
-   g_log.info( "\tloaded " + std::to_string( scriptCount ) +
-               " scripts, " + std::to_string( errorCount ) + " errors." );
+   g_log.info( "\tloaded " + std::to_string( scriptCount ) + " scripts, " + std::to_string( errorCount ) + " errors." );
 
-   std::function<std::string( Entity::Player& ) > f =
-      m_pChaiHandler->eval< std::function<std::string( Entity::Player& ) > >( "onFirstEnterWorld" );
+   std::function< std::string( Entity::Player& ) > f =
+       m_pChaiHandler->eval< std::function< std::string( Entity::Player& ) > >( "onFirstEnterWorld" );
 
    m_onFirstEnterWorld = f;
 
-
    return true;
 }
-

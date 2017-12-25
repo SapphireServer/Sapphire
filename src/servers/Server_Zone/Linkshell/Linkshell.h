@@ -4,8 +4,7 @@
 #include <Server_Common/Common.h>
 #include <set>
 
-namespace Core
-{
+namespace Core {
 
 class Linkshell
 {
@@ -24,12 +23,8 @@ private:
    std::set< uint64_t > m_inviteIds;
 
 public:
-   Linkshell( uint64_t id,
-              const std::string& name,
-              uint64_t masterId,
-              const std::set< uint64_t >& members,
-              const std::set< uint64_t >& leaders,
-              const std::set< uint64_t >& invites );
+   Linkshell( uint64_t id, const std::string& name, uint64_t masterId, const std::set< uint64_t >& members,
+              const std::set< uint64_t >& leaders, const std::set< uint64_t >& invites );
 
    uint64_t getId() const;
 
@@ -54,9 +49,7 @@ public:
 
    void addInvite( uint64_t memberId );
    void removeInvite( uint64_t memberId );
-
-
 };
 
-}
-#endif //SAPPHIRE_LINKSHELL_H
+} // namespace Core
+#endif // SAPPHIRE_LINKSHELL_H

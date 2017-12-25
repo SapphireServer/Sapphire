@@ -9,17 +9,15 @@ extern Core::Logger g_log;
 
 Core::LinkshellMgr::LinkshellMgr()
 {
-
 }
 
 bool Core::LinkshellMgr::loadLinkshells()
 {
 
    auto res = g_charaDb.query( "SELECT LinkshellId, MasterCharacterId, CharacterIdList, "
-                                      "LinkshellName, LeaderIdList, InviteIdList "
-                                      "FROM infolinkshell "
+                               "LinkshellName, LeaderIdList, InviteIdList "
+                               "FROM infolinkshell "
                                "ORDER BY LinkshellId ASC;" );
-
 
    while( res->next() )
    {
@@ -27,8 +25,7 @@ bool Core::LinkshellMgr::loadLinkshells()
       uint32_t masterId = res->getUInt( 2 );
       std::string name = res->getString( 4 );
 
-      auto func = []( std::set< uint64_t >& outList, std::vector< char >& inData )
-      {
+      auto func = []( std::set< uint64_t >& outList, std::vector< char >& inData ) {
          if( inData.size() )
          {
             std::vector< uint64_t > list( inData.size() / 8 );
@@ -54,11 +51,9 @@ bool Core::LinkshellMgr::loadLinkshells()
       auto lsPtr = boost::make_shared< Linkshell >( linkshellId, name, masterId, members, leaders, invites );
       m_linkshellIdMap[linkshellId] = lsPtr;
       m_linkshellNameMap[name] = lsPtr;
-
    }
 
    return true;
-
 }
 
 Core::LinkshellPtr Core::LinkshellMgr::getLinkshellByName( const std::string& name )

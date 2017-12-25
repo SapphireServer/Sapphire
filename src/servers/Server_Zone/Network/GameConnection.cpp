@@ -1,20 +1,20 @@
 #include <Server_Common/Common.h>
-#include <Server_Common/Network/CommonNetwork.h>
-#include <Server_Common/Util/Util.h>
 #include <Server_Common/Logging/Logger.h>
-#include <Server_Common/Network/PacketContainer.h>
+#include <Server_Common/Network/CommonNetwork.h>
 #include <Server_Common/Network/GamePacketParser.h>
+#include <Server_Common/Network/PacketContainer.h>
+#include <Server_Common/Util/Util.h>
 #include <boost/format.hpp>
 
 #include "GameConnection.h"
 
+#include "Actor/Player.h"
+#include "DebugCommand/DebugCommandHandler.h"
+#include "Forwards.h"
+#include "Network/PacketWrappers/InitUIPacket.h"
 #include "ServerZone.h"
 #include "Session.h"
 #include "Zone/Zone.h"
-#include "Network/PacketWrappers/InitUIPacket.h"
-#include "DebugCommand/DebugCommandHandler.h"
-#include "Actor/Player.h"
-#include "Forwards.h"
 
 extern Core::DebugCommandHandler g_gameCommandMgr;
 extern Core::Logger g_log;
@@ -24,87 +24,89 @@ using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-Core::Network::GameConnection::GameConnection( Core::Network::HivePtr pHive,
-                                               Core::Network::AcceptorPtr pAcceptor )
-   : Connection( pHive )
-   , m_pAcceptor( pAcceptor )
-   , m_conType( ConnectionType::None )
+Core::Network::GameConnection::GameConnection( Core::Network::HivePtr pHive, Core::Network::AcceptorPtr pAcceptor ) :
+    Connection( pHive ),
+    m_pAcceptor( pAcceptor ),
+    m_conType( ConnectionType::None )
 {
-   auto setZoneHandler = [=]( uint16_t opcode, std::string handlerName, GameConnection::Handler pHandler )
-   {
+   auto setZoneHandler = [=]( uint16_t opcode, std::string handlerName, GameConnection::Handler pHandler ) {
       m_zoneHandlerMap[opcode] = pHandler;
       m_zoneHandlerStrMap[opcode] = handlerName;
    };
 
-   auto setChatHandler = [=]( uint16_t opcode, std::string handlerName, GameConnection::Handler pHandler )
-   {
+   auto setChatHandler = [=]( uint16_t opcode, std::string handlerName, GameConnection::Handler pHandler ) {
       m_chatHandlerMap[opcode] = pHandler;
       m_chatHandlerStrMap[opcode] = handlerName;
    };
 
-   setZoneHandler( ClientZoneIpcType::PingHandler,          "PingHandler",              &GameConnection::pingHandler );
-   setZoneHandler( ClientZoneIpcType::InitHandler,          "InitHandler",              &GameConnection::initHandler );
-   setZoneHandler( ClientZoneIpcType::ChatHandler,          "ChatHandler",              &GameConnection::chatHandler );
+   setZoneHandler( ClientZoneIpcType::PingHandler, "PingHandler", &GameConnection::pingHandler );
+   setZoneHandler( ClientZoneIpcType::InitHandler, "InitHandler", &GameConnection::initHandler );
+   setZoneHandler( ClientZoneIpcType::ChatHandler, "ChatHandler", &GameConnection::chatHandler );
 
-   setZoneHandler( ClientZoneIpcType::FinishLoadingHandler, "FinishLoadingHandler",     &GameConnection::finishLoadingHandler );
+   setZoneHandler( ClientZoneIpcType::FinishLoadingHandler, "FinishLoadingHandler",
+                   &GameConnection::finishLoadingHandler );
 
-   setZoneHandler( ClientZoneIpcType::PlayTimeHandler,      "PlayTimeHandler",          &GameConnection::playTimeHandler );
-   setZoneHandler( ClientZoneIpcType::LogoutHandler,        "LogoutHandler",            &GameConnection::logoutHandler );
+   setZoneHandler( ClientZoneIpcType::PlayTimeHandler, "PlayTimeHandler", &GameConnection::playTimeHandler );
+   setZoneHandler( ClientZoneIpcType::LogoutHandler, "LogoutHandler", &GameConnection::logoutHandler );
 
-   setZoneHandler( ClientZoneIpcType::SocialListHandler,    "SocialListHandler",        &GameConnection::socialListHandler );
-   setZoneHandler( ClientZoneIpcType::SetSearchInfoHandler, "SetSearchInfoHandler",     &GameConnection::setSearchInfoHandler );
-   setZoneHandler( ClientZoneIpcType::ReqSearchInfoHandler, "ReqSearchInfoHandler",     &GameConnection::reqSearchInfoHandler );
+   setZoneHandler( ClientZoneIpcType::SocialListHandler, "SocialListHandler", &GameConnection::socialListHandler );
+   setZoneHandler( ClientZoneIpcType::SetSearchInfoHandler, "SetSearchInfoHandler",
+                   &GameConnection::setSearchInfoHandler );
+   setZoneHandler( ClientZoneIpcType::ReqSearchInfoHandler, "ReqSearchInfoHandler",
+                   &GameConnection::reqSearchInfoHandler );
 
-   setZoneHandler( ClientZoneIpcType::BlackListHandler,     "BlackListHandler",         &GameConnection::blackListHandler );
+   setZoneHandler( ClientZoneIpcType::BlackListHandler, "BlackListHandler", &GameConnection::blackListHandler );
 
-   setZoneHandler( ClientZoneIpcType::LinkshellListHandler, "LinkshellListHandler",     &GameConnection::linkshellListHandler );
+   setZoneHandler( ClientZoneIpcType::LinkshellListHandler, "LinkshellListHandler",
+                   &GameConnection::linkshellListHandler );
 
-   setZoneHandler( ClientZoneIpcType::FcInfoReqHandler,     "FcInfoReqHandler",         &GameConnection::fcInfoReqHandler );
+   setZoneHandler( ClientZoneIpcType::FcInfoReqHandler, "FcInfoReqHandler", &GameConnection::fcInfoReqHandler );
 
-   setZoneHandler( ClientZoneIpcType::ZoneLineHandler,      "ZoneLineHandler",          &GameConnection::zoneLineHandler );
-   setZoneHandler( ClientZoneIpcType::ActionHandler,        "ActionHandler",            &GameConnection::actionHandler );
+   setZoneHandler( ClientZoneIpcType::ZoneLineHandler, "ZoneLineHandler", &GameConnection::zoneLineHandler );
+   setZoneHandler( ClientZoneIpcType::ActionHandler, "ActionHandler", &GameConnection::actionHandler );
 
-   setZoneHandler( ClientZoneIpcType::DiscoveryHandler,     "DiscoveryHandler",         &GameConnection::discoveryHandler );
+   setZoneHandler( ClientZoneIpcType::DiscoveryHandler, "DiscoveryHandler", &GameConnection::discoveryHandler );
 
-   setZoneHandler( ClientZoneIpcType::SkillHandler,         "SkillHandler",             &GameConnection::skillHandler );
+   setZoneHandler( ClientZoneIpcType::SkillHandler, "SkillHandler", &GameConnection::skillHandler );
 
-   setZoneHandler( ClientZoneIpcType::GMCommand1,           "GMCommand1",               &GameConnection::gm1Handler );
-   setZoneHandler( ClientZoneIpcType::GMCommand2,           "GMCommand2",               &GameConnection::gm2Handler );
+   setZoneHandler( ClientZoneIpcType::GMCommand1, "GMCommand1", &GameConnection::gm1Handler );
+   setZoneHandler( ClientZoneIpcType::GMCommand2, "GMCommand2", &GameConnection::gm2Handler );
 
-   setZoneHandler( ClientZoneIpcType::UpdatePositionHandler,"UpdatePositionHandler",    &GameConnection::updatePositionHandler );
+   setZoneHandler( ClientZoneIpcType::UpdatePositionHandler, "UpdatePositionHandler",
+                   &GameConnection::updatePositionHandler );
 
-   setZoneHandler( ClientZoneIpcType::InventoryModifyHandler,"InventoryModifyHandler",  &GameConnection::inventoryModifyHandler );
+   setZoneHandler( ClientZoneIpcType::InventoryModifyHandler, "InventoryModifyHandler",
+                   &GameConnection::inventoryModifyHandler );
 
-   setZoneHandler( ClientZoneIpcType::TalkEventHandler,     "EventHandler",             &GameConnection::eventHandler );
-   setZoneHandler( ClientZoneIpcType::EmoteEventHandler,    "EventHandler",             &GameConnection::eventHandler );
-   setZoneHandler( ClientZoneIpcType::WithinRangeEventHandler, "EventHandler",          &GameConnection::eventHandler );
-   setZoneHandler( ClientZoneIpcType::OutOfRangeEventHandler, "EventHandler",           &GameConnection::eventHandler );
-   setZoneHandler( ClientZoneIpcType::EnterTeriEventHandler, "EventHandler",            &GameConnection::eventHandler );
+   setZoneHandler( ClientZoneIpcType::TalkEventHandler, "EventHandler", &GameConnection::eventHandler );
+   setZoneHandler( ClientZoneIpcType::EmoteEventHandler, "EventHandler", &GameConnection::eventHandler );
+   setZoneHandler( ClientZoneIpcType::WithinRangeEventHandler, "EventHandler", &GameConnection::eventHandler );
+   setZoneHandler( ClientZoneIpcType::OutOfRangeEventHandler, "EventHandler", &GameConnection::eventHandler );
+   setZoneHandler( ClientZoneIpcType::EnterTeriEventHandler, "EventHandler", &GameConnection::eventHandler );
 
-   setZoneHandler( ClientZoneIpcType::ReturnEventHandler,      "EventHandlerReturn",    &GameConnection::eventHandler );
-   setZoneHandler( ClientZoneIpcType::TradeReturnEventHandler, "EventHandlerReturn",    &GameConnection::eventHandler );
+   setZoneHandler( ClientZoneIpcType::ReturnEventHandler, "EventHandlerReturn", &GameConnection::eventHandler );
+   setZoneHandler( ClientZoneIpcType::TradeReturnEventHandler, "EventHandlerReturn", &GameConnection::eventHandler );
 
-   setZoneHandler( ClientZoneIpcType::LinkshellEventHandler, "LinkshellEventHandler",   &GameConnection::eventHandler );
+   setZoneHandler( ClientZoneIpcType::LinkshellEventHandler, "LinkshellEventHandler", &GameConnection::eventHandler );
    setZoneHandler( ClientZoneIpcType::LinkshellEventHandler1, "LinkshellEventHandler1", &GameConnection::eventHandler );
 
-   setZoneHandler( ClientZoneIpcType::CFDutyInfoHandler, "CFDutyInfoRequest",           &GameConnection::cfDutyInfoRequest );
-   setZoneHandler( ClientZoneIpcType::CFRegisterDuty, "CFRegisterDuty",                 &GameConnection::cfRegisterDuty );
-   setZoneHandler( ClientZoneIpcType::CFRegisterRoulette, "CFRegisterRoulette",         &GameConnection::cfRegisterRoulette );
-   setZoneHandler( ClientZoneIpcType::CFCommenceHandler, "CFDutyAccepted",              &GameConnection::cfDutyAccepted);
+   setZoneHandler( ClientZoneIpcType::CFDutyInfoHandler, "CFDutyInfoRequest", &GameConnection::cfDutyInfoRequest );
+   setZoneHandler( ClientZoneIpcType::CFRegisterDuty, "CFRegisterDuty", &GameConnection::cfRegisterDuty );
+   setZoneHandler( ClientZoneIpcType::CFRegisterRoulette, "CFRegisterRoulette", &GameConnection::cfRegisterRoulette );
+   setZoneHandler( ClientZoneIpcType::CFCommenceHandler, "CFDutyAccepted", &GameConnection::cfDutyAccepted );
 
-   setZoneHandler( ClientZoneIpcType::ReqEquipDisplayFlagsChange, "ReqEquipDisplayFlagsChange", &GameConnection::reqEquipDisplayFlagsHandler );
+   setZoneHandler( ClientZoneIpcType::ReqEquipDisplayFlagsChange, "ReqEquipDisplayFlagsChange",
+                   &GameConnection::reqEquipDisplayFlagsHandler );
 
    setZoneHandler( ClientZoneIpcType::PerformNoteHandler, "PerformNoteHandler", &GameConnection::performNoteHandler );
 
-   setChatHandler( ClientChatIpcType::TellReq, "TellReq",                               &GameConnection::tellHandler);
-
+   setChatHandler( ClientChatIpcType::TellReq, "TellReq", &GameConnection::tellHandler );
 }
 
 Core::Network::GameConnection::~GameConnection() = default;
 
-
 // overwrite the parents onConnect for our game socket needs
-void Core::Network::GameConnection::OnAccept( const std::string & host, uint16_t port )
+void Core::Network::GameConnection::OnAccept( const std::string& host, uint16_t port )
 {
    GameConnectionPtr connection( new GameConnection( m_hive, m_pAcceptor ) );
    m_pAcceptor->Accept( connection );
@@ -112,14 +114,13 @@ void Core::Network::GameConnection::OnAccept( const std::string & host, uint16_t
    g_log.info( "Connect from " + m_socket.remote_endpoint().address().to_string() );
 }
 
-
 void Core::Network::GameConnection::OnDisconnect()
 {
    g_log.debug( "GameConnection DISCONNECT" );
    m_pSession = nullptr;
 }
 
-void Core::Network::GameConnection::OnRecv( std::vector< uint8_t > & buffer )
+void Core::Network::GameConnection::OnRecv( std::vector< uint8_t >& buffer )
 {
    // This is assumed packet always start with valid FFXIVARR_PACKET_HEADER for now.
 
@@ -139,12 +140,12 @@ void Core::Network::GameConnection::OnRecv( std::vector< uint8_t > & buffer )
       Disconnect();
       return;
    }
-   
+
    // Dissect packet list
    std::vector< Packets::FFXIVARR_PACKET_RAW > packetList;
-   const auto packetResult = Packets::getPackets( buffer, sizeof( struct FFXIVARR_PACKET_HEADER ),
-                                                  packetHeader, packetList );
-   
+   const auto packetResult =
+       Packets::getPackets( buffer, sizeof( struct FFXIVARR_PACKET_HEADER ), packetHeader, packetList );
+
    if( packetResult == Incomplete )
    {
       g_log.info( "Dropping connection due to incomplete packets." );
@@ -158,12 +159,12 @@ void Core::Network::GameConnection::OnRecv( std::vector< uint8_t > & buffer )
       Disconnect();
       return;
    }
-   
+
    // Handle it
    handlePackets( packetHeader, packetList );
 }
 
-void Core::Network::GameConnection::OnError( const boost::system::error_code & error )
+void Core::Network::GameConnection::OnError( const boost::system::error_code& error )
 {
    g_log.debug( "GameConnection ERROR: " + error.message() );
 }
@@ -189,24 +190,23 @@ void Core::Network::GameConnection::handleZonePacket( const Packets::GamePacket&
       auto itStr = m_zoneHandlerStrMap.find( pPacket.getSubType() );
       std::string name = itStr != m_zoneHandlerStrMap.end() ? itStr->second : "unknown";
       // dont display packet notification if it is a ping or pos update, don't want the spam
-      if( pPacket.getSubType() != PingHandler &&
-          pPacket.getSubType() != UpdatePositionHandler )
+      if( pPacket.getSubType() != PingHandler && pPacket.getSubType() != UpdatePositionHandler )
 
-         g_log.debug( sessionStr + " Handling Zone IPC : " + name + "( " +
-                      boost::str( boost::format( "%|04X|" ) %
-                                         static_cast< uint32_t >( pPacket.getSubType() & 0xFFFF ) ) + " )" );
+         g_log.debug(
+             sessionStr + " Handling Zone IPC : " + name + "( " +
+             boost::str( boost::format( "%|04X|" ) % static_cast< uint32_t >( pPacket.getSubType() & 0xFFFF ) ) +
+             " )" );
 
       ( this->*( it->second ) )( pPacket, *m_pSession->getPlayer() );
    }
    else
    {
       g_log.debug( sessionStr + " Undefined Zone IPC : Unknown ( " +
-                   boost::str( boost::format( "%|04X|" ) %
-                                      static_cast< uint32_t >( pPacket.getSubType() & 0xFFFF ) ) + " )" );
+                   boost::str( boost::format( "%|04X|" ) % static_cast< uint32_t >( pPacket.getSubType() & 0xFFFF ) ) +
+                   " )" );
       g_log.debug( "\n" + pPacket.toString() );
    }
 }
-
 
 void Core::Network::GameConnection::handleChatPacket( const Packets::GamePacket& pPacket )
 {
@@ -221,16 +221,16 @@ void Core::Network::GameConnection::handleChatPacket( const Packets::GamePacket&
       // dont display packet notification if it is a ping or pos update, don't want the spam
 
       g_log.debug( sessionStr + " Handling Chat IPC : " + name + "( " +
-                   boost::str( boost::format( "%|04X|" ) %
-                                      static_cast< uint32_t >( pPacket.getSubType() & 0xFFFF ) ) + " )" );
+                   boost::str( boost::format( "%|04X|" ) % static_cast< uint32_t >( pPacket.getSubType() & 0xFFFF ) ) +
+                   " )" );
 
       ( this->*( it->second ) )( pPacket, *m_pSession->getPlayer() );
    }
    else
    {
       g_log.debug( sessionStr + " Undefined Chat IPC : Unknown ( " +
-                  boost::str( boost::format( "%|04X|" ) %
-                                     static_cast< uint32_t >( pPacket.getSubType() & 0xFFFF ) ) + " )" );
+                   boost::str( boost::format( "%|04X|" ) % static_cast< uint32_t >( pPacket.getSubType() & 0xFFFF ) ) +
+                   " )" );
       g_log.debug( pPacket.toString() );
    }
 }
@@ -242,20 +242,19 @@ void Core::Network::GameConnection::handlePacket( Core::Network::Packets::GamePa
 
    switch( m_conType )
    {
-      case Network::ConnectionType::Zone:
-         handleZonePacket( *pPacket );
-         break;
+   case Network::ConnectionType::Zone:
+      handleZonePacket( *pPacket );
+      break;
 
-      case Network::ConnectionType::Chat:
-         handleChatPacket( *pPacket );
-         break;
+   case Network::ConnectionType::Chat:
+      handleChatPacket( *pPacket );
+      break;
    }
-
 }
 
 void Core::Network::GameConnection::sendPackets( Packets::PacketContainer* pPacket )
 {
-   //g_log.Log(LoggingSeverity::info, pPacket->toString());
+   // g_log.Log(LoggingSeverity::info, pPacket->toString());
    std::vector< uint8_t > sendBuffer;
 
    pPacket->fillSendBuffer( sendBuffer );
@@ -297,7 +296,6 @@ void Core::Network::GameConnection::processOutQueue()
 
    if( totalSize > 0 )
       sendPackets( &pRP );
-
 }
 
 void Core::Network::GameConnection::sendSinglePacket( Packets::GamePacket* pPacket )
@@ -314,7 +312,7 @@ void Core::Network::GameConnection::injectPacket( const std::string& packetpath,
    memset( packet, 0, 0x11570 );
 
    // get the packet name / path from the command arguments
-   FILE *fp = nullptr;
+   FILE* fp = nullptr;
    fp = fopen( packetpath.c_str(), "rb" );
    if( fp == nullptr )
    {
@@ -326,7 +324,7 @@ void Core::Network::GameConnection::injectPacket( const std::string& packetpath,
    fseek( fp, 0, SEEK_END );
    int32_t size = ftell( fp );
    rewind( fp );
-   if ( fread( packet, sizeof( char ), size, fp ) != size )
+   if( fread( packet, sizeof( char ), size, fp ) != size )
    {
       g_log.error( "Packet " + packetpath + " did not read full size: " + std::to_string( size ) );
       return;
@@ -356,8 +354,9 @@ void Core::Network::GameConnection::injectPacket( const std::string& packetpath,
    }
 }
 
-void Core::Network::GameConnection::handlePackets( const Core::Network::Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
-                                                   const std::vector< Core::Network::Packets::FFXIVARR_PACKET_RAW >& packetData )
+void Core::Network::GameConnection::handlePackets(
+    const Core::Network::Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
+    const std::vector< Core::Network::Packets::FFXIVARR_PACKET_RAW >& packetData )
 {
    // if a session is set, update the last time it recieved a game packet
    if( m_pSession )
@@ -369,7 +368,7 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
       {
       case 1:
       {
-         char* id = ( char* ) &( inPacket.data[4] );
+         char* id = (char*)&( inPacket.data[4] );
          uint32_t playerId = boost::lexical_cast< uint32_t >( id );
          auto pCon = boost::static_pointer_cast< GameConnection, Connection >( shared_from_this() );
 
@@ -387,10 +386,10 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
             }
             session = g_serverZone.getSession( playerId );
          }
-         //TODO: Catch more things in lobby and send real errors
+         // TODO: Catch more things in lobby and send real errors
          else if( !session->isValid() || ( session->getPlayer() && session->getPlayer()->getLastPing() != 0 ) )
          {
-            g_log.error( "[" + std::string(id) + "] Session INVALID, disconnecting" );
+            g_log.error( "[" + std::string( id ) + "] Session INVALID, disconnecting" );
             Disconnect();
             return;
          }
@@ -400,7 +399,7 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
             m_pSession = session;
 
          GamePacket pPe( 0x00, 0x18, 0, 0, 0x07 );
-         //pPe.setValAt< uint32_t >( 0x10, 0xE0000005 );
+         // pPe.setValAt< uint32_t >( 0x10, 0xE0000005 );
          pPe.setValAt< uint32_t >( 0x10, 0xE0037603 );
          pPe.setValAt< uint32_t >( 0x14, static_cast< uint32_t >( time( nullptr ) ) );
          sendSinglePacket( &pPe );
@@ -428,7 +427,6 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
          }
 
          break;
-
       }
       case 3: // game packet
       {
@@ -438,8 +436,8 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
       }
       case 7: // keep alive
       {
-         uint32_t id = *( uint32_t* ) &inPacket.data[0];
-         uint32_t timeStamp = *( uint32_t* ) &inPacket.data[4];
+         uint32_t id = *(uint32_t*)&inPacket.data[0];
+         uint32_t timeStamp = *(uint32_t*)&inPacket.data[4];
 
          GamePacket pPe( 0x00, 0x18, 0, 0, 0x08 );
          pPe.setValAt< uint32_t >( 0x10, id );
@@ -453,6 +451,5 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
          break;
       }
       }
-
    }
 }

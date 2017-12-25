@@ -1,12 +1,11 @@
 #include <cmath>
 
-#include <Server_Common/Exd/ExdData.h>
-#include <Server_Common/Common.h>
 #include "Actor/Actor.h"
 #include "Actor/Player.h"
+#include <Server_Common/Common.h>
+#include <Server_Common/Exd/ExdData.h>
 
 #include "CalcStats.h"
-
 
 using namespace Core::Math;
 using namespace Core::Entity;
@@ -18,7 +17,7 @@ extern Core::Data::ExdData g_exdData;
    Big thanks to the Theoryjerks group!
 
    NOTE:
-   Formulas here shouldn't be considered final. It's possible that the formula it was based on is correct but 
+   Formulas here shouldn't be considered final. It's possible that the formula it was based on is correct but
    wasn't implemented correctly here, or approximated things due to limited knowledge of how things work in retail.
    It's also possible that we're using formulas that were correct for previous patches, but not the current version.
 
@@ -38,12 +37,12 @@ float CalcStats::calculateBaseStat( PlayerPtr pPlayer )
    uint8_t level = pPlayer->getLevel();
 
    // SB Base Stat Formula  (Aligned)
-   if ( level > 60 )
-   { 
-      base = static_cast< float >( ( ( ( level == 61 ) ? 224 : 220 ) + ( level - 61 ) * 8) );
+   if( level > 60 )
+   {
+      base = static_cast< float >( ( ( ( level == 61 ) ? 224 : 220 ) + ( level - 61 ) * 8 ) );
    }
    // HW Base Stat Formula  (Aligned)
-   else if ( level > 50 )
+   else if( level > 50 )
       base = 1.63f * level + 121.02f;
    // ARR Base Stat Formula (Off by one in several cases)
    else
@@ -58,14 +57,14 @@ float CalcStats::calculateBaseStat( PlayerPtr pPlayer )
 uint32_t CalcStats::calculateMaxHp( PlayerPtr pPlayer )
 {
    // TODO: Replace ApproxBaseHP with something that can get us an accurate BaseHP.
-   // Is there any way to pull reliable BaseHP without having to manually use a pet for every level, and using the values from a table?
-   // More info here: https://docs.google.com/spreadsheets/d/1de06KGT0cNRUvyiXNmjNgcNvzBCCQku7jte5QxEQRbs/edit?usp=sharing
-   
+   // Is there any way to pull reliable BaseHP without having to manually use a pet for every level, and using the
+   // values from a table? More info here:
+   // https://docs.google.com/spreadsheets/d/1de06KGT0cNRUvyiXNmjNgcNvzBCCQku7jte5QxEQRbs/edit?usp=sharing
+
    auto classInfoIt = g_exdData.m_classJobInfoMap.find( static_cast< uint8_t >( pPlayer->getClass() ) );
    auto paramGrowthInfoIt = g_exdData.m_paramGrowthInfoMap.find( pPlayer->getLevel() );
 
-   if ( classInfoIt == g_exdData.m_classJobInfoMap.end() ||
-      paramGrowthInfoIt == g_exdData.m_paramGrowthInfoMap.end() )
+   if( classInfoIt == g_exdData.m_classJobInfoMap.end() || paramGrowthInfoIt == g_exdData.m_paramGrowthInfoMap.end() )
       return 0;
 
    uint8_t level = pPlayer->getLevel();
@@ -78,14 +77,15 @@ uint32_t CalcStats::calculateMaxHp( PlayerPtr pPlayer )
 
    // These values are not precise.
 
-   if ( level >= 60 )
+   if( level >= 60 )
       approxBaseHp = static_cast< float >( 2600 + ( level - 60 ) * 100 );
-   else if ( level >= 50 )
+   else if( level >= 50 )
       approxBaseHp = 1700 + ( ( level - 50 ) * ( 1700 * 1.04325f ) );
    else
       approxBaseHp = paramGrowthInfoIt->second.mp_const * 0.7667f;
 
-   uint16_t result = static_cast< uint16_t >( floor( jobModHp * ( approxBaseHp / 100.0f ) ) + floor( hpMod / 100.0f * ( vitStat - baseStat ) ) );
+   uint16_t result = static_cast< uint16_t >( floor( jobModHp * ( approxBaseHp / 100.0f ) ) +
+                                              floor( hpMod / 100.0f * ( vitStat - baseStat ) ) );
 
    return result;
 }
@@ -98,8 +98,7 @@ uint32_t CalcStats::calculateMaxMp( PlayerPtr pPlayer )
    auto classInfoIt = g_exdData.m_classJobInfoMap.find( static_cast< uint8_t >( pPlayer->getClass() ) );
    auto paramGrowthInfoIt = g_exdData.m_paramGrowthInfoMap.find( pPlayer->getLevel() );
 
-   if ( classInfoIt == g_exdData.m_classJobInfoMap.end() ||
-      paramGrowthInfoIt == g_exdData.m_paramGrowthInfoMap.end() )
+   if( classInfoIt == g_exdData.m_classJobInfoMap.end() || paramGrowthInfoIt == g_exdData.m_paramGrowthInfoMap.end() )
       return 0;
 
    float baseStat = calculateBaseStat( pPlayer );
@@ -108,7 +107,8 @@ uint32_t CalcStats::calculateMaxMp( PlayerPtr pPlayer )
    uint16_t jobModMp = classInfoIt->second.mod_mpcpgp;
    uint16_t baseMp = paramGrowthInfoIt->second.mp_const;
 
-   uint16_t result = static_cast< uint16_t >( floor( floor( piety - baseStat ) * ( pietyScalar / 100 ) + baseMp ) * jobModMp / 100 );
+   uint16_t result =
+       static_cast< uint16_t >( floor( floor( piety - baseStat ) * ( pietyScalar / 100 ) + baseMp ) * jobModMp / 100 );
 
    return result;
 }
