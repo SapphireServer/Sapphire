@@ -11,7 +11,6 @@
 #include <map>
 
 namespace Core {
-namespace Entity {
 namespace Social {
 
 class Group;
@@ -51,10 +50,10 @@ public:
    bool isBlacklist() const;
    bool isContentGroup() const;
 
-   virtual Core::Network::Packets::GamePacketPtr addMember( PlayerPtr pSender, PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
+   virtual Core::Network::Packets::GamePacketPtr addMember( Entity::PlayerPtr pSender, Entity::PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
    
-   virtual Core::Network::Packets::GamePacketPtr inviteMember( PlayerPtr pSender, PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
-   virtual Core::Network::Packets::GamePacketPtr removeMember( PlayerPtr pSender, PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
+   virtual Core::Network::Packets::GamePacketPtr inviteMember( Entity::PlayerPtr pSender, Entity::PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
+   virtual Core::Network::Packets::GamePacketPtr removeMember( Entity::PlayerPtr pSender, Entity::PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
    //virtual Core::Network::Packets::GamePacketPtr kickMember( PlayerPtr pSender, PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
    virtual void sendPacketToMembers( Core::Network::Packets::GamePacketPtr pPacket, bool invitesToo = false );
 
@@ -87,7 +86,6 @@ private:
 
 };
 
-}
 }
 };
 #endif // ! _GROUP_H

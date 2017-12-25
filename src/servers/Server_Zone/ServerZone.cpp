@@ -41,7 +41,7 @@ Core::Data::ExdData g_exdData;
 Core::ZoneMgr g_zoneMgr;
 Core::LinkshellMgr g_linkshellMgr;
 Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
-Core::Entity::Social::FriendListMgr g_friendListMgr;
+Core::Social::SocialMgr< Core::Social:: > g_friendListMgr;
 
 Core::ServerZone::ServerZone( const std::string& configPath )
    : m_configPath( configPath ),
@@ -220,7 +220,7 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
       return;
    }
 
-   g_friendListMgr = Core::Social::SocialMgr<Common::SocialListType::FriendList>();
+   g_friendListMgr = Core::Social::SocialMgr<Core::Social::FriendList>();
 
    Network::HivePtr hive( new Network::Hive() );
    Network::addServerToHive< Network::GameConnection >( m_ip, m_port, hive );

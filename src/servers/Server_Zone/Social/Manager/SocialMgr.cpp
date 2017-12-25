@@ -3,17 +3,18 @@
 
 
 template< class T >
-Core::Social::SocialMgr::GroupMgr()
+Core::Social::SocialMgr::SocialMgr()
+{
+
+}
+template< class T >
+Core::Social::SocialMgr::~SocialMgr()
 {
 
 }
 
-Core::Social::SocialMgr::~GroupMgr()
-{
-
-}
-
-T Core::Social::SocialMgr::findGroupByInviteIdForPlayer( uint64_t playerId ) const
+template< class T >
+T Core::Social::SocialMgr< T >::findGroupByInviteIdForPlayer( uint64_t playerId ) const
 {
    auto it = m_invites.find( playerId );
    if( it != m_invites.end() )
@@ -22,8 +23,8 @@ T Core::Social::SocialMgr::findGroupByInviteIdForPlayer( uint64_t playerId ) con
    }
    return nullptr;
 }
-
-T Core::Social::SocialMgr::findGroupById( uint64_t groupId ) const
+template< class T >
+T Core::Social::SocialMgr< T >::findGroupById( uint64_t groupId ) const
 {
    auto it = m_groups.find( groupId );
    if( it != m_groups.end() )
@@ -33,13 +34,15 @@ T Core::Social::SocialMgr::findGroupById( uint64_t groupId ) const
    return nullptr;
 }
 
-uint64_t Core::Social::SocialMgr::GroupMgr::generateGroupId()
+template< class T >
+uint64_t Core::Social::SocialMgr< T >::generateGroupId() const
 {
    m_lastGroupId++;
    return m_lastGroupId;
 }
 
-bool Core::Social::SocialMgr::hasInvite( uint64_t playerId ) const
+template< class T >
+bool Core::Social::SocialMgr< T >::hasInvite( uint64_t playerId ) const
 {
    auto it = m_invites.find( playerId );
    if ( it != m_invites.end() )

@@ -44,7 +44,7 @@ extern Core::ServerZone g_serverZone;
 extern Core::ZoneMgr g_zoneMgr;
 extern Core::Data::ExdData g_exdData;
 extern Core::DebugCommandHandler g_gameCommandMgr;
-extern Core::Social::SocialMgr g_socialMgr;
+extern Core::Social::SocialMgr<Core::Common::SocialListType> g_socialMgr;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;

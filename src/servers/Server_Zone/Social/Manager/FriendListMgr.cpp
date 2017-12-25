@@ -9,19 +9,18 @@
 
 extern Core::Logger g_log;
 
-using namespace Core::Entity;
 
-Core::Entity::Social::FriendListMgr::FriendListMgr()
+Core::Social::FriendListMgr::FriendListMgr()
 {
 
 }  
 
-bool Social::FriendListMgr::init()
+bool Core::Social::FriendListMgr::init()
 {
    return true;
 }
 
-uint64_t Social::FriendListMgr::fetchPlayerFriendsList( uint32_t playerId )
+uint64_t Core::Social::FriendListMgr::fetchPlayerFriendsList( uint32_t playerId )
 {
    uint64_t newGroupId = generateGroupId();
 

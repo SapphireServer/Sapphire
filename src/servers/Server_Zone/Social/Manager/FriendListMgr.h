@@ -27,7 +27,7 @@ public:
    FriendListPtr findGroupByInviteIdForPlayer( uint64_t playerId ) const;
    FriendListPtr findGroupById( uint64_t groupId ) const;
    */
-   std::map< uint64_t, FriendListPtr > m_groups;
+   //std::map< uint64_t, FriendListPtr > m_groups;
 private:
    // todo: can we handle this m_groups grouptype better..?
    
@@ -35,7 +35,7 @@ private:
 
 };
 
-}
-}
 };
+}
+
 #endif /* ! _FRIENDLISTMGR_H */

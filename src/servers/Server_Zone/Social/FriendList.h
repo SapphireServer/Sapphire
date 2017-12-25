@@ -16,7 +16,6 @@ using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
 namespace Core {
-namespace Entity {
 namespace Social {
 
 class FriendList;
@@ -56,7 +55,6 @@ protected:
 
 };
 
-}
 }
 };
 #endif // ! _FRIENDLIST_H

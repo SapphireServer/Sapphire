@@ -59,7 +59,7 @@ protected:
    friend virtual void disband();
    */
 
-   virtual uint64_t generateGroupId();
+   virtual uint64_t generateGroupId() const;
 
 private:
    std::map< uint64_t, T > m_groups;

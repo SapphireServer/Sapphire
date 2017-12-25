@@ -30,8 +30,8 @@
 
 #include "Script/ScriptManager.h"
 
-#include "src/servers/Server_Zone/Actor/Social/FriendList.h"
-#include "src/servers/Server_Zone/Actor/Social/Manager/FriendListMgr.h"
+#include "src/servers/Server_Zone/Social/FriendList.h"
+#include "src/servers/Server_Zone/Actor/Manager/FriendListMgr.h"
 
 #include "src/servers/Server_Zone/Script/ScriptManager.h"
 #include "Inventory/Item.h"
