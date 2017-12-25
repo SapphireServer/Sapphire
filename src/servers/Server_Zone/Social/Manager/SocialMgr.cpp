@@ -3,12 +3,12 @@
 
 
 template< class T >
-Core::Social::SocialMgr::SocialMgr()
+Core::Social::SocialMgr< T >::SocialMgr()
 {
 
 }
 template< class T >
-Core::Social::SocialMgr::~SocialMgr()
+Core::Social::SocialMgr< T >::~SocialMgr()
 {
 
 }

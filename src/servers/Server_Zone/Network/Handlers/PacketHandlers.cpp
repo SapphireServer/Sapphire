@@ -36,7 +36,7 @@
 #include "Event/EventHelper.h"
 #include "Action/Action.h"
 #include "Action/ActionTeleport.h"
-#include "Social/Manager/FriendListMgr.h"
+#include "Social/Manager/SocialMgr.h"
 
 
 extern Core::Logger g_log;
@@ -44,7 +44,7 @@ extern Core::ServerZone g_serverZone;
 extern Core::ZoneMgr g_zoneMgr;
 extern Core::Data::ExdData g_exdData;
 extern Core::DebugCommandHandler g_gameCommandMgr;
-extern Core::Social::SocialMgr<Core::Common::SocialListType> g_socialMgr;
+extern Core::Social::SocialMgr< Core::Social::FriendList > g_friendListMgr;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;

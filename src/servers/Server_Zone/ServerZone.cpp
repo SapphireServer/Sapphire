@@ -28,6 +28,8 @@
 #include "Script/ScriptManager.h"
 #include "Linkshell/LinkshellMgr.h"
 
+#include "Social/Manager/SocialMgr.h"
+
 #include "Forwards.h"
 #include <boost/foreach.hpp>
 #include <boost/make_shared.hpp>
@@ -41,7 +43,7 @@ Core::Data::ExdData g_exdData;
 Core::ZoneMgr g_zoneMgr;
 Core::LinkshellMgr g_linkshellMgr;
 Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
-Core::Social::SocialMgr< Core::Social:: > g_friendListMgr;
+Core::Social::SocialMgr< Core::Social::FriendList > g_friendListMgr;
 
 Core::ServerZone::ServerZone( const std::string& configPath )
    : m_configPath( configPath ),

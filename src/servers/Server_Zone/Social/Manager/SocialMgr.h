@@ -1,5 +1,5 @@
-#ifndef _GROUPMGR_H
-#define _GROUPMGR_H
+#ifndef _SOCIALMGR_H
+#define _SOCIALMGR_H
 
 #include <map>
 #include <cstdint>
@@ -68,4 +68,4 @@ private:
 
 }
 }
-#endif /* ! _GROUPMGR_H */
+#endif /* ! _SOCIALMGR_H  */

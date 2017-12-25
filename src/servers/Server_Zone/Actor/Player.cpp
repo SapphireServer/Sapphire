@@ -51,6 +51,7 @@ extern Core::ServerZone g_serverZone;
 extern Core::ZoneMgr g_zoneMgr;
 extern Core::Data::ExdData g_exdData;
 extern Core::Scripting::ScriptManager g_scriptMgr;
+extern Core::Social::SocialMgr< Core::Social::FriendList > g_friendListMgr;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
