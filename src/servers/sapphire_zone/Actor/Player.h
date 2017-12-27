@@ -534,6 +534,7 @@ public:
    void insertQuest( uint16_t questId, uint8_t index, uint8_t seq ) const;
    void updateDbSearchInfo() const;
    void updateDbClass() const;
+   void insertDbClass( const uint8_t classJobIndex ) const;
 
    void setMarkedForRemoval();
    bool isMarkedForRemoval() const;
