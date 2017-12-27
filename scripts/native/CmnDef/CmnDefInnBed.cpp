@@ -54,5 +54,3 @@ public:
       Scene00100( player );
    }
 };
-
-EXPORT_SCRIPTOBJECT( CmnDefInnBed )

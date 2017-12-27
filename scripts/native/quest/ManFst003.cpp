@@ -19,5 +19,3 @@ public:
 
    }
 };
-
-EXPORT_SCRIPTOBJECT( ManFst003 )

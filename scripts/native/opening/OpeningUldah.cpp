@@ -89,5 +89,3 @@ public:
       }
    }
 };
-
-EXPORT_SCRIPTOBJECT( OpeningUldah )

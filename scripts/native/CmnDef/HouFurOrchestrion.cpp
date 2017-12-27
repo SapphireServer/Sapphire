@@ -1,9 +1,9 @@
 #include "../ScriptObject.h"
 
-class HouFurOrchestrionDef : public EventScript
+class HouFurOrchestrion : public EventScript
 {
 public:
-   HouFurOrchestrionDef() : EventScript( "HouFurOrchestrionDef", 721226 )
+   HouFurOrchestrion() : EventScript( "HouFurOrchestrion", 721226 )
    {}
 
    void Scene00000( Entity::Player& player )
@@ -16,5 +16,3 @@ public:
       Scene00000( player );
    }
 };
-
-EXPORT_SCRIPTOBJECT( HouFurOrchestrionDef )

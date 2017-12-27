@@ -56,5 +56,3 @@ public:
       Scene00001( player );
    }
 };
-
-EXPORT_SCRIPTOBJECT( CmnDefLinkShell )
