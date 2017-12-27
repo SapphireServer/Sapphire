@@ -111,3 +111,6 @@ src/common/Version\.cpp
 
 # travis-ci build mtime cache
 .mtime_cache
+
+# generated script loader files
+scripts/native/*/ScriptLoader.cpp

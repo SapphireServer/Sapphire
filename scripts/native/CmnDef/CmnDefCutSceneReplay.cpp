@@ -34,5 +34,3 @@ public:
       Scene00000( player );
    }
 };
-
-EXPORT_SCRIPTOBJECT( CmnDefCutSceneReplay )

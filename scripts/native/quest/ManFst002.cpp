@@ -221,5 +221,3 @@ public:
          Scene00005( player );
    }
 };
-
-EXPORT_SCRIPTOBJECT( ManFst002 )

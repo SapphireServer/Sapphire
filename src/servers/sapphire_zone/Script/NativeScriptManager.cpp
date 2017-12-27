@@ -57,38 +57,50 @@ namespace Core {
       if( !module )
          return false;
 
-      auto script = m_loader.getScriptObject( module->handle );
-      if( !script )
+      auto scripts = m_loader.getScripts( module->handle );
+      if( !scripts )
       {
          m_loader.unloadScript( module );
          return false;
       }
 
-      module->script = script;
-      module->script_name = script->getName();
-      module->type = script->getType();
+      //
+      bool success = false;
 
-      switch( script->getType() )
+      for( int i = 0; ; i++ )
       {
-         case ScriptType::StatusEffect:
-            m_statusEffectScripts[ script->getId() ] = dynamic_cast< StatusEffectScript* >( script );
-            break;
-         case ScriptType::Action:
-            m_actionScripts[ script->getId() ] = dynamic_cast< ActionScript* >( script );
-            break;
-         case ScriptType::Quest:
-            m_eventScripts[ script->getId() ] = dynamic_cast< EventScript* >( script );
-            break;
-         case ScriptType::BattleNpc:
-            m_battleNpcScripts[ script->getId() ] = dynamic_cast< BattleNpcScript* >( script );
-            break;
-         case ScriptType::Zone:
-            m_zoneScripts[ script->getId() ] = dynamic_cast< ZoneScript* >( script );
+         if( scripts[i] == nullptr )
             break;
 
-         default:
-            m_loader.unloadScript( module );
-            return false;
+         auto script = scripts[i];
+         module->scripts.push_back( script );
+
+         switch( script->getType() )
+         {
+            case ScriptType::StatusEffect:
+               m_statusEffectScripts[ script->getId() ] = dynamic_cast< StatusEffectScript* >( script );
+               break;
+            case ScriptType::Action:
+               m_actionScripts[ script->getId() ] = dynamic_cast< ActionScript* >( script );
+               break;
+            case ScriptType::Quest:
+               m_eventScripts[ script->getId() ] = dynamic_cast< EventScript* >( script );
+               break;
+            case ScriptType::BattleNpc:
+               m_battleNpcScripts[ script->getId() ] = dynamic_cast< BattleNpcScript* >( script );
+               break;
+            case ScriptType::Zone:
+               m_zoneScripts[ script->getId() ] = dynamic_cast< ZoneScript* >( script );
+               break;
+         }
+
+         success = true;
+      }
+
+      if( !success )
+      {
+         m_loader.unloadScript( module->handle );
+         return false;
       }
 
       return true;
@@ -110,28 +122,31 @@ namespace Core {
 
    bool NativeScriptManager::unloadScript( ScriptInfo* info )
    {
-      auto ptr = info->script;
-
-      switch( info->type )
+      for( auto& script : info->scripts )
       {
-         case ScriptType::StatusEffect:
-            removeValueFromMap< uint32_t, StatusEffectScript* >( ptr, m_statusEffectScripts );
-            break;
-         case ScriptType::Action:
-            removeValueFromMap< uint32_t, ActionScript* >( ptr, m_actionScripts );
-            break;
-         case ScriptType::Quest:
-            removeValueFromMap< uint32_t, EventScript* >( ptr, m_eventScripts );
-            break;
-         case ScriptType::BattleNpc:
-            removeValueFromMap< uint32_t, BattleNpcScript* >( ptr, m_battleNpcScripts );
-            break;
-         case ScriptType::Zone:
-            removeValueFromMap< uint32_t, ZoneScript* >( ptr, m_zoneScripts );
-            break;
+         switch( script->getType() )
+         {
+            case ScriptType::StatusEffect:
+               removeValueFromMap< uint32_t, StatusEffectScript* >( script, m_statusEffectScripts );
+               break;
+            case ScriptType::Action:
+               removeValueFromMap< uint32_t, ActionScript* >( script, m_actionScripts );
+               break;
+            case ScriptType::Quest:
+               removeValueFromMap< uint32_t, EventScript* >( script, m_eventScripts );
+               break;
+            case ScriptType::BattleNpc:
+               removeValueFromMap< uint32_t, BattleNpcScript* >( script, m_battleNpcScripts );
+               break;
+            case ScriptType::Zone:
+               removeValueFromMap< uint32_t, ZoneScript* >( script, m_zoneScripts );
+               break;
 
-         default:
-            return false;
+            default:
+               continue;
+         }
+
+         delete script;
       }
 
       return m_loader.unloadScript( info );

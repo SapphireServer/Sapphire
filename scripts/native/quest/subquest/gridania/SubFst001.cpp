@@ -82,5 +82,3 @@ public:
       }
    }
 };
-
-EXPORT_SCRIPTOBJECT( SubFst001 )
