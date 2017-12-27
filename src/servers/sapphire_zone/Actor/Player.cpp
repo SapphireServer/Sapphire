@@ -801,8 +801,12 @@ void Core::Entity::Player::setLevel( uint8_t level )
 
 void Core::Entity::Player::setLevelForClass( uint8_t level, Common::ClassJob classjob )
 {
-    uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( classjob )].exp_idx;
-    m_classArray[classJobIndex] = level;
+   uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( classjob )].exp_idx;
+
+   if( m_classArray[classJobIndex] == 0 )
+      insertDbClass( classJobIndex );
+
+   m_classArray[classJobIndex] = level;
 }
 
 void Core::Entity::Player::sendModel()
