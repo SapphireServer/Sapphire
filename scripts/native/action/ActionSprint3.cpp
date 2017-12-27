@@ -11,5 +11,3 @@ public:
       player.addStatusEffectByIdIfNotExist( 50, 20000, player, 30 );
    }
 };
-
-EXPORT_SCRIPTOBJECT( ActionSprint3 )

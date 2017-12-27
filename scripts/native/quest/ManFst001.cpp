@@ -6,29 +6,29 @@
 // Start NPC: 1001148
 // End NPC: 1001140
 
-#define SEQ_0 0
-#define SEQ_FINISH 255
-
-#define RewardExpFactor 50
-#define RewardGil 103
-
-#define ACTOR0 1001148
-#define ACTOR1 1001140
-#define CUT_EVENT 29
-#define EOBJECT0 2001659
-#define EOBJECT1 2001660
-#define EOBJECT7 2616477
-#define EVENT_ACTION_SEARCH 1
-#define HOWTO_QUEST_ACCEPT 12
-#define HOWTO_QUEST_ANNOUNCE 2
-#define HOWTO_REWARD 11
-#define HOWTO_TODO 3
-#define OPENING_EVENT_HANDLER 1245186
-#define SEQ_2_ACTOR1 2
-
 class ManFst001 : public EventScript
 {
 private:
+   static constexpr auto SEQ_0 = 0;
+   static constexpr auto SEQ_FINISH = 255;
+
+   static constexpr auto RewardExpFactor = 50;
+   static constexpr auto RewardGil = 103;
+
+   static constexpr auto ACTOR0 = 1001148;
+   static constexpr auto ACTOR1 = 1001140;
+   static constexpr auto CUT_EVENT = 29;
+   static constexpr auto EOBJECT0 = 2001659;
+   static constexpr auto EOBJECT1 = 2001660;
+   static constexpr auto EOBJECT7 = 2616477;
+   static constexpr auto EVENT_ACTION_SEARCH = 1;
+   static constexpr auto HOWTO_QUEST_ACCEPT = 12;
+   static constexpr auto HOWTO_QUEST_ANNOUNCE = 2;
+   static constexpr auto HOWTO_REWARD = 11;
+   static constexpr auto HOWTO_TODO = 3;
+   static constexpr auto OPENING_EVENT_HANDLER = 1245186;
+   static constexpr auto SEQ_2_ACTOR1 = 2;
+
    void Scene00000( Entity::Player& player )
    {
       auto callback = [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
@@ -102,5 +102,3 @@ public:
          Scene00004( player );
    }
 };
-
-EXPORT_SCRIPTOBJECT( ManFst001 )

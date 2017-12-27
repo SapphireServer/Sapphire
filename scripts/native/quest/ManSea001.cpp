@@ -159,5 +159,3 @@ public:
          Scene00011( player );
    }
 };
-
-EXPORT_SCRIPTOBJECT( ManSea001 );

@@ -1,6 +1,8 @@
 #ifndef SAPPHIRE_SCRIPTINFO_H
 #define SAPPHIRE_SCRIPTINFO_H
 
+#include <vector>
+
 #include "NativeScriptApi.h"
 
 #ifdef _WIN32
@@ -22,9 +24,8 @@ namespace Scripting {
       std::string cache_path;
       std::string library_path;
 
-      std::string script_name;
       ModuleHandle handle;
-      ScriptObject* script;
+      std::vector< ScriptObject* > scripts;
       ScriptType type;
    };
 }

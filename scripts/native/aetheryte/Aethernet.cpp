@@ -44,5 +44,3 @@ public:
 
    }
 };
-
-EXPORT_SCRIPTOBJECT( Aethernet )

@@ -96,5 +96,3 @@ public:
       // todo: handle closed events
    }
 };
-
-EXPORT_SCRIPTOBJECT( OpeningLimsa )

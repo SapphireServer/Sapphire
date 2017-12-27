@@ -19,24 +19,30 @@ typedef void* ModuleHandle;
 namespace Core {
 namespace Scripting {
 
-   class ScriptLoader {
+   class ScriptLoader
+   {
    protected:
-       std::unordered_map< std::string, ScriptInfo* > m_scriptMap;
+      std::unordered_map< std::string, ScriptInfo* > m_scriptMap;
 
-       bool unloadModule( ModuleHandle );
+      bool unloadModule( ModuleHandle );
 
    public:
-       ScriptLoader();
+      ScriptLoader();
 
-       const std::string getModuleExtension();
-       ScriptInfo* loadModule( const std::string& );
-       bool unloadScript( ScriptInfo* );
-       bool unloadScript( ModuleHandle );
-       ScriptInfo* getScriptInfo( std::string name );
-       ScriptObject* getScriptObject( ModuleHandle handle );
-       bool isModuleLoaded( std::string name );
+      const std::string getModuleExtension();
+      ScriptInfo* loadModule( const std::string& );
 
-       void findScripts( std::set< Core::Scripting::ScriptInfo* >& scripts, const std::string& search );
+      bool unloadScript( ScriptInfo* );
+      bool unloadScript( ModuleHandle );
+
+      ScriptInfo* getScriptInfo( std::string name );
+
+      ScriptObject** getScripts( ModuleHandle handle );
+      ScriptObject* getScriptObject( ModuleHandle handle );
+
+      bool isModuleLoaded( std::string name );
+
+      void findScripts( std::set< Core::Scripting::ScriptInfo* >& scripts, const std::string& search );
    };
 
 }
