@@ -567,9 +567,9 @@ void Core::DebugCommandHandler::script( char* data, Entity::Player &player, boos
             for( auto it = scripts.begin(); it != scripts.end(); ++it )
             {
                auto script = *it;
-               player.sendDebug( " - '" + script->script_name + "' loaded at @ 0x" +
+               player.sendDebug( " - '" + script->library_name + "' loaded at @ 0x" +
                                  boost::str( boost::format( "%|X|" ) % script->handle ) +
-                                 ", script ptr: 0x" + boost::str( boost::format( "%|X|" ) % script->script ) );
+                                 ", num scripts: " + std::to_string( script->scripts.size() ) );
             }
          }
          else

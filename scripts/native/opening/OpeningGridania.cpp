@@ -1,31 +1,28 @@
 #include "../ScriptObject.h"
 
-#define ERANGE_HOWTO_ANN_AND_QUEST 2117539
-#define ERANGE_HOWTO_QUEST_REWARD 2366417
-#define ERANGE_SEQ_1_CLOSED_1 2351918
-#define POS_SEQ_1_CLOSED_RETURN_1 2351921
-#define ERANGE_SEQ_1_CLOSED_2 2351919
-#define POS_SEQ_1_CLOSED_RETURN_2 2351921
-#define ERANGE_ALWAYS_CLOSED_1 2280846
-#define POS_ALWAYS_CLOSED_RETURN_1 2320804
-#define ENPC_ALWAYS_CLOSED_1 2367988
-#define ERANGE_ALWAYS_CLOSED_3 2280851
-#define POS_ALWAYS_CLOSED_RETURN_3 2320811
-#define ENPC_ALWAYS_CLOSED_3 2563491
-#define BGM_MUSIC_ZONE_FST_TWN 1003
-#define NCUT_FST_1 3
-#define NCUT_FST_2 53
-#define NCUT_FST_3 226
-#define ENPC_QUEST_OFFER 1985150
-#define NCUT_LIGHT_ALL 2
-#define NCUT_LIGHT_FST_1 147
-#define NCUT_LIGHT_FST_2 146
-
 class OpeningGridania : public EventScript
 {
-public:
-   OpeningGridania() : EventScript( "OpeningGridania", 1245186 )
-   {}
+private:
+   static constexpr auto ERANGE_HOWTO_ANN_AND_QUEST = 2117539;
+   static constexpr auto ERANGE_HOWTO_QUEST_REWARD = 2366417;
+   static constexpr auto ERANGE_SEQ_1_CLOSED_1 = 2351918;
+   static constexpr auto POS_SEQ_1_CLOSED_RETURN_1 = 2351921;
+   static constexpr auto ERANGE_SEQ_1_CLOSED_2 = 2351919;
+   static constexpr auto POS_SEQ_1_CLOSED_RETURN_2 = 2351921;
+   static constexpr auto ERANGE_ALWAYS_CLOSED_1 = 2280846;
+   static constexpr auto POS_ALWAYS_CLOSED_RETURN_1 = 2320804;
+   static constexpr auto ENPC_ALWAYS_CLOSED_1 = 2367988;
+   static constexpr auto ERANGE_ALWAYS_CLOSED_3 = 2280851;
+   static constexpr auto POS_ALWAYS_CLOSED_RETURN_3 = 2320811;
+   static constexpr auto ENPC_ALWAYS_CLOSED_3 = 2563491;
+   static constexpr auto BGM_MUSIC_ZONE_FST_TWN = 1003;
+   static constexpr auto NCUT_FST_1 = 3;
+   static constexpr auto NCUT_FST_2 = 53;
+   static constexpr auto NCUT_FST_3 = 226;
+   static constexpr auto ENPC_QUEST_OFFER = 1985150;
+   static constexpr auto NCUT_LIGHT_ALL = 2;
+   static constexpr auto NCUT_LIGHT_FST_1 = 147;
+   static constexpr auto NCUT_LIGHT_FST_2 = 146;
 
    void Scene00000( Entity::Player& player )
    {
@@ -67,7 +64,9 @@ public:
       player.eventPlay( getId(), 40, 1, 2, 1, callback );
    }
 
-   ///////////////////////////////
+public:
+   OpeningGridania() : EventScript( "OpeningGridania", 1245186 )
+   {}
 
    void onEnterZone( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 ) override
    {
@@ -89,5 +88,3 @@ public:
       }
    }
 };
-
-EXPORT_SCRIPTOBJECT( OpeningGridania )

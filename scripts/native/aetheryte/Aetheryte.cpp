@@ -66,5 +66,3 @@ public:
       }
    }
 };
-
-EXPORT_SCRIPTOBJECT( Aetheryte )

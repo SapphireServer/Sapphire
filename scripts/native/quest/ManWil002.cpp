@@ -154,5 +154,3 @@ public:
          Scene00000( player );
    }
 };
-
-EXPORT_SCRIPTOBJECT( ManWil002 )

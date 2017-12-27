@@ -100,22 +100,21 @@ Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::loadModule( const st
    return info;
 }
 
-ScriptObject* Core::Scripting::ScriptLoader::getScriptObject( ModuleHandle handle )
+ScriptObject** Core::Scripting::ScriptLoader::getScripts( ModuleHandle handle )
 {
-   using getScript = ScriptObject*(*)();
+   using getScripts = ScriptObject**(*)();
 
 #ifdef _WIN32
-   getScript func = reinterpret_cast< getScript >( GetProcAddress( handle, "getScript" ) );
+   getScripts func = reinterpret_cast< getScripts >( GetProcAddress( handle, "getScripts" ) );
 #else
-   getScript func = reinterpret_cast< getScript >( dlsym( handle, "getScript" ) );
+   getScripts func = reinterpret_cast< getScripts >( dlsym( handle, "getScripts" ) );
 #endif
 
    if( func )
    {
       auto ptr = func();
 
-      g_log.debug( "got ScriptObject @ 0x" + boost::str( boost::format( "%|08X|" ) % ptr ) );
-      g_log.debug( "script info -> name: " + std::string( ptr->getName() ) + ", id: " + std::to_string( ptr->getId() ) );
+      g_log.debug( "got ScriptObject array @ 0x" + boost::str( boost::format( "%|08X|" ) % ptr ) );
 
       return ptr;
    }
@@ -171,7 +170,7 @@ Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::getScriptInfo( std::
 {
    for( auto it = m_scriptMap.begin(); it != m_scriptMap.end(); ++it )
    {
-      if( it->second->script_name == name )
+      if( it->second->library_name == name )
       {
          return it->second;
       }
@@ -184,7 +183,7 @@ void Core::Scripting::ScriptLoader::findScripts( std::set< Core::Scripting::Scri
 {
    for( auto it = m_scriptMap.begin(); it != m_scriptMap.end(); ++it )
    {
-      if( it->second->script_name.find( search ) != std::string::npos )
+      if( it->second->library_name.find( search ) != std::string::npos )
       {
          scripts.insert( it->second );
       }

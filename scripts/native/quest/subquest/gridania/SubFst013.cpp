@@ -182,5 +182,3 @@ public:
          Scene00096( player );
    }
 };
-
-EXPORT_SCRIPTOBJECT( SubFst013 )

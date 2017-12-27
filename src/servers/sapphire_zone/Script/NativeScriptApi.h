@@ -12,10 +12,6 @@
 #define EXPORT __attribute__((visibility("default")))
 #endif
 
-#define EXPORT_SCRIPTOBJECT( type ) \
-extern "C" EXPORT ScriptObject* getScript() \
-{ return static_cast< ScriptObject* >( new type ); }
-
 using namespace Core;
 
 // constant script ids for certain events
