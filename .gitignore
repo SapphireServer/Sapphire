@@ -104,7 +104,7 @@ src/libraries/external/boost_*
 *.idb
 
 # sapphire version
-src/servers/Server_Common/Version\.cpp
+src/common/Version\.cpp
 
 # edit and continue files
 /enc_temp_folder

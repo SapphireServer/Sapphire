@@ -5,10 +5,11 @@ file(GLOB SCRIPT_INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 file(GLOB_RECURSE SCRIPT_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 
 include_directories("${CMAKE_SOURCE_DIR}/src/servers/")
-include_directories("${CMAKE_SOURCE_DIR}/src/servers/Server_Zone/")
+include_directories("${CMAKE_SOURCE_DIR}/src/servers/sapphire_zone/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
 if(MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Yc${CMAKE_CURRENT_SOURCE_DIR}/ScriptObject.h /FI${CMAKE_CURRENT_SOURCE_DIR}/ScriptObject.h")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Yc\"${CMAKE_CURRENT_SOURCE_DIR}/ScriptObject.h\" /FI\"${CMAKE_CURRENT_SOURCE_DIR}/ScriptObject.h\"")
 endif()
 
 message( "exec: ${EXECUTABLE_OUTPUT_DIRECTORY}" )
@@ -37,7 +38,7 @@ foreach(_sourcefile ${SCRIPT_FILES})
         )
     endif()
 
-    target_link_libraries("${_file}" server_zone)
+    target_link_libraries("${_file}" sapphire_zone)
 
     add_custom_command(TARGET "${_file}" POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E remove "${SCRIPT_LIB_DIR}/${_file}.exp"
