@@ -145,6 +145,8 @@ namespace Core {
             default:
                continue;
          }
+
+         delete script;
       }
 
       return m_loader.unloadScript( info );
