@@ -10,10 +10,11 @@ namespace Core {
 namespace Network {
 namespace Packets {
 
-class GamePacket {
+class GamePacket
+{
 public:
    GamePacket( uint16_t subType, uint16_t size, uint32_t id1, uint32_t id2, uint16_t type = 0x03 );
-   GamePacket( char * pData, uint16_t size, bool bWriteStamp = true );
+   GamePacket( char* pData, uint16_t size, bool bWriteStamp = true );
 
    GamePacket( const Packets::FFXIVARR_PACKET_RAW& packetData );
 
@@ -35,14 +36,14 @@ public:
       return m_subType;
    }
 
-   template<class T>
+   template< class T >
    void setValAt( uint16_t pos, T value )
    {
       assert( m_segHdr.size > pos );
       memcpy( reinterpret_cast< uint8_t* >( &m_dataBuf[0] + pos ), &value, sizeof( T ) );
    }
 
-   template<class T>
+   template< class T >
    T getValAt( uint16_t pos ) const
    {
       assert( m_segHdr.size > pos );
@@ -55,7 +56,7 @@ public:
       memcpy( reinterpret_cast< uint8_t* >( &m_dataBuf[0] + offset ), bytes, length );
    }
 
-   const char * getStringAt( uint16_t pos ) const
+   const char* getStringAt( uint16_t pos ) const
    {
       assert( m_segHdr.size > pos );
       return reinterpret_cast< const char* >( &m_dataBuf[0] + pos );
@@ -67,12 +68,12 @@ public:
       memcpy( reinterpret_cast< uint8_t* >( &m_dataBuf[0] + pos ), str.c_str(), str.length() );
    }
 
-   const uint8_t * getData() const
+   const uint8_t* getData() const
    {
       return reinterpret_cast< const uint8_t* >( &m_dataBuf[0] );
    }
 
-   const uint8_t * getDataAt(uint16_t pos) const
+   const uint8_t* getDataAt(uint16_t pos) const
    {
       assert( m_segHdr.size > pos );
       return reinterpret_cast< const uint8_t* >( &m_dataBuf[0] + pos );
@@ -91,7 +92,7 @@ protected:
    uint16_t m_unknown2;
    uint16_t m_subType;
    uint32_t m_timeStamp;
-   std::vector<uint8_t> m_dataBuf;
+   std::vector< uint8_t > m_dataBuf;
 
 };
 
