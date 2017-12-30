@@ -8,8 +8,8 @@
 #include <iostream>
 #include <cctype>
 #include <set>
-#include <src/servers/Server_Common/Exd/ExdData.h>
-#include <src/servers/Server_Common/Logging/Logger.h>
+#include <common/Exd/ExdData.h>
+#include <common/Logging/Logger.h>
 #include <boost/range/algorithm/remove_if.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
