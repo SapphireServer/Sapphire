@@ -1,5 +1,5 @@
-#ifndef NATIVE_SCRIPT_H
-#define NATIVE_SCRIPT_H
+#ifndef NATIVE_SCRIPT_MGR_H
+#define NATIVE_SCRIPT_MGR_H
 
 #include <unordered_map>
 #include <set>
@@ -19,11 +19,7 @@ namespace Scripting {
    class NativeScriptManager
    {
    protected:
-      std::unordered_map< uint32_t, StatusEffectScript* > m_statusEffectScripts;
-      std::unordered_map< uint32_t, ActionScript* > m_actionScripts;
-      std::unordered_map< uint32_t, EventScript* > m_eventScripts;
-      std::unordered_map< uint32_t, BattleNpcScript* > m_battleNpcScripts;
-      std::unordered_map< uint32_t, ZoneScript* > m_zoneScripts;
+      std::unordered_map< ScriptType, std::unordered_map< uint32_t, ScriptObject* > > m_scripts;
 
       ScriptLoader m_loader;
 
@@ -32,13 +28,7 @@ namespace Scripting {
       bool unloadScript( ScriptInfo* info );
 
    public:
-      NativeScriptManager( );
-
-      StatusEffectScript* getStatusEffectScript( uint32_t statusId );
-      ActionScript* getActionScript( uint32_t actionId );
-      EventScript* getEventScript( uint32_t questId );
-      BattleNpcScript* getBattleNpcScript( uint32_t npcId );
-      ZoneScript* getZoneScript( uint32_t zoneId );
+      NativeScriptManager( ) = default;
 
       bool loadScript( const std::string& path );
       bool unloadScript( const std::string& name );
@@ -50,19 +40,16 @@ namespace Scripting {
       const std::string getModuleExtension();
       bool isModuleLoaded( const std::string& name );
 
-      template< typename key, typename val >
-      bool removeValueFromMap( ScriptObject* ptr, std::unordered_map< key, val >& map )
+      // todo: use some template magic (type_traits is_same?) to avoid ScriptType param
+      // not sure if worthwhile given that it adds an extra place where script types need to be managed
+      template< typename T >
+      T* getScript( ScriptType type, uint32_t scriptId )
       {
-         for( typename std::unordered_map< key, val >::iterator it = map.begin(); it != map.end(); ++it )
-         {
-            if( ptr == static_cast< ScriptObject* >( it->second ) )
-            {
-               map.erase( it );
-               return true;
-            }
-         }
+         auto script = m_scripts[ type ].find( scriptId );
+         if( script == m_scripts[ type ].end() )
+            return nullptr;
 
-         return false;
+         return static_cast< T* >( script->second );
       }
    };
 

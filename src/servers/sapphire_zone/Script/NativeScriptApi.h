@@ -20,11 +20,12 @@ using namespace Core;
 
 enum ScriptType
 {
-    StatusEffect,
-    Action,
-    Quest,
-    BattleNpc,
-    Zone
+   None,
+   ScriptedStatusEffect,
+   ScriptedAction,
+   ScriptedEvent,
+   ScriptedBattleNpc,
+   ScriptedZone
 };
 
 class ScriptObject
@@ -62,7 +63,7 @@ class StatusEffectScript : public ScriptObject
 {
 public:
    StatusEffectScript( std::string name, uint32_t effectId ) :
-      ScriptObject( name, effectId, ScriptType::StatusEffect )
+      ScriptObject( name, effectId, ScriptType::ScriptedStatusEffect )
    { }
 
    virtual void onTick( Entity::Actor& actor ) { }
@@ -80,7 +81,7 @@ class ActionScript : public ScriptObject
 {
 public:
     ActionScript( std::string name, uint32_t abilityId ) :
-      ScriptObject( name, abilityId, ScriptType::Action )
+      ScriptObject( name, abilityId, ScriptType::ScriptedAction )
    { }
 
    virtual void onStart( Entity::Actor& sourceActor, Entity::Actor& targetActor ) { }
@@ -93,7 +94,7 @@ class EventScript : public ScriptObject
 {
 public:
    EventScript( std::string name, uint32_t questId ) :
-      ScriptObject( name, questId, ScriptType::Quest )
+      ScriptObject( name, questId, ScriptType::ScriptedEvent )
    { }
 
    virtual void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) { }
@@ -111,7 +112,7 @@ class BattleNpcScript : public ScriptObject
 {
 public:
    BattleNpcScript( std::string name, uint32_t npcId ) :
-      ScriptObject( name, npcId, ScriptType::BattleNpc )
+      ScriptObject( name, npcId, ScriptType::ScriptedBattleNpc )
    { }
 };
 
@@ -119,7 +120,7 @@ class ZoneScript : public ScriptObject
 {
 public:
    ZoneScript( std::string name, uint32_t zoneId ) :
-      ScriptObject( name, zoneId, ScriptType::Zone )
+      ScriptObject( name, zoneId, ScriptType::ScriptedZone )
    { }
 
    virtual void onZoneInit() { }

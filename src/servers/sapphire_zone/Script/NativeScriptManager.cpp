@@ -1,55 +1,7 @@
 #include "NativeScriptManager.h"
 
 namespace Core {
-   namespace Scripting {
-
-   NativeScriptManager::NativeScriptManager( )
-   { }
-
-   StatusEffectScript* NativeScriptManager::getStatusEffectScript( uint32_t statusId )
-   {
-      auto script = m_statusEffectScripts.find( statusId );
-      if( script == m_statusEffectScripts.end() )
-         return nullptr;
-
-      return script->second;
-   }
-
-   ActionScript* NativeScriptManager::getActionScript( uint32_t actionId )
-   {
-      auto script = m_actionScripts.find( actionId );
-      if( script == m_actionScripts.end() )
-         return nullptr;
-
-      return script->second;
-   }
-
-   EventScript* NativeScriptManager::getEventScript( uint32_t questId )
-   {
-      auto script = m_eventScripts.find( questId );
-      if( script == m_eventScripts.end() )
-         return nullptr;
-
-      return script->second;
-   }
-
-   BattleNpcScript* NativeScriptManager::getBattleNpcScript( uint32_t npcId )
-   {
-      auto script = m_battleNpcScripts.find( npcId );
-      if( script == m_battleNpcScripts.end() )
-         return nullptr;
-
-      return script->second;
-   }
-
-   ZoneScript* NativeScriptManager::getZoneScript( uint32_t zoneId )
-   {
-      auto script = m_zoneScripts.find( zoneId );
-      if( script == m_zoneScripts.end() )
-         return nullptr;
-
-      return script->second;
-   }
+namespace Scripting {
 
    bool NativeScriptManager::loadScript( const std::string& path )
    {
@@ -75,24 +27,7 @@ namespace Core {
          auto script = scripts[i];
          module->scripts.push_back( script );
 
-         switch( script->getType() )
-         {
-            case ScriptType::StatusEffect:
-               m_statusEffectScripts[ script->getId() ] = dynamic_cast< StatusEffectScript* >( script );
-               break;
-            case ScriptType::Action:
-               m_actionScripts[ script->getId() ] = dynamic_cast< ActionScript* >( script );
-               break;
-            case ScriptType::Quest:
-               m_eventScripts[ script->getId() ] = dynamic_cast< EventScript* >( script );
-               break;
-            case ScriptType::BattleNpc:
-               m_battleNpcScripts[ script->getId() ] = dynamic_cast< BattleNpcScript* >( script );
-               break;
-            case ScriptType::Zone:
-               m_zoneScripts[ script->getId() ] = dynamic_cast< ZoneScript* >( script );
-               break;
-         }
+         m_scripts[ script->getType() ][ script->getId() ] = script;
 
          success = true;
       }
@@ -124,27 +59,7 @@ namespace Core {
    {
       for( auto& script : info->scripts )
       {
-         switch( script->getType() )
-         {
-            case ScriptType::StatusEffect:
-               removeValueFromMap< uint32_t, StatusEffectScript* >( script, m_statusEffectScripts );
-               break;
-            case ScriptType::Action:
-               removeValueFromMap< uint32_t, ActionScript* >( script, m_actionScripts );
-               break;
-            case ScriptType::Quest:
-               removeValueFromMap< uint32_t, EventScript* >( script, m_eventScripts );
-               break;
-            case ScriptType::BattleNpc:
-               removeValueFromMap< uint32_t, BattleNpcScript* >( script, m_battleNpcScripts );
-               break;
-            case ScriptType::Zone:
-               removeValueFromMap< uint32_t, ZoneScript* >( script, m_zoneScripts );
-               break;
-
-            default:
-               continue;
-         }
+         m_scripts[ script->getType() ].erase( script->getId() );
 
          delete script;
       }
