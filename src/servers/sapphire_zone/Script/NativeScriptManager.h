@@ -49,7 +49,7 @@ namespace Scripting {
          if( script == m_scripts[ type ].end() )
             return nullptr;
 
-         return static_cast< T* >( script->second );
+         return dynamic_cast< T* >( script->second );
       }
    };
 
