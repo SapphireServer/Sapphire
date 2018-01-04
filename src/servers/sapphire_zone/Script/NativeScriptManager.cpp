@@ -27,7 +27,7 @@ namespace Scripting {
          auto script = scripts[i];
          module->scripts.push_back( script );
 
-         m_scripts[ script->getType() ][ script->getId() ] = script;
+         m_scripts[script->getType()][script->getId()] = script;
 
          success = true;
       }
@@ -59,7 +59,7 @@ namespace Scripting {
    {
       for( auto& script : info->scripts )
       {
-         m_scripts[ script->getType() ].erase( script->getId() );
+         m_scripts[script->getType()].erase( script->getId() );
 
          delete script;
       }
