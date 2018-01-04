@@ -134,10 +134,11 @@ bool Core::Scripting::ScriptLoader::unloadScript( ModuleHandle handle )
       if( it->second->handle == handle )
       {
          auto info = it->second;
-         m_scriptMap.erase( it );
 
          if( unloadModule( handle ) )
          {
+            m_scriptMap.erase( it );
+
             // remove cached file
             fs::remove( info->cache_path );
 
