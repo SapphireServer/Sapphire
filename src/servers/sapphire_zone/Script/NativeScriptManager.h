@@ -45,8 +45,8 @@ namespace Scripting {
       template< typename T >
       T* getScript( ScriptType type, uint32_t scriptId )
       {
-         auto script = m_scripts[ type ].find( scriptId );
-         if( script == m_scripts[ type ].end() )
+         auto script = m_scripts[type].find( scriptId );
+         if( script == m_scripts[type].end() )
             return nullptr;
 
          return dynamic_cast< T* >( script->second );
