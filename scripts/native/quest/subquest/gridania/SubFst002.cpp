@@ -28,7 +28,7 @@ private:
          }
       };
 
-      player.eventPlay ( getId (), 0, NONE, callback );
+      player.eventPlay( getId (), 0, NONE, callback );
    }
 
    void Scene00001(Entity::Player& player)
@@ -37,12 +37,12 @@ private:
       {
          if( param2 == 1 ) // finish quest
          {
-            if(player.giveQuestRewards( getId(), 0 ) )
+            if( player.giveQuestRewards( getId(), 0 ) )
                player.finishQuest( getId() );
          }
       };
 
-      player.eventPlay ( getId (), 1, NONE, callback );
+      player.eventPlay( getId (), 1, NONE, callback );
    }
 
 public:
