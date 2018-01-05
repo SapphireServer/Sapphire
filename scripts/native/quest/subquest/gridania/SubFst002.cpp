@@ -42,7 +42,7 @@ private:
          }
       };
 
-      player.eventPlay( getId (), 1, NONE, callback );
+      player.eventPlay( getId(), 1, NONE, callback );
    }
 
 public:
