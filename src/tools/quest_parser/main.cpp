@@ -285,12 +285,10 @@ void createScript( boost::shared_ptr< Core::Data::QuestInfo >& pQuestData, std::
       "};\n\n"
    );
 
-   std::string initObj( "EXPORT_SCRIPTOBJECT( " + className + " );" );
-
    std::ofstream outputFile;
 
    outputFile.open( "generated/" + className + ".cpp_generated" );
-   outputFile << header << additional << classString << initObj;
+   outputFile << header << additional << classString;
    outputFile.close();
 }
 
