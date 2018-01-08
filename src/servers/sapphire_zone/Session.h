@@ -26,6 +26,9 @@ namespace Core {
       void updateLastDataTime();
       void updateLastSqlTime();
 
+      void startReplay( const std::string& folderpath );
+      void stopReplay();
+
       void close();
 
       uint32_t getId() const;
@@ -47,6 +50,9 @@ namespace Core {
 
       uint32_t m_lastSqlTime;
       bool m_isValid;
+
+      bool m_isReplaying;
+      std::vector<std::tuple<uint64_t, std::string>> m_replayCache;
 
       Network::GameConnectionPtr m_pZoneConnection;
       Network::GameConnectionPtr m_pChatConnection;
