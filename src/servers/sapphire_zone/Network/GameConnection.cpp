@@ -307,7 +307,7 @@ void Core::Network::GameConnection::sendSinglePacket( Packets::GamePacket* pPack
    sendPackets( &pRP );
 }
 
-void Core::Network::GameConnection::injectPacket( const std::string& packetpath, Core::Entity::Player& pPlayer )
+void Core::Network::GameConnection::injectPacket( const std::string& packetpath, Core::Entity::Player& player )
 {
 
    char packet[0x11570];
@@ -318,7 +318,7 @@ void Core::Network::GameConnection::injectPacket( const std::string& packetpath,
    fp = fopen( packetpath.c_str(), "rb" );
    if( fp == nullptr )
    {
-      g_log.error( "Packet " + packetpath + " not found!" );
+      player.sendDebug( "Packet " + packetpath + " not found!" );
       return;
    }
 
@@ -328,7 +328,7 @@ void Core::Network::GameConnection::injectPacket( const std::string& packetpath,
    rewind( fp );
    if ( fread( packet, sizeof( char ), size, fp ) != size )
    {
-      g_log.error( "Packet " + packetpath + " did not read full size: " + std::to_string( size ) );
+      player.sendDebug( "Packet " + packetpath + " did not read full size: " + std::to_string( size ) );
       return;
    }
    fclose( fp );
@@ -336,7 +336,7 @@ void Core::Network::GameConnection::injectPacket( const std::string& packetpath,
    // cycle through the packet entries and queue each one
    for( int32_t k = 0x18; k < size; )
    {
-      uint32_t tmpId = pPlayer.getId();
+      uint32_t tmpId = player.getId();
       // replace ids in the entryheader if needed
       if( !memcmp( packet + k + 0x04, packet + k + 0x08, 4 ) )
       {
