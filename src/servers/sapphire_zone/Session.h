@@ -28,6 +28,7 @@ namespace Core {
 
       void startReplay( const std::string& folderpath );
       void stopReplay();
+      void processReplay();
 
       void close();
 
