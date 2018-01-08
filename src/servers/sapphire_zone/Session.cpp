@@ -111,9 +111,9 @@ void Core::Session::updateLastSqlTime()
    m_lastSqlTime = static_cast< uint32_t >( Util::getTimeSeconds() );
 }
 
-void Core::Session::startReplay( const std::string& folderpath )
+void Core::Session::startReplay( const std::string& path )
 {
-   if( !boost::filesystem::exists( folderpath ) )
+   if( !boost::filesystem::exists( path ) )
    {
       getPlayer()->sendDebug( "Couldn't find folder." );
       return;
@@ -123,19 +123,21 @@ void Core::Session::startReplay( const std::string& folderpath )
 
    std::vector< std::tuple< uint64_t, std::string > > loadedSets;
 
-   for( auto it = boost::filesystem::directory_iterator( boost::filesystem::path( folderpath ) ); it != boost::filesystem::directory_iterator(); ++it )
+   for( auto it = boost::filesystem::directory_iterator( boost::filesystem::path( path ) );
+        it != boost::filesystem::directory_iterator(); ++it )
    {
       // Get the filename of the current element
       auto fileName = it->path().filename().string();
       auto unixTime = atoi( fileName.substr( 0, 10 ).c_str() );
 
-      if( unixTime > 1000000000)
+      if( unixTime > 1000000000 )
       {
          loadedSets.push_back( std::tuple< uint64_t, std::string >( unixTime, it->path().string() ) );
       }
    }
 
-   sort( loadedSets.begin(), loadedSets.end(), []( const std::tuple< uint64_t, std::string >& left, const std::tuple< uint64_t, std::string >& right)
+   sort( loadedSets.begin(), loadedSets.end(),
+         []( const std::tuple< uint64_t, std::string >& left, const std::tuple< uint64_t, std::string >& right)
    {
       return std::get< 0 >( left ) < std::get< 0 >( right );
    } );
@@ -144,7 +146,9 @@ void Core::Session::startReplay( const std::string& folderpath )
 
    for( auto set : loadedSets )
    {
-      m_replayCache.push_back( std::tuple<uint64_t, std::string>( Util::getTimeSeconds() + ( std::get< 0 >( set ) - startTime ), std::get< 1 >( set ) ) );
+      m_replayCache.push_back( std::tuple< uint64_t, std::string >(
+         Util::getTimeSeconds() + ( std::get< 0 >( set ) - startTime ), std::get< 1 >( set ) ) );
+
       g_log.info( "Registering " + std::get< 1 >( set ) + " for " + std::to_string( std::get< 0 >( set ) - startTime ) );
    }
 
@@ -158,21 +162,24 @@ void Core::Session::stopReplay()
    m_replayCache.clear();
 }
 
+void Core::Session::processReplay()
+{
+   int at = 0;
+   for( const auto& set : m_replayCache )
+   {
+      if( std::get< 0 >( set ) == Util::getTimeSeconds() )
+      {
+         m_pZoneConnection->injectPacket( std::get< 1 >( set ), *getPlayer().get() );
+         m_replayCache.erase( m_replayCache.begin() + at );
+      }
+      at++;
+   }
+}
+
 void Core::Session::update()
 {
    if( m_isReplaying )
-   {
-      int at = 0;
-      for( const auto& set : m_replayCache )
-      {
-         if( std::get< 0 >( set ) == Util::getTimeSeconds() )
-         {
-            m_pZoneConnection->injectPacket( std::get< 1 >( set ), *getPlayer().get() );
-            m_replayCache.erase( m_replayCache.begin() + at );
-         }
-         at++;
-      }
-   }
+      processReplay();
 
    if( m_pZoneConnection )
    {
