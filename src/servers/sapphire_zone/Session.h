@@ -52,7 +52,7 @@ namespace Core {
       bool m_isValid;
 
       bool m_isReplaying;
-      std::vector<std::tuple<uint64_t, std::string>> m_replayCache;
+      std::vector< std::tuple< uint64_t, std::string > > m_replayCache;
 
       Network::GameConnectionPtr m_pZoneConnection;
       Network::GameConnectionPtr m_pChatConnection;
