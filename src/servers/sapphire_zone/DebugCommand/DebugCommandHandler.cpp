@@ -45,16 +45,17 @@ extern Core::ServerZone g_serverZone;
 Core::DebugCommandHandler::DebugCommandHandler()
 {
    // Push all commands onto the register map ( command name - function - description - required GM level )
-   registerCommand( "set", &DebugCommandHandler::set, "Loads and injects a premade Packet.", 1 );
-   registerCommand( "get", &DebugCommandHandler::get, "Loads and injects a premade Packet.", 1 );
-   registerCommand( "add", &DebugCommandHandler::add, "Loads and injects a premade Packet.", 1 );
+   registerCommand( "set", &DebugCommandHandler::set, "Executes SET commands.", 1 );
+   registerCommand( "get", &DebugCommandHandler::get, "Executes GET commands.", 1 );
+   registerCommand( "add", &DebugCommandHandler::add, "Executes ADD commands.", 1 );
    registerCommand( "inject", &DebugCommandHandler::injectPacket, "Loads and injects a premade packet.", 1 );
    registerCommand( "injectc", &DebugCommandHandler::injectChatPacket, "Loads and injects a premade chat packet.", 1 );
-   registerCommand( "nudge", &DebugCommandHandler::nudge, "Nudges you forward/up/down", 1 );
-   registerCommand( "info", &DebugCommandHandler::serverInfo, "Send server info", 0 );
-   registerCommand( "unlock", &DebugCommandHandler::unlockCharacter, "Unlock character", 1 );
-   registerCommand( "help", &DebugCommandHandler::help, "Shows registered commands", 0 );
-   registerCommand( "script", &DebugCommandHandler::script, "Server script utilities", 1 );
+   registerCommand( "replay", &DebugCommandHandler::replay, "Replays a saved capture folder.", 1 );
+   registerCommand( "nudge", &DebugCommandHandler::nudge, "Nudges you forward/up/down.", 1 );
+   registerCommand( "info", &DebugCommandHandler::serverInfo, "Show server info.", 0 );
+   registerCommand( "unlock", &DebugCommandHandler::unlockCharacter, "Unlock character.", 1 );
+   registerCommand( "help", &DebugCommandHandler::help, "Shows registered commands.", 0 );
+   registerCommand( "script", &DebugCommandHandler::script, "Server script utilities.", 1 );
 }
 
 // clear all loaded commands
@@ -453,6 +454,50 @@ void Core::DebugCommandHandler::injectChatPacket( char * data, Entity::Player& p
    auto pSession = g_serverZone.getSession( player.getId() );
    if( pSession )
       pSession->getChatConnection()->injectPacket( data + 8, player );
+}
+
+void Core::DebugCommandHandler::replay( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
+{
+   std::string subCommand;
+   std::string params = "";
+
+   // check if the command has parameters
+   std::string tmpCommand = std::string( data + command->getName().length() + 1 );
+
+   std::size_t pos = tmpCommand.find_first_of( " " );
+
+   if( pos != std::string::npos )
+      // command has parameters, grab the first part
+      subCommand = tmpCommand.substr( 0, pos );
+   else
+      // no subcommand given
+      subCommand = tmpCommand;
+
+   if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
+      params = std::string( data + command->getName().length() + 1 + pos + 1 );
+
+   g_log.debug( "[" + std::to_string( player.getId() ) + "] " +
+                "subCommand " + subCommand + " params: " + params );
+
+
+   if( subCommand == "start" )
+   {
+      auto pSession = g_serverZone.getSession( player.getId() );
+      if( pSession )
+         pSession->startReplay( params );
+   }
+   else if( subCommand == "stop" )
+   {
+      auto pSession = g_serverZone.getSession( player.getId() );
+      if( pSession )
+         pSession->stopReplay();
+   }
+   else
+   {
+      player.sendUrgent( subCommand + " is not a valid replay command." );
+   }
+
+   
 }
 
 void Core::DebugCommandHandler::nudge( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )

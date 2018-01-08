@@ -38,6 +38,7 @@ public:
 
    void injectPacket( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command );
    void injectChatPacket( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command );
+   void replay( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command );
    void nudge( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command );
    void serverInfo( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command );
 

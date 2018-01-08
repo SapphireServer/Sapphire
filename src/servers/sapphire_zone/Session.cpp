@@ -6,6 +6,10 @@
 #include "Session.h"
 
 #include "Actor/Player.h"
+#include <boost/filesystem/operations.hpp>
+#include <common/Logging/Logger.h>
+
+extern Core::Logger g_log;
 
 Core::Session::Session( uint32_t sessionId )
    : m_sessionId( sessionId )
@@ -107,8 +111,76 @@ void Core::Session::updateLastSqlTime()
    m_lastSqlTime = static_cast< uint32_t >( Util::getTimeSeconds() );
 }
 
+void Core::Session::startReplay( const std::string& path )
+{
+   if( !boost::filesystem::exists( path ) )
+   {
+      getPlayer()->sendDebug( "Couldn't find folder." );
+      return;
+   }
+
+   m_replayCache.clear();
+
+   std::vector< std::tuple< uint64_t, std::string > > loadedSets;
+
+   for( auto it = boost::filesystem::directory_iterator( boost::filesystem::path( path ) );
+        it != boost::filesystem::directory_iterator(); ++it )
+   {
+      // Get the filename of the current element
+      auto fileName = it->path().filename().string();
+      auto unixTime = atoi( fileName.substr( 0, 10 ).c_str() );
+
+      if( unixTime > 1000000000 )
+      {
+         loadedSets.push_back( std::tuple< uint64_t, std::string >( unixTime, it->path().string() ) );
+      }
+   }
+
+   sort( loadedSets.begin(), loadedSets.end(),
+         []( const std::tuple< uint64_t, std::string >& left, const std::tuple< uint64_t, std::string >& right)
+   {
+      return std::get< 0 >( left ) < std::get< 0 >( right );
+   } );
+
+   int startTime = std::get< 0 >( loadedSets.at( 0 ) );
+
+   for( auto set : loadedSets )
+   {
+      m_replayCache.push_back( std::tuple< uint64_t, std::string >(
+         Util::getTimeSeconds() + ( std::get< 0 >( set ) - startTime ), std::get< 1 >( set ) ) );
+
+      g_log.info( "Registering " + std::get< 1 >( set ) + " for " + std::to_string( std::get< 0 >( set ) - startTime ) );
+   }
+
+   getPlayer()->sendDebug( "Registered " + std::to_string( m_replayCache.size() ) + " sets for replay" );
+   m_isReplaying = true;
+}
+
+void Core::Session::stopReplay()
+{
+   m_isReplaying = false;
+   m_replayCache.clear();
+}
+
+void Core::Session::processReplay()
+{
+   int at = 0;
+   for( const auto& set : m_replayCache )
+   {
+      if( std::get< 0 >( set ) == Util::getTimeSeconds() )
+      {
+         m_pZoneConnection->injectPacket( std::get< 1 >( set ), *getPlayer().get() );
+         m_replayCache.erase( m_replayCache.begin() + at );
+      }
+      at++;
+   }
+}
+
 void Core::Session::update()
 {
+   if( m_isReplaying )
+      processReplay();
+
    if( m_pZoneConnection )
    {
       m_pZoneConnection->processInQueue();
