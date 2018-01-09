@@ -171,7 +171,7 @@ void Core::Session::processReplay()
       {
          m_pZoneConnection->injectPacket( std::get< 1 >( set ), *getPlayer().get() );
          m_replayCache.erase( m_replayCache.begin() + at );
-         g_log.info( "Sent for " + std::to_string( std::get< 0 >( set ) ) + ", left: " + std::to_string( m_replayCache.size() ) );
+         //g_log.info( "Sent for " + std::to_string( std::get< 0 >( set ) ) + ", left: " + std::to_string( m_replayCache.size() ) );
       }
       at++;
    }
