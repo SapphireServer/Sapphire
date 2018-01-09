@@ -32,7 +32,7 @@
 #include "Inventory/Item.h"
 
 #include "Inventory/Inventory.h"
-#include "Event/Event.h"
+#include "Event/EventHandler.h"
 #include "Action/Action.h"
 #include "Action/EventAction.h"
 #include "Action/EventItemAction.h"
