@@ -492,6 +492,12 @@ void Core::DebugCommandHandler::replay( char * data, Entity::Player& player, boo
       if( pSession )
          pSession->stopReplay();
    }
+   else if( subCommand == "info" )
+   {
+      auto pSession = g_serverZone.getSession( player.getId() );
+      if( pSession )
+         pSession->sendReplayInfo();
+   }
    else
    {
       player.sendUrgent( subCommand + " is not a valid replay command." );
