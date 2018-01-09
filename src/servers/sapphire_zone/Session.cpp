@@ -128,7 +128,7 @@ void Core::Session::startReplay( const std::string& path )
    {
       // Get the filename of the current element
       auto fileName = it->path().filename().string();
-      auto unixTime = atoi( fileName.substr( 0, 10 ).c_str() );
+      auto unixTime = std::stoull( fileName.substr( 0, 14 ).c_str() );
 
       if( unixTime > 1000000000 )
       {
@@ -142,12 +142,12 @@ void Core::Session::startReplay( const std::string& path )
       return std::get< 0 >( left ) < std::get< 0 >( right );
    } );
 
-   int startTime = std::get< 0 >( loadedSets.at( 0 ) );
+   uint64_t startTime = std::get< 0 >( loadedSets.at( 0 ) );
 
    for( auto set : loadedSets )
    {
       m_replayCache.push_back( std::tuple< uint64_t, std::string >(
-         Util::getTimeSeconds() + ( std::get< 0 >( set ) - startTime ), std::get< 1 >( set ) ) );
+         Util::getTimeMs() + ( std::get< 0 >( set ) - startTime ), std::get< 1 >( set ) ) );
 
       g_log.info( "Registering " + std::get< 1 >( set ) + " for " + std::to_string( std::get< 0 >( set ) - startTime ) );
    }
@@ -167,13 +167,29 @@ void Core::Session::processReplay()
    int at = 0;
    for( const auto& set : m_replayCache )
    {
-      if( std::get< 0 >( set ) == Util::getTimeSeconds() )
+      if( std::get< 0 >( set ) <= Util::getTimeMs() )
       {
          m_pZoneConnection->injectPacket( std::get< 1 >( set ), *getPlayer().get() );
          m_replayCache.erase( m_replayCache.begin() + at );
+         g_log.info( "Sent for " + std::to_string( std::get< 0 >( set ) ) + ", left: " + std::to_string( m_replayCache.size() ) );
       }
       at++;
    }
+
+   if( m_replayCache.size() == 0 )
+      m_isReplaying = false;
+}
+
+void Core::Session::sendReplayInfo()
+{
+   std::string message = std::to_string( m_replayCache.size() ) + " Sets left in cache, ";
+
+   if( m_isReplaying )
+      message += " is active";
+   else
+      message += " is idle";
+
+   getPlayer()->sendDebug( message );
 }
 
 void Core::Session::update()
