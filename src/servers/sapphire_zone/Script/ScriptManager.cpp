@@ -8,7 +8,7 @@
 #include "Actor/Player.h"
 #include "Actor/BattleNpc.h"
 #include "ServerZone.h"
-#include "Event/Event.h"
+#include "Event/EventHandler.h"
 #include "Event/EventHelper.h"
 #include "StatusEffect/StatusEffect.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
@@ -171,7 +171,7 @@ bool Core::Scripting::ScriptManager::onTalk( Entity::Player& player, uint64_t ac
    {
       player.sendDebug( "Calling: " + objName + "." + eventName );
 
-      player.eventStart( actorId, eventId, Event::Event::Talk, 0, 0 );
+      player.eventStart( actorId, eventId, Event::EventHandler::Talk, 0, 0 );
 
       script->onTalk( eventId, player, actorId );
 
@@ -206,7 +206,7 @@ bool Core::Scripting::ScriptManager::onEnterTerritory( Entity::Player& player, u
    auto script = m_nativeScriptManager->getScript< EventScript >( ScriptType::ScriptedEvent, eventId );
    if( script )
    {
-      player.eventStart( player.getId(), eventId, Event::Event::EnterTerritory, 0, player.getZoneId() );
+      player.eventStart( player.getId(), eventId, Event::EventHandler::EnterTerritory, 0, player.getZoneId() );
 
       script->onEnterZone( player, eventId, param1, param2 );
 
@@ -229,7 +229,7 @@ bool Core::Scripting::ScriptManager::onWithinRange( Entity::Player& player, uint
    auto script = m_nativeScriptManager->getScript< EventScript >( ScriptType::ScriptedEvent, eventId );
    if( script )
    {
-      player.eventStart( player.getId(), eventId, Event::Event::WithinRange, 1, param1 );
+      player.eventStart( player.getId(), eventId, Event::EventHandler::WithinRange, 1, param1 );
 
       script->onWithinRange( player, eventId, param1, x, y, z );
 
@@ -251,7 +251,7 @@ bool Core::Scripting::ScriptManager::onOutsideRange( Entity::Player& player, uin
    auto script = m_nativeScriptManager->getScript< EventScript >( ScriptType::ScriptedEvent, eventId );
    if( script )
    {
-      player.eventStart( player.getId(), eventId, Event::Event::WithinRange, 1, param1 );
+      player.eventStart( player.getId(), eventId, Event::EventHandler::WithinRange, 1, param1 );
 
       script->onOutsideRange( player, eventId, param1, x, y, z );
 
@@ -274,7 +274,7 @@ bool Core::Scripting::ScriptManager::onEmote( Entity::Player& player, uint64_t a
    {
       player.sendDebug( "Calling: " + objName + "." + eventName );
 
-      player.eventStart( actorId, eventId, Event::Event::Emote, 0, emoteId );
+      player.eventStart( actorId, eventId, Event::EventHandler::Emote, 0, emoteId );
 
       script->onEmote( actorId, eventId, emoteId, player );
 
@@ -367,7 +367,7 @@ bool Core::Scripting::ScriptManager::onEventItem( Entity::Player& player, uint32
    auto script = m_nativeScriptManager->getScript< EventScript >( ScriptType::ScriptedEvent, eventId );
    if( script )
    {
-      player.eventStart( targetId, eventId, Event::Event::Item, 0, 0 );
+      player.eventStart( targetId, eventId, Event::EventHandler::Item, 0, 0 );
 
       script->onEventItem( player, eventItemId, eventId, castTime, targetId );
 

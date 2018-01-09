@@ -1,5 +1,5 @@
 #include "EventHelper.h"
-#include "Event.h"
+#include "EventHandler.h"
 #include <common/Common.h>
 #include <common/Exd/ExdData.h>
 
@@ -51,7 +51,7 @@ std::string Core::Event::getEventName( uint32_t eventId )
          return "Aetheryte";
       return "Aethernet";
    }
-   case EventType::ChocoPort:
+   case EventType::Warp:
    {
       return "ChocoboTaxi";
    }

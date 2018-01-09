@@ -21,8 +21,8 @@
 #include "Action/EventAction.h"
 #include "Action/EventItemAction.h"
 
-#include "Event/Event.h"
-#include "Event/Event.h"
+#include "Event/EventHandler.h"
+#include "Event/EventHandler.h"
 #include "ServerZone.h"
 
 extern Core::Logger g_log;
@@ -32,23 +32,23 @@ using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-void Core::Entity::Player::addEvent( Event::EventPtr pEvent )
+void Core::Entity::Player::addEvent( Event::EventHandlerPtr pEvent )
 {
    m_eventMap[pEvent->getId()] = pEvent;
 }
 
-std::map< uint32_t, Core::Event::EventPtr >& Core::Entity::Player::eventList()
+std::map< uint32_t, Core::Event::EventHandlerPtr >& Core::Entity::Player::eventList()
 {
    return m_eventMap;
 }
 
-Core::Event::EventPtr Core::Entity::Player::getEvent( uint32_t eventId )
+Core::Event::EventHandlerPtr Core::Entity::Player::getEvent( uint32_t eventId )
 {
    auto it = m_eventMap.find( eventId );
    if( it != m_eventMap.end() )
       return it->second;
 
-   return Event::EventPtr( nullptr );
+   return Event::EventHandlerPtr( nullptr );
 }
 
 size_t Core::Entity::Player::getEventCount()
@@ -76,10 +76,10 @@ void Core::Entity::Player::checkEvent( uint32_t eventId )
 
 
 void Core::Entity::Player::eventStart( uint64_t actorId, uint32_t eventId, 
-                                       uint8_t eventType, uint8_t eventParam1, 
+                                       Event::EventHandler::EventType eventType, uint8_t eventParam1,
                                        uint32_t eventParam2 )
 {
-   Event::EventPtr newEvent( new Event::Event( actorId, eventId, eventType, eventParam1, eventParam2 ) );
+   Event::EventHandlerPtr newEvent( new Event::EventHandler( actorId, eventId, eventType, eventParam2 ) );
    addEvent( newEvent );
 
    setStateFlag( PlayerStateFlag::Occupied2 );
@@ -99,7 +99,7 @@ void Core::Entity::Player::eventPlay( uint32_t eventId, uint32_t scene,
 }
 
 void Core::Entity::Player::eventPlay( uint32_t eventId, uint32_t scene,
-                                      uint32_t flags, Scripting::EventReturnCallback eventCallback )
+                                      uint32_t flags, Event::EventHandler::SceneReturnCallback eventCallback )
 {
    eventPlay( eventId, scene, flags, 0, 0, eventCallback );
 }
@@ -111,7 +111,7 @@ void Core::Entity::Player::eventPlay( uint32_t eventId, uint32_t scene, uint32_t
 
 void Core::Entity::Player::eventPlay( uint32_t eventId, uint32_t scene,
                                       uint32_t flags, uint32_t eventParam2,
-                                      uint32_t eventParam3, Scripting::EventReturnCallback eventCallback )
+                                      uint32_t eventParam3, Event::EventHandler::SceneReturnCallback eventCallback )
 {
    if( flags & 0x02 )
    {
@@ -124,7 +124,7 @@ void Core::Entity::Player::eventPlay( uint32_t eventId, uint32_t scene,
    if( !pEvent && getEventCount() )
    {
       // We're trying to play a nested event, need to start it first.
-      eventStart( getId(), eventId, Event::Event::Nest, 0, 0 );
+      eventStart( getId(), eventId, Event::EventHandler::Nest, 0, 0 );
       pEvent = getEvent( eventId );
    }
    else if( !pEvent )
@@ -143,7 +143,7 @@ void Core::Entity::Player::eventPlay( uint32_t eventId, uint32_t scene,
 
 void Core::Entity::Player::eventPlay( uint32_t eventId, uint32_t scene,
                                       uint32_t flags, uint32_t eventParam2,
-                                      uint32_t eventParam3, uint32_t eventParam4, Scripting::EventReturnCallback eventCallback )
+                                      uint32_t eventParam3, uint32_t eventParam4, Event::EventHandler::SceneReturnCallback eventCallback )
 {
    if( flags & 0x02 )
    {
@@ -156,7 +156,7 @@ void Core::Entity::Player::eventPlay( uint32_t eventId, uint32_t scene,
    if( !pEvent && getEventCount() )
    {
       // We're trying to play a nested event, need to start it first.
-      eventStart( getId(), eventId, Event::Event::Nest, 0, 0 );
+      eventStart( getId(), eventId, Event::EventHandler::Nest, 0, 0 );
       pEvent = getEvent( eventId );
    }
    else if( !pEvent )
@@ -183,7 +183,7 @@ void Core::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlayer )
       return;
    }
 
-   if( getEventCount() > 1 && pEvent->getEventType() != Event::Event::Nest )
+   if( getEventCount() > 1 && pEvent->getEventType() != Event::EventHandler::Nest )
    {
       // this is the parent of a nested event, we can't finish it until the parent finishes
       return;
@@ -191,7 +191,7 @@ void Core::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlayer )
 
    switch( pEvent->getEventType() )
    {
-   case Event::Event::Nest:
+   case Event::EventHandler::Nest:
    {
       queuePacket( EventFinishPacket( getId(), pEvent->getId(), pEvent->getEventType(), pEvent->getEventParam3() ) );
       removeEvent( pEvent->getId() );
@@ -249,7 +249,7 @@ void Core::Entity::Player::eventActionStart( uint32_t eventId,
    if( !pEvent && getEventCount() )
    {
       // We're trying to play a nested event, need to start it first.
-      eventStart( getId(), eventId, Event::Event::Nest, 0, 0 );
+      eventStart( getId(), eventId, Event::EventHandler::Nest, 0, 0 );
       pEvent = getEvent( eventId );
    }
    else if( !pEvent )
