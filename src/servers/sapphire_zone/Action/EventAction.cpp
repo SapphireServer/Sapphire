@@ -6,7 +6,7 @@
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 #include "Actor/Player.h"
-#include "Event/Event.h"
+#include "Event/EventHandler.h"
 
 extern Core::Logger g_log;
 extern Core::Data::ExdData g_exdData;
