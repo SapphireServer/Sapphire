@@ -158,7 +158,7 @@ bool Core::Scripting::ScriptManager::onTalk( Entity::Player& player, uint64_t ac
    uint32_t scriptId = eventId;
 
    // aethernet/aetherytes need to be handled separately
-   if( eventType == Common::EventType::Aetheryte )
+   if( eventType == Event::EventHandler::EventHandlerType::Aetheryte )
    {
       auto aetherInfo = g_exdData.getAetheryteInfo( eventId & 0xFFFF );
       scriptId = EVENTSCRIPT_AETHERYTE_ID;
@@ -179,7 +179,7 @@ bool Core::Scripting::ScriptManager::onTalk( Entity::Player& player, uint64_t ac
    }
    else
    {
-      if ( eventType == Common::EventType::Quest )
+      if ( eventType == Event::EventHandler::EventHandlerType::Quest )
       {
          auto questInfo = g_exdData.getQuestInfo( eventId );
          if ( questInfo )
@@ -284,7 +284,7 @@ bool Core::Scripting::ScriptManager::onEmote( Entity::Player& player, uint64_t a
    {
       uint16_t eventType = eventId >> 16;
 
-      if( eventType == Common::EventType::Quest )
+      if( eventType == Event::EventHandler::EventHandlerType::Quest )
       {
          auto questInfo = g_exdData.getQuestInfo( eventId );
          if( questInfo )
