@@ -319,33 +319,6 @@ namespace Common {
 
    };
 
-   enum EventType : uint16_t
-   {
-      Quest = 0x0001,
-      Warp = 0x0002,
-      Shop = 0x0004,
-      Aetheryte = 0x0005,
-      GuildLeveAssignment = 0x0006,
-      DefaultTalk = 0x0009,
-      CustomTalk = 0x000B,
-      CompanyLeveOfficer = 0x000C,
-      CraftLeve = 0x000E,
-      GimmickAccessor = 0x000F,
-      GimmickBill = 0x0010,
-      GimmickRect = 0x0011,
-      ChocoboTaxiStand = 0x0012,
-      Opening = 0x0013,
-      ExitRange = 0x0014,
-      GCShop = 0x0016,
-      GuildOrderGuide = 0x0017,
-      GuildOrderOfficer = 0x0018,
-      ContentNpc = 0x0019,
-      Story = 0x001A,
-      SpecialShop = 0x001B,
-      BahamutGuide = 0x001C,
-      FcTalk = 0x001F,
-   };
-
    enum struct ActionAspect : uint8_t
    {
       None = 0,   // Doesn't imply unaspected
