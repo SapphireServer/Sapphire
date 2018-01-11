@@ -83,7 +83,6 @@ void Core::Entity::Player::eventStart( uint64_t actorId, uint32_t eventId,
    addEvent( newEvent );
 
    setStateFlag( PlayerStateFlag::Occupied2 );
-   sendStateFlags();
 
    EventStartPacket eventStart( getId(), actorId, eventId, eventType, eventParam1, eventParam2 );
    
@@ -114,11 +113,7 @@ void Core::Entity::Player::eventPlay( uint32_t eventId, uint32_t scene,
                                       uint32_t eventParam3, Event::EventHandler::SceneReturnCallback eventCallback )
 {
    if( flags & 0x02 )
-   {
       setStateFlag( PlayerStateFlag::WatchingCutscene );
-      sendToInRangeSet( ActorControlPacket142( getId(), SetStatusIcon,
-                                               static_cast< uint8_t >( getOnlineStatus() ) ), true );
-   }
 
    auto pEvent = getEvent( eventId );
    if( !pEvent && getEventCount() )
@@ -146,11 +141,7 @@ void Core::Entity::Player::eventPlay( uint32_t eventId, uint32_t scene,
                                       uint32_t eventParam3, uint32_t eventParam4, Event::EventHandler::SceneReturnCallback eventCallback )
 {
    if( flags & 0x02 )
-   {
       setStateFlag( PlayerStateFlag::WatchingCutscene );
-      sendToInRangeSet( ActorControlPacket142( getId(), SetStatusIcon,
-                                               static_cast< uint8_t >( getOnlineStatus() ) ), true );
-   }
 
    auto pEvent = getEvent( eventId );
    if( !pEvent && getEventCount() )
@@ -219,19 +210,12 @@ void Core::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlayer )
    }
 
    if( hasStateFlag( PlayerStateFlag::WatchingCutscene ) )
-   {
       unsetStateFlag( PlayerStateFlag::WatchingCutscene );
-      sendToInRangeSet( ActorControlPacket142( getId(), SetStatusIcon,
-                                               static_cast< uint8_t >( getOnlineStatus() ) ), true );
-   }
 
    removeEvent( pEvent->getId() );
 
    if( freePlayer == 1 )
-   {
       unsetStateFlag( PlayerStateFlag::Occupied2 );
-      sendStateFlags();
-   }
 }
 
 void Core::Entity::Player::eventActionStart( uint32_t eventId,
