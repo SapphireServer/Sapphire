@@ -60,7 +60,6 @@ void Core::Action::ActionMount::onStart()
 
    m_pSource->sendToInRangeSet( castPacket, true );
    m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::Casting );
-   m_pSource->getAsPlayer()->sendStateFlags();
 
 }
 
@@ -73,7 +72,6 @@ void Core::Action::ActionMount::onFinish()
    pPlayer->sendDebug( "ActionMount::onFinish()" );
 
    pPlayer->unsetStateFlag( PlayerStateFlag::Casting );
-   pPlayer->sendStateFlags();
 
    ZoneChannelPacket< FFXIVIpcEffect > effectPacket( pPlayer->getId() );
    effectPacket.data().targetId = pPlayer->getId();
@@ -100,7 +98,6 @@ void Core::Action::ActionMount::onInterrupt()
 
    m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied1 );
    m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Casting );
-   m_pSource->getAsPlayer()->sendStateFlags();
 
    auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt,
                                          0x219, 1, m_id, 0 );

@@ -308,7 +308,6 @@ void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
    }
 
    setStateFlag( PlayerStateFlag::BetweenAreas );
-   sendStateFlags();
 
    auto z_pos = g_zoneMgr.getZonePosition( data->levelId );
 
@@ -402,7 +401,6 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
    // set flags, will be reset automatically by zoning ( only on client side though )
    pPlayer->setStateFlag( PlayerStateFlag::BetweenAreas );
    pPlayer->setStateFlag( PlayerStateFlag::BetweenAreas1 );
-   pPlayer->sendStateFlags();
 
    pPlayer->sendStats();
 
@@ -580,7 +578,6 @@ void Core::Entity::Player::setNewAdventurer( bool state )
    //{
    //   setStateFlag( PlayerStateFlag::NewAdventurer );
    //}
-   sendStateFlags();
    m_bNewAdventurer = state;
 }
 
@@ -972,6 +969,7 @@ bool Core::Entity::Player::hasStateFlag( Common::PlayerStateFlag flag ) const
 
 void Core::Entity::Player::setStateFlag( Common::PlayerStateFlag flag )
 {
+   auto prevOnlineStatus = getOnlineStatus();
    int32_t iFlag = static_cast< uint32_t >( flag );
 
    uint16_t index;
@@ -979,6 +977,13 @@ void Core::Entity::Player::setStateFlag( Common::PlayerStateFlag flag )
    Util::valueToFlagByteIndexValue( iFlag, value, index );
 
    m_stateFlags[index] |= value;
+   sendStateFlags();
+
+   auto newOnlineStatus = getOnlineStatus();
+
+   if( prevOnlineStatus != newOnlineStatus )
+      sendToInRangeSet( ActorControlPacket142( getId(), SetStatusIcon,
+                                               static_cast< uint8_t >( getOnlineStatus() ) ), true );
 
 }
 
@@ -986,13 +991,7 @@ void Core::Entity::Player::setStateFlags( std::vector< Common::PlayerStateFlag >
 {
    for( const auto& flag : flags )
    {
-      int iFlag = static_cast< uint32_t >( flag );
-
-      uint16_t index;
-      uint8_t value;
-      Util::valueToFlagByteIndexValue( iFlag, value, index );
-
-      m_stateFlags[index] |= value;
+      setStateFlag( flag );
    }
 }
 
@@ -1006,6 +1005,8 @@ void Core::Entity::Player::unsetStateFlag( Common::PlayerStateFlag flag )
    if( !hasStateFlag( flag ) )
       return;
 
+   auto prevOnlineStatus = getOnlineStatus();
+
    int32_t iFlag = static_cast< uint32_t >( flag );
 
    uint16_t index;
@@ -1013,7 +1014,13 @@ void Core::Entity::Player::unsetStateFlag( Common::PlayerStateFlag flag )
    Util::valueToFlagByteIndexValue( iFlag, value, index );
 
    m_stateFlags[index] ^= value;
+   sendStateFlags();
 
+   auto newOnlineStatus = getOnlineStatus();
+
+   if( prevOnlineStatus != newOnlineStatus )
+      sendToInRangeSet( ActorControlPacket142( getId(), SetStatusIcon,
+                                               static_cast< uint8_t >( getOnlineStatus() ) ), true );
 }
 
 void Core::Entity::Player::update( int64_t currTime )

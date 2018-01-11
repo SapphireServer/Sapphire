@@ -58,7 +58,6 @@ void Core::Action::ActionCast::onStart()
 
    m_pSource->sendToInRangeSet( castPacket, true );
    m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::Casting );
-   m_pSource->getAsPlayer()->sendStateFlags();
 
 }
 
@@ -71,7 +70,6 @@ void Core::Action::ActionCast::onFinish()
    pPlayer->sendDebug( "onFinish()" );
 
    pPlayer->unsetStateFlag( PlayerStateFlag::Casting );
-   pPlayer->sendStateFlags();
 
    /*auto control = ActorControlPacket143( m_pTarget->getId(), ActorControlType::Unk7,
                                            0x219, m_id, m_id, m_id, m_id );
@@ -87,7 +85,6 @@ void Core::Action::ActionCast::onInterrupt()
 
    m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied1 );
    m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Casting );
-   m_pSource->getAsPlayer()->sendStateFlags();
 
    auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt,
                                          0x219, 1, m_id, 0 );

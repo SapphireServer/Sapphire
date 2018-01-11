@@ -196,7 +196,6 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
 
             player.unsetStateFlag( PlayerStateFlag::BetweenAreas );
             player.unsetStateFlag( PlayerStateFlag::BetweenAreas1 );
-            player.sendStateFlags();
             break;
         }
 
