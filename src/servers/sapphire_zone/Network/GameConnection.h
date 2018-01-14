@@ -100,6 +100,8 @@ public:
    DECLARE_HANDLER( inventoryModifyHandler );
    DECLARE_HANDLER( discoveryHandler );
    DECLARE_HANDLER( eventHandler );
+   DECLARE_HANDLER( eventHandlerTalk );
+
    DECLARE_HANDLER( logoutHandler );
    
    DECLARE_HANDLER( cfDutyInfoRequest );

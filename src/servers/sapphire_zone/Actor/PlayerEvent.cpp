@@ -34,18 +34,18 @@ using namespace Core::Network::Packets::Server;
 
 void Core::Entity::Player::addEvent( Event::EventHandlerPtr pEvent )
 {
-   m_eventMap[pEvent->getId()] = pEvent;
+   m_eventHandlerMap[pEvent->getId()] = pEvent;
 }
 
 std::map< uint32_t, Core::Event::EventHandlerPtr >& Core::Entity::Player::eventList()
 {
-   return m_eventMap;
+   return m_eventHandlerMap;
 }
 
 Core::Event::EventHandlerPtr Core::Entity::Player::getEvent( uint32_t eventId )
 {
-   auto it = m_eventMap.find( eventId );
-   if( it != m_eventMap.end() )
+   auto it = m_eventHandlerMap.find( eventId );
+   if( it != m_eventHandlerMap.end() )
       return it->second;
 
    return Event::EventHandlerPtr( nullptr );
@@ -53,16 +53,16 @@ Core::Event::EventHandlerPtr Core::Entity::Player::getEvent( uint32_t eventId )
 
 size_t Core::Entity::Player::getEventCount()
 {
-   return m_eventMap.size();
+   return m_eventHandlerMap.size();
 }
 
 void Core::Entity::Player::removeEvent( uint32_t eventId )
 {
-   auto it = m_eventMap.find( eventId );
-   if( it != m_eventMap.end() )
+   auto it = m_eventHandlerMap.find( eventId );
+   if( it != m_eventHandlerMap.end() )
    {
       auto tmpEvent = it->second;
-      m_eventMap.erase( it );
+      m_eventHandlerMap.erase( it );
    }
 }
 
@@ -79,7 +79,7 @@ void Core::Entity::Player::eventStart( uint64_t actorId, uint32_t eventId,
                                        Event::EventHandler::EventType eventType, uint8_t eventParam1,
                                        uint32_t eventParam2 )
 {
-   Event::EventHandlerPtr newEvent( new Event::EventHandler( actorId, eventId, eventType, eventParam2 ) );
+   Event::EventHandlerPtr newEvent( new Event::EventHandler( this, actorId, eventId, eventType, eventParam2 ) );
    addEvent( newEvent );
 
    setStateFlag( PlayerStateFlag::Occupied2 );
@@ -184,7 +184,7 @@ void Core::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlayer )
    {
    case Event::EventHandler::Nest:
    {
-      queuePacket( EventFinishPacket( getId(), pEvent->getId(), pEvent->getEventType(), pEvent->getEventParam3() ) );
+      queuePacket( EventFinishPacket( getId(), pEvent->getId(), pEvent->getEventType(), pEvent->getEventParam() ) );
       removeEvent( pEvent->getId() );
 
       auto events = eventList();
@@ -195,7 +195,8 @@ void Core::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlayer )
          if( it.second->hasPlayedScene() == false )
          {
             // TODO: not happy with this, this is also prone to break wit more than one remaining event in there
-            queuePacket( EventFinishPacket( getId(), it.second->getId(), it.second->getEventType(), it.second->getEventParam3() ) );
+            queuePacket( EventFinishPacket( getId(), it.second->getId(), it.second->getEventType(),
+                                            it.second->getEventParam() ) );
             removeEvent( it.second->getId() );
          }
       }
@@ -204,7 +205,7 @@ void Core::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlayer )
    }
    default:
    {
-      queuePacket( EventFinishPacket( getId(), pEvent->getId(), pEvent->getEventType(), pEvent->getEventParam3() ) );
+      queuePacket( EventFinishPacket( getId(), pEvent->getId(), pEvent->getEventType(), pEvent->getEventParam() ) );
       break;
    }
    }

@@ -1,4 +1,5 @@
 #include <common/Common.h>
+#include <common/Exd/ExdData.h>
 #include <common/Network/CommonNetwork.h>
 #include <common/Network/GamePacketNew.h>
 #include <common/Network/PacketContainer.h>
@@ -20,6 +21,7 @@
 #include "Forwards.h"
 #include "Event/EventHelper.h"
 
+extern Core::Data::ExdData g_exdData;
 extern Core::Scripting::ScriptManager g_scriptMgr;
 
 using namespace Core::Common;
@@ -49,12 +51,7 @@ void Core::Network::GameConnection::eventHandler( const Packets::GamePacket& inP
    
    case ClientZoneIpcType::TalkEventHandler: // Talk event
    {
-      uint64_t actorId = inPacket.getValAt< uint64_t >( 0x20 );
-      uint32_t eventId = inPacket.getValAt< uint32_t >( 0x28 );
 
-      if( !g_scriptMgr.onTalk( player, actorId, eventId ) )
-         abortEventFunc( player, actorId, eventId );
-      break;
    }
 
    case ClientZoneIpcType::EmoteEventHandler: // Emote event
@@ -149,6 +146,44 @@ void Core::Network::GameConnection::eventHandler( const Packets::GamePacket& inP
    }
 
    }
+
+}
+
+void Core::Network::GameConnection::eventHandlerTalk( const Packets::GamePacket& inPacket, Entity::Player& player )
+{
+
+   auto actorId = inPacket.getValAt< uint64_t >( 0x20 );
+   auto eventId = inPacket.getValAt< uint32_t >( 0x28 );
+   auto eventType = static_cast< uint16_t >( eventId >> 16 );
+
+   std::string eventName = "onTalk";
+   std::string objName = Event::getEventName( eventId );
+
+   player.sendDebug( "Actor: " +
+                     std::to_string( actorId ) + " -> " +
+                     std::to_string( Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) ) ) +
+                     " \neventId: " +
+                     std::to_string( eventId ) +
+                     " (0x" + boost::str( boost::format( "%|08X|" )
+                                          % static_cast< uint64_t >( eventId & 0xFFFFFFF ) ) + ")" );
+
+
+   player.sendDebug( "Calling: " + objName + "." + eventName );
+   player.eventStart( actorId, eventId, Event::EventHandler::Talk, 0, 0 );
+
+   if( !g_scriptMgr.onTalk( player, actorId, eventId ) )
+   {
+      if ( eventType == Event::EventHandler::EventHandlerType::Quest )
+      {
+         auto questInfo = g_exdData.getQuestInfo( eventId );
+         if ( questInfo )
+         {
+            player.sendUrgent( "Quest not implemented: " + questInfo->name + " (" + questInfo->name_intern + ")" );
+         }
+      }
+   }
+
+   player.checkEvent( eventId );
 
 }
 
