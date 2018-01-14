@@ -1,6 +1,7 @@
 #include "EventHandler.h"
 
-Core::Event::EventHandler::EventHandler( uint64_t actorId, uint32_t eventId, EventType eventType, uint32_t eventParam3 ) :
+Core::Event::EventHandler::EventHandler( Entity::Player* pOwner, uint64_t actorId, uint32_t eventId, EventType eventType, uint32_t eventParam ) :
+     m_pOwner( pOwner ),
      m_actorId( actorId ),
      m_eventId( eventId ),
      m_eventType( eventType ),
@@ -9,7 +10,7 @@ Core::Event::EventHandler::EventHandler( uint64_t actorId, uint32_t eventId, Eve
    m_entryId = static_cast< uint16_t >( eventId );
    m_type = static_cast< uint16_t >( eventId >> 16 );
 
-   m_eventParam3 = eventParam3;
+   m_eventParam = eventParam;
 
    m_callback = nullptr;
 }
@@ -39,9 +40,9 @@ uint16_t Core::Event::EventHandler::getEntryId() const
    return m_entryId;
 }
 
-uint32_t Core::Event::EventHandler::getEventParam3() const
+uint32_t Core::Event::EventHandler::getEventParam() const
 {
-   return m_eventParam3;
+   return m_eventParam;
 }
 
 Core::Event::EventHandler::SceneReturnCallback Core::Event::EventHandler::getEventReturnCallback() const
@@ -62,4 +63,15 @@ bool Core::Event::EventHandler::hasPlayedScene() const
 void Core::Event::EventHandler::setPlayedScene( bool playedScene )
 {
    m_playedScene = playedScene;
+}
+
+bool Core::Event::EventHandler::hasNestedEvent() const
+{
+   return m_pNestedEvent != nullptr;
+}
+
+void Core::Event::EventHandler::removeNestedEvent()
+{
+
+   m_pNestedEvent.reset();
 }

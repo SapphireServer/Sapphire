@@ -143,16 +143,6 @@ bool Core::Scripting::ScriptManager::registerBnpcTemplate( std::string templateN
 
 bool Core::Scripting::ScriptManager::onTalk( Entity::Player& player, uint64_t actorId, uint32_t eventId )
 {
-   std::string eventName = "onTalk";
-   std::string objName = Event::getEventName( eventId );
-
-   player.sendDebug( "Actor: " +
-                     std::to_string( actorId ) + " -> " +
-                     std::to_string( Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) ) ) +
-                     " \neventId: " +
-                     std::to_string( eventId ) +
-                     " (0x" + boost::str( boost::format( "%|08X|" )
-                                          % static_cast< uint64_t >( eventId & 0xFFFFFFF ) ) + ")" );
 
    uint16_t eventType = eventId >> 16;
    uint32_t scriptId = eventId;
@@ -168,29 +158,9 @@ bool Core::Scripting::ScriptManager::onTalk( Entity::Player& player, uint64_t ac
 
    auto script = m_nativeScriptManager->getScript< EventScript >( ScriptType::ScriptedEvent, scriptId );
    if( script )
-   {
-      player.sendDebug( "Calling: " + objName + "." + eventName );
-
-      player.eventStart( actorId, eventId, Event::EventHandler::Talk, 0, 0 );
-
       script->onTalk( eventId, player, actorId );
-
-      player.checkEvent( eventId );
-   }
    else
-   {
-      if ( eventType == Event::EventHandler::EventHandlerType::Quest )
-      {
-         auto questInfo = g_exdData.getQuestInfo( eventId );
-         if ( questInfo )
-         {
-            player.sendUrgent( "Quest not implemented: " + questInfo->name + " (" + questInfo->name_intern + ")" );
-
-         }
-      }
-
       return false;
-   }
 
    return true;
 }

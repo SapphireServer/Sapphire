@@ -39,6 +39,7 @@ namespace Core {
          {
             Quest = 0x0001,
             Warp = 0x0002,
+            Unknown = 0x0003, // Came up in the client with "Begin" unsure that means
             Shop = 0x0004,
             Aetheryte = 0x0005,
             GuildLeveAssignment = 0x0006,
@@ -64,7 +65,7 @@ namespace Core {
 
          using SceneReturnCallback = std::function< void( Entity::Player&, uint32_t, uint16_t, uint16_t, uint16_t ) > ;
 
-         EventHandler( uint64_t actorId, uint32_t eventId, EventType eventType, uint32_t eventParam3 );
+         EventHandler( Entity::Player* pOwner, uint64_t actorId, uint32_t eventId, EventType eventType, uint32_t eventParam );
 
          ~EventHandler() {}
 
@@ -78,7 +79,7 @@ namespace Core {
 
          uint8_t getEventType() const;
 
-         uint32_t getEventParam3() const;
+         uint32_t getEventParam() const;
 
          bool hasPlayedScene() const;
 
@@ -88,15 +89,21 @@ namespace Core {
 
          void setEventReturnCallback( SceneReturnCallback callback );
 
+         bool hasNestedEvent() const;
+
+         void removeNestedEvent();
+
 
 
       protected:
+         Entity::Player* m_pOwner;
          uint64_t m_actorId;
          uint32_t m_eventId;
          uint16_t m_entryId;
          uint16_t m_type;
          uint8_t m_eventType;
-         uint32_t m_eventParam3;
+         uint32_t m_eventParam;
+         EventHandlerPtr m_pNestedEvent;
          bool m_playedScene;
          SceneReturnCallback m_callback;
       };
