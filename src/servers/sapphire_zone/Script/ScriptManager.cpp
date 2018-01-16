@@ -258,7 +258,6 @@ bool Core::Scripting::ScriptManager::onEventItem( Entity::Player& player, uint32
       player.eventStart( targetId, eventId, Event::EventHandler::Item, 0, 0 );
 
       script->onEventItem( player, eventItemId, eventId, castTime, targetId );
-
       return true;
    }
 
@@ -299,7 +298,6 @@ bool Core::Scripting::ScriptManager::onCastFinish( Entity::Player& player, Entit
 
    if( script )
       script->onCastFinish( player, *pTarget );
-
    return true;
 }
 
@@ -313,7 +311,6 @@ bool Core::Scripting::ScriptManager::onStatusReceive( Entity::ActorPtr pActor, u
          pActor->getAsPlayer()->sendDebug( "Calling status receive for statusid: " + std::to_string( effectId ) );
 
       script->onApply( *pActor );
-
       return true;
    }
 
@@ -329,7 +326,6 @@ bool Core::Scripting::ScriptManager::onStatusTick( Entity::ActorPtr pActor, Core
          pActor->getAsPlayer()->sendDebug( "Calling status tick for statusid: " + std::to_string( effect.getId() ) );
 
       script->onTick( *pActor );
-
       return true;
    }
 
@@ -345,7 +341,6 @@ bool Core::Scripting::ScriptManager::onStatusTimeOut( Entity::ActorPtr pActor, u
          pActor->getAsPlayer()->sendDebug( "Calling status timeout for statusid: " + std::to_string( effectId ) );
 
       script->onExpire( *pActor );
-
       return true;
    }
 
@@ -358,7 +353,6 @@ bool Core::Scripting::ScriptManager::onZoneInit( ZonePtr pZone )
    if( script )
    {
       script->onZoneInit();
-
       return true;
    }
 
