@@ -101,6 +101,10 @@ public:
    DECLARE_HANDLER( discoveryHandler );
    DECLARE_HANDLER( eventHandler );
    DECLARE_HANDLER( eventHandlerTalk );
+   DECLARE_HANDLER( eventHandlerEmote );
+   DECLARE_HANDLER( eventHandlerWithinRange );
+   DECLARE_HANDLER( eventHandlerOutsideRange );
+   DECLARE_HANDLER( eventHandlerEnterTerritory );
 
    DECLARE_HANDLER( logoutHandler );
    
