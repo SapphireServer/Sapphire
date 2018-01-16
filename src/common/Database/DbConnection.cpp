@@ -61,7 +61,7 @@ uint32_t Core::Db::DbConnection::open()
    try
    {
       m_pConnection = base->connect( m_connectionInfo.host, m_connectionInfo.user, m_connectionInfo.password,
-                                    options, m_connectionInfo.port );
+                                     options, m_connectionInfo.port );
 
       m_pConnection->setSchema( m_connectionInfo.database );
    }
@@ -79,9 +79,9 @@ uint32_t Core::Db::DbConnection::getLastError()
    return m_pConnection->getErrorNo();
 }
 
-void Core::Db::DbConnection::ping()
+bool Core::Db::DbConnection::ping()
 {
-   m_pConnection->ping();
+   return m_pConnection->ping();
 }
 
 bool Core::Db::DbConnection::lockIfReady()
@@ -145,6 +145,17 @@ boost::shared_ptr< Mysql::ResultSet > Core::Db::DbConnection::query( boost::shar
    boost::shared_ptr< Mysql::ResultSet > res( nullptr );
    if( !stmt )
       return nullptr;
+
+   if( !ping() )
+   {
+      g_log.error( "MysqlConnection went down" );
+      // naivly reconnect and hope for the best
+      open();
+      lockIfReady();
+      if( !prepareStatements() )
+         g_log.error( "Mysql Statements failed to prepare..." );
+      g_log.info( "MysqlConnection reestablished" );
+   }
 
    uint32_t index = stmt->getIndex();
 

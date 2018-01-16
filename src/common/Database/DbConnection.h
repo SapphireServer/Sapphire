@@ -72,7 +72,7 @@ namespace Db
       void rollbackTransaction();
       void commitTransaction();
       
-      void ping();
+      bool ping();
 
       uint32_t getLastError();
       bool lockIfReady();
