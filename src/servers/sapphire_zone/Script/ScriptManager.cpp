@@ -157,115 +157,49 @@ bool Core::Scripting::ScriptManager::onTalk( Entity::Player& player, uint64_t ac
    }
 
    auto script = m_nativeScriptManager->getScript< EventScript >( ScriptType::ScriptedEvent, scriptId );
-   if( script )
-      script->onTalk( eventId, player, actorId );
-   else
+   if( !script )
       return false;
-
+   script->onTalk( eventId, player, actorId );
    return true;
 }
 
 bool Core::Scripting::ScriptManager::onEnterTerritory( Entity::Player& player, uint32_t eventId,
                                                        uint16_t param1, uint16_t param2 )
 {
-   std::string eventName = "onEnterTerritory";
-   std::string objName = Event::getEventName( eventId );
-
-   player.sendDebug( "Calling: " + objName + "." + eventName + " - " + std::to_string( eventId ) );
-
    auto script = m_nativeScriptManager->getScript< EventScript >( ScriptType::ScriptedEvent, eventId );
-   if( script )
-   {
-      player.eventStart( player.getId(), eventId, Event::EventHandler::EnterTerritory, 0, player.getZoneId() );
-
-      script->onEnterZone( player, eventId, param1, param2 );
-
-      player.checkEvent( eventId );
-
-      return true;
-   }
-
-   return false;
+   if( !script )
+      return false;
+   script->onEnterZone( player, eventId, param1, param2 );
+   return true;
 }
 
 bool Core::Scripting::ScriptManager::onWithinRange( Entity::Player& player, uint32_t eventId, uint32_t param1,
                                                     float x, float y, float z )
 {
-
-   std::string eventName = "onWithinRange";
-   std::string objName = Event::getEventName( eventId );
-   player.sendDebug( "Calling: " + objName + "." + eventName + " - " + std::to_string( eventId ) + " p1: " + std::to_string( param1 ) );
-
    auto script = m_nativeScriptManager->getScript< EventScript >( ScriptType::ScriptedEvent, eventId );
-   if( script )
-   {
-      player.eventStart( player.getId(), eventId, Event::EventHandler::WithinRange, 1, param1 );
-
-      script->onWithinRange( player, eventId, param1, x, y, z );
-
-      player.checkEvent( eventId );
-
-      return true;
-   }
-
-   return false;
+   if( !script )
+      return false;
+   script->onWithinRange( player, eventId, param1, x, y, z );
+   return true;
 }
 
 bool Core::Scripting::ScriptManager::onOutsideRange( Entity::Player& player, uint32_t eventId, uint32_t param1,
                                                      float x, float y, float z )
 {
-   std::string eventName = "onOutsideRange";
-   std::string objName = Event::getEventName( eventId );
-   player.sendDebug( "Calling: " + objName + "." + eventName + " - " + std::to_string( eventId ) );
-
    auto script = m_nativeScriptManager->getScript< EventScript >( ScriptType::ScriptedEvent, eventId );
-   if( script )
-   {
-      player.eventStart( player.getId(), eventId, Event::EventHandler::WithinRange, 1, param1 );
-
-      script->onOutsideRange( player, eventId, param1, x, y, z );
-
-      player.checkEvent( eventId );
-
-      return true;
-   }
-
-   return false;
+   if( !script )
+      return false;
+   script->onOutsideRange( player, eventId, param1, x, y, z );
+   return true;
 }
 
 bool Core::Scripting::ScriptManager::onEmote( Entity::Player& player, uint64_t actorId,
                                               uint32_t eventId, uint8_t emoteId )
 {
-   std::string eventName = "onEmote";
-   std::string objName = Event::getEventName( eventId );
-
    auto script = m_nativeScriptManager->getScript< EventScript >( ScriptType::ScriptedEvent, eventId );
-   if( script )
-   {
-      player.sendDebug( "Calling: " + objName + "." + eventName );
-
-      player.eventStart( actorId, eventId, Event::EventHandler::Emote, 0, emoteId );
-
-      script->onEmote( actorId, eventId, emoteId, player );
-
-      player.checkEvent( eventId );
-   }
-   else
-   {
-      uint16_t eventType = eventId >> 16;
-
-      if( eventType == Event::EventHandler::EventHandlerType::Quest )
-      {
-         auto questInfo = g_exdData.getQuestInfo( eventId );
-         if( questInfo )
-         {
-            player.sendUrgent( "Quest not implemented: " + questInfo->name );
-            return false;
-         }
-      }
+   if( !script )
       return false;
-   }
-
+   script->onEmote( actorId, eventId, emoteId, player );
    return true;
 }
 

@@ -76,9 +76,9 @@ Core::Network::GameConnection::GameConnection( Core::Network::HivePtr pHive,
    setZoneHandler( ClientZoneIpcType::InventoryModifyHandler,"InventoryModifyHandler",  &GameConnection::inventoryModifyHandler );
 
    setZoneHandler( ClientZoneIpcType::TalkEventHandler,     "EventHandlerTalk",         &GameConnection::eventHandlerTalk );
-   setZoneHandler( ClientZoneIpcType::EmoteEventHandler,    "EventHandler",             &GameConnection::eventHandler );
-   setZoneHandler( ClientZoneIpcType::WithinRangeEventHandler, "EventHandler",          &GameConnection::eventHandler );
-   setZoneHandler( ClientZoneIpcType::OutOfRangeEventHandler, "EventHandler",           &GameConnection::eventHandler );
+   setZoneHandler( ClientZoneIpcType::EmoteEventHandler,    "EventHandlerEmote",        &GameConnection::eventHandlerEmote );
+   setZoneHandler( ClientZoneIpcType::WithinRangeEventHandler, "EventHandlerWithinRange", &GameConnection::eventHandlerWithinRange );
+   setZoneHandler( ClientZoneIpcType::OutOfRangeEventHandler, "EventHandlerOutsideRange", &GameConnection::eventHandlerOutsideRange );
    setZoneHandler( ClientZoneIpcType::EnterTeriEventHandler, "EventHandler",            &GameConnection::eventHandler );
 
    setZoneHandler( ClientZoneIpcType::ReturnEventHandler,      "EventHandlerReturn",    &GameConnection::eventHandler );
