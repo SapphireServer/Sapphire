@@ -216,32 +216,17 @@ bool Core::Scripting::ScriptManager::onEventHandlerReturn( Entity::Player& playe
                      " p2: " + std::to_string( param2 ) +
                      " p3: " + std::to_string( param3 ) );
 
-   try
+   auto pEvent = player.getEvent( eventId );
+   if( pEvent )
    {
-      auto pEvent = player.getEvent( eventId );
-      if( pEvent )
-      {
-         pEvent->setPlayedScene( false );
-         // try to retrieve a stored callback
-         auto eventCallback = pEvent->getEventReturnCallback();
-         // if there is one, proceed to call it
-         if( eventCallback )
-         {
-            eventCallback( player, eventId, param1, param2, param3 );
-            if( !pEvent->hasPlayedScene() )
-               player.eventFinish( eventId, 1 );
-            else
-               pEvent->setPlayedScene( false );
-         }
-            // else, finish the event.
-         else
-            player.eventFinish( eventId, 1 );
-      }
-   }
-   catch( std::exception& e )
-   {
-      player.sendNotice( e.what() );
-      return false;
+      pEvent->setPlayedScene( false );
+      // try to retrieve a stored callback
+      auto eventCallback = pEvent->getEventReturnCallback();
+      // if there is one, proceed to call it
+      if( eventCallback )
+         eventCallback( player, eventId, param1, param2, param3 );
+      // check the event, finishing it if needed
+      player.checkEvent( eventId );
    }
 
    return true;
@@ -254,7 +239,6 @@ bool Core::Scripting::ScriptManager::onEventHandlerTradeReturn( Entity::Player& 
    if( script )
    {
       script->onEventHandlerTradeReturn( player, eventId, subEvent, param, catalogId );
-
       return true;
    }
 
