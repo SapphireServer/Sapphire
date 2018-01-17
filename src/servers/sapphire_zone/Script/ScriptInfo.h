@@ -26,7 +26,7 @@ namespace Scripting {
 
       ModuleHandle handle;
       std::vector< ScriptObject* > scripts;
-      ScriptType type;
+      std::size_t type;
    };
 }
 }
