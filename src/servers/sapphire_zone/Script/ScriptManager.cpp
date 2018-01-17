@@ -156,7 +156,7 @@ bool Core::Scripting::ScriptManager::onTalk( Entity::Player& player, uint64_t ac
          scriptId = EVENTSCRIPT_AETHERNET_ID;
    }
 
-   auto script = m_nativeScriptManager->getScript< EventScript >( ScriptType::ScriptedEvent, scriptId );
+   auto script = m_nativeScriptManager->getScript< EventScript >( scriptId );
    if( !script )
       return false;
    script->onTalk( eventId, player, actorId );
@@ -166,7 +166,7 @@ bool Core::Scripting::ScriptManager::onTalk( Entity::Player& player, uint64_t ac
 bool Core::Scripting::ScriptManager::onEnterTerritory( Entity::Player& player, uint32_t eventId,
                                                        uint16_t param1, uint16_t param2 )
 {
-   auto script = m_nativeScriptManager->getScript< EventScript >( ScriptType::ScriptedEvent, eventId );
+   auto script = m_nativeScriptManager->getScript< EventScript >( eventId );
    if( !script )
       return false;
    script->onEnterZone( player, eventId, param1, param2 );
@@ -176,7 +176,7 @@ bool Core::Scripting::ScriptManager::onEnterTerritory( Entity::Player& player, u
 bool Core::Scripting::ScriptManager::onWithinRange( Entity::Player& player, uint32_t eventId, uint32_t param1,
                                                     float x, float y, float z )
 {
-   auto script = m_nativeScriptManager->getScript< EventScript >( ScriptType::ScriptedEvent, eventId );
+   auto script = m_nativeScriptManager->getScript< EventScript >( eventId );
    if( !script )
       return false;
    script->onWithinRange( player, eventId, param1, x, y, z );
@@ -186,7 +186,7 @@ bool Core::Scripting::ScriptManager::onWithinRange( Entity::Player& player, uint
 bool Core::Scripting::ScriptManager::onOutsideRange( Entity::Player& player, uint32_t eventId, uint32_t param1,
                                                      float x, float y, float z )
 {
-   auto script = m_nativeScriptManager->getScript< EventScript >( ScriptType::ScriptedEvent, eventId );
+   auto script = m_nativeScriptManager->getScript< EventScript >( eventId );
    if( !script )
       return false;
    script->onOutsideRange( player, eventId, param1, x, y, z );
@@ -196,7 +196,7 @@ bool Core::Scripting::ScriptManager::onOutsideRange( Entity::Player& player, uin
 bool Core::Scripting::ScriptManager::onEmote( Entity::Player& player, uint64_t actorId,
                                               uint32_t eventId, uint8_t emoteId )
 {
-   auto script = m_nativeScriptManager->getScript< EventScript >( ScriptType::ScriptedEvent, eventId );
+   auto script = m_nativeScriptManager->getScript< EventScript >( eventId );
    if( !script )
       return false;
    script->onEmote( actorId, eventId, emoteId, player );
@@ -235,7 +235,7 @@ bool Core::Scripting::ScriptManager::onEventHandlerReturn( Entity::Player& playe
 bool Core::Scripting::ScriptManager::onEventHandlerTradeReturn( Entity::Player& player, uint32_t eventId,
                                                                 uint16_t subEvent, uint16_t param, uint32_t catalogId )
 {
-   auto script = m_nativeScriptManager->getScript< EventScript >( ScriptType::ScriptedEvent, eventId );
+   auto script = m_nativeScriptManager->getScript< EventScript >( eventId );
    if( script )
    {
       script->onEventHandlerTradeReturn( player, eventId, subEvent, param, catalogId );
@@ -252,7 +252,7 @@ bool Core::Scripting::ScriptManager::onEventItem( Entity::Player& player, uint32
    std::string objName = Event::getEventName( eventId );
    player.sendDebug( "Calling: " + objName + "." + eventName + " - " + std::to_string( eventId ) );
 
-   auto script = m_nativeScriptManager->getScript< EventScript >( ScriptType::ScriptedEvent, eventId );
+   auto script = m_nativeScriptManager->getScript< EventScript >( eventId );
    if( script )
    {
       player.eventStart( targetId, eventId, Event::EventHandler::Item, 0, 0 );
@@ -278,7 +278,7 @@ bool Core::Scripting::ScriptManager::onMobKill( Entity::Player& player, uint16_t
 
       uint16_t questId = activeQuests->c.questId;
 
-      auto script = m_nativeScriptManager->getScript< EventScript >( ScriptType::ScriptedEvent, questId );
+      auto script = m_nativeScriptManager->getScript< EventScript >( questId );
       if( script )
       {
          std::string objName = Event::getEventName( 0x00010000 | questId );
@@ -294,7 +294,7 @@ bool Core::Scripting::ScriptManager::onMobKill( Entity::Player& player, uint16_t
 
 bool Core::Scripting::ScriptManager::onCastFinish( Entity::Player& player, Entity::ActorPtr pTarget, uint32_t actionId )
 {
-   auto script = m_nativeScriptManager->getScript< ActionScript >( ScriptType::ScriptedAction, actionId );
+   auto script = m_nativeScriptManager->getScript< ActionScript >( actionId );
 
    if( script )
       script->onCastFinish( player, *pTarget );
@@ -303,7 +303,7 @@ bool Core::Scripting::ScriptManager::onCastFinish( Entity::Player& player, Entit
 
 bool Core::Scripting::ScriptManager::onStatusReceive( Entity::ActorPtr pActor, uint32_t effectId )
 {
-   auto script = m_nativeScriptManager->getScript< StatusEffectScript >( ScriptType::ScriptedStatusEffect, effectId );
+   auto script = m_nativeScriptManager->getScript< StatusEffectScript >( effectId );
 
    if( script )
    {
@@ -319,7 +319,7 @@ bool Core::Scripting::ScriptManager::onStatusReceive( Entity::ActorPtr pActor, u
 
 bool Core::Scripting::ScriptManager::onStatusTick( Entity::ActorPtr pActor, Core::StatusEffect::StatusEffect& effect )
 {
-   auto script = m_nativeScriptManager->getScript< StatusEffectScript >( ScriptType::ScriptedStatusEffect, effect.getId() );
+   auto script = m_nativeScriptManager->getScript< StatusEffectScript >( effect.getId() );
    if( script )
    {
       if( pActor->isPlayer() )
@@ -334,7 +334,7 @@ bool Core::Scripting::ScriptManager::onStatusTick( Entity::ActorPtr pActor, Core
 
 bool Core::Scripting::ScriptManager::onStatusTimeOut( Entity::ActorPtr pActor, uint32_t effectId )
 {
-   auto script = m_nativeScriptManager->getScript< StatusEffectScript >( ScriptType::ScriptedStatusEffect, effectId );
+   auto script = m_nativeScriptManager->getScript< StatusEffectScript >( effectId );
    if( script )
    {
       if( pActor->isPlayer() )
@@ -349,7 +349,7 @@ bool Core::Scripting::ScriptManager::onStatusTimeOut( Entity::ActorPtr pActor, u
 
 bool Core::Scripting::ScriptManager::onZoneInit( ZonePtr pZone )
 {
-   auto script = m_nativeScriptManager->getScript< ZoneScript >( ScriptType::ScriptedZone, pZone->getId() );
+   auto script = m_nativeScriptManager->getScript< ZoneScript >( pZone->getId() );
    if( script )
    {
       script->onZoneInit();
