@@ -85,7 +85,7 @@ bool Core::Data::ExdData::loadZoneInfo()
       int16_t map_index          = getField< int16_t >( mapDataFields, 12 );
       bool is_two_bytes          = getField< bool >( mapDataFields, 15 );
 
-      uint16_t weather_rate       = getField< uint16_t >( fields, 10 ) > 75 ? 0 : getField< uint16_t >( fields, 10 );
+      uint8_t weather_rate       = getField< uint8_t >( fields, 12 ) > 75 ? 0 : getField< uint8_t >( fields, 12 );
       auto weatherRateFields     = weatherRate.get_row( weather_rate );
 
       int32_t aetheryte_index = getField< int32_t >( fields, 23 );
