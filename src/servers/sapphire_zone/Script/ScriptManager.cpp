@@ -74,6 +74,10 @@ bool Core::Scripting::ScriptManager::init()
 
 void Core::Scripting::ScriptManager::watchDirectories()
 {
+   auto shouldWatch = g_serverZone.getConfig()->getValue< bool >( "Settings.General.Scripts.HotSwap.Enabled", true );
+   if( !shouldWatch )
+      return;
+
    Watchdog::watchMany( g_serverZone.getConfig()->getValue< std::string >( "Settings.General.Scripts.Path", "./compiledscripts/" ) + "*" + m_nativeScriptManager->getModuleExtension(),
    [ this ]( const std::vector< ci::fs::path >& paths )
    {
