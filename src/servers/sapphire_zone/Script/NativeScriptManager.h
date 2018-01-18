@@ -40,8 +40,6 @@ namespace Scripting {
       const std::string getModuleExtension();
       bool isModuleLoaded( const std::string& name );
 
-      // todo: use some template magic (type_traits is_same?) to avoid ScriptType param
-      // not sure if worthwhile given that it adds an extra place where script types need to be managed
       template< typename T >
       T* getScript( uint32_t scriptId )
       {
