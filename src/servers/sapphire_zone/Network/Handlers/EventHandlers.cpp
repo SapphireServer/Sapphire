@@ -28,75 +28,8 @@ using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-void Core::Network::GameConnection::eventHandler( const Packets::GamePacket& inPacket,
-                                                  Entity::Player& player )
-{
-   uint16_t eventHandlerId = inPacket.getValAt< uint16_t >( 0x12 );
-
-   // we need to abort the event in case it has not been scripted so the player wont be locked up
-   auto abortEventFunc = []( Core::Entity::Player& player, uint64_t actorId, uint32_t eventId )
-   {
-      player.queuePacket( EventStartPacket( player.getId(), actorId, eventId, 1, 0, 0 ) );
-      player.queuePacket( EventFinishPacket( player.getId(), eventId, 1, 0 ) );
-      // this isn't ideal as it will also reset any other status that might be active
-      player.queuePacket( PlayerStateFlagsPacket( player, PlayerStateFlagList{} ) );
-   };
-
-   std::string eventIdStr = boost::str( boost::format( "%|04X|" ) % static_cast< uint32_t >( eventHandlerId & 0xFFFF ) );
-   player.sendDebug( "---------------------------------------" );
-   player.sendDebug( "EventHandler ( " + eventIdStr + " )" );
-
-   switch( eventHandlerId )
-   {
-   
-   case ClientZoneIpcType::TalkEventHandler: // Talk event
-   case ClientZoneIpcType::EmoteEventHandler: // Emote event
-   case ClientZoneIpcType::WithinRangeEventHandler:
-   case ClientZoneIpcType::OutOfRangeEventHandler:
-   case ClientZoneIpcType::EnterTeriEventHandler:
-      break;
-
-   case ClientZoneIpcType::ReturnEventHandler:
-   case ClientZoneIpcType::TradeReturnEventHandler:
-   {
-      uint32_t eventId = inPacket.getValAt< uint32_t >( 0x20 );
-      uint16_t subEvent = inPacket.getValAt< uint16_t >( 0x24 );
-      uint16_t param1 = inPacket.getValAt< uint16_t >( 0x26 );
-      uint16_t param2 = inPacket.getValAt< uint16_t >( 0x28 );
-      uint16_t param3 = inPacket.getValAt< uint16_t >( 0x2C );
-
-      std::string eventName = Event::getEventName( eventId );
-
-      if( !g_scriptMgr.onEventHandlerReturn( player, eventId, subEvent, param1, param2, param3 ) )
-         abortEventFunc( player, 0, eventId );
-      break;
-   }
-
-   case ClientZoneIpcType::LinkshellEventHandler:
-   case ClientZoneIpcType::LinkshellEventHandler1:
-   {
-      uint32_t eventId = inPacket.getValAt< uint32_t >( 0x20 );
-      uint16_t subEvent = inPacket.getValAt< uint16_t >( 0x24 );
-      std::string lsName = inPacket.getStringAt( 0x27 );
-
-      ZoneChannelPacket< FFXIVIpcEventLinkshell > linkshellEvent( player.getId() );
-      linkshellEvent.data().eventId = eventId;
-      linkshellEvent.data().scene = static_cast< uint8_t >( subEvent );
-      linkshellEvent.data().param3 = 1;
-      linkshellEvent.data().unknown1 = 0x15a;
-      player.queuePacket( linkshellEvent );
-
-//      abortEventFunc( pPlayer, 0, eventId );
-      break;
-   }
-
-   }
-
-}
-
 void Core::Network::GameConnection::eventHandlerTalk( const Packets::GamePacket& inPacket, Entity::Player& player )
 {
-
    auto actorId = inPacket.getValAt< uint64_t >( 0x20 );
    auto eventId = inPacket.getValAt< uint32_t >( 0x28 );
    auto eventType = static_cast< uint16_t >( eventId >> 16 );
@@ -224,6 +157,56 @@ void Core::Network::GameConnection::eventHandlerEnterTerritory( const Packets::G
    g_scriptMgr.onEnterTerritory( player, eventId, param1, param2 );
 
    player.checkEvent( eventId );
+}
+
+void Core::Network::GameConnection::eventHandlerReturn( const Packets::GamePacket &inPacket,
+                                                        Entity::Player &player )
+{
+   auto eventId = inPacket.getValAt< uint32_t >( 0x20 );
+   auto scene = inPacket.getValAt< uint16_t >( 0x24 );
+   auto param1 = inPacket.getValAt< uint16_t >( 0x26 );
+   auto param2 = inPacket.getValAt< uint16_t >( 0x28 );
+   auto param3 = inPacket.getValAt< uint16_t >( 0x2C );
+
+   std::string eventName = Event::getEventName( eventId );
+
+   player.sendDebug( "eventId: " +
+                     std::to_string( eventId ) +
+                     " ( 0x" + boost::str( boost::format( "%|08X|" ) % ( uint64_t ) ( eventId & 0xFFFFFFF ) ) + " ) " +
+                     " scene: " + std::to_string( scene ) +
+                     " p1: " + std::to_string( param1 ) +
+                     " p2: " + std::to_string( param2 ) +
+                     " p3: " + std::to_string( param3 ) );
+
+   auto pEvent = player.getEvent( eventId );
+   if( pEvent )
+   {
+      pEvent->setPlayedScene( false );
+      // try to retrieve a stored callback
+      auto eventCallback = pEvent->getEventReturnCallback();
+      // if there is one, proceed to call it
+      if( eventCallback )
+         eventCallback( player, eventId, param1, param2, param3 );
+   }
+
+   player.checkEvent( eventId );
+
+}
+
+void Core::Network::GameConnection::eventHandlerLinkshell( const Packets::GamePacket &inPacket,
+                                                           Entity::Player &player )
+{
+   auto eventId = inPacket.getValAt< uint32_t >( 0x20 );
+   auto scene = inPacket.getValAt< uint16_t >( 0x24 );
+   auto lsName = inPacket.getStringAt( 0x27 );
+
+   ZoneChannelPacket< FFXIVIpcEventLinkshell > linkshellEvent( player.getId() );
+   linkshellEvent.data().eventId = eventId;
+   linkshellEvent.data().scene = static_cast< uint8_t >( scene );
+   linkshellEvent.data().param3 = 1;
+   linkshellEvent.data().unknown1 = 0x15a;
+   player.queuePacket( linkshellEvent );
+
 }
 
 

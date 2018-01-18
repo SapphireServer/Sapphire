@@ -212,28 +212,7 @@ bool Core::Scripting::ScriptManager::onEventHandlerReturn( Entity::Player& playe
                                                            uint16_t param3 )
 {
 
-   player.sendDebug( "eventId: " +
-                     std::to_string( eventId ) +
-                     " ( 0x" + boost::str( boost::format( "%|08X|" ) % ( uint64_t ) ( eventId & 0xFFFFFFF ) ) + " ) " +
-                     " scene: " + std::to_string( subEvent ) +
-                     " p1: " + std::to_string( param1 ) +
-                     " p2: " + std::to_string( param2 ) +
-                     " p3: " + std::to_string( param3 ) );
-
-   auto pEvent = player.getEvent( eventId );
-   if( pEvent )
-   {
-      pEvent->setPlayedScene( false );
-      // try to retrieve a stored callback
-      auto eventCallback = pEvent->getEventReturnCallback();
-      // if there is one, proceed to call it
-      if( eventCallback )
-         eventCallback( player, eventId, param1, param2, param3 );
-      // check the event, finishing it if needed
-      player.checkEvent( eventId );
-   }
-
-   return true;
+   return false;
 }
 
 bool Core::Scripting::ScriptManager::onEventHandlerTradeReturn( Entity::Player& player, uint32_t eventId,
