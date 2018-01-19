@@ -187,16 +187,6 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
          targetPlayer->getName() + " set in range." );
       break;
    }
-   case GmCommand::Call:
-   {
-      if ( targetPlayer->getZoneId() != player.getZoneId() )
-         targetPlayer->setZone( player.getZoneId() );
-
-      targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z,
-         player.getRotation() );
-      player.sendNotice( "Calling " + targetPlayer->getName() );
-      break;
-   }
    case GmCommand::Inspect:
    {
       player.sendNotice( "Name: " + targetPlayer->getName() +
@@ -504,6 +494,16 @@ void Core::Network::GameConnection::gm2Handler( const Packets::GamePacket& inPac
       player.changePosition( targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z,
          targetActor->getRotation() );
       player.sendNotice( "Jumping to " + targetPlayer->getName() );
+      break;
+   }
+   case GmCommand::Call:
+   {
+      if ( targetPlayer->getZoneId() != player.getZoneId() )
+         targetPlayer->setZone( player.getZoneId() );
+
+      targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z,
+         player.getRotation() );
+      player.sendNotice( "Calling " + targetPlayer->getName() );
       break;
    }
    default:
