@@ -506,6 +506,16 @@ void Core::Network::GameConnection::gm2Handler( const Packets::GamePacket& inPac
       player.sendNotice( "Jumping to " + targetPlayer->getName() );
       break;
    }
+   case GmCommand::Call:
+   {
+      if ( targetPlayer->getZoneId() != player.getZoneId() )
+         targetPlayer->setZone( player.getZoneId() );
+
+      targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z,
+         player.getRotation() );
+      player.sendNotice( "Calling " + targetPlayer->getName() );
+      break;
+   }
    default:
       player.sendUrgent( "GM2 Command not implemented: " + std::to_string( commandId ) );
       break;
