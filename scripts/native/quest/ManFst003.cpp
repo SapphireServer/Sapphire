@@ -12,7 +12,7 @@ private:
 
 
 public:
-   ManFst003() : EventScript( "ManFst003", 65659 ) {}
+   ManFst003() : EventScript( 65659 ) {}
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {

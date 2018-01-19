@@ -3,7 +3,7 @@
 class HouFurOrchestrion : public EventScript
 {
 public:
-   HouFurOrchestrion() : EventScript( "HouFurOrchestrion", 721226 )
+   HouFurOrchestrion() : EventScript( 721226 )
    {}
 
    void Scene00000( Entity::Player& player )
