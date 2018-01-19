@@ -65,7 +65,7 @@ private:
    }
 
 public:
-   OpeningGridania() : EventScript( "OpeningGridania", 1245186 )
+   OpeningGridania() : EventScript( 1245186 )
    {}
 
    void onEnterZone( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 ) override

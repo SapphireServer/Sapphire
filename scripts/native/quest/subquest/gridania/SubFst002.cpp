@@ -46,7 +46,7 @@ private:
    }
 
 public:
-   SubFst002() : EventScript( "SubFst002", 65561 ) {}
+   SubFst002() : EventScript( 65561 ) {}
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
