@@ -13,7 +13,7 @@
 class Aetheryte : public EventScript
 {
 public:
-   Aetheryte() : EventScript( "Aetheryte", EVENTSCRIPT_AETHERYTE_ID )
+   Aetheryte() : EventScript( EVENTSCRIPT_AETHERYTE_ID )
    {}
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override

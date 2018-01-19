@@ -65,7 +65,7 @@ private:
 
 
 public:
-   OpeningUldah() : EventScript( "OpeningUldah", 1245187 ) {}
+   OpeningUldah() : EventScript( 1245187 ) {}
 
    void onEnterZone( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 ) override
    {

@@ -24,21 +24,14 @@ using namespace Core;
 class ScriptObject
 {
 protected:
-   std::string m_scriptName;
    uint32_t m_id;
    std::size_t m_type;
 
 public:
-   ScriptObject( std::string name, uint32_t id, std::size_t type ) :
-      m_scriptName( name ),
+   ScriptObject( uint32_t id, std::size_t type ) :
       m_id( id ),
       m_type( type )
    { }
-
-   virtual const std::string& getName() const
-   {
-      return m_scriptName;
-   }
 
    virtual uint32_t getId() const
    {
@@ -55,8 +48,8 @@ public:
 class StatusEffectScript : public ScriptObject
 {
 public:
-   StatusEffectScript( std::string name, uint32_t effectId ) :
-      ScriptObject( name, effectId, typeid( StatusEffectScript ).hash_code() )
+   StatusEffectScript( uint32_t effectId ) :
+      ScriptObject( effectId, typeid( StatusEffectScript ).hash_code() )
    { }
 
    virtual void onTick( Entity::Actor& actor ) { }
@@ -73,8 +66,8 @@ public:
 class ActionScript : public ScriptObject
 {
 public:
-    ActionScript( std::string name, uint32_t abilityId ) :
-      ScriptObject( name, abilityId, typeid( ActionScript ).hash_code() )
+    ActionScript( uint32_t abilityId ) :
+      ScriptObject( abilityId, typeid( ActionScript ).hash_code() )
    { }
 
    virtual void onStart( Entity::Actor& sourceActor, Entity::Actor& targetActor ) { }
@@ -86,8 +79,8 @@ public:
 class EventScript : public ScriptObject
 {
 public:
-   EventScript( std::string name, uint32_t questId ) :
-      ScriptObject( name, questId, typeid( EventScript ).hash_code() )
+   EventScript( uint32_t questId ) :
+      ScriptObject( questId, typeid( EventScript ).hash_code() )
    { }
 
    virtual void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) { }
@@ -104,16 +97,16 @@ public:
 class BattleNpcScript : public ScriptObject
 {
 public:
-   BattleNpcScript( std::string name, uint32_t npcId ) :
-      ScriptObject( name, npcId, typeid( BattleNpcScript ).hash_code() )
+   BattleNpcScript( uint32_t npcId ) :
+      ScriptObject( npcId, typeid( BattleNpcScript ).hash_code() )
    { }
 };
 
 class ZoneScript : public ScriptObject
 {
 public:
-   ZoneScript( std::string name, uint32_t zoneId ) :
-      ScriptObject( name, zoneId, typeid( ZoneScript ).hash_code() )
+   ZoneScript( uint32_t zoneId ) :
+      ScriptObject( zoneId, typeid( ZoneScript ).hash_code() )
    { }
 
    virtual void onZoneInit() { }

@@ -129,7 +129,7 @@ private:
 
 
 public:
-   ManWil001() : EventScript( "ManWil001", 66130 ) {}
+   ManWil001() : EventScript( 66130 ) {}
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
