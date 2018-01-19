@@ -81,7 +81,7 @@ private:
 
 
 public:
-   OpeningLimsa() : EventScript( "OpeningLimsa", 1245185 ) {}
+   OpeningLimsa() : EventScript( 1245185 ) {}
 
    void onEnterZone( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 ) override
    {
