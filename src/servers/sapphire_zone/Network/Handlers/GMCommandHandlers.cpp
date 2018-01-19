@@ -187,6 +187,16 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
          targetPlayer->getName() + " set in range." );
       break;
    }
+   case GmCommand::Call:
+   {
+      if ( targetPlayer->getZoneId() != player.getZoneId() )
+         targetPlayer->setZone( player.getZoneId() );
+
+      targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z,
+         player.getRotation() );
+      player.sendNotice( "Calling " + targetPlayer->getName() );
+      break;
+   }
    case GmCommand::Inspect:
    {
       player.sendNotice( "Name: " + targetPlayer->getName() +
