@@ -218,6 +218,8 @@ public:
 
    bool isMob() const;
 
+   bool isEventNpc() const;
+
    std::set< ActorPtr > getInRangeActors( bool includeSelf = false );
 
    bool face( const Common::FFXIVARR_POSITION3& p );
@@ -296,6 +298,7 @@ public:
    
    PlayerPtr getAsPlayer();
    BattleNpcPtr getAsBattleNpc();
+   EventNpcPtr getAsEventNpc();
 
    Action::ActionPtr getCurrentAction() const;
 

@@ -40,6 +40,7 @@ protected:
 
    std::unordered_map< int32_t, Entity::PlayerPtr > m_playerMap;
    std::unordered_map< int32_t, Entity::BattleNpcPtr > m_BattleNpcMap;
+   std::unordered_map< int32_t, Entity::EventNpcPtr > m_EventNpcMap;
 
    std::set< Entity::BattleNpcPtr > m_BattleNpcDeadMap;
 
