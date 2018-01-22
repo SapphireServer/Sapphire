@@ -31,6 +31,7 @@ namespace Core
       TYPE_FORWARD( Actor );
       TYPE_FORWARD( Player );
       TYPE_FORWARD( BattleNpc );
+      TYPE_FORWARD( EventNpc );
       TYPE_FORWARD( BattleNpcTemplate );
    }
 

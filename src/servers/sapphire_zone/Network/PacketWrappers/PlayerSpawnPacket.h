@@ -3,7 +3,7 @@
 
 #include <common/Network/PacketDef/Zone/ServerZoneDef.h>
 #include <common/Network/GamePacketNew.h>
-#include <common/Util/UtilMath.h>
+#include <common/Util/Util.h>
 #include "Actor/Player.h"
 #include "Forwards.h"
 #include "Inventory/Inventory.h"
@@ -119,7 +119,7 @@ namespace Server {
          //m_data.unknown_60 = 3;
          //m_data.unknown_61 = 7;
 
-         uint64_t currentTimeMs = Util::getTimeMs();
+         uint64_t currentTimeMs = Core::Util::getTimeMs();
 
          for( auto const& effect : player.getStatusEffectMap() )
          {
