@@ -19,6 +19,7 @@
 #include "Actor/Actor.h"
 #include "Actor/Player.h"
 #include "Actor/BattleNpc.h"
+#include "Actor/EventNpc.h"
 
 #include "Forwards.h"
 
@@ -297,6 +298,12 @@ void Zone::pushActor( Entity::ActorPtr pActor )
       m_BattleNpcMap[pBNpc->getId()] = pBNpc;
       pBNpc->setPosition( pBNpc->getPos() );
 
+   }
+   else if( pActor->getAsEventNpc() )
+   {
+      Entity::EventNpcPtr pENpc = pActor->getAsEventNpc();
+      m_EventNpcMap[pENpc->getId()] = pENpc;
+      pENpc->setPosition( pENpc->getPos() );
    }
 
 }
@@ -762,7 +769,7 @@ void Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
             }
 
          }
-         else if( pActor->isMob() && pCurAct->isPlayer() && pActor->isAlive() )
+         else if( ( pActor->isMob() || pActor->isEventNpc() ) && pCurAct->isPlayer() && pActor->isAlive() )
          {
             auto pPlayer = pCurAct->getAsPlayer();
             if( pPlayer->isLoadingComplete() )

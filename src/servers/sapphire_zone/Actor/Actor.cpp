@@ -72,6 +72,12 @@ bool Core::Entity::Actor::isMob() const
    return m_objKind == ObjKind::BattleNpc;
 }
 
+/*! \return true if the actor is of type resident */
+bool Core::Entity::Actor::isEventNpc() const
+{
+   return m_objKind == ObjKind::EventNpc;
+}
+
 /*! \return list of actors currently in range */
 std::set< Core::Entity::ActorPtr > Core::Entity::Actor::getInRangeActors( bool includeSelf )
 {
@@ -416,6 +422,12 @@ Core::Entity::PlayerPtr Core::Entity::Actor::getAsPlayer()
 Core::Entity::BattleNpcPtr Core::Entity::Actor::getAsBattleNpc()
 {
    return boost::reinterpret_pointer_cast< Entity::BattleNpc, Entity::Actor >( shared_from_this() );
+}
+
+/*! \return pointer to this instance as EventNpcPtr */
+Core::Entity::EventNpcPtr Core::Entity::Actor::getAsEventNpc()
+{
+   return boost::reinterpret_pointer_cast< Entity::EventNpc, Entity::Actor >( shared_from_this() );
 }
 
 /*! \return ActionPtr of the currently registered action, or nullptr */
