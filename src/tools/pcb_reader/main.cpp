@@ -17,8 +17,14 @@
 #include <ExdData.h>
 #include <ExdCat.h>
 #include <Exd.h>
-//#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string.hpp>
 #endif
+
+enum class TerritoryTypeExdIndexes : size_t
+{
+   TerritoryType = 0,
+   Path = 1
+};
 
 std::string gamePath( "C:\\Program Files (x86)\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv" );
 
@@ -88,6 +94,7 @@ int parseBlockEntry( char* data, std::vector<PCB_BLOCK_ENTRY>& entries, int gOff
 std::string zoneNameToPath( const std::string& name )
 {
    std::string path;
+#ifdef STANDALONE
    auto inFile = std::ifstream( "territorytype.exh.csv" );
    if( inFile.good() )
    {
@@ -107,6 +114,26 @@ std::string zoneNameToPath( const std::string& name )
       }
       inFile.close();
    }
+#else
+   xiv::dat::GameData dat( gamePath );
+   xiv::exd::ExdData eData( dat );
+   auto& cat = eData.get_category( "TerritoryType" );
+   auto exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::none ) );
+   for( auto& row : exd.get_rows() )
+   {
+      auto& fields = row.second;
+      auto teriName = *boost::get< std::string >( &fields.at( static_cast< size_t >( TerritoryTypeExdIndexes::TerritoryType ) ) );
+      if( teriName.empty() )
+         continue;
+      auto teriPath = *boost::get< std::string >( &fields.at( static_cast< size_t >( TerritoryTypeExdIndexes::Path ) ) );
+      if( boost::iequals( name, teriName ) )
+      {
+         path = teriPath;
+         break;
+      }
+   }
+#endif
+
    if( !path.empty() )
    {
       //path = path.substr( path.find_first_of( "/" ) + 1, path.size() - path.find_first_of( "/" ));
