@@ -6,15 +6,9 @@ set(SAPPHIRE_BOOST_VER 1.63.0)
 set(SAPPHIRE_BOOST_FOLDER_NAME boost_1_63_0)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_CURRENT_SOURCE_DIR}/../bin/")
 
-include_directories("../../lib/ChaiScript-6.0.0/include/")
-
-include_directories("../../sapphire/datReader/")
-include_directories("../../sapphire/")
-include_directories("../")
 
 file(GLOB SERVER_PUBLIC_INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*")
 file(GLOB SERVER_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}*.c*")
-
 
 #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "../bin/")
 add_executable(pcb_reader2 ${SERVER_PUBLIC_INCLUDE_FILES} ${SERVER_SOURCE_FILES})
@@ -30,9 +24,9 @@ set_target_properties(pcb_reader2 PROPERTIES
 )
 
 if (UNIX)
-  target_link_libraries (pcb_reader2 Common xivdat pthread mysqlclient dl z)
+  target_link_libraries (pcb_reader2 common xivdat pthread mysqlclient dl z)
 else()
-  target_link_libraries (pcb_reader2 Common xivdat libmysql zlib1)
+  target_link_libraries (pcb_reader2 common xivdat libmysql zlib1)
 endif()
 
 target_link_libraries(pcb_reader2 ${Boost_LIBRARIES} ${Boost_LIBRARIES})
