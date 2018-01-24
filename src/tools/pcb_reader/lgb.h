@@ -60,6 +60,16 @@ enum class LgbEntryType : uint32_t
    SphereCastRange = 75,
 };
 
+struct LGB_ENTRY_HEADER
+{
+   LgbEntryType type;
+   uint32_t unknown;
+   uint32_t nameOffset;
+   vec3 translation;
+   vec3 rotation;
+   vec3 scale;
+};
+
 class LGB_MODEL_ENTRY
 {
 public:
@@ -80,14 +90,8 @@ public:
 };
 
 
-struct LGB_BGPARTS_HEADER
+struct LGB_BGPARTS_HEADER : public LGB_ENTRY_HEADER
 {
-   LgbEntryType type;
-   uint32_t unknown2;
-   uint32_t nameOffset;
-   vec3 translation;
-   vec3 rotation;
-   vec3 scale;
    uint32_t modelFileOffset;
    uint32_t collisionFileOffset;
    uint32_t unknown4;
@@ -112,20 +116,7 @@ public:
       name = std::string( buf + offset + header.nameOffset );
       modelFileName = std::string( buf + offset + header.modelFileOffset );
       collisionFileName = std::string( buf + offset + header.collisionFileOffset );
-      //std::cout << "BGPARTS_ENTRY " << name << "\n";
-      //std::cout << "  " << modelFileName << "\n";
-      //std::cout << "  " << collisionFileName << "\n";
    };
-};
-
-struct LGB_ENTRY_HEADER
-{
-   LgbEntryType type;
-   uint32_t unknown;
-   uint32_t nameOffset;
-   vec3 translation;
-   vec3 rotation;
-   vec3 scale;
 };
 
 struct LGB_GIMMICK_HEADER : public LGB_ENTRY_HEADER
@@ -146,6 +137,7 @@ public:
       header = *reinterpret_cast<LGB_GIMMICK_HEADER*>( buf + offset );
       name = std::string( buf + offset + header.nameOffset );
       gimmickFileName = std::string( buf + offset + header.gimmickFileOffset );
+      //std::cout << "\t " << gimmickFileName << " unknown: " << header.unknown << "\n";
    };
 };
 
@@ -165,6 +157,7 @@ public:
    {
       header = *reinterpret_cast< LGB_ENPC_HEADER* >( buf + offset );
       name = std::string( buf + offset + header.nameOffset );
+      //std::cout << "\t ENpc " << header.enpcId << " " << name << "\n";
    };
 };
 
@@ -183,7 +176,7 @@ public:
    LGB_EOBJ_ENTRY( char* buf, uint32_t offset )
    {
       header = *reinterpret_cast< LGB_EOBJ_HEADER* >( buf + offset );
-      std::cout << header.eobjId << std::endl;
+      //std::cout << "\t " << header.eobjId << " " << name << " unknown: " << header.unknown << "\n";
       name = std::string( buf + offset + header.nameOffset );
    };
 };
@@ -218,7 +211,7 @@ struct LGB_GROUP
       header = *reinterpret_cast< LGB_GROUP_HEADER* >( buf + offset );
       name = std::string( buf + offset + header.groupNameOffset );
       //entries.resize( header.entryCount );
-      std::cout << name << std::endl;
+      //std::cout << name << "\n\t unknown: " << header.unknown << "\n";
       const auto entriesOffset = offset + header.entriesOffset;
       for( auto i = 0; i < header.entryCount; ++i )
       {

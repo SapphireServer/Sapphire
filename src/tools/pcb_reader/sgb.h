@@ -78,7 +78,7 @@ public:
    virtual ~SGB_GROUP_ENTRY() {};
 };
 
-struct SGB_MODEL_HEADER
+struct SGB_ENTRY_HEADER
 {
    SgbGroupEntryType type;
    uint32_t unknown2;
@@ -86,6 +86,10 @@ struct SGB_MODEL_HEADER
    vec3 translation;
    vec3 rotation;
    vec3 scale;
+};
+
+struct SGB_MODEL_HEADER : public SGB_ENTRY_HEADER
+{
    int32_t modelFileOffset;
    int32_t collisionFileOffset;
 };
@@ -131,6 +135,10 @@ struct SGB_GROUP
          if( type == SgbGroupEntryType::Model )
          {
             entries.push_back( std::make_shared< SGB_MODEL_ENTRY >( buf, entryOffset ) );
+         }
+         else
+         {
+            // std::cout << "\t\tUnknown SGB entry! Group: " << name << " type: " << type << " index: " << i << " entryOffset: " << entryOffset << "\n";
          }
       }
    }
