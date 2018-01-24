@@ -100,7 +100,7 @@ struct SGB_MODEL_ENTRY : public SGB_GROUP_ENTRY
 
    SGB_MODEL_ENTRY( char* buf, uint32_t offset )
    {
-      header = *reinterpret_cast<SGB_MODEL_HEADER*>( buf + offset );
+      header = *reinterpret_cast< SGB_MODEL_HEADER* >( buf + offset );
       name = std::string( buf + offset + header.nameOffset );
       modelFileName = std::string( buf + offset + header.modelFileOffset );
       collisionFileName = std::string( buf + offset + header.collisionFileOffset );
@@ -112,25 +112,25 @@ struct SGB_GROUP
    SGB_GROUP_HEADER header;
    std::string name;
    SGB_FILE* parent;
-   std::vector<std::shared_ptr<SGB_GROUP_ENTRY>> entries;
+   std::vector< std::shared_ptr< SGB_GROUP_ENTRY > > entries;
 
    SGB_GROUP( char* buf, SGB_FILE* file, uint32_t fileSize, uint32_t offset )
    {
       parent = file;
-      header = *reinterpret_cast<SGB_GROUP_HEADER*>( buf + offset );
+      header = *reinterpret_cast< SGB_GROUP_HEADER* >( buf + offset );
       name = std::string( buf + offset + header.nameOffset );
 
       auto entriesOffset = offset + sizeof( header );
 
       for( auto i = 0; i < header.entryCount; ++i )
       {
-         auto entryOffset = entriesOffset + *reinterpret_cast<uint32_t*>( buf + ( entriesOffset + (i * 4) ) );
+         auto entryOffset = entriesOffset + *reinterpret_cast< uint32_t* >( buf + ( entriesOffset + ( i * 4 ) ) );
          if( entryOffset > fileSize )
             throw std::runtime_error( "SGB_GROUP entry offset was larger than SGB file size!" );
-         auto type = *reinterpret_cast<uint32_t*>( buf + entryOffset );
+         auto type = *reinterpret_cast< uint32_t* >( buf + entryOffset );
          if( type == SgbGroupEntryType::Model )
          {
-            entries.push_back( std::make_shared<SGB_MODEL_ENTRY>( buf, entryOffset ) );
+            entries.push_back( std::make_shared< SGB_MODEL_ENTRY >( buf, entryOffset ) );
          }
       }
    }
@@ -179,7 +179,7 @@ struct SGB_FILE
    SGB_FILE( char* buf )
    {
       constexpr int baseOffset = 0x14;
-      header = *reinterpret_cast<SGB_HEADER*>( buf );
+      header = *reinterpret_cast< SGB_HEADER* >( buf );
 
       if( strncmp( &header.magic[0], "SGB1", 4 ) != 0 || strncmp( &header.magic2[0], "SCN1", 4 ) != 0 )
          throw std::runtime_error( "Unable to load SGB File!" );

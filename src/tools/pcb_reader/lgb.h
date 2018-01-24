@@ -118,7 +118,7 @@ public:
    };
 };
 
-struct LGB_GIMMICK_HEADER
+struct LGB_ENTRY_HEADER
 {
    LgbEntryType type;
    uint32_t unknown;
@@ -126,6 +126,10 @@ struct LGB_GIMMICK_HEADER
    vec3 translation;
    vec3 rotation;
    vec3 scale;
+};
+
+struct LGB_GIMMICK_HEADER : public LGB_ENTRY_HEADER
+{
    uint32_t gimmickFileOffset;
    char unknownBytes[100];
 };
@@ -136,12 +140,51 @@ public:
    LGB_GIMMICK_HEADER header;
    std::string name;
    std::string gimmickFileName;
-   
+
    LGB_GIMMICK_ENTRY( char* buf, uint32_t offset )
    {
       header = *reinterpret_cast<LGB_GIMMICK_HEADER*>( buf + offset );
       name = std::string( buf + offset + header.nameOffset );
       gimmickFileName = std::string( buf + offset + header.gimmickFileOffset );
+   };
+};
+
+struct LGB_ENPC_HEADER : public LGB_ENTRY_HEADER
+{
+   uint32_t enpcId;
+   uint8_t unknown1[0x24];
+};
+
+class LGB_ENPC_ENTRY : public LGB_MODEL_ENTRY
+{
+public:
+   LGB_ENPC_HEADER header;
+   std::string name;
+
+   LGB_ENPC_ENTRY( char* buf, uint32_t offset )
+   {
+      header = *reinterpret_cast< LGB_ENPC_HEADER* >( buf + offset );
+      name = std::string( buf + offset + header.nameOffset );
+   };
+};
+
+struct LGB_EOBJ_HEADER : public LGB_ENTRY_HEADER
+{
+   uint32_t eobjId;
+   uint8_t unknown1[0x10];
+};
+
+class LGB_EOBJ_ENTRY : public LGB_MODEL_ENTRY
+{
+public:
+   LGB_EOBJ_HEADER header;
+   std::string name;
+
+   LGB_EOBJ_ENTRY( char* buf, uint32_t offset )
+   {
+      header = *reinterpret_cast< LGB_EOBJ_HEADER* >( buf + offset );
+      std::cout << header.eobjId << std::endl;
+      name = std::string( buf + offset + header.nameOffset );
    };
 };
 
@@ -167,30 +210,38 @@ struct LGB_GROUP
    LGB_FILE* parent;
    LGB_GROUP_HEADER header;
    std::string name;
-   std::vector<std::shared_ptr<LGB_MODEL_ENTRY>> entries;
+   std::vector< std::shared_ptr< LGB_MODEL_ENTRY > > entries;
 
    LGB_GROUP( char* buf, LGB_FILE* parentStruct, uint32_t offset )
    {
       parent = parentStruct;
-      header = *reinterpret_cast<LGB_GROUP_HEADER*>( buf + offset );
+      header = *reinterpret_cast< LGB_GROUP_HEADER* >( buf + offset );
       name = std::string( buf + offset + header.groupNameOffset );
       //entries.resize( header.entryCount );
-      //std::cout << name << std::endl;
+      std::cout << name << std::endl;
       const auto entriesOffset = offset + header.entriesOffset;
       for( auto i = 0; i < header.entryCount; ++i )
       {
-         const auto entryOffset = entriesOffset + *reinterpret_cast<int32_t*>( buf + ( entriesOffset + i * 4 ) );
+         const auto entryOffset = entriesOffset + *reinterpret_cast< int32_t* >( buf + ( entriesOffset + i * 4 ) );
 
          try
          {
             const auto type = *reinterpret_cast<LgbEntryType*>( buf + entryOffset );
             if( type == LgbEntryType::BgParts )
             {
-               entries.push_back( std::make_shared<LGB_BGPARTS_ENTRY>( buf, entryOffset ) );
-            }     
+               entries.push_back( std::make_shared< LGB_BGPARTS_ENTRY >( buf, entryOffset ) );
+            }
             else if( type == LgbEntryType::Gimmick )
             {
-               entries.push_back( std::make_shared<LGB_GIMMICK_ENTRY>( buf, entryOffset ) );
+               entries.push_back( std::make_shared< LGB_GIMMICK_ENTRY >( buf, entryOffset ) );
+            }
+            else if( type == LgbEntryType::EventNpc )
+            {
+               entries.push_back( std::make_shared< LGB_ENPC_ENTRY >( buf, entryOffset ) );
+            }
+            else if( type == LgbEntryType::EventObject )
+            {
+               entries.push_back( std::make_shared< LGB_EOBJ_ENTRY >( buf, entryOffset ) );
             }
             /*
             else
@@ -223,11 +274,11 @@ struct LGB_FILE_HEADER
 struct LGB_FILE
 {
    LGB_FILE_HEADER header;
-   std::vector<LGB_GROUP> groups;
+   std::vector< LGB_GROUP > groups;
 
    LGB_FILE( char* buf )
    {
-      header = *reinterpret_cast<LGB_FILE_HEADER*>( buf );
+      header = *reinterpret_cast< LGB_FILE_HEADER* >( buf );
       if( strncmp( &header.magic[0], "LGB1", 4 ) != 0 || strncmp( &header.magic2[0], "LGP1", 4 ) != 0 )
          throw std::runtime_error( "Invalid LGB file!" );
 
@@ -236,7 +287,7 @@ struct LGB_FILE
       constexpr auto baseOffset = sizeof( header );
       for( auto i = 0; i < header.groupCount; ++i )
       {
-         const auto groupOffset = baseOffset + *reinterpret_cast<int32_t*>( buf + ( baseOffset + i * 4 ) );
+         const auto groupOffset = baseOffset + *reinterpret_cast< int32_t* >( buf + ( baseOffset + i * 4 ) );
          const auto group = LGB_GROUP( buf, this, groupOffset );
          groups.push_back( group );
       }
