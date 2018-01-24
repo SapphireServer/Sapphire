@@ -11,6 +11,7 @@ if(UNIX)
         /usr/local/mysql/include/mysql
         $ENV{ProgramFiles}/MySQL/*/include
         $ENV{SystemDrive}/MySQL/*/include
+        ${LIBRARY_DIR}/external/MySQL/
     )
 
     if(MYSQL_INCLUDE_DIR)

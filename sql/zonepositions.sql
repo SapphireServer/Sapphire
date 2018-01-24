@@ -1,6 +1,6 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               10.1.24-MariaDB - mariadb.org binary distribution
+-- Server version:               10.1.28-MariaDB - mariadb.org binary distribution
 -- Server OS:                    Win32
 -- HeidiSQL Version:             9.4.0.5125
 -- --------------------------------------------------------
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `zonepositions` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
 
--- Dumping data for table sapphire.zonepositions: 186 rows
+-- Dumping data for table sapphire.zonepositions: 192 rows
 DELETE FROM `zonepositions`;
 /*!40000 ALTER TABLE `zonepositions` DISABLE KEYS */;
 INSERT INTO `zonepositions` (`id`, `target_zone_id`, `pos_x`, `pos_y`, `pos_z`, `pos_o`, `radius`) VALUES
@@ -212,7 +212,13 @@ INSERT INTO `zonepositions` (`id`, `target_zone_id`, `pos_x`, `pos_y`, `pos_z`, 
 	(6905273, 612, 475.811, 61.576, -555.551, -1.274, 2),
 	(6905297, 620, -653.588, 51.867, -790.168, 1.1366, 2),
 	(6906489, 635, -82.295, 0, 8.925, 1.77, 2),
-	(6906492, 635, 100.312, 2.731, -113.366, -0.481, 2);
+	(6906492, 635, 100.312, 2.731, -113.366, -0.481, 2),
+	(3961228, 137, -11.9, 70.5, 3.273, -1.553, 2),
+	(3965420, 138, 257.506, -22.75, 224.382, 2.526, 2),
+	(1359650, 153, -226.643, 21.23, 351.76, -0.74, 2),
+	(3965709, 147, 22.9166, 48.309, -26.801, -2.406, 2),
+	(3965584, 146, -320.39, 8.262, 406.08, -1.455, 2),
+	(5668783, 144, -0.3458, 1.0425, -5.786, 0.0603, 2);
 /*!40000 ALTER TABLE `zonepositions` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

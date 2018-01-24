@@ -5,6 +5,7 @@
 #include <chrono>
 #include <fstream>
 #include <regex>
+#include <map>
 
 #include "pcb.h"
 #include "lgb.h"
@@ -17,8 +18,17 @@
 #include <ExdData.h>
 #include <ExdCat.h>
 #include <Exd.h>
-//#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string.hpp>
 #endif
+
+std::string gamePath("C:\\Program Files (x86)\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv");
+std::unordered_map< uint32_t, std::string > eobjNameMap;
+
+enum class TerritoryTypeExdIndexes : size_t
+{
+   TerritoryType = 0,
+   Path = 1
+};
 
 using namespace std::chrono_literals;
 
@@ -83,14 +93,57 @@ int parseBlockEntry( char* data, std::vector<PCB_BLOCK_ENTRY>& entries, int gOff
    return 0;
 }
 
+void dumpLevelExdEntries( uint32_t zoneId, const std::string& name = std::string() )
+{
+   xiv::dat::GameData dat( gamePath );
+   xiv::exd::ExdData eData( dat );
+   auto& cat = eData.get_category( "Level" );
+   auto exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::none ) );
+
+   std::string fileName( name + "_" + std::to_string( zoneId ) + "_Level" + ".csv" );
+   std::ofstream outfile( fileName, std::ios::trunc );
+
+   if( outfile.good() )
+   {
+      outfile.close();
+      outfile.open( fileName, std::ios::app );
+
+      for( auto& row : exd.get_rows() )
+      {
+         auto id = row.first;
+         auto& fields = row.second;
+         auto x = *boost::get< float >( &fields.at( 0 ) );
+         auto y = *boost::get< float >( &fields.at( 1 ) );
+         auto z = *boost::get< float >( &fields.at( 2 ) );
+         auto yaw = *boost::get< float >( &fields.at( 3 ) );
+         auto radius = *boost::get< float >( &fields.at( 4 ) );
+         auto type = *boost::get< uint8_t >( &fields.at( 5 ) );
+         auto objectid = *boost::get< uint32_t >( &fields.at( 6 ) );
+         auto zone = *boost::get< uint16_t >( &fields.at( 9 ) );
+
+         if( zone == zoneId )
+         {
+            std::string outStr(
+               std::to_string( id ) + ", " + std::to_string( objectid ) + ", " +
+               std::to_string( x ) + ", " + std::to_string( y ) + ", " + std::to_string( z ) + ", " +
+               std::to_string( yaw ) + ", " + std::to_string( radius ) + ", " + std::to_string( type ) + "\n"
+            );
+            outfile.write( outStr.c_str(), outStr.size() );
+         }
+      }
+   }
+}
+
 std::string zoneNameToPath( const std::string& name )
 {
    std::string path;
+   uint32_t id;
+#ifdef STANDALONE
    auto inFile = std::ifstream( "territorytype.exh.csv" );
    if( inFile.good() )
    {
       std::string line;
-      std::regex re("(\\d+),\"(.*)\",\"(.*)\",.*");
+      std::regex re( "(\\d+),\"(.*)\",\"(.*)\",.*" );
       while( std::getline( inFile, line ) )
       {
          std::smatch match;
@@ -98,25 +151,73 @@ std::string zoneNameToPath( const std::string& name )
          {
             if( name == match[2].str() )
             {
+               id = match[1].str();
                path = match[3].str();
                break;
             }
          }
       }
+      inFile.close();
    }
+#else
+   xiv::dat::GameData dat( gamePath );
+   xiv::exd::ExdData eData( dat );
+   auto& cat = eData.get_category( "TerritoryType" );
+   auto exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::none ) );
+   for( auto& row : exd.get_rows() )
+   {
+      auto& fields = row.second;
+      auto teriName = *boost::get< std::string >( &fields.at( static_cast< size_t >( TerritoryTypeExdIndexes::TerritoryType ) ) );
+      if( teriName.empty() )
+         continue;
+      auto teriPath = *boost::get< std::string >( &fields.at( static_cast< size_t >( TerritoryTypeExdIndexes::Path ) ) );
+      id = row.first;
+      if( boost::iequals( name, teriName ) )
+      {
+         path = teriPath;
+         break;
+      }
+   }
+#endif
+
    if( !path.empty() )
    {
       //path = path.substr( path.find_first_of( "/" ) + 1, path.size() - path.find_first_of( "/" ));
-      //path = std::string( "ffxiv/" ) + path; 
-      path = std::string( "bg" ) + path.substr( 0, path.find( "/level/" ) );
+      //path = std::string( "ffxiv/" ) + path;
+      path = std::string( "bg/" ) + path.substr( 0, path.find( "/level/" ) );
       std::cout << "[Info] " << "Found path for " << name << ": " << path << std::endl;
    }
    else
    {
       throw std::runtime_error( "Unable to find path for " + name +
-      ".\n\tPlease open 0a0000.win32.index with FFXIV Explorer and extract territorytype.exh as CSV\n\tand copy territorytype.exh.csv into pcb_reader.exe directory" );
+      ".\n\tPlease double check spelling or open 0a0000.win32.index with FFXIV Explorer and extract territorytype.exh as CSV\n\tand copy territorytype.exh.csv into pcb_reader.exe directory if using standalone" );
    }
+   dumpLevelExdEntries( id, name );
    return path;
+}
+
+void loadEobjNames()
+{
+   xiv::dat::GameData dat( gamePath );
+   xiv::exd::ExdData eData( dat );
+   auto& cat = eData.get_category( "EObjName" );
+   auto exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::en ) );
+   for( auto& row : exd.get_rows() )
+   {
+      auto id = row.first;
+      auto& fields = row.second;
+      auto name = *boost::get< std::string >( &fields.at( 0 ) );
+      eobjNameMap[id] = name;
+   }
+}
+
+void writeEobjEntry( std::ofstream& out, LGB_EOBJ_ENTRY* pEobj, const std::string& name )
+{
+   std::string outStr(
+      std::to_string( pEobj->header.eobjId ) + ", \"" + name + "\", " +
+      std::to_string( pEobj->header.translation.x ) + ", " + std::to_string( pEobj->header.translation.y ) + ", " + std::to_string( pEobj->header.translation.z ) + "\n"
+   );
+   out.write( outStr.c_str(), outStr.size() );
 }
 
 void readFileToBuffer( const std::string& path, std::vector< char >& buf )
@@ -125,7 +226,7 @@ void readFileToBuffer( const std::string& path, std::vector< char >& buf )
    if( inFile.good() )
    {
       inFile.seekg( 0, inFile.end );
-      int32_t fileSize = inFile.tellg();
+      int32_t fileSize = (int32_t)inFile.tellg();
       buf.resize( fileSize );
       inFile.seekg( 0, inFile.beg );
       inFile.read( &buf[0], fileSize );
@@ -142,7 +243,6 @@ int main( int argc, char* argv[] )
    auto startTime = std::chrono::system_clock::now();
 
    // todo: support expansions
-   std::string gamePath = "C:\\Program Files (x86)\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv";
    std::string zoneName = "r1f1";
 
    if( argc > 1 )
@@ -158,15 +258,14 @@ int main( int argc, char* argv[] )
    {
       const auto& zonePath = zoneNameToPath( zoneName );
       std::string listPcbPath( zonePath + "/collision/list.pcb" );
-      std::string bgLgbPath( zonePath + "/level/bg.lgb" );
+      std::string bgLgbPath( zonePath + "/level/planmap.lgb" );
       std::string collisionFilePath( zonePath + "/collision/" );
       std::vector< char > section;
       std::vector< char > section1;
 
-      #ifndef STANDALONE
+#ifndef STANDALONE
       xiv::dat::GameData data1( gamePath );
       xiv::exd::ExdData eData( data1 );
-
       const xiv::dat::Cat& test = data1.get_category( "bg" );
 
       auto test_file = data1.get_file( bgLgbPath );
@@ -174,12 +273,12 @@ int main( int argc, char* argv[] )
 
       auto test_file1 = data1.get_file( listPcbPath );
       section1 = test_file1->access_data_sections().at( 0 );
-      #else
+#else
       {
          readFileToBuffer( bgLgbPath, section );
          readFileToBuffer( listPcbPath, section1 );
       }
-      #endif
+#endif
 
       int32_t list_offset = *( uint32_t* )&section[0x18];
       int32_t size = *( uint32_t* )&section[4];
@@ -187,6 +286,16 @@ int main( int argc, char* argv[] )
       std::vector< std::string > stringList;
 
       uint32_t offset1 = 0x20;
+
+      loadEobjNames();
+      std::string eobjFileName( zoneName + "eobj.csv" );
+      std::ofstream eobjOut( eobjFileName, std::ios::trunc );
+      if( !eobjOut.good() )
+         throw std::string( "Unable to create " + zoneName + "_eobj.csv for eobj entries. Run as admin or check there isnt already a handle on the file." ).c_str();
+
+      eobjOut.close();
+      eobjOut.open( eobjFileName, std::ios::app );
+
       for( ; ; )
       {
 
@@ -235,15 +344,15 @@ int main( int argc, char* argv[] )
             {
                char* dataSection = nullptr;
                //std::cout << fileName << " ";
-               #ifndef STANDALONE
+#ifndef STANDALONE
                auto file = data1.get_file( fileName );
                auto sections = file->get_data_sections();
                dataSection = &sections.at( 0 )[0];
-               #else
+#else
                std::vector< char > buf;
                readFileToBuffer( fileName, buf );
                dataSection = &buf[0];
-               #endif
+#endif
                //std::cout << sections.size() << "\n";
 
                uint32_t offset = 0;
@@ -287,15 +396,15 @@ int main( int argc, char* argv[] )
             {
                char* dataSection = nullptr;
                //std::cout << fileName << " ";
-               #ifndef STANDALONE
+#ifndef STANDALONE
                auto file = data1.get_file( fileName );
                auto sections = file->get_data_sections();
                dataSection = &sections.at( 0 )[0];
-               #else
+#else
                std::vector< char > buf;
                readFileToBuffer( fileName, buf );
                dataSection = &buf[0];
-               #endif
+#endif
                sgbFile = SGB_FILE( &dataSection[0] );
                sgbFiles.insert( std::make_pair( fileName, sgbFile ) );
                return true;
@@ -407,6 +516,7 @@ int main( int argc, char* argv[] )
             {
                auto pGimmick = dynamic_cast< LGB_GIMMICK_ENTRY* >( pEntry.get() );
                auto pBgParts = dynamic_cast< LGB_BGPARTS_ENTRY* >( pEntry.get() );
+               auto pEventObj = dynamic_cast< LGB_EOBJ_ENTRY* >( pEntry.get() );
 
                std::string fileName( "" );
                fileName.resize( 256 );
@@ -465,6 +575,13 @@ int main( int argc, char* argv[] )
                         }
                      }
                   }
+               }
+
+               if( pEventObj )
+               {
+                  fileName = pEventObj->name.empty() ? eobjNameMap[pEventObj->header.eobjId] : pEventObj->name;
+                  writeEobjEntry( eobjOut, pEventObj, fileName );
+                  writeOutput( fileName, &pEventObj->header.scale, &pEventObj->header.rotation, &pEventObj->header.translation );
                }
             }
          }

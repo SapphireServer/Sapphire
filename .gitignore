@@ -38,6 +38,7 @@ build/
 *.la
 *.a
 *.lib
+*.exp
 
 # Executables
 *.exe
@@ -103,10 +104,13 @@ src/libraries/external/boost_*
 *.idb
 
 # sapphire version
-src/servers/Server_Common/Version\.cpp
+src/common/Version\.cpp
 
 # edit and continue files
 /enc_temp_folder
 
 # travis-ci build mtime cache
 .mtime_cache
+
+# generated script loader files
+scripts/native/*/ScriptLoader.cpp

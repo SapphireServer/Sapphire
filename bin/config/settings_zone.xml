@@ -1,5 +1,4 @@
 <Settings>
-
    <General>
       <!-- Port the zone server accepts game conenctions on -->
       <ListenPort>54992</ListenPort> 
@@ -7,8 +6,22 @@
       <ListenIp>127.0.0.1</ListenIp>
       <!-- Path of FFXIV dat files -->
       <DataPath>C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv</DataPath>
+
+      <Scripts>
+        <!-- where compiled scripts are placed -->
+        <Path>./compiledscripts/</Path>
+        <CachePath>./cache/</CachePath>
+
+        <HotSwap>
+            <Enabled>1</Enabled>
+            <ScriptsDir>../scripts/native/</ScriptsDir>
+            <BuildDir>../cmake-build-debug/</BuildDir>
+            <BuildCmd>cmake --build %1% --target %2%</BuildCmd>
+        </HotSwap>
+      </Scripts>
+
       <!-- Path of Chai script files -->
-      <ScriptPath>../scripts/chai</ScriptPath>
+      <ScriptPath>./compiledscripts/</ScriptPath>
       <!-- Connection settings for the mysql db -->
       <Mysql>
          <Host>127.0.0.1</Host>
@@ -16,13 +29,13 @@
          <Username>root</Username>
          <Pass></Pass>
          <Database>sapphire</Database>
-		 <SyncThreads>2</SyncThreads>
-		 <AsyncThreads>2</AsyncThreads>
+         <SyncThreads>2</SyncThreads>
+         <AsyncThreads>2</AsyncThreads>
       </Mysql>
    </General>
 
    <Parameters>
-	  <!-- Messages players see upon logging in - These *must* be smaller than 307 characters -->
+      <!-- Messages players see upon logging in - These *must* be smaller than 307 characters -->
       <MotDArray>
          <MotD>&lt;&lt;&lt;Welcome to Sapphire&gt;&gt;&gt;</MotD>
          <MotD>This is a very good server</MotD>
