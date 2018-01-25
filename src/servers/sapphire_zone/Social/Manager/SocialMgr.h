@@ -5,7 +5,7 @@
 #include <cstdint>
 
 #include <boost/enable_shared_from_this.hpp>
-#include <Server_Zone/Forwards.h>
+#include <sapphire_zone/Forwards.h>
 #include <Social/Group.h>
 
 namespace Core {

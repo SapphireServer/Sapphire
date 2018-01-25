@@ -29,10 +29,9 @@
 
 #include "Script/ScriptManager.h"
 
-#include "src/servers/Server_Zone/Social/FriendList.h"
-#include "src/servers/Server_Zone/Actor/Manager/FriendListMgr.h"
+#include "Social/FriendList.h"
 
-#include "src/servers/Server_Zone/Script/ScriptManager.h"
+#include "Script/ScriptManager.h"
 #include "Inventory/Item.h"
 
 #include "Inventory/Inventory.h"
@@ -445,9 +444,8 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
       queuePacket( gcAffPacket );
 
       //todo: change this to extern, global obj
-      Core::Entity::Social::FriendListMgr fListMgr = {};
 
-      m_friendsListId = fListMgr.fetchPlayerFriendsList( getId() );
+      m_friendsListId = g_friendListMgr.fetchPlayerFriendsList( getId() );
 
       m_itemLevel = getInventory()->calculateEquippedGearItemLevel();
       sendItemLevel();

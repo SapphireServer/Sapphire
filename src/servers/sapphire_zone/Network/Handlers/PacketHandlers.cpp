@@ -481,14 +481,14 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
       auto playerFriendsList = g_friendListMgr.findGroupById( player.getFriendsListId() );
 
       // todo: move this garbage else fucking where
-      for ( auto member : playerFriendsList->getMembers() )
+      for ( auto member : playerFriendsList.getMembers() )
       {
          // more elegant way to break over list entries pls
          if ( i == 10 )
             break;
 
          g_log.debug( "aaa" + std::to_string( i ) + ": " + member.second.name );
-         listPacket.data().entries[i] = Core::Entity::Social::Group::generatePlayerEntry( member.second );
+         listPacket.data().entries[i] = Core::Social::Group::generatePlayerEntry( member.second );
          i++;
       }
 
@@ -692,11 +692,11 @@ void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePac
 
          auto recipientFriendsList = g_friendListMgr.findGroupById( pRecipient->getFriendsListId() );
 
-         auto senderResultPacket = recipientFriendsList->inviteMember( player.getAsPlayer(), pRecipient, player.getId(), pRecipient->getId() );
+         auto senderResultPacket = recipientFriendsList.inviteMember( player.getAsPlayer(), pRecipient, player.getId(), pRecipient->getId() );
 
          player.queuePacket( senderResultPacket );
 
-         if ( recipientFriendsList->isFriendList() )
+         if ( recipientFriendsList.isFriendList() )
          {
             g_log.debug( "he HAA HAAA" );
          }

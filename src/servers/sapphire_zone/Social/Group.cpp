@@ -1,15 +1,15 @@
 #include <cassert>
 #include <boost/shared_ptr.hpp>
-#include <Server_Common/Logging/Logger.h>
+#include <common/Logging/Logger.h>
 
-#include <Server_Zone/Session.h>
-#include <Server_Common/Network/PacketDef/Ipcs.h>
-#include <Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
-#include <Server_Zone/Actor/Actor.h>
-#include <Server_Zone/Actor/Player.h>
-#include <Server_Zone/ServerZone.h>
-#include <Server_Zone/Zone/Zone.h>
-#include <Server_Common/Network/GamePacketNew.h>
+#include <sapphire_zone/Session.h>
+#include <common/Network/PacketDef/Ipcs.h>
+#include <common/Network/PacketDef/Zone/ServerZoneDef.h>
+#include <sapphire_zone/Actor/Actor.h>
+#include <sapphire_zone/Actor/Player.h>
+#include <sapphire_zone/ServerZone.h>
+#include <sapphire_zone/Zone/Zone.h>
+#include <common/Network/GamePacketNew.h>
 #include "Group.h"
 
 extern Core::ServerZone g_serverZone;

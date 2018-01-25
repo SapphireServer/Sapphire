@@ -1,14 +1,14 @@
 #include <cassert>
 #include <boost/shared_ptr.hpp>
-#include <src/servers/Server_Common/Common.h>
+#include <common/Common.h>
 
-#include <Server_Common/Network/PacketDef/Ipcs.h>
-#include <Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
-#include <src/servers/Server_Common/Logging/Logger.h>
-#include <Server_Zone/Actor/Actor.h>
-#include <Server_Zone/Actor/Player.h>
-#include <Server_Zone/ServerZone.h>
-#include <Server_Common/Network/GamePacketNew.h>
+#include <common/Network/PacketDef/Ipcs.h>
+#include <common/Network/PacketDef/Zone/ServerZoneDef.h>
+#include <common/Logging/Logger.h>
+#include <sapphire_zone/Actor/Actor.h>
+#include <sapphire_zone/Actor/Player.h>
+#include <sapphire_zone/ServerZone.h>
+#include <common/Network/GamePacketNew.h>
 #include "FriendList.h"
 #include "Group.h"
 

@@ -1,12 +1,12 @@
 #ifndef _FRIENDLIST_H
 #define _FRIENDLIST_H
 
-#include <src/servers/Server_Common/Common.h>
-#include <Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
-#include <Server_Common/Network/GamePacketNew.h>
-#include <Server_Common/Forwards.h>
-#include <Server_Zone/Social/Group.h>
-#include <Server_Zone/Forwards.h>
+#include <common/Common.h>
+#include <common/Network/PacketDef/Zone/ServerZoneDef.h>
+#include <common/Network/GamePacketNew.h>
+#include <common/Forwards.h>
+#include <sapphire_zone/Social/Group.h>
+#include <sapphire_zone/Forwards.h>
 #include <boost/enable_shared_from_this.hpp>
 #include <set>
 #include <cstdint>

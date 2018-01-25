@@ -1,10 +1,10 @@
 #ifndef _GROUP_H
 #define _GROUP_H
 
-#include <Server_Common/Common.h>
-#include <Server_Common/Network/PacketDef/Zone/ServerZoneDef.h>
-#include <Server_Common/Forwards.h>
-#include <Server_Zone/Forwards.h>
+#include <common/Common.h>
+#include <common/Network/PacketDef/Zone/ServerZoneDef.h>
+#include <common/Forwards.h>
+#include <sapphire_zone/Forwards.h>
 #include <boost/enable_shared_from_this.hpp>
 #include <set>
 #include <cstdint>
