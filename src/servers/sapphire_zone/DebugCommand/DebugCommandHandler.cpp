@@ -279,6 +279,29 @@ void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost:
       player.dismount();
       player.mount( id );
    }
+   else if ( subCommand == "msqguide" )
+   {
+      int32_t id;
+      sscanf( params.c_str(), "%d", &id );
+
+      Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcMSQTrackerProgress > msqPacket(
+              player.getId());
+      msqPacket.data().id = id;
+      player.queuePacket( msqPacket );
+
+      player.sendDebug( "MSQ Guide updated " );
+   }
+   else if ( subCommand == "msqdone")
+   {
+      int32_t id;
+      sscanf( params.c_str(), "%d", &id );
+
+      Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcMSQTrackerComplete > msqPacket ( player.getId() );
+      msqPacket.data().id = id;
+      player.queuePacket( msqPacket );
+
+      player.sendDebug( "MSQ Guide updated " );
+   }
    else
    {
       player.sendUrgent( subCommand + " is not a valid SET command." );
