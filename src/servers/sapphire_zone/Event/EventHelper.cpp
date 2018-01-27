@@ -51,6 +51,7 @@ std::string Core::Event::getEventName( uint32_t eventId )
          return "Aetheryte";
       return "Aethernet";
    }
+
    case Event::EventHandler::EventHandlerType::Warp:
    {
       return "ChocoboTaxi";

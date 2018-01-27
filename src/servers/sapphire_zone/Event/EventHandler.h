@@ -94,9 +94,9 @@ namespace Core {
          void removeNestedEvent();
 
 
-
       protected:
          Entity::Player* m_pOwner;
+
          uint64_t m_actorId;
          uint32_t m_eventId;
          uint16_t m_entryId;
