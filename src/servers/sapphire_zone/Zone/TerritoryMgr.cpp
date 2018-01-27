@@ -66,11 +66,6 @@ bool Core::TerritoryMgr::isInstanceContentTerritory( uint32_t territoryTypeId ) 
    if( !pTeri )
       return false;
 
-   if ( territoryTypeId == 359 )
-   {
-     // return false;
-   }
-
    return pTeri->territoryIntendedUse == TerritoryIntendedUse::AllianceRaid ||
           pTeri->territoryIntendedUse == TerritoryIntendedUse::BeforeTrialDung ||
           pTeri->territoryIntendedUse == TerritoryIntendedUse::Trial ||
