@@ -1272,7 +1272,6 @@ struct FFXIVIpcMount : FFXIVIpcBasePacket<Mount>
    uint32_t id;
 };
 
-
 struct FFXIVIpcActorGauge : FFXIVIpcBasePacket<ActorGauge>
 {
    uint8_t classJobId;
@@ -1282,6 +1281,21 @@ struct FFXIVIpcActorGauge : FFXIVIpcBasePacket<ActorGauge>
 struct FFXIVIpcPerformNote : FFXIVIpcBasePacket<PerformNote>
 {
    uint8_t data[32];
+};
+
+struct FFXIVIpcMSQTrackerProgress : FFXIVIpcBasePacket<MSQTrackerProgress>
+{
+   uint32_t id;
+   uint32_t padding;
+};
+
+struct FFXIVIpcMSQTrackerComplete : FFXIVIpcBasePacket<MSQTrackerComplete>
+{
+   uint32_t id;
+   uint32_t padding1;
+   uint64_t padding2;
+   uint64_t padding3;
+   uint64_t padding4; // last 4 bytes is uint32_t but who cares
 };
 
 
