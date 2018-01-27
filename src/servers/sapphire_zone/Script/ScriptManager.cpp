@@ -332,7 +332,7 @@ bool Core::Scripting::ScriptManager::onStatusTimeOut( Entity::ActorPtr pActor, u
 
 bool Core::Scripting::ScriptManager::onZoneInit( ZonePtr pZone )
 {
-   auto script = m_nativeScriptManager->getScript< ZoneScript >( pZone->getId() );
+   auto script = m_nativeScriptManager->getScript< ZoneScript >(pZone->getTerritoryId() );
    if( script )
    {
       script->onZoneInit();

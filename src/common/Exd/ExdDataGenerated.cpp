@@ -3532,6 +3532,7 @@
          placeNameZone = exdData->getField< uint16_t >( row, 4 );
          placeName = exdData->getField< uint16_t >( row, 5 );
          map = exdData->getField< uint16_t >( row, 6 );
+         territoryIntendedUse = exdData->getField< uint8_t >( row, 9 );
          weatherRate = exdData->getField< uint8_t >( row, 12 );
          aetheryte = exdData->getField< int32_t >( row, 23 );
       }

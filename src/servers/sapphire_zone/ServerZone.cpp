@@ -12,6 +12,7 @@
 #include <common/Network/Hive.h>
 
 #include <common/Exd/ExdData.h>
+#include <common/Exd/ExdDataGenerated.h>
 #include <common/Network/PacketContainer.h>
 #include <common/Database/DbLoader.h>
 #include <common/Database/CharaDbConnection.h>
@@ -21,7 +22,7 @@
 #include "Network/GameConnection.h"
 #include "Session.h"
 
-#include "Zone/ZoneMgr.h"
+#include "Zone/TerritoryMgr.h"
 
 #include "DebugCommand/DebugCommandHandler.h"
 
@@ -33,12 +34,14 @@
 #include <boost/make_shared.hpp>
 #include <boost/algorithm/string.hpp>
 #include <thread>
+#include <common/Util/Util.h>
 
 Core::Logger g_log;
 Core::DebugCommandHandler g_gameCommandMgr;
 Core::Scripting::ScriptManager g_scriptMgr;
 Core::Data::ExdData g_exdData;
-Core::ZoneMgr g_zoneMgr;
+Core::Data::ExdDataGenerated g_exdDataGen;
+Core::TerritoryMgr g_territoryMgr;
 Core::LinkshellMgr g_linkshellMgr;
 Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
 
@@ -168,6 +171,13 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
       return false;
    }
 
+   g_log.info( "Setting up generated EXD data" );
+   if( !g_exdDataGen.init( m_pConfig->getValue< std::string >( "Settings.General.DataPath", "" ) ) )
+   {
+      g_log.fatal( "Error setting up generated EXD data " );
+      return false;
+   }
+
    Core::Db::DbLoader loader;
 
    Core::Db::ConnectionInfo info;
@@ -224,8 +234,8 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
 
    g_scriptMgr.init();
 
-   g_log.info( "ZoneMgr: Setting up zones" );
-   g_zoneMgr.createZones();
+   g_log.info( "TerritoryMgr: Setting up zones" );
+   g_territoryMgr.init();
 
    std::vector< std::thread > thread_list;
    thread_list.emplace_back( std::thread( std::bind( &Network::Hive::Run, hive.get() ) ) );
@@ -258,11 +268,12 @@ void Core::ServerZone::mainLoop()
    {
       this_thread::sleep_for( chrono::milliseconds( 50 ) );
 
-      g_zoneMgr.updateZones();
+
+      auto currTime = static_cast< uint32_t >( Util::getTimeSeconds() );
+
+      g_territoryMgr.updateTerritoryInstances( currTime );
 
       g_scriptMgr.update();
-
-      auto currTime = static_cast< uint32_t >( time( nullptr ) );
 
       lock_guard< std::mutex > lock( this->m_sessionMutex );
       for( auto sessionIt : this->m_sessionMapById )

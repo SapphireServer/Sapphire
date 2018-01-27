@@ -11,7 +11,7 @@
 #include "Player.h"
 #include "BattleNpc.h"
 
-#include "Zone/ZoneMgr.h"
+#include "Zone/TerritoryMgr.h"
 #include "Zone/Zone.h"
 
 #include "ServerZone.h"
@@ -43,7 +43,7 @@
 
 extern Core::Logger g_log;
 extern Core::ServerZone g_serverZone;
-extern Core::ZoneMgr g_zoneMgr;
+extern Core::TerritoryMgr g_territoryMgr;
 extern Core::Data::ExdData g_exdData;
 extern Core::Scripting::ScriptManager g_scriptMgr;
 
@@ -309,7 +309,7 @@ void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
 
    setStateFlag( PlayerStateFlag::BetweenAreas );
 
-   auto z_pos = g_zoneMgr.getZonePosition( data->levelId );
+   auto z_pos = g_territoryMgr.getTerritoryPosition( data->levelId );
 
    Common::FFXIVARR_POSITION3 pos;
    pos.x = 0;
@@ -367,8 +367,7 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
 {
    auto pPlayer = getAsPlayer();
 
-   auto pZone = g_zoneMgr.getZone( zoneId );
-
+   auto pZone = g_territoryMgr.getZoneByTerriId( zoneId );
 
    if( !pZone /*|| ( ( pZone == m_pCurrentZone ) && m_lastPing )*/ )
    {
@@ -437,7 +436,7 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
    }
 
    ZoneChannelPacket< FFXIVIpcInitZone > initZonePacket( getId() );
-   initZonePacket.data().zoneId = getCurrentZone()->getLayoutId();
+   initZonePacket.data().zoneId = getCurrentZone()->getTerritoryId();
    initZonePacket.data().weatherId = static_cast< uint8_t >( getCurrentZone()->getCurrentWeather() );
    initZonePacket.data().bitmask = 0x1;
    initZonePacket.data().unknown5 = 0x2A;
@@ -540,7 +539,7 @@ void Core::Entity::Player::discover( int16_t map_id, int16_t sub_id )
 
    int32_t offset = 4;
 
-   auto info = g_exdData.m_zoneInfoMap[getCurrentZone()->getId()];
+   auto info = g_exdData.m_zoneInfoMap[getCurrentZone()->getTerritoryId()];
    if( info.is_two_byte )
       offset = 4 + 2 * info.discovery_index;
    else
@@ -1030,7 +1029,7 @@ void Core::Entity::Player::update( int64_t currTime )
    if( m_queuedZoneing && ( currTime - m_queuedZoneing->m_queueTime ) > 800 )
    {
       Common::FFXIVARR_POSITION3 targetPos = m_queuedZoneing->m_targetPosition;
-      if( getCurrentZone()->getId() != m_queuedZoneing->m_targetZone )
+      if( getCurrentZone()->getTerritoryId() != m_queuedZoneing->m_targetZone )
       {
          performZoning( m_queuedZoneing->m_targetZone, targetPos, m_queuedZoneing->m_targetRotation);
       }
