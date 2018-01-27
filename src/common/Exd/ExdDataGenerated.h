@@ -1,5 +1,5 @@
-#ifndef _EXDDATA_H
-#define _EXDDATA_H
+#ifndef _EXDDATAGENERATED_H
+#define _EXDDATAGENERATED_H
 
 /* This file has been automatically generated.
    Changes will be lost upon regeneration.
@@ -3020,6 +3020,7 @@ struct TerritoryType
    uint16_t placeNameZone;
    uint16_t placeName;
    uint16_t map;
+   uint8_t territoryIntendedUse;
    uint8_t weatherRate;
    int32_t aetheryte;
 
@@ -4188,1741 +4189,1741 @@ struct WorldDCGroupType
      std::set< uint32_t > m_WorldDCGroupTypeIdList;
 
 
-const std::set< uint32_t >& getAchievementIdList()
+const std::set< uint32_t >& ExdDataGenerated::getAchievementIdList()
 {
    if( m_AchievementIdList.size() == 0 )
       loadIdList( m_AchievementDat, m_AchievementIdList );
    return m_AchievementIdList;
 }
-const std::set< uint32_t >& getAchievementCategoryIdList()
+const std::set< uint32_t >& ExdDataGenerated::getAchievementCategoryIdList()
 {
    if( m_AchievementCategoryIdList.size() == 0 )
       loadIdList( m_AchievementCategoryDat, m_AchievementCategoryIdList );
    return m_AchievementCategoryIdList;
 }
-const std::set< uint32_t >& getAchievementKindIdList()
+const std::set< uint32_t >& ExdDataGenerated::getAchievementKindIdList()
 {
    if( m_AchievementKindIdList.size() == 0 )
       loadIdList( m_AchievementKindDat, m_AchievementKindIdList );
    return m_AchievementKindIdList;
 }
-const std::set< uint32_t >& getActionIdList()
+const std::set< uint32_t >& ExdDataGenerated::getActionIdList()
 {
    if( m_ActionIdList.size() == 0 )
       loadIdList( m_ActionDat, m_ActionIdList );
    return m_ActionIdList;
 }
-const std::set< uint32_t >& getActionCategoryIdList()
+const std::set< uint32_t >& ExdDataGenerated::getActionCategoryIdList()
 {
    if( m_ActionCategoryIdList.size() == 0 )
       loadIdList( m_ActionCategoryDat, m_ActionCategoryIdList );
    return m_ActionCategoryIdList;
 }
-const std::set< uint32_t >& getActionComboRouteIdList()
+const std::set< uint32_t >& ExdDataGenerated::getActionComboRouteIdList()
 {
    if( m_ActionComboRouteIdList.size() == 0 )
       loadIdList( m_ActionComboRouteDat, m_ActionComboRouteIdList );
    return m_ActionComboRouteIdList;
 }
-const std::set< uint32_t >& getActionIndirectionIdList()
+const std::set< uint32_t >& ExdDataGenerated::getActionIndirectionIdList()
 {
    if( m_ActionIndirectionIdList.size() == 0 )
       loadIdList( m_ActionIndirectionDat, m_ActionIndirectionIdList );
    return m_ActionIndirectionIdList;
 }
-const std::set< uint32_t >& getActionProcStatusIdList()
+const std::set< uint32_t >& ExdDataGenerated::getActionProcStatusIdList()
 {
    if( m_ActionProcStatusIdList.size() == 0 )
       loadIdList( m_ActionProcStatusDat, m_ActionProcStatusIdList );
    return m_ActionProcStatusIdList;
 }
-const std::set< uint32_t >& getActionTimelineIdList()
+const std::set< uint32_t >& ExdDataGenerated::getActionTimelineIdList()
 {
    if( m_ActionTimelineIdList.size() == 0 )
       loadIdList( m_ActionTimelineDat, m_ActionTimelineIdList );
    return m_ActionTimelineIdList;
 }
-const std::set< uint32_t >& getActionTransientIdList()
+const std::set< uint32_t >& ExdDataGenerated::getActionTransientIdList()
 {
    if( m_ActionTransientIdList.size() == 0 )
       loadIdList( m_ActionTransientDat, m_ActionTransientIdList );
    return m_ActionTransientIdList;
 }
-const std::set< uint32_t >& getAddonIdList()
+const std::set< uint32_t >& ExdDataGenerated::getAddonIdList()
 {
    if( m_AddonIdList.size() == 0 )
       loadIdList( m_AddonDat, m_AddonIdList );
    return m_AddonIdList;
 }
-const std::set< uint32_t >& getAdventureIdList()
+const std::set< uint32_t >& ExdDataGenerated::getAdventureIdList()
 {
    if( m_AdventureIdList.size() == 0 )
       loadIdList( m_AdventureDat, m_AdventureIdList );
    return m_AdventureIdList;
 }
-const std::set< uint32_t >& getAdventureExPhaseIdList()
+const std::set< uint32_t >& ExdDataGenerated::getAdventureExPhaseIdList()
 {
    if( m_AdventureExPhaseIdList.size() == 0 )
       loadIdList( m_AdventureExPhaseDat, m_AdventureExPhaseIdList );
    return m_AdventureExPhaseIdList;
 }
-const std::set< uint32_t >& getAetherCurrentIdList()
+const std::set< uint32_t >& ExdDataGenerated::getAetherCurrentIdList()
 {
    if( m_AetherCurrentIdList.size() == 0 )
       loadIdList( m_AetherCurrentDat, m_AetherCurrentIdList );
    return m_AetherCurrentIdList;
 }
-const std::set< uint32_t >& getAetherialWheelIdList()
+const std::set< uint32_t >& ExdDataGenerated::getAetherialWheelIdList()
 {
    if( m_AetherialWheelIdList.size() == 0 )
       loadIdList( m_AetherialWheelDat, m_AetherialWheelIdList );
    return m_AetherialWheelIdList;
 }
-const std::set< uint32_t >& getAetheryteIdList()
+const std::set< uint32_t >& ExdDataGenerated::getAetheryteIdList()
 {
    if( m_AetheryteIdList.size() == 0 )
       loadIdList( m_AetheryteDat, m_AetheryteIdList );
    return m_AetheryteIdList;
 }
-const std::set< uint32_t >& getAirshipExplorationLevelIdList()
+const std::set< uint32_t >& ExdDataGenerated::getAirshipExplorationLevelIdList()
 {
    if( m_AirshipExplorationLevelIdList.size() == 0 )
       loadIdList( m_AirshipExplorationLevelDat, m_AirshipExplorationLevelIdList );
    return m_AirshipExplorationLevelIdList;
 }
-const std::set< uint32_t >& getAirshipExplorationLogIdList()
+const std::set< uint32_t >& ExdDataGenerated::getAirshipExplorationLogIdList()
 {
    if( m_AirshipExplorationLogIdList.size() == 0 )
       loadIdList( m_AirshipExplorationLogDat, m_AirshipExplorationLogIdList );
    return m_AirshipExplorationLogIdList;
 }
-const std::set< uint32_t >& getAirshipExplorationParamTypeIdList()
+const std::set< uint32_t >& ExdDataGenerated::getAirshipExplorationParamTypeIdList()
 {
    if( m_AirshipExplorationParamTypeIdList.size() == 0 )
       loadIdList( m_AirshipExplorationParamTypeDat, m_AirshipExplorationParamTypeIdList );
    return m_AirshipExplorationParamTypeIdList;
 }
-const std::set< uint32_t >& getAirshipExplorationPartIdList()
+const std::set< uint32_t >& ExdDataGenerated::getAirshipExplorationPartIdList()
 {
    if( m_AirshipExplorationPartIdList.size() == 0 )
       loadIdList( m_AirshipExplorationPartDat, m_AirshipExplorationPartIdList );
    return m_AirshipExplorationPartIdList;
 }
-const std::set< uint32_t >& getAirshipExplorationPointIdList()
+const std::set< uint32_t >& ExdDataGenerated::getAirshipExplorationPointIdList()
 {
    if( m_AirshipExplorationPointIdList.size() == 0 )
       loadIdList( m_AirshipExplorationPointDat, m_AirshipExplorationPointIdList );
    return m_AirshipExplorationPointIdList;
 }
-const std::set< uint32_t >& getAnimaWeapon5IdList()
+const std::set< uint32_t >& ExdDataGenerated::getAnimaWeapon5IdList()
 {
    if( m_AnimaWeapon5IdList.size() == 0 )
       loadIdList( m_AnimaWeapon5Dat, m_AnimaWeapon5IdList );
    return m_AnimaWeapon5IdList;
 }
-const std::set< uint32_t >& getAnimaWeapon5ParamIdList()
+const std::set< uint32_t >& ExdDataGenerated::getAnimaWeapon5ParamIdList()
 {
    if( m_AnimaWeapon5ParamIdList.size() == 0 )
       loadIdList( m_AnimaWeapon5ParamDat, m_AnimaWeapon5ParamIdList );
    return m_AnimaWeapon5ParamIdList;
 }
-const std::set< uint32_t >& getAnimaWeapon5PatternGroupIdList()
+const std::set< uint32_t >& ExdDataGenerated::getAnimaWeapon5PatternGroupIdList()
 {
    if( m_AnimaWeapon5PatternGroupIdList.size() == 0 )
       loadIdList( m_AnimaWeapon5PatternGroupDat, m_AnimaWeapon5PatternGroupIdList );
    return m_AnimaWeapon5PatternGroupIdList;
 }
-const std::set< uint32_t >& getAnimaWeapon5SpiritTalkIdList()
+const std::set< uint32_t >& ExdDataGenerated::getAnimaWeapon5SpiritTalkIdList()
 {
    if( m_AnimaWeapon5SpiritTalkIdList.size() == 0 )
       loadIdList( m_AnimaWeapon5SpiritTalkDat, m_AnimaWeapon5SpiritTalkIdList );
    return m_AnimaWeapon5SpiritTalkIdList;
 }
-const std::set< uint32_t >& getAnimaWeapon5SpiritTalkParamIdList()
+const std::set< uint32_t >& ExdDataGenerated::getAnimaWeapon5SpiritTalkParamIdList()
 {
    if( m_AnimaWeapon5SpiritTalkParamIdList.size() == 0 )
       loadIdList( m_AnimaWeapon5SpiritTalkParamDat, m_AnimaWeapon5SpiritTalkParamIdList );
    return m_AnimaWeapon5SpiritTalkParamIdList;
 }
-const std::set< uint32_t >& getAnimaWeapon5TradeItemIdList()
+const std::set< uint32_t >& ExdDataGenerated::getAnimaWeapon5TradeItemIdList()
 {
    if( m_AnimaWeapon5TradeItemIdList.size() == 0 )
       loadIdList( m_AnimaWeapon5TradeItemDat, m_AnimaWeapon5TradeItemIdList );
    return m_AnimaWeapon5TradeItemIdList;
 }
-const std::set< uint32_t >& getAnimaWeaponFUITalkIdList()
+const std::set< uint32_t >& ExdDataGenerated::getAnimaWeaponFUITalkIdList()
 {
    if( m_AnimaWeaponFUITalkIdList.size() == 0 )
       loadIdList( m_AnimaWeaponFUITalkDat, m_AnimaWeaponFUITalkIdList );
    return m_AnimaWeaponFUITalkIdList;
 }
-const std::set< uint32_t >& getAnimaWeaponFUITalkParamIdList()
+const std::set< uint32_t >& ExdDataGenerated::getAnimaWeaponFUITalkParamIdList()
 {
    if( m_AnimaWeaponFUITalkParamIdList.size() == 0 )
       loadIdList( m_AnimaWeaponFUITalkParamDat, m_AnimaWeaponFUITalkParamIdList );
    return m_AnimaWeaponFUITalkParamIdList;
 }
-const std::set< uint32_t >& getAnimaWeaponIconIdList()
+const std::set< uint32_t >& ExdDataGenerated::getAnimaWeaponIconIdList()
 {
    if( m_AnimaWeaponIconIdList.size() == 0 )
       loadIdList( m_AnimaWeaponIconDat, m_AnimaWeaponIconIdList );
    return m_AnimaWeaponIconIdList;
 }
-const std::set< uint32_t >& getAnimaWeaponItemIdList()
+const std::set< uint32_t >& ExdDataGenerated::getAnimaWeaponItemIdList()
 {
    if( m_AnimaWeaponItemIdList.size() == 0 )
       loadIdList( m_AnimaWeaponItemDat, m_AnimaWeaponItemIdList );
    return m_AnimaWeaponItemIdList;
 }
-const std::set< uint32_t >& getAquariumFishIdList()
+const std::set< uint32_t >& ExdDataGenerated::getAquariumFishIdList()
 {
    if( m_AquariumFishIdList.size() == 0 )
       loadIdList( m_AquariumFishDat, m_AquariumFishIdList );
    return m_AquariumFishIdList;
 }
-const std::set< uint32_t >& getAquariumWaterIdList()
+const std::set< uint32_t >& ExdDataGenerated::getAquariumWaterIdList()
 {
    if( m_AquariumWaterIdList.size() == 0 )
       loadIdList( m_AquariumWaterDat, m_AquariumWaterIdList );
    return m_AquariumWaterIdList;
 }
-const std::set< uint32_t >& getAttackTypeIdList()
+const std::set< uint32_t >& ExdDataGenerated::getAttackTypeIdList()
 {
    if( m_AttackTypeIdList.size() == 0 )
       loadIdList( m_AttackTypeDat, m_AttackTypeIdList );
    return m_AttackTypeIdList;
 }
-const std::set< uint32_t >& getBalloonIdList()
+const std::set< uint32_t >& ExdDataGenerated::getBalloonIdList()
 {
    if( m_BalloonIdList.size() == 0 )
       loadIdList( m_BalloonDat, m_BalloonIdList );
    return m_BalloonIdList;
 }
-const std::set< uint32_t >& getBaseParamIdList()
+const std::set< uint32_t >& ExdDataGenerated::getBaseParamIdList()
 {
    if( m_BaseParamIdList.size() == 0 )
       loadIdList( m_BaseParamDat, m_BaseParamIdList );
    return m_BaseParamIdList;
 }
-const std::set< uint32_t >& getBattleLeveIdList()
+const std::set< uint32_t >& ExdDataGenerated::getBattleLeveIdList()
 {
    if( m_BattleLeveIdList.size() == 0 )
       loadIdList( m_BattleLeveDat, m_BattleLeveIdList );
    return m_BattleLeveIdList;
 }
-const std::set< uint32_t >& getBeastRankBonusIdList()
+const std::set< uint32_t >& ExdDataGenerated::getBeastRankBonusIdList()
 {
    if( m_BeastRankBonusIdList.size() == 0 )
       loadIdList( m_BeastRankBonusDat, m_BeastRankBonusIdList );
    return m_BeastRankBonusIdList;
 }
-const std::set< uint32_t >& getBeastReputationRankIdList()
+const std::set< uint32_t >& ExdDataGenerated::getBeastReputationRankIdList()
 {
    if( m_BeastReputationRankIdList.size() == 0 )
       loadIdList( m_BeastReputationRankDat, m_BeastReputationRankIdList );
    return m_BeastReputationRankIdList;
 }
-const std::set< uint32_t >& getBeastTribeIdList()
+const std::set< uint32_t >& ExdDataGenerated::getBeastTribeIdList()
 {
    if( m_BeastTribeIdList.size() == 0 )
       loadIdList( m_BeastTribeDat, m_BeastTribeIdList );
    return m_BeastTribeIdList;
 }
-const std::set< uint32_t >& getBehaviorIdList()
+const std::set< uint32_t >& ExdDataGenerated::getBehaviorIdList()
 {
    if( m_BehaviorIdList.size() == 0 )
       loadIdList( m_BehaviorDat, m_BehaviorIdList );
    return m_BehaviorIdList;
 }
-const std::set< uint32_t >& getBGMIdList()
+const std::set< uint32_t >& ExdDataGenerated::getBGMIdList()
 {
    if( m_BGMIdList.size() == 0 )
       loadIdList( m_BGMDat, m_BGMIdList );
    return m_BGMIdList;
 }
-const std::set< uint32_t >& getBNpcAnnounceIconIdList()
+const std::set< uint32_t >& ExdDataGenerated::getBNpcAnnounceIconIdList()
 {
    if( m_BNpcAnnounceIconIdList.size() == 0 )
       loadIdList( m_BNpcAnnounceIconDat, m_BNpcAnnounceIconIdList );
    return m_BNpcAnnounceIconIdList;
 }
-const std::set< uint32_t >& getBNpcBaseIdList()
+const std::set< uint32_t >& ExdDataGenerated::getBNpcBaseIdList()
 {
    if( m_BNpcBaseIdList.size() == 0 )
       loadIdList( m_BNpcBaseDat, m_BNpcBaseIdList );
    return m_BNpcBaseIdList;
 }
-const std::set< uint32_t >& getBNpcCustomizeIdList()
+const std::set< uint32_t >& ExdDataGenerated::getBNpcCustomizeIdList()
 {
    if( m_BNpcCustomizeIdList.size() == 0 )
       loadIdList( m_BNpcCustomizeDat, m_BNpcCustomizeIdList );
    return m_BNpcCustomizeIdList;
 }
-const std::set< uint32_t >& getBNpcNameIdList()
+const std::set< uint32_t >& ExdDataGenerated::getBNpcNameIdList()
 {
    if( m_BNpcNameIdList.size() == 0 )
       loadIdList( m_BNpcNameDat, m_BNpcNameIdList );
    return m_BNpcNameIdList;
 }
-const std::set< uint32_t >& getBuddyActionIdList()
+const std::set< uint32_t >& ExdDataGenerated::getBuddyActionIdList()
 {
    if( m_BuddyActionIdList.size() == 0 )
       loadIdList( m_BuddyActionDat, m_BuddyActionIdList );
    return m_BuddyActionIdList;
 }
-const std::set< uint32_t >& getBuddyEquipIdList()
+const std::set< uint32_t >& ExdDataGenerated::getBuddyEquipIdList()
 {
    if( m_BuddyEquipIdList.size() == 0 )
       loadIdList( m_BuddyEquipDat, m_BuddyEquipIdList );
    return m_BuddyEquipIdList;
 }
-const std::set< uint32_t >& getBuddyItemIdList()
+const std::set< uint32_t >& ExdDataGenerated::getBuddyItemIdList()
 {
    if( m_BuddyItemIdList.size() == 0 )
       loadIdList( m_BuddyItemDat, m_BuddyItemIdList );
    return m_BuddyItemIdList;
 }
-const std::set< uint32_t >& getBuddyRankIdList()
+const std::set< uint32_t >& ExdDataGenerated::getBuddyRankIdList()
 {
    if( m_BuddyRankIdList.size() == 0 )
       loadIdList( m_BuddyRankDat, m_BuddyRankIdList );
    return m_BuddyRankIdList;
 }
-const std::set< uint32_t >& getBuddySkillIdList()
+const std::set< uint32_t >& ExdDataGenerated::getBuddySkillIdList()
 {
    if( m_BuddySkillIdList.size() == 0 )
       loadIdList( m_BuddySkillDat, m_BuddySkillIdList );
    return m_BuddySkillIdList;
 }
-const std::set< uint32_t >& getCabinetIdList()
+const std::set< uint32_t >& ExdDataGenerated::getCabinetIdList()
 {
    if( m_CabinetIdList.size() == 0 )
       loadIdList( m_CabinetDat, m_CabinetIdList );
    return m_CabinetIdList;
 }
-const std::set< uint32_t >& getCabinetCategoryIdList()
+const std::set< uint32_t >& ExdDataGenerated::getCabinetCategoryIdList()
 {
    if( m_CabinetCategoryIdList.size() == 0 )
       loadIdList( m_CabinetCategoryDat, m_CabinetCategoryIdList );
    return m_CabinetCategoryIdList;
 }
-const std::set< uint32_t >& getCalendarIdList()
+const std::set< uint32_t >& ExdDataGenerated::getCalendarIdList()
 {
    if( m_CalendarIdList.size() == 0 )
       loadIdList( m_CalendarDat, m_CalendarIdList );
    return m_CalendarIdList;
 }
-const std::set< uint32_t >& getChainBonusIdList()
+const std::set< uint32_t >& ExdDataGenerated::getChainBonusIdList()
 {
    if( m_ChainBonusIdList.size() == 0 )
       loadIdList( m_ChainBonusDat, m_ChainBonusIdList );
    return m_ChainBonusIdList;
 }
-const std::set< uint32_t >& getCharaMakeCustomizeIdList()
+const std::set< uint32_t >& ExdDataGenerated::getCharaMakeCustomizeIdList()
 {
    if( m_CharaMakeCustomizeIdList.size() == 0 )
       loadIdList( m_CharaMakeCustomizeDat, m_CharaMakeCustomizeIdList );
    return m_CharaMakeCustomizeIdList;
 }
-const std::set< uint32_t >& getCharaMakeTypeIdList()
+const std::set< uint32_t >& ExdDataGenerated::getCharaMakeTypeIdList()
 {
    if( m_CharaMakeTypeIdList.size() == 0 )
       loadIdList( m_CharaMakeTypeDat, m_CharaMakeTypeIdList );
    return m_CharaMakeTypeIdList;
 }
-const std::set< uint32_t >& getChocoboRaceIdList()
+const std::set< uint32_t >& ExdDataGenerated::getChocoboRaceIdList()
 {
    if( m_ChocoboRaceIdList.size() == 0 )
       loadIdList( m_ChocoboRaceDat, m_ChocoboRaceIdList );
    return m_ChocoboRaceIdList;
 }
-const std::set< uint32_t >& getChocoboRaceAbilityIdList()
+const std::set< uint32_t >& ExdDataGenerated::getChocoboRaceAbilityIdList()
 {
    if( m_ChocoboRaceAbilityIdList.size() == 0 )
       loadIdList( m_ChocoboRaceAbilityDat, m_ChocoboRaceAbilityIdList );
    return m_ChocoboRaceAbilityIdList;
 }
-const std::set< uint32_t >& getChocoboRaceAbilityTypeIdList()
+const std::set< uint32_t >& ExdDataGenerated::getChocoboRaceAbilityTypeIdList()
 {
    if( m_ChocoboRaceAbilityTypeIdList.size() == 0 )
       loadIdList( m_ChocoboRaceAbilityTypeDat, m_ChocoboRaceAbilityTypeIdList );
    return m_ChocoboRaceAbilityTypeIdList;
 }
-const std::set< uint32_t >& getChocoboRaceItemIdList()
+const std::set< uint32_t >& ExdDataGenerated::getChocoboRaceItemIdList()
 {
    if( m_ChocoboRaceItemIdList.size() == 0 )
       loadIdList( m_ChocoboRaceItemDat, m_ChocoboRaceItemIdList );
    return m_ChocoboRaceItemIdList;
 }
-const std::set< uint32_t >& getChocoboRaceRankIdList()
+const std::set< uint32_t >& ExdDataGenerated::getChocoboRaceRankIdList()
 {
    if( m_ChocoboRaceRankIdList.size() == 0 )
       loadIdList( m_ChocoboRaceRankDat, m_ChocoboRaceRankIdList );
    return m_ChocoboRaceRankIdList;
 }
-const std::set< uint32_t >& getChocoboRaceStatusIdList()
+const std::set< uint32_t >& ExdDataGenerated::getChocoboRaceStatusIdList()
 {
    if( m_ChocoboRaceStatusIdList.size() == 0 )
       loadIdList( m_ChocoboRaceStatusDat, m_ChocoboRaceStatusIdList );
    return m_ChocoboRaceStatusIdList;
 }
-const std::set< uint32_t >& getChocoboRaceTerritoryIdList()
+const std::set< uint32_t >& ExdDataGenerated::getChocoboRaceTerritoryIdList()
 {
    if( m_ChocoboRaceTerritoryIdList.size() == 0 )
       loadIdList( m_ChocoboRaceTerritoryDat, m_ChocoboRaceTerritoryIdList );
    return m_ChocoboRaceTerritoryIdList;
 }
-const std::set< uint32_t >& getChocoboTaxiStandIdList()
+const std::set< uint32_t >& ExdDataGenerated::getChocoboTaxiStandIdList()
 {
    if( m_ChocoboTaxiStandIdList.size() == 0 )
       loadIdList( m_ChocoboTaxiStandDat, m_ChocoboTaxiStandIdList );
    return m_ChocoboTaxiStandIdList;
 }
-const std::set< uint32_t >& getClassJobIdList()
+const std::set< uint32_t >& ExdDataGenerated::getClassJobIdList()
 {
    if( m_ClassJobIdList.size() == 0 )
       loadIdList( m_ClassJobDat, m_ClassJobIdList );
    return m_ClassJobIdList;
 }
-const std::set< uint32_t >& getClassJobCategoryIdList()
+const std::set< uint32_t >& ExdDataGenerated::getClassJobCategoryIdList()
 {
    if( m_ClassJobCategoryIdList.size() == 0 )
       loadIdList( m_ClassJobCategoryDat, m_ClassJobCategoryIdList );
    return m_ClassJobCategoryIdList;
 }
-const std::set< uint32_t >& getCompanionIdList()
+const std::set< uint32_t >& ExdDataGenerated::getCompanionIdList()
 {
    if( m_CompanionIdList.size() == 0 )
       loadIdList( m_CompanionDat, m_CompanionIdList );
    return m_CompanionIdList;
 }
-const std::set< uint32_t >& getCompanionMoveIdList()
+const std::set< uint32_t >& ExdDataGenerated::getCompanionMoveIdList()
 {
    if( m_CompanionMoveIdList.size() == 0 )
       loadIdList( m_CompanionMoveDat, m_CompanionMoveIdList );
    return m_CompanionMoveIdList;
 }
-const std::set< uint32_t >& getCompanionTransientIdList()
+const std::set< uint32_t >& ExdDataGenerated::getCompanionTransientIdList()
 {
    if( m_CompanionTransientIdList.size() == 0 )
       loadIdList( m_CompanionTransientDat, m_CompanionTransientIdList );
    return m_CompanionTransientIdList;
 }
-const std::set< uint32_t >& getCompanyActionIdList()
+const std::set< uint32_t >& ExdDataGenerated::getCompanyActionIdList()
 {
    if( m_CompanyActionIdList.size() == 0 )
       loadIdList( m_CompanyActionDat, m_CompanyActionIdList );
    return m_CompanyActionIdList;
 }
-const std::set< uint32_t >& getCompanyCraftDraftIdList()
+const std::set< uint32_t >& ExdDataGenerated::getCompanyCraftDraftIdList()
 {
    if( m_CompanyCraftDraftIdList.size() == 0 )
       loadIdList( m_CompanyCraftDraftDat, m_CompanyCraftDraftIdList );
    return m_CompanyCraftDraftIdList;
 }
-const std::set< uint32_t >& getCompanyCraftDraftCategoryIdList()
+const std::set< uint32_t >& ExdDataGenerated::getCompanyCraftDraftCategoryIdList()
 {
    if( m_CompanyCraftDraftCategoryIdList.size() == 0 )
       loadIdList( m_CompanyCraftDraftCategoryDat, m_CompanyCraftDraftCategoryIdList );
    return m_CompanyCraftDraftCategoryIdList;
 }
-const std::set< uint32_t >& getCompanyCraftManufactoryStateIdList()
+const std::set< uint32_t >& ExdDataGenerated::getCompanyCraftManufactoryStateIdList()
 {
    if( m_CompanyCraftManufactoryStateIdList.size() == 0 )
       loadIdList( m_CompanyCraftManufactoryStateDat, m_CompanyCraftManufactoryStateIdList );
    return m_CompanyCraftManufactoryStateIdList;
 }
-const std::set< uint32_t >& getCompanyCraftPartIdList()
+const std::set< uint32_t >& ExdDataGenerated::getCompanyCraftPartIdList()
 {
    if( m_CompanyCraftPartIdList.size() == 0 )
       loadIdList( m_CompanyCraftPartDat, m_CompanyCraftPartIdList );
    return m_CompanyCraftPartIdList;
 }
-const std::set< uint32_t >& getCompanyCraftProcessIdList()
+const std::set< uint32_t >& ExdDataGenerated::getCompanyCraftProcessIdList()
 {
    if( m_CompanyCraftProcessIdList.size() == 0 )
       loadIdList( m_CompanyCraftProcessDat, m_CompanyCraftProcessIdList );
    return m_CompanyCraftProcessIdList;
 }
-const std::set< uint32_t >& getCompanyCraftSequenceIdList()
+const std::set< uint32_t >& ExdDataGenerated::getCompanyCraftSequenceIdList()
 {
    if( m_CompanyCraftSequenceIdList.size() == 0 )
       loadIdList( m_CompanyCraftSequenceDat, m_CompanyCraftSequenceIdList );
    return m_CompanyCraftSequenceIdList;
 }
-const std::set< uint32_t >& getCompanyCraftSupplyItemIdList()
+const std::set< uint32_t >& ExdDataGenerated::getCompanyCraftSupplyItemIdList()
 {
    if( m_CompanyCraftSupplyItemIdList.size() == 0 )
       loadIdList( m_CompanyCraftSupplyItemDat, m_CompanyCraftSupplyItemIdList );
    return m_CompanyCraftSupplyItemIdList;
 }
-const std::set< uint32_t >& getCompanyCraftTypeIdList()
+const std::set< uint32_t >& ExdDataGenerated::getCompanyCraftTypeIdList()
 {
    if( m_CompanyCraftTypeIdList.size() == 0 )
       loadIdList( m_CompanyCraftTypeDat, m_CompanyCraftTypeIdList );
    return m_CompanyCraftTypeIdList;
 }
-const std::set< uint32_t >& getCompleteJournalIdList()
+const std::set< uint32_t >& ExdDataGenerated::getCompleteJournalIdList()
 {
    if( m_CompleteJournalIdList.size() == 0 )
       loadIdList( m_CompleteJournalDat, m_CompleteJournalIdList );
    return m_CompleteJournalIdList;
 }
-const std::set< uint32_t >& getCompleteJournalCategoryIdList()
+const std::set< uint32_t >& ExdDataGenerated::getCompleteJournalCategoryIdList()
 {
    if( m_CompleteJournalCategoryIdList.size() == 0 )
       loadIdList( m_CompleteJournalCategoryDat, m_CompleteJournalCategoryIdList );
    return m_CompleteJournalCategoryIdList;
 }
-const std::set< uint32_t >& getContentExActionIdList()
+const std::set< uint32_t >& ExdDataGenerated::getContentExActionIdList()
 {
    if( m_ContentExActionIdList.size() == 0 )
       loadIdList( m_ContentExActionDat, m_ContentExActionIdList );
    return m_ContentExActionIdList;
 }
-const std::set< uint32_t >& getContentFinderConditionIdList()
+const std::set< uint32_t >& ExdDataGenerated::getContentFinderConditionIdList()
 {
    if( m_ContentFinderConditionIdList.size() == 0 )
       loadIdList( m_ContentFinderConditionDat, m_ContentFinderConditionIdList );
    return m_ContentFinderConditionIdList;
 }
-const std::set< uint32_t >& getContentFinderConditionTransientIdList()
+const std::set< uint32_t >& ExdDataGenerated::getContentFinderConditionTransientIdList()
 {
    if( m_ContentFinderConditionTransientIdList.size() == 0 )
       loadIdList( m_ContentFinderConditionTransientDat, m_ContentFinderConditionTransientIdList );
    return m_ContentFinderConditionTransientIdList;
 }
-const std::set< uint32_t >& getContentMemberTypeIdList()
+const std::set< uint32_t >& ExdDataGenerated::getContentMemberTypeIdList()
 {
    if( m_ContentMemberTypeIdList.size() == 0 )
       loadIdList( m_ContentMemberTypeDat, m_ContentMemberTypeIdList );
    return m_ContentMemberTypeIdList;
 }
-const std::set< uint32_t >& getContentRouletteIdList()
+const std::set< uint32_t >& ExdDataGenerated::getContentRouletteIdList()
 {
    if( m_ContentRouletteIdList.size() == 0 )
       loadIdList( m_ContentRouletteDat, m_ContentRouletteIdList );
    return m_ContentRouletteIdList;
 }
-const std::set< uint32_t >& getContentTypeIdList()
+const std::set< uint32_t >& ExdDataGenerated::getContentTypeIdList()
 {
    if( m_ContentTypeIdList.size() == 0 )
       loadIdList( m_ContentTypeDat, m_ContentTypeIdList );
    return m_ContentTypeIdList;
 }
-const std::set< uint32_t >& getCraftActionIdList()
+const std::set< uint32_t >& ExdDataGenerated::getCraftActionIdList()
 {
    if( m_CraftActionIdList.size() == 0 )
       loadIdList( m_CraftActionDat, m_CraftActionIdList );
    return m_CraftActionIdList;
 }
-const std::set< uint32_t >& getCraftLeveIdList()
+const std::set< uint32_t >& ExdDataGenerated::getCraftLeveIdList()
 {
    if( m_CraftLeveIdList.size() == 0 )
       loadIdList( m_CraftLeveDat, m_CraftLeveIdList );
    return m_CraftLeveIdList;
 }
-const std::set< uint32_t >& getCraftTypeIdList()
+const std::set< uint32_t >& ExdDataGenerated::getCraftTypeIdList()
 {
    if( m_CraftTypeIdList.size() == 0 )
       loadIdList( m_CraftTypeDat, m_CraftTypeIdList );
    return m_CraftTypeIdList;
 }
-const std::set< uint32_t >& getCurrencyIdList()
+const std::set< uint32_t >& ExdDataGenerated::getCurrencyIdList()
 {
    if( m_CurrencyIdList.size() == 0 )
       loadIdList( m_CurrencyDat, m_CurrencyIdList );
    return m_CurrencyIdList;
 }
-const std::set< uint32_t >& getCustomTalkIdList()
+const std::set< uint32_t >& ExdDataGenerated::getCustomTalkIdList()
 {
    if( m_CustomTalkIdList.size() == 0 )
       loadIdList( m_CustomTalkDat, m_CustomTalkIdList );
    return m_CustomTalkIdList;
 }
-const std::set< uint32_t >& getCutsceneIdList()
+const std::set< uint32_t >& ExdDataGenerated::getCutsceneIdList()
 {
    if( m_CutsceneIdList.size() == 0 )
       loadIdList( m_CutsceneDat, m_CutsceneIdList );
    return m_CutsceneIdList;
 }
-const std::set< uint32_t >& getCutScreenImageIdList()
+const std::set< uint32_t >& ExdDataGenerated::getCutScreenImageIdList()
 {
    if( m_CutScreenImageIdList.size() == 0 )
       loadIdList( m_CutScreenImageDat, m_CutScreenImageIdList );
    return m_CutScreenImageIdList;
 }
-const std::set< uint32_t >& getDailySupplyItemIdList()
+const std::set< uint32_t >& ExdDataGenerated::getDailySupplyItemIdList()
 {
    if( m_DailySupplyItemIdList.size() == 0 )
       loadIdList( m_DailySupplyItemDat, m_DailySupplyItemIdList );
    return m_DailySupplyItemIdList;
 }
-const std::set< uint32_t >& getDeepDungeonBanIdList()
+const std::set< uint32_t >& ExdDataGenerated::getDeepDungeonBanIdList()
 {
    if( m_DeepDungeonBanIdList.size() == 0 )
       loadIdList( m_DeepDungeonBanDat, m_DeepDungeonBanIdList );
    return m_DeepDungeonBanIdList;
 }
-const std::set< uint32_t >& getDeepDungeonDangerIdList()
+const std::set< uint32_t >& ExdDataGenerated::getDeepDungeonDangerIdList()
 {
    if( m_DeepDungeonDangerIdList.size() == 0 )
       loadIdList( m_DeepDungeonDangerDat, m_DeepDungeonDangerIdList );
    return m_DeepDungeonDangerIdList;
 }
-const std::set< uint32_t >& getDeepDungeonEquipmentIdList()
+const std::set< uint32_t >& ExdDataGenerated::getDeepDungeonEquipmentIdList()
 {
    if( m_DeepDungeonEquipmentIdList.size() == 0 )
       loadIdList( m_DeepDungeonEquipmentDat, m_DeepDungeonEquipmentIdList );
    return m_DeepDungeonEquipmentIdList;
 }
-const std::set< uint32_t >& getDeepDungeonFloorEffectUIIdList()
+const std::set< uint32_t >& ExdDataGenerated::getDeepDungeonFloorEffectUIIdList()
 {
    if( m_DeepDungeonFloorEffectUIIdList.size() == 0 )
       loadIdList( m_DeepDungeonFloorEffectUIDat, m_DeepDungeonFloorEffectUIIdList );
    return m_DeepDungeonFloorEffectUIIdList;
 }
-const std::set< uint32_t >& getDeepDungeonItemIdList()
+const std::set< uint32_t >& ExdDataGenerated::getDeepDungeonItemIdList()
 {
    if( m_DeepDungeonItemIdList.size() == 0 )
       loadIdList( m_DeepDungeonItemDat, m_DeepDungeonItemIdList );
    return m_DeepDungeonItemIdList;
 }
-const std::set< uint32_t >& getDeepDungeonStatusIdList()
+const std::set< uint32_t >& ExdDataGenerated::getDeepDungeonStatusIdList()
 {
    if( m_DeepDungeonStatusIdList.size() == 0 )
       loadIdList( m_DeepDungeonStatusDat, m_DeepDungeonStatusIdList );
    return m_DeepDungeonStatusIdList;
 }
-const std::set< uint32_t >& getDefaultTalkIdList()
+const std::set< uint32_t >& ExdDataGenerated::getDefaultTalkIdList()
 {
    if( m_DefaultTalkIdList.size() == 0 )
       loadIdList( m_DefaultTalkDat, m_DefaultTalkIdList );
    return m_DefaultTalkIdList;
 }
-const std::set< uint32_t >& getDeliveryQuestIdList()
+const std::set< uint32_t >& ExdDataGenerated::getDeliveryQuestIdList()
 {
    if( m_DeliveryQuestIdList.size() == 0 )
       loadIdList( m_DeliveryQuestDat, m_DeliveryQuestIdList );
    return m_DeliveryQuestIdList;
 }
-const std::set< uint32_t >& getDisposalShopIdList()
+const std::set< uint32_t >& ExdDataGenerated::getDisposalShopIdList()
 {
    if( m_DisposalShopIdList.size() == 0 )
       loadIdList( m_DisposalShopDat, m_DisposalShopIdList );
    return m_DisposalShopIdList;
 }
-const std::set< uint32_t >& getDisposalShopFilterTypeIdList()
+const std::set< uint32_t >& ExdDataGenerated::getDisposalShopFilterTypeIdList()
 {
    if( m_DisposalShopFilterTypeIdList.size() == 0 )
       loadIdList( m_DisposalShopFilterTypeDat, m_DisposalShopFilterTypeIdList );
    return m_DisposalShopFilterTypeIdList;
 }
-const std::set< uint32_t >& getDisposalShopItemIdList()
+const std::set< uint32_t >& ExdDataGenerated::getDisposalShopItemIdList()
 {
    if( m_DisposalShopItemIdList.size() == 0 )
       loadIdList( m_DisposalShopItemDat, m_DisposalShopItemIdList );
    return m_DisposalShopItemIdList;
 }
-const std::set< uint32_t >& getDpsChallengeIdList()
+const std::set< uint32_t >& ExdDataGenerated::getDpsChallengeIdList()
 {
    if( m_DpsChallengeIdList.size() == 0 )
       loadIdList( m_DpsChallengeDat, m_DpsChallengeIdList );
    return m_DpsChallengeIdList;
 }
-const std::set< uint32_t >& getDpsChallengeOfficerIdList()
+const std::set< uint32_t >& ExdDataGenerated::getDpsChallengeOfficerIdList()
 {
    if( m_DpsChallengeOfficerIdList.size() == 0 )
       loadIdList( m_DpsChallengeOfficerDat, m_DpsChallengeOfficerIdList );
    return m_DpsChallengeOfficerIdList;
 }
-const std::set< uint32_t >& getDpsChallengeTransientIdList()
+const std::set< uint32_t >& ExdDataGenerated::getDpsChallengeTransientIdList()
 {
    if( m_DpsChallengeTransientIdList.size() == 0 )
       loadIdList( m_DpsChallengeTransientDat, m_DpsChallengeTransientIdList );
    return m_DpsChallengeTransientIdList;
 }
-const std::set< uint32_t >& getEmoteIdList()
+const std::set< uint32_t >& ExdDataGenerated::getEmoteIdList()
 {
    if( m_EmoteIdList.size() == 0 )
       loadIdList( m_EmoteDat, m_EmoteIdList );
    return m_EmoteIdList;
 }
-const std::set< uint32_t >& getEmoteCategoryIdList()
+const std::set< uint32_t >& ExdDataGenerated::getEmoteCategoryIdList()
 {
    if( m_EmoteCategoryIdList.size() == 0 )
       loadIdList( m_EmoteCategoryDat, m_EmoteCategoryIdList );
    return m_EmoteCategoryIdList;
 }
-const std::set< uint32_t >& getENpcBaseIdList()
+const std::set< uint32_t >& ExdDataGenerated::getENpcBaseIdList()
 {
    if( m_ENpcBaseIdList.size() == 0 )
       loadIdList( m_ENpcBaseDat, m_ENpcBaseIdList );
    return m_ENpcBaseIdList;
 }
-const std::set< uint32_t >& getENpcResidentIdList()
+const std::set< uint32_t >& ExdDataGenerated::getENpcResidentIdList()
 {
    if( m_ENpcResidentIdList.size() == 0 )
       loadIdList( m_ENpcResidentDat, m_ENpcResidentIdList );
    return m_ENpcResidentIdList;
 }
-const std::set< uint32_t >& getEObjIdList()
+const std::set< uint32_t >& ExdDataGenerated::getEObjIdList()
 {
    if( m_EObjIdList.size() == 0 )
       loadIdList( m_EObjDat, m_EObjIdList );
    return m_EObjIdList;
 }
-const std::set< uint32_t >& getEquipRaceCategoryIdList()
+const std::set< uint32_t >& ExdDataGenerated::getEquipRaceCategoryIdList()
 {
    if( m_EquipRaceCategoryIdList.size() == 0 )
       loadIdList( m_EquipRaceCategoryDat, m_EquipRaceCategoryIdList );
    return m_EquipRaceCategoryIdList;
 }
-const std::set< uint32_t >& getEquipSlotCategoryIdList()
+const std::set< uint32_t >& ExdDataGenerated::getEquipSlotCategoryIdList()
 {
    if( m_EquipSlotCategoryIdList.size() == 0 )
       loadIdList( m_EquipSlotCategoryDat, m_EquipSlotCategoryIdList );
    return m_EquipSlotCategoryIdList;
 }
-const std::set< uint32_t >& getEventActionIdList()
+const std::set< uint32_t >& ExdDataGenerated::getEventActionIdList()
 {
    if( m_EventActionIdList.size() == 0 )
       loadIdList( m_EventActionDat, m_EventActionIdList );
    return m_EventActionIdList;
 }
-const std::set< uint32_t >& getEventIconPriorityIdList()
+const std::set< uint32_t >& ExdDataGenerated::getEventIconPriorityIdList()
 {
    if( m_EventIconPriorityIdList.size() == 0 )
       loadIdList( m_EventIconPriorityDat, m_EventIconPriorityIdList );
    return m_EventIconPriorityIdList;
 }
-const std::set< uint32_t >& getEventIconTypeIdList()
+const std::set< uint32_t >& ExdDataGenerated::getEventIconTypeIdList()
 {
    if( m_EventIconTypeIdList.size() == 0 )
       loadIdList( m_EventIconTypeDat, m_EventIconTypeIdList );
    return m_EventIconTypeIdList;
 }
-const std::set< uint32_t >& getEventItemIdList()
+const std::set< uint32_t >& ExdDataGenerated::getEventItemIdList()
 {
    if( m_EventItemIdList.size() == 0 )
       loadIdList( m_EventItemDat, m_EventItemIdList );
    return m_EventItemIdList;
 }
-const std::set< uint32_t >& getEventItemHelpIdList()
+const std::set< uint32_t >& ExdDataGenerated::getEventItemHelpIdList()
 {
    if( m_EventItemHelpIdList.size() == 0 )
       loadIdList( m_EventItemHelpDat, m_EventItemHelpIdList );
    return m_EventItemHelpIdList;
 }
-const std::set< uint32_t >& getExVersionIdList()
+const std::set< uint32_t >& ExdDataGenerated::getExVersionIdList()
 {
    if( m_ExVersionIdList.size() == 0 )
       loadIdList( m_ExVersionDat, m_ExVersionIdList );
    return m_ExVersionIdList;
 }
-const std::set< uint32_t >& getFateIdList()
+const std::set< uint32_t >& ExdDataGenerated::getFateIdList()
 {
    if( m_FateIdList.size() == 0 )
       loadIdList( m_FateDat, m_FateIdList );
    return m_FateIdList;
 }
-const std::set< uint32_t >& getFCActivityIdList()
+const std::set< uint32_t >& ExdDataGenerated::getFCActivityIdList()
 {
    if( m_FCActivityIdList.size() == 0 )
       loadIdList( m_FCActivityDat, m_FCActivityIdList );
    return m_FCActivityIdList;
 }
-const std::set< uint32_t >& getFCAuthorityIdList()
+const std::set< uint32_t >& ExdDataGenerated::getFCAuthorityIdList()
 {
    if( m_FCAuthorityIdList.size() == 0 )
       loadIdList( m_FCAuthorityDat, m_FCAuthorityIdList );
    return m_FCAuthorityIdList;
 }
-const std::set< uint32_t >& getFCAuthorityCategoryIdList()
+const std::set< uint32_t >& ExdDataGenerated::getFCAuthorityCategoryIdList()
 {
    if( m_FCAuthorityCategoryIdList.size() == 0 )
       loadIdList( m_FCAuthorityCategoryDat, m_FCAuthorityCategoryIdList );
    return m_FCAuthorityCategoryIdList;
 }
-const std::set< uint32_t >& getFCChestNameIdList()
+const std::set< uint32_t >& ExdDataGenerated::getFCChestNameIdList()
 {
    if( m_FCChestNameIdList.size() == 0 )
       loadIdList( m_FCChestNameDat, m_FCChestNameIdList );
    return m_FCChestNameIdList;
 }
-const std::set< uint32_t >& getFccShopIdList()
+const std::set< uint32_t >& ExdDataGenerated::getFccShopIdList()
 {
    if( m_FccShopIdList.size() == 0 )
       loadIdList( m_FccShopDat, m_FccShopIdList );
    return m_FccShopIdList;
 }
-const std::set< uint32_t >& getFCHierarchyIdList()
+const std::set< uint32_t >& ExdDataGenerated::getFCHierarchyIdList()
 {
    if( m_FCHierarchyIdList.size() == 0 )
       loadIdList( m_FCHierarchyDat, m_FCHierarchyIdList );
    return m_FCHierarchyIdList;
 }
-const std::set< uint32_t >& getFCReputationIdList()
+const std::set< uint32_t >& ExdDataGenerated::getFCReputationIdList()
 {
    if( m_FCReputationIdList.size() == 0 )
       loadIdList( m_FCReputationDat, m_FCReputationIdList );
    return m_FCReputationIdList;
 }
-const std::set< uint32_t >& getFCRightsIdList()
+const std::set< uint32_t >& ExdDataGenerated::getFCRightsIdList()
 {
    if( m_FCRightsIdList.size() == 0 )
       loadIdList( m_FCRightsDat, m_FCRightsIdList );
    return m_FCRightsIdList;
 }
-const std::set< uint32_t >& getFishingSpotIdList()
+const std::set< uint32_t >& ExdDataGenerated::getFishingSpotIdList()
 {
    if( m_FishingSpotIdList.size() == 0 )
       loadIdList( m_FishingSpotDat, m_FishingSpotIdList );
    return m_FishingSpotIdList;
 }
-const std::set< uint32_t >& getFishParameterIdList()
+const std::set< uint32_t >& ExdDataGenerated::getFishParameterIdList()
 {
    if( m_FishParameterIdList.size() == 0 )
       loadIdList( m_FishParameterDat, m_FishParameterIdList );
    return m_FishParameterIdList;
 }
-const std::set< uint32_t >& getGardeningSeedIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGardeningSeedIdList()
 {
    if( m_GardeningSeedIdList.size() == 0 )
       loadIdList( m_GardeningSeedDat, m_GardeningSeedIdList );
    return m_GardeningSeedIdList;
 }
-const std::set< uint32_t >& getGatheringConditionIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGatheringConditionIdList()
 {
    if( m_GatheringConditionIdList.size() == 0 )
       loadIdList( m_GatheringConditionDat, m_GatheringConditionIdList );
    return m_GatheringConditionIdList;
 }
-const std::set< uint32_t >& getGatheringExpIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGatheringExpIdList()
 {
    if( m_GatheringExpIdList.size() == 0 )
       loadIdList( m_GatheringExpDat, m_GatheringExpIdList );
    return m_GatheringExpIdList;
 }
-const std::set< uint32_t >& getGatheringItemIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGatheringItemIdList()
 {
    if( m_GatheringItemIdList.size() == 0 )
       loadIdList( m_GatheringItemDat, m_GatheringItemIdList );
    return m_GatheringItemIdList;
 }
-const std::set< uint32_t >& getGatheringItemLevelConvertTableIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGatheringItemLevelConvertTableIdList()
 {
    if( m_GatheringItemLevelConvertTableIdList.size() == 0 )
       loadIdList( m_GatheringItemLevelConvertTableDat, m_GatheringItemLevelConvertTableIdList );
    return m_GatheringItemLevelConvertTableIdList;
 }
-const std::set< uint32_t >& getGatheringItemPointIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGatheringItemPointIdList()
 {
    if( m_GatheringItemPointIdList.size() == 0 )
       loadIdList( m_GatheringItemPointDat, m_GatheringItemPointIdList );
    return m_GatheringItemPointIdList;
 }
-const std::set< uint32_t >& getGatheringNotebookListIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGatheringNotebookListIdList()
 {
    if( m_GatheringNotebookListIdList.size() == 0 )
       loadIdList( m_GatheringNotebookListDat, m_GatheringNotebookListIdList );
    return m_GatheringNotebookListIdList;
 }
-const std::set< uint32_t >& getGatheringPointIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGatheringPointIdList()
 {
    if( m_GatheringPointIdList.size() == 0 )
       loadIdList( m_GatheringPointDat, m_GatheringPointIdList );
    return m_GatheringPointIdList;
 }
-const std::set< uint32_t >& getGatheringPointBaseIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGatheringPointBaseIdList()
 {
    if( m_GatheringPointBaseIdList.size() == 0 )
       loadIdList( m_GatheringPointBaseDat, m_GatheringPointBaseIdList );
    return m_GatheringPointBaseIdList;
 }
-const std::set< uint32_t >& getGatheringPointBonusIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGatheringPointBonusIdList()
 {
    if( m_GatheringPointBonusIdList.size() == 0 )
       loadIdList( m_GatheringPointBonusDat, m_GatheringPointBonusIdList );
    return m_GatheringPointBonusIdList;
 }
-const std::set< uint32_t >& getGatheringPointBonusTypeIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGatheringPointBonusTypeIdList()
 {
    if( m_GatheringPointBonusTypeIdList.size() == 0 )
       loadIdList( m_GatheringPointBonusTypeDat, m_GatheringPointBonusTypeIdList );
    return m_GatheringPointBonusTypeIdList;
 }
-const std::set< uint32_t >& getGatheringPointNameIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGatheringPointNameIdList()
 {
    if( m_GatheringPointNameIdList.size() == 0 )
       loadIdList( m_GatheringPointNameDat, m_GatheringPointNameIdList );
    return m_GatheringPointNameIdList;
 }
-const std::set< uint32_t >& getGatheringSubCategoryIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGatheringSubCategoryIdList()
 {
    if( m_GatheringSubCategoryIdList.size() == 0 )
       loadIdList( m_GatheringSubCategoryDat, m_GatheringSubCategoryIdList );
    return m_GatheringSubCategoryIdList;
 }
-const std::set< uint32_t >& getGatheringTypeIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGatheringTypeIdList()
 {
    if( m_GatheringTypeIdList.size() == 0 )
       loadIdList( m_GatheringTypeDat, m_GatheringTypeIdList );
    return m_GatheringTypeIdList;
 }
-const std::set< uint32_t >& getGcArmyExpeditionIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGcArmyExpeditionIdList()
 {
    if( m_GcArmyExpeditionIdList.size() == 0 )
       loadIdList( m_GcArmyExpeditionDat, m_GcArmyExpeditionIdList );
    return m_GcArmyExpeditionIdList;
 }
-const std::set< uint32_t >& getGcArmyExpeditionMemberBonusIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGcArmyExpeditionMemberBonusIdList()
 {
    if( m_GcArmyExpeditionMemberBonusIdList.size() == 0 )
       loadIdList( m_GcArmyExpeditionMemberBonusDat, m_GcArmyExpeditionMemberBonusIdList );
    return m_GcArmyExpeditionMemberBonusIdList;
 }
-const std::set< uint32_t >& getGcArmyExpeditionTypeIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGcArmyExpeditionTypeIdList()
 {
    if( m_GcArmyExpeditionTypeIdList.size() == 0 )
       loadIdList( m_GcArmyExpeditionTypeDat, m_GcArmyExpeditionTypeIdList );
    return m_GcArmyExpeditionTypeIdList;
 }
-const std::set< uint32_t >& getGcArmyMemberGrowIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGcArmyMemberGrowIdList()
 {
    if( m_GcArmyMemberGrowIdList.size() == 0 )
       loadIdList( m_GcArmyMemberGrowDat, m_GcArmyMemberGrowIdList );
    return m_GcArmyMemberGrowIdList;
 }
-const std::set< uint32_t >& getGcArmyTrainingIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGcArmyTrainingIdList()
 {
    if( m_GcArmyTrainingIdList.size() == 0 )
       loadIdList( m_GcArmyTrainingDat, m_GcArmyTrainingIdList );
    return m_GcArmyTrainingIdList;
 }
-const std::set< uint32_t >& getGCScripShopCategoryIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGCScripShopCategoryIdList()
 {
    if( m_GCScripShopCategoryIdList.size() == 0 )
       loadIdList( m_GCScripShopCategoryDat, m_GCScripShopCategoryIdList );
    return m_GCScripShopCategoryIdList;
 }
-const std::set< uint32_t >& getGCScripShopItemIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGCScripShopItemIdList()
 {
    if( m_GCScripShopItemIdList.size() == 0 )
       loadIdList( m_GCScripShopItemDat, m_GCScripShopItemIdList );
    return m_GCScripShopItemIdList;
 }
-const std::set< uint32_t >& getGCShopIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGCShopIdList()
 {
    if( m_GCShopIdList.size() == 0 )
       loadIdList( m_GCShopDat, m_GCShopIdList );
    return m_GCShopIdList;
 }
-const std::set< uint32_t >& getGCShopItemCategoryIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGCShopItemCategoryIdList()
 {
    if( m_GCShopItemCategoryIdList.size() == 0 )
       loadIdList( m_GCShopItemCategoryDat, m_GCShopItemCategoryIdList );
    return m_GCShopItemCategoryIdList;
 }
-const std::set< uint32_t >& getGCSupplyDutyIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGCSupplyDutyIdList()
 {
    if( m_GCSupplyDutyIdList.size() == 0 )
       loadIdList( m_GCSupplyDutyDat, m_GCSupplyDutyIdList );
    return m_GCSupplyDutyIdList;
 }
-const std::set< uint32_t >& getGCSupplyDutyRewardIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGCSupplyDutyRewardIdList()
 {
    if( m_GCSupplyDutyRewardIdList.size() == 0 )
       loadIdList( m_GCSupplyDutyRewardDat, m_GCSupplyDutyRewardIdList );
    return m_GCSupplyDutyRewardIdList;
 }
-const std::set< uint32_t >& getGeneralActionIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGeneralActionIdList()
 {
    if( m_GeneralActionIdList.size() == 0 )
       loadIdList( m_GeneralActionDat, m_GeneralActionIdList );
    return m_GeneralActionIdList;
 }
-const std::set< uint32_t >& getGilShopIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGilShopIdList()
 {
    if( m_GilShopIdList.size() == 0 )
       loadIdList( m_GilShopDat, m_GilShopIdList );
    return m_GilShopIdList;
 }
-const std::set< uint32_t >& getGilShopItemIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGilShopItemIdList()
 {
    if( m_GilShopItemIdList.size() == 0 )
       loadIdList( m_GilShopItemDat, m_GilShopItemIdList );
    return m_GilShopItemIdList;
 }
-const std::set< uint32_t >& getGoldSaucerTextDataIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGoldSaucerTextDataIdList()
 {
    if( m_GoldSaucerTextDataIdList.size() == 0 )
       loadIdList( m_GoldSaucerTextDataDat, m_GoldSaucerTextDataIdList );
    return m_GoldSaucerTextDataIdList;
 }
-const std::set< uint32_t >& getGrandCompanyIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGrandCompanyIdList()
 {
    if( m_GrandCompanyIdList.size() == 0 )
       loadIdList( m_GrandCompanyDat, m_GrandCompanyIdList );
    return m_GrandCompanyIdList;
 }
-const std::set< uint32_t >& getGrandCompanyRankIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGrandCompanyRankIdList()
 {
    if( m_GrandCompanyRankIdList.size() == 0 )
       loadIdList( m_GrandCompanyRankDat, m_GrandCompanyRankIdList );
    return m_GrandCompanyRankIdList;
 }
-const std::set< uint32_t >& getGuardianDeityIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGuardianDeityIdList()
 {
    if( m_GuardianDeityIdList.size() == 0 )
       loadIdList( m_GuardianDeityDat, m_GuardianDeityIdList );
    return m_GuardianDeityIdList;
 }
-const std::set< uint32_t >& getGuildleveAssignmentIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGuildleveAssignmentIdList()
 {
    if( m_GuildleveAssignmentIdList.size() == 0 )
       loadIdList( m_GuildleveAssignmentDat, m_GuildleveAssignmentIdList );
    return m_GuildleveAssignmentIdList;
 }
-const std::set< uint32_t >& getGuildOrderGuideIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGuildOrderGuideIdList()
 {
    if( m_GuildOrderGuideIdList.size() == 0 )
       loadIdList( m_GuildOrderGuideDat, m_GuildOrderGuideIdList );
    return m_GuildOrderGuideIdList;
 }
-const std::set< uint32_t >& getGuildOrderOfficerIdList()
+const std::set< uint32_t >& ExdDataGenerated::getGuildOrderOfficerIdList()
 {
    if( m_GuildOrderOfficerIdList.size() == 0 )
       loadIdList( m_GuildOrderOfficerDat, m_GuildOrderOfficerIdList );
    return m_GuildOrderOfficerIdList;
 }
-const std::set< uint32_t >& getHouseRetainerPoseIdList()
+const std::set< uint32_t >& ExdDataGenerated::getHouseRetainerPoseIdList()
 {
    if( m_HouseRetainerPoseIdList.size() == 0 )
       loadIdList( m_HouseRetainerPoseDat, m_HouseRetainerPoseIdList );
    return m_HouseRetainerPoseIdList;
 }
-const std::set< uint32_t >& getHousingFurnitureIdList()
+const std::set< uint32_t >& ExdDataGenerated::getHousingFurnitureIdList()
 {
    if( m_HousingFurnitureIdList.size() == 0 )
       loadIdList( m_HousingFurnitureDat, m_HousingFurnitureIdList );
    return m_HousingFurnitureIdList;
 }
-const std::set< uint32_t >& getHousingYardObjectIdList()
+const std::set< uint32_t >& ExdDataGenerated::getHousingYardObjectIdList()
 {
    if( m_HousingYardObjectIdList.size() == 0 )
       loadIdList( m_HousingYardObjectDat, m_HousingYardObjectIdList );
    return m_HousingYardObjectIdList;
 }
-const std::set< uint32_t >& getInstanceContentIdList()
+const std::set< uint32_t >& ExdDataGenerated::getInstanceContentIdList()
 {
    if( m_InstanceContentIdList.size() == 0 )
       loadIdList( m_InstanceContentDat, m_InstanceContentIdList );
    return m_InstanceContentIdList;
 }
-const std::set< uint32_t >& getInstanceContentBuffIdList()
+const std::set< uint32_t >& ExdDataGenerated::getInstanceContentBuffIdList()
 {
    if( m_InstanceContentBuffIdList.size() == 0 )
       loadIdList( m_InstanceContentBuffDat, m_InstanceContentBuffIdList );
    return m_InstanceContentBuffIdList;
 }
-const std::set< uint32_t >& getInstanceContentTextDataIdList()
+const std::set< uint32_t >& ExdDataGenerated::getInstanceContentTextDataIdList()
 {
    if( m_InstanceContentTextDataIdList.size() == 0 )
       loadIdList( m_InstanceContentTextDataDat, m_InstanceContentTextDataIdList );
    return m_InstanceContentTextDataIdList;
 }
-const std::set< uint32_t >& getInstanceContentTypeIdList()
+const std::set< uint32_t >& ExdDataGenerated::getInstanceContentTypeIdList()
 {
    if( m_InstanceContentTypeIdList.size() == 0 )
       loadIdList( m_InstanceContentTypeDat, m_InstanceContentTypeIdList );
    return m_InstanceContentTypeIdList;
 }
-const std::set< uint32_t >& getItemIdList()
+const std::set< uint32_t >& ExdDataGenerated::getItemIdList()
 {
    if( m_ItemIdList.size() == 0 )
       loadIdList( m_ItemDat, m_ItemIdList );
    return m_ItemIdList;
 }
-const std::set< uint32_t >& getItemActionIdList()
+const std::set< uint32_t >& ExdDataGenerated::getItemActionIdList()
 {
    if( m_ItemActionIdList.size() == 0 )
       loadIdList( m_ItemActionDat, m_ItemActionIdList );
    return m_ItemActionIdList;
 }
-const std::set< uint32_t >& getItemFoodIdList()
+const std::set< uint32_t >& ExdDataGenerated::getItemFoodIdList()
 {
    if( m_ItemFoodIdList.size() == 0 )
       loadIdList( m_ItemFoodDat, m_ItemFoodIdList );
    return m_ItemFoodIdList;
 }
-const std::set< uint32_t >& getItemSearchCategoryIdList()
+const std::set< uint32_t >& ExdDataGenerated::getItemSearchCategoryIdList()
 {
    if( m_ItemSearchCategoryIdList.size() == 0 )
       loadIdList( m_ItemSearchCategoryDat, m_ItemSearchCategoryIdList );
    return m_ItemSearchCategoryIdList;
 }
-const std::set< uint32_t >& getItemSeriesIdList()
+const std::set< uint32_t >& ExdDataGenerated::getItemSeriesIdList()
 {
    if( m_ItemSeriesIdList.size() == 0 )
       loadIdList( m_ItemSeriesDat, m_ItemSeriesIdList );
    return m_ItemSeriesIdList;
 }
-const std::set< uint32_t >& getItemSpecialBonusIdList()
+const std::set< uint32_t >& ExdDataGenerated::getItemSpecialBonusIdList()
 {
    if( m_ItemSpecialBonusIdList.size() == 0 )
       loadIdList( m_ItemSpecialBonusDat, m_ItemSpecialBonusIdList );
    return m_ItemSpecialBonusIdList;
 }
-const std::set< uint32_t >& getItemUICategoryIdList()
+const std::set< uint32_t >& ExdDataGenerated::getItemUICategoryIdList()
 {
    if( m_ItemUICategoryIdList.size() == 0 )
       loadIdList( m_ItemUICategoryDat, m_ItemUICategoryIdList );
    return m_ItemUICategoryIdList;
 }
-const std::set< uint32_t >& getJournalCategoryIdList()
+const std::set< uint32_t >& ExdDataGenerated::getJournalCategoryIdList()
 {
    if( m_JournalCategoryIdList.size() == 0 )
       loadIdList( m_JournalCategoryDat, m_JournalCategoryIdList );
    return m_JournalCategoryIdList;
 }
-const std::set< uint32_t >& getJournalGenreIdList()
+const std::set< uint32_t >& ExdDataGenerated::getJournalGenreIdList()
 {
    if( m_JournalGenreIdList.size() == 0 )
       loadIdList( m_JournalGenreDat, m_JournalGenreIdList );
    return m_JournalGenreIdList;
 }
-const std::set< uint32_t >& getJournalSectionIdList()
+const std::set< uint32_t >& ExdDataGenerated::getJournalSectionIdList()
 {
    if( m_JournalSectionIdList.size() == 0 )
       loadIdList( m_JournalSectionDat, m_JournalSectionIdList );
    return m_JournalSectionIdList;
 }
-const std::set< uint32_t >& getLeveIdList()
+const std::set< uint32_t >& ExdDataGenerated::getLeveIdList()
 {
    if( m_LeveIdList.size() == 0 )
       loadIdList( m_LeveDat, m_LeveIdList );
    return m_LeveIdList;
 }
-const std::set< uint32_t >& getLeveAssignmentTypeIdList()
+const std::set< uint32_t >& ExdDataGenerated::getLeveAssignmentTypeIdList()
 {
    if( m_LeveAssignmentTypeIdList.size() == 0 )
       loadIdList( m_LeveAssignmentTypeDat, m_LeveAssignmentTypeIdList );
    return m_LeveAssignmentTypeIdList;
 }
-const std::set< uint32_t >& getLeveClientIdList()
+const std::set< uint32_t >& ExdDataGenerated::getLeveClientIdList()
 {
    if( m_LeveClientIdList.size() == 0 )
       loadIdList( m_LeveClientDat, m_LeveClientIdList );
    return m_LeveClientIdList;
 }
-const std::set< uint32_t >& getLevelIdList()
+const std::set< uint32_t >& ExdDataGenerated::getLevelIdList()
 {
    if( m_LevelIdList.size() == 0 )
       loadIdList( m_LevelDat, m_LevelIdList );
    return m_LevelIdList;
 }
-const std::set< uint32_t >& getLeveRewardItemIdList()
+const std::set< uint32_t >& ExdDataGenerated::getLeveRewardItemIdList()
 {
    if( m_LeveRewardItemIdList.size() == 0 )
       loadIdList( m_LeveRewardItemDat, m_LeveRewardItemIdList );
    return m_LeveRewardItemIdList;
 }
-const std::set< uint32_t >& getLeveRewardItemGroupIdList()
+const std::set< uint32_t >& ExdDataGenerated::getLeveRewardItemGroupIdList()
 {
    if( m_LeveRewardItemGroupIdList.size() == 0 )
       loadIdList( m_LeveRewardItemGroupDat, m_LeveRewardItemGroupIdList );
    return m_LeveRewardItemGroupIdList;
 }
-const std::set< uint32_t >& getLeveVfxIdList()
+const std::set< uint32_t >& ExdDataGenerated::getLeveVfxIdList()
 {
    if( m_LeveVfxIdList.size() == 0 )
       loadIdList( m_LeveVfxDat, m_LeveVfxIdList );
    return m_LeveVfxIdList;
 }
-const std::set< uint32_t >& getLogFilterIdList()
+const std::set< uint32_t >& ExdDataGenerated::getLogFilterIdList()
 {
    if( m_LogFilterIdList.size() == 0 )
       loadIdList( m_LogFilterDat, m_LogFilterIdList );
    return m_LogFilterIdList;
 }
-const std::set< uint32_t >& getLogKindIdList()
+const std::set< uint32_t >& ExdDataGenerated::getLogKindIdList()
 {
    if( m_LogKindIdList.size() == 0 )
       loadIdList( m_LogKindDat, m_LogKindIdList );
    return m_LogKindIdList;
 }
-const std::set< uint32_t >& getLogKindCategoryTextIdList()
+const std::set< uint32_t >& ExdDataGenerated::getLogKindCategoryTextIdList()
 {
    if( m_LogKindCategoryTextIdList.size() == 0 )
       loadIdList( m_LogKindCategoryTextDat, m_LogKindCategoryTextIdList );
    return m_LogKindCategoryTextIdList;
 }
-const std::set< uint32_t >& getLogMessageIdList()
+const std::set< uint32_t >& ExdDataGenerated::getLogMessageIdList()
 {
    if( m_LogMessageIdList.size() == 0 )
       loadIdList( m_LogMessageDat, m_LogMessageIdList );
    return m_LogMessageIdList;
 }
-const std::set< uint32_t >& getMacroIconIdList()
+const std::set< uint32_t >& ExdDataGenerated::getMacroIconIdList()
 {
    if( m_MacroIconIdList.size() == 0 )
       loadIdList( m_MacroIconDat, m_MacroIconIdList );
    return m_MacroIconIdList;
 }
-const std::set< uint32_t >& getMacroIconRedirectOldIdList()
+const std::set< uint32_t >& ExdDataGenerated::getMacroIconRedirectOldIdList()
 {
    if( m_MacroIconRedirectOldIdList.size() == 0 )
       loadIdList( m_MacroIconRedirectOldDat, m_MacroIconRedirectOldIdList );
    return m_MacroIconRedirectOldIdList;
 }
-const std::set< uint32_t >& getMainCommandIdList()
+const std::set< uint32_t >& ExdDataGenerated::getMainCommandIdList()
 {
    if( m_MainCommandIdList.size() == 0 )
       loadIdList( m_MainCommandDat, m_MainCommandIdList );
    return m_MainCommandIdList;
 }
-const std::set< uint32_t >& getMainCommandCategoryIdList()
+const std::set< uint32_t >& ExdDataGenerated::getMainCommandCategoryIdList()
 {
    if( m_MainCommandCategoryIdList.size() == 0 )
       loadIdList( m_MainCommandCategoryDat, m_MainCommandCategoryIdList );
    return m_MainCommandCategoryIdList;
 }
-const std::set< uint32_t >& getMapIdList()
+const std::set< uint32_t >& ExdDataGenerated::getMapIdList()
 {
    if( m_MapIdList.size() == 0 )
       loadIdList( m_MapDat, m_MapIdList );
    return m_MapIdList;
 }
-const std::set< uint32_t >& getMapMarkerIdList()
+const std::set< uint32_t >& ExdDataGenerated::getMapMarkerIdList()
 {
    if( m_MapMarkerIdList.size() == 0 )
       loadIdList( m_MapMarkerDat, m_MapMarkerIdList );
    return m_MapMarkerIdList;
 }
-const std::set< uint32_t >& getMapSymbolIdList()
+const std::set< uint32_t >& ExdDataGenerated::getMapSymbolIdList()
 {
    if( m_MapSymbolIdList.size() == 0 )
       loadIdList( m_MapSymbolDat, m_MapSymbolIdList );
    return m_MapSymbolIdList;
 }
-const std::set< uint32_t >& getMasterpieceSupplyDutyIdList()
+const std::set< uint32_t >& ExdDataGenerated::getMasterpieceSupplyDutyIdList()
 {
    if( m_MasterpieceSupplyDutyIdList.size() == 0 )
       loadIdList( m_MasterpieceSupplyDutyDat, m_MasterpieceSupplyDutyIdList );
    return m_MasterpieceSupplyDutyIdList;
 }
-const std::set< uint32_t >& getMasterpieceSupplyMultiplierIdList()
+const std::set< uint32_t >& ExdDataGenerated::getMasterpieceSupplyMultiplierIdList()
 {
    if( m_MasterpieceSupplyMultiplierIdList.size() == 0 )
       loadIdList( m_MasterpieceSupplyMultiplierDat, m_MasterpieceSupplyMultiplierIdList );
    return m_MasterpieceSupplyMultiplierIdList;
 }
-const std::set< uint32_t >& getMateriaIdList()
+const std::set< uint32_t >& ExdDataGenerated::getMateriaIdList()
 {
    if( m_MateriaIdList.size() == 0 )
       loadIdList( m_MateriaDat, m_MateriaIdList );
    return m_MateriaIdList;
 }
-const std::set< uint32_t >& getMinionRaceIdList()
+const std::set< uint32_t >& ExdDataGenerated::getMinionRaceIdList()
 {
    if( m_MinionRaceIdList.size() == 0 )
       loadIdList( m_MinionRaceDat, m_MinionRaceIdList );
    return m_MinionRaceIdList;
 }
-const std::set< uint32_t >& getMinionRulesIdList()
+const std::set< uint32_t >& ExdDataGenerated::getMinionRulesIdList()
 {
    if( m_MinionRulesIdList.size() == 0 )
       loadIdList( m_MinionRulesDat, m_MinionRulesIdList );
    return m_MinionRulesIdList;
 }
-const std::set< uint32_t >& getMinionSkillTypeIdList()
+const std::set< uint32_t >& ExdDataGenerated::getMinionSkillTypeIdList()
 {
    if( m_MinionSkillTypeIdList.size() == 0 )
       loadIdList( m_MinionSkillTypeDat, m_MinionSkillTypeIdList );
    return m_MinionSkillTypeIdList;
 }
-const std::set< uint32_t >& getMobHuntTargetIdList()
+const std::set< uint32_t >& ExdDataGenerated::getMobHuntTargetIdList()
 {
    if( m_MobHuntTargetIdList.size() == 0 )
       loadIdList( m_MobHuntTargetDat, m_MobHuntTargetIdList );
    return m_MobHuntTargetIdList;
 }
-const std::set< uint32_t >& getModelCharaIdList()
+const std::set< uint32_t >& ExdDataGenerated::getModelCharaIdList()
 {
    if( m_ModelCharaIdList.size() == 0 )
       loadIdList( m_ModelCharaDat, m_ModelCharaIdList );
    return m_ModelCharaIdList;
 }
-const std::set< uint32_t >& getMonsterNoteIdList()
+const std::set< uint32_t >& ExdDataGenerated::getMonsterNoteIdList()
 {
    if( m_MonsterNoteIdList.size() == 0 )
       loadIdList( m_MonsterNoteDat, m_MonsterNoteIdList );
    return m_MonsterNoteIdList;
 }
-const std::set< uint32_t >& getMonsterNoteTargetIdList()
+const std::set< uint32_t >& ExdDataGenerated::getMonsterNoteTargetIdList()
 {
    if( m_MonsterNoteTargetIdList.size() == 0 )
       loadIdList( m_MonsterNoteTargetDat, m_MonsterNoteTargetIdList );
    return m_MonsterNoteTargetIdList;
 }
-const std::set< uint32_t >& getMountIdList()
+const std::set< uint32_t >& ExdDataGenerated::getMountIdList()
 {
    if( m_MountIdList.size() == 0 )
       loadIdList( m_MountDat, m_MountIdList );
    return m_MountIdList;
 }
-const std::set< uint32_t >& getMountActionIdList()
+const std::set< uint32_t >& ExdDataGenerated::getMountActionIdList()
 {
    if( m_MountActionIdList.size() == 0 )
       loadIdList( m_MountActionDat, m_MountActionIdList );
    return m_MountActionIdList;
 }
-const std::set< uint32_t >& getNpcEquipIdList()
+const std::set< uint32_t >& ExdDataGenerated::getNpcEquipIdList()
 {
    if( m_NpcEquipIdList.size() == 0 )
       loadIdList( m_NpcEquipDat, m_NpcEquipIdList );
    return m_NpcEquipIdList;
 }
-const std::set< uint32_t >& getOmenIdList()
+const std::set< uint32_t >& ExdDataGenerated::getOmenIdList()
 {
    if( m_OmenIdList.size() == 0 )
       loadIdList( m_OmenDat, m_OmenIdList );
    return m_OmenIdList;
 }
-const std::set< uint32_t >& getOnlineStatusIdList()
+const std::set< uint32_t >& ExdDataGenerated::getOnlineStatusIdList()
 {
    if( m_OnlineStatusIdList.size() == 0 )
       loadIdList( m_OnlineStatusDat, m_OnlineStatusIdList );
    return m_OnlineStatusIdList;
 }
-const std::set< uint32_t >& getOrchestrionIdList()
+const std::set< uint32_t >& ExdDataGenerated::getOrchestrionIdList()
 {
    if( m_OrchestrionIdList.size() == 0 )
       loadIdList( m_OrchestrionDat, m_OrchestrionIdList );
    return m_OrchestrionIdList;
 }
-const std::set< uint32_t >& getOrchestrionPathIdList()
+const std::set< uint32_t >& ExdDataGenerated::getOrchestrionPathIdList()
 {
    if( m_OrchestrionPathIdList.size() == 0 )
       loadIdList( m_OrchestrionPathDat, m_OrchestrionPathIdList );
    return m_OrchestrionPathIdList;
 }
-const std::set< uint32_t >& getParamGrowIdList()
+const std::set< uint32_t >& ExdDataGenerated::getParamGrowIdList()
 {
    if( m_ParamGrowIdList.size() == 0 )
       loadIdList( m_ParamGrowDat, m_ParamGrowIdList );
    return m_ParamGrowIdList;
 }
-const std::set< uint32_t >& getPetIdList()
+const std::set< uint32_t >& ExdDataGenerated::getPetIdList()
 {
    if( m_PetIdList.size() == 0 )
       loadIdList( m_PetDat, m_PetIdList );
    return m_PetIdList;
 }
-const std::set< uint32_t >& getPetActionIdList()
+const std::set< uint32_t >& ExdDataGenerated::getPetActionIdList()
 {
    if( m_PetActionIdList.size() == 0 )
       loadIdList( m_PetActionDat, m_PetActionIdList );
    return m_PetActionIdList;
 }
-const std::set< uint32_t >& getPictureIdList()
+const std::set< uint32_t >& ExdDataGenerated::getPictureIdList()
 {
    if( m_PictureIdList.size() == 0 )
       loadIdList( m_PictureDat, m_PictureIdList );
    return m_PictureIdList;
 }
-const std::set< uint32_t >& getPlaceNameIdList()
+const std::set< uint32_t >& ExdDataGenerated::getPlaceNameIdList()
 {
    if( m_PlaceNameIdList.size() == 0 )
       loadIdList( m_PlaceNameDat, m_PlaceNameIdList );
    return m_PlaceNameIdList;
 }
-const std::set< uint32_t >& getQuestIdList()
+const std::set< uint32_t >& ExdDataGenerated::getQuestIdList()
 {
    if( m_QuestIdList.size() == 0 )
       loadIdList( m_QuestDat, m_QuestIdList );
    return m_QuestIdList;
 }
-const std::set< uint32_t >& getQuestRewardOtherIdList()
+const std::set< uint32_t >& ExdDataGenerated::getQuestRewardOtherIdList()
 {
    if( m_QuestRewardOtherIdList.size() == 0 )
       loadIdList( m_QuestRewardOtherDat, m_QuestRewardOtherIdList );
    return m_QuestRewardOtherIdList;
 }
-const std::set< uint32_t >& getRaceIdList()
+const std::set< uint32_t >& ExdDataGenerated::getRaceIdList()
 {
    if( m_RaceIdList.size() == 0 )
       loadIdList( m_RaceDat, m_RaceIdList );
    return m_RaceIdList;
 }
-const std::set< uint32_t >& getRacingChocoboItemIdList()
+const std::set< uint32_t >& ExdDataGenerated::getRacingChocoboItemIdList()
 {
    if( m_RacingChocoboItemIdList.size() == 0 )
       loadIdList( m_RacingChocoboItemDat, m_RacingChocoboItemIdList );
    return m_RacingChocoboItemIdList;
 }
-const std::set< uint32_t >& getRacingChocoboNameIdList()
+const std::set< uint32_t >& ExdDataGenerated::getRacingChocoboNameIdList()
 {
    if( m_RacingChocoboNameIdList.size() == 0 )
       loadIdList( m_RacingChocoboNameDat, m_RacingChocoboNameIdList );
    return m_RacingChocoboNameIdList;
 }
-const std::set< uint32_t >& getRacingChocoboNameCategoryIdList()
+const std::set< uint32_t >& ExdDataGenerated::getRacingChocoboNameCategoryIdList()
 {
    if( m_RacingChocoboNameCategoryIdList.size() == 0 )
       loadIdList( m_RacingChocoboNameCategoryDat, m_RacingChocoboNameCategoryIdList );
    return m_RacingChocoboNameCategoryIdList;
 }
-const std::set< uint32_t >& getRacingChocoboNameInfoIdList()
+const std::set< uint32_t >& ExdDataGenerated::getRacingChocoboNameInfoIdList()
 {
    if( m_RacingChocoboNameInfoIdList.size() == 0 )
       loadIdList( m_RacingChocoboNameInfoDat, m_RacingChocoboNameInfoIdList );
    return m_RacingChocoboNameInfoIdList;
 }
-const std::set< uint32_t >& getRacingChocoboParamIdList()
+const std::set< uint32_t >& ExdDataGenerated::getRacingChocoboParamIdList()
 {
    if( m_RacingChocoboParamIdList.size() == 0 )
       loadIdList( m_RacingChocoboParamDat, m_RacingChocoboParamIdList );
    return m_RacingChocoboParamIdList;
 }
-const std::set< uint32_t >& getRecipeIdList()
+const std::set< uint32_t >& ExdDataGenerated::getRecipeIdList()
 {
    if( m_RecipeIdList.size() == 0 )
       loadIdList( m_RecipeDat, m_RecipeIdList );
    return m_RecipeIdList;
 }
-const std::set< uint32_t >& getRecipeElementIdList()
+const std::set< uint32_t >& ExdDataGenerated::getRecipeElementIdList()
 {
    if( m_RecipeElementIdList.size() == 0 )
       loadIdList( m_RecipeElementDat, m_RecipeElementIdList );
    return m_RecipeElementIdList;
 }
-const std::set< uint32_t >& getRecipeLevelTableIdList()
+const std::set< uint32_t >& ExdDataGenerated::getRecipeLevelTableIdList()
 {
    if( m_RecipeLevelTableIdList.size() == 0 )
       loadIdList( m_RecipeLevelTableDat, m_RecipeLevelTableIdList );
    return m_RecipeLevelTableIdList;
 }
-const std::set< uint32_t >& getRecipeNotebookListIdList()
+const std::set< uint32_t >& ExdDataGenerated::getRecipeNotebookListIdList()
 {
    if( m_RecipeNotebookListIdList.size() == 0 )
       loadIdList( m_RecipeNotebookListDat, m_RecipeNotebookListIdList );
    return m_RecipeNotebookListIdList;
 }
-const std::set< uint32_t >& getRelicIdList()
+const std::set< uint32_t >& ExdDataGenerated::getRelicIdList()
 {
    if( m_RelicIdList.size() == 0 )
       loadIdList( m_RelicDat, m_RelicIdList );
    return m_RelicIdList;
 }
-const std::set< uint32_t >& getRelic3IdList()
+const std::set< uint32_t >& ExdDataGenerated::getRelic3IdList()
 {
    if( m_Relic3IdList.size() == 0 )
       loadIdList( m_Relic3Dat, m_Relic3IdList );
    return m_Relic3IdList;
 }
-const std::set< uint32_t >& getRelicItemIdList()
+const std::set< uint32_t >& ExdDataGenerated::getRelicItemIdList()
 {
    if( m_RelicItemIdList.size() == 0 )
       loadIdList( m_RelicItemDat, m_RelicItemIdList );
    return m_RelicItemIdList;
 }
-const std::set< uint32_t >& getRelicNoteIdList()
+const std::set< uint32_t >& ExdDataGenerated::getRelicNoteIdList()
 {
    if( m_RelicNoteIdList.size() == 0 )
       loadIdList( m_RelicNoteDat, m_RelicNoteIdList );
    return m_RelicNoteIdList;
 }
-const std::set< uint32_t >& getRelicNoteCategoryIdList()
+const std::set< uint32_t >& ExdDataGenerated::getRelicNoteCategoryIdList()
 {
    if( m_RelicNoteCategoryIdList.size() == 0 )
       loadIdList( m_RelicNoteCategoryDat, m_RelicNoteCategoryIdList );
    return m_RelicNoteCategoryIdList;
 }
-const std::set< uint32_t >& getRetainerTaskIdList()
+const std::set< uint32_t >& ExdDataGenerated::getRetainerTaskIdList()
 {
    if( m_RetainerTaskIdList.size() == 0 )
       loadIdList( m_RetainerTaskDat, m_RetainerTaskIdList );
    return m_RetainerTaskIdList;
 }
-const std::set< uint32_t >& getRetainerTaskNormalIdList()
+const std::set< uint32_t >& ExdDataGenerated::getRetainerTaskNormalIdList()
 {
    if( m_RetainerTaskNormalIdList.size() == 0 )
       loadIdList( m_RetainerTaskNormalDat, m_RetainerTaskNormalIdList );
    return m_RetainerTaskNormalIdList;
 }
-const std::set< uint32_t >& getRetainerTaskParameterIdList()
+const std::set< uint32_t >& ExdDataGenerated::getRetainerTaskParameterIdList()
 {
    if( m_RetainerTaskParameterIdList.size() == 0 )
       loadIdList( m_RetainerTaskParameterDat, m_RetainerTaskParameterIdList );
    return m_RetainerTaskParameterIdList;
 }
-const std::set< uint32_t >& getRetainerTaskRandomIdList()
+const std::set< uint32_t >& ExdDataGenerated::getRetainerTaskRandomIdList()
 {
    if( m_RetainerTaskRandomIdList.size() == 0 )
       loadIdList( m_RetainerTaskRandomDat, m_RetainerTaskRandomIdList );
    return m_RetainerTaskRandomIdList;
 }
-const std::set< uint32_t >& getSalvageIdList()
+const std::set< uint32_t >& ExdDataGenerated::getSalvageIdList()
 {
    if( m_SalvageIdList.size() == 0 )
       loadIdList( m_SalvageDat, m_SalvageIdList );
    return m_SalvageIdList;
 }
-const std::set< uint32_t >& getSatisfactionNpcIdList()
+const std::set< uint32_t >& ExdDataGenerated::getSatisfactionNpcIdList()
 {
    if( m_SatisfactionNpcIdList.size() == 0 )
       loadIdList( m_SatisfactionNpcDat, m_SatisfactionNpcIdList );
    return m_SatisfactionNpcIdList;
 }
-const std::set< uint32_t >& getSatisfactionSupplyIdList()
+const std::set< uint32_t >& ExdDataGenerated::getSatisfactionSupplyIdList()
 {
    if( m_SatisfactionSupplyIdList.size() == 0 )
       loadIdList( m_SatisfactionSupplyDat, m_SatisfactionSupplyIdList );
    return m_SatisfactionSupplyIdList;
 }
-const std::set< uint32_t >& getSatisfactionSupplyRewardIdList()
+const std::set< uint32_t >& ExdDataGenerated::getSatisfactionSupplyRewardIdList()
 {
    if( m_SatisfactionSupplyRewardIdList.size() == 0 )
       loadIdList( m_SatisfactionSupplyRewardDat, m_SatisfactionSupplyRewardIdList );
    return m_SatisfactionSupplyRewardIdList;
 }
-const std::set< uint32_t >& getScreenImageIdList()
+const std::set< uint32_t >& ExdDataGenerated::getScreenImageIdList()
 {
    if( m_ScreenImageIdList.size() == 0 )
       loadIdList( m_ScreenImageDat, m_ScreenImageIdList );
    return m_ScreenImageIdList;
 }
-const std::set< uint32_t >& getSecretRecipeBookIdList()
+const std::set< uint32_t >& ExdDataGenerated::getSecretRecipeBookIdList()
 {
    if( m_SecretRecipeBookIdList.size() == 0 )
       loadIdList( m_SecretRecipeBookDat, m_SecretRecipeBookIdList );
    return m_SecretRecipeBookIdList;
 }
-const std::set< uint32_t >& getSpearfishingItemIdList()
+const std::set< uint32_t >& ExdDataGenerated::getSpearfishingItemIdList()
 {
    if( m_SpearfishingItemIdList.size() == 0 )
       loadIdList( m_SpearfishingItemDat, m_SpearfishingItemIdList );
    return m_SpearfishingItemIdList;
 }
-const std::set< uint32_t >& getSpearfishingNotebookIdList()
+const std::set< uint32_t >& ExdDataGenerated::getSpearfishingNotebookIdList()
 {
    if( m_SpearfishingNotebookIdList.size() == 0 )
       loadIdList( m_SpearfishingNotebookDat, m_SpearfishingNotebookIdList );
    return m_SpearfishingNotebookIdList;
 }
-const std::set< uint32_t >& getSpecialShopIdList()
+const std::set< uint32_t >& ExdDataGenerated::getSpecialShopIdList()
 {
    if( m_SpecialShopIdList.size() == 0 )
       loadIdList( m_SpecialShopDat, m_SpecialShopIdList );
    return m_SpecialShopIdList;
 }
-const std::set< uint32_t >& getSpecialShopItemCategoryIdList()
+const std::set< uint32_t >& ExdDataGenerated::getSpecialShopItemCategoryIdList()
 {
    if( m_SpecialShopItemCategoryIdList.size() == 0 )
       loadIdList( m_SpecialShopItemCategoryDat, m_SpecialShopItemCategoryIdList );
    return m_SpecialShopItemCategoryIdList;
 }
-const std::set< uint32_t >& getStainIdList()
+const std::set< uint32_t >& ExdDataGenerated::getStainIdList()
 {
    if( m_StainIdList.size() == 0 )
       loadIdList( m_StainDat, m_StainIdList );
    return m_StainIdList;
 }
-const std::set< uint32_t >& getStatusIdList()
+const std::set< uint32_t >& ExdDataGenerated::getStatusIdList()
 {
    if( m_StatusIdList.size() == 0 )
       loadIdList( m_StatusDat, m_StatusIdList );
    return m_StatusIdList;
 }
-const std::set< uint32_t >& getStoryIdList()
+const std::set< uint32_t >& ExdDataGenerated::getStoryIdList()
 {
    if( m_StoryIdList.size() == 0 )
       loadIdList( m_StoryDat, m_StoryIdList );
    return m_StoryIdList;
 }
-const std::set< uint32_t >& getSwitchTalkIdList()
+const std::set< uint32_t >& ExdDataGenerated::getSwitchTalkIdList()
 {
    if( m_SwitchTalkIdList.size() == 0 )
       loadIdList( m_SwitchTalkDat, m_SwitchTalkIdList );
    return m_SwitchTalkIdList;
 }
-const std::set< uint32_t >& getTerritoryTypeIdList()
+const std::set< uint32_t >& ExdDataGenerated::getTerritoryTypeIdList()
 {
    if( m_TerritoryTypeIdList.size() == 0 )
       loadIdList( m_TerritoryTypeDat, m_TerritoryTypeIdList );
    return m_TerritoryTypeIdList;
 }
-const std::set< uint32_t >& getTextCommandIdList()
+const std::set< uint32_t >& ExdDataGenerated::getTextCommandIdList()
 {
    if( m_TextCommandIdList.size() == 0 )
       loadIdList( m_TextCommandDat, m_TextCommandIdList );
    return m_TextCommandIdList;
 }
-const std::set< uint32_t >& getTitleIdList()
+const std::set< uint32_t >& ExdDataGenerated::getTitleIdList()
 {
    if( m_TitleIdList.size() == 0 )
       loadIdList( m_TitleDat, m_TitleIdList );
    return m_TitleIdList;
 }
-const std::set< uint32_t >& getTomestonesIdList()
+const std::set< uint32_t >& ExdDataGenerated::getTomestonesIdList()
 {
    if( m_TomestonesIdList.size() == 0 )
       loadIdList( m_TomestonesDat, m_TomestonesIdList );
    return m_TomestonesIdList;
 }
-const std::set< uint32_t >& getTomestonesItemIdList()
+const std::set< uint32_t >& ExdDataGenerated::getTomestonesItemIdList()
 {
    if( m_TomestonesItemIdList.size() == 0 )
       loadIdList( m_TomestonesItemDat, m_TomestonesItemIdList );
    return m_TomestonesItemIdList;
 }
-const std::set< uint32_t >& getTopicSelectIdList()
+const std::set< uint32_t >& ExdDataGenerated::getTopicSelectIdList()
 {
    if( m_TopicSelectIdList.size() == 0 )
       loadIdList( m_TopicSelectDat, m_TopicSelectIdList );
    return m_TopicSelectIdList;
 }
-const std::set< uint32_t >& getTownIdList()
+const std::set< uint32_t >& ExdDataGenerated::getTownIdList()
 {
    if( m_TownIdList.size() == 0 )
       loadIdList( m_TownDat, m_TownIdList );
    return m_TownIdList;
 }
-const std::set< uint32_t >& getTraitIdList()
+const std::set< uint32_t >& ExdDataGenerated::getTraitIdList()
 {
    if( m_TraitIdList.size() == 0 )
       loadIdList( m_TraitDat, m_TraitIdList );
    return m_TraitIdList;
 }
-const std::set< uint32_t >& getTraitRecastIdList()
+const std::set< uint32_t >& ExdDataGenerated::getTraitRecastIdList()
 {
    if( m_TraitRecastIdList.size() == 0 )
       loadIdList( m_TraitRecastDat, m_TraitRecastIdList );
    return m_TraitRecastIdList;
 }
-const std::set< uint32_t >& getTraitTransientIdList()
+const std::set< uint32_t >& ExdDataGenerated::getTraitTransientIdList()
 {
    if( m_TraitTransientIdList.size() == 0 )
       loadIdList( m_TraitTransientDat, m_TraitTransientIdList );
    return m_TraitTransientIdList;
 }
-const std::set< uint32_t >& getTribeIdList()
+const std::set< uint32_t >& ExdDataGenerated::getTribeIdList()
 {
    if( m_TribeIdList.size() == 0 )
       loadIdList( m_TribeDat, m_TribeIdList );
    return m_TribeIdList;
 }
-const std::set< uint32_t >& getTripleTriadIdList()
+const std::set< uint32_t >& ExdDataGenerated::getTripleTriadIdList()
 {
    if( m_TripleTriadIdList.size() == 0 )
       loadIdList( m_TripleTriadDat, m_TripleTriadIdList );
    return m_TripleTriadIdList;
 }
-const std::set< uint32_t >& getTripleTriadCardIdList()
+const std::set< uint32_t >& ExdDataGenerated::getTripleTriadCardIdList()
 {
    if( m_TripleTriadCardIdList.size() == 0 )
       loadIdList( m_TripleTriadCardDat, m_TripleTriadCardIdList );
    return m_TripleTriadCardIdList;
 }
-const std::set< uint32_t >& getTripleTriadCardRarityIdList()
+const std::set< uint32_t >& ExdDataGenerated::getTripleTriadCardRarityIdList()
 {
    if( m_TripleTriadCardRarityIdList.size() == 0 )
       loadIdList( m_TripleTriadCardRarityDat, m_TripleTriadCardRarityIdList );
    return m_TripleTriadCardRarityIdList;
 }
-const std::set< uint32_t >& getTripleTriadCardResidentIdList()
+const std::set< uint32_t >& ExdDataGenerated::getTripleTriadCardResidentIdList()
 {
    if( m_TripleTriadCardResidentIdList.size() == 0 )
       loadIdList( m_TripleTriadCardResidentDat, m_TripleTriadCardResidentIdList );
    return m_TripleTriadCardResidentIdList;
 }
-const std::set< uint32_t >& getTripleTriadCardTypeIdList()
+const std::set< uint32_t >& ExdDataGenerated::getTripleTriadCardTypeIdList()
 {
    if( m_TripleTriadCardTypeIdList.size() == 0 )
       loadIdList( m_TripleTriadCardTypeDat, m_TripleTriadCardTypeIdList );
    return m_TripleTriadCardTypeIdList;
 }
-const std::set< uint32_t >& getTripleTriadCompetitionIdList()
+const std::set< uint32_t >& ExdDataGenerated::getTripleTriadCompetitionIdList()
 {
    if( m_TripleTriadCompetitionIdList.size() == 0 )
       loadIdList( m_TripleTriadCompetitionDat, m_TripleTriadCompetitionIdList );
    return m_TripleTriadCompetitionIdList;
 }
-const std::set< uint32_t >& getTripleTriadRuleIdList()
+const std::set< uint32_t >& ExdDataGenerated::getTripleTriadRuleIdList()
 {
    if( m_TripleTriadRuleIdList.size() == 0 )
       loadIdList( m_TripleTriadRuleDat, m_TripleTriadRuleIdList );
    return m_TripleTriadRuleIdList;
 }
-const std::set< uint32_t >& getTutorialIdList()
+const std::set< uint32_t >& ExdDataGenerated::getTutorialIdList()
 {
    if( m_TutorialIdList.size() == 0 )
       loadIdList( m_TutorialDat, m_TutorialIdList );
    return m_TutorialIdList;
 }
-const std::set< uint32_t >& getTutorialDPSIdList()
+const std::set< uint32_t >& ExdDataGenerated::getTutorialDPSIdList()
 {
    if( m_TutorialDPSIdList.size() == 0 )
       loadIdList( m_TutorialDPSDat, m_TutorialDPSIdList );
    return m_TutorialDPSIdList;
 }
-const std::set< uint32_t >& getTutorialHealerIdList()
+const std::set< uint32_t >& ExdDataGenerated::getTutorialHealerIdList()
 {
    if( m_TutorialHealerIdList.size() == 0 )
       loadIdList( m_TutorialHealerDat, m_TutorialHealerIdList );
    return m_TutorialHealerIdList;
 }
-const std::set< uint32_t >& getTutorialTankIdList()
+const std::set< uint32_t >& ExdDataGenerated::getTutorialTankIdList()
 {
    if( m_TutorialTankIdList.size() == 0 )
       loadIdList( m_TutorialTankDat, m_TutorialTankIdList );
    return m_TutorialTankIdList;
 }
-const std::set< uint32_t >& getWarpIdList()
+const std::set< uint32_t >& ExdDataGenerated::getWarpIdList()
 {
    if( m_WarpIdList.size() == 0 )
       loadIdList( m_WarpDat, m_WarpIdList );
    return m_WarpIdList;
 }
-const std::set< uint32_t >& getWeatherIdList()
+const std::set< uint32_t >& ExdDataGenerated::getWeatherIdList()
 {
    if( m_WeatherIdList.size() == 0 )
       loadIdList( m_WeatherDat, m_WeatherIdList );
    return m_WeatherIdList;
 }
-const std::set< uint32_t >& getWeatherGroupIdList()
+const std::set< uint32_t >& ExdDataGenerated::getWeatherGroupIdList()
 {
    if( m_WeatherGroupIdList.size() == 0 )
       loadIdList( m_WeatherGroupDat, m_WeatherGroupIdList );
    return m_WeatherGroupIdList;
 }
-const std::set< uint32_t >& getWeatherRateIdList()
+const std::set< uint32_t >& ExdDataGenerated::getWeatherRateIdList()
 {
    if( m_WeatherRateIdList.size() == 0 )
       loadIdList( m_WeatherRateDat, m_WeatherRateIdList );
    return m_WeatherRateIdList;
 }
-const std::set< uint32_t >& getWeeklyBingoOrderDataIdList()
+const std::set< uint32_t >& ExdDataGenerated::getWeeklyBingoOrderDataIdList()
 {
    if( m_WeeklyBingoOrderDataIdList.size() == 0 )
       loadIdList( m_WeeklyBingoOrderDataDat, m_WeeklyBingoOrderDataIdList );
    return m_WeeklyBingoOrderDataIdList;
 }
-const std::set< uint32_t >& getWeeklyBingoRewardDataIdList()
+const std::set< uint32_t >& ExdDataGenerated::getWeeklyBingoRewardDataIdList()
 {
    if( m_WeeklyBingoRewardDataIdList.size() == 0 )
       loadIdList( m_WeeklyBingoRewardDataDat, m_WeeklyBingoRewardDataIdList );
    return m_WeeklyBingoRewardDataIdList;
 }
-const std::set< uint32_t >& getWeeklyBingoTextIdList()
+const std::set< uint32_t >& ExdDataGenerated::getWeeklyBingoTextIdList()
 {
    if( m_WeeklyBingoTextIdList.size() == 0 )
       loadIdList( m_WeeklyBingoTextDat, m_WeeklyBingoTextIdList );
    return m_WeeklyBingoTextIdList;
 }
-const std::set< uint32_t >& getWorldDCGroupTypeIdList()
+const std::set< uint32_t >& ExdDataGenerated::getWorldDCGroupTypeIdList()
 {
    if( m_WorldDCGroupTypeIdList.size() == 0 )
       loadIdList( m_WorldDCGroupTypeDat, m_WorldDCGroupTypeIdList );

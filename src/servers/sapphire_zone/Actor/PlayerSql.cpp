@@ -16,7 +16,7 @@
 
 #include "Player.h"
 
-#include "Zone/ZoneMgr.h"
+#include "Zone/TerritoryMgr.h"
 #include "Zone/Zone.h"
 
 #include "ServerZone.h"
@@ -30,7 +30,7 @@
 
 extern Core::Logger g_log;
 extern Core::ServerZone g_serverZone;
-extern Core::ZoneMgr g_zoneMgr;
+extern Core::TerritoryMgr g_territoryMgr;
 extern Core::Data::ExdData g_exdData;
 
 
@@ -58,7 +58,7 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
 
    auto zoneId = res->getUInt( "TerritoryId" );
 
-   ZonePtr pCurrZone = g_zoneMgr.getZone( zoneId );
+   ZonePtr pCurrZone = g_territoryMgr.getZoneByTerriId( zoneId );
    m_zoneId = zoneId;
 
    // TODO: logic for instances needs to be added here
@@ -70,7 +70,7 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
 
       // default to new gridania
       // TODO: should probably just abort and mark character as corrupt
-      pCurrZone = g_zoneMgr.getZone( 132 );
+      pCurrZone = g_territoryMgr.getZoneByTerriId( 132 );
 
       m_pos.x = 0.0f;
       m_pos.y = 0.0f;

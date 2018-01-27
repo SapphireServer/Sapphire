@@ -13,7 +13,6 @@
 #include "Zone/Zone.h"
 #include "Zone/ZonePosition.h"
 #include "ServerZone.h"
-#include "Zone/ZoneMgr.h"
 
 #include "Network/PacketWrappers/InitUIPacket.h"
 #include "Network/PacketWrappers/PingPacket.h"
@@ -37,7 +36,6 @@
 
 extern Core::Logger g_log;
 extern Core::ServerZone g_serverZone;
-extern Core::ZoneMgr g_zoneMgr;
 extern Core::Data::ExdData g_exdData;
 extern Core::DebugCommandHandler g_gameCommandMgr;
 
