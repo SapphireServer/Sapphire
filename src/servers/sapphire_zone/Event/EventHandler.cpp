@@ -9,9 +9,7 @@ Core::Event::EventHandler::EventHandler( Entity::Player* pOwner, uint64_t actorI
 {
    m_entryId = static_cast< uint16_t >( eventId );
    m_type = static_cast< uint16_t >( eventId >> 16 );
-
    m_eventParam = eventParam;
-
    m_callback = nullptr;
 }
 
@@ -72,6 +70,6 @@ bool Core::Event::EventHandler::hasNestedEvent() const
 
 void Core::Event::EventHandler::removeNestedEvent()
 {
-
    m_pNestedEvent.reset();
 }
+

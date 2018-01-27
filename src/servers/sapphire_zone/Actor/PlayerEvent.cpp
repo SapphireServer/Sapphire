@@ -79,7 +79,9 @@ void Core::Entity::Player::eventStart( uint64_t actorId, uint32_t eventId,
                                        Event::EventHandler::EventType eventType, uint8_t eventParam1,
                                        uint32_t eventParam2 )
 {
+
    Event::EventHandlerPtr newEvent( new Event::EventHandler( this, actorId, eventId, eventType, eventParam2 ) );
+
    addEvent( newEvent );
 
    setStateFlag( PlayerStateFlag::Occupied2 );

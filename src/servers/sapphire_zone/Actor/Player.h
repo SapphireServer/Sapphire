@@ -604,6 +604,7 @@ private:
    InventoryPtr m_pInventory;
 
    std::map< uint32_t, Event::EventHandlerPtr > m_eventHandlerMap;
+
    std::map< uint32_t, uint8_t > m_playerIdToSpawnIdMap; // maps player to spawn id
    std::queue< uint8_t > m_freeSpawnIdQueue; // queue with spawn ids free to be assigned
    std::queue< uint8_t > m_freeHateSlotQueue; // queue with "hate slots" free to be assigned
