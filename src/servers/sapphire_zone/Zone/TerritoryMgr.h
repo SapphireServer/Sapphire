@@ -78,7 +78,7 @@ namespace Core
       /*! returns true if the territoryType in question is not a private zone */
       bool isPrivateTerritory( uint32_t territoryTypeId ) const;
 
-      /*! returns true if the territyTyoe is a default-non instanced zone */
+      /*! returns true if the territoryType is a default non-instanced zone */
       bool isDefaultTerritory( uint32_t territoryTypeId ) const;
 
       /*! creates a new instance for a given territoryTypeId */
