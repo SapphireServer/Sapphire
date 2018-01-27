@@ -113,7 +113,8 @@ namespace Packets {
       QuestCompleteList          = 0x017F, // updated 4.1
 
       QuestFinish                = 0x0180, // updated 4.1
-
+      MSQTrackerComplete         = 0x0181,
+      MSQTrackerProgress         = 0x0182,
       QuestTracker               = 0x018D, // updated 4.1
       ActorSpawn                 = 0x0190, // todo: split into playerspawn/actorspawn and use opcode 0x110/0x111
       ActorFreeSpawn             = 0x0191, // unchanged for sb
