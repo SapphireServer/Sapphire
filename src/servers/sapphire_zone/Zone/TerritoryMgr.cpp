@@ -150,6 +150,18 @@ Core::ZonePtr Core::TerritoryMgr::createTerritoryInstance( uint32_t territoryTyp
    return pZone;
 }
 
+bool Core::TerritoryMgr::removeTerritoryInstance( uint32_t territoryTypeId )
+{
+   ZonePtr instance;
+   if( ( instance = getTerritoryZonePtr( territoryTypeId ) ) == nullptr )
+      return false;
+
+   m_instanceIdToZonePtrMap.erase( instance->getGuId() );
+   m_territoryInstanceMap[instance->getTerritoryId()].erase( instance->getGuId() );
+
+   return true;
+}
+
 Core::ZonePtr Core::TerritoryMgr::getTerritoryZonePtr( uint32_t instanceId ) const
 {
    auto it = m_instanceIdToZonePtrMap.find( instanceId );

@@ -687,4 +687,14 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
       auto instance = g_territoryMgr.createTerritoryInstance( terriId );
       player.sendDebug( "Created instance with guid: " + std::to_string( instance->getGuId() ) );
    }
+   else if( subCommand == "remove" || subCommand == "rm" )
+   {
+      uint32_t terriId;
+      sscanf( params.c_str(), "%d", &terriId );
+
+      if( g_territoryMgr.removeTerritoryInstance( terriId ) )
+         player.sendDebug( "Removed instance with id: " + std::to_string( terriId ) );
+      else
+         player.sendDebug( "Failed to remove instance with id: " + std::to_string( terriId ) );
+   }
 }
