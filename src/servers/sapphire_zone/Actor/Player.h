@@ -556,6 +556,11 @@ private:
 
 private:
 
+   Common::FFXIVARR_POSITION3 m_prevPos;
+   uint32_t m_prevZoneType;
+   uint32_t m_prevZoneId;
+   float m_prevRot;
+
    uint8_t m_voice;
 
    uint64_t m_modelMainWeapon;

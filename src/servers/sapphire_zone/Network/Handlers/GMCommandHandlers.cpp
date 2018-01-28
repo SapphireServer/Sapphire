@@ -403,8 +403,11 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    }
    case GmCommand::Teri:
    {
-
-      if( !g_territoryMgr.isValidTerritory( param1 ) )
+      if( auto instance = g_territoryMgr.getTerritoryZonePtr( param1 ) )
+      {
+         player.sendDebug( "Found instance: " + instance->getName() + ", id: " + std::to_string( param1 ) );
+      }
+      else if( !g_territoryMgr.isValidTerritory( param1 )  )
       {
          player.sendUrgent( "Invalid zone " + std::to_string( param1 ) );
       }
@@ -444,7 +447,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       player.sendNotice( "Jumping to " + targetPlayer->getName() + " in range." );
       break;
    }
-  
+
    default:
       player.sendUrgent( "GM1 Command not implemented: " + std::to_string( commandId ) );
       break;
