@@ -86,6 +86,8 @@ public:
 
    void queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range, Network::Packets::GamePacketPtr pPacketEntry );
 
+   void queueOutPacket( Network::Packets::GamePacketPtr pPacketEntry );
+
    virtual uint32_t getTerritoryId();
 
    Common::RegionType getType() const;
