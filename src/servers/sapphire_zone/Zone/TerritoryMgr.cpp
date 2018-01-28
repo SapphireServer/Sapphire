@@ -144,27 +144,19 @@ Core::ZonePtr Core::TerritoryMgr::createTerritoryInstance( uint32_t territoryTyp
    ZonePtr pZone( new Zone( territoryTypeId, getNextInstanceId(), pTeri->name, pPlaceName->name, false ) );
    pZone->init();
 
+   m_territoryInstanceMap[pZone->getTerritoryId()][pZone->getGuId()] = pZone;
+   m_instanceIdToZonePtrMap[pZone->getGuId()] = pZone;
+
    return pZone;
 }
 
-bool Core::TerritoryMgr::addInstance( ZonePtr pInstance )
+Core::ZonePtr Core::TerritoryMgr::getTerritoryZonePtr( uint32_t instanceId ) const
 {
-   // todo: wtf...
-   m_territoryInstanceMap[ pInstance->getTerritoryId() ][ pInstance->getGuId() ] = pInstance;
+   auto it = m_instanceIdToZonePtrMap.find( instanceId );
+   if( it == m_instanceIdToZonePtrMap.end() )
+      return nullptr;
 
-   return true;
-}
-
-Core::ZonePtr Core::TerritoryMgr::getInstance( uint32_t instanceId ) const
-{
-   for( InstanceIdToZonePtrMap map : m_territoryInstanceMap  )
-   {
-      auto it = map.find( instanceId );
-      if( it == map.end() )
-         return nullptr;
-
-      return it->second;
-   }
+   return it->second;
 }
 
 void Core::TerritoryMgr::loadTerritoryPositionMap()

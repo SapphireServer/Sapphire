@@ -685,8 +685,6 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
       sscanf( params.c_str(), "%d", &terriId );
 
       auto instance = g_territoryMgr.createTerritoryInstance( terriId );
-      g_territoryMgr.addInstance( instance );
-
       player.sendDebug( "Created instance with guid: " + std::to_string( instance->getGuId() ) );
    }
 }
