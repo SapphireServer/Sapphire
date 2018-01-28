@@ -4,6 +4,8 @@
 #include <common/Database/DatabaseDef.h>
 #include <common/Exd/ExdDataGenerated.h>
 
+#include "Actor/Player.h"
+
 #include "Zone.h"
 #include "ZonePosition.h"
 
@@ -246,6 +248,52 @@ Core::TerritoryMgr::InstanceIdList Core::TerritoryMgr::getInstanceContentIdList(
    }
 
    return idList;
+}
+
+bool Core::TerritoryMgr::movePlayer( uint32_t territoryId, Core::Entity::PlayerPtr pPlayer )
+{
+   auto pZone = getZoneByTerriId( territoryId );
+
+   if( !pZone  )
+   {
+      g_log.error( "Zone " + std::to_string( territoryId ) + " not found on this server." );
+      return false;
+   }
+
+   pPlayer->setTerritoryId( territoryId );
+
+   // mark character as zoning in progress
+   pPlayer->setLoadingComplete( false );
+
+   if( pPlayer->getLastPing() != 0 )
+      pPlayer->getCurrentZone()->removeActor( pPlayer );
+
+   pPlayer->setCurrentZone( pZone );
+   pZone->pushActor( pPlayer );
+
+   return true;
+}
+
+bool Core::TerritoryMgr::movePlayer( ZonePtr pZone, Core::Entity::PlayerPtr pPlayer )
+{
+   if( !pZone  )
+   {
+      g_log.error( "Zone not found on this server." );
+      return false;
+   }
+
+   pPlayer->setTerritoryId( pZone->getTerritoryId() );
+
+   // mark character as zoning in progress
+   pPlayer->setLoadingComplete( false );
+
+   if( pPlayer->getLastPing() != 0 )
+      pPlayer->getCurrentZone()->removeActor( pPlayer );
+
+   pPlayer->setCurrentZone( pZone );
+   pZone->pushActor( pPlayer );
+
+   return true;
 }
 
 
