@@ -35,11 +35,13 @@
 
 
 #include <cinttypes>
+#include "Zone/TerritoryMgr.h"
 
 extern Core::Scripting::ScriptManager g_scriptMgr;
 extern Core::Data::ExdData g_exdData;
 extern Core::Logger g_log;
 extern Core::ServerZone g_serverZone;
+extern Core::TerritoryMgr g_territoryMgr;
 
 // instanciate and initialize commands
 Core::DebugCommandHandler::DebugCommandHandler()
@@ -56,6 +58,7 @@ Core::DebugCommandHandler::DebugCommandHandler()
    registerCommand( "unlock", &DebugCommandHandler::unlockCharacter, "Unlock character.", 1 );
    registerCommand( "help", &DebugCommandHandler::help, "Shows registered commands.", 0 );
    registerCommand( "script", &DebugCommandHandler::script, "Server script utilities.", 1 );
+   registerCommand( "instance", &DebugCommandHandler::instance, "Instance utilities", 1 );
 }
 
 // clear all loaded commands
@@ -497,7 +500,7 @@ void Core::DebugCommandHandler::replay( char * data, Entity::Player& player, boo
       player.sendUrgent( subCommand + " is not a valid replay command." );
    }
 
-   
+
 }
 
 void Core::DebugCommandHandler::nudge( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
@@ -653,5 +656,45 @@ void Core::DebugCommandHandler::script( char* data, Entity::Player &player, boos
    else
    {
       player.sendDebug( "Unknown script subcommand: " + subCommand );
+   }
+}
+
+void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, boost::shared_ptr< DebugCommand > command )
+{
+   std::string cmd( data ), params, subCommand;
+   auto cmdPos = cmd.find_first_of( ' ' );
+
+   if( cmdPos != std::string::npos )
+   {
+      params = cmd.substr( cmdPos + 1 );
+
+      auto p = params.find_first_of( ' ' );
+
+      if( p != std::string::npos )
+      {
+         subCommand = params.substr( 0, p );
+         params = params.substr( subCommand.length() + 1 );
+      }
+      else
+         subCommand = params;
+   }
+
+   if( subCommand == "create" || subCommand == "cr" )
+   {
+      uint32_t terriId;
+      sscanf( params.c_str(), "%d", &terriId );
+
+      auto instance = g_territoryMgr.createTerritoryInstance( terriId );
+      player.sendDebug( "Created instance with guid: " + std::to_string( instance->getGuId() ) );
+   }
+   else if( subCommand == "remove" || subCommand == "rm" )
+   {
+      uint32_t terriId;
+      sscanf( params.c_str(), "%d", &terriId );
+
+      if( g_territoryMgr.removeTerritoryInstance( terriId ) )
+         player.sendDebug( "Removed instance with id: " + std::to_string( terriId ) );
+      else
+         player.sendDebug( "Failed to remove instance with id: " + std::to_string( terriId ) );
    }
 }

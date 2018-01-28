@@ -128,6 +128,49 @@ bool Core::TerritoryMgr::createDefaultTerritories()
    return true;
 }
 
+Core::ZonePtr Core::TerritoryMgr::createTerritoryInstance( uint32_t territoryTypeId )
+{
+   if( !isValidTerritory( territoryTypeId ) )
+      return nullptr;
+
+   auto pTeri = getTerritoryDetail( territoryTypeId );
+   auto pPlaceName = g_exdDataGen.getPlaceName( pTeri->placeName );
+
+   if( !pTeri || !pPlaceName )
+      return nullptr;
+
+   g_log.debug( "Starting instance for territory: " + std::to_string( territoryTypeId ) + " (" + pPlaceName->name + ")" );
+
+   ZonePtr pZone( new Zone( territoryTypeId, getNextInstanceId(), pTeri->name, pPlaceName->name, false ) );
+   pZone->init();
+
+   m_territoryInstanceMap[pZone->getTerritoryId()][pZone->getGuId()] = pZone;
+   m_instanceIdToZonePtrMap[pZone->getGuId()] = pZone;
+
+   return pZone;
+}
+
+bool Core::TerritoryMgr::removeTerritoryInstance( uint32_t territoryTypeId )
+{
+   ZonePtr instance;
+   if( ( instance = getTerritoryZonePtr( territoryTypeId ) ) == nullptr )
+      return false;
+
+   m_instanceIdToZonePtrMap.erase( instance->getGuId() );
+   m_territoryInstanceMap[instance->getTerritoryId()].erase( instance->getGuId() );
+
+   return true;
+}
+
+Core::ZonePtr Core::TerritoryMgr::getTerritoryZonePtr( uint32_t instanceId ) const
+{
+   auto it = m_instanceIdToZonePtrMap.find( instanceId );
+   if( it == m_instanceIdToZonePtrMap.end() )
+      return nullptr;
+
+   return it->second;
+}
+
 void Core::TerritoryMgr::loadTerritoryPositionMap()
 {
    auto pQR = g_charaDb.query( "SELECT id, target_zone_id, pos_x, pos_y, pos_z, pos_o, radius FROM zonepositions;" );
