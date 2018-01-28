@@ -516,7 +516,7 @@ void Core::Network::GameConnection::chatHandler( const Packets::GamePacket& inPa
    }
    case ChatType::Shout:
    {
-      player.getCurrentZone()->queueOutPacketForRange( player, 6000, chatPacket );
+      player.getCurrentZone()->queueOutPacket( chatPacket );
       break;
    }
    default:
