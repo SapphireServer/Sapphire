@@ -309,6 +309,10 @@ public:
    Common::OnlineStatus getOnlineStatus();
    /*! sets the players zone, initiating a zoning process */
    void setZone( uint32_t zoneId );
+   /*! sets the players territoryId */
+   void setTerritoryId( uint32_t territoryId );
+   /*! gets the players territoryId */
+   uint32_t getTerritoryId() const;
 
    void forceZoneing( uint32_t zoneId );
    /*! return player to preset homepoint */
@@ -471,9 +475,11 @@ public:
    /*! set the loading complete bool */
    void setLoadingComplete( bool bComplete );
    /*! mark this player for zoning, notify worldserver */
-   void performZoning(uint16_t zoneId, const Common::FFXIVARR_POSITION3& pos, float rotation);
+   void performZoning( uint16_t zoneId, const Common::FFXIVARR_POSITION3& pos, float rotation );
    /*! return true if the player is marked for zoning */
    bool isMarkedForZoning() const;
+
+   void sendZonePackets();
 
    Common::ZoneingType getZoningType() const;
    void setZoningType( Common::ZoneingType zoneingType );

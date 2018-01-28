@@ -10,6 +10,13 @@ namespace Core
 class InstanceContent : public Zone
 {
 public:
+   enum InstanceContentState
+   {
+      Created,
+      DutyStarted,
+      DutyFinished
+   };
+
    InstanceContent( uint32_t instanceContentId, uint32_t guid );
    virtual ~InstanceContent();
 

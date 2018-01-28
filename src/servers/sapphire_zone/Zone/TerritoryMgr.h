@@ -103,6 +103,10 @@ namespace Core
           TODO: Mind multiple instances?! */
       ZonePtr getZoneByTerriId( uint32_t territoryId ) const;
 
+
+      bool movePlayer( uint32_t territoryId, Entity::PlayerPtr pPlayer );
+      bool movePlayer( ZonePtr, Entity::PlayerPtr pPlayer );
+
    private:
       using TerritoryTypeDetailCache = std::unordered_map< uint16_t, Data::TerritoryTypePtr >;
       using InstanceIdToZonePtrMap = std::unordered_map< uint32_t, ZonePtr >;
