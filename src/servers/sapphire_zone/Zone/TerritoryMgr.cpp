@@ -120,7 +120,7 @@ bool Core::TerritoryMgr::createDefaultTerritories()
 
       InstanceIdToZonePtrMap instanceMap;
       instanceMap[guid] = pZone;
-
+      m_instanceIdToZonePtrMap[guid] = pZone;
       m_territoryInstanceMap[territoryId] = instanceMap;
 
    }
@@ -179,8 +179,6 @@ Core::ZonePtr Core::TerritoryMgr::getZoneByTerriId( uint32_t territoryId ) const
 
    // TODO: actually select the proper one
    return zoneMap->second.begin()->second;
-
-   return nullptr;
 }
 
 void Core::TerritoryMgr::updateTerritoryInstances( uint32_t currentTime )
@@ -190,7 +188,22 @@ void Core::TerritoryMgr::updateTerritoryInstances( uint32_t currentTime )
       for( auto zone : zoneMap.second )
          zone.second->runZoneLogic( currentTime );
    }
-
 }
+
+Core::TerritoryMgr::InstanceIdList Core::TerritoryMgr::getInstanceContentIdList( uint16_t instanceContentId ) const
+{
+   std::vector< uint32_t > idList;
+   auto zoneMap = m_instanceContentToInstanceMap.find( instanceContentId );
+   if( zoneMap == m_instanceContentToInstanceMap.end() )
+      return idList;
+
+   for( auto& entry : zoneMap->second )
+   {
+      idList.push_back( entry.first );
+   }
+
+   return idList;
+}
+
 
 
