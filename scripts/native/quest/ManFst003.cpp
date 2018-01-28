@@ -1,4 +1,4 @@
-#include "../ScriptObject.h"
+#include <ScriptObject.h>
 
 // Quest Script: ManFst003_00123
 // Quest Name: Close to Home
