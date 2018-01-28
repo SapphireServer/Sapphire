@@ -26,7 +26,6 @@
 #include "Network/PacketWrappers/EventFinishPacket.h"
 #include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
 
-#include "DebugCommand/DebugCommandHandler.h"
 #include "Actor/Player.h"
 #include "Inventory/Inventory.h"
 #include "Forwards.h"
@@ -37,7 +36,6 @@
 extern Core::Logger g_log;
 extern Core::ServerZone g_serverZone;
 extern Core::Data::ExdData g_exdData;
-extern Core::DebugCommandHandler g_gameCommandMgr;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;

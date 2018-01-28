@@ -1,4 +1,4 @@
-#include "../../../ScriptObject.h"
+#include <ScriptObject.h>
 
 // Quest Script: SubFst013_00040
 // Quest Name: For Friendship

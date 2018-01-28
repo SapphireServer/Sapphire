@@ -1,4 +1,4 @@
-#include "../ScriptObject.h"
+#include <ScriptObject.h>
 
 #define ACTION_ATTUNE 0x13
 

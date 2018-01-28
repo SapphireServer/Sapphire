@@ -27,19 +27,19 @@
 #include "Network/PacketWrappers/EventFinishPacket.h"
 #include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
 
-#include "DebugCommand/DebugCommandHandler.h"
 #include "Actor/Player.h"
 #include "Inventory/Inventory.h"
 #include "Forwards.h"
 #include "Event/EventHelper.h"
 #include "Action/Action.h"
 #include "Action/ActionTeleport.h"
+#include "Script/ScriptManager.h"
 
 extern Core::Logger g_log;
 extern Core::ServerZone g_serverZone;
 extern Core::TerritoryMgr g_territoryMgr;
 extern Core::Data::ExdData g_exdData;
-extern Core::DebugCommandHandler g_gameCommandMgr;
+extern Core::Scripting::ScriptManager g_scriptMgr;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -126,6 +126,15 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    if( !targetActor )
       return;
    auto targetPlayer = targetActor->getAsPlayer();
+
+//   auto script = g_scriptMgr.getNativeScriptHandler().getScript< GmCommandScript >( commandId );
+//   if( script )
+//   {
+//      script->gm1Handler( param1, param2, param3 );
+//      return;
+//   }
+//
+//   player.sendUrgent( "GM1 Command not implemented: " + std::to_string( commandId ) );
 
    switch( commandId )
    {

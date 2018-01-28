@@ -20,9 +20,6 @@
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
 
-
-// enable the ambiguity fix for every platform to avoid #define nonsense
-#define WIN_AMBIGUITY_FIX
 #include <libraries/external/watchdog/Watchdog.h>
 
 extern Core::Logger g_log;
@@ -50,7 +47,8 @@ bool Core::Scripting::ScriptManager::init()
    std::set< std::string > files;
 
    loadDir( g_serverZone.getConfig()->getValue< std::string >( "Settings.General.Scripts.Path", "./compiledscripts/" ),
-            files, m_nativeScriptManager->getModuleExtension() );
+            files,
+            m_nativeScriptManager->getModuleExtension() );
 
    uint32_t scriptsFound = 0;
    uint32_t scriptsLoaded = 0;
@@ -65,7 +63,7 @@ bool Core::Scripting::ScriptManager::init()
          scriptsLoaded++;
    }
 
-   g_log.info( "ScriptManager: Loaded " + std::to_string( scriptsLoaded ) + "/" + std::to_string( scriptsFound ) + " scripts successfully" );
+   g_log.info( "ScriptManager: Loaded " + std::to_string( scriptsLoaded ) + "/" + std::to_string( scriptsFound ) + " modules successfully" );
 
    watchDirectories();
 
@@ -89,17 +87,19 @@ void Core::Scripting::ScriptManager::watchDirectories()
          return;
       }
 
-      for( auto path : paths )
+      for( const auto& path : paths )
       {
-         if( m_nativeScriptManager->isModuleLoaded( path.stem().string() ) )
-         {
-            g_log.debug( "Reloading changed script: " + path.stem().string() );
+         auto name = path.stem().string();
 
-            m_nativeScriptManager->queueScriptReload( path.stem( ).string( ));
+         if( m_nativeScriptManager->isModuleLoaded( name ) )
+         {
+            g_log.debug( "Reloading changed script: " + name );
+
+            m_nativeScriptManager->queueScriptReload( name );
          }
          else
          {
-            g_log.debug( "Loading new script: " + path.stem().string() );
+            g_log.debug( "Loading new script: " + name );
 
             m_nativeScriptManager->loadScript( path.string() );
          }
@@ -110,7 +110,7 @@ void Core::Scripting::ScriptManager::watchDirectories()
 void Core::Scripting::ScriptManager::loadDir( const std::string& dirname, std::set<std::string> &files, const std::string& ext )
 {
 
-   g_log.info( "ScriptEngine: loading scripts from " + dirname );
+   g_log.info( "ScriptManager: loading scripts from " + dirname );
 
    boost::filesystem::path targetDir( dirname );
 
@@ -337,6 +337,74 @@ bool Core::Scripting::ScriptManager::onZoneInit( ZonePtr pZone )
    {
       script->onZoneInit();
       return true;
+   }
+
+   return false;
+}
+
+bool Core::Scripting::ScriptManager::gm1Handler( uint32_t cmdId, uint32_t param1, uint32_t param2, uint32_t param3 )
+{
+   auto script = m_nativeScriptManager->getScript< GmCommandScript >( cmdId );
+   if( script )
+   {
+      script->gm1Handler( param1, param2, param3 );
+      return true;
+   }
+
+   return false;
+}
+
+bool Core::Scripting::ScriptManager::gm2Handler( uint32_t cmdId, const std::string& param1 )
+{
+   auto script = m_nativeScriptManager->getScript< GmCommandScript >( cmdId );
+   if( script )
+   {
+      script->gm2Handler( param1 );
+      return true;
+   }
+
+   return false;
+}
+
+bool Core::Scripting::ScriptManager::debugCommandHandler( const std::string& cmd, Entity::Player& player )
+{
+   std::string command, params, subCommand;
+   auto cmdPos = cmd.find_first_of( ' ' );
+
+   if( cmdPos != std::string::npos )
+   {
+      command = cmd.substr( 0, cmdPos );
+      params = cmd.substr( cmdPos + 1 );
+
+      auto p = params.find_first_of( ' ' );
+
+      if( p != std::string::npos )
+      {
+         subCommand = params.substr( 0, p );
+         params = params.substr( subCommand.length() + 1 );
+      }
+      else
+         subCommand = params;
+   }
+   else
+      command = cmd;
+
+   g_log.debug( "[" + std::to_string( player.getId() ) + "] " +
+                "subCommand: " + subCommand + " params: " + params );
+
+   for( std::pair< uint32_t, ScriptObject* > pair : m_nativeScriptManager->getScriptsOfType< DebugCommandScript >() )
+   {
+      if( pair.second == nullptr )
+         continue;
+
+      auto script = dynamic_cast< DebugCommandScript* >( pair.second );
+
+      if( player.getGmRank() >= script->getGmLevel() && script->getCmd() == command )
+      {
+         script->run( player, cmd, subCommand, params );
+
+         return true;
+      }
    }
 
    return false;
