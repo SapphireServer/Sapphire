@@ -14,7 +14,7 @@ public:
    virtual ~InstanceContent();
 
 private:
-   DirectorPtr m_pDirector;
+   Event::DirectorPtr m_pDirector;
 
 };
 
