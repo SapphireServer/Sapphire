@@ -408,6 +408,10 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       {
          player.sendUrgent( "Invalid zone " + std::to_string( param1 ) );
       }
+      else if( auto instance = g_territoryMgr.getInstance( param1 ) )
+      {
+
+      }
       else
       {
          auto pZone = g_territoryMgr.getZoneByTerriId( param1 );
@@ -444,7 +448,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       player.sendNotice( "Jumping to " + targetPlayer->getName() + " in range." );
       break;
    }
-  
+
    default:
       player.sendUrgent( "GM1 Command not implemented: " + std::to_string( commandId ) );
       break;
