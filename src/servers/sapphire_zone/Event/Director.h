@@ -12,7 +12,6 @@ namespace Event {
 \class Director
 \brief Base class for all Directors implements sequence and variables
 
-\author Mordred
 */
 
 class Director

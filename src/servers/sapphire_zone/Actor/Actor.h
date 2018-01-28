@@ -16,7 +16,6 @@ namespace Entity {
 \class Actor
 \brief Base class for all actors
 
-\author Mordred
 */
 class Actor : public boost::enable_shared_from_this< Actor >
 {
