@@ -20,15 +20,18 @@ namespace Scripting {
    {
    protected:
       std::unordered_map< std::size_t, std::unordered_map< uint32_t, ScriptObject* > > m_scripts;
+      std::map< std::size_t, uint32_t > m_allocatedScriptIds;
 
       ScriptLoader m_loader;
+      SapphireObjects* m_objects;
 
       std::queue< std::string > m_scriptLoadQueue;
 
       bool unloadScript( ScriptInfo* info );
 
    public:
-      NativeScriptManager( ) = default;
+      NativeScriptManager();
+      ~NativeScriptManager();
 
       bool loadScript( const std::string& path );
       bool unloadScript( const std::string& name );
@@ -40,7 +43,7 @@ namespace Scripting {
       const std::string getModuleExtension();
       bool isModuleLoaded( const std::string& name );
 
-      template< typename T >
+      template< class T >
       T* getScript( uint32_t scriptId )
       {
          auto type = typeid( T ).hash_code();
@@ -51,6 +54,14 @@ namespace Scripting {
 
          return dynamic_cast< T* >( script->second );
       }
+
+      template< class T >
+      std::unordered_map< uint32_t, ScriptObject* >& getScriptsOfType()
+      {
+         auto type = typeid( T ).hash_code();
+
+         return m_scripts[type];
+      };
    };
 
 

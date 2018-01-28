@@ -12,11 +12,9 @@
 #include "Session.h"
 #include "Zone/Zone.h"
 #include "Network/PacketWrappers/InitUIPacket.h"
-#include "DebugCommand/DebugCommandHandler.h"
 #include "Actor/Player.h"
 #include "Forwards.h"
 
-extern Core::DebugCommandHandler g_gameCommandMgr;
 extern Core::Logger g_log;
 extern Core::ServerZone g_serverZone;
 
