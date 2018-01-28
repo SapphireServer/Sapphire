@@ -1,4 +1,4 @@
-#include "../../../ScriptObject.h"
+#include <ScriptObject.h>
 
 // Quest Script: SubFst010_00001
 // Quest Name: A Good Adventurer Is Hard to Find

@@ -1,4 +1,4 @@
-#include "../ScriptObject.h"
+#include <ScriptObject.h>
 
 class OpeningUldah : public EventScript
 {

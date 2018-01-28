@@ -1,4 +1,4 @@
-#include "../ScriptObject.h"
+#include <ScriptObject.h>
 
 #define ACTION_CREATE 2
 #define ACTION_RENAME 3
