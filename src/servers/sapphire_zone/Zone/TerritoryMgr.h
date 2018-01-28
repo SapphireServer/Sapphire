@@ -87,17 +87,14 @@ namespace Core
       /*! removes instance by instanceId, return true if successful */
       bool removeTerritoryInstance( uint32_t territoryTypeId );
 
+      /*! returns a ZonePtr to the instance or nullptr if not found */
+      ZonePtr getTerritoryZonePtr( uint32_t instanceId ) const;
+
       /*! returns the cached detail of a territory, nullptr if not found */
       Data::TerritoryTypePtr getTerritoryDetail( uint32_t territoryTypeId ) const;
 
       /*! loop for processing territory logic, iterating all existing instances */
       void updateTerritoryInstances( uint32_t currentTime );
-
-      /*! pushes a new instances onto the handling map */
-      bool addInstance( ZonePtr pInstance );
-
-      /*! returns a ZonePtr to the instance or nullptr if not found */
-      ZonePtr getInstance( uint32_t instanceId ) const;
 
       /*! returns a ZonePositionPtr if found, else nullptr */
       ZonePositionPtr getTerritoryPosition( uint32_t territoryPositionId ) const;
@@ -110,21 +107,32 @@ namespace Core
       using TerritoryTypeDetailCache = std::unordered_map< uint16_t, Data::TerritoryTypePtr >;
       using InstanceIdToZonePtrMap = std::unordered_map< uint32_t, ZonePtr >;
       using TerritoryIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToZonePtrMap >;
+      using InstanceContentIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToZonePtrMap >;
+      using PlayerIdToInstanceIdMap = std::unordered_map< uint32_t, uint32_t >;
       using PositionMap = std::unordered_map< int32_t, ZonePositionPtr >;
+      using InstanceIdList = std::vector< uint32_t >;
 
       /*! map holding details for territory templates */
       TerritoryTypeDetailCache m_territoryTypeDetailCacheMap;
 
-      /*! map holding actual instances of territories */
+      /*! map holding actual instances of default territories */
       TerritoryIdToInstanceMap m_territoryInstanceMap;
+
+      /*! map holding actual instances of InstanceContent */
+      InstanceContentIdToInstanceMap m_instanceContentToInstanceMap;
+
+      /*! flat map for easier lookup of instances by guid */
+      InstanceIdToZonePtrMap m_instanceIdToZonePtrMap;
 
       /*! map holding positions for zonelines */
       PositionMap m_territoryPositionMap;
 
-      /*! internal counter for instanceIds
-          TODO: it should be ensured that this does not overflow if the server runs for a loooong time
-          ( as if that will ever happen ;) ) */
+      /*! internal counter for instanceIds */
       uint32_t m_lastInstanceId;
+
+   public:
+      /*! returns a list of instanceContent InstanceIds currently active */
+      InstanceIdList getInstanceContentIdList( uint16_t instanceContentId ) const;
 
    };
 
