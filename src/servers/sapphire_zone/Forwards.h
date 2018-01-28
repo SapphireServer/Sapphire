@@ -36,6 +36,7 @@ namespace Core
 
    namespace Event
    {
+      TYPE_FORWARD( Director );
       TYPE_FORWARD( EventHandler );
    }
 
