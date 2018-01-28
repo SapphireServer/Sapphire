@@ -16,9 +16,6 @@ public:
 
    virtual void run( Entity::Player& player, const std::string& data, const std::string& subCommand, const std::string& params )
    {
-      player.sendDebug( subCommand );
-      player.sendDebug( params );
-
       if( ( ( subCommand == "pos" ) || ( subCommand == "posr" ) ) && ( params != "" ) )
       {
          int32_t posX;
