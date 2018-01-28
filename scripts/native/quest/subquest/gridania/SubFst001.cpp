@@ -1,4 +1,4 @@
-#include <ScriptObject.h>
+#include "../../../ScriptObject.h"
 
 // Quest Script: SubFst001_00024
 // Quest Name: Coarse Correspondence

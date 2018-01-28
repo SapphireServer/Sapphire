@@ -362,19 +362,6 @@ void Zone::queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range,
    }
 }
 
-void Zone::queueOutPacket( Network::Packets::GamePacketPtr pPacketEntry )
-{
-   for( auto it = m_playerMap.begin(); it != m_playerMap.end(); ++it )
-   {
-      auto pSession = g_serverZone.getSession( ( *it ).second->getId() );
-      if( pSession )
-      {
-         pPacketEntry->setValAt< uint32_t >( 0x08, ( *it ).second->getId() );
-         pSession->getZoneConnection()->queueOutPacket( pPacketEntry );
-      }
-   }
-}
-
 uint32_t Zone::getTerritoryId()
 {
    return m_territoryId;

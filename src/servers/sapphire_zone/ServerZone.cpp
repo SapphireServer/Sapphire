@@ -24,7 +24,7 @@
 
 #include "Zone/TerritoryMgr.h"
 
-#include "Actor/Player.h"
+#include "DebugCommand/DebugCommandHandler.h"
 
 #include "Script/ScriptManager.h"
 #include "Linkshell/LinkshellMgr.h"
@@ -37,6 +37,7 @@
 #include <common/Util/Util.h>
 
 Core::Logger g_log;
+Core::DebugCommandHandler g_gameCommandMgr;
 Core::Scripting::ScriptManager g_scriptMgr;
 Core::Data::ExdData g_exdData;
 Core::Data::ExdDataGenerated g_exdDataGen;

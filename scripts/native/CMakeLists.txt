@@ -39,7 +39,7 @@ foreach(_scriptDir ${children})
         endforeach()
 
         add_library("script_${_name}" MODULE "${SCRIPT_FILES}" "${SCRIPT_INCLUDE_FILES}" "${_scriptDir}/ScriptLoader.cpp")
-        target_link_libraries("script_${_name}" sapphire_zone common xivdat ${Boost_LIBRARIES})
+        target_link_libraries("script_${_name}" sapphire_zone)
 
         if(MSVC)
             set_target_properties("script_${_name}" PROPERTIES
@@ -53,10 +53,6 @@ foreach(_scriptDir ${children})
             )
         endif()
 
-        if(EXISTS "${_scriptDir}/PreInclude.h")
-            set(PreScriptIncludes "#include \"${_scriptDir}/PreInclude.h\"")
-        endif()
-
         configure_file("${CMAKE_CURRENT_SOURCE_DIR}/ScriptLoader.cpp.in" "${_scriptDir}/ScriptLoader.cpp")
 
         add_custom_command(TARGET "script_${_name}" POST_BUILD
@@ -67,6 +63,5 @@ foreach(_scriptDir ${children})
 
         unset(ScriptIncludes)
         unset(ScriptNames)
-        unset(PreScriptIncludes)
     endif()
 endforeach()

@@ -113,8 +113,7 @@ bool Core::TerritoryMgr::createDefaultTerritories()
                                         "\t" + std::to_string( guid ) +
                                         "\t" + std::to_string( territoryInfo->territoryIntendedUse ) +
                                         "\t" + territoryInfo->name +
-                                        ( territoryInfo->name.length() > 4 ? "\t" : "\t\t" ) +
-                                        pPlaceName->name );
+                                        "\t" + pPlaceName->name );
 
       ZonePtr pZone( new Zone( territoryId, guid, territoryInfo->name, pPlaceName->name, false ) );
       pZone->init();
