@@ -1,5 +1,7 @@
+#include <vector>
+
 class ScriptObject;
-@PreScriptIncludes@
+
 @ScriptIncludes@
 
 const ScriptObject* ptrs[] =

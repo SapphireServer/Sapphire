@@ -1,29 +1,7 @@
-#include <ServerZone.h>
-#include <common/Exd/ExdData.h>
 #include "NativeScriptManager.h"
-#include "ScriptManager.h"
-
-extern Core::Scripting::ScriptManager g_scriptMgr;
-extern Core::Data::ExdData g_exdData;
-extern Core::Logger g_log;
-extern Core::ServerZone g_serverZone;
 
 namespace Core {
 namespace Scripting {
-
-   NativeScriptManager::NativeScriptManager() :
-      m_objects( new SapphireObjects )
-   {
-      m_objects->m_logger = &g_log;
-      m_objects->m_zone = &g_serverZone;
-      m_objects->m_scriptMgr = &g_scriptMgr;
-      m_objects->m_exd = &g_exdData;
-   }
-
-   NativeScriptManager::~NativeScriptManager()
-   {
-      delete m_objects;
-   }
 
    bool NativeScriptManager::loadScript( const std::string& path )
    {
@@ -48,11 +26,6 @@ namespace Scripting {
 
          auto script = scripts[i];
          module->scripts.push_back( script );
-
-         script->setObjects( m_objects );
-
-         if( script->getId() == 0 )
-            script->setId( m_allocatedScriptIds[script->getType()]++ );
 
          m_scripts[script->getType()][script->getId()] = script;
 

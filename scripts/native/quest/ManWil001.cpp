@@ -1,4 +1,4 @@
-#include <ScriptObject.h>
+#include "../ScriptObject.h"
 
 // Quest Script: ManWil001_00594
 // Quest Name: Coming to Ul'dah

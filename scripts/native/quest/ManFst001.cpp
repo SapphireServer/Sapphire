@@ -1,4 +1,4 @@
-#include <ScriptObject.h>
+#include "../ScriptObject.h"
 
 // Quest Script: ManFst001_00039
 // Quest Name: Coming to Gridania

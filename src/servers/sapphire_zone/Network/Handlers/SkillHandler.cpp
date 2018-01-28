@@ -19,6 +19,8 @@
 
 #include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
 
+#include "DebugCommand/DebugCommandHandler.h"
+
 #include "Actor/Player.h"
 
 #include "Forwards.h"
