@@ -46,7 +46,7 @@ protected:
    SapphireObjects* m_objects;
 
 public:
-   ScriptObject( uint32_t id, const type_info& type ) :
+   ScriptObject( uint32_t id, const std::type_info& type ) :
       m_id( id ),
       m_type( type.hash_code() )
    { }
