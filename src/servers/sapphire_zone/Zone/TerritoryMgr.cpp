@@ -118,7 +118,7 @@ bool Core::TerritoryMgr::createDefaultTerritories()
                                         "\t" + territoryInfo->name +
                                         "\t" + pPlaceName->name );
 
-      ZonePtr pZone( new Zone( territoryId, guid, territoryInfo->name, pPlaceName->name, false ) );
+      ZonePtr pZone( new Zone( territoryId, guid, territoryInfo->name, pPlaceName->name ) );
       pZone->init();
 
       InstanceIdToZonePtrMap instanceMap;
@@ -146,9 +146,9 @@ Core::ZonePtr Core::TerritoryMgr::createTerritoryInstance( uint32_t territoryTyp
 
    ZonePtr pZone;
    if( isInstanceContentTerritory( territoryTypeId ) )
-      pZone = ZonePtr( new InstanceContent( territoryTypeId, getNextInstanceId(), pTeri->name, pPlaceName->name, false ) );
+      pZone = ZonePtr( new InstanceContent( territoryTypeId, getNextInstanceId(), pTeri->name, pPlaceName->name ) );
    else
-      pZone = ZonePtr( new Zone( territoryTypeId, getNextInstanceId(), pTeri->name, pPlaceName->name, false ) );
+      pZone = ZonePtr( new Zone( territoryTypeId, getNextInstanceId(), pTeri->name, pPlaceName->name ) );
 
    pZone->init();
 
