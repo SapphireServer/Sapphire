@@ -49,7 +49,10 @@ namespace Core
          ChocoboTutorial = 21,
          Wedding = 22,
          BeginnerTutorial = 27,
+         FreeCompanyGarrison = 30,
          PalaceOfTheDead = 31,
+         TreasureMapInstance = 33,
+         EventArea = 40,
       };
 
       TerritoryMgr();
@@ -83,6 +86,8 @@ namespace Core
 
       /*! creates a new instance for a given territoryTypeId */
       ZonePtr createTerritoryInstance( uint32_t territoryTypeId );
+
+      ZonePtr createInstanceContent( uint32_t instanceContentId );
 
       /*! removes instance by instanceId, return true if successful */
       bool removeTerritoryInstance( uint32_t territoryTypeId );
