@@ -697,4 +697,8 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
       else
          player.sendDebug( "Failed to remove instance with id: " + std::to_string( terriId ) );
    }
+   else if( subCommand == "return" || subCommand == "ret" )
+   {
+      player.exitInstance();
+   }
 }
