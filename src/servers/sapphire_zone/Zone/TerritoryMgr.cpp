@@ -167,14 +167,15 @@ Core::ZonePtr Core::TerritoryMgr::createInstanceContent( uint32_t instanceConten
       return nullptr;
 
    auto pTeri = getTerritoryDetail( pInstanceContent->territoryType );
-   auto pPlaceName = g_exdDataGen.getPlaceName( pTeri->placeName );
 
-   if( !pTeri || !pPlaceName )
+   if( !pTeri || pInstanceContent->name.empty() )
       return nullptr;
 
-   g_log.debug( "Starting instance for InstanceContent id: " + std::to_string( instanceContentId ) + " (" + pPlaceName->name + ")" );
+   g_log.debug( "Starting instance for InstanceContent id: " + std::to_string( instanceContentId ) +
+                                                           " (" + pInstanceContent->name + ")" );
 
-   ZonePtr pZone = ZonePtr( new InstanceContent( pInstanceContent, getNextInstanceId(), pTeri->name, pPlaceName->name, instanceContentId ) );
+   ZonePtr pZone = ZonePtr( new InstanceContent( pInstanceContent, getNextInstanceId(), pTeri->name,
+                                                 pInstanceContent->name, instanceContentId ) );
    pZone->init();
 
    m_instanceContentToInstanceMap[instanceContentId][pZone->getGuId()] = pZone;
