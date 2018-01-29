@@ -208,7 +208,7 @@ void Zone::loadCellCache()
 
 uint8_t Zone::getNextWeather()
 {
-   auto zoneInfo = g_exdData.m_zoneInfoMap[getGuId() ];
+   auto zoneInfo = g_exdData.m_zoneInfoMap[getTerritoryId()];
 
    uint32_t unixTime = static_cast< uint32_t >( Util::getTimeSeconds() );
    // Get Eorzea hour for weather start
