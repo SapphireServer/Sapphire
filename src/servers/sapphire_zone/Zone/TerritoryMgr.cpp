@@ -174,7 +174,7 @@ Core::ZonePtr Core::TerritoryMgr::createInstanceContent( uint32_t instanceConten
 
    g_log.debug( "Starting instance for InstanceContent id: " + std::to_string( instanceContentId ) + " (" + pPlaceName->name + ")" );
 
-   ZonePtr pZone = ZonePtr( new InstanceContent( pInstanceContent, getNextInstanceId(), pTeri->name, pPlaceName->name ) );
+   ZonePtr pZone = ZonePtr( new InstanceContent( pInstanceContent, getNextInstanceId(), pTeri->name, pPlaceName->name, instanceContentId ) );
    pZone->init();
 
    m_instanceContentToInstanceMap[instanceContentId][pZone->getGuId()] = pZone;
@@ -185,12 +185,20 @@ Core::ZonePtr Core::TerritoryMgr::createInstanceContent( uint32_t instanceConten
 
 bool Core::TerritoryMgr::removeTerritoryInstance( uint32_t instanceId )
 {
-   ZonePtr instance;
-   if( ( instance = getInstanceZonePtr( instanceId ) ) == nullptr )
+   ZonePtr pZone;
+   if( ( pZone = getInstanceZonePtr( instanceId ) ) == nullptr )
       return false;
 
-   m_instanceIdToZonePtrMap.erase( instance->getGuId() );
-   m_territoryInstanceMap[instance->getTerritoryId()].erase( instance->getGuId() );
+   m_instanceIdToZonePtrMap.erase( pZone->getGuId() );
+
+   if( isInstanceContentTerritory( pZone->getTerritoryId() ) )
+   {
+      auto instance = boost::dynamic_pointer_cast< InstanceContent >( pZone );
+      m_instanceContentToInstanceMap[instance->getInstanceContentId()].erase( pZone->getGuId() );
+   }
+   else
+      m_territoryInstanceMap[pZone->getTerritoryId()].erase( pZone->getGuId() );
+
 
    return true;
 }

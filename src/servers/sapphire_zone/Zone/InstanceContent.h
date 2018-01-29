@@ -21,7 +21,8 @@ public:
    InstanceContent( boost::shared_ptr< Core::Data::InstanceContent > pInstanceContent,
                     uint32_t guId,
                     const std::string& internalName,
-                    const std::string& placeName );
+                    const std::string& placeName,
+                    const uint32_t instanceContentId );
    virtual ~InstanceContent();
 
    boost::shared_ptr< Core::Data::InstanceContent > getInstanceContentRow() const
@@ -29,9 +30,15 @@ public:
       return m_instanceContentRow;
    }
 
+   const uint32_t getInstanceContentId()
+   {
+      return m_instanceContentId;
+   }
+
 private:
    Event::DirectorPtr m_pDirector;
    boost::shared_ptr< Core::Data::InstanceContent > m_instanceContentRow;
+   uint32_t m_instanceContentId;
 
 };
 
