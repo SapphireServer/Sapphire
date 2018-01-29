@@ -165,9 +165,8 @@ namespace Packets {
 
       SocialReqSendHandler     = 0x00AE, // updated 4.1
       SocialListHandler        = 0x00B3, // updated 4.1
-      SetSearchInfoHandler     = 0x00B5, // updated 4.1
-
       ReqSearchInfoHandler     = 0x00B4, // updated 4.1
+      SetSearchInfoHandler     = 0x00B5, // updated 4.1
 
       BlackListHandler         = 0x00C0, // updated 4.1
 
