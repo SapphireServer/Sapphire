@@ -365,11 +365,62 @@ void Core::Entity::Player::returnToHomepoint()
 
 void Core::Entity::Player::setZone( uint32_t zoneId )
 {
-
    if( !g_territoryMgr.movePlayer( zoneId, getAsPlayer() ) )
-      return;
+   {
+      // todo: this will require proper handling, for now just return the player to their previous area
+      m_pos = m_prevPos;
+      m_rot = m_prevRot;
+      m_zoneId = m_prevZoneId;
+
+      if( !g_territoryMgr.movePlayer( m_zoneId, getAsPlayer() ) )
+         return;
+   }
 
    sendZonePackets();
+}
+
+bool Core::Entity::Player::setInstance( uint32_t instanceContentId )
+{
+   auto instance = g_territoryMgr.getInstanceZonePtr( instanceContentId );
+   if( !instance )
+      return false;
+
+   return setInstance( instance );
+}
+
+bool Core::Entity::Player::setInstance( ZonePtr instance )
+{
+   if( !instance )
+      return false;
+
+   // zoning within the same zone won't cause the prev data to be overwritten
+   if( instance->getTerritoryId() != m_zoneId )
+   {
+      m_prevPos = m_pos;
+      m_prevRot = m_rot;
+      m_prevZoneId = m_zoneId;
+   }
+
+   if( !g_territoryMgr.movePlayer( instance, getAsPlayer() ) )
+      return false;
+
+   sendZonePackets();
+
+   return true;
+}
+
+bool Core::Entity::Player::exitInstance()
+{
+   if( !g_territoryMgr.movePlayer( m_prevZoneId, getAsPlayer() ) )
+      return false;
+
+   m_pos = m_prevPos;
+   m_rot = m_prevRot;
+   m_zoneId = m_prevZoneId;
+
+   sendZonePackets();
+
+   return true;
 }
 
 uint32_t Core::Entity::Player::getPlayTime() const

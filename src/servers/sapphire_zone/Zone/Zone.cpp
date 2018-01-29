@@ -43,7 +43,6 @@ namespace Core {
 Zone::Zone()
    : m_territoryId( 0 )
    , m_guId( 0 )
-   , m_bPrivate( false )
    , m_type( Common::RegionType::normal )
    , m_currentWeather( static_cast< uint8_t >( Common::Weather::FairSkies ) )
    , m_weatherOverride( 0 )
@@ -51,7 +50,7 @@ Zone::Zone()
 {
 }
 
-Zone::Zone( uint16_t territoryId, uint32_t guId, const std::string& internalName, const std::string& placeName, bool bPrivate = false )
+Zone::Zone( uint16_t territoryId, uint32_t guId, const std::string& internalName, const std::string& placeName )
    : m_type( Common::RegionType::normal )
    , m_currentWeather( static_cast< uint8_t >( Common::Weather::FairSkies ) )
 {
@@ -60,7 +59,6 @@ Zone::Zone( uint16_t territoryId, uint32_t guId, const std::string& internalName
    m_territoryId = territoryId;
    m_internalName = internalName;
    m_placeName = placeName;
-   m_bPrivate = bPrivate;
    m_lastMobUpdate = 0;
 
    m_currentWeather = getNextWeather();
@@ -208,7 +206,7 @@ void Zone::loadCellCache()
 
 uint8_t Zone::getNextWeather()
 {
-   auto zoneInfo = g_exdData.m_zoneInfoMap[getGuId() ];
+   auto zoneInfo = g_exdData.m_zoneInfoMap[getTerritoryId()];
 
    uint32_t unixTime = static_cast< uint32_t >( Util::getTimeSeconds() );
    // Get Eorzea hour for weather start
@@ -452,7 +450,7 @@ void Zone::updateBnpcs( int64_t tickCount )
       for( auto entry : m_BattleNpcMap )
       {
          Entity::BattleNpcPtr pBNpc = entry.second;
-         
+
          if( !pBNpc )
             continue;
 
@@ -462,7 +460,7 @@ void Zone::updateBnpcs( int64_t tickCount )
             m_BattleNpcDeadMap.insert( pBNpc );
             break;
          }
-            
+
          pBNpc->update( tickCount );
 
       }
@@ -476,13 +474,13 @@ bool Zone::runZoneLogic( uint32_t currTime )
    bool changedWeather = checkWeather();
 
    auto it = m_sessionSet.begin();
-   
+
    // update sessions in this zone
    for( ; it != m_sessionSet.end(); )
    {
 
       auto pSession = ( *it );
-      
+
       if( !pSession )
       {
          it = m_sessionSet.erase( it );
@@ -631,8 +629,8 @@ void Zone::changeActorPosition( Entity::ActorPtr pActor )
 
             pActor->removeInRangeActor( *iter2 );
 
-            // @TODO FIXME! 
-            // this break is more or less a hack, iteration will break otherwise after removing 
+            // @TODO FIXME!
+            // this break is more or less a hack, iteration will break otherwise after removing
             break;
          }
       }
