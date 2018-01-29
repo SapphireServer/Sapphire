@@ -309,6 +309,12 @@ public:
    Common::OnlineStatus getOnlineStatus();
    /*! sets the players zone, initiating a zoning process */
    void setZone( uint32_t zoneId );
+   /*! sets the players instance & initiates zoning process */
+   bool setInstance( uint32_t instanceContentId );
+   /*! sets the players instance & initiates zoning process */
+   bool setInstance( ZonePtr instance );
+   /*! returns the player to their position before zoning into an instance */
+   bool exitInstance();
    /*! sets the players territoryId */
    void setTerritoryId( uint32_t territoryId );
    /*! gets the players territoryId */

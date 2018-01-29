@@ -17,7 +17,7 @@ public:
       DutyFinished
    };
 
-   InstanceContent( uint32_t instanceContentId, uint32_t guid );
+   InstanceContent( uint16_t territoryId, uint32_t guId, const std::string& internalName, const std::string& placeName, bool bPrivate );
    virtual ~InstanceContent();
 
 private:

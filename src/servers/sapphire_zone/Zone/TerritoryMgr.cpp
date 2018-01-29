@@ -8,6 +8,7 @@
 
 #include "Zone.h"
 #include "ZonePosition.h"
+#include "InstanceContent.h"
 
 extern Core::Logger g_log;
 extern Core::Data::ExdData g_exdData;
@@ -143,7 +144,12 @@ Core::ZonePtr Core::TerritoryMgr::createTerritoryInstance( uint32_t territoryTyp
 
    g_log.debug( "Starting instance for territory: " + std::to_string( territoryTypeId ) + " (" + pPlaceName->name + ")" );
 
-   ZonePtr pZone( new Zone( territoryTypeId, getNextInstanceId(), pTeri->name, pPlaceName->name, false ) );
+   ZonePtr pZone;
+   if( isInstanceContentTerritory( territoryTypeId ) )
+      pZone = ZonePtr( new InstanceContent( territoryTypeId, getNextInstanceId(), pTeri->name, pPlaceName->name, false ) );
+   else
+      pZone = ZonePtr( new Zone( territoryTypeId, getNextInstanceId(), pTeri->name, pPlaceName->name, false ) );
+
    pZone->init();
 
    m_territoryInstanceMap[pZone->getTerritoryId()][pZone->getGuId()] = pZone;
