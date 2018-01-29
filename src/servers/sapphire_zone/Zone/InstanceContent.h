@@ -3,6 +3,7 @@
 
 #include "Zone.h"
 #include "Forwards.h"
+#include <common/Exd/ExdDataGenerated.h>
 
 namespace Core
 {
@@ -17,11 +18,20 @@ public:
       DutyFinished
    };
 
-   InstanceContent( uint16_t territoryId, uint32_t guId, const std::string& internalName, const std::string& placeName );
+   InstanceContent( boost::shared_ptr< Core::Data::InstanceContent > pInstanceContent,
+                    uint32_t guId,
+                    const std::string& internalName,
+                    const std::string& placeName );
    virtual ~InstanceContent();
+
+   boost::shared_ptr< Core::Data::InstanceContent > getInstanceContentRow() const
+   {
+      return m_instanceContentRow;
+   }
 
 private:
    Event::DirectorPtr m_pDirector;
+   boost::shared_ptr< Core::Data::InstanceContent > m_instanceContentRow;
 
 };
 

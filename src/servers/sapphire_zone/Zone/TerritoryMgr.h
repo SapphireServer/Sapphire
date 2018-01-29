@@ -93,7 +93,7 @@ namespace Core
       bool removeTerritoryInstance( uint32_t territoryTypeId );
 
       /*! returns a ZonePtr to the instance or nullptr if not found */
-      ZonePtr getTerritoryZonePtr( uint32_t instanceId ) const;
+      ZonePtr getInstanceZonePtr( uint32_t instanceId ) const;
 
       /*! returns the cached detail of a territory, nullptr if not found */
       Data::TerritoryTypePtr getTerritoryDetail( uint32_t territoryTypeId ) const;

@@ -373,7 +373,7 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
 
 bool Core::Entity::Player::setInstance( uint32_t instanceContentId )
 {
-   auto instance = g_territoryMgr.getTerritoryZonePtr( instanceContentId );
+   auto instance = g_territoryMgr.getInstanceZonePtr( instanceContentId );
    if( !instance )
       return false;
 
