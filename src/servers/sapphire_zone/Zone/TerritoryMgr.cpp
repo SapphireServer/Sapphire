@@ -76,7 +76,8 @@ bool Core::TerritoryMgr::isInstanceContentTerritory( uint32_t territoryTypeId ) 
           pTeri->territoryIntendedUse == TerritoryIntendedUse::OpenWorldInstanceBattle ||
           pTeri->territoryIntendedUse == TerritoryIntendedUse::PalaceOfTheDead ||
           pTeri->territoryIntendedUse == TerritoryIntendedUse::RaidFights ||
-          pTeri->territoryIntendedUse == TerritoryIntendedUse::Raids;
+          pTeri->territoryIntendedUse == TerritoryIntendedUse::Raids ||
+          pTeri->territoryIntendedUse == TerritoryIntendedUse::TreasureMapInstance;
 }
 
 bool Core::TerritoryMgr::isPrivateTerritory( uint32_t territoryTypeId ) const
@@ -136,6 +137,9 @@ Core::ZonePtr Core::TerritoryMgr::createTerritoryInstance( uint32_t territoryTyp
    if( !isValidTerritory( territoryTypeId ) )
       return nullptr;
 
+   if( isInstanceContentTerritory( territoryTypeId ) )
+      return nullptr;
+
    auto pTeri = getTerritoryDetail( territoryTypeId );
    auto pPlaceName = g_exdDataGen.getPlaceName( pTeri->placeName );
 
@@ -144,12 +148,7 @@ Core::ZonePtr Core::TerritoryMgr::createTerritoryInstance( uint32_t territoryTyp
 
    g_log.debug( "Starting instance for territory: " + std::to_string( territoryTypeId ) + " (" + pPlaceName->name + ")" );
 
-   ZonePtr pZone;
-   if( isInstanceContentTerritory( territoryTypeId ) )
-      pZone = ZonePtr( new InstanceContent( territoryTypeId, getNextInstanceId(), pTeri->name, pPlaceName->name ) );
-   else
-      pZone = ZonePtr( new Zone( territoryTypeId, getNextInstanceId(), pTeri->name, pPlaceName->name ) );
-
+   ZonePtr pZone = ZonePtr( new Zone( territoryTypeId, getNextInstanceId(), pTeri->name, pPlaceName->name ) );
    pZone->init();
 
    m_territoryInstanceMap[pZone->getTerritoryId()][pZone->getGuId()] = pZone;
@@ -158,10 +157,36 @@ Core::ZonePtr Core::TerritoryMgr::createTerritoryInstance( uint32_t territoryTyp
    return pZone;
 }
 
-bool Core::TerritoryMgr::removeTerritoryInstance( uint32_t territoryTypeId )
+Core::ZonePtr Core::TerritoryMgr::createInstanceContent( uint32_t instanceContentId )
+{
+   auto pInstanceContent = g_exdDataGen.getInstanceContent( instanceContentId );
+   if( !pInstanceContent )
+      return nullptr;
+
+   if( !isInstanceContentTerritory( pInstanceContent->territoryType ) )
+      return nullptr;
+
+   auto pTeri = getTerritoryDetail( pInstanceContent->territoryType );
+   auto pPlaceName = g_exdDataGen.getPlaceName( pTeri->placeName );
+
+   if( !pTeri || !pPlaceName )
+      return nullptr;
+
+   g_log.debug( "Starting instance for InstanceContent id: " + std::to_string( instanceContentId ) + " (" + pPlaceName->name + ")" );
+
+   ZonePtr pZone = ZonePtr( new InstanceContent( pInstanceContent, getNextInstanceId(), pTeri->name, pPlaceName->name ) );
+   pZone->init();
+
+   m_instanceContentToInstanceMap[instanceContentId][pZone->getGuId()] = pZone;
+   m_instanceIdToZonePtrMap[pZone->getGuId()] = pZone;
+
+   return pZone;
+}
+
+bool Core::TerritoryMgr::removeTerritoryInstance( uint32_t instanceId )
 {
    ZonePtr instance;
-   if( ( instance = getTerritoryZonePtr( territoryTypeId ) ) == nullptr )
+   if( ( instance = getInstanceZonePtr( instanceId ) ) == nullptr )
       return false;
 
    m_instanceIdToZonePtrMap.erase( instance->getGuId() );
@@ -170,7 +195,7 @@ bool Core::TerritoryMgr::removeTerritoryInstance( uint32_t territoryTypeId )
    return true;
 }
 
-Core::ZonePtr Core::TerritoryMgr::getTerritoryZonePtr( uint32_t instanceId ) const
+Core::ZonePtr Core::TerritoryMgr::getInstanceZonePtr( uint32_t instanceId ) const
 {
    auto it = m_instanceIdToZonePtrMap.find( instanceId );
    if( it == m_instanceIdToZonePtrMap.end() )
@@ -237,6 +262,12 @@ void Core::TerritoryMgr::updateTerritoryInstances( uint32_t currentTime )
    for( auto zoneMap : m_territoryInstanceMap )
    {
       for( auto zone : zoneMap.second )
+         zone.second->runZoneLogic( currentTime );
+   }
+
+   for( auto zoneMap : m_instanceContentToInstanceMap )
+   {
+      for( auto zone: zoneMap.second )
          zone.second->runZoneLogic( currentTime );
    }
 }
