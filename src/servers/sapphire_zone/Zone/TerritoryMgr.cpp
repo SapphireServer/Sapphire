@@ -8,6 +8,7 @@
 
 #include "Zone.h"
 #include "ZonePosition.h"
+#include "InstanceContent.h"
 
 extern Core::Logger g_log;
 extern Core::Data::ExdData g_exdData;
@@ -75,7 +76,8 @@ bool Core::TerritoryMgr::isInstanceContentTerritory( uint32_t territoryTypeId ) 
           pTeri->territoryIntendedUse == TerritoryIntendedUse::OpenWorldInstanceBattle ||
           pTeri->territoryIntendedUse == TerritoryIntendedUse::PalaceOfTheDead ||
           pTeri->territoryIntendedUse == TerritoryIntendedUse::RaidFights ||
-          pTeri->territoryIntendedUse == TerritoryIntendedUse::Raids;
+          pTeri->territoryIntendedUse == TerritoryIntendedUse::Raids ||
+          pTeri->territoryIntendedUse == TerritoryIntendedUse::TreasureMapInstance;
 }
 
 bool Core::TerritoryMgr::isPrivateTerritory( uint32_t territoryTypeId ) const
@@ -117,7 +119,7 @@ bool Core::TerritoryMgr::createDefaultTerritories()
                                         "\t" + territoryInfo->name +
                                         "\t" + pPlaceName->name );
 
-      ZonePtr pZone( new Zone( territoryId, guid, territoryInfo->name, pPlaceName->name, false ) );
+      ZonePtr pZone( new Zone( territoryId, guid, territoryInfo->name, pPlaceName->name ) );
       pZone->init();
 
       InstanceIdToZonePtrMap instanceMap;
@@ -135,6 +137,9 @@ Core::ZonePtr Core::TerritoryMgr::createTerritoryInstance( uint32_t territoryTyp
    if( !isValidTerritory( territoryTypeId ) )
       return nullptr;
 
+   if( isInstanceContentTerritory( territoryTypeId ) )
+      return nullptr;
+
    auto pTeri = getTerritoryDetail( territoryTypeId );
    auto pPlaceName = g_exdDataGen.getPlaceName( pTeri->placeName );
 
@@ -143,7 +148,7 @@ Core::ZonePtr Core::TerritoryMgr::createTerritoryInstance( uint32_t territoryTyp
 
    g_log.debug( "Starting instance for territory: " + std::to_string( territoryTypeId ) + " (" + pPlaceName->name + ")" );
 
-   ZonePtr pZone( new Zone( territoryTypeId, getNextInstanceId(), pTeri->name, pPlaceName->name, false ) );
+   ZonePtr pZone = ZonePtr( new Zone( territoryTypeId, getNextInstanceId(), pTeri->name, pPlaceName->name ) );
    pZone->init();
 
    m_territoryInstanceMap[pZone->getTerritoryId()][pZone->getGuId()] = pZone;
@@ -152,19 +157,53 @@ Core::ZonePtr Core::TerritoryMgr::createTerritoryInstance( uint32_t territoryTyp
    return pZone;
 }
 
-bool Core::TerritoryMgr::removeTerritoryInstance( uint32_t territoryTypeId )
+Core::ZonePtr Core::TerritoryMgr::createInstanceContent( uint32_t instanceContentId )
 {
-   ZonePtr instance;
-   if( ( instance = getTerritoryZonePtr( territoryTypeId ) ) == nullptr )
+   auto pInstanceContent = g_exdDataGen.getInstanceContent( instanceContentId );
+   if( !pInstanceContent )
+      return nullptr;
+
+   if( !isInstanceContentTerritory( pInstanceContent->territoryType ) )
+      return nullptr;
+
+   auto pTeri = getTerritoryDetail( pInstanceContent->territoryType );
+   auto pPlaceName = g_exdDataGen.getPlaceName( pTeri->placeName );
+
+   if( !pTeri || !pPlaceName )
+      return nullptr;
+
+   g_log.debug( "Starting instance for InstanceContent id: " + std::to_string( instanceContentId ) + " (" + pPlaceName->name + ")" );
+
+   ZonePtr pZone = ZonePtr( new InstanceContent( pInstanceContent, getNextInstanceId(), pTeri->name, pPlaceName->name, instanceContentId ) );
+   pZone->init();
+
+   m_instanceContentToInstanceMap[instanceContentId][pZone->getGuId()] = pZone;
+   m_instanceIdToZonePtrMap[pZone->getGuId()] = pZone;
+
+   return pZone;
+}
+
+bool Core::TerritoryMgr::removeTerritoryInstance( uint32_t instanceId )
+{
+   ZonePtr pZone;
+   if( ( pZone = getInstanceZonePtr( instanceId ) ) == nullptr )
       return false;
 
-   m_instanceIdToZonePtrMap.erase( instance->getGuId() );
-   m_territoryInstanceMap[instance->getTerritoryId()].erase( instance->getGuId() );
+   m_instanceIdToZonePtrMap.erase( pZone->getGuId() );
+
+   if( isInstanceContentTerritory( pZone->getTerritoryId() ) )
+   {
+      auto instance = boost::dynamic_pointer_cast< InstanceContent >( pZone );
+      m_instanceContentToInstanceMap[instance->getInstanceContentId()].erase( pZone->getGuId() );
+   }
+   else
+      m_territoryInstanceMap[pZone->getTerritoryId()].erase( pZone->getGuId() );
+
 
    return true;
 }
 
-Core::ZonePtr Core::TerritoryMgr::getTerritoryZonePtr( uint32_t instanceId ) const
+Core::ZonePtr Core::TerritoryMgr::getInstanceZonePtr( uint32_t instanceId ) const
 {
    auto it = m_instanceIdToZonePtrMap.find( instanceId );
    if( it == m_instanceIdToZonePtrMap.end() )
@@ -231,6 +270,12 @@ void Core::TerritoryMgr::updateTerritoryInstances( uint32_t currentTime )
    for( auto zoneMap : m_territoryInstanceMap )
    {
       for( auto zone : zoneMap.second )
+         zone.second->runZoneLogic( currentTime );
+   }
+
+   for( auto zoneMap : m_instanceContentToInstanceMap )
+   {
+      for( auto zone: zoneMap.second )
          zone.second->runZoneLogic( currentTime );
    }
 }

@@ -52,7 +52,7 @@ protected:
 public:
    Zone();
 
-   Zone( uint16_t territoryId, uint32_t guId, const std::string& internalName, const std::string& placeName, bool bPrivate );
+   Zone( uint16_t territoryId, uint32_t guId, const std::string& internalName, const std::string& placeName );
    virtual ~Zone();
 
    bool init();

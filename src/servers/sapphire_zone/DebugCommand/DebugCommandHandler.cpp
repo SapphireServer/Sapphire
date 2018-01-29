@@ -681,11 +681,14 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
 
    if( subCommand == "create" || subCommand == "cr" )
    {
-      uint32_t terriId;
-      sscanf( params.c_str(), "%d", &terriId );
+      uint32_t instanceContentId;
+      sscanf( params.c_str(), "%d", &instanceContentId );
 
-      auto instance = g_territoryMgr.createTerritoryInstance( terriId );
-      player.sendDebug( "Created instance with guid: " + std::to_string( instance->getGuId() ) );
+      auto instance = g_territoryMgr.createInstanceContent( instanceContentId );
+      if( instance )
+         player.sendDebug( "Created instance with id: " + std::to_string( instance->getGuId() ) + " -> " + instance->getName() );
+      else
+         player.sendDebug( "Failed to create instance with id: " + std::to_string( instanceContentId ) );
    }
    else if( subCommand == "remove" || subCommand == "rm" )
    {
@@ -696,5 +699,9 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
          player.sendDebug( "Removed instance with id: " + std::to_string( terriId ) );
       else
          player.sendDebug( "Failed to remove instance with id: " + std::to_string( terriId ) );
+   }
+   else if( subCommand == "return" || subCommand == "ret" )
+   {
+      player.exitInstance();
    }
 }

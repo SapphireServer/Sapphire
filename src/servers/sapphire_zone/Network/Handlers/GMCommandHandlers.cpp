@@ -403,9 +403,11 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    }
    case GmCommand::Teri:
    {
-      if( auto instance = g_territoryMgr.getTerritoryZonePtr( param1 ) )
+      if( auto instance = g_territoryMgr.getInstanceZonePtr( param1 ) )
       {
          player.sendDebug( "Found instance: " + instance->getName() + ", id: " + std::to_string( param1 ) );
+
+         player.setInstance( instance );
       }
       else if( !g_territoryMgr.isValidTerritory( param1 )  )
       {
