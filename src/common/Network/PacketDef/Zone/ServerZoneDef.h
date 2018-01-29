@@ -343,10 +343,10 @@ struct FFXIVIpcPlayerSpawn : FFXIVIpcBasePacket<PlayerSpawn>
    uint8_t u2b;
    uint8_t u2ab;
    uint8_t gmRank;
-   uint8_t onlineStatus;
+   uint8_t u3b;
 
    uint8_t u3a;
-   uint8_t u3b;
+   uint8_t onlineStatus;
    uint8_t u3c;
    uint8_t pose;
 

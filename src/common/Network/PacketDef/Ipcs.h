@@ -60,7 +60,7 @@ namespace Packets {
       CFRegistered               = 0x00B8, // updated 4.1
       SocialRequestResponse      = 0x00BB, // updated 4.1
       SocialList                 = 0x00BE, // updated 4.1
-      UpdateSearchInfo           = 0x10BB,
+      UpdateSearchInfo           = 0x00C0, // updated 4.1
       InitSearchInfo             = 0x00C1, // updated 4.1
       ServerNotice               = 0x00C6, // updated 4.1
       SetOnlineStatus            = 0x00C7, // updated 4.1
@@ -166,9 +166,8 @@ namespace Packets {
 
       SocialReqSendHandler     = 0x00AE, // updated 4.1
       SocialListHandler        = 0x00B3, // updated 4.1
+      ReqSearchInfoHandler     = 0x00B4, // updated 4.1
       SetSearchInfoHandler     = 0x00B5, // updated 4.1
-
-      ReqSearchInfoHandler     = 0x00B6, // updated 4.1
 
       BlackListHandler         = 0x00C0, // updated 4.1
 
