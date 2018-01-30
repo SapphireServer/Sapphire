@@ -19,7 +19,7 @@ namespace Scripting {
    class NativeScriptManager
    {
    protected:
-      std::unordered_map< ScriptType, std::unordered_map< uint32_t, ScriptObject* > > m_scripts;
+      std::unordered_map< std::size_t, std::unordered_map< uint32_t, ScriptObject* > > m_scripts;
 
       ScriptLoader m_loader;
 
@@ -40,11 +40,11 @@ namespace Scripting {
       const std::string getModuleExtension();
       bool isModuleLoaded( const std::string& name );
 
-      // todo: use some template magic (type_traits is_same?) to avoid ScriptType param
-      // not sure if worthwhile given that it adds an extra place where script types need to be managed
       template< typename T >
-      T* getScript( ScriptType type, uint32_t scriptId )
+      T* getScript( uint32_t scriptId )
       {
+         auto type = typeid( T ).hash_code();
+
          auto script = m_scripts[type].find( scriptId );
          if( script == m_scripts[type].end() )
             return nullptr;

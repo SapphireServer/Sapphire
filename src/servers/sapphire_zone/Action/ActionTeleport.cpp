@@ -54,7 +54,6 @@ void Core::Action::ActionTeleport::onStart()
 
    m_pSource->sendToInRangeSet( castPacket, true );
    m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::Casting );
-   m_pSource->getAsPlayer()->sendStateFlags();
 
 }
 
@@ -75,7 +74,6 @@ void Core::Action::ActionTeleport::onFinish()
    pPlayer->removeCurrency( Inventory::CurrencyType::Gil, m_cost );
  
    pPlayer->unsetStateFlag( PlayerStateFlag::Casting );
-   pPlayer->sendStateFlags();
 
    // TODO: not sure if this ever gets sent
    //auto control = Network::Packets::Server::ActorControlPacket142( m_pSource->getId(), Common::ActorControlType::TeleportDone );
@@ -105,7 +103,6 @@ void Core::Action::ActionTeleport::onInterrupt()
       return;
 
    m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Casting );
-   m_pSource->getAsPlayer()->sendStateFlags();
 
    auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt,
                                          0x219, 0x04, m_id, 0 );

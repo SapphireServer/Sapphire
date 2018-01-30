@@ -2,6 +2,9 @@
 #define NATIVE_SCRIPT_API
 
 #include <string>
+#include <typeinfo>
+#include <typeindex>
+
 #include <Actor/Actor.h>
 #include <Actor/Player.h>
 #include <StatusEffect/StatusEffect.h>
@@ -18,41 +21,24 @@ using namespace Core;
 #define EVENTSCRIPT_AETHERYTE_ID 0x50000
 #define EVENTSCRIPT_AETHERNET_ID 0x50001
 
-enum ScriptType
-{
-   None,
-   ScriptedStatusEffect,
-   ScriptedAction,
-   ScriptedEvent,
-   ScriptedBattleNpc,
-   ScriptedZone
-};
-
 class ScriptObject
 {
 protected:
-   std::string m_scriptName;
    uint32_t m_id;
-   ScriptType m_type;
+   std::size_t m_type;
 
 public:
-   ScriptObject( std::string name, uint32_t id, ScriptType type ) :
-      m_scriptName( name ),
+   ScriptObject( uint32_t id, std::size_t type ) :
       m_id( id ),
       m_type( type )
    { }
-
-   virtual const std::string& getName() const
-   {
-      return m_scriptName;
-   }
 
    virtual uint32_t getId() const
    {
       return m_id;
    }
 
-   virtual ScriptType getType() const
+   virtual std::size_t getType() const
    {
       return m_type;
    }
@@ -62,8 +48,8 @@ public:
 class StatusEffectScript : public ScriptObject
 {
 public:
-   StatusEffectScript( std::string name, uint32_t effectId ) :
-      ScriptObject( name, effectId, ScriptType::ScriptedStatusEffect )
+   StatusEffectScript( uint32_t effectId ) :
+      ScriptObject( effectId, typeid( StatusEffectScript ).hash_code() )
    { }
 
    virtual void onTick( Entity::Actor& actor ) { }
@@ -80,8 +66,8 @@ public:
 class ActionScript : public ScriptObject
 {
 public:
-    ActionScript( std::string name, uint32_t abilityId ) :
-      ScriptObject( name, abilityId, ScriptType::ScriptedAction )
+    ActionScript( uint32_t abilityId ) :
+      ScriptObject( abilityId, typeid( ActionScript ).hash_code() )
    { }
 
    virtual void onStart( Entity::Actor& sourceActor, Entity::Actor& targetActor ) { }
@@ -93,8 +79,8 @@ public:
 class EventScript : public ScriptObject
 {
 public:
-   EventScript( std::string name, uint32_t questId ) :
-      ScriptObject( name, questId, ScriptType::ScriptedEvent )
+   EventScript( uint32_t questId ) :
+      ScriptObject( questId, typeid( EventScript ).hash_code() )
    { }
 
    virtual void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) { }
@@ -111,16 +97,16 @@ public:
 class BattleNpcScript : public ScriptObject
 {
 public:
-   BattleNpcScript( std::string name, uint32_t npcId ) :
-      ScriptObject( name, npcId, ScriptType::ScriptedBattleNpc )
+   BattleNpcScript( uint32_t npcId ) :
+      ScriptObject( npcId, typeid( BattleNpcScript ).hash_code() )
    { }
 };
 
 class ZoneScript : public ScriptObject
 {
 public:
-   ZoneScript( std::string name, uint32_t zoneId ) :
-      ScriptObject( name, zoneId, ScriptType::ScriptedZone )
+   ZoneScript( uint32_t zoneId ) :
+      ScriptObject( zoneId, typeid( ZoneScript ).hash_code() )
    { }
 
    virtual void onZoneInit() { }

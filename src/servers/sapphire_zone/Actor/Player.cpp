@@ -11,7 +11,7 @@
 #include "Player.h"
 #include "BattleNpc.h"
 
-#include "Zone/ZoneMgr.h"
+#include "Zone/TerritoryMgr.h"
 #include "Zone/Zone.h"
 
 #include "ServerZone.h"
@@ -32,7 +32,7 @@
 #include "Inventory/Item.h"
 
 #include "Inventory/Inventory.h"
-#include "Event/Event.h"
+#include "Event/EventHandler.h"
 #include "Action/Action.h"
 #include "Action/EventAction.h"
 #include "Action/EventItemAction.h"
@@ -43,7 +43,7 @@
 
 extern Core::Logger g_log;
 extern Core::ServerZone g_serverZone;
-extern Core::ZoneMgr g_zoneMgr;
+extern Core::TerritoryMgr g_territoryMgr;
 extern Core::Data::ExdData g_exdData;
 extern Core::Scripting::ScriptManager g_scriptMgr;
 
@@ -308,9 +308,8 @@ void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
    }
 
    setStateFlag( PlayerStateFlag::BetweenAreas );
-   sendStateFlags();
 
-   auto z_pos = g_zoneMgr.getZonePosition( data->levelId );
+   auto z_pos = g_territoryMgr.getTerritoryPosition( data->levelId );
 
    Common::FFXIVARR_POSITION3 pos;
    pos.x = 0;
@@ -366,101 +365,62 @@ void Core::Entity::Player::returnToHomepoint()
 
 void Core::Entity::Player::setZone( uint32_t zoneId )
 {
-   auto pPlayer = getAsPlayer();
-
-   auto pZone = g_zoneMgr.getZone( zoneId );
-
-
-   if( !pZone /*|| ( ( pZone == m_pCurrentZone ) && m_lastPing )*/ )
+   if( !g_territoryMgr.movePlayer( zoneId, getAsPlayer() ) )
    {
-      g_log.error( "Zone " + std::to_string( zoneId ) + " not found on this server." );
-      return;
+      // todo: this will require proper handling, for now just return the player to their previous area
+      m_pos = m_prevPos;
+      m_rot = m_prevRot;
+      m_zoneId = m_prevZoneId;
+
+      if( !g_territoryMgr.movePlayer( m_zoneId, getAsPlayer() ) )
+         return;
    }
 
-   m_zoneId = zoneId;
+   sendZonePackets();
+}
 
-   // mark character as zoning in progress
-   setLoadingComplete( false );
+bool Core::Entity::Player::setInstance( uint32_t instanceContentId )
+{
+   auto instance = g_territoryMgr.getInstanceZonePtr( instanceContentId );
+   if( !instance )
+      return false;
 
-   if( m_lastPing != 0 )
-      m_pCurrentZone->removeActor( shared_from_this() );
+   return setInstance( instance );
+}
 
-   m_pCurrentZone = pZone;
-   m_pCurrentZone->pushActor( shared_from_this() );
+bool Core::Entity::Player::setInstance( ZonePtr instance )
+{
+   if( !instance )
+      return false;
 
-   ZoneChannelPacket< FFXIVIpcInit > initPacket( getId() );
-   initPacket.data().charId = getId();
-   queuePacket( initPacket );
-
-   sendInventory();
-
-   if( isLogin() )
+   // zoning within the same zone won't cause the prev data to be overwritten
+   if( instance->getTerritoryId() != m_zoneId )
    {
-      queuePacket(ActorControlPacket143( getId(), SetCharaGearParamUI, m_equipDisplayFlags, 1 ) );
+      m_prevPos = m_pos;
+      m_prevRot = m_rot;
+      m_prevZoneId = m_zoneId;
    }
 
-   // set flags, will be reset automatically by zoning ( only on client side though )
-   pPlayer->setStateFlag( PlayerStateFlag::BetweenAreas );
-   pPlayer->setStateFlag( PlayerStateFlag::BetweenAreas1 );
-   pPlayer->sendStateFlags();
+   if( !g_territoryMgr.movePlayer( instance, getAsPlayer() ) )
+      return false;
 
-   pPlayer->sendStats();
+   sendZonePackets();
 
-   // only initialize the UI if the player in fact just logged in.
-   if( isLogin() )
-   {
-      ZoneChannelPacket< FFXIVIpcCFAvailableContents > contentFinderList( getId() );
-      for( auto i = 0; i < sizeof( contentFinderList.data().contents ); i++ )
-      {
-         // unlock all contents for now
-         contentFinderList.data().contents[i] = 0xFF;
-      }
-      queuePacket( contentFinderList );
+   return true;
+}
 
-      Server::InitUIPacket initUIPacket( *pPlayer );
-      queuePacket( initUIPacket );
+bool Core::Entity::Player::exitInstance()
+{
+   if( !g_territoryMgr.movePlayer( m_prevZoneId, getAsPlayer() ) )
+      return false;
 
-      ZoneChannelPacket< FFXIVIpcPlayerClassInfo > classInfoPacket( getId() );
-      classInfoPacket.data().classId = static_cast< uint8_t >( getClass() );
-      classInfoPacket.data().unknown = 1;
-      classInfoPacket.data().level = getLevel();
-      classInfoPacket.data().level1 = getLevel();
-      queuePacket( classInfoPacket );
+   m_pos = m_prevPos;
+   m_rot = m_prevRot;
+   m_zoneId = m_prevZoneId;
 
-      ZoneChannelPacket< FFXIVGCAffiliation > gcAffPacket( getId() );
-      gcAffPacket.data().gcId = m_gc;
-      gcAffPacket.data().gcRank[0] = m_gcRank[0];
-      gcAffPacket.data().gcRank[1] = m_gcRank[1];
-      gcAffPacket.data().gcRank[2] = m_gcRank[2];
-      queuePacket( gcAffPacket );
+   sendZonePackets();
 
-      m_itemLevel = getInventory()->calculateEquippedGearItemLevel();
-      sendItemLevel();
-   }
-
-   ZoneChannelPacket< FFXIVIpcInitZone > initZonePacket( getId() );
-   initZonePacket.data().zoneId = getCurrentZone()->getLayoutId();
-   initZonePacket.data().weatherId = static_cast< uint8_t >( getCurrentZone()->getCurrentWeather() );
-   initZonePacket.data().bitmask = 0x1;
-   initZonePacket.data().unknown5 = 0x2A;
-   initZonePacket.data().pos.x = getPos().x;
-   initZonePacket.data().pos.y = getPos().y;
-   initZonePacket.data().pos.z = getPos().z;
-   queuePacket( initZonePacket );
-
-   if( isLogin() )
-   {
-      ZoneChannelPacket< FFXIVARR_IPC_UNK322 > unk322( getId() );
-      queuePacket( unk322 );
-
-      ZoneChannelPacket< FFXIVARR_IPC_UNK320 > unk320( getId() );
-      queuePacket( unk320 );
-   }
-
-   if( getLastPing() == 0 )
-      sendQuestInfo();
-
-   m_bMarkedForZoning = false;
+   return true;
 }
 
 uint32_t Core::Entity::Player::getPlayTime() const
@@ -542,7 +502,7 @@ void Core::Entity::Player::discover( int16_t map_id, int16_t sub_id )
 
    int32_t offset = 4;
 
-   auto info = g_exdData.m_zoneInfoMap[getCurrentZone()->getId()];
+   auto info = g_exdData.m_zoneInfoMap[getCurrentZone()->getTerritoryId()];
    if( info.is_two_byte )
       offset = 4 + 2 * info.discovery_index;
    else
@@ -580,7 +540,6 @@ void Core::Entity::Player::setNewAdventurer( bool state )
    //{
    //   setStateFlag( PlayerStateFlag::NewAdventurer );
    //}
-   sendStateFlags();
    m_bNewAdventurer = state;
 }
 
@@ -972,6 +931,7 @@ bool Core::Entity::Player::hasStateFlag( Common::PlayerStateFlag flag ) const
 
 void Core::Entity::Player::setStateFlag( Common::PlayerStateFlag flag )
 {
+   auto prevOnlineStatus = getOnlineStatus();
    int32_t iFlag = static_cast< uint32_t >( flag );
 
    uint16_t index;
@@ -979,6 +939,13 @@ void Core::Entity::Player::setStateFlag( Common::PlayerStateFlag flag )
    Util::valueToFlagByteIndexValue( iFlag, value, index );
 
    m_stateFlags[index] |= value;
+   sendStateFlags();
+
+   auto newOnlineStatus = getOnlineStatus();
+
+   if( prevOnlineStatus != newOnlineStatus )
+      sendToInRangeSet( ActorControlPacket142( getId(), SetStatusIcon,
+                                               static_cast< uint8_t >( getOnlineStatus() ) ), true );
 
 }
 
@@ -986,13 +953,7 @@ void Core::Entity::Player::setStateFlags( std::vector< Common::PlayerStateFlag >
 {
    for( const auto& flag : flags )
    {
-      int iFlag = static_cast< uint32_t >( flag );
-
-      uint16_t index;
-      uint8_t value;
-      Util::valueToFlagByteIndexValue( iFlag, value, index );
-
-      m_stateFlags[index] |= value;
+      setStateFlag( flag );
    }
 }
 
@@ -1006,6 +967,8 @@ void Core::Entity::Player::unsetStateFlag( Common::PlayerStateFlag flag )
    if( !hasStateFlag( flag ) )
       return;
 
+   auto prevOnlineStatus = getOnlineStatus();
+
    int32_t iFlag = static_cast< uint32_t >( flag );
 
    uint16_t index;
@@ -1013,7 +976,13 @@ void Core::Entity::Player::unsetStateFlag( Common::PlayerStateFlag flag )
    Util::valueToFlagByteIndexValue( iFlag, value, index );
 
    m_stateFlags[index] ^= value;
+   sendStateFlags();
 
+   auto newOnlineStatus = getOnlineStatus();
+
+   if( prevOnlineStatus != newOnlineStatus )
+      sendToInRangeSet( ActorControlPacket142( getId(), SetStatusIcon,
+                                               static_cast< uint8_t >( getOnlineStatus() ) ), true );
 }
 
 void Core::Entity::Player::update( int64_t currTime )
@@ -1023,7 +992,7 @@ void Core::Entity::Player::update( int64_t currTime )
    if( m_queuedZoneing && ( currTime - m_queuedZoneing->m_queueTime ) > 800 )
    {
       Common::FFXIVARR_POSITION3 targetPos = m_queuedZoneing->m_targetPosition;
-      if( getCurrentZone()->getId() != m_queuedZoneing->m_targetZone )
+      if( getCurrentZone()->getTerritoryId() != m_queuedZoneing->m_targetZone )
       {
          performZoning( m_queuedZoneing->m_targetZone, targetPos, m_queuedZoneing->m_targetRotation);
       }
@@ -1595,4 +1564,90 @@ void Core::Entity::Player::setEorzeaTimeOffset( uint64_t timestamp )
 
    // Send to single player
    queuePacket( packet );
+}
+
+void Player::setTerritoryId( uint32_t territoryId )
+{
+   m_zoneId = territoryId;
+}
+
+uint32_t Player::getTerritoryId() const
+{
+   return m_zoneId;
+}
+
+void Player::sendZonePackets()
+{
+   ZoneChannelPacket< FFXIVIpcInit > initPacket( getId() );
+   initPacket.data().charId = getId();
+   queuePacket( initPacket );
+
+   sendInventory();
+
+   if( isLogin() )
+   {
+      queuePacket(ActorControlPacket143( getId(), SetCharaGearParamUI, m_equipDisplayFlags, 1 ) );
+   }
+
+   // set flags, will be reset automatically by zoning ( only on client side though )
+   setStateFlag( PlayerStateFlag::BetweenAreas );
+   setStateFlag( PlayerStateFlag::BetweenAreas1 );
+
+   sendStats();
+
+   // only initialize the UI if the player in fact just logged in.
+   if( isLogin() )
+   {
+      ZoneChannelPacket< FFXIVIpcCFAvailableContents > contentFinderList( getId() );
+      for( auto i = 0; i < sizeof( contentFinderList.data().contents ); i++ )
+      {
+         // unlock all contents for now
+         contentFinderList.data().contents[i] = 0xFF;
+      }
+      queuePacket( contentFinderList );
+
+      Server::InitUIPacket initUIPacket( *this );
+      queuePacket( initUIPacket );
+
+      ZoneChannelPacket< FFXIVIpcPlayerClassInfo > classInfoPacket( getId() );
+      classInfoPacket.data().classId = static_cast< uint8_t >( getClass() );
+      classInfoPacket.data().unknown = 1;
+      classInfoPacket.data().level = getLevel();
+      classInfoPacket.data().level1 = getLevel();
+      queuePacket( classInfoPacket );
+
+      ZoneChannelPacket< FFXIVGCAffiliation > gcAffPacket( getId() );
+      gcAffPacket.data().gcId = m_gc;
+      gcAffPacket.data().gcRank[0] = m_gcRank[0];
+      gcAffPacket.data().gcRank[1] = m_gcRank[1];
+      gcAffPacket.data().gcRank[2] = m_gcRank[2];
+      queuePacket( gcAffPacket );
+
+      m_itemLevel = getInventory()->calculateEquippedGearItemLevel();
+      sendItemLevel();
+   }
+
+   ZoneChannelPacket< FFXIVIpcInitZone > initZonePacket( getId() );
+   initZonePacket.data().zoneId = getCurrentZone()->getTerritoryId();
+   initZonePacket.data().weatherId = static_cast< uint8_t >( getCurrentZone()->getCurrentWeather() );
+   initZonePacket.data().bitmask = 0x1;
+   initZonePacket.data().unknown5 = 0x2A;
+   initZonePacket.data().pos.x = getPos().x;
+   initZonePacket.data().pos.y = getPos().y;
+   initZonePacket.data().pos.z = getPos().z;
+   queuePacket( initZonePacket );
+
+   if( isLogin() )
+   {
+      ZoneChannelPacket< FFXIVARR_IPC_UNK322 > unk322( getId() );
+      queuePacket( unk322 );
+
+      ZoneChannelPacket< FFXIVARR_IPC_UNK320 > unk320( getId() );
+      queuePacket( unk320 );
+   }
+
+   if( getLastPing() == 0 )
+      sendQuestInfo();
+
+   m_bMarkedForZoning = false;
 }

@@ -1,5 +1,5 @@
 #include "EventHelper.h"
-#include "Event.h"
+#include "EventHandler.h"
 #include <common/Common.h>
 #include <common/Exd/ExdData.h>
 
@@ -15,7 +15,7 @@ std::string Core::Event::getEventName( uint32_t eventId )
 
    switch( eventType )
    {
-   case EventType::Quest:
+   case Event::EventHandler::EventHandlerType::Quest:
    {
       auto questInfo = g_exdData.getQuestInfo( eventId );
       if( !questInfo )
@@ -26,7 +26,7 @@ std::string Core::Event::getEventName( uint32_t eventId )
 
       return questInfo->name_intern.substr( 0, pos );
    }
-   case EventType::CustomTalk:
+   case Event::EventHandler::EventHandlerType::CustomTalk:
    {
       auto customTalkInfo = g_exdData.getCustomTalkInfo( eventId );
       if( !customTalkInfo )
@@ -37,21 +37,22 @@ std::string Core::Event::getEventName( uint32_t eventId )
 
       return customTalkInfo->name_intern.substr( 0, pos );
    }
-   case EventType::Opening:
+   case Event::EventHandler::EventHandlerType::Opening:
    {
       auto openingInfo = g_exdData.getOpeningInfo( eventId );
       if( openingInfo )
          return openingInfo->name;
       return unknown + "Opening";
    }
-   case EventType::Aetheryte:
+   case Event::EventHandler::EventHandlerType::Aetheryte:
    {
       auto aetherInfo = g_exdData.getAetheryteInfo( eventId & 0xFFFF );
       if( aetherInfo->isAetheryte )
          return "Aetheryte";
       return "Aethernet";
    }
-   case EventType::ChocoPort:
+
+   case Event::EventHandler::EventHandlerType::Warp:
    {
       return "ChocoboTaxi";
    }

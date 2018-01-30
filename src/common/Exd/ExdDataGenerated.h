@@ -1,5 +1,5 @@
-#ifndef _EXDDATA_H
-#define _EXDDATA_H
+#ifndef _EXDDATAGENERATED_H
+#define _EXDDATAGENERATED_H
 
 /* This file has been automatically generated.
    Changes will be lost upon regeneration.
@@ -3020,12 +3020,12 @@ struct TerritoryType
    uint16_t placeNameZone;
    uint16_t placeName;
    uint16_t map;
+   uint8_t territoryIntendedUse;
    uint8_t weatherRate;
    int32_t aetheryte;
 
    TerritoryType( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
-
 struct TextCommand
 {
    std::string command;
