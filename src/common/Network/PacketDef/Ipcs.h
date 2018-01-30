@@ -182,7 +182,8 @@ namespace Packets {
       SkillHandler             = 0x0114, // updated 4.1
       GMCommand1               = 0x0115, // updated 4.1 ??
       GMCommand2               = 0x0116, // updated 4.1 ??
-      UpdatePositionHandler    = 0x0118, // updated 4.1
+      UpdatePositionHandler    = 0x0138, // updated 4.2
+      UpdatePositionInstance   = 0x0177, // updated 4.2
 
       InventoryModifyHandler   = 0x011F, // updated 4.1
 
