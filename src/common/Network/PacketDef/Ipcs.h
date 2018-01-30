@@ -176,7 +176,7 @@ namespace Packets {
       FcInfoReqHandler         = 0x0109, // updated 4.1
 
       ZoneLineHandler          = 0x0110, // updated 4.1
-      ActionHandler            = 0x0111, // updated 4.1
+      ActionHandler            = 0x0131, // updated 4.2
       DiscoveryHandler         = 0x0112, // updated 4.1
 
       SkillHandler             = 0x0114, // updated 4.1
