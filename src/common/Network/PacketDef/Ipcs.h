@@ -63,7 +63,7 @@ namespace Packets {
       UpdateSearchInfo           = 0x00C0, // updated 4.1
       InitSearchInfo             = 0x00C1, // updated 4.1
       ServerNotice               = 0x00C6, // updated 4.1
-      SetOnlineStatus            = 0x00C7, // updated 4.1
+      SetOnlineStatus            = 0x00F1, // updated 4.2
 
       LogMessage                 = 0x00D0,
       BlackList                  = 0x00D4, // updated 4.1
@@ -83,7 +83,7 @@ namespace Packets {
       InitUI                     = 0x016B, // updated 4.2
       ActorOwner                 = 0x012D, // updated 4.1
       PlayerStats                = 0x016C, // updated 4.2
-      PlayerStateFlags           = 0x013A, // updated 4.1
+      PlayerStateFlags           = 0x016E, // updated 4.2
       PlayerClassInfo            = 0x016F, // updated 4.2
       ModelEquip                 = 0x013C, // updated 4.1
 
@@ -93,16 +93,16 @@ namespace Packets {
       ActorControl144            = 0x0144, // updated 4.1
       UpdateHpMpTp               = 0x0145, // updated 4.1
 
-      ItemInfo                   = 0x014C, // updated 4.1
-      ContainerInfo              = 0x014D, // updated 4.1
-      InventoryTransactionFinish = 0x014E, // updated 4.1
-      InventoryTransaction       = 0x014F, // updated 4.1
-      CurrencyCrystalInfo        = 0x0150, // updated 4.1
+      ItemInfo                   = 0x017A, // updated 4.2
+      ContainerInfo              = 0x017B, // updated 4.2
+      InventoryTransactionFinish = 0x017C, // updated 4.2
+      InventoryTransaction       = 0x017D, // updated 4.2
+      CurrencyCrystalInfo        = 0x017E, // updated 4.1
       InventoryActionAck         = 0x1139,
       UpdateInventorySlot        = 0x0153, // updated 4.1
 
       EventPlay                  = 0x0160, // updated 4.1
-      EventStart                 = 0x0169, // updated 4.1
+      EventStart                 = 0x0199, // updated 4.2
       EventFinish                = 0x016A, // updated 4.1
 
       EventLinkshell             = 0x1169,
@@ -130,7 +130,7 @@ namespace Packets {
 
       CFAvailableContents        = 0x01CF,
 
-      PrepareZoning              = 0x0248, // updated 4.1
+      PrepareZoning              = 0x027C, // updated 4.2
 
       // Unknown IPC types that still need to be sent
       // TODO: figure all these out properly
