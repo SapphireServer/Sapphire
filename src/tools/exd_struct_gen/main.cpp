@@ -80,7 +80,7 @@ std::string generateDirectGetterDef( const std::string& exd )
    std::string result = "";
    result =
       "boost::shared_ptr< Core::Data::" + exd + " >\n"
-      "   get" + exd + "( uint32_t " + exd + "Id )\n"
+      "   Core::Data::ExdDataGenerated::get" + exd + "( uint32_t " + exd + "Id )\n"
       "{\n"
       "   try\n"
       "   {\n"
@@ -273,9 +273,10 @@ std::string generateConstructorsDecl( const std::string& exd )
 
 int main( int argc, char** argv )
 {
+   g_log.init();
    if( argc > 1 )
    {
-      printf( "using dat path: %s", argv[1] );
+      g_log.info( "using dat path: " + std::string( argv[1] ) );
       datLocation = std::string( argv[1] );
    }
 
@@ -303,7 +304,6 @@ int main( int argc, char** argv )
    using boost::property_tree::ptree;
    ptree m_propTree;
    boost::property_tree::read_json( "ex.json", m_propTree );
-   g_log.init();
 
    g_log.info( "Setting up EXD data" );
    if( !g_exdData.init( datLocation ) )
