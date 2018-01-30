@@ -88,22 +88,22 @@ namespace Packets {
       ModelEquip                 = 0x013C, // updated 4.1
 
       AddStatusEffect            = 0x0141,
-      ActorControl142            = 0x0142, // updated 4.1
-      ActorControl143            = 0x0143, // updated 4.1
-      ActorControl144            = 0x0144, // updated 4.1
-      UpdateHpMpTp               = 0x0145, // updated 4.1
+      ActorControl142            = 0x0142, // updated 4.2
+      ActorControl143            = 0x0143, // updated 4.2
+      ActorControl144            = 0x0144, // updated 4.2
+      UpdateHpMpTp               = 0x0145, // updated 4.2
 
       ItemInfo                   = 0x017A, // updated 4.2
       ContainerInfo              = 0x017B, // updated 4.2
       InventoryTransactionFinish = 0x017C, // updated 4.2
       InventoryTransaction       = 0x017D, // updated 4.2
-      CurrencyCrystalInfo        = 0x017E, // updated 4.1
+      CurrencyCrystalInfo        = 0x017E, // updated 4.2
       InventoryActionAck         = 0x1139,
       UpdateInventorySlot        = 0x0153, // updated 4.1
 
-      EventPlay                  = 0x0160, // updated 4.1
+      EventPlay                  = 0x0190, // updated 4.2
       EventStart                 = 0x0199, // updated 4.2
-      EventFinish                = 0x016A, // updated 4.1
+      EventFinish                = 0x019A, // updated 4.2
 
       EventLinkshell             = 0x1169,
 
