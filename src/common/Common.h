@@ -162,29 +162,6 @@ namespace Common {
       instance,
    };
 
-   enum TerritoryIntendedUseType : uint8_t //ToDo: Add The Rest of The Territory Types and Have Better Names For Them
-   {
-      Town = 0,
-      OpenWorld = 1,
-      Inn = 2,
-      Dungeon = 3,
-      JailArea = 5,
-      OpeningArea = 6,
-      BeforeTrialDung = 7,
-      AllianceRaid = 8,
-      OpenWorldInstanceBattle = 9,
-      Trial = 10,
-      HousingArea = 13,
-      HousingPrivateArea = 14,
-      MSQPrivateArea = 15,
-      Raids = 16,
-      RaidFights = 17,
-      ChocoboTutorial = 21,
-      Wedding = 22,
-      BeginnerTutorial = 27,
-      PalaceOfTheDead = 31,
-   };
-
    enum CharaLook : uint8_t
    {
       Race = 0x00,
@@ -317,25 +294,6 @@ namespace Common {
       };
 
 
-   };
-
-   enum EventType : uint16_t
-   {
-      Quest = 0x0001,
-      ChocoRent = 0x0002,
-      Shop = 0x0004,
-      Aetheryte = 0x0005,
-      GuildLeveAssign = 0x0006,
-      DefaultTalk = 0x0009,
-      CustomTalk = 0x000B,
-      CraftLeve = 0x000E,
-      ChocoPort = 0x0012,
-      Opening = 0x0013,
-      GCShop = 0x0016,
-      GuildOrderGuide = 0x0017,
-      GuildOrderOfficer = 0x0018,
-      Stories = 0x001A,
-      FcTalk = 0x001F,
    };
 
    enum struct ActionAspect : uint8_t

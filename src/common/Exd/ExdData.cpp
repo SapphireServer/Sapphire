@@ -85,10 +85,11 @@ bool Core::Data::ExdData::loadZoneInfo()
       int16_t map_index          = getField< int16_t >( mapDataFields, 12 );
       bool is_two_bytes          = getField< bool >( mapDataFields, 15 );
 
-      uint16_t weather_rate       = getField< uint16_t >( fields, 10 ) > 75 ? 0 : getField< uint16_t >( fields, 10 );
+      uint8_t weather_rate       = getField< uint8_t >( fields, 12 ) > 75 ? 0 : getField< uint8_t >( fields, 12 );
       auto weatherRateFields     = weatherRate.get_row( weather_rate );
 
       int32_t aetheryte_index = getField< int32_t >( fields, 23 );
+      uint8_t zoneType = getField< uint8_t >( fields, 9 );
 
 
       ZoneInfo info{ 0 };
@@ -101,6 +102,8 @@ bool Core::Data::ExdData::loadZoneInfo()
       info.map_id          = map_id;
       info.weather_rate    = weather_rate; // TODO: deal with weather groups
       info.aetheryte_index = aetheryte_index;
+      info.zone_type       = zoneType;
+
 
       uint8_t sumPc = 0;
       for( size_t i = 0; i < 16; )

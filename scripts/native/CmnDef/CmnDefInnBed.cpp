@@ -3,7 +3,7 @@
 class CmnDefInnBed : public EventScript
 {
 public:
-   CmnDefInnBed() : EventScript( "CmnDefInnBed", 720916 )
+   CmnDefInnBed() : EventScript( 720916 )
    {}
 
    // menu

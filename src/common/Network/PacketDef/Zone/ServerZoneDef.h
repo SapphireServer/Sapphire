@@ -365,7 +365,7 @@ struct FFXIVIpcPlayerSpawn : FFXIVIpcBasePacket<PlayerSpawn>
    uint32_t bNPCName;
    uint32_t u18;
    uint32_t u19;
-   uint32_t u20;
+   uint32_t directorId;
    uint32_t ownerId;
    uint32_t u22;
    uint32_t hPMax;

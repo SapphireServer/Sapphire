@@ -71,7 +71,7 @@ class ManFst004 : public EventScript
       static constexpr auto UnlockDesion = 14;
 
    public:
-      ManFst004() : EventScript( "Close to Home", 65660 ){};
+      ManFst004() : EventScript( 65660 ){};
       ~ManFst004(){};
 
    //////////////////////////////////////////////////////////////////////

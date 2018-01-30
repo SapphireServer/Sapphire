@@ -3,7 +3,7 @@
 class CmnDefCutSceneReplay : public EventScript
 {
 public:
-   CmnDefCutSceneReplay() : EventScript( "CmnDefCutSceneReplay", 721028 )
+   CmnDefCutSceneReplay() : EventScript( 721028 )
    {}
 
    void Scene00000( Entity::Player& player )

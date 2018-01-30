@@ -15,26 +15,21 @@
 #include <stdio.h>
 #include <string.h>
 namespace Core {
-namespace Entity
-{
-   class Actor;
-   class Player;
-}
 
 class Session;
 
 class ZonePosition;
 
-typedef std::set< SessionPtr > SessionSet;
+using SessionSet = std::set< SessionPtr >;
 
 class Zone : public CellHandler< Cell >, public boost::enable_shared_from_this< Zone >
 {
 protected:
-   uint32_t	m_zoneId;
-   uint32_t	m_layoutId;
+   uint32_t	m_territoryId;
+   uint32_t	m_guId;
 
-   std::string m_zoneName;
-   std::string m_zoneCode;
+   std::string m_placeName;
+   std::string m_internalName;
 
    bool m_bPrivate;
 
@@ -58,7 +53,7 @@ protected:
 public:
    Zone();
 
-   Zone( uint16_t zoneId, uint32_t layoutId, std::string name, std::string interName, bool bPrivate );
+   Zone( uint16_t territoryId, uint32_t guId, const std::string& internalName, const std::string& placeName );
    virtual ~Zone();
 
    bool init();
@@ -92,11 +87,11 @@ public:
 
    void queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range, Network::Packets::GamePacketPtr pPacketEntry );
 
-   virtual uint32_t getId();
+   virtual uint32_t getTerritoryId();
 
    Common::RegionType getType() const;
 
-   uint16_t getLayoutId() const;
+   uint16_t getGuId() const;
 
    bool isInstance() const;
 
@@ -108,7 +103,7 @@ public:
    bool checkWeather();
    void updateBnpcs( int64_t tickCount );
 
-   bool runZoneLogic();
+   bool runZoneLogic( uint32_t currTime );
 
 };
 

@@ -136,7 +136,7 @@ private:
       player.eventPlay( getId(), 50, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0, 0, callback );
    }
 public:
-   ManSea002() : EventScript( "ManSea002", 65644 ) {}
+   ManSea002() : EventScript( 65644 ) {}
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {

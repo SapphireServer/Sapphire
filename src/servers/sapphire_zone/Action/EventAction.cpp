@@ -6,7 +6,7 @@
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 #include "Actor/Player.h"
-#include "Event/Event.h"
+#include "Event/EventHandler.h"
 
 extern Core::Logger g_log;
 extern Core::Data::ExdData g_exdData;
@@ -54,7 +54,6 @@ void Core::Action::EventAction::onStart()
    {
       m_pSource->sendToInRangeSet( control, true );
       m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::SomeFlag );
-      m_pSource->getAsPlayer()->sendStateFlags();
    }
    else
       m_pSource->sendToInRangeSet( control );
@@ -84,7 +83,6 @@ void Core::Action::EventAction::onFinish()
       if( m_pSource->isPlayer() )
       {
          m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::SomeFlag );
-         m_pSource->getAsPlayer()->sendStateFlags();
          m_pSource->sendToInRangeSet( control, true );
       }
       else
@@ -114,7 +112,6 @@ void Core::Action::EventAction::onInterrupt()
 
          m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::NoCombat );
          m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied1 );
-         m_pSource->getAsPlayer()->sendStateFlags();
          m_pSource->sendToInRangeSet( control );
          m_pSource->sendToInRangeSet( control1 );
 

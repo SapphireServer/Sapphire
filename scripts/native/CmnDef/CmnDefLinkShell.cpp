@@ -7,7 +7,7 @@
 class CmnDefLinkShell : public EventScript
 {
 public:
-   CmnDefLinkShell() : EventScript( "CmnDefLinkShell", 0xB0006 )
+   CmnDefLinkShell() : EventScript( 0xB0006 )
    {}
 
    void Scene00001( Entity::Player& player )
