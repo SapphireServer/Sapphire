@@ -73,18 +73,18 @@ namespace Packets {
       Effect                     = 0x00FB, // updated 4.1
       GCAffiliation              = 0x00FC,
 
-      PlayerSpawn                = 0x011C, // updated 4.1
-      NpcSpawn                   = 0x011D, // updated 4.1
+      PlayerSpawn                = 0x015C, // updated 4.2
+      NpcSpawn                   = 0x015D, // updated 4.2
       ActorMove                  = 0x011E, // updated 4.1
       ActorSetPos                = 0x0120, // updated 4.1
       ActorCast                  = 0x0123, // updated 4.1
-      HateList                   = 0x0126, // updated 4.1
-      UpdateClassInfo            = 0x012A, // updated 4.1
-      InitUI                     = 0x012B, // updated 4.1
+      HateList                   = 0x0165, // updated 4.2
+      UpdateClassInfo            = 0x0169, // updated 4.2
+      InitUI                     = 0x016B, // updated 4.2
       ActorOwner                 = 0x012D, // updated 4.1
-      PlayerStats                = 0x0138, // updated 4.1
+      PlayerStats                = 0x016C, // updated 4.2
       PlayerStateFlags           = 0x013A, // updated 4.1
-      PlayerClassInfo            = 0x013B, // updated 4.1
+      PlayerClassInfo            = 0x016F, // updated 4.2
       ModelEquip                 = 0x013C, // updated 4.1
 
       AddStatusEffect            = 0x0141,
@@ -119,10 +119,10 @@ namespace Packets {
       ActorSpawn                 = 0x0190, // todo: split into playerspawn/actorspawn and use opcode 0x110/0x111
       ActorFreeSpawn             = 0x0191, // unchanged for sb
       InitZone                   = 0x019A, // unchanged for sb
-      Mount                      = 0x019F,
-      WeatherChange              = 0x01AF, // updated for sb
-      PlayerTitleList            = 0x01BD, // updated for 4.1
-      Discovery                  = 0x01BE, // updated for 4.1
+      Mount                      = 0x01CD,
+      WeatherChange              = 0x01DD, // updated for 4.2
+      PlayerTitleList            = 0x01EB, // updated for 4.2
+      Discovery                  = 0x01EC, // updated for 4.2
 
       EorzeaTimeOffset           = 0x01C0, // updated 4.1
 
@@ -176,13 +176,14 @@ namespace Packets {
       FcInfoReqHandler         = 0x0109, // updated 4.1
 
       ZoneLineHandler          = 0x0110, // updated 4.1
-      ActionHandler            = 0x0111, // updated 4.1
+      ActionHandler            = 0x0131, // updated 4.2
       DiscoveryHandler         = 0x0112, // updated 4.1
 
       SkillHandler             = 0x0114, // updated 4.1
       GMCommand1               = 0x0115, // updated 4.1 ??
       GMCommand2               = 0x0116, // updated 4.1 ??
-      UpdatePositionHandler    = 0x0118, // updated 4.1
+      UpdatePositionHandler    = 0x0138, // updated 4.2
+      UpdatePositionInstance   = 0x0177, // updated 4.2
 
       InventoryModifyHandler   = 0x011F, // updated 4.1
 
