@@ -116,7 +116,7 @@ namespace Packets {
       MSQTrackerComplete         = 0x0181,
       MSQTrackerProgress         = 0x0182,
       QuestTracker               = 0x018D, // updated 4.1
-      ActorSpawn                 = 0x0190, // todo: split into playerspawn/actorspawn and use opcode 0x110/0x111
+      ActorSpawn                 = 0x0190, // DEPRECATED
       ActorFreeSpawn             = 0x0191, // unchanged for sb
       InitZone                   = 0x019A, // unchanged for sb
       Mount                      = 0x01CD,
@@ -134,8 +134,8 @@ namespace Packets {
 
       // Unknown IPC types that still need to be sent
       // TODO: figure all these out properly
-      IPCTYPE_UNK_320            = 0x0207, // updated 4.1
-      IPCTYPE_UNK_322            = 0x0209, // updated 4.1
+      IPCTYPE_UNK_320            = 0x0235, // updated 4.2 ( maybe )
+      IPCTYPE_UNK_322            = 0x0237, // updated 4.2 ( maybe )
 
       ActorGauge                 = 0x0249,
 
