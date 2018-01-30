@@ -1,5 +1,5 @@
-#ifndef _EXDDATAGENERATED_H
-#define _EXDDATAGENERATED_H
+#ifndef GENERATED_EXDDATA_H
+#define GENERATED_EXDDATA_H
 
 /* This file has been automatically generated.
    Changes will be lost upon regeneration.
@@ -71,7 +71,6 @@ struct BuddySkill;
 struct Cabinet;
 struct CabinetCategory;
 struct Calendar;
-struct ChainBonus;
 struct CharaMakeCustomize;
 struct CharaMakeType;
 struct ChocoboRace;
@@ -141,11 +140,13 @@ struct EventItemHelp;
 struct ExVersion;
 struct Fate;
 struct FCActivity;
+struct FCActivityCategory;
 struct FCAuthority;
 struct FCAuthorityCategory;
 struct FCChestName;
 struct FccShop;
 struct FCHierarchy;
+struct FCProfile;
 struct FCReputation;
 struct FCRights;
 struct FishingSpot;
@@ -169,6 +170,12 @@ struct GcArmyExpeditionMemberBonus;
 struct GcArmyExpeditionType;
 struct GcArmyMemberGrow;
 struct GcArmyTraining;
+struct GCRankGridaniaFemaleText;
+struct GCRankGridaniaMaleText;
+struct GCRankLimsaFemaleText;
+struct GCRankLimsaMaleText;
+struct GCRankUldahFemaleText;
+struct GCRankUldahMaleText;
 struct GCScripShopCategory;
 struct GCScripShopItem;
 struct GCShop;
@@ -838,14 +845,6 @@ struct Calendar
    Calendar( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
-struct ChainBonus
-{
-   uint8_t bonus;
-   uint8_t timeouts;
-
-   ChainBonus( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
-};
-
 struct CharaMakeCustomize
 {
    uint32_t icon;
@@ -1143,8 +1142,10 @@ struct ContentFinderCondition
    uint8_t contentIndicator;
    uint16_t instanceContent;
    uint8_t contentMemberType;
-   uint8_t classJobLevel;
+   uint8_t classJobLevelRequired;
+   uint8_t classJobLevelSync;
    uint16_t itemLevelRequired;
+   uint16_t itemLevelSync;
    uint32_t icon;
 
    ContentFinderCondition( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
@@ -1173,7 +1174,6 @@ struct ContentRoulette
    std::string description;
    std::string dutyType;
    bool isInDutyFinder;
-   bool requireAllDuties;
    uint16_t itemLevelRequired;
    uint32_t icon;
    uint16_t rewardTomeA;
@@ -1181,6 +1181,7 @@ struct ContentRoulette
    uint16_t rewardTomeC;
    uint8_t sortKey;
    uint8_t contentMemberType;
+   bool requireAllDuties;
 
    ContentRoulette( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
@@ -1531,6 +1532,7 @@ struct EventAction
 {
    std::string name;
    uint16_t icon;
+   uint16_t castTime;
 
    EventAction( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
@@ -1562,6 +1564,7 @@ struct EventItem
    uint16_t icon;
    uint8_t stackSize;
    uint32_t quest;
+   uint8_t castTime;
 
    EventItem( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
@@ -1598,8 +1601,16 @@ struct Fate
 struct FCActivity
 {
    std::string text;
+   uint8_t fCActivityCategory;
 
    FCActivity( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct FCActivityCategory
+{
+   std::string name;
+
+   FCActivityCategory( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct FCAuthority
@@ -1636,6 +1647,13 @@ struct FCHierarchy
    std::string name;
 
    FCHierarchy( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct FCProfile
+{
+   std::string name;
+
+   FCProfile( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct FCReputation
@@ -1851,6 +1869,60 @@ struct GcArmyTraining
    GcArmyTraining( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
+struct GCRankGridaniaFemaleText
+{
+   std::string name;
+   std::string plural;
+   std::string nameRank;
+
+   GCRankGridaniaFemaleText( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct GCRankGridaniaMaleText
+{
+   std::string name;
+   std::string plural;
+   std::string nameRank;
+
+   GCRankGridaniaMaleText( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct GCRankLimsaFemaleText
+{
+   std::string name;
+   std::string plural;
+   std::string nameRank;
+
+   GCRankLimsaFemaleText( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct GCRankLimsaMaleText
+{
+   std::string name;
+   std::string plural;
+   std::string nameRank;
+
+   GCRankLimsaMaleText( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct GCRankUldahFemaleText
+{
+   std::string name;
+   std::string plural;
+   std::string nameRank;
+
+   GCRankUldahFemaleText( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct GCRankUldahMaleText
+{
+   std::string name;
+   std::string plural;
+   std::string nameRank;
+
+   GCRankUldahMaleText( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
 struct GCScripShopCategory
 {
    int8_t grandCompany;
@@ -2022,12 +2094,9 @@ struct InstanceContent
    uint8_t instanceContentType;
    uint8_t weekRestriction;
    uint16_t timeLimitmin;
-   uint8_t classJobLevelSync;
    std::string name;
    uint16_t bGM;
-   uint16_t itemLevelSync;
    uint32_t territoryType;
-   uint32_t icon;
    uint32_t instanceContentTextDataBossStart;
    uint32_t instanceContentTextDataBossEnd;
    uint32_t bNpcBaseBoss;
@@ -2211,7 +2280,6 @@ struct Leve
    int32_t placeNameStart;
    int32_t placeNameIssued;
    uint8_t classJobCategory;
-   int32_t journalCategory;
    int32_t placeNameStartZone;
    int32_t iconCityState;
    int32_t dataId;
@@ -2254,6 +2322,7 @@ struct Level
    uint8_t type;
    uint32_t objectKey;
    uint16_t map;
+   uint32_t eventId;
    uint16_t territory;
 
    Level( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
@@ -3026,6 +3095,7 @@ struct TerritoryType
 
    TerritoryType( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
+
 struct TextCommand
 {
    std::string command;
@@ -3366,7 +3436,6 @@ struct WorldDCGroupType
      xiv::exd::Exd m_CabinetDat;
      xiv::exd::Exd m_CabinetCategoryDat;
      xiv::exd::Exd m_CalendarDat;
-     xiv::exd::Exd m_ChainBonusDat;
      xiv::exd::Exd m_CharaMakeCustomizeDat;
      xiv::exd::Exd m_CharaMakeTypeDat;
      xiv::exd::Exd m_ChocoboRaceDat;
@@ -3436,11 +3505,13 @@ struct WorldDCGroupType
      xiv::exd::Exd m_ExVersionDat;
      xiv::exd::Exd m_FateDat;
      xiv::exd::Exd m_FCActivityDat;
+     xiv::exd::Exd m_FCActivityCategoryDat;
      xiv::exd::Exd m_FCAuthorityDat;
      xiv::exd::Exd m_FCAuthorityCategoryDat;
      xiv::exd::Exd m_FCChestNameDat;
      xiv::exd::Exd m_FccShopDat;
      xiv::exd::Exd m_FCHierarchyDat;
+     xiv::exd::Exd m_FCProfileDat;
      xiv::exd::Exd m_FCReputationDat;
      xiv::exd::Exd m_FCRightsDat;
      xiv::exd::Exd m_FishingSpotDat;
@@ -3464,6 +3535,12 @@ struct WorldDCGroupType
      xiv::exd::Exd m_GcArmyExpeditionTypeDat;
      xiv::exd::Exd m_GcArmyMemberGrowDat;
      xiv::exd::Exd m_GcArmyTrainingDat;
+     xiv::exd::Exd m_GCRankGridaniaFemaleTextDat;
+     xiv::exd::Exd m_GCRankGridaniaMaleTextDat;
+     xiv::exd::Exd m_GCRankLimsaFemaleTextDat;
+     xiv::exd::Exd m_GCRankLimsaMaleTextDat;
+     xiv::exd::Exd m_GCRankUldahFemaleTextDat;
+     xiv::exd::Exd m_GCRankUldahMaleTextDat;
      xiv::exd::Exd m_GCScripShopCategoryDat;
      xiv::exd::Exd m_GCScripShopItemDat;
      xiv::exd::Exd m_GCShopDat;
@@ -3658,7 +3735,6 @@ struct WorldDCGroupType
      boost::shared_ptr< Cabinet > getCabinet( uint32_t CabinetId );
      boost::shared_ptr< CabinetCategory > getCabinetCategory( uint32_t CabinetCategoryId );
      boost::shared_ptr< Calendar > getCalendar( uint32_t CalendarId );
-     boost::shared_ptr< ChainBonus > getChainBonus( uint32_t ChainBonusId );
      boost::shared_ptr< CharaMakeCustomize > getCharaMakeCustomize( uint32_t CharaMakeCustomizeId );
      boost::shared_ptr< CharaMakeType > getCharaMakeType( uint32_t CharaMakeTypeId );
      boost::shared_ptr< ChocoboRace > getChocoboRace( uint32_t ChocoboRaceId );
@@ -3728,11 +3804,13 @@ struct WorldDCGroupType
      boost::shared_ptr< ExVersion > getExVersion( uint32_t ExVersionId );
      boost::shared_ptr< Fate > getFate( uint32_t FateId );
      boost::shared_ptr< FCActivity > getFCActivity( uint32_t FCActivityId );
+     boost::shared_ptr< FCActivityCategory > getFCActivityCategory( uint32_t FCActivityCategoryId );
      boost::shared_ptr< FCAuthority > getFCAuthority( uint32_t FCAuthorityId );
      boost::shared_ptr< FCAuthorityCategory > getFCAuthorityCategory( uint32_t FCAuthorityCategoryId );
      boost::shared_ptr< FCChestName > getFCChestName( uint32_t FCChestNameId );
      boost::shared_ptr< FccShop > getFccShop( uint32_t FccShopId );
      boost::shared_ptr< FCHierarchy > getFCHierarchy( uint32_t FCHierarchyId );
+     boost::shared_ptr< FCProfile > getFCProfile( uint32_t FCProfileId );
      boost::shared_ptr< FCReputation > getFCReputation( uint32_t FCReputationId );
      boost::shared_ptr< FCRights > getFCRights( uint32_t FCRightsId );
      boost::shared_ptr< FishingSpot > getFishingSpot( uint32_t FishingSpotId );
@@ -3756,6 +3834,12 @@ struct WorldDCGroupType
      boost::shared_ptr< GcArmyExpeditionType > getGcArmyExpeditionType( uint32_t GcArmyExpeditionTypeId );
      boost::shared_ptr< GcArmyMemberGrow > getGcArmyMemberGrow( uint32_t GcArmyMemberGrowId );
      boost::shared_ptr< GcArmyTraining > getGcArmyTraining( uint32_t GcArmyTrainingId );
+     boost::shared_ptr< GCRankGridaniaFemaleText > getGCRankGridaniaFemaleText( uint32_t GCRankGridaniaFemaleTextId );
+     boost::shared_ptr< GCRankGridaniaMaleText > getGCRankGridaniaMaleText( uint32_t GCRankGridaniaMaleTextId );
+     boost::shared_ptr< GCRankLimsaFemaleText > getGCRankLimsaFemaleText( uint32_t GCRankLimsaFemaleTextId );
+     boost::shared_ptr< GCRankLimsaMaleText > getGCRankLimsaMaleText( uint32_t GCRankLimsaMaleTextId );
+     boost::shared_ptr< GCRankUldahFemaleText > getGCRankUldahFemaleText( uint32_t GCRankUldahFemaleTextId );
+     boost::shared_ptr< GCRankUldahMaleText > getGCRankUldahMaleText( uint32_t GCRankUldahMaleTextId );
      boost::shared_ptr< GCScripShopCategory > getGCScripShopCategory( uint32_t GCScripShopCategoryId );
      boost::shared_ptr< GCScripShopItem > getGCScripShopItem( uint32_t GCScripShopItemId );
      boost::shared_ptr< GCShop > getGCShop( uint32_t GCShopId );
@@ -3950,7 +4034,6 @@ struct WorldDCGroupType
      std::set< uint32_t > m_CabinetIdList;
      std::set< uint32_t > m_CabinetCategoryIdList;
      std::set< uint32_t > m_CalendarIdList;
-     std::set< uint32_t > m_ChainBonusIdList;
      std::set< uint32_t > m_CharaMakeCustomizeIdList;
      std::set< uint32_t > m_CharaMakeTypeIdList;
      std::set< uint32_t > m_ChocoboRaceIdList;
@@ -4020,11 +4103,13 @@ struct WorldDCGroupType
      std::set< uint32_t > m_ExVersionIdList;
      std::set< uint32_t > m_FateIdList;
      std::set< uint32_t > m_FCActivityIdList;
+     std::set< uint32_t > m_FCActivityCategoryIdList;
      std::set< uint32_t > m_FCAuthorityIdList;
      std::set< uint32_t > m_FCAuthorityCategoryIdList;
      std::set< uint32_t > m_FCChestNameIdList;
      std::set< uint32_t > m_FccShopIdList;
      std::set< uint32_t > m_FCHierarchyIdList;
+     std::set< uint32_t > m_FCProfileIdList;
      std::set< uint32_t > m_FCReputationIdList;
      std::set< uint32_t > m_FCRightsIdList;
      std::set< uint32_t > m_FishingSpotIdList;
@@ -4048,6 +4133,12 @@ struct WorldDCGroupType
      std::set< uint32_t > m_GcArmyExpeditionTypeIdList;
      std::set< uint32_t > m_GcArmyMemberGrowIdList;
      std::set< uint32_t > m_GcArmyTrainingIdList;
+     std::set< uint32_t > m_GCRankGridaniaFemaleTextIdList;
+     std::set< uint32_t > m_GCRankGridaniaMaleTextIdList;
+     std::set< uint32_t > m_GCRankLimsaFemaleTextIdList;
+     std::set< uint32_t > m_GCRankLimsaMaleTextIdList;
+     std::set< uint32_t > m_GCRankUldahFemaleTextIdList;
+     std::set< uint32_t > m_GCRankUldahMaleTextIdList;
      std::set< uint32_t > m_GCScripShopCategoryIdList;
      std::set< uint32_t > m_GCScripShopItemIdList;
      std::set< uint32_t > m_GCShopIdList;
@@ -4512,12 +4603,6 @@ const std::set< uint32_t >& getCalendarIdList()
       loadIdList( m_CalendarDat, m_CalendarIdList );
    return m_CalendarIdList;
 }
-const std::set< uint32_t >& getChainBonusIdList()
-{
-   if( m_ChainBonusIdList.size() == 0 )
-      loadIdList( m_ChainBonusDat, m_ChainBonusIdList );
-   return m_ChainBonusIdList;
-}
 const std::set< uint32_t >& getCharaMakeCustomizeIdList()
 {
    if( m_CharaMakeCustomizeIdList.size() == 0 )
@@ -4932,6 +5017,12 @@ const std::set< uint32_t >& getFCActivityIdList()
       loadIdList( m_FCActivityDat, m_FCActivityIdList );
    return m_FCActivityIdList;
 }
+const std::set< uint32_t >& getFCActivityCategoryIdList()
+{
+   if( m_FCActivityCategoryIdList.size() == 0 )
+      loadIdList( m_FCActivityCategoryDat, m_FCActivityCategoryIdList );
+   return m_FCActivityCategoryIdList;
+}
 const std::set< uint32_t >& getFCAuthorityIdList()
 {
    if( m_FCAuthorityIdList.size() == 0 )
@@ -4961,6 +5052,12 @@ const std::set< uint32_t >& getFCHierarchyIdList()
    if( m_FCHierarchyIdList.size() == 0 )
       loadIdList( m_FCHierarchyDat, m_FCHierarchyIdList );
    return m_FCHierarchyIdList;
+}
+const std::set< uint32_t >& getFCProfileIdList()
+{
+   if( m_FCProfileIdList.size() == 0 )
+      loadIdList( m_FCProfileDat, m_FCProfileIdList );
+   return m_FCProfileIdList;
 }
 const std::set< uint32_t >& getFCReputationIdList()
 {
@@ -5099,6 +5196,42 @@ const std::set< uint32_t >& getGcArmyTrainingIdList()
    if( m_GcArmyTrainingIdList.size() == 0 )
       loadIdList( m_GcArmyTrainingDat, m_GcArmyTrainingIdList );
    return m_GcArmyTrainingIdList;
+}
+const std::set< uint32_t >& getGCRankGridaniaFemaleTextIdList()
+{
+   if( m_GCRankGridaniaFemaleTextIdList.size() == 0 )
+      loadIdList( m_GCRankGridaniaFemaleTextDat, m_GCRankGridaniaFemaleTextIdList );
+   return m_GCRankGridaniaFemaleTextIdList;
+}
+const std::set< uint32_t >& getGCRankGridaniaMaleTextIdList()
+{
+   if( m_GCRankGridaniaMaleTextIdList.size() == 0 )
+      loadIdList( m_GCRankGridaniaMaleTextDat, m_GCRankGridaniaMaleTextIdList );
+   return m_GCRankGridaniaMaleTextIdList;
+}
+const std::set< uint32_t >& getGCRankLimsaFemaleTextIdList()
+{
+   if( m_GCRankLimsaFemaleTextIdList.size() == 0 )
+      loadIdList( m_GCRankLimsaFemaleTextDat, m_GCRankLimsaFemaleTextIdList );
+   return m_GCRankLimsaFemaleTextIdList;
+}
+const std::set< uint32_t >& getGCRankLimsaMaleTextIdList()
+{
+   if( m_GCRankLimsaMaleTextIdList.size() == 0 )
+      loadIdList( m_GCRankLimsaMaleTextDat, m_GCRankLimsaMaleTextIdList );
+   return m_GCRankLimsaMaleTextIdList;
+}
+const std::set< uint32_t >& getGCRankUldahFemaleTextIdList()
+{
+   if( m_GCRankUldahFemaleTextIdList.size() == 0 )
+      loadIdList( m_GCRankUldahFemaleTextDat, m_GCRankUldahFemaleTextIdList );
+   return m_GCRankUldahFemaleTextIdList;
+}
+const std::set< uint32_t >& getGCRankUldahMaleTextIdList()
+{
+   if( m_GCRankUldahMaleTextIdList.size() == 0 )
+      loadIdList( m_GCRankUldahMaleTextDat, m_GCRankUldahMaleTextIdList );
+   return m_GCRankUldahMaleTextIdList;
 }
 const std::set< uint32_t >& getGCScripShopCategoryIdList()
 {
