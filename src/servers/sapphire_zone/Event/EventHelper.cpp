@@ -2,8 +2,10 @@
 #include "EventHandler.h"
 #include <common/Common.h>
 #include <common/Exd/ExdData.h>
+#include <common/Exd/ExdDataGenerated.h>
 
 extern Core::Data::ExdData g_exdData;
+extern Core::Data::ExdDataGenerated g_exdDataGen;
 
 using namespace Core::Common;
 
@@ -17,25 +19,25 @@ std::string Core::Event::getEventName( uint32_t eventId )
    {
    case Event::EventHandler::EventHandlerType::Quest:
    {
-      auto questInfo = g_exdData.getQuestInfo( eventId );
+      auto questInfo = g_exdDataGen.getQuest( eventId );
       if( !questInfo )
          return unknown + "Quest";
 
-      std::string name = questInfo->name_intern;
+      std::string name = questInfo->name;
       std::size_t pos = name.find_first_of( "_" );
 
-      return questInfo->name_intern.substr( 0, pos );
+      return questInfo->name.substr( 0, pos );
    }
    case Event::EventHandler::EventHandlerType::CustomTalk:
    {
-      auto customTalkInfo = g_exdData.getCustomTalkInfo( eventId );
+      auto customTalkInfo = g_exdDataGen.getCustomTalk( eventId );
       if( !customTalkInfo )
          return unknown + "CustomTalk";
 
-      std::string name = customTalkInfo->name_intern;
+      std::string name = customTalkInfo->name;
       std::size_t pos = name.find_first_of( "_" );
 
-      return customTalkInfo->name_intern.substr( 0, pos );
+      return customTalkInfo->name.substr( 0, pos );
    }
    case Event::EventHandler::EventHandlerType::Opening:
    {
@@ -46,7 +48,7 @@ std::string Core::Event::getEventName( uint32_t eventId )
    }
    case Event::EventHandler::EventHandlerType::Aetheryte:
    {
-      auto aetherInfo = g_exdData.getAetheryteInfo( eventId & 0xFFFF );
+      auto aetherInfo = g_exdDataGen.getAetheryte( eventId & 0xFFFF );
       if( aetherInfo->isAetheryte )
          return "Aetheryte";
       return "Aethernet";
