@@ -50,34 +50,34 @@
          actionTimelineUse = exdData->getField< int16_t >( row, 7 );
          actionTimelineHit = exdData->getField< uint16_t >( row, 8 );
          classJob = exdData->getField< int8_t >( row, 10 );
-         classJobLevel = exdData->getField< uint8_t >( row, 11 );
-         isRoleAction = exdData->getField< bool >( row, 12 );
-         range = exdData->getField< int8_t >( row, 13 );
-         canTargetSelf = exdData->getField< bool >( row, 14 );
-         canTargetParty = exdData->getField< bool >( row, 15 );
-         canTargetFriendly = exdData->getField< bool >( row, 16 );
-         canTargetHostile = exdData->getField< bool >( row, 17 );
-         targetArea = exdData->getField< bool >( row, 20 );
-         canTargetDead = exdData->getField< bool >( row, 24 );
-         castType = exdData->getField< uint8_t >( row, 26 );
-         effectRange = exdData->getField< uint8_t >( row, 27 );
-         xAxisModifier = exdData->getField< uint8_t >( row, 28 );
-         costType = exdData->getField< uint8_t >( row, 30 );
-         cost = exdData->getField< uint16_t >( row, 31 );
-         actionCombo = exdData->getField< uint16_t >( row, 34 );
-         preservesCombo = exdData->getField< bool >( row, 35 );
-         cast100ms = exdData->getField< uint16_t >( row, 36 );
-         recast100ms = exdData->getField< uint16_t >( row, 37 );
-         cooldownGroup = exdData->getField< uint8_t >( row, 38 );
-         attackType = exdData->getField< int8_t >( row, 39 );
-         aspect = exdData->getField< uint8_t >( row, 40 );
-         actionProcStatus = exdData->getField< uint8_t >( row, 41 );
-         statusGainSelf = exdData->getField< uint16_t >( row, 42 );
-         actionData = exdData->getField< uint32_t >( row, 43 );
-         classJobCategory = exdData->getField< uint8_t >( row, 44 );
-         affectsPosition = exdData->getField< bool >( row, 47 );
-         omen = exdData->getField< uint8_t >( row, 48 );
-         isPvP = exdData->getField< bool >( row, 49 );
+         classJobLevel = exdData->getField< uint8_t >( row, 12 );
+         isRoleAction = exdData->getField< bool >( row, 13 );
+         range = exdData->getField< int8_t >( row, 14 );
+         canTargetSelf = exdData->getField< bool >( row, 15 );
+         canTargetParty = exdData->getField< bool >( row, 16 );
+         canTargetFriendly = exdData->getField< bool >( row, 17 );
+         canTargetHostile = exdData->getField< bool >( row, 18 );
+         targetArea = exdData->getField< bool >( row, 21 );
+         canTargetDead = exdData->getField< bool >( row, 25 );
+         castType = exdData->getField< uint8_t >( row, 27 );
+         effectRange = exdData->getField< uint8_t >( row, 28 );
+         xAxisModifier = exdData->getField< uint8_t >( row, 29 );
+         costType = exdData->getField< uint8_t >( row, 31 );
+         cost = exdData->getField< uint16_t >( row, 32 );
+         actionCombo = exdData->getField< uint16_t >( row, 35 );
+         preservesCombo = exdData->getField< bool >( row, 36 );
+         cast100ms = exdData->getField< uint16_t >( row, 37 );
+         recast100ms = exdData->getField< uint16_t >( row, 38 );
+         cooldownGroup = exdData->getField< uint8_t >( row, 39 );
+         attackType = exdData->getField< int8_t >( row, 40 );
+         aspect = exdData->getField< uint8_t >( row, 41 );
+         actionProcStatus = exdData->getField< uint8_t >( row, 42 );
+         statusGainSelf = exdData->getField< uint16_t >( row, 43 );
+         actionData = exdData->getField< uint32_t >( row, 44 );
+         classJobCategory = exdData->getField< uint8_t >( row, 45 );
+         affectsPosition = exdData->getField< bool >( row, 48 );
+         omen = exdData->getField< uint8_t >( row, 49 );
+         isPvP = exdData->getField< bool >( row, 50 );
       }
 
       Core::Data::ActionCategory::ActionCategory( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
@@ -415,8 +415,8 @@
          beastRankBonus = exdData->getField< uint8_t >( row, 2 );
          iconReputation = exdData->getField< uint32_t >( row, 3 );
          icon = exdData->getField< uint32_t >( row, 4 );
-         name = exdData->getField< std::string >( row, 11 );
-         nameRelation = exdData->getField< std::string >( row, 19 );
+         name = exdData->getField< std::string >( row, 10 );
+         nameRelation = exdData->getField< std::string >( row, 18 );
       }
 
       Core::Data::Behavior::Behavior( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
@@ -610,13 +610,6 @@
          day.push_back( exdData->getField< uint8_t >( row, 61 ) );
          day.push_back( exdData->getField< uint8_t >( row, 62 ) );
          day.push_back( exdData->getField< uint8_t >( row, 63 ) );
-      }
-
-      Core::Data::ChainBonus::ChainBonus( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
-      {
-         auto row = exdData->m_ChainBonusDat.get_row( row_id );
-         bonus = exdData->getField< uint8_t >( row, 0 );
-         timeouts = exdData->getField< uint8_t >( row, 1 );
       }
 
       Core::Data::CharaMakeCustomize::CharaMakeCustomize( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
@@ -960,12 +953,14 @@
       Core::Data::ContentFinderCondition::ContentFinderCondition( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
       {
          auto row = exdData->m_ContentFinderConditionDat.get_row( row_id );
-         contentIndicator = exdData->getField< uint8_t >( row, 0 );
-         instanceContent = exdData->getField< uint16_t >( row, 1 );
-         contentMemberType = exdData->getField< uint8_t >( row, 5 );
-         classJobLevel = exdData->getField< uint8_t >( row, 8 );
-         itemLevelRequired = exdData->getField< uint16_t >( row, 10 );
-         icon = exdData->getField< uint32_t >( row, 29 );
+         contentIndicator = exdData->getField< uint8_t >( row, 1 );
+         instanceContent = exdData->getField< uint16_t >( row, 2 );
+         contentMemberType = exdData->getField< uint8_t >( row, 7 );
+         classJobLevelRequired = exdData->getField< uint8_t >( row, 13 );
+         classJobLevelSync = exdData->getField< uint8_t >( row, 14 );
+         itemLevelRequired = exdData->getField< uint16_t >( row, 15 );
+         itemLevelSync = exdData->getField< uint16_t >( row, 16 );
+         icon = exdData->getField< uint32_t >( row, 36 );
       }
 
       Core::Data::ContentFinderConditionTransient::ContentFinderConditionTransient( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
@@ -989,15 +984,15 @@
          name = exdData->getField< std::string >( row, 0 );
          description = exdData->getField< std::string >( row, 2 );
          dutyType = exdData->getField< std::string >( row, 3 );
-         isInDutyFinder = exdData->getField< bool >( row, 5 );
-         requireAllDuties = exdData->getField< bool >( row, 6 );
-         itemLevelRequired = exdData->getField< uint16_t >( row, 9 );
-         icon = exdData->getField< uint32_t >( row, 11 );
-         rewardTomeA = exdData->getField< uint16_t >( row, 13 );
-         rewardTomeB = exdData->getField< uint16_t >( row, 14 );
-         rewardTomeC = exdData->getField< uint16_t >( row, 15 );
-         sortKey = exdData->getField< uint8_t >( row, 18 );
-         contentMemberType = exdData->getField< uint8_t >( row, 20 );
+         isInDutyFinder = exdData->getField< bool >( row, 6 );
+         itemLevelRequired = exdData->getField< uint16_t >( row, 10 );
+         icon = exdData->getField< uint32_t >( row, 12 );
+         rewardTomeA = exdData->getField< uint16_t >( row, 14 );
+         rewardTomeB = exdData->getField< uint16_t >( row, 15 );
+         rewardTomeC = exdData->getField< uint16_t >( row, 16 );
+         sortKey = exdData->getField< uint8_t >( row, 19 );
+         contentMemberType = exdData->getField< uint8_t >( row, 21 );
+         requireAllDuties = exdData->getField< bool >( row, 31 );
       }
 
       Core::Data::ContentType::ContentType( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
@@ -1434,6 +1429,7 @@
          auto row = exdData->m_EventActionDat.get_row( row_id );
          name = exdData->getField< std::string >( row, 0 );
          icon = exdData->getField< uint16_t >( row, 1 );
+         castTime = exdData->getField< uint16_t >( row, 3 );
       }
 
       Core::Data::EventIconPriority::EventIconPriority( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
@@ -1477,6 +1473,7 @@
          icon = exdData->getField< uint16_t >( row, 10 );
          stackSize = exdData->getField< uint8_t >( row, 12 );
          quest = exdData->getField< uint32_t >( row, 14 );
+         castTime = exdData->getField< uint8_t >( row, 15 );
       }
 
       Core::Data::EventItemHelp::EventItemHelp( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
@@ -1494,23 +1491,30 @@
       Core::Data::Fate::Fate( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
       {
          auto row = exdData->m_FateDat.get_row( row_id );
-         classJobLevel = exdData->getField< uint8_t >( row, 2 );
-         classJobLevelMax = exdData->getField< uint8_t >( row, 3 );
-         eventItem = exdData->getField< uint32_t >( row, 4 );
-         iconObjective = exdData->getField< uint32_t >( row, 9 );
-         iconMap = exdData->getField< uint32_t >( row, 10 );
-         name = exdData->getField< std::string >( row, 26 );
-         description = exdData->getField< std::string >( row, 27 );
-         objective = exdData->getField< std::string >( row, 28 );
-         statusText.push_back( exdData->getField< std::string >( row, 29 ) );
+         classJobLevel = exdData->getField< uint8_t >( row, 3 );
+         classJobLevelMax = exdData->getField< uint8_t >( row, 4 );
+         eventItem = exdData->getField< uint32_t >( row, 5 );
+         iconObjective = exdData->getField< uint32_t >( row, 10 );
+         iconMap = exdData->getField< uint32_t >( row, 11 );
+         name = exdData->getField< std::string >( row, 27 );
+         description = exdData->getField< std::string >( row, 28 );
+         objective = exdData->getField< std::string >( row, 29 );
          statusText.push_back( exdData->getField< std::string >( row, 30 ) );
          statusText.push_back( exdData->getField< std::string >( row, 31 ) );
+         statusText.push_back( exdData->getField< std::string >( row, 32 ) );
       }
 
       Core::Data::FCActivity::FCActivity( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
       {
          auto row = exdData->m_FCActivityDat.get_row( row_id );
          text = exdData->getField< std::string >( row, 0 );
+         fCActivityCategory = exdData->getField< uint8_t >( row, 4 );
+      }
+
+      Core::Data::FCActivityCategory::FCActivityCategory( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
+      {
+         auto row = exdData->m_FCActivityCategoryDat.get_row( row_id );
+         name = exdData->getField< std::string >( row, 1 );
       }
 
       Core::Data::FCAuthority::FCAuthority( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
@@ -1542,6 +1546,12 @@
       {
          auto row = exdData->m_FCHierarchyDat.get_row( row_id );
          name = exdData->getField< std::string >( row, 0 );
+      }
+
+      Core::Data::FCProfile::FCProfile( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
+      {
+         auto row = exdData->m_FCProfileDat.get_row( row_id );
+         name = exdData->getField< std::string >( row, 1 );
       }
 
       Core::Data::FCReputation::FCReputation( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
@@ -1850,6 +1860,54 @@
          description = exdData->getField< std::string >( row, 5 );
       }
 
+      Core::Data::GCRankGridaniaFemaleText::GCRankGridaniaFemaleText( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
+      {
+         auto row = exdData->m_GCRankGridaniaFemaleTextDat.get_row( row_id );
+         name = exdData->getField< std::string >( row, 0 );
+         plural = exdData->getField< std::string >( row, 2 );
+         nameRank = exdData->getField< std::string >( row, 8 );
+      }
+
+      Core::Data::GCRankGridaniaMaleText::GCRankGridaniaMaleText( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
+      {
+         auto row = exdData->m_GCRankGridaniaMaleTextDat.get_row( row_id );
+         name = exdData->getField< std::string >( row, 0 );
+         plural = exdData->getField< std::string >( row, 2 );
+         nameRank = exdData->getField< std::string >( row, 8 );
+      }
+
+      Core::Data::GCRankLimsaFemaleText::GCRankLimsaFemaleText( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
+      {
+         auto row = exdData->m_GCRankLimsaFemaleTextDat.get_row( row_id );
+         name = exdData->getField< std::string >( row, 0 );
+         plural = exdData->getField< std::string >( row, 2 );
+         nameRank = exdData->getField< std::string >( row, 8 );
+      }
+
+      Core::Data::GCRankLimsaMaleText::GCRankLimsaMaleText( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
+      {
+         auto row = exdData->m_GCRankLimsaMaleTextDat.get_row( row_id );
+         name = exdData->getField< std::string >( row, 0 );
+         plural = exdData->getField< std::string >( row, 2 );
+         nameRank = exdData->getField< std::string >( row, 8 );
+      }
+
+      Core::Data::GCRankUldahFemaleText::GCRankUldahFemaleText( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
+      {
+         auto row = exdData->m_GCRankUldahFemaleTextDat.get_row( row_id );
+         name = exdData->getField< std::string >( row, 0 );
+         plural = exdData->getField< std::string >( row, 2 );
+         nameRank = exdData->getField< std::string >( row, 8 );
+      }
+
+      Core::Data::GCRankUldahMaleText::GCRankUldahMaleText( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
+      {
+         auto row = exdData->m_GCRankUldahMaleTextDat.get_row( row_id );
+         name = exdData->getField< std::string >( row, 0 );
+         plural = exdData->getField< std::string >( row, 2 );
+         nameRank = exdData->getField< std::string >( row, 8 );
+      }
+
       Core::Data::GCScripShopCategory::GCScripShopCategory( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
       {
          auto row = exdData->m_GCScripShopCategoryDat.get_row( row_id );
@@ -2004,25 +2062,22 @@
          instanceContentType = exdData->getField< uint8_t >( row, 0 );
          weekRestriction = exdData->getField< uint8_t >( row, 1 );
          timeLimitmin = exdData->getField< uint16_t >( row, 2 );
-         classJobLevelSync = exdData->getField< uint8_t >( row, 3 );
-         name = exdData->getField< std::string >( row, 4 );
-         bGM = exdData->getField< uint16_t >( row, 6 );
-         itemLevelSync = exdData->getField< uint16_t >( row, 9 );
-         territoryType = exdData->getField< uint32_t >( row, 11 );
-         icon = exdData->getField< uint32_t >( row, 13 );
-         instanceContentTextDataBossStart = exdData->getField< uint32_t >( row, 15 );
-         instanceContentTextDataBossEnd = exdData->getField< uint32_t >( row, 16 );
-         bNpcBaseBoss = exdData->getField< uint32_t >( row, 17 );
-         instanceContentTextDataObjectiveStart = exdData->getField< uint32_t >( row, 18 );
-         instanceContentTextDataObjectiveEnd = exdData->getField< uint32_t >( row, 19 );
-         sortKey = exdData->getField< uint16_t >( row, 20 );
-         newPlayerBonusA = exdData->getField< uint16_t >( row, 23 );
-         newPlayerBonusB = exdData->getField< uint16_t >( row, 24 );
-         finalBossCurrencyA = exdData->getField< uint16_t >( row, 26 );
-         finalBossCurrencyB = exdData->getField< uint16_t >( row, 27 );
-         finalBossCurrencyC = exdData->getField< uint16_t >( row, 28 );
-         instanceContentBuff = exdData->getField< int32_t >( row, 54 );
-         partyCondition = exdData->getField< uint8_t >( row, 58 );
+         name = exdData->getField< std::string >( row, 3 );
+         bGM = exdData->getField< uint16_t >( row, 5 );
+         territoryType = exdData->getField< uint32_t >( row, 9 );
+         instanceContentTextDataBossStart = exdData->getField< uint32_t >( row, 13 );
+         instanceContentTextDataBossEnd = exdData->getField< uint32_t >( row, 14 );
+         bNpcBaseBoss = exdData->getField< uint32_t >( row, 15 );
+         instanceContentTextDataObjectiveStart = exdData->getField< uint32_t >( row, 16 );
+         instanceContentTextDataObjectiveEnd = exdData->getField< uint32_t >( row, 17 );
+         sortKey = exdData->getField< uint16_t >( row, 18 );
+         newPlayerBonusA = exdData->getField< uint16_t >( row, 21 );
+         newPlayerBonusB = exdData->getField< uint16_t >( row, 22 );
+         finalBossCurrencyA = exdData->getField< uint16_t >( row, 24 );
+         finalBossCurrencyB = exdData->getField< uint16_t >( row, 25 );
+         finalBossCurrencyC = exdData->getField< uint16_t >( row, 26 );
+         instanceContentBuff = exdData->getField< int32_t >( row, 52 );
+         partyCondition = exdData->getField< uint8_t >( row, 56 );
       }
 
       Core::Data::InstanceContentBuff::InstanceContentBuff( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
@@ -2195,7 +2250,6 @@
          placeNameStart = exdData->getField< int32_t >( row, 9 );
          placeNameIssued = exdData->getField< int32_t >( row, 10 );
          classJobCategory = exdData->getField< uint8_t >( row, 12 );
-         journalCategory = exdData->getField< int32_t >( row, 13 );
          placeNameStartZone = exdData->getField< int32_t >( row, 15 );
          iconCityState = exdData->getField< int32_t >( row, 16 );
          dataId = exdData->getField< int32_t >( row, 17 );
@@ -2235,6 +2289,7 @@
          type = exdData->getField< uint8_t >( row, 5 );
          objectKey = exdData->getField< uint32_t >( row, 6 );
          map = exdData->getField< uint16_t >( row, 7 );
+         eventId = exdData->getField< uint32_t >( row, 8 );
          territory = exdData->getField< uint16_t >( row, 9 );
       }
 
@@ -2458,8 +2513,8 @@
          plural = exdData->getField< std::string >( row, 2 );
          flyingCondition = exdData->getField< uint8_t >( row, 10 );
          isFlying = exdData->getField< uint8_t >( row, 14 );
-         rideBGM = exdData->getField< uint16_t >( row, 28 );
-         icon = exdData->getField< uint16_t >( row, 41 );
+         rideBGM = exdData->getField< uint16_t >( row, 17 );
+         icon = exdData->getField< uint16_t >( row, 30 );
       }
 
       Core::Data::MountAction::MountAction( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
@@ -2512,8 +2567,8 @@
       Core::Data::OnlineStatus::OnlineStatus( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
       {
          auto row = exdData->m_OnlineStatusDat.get_row( row_id );
-         name = exdData->getField< std::string >( row, 2 );
-         icon = exdData->getField< uint32_t >( row, 3 );
+         name = exdData->getField< std::string >( row, 3 );
+         icon = exdData->getField< uint32_t >( row, 4 );
       }
 
       Core::Data::Orchestrion::Orchestrion( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
@@ -3870,7 +3925,6 @@ bool Core::Data::ExdDataGenerated::init( const std::string& path )
       m_CabinetDat = setupDatAccess( "Cabinet", xiv::exd::Language::none );
       m_CabinetCategoryDat = setupDatAccess( "CabinetCategory", xiv::exd::Language::none );
       m_CalendarDat = setupDatAccess( "Calendar", xiv::exd::Language::none );
-      m_ChainBonusDat = setupDatAccess( "ChainBonus", xiv::exd::Language::none );
       m_CharaMakeCustomizeDat = setupDatAccess( "CharaMakeCustomize", xiv::exd::Language::none );
       m_CharaMakeTypeDat = setupDatAccess( "CharaMakeType", xiv::exd::Language::en );
       m_ChocoboRaceDat = setupDatAccess( "ChocoboRace", xiv::exd::Language::none );
@@ -3940,11 +3994,13 @@ bool Core::Data::ExdDataGenerated::init( const std::string& path )
       m_ExVersionDat = setupDatAccess( "ExVersion", xiv::exd::Language::en );
       m_FateDat = setupDatAccess( "Fate", xiv::exd::Language::en );
       m_FCActivityDat = setupDatAccess( "FCActivity", xiv::exd::Language::en );
+      m_FCActivityCategoryDat = setupDatAccess( "FCActivityCategory", xiv::exd::Language::en );
       m_FCAuthorityDat = setupDatAccess( "FCAuthority", xiv::exd::Language::en );
       m_FCAuthorityCategoryDat = setupDatAccess( "FCAuthorityCategory", xiv::exd::Language::en );
       m_FCChestNameDat = setupDatAccess( "FCChestName", xiv::exd::Language::en );
       m_FccShopDat = setupDatAccess( "FccShop", xiv::exd::Language::en );
       m_FCHierarchyDat = setupDatAccess( "FCHierarchy", xiv::exd::Language::en );
+      m_FCProfileDat = setupDatAccess( "FCProfile", xiv::exd::Language::en );
       m_FCReputationDat = setupDatAccess( "FCReputation", xiv::exd::Language::en );
       m_FCRightsDat = setupDatAccess( "FCRights", xiv::exd::Language::en );
       m_FishingSpotDat = setupDatAccess( "FishingSpot", xiv::exd::Language::en );
@@ -3968,6 +4024,12 @@ bool Core::Data::ExdDataGenerated::init( const std::string& path )
       m_GcArmyExpeditionTypeDat = setupDatAccess( "GcArmyExpeditionType", xiv::exd::Language::en );
       m_GcArmyMemberGrowDat = setupDatAccess( "GcArmyMemberGrow", xiv::exd::Language::none );
       m_GcArmyTrainingDat = setupDatAccess( "GcArmyTraining", xiv::exd::Language::en );
+      m_GCRankGridaniaFemaleTextDat = setupDatAccess( "GCRankGridaniaFemaleText", xiv::exd::Language::en );
+      m_GCRankGridaniaMaleTextDat = setupDatAccess( "GCRankGridaniaMaleText", xiv::exd::Language::en );
+      m_GCRankLimsaFemaleTextDat = setupDatAccess( "GCRankLimsaFemaleText", xiv::exd::Language::en );
+      m_GCRankLimsaMaleTextDat = setupDatAccess( "GCRankLimsaMaleText", xiv::exd::Language::en );
+      m_GCRankUldahFemaleTextDat = setupDatAccess( "GCRankUldahFemaleText", xiv::exd::Language::en );
+      m_GCRankUldahMaleTextDat = setupDatAccess( "GCRankUldahMaleText", xiv::exd::Language::en );
       m_GCScripShopCategoryDat = setupDatAccess( "GCScripShopCategory", xiv::exd::Language::none );
       m_GCScripShopItemDat = setupDatAccess( "GCScripShopItem", xiv::exd::Language::none );
       m_GCShopDat = setupDatAccess( "GCShop", xiv::exd::Language::none );
@@ -4920,21 +4982,6 @@ boost::shared_ptr< Core::Data::Calendar >
    {
       auto row = m_CalendarDat.get_row( CalendarId );
       auto info = boost::make_shared< Calendar >( CalendarId, this );
-      return info;
-   }
-   catch( ... )
-   {
-      return nullptr;
-   }
-   return nullptr;
-}
-boost::shared_ptr< Core::Data::ChainBonus >
-   Core::Data::ExdDataGenerated::getChainBonus( uint32_t ChainBonusId )
-{
-   try
-   {
-      auto row = m_ChainBonusDat.get_row( ChainBonusId );
-      auto info = boost::make_shared< ChainBonus >( ChainBonusId, this );
       return info;
    }
    catch( ... )
@@ -5978,6 +6025,21 @@ boost::shared_ptr< Core::Data::FCActivity >
    }
    return nullptr;
 }
+boost::shared_ptr< Core::Data::FCActivityCategory >
+   Core::Data::ExdDataGenerated::getFCActivityCategory( uint32_t FCActivityCategoryId )
+{
+   try
+   {
+      auto row = m_FCActivityCategoryDat.get_row( FCActivityCategoryId );
+      auto info = boost::make_shared< FCActivityCategory >( FCActivityCategoryId, this );
+      return info;
+   }
+   catch( ... )
+   {
+      return nullptr;
+   }
+   return nullptr;
+}
 boost::shared_ptr< Core::Data::FCAuthority >
    Core::Data::ExdDataGenerated::getFCAuthority( uint32_t FCAuthorityId )
 {
@@ -6045,6 +6107,21 @@ boost::shared_ptr< Core::Data::FCHierarchy >
    {
       auto row = m_FCHierarchyDat.get_row( FCHierarchyId );
       auto info = boost::make_shared< FCHierarchy >( FCHierarchyId, this );
+      return info;
+   }
+   catch( ... )
+   {
+      return nullptr;
+   }
+   return nullptr;
+}
+boost::shared_ptr< Core::Data::FCProfile >
+   Core::Data::ExdDataGenerated::getFCProfile( uint32_t FCProfileId )
+{
+   try
+   {
+      auto row = m_FCProfileDat.get_row( FCProfileId );
+      auto info = boost::make_shared< FCProfile >( FCProfileId, this );
       return info;
    }
    catch( ... )
@@ -6390,6 +6467,96 @@ boost::shared_ptr< Core::Data::GcArmyTraining >
    {
       auto row = m_GcArmyTrainingDat.get_row( GcArmyTrainingId );
       auto info = boost::make_shared< GcArmyTraining >( GcArmyTrainingId, this );
+      return info;
+   }
+   catch( ... )
+   {
+      return nullptr;
+   }
+   return nullptr;
+}
+boost::shared_ptr< Core::Data::GCRankGridaniaFemaleText >
+   Core::Data::ExdDataGenerated::getGCRankGridaniaFemaleText( uint32_t GCRankGridaniaFemaleTextId )
+{
+   try
+   {
+      auto row = m_GCRankGridaniaFemaleTextDat.get_row( GCRankGridaniaFemaleTextId );
+      auto info = boost::make_shared< GCRankGridaniaFemaleText >( GCRankGridaniaFemaleTextId, this );
+      return info;
+   }
+   catch( ... )
+   {
+      return nullptr;
+   }
+   return nullptr;
+}
+boost::shared_ptr< Core::Data::GCRankGridaniaMaleText >
+   Core::Data::ExdDataGenerated::getGCRankGridaniaMaleText( uint32_t GCRankGridaniaMaleTextId )
+{
+   try
+   {
+      auto row = m_GCRankGridaniaMaleTextDat.get_row( GCRankGridaniaMaleTextId );
+      auto info = boost::make_shared< GCRankGridaniaMaleText >( GCRankGridaniaMaleTextId, this );
+      return info;
+   }
+   catch( ... )
+   {
+      return nullptr;
+   }
+   return nullptr;
+}
+boost::shared_ptr< Core::Data::GCRankLimsaFemaleText >
+   Core::Data::ExdDataGenerated::getGCRankLimsaFemaleText( uint32_t GCRankLimsaFemaleTextId )
+{
+   try
+   {
+      auto row = m_GCRankLimsaFemaleTextDat.get_row( GCRankLimsaFemaleTextId );
+      auto info = boost::make_shared< GCRankLimsaFemaleText >( GCRankLimsaFemaleTextId, this );
+      return info;
+   }
+   catch( ... )
+   {
+      return nullptr;
+   }
+   return nullptr;
+}
+boost::shared_ptr< Core::Data::GCRankLimsaMaleText >
+   Core::Data::ExdDataGenerated::getGCRankLimsaMaleText( uint32_t GCRankLimsaMaleTextId )
+{
+   try
+   {
+      auto row = m_GCRankLimsaMaleTextDat.get_row( GCRankLimsaMaleTextId );
+      auto info = boost::make_shared< GCRankLimsaMaleText >( GCRankLimsaMaleTextId, this );
+      return info;
+   }
+   catch( ... )
+   {
+      return nullptr;
+   }
+   return nullptr;
+}
+boost::shared_ptr< Core::Data::GCRankUldahFemaleText >
+   Core::Data::ExdDataGenerated::getGCRankUldahFemaleText( uint32_t GCRankUldahFemaleTextId )
+{
+   try
+   {
+      auto row = m_GCRankUldahFemaleTextDat.get_row( GCRankUldahFemaleTextId );
+      auto info = boost::make_shared< GCRankUldahFemaleText >( GCRankUldahFemaleTextId, this );
+      return info;
+   }
+   catch( ... )
+   {
+      return nullptr;
+   }
+   return nullptr;
+}
+boost::shared_ptr< Core::Data::GCRankUldahMaleText >
+   Core::Data::ExdDataGenerated::getGCRankUldahMaleText( uint32_t GCRankUldahMaleTextId )
+{
+   try
+   {
+      auto row = m_GCRankUldahMaleTextDat.get_row( GCRankUldahMaleTextId );
+      auto info = boost::make_shared< GCRankUldahMaleText >( GCRankUldahMaleTextId, this );
       return info;
    }
    catch( ... )
