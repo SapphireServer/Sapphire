@@ -398,6 +398,7 @@ struct FFXIVIpcPlayerSpawn : FFXIVIpcBasePacket<PlayerSpawn>
    uint8_t mountColor;
    uint8_t scale;
    uint32_t u29b;
+   uint32_t u30b;
    Common::StatusEffect effect[30];
    Common::FFXIVARR_POSITION3 pos;
    uint32_t models[10];
@@ -1155,7 +1156,7 @@ struct FFXIVARR_IPC_UNK322 : FFXIVIpcBasePacket<IPCTYPE_UNK_322>
 */
 struct FFXIVARR_IPC_UNK320 : FFXIVIpcBasePacket<IPCTYPE_UNK_320>
 {
-   /* 0000 */ uint8_t unk[32];
+   /* 0000 */ uint8_t unk[0x38];
 };
 
 /**
