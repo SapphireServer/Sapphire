@@ -62,7 +62,7 @@ std::string Core::Util::binaryToHexDump( uint8_t* pBinData, uint16_t size )
             uint8_t by = pBinData[i + j];
             line[hexColumn] = hexChars[( by >> 4 ) & 0xF];
             line[hexColumn + 1] = hexChars[by & 0xF];
-            line[charColumn] = by < 32 ? '.' : static_cast<char>( by );
+            line[charColumn] = by < 32 ? '.' : static_cast< char >( by );
          }
 
          hexColumn += 3;
@@ -78,13 +78,14 @@ std::string Core::Util::binaryToHexDump( uint8_t* pBinData, uint16_t size )
 
 uint64_t Core::Util::getTimeMs()
 {
-   std::chrono::milliseconds epoch = std::chrono::duration_cast< std::chrono::milliseconds >(std::chrono::system_clock::now().time_since_epoch());
+   std::chrono::milliseconds epoch = std::chrono::duration_cast< std::chrono::milliseconds >
+           ( std::chrono::system_clock::now().time_since_epoch() );
    return epoch.count();
 }
 
-uint64_t Core::Util::getTimeSeconds()
+int64_t Core::Util::getTimeSeconds()
 {
-   std::chrono::seconds epoch = std::chrono::duration_cast< std::chrono::seconds >(std::chrono::system_clock::now().time_since_epoch());
+   std::chrono::seconds epoch = std::chrono::seconds( std::time( nullptr ) );
    return epoch.count();
 }
 
