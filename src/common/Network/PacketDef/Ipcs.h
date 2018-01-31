@@ -101,9 +101,9 @@ namespace Packets {
       InventoryActionAck         = 0x1139,
       UpdateInventorySlot        = 0x0153, // updated 4.1
 
-      EventPlay                  = 0x0190, // updated 4.2
-      EventStart                 = 0x0199, // updated 4.2
-      EventFinish                = 0x019A, // updated 4.2
+      EventPlay                  = 0x0190, // updated 4.2 ??
+      EventStart                 = 0x0199, // updated 4.2 ??
+      EventFinish                = 0x019A, // updated 4.2 ??
 
       EventLinkshell             = 0x1169,
 
@@ -150,7 +150,7 @@ namespace Packets {
 
       PingHandler              = 0x0065, // updated for sb
       InitHandler              = 0x0066, // updated 4.2
-      ChatHandler              = 0x00AD, // updated 4.1
+      ChatHandler              = 0x00C7, // updated 4.2
 
       FinishLoadingHandler     = 0x0069, // updated 4.1
 
@@ -183,16 +183,16 @@ namespace Packets {
       UpdatePositionHandler    = 0x0138, // updated 4.2
       UpdatePositionInstance   = 0x0177, // updated 4.2
 
-      InventoryModifyHandler   = 0x011F, // updated 4.1
+      InventoryModifyHandler   = 0x013F, // updated 4.2
 
-      TalkEventHandler         = 0x0128, // updated 4.1
-      EmoteEventHandler        = 0x0129, // updated 4.1
-      WithinRangeEventHandler  = 0x012A, // updated 4.1
-      OutOfRangeEventHandler   = 0x012B, // updated 4.1
-      EnterTeriEventHandler    = 0x012C, // updated 4.1
+      TalkEventHandler         = 0x0148, // updated 4.2 ?
+      EmoteEventHandler        = 0x0149, // updated 4.2 ?
+      WithinRangeEventHandler  = 0x014A, // updated 4.2 ?
+      OutOfRangeEventHandler   = 0x014B, // updated 4.2 ?
+      EnterTeriEventHandler    = 0x014C, // updated 4.2 ?
 
-      ReturnEventHandler       = 0x0131, // updated 4.1
-      TradeReturnEventHandler  = 0x0132, // updated 4.1
+      ReturnEventHandler       = 0x0151, // updated 4.2 ?
+      TradeReturnEventHandler  = 0x0152, // updated 4.2 ?
 
 
       LinkshellEventHandler    = 0x0144, // updated 4.1 ??
