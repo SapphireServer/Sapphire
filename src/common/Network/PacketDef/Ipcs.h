@@ -59,16 +59,16 @@ namespace Packets {
       Playtime                   = 0x00B7, // updated 4.1
       CFRegistered               = 0x00B8, // updated 4.1
       SocialRequestResponse      = 0x00BB, // updated 4.1
-      SocialList                 = 0x00BE, // updated 4.1
-      UpdateSearchInfo           = 0x00C0, // updated 4.1
-      InitSearchInfo             = 0x00C1, // updated 4.1
+      SocialList                 = 0x00E7, // updated 4.2
+      UpdateSearchInfo           = 0x00EA, // updated 4.2
+      InitSearchInfo             = 0x00EB, // updated 4.2
       ServerNotice               = 0x00F0, // updated 4.2
       SetOnlineStatus            = 0x00F1, // updated 4.2
 
       LogMessage                 = 0x00D0,
-      BlackList                  = 0x00D4, // updated 4.1
+      BlackList                  = 0x00FF, // updated 4.2
 
-      LinkshellList              = 0x00DC, // updated 4.1
+      LinkshellList              = 0x0106, // updated 4.2
       StatusEffectList           = 0x0125, // updated 4.2
       Effect                     = 0x0128, // updated 4.2
       GCAffiliation              = 0x00FC,
@@ -81,7 +81,9 @@ namespace Packets {
       HateList                   = 0x0165, // updated 4.2
       UpdateClassInfo            = 0x0169, // updated 4.2
       InitUI                     = 0x016B, // updated 4.2
+
       ActorOwner                 = 0x012D, // updated 4.1
+
       PlayerStats                = 0x016C, // updated 4.2
       PlayerStateFlags           = 0x016E, // updated 4.2
       PlayerClassInfo            = 0x016F, // updated 4.2
@@ -107,15 +109,15 @@ namespace Packets {
 
       EventLinkshell             = 0x1169,
 
-      QuestMessage               = 0x0188, // updated 4.1
-      QuestActiveList            = 0x017D, // updated 4.1
-      QuestUpdate                = 0x017E, // updated 4.1
-      QuestCompleteList          = 0x017F, // updated 4.1
+      QuestMessage               = 0x01B8, // updated 4.2
+      QuestActiveList            = 0x01AD, // updated 4.2
+      QuestUpdate                = 0x01AE, // updated 4.2
+      QuestCompleteList          = 0x01AF, // updated 4.2
 
-      QuestFinish                = 0x0180, // updated 4.1
-      MSQTrackerComplete         = 0x0181,
-      MSQTrackerProgress         = 0x0182,
-      QuestTracker               = 0x018D, // updated 4.1
+      QuestFinish                = 0x01A0, // updated 4.2
+      MSQTrackerComplete         = 0x01A1, // updated 4.2
+      MSQTrackerProgress         = 0x01A2, // updated 4.2
+      QuestTracker               = 0x01AD, // updated 4.2
       ActorSpawn                 = 0x0190, // DEPRECATED
       ActorFreeSpawn             = 0x0191, // unchanged 4.2
       InitZone                   = 0x019A, // unchanged 4.2
