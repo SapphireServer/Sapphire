@@ -69,7 +69,7 @@ namespace Packets {
       BlackList                  = 0x00D4, // updated 4.1
 
       LinkshellList              = 0x00DC, // updated 4.1
-      StatusEffectList           = 0x00FA, // updated 4.1
+      StatusEffectList           = 0x0125, // updated 4.2
       Effect                     = 0x0128, // updated 4.2
       GCAffiliation              = 0x00FC,
 
@@ -101,9 +101,9 @@ namespace Packets {
       InventoryActionAck         = 0x1139,
       UpdateInventorySlot        = 0x0153, // updated 4.1
 
-      EventPlay                  = 0x0190, // updated 4.2 ??
-      EventStart                 = 0x0199, // updated 4.2 ??
-      EventFinish                = 0x019A, // updated 4.2 ??
+      EventPlay                  = 0x018E, // updated 4.2
+      EventStart                 = 0x0198, // updated 4.2
+      EventFinish                = 0x0199, // updated 4.2
 
       EventLinkshell             = 0x1169,
 
@@ -119,10 +119,10 @@ namespace Packets {
       ActorSpawn                 = 0x0190, // DEPRECATED
       ActorFreeSpawn             = 0x0191, // unchanged 4.2
       InitZone                   = 0x019A, // unchanged 4.2
-      Mount                      = 0x01CD, // updated for 4.2
-      WeatherChange              = 0x01DD, // updated for 4.2
-      PlayerTitleList            = 0x01EB, // updated for 4.2
-      Discovery                  = 0x01EC, // updated for 4.2
+      Mount                      = 0x01CD, // updated 4.2
+      WeatherChange              = 0x01EA, // updated 4.2
+      PlayerTitleList            = 0x01EB, // updated 4.2
+      Discovery                  = 0x01EC, // updated 4.2
 
       EorzeaTimeOffset           = 0x01C0, // updated 4.1
 
@@ -134,8 +134,8 @@ namespace Packets {
       ActorGauge                 = 0x027D, // updated 4.2
       // Unknown IPC types that still need to be sent
       // TODO: figure all these out properly
-      IPCTYPE_UNK_320            = 0x0235, // updated 4.2 ( maybe )
-      IPCTYPE_UNK_322            = 0x0237, // updated 4.2 ( maybe )
+      IPCTYPE_UNK_320            = 0x0235, // updated 4.2
+      IPCTYPE_UNK_322            = 0x0237, // updated 4.2
 
       PerformNote                = 0x0286, // updated 4.2
    };
@@ -148,17 +148,17 @@ namespace Packets {
    enum ClientZoneIpcType : uint16_t
    {
 
-      PingHandler              = 0x0065, // updated for sb
-      InitHandler              = 0x0066, // updated 4.2
+      PingHandler              = 0x0065, // unchanged 4.2
+      InitHandler              = 0x0066, // unchanged 4.2
       ChatHandler              = 0x00C7, // updated 4.2
 
-      FinishLoadingHandler     = 0x0069, // updated 4.1
+      FinishLoadingHandler     = 0x0069, // unchanged 4.2
 
       CFCommenceHandler        = 0x006F,
       CFRegisterDuty           = 0x0071,
       CFRegisterRoulette       = 0x0072,
-      PlayTimeHandler          = 0x0073, // updated 4.1
-      LogoutHandler            = 0x0074, // updated 4.1
+      PlayTimeHandler          = 0x0073, // unchanged 4.2
+      LogoutHandler            = 0x0074, // unchanged 4.2
 
       CFDutyInfoHandler        = 0x0078, // updated 4.2
 
@@ -185,11 +185,11 @@ namespace Packets {
 
       InventoryModifyHandler   = 0x013F, // updated 4.2
 
-      TalkEventHandler         = 0x0148, // updated 4.2 ?
-      EmoteEventHandler        = 0x0149, // updated 4.2 ?
-      WithinRangeEventHandler  = 0x014A, // updated 4.2 ?
-      OutOfRangeEventHandler   = 0x014B, // updated 4.2 ?
-      EnterTeriEventHandler    = 0x014C, // updated 4.2 ?
+      TalkEventHandler         = 0x0148, // updated 4.2
+      EmoteEventHandler        = 0x0149, // updated 4.2
+      WithinRangeEventHandler  = 0x014A, // updated 4.2
+      OutOfRangeEventHandler   = 0x014B, // updated 4.2
+      EnterTeriEventHandler    = 0x014C, // updated 4.2
 
       ReturnEventHandler       = 0x0151, // updated 4.2 ?
       TradeReturnEventHandler  = 0x0152, // updated 4.2 ?
@@ -198,7 +198,7 @@ namespace Packets {
       LinkshellEventHandler    = 0x0144, // updated 4.1 ??
       LinkshellEventHandler1   = 0x0145, // updated 4.1 ??
 
-      ReqEquipDisplayFlagsChange  = 0x014C, // updated 4.1 ??
+      ReqEquipDisplayFlagsChange  = 0x016C, // updated 4.2
 
       PerformNoteHandler       = 0x0160,
    };
