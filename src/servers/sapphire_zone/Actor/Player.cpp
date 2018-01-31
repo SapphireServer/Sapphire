@@ -508,7 +508,7 @@ void Core::Entity::Player::discover( int16_t map_id, int16_t sub_id )
 
    uint16_t level = getLevel();
 
-   uint32_t exp = ( g_exdDataGen.getParamGrow(level)->expToNext * 5 / 100 );
+   uint32_t exp = ( g_exdDataGen.getParamGrow( level )->expToNext * 5 / 100 );
 
    gainExp( exp );
 
