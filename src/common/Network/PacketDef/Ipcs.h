@@ -177,9 +177,9 @@ namespace Packets {
       ActionHandler            = 0x0131, // updated 4.2
       DiscoveryHandler         = 0x0132, // updated 4.2
 
-      SkillHandler             = 0x0114, // updated 4.1
-      GMCommand1               = 0x0115, // updated 4.1 ??
-      GMCommand2               = 0x0116, // updated 4.1 ??
+      SkillHandler             = 0x0134, // updated 4.2
+      GMCommand1               = 0x0135, // updated 4.2
+      GMCommand2               = 0x0136, // updated 4.2
       UpdatePositionHandler    = 0x0138, // updated 4.2
       UpdatePositionInstance   = 0x0177, // updated 4.2
 
