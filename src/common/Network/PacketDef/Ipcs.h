@@ -149,7 +149,7 @@ namespace Packets {
    {
 
       PingHandler              = 0x0065, // updated for sb
-      InitHandler              = 0x0066, // updated 4.1
+      InitHandler              = 0x0066, // updated 4.2
       ChatHandler              = 0x00AD, // updated 4.1
 
       FinishLoadingHandler     = 0x0069, // updated 4.1
@@ -160,16 +160,16 @@ namespace Packets {
       PlayTimeHandler          = 0x0073, // updated 4.1
       LogoutHandler            = 0x0074, // updated 4.1
 
-      CFDutyInfoHandler        = 0x0078, // updated 4.1 ??
+      CFDutyInfoHandler        = 0x0078, // updated 4.2
 
       SocialReqSendHandler     = 0x00AE, // updated 4.1
-      SocialListHandler        = 0x00B3, // updated 4.1
-      ReqSearchInfoHandler     = 0x00B4, // updated 4.1
-      SetSearchInfoHandler     = 0x00B5, // updated 4.1
+      SocialListHandler        = 0x00CF, // updated 4.2
+      ReqSearchInfoHandler     = 0x00D4, // updated 4.2
+      SetSearchInfoHandler     = 0x00D5, // updated 4.2
 
-      BlackListHandler         = 0x00C0, // updated 4.1
+      BlackListHandler         = 0x00E0, // updated 4.2
 
-      LinkshellListHandler     = 0x00C8, // updated 4.1
+      LinkshellListHandler     = 0x00E8, // updated 4.2
 
       FcInfoReqHandler         = 0x0109, // updated 4.1
 
