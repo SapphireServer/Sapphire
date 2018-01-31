@@ -62,7 +62,7 @@ namespace Packets {
       SocialList                 = 0x00BE, // updated 4.1
       UpdateSearchInfo           = 0x00C0, // updated 4.1
       InitSearchInfo             = 0x00C1, // updated 4.1
-      ServerNotice               = 0x00C6, // updated 4.1
+      ServerNotice               = 0x00F0, // updated 4.2
       SetOnlineStatus            = 0x00F1, // updated 4.2
 
       LogMessage                 = 0x00D0,
@@ -117,8 +117,8 @@ namespace Packets {
       MSQTrackerProgress         = 0x0182,
       QuestTracker               = 0x018D, // updated 4.1
       ActorSpawn                 = 0x0190, // DEPRECATED
-      ActorFreeSpawn             = 0x0191, // unchanged for sb
-      InitZone                   = 0x019A, // unchanged for sb
+      ActorFreeSpawn             = 0x0191, // unchanged 4.2
+      InitZone                   = 0x019A, // unchanged 4.2
       Mount                      = 0x01CD, // updated for 4.2
       WeatherChange              = 0x01DD, // updated for 4.2
       PlayerTitleList            = 0x01EB, // updated for 4.2
