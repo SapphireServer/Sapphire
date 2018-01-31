@@ -1,6 +1,6 @@
 #include <cmath>
 
-#include <common/Exd/ExdData.h>
+#include <common/Exd/ExdDataGenerated.h>
 #include <common/Common.h>
 #include "Actor/Actor.h"
 #include "Actor/Player.h"
@@ -11,7 +11,7 @@
 using namespace Core::Math;
 using namespace Core::Entity;
 
-extern Core::Data::ExdData g_exdData;
+extern Core::Data::ExdDataGenerated g_exdDataGen;
 
 /*
    Class used for battle-related formulas and calculations.
@@ -61,19 +61,18 @@ uint32_t CalcStats::calculateMaxHp( PlayerPtr pPlayer )
    // Is there any way to pull reliable BaseHP without having to manually use a pet for every level, and using the values from a table?
    // More info here: https://docs.google.com/spreadsheets/d/1de06KGT0cNRUvyiXNmjNgcNvzBCCQku7jte5QxEQRbs/edit?usp=sharing
    
-   auto classInfoIt = g_exdData.m_classJobInfoMap.find( static_cast< uint8_t >( pPlayer->getClass() ) );
-   auto paramGrowthInfoIt = g_exdData.m_paramGrowthInfoMap.find( pPlayer->getLevel() );
+   auto classInfo = g_exdDataGen.getClassJob( static_cast< uint8_t >( pPlayer->getClass() ) );
+   auto paramGrowthInfo = g_exdDataGen.getParamGrow( pPlayer->getLevel() );
 
-   if ( classInfoIt == g_exdData.m_classJobInfoMap.end() ||
-      paramGrowthInfoIt == g_exdData.m_paramGrowthInfoMap.end() )
+   if ( !classInfo || !paramGrowthInfo )
       return 0;
 
    uint8_t level = pPlayer->getLevel();
 
    float baseStat = calculateBaseStat( pPlayer );
    uint16_t vitStat = pPlayer->getStats().vit;
-   uint16_t hpMod = paramGrowthInfoIt->second.hp_mod;
-   uint16_t jobModHp = classInfoIt->second.mod_hp;
+   uint16_t hpMod = paramGrowthInfo->hpModifier;
+   uint16_t jobModHp = classInfo->modifierHitPoints;
    float approxBaseHp = 0.0f; // Read above
 
    // These values are not precise.
@@ -83,7 +82,7 @@ uint32_t CalcStats::calculateMaxHp( PlayerPtr pPlayer )
    else if ( level >= 50 )
       approxBaseHp = 1700 + ( ( level - 50 ) * ( 1700 * 1.04325f ) );
    else
-      approxBaseHp = paramGrowthInfoIt->second.mp_const * 0.7667f;
+      approxBaseHp = paramGrowthInfo->mpModifier * 0.7667f;
 
    uint16_t result = static_cast< uint16_t >( floor( jobModHp * ( approxBaseHp / 100.0f ) ) + floor( hpMod / 100.0f * ( vitStat - baseStat ) ) );
 
@@ -95,18 +94,17 @@ uint32_t CalcStats::calculateMaxHp( PlayerPtr pPlayer )
 
 uint32_t CalcStats::calculateMaxMp( PlayerPtr pPlayer )
 {
-   auto classInfoIt = g_exdData.m_classJobInfoMap.find( static_cast< uint8_t >( pPlayer->getClass() ) );
-   auto paramGrowthInfoIt = g_exdData.m_paramGrowthInfoMap.find( pPlayer->getLevel() );
+   auto classInfo = g_exdDataGen.getClassJob( static_cast< uint8_t >( pPlayer->getClass() ) );
+   auto paramGrowthInfo = g_exdDataGen.getParamGrow( pPlayer->getLevel() );
 
-   if ( classInfoIt == g_exdData.m_classJobInfoMap.end() ||
-      paramGrowthInfoIt == g_exdData.m_paramGrowthInfoMap.end() )
+   if ( !classInfo || !paramGrowthInfo )
       return 0;
 
    float baseStat = calculateBaseStat( pPlayer );
    uint16_t piety = pPlayer->getStats().pie;
-   uint16_t pietyScalar = paramGrowthInfoIt->second.mp_mod;
-   uint16_t jobModMp = classInfoIt->second.mod_mpcpgp;
-   uint16_t baseMp = paramGrowthInfoIt->second.mp_const;
+   uint16_t pietyScalar = paramGrowthInfo->mpModifier;
+   uint16_t jobModMp = classInfo->modifierManaPoints;
+   uint16_t baseMp = paramGrowthInfo->mpModifier;
 
    uint16_t result = static_cast< uint16_t >( floor( floor( piety - baseStat ) * ( pietyScalar / 100 ) + baseMp ) * jobModMp / 100 );
 

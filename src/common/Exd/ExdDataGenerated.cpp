@@ -735,7 +735,9 @@
          name = exdData->getField< std::string >( row, 0 );
          abbreviation = exdData->getField< std::string >( row, 1 );
          classJobCategory = exdData->getField< uint8_t >( row, 3 );
+         expArrayIndex = exdData->getField< int8_t >( row, 4 );
          modifierHitPoints = exdData->getField< uint16_t >( row, 9 );
+         modifierManaPoints = exdData->getField< uint16_t >( row, 10 );
          modifierStrength = exdData->getField< uint16_t >( row, 11 );
          modifierVitality = exdData->getField< uint16_t >( row, 12 );
          modifierDexterity = exdData->getField< uint16_t >( row, 13 );
@@ -2376,11 +2378,12 @@
          id = exdData->getField< std::string >( row, 5 );
          sizeFactor = exdData->getField< uint16_t >( row, 6 );
          offsetX = exdData->getField< int16_t >( row, 7 );
-         offsetY = exdData->getField< int16_t >( row, 8 );
+         discoveryIndex = exdData->getField< int16_t >( row, 8 );
          placeNameRegion = exdData->getField< uint16_t >( row, 9 );
          placeName = exdData->getField< uint16_t >( row, 10 );
          placeNameSub = exdData->getField< uint16_t >( row, 11 );
          territoryType = exdData->getField< uint16_t >( row, 14 );
+         discoveryArrayByte = exdData->getField< bool >( row, 15 );
       }
 
       Core::Data::MapMarker::MapMarker( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
@@ -2569,6 +2572,12 @@
          auto row = exdData->m_OnlineStatusDat.get_row( row_id );
          name = exdData->getField< std::string >( row, 3 );
          icon = exdData->getField< uint32_t >( row, 4 );
+      }
+
+      Core::Data::Opening::Opening( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
+      {
+         auto row = exdData->m_OpeningDat.get_row( row_id );
+         name = exdData->getField< std::string >( row, 0 );
       }
 
       Core::Data::Orchestrion::Orchestrion( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
@@ -4096,6 +4105,7 @@ bool Core::Data::ExdDataGenerated::init( const std::string& path )
       m_NpcEquipDat = setupDatAccess( "NpcEquip", xiv::exd::Language::none );
       m_OmenDat = setupDatAccess( "Omen", xiv::exd::Language::none );
       m_OnlineStatusDat = setupDatAccess( "OnlineStatus", xiv::exd::Language::en );
+      m_OpeningDat = setupDatAccess( "Opening", xiv::exd::Language::none );
       m_OrchestrionDat = setupDatAccess( "Orchestrion", xiv::exd::Language::en );
       m_OrchestrionPathDat = setupDatAccess( "OrchestrionPath", xiv::exd::Language::none );
       m_ParamGrowDat = setupDatAccess( "ParamGrow", xiv::exd::Language::none );
@@ -7547,6 +7557,21 @@ boost::shared_ptr< Core::Data::OnlineStatus >
    {
       auto row = m_OnlineStatusDat.get_row( OnlineStatusId );
       auto info = boost::make_shared< OnlineStatus >( OnlineStatusId, this );
+      return info;
+   }
+   catch( ... )
+   {
+      return nullptr;
+   }
+   return nullptr;
+}
+boost::shared_ptr< Core::Data::Opening >
+   Core::Data::ExdDataGenerated::getOpening( uint32_t OpeningId )
+{
+   try
+   {
+      auto row = m_OpeningDat.get_row( OpeningId );
+      auto info = boost::make_shared< Opening >( OpeningId, this );
       return info;
    }
    catch( ... )

@@ -1,6 +1,6 @@
 #include <common/Network/PacketDef/Zone/ServerZoneDef.h>
 #include <common/Common.h>
-#include <common/Exd/ExdData.h>
+#include <common/Exd/ExdDataGenerated.h>
 #include <common/Logging/Logger.h>
 #include <common/Database/DatabaseDef.h>
 
@@ -21,7 +21,7 @@
 
 
 extern Core::Logger g_log;
-extern Core::Data::ExdData g_exdData;
+extern Core::Data::ExdDataGenerated g_exdDataGen;
 
 using namespace Core::Common;
 using namespace Core::Network;
@@ -135,11 +135,11 @@ Core::ItemPtr Core::Inventory::getItemAt( uint16_t containerId, uint8_t slotId )
 
 Core::ItemPtr Core::Inventory::createItem( uint32_t catalogId, uint8_t quantity )
 {
-   auto itemInfo = g_exdData.getItemInfo( catalogId );
+   auto itemInfo = g_exdDataGen.getItem( catalogId );
 
    uint8_t itemAmount = quantity;
 
-   if( itemInfo->stack_size == 1 )
+   if( itemInfo->stackSize == 1 )
       itemAmount = 1;
 
    if( !itemInfo )
@@ -153,8 +153,8 @@ Core::ItemPtr Core::Inventory::createItem( uint32_t catalogId, uint8_t quantity 
 
    pItem->setStackSize( itemAmount );
    pItem->setUId( getNextUId() );
-   pItem->setModelIds( itemInfo->model_primary, itemInfo->model_secondary );
-   pItem->setCategory( static_cast< ItemUICategory >( itemInfo->ui_category ) );
+   pItem->setModelIds( itemInfo->modelMain, itemInfo->modelSub );
+   pItem->setCategory( static_cast< ItemUICategory >( itemInfo->itemUICategory ) );
 
    g_charaDb.execute( "INSERT INTO charaglobalitem ( CharacterId, itemId, catalogId, stack, flags ) VALUES ( " +
                       std::to_string( m_pOwner->getId() ) + ", " +
@@ -473,10 +473,10 @@ bool Core::Inventory::isObtainable( uint32_t catalogId, uint8_t quantity )
 int16_t Core::Inventory::addItem( uint16_t inventoryId, int8_t slotId, uint32_t catalogId, uint8_t quantity )
 {
 
-   auto itemInfo = g_exdData.getItemInfo( catalogId );
+   auto itemInfo = g_exdDataGen.getItem( catalogId );
 
    // if item data doesn't exist or it's a blank field
-   if( !itemInfo || itemInfo->item_level == 0 )
+   if( !itemInfo || itemInfo->levelItem == 0 )
    {
       return -1;
    }
@@ -656,13 +656,13 @@ Core::ItemPtr Core::Inventory::loadItem( uint64_t uId )
 
    try
    {
-      auto itemInfo = g_exdData.getItemInfo( itemRes->getUInt( 1 ) );
+      auto itemInfo = g_exdDataGen.getItem( itemRes->getUInt( 1 ) );
       bool isHq = itemRes->getUInt( 3 ) == 1 ? true : false;
       ItemPtr pItem( new Item( uId, 
-                               itemInfo->id, 
-                               itemInfo->model_primary,
-                               itemInfo->model_secondary, 
-                               static_cast< ItemUICategory >( itemInfo->ui_category ),
+                               itemRes->getUInt( 1 ),
+                               itemInfo->modelMain,
+                               itemInfo->modelSub, 
+                               static_cast< ItemUICategory >( itemInfo->itemUICategory ),
                                isHq ) );
       pItem->setStackSize( itemRes->getUInt( 2 ) );
 

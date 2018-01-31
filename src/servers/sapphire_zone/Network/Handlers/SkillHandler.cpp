@@ -1,6 +1,6 @@
 #include <common/Common.h>
 #include <common/Network/CommonNetwork.h>
-#include <common/Exd/ExdData.h>
+#include <common/Exd/ExdDataGenerated.h>
 #include <common/Network/GamePacketNew.h>
 #include <common/Network/PacketContainer.h>
 #include <common/Logging/Logger.h>
@@ -32,7 +32,7 @@
 
 
 extern Core::Scripting::ScriptManager g_scriptMgr;
-extern Core::Data::ExdData g_exdData;
+extern Core::Data::ExdDataGenerated g_exdDataGen;
 extern Core::Logger g_log;
 
 using namespace Core::Common;
@@ -60,7 +60,7 @@ void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inP
         std::string actionIdStr = boost::str( boost::format( "%|04X|" ) % action );
         player.sendDebug( "---------------------------------------" );
         player.sendDebug( "ActionHandler ( " + actionIdStr + " | " +
-                          g_exdData.getActionInfo( action )->name +
+                          g_exdDataGen.getAction( action )->name +
                           " | " + std::to_string( targetId ) + " )" );
 
         player.queuePacket( ActorControlPacket142( player.getId(), ActorControlType::ActionStart, 0x01, action ) );
@@ -100,11 +100,11 @@ void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inP
     }
     else if( action < 3000000 ) // item action
     {
-        auto info = g_exdData.getEventItemInfo( action );
+        auto info = g_exdDataGen.getEventItem( action );
         if( info )
         {
             g_log.debug( info->name );
-            g_scriptMgr.onEventItem( player, action, info->eventId, info->castTime, targetId );
+            g_scriptMgr.onEventItem( player, action, info->quest, info->castTime, targetId );
         }
     }
     else if( action > 3000000 ) // unknown

@@ -1667,8 +1667,16 @@
           }
         },
         {
+          "index": 4,
+          "name": "ExpArrayIndex"
+        },
+        {
           "index": 9,
           "name": "Modifier{HitPoints}"
+        },
+        {
+          "index": 10,
+          "name": "Modifier{ManaPoints}"
         },
         {
           "index": 11,
@@ -6245,12 +6253,20 @@
           }
         },
         {
+          "index": 8,
+          "name": "DiscoveryIndex"
+        },
+        {
           "index": 14,
           "name": "TerritoryType",
           "converter": {
             "type": "link",
             "target": "TerritoryType"
           }
+        },
+        {
+          "index": 15,
+          "name": "DiscoveryArrayByte"
         }
       ]
     },
@@ -6842,6 +6858,15 @@
           "converter": {
             "type": "icon"
           }
+        }
+      ]
+    },
+    {
+      "sheet": "Opening",
+      "defaultColumn": "Name",
+      "definitions": [
+        {
+          "name": "Name"
         }
       ]
     },

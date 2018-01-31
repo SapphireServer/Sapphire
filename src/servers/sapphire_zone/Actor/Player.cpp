@@ -4,7 +4,7 @@
 #include <common/Config/XMLConfig.h>
 #include <common/Network/GamePacket.h>
 #include <common/Logging/Logger.h>
-#include <common/Exd/ExdData.h>
+#include <common/Exd/ExdDataGenerated.h>
 #include <common/Network/PacketContainer.h>
 
 #include "Session.h"
@@ -44,7 +44,7 @@
 extern Core::Logger g_log;
 extern Core::ServerZone g_serverZone;
 extern Core::TerritoryMgr g_territoryMgr;
-extern Core::Data::ExdData g_exdData;
+extern Core::Data::ExdDataGenerated g_exdDataGen;
 extern Core::Scripting::ScriptManager g_scriptMgr;
 
 using namespace Core::Common;
@@ -211,36 +211,27 @@ void Core::Entity::Player::calculateStats()
    uint8_t level = getLevel();
    uint8_t job = static_cast< uint8_t >( getClass() );
 
-   auto classInfoIt = g_exdData.m_classJobInfoMap.find( job );
-   auto tribeInfoIt = g_exdData.m_tribeInfoMap.find( tribe );
-   auto paramGrowthInfoIt = g_exdData.m_paramGrowthInfoMap.find( level );
-
-   if( tribeInfoIt == g_exdData.m_tribeInfoMap.end() ||
-       classInfoIt == g_exdData.m_classJobInfoMap.end() ||
-       paramGrowthInfoIt == g_exdData.m_paramGrowthInfoMap.end() )
-      return;
-
-   auto tribeInfo = tribeInfoIt->second;
-   auto classInfo = classInfoIt->second;
-   auto paramGrowthInfo = paramGrowthInfoIt->second;
+   auto classInfo = g_exdDataGen.getClassJob( job );
+   auto tribeInfo = g_exdDataGen.getTribe( tribe );
+   auto paramGrowthInfo = g_exdDataGen.getParamGrow( level );
 
    // TODO: put formula somewhere else...
    float base = Math::CalcStats::calculateBaseStat( getAsPlayer() );
 
-   m_baseStats.str =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_str ) / 100 ) + tribeInfo.mod_str );
-   m_baseStats.dex =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_dex ) / 100 ) + tribeInfo.mod_dex );
-   m_baseStats.vit =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_vit ) / 100 ) + tribeInfo.mod_vit );
-   m_baseStats.inte = static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_int ) / 100 ) + tribeInfo.mod_int );
-   m_baseStats.mnd =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_mnd ) / 100 ) + tribeInfo.mod_mnd );
-   m_baseStats.pie =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_pie ) / 100 ) + tribeInfo.mod_pie );
+   m_baseStats.str =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierStrength ) / 100 ) + tribeInfo->sTR );
+   m_baseStats.dex =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierDexterity ) / 100 ) + tribeInfo->dEX );
+   m_baseStats.vit =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierVitality ) / 100 ) + tribeInfo->vIT );
+   m_baseStats.inte = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierIntelligence ) / 100 ) + tribeInfo->iNT );
+   m_baseStats.mnd =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierMind ) / 100 ) + tribeInfo->mND );
+   m_baseStats.pie =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierPiety ) / 100 ) + tribeInfo->pIE );
 
-   m_baseStats.skillSpeed      = paramGrowthInfo.base_secondary;
-   m_baseStats.spellSpeed      = paramGrowthInfo.base_secondary;
-   m_baseStats.accuracy        = paramGrowthInfo.base_secondary;
-   m_baseStats.critHitRate     = paramGrowthInfo.base_secondary;
-   m_baseStats.attackPotMagic  = paramGrowthInfo.base_secondary;
-   m_baseStats.healingPotMagic = paramGrowthInfo.base_secondary;
-   m_baseStats.tenacity        = paramGrowthInfo.base_secondary;
+   m_baseStats.skillSpeed      = paramGrowthInfo->baseSpeed;
+   m_baseStats.spellSpeed      = paramGrowthInfo->baseSpeed;
+   m_baseStats.accuracy        = paramGrowthInfo->baseSpeed;
+   m_baseStats.critHitRate     = paramGrowthInfo->baseSpeed;
+   m_baseStats.attackPotMagic  = paramGrowthInfo->baseSpeed;
+   m_baseStats.healingPotMagic = paramGrowthInfo->baseSpeed;
+   m_baseStats.tenacity        = paramGrowthInfo->baseSpeed;
 
    m_baseStats.max_mp = Math::CalcStats::calculateMaxMp( getAsPlayer() );
 
@@ -300,7 +291,7 @@ void Core::Entity::Player::sendStats()
 
 void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
 {
-   auto data = g_exdData.getAetheryteInfo( aetheryteId );
+   auto data = g_exdDataGen.getAetheryte( aetheryteId );
 
    if( data == nullptr )
    {
@@ -309,7 +300,7 @@ void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
 
    setStateFlag( PlayerStateFlag::BetweenAreas );
 
-   auto z_pos = g_territoryMgr.getTerritoryPosition( data->levelId );
+   auto z_pos = g_territoryMgr.getTerritoryPosition( data->territory );
 
    Common::FFXIVARR_POSITION3 pos;
    pos.x = 0;
@@ -323,30 +314,30 @@ void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
       rot = z_pos->getTargetRotation();
    }
 
-   sendDebug( "Teleport: " + data->placename + " " + data->placename_aethernet +
-               "(" + std::to_string( data->levelId ) + ")" );
+   sendDebug( "Teleport: " + g_exdDataGen.getPlaceName( data->placeName )->name + " " + g_exdDataGen.getPlaceName( data->aethernetName )->name +
+               "(" + std::to_string( data->territory ) + ")" );
 
    // TODO: this should be simplified and a type created in server_common/common.h.
    if( type == 1 ) // teleport
    {
-      prepareZoning( data->target_zone, true, 1, 112 );
+      prepareZoning( data->territory, true, 1, 112 ); // TODO: Really?
       sendToInRangeSet( ActorControlPacket142( getId(), ActorDespawnEffect, 0x04 ) );
       setZoningType( Common::ZoneingType::Teleport );
    }
    else if( type == 2 ) // aethernet
    {
-      prepareZoning( data->target_zone, true, 1, 112 );
+      prepareZoning( data->territory, true, 1, 112 );
       sendToInRangeSet( ActorControlPacket142( getId(), ActorDespawnEffect, 0x04 ) );
       setZoningType( Common::ZoneingType::Teleport );
    }
    else if( type == 3 ) // return
    {
-      prepareZoning( data->target_zone, true, 1, 111 );
+      prepareZoning( data->territory, true, 1, 111 );
       sendToInRangeSet( ActorControlPacket142( getId(), ActorDespawnEffect, 0x03 ) );
       setZoningType( Common::ZoneingType::Return );
    }
 
-   m_queuedZoneing = boost::make_shared< QueuedZoning >( data->target_zone, pos, Util::getTimeMs(), rot );
+   m_queuedZoneing = boost::make_shared< QueuedZoning >( data->territory, pos, Util::getTimeMs(), rot );
 
 
 }
@@ -502,11 +493,11 @@ void Core::Entity::Player::discover( int16_t map_id, int16_t sub_id )
 
    int32_t offset = 4;
 
-   auto info = g_exdData.m_zoneInfoMap[getCurrentZone()->getTerritoryId()];
-   if( info.is_two_byte )
-      offset = 4 + 2 * info.discovery_index;
+   auto info = g_exdDataGen.getMap( g_exdDataGen.getTerritoryType( getCurrentZone()->getTerritoryId() )->map );
+   if( info->discoveryArrayByte )
+      offset = 4 + 2 * info->discoveryIndex;
    else
-      offset = 324 + 4 * info.discovery_index;
+      offset = 324 + 4 * info->discoveryIndex;
 
    int32_t index = offset + sub_id / 8;
    uint8_t bitIndex = sub_id % 8;
@@ -517,7 +508,7 @@ void Core::Entity::Player::discover( int16_t map_id, int16_t sub_id )
 
    uint16_t level = getLevel();
 
-   uint32_t exp = ( g_exdData.m_paramGrowthInfoMap[level].needed_exp * 5 / 100 );
+   uint32_t exp = ( g_exdDataGen.getParamGrow(level)->expToNext * 5 / 100 );
 
    gainExp( exp );
 
@@ -594,9 +585,9 @@ void Core::Entity::Player::gainExp( uint32_t amount )
 
    uint16_t level = getLevel();
 
-   uint32_t neededExpToLevel = g_exdData.m_paramGrowthInfoMap[level].needed_exp;
+   uint32_t neededExpToLevel = g_exdDataGen.getParamGrow( level )->expToNext;
 
-   uint32_t neededExpToLevelplus1 = g_exdData.m_paramGrowthInfoMap[level + 1].needed_exp;
+   uint32_t neededExpToLevelplus1 = g_exdDataGen.getParamGrow( level + 1 )->expToNext;
 
    queuePacket( ActorControlPacket143( getId(), GainExpMsg, static_cast< uint8_t >( getClass() ), amount ) );
 
@@ -696,25 +687,25 @@ void Core::Entity::Player::sendStatusUpdate( bool toSelf )
 
 uint8_t Core::Entity::Player::getLevel() const
 {
-   uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( getClass() )].exp_idx;
+   uint8_t classJobIndex = g_exdDataGen.getClassJob( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
    return static_cast< uint8_t >( m_classArray[classJobIndex] );
 }
 
 uint8_t Core::Entity::Player::getLevelForClass( Common::ClassJob pClass ) const
 {
-   uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( pClass )].exp_idx;
+   uint8_t classJobIndex = g_exdDataGen.getClassJob( static_cast< uint8_t >( pClass ) )->expArrayIndex;
    return static_cast< uint8_t >( m_classArray[classJobIndex] );
 }
 
 uint32_t Core::Entity::Player::getExp() const
 {
-   uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( getClass() )].exp_idx;
+   uint8_t classJobIndex = g_exdDataGen.getClassJob( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
    return m_expArray[classJobIndex];
 }
 
 void Core::Entity::Player::setExp( uint32_t amount )
 {
-   uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( getClass() )].exp_idx;
+   uint8_t classJobIndex = g_exdDataGen.getClassJob( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
    m_expArray[classJobIndex] = amount;
 }
 
@@ -754,13 +745,13 @@ void Core::Entity::Player::setClassJob( Common::ClassJob classJob )
 
 void Core::Entity::Player::setLevel( uint8_t level )
 {
-   uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( static_cast< uint8_t >( getClass() ) )].exp_idx;
+   uint8_t classJobIndex = g_exdDataGen.getClassJob( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
    m_classArray[classJobIndex] = level;
 }
 
 void Core::Entity::Player::setLevelForClass( uint8_t level, Common::ClassJob classjob )
 {
-   uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( classjob )].exp_idx;
+   uint8_t classJobIndex = g_exdDataGen.getClassJob( static_cast< uint8_t >( classjob ) )->expArrayIndex;
 
    if( m_classArray[classJobIndex] == 0 )
       insertDbClass( classJobIndex );
@@ -910,11 +901,11 @@ const uint8_t* Core::Entity::Player::getStateFlags() const
 
 bool Core::Entity::Player::actionHasCastTime( uint32_t actionId ) //TODO: Add logic for special cases
 {
-   auto actionInfoPtr = g_exdData.getActionInfo( actionId );
-   if( actionInfoPtr->is_instant )
+   auto actionInfoPtr = g_exdDataGen.getAction( actionId );
+   if( actionInfoPtr->preservesCombo )
       return false;
 
-   return actionInfoPtr->cast_time != 0;
+   return actionInfoPtr->cast100ms != 0;
 
 }
 
