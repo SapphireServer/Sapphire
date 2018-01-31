@@ -2,6 +2,7 @@
 #include <common/Util/UtilMath.h>
 #include <common/Network/PacketContainer.h>
 #include <common/Exd/ExdData.h>
+#include <common/Exd/ExdDataGenerated.h>
 #include <common/Network/GamePacket.h>
 
 #include "Forwards.h"
@@ -24,7 +25,7 @@
 #include "Player.h"
 
 extern Core::ServerZone g_serverZone;
-extern Core::Data::ExdData g_exdData;
+extern Core::Data::ExdDataGenerated g_exdDataGen;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -682,7 +683,7 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
       getAsPlayer()->sendDebug( "Handle script skill type: " + std::to_string( type ) );
    }
 
-   auto actionInfoPtr = g_exdData.getActionInfo( actionId );
+   auto actionInfoPtr = g_exdDataGen.getAction( actionId );
 
    // Todo: Effect packet generator. 90% of this is basically setting params and it's basically unreadable.
    // Prepare packet. This is seemingly common for all packets in the action handler.
@@ -708,7 +709,7 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
       effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::NormalDamage;
       effectPacket.data().effects[0].unknown_3 = 7;
 
-      if( !actionInfoPtr->is_aoe )
+      if( actionInfoPtr->castType == 1 && actionInfoPtr->effectRange != 0 || actionInfoPtr->castType != 1 )
       {
          // If action on this specific target is valid...
          if ( isPlayer() && !ActionCollision::isActorApplicable( pTarget.shared_from_this(), TargetFilter::Enemies ) )
@@ -764,7 +765,7 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
       effectPacket.data().effects[0].effectType = ActionEffectType::Heal;
       effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::NormalHeal;
 
-      if( !actionInfoPtr->is_aoe )
+      if( actionInfoPtr->castType == 1 && actionInfoPtr->effectRange != 0 || actionInfoPtr->castType != 1 )
       {
          if( isPlayer() && !ActionCollision::isActorApplicable( pTarget.shared_from_this(), TargetFilter::Allies ) )
             break;

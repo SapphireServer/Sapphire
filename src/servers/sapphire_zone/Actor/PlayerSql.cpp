@@ -4,7 +4,7 @@
 #include <common/Util/UtilMath.h>
 #include <common/Config/XMLConfig.h>
 #include <common/Logging/Logger.h>
-#include <common/Exd/ExdData.h>
+#include <common/Exd/ExdDataGenerated.h>
 #include <common/Network/PacketContainer.h>
 #include <common/Common.h>
 #include <common/Database/DatabaseDef.h>
@@ -31,7 +31,7 @@
 extern Core::Logger g_log;
 extern Core::ServerZone g_serverZone;
 extern Core::TerritoryMgr g_territoryMgr;
-extern Core::Data::ExdData g_exdData;
+extern Core::Data::ExdDataGenerated g_exdDataGen;
 
 
 using namespace Core::Common;
@@ -433,7 +433,7 @@ void Core::Entity::Player::updateSql()
 
 void Core::Entity::Player::updateDbClass() const
 {
-   uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( getClass() )].exp_idx;
+   uint8_t classJobIndex = g_exdDataGen.getClassJob( static_cast<uint8_t>( getClass() ) )->expArrayIndex;
 
    //Exp = ?, Lvl = ? WHERE CharacterId = ? AND ClassIdx = ?
    auto stmtS = g_charaDb.getPreparedStatement( Db::CHARA_CLASS_UP );
