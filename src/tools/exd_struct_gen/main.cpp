@@ -48,7 +48,9 @@ std::string generateIdListDecl( const std::string &exd )
 
 std::string generateDirectGetters( const std::string& exd )
 {
-   return "     boost::shared_ptr< " + exd + " > get" + exd + "( uint32_t " + exd + "Id );\n";
+         
+   return  "     using " + exd + "Ptr =  boost::shared_ptr< " + exd + " >;\n" +
+           "     " + exd + "Ptr get" + exd + "( uint32_t " + exd + "Id );\n";
 }
 
 std::string generateIdListGetter( const std::string &exd )
@@ -79,7 +81,7 @@ std::string generateDirectGetterDef( const std::string& exd )
 {
    std::string result = "";
    result =
-      "boost::shared_ptr< Core::Data::" + exd + " >\n"
+      "" + exd + "Ptr\n"
       "   Core::Data::ExdDataGenerated::get" + exd + "( uint32_t " + exd + "Id )\n"
       "{\n"
       "   try\n"
