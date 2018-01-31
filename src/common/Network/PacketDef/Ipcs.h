@@ -70,14 +70,14 @@ namespace Packets {
 
       LinkshellList              = 0x00DC, // updated 4.1
       StatusEffectList           = 0x00FA, // updated 4.1
-      Effect                     = 0x00FB, // updated 4.1
+      Effect                     = 0x0128, // updated 4.2
       GCAffiliation              = 0x00FC,
 
       PlayerSpawn                = 0x015C, // updated 4.2
       NpcSpawn                   = 0x015D, // updated 4.2
-      ActorMove                  = 0x011E, // updated 4.1
-      ActorSetPos                = 0x0120, // updated 4.1
-      ActorCast                  = 0x0123, // updated 4.1
+      ActorMove                  = 0x015E, // updated 4.2
+      ActorSetPos                = 0x015F, // updated 4.2
+      ActorCast                  = 0x0162, // updated 4.2
       HateList                   = 0x0165, // updated 4.2
       UpdateClassInfo            = 0x0169, // updated 4.2
       InitUI                     = 0x016B, // updated 4.2
@@ -85,7 +85,7 @@ namespace Packets {
       PlayerStats                = 0x016C, // updated 4.2
       PlayerStateFlags           = 0x016E, // updated 4.2
       PlayerClassInfo            = 0x016F, // updated 4.2
-      ModelEquip                 = 0x013C, // updated 4.1
+      ModelEquip                 = 0x0170, // updated 4.2
 
       AddStatusEffect            = 0x0141,
       ActorControl142            = 0x0142, // updated 4.2
@@ -119,7 +119,7 @@ namespace Packets {
       ActorSpawn                 = 0x0190, // DEPRECATED
       ActorFreeSpawn             = 0x0191, // unchanged for sb
       InitZone                   = 0x019A, // unchanged for sb
-      Mount                      = 0x01CD,
+      Mount                      = 0x01CD, // updated for 4.2
       WeatherChange              = 0x01DD, // updated for 4.2
       PlayerTitleList            = 0x01EB, // updated for 4.2
       Discovery                  = 0x01EC, // updated for 4.2
@@ -131,15 +131,13 @@ namespace Packets {
       CFAvailableContents        = 0x01CF,
 
       PrepareZoning              = 0x027C, // updated 4.2
-
+      ActorGauge                 = 0x027D, // updated 4.2
       // Unknown IPC types that still need to be sent
       // TODO: figure all these out properly
       IPCTYPE_UNK_320            = 0x0235, // updated 4.2 ( maybe )
       IPCTYPE_UNK_322            = 0x0237, // updated 4.2 ( maybe )
 
-      ActorGauge                 = 0x0249,
-
-      PerformNote                = 0x0252,
+      PerformNote                = 0x0286, // updated 4.2
    };
 
    // TODO: Include structures for the individual packet segment types
@@ -175,9 +173,9 @@ namespace Packets {
 
       FcInfoReqHandler         = 0x0109, // updated 4.1
 
-      ZoneLineHandler          = 0x0110, // updated 4.1
+      ZoneLineHandler          = 0x0130, // updated 4.2
       ActionHandler            = 0x0131, // updated 4.2
-      DiscoveryHandler         = 0x0112, // updated 4.1
+      DiscoveryHandler         = 0x0132, // updated 4.2
 
       SkillHandler             = 0x0114, // updated 4.1
       GMCommand1               = 0x0115, // updated 4.1 ??
