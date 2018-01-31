@@ -341,34 +341,34 @@ bool Core::Data::ExdData::loadActionInfo()
 
       int8_t class_job          = getField< int8_t >( fields, 10 );      // 10
       uint8_t unlock_level      = getField< uint8_t >( fields, 11 );     // 11
-      int8_t range              = getField< int8_t >( fields, 13 );      // 13
-      bool can_target_self      = getField< bool >( fields, 14 );        // 14
-      bool can_target_party     = getField< bool>( fields, 15 );         // 15
-      bool can_target_friendly  = getField< bool >( fields, 16 );        // 16
-      bool can_target_enemy     = getField< bool >( fields, 17 );        // 17
+      int8_t range              = getField< int8_t >( fields, 14 );      // 13
+      bool can_target_self      = getField< bool >( fields, 15 );        // 14
+      bool can_target_party     = getField< bool>( fields, 16 );         // 15
+      bool can_target_friendly  = getField< bool >( fields, 17 );        // 16
+      bool can_target_enemy     = getField< bool >( fields, 18 );        // 17
 
-      bool is_ground_aoe        = getField< bool >( fields, 20 );        // 20
+      bool is_ground_aoe        = getField< bool >( fields, 21 );        // 20
       // Column 23: Seems to be related to raising skills (Raise, Resurrection, Reanimate)
-      bool can_target_ko        = getField< bool >( fields, 24 );        // 24
+      bool can_target_ko        = getField< bool >( fields, 25 );        // 24
 
-      uint8_t aoe_type          = getField< uint8_t >( fields, 26 );     // 26
-      uint8_t aoe_range         = getField< uint8_t >( fields, 27 );     // 27
-      uint8_t aoe_width         = getField< uint8_t >( fields, 28 );     // 28
+      uint8_t aoe_type          = getField< uint8_t >( fields, 27 );     // 26
+      uint8_t aoe_range         = getField< uint8_t >( fields, 28 );     // 27
+      uint8_t aoe_width         = getField< uint8_t >( fields, 29 );     // 28
 
-      uint8_t points_type       = getField< uint8_t >( fields, 30 );     // 30
-      uint16_t points_cost      = getField< uint16_t >( fields, 31 );    // 31
+      uint8_t points_type       = getField< uint8_t >( fields, 31 );     // 30
+      uint16_t points_cost      = getField< uint16_t >( fields, 32 );    // 31
 
-      bool is_instant           = getField< bool >( fields, 35 );        // 35
-      uint16_t cast_time        = getField< uint16_t >( fields, 36 );    // 36
-      uint16_t recast_time      = getField< uint16_t >( fields, 37 );    // 37
+      bool is_instant           = getField< bool >( fields, 36 );        // 35
+      uint16_t cast_time        = getField< uint16_t >( fields, 37 );    // 36
+      uint16_t recast_time      = getField< uint16_t >( fields, 38 );    // 37
 
-      int8_t model              = getField< int8_t >( fields, 39 );      // 39
-      uint8_t aspect            = getField< uint8_t >( fields, 40 );     // 40
+      int8_t model              = getField< int8_t >( fields, 40 );      // 39
+      uint8_t aspect            = getField< uint8_t >( fields, 41 );     // 40
 
-      uint16_t toggle_status_id = getField< uint16_t >( fields, 42 );    // 42
-      bool affects_position     = getField< bool >( fields, 47 );        // 47
+      uint16_t toggle_status_id = getField< uint16_t >( fields, 43 );    // 42
+      bool affects_position     = getField< bool >( fields, 48 );        // 47
 
-      bool no_effect_in_battle  = getField< bool >( fields, 60 );        // 60
+      bool no_effect_in_battle  = getField< bool >( fields, 61 );        // 60
 
 
       info->id                  = id;
