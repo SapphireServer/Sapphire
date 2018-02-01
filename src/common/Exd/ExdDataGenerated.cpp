@@ -2378,10 +2378,11 @@
          id = exdData->getField< std::string >( row, 5 );
          sizeFactor = exdData->getField< uint16_t >( row, 6 );
          offsetX = exdData->getField< int16_t >( row, 7 );
-         discoveryIndex = exdData->getField< int16_t >( row, 8 );
+         offsetY = exdData->getField< int16_t >( row, 8 );
          placeNameRegion = exdData->getField< uint16_t >( row, 9 );
          placeName = exdData->getField< uint16_t >( row, 10 );
          placeNameSub = exdData->getField< uint16_t >( row, 11 );
+         discoveryIndex = exdData->getField< int16_t >( row, 12 );
          territoryType = exdData->getField< uint16_t >( row, 14 );
          discoveryArrayByte = exdData->getField< bool >( row, 15 );
       }
@@ -3711,6 +3712,10 @@
          defaultTalkNPCWin = exdData->getField< uint32_t >( row, 22 );
          defaultTalkDraw = exdData->getField< uint32_t >( row, 23 );
          defaultTalkPCWin = exdData->getField< uint32_t >( row, 24 );
+         itemPossibleReward.push_back( exdData->getField< uint32_t >( row, 26 ) );
+         itemPossibleReward.push_back( exdData->getField< uint32_t >( row, 27 ) );
+         itemPossibleReward.push_back( exdData->getField< uint32_t >( row, 28 ) );
+         itemPossibleReward.push_back( exdData->getField< uint32_t >( row, 29 ) );
       }
 
       Core::Data::TripleTriadCard::TripleTriadCard( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )

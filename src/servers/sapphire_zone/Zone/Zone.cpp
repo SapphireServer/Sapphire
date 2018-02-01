@@ -225,8 +225,10 @@ uint8_t Zone::getNextWeather()
 
    auto rate = static_cast< uint8_t >( step2 % 0x64 );
 
-   auto weatherRate = g_exdDataGen.getWeatherRate( zoneInfo->weatherRate );
-   auto weatherRateFields = g_exdDataGen.m_WeatherRateDat.get_row( zoneInfo->weatherRate );
+   uint8_t weatherRateNum = zoneInfo->weatherRate > g_exdDataGen.getWeatherRateIdList().size() ? 0 : zoneInfo->weatherRate;
+
+   auto weatherRate = g_exdDataGen.getWeatherRate( weatherRateNum );
+   auto weatherRateFields = g_exdDataGen.m_WeatherRateDat.get_row( weatherRateNum );
 
    std::map< uint8_t, int32_t> weatherRateMap;
 
@@ -238,7 +240,7 @@ uint8_t Zone::getNextWeather()
       if( weatherId == 0 )
          break;
 
-      sumPc += boost::get<int32_t>( weatherRateFields[i + 1] );
+      sumPc += boost::get<uint8_t>( weatherRateFields[i + 1] );
       weatherRateMap[sumPc] = weatherId;
 
       i += 2;

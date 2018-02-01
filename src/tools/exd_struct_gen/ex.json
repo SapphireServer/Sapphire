@@ -6253,7 +6253,7 @@
           }
         },
         {
-          "index": 8,
+          "index": 12,
           "name": "DiscoveryIndex"
         },
         {
@@ -9113,6 +9113,18 @@
           "converter": {
             "type": "link",
             "target": "DefaultTalk"
+          }
+        },
+        {
+          "index": 26,
+          "type": "repeat",
+          "count": 4,
+          "definition": {
+            "name": "Item{PossibleReward}",
+            "converter": {
+              "type": "link",
+              "target": "Item"
+            }
           }
         }
       ]
