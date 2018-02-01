@@ -100,8 +100,8 @@ namespace Packets {
       InventoryTransactionFinish = 0x017C, // updated 4.2
       InventoryTransaction       = 0x017D, // updated 4.2
       CurrencyCrystalInfo        = 0x017E, // updated 4.2
-      InventoryActionAck         = 0x1139,
-      UpdateInventorySlot        = 0x0180, // updated 4.2
+      InventoryActionAck         = 0x0180, // updated 4.2?
+      UpdateInventorySlot        = 0x0181, // updated 4.2
 
       EventPlay                  = 0x018E, // updated 4.2
       EventStart                 = 0x0198, // updated 4.2
