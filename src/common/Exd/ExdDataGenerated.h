@@ -242,6 +242,7 @@ struct MountAction;
 struct NpcEquip;
 struct Omen;
 struct OnlineStatus;
+struct Opening;
 struct Orchestrion;
 struct OrchestrionPath;
 struct ParamGrow;
@@ -936,7 +937,9 @@ struct ClassJob
    std::string name;
    std::string abbreviation;
    uint8_t classJobCategory;
+   int8_t expArrayIndex;
    uint16_t modifierHitPoints;
+   uint16_t modifierManaPoints;
    uint16_t modifierStrength;
    uint16_t modifierVitality;
    uint16_t modifierDexterity;
@@ -2425,7 +2428,9 @@ struct Map
    uint16_t placeNameRegion;
    uint16_t placeName;
    uint16_t placeNameSub;
+   int16_t discoveryIndex;
    uint16_t territoryType;
+   bool discoveryArrayByte;
 
    Map( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
@@ -2602,6 +2607,13 @@ struct OnlineStatus
    uint32_t icon;
 
    OnlineStatus( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct Opening
+{
+   std::string name;
+
+   Opening( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct Orchestrion
@@ -3204,6 +3216,7 @@ struct TripleTriad
    uint32_t defaultTalkNPCWin;
    uint32_t defaultTalkDraw;
    uint32_t defaultTalkPCWin;
+   std::vector< uint32_t > itemPossibleReward;
 
    TripleTriad( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
@@ -3607,6 +3620,7 @@ struct WorldDCGroupType
      xiv::exd::Exd m_NpcEquipDat;
      xiv::exd::Exd m_OmenDat;
      xiv::exd::Exd m_OnlineStatusDat;
+     xiv::exd::Exd m_OpeningDat;
      xiv::exd::Exd m_OrchestrionDat;
      xiv::exd::Exd m_OrchestrionPathDat;
      xiv::exd::Exd m_ParamGrowDat;
@@ -3906,6 +3920,7 @@ struct WorldDCGroupType
      boost::shared_ptr< NpcEquip > getNpcEquip( uint32_t NpcEquipId );
      boost::shared_ptr< Omen > getOmen( uint32_t OmenId );
      boost::shared_ptr< OnlineStatus > getOnlineStatus( uint32_t OnlineStatusId );
+     boost::shared_ptr< Opening > getOpening( uint32_t OpeningId );
      boost::shared_ptr< Orchestrion > getOrchestrion( uint32_t OrchestrionId );
      boost::shared_ptr< OrchestrionPath > getOrchestrionPath( uint32_t OrchestrionPathId );
      boost::shared_ptr< ParamGrow > getParamGrow( uint32_t ParamGrowId );
@@ -4205,6 +4220,7 @@ struct WorldDCGroupType
      std::set< uint32_t > m_NpcEquipIdList;
      std::set< uint32_t > m_OmenIdList;
      std::set< uint32_t > m_OnlineStatusIdList;
+     std::set< uint32_t > m_OpeningIdList;
      std::set< uint32_t > m_OrchestrionIdList;
      std::set< uint32_t > m_OrchestrionPathIdList;
      std::set< uint32_t > m_ParamGrowIdList;
@@ -5628,6 +5644,12 @@ const std::set< uint32_t >& getOnlineStatusIdList()
    if( m_OnlineStatusIdList.size() == 0 )
       loadIdList( m_OnlineStatusDat, m_OnlineStatusIdList );
    return m_OnlineStatusIdList;
+}
+const std::set< uint32_t >& getOpeningIdList()
+{
+   if( m_OpeningIdList.size() == 0 )
+      loadIdList( m_OpeningDat, m_OpeningIdList );
+   return m_OpeningIdList;
 }
 const std::set< uint32_t >& getOrchestrionIdList()
 {

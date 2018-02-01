@@ -1,10 +1,8 @@
 #include "EventHelper.h"
 #include "EventHandler.h"
 #include <common/Common.h>
-#include <common/Exd/ExdData.h>
 #include <common/Exd/ExdDataGenerated.h>
 
-extern Core::Data::ExdData g_exdData;
 extern Core::Data::ExdDataGenerated g_exdDataGen;
 
 using namespace Core::Common;
@@ -41,7 +39,7 @@ std::string Core::Event::getEventName( uint32_t eventId )
    }
    case Event::EventHandler::EventHandlerType::Opening:
    {
-      auto openingInfo = g_exdData.getOpeningInfo( eventId );
+      auto openingInfo = g_exdDataGen.getOpening( eventId );
       if( openingInfo )
          return openingInfo->name;
       return unknown + "Opening";
@@ -67,9 +65,9 @@ std::string Core::Event::getEventName( uint32_t eventId )
 
 uint32_t Core::Event::mapEventActorToRealActor( uint32_t eventActorId )
 {
-   auto levelInfo = g_exdData.getLevelInfo( eventActorId );
+   auto levelInfo = g_exdDataGen.getLevel( eventActorId );
    if( levelInfo )
-      return levelInfo->actor_id;
+      return levelInfo->objectKey;
 
    return 0;
 }

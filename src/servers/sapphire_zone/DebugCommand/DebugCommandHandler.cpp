@@ -7,7 +7,7 @@
 #include <common/Util/UtilMath.h>
 #include <common/Network/PacketContainer.h>
 #include <common/Logging/Logger.h>
-#include <common/Exd/ExdData.h>
+#include <common/Exd/ExdDataGenerated.h>
 #include <common/Database/DatabaseDef.h>
 
 #include "DebugCommand.h"
@@ -40,7 +40,7 @@
 #include "Zone/TerritoryMgr.h"
 
 extern Core::Scripting::ScriptManager g_scriptMgr;
-extern Core::Data::ExdData g_exdData;
+extern Core::Data::ExdDataGenerated g_exdDataGen;
 extern Core::Logger g_log;
 extern Core::ServerZone g_serverZone;
 extern Core::TerritoryMgr g_territoryMgr;
@@ -480,7 +480,7 @@ void Core::DebugCommandHandler::get( char * data, Entity::Player& player, boost:
    if( ( subCommand == "pos" ) )
    {
 
-      int16_t map_id = g_exdData.m_zoneInfoMap[player.getCurrentZone()->getTerritoryId()].map_id;
+      int16_t map_id = g_exdDataGen.getTerritoryType( player.getCurrentZone()->getTerritoryId() )->map;
 
       player.sendNotice( "Pos:\n" +
                          std::to_string( player.getPos().x ) + "\n" +

@@ -5,7 +5,7 @@
 #include <cmath>
 
 #include <common/Logging/Logger.h>
-#include <common/Exd/ExdData.h>
+#include <common/Exd/ExdDataGenerated.h>
 #include <common/Util/Util.h>
 #include <common/Util/UtilMath.h>
 
@@ -21,7 +21,7 @@ using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
 extern Core::Logger g_log;
-extern Core::Data::ExdData g_exdData;
+extern Core::Data::ExdDataGenerated g_exdDataGen;
 
 uint32_t Core::Entity::BattleNpc::m_nextID = 1149241694;
 
@@ -422,7 +422,7 @@ void Core::Entity::BattleNpc::onDeath()
             auto levelDiff = static_cast< int32_t >( this->m_level ) - level;
             auto cappedLevelDiff = Math::Util::clamp( levelDiff, 1, 6 );
 
-            auto expNeeded = g_exdData.m_paramGrowthInfoMap[m_level + cappedLevelDiff - 1].needed_exp;
+            auto expNeeded = g_exdDataGen.getParamGrow( m_level + cappedLevelDiff - 1 )->expToNext;
             int32_t exp = 0;
 
             // todo: arbitrary numbers pulled out of my ass

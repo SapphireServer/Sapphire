@@ -1,5 +1,5 @@
 #include <common/Common.h>
-#include <common/Exd/ExdData.h>
+#include <common/Exd/ExdDataGenerated.h>
 #include <common/Network/CommonNetwork.h>
 #include <common/Network/GamePacketNew.h>
 #include <common/Network/PacketContainer.h>
@@ -21,7 +21,7 @@
 #include "Forwards.h"
 #include "Event/EventHelper.h"
 
-extern Core::Data::ExdData g_exdData;
+extern Core::Data::ExdDataGenerated g_exdDataGen;
 extern Core::Scripting::ScriptManager g_scriptMgr;
 
 using namespace Core::Common;
@@ -52,9 +52,9 @@ void Core::Network::GameConnection::eventHandlerTalk( const Packets::GamePacket&
    if( !g_scriptMgr.onTalk( player, actorId, eventId ) &&
        eventType == Event::EventHandler::EventHandlerType::Quest )
    {
-      auto questInfo = g_exdData.getQuestInfo( eventId );
+      auto questInfo = g_exdDataGen.getQuest( eventId );
       if ( questInfo )
-         player.sendUrgent( "Quest not implemented: " + questInfo->name + " (" + questInfo->name_intern + ")" );
+         player.sendUrgent( "Quest not implemented: " + questInfo->name + " (" + questInfo->id + ")" );
    }
 
    player.checkEvent( eventId );
@@ -87,7 +87,7 @@ void Core::Network::GameConnection::eventHandlerEmote( const Packets::GamePacket
    if( !g_scriptMgr.onEmote( player, actorId, eventId, static_cast< uint8_t >( emoteId ) )  &&
        eventType == Event::EventHandler::EventHandlerType::Quest )
    {
-      auto questInfo = g_exdData.getQuestInfo( eventId );
+      auto questInfo = g_exdDataGen.getQuest( eventId );
       if( questInfo )
          player.sendUrgent( "Quest not implemented: " + questInfo->name );
    }
