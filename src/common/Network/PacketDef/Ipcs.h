@@ -76,7 +76,7 @@ namespace Packets {
       PlayerSpawn                = 0x015C, // updated 4.2
       NpcSpawn                   = 0x015D, // updated 4.2
       ActorMove                  = 0x015E, // updated 4.2
-      ActorSetPos                = 0x015F, // updated 4.2
+      ActorSetPos                = 0x0160, // updated 4.2
       ActorCast                  = 0x0162, // updated 4.2
       HateList                   = 0x0165, // updated 4.2
       UpdateClassInfo            = 0x0169, // updated 4.2
