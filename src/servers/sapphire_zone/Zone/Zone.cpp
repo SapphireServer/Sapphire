@@ -235,12 +235,12 @@ uint8_t Zone::getNextWeather()
    uint8_t sumPc = 0;
    for( size_t i = 0; i < 16; )
    {
-      int32_t weatherId = boost::get<int32_t>( weatherRateFields[i] );
+      int32_t weatherId = boost::get< int32_t >( weatherRateFields[i] );
 
       if( weatherId == 0 )
          break;
 
-      sumPc += boost::get<uint8_t>( weatherRateFields[i + 1] );
+      sumPc += boost::get< uint8_t >( weatherRateFields[i + 1] );
       weatherRateMap[sumPc] = weatherId;
 
       i += 2;
