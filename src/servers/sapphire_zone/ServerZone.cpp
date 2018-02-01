@@ -269,7 +269,7 @@ void Core::ServerZone::mainLoop()
       this_thread::sleep_for( chrono::milliseconds( 50 ) );
 
 
-      auto currTime = static_cast< uint32_t >( Util::getTimeSeconds() );
+      auto currTime = Util::getTimeSeconds();
 
       g_territoryMgr.updateTerritoryInstances( currTime );
 
@@ -320,7 +320,8 @@ void Core::ServerZone::mainLoop()
          // remove sessions that simply timed out
          if( diff > 20 )
          {
-            g_log.info("[" + std::to_string(it->second->getId() ) + "] Session time out" );
+            g_log.info("[" + std::to_string( it->second->getId() ) + "] Session time out" );
+
             it->second->close();
             // if( it->second.unique() )
             {
