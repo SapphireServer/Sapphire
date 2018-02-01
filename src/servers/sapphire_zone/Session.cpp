@@ -86,7 +86,7 @@ uint32_t Core::Session::getId() const
    return m_sessionId;
 }
 
-uint32_t Core::Session::getLastDataTime() const
+int64_t Core::Session::getLastDataTime() const
 {
    return m_lastDataTime;
 }
@@ -103,7 +103,7 @@ bool Core::Session::isValid() const
 
 void Core::Session::updateLastDataTime()
 {
-   m_lastDataTime = static_cast< uint32_t >( Util::getTimeSeconds() );
+   m_lastDataTime = Util::getTimeSeconds();
 }
 
 void Core::Session::updateLastSqlTime()
