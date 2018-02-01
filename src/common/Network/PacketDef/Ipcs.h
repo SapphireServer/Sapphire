@@ -46,7 +46,7 @@ namespace Packets {
    {
       Ping                       = 0x0065,
       Init                       = 0x0066,
-      Chat                       = 0x00B9,
+      Chat                       = 0x00E1, // updated 4.2
       ChatBanned                 = 0x006B,
       Logout                     = 0x0077,
       CFNotify                   = 0x0078,
@@ -56,7 +56,7 @@ namespace Packets {
 
 
       SocialRequestError         = 0x00AD,
-      Playtime                   = 0x00B7, // updated 4.1
+      Playtime                   = 0x00DF, // updated 4.2
       CFRegistered               = 0x00B8, // updated 4.1
       SocialRequestResponse      = 0x00BB, // updated 4.1
       SocialList                 = 0x00E7, // updated 4.2
@@ -101,7 +101,7 @@ namespace Packets {
       InventoryTransaction       = 0x017D, // updated 4.2
       CurrencyCrystalInfo        = 0x017E, // updated 4.2
       InventoryActionAck         = 0x1139,
-      UpdateInventorySlot        = 0x0153, // updated 4.1
+      UpdateInventorySlot        = 0x0180, // updated 4.2
 
       EventPlay                  = 0x018E, // updated 4.2
       EventStart                 = 0x0198, // updated 4.2
@@ -128,7 +128,7 @@ namespace Packets {
 
       EorzeaTimeOffset           = 0x01C0, // updated 4.1
 
-      EquipDisplayFlags          = 0x01CC, // updated 4.1
+      EquipDisplayFlags          = 0x01FA, // updated 4.2
 
       CFAvailableContents        = 0x01CF,
 
@@ -173,7 +173,7 @@ namespace Packets {
 
       LinkshellListHandler     = 0x00E8, // updated 4.2
 
-      FcInfoReqHandler         = 0x0109, // updated 4.1
+      FcInfoReqHandler         = 0x011A, // updated 4.2
 
       ZoneLineHandler          = 0x0130, // updated 4.2
       ActionHandler            = 0x0131, // updated 4.2
