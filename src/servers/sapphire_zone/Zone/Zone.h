@@ -14,6 +14,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <common/Exd/ExdDataGenerated.h>
 namespace Core {
 
 class Session;
@@ -49,6 +50,10 @@ protected:
    uint8_t m_weatherOverride;
 
    uint64_t m_lastMobUpdate;
+
+   boost::shared_ptr< Data::TerritoryType > m_territoryTypeInfo;
+
+   std::map< uint8_t, int32_t> m_weatherRateMap;
 
 public:
    Zone();

@@ -1043,7 +1043,7 @@ bool Core::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t optional
       for( uint32_t i = 0; i < questInfo->itemReward0.size(); i++ )
       {
          // TODO: add the correct amount of items instead of 1
-         addItem( -1, questInfo->itemReward0.at( i ), questInfo->itemReward1.at( i ) );
+         addItem( -1, questInfo->itemReward0.at( i ), questInfo->itemCountReward0.at( i ) );
       }
    }
 

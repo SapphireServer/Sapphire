@@ -282,7 +282,7 @@ void Core::ServerZone::mainLoop()
       auto it = this->m_sessionMapById.begin();
       for( ; it != this->m_sessionMapById.end(); )
       {
-         uint32_t diff = currTime - it->second->getLastDataTime();
+         int64_t diff = currTime - it->second->getLastDataTime();
 
          auto pPlayer = it->second->getPlayer();
 
