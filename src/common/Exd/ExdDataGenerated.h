@@ -2424,10 +2424,11 @@ struct Map
    std::string id;
    uint16_t sizeFactor;
    int16_t offsetX;
-   int16_t discoveryIndex;
+   int16_t offsetY;
    uint16_t placeNameRegion;
    uint16_t placeName;
    uint16_t placeNameSub;
+   int16_t discoveryIndex;
    uint16_t territoryType;
    bool discoveryArrayByte;
 
@@ -3215,6 +3216,7 @@ struct TripleTriad
    uint32_t defaultTalkNPCWin;
    uint32_t defaultTalkDraw;
    uint32_t defaultTalkPCWin;
+   std::vector< uint32_t > itemPossibleReward;
 
    TripleTriad( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
