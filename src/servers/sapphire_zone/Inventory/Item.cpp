@@ -1,8 +1,8 @@
 #include <common/Common.h>
-#include <common/Exd/ExdData.h>
+#include <common/Exd/ExdDataGenerated.h>
 #include "Item.h"
 
-extern Core::Data::ExdData g_exdData;
+extern Core::Data::ExdDataGenerated g_exdDataGen;
 
 Core::Item::Item()
 {
@@ -24,13 +24,13 @@ Core::Item::Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t mo
    m_model2( model2 ),
    m_isHq( isHq )
 {
-   auto itemInfo = g_exdData.getItemInfo( catalogId );
-   m_delayMs = itemInfo->delayMs;
-   m_physicalDmg = itemInfo->physical_damage;
-   m_magicalDmg = itemInfo->magical_damage;
+   auto itemInfo = g_exdDataGen.getItem( catalogId );
+   m_delayMs = itemInfo->delayms;
+   m_physicalDmg = itemInfo->damagePhys;
+   m_magicalDmg = itemInfo->damageMag;
    m_weaponDmg = ( m_physicalDmg != 0 ) ? m_physicalDmg : m_magicalDmg;
    m_autoAttackDmg = static_cast< float >( m_weaponDmg * m_delayMs ) / 3000;
-   m_itemLevel = itemInfo->item_level;
+   m_itemLevel = itemInfo->levelItem;
 }
 
 Core::Item::~Item()

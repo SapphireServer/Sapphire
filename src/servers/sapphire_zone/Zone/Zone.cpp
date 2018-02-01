@@ -6,7 +6,7 @@
 #include <common/Util/UtilMath.h>
 #include <common/Network/GamePacket.h>
 #include <common/Network/GamePacketNew.h>
-#include <common/Exd/ExdData.h>
+#include <common/Exd/ExdDataGenerated.h>
 #include <common/Network/CommonNetwork.h>
 #include <common/Network/PacketDef/Zone/ServerZoneDef.h>
 #include <common/Network/PacketContainer.h>
@@ -33,7 +33,7 @@
 
 extern Core::Logger g_log;
 extern Core::ServerZone g_serverZone;
-extern Core::Data::ExdData g_exdData;
+extern Core::Data::ExdDataGenerated g_exdDataGen;
 extern Core::Scripting::ScriptManager g_scriptMgr;
 
 namespace Core {
@@ -207,7 +207,7 @@ void Zone::loadCellCache()
 
 uint8_t Zone::getNextWeather()
 {
-   auto zoneInfo = g_exdData.m_zoneInfoMap[getTerritoryId()];
+   auto zoneInfo = g_exdDataGen.getTerritoryType( getTerritoryId() );
 
    uint32_t unixTime = static_cast< uint32_t >( Util::getTimeSeconds() );
    // Get Eorzea hour for weather start
@@ -225,7 +225,28 @@ uint8_t Zone::getNextWeather()
 
    auto rate = static_cast< uint8_t >( step2 % 0x64 );
 
-   for( auto entry : zoneInfo.weather_rate_map )
+   uint8_t weatherRateNum = zoneInfo->weatherRate > g_exdDataGen.getWeatherRateIdList().size() ? 0 : zoneInfo->weatherRate;
+
+   auto weatherRate = g_exdDataGen.getWeatherRate( weatherRateNum );
+   auto weatherRateFields = g_exdDataGen.m_WeatherRateDat.get_row( weatherRateNum );
+
+   std::map< uint8_t, int32_t> weatherRateMap;
+
+   uint8_t sumPc = 0;
+   for( size_t i = 0; i < 16; )
+   {
+      int32_t weatherId = boost::get< int32_t >( weatherRateFields[i] );
+
+      if( weatherId == 0 )
+         break;
+
+      sumPc += boost::get< uint8_t >( weatherRateFields[i + 1] );
+      weatherRateMap[sumPc] = weatherId;
+
+      i += 2;
+   }
+
+   for( auto entry : weatherRateMap )
    {
       uint8_t sRate = entry.first;
       auto weatherId = static_cast< uint8_t >( entry.second );

@@ -1,4 +1,4 @@
-#include <common/Exd/ExdData.h>
+#include <common/Exd/ExdDataGenerated.h>
 #include <common/Util/Util.h>
 #include <common/Network/PacketDef/Zone/ServerZoneDef.h>
 #include <common/Logging/Logger.h>
@@ -13,7 +13,7 @@
 #include "Script/ScriptManager.h"
 
 extern Core::Logger g_log;
-extern Core::Data::ExdData g_exdData;
+extern Core::Data::ExdDataGenerated g_exdDataGen;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -31,8 +31,8 @@ Core::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::ActorPtr so
    , m_tickRate( tickRate )
    , m_lastTick( 0 )
 {
-   auto& entry = g_exdData.m_statusEffectInfoMap[id];
-   m_name = entry.name;
+   auto entry = g_exdDataGen.getStatus( id );
+   m_name = entry->name;
       
    std::replace( m_name.begin(), m_name.end(), ' ', '_' );
    std::replace( m_name.begin(), m_name.end(), ':', '_' );
