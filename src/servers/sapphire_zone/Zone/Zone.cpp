@@ -311,7 +311,7 @@ void Zone::pushActor( Entity::ActorPtr pActor )
       pBNpc->setPosition( pBNpc->getPos() );
 
    }
-   else if( pActor->getAsEventNpc() )
+   else if( pActor->isEventNpc() )
    {
       Entity::EventNpcPtr pENpc = pActor->getAsEventNpc();
       m_EventNpcMap[pENpc->getId()] = pENpc;
