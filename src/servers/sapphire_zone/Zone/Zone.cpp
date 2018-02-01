@@ -62,8 +62,27 @@ Zone::Zone( uint16_t territoryId, uint32_t guId, const std::string& internalName
    m_placeName = placeName;
    m_lastMobUpdate = 0;
 
-   m_currentWeather = getNextWeather();
    m_weatherOverride = 0;
+   m_territoryTypeInfo = g_exdDataGen.getTerritoryType( territoryId );
+
+   uint8_t weatherRateId = m_territoryTypeInfo->weatherRate > g_exdDataGen.getWeatherRateIdList().size() ?
+                           uint8_t{ 0 } : m_territoryTypeInfo->weatherRate;
+
+   uint8_t sumPc = 0;
+   auto weatherRateFields = g_exdDataGen.m_WeatherRateDat.get_row( weatherRateId );
+   for( size_t i = 0; i < 16; )
+   {
+      int32_t weatherId = boost::get< int32_t >( weatherRateFields[i] );
+
+      if( weatherId == 0 )
+         break;
+
+      sumPc += boost::get< uint8_t >( weatherRateFields[i + 1] );
+      m_weatherRateMap[sumPc] = weatherId;
+      i += 2;
+   }
+
+   m_currentWeather = getNextWeather();
 }
 
 Zone::~Zone()
@@ -207,8 +226,6 @@ void Zone::loadCellCache()
 
 uint8_t Zone::getNextWeather()
 {
-   auto zoneInfo = g_exdDataGen.getTerritoryType( getTerritoryId() );
-
    uint32_t unixTime = static_cast< uint32_t >( Util::getTimeSeconds() );
    // Get Eorzea hour for weather start
    uint32_t bell = unixTime / 175;
@@ -225,28 +242,7 @@ uint8_t Zone::getNextWeather()
 
    auto rate = static_cast< uint8_t >( step2 % 0x64 );
 
-   uint8_t weatherRateNum = zoneInfo->weatherRate > g_exdDataGen.getWeatherRateIdList().size() ? 0 : zoneInfo->weatherRate;
-
-   auto weatherRate = g_exdDataGen.getWeatherRate( weatherRateNum );
-   auto weatherRateFields = g_exdDataGen.m_WeatherRateDat.get_row( weatherRateNum );
-
-   std::map< uint8_t, int32_t> weatherRateMap;
-
-   uint8_t sumPc = 0;
-   for( size_t i = 0; i < 16; )
-   {
-      int32_t weatherId = boost::get< int32_t >( weatherRateFields[i] );
-
-      if( weatherId == 0 )
-         break;
-
-      sumPc += boost::get< uint8_t >( weatherRateFields[i + 1] );
-      weatherRateMap[sumPc] = weatherId;
-
-      i += 2;
-   }
-
-   for( auto entry : weatherRateMap )
+   for( auto entry : m_weatherRateMap )
    {
       uint8_t sRate = entry.first;
       auto weatherId = static_cast< uint8_t >( entry.second );

@@ -126,6 +126,7 @@ bool Core::TerritoryMgr::createDefaultTerritories()
       instanceMap[guid] = pZone;
       m_instanceIdToZonePtrMap[guid] = pZone;
       m_territoryInstanceMap[territoryId] = instanceMap;
+      m_zoneSet.insert( { pZone } );
 
    }
 
@@ -180,6 +181,7 @@ Core::ZonePtr Core::TerritoryMgr::createInstanceContent( uint32_t instanceConten
 
    m_instanceContentToInstanceMap[instanceContentId][pZone->getGuId()] = pZone;
    m_instanceIdToZonePtrMap[pZone->getGuId()] = pZone;
+   m_instanceZoneSet.insert( { pZone } );
 
    return pZone;
 }
@@ -191,6 +193,9 @@ bool Core::TerritoryMgr::removeTerritoryInstance( uint32_t instanceId )
       return false;
 
    m_instanceIdToZonePtrMap.erase( pZone->getGuId() );
+
+   if( m_instanceZoneSet.count( pZone ) )
+      m_instanceZoneSet.erase( pZone );
 
    if( isInstanceContentTerritory( pZone->getTerritoryId() ) )
    {
@@ -268,16 +273,14 @@ Core::ZonePtr Core::TerritoryMgr::getZoneByTerriId( uint32_t territoryId ) const
 
 void Core::TerritoryMgr::updateTerritoryInstances( uint32_t currentTime )
 {
-   for( auto zoneMap : m_territoryInstanceMap )
+   for( auto& zone : m_zoneSet )
    {
-      for( auto zone : zoneMap.second )
-         zone.second->runZoneLogic( currentTime );
+      zone->runZoneLogic( currentTime );
    }
 
-   for( auto zoneMap : m_instanceContentToInstanceMap )
+   for( auto& zone : m_instanceZoneSet )
    {
-      for( auto zone: zoneMap.second )
-         zone.second->runZoneLogic( currentTime );
+      zone->runZoneLogic( currentTime );
    }
 }
 

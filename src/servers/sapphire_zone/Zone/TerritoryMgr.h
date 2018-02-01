@@ -3,6 +3,7 @@
 
 #include <common/Exd/ExdData.h>
 #include "Forwards.h"
+#include <set>
 
 namespace Core
 {
@@ -138,6 +139,12 @@ namespace Core
 
       /*! internal counter for instanceIds */
       uint32_t m_lastInstanceId;
+
+      /*! set of ZonePtrs for quick iteration*/
+      std::set< ZonePtr > m_zoneSet;
+
+      /*! set of ZonePtrs for quick iteration*/
+      std::set< ZonePtr > m_instanceZoneSet;
 
    public:
       /*! returns a list of instanceContent InstanceIds currently active */
