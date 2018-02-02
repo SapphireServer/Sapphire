@@ -21,7 +21,7 @@ std::string Core::Event::getEventName( uint32_t eventId )
       if( !questInfo )
          return unknown + "Quest";
 
-      std::string name = questInfo->name;
+      std::string name = questInfo->id;
       std::size_t pos = name.find_first_of( "_" );
 
       return questInfo->name.substr( 0, pos );

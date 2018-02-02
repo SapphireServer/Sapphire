@@ -11,16 +11,12 @@
 
 extern Core::Logger g_log;
 
-Core::Session::Session( uint32_t sessionId )
-   : m_sessionId( sessionId )
-   , m_lastDataTime( static_cast< uint32_t >( Util::getTimeSeconds() ) )
-   , m_lastSqlTime( static_cast< uint32_t >( Util::getTimeSeconds() ) )
-   , m_isValid( false )
+Core::Session::Session( uint32_t sessionId ) :
+   m_sessionId( sessionId ),
+   m_lastDataTime( Util::getTimeSeconds() ),
+   m_lastSqlTime( Util::getTimeSeconds() ),
+   m_isValid( false )
 {
-
-   //   boost::posix_time::ptime now = boost::date_time::not_a_date_time;
-   //   now = boost::posix_time::microsec_clock::universal_time();
-
 }
 
 Core::Session::~Session()
@@ -91,7 +87,7 @@ int64_t Core::Session::getLastDataTime() const
    return m_lastDataTime;
 }
 
-uint32_t Core::Session::getLastSqlTime() const
+int64_t Core::Session::getLastSqlTime() const
 {
    return m_lastSqlTime;
 }
@@ -108,7 +104,7 @@ void Core::Session::updateLastDataTime()
 
 void Core::Session::updateLastSqlTime()
 {
-   m_lastSqlTime = static_cast< uint32_t >( Util::getTimeSeconds() );
+   m_lastSqlTime = Util::getTimeSeconds();
 }
 
 void Core::Session::startReplay( const std::string& path )

@@ -21,7 +21,7 @@ namespace Core {
       Network::GameConnectionPtr getChatConnection() const;
 
       int64_t getLastDataTime() const;
-      uint32_t getLastSqlTime() const;
+      int64_t getLastSqlTime() const;
 
       void updateLastDataTime();
       void updateLastSqlTime();
@@ -50,7 +50,7 @@ namespace Core {
 
       int64_t m_lastDataTime;
 
-      uint32_t m_lastSqlTime;
+      int64_t m_lastSqlTime;
       bool m_isValid;
 
       bool m_isReplaying;
