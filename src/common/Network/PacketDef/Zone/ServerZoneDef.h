@@ -600,7 +600,7 @@ struct FFXIVIpcInitZone : FFXIVIpcBasePacket<InitZone>
    uint8_t weatherId;
    uint8_t bitmask;
    uint16_t unknown5;
-   uint16_t unknown6;
+   uint16_t festivalId;
    uint16_t unknown7;
    uint32_t unknown8;
    Common::FFXIVARR_POSITION3 pos;
