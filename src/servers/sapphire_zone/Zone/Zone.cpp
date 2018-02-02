@@ -6,7 +6,7 @@
 #include <common/Util/UtilMath.h>
 #include <common/Network/GamePacket.h>
 #include <common/Network/GamePacketNew.h>
-#include <common/Exd/ExdData.h>
+#include <common/Exd/ExdDataGenerated.h>
 #include <common/Network/CommonNetwork.h>
 #include <common/Network/PacketDef/Zone/ServerZoneDef.h>
 #include <common/Network/PacketContainer.h>
@@ -33,7 +33,7 @@
 
 extern Core::Logger g_log;
 extern Core::ServerZone g_serverZone;
-extern Core::Data::ExdData g_exdData;
+extern Core::Data::ExdDataGenerated g_exdDataGen;
 extern Core::Scripting::ScriptManager g_scriptMgr;
 
 namespace Core {
@@ -63,8 +63,27 @@ Zone::Zone( uint16_t territoryId, uint32_t guId, const std::string& internalName
    m_placeName = placeName;
    m_lastMobUpdate = 0;
 
-   m_currentWeather = getNextWeather();
    m_weatherOverride = 0;
+   m_territoryTypeInfo = g_exdDataGen.getTerritoryType( territoryId );
+
+   uint8_t weatherRateId = m_territoryTypeInfo->weatherRate > g_exdDataGen.getWeatherRateIdList().size() ?
+                           uint8_t{ 0 } : m_territoryTypeInfo->weatherRate;
+
+   uint8_t sumPc = 0;
+   auto weatherRateFields = g_exdDataGen.m_WeatherRateDat.get_row( weatherRateId );
+   for( size_t i = 0; i < 16; )
+   {
+      int32_t weatherId = boost::get< int32_t >( weatherRateFields[i] );
+
+      if( weatherId == 0 )
+         break;
+
+      sumPc += boost::get< uint8_t >( weatherRateFields[i + 1] );
+      m_weatherRateMap[sumPc] = weatherId;
+      i += 2;
+   }
+
+   m_currentWeather = getNextWeather();
 }
 
 Zone::~Zone()
@@ -218,8 +237,6 @@ void Zone::loadCellCache()
 
 uint8_t Zone::getNextWeather()
 {
-   auto zoneInfo = g_exdData.m_zoneInfoMap[getTerritoryId()];
-
    uint32_t unixTime = static_cast< uint32_t >( Util::getTimeSeconds() );
    // Get Eorzea hour for weather start
    uint32_t bell = unixTime / 175;
@@ -236,7 +253,7 @@ uint8_t Zone::getNextWeather()
 
    auto rate = static_cast< uint8_t >( step2 % 0x64 );
 
-   for( auto entry : zoneInfo.weather_rate_map )
+   for( auto entry : m_weatherRateMap )
    {
       uint8_t sRate = entry.first;
       auto weatherId = static_cast< uint8_t >( entry.second );
@@ -305,7 +322,7 @@ void Zone::pushActor( Entity::ActorPtr pActor )
       pBNpc->setPosition( pBNpc->getPos() );
 
    }
-   else if( pActor->getAsEventNpc() )
+   else if( pActor->isEventNpc() )
    {
       Entity::EventNpcPtr pENpc = pActor->getAsEventNpc();
       m_EventNpcMap[pENpc->getId()] = pENpc;

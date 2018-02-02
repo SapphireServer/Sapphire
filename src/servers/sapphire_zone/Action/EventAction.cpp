@@ -1,6 +1,6 @@
 #include <common/Util/Util.h>
 #include <common/Logging/Logger.h>
-#include <common/Exd/ExdData.h>
+#include <common/Exd/ExdDataGenerated.h>
 
 #include "EventAction.h"
 #include "Network/PacketWrappers/ActorControlPacket142.h"
@@ -9,7 +9,7 @@
 #include "Event/EventHandler.h"
 
 extern Core::Logger g_log;
-extern Core::Data::ExdData g_exdData;
+extern Core::Data::ExdDataGenerated g_exdDataGen;
 
 using namespace Core::Common;
 using namespace Core::Network;
@@ -28,7 +28,7 @@ Core::Action::EventAction::EventAction( Entity::ActorPtr pActor, uint32_t eventI
    m_handleActionType = HandleActionType::Event;
    m_eventId = eventId;
    m_id = action;
-   m_castTime = g_exdData.m_EventActionInfoMap[action].castTime; // TODO: Add security checks.
+   m_castTime = g_exdDataGen.getEventAction( action )->castTime * 100; // TODO: Add security checks.
    m_onActionFinishClb = finishRef;
    m_onActionInterruptClb = interruptRef;
    m_pSource = pActor;

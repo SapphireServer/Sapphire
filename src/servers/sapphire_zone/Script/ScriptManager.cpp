@@ -1,5 +1,5 @@
 #include <common/Logging/Logger.h>
-#include <common/Exd/ExdData.h>
+#include <common/Exd/ExdDataGenerated.h>
 #include <common/Config/XMLConfig.h>
 
 #include "NativeScriptManager.h"
@@ -26,7 +26,7 @@
 #include <libraries/external/watchdog/Watchdog.h>
 
 extern Core::Logger g_log;
-extern Core::Data::ExdData g_exdData;
+extern Core::Data::ExdDataGenerated g_exdDataGen;
 extern Core::ServerZone g_serverZone;
 
 Core::Scripting::ScriptManager::ScriptManager() :
@@ -154,7 +154,7 @@ bool Core::Scripting::ScriptManager::onTalk( Entity::Player& player, uint64_t ac
    // aethernet/aetherytes need to be handled separately
    if( eventType == Event::EventHandler::EventHandlerType::Aetheryte )
    {
-      auto aetherInfo = g_exdData.getAetheryteInfo( eventId & 0xFFFF );
+      auto aetherInfo = g_exdDataGen.getAetheryte( eventId & 0xFFFF );
       scriptId = EVENTSCRIPT_AETHERYTE_ID;
       if( !aetherInfo->isAetheryte )
          scriptId = EVENTSCRIPT_AETHERNET_ID;

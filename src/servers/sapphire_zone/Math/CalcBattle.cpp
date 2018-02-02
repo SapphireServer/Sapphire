@@ -1,6 +1,6 @@
 #include <cmath>
 
-#include <common/Exd/ExdData.h>
+#include <common/Exd/ExdDataGenerated.h>
 #include <common/Common.h>
 #include "Actor/Actor.h"
 #include "Actor/Player.h"
@@ -10,7 +10,7 @@
 using namespace Core::Math;
 using namespace Core::Entity;
 
-extern Core::Data::ExdData g_exdData;
+extern Core::Data::ExdDataGenerated g_exdDataGen;
 
 /*
    Class used for battle-related formulas and calculations.
@@ -30,14 +30,13 @@ extern Core::Data::ExdData g_exdData;
 
 uint32_t CalcBattle::calculateHealValue( PlayerPtr pPlayer, uint32_t potency )
 {
-   auto classInfoIt = g_exdData.m_classJobInfoMap.find( static_cast< uint8_t >( pPlayer->getClass() ) );
-   auto paramGrowthInfoIt = g_exdData.m_paramGrowthInfoMap.find( pPlayer->getLevel() );
+   auto classInfo = g_exdDataGen.getClassJob( static_cast< uint8_t >( pPlayer->getClass() ) );
+   auto paramGrowthInfo = g_exdDataGen.getParamGrow( pPlayer->getLevel() );
 
-   if ( classInfoIt == g_exdData.m_classJobInfoMap.end() ||
-      paramGrowthInfoIt == g_exdData.m_paramGrowthInfoMap.end())
+   if ( !classInfo || !paramGrowthInfo )
       return 0;
 
-   auto jobModVal = classInfoIt->second;
+   //auto jobModVal = classInfoIt->second;
 
    // consider 3% variation
    return potency / 10;

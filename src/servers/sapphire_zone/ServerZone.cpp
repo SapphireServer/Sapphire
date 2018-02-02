@@ -11,7 +11,6 @@
 #include <common/Network/Connection.h>
 #include <common/Network/Hive.h>
 
-#include <common/Exd/ExdData.h>
 #include <common/Exd/ExdDataGenerated.h>
 #include <common/Network/PacketContainer.h>
 #include <common/Database/DbLoader.h>
@@ -39,7 +38,6 @@
 Core::Logger g_log;
 Core::DebugCommandHandler g_gameCommandMgr;
 Core::Scripting::ScriptManager g_scriptMgr;
-Core::Data::ExdData g_exdData;
 Core::Data::ExdDataGenerated g_exdDataGen;
 Core::TerritoryMgr g_territoryMgr;
 Core::LinkshellMgr g_linkshellMgr;
@@ -164,13 +162,6 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
       }
    }
 
-   g_log.info( "Setting up EXD data" );
-   if( !g_exdData.init( m_pConfig->getValue< std::string >( "Settings.General.DataPath", "" ) ) )
-   {
-      g_log.fatal( "Error setting up EXD data " );
-      return false;
-   }
-
    g_log.info( "Setting up generated EXD data" );
    if( !g_exdDataGen.init( m_pConfig->getValue< std::string >( "Settings.General.DataPath", "" ) ) )
    {
@@ -212,15 +203,6 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
       g_log.fatal( "Unable to load settings!" );
       return;
    }
-
-   g_exdData.loadZoneInfo();
-   g_exdData.loadClassJobInfo();
-   g_exdData.loadParamGrowInfo();
-   g_exdData.loadEventActionInfo();
-   g_exdData.loadActionInfo();
-   g_exdData.loadStatusEffectInfo();
-   g_exdData.loadAetheryteInfo();
-   g_exdData.loadTribeInfo();
 
    g_log.info( "LinkshellMgr: Caching linkshells" );
    if( !g_linkshellMgr.loadLinkshells() )
@@ -300,7 +282,7 @@ void Core::ServerZone::mainLoop()
       auto it = this->m_sessionMapById.begin();
       for( ; it != this->m_sessionMapById.end(); )
       {
-         uint32_t diff = currTime - it->second->getLastDataTime();
+         int64_t diff = currTime - it->second->getLastDataTime();
 
          auto pPlayer = it->second->getPlayer();
 
