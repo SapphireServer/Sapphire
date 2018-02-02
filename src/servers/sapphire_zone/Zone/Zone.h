@@ -50,6 +50,8 @@ protected:
 
    uint64_t m_lastMobUpdate;
 
+   uint16_t m_currentFestivalId;
+
 public:
    Zone();
 
@@ -64,6 +66,9 @@ public:
    void setWeatherOverride( uint8_t weather );
 
    uint8_t getCurrentWeather() const;
+
+   uint16_t getCurrentFestival() const;
+   void setCurrentFestival( uint16_t festivalId );
 
    CellCache* getCellCacheList( uint32_t cellx, uint32_t celly );
 

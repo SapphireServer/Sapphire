@@ -762,4 +762,19 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
    {
       player.exitInstance();
    }
+   else if( subCommand == "festival" )
+   {
+      uint32_t festivalId;
+      sscanf( params.c_str(), "%d", &festivalId );
+
+      player.getCurrentZone()->setCurrentFestival( static_cast< uint16_t >( festivalId ) );
+   }
+   else if( subCommand == "disablefestival" )
+   {
+      Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcActorControl143 > actorControl( player.getId() );
+      actorControl.data().category = Core::Common::ActorControlType::DisableCurrentFestival;
+      player.queuePacket( actorControl );
+
+      player.getCurrentZone()->setCurrentFestival( 0 );
+   }
 }

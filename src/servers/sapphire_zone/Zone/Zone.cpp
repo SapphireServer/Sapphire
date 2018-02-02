@@ -48,6 +48,7 @@ Zone::Zone()
    , m_currentWeather( static_cast< uint8_t >( Common::Weather::FairSkies ) )
    , m_weatherOverride( 0 )
    , m_lastMobUpdate( 0 )
+   , m_currentFestivalId( 0 )
 {
 }
 
@@ -97,6 +98,16 @@ void Zone::setWeatherOverride( uint8_t weather )
 uint8_t Zone::getCurrentWeather() const
 {
    return m_currentWeather;
+}
+
+uint16_t Zone::getCurrentFestival() const
+{
+   return m_currentFestivalId;
+}
+
+void Zone::setCurrentFestival( uint16_t festivalId )
+{
+   m_currentFestivalId = festivalId;
 }
 
 CellCache* Zone::getCellCacheList( uint32_t cellx, uint32_t celly )
