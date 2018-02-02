@@ -44,9 +44,23 @@ namespace Packets {
    */
    enum ServerZoneIpcType : uint16_t
    {
+
+      // static opcode ( the ones that rarely if ever change )
       Ping                       = 0x0065,
       Init                       = 0x0066,
-      Chat                       = 0x00E1, // updated 4.2
+
+      ActorSpawn                 = 0x0190, // DEPRECATED
+      ActorFreeSpawn             = 0x0191,
+      InitZone                   = 0x019A,
+
+      AddStatusEffect            = 0x0141,
+      ActorControl142            = 0x0142,
+      ActorControl143            = 0x0143,
+      ActorControl144            = 0x0144,
+      UpdateHpMpTp               = 0x0145,
+
+      ///////////////////////////////////////////////////
+
       ChatBanned                 = 0x006B,
       Logout                     = 0x0077,
       CFNotify                   = 0x0078,
@@ -54,19 +68,23 @@ namespace Packets {
       CFDutyInfo                 = 0x007A,
       CFPlayerInNeed             = 0x007F,
 
-
       SocialRequestError         = 0x00AD,
+
       Playtime                   = 0x00DF, // updated 4.2
       CFRegistered               = 0x00B8, // updated 4.1
       SocialRequestResponse      = 0x00BB, // updated 4.1
+      Chat                       = 0x00E1, // updated 4.2
       SocialList                 = 0x00E7, // updated 4.2
+
       UpdateSearchInfo           = 0x00EA, // updated 4.2
       InitSearchInfo             = 0x00EB, // updated 4.2
+
       ServerNotice               = 0x00F0, // updated 4.2
       SetOnlineStatus            = 0x00F1, // updated 4.2
 
-      LogMessage                 = 0x00D0,
       BlackList                  = 0x00FF, // updated 4.2
+
+      LogMessage                 = 0x00D0,
 
       LinkshellList              = 0x0106, // updated 4.2
       StatusEffectList           = 0x0125, // updated 4.2
@@ -82,46 +100,43 @@ namespace Packets {
       UpdateClassInfo            = 0x0169, // updated 4.2
       InitUI                     = 0x016B, // updated 4.2
 
-      ActorOwner                 = 0x012D, // updated 4.1
+      ActorOwner                 = 0x016D, // updated 4.2 ?
 
       PlayerStats                = 0x016C, // updated 4.2
       PlayerStateFlags           = 0x016E, // updated 4.2
       PlayerClassInfo            = 0x016F, // updated 4.2
       ModelEquip                 = 0x0170, // updated 4.2
 
-      AddStatusEffect            = 0x0141,
-      ActorControl142            = 0x0142, // updated 4.2
-      ActorControl143            = 0x0143, // updated 4.2
-      ActorControl144            = 0x0144, // updated 4.2
-      UpdateHpMpTp               = 0x0145, // updated 4.2
-
       ItemInfo                   = 0x017A, // updated 4.2
       ContainerInfo              = 0x017B, // updated 4.2
       InventoryTransactionFinish = 0x017C, // updated 4.2
       InventoryTransaction       = 0x017D, // updated 4.2
       CurrencyCrystalInfo        = 0x017E, // updated 4.2
-      InventoryActionAck         = 0x0180, // updated 4.2?
+
+      InventoryActionAck         = 0x0180, // updated 4.2 ?
       UpdateInventorySlot        = 0x0181, // updated 4.2
 
       EventPlay                  = 0x018E, // updated 4.2
+
       EventStart                 = 0x0198, // updated 4.2
       EventFinish                = 0x0199, // updated 4.2
 
       EventLinkshell             = 0x1169,
 
       QuestMessage               = 0x01B8, // updated 4.2
-      QuestActiveList            = 0x01AD, // updated 4.2
-      QuestUpdate                = 0x01AE, // updated 4.2
-      QuestCompleteList          = 0x01AF, // updated 4.2
+      QuestTracker               = 0x01BD, // updated 4.2
 
       QuestFinish                = 0x01A0, // updated 4.2
       MSQTrackerComplete         = 0x01A1, // updated 4.2
       MSQTrackerProgress         = 0x01A2, // updated 4.2
-      QuestTracker               = 0x01AD, // updated 4.2
-      ActorSpawn                 = 0x0190, // DEPRECATED
-      ActorFreeSpawn             = 0x0191, // unchanged 4.2
-      InitZone                   = 0x019A, // unchanged 4.2
+
+      QuestActiveList            = 0x01AD, // updated 4.2
+
+      QuestUpdate                = 0x01AE, // updated 4.2
+      QuestCompleteList          = 0x01AF, // updated 4.2
+
       Mount                      = 0x01CD, // updated 4.2
+
       WeatherChange              = 0x01EA, // updated 4.2
       PlayerTitleList            = 0x01EB, // updated 4.2
       Discovery                  = 0x01EC, // updated 4.2
@@ -134,12 +149,14 @@ namespace Packets {
 
       PrepareZoning              = 0x027C, // updated 4.2
       ActorGauge                 = 0x027D, // updated 4.2
+
+      PerformNote                = 0x0286, // updated 4.2
+
       // Unknown IPC types that still need to be sent
       // TODO: figure all these out properly
       IPCTYPE_UNK_320            = 0x0235, // updated 4.2
       IPCTYPE_UNK_322            = 0x0237, // updated 4.2
 
-      PerformNote                = 0x0286, // updated 4.2
    };
 
    // TODO: Include structures for the individual packet segment types
@@ -152,11 +169,13 @@ namespace Packets {
 
       PingHandler              = 0x0065, // unchanged 4.2
       InitHandler              = 0x0066, // unchanged 4.2
-      ChatHandler              = 0x00C7, // updated 4.2
 
       FinishLoadingHandler     = 0x0069, // unchanged 4.2
 
       CFCommenceHandler        = 0x006F,
+
+
+
       CFRegisterDuty           = 0x0071,
       CFRegisterRoulette       = 0x0072,
       PlayTimeHandler          = 0x0073, // unchanged 4.2
@@ -165,9 +184,12 @@ namespace Packets {
       CFDutyInfoHandler        = 0x0078, // updated 4.2
 
       SocialReqSendHandler     = 0x00AE, // updated 4.1
+
+      ChatHandler              = 0x00C7, // updated 4.2
+
       SocialListHandler        = 0x00CF, // updated 4.2
       ReqSearchInfoHandler     = 0x00D4, // updated 4.2
-      SetSearchInfoHandler     = 0x00D5, // updated 4.2
+      SetSearchInfoHandler     = 0x00D2, // updated 4.2
 
       BlackListHandler         = 0x00E0, // updated 4.2
 
@@ -200,9 +222,11 @@ namespace Packets {
       LinkshellEventHandler    = 0x0144, // updated 4.1 ??
       LinkshellEventHandler1   = 0x0145, // updated 4.1 ??
 
+      PerformNoteHandler       = 0x0160,
+
       ReqEquipDisplayFlagsChange  = 0x016C, // updated 4.2
 
-      PerformNoteHandler       = 0x0160,
+
    };
 
    ////////////////////////////////////////////////////////////////////////////////

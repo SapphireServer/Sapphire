@@ -1042,7 +1042,6 @@ bool Core::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t optional
    {
       for( uint32_t i = 0; i < questInfo->itemReward0.size(); i++ )
       {
-         // TODO: add the correct amount of items instead of 1
          addItem( -1, questInfo->itemReward0.at( i ), questInfo->itemCountReward0.at( i ) );
       }
    }
@@ -1050,7 +1049,6 @@ bool Core::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t optional
    if( optionalItemCount > 0 )
    {
       auto itemId = questInfo->itemReward1.at( optionalChoice );
-      // TODO: add the correct amount of items instead of 1
       addItem( -1, itemId, questInfo->itemCountReward1.at( optionalChoice ) );
    }
    
