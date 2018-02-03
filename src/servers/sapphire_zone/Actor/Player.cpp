@@ -300,7 +300,7 @@ void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
 
    setStateFlag( PlayerStateFlag::BetweenAreas );
 
-   auto z_pos = g_territoryMgr.getTerritoryPosition( data->territory );
+   auto z_pos = g_territoryMgr.getTerritoryPosition( data->destination );
 
    Common::FFXIVARR_POSITION3 pos;
    pos.x = 0;
