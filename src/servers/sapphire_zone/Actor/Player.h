@@ -600,13 +600,13 @@ private:
    uint16_t m_activeTitle;
    uint8_t m_titleList[48];
    uint8_t m_howTo[33];
-   uint8_t m_minions[35];
-   uint8_t m_mountGuide[14];
+   uint8_t m_minions[37];
+   uint8_t m_mountGuide[15];
    uint8_t m_homePoint;
    uint8_t m_startTown;
    uint16_t m_townWarpFstFlags;
-   uint8_t m_questCompleteFlags[200];
-   uint8_t m_discovery[420];
+   uint8_t m_questCompleteFlags[396];
+   uint8_t m_discovery[421];
    uint32_t m_playTime;
 
    uint16_t m_classArray[25];

@@ -979,7 +979,7 @@ void Core::Entity::Player::sendQuestInfo()
    queuePacket( pe_qa );
 
    ZoneChannelPacket< FFXIVIpcQuestCompleteList > pe_qc( getId() );
-   memcpy( pe_qc.data().questCompleteMask, m_questCompleteFlags, 200 );
+   memcpy( pe_qc.data().questCompleteMask, m_questCompleteFlags, sizeof( m_questCompleteFlags ) );
    queuePacket( pe_qc );
 
    sendQuestTracker();

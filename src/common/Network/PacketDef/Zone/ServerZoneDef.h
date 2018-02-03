@@ -1086,7 +1086,8 @@ struct FFXIVIpcQuestUpdate : FFXIVIpcBasePacket<QuestUpdate>
 */
 struct FFXIVIpcQuestCompleteList : FFXIVIpcBasePacket<QuestCompleteList>
 {
-   /* 0000 */ uint8_t questCompleteMask[200];
+   uint8_t questCompleteMask[396];
+   uint8_t unknownCompleteMask[32];
 };
 
 /**
