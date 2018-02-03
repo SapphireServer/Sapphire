@@ -151,7 +151,7 @@ namespace Core {
       std::vector< uint8_t > howTo( 32 );
       std::vector< uint8_t > aetherytes( 12 );
       std::vector< uint8_t > discovery( 411 );
-      std::vector< uint8_t > questComplete( 200 );
+      std::vector< uint8_t > questComplete( 396 );
       std::vector< uint8_t > unlocks( 64 );
       std::vector< uint8_t > mountGuide( 13 );
       std::vector< uint8_t > orchestrion( 38 );
