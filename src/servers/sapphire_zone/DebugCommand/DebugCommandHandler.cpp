@@ -702,15 +702,6 @@ void Core::DebugCommandHandler::script( char* data, Entity::Player &player, boos
          player.sendDebug( "Queued script reload for script: " + params );
       }
    }
-   else if( subCommand == "build" || subCommand == "b" )
-   {
-      if( subCommand == params )
-         player.sendDebug( "Command failed: requires name of cmake target" );
-      else
-      {
-
-      }
-   }
    else
    {
       player.sendDebug( "Unknown script subcommand: " + subCommand );
