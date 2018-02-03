@@ -533,6 +533,10 @@
           }
         },
         {
+          "index": 11,
+          "name": "Destination"
+        },
+        {
           "index": 15,
           "name": "IsAetheryte"
         },

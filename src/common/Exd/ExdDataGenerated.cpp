@@ -172,6 +172,7 @@
          placeName = exdData->getField< uint16_t >( row, 8 );
          aethernetName = exdData->getField< uint16_t >( row, 9 );
          territory = exdData->getField< uint16_t >( row, 10 );
+         destination = exdData->getField< uint32_t >( row, 11 );
          isAetheryte = exdData->getField< bool >( row, 15 );
          aethernetGroup = exdData->getField< uint8_t >( row, 16 );
          map = exdData->getField< uint16_t >( row, 19 );
@@ -4195,7 +4196,7 @@ bool Core::Data::ExdDataGenerated::init( const std::string& path )
 
 ///////////////////////////////////////////////////////////////
 // DIRECT GETTERS
-boost::shared_ptr< Core::Data::Achievement >
+Core::Data::ExdDataGenerated::AchievementPtr
    Core::Data::ExdDataGenerated::getAchievement( uint32_t AchievementId )
 {
    try
@@ -4210,7 +4211,7 @@ boost::shared_ptr< Core::Data::Achievement >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::AchievementCategory >
+Core::Data::ExdDataGenerated::AchievementCategoryPtr
    Core::Data::ExdDataGenerated::getAchievementCategory( uint32_t AchievementCategoryId )
 {
    try
@@ -4225,7 +4226,7 @@ boost::shared_ptr< Core::Data::AchievementCategory >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::AchievementKind >
+Core::Data::ExdDataGenerated::AchievementKindPtr
    Core::Data::ExdDataGenerated::getAchievementKind( uint32_t AchievementKindId )
 {
    try
@@ -4240,7 +4241,7 @@ boost::shared_ptr< Core::Data::AchievementKind >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Action >
+Core::Data::ExdDataGenerated::ActionPtr
    Core::Data::ExdDataGenerated::getAction( uint32_t ActionId )
 {
    try
@@ -4255,7 +4256,7 @@ boost::shared_ptr< Core::Data::Action >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ActionCategory >
+Core::Data::ExdDataGenerated::ActionCategoryPtr
    Core::Data::ExdDataGenerated::getActionCategory( uint32_t ActionCategoryId )
 {
    try
@@ -4270,7 +4271,7 @@ boost::shared_ptr< Core::Data::ActionCategory >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ActionComboRoute >
+Core::Data::ExdDataGenerated::ActionComboRoutePtr
    Core::Data::ExdDataGenerated::getActionComboRoute( uint32_t ActionComboRouteId )
 {
    try
@@ -4285,7 +4286,7 @@ boost::shared_ptr< Core::Data::ActionComboRoute >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ActionIndirection >
+Core::Data::ExdDataGenerated::ActionIndirectionPtr
    Core::Data::ExdDataGenerated::getActionIndirection( uint32_t ActionIndirectionId )
 {
    try
@@ -4300,7 +4301,7 @@ boost::shared_ptr< Core::Data::ActionIndirection >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ActionProcStatus >
+Core::Data::ExdDataGenerated::ActionProcStatusPtr
    Core::Data::ExdDataGenerated::getActionProcStatus( uint32_t ActionProcStatusId )
 {
    try
@@ -4315,7 +4316,7 @@ boost::shared_ptr< Core::Data::ActionProcStatus >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ActionTimeline >
+Core::Data::ExdDataGenerated::ActionTimelinePtr
    Core::Data::ExdDataGenerated::getActionTimeline( uint32_t ActionTimelineId )
 {
    try
@@ -4330,7 +4331,7 @@ boost::shared_ptr< Core::Data::ActionTimeline >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ActionTransient >
+Core::Data::ExdDataGenerated::ActionTransientPtr
    Core::Data::ExdDataGenerated::getActionTransient( uint32_t ActionTransientId )
 {
    try
@@ -4345,7 +4346,7 @@ boost::shared_ptr< Core::Data::ActionTransient >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Addon >
+Core::Data::ExdDataGenerated::AddonPtr
    Core::Data::ExdDataGenerated::getAddon( uint32_t AddonId )
 {
    try
@@ -4360,7 +4361,7 @@ boost::shared_ptr< Core::Data::Addon >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Adventure >
+Core::Data::ExdDataGenerated::AdventurePtr
    Core::Data::ExdDataGenerated::getAdventure( uint32_t AdventureId )
 {
    try
@@ -4375,7 +4376,7 @@ boost::shared_ptr< Core::Data::Adventure >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::AdventureExPhase >
+Core::Data::ExdDataGenerated::AdventureExPhasePtr
    Core::Data::ExdDataGenerated::getAdventureExPhase( uint32_t AdventureExPhaseId )
 {
    try
@@ -4390,7 +4391,7 @@ boost::shared_ptr< Core::Data::AdventureExPhase >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::AetherCurrent >
+Core::Data::ExdDataGenerated::AetherCurrentPtr
    Core::Data::ExdDataGenerated::getAetherCurrent( uint32_t AetherCurrentId )
 {
    try
@@ -4405,7 +4406,7 @@ boost::shared_ptr< Core::Data::AetherCurrent >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::AetherialWheel >
+Core::Data::ExdDataGenerated::AetherialWheelPtr
    Core::Data::ExdDataGenerated::getAetherialWheel( uint32_t AetherialWheelId )
 {
    try
@@ -4420,7 +4421,7 @@ boost::shared_ptr< Core::Data::AetherialWheel >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Aetheryte >
+Core::Data::ExdDataGenerated::AetherytePtr
    Core::Data::ExdDataGenerated::getAetheryte( uint32_t AetheryteId )
 {
    try
@@ -4435,7 +4436,7 @@ boost::shared_ptr< Core::Data::Aetheryte >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::AirshipExplorationLevel >
+Core::Data::ExdDataGenerated::AirshipExplorationLevelPtr
    Core::Data::ExdDataGenerated::getAirshipExplorationLevel( uint32_t AirshipExplorationLevelId )
 {
    try
@@ -4450,7 +4451,7 @@ boost::shared_ptr< Core::Data::AirshipExplorationLevel >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::AirshipExplorationLog >
+Core::Data::ExdDataGenerated::AirshipExplorationLogPtr
    Core::Data::ExdDataGenerated::getAirshipExplorationLog( uint32_t AirshipExplorationLogId )
 {
    try
@@ -4465,7 +4466,7 @@ boost::shared_ptr< Core::Data::AirshipExplorationLog >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::AirshipExplorationParamType >
+Core::Data::ExdDataGenerated::AirshipExplorationParamTypePtr
    Core::Data::ExdDataGenerated::getAirshipExplorationParamType( uint32_t AirshipExplorationParamTypeId )
 {
    try
@@ -4480,7 +4481,7 @@ boost::shared_ptr< Core::Data::AirshipExplorationParamType >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::AirshipExplorationPart >
+Core::Data::ExdDataGenerated::AirshipExplorationPartPtr
    Core::Data::ExdDataGenerated::getAirshipExplorationPart( uint32_t AirshipExplorationPartId )
 {
    try
@@ -4495,7 +4496,7 @@ boost::shared_ptr< Core::Data::AirshipExplorationPart >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::AirshipExplorationPoint >
+Core::Data::ExdDataGenerated::AirshipExplorationPointPtr
    Core::Data::ExdDataGenerated::getAirshipExplorationPoint( uint32_t AirshipExplorationPointId )
 {
    try
@@ -4510,7 +4511,7 @@ boost::shared_ptr< Core::Data::AirshipExplorationPoint >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::AnimaWeapon5 >
+Core::Data::ExdDataGenerated::AnimaWeapon5Ptr
    Core::Data::ExdDataGenerated::getAnimaWeapon5( uint32_t AnimaWeapon5Id )
 {
    try
@@ -4525,7 +4526,7 @@ boost::shared_ptr< Core::Data::AnimaWeapon5 >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::AnimaWeapon5Param >
+Core::Data::ExdDataGenerated::AnimaWeapon5ParamPtr
    Core::Data::ExdDataGenerated::getAnimaWeapon5Param( uint32_t AnimaWeapon5ParamId )
 {
    try
@@ -4540,7 +4541,7 @@ boost::shared_ptr< Core::Data::AnimaWeapon5Param >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::AnimaWeapon5PatternGroup >
+Core::Data::ExdDataGenerated::AnimaWeapon5PatternGroupPtr
    Core::Data::ExdDataGenerated::getAnimaWeapon5PatternGroup( uint32_t AnimaWeapon5PatternGroupId )
 {
    try
@@ -4555,7 +4556,7 @@ boost::shared_ptr< Core::Data::AnimaWeapon5PatternGroup >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::AnimaWeapon5SpiritTalk >
+Core::Data::ExdDataGenerated::AnimaWeapon5SpiritTalkPtr
    Core::Data::ExdDataGenerated::getAnimaWeapon5SpiritTalk( uint32_t AnimaWeapon5SpiritTalkId )
 {
    try
@@ -4570,7 +4571,7 @@ boost::shared_ptr< Core::Data::AnimaWeapon5SpiritTalk >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::AnimaWeapon5SpiritTalkParam >
+Core::Data::ExdDataGenerated::AnimaWeapon5SpiritTalkParamPtr
    Core::Data::ExdDataGenerated::getAnimaWeapon5SpiritTalkParam( uint32_t AnimaWeapon5SpiritTalkParamId )
 {
    try
@@ -4585,7 +4586,7 @@ boost::shared_ptr< Core::Data::AnimaWeapon5SpiritTalkParam >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::AnimaWeapon5TradeItem >
+Core::Data::ExdDataGenerated::AnimaWeapon5TradeItemPtr
    Core::Data::ExdDataGenerated::getAnimaWeapon5TradeItem( uint32_t AnimaWeapon5TradeItemId )
 {
    try
@@ -4600,7 +4601,7 @@ boost::shared_ptr< Core::Data::AnimaWeapon5TradeItem >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::AnimaWeaponFUITalk >
+Core::Data::ExdDataGenerated::AnimaWeaponFUITalkPtr
    Core::Data::ExdDataGenerated::getAnimaWeaponFUITalk( uint32_t AnimaWeaponFUITalkId )
 {
    try
@@ -4615,7 +4616,7 @@ boost::shared_ptr< Core::Data::AnimaWeaponFUITalk >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::AnimaWeaponFUITalkParam >
+Core::Data::ExdDataGenerated::AnimaWeaponFUITalkParamPtr
    Core::Data::ExdDataGenerated::getAnimaWeaponFUITalkParam( uint32_t AnimaWeaponFUITalkParamId )
 {
    try
@@ -4630,7 +4631,7 @@ boost::shared_ptr< Core::Data::AnimaWeaponFUITalkParam >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::AnimaWeaponIcon >
+Core::Data::ExdDataGenerated::AnimaWeaponIconPtr
    Core::Data::ExdDataGenerated::getAnimaWeaponIcon( uint32_t AnimaWeaponIconId )
 {
    try
@@ -4645,7 +4646,7 @@ boost::shared_ptr< Core::Data::AnimaWeaponIcon >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::AnimaWeaponItem >
+Core::Data::ExdDataGenerated::AnimaWeaponItemPtr
    Core::Data::ExdDataGenerated::getAnimaWeaponItem( uint32_t AnimaWeaponItemId )
 {
    try
@@ -4660,7 +4661,7 @@ boost::shared_ptr< Core::Data::AnimaWeaponItem >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::AquariumFish >
+Core::Data::ExdDataGenerated::AquariumFishPtr
    Core::Data::ExdDataGenerated::getAquariumFish( uint32_t AquariumFishId )
 {
    try
@@ -4675,7 +4676,7 @@ boost::shared_ptr< Core::Data::AquariumFish >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::AquariumWater >
+Core::Data::ExdDataGenerated::AquariumWaterPtr
    Core::Data::ExdDataGenerated::getAquariumWater( uint32_t AquariumWaterId )
 {
    try
@@ -4690,7 +4691,7 @@ boost::shared_ptr< Core::Data::AquariumWater >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::AttackType >
+Core::Data::ExdDataGenerated::AttackTypePtr
    Core::Data::ExdDataGenerated::getAttackType( uint32_t AttackTypeId )
 {
    try
@@ -4705,7 +4706,7 @@ boost::shared_ptr< Core::Data::AttackType >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Balloon >
+Core::Data::ExdDataGenerated::BalloonPtr
    Core::Data::ExdDataGenerated::getBalloon( uint32_t BalloonId )
 {
    try
@@ -4720,7 +4721,7 @@ boost::shared_ptr< Core::Data::Balloon >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::BaseParam >
+Core::Data::ExdDataGenerated::BaseParamPtr
    Core::Data::ExdDataGenerated::getBaseParam( uint32_t BaseParamId )
 {
    try
@@ -4735,7 +4736,7 @@ boost::shared_ptr< Core::Data::BaseParam >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::BattleLeve >
+Core::Data::ExdDataGenerated::BattleLevePtr
    Core::Data::ExdDataGenerated::getBattleLeve( uint32_t BattleLeveId )
 {
    try
@@ -4750,7 +4751,7 @@ boost::shared_ptr< Core::Data::BattleLeve >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::BeastRankBonus >
+Core::Data::ExdDataGenerated::BeastRankBonusPtr
    Core::Data::ExdDataGenerated::getBeastRankBonus( uint32_t BeastRankBonusId )
 {
    try
@@ -4765,7 +4766,7 @@ boost::shared_ptr< Core::Data::BeastRankBonus >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::BeastReputationRank >
+Core::Data::ExdDataGenerated::BeastReputationRankPtr
    Core::Data::ExdDataGenerated::getBeastReputationRank( uint32_t BeastReputationRankId )
 {
    try
@@ -4780,7 +4781,7 @@ boost::shared_ptr< Core::Data::BeastReputationRank >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::BeastTribe >
+Core::Data::ExdDataGenerated::BeastTribePtr
    Core::Data::ExdDataGenerated::getBeastTribe( uint32_t BeastTribeId )
 {
    try
@@ -4795,7 +4796,7 @@ boost::shared_ptr< Core::Data::BeastTribe >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Behavior >
+Core::Data::ExdDataGenerated::BehaviorPtr
    Core::Data::ExdDataGenerated::getBehavior( uint32_t BehaviorId )
 {
    try
@@ -4810,7 +4811,7 @@ boost::shared_ptr< Core::Data::Behavior >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::BGM >
+Core::Data::ExdDataGenerated::BGMPtr
    Core::Data::ExdDataGenerated::getBGM( uint32_t BGMId )
 {
    try
@@ -4825,7 +4826,7 @@ boost::shared_ptr< Core::Data::BGM >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::BNpcAnnounceIcon >
+Core::Data::ExdDataGenerated::BNpcAnnounceIconPtr
    Core::Data::ExdDataGenerated::getBNpcAnnounceIcon( uint32_t BNpcAnnounceIconId )
 {
    try
@@ -4840,7 +4841,7 @@ boost::shared_ptr< Core::Data::BNpcAnnounceIcon >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::BNpcBase >
+Core::Data::ExdDataGenerated::BNpcBasePtr
    Core::Data::ExdDataGenerated::getBNpcBase( uint32_t BNpcBaseId )
 {
    try
@@ -4855,7 +4856,7 @@ boost::shared_ptr< Core::Data::BNpcBase >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::BNpcCustomize >
+Core::Data::ExdDataGenerated::BNpcCustomizePtr
    Core::Data::ExdDataGenerated::getBNpcCustomize( uint32_t BNpcCustomizeId )
 {
    try
@@ -4870,7 +4871,7 @@ boost::shared_ptr< Core::Data::BNpcCustomize >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::BNpcName >
+Core::Data::ExdDataGenerated::BNpcNamePtr
    Core::Data::ExdDataGenerated::getBNpcName( uint32_t BNpcNameId )
 {
    try
@@ -4885,7 +4886,7 @@ boost::shared_ptr< Core::Data::BNpcName >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::BuddyAction >
+Core::Data::ExdDataGenerated::BuddyActionPtr
    Core::Data::ExdDataGenerated::getBuddyAction( uint32_t BuddyActionId )
 {
    try
@@ -4900,7 +4901,7 @@ boost::shared_ptr< Core::Data::BuddyAction >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::BuddyEquip >
+Core::Data::ExdDataGenerated::BuddyEquipPtr
    Core::Data::ExdDataGenerated::getBuddyEquip( uint32_t BuddyEquipId )
 {
    try
@@ -4915,7 +4916,7 @@ boost::shared_ptr< Core::Data::BuddyEquip >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::BuddyItem >
+Core::Data::ExdDataGenerated::BuddyItemPtr
    Core::Data::ExdDataGenerated::getBuddyItem( uint32_t BuddyItemId )
 {
    try
@@ -4930,7 +4931,7 @@ boost::shared_ptr< Core::Data::BuddyItem >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::BuddyRank >
+Core::Data::ExdDataGenerated::BuddyRankPtr
    Core::Data::ExdDataGenerated::getBuddyRank( uint32_t BuddyRankId )
 {
    try
@@ -4945,7 +4946,7 @@ boost::shared_ptr< Core::Data::BuddyRank >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::BuddySkill >
+Core::Data::ExdDataGenerated::BuddySkillPtr
    Core::Data::ExdDataGenerated::getBuddySkill( uint32_t BuddySkillId )
 {
    try
@@ -4960,7 +4961,7 @@ boost::shared_ptr< Core::Data::BuddySkill >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Cabinet >
+Core::Data::ExdDataGenerated::CabinetPtr
    Core::Data::ExdDataGenerated::getCabinet( uint32_t CabinetId )
 {
    try
@@ -4975,7 +4976,7 @@ boost::shared_ptr< Core::Data::Cabinet >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::CabinetCategory >
+Core::Data::ExdDataGenerated::CabinetCategoryPtr
    Core::Data::ExdDataGenerated::getCabinetCategory( uint32_t CabinetCategoryId )
 {
    try
@@ -4990,7 +4991,7 @@ boost::shared_ptr< Core::Data::CabinetCategory >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Calendar >
+Core::Data::ExdDataGenerated::CalendarPtr
    Core::Data::ExdDataGenerated::getCalendar( uint32_t CalendarId )
 {
    try
@@ -5005,7 +5006,7 @@ boost::shared_ptr< Core::Data::Calendar >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::CharaMakeCustomize >
+Core::Data::ExdDataGenerated::CharaMakeCustomizePtr
    Core::Data::ExdDataGenerated::getCharaMakeCustomize( uint32_t CharaMakeCustomizeId )
 {
    try
@@ -5020,7 +5021,7 @@ boost::shared_ptr< Core::Data::CharaMakeCustomize >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::CharaMakeType >
+Core::Data::ExdDataGenerated::CharaMakeTypePtr
    Core::Data::ExdDataGenerated::getCharaMakeType( uint32_t CharaMakeTypeId )
 {
    try
@@ -5035,7 +5036,7 @@ boost::shared_ptr< Core::Data::CharaMakeType >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ChocoboRace >
+Core::Data::ExdDataGenerated::ChocoboRacePtr
    Core::Data::ExdDataGenerated::getChocoboRace( uint32_t ChocoboRaceId )
 {
    try
@@ -5050,7 +5051,7 @@ boost::shared_ptr< Core::Data::ChocoboRace >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ChocoboRaceAbility >
+Core::Data::ExdDataGenerated::ChocoboRaceAbilityPtr
    Core::Data::ExdDataGenerated::getChocoboRaceAbility( uint32_t ChocoboRaceAbilityId )
 {
    try
@@ -5065,7 +5066,7 @@ boost::shared_ptr< Core::Data::ChocoboRaceAbility >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ChocoboRaceAbilityType >
+Core::Data::ExdDataGenerated::ChocoboRaceAbilityTypePtr
    Core::Data::ExdDataGenerated::getChocoboRaceAbilityType( uint32_t ChocoboRaceAbilityTypeId )
 {
    try
@@ -5080,7 +5081,7 @@ boost::shared_ptr< Core::Data::ChocoboRaceAbilityType >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ChocoboRaceItem >
+Core::Data::ExdDataGenerated::ChocoboRaceItemPtr
    Core::Data::ExdDataGenerated::getChocoboRaceItem( uint32_t ChocoboRaceItemId )
 {
    try
@@ -5095,7 +5096,7 @@ boost::shared_ptr< Core::Data::ChocoboRaceItem >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ChocoboRaceRank >
+Core::Data::ExdDataGenerated::ChocoboRaceRankPtr
    Core::Data::ExdDataGenerated::getChocoboRaceRank( uint32_t ChocoboRaceRankId )
 {
    try
@@ -5110,7 +5111,7 @@ boost::shared_ptr< Core::Data::ChocoboRaceRank >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ChocoboRaceStatus >
+Core::Data::ExdDataGenerated::ChocoboRaceStatusPtr
    Core::Data::ExdDataGenerated::getChocoboRaceStatus( uint32_t ChocoboRaceStatusId )
 {
    try
@@ -5125,7 +5126,7 @@ boost::shared_ptr< Core::Data::ChocoboRaceStatus >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ChocoboRaceTerritory >
+Core::Data::ExdDataGenerated::ChocoboRaceTerritoryPtr
    Core::Data::ExdDataGenerated::getChocoboRaceTerritory( uint32_t ChocoboRaceTerritoryId )
 {
    try
@@ -5140,7 +5141,7 @@ boost::shared_ptr< Core::Data::ChocoboRaceTerritory >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ChocoboTaxiStand >
+Core::Data::ExdDataGenerated::ChocoboTaxiStandPtr
    Core::Data::ExdDataGenerated::getChocoboTaxiStand( uint32_t ChocoboTaxiStandId )
 {
    try
@@ -5155,7 +5156,7 @@ boost::shared_ptr< Core::Data::ChocoboTaxiStand >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ClassJob >
+Core::Data::ExdDataGenerated::ClassJobPtr
    Core::Data::ExdDataGenerated::getClassJob( uint32_t ClassJobId )
 {
    try
@@ -5170,7 +5171,7 @@ boost::shared_ptr< Core::Data::ClassJob >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ClassJobCategory >
+Core::Data::ExdDataGenerated::ClassJobCategoryPtr
    Core::Data::ExdDataGenerated::getClassJobCategory( uint32_t ClassJobCategoryId )
 {
    try
@@ -5185,7 +5186,7 @@ boost::shared_ptr< Core::Data::ClassJobCategory >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Companion >
+Core::Data::ExdDataGenerated::CompanionPtr
    Core::Data::ExdDataGenerated::getCompanion( uint32_t CompanionId )
 {
    try
@@ -5200,7 +5201,7 @@ boost::shared_ptr< Core::Data::Companion >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::CompanionMove >
+Core::Data::ExdDataGenerated::CompanionMovePtr
    Core::Data::ExdDataGenerated::getCompanionMove( uint32_t CompanionMoveId )
 {
    try
@@ -5215,7 +5216,7 @@ boost::shared_ptr< Core::Data::CompanionMove >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::CompanionTransient >
+Core::Data::ExdDataGenerated::CompanionTransientPtr
    Core::Data::ExdDataGenerated::getCompanionTransient( uint32_t CompanionTransientId )
 {
    try
@@ -5230,7 +5231,7 @@ boost::shared_ptr< Core::Data::CompanionTransient >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::CompanyAction >
+Core::Data::ExdDataGenerated::CompanyActionPtr
    Core::Data::ExdDataGenerated::getCompanyAction( uint32_t CompanyActionId )
 {
    try
@@ -5245,7 +5246,7 @@ boost::shared_ptr< Core::Data::CompanyAction >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::CompanyCraftDraft >
+Core::Data::ExdDataGenerated::CompanyCraftDraftPtr
    Core::Data::ExdDataGenerated::getCompanyCraftDraft( uint32_t CompanyCraftDraftId )
 {
    try
@@ -5260,7 +5261,7 @@ boost::shared_ptr< Core::Data::CompanyCraftDraft >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::CompanyCraftDraftCategory >
+Core::Data::ExdDataGenerated::CompanyCraftDraftCategoryPtr
    Core::Data::ExdDataGenerated::getCompanyCraftDraftCategory( uint32_t CompanyCraftDraftCategoryId )
 {
    try
@@ -5275,7 +5276,7 @@ boost::shared_ptr< Core::Data::CompanyCraftDraftCategory >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::CompanyCraftManufactoryState >
+Core::Data::ExdDataGenerated::CompanyCraftManufactoryStatePtr
    Core::Data::ExdDataGenerated::getCompanyCraftManufactoryState( uint32_t CompanyCraftManufactoryStateId )
 {
    try
@@ -5290,7 +5291,7 @@ boost::shared_ptr< Core::Data::CompanyCraftManufactoryState >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::CompanyCraftPart >
+Core::Data::ExdDataGenerated::CompanyCraftPartPtr
    Core::Data::ExdDataGenerated::getCompanyCraftPart( uint32_t CompanyCraftPartId )
 {
    try
@@ -5305,7 +5306,7 @@ boost::shared_ptr< Core::Data::CompanyCraftPart >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::CompanyCraftProcess >
+Core::Data::ExdDataGenerated::CompanyCraftProcessPtr
    Core::Data::ExdDataGenerated::getCompanyCraftProcess( uint32_t CompanyCraftProcessId )
 {
    try
@@ -5320,7 +5321,7 @@ boost::shared_ptr< Core::Data::CompanyCraftProcess >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::CompanyCraftSequence >
+Core::Data::ExdDataGenerated::CompanyCraftSequencePtr
    Core::Data::ExdDataGenerated::getCompanyCraftSequence( uint32_t CompanyCraftSequenceId )
 {
    try
@@ -5335,7 +5336,7 @@ boost::shared_ptr< Core::Data::CompanyCraftSequence >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::CompanyCraftSupplyItem >
+Core::Data::ExdDataGenerated::CompanyCraftSupplyItemPtr
    Core::Data::ExdDataGenerated::getCompanyCraftSupplyItem( uint32_t CompanyCraftSupplyItemId )
 {
    try
@@ -5350,7 +5351,7 @@ boost::shared_ptr< Core::Data::CompanyCraftSupplyItem >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::CompanyCraftType >
+Core::Data::ExdDataGenerated::CompanyCraftTypePtr
    Core::Data::ExdDataGenerated::getCompanyCraftType( uint32_t CompanyCraftTypeId )
 {
    try
@@ -5365,7 +5366,7 @@ boost::shared_ptr< Core::Data::CompanyCraftType >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::CompleteJournal >
+Core::Data::ExdDataGenerated::CompleteJournalPtr
    Core::Data::ExdDataGenerated::getCompleteJournal( uint32_t CompleteJournalId )
 {
    try
@@ -5380,7 +5381,7 @@ boost::shared_ptr< Core::Data::CompleteJournal >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::CompleteJournalCategory >
+Core::Data::ExdDataGenerated::CompleteJournalCategoryPtr
    Core::Data::ExdDataGenerated::getCompleteJournalCategory( uint32_t CompleteJournalCategoryId )
 {
    try
@@ -5395,7 +5396,7 @@ boost::shared_ptr< Core::Data::CompleteJournalCategory >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ContentExAction >
+Core::Data::ExdDataGenerated::ContentExActionPtr
    Core::Data::ExdDataGenerated::getContentExAction( uint32_t ContentExActionId )
 {
    try
@@ -5410,7 +5411,7 @@ boost::shared_ptr< Core::Data::ContentExAction >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ContentFinderCondition >
+Core::Data::ExdDataGenerated::ContentFinderConditionPtr
    Core::Data::ExdDataGenerated::getContentFinderCondition( uint32_t ContentFinderConditionId )
 {
    try
@@ -5425,7 +5426,7 @@ boost::shared_ptr< Core::Data::ContentFinderCondition >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ContentFinderConditionTransient >
+Core::Data::ExdDataGenerated::ContentFinderConditionTransientPtr
    Core::Data::ExdDataGenerated::getContentFinderConditionTransient( uint32_t ContentFinderConditionTransientId )
 {
    try
@@ -5440,7 +5441,7 @@ boost::shared_ptr< Core::Data::ContentFinderConditionTransient >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ContentMemberType >
+Core::Data::ExdDataGenerated::ContentMemberTypePtr
    Core::Data::ExdDataGenerated::getContentMemberType( uint32_t ContentMemberTypeId )
 {
    try
@@ -5455,7 +5456,7 @@ boost::shared_ptr< Core::Data::ContentMemberType >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ContentRoulette >
+Core::Data::ExdDataGenerated::ContentRoulettePtr
    Core::Data::ExdDataGenerated::getContentRoulette( uint32_t ContentRouletteId )
 {
    try
@@ -5470,7 +5471,7 @@ boost::shared_ptr< Core::Data::ContentRoulette >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ContentType >
+Core::Data::ExdDataGenerated::ContentTypePtr
    Core::Data::ExdDataGenerated::getContentType( uint32_t ContentTypeId )
 {
    try
@@ -5485,7 +5486,7 @@ boost::shared_ptr< Core::Data::ContentType >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::CraftAction >
+Core::Data::ExdDataGenerated::CraftActionPtr
    Core::Data::ExdDataGenerated::getCraftAction( uint32_t CraftActionId )
 {
    try
@@ -5500,7 +5501,7 @@ boost::shared_ptr< Core::Data::CraftAction >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::CraftLeve >
+Core::Data::ExdDataGenerated::CraftLevePtr
    Core::Data::ExdDataGenerated::getCraftLeve( uint32_t CraftLeveId )
 {
    try
@@ -5515,7 +5516,7 @@ boost::shared_ptr< Core::Data::CraftLeve >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::CraftType >
+Core::Data::ExdDataGenerated::CraftTypePtr
    Core::Data::ExdDataGenerated::getCraftType( uint32_t CraftTypeId )
 {
    try
@@ -5530,7 +5531,7 @@ boost::shared_ptr< Core::Data::CraftType >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Currency >
+Core::Data::ExdDataGenerated::CurrencyPtr
    Core::Data::ExdDataGenerated::getCurrency( uint32_t CurrencyId )
 {
    try
@@ -5545,7 +5546,7 @@ boost::shared_ptr< Core::Data::Currency >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::CustomTalk >
+Core::Data::ExdDataGenerated::CustomTalkPtr
    Core::Data::ExdDataGenerated::getCustomTalk( uint32_t CustomTalkId )
 {
    try
@@ -5560,7 +5561,7 @@ boost::shared_ptr< Core::Data::CustomTalk >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Cutscene >
+Core::Data::ExdDataGenerated::CutscenePtr
    Core::Data::ExdDataGenerated::getCutscene( uint32_t CutsceneId )
 {
    try
@@ -5575,7 +5576,7 @@ boost::shared_ptr< Core::Data::Cutscene >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::CutScreenImage >
+Core::Data::ExdDataGenerated::CutScreenImagePtr
    Core::Data::ExdDataGenerated::getCutScreenImage( uint32_t CutScreenImageId )
 {
    try
@@ -5590,7 +5591,7 @@ boost::shared_ptr< Core::Data::CutScreenImage >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::DailySupplyItem >
+Core::Data::ExdDataGenerated::DailySupplyItemPtr
    Core::Data::ExdDataGenerated::getDailySupplyItem( uint32_t DailySupplyItemId )
 {
    try
@@ -5605,7 +5606,7 @@ boost::shared_ptr< Core::Data::DailySupplyItem >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::DeepDungeonBan >
+Core::Data::ExdDataGenerated::DeepDungeonBanPtr
    Core::Data::ExdDataGenerated::getDeepDungeonBan( uint32_t DeepDungeonBanId )
 {
    try
@@ -5620,7 +5621,7 @@ boost::shared_ptr< Core::Data::DeepDungeonBan >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::DeepDungeonDanger >
+Core::Data::ExdDataGenerated::DeepDungeonDangerPtr
    Core::Data::ExdDataGenerated::getDeepDungeonDanger( uint32_t DeepDungeonDangerId )
 {
    try
@@ -5635,7 +5636,7 @@ boost::shared_ptr< Core::Data::DeepDungeonDanger >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::DeepDungeonEquipment >
+Core::Data::ExdDataGenerated::DeepDungeonEquipmentPtr
    Core::Data::ExdDataGenerated::getDeepDungeonEquipment( uint32_t DeepDungeonEquipmentId )
 {
    try
@@ -5650,7 +5651,7 @@ boost::shared_ptr< Core::Data::DeepDungeonEquipment >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::DeepDungeonFloorEffectUI >
+Core::Data::ExdDataGenerated::DeepDungeonFloorEffectUIPtr
    Core::Data::ExdDataGenerated::getDeepDungeonFloorEffectUI( uint32_t DeepDungeonFloorEffectUIId )
 {
    try
@@ -5665,7 +5666,7 @@ boost::shared_ptr< Core::Data::DeepDungeonFloorEffectUI >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::DeepDungeonItem >
+Core::Data::ExdDataGenerated::DeepDungeonItemPtr
    Core::Data::ExdDataGenerated::getDeepDungeonItem( uint32_t DeepDungeonItemId )
 {
    try
@@ -5680,7 +5681,7 @@ boost::shared_ptr< Core::Data::DeepDungeonItem >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::DeepDungeonStatus >
+Core::Data::ExdDataGenerated::DeepDungeonStatusPtr
    Core::Data::ExdDataGenerated::getDeepDungeonStatus( uint32_t DeepDungeonStatusId )
 {
    try
@@ -5695,7 +5696,7 @@ boost::shared_ptr< Core::Data::DeepDungeonStatus >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::DefaultTalk >
+Core::Data::ExdDataGenerated::DefaultTalkPtr
    Core::Data::ExdDataGenerated::getDefaultTalk( uint32_t DefaultTalkId )
 {
    try
@@ -5710,7 +5711,7 @@ boost::shared_ptr< Core::Data::DefaultTalk >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::DeliveryQuest >
+Core::Data::ExdDataGenerated::DeliveryQuestPtr
    Core::Data::ExdDataGenerated::getDeliveryQuest( uint32_t DeliveryQuestId )
 {
    try
@@ -5725,7 +5726,7 @@ boost::shared_ptr< Core::Data::DeliveryQuest >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::DisposalShop >
+Core::Data::ExdDataGenerated::DisposalShopPtr
    Core::Data::ExdDataGenerated::getDisposalShop( uint32_t DisposalShopId )
 {
    try
@@ -5740,7 +5741,7 @@ boost::shared_ptr< Core::Data::DisposalShop >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::DisposalShopFilterType >
+Core::Data::ExdDataGenerated::DisposalShopFilterTypePtr
    Core::Data::ExdDataGenerated::getDisposalShopFilterType( uint32_t DisposalShopFilterTypeId )
 {
    try
@@ -5755,7 +5756,7 @@ boost::shared_ptr< Core::Data::DisposalShopFilterType >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::DisposalShopItem >
+Core::Data::ExdDataGenerated::DisposalShopItemPtr
    Core::Data::ExdDataGenerated::getDisposalShopItem( uint32_t DisposalShopItemId )
 {
    try
@@ -5770,7 +5771,7 @@ boost::shared_ptr< Core::Data::DisposalShopItem >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::DpsChallenge >
+Core::Data::ExdDataGenerated::DpsChallengePtr
    Core::Data::ExdDataGenerated::getDpsChallenge( uint32_t DpsChallengeId )
 {
    try
@@ -5785,7 +5786,7 @@ boost::shared_ptr< Core::Data::DpsChallenge >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::DpsChallengeOfficer >
+Core::Data::ExdDataGenerated::DpsChallengeOfficerPtr
    Core::Data::ExdDataGenerated::getDpsChallengeOfficer( uint32_t DpsChallengeOfficerId )
 {
    try
@@ -5800,7 +5801,7 @@ boost::shared_ptr< Core::Data::DpsChallengeOfficer >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::DpsChallengeTransient >
+Core::Data::ExdDataGenerated::DpsChallengeTransientPtr
    Core::Data::ExdDataGenerated::getDpsChallengeTransient( uint32_t DpsChallengeTransientId )
 {
    try
@@ -5815,7 +5816,7 @@ boost::shared_ptr< Core::Data::DpsChallengeTransient >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Emote >
+Core::Data::ExdDataGenerated::EmotePtr
    Core::Data::ExdDataGenerated::getEmote( uint32_t EmoteId )
 {
    try
@@ -5830,7 +5831,7 @@ boost::shared_ptr< Core::Data::Emote >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::EmoteCategory >
+Core::Data::ExdDataGenerated::EmoteCategoryPtr
    Core::Data::ExdDataGenerated::getEmoteCategory( uint32_t EmoteCategoryId )
 {
    try
@@ -5845,7 +5846,7 @@ boost::shared_ptr< Core::Data::EmoteCategory >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ENpcBase >
+Core::Data::ExdDataGenerated::ENpcBasePtr
    Core::Data::ExdDataGenerated::getENpcBase( uint32_t ENpcBaseId )
 {
    try
@@ -5860,7 +5861,7 @@ boost::shared_ptr< Core::Data::ENpcBase >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ENpcResident >
+Core::Data::ExdDataGenerated::ENpcResidentPtr
    Core::Data::ExdDataGenerated::getENpcResident( uint32_t ENpcResidentId )
 {
    try
@@ -5875,7 +5876,7 @@ boost::shared_ptr< Core::Data::ENpcResident >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::EObj >
+Core::Data::ExdDataGenerated::EObjPtr
    Core::Data::ExdDataGenerated::getEObj( uint32_t EObjId )
 {
    try
@@ -5890,7 +5891,7 @@ boost::shared_ptr< Core::Data::EObj >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::EquipRaceCategory >
+Core::Data::ExdDataGenerated::EquipRaceCategoryPtr
    Core::Data::ExdDataGenerated::getEquipRaceCategory( uint32_t EquipRaceCategoryId )
 {
    try
@@ -5905,7 +5906,7 @@ boost::shared_ptr< Core::Data::EquipRaceCategory >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::EquipSlotCategory >
+Core::Data::ExdDataGenerated::EquipSlotCategoryPtr
    Core::Data::ExdDataGenerated::getEquipSlotCategory( uint32_t EquipSlotCategoryId )
 {
    try
@@ -5920,7 +5921,7 @@ boost::shared_ptr< Core::Data::EquipSlotCategory >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::EventAction >
+Core::Data::ExdDataGenerated::EventActionPtr
    Core::Data::ExdDataGenerated::getEventAction( uint32_t EventActionId )
 {
    try
@@ -5935,7 +5936,7 @@ boost::shared_ptr< Core::Data::EventAction >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::EventIconPriority >
+Core::Data::ExdDataGenerated::EventIconPriorityPtr
    Core::Data::ExdDataGenerated::getEventIconPriority( uint32_t EventIconPriorityId )
 {
    try
@@ -5950,7 +5951,7 @@ boost::shared_ptr< Core::Data::EventIconPriority >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::EventIconType >
+Core::Data::ExdDataGenerated::EventIconTypePtr
    Core::Data::ExdDataGenerated::getEventIconType( uint32_t EventIconTypeId )
 {
    try
@@ -5965,7 +5966,7 @@ boost::shared_ptr< Core::Data::EventIconType >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::EventItem >
+Core::Data::ExdDataGenerated::EventItemPtr
    Core::Data::ExdDataGenerated::getEventItem( uint32_t EventItemId )
 {
    try
@@ -5980,7 +5981,7 @@ boost::shared_ptr< Core::Data::EventItem >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::EventItemHelp >
+Core::Data::ExdDataGenerated::EventItemHelpPtr
    Core::Data::ExdDataGenerated::getEventItemHelp( uint32_t EventItemHelpId )
 {
    try
@@ -5995,7 +5996,7 @@ boost::shared_ptr< Core::Data::EventItemHelp >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ExVersion >
+Core::Data::ExdDataGenerated::ExVersionPtr
    Core::Data::ExdDataGenerated::getExVersion( uint32_t ExVersionId )
 {
    try
@@ -6010,7 +6011,7 @@ boost::shared_ptr< Core::Data::ExVersion >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Fate >
+Core::Data::ExdDataGenerated::FatePtr
    Core::Data::ExdDataGenerated::getFate( uint32_t FateId )
 {
    try
@@ -6025,7 +6026,7 @@ boost::shared_ptr< Core::Data::Fate >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::FCActivity >
+Core::Data::ExdDataGenerated::FCActivityPtr
    Core::Data::ExdDataGenerated::getFCActivity( uint32_t FCActivityId )
 {
    try
@@ -6040,7 +6041,7 @@ boost::shared_ptr< Core::Data::FCActivity >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::FCActivityCategory >
+Core::Data::ExdDataGenerated::FCActivityCategoryPtr
    Core::Data::ExdDataGenerated::getFCActivityCategory( uint32_t FCActivityCategoryId )
 {
    try
@@ -6055,7 +6056,7 @@ boost::shared_ptr< Core::Data::FCActivityCategory >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::FCAuthority >
+Core::Data::ExdDataGenerated::FCAuthorityPtr
    Core::Data::ExdDataGenerated::getFCAuthority( uint32_t FCAuthorityId )
 {
    try
@@ -6070,7 +6071,7 @@ boost::shared_ptr< Core::Data::FCAuthority >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::FCAuthorityCategory >
+Core::Data::ExdDataGenerated::FCAuthorityCategoryPtr
    Core::Data::ExdDataGenerated::getFCAuthorityCategory( uint32_t FCAuthorityCategoryId )
 {
    try
@@ -6085,7 +6086,7 @@ boost::shared_ptr< Core::Data::FCAuthorityCategory >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::FCChestName >
+Core::Data::ExdDataGenerated::FCChestNamePtr
    Core::Data::ExdDataGenerated::getFCChestName( uint32_t FCChestNameId )
 {
    try
@@ -6100,7 +6101,7 @@ boost::shared_ptr< Core::Data::FCChestName >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::FccShop >
+Core::Data::ExdDataGenerated::FccShopPtr
    Core::Data::ExdDataGenerated::getFccShop( uint32_t FccShopId )
 {
    try
@@ -6115,7 +6116,7 @@ boost::shared_ptr< Core::Data::FccShop >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::FCHierarchy >
+Core::Data::ExdDataGenerated::FCHierarchyPtr
    Core::Data::ExdDataGenerated::getFCHierarchy( uint32_t FCHierarchyId )
 {
    try
@@ -6130,7 +6131,7 @@ boost::shared_ptr< Core::Data::FCHierarchy >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::FCProfile >
+Core::Data::ExdDataGenerated::FCProfilePtr
    Core::Data::ExdDataGenerated::getFCProfile( uint32_t FCProfileId )
 {
    try
@@ -6145,7 +6146,7 @@ boost::shared_ptr< Core::Data::FCProfile >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::FCReputation >
+Core::Data::ExdDataGenerated::FCReputationPtr
    Core::Data::ExdDataGenerated::getFCReputation( uint32_t FCReputationId )
 {
    try
@@ -6160,7 +6161,7 @@ boost::shared_ptr< Core::Data::FCReputation >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::FCRights >
+Core::Data::ExdDataGenerated::FCRightsPtr
    Core::Data::ExdDataGenerated::getFCRights( uint32_t FCRightsId )
 {
    try
@@ -6175,7 +6176,7 @@ boost::shared_ptr< Core::Data::FCRights >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::FishingSpot >
+Core::Data::ExdDataGenerated::FishingSpotPtr
    Core::Data::ExdDataGenerated::getFishingSpot( uint32_t FishingSpotId )
 {
    try
@@ -6190,7 +6191,7 @@ boost::shared_ptr< Core::Data::FishingSpot >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::FishParameter >
+Core::Data::ExdDataGenerated::FishParameterPtr
    Core::Data::ExdDataGenerated::getFishParameter( uint32_t FishParameterId )
 {
    try
@@ -6205,7 +6206,7 @@ boost::shared_ptr< Core::Data::FishParameter >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GardeningSeed >
+Core::Data::ExdDataGenerated::GardeningSeedPtr
    Core::Data::ExdDataGenerated::getGardeningSeed( uint32_t GardeningSeedId )
 {
    try
@@ -6220,7 +6221,7 @@ boost::shared_ptr< Core::Data::GardeningSeed >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GatheringCondition >
+Core::Data::ExdDataGenerated::GatheringConditionPtr
    Core::Data::ExdDataGenerated::getGatheringCondition( uint32_t GatheringConditionId )
 {
    try
@@ -6235,7 +6236,7 @@ boost::shared_ptr< Core::Data::GatheringCondition >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GatheringExp >
+Core::Data::ExdDataGenerated::GatheringExpPtr
    Core::Data::ExdDataGenerated::getGatheringExp( uint32_t GatheringExpId )
 {
    try
@@ -6250,7 +6251,7 @@ boost::shared_ptr< Core::Data::GatheringExp >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GatheringItem >
+Core::Data::ExdDataGenerated::GatheringItemPtr
    Core::Data::ExdDataGenerated::getGatheringItem( uint32_t GatheringItemId )
 {
    try
@@ -6265,7 +6266,7 @@ boost::shared_ptr< Core::Data::GatheringItem >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GatheringItemLevelConvertTable >
+Core::Data::ExdDataGenerated::GatheringItemLevelConvertTablePtr
    Core::Data::ExdDataGenerated::getGatheringItemLevelConvertTable( uint32_t GatheringItemLevelConvertTableId )
 {
    try
@@ -6280,7 +6281,7 @@ boost::shared_ptr< Core::Data::GatheringItemLevelConvertTable >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GatheringItemPoint >
+Core::Data::ExdDataGenerated::GatheringItemPointPtr
    Core::Data::ExdDataGenerated::getGatheringItemPoint( uint32_t GatheringItemPointId )
 {
    try
@@ -6295,7 +6296,7 @@ boost::shared_ptr< Core::Data::GatheringItemPoint >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GatheringNotebookList >
+Core::Data::ExdDataGenerated::GatheringNotebookListPtr
    Core::Data::ExdDataGenerated::getGatheringNotebookList( uint32_t GatheringNotebookListId )
 {
    try
@@ -6310,7 +6311,7 @@ boost::shared_ptr< Core::Data::GatheringNotebookList >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GatheringPoint >
+Core::Data::ExdDataGenerated::GatheringPointPtr
    Core::Data::ExdDataGenerated::getGatheringPoint( uint32_t GatheringPointId )
 {
    try
@@ -6325,7 +6326,7 @@ boost::shared_ptr< Core::Data::GatheringPoint >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GatheringPointBase >
+Core::Data::ExdDataGenerated::GatheringPointBasePtr
    Core::Data::ExdDataGenerated::getGatheringPointBase( uint32_t GatheringPointBaseId )
 {
    try
@@ -6340,7 +6341,7 @@ boost::shared_ptr< Core::Data::GatheringPointBase >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GatheringPointBonus >
+Core::Data::ExdDataGenerated::GatheringPointBonusPtr
    Core::Data::ExdDataGenerated::getGatheringPointBonus( uint32_t GatheringPointBonusId )
 {
    try
@@ -6355,7 +6356,7 @@ boost::shared_ptr< Core::Data::GatheringPointBonus >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GatheringPointBonusType >
+Core::Data::ExdDataGenerated::GatheringPointBonusTypePtr
    Core::Data::ExdDataGenerated::getGatheringPointBonusType( uint32_t GatheringPointBonusTypeId )
 {
    try
@@ -6370,7 +6371,7 @@ boost::shared_ptr< Core::Data::GatheringPointBonusType >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GatheringPointName >
+Core::Data::ExdDataGenerated::GatheringPointNamePtr
    Core::Data::ExdDataGenerated::getGatheringPointName( uint32_t GatheringPointNameId )
 {
    try
@@ -6385,7 +6386,7 @@ boost::shared_ptr< Core::Data::GatheringPointName >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GatheringSubCategory >
+Core::Data::ExdDataGenerated::GatheringSubCategoryPtr
    Core::Data::ExdDataGenerated::getGatheringSubCategory( uint32_t GatheringSubCategoryId )
 {
    try
@@ -6400,7 +6401,7 @@ boost::shared_ptr< Core::Data::GatheringSubCategory >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GatheringType >
+Core::Data::ExdDataGenerated::GatheringTypePtr
    Core::Data::ExdDataGenerated::getGatheringType( uint32_t GatheringTypeId )
 {
    try
@@ -6415,7 +6416,7 @@ boost::shared_ptr< Core::Data::GatheringType >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GcArmyExpedition >
+Core::Data::ExdDataGenerated::GcArmyExpeditionPtr
    Core::Data::ExdDataGenerated::getGcArmyExpedition( uint32_t GcArmyExpeditionId )
 {
    try
@@ -6430,7 +6431,7 @@ boost::shared_ptr< Core::Data::GcArmyExpedition >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GcArmyExpeditionMemberBonus >
+Core::Data::ExdDataGenerated::GcArmyExpeditionMemberBonusPtr
    Core::Data::ExdDataGenerated::getGcArmyExpeditionMemberBonus( uint32_t GcArmyExpeditionMemberBonusId )
 {
    try
@@ -6445,7 +6446,7 @@ boost::shared_ptr< Core::Data::GcArmyExpeditionMemberBonus >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GcArmyExpeditionType >
+Core::Data::ExdDataGenerated::GcArmyExpeditionTypePtr
    Core::Data::ExdDataGenerated::getGcArmyExpeditionType( uint32_t GcArmyExpeditionTypeId )
 {
    try
@@ -6460,7 +6461,7 @@ boost::shared_ptr< Core::Data::GcArmyExpeditionType >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GcArmyMemberGrow >
+Core::Data::ExdDataGenerated::GcArmyMemberGrowPtr
    Core::Data::ExdDataGenerated::getGcArmyMemberGrow( uint32_t GcArmyMemberGrowId )
 {
    try
@@ -6475,7 +6476,7 @@ boost::shared_ptr< Core::Data::GcArmyMemberGrow >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GcArmyTraining >
+Core::Data::ExdDataGenerated::GcArmyTrainingPtr
    Core::Data::ExdDataGenerated::getGcArmyTraining( uint32_t GcArmyTrainingId )
 {
    try
@@ -6490,7 +6491,7 @@ boost::shared_ptr< Core::Data::GcArmyTraining >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GCRankGridaniaFemaleText >
+Core::Data::ExdDataGenerated::GCRankGridaniaFemaleTextPtr
    Core::Data::ExdDataGenerated::getGCRankGridaniaFemaleText( uint32_t GCRankGridaniaFemaleTextId )
 {
    try
@@ -6505,7 +6506,7 @@ boost::shared_ptr< Core::Data::GCRankGridaniaFemaleText >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GCRankGridaniaMaleText >
+Core::Data::ExdDataGenerated::GCRankGridaniaMaleTextPtr
    Core::Data::ExdDataGenerated::getGCRankGridaniaMaleText( uint32_t GCRankGridaniaMaleTextId )
 {
    try
@@ -6520,7 +6521,7 @@ boost::shared_ptr< Core::Data::GCRankGridaniaMaleText >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GCRankLimsaFemaleText >
+Core::Data::ExdDataGenerated::GCRankLimsaFemaleTextPtr
    Core::Data::ExdDataGenerated::getGCRankLimsaFemaleText( uint32_t GCRankLimsaFemaleTextId )
 {
    try
@@ -6535,7 +6536,7 @@ boost::shared_ptr< Core::Data::GCRankLimsaFemaleText >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GCRankLimsaMaleText >
+Core::Data::ExdDataGenerated::GCRankLimsaMaleTextPtr
    Core::Data::ExdDataGenerated::getGCRankLimsaMaleText( uint32_t GCRankLimsaMaleTextId )
 {
    try
@@ -6550,7 +6551,7 @@ boost::shared_ptr< Core::Data::GCRankLimsaMaleText >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GCRankUldahFemaleText >
+Core::Data::ExdDataGenerated::GCRankUldahFemaleTextPtr
    Core::Data::ExdDataGenerated::getGCRankUldahFemaleText( uint32_t GCRankUldahFemaleTextId )
 {
    try
@@ -6565,7 +6566,7 @@ boost::shared_ptr< Core::Data::GCRankUldahFemaleText >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GCRankUldahMaleText >
+Core::Data::ExdDataGenerated::GCRankUldahMaleTextPtr
    Core::Data::ExdDataGenerated::getGCRankUldahMaleText( uint32_t GCRankUldahMaleTextId )
 {
    try
@@ -6580,7 +6581,7 @@ boost::shared_ptr< Core::Data::GCRankUldahMaleText >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GCScripShopCategory >
+Core::Data::ExdDataGenerated::GCScripShopCategoryPtr
    Core::Data::ExdDataGenerated::getGCScripShopCategory( uint32_t GCScripShopCategoryId )
 {
    try
@@ -6595,7 +6596,7 @@ boost::shared_ptr< Core::Data::GCScripShopCategory >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GCScripShopItem >
+Core::Data::ExdDataGenerated::GCScripShopItemPtr
    Core::Data::ExdDataGenerated::getGCScripShopItem( uint32_t GCScripShopItemId )
 {
    try
@@ -6610,7 +6611,7 @@ boost::shared_ptr< Core::Data::GCScripShopItem >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GCShop >
+Core::Data::ExdDataGenerated::GCShopPtr
    Core::Data::ExdDataGenerated::getGCShop( uint32_t GCShopId )
 {
    try
@@ -6625,7 +6626,7 @@ boost::shared_ptr< Core::Data::GCShop >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GCShopItemCategory >
+Core::Data::ExdDataGenerated::GCShopItemCategoryPtr
    Core::Data::ExdDataGenerated::getGCShopItemCategory( uint32_t GCShopItemCategoryId )
 {
    try
@@ -6640,7 +6641,7 @@ boost::shared_ptr< Core::Data::GCShopItemCategory >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GCSupplyDuty >
+Core::Data::ExdDataGenerated::GCSupplyDutyPtr
    Core::Data::ExdDataGenerated::getGCSupplyDuty( uint32_t GCSupplyDutyId )
 {
    try
@@ -6655,7 +6656,7 @@ boost::shared_ptr< Core::Data::GCSupplyDuty >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GCSupplyDutyReward >
+Core::Data::ExdDataGenerated::GCSupplyDutyRewardPtr
    Core::Data::ExdDataGenerated::getGCSupplyDutyReward( uint32_t GCSupplyDutyRewardId )
 {
    try
@@ -6670,7 +6671,7 @@ boost::shared_ptr< Core::Data::GCSupplyDutyReward >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GeneralAction >
+Core::Data::ExdDataGenerated::GeneralActionPtr
    Core::Data::ExdDataGenerated::getGeneralAction( uint32_t GeneralActionId )
 {
    try
@@ -6685,7 +6686,7 @@ boost::shared_ptr< Core::Data::GeneralAction >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GilShop >
+Core::Data::ExdDataGenerated::GilShopPtr
    Core::Data::ExdDataGenerated::getGilShop( uint32_t GilShopId )
 {
    try
@@ -6700,7 +6701,7 @@ boost::shared_ptr< Core::Data::GilShop >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GilShopItem >
+Core::Data::ExdDataGenerated::GilShopItemPtr
    Core::Data::ExdDataGenerated::getGilShopItem( uint32_t GilShopItemId )
 {
    try
@@ -6715,7 +6716,7 @@ boost::shared_ptr< Core::Data::GilShopItem >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GoldSaucerTextData >
+Core::Data::ExdDataGenerated::GoldSaucerTextDataPtr
    Core::Data::ExdDataGenerated::getGoldSaucerTextData( uint32_t GoldSaucerTextDataId )
 {
    try
@@ -6730,7 +6731,7 @@ boost::shared_ptr< Core::Data::GoldSaucerTextData >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GrandCompany >
+Core::Data::ExdDataGenerated::GrandCompanyPtr
    Core::Data::ExdDataGenerated::getGrandCompany( uint32_t GrandCompanyId )
 {
    try
@@ -6745,7 +6746,7 @@ boost::shared_ptr< Core::Data::GrandCompany >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GrandCompanyRank >
+Core::Data::ExdDataGenerated::GrandCompanyRankPtr
    Core::Data::ExdDataGenerated::getGrandCompanyRank( uint32_t GrandCompanyRankId )
 {
    try
@@ -6760,7 +6761,7 @@ boost::shared_ptr< Core::Data::GrandCompanyRank >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GuardianDeity >
+Core::Data::ExdDataGenerated::GuardianDeityPtr
    Core::Data::ExdDataGenerated::getGuardianDeity( uint32_t GuardianDeityId )
 {
    try
@@ -6775,7 +6776,7 @@ boost::shared_ptr< Core::Data::GuardianDeity >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GuildleveAssignment >
+Core::Data::ExdDataGenerated::GuildleveAssignmentPtr
    Core::Data::ExdDataGenerated::getGuildleveAssignment( uint32_t GuildleveAssignmentId )
 {
    try
@@ -6790,7 +6791,7 @@ boost::shared_ptr< Core::Data::GuildleveAssignment >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GuildOrderGuide >
+Core::Data::ExdDataGenerated::GuildOrderGuidePtr
    Core::Data::ExdDataGenerated::getGuildOrderGuide( uint32_t GuildOrderGuideId )
 {
    try
@@ -6805,7 +6806,7 @@ boost::shared_ptr< Core::Data::GuildOrderGuide >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::GuildOrderOfficer >
+Core::Data::ExdDataGenerated::GuildOrderOfficerPtr
    Core::Data::ExdDataGenerated::getGuildOrderOfficer( uint32_t GuildOrderOfficerId )
 {
    try
@@ -6820,7 +6821,7 @@ boost::shared_ptr< Core::Data::GuildOrderOfficer >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::HouseRetainerPose >
+Core::Data::ExdDataGenerated::HouseRetainerPosePtr
    Core::Data::ExdDataGenerated::getHouseRetainerPose( uint32_t HouseRetainerPoseId )
 {
    try
@@ -6835,7 +6836,7 @@ boost::shared_ptr< Core::Data::HouseRetainerPose >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::HousingFurniture >
+Core::Data::ExdDataGenerated::HousingFurniturePtr
    Core::Data::ExdDataGenerated::getHousingFurniture( uint32_t HousingFurnitureId )
 {
    try
@@ -6850,7 +6851,7 @@ boost::shared_ptr< Core::Data::HousingFurniture >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::HousingYardObject >
+Core::Data::ExdDataGenerated::HousingYardObjectPtr
    Core::Data::ExdDataGenerated::getHousingYardObject( uint32_t HousingYardObjectId )
 {
    try
@@ -6865,7 +6866,7 @@ boost::shared_ptr< Core::Data::HousingYardObject >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::InstanceContent >
+Core::Data::ExdDataGenerated::InstanceContentPtr
    Core::Data::ExdDataGenerated::getInstanceContent( uint32_t InstanceContentId )
 {
    try
@@ -6880,7 +6881,7 @@ boost::shared_ptr< Core::Data::InstanceContent >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::InstanceContentBuff >
+Core::Data::ExdDataGenerated::InstanceContentBuffPtr
    Core::Data::ExdDataGenerated::getInstanceContentBuff( uint32_t InstanceContentBuffId )
 {
    try
@@ -6895,7 +6896,7 @@ boost::shared_ptr< Core::Data::InstanceContentBuff >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::InstanceContentTextData >
+Core::Data::ExdDataGenerated::InstanceContentTextDataPtr
    Core::Data::ExdDataGenerated::getInstanceContentTextData( uint32_t InstanceContentTextDataId )
 {
    try
@@ -6910,7 +6911,7 @@ boost::shared_ptr< Core::Data::InstanceContentTextData >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::InstanceContentType >
+Core::Data::ExdDataGenerated::InstanceContentTypePtr
    Core::Data::ExdDataGenerated::getInstanceContentType( uint32_t InstanceContentTypeId )
 {
    try
@@ -6925,7 +6926,7 @@ boost::shared_ptr< Core::Data::InstanceContentType >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Item >
+Core::Data::ExdDataGenerated::ItemPtr
    Core::Data::ExdDataGenerated::getItem( uint32_t ItemId )
 {
    try
@@ -6940,7 +6941,7 @@ boost::shared_ptr< Core::Data::Item >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ItemAction >
+Core::Data::ExdDataGenerated::ItemActionPtr
    Core::Data::ExdDataGenerated::getItemAction( uint32_t ItemActionId )
 {
    try
@@ -6955,7 +6956,7 @@ boost::shared_ptr< Core::Data::ItemAction >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ItemFood >
+Core::Data::ExdDataGenerated::ItemFoodPtr
    Core::Data::ExdDataGenerated::getItemFood( uint32_t ItemFoodId )
 {
    try
@@ -6970,7 +6971,7 @@ boost::shared_ptr< Core::Data::ItemFood >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ItemSearchCategory >
+Core::Data::ExdDataGenerated::ItemSearchCategoryPtr
    Core::Data::ExdDataGenerated::getItemSearchCategory( uint32_t ItemSearchCategoryId )
 {
    try
@@ -6985,7 +6986,7 @@ boost::shared_ptr< Core::Data::ItemSearchCategory >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ItemSeries >
+Core::Data::ExdDataGenerated::ItemSeriesPtr
    Core::Data::ExdDataGenerated::getItemSeries( uint32_t ItemSeriesId )
 {
    try
@@ -7000,7 +7001,7 @@ boost::shared_ptr< Core::Data::ItemSeries >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ItemSpecialBonus >
+Core::Data::ExdDataGenerated::ItemSpecialBonusPtr
    Core::Data::ExdDataGenerated::getItemSpecialBonus( uint32_t ItemSpecialBonusId )
 {
    try
@@ -7015,7 +7016,7 @@ boost::shared_ptr< Core::Data::ItemSpecialBonus >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ItemUICategory >
+Core::Data::ExdDataGenerated::ItemUICategoryPtr
    Core::Data::ExdDataGenerated::getItemUICategory( uint32_t ItemUICategoryId )
 {
    try
@@ -7030,7 +7031,7 @@ boost::shared_ptr< Core::Data::ItemUICategory >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::JournalCategory >
+Core::Data::ExdDataGenerated::JournalCategoryPtr
    Core::Data::ExdDataGenerated::getJournalCategory( uint32_t JournalCategoryId )
 {
    try
@@ -7045,7 +7046,7 @@ boost::shared_ptr< Core::Data::JournalCategory >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::JournalGenre >
+Core::Data::ExdDataGenerated::JournalGenrePtr
    Core::Data::ExdDataGenerated::getJournalGenre( uint32_t JournalGenreId )
 {
    try
@@ -7060,7 +7061,7 @@ boost::shared_ptr< Core::Data::JournalGenre >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::JournalSection >
+Core::Data::ExdDataGenerated::JournalSectionPtr
    Core::Data::ExdDataGenerated::getJournalSection( uint32_t JournalSectionId )
 {
    try
@@ -7075,7 +7076,7 @@ boost::shared_ptr< Core::Data::JournalSection >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Leve >
+Core::Data::ExdDataGenerated::LevePtr
    Core::Data::ExdDataGenerated::getLeve( uint32_t LeveId )
 {
    try
@@ -7090,7 +7091,7 @@ boost::shared_ptr< Core::Data::Leve >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::LeveAssignmentType >
+Core::Data::ExdDataGenerated::LeveAssignmentTypePtr
    Core::Data::ExdDataGenerated::getLeveAssignmentType( uint32_t LeveAssignmentTypeId )
 {
    try
@@ -7105,7 +7106,7 @@ boost::shared_ptr< Core::Data::LeveAssignmentType >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::LeveClient >
+Core::Data::ExdDataGenerated::LeveClientPtr
    Core::Data::ExdDataGenerated::getLeveClient( uint32_t LeveClientId )
 {
    try
@@ -7120,7 +7121,7 @@ boost::shared_ptr< Core::Data::LeveClient >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Level >
+Core::Data::ExdDataGenerated::LevelPtr
    Core::Data::ExdDataGenerated::getLevel( uint32_t LevelId )
 {
    try
@@ -7135,7 +7136,7 @@ boost::shared_ptr< Core::Data::Level >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::LeveRewardItem >
+Core::Data::ExdDataGenerated::LeveRewardItemPtr
    Core::Data::ExdDataGenerated::getLeveRewardItem( uint32_t LeveRewardItemId )
 {
    try
@@ -7150,7 +7151,7 @@ boost::shared_ptr< Core::Data::LeveRewardItem >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::LeveRewardItemGroup >
+Core::Data::ExdDataGenerated::LeveRewardItemGroupPtr
    Core::Data::ExdDataGenerated::getLeveRewardItemGroup( uint32_t LeveRewardItemGroupId )
 {
    try
@@ -7165,7 +7166,7 @@ boost::shared_ptr< Core::Data::LeveRewardItemGroup >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::LeveVfx >
+Core::Data::ExdDataGenerated::LeveVfxPtr
    Core::Data::ExdDataGenerated::getLeveVfx( uint32_t LeveVfxId )
 {
    try
@@ -7180,7 +7181,7 @@ boost::shared_ptr< Core::Data::LeveVfx >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::LogFilter >
+Core::Data::ExdDataGenerated::LogFilterPtr
    Core::Data::ExdDataGenerated::getLogFilter( uint32_t LogFilterId )
 {
    try
@@ -7195,7 +7196,7 @@ boost::shared_ptr< Core::Data::LogFilter >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::LogKind >
+Core::Data::ExdDataGenerated::LogKindPtr
    Core::Data::ExdDataGenerated::getLogKind( uint32_t LogKindId )
 {
    try
@@ -7210,7 +7211,7 @@ boost::shared_ptr< Core::Data::LogKind >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::LogKindCategoryText >
+Core::Data::ExdDataGenerated::LogKindCategoryTextPtr
    Core::Data::ExdDataGenerated::getLogKindCategoryText( uint32_t LogKindCategoryTextId )
 {
    try
@@ -7225,7 +7226,7 @@ boost::shared_ptr< Core::Data::LogKindCategoryText >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::LogMessage >
+Core::Data::ExdDataGenerated::LogMessagePtr
    Core::Data::ExdDataGenerated::getLogMessage( uint32_t LogMessageId )
 {
    try
@@ -7240,7 +7241,7 @@ boost::shared_ptr< Core::Data::LogMessage >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::MacroIcon >
+Core::Data::ExdDataGenerated::MacroIconPtr
    Core::Data::ExdDataGenerated::getMacroIcon( uint32_t MacroIconId )
 {
    try
@@ -7255,7 +7256,7 @@ boost::shared_ptr< Core::Data::MacroIcon >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::MacroIconRedirectOld >
+Core::Data::ExdDataGenerated::MacroIconRedirectOldPtr
    Core::Data::ExdDataGenerated::getMacroIconRedirectOld( uint32_t MacroIconRedirectOldId )
 {
    try
@@ -7270,7 +7271,7 @@ boost::shared_ptr< Core::Data::MacroIconRedirectOld >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::MainCommand >
+Core::Data::ExdDataGenerated::MainCommandPtr
    Core::Data::ExdDataGenerated::getMainCommand( uint32_t MainCommandId )
 {
    try
@@ -7285,7 +7286,7 @@ boost::shared_ptr< Core::Data::MainCommand >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::MainCommandCategory >
+Core::Data::ExdDataGenerated::MainCommandCategoryPtr
    Core::Data::ExdDataGenerated::getMainCommandCategory( uint32_t MainCommandCategoryId )
 {
    try
@@ -7300,7 +7301,7 @@ boost::shared_ptr< Core::Data::MainCommandCategory >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Map >
+Core::Data::ExdDataGenerated::MapPtr
    Core::Data::ExdDataGenerated::getMap( uint32_t MapId )
 {
    try
@@ -7315,7 +7316,7 @@ boost::shared_ptr< Core::Data::Map >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::MapMarker >
+Core::Data::ExdDataGenerated::MapMarkerPtr
    Core::Data::ExdDataGenerated::getMapMarker( uint32_t MapMarkerId )
 {
    try
@@ -7330,7 +7331,7 @@ boost::shared_ptr< Core::Data::MapMarker >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::MapSymbol >
+Core::Data::ExdDataGenerated::MapSymbolPtr
    Core::Data::ExdDataGenerated::getMapSymbol( uint32_t MapSymbolId )
 {
    try
@@ -7345,7 +7346,7 @@ boost::shared_ptr< Core::Data::MapSymbol >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::MasterpieceSupplyDuty >
+Core::Data::ExdDataGenerated::MasterpieceSupplyDutyPtr
    Core::Data::ExdDataGenerated::getMasterpieceSupplyDuty( uint32_t MasterpieceSupplyDutyId )
 {
    try
@@ -7360,7 +7361,7 @@ boost::shared_ptr< Core::Data::MasterpieceSupplyDuty >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::MasterpieceSupplyMultiplier >
+Core::Data::ExdDataGenerated::MasterpieceSupplyMultiplierPtr
    Core::Data::ExdDataGenerated::getMasterpieceSupplyMultiplier( uint32_t MasterpieceSupplyMultiplierId )
 {
    try
@@ -7375,7 +7376,7 @@ boost::shared_ptr< Core::Data::MasterpieceSupplyMultiplier >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Materia >
+Core::Data::ExdDataGenerated::MateriaPtr
    Core::Data::ExdDataGenerated::getMateria( uint32_t MateriaId )
 {
    try
@@ -7390,7 +7391,7 @@ boost::shared_ptr< Core::Data::Materia >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::MinionRace >
+Core::Data::ExdDataGenerated::MinionRacePtr
    Core::Data::ExdDataGenerated::getMinionRace( uint32_t MinionRaceId )
 {
    try
@@ -7405,7 +7406,7 @@ boost::shared_ptr< Core::Data::MinionRace >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::MinionRules >
+Core::Data::ExdDataGenerated::MinionRulesPtr
    Core::Data::ExdDataGenerated::getMinionRules( uint32_t MinionRulesId )
 {
    try
@@ -7420,7 +7421,7 @@ boost::shared_ptr< Core::Data::MinionRules >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::MinionSkillType >
+Core::Data::ExdDataGenerated::MinionSkillTypePtr
    Core::Data::ExdDataGenerated::getMinionSkillType( uint32_t MinionSkillTypeId )
 {
    try
@@ -7435,7 +7436,7 @@ boost::shared_ptr< Core::Data::MinionSkillType >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::MobHuntTarget >
+Core::Data::ExdDataGenerated::MobHuntTargetPtr
    Core::Data::ExdDataGenerated::getMobHuntTarget( uint32_t MobHuntTargetId )
 {
    try
@@ -7450,7 +7451,7 @@ boost::shared_ptr< Core::Data::MobHuntTarget >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ModelChara >
+Core::Data::ExdDataGenerated::ModelCharaPtr
    Core::Data::ExdDataGenerated::getModelChara( uint32_t ModelCharaId )
 {
    try
@@ -7465,7 +7466,7 @@ boost::shared_ptr< Core::Data::ModelChara >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::MonsterNote >
+Core::Data::ExdDataGenerated::MonsterNotePtr
    Core::Data::ExdDataGenerated::getMonsterNote( uint32_t MonsterNoteId )
 {
    try
@@ -7480,7 +7481,7 @@ boost::shared_ptr< Core::Data::MonsterNote >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::MonsterNoteTarget >
+Core::Data::ExdDataGenerated::MonsterNoteTargetPtr
    Core::Data::ExdDataGenerated::getMonsterNoteTarget( uint32_t MonsterNoteTargetId )
 {
    try
@@ -7495,7 +7496,7 @@ boost::shared_ptr< Core::Data::MonsterNoteTarget >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Mount >
+Core::Data::ExdDataGenerated::MountPtr
    Core::Data::ExdDataGenerated::getMount( uint32_t MountId )
 {
    try
@@ -7510,7 +7511,7 @@ boost::shared_ptr< Core::Data::Mount >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::MountAction >
+Core::Data::ExdDataGenerated::MountActionPtr
    Core::Data::ExdDataGenerated::getMountAction( uint32_t MountActionId )
 {
    try
@@ -7525,7 +7526,7 @@ boost::shared_ptr< Core::Data::MountAction >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::NpcEquip >
+Core::Data::ExdDataGenerated::NpcEquipPtr
    Core::Data::ExdDataGenerated::getNpcEquip( uint32_t NpcEquipId )
 {
    try
@@ -7540,7 +7541,7 @@ boost::shared_ptr< Core::Data::NpcEquip >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Omen >
+Core::Data::ExdDataGenerated::OmenPtr
    Core::Data::ExdDataGenerated::getOmen( uint32_t OmenId )
 {
    try
@@ -7555,7 +7556,7 @@ boost::shared_ptr< Core::Data::Omen >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::OnlineStatus >
+Core::Data::ExdDataGenerated::OnlineStatusPtr
    Core::Data::ExdDataGenerated::getOnlineStatus( uint32_t OnlineStatusId )
 {
    try
@@ -7570,7 +7571,7 @@ boost::shared_ptr< Core::Data::OnlineStatus >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Opening >
+Core::Data::ExdDataGenerated::OpeningPtr
    Core::Data::ExdDataGenerated::getOpening( uint32_t OpeningId )
 {
    try
@@ -7585,7 +7586,7 @@ boost::shared_ptr< Core::Data::Opening >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Orchestrion >
+Core::Data::ExdDataGenerated::OrchestrionPtr
    Core::Data::ExdDataGenerated::getOrchestrion( uint32_t OrchestrionId )
 {
    try
@@ -7600,7 +7601,7 @@ boost::shared_ptr< Core::Data::Orchestrion >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::OrchestrionPath >
+Core::Data::ExdDataGenerated::OrchestrionPathPtr
    Core::Data::ExdDataGenerated::getOrchestrionPath( uint32_t OrchestrionPathId )
 {
    try
@@ -7615,7 +7616,7 @@ boost::shared_ptr< Core::Data::OrchestrionPath >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ParamGrow >
+Core::Data::ExdDataGenerated::ParamGrowPtr
    Core::Data::ExdDataGenerated::getParamGrow( uint32_t ParamGrowId )
 {
    try
@@ -7630,7 +7631,7 @@ boost::shared_ptr< Core::Data::ParamGrow >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Pet >
+Core::Data::ExdDataGenerated::PetPtr
    Core::Data::ExdDataGenerated::getPet( uint32_t PetId )
 {
    try
@@ -7645,7 +7646,7 @@ boost::shared_ptr< Core::Data::Pet >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::PetAction >
+Core::Data::ExdDataGenerated::PetActionPtr
    Core::Data::ExdDataGenerated::getPetAction( uint32_t PetActionId )
 {
    try
@@ -7660,7 +7661,7 @@ boost::shared_ptr< Core::Data::PetAction >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Picture >
+Core::Data::ExdDataGenerated::PicturePtr
    Core::Data::ExdDataGenerated::getPicture( uint32_t PictureId )
 {
    try
@@ -7675,7 +7676,7 @@ boost::shared_ptr< Core::Data::Picture >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::PlaceName >
+Core::Data::ExdDataGenerated::PlaceNamePtr
    Core::Data::ExdDataGenerated::getPlaceName( uint32_t PlaceNameId )
 {
    try
@@ -7690,7 +7691,7 @@ boost::shared_ptr< Core::Data::PlaceName >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Quest >
+Core::Data::ExdDataGenerated::QuestPtr
    Core::Data::ExdDataGenerated::getQuest( uint32_t QuestId )
 {
    try
@@ -7705,7 +7706,7 @@ boost::shared_ptr< Core::Data::Quest >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::QuestRewardOther >
+Core::Data::ExdDataGenerated::QuestRewardOtherPtr
    Core::Data::ExdDataGenerated::getQuestRewardOther( uint32_t QuestRewardOtherId )
 {
    try
@@ -7720,7 +7721,7 @@ boost::shared_ptr< Core::Data::QuestRewardOther >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Race >
+Core::Data::ExdDataGenerated::RacePtr
    Core::Data::ExdDataGenerated::getRace( uint32_t RaceId )
 {
    try
@@ -7735,7 +7736,7 @@ boost::shared_ptr< Core::Data::Race >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::RacingChocoboItem >
+Core::Data::ExdDataGenerated::RacingChocoboItemPtr
    Core::Data::ExdDataGenerated::getRacingChocoboItem( uint32_t RacingChocoboItemId )
 {
    try
@@ -7750,7 +7751,7 @@ boost::shared_ptr< Core::Data::RacingChocoboItem >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::RacingChocoboName >
+Core::Data::ExdDataGenerated::RacingChocoboNamePtr
    Core::Data::ExdDataGenerated::getRacingChocoboName( uint32_t RacingChocoboNameId )
 {
    try
@@ -7765,7 +7766,7 @@ boost::shared_ptr< Core::Data::RacingChocoboName >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::RacingChocoboNameCategory >
+Core::Data::ExdDataGenerated::RacingChocoboNameCategoryPtr
    Core::Data::ExdDataGenerated::getRacingChocoboNameCategory( uint32_t RacingChocoboNameCategoryId )
 {
    try
@@ -7780,7 +7781,7 @@ boost::shared_ptr< Core::Data::RacingChocoboNameCategory >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::RacingChocoboNameInfo >
+Core::Data::ExdDataGenerated::RacingChocoboNameInfoPtr
    Core::Data::ExdDataGenerated::getRacingChocoboNameInfo( uint32_t RacingChocoboNameInfoId )
 {
    try
@@ -7795,7 +7796,7 @@ boost::shared_ptr< Core::Data::RacingChocoboNameInfo >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::RacingChocoboParam >
+Core::Data::ExdDataGenerated::RacingChocoboParamPtr
    Core::Data::ExdDataGenerated::getRacingChocoboParam( uint32_t RacingChocoboParamId )
 {
    try
@@ -7810,7 +7811,7 @@ boost::shared_ptr< Core::Data::RacingChocoboParam >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Recipe >
+Core::Data::ExdDataGenerated::RecipePtr
    Core::Data::ExdDataGenerated::getRecipe( uint32_t RecipeId )
 {
    try
@@ -7825,7 +7826,7 @@ boost::shared_ptr< Core::Data::Recipe >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::RecipeElement >
+Core::Data::ExdDataGenerated::RecipeElementPtr
    Core::Data::ExdDataGenerated::getRecipeElement( uint32_t RecipeElementId )
 {
    try
@@ -7840,7 +7841,7 @@ boost::shared_ptr< Core::Data::RecipeElement >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::RecipeLevelTable >
+Core::Data::ExdDataGenerated::RecipeLevelTablePtr
    Core::Data::ExdDataGenerated::getRecipeLevelTable( uint32_t RecipeLevelTableId )
 {
    try
@@ -7855,7 +7856,7 @@ boost::shared_ptr< Core::Data::RecipeLevelTable >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::RecipeNotebookList >
+Core::Data::ExdDataGenerated::RecipeNotebookListPtr
    Core::Data::ExdDataGenerated::getRecipeNotebookList( uint32_t RecipeNotebookListId )
 {
    try
@@ -7870,7 +7871,7 @@ boost::shared_ptr< Core::Data::RecipeNotebookList >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Relic >
+Core::Data::ExdDataGenerated::RelicPtr
    Core::Data::ExdDataGenerated::getRelic( uint32_t RelicId )
 {
    try
@@ -7885,7 +7886,7 @@ boost::shared_ptr< Core::Data::Relic >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Relic3 >
+Core::Data::ExdDataGenerated::Relic3Ptr
    Core::Data::ExdDataGenerated::getRelic3( uint32_t Relic3Id )
 {
    try
@@ -7900,7 +7901,7 @@ boost::shared_ptr< Core::Data::Relic3 >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::RelicItem >
+Core::Data::ExdDataGenerated::RelicItemPtr
    Core::Data::ExdDataGenerated::getRelicItem( uint32_t RelicItemId )
 {
    try
@@ -7915,7 +7916,7 @@ boost::shared_ptr< Core::Data::RelicItem >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::RelicNote >
+Core::Data::ExdDataGenerated::RelicNotePtr
    Core::Data::ExdDataGenerated::getRelicNote( uint32_t RelicNoteId )
 {
    try
@@ -7930,7 +7931,7 @@ boost::shared_ptr< Core::Data::RelicNote >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::RelicNoteCategory >
+Core::Data::ExdDataGenerated::RelicNoteCategoryPtr
    Core::Data::ExdDataGenerated::getRelicNoteCategory( uint32_t RelicNoteCategoryId )
 {
    try
@@ -7945,7 +7946,7 @@ boost::shared_ptr< Core::Data::RelicNoteCategory >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::RetainerTask >
+Core::Data::ExdDataGenerated::RetainerTaskPtr
    Core::Data::ExdDataGenerated::getRetainerTask( uint32_t RetainerTaskId )
 {
    try
@@ -7960,7 +7961,7 @@ boost::shared_ptr< Core::Data::RetainerTask >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::RetainerTaskNormal >
+Core::Data::ExdDataGenerated::RetainerTaskNormalPtr
    Core::Data::ExdDataGenerated::getRetainerTaskNormal( uint32_t RetainerTaskNormalId )
 {
    try
@@ -7975,7 +7976,7 @@ boost::shared_ptr< Core::Data::RetainerTaskNormal >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::RetainerTaskParameter >
+Core::Data::ExdDataGenerated::RetainerTaskParameterPtr
    Core::Data::ExdDataGenerated::getRetainerTaskParameter( uint32_t RetainerTaskParameterId )
 {
    try
@@ -7990,7 +7991,7 @@ boost::shared_ptr< Core::Data::RetainerTaskParameter >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::RetainerTaskRandom >
+Core::Data::ExdDataGenerated::RetainerTaskRandomPtr
    Core::Data::ExdDataGenerated::getRetainerTaskRandom( uint32_t RetainerTaskRandomId )
 {
    try
@@ -8005,7 +8006,7 @@ boost::shared_ptr< Core::Data::RetainerTaskRandom >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Salvage >
+Core::Data::ExdDataGenerated::SalvagePtr
    Core::Data::ExdDataGenerated::getSalvage( uint32_t SalvageId )
 {
    try
@@ -8020,7 +8021,7 @@ boost::shared_ptr< Core::Data::Salvage >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::SatisfactionNpc >
+Core::Data::ExdDataGenerated::SatisfactionNpcPtr
    Core::Data::ExdDataGenerated::getSatisfactionNpc( uint32_t SatisfactionNpcId )
 {
    try
@@ -8035,7 +8036,7 @@ boost::shared_ptr< Core::Data::SatisfactionNpc >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::SatisfactionSupply >
+Core::Data::ExdDataGenerated::SatisfactionSupplyPtr
    Core::Data::ExdDataGenerated::getSatisfactionSupply( uint32_t SatisfactionSupplyId )
 {
    try
@@ -8050,7 +8051,7 @@ boost::shared_ptr< Core::Data::SatisfactionSupply >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::SatisfactionSupplyReward >
+Core::Data::ExdDataGenerated::SatisfactionSupplyRewardPtr
    Core::Data::ExdDataGenerated::getSatisfactionSupplyReward( uint32_t SatisfactionSupplyRewardId )
 {
    try
@@ -8065,7 +8066,7 @@ boost::shared_ptr< Core::Data::SatisfactionSupplyReward >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::ScreenImage >
+Core::Data::ExdDataGenerated::ScreenImagePtr
    Core::Data::ExdDataGenerated::getScreenImage( uint32_t ScreenImageId )
 {
    try
@@ -8080,7 +8081,7 @@ boost::shared_ptr< Core::Data::ScreenImage >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::SecretRecipeBook >
+Core::Data::ExdDataGenerated::SecretRecipeBookPtr
    Core::Data::ExdDataGenerated::getSecretRecipeBook( uint32_t SecretRecipeBookId )
 {
    try
@@ -8095,7 +8096,7 @@ boost::shared_ptr< Core::Data::SecretRecipeBook >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::SpearfishingItem >
+Core::Data::ExdDataGenerated::SpearfishingItemPtr
    Core::Data::ExdDataGenerated::getSpearfishingItem( uint32_t SpearfishingItemId )
 {
    try
@@ -8110,7 +8111,7 @@ boost::shared_ptr< Core::Data::SpearfishingItem >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::SpearfishingNotebook >
+Core::Data::ExdDataGenerated::SpearfishingNotebookPtr
    Core::Data::ExdDataGenerated::getSpearfishingNotebook( uint32_t SpearfishingNotebookId )
 {
    try
@@ -8125,7 +8126,7 @@ boost::shared_ptr< Core::Data::SpearfishingNotebook >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::SpecialShop >
+Core::Data::ExdDataGenerated::SpecialShopPtr
    Core::Data::ExdDataGenerated::getSpecialShop( uint32_t SpecialShopId )
 {
    try
@@ -8140,7 +8141,7 @@ boost::shared_ptr< Core::Data::SpecialShop >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::SpecialShopItemCategory >
+Core::Data::ExdDataGenerated::SpecialShopItemCategoryPtr
    Core::Data::ExdDataGenerated::getSpecialShopItemCategory( uint32_t SpecialShopItemCategoryId )
 {
    try
@@ -8155,7 +8156,7 @@ boost::shared_ptr< Core::Data::SpecialShopItemCategory >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Stain >
+Core::Data::ExdDataGenerated::StainPtr
    Core::Data::ExdDataGenerated::getStain( uint32_t StainId )
 {
    try
@@ -8170,7 +8171,7 @@ boost::shared_ptr< Core::Data::Stain >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Status >
+Core::Data::ExdDataGenerated::StatusPtr
    Core::Data::ExdDataGenerated::getStatus( uint32_t StatusId )
 {
    try
@@ -8185,7 +8186,7 @@ boost::shared_ptr< Core::Data::Status >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Story >
+Core::Data::ExdDataGenerated::StoryPtr
    Core::Data::ExdDataGenerated::getStory( uint32_t StoryId )
 {
    try
@@ -8200,7 +8201,7 @@ boost::shared_ptr< Core::Data::Story >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::SwitchTalk >
+Core::Data::ExdDataGenerated::SwitchTalkPtr
    Core::Data::ExdDataGenerated::getSwitchTalk( uint32_t SwitchTalkId )
 {
    try
@@ -8215,7 +8216,7 @@ boost::shared_ptr< Core::Data::SwitchTalk >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::TerritoryType >
+Core::Data::ExdDataGenerated::TerritoryTypePtr
    Core::Data::ExdDataGenerated::getTerritoryType( uint32_t TerritoryTypeId )
 {
    try
@@ -8230,7 +8231,7 @@ boost::shared_ptr< Core::Data::TerritoryType >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::TextCommand >
+Core::Data::ExdDataGenerated::TextCommandPtr
    Core::Data::ExdDataGenerated::getTextCommand( uint32_t TextCommandId )
 {
    try
@@ -8245,7 +8246,7 @@ boost::shared_ptr< Core::Data::TextCommand >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Title >
+Core::Data::ExdDataGenerated::TitlePtr
    Core::Data::ExdDataGenerated::getTitle( uint32_t TitleId )
 {
    try
@@ -8260,7 +8261,7 @@ boost::shared_ptr< Core::Data::Title >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Tomestones >
+Core::Data::ExdDataGenerated::TomestonesPtr
    Core::Data::ExdDataGenerated::getTomestones( uint32_t TomestonesId )
 {
    try
@@ -8275,7 +8276,7 @@ boost::shared_ptr< Core::Data::Tomestones >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::TomestonesItem >
+Core::Data::ExdDataGenerated::TomestonesItemPtr
    Core::Data::ExdDataGenerated::getTomestonesItem( uint32_t TomestonesItemId )
 {
    try
@@ -8290,7 +8291,7 @@ boost::shared_ptr< Core::Data::TomestonesItem >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::TopicSelect >
+Core::Data::ExdDataGenerated::TopicSelectPtr
    Core::Data::ExdDataGenerated::getTopicSelect( uint32_t TopicSelectId )
 {
    try
@@ -8305,7 +8306,7 @@ boost::shared_ptr< Core::Data::TopicSelect >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Town >
+Core::Data::ExdDataGenerated::TownPtr
    Core::Data::ExdDataGenerated::getTown( uint32_t TownId )
 {
    try
@@ -8320,7 +8321,7 @@ boost::shared_ptr< Core::Data::Town >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Trait >
+Core::Data::ExdDataGenerated::TraitPtr
    Core::Data::ExdDataGenerated::getTrait( uint32_t TraitId )
 {
    try
@@ -8335,7 +8336,7 @@ boost::shared_ptr< Core::Data::Trait >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::TraitRecast >
+Core::Data::ExdDataGenerated::TraitRecastPtr
    Core::Data::ExdDataGenerated::getTraitRecast( uint32_t TraitRecastId )
 {
    try
@@ -8350,7 +8351,7 @@ boost::shared_ptr< Core::Data::TraitRecast >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::TraitTransient >
+Core::Data::ExdDataGenerated::TraitTransientPtr
    Core::Data::ExdDataGenerated::getTraitTransient( uint32_t TraitTransientId )
 {
    try
@@ -8365,7 +8366,7 @@ boost::shared_ptr< Core::Data::TraitTransient >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Tribe >
+Core::Data::ExdDataGenerated::TribePtr
    Core::Data::ExdDataGenerated::getTribe( uint32_t TribeId )
 {
    try
@@ -8380,7 +8381,7 @@ boost::shared_ptr< Core::Data::Tribe >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::TripleTriad >
+Core::Data::ExdDataGenerated::TripleTriadPtr
    Core::Data::ExdDataGenerated::getTripleTriad( uint32_t TripleTriadId )
 {
    try
@@ -8395,7 +8396,7 @@ boost::shared_ptr< Core::Data::TripleTriad >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::TripleTriadCard >
+Core::Data::ExdDataGenerated::TripleTriadCardPtr
    Core::Data::ExdDataGenerated::getTripleTriadCard( uint32_t TripleTriadCardId )
 {
    try
@@ -8410,7 +8411,7 @@ boost::shared_ptr< Core::Data::TripleTriadCard >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::TripleTriadCardRarity >
+Core::Data::ExdDataGenerated::TripleTriadCardRarityPtr
    Core::Data::ExdDataGenerated::getTripleTriadCardRarity( uint32_t TripleTriadCardRarityId )
 {
    try
@@ -8425,7 +8426,7 @@ boost::shared_ptr< Core::Data::TripleTriadCardRarity >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::TripleTriadCardResident >
+Core::Data::ExdDataGenerated::TripleTriadCardResidentPtr
    Core::Data::ExdDataGenerated::getTripleTriadCardResident( uint32_t TripleTriadCardResidentId )
 {
    try
@@ -8440,7 +8441,7 @@ boost::shared_ptr< Core::Data::TripleTriadCardResident >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::TripleTriadCardType >
+Core::Data::ExdDataGenerated::TripleTriadCardTypePtr
    Core::Data::ExdDataGenerated::getTripleTriadCardType( uint32_t TripleTriadCardTypeId )
 {
    try
@@ -8455,7 +8456,7 @@ boost::shared_ptr< Core::Data::TripleTriadCardType >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::TripleTriadCompetition >
+Core::Data::ExdDataGenerated::TripleTriadCompetitionPtr
    Core::Data::ExdDataGenerated::getTripleTriadCompetition( uint32_t TripleTriadCompetitionId )
 {
    try
@@ -8470,7 +8471,7 @@ boost::shared_ptr< Core::Data::TripleTriadCompetition >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::TripleTriadRule >
+Core::Data::ExdDataGenerated::TripleTriadRulePtr
    Core::Data::ExdDataGenerated::getTripleTriadRule( uint32_t TripleTriadRuleId )
 {
    try
@@ -8485,7 +8486,7 @@ boost::shared_ptr< Core::Data::TripleTriadRule >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Tutorial >
+Core::Data::ExdDataGenerated::TutorialPtr
    Core::Data::ExdDataGenerated::getTutorial( uint32_t TutorialId )
 {
    try
@@ -8500,7 +8501,7 @@ boost::shared_ptr< Core::Data::Tutorial >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::TutorialDPS >
+Core::Data::ExdDataGenerated::TutorialDPSPtr
    Core::Data::ExdDataGenerated::getTutorialDPS( uint32_t TutorialDPSId )
 {
    try
@@ -8515,7 +8516,7 @@ boost::shared_ptr< Core::Data::TutorialDPS >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::TutorialHealer >
+Core::Data::ExdDataGenerated::TutorialHealerPtr
    Core::Data::ExdDataGenerated::getTutorialHealer( uint32_t TutorialHealerId )
 {
    try
@@ -8530,7 +8531,7 @@ boost::shared_ptr< Core::Data::TutorialHealer >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::TutorialTank >
+Core::Data::ExdDataGenerated::TutorialTankPtr
    Core::Data::ExdDataGenerated::getTutorialTank( uint32_t TutorialTankId )
 {
    try
@@ -8545,7 +8546,7 @@ boost::shared_ptr< Core::Data::TutorialTank >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Warp >
+Core::Data::ExdDataGenerated::WarpPtr
    Core::Data::ExdDataGenerated::getWarp( uint32_t WarpId )
 {
    try
@@ -8560,7 +8561,7 @@ boost::shared_ptr< Core::Data::Warp >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::Weather >
+Core::Data::ExdDataGenerated::WeatherPtr
    Core::Data::ExdDataGenerated::getWeather( uint32_t WeatherId )
 {
    try
@@ -8575,7 +8576,7 @@ boost::shared_ptr< Core::Data::Weather >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::WeatherGroup >
+Core::Data::ExdDataGenerated::WeatherGroupPtr
    Core::Data::ExdDataGenerated::getWeatherGroup( uint32_t WeatherGroupId )
 {
    try
@@ -8590,7 +8591,7 @@ boost::shared_ptr< Core::Data::WeatherGroup >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::WeatherRate >
+Core::Data::ExdDataGenerated::WeatherRatePtr
    Core::Data::ExdDataGenerated::getWeatherRate( uint32_t WeatherRateId )
 {
    try
@@ -8605,7 +8606,7 @@ boost::shared_ptr< Core::Data::WeatherRate >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::WeeklyBingoOrderData >
+Core::Data::ExdDataGenerated::WeeklyBingoOrderDataPtr
    Core::Data::ExdDataGenerated::getWeeklyBingoOrderData( uint32_t WeeklyBingoOrderDataId )
 {
    try
@@ -8620,7 +8621,7 @@ boost::shared_ptr< Core::Data::WeeklyBingoOrderData >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::WeeklyBingoRewardData >
+Core::Data::ExdDataGenerated::WeeklyBingoRewardDataPtr
    Core::Data::ExdDataGenerated::getWeeklyBingoRewardData( uint32_t WeeklyBingoRewardDataId )
 {
    try
@@ -8635,7 +8636,7 @@ boost::shared_ptr< Core::Data::WeeklyBingoRewardData >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::WeeklyBingoText >
+Core::Data::ExdDataGenerated::WeeklyBingoTextPtr
    Core::Data::ExdDataGenerated::getWeeklyBingoText( uint32_t WeeklyBingoTextId )
 {
    try
@@ -8650,7 +8651,7 @@ boost::shared_ptr< Core::Data::WeeklyBingoText >
    }
    return nullptr;
 }
-boost::shared_ptr< Core::Data::WorldDCGroupType >
+Core::Data::ExdDataGenerated::WorldDCGroupTypePtr
    Core::Data::ExdDataGenerated::getWorldDCGroupType( uint32_t WorldDCGroupTypeId )
 {
    try
