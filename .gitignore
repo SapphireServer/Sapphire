@@ -113,4 +113,4 @@ src/common/Version\.cpp
 .mtime_cache
 
 # generated script loader files
-scripts/native/*/ScriptLoader.cpp
+src/servers/sapphire_zone/Script/Scripts/*/ScriptLoader.cpp
