@@ -24,7 +24,7 @@ std::string Core::Event::getEventName( uint32_t eventId )
       std::string name = questInfo->id;
       std::size_t pos = name.find_first_of( "_" );
 
-      return questInfo->name.substr( 0, pos );
+      return name.substr( 0, pos );
    }
    case Event::EventHandler::EventHandlerType::CustomTalk:
    {

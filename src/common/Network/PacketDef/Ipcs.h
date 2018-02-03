@@ -126,9 +126,9 @@ namespace Packets {
       QuestMessage               = 0x01B8, // updated 4.2
       QuestTracker               = 0x01BD, // updated 4.2
 
-      QuestFinish                = 0x01A0, // updated 4.2
-      MSQTrackerComplete         = 0x01A1, // updated 4.2
-      MSQTrackerProgress         = 0x01A2, // updated 4.2
+      QuestFinish                = 0x01B0, // updated 4.2
+      MSQTrackerComplete         = 0x01B1, // updated 4.2
+      MSQTrackerProgress         = 0x01B2, // updated 4.2
 
       QuestActiveList            = 0x01AD, // updated 4.2
 
