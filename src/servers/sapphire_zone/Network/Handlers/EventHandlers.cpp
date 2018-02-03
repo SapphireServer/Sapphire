@@ -146,7 +146,7 @@ void Core::Network::GameConnection::eventHandlerEnterTerritory( const Packets::G
    auto param1 = inPacket.getValAt< uint16_t >( 0x24 );
    auto param2 = inPacket.getValAt< uint16_t >( 0x26 );
 
-   std::string eventName = Event::getEventName( eventId );
+   std::string eventName = "onEnterTerritory";
 
    std::string objName = Event::getEventName( eventId );
 
