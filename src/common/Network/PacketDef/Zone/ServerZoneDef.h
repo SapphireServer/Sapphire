@@ -829,11 +829,10 @@ struct FFXIVIpcActorOwner : FFXIVIpcBasePacket<ActorOwner>
 */
 struct FFXIVIpcPlayerStateFlags : FFXIVIpcBasePacket<PlayerStateFlags>
 {
-   /* 0000 */ uint16_t padding;
-   /* 0002 */ uint8_t flags[7];
-   /* 0009 */ uint8_t padding1[3];
-   /* 000C */ uint32_t padding2;
-
+   uint8_t flags[7];
+   uint8_t padding1[3];
+   uint32_t padding2;
+   uint16_t padding;
 };
 
 /**
