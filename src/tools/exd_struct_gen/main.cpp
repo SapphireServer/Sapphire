@@ -81,7 +81,7 @@ std::string generateDirectGetterDef( const std::string& exd )
 {
    std::string result = "";
    result =
-      "" + exd + "Ptr\n"
+      "Core::Data::ExdDataGenerated::" + exd + "Ptr\n"
       "   Core::Data::ExdDataGenerated::get" + exd + "( uint32_t " + exd + "Id )\n"
       "{\n"
       "   try\n"
