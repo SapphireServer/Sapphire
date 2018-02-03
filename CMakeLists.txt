@@ -68,5 +68,3 @@ add_subdirectory("src/tools/exd_struct_gen")
 add_subdirectory("src/tools/exd_struct_test")
 add_subdirectory("src/tools/quest_parser")
 #add_subdirectory("src/tools/pcb_reader")
-
-add_subdirectory("scripts/native")
