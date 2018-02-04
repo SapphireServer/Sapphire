@@ -23,6 +23,8 @@
 
 std::string gamePath("C:\\Program Files (x86)\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv");
 std::unordered_map< uint32_t, std::string > eobjNameMap;
+std::unordered_map< uint16_t, std::string > zoneNameMap;
+
 xiv::dat::GameData* data1 = nullptr;
 xiv::exd::ExdData* eData = nullptr;
 
@@ -103,8 +105,8 @@ int parseBlockEntry( char* data, std::vector<PCB_BLOCK_ENTRY>& entries, int gOff
 
 void dumpLevelExdEntries( uint32_t zoneId, const std::string& name = std::string() )
 {
-   auto& cat = eData->get_category( "Level" );
-   auto exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::none ) );
+   static auto& cat = eData->get_category( "Level" );
+   static auto exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::none ) );
 
    std::string fileName( name + "_" + std::to_string( zoneId ) + "_Level" + ".csv" );
    std::ofstream outfile( fileName, std::ios::trunc );
@@ -113,8 +115,8 @@ void dumpLevelExdEntries( uint32_t zoneId, const std::string& name = std::string
    {
       outfile.close();
       outfile.open( fileName, std::ios::app );
-
-      for( auto& row : exd.get_rows() )
+      static auto rows = exd.get_rows();
+      for( auto& row : rows )
       {
          auto id = row.first;
          auto& fields = row.second;
@@ -144,6 +146,8 @@ std::string zoneNameToPath( const std::string& name )
 {
    std::string path;
    uint32_t id;
+   bool found = false;
+
 #ifdef STANDALONE
    auto inFile = std::ifstream( "territorytype.exh.csv" );
    if( inFile.good() )
@@ -153,22 +157,22 @@ std::string zoneNameToPath( const std::string& name )
       while( std::getline( inFile, line ) )
       {
          std::smatch match;
-         if( std::regex_match( line, match, re ) )
+         if( std::regex_match( line, match, re )
          {
-            if( name == match[2].str() )
+            if( !found && name == match[2].str() )
             {
                id = match[1].str();
                path = match[3].str();
-               break;
+               found = true;
             }
+            zoneNameMap[std::stoul( match[1].str() )] = match[2].str();
          }
       }
       inFile.close();
    }
 #else
-   xiv::dat::GameData dat( gamePath );
-   xiv::exd::ExdData eData( dat );
-   auto& cat = eData.get_category( "TerritoryType" );
+
+   auto& cat = eData->get_category( "TerritoryType" );
    auto exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::none ) );
    for( auto& row : exd.get_rows() )
    {
@@ -177,16 +181,17 @@ std::string zoneNameToPath( const std::string& name )
       if( teriName.empty() )
          continue;
       auto teriPath = *boost::get< std::string >( &fields.at( static_cast< size_t >( TerritoryTypeExdIndexes::Path ) ) );
-      id = row.first;
-      if( boost::iequals( name, teriName ) )
+      if( !found && boost::iequals( name, teriName ) )
       {
          path = teriPath;
-         break;
+         found = true;
+         id = row.first;
       }
+      zoneNameMap[row.first] = teriName;
    }
 #endif
 
-   if( !path.empty() )
+   if( found )
    {
       //path = path.substr( path.find_first_of( "/" ) + 1, path.size() - path.find_first_of( "/" ));
       //path = std::string( "ffxiv/" ) + path;
@@ -217,11 +222,41 @@ void loadEobjNames()
 
 void writeEobjEntry( std::ofstream& out, LGB_EOBJ_ENTRY* pEobj, const std::string& name )
 {
+   static std::string mapRangeStr( "\"MapRange\", " );
+   static std::string eobjStr( "\"EObj\", " );
+
    std::string outStr(
-      std::to_string( pEobj->header.eobjId ) + ", \"" + name + "\", " +
+      std::to_string( pEobj->header.eobjId ) + ", \"" + name + "\", " + std::string( pEobj->header.type == LgbEntryType::MapRange ? mapRangeStr : eobjStr ) +
       std::to_string( pEobj->header.translation.x ) + ", " + std::to_string( pEobj->header.translation.y ) + ", " + std::to_string( pEobj->header.translation.z ) + "\n"
    );
    out.write( outStr.c_str(), outStr.size() );
+}
+
+void dumpAllInstanceContentEntries()
+{
+
+   auto& catInstance = eData->get_category( "InstanceContent" );
+   auto exdInstance = static_cast< xiv::exd::Exd >( catInstance.get_data_ln( xiv::exd::Language::en ) );
+
+   if( zoneNameMap.size() == 0 )
+   {
+      zoneNameToPath( "f1d1" );
+   }
+
+   for( auto& row : exdInstance.get_rows() )
+   {
+      auto id = row.first;
+      auto& fields = row.second;
+
+      auto name = *boost::get< std::string >( &fields.at( 3 ) );
+      if( name.empty() )
+         continue;
+      auto teri = *boost::get< uint32_t >( &fields.at( 7 ) );
+      auto i = 0;
+      while( ( i = name.find( ' ' ) ) != std::string::npos )
+         name = name.replace( name.begin() + i, name.begin() + i + 1, { '_' } );
+      dumpLevelExdEntries( teri, name );
+   }
 }
 
 void readFileToBuffer( const std::string& path, std::vector< char >& buf )
@@ -286,19 +321,24 @@ int main( int argc, char* argv[] )
          readFileToBuffer( listPcbPath, section1 );
       }
 #endif
+      if( argc > 3 && argv[3] == "--instanceDump" )
+         dumpAllInstanceContentEntries();
 
       std::vector< std::string > stringList;
 
       uint32_t offset1 = 0x20;
 
       loadEobjNames();
-      std::string eobjFileName( zoneName + "eobj.csv" );
+      std::string eobjFileName( zoneName + "_eobj.csv" );
       std::ofstream eobjOut( eobjFileName, std::ios::trunc );
       if( !eobjOut.good() )
          throw std::string( "Unable to create " + zoneName + "_eobj.csv for eobj entries. Run as admin or check there isnt already a handle on the file." ).c_str();
 
       eobjOut.close();
       eobjOut.open( eobjFileName, std::ios::app );
+
+      if( !eobjOut.good() )
+         throw std::string( "Unable to create " + zoneName + "_eobj.csv for eobj entries. Run as admin or check there isnt already a handle on the file." ).c_str();
 
       for( ; ; )
       {
@@ -351,7 +391,7 @@ int main( int argc, char* argv[] )
             {
                if( fileName.find( '.' ) == std::string::npos )
                   return false;
-               else if( fileName.substr(fileName.find_last_of('.')) != ".pcb" )
+               else if( fileName.substr( fileName.find_last_of( '.' ) ) != ".pcb" )
                   throw std::runtime_error( "Not a PCB file." );
 
                char* dataSection = nullptr;
@@ -589,6 +629,12 @@ int main( int argc, char* argv[] )
                            }
                         }
                      }
+                  }
+
+                  if( pEntry->header.type == LgbEntryType::EventObject || pEntry->header.type == LgbEntryType::EventNpc ||
+                     pEntry->header.type == LgbEntryType::MapRange )
+                  {
+                     std::cout << "HEADER SHIT " << std::to_string( ( int )pEntry->header.type ) << "\n";
                   }
 
                   if( pEventObj )

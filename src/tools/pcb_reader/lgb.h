@@ -70,23 +70,26 @@ struct LGB_ENTRY_HEADER
    vec3 scale;
 };
 
-class LGB_MODEL_ENTRY
+class LGB_ENTRY
 {
 public:
    char* m_buf;
    uint32_t m_offset;
+   LGB_ENTRY_HEADER header;
 
-   LGB_MODEL_ENTRY()
+   LGB_ENTRY()
    {
       m_buf = nullptr;
       m_offset = 0;
+      memset( &header, 0, sizeof( header ) );
    };
-   LGB_MODEL_ENTRY( char* buf, uint32_t offset )
+   LGB_ENTRY( char* buf, uint32_t offset )
    {
       m_buf = buf;
       m_offset = offset;
+      header = *reinterpret_cast< LGB_ENTRY_HEADER* >( buf + offset );
    };
-   virtual ~LGB_MODEL_ENTRY() {};
+   virtual ~LGB_ENTRY() {};
 };
 
 
@@ -102,7 +105,7 @@ struct LGB_BGPARTS_HEADER : public LGB_ENTRY_HEADER
    uint32_t unknown9;
 };
 
-class LGB_BGPARTS_ENTRY : public LGB_MODEL_ENTRY
+class LGB_BGPARTS_ENTRY : public LGB_ENTRY
 {
 public:
    LGB_BGPARTS_HEADER header;
@@ -110,7 +113,7 @@ public:
    std::string modelFileName;
    std::string collisionFileName;
    LGB_BGPARTS_ENTRY() {};
-   LGB_BGPARTS_ENTRY( char* buf, uint32_t offset )
+   LGB_BGPARTS_ENTRY( char* buf, uint32_t offset ) : LGB_ENTRY( buf, offset )
    {
       header = *reinterpret_cast<LGB_BGPARTS_HEADER*>( buf + offset );
       name = std::string( buf + offset + header.nameOffset );
@@ -125,14 +128,14 @@ struct LGB_GIMMICK_HEADER : public LGB_ENTRY_HEADER
    char unknownBytes[100];
 };
 
-class LGB_GIMMICK_ENTRY : public LGB_MODEL_ENTRY
+class LGB_GIMMICK_ENTRY : public LGB_ENTRY
 {
 public:
    LGB_GIMMICK_HEADER header;
    std::string name;
    std::string gimmickFileName;
 
-   LGB_GIMMICK_ENTRY( char* buf, uint32_t offset )
+   LGB_GIMMICK_ENTRY( char* buf, uint32_t offset ) : LGB_ENTRY( buf, offset )
    {
       header = *reinterpret_cast<LGB_GIMMICK_HEADER*>( buf + offset );
       name = std::string( buf + offset + header.nameOffset );
@@ -147,13 +150,13 @@ struct LGB_ENPC_HEADER : public LGB_ENTRY_HEADER
    uint8_t unknown1[0x24];
 };
 
-class LGB_ENPC_ENTRY : public LGB_MODEL_ENTRY
+class LGB_ENPC_ENTRY : public LGB_ENTRY
 {
 public:
    LGB_ENPC_HEADER header;
    std::string name;
 
-   LGB_ENPC_ENTRY( char* buf, uint32_t offset )
+   LGB_ENPC_ENTRY( char* buf, uint32_t offset ) : LGB_ENTRY( buf, offset )
    {
       header = *reinterpret_cast< LGB_ENPC_HEADER* >( buf + offset );
       name = std::string( buf + offset + header.nameOffset );
@@ -167,13 +170,13 @@ struct LGB_EOBJ_HEADER : public LGB_ENTRY_HEADER
    uint8_t unknown1[0x10];
 };
 
-class LGB_EOBJ_ENTRY : public LGB_MODEL_ENTRY
+class LGB_EOBJ_ENTRY : public LGB_ENTRY
 {
 public:
    LGB_EOBJ_HEADER header;
    std::string name;
 
-   LGB_EOBJ_ENTRY( char* buf, uint32_t offset )
+   LGB_EOBJ_ENTRY( char* buf, uint32_t offset ) : LGB_ENTRY( buf, offset )
    {
       header = *reinterpret_cast< LGB_EOBJ_HEADER* >( buf + offset );
       //std::cout << "\t " << header.eobjId << " " << name << " unknown: " << header.unknown << "\n";
@@ -203,7 +206,7 @@ struct LGB_GROUP
    LGB_FILE* parent;
    LGB_GROUP_HEADER header;
    std::string name;
-   std::vector< std::shared_ptr< LGB_MODEL_ENTRY > > entries;
+   std::vector< std::shared_ptr< LGB_ENTRY > > entries;
 
    LGB_GROUP( char* buf, LGB_FILE* parentStruct, uint32_t offset )
    {
@@ -236,12 +239,17 @@ struct LGB_GROUP
             {
                entries.push_back( std::make_shared< LGB_EOBJ_ENTRY >( buf, entryOffset ) );
             }
+            else if( type == LgbEntryType::MapRange )
+            {
+               entries.push_back( std::make_shared< LGB_EOBJ_ENTRY >( buf, entryOffset ) );
+            }
             /*
             else
             {
-               //entries[i] = nullptr;
+               entries[i] = nullptr;
             }
             */
+            
          }
          catch( std::exception& e )
          {
