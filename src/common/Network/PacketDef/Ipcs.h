@@ -82,11 +82,15 @@ namespace Packets {
       ServerNotice               = 0x00F0, // updated 4.2
       SetOnlineStatus            = 0x00F1, // updated 4.2
 
+      CountdownInitiate          = 0x00FB, // updated 4.2
+      CountdownCancel            = 0x00FC, // updated 4.2
+
       BlackList                  = 0x00FF, // updated 4.2
 
       LogMessage                 = 0x00D0,
 
       LinkshellList              = 0x0106, // updated 4.2
+      SetCharacterFCInfo         = 0x0114, // updated 4.2
       StatusEffectList           = 0x0125, // updated 4.2
       Effect                     = 0x0128, // updated 4.2
       GCAffiliation              = 0x00FC,
@@ -196,6 +200,9 @@ namespace Packets {
       LinkshellListHandler     = 0x00E8, // updated 4.2
 
       FcInfoReqHandler         = 0x011A, // updated 4.2
+
+      ReqCountdownInitiate     = 0x012C, // updated 4.2
+      ReqCountdownCancel       = 0x012D, // updated 4.2
 
       ZoneLineHandler          = 0x0130, // updated 4.2
       ActionHandler            = 0x0131, // updated 4.2
