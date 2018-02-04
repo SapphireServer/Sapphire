@@ -1633,5 +1633,7 @@ void Player::sendZonePackets()
    if( getLastPing() == 0 )
       sendQuestInfo();
 
+   getCurrentZone()->onEnterTerritory( getAsPlayer() );
+
    m_bMarkedForZoning = false;
 }
