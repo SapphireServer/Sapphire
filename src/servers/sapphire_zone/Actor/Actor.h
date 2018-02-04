@@ -215,7 +215,7 @@ public:
 
    bool isPlayer() const;
 
-   bool isMob() const;
+   bool isBNpc() const;
 
    bool isEventNpc() const;
 

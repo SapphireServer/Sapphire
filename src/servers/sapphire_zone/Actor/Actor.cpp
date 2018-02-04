@@ -68,7 +68,7 @@ bool Core::Entity::Actor::isPlayer() const
 }
 
 /*! \return true if the actor is of type mob */
-bool Core::Entity::Actor::isMob() const
+bool Core::Entity::Actor::isBNpc() const
 {
    return m_objKind == ObjKind::BattleNpc;
 }
@@ -416,18 +416,24 @@ void Core::Entity::Actor::sendStatusUpdate( bool toSelf )
 /*! \return pointer to this instance as PlayerPtr */
 Core::Entity::PlayerPtr Core::Entity::Actor::getAsPlayer()
 {
+   if( !isPlayer() )
+      return nullptr;
    return boost::dynamic_pointer_cast< Entity::Player, Entity::Actor >( shared_from_this() );
 }
 
 /*! \return pointer to this instance as BattleNpcPtr */
 Core::Entity::BattleNpcPtr Core::Entity::Actor::getAsBattleNpc()
 {
+   if( !isBNpc() )
+      return nullptr;
    return boost::reinterpret_pointer_cast< Entity::BattleNpc, Entity::Actor >( shared_from_this() );
 }
 
 /*! \return pointer to this instance as EventNpcPtr */
 Core::Entity::EventNpcPtr Core::Entity::Actor::getAsEventNpc()
 {
+   if( !isEventNpc() )
+      return nullptr;
    return boost::reinterpret_pointer_cast< Entity::EventNpc, Entity::Actor >( shared_from_this() );
 }
 

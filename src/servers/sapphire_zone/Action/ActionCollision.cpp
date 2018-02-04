@@ -32,7 +32,7 @@ bool ActionCollision::isActorApplicable( ActorPtr actorPtr, TargetFilter targetF
    case TargetFilter::Allies:
    {
       // todo: implement ally NPCs
-      actorApplicable = !actorPtr->isMob();
+      actorApplicable = !actorPtr->isBNpc();
       break;
    }
    case TargetFilter::Party:
@@ -43,7 +43,7 @@ bool ActionCollision::isActorApplicable( ActorPtr actorPtr, TargetFilter targetF
    }
    case TargetFilter::Enemies:
    {
-      actorApplicable = actorPtr->isMob();
+      actorApplicable = actorPtr->isBNpc();
       break;
    }
    }
