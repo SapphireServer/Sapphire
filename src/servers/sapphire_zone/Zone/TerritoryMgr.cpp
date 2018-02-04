@@ -275,12 +275,12 @@ void Core::TerritoryMgr::updateTerritoryInstances( uint32_t currentTime )
 {
    for( auto& zone : m_zoneSet )
    {
-      zone->runZoneLogic( currentTime );
+      zone->update( currentTime );
    }
 
    for( auto& zone : m_instanceZoneSet )
    {
-      zone->runZoneLogic( currentTime );
+      zone->update( currentTime );
    }
 }
 

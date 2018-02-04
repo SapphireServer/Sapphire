@@ -90,7 +90,6 @@ Core::Entity::Player::Player() :
 
 Core::Entity::Player::~Player()
 {
-   g_log.debug( "PlayerObj destroyed" );
 }
 
 // TODO: add a proper calculation based on race / job / level / gear

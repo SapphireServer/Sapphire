@@ -79,6 +79,10 @@ public:
    CellCache* getCellCacheAndCreate( uint32_t cellx, uint32_t celly );
 
    virtual void loadCellCache();
+   virtual uint32_t getTerritoryId();
+   virtual void onEnterTerritory( Entity::PlayerPtr pPlayer );
+   virtual void onLeaveTerritory( Entity::PlayerPtr pPlayer );
+   virtual void onUpdate( uint32_t currTime );
 
    uint8_t getNextWeather();
 
@@ -96,8 +100,6 @@ public:
 
    void queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range, Network::Packets::GamePacketPtr pPacketEntry );
 
-   virtual uint32_t getTerritoryId();
-
    Common::RegionType getType() const;
 
    uint16_t getGuId() const;
@@ -112,7 +114,7 @@ public:
    bool checkWeather();
    void updateBnpcs( int64_t tickCount );
 
-   bool runZoneLogic( uint32_t currTime );
+   bool update( uint32_t currTime );
 
 };
 

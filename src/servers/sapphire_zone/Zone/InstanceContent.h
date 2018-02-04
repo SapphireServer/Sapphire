@@ -25,6 +25,10 @@ public:
                     uint32_t instanceContentId );
    virtual ~InstanceContent();
 
+   void onEnterTerritory( Entity::PlayerPtr pPlayer ) override;
+   void onLeaveTerritory( Entity::PlayerPtr pPlayer ) override;
+   void onUpdate( uint32_t currTime ) override;
+
    Core::Data::ExdDataGenerated::InstanceContentPtr getInstanceContentInfo() const;
 
    uint32_t getInstanceContentId() const;

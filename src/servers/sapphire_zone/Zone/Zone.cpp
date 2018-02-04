@@ -304,7 +304,6 @@ void Zone::pushActor( Entity::ActorPtr pActor )
 
    if( pActor->isPlayer() )
    {
-      g_log.debug( "[Zone:" + m_internalName + "] Adding player [" + std::to_string( pActor->getId() ) + "]" );
       auto pPlayer = pActor->getAsPlayer();
 
       auto pSession = g_serverZone.getSession( pPlayer->getId() );
@@ -313,8 +312,10 @@ void Zone::pushActor( Entity::ActorPtr pActor )
       m_playerMap[pPlayer->getId()] = pPlayer;
       updateCellActivity( cx, cy, 2 );
 
+      onEnterTerritory( pPlayer );
+
    }
-   else if( pActor->isMob() )
+   else if( pActor->isBNpc() )
    {
 
       Entity::BattleNpcPtr pBNpc = pActor->getAsBattleNpc();
@@ -328,6 +329,7 @@ void Zone::pushActor( Entity::ActorPtr pActor )
       m_EventNpcMap[pENpc->getId()] = pENpc;
       pENpc->setPosition( pENpc->getPos() );
    }
+
 
 }
 
@@ -343,7 +345,6 @@ void Zone::removeActor( Entity::ActorPtr pActor )
    if( pActor->isPlayer() )
    {
 
-      g_log.debug( "[Zone:" + m_internalName + "] Removing player [" + std::to_string( pActor->getId() ) + "]" );
       // If it's a player and he's inside boundaries - update his nearby cells
       if( pActor->getPos().x <= _maxX && pActor->getPos().x >= _minX &&
           pActor->getPos().z <= _maxY && pActor->getPos().z >= _minY )
@@ -354,8 +355,10 @@ void Zone::removeActor( Entity::ActorPtr pActor )
       }
       m_playerMap.erase( pActor->getId() );
 
+      onLeaveTerritory( pActor->getAsPlayer() );
+
    }
-   else if( pActor->isMob() )
+   else if( pActor->isBNpc() )
       m_BattleNpcMap.erase( pActor->getId() );
 
    // remove from lists of other actors
@@ -502,7 +505,7 @@ void Zone::updateBnpcs( int64_t tickCount )
    }
 }
 
-bool Zone::runZoneLogic( uint32_t currTime )
+bool Zone::update( uint32_t currTime )
 {
    int64_t tickCount = Util::getTimeMs();
 
@@ -523,12 +526,11 @@ bool Zone::runZoneLogic( uint32_t currTime )
       }
 
       // this session is not linked to this area anymore, remove it from zone session list
-      if( ( !pSession->getPlayer()->getCurrentZone() ) || ( pSession->getPlayer()->getCurrentZone() != shared_from_this() ) )
+      if( ( !pSession->getPlayer()->getCurrentZone() )
+          || ( pSession->getPlayer()->getCurrentZone() != shared_from_this() ) )
       {
-         g_log.debug( "[Zone:" + m_internalName + "] removing session " + std::to_string( pSession->getId() ) );
-
-         if( pSession->getPlayer()->getCell() )
-            removeActor( pSession->getPlayer() );
+      //   if( pSession->getPlayer()->getCell() )
+      //      removeActor( pSession->getPlayer() );
 
          it = m_sessionSet.erase( it );
          continue;
@@ -549,6 +551,8 @@ bool Zone::runZoneLogic( uint32_t currTime )
    }
 
    updateBnpcs( tickCount );
+
+   onUpdate( currTime );
 
    return true;
 }
@@ -792,7 +796,7 @@ void Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
             }
 
          }
-         else if( ( pActor->isMob() || pActor->isEventNpc() ) && pCurAct->isPlayer() && pActor->isAlive() )
+         else if( ( pActor->isBNpc() || pActor->isEventNpc() ) && pCurAct->isPlayer() && pActor->isAlive() )
          {
             auto pPlayer = pCurAct->getAsPlayer();
             if( pPlayer->isLoadingComplete() )
@@ -809,6 +813,23 @@ void Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
          }
       }
    }
+}
+
+void Zone::onEnterTerritory( Entity::PlayerPtr pPlayer )
+{
+   g_log.debug( "Zone::onEnterTerritory: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryId() ) +
+                                                + ", Entity#" + std::to_string( pPlayer->getId() ) );
+}
+
+void Zone::onLeaveTerritory( Entity::PlayerPtr pPlayer )
+{
+   g_log.debug( "Zone::onLeaveTerritory: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryId() ) +
+                                                + ", Entity#" + std::to_string( pPlayer->getId() ) );
+}
+
+void Zone::onUpdate( uint32_t currTime )
+{
+
 }
 
 }
