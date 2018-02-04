@@ -25,13 +25,13 @@ public:
                     uint32_t instanceContentId );
    virtual ~InstanceContent();
 
-   boost::shared_ptr< Core::Data::InstanceContent > getInstanceContentInfo() const;
+   Core::Data::ExdDataGenerated::InstanceContentPtr getInstanceContentInfo() const;
 
    uint32_t getInstanceContentId() const;
 
 private:
    Event::DirectorPtr m_pDirector;
-   boost::shared_ptr< Core::Data::InstanceContent > m_instanceContentInfo;
+   Core::Data::ExdDataGenerated::InstanceContentPtr m_instanceContentInfo;
    uint32_t m_instanceContentId;
    InstanceContentState m_state;
 

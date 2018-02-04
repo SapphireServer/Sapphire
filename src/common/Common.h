@@ -523,7 +523,7 @@ namespace Common {
       LeveStartAnim = 0x66,
       LeveStartError = 0x67,
       DirectorEObjMod = 0x6A,
-      
+
       DirectorUpdate = 0x6D,
 
       ItemObtainMsg = 0x75,

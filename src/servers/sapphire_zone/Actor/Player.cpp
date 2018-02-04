@@ -356,6 +356,17 @@ void Core::Entity::Player::returnToHomepoint()
 
 void Core::Entity::Player::setZone( uint32_t zoneId )
 {
+   if( !g_territoryMgr.movePlayer( zoneId, getAsPlayer() ) )
+   {
+      // todo: this will require proper handling, for now just return the player to their previous area
+      m_pos = m_prevPos;
+      m_rot = m_prevRot;
+      m_zoneId = m_prevZoneId;
+
+      if( !g_territoryMgr.movePlayer( m_zoneId, getAsPlayer() ) )
+         return;
+   }
+
    sendZonePackets();
 }
 
@@ -1570,8 +1581,8 @@ void Player::sendZonePackets()
    }
 
    // set flags, will be reset automatically by zoning ( only on client side though )
-   setStateFlag( PlayerStateFlag::BetweenAreas );
-   setStateFlag( PlayerStateFlag::BetweenAreas1 );
+   //setStateFlag( PlayerStateFlag::BetweenAreas );
+   //setStateFlag( PlayerStateFlag::BetweenAreas1 );
 
    sendStats();
 

@@ -373,7 +373,7 @@ void Core::Network::GameConnection::initHandler( const Packets::GamePacket& inPa
    // init handler means this is a login procedure
    player.setIsLogin( true );
 
-   player.setZone( player.getZoneId() );
+   player.sendZonePackets();
 }
 
 
