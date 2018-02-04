@@ -2,11 +2,11 @@
 
 #include <common/Util/Util.h>
 #include <common/Common.h>
-#include <common/Exd/ExdData.h>
+#include <common/Exd/ExdDataGenerated.h>
 
 #include <common/Database/DatabaseDef.h>
 
-extern Core::Data::ExdData g_exdData;
+extern Core::Data::ExdDataGenerated g_exdDataGen;
 
 namespace Core {
 
@@ -151,7 +151,7 @@ namespace Core {
       std::vector< uint8_t > howTo( 32 );
       std::vector< uint8_t > aetherytes( 12 );
       std::vector< uint8_t > discovery( 411 );
-      std::vector< uint8_t > questComplete( 200 );
+      std::vector< uint8_t > questComplete( 396 );
       std::vector< uint8_t > unlocks( 64 );
       std::vector< uint8_t > mountGuide( 13 );
       std::vector< uint8_t > orchestrion( 38 );
@@ -220,7 +220,7 @@ namespace Core {
       // CharacterId, ClassIdx, Exp, Lvl
       auto stmtClass = g_charaDb.getPreparedStatement( Db::CharaDbStatements::CHARA_CLASS_INS );
       stmtClass->setInt( 1, m_id );
-      stmtClass->setInt( 2, g_exdData.m_classJobInfoMap[m_class].exp_idx );
+      stmtClass->setInt( 2, g_exdDataGen.getClassJob( m_class )->expArrayIndex );
       stmtClass->setInt( 3, 0 );
       stmtClass->setInt( 4, 1 );
       g_charaDb.directExecute( stmtClass );
@@ -292,14 +292,14 @@ namespace Core {
 
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       /// SETUP EQUIPMENT / STARTING GEAR
-      auto classJobInfo = g_exdData.m_classJobInfoMap[m_class];
-      uint32_t weaponId = classJobInfo.start_weapon_id;
+      auto classJobInfo = g_exdDataGen.getClassJob( m_class );
+      uint32_t weaponId = classJobInfo->itemStartingWeapon;
       uint64_t uniqueId = getNextUId64();
 
       uint8_t race = customize[CharaLook::Race];
       uint8_t gender = customize[CharaLook::Gender];
 
-      auto raceInfo = g_exdData.getRaceInfo( race );
+      auto raceInfo = g_exdDataGen.getRace( race );
 
       uint32_t body;
       uint32_t hands;
@@ -312,17 +312,17 @@ namespace Core {
 
       if( gender == 0 )
       {
-         body = raceInfo->male_body;
-         hands = raceInfo->male_hands;
-         legs = raceInfo->male_legs;
-         feet = raceInfo->male_feet;
+         body = raceInfo->rSEMBody;
+         hands = raceInfo->rSEMHands;
+         legs = raceInfo->rSEMLegs;
+         feet = raceInfo->rSEMFeet;
       }
       else
       {
-         body = raceInfo->female_body;
-         hands = raceInfo->female_hands;
-         legs = raceInfo->female_legs;
-         feet = raceInfo->female_feet;
+         body = raceInfo->rSEFBody;
+         hands = raceInfo->rSEFHands;
+         legs = raceInfo->rSEFLegs;
+         feet = raceInfo->rSEFFeet;
       }
 
       insertDbGlobalItem( weaponId, uniqueId );

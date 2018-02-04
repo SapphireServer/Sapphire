@@ -1,5 +1,5 @@
 #include <common/Logging/Logger.h>
-#include <common/Exd/ExdData.h>
+#include <common/Exd/ExdDataGenerated.h>
 #include <common/Config/XMLConfig.h>
 
 #include "NativeScriptManager.h"
@@ -8,7 +8,7 @@
 #include "Actor/Player.h"
 #include "Actor/BattleNpc.h"
 #include "ServerZone.h"
-#include "Event/Event.h"
+#include "Event/EventHandler.h"
 #include "Event/EventHelper.h"
 #include "StatusEffect/StatusEffect.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
@@ -26,7 +26,7 @@
 #include <libraries/external/watchdog/Watchdog.h>
 
 extern Core::Logger g_log;
-extern Core::Data::ExdData g_exdData;
+extern Core::Data::ExdDataGenerated g_exdDataGen;
 extern Core::ServerZone g_serverZone;
 
 Core::Scripting::ScriptManager::ScriptManager() :
@@ -74,6 +74,10 @@ bool Core::Scripting::ScriptManager::init()
 
 void Core::Scripting::ScriptManager::watchDirectories()
 {
+   auto shouldWatch = g_serverZone.getConfig()->getValue< bool >( "Settings.General.Scripts.HotSwap.Enabled", true );
+   if( !shouldWatch )
+      return;
+
    Watchdog::watchMany( g_serverZone.getConfig()->getValue< std::string >( "Settings.General.Scripts.Path", "./compiledscripts/" ) + "*" + m_nativeScriptManager->getModuleExtension(),
    [ this ]( const std::vector< ci::fs::path >& paths )
    {
@@ -143,159 +147,63 @@ bool Core::Scripting::ScriptManager::registerBnpcTemplate( std::string templateN
 
 bool Core::Scripting::ScriptManager::onTalk( Entity::Player& player, uint64_t actorId, uint32_t eventId )
 {
-   std::string eventName = "onTalk";
-   std::string objName = Event::getEventName( eventId );
-
-   player.sendDebug( "Actor: " +
-                     std::to_string( actorId ) + " -> " +
-                     std::to_string( Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) ) ) +
-                     " \neventId: " +
-                     std::to_string( eventId ) +
-                     " (0x" + boost::str( boost::format( "%|08X|" )
-                                          % static_cast< uint64_t >( eventId & 0xFFFFFFF ) ) + ")" );
 
    uint16_t eventType = eventId >> 16;
    uint32_t scriptId = eventId;
 
    // aethernet/aetherytes need to be handled separately
-   if( eventType == Common::EventType::Aetheryte )
+   if( eventType == Event::EventHandler::EventHandlerType::Aetheryte )
    {
-      auto aetherInfo = g_exdData.getAetheryteInfo( eventId & 0xFFFF );
+      auto aetherInfo = g_exdDataGen.getAetheryte( eventId & 0xFFFF );
       scriptId = EVENTSCRIPT_AETHERYTE_ID;
       if( !aetherInfo->isAetheryte )
          scriptId = EVENTSCRIPT_AETHERNET_ID;
    }
 
-   auto script = m_nativeScriptManager->getScript< EventScript >( ScriptType::ScriptedEvent, scriptId );
-   if( script )
-   {
-      player.sendDebug( "Calling: " + objName + "." + eventName );
-
-      player.eventStart( actorId, eventId, Event::Event::Talk, 0, 0 );
-
-      script->onTalk( eventId, player, actorId );
-
-      player.checkEvent( eventId );
-   }
-   else
-   {
-      if ( eventType == Common::EventType::Quest )
-      {
-         auto questInfo = g_exdData.getQuestInfo( eventId );
-         if ( questInfo )
-         {
-            player.sendUrgent( "Quest not implemented: " + questInfo->name + " (" + questInfo->name_intern + ")" );
-
-         }
-      }
-
+   auto script = m_nativeScriptManager->getScript< EventScript >( scriptId );
+   if( !script )
       return false;
-   }
-
+   script->onTalk( eventId, player, actorId );
    return true;
 }
 
 bool Core::Scripting::ScriptManager::onEnterTerritory( Entity::Player& player, uint32_t eventId,
                                                        uint16_t param1, uint16_t param2 )
 {
-   std::string eventName = "onEnterTerritory";
-   std::string objName = Event::getEventName( eventId );
-
-   player.sendDebug( "Calling: " + objName + "." + eventName + " - " + std::to_string( eventId ) );
-
-   auto script = m_nativeScriptManager->getScript< EventScript >( ScriptType::ScriptedEvent, eventId );
-   if( script )
-   {
-      player.eventStart( player.getId(), eventId, Event::Event::EnterTerritory, 0, player.getZoneId() );
-
-      script->onEnterZone( player, eventId, param1, param2 );
-
-      player.checkEvent( eventId );
-
-      return true;
-   }
-
-   return false;
+   auto script = m_nativeScriptManager->getScript< EventScript >( eventId );
+   if( !script )
+      return false;
+   script->onEnterZone( player, eventId, param1, param2 );
+   return true;
 }
 
 bool Core::Scripting::ScriptManager::onWithinRange( Entity::Player& player, uint32_t eventId, uint32_t param1,
                                                     float x, float y, float z )
 {
-
-   std::string eventName = "onWithinRange";
-   std::string objName = Event::getEventName( eventId );
-   player.sendDebug( "Calling: " + objName + "." + eventName + " - " + std::to_string( eventId ) + " p1: " + std::to_string( param1 ) );
-
-   auto script = m_nativeScriptManager->getScript< EventScript >( ScriptType::ScriptedEvent, eventId );
-   if( script )
-   {
-      player.eventStart( player.getId(), eventId, Event::Event::WithinRange, 1, param1 );
-
-      script->onWithinRange( player, eventId, param1, x, y, z );
-
-      player.checkEvent( eventId );
-
-      return true;
-   }
-
-   return false;
+   auto script = m_nativeScriptManager->getScript< EventScript >( eventId );
+   if( !script )
+      return false;
+   script->onWithinRange( player, eventId, param1, x, y, z );
+   return true;
 }
 
 bool Core::Scripting::ScriptManager::onOutsideRange( Entity::Player& player, uint32_t eventId, uint32_t param1,
                                                      float x, float y, float z )
 {
-   std::string eventName = "onOutsideRange";
-   std::string objName = Event::getEventName( eventId );
-   player.sendDebug( "Calling: " + objName + "." + eventName + " - " + std::to_string( eventId ) );
-
-   auto script = m_nativeScriptManager->getScript< EventScript >( ScriptType::ScriptedEvent, eventId );
-   if( script )
-   {
-      player.eventStart( player.getId(), eventId, Event::Event::WithinRange, 1, param1 );
-
-      script->onOutsideRange( player, eventId, param1, x, y, z );
-
-      player.checkEvent( eventId );
-
-      return true;
-   }
-
-   return false;
+   auto script = m_nativeScriptManager->getScript< EventScript >( eventId );
+   if( !script )
+      return false;
+   script->onOutsideRange( player, eventId, param1, x, y, z );
+   return true;
 }
 
 bool Core::Scripting::ScriptManager::onEmote( Entity::Player& player, uint64_t actorId,
                                               uint32_t eventId, uint8_t emoteId )
 {
-   std::string eventName = "onEmote";
-   std::string objName = Event::getEventName( eventId );
-
-   auto script = m_nativeScriptManager->getScript< EventScript >( ScriptType::ScriptedEvent, eventId );
-   if( script )
-   {
-      player.sendDebug( "Calling: " + objName + "." + eventName );
-
-      player.eventStart( actorId, eventId, Event::Event::Emote, 0, emoteId );
-
-      script->onEmote( actorId, eventId, emoteId, player );
-
-      player.checkEvent( eventId );
-   }
-   else
-   {
-      uint16_t eventType = eventId >> 16;
-
-      if( eventType == Common::EventType::Quest )
-      {
-         auto questInfo = g_exdData.getQuestInfo( eventId );
-         if( questInfo )
-         {
-            player.sendUrgent( "Quest not implemented: " + questInfo->name );
-            return false;
-         }
-      }
+   auto script = m_nativeScriptManager->getScript< EventScript >( eventId );
+   if( !script )
       return false;
-   }
-
+   script->onEmote( actorId, eventId, emoteId, player );
    return true;
 }
 
@@ -304,53 +212,16 @@ bool Core::Scripting::ScriptManager::onEventHandlerReturn( Entity::Player& playe
                                                            uint16_t param3 )
 {
 
-   player.sendDebug( "eventId: " +
-                     std::to_string( eventId ) +
-                     " ( 0x" + boost::str( boost::format( "%|08X|" ) % ( uint64_t ) ( eventId & 0xFFFFFFF ) ) + " ) " +
-                     " scene: " + std::to_string( subEvent ) +
-                     " p1: " + std::to_string( param1 ) +
-                     " p2: " + std::to_string( param2 ) +
-                     " p3: " + std::to_string( param3 ) );
-
-   try
-   {
-      auto pEvent = player.getEvent( eventId );
-      if( pEvent )
-      {
-         pEvent->setPlayedScene( false );
-         // try to retrieve a stored callback
-         auto eventCallback = pEvent->getEventReturnCallback();
-         // if there is one, proceed to call it
-         if( eventCallback )
-         {
-            eventCallback( player, eventId, param1, param2, param3 );
-            if( !pEvent->hasPlayedScene() )
-               player.eventFinish( eventId, 1 );
-            else
-               pEvent->setPlayedScene( false );
-         }
-            // else, finish the event.
-         else
-            player.eventFinish( eventId, 1 );
-      }
-   }
-   catch( std::exception& e )
-   {
-      player.sendNotice( e.what() );
-      return false;
-   }
-
-   return true;
+   return false;
 }
 
 bool Core::Scripting::ScriptManager::onEventHandlerTradeReturn( Entity::Player& player, uint32_t eventId,
                                                                 uint16_t subEvent, uint16_t param, uint32_t catalogId )
 {
-   auto script = m_nativeScriptManager->getScript< EventScript >( ScriptType::ScriptedEvent, eventId );
+   auto script = m_nativeScriptManager->getScript< EventScript >( eventId );
    if( script )
    {
       script->onEventHandlerTradeReturn( player, eventId, subEvent, param, catalogId );
-
       return true;
    }
 
@@ -364,13 +235,12 @@ bool Core::Scripting::ScriptManager::onEventItem( Entity::Player& player, uint32
    std::string objName = Event::getEventName( eventId );
    player.sendDebug( "Calling: " + objName + "." + eventName + " - " + std::to_string( eventId ) );
 
-   auto script = m_nativeScriptManager->getScript< EventScript >( ScriptType::ScriptedEvent, eventId );
+   auto script = m_nativeScriptManager->getScript< EventScript >( eventId );
    if( script )
    {
-      player.eventStart( targetId, eventId, Event::Event::Item, 0, 0 );
+      player.eventStart( targetId, eventId, Event::EventHandler::Item, 0, 0 );
 
       script->onEventItem( player, eventItemId, eventId, castTime, targetId );
-
       return true;
    }
 
@@ -391,7 +261,7 @@ bool Core::Scripting::ScriptManager::onMobKill( Entity::Player& player, uint16_t
 
       uint16_t questId = activeQuests->c.questId;
 
-      auto script = m_nativeScriptManager->getScript< EventScript >( ScriptType::ScriptedEvent, questId );
+      auto script = m_nativeScriptManager->getScript< EventScript >( questId );
       if( script )
       {
          std::string objName = Event::getEventName( 0x00010000 | questId );
@@ -407,17 +277,16 @@ bool Core::Scripting::ScriptManager::onMobKill( Entity::Player& player, uint16_t
 
 bool Core::Scripting::ScriptManager::onCastFinish( Entity::Player& player, Entity::ActorPtr pTarget, uint32_t actionId )
 {
-   auto script = m_nativeScriptManager->getScript< ActionScript >( ScriptType::ScriptedAction, actionId );
+   auto script = m_nativeScriptManager->getScript< ActionScript >( actionId );
 
    if( script )
       script->onCastFinish( player, *pTarget );
-
    return true;
 }
 
 bool Core::Scripting::ScriptManager::onStatusReceive( Entity::ActorPtr pActor, uint32_t effectId )
 {
-   auto script = m_nativeScriptManager->getScript< StatusEffectScript >( ScriptType::ScriptedStatusEffect, effectId );
+   auto script = m_nativeScriptManager->getScript< StatusEffectScript >( effectId );
 
    if( script )
    {
@@ -425,7 +294,6 @@ bool Core::Scripting::ScriptManager::onStatusReceive( Entity::ActorPtr pActor, u
          pActor->getAsPlayer()->sendDebug( "Calling status receive for statusid: " + std::to_string( effectId ) );
 
       script->onApply( *pActor );
-
       return true;
    }
 
@@ -434,14 +302,13 @@ bool Core::Scripting::ScriptManager::onStatusReceive( Entity::ActorPtr pActor, u
 
 bool Core::Scripting::ScriptManager::onStatusTick( Entity::ActorPtr pActor, Core::StatusEffect::StatusEffect& effect )
 {
-   auto script = m_nativeScriptManager->getScript< StatusEffectScript >( ScriptType::ScriptedStatusEffect, effect.getId() );
+   auto script = m_nativeScriptManager->getScript< StatusEffectScript >( effect.getId() );
    if( script )
    {
       if( pActor->isPlayer() )
          pActor->getAsPlayer()->sendDebug( "Calling status tick for statusid: " + std::to_string( effect.getId() ) );
 
       script->onTick( *pActor );
-
       return true;
    }
 
@@ -450,14 +317,13 @@ bool Core::Scripting::ScriptManager::onStatusTick( Entity::ActorPtr pActor, Core
 
 bool Core::Scripting::ScriptManager::onStatusTimeOut( Entity::ActorPtr pActor, uint32_t effectId )
 {
-   auto script = m_nativeScriptManager->getScript< StatusEffectScript >( ScriptType::ScriptedStatusEffect, effectId );
+   auto script = m_nativeScriptManager->getScript< StatusEffectScript >( effectId );
    if( script )
    {
       if( pActor->isPlayer() )
          pActor->getAsPlayer()->sendDebug( "Calling status timeout for statusid: " + std::to_string( effectId ) );
 
       script->onExpire( *pActor );
-
       return true;
    }
 
@@ -466,11 +332,10 @@ bool Core::Scripting::ScriptManager::onStatusTimeOut( Entity::ActorPtr pActor, u
 
 bool Core::Scripting::ScriptManager::onZoneInit( ZonePtr pZone )
 {
-   auto script = m_nativeScriptManager->getScript< ZoneScript >( ScriptType::ScriptedZone, pZone->getId() );
+   auto script = m_nativeScriptManager->getScript< ZoneScript >(pZone->getTerritoryId() );
    if( script )
    {
       script->onZoneInit();
-
       return true;
    }
 

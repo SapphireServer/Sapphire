@@ -37,7 +37,8 @@ namespace Core
 
    namespace Event
    {
-      TYPE_FORWARD( Event );
+      TYPE_FORWARD( Director );
+      TYPE_FORWARD( EventHandler );
    }
 
    namespace Action
@@ -72,7 +73,6 @@ namespace Core
    namespace Scripting
    {
       class NativeScriptManager;
-      typedef std::function< void( Entity::Player&, uint32_t, uint16_t, uint16_t, uint16_t ) > EventReturnCallback;
    }
 
    typedef std::function< void( Entity::Player&, uint32_t, uint64_t ) > ActionCallback;

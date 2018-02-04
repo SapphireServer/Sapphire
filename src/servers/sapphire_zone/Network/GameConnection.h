@@ -101,7 +101,14 @@ public:
    DECLARE_HANDLER( actionHandler );
    DECLARE_HANDLER( inventoryModifyHandler );
    DECLARE_HANDLER( discoveryHandler );
-   DECLARE_HANDLER( eventHandler );
+   DECLARE_HANDLER( eventHandlerTalk );
+   DECLARE_HANDLER( eventHandlerEmote );
+   DECLARE_HANDLER( eventHandlerWithinRange );
+   DECLARE_HANDLER( eventHandlerOutsideRange );
+   DECLARE_HANDLER( eventHandlerEnterTerritory );
+   DECLARE_HANDLER( eventHandlerReturn );
+   DECLARE_HANDLER( eventHandlerLinkshell );
+
    DECLARE_HANDLER( logoutHandler );
    
    DECLARE_HANDLER( cfDutyInfoRequest );

@@ -45,9 +45,9 @@ namespace Core
 
    namespace Event
    {
-      class Event;
+      class EventHandler;
 
-      typedef boost::shared_ptr<Event> EventPtr;
+      typedef boost::shared_ptr<EventHandler> EventPtr;
    }
 
    namespace Action

@@ -32,7 +32,7 @@ Core::Data::ExdData g_exdData;
 bool skipUnmapped = true;
 
 //const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
-const std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv" );
+std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv" );
 std::map< uint8_t, std::string > g_typeMap;
 
 
@@ -48,7 +48,9 @@ std::string generateIdListDecl( const std::string &exd )
 
 std::string generateDirectGetters( const std::string& exd )
 {
-   return "     boost::shared_ptr< " + exd + " > get" + exd + "( uint32_t " + exd + "Id );\n";
+         
+   return  "     using " + exd + "Ptr =  boost::shared_ptr< " + exd + " >;\n" +
+           "     " + exd + "Ptr get" + exd + "( uint32_t " + exd + "Id );\n";
 }
 
 std::string generateIdListGetter( const std::string &exd )
@@ -79,7 +81,7 @@ std::string generateDirectGetterDef( const std::string& exd )
 {
    std::string result = "";
    result =
-      "boost::shared_ptr< Core::Data::" + exd + " >\n"
+      "Core::Data::ExdDataGenerated::" + exd + "Ptr\n"
       "   Core::Data::ExdDataGenerated::get" + exd + "( uint32_t " + exd + "Id )\n"
       "{\n"
       "   try\n"
@@ -271,8 +273,16 @@ std::string generateConstructorsDecl( const std::string& exd )
    return result;
 }
 
-int main()
+int main( int argc, char** argv )
 {
+   g_log.init();
+   if( argc > 1 )
+   {
+      g_log.info( "using dat path: " + std::string( argv[1] ) );
+      datLocation = std::string( argv[1] );
+   }
+
+
    g_typeMap[0] = "std::string";
    g_typeMap[1] = "bool";
    g_typeMap[2] = "int8_t";
@@ -296,7 +306,6 @@ int main()
    using boost::property_tree::ptree;
    ptree m_propTree;
    boost::property_tree::read_json( "ex.json", m_propTree );
-   g_log.init();
 
    g_log.info( "Setting up EXD data" );
    if( !g_exdData.init( datLocation ) )

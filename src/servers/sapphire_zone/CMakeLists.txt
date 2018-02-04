@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.6)
 cmake_policy(SET CMP0015 NEW)
 cmake_policy(SET CMP0014 OLD)
 
+add_subdirectory("Script/Scripts")
+
 project(sapphire_zone)
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
 

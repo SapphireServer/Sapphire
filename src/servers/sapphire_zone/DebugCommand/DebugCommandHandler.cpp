@@ -8,7 +8,7 @@
 #include <common/Util/UtilMath.h>
 #include <common/Network/PacketContainer.h>
 #include <common/Logging/Logger.h>
-#include <common/Exd/ExdData.h>
+#include <common/Exd/ExdDataGenerated.h>
 #include <common/Database/DatabaseDef.h>
 
 #include "DebugCommand.h"
@@ -38,11 +38,13 @@
 
 #include <cinttypes>
 #include "Network/PacketWrappers/PlayerSpawnPacket.h"
+#include "Zone/TerritoryMgr.h"
 
 extern Core::Scripting::ScriptManager g_scriptMgr;
-extern Core::Data::ExdData g_exdData;
+extern Core::Data::ExdDataGenerated g_exdDataGen;
 extern Core::Logger g_log;
 extern Core::ServerZone g_serverZone;
+extern Core::TerritoryMgr g_territoryMgr;
 
 // instanciate and initialize commands
 Core::DebugCommandHandler::DebugCommandHandler()
@@ -59,6 +61,7 @@ Core::DebugCommandHandler::DebugCommandHandler()
    registerCommand( "unlock", &DebugCommandHandler::unlockCharacter, "Unlock character.", 1 );
    registerCommand( "help", &DebugCommandHandler::help, "Shows registered commands.", 0 );
    registerCommand( "script", &DebugCommandHandler::script, "Server script utilities.", 1 );
+   registerCommand( "instance", &DebugCommandHandler::instance, "Instance utilities", 1 );
 }
 
 // clear all loaded commands
@@ -280,6 +283,29 @@ void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost:
       player.dismount();
       player.mount( id );
    }
+   else if ( subCommand == "msqguide" )
+   {
+      int32_t id;
+      sscanf( params.c_str(), "%d", &id );
+
+      Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcMSQTrackerProgress > msqPacket(
+              player.getId());
+      msqPacket.data().id = id;
+      player.queuePacket( msqPacket );
+
+      player.sendDebug( "MSQ Guide updated " );
+   }
+   else if ( subCommand == "msqdone")
+   {
+      int32_t id;
+      sscanf( params.c_str(), "%d", &id );
+
+      Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcMSQTrackerComplete > msqPacket ( player.getId() );
+      msqPacket.data().id = id;
+      player.queuePacket( msqPacket );
+
+      player.sendDebug( "MSQ Guide updated " );
+   }
    else
    {
       player.sendUrgent( subCommand + " is not a valid SET command." );
@@ -479,7 +505,7 @@ void Core::DebugCommandHandler::get( char * data, Entity::Player& player, boost:
    if( ( subCommand == "pos" ) )
    {
 
-      int16_t map_id = g_exdData.m_zoneInfoMap[player.getCurrentZone()->getId()].map_id;
+      int16_t map_id = g_exdDataGen.getTerritoryType( player.getCurrentZone()->getTerritoryId() )->map;
 
       player.sendNotice( "Pos:\n" +
                          std::to_string( player.getPos().x ) + "\n" +
@@ -487,7 +513,7 @@ void Core::DebugCommandHandler::get( char * data, Entity::Player& player, boost:
                          std::to_string( player.getPos().z ) + "\n" +
                          std::to_string( player.getRotation() ) + "\nMapId: " +
                          std::to_string( map_id ) + "\nZoneID: " +
-                         std::to_string( player.getCurrentZone()->getId() ) + "\n" );
+                         std::to_string(player.getCurrentZone()->getTerritoryId() ) + "\n" );
    }
    else
    {
@@ -557,7 +583,7 @@ void Core::DebugCommandHandler::replay( char * data, Entity::Player& player, boo
       player.sendUrgent( subCommand + " is not a valid replay command." );
    }
 
-   
+
 }
 
 void Core::DebugCommandHandler::nudge( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
@@ -701,17 +727,70 @@ void Core::DebugCommandHandler::script( char* data, Entity::Player &player, boos
          player.sendDebug( "Queued script reload for script: " + params );
       }
    }
-   else if( subCommand == "build" || subCommand == "b" )
-   {
-      if( subCommand == params )
-         player.sendDebug( "Command failed: requires name of cmake target" );
-      else
-      {
-
-      }
-   }
    else
    {
       player.sendDebug( "Unknown script subcommand: " + subCommand );
+   }
+}
+
+void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, boost::shared_ptr< DebugCommand > command )
+{
+   std::string cmd( data ), params, subCommand;
+   auto cmdPos = cmd.find_first_of( ' ' );
+
+   if( cmdPos != std::string::npos )
+   {
+      params = cmd.substr( cmdPos + 1 );
+
+      auto p = params.find_first_of( ' ' );
+
+      if( p != std::string::npos )
+      {
+         subCommand = params.substr( 0, p );
+         params = params.substr( subCommand.length() + 1 );
+      }
+      else
+         subCommand = params;
+   }
+
+   if( subCommand == "create" || subCommand == "cr" )
+   {
+      uint32_t instanceContentId;
+      sscanf( params.c_str(), "%d", &instanceContentId );
+
+      auto instance = g_territoryMgr.createInstanceContent( instanceContentId );
+      if( instance )
+         player.sendDebug( "Created instance with id: " + std::to_string( instance->getGuId() ) + " -> " + instance->getName() );
+      else
+         player.sendDebug( "Failed to create instance with id: " + std::to_string( instanceContentId ) );
+   }
+   else if( subCommand == "remove" || subCommand == "rm" )
+   {
+      uint32_t terriId;
+      sscanf( params.c_str(), "%d", &terriId );
+
+      if( g_territoryMgr.removeTerritoryInstance( terriId ) )
+         player.sendDebug( "Removed instance with id: " + std::to_string( terriId ) );
+      else
+         player.sendDebug( "Failed to remove instance with id: " + std::to_string( terriId ) );
+   }
+   else if( subCommand == "return" || subCommand == "ret" )
+   {
+      player.exitInstance();
+   }
+   else if( subCommand == "festival" )
+   {
+      uint32_t festivalId;
+      sscanf( params.c_str(), "%d", &festivalId );
+
+      player.getCurrentZone()->setCurrentFestival( static_cast< uint16_t >( festivalId ) );
+   }
+   else if( subCommand == "disablefestival" )
+   {
+      Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcActorControl143 > actorControl( player.getId() );
+      actorControl.data().category = Core::Common::ActorControlType::DisableCurrentFestival;
+      player.queuePacket( actorControl );
+
+      player.getCurrentZone()->setCurrentFestival( 0 );
    }
 }

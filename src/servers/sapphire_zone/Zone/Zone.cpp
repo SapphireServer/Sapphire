@@ -6,14 +6,14 @@
 #include <common/Util/UtilMath.h>
 #include <common/Network/GamePacket.h>
 #include <common/Network/GamePacketNew.h>
-#include <common/Exd/ExdData.h>
+#include <common/Exd/ExdDataGenerated.h>
 #include <common/Network/CommonNetwork.h>
 #include <common/Network/PacketDef/Zone/ServerZoneDef.h>
 #include <common/Network/PacketContainer.h>
 #include <common/Database/DatabaseDef.h>
 
 #include "Zone.h"
-#include "ZoneMgr.h"
+#include "TerritoryMgr.h"
 
 #include "Session.h"
 #include "Actor/Actor.h"
@@ -33,7 +33,7 @@
 
 extern Core::Logger g_log;
 extern Core::ServerZone g_serverZone;
-extern Core::Data::ExdData g_exdData;
+extern Core::Data::ExdDataGenerated g_exdDataGen;
 extern Core::Scripting::ScriptManager g_scriptMgr;
 
 namespace Core {
@@ -42,30 +42,48 @@ namespace Core {
 * \brief
 */
 Zone::Zone()
-   : m_zoneId( 0 )
-   , m_layoutId( 0 )
-   , m_bPrivate( false )
+   : m_territoryId( 0 )
+   , m_guId( 0 )
    , m_type( Common::RegionType::normal )
    , m_currentWeather( static_cast< uint8_t >( Common::Weather::FairSkies ) )
    , m_weatherOverride( 0 )
    , m_lastMobUpdate( 0 )
+   , m_currentFestivalId( 0 )
 {
 }
 
-Zone::Zone( uint16_t zoneId, uint32_t layoutId, std::string name, std::string interName, bool bPrivate = false )
+Zone::Zone( uint16_t territoryId, uint32_t guId, const std::string& internalName, const std::string& placeName )
    : m_type( Common::RegionType::normal )
    , m_currentWeather( static_cast< uint8_t >( Common::Weather::FairSkies ) )
 {
-   m_layoutId = layoutId;
+   m_guId = guId;
 
-   m_zoneId = zoneId;
-   m_zoneCode = name;
-   m_zoneName = interName;
-   m_bPrivate = bPrivate;
+   m_territoryId = territoryId;
+   m_internalName = internalName;
+   m_placeName = placeName;
    m_lastMobUpdate = 0;
 
-   m_currentWeather = getNextWeather();
    m_weatherOverride = 0;
+   m_territoryTypeInfo = g_exdDataGen.getTerritoryType( territoryId );
+
+   uint8_t weatherRateId = m_territoryTypeInfo->weatherRate > g_exdDataGen.getWeatherRateIdList().size() ?
+                           uint8_t{ 0 } : m_territoryTypeInfo->weatherRate;
+
+   uint8_t sumPc = 0;
+   auto weatherRateFields = g_exdDataGen.m_WeatherRateDat.get_row( weatherRateId );
+   for( size_t i = 0; i < 16; )
+   {
+      int32_t weatherId = boost::get< int32_t >( weatherRateFields[i] );
+
+      if( weatherId == 0 )
+         break;
+
+      sumPc += boost::get< uint8_t >( weatherRateFields[i + 1] );
+      m_weatherRateMap[sumPc] = weatherId;
+      i += 2;
+   }
+
+   m_currentWeather = getNextWeather();
 }
 
 Zone::~Zone()
@@ -99,6 +117,16 @@ void Zone::setWeatherOverride( uint8_t weather )
 uint8_t Zone::getCurrentWeather() const
 {
    return m_currentWeather;
+}
+
+uint16_t Zone::getCurrentFestival() const
+{
+   return m_currentFestivalId;
+}
+
+void Zone::setCurrentFestival( uint16_t festivalId )
+{
+   m_currentFestivalId = festivalId;
 }
 
 CellCache* Zone::getCellCacheList( uint32_t cellx, uint32_t celly )
@@ -151,7 +179,7 @@ void Zone::loadCellCache()
                                "Look,"
                                "Models,"
                                "type "
-                               "FROM battlenpc WHERE ZoneId = " + std::to_string( getId() ) + ";" );
+                               "FROM battlenpc WHERE ZoneId = " + std::to_string(getTerritoryId() ) + ";" );
 
    std::vector< Entity::BattleNpcPtr > cache;
 
@@ -176,10 +204,7 @@ void Zone::loadCellCache()
       uint32_t modelId = pQR->getUInt( 17 );
       uint32_t type = pQR->getUInt( 18 );
 
-      Common::FFXIVARR_POSITION3 pos;
-      pos.x = posX;
-      pos.y = posY;
-      pos.z = posZ;
+      Common::FFXIVARR_POSITION3 pos{ posX, posY, posZ };
       Entity::BattleNpcPtr pBNpc( new Entity::BattleNpc( modelId, nameId, pos,
                                                          sizeId, type, level, behaviour, mobType ) );
       pBNpc->setRotation( static_cast< float >( rotation ) );
@@ -191,8 +216,8 @@ void Zone::loadCellCache()
    for( auto entry : cache )
    {
       // get cell position
-      uint32_t cellX = CellHandler< ZoneMgr >::getPosX( entry->getPos().x );
-      uint32_t cellY = CellHandler< ZoneMgr >::getPosY( entry->getPos().z );
+      uint32_t cellX = CellHandler< TerritoryMgr >::getPosX( entry->getPos().x );
+      uint32_t cellY = CellHandler< TerritoryMgr >::getPosY( entry->getPos().z );
 
       // find the right cell, create it if not existing yet
       if( m_pCellCache[cellX] == nullptr )
@@ -212,9 +237,7 @@ void Zone::loadCellCache()
 
 uint8_t Zone::getNextWeather()
 {
-   auto zoneInfo = g_exdData.m_zoneInfoMap[ getLayoutId() ];
-
-   uint32_t unixTime = static_cast< uint32_t >( time( nullptr ) );
+   uint32_t unixTime = static_cast< uint32_t >( Util::getTimeSeconds() );
    // Get Eorzea hour for weather start
    uint32_t bell = unixTime / 175;
    // Do the magic 'cause for calculations 16:00 is 0, 00:00 is 8 and 08:00 is 16
@@ -228,12 +251,12 @@ uint8_t Zone::getNextWeather()
    uint32_t step1 = ( calcBase << 0xB ) ^ calcBase;
    uint32_t step2 = ( step1 >> 8 ) ^ step1;
 
-   uint8_t rate = static_cast< uint8_t >(step2 % 0x64);
+   auto rate = static_cast< uint8_t >( step2 % 0x64 );
 
-   for( auto entry : zoneInfo.weather_rate_map )
+   for( auto entry : m_weatherRateMap )
    {
       uint8_t sRate = entry.first;
-      int32_t weatherId = entry.second;
+      auto weatherId = static_cast< uint8_t >( entry.second );
 
       if( rate <= sRate )
          return weatherId;
@@ -281,7 +304,7 @@ void Zone::pushActor( Entity::ActorPtr pActor )
 
    if( pActor->isPlayer() )
    {
-      g_log.debug( "[Zone:" + m_zoneCode + "] Adding player [" + std::to_string( pActor->getId() ) + "]" );
+      g_log.debug( "[Zone:" + m_internalName + "] Adding player [" + std::to_string( pActor->getId() ) + "]" );
       auto pPlayer = pActor->getAsPlayer();
 
       auto pSession = g_serverZone.getSession( pPlayer->getId() );
@@ -299,7 +322,7 @@ void Zone::pushActor( Entity::ActorPtr pActor )
       pBNpc->setPosition( pBNpc->getPos() );
 
    }
-   else if( pActor->getAsEventNpc() )
+   else if( pActor->isEventNpc() )
    {
       Entity::EventNpcPtr pENpc = pActor->getAsEventNpc();
       m_EventNpcMap[pENpc->getId()] = pENpc;
@@ -320,7 +343,7 @@ void Zone::removeActor( Entity::ActorPtr pActor )
    if( pActor->isPlayer() )
    {
 
-      g_log.debug( "[Zone:" + m_zoneCode + "] Removing player [" + std::to_string( pActor->getId() ) + "]" );
+      g_log.debug( "[Zone:" + m_internalName + "] Removing player [" + std::to_string( pActor->getId() ) + "]" );
       // If it's a player and he's inside boundaries - update his nearby cells
       if( pActor->getPos().x <= _maxX && pActor->getPos().x >= _minX &&
           pActor->getPos().z <= _maxY && pActor->getPos().z >= _minY )
@@ -372,9 +395,9 @@ void Zone::queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range,
    }
 }
 
-uint32_t Zone::getId()
+uint32_t Zone::getTerritoryId()
 {
-   return m_zoneId;
+   return m_territoryId;
 }
 
 Common::RegionType Zone::getType() const
@@ -382,9 +405,9 @@ Common::RegionType Zone::getType() const
    return m_type;
 }
 
-uint16_t Zone::getLayoutId() const
+uint16_t Zone::getGuId() const
 {
-   return m_layoutId;
+   return m_guId;
 }
 
 bool Zone::isInstance() const
@@ -394,12 +417,12 @@ bool Zone::isInstance() const
 
 const std::string& Zone::getName() const
 {
-   return m_zoneName;
+   return m_placeName;
 }
 
 const std::string& Zone::getInternalName() const
 {
-   return m_zoneCode;
+   return m_internalName;
 }
 
 std::size_t Zone::getPopCount() const
@@ -414,7 +437,7 @@ bool Zone::checkWeather()
       if ( m_weatherOverride != m_currentWeather )
       {
          m_currentWeather = m_weatherOverride;
-         g_log.debug( "[Zone:" + m_zoneCode + "] overriding weather to : " + std::to_string( m_weatherOverride ) );
+         g_log.debug( "[Zone:" + m_internalName + "] overriding weather to : " + std::to_string( m_weatherOverride ) );
          return true;
       }
    }
@@ -424,7 +447,7 @@ bool Zone::checkWeather()
       if ( nextWeather != m_currentWeather )
       {
          m_currentWeather = nextWeather;
-         g_log.debug( "[Zone:" + m_zoneCode + "] changing weather to : " + std::to_string( nextWeather ) );
+         g_log.debug( "[Zone:" + m_internalName + "] changing weather to : " + std::to_string( nextWeather ) );
          return true;
       }
    }
@@ -462,7 +485,7 @@ void Zone::updateBnpcs( int64_t tickCount )
       for( auto entry : m_BattleNpcMap )
       {
          Entity::BattleNpcPtr pBNpc = entry.second;
-         
+
          if( !pBNpc )
             continue;
 
@@ -472,27 +495,27 @@ void Zone::updateBnpcs( int64_t tickCount )
             m_BattleNpcDeadMap.insert( pBNpc );
             break;
          }
-            
+
          pBNpc->update( tickCount );
 
       }
    }
 }
 
-bool Zone::runZoneLogic()
+bool Zone::runZoneLogic( uint32_t currTime )
 {
    int64_t tickCount = Util::getTimeMs();
 
    bool changedWeather = checkWeather();
 
    auto it = m_sessionSet.begin();
-   
+
    // update sessions in this zone
    for( ; it != m_sessionSet.end(); )
    {
 
       auto pSession = ( *it );
-      
+
       if( !pSession )
       {
          it = m_sessionSet.erase( it );
@@ -502,7 +525,7 @@ bool Zone::runZoneLogic()
       // this session is not linked to this area anymore, remove it from zone session list
       if( ( !pSession->getPlayer()->getCurrentZone() ) || ( pSession->getPlayer()->getCurrentZone() != shared_from_this() ) )
       {
-         g_log.debug( "[Zone:" + m_zoneCode + "] removing session " + std::to_string( pSession->getId() ) );
+         g_log.debug( "[Zone:" + m_internalName + "] removing session " + std::to_string( pSession->getId() ) );
 
          if( pSession->getPlayer()->getCell() )
             removeActor( pSession->getPlayer() );
@@ -641,8 +664,8 @@ void Zone::changeActorPosition( Entity::ActorPtr pActor )
 
             pActor->removeInRangeActor( *iter2 );
 
-            // @TODO FIXME! 
-            // this break is more or less a hack, iteration will break otherwise after removing 
+            // @TODO FIXME!
+            // this break is more or less a hack, iteration will break otherwise after removing
             break;
          }
       }

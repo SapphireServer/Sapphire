@@ -2,7 +2,7 @@
 #include <common/Network/CommonNetwork.h>
 #include <common/Network/GamePacketNew.h>
 #include <common/Logging/Logger.h>
-#include <common/Exd/ExdData.h>
+#include <common/Exd/ExdDataGenerated.h>
 #include <common/Network/PacketContainer.h>
 
 #include <boost/format.hpp>
@@ -13,7 +13,6 @@
 #include "Zone/Zone.h"
 #include "Zone/ZonePosition.h"
 #include "ServerZone.h"
-#include "Zone/ZoneMgr.h"
 
 #include "Network/PacketWrappers/InitUIPacket.h"
 #include "Network/PacketWrappers/PingPacket.h"
@@ -37,8 +36,7 @@
 
 extern Core::Logger g_log;
 extern Core::ServerZone g_serverZone;
-extern Core::ZoneMgr g_zoneMgr;
-extern Core::Data::ExdData g_exdData;
+extern Core::Data::ExdDataGenerated g_exdDataGen;
 extern Core::DebugCommandHandler g_gameCommandMgr;
 
 using namespace Core::Common;
@@ -196,22 +194,21 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
 
             player.unsetStateFlag( PlayerStateFlag::BetweenAreas );
             player.unsetStateFlag( PlayerStateFlag::BetweenAreas1 );
-            player.sendStateFlags();
             break;
         }
 
         case 0xCA: // Teleport
         {
             // TODO: only register this action if enough gil is in possession
-            auto targetAetheryte = g_exdData.getAetheryteInfo( param11 );
+            auto targetAetheryte = g_exdDataGen.getAetheryte( param11 );
 
             if( targetAetheryte )
             {
-                auto fromAetheryte = g_exdData.getAetheryteInfo( g_exdData.m_zoneInfoMap[player.getZoneId()].aetheryte_index );
+               auto fromAetheryte = g_exdDataGen.getAetheryte( g_exdDataGen.getTerritoryType( player.getZoneId() )->aetheryte );
 
                 // calculate cost - does not apply for favorite points or homepoints neither checks for aether tickets
-                auto cost = static_cast< uint16_t > ( ( sqrt( pow( fromAetheryte->map_coord_x - targetAetheryte->map_coord_x, 2 ) +
-                                    pow( fromAetheryte->map_coord_y - targetAetheryte->map_coord_y, 2 ) ) / 2 ) + 100 );
+                auto cost = static_cast< uint16_t > ( ( sqrt( pow( fromAetheryte->aetherstreamX - targetAetheryte->aetherstreamX, 2 ) +
+                                    pow( fromAetheryte->aetherstreamY - targetAetheryte->aetherstreamY, 2 ) ) / 2 ) + 100 );
 
                 // cap at 999 gil
                 cost = cost > uint16_t{999} ? uint16_t{999} : cost;

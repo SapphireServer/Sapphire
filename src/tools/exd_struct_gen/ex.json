@@ -1,5 +1,5 @@
 {
-  "version": "2017.11.15.0000.0000",
+  "version": "2018.01.25.0000.0000",
   "sheets": [
     {
       "sheet": "Achievement",
@@ -138,63 +138,63 @@
           }
         },
         {
-          "index": 11,
+          "index": 12,
           "name": "ClassJobLevel"
         },
         {
-          "index": 12,
+          "index": 13,
           "name": "IsRoleAction"
         },
         {
-          "index": 13,
+          "index": 14,
           "name": "Range"
         },
         {
-          "index": 14,
+          "index": 15,
           "name": "CanTargetSelf"
         },
         {
-          "index": 15,
+          "index": 16,
           "name": "CanTargetParty"
         },
         {
-          "index": 16,
+          "index": 17,
           "name": "CanTargetFriendly"
         },
         {
-          "index": 17,
+          "index": 18,
           "name": "CanTargetHostile"
         },
         {
-          "index": 20,
+          "index": 21,
           "name": "TargetArea"
         },
         {
-          "index": 24,
+          "index": 25,
           "name": "CanTargetDead"
         },
         {
-          "index": 26,
+          "index": 27,
           "name": "CastType"
         },
         {
-          "index": 27,
+          "index": 28,
           "name": "EffectRange"
         },
         {
-          "index": 28,
+          "index": 29,
           "name": "XAxisModifier"
         },
         {
-          "index": 30,
+          "index": 31,
           "name": "Cost{Type}"
         },
         {
-          "index": 31,
+          "index": 32,
           "name": "Cost"
         },
         {
-          "index": 34,
+          "index": 35,
           "name": "Action{Combo}",
           "converter": {
             "type": "link",
@@ -202,23 +202,23 @@
           }
         },
         {
-          "index": 35,
+          "index": 36,
           "name": "PreservesCombo"
         },
         {
-          "index": 36,
+          "index": 37,
           "name": "Cast<100ms>"
         },
         {
-          "index": 37,
+          "index": 38,
           "name": "Recast<100ms>"
         },
         {
-          "index": 38,
+          "index": 39,
           "name": "CooldownGroup"
         },
         {
-          "index": 39,
+          "index": 40,
           "name": "AttackType",
           "converter": {
             "type": "link",
@@ -226,11 +226,11 @@
           }
         },
         {
-          "index": 40,
+          "index": 41,
           "name": "Aspect"
         },
         {
-          "index": 41,
+          "index": 42,
           "name": "ActionProcStatus",
           "converter": {
             "type": "link",
@@ -238,7 +238,7 @@
           }
         },
         {
-          "index": 42,
+          "index": 43,
           "name": "Status{GainSelf}",
           "converter": {
             "type": "link",
@@ -246,14 +246,14 @@
           }
         },
         {
-          "index": 43,
+          "index": 44,
           "name": "ActionData",
           "converter": {
             "type": "generic"
           }
         },
         {
-          "index": 44,
+          "index": 45,
           "name": "ClassJobCategory",
           "converter": {
             "type": "link",
@@ -261,11 +261,11 @@
           }
         },
         {
-          "index": 47,
+          "index": 48,
           "name": "AffectsPosition"
         },
         {
-          "index": 48,
+          "index": 49,
           "name": "Omen",
           "converter": {
             "type": "link",
@@ -273,7 +273,7 @@
           }
         },
         {
-          "index": 49,
+          "index": 50,
           "name": "IsPvP"
         }
       ]
@@ -531,6 +531,10 @@
             "type": "link",
             "target": "TerritoryType"
           }
+        },
+        {
+          "index": 11,
+          "name": "Destination"
         },
         {
           "index": 15,
@@ -1046,11 +1050,11 @@
           }
         },
         {
-          "index": 11,
+          "index": 10,
           "name": "Name"
         },
         {
-          "index": 19,
+          "index": 18,
           "name": "Name{Relation}"
         }
       ]
@@ -1442,18 +1446,6 @@
       ]
     },
     {
-      "sheet": "ChainBonus",
-      "definitions": [
-        {
-          "name": "Bonus<%>"
-        },
-        {
-          "index": 1,
-          "name": "Timeout<s>"
-        }
-      ]
-    },
-    {
       "sheet": "CharaMakeCustomize",
       "definitions": [
         {
@@ -1679,8 +1671,16 @@
           }
         },
         {
+          "index": 4,
+          "name": "ExpArrayIndex"
+        },
+        {
           "index": 9,
           "name": "Modifier{HitPoints}"
+        },
+        {
+          "index": 10,
+          "name": "Modifier{ManaPoints}"
         },
         {
           "index": 11,
@@ -2336,10 +2336,11 @@
       "sheet": "ContentFinderCondition",
       "definitions": [
         {
+          "index": 1,
           "name": "ContentIndicator"
         },
         {
-          "index": 1,
+          "index": 2,
           "name": "InstanceContent",
           "converter": {
             "type": "link",
@@ -2347,7 +2348,7 @@
           }
         },
         {
-          "index": 5,
+          "index": 7,
           "name": "ContentMemberType",
           "converter": {
             "type": "link",
@@ -2355,15 +2356,23 @@
           }
         },
         {
-          "index": 8,
-          "name": "ClassJobLevel"
+          "index": 13,
+          "name": "ClassJobLevel{Required}"
         },
         {
-          "index": 10,
+          "index": 14,
+          "name": "ClassJobLevel{Sync}"
+        },
+        {
+          "index": 15,
           "name": "ItemLevel{Required}"
         },
         {
-          "index": 29,
+          "index": 16,
+          "name": "ItemLevel{Sync}"
+        },
+        {
+          "index": 36,
           "name": "Icon",
           "converter": {
             "type": "icon"
@@ -2417,47 +2426,47 @@
           "name": "DutyType"
         },
         {
-          "index": 5,
+          "index": 6,
           "name": "IsInDutyFinder"
         },
         {
-          "index": 6,
-          "name": "RequireAllDuties"
-        },
-        {
-          "index": 9,
+          "index": 10,
           "name": "ItemLevel{Required}"
         },
         {
-          "index": 11,
+          "index": 12,
           "name": "Icon",
           "converter": {
             "type": "icon"
           }
         },
         {
-          "index": 13,
+          "index": 14,
           "name": "Reward{TomeA}"
         },
         {
-          "index": 14,
+          "index": 15,
           "name": "Reward{TomeB}"
         },
         {
-          "index": 15,
+          "index": 16,
           "name": "Reward{TomeC}"
         },
         {
-          "index": 18,
+          "index": 19,
           "name": "SortKey"
         },
         {
-          "index": 20,
+          "index": 21,
           "name": "ContentMemberType",
           "converter": {
             "type": "link",
             "target": "ContentMemberType"
           }
+        },
+        {
+          "index": 31,
+          "name": "RequireAllDuties"
         }
       ]
     },
@@ -3585,6 +3594,10 @@
           "converter": {
             "type": "icon"
           }
+        },
+        {
+          "index": 3,
+          "name": "CastTime"
         }
       ]
     },
@@ -3676,6 +3689,10 @@
             "type": "link",
             "target": "Quest"
           }
+        },
+        {
+          "index": 15,
+          "name": "CastTime"
         }
       ]
     },
@@ -3702,15 +3719,15 @@
       "defaultColumn": "Name",
       "definitions": [
         {
-          "index": 2,
+          "index": 3,
           "name": "ClassJobLevel"
         },
         {
-          "index": 3,
+          "index": 4,
           "name": "ClassJobLevel{Max}"
         },
         {
-          "index": 4,
+          "index": 5,
           "name": "EventItem",
           "converter": {
             "type": "link",
@@ -3718,33 +3735,33 @@
           }
         },
         {
-          "index": 9,
+          "index": 10,
           "name": "Icon{Objective}",
           "converter": {
             "type": "icon"
           }
         },
         {
-          "index": 10,
+          "index": 11,
           "name": "Icon{Map}",
           "converter": {
             "type": "icon"
           }
         },
         {
-          "index": 26,
+          "index": 27,
           "name": "Name"
         },
         {
-          "index": 27,
+          "index": 28,
           "name": "Description"
         },
         {
-          "index": 28,
+          "index": 29,
           "name": "Objective"
         },
         {
-          "index": 29,
+          "index": 30,
           "type": "repeat",
           "count": 3,
           "definition": {
@@ -3759,6 +3776,24 @@
       "definitions": [
         {
           "name": "Text"
+        },
+        {
+          "index": 4,
+          "name": "FCActivityCategory",
+          "converter": {
+            "type": "link",
+            "target": "FCActivityCategory"
+          }
+        }
+      ]
+    },
+    {
+      "sheet": "FCActivityCategory",
+      "defaultColumn": "Name",
+      "definitions": [
+        {
+          "index": 1,
+          "name": "Name"
         }
       ]
     },
@@ -3859,6 +3894,16 @@
       "defaultColumn": "Name",
       "definitions": [
         {
+          "name": "Name"
+        }
+      ]
+    },
+    {
+      "sheet": "FCProfile",
+      "defaultColumn": "Name",
+      "definitions": [
+        {
+          "index": 1,
           "name": "Name"
         }
       ]
@@ -4537,6 +4582,108 @@
       ]
     },
     {
+      "sheet": "GCRankGridaniaFemaleText",
+      "defaultColumn": "Name",
+      "definitions": [
+        {
+          "name": "Name"
+        },
+        {
+          "index": 2,
+          "name": "Plural"
+        },
+        {
+          "index": 8,
+          "name": "Name{Rank}"
+        }
+      ]
+    },
+    {
+      "sheet": "GCRankGridaniaMaleText",
+      "defaultColumn": "Name",
+      "definitions": [
+        {
+          "name": "Name"
+        },
+        {
+          "index": 2,
+          "name": "Plural"
+        },
+        {
+          "index": 8,
+          "name": "Name{Rank}"
+        }
+      ]
+    },
+    {
+      "sheet": "GCRankLimsaFemaleText",
+      "defaultColumn": "Name",
+      "definitions": [
+        {
+          "name": "Name"
+        },
+        {
+          "index": 2,
+          "name": "Plural"
+        },
+        {
+          "index": 8,
+          "name": "Name{Rank}"
+        }
+      ]
+    },
+    {
+      "sheet": "GCRankLimsaMaleText",
+      "defaultColumn": "Name",
+      "definitions": [
+        {
+          "name": "Name"
+        },
+        {
+          "index": 2,
+          "name": "Plural"
+        },
+        {
+          "index": 8,
+          "name": "Name{Rank}"
+        }
+      ]
+    },
+    {
+      "sheet": "GCRankUldahFemaleText",
+      "defaultColumn": "Name",
+      "definitions": [
+        {
+          "name": "Name"
+        },
+        {
+          "index": 2,
+          "name": "Plural"
+        },
+        {
+          "index": 8,
+          "name": "Name{Rank}"
+        }
+      ]
+    },
+    {
+      "sheet": "GCRankUldahMaleText",
+      "defaultColumn": "Name",
+      "definitions": [
+        {
+          "name": "Name"
+        },
+        {
+          "index": 2,
+          "name": "Plural"
+        },
+        {
+          "index": 8,
+          "name": "Name{Rank}"
+        }
+      ]
+    },
+    {
       "sheet": "GCScripShopCategory",
       "definitions": [
         {
@@ -4965,14 +5112,10 @@
         },
         {
           "index": 3,
-          "name": "ClassJobLevel{Sync}"
-        },
-        {
-          "index": 4,
           "name": "Name"
         },
         {
-          "index": 6,
+          "index": 5,
           "name": "BGM",
           "converter": {
             "type": "link",
@@ -4981,10 +5124,6 @@
         },
         {
           "index": 9,
-          "name": "ItemLevel{Sync}"
-        },
-        {
-          "index": 11,
           "name": "TerritoryType",
           "converter": {
             "type": "link",
@@ -4993,21 +5132,14 @@
         },
         {
           "index": 13,
-          "name": "Icon",
-          "converter": {
-            "type": "icon"
-          }
-        },
-        {
-          "index": 15,
           "name": "InstanceContentTextData{Boss}{Start}"
         },
         {
-          "index": 16,
+          "index": 14,
           "name": "InstanceContentTextData{Boss}{End}"
         },
         {
-          "index": 17,
+          "index": 15,
           "name": "BNpcBase{Boss}",
           "converter": {
             "type": "link",
@@ -5015,39 +5147,39 @@
           }
         },
         {
-          "index": 18,
+          "index": 16,
           "name": "InstanceContentTextData{Objective}{Start}"
         },
         {
-          "index": 19,
+          "index": 17,
           "name": "InstanceContentTextData{Objective}{End}"
         },
         {
-          "index": 20,
+          "index": 18,
           "name": "SortKey"
         },
         {
-          "index": 23,
+          "index": 21,
           "name": "NewPlayerBonusA"
         },
         {
-          "index": 24,
+          "index": 22,
           "name": "NewPlayerBonusB"
         },
         {
-          "index": 26,
+          "index": 24,
           "name": "FinalBossCurrencyA"
         },
         {
-          "index": 27,
+          "index": 25,
           "name": "FinalBossCurrencyB"
         },
         {
-          "index": 28,
+          "index": 26,
           "name": "FinalBossCurrencyC"
         },
         {
-          "index": 34,
+          "index": 32,
           "type": "repeat",
           "count": 5,
           "definition": {
@@ -5060,7 +5192,7 @@
           }
         },
         {
-          "index": 39,
+          "index": 37,
           "type": "repeat",
           "count": 5,
           "definition": {
@@ -5073,7 +5205,7 @@
           }
         },
         {
-          "index": 44,
+          "index": 42,
           "type": "repeat",
           "count": 5,
           "definition": {
@@ -5086,7 +5218,7 @@
           }
         },
         {
-          "index": 54,
+          "index": 52,
           "name": "InstanceContentBuff",
           "converter": {
             "type": "link",
@@ -5094,7 +5226,7 @@
           }
         },
         {
-          "index": 58,
+          "index": 56,
           "name": "PartyCondition"
         }
       ]
@@ -5699,14 +5831,6 @@
           }
         },
         {
-          "index": 13,
-          "name": "JournalCategory",
-          "converter": {
-            "type": "link",
-            "target": "JournalGenre"
-          }
-        },
-        {
           "index": 15,
           "name": "PlaceName{StartZone}",
           "converter": {
@@ -5857,6 +5981,10 @@
             "type": "link",
             "target": "Map"
           }
+        },
+        {
+          "index": 8,
+          "name": "EventId"
         },
         {
           "index": 9,
@@ -6129,12 +6257,20 @@
           }
         },
         {
+          "index": 12,
+          "name": "DiscoveryIndex"
+        },
+        {
           "index": 14,
           "name": "TerritoryType",
           "converter": {
             "type": "link",
             "target": "TerritoryType"
           }
+        },
+        {
+          "index": 15,
+          "name": "DiscoveryArrayByte"
         }
       ]
     },
@@ -6519,7 +6655,7 @@
           "name": "IsFlying"
         },
         {
-          "index": 28,
+          "index": 17,
           "name": "RideBGM",
           "converter": {
             "type": "link",
@@ -6527,7 +6663,7 @@
           }
         },
         {
-          "index": 41,
+          "index": 30,
           "name": "Icon",
           "converter": {
             "type": "icon"
@@ -6717,15 +6853,24 @@
       "defaultColumn": "Name",
       "definitions": [
         {
-          "index": 2,
+          "index": 3,
           "name": "Name"
         },
         {
-          "index": 3,
+          "index": 4,
           "name": "Icon",
           "converter": {
             "type": "icon"
           }
+        }
+      ]
+    },
+    {
+      "sheet": "Opening",
+      "defaultColumn": "Name",
+      "definitions": [
+        {
+          "name": "Name"
         }
       ]
     },
@@ -8616,6 +8761,10 @@
           }
         },
         {
+          "index": 9,
+          "name": "TerritoryIntendedUse"
+        },
+        {
           "index": 12,
           "name": "WeatherRate"
         },
@@ -8711,7 +8860,7 @@
           "name": "Name"
         },
         {
-          "index": 3,
+          "index": 4,
           "type": "repeat",
           "count": 10,
           "definition": {
@@ -8968,6 +9117,18 @@
           "converter": {
             "type": "link",
             "target": "DefaultTalk"
+          }
+        },
+        {
+          "index": 26,
+          "type": "repeat",
+          "count": 4,
+          "definition": {
+            "name": "Item{PossibleReward}",
+            "converter": {
+              "type": "link",
+              "target": "Item"
+            }
           }
         }
       ]

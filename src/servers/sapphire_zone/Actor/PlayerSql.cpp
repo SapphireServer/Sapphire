@@ -4,7 +4,7 @@
 #include <common/Util/UtilMath.h>
 #include <common/Config/XMLConfig.h>
 #include <common/Logging/Logger.h>
-#include <common/Exd/ExdData.h>
+#include <common/Exd/ExdDataGenerated.h>
 #include <common/Network/PacketContainer.h>
 #include <common/Common.h>
 #include <common/Database/DatabaseDef.h>
@@ -16,7 +16,7 @@
 
 #include "Player.h"
 
-#include "Zone/ZoneMgr.h"
+#include "Zone/TerritoryMgr.h"
 #include "Zone/Zone.h"
 
 #include "ServerZone.h"
@@ -30,8 +30,8 @@
 
 extern Core::Logger g_log;
 extern Core::ServerZone g_serverZone;
-extern Core::ZoneMgr g_zoneMgr;
-extern Core::Data::ExdData g_exdData;
+extern Core::TerritoryMgr g_territoryMgr;
+extern Core::Data::ExdDataGenerated g_exdDataGen;
 
 
 using namespace Core::Common;
@@ -47,7 +47,7 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
 
    stmt->setUInt( 1, charId );
    auto res = g_charaDb.query( stmt );
-   
+
    if( !res->next() )
       return false;
 
@@ -57,8 +57,10 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
    strcpy( m_name, name.c_str() );
 
    auto zoneId = res->getUInt( "TerritoryId" );
+   m_prevZoneId = res->getUInt( "OTerritoryId" );
+   m_prevZoneType = res->getUInt( "OTerritoryType" );
 
-   ZonePtr pCurrZone = g_zoneMgr.getZone( zoneId );
+   ZonePtr pCurrZone = g_territoryMgr.getZoneByTerriId( zoneId );
    m_zoneId = zoneId;
 
    // TODO: logic for instances needs to be added here
@@ -70,7 +72,7 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
 
       // default to new gridania
       // TODO: should probably just abort and mark character as corrupt
-      pCurrZone = g_zoneMgr.getZone( 132 );
+      pCurrZone = g_territoryMgr.getZoneByTerriId( 132 );
 
       m_pos.x = 0.0f;
       m_pos.y = 0.0f;
@@ -90,6 +92,11 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
    m_pos.y = res->getFloat( "PosY" );
    m_pos.z = res->getFloat( "PosZ" );
    setRotation( res->getFloat( "PosR" ) );
+
+   m_prevPos.x = res->getFloat( "OPosX" );
+   m_prevPos.y = res->getFloat( "OPosY" );
+   m_prevPos.z = res->getFloat( "OPosZ" );
+   m_prevRot = res->getFloat( "OPosR" );
 
    // Model
 
@@ -155,7 +162,7 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
 
    auto orchestrion = res->getBlobVector( "Orchestrion" );
    memcpy( reinterpret_cast< char* >( m_orchestrion ), orchestrion.data(), orchestrion.size() );
-   
+
    auto gcRank = res->getBlobVector( "GrandCompanyRank" );
    memcpy( reinterpret_cast< char* >( m_gcRank ), gcRank.data(), gcRank.size() );
 
@@ -338,12 +345,12 @@ void Core::Entity::Player::updateSql()
    stmt->setDouble( 22, m_pos.z );
    stmt->setDouble( 23, getRotation() );
 
-   stmt->setInt( 24, 0 ); // OTerritoryType
-   stmt->setInt( 25, 0 ); // OTerritoryId
-   stmt->setDouble( 26, 0.0f );
-   stmt->setDouble( 27, 0.0f );
-   stmt->setDouble( 28, 0.0f );
-   stmt->setDouble( 29, 0.0f );
+   stmt->setInt( 24, m_prevZoneType ); // OTerritoryType
+   stmt->setInt( 25, m_prevZoneId ); // OTerritoryId
+   stmt->setDouble( 26, m_prevPos.x );
+   stmt->setDouble( 27, m_prevPos.y );
+   stmt->setDouble( 28, m_prevPos.z );
+   stmt->setDouble( 29, m_prevRot );
 
    stmt->setInt( 30, static_cast< uint8_t >( getClass() ) );
    stmt->setInt( 31, static_cast< uint8_t >( getStatus() ) );
@@ -426,7 +433,7 @@ void Core::Entity::Player::updateSql()
 
 void Core::Entity::Player::updateDbClass() const
 {
-   uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( getClass() )].exp_idx;
+   uint8_t classJobIndex = g_exdDataGen.getClassJob( static_cast<uint8_t>( getClass() ) )->expArrayIndex;
 
    //Exp = ?, Lvl = ? WHERE CharacterId = ? AND ClassIdx = ?
    auto stmtS = g_charaDb.getPreparedStatement( Db::CHARA_CLASS_UP );

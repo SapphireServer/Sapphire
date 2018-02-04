@@ -5,7 +5,6 @@
 
 #include "Player.h"
 
-#include "Zone/ZoneMgr.h"
 #include "Zone/Zone.h"
 
 #include "Network/PacketWrappers/ActorControlPacket142.h"

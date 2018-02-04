@@ -1,7 +1,7 @@
 #include "ActionTeleport.h"
 
 #include <common/Util/Util.h>
-#include <common/Exd/ExdData.h>
+#include <common/Exd/ExdDataGenerated.h>
 #include <common/Logging/Logger.h>
 
 #include "Network/PacketWrappers/ActorControlPacket142.h"
@@ -13,7 +13,7 @@ using namespace Core::Network;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-extern Core::Data::ExdData g_exdData;
+extern Core::Data::ExdDataGenerated g_exdDataGen;
 extern Core::Logger g_log;
 
 Core::Action::ActionTeleport::ActionTeleport()
@@ -26,7 +26,7 @@ Core::Action::ActionTeleport::ActionTeleport( Entity::ActorPtr pActor, uint16_t 
    m_startTime = 0;
    m_id = 5;
    m_handleActionType = HandleActionType::Teleport;
-   m_castTime = g_exdData.getActionInfo(5)->cast_time; // TODO: Add security checks.
+   m_castTime = g_exdDataGen.getAction( 5 )->cast100ms * 100; // TODO: Add security checks.
    m_pSource = pActor;
    m_bInterrupt = false;
    m_targetAetheryte = targetZone;
@@ -54,7 +54,6 @@ void Core::Action::ActionTeleport::onStart()
 
    m_pSource->sendToInRangeSet( castPacket, true );
    m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::Casting );
-   m_pSource->getAsPlayer()->sendStateFlags();
 
 }
 
@@ -75,7 +74,6 @@ void Core::Action::ActionTeleport::onFinish()
    pPlayer->removeCurrency( Inventory::CurrencyType::Gil, m_cost );
  
    pPlayer->unsetStateFlag( PlayerStateFlag::Casting );
-   pPlayer->sendStateFlags();
 
    // TODO: not sure if this ever gets sent
    //auto control = Network::Packets::Server::ActorControlPacket142( m_pSource->getId(), Common::ActorControlType::TeleportDone );
@@ -105,7 +103,6 @@ void Core::Action::ActionTeleport::onInterrupt()
       return;
 
    m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Casting );
-   m_pSource->getAsPlayer()->sendStateFlags();
 
    auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt,
                                          0x219, 0x04, m_id, 0 );

@@ -1,7 +1,7 @@
 #include <common/Common.h>
 #include <common/Network/PacketDef/Zone/ServerZoneDef.h>
 #include <common/Network/GamePacket.h>
-#include <common/Exd/ExdData.h>
+#include <common/Exd/ExdDataGenerated.h>
 #include <common/Network/PacketContainer.h>
 
 #include "Network/GameConnection.h"
@@ -12,7 +12,7 @@
 #include "Inventory/Inventory.h"
 #include "Player.h"
 
-extern Core::Data::ExdData g_exdData;
+extern Core::Data::ExdDataGenerated g_exdDataGen;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -979,7 +979,7 @@ void Core::Entity::Player::sendQuestInfo()
    queuePacket( pe_qa );
 
    ZoneChannelPacket< FFXIVIpcQuestCompleteList > pe_qc( getId() );
-   memcpy( pe_qc.data().questCompleteMask, m_questCompleteFlags, 200 );
+   memcpy( pe_qc.data().questCompleteMask, m_questCompleteFlags, sizeof( m_questCompleteFlags ) );
    queuePacket( pe_qc );
 
    sendQuestTracker();
@@ -1015,24 +1015,24 @@ void Core::Entity::Player::removeQuestsCompleted( uint32_t questId )
 bool Core::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t optionalChoice )
 {
    uint32_t playerLevel = getLevel();
-   auto questInfo = g_exdData.getQuestInfo( questId );
+   auto questInfo = g_exdDataGen.getQuest( questId );
    
 
    if( !questInfo )
       return false;
 
-   auto paramGrowth = g_exdData.m_paramGrowthInfoMap[questInfo->quest_level];
+   auto paramGrowth = g_exdDataGen.getParamGrow( questInfo->classJobLevel0 );
 
    // TODO: use the correct formula, this one is wrong
-   uint32_t exp = ( questInfo->reward_exp_factor * paramGrowth.quest_exp_mod * ( 45 + 5 * questInfo->quest_level) ) / 100;
-   exp = exp + ( questInfo->reward_exp_factor / 100 ) * 10000;
+   uint32_t exp = ( questInfo->expFactor * paramGrowth->questExpModifier * ( 45 + 5 * questInfo->classJobLevel0 ) ) / 100;
+   exp = exp + ( questInfo->expFactor / 100 ) * 10000;
 
-   exp = questInfo->reward_exp_factor;
+   exp = questInfo->expFactor;
 
-   auto rewardItemCount = questInfo->reward_item.size();
-   uint16_t optionalItemCount = questInfo->reward_item_optional.size() > 0 ? 1 : 0;
+   auto rewardItemCount = questInfo->itemReward0.size();
+   uint16_t optionalItemCount = questInfo->itemReward1.size();
 
-   uint32_t gilReward = questInfo->reward_gil;
+   uint32_t gilReward = questInfo->gilReward;
 
    // TODO: check if there is room in inventory, else return false;
    if( exp > 0 )
@@ -1040,18 +1040,16 @@ bool Core::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t optional
 
    if( rewardItemCount > 0 )
    {
-      for( uint32_t i = 0; i < questInfo->reward_item.size(); i++ )
+      for( uint32_t i = 0; i < questInfo->itemReward0.size(); i++ )
       {
-         // TODO: add the correct amount of items instead of 1
-         addItem( -1, questInfo->reward_item.at( i ), questInfo->reward_item_count.at( i ) );
+         addItem( -1, questInfo->itemReward0.at( i ), questInfo->itemCountReward0.at( i ) );
       }
    }
 
    if( optionalItemCount > 0 )
    {
-      auto itemId = questInfo->reward_item_optional.at( optionalChoice );
-      // TODO: add the correct amount of items instead of 1
-      addItem( -1, itemId, questInfo->reward_item_optional_count.at( optionalChoice ) );
+      auto itemId = questInfo->itemReward1.at( optionalChoice );
+      addItem( -1, itemId, questInfo->itemCountReward1.at( optionalChoice ) );
    }
    
    if( gilReward > 0 )

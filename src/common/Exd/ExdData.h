@@ -37,6 +37,7 @@ namespace Core {
          std::map< uint8_t, int32_t> weather_rate_map;
 
          int32_t aetheryte_index;
+         uint8_t zone_type;
       };
 
       struct ClassJobInfo

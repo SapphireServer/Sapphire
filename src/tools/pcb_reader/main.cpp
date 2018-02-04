@@ -23,6 +23,8 @@
 
 std::string gamePath("C:\\Program Files (x86)\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv");
 std::unordered_map< uint32_t, std::string > eobjNameMap;
+xiv::dat::GameData* data1 = nullptr;
+xiv::exd::ExdData* eData = nullptr;
 
 enum class TerritoryTypeExdIndexes : size_t
 {
@@ -36,6 +38,12 @@ struct face
 {
    int32_t f1, f2, f3;
 };
+
+void initExd( const std::string& gamePath )
+{
+   data1 = data1 ? data1 : new xiv::dat::GameData( gamePath );
+   eData = eData ? eData : new xiv::exd::ExdData( *data1 );
+}
 
 int parseBlockEntry( char* data, std::vector<PCB_BLOCK_ENTRY>& entries, int gOff )
 {
@@ -95,14 +103,12 @@ int parseBlockEntry( char* data, std::vector<PCB_BLOCK_ENTRY>& entries, int gOff
 
 void dumpLevelExdEntries( uint32_t zoneId, const std::string& name = std::string() )
 {
-   xiv::dat::GameData dat( gamePath );
-   xiv::exd::ExdData eData( dat );
-   auto& cat = eData.get_category( "Level" );
+   auto& cat = eData->get_category( "Level" );
    auto exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::none ) );
 
    std::string fileName( name + "_" + std::to_string( zoneId ) + "_Level" + ".csv" );
    std::ofstream outfile( fileName, std::ios::trunc );
-
+   std::cout << "[Info] Writing level.exd entries to " << fileName << "\n";
    if( outfile.good() )
    {
       outfile.close();
@@ -198,9 +204,7 @@ std::string zoneNameToPath( const std::string& name )
 
 void loadEobjNames()
 {
-   xiv::dat::GameData dat( gamePath );
-   xiv::exd::ExdData eData( dat );
-   auto& cat = eData.get_category( "EObjName" );
+   auto& cat = eData->get_category( "EObjName" );
    auto exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::en ) );
    for( auto& row : exd.get_rows() )
    {
@@ -244,7 +248,6 @@ int main( int argc, char* argv[] )
 
    // todo: support expansions
    std::string zoneName = "r1f1";
-
    if( argc > 1 )
    {
       zoneName = argv[1];
@@ -254,24 +257,28 @@ int main( int argc, char* argv[] )
       }
    }
 
+   initExd( gamePath );
    try
    {
       const auto& zonePath = zoneNameToPath( zoneName );
       std::string listPcbPath( zonePath + "/collision/list.pcb" );
-      std::string bgLgbPath( zonePath + "/level/planmap.lgb" );
+      std::string bgLgbPath( zonePath + "/level/bg.lgb" );
+      std::string planmapLgbPath( zonePath + "/level/planmap.lgb" );
       std::string collisionFilePath( zonePath + "/collision/" );
       std::vector< char > section;
       std::vector< char > section1;
+      std::vector< char > section2;
 
 #ifndef STANDALONE
-      xiv::dat::GameData data1( gamePath );
-      xiv::exd::ExdData eData( data1 );
-      const xiv::dat::Cat& test = data1.get_category( "bg" );
+      const xiv::dat::Cat& test = data1->get_category( "bg" );
 
-      auto test_file = data1.get_file( bgLgbPath );
+      auto test_file = data1->get_file( bgLgbPath );
       section = test_file->access_data_sections().at( 0 );
 
-      auto test_file1 = data1.get_file( listPcbPath );
+      auto planmap_file = data1->get_file( planmapLgbPath );
+      section2 = planmap_file->access_data_sections().at( 0 );
+
+      auto test_file1 = data1->get_file( listPcbPath );
       section1 = test_file1->access_data_sections().at( 0 );
 #else
       {
@@ -279,9 +286,6 @@ int main( int argc, char* argv[] )
          readFileToBuffer( listPcbPath, section1 );
       }
 #endif
-
-      int32_t list_offset = *( uint32_t* )&section[0x18];
-      int32_t size = *( uint32_t* )&section[4];
 
       std::vector< std::string > stringList;
 
@@ -314,6 +318,9 @@ int main( int argc, char* argv[] )
       }
 
       LGB_FILE bgLgb( &section[0] );
+      LGB_FILE planmapLgb( &section2[0] );
+
+      std::vector< LGB_FILE > lgbList { bgLgb, planmapLgb };
       uint32_t max_index = 0;
 
       // dont bother if we cant write to a file
@@ -342,10 +349,15 @@ int main( int argc, char* argv[] )
          {
             try
             {
+               if( fileName.find( '.' ) == std::string::npos )
+                  return false;
+               else if( fileName.substr(fileName.find_last_of('.')) != ".pcb" )
+                  throw std::runtime_error( "Not a PCB file." );
+
                char* dataSection = nullptr;
                //std::cout << fileName << " ";
 #ifndef STANDALONE
-               auto file = data1.get_file( fileName );
+               auto file = data1->get_file( fileName );
                auto sections = file->get_data_sections();
                dataSection = &sections.at( 0 )[0];
 #else
@@ -397,7 +409,7 @@ int main( int argc, char* argv[] )
                char* dataSection = nullptr;
                //std::cout << fileName << " ";
 #ifndef STANDALONE
-               auto file = data1.get_file( fileName );
+               auto file = data1->get_file( fileName );
                auto sections = file->get_data_sections();
                dataSection = &sections.at( 0 )[0];
 #else
@@ -508,80 +520,83 @@ int main( int argc, char* argv[] )
          std::cout << "[Info] " << bgLgb.groups.size() << " groups " << "\n";
          uint32_t totalGroups = 0;
          uint32_t totalGroupEntries = 0;
-         for( const auto& group : bgLgb.groups )
+
+         for( const auto& lgb : lgbList )
          {
-            //std::cout << "\t" << group.name << " Size " << group.header.entryCount << "\n";
-            totalGroups++;
-            for( const auto& pEntry : group.entries )
+            for( const auto& group : bgLgb.groups )
             {
-               auto pGimmick = dynamic_cast< LGB_GIMMICK_ENTRY* >( pEntry.get() );
-               auto pBgParts = dynamic_cast< LGB_BGPARTS_ENTRY* >( pEntry.get() );
-               auto pEventObj = dynamic_cast< LGB_EOBJ_ENTRY* >( pEntry.get() );
-
-               std::string fileName( "" );
-               fileName.resize( 256 );
-               totalGroupEntries++;
-
-               // write files
-               auto writeOutput = [&]( const std::string& fileName, const vec3* scale, const vec3* rotation, const vec3* translation, const SGB_MODEL_ENTRY* pModel  = nullptr) -> bool
+               //std::cout << "\t" << group.name << " Size " << group.header.entryCount << "\n";
+               totalGroups++;
+               for( const auto& pEntry : group.entries )
                {
-                  {
-                     const auto& it = pcbFiles.find( fileName );
-                     if( it == pcbFiles.end() )
-                     {
-                        if( fileName.empty() || !loadPcbFile( fileName ) )
-                           return false;
-                        //std::cout << "\t\tLoaded PCB File " << pBgParts->collisionFileName << "\n";
-                     }
-                  }
-                  const auto& it = pcbFiles.find( fileName );
-                  if( it != pcbFiles.end() )
-                  {
-                     const auto& pcb_file = it->second;
-                     pushVerts( pcb_file, fileName, scale, rotation, translation, pModel );
-                  }
-                  return true;
-               };
+                  auto pGimmick = dynamic_cast< LGB_GIMMICK_ENTRY* >( pEntry.get() );
+                  auto pBgParts = dynamic_cast< LGB_BGPARTS_ENTRY* >( pEntry.get() );
+                  auto pEventObj = dynamic_cast< LGB_EOBJ_ENTRY* >( pEntry.get() );
 
-               if( pBgParts )
-               {
-                  fileName = pBgParts->collisionFileName;
-                  writeOutput( fileName, &pBgParts->header.scale, &pBgParts->header.rotation, &pBgParts->header.translation );
-               }
+                  std::string fileName( "" );
+                  fileName.resize( 256 );
+                  totalGroupEntries++;
 
-               // gimmick entry
-               if( pGimmick )
-               {
+                  // write files
+                  auto writeOutput = [&]( const std::string& fileName, const vec3* scale, const vec3* rotation, const vec3* translation, const SGB_MODEL_ENTRY* pModel  = nullptr) -> bool
                   {
-                     const auto& it = sgbFiles.find( pGimmick->gimmickFileName );
-                     if( it == sgbFiles.end() )
                      {
-                        //std::cout << "\tGIMMICK:\n\t\t" << pGimmick->name << " " << pGimmick->gimmickFileName << "\n";
-                        loadSgbFile( pGimmick->gimmickFileName );
-                     }
-                  }
-                  const auto& it = sgbFiles.find( pGimmick->gimmickFileName );
-                  if( it != sgbFiles.end() )
-                  {
-                     const auto& sgbFile = it->second;
-
-                     for( const auto& group : sgbFile.entries )
-                     {
-                        for( const auto& pEntry : group.entries )
+                        const auto& it = pcbFiles.find( fileName );
+                        if( it == pcbFiles.end() )
                         {
-                           auto pModel = dynamic_cast< SGB_MODEL_ENTRY* >( pEntry.get() );
-                           fileName = pModel->collisionFileName;
-                           writeOutput( fileName, &pGimmick->header.scale, &pGimmick->header.rotation, &pGimmick->header.translation, pModel );
+                           if( fileName.empty() || !loadPcbFile( fileName ) )
+                              return false;
+                           //std::cout << "\t\tLoaded PCB File " << pBgParts->collisionFileName << "\n";
+                        }
+                     }
+                     const auto& it = pcbFiles.find( fileName );
+                     if( it != pcbFiles.end() )
+                     {
+                        const auto& pcb_file = it->second;
+                        pushVerts( pcb_file, fileName, scale, rotation, translation, pModel );
+                     }
+                     return true;
+                  };
+
+                  if( pBgParts )
+                  {
+                     fileName = pBgParts->collisionFileName;
+                     writeOutput( fileName, &pBgParts->header.scale, &pBgParts->header.rotation, &pBgParts->header.translation );
+                  }
+
+                  // gimmick entry
+                  if( pGimmick )
+                  {
+                     {
+                        const auto& it = sgbFiles.find( pGimmick->gimmickFileName );
+                        if( it == sgbFiles.end() )
+                        {
+                           // std::cout << "\tGIMMICK:\n\t\t" << pGimmick->gimmickFileName << "\n";
+                           loadSgbFile( pGimmick->gimmickFileName );
+                        }
+                     }
+                     const auto& it = sgbFiles.find( pGimmick->gimmickFileName );
+                     if( it != sgbFiles.end() )
+                     {
+                        const auto& sgbFile = it->second;
+                        for( const auto& group : sgbFile.entries )
+                        {
+                           for( const auto& pEntry : group.entries )
+                           {
+                              auto pModel = dynamic_cast< SGB_MODEL_ENTRY* >( pEntry.get() );
+                              fileName = pModel->collisionFileName;
+                              writeOutput( fileName, &pGimmick->header.scale, &pGimmick->header.rotation, &pGimmick->header.translation, pModel );
+                           }
                         }
                      }
                   }
-               }
 
-               if( pEventObj )
-               {
-                  fileName = pEventObj->name.empty() ? eobjNameMap[pEventObj->header.eobjId] : pEventObj->name;
-                  writeEobjEntry( eobjOut, pEventObj, fileName );
-                  writeOutput( fileName, &pEventObj->header.scale, &pEventObj->header.rotation, &pEventObj->header.translation );
+                  if( pEventObj )
+                  {
+                     fileName = pEventObj->name.empty() ? eobjNameMap[pEventObj->header.eobjId] : pEventObj->name;
+                     writeEobjEntry( eobjOut, pEventObj, fileName );
+                     //writeOutput( fileName, &pEventObj->header.scale, &pEventObj->header.rotation, &pEventObj->header.translation );
+                  }
                }
             }
          }
@@ -598,5 +613,10 @@ int main( int argc, char* argv[] )
       std::cout << std::endl;
       std::cout << "[Info] " << "Usage: pcb_reader2 territory \"path/to/game/sqpack/ffxiv\" " << std::endl;
    }
+
+   if( eData )
+      delete eData;
+   if( data1 )
+      delete data1;
    return 0;
 }

@@ -76,17 +76,17 @@ Core::Network::GameConnection::GameConnection( Core::Network::HivePtr pHive,
 
    setZoneHandler( ClientZoneIpcType::InventoryModifyHandler,"InventoryModifyHandler",  &GameConnection::inventoryModifyHandler );
 
-   setZoneHandler( ClientZoneIpcType::TalkEventHandler,     "EventHandler",             &GameConnection::eventHandler );
-   setZoneHandler( ClientZoneIpcType::EmoteEventHandler,    "EventHandler",             &GameConnection::eventHandler );
-   setZoneHandler( ClientZoneIpcType::WithinRangeEventHandler, "EventHandler",          &GameConnection::eventHandler );
-   setZoneHandler( ClientZoneIpcType::OutOfRangeEventHandler, "EventHandler",           &GameConnection::eventHandler );
-   setZoneHandler( ClientZoneIpcType::EnterTeriEventHandler, "EventHandler",            &GameConnection::eventHandler );
+   setZoneHandler( ClientZoneIpcType::TalkEventHandler,     "EventHandlerTalk",         &GameConnection::eventHandlerTalk );
+   setZoneHandler( ClientZoneIpcType::EmoteEventHandler,    "EventHandlerEmote",        &GameConnection::eventHandlerEmote );
+   setZoneHandler( ClientZoneIpcType::WithinRangeEventHandler, "EventHandlerWithinRange", &GameConnection::eventHandlerWithinRange );
+   setZoneHandler( ClientZoneIpcType::OutOfRangeEventHandler, "EventHandlerOutsideRange", &GameConnection::eventHandlerOutsideRange );
+   setZoneHandler( ClientZoneIpcType::EnterTeriEventHandler, "EventHandlerEnterTeri",   &GameConnection::eventHandlerEnterTerritory );
 
-   setZoneHandler( ClientZoneIpcType::ReturnEventHandler,      "EventHandlerReturn",    &GameConnection::eventHandler );
-   setZoneHandler( ClientZoneIpcType::TradeReturnEventHandler, "EventHandlerReturn",    &GameConnection::eventHandler );
+   setZoneHandler( ClientZoneIpcType::ReturnEventHandler,      "EventHandlerReturn",    &GameConnection::eventHandlerReturn );
+   setZoneHandler( ClientZoneIpcType::TradeReturnEventHandler, "EventHandlerReturn",    &GameConnection::eventHandlerReturn );
 
-   setZoneHandler( ClientZoneIpcType::LinkshellEventHandler, "LinkshellEventHandler",   &GameConnection::eventHandler );
-   setZoneHandler( ClientZoneIpcType::LinkshellEventHandler1, "LinkshellEventHandler1", &GameConnection::eventHandler );
+   setZoneHandler( ClientZoneIpcType::LinkshellEventHandler, "LinkshellEventHandler",   &GameConnection::eventHandlerLinkshell );
+   setZoneHandler( ClientZoneIpcType::LinkshellEventHandler1, "LinkshellEventHandler1", &GameConnection::eventHandlerLinkshell );
 
    setZoneHandler( ClientZoneIpcType::CFDutyInfoHandler, "CFDutyInfoRequest",           &GameConnection::cfDutyInfoRequest );
    setZoneHandler( ClientZoneIpcType::CFRegisterDuty, "CFRegisterDuty",                 &GameConnection::cfRegisterDuty );

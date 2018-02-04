@@ -11,7 +11,7 @@
 #include <common/Network/Connection.h>
 #include <common/Network/Hive.h>
 
-#include <common/Exd/ExdData.h>
+#include <common/Exd/ExdDataGenerated.h>
 #include <common/Network/PacketContainer.h>
 #include <common/Database/DbLoader.h>
 #include <common/Database/CharaDbConnection.h>
@@ -21,7 +21,7 @@
 #include "Network/GameConnection.h"
 #include "Session.h"
 
-#include "Zone/ZoneMgr.h"
+#include "Zone/TerritoryMgr.h"
 
 #include "DebugCommand/DebugCommandHandler.h"
 
@@ -35,12 +35,13 @@
 #include <boost/make_shared.hpp>
 #include <boost/algorithm/string.hpp>
 #include <thread>
+#include <common/Util/Util.h>
 
 Core::Logger g_log;
 Core::DebugCommandHandler g_gameCommandMgr;
 Core::Scripting::ScriptManager g_scriptMgr;
-Core::Data::ExdData g_exdData;
-Core::ZoneMgr g_zoneMgr;
+Core::Data::ExdDataGenerated g_exdDataGen;
+Core::TerritoryMgr g_territoryMgr;
 Core::LinkshellMgr g_linkshellMgr;
 Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
 Core::Social::SocialMgr< Core::Social::FriendList > g_friendListMgr;
@@ -164,10 +165,10 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
       }
    }
 
-   g_log.info( "Setting up EXD data" );
-   if( !g_exdData.init( m_pConfig->getValue< std::string >( "Settings.General.DataPath", "" ) ) )
+   g_log.info( "Setting up generated EXD data" );
+   if( !g_exdDataGen.init( m_pConfig->getValue< std::string >( "Settings.General.DataPath", "" ) ) )
    {
-      g_log.fatal( "Error setting up EXD data " );
+      g_log.fatal( "Error setting up generated EXD data " );
       return false;
    }
 
@@ -206,15 +207,6 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
       return;
    }
 
-   g_exdData.loadZoneInfo();
-   g_exdData.loadClassJobInfo();
-   g_exdData.loadParamGrowInfo();
-   g_exdData.loadEventActionInfo();
-   g_exdData.loadActionInfo();
-   g_exdData.loadStatusEffectInfo();
-   g_exdData.loadAetheryteInfo();
-   g_exdData.loadTribeInfo();
-
    g_log.info( "LinkshellMgr: Caching linkshells" );
    if( !g_linkshellMgr.loadLinkshells() )
    {
@@ -229,8 +221,8 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
 
    g_scriptMgr.init();
 
-   g_log.info( "ZoneMgr: Setting up zones" );
-   g_zoneMgr.createZones();
+   g_log.info( "TerritoryMgr: Setting up zones" );
+   g_territoryMgr.init();
 
    std::vector< std::thread > thread_list;
    thread_list.emplace_back( std::thread( std::bind( &Network::Hive::Run, hive.get() ) ) );
@@ -263,11 +255,12 @@ void Core::ServerZone::mainLoop()
    {
       this_thread::sleep_for( chrono::milliseconds( 50 ) );
 
-      g_zoneMgr.updateZones();
+
+      auto currTime = Util::getTimeSeconds();
+
+      g_territoryMgr.updateTerritoryInstances( currTime );
 
       g_scriptMgr.update();
-
-      auto currTime = static_cast< uint32_t >( time( nullptr ) );
 
       lock_guard< std::mutex > lock( this->m_sessionMutex );
       for( auto sessionIt : this->m_sessionMapById )
@@ -294,7 +287,7 @@ void Core::ServerZone::mainLoop()
       auto it = this->m_sessionMapById.begin();
       for( ; it != this->m_sessionMapById.end(); )
       {
-         uint32_t diff = currTime - it->second->getLastDataTime();
+         auto diff = std::difftime( currTime, it->second->getLastDataTime() );
 
          auto pPlayer = it->second->getPlayer();
 
@@ -314,7 +307,8 @@ void Core::ServerZone::mainLoop()
          // remove sessions that simply timed out
          if( diff > 20 )
          {
-            g_log.info("[" + std::to_string(it->second->getId() ) + "] Session time out" );
+            g_log.info("[" + std::to_string( it->second->getId() ) + "] Session time out" );
+
             it->second->close();
             // if( it->second.unique() )
             {

@@ -4,14 +4,14 @@
 #include <common/Config/XMLConfig.h>
 #include <common/Network/GamePacket.h>
 #include <common/Logging/Logger.h>
-#include <common/Exd/ExdData.h>
+#include <common/Exd/ExdDataGenerated.h>
 #include <common/Network/PacketContainer.h>
 
 #include "Session.h"
 #include "Player.h"
 #include "BattleNpc.h"
 
-#include "Zone/ZoneMgr.h"
+#include "Zone/TerritoryMgr.h"
 #include "Zone/Zone.h"
 
 #include "ServerZone.h"
@@ -35,7 +35,7 @@
 #include "Inventory/Item.h"
 
 #include "Inventory/Inventory.h"
-#include "Event/Event.h"
+#include "Event/EventHandler.h"
 #include "Action/Action.h"
 #include "Action/EventAction.h"
 #include "Action/EventItemAction.h"
@@ -46,8 +46,8 @@
 
 extern Core::Logger g_log;
 extern Core::ServerZone g_serverZone;
-extern Core::ZoneMgr g_zoneMgr;
-extern Core::Data::ExdData g_exdData;
+extern Core::TerritoryMgr g_territoryMgr;
+extern Core::Data::ExdDataGenerated g_exdDataGen;
 extern Core::Scripting::ScriptManager g_scriptMgr;
 extern Core::Social::SocialMgr< Core::Social::FriendList > g_friendListMgr;
 
@@ -215,36 +215,27 @@ void Core::Entity::Player::calculateStats()
    uint8_t level = getLevel();
    uint8_t job = static_cast< uint8_t >( getClass() );
 
-   auto classInfoIt = g_exdData.m_classJobInfoMap.find( job );
-   auto tribeInfoIt = g_exdData.m_tribeInfoMap.find( tribe );
-   auto paramGrowthInfoIt = g_exdData.m_paramGrowthInfoMap.find( level );
-
-   if( tribeInfoIt == g_exdData.m_tribeInfoMap.end() ||
-       classInfoIt == g_exdData.m_classJobInfoMap.end() ||
-       paramGrowthInfoIt == g_exdData.m_paramGrowthInfoMap.end() )
-      return;
-
-   auto tribeInfo = tribeInfoIt->second;
-   auto classInfo = classInfoIt->second;
-   auto paramGrowthInfo = paramGrowthInfoIt->second;
+   auto classInfo = g_exdDataGen.getClassJob( job );
+   auto tribeInfo = g_exdDataGen.getTribe( tribe );
+   auto paramGrowthInfo = g_exdDataGen.getParamGrow( level );
 
    // TODO: put formula somewhere else...
    float base = Math::CalcStats::calculateBaseStat( getAsPlayer() );
 
-   m_baseStats.str =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_str ) / 100 ) + tribeInfo.mod_str );
-   m_baseStats.dex =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_dex ) / 100 ) + tribeInfo.mod_dex );
-   m_baseStats.vit =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_vit ) / 100 ) + tribeInfo.mod_vit );
-   m_baseStats.inte = static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_int ) / 100 ) + tribeInfo.mod_int );
-   m_baseStats.mnd =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_mnd ) / 100 ) + tribeInfo.mod_mnd );
-   m_baseStats.pie =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo.mod_pie ) / 100 ) + tribeInfo.mod_pie );
+   m_baseStats.str =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierStrength ) / 100 ) + tribeInfo->sTR );
+   m_baseStats.dex =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierDexterity ) / 100 ) + tribeInfo->dEX );
+   m_baseStats.vit =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierVitality ) / 100 ) + tribeInfo->vIT );
+   m_baseStats.inte = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierIntelligence ) / 100 ) + tribeInfo->iNT );
+   m_baseStats.mnd =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierMind ) / 100 ) + tribeInfo->mND );
+   m_baseStats.pie =  static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierPiety ) / 100 ) + tribeInfo->pIE );
 
-   m_baseStats.skillSpeed      = paramGrowthInfo.base_secondary;
-   m_baseStats.spellSpeed      = paramGrowthInfo.base_secondary;
-   m_baseStats.accuracy        = paramGrowthInfo.base_secondary;
-   m_baseStats.critHitRate     = paramGrowthInfo.base_secondary;
-   m_baseStats.attackPotMagic  = paramGrowthInfo.base_secondary;
-   m_baseStats.healingPotMagic = paramGrowthInfo.base_secondary;
-   m_baseStats.tenacity        = paramGrowthInfo.base_secondary;
+   m_baseStats.skillSpeed      = paramGrowthInfo->baseSpeed;
+   m_baseStats.spellSpeed      = paramGrowthInfo->baseSpeed;
+   m_baseStats.accuracy        = paramGrowthInfo->baseSpeed;
+   m_baseStats.critHitRate     = paramGrowthInfo->baseSpeed;
+   m_baseStats.attackPotMagic  = paramGrowthInfo->baseSpeed;
+   m_baseStats.healingPotMagic = paramGrowthInfo->baseSpeed;
+   m_baseStats.tenacity        = paramGrowthInfo->baseSpeed;
 
    m_baseStats.max_mp = Math::CalcStats::calculateMaxMp( getAsPlayer() );
 
@@ -309,7 +300,7 @@ uint64_t Core::Entity::Player::getFriendsListId() const
 
 void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
 {
-   auto data = g_exdData.getAetheryteInfo( aetheryteId );
+   auto data = g_exdDataGen.getAetheryte( aetheryteId );
 
    if( data == nullptr )
    {
@@ -317,9 +308,8 @@ void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
    }
 
    setStateFlag( PlayerStateFlag::BetweenAreas );
-   sendStateFlags();
 
-   auto z_pos = g_zoneMgr.getZonePosition( data->levelId );
+   auto z_pos = g_territoryMgr.getTerritoryPosition( data->destination );
 
    Common::FFXIVARR_POSITION3 pos;
    pos.x = 0;
@@ -333,30 +323,30 @@ void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
       rot = z_pos->getTargetRotation();
    }
 
-   sendDebug( "Teleport: " + data->placename + " " + data->placename_aethernet +
-               "(" + std::to_string( data->levelId ) + ")" );
+   sendDebug( "Teleport: " + g_exdDataGen.getPlaceName( data->placeName )->name + " " + g_exdDataGen.getPlaceName( data->aethernetName )->name +
+               "(" + std::to_string( data->territory ) + ")" );
 
    // TODO: this should be simplified and a type created in server_common/common.h.
    if( type == 1 ) // teleport
    {
-      prepareZoning( data->target_zone, true, 1, 112 );
+      prepareZoning( data->territory, true, 1, 112 ); // TODO: Really?
       sendToInRangeSet( ActorControlPacket142( getId(), ActorDespawnEffect, 0x04 ) );
       setZoningType( Common::ZoneingType::Teleport );
    }
    else if( type == 2 ) // aethernet
    {
-      prepareZoning( data->target_zone, true, 1, 112 );
+      prepareZoning( data->territory, true, 1, 112 );
       sendToInRangeSet( ActorControlPacket142( getId(), ActorDespawnEffect, 0x04 ) );
       setZoningType( Common::ZoneingType::Teleport );
    }
    else if( type == 3 ) // return
    {
-      prepareZoning( data->target_zone, true, 1, 111 );
+      prepareZoning( data->territory, true, 1, 111 );
       sendToInRangeSet( ActorControlPacket142( getId(), ActorDespawnEffect, 0x03 ) );
       setZoningType( Common::ZoneingType::Return );
    }
 
-   m_queuedZoneing = boost::make_shared< QueuedZoning >( data->target_zone, pos, Util::getTimeMs(), rot );
+   m_queuedZoneing = boost::make_shared< QueuedZoning >( data->territory, pos, Util::getTimeMs(), rot );
 
 
 }
@@ -375,105 +365,62 @@ void Core::Entity::Player::returnToHomepoint()
 
 void Core::Entity::Player::setZone( uint32_t zoneId )
 {
-   auto pPlayer = getAsPlayer();
-
-   auto pZone = g_zoneMgr.getZone( zoneId );
-
-
-   if( !pZone /*|| ( ( pZone == m_pCurrentZone ) && m_lastPing )*/ )
+   if( !g_territoryMgr.movePlayer( zoneId, getAsPlayer() ) )
    {
-      g_log.error( "Zone " + std::to_string( zoneId ) + " not found on this server." );
-      return;
+      // todo: this will require proper handling, for now just return the player to their previous area
+      m_pos = m_prevPos;
+      m_rot = m_prevRot;
+      m_zoneId = m_prevZoneId;
+
+      if( !g_territoryMgr.movePlayer( m_zoneId, getAsPlayer() ) )
+         return;
    }
 
-   m_zoneId = zoneId;
+   sendZonePackets();
+}
 
-   // mark character as zoning in progress
-   setLoadingComplete( false );
+bool Core::Entity::Player::setInstance( uint32_t instanceContentId )
+{
+   auto instance = g_territoryMgr.getInstanceZonePtr( instanceContentId );
+   if( !instance )
+      return false;
 
-   if( m_lastPing != 0 )
-      m_pCurrentZone->removeActor( shared_from_this() );
+   return setInstance( instance );
+}
 
-   m_pCurrentZone = pZone;
-   m_pCurrentZone->pushActor( shared_from_this() );
+bool Core::Entity::Player::setInstance( ZonePtr instance )
+{
+   if( !instance )
+      return false;
 
-   ZoneChannelPacket< FFXIVIpcInit > initPacket( getId() );
-   initPacket.data().charId = getId();
-   queuePacket( initPacket );
-
-   sendInventory();
-
-   if( isLogin() )
+   // zoning within the same zone won't cause the prev data to be overwritten
+   if( instance->getTerritoryId() != m_zoneId )
    {
-      queuePacket(ActorControlPacket143( getId(), SetCharaGearParamUI, m_equipDisplayFlags, 1 ) );
+      m_prevPos = m_pos;
+      m_prevRot = m_rot;
+      m_prevZoneId = m_zoneId;
    }
 
-   // set flags, will be reset automatically by zoning ( only on client side though )
-   pPlayer->setStateFlag( PlayerStateFlag::BetweenAreas );
-   pPlayer->setStateFlag( PlayerStateFlag::BetweenAreas1 );
-   pPlayer->sendStateFlags();
+   if( !g_territoryMgr.movePlayer( instance, getAsPlayer() ) )
+      return false;
 
-   pPlayer->sendStats();
+   sendZonePackets();
 
-   // only initialize the UI if the player in fact just logged in.
-   if( isLogin() )
-   {
-      ZoneChannelPacket< FFXIVIpcCFAvailableContents > contentFinderList( getId() );
-      for( auto i = 0; i < sizeof( contentFinderList.data().contents ); i++ )
-      {
-         // unlock all contents for now
-         contentFinderList.data().contents[i] = 0xFF;
-      }
-      queuePacket( contentFinderList );
+   return true;
+}
 
-      Server::InitUIPacket initUIPacket( *pPlayer );
-      queuePacket( initUIPacket );
+bool Core::Entity::Player::exitInstance()
+{
+   if( !g_territoryMgr.movePlayer( m_prevZoneId, getAsPlayer() ) )
+      return false;
 
-      ZoneChannelPacket< FFXIVIpcPlayerClassInfo > classInfoPacket( getId() );
-      classInfoPacket.data().classId = static_cast< uint8_t >( getClass() );
-      classInfoPacket.data().unknown = 1;
-      classInfoPacket.data().level = getLevel();
-      classInfoPacket.data().level1 = getLevel();
-      queuePacket( classInfoPacket );
+   m_pos = m_prevPos;
+   m_rot = m_prevRot;
+   m_zoneId = m_prevZoneId;
 
-      ZoneChannelPacket< FFXIVGCAffiliation > gcAffPacket( getId() );
-      gcAffPacket.data().gcId = m_gc;
-      gcAffPacket.data().gcRank[0] = m_gcRank[0];
-      gcAffPacket.data().gcRank[1] = m_gcRank[1];
-      gcAffPacket.data().gcRank[2] = m_gcRank[2];
-      queuePacket( gcAffPacket );
+   sendZonePackets();
 
-      //todo: change this to extern, global obj
-
-      m_friendsListId = g_friendListMgr.fetchPlayerFriendsList( getId() );
-
-      m_itemLevel = getInventory()->calculateEquippedGearItemLevel();
-      sendItemLevel();
-   }
-
-   ZoneChannelPacket< FFXIVIpcInitZone > initZonePacket( getId() );
-   initZonePacket.data().zoneId = getCurrentZone()->getLayoutId();
-   initZonePacket.data().weatherId = static_cast< uint8_t >( getCurrentZone()->getCurrentWeather() );
-   initZonePacket.data().bitmask = 0x1;
-   initZonePacket.data().unknown5 = 0x2A;
-   initZonePacket.data().pos.x = getPos().x;
-   initZonePacket.data().pos.y = getPos().y;
-   initZonePacket.data().pos.z = getPos().z;
-   queuePacket( initZonePacket );
-
-   if( isLogin() )
-   {
-      ZoneChannelPacket< FFXIVARR_IPC_UNK322 > unk322( getId() );
-      queuePacket( unk322 );
-
-      ZoneChannelPacket< FFXIVARR_IPC_UNK320 > unk320( getId() );
-      queuePacket( unk320 );
-   }
-
-   if( getLastPing() == 0 )
-      sendQuestInfo();
-
-   m_bMarkedForZoning = false;
+   return true;
 }
 
 uint32_t Core::Entity::Player::getPlayTime() const
@@ -555,11 +502,11 @@ void Core::Entity::Player::discover( int16_t map_id, int16_t sub_id )
 
    int32_t offset = 4;
 
-   auto info = g_exdData.m_zoneInfoMap[getCurrentZone()->getId()];
-   if( info.is_two_byte )
-      offset = 4 + 2 * info.discovery_index;
+   auto info = g_exdDataGen.getMap( g_exdDataGen.getTerritoryType( getCurrentZone()->getTerritoryId() )->map );
+   if( info->discoveryArrayByte )
+      offset = 4 + 2 * info->discoveryIndex;
    else
-      offset = 324 + 4 * info.discovery_index;
+      offset = 324 + 4 * info->discoveryIndex;
 
    int32_t index = offset + sub_id / 8;
    uint8_t bitIndex = sub_id % 8;
@@ -570,7 +517,7 @@ void Core::Entity::Player::discover( int16_t map_id, int16_t sub_id )
 
    uint16_t level = getLevel();
 
-   uint32_t exp = ( g_exdData.m_paramGrowthInfoMap[level].needed_exp * 5 / 100 );
+   uint32_t exp = ( g_exdDataGen.getParamGrow( level )->expToNext * 5 / 100 );
 
    gainExp( exp );
 
@@ -593,7 +540,6 @@ void Core::Entity::Player::setNewAdventurer( bool state )
    //{
    //   setStateFlag( PlayerStateFlag::NewAdventurer );
    //}
-   sendStateFlags();
    m_bNewAdventurer = state;
 }
 
@@ -648,9 +594,9 @@ void Core::Entity::Player::gainExp( uint32_t amount )
 
    uint16_t level = getLevel();
 
-   uint32_t neededExpToLevel = g_exdData.m_paramGrowthInfoMap[level].needed_exp;
+   uint32_t neededExpToLevel = g_exdDataGen.getParamGrow( level )->expToNext;
 
-   uint32_t neededExpToLevelplus1 = g_exdData.m_paramGrowthInfoMap[level + 1].needed_exp;
+   uint32_t neededExpToLevelplus1 = g_exdDataGen.getParamGrow( level + 1 )->expToNext;
 
    queuePacket( ActorControlPacket143( getId(), GainExpMsg, static_cast< uint8_t >( getClass() ), amount ) );
 
@@ -750,25 +696,25 @@ void Core::Entity::Player::sendStatusUpdate( bool toSelf )
 
 uint8_t Core::Entity::Player::getLevel() const
 {
-   uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( getClass() )].exp_idx;
+   uint8_t classJobIndex = g_exdDataGen.getClassJob( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
    return static_cast< uint8_t >( m_classArray[classJobIndex] );
 }
 
 uint8_t Core::Entity::Player::getLevelForClass( Common::ClassJob pClass ) const
 {
-   uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( pClass )].exp_idx;
+   uint8_t classJobIndex = g_exdDataGen.getClassJob( static_cast< uint8_t >( pClass ) )->expArrayIndex;
    return static_cast< uint8_t >( m_classArray[classJobIndex] );
 }
 
 uint32_t Core::Entity::Player::getExp() const
 {
-   uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( getClass() )].exp_idx;
+   uint8_t classJobIndex = g_exdDataGen.getClassJob( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
    return m_expArray[classJobIndex];
 }
 
 void Core::Entity::Player::setExp( uint32_t amount )
 {
-   uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( getClass() )].exp_idx;
+   uint8_t classJobIndex = g_exdDataGen.getClassJob( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
    m_expArray[classJobIndex] = amount;
 }
 
@@ -808,13 +754,13 @@ void Core::Entity::Player::setClassJob( Common::ClassJob classJob )
 
 void Core::Entity::Player::setLevel( uint8_t level )
 {
-   uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( static_cast< uint8_t >( getClass() ) )].exp_idx;
+   uint8_t classJobIndex = g_exdDataGen.getClassJob( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
    m_classArray[classJobIndex] = level;
 }
 
 void Core::Entity::Player::setLevelForClass( uint8_t level, Common::ClassJob classjob )
 {
-   uint8_t classJobIndex = g_exdData.m_classJobInfoMap[static_cast< uint8_t >( classjob )].exp_idx;
+   uint8_t classJobIndex = g_exdDataGen.getClassJob( static_cast< uint8_t >( classjob ) )->expArrayIndex;
 
    if( m_classArray[classJobIndex] == 0 )
       insertDbClass( classJobIndex );
@@ -964,11 +910,11 @@ const uint8_t* Core::Entity::Player::getStateFlags() const
 
 bool Core::Entity::Player::actionHasCastTime( uint32_t actionId ) //TODO: Add logic for special cases
 {
-   auto actionInfoPtr = g_exdData.getActionInfo( actionId );
-   if( actionInfoPtr->is_instant )
+   auto actionInfoPtr = g_exdDataGen.getAction( actionId );
+   if( actionInfoPtr->preservesCombo )
       return false;
 
-   return actionInfoPtr->cast_time != 0;
+   return actionInfoPtr->cast100ms != 0;
 
 }
 
@@ -985,6 +931,7 @@ bool Core::Entity::Player::hasStateFlag( Common::PlayerStateFlag flag ) const
 
 void Core::Entity::Player::setStateFlag( Common::PlayerStateFlag flag )
 {
+   auto prevOnlineStatus = getOnlineStatus();
    int32_t iFlag = static_cast< uint32_t >( flag );
 
    uint16_t index;
@@ -992,6 +939,13 @@ void Core::Entity::Player::setStateFlag( Common::PlayerStateFlag flag )
    Util::valueToFlagByteIndexValue( iFlag, value, index );
 
    m_stateFlags[index] |= value;
+   sendStateFlags();
+
+   auto newOnlineStatus = getOnlineStatus();
+
+   if( prevOnlineStatus != newOnlineStatus )
+      sendToInRangeSet( ActorControlPacket142( getId(), SetStatusIcon,
+                                               static_cast< uint8_t >( getOnlineStatus() ) ), true );
 
 }
 
@@ -999,13 +953,7 @@ void Core::Entity::Player::setStateFlags( std::vector< Common::PlayerStateFlag >
 {
    for( const auto& flag : flags )
    {
-      int iFlag = static_cast< uint32_t >( flag );
-
-      uint16_t index;
-      uint8_t value;
-      Util::valueToFlagByteIndexValue( iFlag, value, index );
-
-      m_stateFlags[index] |= value;
+      setStateFlag( flag );
    }
 }
 
@@ -1019,6 +967,8 @@ void Core::Entity::Player::unsetStateFlag( Common::PlayerStateFlag flag )
    if( !hasStateFlag( flag ) )
       return;
 
+   auto prevOnlineStatus = getOnlineStatus();
+
    int32_t iFlag = static_cast< uint32_t >( flag );
 
    uint16_t index;
@@ -1026,7 +976,13 @@ void Core::Entity::Player::unsetStateFlag( Common::PlayerStateFlag flag )
    Util::valueToFlagByteIndexValue( iFlag, value, index );
 
    m_stateFlags[index] ^= value;
+   sendStateFlags();
 
+   auto newOnlineStatus = getOnlineStatus();
+
+   if( prevOnlineStatus != newOnlineStatus )
+      sendToInRangeSet( ActorControlPacket142( getId(), SetStatusIcon,
+                                               static_cast< uint8_t >( getOnlineStatus() ) ), true );
 }
 
 void Core::Entity::Player::update( int64_t currTime )
@@ -1036,7 +992,7 @@ void Core::Entity::Player::update( int64_t currTime )
    if( m_queuedZoneing && ( currTime - m_queuedZoneing->m_queueTime ) > 800 )
    {
       Common::FFXIVARR_POSITION3 targetPos = m_queuedZoneing->m_targetPosition;
-      if( getCurrentZone()->getId() != m_queuedZoneing->m_targetZone )
+      if( getCurrentZone()->getTerritoryId() != m_queuedZoneing->m_targetZone )
       {
          performZoning( m_queuedZoneing->m_targetZone, targetPos, m_queuedZoneing->m_targetRotation);
       }
@@ -1608,4 +1564,84 @@ void Core::Entity::Player::setEorzeaTimeOffset( uint64_t timestamp )
 
    // Send to single player
    queuePacket( packet );
+}
+
+void Player::setTerritoryId( uint32_t territoryId )
+{
+   m_zoneId = territoryId;
+}
+
+uint32_t Player::getTerritoryId() const
+{
+   return m_zoneId;
+}
+
+void Player::sendZonePackets()
+{
+   ZoneChannelPacket< FFXIVIpcInit > initPacket( getId() );
+   initPacket.data().charId = getId();
+   queuePacket( initPacket );
+
+   sendInventory();
+
+   if( isLogin() )
+   {
+      queuePacket(ActorControlPacket143( getId(), SetCharaGearParamUI, m_equipDisplayFlags, 1 ) );
+   }
+
+   // set flags, will be reset automatically by zoning ( only on client side though )
+   setStateFlag( PlayerStateFlag::BetweenAreas );
+   setStateFlag( PlayerStateFlag::BetweenAreas1 );
+
+   sendStats();
+
+   // only initialize the UI if the player in fact just logged in.
+   if( isLogin() )
+   {
+      ZoneChannelPacket< FFXIVIpcCFAvailableContents > contentFinderList( getId() );
+      for( auto i = 0; i < sizeof( contentFinderList.data().contents ); i++ )
+      {
+         // unlock all contents for now
+         contentFinderList.data().contents[i] = 0xFF;
+      }
+      queuePacket( contentFinderList );
+
+      Server::InitUIPacket initUIPacket( *this );
+      queuePacket( initUIPacket );
+
+      ZoneChannelPacket< FFXIVIpcPlayerClassInfo > classInfoPacket( getId() );
+      classInfoPacket.data().classId = static_cast< uint8_t >( getClass() );
+      classInfoPacket.data().unknown = 1;
+      classInfoPacket.data().level = getLevel();
+      classInfoPacket.data().level1 = getLevel();
+      queuePacket( classInfoPacket );
+
+      m_itemLevel = getInventory()->calculateEquippedGearItemLevel();
+      sendItemLevel();
+   }
+
+   ZoneChannelPacket< FFXIVIpcInitZone > initZonePacket( getId() );
+   initZonePacket.data().zoneId = getCurrentZone()->getTerritoryId();
+   initZonePacket.data().weatherId = static_cast< uint8_t >( getCurrentZone()->getCurrentWeather() );
+   initZonePacket.data().bitmask = 0x1;
+   initZonePacket.data().unknown5 = 0x2A;
+   initZonePacket.data().festivalId = getCurrentZone()->getCurrentFestival();
+   initZonePacket.data().pos.x = getPos().x;
+   initZonePacket.data().pos.y = getPos().y;
+   initZonePacket.data().pos.z = getPos().z;
+   queuePacket( initZonePacket );
+
+   if( isLogin() )
+   {
+      ZoneChannelPacket< FFXIVARR_IPC_UNK322 > unk322( getId() );
+      queuePacket( unk322 );
+
+      ZoneChannelPacket< FFXIVARR_IPC_UNK320 > unk320( getId() );
+      queuePacket( unk320 );
+   }
+
+   if( getLastPing() == 0 )
+      sendQuestInfo();
+
+   m_bMarkedForZoning = false;
 }

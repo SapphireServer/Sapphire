@@ -2,6 +2,7 @@
 #define _ACTIONCOLLISION_H
 
 #include <common/Common.h>
+#include <common/Exd/ExdDataGenerated.h>
 
 #include "Actor/Actor.h"
 #include "Action.h"
@@ -25,7 +26,7 @@ namespace Entity {
       static bool isActorApplicable( ActorPtr actorPtr, TargetFilter targetFilter );
       static std::set< ActorPtr > getActorsHitFromAction( Common::FFXIVARR_POSITION3 aoePosition,
                                                           std::set< ActorPtr > actorsInRange,
-                                                          boost::shared_ptr< Data::ActionInfo > actionInfo,
+                                                          boost::shared_ptr< Data::Action > actionInfo,
                                                           TargetFilter targetFilter );
 
    private:

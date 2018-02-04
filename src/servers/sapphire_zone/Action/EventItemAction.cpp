@@ -56,7 +56,6 @@ void Core::Action::EventItemAction::onStart()
 
    m_pSource->sendToInRangeSet( castPacket, true );
    m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::Casting );
-   m_pSource->getAsPlayer()->sendStateFlags();
 
 }
 
@@ -78,7 +77,6 @@ void Core::Action::EventItemAction::onFinish()
       effectPacket.data().effectTarget = static_cast< uint32_t >( m_additional );
 
       m_pSource->getAsPlayer()->unsetStateFlag( Common::PlayerStateFlag::Casting );
-      m_pSource->getAsPlayer()->sendStateFlags();
       m_pSource->sendToInRangeSet( effectPacket, true );
 
       if( m_onActionFinishClb )
@@ -104,7 +102,6 @@ void Core::Action::EventItemAction::onInterrupt()
       if( m_pSource->isPlayer() )
       {
          m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Casting );
-         m_pSource->getAsPlayer()->sendStateFlags();
          m_pSource->sendToInRangeSet( control, true );
       }
       else

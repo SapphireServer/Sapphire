@@ -10,10 +10,10 @@
 #include "Network/GameConnection.h"
 
 #include "Session.h"
+#include "Zone/TerritoryMgr.h"
 #include "Zone/Zone.h"
 #include "Zone/ZonePosition.h"
 #include "ServerZone.h"
-#include "Zone/ZoneMgr.h"
 
 #include "Network/PacketWrappers/InitUIPacket.h"
 #include "Network/PacketWrappers/PingPacket.h"
@@ -37,7 +37,7 @@
 
 extern Core::Logger g_log;
 extern Core::ServerZone g_serverZone;
-extern Core::ZoneMgr g_zoneMgr;
+extern Core::TerritoryMgr g_territoryMgr;
 extern Core::Data::ExdData g_exdData;
 extern Core::DebugCommandHandler g_gameCommandMgr;
 
@@ -403,16 +403,27 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    }
    case GmCommand::Teri:
    {
-      auto zoneInfo = g_zoneMgr.getZone( param1 );
-      if ( !zoneInfo )
+      if( auto instance = g_territoryMgr.getInstanceZonePtr( param1 ) )
+      {
+         player.sendDebug( "Found instance: " + instance->getName() + ", id: " + std::to_string( param1 ) );
+
+         player.setInstance( instance );
+      }
+      else if( !g_territoryMgr.isValidTerritory( param1 )  )
       {
          player.sendUrgent( "Invalid zone " + std::to_string( param1 ) );
       }
       else
       {
+         auto pZone = g_territoryMgr.getZoneByTerriId( param1 );
+         if( !pZone )
+         {
+            player.sendUrgent( "No zone instance found for " + std::to_string( param1 ) );
+            break;
+         }
          targetPlayer->setPosition( targetPlayer->getPos() );
          targetPlayer->performZoning( param1, targetPlayer->getPos(), 0 );
-         player.sendNotice( targetPlayer->getName() + " was warped to zone " + std::to_string( param1 ) + " (" + zoneInfo->getName( ) + ")" );
+         player.sendNotice( targetPlayer->getName() + " was warped to zone " + std::to_string( param1 ) + " (" + pZone->getName() + ")" );
       }
       break;
    }
@@ -438,7 +449,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       player.sendNotice( "Jumping to " + targetPlayer->getName() + " in range." );
       break;
    }
-  
+
    default:
       player.sendUrgent( "GM1 Command not implemented: " + std::to_string( commandId ) );
       break;

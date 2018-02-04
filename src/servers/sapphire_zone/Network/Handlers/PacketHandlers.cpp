@@ -12,10 +12,10 @@
 #include "Network/GameConnection.h"
 
 #include "Session.h"
+#include "ServerZone.h"
+#include "Zone/TerritoryMgr.h"
 #include "Zone/Zone.h"
 #include "Zone/ZonePosition.h"
-#include "ServerZone.h"
-#include "Zone/ZoneMgr.h"
 
 #include "Network/PacketWrappers/InitUIPacket.h"
 #include "Network/PacketWrappers/PingPacket.h"
@@ -41,7 +41,7 @@
 
 extern Core::Logger g_log;
 extern Core::ServerZone g_serverZone;
-extern Core::ZoneMgr g_zoneMgr;
+extern Core::TerritoryMgr g_territoryMgr;
 extern Core::Data::ExdData g_exdData;
 extern Core::DebugCommandHandler g_gameCommandMgr;
 extern Core::Social::SocialMgr< Core::Social::FriendList > g_friendListMgr;
@@ -299,7 +299,7 @@ void Core::Network::GameConnection::zoneLineHandler( const Packets::GamePacket& 
 
    auto pZone = player.getCurrentZone();
 
-   auto pLine = g_zoneMgr.getZonePosition( zoneLineId );
+   auto pLine = g_territoryMgr.getTerritoryPosition( zoneLineId );
 
    Common::FFXIVARR_POSITION3 targetPos{};
    uint32_t targetZone;
@@ -326,7 +326,7 @@ void Core::Network::GameConnection::zoneLineHandler( const Packets::GamePacket& 
       targetPos.x = 0;
       targetPos.y = 0;
       targetPos.z = 0;
-      targetZone = pZone->getId();
+      targetZone = pZone->getTerritoryId();
    }
 
    player.performZoning( targetZone, targetPos, rotation);
@@ -444,7 +444,7 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
       int32_t entrysizes = sizeof( listPacket.data().entries );
       memset( listPacket.data().entries, 0, sizeof( listPacket.data().entries ) );
 
-      listPacket.data().entries[0].bytes[2] = player.getCurrentZone()->getId();
+      listPacket.data().entries[0].bytes[2] = player.getCurrentZone()->getTerritoryId();
       listPacket.data().entries[0].bytes[3] = 0x80;
       listPacket.data().entries[0].bytes[4] = 0x02;
       listPacket.data().entries[0].bytes[6] = 0x3B;
@@ -452,8 +452,8 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
       listPacket.data().entries[0].classJob = player.getClass();
       listPacket.data().entries[0].contentId = player.getContentId();
       listPacket.data().entries[0].level = player.getLevel();
-      listPacket.data().entries[0].zoneId = player.getCurrentZone()->getId();
-      //listPacket.data().entries[0].zoneId1 = 0x0100;
+      listPacket.data().entries[0].zoneId = player.getCurrentZone()->getTerritoryId();
+      listPacket.data().entries[0].zoneId1 = 0x0100;
       // TODO: no idea what this does
       //listPacket.data().entries[0].one = 1;
 

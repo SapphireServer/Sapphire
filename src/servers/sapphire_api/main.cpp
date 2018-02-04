@@ -13,7 +13,7 @@
 #include <common/Network/Hive.h>
 #include <common/Network/Acceptor.h>
 
-#include <common/Exd/ExdData.h>
+#include <common/Exd/ExdDataGenerated.h>
 #include <common/Crypt/base64.h>
 
 #include <common/Database/DbLoader.h>
@@ -35,7 +35,7 @@
 
 Core::Logger g_log;
 Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
-Core::Data::ExdData g_exdData;
+Core::Data::ExdDataGenerated g_exdDataGen;
 Core::Network::SapphireAPI g_sapphireAPI;
 
 using namespace std;
@@ -139,10 +139,10 @@ bool loadSettings( int32_t argc, char* argv[] )
       }
    }
 
-   g_log.info( "Setting up EXD data" );
-   if( !g_exdData.init( m_pConfig->getValue< std::string >( "Settings.General.DataPath", "" ) ) )
+   g_log.info( "Setting up generated EXD data" );
+   if( !g_exdDataGen.init( m_pConfig->getValue< std::string >( "Settings.General.DataPath", "" ) ) )
    {
-      g_log.fatal( "Error setting up EXD data " );
+      g_log.fatal( "Error setting up generated EXD data " );
       return false;
    }
 
@@ -241,10 +241,10 @@ std::string buildHttpResponse( uint16_t rCode, const std::string& content = "", 
 void getZoneName( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) 
 {
    string number = request->path_match[1];
-   auto it = g_exdData.m_zoneInfoMap.find( atoi( number.c_str() ) );
+   auto info = g_exdDataGen.getTerritoryType( atoi( number.c_str() ) );
    std::string responseStr = "Not found!";
-   if( it != g_exdData.m_zoneInfoMap.end() )
-      responseStr = it->second.zone_name + ", " + it->second.zone_str;
+   if( info )
+      responseStr = info->name + ", " + info->bg;
    *response << buildHttpResponse( 200, responseStr );
 }
 
@@ -750,9 +750,6 @@ int main( int argc, char* argv[] )
 
    if( !loadSettings( argc, argv ) )
       throw std::exception();
-
-   g_exdData.loadZoneInfo();
-   g_exdData.loadClassJobInfo();
 
    server.config.port = stoi( m_pConfig->getValue< std::string >( "Settings.General.HttpPort", "80" ) );
    g_log.info( "Starting API server at port " + m_pConfig->getValue< std::string >( "Settings.General.HttpPort", "80" ) + "..." );

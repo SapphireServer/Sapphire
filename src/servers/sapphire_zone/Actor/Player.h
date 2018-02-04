@@ -11,7 +11,7 @@
 
 #include "Actor.h"
 #include "Inventory/Inventory.h"
-
+#include "Event/EventHandler.h"
 #include <map>
 #include <queue>
 
@@ -55,31 +55,33 @@ public:
    /*! start an event item action */
    void eventItemActionStart( uint32_t eventId, uint32_t action, ActionCallback finishCallback, ActionCallback interruptCallback, uint64_t additional );
    /*! start/register a normal event */
-   void eventStart( uint64_t actorId, uint32_t eventId, uint8_t eventParam, uint8_t eventParam1, uint32_t eventParam2 );
+   void eventStart( uint64_t actorId, uint32_t eventId, Event::EventHandler::EventType eventParam, uint8_t eventParam1, uint32_t eventParam2 );
    /*! play a subevent */
    void eventPlay( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t eventParam2, uint32_t eventParam3 );
    /*! play a subevent */
    void eventPlay( uint32_t eventId, uint32_t scene, uint32_t flags,
-                   uint32_t eventParam2, uint32_t eventParam3, Scripting::EventReturnCallback eventReturnCallback );
+                   uint32_t eventParam2, uint32_t eventParam3, Event::EventHandler::SceneReturnCallback eventReturnCallback );
    /*! play a subevent */
    void eventPlay( uint32_t eventId, uint32_t scene, uint32_t flags,
-                   uint32_t eventParam2, uint32_t eventParam3, uint32_t eventParam4, Scripting::EventReturnCallback eventReturnCallback );
+                   uint32_t eventParam2, uint32_t eventParam3, uint32_t eventParam4,
+                   Event::EventHandler::SceneReturnCallback eventReturnCallback );
    /*! play a subevent */
-   void eventPlay( uint32_t eventId, uint32_t scene, uint32_t flags, Scripting::EventReturnCallback eventReturnCallback );
+   void eventPlay( uint32_t eventId, uint32_t scene, uint32_t flags,
+                   Event::EventHandler::SceneReturnCallback eventReturnCallback );
    /*! play a subevent */
    void eventPlay( uint32_t eventId, uint32_t scene, uint32_t flags );
    /*! finish / unregister an event */
    void eventFinish( uint32_t eventId, uint32_t freePlayer );
    /*! add an event to the event array */
-   void addEvent( Event::EventPtr pEvent );
+   void addEvent( Event::EventHandlerPtr pEvent );
    /*! retrieve an event from the event array */
-   Event::EventPtr getEvent( uint32_t eventId );
+   Event::EventHandlerPtr getEvent( uint32_t eventId );
    /*! get number of active events */
    size_t getEventCount();
    /*! remove an event from the event array */
    void removeEvent( uint32_t eventId );
    /*! return the eventlist */
-   std::map< uint32_t, Event::EventPtr >& eventList();
+   std::map< uint32_t, Event::EventHandlerPtr >& eventList();
 
    void checkEvent( uint32_t eventId );
 
@@ -311,6 +313,16 @@ public:
    Common::OnlineStatus getOnlineStatus();
    /*! sets the players zone, initiating a zoning process */
    void setZone( uint32_t zoneId );
+   /*! sets the players instance & initiates zoning process */
+   bool setInstance( uint32_t instanceContentId );
+   /*! sets the players instance & initiates zoning process */
+   bool setInstance( ZonePtr instance );
+   /*! returns the player to their position before zoning into an instance */
+   bool exitInstance();
+   /*! sets the players territoryId */
+   void setTerritoryId( uint32_t territoryId );
+   /*! gets the players territoryId */
+   uint32_t getTerritoryId() const;
 
    void forceZoneing( uint32_t zoneId );
    /*! return player to preset homepoint */
@@ -478,9 +490,11 @@ public:
    /*! set the loading complete bool */
    void setLoadingComplete( bool bComplete );
    /*! mark this player for zoning, notify worldserver */
-   void performZoning(uint16_t zoneId, const Common::FFXIVARR_POSITION3& pos, float rotation);
+   void performZoning( uint16_t zoneId, const Common::FFXIVARR_POSITION3& pos, float rotation );
    /*! return true if the player is marked for zoning */
    bool isMarkedForZoning() const;
+
+   void sendZonePackets();
 
    Common::ZoneingType getZoningType() const;
    void setZoningType( Common::ZoneingType zoneingType );
@@ -563,6 +577,11 @@ private:
 
 private:
 
+   Common::FFXIVARR_POSITION3 m_prevPos;
+   uint32_t m_prevZoneType;
+   uint32_t m_prevZoneId;
+   float m_prevRot;
+
    uint8_t m_voice;
 
    uint64_t m_modelMainWeapon;
@@ -590,13 +609,13 @@ private:
    uint16_t m_activeTitle;
    uint8_t m_titleList[48];
    uint8_t m_howTo[33];
-   uint8_t m_minions[35];
-   uint8_t m_mountGuide[14];
+   uint8_t m_minions[37];
+   uint8_t m_mountGuide[15];
    uint8_t m_homePoint;
    uint8_t m_startTown;
    uint16_t m_townWarpFstFlags;
-   uint8_t m_questCompleteFlags[200];
-   uint8_t m_discovery[420];
+   uint8_t m_questCompleteFlags[396];
+   uint8_t m_discovery[421];
    uint32_t m_playTime;
 
    uint16_t m_classArray[25];
@@ -610,7 +629,8 @@ private:
    uint16_t m_itemLevel;
    InventoryPtr m_pInventory;
 
-   std::map< uint32_t, Event::EventPtr > m_eventMap;
+   std::map< uint32_t, Event::EventHandlerPtr > m_eventHandlerMap;
+
    std::map< uint32_t, uint8_t > m_playerIdToSpawnIdMap; // maps player to spawn id
    std::queue< uint8_t > m_freeSpawnIdQueue; // queue with spawn ids free to be assigned
    std::queue< uint8_t > m_freeHateSlotQueue; // queue with "hate slots" free to be assigned

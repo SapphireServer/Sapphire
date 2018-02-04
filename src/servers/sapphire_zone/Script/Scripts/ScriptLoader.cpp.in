@@ -1,0 +1,17 @@
+#include <vector>
+#include <Script/NativeScriptApi.h>
+
+class ScriptObject;
+
+@ScriptIncludes@
+
+const ScriptObject* ptrs[] =
+{
+@ScriptNames@
+   nullptr
+};
+
+extern "C" EXPORT const ScriptObject** getScripts()
+{
+   return ptrs;
+}

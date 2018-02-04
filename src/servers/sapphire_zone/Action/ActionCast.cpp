@@ -3,8 +3,8 @@
 #include <common/Common.h>
 #include <common/Util/Util.h>
 #include <common/Util/UtilMath.h>
-#include <common/Exd/ExdData.h>
 #include <common/Logging/Logger.h>
+#include <common/Exd/ExdDataGenerated.h>
 
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
@@ -17,7 +17,7 @@ using namespace Core::Network;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-extern Core::Data::ExdData g_exdData;
+extern Core::Data::ExdDataGenerated g_exdDataGen;
 extern Core::Logger g_log;
 extern Core::Scripting::ScriptManager g_scriptMgr;
 
@@ -31,7 +31,7 @@ Core::Action::ActionCast::ActionCast( Entity::ActorPtr pActor, Entity::ActorPtr 
    m_startTime = 0;
    m_id = actionId;
    m_handleActionType = HandleActionType::Spell;
-   m_castTime = g_exdData.getActionInfo( actionId )->cast_time; // TODO: Add security checks.
+   m_castTime = g_exdDataGen.getAction( actionId )->cast100ms * 100; // TODO: Add security checks.
    m_pSource = pActor;
    m_pTarget = pTarget;
    m_bInterrupt = false;
@@ -58,7 +58,6 @@ void Core::Action::ActionCast::onStart()
 
    m_pSource->sendToInRangeSet( castPacket, true );
    m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::Casting );
-   m_pSource->getAsPlayer()->sendStateFlags();
 
 }
 
@@ -71,7 +70,6 @@ void Core::Action::ActionCast::onFinish()
    pPlayer->sendDebug( "onFinish()" );
 
    pPlayer->unsetStateFlag( PlayerStateFlag::Casting );
-   pPlayer->sendStateFlags();
 
    /*auto control = ActorControlPacket143( m_pTarget->getId(), ActorControlType::Unk7,
                                            0x219, m_id, m_id, m_id, m_id );
@@ -87,7 +85,6 @@ void Core::Action::ActionCast::onInterrupt()
 
    m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied1 );
    m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Casting );
-   m_pSource->getAsPlayer()->sendStateFlags();
 
    auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt,
                                          0x219, 1, m_id, 0 );
