@@ -93,7 +93,8 @@ namespace Packets {
       SetCharacterFCInfo         = 0x0114, // updated 4.2
       StatusEffectList           = 0x0125, // updated 4.2
       Effect                     = 0x0128, // updated 4.2
-      GCAffiliation              = 0x00FC,
+
+      GCAffiliation              = 0xCCFC, // OUTDATED
 
       PlayerSpawn                = 0x015C, // updated 4.2
       NpcSpawn                   = 0x015D, // updated 4.2
