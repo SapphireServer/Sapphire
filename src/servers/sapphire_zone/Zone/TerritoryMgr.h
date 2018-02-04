@@ -109,9 +109,11 @@ namespace Core
           TODO: Mind multiple instances?! */
       ZonePtr getZoneByTerriId( uint32_t territoryId ) const;
 
-
       bool movePlayer( uint32_t territoryId, Entity::PlayerPtr pPlayer );
       bool movePlayer( ZonePtr, Entity::PlayerPtr pPlayer );
+
+      /*! returns an instancePtr if the player is still bound to an isntance */
+      ZonePtr getLinkedInstance( uint32_t playerId ) const;
 
    private:
       using TerritoryTypeDetailCache = std::unordered_map< uint16_t, Data::TerritoryTypePtr >;
@@ -136,6 +138,9 @@ namespace Core
 
       /*! map holding positions for zonelines */
       PositionMap m_territoryPositionMap;
+
+      /*! map storing playerIds to instanceIds, used for instanceContent */
+      PlayerIdToInstanceIdMap m_playerIdToInstanceMap;
 
       /*! internal counter for instanceIds */
       uint32_t m_lastInstanceId;

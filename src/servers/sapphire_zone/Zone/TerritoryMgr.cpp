@@ -302,25 +302,7 @@ Core::TerritoryMgr::InstanceIdList Core::TerritoryMgr::getInstanceContentIdList(
 bool Core::TerritoryMgr::movePlayer( uint32_t territoryId, Core::Entity::PlayerPtr pPlayer )
 {
    auto pZone = getZoneByTerriId( territoryId );
-
-   if( !pZone  )
-   {
-      g_log.error( "Zone " + std::to_string( territoryId ) + " not found on this server." );
-      return false;
-   }
-
-   pPlayer->setTerritoryId( territoryId );
-
-   // mark character as zoning in progress
-   pPlayer->setLoadingComplete( false );
-
-   if( pPlayer->getLastPing() != 0 )
-      pPlayer->getCurrentZone()->removeActor( pPlayer );
-
-   pPlayer->setCurrentZone( pZone );
-   pZone->pushActor( pPlayer );
-
-   return true;
+   return movePlayer( pZone, pPlayer );
 }
 
 bool Core::TerritoryMgr::movePlayer( ZonePtr pZone, Core::Entity::PlayerPtr pPlayer )
@@ -342,7 +324,20 @@ bool Core::TerritoryMgr::movePlayer( ZonePtr pZone, Core::Entity::PlayerPtr pPla
    pPlayer->setCurrentZone( pZone );
    pZone->pushActor( pPlayer );
 
+   // map player to instanceId so it can be tracked.
+   m_playerIdToInstanceMap[pPlayer->getId()] = pZone->getGuId();
+
    return true;
+}
+
+Core::ZonePtr Core::TerritoryMgr::getLinkedInstance( uint32_t playerId ) const
+{
+   auto it = m_playerIdToInstanceMap.find( playerId );
+   if( it != m_playerIdToInstanceMap.end() )
+   {
+      return getInstanceZonePtr( it->second );
+   }
+   return nullptr;
 }
 
 
