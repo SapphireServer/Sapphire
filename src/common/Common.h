@@ -517,9 +517,14 @@ namespace Common {
       SetOwnerId = 0x59,
       ItemRepairMsg = 0x5C,
 
+      DirectorInit = 0x64,
+      DirectorClear = 0x65,
+
       LeveStartAnim = 0x66,
       LeveStartError = 0x67,
-      PlayerNameGrayout = 0x6A,
+      DirectorEObjMod = 0x6A,
+      
+      DirectorUpdate = 0x6D,
 
       ItemObtainMsg = 0x75,
       DutyQuestScreenMsg = 0x7B,
