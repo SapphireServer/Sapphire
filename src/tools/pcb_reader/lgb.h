@@ -13,6 +13,9 @@
 #include "vec3.h"
 #include "sgb.h"
 
+// garbage to skip model loading
+extern bool ignoreModels;
+
 // all credit to
 // https://github.com/ufx/SaintCoinach/blob/master/SaintCoinach/Graphics/Lgb/
 // this is simply their work ported to c++ since we dont c#
@@ -88,6 +91,10 @@ public:
       m_buf = buf;
       m_offset = offset;
       header = *reinterpret_cast< LGB_ENTRY_HEADER* >( buf + offset );
+   };
+   const LgbEntryType getType() const
+   {
+      return header.type;
    };
    virtual ~LGB_ENTRY() {};
 };
@@ -184,6 +191,26 @@ public:
    };
 };
 
+struct LGB_MAPRANGE_HEADER : public LGB_ENTRY_HEADER
+{
+   uint32_t type;
+   uint32_t unknown2;
+   uint8_t unknown3[0x10];
+};
+
+struct LGB_MAPRANGE_ENTRY : public LGB_ENTRY
+{
+public:
+   LGB_MAPRANGE_HEADER header;
+   std::string name;
+
+   LGB_MAPRANGE_ENTRY( char* buf, uint32_t offset ) : LGB_ENTRY( buf, offset )
+   {
+      header = *reinterpret_cast< LGB_MAPRANGE_HEADER* >( buf + offset );
+      name = std::string( buf + offset + header.nameOffset );
+   };
+};
+
 struct LGB_GROUP_HEADER
 {
    uint32_t unknown;
@@ -223,11 +250,12 @@ struct LGB_GROUP
          try
          {
             const auto type = *reinterpret_cast<LgbEntryType*>( buf + entryOffset );
-            if( type == LgbEntryType::BgParts )
+            // garbage to skip model loading
+            if( !ignoreModels && type == LgbEntryType::BgParts )
             {
                entries.push_back( std::make_shared< LGB_BGPARTS_ENTRY >( buf, entryOffset ) );
             }
-            else if( type == LgbEntryType::Gimmick )
+            else if( !ignoreModels && type == LgbEntryType::Gimmick )
             {
                entries.push_back( std::make_shared< LGB_GIMMICK_ENTRY >( buf, entryOffset ) );
             }
@@ -241,7 +269,7 @@ struct LGB_GROUP
             }
             else if( type == LgbEntryType::MapRange )
             {
-               entries.push_back( std::make_shared< LGB_EOBJ_ENTRY >( buf, entryOffset ) );
+               entries.push_back( std::make_shared< LGB_MAPRANGE_ENTRY >( buf, entryOffset ) );
             }
             /*
             else
@@ -249,7 +277,7 @@ struct LGB_GROUP
                entries[i] = nullptr;
             }
             */
-            
+
          }
          catch( std::exception& e )
          {
@@ -276,8 +304,9 @@ struct LGB_FILE
 {
    LGB_FILE_HEADER header;
    std::vector< LGB_GROUP > groups;
+   std::string name;
 
-   LGB_FILE( char* buf )
+   LGB_FILE( char* buf, const std::string& name )
    {
       header = *reinterpret_cast< LGB_FILE_HEADER* >( buf );
       if( strncmp( &header.magic[0], "LGB1", 4 ) != 0 || strncmp( &header.magic2[0], "LGP1", 4 ) != 0 )
