@@ -311,9 +311,6 @@ void Zone::pushActor( Entity::ActorPtr pActor )
          m_sessionSet.insert( pSession );
       m_playerMap[pPlayer->getId()] = pPlayer;
       updateCellActivity( cx, cy, 2 );
-
-      onEnterTerritory( pPlayer );
-
    }
    else if( pActor->isBNpc() )
    {
