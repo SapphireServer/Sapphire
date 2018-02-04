@@ -1607,13 +1607,6 @@ void Player::sendZonePackets()
       classInfoPacket.data().level1 = getLevel();
       queuePacket( classInfoPacket );
 
-      ZoneChannelPacket< FFXIVGCAffiliation > gcAffPacket( getId() );
-      gcAffPacket.data().gcId = m_gc;
-      gcAffPacket.data().gcRank[0] = m_gcRank[0];
-      gcAffPacket.data().gcRank[1] = m_gcRank[1];
-      gcAffPacket.data().gcRank[2] = m_gcRank[2];
-      queuePacket( gcAffPacket );
-
       m_itemLevel = getInventory()->calculateEquippedGearItemLevel();
       sendItemLevel();
    }
