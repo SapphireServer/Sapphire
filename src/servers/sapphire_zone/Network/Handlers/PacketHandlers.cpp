@@ -453,7 +453,7 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
       listPacket.data().entries[0].contentId = player.getContentId();
       listPacket.data().entries[0].level = player.getLevel();
       listPacket.data().entries[0].zoneId = player.getCurrentZone()->getTerritoryId();
-      listPacket.data().entries[0].zoneId1 = 0x0100;
+      // listPacket.data().entries[0].zoneId1 = 0x0100;
       // TODO: no idea what this does
       //listPacket.data().entries[0].one = 1;
 

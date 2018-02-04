@@ -141,7 +141,7 @@ Core::Network::Packets::Server::PlayerEntry Group::generatePlayerEntry( GroupMem
       entry.classJob = pPlayer->getClass();
       
       entry.level = pPlayer->getLevel();
-      entry.zoneId = pPlayer->getCurrentZone()->getId();
+      entry.zoneId = pPlayer->getCurrentZone()->getGuId();
       entry.grandCompany = pPlayer->getGc();
       memcpy( &entry.fcTag[0], "Meme", 4 );
       entry.clientLanguage = 2;
