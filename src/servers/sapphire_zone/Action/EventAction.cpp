@@ -28,7 +28,7 @@ Core::Action::EventAction::EventAction( Entity::ActorPtr pActor, uint32_t eventI
    m_handleActionType = HandleActionType::Event;
    m_eventId = eventId;
    m_id = action;
-   m_castTime = g_exdDataGen.getEventAction( action )->castTime * 100; // TODO: Add security checks.
+   m_castTime = g_exdDataGen.getEventAction( action )->castTime * 1000; // TODO: Add security checks.
    m_onActionFinishClb = finishRef;
    m_onActionInterruptClb = interruptRef;
    m_pSource = pActor;
@@ -53,7 +53,7 @@ void Core::Action::EventAction::onStart()
    if( m_pSource->isPlayer() )
    {
       m_pSource->sendToInRangeSet( control, true );
-      m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::SomeFlag );
+      m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::Occupied2 );
    }
    else
       m_pSource->sendToInRangeSet( control );
@@ -82,7 +82,7 @@ void Core::Action::EventAction::onFinish()
 
       if( m_pSource->isPlayer() )
       {
-         m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::SomeFlag );
+         m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied2 );
          m_pSource->sendToInRangeSet( control, true );
       }
       else

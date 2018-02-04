@@ -1432,7 +1432,7 @@
          auto row = exdData->m_EventActionDat.get_row( row_id );
          name = exdData->getField< std::string >( row, 0 );
          icon = exdData->getField< uint16_t >( row, 1 );
-         castTime = exdData->getField< uint16_t >( row, 3 );
+         castTime = exdData->getField< uint8_t >( row, 2 );
       }
 
       Core::Data::EventIconPriority::EventIconPriority( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
