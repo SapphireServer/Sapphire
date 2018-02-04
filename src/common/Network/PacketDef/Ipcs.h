@@ -201,8 +201,8 @@ namespace Packets {
 
       FcInfoReqHandler         = 0x011A, // updated 4.2
 
-      CountdownInitiate        = 0x012C, // updated 4.2
-      CountdownCancel          = 0x012D, // updated 4.2
+      ReqCountdownInitiate     = 0x012C, // updated 4.2
+      ReqCountdownCancel       = 0x012D, // updated 4.2
 
       ZoneLineHandler          = 0x0130, // updated 4.2
       ActionHandler            = 0x0131, // updated 4.2
