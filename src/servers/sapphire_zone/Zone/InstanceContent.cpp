@@ -51,7 +51,7 @@ void Core::InstanceContent::onEnterTerritory( Entity::PlayerPtr pPlayer )
                                                            + std::to_string( getInstanceContentId() ) +
                                                            + ", Entity#" + std::to_string( pPlayer->getId() ) );
 
-   pPlayer->queuePacket(ActorControlPacket143( pPlayer->getId(), DirectorInit, getDirectorId(),
+   pPlayer->queuePacket( ActorControlPacket143( pPlayer->getId(), DirectorInit, getDirectorId(),
                                                getInstanceContentId() ) );
    pPlayer->setStateFlag( PlayerStateFlag::BoundByDuty );
 }
@@ -61,7 +61,7 @@ void Core::InstanceContent::onLeaveTerritory( Entity::PlayerPtr pPlayer )
    g_log.debug( "InstanceContent::onLeaveTerritory: Zone#" + std::to_string( getGuId() ) + "|"
                                                            + std::to_string( getInstanceContentId() ) +
                                                            + ", Entity#" + std::to_string( pPlayer->getId() ) );
-   pPlayer->queuePacket(ActorControlPacket143( pPlayer->getId(), DirectorClear, getDirectorId() ) );
+   pPlayer->queuePacket( ActorControlPacket143( pPlayer->getId(), DirectorClear, getDirectorId() ) );
    pPlayer->unsetStateFlag( PlayerStateFlag::BoundByDuty );
 }
 
