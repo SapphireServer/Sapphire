@@ -229,6 +229,11 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
         {
            break;
         }
+        case 0x321: // Director init finish
+        {
+           player.getCurrentZone()->onInitDirector( player.getAsPlayer() );
+           break;
+        }
         default:
         {
            g_log.debug( "[" + std::to_string( m_pSession->getId() ) + "] Unhandled action: " +

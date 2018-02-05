@@ -156,12 +156,6 @@ namespace Common {
       uint32_t sourceActorId;
    };
 
-   enum RegionType : uint8_t
-   {
-      normal,
-      instance,
-   };
-
    enum CharaLook : uint8_t
    {
       Race = 0x00,

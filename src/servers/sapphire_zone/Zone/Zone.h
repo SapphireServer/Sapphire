@@ -32,8 +32,6 @@ protected:
    std::string m_placeName;
    std::string m_internalName;
 
-   bool m_bPrivate;
-
    std::unordered_map< int32_t, Entity::PlayerPtr > m_playerMap;
    std::unordered_map< int32_t, Entity::BattleNpcPtr > m_BattleNpcMap;
    std::unordered_map< int32_t, Entity::EventNpcPtr > m_EventNpcMap;
@@ -43,8 +41,6 @@ protected:
    SessionSet m_sessionSet;
 
    CellCache** m_pCellCache[_sizeX];
-
-   Common::RegionType m_type;
 
    uint8_t m_currentWeather;
    uint8_t m_weatherOverride;
@@ -64,8 +60,6 @@ public:
 
    bool init();
 
-   bool isPrivateZone() const;
-
    /*! overrides the zone's weather, set to 0 to unlock */
    void setWeatherOverride( uint8_t weather );
 
@@ -79,8 +73,10 @@ public:
    CellCache* getCellCacheAndCreate( uint32_t cellx, uint32_t celly );
 
    virtual void loadCellCache();
-   virtual uint32_t getTerritoryId();
+   virtual uint32_t getTerritoryId() const;
    virtual void onEnterTerritory( Entity::PlayerPtr pPlayer );
+   virtual void onFinishLoading( Entity::PlayerPtr pPlayer );
+   virtual void onInitDirector( Entity::PlayerPtr pPlayer );
    virtual void onLeaveTerritory( Entity::PlayerPtr pPlayer );
    virtual void onUpdate( uint32_t currTime );
 
@@ -100,14 +96,9 @@ public:
 
    void queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range, Network::Packets::GamePacketPtr pPacketEntry );
 
-   Common::RegionType getType() const;
-
-   uint16_t getGuId() const;
-
-   bool isInstance() const;
+   uint32_t getGuId() const;
 
    const std::string& getName() const;
-
    const std::string& getInternalName() const;
 
    std::size_t getPopCount() const;

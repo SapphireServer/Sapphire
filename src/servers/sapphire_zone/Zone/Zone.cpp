@@ -41,20 +41,18 @@ namespace Core {
 /**
 * \brief
 */
-Zone::Zone()
-   : m_territoryId( 0 )
-   , m_guId( 0 )
-   , m_type( Common::RegionType::normal )
-   , m_currentWeather( static_cast< uint8_t >( Common::Weather::FairSkies ) )
-   , m_weatherOverride( 0 )
-   , m_lastMobUpdate( 0 )
-   , m_currentFestivalId( 0 )
+Zone::Zone() :
+   m_territoryId( 0 ),
+   m_guId( 0 ),
+   m_currentWeather( static_cast< uint8_t >( Common::Weather::FairSkies ) ),
+   m_weatherOverride( 0 ),
+   m_lastMobUpdate( 0 ),
+   m_currentFestivalId( 0 )
 {
 }
 
-Zone::Zone( uint16_t territoryId, uint32_t guId, const std::string& internalName, const std::string& placeName )
-   : m_type( Common::RegionType::normal )
-   , m_currentWeather( static_cast< uint8_t >( Common::Weather::FairSkies ) )
+Zone::Zone( uint16_t territoryId, uint32_t guId, const std::string& internalName, const std::string& placeName ) :
+   m_currentWeather( static_cast< uint8_t >( Common::Weather::FairSkies ) )
 {
    m_guId = guId;
 
@@ -102,11 +100,6 @@ bool Zone::init()
    loadCellCache();
 
    return true;
-}
-
-bool Zone::isPrivateZone() const
-{
-   return m_bPrivate;
 }
 
 void Zone::setWeatherOverride( uint8_t weather )
@@ -179,7 +172,7 @@ void Zone::loadCellCache()
                                "Look,"
                                "Models,"
                                "type "
-                               "FROM battlenpc WHERE ZoneId = " + std::to_string(getTerritoryId() ) + ";" );
+                               "FROM battlenpc WHERE ZoneId = " + std::to_string( getTerritoryId() ) + ";" );
 
    std::vector< Entity::BattleNpcPtr > cache;
 
@@ -395,24 +388,14 @@ void Zone::queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range,
    }
 }
 
-uint32_t Zone::getTerritoryId()
+uint32_t Zone::getTerritoryId() const
 {
    return m_territoryId;
 }
 
-Common::RegionType Zone::getType() const
-{
-   return m_type;
-}
-
-uint16_t Zone::getGuId() const
+uint32_t Zone::getGuId() const
 {
    return m_guId;
-}
-
-bool Zone::isInstance() const
-{
-   return m_type == Common::RegionType::instance;
 }
 
 const std::string& Zone::getName() const
@@ -774,8 +757,9 @@ void Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
             if( !pOwnPlayer->isLoadingComplete() )
                continue;
 
+            // this is a hack to limit actor spawn in one packetset
             count++;
-            if( count > 15 )
+            if( count > 12 )
                break;
 
             pActor->addInRangeActor( pCurAct );
@@ -825,6 +809,16 @@ void Zone::onLeaveTerritory( Entity::PlayerPtr pPlayer )
 }
 
 void Zone::onUpdate( uint32_t currTime )
+{
+
+}
+
+void Zone::onFinishLoading( Entity::PlayerPtr pPlayer )
+{
+
+}
+
+void Zone::onInitDirector( Entity::PlayerPtr pPlayer )
 {
 
 }

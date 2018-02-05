@@ -150,7 +150,7 @@ namespace Packets {
 
       EquipDisplayFlags          = 0x01FA, // updated 4.2
 
-      CFAvailableContents        = 0x01CF,
+      CFAvailableContents        = 0x01FD, // updated 4.2
 
       PrepareZoning              = 0x027C, // updated 4.2
       ActorGauge                 = 0x027D, // updated 4.2
