@@ -30,9 +30,17 @@ public:
       DpsChallange = 0x800D
    };
 
+   Director( DirectorType type, uint16_t contentId );
+
+   uint32_t getDirectorId() const;
+   uint16_t getContentId() const;
+   DirectorType getType() const;
+   uint8_t getSequence() const;
+   uint8_t getBranch() const;
+
 private:
    /*! Id of the content of the director */
-   uint16_t m_id;
+   uint16_t m_contentId;
 
    /*! DirectorType | ContentId */
    uint32_t m_directorId;
@@ -49,11 +57,6 @@ private:
    /*! type of the director */
    DirectorType m_type;
 
-   uint32_t getDirectorId() const;
-   uint16_t getContentId() const;
-   DirectorType getType() const;
-   uint8_t getSequence() const;
-   uint8_t getBranch() const;
 
 };
 

@@ -2,13 +2,14 @@
 #define SAPPHIRE_INSTANCECONTENT_H
 
 #include "Zone.h"
+#include "Event/Director.h"
 #include "Forwards.h"
 #include <common/Exd/ExdDataGenerated.h>
 
 namespace Core
 {
 
-class InstanceContent : public Zone
+class InstanceContent : public Zone, Event::Director
 {
 public:
    enum InstanceContentState
@@ -27,7 +28,10 @@ public:
 
    void onEnterTerritory( Entity::PlayerPtr pPlayer ) override;
    void onLeaveTerritory( Entity::PlayerPtr pPlayer ) override;
+   void onFinishLoading( Entity::PlayerPtr pPlayer ) override;
+   void onInitDirector( Entity::PlayerPtr pPlayer ) override;
    void onUpdate( uint32_t currTime ) override;
+
 
    Core::Data::ExdDataGenerated::InstanceContentPtr getInstanceContentInfo() const;
 
