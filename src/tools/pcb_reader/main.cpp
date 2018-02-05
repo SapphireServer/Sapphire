@@ -6,6 +6,8 @@
 #include <fstream>
 #include <regex>
 #include <map>
+#include <vector>
+#include <set>
 
 #include "pcb.h"
 #include "lgb.h"
@@ -21,8 +23,16 @@
 #include <boost/algorithm/string.hpp>
 #endif
 
-std::string gamePath("C:\\Program Files (x86)\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv");
+// garbage to ignore models
+bool ignoreModels = false;
+
+std::string gamePath( "C:\\Program Files (x86)\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv" );
 std::unordered_map< uint32_t, std::string > eobjNameMap;
+std::unordered_map< uint16_t, std::string > zoneNameMap;
+uint32_t zoneId;
+
+std::set< std::string > zoneDumpList;
+
 xiv::dat::GameData* data1 = nullptr;
 xiv::exd::ExdData* eData = nullptr;
 
@@ -103,8 +113,8 @@ int parseBlockEntry( char* data, std::vector<PCB_BLOCK_ENTRY>& entries, int gOff
 
 void dumpLevelExdEntries( uint32_t zoneId, const std::string& name = std::string() )
 {
-   auto& cat = eData->get_category( "Level" );
-   auto exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::none ) );
+   static auto& cat = eData->get_category( "Level" );
+   static auto exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::none ) );
 
    std::string fileName( name + "_" + std::to_string( zoneId ) + "_Level" + ".csv" );
    std::ofstream outfile( fileName, std::ios::trunc );
@@ -113,8 +123,8 @@ void dumpLevelExdEntries( uint32_t zoneId, const std::string& name = std::string
    {
       outfile.close();
       outfile.open( fileName, std::ios::app );
-
-      for( auto& row : exd.get_rows() )
+      static auto rows = exd.get_rows();
+      for( auto& row : rows )
       {
          auto id = row.first;
          auto& fields = row.second;
@@ -143,7 +153,8 @@ void dumpLevelExdEntries( uint32_t zoneId, const std::string& name = std::string
 std::string zoneNameToPath( const std::string& name )
 {
    std::string path;
-   uint32_t id;
+   bool found = false;
+
 #ifdef STANDALONE
    auto inFile = std::ifstream( "territorytype.exh.csv" );
    if( inFile.good() )
@@ -153,22 +164,23 @@ std::string zoneNameToPath( const std::string& name )
       while( std::getline( inFile, line ) )
       {
          std::smatch match;
-         if( std::regex_match( line, match, re ) )
+         if( std::regex_match( line, match, re )
          {
-            if( name == match[2].str() )
+            auto tmpId = std::stoul( match[1].str() );
+            if( !found && name == match[2].str() )
             {
-               id = match[1].str();
+               zoneId = tmpId;
                path = match[3].str();
-               break;
+               found = true;
             }
+            zoneNameMap[tmpId] = match[2].str();
          }
       }
       inFile.close();
    }
 #else
-   xiv::dat::GameData dat( gamePath );
-   xiv::exd::ExdData eData( dat );
-   auto& cat = eData.get_category( "TerritoryType" );
+
+   auto& cat = eData->get_category( "TerritoryType" );
    auto exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::none ) );
    for( auto& row : exd.get_rows() )
    {
@@ -177,16 +189,17 @@ std::string zoneNameToPath( const std::string& name )
       if( teriName.empty() )
          continue;
       auto teriPath = *boost::get< std::string >( &fields.at( static_cast< size_t >( TerritoryTypeExdIndexes::Path ) ) );
-      id = row.first;
-      if( boost::iequals( name, teriName ) )
+      if( !found && boost::iequals( name, teriName ) )
       {
          path = teriPath;
-         break;
+         found = true;
+         zoneId = row.first;
       }
+      zoneNameMap[row.first] = teriName;
    }
 #endif
 
-   if( !path.empty() )
+   if( found )
    {
       //path = path.substr( path.find_first_of( "/" ) + 1, path.size() - path.find_first_of( "/" ));
       //path = std::string( "ffxiv/" ) + path;
@@ -198,7 +211,7 @@ std::string zoneNameToPath( const std::string& name )
       throw std::runtime_error( "Unable to find path for " + name +
       ".\n\tPlease double check spelling or open 0a0000.win32.index with FFXIV Explorer and extract territorytype.exh as CSV\n\tand copy territorytype.exh.csv into pcb_reader.exe directory if using standalone" );
    }
-   dumpLevelExdEntries( id, name );
+
    return path;
 }
 
@@ -215,13 +228,60 @@ void loadEobjNames()
    }
 }
 
-void writeEobjEntry( std::ofstream& out, LGB_EOBJ_ENTRY* pEobj, const std::string& name )
+void writeEobjEntry( std::ofstream& out, LGB_ENTRY* pObj )
 {
+   static std::string mapRangeStr( "\"MapRange\", " );
+   static std::string eobjStr( "\"EObj\", " );
+
+   uint32_t id;
+   std::string name;
+   std::string typeStr;
+
+   if( pObj->getType() == LgbEntryType::EventObject )
+   {
+      auto pEobj = reinterpret_cast< LGB_EOBJ_ENTRY* >( pObj );
+      id = pEobj->header.eobjId;
+      name = eobjNameMap[id];
+      typeStr = eobjStr;
+   }
+   else if( pObj->getType() == LgbEntryType::MapRange )
+   {
+      auto pMapRange = reinterpret_cast< LGB_MAPRANGE_ENTRY* >( pObj );
+      id = pMapRange->header.unknown;
+      typeStr = mapRangeStr;
+   }
+
    std::string outStr(
-      std::to_string( pEobj->header.eobjId ) + ", \"" + name + "\", " +
-      std::to_string( pEobj->header.translation.x ) + ", " + std::to_string( pEobj->header.translation.y ) + ", " + std::to_string( pEobj->header.translation.z ) + "\n"
+      std::to_string( id ) + ", " + typeStr +  "\"" + name + "\", " +
+      std::to_string( pObj->header.translation.x ) + ", " + std::to_string( pObj->header.translation.y ) + ", " + std::to_string( pObj->header.translation.z ) + "\n"
    );
    out.write( outStr.c_str(), outStr.size() );
+}
+
+void loadAllInstanceContentEntries()
+{
+   auto& catInstance = eData->get_category( "InstanceContent" );
+   auto exdInstance = static_cast< xiv::exd::Exd >( catInstance.get_data_ln( xiv::exd::Language::en ) );
+
+   if( zoneNameMap.size() == 0 )
+   {
+      zoneNameToPath( "f1d1" );
+   }
+
+   for( auto& row : exdInstance.get_rows() )
+   {
+      auto id = row.first;
+      auto& fields = row.second;
+
+      auto name = *boost::get< std::string >( &fields.at( 3 ) );
+      if( name.empty() )
+         continue;
+      auto teri = *boost::get< uint32_t >( &fields.at( 7 ) );
+      auto i = 0;
+      while( ( i = name.find( ' ' ) ) != std::string::npos )
+         name = name.replace( name.begin() + i, name.begin() + i + 1, { '_' } );
+      zoneDumpList.emplace( zoneNameMap[teri] );
+   }
 }
 
 void readFileToBuffer( const std::string& path, std::vector< char >& buf )
@@ -245,22 +305,47 @@ void readFileToBuffer( const std::string& path, std::vector< char >& buf )
 int main( int argc, char* argv[] )
 {
    auto startTime = std::chrono::system_clock::now();
+   auto entryStartTime = std::chrono::system_clock::now();
 
+   std::vector< std::string > argVec( argv + 1, argv + argc );
    // todo: support expansions
    std::string zoneName = "r1f1";
+   bool dumpInstances = ignoreModels = std::remove_if( argVec.begin(), argVec.end(), []( auto arg ){ return arg == "--instance-dump"; } ) != argVec.end();
+
    if( argc > 1 )
    {
       zoneName = argv[1];
       if( argc > 2 )
       {
-         gamePath = argv[2];
+         std::string tmpPath( argv[2] );
+         if( !( tmpPath.empty() || tmpPath.find( '/' ) == std::string::npos ) )
+            gamePath = argv[2];
       }
    }
 
    initExd( gamePath );
+   if( dumpInstances )
+   {
+      loadAllInstanceContentEntries();
+   }
+   else
+   {
+      zoneDumpList.emplace( zoneName );
+   }
+
+LABEL_DUMP:
+   entryStartTime = std::chrono::system_clock::now();
+   zoneName = *zoneDumpList.begin();
    try
    {
       const auto& zonePath = zoneNameToPath( zoneName );
+
+      if( zonePath.find( "ex1/" ) != std::string::npos || zonePath.find( "ex2" ) != std::string::npos )
+      {
+         std::cout << "[Error] Expansions are currently not supported " << zonePath << "\n";
+         goto LABEL_NEXT_ZONE_ENTRY;
+      }
+
       std::string listPcbPath( zonePath + "/collision/list.pcb" );
       std::string bgLgbPath( zonePath + "/level/bg.lgb" );
       std::string planmapLgbPath( zonePath + "/level/planmap.lgb" );
@@ -292,13 +377,17 @@ int main( int argc, char* argv[] )
       uint32_t offset1 = 0x20;
 
       loadEobjNames();
-      std::string eobjFileName( zoneName + "eobj.csv" );
+      dumpLevelExdEntries( zoneId, zoneName );
+      std::string eobjFileName( zoneName + "_eobj.csv" );
       std::ofstream eobjOut( eobjFileName, std::ios::trunc );
       if( !eobjOut.good() )
          throw std::string( "Unable to create " + zoneName + "_eobj.csv for eobj entries. Run as admin or check there isnt already a handle on the file." ).c_str();
 
       eobjOut.close();
       eobjOut.open( eobjFileName, std::ios::app );
+
+      if( !eobjOut.good() )
+         throw std::string( "Unable to create " + zoneName + "_eobj.csv for eobj entries. Run as admin or check there isnt already a handle on the file." ).c_str();
 
       for( ; ; )
       {
@@ -317,20 +406,20 @@ int main( int argc, char* argv[] )
          }
       }
 
-      LGB_FILE bgLgb( &section[0] );
-      LGB_FILE planmapLgb( &section2[0] );
+      LGB_FILE bgLgb( &section[0], "bg" );
+      LGB_FILE planmapLgb( &section2[0], "planmap" );
 
       std::vector< LGB_FILE > lgbList { bgLgb, planmapLgb };
       uint32_t max_index = 0;
 
       // dont bother if we cant write to a file
-      auto fp_out = fopen( ( zoneName + ".obj" ).c_str(), "w" );
+      auto fp_out = ignoreModels ? ( FILE* )nullptr : fopen( ( zoneName + ".obj" ).c_str(), "w" );
       if( fp_out )
       {
          fprintf( fp_out, "\n" );
          fclose( fp_out );
       }
-      else
+      else if( !ignoreModels )
       {
          std::string errorMessage( "Cannot create " + zoneName + ".obj\n" +
             " Check no programs have a handle to file and run as admin.\n" );
@@ -339,19 +428,20 @@ int main( int argc, char* argv[] )
          return 0;
       }
 
-      fp_out = fopen( ( zoneName + ".obj" ).c_str(), "ab+" );
-      if( fp_out )
+      if( ignoreModels || ( fp_out = fopen( ( zoneName + ".obj" ).c_str(), "ab+" ) ) )
       {
          std::map< std::string, PCB_FILE > pcbFiles;
          std::map< std::string, SGB_FILE > sgbFiles;
          std::map< std::string, uint32_t > objCount;
          auto loadPcbFile = [&]( const std::string& fileName ) -> bool
          {
+            if( ignoreModels )
+               return false;
             try
             {
                if( fileName.find( '.' ) == std::string::npos )
                   return false;
-               else if( fileName.substr(fileName.find_last_of('.')) != ".pcb" )
+               else if( fileName.substr( fileName.find_last_of( '.' ) ) != ".pcb" )
                   throw std::runtime_error( "Not a PCB file." );
 
                char* dataSection = nullptr;
@@ -434,6 +524,8 @@ int main( int argc, char* argv[] )
             const vec3* translation = nullptr,
             const SGB_MODEL_ENTRY* pSgbEntry = nullptr)
          {
+            if( ignoreModels )
+               return;
             char name2[0x100];
             memset( name2, 0, 0x100 );
             sprintf( &name2[0], "%s_%u", &name[0], objCount[name]++ );
@@ -516,14 +608,14 @@ int main( int argc, char* argv[] )
             loadPcbFile( fileName );
             pushVerts( pcbFiles[fileName], fileName );
          }
-         std::cout << "[Info] " << "Writing obj file " << "\n";
-         std::cout << "[Info] " << bgLgb.groups.size() << " groups " << "\n";
+
+         std::cout << "[Info] " << ( ignoreModels ? "Dumping MapRange and EObj" : "Writing obj file " ) << "\n";
          uint32_t totalGroups = 0;
          uint32_t totalGroupEntries = 0;
 
          for( const auto& lgb : lgbList )
          {
-            for( const auto& group : bgLgb.groups )
+            for( const auto& group : lgb.groups )
             {
                //std::cout << "\t" << group.name << " Size " << group.header.entryCount << "\n";
                totalGroups++;
@@ -531,7 +623,6 @@ int main( int argc, char* argv[] )
                {
                   auto pGimmick = dynamic_cast< LGB_GIMMICK_ENTRY* >( pEntry.get() );
                   auto pBgParts = dynamic_cast< LGB_BGPARTS_ENTRY* >( pEntry.get() );
-                  auto pEventObj = dynamic_cast< LGB_EOBJ_ENTRY* >( pEntry.get() );
 
                   std::string fileName( "" );
                   fileName.resize( 256 );
@@ -591,20 +682,19 @@ int main( int argc, char* argv[] )
                      }
                   }
 
-                  if( pEventObj )
+                  if( pEntry->getType() == LgbEntryType::EventObject || pEntry->getType() == LgbEntryType::MapRange )
                   {
-                     fileName = pEventObj->name.empty() ? eobjNameMap[pEventObj->header.eobjId] : pEventObj->name;
-                     writeEobjEntry( eobjOut, pEventObj, fileName );
+                     writeEobjEntry( eobjOut, pEntry.get() );
                      //writeOutput( fileName, &pEventObj->header.scale, &pEventObj->header.rotation, &pEventObj->header.translation );
                   }
                }
             }
          }
-         std::cout << "\n[Info] " << "Loaded " << pcbFiles.size() << " PCB Files \n";
+         std::cout << "[Info] " << "Loaded " << pcbFiles.size() << " PCB Files \n";
          std::cout << "[Info] " << "Total Groups " << totalGroups << " Total entries " << totalGroupEntries << "\n";
       }
-      std::cout << "[Success] " << "Finished exporting " << zoneName << " in " <<
-         std::chrono::duration_cast< std::chrono::seconds >( std::chrono::system_clock::now() - startTime ).count() << " seconds\n";
+      std::cout << "[Success] " << "Exported " << zoneName << " in " <<
+         std::chrono::duration_cast< std::chrono::seconds >( std::chrono::system_clock::now() - entryStartTime ).count() << " seconds\n";
    }
    catch( std::exception& e )
    {
@@ -613,6 +703,14 @@ int main( int argc, char* argv[] )
       std::cout << std::endl;
       std::cout << "[Info] " << "Usage: pcb_reader2 territory \"path/to/game/sqpack/ffxiv\" " << std::endl;
    }
+   std::cout << "\n\n\n";
+   LABEL_NEXT_ZONE_ENTRY:
+   zoneDumpList.erase( zoneName );
+   if( !zoneDumpList.empty() )
+      goto LABEL_DUMP;
+
+   std::cout << "\n\n\n[Success] Finished all tasks in " <<
+      std::chrono::duration_cast< std::chrono::seconds >( std::chrono::system_clock::now() - startTime ).count() << " seconds\n";
 
    if( eData )
       delete eData;

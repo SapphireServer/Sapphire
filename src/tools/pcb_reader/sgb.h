@@ -11,6 +11,9 @@
 
 #include "vec3.h"
 
+// garbage to skip model loading
+extern bool ignoreModels;
+
 //
 // ported from https://github.com/ufx/SaintCoinach/blob/master/SaintCoinach/Graphics/Sgb/SgbDataType.cs
 
@@ -132,7 +135,7 @@ struct SGB_GROUP
          if( entryOffset > fileSize )
             throw std::runtime_error( "SGB_GROUP entry offset was larger than SGB file size!" );
          auto type = *reinterpret_cast< uint32_t* >( buf + entryOffset );
-         if( type == SgbGroupEntryType::Model )
+         if( type == SgbGroupEntryType::Model && !ignoreModels )
          {
             entries.push_back( std::make_shared< SGB_MODEL_ENTRY >( buf, entryOffset ) );
          }
