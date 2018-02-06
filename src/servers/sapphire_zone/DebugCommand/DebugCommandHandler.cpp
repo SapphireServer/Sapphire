@@ -26,6 +26,7 @@
 #include "Actor/EventNpc.h"
 
 #include "Zone/Zone.h"
+#include "Zone/InstanceContent.h"
 
 #include "ServerZone.h"
 
@@ -752,6 +753,20 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
    else if( subCommand == "return" || subCommand == "ret" )
    {
       player.exitInstance();
+   }
+   else if( subCommand == "set" )
+   {
+      uint32_t instanceId;
+      uint32_t index;
+      uint32_t value;
+      sscanf( params.c_str(), "%d %d %d", &instanceId, &index, &value );
+
+      auto pInstance = g_territoryMgr.getInstanceZonePtr( instanceId );
+      if( !pInstance )
+         return;
+      auto instance = boost::dynamic_pointer_cast< InstanceContent >( pInstance );
+
+      instance->setVar( static_cast< uint8_t >( index ), static_cast< uint8_t >( value ) );
    }
    else if( subCommand == "festival" )
    {

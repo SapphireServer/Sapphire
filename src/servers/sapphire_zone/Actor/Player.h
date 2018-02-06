@@ -499,6 +499,9 @@ public:
    void sendUrgent( const std::string& message );
    void sendDebug( const std::string& message );
 
+   bool isDirectorInitialized() const;
+   void setDirectorInitialized( bool isInitialized );
+
    // Player Battle Handling
    //////////////////////////////////////////////////////////////////////////////////////////////////////
    void onMobAggro( BattleNpcPtr pBNpc );
@@ -565,6 +568,8 @@ private:
    uint8_t m_mode;
 
    bool m_markedForRemoval;
+
+   bool m_directorInitialized;
 
 private:
 

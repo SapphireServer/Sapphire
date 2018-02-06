@@ -142,6 +142,8 @@ namespace Packets {
 
       Mount                      = 0x01CD, // updated 4.2
 
+      DirectorVars               = 0x01CF, // updated 4.2
+
       WeatherChange              = 0x01EA, // updated 4.2
       PlayerTitleList            = 0x01EB, // updated 4.2
       Discovery                  = 0x01EC, // updated 4.2
