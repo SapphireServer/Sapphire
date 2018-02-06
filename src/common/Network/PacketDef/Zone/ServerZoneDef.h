@@ -1273,6 +1273,23 @@ struct FFXIVIpcMount : FFXIVIpcBasePacket<Mount>
    uint32_t id;
 };
 
+/**
+* Structural representation of the packet sent by the server
+* to mount a player
+*/
+struct FFXIVIpcDirectorVars : FFXIVIpcBasePacket<DirectorVars>
+{
+   /*! DirectorType | ContentId */
+   uint32_t m_directorId;
+   /*! currect sequence */
+   uint8_t m_sequence;
+   /*! current branch */
+   uint8_t m_branch;
+   /*! raw storage for flags/vars */
+   uint8_t m_unionData[10];
+};
+
+
 struct FFXIVIpcActorGauge : FFXIVIpcBasePacket<ActorGauge>
 {
    uint8_t classJobId;

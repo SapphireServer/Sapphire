@@ -406,6 +406,8 @@ void Core::Network::GameConnection::pingHandler( const Packets::GamePacket& inPa
 void Core::Network::GameConnection::finishLoadingHandler( const Packets::GamePacket& inPacket,
                                                           Entity::Player& player )
 {
+   player.getCurrentZone()->onFinishLoading( player.getAsPlayer() );
+
    // player is done zoning
    player.setLoadingComplete( true );
 

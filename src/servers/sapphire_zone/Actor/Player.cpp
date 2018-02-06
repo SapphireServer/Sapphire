@@ -70,7 +70,8 @@ Core::Entity::Player::Player() :
    m_zoningType( Common::ZoneingType::None ),
    m_bAutoattack( false ),
    m_markedForRemoval( false ),
-   m_mount( 0 )
+   m_mount( 0 ),
+   m_directorInitialized( false )
 {
    m_id = 0;
    m_objKind = ObjKind::Player;
@@ -1636,4 +1637,14 @@ void Player::sendZonePackets()
    getCurrentZone()->onEnterTerritory( getAsPlayer() );
 
    m_bMarkedForZoning = false;
+}
+
+void Player::setDirectorInitialized( bool isInitialized )
+{
+   m_directorInitialized = isInitialized;
+}
+
+bool Player::isDirectorInitialized() const
+{
+   return m_directorInitialized;
 }

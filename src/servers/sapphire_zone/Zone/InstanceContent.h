@@ -15,7 +15,8 @@ public:
    enum InstanceContentState
    {
       Created,
-      DutyStarted,
+      DutyReset,
+      DutyInProgress,
       DutyFinished
    };
 
@@ -31,6 +32,8 @@ public:
    void onFinishLoading( Entity::PlayerPtr pPlayer ) override;
    void onInitDirector( Entity::PlayerPtr pPlayer ) override;
    void onUpdate( uint32_t currTime ) override;
+
+   void setVar( uint8_t index, uint8_t value );
 
 
    Core::Data::ExdDataGenerated::InstanceContentPtr getInstanceContentInfo() const;
