@@ -2,7 +2,6 @@
 #include <common/Util/Util.h>
 #include <common/Network/PacketDef/Zone/ServerZoneDef.h>
 #include <common/Logging/Logger.h>
-#include <common/Exd/ExdData.h>
 
 #include <boost/algorithm/string.hpp>
 #include <algorithm>

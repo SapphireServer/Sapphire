@@ -1,7 +1,7 @@
 #ifndef SAPPHIRE_TERRITORYMGR_H
 #define SAPPHIRE_TERRITORYMGR_H
 
-#include <common/Exd/ExdData.h>
+#include <common/Exd/ExdDataGenerated.h>
 #include "Forwards.h"
 #include <set>
 

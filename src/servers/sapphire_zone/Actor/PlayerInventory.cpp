@@ -1,5 +1,4 @@
 #include <common/Common.h>
-#include <common/Exd/ExdData.h>
 #include <common/Network/GamePacket.h>
 #include <common/Logging/Logger.h>
 

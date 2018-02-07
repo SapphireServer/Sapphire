@@ -1,7 +1,6 @@
 #include <common/Util/Util.h>
 #include <common/Util/UtilMath.h>
 #include <common/Network/PacketContainer.h>
-#include <common/Exd/ExdData.h>
 #include <common/Exd/ExdDataGenerated.h>
 #include <common/Network/GamePacket.h>
 

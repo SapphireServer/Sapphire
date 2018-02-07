@@ -3,7 +3,6 @@
 #include <common/Common.h>
 #include <common/Util/Util.h>
 #include <common/Util/UtilMath.h>
-#include <common/Exd/ExdData.h>
 #include <common/Logging/Logger.h>
 
 #include "Network/PacketWrappers/ActorControlPacket142.h"
@@ -17,7 +16,6 @@ using namespace Core::Network;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-extern Core::Data::ExdData g_exdData;
 extern Core::Logger g_log;
 extern Core::Scripting::ScriptManager g_scriptMgr;
 

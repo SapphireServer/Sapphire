@@ -5,7 +5,6 @@
 #include <cmath>
 
 #include <common/Logging/Logger.h>
-#include <common/Exd/ExdData.h>
 #include <common/Util/Util.h>
 #include <common/Util/UtilMath.h>
 
@@ -21,7 +20,6 @@ using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
 extern Core::Logger g_log;
-extern Core::Data::ExdData g_exdData;
 
 uint32_t Core::Entity::EventNpc::m_nextID = 1249241694;
 

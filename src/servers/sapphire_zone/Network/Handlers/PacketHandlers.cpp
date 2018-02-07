@@ -2,7 +2,6 @@
 #include <common/Network/CommonNetwork.h>
 #include <common/Network/GamePacketNew.h>
 #include <common/Logging/Logger.h>
-#include <common/Exd/ExdData.h>
 #include <common/Network/PacketContainer.h>
 #include <common/Network/PacketDef/Chat/ServerChatDef.h>
 #include <common/Database/DatabaseDef.h>
@@ -41,7 +40,6 @@
 extern Core::Logger g_log;
 extern Core::ServerZone g_serverZone;
 extern Core::TerritoryMgr g_territoryMgr;
-extern Core::Data::ExdData g_exdData;
 extern Core::DebugCommandHandler g_gameCommandMgr;
 
 using namespace Core::Common;

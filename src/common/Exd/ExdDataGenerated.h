@@ -252,6 +252,8 @@ struct Picture;
 struct PlaceName;
 struct Quest;
 struct QuestRewardOther;
+struct QuickChat;
+struct QuickChatTransient;
 struct Race;
 struct RacingChocoboItem;
 struct RacingChocoboName;
@@ -295,6 +297,7 @@ struct Town;
 struct Trait;
 struct TraitRecast;
 struct TraitTransient;
+struct TreasureHuntRank;
 struct Tribe;
 struct TripleTriad;
 struct TripleTriadCard;
@@ -693,9 +696,16 @@ struct BeastReputationRank
 
 struct BeastTribe
 {
+   uint8_t minLevel;
+   uint8_t maxLevel;
    uint8_t beastRankBonus;
    uint32_t iconReputation;
    uint32_t icon;
+   uint8_t maxRank;
+   uint32_t alliedBeastTribeQuest;
+   uint8_t expansion;
+   uint32_t currencyItem;
+   uint8_t displayOrder;
    std::string name;
    std::string nameRelation;
 
@@ -1536,7 +1546,7 @@ struct EventAction
 {
    std::string name;
    uint16_t icon;
-   uint16_t castTime;
+   uint8_t castTime;
 
    EventAction( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
@@ -1996,6 +2006,9 @@ struct GilShop
 struct GilShopItem
 {
    int32_t item;
+   std::vector< int32_t > rowRequired;
+   uint16_t stateRequired;
+   uint16_t patch;
 
    GilShopItem( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
@@ -2552,6 +2565,7 @@ struct Mount
    uint8_t flyingCondition;
    uint8_t isFlying;
    uint16_t rideBGM;
+   int8_t order;
    uint16_t icon;
 
    Mount( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
@@ -2604,6 +2618,7 @@ struct Omen
 
 struct OnlineStatus
 {
+   uint8_t priority;
    std::string name;
    uint32_t icon;
 
@@ -2751,6 +2766,22 @@ struct QuestRewardOther
    std::string name;
 
    QuestRewardOther( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct QuickChat
+{
+   std::string nameAction;
+   int32_t icon1;
+   int8_t quickChatTransient;
+
+   QuickChat( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct QuickChatTransient
+{
+   std::string textOutput;
+
+   QuickChatTransient( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct Race
@@ -3185,6 +3216,18 @@ struct TraitTransient
    std::string description;
 
    TraitTransient( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct TreasureHuntRank
+{
+   uint32_t icon;
+   int32_t itemName;
+   int32_t keyItemName;
+   int32_t instanceMap;
+   uint8_t maxPartySize;
+   uint8_t minPartySize;
+
+   TreasureHuntRank( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct Tribe
@@ -3631,6 +3674,8 @@ struct WorldDCGroupType
      xiv::exd::Exd m_PlaceNameDat;
      xiv::exd::Exd m_QuestDat;
      xiv::exd::Exd m_QuestRewardOtherDat;
+     xiv::exd::Exd m_QuickChatDat;
+     xiv::exd::Exd m_QuickChatTransientDat;
      xiv::exd::Exd m_RaceDat;
      xiv::exd::Exd m_RacingChocoboItemDat;
      xiv::exd::Exd m_RacingChocoboNameDat;
@@ -3674,6 +3719,7 @@ struct WorldDCGroupType
      xiv::exd::Exd m_TraitDat;
      xiv::exd::Exd m_TraitRecastDat;
      xiv::exd::Exd m_TraitTransientDat;
+     xiv::exd::Exd m_TreasureHuntRankDat;
      xiv::exd::Exd m_TribeDat;
      xiv::exd::Exd m_TripleTriadDat;
      xiv::exd::Exd m_TripleTriadCardDat;
@@ -4166,6 +4212,10 @@ struct WorldDCGroupType
      QuestPtr getQuest( uint32_t QuestId );
      using QuestRewardOtherPtr =  boost::shared_ptr< QuestRewardOther >;
      QuestRewardOtherPtr getQuestRewardOther( uint32_t QuestRewardOtherId );
+     using QuickChatPtr =  boost::shared_ptr< QuickChat >;
+     QuickChatPtr getQuickChat( uint32_t QuickChatId );
+     using QuickChatTransientPtr =  boost::shared_ptr< QuickChatTransient >;
+     QuickChatTransientPtr getQuickChatTransient( uint32_t QuickChatTransientId );
      using RacePtr =  boost::shared_ptr< Race >;
      RacePtr getRace( uint32_t RaceId );
      using RacingChocoboItemPtr =  boost::shared_ptr< RacingChocoboItem >;
@@ -4252,6 +4302,8 @@ struct WorldDCGroupType
      TraitRecastPtr getTraitRecast( uint32_t TraitRecastId );
      using TraitTransientPtr =  boost::shared_ptr< TraitTransient >;
      TraitTransientPtr getTraitTransient( uint32_t TraitTransientId );
+     using TreasureHuntRankPtr =  boost::shared_ptr< TreasureHuntRank >;
+     TreasureHuntRankPtr getTreasureHuntRank( uint32_t TreasureHuntRankId );
      using TribePtr =  boost::shared_ptr< Tribe >;
      TribePtr getTribe( uint32_t TribeId );
      using TripleTriadPtr =  boost::shared_ptr< TripleTriad >;
@@ -4529,6 +4581,8 @@ struct WorldDCGroupType
      std::set< uint32_t > m_PlaceNameIdList;
      std::set< uint32_t > m_QuestIdList;
      std::set< uint32_t > m_QuestRewardOtherIdList;
+     std::set< uint32_t > m_QuickChatIdList;
+     std::set< uint32_t > m_QuickChatTransientIdList;
      std::set< uint32_t > m_RaceIdList;
      std::set< uint32_t > m_RacingChocoboItemIdList;
      std::set< uint32_t > m_RacingChocoboNameIdList;
@@ -4572,6 +4626,7 @@ struct WorldDCGroupType
      std::set< uint32_t > m_TraitIdList;
      std::set< uint32_t > m_TraitRecastIdList;
      std::set< uint32_t > m_TraitTransientIdList;
+     std::set< uint32_t > m_TreasureHuntRankIdList;
      std::set< uint32_t > m_TribeIdList;
      std::set< uint32_t > m_TripleTriadIdList;
      std::set< uint32_t > m_TripleTriadCardIdList;
@@ -6004,6 +6059,18 @@ const std::set< uint32_t >& getQuestRewardOtherIdList()
       loadIdList( m_QuestRewardOtherDat, m_QuestRewardOtherIdList );
    return m_QuestRewardOtherIdList;
 }
+const std::set< uint32_t >& getQuickChatIdList()
+{
+   if( m_QuickChatIdList.size() == 0 )
+      loadIdList( m_QuickChatDat, m_QuickChatIdList );
+   return m_QuickChatIdList;
+}
+const std::set< uint32_t >& getQuickChatTransientIdList()
+{
+   if( m_QuickChatTransientIdList.size() == 0 )
+      loadIdList( m_QuickChatTransientDat, m_QuickChatTransientIdList );
+   return m_QuickChatTransientIdList;
+}
 const std::set< uint32_t >& getRaceIdList()
 {
    if( m_RaceIdList.size() == 0 )
@@ -6261,6 +6328,12 @@ const std::set< uint32_t >& getTraitTransientIdList()
    if( m_TraitTransientIdList.size() == 0 )
       loadIdList( m_TraitTransientDat, m_TraitTransientIdList );
    return m_TraitTransientIdList;
+}
+const std::set< uint32_t >& getTreasureHuntRankIdList()
+{
+   if( m_TreasureHuntRankIdList.size() == 0 )
+      loadIdList( m_TreasureHuntRankDat, m_TreasureHuntRankIdList );
+   return m_TreasureHuntRankIdList;
 }
 const std::set< uint32_t >& getTribeIdList()
 {
