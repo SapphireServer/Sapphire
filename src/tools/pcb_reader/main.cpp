@@ -29,6 +29,7 @@ bool ignoreModels = false;
 std::string gamePath( "C:\\Program Files (x86)\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv" );
 std::unordered_map< uint32_t, std::string > eobjNameMap;
 std::unordered_map< uint16_t, std::string > zoneNameMap;
+std::unordered_map< uint16_t, std::vector< std::pair< uint16_t, std::string > > > zoneInstanceMap;
 uint32_t zoneId;
 
 std::set< std::string > zoneDumpList;
@@ -234,6 +235,7 @@ void writeEobjEntry( std::ofstream& out, LGB_ENTRY* pObj )
    static std::string eobjStr( "\"EObj\", " );
 
    uint32_t id;
+   uint32_t unknown = 0, unknown2 = 0;
    std::string name;
    std::string typeStr;
 
@@ -241,6 +243,7 @@ void writeEobjEntry( std::ofstream& out, LGB_ENTRY* pObj )
    {
       auto pEobj = reinterpret_cast< LGB_EOBJ_ENTRY* >( pObj );
       id = pEobj->header.eobjId;
+      unknown = pEobj->header.unknown;
       name = eobjNameMap[id];
       typeStr = eobjStr;
    }
@@ -248,11 +251,13 @@ void writeEobjEntry( std::ofstream& out, LGB_ENTRY* pObj )
    {
       auto pMapRange = reinterpret_cast< LGB_MAPRANGE_ENTRY* >( pObj );
       id = pMapRange->header.unknown;
+      unknown = pMapRange->header.unknown2;
+      unknown2 = pMapRange->header.unknown3;
       typeStr = mapRangeStr;
    }
 
    std::string outStr(
-      std::to_string( id ) + ", " + typeStr +  "\"" + name + "\", " +
+      std::to_string( id ) + ", " + typeStr +  "\"" + name + "\", " + std::to_string( unknown ) + ", " + std::to_string( unknown2 ) + ", " +
       std::to_string( pObj->header.translation.x ) + ", " + std::to_string( pObj->header.translation.y ) + ", " + std::to_string( pObj->header.translation.z ) + "\n"
    );
    out.write( outStr.c_str(), outStr.size() );
@@ -268,6 +273,18 @@ void loadAllInstanceContentEntries()
       zoneNameToPath( "f1d1" );
    }
 
+   std::ofstream out( "instancecontent.csv", std::ios::trunc );
+   if( out.good() )
+   {
+      out.close();
+   }
+   out.open( "instancecontent.csv", std::ios::app );
+   if( !out.good() )
+   {
+      throw std::runtime_error( "Unable to create instancecontent.csv!" );
+   }
+   std::cout << "[Info] Writing instancecontent.csv\n";
+
    for( auto& row : exdInstance.get_rows() )
    {
       auto id = row.first;
@@ -276,12 +293,18 @@ void loadAllInstanceContentEntries()
       auto name = *boost::get< std::string >( &fields.at( 3 ) );
       if( name.empty() )
          continue;
-      auto teri = *boost::get< uint32_t >( &fields.at( 7 ) );
+      auto teri = *boost::get< uint32_t >( &fields.at( 9 ) );
       auto i = 0;
       while( ( i = name.find( ' ' ) ) != std::string::npos )
          name = name.replace( name.begin() + i, name.begin() + i + 1, { '_' } );
+      std::string outStr(
+         std::to_string( id ) + ", \"" + name + "\", \"" + zoneNameMap[teri] + "\","  + std::to_string( teri ) + "\n"
+      );
+      out.write( outStr.c_str(), outStr.size() );
+      //zoneInstanceMap[zoneId].push_back( std::make_pair( id, name ) );
       zoneDumpList.emplace( zoneNameMap[teri] );
    }
+   out.close();
 }
 
 void readFileToBuffer( const std::string& path, std::vector< char >& buf )
@@ -389,23 +412,25 @@ LABEL_DUMP:
       if( !eobjOut.good() )
          throw std::string( "Unable to create " + zoneName + "_eobj.csv for eobj entries. Run as admin or check there isnt already a handle on the file." ).c_str();
 
-      for( ; ; )
+      if( !ignoreModels )
       {
-
-         uint16_t trId = *(uint16_t*)&section1[offset1];
-
-         char someString[200];
-         sprintf( someString, "%str%04d.pcb", collisionFilePath.c_str(), trId );
-         stringList.push_back( std::string( someString ) );
-         //std::cout << someString << "\n";
-         offset1 += 0x20;
-
-         if( offset1 >= section1.size() )
+         for( ; ; )
          {
-            break;
+
+            uint16_t trId = *(uint16_t*)&section1[offset1];
+
+            char someString[200];
+            sprintf( someString, "%str%04d.pcb", collisionFilePath.c_str(), trId );
+            stringList.push_back( std::string( someString ) );
+            //std::cout << someString << "\n";
+            offset1 += 0x20;
+
+            if( offset1 >= section1.size() )
+            {
+               break;
+            }
          }
       }
-
       LGB_FILE bgLgb( &section[0], "bg" );
       LGB_FILE planmapLgb( &section2[0], "planmap" );
 
@@ -603,10 +628,13 @@ LABEL_DUMP:
             }
          };
 
-         for( const auto& fileName : stringList )
+         if( !ignoreModels )
          {
-            loadPcbFile( fileName );
-            pushVerts( pcbFiles[fileName], fileName );
+            for( const auto& fileName : stringList )
+            {
+               loadPcbFile( fileName );
+               pushVerts( pcbFiles[fileName], fileName );
+            }
          }
 
          std::cout << "[Info] " << ( ignoreModels ? "Dumping MapRange and EObj" : "Writing obj file " ) << "\n";
@@ -685,7 +713,7 @@ LABEL_DUMP:
                   if( pEntry->getType() == LgbEntryType::EventObject || pEntry->getType() == LgbEntryType::MapRange )
                   {
                      writeEobjEntry( eobjOut, pEntry.get() );
-                     //writeOutput( fileName, &pEventObj->header.scale, &pEventObj->header.rotation, &pEventObj->header.translation );
+                     writeOutput( fileName, &pEntry->header.scale, &pEntry->header.rotation, &pEntry->header.translation );
                   }
                }
             }
