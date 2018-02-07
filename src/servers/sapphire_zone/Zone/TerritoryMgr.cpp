@@ -11,7 +11,6 @@
 #include "InstanceContent.h"
 
 extern Core::Logger g_log;
-extern Core::Data::ExdData g_exdData;
 extern Core::Data::ExdDataGenerated g_exdDataGen;
 
 Core::TerritoryMgr::TerritoryMgr() :
