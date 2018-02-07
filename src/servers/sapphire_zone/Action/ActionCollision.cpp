@@ -1,5 +1,4 @@
 #include <common/Util/Util.h>
-#include <common/Exd/ExdData.h>
 #include <common/Util/UtilMath.h>
 
 #include "ActionCollision.h"
