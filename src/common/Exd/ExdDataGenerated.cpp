@@ -413,9 +413,16 @@
       Core::Data::BeastTribe::BeastTribe( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
       {
          auto row = exdData->m_BeastTribeDat.get_row( row_id );
+         minLevel = exdData->getField< uint8_t >( row, 0 );
+         maxLevel = exdData->getField< uint8_t >( row, 1 );
          beastRankBonus = exdData->getField< uint8_t >( row, 2 );
          iconReputation = exdData->getField< uint32_t >( row, 3 );
          icon = exdData->getField< uint32_t >( row, 4 );
+         maxRank = exdData->getField< uint8_t >( row, 5 );
+         alliedBeastTribeQuest = exdData->getField< uint32_t >( row, 6 );
+         expansion = exdData->getField< uint8_t >( row, 7 );
+         currencyItem = exdData->getField< uint32_t >( row, 8 );
+         displayOrder = exdData->getField< uint8_t >( row, 9 );
          name = exdData->getField< std::string >( row, 10 );
          nameRelation = exdData->getField< std::string >( row, 18 );
       }
@@ -1973,6 +1980,11 @@
       {
          auto row = exdData->m_GilShopItemDat.get_row( row_id );
          item = exdData->getField< int32_t >( row, 0 );
+         rowRequired.push_back( exdData->getField< int32_t >( row, 3 ) );
+         rowRequired.push_back( exdData->getField< int32_t >( row, 4 ) );
+         rowRequired.push_back( exdData->getField< int32_t >( row, 5 ) );
+         stateRequired = exdData->getField< uint16_t >( row, 7 );
+         patch = exdData->getField< uint16_t >( row, 8 );
       }
 
       Core::Data::GoldSaucerTextData::GoldSaucerTextData( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
@@ -2519,6 +2531,7 @@
          flyingCondition = exdData->getField< uint8_t >( row, 10 );
          isFlying = exdData->getField< uint8_t >( row, 14 );
          rideBGM = exdData->getField< uint16_t >( row, 17 );
+         order = exdData->getField< int8_t >( row, 29 );
          icon = exdData->getField< uint16_t >( row, 30 );
       }
 
@@ -2572,6 +2585,7 @@
       Core::Data::OnlineStatus::OnlineStatus( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
       {
          auto row = exdData->m_OnlineStatusDat.get_row( row_id );
+         priority = exdData->getField< uint8_t >( row, 2 );
          name = exdData->getField< std::string >( row, 3 );
          icon = exdData->getField< uint32_t >( row, 4 );
       }
@@ -3014,6 +3028,20 @@
       {
          auto row = exdData->m_QuestRewardOtherDat.get_row( row_id );
          name = exdData->getField< std::string >( row, 1 );
+      }
+
+      Core::Data::QuickChat::QuickChat( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
+      {
+         auto row = exdData->m_QuickChatDat.get_row( row_id );
+         nameAction = exdData->getField< std::string >( row, 0 );
+         icon1 = exdData->getField< int32_t >( row, 1 );
+         quickChatTransient = exdData->getField< int8_t >( row, 3 );
+      }
+
+      Core::Data::QuickChatTransient::QuickChatTransient( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
+      {
+         auto row = exdData->m_QuickChatTransientDat.get_row( row_id );
+         textOutput = exdData->getField< std::string >( row, 0 );
       }
 
       Core::Data::Race::Race( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
@@ -3672,6 +3700,17 @@
          description = exdData->getField< std::string >( row, 0 );
       }
 
+      Core::Data::TreasureHuntRank::TreasureHuntRank( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
+      {
+         auto row = exdData->m_TreasureHuntRankDat.get_row( row_id );
+         icon = exdData->getField< uint32_t >( row, 1 );
+         itemName = exdData->getField< int32_t >( row, 2 );
+         keyItemName = exdData->getField< int32_t >( row, 3 );
+         instanceMap = exdData->getField< int32_t >( row, 4 );
+         maxPartySize = exdData->getField< uint8_t >( row, 5 );
+         minPartySize = exdData->getField< uint8_t >( row, 6 );
+      }
+
       Core::Data::Tribe::Tribe( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
       {
          auto row = exdData->m_TribeDat.get_row( row_id );
@@ -4121,6 +4160,8 @@ bool Core::Data::ExdDataGenerated::init( const std::string& path )
       m_PlaceNameDat = setupDatAccess( "PlaceName", xiv::exd::Language::en );
       m_QuestDat = setupDatAccess( "Quest", xiv::exd::Language::en );
       m_QuestRewardOtherDat = setupDatAccess( "QuestRewardOther", xiv::exd::Language::en );
+      m_QuickChatDat = setupDatAccess( "QuickChat", xiv::exd::Language::en );
+      m_QuickChatTransientDat = setupDatAccess( "QuickChatTransient", xiv::exd::Language::en );
       m_RaceDat = setupDatAccess( "Race", xiv::exd::Language::en );
       m_RacingChocoboItemDat = setupDatAccess( "RacingChocoboItem", xiv::exd::Language::none );
       m_RacingChocoboNameDat = setupDatAccess( "RacingChocoboName", xiv::exd::Language::en );
@@ -4164,6 +4205,7 @@ bool Core::Data::ExdDataGenerated::init( const std::string& path )
       m_TraitDat = setupDatAccess( "Trait", xiv::exd::Language::en );
       m_TraitRecastDat = setupDatAccess( "TraitRecast", xiv::exd::Language::none );
       m_TraitTransientDat = setupDatAccess( "TraitTransient", xiv::exd::Language::en );
+      m_TreasureHuntRankDat = setupDatAccess( "TreasureHuntRank", xiv::exd::Language::none );
       m_TribeDat = setupDatAccess( "Tribe", xiv::exd::Language::en );
       m_TripleTriadDat = setupDatAccess( "TripleTriad", xiv::exd::Language::none );
       m_TripleTriadCardDat = setupDatAccess( "TripleTriadCard", xiv::exd::Language::en );
@@ -7721,6 +7763,36 @@ Core::Data::ExdDataGenerated::QuestRewardOtherPtr
    }
    return nullptr;
 }
+Core::Data::ExdDataGenerated::QuickChatPtr
+   Core::Data::ExdDataGenerated::getQuickChat( uint32_t QuickChatId )
+{
+   try
+   {
+      auto row = m_QuickChatDat.get_row( QuickChatId );
+      auto info = boost::make_shared< QuickChat >( QuickChatId, this );
+      return info;
+   }
+   catch( ... )
+   {
+      return nullptr;
+   }
+   return nullptr;
+}
+Core::Data::ExdDataGenerated::QuickChatTransientPtr
+   Core::Data::ExdDataGenerated::getQuickChatTransient( uint32_t QuickChatTransientId )
+{
+   try
+   {
+      auto row = m_QuickChatTransientDat.get_row( QuickChatTransientId );
+      auto info = boost::make_shared< QuickChatTransient >( QuickChatTransientId, this );
+      return info;
+   }
+   catch( ... )
+   {
+      return nullptr;
+   }
+   return nullptr;
+}
 Core::Data::ExdDataGenerated::RacePtr
    Core::Data::ExdDataGenerated::getRace( uint32_t RaceId )
 {
@@ -8358,6 +8430,21 @@ Core::Data::ExdDataGenerated::TraitTransientPtr
    {
       auto row = m_TraitTransientDat.get_row( TraitTransientId );
       auto info = boost::make_shared< TraitTransient >( TraitTransientId, this );
+      return info;
+   }
+   catch( ... )
+   {
+      return nullptr;
+   }
+   return nullptr;
+}
+Core::Data::ExdDataGenerated::TreasureHuntRankPtr
+   Core::Data::ExdDataGenerated::getTreasureHuntRank( uint32_t TreasureHuntRankId )
+{
+   try
+   {
+      auto row = m_TreasureHuntRankDat.get_row( TreasureHuntRankId );
+      auto info = boost::make_shared< TreasureHuntRank >( TreasureHuntRankId, this );
       return info;
    }
    catch( ... )
