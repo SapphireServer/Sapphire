@@ -1028,6 +1028,13 @@
       "defaultColumn": "Name",
       "definitions": [
         {
+          "name": "MinLevel"
+        },
+        {
+          "index": 1,
+          "name": "MaxLevel"
+        },
+        {
           "index": 2,
           "name": "BeastRankBonus",
           "converter": {
@@ -1048,6 +1055,34 @@
           "converter": {
             "type": "icon"
           }
+        },
+        {
+          "index": 5,
+          "name": "MaxRank"
+        },
+        {
+          "index": 6,
+          "name": "AlliedBeastTribeQuest",
+          "converter": {
+            "type": "link",
+            "target": "Quest"
+          }
+        },
+        {
+          "index": 7,
+          "name": "Expansion"
+        },
+        {
+          "index": 8,
+          "name": "CurrencyItem",
+          "converter": {
+            "type": "link",
+            "target": "Item"
+          }
+        },
+        {
+          "index": 9,
+          "name": "DisplayOrder"
         },
         {
           "index": 10,
@@ -3596,7 +3631,7 @@
           }
         },
         {
-          "index": 3,
+          "index": 2,
           "name": "CastTime"
         }
       ]
@@ -4846,6 +4881,29 @@
             "type": "link",
             "target": "Item"
           }
+        },
+        {
+          "type": "repeat",
+          "count": 3,
+          "index": 3,
+          "definition": {
+            "name": "Row{Required}",
+            "converter": {
+              "type": "multiref",
+              "targets": [
+                "Quest",
+                "Achievement"
+              ]
+            }
+          }
+        },
+        {
+          "index": 7,
+          "name": "State{Required}"
+        },
+        {
+          "index": 8,
+          "name": "Patch"
         }
       ]
     },
@@ -6663,6 +6721,10 @@
           }
         },
         {
+          "index": 29,
+          "name": "Order"
+        },
+        {
           "index": 30,
           "name": "Icon",
           "converter": {
@@ -6852,6 +6914,10 @@
       "sheet": "OnlineStatus",
       "defaultColumn": "Name",
       "definitions": [
+        {
+          "index": 2,
+          "name": "Priority"
+        },
         {
           "index": 3,
           "name": "Name"
@@ -7458,6 +7524,42 @@
         {
           "index": 1,
           "name": "Name"
+        }
+      ]
+    },
+    {
+      "sheet": "QuickChat",
+      "defaultColumn": "Text",
+      "definitions": [
+        {
+          "index": 0,
+          "name": "Name{Action}"
+        },
+        {
+          "index": 1,
+          "name": "Icon1",
+          "converter": {
+            "type": "icon",
+            "target": "Action"
+          }
+        },
+        {
+          "index": 3,
+          "name": "QuickChatTransient",
+          "converter": {
+            "type": "link",
+            "target": "QuickChatTransient"
+          }
+        }
+      ]
+    },
+    {
+      "sheet": "QuickChatTransient",
+      "defaultColumn": "Text{Output}",
+      "definitions": [
+        {
+          "index": 0,
+          "name": "Text{Output}"
         }
       ]
     },
@@ -8968,6 +9070,52 @@
       "definitions": [
         {
           "name": "Description"
+        }
+      ]
+    },
+    {
+      "sheet": "TreasureHuntRank",
+      "defaultColumn": "Name",
+      "definitions": [
+        {
+          "index": 1,
+          "name": "Icon",
+          "converter": {
+            "type": "icon",
+            "target": "Item"
+          }
+        },
+        {
+          "index": 2,
+          "name": "ItemName",
+          "converter": {
+            "type": "link",
+            "target": "Item"
+          }
+        },
+        {
+          "index": 3,
+          "name": "KeyItemName",
+          "converter": {
+            "type": "link",
+            "target": "EventItem"
+          }
+        },
+        {
+          "index": 4,
+          "name": "InstanceMap",
+          "converter": {
+            "type": "link",
+            "target": "EventItem"
+          }
+        },
+        {
+          "index": 5,
+          "name": "MaxPartySize"
+        },
+        {
+          "index": 6,
+          "name": "MinPartySize"
         }
       ]
     },
