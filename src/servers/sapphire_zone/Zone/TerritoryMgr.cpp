@@ -116,7 +116,8 @@ bool Core::TerritoryMgr::createDefaultTerritories()
                                         "\t" + std::to_string( guid ) +
                                         "\t" + std::to_string( territoryInfo->territoryIntendedUse ) +
                                         "\t" + territoryInfo->name +
-                                        "\t" + pPlaceName->name );
+                                        "\t" + pPlaceName->name +
+                                        "\t" + ( isPrivateTerritory( territoryId ) ? "PRIVATE" : "PUBLIC" ) );
 
       ZonePtr pZone( new Zone( territoryId, guid, territoryInfo->name, pPlaceName->name ) );
       pZone->init();

@@ -22,9 +22,11 @@
 #include "Math/CalcBattle.h"
 #include "Actor.h"
 #include "Player.h"
+#include "Zone/TerritoryMgr.h"
 
 extern Core::ServerZone g_serverZone;
 extern Core::Data::ExdDataGenerated g_exdDataGen;
+extern Core::TerritoryMgr g_territoryMgr;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
