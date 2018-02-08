@@ -725,6 +725,7 @@ void Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
    if( pCell == nullptr )
       return;
 
+   // TODO: make sure gms can overwrite this. Potentially temporary solution
    if( g_territoryMgr.isPrivateTerritory( getTerritoryId() ) )
       return;
 
