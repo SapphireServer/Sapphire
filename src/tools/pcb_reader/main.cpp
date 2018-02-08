@@ -236,6 +236,7 @@ void writeEobjEntry( std::ofstream& out, LGB_ENTRY* pObj )
    uint32_t id;
    std::string name;
    std::string typeStr;
+   uint32_t eobjlevelHierachyId = 0;
 
    if( pObj->getType() == LgbEntryType::EventObject )
    {
@@ -243,6 +244,7 @@ void writeEobjEntry( std::ofstream& out, LGB_ENTRY* pObj )
       id = pEobj->header.eobjId;
       name = eobjNameMap[id];
       typeStr = eobjStr;
+      eobjlevelHierachyId = pEobj->header.levelHierachyId;
    }
    else if( pObj->getType() == LgbEntryType::MapRange )
    {
@@ -253,7 +255,8 @@ void writeEobjEntry( std::ofstream& out, LGB_ENTRY* pObj )
 
    std::string outStr(
       std::to_string( id ) + ", " + typeStr +  "\"" + name + "\", " +
-      std::to_string( pObj->header.translation.x ) + ", " + std::to_string( pObj->header.translation.y ) + ", " + std::to_string( pObj->header.translation.z ) + "\n"
+      std::to_string( pObj->header.translation.x ) + ", " + std::to_string( pObj->header.translation.y ) + ", " + std::to_string( pObj->header.translation.z ) +
+      ", " + std::to_string( eobjlevelHierachyId ) + "\n"
    );
    out.write( outStr.c_str(), outStr.size() );
 }
