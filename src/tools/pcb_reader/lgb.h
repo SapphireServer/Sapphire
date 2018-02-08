@@ -174,7 +174,8 @@ public:
 struct LGB_EOBJ_HEADER : public LGB_ENTRY_HEADER
 {
    uint32_t eobjId;
-   uint8_t unknown1[0x10];
+   uint32_t levelHierachyId;
+   uint8_t unknown1[0xC];
 };
 
 class LGB_EOBJ_ENTRY : public LGB_ENTRY
