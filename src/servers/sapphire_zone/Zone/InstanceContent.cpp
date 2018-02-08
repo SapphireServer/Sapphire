@@ -31,7 +31,6 @@ Core::InstanceContent::InstanceContent( boost::shared_ptr< Core::Data::InstanceC
      m_instanceContentId( instanceContentId ),
      m_state( Created )
 {
-   m_instanceExpireTime = Util::getTimeSeconds() + ( m_instanceContentInfo->timeLimitmin * 60u );
 }
 
 Core::InstanceContent::~InstanceContent()
@@ -103,6 +102,7 @@ void Core::InstanceContent::onUpdate( uint32_t currTime )
          }
 
          m_state = DutyInProgress;
+         m_instanceExpireTime = Util::getTimeSeconds() + ( m_instanceContentInfo->timeLimitmin * 60u );
          break;
       }
 
