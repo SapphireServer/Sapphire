@@ -512,9 +512,6 @@ void Core::Entity::Actor::sendToInRangeSet( Network::Packets::GamePacketPtr pPac
          pSession->getZoneConnection()->queueOutPacket( pPacket );
    }
 
-   if( g_territoryMgr.isPrivateTerritory( getCurrentZone()->getTerritoryId() ) )
-      return;
-
    if( m_inRangePlayers.empty() )
       return;
 

@@ -725,6 +725,9 @@ void Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
    if( pCell == nullptr )
       return;
 
+   if( g_territoryMgr.isPrivateTerritory( getTerritoryId() ) )
+      return;
+
    Entity::ActorPtr pCurAct;
 
    auto iter = pCell->m_actors.begin();
