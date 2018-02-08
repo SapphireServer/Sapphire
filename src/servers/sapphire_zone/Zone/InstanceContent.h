@@ -46,6 +46,8 @@ private:
    uint32_t m_instanceContentId;
    InstanceContentState m_state;
 
+   int64_t m_instanceExpireTime;
+
 };
 
 }

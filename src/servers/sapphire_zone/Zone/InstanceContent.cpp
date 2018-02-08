@@ -102,6 +102,7 @@ void Core::InstanceContent::onUpdate( uint32_t currTime )
          }
 
          m_state = DutyInProgress;
+         m_instanceExpireTime = Util::getTimeSeconds() + ( m_instanceContentInfo->timeLimitmin * 60u );
          break;
       }
 

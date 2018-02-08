@@ -1,4 +1,4 @@
-#include "../ScriptObject.h"
+#include <ScriptObject.h>
 
 // Opening Script: OpeningLimsaLominsa
 // Quest Name: OpeningLimsaLominsa
