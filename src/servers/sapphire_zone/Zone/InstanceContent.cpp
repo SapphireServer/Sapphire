@@ -8,6 +8,7 @@
 #include <common/Network/PacketDef/Zone/ServerZoneDef.h>
 
 #include "Event/Director.h"
+#include "Script/ScriptManager.h"
 
 #include "Actor/Player.h"
 
@@ -15,6 +16,7 @@
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 
 extern Core::Logger g_log;
+extern Core::Scripting::ScriptManager g_scriptMgr;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -31,6 +33,7 @@ Core::InstanceContent::InstanceContent( boost::shared_ptr< Core::Data::InstanceC
      m_instanceContentId( instanceContentId ),
      m_state( Created )
 {
+   g_scriptMgr.onInstanceInit( *this );
 }
 
 Core::InstanceContent::~InstanceContent()
@@ -119,6 +122,8 @@ void Core::InstanceContent::onUpdate( uint32_t currTime )
       case DutyFinished:
          break;
    }
+
+   g_scriptMgr.onInstanceUpdate( *this, currTime );
 }
 
 void Core::InstanceContent::onFinishLoading( Entity::PlayerPtr pPlayer )
