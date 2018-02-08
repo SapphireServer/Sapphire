@@ -318,7 +318,7 @@ int main( int argc, char* argv[] )
       if( argc > 2 )
       {
          std::string tmpPath( argv[2] );
-         if( !( tmpPath.empty() || tmpPath.find( '/' ) == std::string::npos ) )
+         if( !tmpPath.empty() )
             gamePath = argv[2];
       }
    }
