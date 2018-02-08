@@ -35,6 +35,7 @@ extern Core::Logger g_log;
 extern Core::ServerZone g_serverZone;
 extern Core::Data::ExdDataGenerated g_exdDataGen;
 extern Core::Scripting::ScriptManager g_scriptMgr;
+extern Core::TerritoryMgr g_territoryMgr;
 
 namespace Core {
 
@@ -369,6 +370,9 @@ void Zone::removeActor( Entity::ActorPtr pActor )
 
 void Zone::queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range, Network::Packets::GamePacketPtr pPacketEntry )
 {
+   if( g_territoryMgr.isPrivateTerritory( getTerritoryId() ) )
+      return;
+
    for( auto it = m_playerMap.begin(); it != m_playerMap.end(); ++it )
    {
       float distance = Math::Util::distance( sourcePlayer.getPos().x,
