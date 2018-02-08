@@ -825,6 +825,9 @@ void Core::Entity::Player::setLookAt( uint8_t index, uint8_t value )
 // spawn this player for pTarget
 void Core::Entity::Player::spawn( Entity::PlayerPtr pTarget )
 {
+   if( g_territoryMgr.isPrivateTerritory( getCurrentZone()->getTerritoryId() ) && pTarget->getId() != getId() )
+      return;
+
    g_log.debug( "[" + std::to_string( pTarget->getId() ) + "] Spawning " +
                 getName() + " for " +
                 pTarget->getName() );
