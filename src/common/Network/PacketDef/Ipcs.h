@@ -93,6 +93,7 @@ namespace Packets {
       SetCharacterFCInfo         = 0x0114, // updated 4.2
       StatusEffectList           = 0x0125, // updated 4.2
       Effect                     = 0x0128, // updated 4.2
+      PersistantEffect           = 0x013B, // updated 4.2
 
       GCAffiliation              = 0xCCFC, // OUTDATED
 
