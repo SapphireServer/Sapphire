@@ -54,7 +54,7 @@ namespace Core {
 
    void ServerLobby::run( int32_t argc, char* argv[] )
    {
-      g_log.setLogPath( "log\\SapphireLobby" );
+      g_log.setLogPath( "log/SapphireLobby" );
       g_log.init();
 
       g_log.info( "===========================================================" );
