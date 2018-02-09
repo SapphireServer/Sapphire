@@ -32,14 +32,14 @@ foreach(_scriptDir ${children})
                 if(ScriptIncludes)
                     set(ScriptIncludes "${ScriptIncludes}\n#include \"${_script}\"")
                 else()
-                    set(ScriptIncludes "#include \"./${_script}\"")
+                    set(ScriptIncludes "#include \"${_script}\"")
                 endif()
 
                 set(ScriptNames "${ScriptNames}   static_cast< ScriptObject* >( new ${_scriptname} ),\n")
             endif()
         endforeach()
 
-        add_library("script_${_name}" MODULE "${SCRIPT_FILES}" "${SCRIPT_INCLUDE_FILES}" "${_scriptDir}/ScriptLoader.cpp")
+        add_library("script_${_name}" MODULE "${SCRIPT_BUILD_FILES}" "${SCRIPT_INCLUDE_FILES}" "${_scriptDir}/ScriptLoader.cpp")
         target_link_libraries("script_${_name}" sapphire_zone)
 
         if(MSVC)
