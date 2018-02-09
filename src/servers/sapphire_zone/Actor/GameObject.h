@@ -50,8 +50,8 @@ namespace Core {
          ObjKind              m_objKind;
 
       public:
-         GameObject( ObjKind type );
-         virtual ~GameObject() {};
+         explicit GameObject( ObjKind type );
+         //virtual ~GameObject() {};
 
          uint32_t getId() const;
 

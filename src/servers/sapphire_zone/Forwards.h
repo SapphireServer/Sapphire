@@ -34,6 +34,7 @@ namespace Core
       TYPE_FORWARD( BattleNpc );
       TYPE_FORWARD( EventNpc );
       TYPE_FORWARD( BattleNpcTemplate );
+      TYPE_FORWARD( InstanceObject );
    }
 
    namespace Event
