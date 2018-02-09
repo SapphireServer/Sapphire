@@ -739,7 +739,7 @@ void defaultGet( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServe
 
 int main( int argc, char* argv[] )
 {
-   g_log.setLogPath( "log\\SapphireAPI" );
+   g_log.setLogPath( "log/SapphireAPI" );
    g_log.init();
 
    g_log.info( "===========================================================" );
