@@ -59,6 +59,8 @@ namespace Core
          bool onEventHandlerReturn( Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param1, uint16_t param2, uint16_t param3 );
          bool onEventHandlerTradeReturn( Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param, uint32_t catalogId );
 
+         bool onInstanceInit( InstanceContent& instance );
+         bool onInstanceUpdate( InstanceContent& instance, uint32_t currTime );
 
          void loadDir( const std::string& dirname, std::set<std::string> &files, const std::string& ext );
 

@@ -13,6 +13,7 @@ namespace Core
 {
    TYPE_FORWARD( Cell );
    TYPE_FORWARD( Zone );
+   TYPE_FORWARD( InstanceContent );
    TYPE_FORWARD( Item );
    TYPE_FORWARD( ItemContainer );
    TYPE_FORWARD( Inventory );
@@ -33,6 +34,7 @@ namespace Core
       TYPE_FORWARD( BattleNpc );
       TYPE_FORWARD( EventNpc );
       TYPE_FORWARD( BattleNpcTemplate );
+      TYPE_FORWARD( InstanceObject );
    }
 
    namespace Event
