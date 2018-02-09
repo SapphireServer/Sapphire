@@ -8,6 +8,7 @@
 #include <Actor/Actor.h>
 #include <Actor/Player.h>
 #include <StatusEffect/StatusEffect.h>
+#include <Zone/InstanceContent.h>
 
 #ifdef _MSC_VER
 #define EXPORT __declspec( dllexport )
@@ -48,7 +49,7 @@ public:
 class StatusEffectScript : public ScriptObject
 {
 public:
-   StatusEffectScript( uint32_t effectId ) :
+   explicit StatusEffectScript( uint32_t effectId ) :
       ScriptObject( effectId, typeid( StatusEffectScript ).hash_code() )
    { }
 
@@ -66,7 +67,7 @@ public:
 class ActionScript : public ScriptObject
 {
 public:
-    ActionScript( uint32_t abilityId ) :
+   explicit ActionScript( uint32_t abilityId ) :
       ScriptObject( abilityId, typeid( ActionScript ).hash_code() )
    { }
 
@@ -79,7 +80,7 @@ public:
 class EventScript : public ScriptObject
 {
 public:
-   EventScript( uint32_t questId ) :
+   explicit EventScript( uint32_t questId ) :
       ScriptObject( questId, typeid( EventScript ).hash_code() )
    { }
 
@@ -97,7 +98,7 @@ public:
 class BattleNpcScript : public ScriptObject
 {
 public:
-   BattleNpcScript( uint32_t npcId ) :
+   explicit BattleNpcScript( uint32_t npcId ) :
       ScriptObject( npcId, typeid( BattleNpcScript ).hash_code() )
    { }
 };
@@ -105,11 +106,22 @@ public:
 class ZoneScript : public ScriptObject
 {
 public:
-   ZoneScript( uint32_t zoneId ) :
+   explicit ZoneScript( uint32_t zoneId ) :
       ScriptObject( zoneId, typeid( ZoneScript ).hash_code() )
    { }
 
    virtual void onZoneInit() { }
+};
+
+class InstanceContentScript : public ScriptObject
+{
+public:
+   explicit InstanceContentScript( uint32_t instanceContentId ) :
+      ScriptObject( instanceContentId, typeid( InstanceContentScript ).hash_code() )
+   { }
+
+   virtual void onInit( InstanceContent& instance ) { }
+   virtual void onUpdate( InstanceContent& instance, uint32_t currTime ) { }
 };
 
 #endif

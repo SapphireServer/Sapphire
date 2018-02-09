@@ -8,6 +8,7 @@
 #include <common/Network/PacketDef/Zone/ServerZoneDef.h>
 
 #include "Event/Director.h"
+#include "Script/ScriptManager.h"
 
 #include "Actor/Player.h"
 
@@ -15,6 +16,7 @@
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 
 extern Core::Logger g_log;
+extern Core::Scripting::ScriptManager g_scriptMgr;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -31,6 +33,7 @@ Core::InstanceContent::InstanceContent( boost::shared_ptr< Core::Data::InstanceC
      m_instanceContentId( instanceContentId ),
      m_state( Created )
 {
+   g_scriptMgr.onInstanceInit( *this );
 }
 
 Core::InstanceContent::~InstanceContent()
@@ -119,6 +122,8 @@ void Core::InstanceContent::onUpdate( uint32_t currTime )
       case DutyFinished:
          break;
    }
+
+   g_scriptMgr.onInstanceUpdate( *this, currTime );
 }
 
 void Core::InstanceContent::onFinishLoading( Entity::PlayerPtr pPlayer )
@@ -206,5 +211,35 @@ void Core::InstanceContent::setVar( uint8_t index, uint8_t value )
    for( const auto &playerIt : m_playerMap )
    {
       sendDirectorVars( playerIt.second );
+   }
+}
+
+void Core::InstanceContent::registerInstanceObj( Core::Entity::InstanceObjectPtr object )
+{
+   if( !object )
+      return;
+
+   object->setParentInstance( InstanceContentPtr( this ) );
+
+   m_instanceObjects[object->getId()] = object;
+}
+
+Core::Entity::InstanceObjectPtr Core::InstanceContent::getInstanceObject( uint32_t objId )
+{
+   auto obj = m_instanceObjects.find( objId );
+   if( obj == m_instanceObjects.end() )
+      return nullptr;
+
+   return obj->second;
+}
+
+void Core::InstanceContent::updateInstanceObj( Core::Entity::InstanceObjectPtr object )
+{
+   if( !object )
+      return;
+
+   for( const auto& playerId : m_playerMap )
+   {
+      // send that packet with le data
    }
 }
