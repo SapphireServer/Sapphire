@@ -21,7 +21,8 @@ foreach(_scriptDir ${children})
     if(IS_DIRECTORY ${_scriptDir} AND NOT ${_name} MATCHES "CMakeFiles")
         message("discovered plugin lib: ${_scriptDir} (${_name})")
 
-        file(GLOB_RECURSE SCRIPT_FILES "${_scriptDir}/*.cpp")
+        file(GLOB_RECURSE SCRIPT_BUILD_FILES "${_scriptDir}/*.cpp")
+        file(GLOB_RECURSE SCRIPT_FILES RELATIVE "${_scriptDir}" "${_name}/*.cpp")
 
         # build file list
         foreach(_script ${SCRIPT_FILES})
@@ -31,7 +32,7 @@ foreach(_scriptDir ${children})
                 if(ScriptIncludes)
                     set(ScriptIncludes "${ScriptIncludes}\n#include \"${_script}\"")
                 else()
-                    set(ScriptIncludes "#include \"${_script}\"")
+                    set(ScriptIncludes "#include \"./${_script}\"")
                 endif()
 
                 set(ScriptNames "${ScriptNames}   static_cast< ScriptObject* >( new ${_scriptname} ),\n")
@@ -55,11 +56,13 @@ foreach(_scriptDir ${children})
 
         configure_file("${CMAKE_CURRENT_SOURCE_DIR}/ScriptLoader.cpp.in" "${_scriptDir}/ScriptLoader.cpp")
 
-        add_custom_command(TARGET "script_${_name}" POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E remove "${SCRIPT_LIB_DIR}/script_${_name}.exp"
-            COMMAND ${CMAKE_COMMAND} -E remove "${SCRIPT_LIB_DIR}/script_${_name}.lib"
-            COMMAND ${CMAKE_COMMAND} -E remove "${SCRIPT_LIB_DIR}/script_${_name}.ilk"
-        )
+        if(MSVC)
+            add_custom_command(TARGET "script_${_name}" POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E remove "${SCRIPT_LIB_DIR}/script_${_name}.exp"
+                COMMAND ${CMAKE_COMMAND} -E remove "${SCRIPT_LIB_DIR}/script_${_name}.lib"
+                COMMAND ${CMAKE_COMMAND} -E remove "${SCRIPT_LIB_DIR}/script_${_name}.ilk"
+            )
+        endif()
 
         unset(ScriptIncludes)
         unset(ScriptNames)
