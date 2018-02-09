@@ -213,3 +213,33 @@ void Core::InstanceContent::setVar( uint8_t index, uint8_t value )
       sendDirectorVars( playerIt.second );
    }
 }
+
+void Core::InstanceContent::registerInstanceObj( Core::Entity::InstanceObjectPtr object )
+{
+   if( !object )
+      return;
+
+   object->setParentInstance( InstanceContentPtr( this ) );
+
+   m_instanceObjects[object->getId()] = object;
+}
+
+Core::Entity::InstanceObjectPtr Core::InstanceContent::getInstanceObject( uint32_t objId )
+{
+   auto obj = m_instanceObjects.find( objId );
+   if( obj == m_instanceObjects.end() )
+      return nullptr;
+
+   return obj->second;
+}
+
+void Core::InstanceContent::updateInstanceObj( Core::Entity::InstanceObjectPtr object )
+{
+   if( !object )
+      return;
+
+   for( const auto& playerId : m_playerMap )
+   {
+      // send that packet with le data
+   }
+}
