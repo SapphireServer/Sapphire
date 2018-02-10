@@ -5,7 +5,6 @@
 #include "Event/Director.h"
 #include "Forwards.h"
 #include <common/Exd/ExdDataGenerated.h>
-#include "Actor/InstanceObject.h"
 
 namespace Core
 {
@@ -36,10 +35,6 @@ public:
 
    void setVar( uint8_t index, uint8_t value );
 
-   void registerInstanceObj( Entity::InstanceObjectPtr object );
-   Entity::InstanceObjectPtr getInstanceObject( uint32_t objId );
-   void updateInstanceObj( Entity::InstanceObjectPtr object );
-
    Core::Data::ExdDataGenerated::InstanceContentPtr getInstanceContentInfo() const;
 
    uint32_t getInstanceContentId() const;
@@ -51,8 +46,6 @@ private:
    InstanceContentState m_state;
 
    int64_t m_instanceExpireTime;
-
-   std::unordered_map< uint32_t, Core::Entity::InstanceObjectPtr > m_instanceObjects;
 };
 
 }
