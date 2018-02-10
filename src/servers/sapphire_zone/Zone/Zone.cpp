@@ -199,8 +199,7 @@ void Zone::loadCellCache()
       uint32_t type = pQR->getUInt( 18 );
 
       Common::FFXIVARR_POSITION3 pos{ posX, posY, posZ };
-      Entity::BattleNpcPtr pBNpc( new Entity::BattleNpc( modelId, nameId, pos,
-                                                         sizeId, type, level, behaviour, mobType ) );
+      auto pBNpc = Entity::make_BattleNpc( modelId, nameId, pos, sizeId, type, level, behaviour, mobType );
       pBNpc->setRotation( static_cast< float >( rotation ) );
       cache.push_back( pBNpc );
    }
@@ -306,7 +305,7 @@ void Zone::pushActor( Entity::ActorPtr pActor )
       m_playerMap[pPlayer->getId()] = pPlayer;
       updateCellActivity( cx, cy, 2 );
    }
-   else if( pActor->isBNpc() )
+   else if( pActor->isBattleNpc() )
    {
 
       Entity::BattleNpcPtr pBNpc = pActor->getAsBattleNpc();
@@ -346,10 +345,10 @@ void Zone::removeActor( Entity::ActorPtr pActor )
       }
       m_playerMap.erase( pActor->getId() );
 
-      onLeaveTerritory( pActor->getAsPlayer() );
+      onLeaveTerritory( *pActor->getAsPlayer() );
 
    }
-   else if( pActor->isBNpc() )
+   else if( pActor->isBattleNpc() )
       m_BattleNpcMap.erase( pActor->getId() );
 
    // remove from lists of other actors
@@ -361,7 +360,7 @@ void Zone::removeActor( Entity::ActorPtr pActor )
       {
          pCurAct = *iter;
          auto iter2 = iter++;
-         pCurAct->removeInRangeActor( pActor );
+         pCurAct->removeInRangeActor( *pActor );
       }
    }
    pActor->clearInRangeSet();
@@ -620,18 +619,18 @@ void Zone::updateCellActivity( uint32_t x, uint32_t y, int32_t radius )
    }
 }
 
-void Zone::changeActorPosition( Entity::ActorPtr pActor )
+void Zone::changeActorPosition( Entity::Actor& actor )
 {
 
-   if( pActor->getCurrentZone() != shared_from_this() )
+   if( actor.getCurrentZone() != shared_from_this() )
       return;
 
-   if( pActor->hasInRangeActor() )
+   if( actor.hasInRangeActor() )
    {
       Entity::ActorPtr pCurAct;
 
       float fRange = 70.0f;
-      for( auto iter = pActor->m_inRangeActors.begin(); iter != pActor->m_inRangeActors.end();)
+      for( auto iter = actor.m_inRangeActors.begin(); iter != actor.m_inRangeActors.end();)
       {
          pCurAct = *iter;
          auto iter2 = iter++;
@@ -639,18 +638,18 @@ void Zone::changeActorPosition( Entity::ActorPtr pActor )
          float distance = Math::Util::distance( pCurAct->getPos().x,
                                                 pCurAct->getPos().y,
                                                 pCurAct->getPos().z,
-                                                pActor->getPos().x,
-                                                pActor->getPos().y,
-                                                pActor->getPos().z );
+                                                actor.getPos().x,
+                                                actor.getPos().y,
+                                                actor.getPos().z );
 
          if( fRange > 0.0f && distance > fRange )
          {
-            pCurAct->removeInRangeActor( pActor );
+            pCurAct->removeInRangeActor( actor );
 
-            if( pActor->getCurrentZone() != shared_from_this() )
+            if( actor.getCurrentZone() != shared_from_this() )
                return;
 
-            pActor->removeInRangeActor( *iter2 );
+            actor.removeInRangeActor( **iter2 );
 
             // @TODO FIXME!
             // this break is more or less a hack, iteration will break otherwise after removing
@@ -659,8 +658,8 @@ void Zone::changeActorPosition( Entity::ActorPtr pActor )
       }
    }
 
-   uint32_t cellX = getPosX( pActor->getPos().x );
-   uint32_t cellY = getPosY( pActor->getPos().z );
+   uint32_t cellX = getPosX( actor.getPos().x );
+   uint32_t cellY = getPosY( actor.getPos().z );
 
    if( cellX >= _sizeX || cellY >= _sizeY )
    {
@@ -668,7 +667,7 @@ void Zone::changeActorPosition( Entity::ActorPtr pActor )
    }
 
    Cell* pCell = getCell( cellX, cellY );
-   Cell* pOldCell = pActor->m_pCell;
+   Cell* pOldCell = actor.m_pCell;
    if( !pCell )
    {
       pCell = create( cellX, cellY );
@@ -680,15 +679,15 @@ void Zone::changeActorPosition( Entity::ActorPtr pActor )
    {
 
       if( pOldCell )
-         pOldCell->removeActor( pActor );
+         pOldCell->removeActor( actor.getAsActor() );
 
-      pCell->addActor( pActor );
-      pActor->m_pCell = pCell;
+      pCell->addActor( actor.getAsActor() );
+      actor.m_pCell = pCell;
 
       // if player we need to update cell activity
       // radius = 2 is used in order to update both
       // old and new cells
-      if( pActor->isPlayer() )
+      if( actor.isPlayer() )
       {
          updateCellActivity( cellX, cellY, 2 );
          if( pOldCell != nullptr )
@@ -714,7 +713,7 @@ void Zone::changeActorPosition( Entity::ActorPtr pActor )
       {
          pCell = getCell( posX, posY );
          if( pCell )
-            updateInRangeSet( pActor, pCell );
+            updateInRangeSet( actor.getAsActor(), pCell );
       }
    }
 }
@@ -785,7 +784,7 @@ void Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
             }
 
          }
-         else if( ( pActor->isBNpc() || pActor->isEventNpc() ) && pCurAct->isPlayer() && pActor->isAlive() )
+         else if( ( pActor->isBattleNpc() || pActor->isEventNpc() ) && pCurAct->isPlayer() && pActor->isAlive() )
          {
             auto pPlayer = pCurAct->getAsPlayer();
             if( pPlayer->isLoadingComplete() )
@@ -804,16 +803,16 @@ void Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
    }
 }
 
-void Zone::onEnterTerritory( Entity::PlayerPtr pPlayer )
+void Zone::onEnterTerritory( Entity::Player& player )
 {
    g_log.debug( "Zone::onEnterTerritory: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryId() ) +
-                                                + ", Entity#" + std::to_string( pPlayer->getId() ) );
+                                                + ", Entity#" + std::to_string( player.getId() ) );
 }
 
-void Zone::onLeaveTerritory( Entity::PlayerPtr pPlayer )
+void Zone::onLeaveTerritory( Entity::Player& player )
 {
    g_log.debug( "Zone::onLeaveTerritory: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryId() ) +
-                                                + ", Entity#" + std::to_string( pPlayer->getId() ) );
+                                                + ", Entity#" + std::to_string( player.getId() ) );
 }
 
 void Zone::onUpdate( uint32_t currTime )
@@ -821,12 +820,12 @@ void Zone::onUpdate( uint32_t currTime )
 
 }
 
-void Zone::onFinishLoading( Entity::PlayerPtr pPlayer )
+void Zone::onFinishLoading( Entity::Player& player )
 {
 
 }
 
-void Zone::onInitDirector( Entity::PlayerPtr pPlayer )
+void Zone::onInitDirector( Entity::Player& player )
 {
 
 }

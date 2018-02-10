@@ -202,11 +202,10 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
    m_modelSubWeapon = 0;
    m_lastTickTime = 0;
 
-   auto pPlayer = getAsPlayer();
    // TODO: remove Inventory and actually inline it in Player class
-   m_pInventory = InventoryPtr( new Inventory( pPlayer.get() ) );
+   m_pInventory = make_Inventory( this );
 
-   pPlayer->calculateStats();
+   calculateStats();
 
    // first login, run the script event
    if( m_bNewGame )

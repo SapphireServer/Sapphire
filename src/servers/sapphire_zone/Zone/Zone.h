@@ -74,10 +74,10 @@ public:
 
    virtual void loadCellCache();
    virtual uint32_t getTerritoryId() const;
-   virtual void onEnterTerritory( Entity::PlayerPtr pPlayer );
-   virtual void onFinishLoading( Entity::PlayerPtr pPlayer );
-   virtual void onInitDirector( Entity::PlayerPtr pPlayer );
-   virtual void onLeaveTerritory( Entity::PlayerPtr pPlayer );
+   virtual void onEnterTerritory( Entity::Player& player );
+   virtual void onFinishLoading( Entity::Player& player );
+   virtual void onInitDirector( Entity::Player& player );
+   virtual void onLeaveTerritory( Entity::Player& player );
    virtual void onUpdate( uint32_t currTime );
 
    uint8_t getNextWeather();
@@ -86,7 +86,7 @@ public:
 
    void removeActor( Entity::ActorPtr pActor );
 
-   void changeActorPosition( Entity::ActorPtr pActor );
+   void changeActorPosition( Entity::Actor& pActor );
 
    bool isCellActive( uint32_t x, uint32_t y );
 

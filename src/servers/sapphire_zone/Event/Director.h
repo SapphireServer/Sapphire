@@ -38,9 +38,9 @@ public:
    uint8_t getSequence() const;
    uint8_t getBranch() const;
 
-   void sendDirectorInit( Entity::PlayerPtr pPlayer ) const;
-   void sendDirectorClear( Entity::PlayerPtr pPlayer ) const;
-   void sendDirectorVars( Entity::PlayerPtr pPlayer ) const;
+   void sendDirectorInit( Entity::Player& player ) const;
+   void sendDirectorClear( Entity::Player& player ) const;
+   void sendDirectorVars( Entity::Player& player ) const;
 
    void setDirectorUI8AL( uint8_t value );
    void setDirectorUI8AH( uint8_t value );

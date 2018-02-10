@@ -119,7 +119,7 @@ bool Core::TerritoryMgr::createDefaultTerritories()
                                         "\t" + pPlaceName->name +
                                         "\t" + ( isPrivateTerritory( territoryId ) ? "PRIVATE" : "PUBLIC" ) );
 
-      ZonePtr pZone( new Zone( territoryId, guid, territoryInfo->name, pPlaceName->name ) );
+      auto pZone = make_Zone( territoryId, guid, territoryInfo->name, pPlaceName->name );
       pZone->init();
 
       InstanceIdToZonePtrMap instanceMap;
@@ -149,7 +149,7 @@ Core::ZonePtr Core::TerritoryMgr::createTerritoryInstance( uint32_t territoryTyp
 
    g_log.debug( "Starting instance for territory: " + std::to_string( territoryTypeId ) + " (" + pPlaceName->name + ")" );
 
-   ZonePtr pZone = ZonePtr( new Zone( territoryTypeId, getNextInstanceId(), pTeri->name, pPlaceName->name ) );
+   auto pZone = make_Zone( territoryTypeId, getNextInstanceId(), pTeri->name, pPlaceName->name );
    pZone->init();
 
    m_territoryInstanceMap[pZone->getTerritoryId()][pZone->getGuId()] = pZone;
@@ -175,8 +175,8 @@ Core::ZonePtr Core::TerritoryMgr::createInstanceContent( uint32_t instanceConten
    g_log.debug( "Starting instance for InstanceContent id: " + std::to_string( instanceContentId ) +
                                                            " (" + pInstanceContent->name + ")" );
 
-   ZonePtr pZone = ZonePtr( new InstanceContent( pInstanceContent, getNextInstanceId(), pTeri->name,
-                                                 pInstanceContent->name, instanceContentId ) );
+   auto pZone = make_InstanceContent( pInstanceContent, getNextInstanceId(),
+                                      pTeri->name, pInstanceContent->name, instanceContentId );
    pZone->init();
 
    m_instanceContentToInstanceMap[instanceContentId][pZone->getGuId()] = pZone;
@@ -233,7 +233,7 @@ void Core::TerritoryMgr::loadTerritoryPositionMap()
       float posO = pQR->getFloat( 6 );
       uint32_t radius = pQR->getUInt( 7 );
 
-      m_territoryPositionMap[id] = ZonePositionPtr( new ZonePosition( id, targetZoneId, pos, radius, posO ) );
+      m_territoryPositionMap[id] = make_ZonePosition( id, targetZoneId, pos, radius, posO );
    }
 }
 
