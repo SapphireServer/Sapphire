@@ -37,6 +37,7 @@ public:
       Housing = 0x0C,
       Cutscene = 0x0D,
       CardStand = 0x0E,
+      Exit = 0x0F,
    };
 
    enum Stance : uint8_t
