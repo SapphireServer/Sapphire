@@ -6,6 +6,7 @@
 
 #include "Cell.h"
 #include "CellHandler.h"
+#include "Actor/InstanceObject.h"
 
 #include "Forwards.h"
 
@@ -51,6 +52,8 @@ protected:
    boost::shared_ptr< Data::TerritoryType > m_territoryTypeInfo;
 
    std::map< uint8_t, int32_t> m_weatherRateMap;
+
+   std::unordered_map< uint32_t, Core::Entity::InstanceObjectPtr > m_instanceObjects;
 
 public:
    Zone();
@@ -106,6 +109,12 @@ public:
    void updateBnpcs( int64_t tickCount );
 
    bool update( uint32_t currTime );
+
+   void registerInstanceObj( Entity::InstanceObjectPtr object );
+   Entity::InstanceObjectPtr getInstanceObject( uint32_t objId );
+   void updateInstanceObj( Entity::InstanceObjectPtr object );
+
+   InstanceContentPtr getAsInstanceContent();
 
 };
 
