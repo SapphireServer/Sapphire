@@ -1316,7 +1316,7 @@ struct FFXIVIpcMSQTrackerComplete : FFXIVIpcBasePacket<MSQTrackerComplete>
    uint64_t padding4; // last 4 bytes is uint32_t but who cares
 };
 
-struct FFXIVIpcObjectControl : FFXIVIpcBasePacket<ObjectControl>
+struct FFXIVIpcObjectSpawn : FFXIVIpcBasePacket<ObjectSpawn>
 {
    uint8_t count;
    uint8_t objKind;

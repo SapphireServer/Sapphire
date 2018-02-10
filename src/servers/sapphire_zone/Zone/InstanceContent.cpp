@@ -223,7 +223,7 @@ void Core::InstanceContent::registerInstanceObj( Core::Entity::InstanceObjectPtr
 
    m_instanceObjects[object->getId()] = object;
 
-   g_log.debug("Registered instance eobj: " + std::to_string( object->getId() ) );
+   g_log.debug( "Registered instance eobj: " + std::to_string( object->getId() ) );
 }
 
 Core::Entity::InstanceObjectPtr Core::InstanceContent::getInstanceObject( uint32_t objId )
@@ -243,7 +243,7 @@ void Core::InstanceContent::updateInstanceObj( Core::Entity::InstanceObjectPtr o
    for( const auto& playerIt : m_playerMap )
    {
       // send that packet with le data
-      ZoneChannelPacket< FFXIVIpcObjectControl > eobjStatePacket( playerIt.second->getId() );
+      ZoneChannelPacket< FFXIVIpcObjectSpawn > eobjStatePacket( playerIt.second->getId() );
       eobjStatePacket.data().objKind = object->getObjKind();
       eobjStatePacket.data().state = object->getState();
       eobjStatePacket.data().objId = object->getId();
