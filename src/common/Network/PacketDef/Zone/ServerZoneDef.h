@@ -1316,6 +1316,28 @@ struct FFXIVIpcMSQTrackerComplete : FFXIVIpcBasePacket<MSQTrackerComplete>
    uint64_t padding4; // last 4 bytes is uint32_t but who cares
 };
 
+struct FFXIVIpcObjectControl : FFXIVIpcBasePacket<ObjectControl>
+{
+   uint8_t count;
+   uint8_t objKind;
+   uint8_t unknown2;
+   uint8_t state;
+   uint32_t objId;
+   uint32_t actorId;
+   uint32_t levelId;
+   uint32_t unknown10;
+   uint32_t someActorId14;
+   uint32_t hierachyId;
+   uint32_t unknown1C;
+   uint32_t unknown20;
+   uint32_t unknown24;
+   uint32_t unknown28;
+   uint32_t unknown2c;
+   Common::FFXIVARR_POSITION3 position;
+   int16_t rotation;
+   int16_t unknown;
+};
+
 
 } /* Server */
 } /* Packets */

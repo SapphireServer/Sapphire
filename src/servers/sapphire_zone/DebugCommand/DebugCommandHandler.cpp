@@ -768,6 +768,45 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
 
       instance->setVar( static_cast< uint8_t >( index ), static_cast< uint8_t >( value ) );
    }
+   else if( subCommand == "objupdate" )
+   {
+      uint32_t instanceId;
+      uint32_t objId;
+
+      sscanf( params.c_str(), "%d %d", &instanceId, &objId );
+
+      auto pInstance = g_territoryMgr.getInstanceZonePtr( instanceId );
+      if( !pInstance )
+         return;
+
+      auto instance = boost::dynamic_pointer_cast< InstanceContent >( pInstance );
+
+      auto obj = instance->getInstanceObject( objId );
+      if( !obj )
+         return;
+
+      instance->updateInstanceObj( obj );
+   }
+   else if( subCommand == "objstate" )
+   {
+      uint32_t instanceId;
+      uint32_t objId;
+      uint32_t state;
+
+      sscanf( params.c_str(), "%d %d %d", &instanceId, &objId, &state );
+
+      auto pInstance = g_territoryMgr.getInstanceZonePtr( instanceId );
+      if( !pInstance )
+         return;
+
+      auto instance = boost::dynamic_pointer_cast< InstanceContent >( pInstance );
+
+      auto obj = instance->getInstanceObject( objId );
+      if( !obj )
+         return;
+
+      obj->setState( state );
+   }
    else if( subCommand == "festival" )
    {
       uint32_t festivalId;

@@ -222,6 +222,8 @@ void Core::InstanceContent::registerInstanceObj( Core::Entity::InstanceObjectPtr
    object->setParentInstance( InstanceContentPtr( this ) );
 
    m_instanceObjects[object->getId()] = object;
+
+   g_log.debug("Registered instance eobj: " + std::to_string( object->getId() ) );
 }
 
 Core::Entity::InstanceObjectPtr Core::InstanceContent::getInstanceObject( uint32_t objId )
@@ -238,8 +240,24 @@ void Core::InstanceContent::updateInstanceObj( Core::Entity::InstanceObjectPtr o
    if( !object )
       return;
 
-   for( const auto& playerId : m_playerMap )
+   for( const auto& playerIt : m_playerMap )
    {
       // send that packet with le data
+      ZoneChannelPacket< FFXIVIpcObjectControl > eobjStatePacket( playerIt.second->getId() );
+      eobjStatePacket.data().objKind = object->getObjKind();
+      eobjStatePacket.data().state = object->getState();
+      eobjStatePacket.data().objId = object->getId();
+      eobjStatePacket.data().hierachyId = object->getHierachyId();
+      eobjStatePacket.data().position = object->getPos();
+
+      // ????
+      //eobjStatePacket.data().levelId = 4236873;
+      //eobjStatePacket.data().unknown2 = 5;
+      //eobjStatePacket.data().unknown1C = 1065353216;
+      //eobjStatePacket.data().unknown20 = 2147423605;
+      //eobjStatePacket.data().actorId = 1074105831;
+      //eobjStatePacket.data().unknown = 1;
+
+      playerIt.second->queuePacket( eobjStatePacket );
    }
 }
