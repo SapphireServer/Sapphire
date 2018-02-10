@@ -770,16 +770,13 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
    }
    else if( subCommand == "objupdate" )
    {
-      uint32_t instanceId;
       uint32_t objId;
 
-      sscanf( params.c_str(), "%d %d", &instanceId, &objId );
+      sscanf( params.c_str(), "%d", &objId );
 
-      auto pInstance = g_territoryMgr.getInstanceZonePtr( instanceId );
-      if( !pInstance )
+      auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+      if( !instance )
          return;
-
-      auto instance = boost::dynamic_pointer_cast< InstanceContent >( pInstance );
 
       auto obj = instance->getInstanceObject( objId );
       if( !obj )
@@ -789,17 +786,14 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
    }
    else if( subCommand == "objstate" )
    {
-      uint32_t instanceId;
       uint32_t objId;
-      uint32_t state;
+      uint8_t state;
 
-      sscanf( params.c_str(), "%d %d %d", &instanceId, &objId, &state );
+      sscanf( params.c_str(), "%d %hhu", &objId, &state );
 
-      auto pInstance = g_territoryMgr.getInstanceZonePtr( instanceId );
-      if( !pInstance )
+      auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+      if( !instance )
          return;
-
-      auto instance = boost::dynamic_pointer_cast< InstanceContent >( pInstance );
 
       auto obj = instance->getInstanceObject( objId );
       if( !obj )
