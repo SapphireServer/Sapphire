@@ -42,7 +42,7 @@ Core::Network::GameConnection::~GameConnection()
 // overwrite the parents onConnect for our game socket needs
 void Core::Network::GameConnection::OnAccept( const std::string & host, uint16_t port )
 {
-   GameConnectionPtr connection( new GameConnection( m_hive, m_pAcceptor ) );
+   auto connection = make_GameConnection( m_hive, m_pAcceptor );
    m_pAcceptor->Accept( connection );
 
    g_log.info( "Connect from " + m_socket.remote_endpoint().address().to_string() );
@@ -54,12 +54,12 @@ void Core::Network::GameConnection::OnDisconnect()
    g_log.debug( "DISCONNECT" );
 }
 
-void Core::Network::GameConnection::OnRecv( std::vector< uint8_t > & buffer )
+void Core::Network::GameConnection::OnRecv( std::vector< uint8_t >& buffer )
 {
    Packets::FFXIVARR_PACKET_HEADER packetHeader;
-   const auto headerResult = Packets::getHeader(buffer, 0, packetHeader);
+   const auto headerResult = Packets::getHeader( buffer, 0, packetHeader );
 
-   if (headerResult == Incomplete)
+   if( headerResult == Incomplete )
    {
       g_log.info("Dropping connection due to incomplete packet header.");
       g_log.info("FIXME: Packet message bounary is not implemented.");
@@ -67,7 +67,7 @@ void Core::Network::GameConnection::OnRecv( std::vector< uint8_t > & buffer )
       return;
    }
 
-   if (headerResult == Malformed)
+   if( headerResult == Malformed )
    {
       g_log.info("Dropping connection due to malformed packet header.");
       Disconnect();
@@ -76,9 +76,10 @@ void Core::Network::GameConnection::OnRecv( std::vector< uint8_t > & buffer )
 
    // Dissect packet list
    std::vector< Packets::FFXIVARR_PACKET_RAW > packetList;
-   const auto packetResult = Packets::getPackets(buffer, sizeof(struct FFXIVARR_PACKET_HEADER), packetHeader, packetList);
+   const auto packetResult = Packets::getPackets( buffer, sizeof( struct FFXIVARR_PACKET_HEADER ),
+                                                  packetHeader, packetList );
 
-   if (packetResult == Incomplete)
+   if( packetResult == Incomplete )
    {
       g_log.info("Dropping connection due to incomplete packets.");
       g_log.info("FIXME: Packet message bounary is not implemented.");
@@ -86,7 +87,7 @@ void Core::Network::GameConnection::OnRecv( std::vector< uint8_t > & buffer )
       return;
    }
 
-   if (packetResult == Malformed)
+   if( packetResult == Malformed )
    {
       g_log.info("Dropping connection due to malformed packets.");
       Disconnect();
@@ -94,7 +95,7 @@ void Core::Network::GameConnection::OnRecv( std::vector< uint8_t > & buffer )
    }
 
    // Handle it
-   handlePackets(packetHeader, packetList);
+   handlePackets( packetHeader, packetList );
 
 }
 
@@ -163,21 +164,21 @@ void Core::Network::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet, ui
             memset( &details, 0, sizeof( FFXIVIpcCharList::CharaDetails ) );
 
             auto& charEntry = charList[charIndex];
-            details.uniqueId = get<1>( charEntry );
-            details.contentId = get<2>( charEntry );
+            details.uniqueId = get< 1 >( charEntry );
+            details.contentId = get< 2 >( charEntry );
             details.serverId = g_serverLobby.getConfig()->getValue<uint16_t>( "Settings.Parameters.WorldID", 1 );
             details.index = charIndex;
-            strcpy( details.charDetailJson, get<3>( charEntry ).c_str() );
-            strcpy( details.nameChara, get<0>( charEntry ).c_str() );
+            strcpy( details.charDetailJson, get< 3 >( charEntry ).c_str() );
+            strcpy( details.nameChara, get< 0 >( charEntry ).c_str() );
             strcpy( details.nameServer, g_serverLobby.getConfig()->getValue< std::string >( "Settings.Parameters.WorldName", "Sapphire" ).c_str() );
 
             charListPacket.data().charaDetails[j] = details;
 
             g_log.debug( "[" + std::to_string( charIndex ) + "] " + std::to_string( details.index ) + " - "
-                         + get<0>( charEntry ) + " - " +
-                         std::to_string( get<1>( charEntry ) ) + " - " +
-                         std::to_string( get<2>( charEntry ) ) + " - " +
-                         get<3>( charEntry ) );
+                         + get< 0 >( charEntry ) + " - " +
+                         std::to_string( get< 1 >( charEntry ) ) + " - " +
+                         std::to_string( get< 2 >( charEntry ) ) + " - " +
+                         get< 3 >( charEntry ) );
          }
          charIndex++;
       }
@@ -215,12 +216,12 @@ void Core::Network::GameConnection::enterWorld( FFXIVARR_PACKET_RAW& packet, uin
    auto charList = g_restConnector.getCharList( ( char * )m_pSession->getSessionId() );
    for( uint32_t i = 0; i < charList.size(); i++ )
    {
-      uint64_t thisContentId = get<2>( charList[i] );
+      uint64_t thisContentId = get< 2 >( charList[i] );
 
       if( thisContentId == lookupId )
       {
-         logInCharId = get<1>( charList[i] );
-         logInCharName = get<0>( charList[i] );
+         logInCharId = get< 1 >( charList[i] );
+         logInCharName = get< 0 >( charList[i] );
          break;
       }
    }
@@ -250,13 +251,13 @@ bool Core::Network::GameConnection::sendServiceAccountList( FFXIVARR_PACKET_RAW&
 {
    LobbySessionPtr pSession = g_serverLobby.getSession( ( char* )&packet.data[0] + 0x20 );
    
-   if( g_serverLobby.getConfig()->getValue<bool>( "Settings.Parameters.AllowNoSessionConnect" ) && pSession == nullptr )
+   if( g_serverLobby.getConfig()->getValue< bool >( "Settings.Parameters.AllowNoSessionConnect" ) && pSession == nullptr )
    {
-      LobbySessionPtr session( new Core::LobbySession() );
+      auto session = make_LobbySession();
       session->setAccountID( 0 );
       session->setSessionId( (uint8_t *)&packet.data[0] + 0x20 );
       pSession = session;
-      g_log.Log( LoggingSeverity::info, "Allowed connection with no session: " + std::string( (char*)&packet.data[0] + 0x20 ) );
+      g_log.Log( LoggingSeverity::info, "Allowed connection with no session: " + std::string( ( char* )&packet.data[0] + 0x20 ) );
    }
 
    if( pSession != nullptr )

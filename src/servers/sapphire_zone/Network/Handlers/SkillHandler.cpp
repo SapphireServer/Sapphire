@@ -87,7 +87,7 @@ void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inP
             }
             else
             {
-                Action::ActionCastPtr pActionCast( new Action::ActionCast( player.getAsPlayer(), targetActor, action ) );
+                auto pActionCast = Action::make_ActionCast( player.getAsPlayer(), targetActor, action );
                 player.setCurrentAction( pActionCast );
                 player.sendDebug( "setCurrentAction()" );
                 player.getCurrentAction()->onStart();
@@ -118,7 +118,7 @@ void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inP
 
     player.sendDebug( "Request mount " + std::to_string( action ) );
 
-    Action::ActionMountPtr pActionMount( new Action::ActionMount( player.getAsPlayer(), action ) );
+    auto pActionMount = Action::make_ActionMount( player.getAsPlayer(), action );
     player.setCurrentAction( pActionMount );
     player.sendDebug( "setCurrentAction()" );
     player.getCurrentAction()->onStart();

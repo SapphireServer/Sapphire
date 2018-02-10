@@ -1,5 +1,10 @@
 #include "GameObject.h"
 
+#include "Player.h"
+#include "Actor.h"
+#include "BattleNpc.h"
+#include "EventNpc.h"
+
 Core::Entity::GameObject::GameObject( ObjKind type ) :
    m_objKind( type )
 {
@@ -48,12 +53,42 @@ bool Core::Entity::GameObject::isPlayer() const
    return m_objKind == ObjKind::Player;
 }
 
-bool Core::Entity::GameObject::isBNpc() const
+bool Core::Entity::GameObject::isBattleNpc() const
 {
    return m_objKind == ObjKind::BattleNpc;
 }
 
-bool Core::Entity::GameObject::isENpc() const
+bool Core::Entity::GameObject::isEventNpc() const
 {
    return m_objKind == ObjKind::EventNpc;
+}
+
+/*! \return pointer to this instance as ActorPtr */
+Core::Entity::ActorPtr Core::Entity::GameObject::getAsActor()
+{
+   return boost::dynamic_pointer_cast< Entity::Actor, Entity::GameObject >( shared_from_this() );
+}
+
+/*! \return pointer to this instance as PlayerPtr */
+Core::Entity::PlayerPtr Core::Entity::GameObject::getAsPlayer()
+{
+   if( !isPlayer() )
+      return nullptr;
+   return boost::dynamic_pointer_cast< Entity::Player, Entity::GameObject >( shared_from_this() );
+}
+
+/*! \return pointer to this instance as BattleNpcPtr */
+Core::Entity::BattleNpcPtr Core::Entity::GameObject::getAsBattleNpc()
+{
+   if( !isBattleNpc() )
+      return nullptr;
+   return boost::dynamic_pointer_cast< Entity::BattleNpc, Entity::GameObject >( shared_from_this() );
+}
+
+/*! \return pointer to this instance as EventNpcPtr */
+Core::Entity::EventNpcPtr Core::Entity::GameObject::getAsEventNpc()
+{
+   if( !isEventNpc() )
+      return nullptr;
+   return boost::dynamic_pointer_cast< Entity::EventNpc, Entity::GameObject >( shared_from_this() );
 }

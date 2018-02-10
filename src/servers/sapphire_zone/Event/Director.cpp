@@ -39,24 +39,24 @@ uint8_t Core::Event::Director::getSequence() const
    return m_sequence;
 }
 
-void Core::Event::Director::sendDirectorClear( Core::Entity::PlayerPtr pPlayer ) const
+void Core::Event::Director::sendDirectorClear( Core::Entity::Player& player ) const
 {
-   pPlayer->queuePacket( ActorControlPacket143( pPlayer->getId(), DirectorClear, m_directorId ) );
+   player.queuePacket( ActorControlPacket143( player.getId(), DirectorClear, m_directorId ) );
 }
 
-void Core::Event::Director::sendDirectorVars( Core::Entity::PlayerPtr pPlayer ) const
+void Core::Event::Director::sendDirectorVars( Core::Entity::Player& player ) const
 {
-   ZoneChannelPacket< FFXIVIpcDirectorVars > varPacket( pPlayer->getId() );
+   ZoneChannelPacket< FFXIVIpcDirectorVars > varPacket( player.getId() );
    varPacket.data().m_directorId = getDirectorId();
    varPacket.data().m_sequence = getSequence();
    varPacket.data().m_branch = 0;
    memcpy( varPacket.data().m_unionData, m_unionData.arrData, sizeof( varPacket.data().m_unionData ) );
-   pPlayer->queuePacket( varPacket );
+   player.queuePacket( varPacket );
 }
 
-void Core::Event::Director::sendDirectorInit( Core::Entity::PlayerPtr pPlayer ) const
+void Core::Event::Director::sendDirectorInit( Core::Entity::Player& player ) const
 {
-   pPlayer->queuePacket( ActorControlPacket143( pPlayer->getId(), DirectorInit, m_directorId, m_contentId ) );
+   player.queuePacket( ActorControlPacket143( player.getId(), DirectorInit, m_directorId, m_contentId ) );
 }
 
 Core::Event::Director::DirectorType Core::Event::Director::getType() const

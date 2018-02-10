@@ -80,7 +80,7 @@ void Core::Entity::Player::eventStart( uint64_t actorId, uint32_t eventId,
                                        uint32_t eventParam2 )
 {
 
-   Event::EventHandlerPtr newEvent( new Event::EventHandler( this, actorId, eventId, eventType, eventParam2 ) );
+   auto newEvent = Event::make_EventHandler( this, actorId, eventId, eventType, eventParam2 );
 
    addEvent( newEvent );
 
@@ -227,8 +227,8 @@ void Core::Entity::Player::eventActionStart( uint32_t eventId,
                                              ActionCallback interruptCallback,
                                              uint64_t additional )
 {
-   Action::ActionPtr pEventAction( new Action::EventAction( shared_from_this(), eventId, action,
-                                                            finishCallback, interruptCallback, additional ) );
+   auto pEventAction = Action::make_EventAction( getAsActor(), eventId, action,
+                                                 finishCallback, interruptCallback, additional );
 
    setCurrentAction( pEventAction );
    auto pEvent = getEvent( eventId );
@@ -257,8 +257,8 @@ void Core::Entity::Player::eventItemActionStart( uint32_t eventId,
                                                  ActionCallback interruptCallback,
                                                  uint64_t additional )
 {
-   Action::ActionPtr pEventItemAction( new Action::EventItemAction( shared_from_this(), eventId, action,
-                                                                    finishCallback, interruptCallback, additional ) );
+   Action::ActionPtr pEventItemAction = Action::make_EventItemAction( getAsActor(), eventId, action,
+                                                                      finishCallback, interruptCallback, additional );
 
    setCurrentAction( pEventItemAction );
 

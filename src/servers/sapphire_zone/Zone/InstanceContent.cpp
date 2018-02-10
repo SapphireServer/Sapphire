@@ -51,32 +51,32 @@ Core::Data::ExdDataGenerated::InstanceContentPtr Core::InstanceContent::getInsta
    return m_instanceContentInfo;
 }
 
-void Core::InstanceContent::onEnterTerritory( Entity::PlayerPtr pPlayer )
+void Core::InstanceContent::onEnterTerritory( Entity::Player& player )
 {
    g_log.debug( "InstanceContent::onEnterTerritory: Zone#" + std::to_string( getGuId() ) + "|"
                                                            + std::to_string( getInstanceContentId() ) +
-                                                           + ", Entity#" + std::to_string( pPlayer->getId() ) );
+                                                           + ", Entity#" + std::to_string( player.getId() ) );
 
    // mark player as "bound by duty"
-   pPlayer->setStateFlag( PlayerStateFlag::BoundByDuty );
+   player.setStateFlag( PlayerStateFlag::BoundByDuty );
 
    // if the instance was not started yet, director init is sent on enter event.
    // else it will be sent on finish loading.
    if( m_state == Created )
-      sendDirectorInit( pPlayer );
+      sendDirectorInit( player );
 
 }
 
-void Core::InstanceContent::onLeaveTerritory( Entity::PlayerPtr pPlayer )
+void Core::InstanceContent::onLeaveTerritory( Entity::Player& player )
 {
    g_log.debug( "InstanceContent::onLeaveTerritory: Zone#" + std::to_string( getGuId() ) + "|"
                                                            + std::to_string( getInstanceContentId() ) +
-                                                           + ", Entity#" + std::to_string( pPlayer->getId() ) );
-   sendDirectorClear( pPlayer );
+                                                           + ", Entity#" + std::to_string( player.getId() ) );
+   sendDirectorClear( player );
 
-   pPlayer->setDirectorInitialized( false );
+   player.setDirectorInitialized( false );
    // remove "bound by duty" state
-   pPlayer->unsetStateFlag( PlayerStateFlag::BoundByDuty );
+   player.unsetStateFlag( PlayerStateFlag::BoundByDuty );
 }
 
 void Core::InstanceContent::onUpdate( uint32_t currTime )
@@ -126,16 +126,16 @@ void Core::InstanceContent::onUpdate( uint32_t currTime )
    g_scriptMgr.onInstanceUpdate( *this, currTime );
 }
 
-void Core::InstanceContent::onFinishLoading( Entity::PlayerPtr pPlayer )
+void Core::InstanceContent::onFinishLoading( Entity::Player& player )
 {
    if( m_state != Created )
-      sendDirectorInit( pPlayer );
+      sendDirectorInit( player );
 }
 
-void Core::InstanceContent::onInitDirector( Entity::PlayerPtr pPlayer )
+void Core::InstanceContent::onInitDirector( Entity::Player& player )
 {
-   sendDirectorVars( pPlayer );
-   pPlayer->setDirectorInitialized( true );
+   sendDirectorVars( player );
+   player.setDirectorInitialized( true );
 }
 
 void Core::InstanceContent::setVar( uint8_t index, uint8_t value )
@@ -210,7 +210,7 @@ void Core::InstanceContent::setVar( uint8_t index, uint8_t value )
 
    for( const auto &playerIt : m_playerMap )
    {
-      sendDirectorVars( playerIt.second );
+      sendDirectorVars( *playerIt.second );
    }
 }
 

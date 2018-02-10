@@ -421,7 +421,7 @@ public:
    /*! send spawn packets to pTarget */
    void spawn( PlayerPtr pTarget ) override;
    /*! send despawn packets to pTarget */
-   void despawn( ActorPtr pTarget ) override;
+   void despawn( PlayerPtr pTarget ) override;
 
    // Player State Handling
    //////////////////////////////////////////////////////////////////////////////////////////////////////

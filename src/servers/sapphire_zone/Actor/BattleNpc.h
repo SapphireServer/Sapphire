@@ -24,7 +24,7 @@ class BattleNpc : public Actor
 {
 public:
    BattleNpc();
-   ~BattleNpc();
+   virtual ~BattleNpc() override;
 
    BattleNpc( uint16_t modelId, uint16_t nameid, const Common::FFXIVARR_POSITION3& spawnPos, uint16_t bnpcBaseId = 0,
               uint32_t type = 2, uint8_t level = 0, uint8_t behaviour = 1, uint32_t mobType = 0 );
@@ -42,7 +42,7 @@ public:
    void spawn( PlayerPtr pTarget ) override;
 
    // send despawn packets to pTarget
-   void despawn( ActorPtr pTarget ) override;
+   void despawn( PlayerPtr pTarget ) override;
 
    uint8_t getLevel() const override;
 
@@ -52,12 +52,12 @@ public:
 
    uint8_t getbehavior() const;
 
-   void hateListAdd( ActorPtr pActor, int32_t hateAmount );
+   void hateListAdd( Actor& actor, int32_t hateAmount );
 
-   void hateListUpdate( ActorPtr pActor, int32_t hateAmount );
-   void hateListRemove( ActorPtr pActor );
+   void hateListUpdate( Actor& actor, int32_t hateAmount );
+   void hateListRemove( Actor& actor );
 
-   bool hateListHasActor( ActorPtr pActor );
+   bool hateListHasActor( Actor& actor );
 
    void resetPos();
 
@@ -67,15 +67,15 @@ public:
 
    ActorPtr hateListGetHighest();
 
-   void aggro( ActorPtr pActor );
+   void aggro( Actor& actor );
 
-   void deaggro( ActorPtr pActor );
+   void deaggro( Actor& actor );
 
    void setOwner( PlayerPtr pPlayer );
 
    void onDeath() override;
 
-   void onActionHostile( ActorPtr pSource ) override;
+   void onActionHostile( Actor& source ) override;
 
    ActorPtr getClaimer() const;
 
