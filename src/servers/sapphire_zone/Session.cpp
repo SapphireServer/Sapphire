@@ -49,7 +49,7 @@ Core::Network::GameConnectionPtr Core::Session::getChatConnection() const
 bool Core::Session::loadPlayer()
 {
 
-   m_pPlayer = Entity::PlayerPtr( new Entity::Player() );
+   m_pPlayer = Entity::make_Player();
 
    if( !m_pPlayer->load( m_sessionId, shared_from_this() ) )
    {

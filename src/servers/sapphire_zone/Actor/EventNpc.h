@@ -11,7 +11,7 @@ class EventNpc : public Actor
 {
 public:
    EventNpc();
-   ~EventNpc();
+   virtual ~EventNpc() override;
 
    EventNpc( uint32_t enpcId, const Common::FFXIVARR_POSITION3& spawnPos, float rotation );
 
@@ -19,7 +19,7 @@ public:
    void spawn( PlayerPtr pTarget ) override;
 
    // send despawn packets to pTarget
-   void despawn( ActorPtr pTarget ) override;
+   void despawn( PlayerPtr pTarget ) override;
 
    uint8_t getLevel() const override;
 

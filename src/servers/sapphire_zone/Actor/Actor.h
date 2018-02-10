@@ -5,6 +5,7 @@
 #include <boost/enable_shared_from_this.hpp>
 
 #include "Forwards.h"
+#include "GameObject.h"
 #include <set>
 #include <map>
 #include <queue>
@@ -17,28 +18,9 @@ namespace Entity {
 \brief Base class for all actors
 
 */
-class Actor : public boost::enable_shared_from_this< Actor >
+class Actor : public GameObject
 {
 public:
-   enum ObjKind : uint8_t
-   {
-      None = 0x00,
-      Player = 0x01,
-      BattleNpc = 0x02,
-      EventNpc = 0x03,
-      Treasure = 0x04,
-      Aetheryte = 0x05,
-      GatheringPoint = 0x06,
-      EventObj = 0x07,
-      Mount = 0x08,
-      Companion = 0x09,
-      Retainer = 0x0A,
-      Area = 0x0B,
-      Housing = 0x0C,
-      Cutscene = 0x0D,
-      CardStand = 0x0E,
-   };
-
    enum Stance : uint8_t
    {
       Passive = 0,
@@ -113,21 +95,9 @@ public:
    } m_baseStats;
 
 protected:
-   // TODO: The position class should probably be abolished and
-   //       the FFXIV_POS struct used instead ( the functions in there
-   //       could be moved to a FFXIV_POS_Helper namespace and rotation to 
-   //       its own member )
-   /*! Position of the actor */
-   Common::FFXIVARR_POSITION3 m_pos;
-   float m_rot;
-   /*! Name of the actor */
    char                 m_name[34];
    /*! Id of the zone the actor currently is in */
    uint32_t	            m_zoneId;
-   /*! Id of the actor */
-   uint32_t             m_id;
-   /*! Type of the actor */
-   ObjKind              m_objKind;
    /*! Ptr to the ZoneObj the actor belongs to */
    ZonePtr              m_pCurrentZone;
    /*! Last tick time for the actor  ( in ms ) */
@@ -170,13 +140,11 @@ protected:
    std::map< uint8_t, StatusEffect::StatusEffectPtr > m_statusEffectMap;
 
 public:
-   Actor();
+   Actor( ObjKind type );
 
-   virtual ~Actor();
+   virtual ~Actor() override;
 
    virtual void calculateStats() {};
-
-   uint32_t getId() const;
 
    /// Status effect functions 
    void addStatusEffect( StatusEffect::StatusEffectPtr pEffect );
@@ -209,15 +177,7 @@ public:
 
    float getRotation() const;
 
-   Common::FFXIVARR_POSITION3& getPos();
-
    std::string getName() const;
-
-   bool isPlayer() const;
-
-   bool isBNpc() const;
-
-   bool isEventNpc() const;
 
    std::set< ActorPtr > getInRangeActors( bool includeSelf = false );
 
@@ -278,12 +238,12 @@ public:
    virtual void autoAttack( ActorPtr pTarget );
 
    virtual void spawn( PlayerPtr pTarget ) {}
-   virtual void despawn( ActorPtr pTarget ) {}
+   virtual void despawn( PlayerPtr pTarget ) {}
 
-   virtual void onRemoveInRangeActor( ActorPtr pActor ) {}
+   virtual void onRemoveInRangeActor( Actor& pActor ) {}
    virtual void onDeath() {};
    virtual void onDamageTaken( Actor& pSource ) {};
-   virtual void onActionHostile( Core::Entity::ActorPtr pSource ) {};
+   virtual void onActionHostile( Actor& source ) {};
    virtual void onActionFriendly( Actor& pSource ) {};
    virtual void onTick() {};
 
@@ -294,10 +254,6 @@ public:
    virtual void heal( uint32_t amount );
    virtual bool checkAction();
    virtual void update( int64_t currTime ) {};
-   
-   PlayerPtr getAsPlayer();
-   BattleNpcPtr getAsBattleNpc();
-   EventNpcPtr getAsEventNpc();
 
    Action::ActionPtr getCurrentAction() const;
 
@@ -316,7 +272,7 @@ public:
    virtual void addInRangeActor( ActorPtr pActor );
 
    // remove an actor from the in range set
-   void removeInRangeActor( ActorPtr pActor );
+   void removeInRangeActor( Actor& pActor );
 
    // return true if there is at least one actor in the in range set
    bool hasInRangeActor() const;

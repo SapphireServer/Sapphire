@@ -219,7 +219,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
 
                 if( !insufficientGil )
                 {
-                    Action::ActionTeleportPtr pActionTeleport( new Action::ActionTeleport( player.getAsPlayer(), param11, cost ) );
+                    auto pActionTeleport = Action::make_ActionTeleport( player.getAsPlayer(), param11, cost );
                     player.setCurrentAction( pActionTeleport );
                 }
             }
@@ -231,7 +231,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
         }
         case 0x321: // Director init finish
         {
-           player.getCurrentZone()->onInitDirector( player.getAsPlayer() );
+           player.getCurrentZone()->onInitDirector( player );
            break;
         }
         default:
