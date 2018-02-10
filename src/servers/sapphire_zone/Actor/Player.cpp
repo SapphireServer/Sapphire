@@ -53,7 +53,7 @@ using namespace Core::Network::Packets::Server;
 
 // player constructor
 Core::Entity::Player::Player() :
-   Actor(),
+   Actor( ObjKind::Player ),
    m_lastWrite( 0 ),
    m_lastPing( 0 ),
    m_bIsLogin( false ),
@@ -74,7 +74,6 @@ Core::Entity::Player::Player() :
    m_directorInitialized( false )
 {
    m_id = 0;
-   m_objKind = ObjKind::Player;
    m_currentStance = Stance::Passive;
    m_onlineStatus = 0;
    m_queuedZoneing = nullptr;
@@ -660,29 +659,7 @@ void Core::Entity::Player::unlock()
 
 void Core::Entity::Player::sendStatusUpdate( bool toSelf )
 {
-   //   CGamePacket* pPE = new CGamePacket(0x140, 0x0128, getId(), getId());
-
-   //pPE->setInt8At(0x20, static_cast<uint8_t>(getClass()));
-
-   //   pPE->setInt8At(0x21, getLevel());
-   //   pPE->setInt8At(0x22, getLevel());
-
-   //   // current exp
-   //   pPE->setInt32At(0x28, getExp());
-
-   //   // rested exp
-   //   //pPE->setInt32At(0x2C, m_hp);
-
-   //   pPE->setInt32At(0x24, m_hp);
-   //   pPE->setInt32At(0x28, getMaxHp());
-   //   pPE->setInt16At(0x2C, m_mp);
-   //   pPE->setInt16At(0x2E, getMaxMp());
-   //   pPE->setInt16At(0x30, m_tp);
-
-   //   sendToInRangeSet(pPE, toSelf);
-
-   sendToInRangeSet( UpdateHpMpTpPacket( shared_from_this() ), true );
-
+   sendToInRangeSet( UpdateHpMpTpPacket( *this ), true );
 }
 
 uint8_t Core::Entity::Player::getLevel() const
@@ -834,9 +811,9 @@ void Core::Entity::Player::spawn( Entity::PlayerPtr pTarget )
 }
 
 // despawn
-void Core::Entity::Player::despawn( Entity::ActorPtr pTarget )
+void Core::Entity::Player::despawn( Entity::PlayerPtr pTarget )
 {
-   auto pPlayer = pTarget->getAsPlayer();
+   auto pPlayer = pTarget;
 
    pPlayer->freePlayerSpawnId( getId() );
 
@@ -1444,7 +1421,7 @@ void Core::Entity::Player::autoAttack( ActorPtr pTarget )
    auto mainWeap = m_pInventory->getItemAt( Inventory::GearSet0,
                                             Inventory::EquipSlot::MainHand );
 
-   pTarget->onActionHostile( shared_from_this() );
+   pTarget->onActionHostile( *this );
    //uint64_t tick = Util::getTimeMs();
    //srand(static_cast< uint32_t >(tick));
 
@@ -1634,7 +1611,7 @@ void Player::sendZonePackets()
    if( getLastPing() == 0 )
       sendQuestInfo();
 
-   getCurrentZone()->onEnterTerritory( getAsPlayer() );
+   getCurrentZone()->onEnterTerritory( *this );
 
    m_bMarkedForZoning = false;
 }

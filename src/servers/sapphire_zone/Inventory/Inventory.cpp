@@ -36,7 +36,7 @@ Core::Inventory::Inventory( Core::Entity::Player* pOwner )
    // shortcut for setting up inventory
    // TODO: use a loop to set theese up?
    auto setupContainer = []( InventoryMap& map, InventoryType type )
-   { map[type] = ItemContainerPtr( new ItemContainer( type ) ); };
+   { map[type] = make_ItemContainer( type ); };
 
    // main bags
    setupContainer( m_inventoryMap, Bag0 );

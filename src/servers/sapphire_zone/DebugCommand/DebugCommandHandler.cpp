@@ -345,7 +345,7 @@ void Core::DebugCommandHandler::add( char * data, Entity::Player& player, boost:
 
       sscanf( params.c_str(), "%d %d %hu", &id, &duration, &param );
 
-      StatusEffect::StatusEffectPtr effect( new StatusEffect::StatusEffect( id, player.getAsPlayer(), player.getAsPlayer(), duration, 3000 ) );
+      auto effect = StatusEffect::make_StatusEffect( id, player.getAsPlayer(), player.getAsPlayer(), duration, 3000 );
       effect->setParam( param );
 
       player.addStatusEffect( effect );
@@ -364,7 +364,7 @@ void Core::DebugCommandHandler::add( char * data, Entity::Player& player, boost:
 
       sscanf( params.c_str(), "%d %d", &model, &name );
 
-      Entity::BattleNpcPtr pBNpc( new Entity::BattleNpc( model, name, player.getPos() ) );
+      auto pBNpc = Entity::make_BattleNpc( model, name, player.getPos() );
 
       auto pZone = player.getCurrentZone();
       pBNpc->setCurrentZone( pZone );
@@ -376,7 +376,7 @@ void Core::DebugCommandHandler::add( char * data, Entity::Player& player, boost:
       // temporary research packet
       int32_t opcode;
       sscanf( params.c_str(), "%x", &opcode );
-      Network::Packets::GamePacketPtr pPe( new Network::Packets::GamePacket( opcode, 0x30, player.getId(), player.getId() ) );
+      auto pPe = Network::Packets::make_GamePacket( opcode, 0x30, player.getId(), player.getId() );
       player.queuePacket( pPe );
    }
    else if( subCommand == "eventnpc-self" )
@@ -400,7 +400,7 @@ void Core::DebugCommandHandler::add( char * data, Entity::Player& player, boost:
 
       sscanf( params.c_str(), "%d", &id );
 
-      Entity::EventNpcPtr pENpc( new Entity::EventNpc( id, player.getPos(), player.getRotation() ) );
+      auto pENpc = Entity::make_EventNpc( id, player.getPos(), player.getRotation() );
 
       auto pZone = player.getCurrentZone();
       pENpc->setCurrentZone( pZone );

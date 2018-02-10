@@ -1,12 +1,17 @@
 #ifndef _FORWARDS_H
 #define _FORWARDS_H
 
+#include <utility>
 #include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 #include <vector>
 
 #define TYPE_FORWARD( x ) \
 class x; \
 typedef boost::shared_ptr< x > x ## Ptr; \
+template< typename...Args > \
+x ## Ptr make_ ## x( Args &&...args ) { \
+return boost::make_shared< x >( std::forward< Args >( args ) ... ); }\
 typedef std::vector< x > x ## PtrList;
 
 namespace Core
@@ -29,6 +34,7 @@ namespace Core
 
    namespace Entity
    {
+      TYPE_FORWARD( GameObject );
       TYPE_FORWARD( Actor );
       TYPE_FORWARD( Player );
       TYPE_FORWARD( BattleNpc );
@@ -50,6 +56,7 @@ namespace Core
       TYPE_FORWARD( ActionCast );
       TYPE_FORWARD( ActionMount );
       TYPE_FORWARD( EventAction );
+      TYPE_FORWARD( EventItemAction );
    }
 
    namespace Network
