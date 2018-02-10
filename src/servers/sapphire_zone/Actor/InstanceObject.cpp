@@ -3,7 +3,8 @@
 
 Core::Entity::InstanceObject::InstanceObject( uint32_t objectId, uint32_t hierachyId ) :
    Core::Entity::GameObject( ObjKind::EventObj ),
-   m_hierachyId( hierachyId )
+   m_hierachyId( hierachyId ),
+   m_state( 0 )
 {
    m_id = objectId;
 }
@@ -33,7 +34,7 @@ void Core::Entity::InstanceObject::setState( uint8_t state )
 {
    m_state = state;
 
-   m_parentInstance->updateInstanceObj( InstanceObjectPtr( this ) );
+   //m_parentInstance->updateInstanceObj( InstanceObjectPtr( this ) );
 }
 
 void Core::Entity::InstanceObject::setParentInstance( Core::InstanceContentPtr instance )
