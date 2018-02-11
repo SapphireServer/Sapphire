@@ -53,6 +53,9 @@ namespace Entity {
       explicit GameObject( ObjKind type );
       virtual ~GameObject() {};
 
+      virtual void spawn( PlayerPtr pTarget ) {}
+      virtual void despawn( PlayerPtr pTarget ) {}
+
       uint32_t getId() const;
 
       ObjKind getObjKind() const;

@@ -139,9 +139,8 @@ protected:
    std::vector< std::pair< uint8_t, uint32_t> > m_statusEffectList;
    std::map< uint8_t, StatusEffect::StatusEffectPtr > m_statusEffectMap;
 
-   std::set< ActorPtr >            m_inRangeActors;
-   std::set< PlayerPtr >           m_inRangePlayers;
-   std::map< uint32_t, ActorPtr >  m_inRangeActorMap;
+   std::set< ActorPtr > m_inRangeActors;
+   std::set< PlayerPtr > m_inRangePlayers;
 
 public:
    Actor( ObjKind type );
@@ -194,11 +193,8 @@ public:
    ActorStats getStats() const;
 
    uint32_t getHp() const;
-
    uint32_t getMp() const;
-
    uint16_t getTp() const;
-
    uint16_t getGp() const;
 
    Common::InvincibilityType getInvincibilityType() const;
@@ -216,17 +212,13 @@ public:
    bool isAlive() const;
 
    virtual uint32_t getMaxHp() const;
-
    virtual uint32_t getMaxMp() const;
 
    void resetHp();
-
    void resetMp();
 
    void setHp( uint32_t hp );
-
    void setMp( uint32_t mp );
-
    void setGp( uint32_t gp );
 
    void setInvincibilityType( Common::InvincibilityType type );
@@ -241,10 +233,8 @@ public:
 
    virtual void autoAttack( ActorPtr pTarget );
 
-   virtual void spawn( PlayerPtr pTarget ) {}
-   virtual void despawn( PlayerPtr pTarget ) {}
-
    virtual void onRemoveInRangeActor( Actor& pActor ) {}
+
    virtual void onDeath() {};
    virtual void onDamageTaken( Actor& pSource ) {};
    virtual void onActionHostile( Actor& source ) {};
@@ -273,7 +263,7 @@ public:
    void sendToInRangeSet( Network::Packets::GamePacketPtr pPacket, bool bToSelf = false );
 
    // add an actor to in range set
-   virtual void addInRangeActor( ActorPtr pActor );
+   void addInRangeActor( ActorPtr pActor );
 
    // remove an actor from the in range set
    void removeInRangeActor( Actor& pActor );
@@ -298,7 +288,7 @@ public:
    // set the current cell
    void setCell( Cell* pCell );
 
-   Core::Cell*          m_pCell;
+   Core::Cell* m_pCell;
 
 };
 
