@@ -26,7 +26,7 @@
 // garbage to ignore models
 bool ignoreModels = false;
 
-std::string gamePath( "C:\\Program Files (x86)\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv" );
+std::string gamePath( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
 std::unordered_map< uint32_t, std::string > eobjNameMap;
 std::unordered_map< uint16_t, std::string > zoneNameMap;
 std::unordered_map< uint16_t, std::vector< std::pair< uint16_t, std::string > > > zoneInstanceMap;
@@ -335,7 +335,7 @@ int main( int argc, char* argv[] )
 
    std::vector< std::string > argVec( argv + 1, argv + argc );
    // todo: support expansions
-   std::string zoneName = "r1f1";
+   std::string zoneName = "r2t2";
    bool dumpInstances = ignoreModels = std::remove_if( argVec.begin(), argVec.end(), []( auto arg ){ return arg == "--instance-dump"; } ) != argVec.end();
 
    if( argc > 1 )
@@ -366,12 +366,6 @@ LABEL_DUMP:
    {
       const auto& zonePath = zoneNameToPath( zoneName );
 
-      if( zonePath.find( "ex1/" ) != std::string::npos || zonePath.find( "ex2" ) != std::string::npos )
-      {
-         std::cout << "[Error] Expansions are currently not supported " << zonePath << "\n";
-         goto LABEL_NEXT_ZONE_ENTRY;
-      }
-
       std::string listPcbPath( zonePath + "/collision/list.pcb" );
       std::string bgLgbPath( zonePath + "/level/bg.lgb" );
       std::string planmapLgbPath( zonePath + "/level/planmap.lgb" );
@@ -381,15 +375,15 @@ LABEL_DUMP:
       std::vector< char > section2;
 
 #ifndef STANDALONE
-      const xiv::dat::Cat& test = data1->get_category( "bg" );
+      const xiv::dat::Cat& test = data1->getCategory( "bg" );
 
-      auto test_file = data1->get_file( bgLgbPath );
+      auto test_file = data1->getFile( bgLgbPath );
       section = test_file->access_data_sections().at( 0 );
 
-      auto planmap_file = data1->get_file( planmapLgbPath );
+      auto planmap_file = data1->getFile( planmapLgbPath );
       section2 = planmap_file->access_data_sections().at( 0 );
 
-      auto test_file1 = data1->get_file( listPcbPath );
+      auto test_file1 = data1->getFile( listPcbPath );
       section1 = test_file1->access_data_sections().at( 0 );
 #else
       {
@@ -475,7 +469,7 @@ LABEL_DUMP:
                char* dataSection = nullptr;
                //std::cout << fileName << " ";
 #ifndef STANDALONE
-               auto file = data1->get_file( fileName );
+               auto file = data1->getFile( fileName );
                auto sections = file->get_data_sections();
                dataSection = &sections.at( 0 )[0];
 #else
@@ -527,7 +521,7 @@ LABEL_DUMP:
                char* dataSection = nullptr;
                //std::cout << fileName << " ";
 #ifndef STANDALONE
-               auto file = data1->get_file( fileName );
+               auto file = data1->getFile( fileName );
                auto sections = file->get_data_sections();
                dataSection = &sections.at( 0 )[0];
 #else
@@ -742,6 +736,8 @@ LABEL_DUMP:
 
    std::cout << "\n\n\n[Success] Finished all tasks in " <<
       std::chrono::duration_cast< std::chrono::seconds >( std::chrono::system_clock::now() - startTime ).count() << " seconds\n";
+
+   getchar();
 
    if( eData )
       delete eData;
