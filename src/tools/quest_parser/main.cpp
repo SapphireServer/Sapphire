@@ -299,7 +299,7 @@ int main( int argc, char** argv )
 
    bool unluac = false;
   // std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
-   std::string datLocation( "C:/Program Files (x86)/SquareEnix/FINAL FANTASY XIV - A Realm Reborn/game/sqpack/ffxiv" );
+   std::string datLocation( "C:/Program Files (x86)/SquareEnix/FINAL FANTASY XIV - A Realm Reborn/game/sqpack" );
    if ( argc > 1 )
       datLocation = std::string( argv[1] );
    if ( argc > 2 )
@@ -350,11 +350,11 @@ int main( int argc, char** argv )
 
 
 
-      const xiv::dat::Cat& test = data.get_category( "game_script" );
+      const xiv::dat::Cat& test = data.getCategory( "game_script" );
 
       const std::string questPath = "game_script/quest/" + folder + "/" + questInfo->name_intern + ".luab";
 
-      const auto &test_file = data.get_file( questPath );
+      const auto &test_file = data.getFile( questPath );
       auto &section = test_file->access_data_sections().at( 0 );
       int32_t size = *( uint32_t* ) &section[4];
 
