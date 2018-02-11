@@ -5,8 +5,6 @@
       <AuthPort>54998</AuthPort>
       <!-- Ip the lobby server listens on -->
       <ListenIp>127.0.0.1</ListenIp>
-      <!-- Path of FFXIV dat files -->
-      <DataPath>C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv</DataPath>
       <!-- IP of the world server -->
       <ZoneIp>127.0.0.1</ZoneIp>
       <!-- Port the world server listens for clients -->

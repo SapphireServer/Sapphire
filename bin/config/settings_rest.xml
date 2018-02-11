@@ -6,7 +6,7 @@
       <!-- Ip the lobby server listens on -->
       <ListenIp>127.0.0.1</ListenIp>
       <!-- Path of FFXIV dat files -->
-      <DataPath>C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv</DataPath>
+      <DataPath>C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack</DataPath>
       <!-- <DataPath>/opt/sapphire_3_15_0/bin/sqpack</DataPath> -->
       <!-- IP of the lobby server -->
       <LobbyHost>127.0.0.1</LobbyHost>
