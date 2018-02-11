@@ -37,12 +37,11 @@ extern Core::Data::ExdDataGenerated g_exdDataGen;
 extern Core::Scripting::ScriptManager g_scriptMgr;
 extern Core::TerritoryMgr g_territoryMgr;
 
-namespace Core {
 
 /**
 * \brief
 */
-Zone::Zone() :
+Core::Zone::Zone() :
    m_territoryId( 0 ),
    m_guId( 0 ),
    m_currentWeather( static_cast< uint8_t >( Common::Weather::FairSkies ) ),
@@ -52,7 +51,7 @@ Zone::Zone() :
 {
 }
 
-Zone::Zone( uint16_t territoryId, uint32_t guId, const std::string& internalName, const std::string& placeName ) :
+Core::Zone::Zone( uint16_t territoryId, uint32_t guId, const std::string& internalName, const std::string& placeName ) :
    m_currentWeather( static_cast< uint8_t >( Common::Weather::FairSkies ) )
 {
    m_guId = guId;
@@ -85,11 +84,11 @@ Zone::Zone( uint16_t territoryId, uint32_t guId, const std::string& internalName
    m_currentWeather = getNextWeather();
 }
 
-Zone::~Zone()
+Core::Zone::~Zone()
 {
 }
 
-bool Zone::init()
+bool Core::Zone::init()
 {
    memset( m_pCellCache, 0, sizeof( CellCache* ) * _sizeX );
 
@@ -103,27 +102,27 @@ bool Zone::init()
    return true;
 }
 
-void Zone::setWeatherOverride( uint8_t weather )
+void Core::Zone::setWeatherOverride( uint8_t weather )
 {
    m_weatherOverride = weather;
 }
 
-uint8_t Zone::getCurrentWeather() const
+uint8_t Core::Zone::getCurrentWeather() const
 {
    return m_currentWeather;
 }
 
-uint16_t Zone::getCurrentFestival() const
+uint16_t Core::Zone::getCurrentFestival() const
 {
    return m_currentFestivalId;
 }
 
-void Zone::setCurrentFestival( uint16_t festivalId )
+void Core::Zone::setCurrentFestival( uint16_t festivalId )
 {
    m_currentFestivalId = festivalId;
 }
 
-CellCache* Zone::getCellCacheList( uint32_t cellx, uint32_t celly )
+Core::CellCache* Core::Zone::getCellCacheList( uint32_t cellx, uint32_t celly )
 {
    assert( cellx < _sizeX );
    assert( celly < _sizeY );
@@ -133,7 +132,7 @@ CellCache* Zone::getCellCacheList( uint32_t cellx, uint32_t celly )
    return m_pCellCache[cellx][celly];
 }
 
-CellCache* Zone::getCellCacheAndCreate( uint32_t cellx, uint32_t celly )
+Core::CellCache* Core::Zone::getCellCacheAndCreate( uint32_t cellx, uint32_t celly )
 {
    assert( cellx < _sizeX );
    assert( celly < _sizeY );
@@ -151,7 +150,7 @@ CellCache* Zone::getCellCacheAndCreate( uint32_t cellx, uint32_t celly )
    return m_pCellCache[cellx][celly];
 }
 
-void Zone::loadCellCache()
+void Core::Zone::loadCellCache()
 {
    auto pQR = g_charaDb.query( "SELECT Id,"
                                "Zoneid,"
@@ -228,7 +227,7 @@ void Zone::loadCellCache()
 
 }
 
-uint8_t Zone::getNextWeather()
+uint8_t Core::Zone::getNextWeather()
 {
    uint32_t unixTime = static_cast< uint32_t >( Util::getTimeSeconds() );
    // Get Eorzea hour for weather start
@@ -258,7 +257,7 @@ uint8_t Zone::getNextWeather()
    return 1;
 }
 
-void Zone::pushActor( Entity::ActorPtr pActor )
+void Core::Zone::pushActor( Entity::ActorPtr pActor )
 {
    float mx = pActor->getPos().x;
    float my = pActor->getPos().z;
@@ -323,7 +322,7 @@ void Zone::pushActor( Entity::ActorPtr pActor )
 
 }
 
-void Zone::removeActor( Entity::ActorPtr pActor )
+void Core::Zone::removeActor( Entity::ActorPtr pActor )
 {
 
    if( pActor->m_pCell )
@@ -357,7 +356,7 @@ void Zone::removeActor( Entity::ActorPtr pActor )
 
 }
 
-void Zone::queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range, Network::Packets::GamePacketPtr pPacketEntry )
+void Core::Zone::queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range, Network::Packets::GamePacketPtr pPacketEntry )
 {
    if( g_territoryMgr.isPrivateTerritory( getTerritoryId() ) )
       return;
@@ -381,32 +380,32 @@ void Zone::queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range,
    }
 }
 
-uint32_t Zone::getTerritoryId() const
+uint32_t Core::Zone::getTerritoryId() const
 {
    return m_territoryId;
 }
 
-uint32_t Zone::getGuId() const
+uint32_t Core::Zone::getGuId() const
 {
    return m_guId;
 }
 
-const std::string& Zone::getName() const
+const std::string& Core::Zone::getName() const
 {
    return m_placeName;
 }
 
-const std::string& Zone::getInternalName() const
+const std::string& Core::Zone::getInternalName() const
 {
    return m_internalName;
 }
 
-std::size_t Zone::getPopCount() const
+std::size_t Core::Zone::getPopCount() const
 {
    return m_playerMap.size();
 }
 
-bool Zone::checkWeather()
+bool Core::Zone::checkWeather()
 {
    if ( m_weatherOverride != 0 )
    {
@@ -430,7 +429,7 @@ bool Zone::checkWeather()
    return false;
 }
 
-void Zone::updateBnpcs( int64_t tickCount )
+void Core::Zone::updateBnpcs( int64_t tickCount )
 {
    if( ( tickCount - m_lastMobUpdate ) > 250 )
    {
@@ -478,7 +477,7 @@ void Zone::updateBnpcs( int64_t tickCount )
    }
 }
 
-bool Zone::update( uint32_t currTime )
+bool Core::Zone::update( uint32_t currTime )
 {
    int64_t tickCount = Util::getTimeMs();
 
@@ -530,7 +529,7 @@ bool Zone::update( uint32_t currTime )
    return true;
 }
 
-bool Zone::isCellActive( uint32_t x, uint32_t y )
+bool Core::Zone::isCellActive( uint32_t x, uint32_t y )
 {
    uint32_t endX = ( ( x + 1 ) <= _sizeX ) ? x + 1 : ( _sizeX - 1 );
    uint32_t endY = ( ( y + 1 ) <= _sizeY ) ? y + 1 : ( _sizeY - 1 );
@@ -555,7 +554,7 @@ bool Zone::isCellActive( uint32_t x, uint32_t y )
    return false;
 }
 
-void Zone::updateCellActivity( uint32_t x, uint32_t y, int32_t radius )
+void Core::Zone::updateCellActivity( uint32_t x, uint32_t y, int32_t radius )
 {
 
    uint32_t endX = ( x + radius ) <= _sizeX ? x + radius : ( _sizeX - 1 );
@@ -609,7 +608,7 @@ void Zone::updateCellActivity( uint32_t x, uint32_t y, int32_t radius )
    }
 }
 
-void Zone::updateActorPosition( Entity::Actor &actor )
+void Core::Zone::updateActorPosition( Entity::Actor &actor )
 {
 
    if( actor.getCurrentZone() != shared_from_this() )
@@ -676,7 +675,7 @@ void Zone::updateActorPosition( Entity::Actor &actor )
 }
 
 
-void Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
+void Core::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
 {
    if( pCell == nullptr )
       return;
@@ -756,36 +755,34 @@ void Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
    }
 }
 
-void Zone::onEnterTerritory( Entity::Player& player )
+void Core::Zone::onEnterTerritory( Entity::Player& player )
 {
    g_log.debug( "Zone::onEnterTerritory: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryId() ) +
                                                 + ", Entity#" + std::to_string( player.getId() ) );
 }
 
-void Zone::onLeaveTerritory( Entity::Player& player )
+void Core::Zone::onLeaveTerritory( Entity::Player& player )
 {
    g_log.debug( "Zone::onLeaveTerritory: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryId() ) +
                                                 + ", Entity#" + std::to_string( player.getId() ) );
 }
 
-void Zone::onUpdate( uint32_t currTime )
+void Core::Zone::onUpdate( uint32_t currTime )
 {
 
 }
 
-void Zone::onFinishLoading( Entity::Player& player )
+void Core::Zone::onFinishLoading( Entity::Player& player )
 {
 
 }
 
-void Zone::onInitDirector( Entity::Player& player )
+void Core::Zone::onInitDirector( Entity::Player& player )
 {
 
 }
 
-}
-
-void Core::Zone::registerInstanceObj( Core::Entity::InstanceObjectPtr object )
+void Core::Zone::registerInstanceObj( Entity::InstanceObjectPtr object )
 {
    if( !object )
       return;

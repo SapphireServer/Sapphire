@@ -9,8 +9,8 @@ Core::Entity::InstanceObject::InstanceObject( uint32_t objectId, uint32_t mapLin
    m_id = objectId;
 }
 
-Core::Entity::InstanceObject::InstanceObject( uint32_t objectId, uint32_t mapLinkId, Common::FFXIVARR_POSITION3 pos )
-      : InstanceObject( objectId, mapLinkId )
+Core::Entity::InstanceObject::InstanceObject( uint32_t objectId, uint32_t mapLinkId, Common::FFXIVARR_POSITION3 pos ) :
+   InstanceObject( objectId, mapLinkId )
 {
 
 }

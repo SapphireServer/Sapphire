@@ -258,7 +258,7 @@ Sets the actors position and notifies the zone to propagate the change
 void Core::Entity::Actor::setPosition( const Common::FFXIVARR_POSITION3& pos )
 {
    m_pos = pos;
-   m_pCurrentZone->updateActorPosition(*this);
+   m_pCurrentZone->updateActorPosition( *this );
 }
 
 void Core::Entity::Actor::setPosition( float x, float y, float z )
@@ -266,7 +266,7 @@ void Core::Entity::Actor::setPosition( float x, float y, float z )
    m_pos.x = x;
    m_pos.y = y;
    m_pos.z = z;
-   m_pCurrentZone->updateActorPosition(*this);
+   m_pCurrentZone->updateActorPosition( *this );
 }
 
 /*!
@@ -309,9 +309,7 @@ Change the current target and propagate to in range players
 void Core::Entity::Actor::changeTarget( uint64_t targetId )
 {
    setTargetId( targetId );
-
-   sendToInRangeSet( ActorControlPacket144( m_id, SetTarget,
-                                            0, 0, 0, 0, targetId ) );
+   sendToInRangeSet( ActorControlPacket144( m_id, SetTarget, 0, 0, 0, 0, targetId ) );
 }
 
 /*!
@@ -495,12 +493,10 @@ void Core::Entity::Actor::addInRangeActor( ActorPtr pActor )
       // if actor is a player, add it to the in range player set
       m_inRangePlayers.insert( pPlayer );
    }
-
-   m_inRangeActorMap[pActor->getId()] = pActor;
 }
 
 /*!
-Remove a given actor from the fitting in range set according to type
+Remove a given actor from the matching in range set according to type
 but also to the global actor map
 
 \param ActorPtr to remove
@@ -519,11 +515,7 @@ void Core::Entity::Actor::removeInRangeActor( Actor& actor )
       actor.despawn( getAsPlayer() );
 
    if( actor.isPlayer() )
-   {
       m_inRangePlayers.erase( actor.getAsPlayer() );
-   }
-
-   m_inRangeActorMap.erase( actor.getId() );
 }
 
 /*! \return true if there is at least one actor in the in range set */
@@ -583,7 +575,6 @@ void Core::Entity::Actor::clearInRangeSet()
 {
    m_inRangeActors.clear();
    m_inRangePlayers.clear();
-   m_inRangeActorMap.clear();
 }
 
 /*! \return ZonePtr to the current zone, nullptr if not set */
