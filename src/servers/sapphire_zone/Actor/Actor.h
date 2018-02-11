@@ -139,6 +139,10 @@ protected:
    std::vector< std::pair< uint8_t, uint32_t> > m_statusEffectList;
    std::map< uint8_t, StatusEffect::StatusEffectPtr > m_statusEffectMap;
 
+   std::set< ActorPtr >            m_inRangeActors;
+   std::set< PlayerPtr >           m_inRangePlayers;
+   std::map< uint32_t, ActorPtr >  m_inRangeActorMap;
+
 public:
    Actor( ObjKind type );
 
@@ -277,6 +281,10 @@ public:
    // return true if there is at least one actor in the in range set
    bool hasInRangeActor() const;
 
+   void checkInRangeActors();
+
+   void removeFromInRange();
+
    // clear the whole in range set, this does no cleanup
    virtual void clearInRangeSet();
 
@@ -289,12 +297,6 @@ public:
 
    // set the current cell
    void setCell( Cell* pCell );
-
-
-   // TODO: Why did i even declare them publicly here?!
-   std::set< ActorPtr >            m_inRangeActors;
-   std::set< PlayerPtr >           m_inRangePlayers;
-   std::map< uint32_t, ActorPtr >  m_inRangeActorMap;
 
    Core::Cell*          m_pCell;
 

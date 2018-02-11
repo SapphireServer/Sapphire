@@ -352,17 +352,7 @@ void Zone::removeActor( Entity::ActorPtr pActor )
       m_BattleNpcMap.erase( pActor->getId() );
 
    // remove from lists of other actors
-   if( pActor->hasInRangeActor() )
-   {
-      Entity::ActorPtr pCurAct;
-
-      for( auto iter = pActor->m_inRangeActors.begin(); iter != pActor->m_inRangeActors.end(); )
-      {
-         pCurAct = *iter;
-         auto iter2 = iter++;
-         pCurAct->removeInRangeActor( *pActor );
-      }
-   }
+   pActor->removeFromInRange();
    pActor->clearInRangeSet();
 
 }
@@ -619,52 +609,19 @@ void Zone::updateCellActivity( uint32_t x, uint32_t y, int32_t radius )
    }
 }
 
-void Zone::changeActorPosition( Entity::Actor& actor )
+void Zone::updateActorPosition( Entity::Actor &actor )
 {
 
    if( actor.getCurrentZone() != shared_from_this() )
       return;
 
-   if( actor.hasInRangeActor() )
-   {
-      Entity::ActorPtr pCurAct;
-
-      float fRange = 70.0f;
-      for( auto iter = actor.m_inRangeActors.begin(); iter != actor.m_inRangeActors.end();)
-      {
-         pCurAct = *iter;
-         auto iter2 = iter++;
-
-         float distance = Math::Util::distance( pCurAct->getPos().x,
-                                                pCurAct->getPos().y,
-                                                pCurAct->getPos().z,
-                                                actor.getPos().x,
-                                                actor.getPos().y,
-                                                actor.getPos().z );
-
-         if( fRange > 0.0f && distance > fRange )
-         {
-            pCurAct->removeInRangeActor( actor );
-
-            if( actor.getCurrentZone() != shared_from_this() )
-               return;
-
-            actor.removeInRangeActor( **iter2 );
-
-            // @TODO FIXME!
-            // this break is more or less a hack, iteration will break otherwise after removing
-            break;
-         }
-      }
-   }
+   actor.checkInRangeActors();
 
    uint32_t cellX = getPosX( actor.getPos().x );
    uint32_t cellY = getPosY( actor.getPos().z );
 
    if( cellX >= _sizeX || cellY >= _sizeY )
-   {
       return;
-   }
 
    Cell* pCell = getCell( cellX, cellY );
    Cell* pOldCell = actor.m_pCell;
@@ -742,12 +699,8 @@ void Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
       if( !pCurAct )
          continue;
 
-      float distance = Math::Util::distance( pCurAct->getPos().x,
-                                             pCurAct->getPos().y,
-                                             pCurAct->getPos().z,
-                                             pActor->getPos().x,
-                                             pActor->getPos().y,
-                                             pActor->getPos().z );
+      float distance = Math::Util::distance( pCurAct->getPos().x, pCurAct->getPos().y, pCurAct->getPos().z,
+                                             pActor->getPos().x, pActor->getPos().y, pActor->getPos().z );
 
       // Add if we are not ourself and  range == 0 or distance is withing range.
       if( pCurAct != pActor && ( fRange == 0.0f || distance <= fRange ) )

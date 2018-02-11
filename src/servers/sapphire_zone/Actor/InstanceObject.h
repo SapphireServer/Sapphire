@@ -10,8 +10,8 @@ namespace Entity
    class InstanceObject : public GameObject
    {
    public:
-      InstanceObject( uint32_t objectId, uint32_t hierachyId );
-      InstanceObject( uint32_t objectId, uint32_t hierachyId, Common::FFXIVARR_POSITION3 pos );
+      InstanceObject( uint32_t objectId, uint32_t mapLinkId );
+      InstanceObject( uint32_t objectId, uint32_t mapLinkId, Common::FFXIVARR_POSITION3 pos );
 
       uint32_t getHierachyId() const;
       void setHierachyId( uint32_t hierachyId );
@@ -23,7 +23,7 @@ namespace Entity
       void setParentInstance( InstanceContentPtr instance );
 
    protected:
-      uint32_t m_hierachyId;
+      uint32_t m_mapLinkId;
       uint8_t m_state;
       InstanceContentPtr m_parentInstance;
    };

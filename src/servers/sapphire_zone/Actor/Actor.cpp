@@ -258,7 +258,7 @@ Sets the actors position and notifies the zone to propagate the change
 void Core::Entity::Actor::setPosition( const Common::FFXIVARR_POSITION3& pos )
 {
    m_pos = pos;
-   m_pCurrentZone->changeActorPosition( *this );
+   m_pCurrentZone->updateActorPosition(*this);
 }
 
 void Core::Entity::Actor::setPosition( float x, float y, float z )
@@ -266,7 +266,7 @@ void Core::Entity::Actor::setPosition( float x, float y, float z )
    m_pos.x = x;
    m_pos.y = y;
    m_pos.z = z;
-   m_pCurrentZone->changeActorPosition( *this );
+   m_pCurrentZone->updateActorPosition(*this);
 }
 
 /*!
@@ -505,32 +505,77 @@ but also to the global actor map
 
 \param ActorPtr to remove
 */
-void Core::Entity::Actor::removeInRangeActor( Actor& pActor )
+void Core::Entity::Actor::removeInRangeActor( Actor& actor )
 {
    // call virtual event
-   onRemoveInRangeActor( pActor );
+   onRemoveInRangeActor( actor );
 
    // remove actor from in range actor set
-   m_inRangeActors.erase( pActor.getAsActor() );
+   m_inRangeActors.erase( actor.getAsActor() );
 
    // if actor is a player, despawn ourself for him
    // TODO: move to virtual onRemove?
    if( isPlayer() )
-      pActor.despawn( getAsPlayer() );
+      actor.despawn( getAsPlayer() );
 
-   if( pActor.isPlayer() )
+   if( actor.isPlayer() )
    {
-      auto pPlayer = pActor.getAsPlayer();
-      m_inRangePlayers.erase( pPlayer );
+      m_inRangePlayers.erase( actor.getAsPlayer() );
    }
 
-   m_inRangeActorMap.erase( pActor.getId() );
+   m_inRangeActorMap.erase( actor.getId() );
 }
 
 /*! \return true if there is at least one actor in the in range set */
 bool Core::Entity::Actor::hasInRangeActor() const
 {
    return ( m_inRangeActors.size() > 0 );
+}
+
+void Core::Entity::Actor::removeFromInRange()
+{
+   if( !hasInRangeActor() )
+      return;
+
+   Entity::ActorPtr pCurAct;
+
+   for( auto& pCurAct : m_inRangeActors )
+   {
+      pCurAct->removeInRangeActor( *this );
+   }
+
+}
+
+void Core::Entity::Actor::checkInRangeActors()
+{
+   if( hasInRangeActor() )
+   {
+      Entity::ActorPtr pCurAct;
+
+      float fRange = 70.0f;
+      for( auto iter = m_inRangeActors.begin(); iter != m_inRangeActors.end();)
+      {
+         pCurAct = *iter;
+         auto iter2 = iter++;
+
+         float distance = Math::Util::distance( pCurAct->getPos().x, pCurAct->getPos().y, pCurAct->getPos().z,
+                                                getPos().x, getPos().y, getPos().z );
+
+         if( fRange > 0.0f && distance > fRange )
+         {
+            pCurAct->removeInRangeActor( *this );
+
+            if( getCurrentZone() != pCurAct->getCurrentZone() )
+               return;
+
+            removeInRangeActor( **iter2 );
+
+            // @TODO FIXME!
+            // this break is more or less a hack, iteration will break otherwise after removing
+            break;
+         }
+      }
+   }
 }
 
 /*! Clear the whole in range set, this does no cleanup */

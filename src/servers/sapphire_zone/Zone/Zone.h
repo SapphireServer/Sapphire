@@ -36,6 +36,7 @@ protected:
    std::unordered_map< int32_t, Entity::PlayerPtr > m_playerMap;
    std::unordered_map< int32_t, Entity::BattleNpcPtr > m_BattleNpcMap;
    std::unordered_map< int32_t, Entity::EventNpcPtr > m_EventNpcMap;
+   std::unordered_map< int32_t, Entity::InstanceObjectPtr > m_instanceObjects;
 
    std::set< Entity::BattleNpcPtr > m_BattleNpcDeadMap;
 
@@ -53,7 +54,7 @@ protected:
 
    std::map< uint8_t, int32_t> m_weatherRateMap;
 
-   std::unordered_map< uint32_t, Core::Entity::InstanceObjectPtr > m_instanceObjects;
+
 
 public:
    Zone();
@@ -89,7 +90,7 @@ public:
 
    void removeActor( Entity::ActorPtr pActor );
 
-   void changeActorPosition( Entity::Actor& pActor );
+   void updateActorPosition( Entity::Actor &pActor );
 
    bool isCellActive( uint32_t x, uint32_t y );
 

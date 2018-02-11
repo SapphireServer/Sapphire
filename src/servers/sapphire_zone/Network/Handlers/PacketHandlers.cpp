@@ -421,7 +421,7 @@ void Core::Network::GameConnection::finishLoadingHandler( const Packets::GamePac
    player.spawn( player.getAsPlayer() );
 
    // notify the zone of a change in position to force an "inRangeActor" update
-   player.getCurrentZone()->changeActorPosition( player );
+   player.getCurrentZone()->updateActorPosition(player);
 }
 
 void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket& inPacket,
