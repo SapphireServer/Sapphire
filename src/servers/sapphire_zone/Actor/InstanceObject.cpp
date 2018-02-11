@@ -1,28 +1,28 @@
 #include "InstanceObject.h"
 #include "Zone/InstanceContent.h"
 
-Core::Entity::InstanceObject::InstanceObject( uint32_t objectId, uint32_t hierachyId ) :
+Core::Entity::InstanceObject::InstanceObject( uint32_t objectId, uint32_t mapLinkId ) :
    Core::Entity::GameObject( ObjKind::EventObj ),
-   m_hierachyId( hierachyId ),
+   m_mapLinkId( mapLinkId ),
    m_state( 0 )
 {
    m_id = objectId;
 }
 
-Core::Entity::InstanceObject::InstanceObject( uint32_t objectId, uint32_t hierachyId, Common::FFXIVARR_POSITION3 pos )
-      : InstanceObject( objectId, hierachyId )
+Core::Entity::InstanceObject::InstanceObject( uint32_t objectId, uint32_t mapLinkId, Common::FFXIVARR_POSITION3 pos )
+      : InstanceObject( objectId, mapLinkId )
 {
 
 }
 
 uint32_t Core::Entity::InstanceObject::getHierachyId() const
 {
-   return m_hierachyId;
+   return m_mapLinkId;
 }
 
 void Core::Entity::InstanceObject::setHierachyId( uint32_t hierachyId )
 {
-   m_hierachyId = hierachyId;
+   m_mapLinkId = hierachyId;
 }
 
 uint8_t Core::Entity::InstanceObject::getState() const
