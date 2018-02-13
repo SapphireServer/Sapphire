@@ -4243,7 +4243,6 @@ Core::Data::ExdDataGenerated::AchievementPtr
 {
    try
    {
-      auto row = m_AchievementDat.get_row( AchievementId );
       auto info = boost::make_shared< Achievement >( AchievementId, this );
       return info;
    }
@@ -4258,7 +4257,6 @@ Core::Data::ExdDataGenerated::AchievementCategoryPtr
 {
    try
    {
-      auto row = m_AchievementCategoryDat.get_row( AchievementCategoryId );
       auto info = boost::make_shared< AchievementCategory >( AchievementCategoryId, this );
       return info;
    }
@@ -4273,7 +4271,6 @@ Core::Data::ExdDataGenerated::AchievementKindPtr
 {
    try
    {
-      auto row = m_AchievementKindDat.get_row( AchievementKindId );
       auto info = boost::make_shared< AchievementKind >( AchievementKindId, this );
       return info;
    }
@@ -4288,7 +4285,6 @@ Core::Data::ExdDataGenerated::ActionPtr
 {
    try
    {
-      auto row = m_ActionDat.get_row( ActionId );
       auto info = boost::make_shared< Action >( ActionId, this );
       return info;
    }
@@ -4303,7 +4299,6 @@ Core::Data::ExdDataGenerated::ActionCategoryPtr
 {
    try
    {
-      auto row = m_ActionCategoryDat.get_row( ActionCategoryId );
       auto info = boost::make_shared< ActionCategory >( ActionCategoryId, this );
       return info;
    }
@@ -4318,7 +4313,6 @@ Core::Data::ExdDataGenerated::ActionComboRoutePtr
 {
    try
    {
-      auto row = m_ActionComboRouteDat.get_row( ActionComboRouteId );
       auto info = boost::make_shared< ActionComboRoute >( ActionComboRouteId, this );
       return info;
    }
@@ -4333,7 +4327,6 @@ Core::Data::ExdDataGenerated::ActionIndirectionPtr
 {
    try
    {
-      auto row = m_ActionIndirectionDat.get_row( ActionIndirectionId );
       auto info = boost::make_shared< ActionIndirection >( ActionIndirectionId, this );
       return info;
    }
@@ -4348,7 +4341,6 @@ Core::Data::ExdDataGenerated::ActionProcStatusPtr
 {
    try
    {
-      auto row = m_ActionProcStatusDat.get_row( ActionProcStatusId );
       auto info = boost::make_shared< ActionProcStatus >( ActionProcStatusId, this );
       return info;
    }
@@ -4363,7 +4355,6 @@ Core::Data::ExdDataGenerated::ActionTimelinePtr
 {
    try
    {
-      auto row = m_ActionTimelineDat.get_row( ActionTimelineId );
       auto info = boost::make_shared< ActionTimeline >( ActionTimelineId, this );
       return info;
    }
@@ -4378,7 +4369,6 @@ Core::Data::ExdDataGenerated::ActionTransientPtr
 {
    try
    {
-      auto row = m_ActionTransientDat.get_row( ActionTransientId );
       auto info = boost::make_shared< ActionTransient >( ActionTransientId, this );
       return info;
    }
@@ -4393,7 +4383,6 @@ Core::Data::ExdDataGenerated::AddonPtr
 {
    try
    {
-      auto row = m_AddonDat.get_row( AddonId );
       auto info = boost::make_shared< Addon >( AddonId, this );
       return info;
    }
@@ -4408,7 +4397,6 @@ Core::Data::ExdDataGenerated::AdventurePtr
 {
    try
    {
-      auto row = m_AdventureDat.get_row( AdventureId );
       auto info = boost::make_shared< Adventure >( AdventureId, this );
       return info;
    }
@@ -4423,7 +4411,6 @@ Core::Data::ExdDataGenerated::AdventureExPhasePtr
 {
    try
    {
-      auto row = m_AdventureExPhaseDat.get_row( AdventureExPhaseId );
       auto info = boost::make_shared< AdventureExPhase >( AdventureExPhaseId, this );
       return info;
    }
@@ -4438,7 +4425,6 @@ Core::Data::ExdDataGenerated::AetherCurrentPtr
 {
    try
    {
-      auto row = m_AetherCurrentDat.get_row( AetherCurrentId );
       auto info = boost::make_shared< AetherCurrent >( AetherCurrentId, this );
       return info;
    }
@@ -4453,7 +4439,6 @@ Core::Data::ExdDataGenerated::AetherialWheelPtr
 {
    try
    {
-      auto row = m_AetherialWheelDat.get_row( AetherialWheelId );
       auto info = boost::make_shared< AetherialWheel >( AetherialWheelId, this );
       return info;
    }
@@ -4468,7 +4453,6 @@ Core::Data::ExdDataGenerated::AetherytePtr
 {
    try
    {
-      auto row = m_AetheryteDat.get_row( AetheryteId );
       auto info = boost::make_shared< Aetheryte >( AetheryteId, this );
       return info;
    }
@@ -4483,7 +4467,6 @@ Core::Data::ExdDataGenerated::AirshipExplorationLevelPtr
 {
    try
    {
-      auto row = m_AirshipExplorationLevelDat.get_row( AirshipExplorationLevelId );
       auto info = boost::make_shared< AirshipExplorationLevel >( AirshipExplorationLevelId, this );
       return info;
    }
@@ -4498,7 +4481,6 @@ Core::Data::ExdDataGenerated::AirshipExplorationLogPtr
 {
    try
    {
-      auto row = m_AirshipExplorationLogDat.get_row( AirshipExplorationLogId );
       auto info = boost::make_shared< AirshipExplorationLog >( AirshipExplorationLogId, this );
       return info;
    }
@@ -4513,7 +4495,6 @@ Core::Data::ExdDataGenerated::AirshipExplorationParamTypePtr
 {
    try
    {
-      auto row = m_AirshipExplorationParamTypeDat.get_row( AirshipExplorationParamTypeId );
       auto info = boost::make_shared< AirshipExplorationParamType >( AirshipExplorationParamTypeId, this );
       return info;
    }
@@ -4528,7 +4509,6 @@ Core::Data::ExdDataGenerated::AirshipExplorationPartPtr
 {
    try
    {
-      auto row = m_AirshipExplorationPartDat.get_row( AirshipExplorationPartId );
       auto info = boost::make_shared< AirshipExplorationPart >( AirshipExplorationPartId, this );
       return info;
    }
@@ -4543,7 +4523,6 @@ Core::Data::ExdDataGenerated::AirshipExplorationPointPtr
 {
    try
    {
-      auto row = m_AirshipExplorationPointDat.get_row( AirshipExplorationPointId );
       auto info = boost::make_shared< AirshipExplorationPoint >( AirshipExplorationPointId, this );
       return info;
    }
@@ -4558,7 +4537,6 @@ Core::Data::ExdDataGenerated::AnimaWeapon5Ptr
 {
    try
    {
-      auto row = m_AnimaWeapon5Dat.get_row( AnimaWeapon5Id );
       auto info = boost::make_shared< AnimaWeapon5 >( AnimaWeapon5Id, this );
       return info;
    }
@@ -4573,7 +4551,6 @@ Core::Data::ExdDataGenerated::AnimaWeapon5ParamPtr
 {
    try
    {
-      auto row = m_AnimaWeapon5ParamDat.get_row( AnimaWeapon5ParamId );
       auto info = boost::make_shared< AnimaWeapon5Param >( AnimaWeapon5ParamId, this );
       return info;
    }
@@ -4588,7 +4565,6 @@ Core::Data::ExdDataGenerated::AnimaWeapon5PatternGroupPtr
 {
    try
    {
-      auto row = m_AnimaWeapon5PatternGroupDat.get_row( AnimaWeapon5PatternGroupId );
       auto info = boost::make_shared< AnimaWeapon5PatternGroup >( AnimaWeapon5PatternGroupId, this );
       return info;
    }
@@ -4603,7 +4579,6 @@ Core::Data::ExdDataGenerated::AnimaWeapon5SpiritTalkPtr
 {
    try
    {
-      auto row = m_AnimaWeapon5SpiritTalkDat.get_row( AnimaWeapon5SpiritTalkId );
       auto info = boost::make_shared< AnimaWeapon5SpiritTalk >( AnimaWeapon5SpiritTalkId, this );
       return info;
    }
@@ -4618,7 +4593,6 @@ Core::Data::ExdDataGenerated::AnimaWeapon5SpiritTalkParamPtr
 {
    try
    {
-      auto row = m_AnimaWeapon5SpiritTalkParamDat.get_row( AnimaWeapon5SpiritTalkParamId );
       auto info = boost::make_shared< AnimaWeapon5SpiritTalkParam >( AnimaWeapon5SpiritTalkParamId, this );
       return info;
    }
@@ -4633,7 +4607,6 @@ Core::Data::ExdDataGenerated::AnimaWeapon5TradeItemPtr
 {
    try
    {
-      auto row = m_AnimaWeapon5TradeItemDat.get_row( AnimaWeapon5TradeItemId );
       auto info = boost::make_shared< AnimaWeapon5TradeItem >( AnimaWeapon5TradeItemId, this );
       return info;
    }
@@ -4648,7 +4621,6 @@ Core::Data::ExdDataGenerated::AnimaWeaponFUITalkPtr
 {
    try
    {
-      auto row = m_AnimaWeaponFUITalkDat.get_row( AnimaWeaponFUITalkId );
       auto info = boost::make_shared< AnimaWeaponFUITalk >( AnimaWeaponFUITalkId, this );
       return info;
    }
@@ -4663,7 +4635,6 @@ Core::Data::ExdDataGenerated::AnimaWeaponFUITalkParamPtr
 {
    try
    {
-      auto row = m_AnimaWeaponFUITalkParamDat.get_row( AnimaWeaponFUITalkParamId );
       auto info = boost::make_shared< AnimaWeaponFUITalkParam >( AnimaWeaponFUITalkParamId, this );
       return info;
    }
@@ -4678,7 +4649,6 @@ Core::Data::ExdDataGenerated::AnimaWeaponIconPtr
 {
    try
    {
-      auto row = m_AnimaWeaponIconDat.get_row( AnimaWeaponIconId );
       auto info = boost::make_shared< AnimaWeaponIcon >( AnimaWeaponIconId, this );
       return info;
    }
@@ -4693,7 +4663,6 @@ Core::Data::ExdDataGenerated::AnimaWeaponItemPtr
 {
    try
    {
-      auto row = m_AnimaWeaponItemDat.get_row( AnimaWeaponItemId );
       auto info = boost::make_shared< AnimaWeaponItem >( AnimaWeaponItemId, this );
       return info;
    }
@@ -4708,7 +4677,6 @@ Core::Data::ExdDataGenerated::AquariumFishPtr
 {
    try
    {
-      auto row = m_AquariumFishDat.get_row( AquariumFishId );
       auto info = boost::make_shared< AquariumFish >( AquariumFishId, this );
       return info;
    }
@@ -4723,7 +4691,6 @@ Core::Data::ExdDataGenerated::AquariumWaterPtr
 {
    try
    {
-      auto row = m_AquariumWaterDat.get_row( AquariumWaterId );
       auto info = boost::make_shared< AquariumWater >( AquariumWaterId, this );
       return info;
    }
@@ -4738,7 +4705,6 @@ Core::Data::ExdDataGenerated::AttackTypePtr
 {
    try
    {
-      auto row = m_AttackTypeDat.get_row( AttackTypeId );
       auto info = boost::make_shared< AttackType >( AttackTypeId, this );
       return info;
    }
@@ -4753,7 +4719,6 @@ Core::Data::ExdDataGenerated::BalloonPtr
 {
    try
    {
-      auto row = m_BalloonDat.get_row( BalloonId );
       auto info = boost::make_shared< Balloon >( BalloonId, this );
       return info;
    }
@@ -4768,7 +4733,6 @@ Core::Data::ExdDataGenerated::BaseParamPtr
 {
    try
    {
-      auto row = m_BaseParamDat.get_row( BaseParamId );
       auto info = boost::make_shared< BaseParam >( BaseParamId, this );
       return info;
    }
@@ -4783,7 +4747,6 @@ Core::Data::ExdDataGenerated::BattleLevePtr
 {
    try
    {
-      auto row = m_BattleLeveDat.get_row( BattleLeveId );
       auto info = boost::make_shared< BattleLeve >( BattleLeveId, this );
       return info;
    }
@@ -4798,7 +4761,6 @@ Core::Data::ExdDataGenerated::BeastRankBonusPtr
 {
    try
    {
-      auto row = m_BeastRankBonusDat.get_row( BeastRankBonusId );
       auto info = boost::make_shared< BeastRankBonus >( BeastRankBonusId, this );
       return info;
    }
@@ -4813,7 +4775,6 @@ Core::Data::ExdDataGenerated::BeastReputationRankPtr
 {
    try
    {
-      auto row = m_BeastReputationRankDat.get_row( BeastReputationRankId );
       auto info = boost::make_shared< BeastReputationRank >( BeastReputationRankId, this );
       return info;
    }
@@ -4828,7 +4789,6 @@ Core::Data::ExdDataGenerated::BeastTribePtr
 {
    try
    {
-      auto row = m_BeastTribeDat.get_row( BeastTribeId );
       auto info = boost::make_shared< BeastTribe >( BeastTribeId, this );
       return info;
    }
@@ -4843,7 +4803,6 @@ Core::Data::ExdDataGenerated::BehaviorPtr
 {
    try
    {
-      auto row = m_BehaviorDat.get_row( BehaviorId );
       auto info = boost::make_shared< Behavior >( BehaviorId, this );
       return info;
    }
@@ -4858,7 +4817,6 @@ Core::Data::ExdDataGenerated::BGMPtr
 {
    try
    {
-      auto row = m_BGMDat.get_row( BGMId );
       auto info = boost::make_shared< BGM >( BGMId, this );
       return info;
    }
@@ -4873,7 +4831,6 @@ Core::Data::ExdDataGenerated::BNpcAnnounceIconPtr
 {
    try
    {
-      auto row = m_BNpcAnnounceIconDat.get_row( BNpcAnnounceIconId );
       auto info = boost::make_shared< BNpcAnnounceIcon >( BNpcAnnounceIconId, this );
       return info;
    }
@@ -4888,7 +4845,6 @@ Core::Data::ExdDataGenerated::BNpcBasePtr
 {
    try
    {
-      auto row = m_BNpcBaseDat.get_row( BNpcBaseId );
       auto info = boost::make_shared< BNpcBase >( BNpcBaseId, this );
       return info;
    }
@@ -4903,7 +4859,6 @@ Core::Data::ExdDataGenerated::BNpcCustomizePtr
 {
    try
    {
-      auto row = m_BNpcCustomizeDat.get_row( BNpcCustomizeId );
       auto info = boost::make_shared< BNpcCustomize >( BNpcCustomizeId, this );
       return info;
    }
@@ -4918,7 +4873,6 @@ Core::Data::ExdDataGenerated::BNpcNamePtr
 {
    try
    {
-      auto row = m_BNpcNameDat.get_row( BNpcNameId );
       auto info = boost::make_shared< BNpcName >( BNpcNameId, this );
       return info;
    }
@@ -4933,7 +4887,6 @@ Core::Data::ExdDataGenerated::BuddyActionPtr
 {
    try
    {
-      auto row = m_BuddyActionDat.get_row( BuddyActionId );
       auto info = boost::make_shared< BuddyAction >( BuddyActionId, this );
       return info;
    }
@@ -4948,7 +4901,6 @@ Core::Data::ExdDataGenerated::BuddyEquipPtr
 {
    try
    {
-      auto row = m_BuddyEquipDat.get_row( BuddyEquipId );
       auto info = boost::make_shared< BuddyEquip >( BuddyEquipId, this );
       return info;
    }
@@ -4963,7 +4915,6 @@ Core::Data::ExdDataGenerated::BuddyItemPtr
 {
    try
    {
-      auto row = m_BuddyItemDat.get_row( BuddyItemId );
       auto info = boost::make_shared< BuddyItem >( BuddyItemId, this );
       return info;
    }
@@ -4978,7 +4929,6 @@ Core::Data::ExdDataGenerated::BuddyRankPtr
 {
    try
    {
-      auto row = m_BuddyRankDat.get_row( BuddyRankId );
       auto info = boost::make_shared< BuddyRank >( BuddyRankId, this );
       return info;
    }
@@ -4993,7 +4943,6 @@ Core::Data::ExdDataGenerated::BuddySkillPtr
 {
    try
    {
-      auto row = m_BuddySkillDat.get_row( BuddySkillId );
       auto info = boost::make_shared< BuddySkill >( BuddySkillId, this );
       return info;
    }
@@ -5008,7 +4957,6 @@ Core::Data::ExdDataGenerated::CabinetPtr
 {
    try
    {
-      auto row = m_CabinetDat.get_row( CabinetId );
       auto info = boost::make_shared< Cabinet >( CabinetId, this );
       return info;
    }
@@ -5023,7 +4971,6 @@ Core::Data::ExdDataGenerated::CabinetCategoryPtr
 {
    try
    {
-      auto row = m_CabinetCategoryDat.get_row( CabinetCategoryId );
       auto info = boost::make_shared< CabinetCategory >( CabinetCategoryId, this );
       return info;
    }
@@ -5038,7 +4985,6 @@ Core::Data::ExdDataGenerated::CalendarPtr
 {
    try
    {
-      auto row = m_CalendarDat.get_row( CalendarId );
       auto info = boost::make_shared< Calendar >( CalendarId, this );
       return info;
    }
@@ -5053,7 +4999,6 @@ Core::Data::ExdDataGenerated::CharaMakeCustomizePtr
 {
    try
    {
-      auto row = m_CharaMakeCustomizeDat.get_row( CharaMakeCustomizeId );
       auto info = boost::make_shared< CharaMakeCustomize >( CharaMakeCustomizeId, this );
       return info;
    }
@@ -5068,7 +5013,6 @@ Core::Data::ExdDataGenerated::CharaMakeTypePtr
 {
    try
    {
-      auto row = m_CharaMakeTypeDat.get_row( CharaMakeTypeId );
       auto info = boost::make_shared< CharaMakeType >( CharaMakeTypeId, this );
       return info;
    }
@@ -5083,7 +5027,6 @@ Core::Data::ExdDataGenerated::ChocoboRacePtr
 {
    try
    {
-      auto row = m_ChocoboRaceDat.get_row( ChocoboRaceId );
       auto info = boost::make_shared< ChocoboRace >( ChocoboRaceId, this );
       return info;
    }
@@ -5098,7 +5041,6 @@ Core::Data::ExdDataGenerated::ChocoboRaceAbilityPtr
 {
    try
    {
-      auto row = m_ChocoboRaceAbilityDat.get_row( ChocoboRaceAbilityId );
       auto info = boost::make_shared< ChocoboRaceAbility >( ChocoboRaceAbilityId, this );
       return info;
    }
@@ -5113,7 +5055,6 @@ Core::Data::ExdDataGenerated::ChocoboRaceAbilityTypePtr
 {
    try
    {
-      auto row = m_ChocoboRaceAbilityTypeDat.get_row( ChocoboRaceAbilityTypeId );
       auto info = boost::make_shared< ChocoboRaceAbilityType >( ChocoboRaceAbilityTypeId, this );
       return info;
    }
@@ -5128,7 +5069,6 @@ Core::Data::ExdDataGenerated::ChocoboRaceItemPtr
 {
    try
    {
-      auto row = m_ChocoboRaceItemDat.get_row( ChocoboRaceItemId );
       auto info = boost::make_shared< ChocoboRaceItem >( ChocoboRaceItemId, this );
       return info;
    }
@@ -5143,7 +5083,6 @@ Core::Data::ExdDataGenerated::ChocoboRaceRankPtr
 {
    try
    {
-      auto row = m_ChocoboRaceRankDat.get_row( ChocoboRaceRankId );
       auto info = boost::make_shared< ChocoboRaceRank >( ChocoboRaceRankId, this );
       return info;
    }
@@ -5158,7 +5097,6 @@ Core::Data::ExdDataGenerated::ChocoboRaceStatusPtr
 {
    try
    {
-      auto row = m_ChocoboRaceStatusDat.get_row( ChocoboRaceStatusId );
       auto info = boost::make_shared< ChocoboRaceStatus >( ChocoboRaceStatusId, this );
       return info;
    }
@@ -5173,7 +5111,6 @@ Core::Data::ExdDataGenerated::ChocoboRaceTerritoryPtr
 {
    try
    {
-      auto row = m_ChocoboRaceTerritoryDat.get_row( ChocoboRaceTerritoryId );
       auto info = boost::make_shared< ChocoboRaceTerritory >( ChocoboRaceTerritoryId, this );
       return info;
    }
@@ -5188,7 +5125,6 @@ Core::Data::ExdDataGenerated::ChocoboTaxiStandPtr
 {
    try
    {
-      auto row = m_ChocoboTaxiStandDat.get_row( ChocoboTaxiStandId );
       auto info = boost::make_shared< ChocoboTaxiStand >( ChocoboTaxiStandId, this );
       return info;
    }
@@ -5203,7 +5139,6 @@ Core::Data::ExdDataGenerated::ClassJobPtr
 {
    try
    {
-      auto row = m_ClassJobDat.get_row( ClassJobId );
       auto info = boost::make_shared< ClassJob >( ClassJobId, this );
       return info;
    }
@@ -5218,7 +5153,6 @@ Core::Data::ExdDataGenerated::ClassJobCategoryPtr
 {
    try
    {
-      auto row = m_ClassJobCategoryDat.get_row( ClassJobCategoryId );
       auto info = boost::make_shared< ClassJobCategory >( ClassJobCategoryId, this );
       return info;
    }
@@ -5233,7 +5167,6 @@ Core::Data::ExdDataGenerated::CompanionPtr
 {
    try
    {
-      auto row = m_CompanionDat.get_row( CompanionId );
       auto info = boost::make_shared< Companion >( CompanionId, this );
       return info;
    }
@@ -5248,7 +5181,6 @@ Core::Data::ExdDataGenerated::CompanionMovePtr
 {
    try
    {
-      auto row = m_CompanionMoveDat.get_row( CompanionMoveId );
       auto info = boost::make_shared< CompanionMove >( CompanionMoveId, this );
       return info;
    }
@@ -5263,7 +5195,6 @@ Core::Data::ExdDataGenerated::CompanionTransientPtr
 {
    try
    {
-      auto row = m_CompanionTransientDat.get_row( CompanionTransientId );
       auto info = boost::make_shared< CompanionTransient >( CompanionTransientId, this );
       return info;
    }
@@ -5278,7 +5209,6 @@ Core::Data::ExdDataGenerated::CompanyActionPtr
 {
    try
    {
-      auto row = m_CompanyActionDat.get_row( CompanyActionId );
       auto info = boost::make_shared< CompanyAction >( CompanyActionId, this );
       return info;
    }
@@ -5293,7 +5223,6 @@ Core::Data::ExdDataGenerated::CompanyCraftDraftPtr
 {
    try
    {
-      auto row = m_CompanyCraftDraftDat.get_row( CompanyCraftDraftId );
       auto info = boost::make_shared< CompanyCraftDraft >( CompanyCraftDraftId, this );
       return info;
    }
@@ -5308,7 +5237,6 @@ Core::Data::ExdDataGenerated::CompanyCraftDraftCategoryPtr
 {
    try
    {
-      auto row = m_CompanyCraftDraftCategoryDat.get_row( CompanyCraftDraftCategoryId );
       auto info = boost::make_shared< CompanyCraftDraftCategory >( CompanyCraftDraftCategoryId, this );
       return info;
    }
@@ -5323,7 +5251,6 @@ Core::Data::ExdDataGenerated::CompanyCraftManufactoryStatePtr
 {
    try
    {
-      auto row = m_CompanyCraftManufactoryStateDat.get_row( CompanyCraftManufactoryStateId );
       auto info = boost::make_shared< CompanyCraftManufactoryState >( CompanyCraftManufactoryStateId, this );
       return info;
    }
@@ -5338,7 +5265,6 @@ Core::Data::ExdDataGenerated::CompanyCraftPartPtr
 {
    try
    {
-      auto row = m_CompanyCraftPartDat.get_row( CompanyCraftPartId );
       auto info = boost::make_shared< CompanyCraftPart >( CompanyCraftPartId, this );
       return info;
    }
@@ -5353,7 +5279,6 @@ Core::Data::ExdDataGenerated::CompanyCraftProcessPtr
 {
    try
    {
-      auto row = m_CompanyCraftProcessDat.get_row( CompanyCraftProcessId );
       auto info = boost::make_shared< CompanyCraftProcess >( CompanyCraftProcessId, this );
       return info;
    }
@@ -5368,7 +5293,6 @@ Core::Data::ExdDataGenerated::CompanyCraftSequencePtr
 {
    try
    {
-      auto row = m_CompanyCraftSequenceDat.get_row( CompanyCraftSequenceId );
       auto info = boost::make_shared< CompanyCraftSequence >( CompanyCraftSequenceId, this );
       return info;
    }
@@ -5383,7 +5307,6 @@ Core::Data::ExdDataGenerated::CompanyCraftSupplyItemPtr
 {
    try
    {
-      auto row = m_CompanyCraftSupplyItemDat.get_row( CompanyCraftSupplyItemId );
       auto info = boost::make_shared< CompanyCraftSupplyItem >( CompanyCraftSupplyItemId, this );
       return info;
    }
@@ -5398,7 +5321,6 @@ Core::Data::ExdDataGenerated::CompanyCraftTypePtr
 {
    try
    {
-      auto row = m_CompanyCraftTypeDat.get_row( CompanyCraftTypeId );
       auto info = boost::make_shared< CompanyCraftType >( CompanyCraftTypeId, this );
       return info;
    }
@@ -5413,7 +5335,6 @@ Core::Data::ExdDataGenerated::CompleteJournalPtr
 {
    try
    {
-      auto row = m_CompleteJournalDat.get_row( CompleteJournalId );
       auto info = boost::make_shared< CompleteJournal >( CompleteJournalId, this );
       return info;
    }
@@ -5428,7 +5349,6 @@ Core::Data::ExdDataGenerated::CompleteJournalCategoryPtr
 {
    try
    {
-      auto row = m_CompleteJournalCategoryDat.get_row( CompleteJournalCategoryId );
       auto info = boost::make_shared< CompleteJournalCategory >( CompleteJournalCategoryId, this );
       return info;
    }
@@ -5443,7 +5363,6 @@ Core::Data::ExdDataGenerated::ContentExActionPtr
 {
    try
    {
-      auto row = m_ContentExActionDat.get_row( ContentExActionId );
       auto info = boost::make_shared< ContentExAction >( ContentExActionId, this );
       return info;
    }
@@ -5458,7 +5377,6 @@ Core::Data::ExdDataGenerated::ContentFinderConditionPtr
 {
    try
    {
-      auto row = m_ContentFinderConditionDat.get_row( ContentFinderConditionId );
       auto info = boost::make_shared< ContentFinderCondition >( ContentFinderConditionId, this );
       return info;
    }
@@ -5473,7 +5391,6 @@ Core::Data::ExdDataGenerated::ContentFinderConditionTransientPtr
 {
    try
    {
-      auto row = m_ContentFinderConditionTransientDat.get_row( ContentFinderConditionTransientId );
       auto info = boost::make_shared< ContentFinderConditionTransient >( ContentFinderConditionTransientId, this );
       return info;
    }
@@ -5488,7 +5405,6 @@ Core::Data::ExdDataGenerated::ContentMemberTypePtr
 {
    try
    {
-      auto row = m_ContentMemberTypeDat.get_row( ContentMemberTypeId );
       auto info = boost::make_shared< ContentMemberType >( ContentMemberTypeId, this );
       return info;
    }
@@ -5503,7 +5419,6 @@ Core::Data::ExdDataGenerated::ContentRoulettePtr
 {
    try
    {
-      auto row = m_ContentRouletteDat.get_row( ContentRouletteId );
       auto info = boost::make_shared< ContentRoulette >( ContentRouletteId, this );
       return info;
    }
@@ -5518,7 +5433,6 @@ Core::Data::ExdDataGenerated::ContentTypePtr
 {
    try
    {
-      auto row = m_ContentTypeDat.get_row( ContentTypeId );
       auto info = boost::make_shared< ContentType >( ContentTypeId, this );
       return info;
    }
@@ -5533,7 +5447,6 @@ Core::Data::ExdDataGenerated::CraftActionPtr
 {
    try
    {
-      auto row = m_CraftActionDat.get_row( CraftActionId );
       auto info = boost::make_shared< CraftAction >( CraftActionId, this );
       return info;
    }
@@ -5548,7 +5461,6 @@ Core::Data::ExdDataGenerated::CraftLevePtr
 {
    try
    {
-      auto row = m_CraftLeveDat.get_row( CraftLeveId );
       auto info = boost::make_shared< CraftLeve >( CraftLeveId, this );
       return info;
    }
@@ -5563,7 +5475,6 @@ Core::Data::ExdDataGenerated::CraftTypePtr
 {
    try
    {
-      auto row = m_CraftTypeDat.get_row( CraftTypeId );
       auto info = boost::make_shared< CraftType >( CraftTypeId, this );
       return info;
    }
@@ -5578,7 +5489,6 @@ Core::Data::ExdDataGenerated::CurrencyPtr
 {
    try
    {
-      auto row = m_CurrencyDat.get_row( CurrencyId );
       auto info = boost::make_shared< Currency >( CurrencyId, this );
       return info;
    }
@@ -5593,7 +5503,6 @@ Core::Data::ExdDataGenerated::CustomTalkPtr
 {
    try
    {
-      auto row = m_CustomTalkDat.get_row( CustomTalkId );
       auto info = boost::make_shared< CustomTalk >( CustomTalkId, this );
       return info;
    }
@@ -5608,7 +5517,6 @@ Core::Data::ExdDataGenerated::CutscenePtr
 {
    try
    {
-      auto row = m_CutsceneDat.get_row( CutsceneId );
       auto info = boost::make_shared< Cutscene >( CutsceneId, this );
       return info;
    }
@@ -5623,7 +5531,6 @@ Core::Data::ExdDataGenerated::CutScreenImagePtr
 {
    try
    {
-      auto row = m_CutScreenImageDat.get_row( CutScreenImageId );
       auto info = boost::make_shared< CutScreenImage >( CutScreenImageId, this );
       return info;
    }
@@ -5638,7 +5545,6 @@ Core::Data::ExdDataGenerated::DailySupplyItemPtr
 {
    try
    {
-      auto row = m_DailySupplyItemDat.get_row( DailySupplyItemId );
       auto info = boost::make_shared< DailySupplyItem >( DailySupplyItemId, this );
       return info;
    }
@@ -5653,7 +5559,6 @@ Core::Data::ExdDataGenerated::DeepDungeonBanPtr
 {
    try
    {
-      auto row = m_DeepDungeonBanDat.get_row( DeepDungeonBanId );
       auto info = boost::make_shared< DeepDungeonBan >( DeepDungeonBanId, this );
       return info;
    }
@@ -5668,7 +5573,6 @@ Core::Data::ExdDataGenerated::DeepDungeonDangerPtr
 {
    try
    {
-      auto row = m_DeepDungeonDangerDat.get_row( DeepDungeonDangerId );
       auto info = boost::make_shared< DeepDungeonDanger >( DeepDungeonDangerId, this );
       return info;
    }
@@ -5683,7 +5587,6 @@ Core::Data::ExdDataGenerated::DeepDungeonEquipmentPtr
 {
    try
    {
-      auto row = m_DeepDungeonEquipmentDat.get_row( DeepDungeonEquipmentId );
       auto info = boost::make_shared< DeepDungeonEquipment >( DeepDungeonEquipmentId, this );
       return info;
    }
@@ -5698,7 +5601,6 @@ Core::Data::ExdDataGenerated::DeepDungeonFloorEffectUIPtr
 {
    try
    {
-      auto row = m_DeepDungeonFloorEffectUIDat.get_row( DeepDungeonFloorEffectUIId );
       auto info = boost::make_shared< DeepDungeonFloorEffectUI >( DeepDungeonFloorEffectUIId, this );
       return info;
    }
@@ -5713,7 +5615,6 @@ Core::Data::ExdDataGenerated::DeepDungeonItemPtr
 {
    try
    {
-      auto row = m_DeepDungeonItemDat.get_row( DeepDungeonItemId );
       auto info = boost::make_shared< DeepDungeonItem >( DeepDungeonItemId, this );
       return info;
    }
@@ -5728,7 +5629,6 @@ Core::Data::ExdDataGenerated::DeepDungeonStatusPtr
 {
    try
    {
-      auto row = m_DeepDungeonStatusDat.get_row( DeepDungeonStatusId );
       auto info = boost::make_shared< DeepDungeonStatus >( DeepDungeonStatusId, this );
       return info;
    }
@@ -5743,7 +5643,6 @@ Core::Data::ExdDataGenerated::DefaultTalkPtr
 {
    try
    {
-      auto row = m_DefaultTalkDat.get_row( DefaultTalkId );
       auto info = boost::make_shared< DefaultTalk >( DefaultTalkId, this );
       return info;
    }
@@ -5758,7 +5657,6 @@ Core::Data::ExdDataGenerated::DeliveryQuestPtr
 {
    try
    {
-      auto row = m_DeliveryQuestDat.get_row( DeliveryQuestId );
       auto info = boost::make_shared< DeliveryQuest >( DeliveryQuestId, this );
       return info;
    }
@@ -5773,7 +5671,6 @@ Core::Data::ExdDataGenerated::DisposalShopPtr
 {
    try
    {
-      auto row = m_DisposalShopDat.get_row( DisposalShopId );
       auto info = boost::make_shared< DisposalShop >( DisposalShopId, this );
       return info;
    }
@@ -5788,7 +5685,6 @@ Core::Data::ExdDataGenerated::DisposalShopFilterTypePtr
 {
    try
    {
-      auto row = m_DisposalShopFilterTypeDat.get_row( DisposalShopFilterTypeId );
       auto info = boost::make_shared< DisposalShopFilterType >( DisposalShopFilterTypeId, this );
       return info;
    }
@@ -5803,7 +5699,6 @@ Core::Data::ExdDataGenerated::DisposalShopItemPtr
 {
    try
    {
-      auto row = m_DisposalShopItemDat.get_row( DisposalShopItemId );
       auto info = boost::make_shared< DisposalShopItem >( DisposalShopItemId, this );
       return info;
    }
@@ -5818,7 +5713,6 @@ Core::Data::ExdDataGenerated::DpsChallengePtr
 {
    try
    {
-      auto row = m_DpsChallengeDat.get_row( DpsChallengeId );
       auto info = boost::make_shared< DpsChallenge >( DpsChallengeId, this );
       return info;
    }
@@ -5833,7 +5727,6 @@ Core::Data::ExdDataGenerated::DpsChallengeOfficerPtr
 {
    try
    {
-      auto row = m_DpsChallengeOfficerDat.get_row( DpsChallengeOfficerId );
       auto info = boost::make_shared< DpsChallengeOfficer >( DpsChallengeOfficerId, this );
       return info;
    }
@@ -5848,7 +5741,6 @@ Core::Data::ExdDataGenerated::DpsChallengeTransientPtr
 {
    try
    {
-      auto row = m_DpsChallengeTransientDat.get_row( DpsChallengeTransientId );
       auto info = boost::make_shared< DpsChallengeTransient >( DpsChallengeTransientId, this );
       return info;
    }
@@ -5863,7 +5755,6 @@ Core::Data::ExdDataGenerated::EmotePtr
 {
    try
    {
-      auto row = m_EmoteDat.get_row( EmoteId );
       auto info = boost::make_shared< Emote >( EmoteId, this );
       return info;
    }
@@ -5878,7 +5769,6 @@ Core::Data::ExdDataGenerated::EmoteCategoryPtr
 {
    try
    {
-      auto row = m_EmoteCategoryDat.get_row( EmoteCategoryId );
       auto info = boost::make_shared< EmoteCategory >( EmoteCategoryId, this );
       return info;
    }
@@ -5893,7 +5783,6 @@ Core::Data::ExdDataGenerated::ENpcBasePtr
 {
    try
    {
-      auto row = m_ENpcBaseDat.get_row( ENpcBaseId );
       auto info = boost::make_shared< ENpcBase >( ENpcBaseId, this );
       return info;
    }
@@ -5908,7 +5797,6 @@ Core::Data::ExdDataGenerated::ENpcResidentPtr
 {
    try
    {
-      auto row = m_ENpcResidentDat.get_row( ENpcResidentId );
       auto info = boost::make_shared< ENpcResident >( ENpcResidentId, this );
       return info;
    }
@@ -5923,7 +5811,6 @@ Core::Data::ExdDataGenerated::EObjPtr
 {
    try
    {
-      auto row = m_EObjDat.get_row( EObjId );
       auto info = boost::make_shared< EObj >( EObjId, this );
       return info;
    }
@@ -5938,7 +5825,6 @@ Core::Data::ExdDataGenerated::EquipRaceCategoryPtr
 {
    try
    {
-      auto row = m_EquipRaceCategoryDat.get_row( EquipRaceCategoryId );
       auto info = boost::make_shared< EquipRaceCategory >( EquipRaceCategoryId, this );
       return info;
    }
@@ -5953,7 +5839,6 @@ Core::Data::ExdDataGenerated::EquipSlotCategoryPtr
 {
    try
    {
-      auto row = m_EquipSlotCategoryDat.get_row( EquipSlotCategoryId );
       auto info = boost::make_shared< EquipSlotCategory >( EquipSlotCategoryId, this );
       return info;
    }
@@ -5968,7 +5853,6 @@ Core::Data::ExdDataGenerated::EventActionPtr
 {
    try
    {
-      auto row = m_EventActionDat.get_row( EventActionId );
       auto info = boost::make_shared< EventAction >( EventActionId, this );
       return info;
    }
@@ -5983,7 +5867,6 @@ Core::Data::ExdDataGenerated::EventIconPriorityPtr
 {
    try
    {
-      auto row = m_EventIconPriorityDat.get_row( EventIconPriorityId );
       auto info = boost::make_shared< EventIconPriority >( EventIconPriorityId, this );
       return info;
    }
@@ -5998,7 +5881,6 @@ Core::Data::ExdDataGenerated::EventIconTypePtr
 {
    try
    {
-      auto row = m_EventIconTypeDat.get_row( EventIconTypeId );
       auto info = boost::make_shared< EventIconType >( EventIconTypeId, this );
       return info;
    }
@@ -6013,7 +5895,6 @@ Core::Data::ExdDataGenerated::EventItemPtr
 {
    try
    {
-      auto row = m_EventItemDat.get_row( EventItemId );
       auto info = boost::make_shared< EventItem >( EventItemId, this );
       return info;
    }
@@ -6028,7 +5909,6 @@ Core::Data::ExdDataGenerated::EventItemHelpPtr
 {
    try
    {
-      auto row = m_EventItemHelpDat.get_row( EventItemHelpId );
       auto info = boost::make_shared< EventItemHelp >( EventItemHelpId, this );
       return info;
    }
@@ -6043,7 +5923,6 @@ Core::Data::ExdDataGenerated::ExVersionPtr
 {
    try
    {
-      auto row = m_ExVersionDat.get_row( ExVersionId );
       auto info = boost::make_shared< ExVersion >( ExVersionId, this );
       return info;
    }
@@ -6058,7 +5937,6 @@ Core::Data::ExdDataGenerated::FatePtr
 {
    try
    {
-      auto row = m_FateDat.get_row( FateId );
       auto info = boost::make_shared< Fate >( FateId, this );
       return info;
    }
@@ -6073,7 +5951,6 @@ Core::Data::ExdDataGenerated::FCActivityPtr
 {
    try
    {
-      auto row = m_FCActivityDat.get_row( FCActivityId );
       auto info = boost::make_shared< FCActivity >( FCActivityId, this );
       return info;
    }
@@ -6088,7 +5965,6 @@ Core::Data::ExdDataGenerated::FCActivityCategoryPtr
 {
    try
    {
-      auto row = m_FCActivityCategoryDat.get_row( FCActivityCategoryId );
       auto info = boost::make_shared< FCActivityCategory >( FCActivityCategoryId, this );
       return info;
    }
@@ -6103,7 +5979,6 @@ Core::Data::ExdDataGenerated::FCAuthorityPtr
 {
    try
    {
-      auto row = m_FCAuthorityDat.get_row( FCAuthorityId );
       auto info = boost::make_shared< FCAuthority >( FCAuthorityId, this );
       return info;
    }
@@ -6118,7 +5993,6 @@ Core::Data::ExdDataGenerated::FCAuthorityCategoryPtr
 {
    try
    {
-      auto row = m_FCAuthorityCategoryDat.get_row( FCAuthorityCategoryId );
       auto info = boost::make_shared< FCAuthorityCategory >( FCAuthorityCategoryId, this );
       return info;
    }
@@ -6133,7 +6007,6 @@ Core::Data::ExdDataGenerated::FCChestNamePtr
 {
    try
    {
-      auto row = m_FCChestNameDat.get_row( FCChestNameId );
       auto info = boost::make_shared< FCChestName >( FCChestNameId, this );
       return info;
    }
@@ -6148,7 +6021,6 @@ Core::Data::ExdDataGenerated::FccShopPtr
 {
    try
    {
-      auto row = m_FccShopDat.get_row( FccShopId );
       auto info = boost::make_shared< FccShop >( FccShopId, this );
       return info;
    }
@@ -6163,7 +6035,6 @@ Core::Data::ExdDataGenerated::FCHierarchyPtr
 {
    try
    {
-      auto row = m_FCHierarchyDat.get_row( FCHierarchyId );
       auto info = boost::make_shared< FCHierarchy >( FCHierarchyId, this );
       return info;
    }
@@ -6178,7 +6049,6 @@ Core::Data::ExdDataGenerated::FCProfilePtr
 {
    try
    {
-      auto row = m_FCProfileDat.get_row( FCProfileId );
       auto info = boost::make_shared< FCProfile >( FCProfileId, this );
       return info;
    }
@@ -6193,7 +6063,6 @@ Core::Data::ExdDataGenerated::FCReputationPtr
 {
    try
    {
-      auto row = m_FCReputationDat.get_row( FCReputationId );
       auto info = boost::make_shared< FCReputation >( FCReputationId, this );
       return info;
    }
@@ -6208,7 +6077,6 @@ Core::Data::ExdDataGenerated::FCRightsPtr
 {
    try
    {
-      auto row = m_FCRightsDat.get_row( FCRightsId );
       auto info = boost::make_shared< FCRights >( FCRightsId, this );
       return info;
    }
@@ -6223,7 +6091,6 @@ Core::Data::ExdDataGenerated::FishingSpotPtr
 {
    try
    {
-      auto row = m_FishingSpotDat.get_row( FishingSpotId );
       auto info = boost::make_shared< FishingSpot >( FishingSpotId, this );
       return info;
    }
@@ -6238,7 +6105,6 @@ Core::Data::ExdDataGenerated::FishParameterPtr
 {
    try
    {
-      auto row = m_FishParameterDat.get_row( FishParameterId );
       auto info = boost::make_shared< FishParameter >( FishParameterId, this );
       return info;
    }
@@ -6253,7 +6119,6 @@ Core::Data::ExdDataGenerated::GardeningSeedPtr
 {
    try
    {
-      auto row = m_GardeningSeedDat.get_row( GardeningSeedId );
       auto info = boost::make_shared< GardeningSeed >( GardeningSeedId, this );
       return info;
    }
@@ -6268,7 +6133,6 @@ Core::Data::ExdDataGenerated::GatheringConditionPtr
 {
    try
    {
-      auto row = m_GatheringConditionDat.get_row( GatheringConditionId );
       auto info = boost::make_shared< GatheringCondition >( GatheringConditionId, this );
       return info;
    }
@@ -6283,7 +6147,6 @@ Core::Data::ExdDataGenerated::GatheringExpPtr
 {
    try
    {
-      auto row = m_GatheringExpDat.get_row( GatheringExpId );
       auto info = boost::make_shared< GatheringExp >( GatheringExpId, this );
       return info;
    }
@@ -6298,7 +6161,6 @@ Core::Data::ExdDataGenerated::GatheringItemPtr
 {
    try
    {
-      auto row = m_GatheringItemDat.get_row( GatheringItemId );
       auto info = boost::make_shared< GatheringItem >( GatheringItemId, this );
       return info;
    }
@@ -6313,7 +6175,6 @@ Core::Data::ExdDataGenerated::GatheringItemLevelConvertTablePtr
 {
    try
    {
-      auto row = m_GatheringItemLevelConvertTableDat.get_row( GatheringItemLevelConvertTableId );
       auto info = boost::make_shared< GatheringItemLevelConvertTable >( GatheringItemLevelConvertTableId, this );
       return info;
    }
@@ -6328,7 +6189,6 @@ Core::Data::ExdDataGenerated::GatheringItemPointPtr
 {
    try
    {
-      auto row = m_GatheringItemPointDat.get_row( GatheringItemPointId );
       auto info = boost::make_shared< GatheringItemPoint >( GatheringItemPointId, this );
       return info;
    }
@@ -6343,7 +6203,6 @@ Core::Data::ExdDataGenerated::GatheringNotebookListPtr
 {
    try
    {
-      auto row = m_GatheringNotebookListDat.get_row( GatheringNotebookListId );
       auto info = boost::make_shared< GatheringNotebookList >( GatheringNotebookListId, this );
       return info;
    }
@@ -6358,7 +6217,6 @@ Core::Data::ExdDataGenerated::GatheringPointPtr
 {
    try
    {
-      auto row = m_GatheringPointDat.get_row( GatheringPointId );
       auto info = boost::make_shared< GatheringPoint >( GatheringPointId, this );
       return info;
    }
@@ -6373,7 +6231,6 @@ Core::Data::ExdDataGenerated::GatheringPointBasePtr
 {
    try
    {
-      auto row = m_GatheringPointBaseDat.get_row( GatheringPointBaseId );
       auto info = boost::make_shared< GatheringPointBase >( GatheringPointBaseId, this );
       return info;
    }
@@ -6388,7 +6245,6 @@ Core::Data::ExdDataGenerated::GatheringPointBonusPtr
 {
    try
    {
-      auto row = m_GatheringPointBonusDat.get_row( GatheringPointBonusId );
       auto info = boost::make_shared< GatheringPointBonus >( GatheringPointBonusId, this );
       return info;
    }
@@ -6403,7 +6259,6 @@ Core::Data::ExdDataGenerated::GatheringPointBonusTypePtr
 {
    try
    {
-      auto row = m_GatheringPointBonusTypeDat.get_row( GatheringPointBonusTypeId );
       auto info = boost::make_shared< GatheringPointBonusType >( GatheringPointBonusTypeId, this );
       return info;
    }
@@ -6418,7 +6273,6 @@ Core::Data::ExdDataGenerated::GatheringPointNamePtr
 {
    try
    {
-      auto row = m_GatheringPointNameDat.get_row( GatheringPointNameId );
       auto info = boost::make_shared< GatheringPointName >( GatheringPointNameId, this );
       return info;
    }
@@ -6433,7 +6287,6 @@ Core::Data::ExdDataGenerated::GatheringSubCategoryPtr
 {
    try
    {
-      auto row = m_GatheringSubCategoryDat.get_row( GatheringSubCategoryId );
       auto info = boost::make_shared< GatheringSubCategory >( GatheringSubCategoryId, this );
       return info;
    }
@@ -6448,7 +6301,6 @@ Core::Data::ExdDataGenerated::GatheringTypePtr
 {
    try
    {
-      auto row = m_GatheringTypeDat.get_row( GatheringTypeId );
       auto info = boost::make_shared< GatheringType >( GatheringTypeId, this );
       return info;
    }
@@ -6463,7 +6315,6 @@ Core::Data::ExdDataGenerated::GcArmyExpeditionPtr
 {
    try
    {
-      auto row = m_GcArmyExpeditionDat.get_row( GcArmyExpeditionId );
       auto info = boost::make_shared< GcArmyExpedition >( GcArmyExpeditionId, this );
       return info;
    }
@@ -6478,7 +6329,6 @@ Core::Data::ExdDataGenerated::GcArmyExpeditionMemberBonusPtr
 {
    try
    {
-      auto row = m_GcArmyExpeditionMemberBonusDat.get_row( GcArmyExpeditionMemberBonusId );
       auto info = boost::make_shared< GcArmyExpeditionMemberBonus >( GcArmyExpeditionMemberBonusId, this );
       return info;
    }
@@ -6493,7 +6343,6 @@ Core::Data::ExdDataGenerated::GcArmyExpeditionTypePtr
 {
    try
    {
-      auto row = m_GcArmyExpeditionTypeDat.get_row( GcArmyExpeditionTypeId );
       auto info = boost::make_shared< GcArmyExpeditionType >( GcArmyExpeditionTypeId, this );
       return info;
    }
@@ -6508,7 +6357,6 @@ Core::Data::ExdDataGenerated::GcArmyMemberGrowPtr
 {
    try
    {
-      auto row = m_GcArmyMemberGrowDat.get_row( GcArmyMemberGrowId );
       auto info = boost::make_shared< GcArmyMemberGrow >( GcArmyMemberGrowId, this );
       return info;
    }
@@ -6523,7 +6371,6 @@ Core::Data::ExdDataGenerated::GcArmyTrainingPtr
 {
    try
    {
-      auto row = m_GcArmyTrainingDat.get_row( GcArmyTrainingId );
       auto info = boost::make_shared< GcArmyTraining >( GcArmyTrainingId, this );
       return info;
    }
@@ -6538,7 +6385,6 @@ Core::Data::ExdDataGenerated::GCRankGridaniaFemaleTextPtr
 {
    try
    {
-      auto row = m_GCRankGridaniaFemaleTextDat.get_row( GCRankGridaniaFemaleTextId );
       auto info = boost::make_shared< GCRankGridaniaFemaleText >( GCRankGridaniaFemaleTextId, this );
       return info;
    }
@@ -6553,7 +6399,6 @@ Core::Data::ExdDataGenerated::GCRankGridaniaMaleTextPtr
 {
    try
    {
-      auto row = m_GCRankGridaniaMaleTextDat.get_row( GCRankGridaniaMaleTextId );
       auto info = boost::make_shared< GCRankGridaniaMaleText >( GCRankGridaniaMaleTextId, this );
       return info;
    }
@@ -6568,7 +6413,6 @@ Core::Data::ExdDataGenerated::GCRankLimsaFemaleTextPtr
 {
    try
    {
-      auto row = m_GCRankLimsaFemaleTextDat.get_row( GCRankLimsaFemaleTextId );
       auto info = boost::make_shared< GCRankLimsaFemaleText >( GCRankLimsaFemaleTextId, this );
       return info;
    }
@@ -6583,7 +6427,6 @@ Core::Data::ExdDataGenerated::GCRankLimsaMaleTextPtr
 {
    try
    {
-      auto row = m_GCRankLimsaMaleTextDat.get_row( GCRankLimsaMaleTextId );
       auto info = boost::make_shared< GCRankLimsaMaleText >( GCRankLimsaMaleTextId, this );
       return info;
    }
@@ -6598,7 +6441,6 @@ Core::Data::ExdDataGenerated::GCRankUldahFemaleTextPtr
 {
    try
    {
-      auto row = m_GCRankUldahFemaleTextDat.get_row( GCRankUldahFemaleTextId );
       auto info = boost::make_shared< GCRankUldahFemaleText >( GCRankUldahFemaleTextId, this );
       return info;
    }
@@ -6613,7 +6455,6 @@ Core::Data::ExdDataGenerated::GCRankUldahMaleTextPtr
 {
    try
    {
-      auto row = m_GCRankUldahMaleTextDat.get_row( GCRankUldahMaleTextId );
       auto info = boost::make_shared< GCRankUldahMaleText >( GCRankUldahMaleTextId, this );
       return info;
    }
@@ -6628,7 +6469,6 @@ Core::Data::ExdDataGenerated::GCScripShopCategoryPtr
 {
    try
    {
-      auto row = m_GCScripShopCategoryDat.get_row( GCScripShopCategoryId );
       auto info = boost::make_shared< GCScripShopCategory >( GCScripShopCategoryId, this );
       return info;
    }
@@ -6643,7 +6483,6 @@ Core::Data::ExdDataGenerated::GCScripShopItemPtr
 {
    try
    {
-      auto row = m_GCScripShopItemDat.get_row( GCScripShopItemId );
       auto info = boost::make_shared< GCScripShopItem >( GCScripShopItemId, this );
       return info;
    }
@@ -6658,7 +6497,6 @@ Core::Data::ExdDataGenerated::GCShopPtr
 {
    try
    {
-      auto row = m_GCShopDat.get_row( GCShopId );
       auto info = boost::make_shared< GCShop >( GCShopId, this );
       return info;
    }
@@ -6673,7 +6511,6 @@ Core::Data::ExdDataGenerated::GCShopItemCategoryPtr
 {
    try
    {
-      auto row = m_GCShopItemCategoryDat.get_row( GCShopItemCategoryId );
       auto info = boost::make_shared< GCShopItemCategory >( GCShopItemCategoryId, this );
       return info;
    }
@@ -6688,7 +6525,6 @@ Core::Data::ExdDataGenerated::GCSupplyDutyPtr
 {
    try
    {
-      auto row = m_GCSupplyDutyDat.get_row( GCSupplyDutyId );
       auto info = boost::make_shared< GCSupplyDuty >( GCSupplyDutyId, this );
       return info;
    }
@@ -6703,7 +6539,6 @@ Core::Data::ExdDataGenerated::GCSupplyDutyRewardPtr
 {
    try
    {
-      auto row = m_GCSupplyDutyRewardDat.get_row( GCSupplyDutyRewardId );
       auto info = boost::make_shared< GCSupplyDutyReward >( GCSupplyDutyRewardId, this );
       return info;
    }
@@ -6718,7 +6553,6 @@ Core::Data::ExdDataGenerated::GeneralActionPtr
 {
    try
    {
-      auto row = m_GeneralActionDat.get_row( GeneralActionId );
       auto info = boost::make_shared< GeneralAction >( GeneralActionId, this );
       return info;
    }
@@ -6733,7 +6567,6 @@ Core::Data::ExdDataGenerated::GilShopPtr
 {
    try
    {
-      auto row = m_GilShopDat.get_row( GilShopId );
       auto info = boost::make_shared< GilShop >( GilShopId, this );
       return info;
    }
@@ -6748,7 +6581,6 @@ Core::Data::ExdDataGenerated::GilShopItemPtr
 {
    try
    {
-      auto row = m_GilShopItemDat.get_row( GilShopItemId );
       auto info = boost::make_shared< GilShopItem >( GilShopItemId, this );
       return info;
    }
@@ -6763,7 +6595,6 @@ Core::Data::ExdDataGenerated::GoldSaucerTextDataPtr
 {
    try
    {
-      auto row = m_GoldSaucerTextDataDat.get_row( GoldSaucerTextDataId );
       auto info = boost::make_shared< GoldSaucerTextData >( GoldSaucerTextDataId, this );
       return info;
    }
@@ -6778,7 +6609,6 @@ Core::Data::ExdDataGenerated::GrandCompanyPtr
 {
    try
    {
-      auto row = m_GrandCompanyDat.get_row( GrandCompanyId );
       auto info = boost::make_shared< GrandCompany >( GrandCompanyId, this );
       return info;
    }
@@ -6793,7 +6623,6 @@ Core::Data::ExdDataGenerated::GrandCompanyRankPtr
 {
    try
    {
-      auto row = m_GrandCompanyRankDat.get_row( GrandCompanyRankId );
       auto info = boost::make_shared< GrandCompanyRank >( GrandCompanyRankId, this );
       return info;
    }
@@ -6808,7 +6637,6 @@ Core::Data::ExdDataGenerated::GuardianDeityPtr
 {
    try
    {
-      auto row = m_GuardianDeityDat.get_row( GuardianDeityId );
       auto info = boost::make_shared< GuardianDeity >( GuardianDeityId, this );
       return info;
    }
@@ -6823,7 +6651,6 @@ Core::Data::ExdDataGenerated::GuildleveAssignmentPtr
 {
    try
    {
-      auto row = m_GuildleveAssignmentDat.get_row( GuildleveAssignmentId );
       auto info = boost::make_shared< GuildleveAssignment >( GuildleveAssignmentId, this );
       return info;
    }
@@ -6838,7 +6665,6 @@ Core::Data::ExdDataGenerated::GuildOrderGuidePtr
 {
    try
    {
-      auto row = m_GuildOrderGuideDat.get_row( GuildOrderGuideId );
       auto info = boost::make_shared< GuildOrderGuide >( GuildOrderGuideId, this );
       return info;
    }
@@ -6853,7 +6679,6 @@ Core::Data::ExdDataGenerated::GuildOrderOfficerPtr
 {
    try
    {
-      auto row = m_GuildOrderOfficerDat.get_row( GuildOrderOfficerId );
       auto info = boost::make_shared< GuildOrderOfficer >( GuildOrderOfficerId, this );
       return info;
    }
@@ -6868,7 +6693,6 @@ Core::Data::ExdDataGenerated::HouseRetainerPosePtr
 {
    try
    {
-      auto row = m_HouseRetainerPoseDat.get_row( HouseRetainerPoseId );
       auto info = boost::make_shared< HouseRetainerPose >( HouseRetainerPoseId, this );
       return info;
    }
@@ -6883,7 +6707,6 @@ Core::Data::ExdDataGenerated::HousingFurniturePtr
 {
    try
    {
-      auto row = m_HousingFurnitureDat.get_row( HousingFurnitureId );
       auto info = boost::make_shared< HousingFurniture >( HousingFurnitureId, this );
       return info;
    }
@@ -6898,7 +6721,6 @@ Core::Data::ExdDataGenerated::HousingYardObjectPtr
 {
    try
    {
-      auto row = m_HousingYardObjectDat.get_row( HousingYardObjectId );
       auto info = boost::make_shared< HousingYardObject >( HousingYardObjectId, this );
       return info;
    }
@@ -6913,7 +6735,6 @@ Core::Data::ExdDataGenerated::InstanceContentPtr
 {
    try
    {
-      auto row = m_InstanceContentDat.get_row( InstanceContentId );
       auto info = boost::make_shared< InstanceContent >( InstanceContentId, this );
       return info;
    }
@@ -6928,7 +6749,6 @@ Core::Data::ExdDataGenerated::InstanceContentBuffPtr
 {
    try
    {
-      auto row = m_InstanceContentBuffDat.get_row( InstanceContentBuffId );
       auto info = boost::make_shared< InstanceContentBuff >( InstanceContentBuffId, this );
       return info;
    }
@@ -6943,7 +6763,6 @@ Core::Data::ExdDataGenerated::InstanceContentTextDataPtr
 {
    try
    {
-      auto row = m_InstanceContentTextDataDat.get_row( InstanceContentTextDataId );
       auto info = boost::make_shared< InstanceContentTextData >( InstanceContentTextDataId, this );
       return info;
    }
@@ -6958,7 +6777,6 @@ Core::Data::ExdDataGenerated::InstanceContentTypePtr
 {
    try
    {
-      auto row = m_InstanceContentTypeDat.get_row( InstanceContentTypeId );
       auto info = boost::make_shared< InstanceContentType >( InstanceContentTypeId, this );
       return info;
    }
@@ -6973,7 +6791,6 @@ Core::Data::ExdDataGenerated::ItemPtr
 {
    try
    {
-      auto row = m_ItemDat.get_row( ItemId );
       auto info = boost::make_shared< Item >( ItemId, this );
       return info;
    }
@@ -6988,7 +6805,6 @@ Core::Data::ExdDataGenerated::ItemActionPtr
 {
    try
    {
-      auto row = m_ItemActionDat.get_row( ItemActionId );
       auto info = boost::make_shared< ItemAction >( ItemActionId, this );
       return info;
    }
@@ -7003,7 +6819,6 @@ Core::Data::ExdDataGenerated::ItemFoodPtr
 {
    try
    {
-      auto row = m_ItemFoodDat.get_row( ItemFoodId );
       auto info = boost::make_shared< ItemFood >( ItemFoodId, this );
       return info;
    }
@@ -7018,7 +6833,6 @@ Core::Data::ExdDataGenerated::ItemSearchCategoryPtr
 {
    try
    {
-      auto row = m_ItemSearchCategoryDat.get_row( ItemSearchCategoryId );
       auto info = boost::make_shared< ItemSearchCategory >( ItemSearchCategoryId, this );
       return info;
    }
@@ -7033,7 +6847,6 @@ Core::Data::ExdDataGenerated::ItemSeriesPtr
 {
    try
    {
-      auto row = m_ItemSeriesDat.get_row( ItemSeriesId );
       auto info = boost::make_shared< ItemSeries >( ItemSeriesId, this );
       return info;
    }
@@ -7048,7 +6861,6 @@ Core::Data::ExdDataGenerated::ItemSpecialBonusPtr
 {
    try
    {
-      auto row = m_ItemSpecialBonusDat.get_row( ItemSpecialBonusId );
       auto info = boost::make_shared< ItemSpecialBonus >( ItemSpecialBonusId, this );
       return info;
    }
@@ -7063,7 +6875,6 @@ Core::Data::ExdDataGenerated::ItemUICategoryPtr
 {
    try
    {
-      auto row = m_ItemUICategoryDat.get_row( ItemUICategoryId );
       auto info = boost::make_shared< ItemUICategory >( ItemUICategoryId, this );
       return info;
    }
@@ -7078,7 +6889,6 @@ Core::Data::ExdDataGenerated::JournalCategoryPtr
 {
    try
    {
-      auto row = m_JournalCategoryDat.get_row( JournalCategoryId );
       auto info = boost::make_shared< JournalCategory >( JournalCategoryId, this );
       return info;
    }
@@ -7093,7 +6903,6 @@ Core::Data::ExdDataGenerated::JournalGenrePtr
 {
    try
    {
-      auto row = m_JournalGenreDat.get_row( JournalGenreId );
       auto info = boost::make_shared< JournalGenre >( JournalGenreId, this );
       return info;
    }
@@ -7108,7 +6917,6 @@ Core::Data::ExdDataGenerated::JournalSectionPtr
 {
    try
    {
-      auto row = m_JournalSectionDat.get_row( JournalSectionId );
       auto info = boost::make_shared< JournalSection >( JournalSectionId, this );
       return info;
    }
@@ -7123,7 +6931,6 @@ Core::Data::ExdDataGenerated::LevePtr
 {
    try
    {
-      auto row = m_LeveDat.get_row( LeveId );
       auto info = boost::make_shared< Leve >( LeveId, this );
       return info;
    }
@@ -7138,7 +6945,6 @@ Core::Data::ExdDataGenerated::LeveAssignmentTypePtr
 {
    try
    {
-      auto row = m_LeveAssignmentTypeDat.get_row( LeveAssignmentTypeId );
       auto info = boost::make_shared< LeveAssignmentType >( LeveAssignmentTypeId, this );
       return info;
    }
@@ -7153,7 +6959,6 @@ Core::Data::ExdDataGenerated::LeveClientPtr
 {
    try
    {
-      auto row = m_LeveClientDat.get_row( LeveClientId );
       auto info = boost::make_shared< LeveClient >( LeveClientId, this );
       return info;
    }
@@ -7168,7 +6973,6 @@ Core::Data::ExdDataGenerated::LevelPtr
 {
    try
    {
-      auto row = m_LevelDat.get_row( LevelId );
       auto info = boost::make_shared< Level >( LevelId, this );
       return info;
    }
@@ -7183,7 +6987,6 @@ Core::Data::ExdDataGenerated::LeveRewardItemPtr
 {
    try
    {
-      auto row = m_LeveRewardItemDat.get_row( LeveRewardItemId );
       auto info = boost::make_shared< LeveRewardItem >( LeveRewardItemId, this );
       return info;
    }
@@ -7198,7 +7001,6 @@ Core::Data::ExdDataGenerated::LeveRewardItemGroupPtr
 {
    try
    {
-      auto row = m_LeveRewardItemGroupDat.get_row( LeveRewardItemGroupId );
       auto info = boost::make_shared< LeveRewardItemGroup >( LeveRewardItemGroupId, this );
       return info;
    }
@@ -7213,7 +7015,6 @@ Core::Data::ExdDataGenerated::LeveVfxPtr
 {
    try
    {
-      auto row = m_LeveVfxDat.get_row( LeveVfxId );
       auto info = boost::make_shared< LeveVfx >( LeveVfxId, this );
       return info;
    }
@@ -7228,7 +7029,6 @@ Core::Data::ExdDataGenerated::LogFilterPtr
 {
    try
    {
-      auto row = m_LogFilterDat.get_row( LogFilterId );
       auto info = boost::make_shared< LogFilter >( LogFilterId, this );
       return info;
    }
@@ -7243,7 +7043,6 @@ Core::Data::ExdDataGenerated::LogKindPtr
 {
    try
    {
-      auto row = m_LogKindDat.get_row( LogKindId );
       auto info = boost::make_shared< LogKind >( LogKindId, this );
       return info;
    }
@@ -7258,7 +7057,6 @@ Core::Data::ExdDataGenerated::LogKindCategoryTextPtr
 {
    try
    {
-      auto row = m_LogKindCategoryTextDat.get_row( LogKindCategoryTextId );
       auto info = boost::make_shared< LogKindCategoryText >( LogKindCategoryTextId, this );
       return info;
    }
@@ -7273,7 +7071,6 @@ Core::Data::ExdDataGenerated::LogMessagePtr
 {
    try
    {
-      auto row = m_LogMessageDat.get_row( LogMessageId );
       auto info = boost::make_shared< LogMessage >( LogMessageId, this );
       return info;
    }
@@ -7288,7 +7085,6 @@ Core::Data::ExdDataGenerated::MacroIconPtr
 {
    try
    {
-      auto row = m_MacroIconDat.get_row( MacroIconId );
       auto info = boost::make_shared< MacroIcon >( MacroIconId, this );
       return info;
    }
@@ -7303,7 +7099,6 @@ Core::Data::ExdDataGenerated::MacroIconRedirectOldPtr
 {
    try
    {
-      auto row = m_MacroIconRedirectOldDat.get_row( MacroIconRedirectOldId );
       auto info = boost::make_shared< MacroIconRedirectOld >( MacroIconRedirectOldId, this );
       return info;
    }
@@ -7318,7 +7113,6 @@ Core::Data::ExdDataGenerated::MainCommandPtr
 {
    try
    {
-      auto row = m_MainCommandDat.get_row( MainCommandId );
       auto info = boost::make_shared< MainCommand >( MainCommandId, this );
       return info;
    }
@@ -7333,7 +7127,6 @@ Core::Data::ExdDataGenerated::MainCommandCategoryPtr
 {
    try
    {
-      auto row = m_MainCommandCategoryDat.get_row( MainCommandCategoryId );
       auto info = boost::make_shared< MainCommandCategory >( MainCommandCategoryId, this );
       return info;
    }
@@ -7348,7 +7141,6 @@ Core::Data::ExdDataGenerated::MapPtr
 {
    try
    {
-      auto row = m_MapDat.get_row( MapId );
       auto info = boost::make_shared< Map >( MapId, this );
       return info;
    }
@@ -7363,7 +7155,6 @@ Core::Data::ExdDataGenerated::MapMarkerPtr
 {
    try
    {
-      auto row = m_MapMarkerDat.get_row( MapMarkerId );
       auto info = boost::make_shared< MapMarker >( MapMarkerId, this );
       return info;
    }
@@ -7378,7 +7169,6 @@ Core::Data::ExdDataGenerated::MapSymbolPtr
 {
    try
    {
-      auto row = m_MapSymbolDat.get_row( MapSymbolId );
       auto info = boost::make_shared< MapSymbol >( MapSymbolId, this );
       return info;
    }
@@ -7393,7 +7183,6 @@ Core::Data::ExdDataGenerated::MasterpieceSupplyDutyPtr
 {
    try
    {
-      auto row = m_MasterpieceSupplyDutyDat.get_row( MasterpieceSupplyDutyId );
       auto info = boost::make_shared< MasterpieceSupplyDuty >( MasterpieceSupplyDutyId, this );
       return info;
    }
@@ -7408,7 +7197,6 @@ Core::Data::ExdDataGenerated::MasterpieceSupplyMultiplierPtr
 {
    try
    {
-      auto row = m_MasterpieceSupplyMultiplierDat.get_row( MasterpieceSupplyMultiplierId );
       auto info = boost::make_shared< MasterpieceSupplyMultiplier >( MasterpieceSupplyMultiplierId, this );
       return info;
    }
@@ -7423,7 +7211,6 @@ Core::Data::ExdDataGenerated::MateriaPtr
 {
    try
    {
-      auto row = m_MateriaDat.get_row( MateriaId );
       auto info = boost::make_shared< Materia >( MateriaId, this );
       return info;
    }
@@ -7438,7 +7225,6 @@ Core::Data::ExdDataGenerated::MinionRacePtr
 {
    try
    {
-      auto row = m_MinionRaceDat.get_row( MinionRaceId );
       auto info = boost::make_shared< MinionRace >( MinionRaceId, this );
       return info;
    }
@@ -7453,7 +7239,6 @@ Core::Data::ExdDataGenerated::MinionRulesPtr
 {
    try
    {
-      auto row = m_MinionRulesDat.get_row( MinionRulesId );
       auto info = boost::make_shared< MinionRules >( MinionRulesId, this );
       return info;
    }
@@ -7468,7 +7253,6 @@ Core::Data::ExdDataGenerated::MinionSkillTypePtr
 {
    try
    {
-      auto row = m_MinionSkillTypeDat.get_row( MinionSkillTypeId );
       auto info = boost::make_shared< MinionSkillType >( MinionSkillTypeId, this );
       return info;
    }
@@ -7483,7 +7267,6 @@ Core::Data::ExdDataGenerated::MobHuntTargetPtr
 {
    try
    {
-      auto row = m_MobHuntTargetDat.get_row( MobHuntTargetId );
       auto info = boost::make_shared< MobHuntTarget >( MobHuntTargetId, this );
       return info;
    }
@@ -7498,7 +7281,6 @@ Core::Data::ExdDataGenerated::ModelCharaPtr
 {
    try
    {
-      auto row = m_ModelCharaDat.get_row( ModelCharaId );
       auto info = boost::make_shared< ModelChara >( ModelCharaId, this );
       return info;
    }
@@ -7513,7 +7295,6 @@ Core::Data::ExdDataGenerated::MonsterNotePtr
 {
    try
    {
-      auto row = m_MonsterNoteDat.get_row( MonsterNoteId );
       auto info = boost::make_shared< MonsterNote >( MonsterNoteId, this );
       return info;
    }
@@ -7528,7 +7309,6 @@ Core::Data::ExdDataGenerated::MonsterNoteTargetPtr
 {
    try
    {
-      auto row = m_MonsterNoteTargetDat.get_row( MonsterNoteTargetId );
       auto info = boost::make_shared< MonsterNoteTarget >( MonsterNoteTargetId, this );
       return info;
    }
@@ -7543,7 +7323,6 @@ Core::Data::ExdDataGenerated::MountPtr
 {
    try
    {
-      auto row = m_MountDat.get_row( MountId );
       auto info = boost::make_shared< Mount >( MountId, this );
       return info;
    }
@@ -7558,7 +7337,6 @@ Core::Data::ExdDataGenerated::MountActionPtr
 {
    try
    {
-      auto row = m_MountActionDat.get_row( MountActionId );
       auto info = boost::make_shared< MountAction >( MountActionId, this );
       return info;
    }
@@ -7573,7 +7351,6 @@ Core::Data::ExdDataGenerated::NpcEquipPtr
 {
    try
    {
-      auto row = m_NpcEquipDat.get_row( NpcEquipId );
       auto info = boost::make_shared< NpcEquip >( NpcEquipId, this );
       return info;
    }
@@ -7588,7 +7365,6 @@ Core::Data::ExdDataGenerated::OmenPtr
 {
    try
    {
-      auto row = m_OmenDat.get_row( OmenId );
       auto info = boost::make_shared< Omen >( OmenId, this );
       return info;
    }
@@ -7603,7 +7379,6 @@ Core::Data::ExdDataGenerated::OnlineStatusPtr
 {
    try
    {
-      auto row = m_OnlineStatusDat.get_row( OnlineStatusId );
       auto info = boost::make_shared< OnlineStatus >( OnlineStatusId, this );
       return info;
    }
@@ -7618,7 +7393,6 @@ Core::Data::ExdDataGenerated::OpeningPtr
 {
    try
    {
-      auto row = m_OpeningDat.get_row( OpeningId );
       auto info = boost::make_shared< Opening >( OpeningId, this );
       return info;
    }
@@ -7633,7 +7407,6 @@ Core::Data::ExdDataGenerated::OrchestrionPtr
 {
    try
    {
-      auto row = m_OrchestrionDat.get_row( OrchestrionId );
       auto info = boost::make_shared< Orchestrion >( OrchestrionId, this );
       return info;
    }
@@ -7648,7 +7421,6 @@ Core::Data::ExdDataGenerated::OrchestrionPathPtr
 {
    try
    {
-      auto row = m_OrchestrionPathDat.get_row( OrchestrionPathId );
       auto info = boost::make_shared< OrchestrionPath >( OrchestrionPathId, this );
       return info;
    }
@@ -7663,7 +7435,6 @@ Core::Data::ExdDataGenerated::ParamGrowPtr
 {
    try
    {
-      auto row = m_ParamGrowDat.get_row( ParamGrowId );
       auto info = boost::make_shared< ParamGrow >( ParamGrowId, this );
       return info;
    }
@@ -7678,7 +7449,6 @@ Core::Data::ExdDataGenerated::PetPtr
 {
    try
    {
-      auto row = m_PetDat.get_row( PetId );
       auto info = boost::make_shared< Pet >( PetId, this );
       return info;
    }
@@ -7693,7 +7463,6 @@ Core::Data::ExdDataGenerated::PetActionPtr
 {
    try
    {
-      auto row = m_PetActionDat.get_row( PetActionId );
       auto info = boost::make_shared< PetAction >( PetActionId, this );
       return info;
    }
@@ -7708,7 +7477,6 @@ Core::Data::ExdDataGenerated::PicturePtr
 {
    try
    {
-      auto row = m_PictureDat.get_row( PictureId );
       auto info = boost::make_shared< Picture >( PictureId, this );
       return info;
    }
@@ -7723,7 +7491,6 @@ Core::Data::ExdDataGenerated::PlaceNamePtr
 {
    try
    {
-      auto row = m_PlaceNameDat.get_row( PlaceNameId );
       auto info = boost::make_shared< PlaceName >( PlaceNameId, this );
       return info;
    }
@@ -7738,7 +7505,6 @@ Core::Data::ExdDataGenerated::QuestPtr
 {
    try
    {
-      auto row = m_QuestDat.get_row( QuestId );
       auto info = boost::make_shared< Quest >( QuestId, this );
       return info;
    }
@@ -7753,7 +7519,6 @@ Core::Data::ExdDataGenerated::QuestRewardOtherPtr
 {
    try
    {
-      auto row = m_QuestRewardOtherDat.get_row( QuestRewardOtherId );
       auto info = boost::make_shared< QuestRewardOther >( QuestRewardOtherId, this );
       return info;
    }
@@ -7768,7 +7533,6 @@ Core::Data::ExdDataGenerated::QuickChatPtr
 {
    try
    {
-      auto row = m_QuickChatDat.get_row( QuickChatId );
       auto info = boost::make_shared< QuickChat >( QuickChatId, this );
       return info;
    }
@@ -7783,7 +7547,6 @@ Core::Data::ExdDataGenerated::QuickChatTransientPtr
 {
    try
    {
-      auto row = m_QuickChatTransientDat.get_row( QuickChatTransientId );
       auto info = boost::make_shared< QuickChatTransient >( QuickChatTransientId, this );
       return info;
    }
@@ -7798,7 +7561,6 @@ Core::Data::ExdDataGenerated::RacePtr
 {
    try
    {
-      auto row = m_RaceDat.get_row( RaceId );
       auto info = boost::make_shared< Race >( RaceId, this );
       return info;
    }
@@ -7813,7 +7575,6 @@ Core::Data::ExdDataGenerated::RacingChocoboItemPtr
 {
    try
    {
-      auto row = m_RacingChocoboItemDat.get_row( RacingChocoboItemId );
       auto info = boost::make_shared< RacingChocoboItem >( RacingChocoboItemId, this );
       return info;
    }
@@ -7828,7 +7589,6 @@ Core::Data::ExdDataGenerated::RacingChocoboNamePtr
 {
    try
    {
-      auto row = m_RacingChocoboNameDat.get_row( RacingChocoboNameId );
       auto info = boost::make_shared< RacingChocoboName >( RacingChocoboNameId, this );
       return info;
    }
@@ -7843,7 +7603,6 @@ Core::Data::ExdDataGenerated::RacingChocoboNameCategoryPtr
 {
    try
    {
-      auto row = m_RacingChocoboNameCategoryDat.get_row( RacingChocoboNameCategoryId );
       auto info = boost::make_shared< RacingChocoboNameCategory >( RacingChocoboNameCategoryId, this );
       return info;
    }
@@ -7858,7 +7617,6 @@ Core::Data::ExdDataGenerated::RacingChocoboNameInfoPtr
 {
    try
    {
-      auto row = m_RacingChocoboNameInfoDat.get_row( RacingChocoboNameInfoId );
       auto info = boost::make_shared< RacingChocoboNameInfo >( RacingChocoboNameInfoId, this );
       return info;
    }
@@ -7873,7 +7631,6 @@ Core::Data::ExdDataGenerated::RacingChocoboParamPtr
 {
    try
    {
-      auto row = m_RacingChocoboParamDat.get_row( RacingChocoboParamId );
       auto info = boost::make_shared< RacingChocoboParam >( RacingChocoboParamId, this );
       return info;
    }
@@ -7888,7 +7645,6 @@ Core::Data::ExdDataGenerated::RecipePtr
 {
    try
    {
-      auto row = m_RecipeDat.get_row( RecipeId );
       auto info = boost::make_shared< Recipe >( RecipeId, this );
       return info;
    }
@@ -7903,7 +7659,6 @@ Core::Data::ExdDataGenerated::RecipeElementPtr
 {
    try
    {
-      auto row = m_RecipeElementDat.get_row( RecipeElementId );
       auto info = boost::make_shared< RecipeElement >( RecipeElementId, this );
       return info;
    }
@@ -7918,7 +7673,6 @@ Core::Data::ExdDataGenerated::RecipeLevelTablePtr
 {
    try
    {
-      auto row = m_RecipeLevelTableDat.get_row( RecipeLevelTableId );
       auto info = boost::make_shared< RecipeLevelTable >( RecipeLevelTableId, this );
       return info;
    }
@@ -7933,7 +7687,6 @@ Core::Data::ExdDataGenerated::RecipeNotebookListPtr
 {
    try
    {
-      auto row = m_RecipeNotebookListDat.get_row( RecipeNotebookListId );
       auto info = boost::make_shared< RecipeNotebookList >( RecipeNotebookListId, this );
       return info;
    }
@@ -7948,7 +7701,6 @@ Core::Data::ExdDataGenerated::RelicPtr
 {
    try
    {
-      auto row = m_RelicDat.get_row( RelicId );
       auto info = boost::make_shared< Relic >( RelicId, this );
       return info;
    }
@@ -7963,7 +7715,6 @@ Core::Data::ExdDataGenerated::Relic3Ptr
 {
    try
    {
-      auto row = m_Relic3Dat.get_row( Relic3Id );
       auto info = boost::make_shared< Relic3 >( Relic3Id, this );
       return info;
    }
@@ -7978,7 +7729,6 @@ Core::Data::ExdDataGenerated::RelicItemPtr
 {
    try
    {
-      auto row = m_RelicItemDat.get_row( RelicItemId );
       auto info = boost::make_shared< RelicItem >( RelicItemId, this );
       return info;
    }
@@ -7993,7 +7743,6 @@ Core::Data::ExdDataGenerated::RelicNotePtr
 {
    try
    {
-      auto row = m_RelicNoteDat.get_row( RelicNoteId );
       auto info = boost::make_shared< RelicNote >( RelicNoteId, this );
       return info;
    }
@@ -8008,7 +7757,6 @@ Core::Data::ExdDataGenerated::RelicNoteCategoryPtr
 {
    try
    {
-      auto row = m_RelicNoteCategoryDat.get_row( RelicNoteCategoryId );
       auto info = boost::make_shared< RelicNoteCategory >( RelicNoteCategoryId, this );
       return info;
    }
@@ -8023,7 +7771,6 @@ Core::Data::ExdDataGenerated::RetainerTaskPtr
 {
    try
    {
-      auto row = m_RetainerTaskDat.get_row( RetainerTaskId );
       auto info = boost::make_shared< RetainerTask >( RetainerTaskId, this );
       return info;
    }
@@ -8038,7 +7785,6 @@ Core::Data::ExdDataGenerated::RetainerTaskNormalPtr
 {
    try
    {
-      auto row = m_RetainerTaskNormalDat.get_row( RetainerTaskNormalId );
       auto info = boost::make_shared< RetainerTaskNormal >( RetainerTaskNormalId, this );
       return info;
    }
@@ -8053,7 +7799,6 @@ Core::Data::ExdDataGenerated::RetainerTaskParameterPtr
 {
    try
    {
-      auto row = m_RetainerTaskParameterDat.get_row( RetainerTaskParameterId );
       auto info = boost::make_shared< RetainerTaskParameter >( RetainerTaskParameterId, this );
       return info;
    }
@@ -8068,7 +7813,6 @@ Core::Data::ExdDataGenerated::RetainerTaskRandomPtr
 {
    try
    {
-      auto row = m_RetainerTaskRandomDat.get_row( RetainerTaskRandomId );
       auto info = boost::make_shared< RetainerTaskRandom >( RetainerTaskRandomId, this );
       return info;
    }
@@ -8083,7 +7827,6 @@ Core::Data::ExdDataGenerated::SalvagePtr
 {
    try
    {
-      auto row = m_SalvageDat.get_row( SalvageId );
       auto info = boost::make_shared< Salvage >( SalvageId, this );
       return info;
    }
@@ -8098,7 +7841,6 @@ Core::Data::ExdDataGenerated::SatisfactionNpcPtr
 {
    try
    {
-      auto row = m_SatisfactionNpcDat.get_row( SatisfactionNpcId );
       auto info = boost::make_shared< SatisfactionNpc >( SatisfactionNpcId, this );
       return info;
    }
@@ -8113,7 +7855,6 @@ Core::Data::ExdDataGenerated::SatisfactionSupplyPtr
 {
    try
    {
-      auto row = m_SatisfactionSupplyDat.get_row( SatisfactionSupplyId );
       auto info = boost::make_shared< SatisfactionSupply >( SatisfactionSupplyId, this );
       return info;
    }
@@ -8128,7 +7869,6 @@ Core::Data::ExdDataGenerated::SatisfactionSupplyRewardPtr
 {
    try
    {
-      auto row = m_SatisfactionSupplyRewardDat.get_row( SatisfactionSupplyRewardId );
       auto info = boost::make_shared< SatisfactionSupplyReward >( SatisfactionSupplyRewardId, this );
       return info;
    }
@@ -8143,7 +7883,6 @@ Core::Data::ExdDataGenerated::ScreenImagePtr
 {
    try
    {
-      auto row = m_ScreenImageDat.get_row( ScreenImageId );
       auto info = boost::make_shared< ScreenImage >( ScreenImageId, this );
       return info;
    }
@@ -8158,7 +7897,6 @@ Core::Data::ExdDataGenerated::SecretRecipeBookPtr
 {
    try
    {
-      auto row = m_SecretRecipeBookDat.get_row( SecretRecipeBookId );
       auto info = boost::make_shared< SecretRecipeBook >( SecretRecipeBookId, this );
       return info;
    }
@@ -8173,7 +7911,6 @@ Core::Data::ExdDataGenerated::SpearfishingItemPtr
 {
    try
    {
-      auto row = m_SpearfishingItemDat.get_row( SpearfishingItemId );
       auto info = boost::make_shared< SpearfishingItem >( SpearfishingItemId, this );
       return info;
    }
@@ -8188,7 +7925,6 @@ Core::Data::ExdDataGenerated::SpearfishingNotebookPtr
 {
    try
    {
-      auto row = m_SpearfishingNotebookDat.get_row( SpearfishingNotebookId );
       auto info = boost::make_shared< SpearfishingNotebook >( SpearfishingNotebookId, this );
       return info;
    }
@@ -8203,7 +7939,6 @@ Core::Data::ExdDataGenerated::SpecialShopPtr
 {
    try
    {
-      auto row = m_SpecialShopDat.get_row( SpecialShopId );
       auto info = boost::make_shared< SpecialShop >( SpecialShopId, this );
       return info;
    }
@@ -8218,7 +7953,6 @@ Core::Data::ExdDataGenerated::SpecialShopItemCategoryPtr
 {
    try
    {
-      auto row = m_SpecialShopItemCategoryDat.get_row( SpecialShopItemCategoryId );
       auto info = boost::make_shared< SpecialShopItemCategory >( SpecialShopItemCategoryId, this );
       return info;
    }
@@ -8233,7 +7967,6 @@ Core::Data::ExdDataGenerated::StainPtr
 {
    try
    {
-      auto row = m_StainDat.get_row( StainId );
       auto info = boost::make_shared< Stain >( StainId, this );
       return info;
    }
@@ -8248,7 +7981,6 @@ Core::Data::ExdDataGenerated::StatusPtr
 {
    try
    {
-      auto row = m_StatusDat.get_row( StatusId );
       auto info = boost::make_shared< Status >( StatusId, this );
       return info;
    }
@@ -8263,7 +7995,6 @@ Core::Data::ExdDataGenerated::StoryPtr
 {
    try
    {
-      auto row = m_StoryDat.get_row( StoryId );
       auto info = boost::make_shared< Story >( StoryId, this );
       return info;
    }
@@ -8278,7 +8009,6 @@ Core::Data::ExdDataGenerated::SwitchTalkPtr
 {
    try
    {
-      auto row = m_SwitchTalkDat.get_row( SwitchTalkId );
       auto info = boost::make_shared< SwitchTalk >( SwitchTalkId, this );
       return info;
    }
@@ -8293,7 +8023,6 @@ Core::Data::ExdDataGenerated::TerritoryTypePtr
 {
    try
    {
-      auto row = m_TerritoryTypeDat.get_row( TerritoryTypeId );
       auto info = boost::make_shared< TerritoryType >( TerritoryTypeId, this );
       return info;
    }
@@ -8308,7 +8037,6 @@ Core::Data::ExdDataGenerated::TextCommandPtr
 {
    try
    {
-      auto row = m_TextCommandDat.get_row( TextCommandId );
       auto info = boost::make_shared< TextCommand >( TextCommandId, this );
       return info;
    }
@@ -8323,7 +8051,6 @@ Core::Data::ExdDataGenerated::TitlePtr
 {
    try
    {
-      auto row = m_TitleDat.get_row( TitleId );
       auto info = boost::make_shared< Title >( TitleId, this );
       return info;
    }
@@ -8338,7 +8065,6 @@ Core::Data::ExdDataGenerated::TomestonesPtr
 {
    try
    {
-      auto row = m_TomestonesDat.get_row( TomestonesId );
       auto info = boost::make_shared< Tomestones >( TomestonesId, this );
       return info;
    }
@@ -8353,7 +8079,6 @@ Core::Data::ExdDataGenerated::TomestonesItemPtr
 {
    try
    {
-      auto row = m_TomestonesItemDat.get_row( TomestonesItemId );
       auto info = boost::make_shared< TomestonesItem >( TomestonesItemId, this );
       return info;
    }
@@ -8368,7 +8093,6 @@ Core::Data::ExdDataGenerated::TopicSelectPtr
 {
    try
    {
-      auto row = m_TopicSelectDat.get_row( TopicSelectId );
       auto info = boost::make_shared< TopicSelect >( TopicSelectId, this );
       return info;
    }
@@ -8383,7 +8107,6 @@ Core::Data::ExdDataGenerated::TownPtr
 {
    try
    {
-      auto row = m_TownDat.get_row( TownId );
       auto info = boost::make_shared< Town >( TownId, this );
       return info;
    }
@@ -8398,7 +8121,6 @@ Core::Data::ExdDataGenerated::TraitPtr
 {
    try
    {
-      auto row = m_TraitDat.get_row( TraitId );
       auto info = boost::make_shared< Trait >( TraitId, this );
       return info;
    }
@@ -8413,7 +8135,6 @@ Core::Data::ExdDataGenerated::TraitRecastPtr
 {
    try
    {
-      auto row = m_TraitRecastDat.get_row( TraitRecastId );
       auto info = boost::make_shared< TraitRecast >( TraitRecastId, this );
       return info;
    }
@@ -8428,7 +8149,6 @@ Core::Data::ExdDataGenerated::TraitTransientPtr
 {
    try
    {
-      auto row = m_TraitTransientDat.get_row( TraitTransientId );
       auto info = boost::make_shared< TraitTransient >( TraitTransientId, this );
       return info;
    }
@@ -8443,7 +8163,6 @@ Core::Data::ExdDataGenerated::TreasureHuntRankPtr
 {
    try
    {
-      auto row = m_TreasureHuntRankDat.get_row( TreasureHuntRankId );
       auto info = boost::make_shared< TreasureHuntRank >( TreasureHuntRankId, this );
       return info;
    }
@@ -8458,7 +8177,6 @@ Core::Data::ExdDataGenerated::TribePtr
 {
    try
    {
-      auto row = m_TribeDat.get_row( TribeId );
       auto info = boost::make_shared< Tribe >( TribeId, this );
       return info;
    }
@@ -8473,7 +8191,6 @@ Core::Data::ExdDataGenerated::TripleTriadPtr
 {
    try
    {
-      auto row = m_TripleTriadDat.get_row( TripleTriadId );
       auto info = boost::make_shared< TripleTriad >( TripleTriadId, this );
       return info;
    }
@@ -8488,7 +8205,6 @@ Core::Data::ExdDataGenerated::TripleTriadCardPtr
 {
    try
    {
-      auto row = m_TripleTriadCardDat.get_row( TripleTriadCardId );
       auto info = boost::make_shared< TripleTriadCard >( TripleTriadCardId, this );
       return info;
    }
@@ -8503,7 +8219,6 @@ Core::Data::ExdDataGenerated::TripleTriadCardRarityPtr
 {
    try
    {
-      auto row = m_TripleTriadCardRarityDat.get_row( TripleTriadCardRarityId );
       auto info = boost::make_shared< TripleTriadCardRarity >( TripleTriadCardRarityId, this );
       return info;
    }
@@ -8518,7 +8233,6 @@ Core::Data::ExdDataGenerated::TripleTriadCardResidentPtr
 {
    try
    {
-      auto row = m_TripleTriadCardResidentDat.get_row( TripleTriadCardResidentId );
       auto info = boost::make_shared< TripleTriadCardResident >( TripleTriadCardResidentId, this );
       return info;
    }
@@ -8533,7 +8247,6 @@ Core::Data::ExdDataGenerated::TripleTriadCardTypePtr
 {
    try
    {
-      auto row = m_TripleTriadCardTypeDat.get_row( TripleTriadCardTypeId );
       auto info = boost::make_shared< TripleTriadCardType >( TripleTriadCardTypeId, this );
       return info;
    }
@@ -8548,7 +8261,6 @@ Core::Data::ExdDataGenerated::TripleTriadCompetitionPtr
 {
    try
    {
-      auto row = m_TripleTriadCompetitionDat.get_row( TripleTriadCompetitionId );
       auto info = boost::make_shared< TripleTriadCompetition >( TripleTriadCompetitionId, this );
       return info;
    }
@@ -8563,7 +8275,6 @@ Core::Data::ExdDataGenerated::TripleTriadRulePtr
 {
    try
    {
-      auto row = m_TripleTriadRuleDat.get_row( TripleTriadRuleId );
       auto info = boost::make_shared< TripleTriadRule >( TripleTriadRuleId, this );
       return info;
    }
@@ -8578,7 +8289,6 @@ Core::Data::ExdDataGenerated::TutorialPtr
 {
    try
    {
-      auto row = m_TutorialDat.get_row( TutorialId );
       auto info = boost::make_shared< Tutorial >( TutorialId, this );
       return info;
    }
@@ -8593,7 +8303,6 @@ Core::Data::ExdDataGenerated::TutorialDPSPtr
 {
    try
    {
-      auto row = m_TutorialDPSDat.get_row( TutorialDPSId );
       auto info = boost::make_shared< TutorialDPS >( TutorialDPSId, this );
       return info;
    }
@@ -8608,7 +8317,6 @@ Core::Data::ExdDataGenerated::TutorialHealerPtr
 {
    try
    {
-      auto row = m_TutorialHealerDat.get_row( TutorialHealerId );
       auto info = boost::make_shared< TutorialHealer >( TutorialHealerId, this );
       return info;
    }
@@ -8623,7 +8331,6 @@ Core::Data::ExdDataGenerated::TutorialTankPtr
 {
    try
    {
-      auto row = m_TutorialTankDat.get_row( TutorialTankId );
       auto info = boost::make_shared< TutorialTank >( TutorialTankId, this );
       return info;
    }
@@ -8638,7 +8345,6 @@ Core::Data::ExdDataGenerated::WarpPtr
 {
    try
    {
-      auto row = m_WarpDat.get_row( WarpId );
       auto info = boost::make_shared< Warp >( WarpId, this );
       return info;
    }
@@ -8653,7 +8359,6 @@ Core::Data::ExdDataGenerated::WeatherPtr
 {
    try
    {
-      auto row = m_WeatherDat.get_row( WeatherId );
       auto info = boost::make_shared< Weather >( WeatherId, this );
       return info;
    }
@@ -8668,7 +8373,6 @@ Core::Data::ExdDataGenerated::WeatherGroupPtr
 {
    try
    {
-      auto row = m_WeatherGroupDat.get_row( WeatherGroupId );
       auto info = boost::make_shared< WeatherGroup >( WeatherGroupId, this );
       return info;
    }
@@ -8683,7 +8387,6 @@ Core::Data::ExdDataGenerated::WeatherRatePtr
 {
    try
    {
-      auto row = m_WeatherRateDat.get_row( WeatherRateId );
       auto info = boost::make_shared< WeatherRate >( WeatherRateId, this );
       return info;
    }
@@ -8698,7 +8401,6 @@ Core::Data::ExdDataGenerated::WeeklyBingoOrderDataPtr
 {
    try
    {
-      auto row = m_WeeklyBingoOrderDataDat.get_row( WeeklyBingoOrderDataId );
       auto info = boost::make_shared< WeeklyBingoOrderData >( WeeklyBingoOrderDataId, this );
       return info;
    }
@@ -8713,7 +8415,6 @@ Core::Data::ExdDataGenerated::WeeklyBingoRewardDataPtr
 {
    try
    {
-      auto row = m_WeeklyBingoRewardDataDat.get_row( WeeklyBingoRewardDataId );
       auto info = boost::make_shared< WeeklyBingoRewardData >( WeeklyBingoRewardDataId, this );
       return info;
    }
@@ -8728,7 +8429,6 @@ Core::Data::ExdDataGenerated::WeeklyBingoTextPtr
 {
    try
    {
-      auto row = m_WeeklyBingoTextDat.get_row( WeeklyBingoTextId );
       auto info = boost::make_shared< WeeklyBingoText >( WeeklyBingoTextId, this );
       return info;
    }
@@ -8743,7 +8443,6 @@ Core::Data::ExdDataGenerated::WorldDCGroupTypePtr
 {
    try
    {
-      auto row = m_WorldDCGroupTypeDat.get_row( WorldDCGroupTypeId );
       auto info = boost::make_shared< WorldDCGroupType >( WorldDCGroupTypeId, this );
       return info;
    }

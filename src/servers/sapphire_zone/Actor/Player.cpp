@@ -618,8 +618,8 @@ void Core::Entity::Player::gainExp( uint32_t amount )
 
 void Core::Entity::Player::gainLevel()
 {
-   setLevel( getLevel() + 1 );
 
+   setLevel( getLevel() + 1 );
    calculateStats();
    sendStats();
    sendStatusUpdate();
@@ -649,6 +649,12 @@ void Core::Entity::Player::gainLevel()
    classInfoPacket.data().nextLevelIndex = getLevel();
    classInfoPacket.data().currentExp = getExp();
    queuePacket( classInfoPacket );
+
+
+
+
+
+
 
 }
 
