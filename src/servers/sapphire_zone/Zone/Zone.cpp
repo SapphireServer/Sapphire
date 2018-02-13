@@ -501,8 +501,8 @@ bool Core::Zone::update( uint32_t currTime )
       if( ( !pSession->getPlayer()->getCurrentZone() )
           || ( pSession->getPlayer()->getCurrentZone() != shared_from_this() ) )
       {
-      //   if( pSession->getPlayer()->getCell() )
-      //      removeActor( pSession->getPlayer() );
+         if( pSession->getPlayer()->getCell() )
+            removeActor( pSession->getPlayer() );
 
          it = m_sessionSet.erase( it );
          continue;
