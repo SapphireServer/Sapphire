@@ -210,9 +210,9 @@ void Core::Entity::Player::calculateStats()
    uint8_t level = getLevel();
    uint8_t job = static_cast< uint8_t >( getClass() );
 
-   auto classInfo = g_exdDataGen.getClassJob( job );
-   auto tribeInfo = g_exdDataGen.getTribe( tribe );
-   auto paramGrowthInfo = g_exdDataGen.getParamGrow( level );
+   auto classInfo = g_exdDataGen.get< Core::Data::ClassJob >( job );
+   auto tribeInfo = g_exdDataGen.get< Core::Data::Tribe >( tribe );
+   auto paramGrowthInfo = g_exdDataGen.get< Core::Data::ParamGrow >( level );
 
    // TODO: put formula somewhere else...
    float base = Math::CalcStats::calculateBaseStat( getAsPlayer() );
@@ -290,7 +290,7 @@ void Core::Entity::Player::sendStats()
 
 void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
 {
-   auto data = g_exdDataGen.getAetheryte( aetheryteId );
+   auto data = g_exdDataGen.get< Core::Data::Aetheryte >( aetheryteId );
 
    if( data == nullptr )
    {
@@ -299,7 +299,7 @@ void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
 
    setStateFlag( PlayerStateFlag::BetweenAreas );
 
-   auto z_pos = g_territoryMgr.getTerritoryPosition( data->destination );
+   auto z_pos = g_territoryMgr.getTerritoryPosition( data->territory );
 
    Common::FFXIVARR_POSITION3 pos;
    pos.x = 0;
@@ -313,7 +313,8 @@ void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
       rot = z_pos->getTargetRotation();
    }
 
-   sendDebug( "Teleport: " + g_exdDataGen.getPlaceName( data->placeName )->name + " " + g_exdDataGen.getPlaceName( data->aethernetName )->name +
+   sendDebug( "Teleport: " + g_exdDataGen.get< Core::Data::PlaceName >( data->placeName )->name + " " +
+                             g_exdDataGen.get< Core::Data::PlaceName >( data->aethernetName )->name +
                "(" + std::to_string( data->territory ) + ")" );
 
    // TODO: this should be simplified and a type created in server_common/common.h.
@@ -492,7 +493,7 @@ void Core::Entity::Player::discover( int16_t map_id, int16_t sub_id )
 
    int32_t offset = 4;
 
-   auto info = g_exdDataGen.getMap( g_exdDataGen.getTerritoryType( getCurrentZone()->getTerritoryId() )->map );
+   auto info = g_exdDataGen.get< Core::Data::Map >( g_exdDataGen.get< Core::Data::TerritoryType >( getCurrentZone()->getTerritoryId() )->map );
    if( info->discoveryArrayByte )
       offset = 4 + 2 * info->discoveryIndex;
    else
@@ -507,7 +508,7 @@ void Core::Entity::Player::discover( int16_t map_id, int16_t sub_id )
 
    uint16_t level = getLevel();
 
-   uint32_t exp = ( g_exdDataGen.getParamGrow( level )->expToNext * 5 / 100 );
+   uint32_t exp = ( g_exdDataGen.get< Core::Data::ParamGrow >( level )->expToNext * 5 / 100 );
 
    gainExp( exp );
 
@@ -584,9 +585,9 @@ void Core::Entity::Player::gainExp( uint32_t amount )
 
    uint16_t level = getLevel();
 
-   uint32_t neededExpToLevel = g_exdDataGen.getParamGrow( level )->expToNext;
+   uint32_t neededExpToLevel = g_exdDataGen.get< Core::Data::ParamGrow >( level )->expToNext;
 
-   uint32_t neededExpToLevelplus1 = g_exdDataGen.getParamGrow( level + 1 )->expToNext;
+   uint32_t neededExpToLevelplus1 = g_exdDataGen.get< Core::Data::ParamGrow >( level + 1 )->expToNext;
 
    queuePacket( ActorControlPacket143( getId(), GainExpMsg, static_cast< uint8_t >( getClass() ), amount ) );
 
@@ -670,25 +671,25 @@ void Core::Entity::Player::sendStatusUpdate( bool toSelf )
 
 uint8_t Core::Entity::Player::getLevel() const
 {
-   uint8_t classJobIndex = g_exdDataGen.getClassJob( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
+   uint8_t classJobIndex = g_exdDataGen.get< Core::Data::ClassJob >( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
    return static_cast< uint8_t >( m_classArray[classJobIndex] );
 }
 
 uint8_t Core::Entity::Player::getLevelForClass( Common::ClassJob pClass ) const
 {
-   uint8_t classJobIndex = g_exdDataGen.getClassJob( static_cast< uint8_t >( pClass ) )->expArrayIndex;
+   uint8_t classJobIndex = g_exdDataGen.get< Core::Data::ClassJob >( static_cast< uint8_t >( pClass ) )->expArrayIndex;
    return static_cast< uint8_t >( m_classArray[classJobIndex] );
 }
 
 uint32_t Core::Entity::Player::getExp() const
 {
-   uint8_t classJobIndex = g_exdDataGen.getClassJob( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
+   uint8_t classJobIndex = g_exdDataGen.get< Core::Data::ClassJob >( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
    return m_expArray[classJobIndex];
 }
 
 void Core::Entity::Player::setExp( uint32_t amount )
 {
-   uint8_t classJobIndex = g_exdDataGen.getClassJob( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
+   uint8_t classJobIndex = g_exdDataGen.get< Core::Data::ClassJob >( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
    m_expArray[classJobIndex] = amount;
 }
 
@@ -728,13 +729,13 @@ void Core::Entity::Player::setClassJob( Common::ClassJob classJob )
 
 void Core::Entity::Player::setLevel( uint8_t level )
 {
-   uint8_t classJobIndex = g_exdDataGen.getClassJob( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
+   uint8_t classJobIndex = g_exdDataGen.get< Core::Data::ClassJob >( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
    m_classArray[classJobIndex] = level;
 }
 
 void Core::Entity::Player::setLevelForClass( uint8_t level, Common::ClassJob classjob )
 {
-   uint8_t classJobIndex = g_exdDataGen.getClassJob( static_cast< uint8_t >( classjob ) )->expArrayIndex;
+   uint8_t classJobIndex = g_exdDataGen.get< Core::Data::ClassJob >( static_cast< uint8_t >( classjob ) )->expArrayIndex;
 
    if( m_classArray[classJobIndex] == 0 )
       insertDbClass( classJobIndex );
@@ -884,7 +885,7 @@ const uint8_t* Core::Entity::Player::getStateFlags() const
 
 bool Core::Entity::Player::actionHasCastTime( uint32_t actionId ) //TODO: Add logic for special cases
 {
-   auto actionInfoPtr = g_exdDataGen.getAction( actionId );
+   auto actionInfoPtr = g_exdDataGen.get< Core::Data::Action >( actionId );
    if( actionInfoPtr->preservesCombo )
       return false;
 

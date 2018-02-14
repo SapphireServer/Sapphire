@@ -30,7 +30,7 @@ Core::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::ActorPtr so
    , m_tickRate( tickRate )
    , m_lastTick( 0 )
 {
-   auto entry = g_exdDataGen.getStatus( id );
+   auto entry = g_exdDataGen.get< Core::Data::Status >( id );
    m_name = entry->name;
       
    std::replace( m_name.begin(), m_name.end(), ' ', '_' );

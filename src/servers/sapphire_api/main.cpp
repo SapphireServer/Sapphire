@@ -241,7 +241,7 @@ std::string buildHttpResponse( uint16_t rCode, const std::string& content = "", 
 void getZoneName( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request ) 
 {
    string number = request->path_match[1];
-   auto info = g_exdDataGen.getTerritoryType( atoi( number.c_str() ) );
+   auto info = g_exdDataGen.get< Core::Data::TerritoryType >( atoi( number.c_str() ) );
    std::string responseStr = "Not found!";
    if( info )
       responseStr = info->name + ", " + info->bg;

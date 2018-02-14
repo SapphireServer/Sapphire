@@ -31,8 +31,8 @@ Core::Logger g_log;
 Core::Data::ExdData g_exdData;
 bool skipUnmapped = true;
 
-//const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
-std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv" );
+std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
+//std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv" );
 std::map< uint8_t, std::string > g_typeMap;
 
 
@@ -48,9 +48,7 @@ std::string generateIdListDecl( const std::string &exd )
 
 std::string generateDirectGetters( const std::string& exd )
 {
-         
-   return  "     using " + exd + "Ptr =  boost::shared_ptr< " + exd + " >;\n" +
-           "     " + exd + "Ptr get" + exd + "( uint32_t " + exd + "Id );\n";
+   return "     using " + exd + "Ptr =  boost::shared_ptr< " + exd + " >;\n";
 }
 
 std::string generateIdListGetter( const std::string &exd )
@@ -77,25 +75,9 @@ std::string generateSetDatAccessCall( const std::string &exd )
    return "      m_" + exd + "Dat = setupDatAccess( \"" + exd + "\", " + lang + " );\n";
 }
 
-std::string generateDirectGetterDef( const std::string& exd )
+std::string generateDirectGetterDef()
 {
    std::string result = "";
-   result =
-      "Core::Data::ExdDataGenerated::" + exd + "Ptr\n"
-      "   Core::Data::ExdDataGenerated::get" + exd + "( uint32_t " + exd + "Id )\n"
-      "{\n"
-      "   try\n"
-      "   {\n"
-      "      auto row = m_" + exd + "Dat.get_row( " + exd + "Id );\n"
-      "      auto info = boost::make_shared< " + exd + " >( " + exd + "Id, this );\n"
-      "      return info;\n"
-      "   }\n"
-      "   catch( ... )\n"
-      "   {\n"
-      "      return nullptr;\n"
-      "   }\n"
-      "   return nullptr;\n"
-      "}\n";
    return result;
 }
 std::map< uint32_t, std::string > indexToNameMap;
@@ -232,9 +214,9 @@ std::string generateConstructorsDecl( const std::string& exd )
    int count = 0;
 
 
-   result += "\n      Core::Data::" + exd + "::" + exd + "( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )\n";
-   result += "      {\n";
-   std::string indent = "         ";
+   result += "\nCore::Data::" + exd + "::" + exd + "( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )\n";
+   result += "{\n";
+   std::string indent = "   ";
    result += indent + "auto row = exdData->m_" + exd + "Dat.get_row( row_id );\n";
    for( auto member : exhMem )
    {  
@@ -263,7 +245,7 @@ std::string generateConstructorsDecl( const std::string& exd )
       }
       count++;
    }
-   result += "      }\n";
+   result += "}\n";
 
    indexToNameMap.clear();
    indexToTypeMap.clear();
@@ -342,10 +324,27 @@ int main( int argc, char** argv )
       idListsDecl += generateIdListDecl( name );
       getterDecl += generateDirectGetters( name );
       datAccCall += generateSetDatAccessCall( name );
-      getterDef += generateDirectGetterDef( name );
       constructorDecl += generateConstructorsDecl( name );
       idListGetters += generateIdListGetter( name );
    }
+
+   getterDecl +=
+      "\n     template< class T >\n"
+      "     boost::shared_ptr< T > get( uint32_t id )\n"
+      "     {\n"
+      "        try\n"
+      "        {\n"
+      "           auto info = boost::make_shared< T >( id, this );\n"
+      "           return info;\n"
+      "        }\n"
+      "        catch( ... )\n"
+      "        {\n"
+      "           return nullptr;\n"
+      "        }\n"
+      "        return nullptr;\n"
+      "     }\n";
+
+   getterDef += generateDirectGetterDef();
 
    // for all sheets in the json i guess....
 

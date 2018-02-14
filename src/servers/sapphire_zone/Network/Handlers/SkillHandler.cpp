@@ -60,7 +60,7 @@ void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inP
         std::string actionIdStr = boost::str( boost::format( "%|04X|" ) % action );
         player.sendDebug( "---------------------------------------" );
         player.sendDebug( "ActionHandler ( " + actionIdStr + " | " +
-                          g_exdDataGen.getAction( action )->name +
+                          g_exdDataGen.get< Core::Data::Action >( action )->name +
                           " | " + std::to_string( targetId ) + " )" );
 
         player.queuePacket( ActorControlPacket142( player.getId(), ActorControlType::ActionStart, 0x01, action ) );
@@ -100,7 +100,7 @@ void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inP
     }
     else if( action < 3000000 ) // item action
     {
-        auto info = g_exdDataGen.getEventItem( action );
+        auto info = g_exdDataGen.get< Core::Data::EventItem >( action );
         if( info )
         {
             g_log.debug( info->name );

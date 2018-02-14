@@ -200,11 +200,11 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
         case 0xCA: // Teleport
         {
             // TODO: only register this action if enough gil is in possession
-            auto targetAetheryte = g_exdDataGen.getAetheryte( param11 );
+            auto targetAetheryte = g_exdDataGen.get< Core::Data::Aetheryte >( param11 );
 
             if( targetAetheryte )
             {
-               auto fromAetheryte = g_exdDataGen.getAetheryte( g_exdDataGen.getTerritoryType( player.getZoneId() )->aetheryte );
+               auto fromAetheryte = g_exdDataGen.get< Core::Data::Aetheryte >( g_exdDataGen.get< Core::Data::TerritoryType >( player.getZoneId() )->aetheryte );
 
                 // calculate cost - does not apply for favorite points or homepoints neither checks for aether tickets
                 auto cost = static_cast< uint16_t > ( ( sqrt( pow( fromAetheryte->aetherstreamX - targetAetheryte->aetherstreamX, 2 ) +

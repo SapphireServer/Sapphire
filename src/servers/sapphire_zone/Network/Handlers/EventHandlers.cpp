@@ -52,7 +52,7 @@ void Core::Network::GameConnection::eventHandlerTalk( const Packets::GamePacket&
    if( !g_scriptMgr.onTalk( player, actorId, eventId ) &&
        eventType == Event::EventHandler::EventHandlerType::Quest )
    {
-      auto questInfo = g_exdDataGen.getQuest( eventId );
+      auto questInfo = g_exdDataGen.get< Core::Data::Quest >( eventId );
       if ( questInfo )
          player.sendUrgent( "Quest not implemented: " + questInfo->name + " (" + questInfo->id + ")" );
    }
@@ -87,7 +87,7 @@ void Core::Network::GameConnection::eventHandlerEmote( const Packets::GamePacket
    if( !g_scriptMgr.onEmote( player, actorId, eventId, static_cast< uint8_t >( emoteId ) )  &&
        eventType == Event::EventHandler::EventHandlerType::Quest )
    {
-      auto questInfo = g_exdDataGen.getQuest( eventId );
+      auto questInfo = g_exdDataGen.get< Core::Data::Quest >( eventId );
       if( questInfo )
          player.sendUrgent( "Quest not implemented: " + questInfo->name );
    }

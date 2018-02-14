@@ -456,7 +456,7 @@ void Core::Entity::Player::updateSql()
 
 void Core::Entity::Player::updateDbClass() const
 {
-   uint8_t classJobIndex = g_exdDataGen.getClassJob( static_cast<uint8_t>( getClass() ) )->expArrayIndex;
+   uint8_t classJobIndex = g_exdDataGen.get< Core::Data::ClassJob >( static_cast<uint8_t>( getClass() ) )->expArrayIndex;
 
    //Exp = ?, Lvl = ? WHERE CharacterId = ? AND ClassIdx = ?
    auto stmtS = g_charaDb.getPreparedStatement( Db::CHARA_CLASS_UP );

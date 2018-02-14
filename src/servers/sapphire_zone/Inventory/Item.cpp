@@ -24,7 +24,7 @@ Core::Item::Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t mo
    m_model2( model2 ),
    m_isHq( isHq )
 {
-   auto itemInfo = g_exdDataGen.getItem( catalogId );
+   auto itemInfo = g_exdDataGen.get< Core::Data::Item >( catalogId );
    m_delayMs = itemInfo->delayms;
    m_physicalDmg = itemInfo->damagePhys;
    m_magicalDmg = itemInfo->damageMag;

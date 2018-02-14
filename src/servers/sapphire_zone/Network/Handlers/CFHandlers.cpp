@@ -70,7 +70,7 @@ void Core::Network::GameConnection::cfRegisterDuty( const Packets::GamePacket& i
    cfCancelPacket.data().state2 = 1; // Your registration is withdrawn.
    queueOutPacket( cfCancelPacket );
 
-   auto cfCondition = g_exdDataGen.getContentFinderCondition( contentId1 );
+   auto cfCondition = g_exdDataGen.get< Core::Data::ContentFinderCondition >( contentId1 );
    if( !cfCondition )
       return;
 

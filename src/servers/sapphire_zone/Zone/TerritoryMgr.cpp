@@ -25,7 +25,7 @@ void Core::TerritoryMgr::loadTerritoryTypeDetailCache()
 
    for( auto id : idList )
    {
-      auto teri1 = g_exdDataGen.getTerritoryType( id );
+      auto teri1 = g_exdDataGen.get< Core::Data::TerritoryType >( id );
 
       if( !teri1->name.empty() )
          m_territoryTypeDetailCacheMap[id] = teri1;
@@ -106,7 +106,7 @@ bool Core::TerritoryMgr::createDefaultTerritories()
       if( territoryInfo->name.empty() )
          continue;
 
-      auto pPlaceName = g_exdDataGen.getPlaceName( territoryInfo->placeName );
+      auto pPlaceName = g_exdDataGen.get< Core::Data::PlaceName >( territoryInfo->placeName );
 
       if( !pPlaceName || pPlaceName->name.empty() || !isDefaultTerritory( territoryId ) )
          continue;
@@ -142,7 +142,7 @@ Core::ZonePtr Core::TerritoryMgr::createTerritoryInstance( uint32_t territoryTyp
       return nullptr;
 
    auto pTeri = getTerritoryDetail( territoryTypeId );
-   auto pPlaceName = g_exdDataGen.getPlaceName( pTeri->placeName );
+   auto pPlaceName = g_exdDataGen.get< Core::Data::PlaceName >( pTeri->placeName );
 
    if( !pTeri || !pPlaceName )
       return nullptr;
@@ -160,7 +160,7 @@ Core::ZonePtr Core::TerritoryMgr::createTerritoryInstance( uint32_t territoryTyp
 
 Core::ZonePtr Core::TerritoryMgr::createInstanceContent( uint32_t instanceContentId )
 {
-   auto pInstanceContent = g_exdDataGen.getInstanceContent( instanceContentId );
+   auto pInstanceContent = g_exdDataGen.get< Core::Data::InstanceContent >( instanceContentId );
    if( !pInstanceContent )
       return nullptr;
 
