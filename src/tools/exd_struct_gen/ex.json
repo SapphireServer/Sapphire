@@ -533,10 +533,6 @@
           }
         },
         {
-          "index": 11,
-          "name": "Destination"
-        },
-        {
           "index": 15,
           "name": "IsAetheryte"
         },
@@ -5889,6 +5885,14 @@
           }
         },
         {
+          "index": 13,
+          "name": "JournalGenre",
+          "converter": {
+            "type": "link",
+            "target": "JournalGenre"
+          }
+        },
+        {
           "index": 15,
           "name": "PlaceName{StartZone}",
           "converter": {
@@ -6953,10 +6957,35 @@
       ]
     },
     {
+      "sheet": "OrchestrionCategory",
+      "defaultColumn": "Name",
+      "definitions": [
+        {
+          "name": "Name"
+        }
+      ]
+    },
+    {
       "sheet": "OrchestrionPath",
       "definitions": [
         {
           "name": "File"
+        }
+      ]
+    },
+    {
+      "sheet": "OrchestrionUiparam",
+      "definitions": [
+        {
+          "name": "OrchestrionCategory",
+          "converter": {
+            "type": "link",
+            "target": "OrchestrionCategory"
+          }
+        },
+        {
+          "index": 1,
+          "name": "Order"
         }
       ]
     },
@@ -8788,6 +8817,90 @@
       "sheet": "Story",
       "isGenericReferenceTarget": true,
       "definitions": []
+    },
+    {
+      "sheet": "SubmarineExploration",
+      "defaultColumn": "Destination",
+      "definitions": [
+        {
+          "name": "Destination"
+        },
+        {
+          "index": 1,
+          "name": "Location"
+        },
+        {
+          "index": 5,
+          "name": "RankReq"
+        },
+        {
+          "index": 6,
+          "name": "CeruleumTankReq"
+        },
+        {
+          "index": 7,
+          "name": "Duration<min>"
+        },
+        {
+          "index": 8,
+          "name": "DistanceForSurvey"
+        },
+        {
+          "index": 9,
+          "name": "ExpReward"
+        }
+      ]
+    },
+    {
+      "sheet": "SubmarinePart",
+      "defaultColumn": "Slot",
+      "definitions": [
+        {
+          "name": "Slot"
+        },
+        {
+          "index": 1,
+          "name": "Rank"
+        },
+        {
+          "index": 2,
+          "name": "Components"
+        },
+        {
+          "index": 3,
+          "name": "Surveillance"
+        },
+        {
+          "index": 4,
+          "name": "Retrieval"
+        },
+        {
+          "index": 5,
+          "name": "Speed"
+        },
+        {
+          "index": 6,
+          "name": "Range"
+        },
+        {
+          "index": 7,
+          "name": "Favor"
+        },
+        {
+          "index": 9,
+          "name": "RepairMaterials"
+        }
+      ]
+    },
+    {
+      "sheet": "SubmarineRank",
+      "defaultColumn": "Slot",
+      "definitions": [
+        {
+          "index": 1,
+          "name": "ExpToNext"
+        }
+      ]
     },
     {
       "sheet": "SwitchTalk",

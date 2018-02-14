@@ -418,7 +418,7 @@ void Core::Entity::BattleNpc::onDeath()
             auto levelDiff = static_cast< int32_t >( this->m_level ) - level;
             auto cappedLevelDiff = Math::Util::clamp( levelDiff, 1, 6 );
 
-            auto expNeeded = g_exdDataGen.getParamGrow( m_level + cappedLevelDiff - 1 )->expToNext;
+            auto expNeeded = g_exdDataGen.get< Core::Data::ParamGrow >( m_level + cappedLevelDiff - 1 )->expToNext;
             int32_t exp = 0;
 
             // todo: arbitrary numbers pulled out of my ass

@@ -30,8 +30,8 @@ extern Core::Data::ExdDataGenerated g_exdDataGen;
 
 uint32_t CalcBattle::calculateHealValue( PlayerPtr pPlayer, uint32_t potency )
 {
-   auto classInfo = g_exdDataGen.getClassJob( static_cast< uint8_t >( pPlayer->getClass() ) );
-   auto paramGrowthInfo = g_exdDataGen.getParamGrow( pPlayer->getLevel() );
+   auto classInfo = g_exdDataGen.get< Core::Data::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
+   auto paramGrowthInfo = g_exdDataGen.get< Core::Data::ParamGrow >( pPlayer->getLevel() );
 
    if ( !classInfo || !paramGrowthInfo )
       return 0;

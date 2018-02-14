@@ -220,7 +220,7 @@ namespace Core {
       // CharacterId, ClassIdx, Exp, Lvl
       auto stmtClass = g_charaDb.getPreparedStatement( Db::CharaDbStatements::CHARA_CLASS_INS );
       stmtClass->setInt( 1, m_id );
-      stmtClass->setInt( 2, g_exdDataGen.getClassJob( m_class )->expArrayIndex );
+      stmtClass->setInt( 2, g_exdDataGen.get< Core::Data::ClassJob >( m_class )->expArrayIndex );
       stmtClass->setInt( 3, 0 );
       stmtClass->setInt( 4, 1 );
       g_charaDb.directExecute( stmtClass );
@@ -292,14 +292,14 @@ namespace Core {
 
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       /// SETUP EQUIPMENT / STARTING GEAR
-      auto classJobInfo = g_exdDataGen.getClassJob( m_class );
+      auto classJobInfo = g_exdDataGen.get< Core::Data::ClassJob >( m_class );
       uint32_t weaponId = classJobInfo->itemStartingWeapon;
       uint64_t uniqueId = getNextUId64();
 
       uint8_t race = customize[CharaLook::Race];
       uint8_t gender = customize[CharaLook::Gender];
 
-      auto raceInfo = g_exdDataGen.getRace( race );
+      auto raceInfo = g_exdDataGen.get< Core::Data::Race >( race );
 
       uint32_t body;
       uint32_t hands;

@@ -481,7 +481,7 @@ void Core::DebugCommandHandler::get( char * data, Entity::Player& player, boost:
    if( ( subCommand == "pos" ) )
    {
 
-      int16_t map_id = g_exdDataGen.getTerritoryType( player.getCurrentZone()->getTerritoryId() )->map;
+      int16_t map_id = g_exdDataGen.get< Core::Data::TerritoryType >( player.getCurrentZone()->getTerritoryId() )->map;
 
       player.sendNotice( "Pos:\n" +
                          std::to_string( player.getPos().x ) + "\n" +

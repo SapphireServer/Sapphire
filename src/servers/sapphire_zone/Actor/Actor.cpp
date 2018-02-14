@@ -671,7 +671,7 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
       getAsPlayer()->sendDebug( "Handle script skill type: " + std::to_string( type ) );
    }
 
-   auto actionInfoPtr = g_exdDataGen.getAction( actionId );
+   auto actionInfoPtr = g_exdDataGen.get< Core::Data::Action >( actionId );
 
    // Todo: Effect packet generator. 90% of this is basically setting params and it's basically unreadable.
    // Prepare packet. This is seemingly common for all packets in the action handler.

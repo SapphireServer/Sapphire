@@ -62,7 +62,7 @@ Core::Zone::Zone( uint16_t territoryId, uint32_t guId, const std::string& intern
    m_lastMobUpdate = 0;
 
    m_weatherOverride = 0;
-   m_territoryTypeInfo = g_exdDataGen.getTerritoryType( territoryId );
+   m_territoryTypeInfo = g_exdDataGen.get< Core::Data::TerritoryType >( territoryId );
 
    uint8_t weatherRateId = m_territoryTypeInfo->weatherRate > g_exdDataGen.getWeatherRateIdList().size() ?
                            uint8_t{ 0 } : m_territoryTypeInfo->weatherRate;
