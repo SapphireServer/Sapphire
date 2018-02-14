@@ -44,15 +44,15 @@ extern Core::TerritoryMgr g_territoryMgr;
 Core::Zone::Zone() :
    m_territoryId( 0 ),
    m_guId( 0 ),
-   m_currentWeather( static_cast< uint8_t >( Common::Weather::FairSkies ) ),
-   m_weatherOverride( 0 ),
+   m_currentWeather( Common::Weather::FairSkies ),
+   m_weatherOverride( Common::Weather::None ),
    m_lastMobUpdate( 0 ),
    m_currentFestivalId( 0 )
 {
 }
 
 Core::Zone::Zone( uint16_t territoryId, uint32_t guId, const std::string& internalName, const std::string& placeName ) :
-   m_currentWeather( static_cast< uint8_t >( Common::Weather::FairSkies ) )
+   m_currentWeather( Common::Weather::FairSkies )
 {
    m_guId = guId;
 
@@ -61,8 +61,21 @@ Core::Zone::Zone( uint16_t territoryId, uint32_t guId, const std::string& intern
    m_placeName = placeName;
    m_lastMobUpdate = 0;
 
-   m_weatherOverride = 0;
+   m_weatherOverride = Common::Weather::None;
    m_territoryTypeInfo = g_exdDataGen.get< Core::Data::TerritoryType >( territoryId );
+
+   loadWeatherRates();
+
+   m_currentWeather = getNextWeather();
+}
+
+void Core::Zone::loadWeatherRates()
+{
+   if( !m_territoryTypeInfo )
+   {
+      g_log.error( std::string( __FUNCTION__ ) + " TerritoryTypeInfo not loaded!" );
+      return;
+   }
 
    uint8_t weatherRateId = m_territoryTypeInfo->weatherRate > g_exdDataGen.getWeatherRateIdList().size() ?
                            uint8_t{ 0 } : m_territoryTypeInfo->weatherRate;
@@ -80,8 +93,6 @@ Core::Zone::Zone( uint16_t territoryId, uint32_t guId, const std::string& intern
       m_weatherRateMap[sumPc] = weatherId;
       i += 2;
    }
-
-   m_currentWeather = getNextWeather();
 }
 
 Core::Zone::~Zone()
@@ -102,12 +113,12 @@ bool Core::Zone::init()
    return true;
 }
 
-void Core::Zone::setWeatherOverride( uint8_t weather )
+void Core::Zone::setWeatherOverride( Common::Weather weather )
 {
    m_weatherOverride = weather;
 }
 
-uint8_t Core::Zone::getCurrentWeather() const
+Core::Common::Weather Core::Zone::getCurrentWeather() const
 {
    return m_currentWeather;
 }
@@ -227,7 +238,7 @@ void Core::Zone::loadCellCache()
 
 }
 
-uint8_t Core::Zone::getNextWeather()
+Core::Common::Weather Core::Zone::getNextWeather()
 {
    uint32_t unixTime = static_cast< uint32_t >( Util::getTimeSeconds() );
    // Get Eorzea hour for weather start
@@ -248,13 +259,13 @@ uint8_t Core::Zone::getNextWeather()
    for( auto entry : m_weatherRateMap )
    {
       uint8_t sRate = entry.first;
-      auto weatherId = static_cast< uint8_t >( entry.second );
+      auto weatherId = static_cast< Common::Weather >( entry.second );
 
       if( rate <= sRate )
          return weatherId;
    }
 
-   return 1;
+   return Common::Weather::FairSkies;
 }
 
 void Core::Zone::pushActor( Entity::ActorPtr pActor )
@@ -407,22 +418,24 @@ std::size_t Core::Zone::getPopCount() const
 
 bool Core::Zone::checkWeather()
 {
-   if ( m_weatherOverride != 0 )
+   if( m_weatherOverride != Common::Weather::None )
    {
-      if ( m_weatherOverride != m_currentWeather )
+      if( m_weatherOverride != m_currentWeather )
       {
          m_currentWeather = m_weatherOverride;
-         g_log.debug( "[Zone:" + m_internalName + "] overriding weather to : " + std::to_string( m_weatherOverride ) );
+         g_log.debug( "[Zone:" + m_internalName + "] overriding weather to : " +
+                      std::to_string( static_cast< uint8_t >( m_weatherOverride ) ) );
          return true;
       }
    }
    else
    {
       auto nextWeather = getNextWeather();
-      if ( nextWeather != m_currentWeather )
+      if( nextWeather != m_currentWeather )
       {
          m_currentWeather = nextWeather;
-         g_log.debug( "[Zone:" + m_internalName + "] changing weather to : " + std::to_string( nextWeather ) );
+         g_log.debug( "[Zone:" + m_internalName + "] changing weather to : " +
+                      std::to_string( static_cast< uint8_t >( nextWeather ) ) );
          return true;
       }
    }
@@ -522,7 +535,7 @@ void Core::Zone::updateSessions( bool changedWeather )
       {
          Core::Network::Packets::ZoneChannelPacket< Core::Network::Packets::Server::FFXIVIpcWeatherChange  >
                  weatherChangePacket( pSession->getPlayer()->getId() );
-         weatherChangePacket.data().weatherId = m_currentWeather;
+         weatherChangePacket.data().weatherId = static_cast< uint8_t >( m_currentWeather );
          weatherChangePacket.data().delay = 5.0f;
          pSession->getPlayer()->queuePacket( weatherChangePacket );
       }

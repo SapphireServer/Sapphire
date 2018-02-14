@@ -44,8 +44,8 @@ protected:
 
    CellCache** m_pCellCache[_sizeX];
 
-   uint8_t m_currentWeather;
-   uint8_t m_weatherOverride;
+   Common::Weather m_currentWeather;
+   Common::Weather m_weatherOverride;
 
    uint64_t m_lastMobUpdate;
 
@@ -65,9 +65,9 @@ public:
    bool init();
 
    /*! overrides the zone's weather, set to 0 to unlock */
-   void setWeatherOverride( uint8_t weather );
+   void setWeatherOverride( Common::Weather weather );
 
-   uint8_t getCurrentWeather() const;
+   Common::Weather getCurrentWeather() const;
 
    uint16_t getCurrentFestival() const;
    void setCurrentFestival( uint16_t festivalId );
@@ -84,7 +84,7 @@ public:
    virtual void onLeaveTerritory( Entity::Player& player );
    virtual void onUpdate( uint32_t currTime );
 
-   uint8_t getNextWeather();
+   Common::Weather getNextWeather();
 
    void pushActor( Entity::ActorPtr pActor );
 
@@ -106,6 +106,7 @@ public:
    const std::string& getInternalName() const;
 
    std::size_t getPopCount() const;
+   void loadWeatherRates();
    bool checkWeather();
    void updateBnpcs( int64_t tickCount );
 
