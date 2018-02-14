@@ -481,8 +481,18 @@ bool Core::Zone::update( uint32_t currTime )
 {
    int64_t tickCount = Util::getTimeMs();
 
+   //TODO: this should be moved to a updateWeather call and pulled out of updateSessions
    bool changedWeather = checkWeather();
 
+   updateSessions( changedWeather );
+   updateBnpcs( tickCount );
+   onUpdate( currTime );
+
+   return true;
+}
+
+void Core::Zone::updateSessions( bool changedWeather )
+{
    auto it = m_sessionSet.begin();
 
    // update sessions in this zone
@@ -493,24 +503,24 @@ bool Core::Zone::update( uint32_t currTime )
 
       if( !pSession )
       {
-         it = m_sessionSet.erase( it );
+         it = m_sessionSet.erase(it );
          continue;
       }
 
       // this session is not linked to this area anymore, remove it from zone session list
-      if( ( !pSession->getPlayer()->getCurrentZone() )
-          || ( pSession->getPlayer()->getCurrentZone() != shared_from_this() ) )
+      if( ( !pSession->getPlayer()->getCurrentZone() ) ||
+          ( pSession->getPlayer()->getCurrentZone() != shared_from_this() ) )
       {
          if( pSession->getPlayer()->getCell() )
-            removeActor( pSession->getPlayer() );
+            removeActor(pSession->getPlayer() );
 
-         it = m_sessionSet.erase( it );
+         it = m_sessionSet.erase(it );
          continue;
       }
 
       if( changedWeather )
       {
-         Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcWeatherChange  >
+         Core::Network::Packets::ZoneChannelPacket< Core::Network::Packets::Server::FFXIVIpcWeatherChange  >
                  weatherChangePacket( pSession->getPlayer()->getId() );
          weatherChangePacket.data().weatherId = m_currentWeather;
          weatherChangePacket.data().delay = 5.0f;
@@ -521,12 +531,6 @@ bool Core::Zone::update( uint32_t currTime )
       pSession->update();
       ++it;
    }
-
-   updateBnpcs( tickCount );
-
-   onUpdate( currTime );
-
-   return true;
 }
 
 bool Core::Zone::isCellActive( uint32_t x, uint32_t y )

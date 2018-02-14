@@ -111,6 +111,8 @@ public:
 
    bool update( uint32_t currTime );
 
+   void updateSessions( bool changedWeather );
+
    void registerInstanceObj( Entity::InstanceObjectPtr object );
    Entity::InstanceObjectPtr getInstanceObject( uint32_t objId );
    void updateInstanceObj( Entity::InstanceObjectPtr object );
