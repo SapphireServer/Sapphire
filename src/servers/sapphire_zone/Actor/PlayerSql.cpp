@@ -313,7 +313,8 @@ bool Core::Entity::Player::loadSearchInfo()
 
    m_searchSelectClass = res->getUInt8( 1 );
    m_searchSelectRegion = res->getUInt8( 2 );
-   sprintf( m_searchMessage, res->getString( 3 ).c_str() );
+   auto searchMessage = res->getString( 3 );
+   std::copy( searchMessage.begin(), searchMessage.end(), m_searchMessage );
 
    return true;
 }
