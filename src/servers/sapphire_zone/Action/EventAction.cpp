@@ -53,7 +53,7 @@ void Core::Action::EventAction::onStart()
    if( m_pSource->isPlayer() )
    {
       m_pSource->sendToInRangeSet( control, true );
-      m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::Occupied2 );
+      //m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::Occupied2 );
    }
    else
       m_pSource->sendToInRangeSet( control );
@@ -82,7 +82,7 @@ void Core::Action::EventAction::onFinish()
 
       if( m_pSource->isPlayer() )
       {
-         m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied2 );
+         //m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied2 );
          m_pSource->sendToInRangeSet( control, true );
       }
       else
@@ -110,8 +110,8 @@ void Core::Action::EventAction::onInterrupt()
       {
          auto control1 = ActorControlPacket143( m_pSource->getId(), ActorControlType::FreeEventPos, m_eventId );
 
-         m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::NoCombat );
-         m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied1 );
+         //m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::NoCombat );
+         //m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied1 );
          m_pSource->sendToInRangeSet( control );
          m_pSource->sendToInRangeSet( control1 );
 

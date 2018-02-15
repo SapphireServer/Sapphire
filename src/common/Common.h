@@ -380,73 +380,21 @@ namespace Common {
       InvincibilityStayAlive,
    };
 
-   enum struct PlayerStateFlag : uint8_t
+   enum PlayerStateFlag : uint8_t
    {
-      NoCombat,
-      Combat,
-      Casting,
-      StatusAffliction,
-      StatusAffliction1,
-      Occupied,
-      Occupied1,
-      Occupied2,
-      Occupied3,
+      HideUILockChar = 0, // as the name suggests, hides the ui and logs the char...
+      InCombat = 1, // in Combat, locks gearchange/return/teleport
+      Casting = 2,
+      InNpcEvent = 7, // when talking to an npc, locks ui giving "occupied" message
 
-      BoundByDuty,
-      Occupied4,
-      DuelingArea,
-      TradeOpen,
-      Occupied5,
-      HandlingItems,
-      Crafting,
-      PreparingToCraft,
-      Gathering,
-      Fishing,
+      InNpcEvent1 = 10, // Sent together with InNpcEvent, when waiting for input? just a guess...
 
-      BeingRaised,
-      BetweenAreas,
-      Stealthed,
-      InnRoom,
-      Jumping,
-      AutoRun,
-      Occupied6,
-      BetweenAreas1,
-      SystemError,
-      LoggingOut,
+      BoundByDuty = 11,
 
-      InvalidLocation,
-      WaitingForDuty,
-      BoundByDuty1,
-      Mounting,
-      WatchingCutscene,
-      WaitingForDutyFinder,
-      CreatingCharacter,
-      Jumping1,
-      PvpDisplay,
-      StatusAfflication2,
+      BetweenAreas = 24,
 
-      Mounting1,
-      CarryingItem,
-      UsingPartyFinder,
-      HousingFunctions,
-      Transformed,
-      FreeTrail,
-      BeingMoved,
-      Mounting2,
-      StatusAffliction3,
-      StatusAffliction4,
+      WatchingCutscene = 50, // this is actually just a dummy, this id is different
 
-      RegisteringRaceOrMatch,
-      WaitingForRaceOrMatch,
-      WaitingForTripleTriadMatch,
-      InFlight,
-      WatchingCutscene1,
-      DeepDungeon,
-      Swimming,
-      Diving,
-      RegisteringTripleTriad,
-      WaitingTripleTriad,
-      InCrossWorldParty
 
    };
 

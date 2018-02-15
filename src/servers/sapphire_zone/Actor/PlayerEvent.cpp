@@ -84,7 +84,7 @@ void Core::Entity::Player::eventStart( uint64_t actorId, uint32_t eventId,
 
    addEvent( newEvent );
 
-   setStateFlag( PlayerStateFlag::Occupied2 );
+   setStateFlag( PlayerStateFlag::InNpcEvent );
 
    EventStartPacket eventStart( getId(), actorId, eventId, eventType, eventParam1, eventParam2 );
    
@@ -218,7 +218,7 @@ void Core::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlayer )
    removeEvent( pEvent->getId() );
 
    if( freePlayer == 1 )
-      unsetStateFlag( PlayerStateFlag::Occupied2 );
+      unsetStateFlag( PlayerStateFlag::InNpcEvent );
 }
 
 void Core::Entity::Player::eventActionStart( uint32_t eventId,
@@ -289,7 +289,6 @@ void Core::Entity::Player::onDeath()
 {
 
 }
-
 
 // TODO: slightly ugly here and way too static. Needs too be done properly
 void Core::Entity::Player::onTick()

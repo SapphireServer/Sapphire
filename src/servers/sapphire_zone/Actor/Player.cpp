@@ -177,7 +177,7 @@ Core::Common::OnlineStatus Core::Entity::Player::getOnlineStatus()
    if( m_onlineStatus & rpMask )
       status = OnlineStatus::Roleplaying;
 
-   if( hasStateFlag( PlayerStateFlag::WatchingCutscene ) || hasStateFlag( PlayerStateFlag::WatchingCutscene1 ) )
+   if( hasStateFlag( PlayerStateFlag::WatchingCutscene ) )
       status = OnlineStatus::ViewingCutscene;
 
    // TODO: add all the logic for returning the proper online status, there probably is a better way for this alltogether

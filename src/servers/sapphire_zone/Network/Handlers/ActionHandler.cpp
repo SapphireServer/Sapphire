@@ -117,6 +117,10 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
                player.getCurrentAction()->setInterrupted();
            break;
         }
+        case 0x12D: // Mark player
+        {
+           break;
+        }
         case 0x12E: // Set player title
         {
            player.setTitle( static_cast< uint16_t >( param1 ) );
@@ -132,7 +136,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
         }
         case 0x133: // Update howtos seen
         {
-            uint32_t howToId = static_cast< uint32_t >( param1 );
+            uint32_t howToId = param11;
             player.updateHowtosSeen( howToId );
             break;
         }
@@ -144,7 +148,23 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
             player.sendToInRangeSet( ActorControlPacket144( player.getId(), Emote, emoteId, 0, 0, 0, targetId ) );
             break;
         }
-        case 0xC8: // return dead
+        case 0x1F7: // cancel persistant emote
+        {
+            break;
+        }
+        case 0x1F9: // change pose
+        {
+            break;
+        }
+        case 0x1FA: // reapply pose
+        {
+            break;
+        }
+        case 0x1FB: // cancel pose
+        {
+            break;
+        }
+        case 0xC8: // return dead / accept raise
         {
            switch ( static_cast < ResurrectType >( param1 ) )
            {
@@ -193,7 +213,6 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
             player.setZoningType( Common::ZoneingType::None );
 
             player.unsetStateFlag( PlayerStateFlag::BetweenAreas );
-            player.unsetStateFlag( PlayerStateFlag::BetweenAreas1 );
             break;
         }
 
