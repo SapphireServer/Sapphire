@@ -564,16 +564,14 @@ void Core::Network::GameConnection::tellHandler( const Packets::GamePacket& inPa
 
    auto pTargetPlayer = pSession->getPlayer();
 
-   if( pTargetPlayer->hasStateFlag( PlayerStateFlag::BetweenAreas ) ||
-       pTargetPlayer->hasStateFlag( PlayerStateFlag::BetweenAreas1 ) )
+   if( pTargetPlayer->hasStateFlag( PlayerStateFlag::BetweenAreas ) )
    {
       // send error for player between areas
       // TODO: implement me
       return;
    }
 
-   if( pTargetPlayer->hasStateFlag( PlayerStateFlag::BoundByDuty ) ||
-       pTargetPlayer->hasStateFlag( PlayerStateFlag::BoundByDuty1 ) )
+   if( pTargetPlayer->hasStateFlag( PlayerStateFlag::BoundByDuty ) )
    {
       // send error for player bound by duty
       // TODO: implement me

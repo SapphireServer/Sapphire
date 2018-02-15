@@ -94,7 +94,7 @@ void Core::Action::ActionMount::onInterrupt()
    if( !m_pSource )
       return;
 
-   m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied1 );
+   //m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied1 );
    m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Casting );
 
    auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt,

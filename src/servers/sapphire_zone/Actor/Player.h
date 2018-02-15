@@ -637,7 +637,7 @@ private:
    boost::shared_ptr< Common::QuestActive > m_activeQuests[30];
    int16_t m_questTracking[5];
 
-   uint8_t m_stateFlags[7];
+   uint8_t m_stateFlags[12];
    uint8_t m_gmRank;
    uint16_t zoneId;
 

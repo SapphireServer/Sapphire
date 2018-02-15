@@ -26,8 +26,8 @@ public:
    PlayerStateFlagsPacket( Entity::Player& player, std::vector< Common::PlayerStateFlag > flags ) :
       ZoneChannelPacket< FFXIVIpcPlayerStateFlags >( player.getId(), player.getId() )
    {
-      uint8_t newFlags[7];
-      memset( newFlags, 0, 7 );
+      uint8_t newFlags[12];
+      memset( newFlags, 0, 12 );
 
       for( auto& flag : flags )
       {
@@ -46,7 +46,7 @@ public:
 private:
    void initialize( const uint8_t* flags )
    {
-      memcpy( m_data.flags, flags, 7 );
+      memcpy( m_data.flags, flags, 12 );
    };
 };
 
