@@ -347,12 +347,15 @@ public:
    void prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadoutTime = 0, uint16_t animation = 0 );
    /*! get player's title list (available titles) */
    uint8_t* getTitleList();
+   const uint8_t* getTitleList() const;
    /*! get player's active title */
    uint16_t getTitle() const;
    /*! add title to player title list */
    void addTitle( uint16_t titleId );
    /*! change player's active title */
    void setTitle( uint16_t titleId );
+   /*! send the players title list */
+   void sendTitleList();
    /*! change gear param state */
    void setEquipDisplayFlags( uint8_t state );
    /*! get gear param state */

@@ -1357,6 +1357,11 @@ uint8_t* Core::Entity::Player::getTitleList()
    return m_titleList;
 }
 
+const uint8_t* Core::Entity::Player::getTitleList() const
+{
+   return m_titleList;
+}
+
 uint16_t Core::Entity::Player::getTitle() const
 {
    return m_activeTitle;
@@ -1541,17 +1546,17 @@ void Core::Entity::Player::setEorzeaTimeOffset( uint64_t timestamp )
    queuePacket( packet );
 }
 
-void Player::setTerritoryId( uint32_t territoryId )
+void Core::Entity::Player::setTerritoryId( uint32_t territoryId )
 {
    m_zoneId = territoryId;
 }
 
-uint32_t Player::getTerritoryId() const
+uint32_t Core::Entity::Player::getTerritoryId() const
 {
    return m_zoneId;
 }
 
-void Player::sendZonePackets()
+void Core::Entity::Player::sendZonePackets()
 {
    ZoneChannelPacket< FFXIVIpcInit > initPacket( getId() );
    initPacket.data().charId = getId();
@@ -1623,12 +1628,20 @@ void Player::sendZonePackets()
    m_bMarkedForZoning = false;
 }
 
-void Player::setDirectorInitialized( bool isInitialized )
+void Core::Entity::Player::setDirectorInitialized( bool isInitialized )
 {
    m_directorInitialized = isInitialized;
 }
 
-bool Player::isDirectorInitialized() const
+bool Core::Entity::Player::isDirectorInitialized() const
 {
    return m_directorInitialized;
+}
+
+void  Core::Entity::Player::sendTitleList()
+{
+   ZoneChannelPacket< FFXIVIpcPlayerTitleList > titleListPacket( getId() );
+   memcpy( titleListPacket.data().titleList, getTitleList(), sizeof( titleListPacket.data().titleList ) );
+
+   queuePacket( titleListPacket );
 }

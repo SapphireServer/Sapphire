@@ -43,6 +43,55 @@ using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
+enum ClientTrigger
+{
+   ToggleSeathe = 0x01,
+   ToggleAutoAttack = 0x02,
+   ChangeTarget = 0x03,
+
+   Dismount = 0x65,
+
+   RemoveStatusEffect = 0x68,
+   CastCancel = 0x69,
+
+   Return = 0xC8, // return dead / accept raise
+   FinishZoning = 0xC9,
+   Teleport = 0xCA,
+
+   MarkPlayer = 0x12D, // Mark player, visible to party only
+   SetTitle = 0x12E,
+   TitleList = 0x12F,
+
+   UpdatedSeenHowTos = 0x133,
+   AllotAttribute = 0x135,
+
+   HuntingLogDetails = 0x194,
+
+   EstateTimers = 0x1AB,
+  
+   DyeItem = 0x1B5,
+
+   Emote = 0x1F4,
+   PersistantEmoteCancel = 0x1F7,
+   PoseChange = 0x1F9,
+   PoseReapply = 0x1FA,
+   PoseCancel = 0x1FB,
+
+   AchievementCrit = 0x202,
+   AchievementComp = 0x203,
+   AchievementCatChat = 0x206,
+  
+   AchievementCritReq = 0x3E8,
+   AchievementList = 0x3E9,
+   
+   DirectorInitFinish = 0x321,
+
+   CompanionAction = 0x6A4,
+   CompanionSetBarding = 0x6A5,
+   CompanionActionUnlock = 0x6A6,
+
+};
+
 void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& inPacket,
                                                    Entity::Player& player )
 {
@@ -65,7 +114,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
 
     switch( commandId )
     {
-        case 0x01:  // Toggle sheathe
+        case ClientTrigger::ToggleSeathe:  // Toggle sheathe
         {
             if ( param11 == 1 )
                 player.setStance( Entity::Actor::Stance::Active );
@@ -79,7 +128,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
 
             break;
         }
-        case 0x02:  // Toggle auto-attack
+        case ClientTrigger::ToggleAutoAttack:  // Toggle auto-attack
         {
             if ( param11 == 1 )
             {
@@ -93,78 +142,75 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
 
             break;
         }
-        case 0x03: // Change target
+        case ClientTrigger::ChangeTarget: // Change target
         {
 
             uint64_t targetId = inPacket.getValAt< uint64_t >( 0x24 );
             player.changeTarget( targetId );
             break;
         }
-        case 0x65:
+        case ClientTrigger::Dismount:
         {
            player.dismount();
            break;
         }
-        case 0x68: // Remove status (clicking it off)
+        case ClientTrigger::RemoveStatusEffect: // Remove status (clicking it off)
         {
            // todo: check if status can be removed by client from exd
            player.removeSingleStatusEffectById( static_cast< uint32_t >( param1 ) );
            break;
         }
-        case 0x69: // Cancel cast
+        case ClientTrigger::CastCancel: // Cancel cast
         {
            if( player.getCurrentAction() )
                player.getCurrentAction()->setInterrupted();
            break;
         }
-        case 0x12D: // Mark player
+        case ClientTrigger::MarkPlayer: // Mark player
         {
            break;
         }
-        case 0x12E: // Set player title
+        case ClientTrigger::SetTitle: // Set player title
         {
            player.setTitle( static_cast< uint16_t >( param1 ) );
            break;
         }
-        case 0x12F: // Get title list
+        case ClientTrigger::TitleList: // Get title list
         {
-           ZoneChannelPacket< FFXIVIpcPlayerTitleList > titleListPacket( player.getId() );
-           memcpy( titleListPacket.data().titleList, player.getTitleList(), sizeof( titleListPacket.data().titleList ) );
-
-           player.queuePacket( titleListPacket );
+           player.sendTitleList();
            break;
         }
-        case 0x133: // Update howtos seen
+        case ClientTrigger::UpdatedSeenHowTos: // Update howtos seen
         {
             uint32_t howToId = param11;
             player.updateHowtosSeen( howToId );
             break;
         }
-        case 0x1F4: // emote
+        case ClientTrigger::Emote: // emote
         {
             uint64_t targetId = player.getTargetId();
             uint32_t emoteId = inPacket.getValAt< uint32_t >( 0x24 );
 
-            player.sendToInRangeSet( ActorControlPacket144( player.getId(), Emote, emoteId, 0, 0, 0, targetId ) );
+            player.sendToInRangeSet( ActorControlPacket144( player.getId(), ActorControlType::Emote, emoteId, 0, 0, 0, targetId ) );
             break;
         }
-        case 0x1F7: // cancel persistant emote
+        case ClientTrigger::PersistantEmoteCancel: // cancel persistant emote
         {
             break;
         }
-        case 0x1F9: // change pose
+        case ClientTrigger::PoseChange: // change pose
         {
             break;
         }
-        case 0x1FA: // reapply pose
+        case ClientTrigger::PoseReapply: // reapply pose
         {
             break;
         }
-        case 0x1FB: // cancel pose
+        case ClientTrigger::PoseCancel: // cancel pose
         {
             break;
         }
-        case 0xC8: // return dead / accept raise
+        case ClientTrigger::Return: // return dead / accept raise
         {
            switch ( static_cast < ResurrectType >( param1 ) )
            {
@@ -180,7 +226,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
            }
             
         }
-        case 0xC9: // Finish zoning
+        case ClientTrigger::FinishZoning: // Finish zoning
         {
             switch( player.getZoningType() )
             {
@@ -216,7 +262,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
             break;
         }
 
-        case 0xCA: // Teleport
+        case ClientTrigger::Teleport: // Teleport
         {
             // TODO: only register this action if enough gil is in possession
             auto targetAetheryte = g_exdDataGen.get< Core::Data::Aetheryte >( param11 );
@@ -244,11 +290,11 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
             }
             break;
         }
-        case 0x1B5: // Dye item
+        case ClientTrigger::DyeItem: // Dye item
         {
            break;
         }
-        case 0x321: // Director init finish
+        case ClientTrigger::DirectorInitFinish: // Director init finish
         {
            player.getCurrentZone()->onInitDirector( player );
            break;
