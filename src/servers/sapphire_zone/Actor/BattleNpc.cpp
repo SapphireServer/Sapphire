@@ -501,9 +501,13 @@ void Core::Entity::BattleNpc::update( int64_t currTime )
 
    case MODE_IDLE:
    {
-      ActorPtr pClosestActor = getClosestActor();
+      // this is bad, it should be getClosesPlayer
+      GameObjectPtr pClosestActor = getClosestGameObject();
 
-      if( pClosestActor && pClosestActor->isAlive() )
+      if( !pClosestActor->isPlayer() )
+         break;
+
+      if( pClosestActor && pClosestActor->getAsPlayer()->isAlive() )
       {
          distance = Math::Util::distance( getPos().x, getPos().y, getPos().z,
                                           pClosestActor->getPos().x,

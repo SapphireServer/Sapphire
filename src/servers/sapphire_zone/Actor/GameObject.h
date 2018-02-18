@@ -49,12 +49,38 @@ namespace Entity {
       /*! Type of the actor */
       ObjKind              m_objKind;
 
+      std::set< GameObjectPtr > m_inRangeGameObjects;
+      std::set< PlayerPtr > m_inRangePlayers;
+
    public:
       explicit GameObject( ObjKind type );
       virtual ~GameObject() {};
 
       virtual void spawn( PlayerPtr pTarget ) {}
       virtual void despawn( PlayerPtr pTarget ) {}
+
+      virtual void onRemoveInRangeGameObject( GameObject &pGameObject ) {}
+
+      // add an actor to in range set
+      void addInRangeGameObject( GameObjectPtr pGameObject );
+
+      // remove an actor from the in range set
+      void removeInRangeGameObject( GameObject& pGameObject );
+
+      // return true if there is at least one actor in the in range set
+      bool hasInRangeGameObject() const;
+
+      void removeFromInRange();
+
+      // clear the whole in range set, this does no cleanup
+      virtual void clearInRangeSet();
+
+      std::set< GameObjectPtr > getInRangeGameObjects( bool includeSelf = false );
+
+      // check if another actor is in the actors in range set
+      bool isInRangeSet( GameObjectPtr pGameObject ) const;
+
+      GameObjectPtr getClosestGameObject();
 
       uint32_t getId() const;
 
