@@ -19,6 +19,7 @@
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
+#include "Network/PacketWrappers/ActorControlPacket144.h"
 #include "Network/PacketWrappers/InitUIPacket.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/ChatPacket.h"
@@ -36,6 +37,7 @@
 #include "Action/Action.h"
 #include "Action/EventAction.h"
 #include "Action/EventItemAction.h"
+#include "Action/ActionTeleport.h"
 #include "Zone/ZonePosition.h"
 #include "Math/CalcStats.h"
 #include "Math/CalcBattle.h"
@@ -299,7 +301,7 @@ void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
 
    setStateFlag( PlayerStateFlag::BetweenAreas );
 
-   auto z_pos = g_territoryMgr.getTerritoryPosition( data->territory );
+   auto targetPos = g_territoryMgr.getTerritoryPosition( data->territory );
 
    Common::FFXIVARR_POSITION3 pos;
    pos.x = 0;
@@ -307,10 +309,10 @@ void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
    pos.z = 0;
    float rot = 0;
 
-   if( z_pos != nullptr )
+   if( targetPos != nullptr )
    {
-      pos = z_pos->getTargetPosition();
-      rot = z_pos->getTargetRotation();
+      pos = targetPos->getTargetPosition();
+      rot = targetPos->getTargetRotation();
    }
 
    sendDebug( "Teleport: " + g_exdDataGen.get< Core::Data::PlaceName >( data->placeName )->name + " " +
@@ -1638,10 +1640,83 @@ bool Core::Entity::Player::isDirectorInitialized() const
    return m_directorInitialized;
 }
 
-void  Core::Entity::Player::sendTitleList()
+void Core::Entity::Player::sendTitleList()
 {
    ZoneChannelPacket< FFXIVIpcPlayerTitleList > titleListPacket( getId() );
    memcpy( titleListPacket.data().titleList, getTitleList(), sizeof( titleListPacket.data().titleList ) );
 
    queuePacket( titleListPacket );
+}
+
+void Core::Entity::Player::finishZoning()
+{
+   switch( getZoningType() )
+   {
+      case ZoneingType::None:
+         sendToInRangeSet( ActorControlPacket143( getId(), ZoneIn, 0x01 ), true );
+         break;
+
+      case ZoneingType::Teleport:
+         sendToInRangeSet( ActorControlPacket143( getId(), ZoneIn, 0x01, 0, 0, 110 ), true );
+         break;
+
+      case ZoneingType::Return:
+      case ZoneingType::ReturnDead:
+      {
+         if( getStatus() == Entity::Actor::ActorStatus::Dead )
+         {
+            resetHp();
+            resetMp();
+            setStatus( Entity::Actor::ActorStatus::Idle );
+
+            sendToInRangeSet( ActorControlPacket143( getId(), ZoneIn, 0x01, 0x01, 0, 111 ), true );
+            sendToInRangeSet( ActorControlPacket142( getId(), SetStatus,
+                                                     static_cast< uint8_t >( Entity::Actor::ActorStatus::Idle ) ), true );
+         }
+         else
+            sendToInRangeSet( ActorControlPacket143( getId(), ZoneIn, 0x01, 0x00, 0, 111 ), true );
+      }
+         break;
+
+      case ZoneingType::FadeIn:
+         break;
+   }
+
+   setZoningType( Common::ZoneingType::None );
+   unsetStateFlag( PlayerStateFlag::BetweenAreas );
+}
+
+void Player::emote( uint32_t emoteId, uint64_t targetId )
+{
+   sendToInRangeSet( ActorControlPacket144( getId(), ActorControlType::Emote, emoteId, 0, 0, 0, targetId ) );
+}
+
+void Player::teleportQuery( uint16_t aetheryteId )
+{
+   // TODO: only register this action if enough gil is in possession
+   auto targetAetheryte = g_exdDataGen.get< Core::Data::Aetheryte >( aetheryteId );
+
+   if( targetAetheryte )
+   {
+      auto fromAetheryte = g_exdDataGen.get< Core::Data::Aetheryte >(
+                                          g_exdDataGen.get< Core::Data::TerritoryType >( getZoneId() )->aetheryte );
+
+      // calculate cost - does not apply for favorite points or homepoints neither checks for aether tickets
+      auto cost = static_cast< uint16_t > ( ( sqrt( pow( fromAetheryte->aetherstreamX - targetAetheryte->aetherstreamX, 2 ) +
+                                                    pow( fromAetheryte->aetherstreamY - targetAetheryte->aetherstreamY, 2 ) ) / 2 ) + 100 );
+
+      // cap at 999 gil
+      cost = cost > uint16_t{999} ? uint16_t{999} : cost;
+
+      bool insufficientGil = getCurrency( Inventory::CurrencyType::Gil ) < cost;
+      // TODO: figure out what param1 really does
+      queuePacket( ActorControlPacket143( getId(), TeleportStart, insufficientGil ? 2 : 0, aetheryteId ) );
+
+      if( !insufficientGil )
+      {
+         Action::ActionPtr pActionTeleport;
+         pActionTeleport = Action::make_ActionTeleport( getAsPlayer(), aetheryteId, cost );
+         setCurrentAction( pActionTeleport );
+      }
+   }
 }

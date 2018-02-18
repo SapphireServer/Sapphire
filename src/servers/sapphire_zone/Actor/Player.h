@@ -343,6 +343,8 @@ public:
    uint64_t getOnlineStatusMask() const;
    /*! perform a teleport of a specified type ( teleport,return,aethernet ) */
    void teleport( uint16_t aetheryteId, uint8_t type = 1 );
+   /*! query teleport of a specified type */
+   void teleportQuery( uint16_t aetheryteId );
    /*! prepares zoning / fades out the screen */
    void prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadoutTime = 0, uint16_t animation = 0 );
    /*! get player's title list (available titles) */
@@ -487,6 +489,10 @@ public:
    void performZoning( uint16_t zoneId, const Common::FFXIVARR_POSITION3& pos, float rotation );
    /*! return true if the player is marked for zoning */
    bool isMarkedForZoning() const;
+
+   void emote( uint32_t emoteId, uint64_t targetId );
+
+   void finishZoning();
 
    void sendZonePackets();
 

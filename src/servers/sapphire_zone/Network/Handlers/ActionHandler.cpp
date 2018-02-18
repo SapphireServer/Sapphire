@@ -191,7 +191,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
             uint64_t targetId = player.getTargetId();
             uint32_t emoteId = inPacket.getValAt< uint32_t >( 0x24 );
 
-            player.sendToInRangeSet( ActorControlPacket144( player.getId(), ActorControlType::Emote, emoteId, 0, 0, 0, targetId ) );
+            player.emote( emoteId, targetId );
             break;
         }
         case ClientTrigger::PersistantEmoteCancel: // cancel persistant emote
@@ -228,66 +228,13 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
         }
         case ClientTrigger::FinishZoning: // Finish zoning
         {
-            switch( player.getZoningType() )
-            {
-                case ZoneingType::None:
-                    player.sendToInRangeSet( ActorControlPacket143( player.getId(), ZoneIn, 0x01 ), true );
-                    break;
-                case ZoneingType::Teleport:
-                    player.sendToInRangeSet( ActorControlPacket143( player.getId(), ZoneIn, 0x01, 0, 0, 110 ), true );
-                    break;
-                case ZoneingType::Return:
-                case ZoneingType::ReturnDead:
-                {
-                    if( player.getStatus() == Entity::Actor::ActorStatus::Dead )
-                    {
-                        player.resetHp();
-                        player.resetMp();
-                        player.setStatus( Entity::Actor::ActorStatus::Idle );
-
-                        player.sendToInRangeSet( ActorControlPacket143( player.getId(), ZoneIn, 0x01, 0x01, 0, 111 ), true );
-                        player.sendToInRangeSet( ActorControlPacket142( player.getId(), SetStatus, static_cast< uint8_t >( Entity::Actor::ActorStatus::Idle ) ), true );
-                    }
-                    else
-                        player.sendToInRangeSet( ActorControlPacket143( player.getId(), ZoneIn, 0x01, 0x00, 0, 111 ), true );
-                }
-                    break;
-                case ZoneingType::FadeIn:
-                    break;
-            }
-
-            player.setZoningType( Common::ZoneingType::None );
-
-            player.unsetStateFlag( PlayerStateFlag::BetweenAreas );
+            player.finishZoning();
             break;
         }
 
         case ClientTrigger::Teleport: // Teleport
         {
-            // TODO: only register this action if enough gil is in possession
-            auto targetAetheryte = g_exdDataGen.get< Core::Data::Aetheryte >( param11 );
-
-            if( targetAetheryte )
-            {
-               auto fromAetheryte = g_exdDataGen.get< Core::Data::Aetheryte >( g_exdDataGen.get< Core::Data::TerritoryType >( player.getZoneId() )->aetheryte );
-
-                // calculate cost - does not apply for favorite points or homepoints neither checks for aether tickets
-                auto cost = static_cast< uint16_t > ( ( sqrt( pow( fromAetheryte->aetherstreamX - targetAetheryte->aetherstreamX, 2 ) +
-                                    pow( fromAetheryte->aetherstreamY - targetAetheryte->aetherstreamY, 2 ) ) / 2 ) + 100 );
-
-                // cap at 999 gil
-                cost = cost > uint16_t{999} ? uint16_t{999} : cost;
-
-                bool insufficientGil = player.getCurrency( Inventory::CurrencyType::Gil ) < cost;
-                // todo: figure out what param1 really does
-                player.queuePacket( ActorControlPacket143( player.getId(), TeleportStart, insufficientGil ? 2 : 0, param11 ) );
-
-                if( !insufficientGil )
-                {
-                    auto pActionTeleport = Action::make_ActionTeleport( player.getAsPlayer(), param11, cost );
-                    player.setCurrentAction( pActionTeleport );
-                }
-            }
+            player.teleportQuery( param11 );
             break;
         }
         case ClientTrigger::DyeItem: // Dye item
