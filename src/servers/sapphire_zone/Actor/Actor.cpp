@@ -52,17 +52,6 @@ std::string Core::Entity::Actor::getName() const
    return std::string( m_name );
 }
 
-/*! \return list of actors currently in range */
-std::set< Core::Entity::ActorPtr > Core::Entity::Actor::getInRangeActors( bool includeSelf )
-{
-   auto tempInRange = m_inRangeActors;
-
-   if( includeSelf )
-      tempInRange.insert( getAsActor() );
-
-   return tempInRange;
-   }
-
 /*! \return current stance of the actors */
 Core::Entity::Actor::Stance Core::Entity::Actor::getStance() const
 {
@@ -397,48 +386,6 @@ void Core::Entity::Actor::setCurrentAction( Core::Action::ActionPtr pAction )
 }
 
 /*!
-check if a given actor is in the actors in range set
-
-\param ActorPtr to be checked for
-\return true if the actor was found
-*/
-bool Core::Entity::Actor::isInRangeSet( ActorPtr pActor ) const
-{
-   return !( m_inRangeActors.find( pActor ) == m_inRangeActors.end() );
-}
-
-/*! \return ActorPtr of the closest actor in range, if none, nullptr */
-Core::Entity::ActorPtr Core::Entity::Actor::getClosestActor()
-{
-   if( m_inRangeActors.empty() )
-      // no actors in range, don't bother
-      return nullptr;
-
-   ActorPtr tmpActor = nullptr;
-
-   // arbitrary high number
-   float minDistance = 10000;
-
-   for( const auto& pCurAct : m_inRangeActors )
-   {
-      float distance = Math::Util::distance( getPos().x,
-                                             getPos().y,
-                                             getPos().z,
-                                             pCurAct->getPos().x,
-                                             pCurAct->getPos().y,
-                                             pCurAct->getPos().z );
-
-      if( distance < minDistance )
-      {
-         minDistance = distance;
-         tmpActor = pCurAct;
-      }
-   }
-
-   return tmpActor;
-}
-
-/*!
 Send a packet to all players in range, potentially to self if set and is player
 
 \param GamePacketPtr to send
@@ -469,80 +416,6 @@ void Core::Entity::Actor::sendToInRangeSet( Network::Packets::GamePacketPtr pPac
       // it might be that the player DC'd in which case the session would be invalid
       pCurAct->queuePacket( pPacket );
    }
-}
-
-/*!
-Add a given actor to the fitting in range set according to type
-but also to the global actor map
-
-\param ActorPtr to add
-*/
-void Core::Entity::Actor::addInRangeActor( ActorPtr pActor )
-{
-
-   // if this is null, something went wrong
-   assert( pActor );
-
-   // add actor to in range set
-   m_inRangeActors.insert( pActor );
-
-   if( pActor->isPlayer() )
-   {
-      auto pPlayer = pActor->getAsPlayer();
-
-      // if actor is a player, add it to the in range player set
-      m_inRangePlayers.insert( pPlayer );
-   }
-}
-
-/*!
-Remove a given actor from the matching in range set according to type
-but also to the global actor map
-
-\param ActorPtr to remove
-*/
-void Core::Entity::Actor::removeInRangeActor( Actor& actor )
-{
-   // call virtual event
-   onRemoveInRangeActor( actor );
-
-   // remove actor from in range actor set
-   m_inRangeActors.erase( actor.getAsActor() );
-
-   // if actor is a player, despawn ourself for him
-   // TODO: move to virtual onRemove?
-   if( isPlayer() )
-      actor.despawn( getAsPlayer() );
-
-   if( actor.isPlayer() )
-      m_inRangePlayers.erase( actor.getAsPlayer() );
-}
-
-/*! \return true if there is at least one actor in the in range set */
-bool Core::Entity::Actor::hasInRangeActor() const
-{
-   return ( m_inRangeActors.size() > 0 );
-}
-
-void Core::Entity::Actor::removeFromInRange()
-{
-   if( !hasInRangeActor() )
-      return;
-
-   Entity::ActorPtr pCurAct;
-
-   for( auto& pCurAct : m_inRangeActors )
-   {
-      pCurAct->removeInRangeActor( *this );
-   }
-
-}
-
-/*! Clear the whole in range set, this does no cleanup */
-void Core::Entity::Actor::clearInRangeSet()
-{
-   m_inRangeActors.clear();
-   m_inRangePlayers.clear();
 }
 
 /*! \return ZonePtr to the current zone, nullptr if not set */
@@ -682,7 +555,7 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
       else
       {
 
-         auto actorsCollided = ActionCollision::getActorsHitFromAction( target.getPos(), getInRangeActors( true ),
+         auto actorsCollided = ActionCollision::getActorsHitFromAction( target.getPos(), getInRangeGameObjects( true ),
                                                                         actionInfoPtr, TargetFilter::Enemies );
 
          for( const auto& pHitActor : actorsCollided )
@@ -734,7 +607,7 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
          // todo: get proper packets: the following was just kind of thrown together from what we know.
          // atm buggy (packets look "delayed" from client)
 
-         auto actorsCollided = ActionCollision::getActorsHitFromAction( target.getPos(), getInRangeActors( true ),
+         auto actorsCollided = ActionCollision::getActorsHitFromAction( target.getPos(), getInRangeGameObjects( true ),
                                                                         actionInfoPtr, TargetFilter::Allies );
 
          for( auto pHitActor : actorsCollided )

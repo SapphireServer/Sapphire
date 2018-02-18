@@ -25,7 +25,7 @@ namespace Entity {
 
       static bool isActorApplicable( Actor& actor, TargetFilter targetFilter );
       static std::set< ActorPtr > getActorsHitFromAction( Common::FFXIVARR_POSITION3 aoePosition,
-                                                          std::set< ActorPtr > actorsInRange,
+                                                          std::set< GameObjectPtr > gameObjectsInRange,
                                                           boost::shared_ptr< Data::Action > actionInfo,
                                                           TargetFilter targetFilter );
 

@@ -831,14 +831,14 @@ void Core::Entity::Player::despawn( Entity::PlayerPtr pTarget )
 
 Core::Entity::ActorPtr Core::Entity::Player::lookupTargetById( uint64_t targetId )
 {
-   ActorPtr targetActor;
-   auto inRange = getInRangeActors( true );
+   GameObjectPtr targetActor;
+   auto inRange = getInRangeGameObjects(true);
    for( auto actor : inRange )
    {
       if( actor->getId() == targetId )
          targetActor = actor;
    }
-   return targetActor;
+   return targetActor->getAsActor();
 }
 
 void Core::Entity::Player::setLastPing( uint32_t ping )
@@ -1005,9 +1005,12 @@ void Core::Entity::Player::update( int64_t currTime )
          auto mainWeap = m_pInventory->getItemAt( Inventory::GearSet0, Inventory::EquipSlot::MainHand );
 
          // @TODO i dislike this, iterating over all in range actors when you already know the id of the actor you need...
-         for( auto actor : m_inRangeActors )
+         for( auto actor : m_inRangeGameObjects )
          {
-            if( actor->getId() == m_targetId && actor->isAlive() && mainWeap )
+            if( actor->getId() != m_targetId || !actor->isBattleNpc() )
+               continue;
+
+            if( actor->getAsBattleNpc()->isAlive() && mainWeap )
             {
                // default autoattack range
                // TODO make this dependant on bnpc size
@@ -1027,7 +1030,7 @@ void Core::Entity::Player::update( int64_t currTime )
                   if( ( currTime - m_lastAttack ) > mainWeap->getDelay() )
                   {
                      m_lastAttack = currTime;
-                     autoAttack( actor );
+                     autoAttack( actor->getAsBattleNpc() );
                   }
 
                }
