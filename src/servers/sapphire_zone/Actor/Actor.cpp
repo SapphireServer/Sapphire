@@ -538,38 +538,6 @@ void Core::Entity::Actor::removeFromInRange()
 
 }
 
-void Core::Entity::Actor::checkInRangeActors()
-{
-   if( hasInRangeActor() )
-   {
-      Entity::ActorPtr pCurAct;
-
-      float fRange = 70.0f;
-      for( auto iter = m_inRangeActors.begin(); iter != m_inRangeActors.end();)
-      {
-         pCurAct = *iter;
-         auto iter2 = iter++;
-
-         float distance = Math::Util::distance( pCurAct->getPos().x, pCurAct->getPos().y, pCurAct->getPos().z,
-                                                getPos().x, getPos().y, getPos().z );
-
-         if( fRange > 0.0f && distance > fRange )
-         {
-            pCurAct->removeInRangeActor( *this );
-
-            if( getCurrentZone() != pCurAct->getCurrentZone() )
-               return;
-
-            removeInRangeActor( **iter2 );
-
-            // @TODO FIXME!
-            // this break is more or less a hack, iteration will break otherwise after removing
-            break;
-         }
-      }
-   }
-}
-
 /*! Clear the whole in range set, this does no cleanup */
 void Core::Entity::Actor::clearInRangeSet()
 {

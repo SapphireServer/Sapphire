@@ -271,8 +271,6 @@ public:
    // return true if there is at least one actor in the in range set
    bool hasInRangeActor() const;
 
-   void checkInRangeActors();
-
    void removeFromInRange();
 
    // clear the whole in range set, this does no cleanup
