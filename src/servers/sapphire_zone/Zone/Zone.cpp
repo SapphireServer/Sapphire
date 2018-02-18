@@ -631,7 +631,7 @@ void Core::Zone::updateActorPosition( Entity::Actor &actor )
    if( actor.getCurrentZone() != shared_from_this() )
       return;
 
-   actor.checkInRangeActors();
+   //actor.checkInRangeActors();
 
    uint32_t cellX = getPosX( actor.getPos().x );
    uint32_t cellY = getPosY( actor.getPos().z );
@@ -712,19 +712,18 @@ void Core::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
       pCurAct = *iter;
       ++iter;
 
-      if( !pCurAct )
+      if( !pCurAct || pCurAct == pActor )
          continue;
 
       float distance = Math::Util::distance( pCurAct->getPos().x, pCurAct->getPos().y, pCurAct->getPos().z,
                                              pActor->getPos().x, pActor->getPos().y, pActor->getPos().z );
 
-      // Add if we are not ourself and  range == 0 or distance is withing range.
-      if( pCurAct != pActor && ( fRange == 0.0f || distance <= fRange ) )
-      {
+      bool isInRange = ( fRange == 0.0f || distance <= fRange );
+      bool isInRangeSet = pActor->isInRangeSet( pCurAct );
 
-         if( pActor->isInRangeSet( pCurAct ) )
-            // Actor already in range set, skip
-            continue;
+      // Add if we are not ourself and range == 0 or distance is withing range.
+      if( isInRange && !isInRangeSet )
+      {
 
          if( pActor->isPlayer() )
          {
@@ -768,6 +767,15 @@ void Core::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
             pActor->addInRangeActor( pCurAct );
             pCurAct->addInRangeActor( pActor );
          }
+      }
+      else if( !isInRange && isInRangeSet )
+      {
+         pCurAct->removeInRangeActor( *pActor );
+
+         if( pActor->getCurrentZone() != pCurAct->getCurrentZone() )
+            continue;
+
+         pActor->removeInRangeActor( *pCurAct );
       }
    }
 }
