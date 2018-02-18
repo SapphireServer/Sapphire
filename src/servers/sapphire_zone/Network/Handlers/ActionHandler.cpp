@@ -65,9 +65,11 @@ enum ClientTrigger
    UpdatedSeenHowTos = 0x133,
    AllotAttribute = 0x135,
 
+   ClearWaymarks = 0x13A,
+
    HuntingLogDetails = 0x194,
 
-   EstateTimers = 0x1AB,
+   Timers = 0x1AB,
   
    DyeItem = 0x1B5,
 
