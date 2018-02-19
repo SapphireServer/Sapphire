@@ -113,11 +113,11 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    }
    else
    {
-      auto inRange = player.getInRangeGameObjects();
+      auto inRange = player.getInRangeActors();
       for( auto actor : inRange )
       {
          if( actor->getId() == param3 )
-            targetActor = actor->getAsActor();
+            targetActor = actor;
       }
    }
 
@@ -138,7 +138,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       targetPlayer->setLookAt( CharaLook::Race, param1 );
       player.sendNotice( "Race for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
       targetPlayer->spawn( targetPlayer );
-      auto inRange = targetPlayer->getInRangeGameObjects();
+      auto inRange = targetPlayer->getInRangeActors();
       for( auto actor : inRange )
       {
          targetPlayer->despawn( actor->getAsPlayer() );
@@ -151,7 +151,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       targetPlayer->setLookAt( CharaLook::Tribe, param1 );
       player.sendNotice( "Tribe for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
       targetPlayer->spawn( targetPlayer );
-      auto inRange = targetPlayer->getInRangeGameObjects();
+      auto inRange = targetPlayer->getInRangeActors();
       for( auto actor : inRange )
       {
          targetPlayer->despawn( actor->getAsPlayer() );
@@ -164,7 +164,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       targetPlayer->setLookAt( CharaLook::Gender, param1 );
       player.sendNotice( "Sex for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
       targetPlayer->spawn( targetPlayer );
-      auto inRange = targetActor->getInRangeGameObjects();
+      auto inRange = targetActor->getInRangeActors();
       for( auto actor : inRange )
       {
          targetPlayer->despawn( actor->getAsPlayer() );
@@ -439,7 +439,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    case GmCommand::Jump:
    {
 
-      auto inRange = player.getInRangeGameObjects();
+      auto inRange = player.getInRangeActors();
 
       player.changePosition( targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z,
                              targetActor->getRotation() );

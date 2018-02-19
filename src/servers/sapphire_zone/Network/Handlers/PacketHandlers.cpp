@@ -190,7 +190,7 @@ void Core::Network::GameConnection::updatePositionHandler( const Packets::GamePa
       player.getCurrentAction()->setInterrupted();
 
    // if no one is in range, don't bother trying to send a position update
-   if( !player.hasInRangeGameObject() )
+   if( !player.hasInRangeActor() )
       return;
 
    uint8_t unk = inPacket.getValAt< uint8_t >( 0x29 );
