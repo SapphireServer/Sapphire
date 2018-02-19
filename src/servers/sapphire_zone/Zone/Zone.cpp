@@ -737,8 +737,8 @@ void Core::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
             if( count > 12 )
                break;
 
-            pActor->addInRangeGameObject( pCurAct );
-            pCurAct->addInRangeGameObject( pActor );
+            pActor->addInRangeActor( pCurAct );
+            pCurAct->addInRangeActor( pActor );
             // spawn the actor for the player
             pCurAct->spawn( pOwnPlayer );
 
@@ -758,24 +758,24 @@ void Core::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
             if( pPlayer->isLoadingComplete() )
             {
                pActor->spawn( pPlayer );
-               pCurAct->addInRangeGameObject( pActor );
-               pActor->addInRangeGameObject( pCurAct );
+               pCurAct->addInRangeActor( pActor );
+               pActor->addInRangeActor( pCurAct );
             }
          }
          else
          {
-            pActor->addInRangeGameObject( pCurAct );
-            pCurAct->addInRangeGameObject( pActor );
+            pActor->addInRangeActor( pCurAct );
+            pCurAct->addInRangeActor( pActor );
          }
       }
       else if( !isInRange && isInRangeSet )
       {
-         pCurAct->removeInRangeGameObject( *pActor );
+         pCurAct->removeInRangeActor( *pActor );
 
          if( pActor->getCurrentZone() != pCurAct->getCurrentZone() )
             continue;
 
-         pActor->removeInRangeGameObject( *pCurAct );
+         pActor->removeInRangeActor( *pCurAct );
       }
    }
 }

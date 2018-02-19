@@ -139,6 +139,9 @@ protected:
    std::vector< std::pair< uint8_t, uint32_t> > m_statusEffectList;
    std::map< uint8_t, StatusEffect::StatusEffectPtr > m_statusEffectMap;
 
+   std::set< ActorPtr > m_inRangeActors;
+   std::set< PlayerPtr > m_inRangePlayers;
+
 public:
    Actor( ObjKind type );
 
@@ -178,6 +181,8 @@ public:
    float getRotation() const;
 
    std::string getName() const;
+
+   std::set< ActorPtr > getInRangeActors( bool includeSelf = false );
 
    bool face( const Common::FFXIVARR_POSITION3& p );
 
@@ -228,6 +233,8 @@ public:
 
    virtual void autoAttack( ActorPtr pTarget );
 
+   virtual void onRemoveInRangeActor( Actor& pActor ) {}
+
    virtual void onDeath() {};
    virtual void onDamageTaken( Actor& pSource ) {};
    virtual void onActionHostile( Actor& source ) {};
@@ -248,7 +255,26 @@ public:
 
    ///// IN RANGE LOGIC /////
 
+   // check if another actor is in the actors in range set
+   bool isInRangeSet( ActorPtr pActor ) const;
+
+   ActorPtr getClosestActor();
+
    void sendToInRangeSet( Network::Packets::GamePacketPtr pPacket, bool bToSelf = false );
+
+   // add an actor to in range set
+   void addInRangeActor( ActorPtr pActor );
+
+   // remove an actor from the in range set
+   void removeInRangeActor( Actor& pActor );
+
+   // return true if there is at least one actor in the in range set
+   bool hasInRangeActor() const;
+
+   void removeFromInRange();
+
+   // clear the whole in range set, this does no cleanup
+   virtual void clearInRangeSet();
 
    ZonePtr getCurrentZone() const;
 
