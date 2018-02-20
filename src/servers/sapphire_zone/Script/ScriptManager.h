@@ -48,11 +48,11 @@ namespace Core
 
          bool onMobKill( Entity::Player& player, uint16_t nameId );
 
-         bool onCastFinish( Entity::Player& pPlayer, Entity::ActorPtr pTarget, uint32_t actionId );
+         bool onCastFinish( Entity::Player& pPlayer, Entity::CharaPtr pTarget, uint32_t actionId );
 
-         bool onStatusReceive( Entity::ActorPtr pActor, uint32_t effectId );
-         bool onStatusTick( Entity::ActorPtr pActor, Core::StatusEffect::StatusEffect& effect );
-         bool onStatusTimeOut( Entity::ActorPtr pActor, uint32_t effectId );
+         bool onStatusReceive( Entity::CharaPtr pActor, uint32_t effectId );
+         bool onStatusTick( Entity::CharaPtr pActor, Core::StatusEffect::StatusEffect& effect );
+         bool onStatusTimeOut( Entity::CharaPtr pActor, uint32_t effectId );
 
          bool onZoneInit( ZonePtr pZone );
 

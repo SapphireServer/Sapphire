@@ -90,22 +90,22 @@ namespace Server {
 
          if( player.getZoningType() != Common::ZoneingType::None )
          {
-            m_data.displayFlags |= Entity::Actor::DisplayFlags::Invisible;
+            m_data.displayFlags |= Entity::Chara::DisplayFlags::Invisible;
          }
 
          if( player.getEquipDisplayFlags() & Core::Common::EquipDisplayFlags::HideHead )
          {
-            m_data.displayFlags |= Entity::Actor::DisplayFlags::HideHead;
+            m_data.displayFlags |= Entity::Chara::DisplayFlags::HideHead;
          }
 
          if( player.getEquipDisplayFlags() & Core::Common::EquipDisplayFlags::HideWeapon )
          {
-            m_data.displayFlags |= Entity::Actor::DisplayFlags::HideWeapon;
+            m_data.displayFlags |= Entity::Chara::DisplayFlags::HideWeapon;
          }
 
          if( player.getEquipDisplayFlags() & Core::Common::EquipDisplayFlags::Visor )
          {
-            m_data.displayFlags |= Entity::Actor::DisplayFlags::Visor;
+            m_data.displayFlags |= Entity::Chara::DisplayFlags::Visor;
          }
 
          m_data.currentMount = player.getCurrentMount();

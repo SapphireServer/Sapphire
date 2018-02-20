@@ -2,7 +2,7 @@
 #define _UPDATEHPMPTP_H
 
 #include <common/Network/GamePacketNew.h>
-#include <Actor/Actor.h>
+#include <Actor/Chara.h>
 #include "Forwards.h"
 
 namespace Core {
@@ -17,14 +17,14 @@ class UpdateHpMpTpPacket :
    public ZoneChannelPacket< FFXIVIpcUpdateHpMpTp >
 {
 public:
-   UpdateHpMpTpPacket( Entity::Actor& actor ) :
+   UpdateHpMpTpPacket( Entity::Chara& actor ) :
       ZoneChannelPacket< FFXIVIpcUpdateHpMpTp >( actor.getId(), actor.getId() )
    {
       initialize( actor );
    };
 
 private:
-   void initialize( Entity::Actor& actor )
+   void initialize( Entity::Chara& actor )
    {
       m_data.hp = actor.getHp();
       m_data.mp = actor.getMp();

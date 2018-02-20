@@ -5,7 +5,7 @@
 
 #include <common/Common.h>
 
-#include "Actor.h"
+#include "Chara.h"
 #include "Inventory/Inventory.h"
 #include "Event/EventHandler.h"
 #include <map>
@@ -33,7 +33,7 @@ struct QueuedZoning
 *  Inheriting from Actor
 *
 */
-class Player : public Actor
+class Player : public Chara
 {
 public:
    /*! Contructor */
@@ -42,7 +42,7 @@ public:
    /*! Destructor */
    ~Player();
 
-   void autoAttack( ActorPtr pTarget ) override;
+   void autoAttack( CharaPtr pTarget ) override;
 
    // EventHandlers
    //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -526,7 +526,7 @@ public:
 
    bool actionHasCastTime( uint32_t actionId );
 
-   Core::Entity::ActorPtr lookupTargetById( uint64_t targetId );
+   Core::Entity::CharaPtr lookupTargetById( uint64_t targetId );
 
    bool isLogin() const;
    void setIsLogin( bool bIsLogin );

@@ -3,7 +3,7 @@
 
 #include <Script/NativeScriptApi.h>
 #include <Forwards.h>
-#include <Actor/Actor.h>
+#include <Actor/Chara.h>
 #include <Actor/Player.h>
 #include <Event/EventHelper.h>
 

@@ -119,10 +119,10 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
         case ClientTrigger::ToggleSeathe:  // Toggle sheathe
         {
             if ( param11 == 1 )
-                player.setStance( Entity::Actor::Stance::Active );
+                player.setStance( Entity::Chara::Stance::Active );
             else
             {
-                player.setStance( Entity::Actor::Stance::Passive );
+                player.setStance( Entity::Chara::Stance::Passive );
                 player.setAutoattack( false );
             }
 
@@ -135,7 +135,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
             if ( param11 == 1 )
             {
                 player.setAutoattack( true );
-                player.setStance( Entity::Actor::Stance::Active );
+                player.setStance( Entity::Chara::Stance::Active );
             }
             else
                 player.setAutoattack( false );

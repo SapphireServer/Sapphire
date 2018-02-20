@@ -15,7 +15,7 @@ namespace Core {
       std::vector< Entity::BattleNpcPtr > battleNpcCache;
    };
 
-   typedef std::set< Entity::ActorPtr > ActorSet;
+   typedef std::set< Entity::CharaPtr > CharaSet;
 
    class Cell 
    {
@@ -25,9 +25,9 @@ namespace Core {
       bool m_bForcedActive;
       uint16_t m_posX;
       uint16_t m_posY;
-      ActorSet m_actors;
+      CharaSet m_charas;
       bool m_bActive;
-      bool  m_bLoaded;
+      bool m_bLoaded;
       bool m_bUnloadPending;
 
       uint16_t m_playerCount;
@@ -37,17 +37,17 @@ namespace Core {
       Cell();
       ~Cell();
 
-      void init(uint32_t x, uint32_t y, ZonePtr pZone);
+      void init( uint32_t x, uint32_t y, ZonePtr pZone );
 
-      void addActor(Entity::ActorPtr pAct); 
+      void addChara( Entity::CharaPtr pAct );
 
-      void removeActor(Entity::ActorPtr pAct);
+      void removeChara( Entity::CharaPtr pAct );
 
-      void loadActors(CellCache* pCC);
+      void loadCharas( CellCache *pCC );
 
-      bool hasActor(Entity::ActorPtr pAct) 
+      bool hasChara( Entity::CharaPtr pAct )
       { 
-         return (m_actors.find(pAct) != m_actors.end()); 
+         return (m_charas.find(pAct) != m_charas.end());
       }
 
       bool hasPlayers() const
@@ -55,21 +55,21 @@ namespace Core {
          return ((m_playerCount > 0) ? true : false); 
       }
 
-      size_t getActorCount() const
+      size_t getCharaCount() const
       { 
-         return m_actors.size(); 
+         return m_charas.size();
       }
 
-      void removeActors();
+      void removeCharas();
 
-      ActorSet::iterator begin() 
+      CharaSet::iterator begin()
       {
-         return m_actors.begin(); 
+         return m_charas.begin();
       }
 
-      ActorSet::iterator end() 
+      CharaSet::iterator end()
       {
-         return m_actors.end(); 
+         return m_charas.end();
       }
 
       void setActivity(bool state);

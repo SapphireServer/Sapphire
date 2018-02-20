@@ -1,13 +1,13 @@
 #ifndef _EVENTNPC_H
 #define _EVENTNPC_H
 
-#include "Actor.h"
+#include "Chara.h"
 
 namespace Core {
 namespace Entity {
 
-// class for Mobs inheriting from Actor
-class EventNpc : public Actor
+// class for Mobs inheriting from Chara
+class EventNpc : public Chara
 {
 public:
    EventNpc();

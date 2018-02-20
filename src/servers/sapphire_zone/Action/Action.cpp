@@ -22,7 +22,7 @@ Core::Common::HandleActionType Core::Action::Action::getHandleActionType() const
    return m_handleActionType;
 }
 
-Core::Entity::ActorPtr Core::Action::Action::getTargetActor() const
+Core::Entity::CharaPtr Core::Action::Action::getTargetChara() const
 {
    return m_pTarget;
 }
@@ -57,7 +57,7 @@ void Core::Action::Action::setCastTime( uint32_t castTime )
    m_castTime = castTime;
 }
 
-Core::Entity::ActorPtr Core::Action::Action::getActionSource() const
+Core::Entity::CharaPtr Core::Action::Action::getActionSource() const
 {
    return m_pSource;
 }

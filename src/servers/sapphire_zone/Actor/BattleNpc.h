@@ -1,7 +1,7 @@
 #ifndef _BATTLENPC_H
 #define _BATTLENPC_H
 
-#include "Actor.h"
+#include "Chara.h"
 
 namespace Core {
 namespace Entity {
@@ -16,11 +16,11 @@ enum StateMode
 typedef struct
 {
    uint32_t m_hateAmount;
-   ActorPtr m_pActor;
+   CharaPtr m_pChara;
 } HateListEntry;
 
-// class for Mobs inheriting from Actor
-class BattleNpc : public Actor
+// class for Mobs inheriting from Chara
+class BattleNpc : public Chara
 {
 public:
    BattleNpc();
@@ -52,12 +52,12 @@ public:
 
    uint8_t getbehavior() const;
 
-   void hateListAdd( Actor& actor, int32_t hateAmount );
+   void hateListAdd( Chara& actor, int32_t hateAmount );
 
-   void hateListUpdate( Actor& actor, int32_t hateAmount );
-   void hateListRemove( Actor& actor );
+   void hateListUpdate( Chara& actor, int32_t hateAmount );
+   void hateListRemove( Chara& actor );
 
-   bool hateListHasActor( Actor& actor );
+   bool hateListHasActor( Chara& actor );
 
    void resetPos();
 
@@ -65,19 +65,19 @@ public:
 
    void hateListClear();
 
-   ActorPtr hateListGetHighest();
+   CharaPtr hateListGetHighest();
 
-   void aggro( Actor& actor );
+   void aggro( Chara& actor );
 
-   void deaggro( Actor& actor );
+   void deaggro( Chara& actor );
 
    void setOwner( PlayerPtr pPlayer );
 
    void onDeath() override;
 
-   void onActionHostile( Actor& source ) override;
+   void onActionHostile( Chara& source ) override;
 
-   ActorPtr getClaimer() const;
+   CharaPtr getClaimer() const;
 
    void sendPositionUpdate();
 
@@ -103,7 +103,7 @@ private:
    uint32_t m_unk1;
    uint32_t m_unk2;
    std::set< HateListEntry* > m_hateList;
-   ActorPtr m_pOwner;
+   CharaPtr m_pOwner;
    uint32_t m_timeOfDeath;
    uint32_t m_mobType;
 

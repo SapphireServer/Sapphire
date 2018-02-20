@@ -21,7 +21,7 @@ Core::Action::ActionTeleport::ActionTeleport()
    m_handleActionType = HandleActionType::Event;
 }
 
-Core::Action::ActionTeleport::ActionTeleport( Entity::ActorPtr pActor, uint16_t targetZone, uint16_t cost )
+Core::Action::ActionTeleport::ActionTeleport( Entity::CharaPtr pActor, uint16_t targetZone, uint16_t cost )
 {
    m_startTime = 0;
    m_id = 5;

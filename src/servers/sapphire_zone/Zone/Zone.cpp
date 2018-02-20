@@ -16,7 +16,7 @@
 #include "TerritoryMgr.h"
 
 #include "Session.h"
-#include "Actor/Actor.h"
+#include "Actor/Chara.h"
 #include "Actor/Player.h"
 #include "Actor/BattleNpc.h"
 #include "Actor/EventNpc.h"
@@ -268,10 +268,10 @@ Core::Common::Weather Core::Zone::getNextWeather()
    return Common::Weather::FairSkies;
 }
 
-void Core::Zone::pushActor( Entity::ActorPtr pActor )
+void Core::Zone::pushActor( Entity::CharaPtr pChara )
 {
-   float mx = pActor->getPos().x;
-   float my = pActor->getPos().z;
+   float mx = pChara->getPos().x;
+   float my = pChara->getPos().z;
    uint32_t cx = getPosX( mx );
    uint32_t cy = getPosY( my );
 
@@ -282,12 +282,12 @@ void Core::Zone::pushActor( Entity::ActorPtr pActor )
       pCell->init( cx, cy, shared_from_this() );
    }
 
-   pCell->addActor( pActor );
+   pCell->addChara(pChara);
 
-   pActor->setCell( pCell );
+   pChara->setCell( pCell );
 
-   uint32_t cellX = getPosX( pActor->getPos().x );
-   uint32_t cellY = getPosY( pActor->getPos().z );
+   uint32_t cellX = getPosX( pChara->getPos().x );
+   uint32_t cellY = getPosY( pChara->getPos().z );
 
    uint32_t endX = cellX <= _sizeX ? cellX + 1 : ( _sizeX - 1 );
    uint32_t endY = cellY <= _sizeY ? cellY + 1 : ( _sizeY - 1 );
@@ -301,13 +301,13 @@ void Core::Zone::pushActor( Entity::ActorPtr pActor )
       {
          pCell = getCell( posX, posY );
          if( pCell )
-            updateInRangeSet( pActor, pCell );
+            updateInRangeSet( pChara, pCell );
       }
    }
 
-   if( pActor->isPlayer() )
+   if( pChara->isPlayer() )
    {
-      auto pPlayer = pActor->getAsPlayer();
+      auto pPlayer = pChara->getAsPlayer();
 
       auto pSession = g_serverZone.getSession( pPlayer->getId() );
       if( pSession )
@@ -315,17 +315,17 @@ void Core::Zone::pushActor( Entity::ActorPtr pActor )
       m_playerMap[pPlayer->getId()] = pPlayer;
       updateCellActivity( cx, cy, 2 );
    }
-   else if( pActor->isBattleNpc() )
+   else if( pChara->isBattleNpc() )
    {
 
-      Entity::BattleNpcPtr pBNpc = pActor->getAsBattleNpc();
+      Entity::BattleNpcPtr pBNpc = pChara->getAsBattleNpc();
       m_BattleNpcMap[pBNpc->getId()] = pBNpc;
       pBNpc->setPosition( pBNpc->getPos() );
 
    }
-   else if( pActor->isEventNpc() )
+   else if( pChara->isEventNpc() )
    {
-      Entity::EventNpcPtr pENpc = pActor->getAsEventNpc();
+      Entity::EventNpcPtr pENpc = pChara->getAsEventNpc();
       m_EventNpcMap[pENpc->getId()] = pENpc;
       pENpc->setPosition( pENpc->getPos() );
    }
@@ -333,37 +333,37 @@ void Core::Zone::pushActor( Entity::ActorPtr pActor )
 
 }
 
-void Core::Zone::removeActor( Entity::ActorPtr pActor )
+void Core::Zone::removeActor( Entity::CharaPtr pChara )
 {
 
-   if( pActor->m_pCell )
+   if( pChara->m_pCell )
    {
-      pActor->m_pCell->removeActor( pActor );
-      pActor->m_pCell = nullptr;
+      pChara->m_pCell->removeChara(pChara);
+      pChara->m_pCell = nullptr;
    }
 
-   if( pActor->isPlayer() )
+   if( pChara->isPlayer() )
    {
 
       // If it's a player and he's inside boundaries - update his nearby cells
-      if( pActor->getPos().x <= _maxX && pActor->getPos().x >= _minX &&
-          pActor->getPos().z <= _maxY && pActor->getPos().z >= _minY )
+      if( pChara->getPos().x <= _maxX && pChara->getPos().x >= _minX &&
+          pChara->getPos().z <= _maxY && pChara->getPos().z >= _minY )
       {
-         uint32_t x = getPosX( pActor->getPos().x );
-         uint32_t y = getPosY( pActor->getPos().z );
+         uint32_t x = getPosX( pChara->getPos().x );
+         uint32_t y = getPosY( pChara->getPos().z );
          updateCellActivity( x, y, 3 );
       }
-      m_playerMap.erase( pActor->getId() );
+      m_playerMap.erase( pChara->getId() );
 
-      onLeaveTerritory( *pActor->getAsPlayer() );
+      onLeaveTerritory( *pChara->getAsPlayer() );
 
    }
-   else if( pActor->isBattleNpc() )
-      m_BattleNpcMap.erase( pActor->getId() );
+   else if( pChara->isBattleNpc() )
+      m_BattleNpcMap.erase( pChara->getId() );
 
    // remove from lists of other actors
-   pActor->removeFromInRange();
-   pActor->clearInRangeSet();
+   pChara->removeFromInRange();
+   pChara->clearInRangeSet();
 
 }
 
@@ -601,7 +601,7 @@ void Core::Zone::updateCellActivity( uint32_t x, uint32_t y, int32_t radius )
 
                CellCache * pCC = getCellCacheAndCreate( posX, posY );
                if( pCC )
-                  pCell->loadActors( pCC );
+                  pCell->loadCharas(pCC);
             }
          }
          else
@@ -615,7 +615,7 @@ void Core::Zone::updateCellActivity( uint32_t x, uint32_t y, int32_t radius )
                {
                   CellCache * pCC = getCellCacheAndCreate( posX, posY );
                   if( pCC )
-                     pCell->loadActors( pCC );
+                     pCell->loadCharas(pCC);
                }
             }
             else if( !isCellActive( posX, posY ) && pCell->isActive() )
@@ -625,7 +625,7 @@ void Core::Zone::updateCellActivity( uint32_t x, uint32_t y, int32_t radius )
    }
 }
 
-void Core::Zone::updateActorPosition( Entity::Actor &actor )
+void Core::Zone::updateActorPosition( Entity::Chara &actor )
 {
 
    if( actor.getCurrentZone() != shared_from_this() )
@@ -652,9 +652,9 @@ void Core::Zone::updateActorPosition( Entity::Actor &actor )
    {
 
       if( pOldCell )
-         pOldCell->removeActor( actor.getAsActor() );
+         pOldCell->removeChara(actor.getAsChara());
 
-      pCell->addActor( actor.getAsActor() );
+      pCell->addChara(actor.getAsChara());
       actor.m_pCell = pCell;
 
       // if player we need to update cell activity
@@ -686,13 +686,13 @@ void Core::Zone::updateActorPosition( Entity::Actor &actor )
       {
          pCell = getCell( posX, posY );
          if( pCell )
-            updateInRangeSet( actor.getAsActor(), pCell );
+            updateInRangeSet( actor.getAsChara(), pCell );
       }
    }
 }
 
 
-void Core::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
+void Core::Zone::updateInRangeSet( Entity::CharaPtr pChara, Cell* pCell )
 {
    if( pCell == nullptr )
       return;
@@ -701,33 +701,33 @@ void Core::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
    if( g_territoryMgr.isPrivateTerritory( getTerritoryId() ) )
       return;
 
-   Entity::ActorPtr pCurAct;
+   Entity::CharaPtr pCurAct;
 
-   auto iter = pCell->m_actors.begin();
+   auto iter = pCell->m_charas.begin();
 
    float fRange = 70.0f;
    int32_t count = 0;
-   while( iter != pCell->m_actors.end() )
+   while( iter != pCell->m_charas.end() )
    {
       pCurAct = *iter;
       ++iter;
 
-      if( !pCurAct || pCurAct == pActor )
+      if( !pCurAct || pCurAct == pChara )
          continue;
 
       float distance = Math::Util::distance( pCurAct->getPos().x, pCurAct->getPos().y, pCurAct->getPos().z,
-                                             pActor->getPos().x, pActor->getPos().y, pActor->getPos().z );
+                                             pChara->getPos().x, pChara->getPos().y, pChara->getPos().z );
 
       bool isInRange = ( fRange == 0.0f || distance <= fRange );
-      bool isInRangeSet = pActor->isInRangeSet( pCurAct );
+      bool isInRangeSet = pChara->isInRangeSet( pCurAct );
 
       // Add if we are not ourself and range == 0 or distance is withing range.
       if( isInRange && !isInRangeSet )
       {
 
-         if( pActor->isPlayer() )
+         if( pChara->isPlayer() )
          {
-            auto pOwnPlayer = pActor->getAsPlayer();
+            auto pOwnPlayer = pChara->getAsPlayer();
 
             if( !pOwnPlayer->isLoadingComplete() )
                continue;
@@ -737,8 +737,8 @@ void Core::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
             if( count > 12 )
                break;
 
-            pActor->addInRangeActor( pCurAct );
-            pCurAct->addInRangeActor( pActor );
+            pChara->addInRangeChara( pCurAct );
+            pCurAct->addInRangeChara( pChara );
             // spawn the actor for the player
             pCurAct->spawn( pOwnPlayer );
 
@@ -748,34 +748,34 @@ void Core::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
                if( !pPlayer->isLoadingComplete() )
                   continue;
 
-               pActor->spawn( pPlayer );
+               pChara->spawn( pPlayer );
             }
 
          }
-         else if( ( pActor->isBattleNpc() || pActor->isEventNpc() ) && pCurAct->isPlayer() && pActor->isAlive() )
+         else if( ( pChara->isBattleNpc() || pChara->isEventNpc() ) && pCurAct->isPlayer() && pChara->isAlive() )
          {
             auto pPlayer = pCurAct->getAsPlayer();
             if( pPlayer->isLoadingComplete() )
             {
-               pActor->spawn( pPlayer );
-               pCurAct->addInRangeActor( pActor );
-               pActor->addInRangeActor( pCurAct );
+               pChara->spawn( pPlayer );
+               pCurAct->addInRangeChara( pChara );
+               pChara->addInRangeChara( pCurAct );
             }
          }
          else
          {
-            pActor->addInRangeActor( pCurAct );
-            pCurAct->addInRangeActor( pActor );
+            pChara->addInRangeChara( pCurAct );
+            pCurAct->addInRangeChara( pChara );
          }
       }
       else if( !isInRange && isInRangeSet )
       {
-         pCurAct->removeInRangeActor( *pActor );
+         pCurAct->removeInRangeChara( *pChara );
 
-         if( pActor->getCurrentZone() != pCurAct->getCurrentZone() )
+         if( pChara->getCurrentZone() != pCurAct->getCurrentZone() )
             continue;
 
-         pActor->removeInRangeActor( *pCurAct );
+         pChara->removeInRangeChara( *pCurAct );
       }
    }
 }

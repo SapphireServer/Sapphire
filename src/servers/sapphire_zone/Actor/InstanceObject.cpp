@@ -2,7 +2,7 @@
 #include "Zone/InstanceContent.h"
 
 Core::Entity::InstanceObject::InstanceObject( uint32_t objectId, uint32_t mapLinkId ) :
-   Core::Entity::GameObject( ObjKind::EventObj ),
+   Core::Entity::Actor( ObjKind::EventObj ),
    m_mapLinkId( mapLinkId ),
    m_state( 0 )
 {

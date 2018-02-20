@@ -15,7 +15,7 @@ namespace Action {
       ActionCast();
       ~ActionCast();
       
-      ActionCast( Entity::ActorPtr pActor, Entity::ActorPtr pTarget, uint16_t actionId );
+      ActionCast( Entity::CharaPtr pActor, Entity::CharaPtr pTarget, uint16_t actionId );
 
       void onStart() override;
       void onFinish() override;

@@ -2,7 +2,7 @@
 #include <common/Util/UtilMath.h>
 
 #include "ActionCollision.h"
-#include "Actor/Actor.h"
+#include "Actor/Chara.h"
 #include "Actor/Player.h"
 
 #include <cmath>
@@ -13,7 +13,7 @@ using namespace Core::Common;
 
 // todo: add AoE actor limits (16, 32)
 
-bool ActionCollision::isActorApplicable( Actor& actor, TargetFilter targetFilter )
+bool ActionCollision::isActorApplicable( Chara& chara, TargetFilter targetFilter )
 {
    bool actorApplicable = false;
    switch( targetFilter )
@@ -25,37 +25,37 @@ bool ActionCollision::isActorApplicable( Actor& actor, TargetFilter targetFilter
    }
    case TargetFilter::Players:
    {
-      actorApplicable = actor.isPlayer();
+      actorApplicable = chara.isPlayer();
       break;
    }
    case TargetFilter::Allies:
    {
       // todo: implement ally NPCs
-      actorApplicable = !actor.isBattleNpc();
+      actorApplicable = !chara.isBattleNpc();
       break;
    }
    case TargetFilter::Party:
    {
       // todo: implement party
-      actorApplicable = actor.isPlayer();
+      actorApplicable = chara.isPlayer();
       break;
    }
    case TargetFilter::Enemies:
    {
-      actorApplicable = actor.isBattleNpc();
+      actorApplicable = chara.isBattleNpc();
       break;
    }
    }
 
-   return ( actorApplicable && actor.isAlive() );
+   return ( actorApplicable && chara.isAlive() );
 }
 
-std::set< Core::Entity::ActorPtr > ActionCollision::getActorsHitFromAction( FFXIVARR_POSITION3 aoePosition,
-                                                                            std::set< ActorPtr > actorsInRange,
+std::set< Core::Entity::CharaPtr > ActionCollision::getActorsHitFromAction( FFXIVARR_POSITION3 aoePosition,
+                                                                            std::set< CharaPtr > actorsInRange,
                                                                             boost::shared_ptr< Core::Data::Action > actionInfo,
                                                                             TargetFilter targetFilter )
 {
-   std::set< ActorPtr > actorsCollided;
+   std::set< CharaPtr > actorsCollided;
 
    switch( static_cast< ActionCollisionType >( actionInfo->castType ) )
    {
