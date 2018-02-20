@@ -26,7 +26,7 @@ Core::Action::ActionCast::ActionCast()
    m_handleActionType = Common::HandleActionType::Event;
 }
 
-Core::Action::ActionCast::ActionCast( Entity::ActorPtr pActor, Entity::ActorPtr pTarget, uint16_t actionId )
+Core::Action::ActionCast::ActionCast( Entity::CharaPtr pActor, Entity::CharaPtr pTarget, uint16_t actionId )
 {
    m_startTime = 0;
    m_id = actionId;

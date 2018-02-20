@@ -55,7 +55,7 @@ using namespace Core::Network::Packets::Server;
 
 // player constructor
 Core::Entity::Player::Player() :
-   Actor( ObjKind::Player ),
+   Chara( ObjKind::Player ),
    m_lastWrite( 0 ),
    m_lastPing( 0 ),
    m_bIsLogin( false ),
@@ -250,7 +250,7 @@ void Core::Entity::Player::calculateStats()
 }
 
 
-void Core::Entity::Player::setAutoattack(bool mode)
+void Core::Entity::Player::setAutoattack( bool mode )
 {
    m_bAutoattack = mode;
    m_lastAttack = Util::getTimeMs();
@@ -829,10 +829,10 @@ void Core::Entity::Player::despawn( Entity::PlayerPtr pTarget )
    pPlayer->queuePacket( ActorControlPacket143( getId(), DespawnZoneScreenMsg, 0x04, getId(), 0x01 ) );
 }
 
-Core::Entity::ActorPtr Core::Entity::Player::lookupTargetById( uint64_t targetId )
+Core::Entity::CharaPtr Core::Entity::Player::lookupTargetById( uint64_t targetId )
 {
-   ActorPtr targetActor;
-   auto inRange = getInRangeActors( true );
+   CharaPtr targetActor;
+   auto inRange = getInRangeCharas(true);
    for( auto actor : inRange )
    {
       if( actor->getId() == targetId )
@@ -1000,12 +1000,12 @@ void Core::Entity::Player::update( int64_t currTime )
 
    if( !checkAction() )
    {
-      if( m_targetId && m_currentStance == Entity::Actor::Stance::Active && isAutoattackOn() )
+      if( m_targetId && m_currentStance == Entity::Chara::Stance::Active && isAutoattackOn() )
       {
          auto mainWeap = m_pInventory->getItemAt( Inventory::GearSet0, Inventory::EquipSlot::MainHand );
 
          // @TODO i dislike this, iterating over all in range actors when you already know the id of the actor you need...
-         for( auto actor : m_inRangeActors )
+         for( auto actor : m_inRangeCharas )
          {
             if( actor->getId() == m_targetId && actor->isAlive() && mainWeap )
             {
@@ -1408,7 +1408,7 @@ uint8_t Core::Entity::Player::getEquipDisplayFlags() const
 void Core::Entity::Player::mount( uint32_t id )
 {
    m_mount = id;
-   sendToInRangeSet( ActorControlPacket142( getId(), ActorControlType::SetStatus, static_cast< uint8_t >( Entity::Actor::ActorStatus::Mounted )), true );
+   sendToInRangeSet( ActorControlPacket142( getId(), ActorControlType::SetStatus, static_cast< uint8_t >( Entity::Chara::ActorStatus::Mounted )), true );
    sendToInRangeSet( ActorControlPacket143( getId(), 0x39e, 12 ), true ); //?
 
    ZoneChannelPacket< FFXIVIpcMount > mountPacket( getId() );
@@ -1419,7 +1419,7 @@ void Core::Entity::Player::mount( uint32_t id )
 void Core::Entity::Player::dismount()
 {
    sendToInRangeSet( ActorControlPacket142( getId(), ActorControlType::SetStatus,
-                                            static_cast< uint8_t >( Entity::Actor::ActorStatus::Idle )), true );
+                                            static_cast< uint8_t >( Entity::Chara::ActorStatus::Idle )), true );
    sendToInRangeSet( ActorControlPacket143( getId(), ActorControlType::Dismount, 1 ), true );
    m_mount = 0;
 }
@@ -1429,7 +1429,7 @@ uint8_t Core::Entity::Player::getCurrentMount() const
    return m_mount;
 }
 
-void Core::Entity::Player::autoAttack( ActorPtr pTarget )
+void Core::Entity::Player::autoAttack( CharaPtr pTarget )
 {
 
    auto mainWeap = m_pInventory->getItemAt( Inventory::GearSet0,
@@ -1663,15 +1663,15 @@ void Core::Entity::Player::finishZoning()
       case ZoneingType::Return:
       case ZoneingType::ReturnDead:
       {
-         if( getStatus() == Entity::Actor::ActorStatus::Dead )
+         if( getStatus() == Entity::Chara::ActorStatus::Dead )
          {
             resetHp();
             resetMp();
-            setStatus( Entity::Actor::ActorStatus::Idle );
+            setStatus( Entity::Chara::ActorStatus::Idle );
 
             sendToInRangeSet( ActorControlPacket143( getId(), ZoneIn, 0x01, 0x01, 0, 111 ), true );
             sendToInRangeSet( ActorControlPacket142( getId(), SetStatus,
-                                                     static_cast< uint8_t >( Entity::Actor::ActorStatus::Idle ) ), true );
+                                                     static_cast< uint8_t >( Entity::Chara::ActorStatus::Idle ) ), true );
          }
          else
             sendToInRangeSet( ActorControlPacket143( getId(), ZoneIn, 0x01, 0x00, 0, 111 ), true );

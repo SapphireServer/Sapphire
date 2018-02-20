@@ -37,7 +37,7 @@ void Core::Network::GameConnection::eventHandlerTalk( const Packets::GamePacket&
    std::string eventName = "onTalk";
    std::string objName = Event::getEventName( eventId );
 
-   player.sendDebug( "Actor: " +
+   player.sendDebug( "Chara: " +
                      std::to_string( actorId ) + " -> " +
                      std::to_string( Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) ) ) +
                      " \neventId: " +
@@ -72,7 +72,7 @@ void Core::Network::GameConnection::eventHandlerEmote( const Packets::GamePacket
    std::string eventName = "onEmote";
    std::string objName = Event::getEventName( eventId );
 
-   player.sendDebug( "Actor: " +
+   player.sendDebug( "Chara: " +
                      std::to_string( actorId ) + " -> " +
                      std::to_string( Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) ) ) +
                      " \neventId: " +

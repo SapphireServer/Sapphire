@@ -26,7 +26,7 @@ extern Core::Data::ExdDataGenerated g_exdDataGen;
 uint32_t Core::Entity::BattleNpc::m_nextID = 1149241694;
 
 Core::Entity::BattleNpc::BattleNpc() :
-   Actor( ObjKind::BattleNpc )
+   Chara( ObjKind::BattleNpc )
 {
    m_id = 0;
    m_status = ActorStatus::Idle;
@@ -40,7 +40,7 @@ Core::Entity::BattleNpc::~BattleNpc()
 Core::Entity::BattleNpc::BattleNpc( uint16_t modelId, uint16_t nameid, const Common::FFXIVARR_POSITION3& spawnPos,
                                     uint16_t bnpcBaseId, uint32_t type, uint8_t level, uint8_t behaviour,
                                     uint32_t mobType ) :
-   Actor( ObjKind::BattleNpc )
+   Chara( ObjKind::BattleNpc )
 {
    BattleNpc::m_nextID++;
    m_id = BattleNpc::m_nextID;
@@ -177,16 +177,16 @@ uint8_t Core::Entity::BattleNpc::getbehavior() const
    return m_behavior;
 }
 
-void Core::Entity::BattleNpc::hateListAdd( Actor& actor, int32_t hateAmount )
+void Core::Entity::BattleNpc::hateListAdd( Chara& actor, int32_t hateAmount )
 {
    auto hateEntry = new HateListEntry();
    hateEntry->m_hateAmount = hateAmount;
-   hateEntry->m_pActor = actor.getAsActor();
+   hateEntry->m_pChara = actor.getAsChara();
 
    m_hateList.insert( hateEntry );
 }
 
-Core::Entity::ActorPtr Core::Entity::BattleNpc::hateListGetHighest()
+Core::Entity::CharaPtr Core::Entity::BattleNpc::hateListGetHighest()
 {
 
    auto it = m_hateList.begin();
@@ -202,7 +202,7 @@ Core::Entity::ActorPtr Core::Entity::BattleNpc::hateListGetHighest()
    }
 
    if( entry && maxHate != 0 )
-      return entry->m_pActor;
+      return entry->m_pChara;
 
    return nullptr;
 }
@@ -274,7 +274,7 @@ bool Core::Entity::BattleNpc::moveTo( Common::FFXIVARR_POSITION3& pos )
 
 }
 
-void Core::Entity::BattleNpc::aggro( Actor& actor )
+void Core::Entity::BattleNpc::aggro( Chara& actor )
 {
 
    m_lastAttack = Util::getTimeMs();
@@ -292,7 +292,7 @@ void Core::Entity::BattleNpc::aggro( Actor& actor )
    }
 }
 
-void Core::Entity::BattleNpc::deaggro( Actor& actor )
+void Core::Entity::BattleNpc::deaggro( Chara& actor )
 {
    if( !hateListHasActor( actor ) )
       hateListRemove( actor );
@@ -309,8 +309,8 @@ void Core::Entity::BattleNpc::hateListClear()
    auto it = m_hateList.begin();
    for( ; it != m_hateList.end(); ++it )
    {
-      if( isInRangeSet( ( *it )->m_pActor ) )
-         deaggro( *( *it )->m_pActor );
+      if( isInRangeSet( ( *it )->m_pChara ) )
+         deaggro( *( *it )->m_pChara );
       HateListEntry* tmpListEntry = ( *it );
       delete tmpListEntry;
    }
@@ -318,12 +318,12 @@ void Core::Entity::BattleNpc::hateListClear()
 }
 
 
-void Core::Entity::BattleNpc::hateListRemove( Actor& actor )
+void Core::Entity::BattleNpc::hateListRemove( Chara& actor )
 {
    auto it = m_hateList.begin();
    for( ; it != m_hateList.end(); ++it )
    {
-      if( ( *it )->m_pActor->getId() == actor.getId() )
+      if( ( *it )->m_pChara->getId() == actor.getId() )
       {
          HateListEntry* pEntry = *it;
          m_hateList.erase( it );
@@ -338,12 +338,12 @@ void Core::Entity::BattleNpc::hateListRemove( Actor& actor )
    }
 }
 
-bool Core::Entity::BattleNpc::hateListHasActor( Actor& actor )
+bool Core::Entity::BattleNpc::hateListHasActor( Chara& actor )
 {
    auto it = m_hateList.begin();
    for( ; it != m_hateList.end(); ++it )
    {
-      if( ( *it )->m_pActor->getId() == actor.getId() )
+      if( ( *it )->m_pChara->getId() == actor.getId() )
          return true;
    }
    return false;
@@ -359,13 +359,13 @@ uint32_t Core::Entity::BattleNpc::getNameId() const
    return m_nameId;
 }
 
-void Core::Entity::BattleNpc::hateListUpdate( Actor& actor, int32_t hateAmount )
+void Core::Entity::BattleNpc::hateListUpdate( Chara& actor, int32_t hateAmount )
 {
 
    auto it = m_hateList.begin();
    for( ; it != m_hateList.end(); ++it )
    {
-      if( ( *it )->m_pActor->getId() == actor.getId() )
+      if( ( *it )->m_pChara->getId() == actor.getId() )
       {
          ( *it )->m_hateAmount += hateAmount;
          return;
@@ -374,7 +374,7 @@ void Core::Entity::BattleNpc::hateListUpdate( Actor& actor, int32_t hateAmount )
 
    auto hateEntry = new HateListEntry();
    hateEntry->m_hateAmount = hateAmount;
-   hateEntry->m_pActor = actor.getAsActor();
+   hateEntry->m_pChara = actor.getAsChara();
    m_hateList.insert( hateEntry );
 }
 
@@ -396,7 +396,7 @@ void Core::Entity::BattleNpc::onDeath()
       uint32_t totalHate = 0;
       for( auto& pHateEntry : m_hateList )
       {
-         if( pHateEntry->m_pActor->isPlayer() )
+         if( pHateEntry->m_pChara->isPlayer() )
          {
             if( pHateEntry->m_hateAmount < minHate )
                minHate = pHateEntry->m_hateAmount;
@@ -412,9 +412,9 @@ void Core::Entity::BattleNpc::onDeath()
       {
          // todo: this is pure retarded
          // todo: check for companion
-         if( pHateEntry->m_pActor->isPlayer()  ) // && pHateEntry->m_hateAmount >= plsBeHatedThisMuchAtLeast )
+         if( pHateEntry->m_pChara->isPlayer()  ) // && pHateEntry->m_hateAmount >= plsBeHatedThisMuchAtLeast )
          {
-            uint8_t level = pHateEntry->m_pActor->getLevel();
+            uint8_t level = pHateEntry->m_pChara->getLevel();
             auto levelDiff = static_cast< int32_t >( this->m_level ) - level;
             auto cappedLevelDiff = Math::Util::clamp( levelDiff, 1, 6 );
 
@@ -439,7 +439,7 @@ void Core::Entity::BattleNpc::onDeath()
             // todo: this is actually retarded, we need real rand()
             srand( static_cast< uint32_t > ( time( nullptr ) ) );
 
-            auto pPlayer = pHateEntry->m_pActor->getAsPlayer();
+            auto pPlayer = pHateEntry->m_pChara->getAsPlayer();
             pPlayer->gainExp( exp );
             pPlayer->onMobKill( m_nameId );
          }
@@ -448,7 +448,7 @@ void Core::Entity::BattleNpc::onDeath()
    hateListClear();
 }
 
-void Core::Entity::BattleNpc::onActionHostile( Actor& source )
+void Core::Entity::BattleNpc::onActionHostile( Chara& source )
 {
 
    if( hateListGetHighest() == nullptr )
@@ -458,7 +458,7 @@ void Core::Entity::BattleNpc::onActionHostile( Actor& source )
       setOwner( source.getAsPlayer() );
 }
 
-Core::Entity::ActorPtr Core::Entity::BattleNpc::getClaimer() const
+Core::Entity::CharaPtr Core::Entity::BattleNpc::getClaimer() const
 {
    return m_pOwner;
 }
@@ -501,46 +501,46 @@ void Core::Entity::BattleNpc::update( int64_t currTime )
 
    case MODE_IDLE:
    {
-      ActorPtr pClosestActor = getClosestActor();
+      CharaPtr pClosestChara = getClosestChara();
 
-      if( pClosestActor && pClosestActor->isAlive() )
+      if( pClosestChara && pClosestChara->isAlive() )
       {
          distance = Math::Util::distance( getPos().x, getPos().y, getPos().z,
-                                          pClosestActor->getPos().x,
-                                          pClosestActor->getPos().y,
-                                          pClosestActor->getPos().z );
+                                          pClosestChara->getPos().x,
+                                          pClosestChara->getPos().y,
+                                          pClosestChara->getPos().z );
 
          //if( distance < 8 && getbehavior() == 2 )
-         //   aggro( pClosestActor );
+         //   aggro( pClosestChara );
       }
    }
    break;
 
    case MODE_COMBAT:
    {
-      ActorPtr pClosestActor = hateListGetHighest();
+      CharaPtr pClosestChara = hateListGetHighest();
 
-      if( pClosestActor != nullptr && !pClosestActor->isAlive() )
+      if( pClosestChara != nullptr && !pClosestChara->isAlive() )
       {
-         hateListRemove( *pClosestActor );
-         pClosestActor = hateListGetHighest();
+         hateListRemove( *pClosestChara );
+         pClosestChara = hateListGetHighest();
       }
 
-      if( pClosestActor != nullptr )
+      if( pClosestChara != nullptr )
       {
          distance = Math::Util::distance( getPos().x, getPos().y, getPos().z,
-                                          pClosestActor->getPos().x,
-                                          pClosestActor->getPos().y,
-                                          pClosestActor->getPos().z );
+                                          pClosestChara->getPos().x,
+                                          pClosestChara->getPos().y,
+                                          pClosestChara->getPos().z );
 
          if( distance > 4 )
-            moveTo( pClosestActor->getPos() );
+            moveTo( pClosestChara->getPos() );
          else
          {
-            if( face( pClosestActor->getPos() ) )
+            if( face( pClosestChara->getPos() ) )
                sendPositionUpdate();
             // in combat range. ATTACK!
-            autoAttack( pClosestActor );
+            autoAttack( pClosestChara );
          }
       }
       else

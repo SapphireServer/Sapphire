@@ -75,7 +75,7 @@ void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inP
         }
         else
         {
-            Core::Entity::ActorPtr targetActor = player.getAsPlayer();
+            Core::Entity::CharaPtr targetActor = player.getAsPlayer();
             if( targetId != player.getId() )
             {
                 targetActor = player.lookupTargetById( targetId );

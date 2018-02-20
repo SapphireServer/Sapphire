@@ -104,7 +104,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       ", params: " + std::to_string( param1 ) + ", " +
       std::to_string( param2 ) + ", " + std::to_string( param3 ) );
 
-   Core::Entity::ActorPtr targetActor;
+   Core::Entity::CharaPtr targetActor;
 
 
    if( player.getId() == param3 )
@@ -113,7 +113,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    }
    else
    {
-      auto inRange = player.getInRangeActors();
+      auto inRange = player.getInRangeCharas();
       for( auto actor : inRange )
       {
          if( actor->getId() == param3 )
@@ -138,7 +138,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       targetPlayer->setLookAt( CharaLook::Race, param1 );
       player.sendNotice( "Race for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
       targetPlayer->spawn( targetPlayer );
-      auto inRange = targetPlayer->getInRangeActors();
+      auto inRange = targetPlayer->getInRangeCharas();
       for( auto actor : inRange )
       {
          targetPlayer->despawn( actor->getAsPlayer() );
@@ -151,7 +151,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       targetPlayer->setLookAt( CharaLook::Tribe, param1 );
       player.sendNotice( "Tribe for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
       targetPlayer->spawn( targetPlayer );
-      auto inRange = targetPlayer->getInRangeActors();
+      auto inRange = targetPlayer->getInRangeCharas();
       for( auto actor : inRange )
       {
          targetPlayer->despawn( actor->getAsPlayer() );
@@ -164,7 +164,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       targetPlayer->setLookAt( CharaLook::Gender, param1 );
       player.sendNotice( "Sex for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
       targetPlayer->spawn( targetPlayer );
-      auto inRange = targetActor->getInRangeActors();
+      auto inRange = targetActor->getInRangeCharas();
       for( auto actor : inRange )
       {
          targetPlayer->despawn( actor->getAsPlayer() );
@@ -439,7 +439,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    case GmCommand::Jump:
    {
 
-      auto inRange = player.getInRangeActors();
+      auto inRange = player.getInRangeCharas();
 
       player.changePosition( targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z,
                              targetActor->getRotation() );
@@ -466,7 +466,7 @@ void Core::Network::GameConnection::gm2Handler( const Packets::GamePacket& inPac
    g_log.debug( player.getName() + " used GM2 commandId: " + std::to_string( commandId ) + ", params: " + param1 );
 
    auto targetSession = g_serverZone.getSession( param1 );
-   Core::Entity::ActorPtr targetActor;
+   Core::Entity::CharaPtr targetActor;
 
    if( targetSession != nullptr )
    {
@@ -496,11 +496,11 @@ void Core::Network::GameConnection::gm2Handler( const Packets::GamePacket& inPac
    {
       targetPlayer->resetHp();
       targetPlayer->resetMp();
-      targetPlayer->setStatus( Entity::Actor::ActorStatus::Idle );
+      targetPlayer->setStatus( Entity::Chara::ActorStatus::Idle );
 
       targetPlayer->sendToInRangeSet( ActorControlPacket143( player.getId(), ZoneIn, 0x01, 0x01, 0, 113 ), true );
       targetPlayer->sendToInRangeSet( ActorControlPacket142( player.getId(), SetStatus,
-         static_cast< uint8_t >( Entity::Actor::ActorStatus::Idle ) ), true );
+         static_cast< uint8_t >( Entity::Chara::ActorStatus::Idle ) ), true );
       player.sendNotice( "Raised  " + targetPlayer->getName() );
       break;
    }

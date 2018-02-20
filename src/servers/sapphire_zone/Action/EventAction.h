@@ -16,7 +16,7 @@ namespace Action {
       EventAction();
       ~EventAction();
       
-      EventAction( Entity::ActorPtr pActor, uint32_t eventId, uint16_t action,
+      EventAction( Entity::CharaPtr pActor, uint32_t eventId, uint16_t action,
                    ActionCallback finishRef, ActionCallback interruptRef, uint64_t additional );
 
       void onStart() override;

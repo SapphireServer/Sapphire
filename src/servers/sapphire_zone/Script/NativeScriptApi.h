@@ -5,7 +5,7 @@
 #include <typeinfo>
 #include <typeindex>
 
-#include <Actor/Actor.h>
+#include <Actor/Chara.h>
 #include <Actor/Player.h>
 #include <StatusEffect/StatusEffect.h>
 #include <Zone/InstanceContent.h>
@@ -53,14 +53,14 @@ public:
       ScriptObject( effectId, typeid( StatusEffectScript ).hash_code() )
    { }
 
-   virtual void onTick( Entity::Actor& actor ) { }
-   virtual void onApply( Entity::Actor& actor ) { }
-   virtual void onRemove( Entity::Actor& actor ) { }
-   virtual void onExpire( Entity::Actor& actor ) { }
-   virtual void onPlayerCollision( Entity::Actor& actor, Entity::Actor& actorHit ) { }
-   virtual void onPlayerFinishCast( Entity::Actor& actor ) { }
-   virtual void onPlayerDamaged( Entity::Actor& actor ) { }
-   virtual void onPlayerDeath( Entity::Actor& actor ) { }
+   virtual void onTick( Entity::Chara& actor ) { }
+   virtual void onApply( Entity::Chara& actor ) { }
+   virtual void onRemove( Entity::Chara& actor ) { }
+   virtual void onExpire( Entity::Chara& actor ) { }
+   virtual void onPlayerCollision( Entity::Chara& actor, Entity::Chara& actorHit ) { }
+   virtual void onPlayerFinishCast( Entity::Chara& actor ) { }
+   virtual void onPlayerDamaged( Entity::Chara& actor ) { }
+   virtual void onPlayerDeath( Entity::Chara& actor ) { }
 };
 
 
@@ -71,9 +71,9 @@ public:
       ScriptObject( abilityId, typeid( ActionScript ).hash_code() )
    { }
 
-   virtual void onStart( Entity::Actor& sourceActor, Entity::Actor& targetActor ) { }
-   virtual void onCastFinish( Entity::Player& player, Entity::Actor& targetActor ) { }
-   virtual void onInterrupt( Entity::Actor& sourceActor/*, Core::Entity::Actor targetActor*/ ) { }
+   virtual void onStart( Entity::Chara& sourceActor, Entity::Chara& targetActor ) { }
+   virtual void onCastFinish( Entity::Player& player, Entity::Chara& targetActor ) { }
+   virtual void onInterrupt( Entity::Chara& sourceActor/*, Core::Entity::Chara targetActor*/ ) { }
 };
 
 

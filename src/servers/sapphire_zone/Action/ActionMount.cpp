@@ -24,7 +24,7 @@ Core::Action::ActionMount::ActionMount()
    m_handleActionType = HandleActionType::Event;
 }
 
-Core::Action::ActionMount::ActionMount( Entity::ActorPtr pActor, uint16_t mountId )
+Core::Action::ActionMount::ActionMount( Entity::CharaPtr pActor, uint16_t mountId )
 {
    m_startTime = 0;
    m_id = mountId;

@@ -275,7 +275,7 @@ bool Core::Scripting::ScriptManager::onMobKill( Entity::Player& player, uint16_t
    return true;
 }
 
-bool Core::Scripting::ScriptManager::onCastFinish( Entity::Player& player, Entity::ActorPtr pTarget, uint32_t actionId )
+bool Core::Scripting::ScriptManager::onCastFinish( Entity::Player& player, Entity::CharaPtr pTarget, uint32_t actionId )
 {
    auto script = m_nativeScriptManager->getScript< ActionScript >( actionId );
 
@@ -284,7 +284,7 @@ bool Core::Scripting::ScriptManager::onCastFinish( Entity::Player& player, Entit
    return true;
 }
 
-bool Core::Scripting::ScriptManager::onStatusReceive( Entity::ActorPtr pActor, uint32_t effectId )
+bool Core::Scripting::ScriptManager::onStatusReceive( Entity::CharaPtr pActor, uint32_t effectId )
 {
    auto script = m_nativeScriptManager->getScript< StatusEffectScript >( effectId );
 
@@ -300,30 +300,30 @@ bool Core::Scripting::ScriptManager::onStatusReceive( Entity::ActorPtr pActor, u
    return false;
 }
 
-bool Core::Scripting::ScriptManager::onStatusTick( Entity::ActorPtr pActor, Core::StatusEffect::StatusEffect& effect )
+bool Core::Scripting::ScriptManager::onStatusTick( Entity::CharaPtr pChara, Core::StatusEffect::StatusEffect& effect )
 {
    auto script = m_nativeScriptManager->getScript< StatusEffectScript >( effect.getId() );
    if( script )
    {
-      if( pActor->isPlayer() )
-         pActor->getAsPlayer()->sendDebug( "Calling status tick for statusid: " + std::to_string( effect.getId() ) );
+      if( pChara->isPlayer() )
+         pChara->getAsPlayer()->sendDebug( "Calling status tick for statusid: " + std::to_string( effect.getId() ) );
 
-      script->onTick( *pActor );
+      script->onTick( *pChara );
       return true;
    }
 
    return false;
 }
 
-bool Core::Scripting::ScriptManager::onStatusTimeOut( Entity::ActorPtr pActor, uint32_t effectId )
+bool Core::Scripting::ScriptManager::onStatusTimeOut( Entity::CharaPtr pChara, uint32_t effectId )
 {
    auto script = m_nativeScriptManager->getScript< StatusEffectScript >( effectId );
    if( script )
    {
-      if( pActor->isPlayer() )
-         pActor->getAsPlayer()->sendDebug( "Calling status timeout for statusid: " + std::to_string( effectId ) );
+      if( pChara->isPlayer() )
+         pChara->getAsPlayer()->sendDebug( "Calling status timeout for statusid: " + std::to_string( effectId ) );
 
-      script->onExpire( *pActor );
+      script->onExpire( *pChara );
       return true;
    }
 

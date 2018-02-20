@@ -2,7 +2,7 @@
 #define _CALCSTATS_H
 
 #include <common/Common.h>
-#include "Actor/Actor.h"
+#include "Actor/Chara.h"
 
 using namespace Core::Entity;
 

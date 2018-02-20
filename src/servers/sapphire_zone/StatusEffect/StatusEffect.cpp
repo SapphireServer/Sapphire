@@ -6,7 +6,7 @@
 #include <boost/algorithm/string.hpp>
 #include <algorithm>
 
-#include "Actor/Actor.h"
+#include "Actor/Chara.h"
 
 #include "StatusEffect.h"
 #include "Script/ScriptManager.h"
@@ -20,7 +20,7 @@ using namespace Core::Network::Packets::Server;
 extern Core::Scripting::ScriptManager g_scriptMgr;
 
 
-Core::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::ActorPtr sourceActor, Entity::ActorPtr targetActor,
+Core::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
                                                 uint32_t duration, uint32_t tickRate )
    : m_id( id )
    , m_sourceActor( sourceActor )

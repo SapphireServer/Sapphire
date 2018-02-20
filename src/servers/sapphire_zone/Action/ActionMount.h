@@ -15,7 +15,7 @@ namespace Action {
       ActionMount();
       ~ActionMount();
       
-      ActionMount( Entity::ActorPtr pActor, uint16_t mountId );
+      ActionMount( Entity::CharaPtr pActor, uint16_t mountId );
 
       void onStart() override;
       void onFinish() override;

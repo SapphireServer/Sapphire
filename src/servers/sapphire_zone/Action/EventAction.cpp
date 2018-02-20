@@ -21,7 +21,7 @@ Core::Action::EventAction::EventAction()
    m_handleActionType = HandleActionType::Event;
 }
 
-Core::Action::EventAction::EventAction( Entity::ActorPtr pActor, uint32_t eventId, uint16_t action,
+Core::Action::EventAction::EventAction( Entity::CharaPtr pActor, uint32_t eventId, uint16_t action,
                                         ActionCallback finishRef, ActionCallback interruptRef, uint64_t additional )
 {
    m_additional = additional;

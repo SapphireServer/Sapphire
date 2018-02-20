@@ -34,11 +34,11 @@ namespace Core
 
    namespace Entity
    {
-      class Actor;
+      class Chara;
       class Player;
       class BattleNpc;
 
-      typedef boost::shared_ptr<Actor> ActorPtr;
+      typedef boost::shared_ptr<Chara> ActorPtr;
       typedef boost::shared_ptr<Player> PlayerPtr;
       typedef boost::shared_ptr<BattleNpc> BattleNpcPtr;
    }

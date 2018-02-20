@@ -24,7 +24,7 @@ extern Core::Logger g_log;
 uint32_t Core::Entity::EventNpc::m_nextID = 1249241694;
 
 Core::Entity::EventNpc::EventNpc() :
-   Actor( ObjKind::EventNpc )
+   Chara( ObjKind::EventNpc )
 {
    m_id = 0;
    m_status = ActorStatus::Idle;
@@ -36,7 +36,7 @@ Core::Entity::EventNpc::~EventNpc()
 }
 
 Core::Entity::EventNpc::EventNpc( uint32_t enpcId, const Common::FFXIVARR_POSITION3& spawnPos, float rotation ) :
-   Actor( ObjKind::EventNpc )
+   Chara( ObjKind::EventNpc )
 {
    EventNpc::m_nextID++;
    m_id = EventNpc::m_nextID;

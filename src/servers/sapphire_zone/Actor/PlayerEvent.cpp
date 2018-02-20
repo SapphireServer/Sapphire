@@ -227,7 +227,7 @@ void Core::Entity::Player::eventActionStart( uint32_t eventId,
                                              ActionCallback interruptCallback,
                                              uint64_t additional )
 {
-   auto pEventAction = Action::make_EventAction( getAsActor(), eventId, action,
+   auto pEventAction = Action::make_EventAction( getAsChara(), eventId, action,
                                                  finishCallback, interruptCallback, additional );
 
    setCurrentAction( pEventAction );
@@ -257,7 +257,7 @@ void Core::Entity::Player::eventItemActionStart( uint32_t eventId,
                                                  ActionCallback interruptCallback,
                                                  uint64_t additional )
 {
-   Action::ActionPtr pEventItemAction = Action::make_EventItemAction( getAsActor(), eventId, action,
+   Action::ActionPtr pEventItemAction = Action::make_EventItemAction( getAsChara(), eventId, action,
                                                                       finishCallback, interruptCallback, additional );
 
    setCurrentAction( pEventItemAction );

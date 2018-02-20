@@ -1,13 +1,13 @@
 #ifndef SAPPHIRE_INSTANCEOBJECT_H
 #define SAPPHIRE_INSTANCEOBJECT_H
 
-#include "GameObject.h"
+#include "Actor.h"
 
 namespace Core
 {
 namespace Entity
 {
-   class InstanceObject : public GameObject
+   class InstanceObject : public Actor
    {
    public:
       InstanceObject( uint32_t objectId, uint32_t mapLinkId );
