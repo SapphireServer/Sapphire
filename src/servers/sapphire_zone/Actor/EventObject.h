@@ -7,11 +7,11 @@ namespace Core
 {
 namespace Entity
 {
-   class InstanceObject : public Actor
+   class EventObject : public Actor
    {
    public:
-      InstanceObject( uint32_t objectId, uint32_t mapLinkId );
-      InstanceObject( uint32_t objectId, uint32_t mapLinkId, Common::FFXIVARR_POSITION3 pos );
+      EventObject( uint32_t objectId, uint32_t mapLinkId );
+      EventObject( uint32_t objectId, uint32_t mapLinkId, Common::FFXIVARR_POSITION3 pos );
 
       uint32_t getHierachyId() const;
       void setHierachyId( uint32_t hierachyId );

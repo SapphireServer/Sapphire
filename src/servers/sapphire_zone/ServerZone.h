@@ -8,7 +8,6 @@
 #include <map>
 
 #include "Forwards.h"
-#include "Actor/BattleNpcTemplate.h"
 
 namespace Core {
 
@@ -34,11 +33,6 @@ namespace Core {
       XMLConfigPtr getConfig() const;
 
       size_t getSessionCount() const;
-
-      bool registerBnpcTemplate( std::string templateName, uint32_t bnpcBaseId,
-                                 uint32_t bnpcNameId, uint32_t modelId, std::string aiName );
-
-      Entity::BattleNpcTemplatePtr getBnpcTemplate( std::string templateName );
 
       void mainLoop();
 
@@ -66,8 +60,6 @@ namespace Core {
 
       std::map< uint32_t, uint32_t > m_zones;
 
-      std::map< std::string, Entity::BattleNpcTemplatePtr > m_bnpcTemplates;
-      
    };
 
 }

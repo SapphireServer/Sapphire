@@ -139,12 +139,6 @@ void Core::Scripting::ScriptManager::onPlayerFirstEnterWorld( Entity::Player& pl
 //   }
 }
 
-bool Core::Scripting::ScriptManager::registerBnpcTemplate( std::string templateName, uint32_t bnpcBaseId,
-                                                           uint32_t bnpcNameId, uint32_t modelId, std::string aiName )
-{
-   return g_serverZone.registerBnpcTemplate( templateName, bnpcBaseId, bnpcNameId, modelId, aiName );
-}
-
 bool Core::Scripting::ScriptManager::onTalk( Entity::Player& player, uint64_t actorId, uint32_t eventId )
 {
 
