@@ -69,12 +69,10 @@ namespace Entity {
 
       bool isPlayer() const;
       bool isBattleNpc() const;
-      bool isEventNpc() const;
 
       CharaPtr getAsChara();
       PlayerPtr getAsPlayer();
       BattleNpcPtr getAsBattleNpc();
-      EventNpcPtr getAsEventNpc();
    };
 
 }

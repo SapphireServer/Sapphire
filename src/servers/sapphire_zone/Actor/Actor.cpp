@@ -3,7 +3,6 @@
 #include "Player.h"
 #include "Chara.h"
 #include "BattleNpc.h"
-#include "EventNpc.h"
 
 Core::Entity::Actor::Actor( ObjKind type ) :
    m_objKind( type )
@@ -58,11 +57,6 @@ bool Core::Entity::Actor::isBattleNpc() const
    return m_objKind == ObjKind::BattleNpc;
 }
 
-bool Core::Entity::Actor::isEventNpc() const
-{
-   return m_objKind == ObjKind::EventNpc;
-}
-
 /*! \return pointer to this instance as ActorPtr */
 Core::Entity::CharaPtr Core::Entity::Actor::getAsChara()
 {
@@ -83,12 +77,4 @@ Core::Entity::BattleNpcPtr Core::Entity::Actor::getAsBattleNpc()
    if( !isBattleNpc() )
       return nullptr;
    return boost::dynamic_pointer_cast< Entity::BattleNpc, Entity::Actor >( shared_from_this() );
-}
-
-/*! \return pointer to this instance as EventNpcPtr */
-Core::Entity::EventNpcPtr Core::Entity::Actor::getAsEventNpc()
-{
-   if( !isEventNpc() )
-      return nullptr;
-   return boost::dynamic_pointer_cast< Entity::EventNpc, Entity::Actor >( shared_from_this() );
 }

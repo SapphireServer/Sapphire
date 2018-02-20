@@ -6,7 +6,7 @@
 
 #include "Cell.h"
 #include "CellHandler.h"
-#include "Actor/InstanceObject.h"
+#include "Actor/EventObject.h"
 
 #include "Forwards.h"
 
@@ -35,8 +35,7 @@ protected:
 
    std::unordered_map< int32_t, Entity::PlayerPtr > m_playerMap;
    std::unordered_map< int32_t, Entity::BattleNpcPtr > m_BattleNpcMap;
-   std::unordered_map< int32_t, Entity::EventNpcPtr > m_EventNpcMap;
-   std::unordered_map< int32_t, Entity::InstanceObjectPtr > m_instanceObjects;
+   std::unordered_map< int32_t, Entity::EventObjectPtr > m_instanceObjects;
 
    std::set< Entity::BattleNpcPtr > m_BattleNpcDeadMap;
 
@@ -114,9 +113,9 @@ public:
 
    void updateSessions( bool changedWeather );
 
-   void registerInstanceObj( Entity::InstanceObjectPtr object );
-   Entity::InstanceObjectPtr getInstanceObject( uint32_t objId );
-   void updateInstanceObj( Entity::InstanceObjectPtr object );
+   void registerEObj( Entity::EventObjectPtr object );
+   Entity::EventObjectPtr getEObj( uint32_t objId );
+   void updateEObj( Entity::EventObjectPtr object );
 
    InstanceContentPtr getAsInstanceContent();
 

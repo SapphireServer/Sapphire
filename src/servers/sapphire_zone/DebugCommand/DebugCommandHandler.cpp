@@ -23,7 +23,6 @@
 
 #include "Actor/Player.h"
 #include "Actor/BattleNpc.h"
-#include "Actor/EventNpc.h"
 
 #include "Zone/Zone.h"
 #include "Zone/InstanceContent.h"
@@ -378,33 +377,6 @@ void Core::DebugCommandHandler::add( char * data, Entity::Player& player, boost:
       sscanf( params.c_str(), "%x", &opcode );
       auto pPe = Network::Packets::make_GamePacket( opcode, 0x30, player.getId(), player.getId() );
       player.queuePacket( pPe );
-   }
-   else if( subCommand == "eventnpc-self" )
-   {
-      int32_t id;
-
-      sscanf( params.c_str(), "%d", &id );
-
-      Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcNpcSpawn > spawnPacket( player.getId() );
-      spawnPacket.data().type = 3;
-      spawnPacket.data().pos = player.getPos();
-      spawnPacket.data().rotation = player.getRotation();
-      spawnPacket.data().bNPCBase = id;
-      spawnPacket.data().bNPCName = id;
-      spawnPacket.data().targetId = player.getId();
-      player.queuePacket( spawnPacket );
-   }
-   else if( subCommand == "eventnpc" )
-   {
-      int32_t id;
-
-      sscanf( params.c_str(), "%d", &id );
-
-      auto pENpc = Entity::make_EventNpc( id, player.getPos(), player.getRotation() );
-
-      auto pZone = player.getCurrentZone();
-      pENpc->setCurrentZone( pZone );
-      pZone->pushActor( pENpc );
    }
    else if( subCommand == "actrl" )
    {
@@ -778,11 +750,11 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
       if( !instance )
          return;
 
-      auto obj = instance->getInstanceObject( objId );
+      auto obj = instance->getEObj(objId);
       if( !obj )
          return;
 
-      instance->updateInstanceObj( obj );
+      instance->updateEObj(obj);
    }
    else if( subCommand == "objstate" )
    {
@@ -795,7 +767,7 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
       if( !instance )
          return;
 
-      auto obj = instance->getInstanceObject( objId );
+      auto obj = instance->getEObj(objId);
       if( !obj )
          return;
 

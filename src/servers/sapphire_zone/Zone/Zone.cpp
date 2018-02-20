@@ -19,7 +19,6 @@
 #include "Actor/Chara.h"
 #include "Actor/Player.h"
 #include "Actor/BattleNpc.h"
-#include "Actor/EventNpc.h"
 
 #include "Forwards.h"
 
@@ -323,14 +322,6 @@ void Core::Zone::pushActor( Entity::CharaPtr pChara )
       pBNpc->setPosition( pBNpc->getPos() );
 
    }
-   else if( pChara->isEventNpc() )
-   {
-      Entity::EventNpcPtr pENpc = pChara->getAsEventNpc();
-      m_EventNpcMap[pENpc->getId()] = pENpc;
-      pENpc->setPosition( pENpc->getPos() );
-   }
-
-
 }
 
 void Core::Zone::removeActor( Entity::CharaPtr pChara )
@@ -752,7 +743,7 @@ void Core::Zone::updateInRangeSet( Entity::CharaPtr pChara, Cell* pCell )
             }
 
          }
-         else if( ( pChara->isBattleNpc() || pChara->isEventNpc() ) && pCurAct->isPlayer() && pChara->isAlive() )
+         else if( ( pChara->isBattleNpc() ) && pCurAct->isPlayer() && pChara->isAlive() )
          {
             auto pPlayer = pCurAct->getAsPlayer();
             if( pPlayer->isLoadingComplete() )
@@ -807,7 +798,7 @@ void Core::Zone::onInitDirector( Entity::Player& player )
 
 }
 
-void Core::Zone::registerInstanceObj( Entity::InstanceObjectPtr object )
+void Core::Zone::registerEObj( Entity::EventObjectPtr object )
 {
    if( !object )
       return;
@@ -819,7 +810,7 @@ void Core::Zone::registerInstanceObj( Entity::InstanceObjectPtr object )
    g_log.debug( "Registered instance eobj: " + std::to_string( object->getId() ) );
 }
 
-Core::Entity::InstanceObjectPtr Core::Zone::getInstanceObject( uint32_t objId )
+Core::Entity::EventObjectPtr Core::Zone::getEObj( uint32_t objId )
 {
    auto obj = m_instanceObjects.find( objId );
    if( obj == m_instanceObjects.end() )
@@ -828,7 +819,7 @@ Core::Entity::InstanceObjectPtr Core::Zone::getInstanceObject( uint32_t objId )
    return obj->second;
 }
 
-void Core::Zone::updateInstanceObj( Core::Entity::InstanceObjectPtr object )
+void Core::Zone::updateEObj( Entity::EventObjectPtr object )
 {
    if( !object )
       return;

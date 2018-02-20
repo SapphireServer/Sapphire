@@ -9,11 +9,11 @@ public:
 
    void onInit( InstanceContent& instance ) override
    {
-      auto exit = new Entity::InstanceObject( EXIT_OBJECT, 0, { 0, 0, -10 } );
-      instance.registerInstanceObj( Entity::InstanceObjectPtr( exit ) );
+      auto exit = new Entity::EventObject( EXIT_OBJECT, 0, { 0, 0, -10 } );
+      instance.registerEObj(Entity::InstanceObjectPtr(exit));
 
-      auto start = new Entity::InstanceObject( START_CIRCLE, 4236868, { 0, 0, 24 } );
-      instance.registerInstanceObj( Entity::InstanceObjectPtr( start ) );
+      auto start = new Entity::EventObject( START_CIRCLE, 4236868, { 0, 0, 24 } );
+      instance.registerEObj(Entity::InstanceObjectPtr(start));
    }
 
    void onUpdate( InstanceContent& instance, uint32_t currTime ) override

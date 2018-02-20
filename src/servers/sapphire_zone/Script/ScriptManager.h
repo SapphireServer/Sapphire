@@ -37,8 +37,6 @@ namespace Core
 
          void onPlayerFirstEnterWorld( Entity::Player& player );
 
-         static bool registerBnpcTemplate( std::string templateName, uint32_t bnpcBaseId, uint32_t bnpcNameId, uint32_t modelId, std::string aiName );
-
          bool onTalk( Entity::Player& player, uint64_t actorId, uint32_t eventId );
          bool onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 );
          bool onWithinRange( Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z );
