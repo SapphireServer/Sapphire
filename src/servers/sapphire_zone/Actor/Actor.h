@@ -68,7 +68,6 @@ namespace Entity {
       void setRot( float rot );
 
       bool isPlayer() const;
-      bool isBattleNpc() const;
 
       CharaPtr getAsChara();
       PlayerPtr getAsPlayer();
