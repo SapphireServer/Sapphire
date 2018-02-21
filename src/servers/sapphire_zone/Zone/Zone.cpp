@@ -805,15 +805,15 @@ void Core::Zone::registerEObj( Entity::EventObjectPtr object )
 
    //object->setParentInstance( InstanceContentPtr( this ) );
 
-   m_instanceObjects[object->getId()] = object;
+   m_eventObjects[object->getId()] = object;
 
    g_log.debug( "Registered instance eobj: " + std::to_string( object->getId() ) );
 }
 
 Core::Entity::EventObjectPtr Core::Zone::getEObj( uint32_t objId )
 {
-   auto obj = m_instanceObjects.find( objId );
-   if( obj == m_instanceObjects.end() )
+   auto obj = m_eventObjects.find( objId );
+   if( obj == m_eventObjects.end() )
       return nullptr;
 
    return obj->second;
