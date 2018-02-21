@@ -53,7 +53,8 @@ void Core::Action::EventAction::onStart()
    if( m_pSource->isPlayer() )
    {
       m_pSource->sendToInRangeSet( control, true );
-      //m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::Occupied2 );
+      if( m_pSource->getAsPlayer()->hasStateFlag( PlayerStateFlag::InNpcEvent ) )
+         m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::InNpcEvent );
    }
    else
       m_pSource->sendToInRangeSet( control );

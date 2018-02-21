@@ -39,7 +39,6 @@ public:
 
          }, 0 );
 
-         player.unlock();
       }
 
    }

@@ -300,7 +300,7 @@ void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
 
    setStateFlag( PlayerStateFlag::BetweenAreas );
 
-   auto targetPos = g_territoryMgr.getTerritoryPosition( data->territory );
+   auto targetPos = g_territoryMgr.getTerritoryPosition( data->levelId );
 
    Common::FFXIVARR_POSITION3 pos;
    pos.x = 0;
@@ -652,17 +652,6 @@ void Core::Entity::Player::gainLevel()
    classInfoPacket.data().currentExp = getExp();
    queuePacket( classInfoPacket );
 
-
-
-
-
-
-
-}
-
-void Core::Entity::Player::unlock()
-{
-   queuePacket( PlayerStateFlagsPacket( *getAsPlayer(), PlayerStateFlagList{} ) );
 }
 
 void Core::Entity::Player::sendStatusUpdate( bool toSelf )

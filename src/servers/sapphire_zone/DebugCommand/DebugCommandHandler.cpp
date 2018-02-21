@@ -56,7 +56,6 @@ Core::DebugCommandHandler::DebugCommandHandler()
    registerCommand( "replay", &DebugCommandHandler::replay, "Replays a saved capture folder.", 1 );
    registerCommand( "nudge", &DebugCommandHandler::nudge, "Nudges you forward/up/down.", 1 );
    registerCommand( "info", &DebugCommandHandler::serverInfo, "Show server info.", 0 );
-   registerCommand( "unlock", &DebugCommandHandler::unlockCharacter, "Unlock character.", 1 );
    registerCommand( "help", &DebugCommandHandler::help, "Shows registered commands.", 0 );
    registerCommand( "script", &DebugCommandHandler::script, "Server script utilities.", 1 );
    registerCommand( "instance", &DebugCommandHandler::instance, "Instance utilities", 1 );
@@ -572,11 +571,6 @@ void Core::DebugCommandHandler::serverInfo( char * data, Entity::Player& player,
    player.sendDebug( "SapphireServer " + Version::VERSION + "\nRev: " + Version::GIT_HASH );
    player.sendDebug( "Compiled: " __DATE__ " " __TIME__ );
    player.sendDebug( "Sessions: " + std::to_string( g_serverZone.getSessionCount() ) );
-}
-
-void Core::DebugCommandHandler::unlockCharacter( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
-{
-   player.unlock();
 }
 
 void Core::DebugCommandHandler::script( char* data, Entity::Player &player, boost::shared_ptr< DebugCommand > command )

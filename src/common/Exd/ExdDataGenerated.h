@@ -496,6 +496,7 @@ struct Aetheryte
    uint16_t placeName;
    uint16_t aethernetName;
    uint16_t territory;
+   uint32_t levelId;
    bool isAetheryte;
    uint8_t aethernetGroup;
    uint16_t map;
