@@ -823,6 +823,8 @@ void Core::Entity::Player::despawn( Entity::PlayerPtr pTarget )
 {
    auto pPlayer = pTarget;
 
+   g_log.debug( "despawning " + getName() + " for " + pTarget->getName() );
+
    pPlayer->freePlayerSpawnId( getId() );
 
    pPlayer->queuePacket( ActorControlPacket143( getId(), DespawnZoneScreenMsg, 0x04, getId(), 0x01 ) );

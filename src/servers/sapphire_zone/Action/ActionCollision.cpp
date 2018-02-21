@@ -31,7 +31,7 @@ bool ActionCollision::isActorApplicable( Chara& chara, TargetFilter targetFilter
    case TargetFilter::Allies:
    {
       // todo: implement ally NPCs
-      actorApplicable = !chara.isBattleNpc();
+    //  actorApplicable = !chara.isBattleNpc();
       break;
    }
    case TargetFilter::Party:
@@ -42,7 +42,7 @@ bool ActionCollision::isActorApplicable( Chara& chara, TargetFilter targetFilter
    }
    case TargetFilter::Enemies:
    {
-      actorApplicable = chara.isBattleNpc();
+      //actorApplicable = chara.isBattleNpc();
       break;
    }
    }

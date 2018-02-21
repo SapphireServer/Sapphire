@@ -35,6 +35,9 @@ extern Core::Data::ExdDataGenerated g_exdDataGen;
 extern Core::Scripting::ScriptManager g_scriptMgr;
 extern Core::TerritoryMgr g_territoryMgr;
 
+using namespace Core::Common;
+using namespace Core::Network::Packets;
+using namespace Core::Network::Packets::Server;
 
 /**
 * \brief
@@ -42,15 +45,15 @@ extern Core::TerritoryMgr g_territoryMgr;
 Core::Zone::Zone() :
    m_territoryId( 0 ),
    m_guId( 0 ),
-   m_currentWeather( Common::Weather::FairSkies ),
-   m_weatherOverride( Common::Weather::None ),
+   m_currentWeather( Weather::FairSkies ),
+   m_weatherOverride( Weather::None ),
    m_lastMobUpdate( 0 ),
    m_currentFestivalId( 0 )
 {
 }
 
 Core::Zone::Zone( uint16_t territoryId, uint32_t guId, const std::string& internalName, const std::string& placeName ) :
-   m_currentWeather( Common::Weather::FairSkies )
+   m_currentWeather( Weather::FairSkies )
 {
    m_guId = guId;
 
@@ -59,7 +62,7 @@ Core::Zone::Zone( uint16_t territoryId, uint32_t guId, const std::string& intern
    m_placeName = placeName;
    m_lastMobUpdate = 0;
 
-   m_weatherOverride = Common::Weather::None;
+   m_weatherOverride = Weather::None;
    m_territoryTypeInfo = g_exdDataGen.get< Core::Data::TerritoryType >( territoryId );
 
    loadWeatherRates();
@@ -109,12 +112,12 @@ bool Core::Zone::init()
    return true;
 }
 
-void Core::Zone::setWeatherOverride( Common::Weather weather )
+void Core::Zone::setWeatherOverride( Weather weather )
 {
    m_weatherOverride = weather;
 }
 
-Core::Common::Weather Core::Zone::getCurrentWeather() const
+Weather Core::Zone::getCurrentWeather() const
 {
    return m_currentWeather;
 }
@@ -135,7 +138,7 @@ void Core::Zone::loadCellCache()
 
 }
 
-Core::Common::Weather Core::Zone::getNextWeather()
+Weather Core::Zone::getNextWeather()
 {
    uint32_t unixTime = static_cast< uint32_t >( Util::getTimeSeconds() );
    // Get Eorzea hour for weather start
@@ -156,13 +159,13 @@ Core::Common::Weather Core::Zone::getNextWeather()
    for( auto entry : m_weatherRateMap )
    {
       uint8_t sRate = entry.first;
-      auto weatherId = static_cast< Common::Weather >( entry.second );
+      auto weatherId = static_cast< Weather >( entry.second );
 
       if( rate <= sRate )
          return weatherId;
    }
 
-   return Common::Weather::FairSkies;
+   return Weather::FairSkies;
 }
 
 void Core::Zone::pushActor( Entity::CharaPtr pChara )
@@ -246,24 +249,25 @@ void Core::Zone::removeActor( Entity::CharaPtr pChara )
 
 }
 
-void Core::Zone::queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range, Network::Packets::GamePacketPtr pPacketEntry )
+void Core::Zone::queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range, GamePacketPtr pPacketEntry )
 {
    if( g_territoryMgr.isPrivateTerritory( getTerritoryId() ) )
       return;
 
-   for( auto it = m_playerMap.begin(); it != m_playerMap.end(); ++it )
+   for( auto entry : m_playerMap )
    {
+      auto player = entry.second;
       float distance = Math::Util::distance( sourcePlayer.getPos().x,
                                              sourcePlayer.getPos().y,
                                              sourcePlayer.getPos().z,
-                                             ( *it ).second->getPos().x,
-                                             ( *it ).second->getPos().y,
-                                             ( *it ).second->getPos().z );
+                                             player->getPos().x,
+                                             player->getPos().y,
+                                             player->getPos().z );
 
-      if( ( distance < range ) && sourcePlayer.getId() != ( *it ).second->getId() )
+      if( ( distance < range ) && sourcePlayer.getId() != player->getId() )
       {
-         auto pSession = g_serverZone.getSession( ( *it ).second->getId() );
-         pPacketEntry->setValAt< uint32_t >( 0x08, ( *it ).second->getId() );
+         auto pSession = g_serverZone.getSession( player->getId() );
+         pPacketEntry->setValAt< uint32_t >( 0x08, player->getId() );
          if( pSession )
             pSession->getZoneConnection()->queueOutPacket( pPacketEntry );
       }
@@ -297,7 +301,7 @@ std::size_t Core::Zone::getPopCount() const
 
 bool Core::Zone::checkWeather()
 {
-   if( m_weatherOverride != Common::Weather::None )
+   if( m_weatherOverride != Weather::None )
    {
       if( m_weatherOverride != m_currentWeather )
       {
@@ -401,12 +405,13 @@ void Core::Zone::updateSessions( bool changedWeather )
          continue;
       }
 
+      auto pPlayer = pSession->getPlayer();
+
       // this session is not linked to this area anymore, remove it from zone session list
-      if( ( !pSession->getPlayer()->getCurrentZone() ) ||
-          ( pSession->getPlayer()->getCurrentZone() != shared_from_this() ) )
+      if( ( !pPlayer->getCurrentZone() ) || ( pPlayer->getCurrentZone() != shared_from_this() ) )
       {
-         if( pSession->getPlayer()->getCell() )
-            removeActor(pSession->getPlayer() );
+         if( pPlayer->getCell() )
+            removeActor( pSession->getPlayer() );
 
          it = m_sessionSet.erase(it );
          continue;
@@ -414,8 +419,7 @@ void Core::Zone::updateSessions( bool changedWeather )
 
       if( changedWeather )
       {
-         Core::Network::Packets::ZoneChannelPacket< Core::Network::Packets::Server::FFXIVIpcWeatherChange  >
-                 weatherChangePacket( pSession->getPlayer()->getId() );
+         ZoneChannelPacket< FFXIVIpcWeatherChange  > weatherChangePacket( pPlayer->getId() );
          weatherChangePacket.data().weatherId = static_cast< uint8_t >( m_currentWeather );
          weatherChangePacket.data().delay = 5.0f;
          pSession->getPlayer()->queuePacket( weatherChangePacket );
@@ -577,15 +581,13 @@ void Core::Zone::updateInRangeSet( Entity::CharaPtr pChara, Cell* pCell )
    if( g_territoryMgr.isPrivateTerritory( getTerritoryId() ) )
       return;
 
-   Entity::CharaPtr pCurAct;
-
    auto iter = pCell->m_charas.begin();
 
    float fRange = 70.0f;
    int32_t count = 0;
    while( iter != pCell->m_charas.end() )
    {
-      pCurAct = *iter;
+      auto pCurAct = *iter;
       ++iter;
 
       if( !pCurAct || pCurAct == pChara )
@@ -597,60 +599,38 @@ void Core::Zone::updateInRangeSet( Entity::CharaPtr pChara, Cell* pCell )
       bool isInRange = ( fRange == 0.0f || distance <= fRange );
       bool isInRangeSet = pChara->isInRangeSet( pCurAct );
 
-      // Add if we are not ourself and range == 0 or distance is withing range.
+      // Add if range == 0 or distance is withing range.
       if( isInRange && !isInRangeSet )
       {
-
          if( pChara->isPlayer() )
          {
             auto pOwnPlayer = pChara->getAsPlayer();
-
             if( !pOwnPlayer->isLoadingComplete() )
                continue;
 
-            // this is a hack to limit actor spawn in one packetset
-            count++;
-            if( count > 12 )
-               break;
-
-            pChara->addInRangeChara( pCurAct );
-            pCurAct->addInRangeChara( pChara );
             // spawn the actor for the player
             pCurAct->spawn( pOwnPlayer );
-
-            if( pCurAct->isPlayer() )
-            {
-               auto pPlayer = pCurAct->getAsPlayer();
-               if( !pPlayer->isLoadingComplete() )
-                  continue;
-
-               pChara->spawn( pPlayer );
-            }
-
          }
-         else if( ( pChara->isBattleNpc() ) && pCurAct->isPlayer() && pChara->isAlive() )
+
+         if( pCurAct->isPlayer() )
          {
             auto pPlayer = pCurAct->getAsPlayer();
-            if( pPlayer->isLoadingComplete() )
-            {
-               pChara->spawn( pPlayer );
-               pCurAct->addInRangeChara( pChara );
-               pChara->addInRangeChara( pCurAct );
-            }
+            if( !pPlayer->isLoadingComplete() )
+               continue;
+
+            pChara->spawn( pPlayer );
          }
-         else
-         {
-            pChara->addInRangeChara( pCurAct );
-            pCurAct->addInRangeChara( pChara );
-         }
+
+         pChara->addInRangeChara( pCurAct );
+         pCurAct->addInRangeChara( pChara );
+
+         // this is a hack to limit actor spawn in one packetset
+         if( count++ > 12 )
+            break;
       }
       else if( !isInRange && isInRangeSet )
       {
          pCurAct->removeInRangeChara( *pChara );
-
-         if( pChara->getCurrentZone() != pCurAct->getCurrentZone() )
-            continue;
-
          pChara->removeInRangeChara( *pCurAct );
       }
    }
@@ -704,6 +684,7 @@ Core::Entity::EventObjectPtr Core::Zone::getEObj( uint32_t objId )
    return obj->second;
 }
 
+// TODO: this is located wrong. state change should happen in the object and it should send to his in range set.
 void Core::Zone::updateEObj( Entity::EventObjectPtr object )
 {
    if( !object )
@@ -712,7 +693,7 @@ void Core::Zone::updateEObj( Entity::EventObjectPtr object )
    for( const auto& playerIt : m_playerMap )
    {
       // send that packet with le data
-      Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcObjectSpawn > eobjStatePacket( playerIt.second->getId() );
+      ZoneChannelPacket< FFXIVIpcObjectSpawn > eobjStatePacket( playerIt.second->getId() );
       eobjStatePacket.data().objKind = object->getObjKind();
       eobjStatePacket.data().state = object->getState();
       eobjStatePacket.data().objId = object->getId();

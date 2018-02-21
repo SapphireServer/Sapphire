@@ -51,11 +51,6 @@ bool Core::Entity::Actor::isPlayer() const
    return m_objKind == ObjKind::Player;
 }
 
-bool Core::Entity::Actor::isBattleNpc() const
-{
-   return m_objKind == ObjKind::BattleNpc;
-}
-
 /*! \return pointer to this instance as ActorPtr */
 Core::Entity::CharaPtr Core::Entity::Actor::getAsChara()
 {
