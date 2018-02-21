@@ -513,14 +513,7 @@ public:
 
    // Player Battle Handling
    //////////////////////////////////////////////////////////////////////////////////////////////////////
-   void onMobAggro( BattleNpcPtr pBNpc );
-   void onMobDeaggro( BattleNpcPtr pBNpc );
-
    void initHateSlotQueue();
-   void hateListAdd( BattleNpcPtr pBNpc );
-   void hateListRemove( BattleNpcPtr pBNpc );
-
-   bool hateListHasMob( BattleNpcPtr pBNpc );
 
    void sendHateList();
 

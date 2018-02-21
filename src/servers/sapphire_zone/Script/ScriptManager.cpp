@@ -6,7 +6,6 @@
 
 #include "Zone/Zone.h"
 #include "Actor/Player.h"
-#include "Actor/BattleNpc.h"
 #include "ServerZone.h"
 #include "Event/EventHandler.h"
 #include "Event/EventHelper.h"

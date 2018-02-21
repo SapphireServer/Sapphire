@@ -34,14 +34,9 @@ protected:
    std::string m_internalName;
 
    std::unordered_map< int32_t, Entity::PlayerPtr > m_playerMap;
-   std::unordered_map< int32_t, Entity::BattleNpcPtr > m_BattleNpcMap;
    std::unordered_map< int32_t, Entity::EventObjectPtr > m_eventObjects;
 
-   std::set< Entity::BattleNpcPtr > m_BattleNpcDeadMap;
-
    SessionSet m_sessionSet;
-
-   CellCache** m_pCellCache[_sizeX];
 
    Common::Weather m_currentWeather;
    Common::Weather m_weatherOverride;
@@ -52,8 +47,6 @@ protected:
    boost::shared_ptr< Data::TerritoryType > m_territoryTypeInfo;
 
    std::map< uint8_t, int32_t> m_weatherRateMap;
-
-
 
 public:
    Zone();
@@ -70,10 +63,6 @@ public:
 
    uint16_t getCurrentFestival() const;
    void setCurrentFestival( uint16_t festivalId );
-
-   CellCache* getCellCacheList( uint32_t cellx, uint32_t celly );
-
-   CellCache* getCellCacheAndCreate( uint32_t cellx, uint32_t celly );
 
    virtual void loadCellCache();
    virtual uint32_t getTerritoryId() const;
@@ -107,7 +96,7 @@ public:
    std::size_t getPopCount() const;
    void loadWeatherRates();
    bool checkWeather();
-   void updateBnpcs( int64_t tickCount );
+   //void updateBnpcs( int64_t tickCount );
 
    bool update( uint32_t currTime );
 
