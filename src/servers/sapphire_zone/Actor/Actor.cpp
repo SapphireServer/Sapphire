@@ -2,7 +2,6 @@
 
 #include "Player.h"
 #include "Chara.h"
-#include "BattleNpc.h"
 
 Core::Entity::Actor::Actor( ObjKind type ) :
    m_objKind( type )
@@ -71,10 +70,3 @@ Core::Entity::PlayerPtr Core::Entity::Actor::getAsPlayer()
    return boost::dynamic_pointer_cast< Entity::Player, Entity::Actor >( shared_from_this() );
 }
 
-/*! \return pointer to this instance as BattleNpcPtr */
-Core::Entity::BattleNpcPtr Core::Entity::Actor::getAsBattleNpc()
-{
-   if( !isBattleNpc() )
-      return nullptr;
-   return boost::dynamic_pointer_cast< Entity::BattleNpc, Entity::Actor >( shared_from_this() );
-}

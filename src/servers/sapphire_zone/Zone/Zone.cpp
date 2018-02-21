@@ -18,7 +18,6 @@
 #include "Session.h"
 #include "Actor/Chara.h"
 #include "Actor/Player.h"
-#include "Actor/BattleNpc.h"
 
 #include "Forwards.h"
 
@@ -100,14 +99,12 @@ Core::Zone::~Zone()
 
 bool Core::Zone::init()
 {
-   memset( m_pCellCache, 0, sizeof( CellCache* ) * _sizeX );
 
    if( g_scriptMgr.onZoneInit( shared_from_this() ) )
    {
       // all good
    }
 
-   loadCellCache();
 
    return true;
 }
@@ -132,108 +129,9 @@ void Core::Zone::setCurrentFestival( uint16_t festivalId )
    m_currentFestivalId = festivalId;
 }
 
-Core::CellCache* Core::Zone::getCellCacheList( uint32_t cellx, uint32_t celly )
-{
-   assert( cellx < _sizeX );
-   assert( celly < _sizeY );
-   if( m_pCellCache[cellx] == nullptr )
-      return nullptr;
-
-   return m_pCellCache[cellx][celly];
-}
-
-Core::CellCache* Core::Zone::getCellCacheAndCreate( uint32_t cellx, uint32_t celly )
-{
-   assert( cellx < _sizeX );
-   assert( celly < _sizeY );
-   if( m_pCellCache[cellx] == nullptr )
-   {
-      m_pCellCache[cellx] = new CellCache*[_sizeY];
-      memset(m_pCellCache[cellx], 0, sizeof( CellCache* ) * _sizeY);
-   }
-
-   if( m_pCellCache[cellx][celly] == nullptr )
-   {
-      //m_pCellCache[cellx][celly] = new CellCache;
-   }
-
-   return m_pCellCache[cellx][celly];
-}
 
 void Core::Zone::loadCellCache()
 {
-   auto pQR = g_charaDb.query( "SELECT Id,"
-                               "Zoneid,"
-                               "NameId,"
-                               "SizeId,"
-                               "ClassJob,"
-                               "DisplayFlags1,"
-                               "DisplayFlags2,"
-                               "Level,"
-                               "Pos_0_0,"
-                               "Pos_0_1,"
-                               "Pos_0_2,"
-                               "Rotation,"
-                               "MobType,"
-                               "Behaviour,"
-                               "ModelMainWeapon,"
-                               "ModelSubWeapon,"
-                               "ModelId,"
-                               "Look,"
-                               "Models,"
-                               "type "
-                               "FROM battlenpc WHERE ZoneId = " + std::to_string( getTerritoryId() ) + ";" );
-
-   std::vector< Entity::BattleNpcPtr > cache;
-
-   while( pQR->next() )
-   {
-      uint32_t id = pQR->getUInt( 1 );
-      uint32_t targetZoneId = pQR->getUInt( 2 );
-      uint32_t nameId = pQR->getUInt( 3 );
-      uint32_t sizeId = pQR->getUInt( 4 );
-      uint32_t classJob = pQR->getUInt( 5 );
-      uint32_t displayFlags1 = pQR->getUInt( 6 );
-      uint32_t displayFlags2 = pQR->getUInt( 7 );
-      uint32_t level = pQR->getUInt( 8 );
-      float posX = pQR->getFloat( 9 );
-      float posY = pQR->getFloat( 10 );
-      float posZ = pQR->getFloat( 11 );
-      uint32_t rotation = pQR->getUInt( 12 );
-      uint32_t mobType = pQR->getUInt( 13 );
-      uint32_t behaviour = pQR->getUInt( 14 );
-      uint64_t modelMainWeapon = pQR->getUInt( 15 );
-      uint64_t modelSubWeapon = pQR->getUInt( 16 );
-      uint32_t modelId = pQR->getUInt( 17 );
-      uint32_t type = pQR->getUInt( 18 );
-
-      Common::FFXIVARR_POSITION3 pos{ posX, posY, posZ };
-      auto pBNpc = Entity::make_BattleNpc( modelId, nameId, pos, sizeId, type, level, behaviour, mobType );
-      pBNpc->setRotation( static_cast< float >( rotation ) );
-      cache.push_back( pBNpc );
-   }
-
-
-
-   for( auto entry : cache )
-   {
-      // get cell position
-      uint32_t cellX = CellHandler< TerritoryMgr >::getPosX( entry->getPos().x );
-      uint32_t cellY = CellHandler< TerritoryMgr >::getPosY( entry->getPos().z );
-
-      // find the right cell, create it if not existing yet
-      if( m_pCellCache[cellX] == nullptr )
-      {
-         m_pCellCache[cellX] = new CellCache*[_sizeY];
-         memset( m_pCellCache[cellX], 0, sizeof( CellCache* ) * _sizeY );
-      }
-
-      if( !m_pCellCache[cellX][cellY] )
-         m_pCellCache[cellX][cellY] = new CellCache;
-
-      // add the populace cache object to the cells list
-      m_pCellCache[cellX][cellY]->battleNpcCache.push_back( entry );
-   }
 
 }
 
@@ -314,15 +212,7 @@ void Core::Zone::pushActor( Entity::CharaPtr pChara )
       m_playerMap[pPlayer->getId()] = pPlayer;
       updateCellActivity( cx, cy, 2 );
    }
-   else if( pChara->isBattleNpc() )
-   {
-
-      Entity::BattleNpcPtr pBNpc = pChara->getAsBattleNpc();
-      m_BattleNpcMap[pBNpc->getId()] = pBNpc;
-      pBNpc->setPosition( pBNpc->getPos() );
-
-   }
-}
+ }
 
 void Core::Zone::removeActor( Entity::CharaPtr pChara )
 {
@@ -349,8 +239,6 @@ void Core::Zone::removeActor( Entity::CharaPtr pChara )
       onLeaveTerritory( *pChara->getAsPlayer() );
 
    }
-   else if( pChara->isBattleNpc() )
-      m_BattleNpcMap.erase( pChara->getId() );
 
    // remove from lists of other actors
    pChara->removeFromInRange();
@@ -433,6 +321,7 @@ bool Core::Zone::checkWeather()
    return false;
 }
 
+/*
 void Core::Zone::updateBnpcs( int64_t tickCount )
 {
    if( ( tickCount - m_lastMobUpdate ) > 250 )
@@ -480,6 +369,7 @@ void Core::Zone::updateBnpcs( int64_t tickCount )
       }
    }
 }
+*/
 
 bool Core::Zone::update( uint32_t currTime )
 {
@@ -489,7 +379,7 @@ bool Core::Zone::update( uint32_t currTime )
    bool changedWeather = checkWeather();
 
    updateSessions( changedWeather );
-   updateBnpcs( tickCount );
+   //updateBnpcs( tickCount );
    onUpdate( currTime );
 
    return true;
@@ -590,9 +480,6 @@ void Core::Zone::updateCellActivity( uint32_t x, uint32_t y, int32_t radius )
 
                assert( !pCell->isLoaded() );
 
-               CellCache * pCC = getCellCacheAndCreate( posX, posY );
-               if( pCC )
-                  pCell->loadCharas(pCC);
             }
          }
          else
@@ -604,9 +491,7 @@ void Core::Zone::updateCellActivity( uint32_t x, uint32_t y, int32_t radius )
 
                if( !pCell->isLoaded() )
                {
-                  CellCache * pCC = getCellCacheAndCreate( posX, posY );
-                  if( pCC )
-                     pCell->loadCharas(pCC);
+
                }
             }
             else if( !isCellActive( posX, posY ) && pCell->isActive() )

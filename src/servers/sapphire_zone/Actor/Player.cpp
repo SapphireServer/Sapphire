@@ -9,7 +9,6 @@
 
 #include "Session.h"
 #include "Player.h"
-#include "BattleNpc.h"
 
 #include "Zone/TerritoryMgr.h"
 #include "Zone/Zone.h"
@@ -1264,64 +1263,6 @@ void Core::Entity::Player::updateHowtosSeen( uint32_t howToId )
    uint8_t value = 1 << bitIndex;
 
    m_howTo[index] |= value;
-}
-
-
-void Core::Entity::Player::onMobAggro( BattleNpcPtr pBNpc )
-{
-   hateListAdd( pBNpc );
-
-   queuePacket( ActorControlPacket142( getId(), ToggleAggro, 1 ) );
-}
-
-void Core::Entity::Player::onMobDeaggro( BattleNpcPtr pBNpc )
-{
-   hateListRemove( pBNpc );
-
-   if( m_actorIdTohateSlotMap.empty() )
-      queuePacket( ActorControlPacket142( getId(), ToggleAggro ) );
-}
-
-void Core::Entity::Player::hateListAdd( BattleNpcPtr pBNpc )
-
-{
-   if( m_freeHateSlotQueue.empty() )
-      return;
-   uint8_t hateId = m_freeHateSlotQueue.front();
-   m_freeHateSlotQueue.pop();
-   m_actorIdTohateSlotMap[pBNpc->getId()] = hateId;
-   sendHateList();
-
-}
-
-void Core::Entity::Player::hateListRemove( BattleNpcPtr pBNpc )
-{
-
-   auto it = m_actorIdTohateSlotMap.begin();
-   for( ; it != m_actorIdTohateSlotMap.end(); ++it )
-   {
-      if( it->first == pBNpc->getId() )
-      {
-         uint8_t hateSlot = it->second;
-         m_freeHateSlotQueue.push( hateSlot );
-         m_actorIdTohateSlotMap.erase( it );
-         sendHateList();
-
-         return;
-      }
-   }
-}
-
-bool Core::Entity::Player::hateListHasMob( BattleNpcPtr pBNpc )
-{
-
-   auto it = m_actorIdTohateSlotMap.begin();
-   for( ; it != m_actorIdTohateSlotMap.end(); ++it )
-   {
-      if( it->first == pBNpc->getId() )
-         return true;
-   }
-   return false;
 }
 
 void Core::Entity::Player::initHateSlotQueue()

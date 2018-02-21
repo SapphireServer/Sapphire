@@ -1,7 +1,6 @@
 #include "Cell.h"
 
 #include "Actor/Chara.h"
-#include "Actor/BattleNpc.h"
 #include "Forwards.h"
 #include "Zone.h"
 
@@ -24,7 +23,6 @@ Core::Cell::~Cell()
 
 void Core::Cell::init( uint32_t x, uint32_t y, ZonePtr pZone )
 {
-   //Console->outDebOnly("[Region:%X] Initializing a new cell[%i/%i]", pRegion->getId(), x, y );
    m_pZone = pZone;
    m_posX = x;
    m_posY = y;
@@ -32,24 +30,12 @@ void Core::Cell::init( uint32_t x, uint32_t y, ZonePtr pZone )
    m_charas.clear();
 }
 
-void Core::Cell::loadCharas( CellCache* pCC )
-{
-   m_bLoaded = true;
-   assert( pCC );
-
-   for( auto entry : pCC->battleNpcCache )
-   {
-      entry->setCurrentZone( m_pZone );
-      m_pZone->pushActor( entry );
-   }
-}
-
 void Core::Cell::addChara( Entity::CharaPtr pAct )
 {
    if( pAct->isPlayer() )
       ++m_playerCount;
 
-   m_charas.insert(pAct);
+   m_charas.insert( pAct );
 }
 
 void Core::Cell::removeChara( Entity::CharaPtr pAct )

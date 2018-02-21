@@ -72,7 +72,6 @@ namespace Entity {
 
       CharaPtr getAsChara();
       PlayerPtr getAsPlayer();
-      BattleNpcPtr getAsBattleNpc();
    };
 
 }

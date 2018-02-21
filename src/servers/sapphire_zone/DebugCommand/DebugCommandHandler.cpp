@@ -22,7 +22,6 @@
 #include "Script/NativeScriptManager.h"
 
 #include "Actor/Player.h"
-#include "Actor/BattleNpc.h"
 
 #include "Zone/Zone.h"
 #include "Zone/InstanceContent.h"
@@ -356,19 +355,6 @@ void Core::DebugCommandHandler::add( char * data, Entity::Player& player, boost:
 
       player.addTitle( titleId );
       player.sendNotice( "Added title (ID: " + std::to_string( titleId ) + ")" );
-   }
-   else if( subCommand == "spawn" )
-   {
-      int32_t model, name;
-
-      sscanf( params.c_str(), "%d %d", &model, &name );
-
-      auto pBNpc = Entity::make_BattleNpc( model, name, player.getPos() );
-
-      auto pZone = player.getCurrentZone();
-      pBNpc->setCurrentZone( pZone );
-      pZone->pushActor( pBNpc );
-
    }
    else if( subCommand == "op" )
    {

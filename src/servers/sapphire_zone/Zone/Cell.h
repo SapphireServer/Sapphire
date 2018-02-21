@@ -9,12 +9,6 @@
 
 namespace Core {
 
-
-   struct CellCache
-   {
-      std::vector< Entity::BattleNpcPtr > battleNpcCache;
-   };
-
    typedef std::set< Entity::CharaPtr > CharaSet;
 
    class Cell 
@@ -42,8 +36,6 @@ namespace Core {
       void addChara( Entity::CharaPtr pAct );
 
       void removeChara( Entity::CharaPtr pAct );
-
-      void loadCharas( CellCache *pCC );
 
       bool hasChara( Entity::CharaPtr pAct )
       { 
