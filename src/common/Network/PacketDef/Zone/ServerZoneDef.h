@@ -629,7 +629,7 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    uint8_t namedayDay;
    uint8_t cityState;
    uint8_t homepoint;
-   uint8_t unknown26;
+   uint8_t unknown26; // 2 if "warrior of light"
    uint8_t petHotBar;
    uint8_t companionRank;
    uint8_t companionStars;
