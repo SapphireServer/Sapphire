@@ -52,16 +52,6 @@ std::string Core::Entity::Chara::getName() const
    return std::string( m_name );
 }
 
-/*! \return list of actors currently in range */
-std::set< Core::Entity::CharaPtr > Core::Entity::Chara::getInRangeCharas( bool includeSelf )
-{
-   auto tempInRange = m_inRangeCharas;
-
-   if( includeSelf )
-      tempInRange.insert( getAsChara() );
-
-   return tempInRange;
-   }
 
 /*! \return current stance of the actors */
 Core::Entity::Chara::Stance Core::Entity::Chara::getStance() const
@@ -396,155 +386,6 @@ void Core::Entity::Chara::setCurrentAction( Core::Action::ActionPtr pAction )
    m_pCurrentAction = pAction;
 }
 
-/*!
-check if a given actor is in the actors in range set
-
-\param ActorPtr to be checked for
-\return true if the actor was found
-*/
-bool Core::Entity::Chara::isInRangeSet( CharaPtr pChara ) const
-{
-   return !( m_inRangeCharas.find( pChara ) == m_inRangeCharas.end() );
-}
-
-/*! \return ActorPtr of the closest actor in range, if none, nullptr */
-Core::Entity::CharaPtr Core::Entity::Chara::getClosestChara()
-{
-   if( m_inRangeCharas.empty() )
-      // no actors in range, don't bother
-      return nullptr;
-
-   CharaPtr tmpActor = nullptr;
-
-   // arbitrary high number
-   float minDistance = 10000;
-
-   for( const auto& pCurAct : m_inRangeCharas )
-   {
-      float distance = Math::Util::distance( getPos().x,
-                                             getPos().y,
-                                             getPos().z,
-                                             pCurAct->getPos().x,
-                                             pCurAct->getPos().y,
-                                             pCurAct->getPos().z );
-
-      if( distance < minDistance )
-      {
-         minDistance = distance;
-         tmpActor = pCurAct;
-      }
-   }
-
-   return tmpActor;
-}
-
-/*!
-Send a packet to all players in range, potentially to self if set and is player
-
-\param GamePacketPtr to send
-\param bool should be send to self?
-*/
-void Core::Entity::Chara::sendToInRangeSet( Network::Packets::GamePacketPtr pPacket, bool bToSelf )
-{
-
-   if( bToSelf && isPlayer() )
-   {
-      auto pPlayer = getAsPlayer();
-
-      auto pSession = g_serverZone.getSession( pPlayer->getId() );
-
-      // it might be that the player DC'd in which case the session would be invalid
-      if( pSession )
-         pSession->getZoneConnection()->queueOutPacket( pPacket );
-   }
-
-   if( m_inRangePlayers.empty() )
-      return;
-
-   for( const auto &pCurAct : m_inRangePlayers )
-   {
-      assert( pCurAct );
-      pPacket->setValAt< uint32_t >( 0x04, m_id );
-      pPacket->setValAt< uint32_t >( 0x08, pCurAct->m_id );
-      // it might be that the player DC'd in which case the session would be invalid
-      pCurAct->queuePacket( pPacket );
-   }
-}
-
-/*!
-Add a given actor to the fitting in range set according to type
-but also to the global actor map
-
-\param ActorPtr to add
-*/
-void Core::Entity::Chara::addInRangeChara( CharaPtr pChara )
-{
-
-   // if this is null, something went wrong
-   assert( pChara );
-
-   // add actor to in range set
-   m_inRangeCharas.insert( pChara );
-
-   if( pChara->isPlayer() )
-   {
-      auto pPlayer = pChara->getAsPlayer();
-
-      // if actor is a player, add it to the in range player set
-      m_inRangePlayers.insert( pPlayer );
-   }
-}
-
-/*!
-Remove a given actor from the matching in range set according to type
-but also to the global actor map
-
-\param ActorPtr to remove
-*/
-void Core::Entity::Chara::removeInRangeChara( Chara& chara )
-{
-   // call virtual event
-   onRemoveInRangeChara( chara );
-
-   // remove actor from in range actor set
-   m_inRangeCharas.erase( chara.getAsChara() );
-
-   // if actor is a player, despawn ourself for him
-   // TODO: move to virtual onRemove?
-   if( isPlayer() )
-      chara.despawn( getAsPlayer() );
-
-   if( chara.isPlayer() )
-      m_inRangePlayers.erase( chara.getAsPlayer() );
-}
-
-/*! \return true if there is at least one actor in the in range set */
-bool Core::Entity::Chara::hasInRangeActor() const
-{
-   return ( m_inRangeCharas.size() > 0 );
-}
-
-void Core::Entity::Chara::removeFromInRange()
-{
-   if( !hasInRangeActor() )
-      return;
-
-   Entity::ActorPtr pCurAct;
-
-   for( auto& pCurAct : m_inRangeCharas )
-   {
-      pCurAct->removeInRangeChara( *this );
-   }
-
-}
-
-/*! Clear the whole in range set, this does no cleanup */
-void Core::Entity::Chara::clearInRangeSet()
-{
-   m_inRangeCharas.clear();
-   m_inRangePlayers.clear();
-}
-
 /*! \return ZonePtr to the current zone, nullptr if not set */
 Core::ZonePtr Core::Entity::Chara::getCurrentZone() const
 {
@@ -682,7 +523,7 @@ void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, u
       else
       {
 
-         auto actorsCollided = ActionCollision::getActorsHitFromAction( target.getPos(), getInRangeCharas(true),
+         auto actorsCollided = ActionCollision::getActorsHitFromAction( target.getPos(), getInRangeActors( true ),
                                                                         actionInfoPtr, TargetFilter::Enemies );
 
          for( const auto& pHitActor : actorsCollided )
@@ -694,16 +535,17 @@ void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, u
             sendToInRangeSet( effectPacket, true );
 
 
-            if( pHitActor->isAlive() )
-               pHitActor->onActionHostile( *this );
+            if( pHitActor->getAsChara()->isAlive() )
+               pHitActor->getAsChara()->onActionHostile( *this );
 
-            pHitActor->takeDamage( static_cast< uint32_t >( param1 ) );
+            pHitActor->getAsChara()->takeDamage( static_cast< uint32_t >( param1 ) );
 
             // Debug
             if ( isPlayer() ) 
             {
                if ( pHitActor->isPlayer() )
-                  getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) + " (" + pHitActor->getName() + ")" );
+                  getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) +
+                                            " (" + pHitActor->getAsChara()->getName() + ")" );
                else
                   getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) );
             }  
@@ -734,7 +576,7 @@ void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, u
          // todo: get proper packets: the following was just kind of thrown together from what we know.
          // atm buggy (packets look "delayed" from client)
 
-         auto actorsCollided = ActionCollision::getActorsHitFromAction( target.getPos(), getInRangeCharas(true),
+         auto actorsCollided = ActionCollision::getActorsHitFromAction( target.getPos(), getInRangeActors(true),
                                                                         actionInfoPtr, TargetFilter::Allies );
 
          for( auto pHitActor : actorsCollided )
@@ -743,13 +585,14 @@ void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, u
             effectPacket.data().effectTarget = pHitActor->getId();
 
             sendToInRangeSet( effectPacket, true );
-            pHitActor->heal( calculatedHeal );
+            pHitActor->getAsChara()->heal( calculatedHeal );
 
             // Debug
             if( isPlayer() )
             {
                if( pHitActor->isPlayer() )
-                  getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) + " (" + pHitActor->getName() + ")" );
+                  getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) +
+                                            " (" + pHitActor->getAsChara()->getName() + ")" );
                else
                   getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) );
             }
@@ -971,4 +814,9 @@ bool Core::Entity::Chara::hasStatusEffect( uint32_t id )
    if( m_statusEffectMap.find( id ) != m_statusEffectMap.end() )
       return true;
    return false;
+}
+
+Chara::ModelType Chara::getModelType() const
+{
+   return m_modelType;
 }

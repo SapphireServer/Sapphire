@@ -76,7 +76,7 @@ namespace Server {
          //m_data.u23 = 0x04;
          //m_data.u24 = 256;
          m_data.state = static_cast< uint8_t >( player.getStatus() );
-         m_data.type = 1;
+         m_data.modelType = player.getModelType();
          if( target.getId() == player.getId() )
          {
             m_data.spawnIndex = 0x00;

@@ -104,7 +104,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       ", params: " + std::to_string( param1 ) + ", " +
       std::to_string( param2 ) + ", " + std::to_string( param3 ) );
 
-   Core::Entity::CharaPtr targetActor;
+   Core::Entity::ActorPtr targetActor;
 
 
    if( player.getId() == param3 )
@@ -113,7 +113,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    }
    else
    {
-      auto inRange = player.getInRangeCharas();
+      auto inRange = player.getInRangeActors();
       for( auto actor : inRange )
       {
          if( actor->getId() == param3 )
@@ -138,7 +138,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       targetPlayer->setLookAt( CharaLook::Race, param1 );
       player.sendNotice( "Race for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
       targetPlayer->spawn( targetPlayer );
-      auto inRange = targetPlayer->getInRangeCharas();
+      auto inRange = targetPlayer->getInRangeActors();
       for( auto actor : inRange )
       {
          targetPlayer->despawn( actor->getAsPlayer() );
@@ -151,7 +151,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       targetPlayer->setLookAt( CharaLook::Tribe, param1 );
       player.sendNotice( "Tribe for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
       targetPlayer->spawn( targetPlayer );
-      auto inRange = targetPlayer->getInRangeCharas();
+      auto inRange = targetPlayer->getInRangeActors();
       for( auto actor : inRange )
       {
          targetPlayer->despawn( actor->getAsPlayer() );
@@ -164,7 +164,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       targetPlayer->setLookAt( CharaLook::Gender, param1 );
       player.sendNotice( "Sex for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
       targetPlayer->spawn( targetPlayer );
-      auto inRange = targetActor->getInRangeCharas();
+      auto inRange = targetActor->getInRangeActors();
       for( auto actor : inRange )
       {
          targetPlayer->despawn( actor->getAsPlayer() );
@@ -216,7 +216,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    }
    case GmCommand::Kill:
    {
-      targetActor->takeDamage( 9999999 );
+      targetActor->getAsChara()->takeDamage( 9999999 );
       player.sendNotice( "Killed " + std::to_string( targetActor->getId() ) );
       break;
    }
@@ -266,10 +266,10 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    }
    case GmCommand::Inv:
    {
-      if( targetActor->getInvincibilityType() == Common::InvincibilityType::InvincibilityRefill )
-         targetActor->setInvincibilityType( Common::InvincibilityType::InvincibilityNone );
+      if( targetActor->getAsChara()->getInvincibilityType() == Common::InvincibilityType::InvincibilityRefill )
+         targetActor->getAsChara()->setInvincibilityType( Common::InvincibilityType::InvincibilityNone );
       else
-         targetActor->setInvincibilityType( Common::InvincibilityType::InvincibilityRefill );
+         targetActor->getAsChara()->setInvincibilityType( Common::InvincibilityType::InvincibilityRefill );
 
       player.sendNotice( "Invincibility for " + targetPlayer->getName() +
          " was switched." );
@@ -439,10 +439,10 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    case GmCommand::Jump:
    {
 
-      auto inRange = player.getInRangeCharas();
+      auto inRange = player.getInRangeActors();
 
       player.changePosition( targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z,
-                             targetActor->getRotation() );
+                             targetActor->getRot() );
 
       player.sendNotice( "Jumping to " + targetPlayer->getName() + " in range." );
       break;

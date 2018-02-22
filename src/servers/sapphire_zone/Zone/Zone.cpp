@@ -602,27 +602,15 @@ void Core::Zone::updateInRangeSet( Entity::CharaPtr pChara, Cell* pCell )
       // Add if range == 0 or distance is withing range.
       if( isInRange && !isInRangeSet )
       {
-         if( pChara->isPlayer() )
-         {
-            auto pOwnPlayer = pChara->getAsPlayer();
-            if( !pOwnPlayer->isLoadingComplete() )
-               continue;
 
-            // spawn the actor for the player
-            pCurAct->spawn( pOwnPlayer );
-         }
+         if( pChara->isPlayer() && !pChara->getAsPlayer()->isLoadingComplete() )
+            continue;
 
-         if( pCurAct->isPlayer() )
-         {
-            auto pPlayer = pCurAct->getAsPlayer();
-            if( !pPlayer->isLoadingComplete() )
-               continue;
+         if( pCurAct->isPlayer() && !pCurAct->getAsPlayer()->isLoadingComplete() )
+            continue;
 
-            pChara->spawn( pPlayer );
-         }
-
-         pChara->addInRangeChara( pCurAct );
-         pCurAct->addInRangeChara( pChara );
+         pChara->addInRangeActor( pCurAct );
+         pCurAct->addInRangeActor( pChara );
 
          // this is a hack to limit actor spawn in one packetset
          if( count++ > 12 )
@@ -630,8 +618,8 @@ void Core::Zone::updateInRangeSet( Entity::CharaPtr pChara, Cell* pCell )
       }
       else if( !isInRange && isInRangeSet )
       {
-         pCurAct->removeInRangeChara( *pChara );
-         pChara->removeInRangeChara( *pCurAct );
+         pCurAct->removeInRangeActor( *pChara );
+         pChara->removeInRangeActor( *pCurAct );
       }
    }
 }

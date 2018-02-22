@@ -80,6 +80,7 @@ Core::Entity::Player::Player() :
    m_queuedZoneing = nullptr;
    m_status = ActorStatus::Idle;
    m_invincibilityType = InvincibilityType::InvincibilityNone;
+   m_modelType = ModelType::Human;
 
    memset( m_questTracking, 0, sizeof( m_questTracking ) );
    memset( m_name, 0, sizeof( m_name ) );
@@ -819,10 +820,10 @@ void Core::Entity::Player::despawn( Entity::PlayerPtr pTarget )
    pPlayer->queuePacket( ActorControlPacket143( getId(), DespawnZoneScreenMsg, 0x04, getId(), 0x01 ) );
 }
 
-Core::Entity::CharaPtr Core::Entity::Player::lookupTargetById( uint64_t targetId )
+Core::Entity::ActorPtr Core::Entity::Player::lookupTargetById( uint64_t targetId )
 {
-   CharaPtr targetActor;
-   auto inRange = getInRangeCharas(true);
+   ActorPtr targetActor;
+   auto inRange = getInRangeActors(true);
    for( auto actor : inRange )
    {
       if( actor->getId() == targetId )
@@ -995,9 +996,9 @@ void Core::Entity::Player::update( int64_t currTime )
          auto mainWeap = m_pInventory->getItemAt( Inventory::GearSet0, Inventory::EquipSlot::MainHand );
 
          // @TODO i dislike this, iterating over all in range actors when you already know the id of the actor you need...
-         for( auto actor : m_inRangeCharas )
+         for( auto actor : m_inRangeActor )
          {
-            if( actor->getId() == m_targetId && actor->isAlive() && mainWeap )
+            if( actor->getId() == m_targetId && actor->getAsChara()->isAlive() && mainWeap )
             {
                // default autoattack range
                // TODO make this dependant on bnpc size
@@ -1017,7 +1018,7 @@ void Core::Entity::Player::update( int64_t currTime )
                   if( ( currTime - m_lastAttack ) > mainWeap->getDelay() )
                   {
                      m_lastAttack = currTime;
-                     autoAttack( actor );
+                     autoAttack( actor->getAsChara() );
                   }
 
                }

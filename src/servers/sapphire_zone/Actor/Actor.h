@@ -49,6 +49,10 @@ namespace Entity {
       /*! Type of the actor */
       ObjKind              m_objKind;
 
+      /*! list of various actors in range */
+      std::set< ActorPtr > m_inRangeActor;
+      std::set< PlayerPtr > m_inRangePlayers;
+
    public:
       explicit Actor( ObjKind type );
       virtual ~Actor() {};
@@ -68,6 +72,34 @@ namespace Entity {
       void setRot( float rot );
 
       bool isPlayer() const;
+
+      ///// IN RANGE LOGIC ///////////////////////////////
+      virtual void onRemoveInRangeActor( Actor& pActor ) {}
+
+      // check if another actor is in the actors in range set
+      bool isInRangeSet( ActorPtr pActor ) const;
+
+      ActorPtr getClosestActor();
+
+      void sendToInRangeSet( Network::Packets::GamePacketPtr pPacket, bool bToSelf = false );
+
+      // add an actor to in range set
+      void addInRangeActor( ActorPtr pActor );
+
+      // remove an actor from the in range set
+      void removeInRangeActor( Actor& actor );
+
+      // return true if there is at least one actor in the in range set
+      bool hasInRangeActor() const;
+
+      void removeFromInRange();
+
+      // clear the whole in range set, this does no cleanup
+      virtual void clearInRangeSet();
+
+      std::set< ActorPtr > getInRangeActors( bool includeSelf = false );
+
+      ////////////////////////////////////////////////////
 
       CharaPtr getAsChara();
       PlayerPtr getAsPlayer();

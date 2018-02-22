@@ -519,7 +519,7 @@ public:
 
    bool actionHasCastTime( uint32_t actionId );
 
-   Core::Entity::CharaPtr lookupTargetById( uint64_t targetId );
+   Core::Entity::ActorPtr lookupTargetById( uint64_t targetId );
 
    bool isLogin() const;
    void setIsLogin( bool bIsLogin );

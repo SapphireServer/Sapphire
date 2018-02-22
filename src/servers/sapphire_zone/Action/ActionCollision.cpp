@@ -2,6 +2,7 @@
 #include <common/Util/UtilMath.h>
 
 #include "ActionCollision.h"
+#include "Actor/Actor.h"
 #include "Actor/Chara.h"
 #include "Actor/Player.h"
 
@@ -13,7 +14,7 @@ using namespace Core::Common;
 
 // todo: add AoE actor limits (16, 32)
 
-bool ActionCollision::isActorApplicable( Chara& chara, TargetFilter targetFilter )
+bool ActionCollision::isActorApplicable( Actor& actor, TargetFilter targetFilter )
 {
    bool actorApplicable = false;
    switch( targetFilter )
@@ -25,7 +26,7 @@ bool ActionCollision::isActorApplicable( Chara& chara, TargetFilter targetFilter
    }
    case TargetFilter::Players:
    {
-      actorApplicable = chara.isPlayer();
+      actorApplicable = actor.isPlayer();
       break;
    }
    case TargetFilter::Allies:
@@ -37,7 +38,7 @@ bool ActionCollision::isActorApplicable( Chara& chara, TargetFilter targetFilter
    case TargetFilter::Party:
    {
       // todo: implement party
-      actorApplicable = chara.isPlayer();
+      actorApplicable = actor.isPlayer();
       break;
    }
    case TargetFilter::Enemies:
@@ -47,15 +48,15 @@ bool ActionCollision::isActorApplicable( Chara& chara, TargetFilter targetFilter
    }
    }
 
-   return ( actorApplicable && chara.isAlive() );
+   return ( actorApplicable && actor.getAsChara()->isAlive() );
 }
 
-std::set< Core::Entity::CharaPtr > ActionCollision::getActorsHitFromAction( FFXIVARR_POSITION3 aoePosition,
-                                                                            std::set< CharaPtr > actorsInRange,
+std::set< Core::Entity::ActorPtr > ActionCollision::getActorsHitFromAction( FFXIVARR_POSITION3 aoePosition,
+                                                                            std::set< ActorPtr > actorsInRange,
                                                                             boost::shared_ptr< Core::Data::Action > actionInfo,
                                                                             TargetFilter targetFilter )
 {
-   std::set< CharaPtr > actorsCollided;
+   std::set< ActorPtr > actorsCollided;
 
    switch( static_cast< ActionCollisionType >( actionInfo->castType ) )
    {
