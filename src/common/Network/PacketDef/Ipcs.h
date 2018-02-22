@@ -227,8 +227,8 @@ namespace Packets {
       OutOfRangeEventHandler   = 0x014B, // updated 4.2
       EnterTeriEventHandler    = 0x014C, // updated 4.2
 
-      ReturnEventHandler       = 0x0151, // updated 4.2 ?
-      TradeReturnEventHandler  = 0x0152, // updated 4.2 ?
+      ReturnEventHandler       = 0x0151, // updated 4.2
+      TradeReturnEventHandler  = 0x0152, // updated 4.2
 
 
       LinkshellEventHandler    = 0x0144, // updated 4.1 ??

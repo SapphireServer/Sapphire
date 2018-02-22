@@ -74,9 +74,9 @@ public:
 
    Common::Weather getNextWeather();
 
-   void pushActor( Entity::CharaPtr pActor );
+   void pushActor( Entity::ActorPtr pActor );
 
-   void removeActor( Entity::CharaPtr pActor );
+   void removeActor( Entity::ActorPtr pActor );
 
    void updateActorPosition( Entity::Actor &pActor );
 
@@ -84,7 +84,7 @@ public:
 
    void updateCellActivity( uint32_t x, uint32_t y, int32_t radius );
 
-   void updateInRangeSet( Entity::CharaPtr pActor, Cell* pCell );
+   void updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell );
 
    void queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range, Network::Packets::GamePacketPtr pPacketEntry );
 

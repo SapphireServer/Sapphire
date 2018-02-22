@@ -168,10 +168,10 @@ Weather Core::Zone::getNextWeather()
    return Weather::FairSkies;
 }
 
-void Core::Zone::pushActor( Entity::CharaPtr pChara )
+void Core::Zone::pushActor( Entity::ActorPtr pActor )
 {
-   float mx = pChara->getPos().x;
-   float my = pChara->getPos().z;
+   float mx = pActor->getPos().x;
+   float my = pActor->getPos().z;
    uint32_t cx = getPosX( mx );
    uint32_t cy = getPosY( my );
 
@@ -182,12 +182,12 @@ void Core::Zone::pushActor( Entity::CharaPtr pChara )
       pCell->init( cx, cy, shared_from_this() );
    }
 
-   pCell->addChara(pChara);
+   pCell->addActor( pActor );
 
-   pChara->setCell( pCell );
+   pActor->setCell( pCell );
 
-   uint32_t cellX = getPosX( pChara->getPos().x );
-   uint32_t cellY = getPosY( pChara->getPos().z );
+   uint32_t cellX = getPosX( pActor->getPos().x );
+   uint32_t cellY = getPosY( pActor->getPos().z );
 
    uint32_t endX = cellX <= _sizeX ? cellX + 1 : ( _sizeX - 1 );
    uint32_t endY = cellY <= _sizeY ? cellY + 1 : ( _sizeY - 1 );
@@ -201,13 +201,13 @@ void Core::Zone::pushActor( Entity::CharaPtr pChara )
       {
          pCell = getCellPtr(posX, posY);
          if( pCell )
-            updateInRangeSet( pChara, pCell );
+            updateInRangeSet( pActor, pCell );
       }
    }
 
-   if( pChara->isPlayer() )
+   if( pActor->isPlayer() )
    {
-      auto pPlayer = pChara->getAsPlayer();
+      auto pPlayer = pActor->getAsPlayer();
 
       auto pSession = g_serverZone.getSession( pPlayer->getId() );
       if( pSession )
@@ -217,36 +217,36 @@ void Core::Zone::pushActor( Entity::CharaPtr pChara )
    }
  }
 
-void Core::Zone::removeActor( Entity::CharaPtr pChara )
+void Core::Zone::removeActor( Entity::ActorPtr pActor )
 {
 
-   auto pCell = pChara->getCellPtr();
+   auto pCell = pActor->getCellPtr();
    if( pCell )
    {
-      pCell->removeChara(pChara);
+      pCell->removeActor( pActor );
       pCell = nullptr;
    }
 
-   if( pChara->isPlayer() )
+   if( pActor->isPlayer() )
    {
 
       // If it's a player and he's inside boundaries - update his nearby cells
-      if( pChara->getPos().x <= _maxX && pChara->getPos().x >= _minX &&
-          pChara->getPos().z <= _maxY && pChara->getPos().z >= _minY )
+      if( pActor->getPos().x <= _maxX && pActor->getPos().x >= _minX &&
+              pActor->getPos().z <= _maxY && pActor->getPos().z >= _minY )
       {
-         uint32_t x = getPosX( pChara->getPos().x );
-         uint32_t y = getPosY( pChara->getPos().z );
+         uint32_t x = getPosX( pActor->getPos().x );
+         uint32_t y = getPosY( pActor->getPos().z );
          updateCellActivity( x, y, 3 );
       }
-      m_playerMap.erase( pChara->getId() );
+      m_playerMap.erase( pActor->getId() );
 
-      onLeaveTerritory( *pChara->getAsPlayer() );
+      onLeaveTerritory( *pActor->getAsPlayer() );
 
    }
 
    // remove from lists of other actors
-   pChara->removeFromInRange();
-   pChara->clearInRangeSet();
+   pActor->removeFromInRange();
+   pActor->clearInRangeSet();
 
 }
 
@@ -534,9 +534,9 @@ void Core::Zone::updateActorPosition( Entity::Actor &actor )
    {
 
       if( pOldCell )
-         pOldCell->removeChara(actor.getAsChara());
+         pOldCell->removeActor( actor.shared_from_this() );
 
-      pCell->addChara( actor.getAsChara() );
+      pCell->addActor( actor.shared_from_this() );
       pOldCell = pCell;
 
       // if player we need to update cell activity
@@ -568,13 +568,13 @@ void Core::Zone::updateActorPosition( Entity::Actor &actor )
       {
          pCell = getCellPtr(posX, posY);
          if( pCell )
-            updateInRangeSet( actor.getAsChara(), pCell );
+            updateInRangeSet( actor.shared_from_this(), pCell );
       }
    }
 }
 
 
-void Core::Zone::updateInRangeSet( Entity::CharaPtr pChara, Cell* pCell )
+void Core::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
 {
    if( pCell == nullptr )
       return;
@@ -583,36 +583,36 @@ void Core::Zone::updateInRangeSet( Entity::CharaPtr pChara, Cell* pCell )
    if( g_territoryMgr.isPrivateTerritory( getTerritoryId() ) )
       return;
 
-   auto iter = pCell->m_charas.begin();
+   auto iter = pCell->m_actors.begin();
 
    float fRange = 70.0f;
    int32_t count = 0;
-   while( iter != pCell->m_charas.end() )
+   while( iter != pCell->m_actors.end() )
    {
       auto pCurAct = *iter;
       ++iter;
 
-      if( !pCurAct || pCurAct == pChara )
+      if( !pCurAct || pCurAct == pActor )
          continue;
 
       float distance = Math::Util::distance( pCurAct->getPos().x, pCurAct->getPos().y, pCurAct->getPos().z,
-                                             pChara->getPos().x, pChara->getPos().y, pChara->getPos().z );
+                                             pActor->getPos().x, pActor->getPos().y, pActor->getPos().z );
 
       bool isInRange = ( fRange == 0.0f || distance <= fRange );
-      bool isInRangeSet = pChara->isInRangeSet( pCurAct );
+      bool isInRangeSet = pActor->isInRangeSet( pCurAct );
 
       // Add if range == 0 or distance is withing range.
       if( isInRange && !isInRangeSet )
       {
 
-         if( pChara->isPlayer() && !pChara->getAsPlayer()->isLoadingComplete() )
+         if( pActor->isPlayer() && !pActor->getAsPlayer()->isLoadingComplete() )
             continue;
 
          if( pCurAct->isPlayer() && !pCurAct->getAsPlayer()->isLoadingComplete() )
             continue;
 
-         pChara->addInRangeActor( pCurAct );
-         pCurAct->addInRangeActor( pChara );
+         pActor->addInRangeActor( pCurAct );
+         pCurAct->addInRangeActor( pActor );
 
          // this is a hack to limit actor spawn in one packetset
          if( count++ > 12 )
@@ -620,8 +620,8 @@ void Core::Zone::updateInRangeSet( Entity::CharaPtr pChara, Cell* pCell )
       }
       else if( !isInRange && isInRangeSet )
       {
-         pCurAct->removeInRangeActor( *pChara );
-         pChara->removeInRangeActor( *pCurAct );
+         pCurAct->removeInRangeActor( *pActor );
+         pActor->removeInRangeActor( *pCurAct );
       }
    }
 }
