@@ -78,7 +78,7 @@ public:
 
    void removeActor( Entity::CharaPtr pActor );
 
-   void updateActorPosition( Entity::Chara &pActor );
+   void updateActorPosition( Entity::Actor &pActor );
 
    bool isCellActive( uint32_t x, uint32_t y );
 

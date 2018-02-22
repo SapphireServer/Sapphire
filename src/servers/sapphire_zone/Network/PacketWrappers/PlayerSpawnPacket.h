@@ -64,7 +64,7 @@ namespace Server {
          m_data.pos.x = player.getPos().x;
          m_data.pos.y = player.getPos().y;
          m_data.pos.z = player.getPos().z;
-         m_data.rotation = Math::Util::floatToUInt16Rot( player.getRotation() );
+         m_data.rotation = Math::Util::floatToUInt16Rot( player.getRot() );
          
 
          m_data.title = player.getTitle();

@@ -174,13 +174,13 @@ void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost:
       }
 
       if( subCommand == "pos" )
-         player.setPosition( static_cast< float >( posX ),
-                             static_cast< float >( posY ),
-                             static_cast< float >( posZ ) );
+         player.setPos( static_cast< float >( posX ),
+                        static_cast< float >( posY ),
+                        static_cast< float >( posZ ) );
       else
-         player.setPosition( player.getPos().x + static_cast< float >( posX ),
-                             player.getPos().y + static_cast< float >( posY ),
-                             player.getPos().z + static_cast< float >( posZ ) );
+         player.setPos( player.getPos().x + static_cast< float >( posX ),
+                        player.getPos().y + static_cast< float >( posY ),
+                        player.getPos().z + static_cast< float >( posZ ) );
 
       Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcActorSetPos >
          setActorPosPacket( player.getId() );
@@ -444,7 +444,7 @@ void Core::DebugCommandHandler::get( char * data, Entity::Player& player, boost:
                          std::to_string( player.getPos().x ) + "\n" +
                          std::to_string( player.getPos().y ) + "\n" +
                          std::to_string( player.getPos().z ) + "\n" +
-                         std::to_string( player.getRotation() ) + "\nMapId: " +
+                         std::to_string( player.getRot() ) + "\nMapId: " +
                          std::to_string( map_id ) + "\nZoneID: " +
                          std::to_string(player.getCurrentZone()->getTerritoryId() ) + "\n" );
    }
@@ -549,7 +549,7 @@ void Core::DebugCommandHandler::nudge( char * data, Entity::Player& player, boos
    }
    else
    {
-      float angle = player.getRotation() + ( PI / 2 );
+      float angle = player.getRot() + ( PI / 2 );
       pos.x -= offset * cos( angle );
       pos.z += offset * sin( angle );
       player.sendNotice( "nudge: Placing forward " + std::to_string( offset ) + " yalms" );
@@ -561,7 +561,7 @@ void Core::DebugCommandHandler::nudge( char * data, Entity::Player& player, boos
       setActorPosPacket.data().x = player.getPos().x;
       setActorPosPacket.data().y = player.getPos().y;
       setActorPosPacket.data().z = player.getPos().z;
-      setActorPosPacket.data().r16 = Math::Util::floatToUInt16Rot( player.getRotation() );
+      setActorPosPacket.data().r16 = Math::Util::floatToUInt16Rot( player.getRot() );
       player.queuePacket( setActorPosPacket );
    }
 }

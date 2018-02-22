@@ -15,14 +15,14 @@ Core::Entity::EventObject::EventObject( uint32_t objectId, uint32_t mapLinkId, C
 
 }
 
-uint32_t Core::Entity::EventObject::getHierachyId() const
+uint32_t Core::Entity::EventObject::getMapLinkId() const
 {
    return m_mapLinkId;
 }
 
-void Core::Entity::EventObject::setHierachyId( uint32_t hierachyId )
+void Core::Entity::EventObject::setMapLinkId( uint32_t mapLinkId )
 {
-   m_mapLinkId = hierachyId;
+   m_mapLinkId = mapLinkId;
 }
 
 uint8_t Core::Entity::EventObject::getState() const

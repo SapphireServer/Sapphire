@@ -229,34 +229,15 @@ position
 */
 bool Core::Entity::Chara::face( const Common::FFXIVARR_POSITION3& p )
 {
-   float oldRot = getRotation();
+   float oldRot = getRot();
    float rot = Math::Util::calcAngFrom( getPos().x, getPos().z, p.x, p.z );
    float newRot = PI - rot + ( PI / 2 );
 
    m_pCell = nullptr;
 
-   setRotation( newRot );
+   setRot( newRot );
 
    return oldRot != newRot ? true : false;
-}
-
-/*!
-Sets the actors position and notifies the zone to propagate the change
-
-\param Position to set
-*/
-void Core::Entity::Chara::setPosition( const Common::FFXIVARR_POSITION3& pos )
-{
-   m_pos = pos;
-   m_pCurrentZone->updateActorPosition( *this );
-}
-
-void Core::Entity::Chara::setPosition( float x, float y, float z )
-{
-   m_pos.x = x;
-   m_pos.y = y;
-   m_pos.z = z;
-   m_pCurrentZone->updateActorPosition( *this );
 }
 
 /*!
@@ -386,38 +367,6 @@ void Core::Entity::Chara::setCurrentAction( Core::Action::ActionPtr pAction )
    m_pCurrentAction = pAction;
 }
 
-/*! \return ZonePtr to the current zone, nullptr if not set */
-Core::ZonePtr Core::Entity::Chara::getCurrentZone() const
-{
-   return m_pCurrentZone;
-}
-
-/*! \param ZonePtr to the zone to be set as current */
-void Core::Entity::Chara::setCurrentZone( ZonePtr currZone )
-{
-   m_pCurrentZone = currZone;
-}
-
-/*!
-Get the current cell of a region the actor is in
-
-\return Cell*
-*/
-Core::Cell * Core::Entity::Chara::getCell() const
-{
-   return m_pCell;
-}
-
-/*!
-Set the current cell the actor is in
-
-\param Cell* for the cell to be set
-*/
-void Core::Entity::Chara::setCell( Cell * pCell )
-{
-   m_pCell = pCell;
-}
-
 /*!
 Autoattack prototype implementation
 TODO: move the check if the autoAttack can be performed to the callee
@@ -448,7 +397,7 @@ void Core::Entity::Chara::autoAttack( CharaPtr pTarget )
 //      effectPacket.data().unknown_3 = 1;
       effectPacket.data().actionTextId = 0x366;
       effectPacket.data().numEffects = 1;
-      effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRotation() );
+      effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRot() );
       effectPacket.data().effectTarget = pTarget->getId();
       effectPacket.data().effects[0].value = damage;
       effectPacket.data().effects[0].effectType = ActionEffectType::Damage;
@@ -492,7 +441,7 @@ void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, u
    effectPacket.data().unknown_2 = 1;  // This seems to have an effect on the "double-cast finish" animation
    effectPacket.data().actionTextId = actionId;
    effectPacket.data().numEffects = 1;
-   effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRotation() );
+   effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRot() );
    effectPacket.data().effectTarget = target.getId();
 
    // Todo: for each actor, calculate how much damage the calculated value should deal to them - 2-step damage calc. we only have 1-step
@@ -653,16 +602,6 @@ void Core::Entity::Chara::addStatusEffectByIdIfNotExist( uint32_t id, int32_t du
    effect->setParam( param );
    addStatusEffect( effect );
 
-}
-
-float Core::Entity::Chara::getRotation() const
-{
-   return m_rot;
-}
-
-void Core::Entity::Chara::setRotation( float rot )
-{
-   m_rot = rot;
 }
 
 int8_t Core::Entity::Chara::getStatusEffectFreeSlot()

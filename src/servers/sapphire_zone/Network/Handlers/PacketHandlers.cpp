@@ -178,13 +178,13 @@ void Core::Network::GameConnection::updatePositionHandler( const Packets::GamePa
        ( player.getPos().y != inPacket.getValAt< float >( 0x30 ) ) ||
        ( player.getPos().z != inPacket.getValAt< float >( 0x34 ) ) )
       bPosChanged = true;
-   if( !bPosChanged  && player.getRotation() == inPacket.getValAt< float >( 0x20 ) )
+   if( !bPosChanged  && player.getRot() == inPacket.getValAt< float >( 0x20 ) )
       return;
 
-   player.setRotation( inPacket.getValAt< float >( 0x20 ) );
-   player.setPosition( inPacket.getValAt< float >( 0x2c ),
-                       inPacket.getValAt< float >( 0x30 ),
-                       inPacket.getValAt< float >( 0x34 ) );
+   player.setRot( inPacket.getValAt< float >( 0x20 ) );
+   player.setPos( inPacket.getValAt< float >( 0x2c ),
+                  inPacket.getValAt< float >( 0x30 ),
+                  inPacket.getValAt< float >( 0x34 ) );
 
    if( ( player.getCurrentAction() != nullptr ) && bPosChanged )
       player.getCurrentAction()->setInterrupted();

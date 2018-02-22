@@ -31,7 +31,7 @@ private:
    void initialize( Entity::Chara& actor, uint8_t unk1, uint8_t unk2, uint8_t unk3, uint16_t unk4 )
    {
       
-      m_data.rotation = Math::Util::floatToUInt8Rot( actor.getRotation() );
+      m_data.rotation = Math::Util::floatToUInt8Rot( actor.getRot() );
       m_data.unknown_1 = unk1;
       m_data.unknown_2 = unk2;
       m_data.unknown_3 = unk3;

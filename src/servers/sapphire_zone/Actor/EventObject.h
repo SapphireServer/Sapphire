@@ -13,8 +13,8 @@ namespace Entity
       EventObject( uint32_t objectId, uint32_t mapLinkId );
       EventObject( uint32_t objectId, uint32_t mapLinkId, Common::FFXIVARR_POSITION3 pos );
 
-      uint32_t getHierachyId() const;
-      void setHierachyId( uint32_t hierachyId );
+      uint32_t getMapLinkId() const;
+      void setMapLinkId( uint32_t mapLinkId );
 
       uint8_t getState() const;
       void setState( uint8_t state );
