@@ -973,7 +973,7 @@ void Core::Entity::Player::update( int64_t currTime )
          setActorPosPacket.data().y = targetPos.y;
          setActorPosPacket.data().z = targetPos.z;
          sendToInRangeSet( setActorPosPacket, true );
-         setPosition( targetPos );
+         setPos( targetPos );
       }
       m_queuedZoneing.reset();
       return;
@@ -1190,7 +1190,7 @@ void Core::Entity::Player::performZoning( uint16_t zoneId, const Common::FFXIVAR
    m_pos = pos;
    m_zoneId = zoneId;
    m_bMarkedForZoning = true;
-   setRotation( rotation );
+   setRot( rotation );
    setZone( zoneId );
 }
 
@@ -1375,11 +1375,9 @@ void Core::Entity::Player::autoAttack( CharaPtr pTarget )
    uint32_t damage = static_cast< uint32_t >( mainWeap->getAutoAttackDmg() );
    uint32_t variation = 0 + rand() % 3;
 
-   if( getClass() == ClassJob::Machinist ||
-       getClass() == ClassJob::Bard ||
-       getClass() == ClassJob::Archer )
+   if( getClass() == ClassJob::Machinist || getClass() == ClassJob::Bard || getClass() == ClassJob::Archer )
    {
-      ZoneChannelPacket< FFXIVIpcEffect > effectPacket(getId());
+      ZoneChannelPacket< FFXIVIpcEffect > effectPacket( getId() );
       effectPacket.data().targetId = pTarget->getId();
       effectPacket.data().actionAnimationId = 8;
      // effectPacket.data().unknown_2 = variation;
@@ -1387,7 +1385,7 @@ void Core::Entity::Player::autoAttack( CharaPtr pTarget )
       effectPacket.data().unknown_61 = 1;
       effectPacket.data().unknown_62 = 1;
       effectPacket.data().actionTextId = 8;
-      effectPacket.data().rotation = Math::Util::floatToUInt16Rot(getRotation());
+      effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRot() );
       effectPacket.data().effectTargetId = pTarget->getId();
       effectPacket.data().effectTarget = pTarget->getId();
       effectPacket.data().effects[0].value = damage;
@@ -1400,7 +1398,7 @@ void Core::Entity::Player::autoAttack( CharaPtr pTarget )
    else
    {
 
-      ZoneChannelPacket< FFXIVIpcEffect > effectPacket(getId());
+      ZoneChannelPacket< FFXIVIpcEffect > effectPacket( getId() );
       effectPacket.data().targetId = pTarget->getId();
       effectPacket.data().actionAnimationId = 7;
       // effectPacket.data().unknown_2 = variation;
@@ -1408,7 +1406,7 @@ void Core::Entity::Player::autoAttack( CharaPtr pTarget )
       effectPacket.data().unknown_61 = 1;
       effectPacket.data().unknown_62 = 1;
       effectPacket.data().actionTextId = 7;
-      effectPacket.data().rotation = Math::Util::floatToUInt16Rot(getRotation());
+      effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRot() );
       effectPacket.data().effectTarget = pTarget->getId();
       effectPacket.data().effects[0].value = damage;
       effectPacket.data().effects[0].effectType = Common::ActionEffectType::Damage;

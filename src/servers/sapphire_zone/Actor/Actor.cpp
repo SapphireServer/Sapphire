@@ -5,11 +5,16 @@
 #include <common/Util/Util.h>
 #include <common/Util/UtilMath.h>
 
-#include "Chara.h"
+
 #include "Network/GameConnection.h"
+
+#include "Chara.h"
+#include "EventObject.h"
 #include "Player.h"
+
 #include "ServerZone.h"
 #include "Session.h"
+#include "Zone/Zone.h"
 
 extern Core::ServerZone g_serverZone;
 
@@ -39,11 +44,13 @@ void Core::Entity::Actor::setPos( float x, float y, float z )
    m_pos.x = x;
    m_pos.y = y;
    m_pos.z = z;
+   m_pCurrentZone->updateActorPosition( *this );
 }
 
 void Core::Entity::Actor::setPos( const Core::Common::FFXIVARR_POSITION3& pos )
 {
    m_pos = pos;
+   m_pCurrentZone->updateActorPosition( *this );
 }
 
 float Core::Entity::Actor::getRot() const
@@ -287,4 +294,36 @@ std::set< Core::Entity::ActorPtr > Core::Entity::Actor::getInRangeActors( bool i
       tempInRange.insert( shared_from_this() );
 
    return tempInRange;
+}
+
+/*! \return ZonePtr to the current zone, nullptr if not set */
+Core::ZonePtr Core::Entity::Actor::getCurrentZone() const
+{
+   return m_pCurrentZone;
+}
+
+/*! \param ZonePtr to the zone to be set as current */
+void Core::Entity::Actor::setCurrentZone( ZonePtr currZone )
+{
+   m_pCurrentZone = currZone;
+}
+
+/*!
+Get the current cell of a region the actor is in
+
+\return Cell*
+*/
+Core::Cell * Core::Entity::Actor::getCellPtr()
+{
+   return m_pCell;
+}
+
+/*!
+Set the current cell the actor is in
+
+\param Cell* for the cell to be set
+*/
+void Core::Entity::Actor::setCell( Cell * pCell )
+{
+   m_pCell = pCell;
 }

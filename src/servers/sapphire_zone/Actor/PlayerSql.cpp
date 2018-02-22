@@ -64,7 +64,7 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
    m_pos.x = res->getFloat( "PosX" );
    m_pos.y = res->getFloat( "PosY" );
    m_pos.z = res->getFloat( "PosZ" );
-   setRotation( res->getFloat( "PosR" ) );
+   setRot( res->getFloat( "PosR" ) );
 
    m_prevPos.x = res->getFloat( "OPosX" );
    m_prevPos.y = res->getFloat( "OPosY" );
@@ -85,7 +85,7 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
          m_pos.x = m_prevPos.x;
          m_pos.y = m_prevPos.y;
          m_pos.z = m_prevPos.z;
-         setRotation( m_prevRot );
+         setRot( m_prevRot );
          pCurrZone = g_territoryMgr.getZoneByTerriId( zoneId );
       }
    }
@@ -110,7 +110,7 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
       m_pos.x = 0.0f;
       m_pos.y = 0.0f;
       m_pos.z = 0.0f;
-      setRotation( 0.0f );
+      setRot( 0.0f );
    }
 
    // Stats
@@ -369,7 +369,7 @@ void Core::Entity::Player::updateSql()
    stmt->setDouble( 20, m_pos.x );
    stmt->setDouble( 21, m_pos.y );
    stmt->setDouble( 22, m_pos.z );
-   stmt->setDouble( 23, getRotation() );
+   stmt->setDouble( 23, getRot() );
 
    stmt->setInt( 24, m_prevZoneType ); // OTerritoryType
    stmt->setInt( 25, m_prevZoneId ); // OTerritoryId

@@ -78,7 +78,7 @@ void Core::Action::ActionMount::onFinish()
    effectPacket.data().unknown_62 = 13; 
    effectPacket.data().actionTextId = 4;
    effectPacket.data().numEffects = 1;
-   effectPacket.data().rotation = Math::Util::floatToUInt16Rot( pPlayer->getRotation() );
+   effectPacket.data().rotation = Math::Util::floatToUInt16Rot( pPlayer->getRot() );
    effectPacket.data().effectTarget = INVALID_GAME_OBJECT_ID;
    effectPacket.data().effects[0].effectType = ActionEffectType::Mount;
    effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::CritDamage;

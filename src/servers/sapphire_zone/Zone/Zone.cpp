@@ -175,7 +175,7 @@ void Core::Zone::pushActor( Entity::CharaPtr pChara )
    uint32_t cx = getPosX( mx );
    uint32_t cy = getPosY( my );
 
-   Cell* pCell = getCell( cx, cy );
+   Cell* pCell = getCellPtr(cx, cy);
    if( !pCell )
    {
       pCell = create( cx, cy );
@@ -199,7 +199,7 @@ void Core::Zone::pushActor( Entity::CharaPtr pChara )
    {
       for( posY = startY; posY <= endY; ++posY )
       {
-         pCell = getCell( posX, posY );
+         pCell = getCellPtr(posX, posY);
          if( pCell )
             updateInRangeSet( pChara, pCell );
       }
@@ -220,10 +220,11 @@ void Core::Zone::pushActor( Entity::CharaPtr pChara )
 void Core::Zone::removeActor( Entity::CharaPtr pChara )
 {
 
-   if( pChara->m_pCell )
+   auto pCell = pChara->getCellPtr();
+   if( pCell )
    {
-      pChara->m_pCell->removeChara(pChara);
-      pChara->m_pCell = nullptr;
+      pCell->removeChara(pChara);
+      pCell = nullptr;
    }
 
    if( pChara->isPlayer() )
@@ -410,7 +411,7 @@ void Core::Zone::updateSessions( bool changedWeather )
       // this session is not linked to this area anymore, remove it from zone session list
       if( ( !pPlayer->getCurrentZone() ) || ( pPlayer->getCurrentZone() != shared_from_this() ) )
       {
-         if( pPlayer->getCell() )
+         if( pPlayer->getCellPtr() )
             removeActor( pSession->getPlayer() );
 
          it = m_sessionSet.erase(it );
@@ -446,7 +447,7 @@ bool Core::Zone::isCellActive( uint32_t x, uint32_t y )
    {
       for( posY = startY; posY <= endY; posY++ )
       {
-         pCell = getCell( posX, posY );
+         pCell = getCellPtr(posX, posY);
 
          if( pCell && ( pCell->hasPlayers() || pCell->isForcedActive() ) )
             return true;
@@ -471,7 +472,7 @@ void Core::Zone::updateCellActivity( uint32_t x, uint32_t y, int32_t radius )
    {
       for( posY = startY; posY <= endY; posY++ )
       {
-         pCell = getCell( posX, posY );
+         pCell = getCellPtr(posX, posY);
 
          if( !pCell )
          {
@@ -505,7 +506,7 @@ void Core::Zone::updateCellActivity( uint32_t x, uint32_t y, int32_t radius )
    }
 }
 
-void Core::Zone::updateActorPosition( Entity::Chara &actor )
+void Core::Zone::updateActorPosition( Entity::Actor &actor )
 {
 
    if( actor.getCurrentZone() != shared_from_this() )
@@ -519,8 +520,9 @@ void Core::Zone::updateActorPosition( Entity::Chara &actor )
    if( cellX >= _sizeX || cellY >= _sizeY )
       return;
 
-   Cell* pCell = getCell( cellX, cellY );
-   Cell* pOldCell = actor.m_pCell;
+   auto pCell = getCellPtr(cellX, cellY);
+
+   auto pOldCell = actor.getCellPtr();
    if( !pCell )
    {
       pCell = create( cellX, cellY );
@@ -534,8 +536,8 @@ void Core::Zone::updateActorPosition( Entity::Chara &actor )
       if( pOldCell )
          pOldCell->removeChara(actor.getAsChara());
 
-      pCell->addChara(actor.getAsChara());
-      actor.m_pCell = pCell;
+      pCell->addChara( actor.getAsChara() );
+      pOldCell = pCell;
 
       // if player we need to update cell activity
       // radius = 2 is used in order to update both
@@ -564,7 +566,7 @@ void Core::Zone::updateActorPosition( Entity::Chara &actor )
    {
       for( posY = startY; posY <= endY; ++posY )
       {
-         pCell = getCell( posX, posY );
+         pCell = getCellPtr(posX, posY);
          if( pCell )
             updateInRangeSet( actor.getAsChara(), pCell );
       }
@@ -685,7 +687,7 @@ void Core::Zone::updateEObj( Entity::EventObjectPtr object )
       eobjStatePacket.data().objKind = object->getObjKind();
       eobjStatePacket.data().state = object->getState();
       eobjStatePacket.data().objId = object->getId();
-      eobjStatePacket.data().hierachyId = object->getHierachyId();
+      eobjStatePacket.data().hierachyId = object->getMapLinkId();
       eobjStatePacket.data().position = object->getPos();
 
       // ????

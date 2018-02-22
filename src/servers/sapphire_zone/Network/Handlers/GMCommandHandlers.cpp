@@ -190,8 +190,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       if( targetPlayer->getZoneId() != player.getZoneId() )
          targetPlayer->setZone( player.getZoneId() );
 
-      targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z,
-         player.getRotation() );
+      targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
       player.sendNotice( "Calling " + targetPlayer->getName() );
       break;
    }
@@ -419,7 +418,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
             player.sendUrgent( "No zone instance found for " + std::to_string( param1 ) );
             break;
          }
-         targetPlayer->setPosition( targetPlayer->getPos() );
+         targetPlayer->setPos( targetPlayer->getPos() );
          targetPlayer->performZoning( param1, targetPlayer->getPos(), 0 );
          player.sendNotice( targetPlayer->getName() + " was warped to zone " + std::to_string( param1 ) + " (" + pZone->getName() + ")" );
       }
@@ -511,7 +510,7 @@ void Core::Network::GameConnection::gm2Handler( const Packets::GamePacket& inPac
          player.setZone( targetPlayer->getZoneId() );
       }
       player.changePosition( targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z,
-         targetActor->getRotation() );
+         targetActor->getRot() );
       player.sendNotice( "Jumping to " + targetPlayer->getName() );
       break;
    }
@@ -520,8 +519,7 @@ void Core::Network::GameConnection::gm2Handler( const Packets::GamePacket& inPac
       if( targetPlayer->getZoneId() != player.getZoneId() )
          targetPlayer->setZone( player.getZoneId() );
 
-      targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z,
-         player.getRotation() );
+      targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
       player.sendNotice( "Calling " + targetPlayer->getName() );
       break;
    }

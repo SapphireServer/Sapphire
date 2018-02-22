@@ -106,10 +106,6 @@ public:
 
 protected:
    char                 m_name[34];
-   /*! Id of the zone the actor currently is in */
-   uint32_t	            m_zoneId;
-   /*! Ptr to the ZoneObj the actor belongs to */
-   ZonePtr              m_pCurrentZone;
    /*! Last tick time for the actor  ( in ms ) */
    uint64_t             m_lastTickTime;
    /*! Last time the actor performed an autoAttack ( in ms ) */
@@ -182,13 +178,6 @@ public:
    void removeSingleStatusEffectFromId( uint32_t id );
    /// End Status Effect Functions
 
-   void setPosition( const Common::FFXIVARR_POSITION3& pos );
-   void setPosition( float x, float y, float z );
-
-   void setRotation( float rot );
-
-   float getRotation() const;
-
    std::string getName() const;
 
    bool face( const Common::FFXIVARR_POSITION3& p );
@@ -259,18 +248,6 @@ public:
    Action::ActionPtr getCurrentAction() const;
 
    void setCurrentAction( Action::ActionPtr pAction );
-
-   ZonePtr getCurrentZone() const;
-
-   void setCurrentZone( ZonePtr currZone );
-
-   // get the current cell of a region the actor is in
-   Cell* getCell() const;
-
-   // set the current cell
-   void setCell( Cell* pCell );
-
-   Core::Cell* m_pCell;
 
 };
 

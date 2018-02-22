@@ -88,7 +88,7 @@ void Core::Action::ActionTeleport::onFinish()
    effectPacket.data().actionTextId = 5;
    effectPacket.data().unknown_5 = 1;
    effectPacket.data().numEffects = 1;
-   effectPacket.data().rotation = static_cast< uint16_t >( 0x8000 * ( ( pPlayer->getRotation() + 3.1415926 ) ) / 3.1415926 );
+   effectPacket.data().rotation = static_cast< uint16_t >( 0x8000 * ( ( pPlayer->getRot() + 3.1415926 ) ) / 3.1415926 );
    effectPacket.data().effectTarget = pPlayer->getId();
    pPlayer->sendToInRangeSet( effectPacket, true );
 

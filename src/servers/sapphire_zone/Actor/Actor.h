@@ -48,10 +48,17 @@ namespace Entity {
       uint32_t             m_id;
       /*! Type of the actor */
       ObjKind              m_objKind;
+      /*! Id of the zone the actor currently is in */
+      uint32_t	            m_zoneId;
+      /*! Ptr to the ZoneObj the actor belongs to */
+      ZonePtr              m_pCurrentZone;
 
       /*! list of various actors in range */
       std::set< ActorPtr > m_inRangeActor;
       std::set< PlayerPtr > m_inRangePlayers;
+
+      /*! Parent cell in the zone */
+      Core::Cell* m_pCell;
 
    public:
       explicit Actor( ObjKind type );
@@ -112,6 +119,15 @@ namespace Entity {
       CharaPtr getAsChara();
       PlayerPtr getAsPlayer();
       EventObjectPtr getAsEventObj();
+
+      ZonePtr getCurrentZone() const;
+      void setCurrentZone( ZonePtr currZone );
+
+      // get the current cell of a region the actor is in
+      Cell* getCellPtr();
+      // set the current cell
+      void setCell( Cell* pCell );
+
    };
 
 }
