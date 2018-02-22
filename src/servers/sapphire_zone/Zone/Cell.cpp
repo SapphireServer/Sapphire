@@ -18,7 +18,7 @@ Core::Cell::Cell() :
 
 Core::Cell::~Cell()
 {
-   removeCharas();
+   removeActors();
 }
 
 void Core::Cell::init( uint32_t x, uint32_t y, ZonePtr pZone )
@@ -27,23 +27,23 @@ void Core::Cell::init( uint32_t x, uint32_t y, ZonePtr pZone )
    m_posX = x;
    m_posY = y;
 
-   m_charas.clear();
+   m_actors.clear();
 }
 
-void Core::Cell::addChara( Entity::CharaPtr pAct )
+void Core::Cell::addActor( Entity::ActorPtr pAct )
 {
    if( pAct->isPlayer() )
       ++m_playerCount;
 
-   m_charas.insert( pAct );
+   m_actors.insert( pAct );
 }
 
-void Core::Cell::removeChara( Entity::CharaPtr pAct )
+void Core::Cell::removeActor( Entity::ActorPtr pAct )
 {
    if( pAct->isPlayer() )
       --m_playerCount;
 
-   m_charas.erase(pAct);
+   m_actors.erase( pAct );
 }
 
 void Core::Cell::setActivity( bool state )
@@ -51,7 +51,7 @@ void Core::Cell::setActivity( bool state )
    if( !m_bActive && state )
    {
       // Move all objects to active set.
-      //for( auto itr = m_charas.begin(); itr != m_charas.end(); ++itr )
+      //for( auto itr = m_actors.begin(); itr != m_actors.end(); ++itr )
       //{
 
       //}
@@ -63,7 +63,7 @@ void Core::Cell::setActivity( bool state )
    else if( m_bActive && !state )
    {
       // Move all objects from active set.
-      //for(auto itr = m_charas.begin(); itr != m_charas.end(); ++itr)
+      //for(auto itr = m_actors.begin(); itr != m_actors.end(); ++itr)
       //{
 
       //}
@@ -75,15 +75,15 @@ void Core::Cell::setActivity( bool state )
 
 }
 
-void Core::Cell::removeCharas()
+void Core::Cell::removeActors()
 {
    //uint32_t ltime = getMSTime();
 
-   m_charas.clear();
+   m_actors.clear();
 
    //This time it's simpler! We just remove everything
    Entity::ActorPtr pAct; //do this outside the loop!
-   for( auto itr = m_charas.begin(); itr != m_charas.end(); )
+   for( auto itr = m_actors.begin(); itr != m_actors.end(); )
    {
       pAct = (*itr);
       itr++;
@@ -126,7 +126,7 @@ void Core::Cell::unload()
    if( m_bActive )
       return;
 
-   removeCharas();
+   removeActors();
    m_bUnloadPending = false;
 }
 

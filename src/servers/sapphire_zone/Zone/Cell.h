@@ -9,7 +9,7 @@
 
 namespace Core {
 
-   typedef std::set< Entity::CharaPtr > CharaSet;
+   typedef std::set< Entity::ActorPtr > ActorSet;
 
    class Cell 
    {
@@ -19,7 +19,7 @@ namespace Core {
       bool m_bForcedActive;
       uint16_t m_posX;
       uint16_t m_posY;
-      CharaSet m_charas;
+      ActorSet m_actors;
       bool m_bActive;
       bool m_bLoaded;
       bool m_bUnloadPending;
@@ -33,13 +33,13 @@ namespace Core {
 
       void init( uint32_t x, uint32_t y, ZonePtr pZone );
 
-      void addChara( Entity::CharaPtr pAct );
+      void addActor( Entity::ActorPtr pAct );
 
-      void removeChara( Entity::CharaPtr pAct );
+      void removeActor( Entity::ActorPtr pAct );
 
-      bool hasChara( Entity::CharaPtr pAct )
+      bool hasActor( Entity::ActorPtr pAct )
       { 
-         return (m_charas.find(pAct) != m_charas.end());
+         return ( m_actors.find(pAct) != m_actors.end() );
       }
 
       bool hasPlayers() const
@@ -47,21 +47,21 @@ namespace Core {
          return ((m_playerCount > 0) ? true : false); 
       }
 
-      size_t getCharaCount() const
+      size_t getActorCount() const
       { 
-         return m_charas.size();
+         return m_actors.size();
       }
 
-      void removeCharas();
+      void removeActors();
 
-      CharaSet::iterator begin()
+      ActorSet::iterator begin()
       {
-         return m_charas.begin();
+         return m_actors.begin();
       }
 
-      CharaSet::iterator end()
+      ActorSet::iterator end()
       {
-         return m_charas.end();
+         return m_actors.end();
       }
 
       void setActivity(bool state);
