@@ -708,16 +708,6 @@ namespace Common {
       MountSkill = 0xD,
    };
 
-   /*! ModelType as found in eventsystemdefine.exd */
-   enum ModelType : uint8_t
-   {
-      Human = 1,
-      DemiHuman = 2,
-      Monster = 3,
-      SharedGroup = 4,
-      Parts = 5
-   };
-
    typedef std::vector< PlayerStateFlag > PlayerStateFlagList;
 
 } /* Common */

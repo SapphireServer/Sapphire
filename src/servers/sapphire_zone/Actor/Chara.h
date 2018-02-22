@@ -49,6 +49,16 @@ public:
       SMachine = 0x08
    };
 
+   /*! ModelType as found in eventsystemdefine.exd */
+   enum ModelType : uint8_t
+   {
+      Human = 1,
+      DemiHuman = 2,
+      Monster = 3,
+      SharedGroup = 4,
+      Parts = 5
+   };
+
    struct ActorStats
    {
       uint32_t max_mp = 0;
@@ -132,15 +142,14 @@ protected:
    Action::ActionPtr    m_pCurrentAction;
    /*! Invincibility type */
    Common::InvincibilityType m_invincibilityType;
+   /*! Type of model to use, humanoid for actors that use look data */
+   ModelType m_modelType;
 
    /*! Status effects */
    const uint8_t MAX_STATUS_EFFECTS = 30;
    std::queue< uint8_t > m_statusEffectFreeSlotQueue;
    std::vector< std::pair< uint8_t, uint32_t> > m_statusEffectList;
    std::map< uint8_t, StatusEffect::StatusEffectPtr > m_statusEffectMap;
-
-   std::set< CharaPtr > m_inRangeCharas;
-   std::set< PlayerPtr > m_inRangePlayers;
 
 public:
    Chara( ObjKind type );
@@ -182,8 +191,6 @@ public:
 
    std::string getName() const;
 
-   std::set< CharaPtr > getInRangeCharas( bool includeSelf = false );
-
    bool face( const Common::FFXIVARR_POSITION3& p );
 
    Stance getStance() const;
@@ -200,6 +207,8 @@ public:
    Common::InvincibilityType getInvincibilityType() const;
 
    Common::ClassJob getClass() const;
+
+   ModelType getModelType() const;
 
    uint8_t getClassAsInt() const;
 
@@ -233,8 +242,6 @@ public:
 
    virtual void autoAttack( CharaPtr pTarget );
 
-   virtual void onRemoveInRangeChara( Chara& pActor ) {}
-
    virtual void onDeath() {};
    virtual void onDamageTaken( Chara& pSource ) {};
    virtual void onActionHostile( Chara& source ) {};
@@ -252,29 +259,6 @@ public:
    Action::ActionPtr getCurrentAction() const;
 
    void setCurrentAction( Action::ActionPtr pAction );
-
-   ///// IN RANGE LOGIC /////
-
-   // check if another actor is in the actors in range set
-   bool isInRangeSet( CharaPtr pChara ) const;
-
-   CharaPtr getClosestChara();
-
-   void sendToInRangeSet( Network::Packets::GamePacketPtr pPacket, bool bToSelf = false );
-
-   // add an actor to in range set
-   void addInRangeChara( CharaPtr pChara );
-
-   // remove an actor from the in range set
-   void removeInRangeChara( Chara& chara );
-
-   // return true if there is at least one actor in the in range set
-   bool hasInRangeActor() const;
-
-   void removeFromInRange();
-
-   // clear the whole in range set, this does no cleanup
-   virtual void clearInRangeSet();
 
    ZonePtr getCurrentZone() const;
 
