@@ -56,14 +56,57 @@ void Core::Entity::Actor::setRot( float rot )
    m_rot = rot;
 }
 
+bool Core::Entity::Actor::isChara() const
+{
+   return isPlayer() || isBattleNpc() || isEventNpc() || isRetainer() || isCompanion();
+}
+
 bool Core::Entity::Actor::isPlayer() const
 {
    return m_objKind == ObjKind::Player;
 }
 
+bool Core::Entity::Actor::isEventNpc() const
+{
+   return m_objKind == ObjKind::EventNpc;
+}
+
+bool Core::Entity::Actor::isBattleNpc() const
+{
+   return m_objKind == ObjKind::BattleNpc;
+}
+
+bool Core::Entity::Actor::isRetainer() const
+{
+   return m_objKind == ObjKind::Retainer;
+}
+
+bool Core::Entity::Actor::isCompanion() const
+{
+   return m_objKind == ObjKind::Companion;
+}
+
+bool Core::Entity::Actor::isEventObj() const
+{
+   return m_objKind == ObjKind::EventObj;
+}
+
+bool Core::Entity::Actor::isHousingEventObj() const
+{
+   return m_objKind == ObjKind::Housing;
+}
+
+bool Core::Entity::Actor::isAetheryte() const
+{
+   return m_objKind == ObjKind::Aetheryte;
+}
+
+
 /*! \return pointer to this instance as ActorPtr */
 Core::Entity::CharaPtr Core::Entity::Actor::getAsChara()
 {
+   if( !isChara() )
+      return nullptr;
    return boost::dynamic_pointer_cast< Entity::Chara, Entity::Actor >( shared_from_this() );
 }
 
@@ -73,6 +116,14 @@ Core::Entity::PlayerPtr Core::Entity::Actor::getAsPlayer()
    if( !isPlayer() )
       return nullptr;
    return boost::dynamic_pointer_cast< Entity::Player, Entity::Actor >( shared_from_this() );
+}
+
+/*! \return pointer to this instance as PlayerPtr */
+Core::Entity::EventObjectPtr Core::Entity::Actor::getAsEventObj()
+{
+   if( !isEventObj() )
+      return nullptr;
+   return boost::dynamic_pointer_cast< Entity::EventObject, Entity::Actor >( shared_from_this() );
 }
 
 /*!
@@ -155,6 +206,7 @@ bool Core::Entity::Actor::isInRangeSet( ActorPtr pActor ) const
    return !( m_inRangeActor.find( pActor ) == m_inRangeActor.end() );
 }
 
+
 /*! \return ActorPtr of the closest actor in range, if none, nullptr */
 Core::Entity::ActorPtr Core::Entity::Actor::getClosestActor()
 {
@@ -185,7 +237,6 @@ Core::Entity::ActorPtr Core::Entity::Actor::getClosestActor()
 
    return tmpActor;
 }
-
 
 /*! Clear the whole in range set, this does no cleanup */
 void Core::Entity::Actor::clearInRangeSet()

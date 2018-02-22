@@ -31,7 +31,7 @@ namespace Entity {
          GatheringPoint = 0x06,
          EventObj = 0x07,
          Mount = 0x08,
-         Companion = 0x09,
+         Companion = 0x09, // this probably actually means minion
          Retainer = 0x0A,
          Area = 0x0B,
          Housing = 0x0C,
@@ -71,7 +71,15 @@ namespace Entity {
       float getRot() const;
       void setRot( float rot );
 
+      bool isChara() const;
       bool isPlayer() const;
+      bool isEventNpc() const;
+      bool isBattleNpc() const;
+      bool isRetainer() const;
+      bool isCompanion() const;
+      bool isEventObj() const;
+      bool isHousingEventObj() const;
+      bool isAetheryte() const;
 
       ///// IN RANGE LOGIC ///////////////////////////////
       virtual void onRemoveInRangeActor( Actor& pActor ) {}
@@ -103,6 +111,7 @@ namespace Entity {
 
       CharaPtr getAsChara();
       PlayerPtr getAsPlayer();
+      EventObjectPtr getAsEventObj();
    };
 
 }
