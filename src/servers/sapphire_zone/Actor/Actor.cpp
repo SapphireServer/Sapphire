@@ -29,6 +29,11 @@ uint32_t Core::Entity::Actor::getId() const
    return m_id;
 }
 
+void Core::Entity::Actor::setId( uint32_t id )
+{
+   m_id = id;
+}
+
 Core::Entity::Actor::ObjKind Core::Entity::Actor::getObjKind() const
 {
    return m_objKind;
@@ -152,7 +157,7 @@ void Core::Entity::Actor::addInRangeActor( ActorPtr pActor )
    {
       auto pPlayer = pActor->getAsPlayer();
 
-      pPlayer->spawn( getAsPlayer() );
+      spawn( pPlayer );
 
       // if actor is a player, add it to the in range player set
       m_inRangePlayers.insert( pPlayer );

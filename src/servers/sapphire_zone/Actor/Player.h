@@ -559,6 +559,8 @@ public:
    void setMarkedForRemoval();
    bool isMarkedForRemoval() const;
 
+   uint8_t getNextObjCount();
+
 private:
    uint32_t m_lastWrite;
    uint32_t m_lastPing;
@@ -669,6 +671,9 @@ private:
    uint32_t m_cfPenaltyUntil; // unix time
 
    uint8_t m_mount;
+
+   // counter used to index objects spawned for the player
+   uint8_t m_objCount;
 };
 
 }

@@ -13,6 +13,7 @@
 #include <common/Database/DatabaseDef.h>
 
 #include "Zone.h"
+#include "InstanceContent.h"
 #include "TerritoryMgr.h"
 
 #include "Session.h"
@@ -48,7 +49,8 @@ Core::Zone::Zone() :
    m_currentWeather( Weather::FairSkies ),
    m_weatherOverride( Weather::None ),
    m_lastMobUpdate( 0 ),
-   m_currentFestivalId( 0 )
+   m_currentFestivalId( 0 ),
+   m_nextEObjId( 0x400D0000 )
 {
 }
 
@@ -658,9 +660,12 @@ void Core::Zone::registerEObj( Entity::EventObjectPtr object )
    if( !object )
       return;
 
-   //object->setParentInstance( InstanceContentPtr( this ) );
+   object->setId( getNextEObjId() );
+   pushActor( object );
 
    m_eventObjects[object->getId()] = object;
+
+   onRegisterEObj( object );
 
    g_log.debug( "Registered instance eobj: " + std::to_string( object->getId() ) );
 }
@@ -700,4 +705,14 @@ void Core::Zone::updateEObj( Entity::EventObjectPtr object )
 
       playerIt.second->queuePacket( eobjStatePacket );
    }
+}
+
+Core::InstanceContentPtr Core::Zone::getAsInstanceContent()
+{
+   return boost::dynamic_pointer_cast< InstanceContent, Zone >( shared_from_this() );
+}
+
+uint32_t Core::Zone::getNextEObjId()
+{
+   return ++m_nextEObjId;
 }

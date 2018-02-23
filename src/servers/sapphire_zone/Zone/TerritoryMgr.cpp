@@ -181,7 +181,7 @@ Core::ZonePtr Core::TerritoryMgr::createInstanceContent( uint32_t instanceConten
 
    m_instanceContentToInstanceMap[instanceContentId][pZone->getGuId()] = pZone;
    m_instanceIdToZonePtrMap[pZone->getGuId()] = pZone;
-   m_instanceZoneSet.insert( { pZone } );
+   m_instanceZoneSet.insert( pZone );
 
    return pZone;
 }
@@ -312,6 +312,8 @@ bool Core::TerritoryMgr::movePlayer( ZonePtr pZone, Core::Entity::PlayerPtr pPla
       g_log.error( "Zone not found on this server." );
       return false;
    }
+
+   pPlayer->initSpawnIdQueue();
 
    pPlayer->setTerritoryId( pZone->getTerritoryId() );
 

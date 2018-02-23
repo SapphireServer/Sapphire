@@ -68,6 +68,7 @@ namespace Entity {
       virtual void despawn( PlayerPtr pTarget ) {}
 
       uint32_t getId() const;
+      void setId( uint32_t id );
 
       ObjKind getObjKind() const;
 

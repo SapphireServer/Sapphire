@@ -72,7 +72,8 @@ Core::Entity::Player::Player() :
    m_bAutoattack( false ),
    m_markedForRemoval( false ),
    m_mount( 0 ),
-   m_directorInitialized( false )
+   m_directorInitialized( false ),
+   m_objCount( 0 )
 {
    m_id = 0;
    m_currentStance = Stance::Passive;
@@ -1491,6 +1492,8 @@ uint32_t Core::Entity::Player::getTerritoryId() const
 
 void Core::Entity::Player::sendZonePackets()
 {
+   getCurrentZone()->onBeforeEnterTerritory( *this );
+
    ZoneChannelPacket< FFXIVIpcInit > initPacket( getId() );
    initPacket.data().charId = getId();
    queuePacket( initPacket );
@@ -1650,4 +1653,9 @@ void Player::teleportQuery( uint16_t aetheryteId )
          setCurrentAction( pActionTeleport );
       }
    }
+}
+
+uint8_t Player::getNextObjCount()
+{
+   return m_objCount++;
 }

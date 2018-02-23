@@ -9,7 +9,7 @@
 namespace Core
 {
 
-class InstanceContent : public Zone, Event::Director
+class InstanceContent : public Event::Director, public Zone
 {
 public:
    enum InstanceContentState
@@ -27,11 +27,15 @@ public:
                     uint32_t instanceContentId );
    virtual ~InstanceContent();
 
+   bool init() override;
+   void onBeforeEnterTerritory( Entity::Player& player ) override;
    void onEnterTerritory( Entity::Player& player ) override;
    void onLeaveTerritory( Entity::Player& player ) override;
    void onFinishLoading( Entity::Player& player ) override;
    void onInitDirector( Entity::Player& player ) override;
    void onUpdate( uint32_t currTime ) override;
+
+   void onRegisterEObj( Entity::EventObjectPtr object ) override;
 
    void setVar( uint8_t index, uint8_t value );
 
@@ -46,6 +50,8 @@ private:
    InstanceContentState m_state;
 
    int64_t m_instanceExpireTime;
+
+   Entity::EventObjectPtr m_pEntranceEObj;
 };
 
 }

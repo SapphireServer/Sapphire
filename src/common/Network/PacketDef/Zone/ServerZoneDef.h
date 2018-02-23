@@ -1318,8 +1318,8 @@ struct FFXIVIpcObjectSpawn : FFXIVIpcBasePacket<ObjectSpawn>
 {
    uint8_t count;
    uint8_t objKind;
-   uint8_t unknown2;
    uint8_t state;
+   uint8_t unknown2;
    uint32_t objId;
    uint32_t actorId;
    uint32_t levelId;

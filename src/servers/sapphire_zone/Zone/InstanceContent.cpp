@@ -29,10 +29,19 @@ Core::InstanceContent::InstanceContent( boost::shared_ptr< Core::Data::InstanceC
      Director( Event::Director::InstanceContent, instanceContentId ),
      m_instanceContentInfo( pInstanceContent ),
      m_instanceContentId( instanceContentId ),
-     m_state( Created )
+     m_state( Created ),
+     m_pEntranceEObj( nullptr )
 {
-   g_scriptMgr.onInstanceInit( *this );
+
 }
+
+bool Core::InstanceContent::init()
+{
+   g_scriptMgr.onInstanceInit( getAsInstanceContent() );
+
+   return true;
+}
+
 
 Core::InstanceContent::~InstanceContent()
 {
@@ -121,7 +130,7 @@ void Core::InstanceContent::onUpdate( uint32_t currTime )
          break;
    }
 
-   g_scriptMgr.onInstanceUpdate( *this, currTime );
+   g_scriptMgr.onInstanceUpdate( getAsInstanceContent(), currTime );
 }
 
 void Core::InstanceContent::onFinishLoading( Entity::Player& player )
@@ -211,3 +220,19 @@ void Core::InstanceContent::setVar( uint8_t index, uint8_t value )
       sendDirectorVars( *playerIt.second );
    }
 }
+
+void Core::InstanceContent::onRegisterEObj( Entity::EventObjectPtr object )
+{
+   if( object->getObjectId() == 2000182 ) // start
+      m_pEntranceEObj = object;
+}
+
+void Core::InstanceContent::onBeforeEnterTerritory( Core::Entity::Player &player )
+{
+   if( m_pEntranceEObj != nullptr )
+      player.setPos( m_pEntranceEObj->getPos() );
+   else
+      player.setPos( { 0.f, 0.f, 0.f } );
+}
+
+
