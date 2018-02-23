@@ -18,11 +18,13 @@ extern Core::Logger g_log;
 
 
 Core::Entity::EventObject::EventObject( uint32_t objectId, uint32_t mapLinkId,
-                                        uint8_t initialState, Common::FFXIVARR_POSITION3 pos ) :
+                                        uint8_t initialState, Common::FFXIVARR_POSITION3 pos,
+                                        const std::string givenName ) :
    Core::Entity::Actor( ObjKind::EventObj ),
    m_mapLinkId( mapLinkId ),
    m_state( initialState ),
-   m_objectId( objectId )
+   m_objectId( objectId ),
+   m_name( givenName )
 {
    m_id = objectId;
    m_pos.x = pos.x;
@@ -69,7 +71,7 @@ Core::InstanceContentPtr Core::Entity::EventObject::getParentInstance() const
 
 void Core::Entity::EventObject::spawn( Core::Entity::PlayerPtr pTarget )
 {
-   g_log.debug( "spawn eobj: " + std::to_string( getId() ) );
+   g_log.debug( "Spawning EObj: id:" + std::to_string( getId() ) + " name:" + getName() );
    ZoneChannelPacket< FFXIVIpcObjectSpawn > eobjStatePacket( getId(), pTarget->getId() );
    eobjStatePacket.data().count = pTarget->getNextObjCount();
    eobjStatePacket.data().objKind = getObjKind();
@@ -84,4 +86,9 @@ void Core::Entity::EventObject::spawn( Core::Entity::PlayerPtr pTarget )
 void Core::Entity::EventObject::despawn( Core::Entity::PlayerPtr pTarget )
 {
    g_log.debug( "despawn eobj: " + std::to_string( getId() ) );
+}
+
+const std::string &Core::Entity::EventObject::getName() const
+{
+   return m_name;
 }

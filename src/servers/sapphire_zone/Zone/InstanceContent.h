@@ -43,6 +43,8 @@ public:
 
    uint32_t getInstanceContentId() const;
 
+   Entity::EventObjectPtr getEObjByName( const std::string& name );
+
 private:
    Event::DirectorPtr m_pDirector;
    Core::Data::ExdDataGenerated::InstanceContentPtr m_instanceContentInfo;
@@ -52,6 +54,8 @@ private:
    int64_t m_instanceExpireTime;
 
    Entity::EventObjectPtr m_pEntranceEObj;
+
+   std::map< std::string, Entity::EventObjectPtr > m_eventObjectMap;
 };
 
 }
