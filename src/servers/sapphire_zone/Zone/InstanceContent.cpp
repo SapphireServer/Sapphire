@@ -223,6 +223,8 @@ void Core::InstanceContent::setVar( uint8_t index, uint8_t value )
 
 void Core::InstanceContent::onRegisterEObj( Entity::EventObjectPtr object )
 {
+   if( object->getName() != "none" )
+      m_eventObjectMap[object->getName()] = object;
    if( object->getObjectId() == 2000182 ) // start
       m_pEntranceEObj = object;
 }
@@ -233,6 +235,15 @@ void Core::InstanceContent::onBeforeEnterTerritory( Core::Entity::Player &player
       player.setPos( m_pEntranceEObj->getPos() );
    else
       player.setPos( { 0.f, 0.f, 0.f } );
+}
+
+Core::Entity::EventObjectPtr Core::InstanceContent::getEObjByName( const std::string &name )
+{
+   auto it = m_eventObjectMap.find( name );
+   if( it == m_eventObjectMap.end() )
+      return nullptr;
+
+   return it->second;
 }
 
 

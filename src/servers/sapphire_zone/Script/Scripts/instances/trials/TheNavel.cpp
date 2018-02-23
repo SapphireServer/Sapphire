@@ -9,10 +9,10 @@ public:
 
    void onInit( InstanceContentPtr instance ) override
    {
-      auto exit = Entity::EventObjectPtr( new Entity::EventObject( EXIT_OBJECT, 0, 4, { 0, 0, -10 } ) );
+      auto exit = Entity::EventObjectPtr( new Entity::EventObject( EXIT_OBJECT, 0, 4, { 0, 0, -10 }, "Entrance" ) );
       instance->registerEObj( exit );
 
-      auto start = Entity::EventObjectPtr( new Entity::EventObject( START_CIRCLE, 4236868, 5, { 0, 0, 24 } ) );
+      auto start = Entity::EventObjectPtr( new Entity::EventObject( START_CIRCLE, 4236868, 5, { 0, 0, 24 }, "Exit" ) );
       instance->registerEObj( start );
    }
 
