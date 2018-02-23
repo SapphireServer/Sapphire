@@ -10,8 +10,7 @@ namespace Entity
    class EventObject : public Actor
    {
    public:
-      EventObject( uint32_t objectId, uint32_t mapLinkId );
-      EventObject( uint32_t objectId, uint32_t mapLinkId, Common::FFXIVARR_POSITION3 pos );
+      EventObject( uint32_t objectId, uint32_t mapLinkId, uint8_t initialState, Common::FFXIVARR_POSITION3 pos );
 
       uint32_t getMapLinkId() const;
       void setMapLinkId( uint32_t mapLinkId );
@@ -19,11 +18,17 @@ namespace Entity
       uint8_t getState() const;
       void setState( uint8_t state );
 
+      uint32_t getObjectId() const;
+
       InstanceContentPtr getParentInstance() const;
       void setParentInstance( InstanceContentPtr instance );
 
+      void spawn( PlayerPtr pTarget ) override;
+      void despawn( PlayerPtr pTarget ) override;
+
    protected:
       uint32_t m_mapLinkId;
+      uint32_t m_objectId;
       uint8_t m_state;
       InstanceContentPtr m_parentInstance;
    };

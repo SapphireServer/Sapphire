@@ -48,13 +48,13 @@ protected:
 
    std::map< uint8_t, int32_t> m_weatherRateMap;
 
+   uint32_t m_nextEObjId;
+
 public:
    Zone();
 
    Zone( uint16_t territoryId, uint32_t guId, const std::string& internalName, const std::string& placeName );
    virtual ~Zone();
-
-   bool init();
 
    /*! overrides the zone's weather, set to 0 to unlock */
    void setWeatherOverride( Common::Weather weather );
@@ -64,13 +64,17 @@ public:
    uint16_t getCurrentFestival() const;
    void setCurrentFestival( uint16_t festivalId );
 
+   virtual bool init();
+
    virtual void loadCellCache();
    virtual uint32_t getTerritoryId() const;
+   virtual void onBeforeEnterTerritory( Entity::Player& player ) {};
    virtual void onEnterTerritory( Entity::Player& player );
    virtual void onFinishLoading( Entity::Player& player );
    virtual void onInitDirector( Entity::Player& player );
    virtual void onLeaveTerritory( Entity::Player& player );
    virtual void onUpdate( uint32_t currTime );
+   virtual void onRegisterEObj( Entity::EventObjectPtr object ) {};
 
    Common::Weather getNextWeather();
 
@@ -89,6 +93,8 @@ public:
    void queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range, Network::Packets::GamePacketPtr pPacketEntry );
 
    uint32_t getGuId() const;
+
+   uint32_t getNextEObjId();
 
    const std::string& getName() const;
    const std::string& getInternalName() const;

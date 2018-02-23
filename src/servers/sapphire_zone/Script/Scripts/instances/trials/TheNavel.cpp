@@ -7,16 +7,16 @@ public:
    TheNavel() : InstanceContentScript( 20002 )
    { }
 
-   void onInit( InstanceContent& instance ) override
+   void onInit( InstanceContentPtr instance ) override
    {
-      auto exit = new Entity::EventObject( EXIT_OBJECT, 0, { 0, 0, -10 } );
-      instance.registerEObj(Entity::EventObjectPtr(exit));
+      auto exit = Entity::EventObjectPtr( new Entity::EventObject( EXIT_OBJECT, 0, 4, { 0, 0, -10 } ) );
+      instance->registerEObj( exit );
 
-      auto start = new Entity::EventObject( START_CIRCLE, 4236868, { 0, 0, 24 } );
-      instance.registerEObj(Entity::EventObjectPtr(start));
+      auto start = Entity::EventObjectPtr( new Entity::EventObject( START_CIRCLE, 4236868, 5, { 0, 0, 24 } ) );
+      instance->registerEObj( start );
    }
 
-   void onUpdate( InstanceContent& instance, uint32_t currTime ) override
+   void onUpdate( InstanceContentPtr instance, uint32_t currTime ) override
    {
 
    }

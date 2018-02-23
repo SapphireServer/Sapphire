@@ -335,9 +335,9 @@ bool Core::Scripting::ScriptManager::onZoneInit( ZonePtr pZone )
    return false;
 }
 
-bool Core::Scripting::ScriptManager::onInstanceInit( InstanceContent& instance )
+bool Core::Scripting::ScriptManager::onInstanceInit( InstanceContentPtr instance )
 {
-   auto script = m_nativeScriptManager->getScript< InstanceContentScript >( instance.getInstanceContentId() );
+   auto script = m_nativeScriptManager->getScript< InstanceContentScript >( instance->getInstanceContentId() );
    if( script )
    {
       script->onInit( instance );
@@ -347,9 +347,9 @@ bool Core::Scripting::ScriptManager::onInstanceInit( InstanceContent& instance )
    return false;
 }
 
-bool Core::Scripting::ScriptManager::onInstanceUpdate( InstanceContent& instance, uint32_t currTime )
+bool Core::Scripting::ScriptManager::onInstanceUpdate( InstanceContentPtr instance, uint32_t currTime )
 {
-   auto script = m_nativeScriptManager->getScript< InstanceContentScript >( instance.getInstanceContentId() );
+   auto script = m_nativeScriptManager->getScript< InstanceContentScript >( instance->getInstanceContentId() );
    if( script )
    {
       script->onUpdate( instance, currTime );

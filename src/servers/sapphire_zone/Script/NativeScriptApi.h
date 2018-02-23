@@ -120,8 +120,8 @@ public:
       ScriptObject( instanceContentId, typeid( InstanceContentScript ).hash_code() )
    { }
 
-   virtual void onInit( InstanceContent& instance ) { }
-   virtual void onUpdate( InstanceContent& instance, uint32_t currTime ) { }
+   virtual void onInit( InstanceContentPtr instance ) { }
+   virtual void onUpdate( InstanceContentPtr instance, uint32_t currTime ) { }
 };
 
 #endif
