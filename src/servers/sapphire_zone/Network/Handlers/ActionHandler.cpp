@@ -82,11 +82,14 @@ enum ClientTrigger
    AchievementCrit = 0x202,
    AchievementComp = 0x203,
    AchievementCatChat = 0x206,
-  
+
+
+   DirectorInitFinish = 0x321,
+
+   EnterTerritoryEventFinished = 0x330,
+
    AchievementCritReq = 0x3E8,
    AchievementList = 0x3E9,
-   
-   DirectorInitFinish = 0x321,
 
    CompanionAction = 0x6A4,
    CompanionSetBarding = 0x6A5,
@@ -246,6 +249,12 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
         case ClientTrigger::DirectorInitFinish: // Director init finish
         {
            player.getCurrentZone()->onInitDirector( player );
+           break;
+        }
+        case ClientTrigger::EnterTerritoryEventFinished:
+        {
+           g_log.debug( "[DOOOOOOOOOOOOOOOOOOOOOOONE]" );
+           player.setOnEnterEventDone( true );
            break;
         }
         default:

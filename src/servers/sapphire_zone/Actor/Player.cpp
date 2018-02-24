@@ -73,7 +73,8 @@ Core::Entity::Player::Player() :
    m_markedForRemoval( false ),
    m_mount( 0 ),
    m_directorInitialized( false ),
-   m_objCount( 0 )
+   m_objCount( 0 ),
+   m_onEnterEventDone( false )
 {
    m_id = 0;
    m_currentStance = Stance::Passive;
@@ -359,6 +360,7 @@ void Core::Entity::Player::returnToHomepoint()
 
 void Core::Entity::Player::setZone( uint32_t zoneId )
 {
+   m_onEnterEventDone = false;
    if( !g_territoryMgr.movePlayer( zoneId, getAsPlayer() ) )
    {
       // todo: this will require proper handling, for now just return the player to their previous area
@@ -375,6 +377,7 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
 
 bool Core::Entity::Player::setInstance( uint32_t instanceContentId )
 {
+   m_onEnterEventDone = false;
    auto instance = g_territoryMgr.getInstanceZonePtr( instanceContentId );
    if( !instance )
       return false;
@@ -384,6 +387,7 @@ bool Core::Entity::Player::setInstance( uint32_t instanceContentId )
 
 bool Core::Entity::Player::setInstance( ZonePtr instance )
 {
+   m_onEnterEventDone = false;
    if( !instance )
       return false;
 
@@ -1620,12 +1624,12 @@ void Core::Entity::Player::finishZoning()
    unsetStateFlag( PlayerStateFlag::BetweenAreas );
 }
 
-void Player::emote( uint32_t emoteId, uint64_t targetId )
+void Core::Entity::Player::emote( uint32_t emoteId, uint64_t targetId )
 {
    sendToInRangeSet( ActorControlPacket144( getId(), ActorControlType::Emote, emoteId, 0, 0, 0, targetId ) );
 }
 
-void Player::teleportQuery( uint16_t aetheryteId )
+void Core::Entity::Player::teleportQuery( uint16_t aetheryteId )
 {
    // TODO: only register this action if enough gil is in possession
    auto targetAetheryte = g_exdDataGen.get< Core::Data::Aetheryte >( aetheryteId );
@@ -1655,7 +1659,17 @@ void Player::teleportQuery( uint16_t aetheryteId )
    }
 }
 
-uint8_t Player::getNextObjCount()
+uint8_t Core::Entity::Player::getNextObjCount()
 {
    return m_objCount++;
+}
+
+void Core::Entity::Player::setOnEnterEventDone( bool isDone )
+{
+   m_onEnterEventDone = isDone;
+}
+
+bool Core::Entity::Player::isOnEnterEventDone() const
+{
+   return m_onEnterEventDone;
 }

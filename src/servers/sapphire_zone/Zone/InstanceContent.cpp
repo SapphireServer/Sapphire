@@ -99,7 +99,9 @@ void Core::InstanceContent::onUpdate( uint32_t currTime )
 
          for( const auto &playerIt : m_playerMap )
          {
-            if( !playerIt.second->isLoadingComplete() || !playerIt.second->isDirectorInitialized() )
+            if( !playerIt.second->isLoadingComplete() ||
+                !playerIt.second->isDirectorInitialized() ||
+                !playerIt.second->isOnEnterEventDone() )
                return;
          }
 
@@ -135,8 +137,7 @@ void Core::InstanceContent::onUpdate( uint32_t currTime )
 
 void Core::InstanceContent::onFinishLoading( Entity::Player& player )
 {
-   if( m_state != Created )
-      sendDirectorInit( player );
+   sendDirectorInit( player );
 }
 
 void Core::InstanceContent::onInitDirector( Entity::Player& player )
@@ -232,9 +233,15 @@ void Core::InstanceContent::onRegisterEObj( Entity::EventObjectPtr object )
 void Core::InstanceContent::onBeforeEnterTerritory( Core::Entity::Player &player )
 {
    if( m_pEntranceEObj != nullptr )
+   {
+      player.setRot( PI );
       player.setPos( m_pEntranceEObj->getPos() );
+   }
    else
+   {
+      player.setRot( PI );
       player.setPos( { 0.f, 0.f, 0.f } );
+   }
 }
 
 Core::Entity::EventObjectPtr Core::InstanceContent::getEObjByName( const std::string &name )
