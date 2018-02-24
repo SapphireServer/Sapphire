@@ -76,7 +76,7 @@ void Core::Entity::EventObject::spawn( Core::Entity::PlayerPtr pTarget )
    eobjStatePacket.data().count = pTarget->getNextObjCount();
    eobjStatePacket.data().objKind = getObjKind();
    eobjStatePacket.data().state = getState();
-   eobjStatePacket.data().objId = getId();
+   eobjStatePacket.data().objId = getObjectId();
    eobjStatePacket.data().hierachyId = getMapLinkId();
    eobjStatePacket.data().position = getPos();
    pTarget->queuePacket( eobjStatePacket );
