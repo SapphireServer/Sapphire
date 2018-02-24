@@ -87,7 +87,7 @@ public:
    virtual void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) { }
    virtual void onNpcKill( uint32_t npcId, Entity::Player& player ) { }
    virtual void onEmote( uint64_t actorId, uint32_t eventId, uint32_t emoteId, Entity::Player& player ) { }
-   virtual void onEnterZone( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 ) { }
+   virtual void onEnterTerritory( Entity::Player &player, uint32_t eventId, uint16_t param1, uint16_t param2 ) { }
    virtual void onWithinRange( Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z ) { }
    virtual void onOutsideRange( Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z ) { }
    virtual void onEventItem( Entity::Player& player, uint32_t eventItemId, uint32_t eventId, uint32_t castTime, uint64_t targetId ) { }
@@ -117,7 +117,7 @@ class InstanceContentScript : public ScriptObject
 {
 public:
    explicit InstanceContentScript( uint32_t instanceContentId ) :
-      ScriptObject( instanceContentId, typeid( InstanceContentScript ).hash_code() )
+      ScriptObject( uint32_t{ 0x8003 } << 16 | instanceContentId, typeid( InstanceContentScript ).hash_code() )
    { }
 
    virtual void onInit( InstanceContentPtr instance ) { }

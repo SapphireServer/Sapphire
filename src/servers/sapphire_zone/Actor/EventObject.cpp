@@ -19,7 +19,7 @@ extern Core::Logger g_log;
 
 Core::Entity::EventObject::EventObject( uint32_t objectId, uint32_t mapLinkId,
                                         uint8_t initialState, Common::FFXIVARR_POSITION3 pos,
-                                        const std::string givenName ) :
+                                        const std::string& givenName ) :
    Core::Entity::Actor( ObjKind::EventObj ),
    m_mapLinkId( mapLinkId ),
    m_state( initialState ),
@@ -88,7 +88,7 @@ void Core::Entity::EventObject::despawn( Core::Entity::PlayerPtr pTarget )
    g_log.debug( "despawn eobj: " + std::to_string( getId() ) );
 }
 
-const std::string &Core::Entity::EventObject::getName() const
+const std::string& Core::Entity::EventObject::getName() const
 {
    return m_name;
 }

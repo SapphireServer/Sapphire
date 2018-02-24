@@ -11,7 +11,7 @@ namespace Entity
    {
    public:
       EventObject( uint32_t objectId, uint32_t mapLinkId, uint8_t initialState, Common::FFXIVARR_POSITION3 pos,
-                   const std::string givenName = "none" );
+                   const std::string& givenName = "none" );
 
       uint32_t getMapLinkId() const;
       void setMapLinkId( uint32_t mapLinkId );

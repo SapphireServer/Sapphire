@@ -61,6 +61,7 @@ namespace Core {
             SpecialShop = 0x001B,
             BahamutGuide = 0x001C,
             FcTalk = 0x001F,
+            ICDirector = 0x8003,
          };
 
          using SceneReturnCallback = std::function< void( Entity::Player&, uint32_t, uint16_t, uint16_t, uint16_t ) > ;

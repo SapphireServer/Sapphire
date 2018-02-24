@@ -166,7 +166,7 @@ bool Core::Scripting::ScriptManager::onEnterTerritory( Entity::Player& player, u
    auto script = m_nativeScriptManager->getScript< EventScript >( eventId );
    if( !script )
       return false;
-   script->onEnterZone( player, eventId, param1, param2 );
+   script->onEnterTerritory( player, eventId, param1, param2 );
    return true;
 }
 
@@ -337,7 +337,7 @@ bool Core::Scripting::ScriptManager::onZoneInit( ZonePtr pZone )
 
 bool Core::Scripting::ScriptManager::onInstanceInit( InstanceContentPtr instance )
 {
-   auto script = m_nativeScriptManager->getScript< InstanceContentScript >( instance->getInstanceContentId() );
+   auto script = m_nativeScriptManager->getScript< InstanceContentScript >( instance->getDirectorId() );
    if( script )
    {
       script->onInit( instance );
@@ -349,7 +349,7 @@ bool Core::Scripting::ScriptManager::onInstanceInit( InstanceContentPtr instance
 
 bool Core::Scripting::ScriptManager::onInstanceUpdate( InstanceContentPtr instance, uint32_t currTime )
 {
-   auto script = m_nativeScriptManager->getScript< InstanceContentScript >( instance->getInstanceContentId() );
+   auto script = m_nativeScriptManager->getScript< InstanceContentScript >( instance->getDirectorId() );
    if( script )
    {
       script->onUpdate( instance, currTime );
