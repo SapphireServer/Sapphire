@@ -559,6 +559,9 @@ public:
    void setMarkedForRemoval();
    bool isMarkedForRemoval() const;
 
+   void setOnEnterEventDone( bool isDone );
+   bool isOnEnterEventDone() const;
+
    uint8_t getNextObjCount();
 
 private:
@@ -574,6 +577,8 @@ private:
    bool m_markedForRemoval;
 
    bool m_directorInitialized;
+
+   bool m_onEnterEventDone;
 
 private:
 
