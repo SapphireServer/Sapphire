@@ -1,6 +1,6 @@
 #include <ScriptObject.h>
 #include <Zone/InstanceContent.h>
-
+#include <boost/make_shared.hpp>
 class TheNavel : public InstanceContentScript
 {
 public:
@@ -9,10 +9,12 @@ public:
 
    void onInit( InstanceContentPtr instance ) override
    {
-      auto exit = Entity::EventObjectPtr( new Entity::EventObject( EXIT_OBJECT, 0, 4, { 0, 0, -10 }, "Entrance" ) );
+      Common::FFXIVARR_POSITION3 pos = { 0, 0, -10 };
+      auto exit = Entity::make_EventObject( EXIT_OBJECT, 0, 4, pos, "Entrance" );
       instance->registerEObj( exit );
 
-      auto start = Entity::EventObjectPtr( new Entity::EventObject( START_CIRCLE, 4236868, 5, { 0, 0, 24 }, "Exit" ) );
+      Common::FFXIVARR_POSITION3 pos1 = { 0, 0, 24 };
+      auto start = Entity::make_EventObject( START_CIRCLE, 4236868, 5, pos1, "Exit" );
       instance->registerEObj( start );
    }
 
