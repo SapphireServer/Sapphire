@@ -313,10 +313,13 @@ void Core::Entity::Actor::setCurrentZone( ZonePtr currZone )
    m_pCurrentZone = currZone;
 }
 
-/*! \return InstanceContentPtr to the current instance, null if not an instance or not set */
+/*! \return InstanceContentPtr to the current instance, nullptr if not an instance or not set */
 Core::InstanceContentPtr Core::Entity::Actor::getCurrentInstance() const
 {
-   return getCurrentZone()->getAsInstanceContent();
+   if( m_pCurrentZone )
+      return m_pCurrentZone->getAsInstanceContent();
+
+   return nullptr;
 }
 
 /*!

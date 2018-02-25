@@ -56,6 +56,15 @@ void Core::Entity::EventObject::setState( uint8_t state )
 {
    m_state = state;
 
+   for( const auto& player : m_inRangePlayers )
+   {
+      ZoneChannelPacket< FFXIVIpcActorControl142 > eobjUpdatePacket( getId(), player->getId() );
+      eobjUpdatePacket.data().category = Common::ActorControlType::DirectorEObjMod;
+      eobjUpdatePacket.data().param1 = state;
+
+      player->queuePacket( eobjUpdatePacket );
+   }
+
    //m_parentInstance->updateEObj( InstanceObjectPtr( this ) );
 }
 
