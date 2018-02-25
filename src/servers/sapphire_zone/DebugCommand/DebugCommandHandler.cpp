@@ -734,7 +734,7 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
       if( !obj )
          return;
 
-      instance->updateEObj(obj);
+      //instance->updateEObj(obj);
    }
    else if( subCommand == "objstate" )
    {
