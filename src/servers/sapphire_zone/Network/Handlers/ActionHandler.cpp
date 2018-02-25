@@ -73,6 +73,8 @@ enum ClientTrigger
   
    DyeItem = 0x1B5,
 
+   RequestChocoboInventory = 0x1C4,
+
    Emote = 0x1F4,
    PersistantEmoteCancel = 0x1F7,
    PoseChange = 0x1F9,
@@ -95,6 +97,7 @@ enum ClientTrigger
    CompanionSetBarding = 0x6A5,
    CompanionActionUnlock = 0x6A6,
 
+   OpenPerformInstrumentUI = 0x71C,
 };
 
 void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& inPacket,
