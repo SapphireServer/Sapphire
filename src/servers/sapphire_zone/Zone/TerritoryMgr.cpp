@@ -115,9 +115,9 @@ bool Core::TerritoryMgr::createDefaultTerritories()
       g_log.Log( LoggingSeverity::info, std::to_string( territoryId ) +
                                         "\t" + std::to_string( guid ) +
                                         "\t" + std::to_string( territoryInfo->territoryIntendedUse ) +
-                                        "\t" + territoryInfo->name +
-                                        "\t" + pPlaceName->name +
-                                        "\t" + ( isPrivateTerritory( territoryId ) ? "PRIVATE" : "PUBLIC" ) );
+                                        "\t" + ( territoryInfo->name.length() <= 4 ? territoryInfo->name + "\t" : territoryInfo->name ) +
+                                        "\t" + ( isPrivateTerritory( territoryId ) ? "PRIVATE" : "PUBLIC" ) +
+                                        "\t" + pPlaceName->name );
 
       auto pZone = make_Zone( territoryId, guid, territoryInfo->name, pPlaceName->name );
       pZone->init();
