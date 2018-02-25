@@ -13,6 +13,8 @@
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 
+#include "Event/EventHandler.h"
+
 extern Core::Logger g_log;
 extern Core::Scripting::ScriptManager g_scriptMgr;
 
@@ -253,4 +255,7 @@ Core::Entity::EventObjectPtr Core::InstanceContent::getEObjByName( const std::st
    return it->second;
 }
 
-
+void Core::InstanceContent::onTalk( Core::Entity::Player& player, uint32_t eventId, uint64_t actorId )
+{
+   auto type = static_cast< Core::Event::EventHandler::EventType >( eventId >> 16 );
+}

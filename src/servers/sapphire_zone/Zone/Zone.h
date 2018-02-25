@@ -113,7 +113,6 @@ public:
 
    void registerEObj( Entity::EventObjectPtr object );
    Entity::EventObjectPtr getEObj( uint32_t objId );
-   void updateEObj( Entity::EventObjectPtr object );
 
    InstanceContentPtr getAsInstanceContent();
 

@@ -313,6 +313,12 @@ void Core::Entity::Actor::setCurrentZone( ZonePtr currZone )
    m_pCurrentZone = currZone;
 }
 
+/*! \return InstanceContentPtr to the current instance, null if not an instance or not set */
+Core::InstanceContentPtr Core::Entity::Actor::getCurrentInstance() const
+{
+   return getCurrentZone()->getAsInstanceContent();
+}
+
 /*!
 Get the current cell of a region the actor is in
 
