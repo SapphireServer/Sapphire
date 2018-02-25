@@ -124,6 +124,8 @@ namespace Entity {
       ZonePtr getCurrentZone() const;
       void setCurrentZone( ZonePtr currZone );
 
+      InstanceContentPtr getCurrentInstance() const;
+
       // get the current cell of a region the actor is in
       Cell* getCellPtr();
       // set the current cell

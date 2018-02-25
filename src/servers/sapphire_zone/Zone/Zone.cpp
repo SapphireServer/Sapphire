@@ -679,34 +679,6 @@ Core::Entity::EventObjectPtr Core::Zone::getEObj( uint32_t objId )
    return obj->second;
 }
 
-// TODO: this is located wrong. state change should happen in the object and it should send to his in range set.
-void Core::Zone::updateEObj( Entity::EventObjectPtr object )
-{
-   if( !object )
-      return;
-
-   for( const auto& playerIt : m_playerMap )
-   {
-      // send that packet with le data
-      ZoneChannelPacket< FFXIVIpcObjectSpawn > eobjStatePacket( playerIt.second->getId() );
-      eobjStatePacket.data().objKind = object->getObjKind();
-      eobjStatePacket.data().state = object->getState();
-      eobjStatePacket.data().objId = object->getId();
-      eobjStatePacket.data().hierachyId = object->getMapLinkId();
-      eobjStatePacket.data().position = object->getPos();
-
-      // ????
-      //eobjStatePacket.data().levelId = 4236873;
-      //eobjStatePacket.data().unknown2 = 5;
-      //eobjStatePacket.data().unknown1C = 1065353216;
-      //eobjStatePacket.data().unknown20 = 2147423605;
-      //eobjStatePacket.data().actorId = 1074105831;
-      //eobjStatePacket.data().unknown = 1;
-
-      playerIt.second->queuePacket( eobjStatePacket );
-   }
-}
-
 Core::InstanceContentPtr Core::Zone::getAsInstanceContent()
 {
    return boost::dynamic_pointer_cast< InstanceContent, Zone >( shared_from_this() );

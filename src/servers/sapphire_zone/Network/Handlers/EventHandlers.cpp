@@ -20,6 +20,7 @@
 #include "Actor/Player.h"
 #include "Forwards.h"
 #include "Event/EventHelper.h"
+#include "Zone/InstanceContent.h"
 
 extern Core::Data::ExdDataGenerated g_exdDataGen;
 extern Core::Scripting::ScriptManager g_scriptMgr;
@@ -49,7 +50,12 @@ void Core::Network::GameConnection::eventHandlerTalk( const Packets::GamePacket&
    player.sendDebug( "Calling: " + objName + "." + eventName );
    player.eventStart( actorId, eventId, Event::EventHandler::Talk, 0, 0 );
 
-   if( !g_scriptMgr.onTalk( player, actorId, eventId ) &&
+
+   if( auto instance = player.getCurrentInstance() )
+   {
+      instance->onTalk( player, eventId, actorId );
+   }
+   else if( !g_scriptMgr.onTalk( player, actorId, eventId ) &&
        eventType == Event::EventHandler::EventHandlerType::Quest )
    {
       auto questInfo = g_exdDataGen.get< Core::Data::Quest >( eventId );
