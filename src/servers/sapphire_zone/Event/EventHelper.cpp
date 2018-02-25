@@ -59,7 +59,8 @@ std::string Core::Event::getEventName( uint32_t eventId )
       auto contentInfo = g_exdDataGen.get< Core::Data::InstanceContent >( eventId & 0xFFFF );
       std::string name = contentInfo->name;
 
-      name.erase( boost::remove_if( name, boost::is_any_of( "_ '()[]" ) ), name.end() );
+      name.erase( boost::remove_if( name, boost::is_any_of( "â˜…_ '()[]-\x1a\x1\x2\x1f\x1\x3.:" ) ), name.end() );
+      name[0] = toupper( name[0] );
       return name;
    }
 
