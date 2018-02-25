@@ -251,9 +251,8 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
            player.getCurrentZone()->onInitDirector( player );
            break;
         }
-        case ClientTrigger::EnterTerritoryEventFinished:
+        case ClientTrigger::EnterTerritoryEventFinished:// this may still be something else. I think i have seen it elsewhere
         {
-           g_log.debug( "[DOOOOOOOOOOOOOOOOOOOOOOONE]" );
            player.setOnEnterEventDone( true );
            break;
         }
