@@ -689,9 +689,11 @@ uint32_t Core::Zone::getNextEObjId()
    return ++m_nextEObjId;
 }
 
-void Core::Zone::registerEObj( const std::string &name, uint32_t objectId, uint32_t mapLink, uint8_t state,
+Core::Entity::EventObjectPtr Core::Zone::registerEObj( const std::string &name, uint32_t objectId, uint32_t mapLink, uint8_t state,
                                FFXIVARR_POSITION3 pos )
 {
    auto eObj = Entity::make_EventObject( objectId, mapLink, state, pos, name );
    registerEObj( eObj );
+
+   return eObj;
 }
