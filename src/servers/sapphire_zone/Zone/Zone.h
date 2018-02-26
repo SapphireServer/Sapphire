@@ -109,7 +109,7 @@ public:
    void updateSessions( bool changedWeather );
 
    Entity::EventObjectPtr registerEObj( const std::string& name, uint32_t objectId, uint32_t mapLink,
-                      uint8_t state, Common::FFXIVARR_POSITION3 pos );
+                                        uint8_t state, Common::FFXIVARR_POSITION3 pos, float scale );
 
    void registerEObj( Entity::EventObjectPtr object );
    Entity::EventObjectPtr getEObj( uint32_t objId );
