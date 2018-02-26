@@ -91,10 +91,10 @@ namespace Core
 
    namespace Scripting
    {
-      typedef std::function< void( Entity::Player&, uint32_t, uint16_t, uint16_t, uint16_t, uint16_t ) > EventReturnCallback;
+      using EventReturnCallback = std::function< void( Entity::Player&, uint32_t, uint16_t, uint16_t, uint16_t, uint16_t ) >;
    }
 
-   typedef std::function< void( Entity::Player&, uint32_t, uint64_t ) > ActionCallback;
+   using ActionCallback = std::function< void( Entity::Player&, uint32_t, uint64_t ) >;
 
 }
 
