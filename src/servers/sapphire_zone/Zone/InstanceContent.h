@@ -57,6 +57,7 @@ private:
    Entity::EventObjectPtr m_pEntranceEObj;
 
    std::map< std::string, Entity::EventObjectPtr > m_eventObjectMap;
+   std::unordered_map< uint32_t, Entity::EventObjectPtr > m_eventIdToObjectMap;
 };
 
 }

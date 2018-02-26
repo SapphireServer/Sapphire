@@ -42,6 +42,26 @@ uint32_t Core::Entity::EventObject::getObjectId() const
    return m_objectId;
 }
 
+float Core::Entity::EventObject::getScale() const
+{
+   return m_scale;
+}
+
+void Core::Entity::EventObject::setScale( float scale )
+{
+   m_scale = scale;
+}
+
+Core::Entity::EventObject::OnTalkEventHandler Core::Entity::EventObject::getOnTalkHandler() const
+{
+   return m_onTalkEventHandler;
+}
+
+void Core::Entity::EventObject::setOnTalkHandler( Core::Entity::EventObject::OnTalkEventHandler handler )
+{
+   m_onTalkEventHandler = handler;
+}
+
 void Core::Entity::EventObject::setMapLinkId( uint32_t mapLinkId )
 {
    m_mapLinkId = mapLinkId;
@@ -64,8 +84,6 @@ void Core::Entity::EventObject::setState( uint8_t state )
 
       player->queuePacket( eobjUpdatePacket );
    }
-
-   //m_parentInstance->updateEObj( InstanceObjectPtr( this ) );
 }
 
 void Core::Entity::EventObject::setParentInstance( Core::InstanceContentPtr instance )
@@ -88,6 +106,8 @@ void Core::Entity::EventObject::spawn( Core::Entity::PlayerPtr pTarget )
    eobjStatePacket.data().objId = getObjectId();
    eobjStatePacket.data().hierachyId = getMapLinkId();
    eobjStatePacket.data().position = getPos();
+   eobjStatePacket.data().scale = getScale();
+   eobjStatePacket.data().actorId = getId();
    pTarget->queuePacket( eobjStatePacket );
 }
 

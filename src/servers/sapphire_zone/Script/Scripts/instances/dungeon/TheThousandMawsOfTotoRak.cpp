@@ -10,6 +10,7 @@ public:
    void onInit( InstanceContentPtr instance ) override
    {
       instance->registerEObj( "Exit", EXIT_OBJECT, 0, EXIT_OBJECT_STATE, { 237, -39, -144 } );
+      instance->getEObjByName( "Exit" )->setScale( 0.6f );
       instance->registerEObj( "Entrance", START_CIRCLE, START_CIRCLE_MAPLINK, START_CIRCLE_STATE, { -322, 12, -78 } );
    }
 

@@ -4,6 +4,7 @@
 #include <common/Logging/Logger.h>
 #include <common/Util/Util.h>
 #include <common/Util/UtilMath.h>
+#include <common/Exd/ExdDataGenerated.h>
 
 #include "Event/Director.h"
 #include "Script/ScriptManager.h"
@@ -17,6 +18,7 @@
 
 extern Core::Logger g_log;
 extern Core::Scripting::ScriptManager g_scriptMgr;
+extern Core::Data::ExdDataGenerated g_exdDataGen;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -230,6 +232,13 @@ void Core::InstanceContent::onRegisterEObj( Entity::EventObjectPtr object )
       m_eventObjectMap[object->getName()] = object;
    if( object->getObjectId() == 2000182 ) // start
       m_pEntranceEObj = object;
+
+   auto objData = g_exdDataGen.get< Core::Data::EObj >( object->getObjectId() );
+   if( objData )
+      // todo: data should be renamed to eventId
+      m_eventIdToObjectMap[objData->data] = object;
+   else
+      g_log.error( "InstanceContent::onRegisterEObj Zone " + m_internalName + ": No EObj data found for EObj with ID: " + std::to_string( object->getObjectId() ) );
 }
 
 void Core::InstanceContent::onBeforeEnterTerritory( Core::Entity::Player &player )
@@ -257,5 +266,15 @@ Core::Entity::EventObjectPtr Core::InstanceContent::getEObjByName( const std::st
 
 void Core::InstanceContent::onTalk( Core::Entity::Player& player, uint32_t eventId, uint64_t actorId )
 {
-   auto type = static_cast< Core::Event::EventHandler::EventType >( eventId >> 16 );
+   // todo: handle exit (and maybe shortcut?) behaviour here
+
+   auto it = m_eventIdToObjectMap.find( eventId );
+   if( it == m_eventIdToObjectMap.end() )
+      return;
+
+   if( auto onTalk = it->second->getOnTalkHandler() )
+      onTalk( player, actorId );
+   else
+      player.sendDebug( "No onTalk handler found for interactable eobj with EObjID: " +
+                        std::to_string( it->second->getObjectId() ) + ", eventId: " + std::to_string( eventId ) );
 }
