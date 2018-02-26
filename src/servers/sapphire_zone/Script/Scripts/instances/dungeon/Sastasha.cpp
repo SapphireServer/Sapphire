@@ -15,13 +15,13 @@ public:
 
    void onInit( InstanceContentPtr instance ) override
    {
-      auto exit = instance->registerEObj( "Exit", EXIT_OBJECT, 0, EXIT_OBJECT_STATE, { -314, 5.6, 348.73 } );
+      auto exit = instance->registerEObj( "Exit", EXIT_OBJECT, 0, EXIT_OBJECT_STATE, { -314.0f, 5.6f, 348.73f } );
       exit->setScale( 0.6f );
       exit->setOnTalkHandler( exitOnTalk );
 
-      instance->registerEObj( "Entrance", START_CIRCLE, START_CIRCLE_MAPLINK, START_CIRCLE_STATE, { 361, 46, -225 } );
+      instance->registerEObj( "Entrance", START_CIRCLE, START_CIRCLE_MAPLINK, START_CIRCLE_STATE, { 361.0f, 46.0f, -225.0f } );
 
-      auto memo = instance->registerEObj( "BloodyMemo", BLOODY_MEMO_1, 0, BLOODY_MEMO_STATE, { 320.81, 47.86, -130.78 } );
+      auto memo = instance->registerEObj( "BloodyMemo", BLOODY_MEMO_1, 0, BLOODY_MEMO_STATE, { 320.81f, 47.86f, -130.78f } );
       memo->setScale( 0.6f );
    }
 
