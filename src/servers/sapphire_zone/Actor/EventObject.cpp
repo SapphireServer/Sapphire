@@ -17,7 +17,7 @@ using namespace Core::Network::Packets::Server;
 extern Core::Logger g_log;
 
 
-Core::Entity::EventObject::EventObject( uint32_t objectId, uint32_t mapLinkId,
+Core::Entity::EventObject::EventObject( uint32_t actorId, uint32_t objectId, uint32_t mapLinkId,
                                         uint8_t initialState, Common::FFXIVARR_POSITION3 pos,
                                         const std::string& givenName ) :
    Core::Entity::Actor( ObjKind::EventObj ),
@@ -26,7 +26,7 @@ Core::Entity::EventObject::EventObject( uint32_t objectId, uint32_t mapLinkId,
    m_objectId( objectId ),
    m_name( givenName )
 {
-   m_id = objectId;
+   m_id = actorId;
    m_pos.x = pos.x;
    m_pos.y = pos.y;
    m_pos.z = pos.z;

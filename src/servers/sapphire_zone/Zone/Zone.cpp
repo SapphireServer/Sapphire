@@ -55,7 +55,8 @@ Core::Zone::Zone() :
 }
 
 Core::Zone::Zone( uint16_t territoryId, uint32_t guId, const std::string& internalName, const std::string& placeName ) :
-   m_currentWeather( Weather::FairSkies )
+   m_currentWeather( Weather::FairSkies ),
+   m_nextEObjId( 0x400D0000 )
 {
    m_guId = guId;
 
@@ -539,6 +540,7 @@ void Core::Zone::updateActorPosition( Entity::Actor &actor )
          pOldCell->removeActor( actor.shared_from_this() );
 
       pCell->addActor( actor.shared_from_this() );
+      actor.setCell( pCell );
       pOldCell = pCell;
 
       // if player we need to update cell activity
@@ -692,7 +694,7 @@ uint32_t Core::Zone::getNextEObjId()
 Core::Entity::EventObjectPtr Core::Zone::registerEObj( const std::string &name, uint32_t objectId, uint32_t mapLink,
                                                        uint8_t state, FFXIVARR_POSITION3 pos, float scale )
 {
-   auto eObj = Entity::make_EventObject( objectId, mapLink, state, pos, name );
+   auto eObj = Entity::make_EventObject( getNextEObjId(), objectId, mapLink, state, pos, name );
    eObj->setScale( scale );
    registerEObj( eObj );
 
