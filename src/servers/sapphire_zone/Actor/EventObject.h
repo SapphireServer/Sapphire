@@ -13,7 +13,7 @@ namespace Entity
       EventObject( uint32_t objectId, uint32_t mapLinkId, uint8_t initialState, Common::FFXIVARR_POSITION3 pos,
                    const std::string& givenName = "none" );
 
-      using OnTalkEventHandler = std::function< void( Entity::Player&, uint64_t ) >;
+      using OnTalkEventHandler = std::function< void( Entity::Player&, Entity::EventObjectPtr, InstanceContentPtr, uint64_t ) >;
 
       uint32_t getMapLinkId() const;
       void setMapLinkId( uint32_t mapLinkId );

@@ -273,7 +273,7 @@ void Core::InstanceContent::onTalk( Core::Entity::Player& player, uint32_t event
       return;
 
    if( auto onTalk = it->second->getOnTalkHandler() )
-      onTalk( player, actorId );
+      onTalk( player, it->second, getAsInstanceContent(), actorId );
    else
       player.sendDebug( "No onTalk handler found for interactable eobj with EObjID: " +
                         std::to_string( it->second->getObjectId() ) + ", eventId: " + std::to_string( eventId ) );
