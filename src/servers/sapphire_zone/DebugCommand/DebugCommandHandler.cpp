@@ -720,34 +720,18 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
 
       instance->setVar( static_cast< uint8_t >( index ), static_cast< uint8_t >( value ) );
    }
-   else if( subCommand == "objupdate" )
-   {
-      uint32_t objId;
-
-      sscanf( params.c_str(), "%d", &objId );
-
-      auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
-      if( !instance )
-         return;
-
-      auto obj = instance->getEObj(objId);
-      if( !obj )
-         return;
-
-      //instance->updateEObj(obj);
-   }
    else if( subCommand == "objstate" )
    {
-      uint32_t objId;
+      char objName[128];
       uint8_t state;
 
-      sscanf( params.c_str(), "%d %hhu", &objId, &state );
+      sscanf( params.c_str(), "%s %hhu", objName, &state );
 
       auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
       if( !instance )
          return;
 
-      auto obj = instance->getEObj(objId);
+      auto obj = instance->getEObjByName( objName );
       if( !obj )
          return;
 
