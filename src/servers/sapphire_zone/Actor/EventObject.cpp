@@ -100,7 +100,7 @@ void Core::Entity::EventObject::spawn( Core::Entity::PlayerPtr pTarget )
 {
    g_log.debug( "Spawning EObj: id:" + std::to_string( getId() ) + " name:" + getName() );
    ZoneChannelPacket< FFXIVIpcObjectSpawn > eobjStatePacket( getId(), pTarget->getId() );
-   eobjStatePacket.data().count = pTarget->getNextObjCount();
+   eobjStatePacket.data().spawnIndex = pTarget->getNextObjSpawnIndexForActorId( getId( ));
    eobjStatePacket.data().objKind = getObjKind();
    eobjStatePacket.data().state = getState();
    eobjStatePacket.data().objId = getObjectId();
@@ -115,6 +115,8 @@ void Core::Entity::EventObject::spawn( Core::Entity::PlayerPtr pTarget )
 void Core::Entity::EventObject::despawn( Core::Entity::PlayerPtr pTarget )
 {
    g_log.debug( "despawn eobj: " + std::to_string( getId() ) );
+
+   pTarget->freeObjSpawnIndexForActorId( getId( ));
 }
 
 const std::string& Core::Entity::EventObject::getName() const

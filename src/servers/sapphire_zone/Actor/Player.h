@@ -562,7 +562,12 @@ public:
    void setOnEnterEventDone( bool isDone );
    bool isOnEnterEventDone() const;
 
-   uint8_t getNextObjCount();
+   /*! gets the next available obj count */
+   uint8_t getNextObjSpawnIndexForActorId( uint32_t actorId );
+   /*! resets the players obj count */
+   void resetObjSpawnIndex();
+   /*! frees an obj count to be used by another eobj */
+   void freeObjSpawnIndexForActorId( uint32_t actorId );
 
 private:
    uint32_t m_lastWrite;
@@ -679,6 +684,8 @@ private:
 
    // counter used to index objects spawned for the player
    uint8_t m_objCount;
+   std::queue< uint8_t > m_freeObjCounts;
+   std::map< uint32_t, uint8_t > m_actorIdToObjCountMap;
 };
 
 }

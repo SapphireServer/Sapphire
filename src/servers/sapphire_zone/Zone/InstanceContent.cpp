@@ -221,6 +221,7 @@ void Core::InstanceContent::setVar( uint8_t index, uint8_t value )
 
    }
 
+   // todo: genericise this?
    for( const auto &playerIt : m_playerMap )
    {
       sendDirectorVars( *playerIt.second );
@@ -274,6 +275,8 @@ void Core::InstanceContent::onBeforeEnterTerritory( Core::Entity::Player &player
       player.setRot( PI );
       player.setPos( { 0.f, 0.f, 0.f } );
    }
+
+   player.resetObjSpawnIndex( );
 }
 
 Core::Entity::EventObjectPtr Core::InstanceContent::getEObjByName( const std::string &name )

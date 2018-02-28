@@ -1316,7 +1316,7 @@ struct FFXIVIpcMSQTrackerComplete : FFXIVIpcBasePacket<MSQTrackerComplete>
 
 struct FFXIVIpcObjectSpawn : FFXIVIpcBasePacket<ObjectSpawn>
 {
-   uint8_t count;
+   uint8_t spawnIndex;
    uint8_t objKind;
    uint8_t state;
    uint8_t unknown3;
