@@ -1,5 +1,6 @@
 #include <ScriptObject.h>
 #include <Zone/InstanceContent.h>
+#include <Actor/EventObject.h>
 
 class Sastasha : public InstanceContentScript
 {

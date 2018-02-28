@@ -4,11 +4,13 @@
 #include "Zone.h"
 #include "Event/Director.h"
 #include "Forwards.h"
-#include <common/Exd/ExdDataGenerated.h>
 
 namespace Core
 {
-
+   namespace Data
+   {
+      struct InstanceContent;
+   }
 class InstanceContent : public Event::Director, public Zone
 {
 public:
@@ -40,7 +42,7 @@ public:
 
    void setVar( uint8_t index, uint8_t value );
 
-   Core::Data::ExdDataGenerated::InstanceContentPtr getInstanceContentInfo() const;
+   boost::shared_ptr< Core::Data::InstanceContent > getInstanceContentInfo() const;
 
    uint32_t getInstanceContentId() const;
 
@@ -48,7 +50,7 @@ public:
 
 private:
    Event::DirectorPtr m_pDirector;
-   Core::Data::ExdDataGenerated::InstanceContentPtr m_instanceContentInfo;
+   boost::shared_ptr< Core::Data::InstanceContent > m_instanceContentInfo;
    uint32_t m_instanceContentId;
    InstanceContentState m_state;
 

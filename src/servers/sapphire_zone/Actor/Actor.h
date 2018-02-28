@@ -39,6 +39,7 @@ namespace Entity {
          CardStand = 0x0E,
       };
 
+
    protected:
       /*! Position of the object */
       Common::FFXIVARR_POSITION3 m_pos;

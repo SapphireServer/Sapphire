@@ -5,6 +5,7 @@
 #include "NativeScriptManager.h"
 
 #include "Zone/Zone.h"
+#include "Zone/InstanceContent.h"
 #include "Actor/Player.h"
 #include "ServerZone.h"
 #include "Event/EventHandler.h"

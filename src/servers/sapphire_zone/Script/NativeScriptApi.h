@@ -4,11 +4,7 @@
 #include <string>
 #include <typeinfo>
 #include <typeindex>
-
-#include <Actor/Chara.h>
-#include <Actor/Player.h>
-#include <StatusEffect/StatusEffect.h>
-#include <Zone/InstanceContent.h>
+#include "Forwards.h"
 
 #ifdef _MSC_VER
 #define EXPORT __declspec( dllexport )

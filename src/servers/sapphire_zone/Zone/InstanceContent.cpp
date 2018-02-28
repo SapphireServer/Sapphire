@@ -10,6 +10,7 @@
 #include "Script/ScriptManager.h"
 
 #include "Actor/Player.h"
+#include "Actor/EventObject.h"
 
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
