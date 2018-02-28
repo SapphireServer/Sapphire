@@ -31,6 +31,7 @@ set(LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/libraries")
 include( "cmake/boost.cmake" )
 include( "cmake/mysql.cmake" )
 include( "cmake/compiler.cmake" )
+include( "cmake/cotire.cmake" )
 
 ##############################
 #             Git            #

@@ -39,8 +39,9 @@ foreach(_scriptDir ${children})
             endif()
         endforeach()
 
-        add_library("script_${_name}" MODULE "${SCRIPT_BUILD_FILES}" "${SCRIPT_INCLUDE_FILES}" "${_scriptDir}/ScriptLoader.cpp")
+        add_library("script_${_name}" MODULE ${SCRIPT_BUILD_FILES} "${SCRIPT_INCLUDE_FILES}" "${_scriptDir}/ScriptLoader.cpp")
         target_link_libraries("script_${_name}" sapphire_zone)
+        cotire("script_${_name}")
 
         if(MSVC)
             target_link_libraries("script_${_name}" ${Boost_LIBRARIES})

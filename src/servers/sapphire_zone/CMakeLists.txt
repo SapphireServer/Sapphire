@@ -64,3 +64,4 @@ else()
 endif()
 
 target_link_libraries( sapphire_zone ${Boost_LIBRARIES} )
+cotire( sapphire_zone )
