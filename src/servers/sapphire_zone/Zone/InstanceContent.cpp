@@ -227,6 +227,26 @@ void Core::InstanceContent::setVar( uint8_t index, uint8_t value )
    }
 }
 
+void Core::InstanceContent::setSequence( uint8_t value )
+{
+   setDirectorSequence( value );
+
+   for( const auto &playerIt : m_playerMap )
+   {
+      sendDirectorVars( *playerIt.second );
+   }
+}
+
+void Core::InstanceContent::setBranch( uint8_t value )
+{
+   setDirectorBranch( value );
+
+   for( const auto &playerIt : m_playerMap )
+   {
+      sendDirectorVars( *playerIt.second );
+   }
+}
+
 void Core::InstanceContent::onRegisterEObj( Entity::EventObjectPtr object )
 {
    if( object->getName() != "none" )
