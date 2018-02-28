@@ -1661,6 +1661,7 @@ void Core::Entity::Player::teleportQuery( uint16_t aetheryteId )
 
 uint8_t Core::Entity::Player::getNextObjSpawnIndexForActorId( uint32_t actorId )
 {
+   // todo: fix it so the case where there's no ids available doesn't break everything :(
    auto nextCount = m_freeObjCounts.front();
    m_freeObjCounts.pop();
 
