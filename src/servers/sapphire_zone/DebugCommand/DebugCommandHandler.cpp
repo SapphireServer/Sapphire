@@ -709,15 +709,13 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
    }
    else if( subCommand == "set" )
    {
-      uint32_t instanceId;
       uint32_t index;
       uint32_t value;
-      sscanf( params.c_str(), "%d %d %d", &instanceId, &index, &value );
+      sscanf( params.c_str(), "%d %d", &index, &value );
 
-      auto pInstance = g_territoryMgr.getInstanceZonePtr( instanceId );
-      if( !pInstance )
+      auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+      if( !instance )
          return;
-      auto instance = boost::dynamic_pointer_cast< InstanceContent >( pInstance );
 
       instance->setVar( static_cast< uint8_t >( index ), static_cast< uint8_t >( value ) );
    }
@@ -737,6 +735,30 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
          return;
 
       obj->setState( state );
+   }
+   else if( subCommand == "seq" )
+   {
+      uint8_t seq;
+
+      sscanf( params.c_str(), "%hhu", &seq );
+
+      auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+      if( !instance )
+         return;
+
+      instance->setSequence( seq );
+   }
+   else if( subCommand == "branch" )
+   {
+      uint8_t branch;
+
+      sscanf( params.c_str(), "%hhu", &branch );
+
+      auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+      if( !instance )
+         return;
+
+      instance->setBranch( branch );
    }
    else if( subCommand == "festival" )
    {
