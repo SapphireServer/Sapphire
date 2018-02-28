@@ -7,6 +7,7 @@
 #include <common/Database/DatabaseDef.h>
 
 #include <boost/format.hpp>
+#include <unordered_map>
 
 #include "Network/GameConnection.h"
 

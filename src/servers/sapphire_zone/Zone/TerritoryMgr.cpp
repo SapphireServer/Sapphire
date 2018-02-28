@@ -4,6 +4,8 @@
 #include <common/Database/DatabaseDef.h>
 #include <common/Exd/ExdDataGenerated.h>
 
+#include <unordered_map>
+
 #include "Actor/Player.h"
 
 #include "Zone.h"

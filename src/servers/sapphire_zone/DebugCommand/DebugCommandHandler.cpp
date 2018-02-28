@@ -22,6 +22,7 @@
 #include "Script/NativeScriptManager.h"
 
 #include "Actor/Player.h"
+#include "Actor/EventObject.h"
 
 #include "Zone/Zone.h"
 #include "Zone/InstanceContent.h"

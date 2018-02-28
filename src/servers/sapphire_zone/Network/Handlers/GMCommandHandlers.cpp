@@ -4,6 +4,7 @@
 #include <common/Logging/Logger.h>
 #include <common/Network/PacketContainer.h>
 
+#include <unordered_map>
 #include <boost/format.hpp>
 
 #include "Network/GameConnection.h"

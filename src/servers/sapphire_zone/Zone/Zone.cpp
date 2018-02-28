@@ -19,6 +19,7 @@
 #include "Session.h"
 #include "Actor/Chara.h"
 #include "Actor/Player.h"
+#include "Actor/EventObject.h"
 
 #include "Forwards.h"
 

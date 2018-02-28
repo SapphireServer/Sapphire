@@ -6,16 +6,16 @@
 
 #include "Cell.h"
 #include "CellHandler.h"
-#include "Actor/EventObject.h"
 
 #include "Forwards.h"
 
 #include <set>
+#include <map>
 #include <boost/enable_shared_from_this.hpp>
 
 #include <stdio.h>
 #include <string.h>
-#include <common/Exd/ExdDataGenerated.h>
+
 namespace Core {
 
 class Session;
@@ -23,6 +23,11 @@ class Session;
 class ZonePosition;
 
 using SessionSet = std::set< SessionPtr >;
+namespace Data
+{
+   struct InstanceContent;
+   struct TerritoryType;
+}
 
 class Zone : public CellHandler< Cell >, public boost::enable_shared_from_this< Zone >
 {

@@ -1,9 +1,9 @@
 #ifndef SAPPHIRE_TERRITORYMGR_H
 #define SAPPHIRE_TERRITORYMGR_H
 
-#include <common/Exd/ExdDataGenerated.h>
 #include "Forwards.h"
 #include <set>
+#include <unordered_map>
 
 namespace Core
 {
