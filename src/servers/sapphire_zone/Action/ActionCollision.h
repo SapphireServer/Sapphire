@@ -2,9 +2,6 @@
 #define _ACTIONCOLLISION_H
 
 #include <common/Common.h>
-#include <common/Exd/ExdDataGenerated.h>
-
-#include "Actor/Chara.h"
 #include "Action.h"
 
 namespace Core {
