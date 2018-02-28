@@ -18,6 +18,8 @@
 #include <common/Database/DbWorkerPool.h>
 #include <common/Database/PreparedStatement.h>
 
+#include "Actor/Player.h"
+
 #include "Network/GameConnection.h"
 #include "Session.h"
 
