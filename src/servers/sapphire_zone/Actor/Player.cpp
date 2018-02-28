@@ -1659,9 +1659,37 @@ void Core::Entity::Player::teleportQuery( uint16_t aetheryteId )
    }
 }
 
-uint8_t Core::Entity::Player::getNextObjCount()
+uint8_t Core::Entity::Player::getNextObjSpawnIndexForActorId( uint32_t actorId )
 {
-   return m_objCount++;
+   auto nextCount = m_freeObjCounts.front();
+   m_freeObjCounts.pop();
+
+   m_actorIdToObjCountMap[actorId] = nextCount;
+
+   return nextCount;
+}
+
+void Core::Entity::Player::resetObjSpawnIndex()
+{
+   while( m_freeObjCounts.empty() )
+      m_freeObjCounts.pop();
+
+   for( uint32_t i = 0; i < MAX_DISPLAYED_EOBJS; ++i )
+      m_freeObjCounts.push( i );
+
+   m_actorIdToObjCountMap.clear();
+}
+
+void Core::Entity::Player::freeObjSpawnIndexForActorId( uint32_t actorId )
+{
+   auto it = m_actorIdToObjCountMap.find( actorId );
+   if( it == m_actorIdToObjCountMap.end() )
+      return;
+
+   auto freeCount = m_actorIdToObjCountMap[actorId];
+   m_freeObjCounts.push( freeCount );
+
+   m_actorIdToObjCountMap.erase( actorId );
 }
 
 void Core::Entity::Player::setOnEnterEventDone( bool isDone )
