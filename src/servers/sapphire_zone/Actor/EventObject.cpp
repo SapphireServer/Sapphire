@@ -120,7 +120,7 @@ void Core::Entity::EventObject::despawn( Core::Entity::PlayerPtr pTarget )
 {
    g_log.debug( "despawn eobj: " + std::to_string( getId() ) );
 
-   pTarget->freeObjSpawnIndexForActorId( getId( ));
+   pTarget->freeObjSpawnIndexForActorId( getId( ) );
 }
 
 const std::string& Core::Entity::EventObject::getName() const
