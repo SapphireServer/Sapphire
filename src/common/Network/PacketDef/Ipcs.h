@@ -104,6 +104,7 @@ namespace Packets {
       ActorCast                  = 0x0162, // updated 4.2
       HateList                   = 0x0165, // updated 4.2
       ObjectSpawn                = 0x0167, // updated 4.2
+      ObjectDespawn              = 0x0168, // updated 4.2
       UpdateClassInfo            = 0x0169, // updated 4.2
       InitUI                     = 0x016B, // updated 4.2
 

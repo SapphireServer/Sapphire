@@ -1655,7 +1655,11 @@ void Core::Entity::Player::resetObjSpawnIndex()
 
 void Core::Entity::Player::freeObjSpawnIndexForActorId( uint32_t actorId )
 {
-   m_objSpawnIndexAllocator.freeUsedSpawnIndex( actorId );
+   auto spawnId = m_objSpawnIndexAllocator.freeUsedSpawnIndex( actorId );
+
+   ZoneChannelPacket< FFXIVIpcObjectDespawn > freeObjectSpawnPacket( getId() );
+   freeObjectSpawnPacket.data().spawnIndex = spawnId;
+   queuePacket( freeObjectSpawnPacket );
 }
 
 bool Core::Entity::Player::isObjSpawnIndexValid( uint8_t index )

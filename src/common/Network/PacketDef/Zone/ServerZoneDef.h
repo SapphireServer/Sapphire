@@ -414,8 +414,7 @@ struct FFXIVIpcPlayerSpawn : FFXIVIpcBasePacket<PlayerSpawn>
 */
 struct FFXIVIpcNpcSpawn : FFXIVIpcBasePacket<NpcSpawn>
 {
-   uint16_t title;
-   uint16_t u1b;
+   uint32_t mapLinkId; // needs to be existing in the map, mob will snap to it
    uint8_t u2b;
    uint8_t u2ab;
    uint8_t gmRank;
@@ -1337,6 +1336,12 @@ struct FFXIVIpcObjectSpawn : FFXIVIpcBasePacket<ObjectSpawn>
    Common::FFXIVARR_POSITION3 position;
    int16_t rotation;
    int16_t unknown;
+};
+
+struct FFXIVIpcObjectDespawn : FFXIVIpcBasePacket<ObjectDespawn>
+{
+   uint8_t spawnIndex;
+   uint8_t padding[7];
 };
 
 
