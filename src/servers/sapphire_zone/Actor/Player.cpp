@@ -73,7 +73,6 @@ Core::Entity::Player::Player() :
    m_markedForRemoval( false ),
    m_mount( 0 ),
    m_directorInitialized( false ),
-   m_objCount( 0 ),
    m_onEnterEventDone( false )
 {
    m_id = 0;
@@ -90,6 +89,9 @@ Core::Entity::Player::Player() :
    memset( m_searchMessage, 0, sizeof( m_searchMessage ) );
    memset( m_classArray, 0, sizeof( m_classArray ) );
    memset( m_expArray, 0, sizeof( m_expArray ) );
+
+   m_objSpawnIndexAllocator.init( MAX_DISPLAYED_EOBJS );
+   m_actorSpawnIndexAllocator.init( MAX_DISPLAYED_ACTORS, true );
 }
 
 Core::Entity::Player::~Player()
@@ -438,43 +440,27 @@ uint8_t Core::Entity::Player::getGender() const
 
 void Core::Entity::Player::initSpawnIdQueue()
 {
-   while( !m_freeSpawnIdQueue.empty() )
-   {
-      m_freeSpawnIdQueue.pop();
-   }
-
-   for( int32_t i = 1; i < MAX_DISPLAYED_ACTORS; i++ )
-   {
-      m_freeSpawnIdQueue.push( i );
-   }
+   m_actorSpawnIndexAllocator.freeAllSpawnIndexes();
 }
 
 uint8_t Core::Entity::Player::getSpawnIdForActorId( uint32_t actorId )
 {
-   if( m_freeSpawnIdQueue.empty() )
-      return 0;
-
-   uint8_t spawnId = m_freeSpawnIdQueue.front();
-   m_freeSpawnIdQueue.pop();
-   m_playerIdToSpawnIdMap[actorId] = spawnId;
-   return spawnId;
+   return m_actorSpawnIndexAllocator.getNextFreeSpawnIndex( actorId );
 }
 
-void Core::Entity::Player::assignSpawnIdToPlayerId( uint32_t actorId, uint8_t spawnId )
+bool Core::Entity::Player::isActorSpawnIdValid( uint8_t spawnIndex )
 {
-   m_playerIdToSpawnIdMap[actorId] = spawnId;
+   return m_actorSpawnIndexAllocator.isSpawnIndexValid( spawnIndex );
 }
 
 void Core::Entity::Player::registerAetheryte( uint8_t aetheryteId )
 {
-
    uint16_t index;
    uint8_t value;
    Util::valueToFlagByteIndexValue( aetheryteId, value, index );
 
    m_aetheryte[index] |= value;
    queuePacket( ActorControlPacket143( getId(), LearnTeleport, aetheryteId, 1 ) );
-
 }
 
 bool Core::Entity::Player::isAetheryteRegistered( uint8_t aetheryteId ) const
@@ -1048,9 +1034,7 @@ void Core::Entity::Player::onMobKill( uint16_t nameId )
 
 void Core::Entity::Player::freePlayerSpawnId( uint32_t actorId )
 {
-   uint8_t spawnId = m_playerIdToSpawnIdMap[actorId];
-   m_playerIdToSpawnIdMap.erase( actorId );
-   m_freeSpawnIdQueue.push( spawnId );
+   auto spawnId = m_actorSpawnIndexAllocator.freeUsedSpawnIndex( actorId );
 
    ZoneChannelPacket< FFXIVIpcActorFreeSpawn > freeActorSpawnPacket( getId() );
    freeActorSpawnPacket.data().actorId = actorId;
@@ -1661,36 +1645,22 @@ void Core::Entity::Player::teleportQuery( uint16_t aetheryteId )
 
 uint8_t Core::Entity::Player::getNextObjSpawnIndexForActorId( uint32_t actorId )
 {
-   // todo: fix it so the case where there's no ids available doesn't break everything :(
-   auto nextCount = m_freeObjCounts.front();
-   m_freeObjCounts.pop();
-
-   m_actorIdToObjCountMap[actorId] = nextCount;
-
-   return nextCount;
+   return m_objSpawnIndexAllocator.getNextFreeSpawnIndex( actorId );
 }
 
 void Core::Entity::Player::resetObjSpawnIndex()
 {
-   while( m_freeObjCounts.empty() )
-      m_freeObjCounts.pop();
-
-   for( uint32_t i = 0; i < MAX_DISPLAYED_EOBJS; ++i )
-      m_freeObjCounts.push( i );
-
-   m_actorIdToObjCountMap.clear();
+   m_objSpawnIndexAllocator.freeAllSpawnIndexes();
 }
 
 void Core::Entity::Player::freeObjSpawnIndexForActorId( uint32_t actorId )
 {
-   auto it = m_actorIdToObjCountMap.find( actorId );
-   if( it == m_actorIdToObjCountMap.end() )
-      return;
+   m_objSpawnIndexAllocator.freeUsedSpawnIndex( actorId );
+}
 
-   auto freeCount = m_actorIdToObjCountMap[actorId];
-   m_freeObjCounts.push( freeCount );
-
-   m_actorIdToObjCountMap.erase( actorId );
+bool Core::Entity::Player::isObjSpawnIndexValid( uint8_t index )
+{
+   return m_objSpawnIndexAllocator.isSpawnIndexValid( index );
 }
 
 void Core::Entity::Player::setOnEnterEventDone( bool isDone )

@@ -4,6 +4,7 @@
 #include "Forwards.h"
 
 #include <common/Common.h>
+#include <common/Util/SpawnIndexAllocator.h>
 
 #include "Chara.h"
 #include "Inventory/Inventory.h"
@@ -419,10 +420,10 @@ public:
    void initSpawnIdQueue();
    /*! get the spawn id mapped to a specific actorId */
    uint8_t getSpawnIdForActorId( uint32_t actorId );
-   /*! assigns the given spawnId to the actor */
-   void assignSpawnIdToPlayerId( uint32_t actorId, uint8_t spawnId );
    /*! frees the spawnId assigned to the given actor */
    void freePlayerSpawnId( uint32_t actorId );
+   /*! checks if the given spawn id is valid */
+   bool isActorSpawnIdValid( uint8_t spawnId );
    /*! send spawn packets to pTarget */
    void spawn( PlayerPtr pTarget ) override;
    /*! send despawn packets to pTarget */
@@ -440,8 +441,6 @@ public:
    bool hasStateFlag( Common::PlayerStateFlag flag ) const;
    /* reset a specified flag */
    void unsetStateFlag( Common::PlayerStateFlag flag );
-   /* helper function, send an empty state flag update */
-   void unlock();
 
    // Player Session Handling
    //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -568,6 +567,8 @@ public:
    void resetObjSpawnIndex();
    /*! frees an obj count to be used by another eobj */
    void freeObjSpawnIndexForActorId( uint32_t actorId );
+   /*! checks if a spawn index is valid */
+   bool isObjSpawnIndexValid( uint8_t index );
 
 private:
    uint32_t m_lastWrite;
@@ -641,8 +642,6 @@ private:
 
    std::map< uint32_t, Event::EventHandlerPtr > m_eventHandlerMap;
 
-   std::map< uint32_t, uint8_t > m_playerIdToSpawnIdMap; // maps player to spawn id
-   std::queue< uint8_t > m_freeSpawnIdQueue; // queue with spawn ids free to be assigned
    std::queue< uint8_t > m_freeHateSlotQueue; // queue with "hate slots" free to be assigned
    std::map< uint32_t, uint8_t > m_actorIdTohateSlotMap;
 
@@ -682,10 +681,8 @@ private:
 
    uint8_t m_mount;
 
-   // counter used to index objects spawned for the player
-   uint8_t m_objCount;
-   std::queue< uint8_t > m_freeObjCounts;
-   std::map< uint32_t, uint8_t > m_actorIdToObjCountMap;
+   Util::SpawnIndexAllocator< uint8_t > m_objSpawnIndexAllocator;
+   Util::SpawnIndexAllocator< uint8_t > m_actorSpawnIndexAllocator;
 };
 
 }
