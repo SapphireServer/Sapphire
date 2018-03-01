@@ -114,3 +114,7 @@ src/common/Version\.cpp
 
 # generated script loader files
 src/servers/sapphire_zone/Script/Scripts/*/ScriptLoader.cpp
+
+# cotire generated files/folders
+cotire/
+*_cotire.cmake

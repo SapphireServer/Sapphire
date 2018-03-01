@@ -168,3 +168,13 @@ void Core::Event::Director::setDirectorUI8JH( uint8_t value )
 {
    m_unionData.ui8lh.UI8JH = value;
 }
+
+void Core::Event::Director::setDirectorBranch( uint8_t value )
+{
+   m_branch = value;
+}
+
+void Core::Event::Director::setDirectorSequence( uint8_t value )
+{
+   m_sequence = value;
+}
