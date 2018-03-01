@@ -1,4 +1,7 @@
+#include <Script/NativeScriptApi.h>
+#include <Actor/Player.h>
 #include "../ScriptObject.h"
+#include "Event/EventHelper.h"
 
 // Quest Script: ManFst001_00039
 // Quest Name: Coming to Gridania

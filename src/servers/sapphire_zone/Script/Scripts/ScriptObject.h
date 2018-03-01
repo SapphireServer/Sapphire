@@ -1,11 +1,7 @@
 #ifndef SAPPHIRE_SCRIPTOBJECT_H
 #define SAPPHIRE_SCRIPTOBJECT_H
 
-#include <Script/NativeScriptApi.h>
 #include <Forwards.h>
-#include <Actor/Chara.h>
-#include <Actor/Player.h>
-#include <Event/EventHelper.h>
 
 enum EventFlags
 {
