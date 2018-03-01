@@ -21,6 +21,10 @@ else()
     # incremental linking
     message(STATUS "Enabling Incremental Linking..")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /INCREMENTAL")
+
+    # enable building with multiple processes
+    message(STATUS "Enabling Build with Multiple Processes..")
+    add_definitions(/MP)
   endif()
 endif()
 
