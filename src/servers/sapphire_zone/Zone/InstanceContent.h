@@ -41,6 +41,8 @@ public:
    void onRegisterEObj( Entity::EventObjectPtr object ) override;
 
    void setVar( uint8_t index, uint8_t value );
+   void setSequence( uint8_t value );
+   void setBranch( uint8_t value );
 
    boost::shared_ptr< Core::Data::InstanceContent > getInstanceContentInfo() const;
 
