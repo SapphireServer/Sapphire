@@ -72,6 +72,9 @@ public:
    void setDirectorUI8JL( uint8_t value );
    void setDirectorUI8JH( uint8_t value );
 
+   void setDirectorSequence( uint8_t value );
+   void setDirectorBranch( uint8_t value );
+
 private:
    /*! Id of the content of the director */
    uint16_t m_contentId;

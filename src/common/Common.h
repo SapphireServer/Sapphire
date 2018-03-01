@@ -16,6 +16,7 @@ namespace Common {
 
    // 99 is the last spawn id that seems to spawn any actor
    const uint8_t MAX_DISPLAYED_ACTORS = 99;
+   const uint8_t MAX_DISPLAYED_EOBJS = 40;
 
    const int32_t INVALID_GAME_OBJECT_ID = 0xE0000000;
 
