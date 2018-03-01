@@ -84,6 +84,9 @@ namespace Server {
          else
          {
             m_data.spawnIndex = target.getSpawnIdForActorId( player.getId() );
+
+            if( !target.isActorSpawnIdValid( m_data.spawnIndex ) )
+               return;
          }
          // 0x20 == spawn hidden to be displayed by the spawneffect control
          m_data.displayFlags = player.getStance();
