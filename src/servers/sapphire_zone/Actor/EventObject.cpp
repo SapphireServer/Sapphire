@@ -98,9 +98,13 @@ Core::InstanceContentPtr Core::Entity::EventObject::getParentInstance() const
 
 void Core::Entity::EventObject::spawn( Core::Entity::PlayerPtr pTarget )
 {
+   auto spawnIndex = pTarget->getNextObjSpawnIndexForActorId( getId( ) );
+   if( !pTarget->isObjSpawnIndexValid( spawnIndex ) )
+      return;
+
    g_log.debug( "Spawning EObj: id:" + std::to_string( getId() ) + " name:" + getName() );
    ZoneChannelPacket< FFXIVIpcObjectSpawn > eobjStatePacket( getId(), pTarget->getId() );
-   eobjStatePacket.data().spawnIndex = pTarget->getNextObjSpawnIndexForActorId( getId( ));
+   eobjStatePacket.data().spawnIndex = spawnIndex;
    eobjStatePacket.data().objKind = getObjKind();
    eobjStatePacket.data().state = getState();
    eobjStatePacket.data().objId = getObjectId();
