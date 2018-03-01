@@ -1,3 +1,6 @@
+#include <Script/NativeScriptApi.h>
+#include <Actor/Player.h>
+#include "Event/EventHelper.h"
 #include "../ScriptObject.h"
 
 class ManSea001 : public EventScript

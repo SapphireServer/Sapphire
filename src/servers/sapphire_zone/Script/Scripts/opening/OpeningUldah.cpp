@@ -1,3 +1,5 @@
+#include <Script/NativeScriptApi.h>
+#include <Actor/Player.h>
 #include <ScriptObject.h>
 
 class OpeningUldah : public EventScript
