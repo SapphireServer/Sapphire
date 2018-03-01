@@ -236,9 +236,6 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
 
    initSpawnIdQueue();
 
-   if( !m_playerIdToSpawnIdMap.empty() )
-      m_playerIdToSpawnIdMap.clear();
-
    if( !g_territoryMgr.movePlayer( pCurrZone, getAsPlayer() ) )
       return false;
 
