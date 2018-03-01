@@ -1,3 +1,4 @@
+#include <Script/NativeScriptApi.h>
 #include <ScriptObject.h>
 #include <Zone/InstanceContent.h>
 

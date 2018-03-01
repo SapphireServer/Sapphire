@@ -1,4 +1,6 @@
+#include <Script/NativeScriptApi.h>
 #include "../ScriptObject.h"
+#include <Actor/Player.h>
 
 class CmnDefCutSceneReplay : public EventScript
 {
