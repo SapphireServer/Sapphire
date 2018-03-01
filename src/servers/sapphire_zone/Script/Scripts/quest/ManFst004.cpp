@@ -1,8 +1,6 @@
-// This is an automatically generated C++ script template
-// Content needs to be added by hand to make it function
-// In order for this script to be loaded, change its extension to .cpp
-// and move it to the correct folder in <root>/scripts/native/
-
+#include <Script/NativeScriptApi.h>
+#include <Actor/Player.h>
+#include "Event/EventHelper.h"
 #include <ScriptObject.h>
 
 // Quest Script: ManFst004_00124
