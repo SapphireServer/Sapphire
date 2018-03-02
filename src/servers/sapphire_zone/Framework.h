@@ -37,7 +37,7 @@ private:
    Data::ExdDataGenerated g_exdDataGen;
    TerritoryMgr g_territoryMgr;
    LinkshellMgr g_linkshellMgr;
-   Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
+   Db::DbWorkerPool< Db::CharaDbConnection > g_charaDb;
 
 public:
 
@@ -47,8 +47,8 @@ public:
    Data::ExdDataGenerated& getExdDataGen();
    TerritoryMgr& getTerritoryMgr();
    LinkshellMgr& getLinkshellMgr();
-   Db::DbWorkerPool< Core::Db::CharaDbConnection >& getCharaDb();
-   ServerZone& Core::Framework::getServerZone();
+   Db::DbWorkerPool< Db::CharaDbConnection >& getCharaDb();
+   ServerZone& Framework::getServerZone();
 
 };
 
