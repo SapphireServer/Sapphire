@@ -1,5 +1,5 @@
-#ifndef SAPPHIRE_SCRIPTLOADER_H
-#define SAPPHIRE_SCRIPTLOADER_H
+#ifndef CORE_SCRIPTLOADER_H
+#define CORE_SCRIPTLOADER_H
 
 #include <string>
 #include <unordered_map>
@@ -51,4 +51,4 @@ namespace Scripting {
 
 
 
-#endif //SAPPHIRE_SCRIPTLOADER_H
+#endif // CORE_SCRIPTLOADER_H

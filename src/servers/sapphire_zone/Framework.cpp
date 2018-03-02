@@ -1,5 +1,4 @@
 #include <boost/make_shared.hpp>
-#include <common/Logging/Logger.h>
 
 #include "Framework.h"
 
