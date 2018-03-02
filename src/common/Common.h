@@ -156,35 +156,6 @@ namespace Core {
          uint32_t sourceActorId;
       };
 
-      enum RegionType : uint8_t
-      {
-         normal,
-         instance,
-      };
-
-      enum TerritoryIntendedUseType : uint8_t //ToDo: Add The Rest of The Territory Types and Have Better Names For Them
-      {
-         Town = 0,
-         OpenWorld = 1,
-         Inn = 2,
-         Dungeon = 3,
-         JailArea = 5,
-         OpeningArea = 6,
-         BeforeTrialDung = 7,
-         AllianceRaid = 8,
-         OpenWorldInstanceBattle = 9,
-         Trial = 10,
-         HousingArea = 13,
-         HousingPrivateArea = 14,
-         MSQPrivateArea = 15,
-         Raids = 16,
-         RaidFights = 17,
-         ChocoboTutorial = 21,
-         Wedding = 22,
-         BeginnerTutorial = 27,
-         PalaceOfTheDead = 31,
-      };
-
       enum CharaLook : uint8_t
       {
          Race = 0x00,
@@ -319,25 +290,6 @@ namespace Core {
 
       };
 
-      enum EventType : uint16_t
-      {
-         Quest = 0x0001,
-         ChocoRent = 0x0002,
-         Shop = 0x0004,
-         Aetheryte = 0x0005,
-         GuildLeveAssign = 0x0006,
-         DefaultTalk = 0x0009,
-         CustomTalk = 0x000B,
-         CraftLeve = 0x000E,
-         ChocoPort = 0x0012,
-         Opening = 0x0013,
-         GCShop = 0x0016,
-         GuildOrderGuide = 0x0017,
-         GuildOrderOfficer = 0x0018,
-         Stories = 0x001A,
-         FcTalk = 0x001F,
-      };
-
       enum struct ActionAspect : uint8_t
       {
          None = 0,   // Doesn't imply unaspected
@@ -430,7 +382,6 @@ namespace Core {
 
       enum struct PlayerStateFlag : uint8_t
       {
-         SomeFlag,
          NoCombat,
          Combat,
          Casting,
@@ -560,16 +511,22 @@ namespace Core {
          SetOwnerId = 0x59,
          ItemRepairMsg = 0x5C,
 
+         DirectorInit = 0x64,
+         DirectorClear = 0x65,
+
          LeveStartAnim = 0x66,
          LeveStartError = 0x67,
-         PlayerNameGrayout = 0x6A,
+         DirectorEObjMod = 0x6A,
 
-      LeveStartAnim = 0x66,
-      LeveStartError = 0x67,
-      PlayerNameGrayout = 0x6A,
+         DirectorUpdate = 0x6D,
 
-      ItemObtainMsg = 0x75,
-      DutyQuestScreenMsg = 0x7B,
+         ItemObtainMsg = 0x75,
+         DutyQuestScreenMsg = 0x7B,
+
+         ItemObtainIcon = 0x84,
+         FateItemFailMsg = 0x85,
+         ItemFailMsg = 0x86,
+         ActionLearnMsg1 = 0x87,
 
          FreeEventPos = 0x8A,
 
@@ -675,7 +632,7 @@ namespace Core {
          SetCharaGearParamUI = 0x260,
 
          GearSetEquipMsg = 0x321,
-         
+
          DisableCurrentFestival = 0x386,
 
          ToggleOrchestrionUnlock = 0x396,
@@ -802,7 +759,17 @@ namespace Core {
          Normal = 0x1,
          MountSkill = 0xD,
       };
-      
+
+      /*! ModelType as found in eventsystemdefine.exd */
+      enum ModelType : uint8_t
+      {
+         Human = 1,
+         DemiHuman = 2,
+         Monster = 3,
+         SharedGroup = 4,
+         Parts = 5
+      };
+
       enum SocialCategory : uint8_t
       {
          Party = 1,
@@ -819,7 +786,7 @@ namespace Core {
       };
 
 
-      // todo: rename SocialRequestAction and SocialRequestResponse cause they seem ambiguous
+      // todo: rename SocialRequestAction and SocialRequestResponse cause they seem ambiguous 
       enum class SocialRequestAction : uint8_t
       {
          Invite = 1,
@@ -833,21 +800,6 @@ namespace Core {
          Decline,
          Accept,
          Cancel,
-      };
-
-      struct ServerEntry
-      {
-         uint32_t serverId;
-         uint32_t flags;
-      };
-
-      enum ModelType : uint8_t
-      {
-         Human = 1,
-         DemiHuman = 2,
-         Monster = 3,
-         SharedGroup = 4,
-         Parts = 5
       };
 
       typedef std::vector< PlayerStateFlag > PlayerStateFlagList;

@@ -29,7 +29,7 @@
 
 #include "Script/ScriptManager.h"
 
-#include "Social/Manager/SocialMgr.h>
+#include <Social/Manager/SocialMgr.h>
 #include "Social/FriendList.h"
 
 #include "Script/ScriptManager.h"
