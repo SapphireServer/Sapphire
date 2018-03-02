@@ -209,7 +209,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
                auto fromAetheryte = g_framework.getExdDataGen().get< Core::Data::Aetheryte >( g_framework.getExdDataGen().get< Core::Data::TerritoryType >( player.getZoneId() )->aetheryte );
 
                 // calculate cost - does not apply for favorite points or homepoints neither checks for aether tickets
-                auto cost = static_cast< uint16_t > ( ( sqrt( pow( fromAetheryte->aetherstreamX - targetAetheryte->aetherstreamX, 2 ) +
+                auto cost = static_cast< uint16_t >( ( sqrt( pow( fromAetheryte->aetherstreamX - targetAetheryte->aetherstreamX, 2 ) +
                                     pow( fromAetheryte->aetherstreamY - targetAetheryte->aetherstreamY, 2 ) ) / 2 ) + 100 );
 
                 // cap at 999 gil

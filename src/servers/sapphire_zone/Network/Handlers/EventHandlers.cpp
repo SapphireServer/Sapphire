@@ -56,7 +56,7 @@ void Core::Network::GameConnection::eventHandlerTalk( const Packets::GamePacket&
        eventType == Event::EventHandler::EventHandlerType::Quest )
    {
       auto questInfo = g_framework.getExdDataGen().get< Core::Data::Quest >( eventId );
-      if ( questInfo )
+      if( questInfo )
          player.sendUrgent( "Quest not implemented: " + questInfo->name + " (" + questInfo->id + ")" );
    }
 
