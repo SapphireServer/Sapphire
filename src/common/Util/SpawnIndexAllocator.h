@@ -24,10 +24,10 @@ namespace Util
 
       void init( T maxSlotId, bool reserveFirstSlot = false )
       {
-         setupQueue();
-
          m_maxSlotId = maxSlotId;
          m_reserveFirstSlot = reserveFirstSlot;
+
+         setupQueue();
 
          // todo: reserve max slot id in map to prevent any runtime reshashing
       }
