@@ -25,7 +25,7 @@
 
 #include "DebugCommand/DebugCommandHandler.h"
 
-#include "Script/ScriptManager.h"
+#include "Script/ScriptMgr.h"
 #include "Linkshell/LinkshellMgr.h"
 
 #include "Forwards.h"
@@ -35,13 +35,10 @@
 #include <thread>
 #include <common/Util/Util.h>
 
+#include "Framework.h"
+
+Core::Framework g_framework;
 Core::Logger g_log;
-Core::DebugCommandHandler g_gameCommandMgr;
-Core::Scripting::ScriptManager g_scriptMgr;
-Core::Data::ExdDataGenerated g_exdDataGen;
-Core::TerritoryMgr g_territoryMgr;
-Core::LinkshellMgr g_linkshellMgr;
-Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
 
 Core::ServerZone::ServerZone( const std::string& configPath )
    : m_configPath( configPath ),
@@ -73,7 +70,7 @@ bool Core::ServerZone::registerBnpcTemplate( std::string templateName, uint32_t 
 
    if( it != m_bnpcTemplates.end() )
    {
-      g_log.error( templateName + " already registered, skipping..." );
+      g_framework.getLogger().error( templateName + " already registered, skipping..." );
       return false;
    }
 
@@ -95,11 +92,11 @@ Core::Entity::BattleNpcTemplatePtr Core::ServerZone::getBnpcTemplate( std::strin
 
 bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
 {
-   g_log.info( "Loading config " + m_configPath );
+   g_framework.getLogger().info( "Loading config " + m_configPath );
 
    if( !m_pConfig->loadConfig( m_configPath ) )
    {
-      g_log.fatal( "Error loading config " + m_configPath );
+      g_framework.getLogger().fatal( "Error loading config " + m_configPath );
       return false;
    }
 
@@ -157,15 +154,15 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
       }
       catch( ... )
       {
-         g_log.error( "Error parsing argument: " + arg + " " + "value: " + val + "\n" );
-         g_log.error( "Usage: <arg> <val> \n" );
+         g_framework.getLogger().error( "Error parsing argument: " + arg + " " + "value: " + val + "\n" );
+         g_framework.getLogger().error( "Usage: <arg> <val> \n" );
       }
    }
 
-   g_log.info( "Setting up generated EXD data" );
-   if( !g_exdDataGen.init( m_pConfig->getValue< std::string >( "Settings.General.DataPath", "" ) ) )
+   g_framework.getLogger().info( "Setting up generated EXD data" );
+   if( !g_framework.getExdDataGen().init( m_pConfig->getValue< std::string >( "Settings.General.DataPath", "" ) ) )
    {
-      g_log.fatal( "Error setting up generated EXD data " );
+      g_framework.getLogger().fatal( "Error setting up generated EXD data " );
       return false;
    }
 
@@ -180,7 +177,7 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
    info.syncThreads = m_pConfig->getValue< uint8_t >( "Settings.General.Mysql.SyncThreads", 2 );
    info.asyncThreads = m_pConfig->getValue< uint8_t >( "Settings.General.Mysql.AsyncThreads", 2 );
 
-   loader.addDb( g_charaDb, info );
+   loader.addDb( g_framework.getCharaDb(), info );
    if( !loader.initDbs() )
       return false;
 
@@ -193,37 +190,43 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
 void Core::ServerZone::run( int32_t argc, char* argv[] )
 {
    // TODO: add more error checks for the entire initialisation
-   g_log.setLogPath( "log/SapphireZone_" );
-   g_log.init();
+   /*g_log.setLogPath( "log/SapphireZone_" );
+   g_log.init();*/
 
    printBanner();
 
+   g_framework.getLogger().setLogPath( "log/SapphireZone_" );
+   g_framework.getLogger().init();
+
+   g_log = g_framework.getLogger();
+   
+
    if( !loadSettings( argc, argv ) )
    {
-      g_log.fatal( "Unable to load settings!" );
+      g_framework.getLogger().fatal( "Unable to load settings!" );
       return;
    }
 
-   g_log.info( "LinkshellMgr: Caching linkshells" );
-   if( !g_linkshellMgr.loadLinkshells() )
+   g_framework.getLogger().info( "LinkshellMgr: Caching linkshells" );
+   if( !g_framework.getLinkshellMgr().loadLinkshells() )
    {
-      g_log.fatal( "Unable to load linkshells!" );
+      g_framework.getLogger().fatal( "Unable to load linkshells!" );
       return;
    }
 
    Network::HivePtr hive( new Network::Hive() );
    Network::addServerToHive< Network::GameConnection >( m_ip, m_port, hive );
 
-   g_scriptMgr.init();
+   g_framework.getScriptMgr().init();
 
-   g_log.info( "TerritoryMgr: Setting up zones" );
-   g_territoryMgr.init();
+   g_framework.getLogger().info( "TerritoryMgr: Setting up zones" );
+   g_framework.getTerritoryMgr().init();
 
    std::vector< std::thread > thread_list;
    thread_list.emplace_back( std::thread( std::bind( &Network::Hive::Run, hive.get() ) ) );
 
-   g_log.info( "Server listening on port: " + std::to_string( m_port ) );
-   g_log.info( "Ready for connections..." );
+   g_framework.getLogger().info( "Server listening on port: " + std::to_string( m_port ) );
+   g_framework.getLogger().info( "Ready for connections..." );
 
    mainLoop();
 
@@ -236,12 +239,12 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
 
 void Core::ServerZone::printBanner() const
 {
-   g_log.info("===========================================================" );
-   g_log.info( "Sapphire Server Project " );
-   g_log.info( "Version: " + Version::VERSION );
-   g_log.info( "Git Hash: " + Version::GIT_HASH );
-   g_log.info( "Compiled: " __DATE__ " " __TIME__ );
-   g_log.info( "===========================================================" );
+   g_framework.getLogger().info("===========================================================" );
+   g_framework.getLogger().info( "Sapphire Server Project " );
+   g_framework.getLogger().info( "Version: " + Version::VERSION );
+   g_framework.getLogger().info( "Git Hash: " + Version::GIT_HASH );
+   g_framework.getLogger().info( "Compiled: " __DATE__ " " __TIME__ );
+   g_framework.getLogger().info( "===========================================================" );
 }
 
 void Core::ServerZone::mainLoop()
@@ -253,9 +256,9 @@ void Core::ServerZone::mainLoop()
 
       auto currTime = Util::getTimeSeconds();
 
-      g_territoryMgr.updateTerritoryInstances( currTime );
+      g_framework.getTerritoryMgr().updateTerritoryInstances( currTime );
 
-      g_scriptMgr.update();
+      g_framework.getScriptMgr().update();
 
       lock_guard< std::mutex > lock( this->m_sessionMutex );
       for( auto sessionIt : this->m_sessionMapById )
@@ -274,7 +277,7 @@ void Core::ServerZone::mainLoop()
 
       if( currTime - m_lastDBPingTime > 3 )
       {
-         g_charaDb.keepAlive();
+         g_framework.getCharaDb().keepAlive();
          m_lastDBPingTime = currTime;
       }
 
@@ -292,7 +295,7 @@ void Core::ServerZone::mainLoop()
             it->second->close();
             // if( it->second.unique() )
             {
-               g_log.info("[" + std::to_string(it->second->getId() ) + "] Session removal" );
+               g_framework.getLogger().info("[" + std::to_string(it->second->getId() ) + "] Session removal" );
                it = this->m_sessionMapById.erase( it );
                removeSession( pPlayer->getName() );
                continue;
@@ -302,7 +305,7 @@ void Core::ServerZone::mainLoop()
          // remove sessions that simply timed out
          if( diff > 20 )
          {
-            g_log.info("[" + std::to_string( it->second->getId() ) + "] Session time out" );
+            g_framework.getLogger().info("[" + std::to_string( it->second->getId() ) + "] Session time out" );
 
             it->second->close();
             // if( it->second.unique() )
@@ -331,18 +334,18 @@ bool Core::ServerZone::createSession( uint32_t sessionId )
 
    if( it != m_sessionMapById.end() )
    {
-      g_log.error( "[" + session_id_str + "] Error creating session" );
+      g_framework.getLogger().error( "[" + session_id_str + "] Error creating session" );
       return false;
    }
 
-   g_log.info( "[" + session_id_str + "] Creating new session" );
+   g_framework.getLogger().info( "[" + session_id_str + "] Creating new session" );
 
    boost::shared_ptr<Session> newSession( new Session( sessionId ) );
    m_sessionMapById[sessionId] = newSession;
 
    if( !newSession->loadPlayer() )
    {
-      g_log.error( "[" + session_id_str + "] Error loading player " + session_id_str );
+      g_framework.getLogger().error( "[" + session_id_str + "] Error loading player " + session_id_str );
       return false;
    }
 

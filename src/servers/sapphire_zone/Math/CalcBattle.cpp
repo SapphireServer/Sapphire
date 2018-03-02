@@ -2,15 +2,17 @@
 
 #include <common/Exd/ExdDataGenerated.h>
 #include <common/Common.h>
+
 #include "Actor/Actor.h"
 #include "Actor/Player.h"
-#include "CalcBattle.h"
 
+#include "CalcBattle.h"
+#include "Framework.h"
+
+extern Core::Framework g_framework;
 
 using namespace Core::Math;
 using namespace Core::Entity;
-
-extern Core::Data::ExdDataGenerated g_exdDataGen;
 
 /*
    Class used for battle-related formulas and calculations.
@@ -30,10 +32,10 @@ extern Core::Data::ExdDataGenerated g_exdDataGen;
 
 uint32_t CalcBattle::calculateHealValue( PlayerPtr pPlayer, uint32_t potency )
 {
-   auto classInfo = g_exdDataGen.get< Core::Data::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
-   auto paramGrowthInfo = g_exdDataGen.get< Core::Data::ParamGrow >( pPlayer->getLevel() );
+   auto classInfo = g_framework.getExdDataGen().get< Core::Data::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
+   auto paramGrowthInfo = g_framework.getExdDataGen().get< Core::Data::ParamGrow >( pPlayer->getLevel() );
 
-   if ( !classInfo || !paramGrowthInfo )
+   if( !classInfo || !paramGrowthInfo )
       return 0;
 
    //auto jobModVal = classInfoIt->second;

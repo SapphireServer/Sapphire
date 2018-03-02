@@ -1,5 +1,3 @@
-#include "TerritoryMgr.h"
-
 #include <common/Logging/Logger.h>
 #include <common/Database/DatabaseDef.h>
 #include <common/Exd/ExdDataGenerated.h>
@@ -9,9 +7,10 @@
 #include "Zone.h"
 #include "ZonePosition.h"
 #include "InstanceContent.h"
+#include "TerritoryMgr.h"
+#include "Framework.h"
 
-extern Core::Logger g_log;
-extern Core::Data::ExdDataGenerated g_exdDataGen;
+extern Core::Framework g_framework;
 
 Core::TerritoryMgr::TerritoryMgr() :
    m_lastInstanceId( 10000 )
@@ -21,11 +20,11 @@ Core::TerritoryMgr::TerritoryMgr() :
 
 void Core::TerritoryMgr::loadTerritoryTypeDetailCache()
 {
-   auto idList = g_exdDataGen.getTerritoryTypeIdList();
+   auto idList = g_framework.getExdDataGen().getTerritoryTypeIdList();
 
    for( auto id : idList )
    {
-      auto teri1 = g_exdDataGen.get< Core::Data::TerritoryType >( id );
+      auto teri1 = g_framework.getExdDataGen().get< Core::Data::TerritoryType >( id );
 
       if( !teri1->name.empty() )
          m_territoryTypeDetailCacheMap[id] = teri1;
@@ -106,13 +105,13 @@ bool Core::TerritoryMgr::createDefaultTerritories()
       if( territoryInfo->name.empty() )
          continue;
 
-      auto pPlaceName = g_exdDataGen.get< Core::Data::PlaceName >( territoryInfo->placeName );
+      auto pPlaceName = g_framework.getExdDataGen().get< Core::Data::PlaceName >( territoryInfo->placeName );
 
       if( !pPlaceName || pPlaceName->name.empty() || !isDefaultTerritory( territoryId ) )
          continue;
 
       uint32_t guid = getNextInstanceId();
-      g_log.Log( LoggingSeverity::info, std::to_string( territoryId ) +
+      g_framework.getLogger().info( std::to_string( territoryId ) +
                                         "\t" + std::to_string( guid ) +
                                         "\t" + std::to_string( territoryInfo->territoryIntendedUse ) +
                                         "\t" + territoryInfo->name +
@@ -142,12 +141,12 @@ Core::ZonePtr Core::TerritoryMgr::createTerritoryInstance( uint32_t territoryTyp
       return nullptr;
 
    auto pTeri = getTerritoryDetail( territoryTypeId );
-   auto pPlaceName = g_exdDataGen.get< Core::Data::PlaceName >( pTeri->placeName );
+   auto pPlaceName = g_framework.getExdDataGen().get< Core::Data::PlaceName >( pTeri->placeName );
 
    if( !pTeri || !pPlaceName )
       return nullptr;
 
-   g_log.debug( "Starting instance for territory: " + std::to_string( territoryTypeId ) + " (" + pPlaceName->name + ")" );
+   g_framework.getLogger().debug( "Starting instance for territory: " + std::to_string( territoryTypeId ) + " (" + pPlaceName->name + ")" );
 
    auto pZone = make_Zone( territoryTypeId, getNextInstanceId(), pTeri->name, pPlaceName->name );
    pZone->init();
@@ -160,7 +159,7 @@ Core::ZonePtr Core::TerritoryMgr::createTerritoryInstance( uint32_t territoryTyp
 
 Core::ZonePtr Core::TerritoryMgr::createInstanceContent( uint32_t instanceContentId )
 {
-   auto pInstanceContent = g_exdDataGen.get< Core::Data::InstanceContent >( instanceContentId );
+   auto pInstanceContent = g_framework.getExdDataGen().get< Core::Data::InstanceContent >( instanceContentId );
    if( !pInstanceContent )
       return nullptr;
 
@@ -172,7 +171,7 @@ Core::ZonePtr Core::TerritoryMgr::createInstanceContent( uint32_t instanceConten
    if( !pTeri || pInstanceContent->name.empty() )
       return nullptr;
 
-   g_log.debug( "Starting instance for InstanceContent id: " + std::to_string( instanceContentId ) +
+   g_framework.getLogger().debug( "Starting instance for InstanceContent id: " + std::to_string( instanceContentId ) +
                                                            " (" + pInstanceContent->name + ")" );
 
    auto pZone = make_InstanceContent( pInstanceContent, getNextInstanceId(),
@@ -220,7 +219,7 @@ Core::ZonePtr Core::TerritoryMgr::getInstanceZonePtr( uint32_t instanceId ) cons
 
 void Core::TerritoryMgr::loadTerritoryPositionMap()
 {
-   auto pQR = g_charaDb.query( "SELECT id, target_zone_id, pos_x, pos_y, pos_z, pos_o, radius FROM zonepositions;" );
+   auto pQR = g_framework.getCharaDb().query( "SELECT id, target_zone_id, pos_x, pos_y, pos_z, pos_o, radius FROM zonepositions;" );
 
    while( pQR->next() )
    {
@@ -309,7 +308,7 @@ bool Core::TerritoryMgr::movePlayer( ZonePtr pZone, Core::Entity::PlayerPtr pPla
 {
    if( !pZone  )
    {
-      g_log.error( "Zone not found on this server." );
+      g_framework.getLogger().error( "Zone not found on this server." );
       return false;
    }
 

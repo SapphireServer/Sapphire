@@ -1,16 +1,18 @@
-#include "EventItemAction.h"
+#include <string.h>
 
 #include <common/Util/Util.h>
 #include <common/Util/UtilMath.h>
 #include <common/Logging/Logger.h>
 
-#include <string.h>
-
-#include "Actor/Player.h"
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 
-extern Core::Logger g_log;
+#include "Actor/Player.h"
+
+#include "EventItemAction.h"
+#include "Framework.h"
+
+extern Core::Framework g_framework;
 
 using namespace Core::Common;
 using namespace Core::Network;
@@ -84,7 +86,7 @@ void Core::Action::EventItemAction::onFinish()
    }
    catch( std::exception& e )
    {
-      g_log.error( e.what() );
+      g_framework.getLogger().error( e.what() );
    }
 
 }
@@ -113,7 +115,7 @@ void Core::Action::EventItemAction::onInterrupt()
    }
    catch( std::exception& e )
    {
-      g_log.error( e.what() );
+      g_framework.getLogger().error( e.what() );
    }
 
 }

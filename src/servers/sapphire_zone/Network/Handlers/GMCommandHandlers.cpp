@@ -1,19 +1,16 @@
+#include <boost/format.hpp>
+
 #include <common/Common.h>
 #include <common/Network/CommonNetwork.h>
 #include <common/Network/GamePacketNew.h>
 #include <common/Logging/Logger.h>
 #include <common/Network/PacketContainer.h>
 
-#include <boost/format.hpp>
-
-#include "Network/GameConnection.h"
-
-#include "Session.h"
 #include "Zone/TerritoryMgr.h"
 #include "Zone/Zone.h"
 #include "Zone/ZonePosition.h"
-#include "ServerZone.h"
 
+#include "Network/GameConnection.h"
 #include "Network/PacketWrappers/InitUIPacket.h"
 #include "Network/PacketWrappers/PingPacket.h"
 #include "Network/PacketWrappers/MoveActorPacket.h"
@@ -27,17 +24,22 @@
 #include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
 
 #include "DebugCommand/DebugCommandHandler.h"
+
 #include "Actor/Player.h"
+
 #include "Inventory/Inventory.h"
-#include "Forwards.h"
+
 #include "Event/EventHelper.h"
+
 #include "Action/Action.h"
 #include "Action/ActionTeleport.h"
 
-extern Core::Logger g_log;
-extern Core::ServerZone g_serverZone;
-extern Core::TerritoryMgr g_territoryMgr;
-extern Core::DebugCommandHandler g_gameCommandMgr;
+#include "Session.h"
+#include "ServerZone.h"
+#include "Forwards.h"
+#include "Framework.h"
+
+extern Core::Framework g_framework;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -100,7 +102,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    uint32_t param2 = inPacket.getValAt< uint32_t >( 0x28 );
    uint32_t param3 = inPacket.getValAt< uint32_t >( 0x38 );
 
-   g_log.debug( player.getName() + " used GM1 commandId: " + std::to_string( commandId ) +
+   g_framework.getLogger().debug( player.getName() + " used GM1 commandId: " + std::to_string( commandId ) +
       ", params: " + std::to_string( param1 ) + ", " +
       std::to_string( param2 ) + ", " + std::to_string( param3 ) );
 
@@ -401,19 +403,19 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    }
    case GmCommand::Teri:
    {
-      if( auto instance = g_territoryMgr.getInstanceZonePtr( param1 ) )
+      if( auto instance = g_framework.getTerritoryMgr().getInstanceZonePtr( param1 ) )
       {
          player.sendDebug( "Found instance: " + instance->getName() + ", id: " + std::to_string( param1 ) );
 
          player.setInstance( instance );
       }
-      else if( !g_territoryMgr.isValidTerritory( param1 )  )
+      else if( !g_framework.getTerritoryMgr().isValidTerritory( param1 )  )
       {
          player.sendUrgent( "Invalid zone " + std::to_string( param1 ) );
       }
       else
       {
-         auto pZone = g_territoryMgr.getZoneByTerriId( param1 );
+         auto pZone = g_framework.getTerritoryMgr().getZoneByTerriId( param1 );
          if( !pZone )
          {
             player.sendUrgent( "No zone instance found for " + std::to_string( param1 ) );
@@ -463,9 +465,9 @@ void Core::Network::GameConnection::gm2Handler( const Packets::GamePacket& inPac
    uint32_t commandId = inPacket.getValAt< uint32_t >( 0x20 );
    std::string param1 = inPacket.getStringAt( 0x34 );
 
-   g_log.debug( player.getName() + " used GM2 commandId: " + std::to_string( commandId ) + ", params: " + param1 );
+   g_framework.getLogger().debug( player.getName() + " used GM2 commandId: " + std::to_string( commandId ) + ", params: " + param1 );
 
-   auto targetSession = g_serverZone.getSession( param1 );
+   auto targetSession = g_framework.getServerZone().getSession( param1 );
    Core::Entity::ActorPtr targetActor;
 
    if( targetSession != nullptr )
