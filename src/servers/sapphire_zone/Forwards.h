@@ -81,7 +81,7 @@ namespace Core
 
    namespace Scripting
    {
-      class NativeScriptManager;
+      class NativeScriptMgr;
    }
 
    typedef std::function< void( Entity::Player&, uint32_t, uint64_t ) > ActionCallback;

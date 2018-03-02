@@ -1,20 +1,21 @@
-#include "ActionTeleport.h"
-
 #include <common/Util/Util.h>
 #include <common/Exd/ExdDataGenerated.h>
 #include <common/Logging/Logger.h>
 
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
+
 #include "Actor/Player.h"
+
+#include "ActionTeleport.h"
+#include "Framework.h"
 
 using namespace Core::Common;
 using namespace Core::Network;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-extern Core::Data::ExdDataGenerated g_exdDataGen;
-extern Core::Logger g_log;
+extern Core::Framework g_framework;
 
 Core::Action::ActionTeleport::ActionTeleport()
 {
@@ -26,7 +27,7 @@ Core::Action::ActionTeleport::ActionTeleport( Entity::ActorPtr pActor, uint16_t 
    m_startTime = 0;
    m_id = 5;
    m_handleActionType = HandleActionType::Teleport;
-   m_castTime = g_exdDataGen.get< Core::Data::Action >( 5 )->cast100ms * 100; // TODO: Add security checks.
+   m_castTime = g_framework.getExdDataGen().get< Core::Data::Action >( 5 )->cast100ms * 100; // TODO: Add security checks.
    m_pSource = pActor;
    m_bInterrupt = false;
    m_targetAetheryte = targetZone;

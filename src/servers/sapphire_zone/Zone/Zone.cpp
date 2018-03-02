@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <vector>
+#include <time.h>
 
 #include <common/Logging/Logger.h>
 #include <common/Util/Util.h>
@@ -12,31 +13,24 @@
 #include <common/Network/PacketContainer.h>
 #include <common/Database/DatabaseDef.h>
 
-#include "Zone.h"
-#include "TerritoryMgr.h"
-
-#include "Session.h"
 #include "Actor/Actor.h"
 #include "Actor/Player.h"
 #include "Actor/BattleNpc.h"
 #include "Actor/EventNpc.h"
 
-#include "Forwards.h"
-
 #include "Network/GameConnection.h"
+
+#include "Script/ScriptMgr.h"
+
+#include "Session.h"
+#include "Forwards.h"
 #include "ServerZone.h"
-#include "Script/ScriptManager.h"
-
 #include "CellHandler.h"
+#include "Zone.h"
+#include "TerritoryMgr.h"
+#include "Framework.h"
 
-#include <time.h>
-
-extern Core::Logger g_log;
-extern Core::ServerZone g_serverZone;
-extern Core::Data::ExdDataGenerated g_exdDataGen;
-extern Core::Scripting::ScriptManager g_scriptMgr;
-extern Core::TerritoryMgr g_territoryMgr;
-
+extern Core::Framework g_framework;
 
 /**
 * \brief
@@ -62,13 +56,13 @@ Core::Zone::Zone( uint16_t territoryId, uint32_t guId, const std::string& intern
    m_lastMobUpdate = 0;
 
    m_weatherOverride = 0;
-   m_territoryTypeInfo = g_exdDataGen.get< Core::Data::TerritoryType >( territoryId );
+   m_territoryTypeInfo = g_framework.getExdDataGen().get< Core::Data::TerritoryType >( territoryId );
 
-   uint8_t weatherRateId = m_territoryTypeInfo->weatherRate > g_exdDataGen.getWeatherRateIdList().size() ?
+   uint8_t weatherRateId = m_territoryTypeInfo->weatherRate > g_framework.getExdDataGen().getWeatherRateIdList().size() ?
                            uint8_t{ 0 } : m_territoryTypeInfo->weatherRate;
 
    uint8_t sumPc = 0;
-   auto weatherRateFields = g_exdDataGen.m_WeatherRateDat.get_row( weatherRateId );
+   auto weatherRateFields = g_framework.getExdDataGen().m_WeatherRateDat.get_row( weatherRateId );
    for( size_t i = 0; i < 16; )
    {
       int32_t weatherId = boost::get< int32_t >( weatherRateFields[i] );
@@ -92,7 +86,7 @@ bool Core::Zone::init()
 {
    memset( m_pCellCache, 0, sizeof( CellCache* ) * _sizeX );
 
-   if( g_scriptMgr.onZoneInit( shared_from_this() ) )
+   if( g_framework.getScriptMgr().onZoneInit( shared_from_this() ) )
    {
       // all good
    }
@@ -152,7 +146,7 @@ Core::CellCache* Core::Zone::getCellCacheAndCreate( uint32_t cellx, uint32_t cel
 
 void Core::Zone::loadCellCache()
 {
-   auto pQR = g_charaDb.query( "SELECT Id,"
+   auto pQR = g_framework.getCharaDb().query( "SELECT Id,"
                                "Zoneid,"
                                "NameId,"
                                "SizeId,"
@@ -298,7 +292,7 @@ void Core::Zone::pushActor( Entity::ActorPtr pActor )
    {
       auto pPlayer = pActor->getAsPlayer();
 
-      auto pSession = g_serverZone.getSession( pPlayer->getId() );
+      auto pSession = g_framework.getServerZone().getSession( pPlayer->getId() );
       if( pSession )
          m_sessionSet.insert( pSession );
       m_playerMap[pPlayer->getId()] = pPlayer;
@@ -358,7 +352,7 @@ void Core::Zone::removeActor( Entity::ActorPtr pActor )
 
 void Core::Zone::queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range, Network::Packets::GamePacketPtr pPacketEntry )
 {
-   if( g_territoryMgr.isPrivateTerritory( getTerritoryId() ) )
+   if( g_framework.getTerritoryMgr().isPrivateTerritory( getTerritoryId() ) )
       return;
 
    for( auto it = m_playerMap.begin(); it != m_playerMap.end(); ++it )
@@ -372,7 +366,7 @@ void Core::Zone::queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t 
 
       if( ( distance < range ) && sourcePlayer.getId() != ( *it ).second->getId() )
       {
-         auto pSession = g_serverZone.getSession( ( *it ).second->getId() );
+         auto pSession = g_framework.getServerZone().getSession( ( *it ).second->getId() );
          pPacketEntry->setValAt< uint32_t >( 0x08, ( *it ).second->getId() );
          if( pSession )
             pSession->getZoneConnection()->queueOutPacket( pPacketEntry );
@@ -412,7 +406,7 @@ bool Core::Zone::checkWeather()
       if ( m_weatherOverride != m_currentWeather )
       {
          m_currentWeather = m_weatherOverride;
-         g_log.debug( "[Zone:" + m_internalName + "] overriding weather to : " + std::to_string( m_weatherOverride ) );
+         g_framework.getLogger().debug( "[Zone:" + m_internalName + "] overriding weather to : " + std::to_string( m_weatherOverride ) );
          return true;
       }
    }
@@ -422,7 +416,7 @@ bool Core::Zone::checkWeather()
       if ( nextWeather != m_currentWeather )
       {
          m_currentWeather = nextWeather;
-         g_log.debug( "[Zone:" + m_internalName + "] changing weather to : " + std::to_string( nextWeather ) );
+         g_framework.getLogger().debug( "[Zone:" + m_internalName + "] changing weather to : " + std::to_string( nextWeather ) );
          return true;
       }
    }
@@ -681,7 +675,7 @@ void Core::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
       return;
 
    // TODO: make sure gms can overwrite this. Potentially temporary solution
-   if( g_territoryMgr.isPrivateTerritory( getTerritoryId() ) )
+   if( g_framework.getTerritoryMgr().isPrivateTerritory( getTerritoryId() ) )
       return;
 
    Entity::ActorPtr pCurAct;
@@ -757,13 +751,13 @@ void Core::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
 
 void Core::Zone::onEnterTerritory( Entity::Player& player )
 {
-   g_log.debug( "Zone::onEnterTerritory: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryId() ) +
+   g_framework.getLogger().debug( "Zone::onEnterTerritory: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryId() ) +
                                                 + ", Entity#" + std::to_string( player.getId() ) );
 }
 
 void Core::Zone::onLeaveTerritory( Entity::Player& player )
 {
-   g_log.debug( "Zone::onLeaveTerritory: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryId() ) +
+   g_framework.getLogger().debug( "Zone::onLeaveTerritory: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryId() ) +
                                                 + ", Entity#" + std::to_string( player.getId() ) );
 }
 
@@ -791,7 +785,7 @@ void Core::Zone::registerInstanceObj( Entity::InstanceObjectPtr object )
 
    m_instanceObjects[object->getId()] = object;
 
-   g_log.debug( "Registered instance eobj: " + std::to_string( object->getId() ) );
+   g_framework.getLogger().debug( "Registered instance eobj: " + std::to_string( object->getId() ) );
 }
 
 Core::Entity::InstanceObjectPtr Core::Zone::getInstanceObject( uint32_t objId )

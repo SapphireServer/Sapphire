@@ -6,6 +6,7 @@
 
 #include "Forwards.h"
 #include "Action/Action.h"
+#include "Action/ActionCollision.h"
 
 #include "Zone/Zone.h"
 
@@ -15,18 +16,20 @@
 #include "Network/PacketWrappers/ActorControlPacket144.h"
 #include "Network/PacketWrappers/UpdateHpMpTpPacket.h"
 
-#include "StatusEffect/StatusEffect.h"
-#include "Action/ActionCollision.h"
-#include "ServerZone.h"
-#include "Session.h"
-#include "Math/CalcBattle.h"
-#include "Actor.h"
-#include "Player.h"
 #include "Zone/TerritoryMgr.h"
 
-extern Core::ServerZone g_serverZone;
-extern Core::Data::ExdDataGenerated g_exdDataGen;
-extern Core::TerritoryMgr g_territoryMgr;
+#include "StatusEffect/StatusEffect.h"
+
+#include "Math/CalcBattle.h"
+
+#include "ServerZone.h"
+#include "Session.h"
+#include "Actor.h"
+#include "Player.h"
+
+#include "Framework.h"
+
+extern Core::Framework g_framework;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -451,7 +454,7 @@ void Core::Entity::Actor::sendToInRangeSet( Network::Packets::GamePacketPtr pPac
    {
       auto pPlayer = getAsPlayer();
 
-      auto pSession = g_serverZone.getSession( pPlayer->getId() );
+      auto pSession = g_framework.getServerZone().getSession( pPlayer->getId() );
 
       // it might be that the player DC'd in which case the session would be invalid
       if( pSession )
@@ -671,7 +674,7 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
       getAsPlayer()->sendDebug( "Handle script skill type: " + std::to_string( type ) );
    }
 
-   auto actionInfoPtr = g_exdDataGen.get< Core::Data::Action >( actionId );
+   auto actionInfoPtr = g_framework.getExdDataGen().get< Core::Data::Action >( actionId );
 
    // Todo: Effect packet generator. 90% of this is basically setting params and it's basically unreadable.
    // Prepare packet. This is seemingly common for all packets in the action handler.
