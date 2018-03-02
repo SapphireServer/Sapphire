@@ -24,18 +24,16 @@ namespace Util
 
       void init( T maxSlotId, bool reserveFirstSlot = false )
       {
-         setupQueue();
-
          m_maxSlotId = maxSlotId;
          m_reserveFirstSlot = reserveFirstSlot;
+
+         setupQueue();
 
          // todo: reserve max slot id in map to prevent any runtime reshashing
       }
 
       T freeUsedSpawnIndex( ActorIdType actorId )
       {
-         assert( m_maxSlotId != 0 );
-
          auto it = m_actorIdToAllocatedMap.find( actorId );
          if( it == m_actorIdToAllocatedMap.end() )
             return 0;
@@ -47,7 +45,7 @@ namespace Util
          return index;
       }
 
-      bool getNextFreeSpawnIndex( ActorIdType actorId )
+      T getNextFreeSpawnIndex( ActorIdType actorId )
       {
          assert( m_maxSlotId != 0 );
 
@@ -82,6 +80,8 @@ namespace Util
    protected:
       void setupQueue()
       {
+         assert( m_maxSlotId != 0 );
+
          while( !m_availableIds.empty() )
             m_availableIds.pop();
 
