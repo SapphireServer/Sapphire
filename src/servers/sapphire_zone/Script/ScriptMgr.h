@@ -1,5 +1,5 @@
-#ifndef _SCRIPTMANAGER_H_
-#define _SCRIPTMANAGER_H_
+#ifndef _ScriptMgr_H_
+#define _ScriptMgr_H_
 
 #include <boost/shared_ptr.hpp>
 #include <mutex>
@@ -13,11 +13,11 @@ namespace Core
    namespace Scripting
    {
 
-      class ScriptManager
+      class ScriptMgr
       {
       private:
 
-          boost::shared_ptr< NativeScriptManager > m_nativeScriptManager;
+          boost::shared_ptr< NativeScriptMgr > m_nativeScriptMgr;
 
          std::function< std::string( Entity::Player& ) > m_onFirstEnterWorld;
         // auto fn = m_pChaiHandler->eval< std::function<const std::string( Entity::Player ) > >( "onFirstEnterWorld" );
@@ -25,8 +25,8 @@ namespace Core
          bool m_firstScriptChangeNotificiation;
 
       public:
-         ScriptManager();
-         ~ScriptManager();
+         ScriptMgr();
+         ~ScriptMgr();
 
          bool init();
          void reload();
@@ -64,7 +64,7 @@ namespace Core
 
          void loadDir( const std::string& dirname, std::set<std::string> &files, const std::string& ext );
 
-         NativeScriptManager& getNativeScriptHandler();
+         NativeScriptMgr& getNativeScriptHandler();
       };
    }
 }

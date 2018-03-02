@@ -1,5 +1,3 @@
-#include "ActionCast.h"
-
 #include <common/Common.h>
 #include <common/Util/Util.h>
 #include <common/Util/UtilMath.h>
@@ -9,17 +7,20 @@
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 #include "Network/PacketWrappers/ActorControlPacket144.h"
+
 #include "Actor/Player.h"
-#include "Script/ScriptManager.h"
+
+#include "Script/ScriptMgr.h"
+
+#include "ActionCast.h"
+#include "Framework.h"
 
 using namespace Core::Common;
 using namespace Core::Network;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-extern Core::Data::ExdDataGenerated g_exdDataGen;
-extern Core::Logger g_log;
-extern Core::Scripting::ScriptManager g_scriptMgr;
+extern Core::Framework g_framework;
 
 Core::Action::ActionCast::ActionCast()
 {
@@ -31,7 +32,7 @@ Core::Action::ActionCast::ActionCast( Entity::ActorPtr pActor, Entity::ActorPtr 
    m_startTime = 0;
    m_id = actionId;
    m_handleActionType = HandleActionType::Spell;
-   m_castTime = g_exdDataGen.get< Core::Data::Action >( actionId )->cast100ms * 100; // TODO: Add security checks.
+   m_castTime = g_framework.getExdDataGen().get< Core::Data::Action >( actionId )->cast100ms * 100; // TODO: Add security checks.
    m_pSource = pActor;
    m_pTarget = pTarget;
    m_bInterrupt = false;
@@ -75,7 +76,7 @@ void Core::Action::ActionCast::onFinish()
                                            0x219, m_id, m_id, m_id, m_id );
    m_pSource->sendToInRangeSet( control, true );*/
 
-   g_scriptMgr.onCastFinish( *pPlayer, m_pTarget, m_id );
+   g_framework.getScriptMgr().onCastFinish( *pPlayer, m_pTarget, m_id );
 }
 
 void Core::Action::ActionCast::onInterrupt()

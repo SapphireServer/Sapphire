@@ -1,15 +1,18 @@
+#include <boost/filesystem/operations.hpp>
 #include <time.h>
 
 #include <common/Util/Util.h>
 #include <common/Network/PacketContainer.h>
-#include "Network/GameConnection.h"
-#include "Session.h"
-
-#include "Actor/Player.h"
-#include <boost/filesystem/operations.hpp>
 #include <common/Logging/Logger.h>
 
-extern Core::Logger g_log;
+#include "Network/GameConnection.h"
+#include "Actor/Player.h"
+
+#include "Session.h"
+#include "Framework.h"
+
+
+extern Core::Framework g_framework;
 
 Core::Session::Session( uint32_t sessionId ) :
    m_sessionId( sessionId ),
@@ -145,7 +148,7 @@ void Core::Session::startReplay( const std::string& path )
       m_replayCache.push_back( std::tuple< uint64_t, std::string >(
          Util::getTimeMs() + ( std::get< 0 >( set ) - startTime ), std::get< 1 >( set ) ) );
 
-      g_log.info( "Registering " + std::get< 1 >( set ) + " for " + std::to_string( std::get< 0 >( set ) - startTime ) );
+      g_framework.getLogger().info( "Registering " + std::get< 1 >( set ) + " for " + std::to_string( std::get< 0 >( set ) - startTime ) );
    }
 
    getPlayer()->sendDebug( "Registered " + std::to_string( m_replayCache.size() ) + " sets for replay" );
@@ -167,7 +170,7 @@ void Core::Session::processReplay()
       {
          m_pZoneConnection->injectPacket( std::get< 1 >( set ), *getPlayer().get() );
          m_replayCache.erase( m_replayCache.begin() + at );
-         //g_log.info( "Sent for " + std::to_string( std::get< 0 >( set ) ) + ", left: " + std::to_string( m_replayCache.size() ) );
+         //g_framework.getLogger().info( "Sent for " + std::to_string( std::get< 0 >( set ) ) + ", left: " + std::to_string( m_replayCache.size() ) );
       }
       at++;
    }

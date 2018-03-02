@@ -1,4 +1,3 @@
-#include "InstanceContent.h"
 
 #include <common/Common.h>
 #include <common/Logging/Logger.h>
@@ -6,15 +5,17 @@
 #include <common/Util/UtilMath.h>
 
 #include "Event/Director.h"
-#include "Script/ScriptManager.h"
+#include "Script/ScriptMgr.h"
 
 #include "Actor/Player.h"
 
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 
-extern Core::Logger g_log;
-extern Core::Scripting::ScriptManager g_scriptMgr;
+#include "InstanceContent.h"
+#include "Framework.h"
+
+extern Core::Framework g_framework;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -31,7 +32,7 @@ Core::InstanceContent::InstanceContent( boost::shared_ptr< Core::Data::InstanceC
      m_instanceContentId( instanceContentId ),
      m_state( Created )
 {
-   g_scriptMgr.onInstanceInit( *this );
+   g_framework.getScriptMgr().onInstanceInit( *this );
 }
 
 Core::InstanceContent::~InstanceContent()
@@ -51,7 +52,7 @@ Core::Data::ExdDataGenerated::InstanceContentPtr Core::InstanceContent::getInsta
 
 void Core::InstanceContent::onEnterTerritory( Entity::Player& player )
 {
-   g_log.debug( "InstanceContent::onEnterTerritory: Zone#" + std::to_string( getGuId() ) + "|"
+   g_framework.getLogger().debug( "InstanceContent::onEnterTerritory: Zone#" + std::to_string( getGuId() ) + "|"
                                                            + std::to_string( getInstanceContentId() ) +
                                                            + ", Entity#" + std::to_string( player.getId() ) );
 
@@ -67,7 +68,7 @@ void Core::InstanceContent::onEnterTerritory( Entity::Player& player )
 
 void Core::InstanceContent::onLeaveTerritory( Entity::Player& player )
 {
-   g_log.debug( "InstanceContent::onLeaveTerritory: Zone#" + std::to_string( getGuId() ) + "|"
+   g_framework.getLogger().debug( "InstanceContent::onLeaveTerritory: Zone#" + std::to_string( getGuId() ) + "|"
                                                            + std::to_string( getInstanceContentId() ) +
                                                            + ", Entity#" + std::to_string( player.getId() ) );
    sendDirectorClear( player );
@@ -121,7 +122,7 @@ void Core::InstanceContent::onUpdate( uint32_t currTime )
          break;
    }
 
-   g_scriptMgr.onInstanceUpdate( *this, currTime );
+   g_framework.getScriptMgr().onInstanceUpdate( *this, currTime );
 }
 
 void Core::InstanceContent::onFinishLoading( Entity::Player& player )
