@@ -31,24 +31,24 @@ class Framework
 {
 private:
 
-   Core::Logger g_log;
-   Core::DebugCommandHandler g_debugCmdHandler;
-   Core::Scripting::ScriptMgr g_scriptMgr;
-   Core::Data::ExdDataGenerated g_exdDataGen;
-   Core::TerritoryMgr g_territoryMgr;
-   Core::LinkshellMgr g_linkshellMgr;
-   Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
+   Logger g_log;
+   DebugCommandHandler g_debugCmdHandler;
+   Scripting::ScriptMgr g_scriptMgr;
+   Data::ExdDataGenerated g_exdDataGen;
+   TerritoryMgr g_territoryMgr;
+   LinkshellMgr g_linkshellMgr;
+   Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
 
 public:
 
-   Core::Logger& getLogger();
-   Core::DebugCommandHandler& getDebugCommandHandler();
-   Core::Scripting::ScriptMgr& getScriptMgr();
-   Core::Data::ExdDataGenerated& getExdDataGen();
-   Core::TerritoryMgr& getTerritoryMgr();
-   Core::LinkshellMgr& getLinkshellMgr();
-   Core::Db::DbWorkerPool< Core::Db::CharaDbConnection >& getCharaDb();
-   Core::ServerZone& Core::Framework::getServerZone();
+   Logger& getLogger();
+   DebugCommandHandler& getDebugCommandHandler();
+   Scripting::ScriptMgr& getScriptMgr();
+   Data::ExdDataGenerated& getExdDataGen();
+   TerritoryMgr& getTerritoryMgr();
+   LinkshellMgr& getLinkshellMgr();
+   Db::DbWorkerPool< Core::Db::CharaDbConnection >& getCharaDb();
+   ServerZone& Core::Framework::getServerZone();
 
 };
 
