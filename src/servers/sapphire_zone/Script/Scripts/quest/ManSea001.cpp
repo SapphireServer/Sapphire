@@ -63,8 +63,6 @@ private:
    {
       auto callback = [ this ]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
       {
-         player.updateQuest( getId(), 1 );
-
          player.eventPlay( OPENING_EVENT_HANDLER, 0x1E, HIDE_HOTBAR | NO_DEFAULT_CAMERA, 1, 0 );
       };
 
