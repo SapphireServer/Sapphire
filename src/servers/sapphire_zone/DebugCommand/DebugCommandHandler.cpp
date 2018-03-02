@@ -304,6 +304,14 @@ void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost:
 
       player.sendDebug( "MSQ Guide updated " );
    }
+   else if( subCommand == "weatheroverride" || subCommand == "wo" )
+   {
+      uint32_t weatherId;
+
+      sscanf( params.c_str(), "%d", &weatherId );
+
+      player.getCurrentZone()->setWeatherOverride( static_cast< Common::Weather >( weatherId ) );
+   }
    else
    {
       player.sendUrgent( subCommand + " is not a valid SET command." );
@@ -569,7 +577,7 @@ void Core::DebugCommandHandler::nudge( char * data, Entity::Player& player, boos
 
 void Core::DebugCommandHandler::serverInfo( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
 {
-   player.sendDebug( "SapphireServer " + Version::VERSION + "\nRev: " + Version::GIT_HASH );
+   player.sendDebug( "SapphireZone " + Version::VERSION + "\nRev: " + Version::GIT_HASH );
    player.sendDebug( "Compiled: " __DATE__ " " __TIME__ );
    player.sendDebug( "Sessions: " + std::to_string( g_serverZone.getSessionCount() ) );
 }
