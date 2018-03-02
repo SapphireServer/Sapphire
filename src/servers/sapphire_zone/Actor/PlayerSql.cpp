@@ -1,3 +1,7 @@
+#include <set>
+#include <stdio.h>
+#include <time.h>
+
 #include <common/Common.h>
 #include <common/Network/GamePacket.h>
 #include <common/Util/Util.h>
@@ -9,30 +13,20 @@
 #include <common/Common.h>
 #include <common/Database/DatabaseDef.h>
 
-#include <set>
-#include <stdio.h>
-
-#include <time.h>
-
-#include "Player.h"
+#include "Network/GameConnection.h"
+#include "Network/PacketWrappers/InitUIPacket.h"
 
 #include "Zone/TerritoryMgr.h"
 #include "Zone/Zone.h"
 
-#include "ServerZone.h"
-
-#include "Forwards.h"
-
-#include "Network/GameConnection.h"
-#include "Network/PacketWrappers/InitUIPacket.h"
 #include "Inventory/Inventory.h"
 
+#include "Player.h"
+#include "ServerZone.h"
+#include "Forwards.h"
+#include "Framework.h"
 
-extern Core::Logger g_log;
-extern Core::ServerZone g_serverZone;
-extern Core::TerritoryMgr g_territoryMgr;
-extern Core::Data::ExdDataGenerated g_exdDataGen;
-
+extern Core::Framework g_framework;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -43,10 +37,10 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
 {
    const std::string char_id_str = std::to_string( charId );
 
-   auto stmt = g_charaDb.getPreparedStatement( Db::CharaDbStatements::CHARA_SEL );
+   auto stmt = g_framework.getCharaDb().getPreparedStatement( Db::CharaDbStatements::CHARA_SEL );
 
    stmt->setUInt( 1, charId );
-   auto res = g_charaDb.query( stmt );
+   auto res = g_framework.getCharaDb().query( stmt );
 
    if( !res->next() )
       return false;
@@ -74,10 +68,10 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
    ZonePtr pCurrZone = nullptr;
 
    // if the zone is an instanceContent zone, we need to actually find the instance
-   if( g_territoryMgr.isInstanceContentTerritory( zoneId ) )
+   if( g_framework.getTerritoryMgr().isInstanceContentTerritory( zoneId ) )
    {
       // try to find an instance actually linked to this player
-      pCurrZone = g_territoryMgr.getLinkedInstance( m_id );
+      pCurrZone = g_framework.getTerritoryMgr().getLinkedInstance( m_id );
       // if none found, revert to previous zone and position
       if( !pCurrZone )
       {
@@ -86,12 +80,12 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
          m_pos.y = m_prevPos.y;
          m_pos.z = m_prevPos.z;
          setRotation( m_prevRot );
-         pCurrZone = g_territoryMgr.getZoneByTerriId( zoneId );
+         pCurrZone = g_framework.getTerritoryMgr().getZoneByTerriId( zoneId );
       }
    }
    else
    {
-      pCurrZone = g_territoryMgr.getZoneByTerriId( zoneId );
+      pCurrZone = g_framework.getTerritoryMgr().getZoneByTerriId( zoneId );
    }
 
    m_zoneId = zoneId;
@@ -100,12 +94,12 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
    // see if a valid zone could be found for the character
    if( !pCurrZone )
    {
-      g_log.error( "[" + char_id_str + "] Zone " + std::to_string( zoneId ) + " not found!" );
-      g_log.error( "[" + char_id_str + "] Setting default zone instead" );
+      g_framework.getLogger().error( "[" + char_id_str + "] Zone " + std::to_string( zoneId ) + " not found!" );
+      g_framework.getLogger().error( "[" + char_id_str + "] Setting default zone instead" );
 
       // default to new gridania
       // TODO: should probably just abort and mark character as corrupt
-      pCurrZone = g_territoryMgr.getZoneByTerriId( 132 );
+      pCurrZone = g_framework.getTerritoryMgr().getZoneByTerriId( 132 );
 
       m_pos.x = 0.0f;
       m_pos.y = 0.0f;
@@ -192,7 +186,7 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
    m_pCell = nullptr;
 
    if( !loadActiveQuests() || !loadClassData() || !loadSearchInfo() )
-      g_log.error( "Player id " + char_id_str + " data corrupt!" );
+      g_framework.getLogger().error( "Player id " + char_id_str + " data corrupt!" );
 
    m_maxHp = getMaxHp();
    m_maxMp = getMaxMp();
@@ -210,7 +204,7 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
    // first login, run the script event
    if( m_bNewGame )
    {
-      //g_scriptMgr.onPlayerFirstEnterWorld( pPlayer );
+      //g_framework.getScriptMgr().onPlayerFirstEnterWorld( pPlayer );
       m_bNewGame = false;
       m_hp = getMaxHp();
       m_mp = getMaxMp();
@@ -239,7 +233,7 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
    if( !m_playerIdToSpawnIdMap.empty() )
       m_playerIdToSpawnIdMap.clear();
 
-   if( !g_territoryMgr.movePlayer( pCurrZone, getAsPlayer() ) )
+   if( !g_framework.getTerritoryMgr().movePlayer( pCurrZone, getAsPlayer() ) )
       return false;
 
    return true;
@@ -248,10 +242,10 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
 bool Core::Entity::Player::loadActiveQuests()
 {
 
-   auto stmt = g_charaDb.getPreparedStatement( Db::CharaDbStatements::CHARA_QUEST_SEL );
+   auto stmt = g_framework.getCharaDb().getPreparedStatement( Db::CharaDbStatements::CHARA_QUEST_SEL );
 
    stmt->setUInt( 1, m_id );
-   auto res = g_charaDb.query( stmt );
+   auto res = g_framework.getCharaDb().query( stmt );
 
    while( res->next() )
    {
@@ -285,9 +279,9 @@ bool Core::Entity::Player::loadClassData()
 {
 
    // ClassIdx, Exp, Lvl
-   auto stmt = g_charaDb.getPreparedStatement( Db::CharaDbStatements::CHARA_CLASS_SEL );
+   auto stmt = g_framework.getCharaDb().getPreparedStatement( Db::CharaDbStatements::CHARA_CLASS_SEL );
    stmt->setUInt( 1, m_id );
-   auto res = g_charaDb.query( stmt );
+   auto res = g_framework.getCharaDb().query( stmt );
 
    while( res->next() )
    {
@@ -304,9 +298,9 @@ bool Core::Entity::Player::loadClassData()
 
 bool Core::Entity::Player::loadSearchInfo()
 {
-   auto stmt = g_charaDb.getPreparedStatement( Db::CharaDbStatements::CHARA_SEARCHINFO_SEL );
+   auto stmt = g_framework.getCharaDb().getPreparedStatement( Db::CharaDbStatements::CHARA_SEARCHINFO_SEL );
    stmt->setUInt( 1, m_id );
-   auto res = g_charaDb.query( stmt );
+   auto res = g_framework.getCharaDb().query( stmt );
 
    if( !res->next() )
       return false;
@@ -332,7 +326,7 @@ void Core::Entity::Player::updateSql()
            "EquippedMannequin 44, ConfigFlags 45, QuestCompleteFlags 46, OpeningSequence 47, "
            "QuestTracking 48, GrandCompany 49, GrandCompanyRank 50, Discovery 51, GMRank 52, Unlocks 53, "
            "CFPenaltyUntil 54"*/
-   auto stmt = g_charaDb.getPreparedStatement( Db::CharaDbStatements::CHARA_UP );
+   auto stmt = g_framework.getCharaDb().getPreparedStatement( Db::CharaDbStatements::CHARA_UP );
 
    stmt->setInt( 1, getHp() );
    stmt->setInt( 2, getMp() );
@@ -441,7 +435,7 @@ void Core::Entity::Player::updateSql()
 
    stmt->setInt( 55, m_id );
 
-   g_charaDb.execute( stmt );
+   g_framework.getCharaDb().execute( stmt );
 
    ////// Searchinfo
    updateDbSearchInfo();
@@ -456,43 +450,43 @@ void Core::Entity::Player::updateSql()
 
 void Core::Entity::Player::updateDbClass() const
 {
-   uint8_t classJobIndex = g_exdDataGen.get< Core::Data::ClassJob >( static_cast<uint8_t>( getClass() ) )->expArrayIndex;
+   uint8_t classJobIndex = g_framework.getExdDataGen().get< Core::Data::ClassJob >( static_cast<uint8_t>( getClass() ) )->expArrayIndex;
 
    //Exp = ?, Lvl = ? WHERE CharacterId = ? AND ClassIdx = ?
-   auto stmtS = g_charaDb.getPreparedStatement( Db::CHARA_CLASS_UP );
+   auto stmtS = g_framework.getCharaDb().getPreparedStatement( Db::CHARA_CLASS_UP );
    stmtS->setInt( 1, getExp() );
    stmtS->setInt( 2, getLevel() );
    stmtS->setInt( 3, m_id );
    stmtS->setInt( 4, classJobIndex );
-   g_charaDb.execute( stmtS );
+   g_framework.getCharaDb().execute( stmtS );
 }
 
 void Core::Entity::Player::insertDbClass( const uint8_t classJobIndex ) const
 {
-   auto stmtClass = g_charaDb.getPreparedStatement( Db::CHARA_CLASS_INS );
+   auto stmtClass = g_framework.getCharaDb().getPreparedStatement( Db::CHARA_CLASS_INS );
    stmtClass->setInt( 1, getId() );
    stmtClass->setInt( 2, classJobIndex );
    stmtClass->setInt( 3, 0 );
    stmtClass->setInt( 4, 1 );
-   g_charaDb.directExecute( stmtClass );
+   g_framework.getCharaDb().directExecute( stmtClass );
 }
 
 void Core::Entity::Player::updateDbSearchInfo() const
 {
-   auto stmtS = g_charaDb.getPreparedStatement( Db::CHARA_SEARCHINFO_UP_SELECTCLASS );
+   auto stmtS = g_framework.getCharaDb().getPreparedStatement( Db::CHARA_SEARCHINFO_UP_SELECTCLASS );
    stmtS->setInt( 1, m_searchSelectClass );
    stmtS->setInt( 2, m_id );
-   g_charaDb.execute( stmtS );
+   g_framework.getCharaDb().execute( stmtS );
 
-   auto stmtS1 = g_charaDb.getPreparedStatement( Db::CHARA_SEARCHINFO_UP_SELECTREGION );
+   auto stmtS1 = g_framework.getCharaDb().getPreparedStatement( Db::CHARA_SEARCHINFO_UP_SELECTREGION );
    stmtS1->setInt( 1, m_searchSelectRegion );
    stmtS1->setInt( 2, m_id );
-   g_charaDb.execute( stmtS1 );
+   g_framework.getCharaDb().execute( stmtS1 );
 
-   auto stmtS2 = g_charaDb.getPreparedStatement( Db::CHARA_SEARCHINFO_UP_SELECTREGION );
+   auto stmtS2 = g_framework.getCharaDb().getPreparedStatement( Db::CHARA_SEARCHINFO_UP_SELECTREGION );
    stmtS2->setString( 1, string( m_searchMessage != nullptr ? m_searchMessage : "" ) );
    stmtS2->setInt( 2, m_id );
-   g_charaDb.execute( stmtS2 );
+   g_framework.getCharaDb().execute( stmtS2 );
 }
 
 void Core::Entity::Player::updateDbAllQuests() const
@@ -503,7 +497,7 @@ void Core::Entity::Player::updateDbAllQuests() const
       if( !m_activeQuests[i] )
          continue;
 
-      auto stmtS3 = g_charaDb.getPreparedStatement( Db::CHARA_QUEST_UP );
+      auto stmtS3 = g_framework.getCharaDb().getPreparedStatement( Db::CHARA_QUEST_UP );
       stmtS3->setInt( 1, m_activeQuests[i]->c.sequence );
       stmtS3->setInt( 2, m_activeQuests[i]->c.flags );
       stmtS3->setInt( 3, m_activeQuests[i]->c.UI8A );
@@ -515,22 +509,22 @@ void Core::Entity::Player::updateDbAllQuests() const
       stmtS3->setInt( 9, m_activeQuests[i]->c.padding1 );
       stmtS3->setInt( 10, m_id);
       stmtS3->setInt( 11, m_activeQuests[i]->c.questId );
-      g_charaDb.execute( stmtS3 );
+      g_framework.getCharaDb().execute( stmtS3 );
 
    }
 }
 
 void Core::Entity::Player::deleteQuest( uint16_t questId ) const
 {
-   auto stmt = g_charaDb.getPreparedStatement( Db::CHARA_QUEST_DEL );
+   auto stmt = g_framework.getCharaDb().getPreparedStatement( Db::CHARA_QUEST_DEL );
    stmt->setInt( 1, m_id );
    stmt->setInt( 2, questId );
-   g_charaDb.execute( stmt );
+   g_framework.getCharaDb().execute( stmt );
 }
 
 void Core::Entity::Player::insertQuest( uint16_t questId, uint8_t index, uint8_t seq ) const
 {
-   auto stmt = g_charaDb.getPreparedStatement( Db::CHARA_QUEST_INS );
+   auto stmt = g_framework.getCharaDb().getPreparedStatement( Db::CHARA_QUEST_INS );
    stmt->setInt( 1, m_id );
    stmt->setInt( 2, index );
    stmt->setInt( 3, questId );
@@ -543,5 +537,5 @@ void Core::Entity::Player::insertQuest( uint16_t questId, uint8_t index, uint8_t
    stmt->setInt( 10, 0 );
    stmt->setInt( 11, 0 );
    stmt->setInt( 12, 0 );
-   g_charaDb.execute( stmt );
+   g_framework.getCharaDb().execute( stmt );
 }

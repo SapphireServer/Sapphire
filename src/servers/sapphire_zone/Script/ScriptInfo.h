@@ -1,11 +1,12 @@
-#ifndef SAPPHIRE_SCRIPTINFO_H
-#define SAPPHIRE_SCRIPTINFO_H
+#ifndef CORE_SCRIPTINFO_H
+#define CORE_SCRIPTINFO_H
 
 #include <vector>
 
 #include "NativeScriptApi.h"
 
 #ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 typedef HMODULE ModuleHandle;
 #else
