@@ -34,8 +34,6 @@ namespace Util
 
       T freeUsedSpawnIndex( ActorIdType actorId )
       {
-         assert( m_maxSlotId != 0 );
-
          auto it = m_actorIdToAllocatedMap.find( actorId );
          if( it == m_actorIdToAllocatedMap.end() )
             return 0;
@@ -47,7 +45,7 @@ namespace Util
          return index;
       }
 
-      bool getNextFreeSpawnIndex( ActorIdType actorId )
+      T getNextFreeSpawnIndex( ActorIdType actorId )
       {
          assert( m_maxSlotId != 0 );
 
@@ -82,6 +80,8 @@ namespace Util
    protected:
       void setupQueue()
       {
+         assert( m_maxSlotId != 0 );
+
          while( !m_availableIds.empty() )
             m_availableIds.pop();
 
