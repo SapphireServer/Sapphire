@@ -1,56 +1,59 @@
-#include <common/Logging/Logger.h>
-#include <common/Exd/ExdDataGenerated.h>
-#include <common/Config/XMLConfig.h>
-
-#include "NativeScriptManager.h"
-
-#include "Zone/Zone.h"
-#include "Actor/Player.h"
-#include "Actor/BattleNpc.h"
-#include "ServerZone.h"
-#include "Event/EventHandler.h"
-#include "Event/EventHelper.h"
-#include "StatusEffect/StatusEffect.h"
-#include "Network/PacketWrappers/ServerNoticePacket.h"
-#include "Script/ScriptManager.h"
-
 #include <boost/lexical_cast.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
 
+#include <common/Logging/Logger.h>
+#include <common/Exd/ExdDataGenerated.h>
+#include <common/Config/XMLConfig.h>
+
+#include "Zone/Zone.h"
+
+#include "Actor/Player.h"
+#include "Actor/BattleNpc.h"
+
+#include "Event/EventHandler.h"
+#include "Event/EventHelper.h"
+
+#include "StatusEffect/StatusEffect.h"
+
+#include "Network/PacketWrappers/ServerNoticePacket.h"
+
+#include "Script/ScriptMgr.h"
+
+#include "NativeScriptMgr.h"
+#include "ServerZone.h"
+#include "Framework.h"
 
 // enable the ambiguity fix for every platform to avoid #define nonsense
 #define WIN_AMBIGUITY_FIX
 #include <libraries/external/watchdog/Watchdog.h>
 
-extern Core::Logger g_log;
-extern Core::Data::ExdDataGenerated g_exdDataGen;
-extern Core::ServerZone g_serverZone;
+extern Core::Framework g_framework;
 
-Core::Scripting::ScriptManager::ScriptManager() :
+Core::Scripting::ScriptMgr::ScriptMgr() :
    m_firstScriptChangeNotificiation( false )
 {
-   m_nativeScriptManager = createNativeScriptMgr();
+   m_nativeScriptMgr = createNativeScriptMgr();
 }
 
-Core::Scripting::ScriptManager::~ScriptManager()
+Core::Scripting::ScriptMgr::~ScriptMgr()
 {
    Watchdog::unwatchAll();
 }
 
-void Core::Scripting::ScriptManager::update()
+void Core::Scripting::ScriptMgr::update()
 {
-   m_nativeScriptManager->processLoadQueue();
+   m_nativeScriptMgr->processLoadQueue();
 }
 
-bool Core::Scripting::ScriptManager::init()
+bool Core::Scripting::ScriptMgr::init()
 {
    std::set< std::string > files;
 
-   loadDir( g_serverZone.getConfig()->getValue< std::string >( "Settings.General.Scripts.Path", "./compiledscripts/" ),
-            files, m_nativeScriptManager->getModuleExtension() );
+   loadDir( g_framework.getServerZone().getConfig()->getValue< std::string >( "Settings.General.Scripts.Path", "./compiledscripts/" ),
+            files, m_nativeScriptMgr->getModuleExtension() );
 
    uint32_t scriptsFound = 0;
    uint32_t scriptsLoaded = 0;
@@ -61,24 +64,24 @@ bool Core::Scripting::ScriptManager::init()
 
       scriptsFound++;
 
-      if( m_nativeScriptManager->loadScript( path ) )
+      if( m_nativeScriptMgr->loadScript( path ) )
          scriptsLoaded++;
    }
 
-   g_log.info( "ScriptManager: Loaded " + std::to_string( scriptsLoaded ) + "/" + std::to_string( scriptsFound ) + " scripts successfully" );
+   g_framework.getLogger().info( "ScriptMgr: Loaded " + std::to_string( scriptsLoaded ) + "/" + std::to_string( scriptsFound ) + " scripts successfully" );
 
    watchDirectories();
 
    return true;
 }
 
-void Core::Scripting::ScriptManager::watchDirectories()
+void Core::Scripting::ScriptMgr::watchDirectories()
 {
-   auto shouldWatch = g_serverZone.getConfig()->getValue< bool >( "Settings.General.Scripts.HotSwap.Enabled", true );
+   auto shouldWatch = g_framework.getServerZone().getConfig()->getValue< bool >( "Settings.General.Scripts.HotSwap.Enabled", true );
    if( !shouldWatch )
       return;
 
-   Watchdog::watchMany( g_serverZone.getConfig()->getValue< std::string >( "Settings.General.Scripts.Path", "./compiledscripts/" ) + "*" + m_nativeScriptManager->getModuleExtension(),
+   Watchdog::watchMany( g_framework.getServerZone().getConfig()->getValue< std::string >( "Settings.General.Scripts.Path", "./compiledscripts/" ) + "*" + m_nativeScriptMgr->getModuleExtension(),
    [ this ]( const std::vector< ci::fs::path >& paths )
    {
       if( !m_firstScriptChangeNotificiation )
@@ -91,26 +94,26 @@ void Core::Scripting::ScriptManager::watchDirectories()
 
       for( auto path : paths )
       {
-         if( m_nativeScriptManager->isModuleLoaded( path.stem().string() ) )
+         if( m_nativeScriptMgr->isModuleLoaded( path.stem().string() ) )
          {
-            g_log.debug( "Reloading changed script: " + path.stem().string() );
+            g_framework.getLogger().debug( "Reloading changed script: " + path.stem().string() );
 
-            m_nativeScriptManager->queueScriptReload( path.stem( ).string( ));
+            m_nativeScriptMgr->queueScriptReload( path.stem( ).string( ));
          }
          else
          {
-            g_log.debug( "Loading new script: " + path.stem().string() );
+            g_framework.getLogger().debug( "Loading new script: " + path.stem().string() );
 
-            m_nativeScriptManager->loadScript( path.string() );
+            m_nativeScriptMgr->loadScript( path.string() );
          }
       }
    });
 }
 
-void Core::Scripting::ScriptManager::loadDir( const std::string& dirname, std::set<std::string> &files, const std::string& ext )
+void Core::Scripting::ScriptMgr::loadDir( const std::string& dirname, std::set<std::string> &files, const std::string& ext )
 {
 
-   g_log.info( "ScriptEngine: loading scripts from " + dirname );
+   g_framework.getLogger().info( "ScriptEngine: loading scripts from " + dirname );
 
    boost::filesystem::path targetDir( dirname );
 
@@ -126,7 +129,7 @@ void Core::Scripting::ScriptManager::loadDir( const std::string& dirname, std::s
    }
 }
 
-void Core::Scripting::ScriptManager::onPlayerFirstEnterWorld( Entity::Player& player )
+void Core::Scripting::ScriptMgr::onPlayerFirstEnterWorld( Entity::Player& player )
 {
 //   try
 //   {
@@ -139,13 +142,13 @@ void Core::Scripting::ScriptManager::onPlayerFirstEnterWorld( Entity::Player& pl
 //   }
 }
 
-bool Core::Scripting::ScriptManager::registerBnpcTemplate( std::string templateName, uint32_t bnpcBaseId,
+bool Core::Scripting::ScriptMgr::registerBnpcTemplate( std::string templateName, uint32_t bnpcBaseId,
                                                            uint32_t bnpcNameId, uint32_t modelId, std::string aiName )
 {
-   return g_serverZone.registerBnpcTemplate( templateName, bnpcBaseId, bnpcNameId, modelId, aiName );
+   return g_framework.getServerZone().registerBnpcTemplate( templateName, bnpcBaseId, bnpcNameId, modelId, aiName );
 }
 
-bool Core::Scripting::ScriptManager::onTalk( Entity::Player& player, uint64_t actorId, uint32_t eventId )
+bool Core::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t actorId, uint32_t eventId )
 {
 
    uint16_t eventType = eventId >> 16;
@@ -154,60 +157,60 @@ bool Core::Scripting::ScriptManager::onTalk( Entity::Player& player, uint64_t ac
    // aethernet/aetherytes need to be handled separately
    if( eventType == Event::EventHandler::EventHandlerType::Aetheryte )
    {
-      auto aetherInfo = g_exdDataGen.get< Core::Data::Aetheryte >( eventId & 0xFFFF );
+      auto aetherInfo = g_framework.getExdDataGen().get< Core::Data::Aetheryte >( eventId & 0xFFFF );
       scriptId = EVENTSCRIPT_AETHERYTE_ID;
       if( !aetherInfo->isAetheryte )
          scriptId = EVENTSCRIPT_AETHERNET_ID;
    }
 
-   auto script = m_nativeScriptManager->getScript< EventScript >( scriptId );
+   auto script = m_nativeScriptMgr->getScript< EventScript >( scriptId );
    if( !script )
       return false;
    script->onTalk( eventId, player, actorId );
    return true;
 }
 
-bool Core::Scripting::ScriptManager::onEnterTerritory( Entity::Player& player, uint32_t eventId,
+bool Core::Scripting::ScriptMgr::onEnterTerritory( Entity::Player& player, uint32_t eventId,
                                                        uint16_t param1, uint16_t param2 )
 {
-   auto script = m_nativeScriptManager->getScript< EventScript >( eventId );
+   auto script = m_nativeScriptMgr->getScript< EventScript >( eventId );
    if( !script )
       return false;
    script->onEnterZone( player, eventId, param1, param2 );
    return true;
 }
 
-bool Core::Scripting::ScriptManager::onWithinRange( Entity::Player& player, uint32_t eventId, uint32_t param1,
+bool Core::Scripting::ScriptMgr::onWithinRange( Entity::Player& player, uint32_t eventId, uint32_t param1,
                                                     float x, float y, float z )
 {
-   auto script = m_nativeScriptManager->getScript< EventScript >( eventId );
+   auto script = m_nativeScriptMgr->getScript< EventScript >( eventId );
    if( !script )
       return false;
    script->onWithinRange( player, eventId, param1, x, y, z );
    return true;
 }
 
-bool Core::Scripting::ScriptManager::onOutsideRange( Entity::Player& player, uint32_t eventId, uint32_t param1,
+bool Core::Scripting::ScriptMgr::onOutsideRange( Entity::Player& player, uint32_t eventId, uint32_t param1,
                                                      float x, float y, float z )
 {
-   auto script = m_nativeScriptManager->getScript< EventScript >( eventId );
+   auto script = m_nativeScriptMgr->getScript< EventScript >( eventId );
    if( !script )
       return false;
    script->onOutsideRange( player, eventId, param1, x, y, z );
    return true;
 }
 
-bool Core::Scripting::ScriptManager::onEmote( Entity::Player& player, uint64_t actorId,
+bool Core::Scripting::ScriptMgr::onEmote( Entity::Player& player, uint64_t actorId,
                                               uint32_t eventId, uint8_t emoteId )
 {
-   auto script = m_nativeScriptManager->getScript< EventScript >( eventId );
+   auto script = m_nativeScriptMgr->getScript< EventScript >( eventId );
    if( !script )
       return false;
    script->onEmote( actorId, eventId, emoteId, player );
    return true;
 }
 
-bool Core::Scripting::ScriptManager::onEventHandlerReturn( Entity::Player& player, uint32_t eventId,
+bool Core::Scripting::ScriptMgr::onEventHandlerReturn( Entity::Player& player, uint32_t eventId,
                                                            uint16_t subEvent, uint16_t param1, uint16_t param2,
                                                            uint16_t param3 )
 {
@@ -215,10 +218,10 @@ bool Core::Scripting::ScriptManager::onEventHandlerReturn( Entity::Player& playe
    return false;
 }
 
-bool Core::Scripting::ScriptManager::onEventHandlerTradeReturn( Entity::Player& player, uint32_t eventId,
+bool Core::Scripting::ScriptMgr::onEventHandlerTradeReturn( Entity::Player& player, uint32_t eventId,
                                                                 uint16_t subEvent, uint16_t param, uint32_t catalogId )
 {
-   auto script = m_nativeScriptManager->getScript< EventScript >( eventId );
+   auto script = m_nativeScriptMgr->getScript< EventScript >( eventId );
    if( script )
    {
       script->onEventHandlerTradeReturn( player, eventId, subEvent, param, catalogId );
@@ -228,14 +231,14 @@ bool Core::Scripting::ScriptManager::onEventHandlerTradeReturn( Entity::Player& 
    return false;
 }
 
-bool Core::Scripting::ScriptManager::onEventItem( Entity::Player& player, uint32_t eventItemId,
+bool Core::Scripting::ScriptMgr::onEventItem( Entity::Player& player, uint32_t eventItemId,
                                                   uint32_t eventId, uint32_t castTime, uint64_t targetId )
 {
    std::string eventName = "onEventItem";
    std::string objName = Event::getEventName( eventId );
    player.sendDebug( "Calling: " + objName + "." + eventName + " - " + std::to_string( eventId ) );
 
-   auto script = m_nativeScriptManager->getScript< EventScript >( eventId );
+   auto script = m_nativeScriptMgr->getScript< EventScript >( eventId );
    if( script )
    {
       player.eventStart( targetId, eventId, Event::EventHandler::Item, 0, 0 );
@@ -247,7 +250,7 @@ bool Core::Scripting::ScriptManager::onEventItem( Entity::Player& player, uint32
    return false;
 }
 
-bool Core::Scripting::ScriptManager::onMobKill( Entity::Player& player, uint16_t nameId )
+bool Core::Scripting::ScriptMgr::onMobKill( Entity::Player& player, uint16_t nameId )
 {
    std::string eventName = "onBnpcKill_" + std::to_string( nameId );
 
@@ -261,7 +264,7 @@ bool Core::Scripting::ScriptManager::onMobKill( Entity::Player& player, uint16_t
 
       uint16_t questId = activeQuests->c.questId;
 
-      auto script = m_nativeScriptManager->getScript< EventScript >( questId );
+      auto script = m_nativeScriptMgr->getScript< EventScript >( questId );
       if( script )
       {
          std::string objName = Event::getEventName( 0x00010000 | questId );
@@ -275,18 +278,18 @@ bool Core::Scripting::ScriptManager::onMobKill( Entity::Player& player, uint16_t
    return true;
 }
 
-bool Core::Scripting::ScriptManager::onCastFinish( Entity::Player& player, Entity::ActorPtr pTarget, uint32_t actionId )
+bool Core::Scripting::ScriptMgr::onCastFinish( Entity::Player& player, Entity::ActorPtr pTarget, uint32_t actionId )
 {
-   auto script = m_nativeScriptManager->getScript< ActionScript >( actionId );
+   auto script = m_nativeScriptMgr->getScript< ActionScript >( actionId );
 
    if( script )
       script->onCastFinish( player, *pTarget );
    return true;
 }
 
-bool Core::Scripting::ScriptManager::onStatusReceive( Entity::ActorPtr pActor, uint32_t effectId )
+bool Core::Scripting::ScriptMgr::onStatusReceive( Entity::ActorPtr pActor, uint32_t effectId )
 {
-   auto script = m_nativeScriptManager->getScript< StatusEffectScript >( effectId );
+   auto script = m_nativeScriptMgr->getScript< StatusEffectScript >( effectId );
 
    if( script )
    {
@@ -300,9 +303,9 @@ bool Core::Scripting::ScriptManager::onStatusReceive( Entity::ActorPtr pActor, u
    return false;
 }
 
-bool Core::Scripting::ScriptManager::onStatusTick( Entity::ActorPtr pActor, Core::StatusEffect::StatusEffect& effect )
+bool Core::Scripting::ScriptMgr::onStatusTick( Entity::ActorPtr pActor, Core::StatusEffect::StatusEffect& effect )
 {
-   auto script = m_nativeScriptManager->getScript< StatusEffectScript >( effect.getId() );
+   auto script = m_nativeScriptMgr->getScript< StatusEffectScript >( effect.getId() );
    if( script )
    {
       if( pActor->isPlayer() )
@@ -315,9 +318,9 @@ bool Core::Scripting::ScriptManager::onStatusTick( Entity::ActorPtr pActor, Core
    return false;
 }
 
-bool Core::Scripting::ScriptManager::onStatusTimeOut( Entity::ActorPtr pActor, uint32_t effectId )
+bool Core::Scripting::ScriptMgr::onStatusTimeOut( Entity::ActorPtr pActor, uint32_t effectId )
 {
-   auto script = m_nativeScriptManager->getScript< StatusEffectScript >( effectId );
+   auto script = m_nativeScriptMgr->getScript< StatusEffectScript >( effectId );
    if( script )
    {
       if( pActor->isPlayer() )
@@ -330,9 +333,9 @@ bool Core::Scripting::ScriptManager::onStatusTimeOut( Entity::ActorPtr pActor, u
    return false;
 }
 
-bool Core::Scripting::ScriptManager::onZoneInit( ZonePtr pZone )
+bool Core::Scripting::ScriptMgr::onZoneInit( ZonePtr pZone )
 {
-   auto script = m_nativeScriptManager->getScript< ZoneScript >( pZone->getTerritoryId() );
+   auto script = m_nativeScriptMgr->getScript< ZoneScript >( pZone->getTerritoryId() );
    if( script )
    {
       script->onZoneInit();
@@ -342,9 +345,9 @@ bool Core::Scripting::ScriptManager::onZoneInit( ZonePtr pZone )
    return false;
 }
 
-bool Core::Scripting::ScriptManager::onInstanceInit( InstanceContent& instance )
+bool Core::Scripting::ScriptMgr::onInstanceInit( InstanceContent& instance )
 {
-   auto script = m_nativeScriptManager->getScript< InstanceContentScript >( instance.getInstanceContentId() );
+   auto script = m_nativeScriptMgr->getScript< InstanceContentScript >( instance.getInstanceContentId() );
    if( script )
    {
       script->onInit( instance );
@@ -354,9 +357,9 @@ bool Core::Scripting::ScriptManager::onInstanceInit( InstanceContent& instance )
    return false;
 }
 
-bool Core::Scripting::ScriptManager::onInstanceUpdate( InstanceContent& instance, uint32_t currTime )
+bool Core::Scripting::ScriptMgr::onInstanceUpdate( InstanceContent& instance, uint32_t currTime )
 {
-   auto script = m_nativeScriptManager->getScript< InstanceContentScript >( instance.getInstanceContentId() );
+   auto script = m_nativeScriptMgr->getScript< InstanceContentScript >( instance.getInstanceContentId() );
    if( script )
    {
       script->onUpdate( instance, currTime );
@@ -366,7 +369,7 @@ bool Core::Scripting::ScriptManager::onInstanceUpdate( InstanceContent& instance
    return false;
 }
 
-Scripting::NativeScriptManager& Core::Scripting::ScriptManager::getNativeScriptHandler()
+Scripting::NativeScriptMgr& Core::Scripting::ScriptMgr::getNativeScriptHandler()
 {
-   return *m_nativeScriptManager;
+   return *m_nativeScriptMgr;
 }

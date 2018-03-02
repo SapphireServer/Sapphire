@@ -5,14 +5,14 @@
 #include <common/Network/PacketContainer.h>
 
 #include "Network/GameConnection.h"
-
 #include "Network/PacketWrappers/QuestMessagePacket.h"
 
 #include "Session.h"
 #include "Inventory/Inventory.h"
 #include "Player.h"
+#include "Framework.h"
 
-extern Core::Data::ExdDataGenerated g_exdDataGen;
+extern Core::Framework g_framework;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -1015,13 +1015,13 @@ void Core::Entity::Player::removeQuestsCompleted( uint32_t questId )
 bool Core::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t optionalChoice )
 {
    uint32_t playerLevel = getLevel();
-   auto questInfo = g_exdDataGen.get< Core::Data::Quest >( questId );
+   auto questInfo = g_framework.getExdDataGen().get< Core::Data::Quest >( questId );
    
 
    if( !questInfo )
       return false;
 
-   auto paramGrowth = g_exdDataGen.get< Core::Data::ParamGrow >( questInfo->classJobLevel0 );
+   auto paramGrowth = g_framework.getExdDataGen().get< Core::Data::ParamGrow >( questInfo->classJobLevel0 );
 
    // TODO: use the correct formula, this one is wrong
    uint32_t exp = ( questInfo->expFactor * paramGrowth->questExpModifier * ( 45 + 5 * questInfo->classJobLevel0 ) ) / 100;

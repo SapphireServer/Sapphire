@@ -8,18 +8,19 @@
 #include <common/Util/Util.h>
 #include <common/Util/UtilMath.h>
 
-#include "Player.h"
-#include "EventNpc.h"
-
 #include "Network/PacketWrappers/MoveActorPacket.h"
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
+
+#include "Player.h"
+#include "EventNpc.h"
+#include "Framework.h"
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-extern Core::Logger g_log;
+extern Core::Framework g_framework;
 
 uint32_t Core::Entity::EventNpc::m_nextID = 1249241694;
 

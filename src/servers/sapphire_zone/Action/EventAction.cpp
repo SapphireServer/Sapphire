@@ -2,14 +2,16 @@
 #include <common/Logging/Logger.h>
 #include <common/Exd/ExdDataGenerated.h>
 
-#include "EventAction.h"
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
+
 #include "Actor/Player.h"
 #include "Event/EventHandler.h"
 
-extern Core::Logger g_log;
-extern Core::Data::ExdDataGenerated g_exdDataGen;
+#include "EventAction.h"
+#include "Framework.h"
+
+extern Core::Framework g_framework;
 
 using namespace Core::Common;
 using namespace Core::Network;
@@ -28,7 +30,7 @@ Core::Action::EventAction::EventAction( Entity::ActorPtr pActor, uint32_t eventI
    m_handleActionType = HandleActionType::Event;
    m_eventId = eventId;
    m_id = action;
-   m_castTime = g_exdDataGen.get< Core::Data::EventAction >( action )->castTime * 1000; // TODO: Add security checks.
+   m_castTime = g_framework.getExdDataGen().get< Core::Data::EventAction >( action )->castTime * 1000; // TODO: Add security checks.
    m_onActionFinishClb = finishRef;
    m_onActionInterruptClb = interruptRef;
    m_pSource = pActor;
@@ -90,7 +92,7 @@ void Core::Action::EventAction::onFinish()
    }
    catch( std::exception& e )
    {
-      g_log.error( e.what() );
+      g_framework.getLogger().error( e.what() );
    }
 
 }
@@ -129,7 +131,7 @@ void Core::Action::EventAction::onInterrupt()
    }
    catch( std::exception& e )
    {
-      g_log.error( e.what() );
+      g_framework.getLogger().error( e.what() );
    }
 
 }
