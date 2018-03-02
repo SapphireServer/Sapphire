@@ -1030,7 +1030,7 @@ bool Core::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t optional
    exp = questInfo->expFactor;
 
    auto rewardItemCount = questInfo->itemReward0.size();
-   uint16_t optionalItemCount = questInfo->itemReward1.size();
+   uint16_t optionalItemCount = static_cast< uint16_t >( questInfo->itemReward1.size() );
 
    uint32_t gilReward = questInfo->gilReward;
 
