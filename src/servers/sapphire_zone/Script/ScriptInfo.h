@@ -1,5 +1,5 @@
-#ifndef SAPPHIRE_SCRIPTINFO_H
-#define SAPPHIRE_SCRIPTINFO_H
+#ifndef CORE_SCRIPTINFO_H
+#define CORE_SCRIPTINFO_H
 
 #include <vector>
 

@@ -6,25 +6,23 @@
 
 #include "Forwards.h"
 
+
 #include "ServerZone.h"
 
 #include <common/Logging/Logger.h>
 
 #include <common/Exd/ExdDataGenerated.h>
-#include <common/Database/DbLoader.h>
-#include <common/Database/CharaDbConnection.h>
-#include <common/Database/DbWorkerPool.h>
-#include <common/Database/PreparedStatement.h>
-
-#include "Zone/TerritoryMgr.h"
-
-#include "DebugCommand/DebugCommandHandler.h"
 
 #include "Script/ScriptMgr.h"
 
 #include "Linkshell/LinkshellMgr.h"
 
+#include "Zone/TerritoryMgr.h"
 
+#include "DebugCommand/DebugCommandHandler.h"
+
+#include <common/Database/CharaDbConnection.h>
+#include <common/Database/DbWorkerPool.h>
 
 namespace Core
 {
@@ -43,7 +41,6 @@ private:
 
 public:
 
-   bool init();
    Core::Logger& getLogger();
    Core::DebugCommandHandler& getDebugCommandHandler();
    Core::Scripting::ScriptMgr& getScriptMgr();
