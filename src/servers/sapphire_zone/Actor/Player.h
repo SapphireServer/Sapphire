@@ -430,7 +430,7 @@ public:
    /*! send spawn packets to pTarget */
    void spawn( PlayerPtr pTarget ) override;
    /*! send despawn packets to pTarget */
-   void despawn( ActorPtr pTarget ) override;
+   void despawn( PlayerPtr pTarget ) override;
 
    // Player State Handling
    //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -508,6 +508,9 @@ public:
    void sendUrgent( const std::string& message );
    void sendDebug( const std::string& message );
 
+   bool isDirectorInitialized() const;
+   void setDirectorInitialized( bool isInitialized );
+
    // Player Battle Handling
    //////////////////////////////////////////////////////////////////////////////////////////////////////
    void onMobAggro( BattleNpcPtr pBNpc );
@@ -574,6 +577,8 @@ private:
    uint8_t m_mode;
 
    bool m_markedForRemoval;
+
+   bool m_directorInitialized;
 
 private:
 

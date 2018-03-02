@@ -1015,13 +1015,13 @@ void Core::Entity::Player::removeQuestsCompleted( uint32_t questId )
 bool Core::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t optionalChoice )
 {
    uint32_t playerLevel = getLevel();
-   auto questInfo = g_exdDataGen.getQuest( questId );
+   auto questInfo = g_exdDataGen.get< Core::Data::Quest >( questId );
    
 
    if( !questInfo )
       return false;
 
-   auto paramGrowth = g_exdDataGen.getParamGrow( questInfo->classJobLevel0 );
+   auto paramGrowth = g_exdDataGen.get< Core::Data::ParamGrow >( questInfo->classJobLevel0 );
 
    // TODO: use the correct formula, this one is wrong
    uint32_t exp = ( questInfo->expFactor * paramGrowth->questExpModifier * ( 45 + 5 * questInfo->classJobLevel0 ) ) / 100;

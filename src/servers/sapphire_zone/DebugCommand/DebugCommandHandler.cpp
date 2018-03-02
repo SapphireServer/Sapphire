@@ -27,6 +27,7 @@
 #include "Actor/EventNpc.h"
 
 #include "Zone/Zone.h"
+#include "Zone/InstanceContent.h"
 
 #include "ServerZone.h"
 
@@ -345,7 +346,7 @@ void Core::DebugCommandHandler::add( char * data, Entity::Player& player, boost:
 
       sscanf( params.c_str(), "%d %d %hu", &id, &duration, &param );
 
-      StatusEffect::StatusEffectPtr effect( new StatusEffect::StatusEffect( id, player.getAsPlayer(), player.getAsPlayer(), duration, 3000 ) );
+      auto effect = StatusEffect::make_StatusEffect( id, player.getAsPlayer(), player.getAsPlayer(), duration, 3000 );
       effect->setParam( param );
 
       player.addStatusEffect( effect );
@@ -364,7 +365,7 @@ void Core::DebugCommandHandler::add( char * data, Entity::Player& player, boost:
 
       sscanf( params.c_str(), "%d %d", &model, &name );
 
-      Entity::BattleNpcPtr pBNpc( new Entity::BattleNpc( model, name, player.getPos() ) );
+      auto pBNpc = Entity::make_BattleNpc( model, name, player.getPos() );
 
       auto pZone = player.getCurrentZone();
       pBNpc->setCurrentZone( pZone );
@@ -400,7 +401,7 @@ void Core::DebugCommandHandler::add( char * data, Entity::Player& player, boost:
       // temporary research packet
       int32_t opcode;
       sscanf( params.c_str(), "%x", &opcode );
-      Network::Packets::GamePacketPtr pPe( new Network::Packets::GamePacket( opcode, 0x30, player.getId(), player.getId() ) );
+      auto pPe = Network::Packets::make_GamePacket( opcode, 0x30, player.getId(), player.getId() );
       player.queuePacket( pPe );
    }
    else if( subCommand == "eventnpc-self" )
@@ -424,7 +425,7 @@ void Core::DebugCommandHandler::add( char * data, Entity::Player& player, boost:
 
       sscanf( params.c_str(), "%d", &id );
 
-      Entity::EventNpcPtr pENpc( new Entity::EventNpc( id, player.getPos(), player.getRotation() ) );
+      auto pENpc = Entity::make_EventNpc( id, player.getPos(), player.getRotation() );
 
       auto pZone = player.getCurrentZone();
       pENpc->setCurrentZone( pZone );
@@ -505,7 +506,7 @@ void Core::DebugCommandHandler::get( char * data, Entity::Player& player, boost:
    if( ( subCommand == "pos" ) )
    {
 
-      int16_t map_id = g_exdDataGen.getTerritoryType( player.getCurrentZone()->getTerritoryId() )->map;
+      int16_t map_id = g_exdDataGen.get< Core::Data::TerritoryType >( player.getCurrentZone()->getTerritoryId() )->map;
 
       player.sendNotice( "Pos:\n" +
                          std::to_string( player.getPos().x ) + "\n" +
@@ -777,6 +778,53 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
    else if( subCommand == "return" || subCommand == "ret" )
    {
       player.exitInstance();
+   }
+   else if( subCommand == "set" )
+   {
+      uint32_t instanceId;
+      uint32_t index;
+      uint32_t value;
+      sscanf( params.c_str(), "%d %d %d", &instanceId, &index, &value );
+
+      auto pInstance = g_territoryMgr.getInstanceZonePtr( instanceId );
+      if( !pInstance )
+         return;
+      auto instance = boost::dynamic_pointer_cast< InstanceContent >( pInstance );
+
+      instance->setVar( static_cast< uint8_t >( index ), static_cast< uint8_t >( value ) );
+   }
+   else if( subCommand == "objupdate" )
+   {
+      uint32_t objId;
+
+      sscanf( params.c_str(), "%d", &objId );
+
+      auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+      if( !instance )
+         return;
+
+      auto obj = instance->getInstanceObject( objId );
+      if( !obj )
+         return;
+
+      instance->updateInstanceObj( obj );
+   }
+   else if( subCommand == "objstate" )
+   {
+      uint32_t objId;
+      uint8_t state;
+
+      sscanf( params.c_str(), "%d %hhu", &objId, &state );
+
+      auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+      if( !instance )
+         return;
+
+      auto obj = instance->getInstanceObject( objId );
+      if( !obj )
+         return;
+
+      obj->setState( state );
    }
    else if( subCommand == "festival" )
    {

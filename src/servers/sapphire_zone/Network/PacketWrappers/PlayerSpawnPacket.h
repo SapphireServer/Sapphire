@@ -32,8 +32,6 @@ namespace Server {
       void initialize( Entity::Player& player, Entity::Player& target )
       {
          // todo: figure out unkown offsets
-         // TODO: temporary gm rank
-         //m_data.gmRank = 0xff;
 
          m_data.classJob = static_cast< uint8_t >( player.getClass() );
          //m_data.status = static_cast< uint8_t >( pPlayer->getStatus() );

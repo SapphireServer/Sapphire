@@ -196,7 +196,7 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
 void Core::ServerZone::run( int32_t argc, char* argv[] )
 {
    // TODO: add more error checks for the entire initialisation
-   g_log.setLogPath( "log\\SapphireZone_" );
+   g_log.setLogPath( "log/SapphireZone_" );
    g_log.init();
 
    printBanner();

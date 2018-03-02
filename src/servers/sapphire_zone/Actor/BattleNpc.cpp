@@ -25,10 +25,10 @@ extern Core::Data::ExdDataGenerated g_exdDataGen;
 
 uint32_t Core::Entity::BattleNpc::m_nextID = 1149241694;
 
-Core::Entity::BattleNpc::BattleNpc()
+Core::Entity::BattleNpc::BattleNpc() :
+   Actor( ObjKind::BattleNpc )
 {
    m_id = 0;
-   m_objKind = ObjKind::BattleNpc;
    m_status = ActorStatus::Idle;
 }
 
@@ -39,7 +39,8 @@ Core::Entity::BattleNpc::~BattleNpc()
 
 Core::Entity::BattleNpc::BattleNpc( uint16_t modelId, uint16_t nameid, const Common::FFXIVARR_POSITION3& spawnPos,
                                     uint16_t bnpcBaseId, uint32_t type, uint8_t level, uint8_t behaviour,
-                                    uint32_t mobType ) : Actor()
+                                    uint32_t mobType ) :
+   Actor( ObjKind::BattleNpc )
 {
    BattleNpc::m_nextID++;
    m_id = BattleNpc::m_nextID;
@@ -47,8 +48,6 @@ Core::Entity::BattleNpc::BattleNpc( uint16_t modelId, uint16_t nameid, const Com
 
    m_pos = spawnPos;
    m_posOrigin = spawnPos;
-
-   m_objKind = ObjKind::BattleNpc;
 
    m_mode = MODE_IDLE;
    m_targetId = static_cast< uint64_t >( INVALID_GAME_OBJECT_ID );
@@ -149,11 +148,8 @@ void Core::Entity::BattleNpc::spawn( PlayerPtr pTarget )
 }
 
 // despawn
-void Core::Entity::BattleNpc::despawn( ActorPtr pTarget )
+void Core::Entity::BattleNpc::despawn( PlayerPtr pPlayer )
 {
-
-   auto pPlayer = pTarget->getAsPlayer();
-
    pPlayer->freePlayerSpawnId( getId() );
 
    ActorControlPacket143 controlPacket( m_id, DespawnZoneScreenMsg, 0x04, getId(), 0x01 );
@@ -181,11 +177,11 @@ uint8_t Core::Entity::BattleNpc::getbehavior() const
    return m_behavior;
 }
 
-void Core::Entity::BattleNpc::hateListAdd( ActorPtr pActor, int32_t hateAmount )
+void Core::Entity::BattleNpc::hateListAdd( Actor& actor, int32_t hateAmount )
 {
    auto hateEntry = new HateListEntry();
    hateEntry->m_hateAmount = hateAmount;
-   hateEntry->m_pActor = pActor;
+   hateEntry->m_pActor = actor.getAsActor();
 
    m_hateList.insert( hateEntry );
 }
@@ -278,32 +274,32 @@ bool Core::Entity::BattleNpc::moveTo( Common::FFXIVARR_POSITION3& pos )
 
 }
 
-void Core::Entity::BattleNpc::aggro( ActorPtr pActor )
+void Core::Entity::BattleNpc::aggro( Actor& actor )
 {
 
    m_lastAttack = Util::getTimeMs();
-   hateListUpdate( pActor, 1 );
+   hateListUpdate( actor, 1 );
 
-   changeTarget( pActor->getId() );
+   changeTarget( actor.getId() );
    setStance( Stance::Active );
    m_mode = MODE_COMBAT;
 
-   if( pActor->isPlayer() )
+   if( actor.isPlayer() )
    {
-      PlayerPtr tmpPlayer = pActor->getAsPlayer();
+      PlayerPtr tmpPlayer = actor.getAsPlayer();
       tmpPlayer->queuePacket( ActorControlPacket142( getId(), 0, 1, 1 ) );
       tmpPlayer->onMobAggro( getAsBattleNpc() );
    }
 }
 
-void Core::Entity::BattleNpc::deaggro( ActorPtr pActor )
+void Core::Entity::BattleNpc::deaggro( Actor& actor )
 {
-   if( !hateListHasActor( pActor ) )
-      hateListRemove( pActor );
+   if( !hateListHasActor( actor ) )
+      hateListRemove( actor );
 
-   if( pActor->isPlayer() )
+   if( actor.isPlayer() )
    {
-      PlayerPtr tmpPlayer = pActor->getAsPlayer();
+      PlayerPtr tmpPlayer = actor.getAsPlayer();
       tmpPlayer->onMobDeaggro( getAsBattleNpc() );
    }
 }
@@ -314,7 +310,7 @@ void Core::Entity::BattleNpc::hateListClear()
    for( ; it != m_hateList.end(); ++it )
    {
       if( isInRangeSet( ( *it )->m_pActor ) )
-         deaggro( ( *it )->m_pActor );
+         deaggro( *( *it )->m_pActor );
       HateListEntry* tmpListEntry = ( *it );
       delete tmpListEntry;
    }
@@ -322,19 +318,19 @@ void Core::Entity::BattleNpc::hateListClear()
 }
 
 
-void Core::Entity::BattleNpc::hateListRemove( ActorPtr pActor )
+void Core::Entity::BattleNpc::hateListRemove( Actor& actor )
 {
    auto it = m_hateList.begin();
    for( ; it != m_hateList.end(); ++it )
    {
-      if( ( *it )->m_pActor == pActor )
+      if( ( *it )->m_pActor->getId() == actor.getId() )
       {
          HateListEntry* pEntry = *it;
          m_hateList.erase( it );
          delete pEntry;
-         if( pActor->isPlayer() )
+         if( actor.isPlayer() )
          {
-            PlayerPtr tmpPlayer = pActor->getAsPlayer();
+            PlayerPtr tmpPlayer = actor.getAsPlayer();
             tmpPlayer->onMobDeaggro( getAsBattleNpc() );
          }
          return;
@@ -342,12 +338,12 @@ void Core::Entity::BattleNpc::hateListRemove( ActorPtr pActor )
    }
 }
 
-bool Core::Entity::BattleNpc::hateListHasActor( ActorPtr pActor )
+bool Core::Entity::BattleNpc::hateListHasActor( Actor& actor )
 {
    auto it = m_hateList.begin();
    for( ; it != m_hateList.end(); ++it )
    {
-      if( ( *it )->m_pActor == pActor )
+      if( ( *it )->m_pActor->getId() == actor.getId() )
          return true;
    }
    return false;
@@ -363,13 +359,13 @@ uint32_t Core::Entity::BattleNpc::getNameId() const
    return m_nameId;
 }
 
-void Core::Entity::BattleNpc::hateListUpdate( ActorPtr pActor, int32_t hateAmount )
+void Core::Entity::BattleNpc::hateListUpdate( Actor& actor, int32_t hateAmount )
 {
 
    auto it = m_hateList.begin();
    for( ; it != m_hateList.end(); ++it )
    {
-      if( ( *it )->m_pActor == pActor )
+      if( ( *it )->m_pActor->getId() == actor.getId() )
       {
          ( *it )->m_hateAmount += hateAmount;
          return;
@@ -378,7 +374,7 @@ void Core::Entity::BattleNpc::hateListUpdate( ActorPtr pActor, int32_t hateAmoun
 
    auto hateEntry = new HateListEntry();
    hateEntry->m_hateAmount = hateAmount;
-   hateEntry->m_pActor = pActor;
+   hateEntry->m_pActor = actor.getAsActor();
    m_hateList.insert( hateEntry );
 }
 
@@ -422,7 +418,7 @@ void Core::Entity::BattleNpc::onDeath()
             auto levelDiff = static_cast< int32_t >( this->m_level ) - level;
             auto cappedLevelDiff = Math::Util::clamp( levelDiff, 1, 6 );
 
-            auto expNeeded = g_exdDataGen.getParamGrow( m_level + cappedLevelDiff - 1 )->expToNext;
+            auto expNeeded = g_exdDataGen.get< Core::Data::ParamGrow >( m_level + cappedLevelDiff - 1 )->expToNext;
             int32_t exp = 0;
 
             // todo: arbitrary numbers pulled out of my ass
@@ -452,14 +448,14 @@ void Core::Entity::BattleNpc::onDeath()
    hateListClear();
 }
 
-void Core::Entity::BattleNpc::onActionHostile( ActorPtr pSource )
+void Core::Entity::BattleNpc::onActionHostile( Actor& source )
 {
 
    if( hateListGetHighest() == nullptr )
-      aggro( pSource );
+      aggro( source );
 
    if( getClaimer() == nullptr )
-      setOwner( pSource->getAsPlayer() );
+      setOwner( source.getAsPlayer() );
 }
 
 Core::Entity::ActorPtr Core::Entity::BattleNpc::getClaimer() const
@@ -526,7 +522,7 @@ void Core::Entity::BattleNpc::update( int64_t currTime )
 
       if( pClosestActor != nullptr && !pClosestActor->isAlive() )
       {
-         hateListRemove( pClosestActor );
+         hateListRemove( *pClosestActor );
          pClosestActor = hateListGetHighest();
       }
 

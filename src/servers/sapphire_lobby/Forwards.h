@@ -2,12 +2,16 @@
 #define _FORWARDS_H
 
 #include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 #include <vector>
 
 #define TYPE_FORWARD( x ) \
 class x; \
 typedef boost::shared_ptr< x > x ## Ptr; \
-typedef std::vector< x > x ## PtrList;     
+template< typename...Args > \
+x ## Ptr make_ ## x( Args &&...args ) { \
+return boost::make_shared< x >( std::forward< Args >( args ) ... ); }\
+typedef std::vector< x > x ## PtrList;
 
 namespace Core 
 {

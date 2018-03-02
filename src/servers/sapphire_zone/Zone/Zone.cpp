@@ -35,26 +35,24 @@ extern Core::Logger g_log;
 extern Core::ServerZone g_serverZone;
 extern Core::Data::ExdDataGenerated g_exdDataGen;
 extern Core::Scripting::ScriptManager g_scriptMgr;
+extern Core::TerritoryMgr g_territoryMgr;
 
-namespace Core {
 
 /**
 * \brief
 */
-Zone::Zone()
-   : m_territoryId( 0 )
-   , m_guId( 0 )
-   , m_type( Common::RegionType::normal )
-   , m_currentWeather( static_cast< uint8_t >( Common::Weather::FairSkies ) )
-   , m_weatherOverride( 0 )
-   , m_lastMobUpdate( 0 )
-   , m_currentFestivalId( 0 )
+Core::Zone::Zone() :
+   m_territoryId( 0 ),
+   m_guId( 0 ),
+   m_currentWeather( static_cast< uint8_t >( Common::Weather::FairSkies ) ),
+   m_weatherOverride( 0 ),
+   m_lastMobUpdate( 0 ),
+   m_currentFestivalId( 0 )
 {
 }
 
-Zone::Zone( uint16_t territoryId, uint32_t guId, const std::string& internalName, const std::string& placeName )
-   : m_type( Common::RegionType::normal )
-   , m_currentWeather( static_cast< uint8_t >( Common::Weather::FairSkies ) )
+Core::Zone::Zone( uint16_t territoryId, uint32_t guId, const std::string& internalName, const std::string& placeName ) :
+   m_currentWeather( static_cast< uint8_t >( Common::Weather::FairSkies ) )
 {
    m_guId = guId;
 
@@ -64,7 +62,7 @@ Zone::Zone( uint16_t territoryId, uint32_t guId, const std::string& internalName
    m_lastMobUpdate = 0;
 
    m_weatherOverride = 0;
-   m_territoryTypeInfo = g_exdDataGen.getTerritoryType( territoryId );
+   m_territoryTypeInfo = g_exdDataGen.get< Core::Data::TerritoryType >( territoryId );
 
    uint8_t weatherRateId = m_territoryTypeInfo->weatherRate > g_exdDataGen.getWeatherRateIdList().size() ?
                            uint8_t{ 0 } : m_territoryTypeInfo->weatherRate;
@@ -86,11 +84,11 @@ Zone::Zone( uint16_t territoryId, uint32_t guId, const std::string& internalName
    m_currentWeather = getNextWeather();
 }
 
-Zone::~Zone()
+Core::Zone::~Zone()
 {
 }
 
-bool Zone::init()
+bool Core::Zone::init()
 {
    memset( m_pCellCache, 0, sizeof( CellCache* ) * _sizeX );
 
@@ -104,32 +102,27 @@ bool Zone::init()
    return true;
 }
 
-bool Zone::isPrivateZone() const
-{
-   return m_bPrivate;
-}
-
-void Zone::setWeatherOverride( uint8_t weather )
+void Core::Zone::setWeatherOverride( uint8_t weather )
 {
    m_weatherOverride = weather;
 }
 
-uint8_t Zone::getCurrentWeather() const
+uint8_t Core::Zone::getCurrentWeather() const
 {
    return m_currentWeather;
 }
 
-uint16_t Zone::getCurrentFestival() const
+uint16_t Core::Zone::getCurrentFestival() const
 {
    return m_currentFestivalId;
 }
 
-void Zone::setCurrentFestival( uint16_t festivalId )
+void Core::Zone::setCurrentFestival( uint16_t festivalId )
 {
    m_currentFestivalId = festivalId;
 }
 
-CellCache* Zone::getCellCacheList( uint32_t cellx, uint32_t celly )
+Core::CellCache* Core::Zone::getCellCacheList( uint32_t cellx, uint32_t celly )
 {
    assert( cellx < _sizeX );
    assert( celly < _sizeY );
@@ -139,7 +132,7 @@ CellCache* Zone::getCellCacheList( uint32_t cellx, uint32_t celly )
    return m_pCellCache[cellx][celly];
 }
 
-CellCache* Zone::getCellCacheAndCreate( uint32_t cellx, uint32_t celly )
+Core::CellCache* Core::Zone::getCellCacheAndCreate( uint32_t cellx, uint32_t celly )
 {
    assert( cellx < _sizeX );
    assert( celly < _sizeY );
@@ -157,7 +150,7 @@ CellCache* Zone::getCellCacheAndCreate( uint32_t cellx, uint32_t celly )
    return m_pCellCache[cellx][celly];
 }
 
-void Zone::loadCellCache()
+void Core::Zone::loadCellCache()
 {
    auto pQR = g_charaDb.query( "SELECT Id,"
                                "Zoneid,"
@@ -179,7 +172,7 @@ void Zone::loadCellCache()
                                "Look,"
                                "Models,"
                                "type "
-                               "FROM battlenpc WHERE ZoneId = " + std::to_string(getTerritoryId() ) + ";" );
+                               "FROM battlenpc WHERE ZoneId = " + std::to_string( getTerritoryId() ) + ";" );
 
    std::vector< Entity::BattleNpcPtr > cache;
 
@@ -205,8 +198,7 @@ void Zone::loadCellCache()
       uint32_t type = pQR->getUInt( 18 );
 
       Common::FFXIVARR_POSITION3 pos{ posX, posY, posZ };
-      Entity::BattleNpcPtr pBNpc( new Entity::BattleNpc( modelId, nameId, pos,
-                                                         sizeId, type, level, behaviour, mobType ) );
+      auto pBNpc = Entity::make_BattleNpc( modelId, nameId, pos, sizeId, type, level, behaviour, mobType );
       pBNpc->setRotation( static_cast< float >( rotation ) );
       cache.push_back( pBNpc );
    }
@@ -235,7 +227,7 @@ void Zone::loadCellCache()
 
 }
 
-uint8_t Zone::getNextWeather()
+uint8_t Core::Zone::getNextWeather()
 {
    uint32_t unixTime = static_cast< uint32_t >( Util::getTimeSeconds() );
    // Get Eorzea hour for weather start
@@ -265,7 +257,7 @@ uint8_t Zone::getNextWeather()
    return 1;
 }
 
-void Zone::pushActor( Entity::ActorPtr pActor )
+void Core::Zone::pushActor( Entity::ActorPtr pActor )
 {
    float mx = pActor->getPos().x;
    float my = pActor->getPos().z;
@@ -304,7 +296,6 @@ void Zone::pushActor( Entity::ActorPtr pActor )
 
    if( pActor->isPlayer() )
    {
-      g_log.debug( "[Zone:" + m_internalName + "] Adding player [" + std::to_string( pActor->getId() ) + "]" );
       auto pPlayer = pActor->getAsPlayer();
 
       auto pSession = g_serverZone.getSession( pPlayer->getId() );
@@ -312,9 +303,8 @@ void Zone::pushActor( Entity::ActorPtr pActor )
          m_sessionSet.insert( pSession );
       m_playerMap[pPlayer->getId()] = pPlayer;
       updateCellActivity( cx, cy, 2 );
-
    }
-   else if( pActor->isMob() )
+   else if( pActor->isBattleNpc() )
    {
 
       Entity::BattleNpcPtr pBNpc = pActor->getAsBattleNpc();
@@ -329,9 +319,10 @@ void Zone::pushActor( Entity::ActorPtr pActor )
       pENpc->setPosition( pENpc->getPos() );
    }
 
+
 }
 
-void Zone::removeActor( Entity::ActorPtr pActor )
+void Core::Zone::removeActor( Entity::ActorPtr pActor )
 {
 
    if( pActor->m_pCell )
@@ -343,7 +334,6 @@ void Zone::removeActor( Entity::ActorPtr pActor )
    if( pActor->isPlayer() )
    {
 
-      g_log.debug( "[Zone:" + m_internalName + "] Removing player [" + std::to_string( pActor->getId() ) + "]" );
       // If it's a player and he's inside boundaries - update his nearby cells
       if( pActor->getPos().x <= _maxX && pActor->getPos().x >= _minX &&
           pActor->getPos().z <= _maxY && pActor->getPos().z >= _minY )
@@ -354,28 +344,23 @@ void Zone::removeActor( Entity::ActorPtr pActor )
       }
       m_playerMap.erase( pActor->getId() );
 
+      onLeaveTerritory( *pActor->getAsPlayer() );
+
    }
-   else if( pActor->isMob() )
+   else if( pActor->isBattleNpc() )
       m_BattleNpcMap.erase( pActor->getId() );
 
    // remove from lists of other actors
-   if( pActor->hasInRangeActor() )
-   {
-      Entity::ActorPtr pCurAct;
-
-      for( auto iter = pActor->m_inRangeActors.begin(); iter != pActor->m_inRangeActors.end(); )
-      {
-         pCurAct = *iter;
-         auto iter2 = iter++;
-         pCurAct->removeInRangeActor( pActor );
-      }
-   }
+   pActor->removeFromInRange();
    pActor->clearInRangeSet();
 
 }
 
-void Zone::queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range, Network::Packets::GamePacketPtr pPacketEntry )
+void Core::Zone::queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range, Network::Packets::GamePacketPtr pPacketEntry )
 {
+   if( g_territoryMgr.isPrivateTerritory( getTerritoryId() ) )
+      return;
+
    for( auto it = m_playerMap.begin(); it != m_playerMap.end(); ++it )
    {
       float distance = Math::Util::distance( sourcePlayer.getPos().x,
@@ -395,42 +380,32 @@ void Zone::queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range,
    }
 }
 
-uint32_t Zone::getTerritoryId()
+uint32_t Core::Zone::getTerritoryId() const
 {
    return m_territoryId;
 }
 
-Common::RegionType Zone::getType() const
-{
-   return m_type;
-}
-
-uint16_t Zone::getGuId() const
+uint32_t Core::Zone::getGuId() const
 {
    return m_guId;
 }
 
-bool Zone::isInstance() const
-{
-   return m_type == Common::RegionType::instance;
-}
-
-const std::string& Zone::getName() const
+const std::string& Core::Zone::getName() const
 {
    return m_placeName;
 }
 
-const std::string& Zone::getInternalName() const
+const std::string& Core::Zone::getInternalName() const
 {
    return m_internalName;
 }
 
-std::size_t Zone::getPopCount() const
+std::size_t Core::Zone::getPopCount() const
 {
    return m_playerMap.size();
 }
 
-bool Zone::checkWeather()
+bool Core::Zone::checkWeather()
 {
    if ( m_weatherOverride != 0 )
    {
@@ -454,7 +429,7 @@ bool Zone::checkWeather()
    return false;
 }
 
-void Zone::updateBnpcs( int64_t tickCount )
+void Core::Zone::updateBnpcs( int64_t tickCount )
 {
    if( ( tickCount - m_lastMobUpdate ) > 250 )
    {
@@ -502,7 +477,7 @@ void Zone::updateBnpcs( int64_t tickCount )
    }
 }
 
-bool Zone::runZoneLogic( uint32_t currTime )
+bool Core::Zone::update( uint32_t currTime )
 {
    int64_t tickCount = Util::getTimeMs();
 
@@ -523,10 +498,9 @@ bool Zone::runZoneLogic( uint32_t currTime )
       }
 
       // this session is not linked to this area anymore, remove it from zone session list
-      if( ( !pSession->getPlayer()->getCurrentZone() ) || ( pSession->getPlayer()->getCurrentZone() != shared_from_this() ) )
+      if( ( !pSession->getPlayer()->getCurrentZone() )
+          || ( pSession->getPlayer()->getCurrentZone() != shared_from_this() ) )
       {
-         g_log.debug( "[Zone:" + m_internalName + "] removing session " + std::to_string( pSession->getId() ) );
-
          if( pSession->getPlayer()->getCell() )
             removeActor( pSession->getPlayer() );
 
@@ -550,10 +524,12 @@ bool Zone::runZoneLogic( uint32_t currTime )
 
    updateBnpcs( tickCount );
 
+   onUpdate( currTime );
+
    return true;
 }
 
-bool Zone::isCellActive( uint32_t x, uint32_t y )
+bool Core::Zone::isCellActive( uint32_t x, uint32_t y )
 {
    uint32_t endX = ( ( x + 1 ) <= _sizeX ) ? x + 1 : ( _sizeX - 1 );
    uint32_t endY = ( ( y + 1 ) <= _sizeY ) ? y + 1 : ( _sizeY - 1 );
@@ -578,7 +554,7 @@ bool Zone::isCellActive( uint32_t x, uint32_t y )
    return false;
 }
 
-void Zone::updateCellActivity( uint32_t x, uint32_t y, int32_t radius )
+void Core::Zone::updateCellActivity( uint32_t x, uint32_t y, int32_t radius )
 {
 
    uint32_t endX = ( x + radius ) <= _sizeX ? x + radius : ( _sizeX - 1 );
@@ -632,55 +608,22 @@ void Zone::updateCellActivity( uint32_t x, uint32_t y, int32_t radius )
    }
 }
 
-void Zone::changeActorPosition( Entity::ActorPtr pActor )
+void Core::Zone::updateActorPosition( Entity::Actor &actor )
 {
 
-   if( pActor->getCurrentZone() != shared_from_this() )
+   if( actor.getCurrentZone() != shared_from_this() )
       return;
 
-   if( pActor->hasInRangeActor() )
-   {
-      Entity::ActorPtr pCurAct;
+   actor.checkInRangeActors();
 
-      float fRange = 70.0f;
-      for( auto iter = pActor->m_inRangeActors.begin(); iter != pActor->m_inRangeActors.end();)
-      {
-         pCurAct = *iter;
-         auto iter2 = iter++;
-
-         float distance = Math::Util::distance( pCurAct->getPos().x,
-                                                pCurAct->getPos().y,
-                                                pCurAct->getPos().z,
-                                                pActor->getPos().x,
-                                                pActor->getPos().y,
-                                                pActor->getPos().z );
-
-         if( fRange > 0.0f && distance > fRange )
-         {
-            pCurAct->removeInRangeActor( pActor );
-
-            if( pActor->getCurrentZone() != shared_from_this() )
-               return;
-
-            pActor->removeInRangeActor( *iter2 );
-
-            // @TODO FIXME!
-            // this break is more or less a hack, iteration will break otherwise after removing
-            break;
-         }
-      }
-   }
-
-   uint32_t cellX = getPosX( pActor->getPos().x );
-   uint32_t cellY = getPosY( pActor->getPos().z );
+   uint32_t cellX = getPosX( actor.getPos().x );
+   uint32_t cellY = getPosY( actor.getPos().z );
 
    if( cellX >= _sizeX || cellY >= _sizeY )
-   {
       return;
-   }
 
    Cell* pCell = getCell( cellX, cellY );
-   Cell* pOldCell = pActor->m_pCell;
+   Cell* pOldCell = actor.m_pCell;
    if( !pCell )
    {
       pCell = create( cellX, cellY );
@@ -692,15 +635,15 @@ void Zone::changeActorPosition( Entity::ActorPtr pActor )
    {
 
       if( pOldCell )
-         pOldCell->removeActor( pActor );
+         pOldCell->removeActor( actor.getAsActor() );
 
-      pCell->addActor( pActor );
-      pActor->m_pCell = pCell;
+      pCell->addActor( actor.getAsActor() );
+      actor.m_pCell = pCell;
 
       // if player we need to update cell activity
       // radius = 2 is used in order to update both
       // old and new cells
-      if( pActor->isPlayer() )
+      if( actor.isPlayer() )
       {
          updateCellActivity( cellX, cellY, 2 );
          if( pOldCell != nullptr )
@@ -726,15 +669,19 @@ void Zone::changeActorPosition( Entity::ActorPtr pActor )
       {
          pCell = getCell( posX, posY );
          if( pCell )
-            updateInRangeSet( pActor, pCell );
+            updateInRangeSet( actor.getAsActor(), pCell );
       }
    }
 }
 
 
-void Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
+void Core::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
 {
    if( pCell == nullptr )
+      return;
+
+   // TODO: make sure gms can overwrite this. Potentially temporary solution
+   if( g_territoryMgr.isPrivateTerritory( getTerritoryId() ) )
       return;
 
    Entity::ActorPtr pCurAct;
@@ -751,12 +698,8 @@ void Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
       if( !pCurAct )
          continue;
 
-      float distance = Math::Util::distance( pCurAct->getPos().x,
-                                             pCurAct->getPos().y,
-                                             pCurAct->getPos().z,
-                                             pActor->getPos().x,
-                                             pActor->getPos().y,
-                                             pActor->getPos().z );
+      float distance = Math::Util::distance( pCurAct->getPos().x, pCurAct->getPos().y, pCurAct->getPos().z,
+                                             pActor->getPos().x, pActor->getPos().y, pActor->getPos().z );
 
       // Add if we are not ourself and  range == 0 or distance is withing range.
       if( pCurAct != pActor && ( fRange == 0.0f || distance <= fRange ) )
@@ -773,8 +716,9 @@ void Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
             if( !pOwnPlayer->isLoadingComplete() )
                continue;
 
+            // this is a hack to limit actor spawn in one packetset
             count++;
-            if( count > 15 )
+            if( count > 12 )
                break;
 
             pActor->addInRangeActor( pCurAct );
@@ -792,7 +736,7 @@ void Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
             }
 
          }
-         else if( ( pActor->isMob() || pActor->isEventNpc() ) && pCurAct->isPlayer() && pActor->isAlive() )
+         else if( ( pActor->isBattleNpc() || pActor->isEventNpc() ) && pCurAct->isPlayer() && pActor->isAlive() )
          {
             auto pPlayer = pCurAct->getAsPlayer();
             if( pPlayer->isLoadingComplete() )
@@ -811,4 +755,77 @@ void Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
    }
 }
 
+void Core::Zone::onEnterTerritory( Entity::Player& player )
+{
+   g_log.debug( "Zone::onEnterTerritory: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryId() ) +
+                                                + ", Entity#" + std::to_string( player.getId() ) );
+}
+
+void Core::Zone::onLeaveTerritory( Entity::Player& player )
+{
+   g_log.debug( "Zone::onLeaveTerritory: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryId() ) +
+                                                + ", Entity#" + std::to_string( player.getId() ) );
+}
+
+void Core::Zone::onUpdate( uint32_t currTime )
+{
+
+}
+
+void Core::Zone::onFinishLoading( Entity::Player& player )
+{
+
+}
+
+void Core::Zone::onInitDirector( Entity::Player& player )
+{
+
+}
+
+void Core::Zone::registerInstanceObj( Entity::InstanceObjectPtr object )
+{
+   if( !object )
+      return;
+
+   //object->setParentInstance( InstanceContentPtr( this ) );
+
+   m_instanceObjects[object->getId()] = object;
+
+   g_log.debug( "Registered instance eobj: " + std::to_string( object->getId() ) );
+}
+
+Core::Entity::InstanceObjectPtr Core::Zone::getInstanceObject( uint32_t objId )
+{
+   auto obj = m_instanceObjects.find( objId );
+   if( obj == m_instanceObjects.end() )
+      return nullptr;
+
+   return obj->second;
+}
+
+void Core::Zone::updateInstanceObj( Core::Entity::InstanceObjectPtr object )
+{
+   if( !object )
+      return;
+
+   for( const auto& playerIt : m_playerMap )
+   {
+      // send that packet with le data
+      Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcObjectSpawn > eobjStatePacket( playerIt.second->getId() );
+      eobjStatePacket.data().objKind = object->getObjKind();
+      eobjStatePacket.data().state = object->getState();
+      eobjStatePacket.data().objId = object->getId();
+      eobjStatePacket.data().hierachyId = object->getHierachyId();
+      eobjStatePacket.data().position = object->getPos();
+
+      // ????
+      //eobjStatePacket.data().levelId = 4236873;
+      //eobjStatePacket.data().unknown2 = 5;
+      //eobjStatePacket.data().unknown1C = 1065353216;
+      //eobjStatePacket.data().unknown20 = 2147423605;
+      //eobjStatePacket.data().actorId = 1074105831;
+      //eobjStatePacket.data().unknown = 1;
+
+      playerIt.second->queuePacket( eobjStatePacket );
+   }
 }

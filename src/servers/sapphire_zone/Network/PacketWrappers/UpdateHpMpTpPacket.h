@@ -17,18 +17,18 @@ class UpdateHpMpTpPacket :
    public ZoneChannelPacket< FFXIVIpcUpdateHpMpTp >
 {
 public:
-   UpdateHpMpTpPacket( Entity::ActorPtr pActor ) :
-      ZoneChannelPacket< FFXIVIpcUpdateHpMpTp >( pActor->getId(), pActor->getId() )
+   UpdateHpMpTpPacket( Entity::Actor& actor ) :
+      ZoneChannelPacket< FFXIVIpcUpdateHpMpTp >( actor.getId(), actor.getId() )
    {
-      initialize( pActor );
+      initialize( actor );
    };
 
 private:
-   void initialize( Entity::ActorPtr pActor )
+   void initialize( Entity::Actor& actor )
    {
-      m_data.hp = pActor->getHp();
-      m_data.mp = pActor->getMp();
-      m_data.tp = pActor->getTp();
+      m_data.hp = actor.getHp();
+      m_data.mp = actor.getMp();
+      m_data.tp = actor.getTp();
    };
 };
 

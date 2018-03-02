@@ -2,7 +2,6 @@
 #include <common/Network/CommonNetwork.h>
 #include <common/Network/GamePacketNew.h>
 #include <common/Logging/Logger.h>
-#include <common/Exd/ExdData.h>
 #include <common/Network/PacketContainer.h>
 #include <common/Network/PacketDef/Chat/ServerChatDef.h>
 #include <common/Database/DatabaseDef.h>
@@ -42,7 +41,6 @@
 extern Core::Logger g_log;
 extern Core::ServerZone g_serverZone;
 extern Core::TerritoryMgr g_territoryMgr;
-extern Core::Data::ExdData g_exdData;
 extern Core::DebugCommandHandler g_gameCommandMgr;
 extern Core::Social::SocialMgr< Core::Social::FriendList > g_friendListMgr;
 
@@ -375,7 +373,7 @@ void Core::Network::GameConnection::initHandler( const Packets::GamePacket& inPa
    // init handler means this is a login procedure
    player.setIsLogin( true );
 
-   player.setZone( player.getZoneId() );
+   player.sendZonePackets();
 }
 
 
@@ -408,6 +406,8 @@ void Core::Network::GameConnection::pingHandler( const Packets::GamePacket& inPa
 void Core::Network::GameConnection::finishLoadingHandler( const Packets::GamePacket& inPacket,
                                                           Entity::Player& player )
 {
+   player.getCurrentZone()->onFinishLoading( player );
+
    // player is done zoning
    player.setLoadingComplete( true );
 
@@ -423,7 +423,7 @@ void Core::Network::GameConnection::finishLoadingHandler( const Packets::GamePac
    player.spawn( player.getAsPlayer() );
 
    // notify the zone of a change in position to force an "inRangeActor" update
-   player.getCurrentZone()->changeActorPosition( player.getAsPlayer() );
+   player.getCurrentZone()->updateActorPosition(player);
 }
 
 void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket& inPacket,

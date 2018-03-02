@@ -28,7 +28,7 @@ Core::Action::EventAction::EventAction( Entity::ActorPtr pActor, uint32_t eventI
    m_handleActionType = HandleActionType::Event;
    m_eventId = eventId;
    m_id = action;
-   m_castTime = g_exdDataGen.getEventAction( action )->castTime * 1000; // TODO: Add security checks.
+   m_castTime = g_exdDataGen.get< Core::Data::EventAction >( action )->castTime * 1000; // TODO: Add security checks.
    m_onActionFinishClb = finishRef;
    m_onActionInterruptClb = interruptRef;
    m_pSource = pActor;

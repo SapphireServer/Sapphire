@@ -2,19 +2,21 @@
 #define SAPPHIRE_INSTANCECONTENT_H
 
 #include "Zone.h"
+#include "Event/Director.h"
 #include "Forwards.h"
 #include <common/Exd/ExdDataGenerated.h>
 
 namespace Core
 {
 
-class InstanceContent : public Zone
+class InstanceContent : public Zone, Event::Director
 {
 public:
    enum InstanceContentState
    {
       Created,
-      DutyStarted,
+      DutyReset,
+      DutyInProgress,
       DutyFinished
    };
 
@@ -25,16 +27,25 @@ public:
                     uint32_t instanceContentId );
    virtual ~InstanceContent();
 
-   boost::shared_ptr< Core::Data::InstanceContent > getInstanceContentInfo() const;
+   void onEnterTerritory( Entity::Player& player ) override;
+   void onLeaveTerritory( Entity::Player& player ) override;
+   void onFinishLoading( Entity::Player& player ) override;
+   void onInitDirector( Entity::Player& player ) override;
+   void onUpdate( uint32_t currTime ) override;
+
+   void setVar( uint8_t index, uint8_t value );
+
+   Core::Data::ExdDataGenerated::InstanceContentPtr getInstanceContentInfo() const;
 
    uint32_t getInstanceContentId() const;
 
 private:
    Event::DirectorPtr m_pDirector;
-   boost::shared_ptr< Core::Data::InstanceContent > m_instanceContentInfo;
+   Core::Data::ExdDataGenerated::InstanceContentPtr m_instanceContentInfo;
    uint32_t m_instanceContentId;
    InstanceContentState m_state;
 
+   int64_t m_instanceExpireTime;
 };
 
 }

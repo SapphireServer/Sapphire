@@ -461,20 +461,21 @@ struct FFXIVIpcNpcSpawn : FFXIVIpcBasePacket<NpcSpawn>
 {
    uint16_t title;
    uint16_t u1b;
-   uint16_t u2a;
-   uint16_t u2b;
-
-   uint8_t pose;
+   uint8_t u2b;
+   uint8_t u2ab;
+   uint8_t gmRank;
    uint8_t u3b;
+
+   uint8_t u3a;
+   uint8_t onlineStatus;
    uint8_t u3c;
-   uint8_t u3d;
+   uint8_t pose;
 
    uint32_t u4;
 
    uint64_t targetId;
    uint32_t u6;
    uint32_t u7;
-
    uint64_t mainWeaponModel;
    uint64_t secWeaponModel;
    uint64_t craftToolModel;
@@ -485,44 +486,40 @@ struct FFXIVIpcNpcSpawn : FFXIVIpcBasePacket<NpcSpawn>
    uint32_t bNPCName;
    uint32_t u18;
    uint32_t u19;
-   uint32_t u20;
-   uint32_t u21;
+   uint32_t directorId;
+   uint32_t ownerId;
    uint32_t u22;
-
-   uint32_t hPCurr;
    uint32_t hPMax;
+   uint32_t hPCurr;
    uint32_t displayFlags;
    uint16_t fateID;
    uint16_t mPCurr;
    uint16_t tPCurr;
    uint16_t mPMax;
-
-   uint16_t unk21a;
+   uint16_t tPMax;
    uint16_t modelChara;
    uint16_t rotation;
-   uint16_t unk22b;
+   uint16_t activeMinion;
    uint8_t spawnIndex;
-   uint8_t state; // ActorState
-   uint8_t u24a;
-   uint8_t type; // 1 for player, 2 for NPC, else furniture;
-   uint8_t subtype; // 4 for players, 2 for pet, 3 for companion, 5 for mob, 7 for minion
-   uint8_t u25b;
+   uint8_t state;
+   uint8_t persistantEmote;
+   uint8_t type;
+   uint8_t subtype;
+   uint8_t voice;
    uint16_t u25c;
-
-   uint8_t enemyType; // 0 for friendly, anything else is an enemy
+   uint8_t enemyType;
    uint8_t level;
    uint8_t classJob;
    uint8_t u26d;
-
    uint16_t u27a;
-
    uint8_t currentMount;
    uint8_t mountHead;
    uint8_t mountBody;
    uint8_t mountFeet;
-   uint16_t mountColor;
-
+   uint8_t mountColor;
+   uint8_t scale;
    uint32_t u29b;
+   uint32_t u30b;
    Common::StatusEffect effect[30];
    Common::FFXIVARR_POSITION3 pos;
    uint32_t models[10];
@@ -1321,6 +1318,23 @@ struct FFXIVIpcMount : FFXIVIpcBasePacket<Mount>
    uint32_t id;
 };
 
+/**
+* Structural representation of the packet sent by the server
+* to mount a player
+*/
+struct FFXIVIpcDirectorVars : FFXIVIpcBasePacket<DirectorVars>
+{
+   /*! DirectorType | ContentId */
+   uint32_t m_directorId;
+   /*! currect sequence */
+   uint8_t m_sequence;
+   /*! current branch */
+   uint8_t m_branch;
+   /*! raw storage for flags/vars */
+   uint8_t m_unionData[10];
+};
+
+
 struct FFXIVIpcActorGauge : FFXIVIpcBasePacket<ActorGauge>
 {
    uint8_t classJobId;
@@ -1345,6 +1359,28 @@ struct FFXIVIpcMSQTrackerComplete : FFXIVIpcBasePacket<MSQTrackerComplete>
    uint64_t padding2;
    uint64_t padding3;
    uint64_t padding4; // last 4 bytes is uint32_t but who cares
+};
+
+struct FFXIVIpcObjectSpawn : FFXIVIpcBasePacket<ObjectSpawn>
+{
+   uint8_t count;
+   uint8_t objKind;
+   uint8_t unknown2;
+   uint8_t state;
+   uint32_t objId;
+   uint32_t actorId;
+   uint32_t levelId;
+   uint32_t unknown10;
+   uint32_t someActorId14;
+   uint32_t hierachyId;
+   uint32_t unknown1C;
+   uint32_t unknown20;
+   uint32_t unknown24;
+   uint32_t unknown28;
+   uint32_t unknown2c;
+   Common::FFXIVARR_POSITION3 position;
+   int16_t rotation;
+   int16_t unknown;
 };
 
 

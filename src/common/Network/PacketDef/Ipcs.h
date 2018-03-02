@@ -96,6 +96,7 @@ namespace Packets {
       SetCharacterFCInfo         = 0x0114, // updated 4.2
       StatusEffectList           = 0x0125, // updated 4.2
       Effect                     = 0x0128, // updated 4.2
+      PersistantEffect           = 0x013B, // updated 4.2
 
       GCAffiliation              = 0xCCFC, // OUTDATED
 
@@ -105,6 +106,7 @@ namespace Packets {
       ActorSetPos                = 0x0160, // updated 4.2
       ActorCast                  = 0x0162, // updated 4.2
       HateList                   = 0x0165, // updated 4.2
+      ObjectSpawn                = 0x0167, // updated 4.2
       UpdateClassInfo            = 0x0169, // updated 4.2
       InitUI                     = 0x016B, // updated 4.2
 
@@ -145,6 +147,8 @@ namespace Packets {
 
       Mount                      = 0x01CD, // updated 4.2
 
+      DirectorVars               = 0x01CF, // updated 4.2
+
       WeatherChange              = 0x01EA, // updated 4.2
       PlayerTitleList            = 0x01EB, // updated 4.2
       Discovery                  = 0x01EC, // updated 4.2
@@ -153,7 +157,7 @@ namespace Packets {
 
       EquipDisplayFlags          = 0x01FA, // updated 4.2
 
-      CFAvailableContents        = 0x01CF,
+      CFAvailableContents        = 0x01FD, // updated 4.2
 
       PrepareZoning              = 0x027C, // updated 4.2
       ActorGauge                 = 0x027D, // updated 4.2

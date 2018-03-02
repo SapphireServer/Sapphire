@@ -564,13 +564,12 @@ namespace Core {
          LeveStartError = 0x67,
          PlayerNameGrayout = 0x6A,
 
-         ItemObtainMsg = 0x75,
-         DutyQuestScreenMsg = 0x7B,
+      LeveStartAnim = 0x66,
+      LeveStartError = 0x67,
+      PlayerNameGrayout = 0x6A,
 
-         ItemObtainIcon = 0x84,
-         FateItemFailMsg = 0x85,
-         ItemFailMsg = 0x86,
-         ActionLearnMsg1 = 0x87,
+      ItemObtainMsg = 0x75,
+      DutyQuestScreenMsg = 0x7B,
 
          FreeEventPos = 0x8A,
 

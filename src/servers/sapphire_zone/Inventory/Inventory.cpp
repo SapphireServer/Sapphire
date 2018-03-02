@@ -36,7 +36,7 @@ Core::Inventory::Inventory( Core::Entity::Player* pOwner )
    // shortcut for setting up inventory
    // TODO: use a loop to set theese up?
    auto setupContainer = []( InventoryMap& map, InventoryType type )
-   { map[type] = ItemContainerPtr( new ItemContainer( type ) ); };
+   { map[type] = make_ItemContainer( type ); };
 
    // main bags
    setupContainer( m_inventoryMap, Bag0 );
@@ -135,7 +135,7 @@ Core::ItemPtr Core::Inventory::getItemAt( uint16_t containerId, uint8_t slotId )
 
 Core::ItemPtr Core::Inventory::createItem( uint32_t catalogId, uint8_t quantity )
 {
-   auto itemInfo = g_exdDataGen.getItem( catalogId );
+   auto itemInfo = g_exdDataGen.get< Core::Data::Item >( catalogId );
 
    uint8_t itemAmount = quantity;
 
@@ -473,7 +473,7 @@ bool Core::Inventory::isObtainable( uint32_t catalogId, uint8_t quantity )
 int16_t Core::Inventory::addItem( uint16_t inventoryId, int8_t slotId, uint32_t catalogId, uint8_t quantity )
 {
 
-   auto itemInfo = g_exdDataGen.getItem( catalogId );
+   auto itemInfo = g_exdDataGen.get< Core::Data::Item >( catalogId );
 
    // if item data doesn't exist or it's a blank field
    if( !itemInfo || itemInfo->levelItem == 0 )
@@ -656,7 +656,7 @@ Core::ItemPtr Core::Inventory::loadItem( uint64_t uId )
 
    try
    {
-      auto itemInfo = g_exdDataGen.getItem( itemRes->getUInt( 1 ) );
+      auto itemInfo = g_exdDataGen.get< Core::Data::Item >( itemRes->getUInt( 1 ) );
       bool isHq = itemRes->getUInt( 3 ) == 1 ? true : false;
       ItemPtr pItem( new Item( uId, 
                                itemRes->getUInt( 1 ),

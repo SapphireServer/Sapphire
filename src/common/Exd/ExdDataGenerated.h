@@ -11,6 +11,7 @@
 #include <ExdCat.h>
 #include <Exd.h>
 #include <set>
+#include <boost/make_shared.hpp>
 
 namespace Core {
 namespace Data {
@@ -244,7 +245,9 @@ struct Omen;
 struct OnlineStatus;
 struct Opening;
 struct Orchestrion;
+struct OrchestrionCategory;
 struct OrchestrionPath;
+struct OrchestrionUiparam;
 struct ParamGrow;
 struct Pet;
 struct PetAction;
@@ -252,6 +255,8 @@ struct Picture;
 struct PlaceName;
 struct Quest;
 struct QuestRewardOther;
+struct QuickChat;
+struct QuickChatTransient;
 struct Race;
 struct RacingChocoboItem;
 struct RacingChocoboName;
@@ -284,6 +289,9 @@ struct SpecialShopItemCategory;
 struct Stain;
 struct Status;
 struct Story;
+struct SubmarineExploration;
+struct SubmarinePart;
+struct SubmarineRank;
 struct SwitchTalk;
 struct TerritoryType;
 struct TextCommand;
@@ -295,6 +303,7 @@ struct Town;
 struct Trait;
 struct TraitRecast;
 struct TraitTransient;
+struct TreasureHuntRank;
 struct Tribe;
 struct TripleTriad;
 struct TripleTriadCard;
@@ -487,7 +496,6 @@ struct Aetheryte
    uint16_t placeName;
    uint16_t aethernetName;
    uint16_t territory;
-   uint32_t destination;
    bool isAetheryte;
    uint8_t aethernetGroup;
    uint16_t map;
@@ -693,9 +701,16 @@ struct BeastReputationRank
 
 struct BeastTribe
 {
+   uint8_t minLevel;
+   uint8_t maxLevel;
    uint8_t beastRankBonus;
    uint32_t iconReputation;
    uint32_t icon;
+   uint8_t maxRank;
+   uint32_t alliedBeastTribeQuest;
+   uint8_t expansion;
+   uint32_t currencyItem;
+   uint8_t displayOrder;
    std::string name;
    std::string nameRelation;
 
@@ -1536,7 +1551,7 @@ struct EventAction
 {
    std::string name;
    uint16_t icon;
-   uint16_t castTime;
+   uint8_t castTime;
 
    EventAction( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
@@ -1996,6 +2011,9 @@ struct GilShop
 struct GilShopItem
 {
    int32_t item;
+   std::vector< int32_t > rowRequired;
+   uint16_t stateRequired;
+   uint16_t patch;
 
    GilShopItem( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
@@ -2284,6 +2302,7 @@ struct Leve
    int32_t placeNameStart;
    int32_t placeNameIssued;
    uint8_t classJobCategory;
+   int32_t journalGenre;
    int32_t placeNameStartZone;
    int32_t iconCityState;
    int32_t dataId;
@@ -2552,6 +2571,7 @@ struct Mount
    uint8_t flyingCondition;
    uint8_t isFlying;
    uint16_t rideBGM;
+   int8_t order;
    uint16_t icon;
 
    Mount( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
@@ -2604,6 +2624,7 @@ struct Omen
 
 struct OnlineStatus
 {
+   uint8_t priority;
    std::string name;
    uint32_t icon;
 
@@ -2625,11 +2646,26 @@ struct Orchestrion
    Orchestrion( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
+struct OrchestrionCategory
+{
+   std::string name;
+
+   OrchestrionCategory( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
 struct OrchestrionPath
 {
    std::string file;
 
    OrchestrionPath( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct OrchestrionUiparam
+{
+   uint8_t orchestrionCategory;
+   uint16_t order;
+
+   OrchestrionUiparam( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct ParamGrow
@@ -2751,6 +2787,22 @@ struct QuestRewardOther
    std::string name;
 
    QuestRewardOther( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct QuickChat
+{
+   std::string nameAction;
+   int32_t icon1;
+   int8_t quickChatTransient;
+
+   QuickChat( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct QuickChatTransient
+{
+   std::string textOutput;
+
+   QuickChatTransient( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct Race
@@ -3086,6 +3138,41 @@ struct Story
    Story( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
+struct SubmarineExploration
+{
+   std::string destination;
+   std::string location;
+   uint8_t rankReq;
+   uint8_t ceruleumTankReq;
+   uint16_t durationmin;
+   uint8_t distanceForSurvey;
+   uint32_t expReward;
+
+   SubmarineExploration( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct SubmarinePart
+{
+   uint8_t slot;
+   uint8_t rank;
+   uint8_t components;
+   int16_t surveillance;
+   int16_t retrieval;
+   int16_t speed;
+   int16_t range;
+   int16_t favor;
+   uint8_t repairMaterials;
+
+   SubmarinePart( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct SubmarineRank
+{
+   uint32_t expToNext;
+
+   SubmarineRank( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
 struct SwitchTalk
 {
    std::vector< uint32_t > quest;
@@ -3185,6 +3272,18 @@ struct TraitTransient
    std::string description;
 
    TraitTransient( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct TreasureHuntRank
+{
+   uint32_t icon;
+   int32_t itemName;
+   int32_t keyItemName;
+   int32_t instanceMap;
+   uint8_t maxPartySize;
+   uint8_t minPartySize;
+
+   TreasureHuntRank( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct Tribe
@@ -3623,7 +3722,9 @@ struct WorldDCGroupType
      xiv::exd::Exd m_OnlineStatusDat;
      xiv::exd::Exd m_OpeningDat;
      xiv::exd::Exd m_OrchestrionDat;
+     xiv::exd::Exd m_OrchestrionCategoryDat;
      xiv::exd::Exd m_OrchestrionPathDat;
+     xiv::exd::Exd m_OrchestrionUiparamDat;
      xiv::exd::Exd m_ParamGrowDat;
      xiv::exd::Exd m_PetDat;
      xiv::exd::Exd m_PetActionDat;
@@ -3631,6 +3732,8 @@ struct WorldDCGroupType
      xiv::exd::Exd m_PlaceNameDat;
      xiv::exd::Exd m_QuestDat;
      xiv::exd::Exd m_QuestRewardOtherDat;
+     xiv::exd::Exd m_QuickChatDat;
+     xiv::exd::Exd m_QuickChatTransientDat;
      xiv::exd::Exd m_RaceDat;
      xiv::exd::Exd m_RacingChocoboItemDat;
      xiv::exd::Exd m_RacingChocoboNameDat;
@@ -3663,6 +3766,9 @@ struct WorldDCGroupType
      xiv::exd::Exd m_StainDat;
      xiv::exd::Exd m_StatusDat;
      xiv::exd::Exd m_StoryDat;
+     xiv::exd::Exd m_SubmarineExplorationDat;
+     xiv::exd::Exd m_SubmarinePartDat;
+     xiv::exd::Exd m_SubmarineRankDat;
      xiv::exd::Exd m_SwitchTalkDat;
      xiv::exd::Exd m_TerritoryTypeDat;
      xiv::exd::Exd m_TextCommandDat;
@@ -3674,6 +3780,7 @@ struct WorldDCGroupType
      xiv::exd::Exd m_TraitDat;
      xiv::exd::Exd m_TraitRecastDat;
      xiv::exd::Exd m_TraitTransientDat;
+     xiv::exd::Exd m_TreasureHuntRankDat;
      xiv::exd::Exd m_TribeDat;
      xiv::exd::Exd m_TripleTriadDat;
      xiv::exd::Exd m_TripleTriadCardDat;
@@ -3697,601 +3804,326 @@ struct WorldDCGroupType
 
 
      using AchievementPtr =  boost::shared_ptr< Achievement >;
-     AchievementPtr getAchievement( uint32_t AchievementId );
      using AchievementCategoryPtr =  boost::shared_ptr< AchievementCategory >;
-     AchievementCategoryPtr getAchievementCategory( uint32_t AchievementCategoryId );
      using AchievementKindPtr =  boost::shared_ptr< AchievementKind >;
-     AchievementKindPtr getAchievementKind( uint32_t AchievementKindId );
      using ActionPtr =  boost::shared_ptr< Action >;
-     ActionPtr getAction( uint32_t ActionId );
      using ActionCategoryPtr =  boost::shared_ptr< ActionCategory >;
-     ActionCategoryPtr getActionCategory( uint32_t ActionCategoryId );
      using ActionComboRoutePtr =  boost::shared_ptr< ActionComboRoute >;
-     ActionComboRoutePtr getActionComboRoute( uint32_t ActionComboRouteId );
      using ActionIndirectionPtr =  boost::shared_ptr< ActionIndirection >;
-     ActionIndirectionPtr getActionIndirection( uint32_t ActionIndirectionId );
      using ActionProcStatusPtr =  boost::shared_ptr< ActionProcStatus >;
-     ActionProcStatusPtr getActionProcStatus( uint32_t ActionProcStatusId );
      using ActionTimelinePtr =  boost::shared_ptr< ActionTimeline >;
-     ActionTimelinePtr getActionTimeline( uint32_t ActionTimelineId );
      using ActionTransientPtr =  boost::shared_ptr< ActionTransient >;
-     ActionTransientPtr getActionTransient( uint32_t ActionTransientId );
      using AddonPtr =  boost::shared_ptr< Addon >;
-     AddonPtr getAddon( uint32_t AddonId );
      using AdventurePtr =  boost::shared_ptr< Adventure >;
-     AdventurePtr getAdventure( uint32_t AdventureId );
      using AdventureExPhasePtr =  boost::shared_ptr< AdventureExPhase >;
-     AdventureExPhasePtr getAdventureExPhase( uint32_t AdventureExPhaseId );
      using AetherCurrentPtr =  boost::shared_ptr< AetherCurrent >;
-     AetherCurrentPtr getAetherCurrent( uint32_t AetherCurrentId );
      using AetherialWheelPtr =  boost::shared_ptr< AetherialWheel >;
-     AetherialWheelPtr getAetherialWheel( uint32_t AetherialWheelId );
      using AetherytePtr =  boost::shared_ptr< Aetheryte >;
-     AetherytePtr getAetheryte( uint32_t AetheryteId );
      using AirshipExplorationLevelPtr =  boost::shared_ptr< AirshipExplorationLevel >;
-     AirshipExplorationLevelPtr getAirshipExplorationLevel( uint32_t AirshipExplorationLevelId );
      using AirshipExplorationLogPtr =  boost::shared_ptr< AirshipExplorationLog >;
-     AirshipExplorationLogPtr getAirshipExplorationLog( uint32_t AirshipExplorationLogId );
      using AirshipExplorationParamTypePtr =  boost::shared_ptr< AirshipExplorationParamType >;
-     AirshipExplorationParamTypePtr getAirshipExplorationParamType( uint32_t AirshipExplorationParamTypeId );
      using AirshipExplorationPartPtr =  boost::shared_ptr< AirshipExplorationPart >;
-     AirshipExplorationPartPtr getAirshipExplorationPart( uint32_t AirshipExplorationPartId );
      using AirshipExplorationPointPtr =  boost::shared_ptr< AirshipExplorationPoint >;
-     AirshipExplorationPointPtr getAirshipExplorationPoint( uint32_t AirshipExplorationPointId );
      using AnimaWeapon5Ptr =  boost::shared_ptr< AnimaWeapon5 >;
-     AnimaWeapon5Ptr getAnimaWeapon5( uint32_t AnimaWeapon5Id );
      using AnimaWeapon5ParamPtr =  boost::shared_ptr< AnimaWeapon5Param >;
-     AnimaWeapon5ParamPtr getAnimaWeapon5Param( uint32_t AnimaWeapon5ParamId );
      using AnimaWeapon5PatternGroupPtr =  boost::shared_ptr< AnimaWeapon5PatternGroup >;
-     AnimaWeapon5PatternGroupPtr getAnimaWeapon5PatternGroup( uint32_t AnimaWeapon5PatternGroupId );
      using AnimaWeapon5SpiritTalkPtr =  boost::shared_ptr< AnimaWeapon5SpiritTalk >;
-     AnimaWeapon5SpiritTalkPtr getAnimaWeapon5SpiritTalk( uint32_t AnimaWeapon5SpiritTalkId );
      using AnimaWeapon5SpiritTalkParamPtr =  boost::shared_ptr< AnimaWeapon5SpiritTalkParam >;
-     AnimaWeapon5SpiritTalkParamPtr getAnimaWeapon5SpiritTalkParam( uint32_t AnimaWeapon5SpiritTalkParamId );
      using AnimaWeapon5TradeItemPtr =  boost::shared_ptr< AnimaWeapon5TradeItem >;
-     AnimaWeapon5TradeItemPtr getAnimaWeapon5TradeItem( uint32_t AnimaWeapon5TradeItemId );
      using AnimaWeaponFUITalkPtr =  boost::shared_ptr< AnimaWeaponFUITalk >;
-     AnimaWeaponFUITalkPtr getAnimaWeaponFUITalk( uint32_t AnimaWeaponFUITalkId );
      using AnimaWeaponFUITalkParamPtr =  boost::shared_ptr< AnimaWeaponFUITalkParam >;
-     AnimaWeaponFUITalkParamPtr getAnimaWeaponFUITalkParam( uint32_t AnimaWeaponFUITalkParamId );
      using AnimaWeaponIconPtr =  boost::shared_ptr< AnimaWeaponIcon >;
-     AnimaWeaponIconPtr getAnimaWeaponIcon( uint32_t AnimaWeaponIconId );
      using AnimaWeaponItemPtr =  boost::shared_ptr< AnimaWeaponItem >;
-     AnimaWeaponItemPtr getAnimaWeaponItem( uint32_t AnimaWeaponItemId );
      using AquariumFishPtr =  boost::shared_ptr< AquariumFish >;
-     AquariumFishPtr getAquariumFish( uint32_t AquariumFishId );
      using AquariumWaterPtr =  boost::shared_ptr< AquariumWater >;
-     AquariumWaterPtr getAquariumWater( uint32_t AquariumWaterId );
      using AttackTypePtr =  boost::shared_ptr< AttackType >;
-     AttackTypePtr getAttackType( uint32_t AttackTypeId );
      using BalloonPtr =  boost::shared_ptr< Balloon >;
-     BalloonPtr getBalloon( uint32_t BalloonId );
      using BaseParamPtr =  boost::shared_ptr< BaseParam >;
-     BaseParamPtr getBaseParam( uint32_t BaseParamId );
      using BattleLevePtr =  boost::shared_ptr< BattleLeve >;
-     BattleLevePtr getBattleLeve( uint32_t BattleLeveId );
      using BeastRankBonusPtr =  boost::shared_ptr< BeastRankBonus >;
-     BeastRankBonusPtr getBeastRankBonus( uint32_t BeastRankBonusId );
      using BeastReputationRankPtr =  boost::shared_ptr< BeastReputationRank >;
-     BeastReputationRankPtr getBeastReputationRank( uint32_t BeastReputationRankId );
      using BeastTribePtr =  boost::shared_ptr< BeastTribe >;
-     BeastTribePtr getBeastTribe( uint32_t BeastTribeId );
      using BehaviorPtr =  boost::shared_ptr< Behavior >;
-     BehaviorPtr getBehavior( uint32_t BehaviorId );
      using BGMPtr =  boost::shared_ptr< BGM >;
-     BGMPtr getBGM( uint32_t BGMId );
      using BNpcAnnounceIconPtr =  boost::shared_ptr< BNpcAnnounceIcon >;
-     BNpcAnnounceIconPtr getBNpcAnnounceIcon( uint32_t BNpcAnnounceIconId );
      using BNpcBasePtr =  boost::shared_ptr< BNpcBase >;
-     BNpcBasePtr getBNpcBase( uint32_t BNpcBaseId );
      using BNpcCustomizePtr =  boost::shared_ptr< BNpcCustomize >;
-     BNpcCustomizePtr getBNpcCustomize( uint32_t BNpcCustomizeId );
      using BNpcNamePtr =  boost::shared_ptr< BNpcName >;
-     BNpcNamePtr getBNpcName( uint32_t BNpcNameId );
      using BuddyActionPtr =  boost::shared_ptr< BuddyAction >;
-     BuddyActionPtr getBuddyAction( uint32_t BuddyActionId );
      using BuddyEquipPtr =  boost::shared_ptr< BuddyEquip >;
-     BuddyEquipPtr getBuddyEquip( uint32_t BuddyEquipId );
      using BuddyItemPtr =  boost::shared_ptr< BuddyItem >;
-     BuddyItemPtr getBuddyItem( uint32_t BuddyItemId );
      using BuddyRankPtr =  boost::shared_ptr< BuddyRank >;
-     BuddyRankPtr getBuddyRank( uint32_t BuddyRankId );
      using BuddySkillPtr =  boost::shared_ptr< BuddySkill >;
-     BuddySkillPtr getBuddySkill( uint32_t BuddySkillId );
      using CabinetPtr =  boost::shared_ptr< Cabinet >;
-     CabinetPtr getCabinet( uint32_t CabinetId );
      using CabinetCategoryPtr =  boost::shared_ptr< CabinetCategory >;
-     CabinetCategoryPtr getCabinetCategory( uint32_t CabinetCategoryId );
      using CalendarPtr =  boost::shared_ptr< Calendar >;
-     CalendarPtr getCalendar( uint32_t CalendarId );
      using CharaMakeCustomizePtr =  boost::shared_ptr< CharaMakeCustomize >;
-     CharaMakeCustomizePtr getCharaMakeCustomize( uint32_t CharaMakeCustomizeId );
      using CharaMakeTypePtr =  boost::shared_ptr< CharaMakeType >;
-     CharaMakeTypePtr getCharaMakeType( uint32_t CharaMakeTypeId );
      using ChocoboRacePtr =  boost::shared_ptr< ChocoboRace >;
-     ChocoboRacePtr getChocoboRace( uint32_t ChocoboRaceId );
      using ChocoboRaceAbilityPtr =  boost::shared_ptr< ChocoboRaceAbility >;
-     ChocoboRaceAbilityPtr getChocoboRaceAbility( uint32_t ChocoboRaceAbilityId );
      using ChocoboRaceAbilityTypePtr =  boost::shared_ptr< ChocoboRaceAbilityType >;
-     ChocoboRaceAbilityTypePtr getChocoboRaceAbilityType( uint32_t ChocoboRaceAbilityTypeId );
      using ChocoboRaceItemPtr =  boost::shared_ptr< ChocoboRaceItem >;
-     ChocoboRaceItemPtr getChocoboRaceItem( uint32_t ChocoboRaceItemId );
      using ChocoboRaceRankPtr =  boost::shared_ptr< ChocoboRaceRank >;
-     ChocoboRaceRankPtr getChocoboRaceRank( uint32_t ChocoboRaceRankId );
      using ChocoboRaceStatusPtr =  boost::shared_ptr< ChocoboRaceStatus >;
-     ChocoboRaceStatusPtr getChocoboRaceStatus( uint32_t ChocoboRaceStatusId );
      using ChocoboRaceTerritoryPtr =  boost::shared_ptr< ChocoboRaceTerritory >;
-     ChocoboRaceTerritoryPtr getChocoboRaceTerritory( uint32_t ChocoboRaceTerritoryId );
      using ChocoboTaxiStandPtr =  boost::shared_ptr< ChocoboTaxiStand >;
-     ChocoboTaxiStandPtr getChocoboTaxiStand( uint32_t ChocoboTaxiStandId );
      using ClassJobPtr =  boost::shared_ptr< ClassJob >;
-     ClassJobPtr getClassJob( uint32_t ClassJobId );
      using ClassJobCategoryPtr =  boost::shared_ptr< ClassJobCategory >;
-     ClassJobCategoryPtr getClassJobCategory( uint32_t ClassJobCategoryId );
      using CompanionPtr =  boost::shared_ptr< Companion >;
-     CompanionPtr getCompanion( uint32_t CompanionId );
      using CompanionMovePtr =  boost::shared_ptr< CompanionMove >;
-     CompanionMovePtr getCompanionMove( uint32_t CompanionMoveId );
      using CompanionTransientPtr =  boost::shared_ptr< CompanionTransient >;
-     CompanionTransientPtr getCompanionTransient( uint32_t CompanionTransientId );
      using CompanyActionPtr =  boost::shared_ptr< CompanyAction >;
-     CompanyActionPtr getCompanyAction( uint32_t CompanyActionId );
      using CompanyCraftDraftPtr =  boost::shared_ptr< CompanyCraftDraft >;
-     CompanyCraftDraftPtr getCompanyCraftDraft( uint32_t CompanyCraftDraftId );
      using CompanyCraftDraftCategoryPtr =  boost::shared_ptr< CompanyCraftDraftCategory >;
-     CompanyCraftDraftCategoryPtr getCompanyCraftDraftCategory( uint32_t CompanyCraftDraftCategoryId );
      using CompanyCraftManufactoryStatePtr =  boost::shared_ptr< CompanyCraftManufactoryState >;
-     CompanyCraftManufactoryStatePtr getCompanyCraftManufactoryState( uint32_t CompanyCraftManufactoryStateId );
      using CompanyCraftPartPtr =  boost::shared_ptr< CompanyCraftPart >;
-     CompanyCraftPartPtr getCompanyCraftPart( uint32_t CompanyCraftPartId );
      using CompanyCraftProcessPtr =  boost::shared_ptr< CompanyCraftProcess >;
-     CompanyCraftProcessPtr getCompanyCraftProcess( uint32_t CompanyCraftProcessId );
      using CompanyCraftSequencePtr =  boost::shared_ptr< CompanyCraftSequence >;
-     CompanyCraftSequencePtr getCompanyCraftSequence( uint32_t CompanyCraftSequenceId );
      using CompanyCraftSupplyItemPtr =  boost::shared_ptr< CompanyCraftSupplyItem >;
-     CompanyCraftSupplyItemPtr getCompanyCraftSupplyItem( uint32_t CompanyCraftSupplyItemId );
      using CompanyCraftTypePtr =  boost::shared_ptr< CompanyCraftType >;
-     CompanyCraftTypePtr getCompanyCraftType( uint32_t CompanyCraftTypeId );
      using CompleteJournalPtr =  boost::shared_ptr< CompleteJournal >;
-     CompleteJournalPtr getCompleteJournal( uint32_t CompleteJournalId );
      using CompleteJournalCategoryPtr =  boost::shared_ptr< CompleteJournalCategory >;
-     CompleteJournalCategoryPtr getCompleteJournalCategory( uint32_t CompleteJournalCategoryId );
      using ContentExActionPtr =  boost::shared_ptr< ContentExAction >;
-     ContentExActionPtr getContentExAction( uint32_t ContentExActionId );
      using ContentFinderConditionPtr =  boost::shared_ptr< ContentFinderCondition >;
-     ContentFinderConditionPtr getContentFinderCondition( uint32_t ContentFinderConditionId );
      using ContentFinderConditionTransientPtr =  boost::shared_ptr< ContentFinderConditionTransient >;
-     ContentFinderConditionTransientPtr getContentFinderConditionTransient( uint32_t ContentFinderConditionTransientId );
      using ContentMemberTypePtr =  boost::shared_ptr< ContentMemberType >;
-     ContentMemberTypePtr getContentMemberType( uint32_t ContentMemberTypeId );
      using ContentRoulettePtr =  boost::shared_ptr< ContentRoulette >;
-     ContentRoulettePtr getContentRoulette( uint32_t ContentRouletteId );
      using ContentTypePtr =  boost::shared_ptr< ContentType >;
-     ContentTypePtr getContentType( uint32_t ContentTypeId );
      using CraftActionPtr =  boost::shared_ptr< CraftAction >;
-     CraftActionPtr getCraftAction( uint32_t CraftActionId );
      using CraftLevePtr =  boost::shared_ptr< CraftLeve >;
-     CraftLevePtr getCraftLeve( uint32_t CraftLeveId );
      using CraftTypePtr =  boost::shared_ptr< CraftType >;
-     CraftTypePtr getCraftType( uint32_t CraftTypeId );
      using CurrencyPtr =  boost::shared_ptr< Currency >;
-     CurrencyPtr getCurrency( uint32_t CurrencyId );
      using CustomTalkPtr =  boost::shared_ptr< CustomTalk >;
-     CustomTalkPtr getCustomTalk( uint32_t CustomTalkId );
      using CutscenePtr =  boost::shared_ptr< Cutscene >;
-     CutscenePtr getCutscene( uint32_t CutsceneId );
      using CutScreenImagePtr =  boost::shared_ptr< CutScreenImage >;
-     CutScreenImagePtr getCutScreenImage( uint32_t CutScreenImageId );
      using DailySupplyItemPtr =  boost::shared_ptr< DailySupplyItem >;
-     DailySupplyItemPtr getDailySupplyItem( uint32_t DailySupplyItemId );
      using DeepDungeonBanPtr =  boost::shared_ptr< DeepDungeonBan >;
-     DeepDungeonBanPtr getDeepDungeonBan( uint32_t DeepDungeonBanId );
      using DeepDungeonDangerPtr =  boost::shared_ptr< DeepDungeonDanger >;
-     DeepDungeonDangerPtr getDeepDungeonDanger( uint32_t DeepDungeonDangerId );
      using DeepDungeonEquipmentPtr =  boost::shared_ptr< DeepDungeonEquipment >;
-     DeepDungeonEquipmentPtr getDeepDungeonEquipment( uint32_t DeepDungeonEquipmentId );
      using DeepDungeonFloorEffectUIPtr =  boost::shared_ptr< DeepDungeonFloorEffectUI >;
-     DeepDungeonFloorEffectUIPtr getDeepDungeonFloorEffectUI( uint32_t DeepDungeonFloorEffectUIId );
      using DeepDungeonItemPtr =  boost::shared_ptr< DeepDungeonItem >;
-     DeepDungeonItemPtr getDeepDungeonItem( uint32_t DeepDungeonItemId );
      using DeepDungeonStatusPtr =  boost::shared_ptr< DeepDungeonStatus >;
-     DeepDungeonStatusPtr getDeepDungeonStatus( uint32_t DeepDungeonStatusId );
      using DefaultTalkPtr =  boost::shared_ptr< DefaultTalk >;
-     DefaultTalkPtr getDefaultTalk( uint32_t DefaultTalkId );
      using DeliveryQuestPtr =  boost::shared_ptr< DeliveryQuest >;
-     DeliveryQuestPtr getDeliveryQuest( uint32_t DeliveryQuestId );
      using DisposalShopPtr =  boost::shared_ptr< DisposalShop >;
-     DisposalShopPtr getDisposalShop( uint32_t DisposalShopId );
      using DisposalShopFilterTypePtr =  boost::shared_ptr< DisposalShopFilterType >;
-     DisposalShopFilterTypePtr getDisposalShopFilterType( uint32_t DisposalShopFilterTypeId );
      using DisposalShopItemPtr =  boost::shared_ptr< DisposalShopItem >;
-     DisposalShopItemPtr getDisposalShopItem( uint32_t DisposalShopItemId );
      using DpsChallengePtr =  boost::shared_ptr< DpsChallenge >;
-     DpsChallengePtr getDpsChallenge( uint32_t DpsChallengeId );
      using DpsChallengeOfficerPtr =  boost::shared_ptr< DpsChallengeOfficer >;
-     DpsChallengeOfficerPtr getDpsChallengeOfficer( uint32_t DpsChallengeOfficerId );
      using DpsChallengeTransientPtr =  boost::shared_ptr< DpsChallengeTransient >;
-     DpsChallengeTransientPtr getDpsChallengeTransient( uint32_t DpsChallengeTransientId );
      using EmotePtr =  boost::shared_ptr< Emote >;
-     EmotePtr getEmote( uint32_t EmoteId );
      using EmoteCategoryPtr =  boost::shared_ptr< EmoteCategory >;
-     EmoteCategoryPtr getEmoteCategory( uint32_t EmoteCategoryId );
      using ENpcBasePtr =  boost::shared_ptr< ENpcBase >;
-     ENpcBasePtr getENpcBase( uint32_t ENpcBaseId );
      using ENpcResidentPtr =  boost::shared_ptr< ENpcResident >;
-     ENpcResidentPtr getENpcResident( uint32_t ENpcResidentId );
      using EObjPtr =  boost::shared_ptr< EObj >;
-     EObjPtr getEObj( uint32_t EObjId );
      using EquipRaceCategoryPtr =  boost::shared_ptr< EquipRaceCategory >;
-     EquipRaceCategoryPtr getEquipRaceCategory( uint32_t EquipRaceCategoryId );
      using EquipSlotCategoryPtr =  boost::shared_ptr< EquipSlotCategory >;
-     EquipSlotCategoryPtr getEquipSlotCategory( uint32_t EquipSlotCategoryId );
      using EventActionPtr =  boost::shared_ptr< EventAction >;
-     EventActionPtr getEventAction( uint32_t EventActionId );
      using EventIconPriorityPtr =  boost::shared_ptr< EventIconPriority >;
-     EventIconPriorityPtr getEventIconPriority( uint32_t EventIconPriorityId );
      using EventIconTypePtr =  boost::shared_ptr< EventIconType >;
-     EventIconTypePtr getEventIconType( uint32_t EventIconTypeId );
      using EventItemPtr =  boost::shared_ptr< EventItem >;
-     EventItemPtr getEventItem( uint32_t EventItemId );
      using EventItemHelpPtr =  boost::shared_ptr< EventItemHelp >;
-     EventItemHelpPtr getEventItemHelp( uint32_t EventItemHelpId );
      using ExVersionPtr =  boost::shared_ptr< ExVersion >;
-     ExVersionPtr getExVersion( uint32_t ExVersionId );
      using FatePtr =  boost::shared_ptr< Fate >;
-     FatePtr getFate( uint32_t FateId );
      using FCActivityPtr =  boost::shared_ptr< FCActivity >;
-     FCActivityPtr getFCActivity( uint32_t FCActivityId );
      using FCActivityCategoryPtr =  boost::shared_ptr< FCActivityCategory >;
-     FCActivityCategoryPtr getFCActivityCategory( uint32_t FCActivityCategoryId );
      using FCAuthorityPtr =  boost::shared_ptr< FCAuthority >;
-     FCAuthorityPtr getFCAuthority( uint32_t FCAuthorityId );
      using FCAuthorityCategoryPtr =  boost::shared_ptr< FCAuthorityCategory >;
-     FCAuthorityCategoryPtr getFCAuthorityCategory( uint32_t FCAuthorityCategoryId );
      using FCChestNamePtr =  boost::shared_ptr< FCChestName >;
-     FCChestNamePtr getFCChestName( uint32_t FCChestNameId );
      using FccShopPtr =  boost::shared_ptr< FccShop >;
-     FccShopPtr getFccShop( uint32_t FccShopId );
      using FCHierarchyPtr =  boost::shared_ptr< FCHierarchy >;
-     FCHierarchyPtr getFCHierarchy( uint32_t FCHierarchyId );
      using FCProfilePtr =  boost::shared_ptr< FCProfile >;
-     FCProfilePtr getFCProfile( uint32_t FCProfileId );
      using FCReputationPtr =  boost::shared_ptr< FCReputation >;
-     FCReputationPtr getFCReputation( uint32_t FCReputationId );
      using FCRightsPtr =  boost::shared_ptr< FCRights >;
-     FCRightsPtr getFCRights( uint32_t FCRightsId );
      using FishingSpotPtr =  boost::shared_ptr< FishingSpot >;
-     FishingSpotPtr getFishingSpot( uint32_t FishingSpotId );
      using FishParameterPtr =  boost::shared_ptr< FishParameter >;
-     FishParameterPtr getFishParameter( uint32_t FishParameterId );
      using GardeningSeedPtr =  boost::shared_ptr< GardeningSeed >;
-     GardeningSeedPtr getGardeningSeed( uint32_t GardeningSeedId );
      using GatheringConditionPtr =  boost::shared_ptr< GatheringCondition >;
-     GatheringConditionPtr getGatheringCondition( uint32_t GatheringConditionId );
      using GatheringExpPtr =  boost::shared_ptr< GatheringExp >;
-     GatheringExpPtr getGatheringExp( uint32_t GatheringExpId );
      using GatheringItemPtr =  boost::shared_ptr< GatheringItem >;
-     GatheringItemPtr getGatheringItem( uint32_t GatheringItemId );
      using GatheringItemLevelConvertTablePtr =  boost::shared_ptr< GatheringItemLevelConvertTable >;
-     GatheringItemLevelConvertTablePtr getGatheringItemLevelConvertTable( uint32_t GatheringItemLevelConvertTableId );
      using GatheringItemPointPtr =  boost::shared_ptr< GatheringItemPoint >;
-     GatheringItemPointPtr getGatheringItemPoint( uint32_t GatheringItemPointId );
      using GatheringNotebookListPtr =  boost::shared_ptr< GatheringNotebookList >;
-     GatheringNotebookListPtr getGatheringNotebookList( uint32_t GatheringNotebookListId );
      using GatheringPointPtr =  boost::shared_ptr< GatheringPoint >;
-     GatheringPointPtr getGatheringPoint( uint32_t GatheringPointId );
      using GatheringPointBasePtr =  boost::shared_ptr< GatheringPointBase >;
-     GatheringPointBasePtr getGatheringPointBase( uint32_t GatheringPointBaseId );
      using GatheringPointBonusPtr =  boost::shared_ptr< GatheringPointBonus >;
-     GatheringPointBonusPtr getGatheringPointBonus( uint32_t GatheringPointBonusId );
      using GatheringPointBonusTypePtr =  boost::shared_ptr< GatheringPointBonusType >;
-     GatheringPointBonusTypePtr getGatheringPointBonusType( uint32_t GatheringPointBonusTypeId );
      using GatheringPointNamePtr =  boost::shared_ptr< GatheringPointName >;
-     GatheringPointNamePtr getGatheringPointName( uint32_t GatheringPointNameId );
      using GatheringSubCategoryPtr =  boost::shared_ptr< GatheringSubCategory >;
-     GatheringSubCategoryPtr getGatheringSubCategory( uint32_t GatheringSubCategoryId );
      using GatheringTypePtr =  boost::shared_ptr< GatheringType >;
-     GatheringTypePtr getGatheringType( uint32_t GatheringTypeId );
      using GcArmyExpeditionPtr =  boost::shared_ptr< GcArmyExpedition >;
-     GcArmyExpeditionPtr getGcArmyExpedition( uint32_t GcArmyExpeditionId );
      using GcArmyExpeditionMemberBonusPtr =  boost::shared_ptr< GcArmyExpeditionMemberBonus >;
-     GcArmyExpeditionMemberBonusPtr getGcArmyExpeditionMemberBonus( uint32_t GcArmyExpeditionMemberBonusId );
      using GcArmyExpeditionTypePtr =  boost::shared_ptr< GcArmyExpeditionType >;
-     GcArmyExpeditionTypePtr getGcArmyExpeditionType( uint32_t GcArmyExpeditionTypeId );
      using GcArmyMemberGrowPtr =  boost::shared_ptr< GcArmyMemberGrow >;
-     GcArmyMemberGrowPtr getGcArmyMemberGrow( uint32_t GcArmyMemberGrowId );
      using GcArmyTrainingPtr =  boost::shared_ptr< GcArmyTraining >;
-     GcArmyTrainingPtr getGcArmyTraining( uint32_t GcArmyTrainingId );
      using GCRankGridaniaFemaleTextPtr =  boost::shared_ptr< GCRankGridaniaFemaleText >;
-     GCRankGridaniaFemaleTextPtr getGCRankGridaniaFemaleText( uint32_t GCRankGridaniaFemaleTextId );
      using GCRankGridaniaMaleTextPtr =  boost::shared_ptr< GCRankGridaniaMaleText >;
-     GCRankGridaniaMaleTextPtr getGCRankGridaniaMaleText( uint32_t GCRankGridaniaMaleTextId );
      using GCRankLimsaFemaleTextPtr =  boost::shared_ptr< GCRankLimsaFemaleText >;
-     GCRankLimsaFemaleTextPtr getGCRankLimsaFemaleText( uint32_t GCRankLimsaFemaleTextId );
      using GCRankLimsaMaleTextPtr =  boost::shared_ptr< GCRankLimsaMaleText >;
-     GCRankLimsaMaleTextPtr getGCRankLimsaMaleText( uint32_t GCRankLimsaMaleTextId );
      using GCRankUldahFemaleTextPtr =  boost::shared_ptr< GCRankUldahFemaleText >;
-     GCRankUldahFemaleTextPtr getGCRankUldahFemaleText( uint32_t GCRankUldahFemaleTextId );
      using GCRankUldahMaleTextPtr =  boost::shared_ptr< GCRankUldahMaleText >;
-     GCRankUldahMaleTextPtr getGCRankUldahMaleText( uint32_t GCRankUldahMaleTextId );
      using GCScripShopCategoryPtr =  boost::shared_ptr< GCScripShopCategory >;
-     GCScripShopCategoryPtr getGCScripShopCategory( uint32_t GCScripShopCategoryId );
      using GCScripShopItemPtr =  boost::shared_ptr< GCScripShopItem >;
-     GCScripShopItemPtr getGCScripShopItem( uint32_t GCScripShopItemId );
      using GCShopPtr =  boost::shared_ptr< GCShop >;
-     GCShopPtr getGCShop( uint32_t GCShopId );
      using GCShopItemCategoryPtr =  boost::shared_ptr< GCShopItemCategory >;
-     GCShopItemCategoryPtr getGCShopItemCategory( uint32_t GCShopItemCategoryId );
      using GCSupplyDutyPtr =  boost::shared_ptr< GCSupplyDuty >;
-     GCSupplyDutyPtr getGCSupplyDuty( uint32_t GCSupplyDutyId );
      using GCSupplyDutyRewardPtr =  boost::shared_ptr< GCSupplyDutyReward >;
-     GCSupplyDutyRewardPtr getGCSupplyDutyReward( uint32_t GCSupplyDutyRewardId );
      using GeneralActionPtr =  boost::shared_ptr< GeneralAction >;
-     GeneralActionPtr getGeneralAction( uint32_t GeneralActionId );
      using GilShopPtr =  boost::shared_ptr< GilShop >;
-     GilShopPtr getGilShop( uint32_t GilShopId );
      using GilShopItemPtr =  boost::shared_ptr< GilShopItem >;
-     GilShopItemPtr getGilShopItem( uint32_t GilShopItemId );
      using GoldSaucerTextDataPtr =  boost::shared_ptr< GoldSaucerTextData >;
-     GoldSaucerTextDataPtr getGoldSaucerTextData( uint32_t GoldSaucerTextDataId );
      using GrandCompanyPtr =  boost::shared_ptr< GrandCompany >;
-     GrandCompanyPtr getGrandCompany( uint32_t GrandCompanyId );
      using GrandCompanyRankPtr =  boost::shared_ptr< GrandCompanyRank >;
-     GrandCompanyRankPtr getGrandCompanyRank( uint32_t GrandCompanyRankId );
      using GuardianDeityPtr =  boost::shared_ptr< GuardianDeity >;
-     GuardianDeityPtr getGuardianDeity( uint32_t GuardianDeityId );
      using GuildleveAssignmentPtr =  boost::shared_ptr< GuildleveAssignment >;
-     GuildleveAssignmentPtr getGuildleveAssignment( uint32_t GuildleveAssignmentId );
      using GuildOrderGuidePtr =  boost::shared_ptr< GuildOrderGuide >;
-     GuildOrderGuidePtr getGuildOrderGuide( uint32_t GuildOrderGuideId );
      using GuildOrderOfficerPtr =  boost::shared_ptr< GuildOrderOfficer >;
-     GuildOrderOfficerPtr getGuildOrderOfficer( uint32_t GuildOrderOfficerId );
      using HouseRetainerPosePtr =  boost::shared_ptr< HouseRetainerPose >;
-     HouseRetainerPosePtr getHouseRetainerPose( uint32_t HouseRetainerPoseId );
      using HousingFurniturePtr =  boost::shared_ptr< HousingFurniture >;
-     HousingFurniturePtr getHousingFurniture( uint32_t HousingFurnitureId );
      using HousingYardObjectPtr =  boost::shared_ptr< HousingYardObject >;
-     HousingYardObjectPtr getHousingYardObject( uint32_t HousingYardObjectId );
      using InstanceContentPtr =  boost::shared_ptr< InstanceContent >;
-     InstanceContentPtr getInstanceContent( uint32_t InstanceContentId );
      using InstanceContentBuffPtr =  boost::shared_ptr< InstanceContentBuff >;
-     InstanceContentBuffPtr getInstanceContentBuff( uint32_t InstanceContentBuffId );
      using InstanceContentTextDataPtr =  boost::shared_ptr< InstanceContentTextData >;
-     InstanceContentTextDataPtr getInstanceContentTextData( uint32_t InstanceContentTextDataId );
      using InstanceContentTypePtr =  boost::shared_ptr< InstanceContentType >;
-     InstanceContentTypePtr getInstanceContentType( uint32_t InstanceContentTypeId );
      using ItemPtr =  boost::shared_ptr< Item >;
-     ItemPtr getItem( uint32_t ItemId );
      using ItemActionPtr =  boost::shared_ptr< ItemAction >;
-     ItemActionPtr getItemAction( uint32_t ItemActionId );
      using ItemFoodPtr =  boost::shared_ptr< ItemFood >;
-     ItemFoodPtr getItemFood( uint32_t ItemFoodId );
      using ItemSearchCategoryPtr =  boost::shared_ptr< ItemSearchCategory >;
-     ItemSearchCategoryPtr getItemSearchCategory( uint32_t ItemSearchCategoryId );
      using ItemSeriesPtr =  boost::shared_ptr< ItemSeries >;
-     ItemSeriesPtr getItemSeries( uint32_t ItemSeriesId );
      using ItemSpecialBonusPtr =  boost::shared_ptr< ItemSpecialBonus >;
-     ItemSpecialBonusPtr getItemSpecialBonus( uint32_t ItemSpecialBonusId );
      using ItemUICategoryPtr =  boost::shared_ptr< ItemUICategory >;
-     ItemUICategoryPtr getItemUICategory( uint32_t ItemUICategoryId );
      using JournalCategoryPtr =  boost::shared_ptr< JournalCategory >;
-     JournalCategoryPtr getJournalCategory( uint32_t JournalCategoryId );
      using JournalGenrePtr =  boost::shared_ptr< JournalGenre >;
-     JournalGenrePtr getJournalGenre( uint32_t JournalGenreId );
      using JournalSectionPtr =  boost::shared_ptr< JournalSection >;
-     JournalSectionPtr getJournalSection( uint32_t JournalSectionId );
      using LevePtr =  boost::shared_ptr< Leve >;
-     LevePtr getLeve( uint32_t LeveId );
      using LeveAssignmentTypePtr =  boost::shared_ptr< LeveAssignmentType >;
-     LeveAssignmentTypePtr getLeveAssignmentType( uint32_t LeveAssignmentTypeId );
      using LeveClientPtr =  boost::shared_ptr< LeveClient >;
-     LeveClientPtr getLeveClient( uint32_t LeveClientId );
      using LevelPtr =  boost::shared_ptr< Level >;
-     LevelPtr getLevel( uint32_t LevelId );
      using LeveRewardItemPtr =  boost::shared_ptr< LeveRewardItem >;
-     LeveRewardItemPtr getLeveRewardItem( uint32_t LeveRewardItemId );
      using LeveRewardItemGroupPtr =  boost::shared_ptr< LeveRewardItemGroup >;
-     LeveRewardItemGroupPtr getLeveRewardItemGroup( uint32_t LeveRewardItemGroupId );
      using LeveVfxPtr =  boost::shared_ptr< LeveVfx >;
-     LeveVfxPtr getLeveVfx( uint32_t LeveVfxId );
      using LogFilterPtr =  boost::shared_ptr< LogFilter >;
-     LogFilterPtr getLogFilter( uint32_t LogFilterId );
      using LogKindPtr =  boost::shared_ptr< LogKind >;
-     LogKindPtr getLogKind( uint32_t LogKindId );
      using LogKindCategoryTextPtr =  boost::shared_ptr< LogKindCategoryText >;
-     LogKindCategoryTextPtr getLogKindCategoryText( uint32_t LogKindCategoryTextId );
      using LogMessagePtr =  boost::shared_ptr< LogMessage >;
-     LogMessagePtr getLogMessage( uint32_t LogMessageId );
      using MacroIconPtr =  boost::shared_ptr< MacroIcon >;
-     MacroIconPtr getMacroIcon( uint32_t MacroIconId );
      using MacroIconRedirectOldPtr =  boost::shared_ptr< MacroIconRedirectOld >;
-     MacroIconRedirectOldPtr getMacroIconRedirectOld( uint32_t MacroIconRedirectOldId );
      using MainCommandPtr =  boost::shared_ptr< MainCommand >;
-     MainCommandPtr getMainCommand( uint32_t MainCommandId );
      using MainCommandCategoryPtr =  boost::shared_ptr< MainCommandCategory >;
-     MainCommandCategoryPtr getMainCommandCategory( uint32_t MainCommandCategoryId );
      using MapPtr =  boost::shared_ptr< Map >;
-     MapPtr getMap( uint32_t MapId );
      using MapMarkerPtr =  boost::shared_ptr< MapMarker >;
-     MapMarkerPtr getMapMarker( uint32_t MapMarkerId );
      using MapSymbolPtr =  boost::shared_ptr< MapSymbol >;
-     MapSymbolPtr getMapSymbol( uint32_t MapSymbolId );
      using MasterpieceSupplyDutyPtr =  boost::shared_ptr< MasterpieceSupplyDuty >;
-     MasterpieceSupplyDutyPtr getMasterpieceSupplyDuty( uint32_t MasterpieceSupplyDutyId );
      using MasterpieceSupplyMultiplierPtr =  boost::shared_ptr< MasterpieceSupplyMultiplier >;
-     MasterpieceSupplyMultiplierPtr getMasterpieceSupplyMultiplier( uint32_t MasterpieceSupplyMultiplierId );
      using MateriaPtr =  boost::shared_ptr< Materia >;
-     MateriaPtr getMateria( uint32_t MateriaId );
      using MinionRacePtr =  boost::shared_ptr< MinionRace >;
-     MinionRacePtr getMinionRace( uint32_t MinionRaceId );
      using MinionRulesPtr =  boost::shared_ptr< MinionRules >;
-     MinionRulesPtr getMinionRules( uint32_t MinionRulesId );
      using MinionSkillTypePtr =  boost::shared_ptr< MinionSkillType >;
-     MinionSkillTypePtr getMinionSkillType( uint32_t MinionSkillTypeId );
      using MobHuntTargetPtr =  boost::shared_ptr< MobHuntTarget >;
-     MobHuntTargetPtr getMobHuntTarget( uint32_t MobHuntTargetId );
      using ModelCharaPtr =  boost::shared_ptr< ModelChara >;
-     ModelCharaPtr getModelChara( uint32_t ModelCharaId );
      using MonsterNotePtr =  boost::shared_ptr< MonsterNote >;
-     MonsterNotePtr getMonsterNote( uint32_t MonsterNoteId );
      using MonsterNoteTargetPtr =  boost::shared_ptr< MonsterNoteTarget >;
-     MonsterNoteTargetPtr getMonsterNoteTarget( uint32_t MonsterNoteTargetId );
      using MountPtr =  boost::shared_ptr< Mount >;
-     MountPtr getMount( uint32_t MountId );
      using MountActionPtr =  boost::shared_ptr< MountAction >;
-     MountActionPtr getMountAction( uint32_t MountActionId );
      using NpcEquipPtr =  boost::shared_ptr< NpcEquip >;
-     NpcEquipPtr getNpcEquip( uint32_t NpcEquipId );
      using OmenPtr =  boost::shared_ptr< Omen >;
-     OmenPtr getOmen( uint32_t OmenId );
      using OnlineStatusPtr =  boost::shared_ptr< OnlineStatus >;
-     OnlineStatusPtr getOnlineStatus( uint32_t OnlineStatusId );
      using OpeningPtr =  boost::shared_ptr< Opening >;
-     OpeningPtr getOpening( uint32_t OpeningId );
      using OrchestrionPtr =  boost::shared_ptr< Orchestrion >;
-     OrchestrionPtr getOrchestrion( uint32_t OrchestrionId );
+     using OrchestrionCategoryPtr =  boost::shared_ptr< OrchestrionCategory >;
      using OrchestrionPathPtr =  boost::shared_ptr< OrchestrionPath >;
-     OrchestrionPathPtr getOrchestrionPath( uint32_t OrchestrionPathId );
+     using OrchestrionUiparamPtr =  boost::shared_ptr< OrchestrionUiparam >;
      using ParamGrowPtr =  boost::shared_ptr< ParamGrow >;
-     ParamGrowPtr getParamGrow( uint32_t ParamGrowId );
      using PetPtr =  boost::shared_ptr< Pet >;
-     PetPtr getPet( uint32_t PetId );
      using PetActionPtr =  boost::shared_ptr< PetAction >;
-     PetActionPtr getPetAction( uint32_t PetActionId );
      using PicturePtr =  boost::shared_ptr< Picture >;
-     PicturePtr getPicture( uint32_t PictureId );
      using PlaceNamePtr =  boost::shared_ptr< PlaceName >;
-     PlaceNamePtr getPlaceName( uint32_t PlaceNameId );
      using QuestPtr =  boost::shared_ptr< Quest >;
-     QuestPtr getQuest( uint32_t QuestId );
      using QuestRewardOtherPtr =  boost::shared_ptr< QuestRewardOther >;
-     QuestRewardOtherPtr getQuestRewardOther( uint32_t QuestRewardOtherId );
+     using QuickChatPtr =  boost::shared_ptr< QuickChat >;
+     using QuickChatTransientPtr =  boost::shared_ptr< QuickChatTransient >;
      using RacePtr =  boost::shared_ptr< Race >;
-     RacePtr getRace( uint32_t RaceId );
      using RacingChocoboItemPtr =  boost::shared_ptr< RacingChocoboItem >;
-     RacingChocoboItemPtr getRacingChocoboItem( uint32_t RacingChocoboItemId );
      using RacingChocoboNamePtr =  boost::shared_ptr< RacingChocoboName >;
-     RacingChocoboNamePtr getRacingChocoboName( uint32_t RacingChocoboNameId );
      using RacingChocoboNameCategoryPtr =  boost::shared_ptr< RacingChocoboNameCategory >;
-     RacingChocoboNameCategoryPtr getRacingChocoboNameCategory( uint32_t RacingChocoboNameCategoryId );
      using RacingChocoboNameInfoPtr =  boost::shared_ptr< RacingChocoboNameInfo >;
-     RacingChocoboNameInfoPtr getRacingChocoboNameInfo( uint32_t RacingChocoboNameInfoId );
      using RacingChocoboParamPtr =  boost::shared_ptr< RacingChocoboParam >;
-     RacingChocoboParamPtr getRacingChocoboParam( uint32_t RacingChocoboParamId );
      using RecipePtr =  boost::shared_ptr< Recipe >;
-     RecipePtr getRecipe( uint32_t RecipeId );
      using RecipeElementPtr =  boost::shared_ptr< RecipeElement >;
-     RecipeElementPtr getRecipeElement( uint32_t RecipeElementId );
      using RecipeLevelTablePtr =  boost::shared_ptr< RecipeLevelTable >;
-     RecipeLevelTablePtr getRecipeLevelTable( uint32_t RecipeLevelTableId );
      using RecipeNotebookListPtr =  boost::shared_ptr< RecipeNotebookList >;
-     RecipeNotebookListPtr getRecipeNotebookList( uint32_t RecipeNotebookListId );
      using RelicPtr =  boost::shared_ptr< Relic >;
-     RelicPtr getRelic( uint32_t RelicId );
      using Relic3Ptr =  boost::shared_ptr< Relic3 >;
-     Relic3Ptr getRelic3( uint32_t Relic3Id );
      using RelicItemPtr =  boost::shared_ptr< RelicItem >;
-     RelicItemPtr getRelicItem( uint32_t RelicItemId );
      using RelicNotePtr =  boost::shared_ptr< RelicNote >;
-     RelicNotePtr getRelicNote( uint32_t RelicNoteId );
      using RelicNoteCategoryPtr =  boost::shared_ptr< RelicNoteCategory >;
-     RelicNoteCategoryPtr getRelicNoteCategory( uint32_t RelicNoteCategoryId );
      using RetainerTaskPtr =  boost::shared_ptr< RetainerTask >;
-     RetainerTaskPtr getRetainerTask( uint32_t RetainerTaskId );
      using RetainerTaskNormalPtr =  boost::shared_ptr< RetainerTaskNormal >;
-     RetainerTaskNormalPtr getRetainerTaskNormal( uint32_t RetainerTaskNormalId );
      using RetainerTaskParameterPtr =  boost::shared_ptr< RetainerTaskParameter >;
-     RetainerTaskParameterPtr getRetainerTaskParameter( uint32_t RetainerTaskParameterId );
      using RetainerTaskRandomPtr =  boost::shared_ptr< RetainerTaskRandom >;
-     RetainerTaskRandomPtr getRetainerTaskRandom( uint32_t RetainerTaskRandomId );
      using SalvagePtr =  boost::shared_ptr< Salvage >;
-     SalvagePtr getSalvage( uint32_t SalvageId );
      using SatisfactionNpcPtr =  boost::shared_ptr< SatisfactionNpc >;
-     SatisfactionNpcPtr getSatisfactionNpc( uint32_t SatisfactionNpcId );
      using SatisfactionSupplyPtr =  boost::shared_ptr< SatisfactionSupply >;
-     SatisfactionSupplyPtr getSatisfactionSupply( uint32_t SatisfactionSupplyId );
      using SatisfactionSupplyRewardPtr =  boost::shared_ptr< SatisfactionSupplyReward >;
-     SatisfactionSupplyRewardPtr getSatisfactionSupplyReward( uint32_t SatisfactionSupplyRewardId );
      using ScreenImagePtr =  boost::shared_ptr< ScreenImage >;
-     ScreenImagePtr getScreenImage( uint32_t ScreenImageId );
      using SecretRecipeBookPtr =  boost::shared_ptr< SecretRecipeBook >;
-     SecretRecipeBookPtr getSecretRecipeBook( uint32_t SecretRecipeBookId );
      using SpearfishingItemPtr =  boost::shared_ptr< SpearfishingItem >;
-     SpearfishingItemPtr getSpearfishingItem( uint32_t SpearfishingItemId );
      using SpearfishingNotebookPtr =  boost::shared_ptr< SpearfishingNotebook >;
-     SpearfishingNotebookPtr getSpearfishingNotebook( uint32_t SpearfishingNotebookId );
      using SpecialShopPtr =  boost::shared_ptr< SpecialShop >;
-     SpecialShopPtr getSpecialShop( uint32_t SpecialShopId );
      using SpecialShopItemCategoryPtr =  boost::shared_ptr< SpecialShopItemCategory >;
-     SpecialShopItemCategoryPtr getSpecialShopItemCategory( uint32_t SpecialShopItemCategoryId );
      using StainPtr =  boost::shared_ptr< Stain >;
-     StainPtr getStain( uint32_t StainId );
      using StatusPtr =  boost::shared_ptr< Status >;
-     StatusPtr getStatus( uint32_t StatusId );
      using StoryPtr =  boost::shared_ptr< Story >;
-     StoryPtr getStory( uint32_t StoryId );
+     using SubmarineExplorationPtr =  boost::shared_ptr< SubmarineExploration >;
+     using SubmarinePartPtr =  boost::shared_ptr< SubmarinePart >;
+     using SubmarineRankPtr =  boost::shared_ptr< SubmarineRank >;
      using SwitchTalkPtr =  boost::shared_ptr< SwitchTalk >;
-     SwitchTalkPtr getSwitchTalk( uint32_t SwitchTalkId );
      using TerritoryTypePtr =  boost::shared_ptr< TerritoryType >;
-     TerritoryTypePtr getTerritoryType( uint32_t TerritoryTypeId );
      using TextCommandPtr =  boost::shared_ptr< TextCommand >;
-     TextCommandPtr getTextCommand( uint32_t TextCommandId );
      using TitlePtr =  boost::shared_ptr< Title >;
-     TitlePtr getTitle( uint32_t TitleId );
      using TomestonesPtr =  boost::shared_ptr< Tomestones >;
-     TomestonesPtr getTomestones( uint32_t TomestonesId );
      using TomestonesItemPtr =  boost::shared_ptr< TomestonesItem >;
-     TomestonesItemPtr getTomestonesItem( uint32_t TomestonesItemId );
      using TopicSelectPtr =  boost::shared_ptr< TopicSelect >;
-     TopicSelectPtr getTopicSelect( uint32_t TopicSelectId );
      using TownPtr =  boost::shared_ptr< Town >;
-     TownPtr getTown( uint32_t TownId );
      using TraitPtr =  boost::shared_ptr< Trait >;
-     TraitPtr getTrait( uint32_t TraitId );
      using TraitRecastPtr =  boost::shared_ptr< TraitRecast >;
-     TraitRecastPtr getTraitRecast( uint32_t TraitRecastId );
      using TraitTransientPtr =  boost::shared_ptr< TraitTransient >;
-     TraitTransientPtr getTraitTransient( uint32_t TraitTransientId );
+     using TreasureHuntRankPtr =  boost::shared_ptr< TreasureHuntRank >;
      using TribePtr =  boost::shared_ptr< Tribe >;
-     TribePtr getTribe( uint32_t TribeId );
      using TripleTriadPtr =  boost::shared_ptr< TripleTriad >;
-     TripleTriadPtr getTripleTriad( uint32_t TripleTriadId );
      using TripleTriadCardPtr =  boost::shared_ptr< TripleTriadCard >;
-     TripleTriadCardPtr getTripleTriadCard( uint32_t TripleTriadCardId );
      using TripleTriadCardRarityPtr =  boost::shared_ptr< TripleTriadCardRarity >;
-     TripleTriadCardRarityPtr getTripleTriadCardRarity( uint32_t TripleTriadCardRarityId );
      using TripleTriadCardResidentPtr =  boost::shared_ptr< TripleTriadCardResident >;
-     TripleTriadCardResidentPtr getTripleTriadCardResident( uint32_t TripleTriadCardResidentId );
      using TripleTriadCardTypePtr =  boost::shared_ptr< TripleTriadCardType >;
-     TripleTriadCardTypePtr getTripleTriadCardType( uint32_t TripleTriadCardTypeId );
      using TripleTriadCompetitionPtr =  boost::shared_ptr< TripleTriadCompetition >;
-     TripleTriadCompetitionPtr getTripleTriadCompetition( uint32_t TripleTriadCompetitionId );
      using TripleTriadRulePtr =  boost::shared_ptr< TripleTriadRule >;
-     TripleTriadRulePtr getTripleTriadRule( uint32_t TripleTriadRuleId );
      using TutorialPtr =  boost::shared_ptr< Tutorial >;
-     TutorialPtr getTutorial( uint32_t TutorialId );
      using TutorialDPSPtr =  boost::shared_ptr< TutorialDPS >;
-     TutorialDPSPtr getTutorialDPS( uint32_t TutorialDPSId );
      using TutorialHealerPtr =  boost::shared_ptr< TutorialHealer >;
-     TutorialHealerPtr getTutorialHealer( uint32_t TutorialHealerId );
      using TutorialTankPtr =  boost::shared_ptr< TutorialTank >;
-     TutorialTankPtr getTutorialTank( uint32_t TutorialTankId );
      using WarpPtr =  boost::shared_ptr< Warp >;
-     WarpPtr getWarp( uint32_t WarpId );
      using WeatherPtr =  boost::shared_ptr< Weather >;
-     WeatherPtr getWeather( uint32_t WeatherId );
      using WeatherGroupPtr =  boost::shared_ptr< WeatherGroup >;
-     WeatherGroupPtr getWeatherGroup( uint32_t WeatherGroupId );
      using WeatherRatePtr =  boost::shared_ptr< WeatherRate >;
-     WeatherRatePtr getWeatherRate( uint32_t WeatherRateId );
      using WeeklyBingoOrderDataPtr =  boost::shared_ptr< WeeklyBingoOrderData >;
-     WeeklyBingoOrderDataPtr getWeeklyBingoOrderData( uint32_t WeeklyBingoOrderDataId );
      using WeeklyBingoRewardDataPtr =  boost::shared_ptr< WeeklyBingoRewardData >;
-     WeeklyBingoRewardDataPtr getWeeklyBingoRewardData( uint32_t WeeklyBingoRewardDataId );
      using WeeklyBingoTextPtr =  boost::shared_ptr< WeeklyBingoText >;
-     WeeklyBingoTextPtr getWeeklyBingoText( uint32_t WeeklyBingoTextId );
      using WorldDCGroupTypePtr =  boost::shared_ptr< WorldDCGroupType >;
-     WorldDCGroupTypePtr getWorldDCGroupType( uint32_t WorldDCGroupTypeId );
+
+     template< class T >
+     boost::shared_ptr< T > get( uint32_t id )
+     {
+        try
+        {
+           auto info = boost::make_shared< T >( id, this );
+           return info;
+        }
+        catch( ... )
+        {
+           return nullptr;
+        }
+        return nullptr;
+     }
 
 
      std::set< uint32_t > m_AchievementIdList;
@@ -4521,7 +4353,9 @@ struct WorldDCGroupType
      std::set< uint32_t > m_OnlineStatusIdList;
      std::set< uint32_t > m_OpeningIdList;
      std::set< uint32_t > m_OrchestrionIdList;
+     std::set< uint32_t > m_OrchestrionCategoryIdList;
      std::set< uint32_t > m_OrchestrionPathIdList;
+     std::set< uint32_t > m_OrchestrionUiparamIdList;
      std::set< uint32_t > m_ParamGrowIdList;
      std::set< uint32_t > m_PetIdList;
      std::set< uint32_t > m_PetActionIdList;
@@ -4529,6 +4363,8 @@ struct WorldDCGroupType
      std::set< uint32_t > m_PlaceNameIdList;
      std::set< uint32_t > m_QuestIdList;
      std::set< uint32_t > m_QuestRewardOtherIdList;
+     std::set< uint32_t > m_QuickChatIdList;
+     std::set< uint32_t > m_QuickChatTransientIdList;
      std::set< uint32_t > m_RaceIdList;
      std::set< uint32_t > m_RacingChocoboItemIdList;
      std::set< uint32_t > m_RacingChocoboNameIdList;
@@ -4561,6 +4397,9 @@ struct WorldDCGroupType
      std::set< uint32_t > m_StainIdList;
      std::set< uint32_t > m_StatusIdList;
      std::set< uint32_t > m_StoryIdList;
+     std::set< uint32_t > m_SubmarineExplorationIdList;
+     std::set< uint32_t > m_SubmarinePartIdList;
+     std::set< uint32_t > m_SubmarineRankIdList;
      std::set< uint32_t > m_SwitchTalkIdList;
      std::set< uint32_t > m_TerritoryTypeIdList;
      std::set< uint32_t > m_TextCommandIdList;
@@ -4572,6 +4411,7 @@ struct WorldDCGroupType
      std::set< uint32_t > m_TraitIdList;
      std::set< uint32_t > m_TraitRecastIdList;
      std::set< uint32_t > m_TraitTransientIdList;
+     std::set< uint32_t > m_TreasureHuntRankIdList;
      std::set< uint32_t > m_TribeIdList;
      std::set< uint32_t > m_TripleTriadIdList;
      std::set< uint32_t > m_TripleTriadCardIdList;
@@ -5956,11 +5796,23 @@ const std::set< uint32_t >& getOrchestrionIdList()
       loadIdList( m_OrchestrionDat, m_OrchestrionIdList );
    return m_OrchestrionIdList;
 }
+const std::set< uint32_t >& getOrchestrionCategoryIdList()
+{
+   if( m_OrchestrionCategoryIdList.size() == 0 )
+      loadIdList( m_OrchestrionCategoryDat, m_OrchestrionCategoryIdList );
+   return m_OrchestrionCategoryIdList;
+}
 const std::set< uint32_t >& getOrchestrionPathIdList()
 {
    if( m_OrchestrionPathIdList.size() == 0 )
       loadIdList( m_OrchestrionPathDat, m_OrchestrionPathIdList );
    return m_OrchestrionPathIdList;
+}
+const std::set< uint32_t >& getOrchestrionUiparamIdList()
+{
+   if( m_OrchestrionUiparamIdList.size() == 0 )
+      loadIdList( m_OrchestrionUiparamDat, m_OrchestrionUiparamIdList );
+   return m_OrchestrionUiparamIdList;
 }
 const std::set< uint32_t >& getParamGrowIdList()
 {
@@ -6003,6 +5855,18 @@ const std::set< uint32_t >& getQuestRewardOtherIdList()
    if( m_QuestRewardOtherIdList.size() == 0 )
       loadIdList( m_QuestRewardOtherDat, m_QuestRewardOtherIdList );
    return m_QuestRewardOtherIdList;
+}
+const std::set< uint32_t >& getQuickChatIdList()
+{
+   if( m_QuickChatIdList.size() == 0 )
+      loadIdList( m_QuickChatDat, m_QuickChatIdList );
+   return m_QuickChatIdList;
+}
+const std::set< uint32_t >& getQuickChatTransientIdList()
+{
+   if( m_QuickChatTransientIdList.size() == 0 )
+      loadIdList( m_QuickChatTransientDat, m_QuickChatTransientIdList );
+   return m_QuickChatTransientIdList;
 }
 const std::set< uint32_t >& getRaceIdList()
 {
@@ -6196,6 +6060,24 @@ const std::set< uint32_t >& getStoryIdList()
       loadIdList( m_StoryDat, m_StoryIdList );
    return m_StoryIdList;
 }
+const std::set< uint32_t >& getSubmarineExplorationIdList()
+{
+   if( m_SubmarineExplorationIdList.size() == 0 )
+      loadIdList( m_SubmarineExplorationDat, m_SubmarineExplorationIdList );
+   return m_SubmarineExplorationIdList;
+}
+const std::set< uint32_t >& getSubmarinePartIdList()
+{
+   if( m_SubmarinePartIdList.size() == 0 )
+      loadIdList( m_SubmarinePartDat, m_SubmarinePartIdList );
+   return m_SubmarinePartIdList;
+}
+const std::set< uint32_t >& getSubmarineRankIdList()
+{
+   if( m_SubmarineRankIdList.size() == 0 )
+      loadIdList( m_SubmarineRankDat, m_SubmarineRankIdList );
+   return m_SubmarineRankIdList;
+}
 const std::set< uint32_t >& getSwitchTalkIdList()
 {
    if( m_SwitchTalkIdList.size() == 0 )
@@ -6261,6 +6143,12 @@ const std::set< uint32_t >& getTraitTransientIdList()
    if( m_TraitTransientIdList.size() == 0 )
       loadIdList( m_TraitTransientDat, m_TraitTransientIdList );
    return m_TraitTransientIdList;
+}
+const std::set< uint32_t >& getTreasureHuntRankIdList()
+{
+   if( m_TreasureHuntRankIdList.size() == 0 )
+      loadIdList( m_TreasureHuntRankDat, m_TreasureHuntRankIdList );
+   return m_TreasureHuntRankIdList;
 }
 const std::set< uint32_t >& getTribeIdList()
 {

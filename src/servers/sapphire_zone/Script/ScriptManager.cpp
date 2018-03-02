@@ -154,7 +154,7 @@ bool Core::Scripting::ScriptManager::onTalk( Entity::Player& player, uint64_t ac
    // aethernet/aetherytes need to be handled separately
    if( eventType == Event::EventHandler::EventHandlerType::Aetheryte )
    {
-      auto aetherInfo = g_exdDataGen.getAetheryte( eventId & 0xFFFF );
+      auto aetherInfo = g_exdDataGen.get< Core::Data::Aetheryte >( eventId & 0xFFFF );
       scriptId = EVENTSCRIPT_AETHERYTE_ID;
       if( !aetherInfo->isAetheryte )
          scriptId = EVENTSCRIPT_AETHERNET_ID;
@@ -332,10 +332,34 @@ bool Core::Scripting::ScriptManager::onStatusTimeOut( Entity::ActorPtr pActor, u
 
 bool Core::Scripting::ScriptManager::onZoneInit( ZonePtr pZone )
 {
-   auto script = m_nativeScriptManager->getScript< ZoneScript >(pZone->getTerritoryId() );
+   auto script = m_nativeScriptManager->getScript< ZoneScript >( pZone->getTerritoryId() );
    if( script )
    {
       script->onZoneInit();
+      return true;
+   }
+
+   return false;
+}
+
+bool Core::Scripting::ScriptManager::onInstanceInit( InstanceContent& instance )
+{
+   auto script = m_nativeScriptManager->getScript< InstanceContentScript >( instance.getInstanceContentId() );
+   if( script )
+   {
+      script->onInit( instance );
+      return true;
+   }
+
+   return false;
+}
+
+bool Core::Scripting::ScriptManager::onInstanceUpdate( InstanceContent& instance, uint32_t currTime )
+{
+   auto script = m_nativeScriptManager->getScript< InstanceContentScript >( instance.getInstanceContentId() );
+   if( script )
+   {
+      script->onUpdate( instance, currTime );
       return true;
    }
 

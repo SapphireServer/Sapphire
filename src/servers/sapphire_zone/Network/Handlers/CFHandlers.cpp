@@ -14,8 +14,13 @@
 #include "Actor/Player.h"
 
 #include "Forwards.h"
+#include <common/Exd/ExdDataGenerated.h>
+#include "Zone/TerritoryMgr.h"
+#include "Zone/Zone.h"
 
 extern Core::Logger g_log;
+extern Core::Data::ExdDataGenerated g_exdDataGen;
+extern Core::TerritoryMgr g_territoryMgr;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -46,24 +51,36 @@ void Core::Network::GameConnection::cfRegisterDuty( const Packets::GamePacket& i
                                                     Entity::Player& player)
 {
    // TODO use for loop for this
-   auto contentId1 = inPacket.getValAt< uint16_t >( 46 );
-   auto contentId2 = inPacket.getValAt< uint16_t >( 48 );
-   auto contentId3 = inPacket.getValAt< uint16_t >( 50 );
-   auto contentId4 = inPacket.getValAt< uint16_t >( 52 );
-   auto contentId5 = inPacket.getValAt< uint16_t >( 54 );
+   auto contentId1 = inPacket.getValAt< uint16_t >( 0x2E );
+   auto contentId2 = inPacket.getValAt< uint16_t >( 0x30 );
+   auto contentId3 = inPacket.getValAt< uint16_t >( 0x32 );
+   auto contentId4 = inPacket.getValAt< uint16_t >( 0x34 );
+   auto contentId5 = inPacket.getValAt< uint16_t >( 0x36 );
 
    player.sendDebug("Duty register request");
-   player.sendDebug("ContentId1" + std::to_string(contentId1));
-   player.sendDebug("ContentId2" + std::to_string(contentId2));
-   player.sendDebug("ContentId3" + std::to_string(contentId3));
-   player.sendDebug("ContentId4" + std::to_string(contentId4));
-   player.sendDebug("ContentId5" + std::to_string(contentId5));
+   player.sendDebug("ContentId1: " + std::to_string(contentId1));
+   player.sendDebug("ContentId2: " + std::to_string(contentId2));
+   player.sendDebug("ContentId3: " + std::to_string(contentId3));
+   player.sendDebug("ContentId4: " + std::to_string(contentId4));
+   player.sendDebug("ContentId5: " + std::to_string(contentId5));
 
    // let's cancel it because otherwise you can't register it again
    ZoneChannelPacket< FFXIVIpcCFNotify > cfCancelPacket( player.getId() );
    cfCancelPacket.data().state1 = 3;
    cfCancelPacket.data().state2 = 1; // Your registration is withdrawn.
    queueOutPacket( cfCancelPacket );
+
+   auto cfCondition = g_exdDataGen.get< Core::Data::ContentFinderCondition >( contentId1 );
+   if( !cfCondition )
+      return;
+
+   auto instance = g_territoryMgr.createInstanceContent( cfCondition->instanceContent );
+   if( !instance )
+      return;
+
+   player.sendDebug( "Created instance with id: " + std::to_string( instance->getGuId() ) );
+
+   player.setInstance( instance );
 }
 
 void Core::Network::GameConnection::cfRegisterRoulette( const Packets::GamePacket& inPacket,

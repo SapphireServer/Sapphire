@@ -26,7 +26,7 @@ Core::Action::ActionTeleport::ActionTeleport( Entity::ActorPtr pActor, uint16_t 
    m_startTime = 0;
    m_id = 5;
    m_handleActionType = HandleActionType::Teleport;
-   m_castTime = g_exdDataGen.getAction( 5 )->cast100ms * 100; // TODO: Add security checks.
+   m_castTime = g_exdDataGen.get< Core::Data::Action >( 5 )->cast100ms * 100; // TODO: Add security checks.
    m_pSource = pActor;
    m_bInterrupt = false;
    m_targetAetheryte = targetZone;

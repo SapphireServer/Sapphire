@@ -67,5 +67,5 @@ private:
 };
 
 }
-}
+};
 #endif /* ! _SOCIALMGR_H  */

@@ -58,7 +58,7 @@ using namespace Core::Network::Packets::Server;
 
 // player constructor
 Core::Entity::Player::Player() :
-   Actor(),
+   Actor( ObjKind::Player ),
    m_lastWrite( 0 ),
    m_lastPing( 0 ),
    m_bIsLogin( false ),
@@ -75,10 +75,10 @@ Core::Entity::Player::Player() :
    m_zoningType( Common::ZoneingType::None ),
    m_bAutoattack( false ),
    m_markedForRemoval( false ),
-   m_mount( 0 )
+   m_mount( 0 ),
+   m_directorInitialized( false )
 {
    m_id = 0;
-   m_objKind = ObjKind::Player;
    m_currentStance = Stance::Passive;
    m_onlineStatus = 0;
    m_queuedZoneing = nullptr;
@@ -95,7 +95,6 @@ Core::Entity::Player::Player() :
 
 Core::Entity::Player::~Player()
 {
-   g_log.debug( "PlayerObj destroyed" );
 }
 
 // TODO: add a proper calculation based on race / job / level / gear
@@ -216,9 +215,9 @@ void Core::Entity::Player::calculateStats()
    uint8_t level = getLevel();
    uint8_t job = static_cast< uint8_t >( getClass() );
 
-   auto classInfo = g_exdDataGen.getClassJob( job );
-   auto tribeInfo = g_exdDataGen.getTribe( tribe );
-   auto paramGrowthInfo = g_exdDataGen.getParamGrow( level );
+   auto classInfo = g_exdDataGen.get< Core::Data::ClassJob >( job );
+   auto tribeInfo = g_exdDataGen.get< Core::Data::Tribe >( tribe );
+   auto paramGrowthInfo = g_exdDataGen.get< Core::Data::ParamGrow >( level );
 
    // TODO: put formula somewhere else...
    float base = Math::CalcStats::calculateBaseStat( getAsPlayer() );
@@ -301,7 +300,7 @@ uint64_t Core::Entity::Player::getFriendsListId() const
 
 void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
 {
-   auto data = g_exdDataGen.getAetheryte( aetheryteId );
+   auto data = g_exdDataGen.get< Core::Data::Aetheryte >( aetheryteId );
 
    if( data == nullptr )
    {
@@ -310,7 +309,7 @@ void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
 
    setStateFlag( PlayerStateFlag::BetweenAreas );
 
-   auto z_pos = g_territoryMgr.getTerritoryPosition( data->destination );
+   auto z_pos = g_territoryMgr.getTerritoryPosition( data->territory );
 
    Common::FFXIVARR_POSITION3 pos;
    pos.x = 0;
@@ -324,7 +323,8 @@ void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
       rot = z_pos->getTargetRotation();
    }
 
-   sendDebug( "Teleport: " + g_exdDataGen.getPlaceName( data->placeName )->name + " " + g_exdDataGen.getPlaceName( data->aethernetName )->name +
+   sendDebug( "Teleport: " + g_exdDataGen.get< Core::Data::PlaceName >( data->placeName )->name + " " +
+                             g_exdDataGen.get< Core::Data::PlaceName >( data->aethernetName )->name +
                "(" + std::to_string( data->territory ) + ")" );
 
    // TODO: this should be simplified and a type created in server_common/common.h.
@@ -503,7 +503,7 @@ void Core::Entity::Player::discover( int16_t map_id, int16_t sub_id )
 
    int32_t offset = 4;
 
-   auto info = g_exdDataGen.getMap( g_exdDataGen.getTerritoryType( getCurrentZone()->getTerritoryId() )->map );
+   auto info = g_exdDataGen.get< Core::Data::Map >( g_exdDataGen.get< Core::Data::TerritoryType >( getCurrentZone()->getTerritoryId() )->map );
    if( info->discoveryArrayByte )
       offset = 4 + 2 * info->discoveryIndex;
    else
@@ -518,7 +518,7 @@ void Core::Entity::Player::discover( int16_t map_id, int16_t sub_id )
 
    uint16_t level = getLevel();
 
-   uint32_t exp = ( g_exdDataGen.getParamGrow( level )->expToNext * 5 / 100 );
+   uint32_t exp = ( g_exdDataGen.get< Core::Data::ParamGrow >( level )->expToNext * 5 / 100 );
 
    gainExp( exp );
 
@@ -595,9 +595,9 @@ void Core::Entity::Player::gainExp( uint32_t amount )
 
    uint16_t level = getLevel();
 
-   uint32_t neededExpToLevel = g_exdDataGen.getParamGrow( level )->expToNext;
+   uint32_t neededExpToLevel = g_exdDataGen.get< Core::Data::ParamGrow >( level )->expToNext;
 
-   uint32_t neededExpToLevelplus1 = g_exdDataGen.getParamGrow( level + 1 )->expToNext;
+   uint32_t neededExpToLevelplus1 = g_exdDataGen.get< Core::Data::ParamGrow >( level + 1 )->expToNext;
 
    queuePacket( ActorControlPacket143( getId(), GainExpMsg, static_cast< uint8_t >( getClass() ), amount ) );
 
@@ -629,8 +629,8 @@ void Core::Entity::Player::gainExp( uint32_t amount )
 
 void Core::Entity::Player::gainLevel()
 {
-   setLevel( getLevel() + 1 );
 
+   setLevel( getLevel() + 1 );
    calculateStats();
    sendStats();
    sendStatusUpdate();
@@ -661,6 +661,12 @@ void Core::Entity::Player::gainLevel()
    classInfoPacket.data().currentExp = getExp();
    queuePacket( classInfoPacket );
 
+
+
+
+
+
+
 }
 
 void Core::Entity::Player::unlock()
@@ -670,52 +676,30 @@ void Core::Entity::Player::unlock()
 
 void Core::Entity::Player::sendStatusUpdate( bool toSelf )
 {
-   //   CGamePacket* pPE = new CGamePacket(0x140, 0x0128, getId(), getId());
-
-   //pPE->setInt8At(0x20, static_cast<uint8_t>(getClass()));
-
-   //   pPE->setInt8At(0x21, getLevel());
-   //   pPE->setInt8At(0x22, getLevel());
-
-   //   // current exp
-   //   pPE->setInt32At(0x28, getExp());
-
-   //   // rested exp
-   //   //pPE->setInt32At(0x2C, m_hp);
-
-   //   pPE->setInt32At(0x24, m_hp);
-   //   pPE->setInt32At(0x28, getMaxHp());
-   //   pPE->setInt16At(0x2C, m_mp);
-   //   pPE->setInt16At(0x2E, getMaxMp());
-   //   pPE->setInt16At(0x30, m_tp);
-
-   //   sendToInRangeSet(pPE, toSelf);
-
-   sendToInRangeSet( UpdateHpMpTpPacket( shared_from_this() ), true );
-
+   sendToInRangeSet( UpdateHpMpTpPacket( *this ), true );
 }
 
 uint8_t Core::Entity::Player::getLevel() const
 {
-   uint8_t classJobIndex = g_exdDataGen.getClassJob( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
+   uint8_t classJobIndex = g_exdDataGen.get< Core::Data::ClassJob >( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
    return static_cast< uint8_t >( m_classArray[classJobIndex] );
 }
 
 uint8_t Core::Entity::Player::getLevelForClass( Common::ClassJob pClass ) const
 {
-   uint8_t classJobIndex = g_exdDataGen.getClassJob( static_cast< uint8_t >( pClass ) )->expArrayIndex;
+   uint8_t classJobIndex = g_exdDataGen.get< Core::Data::ClassJob >( static_cast< uint8_t >( pClass ) )->expArrayIndex;
    return static_cast< uint8_t >( m_classArray[classJobIndex] );
 }
 
 uint32_t Core::Entity::Player::getExp() const
 {
-   uint8_t classJobIndex = g_exdDataGen.getClassJob( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
+   uint8_t classJobIndex = g_exdDataGen.get< Core::Data::ClassJob >( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
    return m_expArray[classJobIndex];
 }
 
 void Core::Entity::Player::setExp( uint32_t amount )
 {
-   uint8_t classJobIndex = g_exdDataGen.getClassJob( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
+   uint8_t classJobIndex = g_exdDataGen.get< Core::Data::ClassJob >( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
    m_expArray[classJobIndex] = amount;
 }
 
@@ -755,13 +739,13 @@ void Core::Entity::Player::setClassJob( Common::ClassJob classJob )
 
 void Core::Entity::Player::setLevel( uint8_t level )
 {
-   uint8_t classJobIndex = g_exdDataGen.getClassJob( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
+   uint8_t classJobIndex = g_exdDataGen.get< Core::Data::ClassJob >( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
    m_classArray[classJobIndex] = level;
 }
 
 void Core::Entity::Player::setLevelForClass( uint8_t level, Common::ClassJob classjob )
 {
-   uint8_t classJobIndex = g_exdDataGen.getClassJob( static_cast< uint8_t >( classjob ) )->expArrayIndex;
+   uint8_t classJobIndex = g_exdDataGen.get< Core::Data::ClassJob >( static_cast< uint8_t >( classjob ) )->expArrayIndex;
 
    if( m_classArray[classJobIndex] == 0 )
       insertDbClass( classJobIndex );
@@ -844,9 +828,9 @@ void Core::Entity::Player::spawn( Entity::PlayerPtr pTarget )
 }
 
 // despawn
-void Core::Entity::Player::despawn( Entity::ActorPtr pTarget )
+void Core::Entity::Player::despawn( Entity::PlayerPtr pTarget )
 {
-   auto pPlayer = pTarget->getAsPlayer();
+   auto pPlayer = pTarget;
 
    pPlayer->freePlayerSpawnId( getId() );
 
@@ -911,7 +895,7 @@ const uint8_t* Core::Entity::Player::getStateFlags() const
 
 bool Core::Entity::Player::actionHasCastTime( uint32_t actionId ) //TODO: Add logic for special cases
 {
-   auto actionInfoPtr = g_exdDataGen.getAction( actionId );
+   auto actionInfoPtr = g_exdDataGen.get< Core::Data::Action >( actionId );
    if( actionInfoPtr->preservesCombo )
       return false;
 
@@ -1454,7 +1438,7 @@ void Core::Entity::Player::autoAttack( ActorPtr pTarget )
    auto mainWeap = m_pInventory->getItemAt( Inventory::GearSet0,
                                             Inventory::EquipSlot::MainHand );
 
-   pTarget->onActionHostile( shared_from_this() );
+   pTarget->onActionHostile( *this );
    //uint64_t tick = Util::getTimeMs();
    //srand(static_cast< uint32_t >(tick));
 
@@ -1591,8 +1575,8 @@ void Player::sendZonePackets()
    }
 
    // set flags, will be reset automatically by zoning ( only on client side though )
-   setStateFlag( PlayerStateFlag::BetweenAreas );
-   setStateFlag( PlayerStateFlag::BetweenAreas1 );
+   //setStateFlag( PlayerStateFlag::BetweenAreas );
+   //setStateFlag( PlayerStateFlag::BetweenAreas1 );
 
    sendStats();
 
@@ -1644,5 +1628,17 @@ void Player::sendZonePackets()
    if( getLastPing() == 0 )
       sendQuestInfo();
 
+   getCurrentZone()->onEnterTerritory( *this );
+
    m_bMarkedForZoning = false;
+}
+
+void Player::setDirectorInitialized( bool isInitialized )
+{
+   m_directorInitialized = isInitialized;
+}
+
+bool Player::isDirectorInitialized() const
+{
+   return m_directorInitialized;
 }

@@ -1,7 +1,6 @@
 #include <common/Util/Util.h>
 #include <common/Util/UtilMath.h>
 #include <common/Network/PacketContainer.h>
-#include <common/Exd/ExdData.h>
 #include <common/Exd/ExdDataGenerated.h>
 #include <common/Network/GamePacket.h>
 
@@ -23,15 +22,18 @@
 #include "Math/CalcBattle.h"
 #include "Actor.h"
 #include "Player.h"
+#include "Zone/TerritoryMgr.h"
 
 extern Core::ServerZone g_serverZone;
 extern Core::Data::ExdDataGenerated g_exdDataGen;
+extern Core::TerritoryMgr g_territoryMgr;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-Core::Entity::Actor::Actor()
+Core::Entity::Actor::Actor( ObjKind type ) :
+   GameObject( type )
 {
    // initialize the free slot queue
    for( uint8_t i = 0; i < MAX_STATUS_EFFECTS; i++ )
@@ -44,51 +46,22 @@ Core::Entity::Actor::~Actor()
 {
 }
 
-/*! \return the id of the actor */
-uint32_t Core::Entity::Actor::getId() const
-{
-   return m_id;
-}
-
-/*! \return the actors position object */
-Core::Common::FFXIVARR_POSITION3& Core::Entity::Actor::getPos()
-{
-   return m_pos;
-}
 /*! \return the actors name */
 std::string Core::Entity::Actor::getName() const
 {
    return std::string( m_name );
 }
 
-/*! \return true if the actor is of type player */
-bool Core::Entity::Actor::isPlayer() const
-{
-   return m_objKind == ObjKind::Player;
-}
-
-/*! \return true if the actor is of type mob */
-bool Core::Entity::Actor::isMob() const
-{
-   return m_objKind == ObjKind::BattleNpc;
-}
-
-/*! \return true if the actor is of type resident */
-bool Core::Entity::Actor::isEventNpc() const
-{
-   return m_objKind == ObjKind::EventNpc;
-}
-
 /*! \return list of actors currently in range */
 std::set< Core::Entity::ActorPtr > Core::Entity::Actor::getInRangeActors( bool includeSelf )
 {
-    auto tempInRange = m_inRangeActors;
+   auto tempInRange = m_inRangeActors;
 
-    if( includeSelf )
-        tempInRange.insert( shared_from_this() );
+   if( includeSelf )
+      tempInRange.insert( getAsActor() );
 
-    return tempInRange;
-}
+   return tempInRange;
+   }
 
 /*! \return current stance of the actors */
 Core::Entity::Actor::Stance Core::Entity::Actor::getStance() const
@@ -285,7 +258,7 @@ Sets the actors position and notifies the zone to propagate the change
 void Core::Entity::Actor::setPosition( const Common::FFXIVARR_POSITION3& pos )
 {
    m_pos = pos;
-   m_pCurrentZone->changeActorPosition( shared_from_this() );
+   m_pCurrentZone->updateActorPosition( *this );
 }
 
 void Core::Entity::Actor::setPosition( float x, float y, float z )
@@ -293,7 +266,7 @@ void Core::Entity::Actor::setPosition( float x, float y, float z )
    m_pos.x = x;
    m_pos.y = y;
    m_pos.z = z;
-   m_pCurrentZone->changeActorPosition( shared_from_this() );
+   m_pCurrentZone->updateActorPosition( *this );
 }
 
 /*!
@@ -336,9 +309,7 @@ Change the current target and propagate to in range players
 void Core::Entity::Actor::changeTarget( uint64_t targetId )
 {
    setTargetId( targetId );
-
-   sendToInRangeSet( ActorControlPacket144( m_id, SetTarget,
-                                            0, 0, 0, 0, targetId ) );
+   sendToInRangeSet( ActorControlPacket144( m_id, SetTarget, 0, 0, 0, 0, targetId ) );
 }
 
 /*!
@@ -409,26 +380,8 @@ so players can have their own version and we can abolish the param.
 */
 void Core::Entity::Actor::sendStatusUpdate( bool toSelf )
 {
-   UpdateHpMpTpPacket updateHpPacket( shared_from_this() );
+   UpdateHpMpTpPacket updateHpPacket( *this );
    sendToInRangeSet( updateHpPacket );
-}
-
-/*! \return pointer to this instance as PlayerPtr */
-Core::Entity::PlayerPtr Core::Entity::Actor::getAsPlayer()
-{
-   return boost::dynamic_pointer_cast< Entity::Player, Entity::Actor >( shared_from_this() );
-}
-
-/*! \return pointer to this instance as BattleNpcPtr */
-Core::Entity::BattleNpcPtr Core::Entity::Actor::getAsBattleNpc()
-{
-   return boost::reinterpret_pointer_cast< Entity::BattleNpc, Entity::Actor >( shared_from_this() );
-}
-
-/*! \return pointer to this instance as EventNpcPtr */
-Core::Entity::EventNpcPtr Core::Entity::Actor::getAsEventNpc()
-{
-   return boost::reinterpret_pointer_cast< Entity::EventNpc, Entity::Actor >( shared_from_this() );
 }
 
 /*! \return ActionPtr of the currently registered action, or nullptr */
@@ -540,39 +493,29 @@ void Core::Entity::Actor::addInRangeActor( ActorPtr pActor )
       // if actor is a player, add it to the in range player set
       m_inRangePlayers.insert( pPlayer );
    }
-
-   m_inRangeActorMap[pActor->getId()] = pActor;
 }
 
 /*!
-Remove a given actor from the fitting in range set according to type
+Remove a given actor from the matching in range set according to type
 but also to the global actor map
 
 \param ActorPtr to remove
 */
-void Core::Entity::Actor::removeInRangeActor( ActorPtr pActor )
+void Core::Entity::Actor::removeInRangeActor( Actor& actor )
 {
-   // if this is null, something went wrong
-   assert( pActor );
-
    // call virtual event
-   onRemoveInRangeActor( pActor );
+   onRemoveInRangeActor( actor );
 
    // remove actor from in range actor set
-   m_inRangeActors.erase( pActor );
+   m_inRangeActors.erase( actor.getAsActor() );
 
    // if actor is a player, despawn ourself for him
    // TODO: move to virtual onRemove?
    if( isPlayer() )
-      pActor->despawn( shared_from_this() );
+      actor.despawn( getAsPlayer() );
 
-   if( pActor->isPlayer() )
-   {
-      auto pPlayer = pActor->getAsPlayer();
-      m_inRangePlayers.erase( pPlayer );
-   }
-
-   m_inRangeActorMap.erase( pActor->getId() );
+   if( actor.isPlayer() )
+      m_inRangePlayers.erase( actor.getAsPlayer() );
 }
 
 /*! \return true if there is at least one actor in the in range set */
@@ -581,12 +524,57 @@ bool Core::Entity::Actor::hasInRangeActor() const
    return ( m_inRangeActors.size() > 0 );
 }
 
+void Core::Entity::Actor::removeFromInRange()
+{
+   if( !hasInRangeActor() )
+      return;
+
+   Entity::ActorPtr pCurAct;
+
+   for( auto& pCurAct : m_inRangeActors )
+   {
+      pCurAct->removeInRangeActor( *this );
+   }
+
+}
+
+void Core::Entity::Actor::checkInRangeActors()
+{
+   if( hasInRangeActor() )
+   {
+      Entity::ActorPtr pCurAct;
+
+      float fRange = 70.0f;
+      for( auto iter = m_inRangeActors.begin(); iter != m_inRangeActors.end();)
+      {
+         pCurAct = *iter;
+         auto iter2 = iter++;
+
+         float distance = Math::Util::distance( pCurAct->getPos().x, pCurAct->getPos().y, pCurAct->getPos().z,
+                                                getPos().x, getPos().y, getPos().z );
+
+         if( fRange > 0.0f && distance > fRange )
+         {
+            pCurAct->removeInRangeActor( *this );
+
+            if( getCurrentZone() != pCurAct->getCurrentZone() )
+               return;
+
+            removeInRangeActor( **iter2 );
+
+            // @TODO FIXME!
+            // this break is more or less a hack, iteration will break otherwise after removing
+            break;
+         }
+      }
+   }
+}
+
 /*! Clear the whole in range set, this does no cleanup */
 void Core::Entity::Actor::clearInRangeSet()
 {
    m_inRangeActors.clear();
    m_inRangePlayers.clear();
-   m_inRangeActorMap.clear();
 }
 
 /*! \return ZonePtr to the current zone, nullptr if not set */
@@ -637,7 +625,7 @@ void Core::Entity::Actor::autoAttack( ActorPtr pTarget )
 
    if( ( tick - m_lastAttack ) > 2500 )
    {
-      pTarget->onActionHostile( shared_from_this() );
+      pTarget->onActionHostile( *this );
       m_lastAttack = tick;
       srand( static_cast< uint32_t >( tick ) );
 
@@ -674,29 +662,29 @@ ChaiScript Skill Handler.
 \param bool should be send to self?
 */
 void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, uint64_t param1,
-                                             uint64_t param2, Entity::Actor& pTarget )
+                                             uint64_t param2, Entity::Actor& target )
 {
 
    if( isPlayer() )
    {
-      getAsPlayer()->sendDebug( std::to_string( pTarget.getId() ) );
+      getAsPlayer()->sendDebug( std::to_string( target.getId() ) );
       getAsPlayer()->sendDebug( "Handle script skill type: " + std::to_string( type ) );
    }
 
-   auto actionInfoPtr = g_exdDataGen.getAction( actionId );
+   auto actionInfoPtr = g_exdDataGen.get< Core::Data::Action >( actionId );
 
    // Todo: Effect packet generator. 90% of this is basically setting params and it's basically unreadable.
    // Prepare packet. This is seemingly common for all packets in the action handler.
 
    ZoneChannelPacket< FFXIVIpcEffect > effectPacket( getId() );
-   effectPacket.data().targetId = pTarget.getId();
+   effectPacket.data().targetId = target.getId();
    effectPacket.data().actionAnimationId = actionId;
    effectPacket.data().unknown_62 = 1; // Affects displaying action name next to number in floating text
    effectPacket.data().unknown_2 = 1;  // This seems to have an effect on the "double-cast finish" animation
    effectPacket.data().actionTextId = actionId;
    effectPacket.data().numEffects = 1;
    effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRotation() );
-   effectPacket.data().effectTarget = pTarget.getId();
+   effectPacket.data().effectTarget = target.getId();
 
    // Todo: for each actor, calculate how much damage the calculated value should deal to them - 2-step damage calc. we only have 1-step
    switch( type )
@@ -712,21 +700,21 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
       if( actionInfoPtr->castType == 1 && actionInfoPtr->effectRange != 0 || actionInfoPtr->castType != 1 )
       {
          // If action on this specific target is valid...
-         if ( isPlayer() && !ActionCollision::isActorApplicable( pTarget.shared_from_this(), TargetFilter::Enemies ) )
+         if ( isPlayer() && !ActionCollision::isActorApplicable( target, TargetFilter::Enemies ) )
             break;
 
          sendToInRangeSet( effectPacket, true );
 
-         if ( pTarget.isAlive() )
-            pTarget.onActionHostile( shared_from_this() );
+         if ( target.isAlive() )
+            target.onActionHostile( *this );
 
-         pTarget.takeDamage( static_cast< uint32_t >( param1 ) );
+         target.takeDamage( static_cast< uint32_t >( param1 ) );
 
       }
       else
       {
 
-         auto actorsCollided = ActionCollision::getActorsHitFromAction( pTarget.getPos(), getInRangeActors( true ),
+         auto actorsCollided = ActionCollision::getActorsHitFromAction( target.getPos(), getInRangeActors( true ),
                                                                         actionInfoPtr, TargetFilter::Enemies );
 
          for( const auto& pHitActor : actorsCollided )
@@ -739,7 +727,7 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
 
 
             if( pHitActor->isAlive() )
-               pHitActor->onActionHostile( shared_from_this() );
+               pHitActor->onActionHostile( *this );
 
             pHitActor->takeDamage( static_cast< uint32_t >( param1 ) );
 
@@ -767,23 +755,23 @@ void Core::Entity::Actor::handleScriptSkill( uint32_t type, uint16_t actionId, u
 
       if( actionInfoPtr->castType == 1 && actionInfoPtr->effectRange != 0 || actionInfoPtr->castType != 1 )
       {
-         if( isPlayer() && !ActionCollision::isActorApplicable( pTarget.shared_from_this(), TargetFilter::Allies ) )
+         if( isPlayer() && !ActionCollision::isActorApplicable( target, TargetFilter::Allies ) )
             break;
 
          sendToInRangeSet( effectPacket, true );
-         pTarget.heal( calculatedHeal );
+         target.heal( calculatedHeal );
       }
       else
       {
          // todo: get proper packets: the following was just kind of thrown together from what we know.
          // atm buggy (packets look "delayed" from client)
 
-         auto actorsCollided = ActionCollision::getActorsHitFromAction( pTarget.getPos(), getInRangeActors( true ),
+         auto actorsCollided = ActionCollision::getActorsHitFromAction( target.getPos(), getInRangeActors( true ),
                                                                         actionInfoPtr, TargetFilter::Allies );
 
          for( auto pHitActor : actorsCollided )
          {
-            effectPacket.data().targetId = pTarget.getId();
+            effectPacket.data().targetId = target.getId();
             effectPacket.data().effectTarget = pHitActor->getId();
 
             sendToInRangeSet( effectPacket, true );
@@ -837,22 +825,20 @@ void Core::Entity::Actor::addStatusEffect( StatusEffect::StatusEffectPtr pEffect
 }
 
 /*! \param StatusEffectPtr to be applied to the actor */
-void Core::Entity::Actor::addStatusEffectById( uint32_t id, int32_t duration, Entity::Actor& pSource, uint16_t param )
+void Core::Entity::Actor::addStatusEffectById( uint32_t id, int32_t duration, Entity::Actor& source, uint16_t param )
 {
-   StatusEffect::StatusEffectPtr effect( new StatusEffect::StatusEffect( id, pSource.shared_from_this(),
-                                                                         shared_from_this(), duration, 3000 ) );
+   auto effect = StatusEffect::make_StatusEffect( id, source.getAsActor(), getAsActor(), duration, 3000 );
    effect->setParam( param );
    addStatusEffect( effect );
 }
 
 /*! \param StatusEffectPtr to be applied to the actor */
-void Core::Entity::Actor::addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Actor& pSource, uint16_t param )
+void Core::Entity::Actor::addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Actor& source, uint16_t param )
 {
    if( hasStatusEffect( id ) )
       return;
 
-   StatusEffect::StatusEffectPtr effect( new StatusEffect::StatusEffect( id, pSource.shared_from_this(),
-                                                                         shared_from_this(), duration, 3000 ) );
+   auto effect = StatusEffect::make_StatusEffect( id, source.getAsActor(), getAsActor(), duration, 3000 );
    effect->setParam( param );
    addStatusEffect( effect );
 

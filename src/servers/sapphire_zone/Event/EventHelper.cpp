@@ -17,7 +17,7 @@ std::string Core::Event::getEventName( uint32_t eventId )
    {
    case Event::EventHandler::EventHandlerType::Quest:
    {
-      auto questInfo = g_exdDataGen.getQuest( eventId );
+      auto questInfo = g_exdDataGen.get< Core::Data::Quest >( eventId );
       if( !questInfo )
          return unknown + "Quest";
 
@@ -28,7 +28,7 @@ std::string Core::Event::getEventName( uint32_t eventId )
    }
    case Event::EventHandler::EventHandlerType::CustomTalk:
    {
-      auto customTalkInfo = g_exdDataGen.getCustomTalk( eventId );
+      auto customTalkInfo = g_exdDataGen.get< Core::Data::CustomTalk >( eventId );
       if( !customTalkInfo )
          return unknown + "CustomTalk";
 
@@ -39,14 +39,14 @@ std::string Core::Event::getEventName( uint32_t eventId )
    }
    case Event::EventHandler::EventHandlerType::Opening:
    {
-      auto openingInfo = g_exdDataGen.getOpening( eventId );
+      auto openingInfo = g_exdDataGen.get< Core::Data::Opening >( eventId );
       if( openingInfo )
          return openingInfo->name;
       return unknown + "Opening";
    }
    case Event::EventHandler::EventHandlerType::Aetheryte:
    {
-      auto aetherInfo = g_exdDataGen.getAetheryte( eventId & 0xFFFF );
+      auto aetherInfo = g_exdDataGen.get< Core::Data::Aetheryte >( eventId & 0xFFFF );
       if( aetherInfo->isAetheryte )
          return "Aetheryte";
       return "Aethernet";
@@ -65,7 +65,7 @@ std::string Core::Event::getEventName( uint32_t eventId )
 
 uint32_t Core::Event::mapEventActorToRealActor( uint32_t eventActorId )
 {
-   auto levelInfo = g_exdDataGen.getLevel( eventActorId );
+   auto levelInfo = g_exdDataGen.get< Core::Data::Level >( eventActorId );
    if( levelInfo )
       return levelInfo->objectKey;
 

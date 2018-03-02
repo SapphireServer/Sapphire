@@ -5,7 +5,6 @@
 #include <cmath>
 
 #include <common/Logging/Logger.h>
-#include <common/Exd/ExdData.h>
 #include <common/Util/Util.h>
 #include <common/Util/UtilMath.h>
 
@@ -21,14 +20,13 @@ using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
 extern Core::Logger g_log;
-extern Core::Data::ExdData g_exdData;
 
 uint32_t Core::Entity::EventNpc::m_nextID = 1249241694;
 
-Core::Entity::EventNpc::EventNpc()
+Core::Entity::EventNpc::EventNpc() :
+   Actor( ObjKind::EventNpc )
 {
    m_id = 0;
-   m_objKind = ObjKind::EventNpc;
    m_status = ActorStatus::Idle;
 }
 
@@ -37,15 +35,14 @@ Core::Entity::EventNpc::~EventNpc()
 
 }
 
-Core::Entity::EventNpc::EventNpc( uint32_t enpcId, const Common::FFXIVARR_POSITION3& spawnPos, float rotation ) : Actor()
+Core::Entity::EventNpc::EventNpc( uint32_t enpcId, const Common::FFXIVARR_POSITION3& spawnPos, float rotation ) :
+   Actor( ObjKind::EventNpc )
 {
    EventNpc::m_nextID++;
    m_id = EventNpc::m_nextID;
 
    m_pos = spawnPos;
    m_posOrigin = spawnPos;
-
-   m_objKind = ObjKind::EventNpc;
 
    m_targetId = static_cast< uint64_t >( INVALID_GAME_OBJECT_ID );
 
@@ -70,7 +67,8 @@ Core::Entity::EventNpc::EventNpc( uint32_t enpcId, const Common::FFXIVARR_POSITI
 }
 
 // spawn this player for pTarget
-// TODO: Retail additionally sends Look+Models for EventNpcs even though it is not needed, add when the new exd reader is implemented(also counts for BNPCs)
+/*! TODO: Retail additionally sends Look+Models for EventNpcs even though it is not needed,
+          add when the new exd reader is implemented(also counts for BNPCs) */
 void Core::Entity::EventNpc::spawn( PlayerPtr pTarget )
 {
    ZoneChannelPacket< FFXIVIpcNpcSpawn > spawnPacket( getId(), pTarget->getId() );
@@ -96,16 +94,12 @@ void Core::Entity::EventNpc::spawn( PlayerPtr pTarget )
 }
 
 // despawn
-void Core::Entity::EventNpc::despawn( ActorPtr pTarget )
+void Core::Entity::EventNpc::despawn( PlayerPtr pTarget )
 {
-
-   auto pPlayer = pTarget->getAsPlayer();
-
-   pPlayer->freePlayerSpawnId( getId() );
+   pTarget->freePlayerSpawnId( getId() );
 
    ActorControlPacket143 controlPacket( m_id, DespawnZoneScreenMsg, 0x04, getId(), 0x01 );
-   pPlayer->queuePacket( controlPacket );
-
+   pTarget->queuePacket( controlPacket );
 }
 
 uint8_t Core::Entity::EventNpc::getLevel() const

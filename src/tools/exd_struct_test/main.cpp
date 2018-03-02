@@ -25,8 +25,8 @@ Core::Logger g_log;
 Core::Data::ExdDataGenerated g_exdData;
 
 
-//const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
-const std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv" );
+const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
+//const std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv" );
 
 
 int main()
@@ -41,14 +41,16 @@ int main()
       return 0;
    }
 
+   
+   g_log.info( "getting id list " );
    auto idList = g_exdData.getTerritoryTypeIdList();
 
+   g_log.info( "getting id list done" );
    for( auto id : idList )
    {
-      auto teri1 = g_exdData.getTerritoryType( id );
+      auto teri1 = g_exdData.get<Core::Data::TerritoryType>( id );
 
       g_log.info( teri1->name );
-      g_log.info( teri1->bg );
    }
 
    return 0;

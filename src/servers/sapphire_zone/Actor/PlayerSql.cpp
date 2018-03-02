@@ -60,7 +60,40 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
    m_prevZoneId = res->getUInt( "OTerritoryId" );
    m_prevZoneType = res->getUInt( "OTerritoryType" );
 
-   ZonePtr pCurrZone = g_territoryMgr.getZoneByTerriId( zoneId );
+   // Position
+   m_pos.x = res->getFloat( "PosX" );
+   m_pos.y = res->getFloat( "PosY" );
+   m_pos.z = res->getFloat( "PosZ" );
+   setRotation( res->getFloat( "PosR" ) );
+
+   m_prevPos.x = res->getFloat( "OPosX" );
+   m_prevPos.y = res->getFloat( "OPosY" );
+   m_prevPos.z = res->getFloat( "OPosZ" );
+   m_prevRot = res->getFloat( "OPosR" );
+
+   ZonePtr pCurrZone = nullptr;
+
+   // if the zone is an instanceContent zone, we need to actually find the instance
+   if( g_territoryMgr.isInstanceContentTerritory( zoneId ) )
+   {
+      // try to find an instance actually linked to this player
+      pCurrZone = g_territoryMgr.getLinkedInstance( m_id );
+      // if none found, revert to previous zone and position
+      if( !pCurrZone )
+      {
+         zoneId = m_prevZoneId;
+         m_pos.x = m_prevPos.x;
+         m_pos.y = m_prevPos.y;
+         m_pos.z = m_prevPos.z;
+         setRotation( m_prevRot );
+         pCurrZone = g_territoryMgr.getZoneByTerriId( zoneId );
+      }
+   }
+   else
+   {
+      pCurrZone = g_territoryMgr.getZoneByTerriId( zoneId );
+   }
+
    m_zoneId = zoneId;
 
    // TODO: logic for instances needs to be added here
@@ -86,20 +119,8 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
    m_mp = res->getUInt( "Mp" );
    m_tp = 0;
 
-   // Position
-
-   m_pos.x = res->getFloat( "PosX" );
-   m_pos.y = res->getFloat( "PosY" );
-   m_pos.z = res->getFloat( "PosZ" );
-   setRotation( res->getFloat( "PosR" ) );
-
-   m_prevPos.x = res->getFloat( "OPosX" );
-   m_prevPos.y = res->getFloat( "OPosY" );
-   m_prevPos.z = res->getFloat( "OPosZ" );
-   m_prevRot = res->getFloat( "OPosR" );
 
    // Model
-
    auto custom = res->getBlobVector( "Customize" );
    memcpy( reinterpret_cast< char* >( m_customize ), custom.data(), custom.size() );
 
@@ -181,11 +202,10 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
    m_modelSubWeapon = 0;
    m_lastTickTime = 0;
 
-   auto pPlayer = getAsPlayer();
    // TODO: remove Inventory and actually inline it in Player class
-   m_pInventory = InventoryPtr( new Inventory( pPlayer.get() ) );
+   m_pInventory = make_Inventory( this );
 
-   pPlayer->calculateStats();
+   calculateStats();
 
    // first login, run the script event
    if( m_bNewGame )
@@ -218,6 +238,9 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
 
    if( !m_playerIdToSpawnIdMap.empty() )
       m_playerIdToSpawnIdMap.clear();
+
+   if( !g_territoryMgr.movePlayer( pCurrZone, getAsPlayer() ) )
+      return false;
 
    return true;
 }
@@ -433,7 +456,7 @@ void Core::Entity::Player::updateSql()
 
 void Core::Entity::Player::updateDbClass() const
 {
-   uint8_t classJobIndex = g_exdDataGen.getClassJob( static_cast<uint8_t>( getClass() ) )->expArrayIndex;
+   uint8_t classJobIndex = g_exdDataGen.get< Core::Data::ClassJob >( static_cast<uint8_t>( getClass() ) )->expArrayIndex;
 
    //Exp = ?, Lvl = ? WHERE CharacterId = ? AND ClassIdx = ?
    auto stmtS = g_charaDb.getPreparedStatement( Db::CHARA_CLASS_UP );
