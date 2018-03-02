@@ -48,7 +48,7 @@ public:
    TerritoryMgr& getTerritoryMgr();
    LinkshellMgr& getLinkshellMgr();
    Db::DbWorkerPool< Db::CharaDbConnection >& getCharaDb();
-   ServerZone& Framework::getServerZone();
+   ServerZone& getServerZone();
 
 };
 
