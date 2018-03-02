@@ -111,7 +111,7 @@ bool Core::TerritoryMgr::createDefaultTerritories()
          continue;
 
       uint32_t guid = getNextInstanceId();
-      g_framework.getLogger.info( std::to_string( territoryId ) +
+      g_framework.getLogger().info( std::to_string( territoryId ) +
                                         "\t" + std::to_string( guid ) +
                                         "\t" + std::to_string( territoryInfo->territoryIntendedUse ) +
                                         "\t" + territoryInfo->name +

@@ -1,13 +1,12 @@
-#include <boost/format.hpp>
-#include <boost/algorithm/string/predicate.hpp>
-#include <boost/filesystem.hpp>
-
+#include "ScriptLoader.h"
 
 #include <common/Logging/Logger.h>
 #include <common/Config/XMLConfig.h>
-
-#include "ScriptLoader.h"
 #include "Framework.h"
+
+#include <boost/format.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/filesystem.hpp>
 
 extern Core::Framework g_framework;
 
@@ -68,7 +67,7 @@ Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::loadModule( const st
    }
    catch ( const boost::filesystem::filesystem_error& err )
    {
-      g_log.error( "Error copying file to cache: " + err.code().message() );
+      g_framework.getLogger().error( "Error copying file to cache: " + err.code().message() );
 
       return nullptr;
    }

@@ -38,6 +38,7 @@
 #include "Framework.h"
 
 Core::Framework g_framework;
+Core::Logger g_log;
 
 Core::ServerZone::ServerZone( const std::string& configPath )
    : m_configPath( configPath ),
@@ -197,6 +198,7 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
    g_framework.getLogger().setLogPath( "log/SapphireZone_" );
    g_framework.getLogger().init();
 
+   g_log = g_framework.getLogger();
    
 
    if( !loadSettings( argc, argv ) )
