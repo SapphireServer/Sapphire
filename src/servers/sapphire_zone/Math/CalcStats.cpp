@@ -39,7 +39,7 @@ float CalcStats::calculateBaseStat( PlayerPtr pPlayer )
    uint8_t level = pPlayer->getLevel();
 
    // SB Base Stat Formula  (Aligned)
-   if ( level > 60 )
+   if( level > 60 )
    { 
       base = static_cast< float >( ( ( ( level == 61 ) ? 224 : 220 ) + ( level - 61 ) * 8) );
    }
@@ -65,7 +65,7 @@ uint32_t CalcStats::calculateMaxHp( PlayerPtr pPlayer )
    auto classInfo = g_framework.getExdDataGen().get< Core::Data::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
    auto paramGrowthInfo = g_framework.getExdDataGen().get< Core::Data::ParamGrow >( pPlayer->getLevel() );
 
-   if ( !classInfo || !paramGrowthInfo )
+   if( !classInfo || !paramGrowthInfo )
       return 0;
 
    uint8_t level = pPlayer->getLevel();
@@ -98,7 +98,7 @@ uint32_t CalcStats::calculateMaxMp( PlayerPtr pPlayer )
    auto classInfo = g_framework.getExdDataGen().get< Core::Data::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
    auto paramGrowthInfo = g_framework.getExdDataGen().get< Core::Data::ParamGrow >( pPlayer->getLevel() );
 
-   if ( !classInfo || !paramGrowthInfo )
+   if( !classInfo || !paramGrowthInfo )
       return 0;
 
    float baseStat = calculateBaseStat( pPlayer );
