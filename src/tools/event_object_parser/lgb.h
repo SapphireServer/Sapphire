@@ -257,7 +257,7 @@ struct LGB_GROUP
             {
                entries.push_back( std::make_shared< LGB_BGPARTS_ENTRY >( buf, entryOffset ) );
             }
-            else if( !ignoreModels && type == LgbEntryType::Gimmick )
+            else if( type == LgbEntryType::Gimmick )
             {
                entries.push_back( std::make_shared< LGB_GIMMICK_ENTRY >( buf, entryOffset ) );
             }
