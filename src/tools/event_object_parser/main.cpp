@@ -236,7 +236,9 @@ void loadEobjNames()
       auto id = row.first;
       auto& fields = row.second;
       auto name = *boost::get< std::string >( &fields.at( 0 ) );
-      eobjNameMap[id] = name;
+
+      if( !name.empty() )
+         eobjNameMap[id] = name;
    }
 }
 
@@ -431,7 +433,7 @@ int main( int argc, char* argv[] )
          std::vector< LGB_FILE > lgbList{ bgLgb, planmapLgb };
          uint32_t max_index = 0;
 
-         if( ignoreModels )
+         //if( ignoreModels )
          {
             std::map< std::string, SGB_FILE > sgbFiles;
 
@@ -470,6 +472,7 @@ int main( int argc, char* argv[] )
             uint32_t count = 0;
             for( const auto& lgb : lgbList )
             {
+               std::map< std::string, uint32_t> nameMap;
                for( const auto& group : lgb.groups )
                {
                   //std::cout << "\t" << group.name << " Size " << group.header.entryCount << "\n";
@@ -494,32 +497,93 @@ int main( int argc, char* argv[] )
                         std::string typeStr;
                         uint32_t eobjlevelHierachyId = 0;
 
-                        if( pObj->getType() == LgbEntryType::EventObject )
+                        auto pEobj = reinterpret_cast< LGB_EOBJ_ENTRY* >( pObj );
+                        id = pEobj->header.eobjId;
+                        unknown = pEobj->header.unknown;
+
+
+                        typeStr = eobjStr;
+                        eobjlevelHierachyId = pEobj->header.levelHierachyId;
+
+                        std::string states = "";
+                        std::string gimmickName = "";
+                        for( const auto& pEntry1 : group.entries )
                         {
-                           auto pEobj = reinterpret_cast< LGB_EOBJ_ENTRY* >( pObj );
-                           id = pEobj->header.eobjId;
-                           unknown = pEobj->header.unknown;
-                           name = eobjNameMap[id];
-                           if( name.empty() )
-                              name = "unknown" + std::to_string( count++ );
-                           name.erase( boost::remove_if( name, boost::is_any_of( "★_ '()[]-\x1a\x1\x2\x1f\x1\x3.:" ) ), name.end() );
-                           name[0] = toupper( name[0] );
-                           typeStr = eobjStr;
-                           eobjlevelHierachyId = pEobj->header.levelHierachyId;
+                           auto pGObj = pEntry1.get();
+                           if( pGObj->getType() == LgbEntryType::Gimmick )
+                           {
+                              if( pGObj->header.unknown == pEobj->header.levelHierachyId )
+                              {
+                                 auto pGObjR = reinterpret_cast< LGB_GIMMICK_ENTRY* >( pGObj );
+                                 char* dataSection = nullptr;
+                                 //std::cout << fileName << " ";
+                                    
+                                 auto file = data1->getFile( pGObjR->gimmickFileName );
+                                 auto sections = file->get_data_sections();
+                                 dataSection = &sections.at( 0 )[0];
+                                 auto sgbFile = SGB_FILE( &dataSection[0] );
+
+                                 auto pos = pGObjR->gimmickFileName.find_last_of( "/" );
+
+                                 if( pos != std::string::npos )
+                                 {
+                                    name = pGObjR->gimmickFileName.substr( pos + 1 );
+                                    name = name.substr( 0, name.length() - 4 );
+                                    gimmickName = name;
+                                 }
+
+                                 if( sgbFile.stateEntries.size() > 0 )
+                                 {
+                                    states = "      // States -> ";
+                                    for( auto entries1 : sgbFile.stateEntries )
+                                    {
+                                       states += entries1.name + " ";
+                                    }
+                                    states += "\n";
+                                 }
+
+                                 break;
+
+                              }
+                           }
                         }
                         int state = 4;
 
-                        if( id == 2000182 )
+                        if( eobjNameMap.find( id ) != eobjNameMap.end() )
+                        {
+                           name = eobjNameMap[id];
+                           name.erase( boost::remove_if( name, boost::is_any_of( "★_ '()[]-\x1a\x1\x2\x1f\x1\x3.:" ) ), name.end() );
+                           name[0] = toupper( name[0] );
+                        }
+                        if( name.empty() )
+                           name = "unknown_" + std::to_string( count++ );
+
+                        if( id == 2000182 || gimmickName == "sgvf_w_lvd_b0095" )
                         {
                            state = 5;
                            name = "Entrance";
                         }
 
-                        eobjects += "\n      instance->registerEObj( \"" + name + "\", " + std::to_string( id ) + 
+                        auto count1 = 0;
+                        if( nameMap.find( name ) == nameMap.end() )
+                        {
+                           nameMap[name] = 0;
+                        }
+                        else
+                        {
+                           nameMap[name] = ++nameMap[name];
+                           count1 = nameMap[name];
+                        }
+
+                        if( count1 > 0 )
+                           name = name + "_" + std::to_string( count1 );
+
+                        eobjects += "      instance->registerEObj( \"" + name + "\", " + std::to_string( id ) + 
                                      ", " + std::to_string( eobjlevelHierachyId ) + ", " + std::to_string( state ) + ", " +
                                      "{ " + std::to_string( pObj->header.translation.x ) + "f, " 
                                      + std::to_string( pObj->header.translation.y ) + "f, " 
-                                     + std::to_string( pObj->header.translation.z ) + "f }, " + std::to_string( pObj->header.scale.x ) + "f );";
+                                     + std::to_string( pObj->header.translation.z ) + "f }, " + std::to_string( pObj->header.scale.x ) + "f );\n" + states;
+
 
                         std::string outStr(
                            std::to_string( id ) + ", " + typeStr + "\"" + name + "\", " +

@@ -160,7 +160,7 @@ struct SGB_HEADER
    int32_t offset1C;
 
    uint32_t unknown20;
-   uint32_t unknown24;
+   uint32_t statesOffset;
    uint32_t unknown28;
    uint32_t unknown2C;
 
@@ -178,10 +178,30 @@ struct SGB_HEADER
    uint32_t unknown54;
 };
 
+struct SGB_STATE_HEADER
+{
+   uint32_t id;
+   uint32_t nameOffset;
+   char unknown[0x24];
+};
+
+struct SGB_STATE_ENTRY
+{
+   SGB_STATE_HEADER header;
+   std::string name;
+
+   SGB_STATE_ENTRY( char* buf )
+   {
+      header = *reinterpret_cast< SGB_STATE_HEADER* >( buf );
+      name = std::string( buf + header.nameOffset );
+   }
+};
+
 struct SGB_FILE
 {
    SGB_HEADER header;
    std::vector<SGB_GROUP> entries;
+   std::vector<SGB_STATE_ENTRY> stateEntries;
 
    SGB_FILE()
    {
@@ -201,6 +221,17 @@ struct SGB_FILE
          entries.push_back( group );
          auto group2 = SGB_GROUP( buf, this, header.fileSize, baseOffset + header.offset1C );
          entries.push_back( group2 );
+         uint32_t stateCount = *reinterpret_cast< uint32_t* >( buf + baseOffset + header.statesOffset + 4 );
+         if( stateCount > 0 )
+         {
+            stateCount = stateCount;
+            for( int i = 0; i < stateCount; ++i )
+            {
+               auto state = SGB_STATE_ENTRY( buf + baseOffset + header.statesOffset + 8 + i * sizeof( SGB_STATE_HEADER ) );
+               stateEntries.push_back( state );
+               std::cout << state.name << "\n";
+            }
+         }
       }
       catch( std::exception& e )
       {
