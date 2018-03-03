@@ -1,3 +1,5 @@
+#include <boost/format.hpp>
+
 #include <common/Common.h>
 #include <common/Network/CommonNetwork.h>
 #include <common/Exd/ExdDataGenerated.h>
@@ -5,12 +7,7 @@
 #include <common/Network/PacketContainer.h>
 #include <common/Logging/Logger.h>
 
-#include <boost/format.hpp>
-
 #include "Network/GameConnection.h"
-
-#include "Session.h"
-
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
@@ -23,17 +20,17 @@
 
 #include "Actor/Player.h"
 
-#include "Forwards.h"
-
 #include "Action/Action.h"
 #include "Action/ActionCast.h"
 #include "Action/ActionMount.h"
-#include "Script/ScriptManager.h"
 
+#include "Script/ScriptMgr.h"
 
-extern Core::Scripting::ScriptManager g_scriptMgr;
-extern Core::Data::ExdDataGenerated g_exdDataGen;
-extern Core::Logger g_log;
+#include "Session.h"
+#include "Forwards.h"
+#include "Framework.h"
+
+extern Core::Framework g_framework;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -60,7 +57,7 @@ void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inP
         std::string actionIdStr = boost::str( boost::format( "%|04X|" ) % action );
         player.sendDebug( "---------------------------------------" );
         player.sendDebug( "ActionHandler ( " + actionIdStr + " | " +
-                          g_exdDataGen.get< Core::Data::Action >( action )->name +
+                          g_framework.getExdDataGen().get< Core::Data::Action >( action )->name +
                           " | " + std::to_string( targetId ) + " )" );
 
         player.queuePacket( ActorControlPacket142( player.getId(), ActorControlType::ActionStart, 0x01, action ) );
@@ -83,7 +80,7 @@ void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inP
 
             if( !player.actionHasCastTime( action ) )
             {
-                g_scriptMgr.onCastFinish( player, targetActor, action );
+                g_framework.getScriptMgr().onCastFinish( player, targetActor, action );
             }
             else
             {
@@ -100,11 +97,11 @@ void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inP
     }
     else if( action < 3000000 ) // item action
     {
-        auto info = g_exdDataGen.get< Core::Data::EventItem >( action );
+        auto info = g_framework.getExdDataGen().get< Core::Data::EventItem >( action );
         if( info )
         {
-            g_log.debug( info->name );
-            g_scriptMgr.onEventItem( player, action, info->quest, info->castTime, targetId );
+            g_framework.getLogger().debug( info->name );
+            g_framework.getScriptMgr().onEventItem( player, action, info->quest, info->castTime, targetId );
         }
     }
     else if( action > 3000000 ) // unknown

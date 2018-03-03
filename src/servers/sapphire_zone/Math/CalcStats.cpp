@@ -2,16 +2,17 @@
 
 #include <common/Exd/ExdDataGenerated.h>
 #include <common/Common.h>
+
 #include "Actor/Actor.h"
 #include "Actor/Player.h"
 
 #include "CalcStats.h"
-
+#include "Framework.h"
 
 using namespace Core::Math;
 using namespace Core::Entity;
 
-extern Core::Data::ExdDataGenerated g_exdDataGen;
+extern Core::Framework g_framework;
 
 /*
    Class used for battle-related formulas and calculations.
@@ -38,7 +39,7 @@ float CalcStats::calculateBaseStat( PlayerPtr pPlayer )
    uint8_t level = pPlayer->getLevel();
 
    // SB Base Stat Formula  (Aligned)
-   if ( level > 60 )
+   if( level > 60 )
    { 
       base = static_cast< float >( ( ( ( level == 61 ) ? 224 : 220 ) + ( level - 61 ) * 8) );
    }
@@ -61,10 +62,10 @@ uint32_t CalcStats::calculateMaxHp( PlayerPtr pPlayer )
    // Is there any way to pull reliable BaseHP without having to manually use a pet for every level, and using the values from a table?
    // More info here: https://docs.google.com/spreadsheets/d/1de06KGT0cNRUvyiXNmjNgcNvzBCCQku7jte5QxEQRbs/edit?usp=sharing
    
-   auto classInfo = g_exdDataGen.get< Core::Data::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
-   auto paramGrowthInfo = g_exdDataGen.get< Core::Data::ParamGrow >( pPlayer->getLevel() );
+   auto classInfo = g_framework.getExdDataGen().get< Core::Data::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
+   auto paramGrowthInfo = g_framework.getExdDataGen().get< Core::Data::ParamGrow >( pPlayer->getLevel() );
 
-   if ( !classInfo || !paramGrowthInfo )
+   if( !classInfo || !paramGrowthInfo )
       return 0;
 
    uint8_t level = pPlayer->getLevel();
@@ -94,10 +95,10 @@ uint32_t CalcStats::calculateMaxHp( PlayerPtr pPlayer )
 
 uint32_t CalcStats::calculateMaxMp( PlayerPtr pPlayer )
 {
-   auto classInfo = g_exdDataGen.get< Core::Data::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
-   auto paramGrowthInfo = g_exdDataGen.get< Core::Data::ParamGrow >( pPlayer->getLevel() );
+   auto classInfo = g_framework.getExdDataGen().get< Core::Data::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
+   auto paramGrowthInfo = g_framework.getExdDataGen().get< Core::Data::ParamGrow >( pPlayer->getLevel() );
 
-   if ( !classInfo || !paramGrowthInfo )
+   if( !classInfo || !paramGrowthInfo )
       return 0;
 
    float baseStat = calculateBaseStat( pPlayer );

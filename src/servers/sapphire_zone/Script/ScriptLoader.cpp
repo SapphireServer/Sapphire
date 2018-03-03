@@ -2,14 +2,13 @@
 
 #include <common/Logging/Logger.h>
 #include <common/Config/XMLConfig.h>
-#include "ServerZone.h"
+#include "Framework.h"
 
 #include <boost/format.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/filesystem.hpp>
 
-extern Core::Logger g_log;
-extern Core::ServerZone g_serverZone;
+extern Core::Framework g_framework;
 
 namespace fs = boost::filesystem;
 
@@ -37,12 +36,12 @@ bool Core::Scripting::ScriptLoader::unloadModule( ModuleHandle handle )
 
    if( !success )
    {
-      g_log.error( "Failed to unload module @ 0x" + boost::str( boost::format( "%|08X|" ) % handle ) );
+      g_framework.getLogger().error( "Failed to unload module @ 0x" + boost::str( boost::format( "%|08X|" ) % handle ) );
 
       return false;
    }
 
-   g_log.debug( "Unloaded module @ 0x" + boost::str( boost::format( "%|08X|" ) % handle ) );
+   g_framework.getLogger().debug( "Unloaded module @ 0x" + boost::str( boost::format( "%|08X|" ) % handle ) );
 
    return true;
 }
@@ -51,14 +50,14 @@ Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::loadModule( const st
 {
    fs::path f( path );
 
-   if ( isModuleLoaded( f.stem().string() ) )
+   if( isModuleLoaded( f.stem().string() ) )
    {
-      g_log.error( "Unable to load module '" + f.stem().string() + "' as it is already loaded" );
+      g_framework.getLogger().error( "Unable to load module '" + f.stem().string() + "' as it is already loaded" );
       return nullptr;
    }
 
    // copy to temp dir
-   fs::path cacheDir( f.parent_path() /= g_serverZone.getConfig()->getValue< std::string >( "Settings.General.Scripts.CachePath", "./cache/" ) );
+   fs::path cacheDir( f.parent_path() /= g_framework.getServerZone().getConfig()->getValue< std::string >( "Settings.General.Scripts.CachePath", "./cache/" ) );
    fs::create_directories( cacheDir );
    fs::path dest( cacheDir /= f.filename().string() );
 
@@ -68,7 +67,7 @@ Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::loadModule( const st
    }
    catch( const boost::filesystem::filesystem_error& err )
    {
-      g_log.error( "Error copying file to cache: " + err.code().message() );
+      g_framework.getLogger().error( "Error copying file to cache: " + err.code().message() );
 
       return nullptr;
    }
@@ -82,12 +81,12 @@ Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::loadModule( const st
 
    if( !handle )
    {
-      g_log.error( "Failed to load module from: " + path );
+      g_framework.getLogger().error( "Failed to load module from: " + path );
 
       return nullptr;
    }
 
-   g_log.debug( "Loaded module '" + f.filename().string() + "' @ 0x" + boost::str( boost::format( "%|08X|" ) % handle ) );
+   g_framework.getLogger().debug( "Loaded module '" + f.filename().string() + "' @ 0x" + boost::str( boost::format( "%|08X|" ) % handle ) );
 
    auto info = new ScriptInfo;
    info->handle = handle;
@@ -102,7 +101,7 @@ Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::loadModule( const st
 
 ScriptObject** Core::Scripting::ScriptLoader::getScripts( ModuleHandle handle )
 {
-   using getScripts = ScriptObject**(*)();
+   using getScripts = ScriptObject**( *)( );
 
 #ifdef _WIN32
    getScripts func = reinterpret_cast< getScripts >( GetProcAddress( handle, "getScripts" ) );
@@ -114,7 +113,7 @@ ScriptObject** Core::Scripting::ScriptLoader::getScripts( ModuleHandle handle )
    {
       auto ptr = func();
 
-      g_log.debug( "got ScriptObject array @ 0x" + boost::str( boost::format( "%|08X|" ) % ptr ) );
+      g_framework.getLogger().debug( "got ScriptObject array @ 0x" + boost::str( boost::format( "%|08X|" ) % ptr ) );
 
       return ptr;
    }
@@ -147,7 +146,7 @@ bool Core::Scripting::ScriptLoader::unloadScript( ModuleHandle handle )
             return true;
          }
 
-         g_log.error( "failed to unload module: " + info->library_name );
+         g_framework.getLogger().error( "failed to unload module: " + info->library_name );
 
          return false;
       }

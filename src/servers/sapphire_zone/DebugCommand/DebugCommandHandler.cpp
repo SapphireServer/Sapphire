@@ -1,5 +1,7 @@
 #include <boost/lexical_cast.hpp>
-#include <random>
+#include <boost/make_shared.hpp>
+#include <boost/format.hpp>
+#include <cinttypes>
 
 #include <common/Common.h>
 #include <common/Version.h>
@@ -18,9 +20,10 @@
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 #include "Network/PacketWrappers/InitUIPacket.h"
+#include "Network/PacketWrappers/PlayerSpawnPacket.h"
 #include "Network/GameConnection.h"
-#include "Script/ScriptManager.h"
-#include "Script/NativeScriptManager.h"
+#include "Script/ScriptMgr.h"
+#include "Script/NativeScriptMgr.h"
 
 #include "Actor/Player.h"
 #include "Actor/BattleNpc.h"
@@ -28,24 +31,15 @@
 
 #include "Zone/Zone.h"
 #include "Zone/InstanceContent.h"
+#include "Zone/TerritoryMgr.h"
 
 #include "ServerZone.h"
 
 #include "StatusEffect/StatusEffect.h"
 #include "Session.h"
-#include <boost/make_shared.hpp>
-#include <boost/format.hpp>
+#include "Framework.h"
 
-
-#include <cinttypes>
-#include "Network/PacketWrappers/PlayerSpawnPacket.h"
-#include "Zone/TerritoryMgr.h"
-
-extern Core::Scripting::ScriptManager g_scriptMgr;
-extern Core::Data::ExdDataGenerated g_exdDataGen;
-extern Core::Logger g_log;
-extern Core::ServerZone g_serverZone;
-extern Core::TerritoryMgr g_territoryMgr;
+extern Core::Framework g_framework;
 
 // instanciate and initialize commands
 Core::DebugCommandHandler::DebugCommandHandler()
@@ -159,7 +153,7 @@ void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost:
    if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
       params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-   g_log.debug( "[" + std::to_string( player.getId() ) + "] " +
+   g_framework.getLogger().debug( "[" + std::to_string( player.getId() ) + "] " +
                 "subCommand " + subCommand + " params: " + params );
 
 
@@ -227,8 +221,8 @@ void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost:
          "', '" + std::to_string( map_id ) +
          "', '" + std::to_string( discover_id ) + "')";
 
-      g_charaDb.execute( query1 );
-      g_charaDb.execute( query2 );
+      g_framework.getCharaDb().execute( query1 );
+      g_framework.getCharaDb().execute( query2 );
 
    }
 
@@ -334,7 +328,7 @@ void Core::DebugCommandHandler::add( char * data, Entity::Player& player, boost:
    if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
       params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-   g_log.debug( "[" + std::to_string( player.getId() ) + "] " +
+   g_framework.getLogger().debug( "[" + std::to_string( player.getId() ) + "] " +
                 "subCommand " + subCommand + " params: " + params );
 
 
@@ -499,14 +493,14 @@ void Core::DebugCommandHandler::get( char * data, Entity::Player& player, boost:
    if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
       params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-   g_log.debug( "[" + std::to_string( player.getId() ) + "] " +
+   g_framework.getLogger().debug( "[" + std::to_string( player.getId() ) + "] " +
                 "subCommand " + subCommand + " params: " + params );
 
 
    if( ( subCommand == "pos" ) )
    {
 
-      int16_t map_id = g_exdDataGen.get< Core::Data::TerritoryType >( player.getCurrentZone()->getTerritoryId() )->map;
+      int16_t map_id = g_framework.getExdDataGen().get< Core::Data::TerritoryType >( player.getCurrentZone()->getTerritoryId() )->map;
 
       player.sendNotice( "Pos:\n" +
                          std::to_string( player.getPos().x ) + "\n" +
@@ -525,14 +519,14 @@ void Core::DebugCommandHandler::get( char * data, Entity::Player& player, boost:
 
 void Core::DebugCommandHandler::injectPacket( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
 {
-   auto pSession = g_serverZone.getSession( player.getId() );
+   auto pSession = g_framework.getServerZone().getSession( player.getId() );
    if( pSession )
       pSession->getZoneConnection()->injectPacket( data + 7, player );
 }
 
 void Core::DebugCommandHandler::injectChatPacket( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
 {
-   auto pSession = g_serverZone.getSession( player.getId() );
+   auto pSession = g_framework.getServerZone().getSession( player.getId() );
    if( pSession )
       pSession->getChatConnection()->injectPacket( data + 8, player );
 }
@@ -557,25 +551,25 @@ void Core::DebugCommandHandler::replay( char * data, Entity::Player& player, boo
    if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
       params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-   g_log.debug( "[" + std::to_string( player.getId() ) + "] " +
+   g_framework.getLogger().debug( "[" + std::to_string( player.getId() ) + "] " +
                 "subCommand " + subCommand + " params: " + params );
 
 
    if( subCommand == "start" )
    {
-      auto pSession = g_serverZone.getSession( player.getId() );
+      auto pSession = g_framework.getServerZone().getSession( player.getId() );
       if( pSession )
          pSession->startReplay( params );
    }
    else if( subCommand == "stop" )
    {
-      auto pSession = g_serverZone.getSession( player.getId() );
+      auto pSession = g_framework.getServerZone().getSession( player.getId() );
       if( pSession )
          pSession->stopReplay();
    }
    else if( subCommand == "info" )
    {
-      auto pSession = g_serverZone.getSession( player.getId() );
+      auto pSession = g_framework.getServerZone().getSession( player.getId() );
       if( pSession )
          pSession->sendReplayInfo();
    }
@@ -638,7 +632,7 @@ void Core::DebugCommandHandler::serverInfo( char * data, Entity::Player& player,
 {
    player.sendDebug( "SapphireServer " + Version::VERSION + "\nRev: " + Version::GIT_HASH );
    player.sendDebug( "Compiled: " __DATE__ " " __TIME__ );
-   player.sendDebug( "Sessions: " + std::to_string( g_serverZone.getSessionCount() ) );
+   player.sendDebug( "Sessions: " + std::to_string( g_framework.getServerZone().getSessionCount() ) );
 }
 
 void Core::DebugCommandHandler::unlockCharacter( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
@@ -667,7 +661,7 @@ void Core::DebugCommandHandler::script( char* data, Entity::Player &player, boos
    if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
       params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-   g_log.debug( "[" + std::to_string( player.getId() ) + "] " +
+   g_framework.getLogger().debug( "[" + std::to_string( player.getId() ) + "] " +
                 "subCommand " + subCommand + " params: " + params );
 
    if( subCommand == "unload" )
@@ -675,7 +669,7 @@ void Core::DebugCommandHandler::script( char* data, Entity::Player &player, boos
       if ( subCommand == params )
          player.sendDebug( "Command failed: requires name of script" );
       else
-         if( g_scriptMgr.getNativeScriptHandler().unloadScript( params ) )
+         if( g_framework.getScriptMgr().getNativeScriptHandler().unloadScript( params ) )
             player.sendDebug( "Unloaded script successfully." );
          else
             player.sendDebug( "Failed to unload script: " + params );
@@ -687,7 +681,7 @@ void Core::DebugCommandHandler::script( char* data, Entity::Player &player, boos
       else
       {
          std::set< Core::Scripting::ScriptInfo* > scripts;
-         g_scriptMgr.getNativeScriptHandler().findScripts( scripts, params );
+         g_framework.getScriptMgr().getNativeScriptHandler().findScripts( scripts, params );
 
          if( !scripts.empty() )
          {
@@ -711,7 +705,7 @@ void Core::DebugCommandHandler::script( char* data, Entity::Player &player, boos
          player.sendDebug( "Command failed: requires relative path to script" );
       else
       {
-         if ( g_scriptMgr.getNativeScriptHandler().loadScript( params ) )
+         if ( g_framework.getScriptMgr().getNativeScriptHandler().loadScript( params ) )
             player.sendDebug( "Loaded '" + params + "' successfully" );
          else
             player.sendDebug( "Failed to load '" + params + "'" );
@@ -724,7 +718,7 @@ void Core::DebugCommandHandler::script( char* data, Entity::Player &player, boos
          player.sendDebug( "Command failed: requires name of script to reload" );
       else
       {
-         g_scriptMgr.getNativeScriptHandler().queueScriptReload( params );
+         g_framework.getScriptMgr().getNativeScriptHandler().queueScriptReload( params );
          player.sendDebug( "Queued script reload for script: " + params );
       }
    }
@@ -759,7 +753,7 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
       uint32_t instanceContentId;
       sscanf( params.c_str(), "%d", &instanceContentId );
 
-      auto instance = g_territoryMgr.createInstanceContent( instanceContentId );
+      auto instance = g_framework.getTerritoryMgr().createInstanceContent( instanceContentId );
       if( instance )
          player.sendDebug( "Created instance with id: " + std::to_string( instance->getGuId() ) + " -> " + instance->getName() );
       else
@@ -770,7 +764,7 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
       uint32_t terriId;
       sscanf( params.c_str(), "%d", &terriId );
 
-      if( g_territoryMgr.removeTerritoryInstance( terriId ) )
+      if( g_framework.getTerritoryMgr().removeTerritoryInstance( terriId ) )
          player.sendDebug( "Removed instance with id: " + std::to_string( terriId ) );
       else
          player.sendDebug( "Failed to remove instance with id: " + std::to_string( terriId ) );
@@ -786,7 +780,7 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
       uint32_t value;
       sscanf( params.c_str(), "%d %d %d", &instanceId, &index, &value );
 
-      auto pInstance = g_territoryMgr.getInstanceZonePtr( instanceId );
+      auto pInstance = g_framework.getTerritoryMgr().getInstanceZonePtr( instanceId );
       if( !pInstance )
          return;
       auto instance = boost::dynamic_pointer_cast< InstanceContent >( pInstance );

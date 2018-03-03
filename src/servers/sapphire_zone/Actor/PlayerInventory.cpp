@@ -2,8 +2,6 @@
 #include <common/Network/GamePacket.h>
 #include <common/Logging/Logger.h>
 
-#include "Player.h"
-
 #include "Zone/Zone.h"
 
 #include "Network/PacketWrappers/ActorControlPacket142.h"
@@ -12,7 +10,10 @@
 #include "Inventory/Inventory.h"
 #include "Inventory/Item.h"
 
-extern Core::Logger g_log;
+#include "Player.h"
+#include "Framework.h"
+
+extern Core::Framework g_framework;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -87,7 +88,7 @@ void Core::Entity::Player::equipWeapon( ItemPtr pItem )
 void Core::Entity::Player::equipItem( Inventory::EquipSlot equipSlotId, ItemPtr pItem, bool sendUpdate )
 {
 
-   //g_log.debug( "Equipping into slot " + std::to_string( equipSlotId ) );
+   //g_framework.getLogger().debug( "Equipping into slot " + std::to_string( equipSlotId ) );
 
    uint64_t model = pItem->getModelId1();
    uint64_t model2 = pItem->getModelId2();

@@ -9,19 +9,19 @@
 #include <common/Util/Util.h>
 #include <common/Util/UtilMath.h>
 
-#include "Player.h"
-#include "BattleNpc.h"
-
 #include "Network/PacketWrappers/MoveActorPacket.h"
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
+
+#include "Player.h"
+#include "BattleNpc.h"
+#include "Framework.h"
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-extern Core::Logger g_log;
-extern Core::Data::ExdDataGenerated g_exdDataGen;
+extern Core::Framework g_framework;
 
 uint32_t Core::Entity::BattleNpc::m_nextID = 1149241694;
 
@@ -101,7 +101,7 @@ void Core::Entity::BattleNpc::spawn( PlayerPtr pTarget )
    //spawnPacket.data().bnpcBaseId = m_bnpcBaseId;
    //spawnPacket.data().nameId = m_nameId;
    //spawnPacket.data().spawnIndex = pTarget->getSpawnIdForActorId( getId() );
-   //g_log.info(std::to_string(spawnPacket.data().spawnIndex) + " " + std::to_string(getId()));
+   //g_framework.getLogger().info(std::to_string(spawnPacket.data().spawnIndex) + " " + std::to_string(getId()));
    //spawnPacket.data().status = static_cast< uint8_t >( m_status );
    //spawnPacket.data().mobAgressive = m_behavior;
    //spawnPacket.data().type = static_cast< uint8_t >( m_type );
@@ -418,7 +418,7 @@ void Core::Entity::BattleNpc::onDeath()
             auto levelDiff = static_cast< int32_t >( this->m_level ) - level;
             auto cappedLevelDiff = Math::Util::clamp( levelDiff, 1, 6 );
 
-            auto expNeeded = g_exdDataGen.get< Core::Data::ParamGrow >( m_level + cappedLevelDiff - 1 )->expToNext;
+            auto expNeeded = g_framework.getExdDataGen().get< Core::Data::ParamGrow >( m_level + cappedLevelDiff - 1 )->expToNext;
             int32_t exp = 0;
 
             // todo: arbitrary numbers pulled out of my ass
