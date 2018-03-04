@@ -2,6 +2,7 @@
 #define SAPPHIRE_SCRIPTOBJECT_H
 
 #include <Forwards.h>
+#include <Script/NativeScriptApi.h>
 
 enum EventFlags
 {
