@@ -1327,15 +1327,15 @@ struct FFXIVIpcObjectSpawn : FFXIVIpcBasePacket<ObjectSpawn>
    uint32_t hierachyId;
    float scale;
    int16_t unknown20a;
-   uint16_t unknown20b;
+   uint16_t rotation;
    int16_t unknown24a;
    int16_t unknown24b;
    uint16_t unknown28a;
    int16_t unknown28c;
    uint32_t unknown2C;
    Common::FFXIVARR_POSITION3 position;
-   int16_t rotation;
-   int16_t unknown;
+   int16_t unknown3C;
+   int16_t unknown3E;
 };
 
 struct FFXIVIpcObjectDespawn : FFXIVIpcBasePacket<ObjectDespawn>

@@ -693,9 +693,9 @@ uint32_t Core::Zone::getNextEObjId()
 }
 
 Core::Entity::EventObjectPtr Core::Zone::registerEObj( const std::string &name, uint32_t objectId, uint32_t mapLink,
-                                                       uint8_t state, FFXIVARR_POSITION3 pos, float scale )
+                                                       uint8_t state, FFXIVARR_POSITION3 pos, float scale, float rotation )
 {
-   auto eObj = Entity::make_EventObject( getNextEObjId(), objectId, mapLink, state, pos, name );
+   auto eObj = Entity::make_EventObject( getNextEObjId(), objectId, mapLink, state, pos, rotation, name );
    eObj->setScale( scale );
    registerEObj( eObj );
 
