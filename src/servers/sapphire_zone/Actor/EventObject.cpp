@@ -9,6 +9,7 @@
 #include <common/Network/CommonNetwork.h>
 #include <common/Network/PacketDef/Zone/ServerZoneDef.h>
 #include <common/Network/PacketContainer.h>
+#include <common/Util/UtilMath.h>
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -19,7 +20,7 @@ extern Core::Logger g_log;
 
 Core::Entity::EventObject::EventObject( uint32_t actorId, uint32_t objectId, uint32_t mapLinkId,
                                         uint8_t initialState, Common::FFXIVARR_POSITION3 pos,
-                                        const std::string& givenName ) :
+                                        float rotation, const std::string& givenName ) :
    Core::Entity::Actor( ObjKind::EventObj ),
    m_mapLinkId( mapLinkId ),
    m_state( initialState ),
@@ -30,6 +31,7 @@ Core::Entity::EventObject::EventObject( uint32_t actorId, uint32_t objectId, uin
    m_pos.x = pos.x;
    m_pos.y = pos.y;
    m_pos.z = pos.z;
+   m_rot = rotation;
 }
 
 uint32_t Core::Entity::EventObject::getMapLinkId() const
@@ -112,6 +114,7 @@ void Core::Entity::EventObject::spawn( Core::Entity::PlayerPtr pTarget )
    eobjStatePacket.data().position = getPos();
    eobjStatePacket.data().scale = getScale();
    eobjStatePacket.data().actorId = getId();
+   eobjStatePacket.data().rotation = Math::Util::floatToUInt16Rot( getRot() );
    pTarget->queuePacket( eobjStatePacket );
 }
 

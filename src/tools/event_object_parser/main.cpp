@@ -39,6 +39,7 @@ struct instanceContent
    uint32_t id;
    std::string name;
    std::string zoneName;
+   uint8_t type;
 };
 
 std::vector< instanceContent > contentList;
@@ -309,6 +310,7 @@ void loadAllInstanceContentEntries()
       auto name = *boost::get< std::string >( &fields.at( 3 ) );
       if( name.empty() )
          continue;
+      auto type = *boost::get< uint8_t >( &fields.at( 0 ) );
       auto teri = *boost::get< uint32_t >( &fields.at( 9 ) );
       auto i = 0;
       while( ( i = name.find( ' ' ) ) != std::string::npos )
@@ -322,7 +324,7 @@ void loadAllInstanceContentEntries()
 
       name.erase( boost::remove_if( name, boost::is_any_of( "★_ '()[]-\x1a\x1\x2\x1f\x1\x3.:" ) ), name.end() );
       name[0] = toupper( name[0] );
-      contentList.push_back( { id, name, zoneNameMap[teri] } );
+      contentList.push_back( { id, name, zoneNameMap[teri], type } );
    }
    out.close();
 }
@@ -366,6 +368,24 @@ int main( int argc, char* argv[] )
             gamePath = argv[2];
       }
    }
+
+   std::map< uint8_t, std::string > contentTypeMap;
+   contentTypeMap[0] = "";
+   contentTypeMap[1] = "raids";
+   contentTypeMap[2] = "dungeons";
+   contentTypeMap[3] = "guildhests";
+   contentTypeMap[4] = "trials";
+   contentTypeMap[5] = "pvp";
+   contentTypeMap[6] = "pvp";
+   contentTypeMap[7] = "questbattles";
+   contentTypeMap[8] = "hallofthenovice";
+   contentTypeMap[9] = "deepdungeon";
+   contentTypeMap[10] = "treasurehunt";
+   contentTypeMap[11] = "events";
+   contentTypeMap[12] = "pvp";
+
+   if( !boost::filesystem::exists( "instance.tmpl" ) )
+      throw std::runtime_error( "instance.tmpl is missing in working directory" );
 
    initExd( gamePath );
    if( dumpInstances )
@@ -578,11 +598,16 @@ int main( int argc, char* argv[] )
                         if( count1 > 0 )
                            name = name + "_" + std::to_string( count1 );
 
-                        eobjects += "      instance->registerEObj( \"" + name + "\", " + std::to_string( id ) + 
-                                     ", " + std::to_string( eobjlevelHierachyId ) + ", " + std::to_string( state ) + ", " +
-                                     "{ " + std::to_string( pObj->header.translation.x ) + "f, " 
-                                     + std::to_string( pObj->header.translation.y ) + "f, " 
-                                     + std::to_string( pObj->header.translation.z ) + "f }, " + std::to_string( pObj->header.scale.x ) + "f );\n" + states;
+                        eobjects += "      instance->registerEObj( \"" + name + "\", " + std::to_string( id ) +
+                                    ", " + std::to_string( eobjlevelHierachyId ) + ", " + std::to_string( state ) +
+                                    ", " +
+                                    "{ " + std::to_string( pObj->header.translation.x ) + "f, "
+                                    + std::to_string( pObj->header.translation.y ) + "f, "
+                                    + std::to_string( pObj->header.translation.z ) + "f }, " +
+                                    std::to_string( pObj->header.scale.x ) + "f, " +
+
+                                    // for whatever reason, the rotation inside the sgbs is the inverse of what the game uses
+                                    std::to_string( pObj->header.rotation.y * -1.f ) + "f ); \n" + states;
 
 
                         std::string outStr(
@@ -619,8 +644,17 @@ int main( int argc, char* argv[] )
       result = std::regex_replace( result, std::regex( "\\INSTANCE_ID" ), std::to_string( entry.id ) );
       result = std::regex_replace( result, std::regex( "\\EOBJ_INIT" ), eobjects );
 
-      
-      std::ofstream outH( entry.name + ".cpp" );
+
+      std::string subdir = "";
+
+      auto subdirIt = contentTypeMap.find( entry.type );
+      if( subdirIt != contentTypeMap.end() )
+         subdir = subdirIt->second + "/";
+
+      boost::filesystem::path outDir( "instances/" + subdir );
+      boost::filesystem::create_directories( outDir );
+
+      std::ofstream outH( outDir.string() + entry.name + ".cpp" );
       outH << result;
       outH.close();
       
