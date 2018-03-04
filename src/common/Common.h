@@ -390,10 +390,8 @@ namespace Common {
 
       InNpcEvent1 = 10, // Sent together with InNpcEvent, when waiting for input? just a guess...
 
-      BoundByDuty = 11,
-
       BetweenAreas = 24,
-
+      BoundByDuty = 28,
       WatchingCutscene = 50, // this is actually just a dummy, this id is different
 
 
