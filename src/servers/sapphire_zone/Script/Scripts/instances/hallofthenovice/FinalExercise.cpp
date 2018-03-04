@@ -10,9 +10,10 @@ public:
 
    void onInit( InstanceContentPtr instance ) override
    {
-      
-      instance->registerEObj( "Entrance", 2000182, 6228959, 5, { 457.583801f, 5.680784f, 280.512787f }, 1.000000f );
-      instance->registerEObj( "Unknown1", 2000608, 2807920, 4, { -95.322441f, -25.054260f, 61.518002f }, 1.000000f );
+      instance->registerEObj( "Entrance", 2000182, 6228959, 5, { 457.583801f, 5.680784f, 280.512787f }, 1.000000f, 0.000000f ); 
+      // States -> vf_lock_on vf_lock_of 
+      instance->registerEObj( "unknown_0", 2000608, 2807920, 4, { -95.322441f, -25.054260f, 61.518002f }, 1.000000f, 0.000000f ); 
+
    }
 
    void onUpdate( InstanceContentPtr instance, uint32_t currTime ) override
