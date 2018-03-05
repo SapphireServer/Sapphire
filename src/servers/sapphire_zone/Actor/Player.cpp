@@ -98,6 +98,13 @@ Core::Entity::Player::~Player()
 {
 }
 
+void Core::Entity::Player::injectPacket( std::string path )
+{
+   auto session = g_serverZone.getSession( getId() );
+   if( session )
+      session->getZoneConnection()->injectPacket( path, *this );
+}
+
 // TODO: add a proper calculation based on race / job / level / gear
 uint32_t Core::Entity::Player::getMaxHp()
 {
@@ -1480,7 +1487,7 @@ uint32_t Core::Entity::Player::getTerritoryId() const
 
 void Core::Entity::Player::sendZonePackets()
 {
-   getCurrentZone()->onBeforeEnterTerritory( *this );
+   getCurrentZone()->onBeforePlayerZoneIn( *this );
 
    ZoneChannelPacket< FFXIVIpcInit > initPacket( getId() );
    initPacket.data().charId = getId();
@@ -1490,7 +1497,7 @@ void Core::Entity::Player::sendZonePackets()
 
    if( isLogin() )
    {
-      queuePacket(ActorControlPacket143( getId(), SetCharaGearParamUI, m_equipDisplayFlags, 1 ) );
+      queuePacket( ActorControlPacket143( getId(), SetCharaGearParamUI, m_equipDisplayFlags, 1 ) );
    }
 
    // set flags, will be reset automatically by zoning ( only on client side though )
@@ -1547,7 +1554,7 @@ void Core::Entity::Player::sendZonePackets()
    if( getLastPing() == 0 )
       sendQuestInfo();
 
-   getCurrentZone()->onEnterTerritory( *this );
+   getCurrentZone()->onPlayerZoneIn( *this );
 
    m_bMarkedForZoning = false;
 }

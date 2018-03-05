@@ -631,7 +631,7 @@ void Core::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
    }
 }
 
-void Core::Zone::onEnterTerritory( Entity::Player& player )
+void Core::Zone::onPlayerZoneIn( Entity::Player &player )
 {
    g_log.debug( "Zone::onEnterTerritory: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryId() ) +
                                                 + ", Entity#" + std::to_string( player.getId() ) );
@@ -654,6 +654,11 @@ void Core::Zone::onFinishLoading( Entity::Player& player )
 }
 
 void Core::Zone::onInitDirector( Entity::Player& player )
+{
+
+}
+
+void Core::Zone::onEnterTerritory( Core::Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 )
 {
 
 }

@@ -158,9 +158,22 @@ void Core::Network::GameConnection::eventHandlerEnterTerritory( const Packets::G
 
    player.sendDebug( "Calling: " + objName + "." + eventName + " - " + std::to_string( eventId ) );
 
-   player.eventStart( player.getId(), eventId, Event::EventHandler::EnterTerritory, 0, player.getZoneId() );
+   player.eventStart( player.getId(), eventId, Event::EventHandler::EnterTerritory, 0, player.getZoneId(), 0 );
 
-   g_scriptMgr.onEnterTerritory( player, eventId, param1, param2 );
+   if( auto instance = player.getCurrentInstance() )
+   {
+      // param2 of eventStart
+      // 0 = default state?
+      // 1 = restore state?
+
+      player.eventStart( player.getId(), eventId, Event::EventHandler::EnterTerritory, 0, player.getZoneId(), instance->getDirectorId() & 0xFFFF );
+      instance->onEnterTerritory( player, eventId, param1, param2 );
+   }
+   else
+   {
+      player.eventStart( player.getId(), eventId, Event::EventHandler::EnterTerritory, 0, player.getZoneId() );
+      g_scriptMgr.onEnterTerritory( player, eventId, param1, param2 );
+   }
 
    player.checkEvent( eventId );
 }
