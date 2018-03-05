@@ -63,7 +63,7 @@ Core::Data::ExdDataGenerated::InstanceContentPtr Core::InstanceContent::getInsta
    return m_instanceContentInfo;
 }
 
-void Core::InstanceContent::onPlayerZoneIn( Entity::Player &player )
+void Core::InstanceContent::onPlayerZoneIn( Entity::Player& player )
 {
    g_log.debug( "InstanceContent::onPlayerZoneIn: Zone#" + std::to_string( getGuId() ) + "|"
                                                            + std::to_string( getInstanceContentId() ) +
@@ -102,7 +102,7 @@ void Core::InstanceContent::onUpdate( uint32_t currTime )
          if( m_playerMap.size() < 1 )
             return;
 
-         for( const auto &playerIt : m_playerMap )
+         for( const auto& playerIt : m_playerMap )
          {
             if( !playerIt.second->isLoadingComplete() ||
                 !playerIt.second->isDirectorInitialized() ||
@@ -110,7 +110,7 @@ void Core::InstanceContent::onUpdate( uint32_t currTime )
                return;
          }
 
-         for( const auto &playerIt : m_playerMap )
+         for( const auto& playerIt : m_playerMap )
          {
             auto pPlayer = playerIt.second;
             pPlayer->queuePacket(
@@ -222,7 +222,7 @@ void Core::InstanceContent::setVar( uint8_t index, uint8_t value )
    }
 
    // todo: genericise this?
-   for( const auto &playerIt : m_playerMap )
+   for( const auto& playerIt : m_playerMap )
    {
       sendDirectorVars( *playerIt.second );
    }
@@ -232,7 +232,7 @@ void Core::InstanceContent::setSequence( uint8_t value )
 {
    setDirectorSequence( value );
 
-   for( const auto &playerIt : m_playerMap )
+   for( const auto& playerIt : m_playerMap )
    {
       sendDirectorVars( *playerIt.second );
    }
@@ -242,7 +242,7 @@ void Core::InstanceContent::setBranch( uint8_t value )
 {
    setDirectorBranch( value );
 
-   for( const auto &playerIt : m_playerMap )
+   for( const auto& playerIt : m_playerMap )
    {
       sendDirectorVars( *playerIt.second );
    }
@@ -263,7 +263,7 @@ void Core::InstanceContent::onRegisterEObj( Entity::EventObjectPtr object )
       g_log.error( "InstanceContent::onRegisterEObj Zone " + m_internalName + ": No EObj data found for EObj with ID: " + std::to_string( object->getObjectId() ) );
 }
 
-void Core::InstanceContent::onBeforePlayerZoneIn( Core::Entity::Player &player )
+void Core::InstanceContent::onBeforePlayerZoneIn( Core::Entity::Player& player )
 {
    if( m_pEntranceEObj != nullptr )
    {
@@ -279,7 +279,7 @@ void Core::InstanceContent::onBeforePlayerZoneIn( Core::Entity::Player &player )
    player.resetObjSpawnIndex( );
 }
 
-Core::Entity::EventObjectPtr Core::InstanceContent::getEObjByName( const std::string &name )
+Core::Entity::EventObjectPtr Core::InstanceContent::getEObjByName( const std::string& name )
 {
    auto it = m_eventObjectMap.find( name );
    if( it == m_eventObjectMap.end() )
