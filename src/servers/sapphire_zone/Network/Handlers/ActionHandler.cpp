@@ -88,6 +88,8 @@ enum ClientTrigger
 
    DirectorInitFinish = 0x321,
 
+   SomeDirectorEvent = 0x328, // unsure what exactly triggers it, starts director when returning to instance though
+
    EnterTerritoryEventFinished = 0x330,
 
    AchievementCritReq = 0x3E8,
@@ -254,6 +256,11 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
            player.getCurrentZone()->onInitDirector( player );
            break;
         }
+       case ClientTrigger::SomeDirectorEvent: // Director init finish
+       {
+          player.getCurrentZone()->onSomeDirectorEvent( player );
+          break;
+       }
         case ClientTrigger::EnterTerritoryEventFinished:// this may still be something else. I think i have seen it elsewhere
         {
            player.setOnEnterEventDone( true );

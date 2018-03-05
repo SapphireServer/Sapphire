@@ -102,16 +102,18 @@ namespace Packets {
       NpcSpawn                   = 0x015D, // updated 4.2
       ActorMove                  = 0x015E, // updated 4.2
       ActorSetPos                = 0x0160, // updated 4.2
+
       ActorCast                  = 0x0162, // updated 4.2
+
       HateList                   = 0x0165, // updated 4.2
+
       ObjectSpawn                = 0x0167, // updated 4.2
       ObjectDespawn              = 0x0168, // updated 4.2
       UpdateClassInfo            = 0x0169, // updated 4.2
+
       InitUI                     = 0x016B, // updated 4.2
-
-      ActorOwner                 = 0x016D, // updated 4.2 ?
-
       PlayerStats                = 0x016C, // updated 4.2
+      ActorOwner                 = 0x016D, // updated 4.2 ?
       PlayerStateFlags           = 0x016E, // updated 4.2
       PlayerClassInfo            = 0x016F, // updated 4.2
       ModelEquip                 = 0x0170, // updated 4.2
@@ -126,6 +128,7 @@ namespace Packets {
       UpdateInventorySlot        = 0x0181, // updated 4.2
 
       EventPlay                  = 0x018E, // updated 4.2
+      DirectorPlayScene          = 0x0192, // updated 4.2
 
       EventStart                 = 0x0198, // updated 4.2
       EventFinish                = 0x0199, // updated 4.2

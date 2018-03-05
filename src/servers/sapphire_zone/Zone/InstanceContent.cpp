@@ -151,6 +151,12 @@ void Core::InstanceContent::onInitDirector( Entity::Player& player )
    player.setDirectorInitialized( true );
 }
 
+void Core::InstanceContent::onSomeDirectorEvent( Entity::Player& player )
+{
+   player.queuePacket( ActorControlPacket143( player.getId(), DirectorUpdate, 0x00110001, 0x80000000, 1 ) );
+}
+
+
 void Core::InstanceContent::setVar( uint8_t index, uint8_t value )
 {
    if( index > 19 )

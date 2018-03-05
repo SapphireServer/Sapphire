@@ -1,5 +1,6 @@
 #include <ScriptObject.h>
 #include <Zone/InstanceContent.h>
+#include <Actor/Player.h>
 
 class Sastasha : public InstanceContentScript
 {
@@ -70,7 +71,7 @@ public:
 
    void onEnterTerritory( Entity::Player &player, uint32_t eventId, uint16_t param1, uint16_t param2 ) override
    {
-
+      player.directorPlayScene( getId(), 1, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 0, 0xA );
    }
 
 };

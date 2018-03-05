@@ -663,6 +663,9 @@ void Core::Entity::Chara::sendStatusEffectUpdate()
 
    ZoneChannelPacket< Server::FFXIVIpcStatusEffectList > statusEffectList( getId() );
 
+   statusEffectList.data().classId = static_cast< uint8_t >( getClass() );
+   statusEffectList.data().level = getLevel();
+   statusEffectList.data().level1 = getLevel();
    statusEffectList.data().current_hp = getHp();
    statusEffectList.data().current_mp = getMp();
    statusEffectList.data().currentTp = getTp();
