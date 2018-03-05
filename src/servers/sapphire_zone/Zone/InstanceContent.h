@@ -30,13 +30,14 @@ public:
    virtual ~InstanceContent();
 
    bool init() override;
-   void onBeforeEnterTerritory( Entity::Player& player ) override;
-   void onEnterTerritory( Entity::Player& player ) override;
+   void onBeforePlayerZoneIn( Entity::Player &player ) override;
+   void onPlayerZoneIn( Entity::Player &player ) override;
    void onLeaveTerritory( Entity::Player& player ) override;
    void onFinishLoading( Entity::Player& player ) override;
    void onInitDirector( Entity::Player& player ) override;
    void onUpdate( uint32_t currTime ) override;
    void onTalk( Entity::Player& player, uint32_t eventId, uint64_t actorId );
+   void onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 ) override;
 
    void onRegisterEObj( Entity::EventObjectPtr object ) override;
 

@@ -160,7 +160,10 @@ void Core::Network::GameConnection::eventHandlerEnterTerritory( const Packets::G
 
    player.eventStart( player.getId(), eventId, Event::EventHandler::EnterTerritory, 0, player.getZoneId() );
 
-   g_scriptMgr.onEnterTerritory( player, eventId, param1, param2 );
+   if( auto instance = player.getCurrentInstance() )
+      instance->onEnterTerritory( player, eventId, param1, param2 );
+   else
+      g_scriptMgr.onEnterTerritory( player, eventId, param1, param2 );
 
    player.checkEvent( eventId );
 }

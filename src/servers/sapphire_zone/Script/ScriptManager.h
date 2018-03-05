@@ -59,6 +59,7 @@ namespace Core
 
          bool onInstanceInit( InstanceContentPtr instance );
          bool onInstanceUpdate( InstanceContentPtr instance, uint32_t currTime );
+         bool onInstanceEnterTerritory( InstanceContentPtr instance, Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 );
 
          void loadDir( const std::string& dirname, std::set<std::string> &files, const std::string& ext );
 
