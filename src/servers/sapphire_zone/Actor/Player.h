@@ -45,6 +45,8 @@ public:
 
    void autoAttack( CharaPtr pTarget ) override;
 
+   void injectPacket( std::string path );
+
    // EventHandlers
    //////////////////////////////////////////////////////////////////////////////////////////////////////
    /*! start an event action */
@@ -52,7 +54,7 @@ public:
    /*! start an event item action */
    void eventItemActionStart( uint32_t eventId, uint32_t action, ActionCallback finishCallback, ActionCallback interruptCallback, uint64_t additional );
    /*! start/register a normal event */
-   void eventStart( uint64_t actorId, uint32_t eventId, Event::EventHandler::EventType eventParam, uint8_t eventParam1, uint32_t eventParam2 );
+   void eventStart( uint64_t actorId, uint32_t eventId, Event::EventHandler::EventType eventParam, uint8_t eventParam1, uint32_t eventParam2, uint32_t contentId = 0 );
    /*! play a subevent */
    void eventPlay( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t eventParam2, uint32_t eventParam3 );
    /*! play a subevent */

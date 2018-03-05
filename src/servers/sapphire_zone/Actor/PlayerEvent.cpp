@@ -77,7 +77,7 @@ void Core::Entity::Player::checkEvent( uint32_t eventId )
 
 void Core::Entity::Player::eventStart( uint64_t actorId, uint32_t eventId, 
                                        Event::EventHandler::EventType eventType, uint8_t eventParam1,
-                                       uint32_t eventParam2 )
+                                       uint32_t eventParam2, uint32_t contentId )
 {
 
    auto newEvent = Event::make_EventHandler( this, actorId, eventId, eventType, eventParam2 );
@@ -86,7 +86,7 @@ void Core::Entity::Player::eventStart( uint64_t actorId, uint32_t eventId,
 
    setStateFlag( PlayerStateFlag::InNpcEvent );
 
-   EventStartPacket eventStart( getId(), actorId, eventId, eventType, eventParam1, eventParam2 );
+   EventStartPacket eventStart( getId(), actorId, eventId, eventType, eventParam1, eventParam2, contentId );
    
    queuePacket( eventStart );
    
