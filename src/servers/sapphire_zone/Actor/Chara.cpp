@@ -23,10 +23,9 @@
 #include "Chara.h"
 #include "Player.h"
 #include "Zone/TerritoryMgr.h"
+#include "Framework.h"
 
-extern Core::ServerZone g_serverZone;
-extern Core::Data::ExdDataGenerated g_exdDataGen;
-extern Core::TerritoryMgr g_territoryMgr;
+extern Core::Framework g_framework;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -429,7 +428,7 @@ void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, u
       getAsPlayer()->sendDebug( "Handle script skill type: " + std::to_string( type ) );
    }
 
-   auto actionInfoPtr = g_exdDataGen.get< Core::Data::Action >( actionId );
+   auto actionInfoPtr = g_framework.getExdDataGen().get< Core::Data::Action >( actionId );
 
    // Todo: Effect packet generator. 90% of this is basically setting params and it's basically unreadable.
    // Prepare packet. This is seemingly common for all packets in the action handler.

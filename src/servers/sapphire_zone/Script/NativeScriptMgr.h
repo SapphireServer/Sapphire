@@ -13,7 +13,7 @@
 namespace Core {
 namespace Scripting {
 
-   class NativeScriptManager
+   class NativeScriptMgr
    {
    protected:
       std::unordered_map< std::size_t, std::unordered_map< uint32_t, ScriptObject* > > m_scripts;
@@ -25,7 +25,7 @@ namespace Scripting {
       bool unloadScript( ScriptInfo* info );
 
    public:
-      NativeScriptManager( ) = default;
+      NativeScriptMgr( ) = default;
 
       bool loadScript( const std::string& path );
       bool unloadScript( const std::string& name );
@@ -52,7 +52,7 @@ namespace Scripting {
 
 
 
-   boost::shared_ptr< NativeScriptManager > createNativeScriptMgr();
+   boost::shared_ptr< NativeScriptMgr > createNativeScriptMgr();
 } }
 
 

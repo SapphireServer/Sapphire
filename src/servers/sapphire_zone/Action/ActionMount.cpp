@@ -1,5 +1,3 @@
-#include "ActionMount.h"
-
 #include <common/Common.h>
 #include <common/Util/Util.h>
 #include <common/Util/UtilMath.h>
@@ -8,16 +6,19 @@
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 #include "Network/PacketWrappers/ActorControlPacket144.h"
+
 #include "Actor/Player.h"
-#include "Script/ScriptManager.h"
+#include "Script/ScriptMgr.h"
+
+#include "ActionMount.h"
+#include "Framework.h"
 
 using namespace Core::Common;
 using namespace Core::Network;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-extern Core::Logger g_log;
-extern Core::Scripting::ScriptManager g_scriptMgr;
+extern Core::Framework g_framework;
 
 Core::Action::ActionMount::ActionMount()
 {

@@ -4,7 +4,12 @@
 #include <common/Common.h>
 #include "Action.h"
 
+
 namespace Core {
+namespace Data
+{
+   struct Action;
+}
 namespace Entity {
 
    enum class TargetFilter

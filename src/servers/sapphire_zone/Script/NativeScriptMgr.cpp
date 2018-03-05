@@ -1,4 +1,4 @@
-#include "NativeScriptManager.h"
+#include "NativeScriptMgr.h"
 #include <boost/filesystem.hpp>
 
 #include <common/Crypt/md5.h>
@@ -6,7 +6,7 @@
 namespace Core {
 namespace Scripting {
 
-   bool NativeScriptManager::loadScript( const std::string& path )
+   bool NativeScriptMgr::loadScript( const std::string& path )
    {
       auto module = m_loader.loadModule( path );
       if( !module )
@@ -44,12 +44,12 @@ namespace Scripting {
       return true;
    }
 
-   const std::string NativeScriptManager::getModuleExtension()
+   const std::string NativeScriptMgr::getModuleExtension()
    {
       return m_loader.getModuleExtension();
    }
 
-   bool NativeScriptManager::unloadScript( const std::string& name )
+   bool NativeScriptMgr::unloadScript( const std::string& name )
    {
       auto info = m_loader.getScriptInfo( name );
       if( !info )
@@ -58,7 +58,7 @@ namespace Scripting {
       return unloadScript( info );
    }
 
-   bool NativeScriptManager::unloadScript( ScriptInfo* info )
+   bool NativeScriptMgr::unloadScript( ScriptInfo* info )
    {
       for( auto& script : info->scripts )
       {
@@ -70,7 +70,7 @@ namespace Scripting {
       return m_loader.unloadScript( info );
    }
 
-   void NativeScriptManager::queueScriptReload( const std::string &name )
+   void NativeScriptMgr::queueScriptReload( const std::string &name )
    {
       auto info = m_loader.getScriptInfo( name );
       if( !info )
@@ -85,7 +85,7 @@ namespace Scripting {
       m_scriptLoadQueue.push( libPath );
    }
 
-   void NativeScriptManager::processLoadQueue()
+   void NativeScriptMgr::processLoadQueue()
    {
       std::vector< std::string > deferredLoads;
 
@@ -107,21 +107,21 @@ namespace Scripting {
       }
    }
 
-   void NativeScriptManager::findScripts( std::set< Core::Scripting::ScriptInfo* >& scripts, const std::string& search )
+   void NativeScriptMgr::findScripts( std::set< Core::Scripting::ScriptInfo* >& scripts, const std::string& search )
    {
       return m_loader.findScripts( scripts, search );
    }
 
-   bool NativeScriptManager::isModuleLoaded( const std::string &name )
+   bool NativeScriptMgr::isModuleLoaded( const std::string &name )
    {
       return m_loader.isModuleLoaded( name );
    }
 
 
 
-   boost::shared_ptr< NativeScriptManager > createNativeScriptMgr()
+   boost::shared_ptr< NativeScriptMgr > createNativeScriptMgr()
    {
-      return boost::make_shared< NativeScriptManager >();
+      return boost::make_shared< NativeScriptMgr >();
    }
 }
 }

@@ -1,36 +1,43 @@
+#include <boost/format.hpp>
+
 #include <common/Common.h>
 #include <common/Network/CommonNetwork.h>
 #include <common/Network/GamePacketNew.h>
 #include <common/Logging/Logger.h>
 #include <common/Network/PacketContainer.h>
 
-#include <boost/format.hpp>
-
 #include "Network/GameConnection.h"
-
-#include "Session.h"
-#include "Zone/Zone.h"
-#include "Zone/ZonePosition.h"
-#include "ServerZone.h"
-
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 #include "Network/PacketWrappers/ActorControlPacket144.h"
 
+#include "Zone/Zone.h"
+#include "Zone/ZonePosition.h"
+
 #include "DebugCommand/DebugCommandHandler.h"
 #include "Actor/Player.h"
 #include "Inventory/Inventory.h"
-#include "Forwards.h"
 
-extern Core::Logger g_log;
-extern Core::ServerZone g_serverZone;
-extern Core::DebugCommandHandler g_gameCommandMgr;
+#include "Session.h"
+#include "ServerZone.h"
+#include "Forwards.h"
+#include "Framework.h"
+
+extern Core::Framework g_framework;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
+enum InventoryOperation
+{
+   Discard = 0x07,
+   Move = 0x08,
+   Swap = 0x09,
+   Merge = 0x0C,
+   Split = 0x0A
+};
 
 void Core::Network::GameConnection::inventoryModifyHandler( const Packets::GamePacket& inPacket,
                                                             Entity::Player& player )
@@ -48,38 +55,38 @@ void Core::Network::GameConnection::inventoryModifyHandler( const Packets::GameP
    player.queuePacket( ackPacket );
 
 
-   g_log.debug( inPacket.toString() );
-   g_log.debug( "InventoryAction: " + std::to_string( action ) );
+   g_framework.getLogger().debug( inPacket.toString() );
+   g_framework.getLogger().debug( "InventoryAction: " + std::to_string( action ) );
 
    // TODO: other inventory operations need to be implemented
    switch( action )
    {
 
-      case 0x07: // discard item action
+      case InventoryOperation::Discard: // discard item action
       {
          player.getInventory()->discardItem( fromContainer, fromSlot );
       }
       break;
 
-      case 0x08: // move item action
+      case InventoryOperation::Move: // move item action
       {
          player.getInventory()->moveItem( fromContainer, fromSlot, toContainer, toSlot );
       }
       break;
 
-      case 0x09: // swap item action
+      case InventoryOperation::Swap: // swap item action
       {
          player.getInventory()->swapItem( fromContainer, fromSlot, toContainer, toSlot );
       }
       break;
 
-      case 0x0C: // merge stack action
+      case InventoryOperation::Merge: // merge stack action
       {
 
       }
       break;
 
-      case 0x0A: // split stack action
+      case InventoryOperation::Split: // split stack action
       {
 
       }

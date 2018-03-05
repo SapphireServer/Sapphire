@@ -1,5 +1,5 @@
-#ifndef SAPPHIRE_SCRIPTLOADER_H
-#define SAPPHIRE_SCRIPTLOADER_H
+#ifndef CORE_SCRIPTLOADER_H
+#define CORE_SCRIPTLOADER_H
 
 #include <string>
 #include <unordered_map>
@@ -10,6 +10,7 @@
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
+
 #include <winbase.h>
 typedef HMODULE ModuleHandle;
 #else
@@ -52,4 +53,4 @@ namespace Scripting {
 
 
 
-#endif //SAPPHIRE_SCRIPTLOADER_H
+#endif // CORE_SCRIPTLOADER_H

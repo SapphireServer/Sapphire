@@ -1,3 +1,5 @@
+#include <boost/format.hpp>
+
 #include <common/Common.h>
 #include <common/Network/CommonNetwork.h>
 #include <common/Network/GamePacketNew.h>
@@ -5,14 +7,10 @@
 #include <common/Network/PacketContainer.h>
 #include <common/Network/PacketDef/Chat/ServerChatDef.h>
 #include <common/Database/DatabaseDef.h>
-
 #include <boost/format.hpp>
 #include <unordered_map>
-
 #include "Network/GameConnection.h"
 
-#include "Session.h"
-#include "ServerZone.h"
 #include "Zone/TerritoryMgr.h"
 #include "Zone/Zone.h"
 #include "Zone/ZonePosition.h"
@@ -30,18 +28,22 @@
 #include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
 
 #include "DebugCommand/DebugCommandHandler.h"
+
 #include "Actor/Player.h"
+
 #include "Inventory/Inventory.h"
-#include "Forwards.h"
+
 #include "Event/EventHelper.h"
+
 #include "Action/Action.h"
 #include "Action/ActionTeleport.h"
 
+#include "Session.h"
+#include "ServerZone.h"
+#include "Forwards.h"
+#include "Framework.h"
 
-extern Core::Logger g_log;
-extern Core::ServerZone g_serverZone;
-extern Core::TerritoryMgr g_territoryMgr;
-extern Core::DebugCommandHandler g_gameCommandMgr;
+extern Core::Framework g_framework;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -283,7 +285,7 @@ void Core::Network::GameConnection::updatePositionHandler( const Packets::GamePa
 void Core::Network::GameConnection::reqEquipDisplayFlagsHandler( const Packets::GamePacket& inPacket,
                                                                  Entity::Player& player )
 {
-   g_log.info( "[" + std::to_string( player.getId() ) + "] Setting EquipDisplayFlags to " + std::to_string( inPacket.getValAt< uint8_t >( 0x20 ) ) );
+   g_framework.getLogger().info( "[" + std::to_string( player.getId() ) + "] Setting EquipDisplayFlags to " + std::to_string( inPacket.getValAt< uint8_t >( 0x20 ) ) );
    player.setEquipDisplayFlags( inPacket.getValAt< uint8_t >( 0x20 ) );
 }
 
@@ -296,7 +298,7 @@ void Core::Network::GameConnection::zoneLineHandler( const Packets::GamePacket& 
 
    auto pZone = player.getCurrentZone();
 
-   auto pLine = g_territoryMgr.getTerritoryPosition( zoneLineId );
+   auto pLine = g_framework.getTerritoryMgr().getTerritoryPosition( zoneLineId );
 
    Common::FFXIVARR_POSITION3 targetPos{};
    uint32_t targetZone;
@@ -335,7 +337,7 @@ void Core::Network::GameConnection::discoveryHandler( const Packets::GamePacket&
 {
    uint32_t ref_position_id = inPacket.getValAt< uint32_t >( 0x20 );
 
-   auto pQR = g_charaDb.query( "SELECT id, map_id, discover_id "
+   auto pQR = g_framework.getCharaDb().query( "SELECT id, map_id, discover_id "
                                "FROM discoveryinfo "
                                "WHERE id = " + std::to_string( ref_position_id ) + ";" );
 
@@ -494,7 +496,7 @@ void Core::Network::GameConnection::chatHandler( const Packets::GamePacket& inPa
    if( chatString.at( 0 ) == '!' )
    {
       // execute game console command
-      g_gameCommandMgr.execCommand( const_cast< char * >( chatString.c_str() ) + 1, player );
+      g_framework.getDebugCommandHandler().execCommand( const_cast< char * >( chatString.c_str() ) + 1, player );
       return;
    }
 
@@ -551,7 +553,7 @@ void Core::Network::GameConnection::tellHandler( const Packets::GamePacket& inPa
    std::string targetPcName = inPacket.getStringAt( 0x21 );
    std::string msg = inPacket.getStringAt( 0x41 );
 
-   auto pSession = g_serverZone.getSession( targetPcName );
+   auto pSession = g_framework.getServerZone().getSession( targetPcName );
 
    if( !pSession )
    {
@@ -559,7 +561,7 @@ void Core::Network::GameConnection::tellHandler( const Packets::GamePacket& inPa
       strcpy( tellErrPacket.data().receipientName, targetPcName.c_str() );
       sendSinglePacket( tellErrPacket );
 
-      g_log.debug( "TargetPc not found" );
+      g_framework.getLogger().debug( "TargetPc not found" );
       return;
    }
 

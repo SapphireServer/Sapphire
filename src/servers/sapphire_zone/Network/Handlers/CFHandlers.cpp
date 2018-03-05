@@ -3,24 +3,26 @@
 #include <common/Network/GamePacketNew.h>
 #include <common/Logging/Logger.h>
 #include <common/Network/PacketContainer.h>
+#include <common/Exd/ExdDataGenerated.h>
+
+#include "Zone/TerritoryMgr.h"
+#include "Zone/Zone.h"
 
 #include "Network/GameConnection.h"
-#include "Session.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 #include "Network/PacketWrappers/ActorControlPacket144.h"
 #include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
+
 #include "Actor/Player.h"
 
 #include "Forwards.h"
-#include <common/Exd/ExdDataGenerated.h>
-#include "Zone/TerritoryMgr.h"
-#include "Zone/Zone.h"
+#include "Framework.h"
+#include "Session.h"
 
-extern Core::Logger g_log;
-extern Core::Data::ExdDataGenerated g_exdDataGen;
-extern Core::TerritoryMgr g_territoryMgr;
+
+extern Core::Framework g_framework;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -70,11 +72,11 @@ void Core::Network::GameConnection::cfRegisterDuty( const Packets::GamePacket& i
    cfCancelPacket.data().state2 = 1; // Your registration is withdrawn.
    queueOutPacket( cfCancelPacket );
 
-   auto cfCondition = g_exdDataGen.get< Core::Data::ContentFinderCondition >( contentId1 );
+   auto cfCondition = g_framework.getExdDataGen().get< Core::Data::ContentFinderCondition >( contentId1 );
    if( !cfCondition )
       return;
 
-   auto instance = g_territoryMgr.createInstanceContent( cfCondition->instanceContent );
+   auto instance = g_framework.getTerritoryMgr().createInstanceContent( cfCondition->instanceContent );
    if( !instance )
       return;
 
