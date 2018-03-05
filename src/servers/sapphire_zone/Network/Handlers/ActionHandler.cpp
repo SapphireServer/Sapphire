@@ -1,3 +1,5 @@
+#include <boost/format.hpp>
+
 #include <common/Common.h>
 #include <common/Network/CommonNetwork.h>
 #include <common/Network/GamePacketNew.h>
@@ -5,15 +7,10 @@
 #include <common/Exd/ExdDataGenerated.h>
 #include <common/Network/PacketContainer.h>
 
-#include <boost/format.hpp>
-
-#include "Network/GameConnection.h"
-
-#include "Session.h"
 #include "Zone/Zone.h"
 #include "Zone/ZonePosition.h"
-#include "ServerZone.h"
 
+#include "Network/GameConnection.h"
 #include "Network/PacketWrappers/InitUIPacket.h"
 #include "Network/PacketWrappers/PingPacket.h"
 #include "Network/PacketWrappers/MoveActorPacket.h"
@@ -27,17 +24,22 @@
 #include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
 
 #include "DebugCommand/DebugCommandHandler.h"
+
 #include "Actor/Player.h"
+
 #include "Inventory/Inventory.h"
-#include "Forwards.h"
+
 #include "Event/EventHelper.h"
+
 #include "Action/Action.h"
 #include "Action/ActionTeleport.h"
 
-extern Core::Logger g_log;
-extern Core::ServerZone g_serverZone;
-extern Core::Data::ExdDataGenerated g_exdDataGen;
-extern Core::DebugCommandHandler g_gameCommandMgr;
+#include "Session.h"
+#include "ServerZone.h"
+#include "Forwards.h"
+#include "Framework.h"
+
+extern Core::Framework g_framework;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -112,7 +114,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
     uint32_t param2 = inPacket.getValAt< uint32_t >( 0x2C );
     uint64_t param3 = inPacket.getValAt< uint64_t >( 0x38 );
 
-    g_log.debug( "[" + std::to_string( m_pSession->getId() ) + "] Incoming action: " +
+    g_framework.getLogger().debug( "[" + std::to_string( m_pSession->getId() ) + "] Incoming action: " +
                  boost::str( boost::format( "%|04X|" ) % ( uint32_t ) ( commandId & 0xFFFF ) ) +
                  "\nparam1: " + boost::str( boost::format( "%|016X|" ) % ( uint64_t ) ( param1 & 0xFFFFFFFFFFFFFFF ) ) +
                  "\nparam2: " + boost::str( boost::format( "%|08X|" ) % ( uint32_t ) ( param2 & 0xFFFFFFFF ) ) +
@@ -244,6 +246,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
 
         case ClientTrigger::Teleport: // Teleport
         {
+
             player.teleportQuery( param11 );
             break;
         }
@@ -268,7 +271,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
         }
         default:
         {
-           g_log.debug( "[" + std::to_string( m_pSession->getId() ) + "] Unhandled action: " +
+           g_framework.getLogger().debug( "[" + std::to_string( m_pSession->getId() ) + "] Unhandled action: " +
               boost::str( boost::format( "%|04X|" ) % (uint32_t) ( commandId & 0xFFFF ) ) );
            break;
         }

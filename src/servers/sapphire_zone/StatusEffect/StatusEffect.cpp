@@ -1,3 +1,6 @@
+#include <boost/algorithm/string.hpp>
+#include <algorithm>
+
 #include <common/Exd/ExdDataGenerated.h>
 #include <common/Util/Util.h>
 #include <common/Network/PacketDef/Zone/ServerZoneDef.h>
@@ -7,18 +10,18 @@
 #include <algorithm>
 
 #include "Actor/Chara.h"
+#include "Actor/Actor.h"
+
+#include "Script/ScriptMgr.h"
 
 #include "StatusEffect.h"
-#include "Script/ScriptManager.h"
+#include "Framework.h"
 
-extern Core::Logger g_log;
-extern Core::Data::ExdDataGenerated g_exdDataGen;
+extern Core::Framework g_framework;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
-extern Core::Scripting::ScriptManager g_scriptMgr;
-
 
 Core::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
                                                 uint32_t duration, uint32_t tickRate )
@@ -30,7 +33,7 @@ Core::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPtr so
    , m_tickRate( tickRate )
    , m_lastTick( 0 )
 {
-   auto entry = g_exdDataGen.get< Core::Data::Status >( id );
+   auto entry = g_framework.getExdDataGen().get< Core::Data::Status >( id );
    m_name = entry->name;
       
    std::replace( m_name.begin(), m_name.end(), ' ', '_' );
@@ -64,7 +67,7 @@ std::pair< uint8_t, uint32_t> Core::StatusEffect::StatusEffect::getTickEffect()
 void Core::StatusEffect::StatusEffect::onTick()
 {
    m_lastTick = Util::getTimeMs();
-   g_scriptMgr.onStatusTick( m_targetActor, *this );
+   g_framework.getScriptMgr().onStatusTick( m_targetActor, *this );
 }
 
 uint32_t Core::StatusEffect::StatusEffect::getSrcActorId() const
@@ -104,14 +107,14 @@ void Core::StatusEffect::StatusEffect::applyStatus()
    //effectPacket.data().effects[4].unknown_5 = 0x80;
    //m_sourceActor->sendToInRangeSet( effectPacket, true );
 
-   g_log.debug( "StatusEffect applied: " + m_name );
-   g_scriptMgr.onStatusReceive( m_targetActor, m_id );
+   g_framework.getLogger().debug( "StatusEffect applied: " + m_name );
+   g_framework.getScriptMgr().onStatusReceive( m_targetActor, m_id );
 }
 
 void Core::StatusEffect::StatusEffect::removeStatus()
 {
-   g_log.debug( "StatusEffect removed: " + m_name );
-   g_scriptMgr.onStatusTimeOut( m_targetActor, m_id );
+   g_framework.getLogger().debug( "StatusEffect removed: " + m_name );
+   g_framework.getScriptMgr().onStatusTimeOut( m_targetActor, m_id );
 }
 
 uint32_t Core::StatusEffect::StatusEffect::getId() const

@@ -1,4 +1,3 @@
-#include "InstanceContent.h"
 
 #include <common/Common.h>
 #include <common/Logging/Logger.h>
@@ -7,7 +6,7 @@
 #include <common/Exd/ExdDataGenerated.h>
 
 #include "Event/Director.h"
-#include "Script/ScriptManager.h"
+#include "Script/ScriptMgr.h"
 
 #include "Actor/Player.h"
 #include "Actor/EventObject.h"
@@ -15,11 +14,13 @@
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 
+
 #include "Event/EventHandler.h"
 
-extern Core::Logger g_log;
-extern Core::Scripting::ScriptManager g_scriptMgr;
-extern Core::Data::ExdDataGenerated g_exdDataGen;
+#include "InstanceContent.h"
+#include "Framework.h"
+
+extern Core::Framework g_framework;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -42,7 +43,7 @@ Core::InstanceContent::InstanceContent( boost::shared_ptr< Core::Data::InstanceC
 
 bool Core::InstanceContent::init()
 {
-   g_scriptMgr.onInstanceInit( getAsInstanceContent() );
+   g_framework.getScriptMgr().onInstanceInit( getAsInstanceContent() );
 
    return true;
 }
@@ -65,7 +66,7 @@ Core::Data::ExdDataGenerated::InstanceContentPtr Core::InstanceContent::getInsta
 
 void Core::InstanceContent::onPlayerZoneIn( Entity::Player& player )
 {
-   g_log.debug( "InstanceContent::onPlayerZoneIn: Zone#" + std::to_string( getGuId() ) + "|"
+   g_framework.getLogger().debug( "InstanceContent::onEnterTerritory: Zone#" + std::to_string( getGuId() ) + "|"
                                                            + std::to_string( getInstanceContentId() ) +
                                                            + ", Entity#" + std::to_string( player.getId() ) );
 
@@ -81,7 +82,7 @@ void Core::InstanceContent::onPlayerZoneIn( Entity::Player& player )
 
 void Core::InstanceContent::onLeaveTerritory( Entity::Player& player )
 {
-   g_log.debug( "InstanceContent::onLeaveTerritory: Zone#" + std::to_string( getGuId() ) + "|"
+   g_framework.getLogger().debug( "InstanceContent::onLeaveTerritory: Zone#" + std::to_string( getGuId() ) + "|"
                                                            + std::to_string( getInstanceContentId() ) +
                                                            + ", Entity#" + std::to_string( player.getId() ) );
    sendDirectorClear( player );
@@ -137,7 +138,8 @@ void Core::InstanceContent::onUpdate( uint32_t currTime )
          break;
    }
 
-   g_scriptMgr.onInstanceUpdate( getAsInstanceContent(), currTime );
+   g_framework.getScriptMgr().onInstanceUpdate( getAsInstanceContent(), currTime );
+
 }
 
 void Core::InstanceContent::onFinishLoading( Entity::Player& player )
@@ -261,12 +263,14 @@ void Core::InstanceContent::onRegisterEObj( Entity::EventObjectPtr object )
    if( object->getObjectId() == 2000182 ) // start
       m_pEntranceEObj = object;
 
-   auto objData = g_exdDataGen.get< Core::Data::EObj >( object->getObjectId() );
+   auto objData = g_framework.getExdDataGen().get< Core::Data::EObj >( object->getObjectId() );
    if( objData )
       // todo: data should be renamed to eventId
       m_eventIdToObjectMap[objData->data] = object;
    else
-      g_log.error( "InstanceContent::onRegisterEObj Zone " + m_internalName + ": No EObj data found for EObj with ID: " + std::to_string( object->getObjectId() ) );
+      g_framework.getLogger().error( "InstanceContent::onRegisterEObj Zone " +
+                                     m_internalName + ": No EObj data found for EObj with ID: " +
+                                     std::to_string( object->getObjectId() ) );
 }
 
 void Core::InstanceContent::onBeforePlayerZoneIn( Core::Entity::Player& player )
@@ -311,5 +315,5 @@ void Core::InstanceContent::onTalk( Core::Entity::Player& player, uint32_t event
 
 void Core::InstanceContent::onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 )
 {
-   g_scriptMgr.onInstanceEnterTerritory( getAsInstanceContent(), player, eventId, param1, param2 );
+   g_framework.getScriptMgr().onInstanceEnterTerritory( getAsInstanceContent(), player, eventId, param1, param2 );
 }

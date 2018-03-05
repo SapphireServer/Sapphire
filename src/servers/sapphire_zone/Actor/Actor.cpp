@@ -5,6 +5,11 @@
 #include <common/Util/Util.h>
 #include <common/Util/UtilMath.h>
 
+#include "Forwards.h"
+#include "Action/Action.h"
+#include "Action/ActionCollision.h"
+
+#include "Zone/Zone.h"
 
 #include "Network/GameConnection.h"
 
@@ -16,7 +21,25 @@
 #include "Session.h"
 #include "Zone/Zone.h"
 
-extern Core::ServerZone g_serverZone;
+
+#include "Zone/TerritoryMgr.h"
+
+#include "StatusEffect/StatusEffect.h"
+
+#include "Math/CalcBattle.h"
+
+#include "ServerZone.h"
+#include "Session.h"
+#include "Actor.h"
+#include "Player.h"
+
+#include "Framework.h"
+
+extern Core::Framework g_framework;
+
+using namespace Core::Common;
+using namespace Core::Network::Packets;
+//using namespace Core::Network::Packets::Server;
 
 Core::Entity::Actor::Actor( ObjKind type ) :
    m_objKind( type )
@@ -270,7 +293,7 @@ void Core::Entity::Actor::sendToInRangeSet( Network::Packets::GamePacketPtr pPac
    {
       auto pPlayer = getAsPlayer();
 
-      auto pSession = g_serverZone.getSession( pPlayer->getId() );
+      auto pSession = g_framework.getServerZone().getSession( pPlayer->getId() );
 
       // it might be that the player DC'd in which case the session would be invalid
       if( pSession )

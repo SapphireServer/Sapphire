@@ -1,8 +1,10 @@
 #include <common/Common.h>
 #include <common/Exd/ExdDataGenerated.h>
+
+#include "Framework.h"
 #include "Item.h"
 
-extern Core::Data::ExdDataGenerated g_exdDataGen;
+extern Core::Framework g_framework;
 
 Core::Item::Item()
 {
@@ -24,7 +26,7 @@ Core::Item::Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t mo
    m_model2( model2 ),
    m_isHq( isHq )
 {
-   auto itemInfo = g_exdDataGen.get< Core::Data::Item >( catalogId );
+   auto itemInfo = g_framework.getExdDataGen().get< Core::Data::Item >( catalogId );
    m_delayMs = itemInfo->delayms;
    m_physicalDmg = itemInfo->damagePhys;
    m_magicalDmg = itemInfo->damageMag;
