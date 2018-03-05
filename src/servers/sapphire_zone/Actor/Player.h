@@ -45,6 +45,8 @@ public:
 
    void autoAttack( CharaPtr pTarget ) override;
 
+   void injectPacket( std::string path );
+
    // EventHandlers
    //////////////////////////////////////////////////////////////////////////////////////////////////////
    /*! start an event action */

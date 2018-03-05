@@ -360,6 +360,18 @@ bool Core::Scripting::ScriptManager::onInstanceUpdate( InstanceContentPtr instan
    return false;
 }
 
+bool Core::Scripting::ScriptManager::onInstanceEnterTerritory( InstanceContentPtr instance, Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 )
+{
+   auto script = m_nativeScriptManager->getScript< InstanceContentScript >( instance->getDirectorId() );
+   if( script )
+   {
+      script->onEnterTerritory( player, eventId, param1, param2 );
+      return true;
+   }
+
+   return false;
+}
+
 Scripting::NativeScriptManager& Core::Scripting::ScriptManager::getNativeScriptHandler()
 {
    return *m_nativeScriptManager;

@@ -73,13 +73,14 @@ public:
 
    virtual void loadCellCache();
    virtual uint32_t getTerritoryId() const;
-   virtual void onBeforeEnterTerritory( Entity::Player& player ) {};
-   virtual void onEnterTerritory( Entity::Player& player );
+   virtual void onBeforePlayerZoneIn( Entity::Player &player ) {};
+   virtual void onPlayerZoneIn( Entity::Player &player );
    virtual void onFinishLoading( Entity::Player& player );
    virtual void onInitDirector( Entity::Player& player );
    virtual void onLeaveTerritory( Entity::Player& player );
    virtual void onUpdate( uint32_t currTime );
    virtual void onRegisterEObj( Entity::EventObjectPtr object ) {};
+   virtual void onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 );
 
    Common::Weather getNextWeather();
 

@@ -63,9 +63,9 @@ Core::Data::ExdDataGenerated::InstanceContentPtr Core::InstanceContent::getInsta
    return m_instanceContentInfo;
 }
 
-void Core::InstanceContent::onEnterTerritory( Entity::Player& player )
+void Core::InstanceContent::onPlayerZoneIn( Entity::Player &player )
 {
-   g_log.debug( "InstanceContent::onEnterTerritory: Zone#" + std::to_string( getGuId() ) + "|"
+   g_log.debug( "InstanceContent::onPlayerZoneIn: Zone#" + std::to_string( getGuId() ) + "|"
                                                            + std::to_string( getInstanceContentId() ) +
                                                            + ", Entity#" + std::to_string( player.getId() ) );
 
@@ -263,7 +263,7 @@ void Core::InstanceContent::onRegisterEObj( Entity::EventObjectPtr object )
       g_log.error( "InstanceContent::onRegisterEObj Zone " + m_internalName + ": No EObj data found for EObj with ID: " + std::to_string( object->getObjectId() ) );
 }
 
-void Core::InstanceContent::onBeforeEnterTerritory( Core::Entity::Player &player )
+void Core::InstanceContent::onBeforePlayerZoneIn( Core::Entity::Player &player )
 {
    if( m_pEntranceEObj != nullptr )
    {
@@ -301,4 +301,9 @@ void Core::InstanceContent::onTalk( Core::Entity::Player& player, uint32_t event
    else
       player.sendDebug( "No onTalk handler found for interactable eobj with EObjID: " +
                         std::to_string( it->second->getObjectId() ) + ", eventId: " + std::to_string( eventId ) );
+}
+
+void Core::InstanceContent::onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 )
+{
+   g_scriptMgr.onInstanceEnterTerritory( getAsInstanceContent(), player, eventId, param1, param2 );
 }
