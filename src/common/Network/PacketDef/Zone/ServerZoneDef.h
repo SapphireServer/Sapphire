@@ -188,7 +188,7 @@ struct FFXIVIpcLinkshellList : FFXIVIpcBasePacket<LinkshellList>
 struct FFXIVIpcStatusEffectList : FFXIVIpcBasePacket<StatusEffectList>
 {
    uint8_t classId;
-   uint8_t classId1;
+   uint8_t level1;
    uint16_t level;
    uint32_t current_hp;
    uint32_t max_hp;
@@ -414,7 +414,7 @@ struct FFXIVIpcPlayerSpawn : FFXIVIpcBasePacket<PlayerSpawn>
 */
 struct FFXIVIpcNpcSpawn : FFXIVIpcBasePacket<NpcSpawn>
 {
-   uint32_t mapLinkId; // needs to be existing in the map, mob will snap to it
+   uint32_t gimmickId; // needs to be existing in the map, mob will snap to it
    uint8_t u2b;
    uint8_t u2ab;
    uint8_t gmRank;
@@ -565,7 +565,7 @@ struct FFXIVIpcHateList : FFXIVIpcBasePacket<HateList>
 struct FFXIVIpcUpdateClassInfo : FFXIVIpcBasePacket<UpdateClassInfo>
 {
    uint8_t classId;
-   uint8_t classId1;
+   uint8_t level1;
    uint16_t level;
    uint32_t nextLevelIndex;
    uint32_t currentExp;
@@ -1021,6 +1021,24 @@ struct FFXIVIpcEventPlay : FFXIVIpcBasePacket<EventPlay>
    uint8_t unknown[8];
 };
 
+   /**
+* Structural representation of the packet sent by the server
+* to play an event
+*/
+struct FFXIVIpcDirectorPlayScene : FFXIVIpcBasePacket<DirectorPlayScene>
+{
+   uint64_t actorId;
+   uint32_t eventId;
+   uint16_t scene;
+   uint16_t padding;
+   uint32_t flags;
+   uint32_t param3;
+   uint8_t param4;
+   uint8_t padding1[3];
+   uint32_t param5;
+   uint8_t unknown[0x40];
+};
+
 /**
 * Structural representation of the packet sent by the server
 * to finish an event
@@ -1324,7 +1342,7 @@ struct FFXIVIpcObjectSpawn : FFXIVIpcBasePacket<ObjectSpawn>
    uint32_t levelId;
    uint32_t unknown10;
    uint32_t someActorId14;
-   uint32_t hierachyId;
+   uint32_t gimmickId;
    float scale;
    int16_t unknown20a;
    uint16_t rotation;

@@ -17,6 +17,7 @@
 #include "Network/PacketWrappers/EventStartPacket.h"
 #include "Network/PacketWrappers/EventPlayPacket.h"
 #include "Network/PacketWrappers/EventFinishPacket.h"
+#include "Network/PacketWrappers/DirectorPlayScenePacket.h"
 
 #include "Action/EventAction.h"
 #include "Action/EventItemAction.h"
@@ -74,6 +75,27 @@ void Core::Entity::Player::checkEvent( uint32_t eventId )
       eventFinish( eventId, 1 );
 }
 
+
+void Core::Entity::Player::directorPlayScene( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t eventParam2,
+                                              uint32_t eventParam3 )
+{
+   if( flags & 0x02 )
+      setStateFlag( PlayerStateFlag::WatchingCutscene );
+
+   auto pEvent = getEvent( eventId );
+   if( !pEvent )
+   {
+      g_log.error( "Could not find event " + std::to_string( eventId ) + ", event has not been started!" );
+      return;
+   }
+
+   pEvent->setPlayedScene( true );
+   pEvent->setEventReturnCallback( nullptr );
+   DirectorPlayScenePacket eventPlay( getId(), getId(), pEvent->getId(),
+                                      scene, flags, eventParam2, eventParam3 );
+
+   queuePacket( eventPlay );
+}
 
 void Core::Entity::Player::eventStart( uint64_t actorId, uint32_t eventId, 
                                        Event::EventHandler::EventType eventType, uint8_t eventParam1,

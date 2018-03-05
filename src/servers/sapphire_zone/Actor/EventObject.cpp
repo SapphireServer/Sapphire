@@ -18,11 +18,11 @@ using namespace Core::Network::Packets::Server;
 extern Core::Logger g_log;
 
 
-Core::Entity::EventObject::EventObject( uint32_t actorId, uint32_t objectId, uint32_t mapLinkId,
+Core::Entity::EventObject::EventObject( uint32_t actorId, uint32_t objectId, uint32_t gimmickId,
                                         uint8_t initialState, Common::FFXIVARR_POSITION3 pos,
                                         float rotation, const std::string& givenName ) :
    Core::Entity::Actor( ObjKind::EventObj ),
-   m_mapLinkId( mapLinkId ),
+   m_gimmickId( gimmickId ),
    m_state( initialState ),
    m_objectId( objectId ),
    m_name( givenName )
@@ -34,9 +34,9 @@ Core::Entity::EventObject::EventObject( uint32_t actorId, uint32_t objectId, uin
    m_rot = rotation;
 }
 
-uint32_t Core::Entity::EventObject::getMapLinkId() const
+uint32_t Core::Entity::EventObject::getGimmickId() const
 {
-   return m_mapLinkId;
+   return m_gimmickId;
 }
 
 uint32_t Core::Entity::EventObject::getObjectId() const
@@ -64,9 +64,9 @@ void Core::Entity::EventObject::setOnTalkHandler( Core::Entity::EventObject::OnT
    m_onTalkEventHandler = handler;
 }
 
-void Core::Entity::EventObject::setMapLinkId( uint32_t mapLinkId )
+void Core::Entity::EventObject::setGimmickId( uint32_t gimmickId )
 {
-   m_mapLinkId = mapLinkId;
+   m_gimmickId = gimmickId;
 }
 
 uint8_t Core::Entity::EventObject::getState() const
@@ -110,7 +110,7 @@ void Core::Entity::EventObject::spawn( Core::Entity::PlayerPtr pTarget )
    eobjStatePacket.data().objKind = getObjKind();
    eobjStatePacket.data().state = getState();
    eobjStatePacket.data().objId = getObjectId();
-   eobjStatePacket.data().hierachyId = getMapLinkId();
+   eobjStatePacket.data().gimmickId = getGimmickId();
    eobjStatePacket.data().position = getPos();
    eobjStatePacket.data().scale = getScale();
    eobjStatePacket.data().actorId = getId();

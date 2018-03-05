@@ -630,7 +630,7 @@ void Core::Entity::Player::gainLevel()
 
    ZoneChannelPacket< FFXIVIpcStatusEffectList > effectListPacket( getId() );
    effectListPacket.data().classId = static_cast< uint8_t > ( getClass() );
-   effectListPacket.data().classId1 = static_cast< uint8_t > ( getClass() );
+   effectListPacket.data().level1 = getLevel();
    effectListPacket.data().level = getLevel();
    effectListPacket.data().current_hp = getMaxHp();
    effectListPacket.data().current_mp = getMaxMp();
@@ -645,7 +645,7 @@ void Core::Entity::Player::gainLevel()
 
    ZoneChannelPacket< FFXIVIpcUpdateClassInfo > classInfoPacket( getId() );
    classInfoPacket.data().classId = static_cast< uint8_t > ( getClass() );
-   classInfoPacket.data().classId1 = static_cast< uint8_t > ( getClass() );
+   classInfoPacket.data().level1 = getLevel();
    classInfoPacket.data().level = getLevel();
    classInfoPacket.data().nextLevelIndex = getLevel();
    classInfoPacket.data().currentExp = getExp();
@@ -1683,3 +1683,5 @@ bool Core::Entity::Player::isOnEnterEventDone() const
 {
    return m_onEnterEventDone;
 }
+
+

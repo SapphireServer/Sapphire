@@ -10,13 +10,13 @@ namespace Entity
    class EventObject : public Actor
    {
    public:
-      EventObject( uint32_t actorId, uint32_t objectId, uint32_t mapLinkId, uint8_t initialState, Common::FFXIVARR_POSITION3 pos,
+      EventObject( uint32_t actorId, uint32_t objectId, uint32_t gimmickId, uint8_t initialState, Common::FFXIVARR_POSITION3 pos,
                    float rotation, const std::string& givenName = "none" );
 
       using OnTalkEventHandler = std::function< void( Entity::Player&, Entity::EventObjectPtr, InstanceContentPtr, uint64_t ) >;
 
-      uint32_t getMapLinkId() const;
-      void setMapLinkId( uint32_t mapLinkId );
+      uint32_t getGimmickId() const;
+      void setGimmickId( uint32_t gimmickId );
 
       uint8_t getState() const;
       void setState( uint8_t state );
@@ -38,7 +38,7 @@ namespace Entity
       void despawn( PlayerPtr pTarget ) override;
 
    protected:
-      uint32_t m_mapLinkId;
+      uint32_t m_gimmickId;
       uint32_t m_objectId;
       uint8_t m_state;
       float m_scale;
