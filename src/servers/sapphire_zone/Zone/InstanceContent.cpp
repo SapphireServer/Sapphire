@@ -115,7 +115,7 @@ void Core::InstanceContent::onUpdate( uint32_t currTime )
 
          if( m_instanceCommenceTime == 0 )
          {
-            m_instanceCommenceTime = Util::getTimeMs() + INSTANCE_COMMENCE_DELAY;
+            m_instanceCommenceTime = Util::getTimeMs() + instanceStartDelay;
             return;
          }
          else if( Util::getTimeMs() < m_instanceCommenceTime )
@@ -129,7 +129,8 @@ void Core::InstanceContent::onUpdate( uint32_t currTime )
                                            getDirectorId(), 0x40000001, m_instanceContentInfo->timeLimitmin * 60u ) );
          }
 
-         m_pEntranceEObj->setState( 7 );
+         if( m_pEntranceEObj )
+            m_pEntranceEObj->setState( 7 );
          m_state = DutyInProgress;
          m_instanceExpireTime = Util::getTimeSeconds() + ( m_instanceContentInfo->timeLimitmin * 60u );
          break;
