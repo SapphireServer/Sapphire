@@ -16,14 +16,14 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
 
 # set(Boost_DEBUG 1)
 
-if(NOT SAPPHIRE_BOOST_VER)
-    set(SAPPHIRE_BOOST_VER 1.60.0)
+if( NOT SAPPHIRE_BOOST_VER )
+    set( SAPPHIRE_BOOST_VER 1.63.0 )
 endif()
-set(SAPPHIRE_BOOST_FOLDER_NAME boost_1_60_0)
+set( SAPPHIRE_BOOST_FOLDER_NAME boost_1_63_0 )
 
 ##########################################################################
 # Common and library path
-set(LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/libraries")
+set( LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/libraries" )
 
 ##########################################################################
 # Dependencies and compiler settings
@@ -34,22 +34,22 @@ include( "cmake/cotire.cmake" )
 ##############################
 #             Git            #
 ##############################
-include(GetGitRevisionDescription)
-get_git_head_revision(GIT_REFSPEC GIT_SHA1)
-git_describe(VERSION --all --dirty=-d)
-configure_file("src/common/Version.cpp.in"
-               "src/common/Version.cpp" @ONLY)
+include( GetGitRevisionDescription )
+get_git_head_revision( GIT_REFSPEC GIT_SHA1 )
+git_describe( VERSION --all --dirty=-d )
+configure_file( "${CMAKE_CURRENT_SOURCE_DIR}/src/common/Version.cpp.in"
+                "${CMAKE_CURRENT_SOURCE_DIR}/src/common/Version.cpp" @ONLY )
 
 ##########################################################################
-add_subdirectory("src/libraries/sapphire/datReader")
-add_subdirectory("src/libraries/sapphire/mysqlConnector")
-add_subdirectory("src/common")
+add_subdirectory( "src/libraries/sapphire/datReader" )
+add_subdirectory( "src/libraries/sapphire/mysqlConnector" )
+add_subdirectory( "src/common" )
 
-add_subdirectory("src/servers")
+add_subdirectory( "src/servers" )
 
-add_subdirectory("src/tools/exd_common_gen")
-add_subdirectory("src/tools/exd_struct_gen")
-add_subdirectory("src/tools/exd_struct_test")
-add_subdirectory("src/tools/quest_parser")
+add_subdirectory( "src/tools/exd_common_gen" )
+add_subdirectory( "src/tools/exd_struct_gen" )
+add_subdirectory( "src/tools/exd_struct_test" )
+add_subdirectory( "src/tools/quest_parser" )
 #add_subdirectory("src/tools/pcb_reader")
 #add_subdirectory("src/tools/event_object_parser")

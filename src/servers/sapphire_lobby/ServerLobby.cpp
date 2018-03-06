@@ -16,6 +16,8 @@
 
 #include "GameConnection.h"
 #include "RestConnector.h"
+#include "Forwards.h"
+#include <Forwards.h>
 
 #include <thread>
 #include <boost/thread.hpp>
