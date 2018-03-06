@@ -1,6 +1,8 @@
 #include "../Group.h"
 #include "SocialMgr.h"
 
+#include "Forwards.h"
+
 
 template< class T >
 Core::Social::SocialMgr< T >::SocialMgr()

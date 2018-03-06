@@ -33,7 +33,7 @@
 #include <Social/Manager/SocialMgr.h>
 #include "Social/FriendList.h"
 
-#include "Script/ScriptManager.h"
+#include "Script/ScriptMgr.h"
 #include "Inventory/Item.h"
 #include "Inventory/Inventory.h"
 

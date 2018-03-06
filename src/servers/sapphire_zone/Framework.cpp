@@ -4,6 +4,12 @@
 
 Core::ServerZone g_serverZone( "config/settings_zone.xml" );
 
+bool Core::Framework::initSocialGroups()
+{
+   g_friendListMgr = Core::Social::SocialMgr< Core::Social::FriendList >();
+   return true;
+}
+
 Core::Logger& Core::Framework::getLogger()
 {
    return g_log;
@@ -42,4 +48,9 @@ Core::Db::DbWorkerPool< Core::Db::CharaDbConnection >& Core::Framework::getChara
 Core::ServerZone& Core::Framework::getServerZone()
 {
    return g_serverZone;
+}
+
+Core::Social::SocialMgr< Core::Social::FriendList > Core::Framework::getFriendsListMgr()
+{
+   return g_friendListMgr;
 }

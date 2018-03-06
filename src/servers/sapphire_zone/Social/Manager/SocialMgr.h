@@ -8,6 +8,8 @@
 #include <sapphire_zone/Forwards.h>
 #include <Social/Group.h>
 
+#include "Forwards.h"
+
 namespace Core {
 namespace Social {
 
@@ -15,6 +17,7 @@ template< class T >
 class SocialMgr
 {
 public:
+
    SocialMgr();
    virtual ~SocialMgr();
 

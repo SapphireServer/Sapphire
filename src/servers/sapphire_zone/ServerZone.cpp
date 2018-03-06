@@ -202,6 +202,10 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
 
    g_log = g_framework.getLogger();
    
+   if ( !g_framework.initSocialGroups() )
+   {
+      g_framework.getLogger().fatal( "Unable to initialize social groups!" );
+   }
 
    if( !loadSettings( argc, argv ) )
    {
@@ -216,8 +220,7 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
       return;
    }
 
-   g_friendListMgr = Core::Social::SocialMgr< Core::Social::FriendList >(); 
-   g_friendListMgr.findGroupById( 0 );
+   g_framework.getFriendsListMgr().findGroupById( 0 );
 
    Network::HivePtr hive( new Network::Hive() );
    Network::addServerToHive< Network::GameConnection >( m_ip, m_port, hive );

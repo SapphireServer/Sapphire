@@ -6,11 +6,11 @@
 
 #include "Forwards.h"
 
-
 #include "ServerZone.h"
 
 #include <common/Logging/Logger.h>
-
+#include <common/Database/CharaDbConnection.h>
+#include <common/Database/DbWorkerPool.h>
 #include <common/Exd/ExdDataGenerated.h>
 
 #include "Script/ScriptMgr.h"
@@ -21,8 +21,8 @@
 
 #include "DebugCommand/DebugCommandHandler.h"
 
-#include <common/Database/CharaDbConnection.h>
-#include <common/Database/DbWorkerPool.h>
+#include "Social/Manager/SocialMgr.h"
+
 
 namespace Core
 {
@@ -38,8 +38,11 @@ private:
    TerritoryMgr g_territoryMgr;
    LinkshellMgr g_linkshellMgr;
    Db::DbWorkerPool< Db::CharaDbConnection > g_charaDb;
+   Social::SocialMgr< Social::FriendList > g_friendListMgr;
 
 public:
+
+   bool initSocialGroups();
 
    Logger& getLogger();
    DebugCommandHandler& getDebugCommandHandler();
@@ -49,6 +52,8 @@ public:
    LinkshellMgr& getLinkshellMgr();
    Db::DbWorkerPool< Db::CharaDbConnection >& getCharaDb();
    ServerZone& getServerZone();
+
+   Social::SocialMgr< Social::FriendList > getFriendsListMgr();
 
 };
 

@@ -2,6 +2,7 @@
 #include <boost/make_shared.hpp>
 #include <boost/format.hpp>
 #include <cinttypes>
+#include <random>
 
 #include <common/Common.h>
 #include <common/Version.h>
@@ -376,7 +377,7 @@ void Core::DebugCommandHandler::add( char * data, Entity::Player& player, boost:
       {
          Common::FFXIVARR_POSITION3 posC = player.getPos();
          std::mt19937 gen( rand() * 1000 );
-         std::uniform_int_distribution<int> dis( distCoefficient * -1, distCoefficient );
+         std::uniform_int_distribution< int > dis( distCoefficient * -1, distCoefficient );
 
          posC.x += dis( gen );
          posC.z += dis( gen );
