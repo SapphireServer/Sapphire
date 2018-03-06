@@ -286,15 +286,22 @@ void Core::InstanceContent::onRegisterEObj( Entity::EventObjectPtr object )
 
 void Core::InstanceContent::onBeforePlayerZoneIn( Core::Entity::Player& player )
 {
-   if( m_pEntranceEObj != nullptr )
+   // if a player has already spawned once inside this instance, don't move them if they happen to zone in again
+   auto it = m_spawnedPlayers.find( player.getId() );
+   if( it == m_spawnedPlayers.end() )
    {
-      player.setRot( PI );
-      player.setPos( m_pEntranceEObj->getPos() );
-   }
-   else
-   {
-      player.setRot( PI );
-      player.setPos( { 0.f, 0.f, 0.f } );
+      if( m_pEntranceEObj != nullptr )
+      {
+         player.setRot( PI );
+         player.setPos( m_pEntranceEObj->getPos() );
+      }
+      else
+      {
+         player.setRot( PI );
+         player.setPos( { 0.f, 0.f, 0.f } );
+      }
+
+      m_spawnedPlayers.insert( player.getId() );
    }
 
    player.resetObjSpawnIndex( );
