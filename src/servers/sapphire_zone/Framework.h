@@ -54,7 +54,7 @@ public:
    Db::DbWorkerPool< Db::CharaDbConnection >& getCharaDb();
    ServerZone& getServerZone();
 
-   Social::SocialMgr< Social::FriendList > getFriendsListMgr();
+   Social::SocialMgr< Social::FriendList >& getFriendsListMgr();
 
 };
 

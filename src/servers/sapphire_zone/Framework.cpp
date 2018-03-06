@@ -50,7 +50,7 @@ Core::ServerZone& Core::Framework::getServerZone()
    return g_serverZone;
 }
 
-Core::Social::SocialMgr< Core::Social::FriendList > Core::Framework::getFriendsListMgr()
+Core::Social::SocialMgr< Core::Social::FriendList >& Core::Framework::getFriendsListMgr()
 {
    return g_friendListMgr;
 }

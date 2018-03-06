@@ -44,6 +44,9 @@
 #include "Forwards.h"
 #include "Framework.h"
 
+#include "Social/Group.h"
+#include "Social/FriendList.h"
+
 extern Core::Framework g_framework;
 
 using namespace Core::Common;
