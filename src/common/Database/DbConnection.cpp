@@ -1,8 +1,8 @@
 #include "DbConnection.h"
 #include "DbWorker.h"
-#include "src/libraries/sapphire/mysqlConnector/MySqlConnector.h"
+#include <MySqlConnector.h>
 
-#include <common/Logging/Logger.h>
+#include "Logging/Logger.h"
 #include "PreparedStatement.h"
 #include <boost/make_shared.hpp>
 

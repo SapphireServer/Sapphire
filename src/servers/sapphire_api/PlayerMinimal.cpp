@@ -1,10 +1,10 @@
 #include "PlayerMinimal.h"
 
-#include <common/Util/Util.h>
-#include <common/Common.h>
-#include <common/Exd/ExdDataGenerated.h>
+#include <Util/Util.h>
+#include <Common.h>
+#include <Exd/ExdDataGenerated.h>
 
-#include <common/Database/DatabaseDef.h>
+#include <Database/DatabaseDef.h>
 
 extern Core::Data::ExdDataGenerated g_exdDataGen;
 

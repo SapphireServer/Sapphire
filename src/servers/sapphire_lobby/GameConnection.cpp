@@ -1,15 +1,15 @@
 #include "GameConnection.h"
 
-#include <common/Common.h>
-#include <common/Network/CommonNetwork.h>
-#include <common/Util/Util.h>
-#include <common/Logging/Logger.h>
-#include <common/Network/GamePacket.h>
-#include <common/Network/GamePacketNew.h>
-#include <common/Network/PacketDef/Lobby/ServerLobbyDef.h>
-#include <common/Network/GamePacketParser.h>
-#include <common/Crypt/md5.h>
-#include <common/Crypt/blowfish.h>
+#include <Common.h>
+#include <Network/CommonNetwork.h>
+#include <Util/Util.h>
+#include <Logging/Logger.h>
+#include <Network/GamePacket.h>
+#include <Network/GamePacketNew.h>
+#include <Network/PacketDef/Lobby/ServerLobbyDef.h>
+#include <Network/GamePacketParser.h>
+#include <Crypt/md5.h>
+#include <Crypt/blowfish.h>
 
 #include <boost/property_tree/json_parser.hpp>
 

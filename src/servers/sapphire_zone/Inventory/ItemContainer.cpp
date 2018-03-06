@@ -1,6 +1,6 @@
-#include <common/Common.h>
-#include <common/Logging/Logger.h>
-#include <common/Database/DatabaseDef.h>
+#include <Common.h>
+#include <Logging/Logger.h>
+#include <Database/DatabaseDef.h>
 
 #include "Actor/Player.h"
 

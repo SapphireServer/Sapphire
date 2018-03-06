@@ -1,5 +1,5 @@
 #include "SapphireAPI.h"
-#include <common/Crypt/base64.h>
+#include <Crypt/base64.h>
 #include "Session.h"
 #include "PlayerMinimal.h"
 #include <time.h>
@@ -11,7 +11,7 @@
 #include <boost/foreach.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include <common/Database/DatabaseDef.h>
+#include <Database/DatabaseDef.h>
 #include <boost/make_shared.hpp>
 
 Core::Network::SapphireAPI::SapphireAPI()

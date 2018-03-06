@@ -1,13 +1,13 @@
 #include <boost/make_shared.hpp>
 
-#include <common/Common.h>
-#include <common/Util/Util.h>
-#include <common/Util/UtilMath.h>
-#include <common/Config/XMLConfig.h>
-#include <common/Network/GamePacket.h>
-#include <common/Logging/Logger.h>
-#include <common/Exd/ExdDataGenerated.h>
-#include <common/Network/PacketContainer.h>
+#include <Common.h>
+#include <Util/Util.h>
+#include <Util/UtilMath.h>
+#include <Config/XMLConfig.h>
+#include <Network/GamePacket.h>
+#include <Logging/Logger.h>
+#include <Exd/ExdDataGenerated.h>
+#include <Network/PacketContainer.h>
 
 #include "Session.h"
 #include "Player.h"

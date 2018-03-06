@@ -4,8 +4,8 @@
 #include <vector>
 #include <string.h>
 
-#include <common/Network/CommonNetwork.h>
-#include <common/Util/Util.h>
+#include <Network/CommonNetwork.h>
+#include <Util/Util.h>
 
 #include "Forwards.h"
 

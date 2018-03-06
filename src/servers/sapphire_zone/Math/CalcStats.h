@@ -1,7 +1,7 @@
 #ifndef _CALCSTATS_H
 #define _CALCSTATS_H
 
-#include <common/Common.h>
+#include <Common.h>
 #include "Forwards.h"
 
 using namespace Core::Entity;

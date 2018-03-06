@@ -1,12 +1,12 @@
 #include <boost/format.hpp>
 
-#include <common/Common.h>
-#include <common/Network/CommonNetwork.h>
-#include <common/Network/GamePacketNew.h>
-#include <common/Logging/Logger.h>
-#include <common/Network/PacketContainer.h>
-#include <common/Network/PacketDef/Chat/ServerChatDef.h>
-#include <common/Database/DatabaseDef.h>
+#include <Common.h>
+#include <Network/CommonNetwork.h>
+#include <Network/GamePacketNew.h>
+#include <Logging/Logger.h>
+#include <Network/PacketContainer.h>
+#include <Network/PacketDef/Chat/ServerChatDef.h>
+#include <Database/DatabaseDef.h>
 #include <boost/format.hpp>
 #include <unordered_map>
 #include "Network/GameConnection.h"
