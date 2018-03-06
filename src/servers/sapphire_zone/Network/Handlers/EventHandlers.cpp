@@ -163,14 +163,8 @@ void Core::Network::GameConnection::eventHandlerEnterTerritory( const Packets::G
 
    player.sendDebug( "Calling: " + objName + "." + eventName + " - " + std::to_string( eventId ) );
 
-   player.eventStart( player.getId(), eventId, Event::EventHandler::EnterTerritory, 0, player.getZoneId(), 0 );
-
    if( auto instance = player.getCurrentInstance() )
    {
-      // param2 of eventStart
-      // 0 = default state?
-      // 1 = restore state?
-      // (^ Mordred: Nope, i don't think thats it )
       player.eventStart( player.getId(), eventId, Event::EventHandler::EnterTerritory, 0, player.getZoneId(), instance->getDirectorId() & 0xFFFF );
       instance->onEnterTerritory( player, eventId, param1, param2 );
    }
