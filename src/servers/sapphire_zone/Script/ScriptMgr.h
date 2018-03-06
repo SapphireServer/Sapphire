@@ -5,7 +5,7 @@
 #include <mutex>
 #include <set>
 
-#include <common/Common.h>
+#include <Common.h>
 #include "Forwards.h"
 
 namespace Core

@@ -1,7 +1,7 @@
 #ifndef SAPPHIRE_DIRECTOR_H
 #define SAPPHIRE_DIRECTOR_H
 
-#include <common/Common.h>
+#include <Common.h>
 
 #include "Forwards.h"
 

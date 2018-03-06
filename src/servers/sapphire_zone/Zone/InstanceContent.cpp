@@ -1,9 +1,9 @@
 
-#include <common/Common.h>
-#include <common/Logging/Logger.h>
-#include <common/Util/Util.h>
-#include <common/Util/UtilMath.h>
-#include <common/Exd/ExdDataGenerated.h>
+#include <Common.h>
+#include <Logging/Logger.h>
+#include <Util/Util.h>
+#include <Util/UtilMath.h>
+#include <Exd/ExdDataGenerated.h>
 
 #include "Event/Director.h"
 #include "Script/ScriptMgr.h"

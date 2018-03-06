@@ -1,13 +1,13 @@
 #include "DbWorkerPool.h"
 #include "DbConnection.h"
 #include "PreparedStatement.h"
-#include <libraries/sapphire/mysqlConnector/MySqlConnector.h>
+#include <MySqlConnector.h>
 #include "StatementTask.h"
 #include "Operation.h"
 #include "CharaDbConnection.h"
 #include <boost/make_shared.hpp>
 
-#include <common/Logging/Logger.h>
+#include "Logging/Logger.h"
 extern Core::Logger g_log;
 
 class PingOperation : public Core::Db::Operation

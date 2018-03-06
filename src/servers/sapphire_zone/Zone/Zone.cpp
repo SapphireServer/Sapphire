@@ -2,16 +2,16 @@
 #include <vector>
 #include <time.h>
 
-#include <common/Logging/Logger.h>
-#include <common/Util/Util.h>
-#include <common/Util/UtilMath.h>
-#include <common/Network/GamePacket.h>
-#include <common/Network/GamePacketNew.h>
-#include <common/Exd/ExdDataGenerated.h>
-#include <common/Network/CommonNetwork.h>
-#include <common/Network/PacketDef/Zone/ServerZoneDef.h>
-#include <common/Network/PacketContainer.h>
-#include <common/Database/DatabaseDef.h>
+#include <Logging/Logger.h>
+#include <Util/Util.h>
+#include <Util/UtilMath.h>
+#include <Network/GamePacket.h>
+#include <Network/GamePacketNew.h>
+#include <Exd/ExdDataGenerated.h>
+#include <Network/CommonNetwork.h>
+#include <Network/PacketDef/Zone/ServerZoneDef.h>
+#include <Network/PacketContainer.h>
+#include <Database/DatabaseDef.h>
 
 #include "Zone.h"
 #include "InstanceContent.h"

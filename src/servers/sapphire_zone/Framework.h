@@ -6,12 +6,12 @@
 
 #include "Forwards.h"
 
-
 #include "ServerZone.h"
 
-#include <common/Logging/Logger.h>
-
-#include <common/Exd/ExdDataGenerated.h>
+#include <Logging/Logger.h>
+#include <Exd/ExdDataGenerated.h>
+#include <Database/CharaDbConnection.h>
+#include <Database/DbWorkerPool.h>
 
 #include "Script/ScriptMgr.h"
 
@@ -21,8 +21,6 @@
 
 #include "DebugCommand/DebugCommandHandler.h"
 
-#include <common/Database/CharaDbConnection.h>
-#include <common/Database/DbWorkerPool.h>
 
 namespace Core
 {

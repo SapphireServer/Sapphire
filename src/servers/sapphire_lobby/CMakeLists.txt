@@ -8,7 +8,6 @@ file(GLOB SERVER_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}*.c*")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_CURRENT_SOURCE_DIR}/../../../bin/")
 
 add_executable(sapphire_lobby ${SERVER_PUBLIC_INCLUDE_FILES} ${SERVER_SOURCE_FILES})
-add_dependencies(sapphire_lobby common xivdat)
 
 set_target_properties(sapphire_lobby PROPERTIES
     CXX_STANDARD 14
@@ -22,9 +21,10 @@ set_target_properties(sapphire_lobby PROPERTIES
 )
 
 if (UNIX)
-  target_link_libraries(sapphire_lobby common xivdat pthread mysqlclient mysqlConnector dl z)
+  target_link_libraries(sapphire_lobby common pthread dl z)
 else()
-  target_link_libraries(sapphire_lobby common xivdat libmysql mysqlConnector zlib1)
+  target_link_libraries(sapphire_lobby common zlib1)
 endif()
 
 target_link_libraries(sapphire_lobby ${Boost_LIBRARIES} ${Boost_LIBRARIES})
+cotire( sapphire_lobby )

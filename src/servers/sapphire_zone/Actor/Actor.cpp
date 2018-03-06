@@ -1,9 +1,9 @@
 #include "Actor.h"
 
-#include <common/Network/PacketContainer.h>
-#include <common/Network/GamePacket.h>
-#include <common/Util/Util.h>
-#include <common/Util/UtilMath.h>
+#include <Network/PacketContainer.h>
+#include <Network/GamePacket.h>
+#include <Util/Util.h>
+#include <Util/UtilMath.h>
 
 #include "Forwards.h"
 #include "Action/Action.h"

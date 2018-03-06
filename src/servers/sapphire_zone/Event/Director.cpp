@@ -1,7 +1,7 @@
 #include "Director.h"
 
-#include <common/Network/PacketDef/Ipcs.h>
-#include <common/Network/PacketDef/Zone/ServerZoneDef.h>
+#include <Network/PacketDef/Ipcs.h>
+#include <Network/PacketDef/Zone/ServerZoneDef.h>
 
 #include "Actor/Player.h"
 

@@ -4,9 +4,11 @@
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
 
-#include <common/Logging/Logger.h>
-#include <common/Exd/ExdDataGenerated.h>
-#include <common/Config/XMLConfig.h>
+#include <Logging/Logger.h>
+#include <Exd/ExdDataGenerated.h>
+#include <Config/XMLConfig.h>
+
+#include "watchdog/Watchdog.h"
 
 #include "Zone/Zone.h"
 #include "Zone/InstanceContent.h"
@@ -27,7 +29,6 @@
 
 // enable the ambiguity fix for every platform to avoid #define nonsense
 #define WIN_AMBIGUITY_FIX
-#include <libraries/external/watchdog/Watchdog.h>
 
 extern Core::Framework g_framework;
 

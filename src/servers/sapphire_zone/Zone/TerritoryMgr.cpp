@@ -1,6 +1,6 @@
-#include <common/Logging/Logger.h>
-#include <common/Database/DatabaseDef.h>
-#include <common/Exd/ExdDataGenerated.h>
+#include <Logging/Logger.h>
+#include <Database/DatabaseDef.h>
+#include <Exd/ExdDataGenerated.h>
 
 #include <unordered_map>
 

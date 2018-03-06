@@ -1,7 +1,7 @@
 #ifndef _ACTION_H_
 #define _ACTION_H_
 
-#include <common/Common.h>
+#include <Common.h>
 #include "../Forwards.h"
 
 namespace Core {

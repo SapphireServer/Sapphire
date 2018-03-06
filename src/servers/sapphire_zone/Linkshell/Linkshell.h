@@ -1,7 +1,7 @@
 #ifndef CORE_LINKSHELL_H
 #define CORE_LINKSHELL_H
 
-#include <common/Common.h>
+#include <Common.h>
 #include <set>
 
 namespace Core

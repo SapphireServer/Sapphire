@@ -1,7 +1,7 @@
 #include "NativeScriptMgr.h"
 #include <boost/filesystem.hpp>
 
-#include <common/Crypt/md5.h>
+#include <Crypt/md5.h>
 
 namespace Core {
 namespace Scripting {
