@@ -14,9 +14,9 @@
 namespace Core {
    namespace Common {
 
-   // 99 is the last spawn id that seems to spawn any actor
-   const uint8_t MAX_DISPLAYED_ACTORS = 99;
-   const uint8_t MAX_DISPLAYED_EOBJS = 40;
+      // 99 is the last spawn id that seems to spawn any actor
+      const uint8_t MAX_DISPLAYED_ACTORS = 99;
+      const uint8_t MAX_DISPLAYED_EOBJS = 40;
 
       const int32_t INVALID_GAME_OBJECT_ID = 0xE0000000;
 
@@ -381,44 +381,39 @@ namespace Core {
          InvincibilityStayAlive,
       };
 
-      enum struct PlayerStateFlag : uint8_t
+      enum PlayerStateFlag : uint8_t
       {
-         NoCombat,
-         Combat,
-         Casting,
-         StatusAffliction,
-         StatusAffliction1,
-         Occupied,
-         Occupied1,
-         Occupied2,
-         Occupied3,
+         HideUILockChar = 0, // as the name suggests, hides the ui and logs the char...
+         InCombat = 1, // in Combat, locks gearchange/return/teleport
+         Casting = 2,
+         InNpcEvent = 7, // when talking to an npc, locks ui giving "occupied" message
 
-         BoundByDuty,
-         Occupied4,
-         DuelingArea,
-         TradeOpen,
-         Occupied5,
-         HandlingItems,
-         Crafting,
-         PreparingToCraft,
-         Gathering,
-         Fishing,
+         InNpcEvent1 = 10, // Sent together with InNpcEvent, when waiting for input? just a guess...
 
-   enum PlayerStateFlag : uint8_t
-   {
-      HideUILockChar = 0, // as the name suggests, hides the ui and logs the char...
-      InCombat = 1, // in Combat, locks gearchange/return/teleport
-      Casting = 2,
-      InNpcEvent = 7, // when talking to an npc, locks ui giving "occupied" message
-
-      InNpcEvent1 = 10, // Sent together with InNpcEvent, when waiting for input? just a guess...
-
-      BetweenAreas = 24,
-      BoundByDuty = 28,
-      WatchingCutscene = 50, // this is actually just a dummy, this id is different
+         BetweenAreas = 24,
+         BoundByDuty = 28,
+         WatchingCutscene = 50, // this is actually just a dummy, this id is different
 
 
-   };
+      };
+
+      enum struct FateStatus : uint8_t
+      {
+         Active = 2,
+         Inactive = 4,
+         Preparing = 7,
+         Completed = 8,
+      };
+
+      enum ActorControlType : uint16_t
+      {
+         ToggleWeapon = 0x01,
+         SetStatus = 0x02,
+         CastStart = 0x03,
+         ToggleAggro = 0x04,
+         ClassJobChange = 0x05,
+         DefeatMsg = 0x06,
+         GainExpMsg = 0x07,
 
          LevelUpEffect = 0x0A,
 
@@ -712,16 +707,6 @@ namespace Core {
          MountSkill = 0xD,
       };
 
-      /*! ModelType as found in eventsystemdefine.exd */
-      enum ModelType : uint8_t
-      {
-         Human = 1,
-         DemiHuman = 2,
-         Monster = 3,
-         SharedGroup = 4,
-         Parts = 5
-      };
-
       enum SocialCategory : uint8_t
       {
          Party = 1,
@@ -730,9 +715,15 @@ namespace Core {
          FreeCompany = 5,
       };
 
-   typedef std::vector< PlayerStateFlag > PlayerStateFlagList;
+      enum SocialListType : uint8_t
+      {
+         PartyList = 0x02,
+         FriendList = 0x0b,
+         SearchList = 0x0e,
+      };
 
-      // todo: rename SocialRequestAction and SocialRequestResponse cause they seem ambiguous 
+
+      // todo: rename SocialRequestAction and SocialRequestResponse cause they seem ambiguous
       enum class SocialRequestAction : uint8_t
       {
          Invite = 1,

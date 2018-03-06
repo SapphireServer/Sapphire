@@ -72,7 +72,6 @@ namespace Packets {
 
       Playtime                   = 0x00DF, // updated 4.2
       CFRegistered               = 0x00B8, // updated 4.1
-      SocialRequestResponse      = 0x00BB, // updated 4.1
       CancelAllianceForming      = 0x00C6, // updated 4.2
       Chat                       = 0x00E1, // updated 4.2
       SocialRequestResponse      = 0x00E5, // updated 4.1

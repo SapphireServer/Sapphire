@@ -22,7 +22,8 @@
 #include "DebugCommand/DebugCommandHandler.h"
 
 #include "Social/Manager/SocialMgr.h"
-
+#include "Social/FriendList.h"
+#include "Social/Group.h"
 
 namespace Core
 {
