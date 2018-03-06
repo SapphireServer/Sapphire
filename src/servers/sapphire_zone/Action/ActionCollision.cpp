@@ -1,7 +1,7 @@
-#include <common/Util/Util.h>
-#include <common/Util/UtilMath.h>
+#include <Util/Util.h>
+#include <Util/UtilMath.h>
 
-#include <common/Exd/ExdDataGenerated.h>
+#include <Exd/ExdDataGenerated.h>
 
 #include "ActionCollision.h"
 #include "Actor/Actor.h"

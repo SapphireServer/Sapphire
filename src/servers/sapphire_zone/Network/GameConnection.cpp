@@ -1,11 +1,11 @@
 #include <boost/format.hpp>
 
-#include <common/Common.h>
-#include <common/Network/CommonNetwork.h>
-#include <common/Util/Util.h>
-#include <common/Logging/Logger.h>
-#include <common/Network/PacketContainer.h>
-#include <common/Network/GamePacketParser.h>
+#include <Common.h>
+#include <Network/CommonNetwork.h>
+#include <Util/Util.h>
+#include <Logging/Logger.h>
+#include <Network/PacketContainer.h>
+#include <Network/GamePacketParser.h>
 
 #include "Zone/Zone.h"
 

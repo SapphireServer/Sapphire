@@ -3,8 +3,8 @@
 
 #include "Forwards.h"
 
-#include <common/Common.h>
-#include <common/Util/SpawnIndexAllocator.h>
+#include <Common.h>
+#include <Util/SpawnIndexAllocator.h>
 
 #include "Chara.h"
 #include "Inventory/Inventory.h"

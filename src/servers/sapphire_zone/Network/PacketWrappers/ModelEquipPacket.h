@@ -1,7 +1,7 @@
 #ifndef _MODELEQUIPPACKET_H
 #define _MODELEQUIPPACKET_H
 
-#include <common/Network/GamePacketNew.h>
+#include <Network/GamePacketNew.h>
 #include "Actor/Player.h"
 #include "Forwards.h"
 

@@ -1,5 +1,5 @@
 #include "CharaDbConnection.h"
-#include <libraries/sapphire/mysqlConnector/MySqlConnector.h>
+#include <MySqlConnector.h>
 
 Core::Db::CharaDbConnection::CharaDbConnection( ConnectionInfo& connInfo ) : DbConnection( connInfo )
 {

@@ -1,8 +1,8 @@
-#include <common/Common.h>
-#include <common/Network/PacketDef/Zone/ServerZoneDef.h>
-#include <common/Network/GamePacket.h>
-#include <common/Exd/ExdDataGenerated.h>
-#include <common/Network/PacketContainer.h>
+#include <Common.h>
+#include <Network/PacketDef/Zone/ServerZoneDef.h>
+#include <Network/GamePacket.h>
+#include <Exd/ExdDataGenerated.h>
+#include <Network/PacketContainer.h>
 
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/QuestMessagePacket.h"

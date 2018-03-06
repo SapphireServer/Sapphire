@@ -1,8 +1,8 @@
-#include <common/Common.h>
-#include <common/Util/Util.h>
-#include <common/Util/UtilMath.h>
-#include <common/Logging/Logger.h>
-#include <common/Exd/ExdDataGenerated.h>
+#include <Common.h>
+#include <Util/Util.h>
+#include <Util/UtilMath.h>
+#include <Logging/Logger.h>
+#include <Exd/ExdDataGenerated.h>
 
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"

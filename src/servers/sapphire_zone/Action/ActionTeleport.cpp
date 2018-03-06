@@ -1,6 +1,6 @@
-#include <common/Util/Util.h>
-#include <common/Exd/ExdDataGenerated.h>
-#include <common/Logging/Logger.h>
+#include <Util/Util.h>
+#include <Exd/ExdDataGenerated.h>
+#include <Logging/Logger.h>
 
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"

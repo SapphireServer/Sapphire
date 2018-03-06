@@ -1,8 +1,8 @@
 #include "RestConnector.h"
 #include "LobbySession.h"
 #include "ServerLobby.h"
-#include <common/Logging/Logger.h>
-#include <common/Crypt/base64.h>
+#include <Logging/Logger.h>
+#include <Crypt/base64.h>
 #include <time.h>
 #include <iomanip>
 

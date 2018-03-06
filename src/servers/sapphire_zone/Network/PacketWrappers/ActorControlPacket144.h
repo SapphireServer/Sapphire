@@ -1,8 +1,8 @@
 #ifndef _ACTORCONTROL144_H
 #define _ACTORCONTROL144_H
 
-#include <common/Network/GamePacketNew.h>
-#include <common/Network/PacketDef/Zone/ServerZoneDef.h>
+#include <Network/GamePacketNew.h>
+#include <Network/PacketDef/Zone/ServerZoneDef.h>
 
 namespace Core {
 namespace Network {

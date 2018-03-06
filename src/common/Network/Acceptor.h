@@ -5,7 +5,7 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
-#include <common/Forwards.h>
+#include "Forwards.h"
 
 namespace Core 
 {

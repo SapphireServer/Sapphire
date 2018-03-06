@@ -2,7 +2,7 @@
 #include <mysqld_error.h>
 #include "CharaDbConnection.h"
 #include "DbWorkerPool.h"
-#include <common/Logging/Logger.h>
+#include "Logging/Logger.h"
 
 extern Core::Logger g_log;
 

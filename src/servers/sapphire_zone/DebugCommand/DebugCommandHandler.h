@@ -2,9 +2,9 @@
 #define _GAMECOMMANDHANDLER_H_
 
 #include <map>
+#include <Common.h>
 
 #include "DebugCommand.h"
-#include <common/Common.h>
 #include "Forwards.h"
 
 namespace Core {

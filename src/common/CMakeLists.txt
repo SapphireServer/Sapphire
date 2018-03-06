@@ -1,12 +1,6 @@
-cmake_minimum_required(VERSION 2.6)
-project(Sapphire)
+cmake_minimum_required( VERSION 3.0.2 )
+project( Sapphire )
 
-include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
-
-file(GLOB UTILS_PUBLIC_INCLUDE_FILES 
-        "${CMAKE_CURRENT_SOURCE_DIR}"
-        "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Exd/*.h" )
 file(GLOB UTILS_SOURCE_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Config/*.cpp"
@@ -18,13 +12,13 @@ file(GLOB UTILS_SOURCE_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/Network/PacketDef/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Script/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Util/*.cpp")
-      
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} )
 
-add_library(common ${UTILS_PUBLIC_INCLUDE_FILES} ${UTILS_SOURCE_FILES})
 
-set_target_properties(common PROPERTIES
+add_library( common ${UTILS_PUBLIC_INCLUDE_FILES} ${UTILS_SOURCE_FILES} )
+
+set_target_properties( common PROPERTIES
     CXX_STANDARD 14
     CXX_STANDARD_REQUIRED ON
     CXX_EXTENSIONS ON
@@ -34,8 +28,14 @@ set_target_properties(common PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_CURRENT_SOURCE_DIR}/../../bin/"
 )
 
-if (UNIX)
-  target_link_libraries( common xivdat mysqlclient mysqlConnector )
+target_link_libraries( common PUBLIC xivdat )
+target_link_libraries( common PUBLIC mysqlConnector )
+
+if( UNIX )
+  target_link_libraries( common PUBLIC mysqlclient )
 else()
-  target_link_libraries( common xivdat mysqlConnector libmysql )
+  target_link_libraries( common PUBLIC libmysql )
 endif()
+
+target_include_directories( common PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/" )
+target_include_directories( common PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/libraries/external/")

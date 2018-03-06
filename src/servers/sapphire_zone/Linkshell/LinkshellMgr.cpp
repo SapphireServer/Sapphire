@@ -1,7 +1,7 @@
 #include <boost/make_shared.hpp>
 
-#include <common/Logging/Logger.h>
-#include <common/Database/DatabaseDef.h>
+#include <Logging/Logger.h>
+#include <Database/DatabaseDef.h>
 
 #include "Linkshell.h"
 #include "Framework.h"
