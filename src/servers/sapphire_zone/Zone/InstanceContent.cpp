@@ -36,7 +36,8 @@ Core::InstanceContent::InstanceContent( boost::shared_ptr< Core::Data::InstanceC
      m_instanceContentInfo( pInstanceContent ),
      m_instanceContentId( instanceContentId ),
      m_state( Created ),
-     m_pEntranceEObj( nullptr )
+     m_pEntranceEObj( nullptr ),
+     m_instanceCommenceTime( 0 )
 {
 
 }
@@ -107,9 +108,18 @@ void Core::InstanceContent::onUpdate( uint32_t currTime )
          {
             if( !playerIt.second->isLoadingComplete() ||
                 !playerIt.second->isDirectorInitialized() ||
-                !playerIt.second->isOnEnterEventDone() )
+                !playerIt.second->isOnEnterEventDone() ||
+                playerIt.second->hasStateFlag( PlayerStateFlag::WatchingCutscene ) )
                return;
          }
+
+         if( m_instanceCommenceTime == 0 )
+         {
+            m_instanceCommenceTime = Util::getTimeMs() + INSTANCE_COMMENCE_DELAY;
+            return;
+         }
+         else if( Util::getTimeMs() < m_instanceCommenceTime )
+            return;
 
          for( const auto& playerIt : m_playerMap )
          {
@@ -119,6 +129,7 @@ void Core::InstanceContent::onUpdate( uint32_t currTime )
                                            getDirectorId(), 0x40000001, m_instanceContentInfo->timeLimitmin * 60u ) );
          }
 
+         m_pEntranceEObj->setState( 7 );
          m_state = DutyInProgress;
          m_instanceExpireTime = Util::getTimeSeconds() + ( m_instanceContentInfo->timeLimitmin * 60u );
          break;

@@ -22,6 +22,9 @@ public:
       DutyFinished
    };
 
+   /*! number of milliseconds after all players are ready for the instance to commence (spawn circle removed) */
+   const uint32_t INSTANCE_COMMENCE_DELAY = 1250;
+
    InstanceContent( boost::shared_ptr< Core::Data::InstanceContent > pInstanceContent,
                     uint32_t guId,
                     const std::string& internalName,
@@ -59,6 +62,7 @@ private:
    InstanceContentState m_state;
 
    int64_t m_instanceExpireTime;
+   int64_t m_instanceCommenceTime;
 
    Entity::EventObjectPtr m_pEntranceEObj;
 
