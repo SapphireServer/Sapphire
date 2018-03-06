@@ -52,6 +52,8 @@ public:
 
    Entity::EventObjectPtr getEObjByName( const std::string& name );
 
+   /*! number of milliseconds after all players are ready for the instance to commence (spawn circle removed) */
+   const uint32_t instanceStartDelay = 1250;
 private:
    Event::DirectorPtr m_pDirector;
    boost::shared_ptr< Core::Data::InstanceContent > m_instanceContentInfo;
@@ -59,11 +61,13 @@ private:
    InstanceContentState m_state;
 
    int64_t m_instanceExpireTime;
+   int64_t m_instanceCommenceTime;
 
    Entity::EventObjectPtr m_pEntranceEObj;
 
    std::map< std::string, Entity::EventObjectPtr > m_eventObjectMap;
    std::unordered_map< uint32_t, Entity::EventObjectPtr > m_eventIdToObjectMap;
+   std::set< uint32_t > m_spawnedPlayers;
 };
 
 }
