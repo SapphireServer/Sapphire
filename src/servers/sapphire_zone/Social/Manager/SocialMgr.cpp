@@ -37,7 +37,7 @@ T Core::Social::SocialMgr< T >::findGroupById( uint64_t groupId ) const
 }
 
 template< class T >
-uint64_t Core::Social::SocialMgr< T >::generateGroupId() const
+uint64_t Core::Social::SocialMgr< T >::generateGroupId()
 {
    m_lastGroupId++;
    return m_lastGroupId;
