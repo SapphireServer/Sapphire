@@ -68,6 +68,7 @@ private:
 
    std::map< std::string, Entity::EventObjectPtr > m_eventObjectMap;
    std::unordered_map< uint32_t, Entity::EventObjectPtr > m_eventIdToObjectMap;
+   std::set< uint32_t > m_spawnedPlayers;
 };
 
 }
