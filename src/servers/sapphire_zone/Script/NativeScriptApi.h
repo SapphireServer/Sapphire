@@ -4,11 +4,7 @@
 #include <string>
 #include <typeinfo>
 #include <typeindex>
-
-#include <Actor/Actor.h>
-#include <Actor/Player.h>
-#include <StatusEffect/StatusEffect.h>
-#include <Zone/InstanceContent.h>
+#include "Forwards.h"
 
 #ifdef _MSC_VER
 #define EXPORT __declspec( dllexport )
@@ -53,14 +49,14 @@ public:
       ScriptObject( effectId, typeid( StatusEffectScript ).hash_code() )
    { }
 
-   virtual void onTick( Entity::Actor& actor ) { }
-   virtual void onApply( Entity::Actor& actor ) { }
-   virtual void onRemove( Entity::Actor& actor ) { }
-   virtual void onExpire( Entity::Actor& actor ) { }
-   virtual void onPlayerCollision( Entity::Actor& actor, Entity::Actor& actorHit ) { }
-   virtual void onPlayerFinishCast( Entity::Actor& actor ) { }
-   virtual void onPlayerDamaged( Entity::Actor& actor ) { }
-   virtual void onPlayerDeath( Entity::Actor& actor ) { }
+   virtual void onTick( Entity::Chara& actor ) { }
+   virtual void onApply( Entity::Chara& actor ) { }
+   virtual void onRemove( Entity::Chara& actor ) { }
+   virtual void onExpire( Entity::Chara& actor ) { }
+   virtual void onPlayerCollision( Entity::Chara& actor, Entity::Chara& actorHit ) { }
+   virtual void onPlayerFinishCast( Entity::Chara& actor ) { }
+   virtual void onPlayerDamaged( Entity::Chara& actor ) { }
+   virtual void onPlayerDeath( Entity::Chara& actor ) { }
 };
 
 
@@ -71,9 +67,9 @@ public:
       ScriptObject( abilityId, typeid( ActionScript ).hash_code() )
    { }
 
-   virtual void onStart( Entity::Actor& sourceActor, Entity::Actor& targetActor ) { }
-   virtual void onCastFinish( Entity::Player& player, Entity::Actor& targetActor ) { }
-   virtual void onInterrupt( Entity::Actor& sourceActor/*, Core::Entity::Actor targetActor*/ ) { }
+   virtual void onStart( Entity::Chara& sourceActor, Entity::Chara& targetActor ) { }
+   virtual void onCastFinish( Entity::Player& player, Entity::Chara& targetActor ) { }
+   virtual void onInterrupt( Entity::Chara& sourceActor/*, Core::Entity::Chara targetActor*/ ) { }
 };
 
 
@@ -87,7 +83,7 @@ public:
    virtual void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) { }
    virtual void onNpcKill( uint32_t npcId, Entity::Player& player ) { }
    virtual void onEmote( uint64_t actorId, uint32_t eventId, uint32_t emoteId, Entity::Player& player ) { }
-   virtual void onEnterZone( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 ) { }
+   virtual void onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 ) { }
    virtual void onWithinRange( Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z ) { }
    virtual void onOutsideRange( Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z ) { }
    virtual void onEventItem( Entity::Player& player, uint32_t eventItemId, uint32_t eventId, uint32_t castTime, uint64_t targetId ) { }
@@ -117,11 +113,12 @@ class InstanceContentScript : public ScriptObject
 {
 public:
    explicit InstanceContentScript( uint32_t instanceContentId ) :
-      ScriptObject( instanceContentId, typeid( InstanceContentScript ).hash_code() )
+      ScriptObject( uint32_t{ 0x8003 } << 16 | instanceContentId, typeid( InstanceContentScript ).hash_code() )
    { }
 
-   virtual void onInit( InstanceContent& instance ) { }
-   virtual void onUpdate( InstanceContent& instance, uint32_t currTime ) { }
+   virtual void onInit( InstanceContentPtr instance ) { }
+   virtual void onUpdate( InstanceContentPtr instance, uint32_t currTime ) { }
+   virtual void onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 ) { }
 };
 
 #endif

@@ -9,12 +9,6 @@
 
 namespace Core {
 
-
-   struct CellCache
-   {
-      std::vector< Entity::BattleNpcPtr > battleNpcCache;
-   };
-
    typedef std::set< Entity::ActorPtr > ActorSet;
 
    class Cell 
@@ -27,7 +21,7 @@ namespace Core {
       uint16_t m_posY;
       ActorSet m_actors;
       bool m_bActive;
-      bool  m_bLoaded;
+      bool m_bLoaded;
       bool m_bUnloadPending;
 
       uint16_t m_playerCount;
@@ -37,17 +31,15 @@ namespace Core {
       Cell();
       ~Cell();
 
-      void init(uint32_t x, uint32_t y, ZonePtr pZone);
+      void init( uint32_t x, uint32_t y, ZonePtr pZone );
 
-      void addActor(Entity::ActorPtr pAct); 
+      void addActor( Entity::ActorPtr pAct );
 
-      void removeActor(Entity::ActorPtr pAct);
+      void removeActor( Entity::ActorPtr pAct );
 
-      void loadActors(CellCache* pCC);
-
-      bool hasActor(Entity::ActorPtr pAct) 
+      bool hasActor( Entity::ActorPtr pAct )
       { 
-         return (m_actors.find(pAct) != m_actors.end()); 
+         return ( m_actors.find(pAct) != m_actors.end() );
       }
 
       bool hasPlayers() const
@@ -57,19 +49,19 @@ namespace Core {
 
       size_t getActorCount() const
       { 
-         return m_actors.size(); 
+         return m_actors.size();
       }
 
       void removeActors();
 
-      ActorSet::iterator begin() 
+      ActorSet::iterator begin()
       {
-         return m_actors.begin(); 
+         return m_actors.begin();
       }
 
-      ActorSet::iterator end() 
+      ActorSet::iterator end()
       {
-         return m_actors.end(); 
+         return m_actors.end();
       }
 
       void setActivity(bool state);

@@ -2,12 +2,14 @@
 #define _ACTIONCOLLISION_H
 
 #include <common/Common.h>
-#include <common/Exd/ExdDataGenerated.h>
-
-#include "Actor/Actor.h"
 #include "Action.h"
 
+
 namespace Core {
+namespace Data
+{
+   struct Action;
+}
 namespace Entity {
 
    enum class TargetFilter

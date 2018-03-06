@@ -31,6 +31,7 @@ set(LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/libraries")
 include( "cmake/boost.cmake" )
 include( "cmake/mysql.cmake" )
 include( "cmake/compiler.cmake" )
+include( "cmake/cotire.cmake" )
 
 ##############################
 #             Git            #
@@ -68,3 +69,4 @@ add_subdirectory("src/tools/exd_struct_gen")
 add_subdirectory("src/tools/exd_struct_test")
 add_subdirectory("src/tools/quest_parser")
 #add_subdirectory("src/tools/pcb_reader")
+#add_subdirectory("src/tools/event_object_parser")

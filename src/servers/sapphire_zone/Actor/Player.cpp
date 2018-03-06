@@ -11,7 +11,6 @@
 
 #include "Session.h"
 #include "Player.h"
-#include "BattleNpc.h"
 
 #include "Zone/TerritoryMgr.h"
 #include "Zone/Zone.h"
@@ -20,6 +19,7 @@
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
+#include "Network/PacketWrappers/ActorControlPacket144.h"
 #include "Network/PacketWrappers/InitUIPacket.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/ChatPacket.h"
@@ -40,6 +40,7 @@
 #include "Event/EventHandler.h"
 
 #include "Action/Action.h"
+#include "Action/ActionTeleport.h"
 #include "Action/EventAction.h"
 #include "Action/EventItemAction.h"
 
@@ -57,7 +58,7 @@ using namespace Core::Network::Packets::Server;
 
 // player constructor
 Core::Entity::Player::Player() :
-   Actor( ObjKind::Player ),
+   Chara( ObjKind::Player ),
    m_lastWrite( 0 ),
    m_lastPing( 0 ),
    m_bIsLogin( false ),
@@ -75,7 +76,8 @@ Core::Entity::Player::Player() :
    m_bAutoattack( false ),
    m_markedForRemoval( false ),
    m_mount( 0 ),
-   m_directorInitialized( false )
+   m_directorInitialized( false ),
+   m_onEnterEventDone( false )
 {
    m_id = 0;
    m_currentStance = Stance::Passive;
@@ -83,6 +85,7 @@ Core::Entity::Player::Player() :
    m_queuedZoneing = nullptr;
    m_status = ActorStatus::Idle;
    m_invincibilityType = InvincibilityType::InvincibilityNone;
+   m_modelType = ModelType::Human;
 
    memset( m_questTracking, 0, sizeof( m_questTracking ) );
    memset( m_name, 0, sizeof( m_name ) );
@@ -90,10 +93,20 @@ Core::Entity::Player::Player() :
    memset( m_searchMessage, 0, sizeof( m_searchMessage ) );
    memset( m_classArray, 0, sizeof( m_classArray ) );
    memset( m_expArray, 0, sizeof( m_expArray ) );
+
+   m_objSpawnIndexAllocator.init( MAX_DISPLAYED_EOBJS );
+   m_actorSpawnIndexAllocator.init( MAX_DISPLAYED_ACTORS, true );
 }
 
 Core::Entity::Player::~Player()
 {
+}
+
+void Core::Entity::Player::injectPacket( std::string path )
+{
+   auto session = g_framework.getServerZone().getSession( getId() );
+   if( session )
+      session->getZoneConnection()->injectPacket( path, *this );
 }
 
 // TODO: add a proper calculation based on race / job / level / gear
@@ -181,7 +194,7 @@ Core::Common::OnlineStatus Core::Entity::Player::getOnlineStatus()
    if( m_onlineStatus & rpMask )
       status = OnlineStatus::Roleplaying;
 
-   if( hasStateFlag( PlayerStateFlag::WatchingCutscene ) || hasStateFlag( PlayerStateFlag::WatchingCutscene1 ) )
+   if( hasStateFlag( PlayerStateFlag::WatchingCutscene ) )
       status = OnlineStatus::ViewingCutscene;
 
    // TODO: add all the logic for returning the proper online status, there probably is a better way for this alltogether
@@ -252,7 +265,7 @@ void Core::Entity::Player::calculateStats()
 }
 
 
-void Core::Entity::Player::setAutoattack(bool mode)
+void Core::Entity::Player::setAutoattack( bool mode )
 {
    m_bAutoattack = mode;
    m_lastAttack = Util::getTimeMs();
@@ -307,8 +320,7 @@ void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
    }
 
    setStateFlag( PlayerStateFlag::BetweenAreas );
-
-   auto z_pos = g_framework.getTerritoryMgr().getTerritoryPosition( data->territory );
+   auto targetPos = g_framework.getTerritoryMgr().getTerritoryPosition( data->levelId );
 
    Common::FFXIVARR_POSITION3 pos;
    pos.x = 0;
@@ -316,10 +328,10 @@ void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
    pos.z = 0;
    float rot = 0;
 
-   if( z_pos != nullptr )
+   if( targetPos != nullptr )
    {
-      pos = z_pos->getTargetPosition();
-      rot = z_pos->getTargetRotation();
+      pos = targetPos->getTargetPosition();
+      rot = targetPos->getTargetRotation();
    }
 
    sendDebug( "Teleport: " + g_framework.getExdDataGen().get< Core::Data::PlaceName >( data->placeName )->name + " " +
@@ -365,6 +377,7 @@ void Core::Entity::Player::returnToHomepoint()
 
 void Core::Entity::Player::setZone( uint32_t zoneId )
 {
+   m_onEnterEventDone = false;
    if( !g_framework.getTerritoryMgr().movePlayer( zoneId, getAsPlayer() ) )
    {
       // todo: this will require proper handling, for now just return the player to their previous area
@@ -381,6 +394,7 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
 
 bool Core::Entity::Player::setInstance( uint32_t instanceContentId )
 {
+   m_onEnterEventDone = false;
    auto instance = g_framework.getTerritoryMgr().getInstanceZonePtr( instanceContentId );
    if( !instance )
       return false;
@@ -390,6 +404,7 @@ bool Core::Entity::Player::setInstance( uint32_t instanceContentId )
 
 bool Core::Entity::Player::setInstance( ZonePtr instance )
 {
+   m_onEnterEventDone = false;
    if( !instance )
       return false;
 
@@ -440,43 +455,27 @@ uint8_t Core::Entity::Player::getGender() const
 
 void Core::Entity::Player::initSpawnIdQueue()
 {
-   while( !m_freeSpawnIdQueue.empty() )
-   {
-      m_freeSpawnIdQueue.pop();
-   }
-
-   for( int32_t i = 1; i < MAX_DISPLAYED_ACTORS; i++ )
-   {
-      m_freeSpawnIdQueue.push( i );
-   }
+   m_actorSpawnIndexAllocator.freeAllSpawnIndexes();
 }
 
 uint8_t Core::Entity::Player::getSpawnIdForActorId( uint32_t actorId )
 {
-   if( m_freeSpawnIdQueue.empty() )
-      return 0;
-
-   uint8_t spawnId = m_freeSpawnIdQueue.front();
-   m_freeSpawnIdQueue.pop();
-   m_playerIdToSpawnIdMap[actorId] = spawnId;
-   return spawnId;
+   return m_actorSpawnIndexAllocator.getNextFreeSpawnIndex( actorId );
 }
 
-void Core::Entity::Player::assignSpawnIdToPlayerId( uint32_t actorId, uint8_t spawnId )
+bool Core::Entity::Player::isActorSpawnIdValid( uint8_t spawnIndex )
 {
-   m_playerIdToSpawnIdMap[actorId] = spawnId;
+   return m_actorSpawnIndexAllocator.isSpawnIndexValid( spawnIndex );
 }
 
 void Core::Entity::Player::registerAetheryte( uint8_t aetheryteId )
 {
-
    uint16_t index;
    uint8_t value;
    Util::valueToFlagByteIndexValue( aetheryteId, value, index );
 
    m_aetheryte[index] |= value;
    queuePacket( ActorControlPacket143( getId(), LearnTeleport, aetheryteId, 1 ) );
-
 }
 
 bool Core::Entity::Player::isAetheryteRegistered( uint8_t aetheryteId ) const
@@ -639,7 +638,7 @@ void Core::Entity::Player::gainLevel()
 
    ZoneChannelPacket< FFXIVIpcStatusEffectList > effectListPacket( getId() );
    effectListPacket.data().classId = static_cast< uint8_t > ( getClass() );
-   effectListPacket.data().classId1 = static_cast< uint8_t > ( getClass() );
+   effectListPacket.data().level1 = getLevel();
    effectListPacket.data().level = getLevel();
    effectListPacket.data().current_hp = getMaxHp();
    effectListPacket.data().current_mp = getMaxMp();
@@ -654,23 +653,12 @@ void Core::Entity::Player::gainLevel()
 
    ZoneChannelPacket< FFXIVIpcUpdateClassInfo > classInfoPacket( getId() );
    classInfoPacket.data().classId = static_cast< uint8_t > ( getClass() );
-   classInfoPacket.data().classId1 = static_cast< uint8_t > ( getClass() );
+   classInfoPacket.data().level1 = getLevel();
    classInfoPacket.data().level = getLevel();
    classInfoPacket.data().nextLevelIndex = getLevel();
    classInfoPacket.data().currentExp = getExp();
    queuePacket( classInfoPacket );
 
-
-
-
-
-
-
-}
-
-void Core::Entity::Player::unlock()
-{
-   queuePacket( PlayerStateFlagsPacket( *getAsPlayer(), PlayerStateFlagList{} ) );
 }
 
 void Core::Entity::Player::sendStatusUpdate( bool toSelf )
@@ -831,6 +819,8 @@ void Core::Entity::Player::despawn( Entity::PlayerPtr pTarget )
 {
    auto pPlayer = pTarget;
 
+   g_framework.getLogger().debug( "despawning " + getName() + " for " + pTarget->getName() );
+
    pPlayer->freePlayerSpawnId( getId() );
 
    pPlayer->queuePacket( ActorControlPacket143( getId(), DespawnZoneScreenMsg, 0x04, getId(), 0x01 ) );
@@ -839,7 +829,7 @@ void Core::Entity::Player::despawn( Entity::PlayerPtr pTarget )
 Core::Entity::ActorPtr Core::Entity::Player::lookupTargetById( uint64_t targetId )
 {
    ActorPtr targetActor;
-   auto inRange = getInRangeActors( true );
+   auto inRange = getInRangeActors(true);
    for( auto actor : inRange )
    {
       if( actor->getId() == targetId )
@@ -989,7 +979,7 @@ void Core::Entity::Player::update( int64_t currTime )
          setActorPosPacket.data().y = targetPos.y;
          setActorPosPacket.data().z = targetPos.z;
          sendToInRangeSet( setActorPosPacket, true );
-         setPosition( targetPos );
+         setPos( targetPos );
       }
       m_queuedZoneing.reset();
       return;
@@ -1007,14 +997,14 @@ void Core::Entity::Player::update( int64_t currTime )
 
    if( !checkAction() )
    {
-      if( m_targetId && m_currentStance == Entity::Actor::Stance::Active && isAutoattackOn() )
+      if( m_targetId && m_currentStance == Entity::Chara::Stance::Active && isAutoattackOn() )
       {
          auto mainWeap = m_pInventory->getItemAt( Inventory::GearSet0, Inventory::EquipSlot::MainHand );
 
          // @TODO i dislike this, iterating over all in range actors when you already know the id of the actor you need...
-         for( auto actor : m_inRangeActors )
+         for( auto actor : m_inRangeActor )
          {
-            if( actor->getId() == m_targetId && actor->isAlive() && mainWeap )
+            if( actor->getId() == m_targetId && actor->getAsChara()->isAlive() && mainWeap )
             {
                // default autoattack range
                // TODO make this dependant on bnpc size
@@ -1034,7 +1024,7 @@ void Core::Entity::Player::update( int64_t currTime )
                   if( ( currTime - m_lastAttack ) > mainWeap->getDelay() )
                   {
                      m_lastAttack = currTime;
-                     autoAttack( actor );
+                     autoAttack( actor->getAsChara() );
                   }
 
                }
@@ -1059,9 +1049,7 @@ void Core::Entity::Player::onMobKill( uint16_t nameId )
 
 void Core::Entity::Player::freePlayerSpawnId( uint32_t actorId )
 {
-   uint8_t spawnId = m_playerIdToSpawnIdMap[actorId];
-   m_playerIdToSpawnIdMap.erase( actorId );
-   m_freeSpawnIdQueue.push( spawnId );
+   auto spawnId = m_actorSpawnIndexAllocator.freeUsedSpawnIndex( actorId );
 
    ZoneChannelPacket< FFXIVIpcActorFreeSpawn > freeActorSpawnPacket( getId() );
    freeActorSpawnPacket.data().actorId = actorId;
@@ -1206,7 +1194,7 @@ void Core::Entity::Player::performZoning( uint16_t zoneId, const Common::FFXIVAR
    m_pos = pos;
    m_zoneId = zoneId;
    m_bMarkedForZoning = true;
-   setRotation( rotation );
+   setRot( rotation );
    setZone( zoneId );
 }
 
@@ -1273,64 +1261,6 @@ void Core::Entity::Player::updateHowtosSeen( uint32_t howToId )
    m_howTo[index] |= value;
 }
 
-
-void Core::Entity::Player::onMobAggro( BattleNpcPtr pBNpc )
-{
-   hateListAdd( pBNpc );
-
-   queuePacket( ActorControlPacket142( getId(), ToggleAggro, 1 ) );
-}
-
-void Core::Entity::Player::onMobDeaggro( BattleNpcPtr pBNpc )
-{
-   hateListRemove( pBNpc );
-
-   if( m_actorIdTohateSlotMap.empty() )
-      queuePacket( ActorControlPacket142( getId(), ToggleAggro ) );
-}
-
-void Core::Entity::Player::hateListAdd( BattleNpcPtr pBNpc )
-
-{
-   if( m_freeHateSlotQueue.empty() )
-      return;
-   uint8_t hateId = m_freeHateSlotQueue.front();
-   m_freeHateSlotQueue.pop();
-   m_actorIdTohateSlotMap[pBNpc->getId()] = hateId;
-   sendHateList();
-
-}
-
-void Core::Entity::Player::hateListRemove( BattleNpcPtr pBNpc )
-{
-
-   auto it = m_actorIdTohateSlotMap.begin();
-   for( ; it != m_actorIdTohateSlotMap.end(); ++it )
-   {
-      if( it->first == pBNpc->getId() )
-      {
-         uint8_t hateSlot = it->second;
-         m_freeHateSlotQueue.push( hateSlot );
-         m_actorIdTohateSlotMap.erase( it );
-         sendHateList();
-
-         return;
-      }
-   }
-}
-
-bool Core::Entity::Player::hateListHasMob( BattleNpcPtr pBNpc )
-{
-
-   auto it = m_actorIdTohateSlotMap.begin();
-   for( ; it != m_actorIdTohateSlotMap.end(); ++it )
-   {
-      if( it->first == pBNpc->getId() )
-         return true;
-   }
-   return false;
-}
-
 void Core::Entity::Player::initHateSlotQueue()
 {
    m_freeHateSlotQueue = std::queue< uint8_t >();
@@ -1362,6 +1292,11 @@ void Core::Entity::Player::setIsLogin( bool bIsLogin )
 }
 
 uint8_t* Core::Entity::Player::getTitleList()
+{
+   return m_titleList;
+}
+
+const uint8_t* Core::Entity::Player::getTitleList() const
 {
    return m_titleList;
 }
@@ -1410,7 +1345,7 @@ uint8_t Core::Entity::Player::getEquipDisplayFlags() const
 void Core::Entity::Player::mount( uint32_t id )
 {
    m_mount = id;
-   sendToInRangeSet( ActorControlPacket142( getId(), ActorControlType::SetStatus, static_cast< uint8_t >( Entity::Actor::ActorStatus::Mounted )), true );
+   sendToInRangeSet( ActorControlPacket142( getId(), ActorControlType::SetStatus, static_cast< uint8_t >( Entity::Chara::ActorStatus::Mounted )), true );
    sendToInRangeSet( ActorControlPacket143( getId(), 0x39e, 12 ), true ); //?
 
    ZoneChannelPacket< FFXIVIpcMount > mountPacket( getId() );
@@ -1421,7 +1356,7 @@ void Core::Entity::Player::mount( uint32_t id )
 void Core::Entity::Player::dismount()
 {
    sendToInRangeSet( ActorControlPacket142( getId(), ActorControlType::SetStatus,
-                                            static_cast< uint8_t >( Entity::Actor::ActorStatus::Idle )), true );
+                                            static_cast< uint8_t >( Entity::Chara::ActorStatus::Idle )), true );
    sendToInRangeSet( ActorControlPacket143( getId(), ActorControlType::Dismount, 1 ), true );
    m_mount = 0;
 }
@@ -1431,7 +1366,7 @@ uint8_t Core::Entity::Player::getCurrentMount() const
    return m_mount;
 }
 
-void Core::Entity::Player::autoAttack( ActorPtr pTarget )
+void Core::Entity::Player::autoAttack( CharaPtr pTarget )
 {
 
    auto mainWeap = m_pInventory->getItemAt( Inventory::GearSet0,
@@ -1444,11 +1379,9 @@ void Core::Entity::Player::autoAttack( ActorPtr pTarget )
    uint32_t damage = static_cast< uint32_t >( mainWeap->getAutoAttackDmg() );
    uint32_t variation = 0 + rand() % 3;
 
-   if( getClass() == ClassJob::Machinist ||
-       getClass() == ClassJob::Bard ||
-       getClass() == ClassJob::Archer )
+   if( getClass() == ClassJob::Machinist || getClass() == ClassJob::Bard || getClass() == ClassJob::Archer )
    {
-      ZoneChannelPacket< FFXIVIpcEffect > effectPacket(getId());
+      ZoneChannelPacket< FFXIVIpcEffect > effectPacket( getId() );
       effectPacket.data().targetId = pTarget->getId();
       effectPacket.data().actionAnimationId = 8;
      // effectPacket.data().unknown_2 = variation;
@@ -1456,7 +1389,7 @@ void Core::Entity::Player::autoAttack( ActorPtr pTarget )
       effectPacket.data().unknown_61 = 1;
       effectPacket.data().unknown_62 = 1;
       effectPacket.data().actionTextId = 8;
-      effectPacket.data().rotation = Math::Util::floatToUInt16Rot(getRotation());
+      effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRot() );
       effectPacket.data().effectTargetId = pTarget->getId();
       effectPacket.data().effectTarget = pTarget->getId();
       effectPacket.data().effects[0].value = damage;
@@ -1469,7 +1402,7 @@ void Core::Entity::Player::autoAttack( ActorPtr pTarget )
    else
    {
 
-      ZoneChannelPacket< FFXIVIpcEffect > effectPacket(getId());
+      ZoneChannelPacket< FFXIVIpcEffect > effectPacket( getId() );
       effectPacket.data().targetId = pTarget->getId();
       effectPacket.data().actionAnimationId = 7;
       // effectPacket.data().unknown_2 = variation;
@@ -1477,7 +1410,7 @@ void Core::Entity::Player::autoAttack( ActorPtr pTarget )
       effectPacket.data().unknown_61 = 1;
       effectPacket.data().unknown_62 = 1;
       effectPacket.data().actionTextId = 7;
-      effectPacket.data().rotation = Math::Util::floatToUInt16Rot(getRotation());
+      effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRot() );
       effectPacket.data().effectTarget = pTarget->getId();
       effectPacket.data().effects[0].value = damage;
       effectPacket.data().effects[0].effectType = Common::ActionEffectType::Damage;
@@ -1550,18 +1483,20 @@ void Core::Entity::Player::setEorzeaTimeOffset( uint64_t timestamp )
    queuePacket( packet );
 }
 
-void Player::setTerritoryId( uint32_t territoryId )
+void Core::Entity::Player::setTerritoryId( uint32_t territoryId )
 {
    m_zoneId = territoryId;
 }
 
-uint32_t Player::getTerritoryId() const
+uint32_t Core::Entity::Player::getTerritoryId() const
 {
    return m_zoneId;
 }
 
-void Player::sendZonePackets()
+void Core::Entity::Player::sendZonePackets()
 {
+   getCurrentZone()->onBeforePlayerZoneIn( *this );
+
    ZoneChannelPacket< FFXIVIpcInit > initPacket( getId() );
    initPacket.data().charId = getId();
    queuePacket( initPacket );
@@ -1570,7 +1505,7 @@ void Player::sendZonePackets()
 
    if( isLogin() )
    {
-      queuePacket(ActorControlPacket143( getId(), SetCharaGearParamUI, m_equipDisplayFlags, 1 ) );
+      queuePacket( ActorControlPacket143( getId(), SetCharaGearParamUI, m_equipDisplayFlags, 1 ) );
    }
 
    // set flags, will be reset automatically by zoning ( only on client side though )
@@ -1627,17 +1562,135 @@ void Player::sendZonePackets()
    if( getLastPing() == 0 )
       sendQuestInfo();
 
-   getCurrentZone()->onEnterTerritory( *this );
+   getCurrentZone()->onPlayerZoneIn( *this );
 
    m_bMarkedForZoning = false;
 }
 
-void Player::setDirectorInitialized( bool isInitialized )
+void Core::Entity::Player::setDirectorInitialized( bool isInitialized )
 {
    m_directorInitialized = isInitialized;
 }
 
-bool Player::isDirectorInitialized() const
+bool Core::Entity::Player::isDirectorInitialized() const
 {
    return m_directorInitialized;
 }
+
+void Core::Entity::Player::sendTitleList()
+{
+   ZoneChannelPacket< FFXIVIpcPlayerTitleList > titleListPacket( getId() );
+   memcpy( titleListPacket.data().titleList, getTitleList(), sizeof( titleListPacket.data().titleList ) );
+
+   queuePacket( titleListPacket );
+}
+
+void Core::Entity::Player::finishZoning()
+{
+   switch( getZoningType() )
+   {
+      case ZoneingType::None:
+         sendToInRangeSet( ActorControlPacket143( getId(), ZoneIn, 0x01 ), true );
+         break;
+
+      case ZoneingType::Teleport:
+         sendToInRangeSet( ActorControlPacket143( getId(), ZoneIn, 0x01, 0, 0, 110 ), true );
+         break;
+
+      case ZoneingType::Return:
+      case ZoneingType::ReturnDead:
+      {
+         if( getStatus() == Entity::Chara::ActorStatus::Dead )
+         {
+            resetHp();
+            resetMp();
+            setStatus( Entity::Chara::ActorStatus::Idle );
+
+            sendToInRangeSet( ActorControlPacket143( getId(), ZoneIn, 0x01, 0x01, 0, 111 ), true );
+            sendToInRangeSet( ActorControlPacket142( getId(), SetStatus,
+                                                     static_cast< uint8_t >( Entity::Chara::ActorStatus::Idle ) ), true );
+         }
+         else
+            sendToInRangeSet( ActorControlPacket143( getId(), ZoneIn, 0x01, 0x00, 0, 111 ), true );
+      }
+         break;
+
+      case ZoneingType::FadeIn:
+         break;
+   }
+
+   setZoningType( Common::ZoneingType::None );
+   unsetStateFlag( PlayerStateFlag::BetweenAreas );
+}
+
+void Core::Entity::Player::emote( uint32_t emoteId, uint64_t targetId )
+{
+   sendToInRangeSet( ActorControlPacket144( getId(), ActorControlType::Emote, emoteId, 0, 0, 0, targetId ) );
+}
+
+void Core::Entity::Player::teleportQuery( uint16_t aetheryteId )
+{
+   // TODO: only register this action if enough gil is in possession
+   auto& exdDataGen = g_framework.getExdDataGen();
+   auto targetAetheryte = exdDataGen.get< Core::Data::Aetheryte >( aetheryteId );
+
+   if( targetAetheryte )
+   {
+      auto fromAetheryte = exdDataGen.get< Core::Data::Aetheryte >(
+                                          exdDataGen.get< Core::Data::TerritoryType >( getZoneId() )->aetheryte );
+
+      // calculate cost - does not apply for favorite points or homepoints neither checks for aether tickets
+      auto cost = static_cast< uint16_t > ( ( sqrt( pow( fromAetheryte->aetherstreamX - targetAetheryte->aetherstreamX, 2 ) +
+                                                    pow( fromAetheryte->aetherstreamY - targetAetheryte->aetherstreamY, 2 ) ) / 2 ) + 100 );
+
+      // cap at 999 gil
+      cost = cost > uint16_t{999} ? uint16_t{999} : cost;
+
+      bool insufficientGil = getCurrency( Inventory::CurrencyType::Gil ) < cost;
+      // TODO: figure out what param1 really does
+      queuePacket( ActorControlPacket143( getId(), TeleportStart, insufficientGil ? 2 : 0, aetheryteId ) );
+
+      if( !insufficientGil )
+      {
+         Action::ActionPtr pActionTeleport;
+         pActionTeleport = Action::make_ActionTeleport( getAsPlayer(), aetheryteId, cost );
+         setCurrentAction( pActionTeleport );
+      }
+   }
+}
+
+uint8_t Core::Entity::Player::getNextObjSpawnIndexForActorId( uint32_t actorId )
+{
+   return m_objSpawnIndexAllocator.getNextFreeSpawnIndex( actorId );
+}
+
+void Core::Entity::Player::resetObjSpawnIndex()
+{
+   m_objSpawnIndexAllocator.freeAllSpawnIndexes();
+}
+
+void Core::Entity::Player::freeObjSpawnIndexForActorId( uint32_t actorId )
+{
+   auto spawnId = m_objSpawnIndexAllocator.freeUsedSpawnIndex( actorId );
+
+   ZoneChannelPacket< FFXIVIpcObjectDespawn > freeObjectSpawnPacket( getId() );
+   freeObjectSpawnPacket.data().spawnIndex = spawnId;
+   queuePacket( freeObjectSpawnPacket );
+}
+
+bool Core::Entity::Player::isObjSpawnIndexValid( uint8_t index )
+{
+   return m_objSpawnIndexAllocator.isSpawnIndexValid( index );
+}
+
+void Core::Entity::Player::setOnEnterEventDone( bool isDone )
+{
+   m_onEnterEventDone = isDone;
+}
+
+bool Core::Entity::Player::isOnEnterEventDone() const
+{
+   return m_onEnterEventDone;
+}
+
+

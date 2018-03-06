@@ -3,14 +3,19 @@
 #include <common/Logging/Logger.h>
 #include <common/Util/Util.h>
 #include <common/Util/UtilMath.h>
+#include <common/Exd/ExdDataGenerated.h>
 
 #include "Event/Director.h"
 #include "Script/ScriptMgr.h"
 
 #include "Actor/Player.h"
+#include "Actor/EventObject.h"
 
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
+
+
+#include "Event/EventHandler.h"
 
 #include "InstanceContent.h"
 #include "Framework.h"
@@ -30,10 +35,19 @@ Core::InstanceContent::InstanceContent( boost::shared_ptr< Core::Data::InstanceC
      Director( Event::Director::InstanceContent, instanceContentId ),
      m_instanceContentInfo( pInstanceContent ),
      m_instanceContentId( instanceContentId ),
-     m_state( Created )
+     m_state( Created ),
+     m_pEntranceEObj( nullptr )
 {
-   g_framework.getScriptMgr().onInstanceInit( *this );
+
 }
+
+bool Core::InstanceContent::init()
+{
+   g_framework.getScriptMgr().onInstanceInit( getAsInstanceContent() );
+
+   return true;
+}
+
 
 Core::InstanceContent::~InstanceContent()
 {
@@ -50,7 +64,7 @@ Core::Data::ExdDataGenerated::InstanceContentPtr Core::InstanceContent::getInsta
    return m_instanceContentInfo;
 }
 
-void Core::InstanceContent::onEnterTerritory( Entity::Player& player )
+void Core::InstanceContent::onPlayerZoneIn( Entity::Player& player )
 {
    g_framework.getLogger().debug( "InstanceContent::onEnterTerritory: Zone#" + std::to_string( getGuId() ) + "|"
                                                            + std::to_string( getInstanceContentId() ) +
@@ -89,13 +103,15 @@ void Core::InstanceContent::onUpdate( uint32_t currTime )
          if( m_playerMap.size() < 1 )
             return;
 
-         for( const auto &playerIt : m_playerMap )
+         for( const auto& playerIt : m_playerMap )
          {
-            if( !playerIt.second->isLoadingComplete() || !playerIt.second->isDirectorInitialized() )
+            if( !playerIt.second->isLoadingComplete() ||
+                !playerIt.second->isDirectorInitialized() ||
+                !playerIt.second->isOnEnterEventDone() )
                return;
          }
 
-         for( const auto &playerIt : m_playerMap )
+         for( const auto& playerIt : m_playerMap )
          {
             auto pPlayer = playerIt.second;
             pPlayer->queuePacket(
@@ -122,13 +138,13 @@ void Core::InstanceContent::onUpdate( uint32_t currTime )
          break;
    }
 
-   g_framework.getScriptMgr().onInstanceUpdate( *this, currTime );
+   g_framework.getScriptMgr().onInstanceUpdate( getAsInstanceContent(), currTime );
+
 }
 
 void Core::InstanceContent::onFinishLoading( Entity::Player& player )
 {
-   if( m_state != Created )
-      sendDirectorInit( player );
+   sendDirectorInit( player );
 }
 
 void Core::InstanceContent::onInitDirector( Entity::Player& player )
@@ -136,6 +152,12 @@ void Core::InstanceContent::onInitDirector( Entity::Player& player )
    sendDirectorVars( player );
    player.setDirectorInitialized( true );
 }
+
+void Core::InstanceContent::onSomeDirectorEvent( Entity::Player& player )
+{
+   player.queuePacket( ActorControlPacket143( player.getId(), DirectorUpdate, 0x00110001, 0x80000000, 1 ) );
+}
+
 
 void Core::InstanceContent::setVar( uint8_t index, uint8_t value )
 {
@@ -207,8 +229,91 @@ void Core::InstanceContent::setVar( uint8_t index, uint8_t value )
 
    }
 
-   for( const auto &playerIt : m_playerMap )
+   // todo: genericise this?
+   for( const auto& playerIt : m_playerMap )
    {
       sendDirectorVars( *playerIt.second );
    }
+}
+
+void Core::InstanceContent::setSequence( uint8_t value )
+{
+   setDirectorSequence( value );
+
+   for( const auto& playerIt : m_playerMap )
+   {
+      sendDirectorVars( *playerIt.second );
+   }
+}
+
+void Core::InstanceContent::setBranch( uint8_t value )
+{
+   setDirectorBranch( value );
+
+   for( const auto& playerIt : m_playerMap )
+   {
+      sendDirectorVars( *playerIt.second );
+   }
+}
+
+void Core::InstanceContent::onRegisterEObj( Entity::EventObjectPtr object )
+{
+   if( object->getName() != "none" )
+      m_eventObjectMap[object->getName()] = object;
+   if( object->getObjectId() == 2000182 ) // start
+      m_pEntranceEObj = object;
+
+   auto objData = g_framework.getExdDataGen().get< Core::Data::EObj >( object->getObjectId() );
+   if( objData )
+      // todo: data should be renamed to eventId
+      m_eventIdToObjectMap[objData->data] = object;
+   else
+      g_framework.getLogger().error( "InstanceContent::onRegisterEObj Zone " +
+                                     m_internalName + ": No EObj data found for EObj with ID: " +
+                                     std::to_string( object->getObjectId() ) );
+}
+
+void Core::InstanceContent::onBeforePlayerZoneIn( Core::Entity::Player& player )
+{
+   if( m_pEntranceEObj != nullptr )
+   {
+      player.setRot( PI );
+      player.setPos( m_pEntranceEObj->getPos() );
+   }
+   else
+   {
+      player.setRot( PI );
+      player.setPos( { 0.f, 0.f, 0.f } );
+   }
+
+   player.resetObjSpawnIndex( );
+}
+
+Core::Entity::EventObjectPtr Core::InstanceContent::getEObjByName( const std::string& name )
+{
+   auto it = m_eventObjectMap.find( name );
+   if( it == m_eventObjectMap.end() )
+      return nullptr;
+
+   return it->second;
+}
+
+void Core::InstanceContent::onTalk( Core::Entity::Player& player, uint32_t eventId, uint64_t actorId )
+{
+   // todo: handle exit (and maybe shortcut?) behaviour here
+
+   auto it = m_eventIdToObjectMap.find( eventId );
+   if( it == m_eventIdToObjectMap.end() )
+      return;
+
+   if( auto onTalk = it->second->getOnTalkHandler() )
+      onTalk( player, it->second, getAsInstanceContent(), actorId );
+   else
+      player.sendDebug( "No onTalk handler found for interactable eobj with EObjID: " +
+                        std::to_string( it->second->getObjectId() ) + ", eventId: " + std::to_string( eventId ) );
+}
+
+void Core::InstanceContent::onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 )
+{
+   g_framework.getScriptMgr().onInstanceEnterTerritory( getAsInstanceContent(), player, eventId, param1, param2 );
 }

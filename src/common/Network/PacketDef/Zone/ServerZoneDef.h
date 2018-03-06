@@ -233,7 +233,7 @@ struct FFXIVIpcLinkshellList : FFXIVIpcBasePacket<LinkshellList>
 struct FFXIVIpcStatusEffectList : FFXIVIpcBasePacket<StatusEffectList>
 {
    uint8_t classId;
-   uint8_t classId1;
+   uint8_t level1;
    uint16_t level;
    uint32_t current_hp;
    uint32_t max_hp;
@@ -427,7 +427,7 @@ struct FFXIVIpcPlayerSpawn : FFXIVIpcBasePacket<PlayerSpawn>
    uint8_t spawnIndex;
    uint8_t state;
    uint8_t persistantEmote;
-   uint8_t type;
+   uint8_t modelType; // modelType -> eventSystemDefine
    uint8_t subtype;
    uint8_t voice;
    uint16_t u25c;
@@ -459,8 +459,7 @@ struct FFXIVIpcPlayerSpawn : FFXIVIpcBasePacket<PlayerSpawn>
 */
 struct FFXIVIpcNpcSpawn : FFXIVIpcBasePacket<NpcSpawn>
 {
-   uint16_t title;
-   uint16_t u1b;
+   uint32_t gimmickId; // needs to be existing in the map, mob will snap to it
    uint8_t u2b;
    uint8_t u2ab;
    uint8_t gmRank;
@@ -503,7 +502,7 @@ struct FFXIVIpcNpcSpawn : FFXIVIpcBasePacket<NpcSpawn>
    uint8_t spawnIndex;
    uint8_t state;
    uint8_t persistantEmote;
-   uint8_t type;
+   uint8_t modelType;
    uint8_t subtype;
    uint8_t voice;
    uint16_t u25c;
@@ -611,7 +610,7 @@ struct FFXIVIpcHateList : FFXIVIpcBasePacket<HateList>
 struct FFXIVIpcUpdateClassInfo : FFXIVIpcBasePacket<UpdateClassInfo>
 {
    uint8_t classId;
-   uint8_t classId1;
+   uint8_t level1;
    uint16_t level;
    uint32_t nextLevelIndex;
    uint32_t currentExp;
@@ -674,7 +673,7 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    uint8_t namedayDay;
    uint8_t cityState;
    uint8_t homepoint;
-   uint8_t unknown26;
+   uint8_t unknown26; // 2 if "warrior of light"
    uint8_t petHotBar;
    uint8_t companionRank;
    uint8_t companionStars;
@@ -871,10 +870,8 @@ struct FFXIVIpcActorOwner : FFXIVIpcBasePacket<ActorOwner>
 */
 struct FFXIVIpcPlayerStateFlags : FFXIVIpcBasePacket<PlayerStateFlags>
 {
-   uint8_t flags[7];
-   uint8_t padding1[3];
-   uint32_t padding2;
-   uint16_t padding;
+   uint8_t flags[12];
+   uint32_t padding;
 };
 
 /**
@@ -1047,7 +1044,7 @@ struct FFXIVIpcEventStart : FFXIVIpcBasePacket<EventStart>
    /* 000D */ uint8_t param2;
    /* 000E */ uint16_t padding;
    /* 0010 */ uint32_t param3;
-   /* 0014 */ uint32_t padding1;
+   /* 0014 */ uint32_t contentId;
 };
 
 
@@ -1067,6 +1064,24 @@ struct FFXIVIpcEventPlay : FFXIVIpcBasePacket<EventPlay>
    uint8_t padding1[3];
    uint32_t param5;
    uint8_t unknown[8];
+};
+
+   /**
+* Structural representation of the packet sent by the server
+* to play an event
+*/
+struct FFXIVIpcDirectorPlayScene : FFXIVIpcBasePacket<DirectorPlayScene>
+{
+   uint64_t actorId;
+   uint32_t eventId;
+   uint16_t scene;
+   uint16_t padding;
+   uint32_t flags;
+   uint32_t param3;
+   uint8_t param4;
+   uint8_t padding1[3];
+   uint32_t param5;
+   uint8_t unknown[0x40];
 };
 
 /**
@@ -1363,24 +1378,33 @@ struct FFXIVIpcMSQTrackerComplete : FFXIVIpcBasePacket<MSQTrackerComplete>
 
 struct FFXIVIpcObjectSpawn : FFXIVIpcBasePacket<ObjectSpawn>
 {
-   uint8_t count;
+   uint8_t spawnIndex;
    uint8_t objKind;
-   uint8_t unknown2;
    uint8_t state;
+   uint8_t unknown3;
    uint32_t objId;
    uint32_t actorId;
    uint32_t levelId;
    uint32_t unknown10;
    uint32_t someActorId14;
-   uint32_t hierachyId;
-   uint32_t unknown1C;
-   uint32_t unknown20;
-   uint32_t unknown24;
-   uint32_t unknown28;
-   uint32_t unknown2c;
+   uint32_t gimmickId;
+   float scale;
+   int16_t unknown20a;
+   uint16_t rotation;
+   int16_t unknown24a;
+   int16_t unknown24b;
+   uint16_t unknown28a;
+   int16_t unknown28c;
+   uint32_t unknown2C;
    Common::FFXIVARR_POSITION3 position;
-   int16_t rotation;
-   int16_t unknown;
+   int16_t unknown3C;
+   int16_t unknown3E;
+};
+
+struct FFXIVIpcObjectDespawn : FFXIVIpcBasePacket<ObjectDespawn>
+{
+   uint8_t spawnIndex;
+   uint8_t padding[7];
 };
 
 

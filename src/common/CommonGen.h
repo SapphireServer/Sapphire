@@ -463,6 +463,7 @@ namespace Common {
    //Weather.exd
    enum class Weather : uint8_t
    {
+      None = 0,
       ClearSkies = 1,
       FairSkies = 2,
       Clouds = 3,

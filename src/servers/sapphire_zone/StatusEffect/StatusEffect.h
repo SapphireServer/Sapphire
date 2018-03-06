@@ -14,7 +14,7 @@ namespace StatusEffect
 class StatusEffect
 {
 public:
-   StatusEffect( uint32_t id, Entity::ActorPtr sourceActor, Entity::ActorPtr targetActor,
+   StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
                  uint32_t duration, uint32_t tickRate );
 
    ~StatusEffect();
@@ -39,8 +39,8 @@ public:
 
 private:
    uint32_t m_id;
-   Entity::ActorPtr m_sourceActor;
-   Entity::ActorPtr m_targetActor;
+   Entity::CharaPtr m_sourceActor;
+   Entity::CharaPtr m_targetActor;
    uint32_t m_duration;
    uint64_t m_startTime;
    uint32_t m_tickRate;

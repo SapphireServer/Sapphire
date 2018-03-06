@@ -13,7 +13,7 @@ extern Core::Framework g_framework;
 
 Core::ItemContainer::ItemContainer( uint16_t locationId ) : 
    m_id( locationId ),
-   m_size( 25 )
+   m_size( 35 )
 {
 
 }

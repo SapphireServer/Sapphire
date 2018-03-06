@@ -720,7 +720,7 @@ bool Core::Inventory::load()
    while( bagRes->next() )
    {
       uint16_t storageId = bagRes->getUInt16( 1 );
-      for( uint32_t i = 1; i <= 25; i++ )
+      for( uint32_t i = 1; i <= 35; i++ )
       {
          uint64_t uItemId = bagRes->getUInt64( i + 1 );
          if( uItemId == 0 )
@@ -890,7 +890,7 @@ uint8_t Core::Inventory::getFreeSlotsInBags()
    uint8_t slots = 0;
    for( uint8_t container : { 0, 1, 2, 3 } )
    {
-      slots += 25 - m_inventoryMap[container]->getEntryCount();
+      slots += 34 - m_inventoryMap[container]->getEntryCount();
    }
    return slots;
 }

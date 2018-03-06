@@ -72,8 +72,8 @@ namespace Packets {
 
       Playtime                   = 0x00DF, // updated 4.2
       CFRegistered               = 0x00B8, // updated 4.1
-
-      
+      SocialRequestResponse      = 0x00BB, // updated 4.1
+      CancelAllianceForming      = 0x00C6, // updated 4.2
       Chat                       = 0x00E1, // updated 4.2
       SocialRequestResponse      = 0x00E5, // updated 4.1
       SocialRequestReceive       = 0x00E6, // updated 4.2
@@ -104,15 +104,18 @@ namespace Packets {
       NpcSpawn                   = 0x015D, // updated 4.2
       ActorMove                  = 0x015E, // updated 4.2
       ActorSetPos                = 0x0160, // updated 4.2
+
       ActorCast                  = 0x0162, // updated 4.2
+
       HateList                   = 0x0165, // updated 4.2
+
       ObjectSpawn                = 0x0167, // updated 4.2
+      ObjectDespawn              = 0x0168, // updated 4.2
       UpdateClassInfo            = 0x0169, // updated 4.2
+
       InitUI                     = 0x016B, // updated 4.2
-
-      ActorOwner                 = 0x016D, // updated 4.2 ?
-
       PlayerStats                = 0x016C, // updated 4.2
+      ActorOwner                 = 0x016D, // updated 4.2 ?
       PlayerStateFlags           = 0x016E, // updated 4.2
       PlayerClassInfo            = 0x016F, // updated 4.2
       ModelEquip                 = 0x0170, // updated 4.2
@@ -127,6 +130,7 @@ namespace Packets {
       UpdateInventorySlot        = 0x0181, // updated 4.2
 
       EventPlay                  = 0x018E, // updated 4.2
+      DirectorPlayScene          = 0x0192, // updated 4.2
 
       EventStart                 = 0x0198, // updated 4.2
       EventFinish                = 0x0199, // updated 4.2
@@ -209,6 +213,8 @@ namespace Packets {
 
       FcInfoReqHandler         = 0x011A, // updated 4.2
 
+
+      ReqJoinNoviceNetwork     = 0x0129, // updated 4.2
       ReqCountdownInitiate     = 0x012C, // updated 4.2
       ReqCountdownCancel       = 0x012D, // updated 4.2
 
@@ -230,8 +236,8 @@ namespace Packets {
       OutOfRangeEventHandler   = 0x014B, // updated 4.2
       EnterTeriEventHandler    = 0x014C, // updated 4.2
 
-      ReturnEventHandler       = 0x0151, // updated 4.2 ?
-      TradeReturnEventHandler  = 0x0152, // updated 4.2 ?
+      ReturnEventHandler       = 0x0151, // updated 4.2
+      TradeReturnEventHandler  = 0x0152, // updated 4.2
 
 
       LinkshellEventHandler    = 0x0144, // updated 4.1 ??

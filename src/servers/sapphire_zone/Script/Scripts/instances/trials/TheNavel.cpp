@@ -7,21 +7,22 @@ public:
    TheNavel() : InstanceContentScript( 20002 )
    { }
 
-   void onInit( InstanceContent& instance ) override
+   void onInit( InstanceContentPtr instance ) override
    {
-      auto exit = new Entity::InstanceObject( EXIT_OBJECT, 0, { 0, 0, -10 } );
-      instance.registerInstanceObj( Entity::InstanceObjectPtr( exit ) );
-
-      auto start = new Entity::InstanceObject( START_CIRCLE, 4236868, { 0, 0, 24 } );
-      instance.registerInstanceObj( Entity::InstanceObjectPtr( start ) );
-   }
-
-   void onUpdate( InstanceContent& instance, uint32_t currTime ) override
-   {
+      instance->registerEObj( "Entrance", 2000182, 4236868, 5, { 0.000000f, 0.000000f, 24.000000f }, 1.000000f, 0.000000f ); 
+      // States -> vf_lock_on vf_lock_of 
+      instance->registerEObj( "Exit", 2000139, 0, 4, { 0.000000f, 0.000000f, -10.000000f }, 1.000000f, 0.000000f ); 
 
    }
 
-private:
-   static constexpr auto EXIT_OBJECT = 2000139;
-   static constexpr auto START_CIRCLE = 2000182;
+   void onUpdate( InstanceContentPtr instance, uint32_t currTime ) override
+   {
+
+   }
+
+   void onEnterTerritory( Entity::Player &player, uint32_t eventId, uint16_t param1, uint16_t param2 ) override
+   {
+
+   }
+
 };

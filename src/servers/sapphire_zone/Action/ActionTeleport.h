@@ -17,7 +17,7 @@ namespace Action {
       ActionTeleport();
       ~ActionTeleport();
       
-      ActionTeleport( Entity::ActorPtr pActor, uint16_t action, uint16_t cost );
+      ActionTeleport( Entity::CharaPtr pActor, uint16_t action, uint16_t cost );
 
       void onStart() override;
       void onFinish() override;

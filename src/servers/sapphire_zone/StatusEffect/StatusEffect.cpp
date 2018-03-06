@@ -6,6 +6,10 @@
 #include <common/Network/PacketDef/Zone/ServerZoneDef.h>
 #include <common/Logging/Logger.h>
 
+#include <boost/algorithm/string.hpp>
+#include <algorithm>
+
+#include "Actor/Chara.h"
 #include "Actor/Actor.h"
 
 #include "Script/ScriptMgr.h"
@@ -19,7 +23,7 @@ using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-Core::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::ActorPtr sourceActor, Entity::ActorPtr targetActor,
+Core::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
                                                 uint32_t duration, uint32_t tickRate )
    : m_id( id )
    , m_sourceActor( sourceActor )

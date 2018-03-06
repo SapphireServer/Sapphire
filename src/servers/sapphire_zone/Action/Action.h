@@ -18,7 +18,7 @@ namespace Action {
 
       Common::HandleActionType getHandleActionType() const;
 
-      Entity::ActorPtr getTargetActor() const;
+      Entity::CharaPtr getTargetChara() const;
 
       bool isInterrupted() const;
 
@@ -32,7 +32,7 @@ namespace Action {
 
       void setCastTime( uint32_t castTime );
 
-      Entity::ActorPtr getActionSource() const;
+      Entity::CharaPtr getActionSource() const;
 
       virtual void onStart() {};
       virtual void onFinish() {};
@@ -48,8 +48,8 @@ namespace Action {
       uint64_t	m_startTime;
       uint32_t	m_castTime;
 
-      Entity::ActorPtr m_pSource;
-      Entity::ActorPtr m_pTarget;
+      Entity::CharaPtr m_pSource;
+      Entity::CharaPtr m_pTarget;
 
       bool m_bInterrupt;
 

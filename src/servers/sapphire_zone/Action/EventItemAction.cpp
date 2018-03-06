@@ -24,7 +24,7 @@ Core::Action::EventItemAction::EventItemAction()
    m_handleActionType = HandleActionType::Event;
 }
 
-Core::Action::EventItemAction::EventItemAction( Entity::ActorPtr pActor, uint32_t eventId, uint16_t action,
+Core::Action::EventItemAction::EventItemAction( Entity::CharaPtr pActor, uint32_t eventId, uint16_t action,
                                                 ActionCallback finishRef, ActionCallback interruptRef, uint64_t additional )
 {
    m_additional = additional;
@@ -75,7 +75,7 @@ void Core::Action::EventItemAction::onFinish()
       effectPacket.data().actionTextId = m_id;
       effectPacket.data().unknown_5 = 2;
       effectPacket.data().numEffects = 1;
-      effectPacket.data().rotation = Math::Util::floatToUInt16Rot( m_pSource->getRotation() );
+      effectPacket.data().rotation = Math::Util::floatToUInt16Rot( m_pSource->getRot() );
       effectPacket.data().effectTarget = static_cast< uint32_t >( m_additional );
 
       m_pSource->getAsPlayer()->unsetStateFlag( Common::PlayerStateFlag::Casting );

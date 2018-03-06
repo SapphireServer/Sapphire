@@ -1,4 +1,6 @@
+#include <Script/NativeScriptApi.h>
 #include "../ScriptObject.h"
+#include <Actor/Player.h>
 
 class CmnDefInnBed : public EventScript
 {
@@ -49,7 +51,7 @@ public:
       Scene00000( player );
    }
 
-   void onEnterZone( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 ) override
+   void onEnterTerritory( Entity::Player &player, uint32_t eventId, uint16_t param1, uint16_t param2 ) override
    {
       Scene00100( player );
    }

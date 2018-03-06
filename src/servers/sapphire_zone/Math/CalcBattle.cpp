@@ -3,7 +3,8 @@
 #include <common/Exd/ExdDataGenerated.h>
 #include <common/Common.h>
 
-#include "Actor/Actor.h"
+#include "Actor/Chara.h"
+
 #include "Actor/Player.h"
 
 #include "CalcBattle.h"

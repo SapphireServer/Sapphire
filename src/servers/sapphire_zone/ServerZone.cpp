@@ -18,6 +18,8 @@
 #include <common/Database/DbWorkerPool.h>
 #include <common/Database/PreparedStatement.h>
 
+#include "Actor/Player.h"
+
 #include "Network/GameConnection.h"
 #include "Session.h"
 
@@ -62,34 +64,6 @@ Core::XMLConfigPtr Core::ServerZone::getConfig() const
 size_t Core::ServerZone::getSessionCount() const
 {
    return m_sessionMapById.size();
-}
-
-bool Core::ServerZone::registerBnpcTemplate( std::string templateName, uint32_t bnpcBaseId,
-                                             uint32_t bnpcNameId, uint32_t modelId, std::string aiName )
-{
-
-   auto it = m_bnpcTemplates.find( templateName );
-
-   if( it != m_bnpcTemplates.end() )
-   {
-      g_framework.getLogger().error( templateName + " already registered, skipping..." );
-      return false;
-   }
-
-   Entity::BattleNpcTemplatePtr pNpcTemplate( new Entity::BattleNpcTemplate( templateName, bnpcBaseId, bnpcNameId, modelId, aiName ) );
-   m_bnpcTemplates[templateName] = pNpcTemplate;
-
-   return true;
-}
-
-Core::Entity::BattleNpcTemplatePtr Core::ServerZone::getBnpcTemplate( std::string templateName )
-{
-   auto it = m_bnpcTemplates.find( templateName );
-
-   if (it != m_bnpcTemplates.end())
-      return nullptr;
-
-   return it->second;
 }
 
 bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
@@ -260,7 +234,6 @@ void Core::ServerZone::mainLoop()
    while( isRunning() )
    {
       this_thread::sleep_for( chrono::milliseconds( 50 ) );
-
 
       auto currTime = Util::getTimeSeconds();
 

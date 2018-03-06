@@ -45,6 +45,65 @@ using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
+enum ClientTrigger
+{
+   ToggleSeathe = 0x01,
+   ToggleAutoAttack = 0x02,
+   ChangeTarget = 0x03,
+
+   Dismount = 0x65,
+
+   RemoveStatusEffect = 0x68,
+   CastCancel = 0x69,
+
+   Return = 0xC8, // return dead / accept raise
+   FinishZoning = 0xC9,
+   Teleport = 0xCA,
+
+   MarkPlayer = 0x12D, // Mark player, visible to party only
+   SetTitle = 0x12E,
+   TitleList = 0x12F,
+
+   UpdatedSeenHowTos = 0x133,
+   AllotAttribute = 0x135,
+
+   ClearWaymarks = 0x13A,
+
+   HuntingLogDetails = 0x194,
+
+   Timers = 0x1AB,
+  
+   DyeItem = 0x1B5,
+
+   RequestChocoboInventory = 0x1C4,
+
+   Emote = 0x1F4,
+   PersistantEmoteCancel = 0x1F7,
+   PoseChange = 0x1F9,
+   PoseReapply = 0x1FA,
+   PoseCancel = 0x1FB,
+
+   AchievementCrit = 0x202,
+   AchievementComp = 0x203,
+   AchievementCatChat = 0x206,
+
+
+   DirectorInitFinish = 0x321,
+
+   SomeDirectorEvent = 0x328, // unsure what exactly triggers it, starts director when returning to instance though
+
+   EnterTerritoryEventFinished = 0x330,
+
+   AchievementCritReq = 0x3E8,
+   AchievementList = 0x3E9,
+
+   CompanionAction = 0x6A4,
+   CompanionSetBarding = 0x6A5,
+   CompanionActionUnlock = 0x6A6,
+
+   OpenPerformInstrumentUI = 0x71C,
+};
+
 void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& inPacket,
                                                    Entity::Player& player )
 {
@@ -67,13 +126,13 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
 
     switch( commandId )
     {
-        case 0x01:  // Toggle sheathe
+        case ClientTrigger::ToggleSeathe:  // Toggle sheathe
         {
             if ( param11 == 1 )
-                player.setStance( Entity::Actor::Stance::Active );
+                player.setStance( Entity::Chara::Stance::Active );
             else
             {
-                player.setStance( Entity::Actor::Stance::Passive );
+                player.setStance( Entity::Chara::Stance::Passive );
                 player.setAutoattack( false );
             }
 
@@ -81,12 +140,12 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
 
             break;
         }
-        case 0x02:  // Toggle auto-attack
+        case ClientTrigger::ToggleAutoAttack:  // Toggle auto-attack
         {
             if ( param11 == 1 )
             {
                 player.setAutoattack( true );
-                player.setStance( Entity::Actor::Stance::Active );
+                player.setStance( Entity::Chara::Stance::Active );
             }
             else
                 player.setAutoattack( false );
@@ -95,58 +154,75 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
 
             break;
         }
-        case 0x03: // Change target
+        case ClientTrigger::ChangeTarget: // Change target
         {
 
             uint64_t targetId = inPacket.getValAt< uint64_t >( 0x24 );
             player.changeTarget( targetId );
             break;
         }
-        case 0x65:
+        case ClientTrigger::Dismount:
         {
            player.dismount();
            break;
         }
-        case 0x68: // Remove status (clicking it off)
+        case ClientTrigger::RemoveStatusEffect: // Remove status (clicking it off)
         {
            // todo: check if status can be removed by client from exd
            player.removeSingleStatusEffectById( static_cast< uint32_t >( param1 ) );
            break;
         }
-        case 0x69: // Cancel cast
+        case ClientTrigger::CastCancel: // Cancel cast
         {
            if( player.getCurrentAction() )
                player.getCurrentAction()->setInterrupted();
            break;
         }
-        case 0x12E: // Set player title
+        case ClientTrigger::MarkPlayer: // Mark player
+        {
+           break;
+        }
+        case ClientTrigger::SetTitle: // Set player title
         {
            player.setTitle( static_cast< uint16_t >( param1 ) );
            break;
         }
-        case 0x12F: // Get title list
+        case ClientTrigger::TitleList: // Get title list
         {
-           ZoneChannelPacket< FFXIVIpcPlayerTitleList > titleListPacket( player.getId() );
-           memcpy( titleListPacket.data().titleList, player.getTitleList(), sizeof( titleListPacket.data().titleList ) );
-
-           player.queuePacket( titleListPacket );
+           player.sendTitleList();
            break;
         }
-        case 0x133: // Update howtos seen
+        case ClientTrigger::UpdatedSeenHowTos: // Update howtos seen
         {
-            uint32_t howToId = static_cast< uint32_t >( param1 );
+            uint32_t howToId = param11;
             player.updateHowtosSeen( howToId );
             break;
         }
-        case 0x1F4: // emote
+        case ClientTrigger::Emote: // emote
         {
             uint64_t targetId = player.getTargetId();
             uint32_t emoteId = inPacket.getValAt< uint32_t >( 0x24 );
 
-            player.sendToInRangeSet( ActorControlPacket144( player.getId(), Emote, emoteId, 0, 0, 0, targetId ) );
+            player.emote( emoteId, targetId );
             break;
         }
-        case 0xC8: // return dead
+        case ClientTrigger::PersistantEmoteCancel: // cancel persistant emote
+        {
+            break;
+        }
+        case ClientTrigger::PoseChange: // change pose
+        {
+            break;
+        }
+        case ClientTrigger::PoseReapply: // reapply pose
+        {
+            break;
+        }
+        case ClientTrigger::PoseCancel: // cancel pose
+        {
+            break;
+        }
+        case ClientTrigger::Return: // return dead / accept raise
         {
            switch ( static_cast < ResurrectType >( param1 ) )
            {
@@ -162,78 +238,35 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
            }
             
         }
-        case 0xC9: // Finish zoning
+        case ClientTrigger::FinishZoning: // Finish zoning
         {
-            switch( player.getZoningType() )
-            {
-                case ZoneingType::None:
-                    player.sendToInRangeSet( ActorControlPacket143( player.getId(), ZoneIn, 0x01 ), true );
-                    break;
-                case ZoneingType::Teleport:
-                    player.sendToInRangeSet( ActorControlPacket143( player.getId(), ZoneIn, 0x01, 0, 0, 110 ), true );
-                    break;
-                case ZoneingType::Return:
-                case ZoneingType::ReturnDead:
-                {
-                    if( player.getStatus() == Entity::Actor::ActorStatus::Dead )
-                    {
-                        player.resetHp();
-                        player.resetMp();
-                        player.setStatus( Entity::Actor::ActorStatus::Idle );
-
-                        player.sendToInRangeSet( ActorControlPacket143( player.getId(), ZoneIn, 0x01, 0x01, 0, 111 ), true );
-                        player.sendToInRangeSet( ActorControlPacket142( player.getId(), SetStatus, static_cast< uint8_t >( Entity::Actor::ActorStatus::Idle ) ), true );
-                    }
-                    else
-                        player.sendToInRangeSet( ActorControlPacket143( player.getId(), ZoneIn, 0x01, 0x00, 0, 111 ), true );
-                }
-                    break;
-                case ZoneingType::FadeIn:
-                    break;
-            }
-
-            player.setZoningType( Common::ZoneingType::None );
-
-            player.unsetStateFlag( PlayerStateFlag::BetweenAreas );
-            player.unsetStateFlag( PlayerStateFlag::BetweenAreas1 );
+            player.finishZoning();
             break;
         }
 
-        case 0xCA: // Teleport
+        case ClientTrigger::Teleport: // Teleport
         {
-            // TODO: only register this action if enough gil is in possession
-            auto targetAetheryte = g_framework.getExdDataGen().get< Core::Data::Aetheryte >( param11 );
 
-            if( targetAetheryte )
-            {
-               auto fromAetheryte = g_framework.getExdDataGen().get< Core::Data::Aetheryte >( g_framework.getExdDataGen().get< Core::Data::TerritoryType >( player.getZoneId() )->aetheryte );
-
-                // calculate cost - does not apply for favorite points or homepoints neither checks for aether tickets
-                auto cost = static_cast< uint16_t >( ( sqrt( pow( fromAetheryte->aetherstreamX - targetAetheryte->aetherstreamX, 2 ) +
-                                    pow( fromAetheryte->aetherstreamY - targetAetheryte->aetherstreamY, 2 ) ) / 2 ) + 100 );
-
-                // cap at 999 gil
-                cost = cost > uint16_t{999} ? uint16_t{999} : cost;
-
-                bool insufficientGil = player.getCurrency( Inventory::CurrencyType::Gil ) < cost;
-                // todo: figure out what param1 really does
-                player.queuePacket( ActorControlPacket143( player.getId(), TeleportStart, insufficientGil ? 2 : 0, param11 ) );
-
-                if( !insufficientGil )
-                {
-                    auto pActionTeleport = Action::make_ActionTeleport( player.getAsPlayer(), param11, cost );
-                    player.setCurrentAction( pActionTeleport );
-                }
-            }
+            player.teleportQuery( param11 );
             break;
         }
-        case 0x1B5: // Dye item
+        case ClientTrigger::DyeItem: // Dye item
         {
            break;
         }
-        case 0x321: // Director init finish
+        case ClientTrigger::DirectorInitFinish: // Director init finish
         {
            player.getCurrentZone()->onInitDirector( player );
+           break;
+        }
+       case ClientTrigger::SomeDirectorEvent: // Director init finish
+       {
+          player.getCurrentZone()->onSomeDirectorEvent( player );
+          break;
+       }
+        case ClientTrigger::EnterTerritoryEventFinished:// this may still be something else. I think i have seen it elsewhere
+        {
+           player.setOnEnterEventDone( true );
            break;
         }
         default:

@@ -13,10 +13,15 @@
 #include <common/Network/PacketContainer.h>
 #include <common/Database/DatabaseDef.h>
 
+#include "Zone.h"
+#include "InstanceContent.h"
+#include "TerritoryMgr.h"
+
+#include "Session.h"
+#include "Actor/Chara.h"
 #include "Actor/Actor.h"
 #include "Actor/Player.h"
-#include "Actor/BattleNpc.h"
-#include "Actor/EventNpc.h"
+#include "Actor/EventObject.h"
 
 #include "Network/GameConnection.h"
 
@@ -30,7 +35,12 @@
 #include "TerritoryMgr.h"
 #include "Framework.h"
 
+using namespace Core::Common;
+using namespace Core::Network::Packets;
+using namespace Core::Network::Packets::Server;
+
 extern Core::Framework g_framework;
+
 
 /**
 * \brief
@@ -38,15 +48,17 @@ extern Core::Framework g_framework;
 Core::Zone::Zone() :
    m_territoryId( 0 ),
    m_guId( 0 ),
-   m_currentWeather( static_cast< uint8_t >( Common::Weather::FairSkies ) ),
-   m_weatherOverride( 0 ),
+   m_currentWeather( Weather::FairSkies ),
+   m_weatherOverride( Weather::None ),
    m_lastMobUpdate( 0 ),
-   m_currentFestivalId( 0 )
+   m_currentFestivalId( 0 ),
+   m_nextEObjId( 0x400D0000 )
 {
 }
 
 Core::Zone::Zone( uint16_t territoryId, uint32_t guId, const std::string& internalName, const std::string& placeName ) :
-   m_currentWeather( static_cast< uint8_t >( Common::Weather::FairSkies ) )
+   m_currentWeather( Weather::FairSkies ),
+   m_nextEObjId( 0x400D0000 )
 {
    m_guId = guId;
 
@@ -55,8 +67,22 @@ Core::Zone::Zone( uint16_t territoryId, uint32_t guId, const std::string& intern
    m_placeName = placeName;
    m_lastMobUpdate = 0;
 
-   m_weatherOverride = 0;
+   m_weatherOverride = Weather::None;
    m_territoryTypeInfo = g_framework.getExdDataGen().get< Core::Data::TerritoryType >( territoryId );
+
+   loadWeatherRates();
+
+   m_currentWeather = getNextWeather();
+}
+
+void Core::Zone::loadWeatherRates()
+{
+   if( !m_territoryTypeInfo )
+   {
+      g_framework.getLogger().error( std::string( __FUNCTION__ ) + " TerritoryTypeInfo not loaded!" );
+      return;
+   }
+
 
    uint8_t weatherRateId = m_territoryTypeInfo->weatherRate > g_framework.getExdDataGen().getWeatherRateIdList().size() ?
                            uint8_t{ 0 } : m_territoryTypeInfo->weatherRate;
@@ -74,8 +100,6 @@ Core::Zone::Zone( uint16_t territoryId, uint32_t guId, const std::string& intern
       m_weatherRateMap[sumPc] = weatherId;
       i += 2;
    }
-
-   m_currentWeather = getNextWeather();
 }
 
 Core::Zone::~Zone()
@@ -84,24 +108,22 @@ Core::Zone::~Zone()
 
 bool Core::Zone::init()
 {
-   memset( m_pCellCache, 0, sizeof( CellCache* ) * _sizeX );
 
    if( g_framework.getScriptMgr().onZoneInit( shared_from_this() ) )
    {
       // all good
    }
 
-   loadCellCache();
 
    return true;
 }
 
-void Core::Zone::setWeatherOverride( uint8_t weather )
+void Core::Zone::setWeatherOverride( Weather weather )
 {
    m_weatherOverride = weather;
 }
 
-uint8_t Core::Zone::getCurrentWeather() const
+Weather Core::Zone::getCurrentWeather() const
 {
    return m_currentWeather;
 }
@@ -116,112 +138,12 @@ void Core::Zone::setCurrentFestival( uint16_t festivalId )
    m_currentFestivalId = festivalId;
 }
 
-Core::CellCache* Core::Zone::getCellCacheList( uint32_t cellx, uint32_t celly )
-{
-   assert( cellx < _sizeX );
-   assert( celly < _sizeY );
-   if( m_pCellCache[cellx] == nullptr )
-      return nullptr;
-
-   return m_pCellCache[cellx][celly];
-}
-
-Core::CellCache* Core::Zone::getCellCacheAndCreate( uint32_t cellx, uint32_t celly )
-{
-   assert( cellx < _sizeX );
-   assert( celly < _sizeY );
-   if( m_pCellCache[cellx] == nullptr )
-   {
-      m_pCellCache[cellx] = new CellCache*[_sizeY];
-      memset(m_pCellCache[cellx], 0, sizeof( CellCache* ) * _sizeY);
-   }
-
-   if( m_pCellCache[cellx][celly] == nullptr )
-   {
-      //m_pCellCache[cellx][celly] = new CellCache;
-   }
-
-   return m_pCellCache[cellx][celly];
-}
 
 void Core::Zone::loadCellCache()
 {
-   auto pQR = g_framework.getCharaDb().query( "SELECT Id,"
-                               "Zoneid,"
-                               "NameId,"
-                               "SizeId,"
-                               "ClassJob,"
-                               "DisplayFlags1,"
-                               "DisplayFlags2,"
-                               "Level,"
-                               "Pos_0_0,"
-                               "Pos_0_1,"
-                               "Pos_0_2,"
-                               "Rotation,"
-                               "MobType,"
-                               "Behaviour,"
-                               "ModelMainWeapon,"
-                               "ModelSubWeapon,"
-                               "ModelId,"
-                               "Look,"
-                               "Models,"
-                               "type "
-                               "FROM battlenpc WHERE ZoneId = " + std::to_string( getTerritoryId() ) + ";" );
-
-   std::vector< Entity::BattleNpcPtr > cache;
-
-   while( pQR->next() )
-   {
-      uint32_t id = pQR->getUInt( 1 );
-      uint32_t targetZoneId = pQR->getUInt( 2 );
-      uint32_t nameId = pQR->getUInt( 3 );
-      uint32_t sizeId = pQR->getUInt( 4 );
-      uint32_t classJob = pQR->getUInt( 5 );
-      uint32_t displayFlags1 = pQR->getUInt( 6 );
-      uint32_t displayFlags2 = pQR->getUInt( 7 );
-      uint32_t level = pQR->getUInt( 8 );
-      float posX = pQR->getFloat( 9 );
-      float posY = pQR->getFloat( 10 );
-      float posZ = pQR->getFloat( 11 );
-      uint32_t rotation = pQR->getUInt( 12 );
-      uint32_t mobType = pQR->getUInt( 13 );
-      uint32_t behaviour = pQR->getUInt( 14 );
-      uint64_t modelMainWeapon = pQR->getUInt( 15 );
-      uint64_t modelSubWeapon = pQR->getUInt( 16 );
-      uint32_t modelId = pQR->getUInt( 17 );
-      uint32_t type = pQR->getUInt( 18 );
-
-      Common::FFXIVARR_POSITION3 pos{ posX, posY, posZ };
-      auto pBNpc = Entity::make_BattleNpc( modelId, nameId, pos, sizeId, type, level, behaviour, mobType );
-      pBNpc->setRotation( static_cast< float >( rotation ) );
-      cache.push_back( pBNpc );
-   }
-
-
-
-   for( auto entry : cache )
-   {
-      // get cell position
-      uint32_t cellX = CellHandler< TerritoryMgr >::getPosX( entry->getPos().x );
-      uint32_t cellY = CellHandler< TerritoryMgr >::getPosY( entry->getPos().z );
-
-      // find the right cell, create it if not existing yet
-      if( m_pCellCache[cellX] == nullptr )
-      {
-         m_pCellCache[cellX] = new CellCache*[_sizeY];
-         memset( m_pCellCache[cellX], 0, sizeof( CellCache* ) * _sizeY );
-      }
-
-      if( !m_pCellCache[cellX][cellY] )
-         m_pCellCache[cellX][cellY] = new CellCache;
-
-      // add the populace cache object to the cells list
-      m_pCellCache[cellX][cellY]->battleNpcCache.push_back( entry );
-   }
-
 }
 
-uint8_t Core::Zone::getNextWeather()
+Weather Core::Zone::getNextWeather()
 {
    uint32_t unixTime = static_cast< uint32_t >( Util::getTimeSeconds() );
    // Get Eorzea hour for weather start
@@ -242,13 +164,13 @@ uint8_t Core::Zone::getNextWeather()
    for( auto entry : m_weatherRateMap )
    {
       uint8_t sRate = entry.first;
-      auto weatherId = static_cast< uint8_t >( entry.second );
+      auto weatherId = static_cast< Weather >( entry.second );
 
       if( rate <= sRate )
          return weatherId;
    }
 
-   return 1;
+   return Weather::FairSkies;
 }
 
 void Core::Zone::pushActor( Entity::ActorPtr pActor )
@@ -258,7 +180,7 @@ void Core::Zone::pushActor( Entity::ActorPtr pActor )
    uint32_t cx = getPosX( mx );
    uint32_t cy = getPosY( my );
 
-   Cell* pCell = getCell( cx, cy );
+   Cell* pCell = getCellPtr(cx, cy);
    if( !pCell )
    {
       pCell = create( cx, cy );
@@ -282,7 +204,7 @@ void Core::Zone::pushActor( Entity::ActorPtr pActor )
    {
       for( posY = startY; posY <= endY; ++posY )
       {
-         pCell = getCell( posX, posY );
+         pCell = getCellPtr(posX, posY);
          if( pCell )
             updateInRangeSet( pActor, pCell );
       }
@@ -298,31 +220,16 @@ void Core::Zone::pushActor( Entity::ActorPtr pActor )
       m_playerMap[pPlayer->getId()] = pPlayer;
       updateCellActivity( cx, cy, 2 );
    }
-   else if( pActor->isBattleNpc() )
-   {
-
-      Entity::BattleNpcPtr pBNpc = pActor->getAsBattleNpc();
-      m_BattleNpcMap[pBNpc->getId()] = pBNpc;
-      pBNpc->setPosition( pBNpc->getPos() );
-
-   }
-   else if( pActor->isEventNpc() )
-   {
-      Entity::EventNpcPtr pENpc = pActor->getAsEventNpc();
-      m_EventNpcMap[pENpc->getId()] = pENpc;
-      pENpc->setPosition( pENpc->getPos() );
-   }
-
-
-}
+ }
 
 void Core::Zone::removeActor( Entity::ActorPtr pActor )
 {
 
-   if( pActor->m_pCell )
+   auto pCell = pActor->getCellPtr();
+   if( pCell )
    {
-      pActor->m_pCell->removeActor( pActor );
-      pActor->m_pCell = nullptr;
+      pCell->removeActor( pActor );
+      pCell = nullptr;
    }
 
    if( pActor->isPlayer() )
@@ -330,7 +237,7 @@ void Core::Zone::removeActor( Entity::ActorPtr pActor )
 
       // If it's a player and he's inside boundaries - update his nearby cells
       if( pActor->getPos().x <= _maxX && pActor->getPos().x >= _minX &&
-          pActor->getPos().z <= _maxY && pActor->getPos().z >= _minY )
+              pActor->getPos().z <= _maxY && pActor->getPos().z >= _minY )
       {
          uint32_t x = getPosX( pActor->getPos().x );
          uint32_t y = getPosY( pActor->getPos().z );
@@ -341,8 +248,6 @@ void Core::Zone::removeActor( Entity::ActorPtr pActor )
       onLeaveTerritory( *pActor->getAsPlayer() );
 
    }
-   else if( pActor->isBattleNpc() )
-      m_BattleNpcMap.erase( pActor->getId() );
 
    // remove from lists of other actors
    pActor->removeFromInRange();
@@ -350,24 +255,26 @@ void Core::Zone::removeActor( Entity::ActorPtr pActor )
 
 }
 
-void Core::Zone::queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range, Network::Packets::GamePacketPtr pPacketEntry )
+void Core::Zone::queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range, GamePacketPtr pPacketEntry )
 {
    if( g_framework.getTerritoryMgr().isPrivateTerritory( getTerritoryId() ) )
       return;
 
-   for( auto it = m_playerMap.begin(); it != m_playerMap.end(); ++it )
+   for( auto entry : m_playerMap )
    {
+      auto player = entry.second;
       float distance = Math::Util::distance( sourcePlayer.getPos().x,
                                              sourcePlayer.getPos().y,
                                              sourcePlayer.getPos().z,
-                                             ( *it ).second->getPos().x,
-                                             ( *it ).second->getPos().y,
-                                             ( *it ).second->getPos().z );
+                                             player->getPos().x,
+                                             player->getPos().y,
+                                             player->getPos().z );
 
-      if( ( distance < range ) && sourcePlayer.getId() != ( *it ).second->getId() )
+      if( ( distance < range ) && sourcePlayer.getId() != player->getId() )
       {
-         auto pSession = g_framework.getServerZone().getSession( ( *it ).second->getId() );
-         pPacketEntry->setValAt< uint32_t >( 0x08, ( *it ).second->getId() );
+
+         auto pSession = g_framework.getServerZone().getSession( player->getId() );
+         pPacketEntry->setValAt< uint32_t >( 0x08, player->getId() );
          if( pSession )
             pSession->getZoneConnection()->queueOutPacket( pPacketEntry );
       }
@@ -401,28 +308,33 @@ std::size_t Core::Zone::getPopCount() const
 
 bool Core::Zone::checkWeather()
 {
-   if ( m_weatherOverride != 0 )
+   if( m_weatherOverride != Weather::None )
    {
-      if ( m_weatherOverride != m_currentWeather )
+      if( m_weatherOverride != m_currentWeather )
       {
          m_currentWeather = m_weatherOverride;
-         g_framework.getLogger().debug( "[Zone:" + m_internalName + "] overriding weather to : " + std::to_string( m_weatherOverride ) );
+         g_framework.getLogger().debug( "[Zone:" + m_internalName + "] overriding weather to : " +
+                                        std::to_string(  static_cast< uint8_t >( m_weatherOverride ) ) );
+
          return true;
       }
    }
    else
    {
       auto nextWeather = getNextWeather();
-      if ( nextWeather != m_currentWeather )
+      if( nextWeather != m_currentWeather )
       {
          m_currentWeather = nextWeather;
-         g_framework.getLogger().debug( "[Zone:" + m_internalName + "] changing weather to : " + std::to_string( nextWeather ) );
+
+         g_framework.getLogger().debug( "[Zone:" + m_internalName + "] changing weather to : " +
+                                        std::to_string( static_cast< uint8_t >( nextWeather ) ) );
          return true;
       }
    }
    return false;
 }
 
+/*
 void Core::Zone::updateBnpcs( int64_t tickCount )
 {
    if( ( tickCount - m_lastMobUpdate ) > 250 )
@@ -470,13 +382,24 @@ void Core::Zone::updateBnpcs( int64_t tickCount )
       }
    }
 }
+*/
 
 bool Core::Zone::update( uint32_t currTime )
 {
    int64_t tickCount = Util::getTimeMs();
 
+   //TODO: this should be moved to a updateWeather call and pulled out of updateSessions
    bool changedWeather = checkWeather();
 
+   updateSessions( changedWeather );
+   //updateBnpcs( tickCount );
+   onUpdate( currTime );
+
+   return true;
+}
+
+void Core::Zone::updateSessions( bool changedWeather )
+{
    auto it = m_sessionSet.begin();
 
    // update sessions in this zone
@@ -487,26 +410,26 @@ bool Core::Zone::update( uint32_t currTime )
 
       if( !pSession )
       {
-         it = m_sessionSet.erase( it );
+         it = m_sessionSet.erase(it );
          continue;
       }
 
+      auto pPlayer = pSession->getPlayer();
+
       // this session is not linked to this area anymore, remove it from zone session list
-      if( ( !pSession->getPlayer()->getCurrentZone() )
-          || ( pSession->getPlayer()->getCurrentZone() != shared_from_this() ) )
+      if( ( !pPlayer->getCurrentZone() ) || ( pPlayer->getCurrentZone() != shared_from_this() ) )
       {
-         if( pSession->getPlayer()->getCell() )
+         if( pPlayer->getCellPtr() )
             removeActor( pSession->getPlayer() );
 
-         it = m_sessionSet.erase( it );
+         it = m_sessionSet.erase(it );
          continue;
       }
 
       if( changedWeather )
       {
-         Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcWeatherChange  >
-                 weatherChangePacket( pSession->getPlayer()->getId() );
-         weatherChangePacket.data().weatherId = m_currentWeather;
+         ZoneChannelPacket< FFXIVIpcWeatherChange  > weatherChangePacket( pPlayer->getId() );
+         weatherChangePacket.data().weatherId = static_cast< uint8_t >( m_currentWeather );
          weatherChangePacket.data().delay = 5.0f;
          pSession->getPlayer()->queuePacket( weatherChangePacket );
       }
@@ -515,12 +438,6 @@ bool Core::Zone::update( uint32_t currTime )
       pSession->update();
       ++it;
    }
-
-   updateBnpcs( tickCount );
-
-   onUpdate( currTime );
-
-   return true;
 }
 
 bool Core::Zone::isCellActive( uint32_t x, uint32_t y )
@@ -538,7 +455,7 @@ bool Core::Zone::isCellActive( uint32_t x, uint32_t y )
    {
       for( posY = startY; posY <= endY; posY++ )
       {
-         pCell = getCell( posX, posY );
+         pCell = getCellPtr(posX, posY);
 
          if( pCell && ( pCell->hasPlayers() || pCell->isForcedActive() ) )
             return true;
@@ -563,7 +480,7 @@ void Core::Zone::updateCellActivity( uint32_t x, uint32_t y, int32_t radius )
    {
       for( posY = startY; posY <= endY; posY++ )
       {
-         pCell = getCell( posX, posY );
+         pCell = getCellPtr(posX, posY);
 
          if( !pCell )
          {
@@ -576,9 +493,6 @@ void Core::Zone::updateCellActivity( uint32_t x, uint32_t y, int32_t radius )
 
                assert( !pCell->isLoaded() );
 
-               CellCache * pCC = getCellCacheAndCreate( posX, posY );
-               if( pCC )
-                  pCell->loadActors( pCC );
             }
          }
          else
@@ -590,9 +504,7 @@ void Core::Zone::updateCellActivity( uint32_t x, uint32_t y, int32_t radius )
 
                if( !pCell->isLoaded() )
                {
-                  CellCache * pCC = getCellCacheAndCreate( posX, posY );
-                  if( pCC )
-                     pCell->loadActors( pCC );
+
                }
             }
             else if( !isCellActive( posX, posY ) && pCell->isActive() )
@@ -608,7 +520,7 @@ void Core::Zone::updateActorPosition( Entity::Actor &actor )
    if( actor.getCurrentZone() != shared_from_this() )
       return;
 
-   actor.checkInRangeActors();
+   //actor.checkInRangeActors();
 
    uint32_t cellX = getPosX( actor.getPos().x );
    uint32_t cellY = getPosY( actor.getPos().z );
@@ -616,8 +528,9 @@ void Core::Zone::updateActorPosition( Entity::Actor &actor )
    if( cellX >= _sizeX || cellY >= _sizeY )
       return;
 
-   Cell* pCell = getCell( cellX, cellY );
-   Cell* pOldCell = actor.m_pCell;
+   auto pCell = getCellPtr(cellX, cellY);
+
+   auto pOldCell = actor.getCellPtr();
    if( !pCell )
    {
       pCell = create( cellX, cellY );
@@ -629,10 +542,11 @@ void Core::Zone::updateActorPosition( Entity::Actor &actor )
    {
 
       if( pOldCell )
-         pOldCell->removeActor( actor.getAsActor() );
+         pOldCell->removeActor( actor.shared_from_this() );
 
-      pCell->addActor( actor.getAsActor() );
-      actor.m_pCell = pCell;
+      pCell->addActor( actor.shared_from_this() );
+      actor.setCell( pCell );
+      pOldCell = pCell;
 
       // if player we need to update cell activity
       // radius = 2 is used in order to update both
@@ -661,9 +575,9 @@ void Core::Zone::updateActorPosition( Entity::Actor &actor )
    {
       for( posY = startY; posY <= endY; ++posY )
       {
-         pCell = getCell( posX, posY );
+         pCell = getCellPtr(posX, posY);
          if( pCell )
-            updateInRangeSet( actor.getAsActor(), pCell );
+            updateInRangeSet( actor.shared_from_this(), pCell );
       }
    }
 }
@@ -678,78 +592,50 @@ void Core::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
    if( g_framework.getTerritoryMgr().isPrivateTerritory( getTerritoryId() ) )
       return;
 
-   Entity::ActorPtr pCurAct;
-
    auto iter = pCell->m_actors.begin();
 
    float fRange = 70.0f;
    int32_t count = 0;
    while( iter != pCell->m_actors.end() )
    {
-      pCurAct = *iter;
+      auto pCurAct = *iter;
       ++iter;
 
-      if( !pCurAct )
+      if( !pCurAct || pCurAct == pActor )
          continue;
 
       float distance = Math::Util::distance( pCurAct->getPos().x, pCurAct->getPos().y, pCurAct->getPos().z,
                                              pActor->getPos().x, pActor->getPos().y, pActor->getPos().z );
 
-      // Add if we are not ourself and  range == 0 or distance is withing range.
-      if( pCurAct != pActor && ( fRange == 0.0f || distance <= fRange ) )
+      bool isInRange = ( fRange == 0.0f || distance <= fRange );
+      bool isInRangeSet = pActor->isInRangeSet( pCurAct );
+
+      // Add if range == 0 or distance is withing range.
+      if( isInRange && !isInRangeSet )
       {
 
-         if( pActor->isInRangeSet( pCurAct ) )
-            // Actor already in range set, skip
+         if( pActor->isPlayer() && !pActor->getAsPlayer()->isLoadingComplete() )
             continue;
 
-         if( pActor->isPlayer() )
-         {
-            auto pOwnPlayer = pActor->getAsPlayer();
+         if( pCurAct->isPlayer() && !pCurAct->getAsPlayer()->isLoadingComplete() )
+            continue;
 
-            if( !pOwnPlayer->isLoadingComplete() )
-               continue;
+         pActor->addInRangeActor( pCurAct );
+         pCurAct->addInRangeActor( pActor );
 
-            // this is a hack to limit actor spawn in one packetset
-            count++;
-            if( count > 12 )
-               break;
-
-            pActor->addInRangeActor( pCurAct );
-            pCurAct->addInRangeActor( pActor );
-            // spawn the actor for the player
-            pCurAct->spawn( pOwnPlayer );
-
-            if( pCurAct->isPlayer() )
-            {
-               auto pPlayer = pCurAct->getAsPlayer();
-               if( !pPlayer->isLoadingComplete() )
-                  continue;
-
-               pActor->spawn( pPlayer );
-            }
-
-         }
-         else if( ( pActor->isBattleNpc() || pActor->isEventNpc() ) && pCurAct->isPlayer() && pActor->isAlive() )
-         {
-            auto pPlayer = pCurAct->getAsPlayer();
-            if( pPlayer->isLoadingComplete() )
-            {
-               pActor->spawn( pPlayer );
-               pCurAct->addInRangeActor( pActor );
-               pActor->addInRangeActor( pCurAct );
-            }
-         }
-         else
-         {
-            pActor->addInRangeActor( pCurAct );
-            pCurAct->addInRangeActor( pActor );
-         }
+         // this is a hack to limit actor spawn in one packetset
+         if( count++ > 12 )
+            break;
+      }
+      else if( !isInRange && isInRangeSet )
+      {
+         pCurAct->removeInRangeActor( *pActor );
+         pActor->removeInRangeActor( *pCurAct );
       }
    }
 }
 
-void Core::Zone::onEnterTerritory( Entity::Player& player )
+void Core::Zone::onPlayerZoneIn( Entity::Player &player )
 {
    g_framework.getLogger().debug( "Zone::onEnterTerritory: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryId() ) +
                                                 + ", Entity#" + std::to_string( player.getId() ) );
@@ -776,50 +662,51 @@ void Core::Zone::onInitDirector( Entity::Player& player )
 
 }
 
-void Core::Zone::registerInstanceObj( Entity::InstanceObjectPtr object )
+void Core::Zone::onEnterTerritory( Core::Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 )
+{
+
+}
+
+void Core::Zone::registerEObj( Entity::EventObjectPtr object )
 {
    if( !object )
       return;
 
-   //object->setParentInstance( InstanceContentPtr( this ) );
+   object->setId( getNextEObjId() );
+   pushActor( object );
 
-   m_instanceObjects[object->getId()] = object;
+   m_eventObjects[object->getId()] = object;
+
+   onRegisterEObj( object );
 
    g_framework.getLogger().debug( "Registered instance eobj: " + std::to_string( object->getId() ) );
 }
 
-Core::Entity::InstanceObjectPtr Core::Zone::getInstanceObject( uint32_t objId )
+Core::Entity::EventObjectPtr Core::Zone::getEObj( uint32_t objId )
 {
-   auto obj = m_instanceObjects.find( objId );
-   if( obj == m_instanceObjects.end() )
+   auto obj = m_eventObjects.find( objId );
+   if( obj == m_eventObjects.end() )
       return nullptr;
 
    return obj->second;
 }
 
-void Core::Zone::updateInstanceObj( Core::Entity::InstanceObjectPtr object )
+Core::InstanceContentPtr Core::Zone::getAsInstanceContent()
 {
-   if( !object )
-      return;
+   return boost::dynamic_pointer_cast< InstanceContent, Zone >( shared_from_this() );
+}
 
-   for( const auto& playerIt : m_playerMap )
-   {
-      // send that packet with le data
-      Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcObjectSpawn > eobjStatePacket( playerIt.second->getId() );
-      eobjStatePacket.data().objKind = object->getObjKind();
-      eobjStatePacket.data().state = object->getState();
-      eobjStatePacket.data().objId = object->getId();
-      eobjStatePacket.data().hierachyId = object->getHierachyId();
-      eobjStatePacket.data().position = object->getPos();
+uint32_t Core::Zone::getNextEObjId()
+{
+   return ++m_nextEObjId;
+}
 
-      // ????
-      //eobjStatePacket.data().levelId = 4236873;
-      //eobjStatePacket.data().unknown2 = 5;
-      //eobjStatePacket.data().unknown1C = 1065353216;
-      //eobjStatePacket.data().unknown20 = 2147423605;
-      //eobjStatePacket.data().actorId = 1074105831;
-      //eobjStatePacket.data().unknown = 1;
+Core::Entity::EventObjectPtr Core::Zone::registerEObj( const std::string &name, uint32_t objectId, uint32_t mapLink,
+                                                       uint8_t state, FFXIVARR_POSITION3 pos, float scale, float rotation )
+{
+   auto eObj = Entity::make_EventObject( getNextEObjId(), objectId, mapLink, state, pos, rotation, name );
+   eObj->setScale( scale );
+   registerEObj( eObj );
 
-      playerIt.second->queuePacket( eobjStatePacket );
-   }
+   return eObj;
 }

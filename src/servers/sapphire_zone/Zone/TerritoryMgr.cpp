@@ -2,6 +2,8 @@
 #include <common/Database/DatabaseDef.h>
 #include <common/Exd/ExdDataGenerated.h>
 
+#include <unordered_map>
+
 #include "Actor/Player.h"
 
 #include "Zone.h"
@@ -114,9 +116,9 @@ bool Core::TerritoryMgr::createDefaultTerritories()
       g_framework.getLogger().info( std::to_string( territoryId ) +
                                         "\t" + std::to_string( guid ) +
                                         "\t" + std::to_string( territoryInfo->territoryIntendedUse ) +
-                                        "\t" + territoryInfo->name +
-                                        "\t" + pPlaceName->name +
-                                        "\t" + ( isPrivateTerritory( territoryId ) ? "PRIVATE" : "PUBLIC" ) );
+                                        "\t" + ( territoryInfo->name.length() <= 4 ? territoryInfo->name + "\t" : territoryInfo->name ) +
+                                        "\t" + ( isPrivateTerritory( territoryId ) ? "PRIVATE" : "PUBLIC" ) +
+                                        "\t" + pPlaceName->name );
 
       auto pZone = make_Zone( territoryId, guid, territoryInfo->name, pPlaceName->name );
       pZone->init();
@@ -180,7 +182,7 @@ Core::ZonePtr Core::TerritoryMgr::createInstanceContent( uint32_t instanceConten
 
    m_instanceContentToInstanceMap[instanceContentId][pZone->getGuId()] = pZone;
    m_instanceIdToZonePtrMap[pZone->getGuId()] = pZone;
-   m_instanceZoneSet.insert( { pZone } );
+   m_instanceZoneSet.insert( pZone );
 
    return pZone;
 }
@@ -311,6 +313,8 @@ bool Core::TerritoryMgr::movePlayer( ZonePtr pZone, Core::Entity::PlayerPtr pPla
       g_framework.getLogger().error( "Zone not found on this server." );
       return false;
    }
+
+   pPlayer->initSpawnIdQueue();
 
    pPlayer->setTerritoryId( pZone->getTerritoryId() );
 

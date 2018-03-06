@@ -34,13 +34,10 @@ namespace Core
 
    namespace Entity
    {
-      TYPE_FORWARD( GameObject );
       TYPE_FORWARD( Actor );
+      TYPE_FORWARD( Chara );
       TYPE_FORWARD( Player );
-      TYPE_FORWARD( BattleNpc );
-      TYPE_FORWARD( EventNpc );
-      TYPE_FORWARD( BattleNpcTemplate );
-      TYPE_FORWARD( InstanceObject );
+      TYPE_FORWARD( EventObject );
    }
 
    namespace Event

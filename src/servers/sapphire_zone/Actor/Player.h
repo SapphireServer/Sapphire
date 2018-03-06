@@ -8,8 +8,9 @@
 #include <common/Network/PacketDef/Zone/ServerZoneDef.h>
 #include <sapphire_zone/Social/FriendList.h>
 #include <common/Common.h>
+#include <common/Util/SpawnIndexAllocator.h>
 
-#include "Actor.h"
+#include "Chara.h"
 #include "Inventory/Inventory.h"
 #include "Event/EventHandler.h"
 #include <map>
@@ -37,7 +38,7 @@ struct QueuedZoning
 *  Inheriting from Actor
 *
 */
-class Player : public Actor
+class Player : public Chara
 {
 public:
    /*! Contructor */
@@ -46,7 +47,9 @@ public:
    /*! Destructor */
    ~Player();
 
-   void autoAttack( ActorPtr pTarget ) override;
+   void autoAttack( CharaPtr pTarget ) override;
+
+   void injectPacket( std::string path );
 
    // EventHandlers
    //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -55,9 +58,12 @@ public:
    /*! start an event item action */
    void eventItemActionStart( uint32_t eventId, uint32_t action, ActionCallback finishCallback, ActionCallback interruptCallback, uint64_t additional );
    /*! start/register a normal event */
-   void eventStart( uint64_t actorId, uint32_t eventId, Event::EventHandler::EventType eventParam, uint8_t eventParam1, uint32_t eventParam2 );
+   void eventStart( uint64_t actorId, uint32_t eventId, Event::EventHandler::EventType eventParam, uint8_t eventParam1, uint32_t eventParam2, uint32_t contentId = 0 );
    /*! play a subevent */
    void eventPlay( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t eventParam2, uint32_t eventParam3 );
+
+   void directorPlayScene( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t eventParam2, uint32_t eventParam3 );
+
    /*! play a subevent */
    void eventPlay( uint32_t eventId, uint32_t scene, uint32_t flags,
                    uint32_t eventParam2, uint32_t eventParam3, Event::EventHandler::SceneReturnCallback eventReturnCallback );
@@ -347,16 +353,21 @@ public:
    uint64_t getOnlineStatusMask() const;
    /*! perform a teleport of a specified type ( teleport,return,aethernet ) */
    void teleport( uint16_t aetheryteId, uint8_t type = 1 );
+   /*! query teleport of a specified type */
+   void teleportQuery( uint16_t aetheryteId );
    /*! prepares zoning / fades out the screen */
    void prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadoutTime = 0, uint16_t animation = 0 );
    /*! get player's title list (available titles) */
    uint8_t* getTitleList();
+   const uint8_t* getTitleList() const;
    /*! get player's active title */
    uint16_t getTitle() const;
    /*! add title to player title list */
    void addTitle( uint16_t titleId );
    /*! change player's active title */
    void setTitle( uint16_t titleId );
+   /*! send the players title list */
+   void sendTitleList();
    /*! change gear param state */
    void setEquipDisplayFlags( uint8_t state );
    /*! get gear param state */
@@ -423,10 +434,10 @@ public:
    void initSpawnIdQueue();
    /*! get the spawn id mapped to a specific actorId */
    uint8_t getSpawnIdForActorId( uint32_t actorId );
-   /*! assigns the given spawnId to the actor */
-   void assignSpawnIdToPlayerId( uint32_t actorId, uint8_t spawnId );
    /*! frees the spawnId assigned to the given actor */
    void freePlayerSpawnId( uint32_t actorId );
+   /*! checks if the given spawn id is valid */
+   bool isActorSpawnIdValid( uint8_t spawnId );
    /*! send spawn packets to pTarget */
    void spawn( PlayerPtr pTarget ) override;
    /*! send despawn packets to pTarget */
@@ -444,8 +455,6 @@ public:
    bool hasStateFlag( Common::PlayerStateFlag flag ) const;
    /* reset a specified flag */
    void unsetStateFlag( Common::PlayerStateFlag flag );
-   /* helper function, send an empty state flag update */
-   void unlock();
 
    // Player Session Handling
    //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -494,6 +503,10 @@ public:
    /*! return true if the player is marked for zoning */
    bool isMarkedForZoning() const;
 
+   void emote( uint32_t emoteId, uint64_t targetId );
+
+   void finishZoning();
+
    void sendZonePackets();
 
    Common::ZoneingType getZoningType() const;
@@ -513,14 +526,7 @@ public:
 
    // Player Battle Handling
    //////////////////////////////////////////////////////////////////////////////////////////////////////
-   void onMobAggro( BattleNpcPtr pBNpc );
-   void onMobDeaggro( BattleNpcPtr pBNpc );
-
    void initHateSlotQueue();
-   void hateListAdd( BattleNpcPtr pBNpc );
-   void hateListRemove( BattleNpcPtr pBNpc );
-
-   bool hateListHasMob( BattleNpcPtr pBNpc );
 
    void sendHateList();
 
@@ -566,6 +572,18 @@ public:
    void setMarkedForRemoval();
    bool isMarkedForRemoval() const;
 
+   void setOnEnterEventDone( bool isDone );
+   bool isOnEnterEventDone() const;
+
+   /*! gets the next available obj count */
+   uint8_t getNextObjSpawnIndexForActorId( uint32_t actorId );
+   /*! resets the players obj count */
+   void resetObjSpawnIndex();
+   /*! frees an obj count to be used by another eobj */
+   void freeObjSpawnIndexForActorId( uint32_t actorId );
+   /*! checks if a spawn index is valid */
+   bool isObjSpawnIndexValid( uint8_t index );
+
 private:
    uint32_t m_lastWrite;
    uint32_t m_lastPing;
@@ -579,6 +597,8 @@ private:
    bool m_markedForRemoval;
 
    bool m_directorInitialized;
+
+   bool m_onEnterEventDone;
 
 private:
 
@@ -636,8 +656,6 @@ private:
 
    std::map< uint32_t, Event::EventHandlerPtr > m_eventHandlerMap;
 
-   std::map< uint32_t, uint8_t > m_playerIdToSpawnIdMap; // maps player to spawn id
-   std::queue< uint8_t > m_freeSpawnIdQueue; // queue with spawn ids free to be assigned
    std::queue< uint8_t > m_freeHateSlotQueue; // queue with "hate slots" free to be assigned
    std::map< uint32_t, uint8_t > m_actorIdTohateSlotMap;
 
@@ -646,7 +664,7 @@ private:
    boost::shared_ptr< Common::QuestActive > m_activeQuests[30];
    int16_t m_questTracking[5];
 
-   uint8_t m_stateFlags[7];
+   uint8_t m_stateFlags[12];
    uint8_t m_gmRank;
    uint16_t zoneId;
 
@@ -680,6 +698,9 @@ private:
    uint32_t m_cfPenaltyUntil; // unix time
 
    uint8_t m_mount;
+
+   Util::SpawnIndexAllocator< uint8_t > m_objSpawnIndexAllocator;
+   Util::SpawnIndexAllocator< uint8_t > m_actorSpawnIndexAllocator;
 };
 
 }

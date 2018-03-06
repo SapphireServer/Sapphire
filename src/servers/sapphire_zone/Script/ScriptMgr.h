@@ -37,8 +37,6 @@ namespace Core
 
          void onPlayerFirstEnterWorld( Entity::Player& player );
 
-         static bool registerBnpcTemplate( std::string templateName, uint32_t bnpcBaseId, uint32_t bnpcNameId, uint32_t modelId, std::string aiName );
-
          bool onTalk( Entity::Player& player, uint64_t actorId, uint32_t eventId );
          bool onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 );
          bool onWithinRange( Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z );
@@ -48,19 +46,20 @@ namespace Core
 
          bool onMobKill( Entity::Player& player, uint16_t nameId );
 
-         bool onCastFinish( Entity::Player& pPlayer, Entity::ActorPtr pTarget, uint32_t actionId );
+         bool onCastFinish( Entity::Player& pPlayer, Entity::CharaPtr pTarget, uint32_t actionId );
 
-         bool onStatusReceive( Entity::ActorPtr pActor, uint32_t effectId );
-         bool onStatusTick( Entity::ActorPtr pActor, Core::StatusEffect::StatusEffect& effect );
-         bool onStatusTimeOut( Entity::ActorPtr pActor, uint32_t effectId );
+         bool onStatusReceive( Entity::CharaPtr pActor, uint32_t effectId );
+         bool onStatusTick( Entity::CharaPtr pActor, Core::StatusEffect::StatusEffect& effect );
+         bool onStatusTimeOut( Entity::CharaPtr pActor, uint32_t effectId );
 
          bool onZoneInit( ZonePtr pZone );
 
          bool onEventHandlerReturn( Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param1, uint16_t param2, uint16_t param3 );
          bool onEventHandlerTradeReturn( Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param, uint32_t catalogId );
 
-         bool onInstanceInit( InstanceContent& instance );
-         bool onInstanceUpdate( InstanceContent& instance, uint32_t currTime );
+         bool onInstanceInit( InstanceContentPtr instance );
+         bool onInstanceUpdate( InstanceContentPtr instance, uint32_t currTime );
+         bool onInstanceEnterTerritory( InstanceContentPtr instance, Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 );
 
          void loadDir( const std::string& dirname, std::set<std::string> &files, const std::string& ext );
 

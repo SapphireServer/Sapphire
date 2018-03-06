@@ -148,13 +148,13 @@ namespace Core {
    {
 
       std::vector< uint8_t > customize( 26 );
-      std::vector< uint8_t > howTo( 32 );
-      std::vector< uint8_t > aetherytes( 12 );
-      std::vector< uint8_t > discovery( 411 );
+      std::vector< uint8_t > howTo( 33 );
+      std::vector< uint8_t > aetherytes( 16 );
+      std::vector< uint8_t > discovery( 421 );
       std::vector< uint8_t > questComplete( 396 );
       std::vector< uint8_t > unlocks( 64 );
-      std::vector< uint8_t > mountGuide( 13 );
-      std::vector< uint8_t > orchestrion( 38 );
+      std::vector< uint8_t > mountGuide( 15 );
+      std::vector< uint8_t > orchestrion( 40 );
       std::vector< uint8_t > modelEquip( 40 );
       std::vector< uint8_t > questTracking8( 10 );
       std::vector< int16_t > questTracking = { -1, -1, -1, -1, -1 };

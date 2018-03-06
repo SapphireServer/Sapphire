@@ -2,7 +2,7 @@
 #define _CALCBATTLE_H
 
 #include <common/Common.h>
-#include "Actor/Actor.h"
+#include "Forwards.h"
 
 using namespace Core::Entity;
 

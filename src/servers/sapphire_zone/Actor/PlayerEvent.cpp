@@ -11,6 +11,7 @@
 #include "Network/PacketWrappers/EventStartPacket.h"
 #include "Network/PacketWrappers/EventPlayPacket.h"
 #include "Network/PacketWrappers/EventFinishPacket.h"
+#include "Network/PacketWrappers/DirectorPlayScenePacket.h"
 
 #include "Action/EventAction.h"
 #include "Action/EventItemAction.h"
@@ -74,18 +75,39 @@ void Core::Entity::Player::checkEvent( uint32_t eventId )
 }
 
 
+void Core::Entity::Player::directorPlayScene( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t eventParam2,
+                                              uint32_t eventParam3 )
+{
+   if( flags & 0x02 )
+      setStateFlag( PlayerStateFlag::WatchingCutscene );
+
+   auto pEvent = getEvent( eventId );
+   if( !pEvent )
+   {
+      g_framework.getLogger().error( "Could not find event " + std::to_string( eventId ) + ", event has not been started!" );
+      return;
+   }
+
+   pEvent->setPlayedScene( true );
+   pEvent->setEventReturnCallback( nullptr );
+   DirectorPlayScenePacket eventPlay( getId(), getId(), pEvent->getId(),
+                                      scene, flags, eventParam2, eventParam3 );
+
+   queuePacket( eventPlay );
+}
+
 void Core::Entity::Player::eventStart( uint64_t actorId, uint32_t eventId, 
                                        Event::EventHandler::EventType eventType, uint8_t eventParam1,
-                                       uint32_t eventParam2 )
+                                       uint32_t eventParam2, uint32_t contentId )
 {
 
    auto newEvent = Event::make_EventHandler( this, actorId, eventId, eventType, eventParam2 );
 
    addEvent( newEvent );
 
-   setStateFlag( PlayerStateFlag::Occupied2 );
+   setStateFlag( PlayerStateFlag::InNpcEvent );
 
-   EventStartPacket eventStart( getId(), actorId, eventId, eventType, eventParam1, eventParam2 );
+   EventStartPacket eventStart( getId(), actorId, eventId, eventType, eventParam1, eventParam2, contentId );
    
    queuePacket( eventStart );
    
@@ -217,7 +239,7 @@ void Core::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlayer )
    removeEvent( pEvent->getId() );
 
    if( freePlayer == 1 )
-      unsetStateFlag( PlayerStateFlag::Occupied2 );
+      unsetStateFlag( PlayerStateFlag::InNpcEvent );
 }
 
 void Core::Entity::Player::eventActionStart( uint32_t eventId,
@@ -226,7 +248,7 @@ void Core::Entity::Player::eventActionStart( uint32_t eventId,
                                              ActionCallback interruptCallback,
                                              uint64_t additional )
 {
-   auto pEventAction = Action::make_EventAction( getAsActor(), eventId, action,
+   auto pEventAction = Action::make_EventAction( getAsChara(), eventId, action,
                                                  finishCallback, interruptCallback, additional );
 
    setCurrentAction( pEventAction );
@@ -256,7 +278,7 @@ void Core::Entity::Player::eventItemActionStart( uint32_t eventId,
                                                  ActionCallback interruptCallback,
                                                  uint64_t additional )
 {
-   Action::ActionPtr pEventItemAction = Action::make_EventItemAction( getAsActor(), eventId, action,
+   Action::ActionPtr pEventItemAction = Action::make_EventItemAction( getAsChara(), eventId, action,
                                                                       finishCallback, interruptCallback, additional );
 
    setCurrentAction( pEventItemAction );
@@ -288,7 +310,6 @@ void Core::Entity::Player::onDeath()
 {
 
 }
-
 
 // TODO: slightly ugly here and way too static. Needs too be done properly
 void Core::Entity::Player::onTick()

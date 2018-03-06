@@ -14,8 +14,9 @@
 namespace Core {
    namespace Common {
 
-      // 99 is the last spawn id that seems to spawn any actor
-      const uint8_t MAX_DISPLAYED_ACTORS = 99;
+   // 99 is the last spawn id that seems to spawn any actor
+   const uint8_t MAX_DISPLAYED_ACTORS = 99;
+   const uint8_t MAX_DISPLAYED_EOBJS = 40;
 
       const int32_t INVALID_GAME_OBJECT_ID = 0xE0000000;
 
@@ -403,70 +404,21 @@ namespace Core {
          Gathering,
          Fishing,
 
-         BeingRaised,
-         BetweenAreas,
-         Stealthed,
-         InnRoom,
-         Jumping,
-         AutoRun,
-         Occupied6,
-         BetweenAreas1,
-         SystemError,
-         LoggingOut,
+   enum PlayerStateFlag : uint8_t
+   {
+      HideUILockChar = 0, // as the name suggests, hides the ui and logs the char...
+      InCombat = 1, // in Combat, locks gearchange/return/teleport
+      Casting = 2,
+      InNpcEvent = 7, // when talking to an npc, locks ui giving "occupied" message
 
-         InvalidLocation,
-         WaitingForDuty,
-         BoundByDuty1,
-         Mounting,
-         WatchingCutscene,
-         WaitingForDutyFinder,
-         CreatingCharacter,
-         Jumping1,
-         PvpDisplay,
-         StatusAfflication2,
+      InNpcEvent1 = 10, // Sent together with InNpcEvent, when waiting for input? just a guess...
 
-         Mounting1,
-         CarryingItem,
-         UsingPartyFinder,
-         HousingFunctions,
-         Transformed,
-         FreeTrail,
-         BeingMoved,
-         Mounting2,
-         StatusAffliction3,
-         StatusAffliction4,
+      BetweenAreas = 24,
+      BoundByDuty = 28,
+      WatchingCutscene = 50, // this is actually just a dummy, this id is different
 
-         RegisteringRaceOrMatch,
-         WaitingForRaceOrMatch,
-         WaitingForTripleTriadMatch,
-         InFlight,
-         WatchingCutscene1,
-         DeepDungeon,
-         Swimming,
-         Diving,
-         RegisteringTripleTriad,
-         WaitingTripleTriad,
-         InCrossWorldParty
 
-      };
-
-      enum struct FateStatus : uint8_t
-      {
-         Active = 2,
-         Inactive = 4,
-         Preparing = 7,
-         Completed = 8,
-      };
-
-      enum ActorControlType : uint16_t
-      {
-         ToggleWeapon = 0x01,
-         SetStatus = 0x02,
-         CastStart = 0x03,
-         ToggleAggro = 0x04,
-         ClassJobChange = 0x05,
-         DefeatMsg = 0x06,
-         GainExpMsg = 0x07,
+   };
 
          LevelUpEffect = 0x0A,
 
@@ -778,13 +730,7 @@ namespace Core {
          FreeCompany = 5,
       };
 
-      enum SocialListType : uint8_t
-      {
-         PartyList = 0x02,
-         FriendList = 0x0b,
-         SearchList = 0x0e,
-      };
-
+   typedef std::vector< PlayerStateFlag > PlayerStateFlagList;
 
       // todo: rename SocialRequestAction and SocialRequestResponse cause they seem ambiguous 
       enum class SocialRequestAction : uint8_t

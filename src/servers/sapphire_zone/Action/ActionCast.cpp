@@ -27,7 +27,7 @@ Core::Action::ActionCast::ActionCast()
    m_handleActionType = Common::HandleActionType::Event;
 }
 
-Core::Action::ActionCast::ActionCast( Entity::ActorPtr pActor, Entity::ActorPtr pTarget, uint16_t actionId )
+Core::Action::ActionCast::ActionCast( Entity::CharaPtr pActor, Entity::CharaPtr pTarget, uint16_t actionId )
 {
    m_startTime = 0;
    m_id = actionId;
@@ -84,7 +84,7 @@ void Core::Action::ActionCast::onInterrupt()
    if( !m_pSource )
       return;
 
-   m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied1 );
+   //m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied1 );
    m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Casting );
 
    auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt,

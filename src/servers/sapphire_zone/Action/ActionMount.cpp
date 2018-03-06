@@ -25,7 +25,7 @@ Core::Action::ActionMount::ActionMount()
    m_handleActionType = HandleActionType::Event;
 }
 
-Core::Action::ActionMount::ActionMount( Entity::ActorPtr pActor, uint16_t mountId )
+Core::Action::ActionMount::ActionMount( Entity::CharaPtr pActor, uint16_t mountId )
 {
    m_startTime = 0;
    m_id = mountId;
@@ -79,7 +79,7 @@ void Core::Action::ActionMount::onFinish()
    effectPacket.data().unknown_62 = 13; 
    effectPacket.data().actionTextId = 4;
    effectPacket.data().numEffects = 1;
-   effectPacket.data().rotation = Math::Util::floatToUInt16Rot( pPlayer->getRotation() );
+   effectPacket.data().rotation = Math::Util::floatToUInt16Rot( pPlayer->getRot() );
    effectPacket.data().effectTarget = INVALID_GAME_OBJECT_ID;
    effectPacket.data().effects[0].effectType = ActionEffectType::Mount;
    effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::CritDamage;
@@ -95,7 +95,7 @@ void Core::Action::ActionMount::onInterrupt()
    if( !m_pSource )
       return;
 
-   m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied1 );
+   //m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied1 );
    m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Casting );
 
    auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt,

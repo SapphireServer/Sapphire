@@ -26,7 +26,7 @@ public:
    CellHandler();
    ~CellHandler();
 
-   T* getCell( uint32_t x, uint32_t y );
+   T* getCellPtr( uint32_t x, uint32_t y );
    T* getCellByCoords( float x, float y );
    T* create( uint32_t x, uint32_t y );
    T* createByCoords( float x, float y );
@@ -144,7 +144,7 @@ void CellHandler<T>::remove( uint32_t x, uint32_t y )
 }
 
 template <class T>
-T* CellHandler<T>::getCell( uint32_t x, uint32_t y )
+T* CellHandler<T>::getCellPtr( uint32_t x, uint32_t y )
 {
    if( !m_pCells[x] )
    {
@@ -157,7 +157,7 @@ T* CellHandler<T>::getCell( uint32_t x, uint32_t y )
 template <class T>
 T* CellHandler<T>::getCellByCoords( float x, float y )
 {
-   return getCell( getPosX( x ), getPosY( y ) );
+   return getCellPtr(getPosX(x), getPosY(y));
 }
 
 template <class T>

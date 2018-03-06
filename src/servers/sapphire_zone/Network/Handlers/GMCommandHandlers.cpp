@@ -6,6 +6,13 @@
 #include <common/Logging/Logger.h>
 #include <common/Network/PacketContainer.h>
 
+#include <unordered_map>
+#include <boost/format.hpp>
+
+#include "Network/GameConnection.h"
+
+#include "Session.h"
+
 #include "Zone/TerritoryMgr.h"
 #include "Zone/Zone.h"
 #include "Zone/ZonePosition.h"
@@ -141,7 +148,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       player.sendNotice( "Race for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
       targetPlayer->spawn( targetPlayer );
       auto inRange = targetPlayer->getInRangeActors();
-      for ( auto actor : inRange )
+      for( auto actor : inRange )
       {
          targetPlayer->despawn( actor->getAsPlayer() );
          targetPlayer->spawn( actor->getAsPlayer() );
@@ -154,7 +161,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       player.sendNotice( "Tribe for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
       targetPlayer->spawn( targetPlayer );
       auto inRange = targetPlayer->getInRangeActors();
-      for ( auto actor : inRange )
+      for( auto actor : inRange )
       {
          targetPlayer->despawn( actor->getAsPlayer() );
          targetPlayer->spawn( actor->getAsPlayer() );
@@ -167,7 +174,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       player.sendNotice( "Sex for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
       targetPlayer->spawn( targetPlayer );
       auto inRange = targetActor->getInRangeActors();
-      for ( auto actor : inRange )
+      for( auto actor : inRange )
       {
          targetPlayer->despawn( actor->getAsPlayer() );
          targetPlayer->spawn( actor->getAsPlayer() );
@@ -182,18 +189,17 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    }
    case GmCommand::Weather:
    {
-      targetPlayer->getCurrentZone()->setWeatherOverride( param1 );
+      targetPlayer->getCurrentZone()->setWeatherOverride( static_cast< Common::Weather >( param1 ) );
       player.sendNotice( "Weather in Zone \"" + targetPlayer->getCurrentZone()->getName() + "\" of " +
          targetPlayer->getName() + " set in range." );
       break;
    }
    case GmCommand::Call:
    {
-      if ( targetPlayer->getZoneId() != player.getZoneId() )
+      if( targetPlayer->getZoneId() != player.getZoneId() )
          targetPlayer->setZone( player.getZoneId() );
 
-      targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z,
-         player.getRotation() );
+      targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
       player.sendNotice( "Calling " + targetPlayer->getName() );
       break;
    }
@@ -218,7 +224,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    }
    case GmCommand::Kill:
    {
-      targetActor->takeDamage( 9999999 );
+      targetActor->getAsChara()->takeDamage( 9999999 );
       player.sendNotice( "Killed " + std::to_string( targetActor->getId() ) );
       break;
    }
@@ -268,10 +274,10 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    }
    case GmCommand::Inv:
    {
-      if ( targetActor->getInvincibilityType() == Common::InvincibilityType::InvincibilityRefill )
-         targetActor->setInvincibilityType( Common::InvincibilityType::InvincibilityNone );
+      if( targetActor->getAsChara()->getInvincibilityType() == Common::InvincibilityType::InvincibilityRefill )
+         targetActor->getAsChara()->setInvincibilityType( Common::InvincibilityType::InvincibilityNone );
       else
-         targetActor->setInvincibilityType( Common::InvincibilityType::InvincibilityRefill );
+         targetActor->getAsChara()->setInvincibilityType( Common::InvincibilityType::InvincibilityRefill );
 
       player.sendNotice( "Invincibility for " + targetPlayer->getName() +
          " was switched." );
@@ -279,11 +285,11 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    }
    case GmCommand::Orchestrion:
    {
-      if ( param1 == 1 )
+      if( param1 == 1 )
       {
-         if ( param2 == 0 )
+         if( param2 == 0 )
          {
-            for ( uint8_t i = 0; i < 255; i++ )
+            for( uint8_t i = 0; i < 255; i++ )
                targetActor->getAsPlayer()->learnSong( i, 0 );
 
             player.sendNotice( "All Songs for " + targetPlayer->getName() +
@@ -326,7 +332,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    {
       uint32_t gil = targetPlayer->getCurrency( 1 );
 
-      if ( gil < param1 )
+      if( gil < param1 )
       {
          player.sendUrgent( "Player does not have enough Gil(" + std::to_string( gil ) + ")" );
       }
@@ -381,11 +387,11 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    }
    case GmCommand::Aetheryte:
    {
-      if ( param1 == 0 )
+      if( param1 == 0 )
       {
-         if ( param2 == 0 )
+         if( param2 == 0 )
          {
-            for ( uint8_t i = 0; i < 255; i++ )
+            for( uint8_t i = 0; i < 255; i++ )
                targetActor->getAsPlayer()->registerAetheryte( i );
 
             player.sendNotice( "All Aetherytes for " + targetPlayer->getName() +
@@ -421,7 +427,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
             player.sendUrgent( "No zone instance found for " + std::to_string( param1 ) );
             break;
          }
-         targetPlayer->setPosition( targetPlayer->getPos() );
+         targetPlayer->setPos( targetPlayer->getPos() );
          targetPlayer->performZoning( param1, targetPlayer->getPos(), 0 );
          player.sendNotice( targetPlayer->getName() + " was warped to zone " + std::to_string( param1 ) + " (" + pZone->getName() + ")" );
       }
@@ -429,23 +435,23 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    }
    case GmCommand::TeriInfo:
    {
+      auto pCurrentZone = player.getCurrentZone();
       player.sendNotice( "ZoneId: " + std::to_string( player.getZoneId() ) + "\nName: " +
-                         player.getCurrentZone()->getName() + "\nInternalName: " +
-                         player.getCurrentZone()->getInternalName() + "\nPopCount: " +
-                         std::to_string( player.getCurrentZone()->getPopCount() ) +
-                         "\nCurrentWeather:" + std::to_string( player.getCurrentZone()->getCurrentWeather() ) +
-                         "\nNextWeather:" + std::to_string( player.getCurrentZone()->getNextWeather() ) );
+                         pCurrentZone->getName() + "\nInternalName: " +
+                         pCurrentZone->getInternalName() + "\nPopCount: " +
+                         std::to_string( pCurrentZone->getPopCount() ) +
+                         "\nCurrentWeather:" + std::to_string( static_cast< uint8_t >( pCurrentZone->getCurrentWeather() ) ) +
+                         "\nNextWeather:" + std::to_string( static_cast< uint8_t >( pCurrentZone->getNextWeather() ) ) );
       break;
    }
    case GmCommand::Jump:
    {
 
       auto inRange = player.getInRangeActors();
-      for( auto actor : inRange )
-      {
-         player.changePosition( targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z,
-                                targetActor->getRotation() );
-      }
+
+      player.changePosition( targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z,
+                             targetActor->getRot() );
+
       player.sendNotice( "Jumping to " + targetPlayer->getName() + " in range." );
       break;
    }
@@ -468,7 +474,7 @@ void Core::Network::GameConnection::gm2Handler( const Packets::GamePacket& inPac
    g_framework.getLogger().debug( player.getName() + " used GM2 commandId: " + std::to_string( commandId ) + ", params: " + param1 );
 
    auto targetSession = g_framework.getServerZone().getSession( param1 );
-   Core::Entity::ActorPtr targetActor;
+   Core::Entity::CharaPtr targetActor;
 
    if( targetSession != nullptr )
    {
@@ -498,11 +504,11 @@ void Core::Network::GameConnection::gm2Handler( const Packets::GamePacket& inPac
    {
       targetPlayer->resetHp();
       targetPlayer->resetMp();
-      targetPlayer->setStatus( Entity::Actor::ActorStatus::Idle );
+      targetPlayer->setStatus( Entity::Chara::ActorStatus::Idle );
 
       targetPlayer->sendToInRangeSet( ActorControlPacket143( player.getId(), ZoneIn, 0x01, 0x01, 0, 113 ), true );
       targetPlayer->sendToInRangeSet( ActorControlPacket142( player.getId(), SetStatus,
-         static_cast< uint8_t >( Entity::Actor::ActorStatus::Idle ) ), true );
+         static_cast< uint8_t >( Entity::Chara::ActorStatus::Idle ) ), true );
       player.sendNotice( "Raised  " + targetPlayer->getName() );
       break;
    }
@@ -513,17 +519,16 @@ void Core::Network::GameConnection::gm2Handler( const Packets::GamePacket& inPac
          player.setZone( targetPlayer->getZoneId() );
       }
       player.changePosition( targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z,
-         targetActor->getRotation() );
+         targetActor->getRot() );
       player.sendNotice( "Jumping to " + targetPlayer->getName() );
       break;
    }
    case GmCommand::Call:
    {
-      if ( targetPlayer->getZoneId() != player.getZoneId() )
+      if( targetPlayer->getZoneId() != player.getZoneId() )
          targetPlayer->setZone( player.getZoneId() );
 
-      targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z,
-         player.getRotation() );
+      targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
       player.sendNotice( "Calling " + targetPlayer->getName() );
       break;
    }

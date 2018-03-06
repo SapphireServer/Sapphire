@@ -172,6 +172,7 @@ Core::Data::Aetheryte::Aetheryte( uint32_t row_id, Core::Data::ExdDataGenerated*
    placeName = exdData->getField< uint16_t >( row, 8 );
    aethernetName = exdData->getField< uint16_t >( row, 9 );
    territory = exdData->getField< uint16_t >( row, 10 );
+   levelId = exdData->getField< uint32_t >( row, 11 );
    isAetheryte = exdData->getField< bool >( row, 15 );
    aethernetGroup = exdData->getField< uint8_t >( row, 16 );
    map = exdData->getField< uint16_t >( row, 19 );

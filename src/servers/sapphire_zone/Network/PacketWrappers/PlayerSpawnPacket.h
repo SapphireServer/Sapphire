@@ -64,7 +64,7 @@ namespace Server {
          m_data.pos.x = player.getPos().x;
          m_data.pos.y = player.getPos().y;
          m_data.pos.z = player.getPos().z;
-         m_data.rotation = Math::Util::floatToUInt16Rot( player.getRotation() );
+         m_data.rotation = Math::Util::floatToUInt16Rot( player.getRot() );
          
 
          m_data.title = player.getTitle();
@@ -76,7 +76,7 @@ namespace Server {
          //m_data.u23 = 0x04;
          //m_data.u24 = 256;
          m_data.state = static_cast< uint8_t >( player.getStatus() );
-         m_data.type = 1;
+         m_data.modelType = player.getModelType();
          if( target.getId() == player.getId() )
          {
             m_data.spawnIndex = 0x00;
@@ -84,28 +84,31 @@ namespace Server {
          else
          {
             m_data.spawnIndex = target.getSpawnIdForActorId( player.getId() );
+
+            if( !target.isActorSpawnIdValid( m_data.spawnIndex ) )
+               return;
          }
          // 0x20 == spawn hidden to be displayed by the spawneffect control
          m_data.displayFlags = player.getStance();
 
          if( player.getZoningType() != Common::ZoneingType::None )
          {
-            m_data.displayFlags |= Entity::Actor::DisplayFlags::Invisible;
+            m_data.displayFlags |= Entity::Chara::DisplayFlags::Invisible;
          }
 
          if( player.getEquipDisplayFlags() & Core::Common::EquipDisplayFlags::HideHead )
          {
-            m_data.displayFlags |= Entity::Actor::DisplayFlags::HideHead;
+            m_data.displayFlags |= Entity::Chara::DisplayFlags::HideHead;
          }
 
          if( player.getEquipDisplayFlags() & Core::Common::EquipDisplayFlags::HideWeapon )
          {
-            m_data.displayFlags |= Entity::Actor::DisplayFlags::HideWeapon;
+            m_data.displayFlags |= Entity::Chara::DisplayFlags::HideWeapon;
          }
 
          if( player.getEquipDisplayFlags() & Core::Common::EquipDisplayFlags::Visor )
          {
-            m_data.displayFlags |= Entity::Actor::DisplayFlags::Visor;
+            m_data.displayFlags |= Entity::Chara::DisplayFlags::Visor;
          }
 
          m_data.currentMount = player.getCurrentMount();

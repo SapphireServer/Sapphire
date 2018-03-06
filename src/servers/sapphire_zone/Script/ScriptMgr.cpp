@@ -9,10 +9,9 @@
 #include <common/Config/XMLConfig.h>
 
 #include "Zone/Zone.h"
-
+#include "Zone/InstanceContent.h"
 #include "Actor/Player.h"
-#include "Actor/BattleNpc.h"
-
+#include "ServerZone.h"
 #include "Event/EventHandler.h"
 #include "Event/EventHelper.h"
 
@@ -142,12 +141,6 @@ void Core::Scripting::ScriptMgr::onPlayerFirstEnterWorld( Entity::Player& player
 //   }
 }
 
-bool Core::Scripting::ScriptMgr::registerBnpcTemplate( std::string templateName, uint32_t bnpcBaseId,
-                                                           uint32_t bnpcNameId, uint32_t modelId, std::string aiName )
-{
-   return g_framework.getServerZone().registerBnpcTemplate( templateName, bnpcBaseId, bnpcNameId, modelId, aiName );
-}
-
 bool Core::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t actorId, uint32_t eventId )
 {
 
@@ -176,7 +169,7 @@ bool Core::Scripting::ScriptMgr::onEnterTerritory( Entity::Player& player, uint3
    auto script = m_nativeScriptMgr->getScript< EventScript >( eventId );
    if( !script )
       return false;
-   script->onEnterZone( player, eventId, param1, param2 );
+   script->onEnterTerritory( player, eventId, param1, param2 );
    return true;
 }
 
@@ -278,7 +271,7 @@ bool Core::Scripting::ScriptMgr::onMobKill( Entity::Player& player, uint16_t nam
    return true;
 }
 
-bool Core::Scripting::ScriptMgr::onCastFinish( Entity::Player& player, Entity::ActorPtr pTarget, uint32_t actionId )
+bool Core::Scripting::ScriptMgr::onCastFinish( Entity::Player& player, Entity::CharaPtr pTarget, uint32_t actionId )
 {
    auto script = m_nativeScriptMgr->getScript< ActionScript >( actionId );
 
@@ -287,7 +280,7 @@ bool Core::Scripting::ScriptMgr::onCastFinish( Entity::Player& player, Entity::A
    return true;
 }
 
-bool Core::Scripting::ScriptMgr::onStatusReceive( Entity::ActorPtr pActor, uint32_t effectId )
+bool Core::Scripting::ScriptMgr::onStatusReceive( Entity::CharaPtr pActor, uint32_t effectId )
 {
    auto script = m_nativeScriptMgr->getScript< StatusEffectScript >( effectId );
 
@@ -303,30 +296,30 @@ bool Core::Scripting::ScriptMgr::onStatusReceive( Entity::ActorPtr pActor, uint3
    return false;
 }
 
-bool Core::Scripting::ScriptMgr::onStatusTick( Entity::ActorPtr pActor, Core::StatusEffect::StatusEffect& effect )
+bool Core::Scripting::ScriptMgr::onStatusTick( Entity::CharaPtr pChara, Core::StatusEffect::StatusEffect& effect )
 {
    auto script = m_nativeScriptMgr->getScript< StatusEffectScript >( effect.getId() );
    if( script )
    {
-      if( pActor->isPlayer() )
-         pActor->getAsPlayer()->sendDebug( "Calling status tick for statusid: " + std::to_string( effect.getId() ) );
+      if( pChara->isPlayer() )
+         pChara->getAsPlayer()->sendDebug( "Calling status tick for statusid: " + std::to_string( effect.getId() ) );
 
-      script->onTick( *pActor );
+      script->onTick( *pChara );
       return true;
    }
 
    return false;
 }
 
-bool Core::Scripting::ScriptMgr::onStatusTimeOut( Entity::ActorPtr pActor, uint32_t effectId )
+bool Core::Scripting::ScriptMgr::onStatusTimeOut( Entity::CharaPtr pChara, uint32_t effectId )
 {
    auto script = m_nativeScriptMgr->getScript< StatusEffectScript >( effectId );
    if( script )
    {
-      if( pActor->isPlayer() )
-         pActor->getAsPlayer()->sendDebug( "Calling status timeout for statusid: " + std::to_string( effectId ) );
+      if( pChara->isPlayer() )
+         pChara->getAsPlayer()->sendDebug( "Calling status timeout for statusid: " + std::to_string( effectId ) );
 
-      script->onExpire( *pActor );
+      script->onExpire( *pChara );
       return true;
    }
 
@@ -345,9 +338,9 @@ bool Core::Scripting::ScriptMgr::onZoneInit( ZonePtr pZone )
    return false;
 }
 
-bool Core::Scripting::ScriptMgr::onInstanceInit( InstanceContent& instance )
+bool Core::Scripting::ScriptMgr::onInstanceInit( InstanceContentPtr instance )
 {
-   auto script = m_nativeScriptMgr->getScript< InstanceContentScript >( instance.getInstanceContentId() );
+   auto script = m_nativeScriptMgr->getScript< InstanceContentScript >( instance->getDirectorId() );
    if( script )
    {
       script->onInit( instance );
@@ -357,12 +350,25 @@ bool Core::Scripting::ScriptMgr::onInstanceInit( InstanceContent& instance )
    return false;
 }
 
-bool Core::Scripting::ScriptMgr::onInstanceUpdate( InstanceContent& instance, uint32_t currTime )
+bool Core::Scripting::ScriptMgr::onInstanceUpdate( InstanceContentPtr instance, uint32_t currTime )
 {
-   auto script = m_nativeScriptMgr->getScript< InstanceContentScript >( instance.getInstanceContentId() );
+   auto script = m_nativeScriptMgr->getScript< InstanceContentScript >( instance->getDirectorId() );
+
    if( script )
    {
       script->onUpdate( instance, currTime );
+      return true;
+   }
+
+   return false;
+}
+
+bool Core::Scripting::ScriptMgr::onInstanceEnterTerritory( InstanceContentPtr instance, Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 )
+{
+   auto script = m_nativeScriptMgr->getScript< InstanceContentScript >( instance->getDirectorId() );
+   if( script )
+   {
+      script->onEnterTerritory( player, eventId, param1, param2 );
       return true;
    }
 

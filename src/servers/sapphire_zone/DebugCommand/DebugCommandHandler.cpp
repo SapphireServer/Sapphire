@@ -27,8 +27,7 @@
 #include "Script/NativeScriptMgr.h"
 
 #include "Actor/Player.h"
-#include "Actor/BattleNpc.h"
-#include "Actor/EventNpc.h"
+#include "Actor/EventObject.h"
 
 #include "Zone/Zone.h"
 #include "Zone/InstanceContent.h"
@@ -54,7 +53,6 @@ Core::DebugCommandHandler::DebugCommandHandler()
    registerCommand( "replay", &DebugCommandHandler::replay, "Replays a saved capture folder.", 1 );
    registerCommand( "nudge", &DebugCommandHandler::nudge, "Nudges you forward/up/down.", 1 );
    registerCommand( "info", &DebugCommandHandler::serverInfo, "Show server info.", 0 );
-   registerCommand( "unlock", &DebugCommandHandler::unlockCharacter, "Unlock character.", 1 );
    registerCommand( "help", &DebugCommandHandler::help, "Shows registered commands.", 0 );
    registerCommand( "script", &DebugCommandHandler::script, "Server script utilities.", 1 );
    registerCommand( "instance", &DebugCommandHandler::instance, "Instance utilities", 1 );
@@ -173,13 +171,13 @@ void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost:
       }
 
       if( subCommand == "pos" )
-         player.setPosition( static_cast< float >( posX ),
-                             static_cast< float >( posY ),
-                             static_cast< float >( posZ ) );
+         player.setPos( static_cast< float >( posX ),
+                        static_cast< float >( posY ),
+                        static_cast< float >( posZ ) );
       else
-         player.setPosition( player.getPos().x + static_cast< float >( posX ),
-                             player.getPos().y + static_cast< float >( posY ),
-                             player.getPos().z + static_cast< float >( posZ ) );
+         player.setPos( player.getPos().x + static_cast< float >( posX ),
+                        player.getPos().y + static_cast< float >( posY ),
+                        player.getPos().z + static_cast< float >( posZ ) );
 
       Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcActorSetPos >
          setActorPosPacket( player.getId() );
@@ -302,6 +300,14 @@ void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost:
 
       player.sendDebug( "MSQ Guide updated " );
    }
+   else if( subCommand == "weatheroverride" || subCommand == "wo" )
+   {
+      uint32_t weatherId;
+
+      sscanf( params.c_str(), "%d", &weatherId );
+
+      player.getCurrentZone()->setWeatherOverride( static_cast< Common::Weather >( weatherId ) );
+   }
    else
    {
       player.sendUrgent( subCommand + " is not a valid SET command." );
@@ -354,43 +360,6 @@ void Core::DebugCommandHandler::add( char * data, Entity::Player& player, boost:
       player.addTitle( titleId );
       player.sendNotice( "Added title (ID: " + std::to_string( titleId ) + ")" );
    }
-   else if( subCommand == "spawn" )
-   {
-      int32_t model, name;
-
-      sscanf( params.c_str(), "%d %d", &model, &name );
-
-      auto pBNpc = Entity::make_BattleNpc( model, name, player.getPos() );
-
-      auto pZone = player.getCurrentZone();
-      pBNpc->setCurrentZone( pZone );
-      pZone->pushActor( pBNpc );
-
-   }
-   else if( subCommand == "sspawn" )
-   {
-      int32_t model, name, count, distCoefficient, i;
-
-      sscanf( params.c_str(), "%d %d %d %d", &model, &name, &count, &distCoefficient );
-
-      for ( i = 0; i < count; i++ )
-      {
-         Common::FFXIVARR_POSITION3 posC = player.getPos();
-         std::mt19937 gen( rand() * 1000 );
-         std::uniform_int_distribution< int > dis( distCoefficient * -1, distCoefficient );
-
-         posC.x += dis( gen );
-         posC.z += dis( gen );
-
-         Entity::BattleNpcPtr pBNpc( new Entity::BattleNpc( model, name, posC ) );
-
-         auto pZone = player.getCurrentZone();
-         pBNpc->setCurrentZone( pZone );
-         pZone->pushActor( pBNpc );
-
-      }
-
-   }
    else if( subCommand == "op" )
    {
       // temporary research packet
@@ -398,33 +367,6 @@ void Core::DebugCommandHandler::add( char * data, Entity::Player& player, boost:
       sscanf( params.c_str(), "%x", &opcode );
       auto pPe = Network::Packets::make_GamePacket( opcode, 0x30, player.getId(), player.getId() );
       player.queuePacket( pPe );
-   }
-   else if( subCommand == "eventnpc-self" )
-   {
-      int32_t id;
-
-      sscanf( params.c_str(), "%d", &id );
-
-      Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcNpcSpawn > spawnPacket( player.getId() );
-      spawnPacket.data().type = 3;
-      spawnPacket.data().pos = player.getPos();
-      spawnPacket.data().rotation = player.getRotation();
-      spawnPacket.data().bNPCBase = id;
-      spawnPacket.data().bNPCName = id;
-      spawnPacket.data().targetId = player.getId();
-      player.queuePacket( spawnPacket );
-   }
-   else if( subCommand == "eventnpc" )
-   {
-      int32_t id;
-
-      sscanf( params.c_str(), "%d", &id );
-
-      auto pENpc = Entity::make_EventNpc( id, player.getPos(), player.getRotation() );
-
-      auto pZone = player.getCurrentZone();
-      pENpc->setCurrentZone( pZone );
-      pZone->pushActor( pENpc );
    }
    else if( subCommand == "actrl" )
    {
@@ -507,7 +449,7 @@ void Core::DebugCommandHandler::get( char * data, Entity::Player& player, boost:
                          std::to_string( player.getPos().x ) + "\n" +
                          std::to_string( player.getPos().y ) + "\n" +
                          std::to_string( player.getPos().z ) + "\n" +
-                         std::to_string( player.getRotation() ) + "\nMapId: " +
+                         std::to_string( player.getRot() ) + "\nMapId: " +
                          std::to_string( map_id ) + "\nZoneID: " +
                          std::to_string(player.getCurrentZone()->getTerritoryId() ) + "\n" );
    }
@@ -612,7 +554,7 @@ void Core::DebugCommandHandler::nudge( char * data, Entity::Player& player, boos
    }
    else
    {
-      float angle = player.getRotation() + ( PI / 2 );
+      float angle = player.getRot() + ( PI / 2 );
       pos.x -= offset * cos( angle );
       pos.z += offset * sin( angle );
       player.sendNotice( "nudge: Placing forward " + std::to_string( offset ) + " yalms" );
@@ -624,21 +566,16 @@ void Core::DebugCommandHandler::nudge( char * data, Entity::Player& player, boos
       setActorPosPacket.data().x = player.getPos().x;
       setActorPosPacket.data().y = player.getPos().y;
       setActorPosPacket.data().z = player.getPos().z;
-      setActorPosPacket.data().r16 = Math::Util::floatToUInt16Rot( player.getRotation() );
+      setActorPosPacket.data().r16 = Math::Util::floatToUInt16Rot( player.getRot() );
       player.queuePacket( setActorPosPacket );
    }
 }
 
 void Core::DebugCommandHandler::serverInfo( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
 {
-   player.sendDebug( "SapphireServer " + Version::VERSION + "\nRev: " + Version::GIT_HASH );
+   player.sendDebug( "SapphireZone " + Version::VERSION + "\nRev: " + Version::GIT_HASH );
    player.sendDebug( "Compiled: " __DATE__ " " __TIME__ );
    player.sendDebug( "Sessions: " + std::to_string( g_framework.getServerZone().getSessionCount() ) );
-}
-
-void Core::DebugCommandHandler::unlockCharacter( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
-{
-   player.unlock();
 }
 
 void Core::DebugCommandHandler::script( char* data, Entity::Player &player, boost::shared_ptr< DebugCommand > command )
@@ -776,50 +713,57 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
    }
    else if( subCommand == "set" )
    {
-      uint32_t instanceId;
       uint32_t index;
       uint32_t value;
-      sscanf( params.c_str(), "%d %d %d", &instanceId, &index, &value );
+      sscanf( params.c_str(), "%d %d", &index, &value );
 
-      auto pInstance = g_framework.getTerritoryMgr().getInstanceZonePtr( instanceId );
-      if( !pInstance )
+
+      auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+      if( !instance )
          return;
-      auto instance = boost::dynamic_pointer_cast< InstanceContent >( pInstance );
 
       instance->setVar( static_cast< uint8_t >( index ), static_cast< uint8_t >( value ) );
    }
-   else if( subCommand == "objupdate" )
-   {
-      uint32_t objId;
-
-      sscanf( params.c_str(), "%d", &objId );
-
-      auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
-      if( !instance )
-         return;
-
-      auto obj = instance->getInstanceObject( objId );
-      if( !obj )
-         return;
-
-      instance->updateInstanceObj( obj );
-   }
    else if( subCommand == "objstate" )
    {
-      uint32_t objId;
+      char objName[128];
       uint8_t state;
 
-      sscanf( params.c_str(), "%d %hhu", &objId, &state );
+      sscanf( params.c_str(), "%s %hhu", objName, &state );
 
       auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
       if( !instance )
          return;
 
-      auto obj = instance->getInstanceObject( objId );
+      auto obj = instance->getEObjByName( objName );
       if( !obj )
          return;
 
       obj->setState( state );
+   }
+   else if( subCommand == "seq" )
+   {
+      uint8_t seq;
+
+      sscanf( params.c_str(), "%hhu", &seq );
+
+      auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+      if( !instance )
+         return;
+
+      instance->setSequence( seq );
+   }
+   else if( subCommand == "branch" )
+   {
+      uint8_t branch;
+
+      sscanf( params.c_str(), "%hhu", &branch );
+
+      auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+      if( !instance )
+         return;
+
+      instance->setBranch( branch );
    }
    else if( subCommand == "festival" )
    {

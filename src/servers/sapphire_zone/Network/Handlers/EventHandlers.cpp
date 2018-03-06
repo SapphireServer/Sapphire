@@ -21,6 +21,9 @@
 #include "Actor/Player.h"
 
 #include "Event/EventHelper.h"
+
+#include "Zone/InstanceContent.h"
+
 #include "Session.h"
 #include "Forwards.h"
 #include "Framework.h"
@@ -40,7 +43,7 @@ void Core::Network::GameConnection::eventHandlerTalk( const Packets::GamePacket&
    std::string eventName = "onTalk";
    std::string objName = Event::getEventName( eventId );
 
-   player.sendDebug( "Actor: " +
+   player.sendDebug( "Chara: " +
                      std::to_string( actorId ) + " -> " +
                      std::to_string( Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) ) ) +
                      " \neventId: " +
@@ -52,8 +55,13 @@ void Core::Network::GameConnection::eventHandlerTalk( const Packets::GamePacket&
    player.sendDebug( "Calling: " + objName + "." + eventName );
    player.eventStart( actorId, eventId, Event::EventHandler::Talk, 0, 0 );
 
-   if( !g_framework.getScriptMgr().onTalk( player, actorId, eventId ) &&
-       eventType == Event::EventHandler::EventHandlerType::Quest )
+
+   if( auto instance = player.getCurrentInstance() )
+   {
+      instance->onTalk( player, eventId, actorId );
+   }
+   else if( !g_framework.getScriptMgr().onTalk( player, actorId, eventId ) &&
+            eventType == Event::EventHandler::EventHandlerType::Quest )
    {
       auto questInfo = g_framework.getExdDataGen().get< Core::Data::Quest >( eventId );
       if( questInfo )
@@ -75,7 +83,7 @@ void Core::Network::GameConnection::eventHandlerEmote( const Packets::GamePacket
    std::string eventName = "onEmote";
    std::string objName = Event::getEventName( eventId );
 
-   player.sendDebug( "Actor: " +
+   player.sendDebug( "Chara: " +
                      std::to_string( actorId ) + " -> " +
                      std::to_string( Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) ) ) +
                      " \neventId: " +
@@ -155,9 +163,22 @@ void Core::Network::GameConnection::eventHandlerEnterTerritory( const Packets::G
 
    player.sendDebug( "Calling: " + objName + "." + eventName + " - " + std::to_string( eventId ) );
 
-   player.eventStart( player.getId(), eventId, Event::EventHandler::EnterTerritory, 0, player.getZoneId() );
+   player.eventStart( player.getId(), eventId, Event::EventHandler::EnterTerritory, 0, player.getZoneId(), 0 );
 
-   g_framework.getScriptMgr().onEnterTerritory( player, eventId, param1, param2 );
+   if( auto instance = player.getCurrentInstance() )
+   {
+      // param2 of eventStart
+      // 0 = default state?
+      // 1 = restore state?
+      // (^ Mordred: Nope, i don't think thats it )
+      player.eventStart( player.getId(), eventId, Event::EventHandler::EnterTerritory, 0, player.getZoneId(), instance->getDirectorId() & 0xFFFF );
+      instance->onEnterTerritory( player, eventId, param1, param2 );
+   }
+   else
+   {
+      player.eventStart( player.getId(), eventId, Event::EventHandler::EnterTerritory, 0, player.getZoneId() );
+      g_framework.getScriptMgr().onEnterTerritory( player, eventId, param1, param2 );
+   }
 
    player.checkEvent( eventId );
 }

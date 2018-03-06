@@ -7,7 +7,8 @@
 #include <common/Network/PacketContainer.h>
 #include <common/Network/PacketDef/Chat/ServerChatDef.h>
 #include <common/Database/DatabaseDef.h>
-
+#include <boost/format.hpp>
+#include <unordered_map>
 #include "Network/GameConnection.h"
 
 #include "Zone/TerritoryMgr.h"
@@ -181,13 +182,13 @@ void Core::Network::GameConnection::updatePositionHandler( const Packets::GamePa
        ( player.getPos().y != inPacket.getValAt< float >( 0x30 ) ) ||
        ( player.getPos().z != inPacket.getValAt< float >( 0x34 ) ) )
       bPosChanged = true;
-   if( !bPosChanged  && player.getRotation() == inPacket.getValAt< float >( 0x20 ) )
+   if( !bPosChanged  && player.getRot() == inPacket.getValAt< float >( 0x20 ) )
       return;
 
-   player.setRotation( inPacket.getValAt< float >( 0x20 ) );
-   player.setPosition( inPacket.getValAt< float >( 0x2c ),
-                       inPacket.getValAt< float >( 0x30 ),
-                       inPacket.getValAt< float >( 0x34 ) );
+   player.setRot( inPacket.getValAt< float >( 0x20 ) );
+   player.setPos( inPacket.getValAt< float >( 0x2c ),
+                  inPacket.getValAt< float >( 0x30 ),
+                  inPacket.getValAt< float >( 0x34 ) );
 
    if( ( player.getCurrentAction() != nullptr ) && bPosChanged )
       player.getCurrentAction()->setInterrupted();
@@ -793,16 +794,14 @@ void Core::Network::GameConnection::tellHandler( const Packets::GamePacket& inPa
 
    auto pTargetPlayer = pSession->getPlayer();
 
-   if( pTargetPlayer->hasStateFlag( PlayerStateFlag::BetweenAreas ) ||
-       pTargetPlayer->hasStateFlag( PlayerStateFlag::BetweenAreas1 ) )
+   if( pTargetPlayer->hasStateFlag( PlayerStateFlag::BetweenAreas ) )
    {
       // send error for player between areas
       // TODO: implement me
       return;
    }
 
-   if( pTargetPlayer->hasStateFlag( PlayerStateFlag::BoundByDuty ) ||
-       pTargetPlayer->hasStateFlag( PlayerStateFlag::BoundByDuty1 ) )
+   if( pTargetPlayer->hasStateFlag( PlayerStateFlag::BoundByDuty ) )
    {
       // send error for player bound by duty
       // TODO: implement me

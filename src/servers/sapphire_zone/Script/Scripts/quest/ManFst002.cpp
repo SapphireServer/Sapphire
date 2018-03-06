@@ -1,3 +1,6 @@
+#include <Script/NativeScriptApi.h>
+#include <Actor/Player.h>
+#include "Event/EventHelper.h"
 #include "../ScriptObject.h"
 
 // Quest Script: ManFst002_00124
@@ -211,7 +214,6 @@ public:
 
          player.eventActionStart( 0x050002, 0x13, event, nullptr, 0x050002 );
 
-         player.unlock();
       }
       else if( actor == ACTOR2 )
          Scene00002( player );

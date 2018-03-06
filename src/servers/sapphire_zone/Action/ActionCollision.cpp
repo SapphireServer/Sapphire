@@ -1,8 +1,11 @@
 #include <common/Util/Util.h>
 #include <common/Util/UtilMath.h>
 
+#include <common/Exd/ExdDataGenerated.h>
+
 #include "ActionCollision.h"
 #include "Actor/Actor.h"
+#include "Actor/Chara.h"
 #include "Actor/Player.h"
 
 #include <cmath>
@@ -31,7 +34,7 @@ bool ActionCollision::isActorApplicable( Actor& actor, TargetFilter targetFilter
    case TargetFilter::Allies:
    {
       // todo: implement ally NPCs
-      actorApplicable = !actor.isBattleNpc();
+    //  actorApplicable = !chara.isBattleNpc();
       break;
    }
    case TargetFilter::Party:
@@ -42,12 +45,12 @@ bool ActionCollision::isActorApplicable( Actor& actor, TargetFilter targetFilter
    }
    case TargetFilter::Enemies:
    {
-      actorApplicable = actor.isBattleNpc();
+      //actorApplicable = chara.isBattleNpc();
       break;
    }
    }
 
-   return ( actorApplicable && actor.isAlive() );
+   return ( actorApplicable && actor.getAsChara()->isAlive() );
 }
 
 std::set< Core::Entity::ActorPtr > ActionCollision::getActorsHitFromAction( FFXIVARR_POSITION3 aoePosition,

@@ -23,7 +23,7 @@ Core::Action::EventAction::EventAction()
    m_handleActionType = HandleActionType::Event;
 }
 
-Core::Action::EventAction::EventAction( Entity::ActorPtr pActor, uint32_t eventId, uint16_t action,
+Core::Action::EventAction::EventAction( Entity::CharaPtr pActor, uint32_t eventId, uint16_t action,
                                         ActionCallback finishRef, ActionCallback interruptRef, uint64_t additional )
 {
    m_additional = additional;
@@ -55,7 +55,8 @@ void Core::Action::EventAction::onStart()
    if( m_pSource->isPlayer() )
    {
       m_pSource->sendToInRangeSet( control, true );
-      m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::Occupied2 );
+      if( m_pSource->getAsPlayer()->hasStateFlag( PlayerStateFlag::InNpcEvent ) )
+         m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::InNpcEvent );
    }
    else
       m_pSource->sendToInRangeSet( control );
@@ -84,7 +85,7 @@ void Core::Action::EventAction::onFinish()
 
       if( m_pSource->isPlayer() )
       {
-         m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied2 );
+         //m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied2 );
          m_pSource->sendToInRangeSet( control, true );
       }
       else
@@ -112,8 +113,8 @@ void Core::Action::EventAction::onInterrupt()
       {
          auto control1 = ActorControlPacket143( m_pSource->getId(), ActorControlType::FreeEventPos, m_eventId );
 
-         m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::NoCombat );
-         m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied1 );
+         //m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::NoCombat );
+         //m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied1 );
          m_pSource->sendToInRangeSet( control );
          m_pSource->sendToInRangeSet( control1 );
 

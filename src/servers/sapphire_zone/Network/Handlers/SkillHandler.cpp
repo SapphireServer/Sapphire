@@ -80,11 +80,11 @@ void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inP
 
             if( !player.actionHasCastTime( action ) )
             {
-                g_framework.getScriptMgr().onCastFinish( player, targetActor, action );
+                g_framework.getScriptMgr().onCastFinish( player, targetActor->getAsChara(), action );
             }
             else
             {
-                auto pActionCast = Action::make_ActionCast( player.getAsPlayer(), targetActor, action );
+                auto pActionCast = Action::make_ActionCast( player.getAsPlayer(), targetActor->getAsChara(), action );
                 player.setCurrentAction( pActionCast );
                 player.sendDebug( "setCurrentAction()" );
                 player.getCurrentAction()->onStart();
