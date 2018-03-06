@@ -1,8 +1,8 @@
-#include <common/Common.h>
-#include <common/Network/GamePacket.h>
-#include <common/Logging/Logger.h>
-#include <common/Network/PacketContainer.h>
-#include <common/Config/XMLConfig.h>
+#include <Common.h>
+#include <Network/GamePacket.h>
+#include <Logging/Logger.h>
+#include <Network/PacketContainer.h>
+#include <Config/XMLConfig.h>
 
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ActorControlPacket142.h"

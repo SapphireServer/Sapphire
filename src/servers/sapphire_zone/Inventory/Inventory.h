@@ -1,7 +1,7 @@
 #ifndef INVENTORY_H_
 #define INVENTORY_H_
 #include <map>
-#include <common/Common.h>
+#include <Common.h>
 #include "../Forwards.h"
 
 namespace Core

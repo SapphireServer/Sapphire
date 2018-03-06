@@ -1,5 +1,5 @@
-#include <common/Common.h>
-#include <common/Exd/ExdDataGenerated.h>
+#include <Common.h>
+#include <Exd/ExdDataGenerated.h>
 
 #include "Framework.h"
 #include "Item.h"

@@ -1,9 +1,9 @@
-#include <common/Common.h>
-#include <common/Network/CommonNetwork.h>
-#include <common/Network/GamePacketNew.h>
-#include <common/Logging/Logger.h>
-#include <common/Network/PacketContainer.h>
-#include <common/Exd/ExdDataGenerated.h>
+#include <Common.h>
+#include <Network/CommonNetwork.h>
+#include <Network/GamePacketNew.h>
+#include <Logging/Logger.h>
+#include <Network/PacketContainer.h>
+#include <Exd/ExdDataGenerated.h>
 
 #include "Zone/TerritoryMgr.h"
 #include "Zone/Zone.h"

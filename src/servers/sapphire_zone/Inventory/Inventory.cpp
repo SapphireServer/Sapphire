@@ -1,11 +1,11 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/clamp.hpp>
 
-#include <common/Network/PacketDef/Zone/ServerZoneDef.h>
-#include <common/Common.h>
-#include <common/Exd/ExdDataGenerated.h>
-#include <common/Logging/Logger.h>
-#include <common/Database/DatabaseDef.h>
+#include <Network/PacketDef/Zone/ServerZoneDef.h>
+#include <Common.h>
+#include <Exd/ExdDataGenerated.h>
+#include <Logging/Logger.h>
+#include <Database/DatabaseDef.h>
 
 #include "Actor/Player.h"
 

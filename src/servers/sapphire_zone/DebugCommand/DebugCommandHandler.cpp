@@ -3,15 +3,15 @@
 #include <boost/format.hpp>
 #include <cinttypes>
 
-#include <common/Common.h>
-#include <common/Version.h>
-#include <common/Network/GamePacketNew.h>
-#include <common/Network/CommonNetwork.h>
-#include <common/Util/UtilMath.h>
-#include <common/Network/PacketContainer.h>
-#include <common/Logging/Logger.h>
-#include <common/Exd/ExdDataGenerated.h>
-#include <common/Database/DatabaseDef.h>
+#include <Common.h>
+#include <Version.h>
+#include <Network/GamePacketNew.h>
+#include <Network/CommonNetwork.h>
+#include <Util/UtilMath.h>
+#include <Network/PacketContainer.h>
+#include <Logging/Logger.h>
+#include <Exd/ExdDataGenerated.h>
+#include <Database/DatabaseDef.h>
 
 #include "DebugCommand.h"
 #include "DebugCommandHandler.h"

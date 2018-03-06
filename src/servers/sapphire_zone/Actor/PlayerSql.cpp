@@ -2,16 +2,16 @@
 #include <stdio.h>
 #include <time.h>
 
-#include <common/Common.h>
-#include <common/Network/GamePacket.h>
-#include <common/Util/Util.h>
-#include <common/Util/UtilMath.h>
-#include <common/Config/XMLConfig.h>
-#include <common/Logging/Logger.h>
-#include <common/Exd/ExdDataGenerated.h>
-#include <common/Network/PacketContainer.h>
-#include <common/Common.h>
-#include <common/Database/DatabaseDef.h>
+#include <Common.h>
+#include <Network/GamePacket.h>
+#include <Util/Util.h>
+#include <Util/UtilMath.h>
+#include <Config/XMLConfig.h>
+#include <Logging/Logger.h>
+#include <Exd/ExdDataGenerated.h>
+#include <Network/PacketContainer.h>
+#include <Common.h>
+#include <Database/DatabaseDef.h>
 
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/InitUIPacket.h"

@@ -1,22 +1,23 @@
 #include "ServerZone.h"
 
-#include <common/Version.h>
-#include <common/Logging/Logger.h>
-#include <common/Config/XMLConfig.h>
-#include <common/Version.h>
+#include <Version.h>
+#include <Logging/Logger.h>
+#include <Config/XMLConfig.h>
+#include <Version.h>
 
 #include <MySqlBase.h>
 #include <Connection.h>
 
-#include <common/Network/Connection.h>
-#include <common/Network/Hive.h>
+#include <Network/Connection.h>
+#include <Network/Hive.h>
 
-#include <common/Exd/ExdDataGenerated.h>
-#include <common/Network/PacketContainer.h>
-#include <common/Database/DbLoader.h>
-#include <common/Database/CharaDbConnection.h>
-#include <common/Database/DbWorkerPool.h>
-#include <common/Database/PreparedStatement.h>
+#include <Exd/ExdDataGenerated.h>
+#include <Network/PacketContainer.h>
+#include <Database/DbLoader.h>
+#include <Database/CharaDbConnection.h>
+#include <Database/DbWorkerPool.h>
+#include <Database/PreparedStatement.h>
+#include <Util/Util.h>
 
 #include "Actor/Player.h"
 
@@ -35,7 +36,6 @@
 #include <boost/make_shared.hpp>
 #include <boost/algorithm/string.hpp>
 #include <thread>
-#include <common/Util/Util.h>
 
 #include "Framework.h"
 

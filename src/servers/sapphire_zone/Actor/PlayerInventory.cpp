@@ -1,6 +1,6 @@
-#include <common/Common.h>
-#include <common/Network/GamePacket.h>
-#include <common/Logging/Logger.h>
+#include <Common.h>
+#include <Network/GamePacket.h>
+#include <Logging/Logger.h>
 
 #include "Zone/Zone.h"
 

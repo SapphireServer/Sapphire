@@ -1,6 +1,6 @@
 #include "DbWorker.h"
 #include "Operation.h"
-#include <common/Util/LockedWaitQueue.h>
+#include "Util/LockedWaitQueue.h"
 
 Core::Db::DbWorker::DbWorker( Core::LockedWaitQueue< boost::shared_ptr< Operation > >* newQueue, DbConnection* pConn )
 {

@@ -1,9 +1,9 @@
 #include <boost/filesystem/operations.hpp>
 #include <time.h>
 
-#include <common/Util/Util.h>
-#include <common/Network/PacketContainer.h>
-#include <common/Logging/Logger.h>
+#include <Util/Util.h>
+#include <Network/PacketContainer.h>
+#include <Logging/Logger.h>
 
 #include "Network/GameConnection.h"
 #include "Actor/Player.h"

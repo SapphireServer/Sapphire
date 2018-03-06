@@ -1,7 +1,7 @@
 #include <cmath>
 
-#include <common/Exd/ExdDataGenerated.h>
-#include <common/Common.h>
+#include <Exd/ExdDataGenerated.h>
+#include <Common.h>
 
 #include "Actor/Chara.h"
 

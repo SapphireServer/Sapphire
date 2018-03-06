@@ -9,8 +9,8 @@
 #include <iostream>
 #include <cctype>
 #include <set>
-#include <common/Exd/ExdData.h>
-#include <common/Logging/Logger.h>
+#include <Exd/ExdData.h>
+#include <Logging/Logger.h>
 #include <boost/range/algorithm/remove_if.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/shared_ptr.hpp>

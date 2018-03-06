@@ -4,8 +4,6 @@ project(Sapphire_Script)
 file(GLOB SCRIPT_INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 
 include_directories("${CMAKE_SOURCE_DIR}/src/servers/")
-include_directories("${CMAKE_SOURCE_DIR}/src/servers/sapphire_zone/")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
 message("exec: ${EXECUTABLE_OUTPUT_DIRECTORY}")
 
@@ -41,7 +39,6 @@ foreach(_scriptDir ${children})
 
         add_library("script_${_name}" MODULE ${SCRIPT_BUILD_FILES} "${SCRIPT_INCLUDE_FILES}" "${_scriptDir}/ScriptLoader.cpp")
         target_link_libraries("script_${_name}" sapphire_zone)
-        cotire("script_${_name}")
 
         if(MSVC)
             target_link_libraries("script_${_name}" ${Boost_LIBRARIES})
@@ -58,8 +55,17 @@ foreach(_scriptDir ${children})
                 LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL "${SCRIPT_LIB_DIR}"
             )
         endif()
+        target_include_directories("script_${_name}" PUBLIC "${CMAKE_SOURCE_DIR}/src/servers/sapphire_zone/")
+        target_include_directories("script_${_name}" PUBLIC "${CMAKE_SOURCE_DIR}/src/servers/sapphire_zone/Script")
+        target_include_directories("script_${_name}" PUBLIC "${CMAKE_SOURCE_DIR}/src/servers/sapphire_zone/Script/Scripts")
+        target_include_directories("script_${_name}" PUBLIC "${CMAKE_SOURCE_DIR}/src/")
+        target_include_directories("script_${_name}" PUBLIC "${CMAKE_SOURCE_DIR}/src/common")
+        target_include_directories("script_${_name}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+        target_include_directories("script_${_name}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/Scripts")
 
         configure_file("${CMAKE_CURRENT_SOURCE_DIR}/ScriptLoader.cpp.in" "${_scriptDir}/ScriptLoader.cpp")
+
+        cotire("script_${_name}")
 
         if(MSVC)
             add_custom_command(TARGET "script_${_name}" POST_BUILD
