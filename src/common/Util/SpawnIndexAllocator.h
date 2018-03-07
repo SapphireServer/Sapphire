@@ -72,7 +72,7 @@ namespace Util
          return spawnIndex != getAllocFailId();
       }
 
-      constexpr T getAllocFailId()
+      constexpr T getAllocFailId() const
       {
          return static_cast< T >( -1 );
       }
