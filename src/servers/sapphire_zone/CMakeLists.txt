@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.0.2)
 cmake_policy(SET CMP0015 NEW)
 cmake_policy(SET CMP0014 OLD)
 
-add_subdirectory("Script/Scripts")
-
 project(sapphire_zone)
 
 file(GLOB SERVER_PUBLIC_INCLUDE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
@@ -68,6 +66,5 @@ endif()
 target_link_libraries( sapphire_zone ${Boost_LIBRARIES} )
 target_include_directories( sapphire_zone PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" )
 target_include_directories( sapphire_zone PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/Script" )
-target_include_directories( sapphire_zone PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/Script/Scripts" )
 target_include_directories( sapphire_zone PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external" )
 cotire( sapphire_zone )
