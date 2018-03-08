@@ -12,7 +12,7 @@
 #include "EventItemAction.h"
 #include "Framework.h"
 
-extern Core::Framework g_framework;
+extern Core::Framework g_fw;
 
 using namespace Core::Common;
 using namespace Core::Network;
@@ -86,7 +86,8 @@ void Core::Action::EventItemAction::onFinish()
    }
    catch( std::exception& e )
    {
-      g_framework.getLogger().error( e.what() );
+      auto pLog = g_fw.get< Logger >();
+      pLog->error( e.what() );
    }
 
 }
@@ -115,7 +116,8 @@ void Core::Action::EventItemAction::onInterrupt()
    }
    catch( std::exception& e )
    {
-      g_framework.getLogger().error( e.what() );
+      auto pLog = g_fw.get< Logger >();
+      pLog->error( e.what() );
    }
 
 }

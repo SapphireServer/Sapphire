@@ -29,10 +29,13 @@
 #include <vector>
 #include <algorithm>
 
+#include <Framework.h>
+
 #include "Forwards.h"
 #include "SapphireAPI.h"
 
 
+Core::Framework g_fw;
 Core::Logger g_log;
 Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
 Core::Data::ExdDataGenerated g_exdDataGen;
@@ -739,6 +742,8 @@ void defaultGet( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServe
 
 int main( int argc, char* argv[] )
 {
+   auto pLog = boost::shared_ptr< Core::Logger >( new Core::Logger() );
+   g_fw.set< Core::Logger >( pLog );
    g_log.setLogPath( "log/SapphireAPI" );
    g_log.init();
 

@@ -1,13 +1,13 @@
 #include "DbConnection.h"
 #include "DbWorker.h"
 #include <MySqlConnector.h>
-
 #include "Logging/Logger.h"
+
 #include "PreparedStatement.h"
 #include <boost/make_shared.hpp>
+#include "Framework.h"
 
-
-extern Core::Logger g_log;
+extern Core::Framework g_fw;
 
 Core::Db::DbConnection::DbConnection( ConnectionInfo &connInfo ) :
    m_reconnecting( false ),
@@ -67,7 +67,7 @@ uint32_t Core::Db::DbConnection::open()
    }
    catch( std::runtime_error& e )
    {
-      g_log.error( e.what() );
+      g_fw.get< Logger >()->error( e.what() );
       return 1;
    }
 
@@ -119,7 +119,7 @@ bool Core::Db::DbConnection::execute( const std::string& sql )
    }
    catch( std::runtime_error& e )
    {
-      g_log.error( e.what() );
+      g_fw.get< Logger >()->error( e.what() );
       return false;
    }
 }
@@ -134,7 +134,7 @@ boost::shared_ptr< Mysql::ResultSet > Core::Db::DbConnection::query( const std::
    }
    catch( std::runtime_error& e )
    {
-      g_log.error( e.what() );
+      g_fw.get< Logger >()->error( e.what() );
       return nullptr;
    }
 }
@@ -148,13 +148,11 @@ boost::shared_ptr< Mysql::ResultSet > Core::Db::DbConnection::query( boost::shar
 
    if( !ping() )
    {
-      g_log.error( "MysqlConnection went down" );
       // naivly reconnect and hope for the best
       open();
       lockIfReady();
       if( !prepareStatements() )
-         g_log.error( "Mysql Statements failed to prepare..." );
-      g_log.info( "MysqlConnection reestablished" );
+         return nullptr;
    }
 
    uint32_t index = stmt->getIndex();
@@ -172,7 +170,7 @@ boost::shared_ptr< Mysql::ResultSet > Core::Db::DbConnection::query( boost::shar
    }
    catch( std::runtime_error& e )
    {
-      g_log.error( e.what() );
+      g_fw.get< Logger >()->error( e.what() );
       return nullptr;
    }
    
@@ -198,7 +196,7 @@ bool Core::Db::DbConnection::execute( boost::shared_ptr< Core::Db::PreparedState
    }
    catch( std::runtime_error& e )
    {
-      g_log.error( e.what() );
+      g_fw.get< Logger >()->error( e.what() );
       return false;
    }
 }
@@ -234,7 +232,7 @@ void Core::Db::DbConnection::prepareStatement( uint32_t index, const std::string
    }
    catch( std::runtime_error& e )
    {
-      g_log.error( e.what() );
+      g_fw.get< Logger >()->error( e.what() );
       m_prepareError = true;
    }
 

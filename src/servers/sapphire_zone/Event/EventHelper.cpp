@@ -6,13 +6,14 @@
 #include <boost/range/algorithm/remove_if.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
-extern Core::Framework g_framework;
+extern Core::Framework g_fw;
 
 
 using namespace Core::Common;
 
 std::string Core::Event::getEventName( uint32_t eventId )
 {
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
    uint16_t eventType = eventId >> 16;
 
    auto unknown = std::string{ "unknown" };
@@ -21,7 +22,7 @@ std::string Core::Event::getEventName( uint32_t eventId )
    {
    case Event::EventHandler::EventHandlerType::Quest:
    {
-      auto questInfo = g_framework.getExdDataGen().get< Core::Data::Quest >( eventId );
+      auto questInfo = pExdData->get< Core::Data::Quest >( eventId );
       if( !questInfo )
          return unknown + "Quest";
 
@@ -32,7 +33,7 @@ std::string Core::Event::getEventName( uint32_t eventId )
    }
    case Event::EventHandler::EventHandlerType::CustomTalk:
    {
-      auto customTalkInfo = g_framework.getExdDataGen().get< Core::Data::CustomTalk >( eventId );
+      auto customTalkInfo = pExdData->get< Core::Data::CustomTalk >( eventId );
       if( !customTalkInfo )
          return unknown + "CustomTalk";
 
@@ -43,21 +44,21 @@ std::string Core::Event::getEventName( uint32_t eventId )
    }
    case Event::EventHandler::EventHandlerType::Opening:
    {
-      auto openingInfo = g_framework.getExdDataGen().get< Core::Data::Opening >( eventId );
+      auto openingInfo = pExdData->get< Core::Data::Opening >( eventId );
       if( openingInfo )
          return openingInfo->name;
       return unknown + "Opening";
    }
    case Event::EventHandler::EventHandlerType::Aetheryte:
    {
-      auto aetherInfo = g_framework.getExdDataGen().get< Core::Data::Aetheryte >( eventId & 0xFFFF );
+      auto aetherInfo = pExdData->get< Core::Data::Aetheryte >( eventId & 0xFFFF );
       if( aetherInfo->isAetheryte )
          return "Aetheryte";
       return "Aethernet";
    }
    case Event::EventHandler::EventHandlerType::ICDirector:
    {
-      auto contentInfo = g_framework.getExdDataGen().get< Core::Data::InstanceContent >( eventId & 0xFFFF );
+      auto contentInfo = pExdData->get< Core::Data::InstanceContent >( eventId & 0xFFFF );
       std::string name = contentInfo->name;
 
       name.erase( boost::remove_if( name, boost::is_any_of( "â˜…_ '()[]-\x1a\x1\x2\x1f\x1\x3.:" ) ), name.end() );
@@ -78,7 +79,8 @@ std::string Core::Event::getEventName( uint32_t eventId )
 
 uint32_t Core::Event::mapEventActorToRealActor( uint32_t eventActorId )
 {
-   auto levelInfo = g_framework.getExdDataGen().get< Core::Data::Level >( eventActorId );
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+   auto levelInfo = pExdData->get< Core::Data::Level >( eventActorId );
    if( levelInfo )
       return levelInfo->objectKey;
 

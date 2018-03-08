@@ -26,7 +26,7 @@
 #include "ServerZone.h"
 #include "Framework.h"
 
-extern Core::Framework g_framework;
+extern Core::Framework g_fw;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -84,7 +84,8 @@ void Core::Entity::Player::directorPlayScene( uint32_t eventId, uint32_t scene, 
    auto pEvent = getEvent( eventId );
    if( !pEvent )
    {
-      g_framework.getLogger().error( "Could not find event " + std::to_string( eventId ) + ", event has not been started!" );
+      auto pLog = g_fw.get< Logger >();
+      pLog->error( "Could not find event " + std::to_string( eventId ) + ", event has not been started!" );
       return;
    }
 
@@ -147,7 +148,8 @@ void Core::Entity::Player::eventPlay( uint32_t eventId, uint32_t scene,
    }
    else if( !pEvent )
    {
-      g_framework.getLogger().error( "Could not find event " + std::to_string( eventId ) + ", event has not been started!" );
+      auto pLog = g_fw.get< Logger >();
+      pLog->error( "Could not find event " + std::to_string( eventId ) + ", event has not been started!" );
       return;
    }
 
@@ -175,7 +177,8 @@ void Core::Entity::Player::eventPlay( uint32_t eventId, uint32_t scene,
    }
    else if( !pEvent )
    {
-      g_framework.getLogger().error( "Could not find event " + std::to_string( eventId ) + ", event has not been started!" );
+      auto pLog = g_fw.get< Logger >();
+      pLog->error( "Could not find event " + std::to_string( eventId ) + ", event has not been started!" );
       return;
    }
 
@@ -193,7 +196,8 @@ void Core::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlayer )
 
    if( !pEvent )
    {
-      g_framework.getLogger().error( "Could not find event " + std::to_string( eventId ) + ", event has not been started!" );
+      auto pLog = g_fw.get< Logger >();
+      pLog->error( "Could not find event " + std::to_string( eventId ) + ", event has not been started!" );
       return;
    }
 
@@ -262,7 +266,8 @@ void Core::Entity::Player::eventActionStart( uint32_t eventId,
    }
    else if( !pEvent )
    {
-      g_framework.getLogger().error( "Could not find event " + std::to_string( eventId ) + ", event has not been started!" );
+      auto pLog = g_fw.get< Logger >();
+      pLog->error( "Could not find event " + std::to_string( eventId ) + ", event has not been started!" );
       return;
    }
 
@@ -290,7 +295,8 @@ void Core::Entity::Player::eventItemActionStart( uint32_t eventId,
 
 void Core::Entity::Player::onLogin()
 {
-   for( auto& child : g_framework.getServerZone().getConfig()->getChild( "Settings.Parameters.MotDArray" ) )
+   auto pConfig = g_fw.get< XMLConfig >();
+   for( auto& child : pConfig->getChild( "Settings.Parameters.MotDArray" ) )
    {
       sendNotice( child.second.data() );
    }
