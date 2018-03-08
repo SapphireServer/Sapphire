@@ -10,7 +10,7 @@
 #include "CalcBattle.h"
 #include "Framework.h"
 
-extern Core::Framework g_framework;
+extern Core::Framework g_fw;
 
 using namespace Core::Math;
 using namespace Core::Entity;
@@ -33,8 +33,9 @@ using namespace Core::Entity;
 
 uint32_t CalcBattle::calculateHealValue( PlayerPtr pPlayer, uint32_t potency )
 {
-   auto classInfo = g_framework.getExdDataGen().get< Core::Data::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
-   auto paramGrowthInfo = g_framework.getExdDataGen().get< Core::Data::ParamGrow >( pPlayer->getLevel() );
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+   auto classInfo = pExdData->get< Core::Data::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
+   auto paramGrowthInfo = pExdData->get< Core::Data::ParamGrow >( pPlayer->getLevel() );
 
    if( !classInfo || !paramGrowthInfo )
       return 0;

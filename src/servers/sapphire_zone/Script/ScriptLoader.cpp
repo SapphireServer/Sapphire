@@ -2,12 +2,14 @@
 
 #include <Logging/Logger.h>
 #include <Config/XMLConfig.h>
-#include "Framework.h"
+
+#include "ServerZone.h"
 
 #include <boost/format.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/filesystem.hpp>
 
+#include "Framework.h"
 extern Core::Framework g_framework;
 
 namespace fs = boost::filesystem;

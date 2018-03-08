@@ -39,7 +39,7 @@
 #include "Forwards.h"
 #include "Framework.h"
 
-extern Core::Framework g_framework;
+extern Core::Framework g_fw;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -107,6 +107,7 @@ enum ClientTrigger
 void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& inPacket,
                                                    Entity::Player& player )
 {
+    auto pLog = g_fw.get< Logger >();
     uint16_t commandId = inPacket.getValAt< uint16_t >( 0x20 );
     uint64_t param1 = inPacket.getValAt< uint64_t >( 0x24 );
     uint32_t param11 = inPacket.getValAt< uint32_t >( 0x24 );
@@ -114,7 +115,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
     uint32_t param2 = inPacket.getValAt< uint32_t >( 0x2C );
     uint64_t param3 = inPacket.getValAt< uint64_t >( 0x38 );
 
-    g_framework.getLogger().debug( "[" + std::to_string( m_pSession->getId() ) + "] Incoming action: " +
+    pLog->debug( "[" + std::to_string( m_pSession->getId() ) + "] Incoming action: " +
                  boost::str( boost::format( "%|04X|" ) % ( uint32_t ) ( commandId & 0xFFFF ) ) +
                  "\nparam1: " + boost::str( boost::format( "%|016X|" ) % ( uint64_t ) ( param1 & 0xFFFFFFFFFFFFFFF ) ) +
                  "\nparam2: " + boost::str( boost::format( "%|08X|" ) % ( uint32_t ) ( param2 & 0xFFFFFFFF ) ) +
@@ -271,7 +272,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
         }
         default:
         {
-           g_framework.getLogger().debug( "[" + std::to_string( m_pSession->getId() ) + "] Unhandled action: " +
+           pLog->debug( "[" + std::to_string( m_pSession->getId() ) + "] Unhandled action: " +
               boost::str( boost::format( "%|04X|" ) % (uint32_t) ( commandId & 0xFFFF ) ) );
            break;
         }

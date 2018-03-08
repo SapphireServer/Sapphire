@@ -18,7 +18,7 @@
 #include "Item.h"
 #include "Framework.h"
 
-extern Core::Framework g_framework;
+extern Core::Framework g_fw;
 
 using namespace Core::Common;
 using namespace Core::Network;
@@ -132,7 +132,9 @@ Core::ItemPtr Core::Inventory::getItemAt( uint16_t containerId, uint8_t slotId )
 
 Core::ItemPtr Core::Inventory::createItem( uint32_t catalogId, uint8_t quantity )
 {
-   auto itemInfo = g_framework.getExdDataGen().get< Core::Data::Item >( catalogId );
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+   auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+   auto itemInfo = pExdData->get< Core::Data::Item >( catalogId );
 
    uint8_t itemAmount = quantity;
 
@@ -153,7 +155,7 @@ Core::ItemPtr Core::Inventory::createItem( uint32_t catalogId, uint8_t quantity 
    pItem->setModelIds( itemInfo->modelMain, itemInfo->modelSub );
    pItem->setCategory( static_cast< ItemUICategory >( itemInfo->itemUICategory ) );
 
-   g_framework.getCharaDb().execute( "INSERT INTO charaglobalitem ( CharacterId, itemId, catalogId, stack, flags ) VALUES ( " +
+  pDb->execute( "INSERT INTO charaglobalitem ( CharacterId, itemId, catalogId, stack, flags ) VALUES ( " +
                       std::to_string( m_pOwner->getId() ) + ", " +
                       std::to_string( pItem->getUId() ) + ", " +
                       std::to_string( pItem->getId() ) + ", " +
@@ -235,6 +237,7 @@ bool Core::Inventory::addCurrency( CurrencyType type, uint32_t amount )
 
 void Core::Inventory::updateCurrencyDb()
 {
+   auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
    int32_t firstItemPos = -1;
    std::string query = "UPDATE charaitemcurrency SET ";
 
@@ -256,12 +259,13 @@ void Core::Inventory::updateCurrencyDb()
 
    query += " WHERE CharacterId = " + std::to_string( m_pOwner->getId() );
 
-   g_framework.getCharaDb().execute( query );
+   pDb->execute( query );
 }
 
 
 void Core::Inventory::updateCrystalDb()
 {
+   auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
    int32_t firstItemPos = -1;
    std::string query = "UPDATE charaitemcrystal SET ";
 
@@ -283,11 +287,12 @@ void Core::Inventory::updateCrystalDb()
 
    query += " WHERE CharacterId = " + std::to_string( m_pOwner->getId() );
 
-   g_framework.getCharaDb().execute( query );
+   pDb->execute( query );
 }
 
 void Core::Inventory::updateBagDb( InventoryType type )
 {
+   auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
    std::string query = "UPDATE charaiteminventory SET ";
 
    for( int32_t i = 0; i <= 34; i++ )
@@ -303,7 +308,7 @@ void Core::Inventory::updateBagDb( InventoryType type )
    query += " WHERE CharacterId = " + std::to_string( m_pOwner->getId() ) +
       " AND storageId = " + std::to_string( static_cast< uint16_t >( type ) );
 
-   g_framework.getCharaDb().execute( query );
+   pDb->execute( query );
 }
 
 bool Core::Inventory::isArmory( uint16_t containerId )
@@ -371,6 +376,8 @@ bool Core::Inventory::isEquipment( uint16_t containerId )
 
 void Core::Inventory::updateMannequinDb( InventoryType type )
 {
+   auto pLog = g_fw.get< Logger >();
+   auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
    std::string query = "UPDATE charaitemgearset SET ";
 
    for( int32_t i = 0; i <= 13; i++ )
@@ -386,14 +393,15 @@ void Core::Inventory::updateMannequinDb( InventoryType type )
    query += " WHERE CharacterId = " + std::to_string( m_pOwner->getId() ) +
       " AND storageId = " + std::to_string( static_cast< uint16_t >( type ) );
 
-   g_framework.getLogger().debug( query );
-   g_framework.getCharaDb().execute( query );
+   pLog->debug( query );
+   pDb->execute( query );
 }
 
 
 void Core::Inventory::updateItemDb( Core::ItemPtr pItem ) const
 {
-   g_framework.getCharaDb().execute( "UPDATE charaglobalitem SET stack = " + std::to_string( pItem->getStackSize() ) + " " +
+   auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+   pDb->execute( "UPDATE charaglobalitem SET stack = " + std::to_string( pItem->getStackSize() ) + " " +
                      // TODO: add other attributes
                      " WHERE itemId = " + std::to_string( pItem->getUId() ) );
 }
@@ -469,8 +477,9 @@ bool Core::Inventory::isObtainable( uint32_t catalogId, uint8_t quantity )
 
 int16_t Core::Inventory::addItem( uint16_t inventoryId, int8_t slotId, uint32_t catalogId, uint8_t quantity )
 {
-
-   auto itemInfo = g_framework.getExdDataGen().get< Core::Data::Item >( catalogId );
+   auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+   auto itemInfo = pExdData->get< Core::Data::Item >( catalogId );
 
    // if item data doesn't exist or it's a blank field
    if( !itemInfo || itemInfo->levelItem == 0 )
@@ -503,7 +512,7 @@ int16_t Core::Inventory::addItem( uint16_t inventoryId, int8_t slotId, uint32_t 
 
       m_inventoryMap[inventoryId]->setItem( rSlotId, item );
 
-      g_framework.getCharaDb().execute( "UPDATE charaiteminventory SET container_" + std::to_string( rSlotId ) + " = " + std::to_string( item->getUId() ) +
+      pDb->execute( "UPDATE charaiteminventory SET container_" + std::to_string( rSlotId ) + " = " + std::to_string( item->getUId() ) +
                          " WHERE storageId = " + std::to_string( inventoryId ) +
                          " AND CharacterId = " + std::to_string( m_pOwner->getId() ) );
 
@@ -646,14 +655,16 @@ void Core::Inventory::discardItem( uint16_t fromInventoryId, uint8_t fromSlotId 
 
 Core::ItemPtr Core::Inventory::loadItem( uint64_t uId )
 {
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+   auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
    // load actual item 
-   auto itemRes = g_framework.getCharaDb().query( "SELECT catalogId, stack, flags FROM charaglobalitem WHERE itemId = " + std::to_string( uId ) + ";" );
+   auto itemRes = pDb->query( "SELECT catalogId, stack, flags FROM charaglobalitem WHERE itemId = " + std::to_string( uId ) + ";" );
    if( !itemRes->next() )
       return nullptr;
 
    try
    {
-      auto itemInfo = g_framework.getExdDataGen().get< Core::Data::Item >( itemRes->getUInt( 1 ) );
+      auto itemInfo = pExdData->get< Core::Data::Item >( itemRes->getUInt( 1 ) );
       bool isHq = itemRes->getUInt( 3 ) == 1 ? true : false;
       ItemPtr pItem( new Item( uId, 
                                itemRes->getUInt( 1 ),
@@ -673,9 +684,10 @@ Core::ItemPtr Core::Inventory::loadItem( uint64_t uId )
 
 bool Core::Inventory::load()
 {
+   auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
    //////////////////////////////////////////////////////////////////////////////////////////////////////
    // load active gearset
-   auto res = g_framework.getCharaDb().query( "SELECT storageId, container_0, container_1, container_2, container_3, "
+   auto res = pDb->query( "SELECT storageId, container_0, container_1, container_2, container_3, "
                                "container_4, container_5, container_6, container_7, "
                                "container_8, container_9, container_10, container_11, "
                                "container_12, container_13 "
@@ -705,7 +717,7 @@ bool Core::Inventory::load()
 
    ///////////////////////////////////////////////////////////////////////////////////////////////////////
    // Load Bags
-   auto bagRes = g_framework.getCharaDb().query( "SELECT storageId, "
+   auto bagRes = pDb->query( "SELECT storageId, "
                                   "container_0, container_1, container_2, container_3, container_4, "
                                   "container_5, container_6, container_7, container_8, container_9, "
                                   "container_10, container_11, container_12, container_13, container_14, "
@@ -738,7 +750,7 @@ bool Core::Inventory::load()
 
    ///////////////////////////////////////////////////////////////////////////////////////////////////////
    // Load Currency
-   auto curRes = g_framework.getCharaDb().query( "SELECT storageId, "
+   auto curRes = pDb->query( "SELECT storageId, "
                                   "container_0, container_1, container_2, container_3, container_4, "
                                   "container_5, container_6, container_7, container_8, container_9, "
                                   "container_10, container_11 "
@@ -767,7 +779,7 @@ bool Core::Inventory::load()
 
    ///////////////////////////////////////////////////////////////////////////////////////////////////////
    // Load Crystals
-   auto crystalRes = g_framework.getCharaDb().query( "SELECT storageId, "
+   auto crystalRes = pDb->query( "SELECT storageId, "
                                       "container_0, container_1, container_2, container_3, container_4, "
                                       "container_5, container_6, container_7, container_8, container_9, "
                                       "container_10, container_11, container_12, container_13, container_14, "
@@ -874,7 +886,8 @@ uint16_t Core::Inventory::calculateEquippedGearItemLevel()
          }
          else
          {
-            g_framework.getLogger().debug( "Is one handed" );
+            auto pLog = g_fw.get< Logger >();
+            pLog->debug( "Is one handed" );
          }
       }
 
@@ -923,8 +936,8 @@ Core::Inventory::ContainerType Core::Inventory::getContainerType( uint32_t conta
 uint32_t Core::Inventory::getNextUId()
 {
    uint32_t charId = 0;
-
-   auto pQR = g_framework.getCharaDb().query( "SELECT MAX(ItemId) FROM charaglobalitem" );
+   auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+   auto pQR = pDb->query( "SELECT MAX(ItemId) FROM charaglobalitem" );
 
    if( !pQR->next() )
       return 0x00500001;
