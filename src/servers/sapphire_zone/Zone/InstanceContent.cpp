@@ -20,7 +20,7 @@
 #include "InstanceContent.h"
 #include "Framework.h"
 
-extern Core::Framework g_framework;
+extern Core::Framework g_fw;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -44,7 +44,8 @@ Core::InstanceContent::InstanceContent( boost::shared_ptr< Core::Data::InstanceC
 
 bool Core::InstanceContent::init()
 {
-   g_framework.getScriptMgr().onInstanceInit( getAsInstanceContent() );
+   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
+   pScriptMgr->onInstanceInit( getAsInstanceContent() );
 
    return true;
 }
@@ -67,7 +68,8 @@ Core::Data::ExdDataGenerated::InstanceContentPtr Core::InstanceContent::getInsta
 
 void Core::InstanceContent::onPlayerZoneIn( Entity::Player& player )
 {
-   g_framework.getLogger().debug( "InstanceContent::onEnterTerritory: Zone#" + std::to_string( getGuId() ) + "|"
+   auto pLog = g_fw.get< Logger >();
+   pLog->debug( "InstanceContent::onEnterTerritory: Zone#" + std::to_string( getGuId() ) + "|"
                                                            + std::to_string( getInstanceContentId() ) +
                                                            + ", Entity#" + std::to_string( player.getId() ) );
 
@@ -83,7 +85,8 @@ void Core::InstanceContent::onPlayerZoneIn( Entity::Player& player )
 
 void Core::InstanceContent::onLeaveTerritory( Entity::Player& player )
 {
-   g_framework.getLogger().debug( "InstanceContent::onLeaveTerritory: Zone#" + std::to_string( getGuId() ) + "|"
+   auto pLog = g_fw.get< Logger >();
+   pLog->debug( "InstanceContent::onLeaveTerritory: Zone#" + std::to_string( getGuId() ) + "|"
                                                            + std::to_string( getInstanceContentId() ) +
                                                            + ", Entity#" + std::to_string( player.getId() ) );
    sendDirectorClear( player );
@@ -149,8 +152,8 @@ void Core::InstanceContent::onUpdate( uint32_t currTime )
       case DutyFinished:
          break;
    }
-
-   g_framework.getScriptMgr().onInstanceUpdate( getAsInstanceContent(), currTime );
+   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
+   pScriptMgr->onInstanceUpdate( getAsInstanceContent(), currTime );
 
 }
 
@@ -274,13 +277,15 @@ void Core::InstanceContent::onRegisterEObj( Entity::EventObjectPtr object )
       m_eventObjectMap[object->getName()] = object;
    if( object->getObjectId() == 2000182 ) // start
       m_pEntranceEObj = object;
-
-   auto objData = g_framework.getExdDataGen().get< Core::Data::EObj >( object->getObjectId() );
+   
+   auto pLog = g_fw.get< Logger >();
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+   auto objData = pExdData->get< Core::Data::EObj >( object->getObjectId() );
    if( objData )
       // todo: data should be renamed to eventId
       m_eventIdToObjectMap[objData->data] = object;
    else
-      g_framework.getLogger().error( "InstanceContent::onRegisterEObj Zone " +
+      pLog->error( "InstanceContent::onRegisterEObj Zone " +
                                      m_internalName + ": No EObj data found for EObj with ID: " +
                                      std::to_string( object->getObjectId() ) );
 }
@@ -334,5 +339,6 @@ void Core::InstanceContent::onTalk( Core::Entity::Player& player, uint32_t event
 
 void Core::InstanceContent::onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 )
 {
-   g_framework.getScriptMgr().onInstanceEnterTerritory( getAsInstanceContent(), player, eventId, param1, param2 );
+   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
+   pScriptMgr->onInstanceEnterTerritory( getAsInstanceContent(), player, eventId, param1, param2 );
 }

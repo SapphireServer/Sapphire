@@ -46,7 +46,7 @@
 #include "Forwards.h"
 #include "Framework.h"
 
-extern Core::Framework g_framework;
+extern Core::Framework g_fw;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -109,7 +109,8 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    uint32_t param2 = inPacket.getValAt< uint32_t >( 0x28 );
    uint32_t param3 = inPacket.getValAt< uint32_t >( 0x38 );
 
-   g_framework.getLogger().debug( player.getName() + " used GM1 commandId: " + std::to_string( commandId ) +
+   auto pLog = g_fw.get< Logger >();
+   pLog->debug( player.getName() + " used GM1 commandId: " + std::to_string( commandId ) +
       ", params: " + std::to_string( param1 ) + ", " +
       std::to_string( param2 ) + ", " + std::to_string( param3 ) );
 
@@ -409,19 +410,20 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    }
    case GmCommand::Teri:
    {
-      if( auto instance = g_framework.getTerritoryMgr().getInstanceZonePtr( param1 ) )
+      auto pTeriMgr = g_fw.get< TerritoryMgr >();
+      if( auto instance = pTeriMgr->getInstanceZonePtr( param1 ) )
       {
          player.sendDebug( "Found instance: " + instance->getName() + ", id: " + std::to_string( param1 ) );
 
          player.setInstance( instance );
       }
-      else if( !g_framework.getTerritoryMgr().isValidTerritory( param1 )  )
+      else if( !pTeriMgr->isValidTerritory( param1 )  )
       {
          player.sendUrgent( "Invalid zone " + std::to_string( param1 ) );
       }
       else
       {
-         auto pZone = g_framework.getTerritoryMgr().getZoneByTerriId( param1 );
+         auto pZone = pTeriMgr->getZoneByTerriId( param1 );
          if( !pZone )
          {
             player.sendUrgent( "No zone instance found for " + std::to_string( param1 ) );
@@ -467,13 +469,16 @@ void Core::Network::GameConnection::gm2Handler( const Packets::GamePacket& inPac
 {
    if( player.getGmRank() <= 0 )
       return;
+   
+   auto pLog = g_fw.get< Logger >();
+   auto pServerZone = g_fw.get< ServerZone >();
 
    uint32_t commandId = inPacket.getValAt< uint32_t >( 0x20 );
    std::string param1 = inPacket.getStringAt( 0x34 );
 
-   g_framework.getLogger().debug( player.getName() + " used GM2 commandId: " + std::to_string( commandId ) + ", params: " + param1 );
+   pLog->debug( player.getName() + " used GM2 commandId: " + std::to_string( commandId ) + ", params: " + param1 );
 
-   auto targetSession = g_framework.getServerZone().getSession( param1 );
+   auto targetSession = pServerZone->getSession( param1 );
    Core::Entity::CharaPtr targetActor;
 
    if( targetSession != nullptr )

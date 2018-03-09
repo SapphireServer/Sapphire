@@ -12,7 +12,7 @@
 #include "TerritoryMgr.h"
 #include "Framework.h"
 
-extern Core::Framework g_framework;
+extern Core::Framework g_fw;
 
 Core::TerritoryMgr::TerritoryMgr() :
    m_lastInstanceId( 10000 )
@@ -22,11 +22,12 @@ Core::TerritoryMgr::TerritoryMgr() :
 
 void Core::TerritoryMgr::loadTerritoryTypeDetailCache()
 {
-   auto idList = g_framework.getExdDataGen().getTerritoryTypeIdList();
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+   auto idList = pExdData->getTerritoryTypeIdList();
 
    for( auto id : idList )
    {
-      auto teri1 = g_framework.getExdDataGen().get< Core::Data::TerritoryType >( id );
+      auto teri1 = pExdData->get< Core::Data::TerritoryType >( id );
 
       if( !teri1->name.empty() )
          m_territoryTypeDetailCacheMap[id] = teri1;
@@ -97,6 +98,8 @@ bool Core::TerritoryMgr::isPrivateTerritory( uint32_t territoryTypeId ) const
 
 bool Core::TerritoryMgr::createDefaultTerritories()
 {
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+   auto pLog = g_fw.get< Logger >();
    // for each entry in territoryTypeExd, check if it is a normal and if so, add the zone object
    for( const auto& territory : m_territoryTypeDetailCacheMap )
    {
@@ -107,18 +110,18 @@ bool Core::TerritoryMgr::createDefaultTerritories()
       if( territoryInfo->name.empty() )
          continue;
 
-      auto pPlaceName = g_framework.getExdDataGen().get< Core::Data::PlaceName >( territoryInfo->placeName );
+      auto pPlaceName = pExdData->get< Core::Data::PlaceName >( territoryInfo->placeName );
 
       if( !pPlaceName || pPlaceName->name.empty() || !isDefaultTerritory( territoryId ) )
          continue;
 
       uint32_t guid = getNextInstanceId();
-      g_framework.getLogger().info( std::to_string( territoryId ) +
-                                        "\t" + std::to_string( guid ) +
-                                        "\t" + std::to_string( territoryInfo->territoryIntendedUse ) +
-                                        "\t" + ( territoryInfo->name.length() <= 4 ? territoryInfo->name + "\t" : territoryInfo->name ) +
-                                        "\t" + ( isPrivateTerritory( territoryId ) ? "PRIVATE" : "PUBLIC" ) +
-                                        "\t" + pPlaceName->name );
+      pLog->info( std::to_string( territoryId ) +
+                                 "\t" + std::to_string( guid ) +
+                                 "\t" + std::to_string( territoryInfo->territoryIntendedUse ) +
+                                 "\t" + ( territoryInfo->name.length() <= 4 ? territoryInfo->name + "\t" : territoryInfo->name ) +
+                                 "\t" + ( isPrivateTerritory( territoryId ) ? "PRIVATE" : "PUBLIC" ) +
+                                 "\t" + pPlaceName->name );
 
       auto pZone = make_Zone( territoryId, guid, territoryInfo->name, pPlaceName->name );
       pZone->init();
@@ -142,13 +145,15 @@ Core::ZonePtr Core::TerritoryMgr::createTerritoryInstance( uint32_t territoryTyp
    if( isInstanceContentTerritory( territoryTypeId ) )
       return nullptr;
 
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+   auto pLog = g_fw.get< Logger >();
    auto pTeri = getTerritoryDetail( territoryTypeId );
-   auto pPlaceName = g_framework.getExdDataGen().get< Core::Data::PlaceName >( pTeri->placeName );
+   auto pPlaceName = pExdData->get< Core::Data::PlaceName >( pTeri->placeName );
 
    if( !pTeri || !pPlaceName )
       return nullptr;
 
-   g_framework.getLogger().debug( "Starting instance for territory: " + std::to_string( territoryTypeId ) + " (" + pPlaceName->name + ")" );
+   pLog->debug( "Starting instance for territory: " + std::to_string( territoryTypeId ) + " (" + pPlaceName->name + ")" );
 
    auto pZone = make_Zone( territoryTypeId, getNextInstanceId(), pTeri->name, pPlaceName->name );
    pZone->init();
@@ -161,7 +166,8 @@ Core::ZonePtr Core::TerritoryMgr::createTerritoryInstance( uint32_t territoryTyp
 
 Core::ZonePtr Core::TerritoryMgr::createInstanceContent( uint32_t instanceContentId )
 {
-   auto pInstanceContent = g_framework.getExdDataGen().get< Core::Data::InstanceContent >( instanceContentId );
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+   auto pInstanceContent = pExdData->get< Core::Data::InstanceContent >( instanceContentId );
    if( !pInstanceContent )
       return nullptr;
 
@@ -173,8 +179,9 @@ Core::ZonePtr Core::TerritoryMgr::createInstanceContent( uint32_t instanceConten
    if( !pTeri || pInstanceContent->name.empty() )
       return nullptr;
 
-   g_framework.getLogger().debug( "Starting instance for InstanceContent id: " + std::to_string( instanceContentId ) +
-                                                           " (" + pInstanceContent->name + ")" );
+   auto pLog = g_fw.get< Logger >();
+   pLog->debug( "Starting instance for InstanceContent id: " + std::to_string( instanceContentId ) +
+                " (" + pInstanceContent->name + ")" );
 
    auto pZone = make_InstanceContent( pInstanceContent, getNextInstanceId(),
                                       pTeri->name, pInstanceContent->name, instanceContentId );
@@ -221,7 +228,8 @@ Core::ZonePtr Core::TerritoryMgr::getInstanceZonePtr( uint32_t instanceId ) cons
 
 void Core::TerritoryMgr::loadTerritoryPositionMap()
 {
-   auto pQR = g_framework.getCharaDb().query( "SELECT id, target_zone_id, pos_x, pos_y, pos_z, pos_o, radius FROM zonepositions;" );
+   auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+   auto pQR = pDb->query( "SELECT id, target_zone_id, pos_x, pos_y, pos_z, pos_o, radius FROM zonepositions;" );
 
    while( pQR->next() )
    {
@@ -308,9 +316,10 @@ bool Core::TerritoryMgr::movePlayer( uint32_t territoryId, Core::Entity::PlayerP
 
 bool Core::TerritoryMgr::movePlayer( ZonePtr pZone, Core::Entity::PlayerPtr pPlayer )
 {
+   auto pLog = g_fw.get< Logger >();
    if( !pZone  )
    {
-      g_framework.getLogger().error( "Zone not found on this server." );
+      pLog->error( "Zone not found on this server." );
       return false;
    }
 
