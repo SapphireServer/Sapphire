@@ -46,6 +46,10 @@ public:
    void setSequence( uint8_t value );
    void setBranch( uint8_t value );
 
+   void startQte();
+   void startEventCutscene();
+   void endEventCutscene();
+
    boost::shared_ptr< Core::Data::InstanceContent > getInstanceContentInfo() const;
 
    uint32_t getInstanceContentId() const;
