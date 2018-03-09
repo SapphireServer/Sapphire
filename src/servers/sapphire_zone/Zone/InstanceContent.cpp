@@ -271,6 +271,34 @@ void Core::InstanceContent::setBranch( uint8_t value )
    }
 }
 
+void Core::InstanceContent::startQte()
+{
+   for ( const auto& playerIt : m_playerMap )
+   {
+      auto player = playerIt.second;
+      player->queuePacket( ActorControlPacket143( player->getId(), DirectorUpdate, getDirectorId(), 0x8000000A ) );
+   }
+}
+
+void Core::InstanceContent::startEventCutscene()
+{
+   // TODO: lock player movement
+   for ( const auto& playerIt : m_playerMap )
+   {
+      auto player = playerIt.second;
+      player->queuePacket( ActorControlPacket143( player->getId(), DirectorUpdate, getDirectorId(), 0x80000008 ) );
+   }
+}
+
+void Core::InstanceContent::endEventCutscene()
+{
+   for ( const auto& playerIt : m_playerMap )
+   {
+      auto player = playerIt.second;
+      player->queuePacket( ActorControlPacket143( player->getId(), DirectorUpdate, getDirectorId(), 0x80000009 ) );
+   }
+}
+
 void Core::InstanceContent::onRegisterEObj( Entity::EventObjectPtr object )
 {
    if( object->getName() != "none" )
