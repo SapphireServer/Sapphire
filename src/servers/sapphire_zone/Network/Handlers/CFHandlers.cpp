@@ -1,9 +1,9 @@
-#include <common/Common.h>
-#include <common/Network/CommonNetwork.h>
-#include <common/Network/GamePacketNew.h>
-#include <common/Logging/Logger.h>
-#include <common/Network/PacketContainer.h>
-#include <common/Exd/ExdDataGenerated.h>
+#include <Common.h>
+#include <Network/CommonNetwork.h>
+#include <Network/GamePacketNew.h>
+#include <Logging/Logger.h>
+#include <Network/PacketContainer.h>
+#include <Exd/ExdDataGenerated.h>
 
 #include "Zone/TerritoryMgr.h"
 #include "Zone/Zone.h"
@@ -22,7 +22,7 @@
 #include "Session.h"
 
 
-extern Core::Framework g_framework;
+extern Core::Framework g_fw;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -35,7 +35,7 @@ void Core::Network::GameConnection::cfDutyInfoRequest( const Packets::GamePacket
    ZoneChannelPacket< FFXIVIpcCFDutyInfo > dutyInfoPacket( player.getId() );
 
    auto penaltyMinutes = player.getCFPenaltyMinutes();
-   if (penaltyMinutes > 255)
+   if( penaltyMinutes > 255 )
    {
       // cap it since it's uint8_t in packets
       penaltyMinutes = 255;
@@ -52,6 +52,8 @@ void Core::Network::GameConnection::cfDutyInfoRequest( const Packets::GamePacket
 void Core::Network::GameConnection::cfRegisterDuty( const Packets::GamePacket& inPacket,
                                                     Entity::Player& player)
 {
+   auto pTeriMgr = g_fw.get< TerritoryMgr >();
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
    // TODO use for loop for this
    auto contentId1 = inPacket.getValAt< uint16_t >( 0x2E );
    auto contentId2 = inPacket.getValAt< uint16_t >( 0x30 );
@@ -59,12 +61,12 @@ void Core::Network::GameConnection::cfRegisterDuty( const Packets::GamePacket& i
    auto contentId4 = inPacket.getValAt< uint16_t >( 0x34 );
    auto contentId5 = inPacket.getValAt< uint16_t >( 0x36 );
 
-   player.sendDebug("Duty register request");
-   player.sendDebug("ContentId1: " + std::to_string(contentId1));
-   player.sendDebug("ContentId2: " + std::to_string(contentId2));
-   player.sendDebug("ContentId3: " + std::to_string(contentId3));
-   player.sendDebug("ContentId4: " + std::to_string(contentId4));
-   player.sendDebug("ContentId5: " + std::to_string(contentId5));
+   player.sendDebug( "Duty register request");
+   player.sendDebug( "ContentId1: " + std::to_string( contentId1 ) );
+   player.sendDebug( "ContentId2: " + std::to_string( contentId2 ) );
+   player.sendDebug( "ContentId3: " + std::to_string( contentId3 ) );
+   player.sendDebug( "ContentId4: " + std::to_string( contentId4 ) );
+   player.sendDebug( "ContentId5: " + std::to_string( contentId5 ) );
 
    // let's cancel it because otherwise you can't register it again
    ZoneChannelPacket< FFXIVIpcCFNotify > cfCancelPacket( player.getId() );
@@ -72,11 +74,11 @@ void Core::Network::GameConnection::cfRegisterDuty( const Packets::GamePacket& i
    cfCancelPacket.data().state2 = 1; // Your registration is withdrawn.
    queueOutPacket( cfCancelPacket );
 
-   auto cfCondition = g_framework.getExdDataGen().get< Core::Data::ContentFinderCondition >( contentId1 );
+   auto cfCondition = pExdData->get< Core::Data::ContentFinderCondition >( contentId1 );
    if( !cfCondition )
       return;
 
-   auto instance = g_framework.getTerritoryMgr().createInstanceContent( cfCondition->instanceContent );
+   auto instance = pTeriMgr->createInstanceContent( cfCondition->instanceContent );
    if( !instance )
       return;
 
@@ -88,11 +90,11 @@ void Core::Network::GameConnection::cfRegisterDuty( const Packets::GamePacket& i
 void Core::Network::GameConnection::cfRegisterRoulette( const Packets::GamePacket& inPacket,
                                                         Entity::Player& player)
 {
-   player.sendDebug("Roulette register");
+   player.sendDebug( "Roulette register" );
 }
 
 void Core::Network::GameConnection::cfDutyAccepted( const Packets::GamePacket& inPacket,
                                                     Entity::Player& player)
 {
-   player.sendDebug("TODO: Duty accept");
+   player.sendDebug( "TODO: Duty accept" );
 }

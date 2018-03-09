@@ -1,8 +1,8 @@
 #ifndef _CORE_NETWORK_PACKETS_CHAT_SERVER_IPC_H
 #define _CORE_NETWORK_PACKETS_CHAT_SERVER_IPC_H
 
-#include <common/Common.h>
-#include <common/Network/CommonNetwork.h>
+#include <Common.h>
+#include <Network/CommonNetwork.h>
 
 namespace Core {
 namespace Network {

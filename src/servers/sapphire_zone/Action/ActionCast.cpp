@@ -1,8 +1,8 @@
-#include <common/Common.h>
-#include <common/Util/Util.h>
-#include <common/Util/UtilMath.h>
-#include <common/Logging/Logger.h>
-#include <common/Exd/ExdDataGenerated.h>
+#include <Common.h>
+#include <Util/Util.h>
+#include <Util/UtilMath.h>
+#include <Logging/Logger.h>
+#include <Exd/ExdDataGenerated.h>
 
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
@@ -20,7 +20,7 @@ using namespace Core::Network;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-extern Core::Framework g_framework;
+extern Core::Framework g_fw;
 
 Core::Action::ActionCast::ActionCast()
 {
@@ -29,10 +29,11 @@ Core::Action::ActionCast::ActionCast()
 
 Core::Action::ActionCast::ActionCast( Entity::CharaPtr pActor, Entity::CharaPtr pTarget, uint16_t actionId )
 {
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
    m_startTime = 0;
    m_id = actionId;
    m_handleActionType = HandleActionType::Spell;
-   m_castTime = g_framework.getExdDataGen().get< Core::Data::Action >( actionId )->cast100ms * 100; // TODO: Add security checks.
+   m_castTime = pExdData->get< Core::Data::Action >( actionId )->cast100ms * 100; // TODO: Add security checks.
    m_pSource = pActor;
    m_pTarget = pTarget;
    m_bInterrupt = false;
@@ -67,6 +68,8 @@ void Core::Action::ActionCast::onFinish()
    if( !m_pSource )
       return;
 
+   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
+
    auto pPlayer = m_pSource->getAsPlayer();
    pPlayer->sendDebug( "onFinish()" );
 
@@ -76,7 +79,7 @@ void Core::Action::ActionCast::onFinish()
                                            0x219, m_id, m_id, m_id, m_id );
    m_pSource->sendToInRangeSet( control, true );*/
 
-   g_framework.getScriptMgr().onCastFinish( *pPlayer, m_pTarget, m_id );
+   pScriptMgr->onCastFinish( *pPlayer, m_pTarget, m_id );
 }
 
 void Core::Action::ActionCast::onInterrupt()

@@ -2,16 +2,16 @@
 #include <vector>
 #include <time.h>
 
-#include <common/Logging/Logger.h>
-#include <common/Util/Util.h>
-#include <common/Util/UtilMath.h>
-#include <common/Network/GamePacket.h>
-#include <common/Network/GamePacketNew.h>
-#include <common/Exd/ExdDataGenerated.h>
-#include <common/Network/CommonNetwork.h>
-#include <common/Network/PacketDef/Zone/ServerZoneDef.h>
-#include <common/Network/PacketContainer.h>
-#include <common/Database/DatabaseDef.h>
+#include <Logging/Logger.h>
+#include <Util/Util.h>
+#include <Util/UtilMath.h>
+#include <Network/GamePacket.h>
+#include <Network/GamePacketNew.h>
+#include <Exd/ExdDataGenerated.h>
+#include <Network/CommonNetwork.h>
+#include <Network/PacketDef/Zone/ServerZoneDef.h>
+#include <Network/PacketContainer.h>
+#include <Database/DatabaseDef.h>
 
 #include "Zone.h"
 #include "InstanceContent.h"
@@ -39,7 +39,7 @@ using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-extern Core::Framework g_framework;
+extern Core::Framework g_fw;
 
 
 /**
@@ -60,6 +60,7 @@ Core::Zone::Zone( uint16_t territoryId, uint32_t guId, const std::string& intern
    m_currentWeather( Weather::FairSkies ),
    m_nextEObjId( 0x400D0000 )
 {
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
    m_guId = guId;
 
    m_territoryId = territoryId;
@@ -68,7 +69,7 @@ Core::Zone::Zone( uint16_t territoryId, uint32_t guId, const std::string& intern
    m_lastMobUpdate = 0;
 
    m_weatherOverride = Weather::None;
-   m_territoryTypeInfo = g_framework.getExdDataGen().get< Core::Data::TerritoryType >( territoryId );
+   m_territoryTypeInfo = pExdData->get< Core::Data::TerritoryType >( territoryId );
 
    loadWeatherRates();
 
@@ -78,17 +79,15 @@ Core::Zone::Zone( uint16_t territoryId, uint32_t guId, const std::string& intern
 void Core::Zone::loadWeatherRates()
 {
    if( !m_territoryTypeInfo )
-   {
-      g_framework.getLogger().error( std::string( __FUNCTION__ ) + " TerritoryTypeInfo not loaded!" );
       return;
-   }
 
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
 
-   uint8_t weatherRateId = m_territoryTypeInfo->weatherRate > g_framework.getExdDataGen().getWeatherRateIdList().size() ?
+   uint8_t weatherRateId = m_territoryTypeInfo->weatherRate > pExdData->getWeatherRateIdList().size() ?
                            uint8_t{ 0 } : m_territoryTypeInfo->weatherRate;
 
    uint8_t sumPc = 0;
-   auto weatherRateFields = g_framework.getExdDataGen().m_WeatherRateDat.get_row( weatherRateId );
+   auto weatherRateFields = pExdData->m_WeatherRateDat.get_row( weatherRateId );
    for( size_t i = 0; i < 16; )
    {
       int32_t weatherId = boost::get< int32_t >( weatherRateFields[i] );
@@ -108,8 +107,9 @@ Core::Zone::~Zone()
 
 bool Core::Zone::init()
 {
+   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
 
-   if( g_framework.getScriptMgr().onZoneInit( shared_from_this() ) )
+   if( pScriptMgr->onZoneInit( shared_from_this() ) )
    {
       // all good
    }
@@ -214,7 +214,8 @@ void Core::Zone::pushActor( Entity::ActorPtr pActor )
    {
       auto pPlayer = pActor->getAsPlayer();
 
-      auto pSession = g_framework.getServerZone().getSession( pPlayer->getId() );
+      auto pServerZone = g_fw.get< ServerZone >();
+      auto pSession = pServerZone->getSession( pPlayer->getId() );
       if( pSession )
          m_sessionSet.insert( pSession );
       m_playerMap[pPlayer->getId()] = pPlayer;
@@ -257,9 +258,11 @@ void Core::Zone::removeActor( Entity::ActorPtr pActor )
 
 void Core::Zone::queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range, GamePacketPtr pPacketEntry )
 {
-   if( g_framework.getTerritoryMgr().isPrivateTerritory( getTerritoryId() ) )
+   auto pTeriMgr = g_fw.get< TerritoryMgr >();
+   if( pTeriMgr->isPrivateTerritory( getTerritoryId() ) )
       return;
 
+   auto pServerZone = g_fw.get< ServerZone >();
    for( auto entry : m_playerMap )
    {
       auto player = entry.second;
@@ -273,7 +276,7 @@ void Core::Zone::queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t 
       if( ( distance < range ) && sourcePlayer.getId() != player->getId() )
       {
 
-         auto pSession = g_framework.getServerZone().getSession( player->getId() );
+         auto pSession = pServerZone->getSession( player->getId() );
          pPacketEntry->setValAt< uint32_t >( 0x08, player->getId() );
          if( pSession )
             pSession->getZoneConnection()->queueOutPacket( pPacketEntry );
@@ -313,9 +316,6 @@ bool Core::Zone::checkWeather()
       if( m_weatherOverride != m_currentWeather )
       {
          m_currentWeather = m_weatherOverride;
-         g_framework.getLogger().debug( "[Zone:" + m_internalName + "] overriding weather to : " +
-                                        std::to_string(  static_cast< uint8_t >( m_weatherOverride ) ) );
-
          return true;
       }
    }
@@ -325,9 +325,6 @@ bool Core::Zone::checkWeather()
       if( nextWeather != m_currentWeather )
       {
          m_currentWeather = nextWeather;
-
-         g_framework.getLogger().debug( "[Zone:" + m_internalName + "] changing weather to : " +
-                                        std::to_string( static_cast< uint8_t >( nextWeather ) ) );
          return true;
       }
    }
@@ -588,8 +585,9 @@ void Core::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
    if( pCell == nullptr )
       return;
 
+   auto pTeriMgr = g_fw.get< TerritoryMgr >();
    // TODO: make sure gms can overwrite this. Potentially temporary solution
-   if( g_framework.getTerritoryMgr().isPrivateTerritory( getTerritoryId() ) )
+   if( pTeriMgr->isPrivateTerritory( getTerritoryId() ) )
       return;
 
    auto iter = pCell->m_actors.begin();
@@ -637,13 +635,15 @@ void Core::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
 
 void Core::Zone::onPlayerZoneIn( Entity::Player &player )
 {
-   g_framework.getLogger().debug( "Zone::onEnterTerritory: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryId() ) +
+   auto pLog = g_fw.get< Logger >();
+   pLog->debug( "Zone::onEnterTerritory: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryId() ) +
                                                 + ", Entity#" + std::to_string( player.getId() ) );
 }
 
 void Core::Zone::onLeaveTerritory( Entity::Player& player )
 {
-   g_framework.getLogger().debug( "Zone::onLeaveTerritory: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryId() ) +
+   auto pLog = g_fw.get< Logger >();
+   pLog->debug( "Zone::onLeaveTerritory: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryId() ) +
                                                 + ", Entity#" + std::to_string( player.getId() ) );
 }
 
@@ -671,7 +671,7 @@ void Core::Zone::registerEObj( Entity::EventObjectPtr object )
 {
    if( !object )
       return;
-
+   auto pLog = g_fw.get< Logger >();
    object->setId( getNextEObjId() );
    pushActor( object );
 
@@ -679,7 +679,7 @@ void Core::Zone::registerEObj( Entity::EventObjectPtr object )
 
    onRegisterEObj( object );
 
-   g_framework.getLogger().debug( "Registered instance eobj: " + std::to_string( object->getId() ) );
+   pLog->debug( "Registered instance eobj: " + std::to_string( object->getId() ) );
 }
 
 Core::Entity::EventObjectPtr Core::Zone::getEObj( uint32_t objId )

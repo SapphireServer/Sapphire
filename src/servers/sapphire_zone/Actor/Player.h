@@ -3,12 +3,8 @@
 
 #include "Forwards.h"
 
-
-#include <common/Common.h>
-#include <common/Network/PacketDef/Zone/ServerZoneDef.h>
-#include <sapphire_zone/Social/FriendList.h>
-#include <common/Common.h>
-#include <common/Util/SpawnIndexAllocator.h>
+#include <Common.h>
+#include <Util/SpawnIndexAllocator.h>
 
 #include "Chara.h"
 #include "Inventory/Inventory.h"

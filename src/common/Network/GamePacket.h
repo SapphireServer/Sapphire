@@ -2,7 +2,7 @@
 #define _GAMEPACKET_H_
 
 #include "CommonNetwork.h"
-#include <common/Forwards.h>
+#include "Forwards.h"
 #include <stdint.h>
 #include <string.h>
 

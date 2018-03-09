@@ -5,7 +5,7 @@
 #include <time.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
-#include <common/Util/Util.h>
+#include "Util/Util.h"
 
 Core::Network::Packets::GamePacket::GamePacket( uint16_t subType, uint16_t size, uint32_t id1, uint32_t id2, uint16_t type )
 {

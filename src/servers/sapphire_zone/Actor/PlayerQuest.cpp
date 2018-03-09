@@ -1,8 +1,8 @@
-#include <common/Common.h>
-#include <common/Network/PacketDef/Zone/ServerZoneDef.h>
-#include <common/Network/GamePacket.h>
-#include <common/Exd/ExdDataGenerated.h>
-#include <common/Network/PacketContainer.h>
+#include <Common.h>
+#include <Network/PacketDef/Zone/ServerZoneDef.h>
+#include <Network/GamePacket.h>
+#include <Exd/ExdDataGenerated.h>
+#include <Network/PacketContainer.h>
 
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/QuestMessagePacket.h"
@@ -12,7 +12,7 @@
 #include "Player.h"
 #include "Framework.h"
 
-extern Core::Framework g_framework;
+extern Core::Framework g_fw;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -1014,14 +1014,15 @@ void Core::Entity::Player::removeQuestsCompleted( uint32_t questId )
 
 bool Core::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t optionalChoice )
 {
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
    uint32_t playerLevel = getLevel();
-   auto questInfo = g_framework.getExdDataGen().get< Core::Data::Quest >( questId );
+   auto questInfo = pExdData->get< Core::Data::Quest >( questId );
    
 
    if( !questInfo )
       return false;
 
-   auto paramGrowth = g_framework.getExdDataGen().get< Core::Data::ParamGrow >( questInfo->classJobLevel0 );
+   auto paramGrowth = pExdData->get< Core::Data::ParamGrow >( questInfo->classJobLevel0 );
 
    // TODO: use the correct formula, this one is wrong
    uint32_t exp = ( questInfo->expFactor * paramGrowth->questExpModifier * ( 45 + 5 * questInfo->classJobLevel0 ) ) / 100;

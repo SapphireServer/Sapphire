@@ -6,20 +6,20 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
-#include <common/Logging/Logger.h>
-#include <common/Config/XMLConfig.h>
+#include <Logging/Logger.h>
+#include <Config/XMLConfig.h>
 
-#include <common/Network/Connection.h>
-#include <common/Network/Hive.h>
-#include <common/Network/Acceptor.h>
+#include <Network/Connection.h>
+#include <Network/Hive.h>
+#include <Network/Acceptor.h>
 
-#include <common/Exd/ExdDataGenerated.h>
-#include <common/Crypt/base64.h>
+#include <Exd/ExdDataGenerated.h>
+#include <Crypt/base64.h>
 
-#include <common/Database/DbLoader.h>
-#include <common/Database/CharaDbConnection.h>
-#include <common/Database/DbWorkerPool.h>
-#include <common/Database/PreparedStatement.h>
+#include <Database/DbLoader.h>
+#include <Database/CharaDbConnection.h>
+#include <Database/DbWorkerPool.h>
+#include <Database/PreparedStatement.h>
 
 //Added for the default_resource example
 #include <fstream>
@@ -29,10 +29,13 @@
 #include <vector>
 #include <algorithm>
 
+#include <Framework.h>
+
 #include "Forwards.h"
 #include "SapphireAPI.h"
 
 
+Core::Framework g_fw;
 Core::Logger g_log;
 Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
 Core::Data::ExdDataGenerated g_exdDataGen;
@@ -739,6 +742,8 @@ void defaultGet( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServe
 
 int main( int argc, char* argv[] )
 {
+   auto pLog = boost::shared_ptr< Core::Logger >( new Core::Logger() );
+   g_fw.set< Core::Logger >( pLog );
    g_log.setLogPath( "log/SapphireAPI" );
    g_log.init();
 

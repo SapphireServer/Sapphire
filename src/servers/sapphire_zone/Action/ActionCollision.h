@@ -1,7 +1,7 @@
 #ifndef _ACTIONCOLLISION_H
 #define _ACTIONCOLLISION_H
 
-#include <common/Common.h>
+#include <Common.h>
 #include "Action.h"
 
 

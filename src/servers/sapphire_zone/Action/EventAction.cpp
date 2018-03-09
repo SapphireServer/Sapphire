@@ -1,6 +1,6 @@
-#include <common/Util/Util.h>
-#include <common/Logging/Logger.h>
-#include <common/Exd/ExdDataGenerated.h>
+#include <Util/Util.h>
+#include <Logging/Logger.h>
+#include <Exd/ExdDataGenerated.h>
 
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
@@ -11,7 +11,7 @@
 #include "EventAction.h"
 #include "Framework.h"
 
-extern Core::Framework g_framework;
+extern Core::Framework g_fw;
 
 using namespace Core::Common;
 using namespace Core::Network;
@@ -26,11 +26,13 @@ Core::Action::EventAction::EventAction()
 Core::Action::EventAction::EventAction( Entity::CharaPtr pActor, uint32_t eventId, uint16_t action,
                                         ActionCallback finishRef, ActionCallback interruptRef, uint64_t additional )
 {
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+
    m_additional = additional;
    m_handleActionType = HandleActionType::Event;
    m_eventId = eventId;
    m_id = action;
-   m_castTime = g_framework.getExdDataGen().get< Core::Data::EventAction >( action )->castTime * 1000; // TODO: Add security checks.
+   m_castTime = pExdData->get< Core::Data::EventAction >( action )->castTime * 1000; // TODO: Add security checks.
    m_onActionFinishClb = finishRef;
    m_onActionInterruptClb = interruptRef;
    m_pSource = pActor;
@@ -93,7 +95,8 @@ void Core::Action::EventAction::onFinish()
    }
    catch( std::exception& e )
    {
-      g_framework.getLogger().error( e.what() );
+      auto pLog = g_fw.get< Logger >();
+      pLog->error( e.what() );
    }
 
 }
@@ -132,7 +135,8 @@ void Core::Action::EventAction::onInterrupt()
    }
    catch( std::exception& e )
    {
-      g_framework.getLogger().error( e.what() );
+      auto pLog = g_fw.get< Logger >();
+      pLog->error( e.what() );
    }
 
 }

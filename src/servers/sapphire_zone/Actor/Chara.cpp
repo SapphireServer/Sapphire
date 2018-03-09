@@ -1,8 +1,8 @@
-#include <common/Util/Util.h>
-#include <common/Util/UtilMath.h>
-#include <common/Network/PacketContainer.h>
-#include <common/Exd/ExdDataGenerated.h>
-#include <common/Network/GamePacket.h>
+#include <Util/Util.h>
+#include <Util/UtilMath.h>
+#include <Network/PacketContainer.h>
+#include <Exd/ExdDataGenerated.h>
+#include <Network/GamePacket.h>
 
 #include "Forwards.h"
 #include "Action/Action.h"
@@ -25,7 +25,7 @@
 #include "Zone/TerritoryMgr.h"
 #include "Framework.h"
 
-extern Core::Framework g_framework;
+extern Core::Framework g_fw;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -421,14 +421,14 @@ ChaiScript Skill Handler.
 void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, uint64_t param1,
                                              uint64_t param2, Entity::Chara& target )
 {
-
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
    if( isPlayer() )
    {
       getAsPlayer()->sendDebug( std::to_string( target.getId() ) );
       getAsPlayer()->sendDebug( "Handle script skill type: " + std::to_string( type ) );
    }
 
-   auto actionInfoPtr = g_framework.getExdDataGen().get< Core::Data::Action >( actionId );
+   auto actionInfoPtr = pExdData->get< Core::Data::Action >( actionId );
 
    // Todo: Effect packet generator. 90% of this is basically setting params and it's basically unreadable.
    // Prepare packet. This is seemingly common for all packets in the action handler.

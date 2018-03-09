@@ -1,22 +1,23 @@
 #include "ServerZone.h"
 
-#include <common/Version.h>
-#include <common/Logging/Logger.h>
-#include <common/Config/XMLConfig.h>
-#include <common/Version.h>
+#include <Version.h>
+#include <Logging/Logger.h>
+#include <Config/XMLConfig.h>
+#include <Version.h>
 
 #include <MySqlBase.h>
 #include <Connection.h>
 
-#include <common/Network/Connection.h>
-#include <common/Network/Hive.h>
+#include <Network/Connection.h>
+#include <Network/Hive.h>
 
-#include <common/Exd/ExdDataGenerated.h>
-#include <common/Network/PacketContainer.h>
-#include <common/Database/DbLoader.h>
-#include <common/Database/CharaDbConnection.h>
-#include <common/Database/DbWorkerPool.h>
-#include <common/Database/PreparedStatement.h>
+#include <Exd/ExdDataGenerated.h>
+#include <Network/PacketContainer.h>
+#include <Database/DbLoader.h>
+#include <Database/CharaDbConnection.h>
+#include <Database/DbWorkerPool.h>
+#include <Database/PreparedStatement.h>
+#include <Util/Util.h>
 
 #include "Actor/Player.h"
 
@@ -37,28 +38,20 @@
 #include <boost/make_shared.hpp>
 #include <boost/algorithm/string.hpp>
 #include <thread>
-#include <common/Util/Util.h>
 
 #include "Framework.h"
 
-Core::Framework g_framework;
-Core::Logger g_log;
+extern Core::Framework g_fw;
 
-Core::ServerZone::ServerZone( const std::string& configPath )
-   : m_configPath( configPath ),
-     m_bRunning( true ),
-     m_lastDBPingTime( 0 )
+Core::ServerZone::ServerZone( const std::string& configPath ) :
+   m_configPath( configPath ),
+   m_bRunning( true ),
+   m_lastDBPingTime( 0 )
 {
-   m_pConfig = XMLConfigPtr( new XMLConfig );
 }
 
 Core::ServerZone::~ServerZone()
 {
-}
-
-Core::XMLConfigPtr Core::ServerZone::getConfig() const
-{
-   return m_pConfig;
 }
 
 size_t Core::ServerZone::getSessionCount() const
@@ -68,15 +61,20 @@ size_t Core::ServerZone::getSessionCount() const
 
 bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
 {
-   g_framework.getLogger().info( "Loading config " + m_configPath );
+   auto pLog = g_fw.get< Core::Logger >();
+   auto pConfig = g_fw.get< Core::XMLConfig >();
+   auto pExd = g_fw.get< Data::ExdDataGenerated >();
+   auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
 
-   if( !m_pConfig->loadConfig( m_configPath ) )
+   pLog->info( "Loading config " + m_configPath );
+
+   if( !pConfig->loadConfig( m_configPath ) )
    {
-      g_framework.getLogger().fatal( "Error loading config " + m_configPath );
+      pLog->fatal( "Error loading config " + m_configPath );
       return false;
    }
 
-   std::vector<std::string> args( argv + 1, argv + argc );
+   std::vector< std::string > args( argv + 1, argv + argc );
    for( uint32_t i = 0; i + 1 < args.size(); i += 2 )
    {
       std::string arg( "" );
@@ -93,104 +91,95 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
          if( arg == "ip" )
          {
             // todo: ip addr in config
-            m_pConfig->setValue< std::string >( "Settings.General.ListenIP", val );
+            pConfig->setValue< std::string >( "Settings.General.ListenIP", val );
          }
          else if( arg == "p" || arg == "port" )
          {
-            m_pConfig->setValue< std::string >( "Settings.General.ListenPort", val );
+            pConfig->setValue< std::string >( "Settings.General.ListenPort", val );
          }
          else if( arg == "exdpath" || arg == "datapath" )
          {
-            m_pConfig->setValue< std::string >( "Settings.General.DataPath", val );
+            pConfig->setValue< std::string >( "Settings.General.DataPath", val );
          }
          else if( arg == "s" || arg == "scriptpath" )
          {
-            m_pConfig->setValue< std::string >( "Settings.General.ScriptPath", val );
+            pConfig->setValue< std::string >( "Settings.General.ScriptPath", val );
          }
          else if( arg == "h" || arg == "dbhost" )
          {
-            m_pConfig->setValue< std::string >( "Settings.General.Mysql.Host", val );
+            pConfig->setValue< std::string >( "Settings.General.Mysql.Host", val );
          }
          else if( arg == "dbport" )
          {
-            m_pConfig->setValue< std::string >( "Settings.General.Mysql.Port", val );
+            pConfig->setValue< std::string >( "Settings.General.Mysql.Port", val );
          }
          else if( arg == "u" || arg == "user" || arg == "dbuser" )
          {
-            m_pConfig->setValue< std::string >( "Settings.General.Mysql.Username", val );
+            pConfig->setValue< std::string >( "Settings.General.Mysql.Username", val );
          }
          else if( arg == "pass" || arg == "dbpass" )
          {
-            m_pConfig->setValue< std::string >( "Settings.General.Mysql.Pass", val );
+            pConfig->setValue< std::string >( "Settings.General.Mysql.Pass", val );
          }
          else if( arg == "d" || arg == "db" || arg == "database" )
          {
-            m_pConfig->setValue< std::string >( "Settings.General.Mysql.Database", val );
+            pConfig->setValue< std::string >( "Settings.General.Mysql.Database", val );
          }
       }
       catch( ... )
       {
-         g_framework.getLogger().error( "Error parsing argument: " + arg + " " + "value: " + val + "\n" );
-         g_framework.getLogger().error( "Usage: <arg> <val> \n" );
+         pLog->error( "Error parsing argument: " + arg + " " + "value: " + val + "\n" );
+         pLog->error( "Usage: <arg> <val> \n" );
       }
    }
 
-   g_framework.getLogger().info( "Setting up generated EXD data" );
-   if( !g_framework.getExdDataGen().init( m_pConfig->getValue< std::string >( "Settings.General.DataPath", "" ) ) )
+   pLog->info( "Setting up generated EXD data" );
+   if( !pExd->init( pConfig->getValue< std::string >( "Settings.General.DataPath", "" ) ) )
    {
-      g_framework.getLogger().fatal( "Error setting up generated EXD data " );
+      pLog->fatal( "Error setting up generated EXD data " );
       return false;
    }
 
    Core::Db::DbLoader loader;
 
    Core::Db::ConnectionInfo info;
-   info.password = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Pass", "" );
-   info.host = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Host", "127.0.0.1" );
-   info.database = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Database", "sapphire" );
-   info.port = m_pConfig->getValue< uint16_t >( "Settings.General.Mysql.Port", 3306 );
-   info.user = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Username", "root" );
-   info.syncThreads = m_pConfig->getValue< uint8_t >( "Settings.General.Mysql.SyncThreads", 2 );
-   info.asyncThreads = m_pConfig->getValue< uint8_t >( "Settings.General.Mysql.AsyncThreads", 2 );
+   info.password = pConfig->getValue< std::string >( "Settings.General.Mysql.Pass", "" );
+   info.host = pConfig->getValue< std::string >( "Settings.General.Mysql.Host", "127.0.0.1" );
+   info.database = pConfig->getValue< std::string >( "Settings.General.Mysql.Database", "sapphire" );
+   info.port = pConfig->getValue< uint16_t >( "Settings.General.Mysql.Port", 3306 );
+   info.user = pConfig->getValue< std::string >( "Settings.General.Mysql.Username", "root" );
+   info.syncThreads = pConfig->getValue< uint8_t >( "Settings.General.Mysql.SyncThreads", 2 );
+   info.asyncThreads = pConfig->getValue< uint8_t >( "Settings.General.Mysql.AsyncThreads", 2 );
 
-   loader.addDb( g_framework.getCharaDb(), info );
+   loader.addDb( *pDb, info );
    if( !loader.initDbs() )
       return false;
 
-   m_port = m_pConfig->getValue< uint16_t >( "Settings.General.ListenPort", 54992 );
-   m_ip = m_pConfig->getValue< std::string >( "Settings.General.ListenIp", "0.0.0.0" );
+   m_port = pConfig->getValue< uint16_t >( "Settings.General.ListenPort", 54992 );
+   m_ip = pConfig->getValue< std::string >( "Settings.General.ListenIp", "0.0.0.0" );
 
    return true;
 }
 
 void Core::ServerZone::run( int32_t argc, char* argv[] )
 {
-   // TODO: add more error checks for the entire initialisation
-   /*g_log.setLogPath( "log/SapphireZone_" );
-   g_log.init();*/
+   auto pLog = g_fw.get< Core::Logger>();
+   auto pScript = g_fw.get< Scripting::ScriptMgr >();
+   auto pLsMgr = g_fw.get< LinkshellMgr >();
+   auto pTeriMgr = g_fw.get< TerritoryMgr >();
 
    printBanner();
 
-   g_framework.getLogger().setLogPath( "log/SapphireZone_" );
-   g_framework.getLogger().init();
-
-   g_log = g_framework.getLogger();
-   
-   if ( !g_framework.initSocialGroups() )
-   {
-      g_framework.getLogger().fatal( "Unable to initialize social groups!" );
-   }
-
    if( !loadSettings( argc, argv ) )
    {
-      g_framework.getLogger().fatal( "Unable to load settings!" );
+      pLog->fatal( "Unable to load settings!" );
       return;
    }
 
-   g_framework.getLogger().info( "LinkshellMgr: Caching linkshells" );
-   if( !g_framework.getLinkshellMgr().loadLinkshells() )
+   pLog->info( "LinkshellMgr: Caching linkshells" );
+   if( !pLsMgr->loadLinkshells() )
    {
-      g_framework.getLogger().fatal( "Unable to load linkshells!" );
+      pLog->fatal( "Unable to load linkshells!" );
       return;
    }
 
@@ -199,16 +188,16 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
    Network::HivePtr hive( new Network::Hive() );
    Network::addServerToHive< Network::GameConnection >( m_ip, m_port, hive );
 
-   g_framework.getScriptMgr().init();
+   pScript->init();
 
-   g_framework.getLogger().info( "TerritoryMgr: Setting up zones" );
-   g_framework.getTerritoryMgr().init();
+   pLog->info( "TerritoryMgr: Setting up zones" );
+   pTeriMgr->init();
 
    std::vector< std::thread > thread_list;
    thread_list.emplace_back( std::thread( std::bind( &Network::Hive::Run, hive.get() ) ) );
 
-   g_framework.getLogger().info( "Server listening on port: " + std::to_string( m_port ) );
-   g_framework.getLogger().info( "Ready for connections..." );
+   pLog->info( "Server listening on port: " + std::to_string( m_port ) );
+   pLog->info( "Ready for connections..." );
 
    mainLoop();
 
@@ -221,25 +210,32 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
 
 void Core::ServerZone::printBanner() const
 {
-   g_framework.getLogger().info("===========================================================" );
-   g_framework.getLogger().info( "Sapphire Server Project " );
-   g_framework.getLogger().info( "Version: " + Version::VERSION );
-   g_framework.getLogger().info( "Git Hash: " + Version::GIT_HASH );
-   g_framework.getLogger().info( "Compiled: " __DATE__ " " __TIME__ );
-   g_framework.getLogger().info( "===========================================================" );
+   auto pLog = g_fw.get< Core::Logger>();
+
+   pLog->info("===========================================================" );
+   pLog->info( "Sapphire Server Project " );
+   pLog->info( "Version: " + Version::VERSION );
+   pLog->info( "Git Hash: " + Version::GIT_HASH );
+   pLog->info( "Compiled: " __DATE__ " " __TIME__ );
+   pLog->info( "===========================================================" );
 }
 
 void Core::ServerZone::mainLoop()
 {
+   auto pLog = g_fw.get< Logger >();
+   auto pTeriMgr = g_fw.get< TerritoryMgr >();
+   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
+   auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+
    while( isRunning() )
    {
       this_thread::sleep_for( chrono::milliseconds( 50 ) );
 
       auto currTime = Util::getTimeSeconds();
 
-      g_framework.getTerritoryMgr().updateTerritoryInstances( currTime );
+      pTeriMgr->updateTerritoryInstances( currTime );
 
-      g_framework.getScriptMgr().update();
+      pScriptMgr->update();
 
       lock_guard< std::mutex > lock( this->m_sessionMutex );
       for( auto sessionIt : this->m_sessionMapById )
@@ -258,7 +254,7 @@ void Core::ServerZone::mainLoop()
 
       if( currTime - m_lastDBPingTime > 3 )
       {
-         g_framework.getCharaDb().keepAlive();
+         pDb->keepAlive();
          m_lastDBPingTime = currTime;
       }
 
@@ -276,7 +272,7 @@ void Core::ServerZone::mainLoop()
             it->second->close();
             // if( it->second.unique() )
             {
-               g_framework.getLogger().info("[" + std::to_string(it->second->getId() ) + "] Session removal" );
+               pLog->info("[" + std::to_string(it->second->getId() ) + "] Session removal" );
                it = this->m_sessionMapById.erase( it );
                removeSession( pPlayer->getName() );
                continue;
@@ -286,7 +282,7 @@ void Core::ServerZone::mainLoop()
          // remove sessions that simply timed out
          if( diff > 20 )
          {
-            g_framework.getLogger().info("[" + std::to_string( it->second->getId() ) + "] Session time out" );
+            pLog->info("[" + std::to_string( it->second->getId() ) + "] Session time out" );
 
             it->second->close();
             // if( it->second.unique() )
@@ -307,6 +303,8 @@ void Core::ServerZone::mainLoop()
 
 bool Core::ServerZone::createSession( uint32_t sessionId )
 {
+   auto pLog = g_fw.get< Core::Logger>();
+
    std::lock_guard< std::mutex > lock( m_sessionMutex );
 
    const std::string session_id_str = std::to_string( sessionId );
@@ -315,18 +313,18 @@ bool Core::ServerZone::createSession( uint32_t sessionId )
 
    if( it != m_sessionMapById.end() )
    {
-      g_framework.getLogger().error( "[" + session_id_str + "] Error creating session" );
+      pLog->error( "[" + session_id_str + "] Error creating session" );
       return false;
    }
 
-   g_framework.getLogger().info( "[" + session_id_str + "] Creating new session" );
+   pLog->info( "[" + session_id_str + "] Creating new session" );
 
    boost::shared_ptr<Session> newSession( new Session( sessionId ) );
    m_sessionMapById[sessionId] = newSession;
 
    if( !newSession->loadPlayer() )
    {
-      g_framework.getLogger().error( "[" + session_id_str + "] Error loading player " + session_id_str );
+      pLog->error( "[" + session_id_str + "] Error loading player " + session_id_str );
       return false;
    }
 

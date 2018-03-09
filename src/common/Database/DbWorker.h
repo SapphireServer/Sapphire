@@ -3,7 +3,7 @@
 
 #include <atomic>
 #include <thread>
-#include <common/Util/LockedWaitQueue.h>
+#include "Util/LockedWaitQueue.h"
 #include <boost/shared_ptr.hpp>
 
 namespace Core

@@ -1,6 +1,6 @@
-#include <common/Common.h>
-#include <common/Logging/Logger.h>
-#include <common/Database/DatabaseDef.h>
+#include <Common.h>
+#include <Logging/Logger.h>
+#include <Database/DatabaseDef.h>
 
 #include "Actor/Player.h"
 
@@ -9,7 +9,7 @@
 #include "Forwards.h"
 #include "ItemContainer.h"
 
-extern Core::Framework g_framework;
+extern Core::Framework g_fw;
 
 Core::ItemContainer::ItemContainer( uint16_t locationId ) : 
    m_id( locationId ),
@@ -35,19 +35,21 @@ uint8_t Core::ItemContainer::getEntryCount() const
 
 void Core::ItemContainer::removeItem( uint8_t slotId )
 {
+   auto pLog = g_fw.get< Logger >();
+   auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
    ItemMap::iterator it = m_itemMap.find( slotId );
 
    if( it != m_itemMap.end() )
    {
-      g_framework.getCharaDb().execute( "DELETE FROM charaglobalitem WHERE itemId = " + std::to_string( it->second->getUId() ) );
+      pDb->execute( "DELETE FROM charaglobalitem WHERE itemId = " + std::to_string( it->second->getUId() ) );
 
       m_itemMap.erase( it );
 
-      g_framework.getLogger().debug( "Dropped item from slot " + std::to_string( slotId ) );
+      pLog->debug( "Dropped item from slot " + std::to_string( slotId ) );
    }
    else
    {
-      g_framework.getLogger().debug( "Item could not be dropped from slot " + std::to_string( slotId ) );
+      pLog->debug( "Item could not be dropped from slot " + std::to_string( slotId ) );
    }
 }
 
@@ -78,7 +80,8 @@ Core::ItemPtr Core::ItemContainer::getItem( uint8_t slotId )
 
    if( ( slotId > m_size ) || ( slotId == -1 ) )
    {
-      g_framework.getLogger().error( "Slot out of range " + std::to_string( slotId ) );
+      auto pLog = g_fw.get< Logger >();
+      pLog->error( "Slot out of range " + std::to_string( slotId ) );
       return nullptr;
    }
 

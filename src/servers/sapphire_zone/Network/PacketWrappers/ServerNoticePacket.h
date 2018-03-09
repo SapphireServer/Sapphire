@@ -1,8 +1,8 @@
 #ifndef _SERVERNOTICEPACKET_H
 #define _SERVERNOTICEPACKET_H
 
-#include <common/Network/GamePacketNew.h>
-#include <common/Network/PacketDef/Zone/ServerZoneDef.h>
+#include <Network/GamePacketNew.h>
+#include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include "Forwards.h"
 
 namespace Core {

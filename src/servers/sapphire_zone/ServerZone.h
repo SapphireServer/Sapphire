@@ -1,7 +1,7 @@
 #ifndef __GAMESERVER_H
 #define __GAMESERVER_H
 
-#include <common/Common.h>
+#include <Common.h>
 
 #include <boost/shared_ptr.hpp>
 #include <mutex>
@@ -30,8 +30,6 @@ namespace Core {
       void updateSession( uint32_t id );
       void updateSession( std::string playerName );
 
-      XMLConfigPtr getConfig() const;
-
       size_t getSessionCount() const;
 
       void mainLoop();
@@ -50,8 +48,6 @@ namespace Core {
       bool m_bRunning;
 
       std::string m_configPath;
-
-      XMLConfigPtr m_pConfig;
 
       std::mutex m_sessionMutex;
 

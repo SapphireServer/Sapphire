@@ -7,7 +7,6 @@ file(GLOB SERVER_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}*.c*")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_CURRENT_SOURCE_DIR}/../../../bin/")
 add_executable(sapphire_api ${SERVER_PUBLIC_INCLUDE_FILES} ${SERVER_SOURCE_FILES})
-add_dependencies(sapphire_api common xivdat)
 
 set_target_properties(sapphire_api PROPERTIES
     CXX_STANDARD 14
@@ -21,13 +20,9 @@ set_target_properties(sapphire_api PROPERTIES
 )
 
 if (UNIX)
-  target_link_libraries (sapphire_api common xivdat pthread mysqlclient mysqlConnector dl z)
+  target_link_libraries (sapphire_api common pthread dl z)
 else()
-  # ignore unchecked iterators warnings from msvc
-  add_definitions(-D_SCL_SECURE_NO_WARNINGS)
-
-  target_link_libraries (sapphire_api common xivdat libmysql mysqlConnector zlib1)
-
+  target_link_libraries (sapphire_api common zlib1)
 endif()
 
 target_link_libraries( sapphire_api ${Boost_LIBRARIES} ${Boost_LIBRARIES} )

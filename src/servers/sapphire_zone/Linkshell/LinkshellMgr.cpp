@@ -1,13 +1,13 @@
 #include <boost/make_shared.hpp>
 
-#include <common/Logging/Logger.h>
-#include <common/Database/DatabaseDef.h>
+#include <Logging/Logger.h>
+#include <Database/DatabaseDef.h>
 
 #include "Linkshell.h"
 #include "Framework.h"
 #include "LinkshellMgr.h"
 
-extern Core::Framework g_framework;
+extern Core::Framework g_fw;
 
 Core::LinkshellMgr::LinkshellMgr()
 {
@@ -16,8 +16,8 @@ Core::LinkshellMgr::LinkshellMgr()
 
 bool Core::LinkshellMgr::loadLinkshells()
 {
-
-   auto res = g_framework.getCharaDb().query( "SELECT LinkshellId, MasterCharacterId, CharacterIdList, "
+   auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+   auto res = pDb->query( "SELECT LinkshellId, MasterCharacterId, CharacterIdList, "
                                       "LinkshellName, LeaderIdList, InviteIdList "
                                       "FROM infolinkshell "
                                "ORDER BY LinkshellId ASC;" );

@@ -1,7 +1,7 @@
 #ifndef _DIRECTORPLAYSCENE_H
 #define _DIRECTORPLAYSCENE_H
 
-#include <common/Network/GamePacketNew.h>
+#include <Network/GamePacketNew.h>
 #include "Forwards.h"
 
 namespace Core {

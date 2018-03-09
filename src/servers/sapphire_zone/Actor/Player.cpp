@@ -1,13 +1,13 @@
 #include <boost/make_shared.hpp>
 
-#include <common/Common.h>
-#include <common/Util/Util.h>
-#include <common/Util/UtilMath.h>
-#include <common/Config/XMLConfig.h>
-#include <common/Network/GamePacket.h>
-#include <common/Logging/Logger.h>
-#include <common/Exd/ExdDataGenerated.h>
-#include <common/Network/PacketContainer.h>
+#include <Common.h>
+#include <Util/Util.h>
+#include <Util/UtilMath.h>
+#include <Config/XMLConfig.h>
+#include <Network/GamePacket.h>
+#include <Logging/Logger.h>
+#include <Exd/ExdDataGenerated.h>
+#include <Network/PacketContainer.h>
 
 #include "Session.h"
 #include "Player.h"
@@ -50,7 +50,7 @@
 #include "ServerZone.h"
 #include "Framework.h"
 
-extern Core::Framework g_framework;
+extern Core::Framework g_fw;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -104,7 +104,8 @@ Core::Entity::Player::~Player()
 
 void Core::Entity::Player::injectPacket( std::string path )
 {
-   auto session = g_framework.getServerZone().getSession( getId() );
+   auto pServerZone = g_fw.get< ServerZone >();
+   auto session = pServerZone->getSession( getId() );
    if( session )
       session->getZoneConnection()->injectPacket( path, *this );
 }
@@ -227,9 +228,11 @@ void Core::Entity::Player::calculateStats()
    uint8_t level = getLevel();
    uint8_t job = static_cast< uint8_t >( getClass() );
 
-   auto classInfo = g_framework.getExdDataGen().get< Core::Data::ClassJob >( job );
-   auto tribeInfo = g_framework.getExdDataGen().get< Core::Data::Tribe >( tribe );
-   auto paramGrowthInfo = g_framework.getExdDataGen().get< Core::Data::ParamGrow >( level );
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+
+   auto classInfo = pExdData->get< Core::Data::ClassJob >( job );
+   auto tribeInfo = pExdData->get< Core::Data::Tribe >( tribe );
+   auto paramGrowthInfo = pExdData->get< Core::Data::ParamGrow >( level );
 
    // TODO: put formula somewhere else...
    float base = Math::CalcStats::calculateBaseStat( getAsPlayer() );
@@ -312,7 +315,10 @@ uint64_t Core::Entity::Player::getFriendsListId() const
 
 void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
 {
-   auto data = g_framework.getExdDataGen().get< Core::Data::Aetheryte >( aetheryteId );
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+   auto pTeriMgr = g_fw.get< TerritoryMgr >();
+
+   auto data = pExdData->get< Core::Data::Aetheryte >( aetheryteId );
 
    if( data == nullptr )
    {
@@ -320,7 +326,7 @@ void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
    }
 
    setStateFlag( PlayerStateFlag::BetweenAreas );
-   auto targetPos = g_framework.getTerritoryMgr().getTerritoryPosition( data->levelId );
+   auto targetPos = pTeriMgr->getTerritoryPosition( data->levelId );
 
    Common::FFXIVARR_POSITION3 pos;
    pos.x = 0;
@@ -334,8 +340,8 @@ void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
       rot = targetPos->getTargetRotation();
    }
 
-   sendDebug( "Teleport: " + g_framework.getExdDataGen().get< Core::Data::PlaceName >( data->placeName )->name + " " +
-                             g_framework.getExdDataGen().get< Core::Data::PlaceName >( data->aethernetName )->name +
+   sendDebug( "Teleport: " + pExdData->get< Core::Data::PlaceName >( data->placeName )->name + " " +
+                             pExdData->get< Core::Data::PlaceName >( data->aethernetName )->name +
                "(" + std::to_string( data->territory ) + ")" );
 
    // TODO: this should be simplified and a type created in server_common/common.h.
@@ -377,15 +383,16 @@ void Core::Entity::Player::returnToHomepoint()
 
 void Core::Entity::Player::setZone( uint32_t zoneId )
 {
+   auto pTeriMgr = g_fw.get< TerritoryMgr >();
    m_onEnterEventDone = false;
-   if( !g_framework.getTerritoryMgr().movePlayer( zoneId, getAsPlayer() ) )
+   if( !pTeriMgr->movePlayer( zoneId, getAsPlayer() ) )
    {
       // todo: this will require proper handling, for now just return the player to their previous area
       m_pos = m_prevPos;
       m_rot = m_prevRot;
       m_zoneId = m_prevZoneId;
 
-      if( !g_framework.getTerritoryMgr().movePlayer( m_zoneId, getAsPlayer() ) )
+      if( !pTeriMgr->movePlayer( m_zoneId, getAsPlayer() ) )
          return;
    }
 
@@ -394,8 +401,9 @@ void Core::Entity::Player::setZone( uint32_t zoneId )
 
 bool Core::Entity::Player::setInstance( uint32_t instanceContentId )
 {
+   auto pTeriMgr = g_fw.get< TerritoryMgr >();
    m_onEnterEventDone = false;
-   auto instance = g_framework.getTerritoryMgr().getInstanceZonePtr( instanceContentId );
+   auto instance = pTeriMgr->getInstanceZonePtr( instanceContentId );
    if( !instance )
       return false;
 
@@ -408,6 +416,8 @@ bool Core::Entity::Player::setInstance( ZonePtr instance )
    if( !instance )
       return false;
 
+   auto pTeriMgr = g_fw.get< TerritoryMgr >();
+
    // zoning within the same zone won't cause the prev data to be overwritten
    if( instance->getTerritoryId() != m_zoneId )
    {
@@ -416,7 +426,7 @@ bool Core::Entity::Player::setInstance( ZonePtr instance )
       m_prevZoneId = m_zoneId;
    }
 
-   if( !g_framework.getTerritoryMgr().movePlayer( instance, getAsPlayer() ) )
+   if( !pTeriMgr->movePlayer( instance, getAsPlayer() ) )
       return false;
 
    sendZonePackets();
@@ -426,7 +436,8 @@ bool Core::Entity::Player::setInstance( ZonePtr instance )
 
 bool Core::Entity::Player::exitInstance()
 {
-   if( !g_framework.getTerritoryMgr().movePlayer( m_prevZoneId, getAsPlayer() ) )
+   auto pTeriMgr = g_fw.get< TerritoryMgr >();
+   if( !pTeriMgr->movePlayer( m_prevZoneId, getAsPlayer() ) )
       return false;
 
    m_pos = m_prevPos;
@@ -499,9 +510,11 @@ void Core::Entity::Player::discover( int16_t map_id, int16_t sub_id )
 
    // section to starts at 320 - 4 bytes long
 
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+
    int32_t offset = 4;
 
-   auto info = g_framework.getExdDataGen().get< Core::Data::Map >( g_framework.getExdDataGen().get< Core::Data::TerritoryType >( getCurrentZone()->getTerritoryId() )->map );
+   auto info = pExdData->get< Core::Data::Map >( pExdData->get< Core::Data::TerritoryType >( getCurrentZone()->getTerritoryId() )->map );
    if( info->discoveryArrayByte )
       offset = 4 + 2 * info->discoveryIndex;
    else
@@ -516,7 +529,7 @@ void Core::Entity::Player::discover( int16_t map_id, int16_t sub_id )
 
    uint16_t level = getLevel();
 
-   uint32_t exp = ( g_framework.getExdDataGen().get< Core::Data::ParamGrow >( level )->expToNext * 5 / 100 );
+   uint32_t exp = ( pExdData->get< Core::Data::ParamGrow >( level )->expToNext * 5 / 100 );
 
    gainExp( exp );
 
@@ -589,13 +602,15 @@ bool Core::Entity::Player::isActionLearned( uint8_t actionId ) const
 
 void Core::Entity::Player::gainExp( uint32_t amount )
 {
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+
    uint32_t currentExp = getExp();
 
    uint16_t level = getLevel();
 
-   uint32_t neededExpToLevel = g_framework.getExdDataGen().get< Core::Data::ParamGrow >( level )->expToNext;
+   uint32_t neededExpToLevel = pExdData->get< Core::Data::ParamGrow >( level )->expToNext;
 
-   uint32_t neededExpToLevelplus1 = g_framework.getExdDataGen().get< Core::Data::ParamGrow >( level + 1 )->expToNext;
+   uint32_t neededExpToLevelplus1 = pExdData->get< Core::Data::ParamGrow >( level + 1 )->expToNext;
 
    queuePacket( ActorControlPacket143( getId(), GainExpMsg, static_cast< uint8_t >( getClass() ), amount ) );
 
@@ -668,25 +683,28 @@ void Core::Entity::Player::sendStatusUpdate( bool toSelf )
 
 uint8_t Core::Entity::Player::getLevel() const
 {
-   uint8_t classJobIndex = g_framework.getExdDataGen().get< Core::Data::ClassJob >( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+   uint8_t classJobIndex = pExdData->get< Core::Data::ClassJob >( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
    return static_cast< uint8_t >( m_classArray[classJobIndex] );
 }
 
 uint8_t Core::Entity::Player::getLevelForClass( Common::ClassJob pClass ) const
 {
-   uint8_t classJobIndex = g_framework.getExdDataGen().get< Core::Data::ClassJob >( static_cast< uint8_t >( pClass ) )->expArrayIndex;
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+   uint8_t classJobIndex = pExdData->get< Core::Data::ClassJob >( static_cast< uint8_t >( pClass ) )->expArrayIndex;
    return static_cast< uint8_t >( m_classArray[classJobIndex] );
 }
 
 uint32_t Core::Entity::Player::getExp() const
 {
-   uint8_t classJobIndex = g_framework.getExdDataGen().get< Core::Data::ClassJob >( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+   uint8_t classJobIndex = pExdData->get< Core::Data::ClassJob >( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
    return m_expArray[classJobIndex];
 }
 
 void Core::Entity::Player::setExp( uint32_t amount )
-{
-   uint8_t classJobIndex = g_framework.getExdDataGen().get< Core::Data::ClassJob >( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
+{   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+   uint8_t classJobIndex = pExdData->get< Core::Data::ClassJob >( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
    m_expArray[classJobIndex] = amount;
 }
 
@@ -726,13 +744,15 @@ void Core::Entity::Player::setClassJob( Common::ClassJob classJob )
 
 void Core::Entity::Player::setLevel( uint8_t level )
 {
-   uint8_t classJobIndex = g_framework.getExdDataGen().get< Core::Data::ClassJob >( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+   uint8_t classJobIndex = pExdData->get< Core::Data::ClassJob >( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
    m_classArray[classJobIndex] = level;
 }
 
 void Core::Entity::Player::setLevelForClass( uint8_t level, Common::ClassJob classjob )
 {
-   uint8_t classJobIndex = g_framework.getExdDataGen().get< Core::Data::ClassJob >( static_cast< uint8_t >( classjob ) )->expArrayIndex;
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+   uint8_t classJobIndex = pExdData->get< Core::Data::ClassJob >( static_cast< uint8_t >( classjob ) )->expArrayIndex;
 
    if( m_classArray[classJobIndex] == 0 )
       insertDbClass( classJobIndex );
@@ -806,7 +826,8 @@ void Core::Entity::Player::setLookAt( uint8_t index, uint8_t value )
 // spawn this player for pTarget
 void Core::Entity::Player::spawn( Entity::PlayerPtr pTarget )
 {
-   g_framework.getLogger().debug( "[" + std::to_string( pTarget->getId() ) + "] Spawning " +
+   auto pLog = g_fw.get< Logger >();
+   pLog->debug( "[" + std::to_string( pTarget->getId() ) + "] Spawning " +
                 getName() + " for " +
                 pTarget->getName() );
 
@@ -818,8 +839,8 @@ void Core::Entity::Player::spawn( Entity::PlayerPtr pTarget )
 void Core::Entity::Player::despawn( Entity::PlayerPtr pTarget )
 {
    auto pPlayer = pTarget;
-
-   g_framework.getLogger().debug( "despawning " + getName() + " for " + pTarget->getName() );
+   auto pLog = g_fw.get< Logger >();
+   pLog->debug( "despawning " + getName() + " for " + pTarget->getName() );
 
    pPlayer->freePlayerSpawnId( getId() );
 
@@ -884,7 +905,8 @@ const uint8_t* Core::Entity::Player::getStateFlags() const
 
 bool Core::Entity::Player::actionHasCastTime( uint32_t actionId ) //TODO: Add logic for special cases
 {
-   auto actionInfoPtr = g_framework.getExdDataGen().get< Core::Data::Action >( actionId );
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+   auto actionInfoPtr = pExdData->get< Core::Data::Action >( actionId );
    if( actionInfoPtr->preservesCombo )
       return false;
 
@@ -1044,7 +1066,8 @@ void Core::Entity::Player::update( int64_t currTime )
 
 void Core::Entity::Player::onMobKill( uint16_t nameId )
 {
-   g_framework.getScriptMgr().onMobKill( *getAsPlayer(), nameId );
+   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
+   pScriptMgr->onMobKill( *getAsPlayer(), nameId );
 }
 
 void Core::Entity::Player::freePlayerSpawnId( uint32_t actorId )
@@ -1154,7 +1177,8 @@ const uint8_t* Core::Entity::Player::getGcRankArray() const
 
 void Core::Entity::Player::queuePacket( Network::Packets::GamePacketPtr pPacket )
 {
-   auto pSession = g_framework.getServerZone().getSession( m_id );
+   auto pServerZone = g_fw.get< ServerZone >();
+   auto pSession = pServerZone->getSession( m_id );
 
    if( !pSession )
       return;
@@ -1168,7 +1192,8 @@ void Core::Entity::Player::queuePacket( Network::Packets::GamePacketPtr pPacket 
 
 void Core::Entity::Player::queueChatPacket( Network::Packets::GamePacketPtr pPacket )
 {
-   auto pSession = g_framework.getServerZone().getSession( m_id );
+   auto pServerZone = g_fw.get< ServerZone >();
+   auto pSession = pServerZone->getSession( m_id );
 
    if( !pSession )
       return;
@@ -1630,14 +1655,14 @@ void Core::Entity::Player::emote( uint32_t emoteId, uint64_t targetId )
 
 void Core::Entity::Player::teleportQuery( uint16_t aetheryteId )
 {
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
    // TODO: only register this action if enough gil is in possession
-   auto& exdDataGen = g_framework.getExdDataGen();
-   auto targetAetheryte = exdDataGen.get< Core::Data::Aetheryte >( aetheryteId );
+   auto targetAetheryte = pExdData->get< Core::Data::Aetheryte >( aetheryteId );
 
    if( targetAetheryte )
    {
-      auto fromAetheryte = exdDataGen.get< Core::Data::Aetheryte >(
-                                          exdDataGen.get< Core::Data::TerritoryType >( getZoneId() )->aetheryte );
+      auto fromAetheryte = pExdData->get< Core::Data::Aetheryte >(
+                             pExdData->get< Core::Data::TerritoryType >( getZoneId() )->aetheryte );
 
       // calculate cost - does not apply for favorite points or homepoints neither checks for aether tickets
       auto cost = static_cast< uint16_t > ( ( sqrt( pow( fromAetheryte->aetherstreamX - targetAetheryte->aetherstreamX, 2 ) +
