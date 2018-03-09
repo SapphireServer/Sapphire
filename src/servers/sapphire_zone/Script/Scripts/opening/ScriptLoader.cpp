@@ -1,13 +1,13 @@
 #include <Script/NativeScriptApi.h>
 
-#include "OpeningLimsa.cpp"
 #include "OpeningGridania.cpp"
+#include "OpeningLimsa.cpp"
 #include "OpeningUldah.cpp"
 
 const ScriptObject* ptrs[] =
 {
-   static_cast< ScriptObject* >( new OpeningLimsa ),
    static_cast< ScriptObject* >( new OpeningGridania ),
+   static_cast< ScriptObject* >( new OpeningLimsa ),
    static_cast< ScriptObject* >( new OpeningUldah ),
 
    nullptr
