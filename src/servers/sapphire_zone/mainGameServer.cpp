@@ -11,6 +11,7 @@
 #include <Database/DbWorkerPool.h>
 #include "Linkshell/LinkshellMgr.h"
 #include "Zone/TerritoryMgr.h"
+#include "DebugCommand/DebugCommandHandler.h"
 
 Core::Framework g_fw;
 
@@ -26,6 +27,7 @@ bool setupFramework()
    auto pDb = boost::make_shared< Db::DbWorkerPool< Db::CharaDbConnection > >();
    auto pLsMgr = boost::make_shared< LinkshellMgr >();
    auto pTeriMgr = boost::make_shared< TerritoryMgr >();
+   auto pDebugCom = boost::make_shared< DebugCommandHandler >();
 
    pLogger->setLogPath( "log/SapphireZone_" );
    pLogger->init();
@@ -38,6 +40,7 @@ bool setupFramework()
    g_fw.set< Db::DbWorkerPool< Db::CharaDbConnection > >( pDb );
    g_fw.set< LinkshellMgr >( pLsMgr );
    g_fw.set< TerritoryMgr >( pTeriMgr );
+   g_fw.set< DebugCommandHandler >( pDebugCom );
 
    // actuall catch errors here...
    return true;
