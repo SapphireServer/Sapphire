@@ -183,7 +183,7 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
       return;
    }
 
-   g_framework.getFriendsListMgr().findGroupById( 0 );
+   //g_framework.getFriendsListMgr().findGroupById( 0 );
 
    Network::HivePtr hive( new Network::Hive() );
    Network::addServerToHive< Network::GameConnection >( m_ip, m_port, hive );

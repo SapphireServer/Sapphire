@@ -1,14 +1,15 @@
 #ifndef _GROUP_H
 #define _GROUP_H
 
-#include <common/Common.h>
-#include <common/Network/PacketDef/Zone/ServerZoneDef.h>
-#include <common/Forwards.h>
+#include <Common.h>
+#include <Network/PacketDef/Zone/ServerZoneDef.h>
+#include <Forwards.h>
 #include <sapphire_zone/Forwards.h>
 #include <boost/enable_shared_from_this.hpp>
 #include <set>
 #include <cstdint>
 #include <map>
+#include <chrono>
 
 namespace Core {
 namespace Social {
@@ -73,7 +74,7 @@ protected:
    uint64_t m_ownerId{ 0 };
    uint32_t m_maxCapacity{ 250 };
    uint32_t m_maxRoles{ 50 };
-   time_point m_createTime{ std::chrono::steady_clock::now() };
+   std::chrono::steady_clock::time_point m_createTime{ std::chrono::steady_clock::now() };
    std::map< uint64_t, GroupMember > m_members;
    std::map< uint64_t, GroupMember > m_invites; // <recipient, groupmember (which contains senderId)>
 

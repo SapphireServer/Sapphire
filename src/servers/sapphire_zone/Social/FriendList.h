@@ -1,9 +1,9 @@
 #ifndef _FRIENDLIST_H
 #define _FRIENDLIST_H
 
-#include <common/Common.h>
-#include <common/Network/PacketDef/Zone/ServerZoneDef.h>
-#include <common/Forwards.h>
+#include <Common.h>
+#include <Network/PacketDef/Zone/ServerZoneDef.h>
+#include <Forwards.h>
 #include <sapphire_zone/Forwards.h>
 #include <boost/enable_shared_from_this.hpp>
 #include <set>

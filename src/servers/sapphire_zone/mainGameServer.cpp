@@ -12,6 +12,8 @@
 #include "Linkshell/LinkshellMgr.h"
 #include "Zone/TerritoryMgr.h"
 #include "DebugCommand/DebugCommandHandler.h"
+#include "Social/Manager/SocialMgr.h"
+#include "Social/FriendList.h"
 
 Core::Framework g_fw;
 
@@ -29,6 +31,8 @@ bool setupFramework()
    auto pTeriMgr = boost::make_shared< TerritoryMgr >();
    auto pDebugCom = boost::make_shared< DebugCommandHandler >();
 
+   auto pFriendsListMgr = boost::make_shared< Social::SocialMgr< Social::FriendList > >();
+
    pLogger->setLogPath( "log/SapphireZone_" );
    pLogger->init();
 
@@ -41,6 +45,8 @@ bool setupFramework()
    g_fw.set< LinkshellMgr >( pLsMgr );
    g_fw.set< TerritoryMgr >( pTeriMgr );
    g_fw.set< DebugCommandHandler >( pDebugCom );
+
+   g_fw.set< Social::SocialMgr< Social::FriendList > >( pFriendsListMgr );
 
    // actuall catch errors here...
    return true;

@@ -1,6 +1,8 @@
 #ifndef _SOCIALMGR_H
 #define _SOCIALMGR_H
 
+#include <Common.h>
+
 #include <map>
 #include <cstdint>
 

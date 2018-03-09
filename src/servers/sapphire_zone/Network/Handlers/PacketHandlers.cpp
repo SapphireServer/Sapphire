@@ -41,6 +41,7 @@
 #include "Action/Action.h"
 #include "Action/ActionTeleport.h"
 #include "Social/Manager/SocialMgr.h"
+#include "Social/FriendList.h"
 
 #include "Session.h"
 #include "ServerZone.h"
@@ -485,7 +486,7 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
 
       uint16_t i = 0;
 
-      auto playerFriendsList = g_framework.getFriendsListMgr().findGroupById( player.getFriendsListId() );
+      auto playerFriendsList = g_fw.get< Social::SocialMgr< Social::FriendList > >()->findGroupById( player.getFriendsListId() );
 
       // todo: move this garbage else fucking where
       for ( auto member : playerFriendsList.getMembers() )
@@ -494,7 +495,7 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
          if ( i == 10 )
             break;
 
-         g_framework.getLogger().debug( "aaa" + std::to_string( i ) + ": " + member.second.name );
+         g_fw.get< Logger >()->debug( "aaa" + std::to_string( i ) + ": " + member.second.name );
          listPacket.data().entries[i] = Core::Social::Group::generatePlayerEntry( member.second );
          i++;
       }
@@ -545,15 +546,15 @@ void Core::Network::GameConnection::socialReqResponseHandler( const Packets::Gam
       return;
    }*/
 
-   g_framework.getLogger().debug( std::to_string( static_cast<uint8_t>( action ) ) );
+   g_fw.get< Logger >()->debug( std::to_string( static_cast<uint8_t>( action ) ) );
 
-   auto pSession = g_framework.getServerZone().getSession( targetId );
+   auto pSession = g_fw.get< ServerZone >()->getSession( targetId );
 
    // todo: notify both inviter/invitee with 0x00CB packet
 
    if( pSession )
    {
-      g_framework.getLogger().debug( std::to_string(static_cast<uint8_t>(action)) );
+      g_fw.get< Logger >()->debug( std::to_string(static_cast<uint8_t>(action)) );
    }
    response.data().response = Common::SocialRequestResponse::Accept;
    memcpy( &( response.data().name ), name.c_str(), 32 );
@@ -567,7 +568,7 @@ void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePac
    auto category = inPacket.getValAt< Common::SocialCategory >( 0x20 );
    auto name = std::string( inPacket.getStringAt( 0x21 ) );
 
-   auto pSession = g_framework.getServerZone().getSession( name );
+   auto pSession = g_fw.get< ServerZone >()->getSession( name );
 
    // only the requester needs the response
    ZoneChannelPacket< FFXIVIpcSocialRequestError > response( player.getId() );
@@ -697,7 +698,7 @@ void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePac
          pRecipient->queuePacket( packet );
          pRecipient->sendDebug( "ding ding" );
 
-         auto recipientFriendsList = g_framework.getFriendsListMgr().findGroupById( pRecipient->getFriendsListId() );
+         auto recipientFriendsList = g_fw.get< Social::SocialMgr< Social::FriendList > >()->findGroupById( pRecipient->getFriendsListId() );
 
          auto senderResultPacket = recipientFriendsList.inviteMember( player.getAsPlayer(), pRecipient, player.getId(), pRecipient->getId() );
 
@@ -705,7 +706,7 @@ void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePac
 
          if ( recipientFriendsList.isFriendList() )
          {
-            g_framework.getLogger().debug( "he HAA HAAA" );
+            g_fw.get< Logger >()->debug( "he HAA HAAA" );
          }
 
          response.data().messageId = typeMessage[category];
@@ -714,7 +715,7 @@ void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePac
 
    player.queuePacket( response );
    // todo: handle party, friend request
-   g_framework.getLogger().debug("sent to " + name);
+   g_fw.get< Logger >()->debug( "sent to " + name );
 }
 
 void Core::Network::GameConnection::chatHandler( const Packets::GamePacket& inPacket,

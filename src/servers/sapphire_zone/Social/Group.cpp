@@ -1,23 +1,25 @@
 #include <cassert>
 #include <boost/shared_ptr.hpp>
-#include <common/Logging/Logger.h>
+#include <Logging/Logger.h>
 
 #include <sapphire_zone/Session.h>
-#include <common/Network/PacketDef/Ipcs.h>
-#include <common/Network/PacketDef/Zone/ServerZoneDef.h>
+#include <Network/PacketDef/Ipcs.h>
+#include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <sapphire_zone/Actor/Actor.h>
 #include <sapphire_zone/Actor/Player.h>
 #include <sapphire_zone/ServerZone.h>
 #include <sapphire_zone/Zone/Zone.h>
-#include <common/Network/GamePacketNew.h>
-#include "Group.h"
+#include <Network/GamePacketNew.h>
 
-extern Core::ServerZone g_serverZone;
-extern Core::Logger g_log;
+#include "Group.h"
+#include "Framework.h"
+#include "Forwards.h"
+
+extern Core::Framework g_fw;
 
 using namespace Core::Social;
+using namespace Core::Network;
 
-// todo: i fuckin have no fuckin clue how to use group manager classes, why not just have a map of <id, group>?
 // todo: invite map in g_serverZone.getGroupMgr(GroupType) and look up
 
 Core::Network::Packets::GamePacketPtr Group::addMember( Core::Entity::PlayerPtr pSender, Core::Entity::PlayerPtr pRecipient, uint64_t senderId, uint64_t recipientId )
@@ -66,11 +68,12 @@ Core::Network::Packets::GamePacketPtr Group::addMember( Core::Entity::PlayerPtr 
    return packet;
 }
 
-Core::Network::Packets::GamePacketPtr Group::inviteMember( Core::Entity::PlayerPtr pSender, Core::Entity::PlayerPtr pRecipient, uint64_t senderId, uint64_t recipientId )
+Packets::GamePacketPtr Group::inviteMember( Core::Entity::PlayerPtr pSender, Core::Entity::PlayerPtr pRecipient, uint64_t senderId, uint64_t recipientId )
 {
    assert( pSender != nullptr || senderId != 0 );
 
-   auto packet = GamePacketNew< Server::FFXIVIpcSocialRequestResponse, ServerZoneIpcType >( recipientId, senderId );
+
+   auto packet = Packets::GamePacketNew< Packets::Server::FFXIVIpcSocialRequestResponse, Packets::ServerZoneIpcType >( recipientId, senderId );
    packet.data().contentId = recipientId;
    packet.data().category = Common::SocialCategory::Friends;
 
@@ -93,7 +96,7 @@ Core::Network::Packets::GamePacketPtr Group::removeMember( Core::Entity::PlayerP
 {
    assert( pSender != nullptr || senderId != 0 );
 
-   auto packet = GamePacketNew< Server::FFXIVIpcSocialRequestResponse, ServerZoneIpcType >( recipientId, senderId );
+   auto packet = Packets::GamePacketNew< Packets::Server::FFXIVIpcSocialRequestResponse, Packets::ServerZoneIpcType >( recipientId, senderId );
    packet.data().contentId = recipientId;
    packet.data().category = Common::SocialCategory::Friends;
 
@@ -105,7 +108,7 @@ void Group::sendPacketToMembers( Core::Network::Packets::GamePacketPtr pPacket, 
    assert( pPacket );
    for( const auto& member : m_members )
    {
-      auto pSession = g_serverZone.getSession( member.second.name );
+      auto pSession = g_fw.get< ServerZone >()->getSession( member.second.name );
       if( pSession )
       {
          pSession->getPlayer()->queuePacket( pPacket );
@@ -123,7 +126,7 @@ Core::Network::Packets::Server::PlayerEntry Group::generatePlayerEntry( GroupMem
    // We check if player is online. If so, we can pull more data - otherwise just name
    // todo: set as offline in one of the unknown values, if session does not exist
 
-   auto pSession = g_serverZone.getSession( groupMember.name ); // todo: aa i don't like this. maybe just store their ID instead of contentID???
+   auto pSession = g_fw.get< ServerZone >()->getSession( groupMember.name ); // todo: aa i don't like this. maybe just store their ID instead of contentID???
 
    entry.timestamp = 1512799339;
    entry.status = 2;
@@ -148,15 +151,15 @@ Core::Network::Packets::Server::PlayerEntry Group::generatePlayerEntry( GroupMem
       entry.knownLanguages = 0x0F;
       entry.onlineStatusMask = pPlayer->getOnlineStatusMask();
 
-      g_log.debug( std::to_string( pPlayer->getContentId() ) );
+      g_fw.get< Logger >()->debug( std::to_string( pPlayer->getContentId() ) );
    }
 
    // TODO: no idea what this does - me neither
    //listPacket.data().entries[0].one = 1;
 
-   g_log.debug( std::to_string(groupMember.contentId) );
+   g_fw.get< Logger >()->debug( std::to_string(groupMember.contentId) );
 
-   g_log.debug( std::to_string( entry.contentId ) );
+   g_fw.get< Logger >()->debug( std::to_string( entry.contentId ) );
    
    return entry;
 }
