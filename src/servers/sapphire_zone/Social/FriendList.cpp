@@ -14,9 +14,6 @@
 #include "Group.h"
 #include "FriendList.h"
 
-extern Core::ServerZone g_serverZone;
-extern Core::Logger g_log;
-
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 

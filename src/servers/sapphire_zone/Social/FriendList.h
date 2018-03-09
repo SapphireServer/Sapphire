@@ -12,9 +12,6 @@
 #include "Group.h"
 
 
-using namespace Core::Network::Packets;
-using namespace Core::Network::Packets::Server;
-
 namespace Core {
 namespace Social {
 
@@ -26,7 +23,7 @@ public:
       Group( id, ownerId ),
       m_id( id ), m_ownerId( ownerId ) {};
 
-   std::vector< Core::Network::Packets::Server::PlayerEntry > getFriendListEntries( uint16_t entryAmount );
+   std::vector< Network::Packets::Server::PlayerEntry > getFriendListEntries( uint16_t entryAmount );
 
 protected:
    uint64_t m_id{ 0 };

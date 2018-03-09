@@ -14,9 +14,6 @@
 namespace Core {
 namespace Social {
 
-class Group;
-using GroupPtr = boost::shared_ptr< Group >;
-
 struct GroupMember
 {
    uint64_t inviterId;
@@ -37,7 +34,7 @@ enum class GroupType : uint8_t
    ContentGroup
 };
 
-class Group : public boost::enable_shared_from_this< Group >
+class Group
 {
 public:
    Group( uint64_t id, uint64_t ownerId ) :
@@ -88,5 +85,8 @@ private:
 };
 
 }
+
+using GroupPtr = boost::shared_ptr< Social::Group >;
+
 };
 #endif // ! _GROUP_H

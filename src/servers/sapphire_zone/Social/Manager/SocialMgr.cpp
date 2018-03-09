@@ -1,19 +1,25 @@
-#include "../Group.h"
 #include "SocialMgr.h"
+#include "Social/Group.h"
 
+#include <Common.h>
+#include <boost/make_shared.hpp>
 #include "Forwards.h"
 
 
 template< class T >
 Core::Social::SocialMgr< T >::SocialMgr()
+      : m_groupCount( 0 ),
+        m_lastGroupId( 0 ),
+        m_groups{}
 {
-
 }
+
 template< class T >
 Core::Social::SocialMgr< T >::~SocialMgr()
 {
-
+   
 }
+
 
 template< class T >
 T Core::Social::SocialMgr< T >::findGroupByInviteIdForPlayer( uint64_t playerId ) const

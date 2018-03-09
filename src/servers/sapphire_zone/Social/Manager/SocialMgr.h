@@ -21,7 +21,7 @@ class SocialMgr
 public:
 
    SocialMgr();
-   virtual ~SocialMgr();
+   ~SocialMgr();
 
    T findGroupByInviteIdForPlayer( uint64_t playerId ) const;
    T findGroupById( uint64_t groupId ) const;
@@ -44,10 +44,10 @@ protected:
 //   GroupType m_type{ GroupType::None };
 //   uint32_t m_maxEntries{ 0xFFFFFFFF };
 
-   uint64_t m_groupCount{ 0 };   
+   uint64_t m_groupCount;   
    std::map< uint64_t, uint64_t > m_invites;
 
-   uint64_t m_lastGroupId{ 0 };
+   uint64_t m_lastGroupId;
 
    // < recipient, groupid >
    //virtual GroupPtr createGroup( PlayerPtr pOwner ) = 0;
@@ -64,10 +64,11 @@ protected:
    friend virtual void disband();
    */
 
-   virtual uint64_t generateGroupId();
+   uint64_t generateGroupId();
+   std::map< uint64_t, T > m_groups;
 
 private:
-   std::map< uint64_t, T > m_groups;
+   
 
 };
 
