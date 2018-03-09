@@ -27,6 +27,7 @@ namespace Core
       template< typename T >
       void set( boost::shared_ptr< T > value )
       {
+         assert( value ); // why would anyone store nullptrs....
          ObjectMap[typeid( T )] = value;
       }
    };
