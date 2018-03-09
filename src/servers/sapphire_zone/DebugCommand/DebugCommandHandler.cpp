@@ -792,4 +792,35 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
 
       player.getCurrentZone()->setCurrentFestival( 0 );
    }
+   else if ( subCommand == "qte_start" )
+   {
+      auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+      if ( !instance )
+         return;
+
+      player.sendDebug( "qte start" );
+      instance->startQte();
+   }
+   else if ( subCommand == "event_start" )
+   {
+      auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+      if ( !instance )
+         return;
+
+      player.sendDebug( "evt start" );
+      instance->startEventCutscene();
+   }
+   else if ( subCommand == "event_end" )
+   {
+      auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+      if ( !instance )
+         return;
+
+      player.sendDebug( "evt end" );
+      instance->endEventCutscene();
+   }
+   else
+   {
+      player.sendDebug( "Unknown sub command." );
+   }
 }
