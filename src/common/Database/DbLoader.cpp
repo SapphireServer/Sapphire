@@ -3,8 +3,9 @@
 #include "CharaDbConnection.h"
 #include "DbWorkerPool.h"
 #include "Logging/Logger.h"
+#include "Framework.h"
 
-extern Core::Logger g_log;
+extern Core::Framework g_fw;
 
 Core::Db::DbLoader::DbLoader()
 {
@@ -16,12 +17,14 @@ Core::Db::DbLoader& Core::Db::DbLoader::addDb( Core::Db::DbWorkerPool< T >& pool
 
    m_open.push([this, info, &pool]() -> bool
               {
+                
+                 auto pLog = g_fw.get< Logger >();
                  const uint8_t asyncThreads = info.asyncThreads;
                  const uint8_t synchThreads = info.syncThreads;
 
                  if( asyncThreads < 1 || asyncThreads > 32 )
                  {
-                    g_log.error( "database: invalid number of worker threads specified. Please pick a value between 1 and 32." );
+                    pLog->error( "database: invalid number of worker threads specified. Please pick a value between 1 and 32." );
                     return false;
                  }
 
@@ -36,7 +39,7 @@ Core::Db::DbLoader& Core::Db::DbLoader::addDb( Core::Db::DbWorkerPool< T >& pool
 
                     if( error )
                     {
-                       g_log.error( "DatabasePool failed to open." );
+                       pLog->error( "DatabasePool failed to open." );
                        return false;
                     }
                  }
@@ -50,7 +53,8 @@ Core::Db::DbLoader& Core::Db::DbLoader::addDb( Core::Db::DbWorkerPool< T >& pool
                  {
                     if( !pool.prepareStatements() )
                     {
-                       g_log.error( "Could not prepare statements of the database, see log for details." );
+                       auto pLog = g_fw.get< Logger >();
+                       pLog->error( "Could not prepare statements of the database, see log for details." );
                        return false;
                     }
                     return true;
@@ -104,5 +108,5 @@ bool Core::Db::DbLoader::process( std::queue< Predicate >& queue )
 template
 Core::Db::DbLoader&
    Core::Db::DbLoader::addDb< Core::Db::CharaDbConnection >( Core::Db::DbWorkerPool< Core::Db::CharaDbConnection >&,
-                                                                          const ConnectionInfo& );
+                                                             const ConnectionInfo& );
 

@@ -6,9 +6,11 @@
 #include "Operation.h"
 #include "CharaDbConnection.h"
 #include <boost/make_shared.hpp>
+#include "Framework.h"
 
 #include "Logging/Logger.h"
-extern Core::Logger g_log;
+
+extern Core::Framework g_fw;
 
 class PingOperation : public Core::Db::Operation
 {
@@ -46,7 +48,8 @@ void Core::Db::DbWorkerPool< T >::setConnectionInfo( const ConnectionInfo& info,
 template< class T >
 uint32_t Core::Db::DbWorkerPool< T >::open()
 {
-   g_log.info( "[DbPool] Opening DatabasePool " + getDatabaseName() +
+   auto pLog = g_fw.get< Logger >();
+   pLog->info( "[DbPool] Opening DatabasePool " + getDatabaseName() +
                " Asynchronous connections: " + std::to_string( m_asyncThreads ) +
                " Synchronous connections: " + std::to_string( m_synchThreads ) );
 
@@ -59,7 +62,7 @@ uint32_t Core::Db::DbWorkerPool< T >::open()
 
    if( !error )
    {
-      g_log.info( "[DbPool] DatabasePool " + getDatabaseName() + " opened successfully. " +
+      pLog->info( "[DbPool] DatabasePool " + getDatabaseName() + " opened successfully. " +
                   std::to_string( ( m_connections[IDX_SYNCH].size() + m_connections[IDX_ASYNC].size() ) ) +
                   " total connections running." );
    }
@@ -70,10 +73,11 @@ uint32_t Core::Db::DbWorkerPool< T >::open()
 template< class T >
 void Core::Db::DbWorkerPool< T >::close()
 {
-   g_log.info("[DbPool] Closing down DatabasePool " + getDatabaseName() );
+   auto pLog = g_fw.get< Logger >();
+   pLog->info("[DbPool] Closing down DatabasePool " + getDatabaseName() );
    m_connections[IDX_ASYNC].clear();
    m_connections[IDX_SYNCH].clear();
-   g_log.info("[DbPool] All connections on DatabasePool " + getDatabaseName() + "closed." );
+   pLog->info("[DbPool] All connections on DatabasePool " + getDatabaseName() + "closed." );
 }
 
 template< class T >
