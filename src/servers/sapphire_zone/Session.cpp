@@ -12,7 +12,7 @@
 #include "Framework.h"
 
 
-extern Core::Framework g_framework;
+extern Core::Framework g_fw;
 
 Core::Session::Session( uint32_t sessionId ) :
    m_sessionId( sessionId ),
@@ -112,6 +112,7 @@ void Core::Session::updateLastSqlTime()
 
 void Core::Session::startReplay( const std::string& path )
 {
+   auto pLog = g_fw.get< Logger >();
    if( !boost::filesystem::exists( path ) )
    {
       getPlayer()->sendDebug( "Couldn't find folder." );
@@ -148,7 +149,7 @@ void Core::Session::startReplay( const std::string& path )
       m_replayCache.push_back( std::tuple< uint64_t, std::string >(
          Util::getTimeMs() + ( std::get< 0 >( set ) - startTime ), std::get< 1 >( set ) ) );
 
-      g_framework.getLogger().info( "Registering " + std::get< 1 >( set ) + " for " + std::to_string( std::get< 0 >( set ) - startTime ) );
+      pLog->info( "Registering " + std::get< 1 >( set ) + " for " + std::to_string( std::get< 0 >( set ) - startTime ) );
    }
 
    getPlayer()->sendDebug( "Registered " + std::to_string( m_replayCache.size() ) + " sets for replay" );

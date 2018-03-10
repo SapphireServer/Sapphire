@@ -81,19 +81,64 @@ struct FFXIVIpcPlayTime : FFXIVIpcBasePacket<Playtime>
 */
 struct PlayerEntry {
    uint64_t contentId;
-   uint8_t bytes[12];
+   uint32_t timestamp;
+   uint8_t bytes[4];
+   uint8_t status;      // bitmask. friend: if it's a request, if added, recipient/sender
+   uint8_t unknown;     // maybe bitmask? a value of 4 sets it to linkshell request
+   uint8_t entryIcon;   // observed in friend group icon, sideffects for displaying text
+   uint8_t unavailable; // bool
    uint16_t zoneId;
-   uint16_t zoneId1;
-   char bytes1[8];
+   uint8_t grandCompany;
+   uint8_t clientLanguage;
+   uint8_t knownLanguages; // bitmask, J 0x01, E 0x02, D 0x04, F 0x08
+   uint8_t searchComment; // bool
+   char bytes1[6];
    uint64_t onlineStatusMask;
-   uint8_t classJob;
+   Common::ClassJob classJob;
    uint8_t padding;
-   uint8_t level;
-   uint8_t padding1;
+   uint16_t level;
    uint16_t padding2;
    uint8_t one;
    char name[0x20];
-   char fcTag[9];
+   char fcTag[5];
+};
+
+struct FFXIVIpcSocialRequestReceive : FFXIVIpcBasePacket<SocialRequestReceive>
+{
+   uint32_t actorId;                    // actor id of player which initiated request
+   uint16_t unknown;
+   uint16_t unknown2;
+   uint32_t timestamp;                  // must be greater than current time
+   uint8_t unknown3;
+   uint8_t unknown4;                   // Very likely cross-world related
+   Common::SocialCategory category;     // 1 - party invite, 2 - friends request, 3 - ??, 4 - fc signature request, 5 - fc invite,
+   uint8_t unknown5;
+   Common::SocialRequestAction action;  // 0 - ??, 1 - received, 2 - canceled, 4 - friend accept/fc sign/fc join, 5 - refuse fc petition/decline invite         
+   uint8_t unknown6;
+   char name[0x20];
+   uint16_t unknown7;
+   uint16_t unknown8;
+   uint16_t unknown9;
+};
+
+struct FFXIVIpcSocialRequestError : FFXIVIpcBasePacket<SocialRequestError>
+{
+   uint32_t messageId;              // if 0 then type's message is used (type must 2/4/5 or it wont print)
+   Common::SocialCategory category; // 2 - friend request, 4 - fc petition, 5 - fc invitation, anything else and wont print
+   uint8_t unknown;                 // possibly padding
+   char    name[0x20];
+   uint8_t unknown3[2];             // probably padding
+
+};
+
+struct FFXIVIpcSocialRequestResponse : FFXIVIpcBasePacket<SocialRequestResponse>
+{
+   uint64_t contentId;
+   uint32_t unknown;
+   Common::SocialCategory category; // Common::SocialCategory
+   Common::SocialRequestResponse response; // Common::SocialRequestResponse
+   char name[0x20];
+   uint16_t padding;
 };
 
 struct FFXIVIpcSocialList : FFXIVIpcBasePacket<SocialList>

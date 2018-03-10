@@ -378,6 +378,11 @@ public:
    void calculateStats() override;
    void sendStats();
 
+   // Social-based
+   //////////////////////////////////////////////////////////////////////////////////////////////////////
+
+   uint64_t getFriendsListId() const;
+
 
    // Aetheryte / Action / Attribute bitmasks
    //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -658,6 +663,10 @@ private:
    uint8_t m_stateFlags[12];
    uint8_t m_gmRank;
    uint16_t zoneId;
+
+   // Social-based
+
+   uint64_t m_friendsListId;
 
    uint8_t m_equipDisplayFlags;
 

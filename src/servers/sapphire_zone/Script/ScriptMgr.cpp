@@ -30,7 +30,7 @@
 // enable the ambiguity fix for every platform to avoid #define nonsense
 #define WIN_AMBIGUITY_FIX
 
-extern Core::Framework g_framework;
+extern Core::Framework g_fw;
 
 Core::Scripting::ScriptMgr::ScriptMgr() :
    m_firstScriptChangeNotificiation( false )
@@ -51,8 +51,10 @@ void Core::Scripting::ScriptMgr::update()
 bool Core::Scripting::ScriptMgr::init()
 {
    std::set< std::string > files;
+   auto pConfig = g_fw.get< XMLConfig >();
+   auto pLog = g_fw.get< Logger >();
 
-   loadDir( g_framework.getServerZone().getConfig()->getValue< std::string >( "Settings.General.Scripts.Path", "./compiledscripts/" ),
+   loadDir( pConfig->getValue< std::string >( "Settings.General.Scripts.Path", "./compiledscripts/" ),
             files, m_nativeScriptMgr->getModuleExtension() );
 
    uint32_t scriptsFound = 0;
@@ -68,7 +70,7 @@ bool Core::Scripting::ScriptMgr::init()
          scriptsLoaded++;
    }
 
-   g_framework.getLogger().info( "ScriptMgr: Loaded " + std::to_string( scriptsLoaded ) + "/" + std::to_string( scriptsFound ) + " scripts successfully" );
+   pLog->info( "ScriptMgr: Loaded " + std::to_string( scriptsLoaded ) + "/" + std::to_string( scriptsFound ) + " scripts successfully" );
 
    watchDirectories();
 
@@ -77,11 +79,12 @@ bool Core::Scripting::ScriptMgr::init()
 
 void Core::Scripting::ScriptMgr::watchDirectories()
 {
-   auto shouldWatch = g_framework.getServerZone().getConfig()->getValue< bool >( "Settings.General.Scripts.HotSwap.Enabled", true );
+   auto pConfig = g_fw.get< XMLConfig >();
+   auto shouldWatch = pConfig->getValue< bool >( "Settings.General.Scripts.HotSwap.Enabled", true );
    if( !shouldWatch )
       return;
 
-   Watchdog::watchMany( g_framework.getServerZone().getConfig()->getValue< std::string >( "Settings.General.Scripts.Path", "./compiledscripts/" ) + "*" + m_nativeScriptMgr->getModuleExtension(),
+   Watchdog::watchMany( pConfig->getValue< std::string >( "Settings.General.Scripts.Path", "./compiledscripts/" ) + "*" + m_nativeScriptMgr->getModuleExtension(),
    [ this ]( const std::vector< ci::fs::path >& paths )
    {
       if( !m_firstScriptChangeNotificiation )
@@ -91,18 +94,19 @@ void Core::Scripting::ScriptMgr::watchDirectories()
          m_firstScriptChangeNotificiation = true;
          return;
       }
+      auto pLog = g_fw.get< Logger >();
 
       for( auto path : paths )
       {
          if( m_nativeScriptMgr->isModuleLoaded( path.stem().string() ) )
          {
-            g_framework.getLogger().debug( "Reloading changed script: " + path.stem().string() );
+            pLog->debug( "Reloading changed script: " + path.stem().string() );
 
             m_nativeScriptMgr->queueScriptReload( path.stem( ).string( ));
          }
          else
          {
-            g_framework.getLogger().debug( "Loading new script: " + path.stem().string() );
+            pLog->debug( "Loading new script: " + path.stem().string() );
 
             m_nativeScriptMgr->loadScript( path.string() );
          }
@@ -113,7 +117,8 @@ void Core::Scripting::ScriptMgr::watchDirectories()
 void Core::Scripting::ScriptMgr::loadDir( const std::string& dirname, std::set<std::string> &files, const std::string& ext )
 {
 
-   g_framework.getLogger().info( "ScriptEngine: loading scripts from " + dirname );
+   auto pLog = g_fw.get< Logger >();
+   pLog->info( "ScriptEngine: loading scripts from " + dirname );
 
    boost::filesystem::path targetDir( dirname );
 
@@ -145,13 +150,14 @@ void Core::Scripting::ScriptMgr::onPlayerFirstEnterWorld( Entity::Player& player
 bool Core::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t actorId, uint32_t eventId )
 {
 
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
    uint16_t eventType = eventId >> 16;
    uint32_t scriptId = eventId;
 
    // aethernet/aetherytes need to be handled separately
    if( eventType == Event::EventHandler::EventHandlerType::Aetheryte )
    {
-      auto aetherInfo = g_framework.getExdDataGen().get< Core::Data::Aetheryte >( eventId & 0xFFFF );
+      auto aetherInfo = pExdData->get< Core::Data::Aetheryte >( eventId & 0xFFFF );
       scriptId = EVENTSCRIPT_AETHERYTE_ID;
       if( !aetherInfo->isAetheryte )
          scriptId = EVENTSCRIPT_AETHERNET_ID;

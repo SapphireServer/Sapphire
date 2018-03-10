@@ -21,7 +21,7 @@
 #include "Framework.h"
 #include "Forwards.h"
 
-extern Core::Framework g_framework;
+extern Core::Framework g_fw;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -54,6 +54,7 @@ Core::Network::GameConnection::GameConnection( Core::Network::HivePtr pHive,
    setZoneHandler( ClientZoneIpcType::PlayTimeHandler,      "PlayTimeHandler",          &GameConnection::playTimeHandler );
    setZoneHandler( ClientZoneIpcType::LogoutHandler,        "LogoutHandler",            &GameConnection::logoutHandler );
 
+   setZoneHandler( ClientZoneIpcType::SocialReqSendHandler, "SocialReqSendHandler",     &GameConnection::socialReqSendHandler );
    setZoneHandler( ClientZoneIpcType::SocialListHandler,    "SocialListHandler",        &GameConnection::socialListHandler );
    setZoneHandler( ClientZoneIpcType::SetSearchInfoHandler, "SetSearchInfoHandler",     &GameConnection::setSearchInfoHandler );
    setZoneHandler( ClientZoneIpcType::ReqSearchInfoHandler, "ReqSearchInfoHandler",     &GameConnection::reqSearchInfoHandler );
@@ -111,34 +112,35 @@ void Core::Network::GameConnection::OnAccept( const std::string & host, uint16_t
 {
    GameConnectionPtr connection( new GameConnection( m_hive, m_pAcceptor ) );
    m_pAcceptor->Accept( connection );
-
-   g_framework.getLogger().info( "Connect from " + m_socket.remote_endpoint().address().to_string() );
+   auto pLog = g_fw.get< Logger >();
+   pLog->info( "Connect from " + m_socket.remote_endpoint().address().to_string() );
 }
 
 
 void Core::Network::GameConnection::OnDisconnect()
 {
-   g_framework.getLogger().debug( "GameConnection DISCONNECT" );
+   auto pLog = g_fw.get< Logger >();
+   pLog->debug( "GameConnection DISCONNECT" );
    m_pSession = nullptr;
 }
 
 void Core::Network::GameConnection::OnRecv( std::vector< uint8_t > & buffer )
 {
    // This is assumed packet always start with valid FFXIVARR_PACKET_HEADER for now.
-
+   auto pLog = g_fw.get< Logger >();
    Packets::FFXIVARR_PACKET_HEADER packetHeader{};
    const auto headerResult = Packets::getHeader( buffer, 0, packetHeader );
 
    if( headerResult == Incomplete )
    {
-      g_framework.getLogger().info( "Dropping connection due to incomplete packet header." );
-      g_framework.getLogger().info( "FIXME: Packet message bounary is not implemented." );
+      pLog->info( "Dropping connection due to incomplete packet header." );
+      pLog->info( "FIXME: Packet message bounary is not implemented." );
       Disconnect();
       return;
    }
    else if( headerResult == Malformed )
    {
-      g_framework.getLogger().info( "Dropping connection due to malformed packet header." );
+      pLog->info( "Dropping connection due to malformed packet header." );
       Disconnect();
       return;
    }
@@ -150,14 +152,14 @@ void Core::Network::GameConnection::OnRecv( std::vector< uint8_t > & buffer )
    
    if( packetResult == Incomplete )
    {
-      g_framework.getLogger().info( "Dropping connection due to incomplete packets." );
-      g_framework.getLogger().info( "FIXME: Packet message bounary is not implemented." );
+      pLog->info( "Dropping connection due to incomplete packets." );
+      pLog->info( "FIXME: Packet message bounary is not implemented." );
       Disconnect();
       return;
    }
    else if( packetResult == Malformed )
    {
-      g_framework.getLogger().info( "Dropping connection due to malformed packets." );
+      pLog->info( "Dropping connection due to malformed packets." );
       Disconnect();
       return;
    }
@@ -168,7 +170,8 @@ void Core::Network::GameConnection::OnRecv( std::vector< uint8_t > & buffer )
 
 void Core::Network::GameConnection::OnError( const boost::system::error_code & error )
 {
-   g_framework.getLogger().debug( "GameConnection ERROR: " + error.message() );
+   auto pLog = g_fw.get< Logger >();
+   pLog->debug( "GameConnection ERROR: " + error.message() );
 }
 
 void Core::Network::GameConnection::queueInPacket( Core::Network::Packets::GamePacketPtr inPacket )
@@ -183,6 +186,7 @@ void Core::Network::GameConnection::queueOutPacket( Core::Network::Packets::Game
 
 void Core::Network::GameConnection::handleZonePacket( const Packets::GamePacket& pPacket )
 {
+   auto pLog = g_fw.get< Logger >();
    auto it = m_zoneHandlerMap.find( pPacket.getSubType() );
 
    std::string sessionStr = "[" + std::to_string( m_pSession->getId() ) + "]";
@@ -195,7 +199,7 @@ void Core::Network::GameConnection::handleZonePacket( const Packets::GamePacket&
       if( pPacket.getSubType() != PingHandler &&
           pPacket.getSubType() != UpdatePositionHandler )
 
-         g_framework.getLogger().debug( sessionStr + " Handling Zone IPC : " + name + "( " +
+         pLog->debug( sessionStr + " Handling Zone IPC : " + name + "( " +
                       boost::str( boost::format( "%|04X|" ) %
                                          static_cast< uint32_t >( pPacket.getSubType() & 0xFFFF ) ) + " )" );
 
@@ -203,16 +207,17 @@ void Core::Network::GameConnection::handleZonePacket( const Packets::GamePacket&
    }
    else
    {
-      g_framework.getLogger().debug( sessionStr + " Undefined Zone IPC : Unknown ( " +
+      pLog->debug( sessionStr + " Undefined Zone IPC : Unknown ( " +
                    boost::str( boost::format( "%|04X|" ) %
                                       static_cast< uint32_t >( pPacket.getSubType() & 0xFFFF ) ) + " )" );
-      g_framework.getLogger().debug( "\n" + pPacket.toString() );
+      pLog->debug( "\n" + pPacket.toString() );
    }
 }
 
 
 void Core::Network::GameConnection::handleChatPacket( const Packets::GamePacket& pPacket )
 {
+   auto pLog = g_fw.get< Logger >();
    auto it = m_chatHandlerMap.find( pPacket.getSubType() );
 
    std::string sessionStr = "[" + std::to_string( m_pSession->getId() ) + "]";
@@ -223,7 +228,7 @@ void Core::Network::GameConnection::handleChatPacket( const Packets::GamePacket&
       std::string name = itStr != m_chatHandlerStrMap.end() ? itStr->second : "unknown";
       // dont display packet notification if it is a ping or pos update, don't want the spam
 
-      g_framework.getLogger().debug( sessionStr + " Handling Chat IPC : " + name + "( " +
+      pLog->debug( sessionStr + " Handling Chat IPC : " + name + "( " +
                    boost::str( boost::format( "%|04X|" ) %
                                       static_cast< uint32_t >( pPacket.getSubType() & 0xFFFF ) ) + " )" );
 
@@ -231,10 +236,10 @@ void Core::Network::GameConnection::handleChatPacket( const Packets::GamePacket&
    }
    else
    {
-      g_framework.getLogger().debug( sessionStr + " Undefined Chat IPC : Unknown ( " +
+      pLog->debug( sessionStr + " Undefined Chat IPC : Unknown ( " +
                   boost::str( boost::format( "%|04X|" ) %
                                      static_cast< uint32_t >( pPacket.getSubType() & 0xFFFF ) ) + " )" );
-      g_framework.getLogger().debug( pPacket.toString() );
+      pLog->debug( pPacket.toString() );
    }
 }
 
@@ -276,7 +281,7 @@ void Core::Network::GameConnection::processInQueue()
 
 void Core::Network::GameConnection::processOutQueue()
 {
-
+   auto pLog = g_fw.get< Logger >();
    if( m_outQueue.size() < 1 )
       return;
 
@@ -290,7 +295,7 @@ void Core::Network::GameConnection::processOutQueue()
    {
       if( pPacket->getSize() == 0 )
       {
-         g_framework.getLogger().debug( "end of packet set" );
+         pLog->debug( "end of packet set" );
          break;
       }
 
@@ -362,6 +367,8 @@ void Core::Network::GameConnection::injectPacket( const std::string& packetpath,
 void Core::Network::GameConnection::handlePackets( const Core::Network::Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
                                                    const std::vector< Core::Network::Packets::FFXIVARR_PACKET_RAW >& packetData )
 {
+   auto pLog = g_fw.get< Logger >();
+   auto pServerZone = g_fw.get< ServerZone >();
    // if a session is set, update the last time it recieved a game packet
    if( m_pSession )
       m_pSession->updateLastDataTime();
@@ -377,23 +384,23 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
          auto pCon = boost::static_pointer_cast< GameConnection, Connection >( shared_from_this() );
 
          // try to retrieve the session for this id
-         auto session = g_framework.getServerZone().getSession( playerId );
+         auto session = pServerZone->getSession( playerId );
 
          if( !session )
          {
-            g_framework.getLogger().info( "[" + std::string( id ) + "] Session not registered, creating" );
+            pLog->info( "[" + std::string( id ) + "] Session not registered, creating" );
             // return;
-            if( !g_framework.getServerZone().createSession( playerId ) )
+            if( !pServerZone->createSession( playerId ) )
             {
                Disconnect();
                return;
             }
-            session = g_framework.getServerZone().getSession( playerId );
+            session = pServerZone->getSession( playerId );
          }
          //TODO: Catch more things in lobby and send real errors
          else if( !session->isValid() || ( session->getPlayer() && session->getPlayer()->getLastPing() != 0 ) )
          {
-            g_framework.getLogger().error( "[" + std::string(id) + "] Session INVALID, disconnecting" );
+            pLog->error( "[" + std::string(id) + "] Session INVALID, disconnecting" );
             Disconnect();
             return;
          }
@@ -414,7 +421,7 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
             pPe = GamePacket( 0x00, 0x38, 0, 0, 0x02 );
             pPe.setValAt< uint32_t >( 0x10, playerId );
             sendSinglePacket( &pPe );
-            g_framework.getLogger().info( "[" + std::string( id ) + "] Setting session for zone connection" );
+            pLog->info( "[" + std::string( id ) + "] Setting session for zone connection" );
             session->setZoneConnection( pCon );
          }
          // chat connection, assinging it to the session
@@ -424,7 +431,7 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
             pPe.setValAt< uint32_t >( 0x10, playerId );
             sendSinglePacket( &pPe );
 
-            g_framework.getLogger().info( "[" + std::string( id ) + "] Setting session for chat connection" );
+            pLog->info( "[" + std::string( id ) + "] Setting session for chat connection" );
             session->setChatConnection( pCon );
             pPe = GamePacket( 0x02, 0x28, playerId, playerId, 0x03 );
             sendSinglePacket( &pPe );

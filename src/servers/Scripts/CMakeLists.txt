@@ -3,8 +3,6 @@ project(Sapphire_Script)
 
 file(GLOB SCRIPT_INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 
-include_directories("${CMAKE_SOURCE_DIR}/src/servers/")
-
 message("exec: ${EXECUTABLE_OUTPUT_DIRECTORY}")
 
 set(SCRIPT_LIB_DIR "${EXECUTABLE_OUTPUT_DIRECTORY}/compiledscripts/" )
@@ -38,14 +36,11 @@ foreach(_scriptDir ${children})
         endforeach()
 
         add_library("script_${_name}" MODULE ${SCRIPT_BUILD_FILES} "${SCRIPT_INCLUDE_FILES}" "${_scriptDir}/ScriptLoader.cpp")
-        target_link_libraries("script_${_name}" sapphire_zone)
+        target_link_libraries( "script_${_name}" sapphire_zone )
 
         if(MSVC)
-            target_link_libraries("script_${_name}" ${Boost_LIBRARIES})
-        endif()
-
-        if(MSVC)
-            set_target_properties("script_${_name}" PROPERTIES
+            target_link_libraries( "script_${_name}" ${Boost_LIBRARIES})
+            set_target_properties( "script_${_name}" PROPERTIES
                 CXX_STANDARD 14
                 CXX_STANDARD_REQUIRED ON
                 CXX_EXTENSIONS ON
@@ -56,10 +51,7 @@ foreach(_scriptDir ${children})
             )
         endif()
         target_include_directories("script_${_name}" PUBLIC "${CMAKE_SOURCE_DIR}/src/servers/sapphire_zone/")
-        target_include_directories("script_${_name}" PUBLIC "${CMAKE_SOURCE_DIR}/src/servers/sapphire_zone/Script")
-        target_include_directories("script_${_name}" PUBLIC "${CMAKE_SOURCE_DIR}/src/servers/sapphire_zone/Script/Scripts")
-        target_include_directories("script_${_name}" PUBLIC "${CMAKE_SOURCE_DIR}/src/")
-        target_include_directories("script_${_name}" PUBLIC "${CMAKE_SOURCE_DIR}/src/common")
+        target_include_directories("script_${_name}" PUBLIC "${CMAKE_SOURCE_DIR}/src/servers/Script/Scripts")
         target_include_directories("script_${_name}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
         target_include_directories("script_${_name}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/Scripts")
 

@@ -30,7 +30,7 @@
 #include "Forwards.h"
 #include "Framework.h"
 
-extern Core::Framework g_framework;
+extern Core::Framework g_fw;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -47,6 +47,9 @@ void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inP
     uint64_t targetId = inPacket.getValAt< uint64_t >( 0x30 );
 
     player.sendDebug( "Skill type:" + std::to_string( type ) );
+  
+    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+    auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
 
     switch( type )
     {
@@ -57,7 +60,7 @@ void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inP
         std::string actionIdStr = boost::str( boost::format( "%|04X|" ) % action );
         player.sendDebug( "---------------------------------------" );
         player.sendDebug( "ActionHandler ( " + actionIdStr + " | " +
-                          g_framework.getExdDataGen().get< Core::Data::Action >( action )->name +
+                          pExdData->get< Core::Data::Action >( action )->name +
                           " | " + std::to_string( targetId ) + " )" );
 
         player.queuePacket( ActorControlPacket142( player.getId(), ActorControlType::ActionStart, 0x01, action ) );
@@ -80,7 +83,7 @@ void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inP
 
             if( !player.actionHasCastTime( action ) )
             {
-                g_framework.getScriptMgr().onCastFinish( player, targetActor->getAsChara(), action );
+                pScriptMgr->onCastFinish( player, targetActor->getAsChara(), action );
             }
             else
             {
@@ -97,11 +100,10 @@ void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inP
     }
     else if( action < 3000000 ) // item action
     {
-        auto info = g_framework.getExdDataGen().get< Core::Data::EventItem >( action );
+        auto info = pExdData->get< Core::Data::EventItem >( action );
         if( info )
         {
-            g_framework.getLogger().debug( info->name );
-            g_framework.getScriptMgr().onEventItem( player, action, info->quest, info->castTime, targetId );
+            pScriptMgr->onEventItem( player, action, info->quest, info->castTime, targetId );
         }
     }
     else if( action > 3000000 ) // unknown

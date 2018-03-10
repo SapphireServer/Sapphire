@@ -1,7 +1,7 @@
 #ifndef _CORE_NETWORK_PACKETS_IPCS_H
 #define _CORE_NETWORK_PACKETS_IPCS_H
 
-#include<stdint.h>
+#include <stdint.h>
 
 namespace Core {
 namespace Network {
@@ -72,9 +72,10 @@ namespace Packets {
 
       Playtime                   = 0x00DF, // updated 4.2
       CFRegistered               = 0x00B8, // updated 4.1
-      SocialRequestResponse      = 0x00BB, // updated 4.1
       CancelAllianceForming      = 0x00C6, // updated 4.2
       Chat                       = 0x00E1, // updated 4.2
+      SocialRequestResponse      = 0x00E5, // updated 4.1
+      SocialRequestReceive       = 0x00E6, // updated 4.2
       SocialList                 = 0x00E7, // updated 4.2
 
       UpdateSearchInfo           = 0x00EA, // updated 4.2

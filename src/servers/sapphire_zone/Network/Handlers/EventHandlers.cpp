@@ -28,7 +28,7 @@
 #include "Forwards.h"
 #include "Framework.h"
 
-extern Core::Framework g_framework;
+extern Core::Framework g_fw;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -36,6 +36,8 @@ using namespace Core::Network::Packets::Server;
 
 void Core::Network::GameConnection::eventHandlerTalk( const Packets::GamePacket& inPacket, Entity::Player& player )
 {
+   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
    auto actorId = inPacket.getValAt< uint64_t >( 0x20 );
    auto eventId = inPacket.getValAt< uint32_t >( 0x28 );
    auto eventType = static_cast< uint16_t >( eventId >> 16 );
@@ -60,10 +62,10 @@ void Core::Network::GameConnection::eventHandlerTalk( const Packets::GamePacket&
    {
       instance->onTalk( player, eventId, actorId );
    }
-   else if( !g_framework.getScriptMgr().onTalk( player, actorId, eventId ) &&
+   else if( !pScriptMgr->onTalk( player, actorId, eventId ) &&
             eventType == Event::EventHandler::EventHandlerType::Quest )
    {
-      auto questInfo = g_framework.getExdDataGen().get< Core::Data::Quest >( eventId );
+      auto questInfo = pExdData->get< Core::Data::Quest >( eventId );
       if( questInfo )
          player.sendUrgent( "Quest not implemented: " + questInfo->name + " (" + questInfo->id + ")" );
    }
@@ -75,6 +77,8 @@ void Core::Network::GameConnection::eventHandlerTalk( const Packets::GamePacket&
 void Core::Network::GameConnection::eventHandlerEmote( const Packets::GamePacket& inPacket, Entity::Player& player )
 {
 
+   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
    auto actorId = inPacket.getValAt< uint64_t >( 0x20 );
    auto eventId = inPacket.getValAt< uint32_t >( 0x28 );
    auto emoteId = inPacket.getValAt< uint16_t >( 0x2C );
@@ -95,10 +99,10 @@ void Core::Network::GameConnection::eventHandlerEmote( const Packets::GamePacket
 
    player.eventStart( actorId, eventId, Event::EventHandler::Emote, 0, emoteId );
 
-   if( !g_framework.getScriptMgr().onEmote( player, actorId, eventId, static_cast< uint8_t >( emoteId ) )  &&
+   if( !pScriptMgr->onEmote( player, actorId, eventId, static_cast< uint8_t >( emoteId ) )  &&
        eventType == Event::EventHandler::EventHandlerType::Quest )
    {
-      auto questInfo = g_framework.getExdDataGen().get< Core::Data::Quest >( eventId );
+      auto questInfo = pExdData->get< Core::Data::Quest >( eventId );
       if( questInfo )
          player.sendUrgent( "Quest not implemented: " + questInfo->name );
    }
@@ -109,7 +113,7 @@ void Core::Network::GameConnection::eventHandlerEmote( const Packets::GamePacket
 void Core::Network::GameConnection::eventHandlerWithinRange( const Packets::GamePacket& inPacket,
                                                              Entity::Player& player )
 {
-
+   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
    auto eventId = inPacket.getValAt< uint32_t >( 0x24 );
    auto param1 = inPacket.getValAt< uint32_t >( 0x20 );
    auto x = inPacket.getValAt< float >( 0x28 );
@@ -123,7 +127,7 @@ void Core::Network::GameConnection::eventHandlerWithinRange( const Packets::Game
 
    player.eventStart( player.getId(), eventId, Event::EventHandler::WithinRange, 1, param1 );
 
-   g_framework.getScriptMgr().onWithinRange( player, eventId, param1, x, y, z );
+   pScriptMgr->onWithinRange( player, eventId, param1, x, y, z );
 
    player.checkEvent( eventId );
 }
@@ -131,7 +135,7 @@ void Core::Network::GameConnection::eventHandlerWithinRange( const Packets::Game
 void Core::Network::GameConnection::eventHandlerOutsideRange( const Packets::GamePacket& inPacket,
                                                               Entity::Player& player )
 {
-
+   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
    auto eventId = inPacket.getValAt< uint32_t >( 0x24 );
    auto param1 = inPacket.getValAt< uint32_t >( 0x20 );
    auto x = inPacket.getValAt< float >( 0x28 );
@@ -145,7 +149,7 @@ void Core::Network::GameConnection::eventHandlerOutsideRange( const Packets::Gam
 
    player.eventStart( player.getId(), eventId, Event::EventHandler::WithinRange, 1, param1 );
 
-   g_framework.getScriptMgr().onOutsideRange( player, eventId, param1, x, y, z );
+   pScriptMgr->onOutsideRange( player, eventId, param1, x, y, z );
 
    player.checkEvent( eventId );
 }
@@ -153,6 +157,7 @@ void Core::Network::GameConnection::eventHandlerOutsideRange( const Packets::Gam
 void Core::Network::GameConnection::eventHandlerEnterTerritory( const Packets::GamePacket &inPacket,
                                                                 Entity::Player &player )
 {
+   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
    auto eventId = inPacket.getValAt< uint32_t >( 0x20 );
    auto param1 = inPacket.getValAt< uint16_t >( 0x24 );
    auto param2 = inPacket.getValAt< uint16_t >( 0x26 );
@@ -163,21 +168,15 @@ void Core::Network::GameConnection::eventHandlerEnterTerritory( const Packets::G
 
    player.sendDebug( "Calling: " + objName + "." + eventName + " - " + std::to_string( eventId ) );
 
-   player.eventStart( player.getId(), eventId, Event::EventHandler::EnterTerritory, 0, player.getZoneId(), 0 );
-
    if( auto instance = player.getCurrentInstance() )
    {
-      // param2 of eventStart
-      // 0 = default state?
-      // 1 = restore state?
-      // (^ Mordred: Nope, i don't think thats it )
       player.eventStart( player.getId(), eventId, Event::EventHandler::EnterTerritory, 0, player.getZoneId(), instance->getDirectorId() & 0xFFFF );
       instance->onEnterTerritory( player, eventId, param1, param2 );
    }
    else
    {
       player.eventStart( player.getId(), eventId, Event::EventHandler::EnterTerritory, 0, player.getZoneId() );
-      g_framework.getScriptMgr().onEnterTerritory( player, eventId, param1, param2 );
+      pScriptMgr->onEnterTerritory( player, eventId, param1, param2 );
    }
 
    player.checkEvent( eventId );

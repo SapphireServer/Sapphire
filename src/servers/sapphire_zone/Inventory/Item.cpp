@@ -4,7 +4,7 @@
 #include "Framework.h"
 #include "Item.h"
 
-extern Core::Framework g_framework;
+extern Core::Framework g_fw;
 
 Core::Item::Item()
 {
@@ -26,7 +26,8 @@ Core::Item::Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t mo
    m_model2( model2 ),
    m_isHq( isHq )
 {
-   auto itemInfo = g_framework.getExdDataGen().get< Core::Data::Item >( catalogId );
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+   auto itemInfo = pExdData->get< Core::Data::Item >( catalogId );
    m_delayMs = itemInfo->delayms;
    m_physicalDmg = itemInfo->damagePhys;
    m_magicalDmg = itemInfo->damageMag;

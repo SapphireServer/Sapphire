@@ -86,6 +86,8 @@ public:
    DECLARE_HANDLER( initHandler );
    DECLARE_HANDLER( finishLoadingHandler );
    DECLARE_HANDLER( blackListHandler );
+   DECLARE_HANDLER( socialReqResponseHandler );
+   DECLARE_HANDLER( socialReqSendHandler );
    DECLARE_HANDLER( socialListHandler );
    DECLARE_HANDLER( linkshellListHandler );
    DECLARE_HANDLER( playTimeHandler );
@@ -125,7 +127,6 @@ public:
    DECLARE_HANDLER( performNoteHandler );
 
    DECLARE_HANDLER( tellHandler );
-
 };
 
 

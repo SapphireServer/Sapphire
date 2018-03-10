@@ -7,6 +7,9 @@
 #include <Network/PacketContainer.h>
 #include <Network/PacketDef/Chat/ServerChatDef.h>
 #include <Database/DatabaseDef.h>
+#include <Database/DbWorkerPool.h>
+#include <Database/CharaDbConnection.h>
+
 #include <boost/format.hpp>
 #include <unordered_map>
 #include "Network/GameConnection.h"
@@ -37,13 +40,15 @@
 
 #include "Action/Action.h"
 #include "Action/ActionTeleport.h"
+#include "Social/Manager/SocialMgr.h"
+#include "Social/FriendList.h"
 
 #include "Session.h"
 #include "ServerZone.h"
 #include "Forwards.h"
 #include "Framework.h"
 
-extern Core::Framework g_framework;
+extern Core::Framework g_fw;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -285,20 +290,20 @@ void Core::Network::GameConnection::updatePositionHandler( const Packets::GamePa
 void Core::Network::GameConnection::reqEquipDisplayFlagsHandler( const Packets::GamePacket& inPacket,
                                                                  Entity::Player& player )
 {
-   g_framework.getLogger().info( "[" + std::to_string( player.getId() ) + "] Setting EquipDisplayFlags to " + std::to_string( inPacket.getValAt< uint8_t >( 0x20 ) ) );
    player.setEquipDisplayFlags( inPacket.getValAt< uint8_t >( 0x20 ) );
 }
 
 void Core::Network::GameConnection::zoneLineHandler( const Packets::GamePacket& inPacket,
                                                      Entity::Player& player )
 {
+   auto pTeriMgr = g_fw.get< TerritoryMgr >();
    uint32_t zoneLineId = inPacket.getValAt< uint32_t >( 0x20 );
 
    player.sendDebug( "Walking ZoneLine " + std::to_string( zoneLineId ) );
 
    auto pZone = player.getCurrentZone();
 
-   auto pLine = g_framework.getTerritoryMgr().getTerritoryPosition( zoneLineId );
+   auto pLine = pTeriMgr->getTerritoryPosition( zoneLineId );
 
    Common::FFXIVARR_POSITION3 targetPos{};
    uint32_t targetZone;
@@ -337,7 +342,9 @@ void Core::Network::GameConnection::discoveryHandler( const Packets::GamePacket&
 {
    uint32_t ref_position_id = inPacket.getValAt< uint32_t >( 0x20 );
 
-   auto pQR = g_framework.getCharaDb().query( "SELECT id, map_id, discover_id "
+   auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+
+   auto pQR = pDb->query( "SELECT id, map_id, discover_id "
                                "FROM discoveryinfo "
                                "WHERE id = " + std::to_string( ref_position_id ) + ";" );
 
@@ -430,11 +437,11 @@ void Core::Network::GameConnection::finishLoadingHandler( const Packets::GamePac
 void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket& inPacket,
                                                        Entity::Player& player )
 {
-
+    
    uint8_t type = inPacket.getValAt< uint8_t >( 0x2A );
    uint8_t count = inPacket.getValAt< uint8_t >( 0x2B );
 
-   if( type == 0x02 )
+   if( type == SocialListType::PartyList )
    { // party list
 
       ZoneChannelPacket< FFXIVIpcSocialList > listPacket( player.getId() );
@@ -450,11 +457,11 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
       listPacket.data().entries[0].bytes[4] = 0x02;
       listPacket.data().entries[0].bytes[6] = 0x3B;
       listPacket.data().entries[0].bytes[11] = 0x10;
-      listPacket.data().entries[0].classJob = static_cast< uint8_t >( player.getClass() );
+      listPacket.data().entries[0].classJob = player.getClass();
       listPacket.data().entries[0].contentId = player.getContentId();
       listPacket.data().entries[0].level = player.getLevel();
       listPacket.data().entries[0].zoneId = player.getCurrentZone()->getTerritoryId();
-      listPacket.data().entries[0].zoneId1 = 0x0100;
+      // listPacket.data().entries[0].zoneId1 = 0x0100;
       // TODO: no idea what this does
       //listPacket.data().entries[0].one = 1;
 
@@ -469,7 +476,7 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
       queueOutPacket( listPacket );
 
    }
-   else if( type == 0x0b )
+   else if( type == SocialListType::FriendList )
    { // friend list
 
       ZoneChannelPacket< FFXIVIpcSocialList > listPacket( player.getId() );
@@ -477,18 +484,245 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
       listPacket.data().sequence = count;
       memset( listPacket.data().entries, 0, sizeof( listPacket.data().entries ) );
 
+      uint16_t i = 0;
+
+      auto playerFriendsList = g_fw.get< Social::SocialMgr< Social::FriendList > >()->findGroupById( player.getFriendsListId() );
+
+      // todo: move this garbage else fucking where
+      for ( auto member : playerFriendsList.getMembers() )
+      {
+         // more elegant way to break over list entries pls
+         if ( i == 10 )
+            break;
+
+         g_fw.get< Logger >()->debug( "aaa" + std::to_string( i ) + ": " + member.second.name );
+         listPacket.data().entries[i] = Core::Social::Group::generatePlayerEntry( member.second );
+         i++;
+      }
+
+      queueOutPacket( listPacket );
+
    }
-   else if( type == 0x0e )
+   else if( type == SocialListType::SearchList )
    { // player search result
      // TODO: implement player search
    }
 
 }
 
+void Core::Network::GameConnection::socialReqResponseHandler( const Packets::GamePacket& inPacket,
+                                                              Entity::Player& player )
+{
+   auto targetId = inPacket.getValAt< uint32_t >( 0x20 );
+   auto category = inPacket.getValAt< Common::SocialCategory >( 0x28 );
+   auto action = inPacket.getValAt< Common::SocialRequestAction >( 0x29 );
+
+   ZoneChannelPacket< FFXIVIpcSocialRequestError > info( targetId, player.getId() );
+   ZoneChannelPacket< FFXIVIpcSocialRequestResponse > response( targetId, player.getId() );
+
+   info.data().category = category;
+   response.data().category = category;
+
+   //auto pQR = g_database.query( "SELECT Name FROM dbchara WHERE CharacterId = " + to_string( targetId ) );
+   auto name = player.getName();
+   /*
+   if( pQR->getRowCount() > 0 )
+   {
+      name = pQR->fetch()->getString();
+   }
+   else
+   {
+      // todo: enumerate these messages
+      std::array< uint32_t, 5> categoryError = { 0,
+         320, // Unable to process party command.
+         310, // Unable to process friend list command.
+         3035, // Unable to reply. Free company invite invalid. // todo: find actual message
+         3035, // Unable to reply. Free company invite invalid.
+      };
+
+      response.data().messageId = categoryError[category];
+      response.data().category = category; // client only uses messageId if this is 1 for some reason
+      pPlayer->queuePacket( response );
+      return;
+   }*/
+
+   g_fw.get< Logger >()->debug( std::to_string( static_cast<uint8_t>( action ) ) );
+
+   auto pSession = g_fw.get< ServerZone >()->getSession( targetId );
+
+   // todo: notify both inviter/invitee with 0x00CB packet
+
+   if( pSession )
+   {
+      g_fw.get< Logger >()->debug( std::to_string(static_cast<uint8_t>(action)) );
+   }
+   response.data().response = Common::SocialRequestResponse::Accept;
+   memcpy( &( response.data().name ), name.c_str(), 32 );
+   player.queuePacket( response );
+}
+
+void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePacket& inPacket,
+                                                          Entity::Player& player )
+{
+      // todo: handle all social request packets here
+   auto category = inPacket.getValAt< Common::SocialCategory >( 0x20 );
+   auto name = std::string( inPacket.getStringAt( 0x21 ) );
+
+   auto pSession = g_fw.get< ServerZone >()->getSession( name );
+
+   // only the requester needs the response
+   ZoneChannelPacket< FFXIVIpcSocialRequestError > response( player.getId() );
+   memcpy( &( response.data().name ), name.c_str(), 32 );
+
+   // todo: enumerate log messages
+   response.data().messageId = 319; // That name does not exist. Please confirm the spelling.
+   response.data().category = category;
+
+   // todo: enumerate and move each of these cases into their classes?
+   if( pSession )
+   {
+      bool successful = false;
+      Entity::PlayerPtr pRecipient = pSession->getPlayer();
+
+      std::array<std::string, 5> typeVar{ "", "PartyInvite", "FriendInvite", "FreeCompanyPetition", "FreeCompanyInvite" };
+
+      // todo: proper handling of invites already sent
+      // todo: move this to world server
+      // check if an invite has already been sent by me
+      /*
+      if( pRecipient->getTempVariable( typeVar[category] + "Id" ) )
+      {
+         if( pRecipient->getTempVariable( typeVar[category] + "Id" ) == pPlayer->getId() )
+         {
+            response.data().messageId = 328; // That player has already been invited.
+            pPlayer->queuePacket( response );
+         }
+         return;
+      }*/
+
+      if( pRecipient->getId() == player.getId() )
+      {
+         response.data().messageId = 321; // Unable to invite.
+      }
+
+      switch( category )
+      {
+         // party invite
+         case Core::Common::SocialCategory::Party:
+         {
+            /*
+            if( pRecipient->getParty() )
+            {
+               response.data().messageId = 326; // That player is already in another party.
+            }
+            else if( pRecipient->getTempVariable( "PartyInviteId" ) == pPlayer->getId() )
+            {
+               response.data().messageId = 328; // That player has already been invited.
+            }
+            else if( pPlayer->getParty() && pPlayer->getParty()->getPartyMemberCount() >= pPlayer->getParty()->getType() )
+            {
+               response.data().messageId = 329; // Unable to invite. The party is full.
+            }*/
+            if( !pRecipient->isLoadingComplete() ) // || pRecipient->getDuty() )
+            {
+               response.data().messageId = 331; // Unable to invite. That player is currently bound by duty or in a different area.
+            }
+            else if( pRecipient->getOnlineStatus() == Common::OnlineStatus::Busy )
+            {
+               response.data().messageId = 334; // Unable to send party invite. Player's online status is set to Busy.
+            }
+            else if( pRecipient->getOnlineStatus() == Common::OnlineStatus::ViewingCutscene )
+            {
+               response.data().messageId = 336; // Unable to invite. That player is currently watching a cutscene.
+            }
+            else
+            {
+               successful = true;
+            }
+            // response.data().messageId = 62; // <name> declines the party invite.
+         }
+         break;
+
+         case Common::SocialCategory::Friends:
+         {
+            // todo: check if already on friends list or invite pending
+            /*
+            if( pPlayer->getFriendList()->find(name) )
+            {
+            response.data().messageId = 312; // That player is already a friend or has been sent a request.
+            }
+            else if( pRecipient->getFriendList()->getSize() >= 200 )
+            {
+            response.data().messageId = 314; // Unable to send friend request. The other player's friend list is full.
+            }
+            else if( pPlayer->getFriendList()->getSize() >= 200 )
+            {
+            response.data().messageId = 313; // Your friend list is full.
+            }
+            */
+            successful = true;
+         }
+         break;
+
+         default:
+            break;
+      }
+
+      if( successful )
+      {
+         ZoneChannelPacket< FFXIVIpcSocialRequestReceive > packet( player.getId(), pRecipient->getId() );
+
+         std::array<uint16_t, 5> typeMessage{ 0,
+            1, // You invite <name> to a party.
+            10, // You send a friend request to <name>.
+            1884, // You invite <name> to your free company.
+            3044, // Free company petition signature request sent to <name>
+         };
+
+         // TODO: confirm the timers on retail
+         auto expireTime = time( nullptr ) + 120;
+
+         // todo: fix this for cross zone parties (move to world server)
+         /*
+         pRecipient->setTempVariable( typeVar[category] + "Id", pPlayer->getId() );
+         pRecipient->setTempVariable( typeVar[category] + "Timer", expireTime );*/
+
+         packet.data().actorId = player.getId();
+         packet.data().category = category;
+         packet.data().action = Core::Common::SocialRequestAction::Invite;
+         packet.data().unknown3 = 80;
+         packet.data().unknown = 46;
+         packet.data().unknown2 = 64;
+         memcpy( &( packet.data().name ), player.getName().c_str(), 32 );
+
+         pRecipient->queuePacket( packet );
+         pRecipient->sendDebug( "ding ding" );
+
+         auto recipientFriendsList = g_fw.get< Social::SocialMgr< Social::FriendList > >()->findGroupById( pRecipient->getFriendsListId() );
+
+         auto senderResultPacket = recipientFriendsList.inviteMember( player.getAsPlayer(), pRecipient, player.getId(), pRecipient->getId() );
+
+         player.queuePacket( senderResultPacket );
+
+         if ( recipientFriendsList.isFriendList() )
+         {
+            g_fw.get< Logger >()->debug( "he HAA HAAA" );
+         }
+
+         response.data().messageId = typeMessage[category];
+      }
+   }
+
+   player.queuePacket( response );
+   // todo: handle party, friend request
+   g_fw.get< Logger >()->debug( "sent to " + name );
+}
+
 void Core::Network::GameConnection::chatHandler( const Packets::GamePacket& inPacket,
                                                  Entity::Player& player )
 {
 
+   auto pDebugCom = g_fw.get< DebugCommandHandler >();
    std::string chatString( inPacket.getStringAt( 0x3a ) );
 
    uint32_t sourceId = inPacket.getValAt< uint32_t >( 0x24 );
@@ -496,7 +730,7 @@ void Core::Network::GameConnection::chatHandler( const Packets::GamePacket& inPa
    if( chatString.at( 0 ) == '!' )
    {
       // execute game console command
-      g_framework.getDebugCommandHandler().execCommand( const_cast< char * >( chatString.c_str() ) + 1, player );
+      pDebugCom->execCommand( const_cast< char * >( chatString.c_str() ) + 1, player );
       return;
    }
 
@@ -553,15 +787,15 @@ void Core::Network::GameConnection::tellHandler( const Packets::GamePacket& inPa
    std::string targetPcName = inPacket.getStringAt( 0x21 );
    std::string msg = inPacket.getStringAt( 0x41 );
 
-   auto pSession = g_framework.getServerZone().getSession( targetPcName );
+   auto pZoneServer = g_fw.get< ServerZone >();
+
+   auto pSession = pZoneServer->getSession( targetPcName );
 
    if( !pSession )
    {
       ChatChannelPacket< FFXIVIpcTellErrNotFound > tellErrPacket( player.getId() );
       strcpy( tellErrPacket.data().receipientName, targetPcName.c_str() );
       sendSinglePacket( tellErrPacket );
-
-      g_framework.getLogger().debug( "TargetPc not found" );
       return;
    }
 

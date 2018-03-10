@@ -17,7 +17,7 @@
 #include "StatusEffect.h"
 #include "Framework.h"
 
-extern Core::Framework g_framework;
+extern Core::Framework g_fw;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -33,7 +33,8 @@ Core::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPtr so
    , m_tickRate( tickRate )
    , m_lastTick( 0 )
 {
-   auto entry = g_framework.getExdDataGen().get< Core::Data::Status >( id );
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+   auto entry = pExdData->get< Core::Data::Status >( id );
    m_name = entry->name;
       
    std::replace( m_name.begin(), m_name.end(), ' ', '_' );
@@ -66,8 +67,9 @@ std::pair< uint8_t, uint32_t> Core::StatusEffect::StatusEffect::getTickEffect()
 
 void Core::StatusEffect::StatusEffect::onTick()
 {
+   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
    m_lastTick = Util::getTimeMs();
-   g_framework.getScriptMgr().onStatusTick( m_targetActor, *this );
+   pScriptMgr->onStatusTick( m_targetActor, *this );
 }
 
 uint32_t Core::StatusEffect::StatusEffect::getSrcActorId() const
@@ -88,6 +90,7 @@ uint16_t Core::StatusEffect::StatusEffect::getParam() const
 void Core::StatusEffect::StatusEffect::applyStatus()
 {
    m_startTime = Util::getTimeMs();
+   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
 
    // this is only right when an action is being used by the player
    // else you probably need to use an actorcontrol
@@ -107,14 +110,13 @@ void Core::StatusEffect::StatusEffect::applyStatus()
    //effectPacket.data().effects[4].unknown_5 = 0x80;
    //m_sourceActor->sendToInRangeSet( effectPacket, true );
 
-   g_framework.getLogger().debug( "StatusEffect applied: " + m_name );
-   g_framework.getScriptMgr().onStatusReceive( m_targetActor, m_id );
+   pScriptMgr->onStatusReceive( m_targetActor, m_id );
 }
 
 void Core::StatusEffect::StatusEffect::removeStatus()
 {
-   g_framework.getLogger().debug( "StatusEffect removed: " + m_name );
-   g_framework.getScriptMgr().onStatusTimeOut( m_targetActor, m_id );
+   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
+   pScriptMgr->onStatusTimeOut( m_targetActor, m_id );
 }
 
 uint32_t Core::StatusEffect::StatusEffect::getId() const

@@ -35,7 +35,7 @@
 
 #include "Framework.h"
 
-extern Core::Framework g_framework;
+extern Core::Framework g_fw;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -288,12 +288,12 @@ Send a packet to all players in range, potentially to self if set and is player
 */
 void Core::Entity::Actor::sendToInRangeSet( Network::Packets::GamePacketPtr pPacket, bool bToSelf )
 {
-
+   auto pServerZone = g_fw.get< ServerZone >();
    if( bToSelf && isPlayer() )
    {
       auto pPlayer = getAsPlayer();
 
-      auto pSession = g_framework.getServerZone().getSession( pPlayer->getId() );
+      auto pSession = pServerZone->getSession( pPlayer->getId() );
 
       // it might be that the player DC'd in which case the session would be invalid
       if( pSession )

@@ -24,7 +24,7 @@
 #include "Forwards.h"
 #include "Framework.h"
 
-extern Core::Framework g_framework;
+extern Core::Framework g_fw;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
@@ -53,10 +53,12 @@ void Core::Network::GameConnection::inventoryModifyHandler( const Packets::GameP
    ackPacket.data().sequence = seq;
    ackPacket.data().type = 7;
    player.queuePacket( ackPacket );
+  
+   auto pLog = g_fw.get< Logger >();
 
 
-   g_framework.getLogger().debug( inPacket.toString() );
-   g_framework.getLogger().debug( "InventoryAction: " + std::to_string( action ) );
+   pLog->debug( inPacket.toString() );
+   pLog->debug( "InventoryAction: " + std::to_string( action ) );
 
    // TODO: other inventory operations need to be implemented
    switch( action )
