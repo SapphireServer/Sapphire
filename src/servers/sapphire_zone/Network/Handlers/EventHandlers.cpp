@@ -170,7 +170,7 @@ void Core::Network::GameConnection::eventHandlerEnterTerritory( const Packets::G
 
    if( auto instance = player.getCurrentInstance() )
    {
-      player.eventStart( player.getId(), eventId, Event::EventHandler::EnterTerritory, 0, player.getZoneId(), instance->getDirectorId() & 0xFFFF );
+      player.eventStart( player.getId(), eventId, Event::EventHandler::EnterTerritory, 1, player.getZoneId() );
       instance->onEnterTerritory( player, eventId, param1, param2 );
    }
    else

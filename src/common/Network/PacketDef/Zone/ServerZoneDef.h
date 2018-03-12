@@ -999,7 +999,7 @@ struct FFXIVIpcEventStart : FFXIVIpcBasePacket<EventStart>
    /* 000D */ uint8_t param2;
    /* 000E */ uint16_t padding;
    /* 0010 */ uint32_t param3;
-   /* 0014 */ uint32_t contentId;
+   /* 0014 */ uint32_t padding1;
 };
 
 
@@ -1036,7 +1036,8 @@ struct FFXIVIpcDirectorPlayScene : FFXIVIpcBasePacket<DirectorPlayScene>
    uint8_t param4;
    uint8_t padding1[3];
    uint32_t param5;
-   uint8_t unknown[0x40];
+   uint8_t unknown8[0x08];
+   uint8_t unknown[0x38];
 };
 
 /**
