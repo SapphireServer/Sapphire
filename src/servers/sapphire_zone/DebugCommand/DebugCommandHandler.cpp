@@ -709,7 +709,7 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
       else
          player.sendDebug( "Failed to create instance with id: " + std::to_string( instanceContentId ) );
    }
-   if( subCommand == "createzone" || subCommand == "crz" )
+   else if( subCommand == "createzone" || subCommand == "crz" )
    {
       uint32_t zoneId;
       sscanf( params.c_str(), "%d", &zoneId );
