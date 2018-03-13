@@ -118,7 +118,7 @@ public:
 
    virtual void onInit( InstanceContentPtr instance ) { }
    virtual void onUpdate( InstanceContentPtr instance, uint32_t currTime ) { }
-   virtual void onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 ) { }
+   virtual void onEnterTerritory( InstanceContentPtr instance, Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 ) { }
 };
 
 #endif
