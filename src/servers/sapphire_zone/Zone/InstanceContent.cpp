@@ -318,11 +318,21 @@ void Core::InstanceContent::onRegisterEObj( Entity::EventObjectPtr object )
                                      std::to_string( object->getObjectId() ) );
 }
 
+bool Core::InstanceContent::hasPlayerPreviouslySpawned( Entity::Player &player ) const
+{
+   auto it = m_spawnedPlayers.find( player.getId() );
+   return it != m_spawnedPlayers.end();
+}
+
+Core::InstanceContent::InstanceContentState Core::InstanceContent::getState() const
+{
+   return m_state;
+}
+
 void Core::InstanceContent::onBeforePlayerZoneIn( Core::Entity::Player& player )
 {
    // if a player has already spawned once inside this instance, don't move them if they happen to zone in again
-   auto it = m_spawnedPlayers.find( player.getId() );
-   if( it == m_spawnedPlayers.end() )
+   if( !hasPlayerPreviouslySpawned( player ) )
    {
       if( m_pEntranceEObj != nullptr )
       {
@@ -334,11 +344,9 @@ void Core::InstanceContent::onBeforePlayerZoneIn( Core::Entity::Player& player )
          player.setRot( PI );
          player.setPos( { 0.f, 0.f, 0.f } );
       }
-
-      m_spawnedPlayers.insert( player.getId() );
    }
 
-   player.resetObjSpawnIndex( );
+   player.resetObjSpawnIndex();
 }
 
 Core::Entity::EventObjectPtr Core::InstanceContent::getEObjByName( const std::string& name )
@@ -369,4 +377,7 @@ void Core::InstanceContent::onEnterTerritory( Entity::Player& player, uint32_t e
 {
    auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
    pScriptMgr->onInstanceEnterTerritory( getAsInstanceContent(), player, eventId, param1, param2 );
+
+   if( !hasPlayerPreviouslySpawned( player ) )
+      m_spawnedPlayers.insert( player.getId() );
 }

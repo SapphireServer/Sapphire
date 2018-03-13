@@ -50,6 +50,9 @@ public:
    void startEventCutscene();
    void endEventCutscene();
 
+   bool hasPlayerPreviouslySpawned( Entity::Player &player ) const;
+   InstanceContentState getState() const;
+
    boost::shared_ptr< Core::Data::InstanceContent > getInstanceContentInfo() const;
 
    uint32_t getInstanceContentId() const;
