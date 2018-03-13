@@ -6,6 +6,7 @@
 #include <Exd/ExdDataGenerated.h>
 
 #include "Event/Director.h"
+#include "Event/EventDefs.h"
 #include "Script/ScriptMgr.h"
 
 #include "Actor/Player.h"
@@ -379,5 +380,10 @@ void Core::InstanceContent::onEnterTerritory( Entity::Player& player, uint32_t e
    pScriptMgr->onInstanceEnterTerritory( getAsInstanceContent(), player, eventId, param1, param2 );
 
    if( !hasPlayerPreviouslySpawned( player ) )
+   {
       m_spawnedPlayers.insert( player.getId() );
+      player.directorPlayScene( getDirectorId(), 1, NO_DEFAULT_CAMERA | HIDE_HOTBAR | CONDITION_CUTSCENE, 0, 0xA );
+   }
+   else
+      player.directorPlayScene( getDirectorId(), 2, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 0, 0xA );
 }
