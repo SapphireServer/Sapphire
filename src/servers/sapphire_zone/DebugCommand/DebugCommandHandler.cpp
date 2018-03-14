@@ -709,6 +709,17 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
       else
          player.sendDebug( "Failed to create instance with id: " + std::to_string( instanceContentId ) );
    }
+   else if( subCommand == "createzone" || subCommand == "crz" )
+   {
+      uint32_t zoneId;
+      sscanf( params.c_str(), "%d", &zoneId );
+
+      auto instance = pTeriMgr->createTerritoryInstance( zoneId );
+      if( instance )
+         player.sendDebug( "Created instance with id: " + std::to_string( instance->getGuId() ) + " -> " + instance->getName() );
+      else
+         player.sendDebug( "Failed to create instance with id: " + std::to_string( zoneId ) );
+   }
    else if( subCommand == "remove" || subCommand == "rm" )
    {
       uint32_t terriId;
