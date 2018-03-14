@@ -128,8 +128,8 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
 
    switch( commandId )
    {
-      case ClientTrigger::ToggleSeathe:  // Toggle sheathe
-      {
+       case ClientTrigger::ToggleSeathe:  // Toggle sheathe
+       {
           if ( param11 == 1 )
               player.setStance( Entity::Chara::Stance::Active );
           else
@@ -141,9 +141,9 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
           player.sendToInRangeSet( ActorControlPacket142( player.getId(), 0, param11, 1 ) );
 
           break;
-      }
-      case ClientTrigger::ToggleAutoAttack:  // Toggle auto-attack
-      {
+       }
+       case ClientTrigger::ToggleAutoAttack:  // Toggle auto-attack
+       {
           if ( param11 == 1 )
           {
               player.setAutoattack( true );
@@ -155,135 +155,135 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
           player.sendToInRangeSet( ActorControlPacket142( player.getId(), 1, param11, 1 ) );
 
           break;
-      }
-      case ClientTrigger::ChangeTarget: // Change target
-      {
+       }
+       case ClientTrigger::ChangeTarget: // Change target
+       {
 
           uint64_t targetId = inPacket.getValAt< uint64_t >( 0x24 );
           player.changeTarget( targetId );
           break;
-      }
-      case ClientTrigger::Dismount:
-      {
-         player.dismount();
-         break;
-      }
-      case ClientTrigger::RemoveStatusEffect: // Remove status (clicking it off)
-      {
-         // todo: check if status can be removed by client from exd
-         player.removeSingleStatusEffectById( static_cast< uint32_t >( param1 ) );
-         break;
-      }
-      case ClientTrigger::CastCancel: // Cancel cast
-      {
-         if( player.getCurrentAction() )
-             player.getCurrentAction()->setInterrupted();
-         break;
-      }
-      case ClientTrigger::MarkPlayer: // Mark player
-      {
-         break;
-      }
-      case ClientTrigger::SetTitle: // Set player title
-      {
-         player.setTitle( static_cast< uint16_t >( param1 ) );
-         break;
-      }
-      case ClientTrigger::TitleList: // Get title list
-      {
-         player.sendTitleList();
-         break;
-      }
-      case ClientTrigger::UpdatedSeenHowTos: // Update howtos seen
-      {
+       }
+       case ClientTrigger::Dismount:
+       {
+          player.dismount();
+          break;
+       }
+       case ClientTrigger::RemoveStatusEffect: // Remove status (clicking it off)
+       {
+          // todo: check if status can be removed by client from exd
+          player.removeSingleStatusEffectById( static_cast< uint32_t >( param1 ) );
+          break;
+       }
+       case ClientTrigger::CastCancel: // Cancel cast
+       {
+          if( player.getCurrentAction() )
+              player.getCurrentAction()->setInterrupted();
+          break;
+       }
+       case ClientTrigger::MarkPlayer: // Mark player
+       {
+          break;
+       }
+       case ClientTrigger::SetTitle: // Set player title
+       {
+          player.setTitle( static_cast< uint16_t >( param1 ) );
+          break;
+       }
+       case ClientTrigger::TitleList: // Get title list
+       {
+          player.sendTitleList();
+          break;
+       }
+       case ClientTrigger::UpdatedSeenHowTos: // Update howtos seen
+       {
           uint32_t howToId = param11;
           player.updateHowtosSeen( howToId );
           break;
-      }
-      case ClientTrigger::Emote: // emote
-      {
+       }
+       case ClientTrigger::Emote: // emote
+       {
           uint64_t targetId = player.getTargetId();
           uint32_t emoteId = inPacket.getValAt< uint32_t >( 0x24 );
 
           player.emote( emoteId, targetId );
           break;
-      }
-      case ClientTrigger::PersistantEmoteCancel: // cancel persistant emote
-      {
+       }
+       case ClientTrigger::PersistantEmoteCancel: // cancel persistant emote
+       {
           break;
-      }
-      case ClientTrigger::PoseChange: // change pose
-      {
+       }
+       case ClientTrigger::PoseChange: // change pose
+       {
           break;
-      }
-      case ClientTrigger::PoseReapply: // reapply pose
-      {
+       }
+       case ClientTrigger::PoseReapply: // reapply pose
+       {
           break;
-      }
-      case ClientTrigger::PoseCancel: // cancel pose
-      {
+       }
+       case ClientTrigger::PoseCancel: // cancel pose
+       {
           break;
-      }
-      case ClientTrigger::Return: // return dead / accept raise
-      {
-         switch ( static_cast < ResurrectType >( param1 ) )
-         {
-            case ResurrectType::RaiseSpell:
-               // todo: handle raise case (set position to raiser, apply weakness status, set hp/mp/tp as well as packet)
-               player.returnToHomepoint();
-               break;
-            case ResurrectType::Return:
-               player.returnToHomepoint();
-               break;
-            default:
-               break;
-         }
+       }
+       case ClientTrigger::Return: // return dead / accept raise
+       {
+          switch ( static_cast < ResurrectType >( param1 ) )
+          {
+             case ResurrectType::RaiseSpell:
+                // todo: handle raise case (set position to raiser, apply weakness status, set hp/mp/tp as well as packet)
+                player.returnToHomepoint();
+                break;
+             case ResurrectType::Return:
+                player.returnToHomepoint();
+                break;
+             default:
+                break;
+          }
 
-      }
-      case ClientTrigger::FinishZoning: // Finish zoning
-      {
+       }
+       case ClientTrigger::FinishZoning: // Finish zoning
+       {
           player.finishZoning();
           break;
-      }
+       }
 
-      case ClientTrigger::Teleport: // Teleport
-      {
+       case ClientTrigger::Teleport: // Teleport
+       {
 
           player.teleportQuery( param11 );
           break;
-      }
-      case ClientTrigger::DyeItem: // Dye item
-      {
-         break;
-      }
-      case ClientTrigger::DirectorInitFinish: // Director init finish
-      {
-         player.getCurrentZone()->onInitDirector( player );
-         break;
-      }
-      case ClientTrigger::SomeDirectorEvent: // Director init finish
-      {
-         player.getCurrentZone()->onSomeDirectorEvent( player );
-         break;
-      }
-      case ClientTrigger::EnterTerritoryEventFinished:// this may still be something else. I think i have seen it elsewhere
-      {
-         player.setOnEnterEventDone( true );
-         break;
-      }
-      case ClientTrigger::RequestInstanceLeave:
-      {
-         // todo: apply cf penalty if applicable, make sure player isnt in combat
-         player.exitInstance();
-         break;
-      }
+       }
+       case ClientTrigger::DyeItem: // Dye item
+       {
+          break;
+       }
+       case ClientTrigger::DirectorInitFinish: // Director init finish
+       {
+          player.getCurrentZone()->onInitDirector( player );
+          break;
+       }
+       case ClientTrigger::SomeDirectorEvent: // Director init finish
+       {
+          player.getCurrentZone()->onSomeDirectorEvent( player );
+          break;
+       }
+       case ClientTrigger::EnterTerritoryEventFinished:// this may still be something else. I think i have seen it elsewhere
+       {
+          player.setOnEnterEventDone( true );
+          break;
+       }
+       case ClientTrigger::RequestInstanceLeave:
+       {
+          // todo: apply cf penalty if applicable, make sure player isnt in combat
+          player.exitInstance();
+          break;
+       }
 
 
-      default:
-      {
-         pLog->debug( "[" + std::to_string( m_pSession->getId() ) + "] Unhandled action: " +
-            boost::str( boost::format( "%|04X|" ) % (uint32_t) ( commandId & 0xFFFF ) ) );
-         break;
-      }
+       default:
+       {
+          pLog->debug( "[" + std::to_string( m_pSession->getId() ) + "] Unhandled action: " +
+             boost::str( boost::format( "%|04X|" ) % (uint32_t) ( commandId & 0xFFFF ) ) );
+          break;
+       }
    }
 }
