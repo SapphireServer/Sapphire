@@ -382,8 +382,8 @@ void Core::InstanceContent::onEnterTerritory( Entity::Player& player, uint32_t e
    if( !hasPlayerPreviouslySpawned( player ) )
    {
       m_spawnedPlayers.insert( player.getId() );
-      player.directorPlayScene( getDirectorId(), 1, NO_DEFAULT_CAMERA | HIDE_HOTBAR | CONDITION_CUTSCENE, 0, 0xA );
+      player.directorPlayScene( getDirectorId(), 1, 139699201, 0, 0x9 );
    }
    else
-      player.directorPlayScene( getDirectorId(), 2, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 0, 0xA );
+      player.directorPlayScene( getDirectorId(), 2, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 0, 0x9 );
 }
