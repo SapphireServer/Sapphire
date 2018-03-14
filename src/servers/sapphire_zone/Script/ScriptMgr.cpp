@@ -375,7 +375,7 @@ bool Core::Scripting::ScriptMgr::onInstanceEnterTerritory( InstanceContentPtr in
    auto script = m_nativeScriptMgr->getScript< InstanceContentScript >( instance->getDirectorId() );
    if( script )
    {
-      script->onEnterTerritory( player, eventId, param1, param2 );
+      script->onEnterTerritory( instance, player, eventId, param1, param2 );
       return true;
    }
 
