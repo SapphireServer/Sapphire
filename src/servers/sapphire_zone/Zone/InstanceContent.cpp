@@ -382,7 +382,10 @@ void Core::InstanceContent::onEnterTerritory( Entity::Player& player, uint32_t e
    if( !hasPlayerPreviouslySpawned( player ) )
    {
       m_spawnedPlayers.insert( player.getId() );
-      player.directorPlayScene( getDirectorId(), 1, 139699201, 0, 0x9 );
+      player.directorPlayScene( getDirectorId(), 1, NO_DEFAULT_CAMERA | CONDITION_CUTSCENE | SILENT_ENTER_TERRI_ENV |
+                                                    HIDE_HOTBAR | SILENT_ENTER_TERRI_BGM | SILENT_ENTER_TERRI_SE |
+                                                    DISABLE_STEALTH | 0x00100000 | LOCK_HUD | LOCK_HOTBAR | // todo: wtf is 0x00100000
+                                                    DISABLE_CANCEL_EMOTE, 0, 0x9 );
    }
    else
       player.directorPlayScene( getDirectorId(), 2, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 0, 0x9 );
