@@ -52,8 +52,10 @@ private:
       m_data.unknown[0x14] = 0x08;
       m_data.unknown[0x15] = 0x02;
 
+      // time remaining in sec
       m_data.unknown[0x18] = 0x19;
       m_data.unknown[0x19] = 0x14;
+
       m_data.unknown[0x1C] = 0x23;
       m_data.unknown[0x20] = 0x40;
       m_data.unknown[0x24] = 0x80;
