@@ -71,10 +71,7 @@ public:
 
    void onEnterTerritory( InstanceContentPtr instance, Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 ) override
    {
-      if( !instance->hasPlayerPreviouslySpawned( player ) )
-         player.directorPlayScene( getId(), 1, NO_DEFAULT_CAMERA | HIDE_HOTBAR | CONDITION_CUTSCENE, 0, 0xA );
-      else
-         player.directorPlayScene( getId(), 2, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 0, 0xA );
+
    }
 
 };
