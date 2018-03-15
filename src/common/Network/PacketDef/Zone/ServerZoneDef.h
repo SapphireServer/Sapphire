@@ -137,6 +137,7 @@ struct FFXIVIpcSocialRequestResponse : FFXIVIpcBasePacket<SocialRequestResponse>
    uint32_t unknown;
    Common::SocialCategory category; // Common::SocialCategory
    Common::SocialRequestResponse response; // Common::SocialRequestResponse
+   uint8_t unknown2;                 // possibly padding
    char name[0x20];
    uint16_t padding;
 };

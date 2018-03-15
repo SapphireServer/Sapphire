@@ -26,6 +26,8 @@
 #include "Forwards.h"
 #include "Framework.h"
 
+#include "Social/Manager/SocialMgr.h"
+
 extern Core::Framework g_fw;
 
 using namespace Core::Common;
@@ -204,6 +206,9 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
    m_pInventory = make_Inventory( this );
 
    calculateStats();
+
+   m_friendsListId = g_fw.get< Social::SocialMgr < Social::FriendList > >()->loadFriendsList( m_id );
+   pLog->debug( std::to_string( m_id ) + " ID, has group ID: " + std::to_string( m_friendsListId ) );
 
    // first login, run the script event
    if( m_bNewGame )

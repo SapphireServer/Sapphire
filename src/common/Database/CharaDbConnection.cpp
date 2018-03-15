@@ -133,7 +133,7 @@ void Core::Db::CharaDbConnection::doPrepareStatements()
    /// ITEM GLOBAL
    prepareStatement( CHARA_ITEMGLOBAL_INS, "INSERT INTO charaglobalitem ( CharacterId, ItemId, catalogId, UPDATE_DATE ) VALUES ( ?, ?, ?, NOW() );", CONNECTION_BOTH );
 
+   // SOCIAL GROUPS
 
-
-
+   prepareStatement( CHARA_SOCIAL_FRIENDS_INS, "INSERT INTO charainfofriendlist ( CharacterId, CharacterIdList, InviteDataList, UPDATE_DATE ) VALUES ( ?, ?, ?, NOW() );", CONNECTION_SYNC ); // todo: maybe not sync
 }

@@ -167,12 +167,21 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
    auto pScript = g_fw.get< Scripting::ScriptMgr >();
    auto pLsMgr = g_fw.get< LinkshellMgr >();
    auto pTeriMgr = g_fw.get< TerritoryMgr >();
+   auto pFriendListMgr = g_fw.get< Social::SocialMgr< Social::FriendList > >();
 
    printBanner();
 
    if( !loadSettings( argc, argv ) )
    {
       pLog->fatal( "Unable to load settings!" );
+      return;
+   }
+   
+   pLog->info( "Initializing social groups" );
+
+   if( !pFriendListMgr->init() )
+   {
+      pLog->fatal( "Unable to initialize friend list manager!" );
       return;
    }
 

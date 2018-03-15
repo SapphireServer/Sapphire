@@ -489,14 +489,15 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
       auto playerFriendsList = g_fw.get< Social::SocialMgr< Social::FriendList > >()->findGroupById( player.getFriendsListId() );
 
       // todo: move this garbage else fucking where
-      for ( auto member : playerFriendsList.getMembers() )
+      for ( auto member : playerFriendsList->getMembers() )
       {
          // more elegant way to break over list entries pls
          if ( i == 10 )
             break;
 
-         g_fw.get< Logger >()->debug( "aaa" + std::to_string( i ) + ": " + member.second.name );
-         listPacket.data().entries[i] = Core::Social::Group::generatePlayerEntry( member.second );
+         g_fw.get< Logger >()->debug( "aaa" + std::to_string( i ) );
+         // todo: replace this with call for generating the entire vector
+         listPacket.data().entries[i] = Core::Social::FriendList::generatePlayerEntry( member, false );
          i++;
       }
 
@@ -554,7 +555,7 @@ void Core::Network::GameConnection::socialReqResponseHandler( const Packets::Gam
 
    if( pSession )
    {
-      g_fw.get< Logger >()->debug( std::to_string(static_cast<uint8_t>(action)) );
+      g_fw.get< Logger >()->debug( std::to_string( static_cast< uint8_t >( action ) ) );
    }
    response.data().response = Common::SocialRequestResponse::Accept;
    memcpy( &( response.data().name ), name.c_str(), 32 );
@@ -584,7 +585,7 @@ void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePac
       bool successful = false;
       Entity::PlayerPtr pRecipient = pSession->getPlayer();
 
-      std::array<std::string, 5> typeVar{ "", "PartyInvite", "FriendInvite", "FreeCompanyPetition", "FreeCompanyInvite" };
+      std::array< std::string, 5 > typeVar{ "", "PartyInvite", "FriendInvite", "FreeCompanyPetition", "FreeCompanyInvite" };
 
       // todo: proper handling of invites already sent
       // todo: move this to world server
@@ -647,7 +648,9 @@ void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePac
          {
             // todo: check if already on friends list or invite pending
             /*
-            if( pPlayer->getFriendList()->find(name) )
+            auto playerFriendsList = g_fw.get< Social::SocialMgr< Social::FriendList > >()->findGroupById( pPlayer->getgetFriendsListId() );
+
+            if( playerFriendsList )
             {
             response.data().messageId = 312; // That player is already a friend or has been sent a request.
             }
@@ -672,11 +675,11 @@ void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePac
       {
          ZoneChannelPacket< FFXIVIpcSocialRequestReceive > packet( player.getId(), pRecipient->getId() );
 
-         std::array<uint16_t, 5> typeMessage{ 0,
+         std::array< uint16_t, 5 > typeMessage{ 0,
             1, // You invite <name> to a party.
-            10, // You send a friend request to <name>.
-            1884, // You invite <name> to your free company.
-            3044, // Free company petition signature request sent to <name>
+            2, // You send a friend request to <name>.
+            4, // Free company petition signature request sent to <name>
+            5, // You invite <name> to your free company.
          };
 
          // TODO: confirm the timers on retail
@@ -690,7 +693,7 @@ void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePac
          packet.data().actorId = player.getId();
          packet.data().category = category;
          packet.data().action = Core::Common::SocialRequestAction::Invite;
-         packet.data().unknown3 = 80;
+         packet.data().unknown3 = 80; // these seem like bitmasks!
          packet.data().unknown = 46;
          packet.data().unknown2 = 64;
          memcpy( &( packet.data().name ), player.getName().c_str(), 32 );
@@ -700,11 +703,21 @@ void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePac
 
          auto recipientFriendsList = g_fw.get< Social::SocialMgr< Social::FriendList > >()->findGroupById( pRecipient->getFriendsListId() );
 
-         auto senderResultPacket = recipientFriendsList.inviteMember( player.getAsPlayer(), pRecipient, player.getId(), pRecipient->getId() );
+         auto senderResultPacketResult = recipientFriendsList->addInvite( pRecipient->getId() );
 
+         recipientFriendsList->addInvite( player.getId() );
+         
+         auto senderResultPacket = GamePacketNew< Server::FFXIVIpcSocialRequestResponse, ServerZoneIpcType >( pRecipient->getId(), player.getId() );
+         senderResultPacket.data().contentId = pRecipient->getId();
+         senderResultPacket.data().category = Common::SocialCategory::Friends;
+         senderResultPacket.data().response = Common::SocialRequestResponse::Cancel;
+
+         memcpy( &( senderResultPacket.data().name ), pRecipient->getName().c_str(), 32 );
+
+         //todo: build packet from packetresult here
          player.queuePacket( senderResultPacket );
 
-         if ( recipientFriendsList.isFriendList() )
+         if( recipientFriendsList->isFriendList() )
          {
             g_fw.get< Logger >()->debug( "he HAA HAAA" );
          }

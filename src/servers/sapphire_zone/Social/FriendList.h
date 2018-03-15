@@ -25,6 +25,8 @@ public:
 
    std::vector< Network::Packets::Server::PlayerEntry > getFriendListEntries( uint16_t entryAmount );
 
+   static Core::Network::Packets::Server::PlayerEntry generatePlayerEntry( uint64_t characterId, bool isInvite );
+
 protected:
    uint64_t m_id{ 0 };
    uint64_t m_ownerId{ 0 };

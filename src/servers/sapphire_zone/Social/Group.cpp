@@ -22,7 +22,64 @@ using namespace Core::Network;
 
 // todo: invite map in g_serverZone.getGroupMgr(GroupType) and look up
 
-Core::Network::Packets::GamePacketPtr Group::addMember( Core::Entity::PlayerPtr pSender, Core::Entity::PlayerPtr pRecipient, uint64_t senderId, uint64_t recipientId )
+
+
+uint32_t Group::addMember( uint64_t characterId )
+{
+   assert( characterId != 0 );
+
+   uint32_t logMessage = 0;
+
+   m_groupMembers.insert( characterId );
+
+   return 0;
+}
+
+uint32_t Group::addInvite( uint64_t characterId )
+{
+   assert( characterId != 0 );
+
+   uint32_t logMessage = 0;
+
+   m_groupInvites.insert( characterId );
+
+   return 0;
+}
+
+Core::Network::Packets::GamePacketPtr Group::processInvite( uint64_t recipientId, uint64_t senderId )
+{
+   constexpr uint32_t logMessages[] = {
+      0, // 
+      1
+   };
+   assert( senderId != 0 );
+
+   using namespace Core::Network::Packets;
+
+   uint64_t recipientContentId = 0;
+
+   auto packet = GamePacketNew< Server::FFXIVIpcSocialRequestResponse, ServerZoneIpcType >( recipientId, senderId );
+   packet.data().contentId = recipientContentId;
+   packet.data().category = Common::SocialCategory::Friends;
+   packet.data().response = Common::SocialRequestResponse::Accept;
+   //packet.data().
+
+   if ( m_members.size() < m_maxCapacity )
+   {
+      // todo: broadcast join message
+
+      m_groupInvites.erase( recipientId );
+
+      m_groupMembers.emplace( recipientId );
+   }
+   else
+   {
+   }
+
+   return packet;
+}
+
+Core::Network::Packets::GamePacketPtr Group::addMember2( Core::Entity::PlayerPtr pSender, Core::Entity::PlayerPtr pRecipient, uint64_t senderId, uint64_t recipientId )
 {
    constexpr uint32_t logMessages[] = {
       0, // 
@@ -55,10 +112,10 @@ Core::Network::Packets::GamePacketPtr Group::addMember( Core::Entity::PlayerPtr 
 
       m_invites.erase( m_invites.find( recipientId ), m_invites.end() );
       GroupMember member;
-      member.inviterId = senderId;
+      //member.inviterId = senderId;
       member.role = 0;
-      member.contentId = recipientId;
-      member.name = pSender->getName();
+      //member.contentId = recipientId;
+      //member.name = pSender->getName();
       m_members.emplace( recipientId, member );
    }
    else
@@ -68,7 +125,7 @@ Core::Network::Packets::GamePacketPtr Group::addMember( Core::Entity::PlayerPtr 
    return packet;
 }
 
-Packets::GamePacketPtr Group::inviteMember( Core::Entity::PlayerPtr pSender, Core::Entity::PlayerPtr pRecipient, uint64_t senderId, uint64_t recipientId )
+Packets::GamePacketPtr Group::inviteMember2( Core::Entity::PlayerPtr pSender, Core::Entity::PlayerPtr pRecipient, uint64_t senderId, uint64_t recipientId )
 {
    assert( pSender != nullptr || senderId != 0 );
 
@@ -77,13 +134,13 @@ Packets::GamePacketPtr Group::inviteMember( Core::Entity::PlayerPtr pSender, Cor
    packet.data().contentId = recipientId;
    packet.data().category = Common::SocialCategory::Friends;
 
-   if ( m_invites.size() < m_maxCapacity )
+   if( m_invites.size() < m_maxCapacity )
    {
       GroupMember member;
-      member.inviterId = senderId;
+      //member.inviterId = senderId;
       member.role = 0;
-      member.contentId = recipientId;
-      member.name = pSender->getName();
+      //member.contentId = recipientId;
+      //member.name = pSender->getName();
 
       m_invites.emplace( recipientId, member );
    }
@@ -92,7 +149,7 @@ Packets::GamePacketPtr Group::inviteMember( Core::Entity::PlayerPtr pSender, Cor
 }
 
 // todo: fix
-Core::Network::Packets::GamePacketPtr Group::removeMember( Core::Entity::PlayerPtr pSender, Core::Entity::PlayerPtr pRecipient, uint64_t senderId, uint64_t recipientId )
+Core::Network::Packets::GamePacketPtr Group::removeMember2( Core::Entity::PlayerPtr pSender, Core::Entity::PlayerPtr pRecipient, uint64_t senderId, uint64_t recipientId )
 {
    assert( pSender != nullptr || senderId != 0 );
 
@@ -108,7 +165,7 @@ void Group::sendPacketToMembers( Core::Network::Packets::GamePacketPtr pPacket, 
    assert( pPacket );
    for( const auto& member : m_members )
    {
-      auto pSession = g_fw.get< ServerZone >()->getSession( member.second.name );
+      auto pSession = g_fw.get< ServerZone >()->getSession( member.second.characterId );
       if( pSession )
       {
          pSession->getPlayer()->queuePacket( pPacket );
@@ -116,62 +173,26 @@ void Group::sendPacketToMembers( Core::Network::Packets::GamePacketPtr pPacket, 
    }
 }
 
-Core::Network::Packets::Server::PlayerEntry Group::generatePlayerEntry( GroupMember groupMember )
+
+
+std::set< uint64_t >& Group::getMembers()
 {
-   Core::Network::Packets::Server::PlayerEntry entry = {};
-
-   memcpy( entry.name, groupMember.name.c_str(), strlen( groupMember.name.c_str() ) );
-   entry.contentId = groupMember.contentId;
-
-   // We check if player is online. If so, we can pull more data - otherwise just name
-   // todo: set as offline in one of the unknown values, if session does not exist
-
-   auto pSession = g_fw.get< ServerZone >()->getSession( groupMember.name ); // todo: aa i don't like this. maybe just store their ID instead of contentID???
-
-   entry.timestamp = 1512799339;
-   entry.status = 2;
-   entry.unknown = 0;
-   //entry.entryIcon = 0xf;  
-   entry.unavailable = 0;    // unavailable (other world)
-   entry.one = 0;
-
-   if( pSession )
-   {
-      auto pPlayer = pSession->getPlayer();
-      entry.contentId = pPlayer->getContentId();
-      //entry.bytes[2] = pPlayer->getCurrentZone()->getId();
-      
-      entry.classJob = pPlayer->getClass();
-      
-      entry.level = pPlayer->getLevel();
-      entry.zoneId = pPlayer->getCurrentZone()->getGuId();
-      entry.grandCompany = pPlayer->getGc();
-      memcpy( &entry.fcTag[0], "Meme", 4 );
-      entry.clientLanguage = 2;
-      entry.knownLanguages = 0x0F;
-      entry.onlineStatusMask = pPlayer->getOnlineStatusMask();
-
-      g_fw.get< Logger >()->debug( std::to_string( pPlayer->getContentId() ) );
-   }
-
-   // TODO: no idea what this does - me neither
-   //listPacket.data().entries[0].one = 1;
-
-   g_fw.get< Logger >()->debug( std::to_string(groupMember.contentId) );
-
-   g_fw.get< Logger >()->debug( std::to_string( entry.contentId ) );
-   
-   return entry;
+   return m_groupMembers;
 }
 
-std::map< uint64_t, GroupMember > Group::getMembers() const
+std::set< uint64_t >& Group::getInvites()
 {
-   return m_members;
+   return m_groupInvites;
 }
 
 uint32_t Group::getCapacity() const
 {
    return m_maxCapacity;
+}
+
+uint32_t Group::getTotalSize() const
+{
+   return m_groupMembers.size() + m_groupInvites.size();
 }
 
 bool Group::isParty() const

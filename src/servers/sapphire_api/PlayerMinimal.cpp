@@ -290,6 +290,11 @@ namespace Core {
       createInvDbContainer( InventoryType::Currency );
       createInvDbContainer( InventoryType::Crystal );
 
+      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /// SET UP SOCIAL GROUPS
+
+      createFriendsListContainer( m_id );
+
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       /// SETUP EQUIPMENT / STARTING GEAR
       auto classJobInfo = g_exdDataGen.get< Core::Data::ClassJob >( m_class );
@@ -362,6 +367,21 @@ namespace Core {
       stmtCreateInv->setInt( 1, m_id );
       stmtCreateInv->setInt( 2, slot );
       g_charaDb.directExecute( stmtCreateInv );
+   }
+
+   void PlayerMinimal::createFriendsListContainer( uint32_t characterId ) const
+   {
+      // todo: check if size is a-ok
+      std::vector< uint8_t > friendsList( 800 );
+      std::vector< uint8_t > inviteDateList( 800 );
+
+      auto stmtCreateFrnList = g_charaDb.getPreparedStatement( Db::CHARA_SOCIAL_FRIENDS_INS );
+      stmtCreateFrnList->setInt( 1, characterId );
+      stmtCreateFrnList->setBinary( 2, friendsList );
+      stmtCreateFrnList->setBinary( 3, inviteDateList );
+
+      g_charaDb.directExecute( stmtCreateFrnList );
+
    }
 
    uint64_t PlayerMinimal::getNextUId64() const
