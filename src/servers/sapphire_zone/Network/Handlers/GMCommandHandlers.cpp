@@ -15,6 +15,7 @@
 
 #include "Zone/TerritoryMgr.h"
 #include "Zone/Zone.h"
+#include "Zone/InstanceContent.h"
 #include "Zone/ZonePosition.h"
 
 #include "Network/GameConnection.h"
@@ -415,6 +416,15 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       {
          player.sendDebug( "Found instance: " + instance->getName() + ", id: " + std::to_string( param1 ) );
 
+         // if the zone is an instanceContent instance, make sure the player is actually bound to it
+         auto pInstance = instance->getAsInstanceContent();
+         if( !pInstance->isPlayerBound( player.getId() ) )
+         {
+            player.sendUrgent( "Not able to join instance: " + std::to_string( param1 ) );
+            player.sendUrgent( "Player not bound! ( run !instance bind <instanceId> first ) " + std::to_string( param1 ) );
+            break;
+         }
+
          player.setInstance( instance );
       }
       else if( !pTeriMgr->isValidTerritory( param1 )  )
@@ -429,9 +439,11 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
             player.sendUrgent( "No zone instance found for " + std::to_string( param1 ) );
             break;
          }
+
          targetPlayer->setPos( targetPlayer->getPos() );
          targetPlayer->performZoning( param1, targetPlayer->getPos(), 0 );
-         player.sendNotice( targetPlayer->getName() + " was warped to zone " + std::to_string( param1 ) + " (" + pZone->getName() + ")" );
+         player.sendNotice( targetPlayer->getName() + " was warped to zone " +
+                            std::to_string( param1 ) + " (" + pZone->getName() + ")" );
       }
       break;
    }
