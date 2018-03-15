@@ -50,6 +50,11 @@ public:
    void startEventCutscene();
    void endEventCutscene();
 
+   /*! set the current bgm index (inside bgm.exd) */
+   void setCurrentBGM( uint16_t bgmIndex );
+   /*! get the currently playing bgm index */
+   uint16_t getCurrentBGM() const;
+
    bool hasPlayerPreviouslySpawned( Entity::Player &player ) const;
    InstanceContentState getState() const;
 
@@ -66,6 +71,7 @@ private:
    boost::shared_ptr< Core::Data::InstanceContent > m_instanceContentInfo;
    uint32_t m_instanceContentId;
    InstanceContentState m_state;
+   uint16_t m_currentBgm;
 
    int64_t m_instanceExpireTime;
    int64_t m_instanceCommenceTime;
