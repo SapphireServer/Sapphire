@@ -101,6 +101,10 @@ void Core::InstanceContent::onLeaveTerritory( Entity::Player& player )
 void Core::InstanceContent::onUpdate( uint32_t currTime )
 {
 
+
+   // TODO: check all players if still bound, if not, remove
+   //       needs to happen regardless of state
+
    switch( m_state )
    {
       case Created:
@@ -109,6 +113,7 @@ void Core::InstanceContent::onUpdate( uint32_t currTime )
          if( m_playerMap.size() < 1 )
             return;
 
+         // TODO: 1. check all bound players instead of just players in instance at the time
          for( const auto& playerIt : m_playerMap )
          {
             if( !playerIt.second->isLoadingComplete() ||
@@ -409,4 +414,28 @@ void Core::InstanceContent::setCurrentBGM( uint16_t bgmIndex )
 uint16_t Core::InstanceContent::getCurrentBGM() const
 {
    return m_currentBgm;
+}
+
+bool Core::InstanceContent::bindPlayer( uint32_t playerId )
+{
+   // if player already bound, return false
+   if( m_boundPlayerIds.count( playerId ) )
+      return false;
+
+   // TODO: do not allow binding of players if instance already has all it can take
+   // if( m_boundPlayerIds.size() >= party resttrictions )
+   //    return false;
+
+   m_boundPlayerIds.insert( playerId );
+   return true;
+}
+
+bool Core::InstanceContent::isPlayerBound( uint32_t playerId ) const
+{
+   return m_boundPlayerIds.count( playerId ) > 0;
+}
+
+void Core::InstanceContent::unbindPlayer( uint32_t playerId )
+{
+   m_boundPlayerIds.erase( playerId );
 }

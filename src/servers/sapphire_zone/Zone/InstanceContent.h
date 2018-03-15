@@ -64,10 +64,19 @@ public:
 
    Entity::EventObjectPtr getEObjByName( const std::string& name );
 
+   /*! binds a player to the instance */
+   bool bindPlayer( uint32_t playerId );
+
+   /*! removes bind of player from the instance */
+   void unbindPlayer( uint32_t playerId );
+
+   /*! return true if the player is bound to the instance */
+   bool isPlayerBound( uint32_t playerId ) const;
+
    /*! number of milliseconds after all players are ready for the instance to commence (spawn circle removed) */
    const uint32_t instanceStartDelay = 1250;
+
 private:
-   Event::DirectorPtr m_pDirector;
    boost::shared_ptr< Core::Data::InstanceContent > m_instanceContentInfo;
    uint32_t m_instanceContentId;
    InstanceContentState m_state;
@@ -81,6 +90,9 @@ private:
    std::map< std::string, Entity::EventObjectPtr > m_eventObjectMap;
    std::unordered_map< uint32_t, Entity::EventObjectPtr > m_eventIdToObjectMap;
    std::set< uint32_t > m_spawnedPlayers;
+
+   // the players which are bound to the instance, regardless of inside or offline
+   std::set< uint32_t > m_boundPlayerIds;
 };
 
 }
