@@ -477,6 +477,8 @@ namespace Common {
 
       FreeEventPos = 0x8A,
 
+      SetBGM = 0xA1,
+
       UnlockAetherCurrentMsg = 0xA4,
 
       RemoveName = 0xA8,
