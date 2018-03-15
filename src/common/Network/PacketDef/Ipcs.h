@@ -206,6 +206,7 @@ namespace Packets {
       SetSearchInfoHandler     = 0x00D2, // updated 4.2
 
       BlackListHandler         = 0x00E0, // updated 4.2
+      PlayerSearchHandler      = 0x00E2, // updated 4.2
 
       LinkshellListHandler     = 0x00E8, // updated 4.2
 
