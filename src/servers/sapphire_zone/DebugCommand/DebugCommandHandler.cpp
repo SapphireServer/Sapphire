@@ -830,6 +830,14 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
       player.sendDebug( "evt end" );
       instance->endEventCutscene();
    }
+   else if( subCommand == "bgm" )
+   {
+      uint16_t bgmId;
+      sscanf( params.c_str(), "%hd", &bgmId );
+
+      if( auto instance = player.getCurrentInstance() )
+         instance->setCurrentBGM( bgmId );
+   }
    else
    {
       player.sendDebug( "Unknown sub command." );
