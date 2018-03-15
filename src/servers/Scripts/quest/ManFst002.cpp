@@ -108,7 +108,7 @@ private:
          checkQuestCompletion( player, 3 );
       };
 
-      player.eventPlay( getId(), 2, 0, 0, 0, callback );
+      player.eventPlay( getId(), 2, NONE, 0, 0, callback );
    }
 
    void Scene00003( Entity::Player& player )
@@ -121,12 +121,12 @@ private:
             Scene00099( player );
       };
 
-      player.eventPlay( getId(), 3, 0, 0, 0, callback );
+      player.eventPlay( getId(), 3, NONE, 0, 0, callback );
    }
 
    void Scene00004( Entity::Player& player )
    {
-      player.eventPlay( getId(), 4, 0, 0, 0 );
+      player.eventPlay( getId(), 4, NONE, 0, 0 );
    }
 
    void Scene00005( Entity::Player& player )
@@ -165,7 +165,7 @@ private:
          Scene00001( player );
       };
 
-      player.eventPlay( getId(), 51, 0, 0, 0, callback );
+      player.eventPlay( getId(), 51, NONE, 0, 0, callback );
    }
 
    void Scene00099( Entity::Player& player )
@@ -175,7 +175,7 @@ private:
          Scene00004( player );
       };
 
-      player.eventPlay( getId(), 99, 0, 0, 0, callback );
+      player.eventPlay( getId(), 99, NONE, 0, 0, callback );
    }
 
    void Scene00100( Entity::Player& player )

@@ -49,7 +49,9 @@ private:
          Scene00001( player );
       };
 
-      player.eventPlay( getId(), 0, 0x04AC05, 0, 1, callback );
+      player.eventPlay( getId(), 0, NO_DEFAULT_CAMERA | INVIS_ENPC |
+                                    CONDITION_CUTSCENE | HIDE_UI |
+                                    HIDE_HOTBAR | SILENT_ENTER_TERRI_ENV, 0, 1, callback );
    }
 
    void Scene00001( Entity::Player& player )
