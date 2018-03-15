@@ -38,7 +38,8 @@ Core::InstanceContent::InstanceContent( boost::shared_ptr< Core::Data::InstanceC
      m_instanceContentId( instanceContentId ),
      m_state( Created ),
      m_pEntranceEObj( nullptr ),
-     m_instanceCommenceTime( 0 )
+     m_instanceCommenceTime( 0 ),
+     m_currentBgm( pInstanceContent->bGM )
 {
 
 }
@@ -274,7 +275,7 @@ void Core::InstanceContent::setBranch( uint8_t value )
 
 void Core::InstanceContent::startQte()
 {
-   for ( const auto& playerIt : m_playerMap )
+   for( const auto& playerIt : m_playerMap )
    {
       auto player = playerIt.second;
       player->queuePacket( ActorControlPacket143( player->getId(), DirectorUpdate, getDirectorId(), 0x8000000A ) );
@@ -284,7 +285,7 @@ void Core::InstanceContent::startQte()
 void Core::InstanceContent::startEventCutscene()
 {
    // TODO: lock player movement
-   for ( const auto& playerIt : m_playerMap )
+   for( const auto& playerIt : m_playerMap )
    {
       auto player = playerIt.second;
       player->queuePacket( ActorControlPacket143( player->getId(), DirectorUpdate, getDirectorId(), 0x80000008 ) );
@@ -293,7 +294,7 @@ void Core::InstanceContent::startEventCutscene()
 
 void Core::InstanceContent::endEventCutscene()
 {
-   for ( const auto& playerIt : m_playerMap )
+   for( const auto& playerIt : m_playerMap )
    {
       auto player = playerIt.second;
       player->queuePacket( ActorControlPacket143( player->getId(), DirectorUpdate, getDirectorId(), 0x80000009 ) );
@@ -385,8 +386,20 @@ void Core::InstanceContent::onEnterTerritory( Entity::Player& player, uint32_t e
       player.directorPlayScene( getDirectorId(), 1, NO_DEFAULT_CAMERA | CONDITION_CUTSCENE | SILENT_ENTER_TERRI_ENV |
                                                     HIDE_HOTBAR | SILENT_ENTER_TERRI_BGM | SILENT_ENTER_TERRI_SE |
                                                     DISABLE_STEALTH | 0x00100000 | LOCK_HUD | LOCK_HOTBAR | // todo: wtf is 0x00100000
-                                                    DISABLE_CANCEL_EMOTE, 0, 0x9 );
+                                                    DISABLE_CANCEL_EMOTE, 0, 0x9, getCurrentBGM() );
    }
    else
-      player.directorPlayScene( getDirectorId(), 2, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 0, 0x9 );
+      player.directorPlayScene( getDirectorId(), 2, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 0, 0x9, getCurrentBGM() );
+}
+
+void Core::InstanceContent::setCurrentBGM( uint16_t bgmIndex )
+{
+   m_currentBgm = bgmIndex;
+
+   // todo: actrl a1 does not override whatever is set with directorplayscene, need to figure out the magic behind it
+}
+
+uint16_t Core::InstanceContent::getCurrentBGM() const
+{
+   return m_currentBgm;
 }
