@@ -22,7 +22,7 @@ public:
       DutyFinished
    };
 
-   InstanceContent( boost::shared_ptr< Core::Data::InstanceContent > pInstanceContent,
+   InstanceContent( boost::shared_ptr< Core::Data::InstanceContent > pInstanceConfiguration,
                     uint32_t guId,
                     const std::string& internalName,
                     const std::string& contentName,
@@ -51,14 +51,16 @@ public:
    void endEventCutscene();
 
    /*! set the current bgm index (inside bgm.exd) */
-   void setCurrentBGM( uint16_t bgmIndex );
+   void setCurrentBGM( uint16_t bgmId );
+   /*! set the current bgm for a specific player */
+   void setPlayerBGM( Entity::Player& player, uint16_t bgmId );
    /*! get the currently playing bgm index */
    uint16_t getCurrentBGM() const;
 
-   bool hasPlayerPreviouslySpawned( Entity::Player &player ) const;
+   bool hasPlayerPreviouslySpawned( Entity::Player& player ) const;
    InstanceContentState getState() const;
 
-   boost::shared_ptr< Core::Data::InstanceContent > getInstanceContentInfo() const;
+   boost::shared_ptr< Core::Data::InstanceContent > getInstanceConfiguration() const;
 
    uint32_t getInstanceContentId() const;
 
@@ -77,7 +79,7 @@ public:
    const uint32_t instanceStartDelay = 1250;
 
 private:
-   boost::shared_ptr< Core::Data::InstanceContent > m_instanceContentInfo;
+   boost::shared_ptr< Core::Data::InstanceContent > m_instanceConfiguration;
    uint32_t m_instanceContentId;
    InstanceContentState m_state;
    uint16_t m_currentBgm;
