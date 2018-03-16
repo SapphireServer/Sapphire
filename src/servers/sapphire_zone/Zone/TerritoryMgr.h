@@ -53,7 +53,10 @@ namespace Core
          FreeCompanyGarrison = 30,
          PalaceOfTheDead = 31,
          TreasureMapInstance = 33,
-         EventArea = 40,
+         EventTrial = 36,
+         TheFeastArea = 37,
+         PrivateEventArea = 40,
+         //Eureka = 41, // wat
       };
 
       TerritoryMgr();

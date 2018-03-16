@@ -27,19 +27,19 @@ using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-Core::InstanceContent::InstanceContent( boost::shared_ptr< Core::Data::InstanceContent > pInstanceContent,
+Core::InstanceContent::InstanceContent( boost::shared_ptr< Core::Data::InstanceContent > pInstanceConfiguration,
                                         uint32_t guId,
                                         const std::string& internalName,
                                         const std::string& contentName,
                                         uint32_t instanceContentId )
-   : Zone( static_cast< uint16_t >( pInstanceContent->territoryType ), guId, internalName, contentName ),
+   : Zone( static_cast< uint16_t >( pInstanceConfiguration->territoryType ), guId, internalName, contentName ),
      Director( Event::Director::InstanceContent, instanceContentId ),
-     m_instanceContentInfo( pInstanceContent ),
+     m_instanceConfiguration( pInstanceConfiguration ),
      m_instanceContentId( instanceContentId ),
      m_state( Created ),
      m_pEntranceEObj( nullptr ),
      m_instanceCommenceTime( 0 ),
-     m_currentBgm( pInstanceContent->bGM )
+     m_currentBgm( pInstanceConfiguration->bGM )
 {
 
 }
@@ -63,15 +63,15 @@ uint32_t Core::InstanceContent::getInstanceContentId() const
    return m_instanceContentId;
 }
 
-Core::Data::ExdDataGenerated::InstanceContentPtr Core::InstanceContent::getInstanceContentInfo() const
+Core::Data::ExdDataGenerated::InstanceContentPtr Core::InstanceContent::getInstanceConfiguration() const
 {
-   return m_instanceContentInfo;
+   return m_instanceConfiguration;
 }
 
 void Core::InstanceContent::onPlayerZoneIn( Entity::Player& player )
 {
    auto pLog = g_fw.get< Logger >();
-   pLog->debug( "InstanceContent::onEnterTerritory: Zone#" + std::to_string( getGuId() ) + "|"
+   pLog->debug( "InstanceContent::onPlayerZoneIn: Zone#" + std::to_string( getGuId() ) + "|"
                                                            + std::to_string( getInstanceContentId() ) +
                                                            + ", Entity#" + std::to_string( player.getId() ) );
 
@@ -100,26 +100,28 @@ void Core::InstanceContent::onLeaveTerritory( Entity::Player& player )
 
 void Core::InstanceContent::onUpdate( uint32_t currTime )
 {
-
-
-   // TODO: check all players if still bound, if not, remove
-   //       needs to happen regardless of state
-
    switch( m_state )
    {
       case Created:
       {
-         // temporary handling for instance state progression
-         if( m_playerMap.size() < 1 )
+         if( m_boundPlayerIds.size() == 0 )
             return;
 
-         // TODO: 1. check all bound players instead of just players in instance at the time
+         for( const auto playerId : m_boundPlayerIds )
+         {
+            auto it = m_playerMap.find( playerId );
+            if( it == m_playerMap.end() )
+               return;
+         }
+
          for( const auto& playerIt : m_playerMap )
          {
-            if( !playerIt.second->isLoadingComplete() ||
-                !playerIt.second->isDirectorInitialized() ||
-                !playerIt.second->isOnEnterEventDone() ||
-                playerIt.second->hasStateFlag( PlayerStateFlag::WatchingCutscene ) )
+            const auto& player = playerIt.second;
+
+            if( !player->isLoadingComplete() ||
+                !player->isDirectorInitialized() ||
+                !player->isOnEnterEventDone() ||
+                player->hasStateFlag( PlayerStateFlag::WatchingCutscene ) )
                return;
          }
 
@@ -136,13 +138,13 @@ void Core::InstanceContent::onUpdate( uint32_t currTime )
             auto pPlayer = playerIt.second;
             pPlayer->queuePacket(
                     ActorControlPacket143( pPlayer->getId(), DirectorUpdate,
-                                           getDirectorId(), 0x40000001, m_instanceContentInfo->timeLimitmin * 60u ) );
+                                           getDirectorId(), 0x40000001, m_instanceConfiguration->timeLimitmin * 60u ) );
          }
 
          if( m_pEntranceEObj )
             m_pEntranceEObj->setState( 7 );
          m_state = DutyInProgress;
-         m_instanceExpireTime = Util::getTimeSeconds() + ( m_instanceContentInfo->timeLimitmin * 60u );
+         m_instanceExpireTime = Util::getTimeSeconds() + ( m_instanceConfiguration->timeLimitmin * 60u );
          break;
       }
 
@@ -159,9 +161,9 @@ void Core::InstanceContent::onUpdate( uint32_t currTime )
       case DutyFinished:
          break;
    }
+
    auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
    pScriptMgr->onInstanceUpdate( getAsInstanceContent(), currTime );
-
 }
 
 void Core::InstanceContent::onFinishLoading( Entity::Player& player )
@@ -338,6 +340,10 @@ Core::InstanceContent::InstanceContentState Core::InstanceContent::getState() co
 
 void Core::InstanceContent::onBeforePlayerZoneIn( Core::Entity::Player& player )
 {
+   // remove any players from the instance who aren't bound on zone in
+   if( !isPlayerBound( player.getId() ) )
+      player.exitInstance();
+
    // if a player has already spawned once inside this instance, don't move them if they happen to zone in again
    if( !hasPlayerPreviouslySpawned( player ) )
    {
@@ -411,6 +417,11 @@ void Core::InstanceContent::setCurrentBGM( uint16_t bgmIndex )
    }
 }
 
+void Core::InstanceContent::setPlayerBGM( Core::Entity::Player& player, uint16_t bgmId )
+{
+   player.queuePacket( ActorControlPacket143( player.getId(), DirectorUpdate, getDirectorId(), 0x80000001, bgmId ) );
+}
+
 uint16_t Core::InstanceContent::getCurrentBGM() const
 {
    return m_currentBgm;
@@ -438,4 +449,8 @@ bool Core::InstanceContent::isPlayerBound( uint32_t playerId ) const
 void Core::InstanceContent::unbindPlayer( uint32_t playerId )
 {
    m_boundPlayerIds.erase( playerId );
+
+   auto it = m_playerMap.find( playerId );
+   if( it != m_playerMap.end() )
+      it->second->exitInstance();
 }
