@@ -744,7 +744,7 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    uint8_t unlockedRaids[28];
    uint8_t unlockedDungeons[18];
    uint8_t unlockedGuildhests[10];
-   uint8_t unlockedTrails[7];
+   uint8_t unlockedTrials[7];
    uint8_t unlockedPvp[5];
    uint8_t unknownMask72D[28];
    uint8_t unknownMask749[18];

@@ -75,6 +75,17 @@ private:
       m_data.maxLevel = 0x46;
       m_data.expansion = 2;
 
+      // df stuff
+      // todo: actually do this properly
+      m_data.unknown70[4] = 1; // enable df
+
+      // enable all raids/guildhests/dungeons
+      memset( m_data.unlockedDungeons, 0xFF, sizeof( m_data.unlockedDungeons ) );
+      memset( m_data.unlockedGuildhests, 0xFF, sizeof( m_data.unlockedGuildhests ) );
+      memset( m_data.unlockedPvp, 0xFF, sizeof( m_data.unlockedPvp ) );
+      memset( m_data.unlockedRaids, 0xFF, sizeof( m_data.unlockedRaids ) );
+      memset( m_data.unlockedTrials, 0xFF, sizeof( m_data.unlockedTrials ) );
+
    };
 };
 
