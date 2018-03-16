@@ -70,15 +70,18 @@ bool Core::TerritoryMgr::isInstanceContentTerritory( uint32_t territoryTypeId ) 
    if( !pTeri )
       return false;
 
-   return pTeri->territoryIntendedUse == TerritoryIntendedUse::AllianceRaid ||
-          pTeri->territoryIntendedUse == TerritoryIntendedUse::BeforeTrialDung ||
-          pTeri->territoryIntendedUse == TerritoryIntendedUse::Trial ||
-          pTeri->territoryIntendedUse == TerritoryIntendedUse::Dungeon ||
-          pTeri->territoryIntendedUse == TerritoryIntendedUse::OpenWorldInstanceBattle ||
-          pTeri->territoryIntendedUse == TerritoryIntendedUse::PalaceOfTheDead ||
-          pTeri->territoryIntendedUse == TerritoryIntendedUse::RaidFights ||
-          pTeri->territoryIntendedUse == TerritoryIntendedUse::Raids ||
-          pTeri->territoryIntendedUse == TerritoryIntendedUse::TreasureMapInstance;
+   auto intendedUse = pTeri->territoryIntendedUse;
+
+   return intendedUse == TerritoryIntendedUse::AllianceRaid ||
+          intendedUse == TerritoryIntendedUse::BeforeTrialDung ||
+          intendedUse == TerritoryIntendedUse::Trial ||
+          intendedUse == TerritoryIntendedUse::Dungeon ||
+          intendedUse == TerritoryIntendedUse::OpenWorldInstanceBattle ||
+          intendedUse == TerritoryIntendedUse::PalaceOfTheDead ||
+          intendedUse == TerritoryIntendedUse::RaidFights ||
+          intendedUse == TerritoryIntendedUse::Raids ||
+          intendedUse == TerritoryIntendedUse::TreasureMapInstance ||
+          intendedUse == TerritoryIntendedUse::EventTrial;
 }
 
 bool Core::TerritoryMgr::isPrivateTerritory( uint32_t territoryTypeId ) const
