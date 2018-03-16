@@ -27,4 +27,8 @@ else()
 endif()
 
 target_link_libraries(sapphire_lobby ${Boost_LIBRARIES} ${Boost_LIBRARIES})
-cotire( sapphire_lobby )
+
+if(Cotire_ENABLED)
+  message( "Cotire enabled for sapphire_lobby" )
+  cotire( sapphire_lobby )
+endif()

@@ -11,6 +11,8 @@ set(EXECUTABLE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 set(PROJECT_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
 
+set(Cotire_ENABLED TRUE)
+
 ##########################################################################
 # Boost stuff
 
@@ -30,7 +32,10 @@ set( LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/libraries" )
 include( "cmake/boost.cmake" )
 include( "cmake/mysql.cmake" )
 include( "cmake/compiler.cmake" )
-include( "cmake/cotire.cmake" )
+
+if(Cotire_ENABLED)
+	include( "cmake/cotire.cmake" )
+endif()
 ##############################
 #             Git            #
 ##############################
