@@ -83,7 +83,7 @@ void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inP
             }
 
             // Check if we actually have an actor
-            if ( targetActor == nullptr )
+            if( !targetActor )
             {
                // todo: interrupt a cast.
                player.sendDebug( "Invalid target." );
