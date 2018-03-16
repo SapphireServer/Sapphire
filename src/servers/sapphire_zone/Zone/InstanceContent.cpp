@@ -27,19 +27,19 @@ using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-Core::InstanceContent::InstanceContent( boost::shared_ptr< Core::Data::InstanceContent > instanceConfiguration,
+Core::InstanceContent::InstanceContent( boost::shared_ptr< Core::Data::InstanceContent > pInstanceConfiguration,
                                         uint32_t guId,
                                         const std::string& internalName,
                                         const std::string& contentName,
                                         uint32_t instanceContentId )
-   : Zone( static_cast< uint16_t >( instanceConfiguration->territoryType ), guId, internalName, contentName ),
+   : Zone( static_cast< uint16_t >( pInstanceConfiguration->territoryType ), guId, internalName, contentName ),
      Director( Event::Director::InstanceContent, instanceContentId ),
-     m_instanceConfiguration( instanceConfiguration ),
+     m_instanceConfiguration( pInstanceConfiguration ),
      m_instanceContentId( instanceContentId ),
      m_state( Created ),
      m_pEntranceEObj( nullptr ),
      m_instanceCommenceTime( 0 ),
-     m_currentBgm( instanceConfiguration->bGM )
+     m_currentBgm( pInstanceConfiguration->bGM )
 {
 
 }
@@ -107,7 +107,7 @@ void Core::InstanceContent::onUpdate( uint32_t currTime )
          if( m_boundPlayerIds.size() == 0 )
             return;
 
-         for( const auto& playerId : m_boundPlayerIds )
+         for( const auto playerId : m_boundPlayerIds )
          {
             auto it = m_playerMap.find( playerId );
             if( it == m_playerMap.end() )
