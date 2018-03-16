@@ -22,7 +22,7 @@ public:
       DutyFinished
    };
 
-   InstanceContent( boost::shared_ptr< Core::Data::InstanceContent > instanceConfiguration,
+   InstanceContent( boost::shared_ptr< Core::Data::InstanceContent > pInstanceConfiguration,
                     uint32_t guId,
                     const std::string& internalName,
                     const std::string& contentName,

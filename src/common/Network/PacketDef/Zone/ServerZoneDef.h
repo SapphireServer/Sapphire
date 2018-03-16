@@ -730,8 +730,8 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    uint16_t pvpFrontlineWeekly2nd;
    uint16_t pvpFrontlineWeekly3rd;
    uint8_t unknown61E;
-   uint8_t unknown61F[32];
-   uint8_t unknown63F[22];
+   uint8_t centurioSealHunts[32];
+   uint8_t alliedSealHunts[22];
    uint8_t tripleTriadCards[28];
    uint8_t unknown671[11];
    uint8_t unknownMask67C[22];
@@ -739,7 +739,7 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    uint8_t orchestrionMask[40];
    uint8_t hallOfNoviceCompleteMask[3];
    uint8_t unknownMask6C0[11];
-   uint8_t unknownMask6CB[16];
+   uint8_t animaRelicMask[16]; // [2] = anima glass key item, [1] = ulan's note key item
    uint8_t unknown6DB[14];
    uint8_t unlockedRaids[28];
    uint8_t unlockedDungeons[18];
