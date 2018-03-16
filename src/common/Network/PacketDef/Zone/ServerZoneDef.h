@@ -614,7 +614,7 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    uint32_t unknownC;
    uint32_t charId;
    uint32_t restedExp;
-   uint16_t unknown18;
+   uint16_t currentLevel;
    uint8_t maxLevel;
    uint8_t expansion;
    uint8_t unknown1A;
