@@ -38,6 +38,7 @@ private:
       m_data.gender = player.getLookAt( Common::CharaLook::Gender );
       m_data.currentClass = static_cast< uint8_t >( player.getClass() );
       m_data.currentJob = static_cast< uint8_t >( player.getClass() );
+      m_data.currentLevel = player.getLevel();
       m_data.deity = static_cast< uint8_t >( player.getGuardianDeity() );
       m_data.namedayMonth = player.getBirthMonth();
       m_data.namedayDay = player.getBirthDay();
