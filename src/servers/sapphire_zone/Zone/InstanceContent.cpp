@@ -104,16 +104,19 @@ void Core::InstanceContent::onUpdate( uint32_t currTime )
    {
       case Created:
       {
-         // temporary handling for instance state progression
-         if( m_playerMap.size() < 1 )
+         if( m_boundPlayerIds.size() == 0 )
             return;
+
+         for( const auto& playerId : m_boundPlayerIds )
+         {
+            auto it = m_playerMap.find( playerId );
+            if( it == m_playerMap.end() )
+               return;
+         }
 
          for( const auto& playerIt : m_playerMap )
          {
             const auto& player = playerIt.second;
-
-            if( !isPlayerBound( player->getId() ) )
-               continue;
 
             if( !player->isLoadingComplete() ||
                 !player->isDirectorInitialized() ||
