@@ -418,7 +418,9 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
 
          // if the zone is an instanceContent instance, make sure the player is actually bound to it
          auto pInstance = instance->getAsInstanceContent();
-         if( !pInstance->isPlayerBound( player.getId() ) )
+
+         // pInstance will be nullptr if you're accessing a normal zone via its allocated instance id rather than its zoneid
+         if( pInstance && !pInstance->isPlayerBound( player.getId() ) )
          {
             player.sendUrgent( "Not able to join instance: " + std::to_string( param1 ) );
             player.sendUrgent( "Player not bound! ( run !instance bind <instanceId> first ) " + std::to_string( param1 ) );
