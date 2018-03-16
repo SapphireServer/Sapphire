@@ -76,9 +76,18 @@ void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inP
         else
         {
             Core::Entity::ActorPtr targetActor = player.getAsPlayer();
+           
             if( targetId != player.getId() )
             {
                 targetActor = player.lookupTargetById( targetId );
+            }
+
+            // Check if we actually have an actor
+            if( !targetActor )
+            {
+               // todo: interrupt a cast.
+               player.sendDebug( "Invalid target." );
+               return;
             }
 
             if( !player.actionHasCastTime( action ) )
