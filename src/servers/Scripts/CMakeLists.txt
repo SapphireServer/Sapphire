@@ -13,10 +13,6 @@ set(RUNTIME_OUTPUT_DIRECTORY "${SCRIPT_LIB_DIR}")
 
 file(GLOB children "${CMAKE_CURRENT_SOURCE_DIR}/*" )
 
-if(Cotire_ENABLED)
-    message( "Cotire enabled for scripts" )
-endif()
-
 foreach(_scriptDir ${children})
     get_filename_component(_name "${_scriptDir}" NAME_WE)
     if(IS_DIRECTORY ${_scriptDir} AND NOT ${_name} MATCHES "CMakeFiles")
