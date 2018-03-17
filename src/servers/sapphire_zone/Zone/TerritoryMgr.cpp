@@ -314,6 +314,7 @@ Core::TerritoryMgr::InstanceIdList Core::TerritoryMgr::getInstanceContentIdList(
 bool Core::TerritoryMgr::movePlayer( uint32_t territoryId, Core::Entity::PlayerPtr pPlayer )
 {
    auto pZone = getZoneByTerriId( territoryId );
+   assert( pZone );
    return movePlayer( pZone, pPlayer );
 }
 
@@ -333,8 +334,8 @@ bool Core::TerritoryMgr::movePlayer( ZonePtr pZone, Core::Entity::PlayerPtr pPla
    // mark character as zoning in progress
    pPlayer->setLoadingComplete( false );
 
-   if( pPlayer->getLastPing() != 0 )
-      pPlayer->getCurrentZone()->removeActor( pPlayer );
+   //if( pPlayer->getLastPing() != 0 )
+   //   pPlayer->getCurrentZone()->removeActor( pPlayer );
 
    pPlayer->setCurrentZone( pZone );
    pZone->pushActor( pPlayer );
