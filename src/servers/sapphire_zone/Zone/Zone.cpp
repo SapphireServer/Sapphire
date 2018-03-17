@@ -226,19 +226,21 @@ void Core::Zone::pushActor( Entity::ActorPtr pActor )
 void Core::Zone::removeActor( Entity::ActorPtr pActor )
 {
 
-   auto pCell = pActor->getCellPtr();
-   if( pCell )
-   {
-      pCell->removeActor( pActor );
-      pCell = nullptr;
-   }
+   /* TODO: have to wait and see if removal of this actually breaks anything
+            this however is potentially removing a player from a zone he does not belong to */
+   //auto pCell = pActor->getCellPtr();
+   //if( pCell )
+   //{
+   //   pCell->removeActor( pActor );
+   //   pCell = nullptr;
+   //}
 
    if( pActor->isPlayer() )
    {
 
       // If it's a player and he's inside boundaries - update his nearby cells
       if( pActor->getPos().x <= _maxX && pActor->getPos().x >= _minX &&
-              pActor->getPos().z <= _maxY && pActor->getPos().z >= _minY )
+          pActor->getPos().z <= _maxY && pActor->getPos().z >= _minY )
       {
          uint32_t x = getPosX( pActor->getPos().x );
          uint32_t y = getPosY( pActor->getPos().z );
@@ -539,7 +541,11 @@ void Core::Zone::updateActorPosition( Entity::Actor &actor )
    {
 
       if( pOldCell )
+      {
+         auto pLog = g_fw.get< Logger >();
+         pLog->debug( std::string( __FUNCTION__ ) + "removeActor" );
          pOldCell->removeActor( actor.shared_from_this() );
+      }
 
       pCell->addActor( actor.shared_from_this() );
       actor.setCell( pCell );
