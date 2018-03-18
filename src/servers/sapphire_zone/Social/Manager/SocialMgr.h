@@ -124,30 +124,36 @@ uint64_t Core::Social::SocialMgr< Core::Social::FriendList >::loadFriendsList( u
    uint64_t ownerId = res->getUInt64( 1 );
 
    auto groupID = generateGroupId();
-   auto friendsList = Core::Social::FriendList( groupID, ownerId );
+   auto friendsList = Social::FriendList( groupID, ownerId );
 
-   auto func = []( std::set< uint64_t >& outList, std::vector< char >& inData )
-   {
-      if ( inData.size() )
-      {
-         std::vector< uint64_t > list( inData.size() / 8 );
-         // todo: fix this garbage. maybe get rid of lambda altogether
-         if( list.at( 0 ) != 0 )
-         {
-            outList.insert( list.begin(), list.end() );
-         }
-      }
-   };
+   // Insert friend content IDs from binary data
 
    std::vector< char > friends;
    friends = res->getBlobVector( 2 );
-   func( friendsList.getMembers(), friends );
 
-   std::vector< char > friendInvites;
-   friendInvites = res->getBlobVector( 3 );
-   func( friendsList.getInvites(), friendInvites );
+   if( friends.size() )
+   {
+      std::vector< uint64_t > list( friends.size() / 8 );
+      // todo: fix this garbage check
+      if( list.at( 0 ) != 0 )
+      {
+         friendsList.getMembers().insert( list.begin(), list.end() );
+      }
+   }
 
-   auto friendListPtr = boost::make_shared< Core::Social::FriendList >( friendsList );
+   // Insert invite data from binary data
+
+   std::vector< char > inviteData;
+   inviteData = res->getBlobVector( 3 );
+   
+   if( inviteData.size() )
+   {
+      std::vector< Social::FriendEntry > list( friends.size() / 8 );
+
+      friendsList.getEntries().insert( list.begin(), list.end() );
+   }
+
+   auto friendListPtr = boost::make_shared< Social::FriendList >( friendsList );
       
    m_groups[groupID] = friendListPtr;
 

@@ -50,7 +50,7 @@ public:
 
    // New group system: return error code for logmessage
 
-   virtual uint32_t addMember( uint64_t characterId );
+   virtual uint32_t addMember( uint64_t contentId );
    //virtual uint32_t addInvite( uint64_t characterId );
    
    virtual Core::Network::Packets::GamePacketPtr processInvite( uint64_t recipientId, uint64_t senderId );
@@ -74,7 +74,7 @@ public:
    uint32_t Group::getTotalSize() const;
 
    /*! check if group has member */
-   bool hasMember( uint64_t memberId ) const;
+   bool hasMember( uint64_t contentId ) const;
 
 
 protected:

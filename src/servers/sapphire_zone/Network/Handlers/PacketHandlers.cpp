@@ -497,19 +497,7 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
 
          g_fw.get< Logger >()->debug( "aaa" + std::to_string( i ) );
          // todo: replace this with call for generating the entire vector
-         listPacket.data().entries[i] = Core::Social::FriendList::generatePlayerEntry( member, false );
-         i++;
-      }
-
-      for ( auto invite : playerFriendsList->getInvites() )
-      {
-         // more elegant way to break over list entries pls
-         if ( i == 10 )
-            break;
-
-         g_fw.get< Logger >()->debug( "aaa" + std::to_string( i ) );
-         // todo: replace this with call for generating the entire vector
-         listPacket.data().entries[i] = Core::Social::FriendList::generatePlayerEntry( invite, true );
+         listPacket.data().entries[i] = Core::Social::FriendList::generatePlayerEntry( member );
          i++;
       }
 
@@ -660,7 +648,7 @@ void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePac
             auto recipientFriendsList = g_fw.get< Social::SocialMgr< Social::FriendList > >()->findGroupById( pRecipient->getFriendsListId() );
 
             // If any of these are true, an error has occured.
-            if( senderFriendsList->hasInvite( recipientId ) || senderFriendsList->hasMember( recipientId ) )
+            if( senderFriendsList->hasMember( recipientId ) )
             {
                logMessage = 312; // That player is already a friend or has been sent a request.
             }
@@ -679,7 +667,7 @@ void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePac
             else
             {
                // Catch any other, unreported mess
-               logMessage = senderFriendsList->addInvite( recipientId );
+               //logMessage = senderFriendsList->addInvite( recipientId );
             }
 
          }
@@ -722,7 +710,7 @@ void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePac
 
          auto recipientFriendsList = g_fw.get< Social::SocialMgr< Social::FriendList > >()->findGroupById( pRecipient->getFriendsListId() );
 
-         recipientFriendsList->addInvite( player.getId() );
+         //recipientFriendsList->addInvite( player.getId() );
          
          auto senderResultPacket = GamePacketNew< Server::FFXIVIpcSocialRequestResponse, ServerZoneIpcType >( pRecipient->getId(), player.getId() );
          senderResultPacket.data().contentId = pRecipient->getId();

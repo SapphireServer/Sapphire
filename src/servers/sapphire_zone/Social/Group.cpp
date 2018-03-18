@@ -22,20 +22,20 @@ using namespace Core::Network;
 
 // todo: invite map in g_serverZone.getGroupMgr(GroupType) and look up
 
-uint32_t Group::addMember( uint64_t characterId )
+uint32_t Group::addMember( uint64_t contentId )
 {
-   assert( characterId != 0 );
+   assert( contentId != 0 );
 
    uint32_t logMessage = 0;
 
-   m_members.insert( characterId );
+   m_members.insert( contentId );
 
    return logMessage;
 }
 
-bool Group::hasMember( uint64_t memberId ) const
+bool Group::hasMember( uint64_t contentId ) const
 {
-   return m_members.find( memberId ) != m_members.end();
+   return m_members.find( contentId ) != m_members.end();
 }
 
 Core::Network::Packets::GamePacketPtr Group::processInvite( uint64_t recipientId, uint64_t senderId )
@@ -97,7 +97,7 @@ Core::Network::Packets::GamePacketPtr Group::addMember2( Core::Entity::PlayerPtr
    auto packet = GamePacketNew< Server::FFXIVIpcSocialRequestResponse, ServerZoneIpcType >( recipientId, senderId );
    packet.data().contentId = recipientContentId;
    packet.data().category = Common::SocialCategory::Friends;
-
+   /*
    if( m_members.size() < m_maxCapacity )
    {
       // todo: broadcast join message
@@ -113,7 +113,7 @@ Core::Network::Packets::GamePacketPtr Group::addMember2( Core::Entity::PlayerPtr
    else
    {
    }
-
+   */
    return packet;
 }
 
@@ -125,7 +125,7 @@ Packets::GamePacketPtr Group::inviteMember2( Core::Entity::PlayerPtr pSender, Co
    auto packet = Packets::GamePacketNew< Packets::Server::FFXIVIpcSocialRequestResponse, Packets::ServerZoneIpcType >( recipientId, senderId );
    packet.data().contentId = recipientId;
    packet.data().category = Common::SocialCategory::Friends;
-
+/*
    if( m_invites.size() < m_maxCapacity )
    {
       GroupMember member;
@@ -136,7 +136,7 @@ Packets::GamePacketPtr Group::inviteMember2( Core::Entity::PlayerPtr pSender, Co
 
       m_invites.emplace( recipientId, member );
    }
-
+   */
    return packet;
 }
 
@@ -157,7 +157,7 @@ void Group::sendPacketToMembers( Core::Network::Packets::GamePacketPtr pPacket, 
    assert( pPacket );
    for( const auto& member : m_members )
    {
-      auto pSession = g_fw.get< ServerZone >()->getSession( member.second.characterId );
+      auto pSession = g_fw.get< ServerZone >()->getSession( member );
       if( pSession )
       {
          pSession->getPlayer()->queuePacket( pPacket );
@@ -169,13 +169,9 @@ void Group::sendPacketToMembers( Core::Network::Packets::GamePacketPtr pPacket, 
 
 std::set< uint64_t >& Group::getMembers()
 {
-   return m_groupMembers;
+   return m_members;
 }
 
-std::set< uint64_t >& Group::getInvites()
-{
-   return m_groupInvites;
-}
 
 uint32_t Group::getCapacity() const
 {
@@ -184,7 +180,7 @@ uint32_t Group::getCapacity() const
 
 uint32_t Group::getTotalSize() const
 {
-   return m_groupMembers.size() + m_groupInvites.size();
+   return m_members.size();
 }
 
 bool Group::isParty() const

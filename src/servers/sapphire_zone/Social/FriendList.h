@@ -15,6 +15,21 @@
 namespace Core {
 namespace Social {
 
+enum class FriendEntryType : uint8_t
+{
+   Added = 0x10,
+   SentRequest = 0x20,
+   ReceivedRequest = 0x30
+};
+
+struct FriendEntry
+{
+   uint32_t timestamp;
+   FriendEntryType entryStatus;
+   uint8_t unknown;
+   uint8_t friendGroup;
+};
+
 class FriendList : public Group
 {
 
@@ -25,15 +40,21 @@ public:
 
    std::vector< Network::Packets::Server::PlayerEntry > getFriendListEntries( uint16_t entryAmount );
 
-   static Core::Network::Packets::Server::PlayerEntry generatePlayerEntry( uint64_t characterId, bool isInvite );
+   Core::Network::Packets::Server::PlayerEntry generatePlayerEntry( uint64_t contentId );
+
+   uint32_t addMember( uint64_t contentId, FriendEntryType friendEntryType );
+
+   /*! access entry vector */
+   std::set< FriendEntry >& getEntries();
 
 protected:
    uint64_t m_id{ 0 };
    uint64_t m_ownerId{ 0 };
    GroupType m_type{ GroupType::FriendList };
    uint32_t m_maxCapacity{ 200 };
-
    
+   // todo: (urgent) think of a way to only use a single std set, use index based for correlating with data
+   std::set< FriendEntry > m_entries;
 
 };
 

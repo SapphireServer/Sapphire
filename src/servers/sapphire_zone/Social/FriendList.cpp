@@ -1,4 +1,6 @@
 #include <cassert>
+#include <ctime>
+
 #include <boost/shared_ptr.hpp>
 #include <Logging/Logger.h>
 
@@ -23,6 +25,31 @@ using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
 using namespace Core::Social;
+
+
+uint32_t FriendList::addMember( uint64_t contentId, FriendEntryType friendEntryType )
+{
+   assert( contentId != 0 );
+
+   uint32_t logMessage = 0;
+
+   m_members.insert( contentId );
+
+   FriendEntry friendEntry;
+   friendEntry.timestamp = std::time( nullptr );
+   friendEntry.friendGroup = 0;
+   friendEntry.entryStatus = friendEntryType;
+   friendEntry.unknown = 0;
+
+   m_entries.insert( friendEntry );
+
+   return logMessage;
+}
+
+std::set< FriendEntry >& FriendList::getEntries()
+{
+   return m_entries;
+}
 
 /*
 uint32_t Group::addInvite( uint64_t characterId )
@@ -53,26 +80,17 @@ uint32_t Group::addInvite( uint64_t characterId )
    return logMessage;
 }
 */
-std::vector< PlayerEntry > Core::Social::FriendList::getFriendListEntries( uint16_t entryAmount )
+std::vector< PlayerEntry > FriendList::getFriendListEntries( uint16_t entryAmount )
 {
    std::vector< PlayerEntry > entryList = {};
    uint16_t limit = 0;
 
-   for ( const auto& member : m_groupMembers )
+   for ( const auto& member : m_members )
    {
       if ( limit == entryAmount )
          break;
 
-      entryList.push_back( generatePlayerEntry( member, false ) );
-      limit++;
-   }
-
-   for ( const auto& invite : m_groupInvites )
-   {
-      if ( limit == entryAmount )
-         break;
-
-      entryList.push_back( generatePlayerEntry( invite, true ) );
+      entryList.push_back( generatePlayerEntry( member ) );
       limit++;
    }
 
@@ -81,17 +99,20 @@ std::vector< PlayerEntry > Core::Social::FriendList::getFriendListEntries( uint1
 
 
 //todo: generalize this for linkshell etc
-Core::Network::Packets::Server::PlayerEntry FriendList::generatePlayerEntry( uint64_t characterId, bool isInvite )
+Core::Network::Packets::Server::PlayerEntry FriendList::generatePlayerEntry( uint64_t contentId )
 {
    // We check if player is online. If so, we can pull data from existing session in memory
    // Otherwise, we pull from SQL. We can optimize this later, there are quite a few choices here
 
-   auto pSession = g_fw.get< ServerZone >()->getSession( characterId );
+   auto pSession = g_fw.get< ServerZone >()->getSession( contentId );
+   
+   auto dataIndex = m_members.find( contentId );
+   auto friendEntry = m_entries;
 
    // todo: set as offline in one of the unknown values, if session does not exist
    Core::Network::Packets::Server::PlayerEntry entry = {};
 
-   entry.contentId = characterId;
+   entry.contentId = contentId;
    entry.timestamp = 1517767262;
 
    // todo: if invite change these
@@ -131,7 +152,8 @@ Core::Network::Packets::Server::PlayerEntry FriendList::generatePlayerEntry( uin
 
       auto stmt = pDb->getPreparedStatement( Db::CharaDbStatements::CHARA_SEL );
 
-      stmt->setUInt( 1, characterId );
+      //todo: this WILL break
+      stmt->setUInt( 1, contentId );
       auto res = pDb->query( stmt );
 
       // todo: Is this correct? Seems so judging from retail
@@ -161,7 +183,7 @@ Core::Network::Packets::Server::PlayerEntry FriendList::generatePlayerEntry( uin
    // TODO: no idea what this does - me neither
    //listPacket.data().entries[0].one = 1;
 
-   g_fw.get< Logger >()->debug( std::to_string( characterId ) );
+   g_fw.get< Logger >()->debug( std::to_string( contentId ) );
 
    //g_fw.get< Logger >()->debug( std::to_string( entry.contentId ) );
 
