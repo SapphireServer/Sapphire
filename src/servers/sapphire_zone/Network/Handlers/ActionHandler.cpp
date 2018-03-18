@@ -103,6 +103,10 @@ enum ClientTrigger
    CompanionActionUnlock = 0x6A6,
 
    OpenPerformInstrumentUI = 0x71C,
+
+   OpenDuelUI = 0x898, // Open a duel ui
+   DuelRequestResult = 0x899, // either accept/reject
+
 };
 
 void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& inPacket,

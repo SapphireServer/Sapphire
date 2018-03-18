@@ -557,7 +557,7 @@ namespace Common {
       SetTitle = 0x1F4,
 
       SetStatusIcon = 0x1F8,
-
+      LimitBreakGauge = 0x1F9, // Max level, amount, build type (chop sound), lb type(0=pve lb 1=pvp lb)
       SetHomepoint = 0x1FB,
       SetFavorite = 0x1FC,
       LearnTeleport = 0x1FD,
@@ -586,6 +586,12 @@ namespace Common {
 
       ToggleOrchestrionUnlock = 0x396,
       Dismount = 0x3a0
+
+      SetPvPState = 0x5E0, // param3 must be 6 to engage a duel (hardcoded in the client)
+      EndDuelSession = 0x5E1, // because someone went oob?
+      StartDuelCountdown = 0x5E2, // begins a countdown; also does some duel bgm thing.
+      StartDuel = 0x5E3, // actually all it does is set the challenger actor id;
+      DuelResultScreen = 0x5E4, // win/lose thing, also reset a target id just like what EndDuelSession does.
    };
 
    enum struct ChatType : uint16_t
