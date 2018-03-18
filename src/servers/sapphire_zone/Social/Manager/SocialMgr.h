@@ -131,7 +131,11 @@ uint64_t Core::Social::SocialMgr< Core::Social::FriendList >::loadFriendsList( u
       if ( inData.size() )
       {
          std::vector< uint64_t > list( inData.size() / 8 );
-         outList.insert( list.begin(), list.end() );
+         // todo: fix this garbage. maybe get rid of lambda altogether
+         if( list.at( 0 ) != 0 )
+         {
+            outList.insert( list.begin(), list.end() );
+         }
       }
    };
 

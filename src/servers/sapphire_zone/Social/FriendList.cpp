@@ -24,6 +24,35 @@ using namespace Core::Network::Packets::Server;
 
 using namespace Core::Social;
 
+/*
+uint32_t Group::addInvite( uint64_t characterId )
+{
+   assert( characterId != 0 );
+
+   uint32_t logMessage = 0;
+
+   g_fw.get< Logger >()->debug( "here" );
+
+   if( m_groupMembers.find( characterId ) != m_groupMembers.end() || m_groupInvites.find( characterId ) != m_groupInvites.end() )
+   {
+      // That player is already a friend or has been sent a request.
+      logMessage = 312;
+      return logMessage;
+   }
+   
+   if( getTotalSize() >= getCapacity() )
+   {
+      // Unable to send friend request. The other player's friend list is full.
+      logMessage = 314;
+      return logMessage;
+   }
+
+
+   m_groupInvites.insert( characterId );
+
+   return logMessage;
+}
+*/
 std::vector< PlayerEntry > Core::Social::FriendList::getFriendListEntries( uint16_t entryAmount )
 {
    std::vector< PlayerEntry > entryList = {};
@@ -63,14 +92,15 @@ Core::Network::Packets::Server::PlayerEntry FriendList::generatePlayerEntry( uin
    Core::Network::Packets::Server::PlayerEntry entry = {};
 
    entry.contentId = characterId;
-   entry.timestamp = 1512799339;
+   entry.timestamp = 1517767262;
 
    // todo: if invite change these
-   entry.status = 2;
+
+   entry.status = 16;
    entry.unknown = 0;
    //entry.entryIcon = 0xf;  
    entry.unavailable = 0;    // unavailable (other world)
-   entry.one = 0;
+   entry.one = 1;
 
    if ( pSession )
    {
@@ -83,7 +113,7 @@ Core::Network::Packets::Server::PlayerEntry FriendList::generatePlayerEntry( uin
       entry.classJob = pPlayer->getClass();
 
       entry.level = pPlayer->getLevel();
-      entry.zoneId = pPlayer->getCurrentZone()->getGuId();
+      entry.zoneId = pPlayer->getCurrentZone()->getTerritoryId();
       entry.grandCompany = pPlayer->getGc();
       memcpy( &entry.fcTag[0], "Meme", 4 );
       entry.clientLanguage = 2;

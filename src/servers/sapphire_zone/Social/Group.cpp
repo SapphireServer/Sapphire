@@ -22,8 +22,6 @@ using namespace Core::Network;
 
 // todo: invite map in g_serverZone.getGroupMgr(GroupType) and look up
 
-
-
 uint32_t Group::addMember( uint64_t characterId )
 {
    assert( characterId != 0 );
@@ -32,7 +30,7 @@ uint32_t Group::addMember( uint64_t characterId )
 
    m_groupMembers.insert( characterId );
 
-   return 0;
+   return logMessage;
 }
 
 uint32_t Group::addInvite( uint64_t characterId )
@@ -43,7 +41,17 @@ uint32_t Group::addInvite( uint64_t characterId )
 
    m_groupInvites.insert( characterId );
 
-   return 0;
+   return logMessage;
+}
+
+bool Group::hasMember( uint64_t memberId ) const
+{
+   return m_groupMembers.find( memberId ) != m_groupMembers.end();
+}
+
+bool Group::hasInvite( uint64_t inviteId ) const
+{
+   return m_groupInvites.find( inviteId ) != m_groupInvites.end();
 }
 
 Core::Network::Packets::GamePacketPtr Group::processInvite( uint64_t recipientId, uint64_t senderId )

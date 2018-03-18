@@ -372,8 +372,8 @@ namespace Core {
    void PlayerMinimal::createFriendsListContainer( uint32_t characterId ) const
    {
       // todo: check if size is a-ok
-      std::vector< uint8_t > friendsList( 800 );
-      std::vector< uint8_t > inviteDateList( 800 );
+      std::vector< uint8_t > friendsList( 1600 );
+      std::vector< uint8_t > inviteDateList( 1600 );
 
       auto stmtCreateFrnList = g_charaDb.getPreparedStatement( Db::CHARA_SOCIAL_FRIENDS_INS );
       stmtCreateFrnList->setInt( 1, characterId );

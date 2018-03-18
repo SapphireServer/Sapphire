@@ -47,3 +47,6 @@ ALTER TABLE `charainfo` CHANGE `Mounts` `Mounts` BINARY(15) NULL DEFAULT NULL;
 ALTER TABLE `charainfo` CHANGE `Orchestrion` `Orchestrion` BINARY(40) NULL DEFAULT NULL;
 ALTER TABLE `charainfo` CHANGE `Minions` `Minions` BINARY(37) NULL DEFAULT NULL;
 ALTER TABLE `charainfo` CHANGE `QuestCompleteFlags` `QuestCompleteFlags` VARBINARY(396) NULL DEFAULT NULL;
+
+ALTER TABLE `charainfofriendlist` CHANGE `CharacterIdList` `CharacterIdList` VARBINARY(1600) NULL DEFAULT NULL;
+ALTER TABLE `charainfofriendlist` CHANGE `InviteDataList` `InviteDataList` VARBINARY(1600) NULL DEFAULT NULL;

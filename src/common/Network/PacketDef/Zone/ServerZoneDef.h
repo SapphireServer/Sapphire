@@ -101,6 +101,7 @@ struct PlayerEntry {
    uint8_t one;
    char name[0x20];
    char fcTag[5];
+   uint32_t unknown_p1; // Added 4.2
 };
 
 struct FFXIVIpcSocialRequestReceive : FFXIVIpcBasePacket<SocialRequestReceive>
@@ -123,6 +124,8 @@ struct FFXIVIpcSocialRequestReceive : FFXIVIpcBasePacket<SocialRequestReceive>
 
 struct FFXIVIpcSocialRequestError : FFXIVIpcBasePacket<SocialRequestError>
 {
+   uint32_t unknown_p1;             // Added on 4.2, unknown. Possibly padding/crossworld related
+   uint32_t unknown_p2;
    uint32_t messageId;              // if 0 then type's message is used (type must 2/4/5 or it wont print)
    Common::SocialCategory category; // 2 - friend request, 4 - fc petition, 5 - fc invitation, anything else and wont print
    uint8_t unknown;                 // possibly padding

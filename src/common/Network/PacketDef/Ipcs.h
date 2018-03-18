@@ -68,13 +68,13 @@ namespace Packets {
       CFDutyInfo                 = 0x007A,
       CFPlayerInNeed             = 0x007F,
 
-      SocialRequestError         = 0x00AD,
-
       Playtime                   = 0x00DF, // updated 4.2
       CFRegistered               = 0x00B8, // updated 4.1
       CancelAllianceForming      = 0x00C6, // updated 4.2
       Chat                       = 0x00E1, // updated 4.2
-      SocialRequestResponse      = 0x00E5, // updated 4.1
+
+      SocialRequestError         = 0x00E4, // updated 4.2
+      SocialRequestResponse      = 0x00E5, // updated 4.2
       SocialRequestReceive       = 0x00E6, // updated 4.2
       SocialList                 = 0x00E7, // updated 4.2
 

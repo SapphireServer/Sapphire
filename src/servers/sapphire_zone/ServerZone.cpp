@@ -338,6 +338,7 @@ bool Core::ServerZone::createSession( uint32_t sessionId )
    }
 
    m_sessionMapByName[newSession->getPlayer()->getName()] = newSession;
+   m_sessionMapByContentId[newSession->getPlayer()->getContentId()] = newSession;
 
    return true;
 
@@ -362,6 +363,18 @@ Core::SessionPtr Core::ServerZone::getSession( uint32_t id )
    //std::lock_guard<std::mutex> lock( m_sessionMutex );
 
    auto it = m_sessionMapById.find( id );
+
+   if( it != m_sessionMapById.end() )
+      return ( it->second );
+
+   return nullptr;
+}
+
+Core::SessionPtr Core::ServerZone::getSession( uint64_t contentId )
+{
+   //std::lock_guard<std::mutex> lock( m_sessionMutex );
+
+   auto it = m_sessionMapById.find( contentId );
 
    if( it != m_sessionMapById.end() )
       return ( it->second );

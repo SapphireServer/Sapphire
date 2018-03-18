@@ -80,6 +80,10 @@ public:
    /*! get total size of group (members + invites) */
    uint32_t Group::getTotalSize() const;
 
+   bool hasMember( uint64_t memberId ) const;
+
+   bool hasInvite( uint64_t inviteId ) const;
+
 protected:
    GroupType m_type{ GroupType::None };
    uint64_t m_id{ 0 };

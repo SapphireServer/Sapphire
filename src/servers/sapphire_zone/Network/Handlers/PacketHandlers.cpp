@@ -501,6 +501,18 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
          i++;
       }
 
+      for ( auto invite : playerFriendsList->getInvites() )
+      {
+         // more elegant way to break over list entries pls
+         if ( i == 10 )
+            break;
+
+         g_fw.get< Logger >()->debug( "aaa" + std::to_string( i ) );
+         // todo: replace this with call for generating the entire vector
+         listPacket.data().entries[i] = Core::Social::FriendList::generatePlayerEntry( invite, true );
+         i++;
+      }
+
       queueOutPacket( listPacket );
 
    }
@@ -571,18 +583,14 @@ void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePac
 
    auto pSession = g_fw.get< ServerZone >()->getSession( name );
 
-   // only the requester needs the response
-   ZoneChannelPacket< FFXIVIpcSocialRequestError > response( player.getId() );
-   memcpy( &( response.data().name ), name.c_str(), 32 );
+   // Variable for error logging and control
+   uint32_t logMessage = 0;
 
-   // todo: enumerate log messages
-   response.data().messageId = 319; // That name does not exist. Please confirm the spelling.
-   response.data().category = category;
+   // only the requester needs the response
 
    // todo: enumerate and move each of these cases into their classes?
    if( pSession )
    {
-      bool successful = false;
       Entity::PlayerPtr pRecipient = pSession->getPlayer();
 
       std::array< std::string, 5 > typeVar{ "", "PartyInvite", "FriendInvite", "FreeCompanyPetition", "FreeCompanyInvite" };
@@ -600,12 +608,13 @@ void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePac
          }
          return;
       }*/
-
+      
+      /*
       if( pRecipient->getId() == player.getId() )
       {
          response.data().messageId = 321; // Unable to invite.
       }
-
+      */
       switch( category )
       {
          // party invite
@@ -626,19 +635,15 @@ void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePac
             }*/
             if( !pRecipient->isLoadingComplete() ) // || pRecipient->getDuty() )
             {
-               response.data().messageId = 331; // Unable to invite. That player is currently bound by duty or in a different area.
+               logMessage = 331; // Unable to invite. That player is currently bound by duty or in a different area.
             }
             else if( pRecipient->getOnlineStatus() == Common::OnlineStatus::Busy )
             {
-               response.data().messageId = 334; // Unable to send party invite. Player's online status is set to Busy.
+               logMessage = 334; // Unable to send party invite. Player's online status is set to Busy.
             }
             else if( pRecipient->getOnlineStatus() == Common::OnlineStatus::ViewingCutscene )
             {
-               response.data().messageId = 336; // Unable to invite. That player is currently watching a cutscene.
-            }
-            else
-            {
-               successful = true;
+               logMessage = 336; // Unable to invite. That player is currently watching a cutscene.
             }
             // response.data().messageId = 62; // <name> declines the party invite.
          }
@@ -647,23 +652,36 @@ void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePac
          case Common::SocialCategory::Friends:
          {
             // todo: check if already on friends list or invite pending
-            /*
-            auto playerFriendsList = g_fw.get< Social::SocialMgr< Social::FriendList > >()->findGroupById( pPlayer->getgetFriendsListId() );
 
-            if( playerFriendsList )
+            auto recipientId = pRecipient->getId();
+            auto senderId = player.getId();
+
+            auto senderFriendsList = g_fw.get< Social::SocialMgr< Social::FriendList > >()->findGroupById( player.getFriendsListId() );
+            auto recipientFriendsList = g_fw.get< Social::SocialMgr< Social::FriendList > >()->findGroupById( pRecipient->getFriendsListId() );
+
+            // If any of these are true, an error has occured.
+            if( senderFriendsList->hasInvite( recipientId ) || senderFriendsList->hasMember( recipientId ) )
             {
-            response.data().messageId = 312; // That player is already a friend or has been sent a request.
+               logMessage = 312; // That player is already a friend or has been sent a request.
             }
-            else if( pRecipient->getFriendList()->getSize() >= 200 )
+            else if( senderFriendsList->getTotalSize() >= senderFriendsList->getCapacity() )
             {
-            response.data().messageId = 314; // Unable to send friend request. The other player's friend list is full.
+               logMessage = 313; // Your friend list is full.
             }
-            else if( pPlayer->getFriendList()->getSize() >= 200 )
+            else if( recipientFriendsList->getTotalSize() >= recipientFriendsList->getCapacity() )
             {
-            response.data().messageId = 313; // Your friend list is full.
+               logMessage = 314; // Unable to send friend request. The other player's friend list is full.
             }
-            */
-            successful = true;
+            else if( pRecipient->getOnlineStatus() == Common::OnlineStatus::Busy )
+            {
+               logMessage = 316; // Unable to send friend request. Player's online status is set to Busy.
+            }
+            else
+            {
+               // Catch any other, unreported mess
+               logMessage = senderFriendsList->addInvite( recipientId );
+            }
+
          }
          break;
 
@@ -671,7 +689,8 @@ void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePac
             break;
       }
 
-      if( successful )
+      // No errors reported
+      if( logMessage == 0 )
       {
          ZoneChannelPacket< FFXIVIpcSocialRequestReceive > packet( player.getId(), pRecipient->getId() );
 
@@ -703,8 +722,6 @@ void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePac
 
          auto recipientFriendsList = g_fw.get< Social::SocialMgr< Social::FriendList > >()->findGroupById( pRecipient->getFriendsListId() );
 
-         auto senderResultPacketResult = recipientFriendsList->addInvite( pRecipient->getId() );
-
          recipientFriendsList->addInvite( player.getId() );
          
          auto senderResultPacket = GamePacketNew< Server::FFXIVIpcSocialRequestResponse, ServerZoneIpcType >( pRecipient->getId(), player.getId() );
@@ -722,11 +739,23 @@ void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePac
             g_fw.get< Logger >()->debug( "he HAA HAAA" );
          }
 
-         response.data().messageId = typeMessage[category];
+         //response.data().messageId = typeMessage[category];
+      }
+      else
+      {
+         ZoneChannelPacket< FFXIVIpcSocialRequestError > error( player.getId() );
+         memcpy( &( error.data().name ), name.c_str(), 32 );
+
+         // todo: enumerate log messages
+         error.data().messageId = logMessage; // That name does not exist. Please confirm the spelling.
+         error.data().category = category;
+         // Errors have happened. Send it back only to requester
+
+         player.queuePacket( error );
       }
    }
 
-   player.queuePacket( response );
+   //player.queuePacket( response );
    // todo: handle party, friend request
    g_fw.get< Logger >()->debug( "sent to " + name );
 }

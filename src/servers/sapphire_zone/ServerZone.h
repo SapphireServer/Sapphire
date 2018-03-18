@@ -26,6 +26,7 @@ namespace Core {
       bool loadSettings( int32_t argc, char* argv[] );
 
       SessionPtr getSession( uint32_t id );
+      SessionPtr getSession( uint64_t contentId );
       SessionPtr getSession( std::string playerName );
       void updateSession( uint32_t id );
       void updateSession( std::string playerName );
@@ -52,6 +53,7 @@ namespace Core {
       std::mutex m_sessionMutex;
 
       std::map< uint32_t, SessionPtr > m_sessionMapById;
+      std::map< uint64_t, SessionPtr > m_sessionMapByContentId;
       std::map< std::string, SessionPtr > m_sessionMapByName;
 
       std::map< uint32_t, uint32_t > m_zones;
