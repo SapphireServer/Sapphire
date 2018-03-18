@@ -164,7 +164,7 @@ namespace Packets {
       PrepareZoning              = 0x027C, // updated 4.2
       ActorGauge                 = 0x027D, // updated 4.2
 
-      DuelChallenge             = 0x0277, // 4.2; this is the responsible for opening an ui
+      DuelChallenge              = 0x0277, // 4.2; this is the responsible for opening an ui
       PerformNote                = 0x0286, // updated 4.2
 
       // Unknown IPC types that still need to be sent
