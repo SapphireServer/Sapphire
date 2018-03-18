@@ -585,7 +585,7 @@ namespace Common {
       DisableCurrentFestival = 0x386,
 
       ToggleOrchestrionUnlock = 0x396,
-      Dismount = 0x3a0
+      Dismount = 0x3A0,
 
       // PvP Duel
       SetPvPState = 0x5E0, // param3 must be 6 to engage a duel (hardcoded in the client)
