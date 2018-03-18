@@ -587,11 +587,18 @@ namespace Common {
       ToggleOrchestrionUnlock = 0x396,
       Dismount = 0x3a0
 
+      // PvP Duel
       SetPvPState = 0x5E0, // param3 must be 6 to engage a duel (hardcoded in the client)
       EndDuelSession = 0x5E1, // because someone went oob?
       StartDuelCountdown = 0x5E2, // begins a countdown; also does some duel bgm thing.
       StartDuel = 0x5E3, // actually all it does is set the challenger actor id;
       DuelResultScreen = 0x5E4, // win/lose thing, also reset a target id just like what EndDuelSession does.
+
+      // Duty Action
+      SetDutyActionId = 0x5E8,  // ContentExAction
+      SetDutyActionHud = 0x5E9, // disable/enable
+      SetDutyActionActive = 0x5EA,
+      SetDutyActionRemaining = 0x5EB,
    };
 
    enum struct ChatType : uint16_t
