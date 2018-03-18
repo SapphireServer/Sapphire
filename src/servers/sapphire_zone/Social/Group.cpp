@@ -28,14 +28,14 @@ uint32_t Group::addMember( uint64_t contentId )
 
    uint32_t logMessage = 0;
 
-   m_members.insert( contentId );
+   m_members.push_back( contentId );
 
    return logMessage;
 }
 
 bool Group::hasMember( uint64_t contentId ) const
 {
-   return m_members.find( contentId ) != m_members.end();
+   return std::find( m_members.begin(), m_members.end(), contentId ) != m_members.end();
 }
 
 Core::Network::Packets::GamePacketPtr Group::processInvite( uint64_t recipientId, uint64_t senderId )
@@ -62,7 +62,7 @@ Core::Network::Packets::GamePacketPtr Group::processInvite( uint64_t recipientId
 
       //m_groupInvites.erase( recipientId );
 
-      m_members.emplace( recipientId );
+      m_members.push_back( recipientId );
    }
    else
    {
@@ -167,7 +167,7 @@ void Group::sendPacketToMembers( Core::Network::Packets::GamePacketPtr pPacket, 
 
 
 
-std::set< uint64_t >& Group::getMembers()
+std::vector< uint64_t >& Group::getMembers()
 {
    return m_members;
 }

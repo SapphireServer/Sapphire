@@ -33,7 +33,7 @@ uint32_t FriendList::addMember( uint64_t contentId, FriendEntryType friendEntryT
 
    uint32_t logMessage = 0;
 
-   m_members.insert( contentId );
+   m_members.push_back( contentId );
 
    FriendEntry friendEntry;
    friendEntry.timestamp = std::time( nullptr );
@@ -41,12 +41,12 @@ uint32_t FriendList::addMember( uint64_t contentId, FriendEntryType friendEntryT
    friendEntry.entryStatus = friendEntryType;
    friendEntry.unknown = 0;
 
-   m_entries.insert( friendEntry );
+   m_entries.push_back( friendEntry );
 
    return logMessage;
 }
 
-std::set< FriendEntry >& FriendList::getEntries()
+std::vector< FriendEntry >& FriendList::getEntries()
 {
    return m_entries;
 }
@@ -101,13 +101,16 @@ std::vector< PlayerEntry > FriendList::getFriendListEntries( uint16_t entryAmoun
 //todo: generalize this for linkshell etc
 Core::Network::Packets::Server::PlayerEntry FriendList::generatePlayerEntry( uint64_t contentId )
 {
-   // We check if player is online. If so, we can pull data from existing session in memory
-   // Otherwise, we pull from SQL. We can optimize this later, there are quite a few choices here
+   // Correlate our contentID with the PlayerEntry map, based on index
+   // can probably optimize using std::set and doing something funky with pointers
 
-   auto pSession = g_fw.get< ServerZone >()->getSession( contentId );
-   
-   auto dataIndex = m_members.find( contentId );
-   auto friendEntry = m_entries;
+   std::vector< uint64_t >::iterator it;
+
+   it = std::find( m_members.begin(), m_members.end(), contentId );
+
+   auto dataIndex = std::distance( m_members.begin(), it );
+
+   auto friendEntry = m_entries.at( dataIndex );
 
    // todo: set as offline in one of the unknown values, if session does not exist
    Core::Network::Packets::Server::PlayerEntry entry = {};
@@ -123,7 +126,12 @@ Core::Network::Packets::Server::PlayerEntry FriendList::generatePlayerEntry( uin
    entry.unavailable = 0;    // unavailable (other world)
    entry.one = 1;
 
-   if ( pSession )
+   // We check if player is online. If so, we can pull data from existing session in memory
+   // Otherwise, we pull from SQL. We can optimize this later, there are quite a few choices here
+
+   auto pSession = g_fw.get< ServerZone >()->getSession( contentId );
+
+   if( pSession )
    {
       auto pPlayer = pSession->getPlayer();
       //entry.contentId = pPlayer->getContentId();
@@ -164,7 +172,6 @@ Core::Network::Packets::Server::PlayerEntry FriendList::generatePlayerEntry( uin
       else
       {
          // Todo: Can we make PlayerSQL a static function and use it for this?
-
 
          auto name = res->getString( "Name" );
          strcpy( entry.name, name.c_str() );

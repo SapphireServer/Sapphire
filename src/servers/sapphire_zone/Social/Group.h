@@ -65,7 +65,7 @@ public:
    //virtual void populateGroupMembers();
 
    /*! access member vector */
-   std::set< uint64_t >& getMembers();
+   std::vector< uint64_t >& getMembers();
 
    /*! get container limit */
    uint32_t getCapacity() const;

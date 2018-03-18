@@ -497,7 +497,7 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
 
          g_fw.get< Logger >()->debug( "aaa" + std::to_string( i ) );
          // todo: replace this with call for generating the entire vector
-         listPacket.data().entries[i] = Core::Social::FriendList::generatePlayerEntry( member );
+         listPacket.data().entries[i] = playerFriendsList->generatePlayerEntry( member );
          i++;
       }
 

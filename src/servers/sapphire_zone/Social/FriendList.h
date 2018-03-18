@@ -45,7 +45,7 @@ public:
    uint32_t addMember( uint64_t contentId, FriendEntryType friendEntryType );
 
    /*! access entry vector */
-   std::set< FriendEntry >& getEntries();
+   std::vector< FriendEntry >& getEntries();
 
 protected:
    uint64_t m_id{ 0 };

@@ -137,7 +137,7 @@ uint64_t Core::Social::SocialMgr< Core::Social::FriendList >::loadFriendsList( u
       // todo: fix this garbage check
       if( list.at( 0 ) != 0 )
       {
-         friendsList.getMembers().insert( list.begin(), list.end() );
+         friendsList.getMembers() = list;
       }
    }
 
@@ -148,9 +148,9 @@ uint64_t Core::Social::SocialMgr< Core::Social::FriendList >::loadFriendsList( u
    
    if( inviteData.size() )
    {
-      std::vector< Social::FriendEntry > list( friends.size() / 8 );
+      std::vector< Social::FriendEntry > invList( friends.size() / 8 );
 
-      friendsList.getEntries().insert( list.begin(), list.end() );
+      friendsList.getEntries() = invList;
    }
 
    auto friendListPtr = boost::make_shared< Social::FriendList >( friendsList );
