@@ -225,7 +225,7 @@ class ManFst004 : public EventScript
 
    void Scene00051( Entity::Player& player )
    {
-      player.eventPlay( m_id, 51, 0,
+      player.eventPlay( m_id, 51, NONE,
          [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
          {
             Scene00001( player );
@@ -234,7 +234,7 @@ class ManFst004 : public EventScript
 
    void Scene00099( Entity::Player& player )
    {
-      player.eventPlay( m_id, 99, 0,
+      player.eventPlay( m_id, 99, NONE,
          [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
          {
             Scene00004( player );
@@ -243,7 +243,7 @@ class ManFst004 : public EventScript
 
    void Scene00100( Entity::Player& player )
    {
-      player.eventPlay( m_id, 100, 0,
+      player.eventPlay( m_id, 100, NONE,
          [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
          {
             player.setQuestUI8CH( m_id, 0 ); // remove key item, since we have just traded it

@@ -20,11 +20,10 @@ public:
                      uint32_t eventId,
                      uint8_t param1 = 0,
                      uint8_t param2 = 0,
-                     uint32_t param3 = 0,
-                     uint32_t contentId = 0 ) :
+                     uint32_t param3 = 0 ) :
       ZoneChannelPacket< FFXIVIpcEventStart >( playerId, playerId )
    {
-      initialize( actorId, eventId, param1, param2, param3, contentId );
+      initialize( actorId, eventId, param1, param2, param3 );
    };
 
 private:
@@ -32,15 +31,13 @@ private:
                     uint32_t eventId,
                     uint8_t param1,
                     uint8_t param2,
-                    uint32_t param3,
-                    uint32_t contentId )
+                    uint32_t param3 )
    {
       m_data.actorId = actorId;
       m_data.eventId = eventId;
       m_data.param1 = param1;
       m_data.param2 = param2;
       m_data.param3 = param3;
-      m_data.contentId = contentId;
 
    };
 };

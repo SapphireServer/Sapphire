@@ -710,6 +710,58 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
       else
          player.sendDebug( "Failed to create instance with id: " + std::to_string( instanceContentId ) );
    }
+   else if( subCommand == "bind" )
+   {
+      uint32_t instanceId;
+      sscanf( params.c_str(), "%d", &instanceId );
+
+      auto instance = pTeriMgr->getInstanceZonePtr( instanceId );
+      if( instance )
+      {
+         auto pInstanceContent = instance->getAsInstanceContent();
+         pInstanceContent->bindPlayer( player.getId() );
+         player.sendDebug(
+                 "Now bound to instance with id: " + std::to_string( pInstanceContent->getGuId() ) +
+                 " -> " + pInstanceContent->getName() );
+      }
+      else
+         player.sendDebug( "Unknown instance with id: " + std::to_string( instanceId ) );
+   }
+   else if( subCommand == "unbind" )
+   {
+      uint32_t instanceId;
+      sscanf( params.c_str(), "%d", &instanceId );
+
+      auto instance = pTeriMgr->getInstanceZonePtr( instanceId );
+      if( !instance )
+      {
+         player.sendDebug( "Unknown instance with id: " + std::to_string( instanceId ) );
+         return;
+      }
+
+      auto pInstanceContent = instance->getAsInstanceContent();
+      if( pInstanceContent->isPlayerBound( player.getId() ) )
+      {
+         pInstanceContent->unbindPlayer( player.getId() );
+         player.sendDebug(
+                 "Now unbound from instance with id: " + std::to_string( pInstanceContent->getGuId() ) +
+                 " -> " + pInstanceContent->getName() );
+      }
+      else
+         player.sendDebug( "Player not bound to instance with id: " + std::to_string( instanceId ) );
+
+   }
+   else if( subCommand == "createzone" || subCommand == "crz" )
+   {
+      uint32_t zoneId;
+      sscanf( params.c_str(), "%d", &zoneId );
+
+      auto instance = pTeriMgr->createTerritoryInstance( zoneId );
+      if( instance )
+         player.sendDebug( "Created instance with id: " + std::to_string( instance->getGuId() ) + " -> " + instance->getName() );
+      else
+         player.sendDebug( "Failed to create instance with id: " + std::to_string( zoneId ) );
+   }
    else if( subCommand == "remove" || subCommand == "rm" )
    {
       uint32_t terriId;
@@ -792,5 +844,44 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
       player.queuePacket( actorControl );
 
       player.getCurrentZone()->setCurrentFestival( 0 );
+   }
+   else if ( subCommand == "qte_start" )
+   {
+      auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+      if ( !instance )
+         return;
+
+      player.sendDebug( "qte start" );
+      instance->startQte();
+   }
+   else if ( subCommand == "event_start" )
+   {
+      auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+      if ( !instance )
+         return;
+
+      player.sendDebug( "evt start" );
+      instance->startEventCutscene();
+   }
+   else if ( subCommand == "event_end" )
+   {
+      auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+      if ( !instance )
+         return;
+
+      player.sendDebug( "evt end" );
+      instance->endEventCutscene();
+   }
+   else if( subCommand == "bgm" )
+   {
+      uint16_t bgmId;
+      sscanf( params.c_str(), "%hd", &bgmId );
+
+      if( auto instance = player.getCurrentInstance() )
+         instance->setCurrentBGM( bgmId );
+   }
+   else
+   {
+      player.sendDebug( "Unknown sub command." );
    }
 }

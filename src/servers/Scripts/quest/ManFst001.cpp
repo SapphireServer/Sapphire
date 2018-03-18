@@ -53,7 +53,7 @@ private:
          Scene00002( player );
       };
 
-      player.eventPlay( getId(), 1, 0xF8482EFB, 0, 0, callback );
+      player.eventPlay( getId(), 1, DISABLE_SKIP | HIDE_HOTBAR | SET_BASE, 0, 0, callback );
    }
 
    void Scene00002( Entity::Player& player )
@@ -75,7 +75,7 @@ private:
          Scene00005( player );
       };
 
-      player.eventPlay( getId(), 4, 0x2c02, 0, 0, callback );
+      player.eventPlay( getId(), 4, FADE_OUT | HIDE_HOTBAR | CONDITION_CUTSCENE | HIDE_UI , 0, 0, callback );
    }
 
    void Scene00005( Entity::Player& player )

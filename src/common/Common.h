@@ -481,6 +481,9 @@ namespace Core {
 
          RemoveName = 0xA8,
 
+      SetBGM = 0xA1,
+
+      UnlockAetherCurrentMsg = 0xA4,
          ScreenFadeOut = 0xAA,
 
          ZoneIn = 0xC8,

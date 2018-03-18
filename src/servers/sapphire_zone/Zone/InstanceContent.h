@@ -22,7 +22,7 @@ public:
       DutyFinished
    };
 
-   InstanceContent( boost::shared_ptr< Core::Data::InstanceContent > pInstanceContent,
+   InstanceContent( boost::shared_ptr< Core::Data::InstanceContent > pInstanceConfiguration,
                     uint32_t guId,
                     const std::string& internalName,
                     const std::string& contentName,
@@ -46,19 +46,43 @@ public:
    void setSequence( uint8_t value );
    void setBranch( uint8_t value );
 
-   boost::shared_ptr< Core::Data::InstanceContent > getInstanceContentInfo() const;
+   void startQte();
+   void startEventCutscene();
+   void endEventCutscene();
+
+   /*! set the current bgm index (inside bgm.exd) */
+   void setCurrentBGM( uint16_t bgmId );
+   /*! set the current bgm for a specific player */
+   void setPlayerBGM( Entity::Player& player, uint16_t bgmId );
+   /*! get the currently playing bgm index */
+   uint16_t getCurrentBGM() const;
+
+   bool hasPlayerPreviouslySpawned( Entity::Player& player ) const;
+   InstanceContentState getState() const;
+
+   boost::shared_ptr< Core::Data::InstanceContent > getInstanceConfiguration() const;
 
    uint32_t getInstanceContentId() const;
 
    Entity::EventObjectPtr getEObjByName( const std::string& name );
 
+   /*! binds a player to the instance */
+   bool bindPlayer( uint32_t playerId );
+
+   /*! removes bind of player from the instance */
+   void unbindPlayer( uint32_t playerId );
+
+   /*! return true if the player is bound to the instance */
+   bool isPlayerBound( uint32_t playerId ) const;
+
    /*! number of milliseconds after all players are ready for the instance to commence (spawn circle removed) */
    const uint32_t instanceStartDelay = 1250;
+
 private:
-   Event::DirectorPtr m_pDirector;
-   boost::shared_ptr< Core::Data::InstanceContent > m_instanceContentInfo;
+   boost::shared_ptr< Core::Data::InstanceContent > m_instanceConfiguration;
    uint32_t m_instanceContentId;
    InstanceContentState m_state;
+   uint16_t m_currentBgm;
 
    int64_t m_instanceExpireTime;
    int64_t m_instanceCommenceTime;
@@ -68,6 +92,9 @@ private:
    std::map< std::string, Entity::EventObjectPtr > m_eventObjectMap;
    std::unordered_map< uint32_t, Entity::EventObjectPtr > m_eventIdToObjectMap;
    std::set< uint32_t > m_spawnedPlayers;
+
+   // the players which are bound to the instance, regardless of inside or offline
+   std::set< uint32_t > m_boundPlayerIds;
 };
 
 }

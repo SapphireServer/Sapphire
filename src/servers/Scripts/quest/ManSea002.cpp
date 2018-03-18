@@ -132,7 +132,7 @@ private:
          player.updateQuest( getId(), 1 );
          player.setQuestUI8CH( getId(), 1 ); // receive key item
 
-         // teleport to real gridania
+         // teleport to real limsa
          player.forceZoneing( 128 );
       };
 

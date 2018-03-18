@@ -47,7 +47,7 @@ private:
          Scene00002( player );
       };
 
-      player.eventPlay( getId(), 1, 0xF8482EFB, 0, 0, callback );
+      player.eventPlay( getId(), 1, DISABLE_SKIP | HIDE_HOTBAR | SET_BASE, 0, 0, callback );
    }
 
    void Scene00002( Entity::Player& player )
@@ -62,7 +62,7 @@ private:
 
    void Scene00003( Entity::Player& player )
    {
-      player.eventPlay( getId(), 3, 0, 0, 0 );
+      player.eventPlay( getId(), 3, NONE, 0, 0 );
    }
 
    void Scene00004( Entity::Player& player )

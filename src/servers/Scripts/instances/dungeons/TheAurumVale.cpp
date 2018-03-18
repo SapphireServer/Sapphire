@@ -39,7 +39,8 @@ public:
 
    }
 
-   void onEnterTerritory( Entity::Player &player, uint32_t eventId, uint16_t param1, uint16_t param2 ) override
+   void onEnterTerritory( InstanceContentPtr instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
+                             uint16_t param2 ) override
    {
 
    }

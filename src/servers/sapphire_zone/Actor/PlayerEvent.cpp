@@ -75,8 +75,8 @@ void Core::Entity::Player::checkEvent( uint32_t eventId )
 }
 
 
-void Core::Entity::Player::directorPlayScene( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t eventParam2,
-                                              uint32_t eventParam3 )
+void Core::Entity::Player::directorPlayScene( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t eventParam3,
+                                              uint32_t eventParam4, uint32_t eventParam5 )
 {
    if( flags & 0x02 )
       setStateFlag( PlayerStateFlag::WatchingCutscene );
@@ -92,14 +92,14 @@ void Core::Entity::Player::directorPlayScene( uint32_t eventId, uint32_t scene, 
    pEvent->setPlayedScene( true );
    pEvent->setEventReturnCallback( nullptr );
    DirectorPlayScenePacket eventPlay( getId(), getId(), pEvent->getId(),
-                                      scene, flags, eventParam2, eventParam3 );
+                                      scene, flags, eventParam3, eventParam4, eventParam5 );
 
    queuePacket( eventPlay );
 }
 
 void Core::Entity::Player::eventStart( uint64_t actorId, uint32_t eventId, 
                                        Event::EventHandler::EventType eventType, uint8_t eventParam1,
-                                       uint32_t eventParam2, uint32_t contentId )
+                                       uint32_t eventParam2 )
 {
 
    auto newEvent = Event::make_EventHandler( this, actorId, eventId, eventType, eventParam2 );
@@ -108,7 +108,7 @@ void Core::Entity::Player::eventStart( uint64_t actorId, uint32_t eventId,
 
    setStateFlag( PlayerStateFlag::InNpcEvent );
 
-   EventStartPacket eventStart( getId(), actorId, eventId, eventType, eventParam1, eventParam2, contentId );
+   EventStartPacket eventStart( getId(), actorId, eventId, eventType, eventParam1, eventParam2 );
    
    queuePacket( eventStart );
    
