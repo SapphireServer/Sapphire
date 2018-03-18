@@ -53,8 +53,8 @@ protected:
    GroupType m_type{ GroupType::FriendList };
    uint32_t m_maxCapacity{ 200 };
    
-   // todo: (urgent) think of a way to only use a single std set, use index based for correlating with data
-   std::set< FriendEntry > m_entries;
+   // todo: profile and evaluate set vs vector approach
+   std::vector< FriendEntry > m_entries;
 
 };
 

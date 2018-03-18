@@ -85,7 +85,7 @@ protected:
    uint32_t m_maxRoles{ 50 };
    std::chrono::steady_clock::time_point m_createTime{ std::chrono::steady_clock::now() };
 
-   std::set< uint64_t > m_members;
+   std::vector< uint64_t > m_members;
 
 private:
    
