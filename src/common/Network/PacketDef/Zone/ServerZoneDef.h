@@ -1363,6 +1363,18 @@ struct FFXIVIpcObjectDespawn : FFXIVIpcBasePacket<ObjectDespawn>
    uint8_t padding[7];
 };
 
+struct FFXIVIpcDuelChallenge : FFXIVIpcBasePacket<DuelChallenge>
+{
+   uint8_t otherClassJobId;
+   uint8_t otherLevel; // class job level
+   uint8_t challengeByYou; // 0 if the other challenges you, 1 if you challenges the other.
+   uint8_t otherItemLevel;
+
+   uint32_t otherActorId;
+
+   char otherName[32];
+};
+
 
 } /* Server */
 } /* Packets */
