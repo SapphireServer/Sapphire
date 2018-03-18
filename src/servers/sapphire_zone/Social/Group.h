@@ -49,10 +49,9 @@ public:
    bool isContentGroup() const;
 
    // New group system: return error code for logmessage
-   //TODO: change the member models!!!!!!!
 
    virtual uint32_t addMember( uint64_t characterId );
-   virtual uint32_t addInvite( uint64_t characterId );
+   //virtual uint32_t addInvite( uint64_t characterId );
    
    virtual Core::Network::Packets::GamePacketPtr processInvite( uint64_t recipientId, uint64_t senderId );
 
@@ -65,14 +64,8 @@ public:
 
    //virtual void populateGroupMembers();
 
-   /*! generates a player entry used for lists (social, etc) */
-   //
-
    /*! access member vector */
    std::set< uint64_t >& getMembers();
-
-   /*! access invite vector */
-   std::set< uint64_t >& getInvites();
 
    /*! get container limit */
    uint32_t getCapacity() const;
@@ -80,9 +73,9 @@ public:
    /*! get total size of group (members + invites) */
    uint32_t Group::getTotalSize() const;
 
+   /*! check if group has member */
    bool hasMember( uint64_t memberId ) const;
 
-   bool hasInvite( uint64_t inviteId ) const;
 
 protected:
    GroupType m_type{ GroupType::None };
@@ -92,11 +85,7 @@ protected:
    uint32_t m_maxRoles{ 50 };
    std::chrono::steady_clock::time_point m_createTime{ std::chrono::steady_clock::now() };
 
-   std::set< uint64_t > m_groupMembers;
-   std::set< uint64_t > m_groupInvites;
-
-   std::map< uint64_t, GroupMember > m_members;
-   std::map< uint64_t, GroupMember > m_invites; // <recipient, groupmember (which contains senderId)>
+   std::set< uint64_t > m_members;
 
 private:
    

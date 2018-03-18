@@ -28,30 +28,14 @@ uint32_t Group::addMember( uint64_t characterId )
 
    uint32_t logMessage = 0;
 
-   m_groupMembers.insert( characterId );
-
-   return logMessage;
-}
-
-uint32_t Group::addInvite( uint64_t characterId )
-{
-   assert( characterId != 0 );
-
-   uint32_t logMessage = 0;
-
-   m_groupInvites.insert( characterId );
+   m_members.insert( characterId );
 
    return logMessage;
 }
 
 bool Group::hasMember( uint64_t memberId ) const
 {
-   return m_groupMembers.find( memberId ) != m_groupMembers.end();
-}
-
-bool Group::hasInvite( uint64_t inviteId ) const
-{
-   return m_groupInvites.find( inviteId ) != m_groupInvites.end();
+   return m_members.find( memberId ) != m_members.end();
 }
 
 Core::Network::Packets::GamePacketPtr Group::processInvite( uint64_t recipientId, uint64_t senderId )
@@ -76,9 +60,9 @@ Core::Network::Packets::GamePacketPtr Group::processInvite( uint64_t recipientId
    {
       // todo: broadcast join message
 
-      m_groupInvites.erase( recipientId );
+      //m_groupInvites.erase( recipientId );
 
-      m_groupMembers.emplace( recipientId );
+      m_members.emplace( recipientId );
    }
    else
    {
