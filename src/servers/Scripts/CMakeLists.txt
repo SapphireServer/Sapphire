@@ -14,7 +14,7 @@ set(RUNTIME_OUTPUT_DIRECTORY "${SCRIPT_LIB_DIR}")
 file(GLOB children "${CMAKE_CURRENT_SOURCE_DIR}/*" )
 foreach(_scriptDir ${children})
     get_filename_component(_name "${_scriptDir}" NAME_WE)
-    if(IS_DIRECTORY ${_scriptDir} AND NOT ${_name} MATCHES "CMakeFiles")
+    if(IS_DIRECTORY ${_scriptDir} AND NOT ${_name} MATCHES "CMakeFiles" AND NOT ${_name} MATCHES "\\.dir$")
         message("discovered plugin lib: ${_scriptDir} (${_name})")
 
         file(GLOB_RECURSE SCRIPT_BUILD_FILES "${_scriptDir}/*.cpp")

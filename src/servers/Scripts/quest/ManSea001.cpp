@@ -27,9 +27,9 @@ private:
 
    void Scene00000( Entity::Player& player )
    {
-      auto callback = [ this ]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
       {
-         if( param2 == 1 )
+         if( result.param2 == 1 )
          {
             player.setOpeningSequence( 2 );
             Scene00001( player );
@@ -41,7 +41,7 @@ private:
 
    void Scene00001( Entity::Player& player )
    {
-      auto callback = [ this ]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
       {
          Scene00002( player );
       };
@@ -51,7 +51,7 @@ private:
 
    void Scene00002( Entity::Player& player )
    {
-      auto callback = [ this ]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
       {
          Scene00003( player );
       };
@@ -61,7 +61,7 @@ private:
 
    void Scene00003( Entity::Player& player )
    {
-      auto callback = [ this ]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
       {
          player.eventPlay( OPENING_EVENT_HANDLER, 0x1E, HIDE_HOTBAR | NO_DEFAULT_CAMERA, 1, 0 );
       };
@@ -76,7 +76,7 @@ private:
 
    void Scene00005( Entity::Player& player )
    {
-      auto callback = [ this ]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
       {
          Scene00006( player );
       };
@@ -86,7 +86,7 @@ private:
 
    void Scene00006( Entity::Player& player )
    {
-      auto callback = [ this ]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
       {
          player.updateQuest( getId(), SEQ_FINISH );
          player.prepareZoning( player.getZoneId(), true, 1, 0 );
@@ -118,7 +118,7 @@ private:
 
    void Scene00011( Entity::Player& player )
    {
-      auto callback = [ this ]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
       {
          Scene00012( player );
       };
@@ -128,9 +128,9 @@ private:
 
    void Scene00012( Entity::Player& player )
    {
-      auto callback = [ this ]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
       {
-         if( param2 == 1 ) // finish quest
+         if( result.param2 == 1 ) // finish quest
          {
             if( player.giveQuestRewards( getId(), 0 ) )
                player.finishQuest( getId() );
