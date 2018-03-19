@@ -41,9 +41,9 @@ private:
 
    void Scene00000( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
       {
-         if( param2 == 1 )
+         if( result.param2 == 1 )
          {
             player.updateQuest( getId(), SEQ_1 );
          }
@@ -59,7 +59,7 @@ private:
 
    void Scene00002( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
       {
          player.updateQuest( getId(), SEQ_3 );
       };
@@ -74,7 +74,7 @@ private:
 
    void Scene00004( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
       {
          player.updateQuest( getId(), SEQ_5 );
       };
@@ -89,9 +89,9 @@ private:
 
    void Scene00006( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
       {
-         if( param2 == 1 ) // finish quest
+         if( result.param2 == 1 ) // finish quest
          {
             if( player.giveQuestRewards( getId(), 0 ) )
                player.finishQuest( getId() );
@@ -108,7 +108,7 @@ private:
 
    void Scene00096( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
       {
          player.updateQuest( getId(), SEQ_FINISH );
          player.sendQuestMessage( getId(), 4, 2, 0, 0 );
@@ -124,7 +124,7 @@ private:
 
    void Scene00098( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
       {
          player.updateQuest( getId(), SEQ_4 );
          player.sendQuestMessage( getId(), 2, 2, 0, 0 );
@@ -140,7 +140,7 @@ private:
 
    void Scene00100( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
       {
          player.updateQuest( getId(), SEQ_2 );
          player.sendQuestMessage( getId(), 0, 2, 0, 0 );

@@ -1,5 +1,6 @@
 #include <Script/NativeScriptApi.h>
 #include <Actor/Player.h>
+#include <sapphire_zone/Event/EventHandler.h>
 #include "../ScriptObject.h"
 #include "Event/EventHelper.h"
 
@@ -34,9 +35,9 @@ private:
 
    void Scene00000( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
       {
-         if( param2 == 1 ) // accept quest
+         if( result.param2 == 1 ) // accept quest
          {
             player.setOpeningSequence( 2 );
             Scene00001( player );
@@ -48,7 +49,7 @@ private:
 
    void Scene00001( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
       {
          Scene00002( player );
       };
@@ -58,7 +59,7 @@ private:
 
    void Scene00002( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
       {
          player.updateQuest( getId(), SEQ_FINISH );
 
@@ -70,7 +71,7 @@ private:
 
    void Scene00004( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
       {
          Scene00005( player );
       };
@@ -80,9 +81,9 @@ private:
 
    void Scene00005( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
       {
-         if( param2 == 1 )
+         if( result.param2 == 1 )
          {
             if( player.giveQuestRewards( getId(), 0 ) )
                player.finishQuest( getId() );

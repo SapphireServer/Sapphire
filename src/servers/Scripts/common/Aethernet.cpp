@@ -21,11 +21,11 @@ public:
    {
       if( player.isAetheryteRegistered( eventId & 0xFFFF ) )
       {
-         player.eventPlay( eventId, 2, 0, []( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+         player.eventPlay( eventId, 2, 0, []( Entity::Player& player, const Event::SceneResult& result )
          {
-            if( param1 == 256 )
+            if( result.param1 == 256 )
             {
-               player.teleport( param2, 2 );
+               player.teleport( result.param2, 2 );
             }
          } );
       }

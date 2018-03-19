@@ -6,6 +6,14 @@
 namespace Core {
    namespace Event {
 
+      using SceneResult = struct
+      {
+         uint32_t eventId;
+         uint16_t param1;
+         uint16_t param2;
+         uint16_t param3;
+      };
+
       class EventHandler
       {
       public:
@@ -64,7 +72,7 @@ namespace Core {
             ICDirector = 0x8003,
          };
 
-         using SceneReturnCallback = std::function< void( Entity::Player&, uint32_t, uint16_t, uint16_t, uint16_t ) > ;
+         using SceneReturnCallback = std::function< void( Entity::Player&, const SceneResult& ) > ;
 
          EventHandler( Entity::Player* pOwner, uint64_t actorId, uint32_t eventId, EventType eventType, uint32_t eventParam );
 

@@ -28,7 +28,7 @@ private:
 
    void Scene00000( Entity::Player& player )
    {
-      auto callback = [ this ]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
       {
          player.setOpeningSequence( 1 );
          Scene00001( player );
@@ -56,7 +56,7 @@ private:
 
    void Scene00040( Entity::Player& player )
    {
-      auto callback = [ this ]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
       {
          if( player.getOpeningSequence() == 2 )
          {

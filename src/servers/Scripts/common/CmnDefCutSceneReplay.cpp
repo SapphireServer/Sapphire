@@ -10,11 +10,11 @@ public:
 
    void Scene00000( Entity::Player& player )
    {
-      auto callback = [ this ]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
       {
-         if( param2 != 0 )
+         if( result.param2 != 0 )
          {
-            Scene00001( player, param2 );
+            Scene00001( player, result.param2 );
          }
       };
 
@@ -23,7 +23,7 @@ public:
 
    void Scene00001( Entity::Player& player, uint16_t returnScene )
    {
-      auto callback = []( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = []( Entity::Player& player, const Event::SceneResult& result )
       {
          // todo: this is fucked
       };

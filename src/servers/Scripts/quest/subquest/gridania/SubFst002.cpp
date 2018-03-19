@@ -23,9 +23,9 @@ private:
 
    void Scene00000( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
       {
-         if( param2 == 1 ) // accept quest
+         if( result.param2 == 1 ) // accept quest
          {
             player.updateQuest( getId(), SEQ_1 );
          }
@@ -36,9 +36,9 @@ private:
 
    void Scene00001(Entity::Player& player)
    {
-      auto callback = [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
       {
-         if( param2 == 1 ) // finish quest
+         if( result.param2 == 1 ) // finish quest
          {
             if( player.giveQuestRewards( getId(), 0 ) )
                player.finishQuest( getId() );

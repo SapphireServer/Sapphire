@@ -11,10 +11,10 @@ public:
    // menu
    void Scene00000( Entity::Player& player )
    {
-      auto callback = [ this ]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
       {
-         if( param2 > 0 )
-            Scene00001( player, param2 );
+         if( result.param2 > 0 )
+            Scene00001( player, result.param2 );
       };
 
       player.eventPlay( getId(), 0, 0x2000, 0, 1, callback );
@@ -23,9 +23,9 @@ public:
    // lay down
    void Scene00001( Entity::Player& player, uint16_t param )
    {
-      auto callback = [ this ]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
       {
-         Scene00002( player, param2 );
+         Scene00002( player, result.param2 );
       };
 
       player.eventPlay( getId(), 1, 0xF32E48F8, 0, 1, param, callback );
@@ -40,7 +40,7 @@ public:
    // wake up
    void Scene00100( Entity::Player& player )
    {
-      auto callback = []( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = []( Entity::Player& player, const Event::SceneResult& result )
       {};
 
       player.eventPlay( getId(), 100, 0x800, 0, 0, callback );

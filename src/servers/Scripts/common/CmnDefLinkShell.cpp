@@ -14,9 +14,9 @@ public:
 
    void Scene00001( Entity::Player& player )
    {
-      auto callback = [ this ]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
       {
-         switch( param2 )
+         switch( result.param2 )
          {
             case ACTION_CREATE:
                Scene00002( player );

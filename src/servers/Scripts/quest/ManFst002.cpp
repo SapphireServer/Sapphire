@@ -1,5 +1,6 @@
 #include <Script/NativeScriptApi.h>
 #include <Actor/Player.h>
+#include <sapphire_zone/Event/EventHandler.h>
 #include "Event/EventHelper.h"
 #include "../ScriptObject.h"
 
@@ -15,6 +16,7 @@ private:
 
    static constexpr auto SEQ_0 = 0;
    static constexpr auto SEQ_1 = 1;
+   static constexpr auto SEQ_2 = 2;
    static constexpr auto SEQ_FINISH = 255;
    //this.SEQ_OFFER = ?;
 
@@ -80,107 +82,107 @@ private:
 
    void Scene00000( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
       {
-         if( param2 == 1 ) // accept quest
+         if( result.param2 == 1 ) // accept quest
             Scene00050( player );
       };
 
-      player.eventPlay( getId(), 0, HIDE_HOTBAR, 0, 0, callback );
+      player.eventPlay( getId(), SEQ_0_ACTOR0, HIDE_HOTBAR, 0, 0, callback );
    }
 
    void Scene00001( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
       {
          player.setQuestUI8AL( getId(), 1 );
          checkQuestCompletion( player, 0 );
       };
 
-      player.eventPlay( getId(), 1, 0x0EFB, 0, 0, callback );
+      player.eventPlay( getId(), SEQ_1_ACTOR1, 0x0EFB, 0, 0, callback );
    }
 
    void Scene00002( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
       {
          player.setQuestUI8BH( getId(), 1 );
          checkQuestCompletion( player, 3 );
       };
 
-      player.eventPlay( getId(), 2, NONE, 0, 0, callback );
+      player.eventPlay( getId(), SEQ_1_ACTOR2, NONE, 0, 0, callback );
    }
 
    void Scene00003( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
       {
-         if( param2 == 1 )
+         if( result.param2 == 1 )
             Scene00100( player );
          else
             Scene00099( player );
       };
 
-      player.eventPlay( getId(), 3, NONE, 0, 0, callback );
+      player.eventPlay( getId(), SEQ_1_ACTOR3, NONE, 0, 0, callback );
    }
 
    void Scene00004( Entity::Player& player )
    {
-      player.eventPlay( getId(), 4, NONE, 0, 0 );
+      player.eventPlay( getId(), SEQ_1_ACTOR0, NONE, 0, 0 );
    }
 
    void Scene00005( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
       {
-         if( param2 == 1 ) // finish quest
+         if( result.param2 == 1 ) // finish quest
          {
             if( player.giveQuestRewards( getId(), 0 ) )
                player.finishQuest( getId() );
          }
       };
 
-      player.eventPlay( getId(), 5, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0, 0, callback );
+      player.eventPlay( getId(), SEQ_2_ACTOR4, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0, 0, callback );
    }
 
    void Scene00050( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
       {
          // on quest accept
-         player.updateQuest( getId(), 1 );
+         player.updateQuest( getId(), SEQ_1 );
          player.setQuestUI8CH( getId(), 1 ); // receive key item
 
          // teleport to real gridania
-         player.forceZoneing( 132 );
+         player.forceZoneing( TERRITORYTYPE0 );
       };
 
-      player.eventPlay( getId(), 50, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0, 0, callback );
+      player.eventPlay( getId(), SEQ_0_ACTOR0_LQ, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0, 0, callback );
    }
 
    void Scene00051( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
       {
          Scene00001( player );
       };
 
-      player.eventPlay( getId(), 51, NONE, 0, 0, callback );
+      player.eventPlay( getId(), SEQ_1_ACTOR1_WAIT, NONE, 0, 0, callback );
    }
 
    void Scene00099( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
       {
          Scene00004( player );
       };
 
-      player.eventPlay( getId(), 99, NONE, 0, 0, callback );
+      player.eventPlay( getId(), SEQ_1_ACTOR3_NPCTRADENO, NONE, 0, 0, callback );
    }
 
    void Scene00100( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
       {
          player.setQuestUI8CH( getId(), 0 ); // remove traded key item
          player.setQuestUI8BL( getId(), 1 );
@@ -188,7 +190,7 @@ private:
          checkQuestCompletion( player, 2 );
       };
 
-      player.eventPlay( getId(), 100, 0x0EFB, 0, 0, callback );
+      player.eventPlay( getId(), SEQ_1_ACTOR3_NPCTRADEOK, 0x0EFB, 0, 0, callback );
    }
 
 public:
