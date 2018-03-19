@@ -225,20 +225,21 @@ void Core::Zone::pushActor( Entity::ActorPtr pActor )
 
 void Core::Zone::removeActor( Entity::ActorPtr pActor )
 {
+   float mx = pActor->getPos().x;
+   float my = pActor->getPos().z;
+   uint32_t cx = getPosX( mx );
+   uint32_t cy = getPosY( my );
 
-   auto pCell = pActor->getCellPtr();
-   if( pCell )
-   {
+   Cell* pCell = getCellPtr(cx, cy);
+   if( pCell && pCell->hasActor( pActor ) )
       pCell->removeActor( pActor );
-      pCell = nullptr;
-   }
 
    if( pActor->isPlayer() )
    {
 
       // If it's a player and he's inside boundaries - update his nearby cells
       if( pActor->getPos().x <= _maxX && pActor->getPos().x >= _minX &&
-              pActor->getPos().z <= _maxY && pActor->getPos().z >= _minY )
+          pActor->getPos().z <= _maxY && pActor->getPos().z >= _minY )
       {
          uint32_t x = getPosX( pActor->getPos().x );
          uint32_t y = getPosY( pActor->getPos().z );
@@ -416,8 +417,7 @@ void Core::Zone::updateSessions( bool changedWeather )
       // this session is not linked to this area anymore, remove it from zone session list
       if( ( !pPlayer->getCurrentZone() ) || ( pPlayer->getCurrentZone() != shared_from_this() ) )
       {
-         if( pPlayer->getCellPtr() )
-            removeActor( pSession->getPlayer() );
+         removeActor( pSession->getPlayer() );
 
          it = m_sessionSet.erase(it );
          continue;
@@ -539,7 +539,11 @@ void Core::Zone::updateActorPosition( Entity::Actor &actor )
    {
 
       if( pOldCell )
+      {
+         auto pLog = g_fw.get< Logger >();
+         pLog->debug( std::string( __FUNCTION__ ) + " -> removeActor() ...moving cell..." );
          pOldCell->removeActor( actor.shared_from_this() );
+      }
 
       pCell->addActor( actor.shared_from_this() );
       actor.setCell( pCell );
