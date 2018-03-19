@@ -51,6 +51,10 @@ void Core::Db::CharaDbConnection::doPrepareStatements()
                                                "Class, ContentId, BirthDay, BirthMonth "
                                                 "FROM charainfo WHERE CharacterId = ?;", CONNECTION_SYNC );
 
+   prepareStatement( CHARA_SEL_MINIMAL_FROM_CONTENTID, "SELECT Name, Customize, ModelEquip, TerritoryId, GuardianDeity, "
+                                                       "Class, ContentId, BirthDay, BirthMonth "
+                                                       "FROM charainfo WHERE ContentId = ?;", CONNECTION_SYNC );
+
    prepareStatement( CHARA_INS, "INSERT INTO charainfo (AccountId, CharacterId, ContentId, Name, Hp, Mp, "
                                         "Customize, Voice, IsNewGame, TerritoryId, PosX, PosY, PosZ, PosR, ModelEquip, "
                                         "IsNewAdventurer, GuardianDeity, Birthday, BirthMonth, Class, Status, FirstClass, "

@@ -641,8 +641,8 @@ void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePac
          {
             // todo: check if already on friends list or invite pending
 
-            auto recipientId = pRecipient->getId();
-            auto senderId = player.getId();
+            auto recipientId = pRecipient->getContentId();
+            auto senderId = player.getContentId();
 
             auto senderFriendsList = g_fw.get< Social::SocialMgr< Social::FriendList > >()->findGroupById( player.getFriendsListId() );
             auto recipientFriendsList = g_fw.get< Social::SocialMgr< Social::FriendList > >()->findGroupById( pRecipient->getFriendsListId() );
@@ -666,8 +666,8 @@ void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePac
             }
             else
             {
-               // Catch any other, unreported mess
-               //logMessage = senderFriendsList->addInvite( recipientId );
+               // todo: get entry, verify if recipient already has member as friend
+               senderFriendsList->addMember( recipientId, Social::FriendEntryType::SentRequest );
             }
 
          }
@@ -710,10 +710,12 @@ void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePac
 
          auto recipientFriendsList = g_fw.get< Social::SocialMgr< Social::FriendList > >()->findGroupById( pRecipient->getFriendsListId() );
 
-         //recipientFriendsList->addInvite( player.getId() );
+         g_fw.get< Logger >()->debug( "Player " + player.getName() + " has added " + pRecipient->getName() );
+
+         recipientFriendsList->addMember( player.getContentId(), Social::FriendEntryType::ReceivedRequest );
          
          auto senderResultPacket = GamePacketNew< Server::FFXIVIpcSocialRequestResponse, ServerZoneIpcType >( pRecipient->getId(), player.getId() );
-         senderResultPacket.data().contentId = pRecipient->getId();
+         senderResultPacket.data().contentId = pRecipient->getContentId();
          senderResultPacket.data().category = Common::SocialCategory::Friends;
          senderResultPacket.data().response = Common::SocialRequestResponse::Cancel;
 
@@ -722,6 +724,7 @@ void Core::Network::GameConnection::socialReqSendHandler( const Packets::GamePac
          //todo: build packet from packetresult here
          player.queuePacket( senderResultPacket );
 
+         // todo: fix this, it should be logging.
          if( recipientFriendsList->isFriendList() )
          {
             g_fw.get< Logger >()->debug( "he HAA HAAA" );

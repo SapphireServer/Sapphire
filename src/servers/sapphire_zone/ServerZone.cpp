@@ -374,9 +374,9 @@ Core::SessionPtr Core::ServerZone::getSession( uint64_t contentId )
 {
    //std::lock_guard<std::mutex> lock( m_sessionMutex );
 
-   auto it = m_sessionMapById.find( contentId );
+   auto it = m_sessionMapByContentId.find( contentId );
 
-   if( it != m_sessionMapById.end() )
+   if( it != m_sessionMapByContentId.end() )
       return ( it->second );
 
    return nullptr;

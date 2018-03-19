@@ -20,6 +20,12 @@ extern Core::Framework g_fw;
 using namespace Core::Social;
 using namespace Core::Network;
 
+
+uint32_t Group::findNextAvailableIndex() const
+{
+
+}
+
 // todo: invite map in g_serverZone.getGroupMgr(GroupType) and look up
 
 uint32_t Group::addMember( uint64_t contentId )

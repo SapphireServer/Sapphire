@@ -64,6 +64,8 @@ public:
 
    //virtual void populateGroupMembers();
 
+   uint32_t findNextAvailableIndex() const;
+
    /*! access member vector */
    std::vector< uint64_t >& getMembers();
 

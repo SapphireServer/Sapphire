@@ -15,7 +15,7 @@
 namespace Core {
 namespace Social {
 
-enum class FriendEntryType : uint8_t
+enum FriendEntryType : uint8_t
 {
    Added = 0x10,
    SentRequest = 0x20,

@@ -80,6 +80,7 @@ uint32_t Group::addInvite( uint64_t characterId )
    return logMessage;
 }
 */
+
 std::vector< PlayerEntry > FriendList::getFriendListEntries( uint16_t entryAmount )
 {
    std::vector< PlayerEntry > entryList = {};
@@ -97,7 +98,6 @@ std::vector< PlayerEntry > FriendList::getFriendListEntries( uint16_t entryAmoun
    return entryList;
 }
 
-
 //todo: generalize this for linkshell etc
 Core::Network::Packets::Server::PlayerEntry FriendList::generatePlayerEntry( uint64_t contentId )
 {
@@ -110,20 +110,18 @@ Core::Network::Packets::Server::PlayerEntry FriendList::generatePlayerEntry( uin
 
    auto dataIndex = std::distance( m_members.begin(), it );
 
-   auto friendEntry = m_entries.at( dataIndex );
+   auto friendEntryData = m_entries.at( dataIndex );
 
    // todo: set as offline in one of the unknown values, if session does not exist
    Core::Network::Packets::Server::PlayerEntry entry = {};
 
    entry.contentId = contentId;
-   entry.timestamp = 1517767262;
-
-   // todo: if invite change these
-
-   entry.status = 16;
+   entry.timestamp = friendEntryData.timestamp;
+   entry.status = friendEntryData.entryStatus;
    entry.unknown = 0;
-   //entry.entryIcon = 0xf;  
-   entry.unavailable = 0;    // unavailable (other world)
+   entry.entryIcon = friendEntryData.friendGroup;
+
+   entry.unavailable = 0;
    entry.one = 1;
 
    // We check if player is online. If so, we can pull data from existing session in memory
@@ -153,15 +151,12 @@ Core::Network::Packets::Server::PlayerEntry FriendList::generatePlayerEntry( uin
    }
    else
    {
-      //todo: lets grab it from the db
       auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
 
-      //const std::string char_id_str = std::to_string( characterId );
-
-      auto stmt = pDb->getPreparedStatement( Db::CharaDbStatements::CHARA_SEL );
+      auto stmt = pDb->getPreparedStatement( Db::CharaDbStatements::CHARA_SEL_MINIMAL_FROM_CONTENTID );
 
       //todo: this WILL break
-      stmt->setUInt( 1, contentId );
+      stmt->setUInt64( 1, contentId );
       auto res = pDb->query( stmt );
 
       // todo: Is this correct? Seems so judging from retail
@@ -179,7 +174,8 @@ Core::Network::Packets::Server::PlayerEntry FriendList::generatePlayerEntry( uin
 
          //todo: pull actual FC name
          memcpy( &entry.fcTag[0], "Ao", 4 );
-         entry.clientLanguage = res->getUInt8( "Language" );
+         // todo: fix this
+         entry.clientLanguage = 0x02; //->getUInt8( "Language" );
          entry.knownLanguages = 0x0F;
          //entry.onlineStatusMask = pPlayer->getOnlineStatusMask();
       }
