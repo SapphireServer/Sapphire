@@ -64,7 +64,7 @@ private:
 
 public:
    SubFst001() : EventScript( 65560 )
-   { }
+   {}
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
@@ -72,13 +72,13 @@ public:
 
       if( actor == ACTOR0 )
       {
-         if( !player.hasQuest( getId()))
+         if( !player.hasQuest( getId() ) )
             Scene00000( player );
          else
             Scene00001( player );
       } else if( actor == ACTOR1 )
       {
-         if( !player.hasQuest( getId()))
+         if( !player.hasQuest( getId() ) )
             Scene00099( player );
          else
             Scene00100( player );
