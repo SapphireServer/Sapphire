@@ -31,33 +31,34 @@ private:
          }
       };
 
-      player.playScene( getId( ), 0, NONE, callback );
+      player.playScene( getId(), 0, NONE, callback );
    }
 
-   void Scene00001(Entity::Player& player)
+   void Scene00001( Entity::Player& player )
    {
       auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
       {
          if( result.param2 == 1 ) // finish quest
          {
-            if( player.giveQuestRewards( getId(), 0 ) )
-               player.finishQuest( getId() );
+            if( player.giveQuestRewards( getId(), 0 ))
+               player.finishQuest( getId());
          }
       };
 
-      player.playScene( getId( ), 1, NONE, callback );
+      player.playScene( getId(), 1, NONE, callback );
    }
 
 public:
-   SubFst002() : EventScript( 65561 ) {}
+   SubFst002() : EventScript( 65561 )
+   { }
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
-      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
+      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ));
 
-      if( actor == ACTOR0 && !player.hasQuest( getId() ) )
+      if( actor == ACTOR0 && !player.hasQuest( getId()))
          Scene00000( player );
-      else if( actor == ACTOR0 && player.getQuestSeq( getId() ) == SEQ_FINISH )
+      else if( actor == ACTOR0 && player.getQuestSeq( getId()) == SEQ_FINISH )
          Scene00001( player );
    }
 
@@ -66,7 +67,7 @@ public:
       if( npcId != ENEMY0 )
          return;
 
-      auto currentKC = player.getQuestUI8AL( getId() ) + 1;
+      auto currentKC = player.getQuestUI8AL( getId()) + 1;
 
       if( currentKC >= 6 )
          player.updateQuest( getId(), SEQ_FINISH );
