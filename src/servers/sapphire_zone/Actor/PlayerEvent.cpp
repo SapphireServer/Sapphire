@@ -170,6 +170,7 @@ void Core::Entity::Player::playScene( uint32_t eventId, uint32_t scene,
 
    pEvent->setPlayedScene( true );
    pEvent->setEventReturnCallback( eventCallback );
+   pEvent->setSceneChainCallback( nullptr );
    EventPlayPacket eventPlay( getId(), pEvent->getActorId(), pEvent->getId(),
                               scene, flags, eventParam2, eventParam3, eventParam4 );
 
@@ -186,6 +187,7 @@ void Core::Entity::Player::playSceneChain( uint32_t eventId, uint32_t scene, uin
 
    pEvent->setPlayedScene( true );
    pEvent->setSceneChainCallback( sceneChainCallback );
+   pEvent->setEventReturnCallback( nullptr );
    EventPlayPacket eventPlay( getId(), pEvent->getActorId(), pEvent->getId(),
                               scene, flags, eventParam2, eventParam3, eventParam4 );
 

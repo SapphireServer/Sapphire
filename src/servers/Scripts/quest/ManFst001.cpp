@@ -49,12 +49,7 @@ private:
 
    void Scene00001( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
-      {
-         Scene00002( player );
-      };
-
-      player.playScene( getId(), 1, DISABLE_SKIP | HIDE_HOTBAR | SET_BASE, 0, 0, callback );
+      player.playSceneChain( getId(), 1, DISABLE_SKIP | HIDE_HOTBAR | SET_BASE, BIND_SCENE( &ManFst001::Scene00002 ) );
    }
 
    void Scene00002( Entity::Player& player )
@@ -71,12 +66,7 @@ private:
 
    void Scene00004( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
-      {
-         Scene00005( player );
-      };
-
-      player.playScene( getId(), 4, FADE_OUT | HIDE_HOTBAR | CONDITION_CUTSCENE | HIDE_UI, 0, 0, callback );
+      player.playSceneChain( getId(), 4, FADE_OUT | HIDE_HOTBAR | CONDITION_CUTSCENE | HIDE_UI, BIND_SCENE( &ManFst001::Scene00005 ) );
    }
 
    void Scene00005( Entity::Player& player )
@@ -85,7 +75,7 @@ private:
       {
          if( result.param2 == 1 )
          {
-            if( player.giveQuestRewards( getId(), 0 ))
+            if( player.giveQuestRewards( getId(), 0 ) )
                player.finishQuest( getId() );
          }
       };

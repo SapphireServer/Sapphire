@@ -41,22 +41,12 @@ private:
 
    void Scene00001( Entity::Player& player )
    {
-      auto callback = [this]( Entity::Player& player, const Event::SceneResult& result )
-      {
-         Scene00002( player );
-      };
-
-      player.playScene( getId(), 1, DISABLE_SKIP | HIDE_HOTBAR | SET_BASE, 0, 0, callback );
+      player.playSceneChain( getId(), 1, DISABLE_SKIP | HIDE_HOTBAR | SET_BASE, BIND_SCENE( &ManSea001::Scene00002 ) );
    }
 
    void Scene00002( Entity::Player& player )
    {
-      auto callback = [this]( Entity::Player& player, const Event::SceneResult& result )
-      {
-         Scene00003( player );
-      };
-
-      player.playScene( getId(), 2, NONE, 0, 0, callback );
+      player.playSceneChain( getId(), 2, NONE, BIND_SCENE( &ManSea001::Scene00003 ) );
    }
 
    void Scene00003( Entity::Player& player )
@@ -76,12 +66,7 @@ private:
 
    void Scene00005( Entity::Player& player )
    {
-      auto callback = [this]( Entity::Player& player, const Event::SceneResult& result )
-      {
-         Scene00006( player );
-      };
-
-      player.playScene( getId(), 5, HIDE_HOTBAR, 0, 0, callback );
+      player.playSceneChain( getId(), 5, HIDE_HOTBAR, BIND_SCENE( &ManSea001::Scene00006 ) );
    }
 
    void Scene00006( Entity::Player& player )
@@ -118,12 +103,7 @@ private:
 
    void Scene00011( Entity::Player& player )
    {
-      auto callback = [this]( Entity::Player& player, const Event::SceneResult& result )
-      {
-         Scene00012( player );
-      };
-
-      player.playScene( getId(), 11, 0x2c02, 0, 0, callback );
+      player.playSceneChain( getId(), 11, 0x2c02, 0, 0, BIND_SCENE( &ManSea001::Scene00012 ) );
    }
 
    void Scene00012( Entity::Player& player )

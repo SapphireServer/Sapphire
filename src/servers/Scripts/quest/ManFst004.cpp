@@ -79,11 +79,13 @@ public:
    // Event Handlers
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
-      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ));
+      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
+
       if( actor == ManFst004::Actor0 )
       {
          Scene00000( player );
-      } else if( actor == ManFst004::Actor1 )
+      }
+      else if( actor == ManFst004::Actor1 )
       {
          // starting the Aetheryte eventaction
          // player.eventStart( actorId, 0x050002, 7, 0, 0);
@@ -99,13 +101,16 @@ public:
             [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
             { },
             eventId );
-      } else if( actor == ManFst004::Actor2 )
+      }
+      else if( actor == ManFst004::Actor2 )
       {
          Scene00002( player );
-      } else if( actor == ManFst004::Actor3 )
+      }
+      else if( actor == ManFst004::Actor3 )
       {
          Scene00003( player );
-      } else if( actor == ManFst004::Actor4 )
+      }
+      else if( actor == ManFst004::Actor4 )
       {
          Scene00005( player );
       }
@@ -199,7 +204,7 @@ private:
          {
             if( result.param2 == 1 ) // finish quest
             {
-               if( player.giveQuestRewards( m_id, 0 ))
+               if( player.giveQuestRewards( m_id, 0 ) )
                {
                   player.finishQuest( m_id );
                }

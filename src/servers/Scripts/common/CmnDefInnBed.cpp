@@ -6,7 +6,7 @@ class CmnDefInnBed : public EventScript
 {
 public:
    CmnDefInnBed() : EventScript( 720916 )
-   { }
+   {}
 
    // menu
    void Scene00000( Entity::Player& player )

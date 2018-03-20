@@ -10,7 +10,7 @@ class CmnDefLinkShell : public EventScript
 {
 public:
    CmnDefLinkShell() : EventScript( 0xB0006 )
-   { }
+   {}
 
    void Scene00001( Entity::Player& player )
    {
