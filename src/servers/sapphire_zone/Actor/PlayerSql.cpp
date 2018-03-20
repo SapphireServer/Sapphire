@@ -207,7 +207,13 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
 
    calculateStats();
 
-   m_friendsListId = g_fw.get< Social::SocialMgr < Social::FriendList > >()->loadFriendsList( m_id );
+   auto friendListMgr = g_fw.get< Social::SocialMgr < Social::FriendList > >();
+
+   if( !friendListMgr->loadFriendsList( m_id ) )
+   {
+      pLog->error( "[" + char_id_str + "] Failed to load friends list!" );
+   }
+
    pLog->debug( std::to_string( m_id ) + " ID, has group ID: " + std::to_string( m_friendsListId ) );
 
    // first login, run the script event

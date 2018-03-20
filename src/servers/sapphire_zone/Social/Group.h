@@ -64,13 +64,16 @@ public:
 
    //virtual void populateGroupMembers();
 
-   uint32_t findNextAvailableIndex() const;
+   int32_t findNextAvailableIndex() const;
 
    /*! access member vector */
    std::vector< uint64_t >& getMembers();
 
    /*! get container limit */
    uint32_t getCapacity() const;
+
+   /*! get group id */
+   uint64_t getId() const;
 
    /*! get total size of group (members + invites) */
    uint32_t Group::getTotalSize() const;
@@ -87,6 +90,8 @@ protected:
    uint32_t m_maxRoles{ 50 };
    std::chrono::steady_clock::time_point m_createTime{ std::chrono::steady_clock::now() };
 
+   // todo: it might be interesting to consider moving to a map with entries and sorting that out.
+   // it does imply useless information being stored in the case of a few groups, which is why I'm not doing it atm
    std::vector< uint64_t > m_members;
 
 private:

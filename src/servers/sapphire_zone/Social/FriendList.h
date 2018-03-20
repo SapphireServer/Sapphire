@@ -17,6 +17,7 @@ namespace Social {
 
 enum FriendEntryType : uint8_t
 {
+   Invalid = 0,
    Added = 0x10,
    SentRequest = 0x20,
    ReceivedRequest = 0x30
@@ -43,6 +44,12 @@ public:
    Core::Network::Packets::Server::PlayerEntry generatePlayerEntry( uint64_t contentId );
 
    uint32_t addMember( uint64_t contentId, FriendEntryType friendEntryType );
+
+   uint32_t processInvite( uint64_t contentId, Common::SocialRequestAction );
+
+   uint32_t removeMember( uint64_t contentId );
+
+   uint32_t getFriendIndex( uint64_t contentId );
 
    /*! access entry vector */
    std::vector< FriendEntry >& getEntries();

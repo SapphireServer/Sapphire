@@ -736,9 +736,9 @@ namespace Core {
 
       enum class SocialRequestResponse : uint8_t
       {
-         Decline,
-         Accept,
-         Cancel,
+         Decline = 0,
+         Accept = 1,
+         Cancel = 2
       };
 
       typedef std::vector< PlayerStateFlag > PlayerStateFlagList;

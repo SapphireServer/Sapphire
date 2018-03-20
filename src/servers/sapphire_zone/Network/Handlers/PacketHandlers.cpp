@@ -511,18 +511,43 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
 
 }
 
-void Core::Network::GameConnection::socialReqResponseHandler( const Packets::GamePacket& inPacket,
+void Core::Network::GameConnection::socialReqProcessHandler( const Packets::GamePacket& inPacket,
                                                               Entity::Player& player )
 {
    auto targetId = inPacket.getValAt< uint32_t >( 0x20 );
    auto category = inPacket.getValAt< Common::SocialCategory >( 0x28 );
    auto action = inPacket.getValAt< Common::SocialRequestAction >( 0x29 );
 
+   auto friendListMgr = g_fw.get< Social::SocialMgr< Social::FriendList > >();
+
    ZoneChannelPacket< FFXIVIpcSocialRequestError > info( targetId, player.getId() );
    ZoneChannelPacket< FFXIVIpcSocialRequestResponse > response( targetId, player.getId() );
 
    info.data().category = category;
    response.data().category = category;
+
+   switch( action )
+   {
+      case SocialRequestAction::Accept:
+      {
+         auto recipientFriendsList = g_fw.get< Social::SocialMgr< Social::FriendList > >()->findGroupById( player.getId() );
+
+         // Load our target's friendlist, hoping it's still in memory.. (target could have gone offline at this point)
+         if( !friendListMgr->loadFriendsList( targetId ) )
+         {
+            g_fw.get< Logger >()->error( "Failed to load friend list for character ID " + std::to_string( targetId ) + ", removing entry." );
+         }
+
+         auto senderFriendsList = friendListMgr->findGroupById( targetId );
+         
+         senderFriendsList->processInvite( player.getContentId(), SocialRequestAction::Accept );
+         //todo: FICK
+         recipientFriendsList->processInvite( targetId, SocialRequestAction::Accept );
+
+      }
+      default:
+         break;
+   }
 
    //auto pQR = g_database.query( "SELECT Name FROM dbchara WHERE CharacterId = " + to_string( targetId ) );
    auto name = player.getName();

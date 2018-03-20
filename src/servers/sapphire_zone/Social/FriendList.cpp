@@ -33,7 +33,9 @@ uint32_t FriendList::addMember( uint64_t contentId, FriendEntryType friendEntryT
 
    uint32_t logMessage = 0;
 
-   m_members.push_back( contentId );
+   // todo: index logmessage.. report error (-1)
+
+   const int32_t index = Group::findNextAvailableIndex();
 
    FriendEntry friendEntry;
    friendEntry.timestamp = std::time( nullptr );
@@ -41,9 +43,72 @@ uint32_t FriendList::addMember( uint64_t contentId, FriendEntryType friendEntryT
    friendEntry.entryStatus = friendEntryType;
    friendEntry.unknown = 0;
 
-   m_entries.push_back( friendEntry );
+   m_members[index] = contentId;
+   m_entries[index] = friendEntry;
 
    return logMessage;
+}
+
+uint32_t FriendList::removeMember( uint64_t contentId )
+{
+   assert( contentId != 0 );
+
+   uint32_t logMessage = 0;
+
+   // todo: index logmessage.. report error (-1)
+
+   const uint32_t index = getFriendIndex( contentId );
+
+   m_members[index] = 0;
+
+   auto entry = m_entries[index];
+   entry.entryStatus = FriendEntryType::Invalid;
+   entry.friendGroup = 0;
+   entry.timestamp = 0;
+   entry.unknown = 0;
+
+   return logMessage;
+}
+
+
+uint32_t FriendList::processInvite( uint64_t contentId, Common::SocialRequestAction action )
+{
+   uint32_t logMessage = 0;
+
+   std::vector< uint64_t >::iterator it;
+
+   it = std::find( m_members.begin(), m_members.end(), contentId );
+
+   auto dataIndex = std::distance( m_members.begin(), it );
+
+   auto friendEntryData = m_entries.at( dataIndex );
+
+   // todo: check timestamp, if expired etc.
+
+   switch( action )
+   {
+      case Common::SocialRequestAction::Accept:
+      {
+         friendEntryData.entryStatus = FriendEntryType::Added;
+         break;
+      }
+      case Common::SocialRequestAction::Decline:
+      {
+         removeMember( contentId );
+      }
+      default:
+         break;
+   }
+
+}
+
+uint32_t FriendList::getFriendIndex( uint64_t contentId )
+{
+   std::vector< uint64_t >::iterator it;
+
+   it = std::find( m_members.begin(), m_members.end(), contentId );
+
+   return std::distance( m_members.begin(), it );
 }
 
 std::vector< FriendEntry >& FriendList::getEntries()
@@ -86,10 +151,13 @@ std::vector< PlayerEntry > FriendList::getFriendListEntries( uint16_t entryAmoun
    std::vector< PlayerEntry > entryList = {};
    uint16_t limit = 0;
 
-   for ( const auto& member : m_members )
+   for( const auto& member : m_members )
    {
-      if ( limit == entryAmount )
+      if( limit == entryAmount )
          break;
+
+      if( member == 0 )
+         continue;
 
       entryList.push_back( generatePlayerEntry( member ) );
       limit++;

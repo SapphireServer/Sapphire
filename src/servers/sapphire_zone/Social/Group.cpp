@@ -15,15 +15,25 @@
 #include "Framework.h"
 #include "Forwards.h"
 
+#include <set>
+
 extern Core::Framework g_fw;
 
 using namespace Core::Social;
 using namespace Core::Network;
 
 
-uint32_t Group::findNextAvailableIndex() const
+int32_t Group::findNextAvailableIndex() const
 {
+   // todo: perhaps throw an exception instead of returning -1 if not available?
+   auto const it = std::find( std::begin( m_members ), std::end( m_members ), 0 );
 
+   if( it == m_members.end() )
+   {
+      return -1;
+   }
+
+   return std::distance( m_members.begin(), it );
 }
 
 // todo: invite map in g_serverZone.getGroupMgr(GroupType) and look up

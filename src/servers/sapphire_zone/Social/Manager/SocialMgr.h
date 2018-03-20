@@ -72,7 +72,7 @@ public:
       return false;
    }
 
-   uint64_t loadFriendsList( uint32_t characterId );
+   bool loadFriendsList( uint32_t characterId );
 
 protected:
 // those would be implemented in T, so you'd have T.m_type and T.m_maxEntries
@@ -109,8 +109,12 @@ bool Core::Social::SocialMgr< T >::init()
 }
 
 template<> inline
-uint64_t Core::Social::SocialMgr< Core::Social::FriendList >::loadFriendsList( uint32_t characterId )
+bool Core::Social::SocialMgr< Core::Social::FriendList >::loadFriendsList( uint32_t characterId )
 {
+   // Check if our group has already been loaded..
+   auto group = findGroupById( characterId );
+   if( group )
+      return true;
 
    auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
    auto res = pDb->query( "SELECT CharacterId, CharacterIdList, InviteDataList "
@@ -135,10 +139,7 @@ uint64_t Core::Social::SocialMgr< Core::Social::FriendList >::loadFriendsList( u
    {
       std::vector< uint64_t > list( friends.size() / 8 );
       // todo: fix this garbage check
-      if( list.at( 0 ) != 0 )
-      {
-         friendsList.getMembers() = list;
-      }
+      friendsList.getMembers() = list;
    }
 
    // Insert invite data from binary data
@@ -155,9 +156,9 @@ uint64_t Core::Social::SocialMgr< Core::Social::FriendList >::loadFriendsList( u
 
    auto friendListPtr = boost::make_shared< Social::FriendList >( friendsList );
       
-   m_groups[groupID] = friendListPtr;
+   m_groups.emplace( characterId, friendListPtr );
 
-   return groupID;
+   return true;
 }
 
 

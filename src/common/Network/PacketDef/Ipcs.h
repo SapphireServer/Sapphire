@@ -199,6 +199,7 @@ namespace Packets {
       CFDutyInfoHandler        = 0x0078, // updated 4.2
 
       SocialReqSendHandler     = 0x00CA, // updated 4.2
+      SocialReqProcessHandler  = 0x00CC, // updated 4.2
 
       ChatHandler              = 0x00C7, // updated 4.2
 
