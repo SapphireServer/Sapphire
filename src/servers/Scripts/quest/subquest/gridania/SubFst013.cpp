@@ -49,12 +49,12 @@ private:
          }
       };
 
-      player.playScene( getId( ), 0, NONE, callback );
+      player.playScene( getId(), 0, NONE, callback );
    }
 
    void Scene00001( Entity::Player& player )
    {
-      player.playScene( getId( ), 2, NONE );
+      player.playScene( getId(), 2, NONE );
    }
 
    void Scene00002( Entity::Player& player )
@@ -64,12 +64,12 @@ private:
          player.updateQuest( getId(), SEQ_3 );
       };
 
-      player.playScene( getId( ), 2, NONE, callback );
+      player.playScene( getId(), 2, NONE, callback );
    }
 
    void Scene00003( Entity::Player& player )
    {
-      player.playScene( getId( ), 3, NONE );
+      player.playScene( getId(), 3, NONE );
    }
 
    void Scene00004( Entity::Player& player )
@@ -79,12 +79,12 @@ private:
          player.updateQuest( getId(), SEQ_5 );
       };
 
-      player.playScene( getId( ), 4, NONE, callback );
+      player.playScene( getId(), 4, NONE, callback );
    }
 
    void Scene00005( Entity::Player& player )
    {
-      player.playScene( getId( ), 5, NONE );
+      player.playScene( getId(), 5, NONE );
    }
 
    void Scene00006( Entity::Player& player )
@@ -93,17 +93,17 @@ private:
       {
          if( result.param2 == 1 ) // finish quest
          {
-            if( player.giveQuestRewards( getId(), 0 ) )
-               player.finishQuest( getId() );
+            if( player.giveQuestRewards( getId(), 0 ))
+               player.finishQuest( getId());
          }
       };
 
-      player.playScene( getId( ), 6, NONE, callback );
+      player.playScene( getId(), 6, NONE, callback );
    }
 
    void Scene00095( Entity::Player& player )
    {
-      player.playScene( getId( ), 95, NONE );
+      player.playScene( getId(), 95, NONE );
    }
 
    void Scene00096( Entity::Player& player )
@@ -114,12 +114,12 @@ private:
          player.sendQuestMessage( getId(), 4, 2, 0, 0 );
       };
 
-      player.playScene( getId( ), 96, NONE, callback );
+      player.playScene( getId(), 96, NONE, callback );
    }
 
    void Scene00097( Entity::Player& player )
    {
-      player.playScene( getId( ), 97, NONE );
+      player.playScene( getId(), 97, NONE );
    }
 
    void Scene00098( Entity::Player& player )
@@ -130,12 +130,12 @@ private:
          player.sendQuestMessage( getId(), 2, 2, 0, 0 );
       };
 
-      player.playScene( getId( ), 98, NONE, callback );
+      player.playScene( getId(), 98, NONE, callback );
    }
 
    void Scene00099( Entity::Player& player )
    {
-      player.playScene( getId( ), 99, NONE );
+      player.playScene( getId(), 99, NONE );
    }
 
    void Scene00100( Entity::Player& player )
@@ -146,18 +146,19 @@ private:
          player.sendQuestMessage( getId(), 0, 2, 0, 0 );
       };
 
-      player.playScene( getId( ), 100, NONE, callback );
+      player.playScene( getId(), 100, NONE, callback );
    }
 
 
 public:
-   SubFst013() : EventScript( 65576 ) {}
+   SubFst013() : EventScript( 65576 )
+   { }
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
-      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
+      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ));
 
-      if( !player.hasQuest( getId() ) )
+      if( !player.hasQuest( getId()))
       {
          Scene00000( player );
          return;
@@ -165,23 +166,23 @@ public:
 
       if( actor == ACTOR1 ) // talking to Aunillie while on quest
          Scene00003( player );
-      else if( actor == ACTOR0 && player.getQuestSeq( getId() ) == SEQ_2 )
+      else if( actor == ACTOR0 && player.getQuestSeq( getId()) == SEQ_2 )
          Scene00002( player );
-      else if( actor == ACTOR0 && player.getQuestSeq( getId() ) == SEQ_4 )
+      else if( actor == ACTOR0 && player.getQuestSeq( getId()) == SEQ_4 )
          Scene00004( player );
-      else if( actor == ACTOR0 && player.getQuestSeq( getId() ) == SEQ_FINISH )
+      else if( actor == ACTOR0 && player.getQuestSeq( getId()) == SEQ_FINISH )
          Scene00006( player );
    }
 
    void onEmote( uint64_t actorId, uint32_t eventId, uint32_t emoteId, Entity::Player& player ) override
    {
-      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
+      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ));
 
-      if( actor == ACTOR1 && emoteId == 5 && player.getQuestSeq( getId() ) == SEQ_1 )
+      if( actor == ACTOR1 && emoteId == 5 && player.getQuestSeq( getId()) == SEQ_1 )
          Scene00100( player );
-      else if( actor == ACTOR1 && emoteId == 18 && player.getQuestSeq( getId() ) == SEQ_3 )
+      else if( actor == ACTOR1 && emoteId == 18 && player.getQuestSeq( getId()) == SEQ_3 )
          Scene00098( player );
-      else if( actor == ACTOR1 && emoteId == 11 && player.getQuestSeq( getId() ) == SEQ_5 )
+      else if( actor == ACTOR1 && emoteId == 11 && player.getQuestSeq( getId()) == SEQ_5 )
          Scene00096( player );
    }
 };

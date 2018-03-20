@@ -41,7 +41,7 @@ private:
             Scene00050( player );
       };
 
-      player.playScene( getId( ), 0, HIDE_HOTBAR, 0, 0, callback );
+      player.playScene( getId(), 0, HIDE_HOTBAR, 0, 0, callback );
    }
 
    void Scene00001( Entity::Player& player )
@@ -51,7 +51,7 @@ private:
 
       };
 
-      player.playScene( getId( ), 1, NONE, callback );
+      player.playScene( getId(), 1, NONE, callback );
    }
 
    void Scene00002( Entity::Player& player )
@@ -61,7 +61,7 @@ private:
 
       };
 
-      player.playScene( getId( ), 2, NONE, callback );
+      player.playScene( getId(), 2, NONE, callback );
    }
 
    void Scene00003( Entity::Player& player )
@@ -71,7 +71,7 @@ private:
 
       };
 
-      player.playScene( getId( ), 3, NONE, callback );
+      player.playScene( getId(), 3, NONE, callback );
    }
 
    void Scene00004( Entity::Player& player )
@@ -81,7 +81,7 @@ private:
 
       };
 
-      player.playScene( getId( ), 4, NONE, callback );
+      player.playScene( getId(), 4, NONE, callback );
    }
 
    void Scene00005( Entity::Player& player )
@@ -91,7 +91,7 @@ private:
 
       };
 
-      player.playScene( getId( ), 5, NONE, callback );
+      player.playScene( getId(), 5, NONE, callback );
    }
 
    void Scene00006( Entity::Player& player )
@@ -101,7 +101,7 @@ private:
 
       };
 
-      player.playScene( getId( ), 6, NONE, callback );
+      player.playScene( getId(), 6, NONE, callback );
    }
 
    void Scene00007( Entity::Player& player )
@@ -111,7 +111,7 @@ private:
 
       };
 
-      player.playScene( getId( ), 7, NONE, callback );
+      player.playScene( getId(), 7, NONE, callback );
    }
 
    void Scene00008( Entity::Player& player )
@@ -121,7 +121,7 @@ private:
 
       };
 
-      player.playScene( getId( ), 8, NONE, callback );
+      player.playScene( getId(), 8, NONE, callback );
    }
 
    void Scene00050( Entity::Player& player )
@@ -136,14 +136,16 @@ private:
          player.forceZoneing( 128 );
       };
 
-      player.playScene( getId( ), 50, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0, 0, callback );
+      player.playScene( getId(), 50, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0, 0, callback );
    }
+
 public:
-   ManSea002() : EventScript( 65644 ) {}
+   ManSea002() : EventScript( 65644 )
+   { }
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
-      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
+      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ));
 
       // todo: this doesn't actually play a cutscene after accepting the quest
       if( actor == ACTOR0 )

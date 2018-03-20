@@ -44,7 +44,7 @@ private:
          }
       };
 
-      player.playScene( getId( ), 0, HIDE_HOTBAR, 0, 0, callback );
+      player.playScene( getId(), 0, HIDE_HOTBAR, 0, 0, callback );
    }
 
    void Scene00001( Entity::Player& player )
@@ -54,7 +54,7 @@ private:
          Scene00002( player );
       };
 
-      player.playScene( getId( ), 1, DISABLE_SKIP | HIDE_HOTBAR | SET_BASE, 0, 0, callback );
+      player.playScene( getId(), 1, DISABLE_SKIP | HIDE_HOTBAR | SET_BASE, 0, 0, callback );
    }
 
    void Scene00002( Entity::Player& player )
@@ -66,7 +66,7 @@ private:
          player.playScene( OPENING_EVENT_HANDLER, 0x1E, HIDE_HOTBAR | NO_DEFAULT_CAMERA, 0, 0 );
       };
 
-      player.playScene( getId( ), 2, 0, 0, 0, callback );
+      player.playScene( getId(), 2, 0, 0, 0, callback );
    }
 
    void Scene00004( Entity::Player& player )
@@ -76,7 +76,7 @@ private:
          Scene00005( player );
       };
 
-      player.playScene( getId( ), 4, FADE_OUT | HIDE_HOTBAR | CONDITION_CUTSCENE | HIDE_UI, 0, 0, callback );
+      player.playScene( getId(), 4, FADE_OUT | HIDE_HOTBAR | CONDITION_CUTSCENE | HIDE_UI, 0, 0, callback );
    }
 
    void Scene00005( Entity::Player& player )
@@ -85,20 +85,21 @@ private:
       {
          if( result.param2 == 1 )
          {
-            if( player.giveQuestRewards( getId(), 0 ) )
-               player.finishQuest( getId() );
+            if( player.giveQuestRewards( getId(), 0 ))
+               player.finishQuest( getId());
          }
       };
 
-      player.playScene( getId( ), 5, INVIS_OTHER_PC, 0, 0, callback );
+      player.playScene( getId(), 5, INVIS_OTHER_PC, 0, 0, callback );
    }
 
 public:
-   ManFst001() : EventScript( 65575 ) {}
+   ManFst001() : EventScript( 65575 )
+   { }
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
-      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
+      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ));
 
       if( actor == ACTOR0 )
          Scene00000( player );

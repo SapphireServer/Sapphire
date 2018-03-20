@@ -21,8 +21,10 @@ public:
    {
       if( player.isAetheryteRegistered( eventId & 0xFFFF ) )
       {
-         player.playScene( eventId, 2, 0, []( Entity::Player& player, const Event::SceneResult& result ) {
-            if( result.param1 == 256 ) {
+         player.playScene( eventId, 2, 0, []( Entity::Player& player, const Event::SceneResult& result )
+         {
+            if( result.param1 == 256 )
+            {
                player.teleport( result.param2, 2 );
             }
          } );
