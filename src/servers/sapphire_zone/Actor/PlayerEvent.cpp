@@ -17,7 +17,6 @@
 #include "Action/EventItemAction.h"
 
 #include "Event/EventHandler.h"
-#include "Event/EventHandler.h"
 
 #include "Zone/Zone.h"
 
