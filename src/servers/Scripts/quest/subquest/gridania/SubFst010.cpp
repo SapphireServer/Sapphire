@@ -27,7 +27,7 @@ private:
             player.updateQuest( getId(), SEQ_FINISH );
       };
 
-      player.eventPlay( getId(), 0, NONE, callback );
+      player.playScene( getId( ), 0, NONE, callback );
    }
 
    void Scene00001( Entity::Player& player )
@@ -41,7 +41,7 @@ private:
          }
       };
 
-      player.eventPlay( getId(), 1, NONE, callback );
+      player.playScene( getId( ), 1, NONE, callback );
    }
 
 public:

@@ -47,7 +47,7 @@ private:
             Scene00050( player );
       };
 
-      player.eventPlay( getId(), 0, HIDE_HOTBAR, 0, 0, callback );
+      player.playScene( getId( ), 0, HIDE_HOTBAR, 0, 0, callback );
    }
 
    void Scene00001( Entity::Player& player )
@@ -57,7 +57,7 @@ private:
 
       };
 
-      player.eventPlay( getId(), 1, NONE, callback );
+      player.playScene( getId( ), 1, NONE, callback );
    }
 
    void Scene00002( Entity::Player& player )
@@ -67,7 +67,7 @@ private:
 
       };
 
-      player.eventPlay( getId(), 2, NONE, callback );
+      player.playScene( getId( ), 2, NONE, callback );
    }
 
    void Scene00003( Entity::Player& player )
@@ -77,7 +77,7 @@ private:
 
       };
 
-      player.eventPlay( getId(), 3, NONE, callback );
+      player.playScene( getId( ), 3, NONE, callback );
    }
 
    void Scene00004( Entity::Player& player )
@@ -87,7 +87,7 @@ private:
 
       };
 
-      player.eventPlay( getId(), 4, NONE, callback );
+      player.playScene( getId( ), 4, NONE, callback );
    }
 
    void Scene00005( Entity::Player& player )
@@ -97,7 +97,7 @@ private:
 
       };
 
-      player.eventPlay( getId(), 5, NONE, callback );
+      player.playScene( getId( ), 5, NONE, callback );
    }
 
    void Scene00006( Entity::Player& player )
@@ -107,7 +107,7 @@ private:
 
       };
 
-      player.eventPlay( getId(), 6, NONE, callback );
+      player.playScene( getId( ), 6, NONE, callback );
    }
 
    void Scene00007( Entity::Player& player )
@@ -117,7 +117,7 @@ private:
 
       };
 
-      player.eventPlay( getId(), 7, NONE, callback );
+      player.playScene( getId( ), 7, NONE, callback );
    }
 
    void Scene00008( Entity::Player& player )
@@ -127,7 +127,7 @@ private:
 
       };
 
-      player.eventPlay( getId(), 8, NONE, callback );
+      player.playScene( getId( ), 8, NONE, callback );
    }
 
    void Scene00050( Entity::Player& player )
@@ -142,7 +142,7 @@ private:
          player.forceZoneing( 130 );
       };
 
-      player.eventPlay( getId(), 50, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0, 0, callback );
+      player.playScene( getId( ), 50, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0, 0, callback );
    }
 
 

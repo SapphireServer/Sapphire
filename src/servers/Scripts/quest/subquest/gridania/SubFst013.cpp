@@ -49,12 +49,12 @@ private:
          }
       };
 
-      player.eventPlay( getId(), 0, NONE, callback );
+      player.playScene( getId( ), 0, NONE, callback );
    }
 
    void Scene00001( Entity::Player& player )
    {
-      player.eventPlay( getId(), 2, NONE );
+      player.playScene( getId( ), 2, NONE );
    }
 
    void Scene00002( Entity::Player& player )
@@ -64,12 +64,12 @@ private:
          player.updateQuest( getId(), SEQ_3 );
       };
 
-      player.eventPlay( getId(), 2, NONE, callback );
+      player.playScene( getId( ), 2, NONE, callback );
    }
 
    void Scene00003( Entity::Player& player )
    {
-      player.eventPlay( getId(), 3, NONE );
+      player.playScene( getId( ), 3, NONE );
    }
 
    void Scene00004( Entity::Player& player )
@@ -79,12 +79,12 @@ private:
          player.updateQuest( getId(), SEQ_5 );
       };
 
-      player.eventPlay( getId(), 4, NONE, callback );
+      player.playScene( getId( ), 4, NONE, callback );
    }
 
    void Scene00005( Entity::Player& player )
    {
-      player.eventPlay( getId(), 5, NONE );
+      player.playScene( getId( ), 5, NONE );
    }
 
    void Scene00006( Entity::Player& player )
@@ -98,12 +98,12 @@ private:
          }
       };
 
-      player.eventPlay( getId(), 6, NONE, callback );
+      player.playScene( getId( ), 6, NONE, callback );
    }
 
    void Scene00095( Entity::Player& player )
    {
-      player.eventPlay( getId(), 95, NONE );
+      player.playScene( getId( ), 95, NONE );
    }
 
    void Scene00096( Entity::Player& player )
@@ -114,12 +114,12 @@ private:
          player.sendQuestMessage( getId(), 4, 2, 0, 0 );
       };
 
-      player.eventPlay( getId(), 96, NONE, callback );
+      player.playScene( getId( ), 96, NONE, callback );
    }
 
    void Scene00097( Entity::Player& player )
    {
-      player.eventPlay( getId(), 97, NONE );
+      player.playScene( getId( ), 97, NONE );
    }
 
    void Scene00098( Entity::Player& player )
@@ -130,12 +130,12 @@ private:
          player.sendQuestMessage( getId(), 2, 2, 0, 0 );
       };
 
-      player.eventPlay( getId(), 98, NONE, callback );
+      player.playScene( getId( ), 98, NONE, callback );
    }
 
    void Scene00099( Entity::Player& player )
    {
-      player.eventPlay( getId(), 99, NONE );
+      player.playScene( getId( ), 99, NONE );
    }
 
    void Scene00100( Entity::Player& player )
@@ -146,7 +146,7 @@ private:
          player.sendQuestMessage( getId(), 0, 2, 0, 0 );
       };
 
-      player.eventPlay( getId(), 100, NONE, callback );
+      player.playScene( getId( ), 100, NONE, callback );
    }
 
 

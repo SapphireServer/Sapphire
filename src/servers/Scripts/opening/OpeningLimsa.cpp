@@ -49,24 +49,24 @@ private:
          Scene00001( player );
       };
 
-      player.eventPlay( getId(), 0, NO_DEFAULT_CAMERA | INVIS_ENPC |
-                                    CONDITION_CUTSCENE | HIDE_UI |
-                                    HIDE_HOTBAR | SILENT_ENTER_TERRI_ENV, 0, 1, callback );
+      player.playScene( getId( ), 0, NO_DEFAULT_CAMERA | INVIS_ENPC |
+                                     CONDITION_CUTSCENE | HIDE_UI |
+                                     HIDE_HOTBAR | SILENT_ENTER_TERRI_ENV, 0, 1, callback );
    }
 
    void Scene00001( Entity::Player& player )
    {
-      player.eventPlay( getId(), 1, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 1, 0x32 );
+      player.playScene( getId( ), 1, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 1, 0x32 );
    }
 
    void Scene00020( Entity::Player& player )
    {
-      player.eventPlay( getId(), 20, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 0, 1 );
+      player.playScene( getId( ), 20, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 0, 1 );
    }
 
    void Scene00030( Entity::Player& player )
    {
-      player.eventPlay( getId(), 30, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 0, 0 );
+      player.playScene( getId( ), 30, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 0, 0 );
    }
 
    void Scene00040( Entity::Player& player )
@@ -80,7 +80,7 @@ private:
          }
       };
 
-      player.eventPlay( getId(), 40, NO_DEFAULT_CAMERA, 2, 1, callback );
+      player.playScene( getId( ), 40, NO_DEFAULT_CAMERA, 2, 1, callback );
    }
 
 
