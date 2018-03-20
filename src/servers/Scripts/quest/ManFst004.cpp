@@ -143,113 +143,100 @@ class ManFst004 : public EventScript
    // Available Scenes in this quest, not necessarly all are used
    void Scene00000( Entity::Player& player )
    {
-      player.eventPlay( m_id, 0, 0x2000,
-         [&]( Entity::Player& player, const Event::SceneResult& result )
-         {
-            if( result.param2 == 1 ) // accept quest
-            {
-               Scene00050( player );
-            }
-         });
+      player.playScene( m_id, 0, 0x2000,
+                        [&]( Entity::Player& player, const Event::SceneResult& result ) {
+                           if( result.param2 == 1 ) // accept quest
+                           {
+                              Scene00050( player );
+                           }
+                        } );
    }
 
    void Scene00001( Entity::Player& player )
    {
-      player.eventPlay( m_id, 1, 0,
-         [&]( Entity::Player& player, const Event::SceneResult& result )
-         {
-            player.setQuestUI8AL( m_id, 1 );
-            checkQuestCompletion( player, 0 );
-         });
+      player.playScene( m_id, 1, 0,
+                        [&]( Entity::Player& player, const Event::SceneResult& result ) {
+                           player.setQuestUI8AL( m_id, 1 );
+                           checkQuestCompletion( player, 0 );
+                        } );
    }
 
    void Scene00002( Entity::Player& player )
    {
-      player.eventPlay( m_id, 2, 0,
-         [&]( Entity::Player& player, const Event::SceneResult& result )
-         {
-            player.setQuestUI8BH( m_id, 1 );
-            checkQuestCompletion( player, 3 );
-         });
+      player.playScene( m_id, 2, 0,
+                        [&]( Entity::Player& player, const Event::SceneResult& result ) {
+                           player.setQuestUI8BH( m_id, 1 );
+                           checkQuestCompletion( player, 3 );
+                        } );
    }
 
    void Scene00003( Entity::Player& player )
    {
-      player.eventPlay( m_id, 3, 0,
-         [&]( Entity::Player& player, const Event::SceneResult& result )
-         {
-            if( result.param2 == 1 )
-            {
-               Scene00100( player );
-            }
-            else
-            {
-               Scene00099( player );
-            }
-         });
+      player.playScene( m_id, 3, 0,
+                        [&]( Entity::Player& player, const Event::SceneResult& result ) {
+                           if( result.param2 == 1 ) {
+                              Scene00100( player );
+                           } else {
+                              Scene00099( player );
+                           }
+                        } );
    }
 
    void Scene00004( Entity::Player& player )
    {
-      player.eventPlay( m_id, 4, 0, 0, 0 );
+      player.playScene( m_id, 4, 0, 0, 0 );
    }
 
    void Scene00005( Entity::Player& player )
    {
-      player.eventPlay( m_id, 5, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0, 0,
-         [&]( Entity::Player& player, const Event::SceneResult& result )
-         {
-            if( result.param2 == 1 ) // finish quest
-            {
-               if( player.giveQuestRewards( m_id, 0 ) )
-               {
-                  player.finishQuest( m_id );
-               }
-            }
-         });
+      player.playScene( m_id, 5, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0, 0,
+                        [&]( Entity::Player& player, const Event::SceneResult& result ) {
+                           if( result.param2 == 1 ) // finish quest
+                           {
+                              if( player.giveQuestRewards( m_id, 0 )) {
+                                 player.finishQuest( m_id );
+                              }
+                           }
+                        } );
    }
 
    void Scene00050( Entity::Player& player )
    {
-      player.eventPlay( m_id, 50, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0/*unk*/, 0/*unk*/,
-         [&]( Entity::Player& player, const Event::SceneResult& result )
-         {
-            // accepting quest "close to home"
-            player.updateQuest( m_id, 1 );
-            player.setQuestUI8CH( m_id, 1 ); // receive key item
-            // event is done, need to teleport to real zone.
-            player.setZone( 132 );
-            //player.setZone(183); back to starting griania for debug purpose
-         });
+      player.playScene( m_id, 50, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0/*unk*/, 0/*unk*/,
+                        [&]( Entity::Player& player, const Event::SceneResult& result ) {
+                           // accepting quest "close to home"
+                           player.updateQuest( m_id, 1 );
+                           player.setQuestUI8CH( m_id, 1 ); // receive key item
+                           // event is done, need to teleport to real zone.
+                           player.setZone( 132 );
+                           //player.setZone(183); back to starting griania for debug purpose
+                        } );
    }
 
    void Scene00051( Entity::Player& player )
    {
-      player.eventPlay( m_id, 51, NONE,
-         [&]( Entity::Player& player, const Event::SceneResult& result )
-         {
-            Scene00001( player );
-         });
+      player.playScene( m_id, 51, NONE,
+                        [&]( Entity::Player& player, const Event::SceneResult& result ) {
+                           Scene00001( player );
+                        } );
    }
 
    void Scene00099( Entity::Player& player )
    {
-      player.eventPlay( m_id, 99, NONE,
-         [&]( Entity::Player& player, const Event::SceneResult& result )
-         {
-            Scene00004( player );
-         });
+      player.playScene( m_id, 99, NONE,
+                        [&]( Entity::Player& player, const Event::SceneResult& result ) {
+                           Scene00004( player );
+                        } );
    }
 
    void Scene00100( Entity::Player& player )
    {
-      player.eventPlay( m_id, 100, NONE,
-         [&]( Entity::Player& player, const Event::SceneResult& result )
-         {
-            player.setQuestUI8CH( m_id, 0 ); // remove key item, since we have just traded it
-            player.setQuestUI8BL( m_id, 1 );
-            checkQuestCompletion( player, 2 );
-         });
+      player.playScene( m_id, 100, NONE,
+                        [&]( Entity::Player& player, const Event::SceneResult& result ) {
+                           player.setQuestUI8CH( m_id, 0 ); // remove key item, since we have just traded it
+                           player.setQuestUI8BL( m_id, 1 );
+                           checkQuestCompletion( player, 2 );
+                        } );
    }
 
 };

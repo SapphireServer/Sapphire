@@ -18,7 +18,7 @@ public:
          }
       };
 
-      player.eventPlay( getId(), 0, 0x2000, 0, 1, callback );
+      player.playScene( getId( ), 0, 0x2000, 0, 1, callback );
    }
 
    void Scene00001( Entity::Player& player, uint16_t returnScene )
@@ -28,7 +28,7 @@ public:
          // todo: this is fucked
       };
 
-      player.eventPlay( getId(), 1, 0xFB2EC8F8, 0, 1, returnScene, callback );
+      player.playScene( getId( ), 1, 0xFB2EC8F8, 0, 1, returnScene, callback );
    }
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override

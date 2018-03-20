@@ -88,7 +88,7 @@ private:
             Scene00050( player );
       };
 
-      player.eventPlay( getId(), SEQ_0_ACTOR0, HIDE_HOTBAR, 0, 0, callback );
+      player.playScene( getId( ), SEQ_0_ACTOR0, HIDE_HOTBAR, 0, 0, callback );
    }
 
    void Scene00001( Entity::Player& player )
@@ -99,7 +99,7 @@ private:
          checkQuestCompletion( player, 0 );
       };
 
-      player.eventPlay( getId(), SEQ_1_ACTOR1, 0x0EFB, 0, 0, callback );
+      player.playScene( getId( ), SEQ_1_ACTOR1, 0x0EFB, 0, 0, callback );
    }
 
    void Scene00002( Entity::Player& player )
@@ -110,7 +110,7 @@ private:
          checkQuestCompletion( player, 3 );
       };
 
-      player.eventPlay( getId(), SEQ_1_ACTOR2, NONE, 0, 0, callback );
+      player.playScene( getId( ), SEQ_1_ACTOR2, NONE, 0, 0, callback );
    }
 
    void Scene00003( Entity::Player& player )
@@ -123,12 +123,12 @@ private:
             Scene00099( player );
       };
 
-      player.eventPlay( getId(), SEQ_1_ACTOR3, NONE, 0, 0, callback );
+      player.playScene( getId( ), SEQ_1_ACTOR3, NONE, 0, 0, callback );
    }
 
    void Scene00004( Entity::Player& player )
    {
-      player.eventPlay( getId(), SEQ_1_ACTOR0, NONE, 0, 0 );
+      player.playScene( getId( ), SEQ_1_ACTOR0, NONE, 0, 0 );
    }
 
    void Scene00005( Entity::Player& player )
@@ -142,7 +142,7 @@ private:
          }
       };
 
-      player.eventPlay( getId(), SEQ_2_ACTOR4, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0, 0, callback );
+      player.playScene( getId( ), SEQ_2_ACTOR4, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0, 0, callback );
    }
 
    void Scene00050( Entity::Player& player )
@@ -157,27 +157,17 @@ private:
          player.forceZoneing( TERRITORYTYPE0 );
       };
 
-      player.eventPlay( getId(), SEQ_0_ACTOR0_LQ, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0, 0, callback );
+      player.playScene( getId( ), SEQ_0_ACTOR0_LQ, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0, 0, callback );
    }
 
    void Scene00051( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
-      {
-         Scene00001( player );
-      };
-
-      player.eventPlay( getId(), SEQ_1_ACTOR1_WAIT, NONE, 0, 0, callback );
+      player.playSceneChain( getId(), SEQ_1_ACTOR1_WAIT, NONE, Scene00001 );
    }
 
    void Scene00099( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
-      {
-         Scene00004( player );
-      };
-
-      player.eventPlay( getId(), SEQ_1_ACTOR3_NPCTRADENO, NONE, 0, 0, callback );
+      player.playSceneChain( getId(), SEQ_1_ACTOR3_NPCTRADENO, NONE, Scene00004 );
    }
 
    void Scene00100( Entity::Player& player )
@@ -190,7 +180,7 @@ private:
          checkQuestCompletion( player, 2 );
       };
 
-      player.eventPlay( getId(), SEQ_1_ACTOR3_NPCTRADEOK, 0x0EFB, 0, 0, callback );
+      player.playScene( getId( ), SEQ_1_ACTOR3_NPCTRADEOK, 0x0EFB, 0, 0, callback );
    }
 
 public:

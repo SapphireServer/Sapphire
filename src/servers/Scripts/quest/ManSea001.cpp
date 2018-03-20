@@ -36,7 +36,7 @@ private:
          }
       };
 
-      player.eventPlay( getId(), 0, HIDE_HOTBAR, 0, 0, callback );
+      player.playScene( getId( ), 0, HIDE_HOTBAR, 0, 0, callback );
    }
 
    void Scene00001( Entity::Player& player )
@@ -46,7 +46,7 @@ private:
          Scene00002( player );
       };
 
-      player.eventPlay( getId(), 1, DISABLE_SKIP | HIDE_HOTBAR | SET_BASE, 0, 0, callback );
+      player.playScene( getId( ), 1, DISABLE_SKIP | HIDE_HOTBAR | SET_BASE, 0, 0, callback );
    }
 
    void Scene00002( Entity::Player& player )
@@ -56,22 +56,22 @@ private:
          Scene00003( player );
       };
 
-      player.eventPlay( getId(), 2, NONE, 0, 0, callback );
+      player.playScene( getId( ), 2, NONE, 0, 0, callback );
    }
 
    void Scene00003( Entity::Player& player )
    {
       auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
       {
-         player.eventPlay( OPENING_EVENT_HANDLER, 0x1E, HIDE_HOTBAR | NO_DEFAULT_CAMERA, 1, 0 );
+         player.playScene( OPENING_EVENT_HANDLER, 0x1E, HIDE_HOTBAR | NO_DEFAULT_CAMERA, 1, 0 );
       };
 
-      player.eventPlay( getId(), 3, NONE, 0, 0, callback );
+      player.playScene( getId( ), 3, NONE, 0, 0, callback );
    }
 
    void Scene00004( Entity::Player& player )
    {
-      player.eventPlay( getId(), 4, NONE, 0, 0 );
+      player.playScene( getId( ), 4, NONE, 0, 0 );
    }
 
    void Scene00005( Entity::Player& player )
@@ -81,7 +81,7 @@ private:
          Scene00006( player );
       };
 
-      player.eventPlay( getId(), 5, HIDE_HOTBAR, 0, 0, callback );
+      player.playScene( getId( ), 5, HIDE_HOTBAR, 0, 0, callback );
    }
 
    void Scene00006( Entity::Player& player )
@@ -93,27 +93,27 @@ private:
          player.changePosition( 9, 40, 14, 2 );
       };
 
-      player.eventPlay( getId(), 6, INVIS_OTHER_PC, 0, 0, callback );
+      player.playScene( getId( ), 6, INVIS_OTHER_PC, 0, 0, callback );
    }
 
    void Scene00007( Entity::Player& player )
    {
-      player.eventPlay( getId(), 7, NONE, 0, 0 );
+      player.playScene( getId( ), 7, NONE, 0, 0 );
    }
 
    void Scene00008( Entity::Player& player )
    {
-      player.eventPlay( getId(), 8, NONE, 0, 0 );
+      player.playScene( getId( ), 8, NONE, 0, 0 );
    }
 
    void Scene00009( Entity::Player& player )
    {
-      player.eventPlay( getId(), 9, NONE, 0, 0 );
+      player.playScene( getId( ), 9, NONE, 0, 0 );
    }
 
    void Scene00010( Entity::Player& player )
    {
-      player.eventPlay( getId(), 10, NONE, 0, 0 );
+      player.playScene( getId( ), 10, NONE, 0, 0 );
    }
 
    void Scene00011( Entity::Player& player )
@@ -123,7 +123,7 @@ private:
          Scene00012( player );
       };
 
-      player.eventPlay( getId(), 11, 0x2c02, 0, 0, callback );
+      player.playScene( getId( ), 11, 0x2c02, 0, 0, callback );
    }
 
    void Scene00012( Entity::Player& player )
@@ -137,12 +137,12 @@ private:
          }
       };
 
-      player.eventPlay( getId(), 12, INVIS_OTHER_PC, 0, 0, callback );
+      player.playScene( getId( ), 12, INVIS_OTHER_PC, 0, 0, callback );
    }
 
    void Scene00013( Entity::Player& player )
    {
-      player.eventPlay( getId(), 13, NONE, 0, 0 );
+      player.playScene( getId( ), 13, NONE, 0, 0 );
    }
 
 public:

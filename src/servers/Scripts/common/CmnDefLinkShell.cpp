@@ -32,25 +32,25 @@ public:
          }
       };
 
-      player.eventPlay( getId(), 1, 0, 0, 0, callback );
+      player.playScene( getId( ), 1, 0, 0, 0, callback );
    }
 
    // create linkshell
    void Scene00002( Entity::Player& player )
    {
-      player.eventPlay( getId(), 2, 0, 0, 0 );
+      player.playScene( getId( ), 2, 0, 0, 0 );
    }
 
    // rename linkshell
    void Scene00003( Entity::Player& player )
    {
-      player.eventPlay( getId(), 3, 0, 0, 0 );
+      player.playScene( getId( ), 3, 0, 0, 0 );
    }
 
    // remove linkshell
    void Scene00004( Entity::Player& player )
    {
-      player.eventPlay( getId(), 4, 0, 0, 0 );
+      player.playScene( getId( ), 4, 0, 0, 0 );
    }
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override

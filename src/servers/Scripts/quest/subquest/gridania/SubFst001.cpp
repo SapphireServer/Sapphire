@@ -34,17 +34,17 @@ private:
          }
       };
 
-      player.eventPlay( getId(), 0, NONE, callback );
+      player.playScene( getId( ), 0, NONE, callback );
    }
 
    void Scene00001( Entity::Player& player )
    {
-      player.eventPlay( getId(), 1, NONE );
+      player.playScene( getId( ), 1, NONE );
    }
 
    void Scene00099( Entity::Player& player )
    {
-      player.eventPlay( getId(), 99, NONE );
+      player.playScene( getId( ), 99, NONE );
    }
 
    void Scene00100( Entity::Player& player )
@@ -58,7 +58,7 @@ private:
          }
       };
 
-      player.eventPlay( getId(), 100, NONE, callback );
+      player.playScene( getId( ), 100, NONE, callback );
    }
 
 
