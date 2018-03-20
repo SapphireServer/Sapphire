@@ -40,8 +40,8 @@ private:
       {
          if( result.param2 == 1 ) // finish quest
          {
-            if( player.giveQuestRewards( getId(), 0 ))
-               player.finishQuest( getId());
+            if( player.giveQuestRewards( getId(), 0 ) )
+               player.finishQuest( getId() );
          }
       };
 
@@ -50,15 +50,15 @@ private:
 
 public:
    SubFst002() : EventScript( 65561 )
-   { }
+   {}
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
-      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ));
+      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
-      if( actor == ACTOR0 && !player.hasQuest( getId()))
+      if( actor == ACTOR0 && !player.hasQuest( getId() ) )
          Scene00000( player );
-      else if( actor == ACTOR0 && player.getQuestSeq( getId()) == SEQ_FINISH )
+      else if( actor == ACTOR0 && player.getQuestSeq( getId() ) == SEQ_FINISH )
          Scene00001( player );
    }
 

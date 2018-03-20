@@ -72,9 +72,9 @@ private:
       else
          player.sendQuestMessage( getId(), 0, 0, 0, 0 );
 
-      auto var_attuned = player.getQuestUI8AL( static_cast< uint16_t >( getId()));
-      auto var_class = player.getQuestUI8BH( static_cast< uint16_t >( getId()));
-      auto var_trade = player.getQuestUI8BL( static_cast< uint16_t >( getId()));
+      auto var_attuned = player.getQuestUI8AL( static_cast< uint16_t >( getId() ) );
+      auto var_class = player.getQuestUI8BH( static_cast< uint16_t >( getId() ) );
+      auto var_trade = player.getQuestUI8BL( static_cast< uint16_t >( getId() ) );
 
       if( var_attuned == 1 && var_class == 1 && var_trade == 1 )
          player.updateQuest( getId(), SEQ_FINISH );
@@ -185,11 +185,11 @@ private:
 
 public:
    ManFst002() : EventScript( 65621 )
-   { }
+   {}
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
-      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ));
+      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
       if( actor == ACTOR0 )
          Scene00000( player );

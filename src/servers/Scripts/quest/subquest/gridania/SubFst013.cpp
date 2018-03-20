@@ -152,11 +152,11 @@ private:
 
 public:
    SubFst013() : EventScript( 65576 )
-   { }
+   {}
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
-      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ));
+      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
       if( !player.hasQuest( getId()))
       {
@@ -166,11 +166,11 @@ public:
 
       if( actor == ACTOR1 ) // talking to Aunillie while on quest
          Scene00003( player );
-      else if( actor == ACTOR0 && player.getQuestSeq( getId()) == SEQ_2 )
+      else if( actor == ACTOR0 && player.getQuestSeq( getId() ) == SEQ_2 )
          Scene00002( player );
-      else if( actor == ACTOR0 && player.getQuestSeq( getId()) == SEQ_4 )
+      else if( actor == ACTOR0 && player.getQuestSeq( getId() ) == SEQ_4 )
          Scene00004( player );
-      else if( actor == ACTOR0 && player.getQuestSeq( getId()) == SEQ_FINISH )
+      else if( actor == ACTOR0 && player.getQuestSeq( getId() ) == SEQ_FINISH )
          Scene00006( player );
    }
 
@@ -178,11 +178,11 @@ public:
    {
       auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ));
 
-      if( actor == ACTOR1 && emoteId == 5 && player.getQuestSeq( getId()) == SEQ_1 )
+      if( actor == ACTOR1 && emoteId == 5 && player.getQuestSeq( getId() ) == SEQ_1 )
          Scene00100( player );
-      else if( actor == ACTOR1 && emoteId == 18 && player.getQuestSeq( getId()) == SEQ_3 )
+      else if( actor == ACTOR1 && emoteId == 18 && player.getQuestSeq( getId() ) == SEQ_3 )
          Scene00098( player );
-      else if( actor == ACTOR1 && emoteId == 11 && player.getQuestSeq( getId()) == SEQ_5 )
+      else if( actor == ACTOR1 && emoteId == 11 && player.getQuestSeq( getId() ) == SEQ_5 )
          Scene00096( player );
    }
 };

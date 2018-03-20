@@ -86,7 +86,7 @@ private:
          if( result.param2 == 1 )
          {
             if( player.giveQuestRewards( getId(), 0 ))
-               player.finishQuest( getId());
+               player.finishQuest( getId() );
          }
       };
 
@@ -95,11 +95,11 @@ private:
 
 public:
    ManFst001() : EventScript( 65575 )
-   { }
+   {}
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
-      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ));
+      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
       if( actor == ACTOR0 )
          Scene00000( player );
