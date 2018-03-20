@@ -6,7 +6,7 @@
 namespace Core {
    namespace Event {
 
-      using SceneResult = struct
+      struct SceneResult
       {
          uint32_t eventId;
          uint16_t param1;
