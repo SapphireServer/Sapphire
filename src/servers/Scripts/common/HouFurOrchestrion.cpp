@@ -6,7 +6,7 @@ class HouFurOrchestrion : public EventScript
 {
 public:
    HouFurOrchestrion() : EventScript( 721226 )
-   { }
+   {}
 
    void Scene00000( Entity::Player& player )
    {
