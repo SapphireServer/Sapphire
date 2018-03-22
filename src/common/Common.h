@@ -587,6 +587,10 @@ namespace Common {
       ToggleOrchestrionUnlock = 0x396,
       Dismount = 0x3A0,
 
+      // Duty Recorder
+      BeginReplayAck = 0x3A1,
+      EndReplayAck = 0x3A2,
+
       // PvP Duel
       SetPvPState = 0x5E0, // param3 must be 6 to engage a duel (hardcoded in the client)
       EndDuelSession = 0x5E1, // because someone went oob?
