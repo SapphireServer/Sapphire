@@ -162,12 +162,12 @@ private:
 
    void Scene00051( Entity::Player& player )
    {
-      player.playSceneChain( getId(), SEQ_1_ACTOR1_WAIT, NONE, BIND_SCENE( &ManFst002::Scene00001 ));
+      player.playSceneChain( getId(), SEQ_1_ACTOR1_WAIT, NONE, bindScene( &ManFst002::Scene00001 ));
    }
 
    void Scene00099( Entity::Player& player )
    {
-      player.playSceneChain( getId(), SEQ_1_ACTOR3_NPCTRADENO, NONE, BIND_SCENE( &ManFst002::Scene00005 ));
+      player.playSceneChain( getId(), SEQ_1_ACTOR3_NPCTRADENO, NONE, bindScene( &ManFst002::Scene00005 ));
    }
 
    void Scene00100( Entity::Player& player )

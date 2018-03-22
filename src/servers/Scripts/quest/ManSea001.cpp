@@ -41,12 +41,12 @@ private:
 
    void Scene00001( Entity::Player& player )
    {
-      player.playSceneChain( getId(), 1, DISABLE_SKIP | HIDE_HOTBAR | SET_BASE, BIND_SCENE( &ManSea001::Scene00002 ) );
+      player.playSceneChain( getId(), 1, DISABLE_SKIP | HIDE_HOTBAR | SET_BASE, bindScene( &ManSea001::Scene00002 ) );
    }
 
    void Scene00002( Entity::Player& player )
    {
-      player.playSceneChain( getId(), 2, NONE, BIND_SCENE( &ManSea001::Scene00003 ) );
+      player.playSceneChain( getId(), 2, NONE, bindScene( &ManSea001::Scene00003 ) );
    }
 
    void Scene00003( Entity::Player& player )
@@ -66,7 +66,7 @@ private:
 
    void Scene00005( Entity::Player& player )
    {
-      player.playSceneChain( getId(), 5, HIDE_HOTBAR, BIND_SCENE( &ManSea001::Scene00006 ) );
+      player.playSceneChain( getId(), 5, HIDE_HOTBAR, bindScene( &ManSea001::Scene00006 ) );
    }
 
    void Scene00006( Entity::Player& player )
@@ -103,7 +103,7 @@ private:
 
    void Scene00011( Entity::Player& player )
    {
-      player.playSceneChain( getId(), 11, 0x2c02, 0, 0, BIND_SCENE( &ManSea001::Scene00012 ) );
+      player.playSceneChain( getId(), 11, 0x2c02, 0, 0, bindScene( &ManSea001::Scene00012 ) );
    }
 
    void Scene00012( Entity::Player& player )

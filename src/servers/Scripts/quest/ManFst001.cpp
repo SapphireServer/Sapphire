@@ -49,7 +49,7 @@ private:
 
    void Scene00001( Entity::Player& player )
    {
-      player.playSceneChain( getId(), 1, DISABLE_SKIP | HIDE_HOTBAR | SET_BASE, BIND_SCENE( &ManFst001::Scene00002 ) );
+      player.playSceneChain( getId(), 1, DISABLE_SKIP | HIDE_HOTBAR | SET_BASE, bindScene( &ManFst001::Scene00002 ) );
    }
 
    void Scene00002( Entity::Player& player )
@@ -66,7 +66,7 @@ private:
 
    void Scene00004( Entity::Player& player )
    {
-      player.playSceneChain( getId(), 4, FADE_OUT | HIDE_HOTBAR | CONDITION_CUTSCENE | HIDE_UI, BIND_SCENE( &ManFst001::Scene00005 ) );
+      player.playSceneChain( getId(), 4, FADE_OUT | HIDE_HOTBAR | CONDITION_CUTSCENE | HIDE_UI, bindScene( &ManFst001::Scene00005 ) );
    }
 
    void Scene00005( Entity::Player& player )
