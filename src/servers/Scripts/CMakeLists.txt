@@ -12,6 +12,7 @@ set(RUNTIME_OUTPUT_DIRECTORY "${SCRIPT_LIB_DIR}")
 
 
 file(GLOB children "${CMAKE_CURRENT_SOURCE_DIR}/*" )
+
 foreach(_scriptDir ${children})
     get_filename_component(_name "${_scriptDir}" NAME_WE)
     if(IS_DIRECTORY ${_scriptDir} AND NOT ${_name} MATCHES "CMakeFiles" AND NOT ${_name} MATCHES "\\.dir$")
@@ -57,8 +58,9 @@ foreach(_scriptDir ${children})
 
         configure_file("${CMAKE_CURRENT_SOURCE_DIR}/ScriptLoader.cpp.in" "${_scriptDir}/ScriptLoader.cpp")
 
-        cotire("script_${_name}")
-
+		if( Cotire_ENABLED )
+			cotire("script_${_name}")
+		endif()
         if(MSVC)
             add_custom_command(TARGET "script_${_name}" POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E remove "${SCRIPT_LIB_DIR}/script_${_name}.exp"
