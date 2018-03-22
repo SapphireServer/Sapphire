@@ -67,7 +67,7 @@ private:
 
    void Scene00004( Entity::Player& player )
    {
-      player.playSceneChain( getId(), 4, 0x2c02, BIND_SCENE( &ManWil001::Scene00005 ) );
+      player.playSceneChain( getId(), 4, 0x2c02, bindScene( &ManWil001::Scene00005 ) );
    }
 
    void Scene00005( Entity::Player& player )

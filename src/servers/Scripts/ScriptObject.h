@@ -6,7 +6,4 @@
 
 #include <Event/EventDefs.h>
 
-#define BIND_SCENE( x ) std::bind( x, this, std::placeholders::_1 )
-
-
 #endif //SAPPHIRE_SCRIPTOBJECT_H
