@@ -201,7 +201,7 @@ int parseBlockEntry( char* data, std::vector<PCB_BLOCK_ENTRY>& entries, int gOff
 std::string getMapExdEntries( uint32_t mapId )
 {
    static auto& cat = eData->get_category( "Map" );
-   static auto& exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::none ) );
+   static auto exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::none ) );
    //static std::unique_ptr< Converter > pConverter = std::make_unique< Converter >();
 
    static auto& rows = exd.get_rows();
@@ -275,7 +275,7 @@ std::string getMapExdEntries( uint32_t mapId )
 void dumpLevelExdEntries( uint32_t zoneId, const std::string& name = std::string() )
 {
    static auto& cat = eData->get_category( "Level" );
-   static auto& exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::none ) );
+   static auto exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::none ) );
 
    std::string fileName( name + "_" + std::to_string( zoneId ) + "_Level" + ".csv" );
    std::ofstream outfile( fileName, std::ios::trunc );
@@ -348,7 +348,7 @@ std::string zoneNameToPath( const std::string& name )
 #else
 
    static auto& cat = eData->get_category( "TerritoryType" );
-   static auto& exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::none ) );
+   static auto exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::none ) );
    static auto& rows = exd.get_rows();
    for( auto& row : rows )
    {
@@ -385,8 +385,8 @@ std::string zoneNameToPath( const std::string& name )
 
 void loadEobjNames()
 {
-   auto& cat = eData->get_category( "EObjName" );
-   auto& exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::en ) );
+   static auto& cat = eData->get_category( "EObjName" );
+   static auto exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::en ) );
    for( auto& row : exd.get_rows() )
    {
       auto id = row.first;
