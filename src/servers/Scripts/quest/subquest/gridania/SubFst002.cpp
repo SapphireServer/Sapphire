@@ -31,10 +31,10 @@ private:
          }
       };
 
-      player.eventPlay( getId (), 0, NONE, callback );
+      player.playScene( getId(), 0, NONE, callback );
    }
 
-   void Scene00001(Entity::Player& player)
+   void Scene00001( Entity::Player& player )
    {
       auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
       {
@@ -45,11 +45,12 @@ private:
          }
       };
 
-      player.eventPlay( getId(), 1, NONE, callback );
+      player.playScene( getId(), 1, NONE, callback );
    }
 
 public:
-   SubFst002() : EventScript( 65561 ) {}
+   SubFst002() : EventScript( 65561 )
+   {}
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
@@ -66,7 +67,7 @@ public:
       if( npcId != ENEMY0 )
          return;
 
-      auto currentKC = player.getQuestUI8AL( getId() ) + 1;
+      auto currentKC = player.getQuestUI8AL( getId()) + 1;
 
       if( currentKC >= 6 )
          player.updateQuest( getId(), SEQ_FINISH );

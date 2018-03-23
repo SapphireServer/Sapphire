@@ -4,6 +4,7 @@
 #include <string>
 #include <typeinfo>
 #include <typeindex>
+#include <sapphire_zone/Event/EventHandler.h>
 #include "Forwards.h"
 
 #ifdef _MSC_VER
@@ -75,6 +76,13 @@ public:
 
 class EventScript : public ScriptObject
 {
+protected:
+   template< typename Ret, class Obj >
+   inline Event::EventHandler::SceneChainCallback bindScene( Ret ( Obj::*f )( Entity::Player& ) )
+   {
+      return std::bind( f, static_cast< Obj* >( this ), std::placeholders::_1 );
+   }
+
 public:
    explicit EventScript( uint32_t questId ) :
       ScriptObject( questId, typeid( EventScript ).hash_code() )

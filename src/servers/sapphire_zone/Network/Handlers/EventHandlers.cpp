@@ -218,6 +218,9 @@ void Core::Network::GameConnection::eventHandlerReturn( const Packets::GamePacke
          result.param3 = param3;
          eventCallback( player, result );
       }
+      // we might have a scene chain callback instead so check for that too
+      else if( auto chainCallback = pEvent->getSceneChainCallback() )
+         chainCallback( player );
 
    }
 

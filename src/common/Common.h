@@ -582,7 +582,7 @@ namespace Common {
 
       GearSetEquipMsg = 0x321,
 
-      DisableCurrentFestival = 0x386,
+      SetFestival = 0x386, // param1: festival.exd index
 
       ToggleOrchestrionUnlock = 0x396,
       Dismount = 0x3A0,

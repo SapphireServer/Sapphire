@@ -356,5 +356,25 @@ Core::ZonePtr Core::TerritoryMgr::getLinkedInstance( uint32_t playerId ) const
    return nullptr;
 }
 
+const uint16_t Core::TerritoryMgr::getCurrentFestival() const
+{
+   return m_currentFestival;
+}
+
+void Core::TerritoryMgr::setCurrentFestival( uint16_t festivalId )
+{
+   m_currentFestival = festivalId;
+
+   for( const auto& zone : m_zoneSet )
+   {
+      zone->setCurrentFestival( m_currentFestival );
+   }
+}
+
+void Core::TerritoryMgr::disableCurrentFestival()
+{
+   setCurrentFestival( 0 );
+}
+
 
 
