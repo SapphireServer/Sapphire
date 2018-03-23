@@ -34,17 +34,17 @@ private:
          }
       };
 
-      player.eventPlay( getId(), 0, NONE, callback );
+      player.playScene( getId(), 0, NONE, callback );
    }
 
    void Scene00001( Entity::Player& player )
    {
-      player.eventPlay( getId(), 1, NONE );
+      player.playScene( getId(), 1, NONE );
    }
 
    void Scene00099( Entity::Player& player )
    {
-      player.eventPlay( getId(), 99, NONE );
+      player.playScene( getId(), 99, NONE );
    }
 
    void Scene00100( Entity::Player& player )
@@ -53,21 +53,22 @@ private:
       {
          if( result.param2 == 1 ) // accept quest
          {
-            if( player.giveQuestRewards( getId(), 0 ) )
-               player.finishQuest( getId() );
+            if( player.giveQuestRewards( getId(), 0 ))
+               player.finishQuest( getId());
          }
       };
 
-      player.eventPlay( getId(), 100, NONE, callback );
+      player.playScene( getId(), 100, NONE, callback );
    }
 
 
 public:
-   SubFst001() : EventScript( 65560 ) {}
+   SubFst001() : EventScript( 65560 )
+   {}
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
-      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
+      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ));
 
       if( actor == ACTOR0 )
       {
@@ -75,8 +76,7 @@ public:
             Scene00000( player );
          else
             Scene00001( player );
-      }
-      else if( actor == ACTOR1 )
+      } else if( actor == ACTOR1 )
       {
          if( !player.hasQuest( getId() ) )
             Scene00099( player );

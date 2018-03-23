@@ -6,5 +6,4 @@
 
 #include <Event/EventDefs.h>
 
-
 #endif //SAPPHIRE_SCRIPTOBJECT_H
