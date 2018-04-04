@@ -40,7 +40,6 @@ namespace Scripting {
       ScriptInfo* getScriptInfo( std::string name );
 
       ScriptObject** getScripts( ModuleHandle handle );
-      ScriptObject* getScriptObject( ModuleHandle handle );
 
       bool isModuleLoaded( std::string name );
 
