@@ -546,6 +546,9 @@ public:
    uint8_t getGmRank() const;
    void setGmRank( uint8_t rank );
 
+   bool getGmInvis() const;
+   void setGmInvis( bool invis );
+
    uint8_t getMode() const;
    void setMode( uint8_t mode );
 
@@ -671,6 +674,7 @@ private:
    uint8_t m_stateFlags[12];
    uint8_t m_gmRank;
    uint16_t zoneId;
+   bool m_gmInvis = false;
 
    uint8_t m_equipDisplayFlags;
 
