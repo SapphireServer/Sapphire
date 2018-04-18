@@ -132,6 +132,16 @@ void Core::Entity::Player::setGmRank( uint8_t rank )
    m_gmRank = rank;
 }
 
+bool Core::Entity::Player::getGmInvis() const
+{
+   return m_gmInvis;
+}
+
+void Core::Entity::Player::setGmInvis( bool invis )
+{
+   m_gmInvis = invis;
+}
+
 uint8_t Core::Entity::Player::getMode() const
 {
    return m_mode;
@@ -167,6 +177,16 @@ Core::Common::OnlineStatus Core::Entity::Player::getOnlineStatus()
    uint64_t ptMask = uint64_t( 1 ) << static_cast< uint32_t >( OnlineStatus::LookingforParty );
    uint64_t rpMask = uint64_t( 1 ) << static_cast< uint32_t >( OnlineStatus::Roleplaying );
 
+   uint64_t prodMask = uint64_t( 1 ) << static_cast< uint32_t >( OnlineStatus::Producer );
+   uint64_t gmMask = uint64_t( 1 ) << static_cast< uint32_t >( OnlineStatus::GameMaster );
+   uint64_t gm1Mask = uint64_t( 1 ) << static_cast< uint32_t >( OnlineStatus::GameMaster1 );
+   uint64_t gm2Mask = uint64_t( 1 ) << static_cast< uint32_t >( OnlineStatus::GameMaster2 );
+
+   uint64_t menMask = uint64_t( 1 ) << static_cast< uint32_t >( OnlineStatus::Mentor );
+   uint64_t retMask = uint64_t( 1 ) << static_cast< uint32_t >( OnlineStatus::Returner );
+   uint64_t trialMask = uint64_t( 1 ) << static_cast< uint32_t >( OnlineStatus::TrialAdventurer );
+
+
    OnlineStatus status = OnlineStatus::Online;
 
    //if( hasStateFlag( Common::PlayerStateFlag::NewAdventurer ) )
@@ -190,6 +210,27 @@ Core::Common::OnlineStatus Core::Entity::Player::getOnlineStatus()
 
    if( m_onlineStatus & rpMask )
       status = OnlineStatus::Roleplaying;
+
+   if( m_onlineStatus & prodMask )
+      status = OnlineStatus::Producer;
+
+   if( m_onlineStatus & gmMask )
+      status = OnlineStatus::GameMaster;
+
+   if( m_onlineStatus & gm1Mask )
+      status = OnlineStatus::GameMaster1;
+
+   if( m_onlineStatus & gm2Mask )
+      status = OnlineStatus::GameMaster2;
+
+   if( m_onlineStatus & menMask )
+      status = OnlineStatus::Mentor;
+
+   if( m_onlineStatus & retMask )
+      status = OnlineStatus::Returner;
+
+   if( m_onlineStatus & trialMask )
+      status = OnlineStatus::TrialAdventurer;
 
    if( hasStateFlag( PlayerStateFlag::WatchingCutscene ) )
       status = OnlineStatus::ViewingCutscene;
@@ -1606,11 +1647,17 @@ void Core::Entity::Player::finishZoning()
    switch( getZoningType() )
    {
       case ZoneingType::None:
-         sendToInRangeSet( ActorControlPacket143( getId(), ZoneIn, 0x01 ), true );
+         if (getGmInvis() == false)
+            sendToInRangeSet( ActorControlPacket143( getId(), ZoneIn, 0x01 ), true );
+         else
+            queuePacket( ActorControlPacket143( getId(), ZoneIn, 0x01 ) );
          break;
 
       case ZoneingType::Teleport:
-         sendToInRangeSet( ActorControlPacket143( getId(), ZoneIn, 0x01, 0, 0, 110 ), true );
+         if( getGmInvis() == false )
+            sendToInRangeSet( ActorControlPacket143( getId(), ZoneIn, 0x01, 0, 0, 110 ), true );
+         else
+            queuePacket( ActorControlPacket143( getId(), ZoneIn, 0x01, 0, 0, 110 ) );
          break;
 
       case ZoneingType::Return:
@@ -1621,13 +1668,18 @@ void Core::Entity::Player::finishZoning()
             resetHp();
             resetMp();
             setStatus( Entity::Chara::ActorStatus::Idle );
-
-            sendToInRangeSet( ActorControlPacket143( getId(), ZoneIn, 0x01, 0x01, 0, 111 ), true );
+            if( getGmInvis() == false )
+               sendToInRangeSet( ActorControlPacket143( getId(), ZoneIn, 0x01, 0x01, 0, 111 ), true );
+            else
+               queuePacket( ActorControlPacket143( getId(), ZoneIn, 0x01, 0x01, 0, 111 ) );
             sendToInRangeSet( ActorControlPacket142( getId(), SetStatus,
                                                      static_cast< uint8_t >( Entity::Chara::ActorStatus::Idle ) ), true );
          }
          else
-            sendToInRangeSet( ActorControlPacket143( getId(), ZoneIn, 0x01, 0x00, 0, 111 ), true );
+            if( getGmInvis() == false )
+               sendToInRangeSet( ActorControlPacket143( getId(), ZoneIn, 0x01, 0x00, 0, 111 ), true );
+            else
+               queuePacket( ActorControlPacket143( getId(), ZoneIn, 0x01, 0x00, 0, 111 ) );
       }
          break;
 
