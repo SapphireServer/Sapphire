@@ -150,12 +150,12 @@ namespace Core {
          m_gmRank = rank;
       }
 
-      bool getGminvis() const
+      bool getGmInvis() const
       {
          return m_gmInvis;
       }
 
-      bool setGminvis( bool invis )
+      bool setGmInvis( bool invis )
       {
          m_gmInvis = invis;
       }
