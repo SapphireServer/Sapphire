@@ -1600,18 +1600,18 @@ void Core::Entity::Player::sendTitleList()
    queuePacket( titleListPacket );
 }
 
-void Core::Entity::Player::sendZoneInPackets( uint32_t param1, uint32_t param2 = 0, uint32_t param3 = 0, uint32_t param4 = 0, bool pSetStatus = false )
+void Core::Entity::Player::sendZoneInPackets( uint32_t param1, uint32_t param2 = 0, uint32_t param3 = 0, uint32_t param4 = 0, bool shouldSetStatus = false )
 {
    auto zoneInPacket = ActorControlPacket143( getId(), ZoneIn, param1, param2, param3, param4 );
    auto SetStatusPacket = ActorControlPacket142( getId(), SetStatus, static_cast< uint8_t >( Entity::Chara::ActorStatus::Idle ) );
 
    if( getGmInvis() )
       sendToInRangeSet( zoneInPacket, true );
-      if( pSetStatus )
+      if( shouldSetStatus )
          sendToInRangeSet( SetStatusPacket );
    else
       queuePacket( zoneInPacket );
-      if (pSetStatus)
+      if ( shouldSetStatus )
          queuePacket( SetStatusPacket );
 
    setZoningType( Common::ZoneingType::None );
@@ -1638,10 +1638,7 @@ void Core::Entity::Player::finishZoning()
             resetHp();
             resetMp();
             setStatus( Entity::Chara::ActorStatus::Idle );
-
             sendZoneInPackets( 0x01, 0x01, 0, 111, true );
-            sendToInRangeSet( ActorControlPacket142( getId(), SetStatus,
-                                                     static_cast< uint8_t >( Entity::Chara::ActorStatus::Idle ) ), true );
          }
          else
             sendZoneInPackets( 0x01, 0x00, 0, 111 );
