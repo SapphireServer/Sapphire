@@ -1605,7 +1605,7 @@ void Core::Entity::Player::sendZoneInPackets( uint32_t param1, uint32_t param2 =
    auto zoneInPacket = ActorControlPacket143( getId(), ZoneIn, param1, param2, param3, param4 );
    auto SetStatusPacket = ActorControlPacket142( getId(), SetStatus, static_cast< uint8_t >( Entity::Chara::ActorStatus::Idle ) );
 
-   if( getGmInvis() )
+   if( !getGmInvis() )
       sendToInRangeSet( zoneInPacket, true );
       if( shouldSetStatus )
          sendToInRangeSet( SetStatusPacket );
