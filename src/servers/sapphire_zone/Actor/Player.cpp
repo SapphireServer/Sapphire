@@ -176,7 +176,7 @@ Core::Common::OnlineStatus Core::Entity::Player::getOnlineStatus()
    uint32_t statusDisplayOrder = 0xFF14;
    uint32_t applicableStatus = 0;
 
-   for( uint32_t i = 0; i < 64; i++ )
+   for( uint32_t i = 0; i < std::numeric_limits< uint64_t >::digits; i++ )
    {
       bool bit = ( m_onlineStatus >> i ) & 1;
 
