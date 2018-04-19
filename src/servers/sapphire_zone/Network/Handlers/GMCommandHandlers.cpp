@@ -226,29 +226,16 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    }
    case GmCommand::Invis:
    {
-      if( targetPlayer->getGmInvis() == false ) {
-         targetPlayer->setGmInvis( true );
-         auto inRange = targetPlayer->getInRangeActors();
-         for( auto actor : inRange )
-         {
-            targetPlayer->despawn( actor->getAsPlayer() );
-            targetPlayer->spawn( actor->getAsPlayer() );
-         }
-         player.sendNotice( "Invisibility flag for " + targetPlayer->getName() + " was toggled to on" );
-         break;
-      }
-      else
+      player.setGmInvis( !player.getGmInvis() );
+      player.sendNotice( "Invisibility flag for " + player.getName() +
+         " was toggled to " + std::to_string( !player.getGmInvis() ) );
+
+      for( auto actor : player.getInRangeActors() )
       {
-         targetPlayer->setGmInvis( false );
-         auto inRange = targetPlayer->getInRangeActors();
-         for( auto actor : inRange )
-         {
-            targetPlayer->despawn( actor->getAsPlayer() );
-            targetPlayer->spawn( actor->getAsPlayer() );
-         }
-         player.sendNotice( "Invisibility flag for " + targetPlayer->getName() + " was toggled to off" );
-         break;
+         player.despawn( actor->getAsPlayer() );
+         player.spawn( actor->getAsPlayer() );
       }
+      break;
    }
    case GmCommand::Kill:
    {
