@@ -321,6 +321,15 @@ void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost:
    {
       pTerriMgr->disableCurrentFestival();
    }
+   else if( subCommand == "logout" )
+   {
+      Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcLogout > logoutPacket( player.getId() );
+      logoutPacket.data().flags1 = 0x0;
+      logoutPacket.data().flags2 = 0xE179C650;
+      player.queuePacket( logoutPacket );
+
+      player.setMarkedForRemoval();
+   }
    else
    {
       player.sendUrgent( subCommand + " is not a valid SET command." );
