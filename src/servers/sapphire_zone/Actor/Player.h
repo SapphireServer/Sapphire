@@ -509,6 +509,8 @@ public:
 
    void emote( uint32_t emoteId, uint64_t targetId );
 
+   void sendZoneInPackets( uint32_t param1, uint32_t param2, uint32_t param3, uint32_t param4, bool pSetStatus );
+
    void finishZoning();
 
    void sendZonePackets();
@@ -545,6 +547,9 @@ public:
 
    uint8_t getGmRank() const;
    void setGmRank( uint8_t rank );
+
+   bool getGmInvis() const;
+   void setGmInvis( bool invis );
 
    uint8_t getMode() const;
    void setMode( uint8_t mode );
@@ -671,6 +676,7 @@ private:
    uint8_t m_stateFlags[12];
    uint8_t m_gmRank;
    uint16_t zoneId;
+   bool m_gmInvis = false;
 
    uint8_t m_equipDisplayFlags;
 

@@ -224,6 +224,19 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       player.sendNotice( "Speed for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
       break;
    }
+   case GmCommand::Invis:
+   {
+      player.setGmInvis( !player.getGmInvis() );
+      player.sendNotice( "Invisibility flag for " + player.getName() +
+         " was toggled to " + std::to_string( !player.getGmInvis() ) );
+
+      for( auto actor : player.getInRangeActors() )
+      {
+         player.despawn( actor->getAsPlayer() );
+         player.spawn( actor->getAsPlayer() );
+      }
+      break;
+   }
    case GmCommand::Kill:
    {
       targetActor->getAsChara()->takeDamage( 9999999 );
