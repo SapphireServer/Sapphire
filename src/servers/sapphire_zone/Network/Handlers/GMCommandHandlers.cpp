@@ -467,10 +467,11 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       auto pCurrentZone = player.getCurrentZone();
       player.sendNotice( "ZoneId: " + std::to_string( player.getZoneId() ) + "\nName: " +
                          pCurrentZone->getName() + "\nInternalName: " +
-                         pCurrentZone->getInternalName() + "\nPopCount: " +
+                         pCurrentZone->getInternalName() + "\nGuId: " +
+                         std::to_string( pCurrentZone->getGuId() ) + "\nPopCount: " +
                          std::to_string( pCurrentZone->getPopCount() ) +
-                         "\nCurrentWeather:" + std::to_string( static_cast< uint8_t >( pCurrentZone->getCurrentWeather() ) ) +
-                         "\nNextWeather:" + std::to_string( static_cast< uint8_t >( pCurrentZone->getNextWeather() ) ) );
+                         "\nCurrentWeather: " + std::to_string( static_cast< uint8_t >( pCurrentZone->getCurrentWeather() ) ) +
+                         "\nNextWeather: " + std::to_string( static_cast< uint8_t >( pCurrentZone->getNextWeather() ) ) );
       break;
    }
    case GmCommand::Jump:
