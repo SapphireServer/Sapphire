@@ -206,8 +206,8 @@ bool Core::TerritoryMgr::removeTerritoryInstance( uint32_t instanceId )
 
    m_instanceIdToZonePtrMap.erase( pZone->getGuId() );
 
-   if( m_instanceZoneSet.count( pZone ) )
-      m_instanceZoneSet.erase( pZone );
+   m_instanceZoneSet.erase( pZone );
+   m_zoneSet.erase( pZone );
 
    if( isInstanceContentTerritory( pZone->getTerritoryId() ) )
    {
