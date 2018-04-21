@@ -161,8 +161,9 @@ Core::ZonePtr Core::TerritoryMgr::createTerritoryInstance( uint32_t territoryTyp
    auto pZone = make_Zone( territoryTypeId, getNextInstanceId(), pTeri->name, pPlaceName->name );
    pZone->init();
 
-   m_territoryInstanceMap[pZone->getTerritoryId()][pZone->getGuId()] = pZone;
    m_instanceIdToZonePtrMap[pZone->getGuId()] = pZone;
+   m_territoryInstanceMap[pZone->getTerritoryId()][pZone->getGuId()] = pZone;
+   m_zoneSet.insert( { pZone } );
 
    return pZone;
 }
