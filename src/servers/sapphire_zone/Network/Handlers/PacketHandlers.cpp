@@ -515,7 +515,7 @@ void Core::Network::GameConnection::chatHandler( const Packets::GamePacket& inPa
    {
    case ChatType::Say:
    {
-      if (player.getGmRank() > 0)
+      if (player.getOnlineStatus() == OnlineStatus::GameMaster || player.getOnlineStatus() == OnlineStatus::GameMaster1 || player.getOnlineStatus() == OnlineStatus::GameMaster2 )
          chatPacket.data().chatType = ChatType::GMSay;
 
       player.getCurrentZone()->queueOutPacketForRange( player, 50, chatPacket );
@@ -523,7 +523,7 @@ void Core::Network::GameConnection::chatHandler( const Packets::GamePacket& inPa
    }
    case ChatType::Yell:
    {
-      if( player.getGmRank() > 0 )
+      if( player.getOnlineStatus() == OnlineStatus::GameMaster || player.getOnlineStatus() == OnlineStatus::GameMaster1 || player.getOnlineStatus() == OnlineStatus::GameMaster2 )
          chatPacket.data().chatType = ChatType::GMYell;
 
       player.getCurrentZone()->queueOutPacketForRange( player, 6000, chatPacket );
@@ -531,7 +531,7 @@ void Core::Network::GameConnection::chatHandler( const Packets::GamePacket& inPa
    }
    case ChatType::Shout:
    {
-      if( player.getGmRank() > 0 )
+      if( player.getOnlineStatus() == OnlineStatus::GameMaster || player.getOnlineStatus() == OnlineStatus::GameMaster1 || player.getOnlineStatus() == OnlineStatus::GameMaster2 )
          chatPacket.data().chatType = ChatType::GMShout;
 
       player.getCurrentZone()->queueOutPacketForRange( player, 6000, chatPacket );
