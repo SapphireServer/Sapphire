@@ -538,10 +538,8 @@ void Core::Network::GameConnection::gm2Handler( const Packets::GamePacket& inPac
       targetPlayer->resetHp();
       targetPlayer->resetMp();
       targetPlayer->setStatus( Entity::Chara::ActorStatus::Idle );
+      targetPlayer->sendZoneInPackets( 0x01, 0x01, 0, 113, true );
 
-      targetPlayer->sendToInRangeSet( ActorControlPacket143( player.getId(), ZoneIn, 0x01, 0x01, 0, 113 ), true );
-      targetPlayer->sendToInRangeSet( ActorControlPacket142( player.getId(), SetStatus,
-         static_cast< uint8_t >( Entity::Chara::ActorStatus::Idle ) ), true );
       player.sendNotice( "Raised  " + targetPlayer->getName() );
       break;
    }
