@@ -56,22 +56,35 @@ public:
    /*! start/register a normal event */
    void eventStart( uint64_t actorId, uint32_t eventId, Event::EventHandler::EventType eventParam, uint8_t eventParam1, uint32_t eventParam2 );
    /*! play a subevent */
-   void eventPlay( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t eventParam2, uint32_t eventParam3 );
+   void playScene( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t eventParam2, uint32_t eventParam3 );
 
    void directorPlayScene( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t eventParam3, uint32_t eventParam4, uint32_t eventParam5 = 0 );
 
    /*! play a subevent */
-   void eventPlay( uint32_t eventId, uint32_t scene, uint32_t flags,
+   void playScene( uint32_t eventId, uint32_t scene, uint32_t flags,
                    uint32_t eventParam2, uint32_t eventParam3, Event::EventHandler::SceneReturnCallback eventReturnCallback );
    /*! play a subevent */
-   void eventPlay( uint32_t eventId, uint32_t scene, uint32_t flags,
+   void playScene( uint32_t eventId, uint32_t scene, uint32_t flags,
                    uint32_t eventParam2, uint32_t eventParam3, uint32_t eventParam4,
                    Event::EventHandler::SceneReturnCallback eventReturnCallback );
    /*! play a subevent */
-   void eventPlay( uint32_t eventId, uint32_t scene, uint32_t flags,
+   void playScene( uint32_t eventId, uint32_t scene, uint32_t flags,
                    Event::EventHandler::SceneReturnCallback eventReturnCallback );
    /*! play a subevent */
-   void eventPlay( uint32_t eventId, uint32_t scene, uint32_t flags );
+   void playScene( uint32_t eventId, uint32_t scene, uint32_t flags );
+   /*! play a subevent */
+   void playSceneChain( uint32_t eventId, uint32_t scene, uint32_t flags,
+                        uint32_t eventParam2, uint32_t eventParam3, uint32_t eventParam4,
+                        Event::EventHandler::SceneChainCallback sceneChainCallback );
+   /*! play a subevent */
+   void playSceneChain( uint32_t eventId, uint32_t scene, uint32_t flags,
+                        uint32_t eventParam2, uint32_t eventParam3,
+                        Event::EventHandler::SceneChainCallback sceneChainCallback );
+   /*! play a subevent */
+   void playSceneChain( uint32_t eventId, uint32_t scene, uint32_t flags,
+                        Event::EventHandler::SceneChainCallback sceneChainCallback );
+   /*! setup the event and return a ptr to it */
+   Event::EventHandlerPtr bootstrapSceneEvent( uint32_t eventId, uint32_t flags );
    /*! finish / unregister an event */
    void eventFinish( uint32_t eventId, uint32_t freePlayer );
    /*! add an event to the event array */
@@ -496,6 +509,8 @@ public:
 
    void emote( uint32_t emoteId, uint64_t targetId );
 
+   void sendZoneInPackets( uint32_t param1, uint32_t param2, uint32_t param3, uint32_t param4, bool pSetStatus );
+
    void finishZoning();
 
    void sendZonePackets();
@@ -532,6 +547,9 @@ public:
 
    uint8_t getGmRank() const;
    void setGmRank( uint8_t rank );
+
+   bool getGmInvis() const;
+   void setGmInvis( bool invis );
 
    uint8_t getMode() const;
    void setMode( uint8_t mode );
@@ -658,6 +676,7 @@ private:
    uint8_t m_stateFlags[12];
    uint8_t m_gmRank;
    uint16_t zoneId;
+   bool m_gmInvis = false;
 
    uint8_t m_equipDisplayFlags;
 

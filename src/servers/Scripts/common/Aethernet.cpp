@@ -21,7 +21,7 @@ public:
    {
       if( player.isAetheryteRegistered( eventId & 0xFFFF ) )
       {
-         player.eventPlay( eventId, 2, 0, []( Entity::Player& player, const Event::SceneResult& result )
+         player.playScene( eventId, 2, 0, []( Entity::Player& player, const Event::SceneResult& result )
          {
             if( result.param1 == 256 )
             {
@@ -34,7 +34,7 @@ public:
          player.eventActionStart( eventId, ACTION_ATTUNE, []( Entity::Player& player, uint32_t eventId, uint64_t additional )
          {
             player.registerAetheryte( eventId & 0xFFFF );
-            player.eventPlay( eventId, 3, 0, 0, 0 );
+            player.playScene( eventId, 3, 0, 0, 0 );
          },
          [] ( Entity::Player& ply, uint32_t evntId, uint64_t additional )
          {

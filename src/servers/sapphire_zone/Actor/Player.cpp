@@ -132,6 +132,16 @@ void Core::Entity::Player::setGmRank( uint8_t rank )
    m_gmRank = rank;
 }
 
+bool Core::Entity::Player::getGmInvis() const
+{
+   return m_gmInvis;
+}
+
+void Core::Entity::Player::setGmInvis( bool invis )
+{
+   m_gmInvis = invis;
+}
+
 uint8_t Core::Entity::Player::getMode() const
 {
    return m_mode;
@@ -159,43 +169,33 @@ bool Core::Entity::Player::isMarkedForRemoval() const
 
 Core::Common::OnlineStatus Core::Entity::Player::getOnlineStatus()
 {
-   uint64_t newMask = uint64_t( 1 ) << static_cast< uint32_t >( OnlineStatus::NewAdventurer );
-   uint64_t afkMask = uint64_t( 1 ) << static_cast< uint32_t >( OnlineStatus::AwayfromKeyboard );
-   uint64_t busyMask = uint64_t( 1 ) << static_cast< uint32_t >( OnlineStatus::Busy );
-   uint64_t dcMask = uint64_t( 1 ) << static_cast< uint32_t >( OnlineStatus::Disconnected );
-   uint64_t meldMask = uint64_t( 1 ) << static_cast< uint32_t >( OnlineStatus::LookingtoMeldMateria );
-   uint64_t ptMask = uint64_t( 1 ) << static_cast< uint32_t >( OnlineStatus::LookingforParty );
-   uint64_t rpMask = uint64_t( 1 ) << static_cast< uint32_t >( OnlineStatus::Roleplaying );
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+   if( !pExdData )
+      return OnlineStatus::Online;
 
-   OnlineStatus status = OnlineStatus::Online;
+   uint32_t statusDisplayOrder = 0xFF14;
+   uint32_t applicableStatus = static_cast< uint32_t >( OnlineStatus::Online );
 
-   //if( hasStateFlag( Common::PlayerStateFlag::NewAdventurer ) )
-   if( m_onlineStatus & newMask )
-      status = OnlineStatus::NewAdventurer;
+   for( uint32_t i = 0; i < std::numeric_limits< decltype( m_onlineStatus ) >::digits; i++ )
+   {
+      bool bit = ( m_onlineStatus >> i ) & 1;
 
-   if( m_onlineStatus & afkMask )
-      status = OnlineStatus::AwayfromKeyboard;
+      if( !bit )
+         continue;
 
-   if( m_onlineStatus & busyMask )
-      status = OnlineStatus::Busy;
+      auto pOnlineStatus = pExdData->get< Data::OnlineStatus >( i );
+      if( !pOnlineStatus )
+         continue;
 
-   if( m_onlineStatus & dcMask )
-      status = OnlineStatus::Disconnected;
+      if( pOnlineStatus->priority < statusDisplayOrder )
+      {
+         // todo: also check that the status can actually be set here, otherwise we need to ignore it (and ban the player obv)
+         statusDisplayOrder = pOnlineStatus->priority;
+         applicableStatus = i;
+      }
+   }
 
-   if( m_onlineStatus & meldMask )
-      status = OnlineStatus::LookingtoMeldMateria;
-
-   if( m_onlineStatus & ptMask )
-      status = OnlineStatus::LookingforParty;
-
-   if( m_onlineStatus & rpMask )
-      status = OnlineStatus::Roleplaying;
-
-   if( hasStateFlag( PlayerStateFlag::WatchingCutscene ) )
-      status = OnlineStatus::ViewingCutscene;
-
-   // TODO: add all the logic for returning the proper online status, there probably is a better way for this alltogether
-   return status;
+   return static_cast< OnlineStatus >( applicableStatus );
 }
 
 void Core::Entity::Player::setOnlineStatusMask( uint64_t status )
@@ -1601,16 +1601,34 @@ void Core::Entity::Player::sendTitleList()
    queuePacket( titleListPacket );
 }
 
+void Core::Entity::Player::sendZoneInPackets( uint32_t param1, uint32_t param2 = 0, uint32_t param3 = 0, uint32_t param4 = 0, bool shouldSetStatus = false )
+{
+   auto zoneInPacket = ActorControlPacket143( getId(), ZoneIn, param1, param2, param3, param4 );
+   auto SetStatusPacket = ActorControlPacket142( getId(), SetStatus, static_cast< uint8_t >( Entity::Chara::ActorStatus::Idle ) );
+
+   if( !getGmInvis() )
+      sendToInRangeSet( zoneInPacket, true );
+      if( shouldSetStatus )
+         sendToInRangeSet( SetStatusPacket );
+   else
+      queuePacket( zoneInPacket );
+      if ( shouldSetStatus )
+         queuePacket( SetStatusPacket );
+
+   setZoningType( Common::ZoneingType::None );
+   unsetStateFlag( PlayerStateFlag::BetweenAreas );
+}
+
 void Core::Entity::Player::finishZoning()
 {
    switch( getZoningType() )
    {
       case ZoneingType::None:
-         sendToInRangeSet( ActorControlPacket143( getId(), ZoneIn, 0x01 ), true );
+         sendZoneInPackets( 0x01 );
          break;
 
       case ZoneingType::Teleport:
-         sendToInRangeSet( ActorControlPacket143( getId(), ZoneIn, 0x01, 0, 0, 110 ), true );
+         sendZoneInPackets( 0x01, 0, 0, 110 );
          break;
 
       case ZoneingType::Return:
@@ -1621,22 +1639,16 @@ void Core::Entity::Player::finishZoning()
             resetHp();
             resetMp();
             setStatus( Entity::Chara::ActorStatus::Idle );
-
-            sendToInRangeSet( ActorControlPacket143( getId(), ZoneIn, 0x01, 0x01, 0, 111 ), true );
-            sendToInRangeSet( ActorControlPacket142( getId(), SetStatus,
-                                                     static_cast< uint8_t >( Entity::Chara::ActorStatus::Idle ) ), true );
+            sendZoneInPackets( 0x01, 0x01, 0, 111, true );
          }
          else
-            sendToInRangeSet( ActorControlPacket143( getId(), ZoneIn, 0x01, 0x00, 0, 111 ), true );
+            sendZoneInPackets( 0x01, 0x00, 0, 111 );
       }
-         break;
+      break;
 
       case ZoneingType::FadeIn:
          break;
    }
-
-   setZoningType( Common::ZoneingType::None );
-   unsetStateFlag( PlayerStateFlag::BetweenAreas );
 }
 
 void Core::Entity::Player::emote( uint32_t emoteId, uint64_t targetId )

@@ -10,7 +10,7 @@ public:
 
    void Scene00000( Entity::Player& player )
    {
-      player.eventPlay( getId(), 0, 0x2000, 0, 1 );
+      player.playScene( getId(), 0, 0x2000, 0, 1 );
    }
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
