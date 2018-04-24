@@ -12,10 +12,10 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include <winbase.h>
-typedef HMODULE ModuleHandle;
+using ModuleHandle = HMODULE;
 #else
 #include <dlfcn.h>
-typedef void* ModuleHandle;
+using ModuleHandle = void*;
 #endif
 
 namespace Core {
