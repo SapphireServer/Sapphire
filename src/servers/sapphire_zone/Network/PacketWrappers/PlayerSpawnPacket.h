@@ -91,7 +91,7 @@ namespace Server {
          // 0x20 == spawn hidden to be displayed by the spawneffect control
          m_data.displayFlags = player.getStance();
 
-         if( player.getZoningType() != Common::ZoneingType::None )
+         if( player.getZoningType() != Common::ZoneingType::None || player.getGmInvis() == true )
          {
             m_data.displayFlags |= Entity::Chara::DisplayFlags::Invisible;
          }

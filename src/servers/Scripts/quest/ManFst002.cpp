@@ -88,7 +88,7 @@ private:
             Scene00050( player );
       };
 
-      player.eventPlay( getId(), SEQ_0_ACTOR0, HIDE_HOTBAR, 0, 0, callback );
+      player.playScene( getId(), SEQ_0_ACTOR0, HIDE_HOTBAR, 0, 0, callback );
    }
 
    void Scene00001( Entity::Player& player )
@@ -99,7 +99,7 @@ private:
          checkQuestCompletion( player, 0 );
       };
 
-      player.eventPlay( getId(), SEQ_1_ACTOR1, 0x0EFB, 0, 0, callback );
+      player.playScene( getId(), SEQ_1_ACTOR1, 0x0EFB, 0, 0, callback );
    }
 
    void Scene00002( Entity::Player& player )
@@ -110,7 +110,7 @@ private:
          checkQuestCompletion( player, 3 );
       };
 
-      player.eventPlay( getId(), SEQ_1_ACTOR2, NONE, 0, 0, callback );
+      player.playScene( getId(), SEQ_1_ACTOR2, NONE, 0, 0, callback );
    }
 
    void Scene00003( Entity::Player& player )
@@ -123,12 +123,12 @@ private:
             Scene00099( player );
       };
 
-      player.eventPlay( getId(), SEQ_1_ACTOR3, NONE, 0, 0, callback );
+      player.playScene( getId(), SEQ_1_ACTOR3, NONE, 0, 0, callback );
    }
 
    void Scene00004( Entity::Player& player )
    {
-      player.eventPlay( getId(), SEQ_1_ACTOR0, NONE, 0, 0 );
+      player.playScene( getId(), SEQ_1_ACTOR0, NONE, 0, 0 );
    }
 
    void Scene00005( Entity::Player& player )
@@ -137,12 +137,12 @@ private:
       {
          if( result.param2 == 1 ) // finish quest
          {
-            if( player.giveQuestRewards( getId(), 0 ) )
-               player.finishQuest( getId() );
+            if( player.giveQuestRewards( getId(), 0 ))
+               player.finishQuest( getId());
          }
       };
 
-      player.eventPlay( getId(), SEQ_2_ACTOR4, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0, 0, callback );
+      player.playScene( getId(), SEQ_2_ACTOR4, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0, 0, callback );
    }
 
    void Scene00050( Entity::Player& player )
@@ -157,27 +157,17 @@ private:
          player.forceZoneing( TERRITORYTYPE0 );
       };
 
-      player.eventPlay( getId(), SEQ_0_ACTOR0_LQ, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0, 0, callback );
+      player.playScene( getId(), SEQ_0_ACTOR0_LQ, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0, 0, callback );
    }
 
    void Scene00051( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
-      {
-         Scene00001( player );
-      };
-
-      player.eventPlay( getId(), SEQ_1_ACTOR1_WAIT, NONE, 0, 0, callback );
+      player.playSceneChain( getId(), SEQ_1_ACTOR1_WAIT, NONE, bindScene( &ManFst002::Scene00001 ));
    }
 
    void Scene00099( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
-      {
-         Scene00004( player );
-      };
-
-      player.eventPlay( getId(), SEQ_1_ACTOR3_NPCTRADENO, NONE, 0, 0, callback );
+      player.playSceneChain( getId(), SEQ_1_ACTOR3_NPCTRADENO, NONE, bindScene( &ManFst002::Scene00005 ));
    }
 
    void Scene00100( Entity::Player& player )
@@ -190,11 +180,12 @@ private:
          checkQuestCompletion( player, 2 );
       };
 
-      player.eventPlay( getId(), SEQ_1_ACTOR3_NPCTRADEOK, 0x0EFB, 0, 0, callback );
+      player.playScene( getId(), SEQ_1_ACTOR3_NPCTRADEOK, 0x0EFB, 0, 0, callback );
    }
 
 public:
-   ManFst002() : EventScript( 65621 ) {}
+   ManFst002() : EventScript( 65621 )
+   {}
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
@@ -216,8 +207,7 @@ public:
 
          player.eventActionStart( 0x050002, 0x13, event, nullptr, 0x050002 );
 
-      }
-      else if( actor == ACTOR2 )
+      } else if( actor == ACTOR2 )
          Scene00002( player );
       else if( actor == ACTOR3 )
          Scene00003( player );

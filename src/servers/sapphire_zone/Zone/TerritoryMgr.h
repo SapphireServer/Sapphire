@@ -118,6 +118,10 @@ namespace Core
       /*! returns an instancePtr if the player is still bound to an isntance */
       ZonePtr getLinkedInstance( uint32_t playerId ) const;
 
+      void setCurrentFestival( uint16_t festivalId );
+      void disableCurrentFestival();
+      const uint16_t getCurrentFestival() const;
+
    private:
       using TerritoryTypeDetailCache = std::unordered_map< uint16_t, Data::TerritoryTypePtr >;
       using InstanceIdToZonePtrMap = std::unordered_map< uint32_t, ZonePtr >;
@@ -153,6 +157,9 @@ namespace Core
 
       /*! set of ZonePtrs for quick iteration*/
       std::set< ZonePtr > m_instanceZoneSet;
+
+      /*! id of current festival to set for public zones from festival.exd */
+      uint16_t m_currentFestival;
 
    public:
       /*! returns a list of instanceContent InstanceIds currently active */

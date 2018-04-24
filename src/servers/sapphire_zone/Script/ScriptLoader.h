@@ -12,10 +12,10 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include <winbase.h>
-typedef HMODULE ModuleHandle;
+using ModuleHandle = HMODULE;
 #else
 #include <dlfcn.h>
-typedef void* ModuleHandle;
+using ModuleHandle = void*;
 #endif
 
 namespace Core {
@@ -40,7 +40,6 @@ namespace Scripting {
       ScriptInfo* getScriptInfo( std::string name );
 
       ScriptObject** getScripts( ModuleHandle handle );
-      ScriptObject* getScriptObject( ModuleHandle handle );
 
       bool isModuleLoaded( std::string name );
 
