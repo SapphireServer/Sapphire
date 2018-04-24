@@ -192,9 +192,10 @@ Core::Common::OnlineStatus Core::Entity::Player::getOnlineStatus()
          // todo: also check that the status can actually be set here, otherwise we need to ignore it (and ban the player obv)
          statusDisplayOrder = pOnlineStatus->priority;
          applicableStatus = i;
-         return static_cast< OnlineStatus >( applicableStatus );
       }
    }
+
+   return static_cast< OnlineStatus >( applicableStatus );
 }
 
 void Core::Entity::Player::setOnlineStatusMask( uint64_t status )
