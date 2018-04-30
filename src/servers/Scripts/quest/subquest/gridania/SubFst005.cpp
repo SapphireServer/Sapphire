@@ -16,8 +16,6 @@ class SubFst005 : public EventScript
       // Quest vars / flags used
       // GetQuestUI8AL
 
-      // Steps in this quest ( 0 is before accepting, 
-      // 1 is first, 255 means ready for turning it in
       enum Sequence : uint8_t
       {
          Seq0 = 0,
@@ -70,10 +68,10 @@ class SubFst005 : public EventScript
       player.playScene( m_id, 1, 0,
          [&]( Entity::Player& player, const Event::SceneResult& result )
       {
-         if (result.param2 == 1)
+         if ( result.param2 == 1 )
          {
-            if (player.giveQuestRewards(m_id, 0))
-               player.finishQuest(m_id);
+            if ( player.giveQuestRewards( m_id, 0 ) )
+               player.finishQuest( m_id );
          }
       });
    }
