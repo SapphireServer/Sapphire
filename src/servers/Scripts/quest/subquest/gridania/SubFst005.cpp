@@ -33,9 +33,9 @@ class SubFst005 : public EventScript
       static constexpr auto Seq1Actor1 = 1;
 
    public:
-      SubFst005( ) : EventScript( 65564 )
+      SubFst005() : EventScript( 65564 )
       { }; 
-      ~SubFst005( )
+      ~SubFst005()
       { }; 
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
