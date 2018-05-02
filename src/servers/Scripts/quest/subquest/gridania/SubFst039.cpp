@@ -57,7 +57,7 @@ class SubFst039 : public EventScript
       }
    }
 
-   void onMobKill_160( Entity::Player& player, uint64_t npcId )
+   void onMobKill( Entity::Player& player, uint64_t npcId )
    {
       if ( npcId != Enemy0 )
          return;
