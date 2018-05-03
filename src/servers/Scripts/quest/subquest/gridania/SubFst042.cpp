@@ -76,7 +76,7 @@ class SubFst042 : public EventScript
 
    void Scene00000( Entity::Player& player )
    {
-      player.playScene( m_id, 0, 8192,
+      player.playScene( m_id, 0, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
             if ( result.param2 == 1 )
@@ -86,7 +86,7 @@ class SubFst042 : public EventScript
 
    void Scene00001( Entity::Player& player )
    {
-      player.playScene( m_id, 0, 8192,
+      player.playScene( m_id, 0, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
             if ( result.param2 == 1 )
