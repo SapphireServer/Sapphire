@@ -138,7 +138,7 @@ public:
          Scene00000( player );
       else if( actor == ACTOR1 )
          Scene00005( player );
-     else if( actor == ACTOR2 )
+      else if( actor == ACTOR2 )
          Scene00011( player );
    }
 };
