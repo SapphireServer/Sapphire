@@ -35,23 +35,26 @@ private:
 
    void Scene00000( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
+      player.playScene(getId(), 0, HIDE_HOTBAR,
+         [&]( Entity::Player& player, const Event::SceneResult& result)
       {
          if( result.param2 == 1 ) // accept quest
-            Scene00050( player );
-      };
-
-      player.playScene( getId(), 0, HIDE_HOTBAR, 0, 0, callback );
+            Scene00001( player );
+      } );
    }
 
    void Scene00001( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
+      player.playScene( getId(), 1, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI,
+         [&](Entity::Player& player, const Event::SceneResult& result)
       {
+         // on quest accept
+         player.updateQuest(getId(), 1);
+         player.setQuestUI8CH(getId(), 1); // receive key item
 
-      };
-
-      player.playScene( getId(), 1, NONE, callback );
+         //player.forceZoneing(128);        // teleport to real limsa
+         //player.playSceneChain(getId(), 2, NONE, bindScene( &ManSea002::Scene00050 ) );
+      } );
    }
 
    void Scene00002( Entity::Player& player )
@@ -128,12 +131,12 @@ private:
    {
       auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
       {
-         // on quest accept
+         /*// on quest accept
          player.updateQuest( getId(), 1 );
          player.setQuestUI8CH( getId(), 1 ); // receive key item
 
          // teleport to real limsa
-         player.forceZoneing( 128 );
+         player.forceZoneing( 128 );*/
       };
 
       player.playScene( getId(), 50, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0, 0, callback );
