@@ -43,8 +43,7 @@ public:
    {
       auto actor = Event::mapEventActorToRealActor( static_cast<uint32_t>( actorId ) );
 
-      // todo: this doesn't actually play a cutscene after accepting the quest
-      if ( actor == ACTOR0 )
+      if( actor == ACTOR0 )
          Scene00000( player );
    }
 
@@ -88,7 +87,7 @@ private:
 
       };
 
-      player.playScene( getId(), 3, NONE, callback );
+      player.playScene( getId(), 3, NONE, callback);
    }
 
    void Scene00004( Entity::Player& player )
@@ -98,7 +97,7 @@ private:
 
       };
 
-      player.playScene( getId(), 4, NONE, callback );
+      player.playScene( getId(), 4, NONE, callback);
    }
 
    void Scene00005( Entity::Player& player )
@@ -108,7 +107,7 @@ private:
 
       };
 
-      player.playScene( getId(), 5, NONE, callback );
+      player.playScene( getId(), 5, NONE, callback);
    }
 
    void Scene00006( Entity::Player& player )
@@ -118,7 +117,7 @@ private:
 
       };
 
-      player.playScene( getId(), 6, NONE, callback );
+      player.playScene( getId(), 6, NONE, callback);
    }
 
    void Scene00007( Entity::Player& player )
@@ -128,6 +127,6 @@ private:
 
       };
 
-      player.playScene( getId(), 7, NONE, callback );
+      player.playScene( getId(), 7, NONE, callback);
    }
 };
