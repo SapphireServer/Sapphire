@@ -33,10 +33,27 @@ private:
    static constexpr auto SCREENIMAGE0 = 14;
    static constexpr auto UNLOCK_DESION = 14;
 
+public:
+   ManSea002() : EventScript( 65644 )
+   {}
+   ~ManSea002()
+   {};
+
+   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
+   {
+      auto actor = Event::mapEventActorToRealActor( static_cast<uint32_t>( actorId ) );
+
+      // todo: this doesn't actually play a cutscene after accepting the quest
+      if ( actor == ACTOR0 )
+         Scene00000( player );
+   }
+
+private:
+
    void Scene00000( Entity::Player& player )
    {
-      player.playScene(getId(), 0, HIDE_HOTBAR,
-         [&]( Entity::Player& player, const Event::SceneResult& result)
+      player.playScene( getId(), 0, HIDE_HOTBAR,
+         [&]( Entity::Player& player, const Event::SceneResult& result )
       {
          if( result.param2 == 1 ) // accept quest
             Scene00001( player );
@@ -46,14 +63,11 @@ private:
    void Scene00001( Entity::Player& player )
    {
       player.playScene( getId(), 1, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI,
-         [&](Entity::Player& player, const Event::SceneResult& result)
+         [&]( Entity::Player& player, const Event::SceneResult& result )
       {
          // on quest accept
-         player.updateQuest(getId(), 1);
-         player.setQuestUI8CH(getId(), 1); // receive key item
-
-         //player.forceZoneing(128);        // teleport to real limsa
-         //player.playSceneChain(getId(), 2, NONE, bindScene( &ManSea002::Scene00050 ) );
+         player.updateQuest( getId(), 1 );
+         player.setQuestUI8CH( getId(), 1 ); // receive key item
       } );
    }
 
@@ -115,43 +129,5 @@ private:
       };
 
       player.playScene( getId(), 7, NONE, callback );
-   }
-
-   void Scene00008( Entity::Player& player )
-   {
-      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
-      {
-
-      };
-
-      player.playScene( getId(), 8, NONE, callback );
-   }
-
-   void Scene00050( Entity::Player& player )
-   {
-      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
-      {
-         /*// on quest accept
-         player.updateQuest( getId(), 1 );
-         player.setQuestUI8CH( getId(), 1 ); // receive key item
-
-         // teleport to real limsa
-         player.forceZoneing( 128 );*/
-      };
-
-      player.playScene( getId(), 50, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0, 0, callback );
-   }
-
-public:
-   ManSea002() : EventScript( 65644 )
-   {}
-
-   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
-   {
-      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
-
-      // todo: this doesn't actually play a cutscene after accepting the quest
-      if( actor == ACTOR0 )
-         Scene00000( player );
    }
 };

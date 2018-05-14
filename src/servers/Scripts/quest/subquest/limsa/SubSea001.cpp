@@ -66,7 +66,7 @@ class SubSea001 : public EventScript
       {
          Scene00002( player );
       }
-      else if (actor == SubSea001::Actor2)
+      else if ( actor == SubSea001::Actor2 )
       {
          Scene00016( player );
       }
@@ -77,7 +77,7 @@ class SubSea001 : public EventScript
    void Scene00000( Entity::Player& player )
    {
       player.playScene( getId(), 0, 8192,
-         [&](Entity::Player& player, const Event::SceneResult& result)
+         [&]( Entity::Player& player, const Event::SceneResult& result )
          {
             if (result.param2 == 1)
                player.updateQuest( getId(), 1);
@@ -98,7 +98,7 @@ class SubSea001 : public EventScript
       player.playScene( getId(), 2, 8192,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            if ( result.param2 == 1 && player.hasQuest( 65644 ) )
+            if( result.param2 == 1 && player.hasQuest( 65644 ) )
             {
                player.updateQuest( getId(), 2);
                player.prepareZoning( 129, true, 1, 0 ); // teleport to real limsa
@@ -111,139 +111,138 @@ class SubSea001 : public EventScript
                   player.updateQuest( getId(), 255 );
                }
             }
-            else
-               return;
-         });
+            else return;
+         } );
    }
 
    void Scene00003( Entity::Player& player )
    {
       player.playScene( getId(), 3, 8192,
-         [&](Entity::Player& player, const Event::SceneResult& result)
+         [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-         });
+         } );
    }
 
    void Scene00004( Entity::Player& player )
    {
       player.playScene( getId(), 4, 8192,
-         [&](Entity::Player& player, const Event::SceneResult& result)
+         [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-         });
+         } );
    }
 
    void Scene00005( Entity::Player& player )
    {
       player.playScene( getId(), 5, 8192,
-         [&](Entity::Player& player, const Event::SceneResult& result)
+         [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-         });
+         } );
    }
 
    void Scene00006( Entity::Player& player )
    {
       player.playScene( getId(), 6, 8192,
-         [&](Entity::Player& player, const Event::SceneResult& result)
+         [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-         });
+         } );
    }
 
    void Scene00007( Entity::Player& player )
    {
       player.playScene( getId(), 7, 8192,
-         [&](Entity::Player& player, const Event::SceneResult& result)
+         [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-         });
+         } );
    }
 
    void Scene00008( Entity::Player& player )
    {
       player.playScene( getId(), 8, 8192,
-         [&](Entity::Player& player, const Event::SceneResult& result)
+         [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-         });
+         } );
    }
 
    void Scene00009( Entity::Player& player )
    {
       player.playScene( getId(), 9, 8192,
-         [&](Entity::Player& player, const Event::SceneResult& result)
+         [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-         });
+         } );
    }
 
    void Scene00010( Entity::Player& player )
    {
       player.playScene( getId(), 10, 8192,
-         [&](Entity::Player& player, const Event::SceneResult& result)
+         [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-         });
+         } );
    }
 
    void Scene00011( Entity::Player& player )
    {
       player.playScene( getId(), 11, 8192,
-         [&](Entity::Player& player, const Event::SceneResult& result)
+         [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-         });
+         } );
    }
 
    void Scene00012( Entity::Player& player )
    {
       player.playScene( getId(), 12, 8192,
-         [&](Entity::Player& player, const Event::SceneResult& result)
+         [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-         });
+         } );
    }
 
    void Scene00013( Entity::Player& player )
    {
       player.playScene( getId(), 13, 8192,
-         [&](Entity::Player& player, const Event::SceneResult& result)
+         [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-         });
+         } );
    }
 
    void Scene00014( Entity::Player& player )
    {
       player.playScene( getId(), 14, 8192,
-         [&](Entity::Player& player, const Event::SceneResult& result)
+         [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-         });
+         } );
    }
 
    void Scene00015( Entity::Player& player )
    {
       player.playScene( getId(), 15, 8192,
-         [&](Entity::Player& player, const Event::SceneResult& result)
+         [&]( Entity::Player& player, const Event::SceneResult& result )
          {
 
-         });
+         } );
    }
 
    void Scene00016( Entity::Player& player )
    {
       player.playScene( getId(), 16, 8192,
-         [&](Entity::Player& player, const Event::SceneResult& result)
+         [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            if (result.param2 == 1)
+            if( result.param2 == 1 )
             {
-               Scene00017(player);
+               Scene00017( player );
             }
             else return;
-         });
+         } );
    }
 
    void Scene00017( Entity::Player& player )
    {
       player.playScene( getId(), 17, 8192,
-         [&](Entity::Player& player, const Event::SceneResult& result)
+         [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            player.setQuestUI8BH(getId(), 0);
+            player.setQuestUI8BH( getId(), 0 );
 
-            if (player.giveQuestRewards(getId(), 0))
-               player.finishQuest(getId());
-         });
+            if (player.giveQuestRewards( getId(), 0 ) )
+               player.finishQuest( getId() );
+         } );
    }
 
 };
