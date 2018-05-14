@@ -32,10 +32,10 @@ private:
 
    void Scene00000( Entity::Player& player )
    {
-      player.playScene( m_id, 0, 8192,
+      player.playScene( getId(), 0, 8192,
          [&]( Entity::Player& player, const Event::SceneResult& result )
       {
-         if ( result.param2 == 1 )
+         if( result.param2 == 1 )
          {
             player.setOpeningSequence( 2 );
             Scene00001( player );
@@ -45,38 +45,42 @@ private:
 
    void Scene00001( Entity::Player& player )
    {
-      player.playSceneChain( m_id, 1, DISABLE_SKIP | HIDE_HOTBAR | SET_BASE, bindScene( &ManSea001::Scene00002 ) );
+      player.playSceneChain( getId(), 1, DISABLE_SKIP | HIDE_HOTBAR | SET_BASE, bindScene( &ManSea001::Scene00002 ) );
    }
 
    void Scene00002( Entity::Player& player )
    {
-      player.updateQuest( m_id, 1 );
-      player.playSceneChain( m_id, 2, NONE, bindScene( &ManSea001::Scene00003 ) );
+      player.updateQuest( getId(), 1 );
+      player.playSceneChain( getId(), 2, NONE, bindScene( &ManSea001::Scene00003 ) );
    }
 
    void Scene00003( Entity::Player& player )
    {
-      player.playScene( OPENING_EVENT_HANDLER, 0x1E, HIDE_HOTBAR | NO_DEFAULT_CAMERA, 1, 0 );
+      player.playScene( getId(), 3, NONE,
+         [&]( Entity::Player& player, const Event::SceneResult& result )
+      {
+         player.playScene( OPENING_EVENT_HANDLER, 0x1E, HIDE_HOTBAR | NO_DEFAULT_CAMERA, 1, 0 );
+      } );
    }
 
    void Scene00004( Entity::Player& player )
    {
-      player.playScene( m_id, 4, NONE, 0, 0 );
+      player.playScene( getId(), 4, NONE, 0, 0 );
    }
 
    void Scene00005( Entity::Player& player )
    {
-      player.playSceneChain( m_id, 5, HIDE_HOTBAR, bindScene( &ManSea001::Scene00006 ) );
+      player.playSceneChain( getId(), 5, HIDE_HOTBAR, bindScene( &ManSea001::Scene00006 ) );
    }
 
    void Scene00006( Entity::Player& player )
    {
-      player.playScene( m_id, 6, INVIS_OTHER_PC,
+      player.playScene( getId(), 6, INVIS_OTHER_PC,
          [&]( Entity::Player& player, const Event::SceneResult& result )
       {
-         if ( result.param2 == 1 )
+         if( result.param2 == 1 )
          {
-            player.updateQuest( m_id, SEQ_FINISH );
+            player.updateQuest( getId(), SEQ_FINISH );
             player.prepareZoning( player.getZoneId(), true, 1, 0 );
             player.changePosition( 9, 40, 14, 2 );
          }
@@ -85,37 +89,37 @@ private:
 
    void Scene00007( Entity::Player& player )
    {
-      player.playScene( m_id, 7, NONE, 0, 0 );
+      player.playScene( getId(), 7, NONE, 0, 0 );
    }
 
    void Scene00008( Entity::Player& player )
    {
-      player.playScene( m_id, 8, NONE, 0, 0 );
+      player.playScene( getId(), 8, NONE, 0, 0 );
    }
 
    void Scene00009( Entity::Player& player )
    {
-      player.playScene( m_id, 9, NONE, 0, 0 );
+      player.playScene( getId(), 9, NONE, 0, 0 );
    }
 
    void Scene00010( Entity::Player& player )
    {
-      player.playScene( m_id, 10, NONE, 0, 0 );
+      player.playScene( getId(), 10, NONE, 0, 0 );
    }
 
    void Scene00011( Entity::Player& player )
    {
-      player.playSceneChain( m_id, 11, 0x2c02, 0, 0, bindScene( &ManSea001::Scene00012 ) );
+      player.playSceneChain( getId(), 11, 0x2c02, 0, 0, bindScene( &ManSea001::Scene00012 ) );
    }
 
    void Scene00012( Entity::Player& player )
    {
-      player.playScene( m_id, 12, INVIS_OTHER_PC,
+      player.playScene( getId(), 12, INVIS_OTHER_PC,
          [&]( Entity::Player& player, const Event::SceneResult& result )
       {
-         if ( result.param2 == 1 ) // finish quest
+         if( result.param2 == 1 ) // finish quest
          {
-            if ( player.giveQuestRewards( m_id, 0 ) )
+            if( player.giveQuestRewards( getId(), 0 ) )
                player.finishQuest( m_id );
          }
       } );
@@ -123,7 +127,7 @@ private:
 
    void Scene00013( Entity::Player& player )
    {
-      player.playScene( m_id, 13, NONE, 0, 0 );
+      player.playScene( getId(), 13, NONE, 0, 0 );
    }
 
 public:
