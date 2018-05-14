@@ -119,8 +119,8 @@ private:
       {
          if( result.param2 == 1 ) // finish quest
          {
-            if( player.giveQuestRewards( getId(), 0 ) )
-               player.finishQuest( m_id );
+            if (player.giveQuestRewards( getId(), 0))
+               player.finishQuest( getId() );
          }
       } );
    }
