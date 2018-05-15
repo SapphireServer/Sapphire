@@ -41,13 +41,68 @@ public:
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
-      auto actor = Event::mapEventActorToRealActor( static_cast<uint32_t>( actorId ) );
+      auto actor = Event::mapEventActorToRealActor( actorId );
 
       if( actor == ACTOR0 )
+      {
          Scene00000( player );
+      }
+      else if( actor == AETHERYTE0 )
+      {
+         player.eventActionStart( 0x050002, 0x13,
+            [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
+         {
+            player.sendQuestMessage( 0x050002, 0, 1, 0, 0 );
+            player.registerAetheryte( 2 );
+            player.learnAction( 1 );
+            Scene00002( player );
+         },
+            [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
+         {},
+            eventId );
+      }
+      else if( actor == ACTOR1 )
+      {
+         Scene00004( player );
+      }
+      else if( actor == ACTOR2 )
+      {
+         Scene00006( player );
+      }
+      else if( actor == ACTOR3 )
+      {
+         Scene00007( player );
+      }
    }
 
 private:
+
+   void checkQuestCompletion( Entity::Player& player, uint32_t varIdx )
+   {
+      if ( varIdx == 1 )
+      {
+         player.sendQuestMessage( getId(), 1, 0, 0, 0 );
+      }
+      else if ( varIdx == 2 )
+      {
+         player.sendQuestMessage( getId(), 2, 0, 0, 0 );
+      }
+      else
+      {
+         player.sendQuestMessage( getId(), 0, 0, 0, 0 );
+      }
+
+      auto questId = getId();
+
+      auto QUEST_VAR_ATTUNE = player.getQuestUI8AL( questId );
+      auto QUEST_VAR_CLASS = player.getQuestUI8BH( questId );
+      auto QUEST_VAR_TRADE = player.getQuestUI8BL( questId );
+
+      if ( QUEST_VAR_ATTUNE == 1 && QUEST_VAR_CLASS == 1 && QUEST_VAR_TRADE == 1 )
+      {
+         player.updateQuest( questId, SEQ_FINISH );
+      }
+   }
 
    void Scene00000( Entity::Player& player )
    {
@@ -72,61 +127,69 @@ private:
 
    void Scene00002( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
+      player.playScene( getId(), 2, HIDE_HOTBAR,
+         [&]( Entity::Player& player, const Event::SceneResult& result )
       {
-
-      };
-
-      player.playScene( getId(), 2, NONE, callback );
+         Scene00003( player );
+      } );
    }
 
    void Scene00003( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
+      player.playScene( getId(), 3, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ,
+         [&]( Entity::Player& player, const Event::SceneResult& result )
       {
-
-      };
-
-      player.playScene( getId(), 3, NONE, callback);
+         player.setQuestUI8BL( getId(), 1 );
+         checkQuestCompletion( player, 0 );
+      } );
    }
 
    void Scene00004( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
+      player.playScene( getId(), 4, HIDE_HOTBAR,
+         [&]( Entity::Player& player, const Event::SceneResult& result )
       {
-
-      };
-
-      player.playScene( getId(), 4, NONE, callback);
+         if( result.param2 == 1 )
+         {
+            Scene00005( player );
+         }
+         else return;
+      } );
    }
 
    void Scene00005( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
+      player.playScene( getId(), 5, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ, 0, 0,
+         [&]( Entity::Player& player, const Event::SceneResult& result )
       {
-
-      };
-
-      player.playScene( getId(), 5, NONE, callback);
+         player.setQuestUI8CH( getId(), 0 ); // remove key item, since we have just traded it
+         player.setQuestUI8BH( getId(), 1 );
+         checkQuestCompletion( player, 1 );
+      } );
    }
 
    void Scene00006( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
+      player.playScene( getId(), 6, HIDE_HOTBAR,
+         [&]( Entity::Player& player, const Event::SceneResult& result )
       {
-
-      };
-
-      player.playScene( getId(), 6, NONE, callback);
+         player.setQuestUI8AL( getId(), 1 );
+         checkQuestCompletion( player, 2 );
+      } );
    }
 
    void Scene00007( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
+      player.playScene( getId(), 7, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ, 0, 0,
+         [&]( Entity::Player& player, const Event::SceneResult& result )
       {
-
-      };
-
-      player.playScene( getId(), 7, NONE, callback);
+         if ( result.param2 == 1 ) // finish quest
+         {
+            if (player.giveQuestRewards( getId(), 0 ) )
+            {
+               player.finishQuest( getId() );
+            }
+         }
+      } );
    }
 };
