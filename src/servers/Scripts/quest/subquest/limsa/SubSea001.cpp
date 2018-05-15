@@ -50,9 +50,9 @@ class SubSea001 : public EventScript
 
    public:
       SubSea001() : EventScript( 65647 )
-      { }; 
+      {}; 
       ~SubSea001()
-      { }; 
+      {}; 
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
@@ -76,35 +76,34 @@ class SubSea001 : public EventScript
 
    void Scene00000( Entity::Player& player )
    {
-      player.playScene( getId(), 0, 8192,
+      player.playScene( getId(), 0, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            if (result.param2 == 1)
-               player.updateQuest( getId(), 1);
+            if( result.param2 == 1 )
+               player.updateQuest( getId(), 1 );
          } );
    }
 
    void Scene00001( Entity::Player& player )
    {
-      player.playScene( getId(), 1, 8192,
+      player.playScene( getId(), 1, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-
          } );
    }
 
    void Scene00002( Entity::Player& player )
    {
-      player.playScene( getId(), 2, 8192,
+      player.playScene( getId(), 2, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
             if( result.param2 == 1 && player.hasQuest( 65644 ) )
             {
                player.updateQuest( getId(), 2);
-               player.prepareZoning( 129, true, 1, 0 ); // teleport to real limsa
                player.changePosition( 10, 21, 13, -2 );
+               player.forceZoneing( Territorytype0 ); // teleport to real limsa
 
-               //HARDCODE for autocomplete quest
+               //Autocomplete quest
                if (player.getQuestSeq( getId() ) == 2 )
                {
                   player.setQuestUI8BH( getId(), 6 );
@@ -117,7 +116,7 @@ class SubSea001 : public EventScript
 
    void Scene00003( Entity::Player& player )
    {
-      player.playScene( getId(), 3, 8192,
+      player.playScene( getId(), 3, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
          } );
@@ -125,7 +124,7 @@ class SubSea001 : public EventScript
 
    void Scene00004( Entity::Player& player )
    {
-      player.playScene( getId(), 4, 8192,
+      player.playScene( getId(), 4, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
          } );
@@ -133,7 +132,7 @@ class SubSea001 : public EventScript
 
    void Scene00005( Entity::Player& player )
    {
-      player.playScene( getId(), 5, 8192,
+      player.playScene( getId(), 5, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
          } );
@@ -141,7 +140,7 @@ class SubSea001 : public EventScript
 
    void Scene00006( Entity::Player& player )
    {
-      player.playScene( getId(), 6, 8192,
+      player.playScene( getId(), 6, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
          } );
@@ -149,7 +148,7 @@ class SubSea001 : public EventScript
 
    void Scene00007( Entity::Player& player )
    {
-      player.playScene( getId(), 7, 8192,
+      player.playScene( getId(), 7, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
          } );
@@ -157,7 +156,7 @@ class SubSea001 : public EventScript
 
    void Scene00008( Entity::Player& player )
    {
-      player.playScene( getId(), 8, 8192,
+      player.playScene( getId(), 8, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
          } );
@@ -165,7 +164,7 @@ class SubSea001 : public EventScript
 
    void Scene00009( Entity::Player& player )
    {
-      player.playScene( getId(), 9, 8192,
+      player.playScene( getId(), 9, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
          } );
@@ -173,7 +172,7 @@ class SubSea001 : public EventScript
 
    void Scene00010( Entity::Player& player )
    {
-      player.playScene( getId(), 10, 8192,
+      player.playScene( getId(), 10, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
          } );
@@ -181,7 +180,7 @@ class SubSea001 : public EventScript
 
    void Scene00011( Entity::Player& player )
    {
-      player.playScene( getId(), 11, 8192,
+      player.playScene( getId(), 11, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
          } );
@@ -189,7 +188,7 @@ class SubSea001 : public EventScript
 
    void Scene00012( Entity::Player& player )
    {
-      player.playScene( getId(), 12, 8192,
+      player.playScene( getId(), 12, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
          } );
@@ -197,7 +196,7 @@ class SubSea001 : public EventScript
 
    void Scene00013( Entity::Player& player )
    {
-      player.playScene( getId(), 13, 8192,
+      player.playScene( getId(), 13, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
          } );
@@ -205,7 +204,7 @@ class SubSea001 : public EventScript
 
    void Scene00014( Entity::Player& player )
    {
-      player.playScene( getId(), 14, 8192,
+      player.playScene( getId(), 14, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
          } );
@@ -213,16 +212,15 @@ class SubSea001 : public EventScript
 
    void Scene00015( Entity::Player& player )
    {
-      player.playScene( getId(), 15, 8192,
+      player.playScene( getId(), 15, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-
          } );
    }
 
    void Scene00016( Entity::Player& player )
    {
-      player.playScene( getId(), 16, 8192,
+      player.playScene( getId(), 16, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
             if( result.param2 == 1 )
@@ -235,12 +233,12 @@ class SubSea001 : public EventScript
 
    void Scene00017( Entity::Player& player )
    {
-      player.playScene( getId(), 17, 8192,
+      player.playScene( getId(), 17, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
             player.setQuestUI8BH( getId(), 0 );
 
-            if (player.giveQuestRewards( getId(), 0 ) )
+            if( player.giveQuestRewards( getId(), 0 ) )
                player.finishQuest( getId() );
          } );
    }
