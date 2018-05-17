@@ -29,7 +29,7 @@ void Core::Db::CharaDbConnection::doPrepareStatements()
                                        "FavoritePoint, RestPoint, StartTown, ActiveTitle, TitleList, Achievement, "
                                        "Aetheryte, HowTo, Minions, Mounts, Orchestrion, EquippedMannequin, ConfigFlags, "
                                        "QuestCompleteFlags, OpeningSequence, QuestTracking, GrandCompany, "
-                                       "GrandCompanyRank, Discovery, GMRank, Unlocks, CFPenaltyUntil "
+                                       "GrandCompanyRank, Discovery, GMRank, EquipDisplayFlags, Unlocks, CFPenaltyUntil "
                                        "FROM charainfo WHERE CharacterId = ?;", CONNECTION_SYNC );
 
 
@@ -43,7 +43,7 @@ void Core::Db::CharaDbConnection::doPrepareStatements()
                      "Class = ?, Status = ?, TotalPlayTime = ?, HomePoint = ?, FavoritePoint = ?, RestPoint = ?, "
                      "ActiveTitle = ?, TitleList = ?, Achievement = ?, Aetheryte = ?, HowTo = ?, Minions = ?, Mounts = ?, Orchestrion = ?, "
                      "EquippedMannequin = ?, ConfigFlags = ?, QuestCompleteFlags = ?, OpeningSequence = ?, "
-                     "QuestTracking = ?, GrandCompany = ?, GrandCompanyRank = ?, Discovery = ?, GMRank = ?, Unlocks = ?, "
+                     "QuestTracking = ?, GrandCompany = ?, GrandCompanyRank = ?, Discovery = ?, GMRank = ?, EquipDisplayFlags = ?, Unlocks = ?, "
                      "CFPenaltyUntil = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
 
 
@@ -97,6 +97,7 @@ void Core::Db::CharaDbConnection::doPrepareStatements()
    prepareStatement( CHARA_UP_GRANDCOMPANYRANKS, "UPDATE charainfo SET GrandCompanyRank = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
    prepareStatement( CHARA_UP_DISCOVERY, "UPDATE charainfo SET Discovery = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
    prepareStatement( CHARA_UP_GMRANK, "UPDATE charainfo SET GMRank = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
+   prepareStatement( CHARA_UP_EQUIPDISPLAYFLAGS, "UPDATE charainfo SET EquipDisplayFlags = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
    prepareStatement( CHARA_UP_UNLOCKS, "UPDATE charainfo SET Unlocks = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
    prepareStatement( CHARA_UP_CFPENATLY, "UPDATE charainfo SET CFPenaltyUntil = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
 
