@@ -111,6 +111,11 @@ namespace Server {
             m_data.displayFlags |= Entity::Chara::DisplayFlags::Visor;
          }
 
+         if( !( player.getEquipDisplayFlags() & Core::Common::EquipDisplayFlags::HideLegacyMark ) )
+         {
+            m_data.look[0xC] = m_data.look[0xC] |  1 << 7;
+         }
+
          m_data.currentMount = player.getCurrentMount();
 
          m_data.targetId = player.getTargetId();

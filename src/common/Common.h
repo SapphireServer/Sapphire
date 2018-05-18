@@ -715,7 +715,7 @@ namespace Common {
       HideNothing = 0x0,
       HideHead = 0x1,
       HideWeapon = 0x2,
-      LegacyMark = 0x4,
+      HideLegacyMark = 0x4,
 
       Visor = 0x40,
    };

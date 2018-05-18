@@ -289,6 +289,8 @@ void Core::Network::GameConnection::reqEquipDisplayFlagsHandler( const Packets::
                                                                  Entity::Player& player )
 {
    player.setEquipDisplayFlags( inPacket.getValAt< uint8_t >( 0x20 ) );
+
+   player.sendDebug( "EquipDisplayFlag CHANGE: " + std::to_string( player.getEquipDisplayFlags() ) );
 }
 
 void Core::Network::GameConnection::zoneLineHandler( const Packets::GamePacket& inPacket,
