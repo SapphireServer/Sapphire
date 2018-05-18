@@ -1,13 +1,18 @@
 #include <Script/NativeScriptApi.h>
 #include <Actor/Player.h>
 #include "Event/EventHelper.h"
-#include "../ScriptObject.h"
+#include <ScriptObject.h>
+
+// Quest Script: ManSea001_00107
+// Quest Name: Coming to Limsa Lominsa
+// Quest ID: 65643
+// Start NPC: 1001028
+// End NPC: 1002697
 
 class ManSea001 : public EventScript
 {
 private:
-   // Steps in this quest ( 0 is before accepting,
-   // 1 is first, 255 means ready for turning it in
+
    static constexpr auto SEQ_0 = 0;
    static constexpr auto SEQ_1 = 1;
    static constexpr auto SEQ_FINISH = 255;
@@ -27,16 +32,15 @@ private:
 
    void Scene00000( Entity::Player& player )
    {
-      auto callback = [this]( Entity::Player& player, const Event::SceneResult& result )
+      player.playScene( getId(), 0, 8192,
+         [&]( Entity::Player& player, const Event::SceneResult& result )
       {
          if( result.param2 == 1 )
          {
             player.setOpeningSequence( 2 );
             Scene00001( player );
          }
-      };
-
-      player.playScene( getId(), 0, HIDE_HOTBAR, 0, 0, callback );
+      } );
    }
 
    void Scene00001( Entity::Player& player )
@@ -46,17 +50,17 @@ private:
 
    void Scene00002( Entity::Player& player )
    {
+      player.updateQuest( getId(), 1 );
       player.playSceneChain( getId(), 2, NONE, bindScene( &ManSea001::Scene00003 ) );
    }
 
    void Scene00003( Entity::Player& player )
    {
-      auto callback = [this]( Entity::Player& player, const Event::SceneResult& result )
+      player.playScene( getId(), 3, NONE,
+         [&]( Entity::Player& player, const Event::SceneResult& result )
       {
          player.playScene( OPENING_EVENT_HANDLER, 0x1E, HIDE_HOTBAR | NO_DEFAULT_CAMERA, 1, 0 );
-      };
-
-      player.playScene( getId(), 3, NONE, 0, 0, callback );
+      } );
    }
 
    void Scene00004( Entity::Player& player )
@@ -71,14 +75,16 @@ private:
 
    void Scene00006( Entity::Player& player )
    {
-      auto callback = [this]( Entity::Player& player, const Event::SceneResult& result )
+      player.playScene( getId(), 6, INVIS_OTHER_PC,
+         [&]( Entity::Player& player, const Event::SceneResult& result )
       {
-         player.updateQuest( getId(), SEQ_FINISH );
-         player.prepareZoning( player.getZoneId(), true, 1, 0 );
-         player.changePosition( 9, 40, 14, 2 );
-      };
-
-      player.playScene( getId(), 6, INVIS_OTHER_PC, 0, 0, callback );
+         if( result.param2 == 1 )
+         {
+            player.updateQuest( getId(), SEQ_FINISH );
+            player.prepareZoning( player.getZoneId(), true, 1, 0 );
+            player.changePosition( 9, 40, 14, 2 );
+         }
+      } );
    }
 
    void Scene00007( Entity::Player& player )
@@ -108,16 +114,15 @@ private:
 
    void Scene00012( Entity::Player& player )
    {
-      auto callback = [this]( Entity::Player& player, const Event::SceneResult& result )
+      player.playScene( getId(), 12, INVIS_OTHER_PC,
+         [&]( Entity::Player& player, const Event::SceneResult& result )
       {
          if( result.param2 == 1 ) // finish quest
          {
-            if( player.giveQuestRewards( getId(), 0 ) )
-               player.finishQuest( getId());
+            if(player.giveQuestRewards( getId(), 0 ) )
+               player.finishQuest( getId() );
          }
-      };
-
-      player.playScene( getId(), 12, INVIS_OTHER_PC, 0, 0, callback );
+      } );
    }
 
    void Scene00013( Entity::Player& player )
