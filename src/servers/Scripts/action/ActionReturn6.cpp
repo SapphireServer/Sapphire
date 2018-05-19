@@ -2,10 +2,10 @@
 #include "../ScriptObject.h"
 #include <Actor/Player.h>
 
-class ActionSprint3 : public ActionScript
+class ActionReturn6 : public ActionScript
 {
 public:
-   ActionSprint3() : ActionScript( 3 )
+   ActionReturn6() : ActionScript( 6 )
    {}
 
    void onCastFinish( Core::Entity::Player& player, Core::Entity::Chara& targetActor ) override
