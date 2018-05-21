@@ -17,8 +17,6 @@ class SubFst004 : public EventScript
       // GetQuestUI8AL
       // GetQuestUI8BH
 
-      // Steps in this quest ( 0 is before accepting, 
-      // 1 is first, 255 means ready for turning it in
       enum Sequence : uint8_t
       {
          Seq0 = 0,
@@ -52,15 +50,15 @@ class SubFst004 : public EventScript
    {
       auto actor = Event::mapEventActorToRealActor( actorId );
 
-      if ( actor == SubFst004::Actor0 )
+      if( actor == SubFst004::Actor0 )
       {
          Scene00000( player );
       }
-      else if ( actor == SubFst004::Actor1 )
+      else if( actor == SubFst004::Actor1 )
       {
          Scene00001( player );
       }
-      else if ( actor == SubFst004::Actor2 && player.getQuestUI8AL( m_id ) == 1 )
+      else if( actor == SubFst004::Actor2 )
       {
          Scene00002( player );
       }
@@ -68,48 +66,33 @@ class SubFst004 : public EventScript
 
    private:
 
-   void checkQuestCompletion( Entity::Player& player, uint32_t varIdx )
-   {
-      if ( varIdx == 0 )
-      {
-         player.setQuestUI8AL( m_id, 1 );
-         player.sendQuestMessage( m_id, 1, 0, 21002, 0 );
-      }
-      else if (varIdx == 1)
-      {
-         player.sendQuestMessage( m_id, 1, 0, 0, 0 );
-         player.setQuestUI8BH( m_id, 1 );
-         player.setQuestUI8AL( m_id, 0 );
-      }
-   }
-
    void Scene00000( Entity::Player& player )
    {
-      player.playScene( m_id, 0, 8192,
+      player.playScene( getId(), 0, 8192,
          [&]( Entity::Player& player, const Event::SceneResult& result )
       {
-         if ( result.param2 == 1 ) // accept quest
-            player.updateQuest( m_id, 1 );
+         if( result.param2 == 1 ) // accept quest
+            player.updateQuest( getId(), 1 );
       } );
    }
 
    void Scene00001( Entity::Player& player )
    {
-      player.playScene( m_id, 1, 8192,
+      player.playScene( getId(), 1, 8192,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            player.setQuestUI8BH( m_id, 1 );
-            checkQuestCompletion( player, 0 );
-            player.updateQuest( m_id, 255 );
+            player.sendQuestMessage( getId(), 0, 1, 21002, 0 );
+            player.setQuestUI8BH( getId(), 1 );
+            player.updateQuest( getId(), 255 );
          } );
    }
 
    void Scene00002( Entity::Player& player )
    {
-      player.playScene( m_id, 2, 8192,
+      player.playScene( getId(), 2, 8192,
          [&]( Entity::Player& player, const Event::SceneResult& result )
       {
-         if ( result.param2 == 1 )
+         if( result.param2 == 1 )
          {
             Scene00100( player );
          }
@@ -122,27 +105,24 @@ class SubFst004 : public EventScript
 
    void Scene00099( Entity::Player& player )
    {
-      player.playScene( m_id, 99, 8192,
+      player.playScene( getId(), 99, 8192,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            Scene00002( player );
+            player.playScene( getId(), 99, 0, 0, 0 );
          } );
    }
 
    void Scene00100( Entity::Player& player )
    {
-      player.playScene( m_id, 100, 8192,
+      player.playScene( getId(), 100, 8192,
          [&]( Entity::Player& player, const Event::SceneResult& result )
       {
-         checkQuestCompletion( player, 1 );
+         player.setQuestUI8AL( getId(), 0 );
 
-         if ( player.getQuestUI8BH( m_id ) == 1 )
-         {
-            if ( player.giveQuestRewards( m_id, 0 ) )
+            if( player.giveQuestRewards( getId(), 0 ) )
             {
-               player.finishQuest( m_id );
+               player.finishQuest( getId() );
             }
-         }
       } );
    }
 };
