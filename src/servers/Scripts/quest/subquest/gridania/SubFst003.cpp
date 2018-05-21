@@ -37,82 +37,77 @@ class SubFst003 : public EventScript
       static constexpr auto Seq1Actor1Npctradeok = 100;
 
    public:
-      SubFst003( ) : EventScript( 65562 )
-      { }; 
-      ~SubFst003( )
-      { }; 
+      SubFst003() : EventScript( 65562 )
+      {}; 
+      ~SubFst003()
+      {}; 
 
-      void onTalk(uint32_t eventId, Entity::Player& player, uint64_t actorId) override
+      void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
       {
-         auto actor = Event::mapEventActorToRealActor(actorId);
+         auto actor = Event::mapEventActorToRealActor( actorId );
 
-         if (actor == SubFst003::Actor0)
+         if( actor == SubFst003::Actor0 )
          {
-            Scene00000(player);
+            Scene00000( player );
          }
-         else if (actor == SubFst003::Actor1 && player.getQuestUI8AL(m_id) == 1)
+         else if(actor == SubFst003::Actor1 )
          {
-            Scene00001(player);
+            Scene00001( player );
          }
       }
 
    private:
 
-   void Scene00000(Entity::Player& player)
+   void Scene00000( Entity::Player& player )
    {
-      player.playScene(m_id, 0, 8192,
-         [&](Entity::Player& player, const Event::SceneResult& result)
+      player.playScene( getId(), 0, HIDE_HOTBAR,
+         [&]( Entity::Player& player, const Event::SceneResult& result )
       {
-         if (result.param2 == 1) // accept quest
+         if( result.param2 == 1 ) // accept quest
          {
-            player.updateQuest(m_id, 255);
-            player.setQuestUI8AL(m_id, 1);
+            player.updateQuest( getId(), 255 );
+            player.setQuestUI8BH( getId(), 1 );
          }
-      });
+      } );
    }
 
-   void Scene00001(Entity::Player& player)
+   void Scene00001( Entity::Player& player )
    {
-      player.playScene(m_id, 1, 8192,
-         [&](Entity::Player& player, const Event::SceneResult& result)
+      player.playScene( getId(), 1, HIDE_HOTBAR,
+         [&]( Entity::Player& player, const Event::SceneResult& result )
       {
-         if (result.param2 == 1)
+         if( result.param2 == 1 )
          {
-            Scene00100(player);
+            Scene00100( player );
          }
          else
          {
-            Scene00099(player);
+            Scene00099( player );
          }
-      });
+      } );
    }
 
    void Scene00099( Entity::Player& player )
    {
-      player.playScene(m_id, 99, 8192,
-         [&](Entity::Player& player, const Event::SceneResult& result)
+      player.playScene( getId(), 99, HIDE_HOTBAR,
+         [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            player.playScene(m_id, 99, 0, 0, 0);
-         });
+            player.playScene( getId(), 99, 0, 0, 0 );
+         } );
    }
 
    void Scene00100( Entity::Player& player )
    {
-      player.playScene(m_id, 100, 8192,
-         [&](Entity::Player& player, const Event::SceneResult& result)
+      player.playScene( getId(), 100, HIDE_HOTBAR,
+         [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            player.sendQuestMessage(m_id, 1, 0, 0, 0);
-            player.setQuestUI8BH(m_id, 1);
-            player.setQuestUI8AL(m_id, 0);
+            player.setQuestUI8BH( getId(), 0);
 
-            if (player.getQuestUI8BH(m_id) == 1)
+            if( player.giveQuestRewards( getId(), 0 ) )
             {
-               if (player.giveQuestRewards(m_id, 0))
-               {
-                  player.finishQuest(m_id);
-               }
+               player.finishQuest( getId() );
             }
-         });
+         } );
    }
 };
 

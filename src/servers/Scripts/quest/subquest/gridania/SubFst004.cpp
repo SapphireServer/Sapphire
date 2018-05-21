@@ -42,9 +42,9 @@ class SubFst004 : public EventScript
 
    public:
       SubFst004() : EventScript( 65563 )
-      { }; 
+      {}; 
       ~SubFst004()
-      { }; 
+      {}; 
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
