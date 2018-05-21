@@ -43,11 +43,11 @@ class SubFst019 : public EventScript
    {
       auto actor = Event::mapEventActorToRealActor( actorId );
 
-      if ( actor == SubFst019::Actor0 )
+      if( actor == SubFst019::Actor0 )
       {
          Scene00000( player );
       }
-      else if ( actor == SubFst019::Actor1 )
+      else if( actor == SubFst019::Actor1 )
       {
          Scene00001( player );
       }
@@ -57,25 +57,25 @@ class SubFst019 : public EventScript
 
    void Scene00000( Entity::Player& player )
    {
-      player.playScene( m_id, 0, 8192,
+      player.playScene( getId(), 0, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            if ( result.param2 == 1 )
+            if( result.param2 == 1 )
             {
-               player.updateQuest( m_id, 255 );
+               player.updateQuest( getId(), 255 );
             }
          } );
    }
 
    void Scene00001( Entity::Player& player )
    {
-      player.playScene( m_id, 1, 8192,
+      player.playScene( getId(), 1, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            if ( result.param2 == 1 )
+            if( result.param2 == 1 )
             {
-               if ( player.giveQuestRewards( m_id, 0 ) )
-                  player.finishQuest( m_id );
+               if( player.giveQuestRewards( getId(), 0 ) )
+                  player.finishQuest( getId() );
             }
          } );
    }
