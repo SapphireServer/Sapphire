@@ -31,8 +31,8 @@ Core::Logger g_log;
 Core::Data::ExdData g_exdData;
 bool skipUnmapped = true;
 
-std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
-//std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv" );
+//std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
+std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
 std::map< uint8_t, std::string > g_typeMap;
 
 

@@ -317,7 +317,7 @@ void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
    }
 
    setStateFlag( PlayerStateFlag::BetweenAreas );
-   auto targetPos = pTeriMgr->getTerritoryPosition( data->levelId );
+   auto targetPos = pTeriMgr->getTerritoryPosition( data->level.at( 0 ) );
 
    Common::FFXIVARR_POSITION3 pos;
    pos.x = 0;
