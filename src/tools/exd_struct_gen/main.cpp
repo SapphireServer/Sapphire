@@ -52,8 +52,8 @@ std::vector< std::string > cppKeyWords
    "class"
 };
 
-std::string datLocation( "E:\\Steam\\SteamApps\\common\\FINAL FANTASY XIV Online\\game\\sqpack" );
-//std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv" );
+//std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
+std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
 std::map< uint8_t, std::string > g_typeMap;
 
 
