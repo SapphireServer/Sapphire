@@ -80,7 +80,7 @@ namespace Packets {
       UpdateSearchInfo           = 0x00EA, // updated 4.2
       InitSearchInfo             = 0x00EB, // updated 4.2
 
-      ServerNotice               = 0x0106, // updated 4.2
+      ServerNotice               = 0x0106, // updated 4.3
       SetOnlineStatus            = 0x00F1, // updated 4.2
 
       CountdownInitiate          = 0x0111, // updated 4.3
@@ -138,9 +138,9 @@ namespace Packets {
       QuestMessage               = 0x01CE, // updated 4.3
       QuestTracker               = 0x01D3, // updated 4.3
 
-      QuestFinish                = 0x01C6, // updated 4.3 ?
-      MSQTrackerComplete         = 0x01C7, // updated 4.3 ?
-      MSQTrackerProgress         = 0x01C8, // updated 4.3 ?
+      QuestFinish                = 0x01C6, // updated 4.3
+      MSQTrackerComplete         = 0x01C7, // updated 4.3
+      MSQTrackerProgress         = 0x01C8, // updated 4.3 
 
       QuestActiveList            = 0x01C3, // updated 4.3
       QuestUpdate                = 0x01C4, // updated 4.3
