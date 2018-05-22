@@ -83,8 +83,8 @@ namespace Packets {
       ServerNotice               = 0x00F0, // updated 4.2
       SetOnlineStatus            = 0x00F1, // updated 4.2
 
-      CountdownInitiate          = 0x00FB, // updated 4.2
-      CountdownCancel            = 0x00FC, // updated 4.2
+      CountdownInitiate          = 0x0111, // updated 4.3
+      CountdownCancel            = 0x0112, // updated 4.3
 
       BlackList                  = 0x00FF, // updated 4.2
 
@@ -92,9 +92,9 @@ namespace Packets {
 
       LinkshellList              = 0x0106, // updated 4.2
       SetCharacterFCInfo         = 0x0114, // updated 4.2
-      StatusEffectList           = 0x0125, // updated 4.2
-      Effect                     = 0x0128, // updated 4.2
-      PersistantEffect           = 0x013B, // updated 4.2
+      StatusEffectList           = 0x0150, // updated 4.3
+      Effect                     = 0x0151, // updated 4.3
+      PersistantEffect           = 0x0158, // updated 4.3
 
       GCAffiliation              = 0xCCFC, // OUTDATED
 
@@ -135,42 +135,41 @@ namespace Packets {
 
       EventLinkshell             = 0x1169,
 
-      QuestMessage               = 0x01B8, // updated 4.2
-      QuestTracker               = 0x01BD, // updated 4.2
+      QuestMessage               = 0x01CE, // updated 4.3
+      QuestTracker               = 0x01D3, // updated 4.3
 
-      QuestFinish                = 0x01B0, // updated 4.2
-      MSQTrackerComplete         = 0x01B1, // updated 4.2
-      MSQTrackerProgress         = 0x01B2, // updated 4.2
+      QuestFinish                = 0x01C6, // updated 4.3 ?
+      MSQTrackerComplete         = 0x01C7, // updated 4.3 ?
+      MSQTrackerProgress         = 0x01C8, // updated 4.3 ?
 
-      QuestActiveList            = 0x01AD, // updated 4.2
+      QuestActiveList            = 0x01C3, // updated 4.3
+      QuestUpdate                = 0x01C4, // updated 4.3
+      QuestCompleteList          = 0x01C5, // updated 4.3
 
-      QuestUpdate                = 0x01AE, // updated 4.2
-      QuestCompleteList          = 0x01AF, // updated 4.2
+      Mount                      = 0x01E3, // updated 4.3
 
-      Mount                      = 0x01CD, // updated 4.2
+      DirectorVars               = 0x01E5, // updated 4.3
 
-      DirectorVars               = 0x01CF, // updated 4.2
+      WeatherChange              = 0x0200, // updated 4.3
+      PlayerTitleList            = 0x0201, // updated 4.3
+      Discovery                  = 0x0202, // updated 4.3
 
-      WeatherChange              = 0x01EA, // updated 4.2
-      PlayerTitleList            = 0x01EB, // updated 4.2
-      Discovery                  = 0x01EC, // updated 4.2
-
-      EorzeaTimeOffset           = 0x01EE, // updated 4.2
+      EorzeaTimeOffset           = 0x0204, // updated 4.3
 
       EquipDisplayFlags          = 0x01FA, // updated 4.2
 
       CFAvailableContents        = 0x01FD, // updated 4.2
 
-      PrepareZoning              = 0x027C, // updated 4.2
-      ActorGauge                 = 0x027D, // updated 4.2
+      PrepareZoning              = 0x0291, // updated 4.3
+      ActorGauge                 = 0x0292, // updated 4.3
 
       DuelChallenge              = 0x0277, // 4.2; this is the responsible for opening an ui
       PerformNote                = 0x0286, // updated 4.3
 
       // Unknown IPC types that still need to be sent
       // TODO: figure all these out properly
-      IPCTYPE_UNK_320            = 0x0235, // updated 4.2
-      IPCTYPE_UNK_322            = 0x0237, // updated 4.2
+      IPCTYPE_UNK_320            = 0x024C, // updated 4.3
+      IPCTYPE_UNK_322            = 0x024E, // updated 4.3
 
    };
 
@@ -202,14 +201,14 @@ namespace Packets {
 
       ChatHandler              = 0x00C7, // updated 4.2
 
-      SocialListHandler        = 0x00CF, // updated 4.2
-      ReqSearchInfoHandler     = 0x00D4, // updated 4.2
+      SocialListHandler        = 0x00DB, // updated 4.3
+      ReqSearchInfoHandler     = 0x00E0, // updated 4.3
       SetSearchInfoHandler     = 0x00D2, // updated 4.2
 
-      BlackListHandler         = 0x00E0, // updated 4.2
+      BlackListHandler         = 0x00EC, // updated 4.3
       PlayerSearchHandler      = 0x00E2, // updated 4.2
 
-      LinkshellListHandler     = 0x00E8, // updated 4.2
+      LinkshellListHandler     = 0x00F4, // updated 4.3
 
       FcInfoReqHandler         = 0x011A, // updated 4.2
 
@@ -218,30 +217,30 @@ namespace Packets {
       ReqCountdownInitiate     = 0x012C, // updated 4.2
       ReqCountdownCancel       = 0x012D, // updated 4.2
 
-      ZoneLineHandler          = 0x0130, // updated 4.2
-      ActionHandler            = 0x0131, // updated 4.2
-      DiscoveryHandler         = 0x0132, // updated 4.2
+      ZoneLineHandler          = 0x013C, // updated 4.3
+      ActionHandler            = 0x013D, // updated 4.3
+      DiscoveryHandler         = 0x013E, // updated 4.3
 
-      SkillHandler             = 0x0134, // updated 4.2
-      GMCommand1               = 0x0135, // updated 4.2
-      GMCommand2               = 0x0136, // updated 4.2
-      UpdatePositionHandler    = 0x0138, // updated 4.2
-      UpdatePositionInstance   = 0x0177, // updated 4.2
+      SkillHandler             = 0x0140, // updated 4.3
+      GMCommand1               = 0x0141, // updated 4.3
+      GMCommand2               = 0x0142, // updated 4.3
+
+      UpdatePositionHandler    = 0x0144, // updated 4.3
+      UpdatePositionInstance   = 0x0183, // updated 4.3
 
       InventoryModifyHandler   = 0x013F, // updated 4.2
 
-      TalkEventHandler         = 0x0148, // updated 4.2
-      EmoteEventHandler        = 0x0149, // updated 4.2
-      WithinRangeEventHandler  = 0x014A, // updated 4.2
-      OutOfRangeEventHandler   = 0x014B, // updated 4.2
-      EnterTeriEventHandler    = 0x014C, // updated 4.2
+      TalkEventHandler         = 0x0154, // updated 4.3 ?
+      EmoteEventHandler        = 0x0155, // updated 4.3 ?
+      WithinRangeEventHandler  = 0x0156, // updated 4.3 ?
+      OutOfRangeEventHandler   = 0x0157, // updated 4.3 ?
+      EnterTeriEventHandler    = 0x0158, // updated 4.3 ?
 
-      ReturnEventHandler       = 0x0151, // updated 4.2
-      TradeReturnEventHandler  = 0x0152, // updated 4.2
+      ReturnEventHandler       = 0x015D, // updated 4.3 ?
+      TradeReturnEventHandler  = 0x015E, // updated 4.3 ?
 
-
-      LinkshellEventHandler    = 0x0144, // updated 4.1 ??
-      LinkshellEventHandler1   = 0x0145, // updated 4.1 ??
+      LinkshellEventHandler    = 0x0150, // updated 4.1 ??
+      LinkshellEventHandler1   = 0x0151, // updated 4.1 ??
 
       PerformNoteHandler       = 0x0160, // updated 4.2
 
