@@ -98,31 +98,31 @@ namespace Packets {
 
       GCAffiliation              = 0xCCFC, // OUTDATED
 
-      PlayerSpawn                = 0x015C, // updated 4.2
-      NpcSpawn                   = 0x015D, // updated 4.2
-      ActorMove                  = 0x015E, // updated 4.2
-      ActorSetPos                = 0x0160, // updated 4.2
+      PlayerSpawn                = 0x0172, // updated 4.3
+      NpcSpawn                   = 0x0173, // updated 4.3
+      ActorMove                  = 0x0174, // updated 4.3
+      ActorSetPos                = 0x0176, // updated 4.3
 
-      ActorCast                  = 0x0162, // updated 4.2
+      ActorCast                  = 0x0178, // updated 4.3
 
-      HateList                   = 0x0165, // updated 4.2
+      HateList                   = 0x017B, // updated 4.3
 
-      ObjectSpawn                = 0x0167, // updated 4.2
-      ObjectDespawn              = 0x0168, // updated 4.2
-      UpdateClassInfo            = 0x0169, // updated 4.2
+      ObjectSpawn                = 0x017D, // updated 4.3
+      ObjectDespawn              = 0x017E, // updated 4.3
+      UpdateClassInfo            = 0x018A, // updated 4.3
 
-      InitUI                     = 0x016B, // updated 4.2
-      PlayerStats                = 0x016C, // updated 4.2
-      ActorOwner                 = 0x016D, // updated 4.2 ?
-      PlayerStateFlags           = 0x016E, // updated 4.2
-      PlayerClassInfo            = 0x016F, // updated 4.2
-      ModelEquip                 = 0x0170, // updated 4.2
+      InitUI                     = 0x0181, // updated 4.3
+      PlayerStats                = 0x0182, // updated 4.3
+      ActorOwner                 = 0x0183, // updated 4.3 ?
+      PlayerStateFlags           = 0x0184, // updated 4.3
+      PlayerClassInfo            = 0x0185, // updated 4.3
+      ModelEquip                 = 0x0186, // updated 4.3
 
-      ItemInfo                   = 0x017A, // updated 4.2
-      ContainerInfo              = 0x017B, // updated 4.2
-      InventoryTransactionFinish = 0x017C, // updated 4.2
-      InventoryTransaction       = 0x017D, // updated 4.2
-      CurrencyCrystalInfo        = 0x017E, // updated 4.2
+      ItemInfo                   = 0x0190, // updated 4.3
+      ContainerInfo              = 0x0191, // updated 4.3
+      InventoryTransactionFinish = 0x0192, // updated 4.3
+      InventoryTransaction       = 0x0193, // updated 4.3
+      CurrencyCrystalInfo        = 0x0197, // updated 4.3
 
       InventoryActionAck         = 0x0180, // updated 4.2 ?
       UpdateInventorySlot        = 0x0181, // updated 4.2
@@ -165,7 +165,7 @@ namespace Packets {
       ActorGauge                 = 0x027D, // updated 4.2
 
       DuelChallenge              = 0x0277, // 4.2; this is the responsible for opening an ui
-      PerformNote                = 0x0286, // updated 4.2
+      PerformNote                = 0x0286, // updated 4.3
 
       // Unknown IPC types that still need to be sent
       // TODO: figure all these out properly
@@ -243,7 +243,7 @@ namespace Packets {
       LinkshellEventHandler    = 0x0144, // updated 4.1 ??
       LinkshellEventHandler1   = 0x0145, // updated 4.1 ??
 
-      PerformNoteHandler       = 0x0160,
+      PerformNoteHandler       = 0x0160, // updated 4.2
 
       ReqEquipDisplayFlagsChange  = 0x016C, // updated 4.2
 
