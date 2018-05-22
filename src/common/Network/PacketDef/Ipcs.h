@@ -203,7 +203,7 @@ namespace Packets {
 
       SocialListHandler        = 0x00DB, // updated 4.3
       ReqSearchInfoHandler     = 0x00E0, // updated 4.3
-      SetSearchInfoHandler     = 0x00DE, // updated 4.2
+      SetSearchInfoHandler     = 0x00DE, // updated 4.3
 
       BlackListHandler         = 0x00EC, // updated 4.3
       PlayerSearchHandler      = 0x00E2, // updated 4.2
