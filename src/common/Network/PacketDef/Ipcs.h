@@ -199,11 +199,11 @@ namespace Packets {
 
       SocialReqSendHandler     = 0x00AE, // updated 4.1
 
-      ChatHandler              = 0x00C7, // updated 4.2
+      ChatHandler              = 0x00D3, // updated 4.3
 
       SocialListHandler        = 0x00DB, // updated 4.3
       ReqSearchInfoHandler     = 0x00E0, // updated 4.3
-      SetSearchInfoHandler     = 0x00D2, // updated 4.2
+      SetSearchInfoHandler     = 0x00DE, // updated 4.2
 
       BlackListHandler         = 0x00EC, // updated 4.3
       PlayerSearchHandler      = 0x00E2, // updated 4.2
@@ -230,21 +230,21 @@ namespace Packets {
 
       InventoryModifyHandler   = 0x013F, // updated 4.2
 
-      TalkEventHandler         = 0x0154, // updated 4.3 ?
-      EmoteEventHandler        = 0x0155, // updated 4.3 ?
-      WithinRangeEventHandler  = 0x0156, // updated 4.3 ?
-      OutOfRangeEventHandler   = 0x0157, // updated 4.3 ?
-      EnterTeriEventHandler    = 0x0158, // updated 4.3 ?
+      TalkEventHandler         = 0x0154, // updated 4.3
+      EmoteEventHandler        = 0x0155, // updated 4.3
+      WithinRangeEventHandler  = 0x0156, // updated 4.3
+      OutOfRangeEventHandler   = 0x0157, // updated 4.3
+      EnterTeriEventHandler    = 0x0158, // updated 4.3
 
-      ReturnEventHandler       = 0x015D, // updated 4.3 ?
-      TradeReturnEventHandler  = 0x015E, // updated 4.3 ?
+      ReturnEventHandler       = 0x015D, // updated 4.3
+      TradeReturnEventHandler  = 0x015E, // updated 4.3
 
       LinkshellEventHandler    = 0x0150, // updated 4.1 ??
       LinkshellEventHandler1   = 0x0151, // updated 4.1 ??
 
       PerformNoteHandler       = 0x0160, // updated 4.2
 
-      ReqEquipDisplayFlagsChange  = 0x016C, // updated 4.2
+      ReqEquipDisplayFlagsChange  = 0x0178, // updated 4.3
 
 
    };
