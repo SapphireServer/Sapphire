@@ -80,7 +80,7 @@ namespace Packets {
       UpdateSearchInfo           = 0x00EA, // updated 4.2
       InitSearchInfo             = 0x00EB, // updated 4.2
 
-      ServerNotice               = 0x00F0, // updated 4.2
+      ServerNotice               = 0x0106, // updated 4.2
       SetOnlineStatus            = 0x00F1, // updated 4.2
 
       CountdownInitiate          = 0x0111, // updated 4.3
@@ -127,11 +127,11 @@ namespace Packets {
       InventoryActionAck         = 0x0180, // updated 4.2 ?
       UpdateInventorySlot        = 0x0181, // updated 4.2
 
-      EventPlay                  = 0x018E, // updated 4.2
+      EventPlay                  = 0x01A6, // updated 4.3
       DirectorPlayScene          = 0x0192, // updated 4.2
 
-      EventStart                 = 0x0198, // updated 4.2
-      EventFinish                = 0x0199, // updated 4.2
+      EventStart                 = 0x01AF, // updated 4.3
+      EventFinish                = 0x01B0, // updated 4.3
 
       EventLinkshell             = 0x1169,
 
