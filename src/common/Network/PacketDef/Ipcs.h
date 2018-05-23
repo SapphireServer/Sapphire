@@ -77,11 +77,11 @@ namespace Packets {
       Chat                       = 0x00E1, // updated 4.2
       SocialList                 = 0x00E7, // updated 4.2
 
-      UpdateSearchInfo           = 0x00EA, // updated 4.2
-      InitSearchInfo             = 0x00EB, // updated 4.2
+      UpdateSearchInfo           = 0x0100, // updated 4.3
+      InitSearchInfo             = 0x0101, // updated 4.3
 
       ServerNotice               = 0x0106, // updated 4.3
-      SetOnlineStatus            = 0x00F1, // updated 4.2
+      SetOnlineStatus            = 0x0107, // updated 4.3
 
       CountdownInitiate          = 0x0111, // updated 4.3
       CountdownCancel            = 0x0112, // updated 4.3
@@ -156,7 +156,7 @@ namespace Packets {
 
       EorzeaTimeOffset           = 0x0204, // updated 4.3
 
-      EquipDisplayFlags          = 0x01FA, // updated 4.2
+      EquipDisplayFlags          = 0x0210, // updated 4.3
 
       CFAvailableContents        = 0x01FD, // updated 4.2
 
@@ -228,7 +228,7 @@ namespace Packets {
       UpdatePositionHandler    = 0x0144, // updated 4.3
       UpdatePositionInstance   = 0x0183, // updated 4.3
 
-      InventoryModifyHandler   = 0x013F, // updated 4.2
+      InventoryModifyHandler   = 0x014B, // updated 4.3
 
       TalkEventHandler         = 0x0154, // updated 4.3
       EmoteEventHandler        = 0x0155, // updated 4.3
