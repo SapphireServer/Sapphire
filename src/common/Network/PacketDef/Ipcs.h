@@ -62,7 +62,7 @@ namespace Packets {
       ///////////////////////////////////////////////////
 
       ChatBanned                 = 0x006B,
-      Logout                     = 0x0077,
+      Logout                     = 0x0077, // updated 4.3
       CFNotify                   = 0x0078,
       CFMemberStatus             = 0x0079,
       CFDutyInfo                 = 0x007A,
@@ -128,7 +128,7 @@ namespace Packets {
       UpdateInventorySlot        = 0x0181, // updated 4.2
 
       EventPlay                  = 0x01A6, // updated 4.3
-      DirectorPlayScene          = 0x0192, // updated 4.2
+      DirectorPlayScene          = 0x01AA, // updated 4.3
 
       EventStart                 = 0x01AF, // updated 4.3
       EventFinish                = 0x01B0, // updated 4.3
@@ -140,7 +140,7 @@ namespace Packets {
 
       QuestFinish                = 0x01C6, // updated 4.3
       MSQTrackerComplete         = 0x01C7, // updated 4.3
-      MSQTrackerProgress         = 0x01C8, // updated 4.3 
+      MSQTrackerProgress         = 0x01C8, // updated 4.3
 
       QuestActiveList            = 0x01C3, // updated 4.3
       QuestUpdate                = 0x01C4, // updated 4.3
@@ -181,10 +181,10 @@ namespace Packets {
    enum ClientZoneIpcType : uint16_t
    {
 
-      PingHandler              = 0x0065, // unchanged 4.2
-      InitHandler              = 0x0066, // unchanged 4.2
+      PingHandler              = 0x0065, // unchanged 4.3
+      InitHandler              = 0x0066, // unchanged 4.3
 
-      FinishLoadingHandler     = 0x0069, // unchanged 4.2
+      FinishLoadingHandler     = 0x0069, // unchanged 4.3
 
       CFCommenceHandler        = 0x006F,
 
@@ -192,8 +192,8 @@ namespace Packets {
 
       CFRegisterDuty           = 0x0071,
       CFRegisterRoulette       = 0x0072,
-      PlayTimeHandler          = 0x0073, // unchanged 4.2
-      LogoutHandler            = 0x0074, // unchanged 4.2
+      PlayTimeHandler          = 0x0073, // unchanged 4.3
+      LogoutHandler            = 0x0074, // unchanged 4.3
 
       CFDutyInfoHandler        = 0x0078, // updated 4.2
 
