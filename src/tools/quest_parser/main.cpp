@@ -18,7 +18,6 @@
 #include <Exd/ExdData.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Logging/Logger.h>
-#include "exd_struct_gen/ExdDataGenerated.h"
 
 
 Core::Logger g_log;
