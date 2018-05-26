@@ -126,7 +126,7 @@ namespace Packets {
       CurrencyCrystalInfo        = 0x0197, // updated 4.3
 
       InventoryActionAck         = 0x0180, // updated 4.2 ?
-      UpdateInventorySlot        = 0x0181, // updated 4.2
+      UpdateInventorySlot        = 0x0198, // updated 4.3
 
       EventPlay                  = 0x01A6, // updated 4.3
       DirectorPlayScene          = 0x01AA, // updated 4.3
