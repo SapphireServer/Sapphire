@@ -614,35 +614,13 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    uint32_t unknownC;
    uint32_t charId;
    uint32_t restedExp;
-   uint16_t currentLevel;
-   uint8_t maxLevel;
-   uint8_t expansion;
-   uint8_t unknown1A;
-   uint8_t race;
-   uint8_t tribe;
-   uint8_t gender;
-   uint8_t currentJob;
-   uint8_t currentClass;
-   uint8_t deity;
-   uint8_t namedayMonth;
-   uint8_t namedayDay;
-   uint8_t cityState;
-   uint8_t homepoint;
-   uint8_t unknown26; // 2 if "warrior of light"
-   uint8_t petHotBar;
-   uint8_t companionRank;
-   uint8_t companionStars;
-   uint8_t companionSp;
-   uint8_t companionUnk2B;
-   uint8_t companionColor;
-   uint8_t companionFavoFeed;
-   uint8_t companionUnk2E;
-   float companionTimePassed;
+
    uint32_t companionCurrentExp;
-   uint32_t unknown38;
+
    uint32_t unknown3C;
    uint32_t fishCaught;
    uint32_t useBaitCatalogId;
+
    uint32_t pvpWolfFoldMatches;
    uint16_t pvpWolfFoldWeeklyMatches;
    uint16_t pvpWolfFoldWeeklyVictories;
@@ -658,21 +636,61 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    uint8_t unknown6A;
    uint8_t unknown6B;
    uint8_t unknown6C[4];
-   uint8_t unknown70[61];
-   uint8_t preNamePadding;
-   char name[32];
-   uint8_t unknownOword[16];
-   uint8_t unknownDE[2];
+   uint8_t unknown70[34];
+
+   uint16_t unknown18;
+   uint8_t maxLevel;
+   uint8_t expansion;
+   uint8_t unknown;
+   uint8_t race;
+   uint8_t tribe;
+   uint8_t gender;
+   uint8_t currentJob;
+   uint8_t currentClass;
+   uint8_t deity;
+   uint8_t namedayMonth;
+   uint8_t namedayDay;
+   uint8_t cityState;
+   uint8_t homepoint;
+   uint8_t unknown26;
+   uint8_t petHotBar;
+   uint8_t companionRank;
+   uint8_t companionStars;
+   uint8_t companionSp;
+   uint8_t companionUnk2B;
+   uint8_t companionColor;
+   uint8_t companionFavoFeed;
+   uint8_t companionUnk2E;
+   uint8_t companionTimePassed[4];
+   uint16_t unknown38[11];
+
+   uint32_t exp[25];
+   uint8_t unknown564[16];
+   uint32_t pvpFrontlineOverall1st;
+   uint32_t pvpFrontlineOverall2nd;
+   uint32_t pvpFrontlineOverall3rd;
+   uint8_t relicBookCompletion1[4];
    uint16_t levels[25];
    uint16_t levelsPadding;
-   uint32_t exp[25];
+   uint8_t unknown__[16];
+   uint16_t fishingRecordsFish[26];
+   uint16_t fishingRecordsFishWeight[26];
+   uint8_t unknownMask554[44];
+
+   uint8_t companion_name[21];
+   uint8_t companionDefRank;
+   uint8_t companionAttRank;
+   uint8_t companionHealRank;
+   uint8_t mountGuideMask[16];
+   char name[32];
+   uint8_t unknownOword[16];
    uint8_t unlockBitmask[64];
-   uint8_t aetheryte[16];
+   uint8_t aetheryte[17];
    uint8_t discovery[421];
    uint8_t howto[33];
-   uint8_t minions[37];
+   uint8_t minions[38];
    uint8_t chocoboTaxiMask[8];
-   uint8_t contentClearMask[108];
+   uint8_t contentClearMask[111];
    uint8_t contentClearPadding;
    uint16_t unknown428[8];
    uint8_t companionBardingMask[8];
@@ -681,18 +699,13 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    uint8_t companionEquippedFeet;
    uint8_t companionUnk4[4];
    uint8_t companion_fields[11];
-   uint8_t companion_name[21];
-   uint8_t companionDefRank;
-   uint8_t companionAttRank;
-   uint8_t companionHealRank;
-   uint8_t mountGuideMask[15];
+
    uint8_t fishingGuideMask[89];
    uint8_t fishingSpotVisited[25];
-   uint16_t fishingRecordsFish[26];
-   uint16_t fishingRecordsFishWeight[26];
-   uint8_t unknownMask554[15];
+
+
    uint8_t unknownMask4Padding;
-   uint8_t unknown564[19];
+
    uint8_t rankAmalJaa;
    uint8_t rankSylph;
    uint8_t rankKobold;
@@ -720,18 +733,16 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    uint8_t unknownMask5C1[28];
    uint8_t unknown_03411;
    uint32_t unknownDword5E0;
-   uint8_t relicBookCompletion[12];
-   uint8_t sightseeingMask[26];
-   uint16_t unknown_XXX;
-   uint32_t pvpFrontlineOverall1st;
-   uint32_t pvpFrontlineOverall2nd;
-   uint32_t pvpFrontlineOverall3rd;
    uint16_t pvpFrontlineWeekly1st;
    uint16_t pvpFrontlineWeekly2nd;
    uint16_t pvpFrontlineWeekly3rd;
+   uint8_t relicBookCompletion2[8];
+   uint8_t sightseeingMask[26];
+   uint16_t unknown_XXX;
+
    uint8_t unknown61E;
-   uint8_t centurioSealHunts[32];
-   uint8_t alliedSealHunts[22];
+   uint8_t unknown61F[32];
+   uint8_t unknown63F[22];
    uint8_t tripleTriadCards[28];
    uint8_t unknown671[11];
    uint8_t unknownMask67C[22];
@@ -739,7 +750,7 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    uint8_t orchestrionMask[40];
    uint8_t hallOfNoviceCompleteMask[3];
    uint8_t unknownMask6C0[11];
-   uint8_t animaRelicMask[16]; // [2] = anima glass key item, [1] = ulan's note key item
+   uint8_t unknownMask6CB[16];
    uint8_t unknown6DB[14];
    uint8_t unlockedRaids[28];
    uint8_t unlockedDungeons[18];
@@ -747,8 +758,9 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    uint8_t unlockedTrials[7];
    uint8_t unlockedPvp[5];
    uint8_t unknownMask72D[28];
-   uint8_t unknownMask749[18];
-   uint8_t unknown749[23];
+   // uint8_t unknownMask749[18];
+   //uint8_t unknown749[13];
+
 };
 
 /**
