@@ -120,9 +120,9 @@ namespace Packets {
       ModelEquip                 = 0x0186, // updated 4.3
 
       ItemInfo                   = 0x0190, // updated 4.3
-      ContainerInfo              = 0x0191, // updated 4.3
-      InventoryTransactionFinish = 0x0192, // updated 4.3
-      InventoryTransaction       = 0x0193, // updated 4.3
+      ContainerInfo              = 0x0192, // updated 4.3
+      InventoryTransactionFinish = 0x0193, // updated 4.3
+      InventoryTransaction       = 0x0194, // updated 4.3
       CurrencyCrystalInfo        = 0x0197, // updated 4.3
 
       InventoryActionAck         = 0x0180, // updated 4.2 ?
