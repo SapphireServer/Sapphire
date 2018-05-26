@@ -36,9 +36,9 @@ class SubFst029 : public EventScript
 
    public:
       SubFst029() : EventScript( 65708 )
-      { }; 
+      {}; 
       ~SubFst029()
-      { }; 
+      {}; 
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
@@ -46,11 +46,11 @@ class SubFst029 : public EventScript
 
       //NOT SAFE - CRASH
 
-      /*if (actor == SubFst029::Actor0 && !player.hasQuest( m_id ) )
+      /*if( actor == SubFst029::Actor0 && !player.hasQuest( getId() ) )
       {
          Scene00000( player );
       }
-      if (actor == SubFst029::Actor0 && player.getQuestSeq ( m_id ) == 255 )
+      if( actor == SubFst029::Actor0 && player.getQuestSeq ( getId() ) == 255 )
       {
          Scene00001( player );
       }*/
@@ -60,22 +60,22 @@ class SubFst029 : public EventScript
 
    void Scene00000( Entity::Player& player )
    {
-      player.playScene( m_id, 0, 8192,
+      player.playScene( getId(), 0, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            if ( result.param2 == 1 )
+            if( result.param2 == 1 )
             {
-               player.updateQuest( m_id, 255 );
+               player.updateQuest( getId(), 255 );
             }
          } );
    }
 
    void Scene00001( Entity::Player& player )
    {
-      player.playScene( m_id, 1, 8192,
+      player.playScene( getId(), 1, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            if ( result.param2 == 1 )
+            if( result.param2 == 1 )
             {
                Scene00100( player );
             }
@@ -88,24 +88,23 @@ class SubFst029 : public EventScript
 
    void Scene00099( Entity::Player& player )
    {
-      player.playScene( m_id, 99, 8192,
+      player.playScene( getId(), 99, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            player.playScene( m_id, 99, 0, 0, 0 );
+            player.playScene( getId(), 99, 0, 0, 0 );
          } );
    }
 
    void Scene00100( Entity::Player& player )
    {
-      player.playScene( m_id, 100, 8192,
+      player.playScene( getId(), 100, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            if (player.giveQuestRewards(m_id, 0))
+            if( player.giveQuestRewards( getId(), 0 ) )
             {
-               player.finishQuest(m_id);
+               player.finishQuest( getId() );
             }
          } );
    }
-
 };
 
