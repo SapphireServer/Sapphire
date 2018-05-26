@@ -49,7 +49,7 @@ namespace Packets {
       Ping                       = 0x0065,
       Init                       = 0x0066,
 
-      ActorSpawn                 = 0x0190, // DEPRECATED
+      //ActorSpawn                 = 0x0190, // DEPRECATED
       ActorFreeSpawn             = 0x0191,
       InitZone                   = 0x019A,
 
@@ -74,8 +74,8 @@ namespace Packets {
       CFRegistered               = 0x00B8, // updated 4.1
       SocialRequestResponse      = 0x00BB, // updated 4.1
       CancelAllianceForming      = 0x00C6, // updated 4.2
-      Chat                       = 0x00E1, // updated 4.2
-      SocialList                 = 0x00E7, // updated 4.2
+      Chat                       = 0x00F7, // updated 4.3
+      SocialList                 = 0x00FD, // updated 4.3
 
       UpdateSearchInfo           = 0x0100, // updated 4.3
       InitSearchInfo             = 0x0101, // updated 4.3
@@ -92,7 +92,8 @@ namespace Packets {
 
       LinkshellList              = 0x0106, // updated 4.2
       SetCharacterFCInfo         = 0x0114, // updated 4.2
-      StatusEffectList           = 0x0150, // updated 4.3
+
+      StatusEffectList           = 0x014E, // updated 4.3
       Effect                     = 0x0151, // updated 4.3
       PersistantEffect           = 0x0158, // updated 4.3
 
@@ -242,7 +243,7 @@ namespace Packets {
       LinkshellEventHandler    = 0x0150, // updated 4.1 ??
       LinkshellEventHandler1   = 0x0151, // updated 4.1 ??
 
-      PerformNoteHandler       = 0x0160, // updated 4.2
+      PerformNoteHandler       = 0x029B, // updated 4.3
 
       ReqEquipDisplayFlagsChange  = 0x0178, // updated 4.3
 
