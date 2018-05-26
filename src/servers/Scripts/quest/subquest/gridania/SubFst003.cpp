@@ -50,7 +50,7 @@ class SubFst003 : public EventScript
          {
             Scene00000( player );
          }
-         else if(actor == SubFst003::Actor1 )
+         else if( actor == SubFst003::Actor1 )
          {
             Scene00001( player );
          }
@@ -101,10 +101,9 @@ class SubFst003 : public EventScript
       player.playScene( getId(), 100, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            player.setQuestUI8BH( getId(), 0);
-
             if( player.giveQuestRewards( getId(), 0 ) )
             {
+               player.setQuestUI8BH( getId(), 0 );
                player.finishQuest( getId() );
             }
          } );
