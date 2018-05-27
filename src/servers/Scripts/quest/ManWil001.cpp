@@ -28,110 +28,106 @@ private:
 
    void Scene00000( Entity::Player& player )
    {
-      auto callback = [ this ]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [this]( Entity::Player& player, const Event::SceneResult& result )
       {
-         if( param2 == 1 )
+         if( result.param2 == 1 )
          {
             player.setOpeningSequence( 2 );
             Scene00001( player );
          }
       };
 
-      player.eventPlay( getId(), 0, HIDE_HOTBAR, 0, 0, callback );
+      player.playScene( getId(), 0, HIDE_HOTBAR, 0, 0, callback );
    }
 
    void Scene00001( Entity::Player& player )
    {
-      auto callback = [ this ]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [this]( Entity::Player& player, const Event::SceneResult& result )
       {
          Scene00002( player );
       };
 
-      player.eventPlay( getId(), 1, DISABLE_SKIP | HIDE_HOTBAR | SET_BASE, 0, 0, callback );
+      player.playScene( getId(), 1, DISABLE_SKIP | HIDE_HOTBAR | SET_BASE, 0, 0, callback );
    }
 
    void Scene00002( Entity::Player& player )
    {
-      auto callback = [ this ]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [this]( Entity::Player& player, const Event::SceneResult& result )
       {
-         player.eventPlay( OPENING_EVENT_HANDLER, 0x1E, HIDE_HOTBAR | NO_DEFAULT_CAMERA, 0, 0 );
+         player.playScene( OPENING_EVENT_HANDLER, 0x1E, HIDE_HOTBAR | NO_DEFAULT_CAMERA, 0, 0 );
       };
 
-      player.eventPlay( getId(), 2, NONE, 0, 0, callback );
+      player.playScene( getId(), 2, NONE, 0, 0, callback );
    }
 
    void Scene00003( Entity::Player& player )
    {
-      player.eventPlay( getId(), 3, NONE, 0, 0 );
+      player.playScene( getId(), 3, NONE, 0, 0 );
    }
 
    void Scene00004( Entity::Player& player )
    {
-      auto callback = [ this ]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
-      {
-         Scene00005( player );
-      };
-
-      player.eventPlay( getId(), 4, 0x2c02, 0, 0, callback );
+      player.playSceneChain( getId(), 4, 0x2c02, bindScene( &ManWil001::Scene00005 ) );
    }
 
    void Scene00005( Entity::Player& player )
    {
-      auto callback = [ this ]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [this]( Entity::Player& player, const Event::SceneResult& result )
       {
-         if( param2 == 1 )
+         if( result.param2 == 1 )
          {
-            if( player.giveQuestRewards( getId(), 0 ) )
-               player.finishQuest( getId() );
+            if( player.giveQuestRewards( getId(), 0 ))
+               player.finishQuest( getId());
          }
       };
 
-      player.eventPlay( getId(), 5, INVIS_OTHER_PC, 0, 0, callback );
+      player.playScene( getId(), 5, INVIS_OTHER_PC, 0, 0, callback );
    }
 
    void Scene00006( Entity::Player& player )
    {
-      player.eventPlay( getId(), 6, 0, 0, 0 );
+      player.playScene( getId(), 6, 0, 0, 0 );
    }
 
    void Scene00007( Entity::Player& player )
    {
-      player.eventPlay( getId(), 7, 0, 0, 0 );
+      player.playScene( getId(), 7, 0, 0, 0 );
    }
 
    void Scene00008( Entity::Player& player )
    {
-      player.eventPlay( getId(), 8, 0, 0, 0 );
+      player.playScene( getId(), 8, 0, 0, 0 );
    }
 
    void Scene00009( Entity::Player& player )
    {
-      player.eventPlay( getId(), 9, 0, 0, 0 );
+      player.playScene( getId(), 9, 0, 0, 0 );
    }
 
    void Scene00010( Entity::Player& player )
    {
-      player.eventPlay( getId(), 10, 0, 0, 0 );
+      player.playScene( getId(), 10, 0, 0, 0 );
    }
 
    void Scene00011( Entity::Player& player )
    {
-      player.eventPlay( getId(), 11, 0, 0, 0 );
+      player.playScene( getId(), 11, 0, 0, 0 );
    }
 
    void Scene00012( Entity::Player& player )
    {
-      player.eventPlay( getId(), 12, 0, 0, 0 );
+      player.playScene( getId(), 12, 0, 0, 0 );
    }
 
    void Scene00013( Entity::Player& player )
    {
-      player.eventPlay( getId(), 13, 0, 0, 0 );
+      player.playScene( getId(), 13, 0, 0, 0 );
    }
 
 
 public:
-   ManWil001() : EventScript( 66130 ) {}
+   ManWil001() : EventScript( 66130 )
+   {}
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {

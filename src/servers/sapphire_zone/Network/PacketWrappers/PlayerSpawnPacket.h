@@ -91,7 +91,7 @@ namespace Server {
          // 0x20 == spawn hidden to be displayed by the spawneffect control
          m_data.displayFlags = player.getStance();
 
-         if( player.getZoningType() != Common::ZoneingType::None )
+         if( player.getZoningType() != Common::ZoneingType::None || player.getGmInvis() == true )
          {
             m_data.displayFlags |= Entity::Chara::DisplayFlags::Invisible;
          }
@@ -109,6 +109,11 @@ namespace Server {
          if( player.getEquipDisplayFlags() & Core::Common::EquipDisplayFlags::Visor )
          {
             m_data.displayFlags |= Entity::Chara::DisplayFlags::Visor;
+         }
+
+         if( !( player.getEquipDisplayFlags() & Core::Common::EquipDisplayFlags::HideLegacyMark ) )
+         {
+            m_data.look[0xC] = m_data.look[0xC] |  1 << 7;
          }
 
          m_data.currentMount = player.getCurrentMount();

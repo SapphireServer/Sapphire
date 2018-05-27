@@ -6,6 +6,7 @@
 #include <Network/GamePacketNew.h>
 #include <Network/PacketContainer.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
+#include <sapphire_zone/Event/EventHandler.h>
 
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
@@ -209,7 +210,18 @@ void Core::Network::GameConnection::eventHandlerReturn( const Packets::GamePacke
       auto eventCallback = pEvent->getEventReturnCallback();
       // if there is one, proceed to call it
       if( eventCallback )
-         eventCallback( player, eventId, param1, param2, param3 );
+      {
+         Event::SceneResult result;
+         result.eventId = eventId;
+         result.param1 = param1;
+         result.param2 = param2;
+         result.param3 = param3;
+         eventCallback( player, result );
+      }
+      // we might have a scene chain callback instead so check for that too
+      else if( auto chainCallback = pEvent->getSceneChainCallback() )
+         chainCallback( player );
+
    }
 
    player.checkEvent( eventId );

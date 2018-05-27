@@ -6,6 +6,14 @@
 namespace Core {
    namespace Event {
 
+      struct SceneResult
+      {
+         uint32_t eventId;
+         uint16_t param1;
+         uint16_t param2;
+         uint16_t param3;
+      };
+
       class EventHandler
       {
       public:
@@ -64,7 +72,8 @@ namespace Core {
             ICDirector = 0x8003,
          };
 
-         using SceneReturnCallback = std::function< void( Entity::Player&, uint32_t, uint16_t, uint16_t, uint16_t ) > ;
+         using SceneReturnCallback = std::function< void( Entity::Player&, const SceneResult& ) >;
+         using SceneChainCallback = std::function< void( Entity::Player& ) >;
 
          EventHandler( Entity::Player* pOwner, uint64_t actorId, uint32_t eventId, EventType eventType, uint32_t eventParam );
 
@@ -90,6 +99,10 @@ namespace Core {
 
          void setEventReturnCallback( SceneReturnCallback callback );
 
+         SceneChainCallback getSceneChainCallback() const;
+
+         void setSceneChainCallback( SceneChainCallback callback );
+
          bool hasNestedEvent() const;
 
          void removeNestedEvent();
@@ -106,7 +119,8 @@ namespace Core {
          uint32_t m_eventParam;
          EventHandlerPtr m_pNestedEvent;
          bool m_playedScene;
-         SceneReturnCallback m_callback;
+         SceneReturnCallback m_returnCallback;
+         SceneChainCallback m_chainCallback;
       };
 
    }

@@ -150,6 +150,16 @@ namespace Core {
          m_gmRank = rank;
       }
 
+      bool getGmInvis() const
+      {
+         return m_gmInvis;
+      }
+
+      bool setGmInvis( bool invis )
+      {
+         m_gmInvis = invis;
+      }
+
       void createInvDbContainer( uint16_t slot ) const;
 
       void createFriendsListContainer( uint32_t characterId ) const;
@@ -179,6 +189,7 @@ namespace Core {
       uint8_t m_look[26];
 
       uint8_t m_gmRank;
+      bool m_gmInvis;
 
       char m_name[34];
 

@@ -135,6 +135,7 @@ void Core::DebugCommandHandler::help( char* data, Entity::Player& player, boost:
 void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
 {
    auto pLog = g_fw.get< Logger >();
+   auto pTerriMgr = g_fw.get< TerritoryMgr >();
    auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
    std::string subCommand = "";
    std::string params = "";
@@ -309,6 +310,17 @@ void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost:
       sscanf( params.c_str(), "%d", &weatherId );
 
       player.getCurrentZone()->setWeatherOverride( static_cast< Common::Weather >( weatherId ) );
+   }
+   else if( subCommand == "festival" )
+   {
+      uint16_t festivalId;
+      sscanf( params.c_str(), "%hu", &festivalId );
+
+      pTerriMgr->setCurrentFestival( festivalId );
+   }
+   else if( subCommand == "festivaldisable" )
+   {
+      pTerriMgr->disableCurrentFestival();
    }
    else
    {
@@ -829,21 +841,6 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
          return;
 
       instance->setBranch( branch );
-   }
-   else if( subCommand == "festival" )
-   {
-      uint32_t festivalId;
-      sscanf( params.c_str(), "%d", &festivalId );
-
-      player.getCurrentZone()->setCurrentFestival( static_cast< uint16_t >( festivalId ) );
-   }
-   else if( subCommand == "disablefestival" )
-   {
-      Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcActorControl143 > actorControl( player.getId() );
-      actorControl.data().category = Core::Common::ActorControlType::DisableCurrentFestival;
-      player.queuePacket( actorControl );
-
-      player.getCurrentZone()->setCurrentFestival( 0 );
    }
    else if ( subCommand == "qte_start" )
    {

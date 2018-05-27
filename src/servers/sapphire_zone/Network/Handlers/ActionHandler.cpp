@@ -72,7 +72,7 @@ enum ClientTrigger
    HuntingLogDetails = 0x194,
 
    Timers = 0x1AB,
-  
+
    DyeItem = 0x1B5,
 
    RequestChocoboInventory = 0x1C4,
@@ -103,6 +103,13 @@ enum ClientTrigger
    CompanionActionUnlock = 0x6A6,
 
    OpenPerformInstrumentUI = 0x71C,
+
+   StartReplay = 0x7BC,
+   EndReplay = 0x7BD, // request for restoring the original player state (actor, buff, gauge, etc..)
+
+   OpenDuelUI = 0x898, // Open a duel ui
+   DuelRequestResult = 0x899, // either accept/reject
+
 };
 
 void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& inPacket,

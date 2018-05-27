@@ -110,12 +110,20 @@ namespace Core {
    std::string PlayerMinimal::getInfoJson()
    {
       std::string charDetails = "{\"content\":[\"" + std::string( getName() ) + "\"," +
-         "[" + getClassString() + "]," +
-         "\"0\",\"0\",\"0\",\"" + std::to_string( getBirthMonth() ) + "\",\"" + std::to_string( getBirthDay() ) + "\",\"" + std::to_string( getGuardianDeity() ) + "\",\"" + std::to_string( m_class ) + "\",\"0\",\"" + std::to_string( getZoneId() ) + "\"," +
+         //"[" + getClassString() + "]," +
+         "[\"0\",\"0\",\"0\",\"0\",\"0\",\"1\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\"],"
+         "\"0\",\"0\",\"0\",\"" +
+                                std::to_string( getBirthMonth() ) +
+                                "\",\"" + std::to_string( getBirthDay() ) +
+                                "\",\"" + std::to_string( getGuardianDeity() ) +
+                                "\",\"" + std::to_string( m_class ) +
+                                "\",\"0\",\"" + std::to_string( getZoneId() ) +
+                                "\",\"0\"," +
+
          "[" + getLookString() + "]," +
          "\"0\",\"0\"," +
          "[" + getModelString() + "]," +
-         "\"1\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\"]," +
+         "\"1\",\"0\",\"0\",\"0\",\"0\",\"0\",\"\",\"0\",\"0\"]," +
          "\"classname\":\"ClientSelectData\",\"classid\":116}";
       return charDetails;
    }

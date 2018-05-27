@@ -271,7 +271,7 @@ void createScript( boost::shared_ptr< Core::Data::QuestInfo >& pQuestData, std::
    constructor += rewards + "\n";
    constructor += sentities + "\n";
    constructor += "   public:\n";
-   constructor += "      " + className + "() : EventScript" + "( \"" + pQuestData->name + "\", " + std::to_string( pQuestData->id ) + " ){}; \n";
+   constructor += "      " + className + "() : EventScript" + "( " + std::to_string( pQuestData->id ) + " ){}; \n";
    constructor += "      ~" + className + "(){}; \n";
 
    std::string classString(
@@ -299,11 +299,14 @@ int main( int argc, char** argv )
 
    bool unluac = false;
   // std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
-   std::string datLocation( "C:/Program Files (x86)/SquareEnix/FINAL FANTASY XIV - A Realm Reborn/game/sqpack" );
+   //std::string datLocation( "C:/Program Files (x86)/SquareEnix/FINAL FANTASY XIV - A Realm Reborn/game/sqpack" );
+   std::string datLocation( "C:/SquareEnix/FINAL FANTASY XIV - A Realm Reborn/game/sqpack" );
    if ( argc > 1 )
       datLocation = std::string( argv[1] );
    if ( argc > 2 )
       unluac = (bool)atoi( argv[2] );
+
+   unluac = true;
 
    g_log.info( "Setting up EXD data" );
    if( !g_exdData.init( datLocation  ) )

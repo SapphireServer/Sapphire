@@ -10,7 +10,7 @@ Core::Event::EventHandler::EventHandler( Entity::Player* pOwner, uint64_t actorI
    m_entryId = static_cast< uint16_t >( eventId );
    m_type = static_cast< uint16_t >( eventId >> 16 );
    m_eventParam = eventParam;
-   m_callback = nullptr;
+   m_returnCallback = nullptr;
 }
 
 uint64_t Core::Event::EventHandler::getActorId() const
@@ -45,12 +45,22 @@ uint32_t Core::Event::EventHandler::getEventParam() const
 
 Core::Event::EventHandler::SceneReturnCallback Core::Event::EventHandler::getEventReturnCallback() const
 {
-   return m_callback;
+   return m_returnCallback;
 }
 
 void Core::Event::EventHandler::setEventReturnCallback( SceneReturnCallback callback )
 {
-   m_callback = callback;
+   m_returnCallback = callback;
+}
+
+Core::Event::EventHandler::SceneChainCallback Core::Event::EventHandler::getSceneChainCallback() const
+{
+   return m_chainCallback;
+}
+
+void Core::Event::EventHandler::setSceneChainCallback( Core::Event::EventHandler::SceneChainCallback callback )
+{
+   m_chainCallback = callback;
 }
 
 bool Core::Event::EventHandler::hasPlayedScene() const

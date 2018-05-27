@@ -12,6 +12,7 @@
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Network/PacketContainer.h>
 #include <Database/DatabaseDef.h>
+#include <Network/PacketWrappers/ActorControlPacket143.h>
 
 #include "Zone.h"
 #include "InstanceContent.h"
@@ -136,8 +137,15 @@ uint16_t Core::Zone::getCurrentFestival() const
 void Core::Zone::setCurrentFestival( uint16_t festivalId )
 {
    m_currentFestivalId = festivalId;
-}
 
+   for( const auto& playerEntry : m_playerMap )
+   {
+      auto player = playerEntry.second;
+
+      ActorControlPacket143 enableFestival( player->getId(), SetFestival, m_currentFestivalId );
+      playerEntry.second->queuePacket( enableFestival );
+   }
+}
 
 void Core::Zone::loadCellCache()
 {

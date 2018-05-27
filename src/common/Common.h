@@ -562,9 +562,11 @@ namespace Core {
          SetFavorite = 0x1FC,
          LearnTeleport = 0x1FD,
 
-         ArmoryErrorMsg = 0x201,
-
-         AchievementPopup = 0x203,
+      SetStatusIcon = 0x1F8,
+      LimitBreakGauge = 0x1F9, // Max level, amount, build type (chop sound), lb type(0=pve lb 1=pvp lb)
+      SetHomepoint = 0x1FB,
+      SetFavorite = 0x1FC,
+      LearnTeleport = 0x1FD,
 
          Unk7 = 0x205,                 // LogMessage?
          AchievementMsg = 0x206,
@@ -588,126 +590,38 @@ namespace Core {
          Dismount = 0x3a0
       };
 
-      enum struct ChatType : uint16_t
-      {
-         LogKindError,
-         ServerDebug,
-         ServerUrgent,
-         ServerNotice,
-         Unused4,
-         Unused5,
-         Unused6,
-         Unused7,
-         Unused8,
-         Unused9,
-         Say,
-         Shout,
-         Tell,
-         TellReceive,
-         Party,
-         Alliance,
-         LS1,
-         LS2,
-         LS3,
-         LS4,
-         LS5,
-         LS6,
-         LS7,
-         LS8,
-         FreeCompany,
-         Unused25,
-         Unused26,
-         NoviceNetwork,
-         CustomEmote,
-         StandardEmote,
-         Yell,
-         Unknown31,
-         PartyUnk2,
-         Unused33,
-         Unused34,
-         Unused35,
-         Unused36,
-         Unused37,
-         Unused38,
-         Unused39,
-         Unused40,
-         BattleDamage,
-         BattleFailed,
-         BattleActions,
-         BattleItems,
-         BattleHealing,
-         BattleBeneficial,
-         BattleDetrimental,
-         BattleUnk48,
-         BattleUnk49,
-         Unused50,
-         Unused51,
-         Unused52,
-         Unused53,
-         Unused54,
-         Unused55,
-         Echo,
-         SystemMessage,
-         SystemErrorMessage,
-         BattleSystem,
-         GatheringSystem,
-         NPCMessage,
-         LootMessage,
-         Unused63,
-         CharProgress,
-         Loot,
-         Crafting,
-         Gathering,
-         NPCAnnouncement,
-         FCAnnouncement,
-         FCLogin,
-         RetainerSale,
-         PartySearch,
-         PCSign,
-         DiceRoll,
-         NoviceNetworkNotice,
-         Unknown76,
-         Unused77,
-         Unused78,
-         Unused79,
-         GMTell,
-         GMSay,
-         GMShout,
-         GMYell,
-         GMParty,
-         GMFreeCompany,
-         GMLS1,
-         GMLS2,
-         GMLS3,
-         GMLS4,
-         GMLS5,
-         GMLS6,
-         GMLS7,
-         GMLS8,
-         GMNoviceNetwork,
-         Unused95,
-         Unused96,
-         Unused97,
-         Unused98,
-         Unused99,
-         Unused100
-      };
+      SetFestival = 0x386, // param1: festival.exd index
 
-      enum EquipDisplayFlags : uint8_t
-      {
-         HideNothing = 0x0,
-         HideHead = 0x1,
-         HideWeapon = 0x2,
-         LegacyMark = 0x4,
+      ToggleOrchestrionUnlock = 0x396,
+      Dismount = 0x3A0,
+
+      // Duty Recorder
+      BeginReplayAck = 0x3A1,
+      EndReplayAck = 0x3A2,
+
+      // PvP Duel
+      SetPvPState = 0x5E0, // param3 must be 6 to engage a duel (hardcoded in the client)
+      EndDuelSession = 0x5E1, // because someone went oob?
+      StartDuelCountdown = 0x5E2, // begins a countdown; also does some duel bgm thing.
+      StartDuel = 0x5E3, // actually all it does is set the challenger actor id;
+      DuelResultScreen = 0x5E4, // win/lose thing, also reset a target id just like what EndDuelSession does.
+
+      // Duty Action
+      SetDutyActionId = 0x5E8,  // ContentExAction
+      SetDutyActionHud = 0x5E9, // disable/enable
+      SetDutyActionActive = 0x5EA,
+      SetDutyActionRemaining = 0x5EB,
+   };
 
          Visor = 0x40,
       };
 
-      enum SkillType : uint8_t
-      {
-         Normal = 0x1,
-         MountSkill = 0xD,
-      };
+   enum EquipDisplayFlags : uint8_t
+   {
+      HideNothing = 0x0,
+      HideHead = 0x1,
+      HideWeapon = 0x2,
+      HideLegacyMark = 0x4,
 
       enum SocialCategory : uint8_t
       {
