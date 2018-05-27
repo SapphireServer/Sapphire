@@ -39,19 +39,19 @@ class SubFst039 : public EventScript
 
    public:
       SubFst039() : EventScript( 65732 )
-      { }; 
+      {}; 
       ~SubFst039()
-      { }; 
+      {}; 
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
       auto actor = Event::mapEventActorToRealActor( actorId );
 
-      if ( actor == SubFst039::Actor0 && !player.hasQuest( m_id ) )
+      if( actor == SubFst039::Actor0 && !player.hasQuest( getId() ) )
       {
          Scene00000( player );
       }
-      if ( actor == SubFst039::Actor0 && player.getQuestSeq( m_id ) == 255 )
+      if( actor == SubFst039::Actor0 && player.getQuestSeq( getId() ) == 255 )
       {
          Scene00001( player );
       }
@@ -59,17 +59,17 @@ class SubFst039 : public EventScript
 
    void onMobKill( Entity::Player& player, uint64_t npcId )
    {
-      if ( npcId != Enemy0 )
+      if( npcId != Enemy0 )
          return;
 
-      auto currentKC = player.getQuestUI8AL( m_id ) + 1;
+      auto currentKC = player.getQuestUI8AL( getId() ) + 1;
 
       if ( currentKC >= 6 )
-         player.updateQuest( m_id, 255 );
+         player.updateQuest( getId(), 255 );
       else
       {
-         player.setQuestUI8AL( m_id, currentKC );
-         player.sendQuestMessage( m_id, 0, 2, currentKC, 6 );
+         player.setQuestUI8AL( getId(), currentKC );
+         player.sendQuestMessage( getId(), 0, 2, currentKC, 6 );
       }
    }
 
@@ -77,26 +77,26 @@ class SubFst039 : public EventScript
 
    void Scene00000( Entity::Player& player )
    {
-      player.playScene( m_id, 0, HIDE_HOTBAR,
+      player.playScene( getId(), 0, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            if ( result.param2 == 1 )
+            if( result.param2 == 1 )
             {
-               player.updateQuest( m_id, 1 );
+               player.updateQuest( getId(), 1 );
             }
          } );
    }
 
    void Scene00001( Entity::Player& player )
    {
-      player.playScene( m_id, 1, HIDE_HOTBAR,
+      player.playScene( getId(), 1, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            if ( player.getQuestUI8AL( m_id ) == 1 )
+            if( player.getQuestUI8AL( getId() ) == 1 )
             {
-               if ( player.giveQuestRewards( m_id, 0 ) )
+               if( player.giveQuestRewards( getId(), 0 ) )
                {
-                  player.finishQuest( m_id );
+                  player.finishQuest( getId() );
                }
             }
          } );
