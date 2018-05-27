@@ -42,23 +42,23 @@ class SubFst008 : public EventScript
 
    public:
       SubFst008() : EventScript( 65568 )
-      { }; 
+      {}; 
       ~SubFst008()
-      { }; 
+      {}; 
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
       auto actor = Event::mapEventActorToRealActor( actorId );
 
-      if ( actor == SubFst008::Actor0 )
+      if( actor == SubFst008::Actor0 )
       {
          Scene00000( player );
       }
-      else if ( actor == SubFst008::Actor1 )
+      else if( actor == SubFst008::Actor1 )
       {
          Scene00001( player );
       }
-      else if ( Actor2 == SubFst008::Actor2 )
+      else if( Actor2 == SubFst008::Actor2 )
       {
          Scene00002( player );
       }
@@ -68,29 +68,29 @@ class SubFst008 : public EventScript
 
    void Scene00000( Entity::Player& player )
    {
-      player.playScene( m_id, 0, 8192,
+      player.playScene( getId(), 0, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            if ( result.param2 == 1 )
+            if( result.param2 == 1 )
                {
-                  player.updateQuest( m_id, 1 );
+                  player.updateQuest( getId(), 1 );
                }
          } );
    }
 
    void Scene00001( Entity::Player& player )
    {
-      player.playScene( m_id, 1, 8192,
+      player.playScene( getId(), 1, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            player.setQuestUI8BH( m_id, 1 );
-            player.updateQuest( m_id, 255 );
+            player.setQuestUI8BH( getId(), 1 );
+            player.updateQuest( getId(), 255 );
          } );
    }
 
    void Scene00002( Entity::Player& player )
    {
-      player.playScene( m_id, 2, 8192,
+      player.playScene( getId(), 2, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
             if ( result.param2 == 1 )
@@ -106,29 +106,24 @@ class SubFst008 : public EventScript
 
    void Scene00099( Entity::Player& player )
    {
-      player.playScene( m_id, 99, 8192,
+      player.playScene( getId(), 99, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-         player.playScene( m_id, 99, 0, 0, 0 );
+            player.playScene( getId(), 99, 0, 0, 0 );
          } );
    }
 
    void Scene00100( Entity::Player& player )
    {
-      player.playScene( m_id, 100, 8192,
+      player.playScene(getId(), 100, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            player.sendQuestMessage( m_id, 1, 0, 0, 0 );
-            player.setQuestUI8BH( m_id, 0 );
-            player.setQuestUI8AL( m_id, 1 );
-
-            if ( player.getQuestUI8AL( m_id ) == 1 )
-               { 
-                  if ( player.giveQuestRewards( m_id, 0 ) )
-                     player.finishQuest( m_id );
+            if ( player.giveQuestRewards( getId(), 0 ) )
+               {
+                  player.setQuestUI8BH( getId(), 0 );
+                  player.finishQuest( getId() );
                }
          } );
    }
-
 };
 
