@@ -48,11 +48,11 @@ class SubFst015 : public EventScript
    {
       auto actor = Event::mapEventActorToRealActor( actorId );
 
-      if( actor == SubFst015::Actor0 )
+      if( actor == SubFst015::Actor0 && !player.hasQuest( getId() ) )
       {
          Scene00000( player );
       }
-      else if( actor == SubFst015::Actor0 && player.getQuestSeq( getId() ) == 255 )
+      else if( actor == SubFst015::Actor0 )
       {
          Scene00007( player );
       }
@@ -62,8 +62,7 @@ class SubFst015 : public EventScript
          player.eventActionStart( getId(), 0x01,
             [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
          {
-            //player.setQuestBitFlag8( getId(), 1, true/*false*/);
-            Scene00001( player );//100
+            Scene00001( player );
          },
             [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
          {},
@@ -74,8 +73,7 @@ class SubFst015 : public EventScript
          player.eventActionStart( getId(), 0x01,
             [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
          {
-            //player.setQuestBitFlag8( getId(), 2, true/*false*/);
-            Scene00002( player );//98
+            Scene00002( player );
          },
             [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
          {},
@@ -86,8 +84,7 @@ class SubFst015 : public EventScript
          player.eventActionStart( getId(), 0x01,
             [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
          {
-            //player.setQuestBitFlag8( getId(), 3, true/*false*/);
-            Scene00003( player );//96
+            Scene00003( player );
          },
             [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
          {},
@@ -98,8 +95,7 @@ class SubFst015 : public EventScript
          player.eventActionStart( getId(), 0x01,
             [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
          {
-            //player.setQuestBitFlag8( getId(), 4, true/*false*/);
-            Scene00004( player );//94
+            Scene00004( player );
          },
             [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
          {},
@@ -110,8 +106,7 @@ class SubFst015 : public EventScript
          player.eventActionStart( getId(), 0x01,
             [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
          {
-            //player.setQuestBitFlag8( getId(), 5, true/*false*/);
-            Scene00005( player );//92
+            Scene00005( player );
          },
             [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
          {},
@@ -122,8 +117,7 @@ class SubFst015 : public EventScript
          player.eventActionStart( getId(), 0x01,
             [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
          {
-            //player.setQuestBitFlag8( getId(), 6, true/*false*/);
-            Scene00006( player );//90
+            Scene00006( player );
          },
             [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
          {},
@@ -137,11 +131,11 @@ class SubFst015 : public EventScript
    {
       auto currentCC = player.getQuestUI8AL( getId() );
 
-      player.sendQuestMessage( getId(), 0, 2, currentCC + 1, 6 );//sendquestMessage(eventId, 0, 2, currVegetal + 1, 6);
+      player.sendQuestMessage( getId(), 0, 2, currentCC + 1, 6 );
 
       if( currentCC + 1 >= 6 )
       {
-         player.updateQuest( getId(), SeqFinish );//questUpdate(eventId, SubFst015.SEQ_FINISH);
+         player.updateQuest( getId(), SeqFinish );
       }
       else
       {
@@ -242,7 +236,7 @@ class SubFst015 : public EventScript
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
          checkQuestcompletion( player );
-         player.setQuestBitFlag8( getId(), 6, true/*false*/ );
+         player.setQuestBitFlag8( getId(), 2, true );
          } );
    }
 
@@ -260,7 +254,7 @@ class SubFst015 : public EventScript
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
          checkQuestcompletion( player );
-         player.setQuestBitFlag8( getId(), 5, true/*false*/ );
+         player.setQuestBitFlag8( getId(), 3, true );
          } );
    }
 
@@ -278,7 +272,7 @@ class SubFst015 : public EventScript
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
          checkQuestcompletion( player );
-         player.setQuestBitFlag8( getId(), 4, true/*false*/ );
+         player.setQuestBitFlag8( getId(), 4, true );
          } );
    }
 
@@ -296,7 +290,7 @@ class SubFst015 : public EventScript
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
          checkQuestcompletion( player );
-         player.setQuestBitFlag8( getId(), 3, true/*false*/ );
+         player.setQuestBitFlag8( getId(), 5, true );
          } );
    }
 
@@ -314,7 +308,7 @@ class SubFst015 : public EventScript
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
          checkQuestcompletion( player );
-         player.setQuestBitFlag8( getId(), 2, true/*false*/ );
+         player.setQuestBitFlag8( getId(), 6, true );
          } );
    }
 
@@ -332,7 +326,7 @@ class SubFst015 : public EventScript
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
          checkQuestcompletion( player );
-         player.setQuestBitFlag8( getId(), 1, true/*false*/ );
+         player.setQuestBitFlag8( getId(), 7, true );
          } );
    }
 };
