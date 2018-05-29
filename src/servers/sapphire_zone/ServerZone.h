@@ -27,8 +27,6 @@ namespace Core {
 
       SessionPtr getSession( uint32_t id );
       SessionPtr getSession( std::string playerName );
-      void updateSession( uint32_t id );
-      void updateSession( std::string playerName );
 
       size_t getSessionCount() const;
 
@@ -37,7 +35,6 @@ namespace Core {
       bool isRunning() const;
 
       void printBanner() const;
-
 
    private:
 

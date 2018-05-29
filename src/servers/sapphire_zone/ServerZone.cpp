@@ -335,15 +335,6 @@ void Core::ServerZone::removeSession( uint32_t sessionId )
    m_sessionMapById.erase( sessionId );
 }
 
-void Core::ServerZone::updateSession( uint32_t id )
-{
-   std::lock_guard< std::mutex > lock( m_sessionMutex );
-   auto it = m_sessionMapById.find( id );
-
-   if( it != m_sessionMapById.end() )
-      it->second->loadPlayer();
-}
-
 Core::SessionPtr Core::ServerZone::getSession( uint32_t id )
 {
    //std::lock_guard<std::mutex> lock( m_sessionMutex );
@@ -373,14 +364,6 @@ void Core::ServerZone::removeSession( std::string playerName )
    m_sessionMapByName.erase( playerName );
 }
 
-void Core::ServerZone::updateSession( std::string playerName )
-{
-   std::lock_guard< std::mutex > lock( m_sessionMutex );
-   auto it = m_sessionMapByName.find( playerName );
-
-   if( it != m_sessionMapByName.end() )
-      it->second->loadPlayer();
-}
 
 bool Core::ServerZone::isRunning() const
 {
