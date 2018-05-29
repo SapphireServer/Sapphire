@@ -86,12 +86,13 @@ namespace Packets {
       CountdownInitiate          = 0x0111, // updated 4.3
       CountdownCancel            = 0x0112, // updated 4.3
 
-      BlackList                  = 0x00FF, // updated 4.2
+      BlackList                  = 0x0115, // updated 4.3
 
       LogMessage                 = 0x00D0,
 
-      LinkshellList              = 0x0106, // updated 4.2
-      SetCharacterFCInfo         = 0x0114, // updated 4.2
+      LinkshellList              = 0x011C, // updated 4.3
+      SetCharaFCTag              = 0x013B, // updated 4.3
+      SetFreeCompanyInfo         = 0x013D, // updated 4.3
 
       StatusEffectList           = 0x014E, // updated 4.3
       Effect                     = 0x0151, // updated 4.3
@@ -199,6 +200,7 @@ namespace Packets {
       CFDutyInfoHandler        = 0x0078, // updated 4.2
 
       SocialReqSendHandler     = 0x00AE, // updated 4.1
+      CreateCrossWorldLS       = 0x00AF, // updated 4.3
 
       ChatHandler              = 0x00D3, // updated 4.3
 
