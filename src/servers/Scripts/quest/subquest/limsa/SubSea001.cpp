@@ -54,181 +54,110 @@ public:
    ~SubSea001()
    {};
 
-   void onTalk(uint32_t eventId, Entity::Player& player, uint64_t actorId) override
+   void onTalk(uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
-      auto actor = Event::mapEventActorToRealActor(actorId);
-      auto currentCC = player.getQuestUI8AL(getId());
+      auto actor = Event::mapEventActorToRealActor( actorId );
+      auto currentCC = player.getQuestUI8AL( getId() );
 
-      auto despawn1 = player.getQuestUI8FL(getId());
-      auto despawn2 = player.getQuestUI8FH(getId());
-
-      if (actor == SubSea001::Actor0)
+      if( actor == Actor0 )
       {
-         Scene00000(player);
+         Scene00000( player );
       }
-      else if (actor == SubSea001::Actor1)
+      else if( actor == Actor1 )
       {
-         Scene00002(player);
+         Scene00002( player );
       }
-      else if (actor == SubSea001::Actor2)
+      else if( actor == Actor2 )
       {
-         Scene00016(player);
+         Scene00016( player );
       }
       //EOBJECTS CHECK
-      else if (actor == SubSea001::Eobject0) 
+      else if( actor == Eobject0 ) 
       {
-         player.eventActionStart(getId(), 0x0E,
-            [&](Entity::Player& player, uint32_t eventId, uint64_t additional)
+         player.eventActionStart( getId(), 0x0E,
+            [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
          {
-            despawn2 = despawn2 | 8;
-            player.setQuestUI8FL(getId(), despawn2);
-            Scene00003(player);
+            Scene00003( player );
          },
-            [&](Entity::Player& player, uint32_t eventId, uint64_t additional)
+            [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
          {},
-            eventId);
+            eventId );
       }
-      else if (actor == SubSea001::Eobject1) 
+      else if(actor == Eobject1) 
       {
-         player.eventActionStart(getId(), 0x0E,
-            [&](Entity::Player& player, uint32_t eventId, uint64_t additional)
+         player.eventActionStart( getId(), 0x0E,
+            [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
          {
-            despawn2 = despawn2 | 4;
-            player.setQuestUI8FL(getId(), despawn2);
-            Scene00005(player);
+            Scene00005( player );
          },
-            [&](Entity::Player& player, uint32_t eventId, uint64_t additional)
+            [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
          {},
-            eventId);
+            eventId );
       }
-      else if (actor == SubSea001::Eobject2) 
+      else if( actor == Eobject2 ) 
       {
-         player.eventActionStart(getId(), 0x0E,
-            [&](Entity::Player& player, uint32_t eventId, uint64_t additional)
+         player.eventActionStart( getId(), 0x0E,
+            [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
          {
-            despawn2 = despawn2 | 2;
-            player.setQuestUI8FL(getId(), despawn2);
-            Scene00007(player);
+            Scene00007( player );
          },
-            [&](Entity::Player& player, uint32_t eventId, uint64_t additional)
+            [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
          {},
-            eventId);
+            eventId );
       }
-      else if (actor == SubSea001::Eobject3) 
+      else if( actor == Eobject3) 
       {
-         player.eventActionStart(getId(), 0x0E,
-            [&](Entity::Player& player, uint32_t eventId, uint64_t additional)
+         player.eventActionStart( getId(), 0x0E,
+            [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
          {
-            despawn2 = despawn2 | 1;
-            player.setQuestUI8FL(getId(), despawn2);
-            Scene00009(player);
+            Scene00009( player );
          },
-            [&](Entity::Player& player, uint32_t eventId, uint64_t additional)
+            [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
          {},
-            eventId);
+            eventId );
       }
-      else if (actor == SubSea001::Eobject4)
+      else if( actor == Eobject4)
       {
-         player.eventActionStart(getId(), 0x0E,
-            [&](Entity::Player& player, uint32_t eventId, uint64_t additional)
+         player.eventActionStart( getId(), 0x0E,
+            [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
          {
-            despawn2 = despawn2 | 8;
-            player.setQuestUI8FL(getId(), despawn2);
-            Scene00011(player);
+            Scene00011( player );
          },
-            [&](Entity::Player& player, uint32_t eventId, uint64_t additional)
+            [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
          {},
-            eventId);
+            eventId );
       }
-      else if (actor == SubSea001::Eobject5)
+      else if( actor == Eobject5)
       {
-         player.eventActionStart(getId(), 0x0E,
-            [&](Entity::Player& player, uint32_t eventId, uint64_t additional)
+         player.eventActionStart( getId(), 0x0E,
+            [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
          {
-            despawn2 = despawn2 | 4;
-            player.setQuestUI8FL(getId(), despawn2);
-            Scene00013(player);
+            Scene00013( player );
          },
-            [&](Entity::Player& player, uint32_t eventId, uint64_t additional)
+            [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
          {},
-            eventId);
+            eventId );
       }
    };
 
 private:
 
-   void checkQuestcompletion(Entity::Player& player, uint32_t varIdx, uint32_t actorId)
+   void checkQuestcompletion( Entity::Player& player )
    {
-      auto currentCC = player.getQuestUI8AL(getId());
+      auto currentCC = player.getQuestUI8BH( getId() );
 
-      if (varIdx == 1)
-      {
-         player.sendQuestMessage(getId(), 0, 2, currentCC + 1, 6);//sendquestMessage(eventId, 0, 2, currVegetal + 1, 6);
+      player.sendQuestMessage( getId(), 1, 3, currentCC + 1, 6 );
 
-         if (currentCC + 1 == 6)
-         {
-            player.updateQuest(getId(), SeqFinish);//questUpdate(eventId, SubFst015.SEQ_FINISH);
-         }
-         else
-         {
-            player.setQuestUI8AL(getId(), currentCC + 1);
-         }
-      }
-
-      /*auto eobj = Event::mapEventActorToRealActor(actorId);
-      auto currentCC = player.getQuestUI8BH(getId());
-
-      auto despawn1 = player.getQuestUI8FL(getId());
-      auto despawn2 = player.getQuestUI8FH(getId());
-
-      //if(varIdx == 0)
-      if (eobj == SubSea001::Eobject0 && varIdx == 0)
+      if( currentCC + 1 >= 6 )
       {
-         despawn2 = despawn2 | 8;
-         player.setQuestUI8FH(getId(), despawn2);
-      }
-      //if (varIdx == 1)
-      else if (eobj == SubSea001::Eobject1 && varIdx == 1)
-      {
-         despawn2 = despawn2 | 4;
-         player.setQuestUI8FH(getId(), despawn2);
-      }
-      //if (varIdx == 2)
-      else if (eobj == SubSea001::Eobject2 && varIdx == 2)
-      {
-         despawn2 = despawn2 | 2;
-         player.setQuestUI8FH(getId(), despawn2);
-      }
-      //if (varIdx == 3)
-      else if (eobj == SubSea001::Eobject3 && varIdx == 3)
-      {
-         despawn2 = despawn2 | 1;
-         player.setQuestUI8FH(getId(), despawn2);
-      }
-      //if(varIdx == 4)
-      else if (eobj == SubSea001::Eobject4 && varIdx == 4)
-      {
-         despawn2 = despawn2 | 8;
-         player.setQuestUI8FH(getId(), despawn2);
-      }
-      //if(varIdx == 5)
-      else if (eobj == SubSea001::Eobject5 && varIdx == 5)
-      {
-         despawn2 = despawn2 | 4;
-         player.setQuestUI8FH(getId(), despawn2);
-      }
-
-      player.sendQuestMessage(getId(), 0, 2, currentCC + 1, 6);//sendquestMessage(eventId, 0, 2, currVegetal + 1, 6);
-
-      if (currentCC + 1 == 6)
-      {
-         player.updateQuest(getId(), SeqFinish);//questUpdate(eventId, SubFst015.SEQ_FINISH);
+         player.updateQuest( getId(), SeqFinish );
       }
       else
       {
-         player.setQuestUI8BH(getId(), currentCC + 1);
-      }*/
-   };
+         player.setQuestUI8BH( getId(), currentCC + 1 );
+         player.setQuestUI8AL( getId(), currentCC + 1 );
+      }
+   }
 
    void Scene00000( Entity::Player& player )
    {
@@ -253,11 +182,14 @@ private:
       player.playScene( getId(), 2, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            if( player.hasQuest(65644) && result.param2 == 1 )
+            if( player.hasQuest(65644) || player.hasQuest(65645))
             {
-               player.updateQuest( getId(), 2);
-               player.changePosition( 10, 21, 13, -2 );
-               player.forceZoneing( Territorytype0 ); // teleport to real limsa
+               if( result.param2 == 1 )
+               {
+                  player.updateQuest( getId(), 2 );
+                  player.changePosition( 10, 21, 13, -2 );
+                  player.forceZoneing( Territorytype0 ); // teleport to real limsa
+               }
             }
             else return;
          } );
@@ -268,7 +200,7 @@ private:
       player.playScene( getId(), 3, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            Scene00004(player);
+            Scene00004( player );
          } );
    }
 
@@ -277,7 +209,8 @@ private:
       player.playScene( getId(), 4, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            player.playScene(getId(), 4, 0, 0, 0);
+            checkQuestcompletion( player );
+            player.setQuestBitFlag8( getId(), 7, true );
          } );
    }
 
@@ -286,7 +219,7 @@ private:
       player.playScene( getId(), 5, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            Scene00006(player);
+            Scene00006( player );
          } );
    }
 
@@ -295,7 +228,8 @@ private:
       player.playScene( getId(), 6, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            player.playScene(getId(), 6, 0, 0, 0);
+            checkQuestcompletion( player );
+            player.setQuestBitFlag8( getId(), 6, true );
          } );
    }
 
@@ -304,7 +238,7 @@ private:
       player.playScene( getId(), 7, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            Scene00008(player);
+            Scene00008( player );
          } );
    }
 
@@ -313,7 +247,8 @@ private:
       player.playScene( getId(), 8, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            player.playScene(getId(), 8, 0, 0, 0);
+            checkQuestcompletion( player );
+            player.setQuestBitFlag8( getId(), 5, true );
          } );
    }
 
@@ -322,7 +257,7 @@ private:
       player.playScene( getId(), 9, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            Scene00010(player);
+            Scene00010( player );
          } );
    }
 
@@ -331,7 +266,8 @@ private:
       player.playScene( getId(), 10, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            player.playScene(getId(), 10, 0, 0, 0);
+            checkQuestcompletion( player );
+            player.setQuestBitFlag8( getId(), 4, true );
          } );
    }
 
@@ -340,7 +276,7 @@ private:
       player.playScene( getId(), 11, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            Scene00012(player);
+            Scene00012( player );
          } );
    }
 
@@ -349,7 +285,8 @@ private:
       player.playScene( getId(), 12, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            player.playScene(getId(), 12, 0, 0, 0);
+            checkQuestcompletion( player );
+            player.setQuestBitFlag8( getId(), 3, true );
          } );
    }
 
@@ -358,7 +295,7 @@ private:
       player.playScene( getId(), 13, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            Scene00014(player);
+            Scene00014( player );
          } );
    }
 
@@ -367,7 +304,8 @@ private:
       player.playScene( getId(), 14, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            player.playScene(getId(), 14, 0, 0, 0);
+            checkQuestcompletion( player );
+            player.setQuestBitFlag8( getId(), 2, true );
          } );
    }
 
@@ -376,6 +314,7 @@ private:
       player.playScene( getId(), 15, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
+            player.playScene( getId(), 15, 0, 0, 0 );
          } );
    }
 
@@ -388,7 +327,8 @@ private:
             {
                Scene00017( player );
             }
-            else return;
+            else 
+               Scene00015( player );
          } );
    }
 
@@ -396,13 +336,13 @@ private:
    {
       player.playScene( getId(), 17, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
+      {
+         if( result.param2 == 1 )
          {
-            player.setQuestUI8BH( getId(), 0 );
-
             if( player.giveQuestRewards( getId(), 0 ) )
                player.finishQuest( getId() );
-         } );
+         }
+       } );
    }
-
 };
 
