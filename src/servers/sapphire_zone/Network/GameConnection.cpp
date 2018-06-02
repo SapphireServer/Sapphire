@@ -8,14 +8,13 @@
 #include <Network/Acceptor.h>
 #include <Network/PacketContainer.h>
 #include <Network/GamePacketParser.h>
+#include <Network/GamePacket.h>
 
 #include "Zone/Zone.h"
 
 #include "Network/PacketWrappers/InitUIPacket.h"
 
 #include "DebugCommand/DebugCommandHandler.h"
-
-#include "Actor/Player.h"
 
 #include "GameConnection.h"
 #include "ServerZone.h"

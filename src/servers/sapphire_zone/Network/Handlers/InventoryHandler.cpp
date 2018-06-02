@@ -17,11 +17,10 @@
 
 #include "DebugCommand/DebugCommandHandler.h"
 #include "Actor/Player.h"
-#include "Inventory/Inventory.h"
 
 #include "Session.h"
 #include "ServerZone.h"
-#include "Forwards.h"
+
 #include "Framework.h"
 
 extern Core::Framework g_fw;

@@ -4,7 +4,7 @@
 #include <Network/Connection.h>
 
 #include <Network/CommonNetwork.h>
-#include <Network/GamePacket.h>
+//#include <Network/GamePacket.h>
 #include <Util/LockedQueue.h>
 
 #include "Forwards.h"
@@ -13,7 +13,9 @@
 
 namespace Core {
 namespace Network {
-
+namespace Packets {
+   class GamePacket;
+}
 enum ConnectionType : uint8_t
 {
    Zone = 1,

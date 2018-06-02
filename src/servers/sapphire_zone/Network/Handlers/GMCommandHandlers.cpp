@@ -15,7 +15,6 @@
 #include "Zone/TerritoryMgr.h"
 #include "Zone/Zone.h"
 #include "Zone/InstanceContent.h"
-#include "Zone/ZonePosition.h"
 
 #include "Network/PacketWrappers/InitUIPacket.h"
 #include "Network/PacketWrappers/PingPacket.h"
@@ -29,15 +28,7 @@
 #include "Network/PacketWrappers/EventFinishPacket.h"
 #include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
 
-#include "DebugCommand/DebugCommandHandler.h"
-
-#include "Event/EventHelper.h"
-
-#include "Action/Action.h"
-#include "Action/ActionTeleport.h"
-
 #include "ServerZone.h"
-#include "Forwards.h"
 #include "Framework.h"
 
 extern Core::Framework g_fw;

@@ -18,8 +18,6 @@
 
 #include "DebugCommand/DebugCommandHandler.h"
 
-#include "Actor/Player.h"
-
 #include "Action/Action.h"
 #include "Action/ActionCast.h"
 #include "Action/ActionMount.h"
@@ -27,7 +25,6 @@
 #include "Script/ScriptMgr.h"
 
 #include "Session.h"
-#include "Forwards.h"
 #include "Framework.h"
 
 extern Core::Framework g_fw;
