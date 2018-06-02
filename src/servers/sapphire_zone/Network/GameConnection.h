@@ -2,7 +2,7 @@
 #define GAMECONNECTION_H
 
 #include <Network/Connection.h>
-#include <Network/Acceptor.h>
+
 #include <Network/CommonNetwork.h>
 #include <Network/GamePacket.h>
 #include <Util/LockedQueue.h>

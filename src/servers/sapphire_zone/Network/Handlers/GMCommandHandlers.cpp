@@ -7,7 +7,6 @@
 #include <Network/PacketContainer.h>
 
 #include <unordered_map>
-#include <boost/format.hpp>
 
 #include "Network/GameConnection.h"
 
@@ -18,7 +17,6 @@
 #include "Zone/InstanceContent.h"
 #include "Zone/ZonePosition.h"
 
-#include "Network/GameConnection.h"
 #include "Network/PacketWrappers/InitUIPacket.h"
 #include "Network/PacketWrappers/PingPacket.h"
 #include "Network/PacketWrappers/MoveActorPacket.h"
@@ -33,16 +31,11 @@
 
 #include "DebugCommand/DebugCommandHandler.h"
 
-#include "Actor/Player.h"
-
-#include "Inventory/Inventory.h"
-
 #include "Event/EventHelper.h"
 
 #include "Action/Action.h"
 #include "Action/ActionTeleport.h"
 
-#include "Session.h"
 #include "ServerZone.h"
 #include "Forwards.h"
 #include "Framework.h"

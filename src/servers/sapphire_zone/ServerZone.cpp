@@ -3,7 +3,6 @@
 #include <Version.h>
 #include <Logging/Logger.h>
 #include <Config/XMLConfig.h>
-#include <Version.h>
 
 #include <MySqlBase.h>
 #include <Connection.h>
@@ -26,15 +25,12 @@
 
 #include "Zone/TerritoryMgr.h"
 
-#include "DebugCommand/DebugCommandHandler.h"
-
 #include "Script/ScriptMgr.h"
 #include "Linkshell/LinkshellMgr.h"
 
 #include "Forwards.h"
-#include <boost/foreach.hpp>
+
 #include <boost/make_shared.hpp>
-#include <boost/algorithm/string.hpp>
 #include <thread>
 
 #include "Framework.h"
@@ -206,7 +202,7 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
 
 void Core::ServerZone::printBanner() const
 {
-   auto pLog = g_fw.get< Core::Logger>();
+   auto pLog = g_fw.get< Core::Logger >();
 
    pLog->info("===========================================================" );
    pLog->info( "Sapphire Server Project " );
