@@ -7,10 +7,7 @@
 #include <Network/PacketContainer.h>
 #include <Network/PacketDef/Chat/ServerChatDef.h>
 #include <Database/DatabaseDef.h>
-#include <Database/DbWorkerPool.h>
-#include <Database/CharaDbConnection.h>
 
-#include <boost/format.hpp>
 #include <unordered_map>
 #include "Network/GameConnection.h"
 
@@ -31,10 +28,6 @@
 #include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
 
 #include "DebugCommand/DebugCommandHandler.h"
-
-#include "Actor/Player.h"
-
-#include "Inventory/Inventory.h"
 
 #include "Event/EventHelper.h"
 

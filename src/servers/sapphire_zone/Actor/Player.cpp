@@ -30,11 +30,6 @@
 
 #include "Script/ScriptMgr.h"
 
-#include "Inventory/Item.h"
-#include "Inventory/Inventory.h"
-
-#include "Event/EventHandler.h"
-
 #include "Action/Action.h"
 #include "Action/ActionTeleport.h"
 #include "Action/EventAction.h"
