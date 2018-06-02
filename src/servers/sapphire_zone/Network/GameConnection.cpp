@@ -4,6 +4,8 @@
 #include <Network/CommonNetwork.h>
 #include <Util/Util.h>
 #include <Logging/Logger.h>
+
+#include <Network/Acceptor.h>
 #include <Network/PacketContainer.h>
 #include <Network/GamePacketParser.h>
 

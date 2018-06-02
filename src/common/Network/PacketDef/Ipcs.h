@@ -1,7 +1,7 @@
 #ifndef _CORE_NETWORK_PACKETS_IPCS_H
 #define _CORE_NETWORK_PACKETS_IPCS_H
 
-#include<stdint.h>
+#include <stdint.h>
 
 namespace Core {
 namespace Network {
@@ -174,8 +174,6 @@ namespace Packets {
       IPCTYPE_UNK_322            = 0x024E, // updated 4.3
 
    };
-
-   // TODO: Include structures for the individual packet segment types
 
    /**
    * Client IPC Zone Type Codes.

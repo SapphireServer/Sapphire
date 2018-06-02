@@ -2,7 +2,7 @@
 #include <boost/algorithm/clamp.hpp>
 
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
-#include <Common.h>
+
 #include <Exd/ExdDataGenerated.h>
 #include <Logging/Logger.h>
 #include <Database/DatabaseDef.h>
@@ -12,8 +12,6 @@
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 
-#include "Forwards.h"
-#include "Inventory.h"
 #include "ItemContainer.h"
 #include "Item.h"
 #include "Framework.h"
