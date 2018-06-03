@@ -23,7 +23,7 @@ void Core::Network::Packets::GamePacket::setHeader( uint16_t size, uint16_t type
    m_segHdr.type = type;
    m_segHdr.source_actor = id1;
    m_segHdr.target_actor = id2;
-   m_segHdr._reserved_E = 0x00;
+   //m_segHdr._reserved_E = 0x00;
    m_subType = subType;
 
    m_timeStamp = static_cast< uint32_t >( time( nullptr ) );
