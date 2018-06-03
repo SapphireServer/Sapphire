@@ -162,7 +162,7 @@ namespace Core {
 
       void createInvDbContainer( uint16_t slot ) const;
 
-      void createFriendsListContainer( uint32_t characterId ) const;
+      void createFriendsListContainer( uint64_t characterId ) const;
 
       uint32_t m_modelEquip[10];
 

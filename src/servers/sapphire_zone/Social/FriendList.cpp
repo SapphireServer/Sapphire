@@ -14,6 +14,7 @@
 
 #include <Database/DatabaseDef.h>
 #include <Network/GamePacketNew.h>
+#include <Common.h>
 #include "Group.h"
 #include "FriendList.h"
 
@@ -71,7 +72,7 @@ uint32_t FriendList::removeMember( uint64_t contentId )
 }
 
 
-uint32_t FriendList::processInvite( uint64_t contentId, Common::SocialRequestAction action )
+uint32_t FriendList::processInvite( uint64_t contentId, Core::Common::SocialRequestExecute execute )
 {
    uint32_t logMessage = 0;
 
@@ -81,25 +82,30 @@ uint32_t FriendList::processInvite( uint64_t contentId, Common::SocialRequestAct
 
    auto dataIndex = std::distance( m_members.begin(), it );
 
-   auto friendEntryData = m_entries.at( dataIndex );
+   auto& friendEntryData = m_entries.at( dataIndex );
 
    // todo: check timestamp, if expired etc.
 
-   switch( action )
+   g_fw.get< Logger >()->debug( "Process Invite: stepping through " );
+
+   switch( execute )
    {
-      case Common::SocialRequestAction::Accept:
+      case Common::SocialRequestExecute::Accept:
       {
          friendEntryData.entryStatus = FriendEntryType::Added;
+         g_fw.get< Logger >()->debug( "Process Invite: Adding " + std::to_string( contentId ) + " to " + to_string( m_ownerId ) );
          break;
       }
-      case Common::SocialRequestAction::Decline:
+      case Common::SocialRequestExecute::Decline:
       {
          removeMember( contentId );
+         break;
       }
       default:
          break;
    }
 
+   return 0;
 }
 
 uint32_t FriendList::getFriendIndex( uint64_t contentId )

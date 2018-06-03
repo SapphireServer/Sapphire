@@ -211,12 +211,12 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
 
    auto friendListMgr = g_fw.get< Social::SocialMgr < Social::FriendList > >();
 
-   if( !friendListMgr->loadFriendsList( m_id ) )
+   if( !friendListMgr->loadFriendsList( m_contentId ) )
    {
-      pLog->error( "[" + char_id_str + "] Failed to load friends list!" );
+      pLog->error( "[" + std::to_string( m_contentId ) + "] Failed to load friends list!" );
    }
 
-   pLog->debug( std::to_string( m_id ) + " ID, has group ID: " + std::to_string( m_friendsListId ) );
+   pLog->debug( std::to_string( m_contentId ) + " ID, has group ID: " + std::to_string( m_friendsListId ) );
 
    // first login, run the script event
    if( m_bNewGame )

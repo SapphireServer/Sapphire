@@ -15,6 +15,8 @@
 #include <Social/FriendList.h>
 #include <Database/DatabaseDef.h>
 
+#include <Logging/Logger.h>
+
 #include "Framework.h"
 
 extern Core::Framework g_fw;
@@ -40,7 +42,6 @@ public:
    }
 
    bool init();
-   //bool< FriendList > init();
 
    boost::shared_ptr< T > findGroupByInviteIdForPlayer( uint64_t playerId ) const
    {
@@ -54,6 +55,9 @@ public:
 
    boost::shared_ptr< T > findGroupById( uint64_t groupId ) const
    {
+      // todo: lol
+      g_fw.get< Logger >()->debug( std::to_string( m_groups.size() ) );
+
       auto it = m_groups.find( groupId );
       if ( it != m_groups.end() )
       {
@@ -72,7 +76,7 @@ public:
       return false;
    }
 
-   bool loadFriendsList( uint32_t characterId );
+   bool loadFriendsList( uint64_t contentId );
 
 protected:
 // those would be implemented in T, so you'd have T.m_type and T.m_maxEntries
@@ -109,17 +113,22 @@ bool Core::Social::SocialMgr< T >::init()
 }
 
 template<> inline
-bool Core::Social::SocialMgr< Core::Social::FriendList >::loadFriendsList( uint32_t characterId )
+bool Core::Social::SocialMgr< Core::Social::FriendList >::loadFriendsList( uint64_t contentId )
 {
    // Check if our group has already been loaded..
-   auto group = findGroupById( characterId );
+   auto group = findGroupById( contentId );
    if( group )
       return true;
 
+   // TODO: Remove this message
+   g_fw.get< Logger >()->debug( "Crashing here usually implies pre-social implementation database and/or character, recreate the database and characters." );
+
+
+   g_fw.get< Logger >()->debug( std::to_string( contentId ) );
    auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
-   auto res = pDb->query( "SELECT CharacterId, CharacterIdList, InviteDataList "
+   auto res = pDb->query( "SELECT ContentId, ContentIdList, InviteDataList "
       "FROM charainfofriendlist "
-      "WHERE CharacterId = " + std::to_string( characterId ) );
+      "WHERE ContentId = " + std::to_string( contentId ) );
 
 
    if ( !res->next() )
@@ -156,7 +165,7 @@ bool Core::Social::SocialMgr< Core::Social::FriendList >::loadFriendsList( uint3
 
    auto friendListPtr = boost::make_shared< Social::FriendList >( friendsList );
       
-   m_groups.emplace( characterId, friendListPtr );
+   m_groups.emplace( contentId, friendListPtr );
 
    return true;
 }

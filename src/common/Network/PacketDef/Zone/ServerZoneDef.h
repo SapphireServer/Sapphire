@@ -82,22 +82,24 @@ struct FFXIVIpcPlayTime : FFXIVIpcBasePacket<Playtime>
 struct PlayerEntry {
    uint64_t contentId;
    uint32_t timestamp;
-   uint8_t bytes[4];
+   uint32_t padding;
    uint8_t status;      // bitmask. friend: if it's a request, if added, recipient/sender
    uint8_t unknown;     // maybe bitmask? a value of 4 sets it to linkshell request
    uint8_t entryIcon;   // observed in friend group icon, sideffects for displaying text
    uint8_t unavailable; // bool
    uint16_t zoneId;
-   uint8_t grandCompany;
+   uint8_t unknown_43_1;
+   uint8_t unknown_43_2;
+   uint8_t grandCompany; 
    uint8_t clientLanguage;
-   uint8_t knownLanguages; // bitmask, J 0x01, E 0x02, D 0x04, F 0x08
-   uint8_t searchComment; // bool
-   char bytes1[6];
+   uint8_t knownLanguages;   // bitmask, J 0x01, E 0x02, D 0x04, F 0x08
+   uint8_t searchComment;    // bool
+   char bytes1[4];
    uint64_t onlineStatusMask;
    Common::ClassJob classJob;
-   uint8_t padding;
+   uint8_t padding_1;
    uint16_t level;
-   uint16_t padding2;
+   uint16_t padding_2;
    uint8_t one;
    char name[0x20];
    char fcTag[5];
@@ -139,7 +141,7 @@ struct FFXIVIpcSocialRequestResponse : FFXIVIpcBasePacket<SocialRequestResponse>
    uint64_t contentId;
    uint32_t unknown;
    Common::SocialCategory category; // Common::SocialCategory
-   Common::SocialRequestResponse response; // Common::SocialRequestResponse
+   Common::SocialRequestExecute execute; // Common::SocialRequestResponse
    uint8_t unknown2;                 // possibly padding
    char name[0x20];
    uint16_t padding;

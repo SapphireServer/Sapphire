@@ -88,6 +88,7 @@ public:
    DECLARE_HANDLER( blackListHandler );
    DECLARE_HANDLER( socialReqProcessHandler );
    DECLARE_HANDLER( socialReqSendHandler );
+   DECLARE_HANDLER( socialReqRemoveHandler );
    DECLARE_HANDLER( socialListHandler );
    DECLARE_HANDLER( linkshellListHandler );
    DECLARE_HANDLER( playTimeHandler );

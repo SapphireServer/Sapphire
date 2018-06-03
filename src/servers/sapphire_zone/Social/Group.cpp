@@ -69,7 +69,7 @@ Core::Network::Packets::GamePacketPtr Group::processInvite( uint64_t recipientId
    auto packet = GamePacketNew< Server::FFXIVIpcSocialRequestResponse, ServerZoneIpcType >( recipientId, senderId );
    packet.data().contentId = recipientContentId;
    packet.data().category = Common::SocialCategory::Friends;
-   packet.data().response = Common::SocialRequestResponse::Accept;
+   packet.data().execute = Common::SocialRequestExecute::Accept;
    //packet.data().
 
    if ( m_members.size() < m_maxCapacity )
@@ -182,16 +182,19 @@ void Group::sendPacketToMembers( Core::Network::Packets::GamePacketPtr pPacket, 
 }
 
 
-
 std::vector< uint64_t >& Group::getMembers()
 {
    return m_members;
 }
 
-
 uint32_t Group::getCapacity() const
 {
    return m_maxCapacity;
+}
+
+uint64_t Group::getId() const
+{
+   return m_id;
 }
 
 uint32_t Group::getTotalSize() const

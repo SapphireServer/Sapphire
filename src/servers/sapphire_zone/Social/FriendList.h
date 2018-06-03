@@ -45,7 +45,7 @@ public:
 
    uint32_t addMember( uint64_t contentId, FriendEntryType friendEntryType );
 
-   uint32_t processInvite( uint64_t contentId, Common::SocialRequestAction );
+   uint32_t processInvite( uint64_t contentId, Core::Common::SocialRequestExecute execute );
 
    uint32_t removeMember( uint64_t contentId );
 

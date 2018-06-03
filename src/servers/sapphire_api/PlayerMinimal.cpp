@@ -301,9 +301,9 @@ namespace Core {
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       /// SET UP SOCIAL GROUPS
 
-      createFriendsListContainer( m_id );
+      createFriendsListContainer( m_contentId );
 
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       /// SETUP EQUIPMENT / STARTING GEAR
       auto classJobInfo = g_exdDataGen.get< Core::Data::ClassJob >( m_class );
       uint32_t weaponId = classJobInfo->itemStartingWeapon;
@@ -377,14 +377,14 @@ namespace Core {
       g_charaDb.directExecute( stmtCreateInv );
    }
 
-   void PlayerMinimal::createFriendsListContainer( uint32_t characterId ) const
+   void PlayerMinimal::createFriendsListContainer( uint64_t contentId ) const
    {
       // todo: check if size is a-ok
       std::vector< uint8_t > friendsList( 1600 );
       std::vector< uint8_t > inviteDateList( 1600 );
 
       auto stmtCreateFrnList = g_charaDb.getPreparedStatement( Db::CHARA_SOCIAL_FRIENDS_INS );
-      stmtCreateFrnList->setInt( 1, characterId );
+      stmtCreateFrnList->setInt64( 1, contentId );
       stmtCreateFrnList->setBinary( 2, friendsList );
       stmtCreateFrnList->setBinary( 3, inviteDateList );
 

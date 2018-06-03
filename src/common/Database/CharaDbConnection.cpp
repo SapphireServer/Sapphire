@@ -140,5 +140,5 @@ void Core::Db::CharaDbConnection::doPrepareStatements()
 
    // SOCIAL GROUPS
 
-   prepareStatement( CHARA_SOCIAL_FRIENDS_INS, "INSERT INTO charainfofriendlist ( CharacterId, CharacterIdList, InviteDataList, UPDATE_DATE ) VALUES ( ?, ?, ?, NOW() );", CONNECTION_SYNC ); // todo: maybe not sync
+   prepareStatement( CHARA_SOCIAL_FRIENDS_INS, "INSERT INTO charainfofriendlist ( ContentId, ContentIdList, InviteDataList, UPDATE_DATE ) VALUES ( ?, ?, ?, NOW() );", CONNECTION_SYNC ); // todo: maybe not sync
 }
