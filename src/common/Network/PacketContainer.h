@@ -16,14 +16,14 @@ class GamePacket;
 class PacketContainer
 {
 public:
-   PacketContainer( void );
-   ~PacketContainer( void );
+   PacketContainer();
+   ~PacketContainer();
 
    void addPacket( GamePacket pEntry );
 
    FFXIVARR_PACKET_HEADER m_ipcHdr;
 
-   std::vector<GamePacket> m_entryList;
+   std::vector< GamePacket > m_entryList;
 
    std::string toString();
 

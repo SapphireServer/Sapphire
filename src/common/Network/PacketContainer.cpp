@@ -7,14 +7,14 @@
 #include <chrono>
 
 
-Core::Network::Packets::PacketContainer::PacketContainer( void )
+Core::Network::Packets::PacketContainer::PacketContainer()
 {
    memset( &m_ipcHdr, 0, sizeof( FFXIVARR_PACKET_HEADER ) );
    m_ipcHdr.size = sizeof( FFXIVARR_PACKET_HEADER );
    m_ipcHdr.count = 0;
 }
 
-Core::Network::Packets::PacketContainer::~PacketContainer( void )
+Core::Network::Packets::PacketContainer::~PacketContainer()
 {
    m_entryList.clear();
 }

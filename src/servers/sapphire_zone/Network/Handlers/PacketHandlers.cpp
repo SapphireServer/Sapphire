@@ -48,9 +48,10 @@ using namespace Core::Network::Packets::Server;
 void Core::Network::GameConnection::fcInfoReqHandler( const Packets::GamePacket& inPacket,
                                                       Entity::Player& player )
 {
-   GamePacketPtr pPe( new GamePacket( 0xDD, 0x78, player.getId(), player.getId() ) );
-   pPe->setValAt< uint8_t >( 0x48, 0x01 );
-   queueOutPacket( pPe );
+   // TODO: use new packet struct for this
+   //GamePacketPtr pPe( new GamePacket( 0xDD, 0x78, player.getId(), player.getId() ) );
+   //pPe->setValAt< uint8_t >( 0x48, 0x01 );
+   //queueOutPacket( pPe );
 }
 
 void Core::Network::GameConnection::setSearchInfoHandler( const Packets::GamePacket& inPacket,
