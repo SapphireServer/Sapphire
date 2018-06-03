@@ -77,7 +77,7 @@ private:
 
       // df stuff
       // todo: actually do this properly
-      m_data.unknown70[4] = 1; // enable df
+//      m_data.unknown70[4] = 1; // enable df
 
       // enable all raids/guildhests/dungeons
       memset( m_data.unlockedDungeons, 0xFF, sizeof( m_data.unlockedDungeons ) );

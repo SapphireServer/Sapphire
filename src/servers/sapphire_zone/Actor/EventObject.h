@@ -10,10 +10,11 @@ namespace Entity
    class EventObject : public Actor
    {
    public:
-      EventObject( uint32_t actorId, uint32_t objectId, uint32_t gimmickId, uint8_t initialState, Common::FFXIVARR_POSITION3 pos,
-                   float rotation, const std::string& givenName = "none" );
+      EventObject( uint32_t actorId, uint32_t objectId, uint32_t gimmickId, uint8_t initialState,
+                   Common::FFXIVARR_POSITION3 pos, float rotation, const std::string& givenName = "none" );
 
-      using OnTalkEventHandler = std::function< void( Entity::Player&, Entity::EventObjectPtr, InstanceContentPtr, uint64_t ) >;
+      using OnTalkEventHandler = std::function< void( Entity::Player&, Entity::EventObjectPtr,
+                                                      InstanceContentPtr, uint64_t ) >;
 
       uint32_t getGimmickId() const;
       void setGimmickId( uint32_t gimmickId );

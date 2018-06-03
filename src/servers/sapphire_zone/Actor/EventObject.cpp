@@ -6,9 +6,7 @@
 #include <Logging/Logger.h>
 #include <Network/GamePacket.h>
 #include <Network/GamePacketNew.h>
-#include <Network/CommonNetwork.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
-#include <Network/PacketContainer.h>
 #include <Util/UtilMath.h>
 
 using namespace Core::Common;
