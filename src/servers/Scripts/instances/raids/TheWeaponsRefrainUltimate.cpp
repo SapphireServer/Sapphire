@@ -28,8 +28,7 @@ public:
 
    }
 
-   void onEnterTerritory( boost::shared_ptr <Core::InstanceContent> instance, Core::Entity::Player& player,
-                             unsigned int eventId, unsigned short param1, unsigned short param2 ) override
+   void onEnterTerritory( InstanceContentPtr instance, Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 ) override
    {
 
    }
