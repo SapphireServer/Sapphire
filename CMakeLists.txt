@@ -28,7 +28,7 @@ set( LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/libraries" )
 ##########################################################################
 # Dependencies and compiler settings
 include( "cmake/boost.cmake" )
-include( "cmake/mysql.cmake" )
+#include( "cmake/mysql.cmake" )
 include( "cmake/compiler.cmake" )
 include( "cmake/cotire.cmake" )
 ##############################
@@ -41,16 +41,15 @@ configure_file( "${CMAKE_CURRENT_SOURCE_DIR}/src/common/Version.cpp.in"
                 "${CMAKE_CURRENT_SOURCE_DIR}/src/common/Version.cpp" @ONLY )
 
 ##########################################################################
-add_subdirectory( "src/libraries/sapphire/datReader" )
-add_subdirectory( "src/libraries/sapphire/mysqlConnector" )
+#add_subdirectory( "src/libraries/sapphire/datReader" )
+#add_subdirectory( "src/libraries/sapphire/mysqlConnector" )
 add_subdirectory( "src/common" )
+#add_subdirectory( "src/servers" )
 
-add_subdirectory( "src/servers" )
-
-add_subdirectory( "src/tools/exd_common_gen" )
-add_subdirectory( "src/tools/exd_struct_gen" )
-add_subdirectory( "src/tools/exd_struct_test" )
-add_subdirectory( "src/tools/quest_parser" )
-add_subdirectory( "src/tools/discovery_parser" )
+#add_subdirectory( "src/tools/exd_common_gen" )
+#add_subdirectory( "src/tools/exd_struct_gen" )
+#add_subdirectory( "src/tools/exd_struct_test" )
+#add_subdirectory( "src/tools/quest_parser" )
+#add_subdirectory( "src/tools/discovery_parser" )
 #add_subdirectory("src/tools/pcb_reader")
 #add_subdirectory("src/tools/event_object_parser")

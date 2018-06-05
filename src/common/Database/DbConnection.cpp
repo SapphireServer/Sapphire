@@ -55,8 +55,8 @@ uint32_t Core::Db::DbConnection::open()
 {
    boost::shared_ptr< Mysql::MySqlBase > base( new Mysql::MySqlBase() );
    Mysql::optionMap options;
-   options[ MYSQL_OPT_RECONNECT ] = "1";
-   options[ MYSQL_SET_CHARSET_NAME ] = "utf8";
+   //options[ MYSQL_OPT_RECONNECT ] = "1";
+   //options[ MYSQL_SET_CHARSET_NAME ] = "utf8";
 
    try
    {

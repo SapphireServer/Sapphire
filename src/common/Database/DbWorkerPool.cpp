@@ -134,10 +134,7 @@ void Core::Db::DbWorkerPool< T >::escapeString( std::string& str )
    if( str.empty() )
       return;
 
-   char* buf = new char[str.size() * 2 + 1];
-   escapeString( buf, str.c_str(), str.size() );
-   str = buf;
-   delete[] buf;
+   str = m_connections[IDX_SYNCH].front()->getConnection()->escapeString( str );
 }
 
 template< class T >
@@ -187,15 +184,7 @@ uint32_t Core::Db::DbWorkerPool< T >::openConnections( InternalIndex type, uint8
    return 0;
 }
 
-template< class T >
-unsigned long Core::Db::DbWorkerPool< T >::escapeString( char *to, const char *from, unsigned long length )
-{
-   if( !to || !from || !length )
-      return 0;
 
-   return mysql_real_escape_string(
-           m_connections[IDX_SYNCH].front()->getConnection()->getRawCon(), to, from, length );
-}
 
 template< class T >
 void Core::Db::DbWorkerPool< T >::enqueue( boost::shared_ptr< Operation > op )

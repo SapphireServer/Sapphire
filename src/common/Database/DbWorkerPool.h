@@ -68,8 +68,6 @@ public:
 private:
    uint32_t openConnections( InternalIndex type, uint8_t numConnections );
 
-   unsigned long escapeString( char *to, const char *from, unsigned long length );
-
    void enqueue( boost::shared_ptr< Operation > op );
 
    boost::shared_ptr< T > getFreeConnection();

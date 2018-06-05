@@ -1,5 +1,4 @@
 #include "DbLoader.h"
-#include <mysqld_error.h>
 #include "CharaDbConnection.h"
 #include "DbWorkerPool.h"
 #include "Logging/Logger.h"
@@ -32,7 +31,7 @@ Core::Db::DbLoader& Core::Db::DbLoader::addDb( Core::Db::DbWorkerPool< T >& pool
                  if( uint32_t error = pool.open() )
                  {
                     // Database does not exist
-                    if( error == ER_BAD_DB_ERROR )
+                    if( error == 1049 /* BAD_DB_ERROR */ )
                     {
                         return false;
                     }
