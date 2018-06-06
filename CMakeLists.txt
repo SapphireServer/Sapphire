@@ -27,7 +27,7 @@ set( LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/libraries" )
 
 ##########################################################################
 # Dependencies and compiler settings
-include( "cmake/boost.cmake" )
+#include( "cmake/boost.cmake" )
 #include( "cmake/mysql.cmake" )
 include( "cmake/compiler.cmake" )
 include( "cmake/cotire.cmake" )

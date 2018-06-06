@@ -9,6 +9,12 @@ set( MYSQLCONNECTOR_ROOT ${CMAKE_BINARY_DIR}/external/MysqlConnector )
 set( MYSQLCONNECTOR_LIB_DIR ${MYSQLCONNECTOR_ROOT}/bin/lib )
 set( MYSQLCONNECTOR_INCLUDE_DIR ${MYSQLCONNECTOR_ROOT}/bin/include )
 
+if( UNIX )
+  set( BUILD_EXEC make )
+else()
+  set( BUILD_EXEC nmake )
+endif()
+
 ExternalProject_Add( mysqlConnector_external
         PREFIX ${MYSQLCONNECTOR_ROOT}
         GIT_REPOSITORY "https://github.com/SapphireMordred/MysqlConnector.git"
@@ -17,7 +23,7 @@ ExternalProject_Add( mysqlConnector_external
         BINARY_DIR ${MYSQLCONNECTOR_ROOT}/src/MysqlConnector
         SOURCE_DIR ${MYSQLCONNECTOR_ROOT}/src/MysqlConnector
         INSTALL_DIR ${MYSQLCONNECTOR_ROOT}/bin
-        BUILD_COMMAND nmake )
+        BUILD_COMMAND ${BUILD_EXEC} )
 
 add_library( mysqlConnector STATIC IMPORTED )
 set_target_properties( mysqlConnector PROPERTIES IMPORTED_LOCATION ${MYSQLCONNECTOR_LIB_DIR}/mysqlConnector.a )
@@ -37,7 +43,7 @@ ExternalProject_Add( xivdat_external
         BINARY_DIR ${XIVDAT_ROOT}/src/XivDat
         SOURCE_DIR ${XIVDAT_ROOT}/src/XivDat
         INSTALL_DIR ${XIVDAT_ROOT}/bin
-        BUILD_COMMAND nmake )
+        BUILD_COMMAND ${BUILD_EXEC} )
 
 add_library( xivdat STATIC IMPORTED )
 set_target_properties( xivdat PROPERTIES IMPORTED_LOCATION ${XIVDAT_LIB_DIR}/xivdat.a )
