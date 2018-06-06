@@ -22,33 +22,33 @@
 #include <thread>
 
 
-Core::ServerZone::ServerZone( const std::string& configPath ) :
+Core::ZoneServer::ZoneServer( const std::string& configPath ) :
   m_configPath( configPath ),
   m_bRunning( true ),
   m_lastDBPingTime( 0 )
 {
 }
 
-Core::ServerZone::~ServerZone()
+Core::ZoneServer::~ZoneServer()
 {
 }
 
-bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
+bool Core::ZoneServer::loadSettings( int32_t argc, char* argv[] )
 {
   return true;
 }
 
-void Core::ServerZone::run( int32_t argc, char* argv[] )
+void Core::ZoneServer::run( int32_t argc, char* argv[] )
 {
 
 
 }
 
-void Core::ServerZone::printBanner() const
+void Core::ZoneServer::printBanner() const
 {
 }
 
-void Core::ServerZone::mainLoop()
+void Core::ZoneServer::mainLoop()
 {
   while( isRunning() )
   {

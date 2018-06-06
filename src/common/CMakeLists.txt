@@ -11,8 +11,12 @@ set( MYSQLCONNECTOR_INCLUDE_DIR ${MYSQLCONNECTOR_ROOT}/bin/include )
 
 if( UNIX )
   set( BUILD_EXEC make )
+  set( MYSQLCONNECTOR_LIB_NAME libmysqlConnector.a )
+  set( XIVDAT_LIB_NAME libxivdat.a )
 else()
+  set( MYSQLCONNECTOR_LIB_NAME mysqlConnector.lib )
   set( BUILD_EXEC nmake )
+  set( XIVDAT_LIB_NAME xivdat.lib )
 endif()
 
 ExternalProject_Add( mysqlConnector_external
@@ -28,7 +32,8 @@ ExternalProject_Add( mysqlConnector_external
 message( ${MYSQLCONNECTOR_ROOT}/src/MysqlConnector/src/ )
 
 add_library( mysqlConnector STATIC IMPORTED )
-set_target_properties( mysqlConnector PROPERTIES IMPORTED_LOCATION ${MYSQLCONNECTOR_ROOT}/src/MysqlConnector/src/libmysqlConnector.a )
+set_target_properties( mysqlConnector PROPERTIES IMPORTED_LOCATION
+                       ${MYSQLCONNECTOR_ROOT}/src/MysqlConnector/src/${MYSQLCONNECTOR_LIB_NAME} )
 add_dependencies( mysqlConnector mysqlConnector_external )
 
 #############################################################################
@@ -48,7 +53,8 @@ ExternalProject_Add( xivdat_external
         BUILD_COMMAND ${BUILD_EXEC} )
 
 add_library( xivdat STATIC IMPORTED )
-set_target_properties( xivdat PROPERTIES IMPORTED_LOCATION ${XIVDAT_ROOT}/src/XivDat/src/libxivdat.a )
+set_target_properties( xivdat PROPERTIES IMPORTED_LOCATION
+                       ${XIVDAT_ROOT}/src/XivDat/src/${XIVDAT_LIB_NAME} )
 add_dependencies( xivdat xivdat_external )
 
 #############################################################################
@@ -70,12 +76,13 @@ set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib )
 
 add_library( common ${UTILS_PUBLIC_INCLUDE_FILES} ${UTILS_SOURCE_FILES} )
 
-target_link_libraries( common PUBLIC xivdat )
+target_link_libraries( common PUBLIC xivdat  )
 target_link_libraries( common PUBLIC mysqlConnector )
 
 target_include_directories( common PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/"
                                           "${MYSQLCONNECTOR_ROOT}/src/MysqlConnector/src/"
-                                          "${XIVDAT_ROOT}/src/XivDat/src/" )
+                                          "${XIVDAT_ROOT}/src/XivDat/src/"
+                                          "${Boost_INCLUDE_DIR}" )
 
 target_include_directories( common PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/libraries/external/")
 

@@ -9,11 +9,11 @@
 
 namespace Core {
 
-  class ServerZone
+  class ZoneServer
   {
   public:
-    ServerZone( const std::string& configPath );
-    ~ServerZone();
+    ZoneServer( const std::string& configPath );
+    ~ZoneServer();
 
     void run( int32_t argc, char* argv[] );
 
