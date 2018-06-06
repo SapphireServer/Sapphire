@@ -18,7 +18,7 @@ endif()
 ExternalProject_Add( mysqlConnector_external
         PREFIX ${MYSQLCONNECTOR_ROOT}
         GIT_REPOSITORY "https://github.com/SapphireMordred/MysqlConnector.git"
-        UPDATE_COMMAND ""
+        UPDATE_COMMAND ${GIT_EXECUTABLE} pull
         PATCH_COMMAND ""
         BINARY_DIR ${MYSQLCONNECTOR_ROOT}/src/MysqlConnector
         SOURCE_DIR ${MYSQLCONNECTOR_ROOT}/src/MysqlConnector
@@ -38,7 +38,7 @@ set( XIVDAT_INCLUDE_DIR ${XIVDAT_ROOT}/bin/include )
 ExternalProject_Add( xivdat_external
         PREFIX ${XIVDAT_ROOT}
         GIT_REPOSITORY "https://github.com/SapphireMordred/XivDat.git"
-        UPDATE_COMMAND ""
+        UPDATE_COMMAND ${GIT_EXECUTABLE} pull
         PATCH_COMMAND ""
         BINARY_DIR ${XIVDAT_ROOT}/src/XivDat
         SOURCE_DIR ${XIVDAT_ROOT}/src/XivDat
