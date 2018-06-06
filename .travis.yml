@@ -14,8 +14,8 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - gcc-7
-            - g++-7
+            - gcc-7-multilib
+            - g++-7-multilib
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
 
