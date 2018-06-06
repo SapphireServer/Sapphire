@@ -25,8 +25,10 @@ ExternalProject_Add( mysqlConnector_external
         INSTALL_DIR ${MYSQLCONNECTOR_ROOT}/bin
         BUILD_COMMAND ${BUILD_EXEC} )
 
+message( ${MYSQLCONNECTOR_ROOT}/src/MysqlConnector/src/ )
+
 add_library( mysqlConnector STATIC IMPORTED )
-set_target_properties( mysqlConnector PROPERTIES IMPORTED_LOCATION ${MYSQLCONNECTOR_LIB_DIR}/mysqlConnector.a )
+set_target_properties( mysqlConnector PROPERTIES IMPORTED_LOCATION ${MYSQLCONNECTOR_ROOT}/src/MysqlConnector/src/libmysqlConnector.a )
 add_dependencies( mysqlConnector mysqlConnector_external )
 
 #############################################################################
@@ -46,7 +48,7 @@ ExternalProject_Add( xivdat_external
         BUILD_COMMAND ${BUILD_EXEC} )
 
 add_library( xivdat STATIC IMPORTED )
-set_target_properties( xivdat PROPERTIES IMPORTED_LOCATION ${XIVDAT_LIB_DIR}/xivdat.a )
+set_target_properties( xivdat PROPERTIES IMPORTED_LOCATION ${XIVDAT_ROOT}/src/XivDat/src/libxivdat.a )
 add_dependencies( xivdat xivdat_external )
 
 #############################################################################

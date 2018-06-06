@@ -44,7 +44,7 @@ configure_file( "${CMAKE_CURRENT_SOURCE_DIR}/src/common/Version.cpp.in"
 #add_subdirectory( "src/libraries/sapphire/datReader" )
 #add_subdirectory( "src/libraries/sapphire/mysqlConnector" )
 add_subdirectory( "src/common" )
-#add_subdirectory( "src/servers" )
+add_subdirectory( "src/sapphire_zone" )
 
 #add_subdirectory( "src/tools/exd_common_gen" )
 #add_subdirectory( "src/tools/exd_struct_gen" )
