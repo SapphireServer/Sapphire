@@ -47,11 +47,11 @@ class SubFst039 : public EventScript
    {
       auto actor = Event::mapEventActorToRealActor( actorId );
 
-      if( actor == SubFst039::Actor0 && !player.hasQuest( getId() ) )
+      if( actor == Actor0 && !player.hasQuest( getId() ) )
       {
          Scene00000( player );
       }
-      if( actor == SubFst039::Actor0 && player.getQuestSeq( getId() ) == 255 )
+      if( actor == Actor0 )
       {
          Scene00001( player );
       }
@@ -92,7 +92,7 @@ class SubFst039 : public EventScript
       player.playScene( getId(), 1, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            if( player.getQuestUI8AL( getId() ) == 1 )
+            if( result.param2 == 1 )
             {
                if( player.giveQuestRewards( getId(), 0 ) )
                {

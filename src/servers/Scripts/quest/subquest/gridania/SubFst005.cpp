@@ -59,7 +59,10 @@ class SubFst005 : public EventScript
       player.playScene( getId(), 0, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
       {
-         player.updateQuest( getId(), 255 );
+         if( result.param2 == 1 )
+         {
+            player.updateQuest( getId(), 255 );
+         }
       } );
    }
 
@@ -71,7 +74,7 @@ class SubFst005 : public EventScript
          if( result.param2 == 1 )
          {
             if( player.giveQuestRewards( getId(), 0 ) )
-               player.finishQuest( getId());
+               player.finishQuest( getId() );
          }
       } );
    }
