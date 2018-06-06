@@ -67,7 +67,7 @@
       "variables": [
         {
           "name": "Boost_COMPILER",
-          "value": "-vc141"
+          "value": "-vc140"
         }
       ]
     },
@@ -81,7 +81,7 @@
       "variables": [
         {
           "name": "Boost_COMPILER",
-          "value": "-vc141"
+          "value": "-vc140"
         }
       ]
     },
@@ -95,7 +95,7 @@
       "variables": [
         {
           "name": "Boost_COMPILER",
-          "value": "-vc141"
+          "value": "-vc140"
         }
       ]
     },
@@ -109,7 +109,7 @@
       "variables": [
         {
           "name": "Boost_COMPILER",
-          "value": "-vc141"
+          "value": "-vc140"
         }
       ]
     }
