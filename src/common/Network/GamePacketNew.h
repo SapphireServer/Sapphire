@@ -20,7 +20,7 @@ template < typename T, typename T1 >
 class GamePacketNew;
 
 template < typename T, typename T1 >
-std::ostream& operator<< ( std::ostream& os, const GamePacketNew< T, T1 >& packet );
+std::ostream& operator << ( std::ostream& os, const GamePacketNew< T, T1 >& packet );
 
 template< class T >
 using ZoneChannelPacket = GamePacketNew< T, ServerZoneIpcType >;
@@ -32,15 +32,15 @@ using ChatChannelPacket = GamePacketNew< T, ServerChatIpcType >;
 * The base implementation of a game packet. Needed for parsing packets.
 */
 template < typename T1 >
-class FFXIVPacketBase
+class FFXIVIpcPacketBase
 {
 public:
-   virtual ~FFXIVPacketBase() = default;
+   virtual ~FFXIVIpcPacketBase() = default;
    /**
    * @brief Gets the IPC type of this packet. (Useful for determining the
    * type of a parsed packet.)
    */
-   virtual T1 ipcType( void ) = 0;
+   virtual T1 ipcType() = 0;
 };
 
 /**
@@ -50,7 +50,7 @@ public:
 * 32 byte header information.)
 */
 template < typename T, typename T1 >
-class GamePacketNew : public FFXIVPacketBase< T1 >
+class GamePacketNew : public FFXIVIpcPacketBase< T1 >
 {
 public:
    /**
@@ -96,7 +96,7 @@ protected:
    };
 
 public:
-   virtual T1 ipcType( void )
+   virtual T1 ipcType()
    {
       return static_cast< T1 >( m_data._ServerIpcType );
    };

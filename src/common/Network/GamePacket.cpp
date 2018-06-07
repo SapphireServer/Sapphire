@@ -7,16 +7,17 @@
 #include <boost/format.hpp>
 #include "Util/Util.h"
 
-Core::Network::Packets::GamePacket::GamePacket( uint16_t subType, uint16_t size, uint32_t id1, uint32_t id2, uint16_t type )
+Core::Network::Packets::GamePacket::GamePacket( uint16_t subType, uint16_t size,
+                                                uint32_t id1, uint32_t id2, uint16_t type )
 {
-   m_dataBuf = std::vector<uint8_t>( size );
+   m_dataBuf = std::vector< uint8_t >( size );
    memset( &m_segHdr, 0, sizeof( m_segHdr ) );
 
    setHeader( size, type, id1, id2, subType, 0x00 );
-
 }
 
-void Core::Network::Packets::GamePacket::setHeader( uint16_t size, uint16_t type, uint32_t id1, uint32_t id2, uint16_t subType, uint32_t unknown )
+void Core::Network::Packets::GamePacket::setHeader( uint16_t size, uint16_t type, uint32_t id1,
+                                                    uint32_t id2, uint16_t subType, uint32_t unknown )
 {
 
    m_segHdr.size = size;
@@ -40,7 +41,7 @@ void Core::Network::Packets::GamePacket::setHeader( uint16_t size, uint16_t type
 Core::Network::Packets::GamePacket::GamePacket( char * pData, uint16_t size, bool bWriteStamp )
 {
 
-   m_dataBuf = std::vector<uint8_t>( size );
+   m_dataBuf = std::vector< uint8_t >( size );
    memcpy( &m_dataBuf[0], pData, size );
    m_unknown2 = 0;
 
@@ -65,9 +66,12 @@ Core::Network::Packets::GamePacket::GamePacket( const Packets::FFXIVARR_PACKET_R
 {
 
    m_segHdr = packetData.segHdr;
-   m_dataBuf = std::vector<uint8_t>( m_segHdr.size );
+   m_dataBuf = std::vector< uint8_t >( m_segHdr.size );
 
-   memcpy( &m_dataBuf[0] + sizeof( Packets::FFXIVARR_PACKET_SEGMENT_HEADER ), &packetData.data[0], m_segHdr.size - sizeof( Packets::FFXIVARR_PACKET_SEGMENT_HEADER ) );
+   memcpy( &m_dataBuf[0] + sizeof( Packets::FFXIVARR_PACKET_SEGMENT_HEADER ),
+           &packetData.data[0],
+           m_segHdr.size - sizeof( Packets::FFXIVARR_PACKET_SEGMENT_HEADER ) );
+
    memcpy( &m_dataBuf[0], &m_segHdr, sizeof( Packets::FFXIVARR_PACKET_SEGMENT_HEADER ) );
 
    m_subType = *reinterpret_cast< uint16_t* >( &m_dataBuf[0] + 0x12 );
@@ -98,5 +102,5 @@ void Core::Network::Packets::GamePacket::savePacket()
 
 std::string Core::Network::Packets::GamePacket::toString() const
 {
-   return Core::Util::binaryToHexDump( const_cast<uint8_t *>( &m_dataBuf[0] ), getSize() );
+   return Core::Util::binaryToHexDump( const_cast< uint8_t* >( &m_dataBuf[0] ), getSize() );
 }
