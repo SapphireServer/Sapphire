@@ -17,25 +17,7 @@ Sapphire requires the following software:
 | Boost 1.63.0 | [Win32 precompiled binaries](https://sourceforge.net/projects/boost/files/boost-binaries/1.63.0/boost_1_63_0-msvc-14.0-32.exe/download) | Boost libraries from your distribution's package manager |
 | MySQL Server 5.7 | [Official Site](https://dev.mysql.com/downloads/mysql/) | MySQL server from your distribution's package manager |
 
-**Windows**
-Set the environment variables ``BOOST_ROOT_DIR`` and ``BOOST_LIB_DIR`` to ``[boost main folder]`` and ``[boost main folder]/lib32-msvc-14.0`` respectively **or** copy your boost installation into the project's ``src/lib`` folder.
-
-Visual Studio 2017 users: open `Visual Studio Installer` and ensure `Individual Components > SDKs, libraries, and frameworks > Windows Universal C Runtime` is installed. You may also need to install `Individual Components > Compilers, build tools, and runtimes > VC++ 2015.3 v140 toolset for desktop (x86, 64)`.
-
-To enable [Edit and Continue](https://msdn.microsoft.com/en-us/library/esaeyddf.aspx) ensure you define `-DCMAKE_BUILD_TYPE="Debug"` when generating with CMake.
-
-If you installed CMake outside of Visual Studio and have it in your `PATH` environment variable, navigate to Sapphire folder and `cmake -DCMAKE_BUILD_TYPE="Debug" && cmake --build .`.
-
-Otherwise:
-* In *Visual Studio 2017*: Open the project via ``File`` > ``Open`` > ``Folder`` and wait, till CMake automatically finishes cache generation. Right click any CMakeLists.txt and select build to build a application. 
-To configure debug startup parameters, select ``Debug and Launch settings``, the application you want to set up parameters for, and add a ``args`` json array containing your launch parameters in ``configurations``.
-If Visual Studio fails to generate a CMake Cache or does not show options to build, make sure that the newest version of it is installed and all environment variables are set correctly. Keep in mind that generating a cache can take a while on some machines.
-
-The solution `Sapphire.sln` is also generated in the main Sapphire folder.
-
-**Linux**
-`cmake . -DSAPPHIRE_BOOST_VER="your.boost.ver" && make -j JOBS` where `JOBS` is number of cores on your system.  
-`-j JOBS` can be omitted if your system lacks resources (spoiler: your system probably lacks resources if running on 1GB RAM or lower, or if the build fails due to being out of memory)
+Please check the [wiki](https://github.com/SapphireMordred/Sapphire/wiki) for detailed installation/build instructions for your OS.
 
 ## Links
 
