@@ -54,13 +54,13 @@ bool Core::ConfigMgr::copyDefaultConfig( const std::string& configName )
    boost::filesystem::path configPath( m_configFolderRoot );
    configPath /= configName;
 
-   if( !boost::filesystem::exists( configPath.c_str() + m_configDefaultSuffix ) )
+   if( !boost::filesystem::exists( configPath.string() + m_configDefaultSuffix ) )
    {
       // no default file :(
       return false;
    }
 
-   boost::filesystem::copy_file( configPath.c_str() + m_configDefaultSuffix, configPath );
+   boost::filesystem::copy_file( configPath.string() + m_configDefaultSuffix, configPath );
 
    return true;
 }
