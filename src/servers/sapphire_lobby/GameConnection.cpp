@@ -10,6 +10,7 @@
 #include <Network/GamePacketParser.h>
 #include <Crypt/md5.h>
 #include <Crypt/blowfish.h>
+#include <Config/ConfigMgr.h>
 
 #include <boost/property_tree/json_parser.hpp>
 
@@ -129,10 +130,10 @@ void Core::Network::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet, ui
    serverListPacket.data().seq = 1;
    serverListPacket.data().offset = 0;
    serverListPacket.data().numServers = 1;
-   serverListPacket.data().server[0].id = g_serverLobby.getConfig()->getValue<uint16_t>( "Settings.Parameters.WorldID", 1 );
+   serverListPacket.data().server[0].id = g_serverLobby.getConfig()->getValue<uint16_t>( "Lobby.WorldID", 1 );
    serverListPacket.data().server[0].index = 0;
    serverListPacket.data().final = 1;
-   strcpy( serverListPacket.data().server[0].name, g_serverLobby.getConfig()->getValue< std::string >( "Settings.Parameters.WorldName", "Sapphire" ).c_str() );
+   strcpy( serverListPacket.data().server[0].name, g_serverLobby.getConfig()->getValue< std::string >( "Lobby.WorldName", "Sapphire" ).c_str() );
 
    pRP.addPacket( serverListPacket );
 
@@ -166,11 +167,11 @@ void Core::Network::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet, ui
             auto& charEntry = charList[charIndex];
             details.uniqueId = get< 1 >( charEntry );
             details.contentId = get< 2 >( charEntry );
-            details.serverId = g_serverLobby.getConfig()->getValue<uint16_t>( "Settings.Parameters.WorldID", 1 );
+            details.serverId = g_serverLobby.getConfig()->getValue<uint16_t>( "Lobby.WorldID", 1 );
             details.index = charIndex;
             strcpy( details.charDetailJson, get< 3 >( charEntry ).c_str() );
             strcpy( details.nameChara, get< 0 >( charEntry ).c_str() );
-            strcpy( details.nameServer, g_serverLobby.getConfig()->getValue< std::string >( "Settings.Parameters.WorldName", "Sapphire" ).c_str() );
+            strcpy( details.nameServer, g_serverLobby.getConfig()->getValue< std::string >( "Lobby.WorldName", "Sapphire" ).c_str() );
 
             charListPacket.data().charaDetails[j] = details;
 
@@ -238,8 +239,8 @@ void Core::Network::GameConnection::enterWorld( FFXIVARR_PACKET_RAW& packet, uin
    enterWorldPacket.data().contentId = lookupId;
 
    enterWorldPacket.data().seq = sequence;
-   strcpy( enterWorldPacket.data().host, g_serverLobby.getConfig()->getValue< std::string >( "Settings.General.ZoneIp" ).c_str() );
-   enterWorldPacket.data().port = g_serverLobby.getConfig()->getValue< uint16_t >( "Settings.General.ZonePort" );
+   strcpy( enterWorldPacket.data().host, g_serverLobby.getConfig()->getValue< std::string >( "GlobalNetwork.ZoneHost" ).c_str() );
+   enterWorldPacket.data().port = g_serverLobby.getConfig()->getValue< uint16_t >( "GlobalNetwork.ZonePort" );
    enterWorldPacket.data().charId = logInCharId;
    memcpy( enterWorldPacket.data().sid, m_pSession->getSessionId(), 66 );
 
@@ -251,7 +252,7 @@ bool Core::Network::GameConnection::sendServiceAccountList( FFXIVARR_PACKET_RAW&
 {
    LobbySessionPtr pSession = g_serverLobby.getSession( ( char* )&packet.data[0] + 0x20 );
    
-   if( g_serverLobby.getConfig()->getValue< bool >( "Settings.Parameters.AllowNoSessionConnect" ) && pSession == nullptr )
+   if( g_serverLobby.getConfig()->getValue< bool >( "Lobby.AllowNoSessionConnect" ) && pSession == nullptr )
    {
       auto session = make_LobbySession();
       session->setAccountID( 0 );
@@ -319,7 +320,7 @@ bool Core::Network::GameConnection::createOrModifyChar( FFXIVARR_PACKET_RAW& pac
 
       charCreatePacket.data().content_id = newContentId;
       strcpy( charCreatePacket.data().name, name.c_str() );
-      strcpy( charCreatePacket.data().world, g_serverLobby.getConfig()->getValue< std::string >( "Settings.Parameters.WorldName", "Sapphire" ).c_str() );
+      strcpy( charCreatePacket.data().world, g_serverLobby.getConfig()->getValue< std::string >( "Lobby.WorldName", "Sapphire" ).c_str() );
       charCreatePacket.data().type = 1;
       charCreatePacket.data().seq = sequence;
       charCreatePacket.data().unknown = 1;
@@ -343,7 +344,7 @@ bool Core::Network::GameConnection::createOrModifyChar( FFXIVARR_PACKET_RAW& pac
 
          charCreatePacket.data().content_id = newContentId;
          strcpy( charCreatePacket.data().name, name.c_str() );
-         strcpy( charCreatePacket.data().world, g_serverLobby.getConfig()->getValue< std::string >( "Settings.Parameters.WorldName", "Sapphire" ).c_str() );
+         strcpy( charCreatePacket.data().world, g_serverLobby.getConfig()->getValue< std::string >( "Lobby.WorldName", "Sapphire" ).c_str() );
          charCreatePacket.data().type = 2;
          charCreatePacket.data().seq = sequence;
          charCreatePacket.data().unknown = 1;
@@ -374,7 +375,7 @@ bool Core::Network::GameConnection::createOrModifyChar( FFXIVARR_PACKET_RAW& pac
          //charCreatePacket.data().content_id = deletePlayer.getContentId();
          charCreatePacket.data().content_id = 0;
          strcpy( charCreatePacket.data().name, name.c_str() );
-         strcpy( charCreatePacket.data().world, g_serverLobby.getConfig()->getValue< std::string >( "Settings.Parameters.WorldName", "Sapphire" ).c_str() );
+         strcpy( charCreatePacket.data().world, g_serverLobby.getConfig()->getValue< std::string >( "Lobby.WorldName", "Sapphire" ).c_str() );
          charCreatePacket.data().type = 4;
          charCreatePacket.data().seq = sequence;
          charCreatePacket.data().unknown = 1;

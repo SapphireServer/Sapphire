@@ -6,9 +6,9 @@
 namespace Core 
 {
 
-   class XMLConfig;
+   class ConfigMgr;
 
-   typedef boost::shared_ptr<XMLConfig> XMLConfigPtr;
+   typedef boost::shared_ptr<ConfigMgr> ConfigMgrPtr;
 
 
    namespace Network 

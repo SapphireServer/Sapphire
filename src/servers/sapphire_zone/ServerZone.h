@@ -14,7 +14,7 @@ namespace Core {
    class ServerZone
    {
    public:
-      ServerZone( const std::string& configPath );
+      ServerZone( const std::string& configName );
       ~ServerZone();
 
       void run( int32_t argc, char* argv[] );
@@ -44,7 +44,7 @@ namespace Core {
 
       bool m_bRunning;
 
-      std::string m_configPath;
+      std::string m_configName;
 
       std::mutex m_sessionMutex;
 

@@ -6,7 +6,7 @@
 
 #include <Logging/Logger.h>
 #include <Exd/ExdDataGenerated.h>
-#include <Config/XMLConfig.h>
+#include <Config/ConfigMgr.h>
 
 #include "watchdog/Watchdog.h"
 
@@ -51,10 +51,10 @@ void Core::Scripting::ScriptMgr::update()
 bool Core::Scripting::ScriptMgr::init()
 {
    std::set< std::string > files;
-   auto pConfig = g_fw.get< XMLConfig >();
+   auto pConfig = g_fw.get< ConfigMgr >();
    auto pLog = g_fw.get< Logger >();
 
-   auto status = loadDir( pConfig->getValue< std::string >( "Settings.General.Scripts.Path", "./compiledscripts/" ),
+   auto status = loadDir( pConfig->getValue< std::string >( "Scripts.Path", "./compiledscripts/" ),
             files, m_nativeScriptMgr->getModuleExtension() );
 
    if( !status )
@@ -85,12 +85,12 @@ bool Core::Scripting::ScriptMgr::init()
 
 void Core::Scripting::ScriptMgr::watchDirectories()
 {
-   auto pConfig = g_fw.get< XMLConfig >();
-   auto shouldWatch = pConfig->getValue< bool >( "Settings.General.Scripts.HotSwap.Enabled", true );
+   auto pConfig = g_fw.get< ConfigMgr >();
+   auto shouldWatch = pConfig->getValue< bool >( "Scripts.HotSwap", true );
    if( !shouldWatch )
       return;
 
-   Watchdog::watchMany( pConfig->getValue< std::string >( "Settings.General.Scripts.Path", "./compiledscripts/" ) + "*" + m_nativeScriptMgr->getModuleExtension(),
+   Watchdog::watchMany( pConfig->getValue< std::string >( "Scripts.Path", "./compiledscripts/" ) + "*" + m_nativeScriptMgr->getModuleExtension(),
    [ this ]( const std::vector< ci::fs::path >& paths )
    {
       if( !m_firstScriptChangeNotificiation )
