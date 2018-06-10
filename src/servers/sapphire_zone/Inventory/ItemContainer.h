@@ -5,7 +5,7 @@
 
 #include <Common.h>
 
-#include "../Forwards.h"
+#include "Forwards.h"
 
 namespace Core
 {

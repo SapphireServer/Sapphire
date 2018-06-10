@@ -1,11 +1,10 @@
 #include "Actor.h"
 
 #include <Network/PacketContainer.h>
-#include <Network/GamePacket.h>
+
 #include <Util/Util.h>
 #include <Util/UtilMath.h>
 
-#include "Forwards.h"
 #include "Action/Action.h"
 #include "Action/ActionCollision.h"
 
@@ -19,19 +18,12 @@
 
 #include "ServerZone.h"
 #include "Session.h"
-#include "Zone/Zone.h"
-
 
 #include "Zone/TerritoryMgr.h"
 
 #include "StatusEffect/StatusEffect.h"
 
 #include "Math/CalcBattle.h"
-
-#include "ServerZone.h"
-#include "Session.h"
-#include "Actor.h"
-#include "Player.h"
 
 #include "Framework.h"
 

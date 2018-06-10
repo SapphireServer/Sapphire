@@ -1,6 +1,3 @@
-/**
-* Structural definitions common to all FFXIV:ARR packets.
-*/
 #ifndef _CORE_NETWORK_PACKETS_COMMON_H
 #define _CORE_NETWORK_PACKETS_COMMON_H
 
@@ -25,7 +22,7 @@ namespace Packets {
 *
 * std::stringstream buf;
 * buf << pkt_hdr;
-* for (int i = 0; i < n; i++)
+* for( int i = 0; i < n; i++ )
 * {
 *     buf << pkt_seg_hdr[i];
 *     buf << {pkt_seg_data[i]};
@@ -46,6 +43,8 @@ namespace Packets {
 *
 * 0               4               8              12      14      16
 * +-------------------------------+---------------+-------+-------+
+* | unknown_0                     | unknown_8                     |
+* +-------------------------------+---------------+-------+-------+
 * | timestamp                     | size          | cType | count |
 * +---+---+-------+---------------+---------------+-------+-------+
 * | ? |CMP|   ?   | ?             |
@@ -54,13 +53,10 @@ namespace Packets {
 */
 struct FFXIVARR_PACKET_HEADER
 {
-
+   /** Unknown data, no actual use has been determined */
    uint64_t unknown_0;
    uint64_t unknown_8;
-   /**
-   * Represents the number of milliseconds since epoch that the packet was
-   * sent.
-   */
+   /** Represents the number of milliseconds since epoch that the packet was sent. */
    uint64_t timestamp;
    /** The size of the packet header and its payload */
    uint32_t size;
@@ -74,14 +70,14 @@ struct FFXIVARR_PACKET_HEADER
    uint32_t unknown_24;
 };
 
-inline ostream& operator<<(ostream& os, const FFXIVARR_PACKET_HEADER& hdr)
+inline ostream& operator << ( ostream& os, const FFXIVARR_PACKET_HEADER& hdr )
 {
-   return os.write(reinterpret_cast<const char*>(&hdr), sizeof hdr);
+   return os.write( reinterpret_cast< const char* >( &hdr ), sizeof hdr );
 }
 
-inline istream& operator>>(istream& is, FFXIVARR_PACKET_HEADER& hdr)
+inline istream& operator >> ( istream& is, FFXIVARR_PACKET_HEADER& hdr )
 {
-   return is.read(reinterpret_cast<char*>(&hdr), sizeof hdr);
+   return is.read( reinterpret_cast< char* >( &hdr ), sizeof hdr );
 }
 
 /**
@@ -92,7 +88,7 @@ inline istream& operator>>(istream& is, FFXIVARR_PACKET_HEADER& hdr)
 *
 * 0               4               8              12              16
 * +---------------+---------------+---------------+-------+-------+
-* | size          | source_actor  | target_actor  | type  |   ?   |
+* | size          | source_actor  | target_actor  | type  |  pad  |
 * +---------------+---------------+---------------+-------+-------+
 * |                                                               |
 * :          type-specific data of length, size, follows          :
@@ -109,22 +105,20 @@ struct FFXIVARR_PACKET_SEGMENT_HEADER
    uint32_t target_actor;
    /** The segment type. (1, 2, 3, 7, 8, 9, 10) */
    uint16_t type;
-   uint16_t _reserved_E;
+   uint16_t padding;
 };
 
-inline ostream& operator<<(ostream& os, const FFXIVARR_PACKET_SEGMENT_HEADER& hdr)
+inline ostream& operator << ( ostream& os, const FFXIVARR_PACKET_SEGMENT_HEADER& hdr )
 {
-   return os.write(reinterpret_cast<const char*>(&hdr), sizeof hdr);
+   return os.write( reinterpret_cast< const char* >( &hdr ), sizeof hdr );
 }
 
-inline istream& operator>>(istream& is, FFXIVARR_PACKET_SEGMENT_HEADER& hdr)
+inline istream& operator >> ( istream& is, FFXIVARR_PACKET_SEGMENT_HEADER& hdr )
 {
-   return is.read(reinterpret_cast<char*>(&hdr), sizeof hdr);
+   return is.read( reinterpret_cast< char* >( &hdr ), sizeof hdr );
 }
 
-// TODO: Include structures for the individual packet segment types
-
-template <int T> struct FFXIVIpcBasePacket
+template < int T > struct FFXIVIpcBasePacket
 {
    /** Creates a constant representing the IPC type */
    enum { _ServerIpcType = T };
@@ -133,7 +127,7 @@ template <int T> struct FFXIVIpcBasePacket
 struct FFXIVARR_PACKET_RAW
 {
    FFXIVARR_PACKET_SEGMENT_HEADER segHdr;
-   std::vector<uint8_t> data;
+   std::vector< uint8_t > data;
 };
 
 /**
@@ -142,7 +136,7 @@ struct FFXIVARR_PACKET_RAW
 *
 * 0               4      6          8              12              16
 * +-------+-------+------+----------+---------------+---------------+
-* | 14 00 | type  |  ??  | serverId |   timestamp   |      ???      |
+* | 14 00 | type  |  pad  | serverId |   timestamp   |      pad1    |
 * +-------+-------+------+----------+---------------+---------------+
 * |                                                                 |
 * :                             data                                :
@@ -153,23 +147,21 @@ struct FFXIVARR_IPC_HEADER
 {
    uint16_t reserved;
    uint16_t type;
-   uint16_t unknown_2;
+   uint16_t padding;
    uint16_t serverId;
    uint32_t timestamp;
-   uint32_t unknown_C;
+   uint32_t padding1;
 };
 
-inline ostream& operator<<(ostream& os, const FFXIVARR_IPC_HEADER& hdr)
+inline ostream& operator << ( ostream& os, const FFXIVARR_IPC_HEADER& hdr )
 {
-   return os.write(reinterpret_cast<const char*>(&hdr), sizeof hdr);
+   return os.write( reinterpret_cast< const char* >( &hdr ), sizeof hdr );
 }
 
-inline istream& operator>>(istream& is, FFXIVARR_IPC_HEADER& hdr)
+inline istream& operator >> ( istream& is, FFXIVARR_IPC_HEADER& hdr )
 {
-   return is.read(reinterpret_cast<char*>(&hdr), sizeof hdr);
+   return is.read( reinterpret_cast< char* >( &hdr ), sizeof hdr );
 }
-
-
 
 } /* Packets */
 } /* Network */

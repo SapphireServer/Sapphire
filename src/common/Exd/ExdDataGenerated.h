@@ -22,16 +22,21 @@ struct Achievement;
 struct AchievementCategory;
 struct AchievementKind;
 struct Action;
+struct ActionCastTimeline;
+struct ActionCastVFX;
 struct ActionCategory;
 struct ActionComboRoute;
 struct ActionIndirection;
+struct ActionParam;
 struct ActionProcStatus;
 struct ActionTimeline;
+struct ActionTimelineReplace;
 struct ActionTransient;
 struct Addon;
 struct Adventure;
 struct AdventureExPhase;
 struct AetherCurrent;
+struct AetherCurrentCompFlgSet;
 struct AetherialWheel;
 struct Aetheryte;
 struct AirshipExplorationLevel;
@@ -64,6 +69,7 @@ struct BNpcAnnounceIcon;
 struct BNpcBase;
 struct BNpcCustomize;
 struct BNpcName;
+struct Buddy;
 struct BuddyAction;
 struct BuddyEquip;
 struct BuddyItem;
@@ -81,6 +87,7 @@ struct ChocoboRaceItem;
 struct ChocoboRaceRank;
 struct ChocoboRaceStatus;
 struct ChocoboRaceTerritory;
+struct ChocoboTaxi;
 struct ChocoboTaxiStand;
 struct ClassJob;
 struct ClassJobCategory;
@@ -102,7 +109,12 @@ struct ContentExAction;
 struct ContentFinderCondition;
 struct ContentFinderConditionTransient;
 struct ContentMemberType;
+struct ContentNpcTalk;
 struct ContentRoulette;
+struct ContentsNote;
+struct ContentsNoteCategory;
+struct ContentTalk;
+struct ContentTalkParam;
 struct ContentType;
 struct CraftAction;
 struct CraftLeve;
@@ -131,8 +143,12 @@ struct EmoteCategory;
 struct ENpcBase;
 struct ENpcResident;
 struct EObj;
+struct EObjName;
 struct EquipRaceCategory;
 struct EquipSlotCategory;
+struct EurekaAethernet;
+struct EurekaGrowData;
+struct EurekaSphereElementAdjust;
 struct EventAction;
 struct EventIconPriority;
 struct EventIconType;
@@ -150,6 +166,7 @@ struct FCHierarchy;
 struct FCProfile;
 struct FCReputation;
 struct FCRights;
+struct FieldMarker;
 struct FishingSpot;
 struct FishParameter;
 struct GardeningSeed;
@@ -199,7 +216,6 @@ struct HousingYardObject;
 struct InstanceContent;
 struct InstanceContentBuff;
 struct InstanceContentTextData;
-struct InstanceContentType;
 struct Item;
 struct ItemAction;
 struct ItemFood;
@@ -227,7 +243,9 @@ struct MainCommand;
 struct MainCommandCategory;
 struct Map;
 struct MapMarker;
+struct MapMarkerRegion;
 struct MapSymbol;
+struct Marker;
 struct MasterpieceSupplyDuty;
 struct MasterpieceSupplyMultiplier;
 struct Materia;
@@ -240,6 +258,8 @@ struct MonsterNote;
 struct MonsterNoteTarget;
 struct Mount;
 struct MountAction;
+struct MoveTimeline;
+struct MoveVfx;
 struct NpcEquip;
 struct Omen;
 struct OnlineStatus;
@@ -249,11 +269,17 @@ struct OrchestrionCategory;
 struct OrchestrionPath;
 struct OrchestrionUiparam;
 struct ParamGrow;
+struct Perform;
+struct PerformTransient;
 struct Pet;
 struct PetAction;
 struct Picture;
 struct PlaceName;
+struct PublicContent;
+struct PvPActionSort;
 struct Quest;
+struct QuestClassJobReward;
+struct QuestRepeatFlag;
 struct QuestRewardOther;
 struct QuickChat;
 struct QuickChatTransient;
@@ -267,12 +293,14 @@ struct Recipe;
 struct RecipeElement;
 struct RecipeLevelTable;
 struct RecipeNotebookList;
+struct RecommendContents;
 struct Relic;
 struct Relic3;
 struct RelicItem;
 struct RelicNote;
 struct RelicNoteCategory;
 struct RetainerTask;
+struct RetainerTaskLvRange;
 struct RetainerTaskNormal;
 struct RetainerTaskParameter;
 struct RetainerTaskRandom;
@@ -280,14 +308,26 @@ struct Salvage;
 struct SatisfactionNpc;
 struct SatisfactionSupply;
 struct SatisfactionSupplyReward;
+struct ScenarioTree;
+struct ScenarioTreeTips;
+struct ScenarioTreeTipsClassQuest;
+struct ScenarioTreeTipsQuest;
+struct ScenarioType;
 struct ScreenImage;
 struct SecretRecipeBook;
+struct SkyIsland2Mission;
+struct SkyIsland2MissionDetail;
+struct SkyIsland2MissionType;
+struct SkyIsland2RangeType;
 struct SpearfishingItem;
 struct SpearfishingNotebook;
 struct SpecialShop;
 struct SpecialShopItemCategory;
 struct Stain;
+struct StainTransient;
 struct Status;
+struct StatusHitEffect;
+struct StatusLoopVFX;
 struct Story;
 struct SubmarineExploration;
 struct SubmarinePart;
@@ -303,6 +343,8 @@ struct Town;
 struct Trait;
 struct TraitRecast;
 struct TraitTransient;
+struct Transformation;
+struct Treasure;
 struct TreasureHuntRank;
 struct Tribe;
 struct TripleTriad;
@@ -316,14 +358,21 @@ struct Tutorial;
 struct TutorialDPS;
 struct TutorialHealer;
 struct TutorialTank;
+struct VaseFlower;
+struct VFX;
 struct Warp;
+struct WarpCondition;
 struct Weather;
 struct WeatherGroup;
 struct WeatherRate;
+struct WeddingBGM;
 struct WeeklyBingoOrderData;
 struct WeeklyBingoRewardData;
 struct WeeklyBingoText;
+struct World;
 struct WorldDCGroupType;
+struct YKW;
+struct ZoneSharedGroup;
 
 
 struct Achievement
@@ -362,7 +411,9 @@ struct Action
    std::string name;
    uint16_t icon;
    uint8_t actionCategory;
-   int16_t actionTimelineUse;
+   uint8_t animationStart;
+   uint8_t vFX;
+   int16_t animationEnd;
    uint16_t actionTimelineHit;
    int8_t classJob;
    uint8_t classJobLevel;
@@ -397,6 +448,21 @@ struct Action
    Action( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
+struct ActionCastTimeline
+{
+   uint16_t name;
+   uint16_t vFX;
+
+   ActionCastTimeline( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct ActionCastVFX
+{
+   uint16_t vFX;
+
+   ActionCastVFX( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
 struct ActionCategory
 {
    std::string name;
@@ -419,6 +485,13 @@ struct ActionIndirection
    ActionIndirection( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
+struct ActionParam
+{
+   int16_t name;
+
+   ActionParam( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
 struct ActionProcStatus
 {
    uint16_t status;
@@ -431,6 +504,14 @@ struct ActionTimeline
    std::string key;
 
    ActionTimeline( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct ActionTimelineReplace
+{
+   uint16_t old;
+   uint16_t new1;
+
+   ActionTimelineReplace( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct ActionTransient
@@ -481,6 +562,14 @@ struct AetherCurrent
    AetherCurrent( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
+struct AetherCurrentCompFlgSet
+{
+   int32_t territory;
+   std::vector< int32_t > aetherCurrent;
+
+   AetherCurrentCompFlgSet( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
 struct AetherialWheel
 {
    int32_t itemUnprimed;
@@ -496,7 +585,7 @@ struct Aetheryte
    uint16_t placeName;
    uint16_t aethernetName;
    uint16_t territory;
-   uint32_t levelId;
+   std::vector< uint32_t > level;
    bool isAetheryte;
    uint8_t aethernetGroup;
    uint16_t map;
@@ -669,6 +758,25 @@ struct BaseParam
 {
    std::string name;
    std::string description;
+   uint8_t oneHWpn;
+   uint8_t oH;
+   uint8_t head;
+   uint8_t chest;
+   uint8_t hands;
+   uint8_t waist;
+   uint8_t legs;
+   uint8_t feet;
+   uint8_t earring;
+   uint8_t necklace;
+   uint8_t bracelet;
+   uint8_t ring;
+   uint8_t twoHWpn;
+   uint8_t chestHead;
+   uint8_t chestHeadLegsFeet;
+   uint8_t legsFeet;
+   uint8_t headChestHandsLegsFeet;
+   uint8_t chestLegsGloves;
+   uint8_t chestLegsFeet;
 
    BaseParam( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
@@ -790,6 +898,18 @@ struct BNpcName
    BNpcName( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
+struct Buddy
+{
+   int32_t questRequirement2;
+   int32_t questRequirement1;
+   std::string soundEffect4;
+   std::string soundEffect3;
+   std::string soundEffect2;
+   std::string soundEffect1;
+
+   Buddy( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
 struct BuddyAction
 {
    std::string name;
@@ -833,6 +953,10 @@ struct BuddyRank
 struct BuddySkill
 {
    uint8_t buddyLevel;
+   bool isActive;
+   uint16_t defender;
+   uint16_t attacker;
+   uint16_t healer;
 
    BuddySkill( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
@@ -867,6 +991,7 @@ struct CharaMakeCustomize
 {
    uint32_t icon;
    uint16_t data;
+   bool isPurchasable;
 
    CharaMakeCustomize( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
@@ -942,6 +1067,13 @@ struct ChocoboRaceTerritory
    ChocoboRaceTerritory( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
+struct ChocoboTaxi
+{
+   uint32_t location;
+
+   ChocoboTaxi( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
 struct ChocoboTaxiStand
 {
    std::string placeName;
@@ -970,6 +1102,9 @@ struct ClassJob
    uint16_t limitBreak2;
    uint16_t limitBreak3;
    uint32_t itemSoulCrystal;
+   uint32_t unlockQuest;
+   uint32_t relicQuest;
+   uint32_t prerequisite;
    uint8_t startingLevel;
 
    ClassJob( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
@@ -1012,6 +1147,8 @@ struct ClassJobCategory
    bool mCH;
    bool dRK;
    bool aST;
+   bool sAM;
+   bool rDM;
 
    ClassJobCategory( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
@@ -1159,13 +1296,14 @@ struct ContentExAction
 
 struct ContentFinderCondition
 {
-   uint8_t contentIndicator;
    uint16_t instanceContent;
    uint8_t contentMemberType;
    uint8_t classJobLevelRequired;
    uint8_t classJobLevelSync;
    uint16_t itemLevelRequired;
    uint16_t itemLevelSync;
+   uint8_t contentIndicator;
+   uint8_t contentType;
    uint32_t icon;
 
    ContentFinderCondition( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
@@ -1188,6 +1326,13 @@ struct ContentMemberType
    ContentMemberType( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
+struct ContentNpcTalk
+{
+   std::vector< uint32_t > contentTalk;
+
+   ContentNpcTalk( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
 struct ContentRoulette
 {
    std::string name;
@@ -1206,6 +1351,37 @@ struct ContentRoulette
    ContentRoulette( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
+struct ContentsNote
+{
+   uint8_t contentType;
+   int32_t requiredAmount;
+
+   ContentsNote( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct ContentsNoteCategory
+{
+   uint8_t type;
+
+   ContentsNoteCategory( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct ContentTalk
+{
+   uint8_t contentTalkParam;
+   std::string text;
+
+   ContentTalk( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct ContentTalkParam
+{
+   bool param;
+   uint32_t testAction;
+
+   ContentTalkParam( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
 struct ContentType
 {
    std::string name;
@@ -1219,6 +1395,8 @@ struct CraftAction
 {
    std::string name;
    std::string description;
+   uint16_t animationStart;
+   uint16_t animationEnd;
    uint16_t icon;
    int8_t classJob;
    uint8_t classJobCategory;
@@ -1514,6 +1692,13 @@ struct EObj
    EObj( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
+struct EObjName
+{
+   std::string singular;
+
+   EObjName( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
 struct EquipRaceCategory
 {
    bool hyur;
@@ -1546,6 +1731,27 @@ struct EquipSlotCategory
    int8_t soulCrystal;
 
    EquipSlotCategory( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct EurekaAethernet
+{
+   uint16_t location;
+
+   EurekaAethernet( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct EurekaGrowData
+{
+   uint16_t baseResistance;
+
+   EurekaGrowData( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct EurekaSphereElementAdjust
+{
+   uint16_t powerModifier;
+
+   EurekaSphereElementAdjust( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct EventAction
@@ -1605,15 +1811,19 @@ struct ExVersion
 
 struct Fate
 {
+   uint8_t eurekaFate;
+   uint32_t location;
    uint8_t classJobLevel;
    uint8_t classJobLevelMax;
    uint32_t eventItem;
    uint32_t iconObjective;
    uint32_t iconMap;
+   int32_t music;
    std::string name;
    std::string description;
    std::string objective;
    std::vector< std::string > statusText;
+   uint32_t arrayIndex;
 
    Fate( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
@@ -1693,6 +1903,14 @@ struct FCRights
    uint8_t fCRank;
 
    FCRights( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct FieldMarker
+{
+   int32_t vFX;
+   uint16_t icon;
+
+   FieldMarker( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct FishingSpot
@@ -1997,6 +2215,7 @@ struct GeneralAction
 {
    std::string name;
    std::string description;
+   uint16_t action;
    int32_t icon;
 
    GeneralAction( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
@@ -2150,14 +2369,6 @@ struct InstanceContentTextData
    std::string text;
 
    InstanceContentTextData( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
-};
-
-struct InstanceContentType
-{
-   uint8_t sortKey;
-   uint8_t contentType;
-
-   InstanceContentType( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct Item
@@ -2463,11 +2674,19 @@ struct MapMarker
    uint16_t icon;
    uint16_t placeNameSubtext;
    uint8_t subtextOrientation;
+   uint8_t mapMarkerRegion;
    uint8_t type;
    uint8_t dataType;
    uint16_t dataKey;
 
    MapMarker( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct MapMarkerRegion
+{
+   int16_t x;
+
+   MapMarkerRegion( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct MapSymbol
@@ -2476,6 +2695,14 @@ struct MapSymbol
    int32_t placeName;
 
    MapSymbol( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct Marker
+{
+   int32_t icon;
+   std::string name;
+
+   Marker( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct MasterpieceSupplyDuty
@@ -2572,7 +2799,7 @@ struct Mount
    uint8_t flyingCondition;
    uint8_t isFlying;
    uint16_t rideBGM;
-   int8_t order;
+   int16_t order;
    uint16_t icon;
 
    Mount( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
@@ -2583,6 +2810,30 @@ struct MountAction
    std::vector< uint16_t > action;
 
    MountAction( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct MoveTimeline
+{
+   uint16_t idle;
+   uint16_t moveForward;
+   uint16_t moveBack;
+   uint16_t moveLeft;
+   uint16_t moveRight;
+   uint16_t moveUp;
+   uint16_t moveDown;
+   uint16_t moveTurnLeft;
+   uint16_t moveTurnRight;
+   uint16_t extra;
+
+   MoveTimeline( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct MoveVfx
+{
+   uint16_t zero;
+   uint16_t one;
+
+   MoveVfx( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct NpcEquip
@@ -2683,6 +2934,29 @@ struct ParamGrow
    ParamGrow( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
+struct Perform
+{
+   std::string name;
+   uint64_t modelKey;
+   uint16_t animationStart;
+   uint16_t animationEnd;
+   uint16_t animationIdle;
+   uint16_t animationPlay01;
+   uint16_t animationPlay02;
+   int32_t stopAnimation;
+   std::string instrument;
+   uint8_t transient;
+
+   Perform( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct PerformTransient
+{
+   std::string text;
+
+   PerformTransient( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
 struct Pet
 {
    std::string name;
@@ -2715,6 +2989,24 @@ struct PlaceName
    std::string nameNoArticle;
 
    PlaceName( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct PublicContent
+{
+   uint16_t timeLimit;
+   uint32_t mapIcon;
+   std::string name;
+   uint16_t territoryType;
+
+   PublicContent( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct PvPActionSort
+{
+   uint8_t name;
+   uint16_t action;
+
+   PvPActionSort( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct Quest
@@ -2783,6 +3075,24 @@ struct Quest
    Quest( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
+struct QuestClassJobReward
+{
+   uint8_t classJobCategory;
+   std::vector< uint32_t > rewardItem;
+   std::vector< uint8_t > rewardAmount;
+   std::vector< uint32_t > requiredItem;
+   std::vector< uint8_t > requiredAmount;
+
+   QuestClassJobReward( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct QuestRepeatFlag
+{
+   uint32_t quest;
+
+   QuestRepeatFlag( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
 struct QuestRewardOther
 {
    std::string name;
@@ -2793,7 +3103,8 @@ struct QuestRewardOther
 struct QuickChat
 {
    std::string nameAction;
-   int32_t icon1;
+   int32_t icon;
+   int32_t addon;
    int8_t quickChatTransient;
 
    QuickChat( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
@@ -2878,6 +3189,7 @@ struct Recipe
    uint16_t secretRecipeBook;
    bool canQuickSynth;
    bool canHq;
+   bool expRewarded;
    int32_t statusRequired;
    int32_t itemRequired;
    bool isSpecializationRequired;
@@ -2908,6 +3220,13 @@ struct RecipeNotebookList
    std::vector< int32_t > recipe;
 
    RecipeNotebookList( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct RecommendContents
+{
+   int32_t level;
+
+   RecommendContents( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct Relic
@@ -2979,12 +3298,22 @@ struct RetainerTask
    RetainerTask( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
+struct RetainerTaskLvRange
+{
+   uint8_t min;
+   uint8_t max;
+
+   RetainerTaskLvRange( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
 struct RetainerTaskNormal
 {
    int32_t item;
    uint8_t quantity0;
    uint8_t quantity1;
    uint8_t quantity2;
+   int16_t gatheringLog;
+   int16_t fishingLog;
 
    RetainerTaskNormal( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
@@ -3050,6 +3379,46 @@ struct SatisfactionSupplyReward
    SatisfactionSupplyReward( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
+struct ScenarioTree
+{
+   uint8_t type;
+   uint16_t image;
+
+   ScenarioTree( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct ScenarioTreeTips
+{
+   uint32_t tips1;
+   uint32_t tips2;
+
+   ScenarioTreeTips( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct ScenarioTreeTipsClassQuest
+{
+   uint32_t quest;
+   uint16_t requiredLevel;
+   uint8_t requiredExpansion;
+   uint32_t requiredQuest;
+
+   ScenarioTreeTipsClassQuest( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct ScenarioTreeTipsQuest
+{
+   uint32_t level;
+
+   ScenarioTreeTipsQuest( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct ScenarioType
+{
+   std::string type;
+
+   ScenarioType( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
 struct ScreenImage
 {
    uint32_t image;
@@ -3063,6 +3432,44 @@ struct SecretRecipeBook
    std::string name;
 
    SecretRecipeBook( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct SkyIsland2Mission
+{
+   uint32_t item1;
+   uint32_t item2;
+   uint16_t objective1;
+   uint8_t requiredAmount1;
+   uint16_t objective2;
+   uint8_t requiredAmount2;
+   uint16_t objective3;
+   uint32_t image;
+
+   SkyIsland2Mission( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct SkyIsland2MissionDetail
+{
+   uint8_t type;
+   uint8_t range;
+   uint32_t eObj;
+   std::string objective;
+
+   SkyIsland2MissionDetail( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct SkyIsland2MissionType
+{
+   bool type;
+
+   SkyIsland2MissionType( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct SkyIsland2RangeType
+{
+   uint8_t type;
+
+   SkyIsland2RangeType( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct SpearfishingItem
@@ -3114,23 +3521,48 @@ struct Stain
    Stain( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
+struct StainTransient
+{
+   uint32_t item1;
+   uint32_t item2;
+
+   StainTransient( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
 struct Status
 {
    std::string name;
    std::string description;
    uint16_t icon;
    uint8_t maxStacks;
+   uint8_t category;
+   uint8_t hitEffect;
+   uint8_t vFX;
    bool lockMovement;
    bool lockActions;
    bool lockControl;
    bool transfiguration;
    bool canDispel;
-   bool isPermanent;
    bool inflictedByActor;
+   bool isPermanent;
    bool isFcBuff;
    bool invisibility;
 
    Status( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct StatusHitEffect
+{
+   uint16_t location;
+
+   StatusHitEffect( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct StatusLoopVFX
+{
+   uint16_t location;
+
+   StatusLoopVFX( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct Story
@@ -3169,6 +3601,7 @@ struct SubmarinePart
 
 struct SubmarineRank
 {
+   uint16_t rank;
    uint32_t expToNext;
 
    SubmarineRank( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
@@ -3192,6 +3625,7 @@ struct TerritoryType
    uint16_t map;
    uint8_t territoryIntendedUse;
    uint8_t weatherRate;
+   uint32_t arrayEventHandler;
    int32_t aetheryte;
 
    TerritoryType( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
@@ -3273,6 +3707,28 @@ struct TraitTransient
    std::string description;
 
    TraitTransient( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct Transformation
+{
+   int16_t model;
+   int32_t bNpcCustomize;
+   int32_t bNpcEquip;
+   std::vector< uint16_t > action;
+   float speed;
+   float scale;
+   bool isPvP;
+   bool isEvent;
+   bool playerCamera;
+
+   Transformation( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct Treasure
+{
+   uint32_t item;
+
+   Treasure( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct TreasureHuntRank
@@ -3406,6 +3862,20 @@ struct TutorialTank
    TutorialTank( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
+struct VaseFlower
+{
+   uint32_t item;
+
+   VaseFlower( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct VFX
+{
+   std::string location;
+
+   VFX( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
 struct Warp
 {
    uint32_t level;
@@ -3417,6 +3887,16 @@ struct Warp
    uint16_t warpLogic;
 
    Warp( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct WarpCondition
+{
+   uint32_t requiredQuest1;
+   uint32_t requiredQuest2;
+   uint32_t dRequiredQuest3;
+   uint32_t requiredQuest4;
+
+   WarpCondition( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct Weather
@@ -3439,6 +3919,14 @@ struct WeatherRate
 {
 
    WeatherRate( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct WeddingBGM
+{
+   uint16_t song;
+   std::string songName;
+
+   WeddingBGM( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct WeeklyBingoOrderData
@@ -3466,11 +3954,38 @@ struct WeeklyBingoText
    WeeklyBingoText( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
+struct World
+{
+   uint8_t dataCenter;
+
+   World( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
 struct WorldDCGroupType
 {
    std::string name;
 
    WorldDCGroupType( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct YKW
+{
+   uint32_t item;
+   std::vector< uint16_t > location;
+
+   YKW( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct ZoneSharedGroup
+{
+   uint32_t quest1;
+   uint32_t quest2;
+   uint32_t quest3;
+   uint32_t quest4;
+   uint32_t quest5;
+   uint32_t quest6;
+
+   ZoneSharedGroup( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
 
@@ -3500,16 +4015,21 @@ struct WorldDCGroupType
      xiv::exd::Exd m_AchievementCategoryDat;
      xiv::exd::Exd m_AchievementKindDat;
      xiv::exd::Exd m_ActionDat;
+     xiv::exd::Exd m_ActionCastTimelineDat;
+     xiv::exd::Exd m_ActionCastVFXDat;
      xiv::exd::Exd m_ActionCategoryDat;
      xiv::exd::Exd m_ActionComboRouteDat;
      xiv::exd::Exd m_ActionIndirectionDat;
+     xiv::exd::Exd m_ActionParamDat;
      xiv::exd::Exd m_ActionProcStatusDat;
      xiv::exd::Exd m_ActionTimelineDat;
+     xiv::exd::Exd m_ActionTimelineReplaceDat;
      xiv::exd::Exd m_ActionTransientDat;
      xiv::exd::Exd m_AddonDat;
      xiv::exd::Exd m_AdventureDat;
      xiv::exd::Exd m_AdventureExPhaseDat;
      xiv::exd::Exd m_AetherCurrentDat;
+     xiv::exd::Exd m_AetherCurrentCompFlgSetDat;
      xiv::exd::Exd m_AetherialWheelDat;
      xiv::exd::Exd m_AetheryteDat;
      xiv::exd::Exd m_AirshipExplorationLevelDat;
@@ -3542,6 +4062,7 @@ struct WorldDCGroupType
      xiv::exd::Exd m_BNpcBaseDat;
      xiv::exd::Exd m_BNpcCustomizeDat;
      xiv::exd::Exd m_BNpcNameDat;
+     xiv::exd::Exd m_BuddyDat;
      xiv::exd::Exd m_BuddyActionDat;
      xiv::exd::Exd m_BuddyEquipDat;
      xiv::exd::Exd m_BuddyItemDat;
@@ -3559,6 +4080,7 @@ struct WorldDCGroupType
      xiv::exd::Exd m_ChocoboRaceRankDat;
      xiv::exd::Exd m_ChocoboRaceStatusDat;
      xiv::exd::Exd m_ChocoboRaceTerritoryDat;
+     xiv::exd::Exd m_ChocoboTaxiDat;
      xiv::exd::Exd m_ChocoboTaxiStandDat;
      xiv::exd::Exd m_ClassJobDat;
      xiv::exd::Exd m_ClassJobCategoryDat;
@@ -3580,7 +4102,12 @@ struct WorldDCGroupType
      xiv::exd::Exd m_ContentFinderConditionDat;
      xiv::exd::Exd m_ContentFinderConditionTransientDat;
      xiv::exd::Exd m_ContentMemberTypeDat;
+     xiv::exd::Exd m_ContentNpcTalkDat;
      xiv::exd::Exd m_ContentRouletteDat;
+     xiv::exd::Exd m_ContentsNoteDat;
+     xiv::exd::Exd m_ContentsNoteCategoryDat;
+     xiv::exd::Exd m_ContentTalkDat;
+     xiv::exd::Exd m_ContentTalkParamDat;
      xiv::exd::Exd m_ContentTypeDat;
      xiv::exd::Exd m_CraftActionDat;
      xiv::exd::Exd m_CraftLeveDat;
@@ -3609,8 +4136,12 @@ struct WorldDCGroupType
      xiv::exd::Exd m_ENpcBaseDat;
      xiv::exd::Exd m_ENpcResidentDat;
      xiv::exd::Exd m_EObjDat;
+     xiv::exd::Exd m_EObjNameDat;
      xiv::exd::Exd m_EquipRaceCategoryDat;
      xiv::exd::Exd m_EquipSlotCategoryDat;
+     xiv::exd::Exd m_EurekaAethernetDat;
+     xiv::exd::Exd m_EurekaGrowDataDat;
+     xiv::exd::Exd m_EurekaSphereElementAdjustDat;
      xiv::exd::Exd m_EventActionDat;
      xiv::exd::Exd m_EventIconPriorityDat;
      xiv::exd::Exd m_EventIconTypeDat;
@@ -3628,6 +4159,7 @@ struct WorldDCGroupType
      xiv::exd::Exd m_FCProfileDat;
      xiv::exd::Exd m_FCReputationDat;
      xiv::exd::Exd m_FCRightsDat;
+     xiv::exd::Exd m_FieldMarkerDat;
      xiv::exd::Exd m_FishingSpotDat;
      xiv::exd::Exd m_FishParameterDat;
      xiv::exd::Exd m_GardeningSeedDat;
@@ -3677,7 +4209,6 @@ struct WorldDCGroupType
      xiv::exd::Exd m_InstanceContentDat;
      xiv::exd::Exd m_InstanceContentBuffDat;
      xiv::exd::Exd m_InstanceContentTextDataDat;
-     xiv::exd::Exd m_InstanceContentTypeDat;
      xiv::exd::Exd m_ItemDat;
      xiv::exd::Exd m_ItemActionDat;
      xiv::exd::Exd m_ItemFoodDat;
@@ -3705,7 +4236,9 @@ struct WorldDCGroupType
      xiv::exd::Exd m_MainCommandCategoryDat;
      xiv::exd::Exd m_MapDat;
      xiv::exd::Exd m_MapMarkerDat;
+     xiv::exd::Exd m_MapMarkerRegionDat;
      xiv::exd::Exd m_MapSymbolDat;
+     xiv::exd::Exd m_MarkerDat;
      xiv::exd::Exd m_MasterpieceSupplyDutyDat;
      xiv::exd::Exd m_MasterpieceSupplyMultiplierDat;
      xiv::exd::Exd m_MateriaDat;
@@ -3718,6 +4251,8 @@ struct WorldDCGroupType
      xiv::exd::Exd m_MonsterNoteTargetDat;
      xiv::exd::Exd m_MountDat;
      xiv::exd::Exd m_MountActionDat;
+     xiv::exd::Exd m_MoveTimelineDat;
+     xiv::exd::Exd m_MoveVfxDat;
      xiv::exd::Exd m_NpcEquipDat;
      xiv::exd::Exd m_OmenDat;
      xiv::exd::Exd m_OnlineStatusDat;
@@ -3727,11 +4262,17 @@ struct WorldDCGroupType
      xiv::exd::Exd m_OrchestrionPathDat;
      xiv::exd::Exd m_OrchestrionUiparamDat;
      xiv::exd::Exd m_ParamGrowDat;
+     xiv::exd::Exd m_PerformDat;
+     xiv::exd::Exd m_PerformTransientDat;
      xiv::exd::Exd m_PetDat;
      xiv::exd::Exd m_PetActionDat;
      xiv::exd::Exd m_PictureDat;
      xiv::exd::Exd m_PlaceNameDat;
+     xiv::exd::Exd m_PublicContentDat;
+     xiv::exd::Exd m_PvPActionSortDat;
      xiv::exd::Exd m_QuestDat;
+     xiv::exd::Exd m_QuestClassJobRewardDat;
+     xiv::exd::Exd m_QuestRepeatFlagDat;
      xiv::exd::Exd m_QuestRewardOtherDat;
      xiv::exd::Exd m_QuickChatDat;
      xiv::exd::Exd m_QuickChatTransientDat;
@@ -3745,12 +4286,14 @@ struct WorldDCGroupType
      xiv::exd::Exd m_RecipeElementDat;
      xiv::exd::Exd m_RecipeLevelTableDat;
      xiv::exd::Exd m_RecipeNotebookListDat;
+     xiv::exd::Exd m_RecommendContentsDat;
      xiv::exd::Exd m_RelicDat;
      xiv::exd::Exd m_Relic3Dat;
      xiv::exd::Exd m_RelicItemDat;
      xiv::exd::Exd m_RelicNoteDat;
      xiv::exd::Exd m_RelicNoteCategoryDat;
      xiv::exd::Exd m_RetainerTaskDat;
+     xiv::exd::Exd m_RetainerTaskLvRangeDat;
      xiv::exd::Exd m_RetainerTaskNormalDat;
      xiv::exd::Exd m_RetainerTaskParameterDat;
      xiv::exd::Exd m_RetainerTaskRandomDat;
@@ -3758,14 +4301,26 @@ struct WorldDCGroupType
      xiv::exd::Exd m_SatisfactionNpcDat;
      xiv::exd::Exd m_SatisfactionSupplyDat;
      xiv::exd::Exd m_SatisfactionSupplyRewardDat;
+     xiv::exd::Exd m_ScenarioTreeDat;
+     xiv::exd::Exd m_ScenarioTreeTipsDat;
+     xiv::exd::Exd m_ScenarioTreeTipsClassQuestDat;
+     xiv::exd::Exd m_ScenarioTreeTipsQuestDat;
+     xiv::exd::Exd m_ScenarioTypeDat;
      xiv::exd::Exd m_ScreenImageDat;
      xiv::exd::Exd m_SecretRecipeBookDat;
+     xiv::exd::Exd m_SkyIsland2MissionDat;
+     xiv::exd::Exd m_SkyIsland2MissionDetailDat;
+     xiv::exd::Exd m_SkyIsland2MissionTypeDat;
+     xiv::exd::Exd m_SkyIsland2RangeTypeDat;
      xiv::exd::Exd m_SpearfishingItemDat;
      xiv::exd::Exd m_SpearfishingNotebookDat;
      xiv::exd::Exd m_SpecialShopDat;
      xiv::exd::Exd m_SpecialShopItemCategoryDat;
      xiv::exd::Exd m_StainDat;
+     xiv::exd::Exd m_StainTransientDat;
      xiv::exd::Exd m_StatusDat;
+     xiv::exd::Exd m_StatusHitEffectDat;
+     xiv::exd::Exd m_StatusLoopVFXDat;
      xiv::exd::Exd m_StoryDat;
      xiv::exd::Exd m_SubmarineExplorationDat;
      xiv::exd::Exd m_SubmarinePartDat;
@@ -3781,6 +4336,8 @@ struct WorldDCGroupType
      xiv::exd::Exd m_TraitDat;
      xiv::exd::Exd m_TraitRecastDat;
      xiv::exd::Exd m_TraitTransientDat;
+     xiv::exd::Exd m_TransformationDat;
+     xiv::exd::Exd m_TreasureDat;
      xiv::exd::Exd m_TreasureHuntRankDat;
      xiv::exd::Exd m_TribeDat;
      xiv::exd::Exd m_TripleTriadDat;
@@ -3794,30 +4351,42 @@ struct WorldDCGroupType
      xiv::exd::Exd m_TutorialDPSDat;
      xiv::exd::Exd m_TutorialHealerDat;
      xiv::exd::Exd m_TutorialTankDat;
+     xiv::exd::Exd m_VaseFlowerDat;
+     xiv::exd::Exd m_VFXDat;
      xiv::exd::Exd m_WarpDat;
+     xiv::exd::Exd m_WarpConditionDat;
      xiv::exd::Exd m_WeatherDat;
      xiv::exd::Exd m_WeatherGroupDat;
      xiv::exd::Exd m_WeatherRateDat;
+     xiv::exd::Exd m_WeddingBGMDat;
      xiv::exd::Exd m_WeeklyBingoOrderDataDat;
      xiv::exd::Exd m_WeeklyBingoRewardDataDat;
      xiv::exd::Exd m_WeeklyBingoTextDat;
+     xiv::exd::Exd m_WorldDat;
      xiv::exd::Exd m_WorldDCGroupTypeDat;
+     xiv::exd::Exd m_YKWDat;
+     xiv::exd::Exd m_ZoneSharedGroupDat;
 
 
      using AchievementPtr =  boost::shared_ptr< Achievement >;
      using AchievementCategoryPtr =  boost::shared_ptr< AchievementCategory >;
      using AchievementKindPtr =  boost::shared_ptr< AchievementKind >;
      using ActionPtr =  boost::shared_ptr< Action >;
+     using ActionCastTimelinePtr =  boost::shared_ptr< ActionCastTimeline >;
+     using ActionCastVFXPtr =  boost::shared_ptr< ActionCastVFX >;
      using ActionCategoryPtr =  boost::shared_ptr< ActionCategory >;
      using ActionComboRoutePtr =  boost::shared_ptr< ActionComboRoute >;
      using ActionIndirectionPtr =  boost::shared_ptr< ActionIndirection >;
+     using ActionParamPtr =  boost::shared_ptr< ActionParam >;
      using ActionProcStatusPtr =  boost::shared_ptr< ActionProcStatus >;
      using ActionTimelinePtr =  boost::shared_ptr< ActionTimeline >;
+     using ActionTimelineReplacePtr =  boost::shared_ptr< ActionTimelineReplace >;
      using ActionTransientPtr =  boost::shared_ptr< ActionTransient >;
      using AddonPtr =  boost::shared_ptr< Addon >;
      using AdventurePtr =  boost::shared_ptr< Adventure >;
      using AdventureExPhasePtr =  boost::shared_ptr< AdventureExPhase >;
      using AetherCurrentPtr =  boost::shared_ptr< AetherCurrent >;
+     using AetherCurrentCompFlgSetPtr =  boost::shared_ptr< AetherCurrentCompFlgSet >;
      using AetherialWheelPtr =  boost::shared_ptr< AetherialWheel >;
      using AetherytePtr =  boost::shared_ptr< Aetheryte >;
      using AirshipExplorationLevelPtr =  boost::shared_ptr< AirshipExplorationLevel >;
@@ -3850,6 +4419,7 @@ struct WorldDCGroupType
      using BNpcBasePtr =  boost::shared_ptr< BNpcBase >;
      using BNpcCustomizePtr =  boost::shared_ptr< BNpcCustomize >;
      using BNpcNamePtr =  boost::shared_ptr< BNpcName >;
+     using BuddyPtr =  boost::shared_ptr< Buddy >;
      using BuddyActionPtr =  boost::shared_ptr< BuddyAction >;
      using BuddyEquipPtr =  boost::shared_ptr< BuddyEquip >;
      using BuddyItemPtr =  boost::shared_ptr< BuddyItem >;
@@ -3867,6 +4437,7 @@ struct WorldDCGroupType
      using ChocoboRaceRankPtr =  boost::shared_ptr< ChocoboRaceRank >;
      using ChocoboRaceStatusPtr =  boost::shared_ptr< ChocoboRaceStatus >;
      using ChocoboRaceTerritoryPtr =  boost::shared_ptr< ChocoboRaceTerritory >;
+     using ChocoboTaxiPtr =  boost::shared_ptr< ChocoboTaxi >;
      using ChocoboTaxiStandPtr =  boost::shared_ptr< ChocoboTaxiStand >;
      using ClassJobPtr =  boost::shared_ptr< ClassJob >;
      using ClassJobCategoryPtr =  boost::shared_ptr< ClassJobCategory >;
@@ -3888,7 +4459,12 @@ struct WorldDCGroupType
      using ContentFinderConditionPtr =  boost::shared_ptr< ContentFinderCondition >;
      using ContentFinderConditionTransientPtr =  boost::shared_ptr< ContentFinderConditionTransient >;
      using ContentMemberTypePtr =  boost::shared_ptr< ContentMemberType >;
+     using ContentNpcTalkPtr =  boost::shared_ptr< ContentNpcTalk >;
      using ContentRoulettePtr =  boost::shared_ptr< ContentRoulette >;
+     using ContentsNotePtr =  boost::shared_ptr< ContentsNote >;
+     using ContentsNoteCategoryPtr =  boost::shared_ptr< ContentsNoteCategory >;
+     using ContentTalkPtr =  boost::shared_ptr< ContentTalk >;
+     using ContentTalkParamPtr =  boost::shared_ptr< ContentTalkParam >;
      using ContentTypePtr =  boost::shared_ptr< ContentType >;
      using CraftActionPtr =  boost::shared_ptr< CraftAction >;
      using CraftLevePtr =  boost::shared_ptr< CraftLeve >;
@@ -3917,8 +4493,12 @@ struct WorldDCGroupType
      using ENpcBasePtr =  boost::shared_ptr< ENpcBase >;
      using ENpcResidentPtr =  boost::shared_ptr< ENpcResident >;
      using EObjPtr =  boost::shared_ptr< EObj >;
+     using EObjNamePtr =  boost::shared_ptr< EObjName >;
      using EquipRaceCategoryPtr =  boost::shared_ptr< EquipRaceCategory >;
      using EquipSlotCategoryPtr =  boost::shared_ptr< EquipSlotCategory >;
+     using EurekaAethernetPtr =  boost::shared_ptr< EurekaAethernet >;
+     using EurekaGrowDataPtr =  boost::shared_ptr< EurekaGrowData >;
+     using EurekaSphereElementAdjustPtr =  boost::shared_ptr< EurekaSphereElementAdjust >;
      using EventActionPtr =  boost::shared_ptr< EventAction >;
      using EventIconPriorityPtr =  boost::shared_ptr< EventIconPriority >;
      using EventIconTypePtr =  boost::shared_ptr< EventIconType >;
@@ -3936,6 +4516,7 @@ struct WorldDCGroupType
      using FCProfilePtr =  boost::shared_ptr< FCProfile >;
      using FCReputationPtr =  boost::shared_ptr< FCReputation >;
      using FCRightsPtr =  boost::shared_ptr< FCRights >;
+     using FieldMarkerPtr =  boost::shared_ptr< FieldMarker >;
      using FishingSpotPtr =  boost::shared_ptr< FishingSpot >;
      using FishParameterPtr =  boost::shared_ptr< FishParameter >;
      using GardeningSeedPtr =  boost::shared_ptr< GardeningSeed >;
@@ -3985,7 +4566,6 @@ struct WorldDCGroupType
      using InstanceContentPtr =  boost::shared_ptr< InstanceContent >;
      using InstanceContentBuffPtr =  boost::shared_ptr< InstanceContentBuff >;
      using InstanceContentTextDataPtr =  boost::shared_ptr< InstanceContentTextData >;
-     using InstanceContentTypePtr =  boost::shared_ptr< InstanceContentType >;
      using ItemPtr =  boost::shared_ptr< Item >;
      using ItemActionPtr =  boost::shared_ptr< ItemAction >;
      using ItemFoodPtr =  boost::shared_ptr< ItemFood >;
@@ -4013,7 +4593,9 @@ struct WorldDCGroupType
      using MainCommandCategoryPtr =  boost::shared_ptr< MainCommandCategory >;
      using MapPtr =  boost::shared_ptr< Map >;
      using MapMarkerPtr =  boost::shared_ptr< MapMarker >;
+     using MapMarkerRegionPtr =  boost::shared_ptr< MapMarkerRegion >;
      using MapSymbolPtr =  boost::shared_ptr< MapSymbol >;
+     using MarkerPtr =  boost::shared_ptr< Marker >;
      using MasterpieceSupplyDutyPtr =  boost::shared_ptr< MasterpieceSupplyDuty >;
      using MasterpieceSupplyMultiplierPtr =  boost::shared_ptr< MasterpieceSupplyMultiplier >;
      using MateriaPtr =  boost::shared_ptr< Materia >;
@@ -4026,6 +4608,8 @@ struct WorldDCGroupType
      using MonsterNoteTargetPtr =  boost::shared_ptr< MonsterNoteTarget >;
      using MountPtr =  boost::shared_ptr< Mount >;
      using MountActionPtr =  boost::shared_ptr< MountAction >;
+     using MoveTimelinePtr =  boost::shared_ptr< MoveTimeline >;
+     using MoveVfxPtr =  boost::shared_ptr< MoveVfx >;
      using NpcEquipPtr =  boost::shared_ptr< NpcEquip >;
      using OmenPtr =  boost::shared_ptr< Omen >;
      using OnlineStatusPtr =  boost::shared_ptr< OnlineStatus >;
@@ -4035,11 +4619,17 @@ struct WorldDCGroupType
      using OrchestrionPathPtr =  boost::shared_ptr< OrchestrionPath >;
      using OrchestrionUiparamPtr =  boost::shared_ptr< OrchestrionUiparam >;
      using ParamGrowPtr =  boost::shared_ptr< ParamGrow >;
+     using PerformPtr =  boost::shared_ptr< Perform >;
+     using PerformTransientPtr =  boost::shared_ptr< PerformTransient >;
      using PetPtr =  boost::shared_ptr< Pet >;
      using PetActionPtr =  boost::shared_ptr< PetAction >;
      using PicturePtr =  boost::shared_ptr< Picture >;
      using PlaceNamePtr =  boost::shared_ptr< PlaceName >;
+     using PublicContentPtr =  boost::shared_ptr< PublicContent >;
+     using PvPActionSortPtr =  boost::shared_ptr< PvPActionSort >;
      using QuestPtr =  boost::shared_ptr< Quest >;
+     using QuestClassJobRewardPtr =  boost::shared_ptr< QuestClassJobReward >;
+     using QuestRepeatFlagPtr =  boost::shared_ptr< QuestRepeatFlag >;
      using QuestRewardOtherPtr =  boost::shared_ptr< QuestRewardOther >;
      using QuickChatPtr =  boost::shared_ptr< QuickChat >;
      using QuickChatTransientPtr =  boost::shared_ptr< QuickChatTransient >;
@@ -4053,12 +4643,14 @@ struct WorldDCGroupType
      using RecipeElementPtr =  boost::shared_ptr< RecipeElement >;
      using RecipeLevelTablePtr =  boost::shared_ptr< RecipeLevelTable >;
      using RecipeNotebookListPtr =  boost::shared_ptr< RecipeNotebookList >;
+     using RecommendContentsPtr =  boost::shared_ptr< RecommendContents >;
      using RelicPtr =  boost::shared_ptr< Relic >;
      using Relic3Ptr =  boost::shared_ptr< Relic3 >;
      using RelicItemPtr =  boost::shared_ptr< RelicItem >;
      using RelicNotePtr =  boost::shared_ptr< RelicNote >;
      using RelicNoteCategoryPtr =  boost::shared_ptr< RelicNoteCategory >;
      using RetainerTaskPtr =  boost::shared_ptr< RetainerTask >;
+     using RetainerTaskLvRangePtr =  boost::shared_ptr< RetainerTaskLvRange >;
      using RetainerTaskNormalPtr =  boost::shared_ptr< RetainerTaskNormal >;
      using RetainerTaskParameterPtr =  boost::shared_ptr< RetainerTaskParameter >;
      using RetainerTaskRandomPtr =  boost::shared_ptr< RetainerTaskRandom >;
@@ -4066,14 +4658,26 @@ struct WorldDCGroupType
      using SatisfactionNpcPtr =  boost::shared_ptr< SatisfactionNpc >;
      using SatisfactionSupplyPtr =  boost::shared_ptr< SatisfactionSupply >;
      using SatisfactionSupplyRewardPtr =  boost::shared_ptr< SatisfactionSupplyReward >;
+     using ScenarioTreePtr =  boost::shared_ptr< ScenarioTree >;
+     using ScenarioTreeTipsPtr =  boost::shared_ptr< ScenarioTreeTips >;
+     using ScenarioTreeTipsClassQuestPtr =  boost::shared_ptr< ScenarioTreeTipsClassQuest >;
+     using ScenarioTreeTipsQuestPtr =  boost::shared_ptr< ScenarioTreeTipsQuest >;
+     using ScenarioTypePtr =  boost::shared_ptr< ScenarioType >;
      using ScreenImagePtr =  boost::shared_ptr< ScreenImage >;
      using SecretRecipeBookPtr =  boost::shared_ptr< SecretRecipeBook >;
+     using SkyIsland2MissionPtr =  boost::shared_ptr< SkyIsland2Mission >;
+     using SkyIsland2MissionDetailPtr =  boost::shared_ptr< SkyIsland2MissionDetail >;
+     using SkyIsland2MissionTypePtr =  boost::shared_ptr< SkyIsland2MissionType >;
+     using SkyIsland2RangeTypePtr =  boost::shared_ptr< SkyIsland2RangeType >;
      using SpearfishingItemPtr =  boost::shared_ptr< SpearfishingItem >;
      using SpearfishingNotebookPtr =  boost::shared_ptr< SpearfishingNotebook >;
      using SpecialShopPtr =  boost::shared_ptr< SpecialShop >;
      using SpecialShopItemCategoryPtr =  boost::shared_ptr< SpecialShopItemCategory >;
      using StainPtr =  boost::shared_ptr< Stain >;
+     using StainTransientPtr =  boost::shared_ptr< StainTransient >;
      using StatusPtr =  boost::shared_ptr< Status >;
+     using StatusHitEffectPtr =  boost::shared_ptr< StatusHitEffect >;
+     using StatusLoopVFXPtr =  boost::shared_ptr< StatusLoopVFX >;
      using StoryPtr =  boost::shared_ptr< Story >;
      using SubmarineExplorationPtr =  boost::shared_ptr< SubmarineExploration >;
      using SubmarinePartPtr =  boost::shared_ptr< SubmarinePart >;
@@ -4089,6 +4693,8 @@ struct WorldDCGroupType
      using TraitPtr =  boost::shared_ptr< Trait >;
      using TraitRecastPtr =  boost::shared_ptr< TraitRecast >;
      using TraitTransientPtr =  boost::shared_ptr< TraitTransient >;
+     using TransformationPtr =  boost::shared_ptr< Transformation >;
+     using TreasurePtr =  boost::shared_ptr< Treasure >;
      using TreasureHuntRankPtr =  boost::shared_ptr< TreasureHuntRank >;
      using TribePtr =  boost::shared_ptr< Tribe >;
      using TripleTriadPtr =  boost::shared_ptr< TripleTriad >;
@@ -4102,14 +4708,21 @@ struct WorldDCGroupType
      using TutorialDPSPtr =  boost::shared_ptr< TutorialDPS >;
      using TutorialHealerPtr =  boost::shared_ptr< TutorialHealer >;
      using TutorialTankPtr =  boost::shared_ptr< TutorialTank >;
+     using VaseFlowerPtr =  boost::shared_ptr< VaseFlower >;
+     using VFXPtr =  boost::shared_ptr< VFX >;
      using WarpPtr =  boost::shared_ptr< Warp >;
+     using WarpConditionPtr =  boost::shared_ptr< WarpCondition >;
      using WeatherPtr =  boost::shared_ptr< Weather >;
      using WeatherGroupPtr =  boost::shared_ptr< WeatherGroup >;
      using WeatherRatePtr =  boost::shared_ptr< WeatherRate >;
+     using WeddingBGMPtr =  boost::shared_ptr< WeddingBGM >;
      using WeeklyBingoOrderDataPtr =  boost::shared_ptr< WeeklyBingoOrderData >;
      using WeeklyBingoRewardDataPtr =  boost::shared_ptr< WeeklyBingoRewardData >;
      using WeeklyBingoTextPtr =  boost::shared_ptr< WeeklyBingoText >;
+     using WorldPtr =  boost::shared_ptr< World >;
      using WorldDCGroupTypePtr =  boost::shared_ptr< WorldDCGroupType >;
+     using YKWPtr =  boost::shared_ptr< YKW >;
+     using ZoneSharedGroupPtr =  boost::shared_ptr< ZoneSharedGroup >;
 
      template< class T >
      boost::shared_ptr< T > get( uint32_t id )
@@ -4131,16 +4744,21 @@ struct WorldDCGroupType
      std::set< uint32_t > m_AchievementCategoryIdList;
      std::set< uint32_t > m_AchievementKindIdList;
      std::set< uint32_t > m_ActionIdList;
+     std::set< uint32_t > m_ActionCastTimelineIdList;
+     std::set< uint32_t > m_ActionCastVFXIdList;
      std::set< uint32_t > m_ActionCategoryIdList;
      std::set< uint32_t > m_ActionComboRouteIdList;
      std::set< uint32_t > m_ActionIndirectionIdList;
+     std::set< uint32_t > m_ActionParamIdList;
      std::set< uint32_t > m_ActionProcStatusIdList;
      std::set< uint32_t > m_ActionTimelineIdList;
+     std::set< uint32_t > m_ActionTimelineReplaceIdList;
      std::set< uint32_t > m_ActionTransientIdList;
      std::set< uint32_t > m_AddonIdList;
      std::set< uint32_t > m_AdventureIdList;
      std::set< uint32_t > m_AdventureExPhaseIdList;
      std::set< uint32_t > m_AetherCurrentIdList;
+     std::set< uint32_t > m_AetherCurrentCompFlgSetIdList;
      std::set< uint32_t > m_AetherialWheelIdList;
      std::set< uint32_t > m_AetheryteIdList;
      std::set< uint32_t > m_AirshipExplorationLevelIdList;
@@ -4173,6 +4791,7 @@ struct WorldDCGroupType
      std::set< uint32_t > m_BNpcBaseIdList;
      std::set< uint32_t > m_BNpcCustomizeIdList;
      std::set< uint32_t > m_BNpcNameIdList;
+     std::set< uint32_t > m_BuddyIdList;
      std::set< uint32_t > m_BuddyActionIdList;
      std::set< uint32_t > m_BuddyEquipIdList;
      std::set< uint32_t > m_BuddyItemIdList;
@@ -4190,6 +4809,7 @@ struct WorldDCGroupType
      std::set< uint32_t > m_ChocoboRaceRankIdList;
      std::set< uint32_t > m_ChocoboRaceStatusIdList;
      std::set< uint32_t > m_ChocoboRaceTerritoryIdList;
+     std::set< uint32_t > m_ChocoboTaxiIdList;
      std::set< uint32_t > m_ChocoboTaxiStandIdList;
      std::set< uint32_t > m_ClassJobIdList;
      std::set< uint32_t > m_ClassJobCategoryIdList;
@@ -4211,7 +4831,12 @@ struct WorldDCGroupType
      std::set< uint32_t > m_ContentFinderConditionIdList;
      std::set< uint32_t > m_ContentFinderConditionTransientIdList;
      std::set< uint32_t > m_ContentMemberTypeIdList;
+     std::set< uint32_t > m_ContentNpcTalkIdList;
      std::set< uint32_t > m_ContentRouletteIdList;
+     std::set< uint32_t > m_ContentsNoteIdList;
+     std::set< uint32_t > m_ContentsNoteCategoryIdList;
+     std::set< uint32_t > m_ContentTalkIdList;
+     std::set< uint32_t > m_ContentTalkParamIdList;
      std::set< uint32_t > m_ContentTypeIdList;
      std::set< uint32_t > m_CraftActionIdList;
      std::set< uint32_t > m_CraftLeveIdList;
@@ -4240,8 +4865,12 @@ struct WorldDCGroupType
      std::set< uint32_t > m_ENpcBaseIdList;
      std::set< uint32_t > m_ENpcResidentIdList;
      std::set< uint32_t > m_EObjIdList;
+     std::set< uint32_t > m_EObjNameIdList;
      std::set< uint32_t > m_EquipRaceCategoryIdList;
      std::set< uint32_t > m_EquipSlotCategoryIdList;
+     std::set< uint32_t > m_EurekaAethernetIdList;
+     std::set< uint32_t > m_EurekaGrowDataIdList;
+     std::set< uint32_t > m_EurekaSphereElementAdjustIdList;
      std::set< uint32_t > m_EventActionIdList;
      std::set< uint32_t > m_EventIconPriorityIdList;
      std::set< uint32_t > m_EventIconTypeIdList;
@@ -4259,6 +4888,7 @@ struct WorldDCGroupType
      std::set< uint32_t > m_FCProfileIdList;
      std::set< uint32_t > m_FCReputationIdList;
      std::set< uint32_t > m_FCRightsIdList;
+     std::set< uint32_t > m_FieldMarkerIdList;
      std::set< uint32_t > m_FishingSpotIdList;
      std::set< uint32_t > m_FishParameterIdList;
      std::set< uint32_t > m_GardeningSeedIdList;
@@ -4308,7 +4938,6 @@ struct WorldDCGroupType
      std::set< uint32_t > m_InstanceContentIdList;
      std::set< uint32_t > m_InstanceContentBuffIdList;
      std::set< uint32_t > m_InstanceContentTextDataIdList;
-     std::set< uint32_t > m_InstanceContentTypeIdList;
      std::set< uint32_t > m_ItemIdList;
      std::set< uint32_t > m_ItemActionIdList;
      std::set< uint32_t > m_ItemFoodIdList;
@@ -4336,7 +4965,9 @@ struct WorldDCGroupType
      std::set< uint32_t > m_MainCommandCategoryIdList;
      std::set< uint32_t > m_MapIdList;
      std::set< uint32_t > m_MapMarkerIdList;
+     std::set< uint32_t > m_MapMarkerRegionIdList;
      std::set< uint32_t > m_MapSymbolIdList;
+     std::set< uint32_t > m_MarkerIdList;
      std::set< uint32_t > m_MasterpieceSupplyDutyIdList;
      std::set< uint32_t > m_MasterpieceSupplyMultiplierIdList;
      std::set< uint32_t > m_MateriaIdList;
@@ -4349,6 +4980,8 @@ struct WorldDCGroupType
      std::set< uint32_t > m_MonsterNoteTargetIdList;
      std::set< uint32_t > m_MountIdList;
      std::set< uint32_t > m_MountActionIdList;
+     std::set< uint32_t > m_MoveTimelineIdList;
+     std::set< uint32_t > m_MoveVfxIdList;
      std::set< uint32_t > m_NpcEquipIdList;
      std::set< uint32_t > m_OmenIdList;
      std::set< uint32_t > m_OnlineStatusIdList;
@@ -4358,11 +4991,17 @@ struct WorldDCGroupType
      std::set< uint32_t > m_OrchestrionPathIdList;
      std::set< uint32_t > m_OrchestrionUiparamIdList;
      std::set< uint32_t > m_ParamGrowIdList;
+     std::set< uint32_t > m_PerformIdList;
+     std::set< uint32_t > m_PerformTransientIdList;
      std::set< uint32_t > m_PetIdList;
      std::set< uint32_t > m_PetActionIdList;
      std::set< uint32_t > m_PictureIdList;
      std::set< uint32_t > m_PlaceNameIdList;
+     std::set< uint32_t > m_PublicContentIdList;
+     std::set< uint32_t > m_PvPActionSortIdList;
      std::set< uint32_t > m_QuestIdList;
+     std::set< uint32_t > m_QuestClassJobRewardIdList;
+     std::set< uint32_t > m_QuestRepeatFlagIdList;
      std::set< uint32_t > m_QuestRewardOtherIdList;
      std::set< uint32_t > m_QuickChatIdList;
      std::set< uint32_t > m_QuickChatTransientIdList;
@@ -4376,12 +5015,14 @@ struct WorldDCGroupType
      std::set< uint32_t > m_RecipeElementIdList;
      std::set< uint32_t > m_RecipeLevelTableIdList;
      std::set< uint32_t > m_RecipeNotebookListIdList;
+     std::set< uint32_t > m_RecommendContentsIdList;
      std::set< uint32_t > m_RelicIdList;
      std::set< uint32_t > m_Relic3IdList;
      std::set< uint32_t > m_RelicItemIdList;
      std::set< uint32_t > m_RelicNoteIdList;
      std::set< uint32_t > m_RelicNoteCategoryIdList;
      std::set< uint32_t > m_RetainerTaskIdList;
+     std::set< uint32_t > m_RetainerTaskLvRangeIdList;
      std::set< uint32_t > m_RetainerTaskNormalIdList;
      std::set< uint32_t > m_RetainerTaskParameterIdList;
      std::set< uint32_t > m_RetainerTaskRandomIdList;
@@ -4389,14 +5030,26 @@ struct WorldDCGroupType
      std::set< uint32_t > m_SatisfactionNpcIdList;
      std::set< uint32_t > m_SatisfactionSupplyIdList;
      std::set< uint32_t > m_SatisfactionSupplyRewardIdList;
+     std::set< uint32_t > m_ScenarioTreeIdList;
+     std::set< uint32_t > m_ScenarioTreeTipsIdList;
+     std::set< uint32_t > m_ScenarioTreeTipsClassQuestIdList;
+     std::set< uint32_t > m_ScenarioTreeTipsQuestIdList;
+     std::set< uint32_t > m_ScenarioTypeIdList;
      std::set< uint32_t > m_ScreenImageIdList;
      std::set< uint32_t > m_SecretRecipeBookIdList;
+     std::set< uint32_t > m_SkyIsland2MissionIdList;
+     std::set< uint32_t > m_SkyIsland2MissionDetailIdList;
+     std::set< uint32_t > m_SkyIsland2MissionTypeIdList;
+     std::set< uint32_t > m_SkyIsland2RangeTypeIdList;
      std::set< uint32_t > m_SpearfishingItemIdList;
      std::set< uint32_t > m_SpearfishingNotebookIdList;
      std::set< uint32_t > m_SpecialShopIdList;
      std::set< uint32_t > m_SpecialShopItemCategoryIdList;
      std::set< uint32_t > m_StainIdList;
+     std::set< uint32_t > m_StainTransientIdList;
      std::set< uint32_t > m_StatusIdList;
+     std::set< uint32_t > m_StatusHitEffectIdList;
+     std::set< uint32_t > m_StatusLoopVFXIdList;
      std::set< uint32_t > m_StoryIdList;
      std::set< uint32_t > m_SubmarineExplorationIdList;
      std::set< uint32_t > m_SubmarinePartIdList;
@@ -4412,6 +5065,8 @@ struct WorldDCGroupType
      std::set< uint32_t > m_TraitIdList;
      std::set< uint32_t > m_TraitRecastIdList;
      std::set< uint32_t > m_TraitTransientIdList;
+     std::set< uint32_t > m_TransformationIdList;
+     std::set< uint32_t > m_TreasureIdList;
      std::set< uint32_t > m_TreasureHuntRankIdList;
      std::set< uint32_t > m_TribeIdList;
      std::set< uint32_t > m_TripleTriadIdList;
@@ -4425,14 +5080,21 @@ struct WorldDCGroupType
      std::set< uint32_t > m_TutorialDPSIdList;
      std::set< uint32_t > m_TutorialHealerIdList;
      std::set< uint32_t > m_TutorialTankIdList;
+     std::set< uint32_t > m_VaseFlowerIdList;
+     std::set< uint32_t > m_VFXIdList;
      std::set< uint32_t > m_WarpIdList;
+     std::set< uint32_t > m_WarpConditionIdList;
      std::set< uint32_t > m_WeatherIdList;
      std::set< uint32_t > m_WeatherGroupIdList;
      std::set< uint32_t > m_WeatherRateIdList;
+     std::set< uint32_t > m_WeddingBGMIdList;
      std::set< uint32_t > m_WeeklyBingoOrderDataIdList;
      std::set< uint32_t > m_WeeklyBingoRewardDataIdList;
      std::set< uint32_t > m_WeeklyBingoTextIdList;
+     std::set< uint32_t > m_WorldIdList;
      std::set< uint32_t > m_WorldDCGroupTypeIdList;
+     std::set< uint32_t > m_YKWIdList;
+     std::set< uint32_t > m_ZoneSharedGroupIdList;
 
 
 const std::set< uint32_t >& getAchievementIdList()
@@ -4459,6 +5121,18 @@ const std::set< uint32_t >& getActionIdList()
       loadIdList( m_ActionDat, m_ActionIdList );
    return m_ActionIdList;
 }
+const std::set< uint32_t >& getActionCastTimelineIdList()
+{
+   if( m_ActionCastTimelineIdList.size() == 0 )
+      loadIdList( m_ActionCastTimelineDat, m_ActionCastTimelineIdList );
+   return m_ActionCastTimelineIdList;
+}
+const std::set< uint32_t >& getActionCastVFXIdList()
+{
+   if( m_ActionCastVFXIdList.size() == 0 )
+      loadIdList( m_ActionCastVFXDat, m_ActionCastVFXIdList );
+   return m_ActionCastVFXIdList;
+}
 const std::set< uint32_t >& getActionCategoryIdList()
 {
    if( m_ActionCategoryIdList.size() == 0 )
@@ -4477,6 +5151,12 @@ const std::set< uint32_t >& getActionIndirectionIdList()
       loadIdList( m_ActionIndirectionDat, m_ActionIndirectionIdList );
    return m_ActionIndirectionIdList;
 }
+const std::set< uint32_t >& getActionParamIdList()
+{
+   if( m_ActionParamIdList.size() == 0 )
+      loadIdList( m_ActionParamDat, m_ActionParamIdList );
+   return m_ActionParamIdList;
+}
 const std::set< uint32_t >& getActionProcStatusIdList()
 {
    if( m_ActionProcStatusIdList.size() == 0 )
@@ -4488,6 +5168,12 @@ const std::set< uint32_t >& getActionTimelineIdList()
    if( m_ActionTimelineIdList.size() == 0 )
       loadIdList( m_ActionTimelineDat, m_ActionTimelineIdList );
    return m_ActionTimelineIdList;
+}
+const std::set< uint32_t >& getActionTimelineReplaceIdList()
+{
+   if( m_ActionTimelineReplaceIdList.size() == 0 )
+      loadIdList( m_ActionTimelineReplaceDat, m_ActionTimelineReplaceIdList );
+   return m_ActionTimelineReplaceIdList;
 }
 const std::set< uint32_t >& getActionTransientIdList()
 {
@@ -4518,6 +5204,12 @@ const std::set< uint32_t >& getAetherCurrentIdList()
    if( m_AetherCurrentIdList.size() == 0 )
       loadIdList( m_AetherCurrentDat, m_AetherCurrentIdList );
    return m_AetherCurrentIdList;
+}
+const std::set< uint32_t >& getAetherCurrentCompFlgSetIdList()
+{
+   if( m_AetherCurrentCompFlgSetIdList.size() == 0 )
+      loadIdList( m_AetherCurrentCompFlgSetDat, m_AetherCurrentCompFlgSetIdList );
+   return m_AetherCurrentCompFlgSetIdList;
 }
 const std::set< uint32_t >& getAetherialWheelIdList()
 {
@@ -4711,6 +5403,12 @@ const std::set< uint32_t >& getBNpcNameIdList()
       loadIdList( m_BNpcNameDat, m_BNpcNameIdList );
    return m_BNpcNameIdList;
 }
+const std::set< uint32_t >& getBuddyIdList()
+{
+   if( m_BuddyIdList.size() == 0 )
+      loadIdList( m_BuddyDat, m_BuddyIdList );
+   return m_BuddyIdList;
+}
 const std::set< uint32_t >& getBuddyActionIdList()
 {
    if( m_BuddyActionIdList.size() == 0 )
@@ -4812,6 +5510,12 @@ const std::set< uint32_t >& getChocoboRaceTerritoryIdList()
    if( m_ChocoboRaceTerritoryIdList.size() == 0 )
       loadIdList( m_ChocoboRaceTerritoryDat, m_ChocoboRaceTerritoryIdList );
    return m_ChocoboRaceTerritoryIdList;
+}
+const std::set< uint32_t >& getChocoboTaxiIdList()
+{
+   if( m_ChocoboTaxiIdList.size() == 0 )
+      loadIdList( m_ChocoboTaxiDat, m_ChocoboTaxiIdList );
+   return m_ChocoboTaxiIdList;
 }
 const std::set< uint32_t >& getChocoboTaxiStandIdList()
 {
@@ -4939,11 +5643,41 @@ const std::set< uint32_t >& getContentMemberTypeIdList()
       loadIdList( m_ContentMemberTypeDat, m_ContentMemberTypeIdList );
    return m_ContentMemberTypeIdList;
 }
+const std::set< uint32_t >& getContentNpcTalkIdList()
+{
+   if( m_ContentNpcTalkIdList.size() == 0 )
+      loadIdList( m_ContentNpcTalkDat, m_ContentNpcTalkIdList );
+   return m_ContentNpcTalkIdList;
+}
 const std::set< uint32_t >& getContentRouletteIdList()
 {
    if( m_ContentRouletteIdList.size() == 0 )
       loadIdList( m_ContentRouletteDat, m_ContentRouletteIdList );
    return m_ContentRouletteIdList;
+}
+const std::set< uint32_t >& getContentsNoteIdList()
+{
+   if( m_ContentsNoteIdList.size() == 0 )
+      loadIdList( m_ContentsNoteDat, m_ContentsNoteIdList );
+   return m_ContentsNoteIdList;
+}
+const std::set< uint32_t >& getContentsNoteCategoryIdList()
+{
+   if( m_ContentsNoteCategoryIdList.size() == 0 )
+      loadIdList( m_ContentsNoteCategoryDat, m_ContentsNoteCategoryIdList );
+   return m_ContentsNoteCategoryIdList;
+}
+const std::set< uint32_t >& getContentTalkIdList()
+{
+   if( m_ContentTalkIdList.size() == 0 )
+      loadIdList( m_ContentTalkDat, m_ContentTalkIdList );
+   return m_ContentTalkIdList;
+}
+const std::set< uint32_t >& getContentTalkParamIdList()
+{
+   if( m_ContentTalkParamIdList.size() == 0 )
+      loadIdList( m_ContentTalkParamDat, m_ContentTalkParamIdList );
+   return m_ContentTalkParamIdList;
 }
 const std::set< uint32_t >& getContentTypeIdList()
 {
@@ -5113,6 +5847,12 @@ const std::set< uint32_t >& getEObjIdList()
       loadIdList( m_EObjDat, m_EObjIdList );
    return m_EObjIdList;
 }
+const std::set< uint32_t >& getEObjNameIdList()
+{
+   if( m_EObjNameIdList.size() == 0 )
+      loadIdList( m_EObjNameDat, m_EObjNameIdList );
+   return m_EObjNameIdList;
+}
 const std::set< uint32_t >& getEquipRaceCategoryIdList()
 {
    if( m_EquipRaceCategoryIdList.size() == 0 )
@@ -5124,6 +5864,24 @@ const std::set< uint32_t >& getEquipSlotCategoryIdList()
    if( m_EquipSlotCategoryIdList.size() == 0 )
       loadIdList( m_EquipSlotCategoryDat, m_EquipSlotCategoryIdList );
    return m_EquipSlotCategoryIdList;
+}
+const std::set< uint32_t >& getEurekaAethernetIdList()
+{
+   if( m_EurekaAethernetIdList.size() == 0 )
+      loadIdList( m_EurekaAethernetDat, m_EurekaAethernetIdList );
+   return m_EurekaAethernetIdList;
+}
+const std::set< uint32_t >& getEurekaGrowDataIdList()
+{
+   if( m_EurekaGrowDataIdList.size() == 0 )
+      loadIdList( m_EurekaGrowDataDat, m_EurekaGrowDataIdList );
+   return m_EurekaGrowDataIdList;
+}
+const std::set< uint32_t >& getEurekaSphereElementAdjustIdList()
+{
+   if( m_EurekaSphereElementAdjustIdList.size() == 0 )
+      loadIdList( m_EurekaSphereElementAdjustDat, m_EurekaSphereElementAdjustIdList );
+   return m_EurekaSphereElementAdjustIdList;
 }
 const std::set< uint32_t >& getEventActionIdList()
 {
@@ -5226,6 +5984,12 @@ const std::set< uint32_t >& getFCRightsIdList()
    if( m_FCRightsIdList.size() == 0 )
       loadIdList( m_FCRightsDat, m_FCRightsIdList );
    return m_FCRightsIdList;
+}
+const std::set< uint32_t >& getFieldMarkerIdList()
+{
+   if( m_FieldMarkerIdList.size() == 0 )
+      loadIdList( m_FieldMarkerDat, m_FieldMarkerIdList );
+   return m_FieldMarkerIdList;
 }
 const std::set< uint32_t >& getFishingSpotIdList()
 {
@@ -5521,12 +6285,6 @@ const std::set< uint32_t >& getInstanceContentTextDataIdList()
       loadIdList( m_InstanceContentTextDataDat, m_InstanceContentTextDataIdList );
    return m_InstanceContentTextDataIdList;
 }
-const std::set< uint32_t >& getInstanceContentTypeIdList()
-{
-   if( m_InstanceContentTypeIdList.size() == 0 )
-      loadIdList( m_InstanceContentTypeDat, m_InstanceContentTypeIdList );
-   return m_InstanceContentTypeIdList;
-}
 const std::set< uint32_t >& getItemIdList()
 {
    if( m_ItemIdList.size() == 0 )
@@ -5689,11 +6447,23 @@ const std::set< uint32_t >& getMapMarkerIdList()
       loadIdList( m_MapMarkerDat, m_MapMarkerIdList );
    return m_MapMarkerIdList;
 }
+const std::set< uint32_t >& getMapMarkerRegionIdList()
+{
+   if( m_MapMarkerRegionIdList.size() == 0 )
+      loadIdList( m_MapMarkerRegionDat, m_MapMarkerRegionIdList );
+   return m_MapMarkerRegionIdList;
+}
 const std::set< uint32_t >& getMapSymbolIdList()
 {
    if( m_MapSymbolIdList.size() == 0 )
       loadIdList( m_MapSymbolDat, m_MapSymbolIdList );
    return m_MapSymbolIdList;
+}
+const std::set< uint32_t >& getMarkerIdList()
+{
+   if( m_MarkerIdList.size() == 0 )
+      loadIdList( m_MarkerDat, m_MarkerIdList );
+   return m_MarkerIdList;
 }
 const std::set< uint32_t >& getMasterpieceSupplyDutyIdList()
 {
@@ -5767,6 +6537,18 @@ const std::set< uint32_t >& getMountActionIdList()
       loadIdList( m_MountActionDat, m_MountActionIdList );
    return m_MountActionIdList;
 }
+const std::set< uint32_t >& getMoveTimelineIdList()
+{
+   if( m_MoveTimelineIdList.size() == 0 )
+      loadIdList( m_MoveTimelineDat, m_MoveTimelineIdList );
+   return m_MoveTimelineIdList;
+}
+const std::set< uint32_t >& getMoveVfxIdList()
+{
+   if( m_MoveVfxIdList.size() == 0 )
+      loadIdList( m_MoveVfxDat, m_MoveVfxIdList );
+   return m_MoveVfxIdList;
+}
 const std::set< uint32_t >& getNpcEquipIdList()
 {
    if( m_NpcEquipIdList.size() == 0 )
@@ -5821,6 +6603,18 @@ const std::set< uint32_t >& getParamGrowIdList()
       loadIdList( m_ParamGrowDat, m_ParamGrowIdList );
    return m_ParamGrowIdList;
 }
+const std::set< uint32_t >& getPerformIdList()
+{
+   if( m_PerformIdList.size() == 0 )
+      loadIdList( m_PerformDat, m_PerformIdList );
+   return m_PerformIdList;
+}
+const std::set< uint32_t >& getPerformTransientIdList()
+{
+   if( m_PerformTransientIdList.size() == 0 )
+      loadIdList( m_PerformTransientDat, m_PerformTransientIdList );
+   return m_PerformTransientIdList;
+}
 const std::set< uint32_t >& getPetIdList()
 {
    if( m_PetIdList.size() == 0 )
@@ -5845,11 +6639,35 @@ const std::set< uint32_t >& getPlaceNameIdList()
       loadIdList( m_PlaceNameDat, m_PlaceNameIdList );
    return m_PlaceNameIdList;
 }
+const std::set< uint32_t >& getPublicContentIdList()
+{
+   if( m_PublicContentIdList.size() == 0 )
+      loadIdList( m_PublicContentDat, m_PublicContentIdList );
+   return m_PublicContentIdList;
+}
+const std::set< uint32_t >& getPvPActionSortIdList()
+{
+   if( m_PvPActionSortIdList.size() == 0 )
+      loadIdList( m_PvPActionSortDat, m_PvPActionSortIdList );
+   return m_PvPActionSortIdList;
+}
 const std::set< uint32_t >& getQuestIdList()
 {
    if( m_QuestIdList.size() == 0 )
       loadIdList( m_QuestDat, m_QuestIdList );
    return m_QuestIdList;
+}
+const std::set< uint32_t >& getQuestClassJobRewardIdList()
+{
+   if( m_QuestClassJobRewardIdList.size() == 0 )
+      loadIdList( m_QuestClassJobRewardDat, m_QuestClassJobRewardIdList );
+   return m_QuestClassJobRewardIdList;
+}
+const std::set< uint32_t >& getQuestRepeatFlagIdList()
+{
+   if( m_QuestRepeatFlagIdList.size() == 0 )
+      loadIdList( m_QuestRepeatFlagDat, m_QuestRepeatFlagIdList );
+   return m_QuestRepeatFlagIdList;
 }
 const std::set< uint32_t >& getQuestRewardOtherIdList()
 {
@@ -5929,6 +6747,12 @@ const std::set< uint32_t >& getRecipeNotebookListIdList()
       loadIdList( m_RecipeNotebookListDat, m_RecipeNotebookListIdList );
    return m_RecipeNotebookListIdList;
 }
+const std::set< uint32_t >& getRecommendContentsIdList()
+{
+   if( m_RecommendContentsIdList.size() == 0 )
+      loadIdList( m_RecommendContentsDat, m_RecommendContentsIdList );
+   return m_RecommendContentsIdList;
+}
 const std::set< uint32_t >& getRelicIdList()
 {
    if( m_RelicIdList.size() == 0 )
@@ -5964,6 +6788,12 @@ const std::set< uint32_t >& getRetainerTaskIdList()
    if( m_RetainerTaskIdList.size() == 0 )
       loadIdList( m_RetainerTaskDat, m_RetainerTaskIdList );
    return m_RetainerTaskIdList;
+}
+const std::set< uint32_t >& getRetainerTaskLvRangeIdList()
+{
+   if( m_RetainerTaskLvRangeIdList.size() == 0 )
+      loadIdList( m_RetainerTaskLvRangeDat, m_RetainerTaskLvRangeIdList );
+   return m_RetainerTaskLvRangeIdList;
 }
 const std::set< uint32_t >& getRetainerTaskNormalIdList()
 {
@@ -6007,6 +6837,36 @@ const std::set< uint32_t >& getSatisfactionSupplyRewardIdList()
       loadIdList( m_SatisfactionSupplyRewardDat, m_SatisfactionSupplyRewardIdList );
    return m_SatisfactionSupplyRewardIdList;
 }
+const std::set< uint32_t >& getScenarioTreeIdList()
+{
+   if( m_ScenarioTreeIdList.size() == 0 )
+      loadIdList( m_ScenarioTreeDat, m_ScenarioTreeIdList );
+   return m_ScenarioTreeIdList;
+}
+const std::set< uint32_t >& getScenarioTreeTipsIdList()
+{
+   if( m_ScenarioTreeTipsIdList.size() == 0 )
+      loadIdList( m_ScenarioTreeTipsDat, m_ScenarioTreeTipsIdList );
+   return m_ScenarioTreeTipsIdList;
+}
+const std::set< uint32_t >& getScenarioTreeTipsClassQuestIdList()
+{
+   if( m_ScenarioTreeTipsClassQuestIdList.size() == 0 )
+      loadIdList( m_ScenarioTreeTipsClassQuestDat, m_ScenarioTreeTipsClassQuestIdList );
+   return m_ScenarioTreeTipsClassQuestIdList;
+}
+const std::set< uint32_t >& getScenarioTreeTipsQuestIdList()
+{
+   if( m_ScenarioTreeTipsQuestIdList.size() == 0 )
+      loadIdList( m_ScenarioTreeTipsQuestDat, m_ScenarioTreeTipsQuestIdList );
+   return m_ScenarioTreeTipsQuestIdList;
+}
+const std::set< uint32_t >& getScenarioTypeIdList()
+{
+   if( m_ScenarioTypeIdList.size() == 0 )
+      loadIdList( m_ScenarioTypeDat, m_ScenarioTypeIdList );
+   return m_ScenarioTypeIdList;
+}
 const std::set< uint32_t >& getScreenImageIdList()
 {
    if( m_ScreenImageIdList.size() == 0 )
@@ -6018,6 +6878,30 @@ const std::set< uint32_t >& getSecretRecipeBookIdList()
    if( m_SecretRecipeBookIdList.size() == 0 )
       loadIdList( m_SecretRecipeBookDat, m_SecretRecipeBookIdList );
    return m_SecretRecipeBookIdList;
+}
+const std::set< uint32_t >& getSkyIsland2MissionIdList()
+{
+   if( m_SkyIsland2MissionIdList.size() == 0 )
+      loadIdList( m_SkyIsland2MissionDat, m_SkyIsland2MissionIdList );
+   return m_SkyIsland2MissionIdList;
+}
+const std::set< uint32_t >& getSkyIsland2MissionDetailIdList()
+{
+   if( m_SkyIsland2MissionDetailIdList.size() == 0 )
+      loadIdList( m_SkyIsland2MissionDetailDat, m_SkyIsland2MissionDetailIdList );
+   return m_SkyIsland2MissionDetailIdList;
+}
+const std::set< uint32_t >& getSkyIsland2MissionTypeIdList()
+{
+   if( m_SkyIsland2MissionTypeIdList.size() == 0 )
+      loadIdList( m_SkyIsland2MissionTypeDat, m_SkyIsland2MissionTypeIdList );
+   return m_SkyIsland2MissionTypeIdList;
+}
+const std::set< uint32_t >& getSkyIsland2RangeTypeIdList()
+{
+   if( m_SkyIsland2RangeTypeIdList.size() == 0 )
+      loadIdList( m_SkyIsland2RangeTypeDat, m_SkyIsland2RangeTypeIdList );
+   return m_SkyIsland2RangeTypeIdList;
 }
 const std::set< uint32_t >& getSpearfishingItemIdList()
 {
@@ -6049,11 +6933,29 @@ const std::set< uint32_t >& getStainIdList()
       loadIdList( m_StainDat, m_StainIdList );
    return m_StainIdList;
 }
+const std::set< uint32_t >& getStainTransientIdList()
+{
+   if( m_StainTransientIdList.size() == 0 )
+      loadIdList( m_StainTransientDat, m_StainTransientIdList );
+   return m_StainTransientIdList;
+}
 const std::set< uint32_t >& getStatusIdList()
 {
    if( m_StatusIdList.size() == 0 )
       loadIdList( m_StatusDat, m_StatusIdList );
    return m_StatusIdList;
+}
+const std::set< uint32_t >& getStatusHitEffectIdList()
+{
+   if( m_StatusHitEffectIdList.size() == 0 )
+      loadIdList( m_StatusHitEffectDat, m_StatusHitEffectIdList );
+   return m_StatusHitEffectIdList;
+}
+const std::set< uint32_t >& getStatusLoopVFXIdList()
+{
+   if( m_StatusLoopVFXIdList.size() == 0 )
+      loadIdList( m_StatusLoopVFXDat, m_StatusLoopVFXIdList );
+   return m_StatusLoopVFXIdList;
 }
 const std::set< uint32_t >& getStoryIdList()
 {
@@ -6145,6 +7047,18 @@ const std::set< uint32_t >& getTraitTransientIdList()
       loadIdList( m_TraitTransientDat, m_TraitTransientIdList );
    return m_TraitTransientIdList;
 }
+const std::set< uint32_t >& getTransformationIdList()
+{
+   if( m_TransformationIdList.size() == 0 )
+      loadIdList( m_TransformationDat, m_TransformationIdList );
+   return m_TransformationIdList;
+}
+const std::set< uint32_t >& getTreasureIdList()
+{
+   if( m_TreasureIdList.size() == 0 )
+      loadIdList( m_TreasureDat, m_TreasureIdList );
+   return m_TreasureIdList;
+}
 const std::set< uint32_t >& getTreasureHuntRankIdList()
 {
    if( m_TreasureHuntRankIdList.size() == 0 )
@@ -6223,11 +7137,29 @@ const std::set< uint32_t >& getTutorialTankIdList()
       loadIdList( m_TutorialTankDat, m_TutorialTankIdList );
    return m_TutorialTankIdList;
 }
+const std::set< uint32_t >& getVaseFlowerIdList()
+{
+   if( m_VaseFlowerIdList.size() == 0 )
+      loadIdList( m_VaseFlowerDat, m_VaseFlowerIdList );
+   return m_VaseFlowerIdList;
+}
+const std::set< uint32_t >& getVFXIdList()
+{
+   if( m_VFXIdList.size() == 0 )
+      loadIdList( m_VFXDat, m_VFXIdList );
+   return m_VFXIdList;
+}
 const std::set< uint32_t >& getWarpIdList()
 {
    if( m_WarpIdList.size() == 0 )
       loadIdList( m_WarpDat, m_WarpIdList );
    return m_WarpIdList;
+}
+const std::set< uint32_t >& getWarpConditionIdList()
+{
+   if( m_WarpConditionIdList.size() == 0 )
+      loadIdList( m_WarpConditionDat, m_WarpConditionIdList );
+   return m_WarpConditionIdList;
 }
 const std::set< uint32_t >& getWeatherIdList()
 {
@@ -6247,6 +7179,12 @@ const std::set< uint32_t >& getWeatherRateIdList()
       loadIdList( m_WeatherRateDat, m_WeatherRateIdList );
    return m_WeatherRateIdList;
 }
+const std::set< uint32_t >& getWeddingBGMIdList()
+{
+   if( m_WeddingBGMIdList.size() == 0 )
+      loadIdList( m_WeddingBGMDat, m_WeddingBGMIdList );
+   return m_WeddingBGMIdList;
+}
 const std::set< uint32_t >& getWeeklyBingoOrderDataIdList()
 {
    if( m_WeeklyBingoOrderDataIdList.size() == 0 )
@@ -6265,11 +7203,29 @@ const std::set< uint32_t >& getWeeklyBingoTextIdList()
       loadIdList( m_WeeklyBingoTextDat, m_WeeklyBingoTextIdList );
    return m_WeeklyBingoTextIdList;
 }
+const std::set< uint32_t >& getWorldIdList()
+{
+   if( m_WorldIdList.size() == 0 )
+      loadIdList( m_WorldDat, m_WorldIdList );
+   return m_WorldIdList;
+}
 const std::set< uint32_t >& getWorldDCGroupTypeIdList()
 {
    if( m_WorldDCGroupTypeIdList.size() == 0 )
       loadIdList( m_WorldDCGroupTypeDat, m_WorldDCGroupTypeIdList );
    return m_WorldDCGroupTypeIdList;
+}
+const std::set< uint32_t >& getYKWIdList()
+{
+   if( m_YKWIdList.size() == 0 )
+      loadIdList( m_YKWDat, m_YKWIdList );
+   return m_YKWIdList;
+}
+const std::set< uint32_t >& getZoneSharedGroupIdList()
+{
+   if( m_ZoneSharedGroupIdList.size() == 0 )
+      loadIdList( m_ZoneSharedGroupDat, m_ZoneSharedGroupIdList );
+   return m_ZoneSharedGroupIdList;
 }
 
 

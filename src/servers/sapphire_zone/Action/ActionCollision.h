@@ -2,14 +2,14 @@
 #define _ACTIONCOLLISION_H
 
 #include <Common.h>
-#include "Action.h"
-
+#include "Forwards.h"
 
 namespace Core {
 namespace Data
 {
    struct Action;
 }
+
 namespace Entity {
 
    enum class TargetFilter

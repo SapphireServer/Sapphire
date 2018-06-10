@@ -7,10 +7,7 @@
 #include <Network/PacketContainer.h>
 #include <Network/PacketDef/Chat/ServerChatDef.h>
 #include <Database/DatabaseDef.h>
-#include <Database/DbWorkerPool.h>
-#include <Database/CharaDbConnection.h>
 
-#include <boost/format.hpp>
 #include <unordered_map>
 #include "Network/GameConnection.h"
 
@@ -32,10 +29,6 @@
 
 #include "DebugCommand/DebugCommandHandler.h"
 
-#include "Actor/Player.h"
-
-#include "Inventory/Inventory.h"
-
 #include "Event/EventHelper.h"
 
 #include "Action/Action.h"
@@ -55,9 +48,10 @@ using namespace Core::Network::Packets::Server;
 void Core::Network::GameConnection::fcInfoReqHandler( const Packets::GamePacket& inPacket,
                                                       Entity::Player& player )
 {
-   GamePacketPtr pPe( new GamePacket( 0xDD, 0x78, player.getId(), player.getId() ) );
-   pPe->setValAt< uint8_t >( 0x48, 0x01 );
-   queueOutPacket( pPe );
+   // TODO: use new packet struct for this
+   //GamePacketPtr pPe( new GamePacket( 0xDD, 0x78, player.getId(), player.getId() ) );
+   //pPe->setValAt< uint8_t >( 0x48, 0x01 );
+   //queueOutPacket( pPe );
 }
 
 void Core::Network::GameConnection::setSearchInfoHandler( const Packets::GamePacket& inPacket,

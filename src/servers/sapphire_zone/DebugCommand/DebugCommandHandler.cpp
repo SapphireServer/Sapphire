@@ -6,7 +6,6 @@
 #include <Common.h>
 #include <Version.h>
 #include <Network/GamePacketNew.h>
-#include <Network/CommonNetwork.h>
 #include <Util/UtilMath.h>
 #include <Network/PacketContainer.h>
 #include <Logging/Logger.h>
@@ -25,7 +24,6 @@
 #include "Script/ScriptMgr.h"
 #include "Script/NativeScriptMgr.h"
 
-#include "Actor/Player.h"
 #include "Actor/EventObject.h"
 
 #include "Zone/Zone.h"
@@ -34,7 +32,6 @@
 
 #include "ServerZone.h"
 
-#include "StatusEffect/StatusEffect.h"
 #include "Session.h"
 #include "Framework.h"
 
