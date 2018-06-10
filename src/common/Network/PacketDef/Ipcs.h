@@ -107,10 +107,13 @@ namespace Packets {
 
       ActorCast                  = 0x0178, // updated 4.3
 
+      PartyList                  = 0x017A, // updated 4.3
       HateList                   = 0x017B, // updated 4.3
 
       ObjectSpawn                = 0x017D, // updated 4.3
       ObjectDespawn              = 0x017E, // updated 4.3
+
+      SetLevelSync               = 0x017F, // updated 4.3
 
       InventoryActionAck         = 0x0180, // updated 4.2 ?
 
