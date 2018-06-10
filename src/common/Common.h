@@ -553,6 +553,7 @@ namespace Common {
       AetherReductionDlg = 0x17D,
 
       Unk6 = 0x19C,
+      EObjAnimation = 0x19D,
 
       SetTitle = 0x1F4,
 
@@ -562,6 +563,7 @@ namespace Common {
       SetFavorite = 0x1FC,
       LearnTeleport = 0x1FD,
 
+      OpenRecommendationGuide = 0x200,
       ArmoryErrorMsg = 0x201,
 
       AchievementPopup = 0x203,
