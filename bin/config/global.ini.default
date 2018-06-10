@@ -1,0 +1,22 @@
+[Database]
+Host = 127.0.0.1
+Port = 3306
+Database = sapphire
+Username = sapphire
+Password =
+SyncThreads = 2
+AsyncThreads = 2
+
+[GlobalParameters]
+ServerSecret = default
+DataPath = C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack
+
+[GlobalNetwork]
+ZoneHost = 127.0.0.1
+ZonePort = 54992
+
+LobbyHost = 127.0.0.1
+LobbyPort = 54994
+
+RestHost = 127.0.0.1
+RestPort = 80
