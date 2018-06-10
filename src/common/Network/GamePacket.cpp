@@ -92,8 +92,8 @@ Core::Network::Packets::GamePacket::~GamePacket()
 void Core::Network::Packets::GamePacket::savePacket()
 {
    char filename[20];
-   sprintf( filename, "dump_0x%x_%i.dat", m_subType, Util::getTimeMs() );
-   FILE * fp = nullptr;
+   sprintf( filename, "dump_0x%x_%li.dat", m_subType, Util::getTimeMs() );
+   FILE* fp = nullptr;
    fp = fopen( filename, "wb" );
    fwrite( &m_dataBuf[0], 1, m_segHdr.size, fp );
    fclose( fp );
