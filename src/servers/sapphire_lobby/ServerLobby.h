@@ -6,7 +6,6 @@
 #include <map>
 
 #include <boost/shared_ptr.hpp>
-#include <Config/XMLConfig.h>
 
 #include "Forwards.h"
 
@@ -15,7 +14,7 @@ const std::string LOBBY_VERSION = "0.0.5";
 namespace Core
 {
    class LobbySession;
-   class XMLConfig;
+   class ConfigMgr;
    typedef std::map< std::string, LobbySessionPtr > LobbySessionMap;
 
    class ServerLobby
@@ -30,7 +29,7 @@ namespace Core
       uint16_t m_port;
       std::string m_ip;
 
-      boost::shared_ptr<XMLConfig> m_pConfig;
+      boost::shared_ptr< ConfigMgr > m_pConfig;
 
    public:
       ServerLobby( const std::string& configPath );
@@ -45,7 +44,7 @@ namespace Core
          m_sessionMap[std::string( sessionId )] = pSession;
       }
       
-      boost::shared_ptr<XMLConfig> getConfig() const;
+      boost::shared_ptr< ConfigMgr > getConfig() const;
 
       LobbySessionPtr getSession( char* sessionId );
       uint32_t m_numConnections;

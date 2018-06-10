@@ -4,7 +4,6 @@
 #include <Network/GamePacket.h>
 #include <Util/Util.h>
 #include <Util/UtilMath.h>
-#include <Config/XMLConfig.h>
 #include <Logging/Logger.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Network/PacketContainer.h>
