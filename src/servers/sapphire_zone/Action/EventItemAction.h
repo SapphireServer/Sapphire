@@ -1,7 +1,7 @@
 #ifndef _EVENTITEMACTION_H_
 #define _EVENTITEMACTION_H_
 
-#include "../Forwards.h"
+#include "Forwards.h"
 #include "Action.h"
 
 namespace Core {

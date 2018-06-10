@@ -16,11 +16,12 @@
 #include <DatCat.h>
 
 #include <Exd/ExdData.h>
+#include <Exd/ExdDataGenerated.h>
 #include <Logging/Logger.h>
 
 
 Core::Logger g_log;
-Core::Data::ExdData g_exdData;
+Core::Data::ExdDataGenerated g_exdDataGen;
 
 const std::string onTalkStr(
    "   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override\n"
@@ -58,7 +59,7 @@ std::string titleCase( const std::string& str )
    return retStr;
 }
 
-void createScript( boost::shared_ptr< Core::Data::QuestInfo >& pQuestData, std::set< std::string >& additionalList )
+void createScript( boost::shared_ptr< Core::Data::Quest >& pQuestData, std::set< std::string >& additionalList, int questId )
 {
    std::string header(
       "// This is an automatically generated C++ script template\n"
@@ -69,8 +70,8 @@ void createScript( boost::shared_ptr< Core::Data::QuestInfo >& pQuestData, std::
       "#include <ScriptObject.h>\n\n"
    );
 
-   std::size_t splitPos( pQuestData->name_intern.find( "_" ) );
-   std::string className( pQuestData->name_intern.substr( 0, splitPos ) );
+   std::size_t splitPos( pQuestData->id.find( "_" ) );
+   std::string className( pQuestData->id.substr( 0, splitPos ) );
    //className = "Quest" + className;
    std::string sceneStr( "   //////////////////////////////////////////////////////////////////////\n   // Available Scenes in this quest, not necessarly all are used\n" );
    std::string seqStr;
@@ -131,26 +132,26 @@ void createScript( boost::shared_ptr< Core::Data::QuestInfo >& pQuestData, std::
    std::string rewards;
    rewards.reserve( 0xFFF );
    rewards += "      // Quest rewards \n";
-   rewards += ( pQuestData->reward_exp_factor != 0 ) ? "      static constexpr auto RewardExpFactor = " + std::to_string( pQuestData->reward_exp_factor ) + ";\n" : "";
-   rewards += ( pQuestData->reward_gil != 0 ) ? "      static constexpr auto RewardGil = " + std::to_string( pQuestData->reward_gil ) + ";\n" : "";
-   rewards += ( pQuestData->reward_emote != 0 ) ? "      static constexpr auto RewardEmote = " + std::to_string( pQuestData->reward_emote ) + ";\n" : "";
-   rewards += ( pQuestData->reward_action != 0 ) ? "      static constexpr auto RewardAction = " + std::to_string( pQuestData->reward_action ) + ";\n" : "";
-   rewards += ( pQuestData->reward_action_general1 != 0 ) ? "      static constexpr auto RewardGeneralAction1 = " + std::to_string( pQuestData->reward_action_general1 ) + ";\n" : "";
-   rewards += ( pQuestData->reward_action_general2 != 0 ) ? "      static constexpr auto RewardGeneralAction2 = " + std::to_string( pQuestData->reward_action_general2 ) + ";\n" : "";
-   rewards += ( pQuestData->reward_gc_seals != 0 ) ? "      static constexpr auto RewardGCSeals = " + std::to_string( pQuestData->reward_gc_seals ) + ";\n" : "";
-   rewards += ( pQuestData->reward_other != 0 ) ? "       static constexpr auto RewardOther = " + std::to_string( pQuestData->reward_other ) + ";\n" : "";
-   rewards += ( pQuestData->reward_reputation != 0 ) ? "      static constexpr auto RewardReputation = " + std::to_string( pQuestData->reward_reputation ) + ";\n" : "";
-   rewards += ( pQuestData->reward_tome_type != 0 ) ? "      static constexpr auto RewardTomeType = " + std::to_string( pQuestData->reward_tome_type ) + ";\n" : "";
-   rewards += ( pQuestData->reward_tome_count != 0 ) ? "      static constexpr auto RewardTomeCount = " + std::to_string( pQuestData->reward_tome_count ) + ";\n" : "";
-   rewards += ( pQuestData->instanced_content_unlock != 0 ) ? "      static constexpr auto InstancedContentUnlock = " + std::to_string( pQuestData->instanced_content_unlock ) + ";\n" : "";
+   rewards += ( pQuestData->expFactor != 0 ) ? "      static constexpr auto RewardExpFactor = " + std::to_string( pQuestData->expFactor ) + ";\n" : "";
+   rewards += ( pQuestData->gilReward != 0 ) ? "      static constexpr auto RewardGil = " + std::to_string( pQuestData->gilReward ) + ";\n" : "";
+   rewards += ( pQuestData->emoteReward != 0 ) ? "      static constexpr auto RewardEmote = " + std::to_string( pQuestData->emoteReward ) + ";\n" : "";
+   rewards += ( pQuestData->actionReward != 0 ) ? "      static constexpr auto RewardAction = " + std::to_string( pQuestData->actionReward ) + ";\n" : "";
+   rewards += ( pQuestData->generalActionReward[0] != 0 ) ? "      static constexpr auto RewardGeneralAction1 = " + std::to_string( pQuestData->generalActionReward[0] ) + ";\n" : "";
+   rewards += ( pQuestData->generalActionReward[1] != 0 ) ? "      static constexpr auto RewardGeneralAction2 = " + std::to_string( pQuestData->generalActionReward[1] ) + ";\n" : "";
+   rewards += ( pQuestData->gCSeals != 0 ) ? "      static constexpr auto RewardGCSeals = " + std::to_string( pQuestData->gCSeals ) + ";\n" : "";
+   rewards += ( pQuestData->otherReward != 0 ) ? "       static constexpr auto RewardOther = " + std::to_string( pQuestData->otherReward ) + ";\n" : "";
+   rewards += ( pQuestData->reputationReward != 0 ) ? "      static constexpr auto RewardReputation = " + std::to_string( pQuestData->reputationReward ) + ";\n" : "";
+   rewards += ( pQuestData->tomestoneReward != 0 ) ? "      static constexpr auto RewardTomeType = " + std::to_string( pQuestData->tomestoneReward ) + ";\n" : "";
+   rewards += ( pQuestData->tomestoneCountReward != 0 ) ? "      static constexpr auto RewardTomeCount = " + std::to_string( pQuestData->tomestoneCountReward ) + ";\n" : "";
+   rewards += ( pQuestData->instanceContentUnlock != 0 ) ? "      static constexpr auto InstancedContentUnlock = " + std::to_string( pQuestData->instanceContentUnlock ) + ";\n" : "";
 
-   if( pQuestData->reward_item.size() > 0 )
+   if( !pQuestData->itemReward0.empty() )
    {
       rewards += "      static constexpr auto RewardItem[] = { ";
-      for( size_t ca = 0; ca < pQuestData->reward_item.size(); ca++ )
+      for( size_t ca = 0; ca < pQuestData->itemReward0.size(); ca++ )
       {
-         rewards += std::to_string( pQuestData->reward_item.at( ca ) );
-         if( ca != pQuestData->reward_item.size() - 1 )
+         rewards += std::to_string( pQuestData->itemReward0.at( ca ) );
+         if( ca != pQuestData->itemReward0.size() - 1 )
          {
             rewards += ", ";
          }
@@ -158,13 +159,13 @@ void createScript( boost::shared_ptr< Core::Data::QuestInfo >& pQuestData, std::
       rewards += " };\n";
    }
 
-   if( pQuestData->reward_item.size() > 0 )
+   if( !pQuestData->itemReward0.empty() )
    {
       rewards += "      static constexpr auto RewardItemCount[] = { ";
-      for( size_t ca = 0; ca < pQuestData->reward_item_count.size(); ca++ )
+      for( size_t ca = 0; ca < pQuestData->itemCountReward0.size(); ca++ )
       {
-         rewards += std::to_string( pQuestData->reward_item_count.at( ca ) );
-         if( ca != pQuestData->reward_item_count.size() - 1 )
+         rewards += std::to_string( pQuestData->itemCountReward0.at( ca ) );
+         if( ca != pQuestData->itemCountReward0.size() - 1 )
          {
             rewards += ", ";
          }
@@ -172,13 +173,13 @@ void createScript( boost::shared_ptr< Core::Data::QuestInfo >& pQuestData, std::
       rewards += " };\n";
    }
 
-   if( pQuestData->reward_item_optional.size() > 0 )
+   if( !pQuestData->itemReward1.empty() )
    {
       rewards += "      static constexpr auto RewardItemOptional[] = { ";
-      for( size_t ca = 0; ca < pQuestData->reward_item_optional.size(); ca++ )
+      for( size_t ca = 0; ca < pQuestData->itemReward1.size(); ca++ )
       {
-         rewards += std::to_string( pQuestData->reward_item_optional.at( ca ) );
-         if( ca != pQuestData->reward_item_optional.size() - 1 )
+         rewards += std::to_string( pQuestData->itemReward1.at( ca ) );
+         if( ca != pQuestData->itemReward1.size() - 1 )
          {
             rewards += ", ";
          }
@@ -186,13 +187,13 @@ void createScript( boost::shared_ptr< Core::Data::QuestInfo >& pQuestData, std::
       rewards += " };\n";
    }
 
-   if( pQuestData->reward_item_optional_count.size() > 0 )
+   if( !pQuestData->itemCountReward1.empty() )
    {
       rewards += "      static constexpr auto RewardItemOptionalCount[] = { ";
-      for( size_t ca = 0; ca < pQuestData->reward_item_optional_count.size(); ca++ )
+      for( size_t ca = 0; ca < pQuestData->itemCountReward1.size(); ca++ )
       {
-         rewards += std::to_string( pQuestData->reward_item_optional_count.at( ca ) );
-         if( ca != pQuestData->reward_item_optional_count.size() - 1 )
+         rewards += std::to_string( pQuestData->itemCountReward1.at( ca ) );
+         if( ca != pQuestData->itemCountReward1.size() - 1 )
          {
             rewards += ", ";
          }
@@ -207,21 +208,22 @@ void createScript( boost::shared_ptr< Core::Data::QuestInfo >& pQuestData, std::
    std::vector< std::string > script_entities;
    std::string sentities = "      // Entities found in the script data of the quest\n";
 
-   for( size_t ca = 0; ca < pQuestData->script_entity.size(); ca ++ )
+   for( size_t ca = 0; ca < pQuestData->scriptInstruction.size(); ca ++ )
    {
-     if( ( pQuestData->script_entity.at( ca ).find( "HOWTO" ) != std::string::npos ) || ( pQuestData->script_entity.at( ca ).find( "HOW_TO" ) != std::string::npos ) )
+     if( ( pQuestData->scriptInstruction.at( ca ).find( "HOWTO" ) != std::string::npos ) || ( pQuestData->scriptInstruction.at( ca ).find( "HOW_TO" ) != std::string::npos ) )
         continue;
 
-     if( ( pQuestData->script_entity.at( ca ).find( "EMOTENO" ) != std::string::npos ) || ( pQuestData->script_entity.at( ca ).find( "EMOTEOK" ) != std::string::npos ) )
+     if( ( pQuestData->scriptInstruction.at( ca ).find( "EMOTENO" ) != std::string::npos ) || ( pQuestData->scriptInstruction.at( ca ).find( "EMOTEOK" ) != std::string::npos ) )
         hasEmote = true;
 
-     if( pQuestData->script_entity.at( ca ).find( "ENEMY" ) != std::string::npos )
+     if( pQuestData->scriptInstruction.at( ca ).find( "ENEMY" ) != std::string::npos )
      {
         hasEnemies = true;
-        enemy_ids.push_back( pQuestData->script_value.at( ca ) );
+        enemy_ids.push_back( pQuestData->scriptArg.at( ca ) );
      }
 
-     script_entities.push_back( pQuestData->script_entity.at( ca ) + " = " + std::to_string( pQuestData->script_value.at( ca ) ) );
+      if( !pQuestData->scriptInstruction.at( ca ).empty() )
+         script_entities.push_back( pQuestData->scriptInstruction.at( ca ) + " = " + std::to_string( pQuestData->scriptArg.at( ca ) ) );
    }
    std::sort( script_entities.begin(), script_entities.end() );
    for( auto& entity : script_entities )
@@ -231,11 +233,11 @@ void createScript( boost::shared_ptr< Core::Data::QuestInfo >& pQuestData, std::
       sentities += "      static constexpr auto " + name + ";\n";
    }
 
-   std::string additional = "// Quest Script: " + pQuestData->name_intern + "\n";
+   std::string additional = "// Quest Script: " + pQuestData->id + "\n";
    additional += "// Quest Name: " + pQuestData->name + "\n";
-   additional += "// Quest ID: " + std::to_string( pQuestData->id ) + "\n";
-   additional += "// Start NPC: " + std::to_string( pQuestData->enpc_resident_start ) + "\n";
-   additional += "// End NPC: " + std::to_string( pQuestData->enpc_resident_end ) + "\n\n";
+   additional += "// Quest ID: " + std::to_string( questId ) + "\n";
+   additional += "// Start NPC: " + std::to_string( pQuestData->eNpcResidentStart ) + "\n";
+   additional += "// End NPC: " + std::to_string( pQuestData->eNpcResidentEnd ) + "\n\n";
 
    std::string scriptEntry;
    scriptEntry.reserve(0xFFFF);
@@ -271,7 +273,7 @@ void createScript( boost::shared_ptr< Core::Data::QuestInfo >& pQuestData, std::
    constructor += rewards + "\n";
    constructor += sentities + "\n";
    constructor += "   public:\n";
-   constructor += "      " + className + "() : EventScript" + "( " + std::to_string( pQuestData->id ) + " ){}; \n";
+   constructor += "      " + className + "() : EventScript" + "( " + std::to_string( questId ) + " ){}; \n";
    constructor += "      ~" + className + "(){}; \n";
 
    std::string classString(
@@ -287,7 +289,7 @@ void createScript( boost::shared_ptr< Core::Data::QuestInfo >& pQuestData, std::
 
    std::ofstream outputFile;
 
-   outputFile.open( "generated/" + className + ".cpp_generated" );
+   outputFile.open( "generated/" + className + ".cpp" );
    outputFile << header << additional << classString;
    outputFile.close();
 }
@@ -308,8 +310,8 @@ int main( int argc, char** argv )
 
    unluac = true;
 
-   g_log.info( "Setting up EXD data" );
-   if( !g_exdData.init( datLocation  ) )
+   g_log.info( "Setting up generated EXD data" );
+   if( !g_exdDataGen.init( datLocation ) )
    {
       std::cout << datLocation << "\n";
       g_log.fatal( "Error setting up EXD data " );
@@ -318,33 +320,33 @@ int main( int argc, char** argv )
    }
 
    xiv::dat::GameData data( datLocation );
-   xiv::exd::ExdData eData( data );
 
-   auto QuestDat = g_exdData.setupDatAccess( "Quest", xiv::exd::Language::en );
-   auto rows = QuestDat.get_rows();
+   auto rows = g_exdDataGen.getQuestIdList();
 
    if ( !boost::filesystem::exists( "./generated" ) )
       boost::filesystem::create_directory( "./generated" );
 
-   std::cout << "Export in progress";
+   g_log.info( "Export in progress" );
+
    uint32_t updateInterval = rows.size() / 20;
    uint32_t i = 0;
    for( const auto& row : rows )
    {
-      auto questInfo = g_exdData.getQuestInfo( row.first );
+      g_log.info( "Generating " + std::to_string( row ) );
+      auto questInfo = g_exdDataGen.get<Core::Data::Quest>( row );
 
-      if( questInfo->name.empty() || questInfo->name_intern.empty() )
+      if( questInfo->name.empty() || questInfo->id.empty() )
       {
          continue;
       }
 
-      size_t pos_seperator = questInfo->name_intern.find_first_of( "_" );
+      size_t pos_seperator = questInfo->id.find_first_of( "_" );
 
       std::string folder;
 
       if( pos_seperator != std::string::npos )
       {
-         folder = questInfo->name_intern.substr( pos_seperator + 1, 3 );
+         folder = questInfo->id.substr( pos_seperator + 1, 3 );
       }
       else
       {
@@ -355,7 +357,7 @@ int main( int argc, char** argv )
 
       const xiv::dat::Cat& test = data.getCategory( "game_script" );
 
-      const std::string questPath = "game_script/quest/" + folder + "/" + questInfo->name_intern + ".luab";
+      const std::string questPath = "game_script/quest/" + folder + "/" + questInfo->id + ".luab";
 
       const auto &test_file = data.getFile( questPath );
       auto &section = test_file->access_data_sections().at( 0 );
@@ -366,12 +368,12 @@ int main( int argc, char** argv )
       uint32_t offset = 0;
 
       std::ofstream outputFile1;
-      outputFile1.open( "generated/" + questInfo->name_intern + ".luab", std::ios::binary );
+      outputFile1.open( "generated/" + questInfo->id + ".luab", std::ios::binary );
       outputFile1.write( &section[0], section.size() );
       outputFile1.close();
       if( unluac )
       {
-         std::string command = std::string( "java -jar unluac_2015_06_13.jar " ) + "generated/" + questInfo->name_intern + ".luab" + ">> " + "generated/" + questInfo->name_intern + ".lua";
+         std::string command = std::string( "java -jar unluac_2015_06_13.jar " ) + "generated/" + questInfo->id + ".luab" + ">> " + "generated/" + questInfo->id + ".lua";
          if ( system( command.c_str() ) == -1 )
          {
             g_log.error( "Error executing java command:\n" + command + "\nerrno: " + std::strerror( errno ) );
@@ -402,7 +404,7 @@ int main( int argc, char** argv )
       }
 
 
-      createScript( questInfo, stringList );
+      createScript( questInfo, stringList, row );
       ++i;
       if( i % updateInterval == 0 )
          std::cout << ".";
