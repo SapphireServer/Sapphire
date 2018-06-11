@@ -59,6 +59,7 @@ namespace Common {
       Crystal = 2001,
       //UNKNOWN_0 = 2003,
       KeyItem = 2004,
+      HandIn = 2005,
       DamagedGear = 2007,
       //UNKNOWN_1 = 2008,
 
