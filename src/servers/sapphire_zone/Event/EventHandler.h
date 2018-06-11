@@ -1,7 +1,7 @@
 #ifndef _EVENT_H
 #define _EVENT_H
 
-#include "../Forwards.h"
+#include "Forwards.h"
 
 namespace Core {
    namespace Event {

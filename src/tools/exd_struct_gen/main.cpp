@@ -25,14 +25,35 @@
 #include <fstream>
 #include <streambuf>
 #include <regex>
+#include <boost/archive/iterators/ostream_iterator.hpp>
 
 
 Core::Logger g_log;
 Core::Data::ExdData g_exdData;
 bool skipUnmapped = true;
 
-std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
-//std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv" );
+std::map< char, std::string > numberToStringMap 
+{
+   { '0', "zero" },
+   { '1', "one" },
+   { '2', "two" },
+   { '3', "three" },
+   { '4', "four" },
+   { '5', "five" },
+   { '6', "six" },
+   { '7', "seven" },
+   { '8', "eight" },
+   { '9', "nine" },
+};
+
+std::vector< std::string > cppKeyWords
+{
+   "new",
+   "class"
+};
+
+//std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
+std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
 std::map< uint8_t, std::string > g_typeMap;
 
 
@@ -179,7 +200,23 @@ std::string generateStruct( const std::string &exd )
          fieldName = indexToNameMap[count];
       }
       fieldName[0] = std::tolower( fieldName[0] );
-      fieldName.erase( boost::remove_if( fieldName, boost::is_any_of(",-':![](){}<>% \x02\x1f\x01\x03") ), fieldName.end() );   
+      fieldName.erase( boost::remove_if( fieldName, boost::is_any_of(",-':![](){}<>% \x02\x1f\x01\x03") ), fieldName.end() );
+
+      for( auto entry : numberToStringMap )
+      {
+         if( fieldName[0] == entry.first )
+         {
+            fieldName.erase( 0, 1 );
+            fieldName.insert( 0, entry.second );
+         }
+      }
+
+      for( std::string keyword : cppKeyWords )
+      {
+         if( fieldName == keyword )
+            fieldName[0] = toupper( fieldName[0] );
+      }
+
       indexToNameMap[count] = fieldName;
       indexToTypeMap[count] = type;
       if( indexToTarget.find( count ) != indexToTarget.end() )

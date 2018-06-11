@@ -6,9 +6,9 @@
 namespace Core 
 {
 
-   class XMLConfig;
+   class ConfigMgr;
 
-   typedef boost::shared_ptr<XMLConfig> XMLConfigPtr;
+   typedef boost::shared_ptr< ConfigMgr > ConfigMgrPtr;
 
 
    namespace Network 
@@ -17,15 +17,15 @@ namespace Core
       class Acceptor;
       class Connection;
 
-      typedef boost::shared_ptr<Hive> HivePtr;
-      typedef boost::shared_ptr<Acceptor> AcceptorPtr;
-      typedef boost::shared_ptr<Connection> ConnectionPtr;
+      typedef boost::shared_ptr< Hive > HivePtr;
+      typedef boost::shared_ptr< Acceptor > AcceptorPtr;
+      typedef boost::shared_ptr< Connection > ConnectionPtr;
 
       namespace Packets
       {
          class GamePacket;
 
-         typedef boost::shared_ptr<GamePacket> GamePacketPtr;
+         typedef boost::shared_ptr< GamePacket > GamePacketPtr;
       }
 
    }

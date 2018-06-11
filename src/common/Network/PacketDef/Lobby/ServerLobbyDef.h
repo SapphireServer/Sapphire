@@ -87,8 +87,10 @@ struct FFXIVIpcCharList : FFXIVIpcBasePacket<LobbyCharList>
       uint32_t index;
       uint32_t padding2;
       uint16_t serverId;
+      uint16_t serverId1;
       char nameChara[32];
       char nameServer[32];
+      char nameServer1[32];
       char charDetailJson[1030];
    } charaDetails[2];
 

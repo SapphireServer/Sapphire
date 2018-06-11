@@ -69,12 +69,6 @@ namespace Core
       EVENT_TABLE_GAME = 24
    };
 
-   enum EventFinishState
-   {
-      UNLOCK = 1,
-      KEEPLOCK = 0
-   };
-
    enum DamageType
    {
       STD_DAMAGE = 0X03,

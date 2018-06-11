@@ -2,7 +2,7 @@
 #include <Network/GamePacket.h>
 #include <Logging/Logger.h>
 #include <Network/PacketContainer.h>
-#include <Config/XMLConfig.h>
+#include <Config/ConfigMgr.h>
 
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ActorControlPacket142.h"
@@ -16,12 +16,7 @@
 #include "Action/EventAction.h"
 #include "Action/EventItemAction.h"
 
-#include "Event/EventHandler.h"
-
 #include "Zone/Zone.h"
-
-#include "Player.h"
-#include "Forwards.h"
 #include "ServerZone.h"
 #include "Framework.h"
 
@@ -312,10 +307,14 @@ void Core::Entity::Player::eventItemActionStart( uint32_t eventId,
 
 void Core::Entity::Player::onLogin()
 {
-   auto pConfig = g_fw.get< XMLConfig >();
-   for( auto& child : pConfig->getChild( "Settings.Parameters.MotDArray" ) )
+   auto pConfig = g_fw.get< ConfigMgr >();
+   auto motd = pConfig->getValue< std::string >( "General.MotD", "" );
+
+   std::istringstream ss( motd );
+   std::string msg;
+   while( std::getline( ss, msg, ';' ) )
    {
-      sendNotice( child.second.data() );
+      sendNotice( msg );
    }
 }
 
