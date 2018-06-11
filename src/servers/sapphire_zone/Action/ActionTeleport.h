@@ -1,7 +1,7 @@
 #ifndef _ACTIONTELEPORT_H_
 #define _ACTIONTELEPORT_H_
 
-#include "../Forwards.h"
+#include "Forwards.h"
 #include "Action.h"
 
 namespace Core {

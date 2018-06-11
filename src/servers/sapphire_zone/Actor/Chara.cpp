@@ -2,7 +2,6 @@
 #include <Util/UtilMath.h>
 #include <Network/PacketContainer.h>
 #include <Exd/ExdDataGenerated.h>
-#include <Network/GamePacket.h>
 
 #include "Forwards.h"
 #include "Action/Action.h"

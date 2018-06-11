@@ -1,0 +1,4 @@
+[Lobby]
+WorldID = 67
+AllowNoSessionConnect = false
+WorldName = Sapphire
