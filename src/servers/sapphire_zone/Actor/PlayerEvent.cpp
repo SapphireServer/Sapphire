@@ -16,12 +16,7 @@
 #include "Action/EventAction.h"
 #include "Action/EventItemAction.h"
 
-#include "Event/EventHandler.h"
-
 #include "Zone/Zone.h"
-
-#include "Player.h"
-#include "Forwards.h"
 #include "ServerZone.h"
 #include "Framework.h"
 

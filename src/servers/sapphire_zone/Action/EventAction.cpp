@@ -6,7 +6,6 @@
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 
 #include "Actor/Player.h"
-#include "Event/EventHandler.h"
 
 #include "EventAction.h"
 #include "Framework.h"

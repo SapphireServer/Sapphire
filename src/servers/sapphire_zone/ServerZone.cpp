@@ -3,7 +3,6 @@
 #include <Version.h>
 #include <Logging/Logger.h>
 #include <Config/XMLConfig.h>
-#include <Version.h>
 
 #include <MySqlBase.h>
 #include <Connection.h>
@@ -26,15 +25,12 @@
 
 #include "Zone/TerritoryMgr.h"
 
-#include "DebugCommand/DebugCommandHandler.h"
-
 #include "Script/ScriptMgr.h"
 #include "Linkshell/LinkshellMgr.h"
 
 #include "Forwards.h"
-#include <boost/foreach.hpp>
+
 #include <boost/make_shared.hpp>
-#include <boost/algorithm/string.hpp>
 #include <thread>
 
 #include "Framework.h"
@@ -206,7 +202,7 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
 
 void Core::ServerZone::printBanner() const
 {
-   auto pLog = g_fw.get< Core::Logger>();
+   auto pLog = g_fw.get< Core::Logger >();
 
    pLog->info("===========================================================" );
    pLog->info( "Sapphire Server Project " );
@@ -335,15 +331,6 @@ void Core::ServerZone::removeSession( uint32_t sessionId )
    m_sessionMapById.erase( sessionId );
 }
 
-void Core::ServerZone::updateSession( uint32_t id )
-{
-   std::lock_guard< std::mutex > lock( m_sessionMutex );
-   auto it = m_sessionMapById.find( id );
-
-   if( it != m_sessionMapById.end() )
-      it->second->loadPlayer();
-}
-
 Core::SessionPtr Core::ServerZone::getSession( uint32_t id )
 {
    //std::lock_guard<std::mutex> lock( m_sessionMutex );
@@ -373,14 +360,6 @@ void Core::ServerZone::removeSession( std::string playerName )
    m_sessionMapByName.erase( playerName );
 }
 
-void Core::ServerZone::updateSession( std::string playerName )
-{
-   std::lock_guard< std::mutex > lock( m_sessionMutex );
-   auto it = m_sessionMapByName.find( playerName );
-
-   if( it != m_sessionMapByName.end() )
-      it->second->loadPlayer();
-}
 
 bool Core::ServerZone::isRunning() const
 {

@@ -8,8 +8,6 @@
 #include "Network/PacketWrappers/QuestMessagePacket.h"
 
 #include "Session.h"
-#include "Inventory/Inventory.h"
-#include "Player.h"
 #include "Framework.h"
 
 extern Core::Framework g_fw;

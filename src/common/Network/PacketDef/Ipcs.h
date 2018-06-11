@@ -1,7 +1,7 @@
 #ifndef _CORE_NETWORK_PACKETS_IPCS_H
 #define _CORE_NETWORK_PACKETS_IPCS_H
 
-#include<stdint.h>
+#include <stdint.h>
 
 namespace Core {
 namespace Network {
@@ -45,11 +45,10 @@ namespace Packets {
    enum ServerZoneIpcType : uint16_t
    {
 
-      // static opcode ( the ones that rarely if ever change )
+      // static opcode ( the ones that rarely, if ever, change )
       Ping                       = 0x0065,
       Init                       = 0x0066,
 
-      //ActorSpawn                 = 0x0190, // DEPRECATED
       ActorFreeSpawn             = 0x0191,
       InitZone                   = 0x019A,
 
@@ -74,6 +73,7 @@ namespace Packets {
       CFRegistered               = 0x00B8, // updated 4.1
       SocialRequestResponse      = 0x00BB, // updated 4.1
       CancelAllianceForming      = 0x00C6, // updated 4.2
+
       Chat                       = 0x00F7, // updated 4.3
       SocialList                 = 0x00FD, // updated 4.3
 
@@ -86,12 +86,13 @@ namespace Packets {
       CountdownInitiate          = 0x0111, // updated 4.3
       CountdownCancel            = 0x0112, // updated 4.3
 
-      BlackList                  = 0x00FF, // updated 4.2
+      BlackList                  = 0x0115, // updated 4.3
 
       LogMessage                 = 0x00D0,
 
-      LinkshellList              = 0x0106, // updated 4.2
-      SetCharacterFCInfo         = 0x0114, // updated 4.2
+      LinkshellList              = 0x011C, // updated 4.3
+      SetCharaFCTag              = 0x013B, // updated 4.3
+      SetFreeCompanyInfo         = 0x013D, // updated 4.3
 
       StatusEffectList           = 0x014E, // updated 4.3
       Effect                     = 0x0151, // updated 4.3
@@ -106,11 +107,15 @@ namespace Packets {
 
       ActorCast                  = 0x0178, // updated 4.3
 
+      PartyList                  = 0x017A, // updated 4.3
       HateList                   = 0x017B, // updated 4.3
 
       ObjectSpawn                = 0x017D, // updated 4.3
       ObjectDespawn              = 0x017E, // updated 4.3
-      UpdateClassInfo            = 0x018A, // updated 4.3
+
+      SetLevelSync               = 0x017F, // updated 4.3
+
+      InventoryActionAck         = 0x0180, // updated 4.2 ?
 
       InitUI                     = 0x0181, // updated 4.3
       PlayerStats                = 0x0182, // updated 4.3
@@ -119,13 +124,14 @@ namespace Packets {
       PlayerClassInfo            = 0x0185, // updated 4.3
       ModelEquip                 = 0x0186, // updated 4.3
 
+      UpdateClassInfo            = 0x018A, // updated 4.3
+
       ItemInfo                   = 0x0190, // updated 4.3
       ContainerInfo              = 0x0192, // updated 4.3
       InventoryTransactionFinish = 0x0193, // updated 4.3
       InventoryTransaction       = 0x0194, // updated 4.3
       CurrencyCrystalInfo        = 0x0197, // updated 4.3
 
-      InventoryActionAck         = 0x0180, // updated 4.2 ?
       UpdateInventorySlot        = 0x0198, // updated 4.3
 
       EventPlay                  = 0x01A6, // updated 4.3
@@ -136,20 +142,23 @@ namespace Packets {
 
       EventLinkshell             = 0x1169,
 
-      QuestMessage               = 0x01CE, // updated 4.3
-      QuestTracker               = 0x01D3, // updated 4.3
+      QuestActiveList            = 0x01C3, // updated 4.3
+      QuestUpdate                = 0x01C4, // updated 4.3
+      QuestCompleteList          = 0x01C5, // updated 4.3
 
       QuestFinish                = 0x01C6, // updated 4.3
       MSQTrackerComplete         = 0x01C7, // updated 4.3
       MSQTrackerProgress         = 0x01C8, // updated 4.3
 
-      QuestActiveList            = 0x01C3, // updated 4.3
-      QuestUpdate                = 0x01C4, // updated 4.3
-      QuestCompleteList          = 0x01C5, // updated 4.3
+      QuestMessage               = 0x01CE, // updated 4.3
+
+      QuestTracker               = 0x01D3, // updated 4.3
 
       Mount                      = 0x01E3, // updated 4.3
 
       DirectorVars               = 0x01E5, // updated 4.3
+
+      CFAvailableContents        = 0x01FD, // updated 4.2
 
       WeatherChange              = 0x0200, // updated 4.3
       PlayerTitleList            = 0x0201, // updated 4.3
@@ -159,13 +168,13 @@ namespace Packets {
 
       EquipDisplayFlags          = 0x0210, // updated 4.3
 
-      CFAvailableContents        = 0x01FD, // updated 4.2
+      DuelChallenge              = 0x0277, // 4.2; this is responsible for opening the ui
+      PerformNote                = 0x0286, // updated 4.3
 
       PrepareZoning              = 0x0291, // updated 4.3
       ActorGauge                 = 0x0292, // updated 4.3
 
-      DuelChallenge              = 0x0277, // 4.2; this is the responsible for opening an ui
-      PerformNote                = 0x0286, // updated 4.3
+
 
       // Unknown IPC types that still need to be sent
       // TODO: figure all these out properly
@@ -173,8 +182,6 @@ namespace Packets {
       IPCTYPE_UNK_322            = 0x024E, // updated 4.3
 
    };
-
-   // TODO: Include structures for the individual packet segment types
 
    /**
    * Client IPC Zone Type Codes.
@@ -199,6 +206,7 @@ namespace Packets {
       CFDutyInfoHandler        = 0x0078, // updated 4.2
 
       SocialReqSendHandler     = 0x00AE, // updated 4.1
+      CreateCrossWorldLS       = 0x00AF, // updated 4.3
 
       ChatHandler              = 0x00D3, // updated 4.3
 

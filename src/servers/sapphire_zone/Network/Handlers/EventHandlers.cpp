@@ -19,14 +19,12 @@
 
 #include "Script/ScriptMgr.h"
 
-#include "Actor/Player.h"
-
 #include "Event/EventHelper.h"
 
 #include "Zone/InstanceContent.h"
 
 #include "Session.h"
-#include "Forwards.h"
+
 #include "Framework.h"
 
 extern Core::Framework g_fw;
