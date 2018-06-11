@@ -178,12 +178,12 @@ public:
    uint16_t getQuestUI16C( uint16_t questId );
    uint32_t getQuestUI32A( uint16_t questId );
 
-   uint8_t getQuestBitFlag8( uint16_t questId );
-   uint8_t getQuestBitFlag16( uint16_t questId );
-   uint8_t getQuestBitFlag24( uint16_t questId );
-   uint8_t getQuestBitFlag32( uint16_t questId );
-   uint8_t getQuestBitFlag40( uint16_t questId );
-   uint8_t getQuestBitFlag48( uint16_t questId );
+   bool getQuestBitFlag8( uint16_t questId, uint8_t index );
+   bool getQuestBitFlag16( uint16_t questId, uint8_t index  );
+   bool getQuestBitFlag24( uint16_t questId, uint8_t index  );
+   bool getQuestBitFlag32( uint16_t questId, uint8_t index  );
+   bool getQuestBitFlag40( uint16_t questId, uint8_t index  );
+   bool getQuestBitFlag48( uint16_t questId, uint8_t index  );
 
 
    void setQuestUI8A( uint16_t questId, uint8_t val );
@@ -209,12 +209,12 @@ public:
    void setQuestUI16C( uint16_t questId, uint16_t val );
    void setQuestUI32A( uint16_t questId, uint32_t val );
 
-   void setQuestBitFlag8( uint16_t questId, uint8_t val );
-   void setQuestBitFlag16( uint16_t questId, uint8_t val );
-   void setQuestBitFlag24( uint16_t questId, uint8_t val );
-   void setQuestBitFlag32( uint16_t questId, uint8_t val );
-   void setQuestBitFlag40( uint16_t questId, uint8_t val );
-   void setQuestBitFlag48( uint16_t questId, uint8_t val );
+   void setQuestBitFlag8( uint16_t questId, uint8_t index, bool val );
+   void setQuestBitFlag16( uint16_t questId, uint8_t index, bool val );
+   void setQuestBitFlag24( uint16_t questId, uint8_t index, bool val );
+   void setQuestBitFlag32( uint16_t questId, uint8_t index, bool val );
+   void setQuestBitFlag40( uint16_t questId, uint8_t index, bool val );
+   void setQuestBitFlag48( uint16_t questId, uint8_t index, bool val );
 
    // Inventory / Item / Currency
    //////////////////////////////////////////////////////////////////////////////////////////////////////

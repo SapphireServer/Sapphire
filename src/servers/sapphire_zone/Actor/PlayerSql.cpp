@@ -1,6 +1,4 @@
 #include <set>
-#include <stdio.h>
-#include <time.h>
 
 #include <Common.h>
 #include <Network/GamePacket.h>
@@ -19,11 +17,7 @@
 #include "Zone/TerritoryMgr.h"
 #include "Zone/Zone.h"
 
-#include "Inventory/Inventory.h"
-
-#include "Player.h"
 #include "ServerZone.h"
-#include "Forwards.h"
 #include "Framework.h"
 
 extern Core::Framework g_fw;
@@ -152,6 +146,8 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
    m_activeTitle = res->getUInt16( "ActiveTitle" );
 
    m_gmRank = res->getUInt8( "GMRank" );
+
+   m_equipDisplayFlags = res->getUInt8( "EquipDisplayFlags" );
 
    // Blobs
 
@@ -432,13 +428,15 @@ void Core::Entity::Player::updateSql()
 
    stmt->setInt( 52, m_gmRank );
 
+   stmt->setInt( 53, m_equipDisplayFlags );
+
    std::vector< uint8_t > unlockVec( sizeof( m_unlocks ) );
    memcpy( unlockVec.data(), m_unlocks, sizeof( m_unlocks ) );
-   stmt->setBinary( 53, unlockVec );
+   stmt->setBinary( 54, unlockVec );
 
-   stmt->setInt( 54, m_cfPenaltyUntil );
+   stmt->setInt( 55, m_cfPenaltyUntil );
 
-   stmt->setInt( 55, m_id );
+   stmt->setInt( 56, m_id );
 
    pDb->execute( stmt );
 

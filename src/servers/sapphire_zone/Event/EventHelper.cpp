@@ -1,10 +1,12 @@
 #include <Common.h>
 #include <Exd/ExdDataGenerated.h>
+#include <boost/range/algorithm/remove_if.hpp>
+#include <boost/algorithm/string/classification.hpp>
+
 #include "Framework.h"
 #include "EventHelper.h"
 #include "EventHandler.h"
-#include <boost/range/algorithm/remove_if.hpp>
-#include <boost/algorithm/string/classification.hpp>
+
 
 extern Core::Framework g_fw;
 
