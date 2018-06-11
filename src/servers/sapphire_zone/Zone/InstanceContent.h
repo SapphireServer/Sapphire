@@ -85,7 +85,7 @@ private:
    uint16_t m_currentBgm;
 
    int64_t m_instanceExpireTime;
-   int64_t m_instanceCommenceTime;
+   uint64_t m_instanceCommenceTime;
 
    Entity::EventObjectPtr m_pEntranceEObj;
 
