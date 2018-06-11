@@ -67,6 +67,9 @@ void createScript( boost::shared_ptr< Core::Data::Quest >& pQuestData, std::set<
       "// In order for this script to be loaded, change its extension to .cpp\n"
       "// and move it to the correct folder in <root>/scripts/native/\n"
       "\n"
+      "#include <Script/NativeScriptApi.h>\n"
+      "#include <Actor/Player.h>\n"
+      "#include <Event/EventHelper.h>\n"
       "#include <ScriptObject.h>\n\n"
    );
 
@@ -95,10 +98,10 @@ void createScript( boost::shared_ptr< Core::Data::Quest >& pQuestData, std::set<
             sceneName +
             "( Entity::Player& player )\n"
             "   {\n"
-            "      player.eventPlay( this->getId(), " +
+            "      player.playScene( getId(), " +
             sceneId +
             ", 0,\n"
-            "         [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )\n"
+            "         [&]( Entity::Player& player, const Event::SceneResult& result )\n"
             "         {\n"
             "         });\n"
             "   }\n\n"
@@ -147,7 +150,7 @@ void createScript( boost::shared_ptr< Core::Data::Quest >& pQuestData, std::set<
 
    if( !pQuestData->itemReward0.empty() )
    {
-      rewards += "      static constexpr auto RewardItem[] = { ";
+      rewards += "      uint16_t RewardItem[] = { ";
       for( size_t ca = 0; ca < pQuestData->itemReward0.size(); ca++ )
       {
          rewards += std::to_string( pQuestData->itemReward0.at( ca ) );
@@ -161,7 +164,7 @@ void createScript( boost::shared_ptr< Core::Data::Quest >& pQuestData, std::set<
 
    if( !pQuestData->itemReward0.empty() )
    {
-      rewards += "      static constexpr auto RewardItemCount[] = { ";
+      rewards += "      uint16_t RewardItemCount[] = { ";
       for( size_t ca = 0; ca < pQuestData->itemCountReward0.size(); ca++ )
       {
          rewards += std::to_string( pQuestData->itemCountReward0.at( ca ) );
@@ -175,7 +178,7 @@ void createScript( boost::shared_ptr< Core::Data::Quest >& pQuestData, std::set<
 
    if( !pQuestData->itemReward1.empty() )
    {
-      rewards += "      static constexpr auto RewardItemOptional[] = { ";
+      rewards += "      uint16_t RewardItemOptional[] = { ";
       for( size_t ca = 0; ca < pQuestData->itemReward1.size(); ca++ )
       {
          rewards += std::to_string( pQuestData->itemReward1.at( ca ) );
@@ -189,7 +192,7 @@ void createScript( boost::shared_ptr< Core::Data::Quest >& pQuestData, std::set<
 
    if( !pQuestData->itemCountReward1.empty() )
    {
-      rewards += "      static constexpr auto RewardItemOptionalCount[] = { ";
+      rewards += "      uint16_t RewardItemOptionalCount[] = { ";
       for( size_t ca = 0; ca < pQuestData->itemCountReward1.size(); ca++ )
       {
          rewards += std::to_string( pQuestData->itemCountReward1.at( ca ) );
@@ -258,7 +261,7 @@ void createScript( boost::shared_ptr< Core::Data::Quest >& pQuestData, std::set<
    for( auto enemy : enemy_ids )
    {
       scriptEntry += std::string(
-         "   void onMobKill_" + std::to_string( enemy ) + "( Entity::Player& player )\n"
+         "   void onMobKill_" + std::to_string( enemy ) + "( Entity::Player& player, uint64_t npcId )\n"
          "   {\n"
          "   }\n\n"
       );
