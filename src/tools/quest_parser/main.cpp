@@ -24,9 +24,9 @@ Core::Logger g_log;
 Core::Data::ExdDataGenerated g_exdDataGen;
 
 const std::string onTalkStr(
-   "   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override\n"
+   "   void onTalk( uint32_t eventId, Entity::Player& player, uint32_t actorId ) override\n"
    "   {\n"
-   "      auto actor = Event::mapEventActorToRealActor( actorId );\n"
+   "      uint32_t actor = Event::mapEventActorToRealActor( actorId );\n"
    "   }\n\n"
 );
 

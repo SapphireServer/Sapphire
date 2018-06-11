@@ -52,9 +52,9 @@ public:
    SubFst002() : EventScript( 65561 )
    {}
 
-   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
+   void onTalk( uint32_t eventId, Entity::Player& player, uint32_t actorId ) override
    {
-      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
+      uint32_t actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
       if( actor == ACTOR0 && !player.hasQuest( getId() ) )
          Scene00000( player );

@@ -31,7 +31,7 @@ public:
       player.playScene( getId(), 1, 0xFB2EC8F8, 0, 1, returnScene, callback );
    }
 
-   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
+   void onTalk( uint32_t eventId, Entity::Player& player, uint32_t actorId ) override
    {
       Scene00000( player );
    }
