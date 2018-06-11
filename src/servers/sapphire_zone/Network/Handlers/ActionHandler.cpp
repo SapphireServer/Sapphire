@@ -25,10 +25,6 @@
 
 #include "DebugCommand/DebugCommandHandler.h"
 
-#include "Actor/Player.h"
-
-#include "Inventory/Inventory.h"
-
 #include "Event/EventHelper.h"
 
 #include "Action/Action.h"

@@ -1,6 +1,4 @@
 #include <set>
-#include <stdio.h>
-#include <time.h>
 
 #include <Common.h>
 #include <Network/GamePacket.h>
@@ -19,11 +17,7 @@
 #include "Zone/TerritoryMgr.h"
 #include "Zone/Zone.h"
 
-#include "Inventory/Inventory.h"
-
-#include "Player.h"
 #include "ServerZone.h"
-#include "Forwards.h"
 #include "Framework.h"
 
 extern Core::Framework g_fw;
