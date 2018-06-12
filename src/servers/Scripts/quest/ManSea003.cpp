@@ -56,7 +56,7 @@ class ManSea003 : public EventScript
 
       void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
       {
-         auto actor = Event::mapEventActorToRealActor( actorId );
+         auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
          if( actor == Actor0)
          {
@@ -124,7 +124,7 @@ class ManSea003 : public EventScript
       player.playScene( getId(), 0, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
       {
-         if(result.param2 == 1) // accept quest
+         if( result.param2 == 1 ) // accept quest
             Scene00001( player );
       } );
    }

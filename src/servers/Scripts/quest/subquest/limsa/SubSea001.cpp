@@ -56,7 +56,7 @@ public:
 
    void onTalk(uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
-      auto actor = Event::mapEventActorToRealActor( actorId );
+      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
       auto currentCC = player.getQuestUI8AL( getId() );
 
       if( actor == Actor0 )
@@ -83,7 +83,7 @@ public:
          {},
             eventId );
       }
-      else if(actor == Eobject1) 
+      else if(actor == Eobject1 ) 
       {
          player.eventActionStart( getId(), 0x0E,
             [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
@@ -105,7 +105,7 @@ public:
          {},
             eventId );
       }
-      else if( actor == Eobject3) 
+      else if( actor == Eobject3 ) 
       {
          player.eventActionStart( getId(), 0x0E,
             [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
@@ -116,7 +116,7 @@ public:
          {},
             eventId );
       }
-      else if( actor == Eobject4)
+      else if( actor == Eobject4 )
       {
          player.eventActionStart( getId(), 0x0E,
             [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
@@ -127,7 +127,7 @@ public:
          {},
             eventId );
       }
-      else if( actor == Eobject5)
+      else if( actor == Eobject5 )
       {
          player.eventActionStart( getId(), 0x0E,
             [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
@@ -151,6 +151,8 @@ private:
       if( currentCC + 1 >= 6 )
       {
          player.updateQuest( getId(), SeqFinish );
+         player.setQuestUI8BH(getId(), currentCC + 1);
+         player.setQuestUI8AL(getId(), currentCC + 1);
       }
       else
       {
@@ -182,7 +184,7 @@ private:
       player.playScene( getId(), 2, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            if( player.hasQuest(65644) || player.hasQuest(65645))
+            if( player.hasQuest( 65644 ) || player.hasQuest( 65645 ) )
             {
                if( result.param2 == 1 )
                {
@@ -327,8 +329,6 @@ private:
             {
                Scene00017( player );
             }
-            else 
-               Scene00015( player );
          } );
    }
 

@@ -41,7 +41,7 @@ public:
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
-      auto actor = Event::mapEventActorToRealActor( actorId );
+      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
       if( actor == ACTOR0 )
       {
@@ -79,11 +79,11 @@ private:
 
    void checkQuestCompletion( Entity::Player& player, uint32_t varIdx )
    {
-      if ( varIdx == 1 )
+      if( varIdx == 1 )
       {
          player.sendQuestMessage( getId(), 1, 0, 0, 0 );
       }
-      else if ( varIdx == 2 )
+      else if( varIdx == 2 )
       {
          player.sendQuestMessage( getId(), 2, 0, 0, 0 );
       }
