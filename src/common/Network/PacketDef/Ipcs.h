@@ -69,11 +69,11 @@ namespace Packets {
 
       SocialRequestError         = 0x00AD,
 
-      Playtime                   = 0x00DF, // updated 4.2
       CFRegistered               = 0x00B8, // updated 4.1
       SocialRequestResponse      = 0x00BB, // updated 4.1
       CancelAllianceForming      = 0x00C6, // updated 4.2
 
+      Playtime                   = 0x00F5, // updated 4.3
       Chat                       = 0x00F7, // updated 4.3
       SocialList                 = 0x00FD, // updated 4.3
 
