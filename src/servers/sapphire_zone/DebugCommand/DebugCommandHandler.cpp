@@ -29,6 +29,7 @@
 #include "Zone/Zone.h"
 #include "Zone/InstanceContent.h"
 #include "Zone/TerritoryMgr.h"
+#include "Event/EventDefs.h"
 
 #include "ServerZone.h"
 
@@ -813,6 +814,26 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
          return;
 
       obj->setState( state );
+   }
+   else if ( subCommand == "objflag" )
+   {
+      char objName[256];
+      uint32_t state1;
+      uint32_t state2;
+
+      sscanf( params.c_str(), "%s %i %i", objName, &state1, &state2 );
+
+      auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+      if( !instance )
+         return;
+
+      auto obj = instance->getEObjByName( objName );
+      if( !obj ) {
+         player.sendDebug( "No eobj found." );
+         return;
+      }
+
+      obj->setAnimationFlag( state1, state2 );
    }
    else if( subCommand == "seq" )
    {

@@ -86,6 +86,18 @@ void Core::Entity::EventObject::setState( uint8_t state )
    }
 }
 
+void Core::Entity::EventObject::setAnimationFlag( uint32_t flag, uint32_t animationFlag ) {
+   for( const auto& player : m_inRangePlayers )
+   {
+      ZoneChannelPacket< FFXIVIpcActorControl142 > eobjUpdatePacket( getId(), player->getId() );
+      eobjUpdatePacket.data().category = Common::ActorControlType::EObjAnimation;
+      eobjUpdatePacket.data().param1 = flag;
+      eobjUpdatePacket.data().param2 = animationFlag;
+
+      player->queuePacket( eobjUpdatePacket );
+   }
+}
+
 void Core::Entity::EventObject::setParentInstance( Core::InstanceContentPtr instance )
 {
    m_parentInstance = instance;
