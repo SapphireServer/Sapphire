@@ -140,12 +140,14 @@ public:
 
    InvSlotPairVec getSlotsOfItemsInInventory( uint32_t catalogId );
    InvSlotPair getFreeBagSlot();
-   int16_t addItem( uint16_t inventoryId, int8_t slotId, uint32_t catalogId, uint8_t quantity = 1 );
+   int16_t addItem( uint16_t inventoryId, int8_t slotId, uint32_t catalogId, uint16_t quantity = 1, bool isHq = false );
    void moveItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot );
    void swapItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot );
    void discardItem( uint16_t fromInventoryId, uint8_t fromSlotId );
+   void splitItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot, uint16_t splitCount );
+   void mergeItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot );
 
-   ItemPtr createItem( uint32_t catalogId, uint8_t quantity = 1 );
+   ItemPtr createItem( uint32_t catalogId, uint16_t quantity = 1 );
 
    ItemPtr loadItem( uint64_t uId );
 
@@ -197,6 +199,7 @@ public:
 private:
    Entity::Player* m_pOwner;
    InventoryMap m_inventoryMap;
+   const uint32_t m_maxSlotSize = 999;
 };
 
 }
