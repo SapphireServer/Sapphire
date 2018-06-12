@@ -479,7 +479,7 @@ bool Core::Inventory::isObtainable( uint32_t catalogId, uint8_t quantity )
 }
 
 
-int16_t Core::Inventory::addItem( uint16_t inventoryId, int8_t slotId, uint32_t catalogId, uint16_t quantity, bool isHq )
+int16_t Core::Inventory::addItem( uint16_t inventoryId, int8_t slotId, uint32_t catalogId, uint16_t quantity, bool isHq, bool silent )
 {
    auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
@@ -531,7 +531,8 @@ int16_t Core::Inventory::addItem( uint16_t inventoryId, int8_t slotId, uint32_t 
       invUpPacket.data().condition = 30000;
       m_pOwner->queuePacket( invUpPacket );
 
-      m_pOwner->queuePacket( ActorControlPacket143( m_pOwner->getId(), ItemObtainIcon, catalogId, item->getStackSize() ) );
+      if( !silent )
+         m_pOwner->queuePacket( ActorControlPacket143( m_pOwner->getId(), ItemObtainIcon, catalogId, item->getStackSize() ) );
 
    }
 
@@ -623,7 +624,7 @@ void Core::Inventory::splitItem( uint16_t fromInventoryId, uint8_t fromSlotId, u
       // todo: correct invalid move? again, not sure what retail does here
       return;
 
-   auto newSlot = addItem( toInventoryId, toSlot, fromItem->getId(), itemCount, fromItem->isHq() );
+   auto newSlot = addItem( toInventoryId, toSlot, fromItem->getId(), itemCount, fromItem->isHq(), true );
    if( newSlot == -1 )
       return;
 
