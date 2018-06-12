@@ -154,9 +154,9 @@ public:
    SubFst013() : EventScript( 65576 )
    {}
 
-   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
+   void onTalk( uint32_t eventId, Entity::Player& player, uint32_t actorId ) override
    {
-      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
+      uint32_t actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
       if( !player.hasQuest( getId()))
       {
@@ -176,7 +176,7 @@ public:
 
    void onEmote( uint64_t actorId, uint32_t eventId, uint32_t emoteId, Entity::Player& player ) override
    {
-      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ));
+      uint32_t actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ));
 
       if( actor == ACTOR1 && emoteId == 5 && player.getQuestSeq( getId() ) == SEQ_1 )
          Scene00100( player );

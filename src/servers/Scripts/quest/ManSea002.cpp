@@ -143,9 +143,9 @@ public:
    ManSea002() : EventScript( 65644 )
    {}
 
-   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
+   void onTalk( uint32_t eventId, Entity::Player& player, uint32_t actorId ) override
    {
-      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
+      uint32_t actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
       // todo: this doesn't actually play a cutscene after accepting the quest
       if( actor == ACTOR0 )

@@ -17,7 +17,7 @@ public:
    Aethernet() : EventScript( EVENTSCRIPT_AETHERNET_ID )
    {}
 
-   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
+   void onTalk( uint32_t eventId, Entity::Player& player, uint32_t actorId ) override
    {
       if( player.isAetheryteRegistered( eventId & 0xFFFF ) )
       {

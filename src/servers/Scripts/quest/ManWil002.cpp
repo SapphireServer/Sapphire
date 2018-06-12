@@ -150,9 +150,9 @@ public:
    ManWil002() : EventScript( 66104 )
    { }
 
-   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
+   void onTalk( uint32_t eventId, Entity::Player& player, uint32_t actorId ) override
    {
-      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
+      uint32_t actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
       if( actor == ACTOR0 )
          Scene00000( player );
