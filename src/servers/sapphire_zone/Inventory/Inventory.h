@@ -170,6 +170,7 @@ public:
    void updateBagDb( InventoryType type );
    void updateMannequinDb( InventoryType type );
    void updateItemDb( ItemPtr pItem ) const;
+   void deleteItemDb( ItemPtr pItem ) const;
 
    bool isArmory( uint16_t containerId );
    bool isEquipment( uint16_t containerId );
