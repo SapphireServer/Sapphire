@@ -47,6 +47,7 @@ void Core::Network::GameConnection::inventoryModifyHandler( const Packets::GameP
    uint8_t toSlot = inPacket.getValAt< uint8_t >( 0x44 );
    uint16_t fromContainer = inPacket.getValAt< uint16_t >( 0x2C );
    uint16_t toContainer = inPacket.getValAt< uint16_t >( 0x40 );
+   // todo: check packet handler in game and see if this is sent as a u16 or u32
    uint16_t splitCount = inPacket.getValAt< uint16_t >( 0x48 );
 
    ZoneChannelPacket< FFXIVIpcInventoryActionAck > ackPacket( player.getId() );

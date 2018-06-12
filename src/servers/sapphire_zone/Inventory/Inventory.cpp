@@ -404,6 +404,12 @@ void Core::Inventory::updateItemDb( Core::ItemPtr pItem ) const
                      " WHERE itemId = " + std::to_string( pItem->getUId() ) );
 }
 
+void Core::Inventory::deleteItemDb( Core::ItemPtr item ) const
+{
+   auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+   pDb->execute( "UPDATE charaglobalitem SET IS_DELETE = 1 WHERE itemId = " + std::to_string( item->getUId() ) );
+}
+
 bool Core::Inventory::removeCurrency( CurrencyType type, uint32_t amount )
 {
 
@@ -649,19 +655,20 @@ void Core::Inventory::mergeItem( uint16_t fromInventoryId, uint8_t fromSlotId, u
    if( stackOverflow == 0 )
    {
       m_inventoryMap[fromInventoryId]->removeItem( fromSlotId );
-      fromItem = nullptr;
+      deleteItemDb( fromItem );
    }
    else
+   {
       fromItem->setStackSize( stackOverflow );
+      updateItemDb( fromItem );
+   }
+
 
    toItem->setStackSize( stackSize );
+   updateItemDb( toItem );
 
    updateContainer( fromInventoryId, fromSlotId, fromItem );
    updateContainer( toInventoryId, toSlot, toItem );
-
-   updateItemDb( toItem );
-   if( fromItem )
-      updateItemDb( fromItem );
 }
 
 void Core::Inventory::swapItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot )
@@ -697,6 +704,8 @@ void Core::Inventory::discardItem( uint16_t fromInventoryId, uint8_t fromSlotId 
    uint32_t transactionId = 1;
 
    auto fromItem = m_inventoryMap[fromInventoryId]->getItem( fromSlotId );
+   
+   deleteItemDb( fromItem );
 
    m_inventoryMap[fromInventoryId]->removeItem( fromSlotId );
    updateContainer( fromInventoryId, fromSlotId, nullptr );
