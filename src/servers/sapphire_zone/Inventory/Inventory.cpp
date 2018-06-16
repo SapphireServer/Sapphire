@@ -945,23 +945,18 @@ uint16_t Core::Inventory::calculateEquippedGearItemLevel()
 
    auto it = gearSetMap.begin();
 
-   while ( it != gearSetMap.end() )
+   while( it != gearSetMap.end() )
    {
       auto currItem = it->second;
 
-      if ( currItem )
+      if( currItem )
       {
          iLvlResult += currItem->getItemLevel();
 
          // If item is weapon and isn't one-handed
-         if ( currItem->isWeapon() && !isOneHandedWeapon( currItem->getCategory() ) )
+         if( currItem->isWeapon() && !isOneHandedWeapon( currItem->getCategory() ) )
          {
             iLvlResult += currItem->getItemLevel();
-         }
-         else
-         {
-            auto pLog = g_fw.get< Logger >();
-            pLog->debug( "Is one handed" );
          }
       }
 
