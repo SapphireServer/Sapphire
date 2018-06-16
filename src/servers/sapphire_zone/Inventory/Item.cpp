@@ -21,7 +21,7 @@ Core::Item::Item( uint32_t catalogId ) :
 Core::Item::Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, Common::ItemUICategory categoryId, bool isHq ) :
    m_id( catalogId ),
    m_uId( uId ),
-   m_category( static_cast< Common::ItemUICategory >( categoryId ) ),
+   m_category( categoryId ),
    m_model1( model1 ),
    m_model2( model2 ),
    m_isHq( isHq )
