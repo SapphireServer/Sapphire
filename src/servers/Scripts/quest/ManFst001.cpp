@@ -1,7 +1,6 @@
-#include <Script/NativeScriptApi.h>
 #include <Actor/Player.h>
 #include <sapphire_zone/Event/EventHandler.h>
-#include "../ScriptObject.h"
+#include <ScriptObject.h>
 #include "Event/EventHelper.h"
 
 // Quest Script: ManFst001_00039
