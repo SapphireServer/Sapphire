@@ -483,7 +483,7 @@ void Core::Network::GameConnection::generateEncryptionKey( uint32_t key, const s
 }
 
 void Core::Network::GameConnection::handlePackets( const Core::Network::Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
-                                                   const std::vector<Core::Network::Packets::FFXIVARR_PACKET_RAW>& packetData )
+                                                   const std::vector< Core::Network::Packets::FFXIVARR_PACKET_RAW >& packetData )
 {
 
    for( auto inPacket : packetData )

@@ -26,7 +26,7 @@ using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
 
-void Core::Network::GameConnection::cfDutyInfoRequest( const Packets::GamePacket& inPacket,
+void Core::Network::GameConnection::cfDutyInfoRequest( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                        Entity::Player& player )
 {
    ZoneChannelPacket< FFXIVIpcCFDutyInfo > dutyInfoPacket( player.getId() );
@@ -46,17 +46,18 @@ void Core::Network::GameConnection::cfDutyInfoRequest( const Packets::GamePacket
 
 }
 
-void Core::Network::GameConnection::cfRegisterDuty( const Packets::GamePacket& inPacket,
+void Core::Network::GameConnection::cfRegisterDuty( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                     Entity::Player& player)
 {
+   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
    auto pTeriMgr = g_fw.get< TerritoryMgr >();
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
 
    std::vector< uint16_t > selectedContent;
 
-   for( uint32_t offset = 0x2E; offset <= 0x36; offset += 0x2 )
+   for( uint32_t offset = 0x1E; offset <= 0x26; offset += 0x2 )
    {
-      auto id = inPacket.getValAt< uint16_t >( offset );
+      auto id = *reinterpret_cast< uint16_t* >( &copy.data[offset] );
       if( id == 0 )
          break;
 
@@ -93,7 +94,7 @@ void Core::Network::GameConnection::cfRegisterDuty( const Packets::GamePacket& i
    player.setInstance( instance );
 }
 
-void Core::Network::GameConnection::cfRegisterRoulette( const Packets::GamePacket& inPacket,
+void Core::Network::GameConnection::cfRegisterRoulette( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                         Entity::Player& player)
 {
    ZoneChannelPacket< FFXIVIpcCFNotify > cfCancelPacket( player.getId() );
@@ -104,7 +105,7 @@ void Core::Network::GameConnection::cfRegisterRoulette( const Packets::GamePacke
    player.sendDebug( "Roulette register" );
 }
 
-void Core::Network::GameConnection::cfDutyAccepted( const Packets::GamePacket& inPacket,
+void Core::Network::GameConnection::cfDutyAccepted( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                     Entity::Player& player)
 {
    player.sendDebug( "TODO: Duty accept" );

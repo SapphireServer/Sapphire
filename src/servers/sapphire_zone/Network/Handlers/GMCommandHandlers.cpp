@@ -84,15 +84,17 @@ enum GmCommand
    JumpNpc = 0x025F,
 };
 
-void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPacket, Entity::Player& player )
+void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
    if( player.getGmRank() <= 0 )
       return;
 
-   uint32_t commandId = inPacket.getValAt< uint32_t >( 0x20 );
-   uint32_t param1 = inPacket.getValAt< uint32_t >( 0x24 );
-   uint32_t param2 = inPacket.getValAt< uint32_t >( 0x28 );
-   uint32_t param3 = inPacket.getValAt< uint32_t >( 0x38 );
+   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
+   auto commandId = *reinterpret_cast< uint32_t* >( &copy.data[0x10] );
+
+   uint32_t param1 = *reinterpret_cast< uint32_t* >( &copy.data[0x14] );
+   uint32_t param2 = *reinterpret_cast< uint32_t* >( &copy.data[0x18] );
+   uint32_t param3 = *reinterpret_cast< uint32_t* >( &copy.data[0x28] );
 
    auto pLog = g_fw.get< Logger >();
    pLog->debug( player.getName() + " used GM1 commandId: " + std::to_string( commandId ) +
@@ -476,7 +478,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
 
 }
 
-void Core::Network::GameConnection::gm2Handler( const Packets::GamePacket& inPacket, Entity::Player& player )
+void Core::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
    if( player.getGmRank() <= 0 )
       return;
@@ -484,8 +486,10 @@ void Core::Network::GameConnection::gm2Handler( const Packets::GamePacket& inPac
    auto pLog = g_fw.get< Logger >();
    auto pServerZone = g_fw.get< ServerZone >();
 
-   uint32_t commandId = inPacket.getValAt< uint32_t >( 0x20 );
-   std::string param1 = inPacket.getStringAt( 0x34 );
+   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
+   auto commandId = *reinterpret_cast< uint32_t* >( &copy.data[0x10] );
+
+   auto param1 = std::string( reinterpret_cast< char* >( &copy.data[0x24] ) );
 
    pLog->debug( player.getName() + " used GM2 commandId: " + std::to_string( commandId ) + ", params: " + param1 );
 

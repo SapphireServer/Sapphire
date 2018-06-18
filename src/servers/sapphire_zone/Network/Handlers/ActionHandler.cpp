@@ -108,16 +108,18 @@ enum ClientTrigger
 
 };
 
-void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& inPacket,
+void Core::Network::GameConnection::actionHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                    Entity::Player& player )
 {
+   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
+
    auto pLog = g_fw.get< Logger >();
-   uint16_t commandId = inPacket.getValAt< uint16_t >( 0x20 );
-   uint64_t param1 = inPacket.getValAt< uint64_t >( 0x24 );
-   uint32_t param11 = inPacket.getValAt< uint32_t >( 0x24 );
-   uint32_t param12 = inPacket.getValAt< uint32_t >( 0x28 );
-   uint32_t param2 = inPacket.getValAt< uint32_t >( 0x2C );
-   uint64_t param3 = inPacket.getValAt< uint64_t >( 0x38 );
+   uint16_t commandId = *reinterpret_cast< uint16_t* >( &copy.data[0x10] );
+   uint64_t param1 = *reinterpret_cast< uint64_t* >( &copy.data[0x14] );
+   uint32_t param11 = *reinterpret_cast< uint32_t* >( &copy.data[0x14] );
+   uint32_t param12 = *reinterpret_cast< uint32_t* >( &copy.data[0x18] );
+   uint32_t param2 = *reinterpret_cast< uint32_t* >( &copy.data[0x1C] );
+   uint64_t param3 = *reinterpret_cast< uint64_t* >( &copy.data[0x28] );
 
    pLog->debug( "[" + std::to_string( m_pSession->getId() ) + "] Incoming action: " +
               boost::str( boost::format( "%|04X|" ) % ( uint32_t ) ( commandId & 0xFFFF ) ) +
@@ -162,7 +164,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
        case ClientTrigger::ChangeTarget: // Change target
        {
 
-          uint64_t targetId = inPacket.getValAt< uint64_t >( 0x24 );
+          uint64_t targetId = param1;
           player.changeTarget( targetId );
           break;
        }
@@ -206,7 +208,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
        case ClientTrigger::Emote: // emote
        {
           uint64_t targetId = player.getTargetId();
-          uint32_t emoteId = inPacket.getValAt< uint32_t >( 0x24 );
+          uint32_t emoteId = param11;
 
           player.emote( emoteId, targetId );
           break;
