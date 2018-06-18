@@ -174,7 +174,7 @@ void Core::Network::GameConnection::OnError( const boost::system::error_code & e
    pLog->debug( "GameConnection ERROR: " + error.message() );
 }
 
-void Core::Network::GameConnection::queueInPacket( Core::Network::Packets::GamePacketPtr inPacket )
+void Core::Network::GameConnection::queueInPacket( Core::Network::Packets::FFXIVARR_PACKET_RAW inPacket )
 {
    m_inQueue.push( inPacket );
 }
@@ -184,24 +184,25 @@ void Core::Network::GameConnection::queueOutPacket( Core::Network::Packets::Game
    m_outQueue.push( outPacket );
 }
 
-void Core::Network::GameConnection::handleZonePacket( const Packets::GamePacket& pPacket )
+void Core::Network::GameConnection::handleZonePacket( Core::Network::Packets::FFXIVARR_PACKET_RAW& pPacket )
 {
    auto pLog = g_fw.get< Logger >();
-   auto it = m_zoneHandlerMap.find( pPacket.getSubType() );
+   uint16_t opcode = *reinterpret_cast< uint16_t* >( &pPacket.data[0x02] );
+   auto it = m_zoneHandlerMap.find( opcode );
 
    std::string sessionStr = "[" + std::to_string( m_pSession->getId() ) + "]";
 
    if( it != m_zoneHandlerMap.end() )
    {
-      auto itStr = m_zoneHandlerStrMap.find( pPacket.getSubType() );
+      auto itStr = m_zoneHandlerStrMap.find( opcode );
       std::string name = itStr != m_zoneHandlerStrMap.end() ? itStr->second : "unknown";
       // dont display packet notification if it is a ping or pos update, don't want the spam
-      if( pPacket.getSubType() != PingHandler &&
-          pPacket.getSubType() != UpdatePositionHandler )
+      if( opcode != PingHandler &&
+          opcode != UpdatePositionHandler )
 
          pLog->debug( sessionStr + " Handling Zone IPC : " + name + "( " +
                       boost::str( boost::format( "%|04X|" ) %
-                                         static_cast< uint32_t >( pPacket.getSubType() & 0xFFFF ) ) + " )" );
+                                         static_cast< uint32_t >( opcode ) ) + " )" );
 
       ( this->*( it->second ) )( pPacket, *m_pSession->getPlayer() );
    }
@@ -209,28 +210,29 @@ void Core::Network::GameConnection::handleZonePacket( const Packets::GamePacket&
    {
       pLog->debug( sessionStr + " Undefined Zone IPC : Unknown ( " +
                    boost::str( boost::format( "%|04X|" ) %
-                                      static_cast< uint32_t >( pPacket.getSubType() & 0xFFFF ) ) + " )" );
-      pLog->debug( "\n" + pPacket.toString() );
+                                      static_cast< uint32_t >( opcode ) ) + " )" );
+      //pLog->debug( "\n" + pPacket.toString() );
    }
 }
 
 
-void Core::Network::GameConnection::handleChatPacket( const Packets::GamePacket& pPacket )
+void Core::Network::GameConnection::handleChatPacket( Core::Network::Packets::FFXIVARR_PACKET_RAW& pPacket )
 {
    auto pLog = g_fw.get< Logger >();
-   auto it = m_chatHandlerMap.find( pPacket.getSubType() );
+   uint16_t opcode = *reinterpret_cast< uint16_t* >( &pPacket.data[0x02] );
+   auto it = m_chatHandlerMap.find( opcode );
 
    std::string sessionStr = "[" + std::to_string( m_pSession->getId() ) + "]";
 
    if( it != m_chatHandlerMap.end() )
    {
-      auto itStr = m_chatHandlerStrMap.find( pPacket.getSubType() );
+      auto itStr = m_chatHandlerStrMap.find( opcode );
       std::string name = itStr != m_chatHandlerStrMap.end() ? itStr->second : "unknown";
       // dont display packet notification if it is a ping or pos update, don't want the spam
 
       pLog->debug( sessionStr + " Handling Chat IPC : " + name + "( " +
                    boost::str( boost::format( "%|04X|" ) %
-                                      static_cast< uint32_t >( pPacket.getSubType() & 0xFFFF ) ) + " )" );
+                                      static_cast< uint32_t >( opcode ) ) + " )" );
 
       ( this->*( it->second ) )( pPacket, *m_pSession->getPlayer() );
    }
@@ -238,12 +240,12 @@ void Core::Network::GameConnection::handleChatPacket( const Packets::GamePacket&
    {
       pLog->debug( sessionStr + " Undefined Chat IPC : Unknown ( " +
                   boost::str( boost::format( "%|04X|" ) %
-                                     static_cast< uint32_t >( pPacket.getSubType() & 0xFFFF ) ) + " )" );
-      pLog->debug( pPacket.toString() );
+                                     static_cast< uint32_t >( opcode ) ) + " )" );
+      //pLog->debug( pPacket.toString() );
    }
 }
 
-void Core::Network::GameConnection::handlePacket( Core::Network::Packets::GamePacketPtr pPacket )
+void Core::Network::GameConnection::handlePacket( Core::Network::Packets::FFXIVARR_PACKET_RAW& pPacket )
 {
    if( !m_pSession )
       return;
@@ -251,11 +253,11 @@ void Core::Network::GameConnection::handlePacket( Core::Network::Packets::GamePa
    switch( m_conType )
    {
       case Network::ConnectionType::Zone:
-         handleZonePacket( *pPacket );
+         handleZonePacket( pPacket );
          break;
 
       case Network::ConnectionType::Chat:
-         handleChatPacket( *pPacket );
+         handleChatPacket( pPacket );
          break;
    }
 
@@ -273,8 +275,9 @@ void Core::Network::GameConnection::sendPackets( Packets::PacketContainer* pPack
 void Core::Network::GameConnection::processInQueue()
 {
    // handle the incoming game packets
-   while( auto pPacket = m_inQueue.pop() )
+   while( m_inQueue.size() )
    {
+      auto pPacket = m_inQueue.pop();
       handlePacket( pPacket );
    }
 }
@@ -442,8 +445,7 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
       }
       case 3: // game packet
       {
-         auto pPacket = new GamePacket( inPacket );
-         queueInPacket( Packets::GamePacketPtr( pPacket ) );
+         queueInPacket( inPacket );
          break;
       }
       case 7: // keep alive

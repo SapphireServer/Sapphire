@@ -33,12 +33,15 @@ using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-void Core::Network::GameConnection::eventHandlerTalk( const Packets::GamePacket& inPacket, Entity::Player& player )
+void Core::Network::GameConnection::eventHandlerTalk( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                      Entity::Player& player )
 {
    auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-   auto actorId = inPacket.getValAt< uint64_t >( 0x20 );
-   auto eventId = inPacket.getValAt< uint32_t >( 0x28 );
+   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
+
+   auto actorId = *reinterpret_cast< uint64_t* >( &copy.data[0x10] );
+   auto eventId = *reinterpret_cast< uint32_t* >( &copy.data[0x18] );
    auto eventType = static_cast< uint16_t >( eventId >> 16 );
 
    std::string eventName = "onTalk";
@@ -56,7 +59,6 @@ void Core::Network::GameConnection::eventHandlerTalk( const Packets::GamePacket&
    player.sendDebug( "Calling: " + objName + "." + eventName );
    player.eventStart( actorId, eventId, Event::EventHandler::Talk, 0, 0 );
 
-
    if( auto instance = player.getCurrentInstance() )
    {
       instance->onTalk( player, eventId, actorId );
@@ -73,14 +75,17 @@ void Core::Network::GameConnection::eventHandlerTalk( const Packets::GamePacket&
 
 }
 
-void Core::Network::GameConnection::eventHandlerEmote( const Packets::GamePacket& inPacket, Entity::Player& player )
+void Core::Network::GameConnection::eventHandlerEmote( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                       Entity::Player& player )
 {
 
    auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-   auto actorId = inPacket.getValAt< uint64_t >( 0x20 );
-   auto eventId = inPacket.getValAt< uint32_t >( 0x28 );
-   auto emoteId = inPacket.getValAt< uint16_t >( 0x2C );
+   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
+
+   auto actorId = *reinterpret_cast< uint64_t* >( &copy.data[0x10] );
+   auto eventId = *reinterpret_cast< uint32_t* >( &copy.data[0x18] );
+   auto emoteId = *reinterpret_cast< uint16_t* >( &copy.data[0x1C] );
    auto eventType = static_cast< uint16_t >( eventId >> 16 );
 
    std::string eventName = "onEmote";
@@ -109,15 +114,18 @@ void Core::Network::GameConnection::eventHandlerEmote( const Packets::GamePacket
    player.checkEvent( eventId );
 }
 
-void Core::Network::GameConnection::eventHandlerWithinRange( const Packets::GamePacket& inPacket,
+void Core::Network::GameConnection::eventHandlerWithinRange( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                              Entity::Player& player )
 {
    auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
-   auto eventId = inPacket.getValAt< uint32_t >( 0x24 );
-   auto param1 = inPacket.getValAt< uint32_t >( 0x20 );
-   auto x = inPacket.getValAt< float >( 0x28 );
-   auto y = inPacket.getValAt< float >( 0x2C );
-   auto z = inPacket.getValAt< float >( 0x30 );
+   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
+
+   auto eventId = *reinterpret_cast< uint32_t* >( &copy.data[0x14] );
+   auto param1 = *reinterpret_cast< uint32_t* >( &copy.data[0x10] );
+
+   auto x = *reinterpret_cast< float* >( &copy.data[0x18] );
+   auto y = *reinterpret_cast< float* >( &copy.data[0x1C] );
+   auto z = *reinterpret_cast< float* >( &copy.data[0x20] );
 
    std::string eventName = "onWithinRange";
    std::string objName = Event::getEventName( eventId );
@@ -131,15 +139,18 @@ void Core::Network::GameConnection::eventHandlerWithinRange( const Packets::Game
    player.checkEvent( eventId );
 }
 
-void Core::Network::GameConnection::eventHandlerOutsideRange( const Packets::GamePacket& inPacket,
+void Core::Network::GameConnection::eventHandlerOutsideRange( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                               Entity::Player& player )
 {
    auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
-   auto eventId = inPacket.getValAt< uint32_t >( 0x24 );
-   auto param1 = inPacket.getValAt< uint32_t >( 0x20 );
-   auto x = inPacket.getValAt< float >( 0x28 );
-   auto y = inPacket.getValAt< float >( 0x2C );
-   auto z = inPacket.getValAt< float >( 0x30 );
+   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
+
+   auto eventId = *reinterpret_cast< uint32_t* >( &copy.data[0x14] );
+   auto param1 = *reinterpret_cast< uint32_t* >( &copy.data[0x10] );
+
+   auto x = *reinterpret_cast< float* >( &copy.data[0x18] );
+   auto y = *reinterpret_cast< float* >( &copy.data[0x1C] );
+   auto z = *reinterpret_cast< float* >( &copy.data[0x20] );
 
    std::string eventName = "onOutsideRange";
    std::string objName = Event::getEventName( eventId );
@@ -153,13 +164,15 @@ void Core::Network::GameConnection::eventHandlerOutsideRange( const Packets::Gam
    player.checkEvent( eventId );
 }
 
-void Core::Network::GameConnection::eventHandlerEnterTerritory( const Packets::GamePacket &inPacket,
-                                                                Entity::Player &player )
+void Core::Network::GameConnection::eventHandlerEnterTerritory( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                                Entity::Player& player )
 {
    auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
-   auto eventId = inPacket.getValAt< uint32_t >( 0x20 );
-   auto param1 = inPacket.getValAt< uint16_t >( 0x24 );
-   auto param2 = inPacket.getValAt< uint16_t >( 0x26 );
+   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
+
+   auto eventId = *reinterpret_cast< uint32_t* >( &copy.data[0x14] );
+   auto param1 = *reinterpret_cast< uint16_t* >( &copy.data[0x10] );
+   auto param2 = *reinterpret_cast< uint16_t* >( &copy.data[0x16] );
 
    std::string eventName = "onEnterTerritory";
 
@@ -181,14 +194,16 @@ void Core::Network::GameConnection::eventHandlerEnterTerritory( const Packets::G
    player.checkEvent( eventId );
 }
 
-void Core::Network::GameConnection::eventHandlerReturn( const Packets::GamePacket &inPacket,
-                                                        Entity::Player &player )
+void Core::Network::GameConnection::eventHandlerReturn( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                        Entity::Player& player )
 {
-   auto eventId = inPacket.getValAt< uint32_t >( 0x20 );
-   auto scene = inPacket.getValAt< uint16_t >( 0x24 );
-   auto param1 = inPacket.getValAt< uint16_t >( 0x26 );
-   auto param2 = inPacket.getValAt< uint16_t >( 0x28 );
-   auto param3 = inPacket.getValAt< uint16_t >( 0x2C );
+   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
+
+   auto eventId = *reinterpret_cast< uint32_t* >( &copy.data[0x10] );
+   auto scene = *reinterpret_cast< uint16_t* >( &copy.data[0x14] );
+   auto param1 = *reinterpret_cast< uint16_t* >( &copy.data[0x16] );
+   auto param2 = *reinterpret_cast< uint16_t* >( &copy.data[0x18] );
+   auto param3 = *reinterpret_cast< uint16_t* >( &copy.data[0x1C] );
 
    std::string eventName = Event::getEventName( eventId );
 
@@ -226,12 +241,14 @@ void Core::Network::GameConnection::eventHandlerReturn( const Packets::GamePacke
 
 }
 
-void Core::Network::GameConnection::eventHandlerLinkshell( const Packets::GamePacket &inPacket,
-                                                           Entity::Player &player )
+void Core::Network::GameConnection::eventHandlerLinkshell( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                           Entity::Player& player )
 {
-   auto eventId = inPacket.getValAt< uint32_t >( 0x20 );
-   auto scene = inPacket.getValAt< uint16_t >( 0x24 );
-   auto lsName = inPacket.getStringAt( 0x27 );
+   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
+
+   auto eventId = *reinterpret_cast< uint32_t* >( &copy.data[0x10] );
+   auto scene = *reinterpret_cast< uint16_t* >( &copy.data[0x14] );
+   auto lsName = std::string( reinterpret_cast< char* >( &copy.data[0x17] ) );
 
    ZoneChannelPacket< FFXIVIpcEventLinkshell > linkshellEvent( player.getId() );
    linkshellEvent.data().eventId = eventId;

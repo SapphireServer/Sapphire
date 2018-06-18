@@ -45,7 +45,7 @@ using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-void Core::Network::GameConnection::fcInfoReqHandler( const Packets::GamePacket& inPacket,
+void Core::Network::GameConnection::fcInfoReqHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                       Entity::Player& player )
 {
    // TODO: use new packet struct for this
@@ -54,16 +54,18 @@ void Core::Network::GameConnection::fcInfoReqHandler( const Packets::GamePacket&
    //queueOutPacket( pPe );
 }
 
-void Core::Network::GameConnection::setSearchInfoHandler( const Packets::GamePacket& inPacket,
+void Core::Network::GameConnection::setSearchInfoHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                           Entity::Player& player )
 {
-   uint32_t inval = inPacket.getValAt< uint32_t >( 0x20 );
-   uint32_t inval1 = inPacket.getValAt< uint32_t >( 0x24 );
-   uint64_t status = inPacket.getValAt< uint64_t >( 0x20 );
+   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
 
-   uint8_t selectRegion = inPacket.getValAt< uint8_t >( 0x31 );
+   auto inval = *reinterpret_cast< uint32_t* >( &copy.data[0x10] );
+   auto inval1 = *reinterpret_cast< uint32_t* >( &copy.data[0x14] );
+   auto status = *reinterpret_cast< uint64_t* >( &copy.data[0x10] );
 
-   player.setSearchInfo( selectRegion, 0, inPacket.getStringAt( 0x32 ) );
+   auto selectRegion = copy.data[0x21];
+
+   player.setSearchInfo( selectRegion, 0, reinterpret_cast< char* >( &copy.data[0x22] ) );
 
    player.setOnlineStatusMask( status );
 
@@ -88,7 +90,7 @@ void Core::Network::GameConnection::setSearchInfoHandler( const Packets::GamePac
                                                    static_cast< uint8_t >( player.getOnlineStatus() ) ), true );
 }
 
-void Core::Network::GameConnection::reqSearchInfoHandler( const Packets::GamePacket& inPacket,
+void Core::Network::GameConnection::reqSearchInfoHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                           Entity::Player& player )
 {
    ZoneChannelPacket< FFXIVIpcInitSearchInfo > searchInfoPacket( player.getId() );
@@ -98,19 +100,21 @@ void Core::Network::GameConnection::reqSearchInfoHandler( const Packets::GamePac
    queueOutPacket( searchInfoPacket );
 }
 
-void Core::Network::GameConnection::linkshellListHandler( const Packets::GamePacket& inPacket,
+void Core::Network::GameConnection::linkshellListHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                           Entity::Player& player )
 {
    ZoneChannelPacket< FFXIVIpcLinkshellList > linkshellListPacket( player.getId() );
    queueOutPacket( linkshellListPacket );
 }
 
-void Core::Network::GameConnection::updatePositionHandler( const Packets::GamePacket& inPacket,
+void Core::Network::GameConnection::updatePositionHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                            Entity::Player& player )
 {
    // if the player is marked for zoning we no longer want to update his pos
    if( player.isMarkedForZoning() )
       return;
+
+   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
 
    struct testMov
    {
@@ -140,10 +144,10 @@ void Core::Network::GameConnection::updatePositionHandler( const Packets::GamePa
       uint16_t bit16 : 1;
    } IPC_OP_019AB;
 
-   uint16_t flags = inPacket.getValAt<uint16_t>( 0x28 );
+   auto flags = *reinterpret_cast< uint16_t* >( &copy.data[0x18] );
    memcpy( &IPC_OP_019AB, &flags, 2 );
 
-   uint32_t flags1 = inPacket.getValAt<uint32_t>( 0x24 );
+   auto flags1 = *reinterpret_cast< uint32_t* >( &copy.data[0x14] );
    memcpy( &IPC_OP_019A, &flags1, 4 );
 
    //g_log.Log(LoggingSeverity::debug, "" + boost::lexical_cast<std::string>((int)IPC_OP_019AB.bit1)
@@ -173,18 +177,19 @@ void Core::Network::GameConnection::updatePositionHandler( const Packets::GamePa
 
    //pInPacket->debugPrint();
 
+   ;
    bool bPosChanged = false;
-   if( ( player.getPos().x != inPacket.getValAt< float >( 0x2c ) ) ||
-       ( player.getPos().y != inPacket.getValAt< float >( 0x30 ) ) ||
-       ( player.getPos().z != inPacket.getValAt< float >( 0x34 ) ) )
+   if( ( player.getPos().x != *reinterpret_cast< float* >( &copy.data[0x1C] ) ) ||
+       ( player.getPos().y != *reinterpret_cast< float* >( &copy.data[0x20] ) ) ||
+       ( player.getPos().z != *reinterpret_cast< float* >( &copy.data[0x24] ) ) )
       bPosChanged = true;
-   if( !bPosChanged  && player.getRot() == inPacket.getValAt< float >( 0x20 ) )
+   if( !bPosChanged  && player.getRot() == *reinterpret_cast< float* >( &copy.data[0x10] ) )
       return;
 
-   player.setRot( inPacket.getValAt< float >( 0x20 ) );
-   player.setPos( inPacket.getValAt< float >( 0x2c ),
-                  inPacket.getValAt< float >( 0x30 ),
-                  inPacket.getValAt< float >( 0x34 ) );
+   player.setRot( *reinterpret_cast< float* >( &copy.data[0x10] ) );
+   player.setPos( *reinterpret_cast< float* >( &copy.data[0x1C] ),
+                  *reinterpret_cast< float* >( &copy.data[0x20] ),
+                  *reinterpret_cast< float* >( &copy.data[0x24] ) );
 
    if( ( player.getCurrentAction() != nullptr ) && bPosChanged )
       player.getCurrentAction()->setInterrupted();
@@ -193,9 +198,9 @@ void Core::Network::GameConnection::updatePositionHandler( const Packets::GamePa
    if( !player.hasInRangeActor() )
       return;
 
-   uint8_t unk = inPacket.getValAt< uint8_t >( 0x29 );
+   auto unk = *reinterpret_cast< uint8_t* >( &copy.data[0x19] );
 
-   uint16_t moveType = inPacket.getValAt< uint16_t >( 0x28 );
+   auto moveType = *reinterpret_cast< uint16_t* >( &copy.data[0x18] );
 
    uint8_t unk1 = 0;
    uint8_t unk2 = 0;
@@ -279,19 +284,21 @@ void Core::Network::GameConnection::updatePositionHandler( const Packets::GamePa
 
 }
 
-void Core::Network::GameConnection::reqEquipDisplayFlagsHandler( const Packets::GamePacket& inPacket,
+void Core::Network::GameConnection::reqEquipDisplayFlagsHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                                  Entity::Player& player )
 {
-   player.setEquipDisplayFlags( inPacket.getValAt< uint8_t >( 0x20 ) );
+   player.setEquipDisplayFlags( inPacket.data[0x10] );
 
    player.sendDebug( "EquipDisplayFlag CHANGE: " + std::to_string( player.getEquipDisplayFlags() ) );
 }
 
-void Core::Network::GameConnection::zoneLineHandler( const Packets::GamePacket& inPacket,
+void Core::Network::GameConnection::zoneLineHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                      Entity::Player& player )
 {
    auto pTeriMgr = g_fw.get< TerritoryMgr >();
-   uint32_t zoneLineId = inPacket.getValAt< uint32_t >( 0x20 );
+
+   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
+   auto zoneLineId = *reinterpret_cast< uint32_t* >( &copy.data[0x10] );
 
    player.sendDebug( "Walking ZoneLine " + std::to_string( zoneLineId ) );
 
@@ -331,10 +338,13 @@ void Core::Network::GameConnection::zoneLineHandler( const Packets::GamePacket& 
 }
 
 
-void Core::Network::GameConnection::discoveryHandler( const Packets::GamePacket& inPacket,
+void Core::Network::GameConnection::discoveryHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                       Entity::Player& player )
 {
-   uint32_t ref_position_id = inPacket.getValAt< uint32_t >( 0x20 );
+
+   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
+
+   auto ref_position_id = *reinterpret_cast< uint32_t* >( &copy.data[0x10] );
 
    auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
 
@@ -360,7 +370,7 @@ void Core::Network::GameConnection::discoveryHandler( const Packets::GamePacket&
 }
 
 
-void Core::Network::GameConnection::playTimeHandler( const Packets::GamePacket& inPacket,
+void Core::Network::GameConnection::playTimeHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                      Entity::Player& player )
 {
    ZoneChannelPacket< FFXIVIpcPlayTime > playTimePacket( player.getId() );
@@ -369,7 +379,7 @@ void Core::Network::GameConnection::playTimeHandler( const Packets::GamePacket& 
 }
 
 
-void Core::Network::GameConnection::initHandler( const Packets::GamePacket& inPacket,
+void Core::Network::GameConnection::initHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                  Entity::Player& player )
 {
    // init handler means this is a login procedure
@@ -379,10 +389,10 @@ void Core::Network::GameConnection::initHandler( const Packets::GamePacket& inPa
 }
 
 
-void Core::Network::GameConnection::blackListHandler( const Packets::GamePacket& inPacket,
+void Core::Network::GameConnection::blackListHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                       Entity::Player& player )
 {
-   uint8_t count = inPacket.getValAt< uint8_t >( 0x21 );
+   uint8_t count = inPacket.data[0x11];
 
    ZoneChannelPacket< FFXIVIpcBlackList > blackListPacket( player.getId() );
    blackListPacket.data().sequence = count;
@@ -394,10 +404,12 @@ void Core::Network::GameConnection::blackListHandler( const Packets::GamePacket&
 }
 
 
-void Core::Network::GameConnection::pingHandler( const Packets::GamePacket& inPacket,
+void Core::Network::GameConnection::pingHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                  Entity::Player& player )
 {
-   int32_t inVal = inPacket.getValAt< int32_t >( 0x20 );
+   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
+   auto inVal = *reinterpret_cast< uint32_t* >( &copy.data[0x10] );
+
    PingPacket pingPacket( player, inVal );
    queueOutPacket( pingPacket );
 
@@ -405,7 +417,7 @@ void Core::Network::GameConnection::pingHandler( const Packets::GamePacket& inPa
 }
 
 
-void Core::Network::GameConnection::finishLoadingHandler( const Packets::GamePacket& inPacket,
+void Core::Network::GameConnection::finishLoadingHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                           Entity::Player& player )
 {
    player.getCurrentZone()->onFinishLoading( player );
@@ -428,12 +440,12 @@ void Core::Network::GameConnection::finishLoadingHandler( const Packets::GamePac
    player.getCurrentZone()->updateActorPosition(player);
 }
 
-void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket& inPacket,
+void Core::Network::GameConnection::socialListHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                        Entity::Player& player )
 {
 
-   uint8_t type = inPacket.getValAt< uint8_t >( 0x2A );
-   uint8_t count = inPacket.getValAt< uint8_t >( 0x2B );
+   uint8_t type = inPacket.data[0x1A];
+   uint8_t count = inPacket.data[0x1B];
 
    if( type == 0x02 )
    { // party list
@@ -486,14 +498,16 @@ void Core::Network::GameConnection::socialListHandler( const Packets::GamePacket
 
 }
 
-void Core::Network::GameConnection::chatHandler( const Packets::GamePacket& inPacket,
+void Core::Network::GameConnection::chatHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                  Entity::Player& player )
 {
-
    auto pDebugCom = g_fw.get< DebugCommandHandler >();
-   std::string chatString( inPacket.getStringAt( 0x3a ) );
 
-   uint32_t sourceId = inPacket.getValAt< uint32_t >( 0x24 );
+   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
+
+   std::string chatString( reinterpret_cast< char* >( &copy.data[0x2a] ) );
+
+   auto sourceId = *reinterpret_cast< uint32_t* >( &copy.data[0x14] );
 
    if( chatString.at( 0 ) == '!' )
    {
@@ -502,7 +516,7 @@ void Core::Network::GameConnection::chatHandler( const Packets::GamePacket& inPa
       return;
    }
 
-   ChatType chatType = static_cast< ChatType >( inPacket.getValAt< uint8_t >( 0x38 ) );
+   ChatType chatType = static_cast< ChatType >( inPacket.data[0x28] );
 
    //ToDo, need to implement sending GM chat types.
    ChatPacket chatPacket( player, chatType, chatString );
@@ -546,7 +560,7 @@ void Core::Network::GameConnection::chatHandler( const Packets::GamePacket& inPa
 // currently we wait for the session to just time out after logout, this can be a problem is the user tries to
 // log right back in.
 // Also the packet needs to be converted to an ipc structure
-void Core::Network::GameConnection::logoutHandler( const Packets::GamePacket& inPacket,
+void Core::Network::GameConnection::logoutHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                    Entity::Player& player )
 {
    ZoneChannelPacket< FFXIVIpcLogout > logoutPacket( player.getId() );
@@ -558,11 +572,13 @@ void Core::Network::GameConnection::logoutHandler( const Packets::GamePacket& in
 }
 
 
-void Core::Network::GameConnection::tellHandler( const Packets::GamePacket& inPacket,
+void Core::Network::GameConnection::tellHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                  Entity::Player& player )
 {
-   std::string targetPcName = inPacket.getStringAt( 0x21 );
-   std::string msg = inPacket.getStringAt( 0x41 );
+   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
+
+   std::string targetPcName( reinterpret_cast< char* >( &copy.data[0x11] ) );
+   std::string msg( reinterpret_cast< char* >( &copy.data[0x31] ) );
 
    auto pZoneServer = g_fw.get< ServerZone >();
 
@@ -610,13 +626,12 @@ void Core::Network::GameConnection::tellHandler( const Packets::GamePacket& inPa
 
 }
 
-void Core::Network::GameConnection::performNoteHandler( const Packets::GamePacket& inPacket,
+void Core::Network::GameConnection::performNoteHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                         Entity::Player& player )
 {
    ZoneChannelPacket< FFXIVIpcPerformNote > performPacket( player.getId() );
 
-   auto inVal = inPacket.getDataAt( 0x20 );
-   memcpy( &performPacket.data().data[0], inVal, 32 );
+   memcpy( &performPacket.data().data[0], &inPacket.data[0x10], 32 );
 
    player.sendToInRangeSet( performPacket );
 }

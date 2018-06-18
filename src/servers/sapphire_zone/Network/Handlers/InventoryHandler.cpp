@@ -38,17 +38,20 @@ enum InventoryOperation
    Split = 0x0A
 };
 
-void Core::Network::GameConnection::inventoryModifyHandler( const Packets::GamePacket& inPacket,
+void Core::Network::GameConnection::inventoryModifyHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                             Entity::Player& player )
 {
-   uint32_t seq = inPacket.getValAt< uint32_t >( 0x20 );
-   uint8_t action = inPacket.getValAt< uint8_t >( 0x24 );
-   uint8_t fromSlot = inPacket.getValAt< uint8_t >( 0x30 );
-   uint8_t toSlot = inPacket.getValAt< uint8_t >( 0x44 );
-   uint16_t fromContainer = inPacket.getValAt< uint16_t >( 0x2C );
-   uint16_t toContainer = inPacket.getValAt< uint16_t >( 0x40 );
+   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
+   auto seq = *reinterpret_cast< uint32_t* >( &copy.data[0x10] );
+   auto action = *reinterpret_cast< uint8_t* >( &copy.data[0x14] );
+   auto fromSlot = *reinterpret_cast< uint8_t* >( &copy.data[0x20] );
+   auto toSlot = *reinterpret_cast< uint8_t* >( &copy.data[0x34] );
+
+   auto fromContainer = *reinterpret_cast< uint16_t* >( &copy.data[0x1C] );
+   auto toContainer = *reinterpret_cast< uint16_t* >( &copy.data[0x30] );
+
    // todo: check packet handler in game and see if this is sent as a u16 or u32
-   uint16_t splitCount = inPacket.getValAt< uint16_t >( 0x48 );
+   auto splitCount = *reinterpret_cast< uint16_t* >( &copy.data[0x38] );
 
    ZoneChannelPacket< FFXIVIpcInventoryActionAck > ackPacket( player.getId() );
    ackPacket.data().sequence = seq;
@@ -58,7 +61,7 @@ void Core::Network::GameConnection::inventoryModifyHandler( const Packets::GameP
    auto pLog = g_fw.get< Logger >();
 
 
-   pLog->debug( inPacket.toString() );
+   //pLog->debug( inPacket.toString() );
    pLog->debug( "InventoryAction: " + std::to_string( action ) );
 
    // TODO: other inventory operations need to be implemented
