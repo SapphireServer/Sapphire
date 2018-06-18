@@ -1,7 +1,6 @@
-#include <Script/NativeScriptApi.h>
 #include <Actor/Player.h>
 #include "Event/EventHelper.h"
-#include "../../../ScriptObject.h"
+#include <ScriptObject.h>
 
 // Quest Script: SubFst002_00025
 // Quest Name: Quarrels with Squirrels
