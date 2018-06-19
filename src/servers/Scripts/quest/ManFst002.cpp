@@ -1,8 +1,7 @@
-#include <Script/NativeScriptApi.h>
 #include <Actor/Player.h>
 #include <sapphire_zone/Event/EventHandler.h>
 #include "Event/EventHelper.h"
-#include "../ScriptObject.h"
+#include <ScriptObject.h>
 
 // Quest Script: ManFst002_00124
 // Quest Name: Close to Home
