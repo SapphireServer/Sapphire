@@ -1,7 +1,6 @@
-#include <Script/NativeScriptApi.h>
+#include <ScriptObject.h>
 #include <Actor/Player.h>
 #include "Event/EventHelper.h"
-#include "../../../ScriptObject.h"
 
 // Quest Script: SubFst013_00040
 // Quest Name: For Friendship
