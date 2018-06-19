@@ -1,4 +1,3 @@
-#include <Script/NativeScriptApi.h>
 #include <Actor/Player.h>
 #include "Event/EventHelper.h"
 #include <ScriptObject.h>
@@ -88,9 +87,7 @@ class ManFst003 : public EventScript
             player.learnAction( 1 );
             Scene00051( player );
          },
-            [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-         {},
-            eventId );
+            nullptr, eventId );
       }
       else if( actor == Actor2 )
       {
@@ -114,7 +111,7 @@ class ManFst003 : public EventScript
       {
          player.sendQuestMessage( getId(), 1, 0, 0, 0 );
       }
-      else if( varIdx == 2)
+      else if( varIdx == 2 )
       {
          player.sendQuestMessage( getId(), 2, 0, 0, 0 );
       }
@@ -172,7 +169,7 @@ class ManFst003 : public EventScript
       player.playScene( getId(), 3, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            if( result.param2 == 1)
+            if( result.param2 == 1 )
             {
                Scene00100( player );
             }
