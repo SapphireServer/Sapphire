@@ -81,13 +81,13 @@ class ManFst003 : public EventScript
       {
          player.eventActionStart( 0x050002, 0x13,
             [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-         {
-            player.sendQuestMessage( 0x050002, 0, 1, 0, 0 );
-            player.registerAetheryte( 2 );
-            player.learnAction( 1 );
-            Scene00051( player );
-         },
-            nullptr, eventId );
+            {
+               player.sendQuestMessage( 0x050002, 0, 1, 0, 0 );
+               player.registerAetheryte( 2 );
+               player.learnAction( 1 );
+               Scene00051( player );
+            },
+               nullptr, eventId );
       }
       else if( actor == Actor2 )
       {
