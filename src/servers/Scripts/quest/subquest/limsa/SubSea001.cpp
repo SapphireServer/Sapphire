@@ -76,67 +76,55 @@ public:
       {
          player.eventActionStart( getId(), 0x0E,
             [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-         {
-            Scene00003( player );
-         },
-            [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-         {},
-            eventId );
+            {
+               Scene00003( player );
+            },
+               nullptr, eventId );
       }
       else if(actor == Eobject1 ) 
       {
          player.eventActionStart( getId(), 0x0E,
             [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-         {
-            Scene00005( player );
-         },
-            [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-         {},
-            eventId );
+            {
+               Scene00005( player );
+            },
+               nullptr, eventId );
       }
       else if( actor == Eobject2 ) 
       {
          player.eventActionStart( getId(), 0x0E,
             [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-         {
-            Scene00007( player );
-         },
-            [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-         {},
-            eventId );
+            {
+               Scene00007( player );
+            },
+               nullptr, eventId );
       }
       else if( actor == Eobject3 ) 
       {
          player.eventActionStart( getId(), 0x0E,
             [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-         {
-            Scene00009( player );
-         },
-            [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-         {},
-            eventId );
+            {
+               Scene00009( player );
+            },
+               nullptr, eventId );
       }
       else if( actor == Eobject4 )
       {
          player.eventActionStart( getId(), 0x0E,
             [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-         {
-            Scene00011( player );
-         },
-            [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-         {},
-            eventId );
+            {
+               Scene00011( player );
+            },
+               nullptr, eventId );
       }
       else if( actor == Eobject5 )
       {
          player.eventActionStart( getId(), 0x0E,
             [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-         {
-            Scene00013( player );
-         },
-            [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-         {},
-            eventId );
+            {
+               Scene00013( player );
+            },
+               nullptr, eventId );
       }
    };
 
