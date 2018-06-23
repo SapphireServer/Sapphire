@@ -7,11 +7,13 @@
 #include <Network/GamePacket.h>
 #include <Network/GamePacketNew.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
+#include <Network/CommonActorControl.h>
 #include <Util/UtilMath.h>
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
+using namespace Core::Network::ActorControl;
 
 #include "Framework.h"
 extern Core::Framework g_fw;
@@ -79,7 +81,7 @@ void Core::Entity::EventObject::setState( uint8_t state )
    for( const auto& player : m_inRangePlayers )
    {
       ZoneChannelPacket< FFXIVIpcActorControl142 > eobjUpdatePacket( getId(), player->getId() );
-      eobjUpdatePacket.data().category = Common::ActorControlType::DirectorEObjMod;
+      eobjUpdatePacket.data().category = ActorControlType::DirectorEObjMod;
       eobjUpdatePacket.data().param1 = state;
 
       player->queuePacket( eobjUpdatePacket );
@@ -90,7 +92,7 @@ void Core::Entity::EventObject::setAnimationFlag( uint32_t flag, uint32_t animat
    for( const auto& player : m_inRangePlayers )
    {
       ZoneChannelPacket< FFXIVIpcActorControl142 > eobjUpdatePacket( getId(), player->getId() );
-      eobjUpdatePacket.data().category = Common::ActorControlType::EObjAnimation;
+      eobjUpdatePacket.data().category = ActorControlType::EObjAnimation;
       eobjUpdatePacket.data().param1 = flag;
       eobjUpdatePacket.data().param2 = animationFlag;
 

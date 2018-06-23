@@ -2,6 +2,7 @@
 
 #include <Network/PacketDef/Ipcs.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
+#include <Network/CommonActorControl.h>
 
 #include "Actor/Player.h"
 
@@ -12,6 +13,7 @@
 using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
+using namespace Core::Network::ActorControl;
 
 Core::Event::Director::Director( Core::Event::Director::DirectorType type, uint16_t contentId ) :
    m_contentId( contentId ),
