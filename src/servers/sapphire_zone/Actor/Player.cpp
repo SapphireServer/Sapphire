@@ -7,6 +7,7 @@
 #include <Logging/Logger.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Network/PacketContainer.h>
+#include <Network/CommonActorControl.h>
 
 #include "Session.h"
 #include "Player.h"
@@ -45,6 +46,7 @@ extern Core::Framework g_fw;
 using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
+using namespace Core::Network::ActorControl;
 
 // player constructor
 Core::Entity::Player::Player() :
@@ -1336,7 +1338,7 @@ void Core::Entity::Player::setTitle( uint16_t titleId )
 
    m_activeTitle = titleId;
 
-   sendToInRangeSet( ActorControlPacket142( getId(), SetTitle, titleId ), true );
+   sendToInRangeSet( ActorControlPacket142( getId(), ActorControlType::SetTitle, titleId ), true );
 }
 
 void Core::Entity::Player::setEquipDisplayFlags( uint8_t state )

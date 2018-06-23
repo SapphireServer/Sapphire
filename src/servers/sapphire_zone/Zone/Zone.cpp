@@ -11,6 +11,7 @@
 #include <Network/CommonNetwork.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Network/PacketContainer.h>
+#include <Network/CommonActorControl.h>
 #include <Database/DatabaseDef.h>
 #include <Network/PacketWrappers/ActorControlPacket143.h>
 
@@ -39,9 +40,9 @@
 using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
+using namespace Core::Network::ActorControl;
 
 extern Core::Framework g_fw;
-
 
 /**
 * \brief
@@ -142,7 +143,7 @@ void Core::Zone::setCurrentFestival( uint16_t festivalId )
    {
       auto player = playerEntry.second;
 
-      ActorControlPacket143 enableFestival( player->getId(), SetFestival, m_currentFestivalId );
+      ActorControlPacket143 enableFestival( player->getId(), ActorControlType::SetFestival, m_currentFestivalId );
       playerEntry.second->queuePacket( enableFestival );
    }
 }

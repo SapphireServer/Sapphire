@@ -98,7 +98,7 @@ public:
    DECLARE_HANDLER( updatePositionHandler );
    DECLARE_HANDLER( chatHandler );
    DECLARE_HANDLER( zoneLineHandler );
-   DECLARE_HANDLER( actionHandler );
+   DECLARE_HANDLER( clientActorControlHandler );
    DECLARE_HANDLER( inventoryModifyHandler );
    DECLARE_HANDLER( discoveryHandler );
    DECLARE_HANDLER( eventHandlerTalk );
