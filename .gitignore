@@ -118,3 +118,6 @@ src/servers/Scripts/*/ScriptLoader.cpp
 # cotire generated files/folders
 cotire/
 *_cotire.cmake
+
+*objects.txt
+*exports.def
