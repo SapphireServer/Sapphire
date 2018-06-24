@@ -75,7 +75,7 @@ namespace Core {
       Network::HivePtr hive( new Network::Hive() );
       Network::addServerToHive< Network::GameConnection >( m_ip, m_port, hive );
 
-      g_log.info( "Lobbyserver ready for connections." );
+      g_log.info( "Lobby server running on " + m_pConfig->getValue< std::string >( "LobbyNetwork.ListenIp", "0.0.0.0" ) + ":" + m_pConfig->getValue< std::string >( "LobbyNetwork.ListenPort", "80" ) );
 
       boost::thread_group worker_threads;
       worker_threads.create_thread( boost::bind( &Network::Hive::Run, hive.get() ) );
@@ -109,11 +109,11 @@ namespace Core {
             if( arg == "ip" )
             {
                // todo: ip addr in config
-               m_pConfig->setValue< std::string >( "GlobalNetwork.LobbyHost", val );
+               m_pConfig->setValue< std::string >( "LobbyNetwork.ListenIp", val );
             }
             else if( arg == "p" || arg == "port" )
             {
-               m_pConfig->setValue< std::string >( "GlobalNetwork.LobbyPort", val );
+               m_pConfig->setValue< std::string >( "LobbyNetwork.LobbyPort", val );
             }
             else if( arg == "worldip" || arg == "worldip" )
             {
@@ -131,8 +131,8 @@ namespace Core {
          }
       }
 
-      m_port = m_pConfig->getValue< uint16_t >( "GlobalNetwork.LobbyPort", 54994 );
-      m_ip = m_pConfig->getValue< std::string >( "GlobalNetwork.LobbyHost", "0.0.0.0" );
+      m_port = m_pConfig->getValue< uint16_t >( "LobbyNetwork.ListenPort", 54994 );
+      m_ip = m_pConfig->getValue< std::string >( "LobbyNetwork.ListenIp", "0.0.0.0" );
 
       g_restConnector.restHost = m_pConfig->getValue< std::string >( "GlobalNetwork.RestHost" ) + ":" + m_pConfig->getValue< std::string >( "GlobalNetwork.RestPort" );
       g_restConnector.serverSecret = m_pConfig->getValue< std::string >( "GlobalParameters.ServerSecret" );

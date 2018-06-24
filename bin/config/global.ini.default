@@ -2,7 +2,7 @@
 Host = 127.0.0.1
 Port = 3306
 Database = sapphire
-Username = sapphire
+Username = root
 Password =
 SyncThreads = 2
 AsyncThreads = 2
@@ -12,6 +12,7 @@ ServerSecret = default
 DataPath = C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack
 
 [GlobalNetwork]
+; Values definining how Users and other servers will access - these have to be set to your public IP when running a public server
 ZoneHost = 127.0.0.1
 ZonePort = 54992
 
