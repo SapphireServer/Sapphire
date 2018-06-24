@@ -2,3 +2,7 @@
 WorldID = 67
 AllowNoSessionConnect = false
 WorldName = Sapphire
+
+[LobbyNetwork]
+ListenIp = 0.0.0.0
+ListenPort = 54994
