@@ -29,19 +29,17 @@ using namespace Core::Network::Packets::Server;
 void Core::Network::GameConnection::cfDutyInfoRequest( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                        Entity::Player& player )
 {
-   ZoneChannelPacket< FFXIVIpcCFDutyInfo > dutyInfoPacket( player.getId() );
-
+   auto dutyInfoPacket = makeZonePacket< FFXIVIpcCFDutyInfo >( player.getId() );
    auto penaltyMinutes = player.getCFPenaltyMinutes();
    if( penaltyMinutes > 255 )
    {
       // cap it since it's uint8_t in packets
       penaltyMinutes = 255;
    }
-   dutyInfoPacket.data().penaltyTime = penaltyMinutes;
-
+   dutyInfoPacket->data().penaltyTime = penaltyMinutes;
    queueOutPacket( dutyInfoPacket );
 
-   ZoneChannelPacket< FFXIVIpcCFPlayerInNeed > inNeedsPacket( player.getId() );
+   auto inNeedsPacket = makeZonePacket< FFXIVIpcCFPlayerInNeed >( player.getId() );
    queueOutPacket( inNeedsPacket );
 
 }
@@ -73,9 +71,9 @@ void Core::Network::GameConnection::cfRegisterDuty( const Packets::FFXIVARR_PACK
    player.sendDebug( "Duty register request for contentid: " + std::to_string( contentId ) );
 
    // let's cancel it because otherwise you can't register it again
-   ZoneChannelPacket< FFXIVIpcCFNotify > cfCancelPacket( player.getId() );
-   cfCancelPacket.data().state1 = 3;
-   cfCancelPacket.data().state2 = 1; // Your registration is withdrawn.
+   auto cfCancelPacket = makeZonePacket< FFXIVIpcCFNotify >( player.getId() );
+   cfCancelPacket->data().state1 = 3;
+   cfCancelPacket->data().state2 = 1; // Your registration is withdrawn.
    queueOutPacket( cfCancelPacket );
 
    auto cfCondition = pExdData->get< Core::Data::ContentFinderCondition >( contentId );
@@ -97,9 +95,9 @@ void Core::Network::GameConnection::cfRegisterDuty( const Packets::FFXIVARR_PACK
 void Core::Network::GameConnection::cfRegisterRoulette( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                         Entity::Player& player)
 {
-   ZoneChannelPacket< FFXIVIpcCFNotify > cfCancelPacket( player.getId() );
-   cfCancelPacket.data().state1 = 3;
-   cfCancelPacket.data().state2 = 1; // Your registration is withdrawn.
+   auto cfCancelPacket = makeZonePacket< FFXIVIpcCFNotify >( player.getId() );
+   cfCancelPacket->data().state1 = 3;
+   cfCancelPacket->data().state2 = 1; // Your registration is withdrawn.
    queueOutPacket( cfCancelPacket );
 
    player.sendDebug( "Roulette register" );

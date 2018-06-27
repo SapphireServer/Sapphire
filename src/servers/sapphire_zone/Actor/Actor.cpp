@@ -4,6 +4,7 @@
 
 #include <Util/Util.h>
 #include <Util/UtilMath.h>
+#include <utility>
 
 #include "Action/Action.h"
 #include "Action/ActionCollision.h"
@@ -278,7 +279,7 @@ Send a packet to all players in range, potentially to self if set and is player
 \param GamePacketPtr to send
 \param bool should be send to self?
 */
-void Core::Entity::Actor::sendToInRangeSet( Network::Packets::GamePacketPtr pPacket, bool bToSelf )
+void Core::Entity::Actor::sendToInRangeSet( Network::Packets::FFXIVPacketBasePtr pPacket, bool bToSelf )
 {
    auto pServerZone = g_fw.get< ServerZone >();
    if( bToSelf && isPlayer() )
@@ -289,7 +290,7 @@ void Core::Entity::Actor::sendToInRangeSet( Network::Packets::GamePacketPtr pPac
 
       // it might be that the player DC'd in which case the session would be invalid
       if( pSession )
-         pSession->getZoneConnection()->queueOutPacket( pPacket );
+         pSession->getZoneConnection()->queueOutPacket( std::move( pPacket ) );
    }
 
    if( m_inRangePlayers.empty() )
@@ -298,10 +299,11 @@ void Core::Entity::Actor::sendToInRangeSet( Network::Packets::GamePacketPtr pPac
    for( const auto &pCurAct : m_inRangePlayers )
    {
       assert( pCurAct );
-      pPacket->setValAt< uint32_t >( 0x04, m_id );
-      pPacket->setValAt< uint32_t >( 0x08, pCurAct->getId() );
+      pPacket->setSourceActor( m_id );
+      pPacket->setTargetActor( pCurAct->getId() );
       // it might be that the player DC'd in which case the session would be invalid
-      pCurAct->queuePacket( pPacket );
+      // TODO: copy packet to a new unique_ptr then move ownership
+      //pCurAct->queuePacket( pPacket );
    }
 }
 

@@ -204,12 +204,14 @@ uint64_t Core::Entity::Player::getOnlineStatusMask() const
 
 void Core::Entity::Player::prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadeOutTime, uint16_t animation )
 {
-   ZoneChannelPacket< FFXIVIpcPrepareZoning > preparePacket( getId() );
+   FFXIVPacketBasePtr packet = boost::make_shared< ZoneChannelPacket< FFXIVIpcPrepareZoning > >( getId() );
+   auto preparePacket = dynamic_cast< ZoneChannelPacket< FFXIVIpcPrepareZoning >& >( *packet );
+
    preparePacket.data().targetZone = targetZone;
    preparePacket.data().fadeOutTime = fadeOutTime;
    preparePacket.data().animation = animation;
    preparePacket.data().fadeOut = static_cast< uint8_t >( fadeOut ? 1 : 0 );
-   queuePacket( preparePacket );
+   queuePacket( packet );
 }
 
 void Core::Entity::Player::calculateStats()
@@ -271,29 +273,30 @@ bool Core::Entity::Player::isAutoattackOn() const
 
 void Core::Entity::Player::sendStats()
 {
-   ZoneChannelPacket< FFXIVIpcPlayerStats > statPacket( getId() );
-   statPacket.data().strength = m_baseStats.str;
-   statPacket.data().dexterity = m_baseStats.dex;
-   statPacket.data().vitality = m_baseStats.vit;
-   statPacket.data().intelligence = m_baseStats.inte;
-   statPacket.data().mind = m_baseStats.mnd;
-   statPacket.data().piety = m_baseStats.pie;
-   statPacket.data().determination = m_baseStats.determination;
-   statPacket.data().hp = m_baseStats.max_hp;
-   statPacket.data().mp = m_baseStats.max_mp;
-   statPacket.data().accuracy = m_baseStats.accuracy;
-   statPacket.data().attack = m_baseStats.attack;
-   statPacket.data().attackMagicPotency = m_baseStats.attackPotMagic;
-   statPacket.data().healingMagicPotency = m_baseStats.healingPotMagic;
-   statPacket.data().skillSpeed = m_baseStats.skillSpeed;
-   statPacket.data().spellSpeed = m_baseStats.spellSpeed;
-   statPacket.data().spellSpeed1 = m_baseStats.spellSpeed;
-   statPacket.data().spellSpeedMod = 100;
 
-   statPacket.data().criticalHitRate = m_baseStats.spellSpeed;
-   statPacket.data().defense = m_baseStats.spellSpeed;
-   statPacket.data().magicDefense = m_baseStats.spellSpeed;
-   statPacket.data().attack = m_baseStats.spellSpeed;
+   auto statPacket = makeZonePacket< FFXIVIpcPlayerStats >( getId() );
+   statPacket->data().strength = m_baseStats.str;
+   statPacket->data().dexterity = m_baseStats.dex;
+   statPacket->data().vitality = m_baseStats.vit;
+   statPacket->data().intelligence = m_baseStats.inte;
+   statPacket->data().mind = m_baseStats.mnd;
+   statPacket->data().piety = m_baseStats.pie;
+   statPacket->data().determination = m_baseStats.determination;
+   statPacket->data().hp = m_baseStats.max_hp;
+   statPacket->data().mp = m_baseStats.max_mp;
+   statPacket->data().accuracy = m_baseStats.accuracy;
+   statPacket->data().attack = m_baseStats.attack;
+   statPacket->data().attackMagicPotency = m_baseStats.attackPotMagic;
+   statPacket->data().healingMagicPotency = m_baseStats.healingPotMagic;
+   statPacket->data().skillSpeed = m_baseStats.skillSpeed;
+   statPacket->data().spellSpeed = m_baseStats.spellSpeed;
+   statPacket->data().spellSpeed1 = m_baseStats.spellSpeed;
+   statPacket->data().spellSpeedMod = 100;
+
+   statPacket->data().criticalHitRate = m_baseStats.spellSpeed;
+   statPacket->data().defense = m_baseStats.spellSpeed;
+   statPacket->data().magicDefense = m_baseStats.spellSpeed;
+   statPacket->data().attack = m_baseStats.spellSpeed;
 
    queuePacket( statPacket );
 }
@@ -333,19 +336,19 @@ void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
    if( type == 1 ) // teleport
    {
       prepareZoning( data->territory, true, 1, 112 ); // TODO: Really?
-      sendToInRangeSet( ActorControlPacket142( getId(), ActorDespawnEffect, 0x04 ) );
+      sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( getId(), ActorDespawnEffect, 0x04 ) );
       setZoningType( Common::ZoneingType::Teleport );
    }
    else if( type == 2 ) // aethernet
    {
       prepareZoning( data->territory, true, 1, 112 );
-      sendToInRangeSet( ActorControlPacket142( getId(), ActorDespawnEffect, 0x04 ) );
+      sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( getId(), ActorDespawnEffect, 0x04 ) );
       setZoningType( Common::ZoneingType::Teleport );
    }
    else if( type == 3 ) // return
    {
       prepareZoning( data->territory, true, 1, 111 );
-      sendToInRangeSet( ActorControlPacket142( getId(), ActorDespawnEffect, 0x03 ) );
+      sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( getId(), ActorDespawnEffect, 0x03 ) );
       setZoningType( Common::ZoneingType::Return );
    }
 
@@ -471,7 +474,7 @@ void Core::Entity::Player::registerAetheryte( uint8_t aetheryteId )
    Util::valueToFlagByteIndexValue( aetheryteId, value, index );
 
    m_aetheryte[index] |= value;
-   queuePacket( ActorControlPacket143( getId(), LearnTeleport, aetheryteId, 1 ) );
+   queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), LearnTeleport, aetheryteId, 1 ) );
 }
 
 bool Core::Entity::Player::isAetheryteRegistered( uint8_t aetheryteId ) const
@@ -562,7 +565,7 @@ void Core::Entity::Player::learnAction( uint8_t actionId )
 
    m_unlocks[index] |= value;
 
-   queuePacket( ActorControlPacket143( getId(), ToggleActionUnlock, actionId, 1 ) );
+   queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), ToggleActionUnlock, actionId, 1 ) );
 }
 
 void Core::Entity::Player::learnSong( uint8_t songId, uint32_t itemId )
@@ -573,7 +576,7 @@ void Core::Entity::Player::learnSong( uint8_t songId, uint32_t itemId )
 
    m_orchestrion[index] |= value;
 
-   queuePacket( ActorControlPacket143( getId(), ToggleOrchestrionUnlock, songId, 1, itemId ) );
+   queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), ToggleOrchestrionUnlock, songId, 1, itemId ) );
 }
 
 bool Core::Entity::Player::isActionLearned( uint8_t actionId ) const
@@ -597,11 +600,11 @@ void Core::Entity::Player::gainExp( uint32_t amount )
 
    uint32_t neededExpToLevelplus1 = pExdData->get< Core::Data::ParamGrow >( level + 1 )->expToNext;
 
-   queuePacket( ActorControlPacket143( getId(), GainExpMsg, static_cast< uint8_t >( getClass() ), amount ) );
+   queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), GainExpMsg, static_cast< uint8_t >( getClass() ), amount ) );
 
    if( level >= 70 ) // temporary fix for leveling over levelcap
    {
-      queuePacket( ActorControlPacket143( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), amount ) );
+      queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), amount ) );
       return;
    }
 
@@ -613,12 +616,12 @@ void Core::Entity::Player::gainExp( uint32_t amount )
                ( currentExp + amount - neededExpToLevel );
       setExp( amount );
       gainLevel();
-      queuePacket( ActorControlPacket143( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), amount ) );
+      queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), amount ) );
 
    }
    else
    {
-      queuePacket( ActorControlPacket143( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), currentExp + amount ) );
+      queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), currentExp + amount ) );
       setExp( currentExp + amount );
    }
 
@@ -636,34 +639,33 @@ void Core::Entity::Player::gainLevel()
    m_hp = getMaxHp();
    m_mp = getMaxMp();
 
-   ZoneChannelPacket< FFXIVIpcStatusEffectList > effectListPacket( getId() );
-   effectListPacket.data().classId = static_cast< uint8_t > ( getClass() );
-   effectListPacket.data().level1 = getLevel();
-   effectListPacket.data().level = getLevel();
-   effectListPacket.data().current_hp = getMaxHp();
-   effectListPacket.data().current_mp = getMaxMp();
-   effectListPacket.data().currentTp = 1000;
-   effectListPacket.data().max_hp = getMaxHp();
-   effectListPacket.data().max_mp = getMaxMp();
+   auto effectListPacket = makeZonePacket< FFXIVIpcStatusEffectList >( getId() );
+   effectListPacket->data().classId = static_cast< uint8_t > ( getClass() );
+   effectListPacket->data().level1 = getLevel();
+   effectListPacket->data().level = getLevel();
+   effectListPacket->data().current_hp = getMaxHp();
+   effectListPacket->data().current_mp = getMaxMp();
+   effectListPacket->data().currentTp = 1000;
+   effectListPacket->data().max_hp = getMaxHp();
+   effectListPacket->data().max_mp = getMaxMp();
    sendToInRangeSet( effectListPacket, true );
 
-   sendToInRangeSet( ActorControlPacket142( getId(), LevelUpEffect, static_cast< uint8_t >( getClass() ),
-                                            getLevel(), getLevel() - 1 ), true );
+   sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( getId(), LevelUpEffect, static_cast< uint8_t >( getClass() ),
+                                                                  getLevel(), getLevel() - 1 ), true );
 
-
-   ZoneChannelPacket< FFXIVIpcUpdateClassInfo > classInfoPacket( getId() );
-   classInfoPacket.data().classId = static_cast< uint8_t > ( getClass() );
-   classInfoPacket.data().level1 = getLevel();
-   classInfoPacket.data().level = getLevel();
-   classInfoPacket.data().nextLevelIndex = getLevel();
-   classInfoPacket.data().currentExp = getExp();
+   auto classInfoPacket = makeZonePacket< FFXIVIpcUpdateClassInfo >( getId() );
+   classInfoPacket->data().classId = static_cast< uint8_t > ( getClass() );
+   classInfoPacket->data().level1 = getLevel();
+   classInfoPacket->data().level = getLevel();
+   classInfoPacket->data().nextLevelIndex = getLevel();
+   classInfoPacket->data().currentExp = getExp();
    queuePacket( classInfoPacket );
 
 }
 
 void Core::Entity::Player::sendStatusUpdate( bool toSelf )
 {
-   sendToInRangeSet( UpdateHpMpTpPacket( *this ), true );
+   sendToInRangeSet( boost::make_shared< UpdateHpMpTpPacket >( *this ), true );
 }
 
 uint8_t Core::Entity::Player::getLevel() const
@@ -717,12 +719,12 @@ void Core::Entity::Player::setClassJob( Common::ClassJob classJob )
 
    m_tp = 0;
 
-   ZoneChannelPacket< FFXIVIpcPlayerClassInfo > classInfoPacket( getId() );
-   classInfoPacket.data().classId = static_cast< uint8_t >( getClass() );
-   classInfoPacket.data().level = getLevel();
+   auto classInfoPacket = makeZonePacket< FFXIVIpcPlayerClassInfo >( getId() );
+   classInfoPacket->data().classId = static_cast< uint8_t >( getClass() );
+   classInfoPacket->data().level = getLevel();
    queuePacket( classInfoPacket );
 
-   sendToInRangeSet( ActorControlPacket142( getId(), ClassJobChange, 0x04 ), true );
+   sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( getId(), ClassJobChange, 0x04 ), true );
 
    sendStatusUpdate( true );
 }
@@ -747,8 +749,7 @@ void Core::Entity::Player::setLevelForClass( uint8_t level, Common::ClassJob cla
 
 void Core::Entity::Player::sendModel()
 {
-   ModelEquipPacket modelEquip( *getAsPlayer() );
-   sendToInRangeSet( modelEquip, true );
+   sendToInRangeSet( boost::make_shared< ModelEquipPacket >( *getAsPlayer() ), true );
 }
 
 uint32_t Core::Entity::Player::getModelForSlot( Inventory::EquipSlot slot )
@@ -816,8 +817,7 @@ void Core::Entity::Player::spawn( Entity::PlayerPtr pTarget )
                 getName() + " for " +
                 pTarget->getName() );
 
-   PlayerSpawnPacket spawnActor( *getAsPlayer(), *pTarget );
-   pTarget->queuePacket( spawnActor );
+   pTarget->queuePacket( boost::make_shared< PlayerSpawnPacket >( *getAsPlayer(), *pTarget ) );
 }
 
 // despawn
@@ -829,7 +829,7 @@ void Core::Entity::Player::despawn( Entity::PlayerPtr pTarget )
 
    pPlayer->freePlayerSpawnId( getId() );
 
-   pPlayer->queuePacket( ActorControlPacket143( getId(), DespawnZoneScreenMsg, 0x04, getId(), 0x01 ) );
+   pPlayer->queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), DespawnZoneScreenMsg, 0x04, getId(), 0x01 ) );
 }
 
 Core::Entity::ActorPtr Core::Entity::Player::lookupTargetById( uint64_t targetId )
@@ -863,11 +863,11 @@ void Core::Entity::Player::setGc( uint8_t gc )
 {
    m_gc = gc;
 
-   ZoneChannelPacket< FFXIVGCAffiliation > gcAffPacket( getId() );
-   gcAffPacket.data().gcId = m_gc;
-   gcAffPacket.data().gcRank[0] = m_gcRank[0];
-   gcAffPacket.data().gcRank[1] = m_gcRank[1];
-   gcAffPacket.data().gcRank[2] = m_gcRank[2];
+   auto gcAffPacket = makeZonePacket< FFXIVGCAffiliation >( getId() );
+   gcAffPacket->data().gcId = m_gc;
+   gcAffPacket->data().gcRank[0] = m_gcRank[0];
+   gcAffPacket->data().gcRank[1] = m_gcRank[1];
+   gcAffPacket->data().gcRank[2] = m_gcRank[2];
    queuePacket( gcAffPacket );
 }
 
@@ -875,11 +875,11 @@ void Core::Entity::Player::setGcRankAt( uint8_t index, uint8_t rank )
 {
    m_gcRank[index] = rank;
 
-   ZoneChannelPacket< FFXIVGCAffiliation > gcAffPacket( getId() );
-   gcAffPacket.data().gcId = m_gc;
-   gcAffPacket.data().gcRank[0] = m_gcRank[0];
-   gcAffPacket.data().gcRank[1] = m_gcRank[1];
-   gcAffPacket.data().gcRank[2] = m_gcRank[2];
+   auto gcAffPacket = makeZonePacket< FFXIVGCAffiliation >( getId() );
+   gcAffPacket->data().gcId = m_gc;
+   gcAffPacket->data().gcRank[0] = m_gcRank[0];
+   gcAffPacket->data().gcRank[1] = m_gcRank[1];
+   gcAffPacket->data().gcRank[2] = m_gcRank[2];
    queuePacket( gcAffPacket );
 }
 
@@ -925,8 +925,8 @@ void Core::Entity::Player::setStateFlag( Common::PlayerStateFlag flag )
    auto newOnlineStatus = getOnlineStatus();
 
    if( prevOnlineStatus != newOnlineStatus )
-      sendToInRangeSet( ActorControlPacket142( getId(), SetStatusIcon,
-                                               static_cast< uint8_t >( getOnlineStatus() ) ), true );
+      sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( getId(), SetStatusIcon,
+                                                                     static_cast< uint8_t >( getOnlineStatus() ) ), true );
 
 }
 
@@ -940,7 +940,7 @@ void Core::Entity::Player::setStateFlags( std::vector< Common::PlayerStateFlag >
 
 void Core::Entity::Player::sendStateFlags()
 {
-   queuePacket( PlayerStateFlagsPacket( *getAsPlayer() ) );
+   queuePacket( boost::make_shared< PlayerStateFlagsPacket >( *getAsPlayer() ) );
 }
 
 void Core::Entity::Player::unsetStateFlag( Common::PlayerStateFlag flag )
@@ -962,8 +962,8 @@ void Core::Entity::Player::unsetStateFlag( Common::PlayerStateFlag flag )
    auto newOnlineStatus = getOnlineStatus();
 
    if( prevOnlineStatus != newOnlineStatus )
-      sendToInRangeSet( ActorControlPacket142( getId(), SetStatusIcon,
-                                               static_cast< uint8_t >( getOnlineStatus() ) ), true );
+      sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( getId(), SetStatusIcon,
+                                                                     static_cast< uint8_t >( getOnlineStatus() ) ), true );
 }
 
 void Core::Entity::Player::update( int64_t currTime )
@@ -979,12 +979,12 @@ void Core::Entity::Player::update( int64_t currTime )
       }
       else
       {
-         ZoneChannelPacket< FFXIVIpcActorSetPos > setActorPosPacket( getId() );
-         setActorPosPacket.data().r16 = Math::Util::floatToUInt16Rot( m_queuedZoneing->m_targetRotation );
-         setActorPosPacket.data().waitForLoad = 0x04;
-         setActorPosPacket.data().x = targetPos.x;
-         setActorPosPacket.data().y = targetPos.y;
-         setActorPosPacket.data().z = targetPos.z;
+         auto setActorPosPacket = makeZonePacket< FFXIVIpcActorSetPos >( getId() );
+         setActorPosPacket->data().r16 = Math::Util::floatToUInt16Rot( m_queuedZoneing->m_targetRotation );
+         setActorPosPacket->data().waitForLoad = 0x04;
+         setActorPosPacket->data().x = targetPos.x;
+         setActorPosPacket->data().y = targetPos.y;
+         setActorPosPacket->data().z = targetPos.z;
          sendToInRangeSet( setActorPosPacket, true );
          setPos( targetPos );
       }
@@ -1059,9 +1059,9 @@ void Core::Entity::Player::freePlayerSpawnId( uint32_t actorId )
 {
    auto spawnId = m_actorSpawnIndexAllocator.freeUsedSpawnIndex( actorId );
 
-   ZoneChannelPacket< FFXIVIpcActorFreeSpawn > freeActorSpawnPacket( getId() );
-   freeActorSpawnPacket.data().actorId = actorId;
-   freeActorSpawnPacket.data().spawnId = spawnId;
+   auto freeActorSpawnPacket = makeZonePacket< FFXIVIpcActorFreeSpawn >( getId() );
+   freeActorSpawnPacket->data().actorId = actorId;
+   freeActorSpawnPacket->data().spawnId = spawnId;
    queuePacket( freeActorSpawnPacket );
 
 }
@@ -1076,7 +1076,7 @@ void Core::Entity::Player::setHomepoint( uint8_t aetheryteId )
 {
    m_homePoint = aetheryteId;
 
-   queuePacket( ActorControlPacket143( getId(), SetHomepoint, aetheryteId ) );
+   queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), SetHomepoint, aetheryteId ) );
 }
 
 /*! get homepoint */
@@ -1160,7 +1160,7 @@ const uint8_t* Core::Entity::Player::getGcRankArray() const
    return m_gcRank;
 }
 
-void Core::Entity::Player::queuePacket( Network::Packets::GamePacketPtr pPacket )
+void Core::Entity::Player::queuePacket( Network::Packets::FFXIVPacketBasePtr pPacket )
 {
    auto pServerZone = g_fw.get< ServerZone >();
    auto pSession = pServerZone->getSession( m_id );
@@ -1175,7 +1175,7 @@ void Core::Entity::Player::queuePacket( Network::Packets::GamePacketPtr pPacket 
 
 }
 
-void Core::Entity::Player::queueChatPacket( Network::Packets::GamePacketPtr pPacket )
+void Core::Entity::Player::queueChatPacket( Network::Packets::FFXIVPacketBasePtr pPacket )
 {
    auto pServerZone = g_fw.get< ServerZone >();
    auto pSession = pServerZone->getSession( m_id );
@@ -1248,17 +1248,17 @@ uint8_t Core::Entity::Player::getSearchSelectClass() const
 
 void Core::Entity::Player::sendNotice( const std::string& message ) //Purple Text
 {
-   queuePacket( ServerNoticePacket( getId(), message ) );
+   queuePacket( boost::make_shared< ServerNoticePacket >( getId(), message ) );
 }
 
 void Core::Entity::Player::sendUrgent( const std::string& message ) //Red Text
 {
-   queuePacket( ChatPacket( *getAsPlayer(), ChatType::ServerUrgent, message ) );
+   queuePacket( boost::make_shared< ChatPacket >( *getAsPlayer(), ChatType::ServerUrgent, message ) );
 }
 
 void Core::Entity::Player::sendDebug( const std::string& message ) //Grey Text
 {
-   queuePacket( ChatPacket( *getAsPlayer(), ChatType::ServerDebug, message ) );
+   queuePacket( boost::make_shared< ChatPacket >( *getAsPlayer(), ChatType::ServerDebug, message ) );
 }
 
 void Core::Entity::Player::updateHowtosSeen( uint32_t howToId )
@@ -1280,13 +1280,13 @@ void Core::Entity::Player::initHateSlotQueue()
 
 void Core::Entity::Player::sendHateList()
 {
-   ZoneChannelPacket< FFXIVIpcHateList > hateListPacket( getId() );
-   hateListPacket.data().numEntries = m_actorIdTohateSlotMap.size();
+   auto hateListPacket = makeZonePacket< FFXIVIpcHateList >( getId() );
+   hateListPacket->data().numEntries = m_actorIdTohateSlotMap.size();
    auto it = m_actorIdTohateSlotMap.begin();
    for( int32_t i = 0; it != m_actorIdTohateSlotMap.end(); ++it, i++ )
    {
-      hateListPacket.data().entry[i].actorId = it->first;
-      hateListPacket.data().entry[i].hatePercent = 100;
+      hateListPacket->data().entry[i].actorId = it->first;
+      hateListPacket->data().entry[i].hatePercent = 100;
    }
    queuePacket( hateListPacket );
 }
@@ -1336,14 +1336,14 @@ void Core::Entity::Player::setTitle( uint16_t titleId )
 
    m_activeTitle = titleId;
 
-   sendToInRangeSet( ActorControlPacket142( getId(), SetTitle, titleId ), true );
+   sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( getId(), SetTitle, titleId ), true );
 }
 
 void Core::Entity::Player::setEquipDisplayFlags( uint8_t state )
 {
    m_equipDisplayFlags = state;
-   ZoneChannelPacket< FFXIVIpcEquipDisplayFlags > paramPacket( getId() );
-   paramPacket.data().bitmask = m_equipDisplayFlags;
+   auto paramPacket = makeZonePacket< FFXIVIpcEquipDisplayFlags >( getId() );
+   paramPacket->data().bitmask = m_equipDisplayFlags;
    sendToInRangeSet( paramPacket, true );
 }
 
@@ -1355,19 +1355,19 @@ uint8_t Core::Entity::Player::getEquipDisplayFlags() const
 void Core::Entity::Player::mount( uint32_t id )
 {
    m_mount = id;
-   sendToInRangeSet( ActorControlPacket142( getId(), ActorControlType::SetStatus, static_cast< uint8_t >( Entity::Chara::ActorStatus::Mounted )), true );
-   sendToInRangeSet( ActorControlPacket143( getId(), 0x39e, 12 ), true ); //?
+   sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( getId(), ActorControlType::SetStatus, static_cast< uint8_t >( Entity::Chara::ActorStatus::Mounted )), true );
+   sendToInRangeSet( boost::make_shared< ActorControlPacket143 >( getId(), 0x39e, 12 ), true ); //?
 
-   ZoneChannelPacket< FFXIVIpcMount > mountPacket( getId() );
-   mountPacket.data().id = id;
+   auto mountPacket = makeZonePacket< FFXIVIpcMount >( getId() );
+   mountPacket->data().id = id;
    sendToInRangeSet( mountPacket, true );
 }
 
 void Core::Entity::Player::dismount()
 {
-   sendToInRangeSet( ActorControlPacket142( getId(), ActorControlType::SetStatus,
-                                            static_cast< uint8_t >( Entity::Chara::ActorStatus::Idle )), true );
-   sendToInRangeSet( ActorControlPacket143( getId(), ActorControlType::Dismount, 1 ), true );
+   sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( getId(), ActorControlType::SetStatus,
+                                                                  static_cast< uint8_t >( Entity::Chara::ActorStatus::Idle )), true );
+   sendToInRangeSet( boost::make_shared< ActorControlPacket143 >( getId(), ActorControlType::Dismount, 1 ), true );
    m_mount = 0;
 }
 
@@ -1391,41 +1391,41 @@ void Core::Entity::Player::autoAttack( CharaPtr pTarget )
 
    if( getClass() == ClassJob::Machinist || getClass() == ClassJob::Bard || getClass() == ClassJob::Archer )
    {
-      ZoneChannelPacket< FFXIVIpcEffect > effectPacket( getId() );
-      effectPacket.data().targetId = pTarget->getId();
-      effectPacket.data().actionAnimationId = 8;
+      auto effectPacket = makeZonePacket< FFXIVIpcEffect >( getId() );
+      effectPacket->data().targetId = pTarget->getId();
+      effectPacket->data().actionAnimationId = 8;
      // effectPacket.data().unknown_2 = variation;
-      effectPacket.data().numEffects = 1;
-      effectPacket.data().unknown_61 = 1;
-      effectPacket.data().unknown_62 = 1;
-      effectPacket.data().actionTextId = 8;
-      effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRot() );
-      effectPacket.data().effectTargetId = pTarget->getId();
-      effectPacket.data().effectTarget = pTarget->getId();
-      effectPacket.data().effects[0].value = damage;
-      effectPacket.data().effects[0].effectType = Common::ActionEffectType::Damage;
-      effectPacket.data().effects[0].hitSeverity = Common::ActionHitSeverityType::NormalDamage;
-      effectPacket.data().effects[0].unknown_3 = 7;
+      effectPacket->data().numEffects = 1;
+      effectPacket->data().unknown_61 = 1;
+      effectPacket->data().unknown_62 = 1;
+      effectPacket->data().actionTextId = 8;
+      effectPacket->data().rotation = Math::Util::floatToUInt16Rot( getRot() );
+      effectPacket->data().effectTargetId = pTarget->getId();
+      effectPacket->data().effectTarget = pTarget->getId();
+      effectPacket->data().effects[0].value = damage;
+      effectPacket->data().effects[0].effectType = Common::ActionEffectType::Damage;
+      effectPacket->data().effects[0].hitSeverity = Common::ActionHitSeverityType::NormalDamage;
+      effectPacket->data().effects[0].unknown_3 = 7;
 
       sendToInRangeSet(effectPacket, true);
    }
    else
    {
 
-      ZoneChannelPacket< FFXIVIpcEffect > effectPacket( getId() );
-      effectPacket.data().targetId = pTarget->getId();
-      effectPacket.data().actionAnimationId = 7;
+      auto effectPacket = makeZonePacket< FFXIVIpcEffect >( getId() );
+      effectPacket->data().targetId = pTarget->getId();
+      effectPacket->data().actionAnimationId = 7;
       // effectPacket.data().unknown_2 = variation;
-      effectPacket.data().numEffects = 1;
-      effectPacket.data().unknown_61 = 1;
-      effectPacket.data().unknown_62 = 1;
-      effectPacket.data().actionTextId = 7;
-      effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRot() );
-      effectPacket.data().effectTarget = pTarget->getId();
-      effectPacket.data().effects[0].value = damage;
-      effectPacket.data().effects[0].effectType = Common::ActionEffectType::Damage;
-      effectPacket.data().effects[0].hitSeverity = Common::ActionHitSeverityType::NormalDamage;
-      effectPacket.data().effects[0].unknown_3 = 71;
+      effectPacket->data().numEffects = 1;
+      effectPacket->data().unknown_61 = 1;
+      effectPacket->data().unknown_62 = 1;
+      effectPacket->data().actionTextId = 7;
+      effectPacket->data().rotation = Math::Util::floatToUInt16Rot( getRot() );
+      effectPacket->data().effectTarget = pTarget->getId();
+      effectPacket->data().effects[0].value = damage;
+      effectPacket->data().effects[0].effectType = Common::ActionEffectType::Damage;
+      effectPacket->data().effects[0].hitSeverity = Common::ActionHitSeverityType::NormalDamage;
+      effectPacket->data().effects[0].unknown_3 = 71;
 
       sendToInRangeSet(effectPacket, true);
    }
@@ -1486,8 +1486,8 @@ uint16_t Core::Entity::Player::getItemLevel() const
 void Core::Entity::Player::setEorzeaTimeOffset( uint64_t timestamp )
 {
    // TODO: maybe change to persistent?
-   ZoneChannelPacket< FFXIVIpcEorzeaTimeOffset > packet ( getId() );
-   packet.data().timestamp = timestamp;
+   auto packet = makeZonePacket< FFXIVIpcEorzeaTimeOffset >( getId() );
+   packet->data().timestamp = timestamp;
 
    // Send to single player
    queuePacket( packet );
@@ -1507,15 +1507,15 @@ void Core::Entity::Player::sendZonePackets()
 {
    getCurrentZone()->onBeforePlayerZoneIn( *this );
 
-   ZoneChannelPacket< FFXIVIpcInit > initPacket( getId() );
-   initPacket.data().charId = getId();
+   auto initPacket = makeZonePacket< FFXIVIpcInit >( getId() );
+   initPacket->data().charId = getId();
    queuePacket( initPacket );
 
    sendInventory();
 
    if( isLogin() )
    {
-      queuePacket( ActorControlPacket143( getId(), SetCharaGearParamUI, m_equipDisplayFlags, 1 ) );
+      queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), SetCharaGearParamUI, m_equipDisplayFlags, 1 ) );
    }
 
    // set flags, will be reset automatically by zoning ( only on client side though )
@@ -1527,45 +1527,45 @@ void Core::Entity::Player::sendZonePackets()
    // only initialize the UI if the player in fact just logged in.
    if( isLogin() )
    {
-      ZoneChannelPacket< FFXIVIpcCFAvailableContents > contentFinderList( getId() );
-      for( auto i = 0; i < sizeof( contentFinderList.data().contents ); i++ )
+      auto contentFinderList = makeZonePacket< FFXIVIpcCFAvailableContents >( getId() );
+
+      for( auto i = 0; i < sizeof( contentFinderList->data().contents ); i++ )
       {
          // unlock all contents for now
-         contentFinderList.data().contents[i] = 0xFF;
+         contentFinderList->data().contents[i] = 0xFF;
       }
       queuePacket( contentFinderList );
 
-      Server::InitUIPacket initUIPacket( *this );
-      queuePacket( initUIPacket );
+      queuePacket( boost::make_shared< InitUIPacket >( *this ) );
 
-      ZoneChannelPacket< FFXIVIpcPlayerClassInfo > classInfoPacket( getId() );
-      classInfoPacket.data().classId = static_cast< uint8_t >( getClass() );
-      classInfoPacket.data().unknown = 1;
-      classInfoPacket.data().level = getLevel();
-      classInfoPacket.data().level1 = getLevel();
+      auto classInfoPacket = makeZonePacket< FFXIVIpcPlayerClassInfo >( getId() );
+      classInfoPacket->data().classId = static_cast< uint8_t >( getClass() );
+      classInfoPacket->data().unknown = 1;
+      classInfoPacket->data().level = getLevel();
+      classInfoPacket->data().level1 = getLevel();
       queuePacket( classInfoPacket );
 
       m_itemLevel = getInventory()->calculateEquippedGearItemLevel();
       sendItemLevel();
    }
 
-   ZoneChannelPacket< FFXIVIpcInitZone > initZonePacket( getId() );
-   initZonePacket.data().zoneId = getCurrentZone()->getTerritoryId();
-   initZonePacket.data().weatherId = static_cast< uint8_t >( getCurrentZone()->getCurrentWeather() );
-   initZonePacket.data().bitmask = 0x1;
-   initZonePacket.data().unknown5 = 0x2A;
-   initZonePacket.data().festivalId = getCurrentZone()->getCurrentFestival();
-   initZonePacket.data().pos.x = getPos().x;
-   initZonePacket.data().pos.y = getPos().y;
-   initZonePacket.data().pos.z = getPos().z;
+   auto initZonePacket = makeZonePacket< FFXIVIpcInitZone >( getId() );
+   initZonePacket->data().zoneId = getCurrentZone()->getTerritoryId();
+   initZonePacket->data().weatherId = static_cast< uint8_t >( getCurrentZone()->getCurrentWeather() );
+   initZonePacket->data().bitmask = 0x1;
+   initZonePacket->data().unknown5 = 0x2A;
+   initZonePacket->data().festivalId = getCurrentZone()->getCurrentFestival();
+   initZonePacket->data().pos.x = getPos().x;
+   initZonePacket->data().pos.y = getPos().y;
+   initZonePacket->data().pos.z = getPos().z;
    queuePacket( initZonePacket );
 
    if( isLogin() )
    {
-      ZoneChannelPacket< FFXIVARR_IPC_UNK322 > unk322( getId() );
+      auto unk322 = makeZonePacket< FFXIVARR_IPC_UNK322 >( getId() );
       queuePacket( unk322 );
 
-      ZoneChannelPacket< FFXIVARR_IPC_UNK320 > unk320( getId() );
+      auto unk320 = makeZonePacket< FFXIVARR_IPC_UNK320 >( getId() );
       queuePacket( unk320 );
    }
 
@@ -1589,16 +1589,16 @@ bool Core::Entity::Player::isDirectorInitialized() const
 
 void Core::Entity::Player::sendTitleList()
 {
-   ZoneChannelPacket< FFXIVIpcPlayerTitleList > titleListPacket( getId() );
-   memcpy( titleListPacket.data().titleList, getTitleList(), sizeof( titleListPacket.data().titleList ) );
+   auto titleListPacket = makeZonePacket< FFXIVIpcPlayerTitleList >( getId() );
+   memcpy( titleListPacket->data().titleList, getTitleList(), sizeof( titleListPacket->data().titleList ) );
 
    queuePacket( titleListPacket );
 }
 
 void Core::Entity::Player::sendZoneInPackets( uint32_t param1, uint32_t param2 = 0, uint32_t param3 = 0, uint32_t param4 = 0, bool shouldSetStatus = false )
 {
-   auto zoneInPacket = ActorControlPacket143( getId(), ZoneIn, param1, param2, param3, param4 );
-   auto SetStatusPacket = ActorControlPacket142( getId(), SetStatus, static_cast< uint8_t >( Entity::Chara::ActorStatus::Idle ) );
+   auto zoneInPacket = boost::make_shared< ActorControlPacket143 >( getId(), ZoneIn, param1, param2, param3, param4 );
+   auto SetStatusPacket = boost::make_shared< ActorControlPacket142 >( getId(), SetStatus, static_cast< uint8_t >( Entity::Chara::ActorStatus::Idle ) );
 
    if( !getGmInvis() )
       sendToInRangeSet( zoneInPacket, true );
@@ -1647,7 +1647,7 @@ void Core::Entity::Player::finishZoning()
 
 void Core::Entity::Player::emote( uint32_t emoteId, uint64_t targetId )
 {
-   sendToInRangeSet( ActorControlPacket144( getId(), ActorControlType::Emote, emoteId, 0, 0, 0, targetId ) );
+   sendToInRangeSet( boost::make_shared< ActorControlPacket144 >( getId(), ActorControlType::Emote, emoteId, 0, 0, 0, targetId ) );
 }
 
 void Core::Entity::Player::teleportQuery( uint16_t aetheryteId )
@@ -1670,7 +1670,7 @@ void Core::Entity::Player::teleportQuery( uint16_t aetheryteId )
 
       bool insufficientGil = getCurrency( Inventory::CurrencyType::Gil ) < cost;
       // TODO: figure out what param1 really does
-      queuePacket( ActorControlPacket143( getId(), TeleportStart, insufficientGil ? 2 : 0, aetheryteId ) );
+      queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), TeleportStart, insufficientGil ? 2 : 0, aetheryteId ) );
 
       if( !insufficientGil )
       {
@@ -1695,8 +1695,8 @@ void Core::Entity::Player::freeObjSpawnIndexForActorId( uint32_t actorId )
 {
    auto spawnId = m_objSpawnIndexAllocator.freeUsedSpawnIndex( actorId );
 
-   ZoneChannelPacket< FFXIVIpcObjectDespawn > freeObjectSpawnPacket( getId() );
-   freeObjectSpawnPacket.data().spawnIndex = spawnId;
+   auto freeObjectSpawnPacket = makeZonePacket< FFXIVIpcObjectDespawn >( getId() );
+   freeObjectSpawnPacket->data().spawnIndex = spawnId;
    queuePacket( freeObjectSpawnPacket );
 }
 

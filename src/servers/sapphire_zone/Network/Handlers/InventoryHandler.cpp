@@ -53,9 +53,9 @@ void Core::Network::GameConnection::inventoryModifyHandler( const Packets::FFXIV
    // todo: check packet handler in game and see if this is sent as a u16 or u32
    auto splitCount = *reinterpret_cast< uint16_t* >( &copy.data[0x38] );
 
-   ZoneChannelPacket< FFXIVIpcInventoryActionAck > ackPacket( player.getId() );
-   ackPacket.data().sequence = seq;
-   ackPacket.data().type = 7;
+   auto ackPacket = makeZonePacket< FFXIVIpcInventoryActionAck >( player.getId() );
+   ackPacket->data().sequence = seq;
+   ackPacket->data().type = 7;
    player.queuePacket( ackPacket );
   
    auto pLog = g_fw.get< Logger >();

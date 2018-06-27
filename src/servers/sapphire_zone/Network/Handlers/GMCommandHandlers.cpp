@@ -206,7 +206,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
    }
    case GmCommand::Speed:
    {
-      targetPlayer->queuePacket( ActorControlPacket143( player.getId(), Flee, param1 ) );
+      targetPlayer->queuePacket( boost::make_shared< ActorControlPacket143 >( player.getId(), Flee, param1 ) );
       player.sendNotice( "Speed for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
       break;
    }
@@ -233,17 +233,17 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
    {
       targetPlayer->setOnlineStatusMask( param1 );
 
-      ZoneChannelPacket< FFXIVIpcSetOnlineStatus > statusPacket( targetPlayer->getId() );
-      statusPacket.data().onlineStatusFlags = param1;
+      auto statusPacket = makeZonePacket< FFXIVIpcSetOnlineStatus >( player.getId() );
+      statusPacket->data().onlineStatusFlags = param1;
       queueOutPacket( statusPacket );
 
-      ZoneChannelPacket< FFXIVIpcSetSearchInfo > searchInfoPacket( targetPlayer->getId() );
-      searchInfoPacket.data().onlineStatusFlags = param1;
-      searchInfoPacket.data().selectRegion = targetPlayer->getSearchSelectRegion();
-      strcpy( searchInfoPacket.data().searchMessage, targetPlayer->getSearchMessage() );
+      auto searchInfoPacket = makeZonePacket< FFXIVIpcSetSearchInfo >( player.getId() );
+      searchInfoPacket->data().onlineStatusFlags = param1;
+      searchInfoPacket->data().selectRegion = targetPlayer->getSearchSelectRegion();
+      strcpy( searchInfoPacket->data().searchMessage, targetPlayer->getSearchMessage() );
       targetPlayer->queuePacket( searchInfoPacket );
 
-      targetPlayer->sendToInRangeSet( ActorControlPacket142( player.getId(), SetStatusIcon,
+      targetPlayer->sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( player.getId(), SetStatusIcon,
          static_cast< uint8_t >( player.getOnlineStatus() ) ),
          true );
       player.sendNotice( "Icon for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
@@ -526,8 +526,8 @@ void Core::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACKET_R
       targetPlayer->resetMp();
       targetPlayer->setStatus( Entity::Chara::ActorStatus::Idle );
 
-      targetPlayer->sendToInRangeSet( ActorControlPacket143( player.getId(), ZoneIn, 0x01, 0x01, 0, 113 ), true );
-      targetPlayer->sendToInRangeSet( ActorControlPacket142( player.getId(), SetStatus,
+      targetPlayer->sendToInRangeSet( boost::make_shared< ActorControlPacket143 >( player.getId(), ZoneIn, 0x01, 0x01, 0, 113 ), true );
+      targetPlayer->sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( player.getId(), SetStatus,
          static_cast< uint8_t >( Entity::Chara::ActorStatus::Idle ) ), true );
       player.sendNotice( "Raised  " + targetPlayer->getName() );
       break;

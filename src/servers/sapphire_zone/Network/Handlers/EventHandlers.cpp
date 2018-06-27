@@ -250,11 +250,11 @@ void Core::Network::GameConnection::eventHandlerLinkshell( const Packets::FFXIVA
    auto scene = *reinterpret_cast< uint16_t* >( &copy.data[0x14] );
    auto lsName = std::string( reinterpret_cast< char* >( &copy.data[0x17] ) );
 
-   ZoneChannelPacket< FFXIVIpcEventLinkshell > linkshellEvent( player.getId() );
-   linkshellEvent.data().eventId = eventId;
-   linkshellEvent.data().scene = static_cast< uint8_t >( scene );
-   linkshellEvent.data().param3 = 1;
-   linkshellEvent.data().unknown1 = 0x15a;
+   auto linkshellEvent = makeZonePacket< FFXIVIpcEventLinkshell >( player.getId() );
+   linkshellEvent->data().eventId = eventId;
+   linkshellEvent->data().scene = static_cast< uint8_t >( scene );
+   linkshellEvent->data().param3 = 1;
+   linkshellEvent->data().unknown1 = 0x15a;
    player.queuePacket( linkshellEvent );
 
 }

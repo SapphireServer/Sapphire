@@ -76,34 +76,34 @@ void Core::Network::GameConnection::setSearchInfoHandler( const Packets::FFXIVAR
       // mark player as new adventurer
       player.setNewAdventurer( true );
 
-   ZoneChannelPacket< FFXIVIpcSetOnlineStatus > statusPacket( player.getId() );
-   statusPacket.data().onlineStatusFlags = status;
+   auto statusPacket = makeZonePacket< FFXIVIpcSetOnlineStatus >( player.getId() );
+   statusPacket->data().onlineStatusFlags = status;
    queueOutPacket( statusPacket );
 
-   ZoneChannelPacket< FFXIVIpcSetSearchInfo > searchInfoPacket( player.getId() );
-   searchInfoPacket.data().onlineStatusFlags = status;
-   searchInfoPacket.data().selectRegion = player.getSearchSelectRegion();
-   strcpy( searchInfoPacket.data().searchMessage, player.getSearchMessage() );
+   auto searchInfoPacket = makeZonePacket< FFXIVIpcSetSearchInfo >( player.getId() );
+   searchInfoPacket->data().onlineStatusFlags = status;
+   searchInfoPacket->data().selectRegion = player.getSearchSelectRegion();
+   strcpy( searchInfoPacket->data().searchMessage, player.getSearchMessage() );
    queueOutPacket( searchInfoPacket );
 
-   player.sendToInRangeSet( ActorControlPacket142( player.getId(), SetStatusIcon,
+   player.sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( player.getId(), SetStatusIcon,
                                                    static_cast< uint8_t >( player.getOnlineStatus() ) ), true );
 }
 
 void Core::Network::GameConnection::reqSearchInfoHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                           Entity::Player& player )
 {
-   ZoneChannelPacket< FFXIVIpcInitSearchInfo > searchInfoPacket( player.getId() );
-   searchInfoPacket.data().onlineStatusFlags = player.getOnlineStatusMask();
-   searchInfoPacket.data().selectRegion = player.getSearchSelectRegion();
-   strcpy( searchInfoPacket.data().searchMessage, player.getSearchMessage() );
+   auto searchInfoPacket = makeZonePacket< FFXIVIpcInitSearchInfo >( player.getId() );
+   searchInfoPacket->data().onlineStatusFlags = player.getOnlineStatusMask();
+   searchInfoPacket->data().selectRegion = player.getSearchSelectRegion();
+   strcpy( searchInfoPacket->data().searchMessage, player.getSearchMessage() );
    queueOutPacket( searchInfoPacket );
 }
 
 void Core::Network::GameConnection::linkshellListHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                           Entity::Player& player )
 {
-   ZoneChannelPacket< FFXIVIpcLinkshellList > linkshellListPacket( player.getId() );
+   auto linkshellListPacket = makeZonePacket< FFXIVIpcLinkshellList >( player.getId() );
    queueOutPacket( linkshellListPacket );
 }
 
@@ -279,7 +279,7 @@ void Core::Network::GameConnection::updatePositionHandler( const Core::Network::
    }
    }
 
-   MoveActorPacket movePacket( player, unk1, unk2, unk3, unk4 );
+   auto movePacket = boost::make_shared< MoveActorPacket >( player, unk1, unk2, unk3, unk4 );
    player.sendToInRangeSet( movePacket );
 
 }
@@ -317,8 +317,8 @@ void Core::Network::GameConnection::zoneLineHandler( const Core::Network::Packet
       targetZone = pLine->getTargetZoneId();
       rotation = pLine->getTargetRotation();
 
-      ZoneChannelPacket< FFXIVIpcPrepareZoning > preparePacket( player.getId() );
-      preparePacket.data().targetZone = targetZone;
+      auto preparePacket = makeZonePacket< FFXIVIpcPrepareZoning >( player.getId() );
+      preparePacket->data().targetZone = targetZone;
 
       //ActorControlPacket143 controlPacket( pPlayer, ActorControlType::DespawnZoneScreenMsg,
       //                                     0x03, player.getId(), 0x01, targetZone );
@@ -358,9 +358,9 @@ void Core::Network::GameConnection::discoveryHandler( const Core::Network::Packe
       return;
    }
 
-   ZoneChannelPacket< FFXIVIpcDiscovery > discoveryPacket( player.getId() );
-   discoveryPacket.data().map_id = pQR->getUInt( 2 );
-   discoveryPacket.data().map_part_id = pQR->getUInt( 3 );
+   auto discoveryPacket = makeZonePacket< FFXIVIpcDiscovery >( player.getId() );
+   discoveryPacket->data().map_id = pQR->getUInt( 2 );
+   discoveryPacket->data().map_part_id = pQR->getUInt( 3 );
 
    player.queuePacket( discoveryPacket );
    player.sendNotice( "Discovery ref pos ID: " + std::to_string( ref_position_id ) );
@@ -373,8 +373,8 @@ void Core::Network::GameConnection::discoveryHandler( const Core::Network::Packe
 void Core::Network::GameConnection::playTimeHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                      Entity::Player& player )
 {
-   ZoneChannelPacket< FFXIVIpcPlayTime > playTimePacket( player.getId() );
-   playTimePacket.data().playTimeInMinutes = player.getPlayTime() / 60;
+   auto playTimePacket = makeZonePacket< FFXIVIpcPlayTime >( player.getId() );
+   playTimePacket->data().playTimeInMinutes = player.getPlayTime() / 60;
    player.queuePacket( playTimePacket );
 }
 
@@ -394,8 +394,8 @@ void Core::Network::GameConnection::blackListHandler( const Core::Network::Packe
 {
    uint8_t count = inPacket.data[0x11];
 
-   ZoneChannelPacket< FFXIVIpcBlackList > blackListPacket( player.getId() );
-   blackListPacket.data().sequence = count;
+   auto blackListPacket = makeZonePacket< FFXIVIpcBlackList >( player.getId() );
+   blackListPacket->data().sequence = count;
    // TODO: Fill with actual blacklist data
    //blackListPacket.data().entry[0].contentId = 1;
    //sprintf( blackListPacket.data().entry[0].name, "Test Test" );
@@ -410,8 +410,7 @@ void Core::Network::GameConnection::pingHandler( const Core::Network::Packets::F
    Packets::FFXIVARR_PACKET_RAW copy = inPacket;
    auto inVal = *reinterpret_cast< uint32_t* >( &copy.data[0x10] );
 
-   PingPacket pingPacket( player, inVal );
-   queueOutPacket( pingPacket );
+   queueOutPacket( boost::make_shared< PingPacket>( player, inVal ) );
 
    player.setLastPing( static_cast< uint32_t >( time( nullptr ) ) );
 }
@@ -450,45 +449,44 @@ void Core::Network::GameConnection::socialListHandler( const Core::Network::Pack
    if( type == 0x02 )
    { // party list
 
-      ZoneChannelPacket< FFXIVIpcSocialList > listPacket( player.getId() );
+      auto listPacket = makeZonePacket< FFXIVIpcSocialList >( player.getId() );
 
-      listPacket.data().type = 2;
-      listPacket.data().sequence = count;
+      listPacket->data().type = 2;
+      listPacket->data().sequence = count;
 
-      int32_t entrysizes = sizeof( listPacket.data().entries );
-      memset( listPacket.data().entries, 0, sizeof( listPacket.data().entries ) );
+      int32_t entrysizes = sizeof( listPacket->data().entries );
+      memset( listPacket->data().entries, 0, sizeof( listPacket->data().entries ) );
 
-      listPacket.data().entries[0].bytes[2] = player.getCurrentZone()->getTerritoryId();
-      listPacket.data().entries[0].bytes[3] = 0x80;
-      listPacket.data().entries[0].bytes[4] = 0x02;
-      listPacket.data().entries[0].bytes[6] = 0x3B;
-      listPacket.data().entries[0].bytes[11] = 0x10;
-      listPacket.data().entries[0].classJob = static_cast< uint8_t >( player.getClass() );
-      listPacket.data().entries[0].contentId = player.getContentId();
-      listPacket.data().entries[0].level = player.getLevel();
-      listPacket.data().entries[0].zoneId = player.getCurrentZone()->getTerritoryId();
-      listPacket.data().entries[0].zoneId1 = 0x0100;
+      listPacket->data().entries[0].bytes[2] = player.getCurrentZone()->getTerritoryId();
+      listPacket->data().entries[0].bytes[3] = 0x80;
+      listPacket->data().entries[0].bytes[4] = 0x02;
+      listPacket->data().entries[0].bytes[6] = 0x3B;
+      listPacket->data().entries[0].bytes[11] = 0x10;
+      listPacket->data().entries[0].classJob = static_cast< uint8_t >( player.getClass() );
+      listPacket->data().entries[0].contentId = player.getContentId();
+      listPacket->data().entries[0].level = player.getLevel();
+      listPacket->data().entries[0].zoneId = player.getCurrentZone()->getTerritoryId();
+      listPacket->data().entries[0].zoneId1 = 0x0100;
       // TODO: no idea what this does
       //listPacket.data().entries[0].one = 1;
 
-      memcpy( listPacket.data().entries[0].name, player.getName().c_str(), strlen( player.getName().c_str() ) );
+      memcpy( listPacket->data().entries[0].name, player.getName().c_str(), strlen( player.getName().c_str() ) );
 
       // TODO: actually store and read language from somewhere
-      listPacket.data().entries[0].bytes1[0] = 0x01;//flags (lang)
+      listPacket->data().entries[0].bytes1[0] = 0x01;//flags (lang)
                                                     // TODO: these flags need to be figured out
                                                     //listPacket.data().entries[0].bytes1[1] = 0x00;//flags
-      listPacket.data().entries[0].onlineStatusMask = player.getOnlineStatusMask();
+      listPacket->data().entries[0].onlineStatusMask = player.getOnlineStatusMask();
 
       queueOutPacket( listPacket );
 
    }
    else if( type == 0x0b )
    { // friend list
-
-      ZoneChannelPacket< FFXIVIpcSocialList > listPacket( player.getId() );
-      listPacket.data().type = 0x0B;
-      listPacket.data().sequence = count;
-      memset( listPacket.data().entries, 0, sizeof( listPacket.data().entries ) );
+      auto listPacket = makeZonePacket< FFXIVIpcSocialList >( player.getId() );
+      listPacket->data().type = 0x0B;
+      listPacket->data().sequence = count;
+      memset( listPacket->data().entries, 0, sizeof( listPacket->data().entries ) );
 
    }
    else if( type == 0x0e )
@@ -519,14 +517,14 @@ void Core::Network::GameConnection::chatHandler( const Core::Network::Packets::F
    ChatType chatType = static_cast< ChatType >( inPacket.data[0x28] );
 
    //ToDo, need to implement sending GM chat types.
-   ChatPacket chatPacket( player, chatType, chatString );
+   auto chatPacket = boost::make_shared< ChatPacket >( player, chatType, chatString );
 
    switch( chatType )
    {
    case ChatType::Say:
    {
       if (player.getGmRank() > 0)
-         chatPacket.data().chatType = ChatType::GMSay;
+         chatPacket->data().chatType = ChatType::GMSay;
 
       player.getCurrentZone()->queueOutPacketForRange( player, 50, chatPacket );
       break;
@@ -534,7 +532,7 @@ void Core::Network::GameConnection::chatHandler( const Core::Network::Packets::F
    case ChatType::Yell:
    {
       if( player.getGmRank() > 0 )
-         chatPacket.data().chatType = ChatType::GMYell;
+         chatPacket->data().chatType = ChatType::GMYell;
 
       player.getCurrentZone()->queueOutPacketForRange( player, 6000, chatPacket );
       break;
@@ -542,7 +540,7 @@ void Core::Network::GameConnection::chatHandler( const Core::Network::Packets::F
    case ChatType::Shout:
    {
       if( player.getGmRank() > 0 )
-         chatPacket.data().chatType = ChatType::GMShout;
+         chatPacket->data().chatType = ChatType::GMShout;
 
       player.getCurrentZone()->queueOutPacketForRange( player, 6000, chatPacket );
       break;
@@ -563,9 +561,9 @@ void Core::Network::GameConnection::chatHandler( const Core::Network::Packets::F
 void Core::Network::GameConnection::logoutHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                    Entity::Player& player )
 {
-   ZoneChannelPacket< FFXIVIpcLogout > logoutPacket( player.getId() );
-   logoutPacket.data().flags1 = 0x02;
-   logoutPacket.data().flags2 = 0x2000;
+   auto logoutPacket = makeZonePacket< FFXIVIpcLogout >( player.getId() );
+   logoutPacket->data().flags1 = 0x02;
+   logoutPacket->data().flags2 = 0x2000;
    queueOutPacket( logoutPacket );
 
    player.setMarkedForRemoval();
@@ -586,8 +584,8 @@ void Core::Network::GameConnection::tellHandler( const Core::Network::Packets::F
 
    if( !pSession )
    {
-      ChatChannelPacket< FFXIVIpcTellErrNotFound > tellErrPacket( player.getId() );
-      strcpy( tellErrPacket.data().receipientName, targetPcName.c_str() );
+      auto tellErrPacket = makeZonePacket< FFXIVIpcTellErrNotFound >( player.getId() );
+      strcpy( tellErrPacket->data().receipientName, targetPcName.c_str() );
       sendSinglePacket( tellErrPacket );
       return;
    }
@@ -615,9 +613,9 @@ void Core::Network::GameConnection::tellHandler( const Core::Network::Packets::F
       return;
    }
 
-   ChatChannelPacket< FFXIVIpcTell > tellPacket( player.getId() );
-   strcpy( tellPacket.data().msg, msg.c_str() );
-   strcpy( tellPacket.data().receipientName, player.getName().c_str() );
+   auto tellPacket = makeChatPacket< FFXIVIpcTell >( player.getId() );
+   strcpy( tellPacket->data().msg, msg.c_str() );
+   strcpy( tellPacket->data().receipientName, player.getName().c_str() );
    // TODO: do these have a meaning?
    //tellPacket.data().u1 = 0x92CD7337;
    //tellPacket.data().u2a = 0x2E;
@@ -629,9 +627,7 @@ void Core::Network::GameConnection::tellHandler( const Core::Network::Packets::F
 void Core::Network::GameConnection::performNoteHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                         Entity::Player& player )
 {
-   ZoneChannelPacket< FFXIVIpcPerformNote > performPacket( player.getId() );
-
-   memcpy( &performPacket.data().data[0], &inPacket.data[0x10], 32 );
-
+   auto performPacket = makeZonePacket< FFXIVIpcPerformNote >( player.getId() );
+   memcpy( &performPacket->data().data[0], &inPacket.data[0x10], 32 );
    player.sendToInRangeSet( performPacket );
 }

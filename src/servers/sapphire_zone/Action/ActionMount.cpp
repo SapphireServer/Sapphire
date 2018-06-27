@@ -48,14 +48,13 @@ void Core::Action::ActionMount::onStart()
    m_pSource->getAsPlayer()->sendDebug( "ActionMount::onStart()" );
    m_startTime = Util::getTimeMs();
 
-   ZoneChannelPacket< FFXIVIpcActorCast > castPacket( m_pSource->getId() );
-
-   castPacket.data().action_id = m_id;
-   castPacket.data().skillType = Common::SkillType::MountSkill;
-   castPacket.data().unknown_1 = m_id;
+   auto castPacket = makeZonePacket< FFXIVIpcActorCast >( getId() );
+   castPacket->data().action_id = m_id;
+   castPacket->data().skillType = Common::SkillType::MountSkill;
+   castPacket->data().unknown_1 = m_id;
    // This is used for the cast bar above the target bar of the caster.
-   castPacket.data().cast_time = static_cast< float >( m_castTime / 1000 );
-   castPacket.data().target_id = m_pSource->getAsPlayer()->getId();
+   castPacket->data().cast_time = static_cast< float >( m_castTime / 1000 );
+   castPacket->data().target_id = m_pSource->getAsPlayer()->getId();
 
    m_pSource->sendToInRangeSet( castPacket, true );
    m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::Casting );
@@ -72,18 +71,19 @@ void Core::Action::ActionMount::onFinish()
 
    pPlayer->unsetStateFlag( PlayerStateFlag::Casting );
 
-   ZoneChannelPacket< FFXIVIpcEffect > effectPacket( pPlayer->getId() );
-   effectPacket.data().targetId = pPlayer->getId();
-   effectPacket.data().actionAnimationId = m_id;
+   auto effectPacket = makeZonePacket< FFXIVIpcEffect >( getId() );
+
+   effectPacket->data().targetId = pPlayer->getId();
+   effectPacket->data().actionAnimationId = m_id;
    // Affects displaying action name next to number in floating text
-   effectPacket.data().unknown_62 = 13; 
-   effectPacket.data().actionTextId = 4;
-   effectPacket.data().numEffects = 1;
-   effectPacket.data().rotation = Math::Util::floatToUInt16Rot( pPlayer->getRot() );
-   effectPacket.data().effectTarget = INVALID_GAME_OBJECT_ID;
-   effectPacket.data().effects[0].effectType = ActionEffectType::Mount;
-   effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::CritDamage;
-   effectPacket.data().effects[0].value = m_id;
+   effectPacket->data().unknown_62 = 13;
+   effectPacket->data().actionTextId = 4;
+   effectPacket->data().numEffects = 1;
+   effectPacket->data().rotation = Math::Util::floatToUInt16Rot( pPlayer->getRot() );
+   effectPacket->data().effectTarget = INVALID_GAME_OBJECT_ID;
+   effectPacket->data().effects[0].effectType = ActionEffectType::Mount;
+   effectPacket->data().effects[0].hitSeverity = ActionHitSeverityType::CritDamage;
+   effectPacket->data().effects[0].value = m_id;
 
    pPlayer->sendToInRangeSet( effectPacket, true );
 
@@ -98,8 +98,8 @@ void Core::Action::ActionMount::onInterrupt()
    //m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied1 );
    m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Casting );
 
-   auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt,
-                                         0x219, 1, m_id, 0 );
+   auto control = boost::make_shared< ActorControlPacket142 >( m_pSource->getId(), ActorControlType::CastInterrupt,
+                                                               0x219, 1, m_id, 0 );
 
    // Note: When cast interrupt from taking too much damage, set the last value to 1. This enables the cast interrupt effect. Example:
    // auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt, 0x219, 1, m_id, 0 );

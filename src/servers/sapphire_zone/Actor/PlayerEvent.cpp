@@ -85,8 +85,8 @@ void Core::Entity::Player::directorPlayScene( uint32_t eventId, uint32_t scene, 
 
    pEvent->setPlayedScene( true );
    pEvent->setEventReturnCallback( nullptr );
-   DirectorPlayScenePacket eventPlay( getId(), getId(), pEvent->getId(),
-                                      scene, flags, eventParam3, eventParam4, eventParam5 );
+   auto eventPlay = boost::make_shared< DirectorPlayScenePacket >( getId(), getId(), pEvent->getId(),
+                                                                   scene, flags, eventParam3, eventParam4, eventParam5 );
 
    queuePacket( eventPlay );
 }
@@ -102,7 +102,8 @@ void Core::Entity::Player::eventStart( uint64_t actorId, uint32_t eventId,
 
    setStateFlag( PlayerStateFlag::InNpcEvent );
 
-   EventStartPacket eventStart( getId(), actorId, eventId, eventType, eventParam1, eventParam2 );
+   auto eventStart = boost::make_shared< EventStartPacket >( getId(), actorId, eventId,
+                                                             eventType, eventParam1, eventParam2 );
    
    queuePacket( eventStart );
    
@@ -166,8 +167,8 @@ void Core::Entity::Player::playScene( uint32_t eventId, uint32_t scene,
    pEvent->setPlayedScene( true );
    pEvent->setEventReturnCallback( eventCallback );
    pEvent->setSceneChainCallback( nullptr );
-   EventPlayPacket eventPlay( getId(), pEvent->getActorId(), pEvent->getId(),
-                              scene, flags, eventParam2, eventParam3, eventParam4 );
+   auto eventPlay = boost::make_shared< EventPlayPacket >( getId(), pEvent->getActorId(), pEvent->getId(),
+                                                           scene, flags, eventParam2, eventParam3, eventParam4 );
 
    queuePacket( eventPlay );
 }
@@ -183,8 +184,8 @@ void Core::Entity::Player::playSceneChain( uint32_t eventId, uint32_t scene, uin
    pEvent->setPlayedScene( true );
    pEvent->setSceneChainCallback( sceneChainCallback );
    pEvent->setEventReturnCallback( nullptr );
-   EventPlayPacket eventPlay( getId(), pEvent->getActorId(), pEvent->getId(),
-                              scene, flags, eventParam2, eventParam3, eventParam4 );
+   auto eventPlay = boost::make_shared< EventPlayPacket >( getId(), pEvent->getActorId(), pEvent->getId(),
+                                                           scene, flags, eventParam2, eventParam3, eventParam4 );
 
    queuePacket( eventPlay );
 }
@@ -223,7 +224,8 @@ void Core::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlayer )
    {
    case Event::EventHandler::Nest:
    {
-      queuePacket( EventFinishPacket( getId(), pEvent->getId(), pEvent->getEventType(), pEvent->getEventParam() ) );
+      queuePacket( boost::make_shared< EventFinishPacket >( getId(), pEvent->getId(),
+                                                            pEvent->getEventType(), pEvent->getEventParam() ) );
       removeEvent( pEvent->getId() );
 
       auto events = eventList();
@@ -234,8 +236,8 @@ void Core::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlayer )
          if( it.second->hasPlayedScene() == false )
          {
             // TODO: not happy with this, this is also prone to break wit more than one remaining event in there
-            queuePacket( EventFinishPacket( getId(), it.second->getId(), it.second->getEventType(),
-                                            it.second->getEventParam() ) );
+            queuePacket( boost::make_shared< EventFinishPacket >( getId(), it.second->getId(),
+                                                                  it.second->getEventType(), it.second->getEventParam() ) );
             removeEvent( it.second->getId() );
          }
       }
@@ -244,7 +246,8 @@ void Core::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlayer )
    }
    default:
    {
-      queuePacket( EventFinishPacket( getId(), pEvent->getId(), pEvent->getEventType(), pEvent->getEventParam() ) );
+      queuePacket( boost::make_shared< EventFinishPacket >( getId(), pEvent->getId(),
+                                                            pEvent->getEventType(), pEvent->getEventParam() ) );
       break;
    }
    }

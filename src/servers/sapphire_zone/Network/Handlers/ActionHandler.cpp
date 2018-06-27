@@ -143,7 +143,7 @@ void Core::Network::GameConnection::actionHandler( const Core::Network::Packets:
               player.setAutoattack( false );
           }
 
-          player.sendToInRangeSet( ActorControlPacket142( player.getId(), 0, param11, 1 ) );
+          player.sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( player.getId(), 0, param11, 1 ) );
 
           break;
        }
@@ -157,7 +157,7 @@ void Core::Network::GameConnection::actionHandler( const Core::Network::Packets:
           else
               player.setAutoattack( false );
 
-          player.sendToInRangeSet( ActorControlPacket142( player.getId(), 1, param11, 1 ) );
+          player.sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( player.getId(), 1, param11, 1 ) );
 
           break;
        }

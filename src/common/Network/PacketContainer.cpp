@@ -1,5 +1,5 @@
 #include "PacketContainer.h"
-#include "GamePacket.h"
+
 #include "Common.h"
 
 #include <boost/format.hpp>
@@ -19,18 +19,18 @@ Core::Network::Packets::PacketContainer::~PacketContainer()
    m_entryList.clear();
 }
 
-void Core::Network::Packets::PacketContainer::addPacket( GamePacket pEntry )
+void Core::Network::Packets::PacketContainer::addPacket( FFXIVPacketBase entry )
 {
-   m_entryList.push_back( pEntry );
+   m_entryList.push_back( entry );
 
-   m_ipcHdr.size += pEntry.getSize();
+   m_ipcHdr.size += entry.getSize();
    m_ipcHdr.count++;
 }
 
 void Core::Network::Packets::PacketContainer::fillSendBuffer( std::vector< uint8_t >& sendBuffer )
 {
-   uint8_t* tempBuffer = new uint8_t[m_ipcHdr.size];
-   memset( tempBuffer, 0, m_ipcHdr.size );
+   std::vector< uint8_t > tempBuffer( m_ipcHdr.size );
+   memset( &tempBuffer[0], 0, m_ipcHdr.size );
 
    using namespace std::chrono;
    auto ms = duration_cast< milliseconds >( system_clock::now().time_since_epoch() );
@@ -40,23 +40,22 @@ void Core::Network::Packets::PacketContainer::fillSendBuffer( std::vector< uint8
    m_ipcHdr.timestamp = tick;
    m_ipcHdr.unknown_20 = 1;
 
-   memcpy( tempBuffer, &m_ipcHdr, sizeof( FFXIVARR_PACKET_HEADER ) );
+   memcpy( &tempBuffer[0], &m_ipcHdr, sizeof( FFXIVARR_PACKET_HEADER ) );
 
    auto it = m_entryList.begin();
-   uint16_t offset = 0;
+   std::size_t offset = 0;
 
    if( m_entryList.size() > 1 )
       offset = 0;
 
    for( ; it != m_entryList.end(); ++it )
    {
-      memcpy( tempBuffer + sizeof( FFXIVARR_PACKET_HEADER ) + offset, it->getData(), it->m_segHdr.size );
-      offset += it->m_segHdr.size;
+      auto data = it->getData();
+      memcpy( &tempBuffer[0] + sizeof( FFXIVARR_PACKET_HEADER ) + offset, &data[0], it->getSize() );
+      offset += it->getSize();
    }
 
-   sendBuffer.assign( tempBuffer, tempBuffer + m_ipcHdr.size );
-
-   delete[] tempBuffer;
+   sendBuffer.assign( &tempBuffer[0], &tempBuffer[0] + m_ipcHdr.size );
 
 }
 

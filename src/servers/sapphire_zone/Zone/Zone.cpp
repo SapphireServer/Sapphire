@@ -142,7 +142,7 @@ void Core::Zone::setCurrentFestival( uint16_t festivalId )
    {
       auto player = playerEntry.second;
 
-      ActorControlPacket143 enableFestival( player->getId(), SetFestival, m_currentFestivalId );
+      auto enableFestival = boost::make_shared< ActorControlPacket143 >( player->getId(), SetFestival, m_currentFestivalId );
       playerEntry.second->queuePacket( enableFestival );
    }
 }
@@ -265,7 +265,8 @@ void Core::Zone::removeActor( Entity::ActorPtr pActor )
 
 }
 
-void Core::Zone::queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range, GamePacketPtr pPacketEntry )
+void Core::Zone::queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range,
+                                         Network::Packets::FFXIVPacketBasePtr pPacketEntry )
 {
    auto pTeriMgr = g_fw.get< TerritoryMgr >();
    if( pTeriMgr->isPrivateTerritory( getTerritoryId() ) )
@@ -286,7 +287,7 @@ void Core::Zone::queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t 
       {
 
          auto pSession = pServerZone->getSession( player->getId() );
-         pPacketEntry->setValAt< uint32_t >( 0x08, player->getId() );
+         //pPacketEntry->setValAt< uint32_t >( 0x08, player->getId() );
          if( pSession )
             pSession->getZoneConnection()->queueOutPacket( pPacketEntry );
       }
@@ -433,9 +434,9 @@ void Core::Zone::updateSessions( bool changedWeather )
 
       if( changedWeather )
       {
-         ZoneChannelPacket< FFXIVIpcWeatherChange  > weatherChangePacket( pPlayer->getId() );
-         weatherChangePacket.data().weatherId = static_cast< uint8_t >( m_currentWeather );
-         weatherChangePacket.data().delay = 5.0f;
+         auto weatherChangePacket = makeZonePacket< FFXIVIpcWeatherChange >(pPlayer->getId() );
+         weatherChangePacket->data().weatherId = static_cast< uint8_t >( m_currentWeather );
+         weatherChangePacket->data().delay = 5.0f;
          pSession->getPlayer()->queuePacket( weatherChangePacket );
       }
 
