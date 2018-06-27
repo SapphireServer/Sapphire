@@ -78,23 +78,27 @@ void Core::Entity::EventObject::setState( uint8_t state )
 
    for( const auto& player : m_inRangePlayers )
    {
-      ZoneChannelPacket< FFXIVIpcActorControl142 > eobjUpdatePacket( getId(), player->getId() );
+      FFXIVPacketBasePtr packet = boost::make_shared< ZoneChannelPacket< FFXIVIpcActorControl142 > >(  getId(), player->getId() );
+      auto eobjUpdatePacket = dynamic_cast< ZoneChannelPacket< FFXIVIpcActorControl142 >& >( *packet );
+
       eobjUpdatePacket.data().category = Common::ActorControlType::DirectorEObjMod;
       eobjUpdatePacket.data().param1 = state;
 
-      player->queuePacket( eobjUpdatePacket );
+      player->queuePacket( packet );
    }
 }
 
 void Core::Entity::EventObject::setAnimationFlag( uint32_t flag, uint32_t animationFlag ) {
    for( const auto& player : m_inRangePlayers )
    {
-      ZoneChannelPacket< FFXIVIpcActorControl142 > eobjUpdatePacket( getId(), player->getId() );
+      FFXIVPacketBasePtr packet = boost::make_shared< ZoneChannelPacket< FFXIVIpcActorControl142 > >(  getId(), player->getId() );
+      auto eobjUpdatePacket = dynamic_cast< ZoneChannelPacket< FFXIVIpcActorControl142 >& >( *packet );
+
       eobjUpdatePacket.data().category = Common::ActorControlType::EObjAnimation;
       eobjUpdatePacket.data().param1 = flag;
       eobjUpdatePacket.data().param2 = animationFlag;
 
-      player->queuePacket( eobjUpdatePacket );
+      player->queuePacket( packet );
    }
 }
 
@@ -117,7 +121,10 @@ void Core::Entity::EventObject::spawn( Core::Entity::PlayerPtr pTarget )
    auto pLog = g_fw.get< Logger >();
 
    pLog->debug( "Spawning EObj: id:" + std::to_string( getId() ) + " name:" + getName() );
-   ZoneChannelPacket< FFXIVIpcObjectSpawn > eobjStatePacket( getId(), pTarget->getId() );
+
+   FFXIVPacketBasePtr packet = boost::make_shared< ZoneChannelPacket< FFXIVIpcObjectSpawn > >(  getId(), pTarget->getId()  );
+   auto eobjStatePacket = dynamic_cast< ZoneChannelPacket< FFXIVIpcObjectSpawn >& >( *packet );
+
    eobjStatePacket.data().spawnIndex = spawnIndex;
    eobjStatePacket.data().objKind = getObjKind();
    eobjStatePacket.data().state = getState();
@@ -127,7 +134,7 @@ void Core::Entity::EventObject::spawn( Core::Entity::PlayerPtr pTarget )
    eobjStatePacket.data().scale = getScale();
    eobjStatePacket.data().actorId = getId();
    eobjStatePacket.data().rotation = Math::Util::floatToUInt16Rot( getRot() );
-   pTarget->queuePacket( eobjStatePacket );
+   pTarget->queuePacket( packet );
 }
 
 

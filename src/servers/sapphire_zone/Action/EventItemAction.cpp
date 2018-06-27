@@ -48,13 +48,12 @@ void Core::Action::EventItemAction::onStart()
 
    m_startTime = Util::getTimeMs();
 
-   GamePacketNew< FFXIVIpcActorCast, ServerZoneIpcType > castPacket( m_pSource->getId() );
-
-   castPacket.data().action_id = 1;
-   castPacket.data().unknown = 3;
-   castPacket.data().unknown_1 = m_id;
-   castPacket.data().cast_time = 3.0f;
-   castPacket.data().target_id = m_pSource->getId();
+   auto castPacket = makeZonePacket< FFXIVIpcActorCast >( m_pSource->getId() );
+   castPacket->data().action_id = 1;
+   castPacket->data().unknown = 3;
+   castPacket->data().unknown_1 = m_id;
+   castPacket->data().cast_time = 3.0f;
+   castPacket->data().target_id = m_pSource->getId();
 
    m_pSource->sendToInRangeSet( castPacket, true );
    m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::Casting );
@@ -68,15 +67,15 @@ void Core::Action::EventItemAction::onFinish()
 
    try
    {
-      GamePacketNew< FFXIVIpcEffect, ServerZoneIpcType > effectPacket( m_pSource->getId() );
-      effectPacket.data().targetId = static_cast< uint32_t >( m_additional );
-      effectPacket.data().actionAnimationId = 1;
+      auto effectPacket = makeZonePacket< FFXIVIpcEffect >( m_pSource->getId() );
+      effectPacket->data().targetId = static_cast< uint32_t >( m_additional );
+      effectPacket->data().actionAnimationId = 1;
 //      effectPacket.data().unknown_3 = 3;
-      effectPacket.data().actionTextId = m_id;
-      effectPacket.data().unknown_5 = 2;
-      effectPacket.data().numEffects = 1;
-      effectPacket.data().rotation = Math::Util::floatToUInt16Rot( m_pSource->getRot() );
-      effectPacket.data().effectTarget = static_cast< uint32_t >( m_additional );
+      effectPacket->data().actionTextId = m_id;
+      effectPacket->data().unknown_5 = 2;
+      effectPacket->data().numEffects = 1;
+      effectPacket->data().rotation = Math::Util::floatToUInt16Rot( m_pSource->getRot() );
+      effectPacket->data().effectTarget = static_cast< uint32_t >( m_additional );
 
       m_pSource->getAsPlayer()->unsetStateFlag( Common::PlayerStateFlag::Casting );
       m_pSource->sendToInRangeSet( effectPacket, true );
@@ -100,8 +99,8 @@ void Core::Action::EventItemAction::onInterrupt()
    try
    {
 
-      auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt,
-                                            0x219, 0x04, m_id );
+      auto control = boost::make_shared< ActorControlPacket142 >( m_pSource->getId(), ActorControlType::CastInterrupt,
+                                                                  0x219, 0x04, m_id );
       if( m_pSource->isPlayer() )
       {
          m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Casting );

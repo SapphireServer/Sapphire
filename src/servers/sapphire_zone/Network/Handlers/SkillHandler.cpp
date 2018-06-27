@@ -37,7 +37,7 @@ void Core::Network::GameConnection::skillHandler( const Packets::FFXIVARR_PACKET
                                                   Entity::Player& player )
 {
    Packets::FFXIVARR_PACKET_RAW copy = inPacket;
-   
+
    uint8_t type = inPacket.data[0x11];
 
    auto action = *reinterpret_cast< uint32_t* >( &copy.data[0x14] );
@@ -62,7 +62,7 @@ void Core::Network::GameConnection::skillHandler( const Packets::FFXIVARR_PACKET
                         pExdData->get< Core::Data::Action >( action )->name +
                         " | " + std::to_string( targetId ) + " )" );
 
-      player.queuePacket( ActorControlPacket142( player.getId(), ActorControlType::ActionStart, 0x01, action ) );
+      player.queuePacket( boost::make_shared< ActorControlPacket142 >( player.getId(), ActorControlType::ActionStart, 0x01, action ) );
 
       if( action == 5 )
       {

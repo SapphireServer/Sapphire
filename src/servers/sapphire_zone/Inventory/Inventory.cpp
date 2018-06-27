@@ -522,17 +522,19 @@ int16_t Core::Inventory::addItem( uint16_t inventoryId, int8_t slotId, uint32_t 
                          " WHERE storageId = " + std::to_string( inventoryId ) +
                          " AND CharacterId = " + std::to_string( m_pOwner->getId() ) );
 
-      ZoneChannelPacket< FFXIVIpcUpdateInventorySlot > invUpPacket( m_pOwner->getId() );
-      invUpPacket.data().containerId = inventoryId;
-      invUpPacket.data().catalogId = catalogId;
-      invUpPacket.data().quantity = item->getStackSize();
-      invUpPacket.data().hqFlag = item->isHq() ? 1 : 0;
-      invUpPacket.data().slot = rSlotId;
-      invUpPacket.data().condition = 30000;
+
+      auto invUpPacket = makeZonePacket< FFXIVIpcUpdateInventorySlot >( m_pOwner->getId() );
+      invUpPacket->data().containerId = inventoryId;
+      invUpPacket->data().catalogId = catalogId;
+      invUpPacket->data().quantity = item->getStackSize();
+      invUpPacket->data().hqFlag = item->isHq() ? 1 : 0;
+      invUpPacket->data().slot = rSlotId;
+      invUpPacket->data().condition = 30000;
       m_pOwner->queuePacket( invUpPacket );
 
       if( !silent )
-         m_pOwner->queuePacket( ActorControlPacket143( m_pOwner->getId(), ItemObtainIcon, catalogId, item->getStackSize() ) );
+         m_pOwner->queuePacket( boost::make_shared< ActorControlPacket143 >( m_pOwner->getId(), ItemObtainIcon,
+                                                                             catalogId, item->getStackSize() ) );
 
    }
 
@@ -711,19 +713,19 @@ void Core::Inventory::discardItem( uint16_t fromInventoryId, uint8_t fromSlotId 
    m_inventoryMap[fromInventoryId]->removeItem( fromSlotId );
    updateContainer( fromInventoryId, fromSlotId, nullptr );
 
-   ZoneChannelPacket< FFXIVIpcInventoryTransaction > invTransPacket( m_pOwner->getId() );
-   invTransPacket.data().transactionId = transactionId;
-   invTransPacket.data().ownerId = m_pOwner->getId();
-   invTransPacket.data().storageId = fromInventoryId;
-   invTransPacket.data().catalogId = fromItem->getId();
-   invTransPacket.data().stackSize = fromItem->getStackSize();
-   invTransPacket.data().slotId = fromSlotId;
-   invTransPacket.data().type = 7;
+   auto invTransPacket = makeZonePacket< FFXIVIpcInventoryTransaction >( m_pOwner->getId() );
+   invTransPacket->data().transactionId = transactionId;
+   invTransPacket->data().ownerId = m_pOwner->getId();
+   invTransPacket->data().storageId = fromInventoryId;
+   invTransPacket->data().catalogId = fromItem->getId();
+   invTransPacket->data().stackSize = fromItem->getStackSize();
+   invTransPacket->data().slotId = fromSlotId;
+   invTransPacket->data().type = 7;
    m_pOwner->queuePacket( invTransPacket );
 
-   ZoneChannelPacket< FFXIVIpcInventoryTransactionFinish > invTransFinPacket( m_pOwner->getId() );
-   invTransFinPacket.data().transactionId = transactionId;
-   invTransFinPacket.data().transactionId1 = transactionId;
+   auto invTransFinPacket = makeZonePacket< FFXIVIpcInventoryTransactionFinish >( m_pOwner->getId() );
+   invTransFinPacket->data().transactionId = transactionId;
+   invTransFinPacket->data().transactionId1 = transactionId;
    m_pOwner->queuePacket( invTransFinPacket );
 }
 
@@ -902,34 +904,34 @@ void Core::Inventory::send()
 
          if( it->second->getId() == InventoryType::Currency || it->second->getId() == InventoryType::Crystal )
          {
-            ZoneChannelPacket< FFXIVIpcCurrencyCrystalInfo > currencyInfoPacket( m_pOwner->getId() );
-            currencyInfoPacket.data().sequence = count;
-            currencyInfoPacket.data().catalogId = itM->second->getId();
-            currencyInfoPacket.data().unknown = 1;
-            currencyInfoPacket.data().quantity = itM->second->getStackSize();
-            currencyInfoPacket.data().containerId = it->second->getId();
-            currencyInfoPacket.data().slot = 0;
+            auto currencyInfoPacket = makeZonePacket< FFXIVIpcCurrencyCrystalInfo >( m_pOwner->getId() );
+            currencyInfoPacket->data().sequence = count;
+            currencyInfoPacket->data().catalogId = itM->second->getId();
+            currencyInfoPacket->data().unknown = 1;
+            currencyInfoPacket->data().quantity = itM->second->getStackSize();
+            currencyInfoPacket->data().containerId = it->second->getId();
+            currencyInfoPacket->data().slot = 0;
             m_pOwner->queuePacket( currencyInfoPacket );
          }
          else
          {
-            ZoneChannelPacket< FFXIVIpcItemInfo > itemInfoPacket( m_pOwner->getId() );
-            itemInfoPacket.data().sequence = count;
-            itemInfoPacket.data().containerId = it->second->getId();
-            itemInfoPacket.data().slot = itM->first;
-            itemInfoPacket.data().quantity = itM->second->getStackSize();
-            itemInfoPacket.data().catalogId = itM->second->getId();
-            itemInfoPacket.data().condition = 30000;
-            itemInfoPacket.data().spiritBond = 0;
-            itemInfoPacket.data().hqFlag = itM->second->isHq() ? 1 : 0;
+            auto itemInfoPacket = makeZonePacket< FFXIVIpcItemInfo >( m_pOwner->getId() );
+            itemInfoPacket->data().sequence = count;
+            itemInfoPacket->data().containerId = it->second->getId();
+            itemInfoPacket->data().slot = itM->first;
+            itemInfoPacket->data().quantity = itM->second->getStackSize();
+            itemInfoPacket->data().catalogId = itM->second->getId();
+            itemInfoPacket->data().condition = 30000;
+            itemInfoPacket->data().spiritBond = 0;
+            itemInfoPacket->data().hqFlag = itM->second->isHq() ? 1 : 0;
             m_pOwner->queuePacket( itemInfoPacket );
          }
       }
 
-      ZoneChannelPacket< FFXIVIpcContainerInfo > containerInfoPacket( m_pOwner->getId() );
-      containerInfoPacket.data().sequence = count;
-      containerInfoPacket.data().numItems = it->second->getEntryCount();
-      containerInfoPacket.data().containerId = it->second->getId();
+      auto containerInfoPacket = makeZonePacket< FFXIVIpcContainerInfo >( m_pOwner->getId() );
+      containerInfoPacket->data().sequence = count;
+      containerInfoPacket->data().numItems = it->second->getEntryCount();
+      containerInfoPacket->data().containerId = it->second->getId();
       m_pOwner->queuePacket( containerInfoPacket );
 
 

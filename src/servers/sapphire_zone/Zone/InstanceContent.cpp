@@ -133,7 +133,7 @@ void Core::InstanceContent::onUpdate( uint32_t currTime )
          {
             auto pPlayer = playerIt.second;
             pPlayer->queuePacket(
-                    ActorControlPacket143( pPlayer->getId(), DirectorUpdate,
+                    boost::make_shared< ActorControlPacket143 >( pPlayer->getId(), DirectorUpdate,
                                            getDirectorId(), 0x40000001, m_instanceConfiguration->timeLimitmin * 60u ) );
          }
 
@@ -175,7 +175,7 @@ void Core::InstanceContent::onInitDirector( Entity::Player& player )
 
 void Core::InstanceContent::onSomeDirectorEvent( Entity::Player& player )
 {
-   player.queuePacket( ActorControlPacket143( player.getId(), DirectorUpdate, 0x00110001, 0x80000000, 1 ) );
+   player.queuePacket( boost::make_shared< ActorControlPacket143 >( player.getId(), DirectorUpdate, 0x00110001, 0x80000000, 1 ) );
 }
 
 
@@ -281,7 +281,7 @@ void Core::InstanceContent::startQte()
    for( const auto& playerIt : m_playerMap )
    {
       auto player = playerIt.second;
-      player->queuePacket( ActorControlPacket143( player->getId(), DirectorUpdate, getDirectorId(), 0x8000000A ) );
+      player->queuePacket( boost::make_shared< ActorControlPacket143 >( player->getId(), DirectorUpdate, getDirectorId(), 0x8000000A ) );
    }
 }
 
@@ -291,7 +291,7 @@ void Core::InstanceContent::startEventCutscene()
    for( const auto& playerIt : m_playerMap )
    {
       auto player = playerIt.second;
-      player->queuePacket( ActorControlPacket143( player->getId(), DirectorUpdate, getDirectorId(), 0x80000008 ) );
+      player->queuePacket( boost::make_shared< ActorControlPacket143 >( player->getId(), DirectorUpdate, getDirectorId(), 0x80000008 ) );
    }
 }
 
@@ -300,7 +300,7 @@ void Core::InstanceContent::endEventCutscene()
    for( const auto& playerIt : m_playerMap )
    {
       auto player = playerIt.second;
-      player->queuePacket( ActorControlPacket143( player->getId(), DirectorUpdate, getDirectorId(), 0x80000009 ) );
+      player->queuePacket( boost::make_shared< ActorControlPacket143 >( player->getId(), DirectorUpdate, getDirectorId(), 0x80000009 ) );
    }
 }
 
@@ -409,13 +409,13 @@ void Core::InstanceContent::setCurrentBGM( uint16_t bgmIndex )
       // note: retail do send a BGM_MUTE(1) first before any BGM transition, but YOLO in this case.
       // also do note that this code can't control the bgm granularly. (i.e. per player for WoD submap.) oops.
       // player->queuePacket( ActorControlPacket143( player->getId(), DirectorUpdate, getDirectorId(), 0x80000001, 1 ) );
-      player->queuePacket( ActorControlPacket143( player->getId(), DirectorUpdate, getDirectorId(), 0x80000001, bgmIndex ) );
+      player->queuePacket( boost::make_shared< ActorControlPacket143 >( player->getId(), DirectorUpdate, getDirectorId(), 0x80000001, bgmIndex ) );
    }
 }
 
 void Core::InstanceContent::setPlayerBGM( Core::Entity::Player& player, uint16_t bgmId )
 {
-   player.queuePacket( ActorControlPacket143( player.getId(), DirectorUpdate, getDirectorId(), 0x80000001, bgmId ) );
+   player.queuePacket( boost::make_shared< ActorControlPacket143 >( player.getId(), DirectorUpdate, getDirectorId(), 0x80000001, bgmId ) );
 }
 
 uint16_t Core::InstanceContent::getCurrentBGM() const

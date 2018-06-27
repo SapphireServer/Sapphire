@@ -98,7 +98,7 @@ namespace Entity {
 
       ActorPtr getClosestActor();
 
-      void sendToInRangeSet( Network::Packets::GamePacketPtr pPacket, bool bToSelf = false );
+      void sendToInRangeSet( Network::Packets::FFXIVPacketBasePtr pPacket, bool bToSelf = false );
 
       // add an actor to in range set
       void addInRangeActor( ActorPtr pActor );
