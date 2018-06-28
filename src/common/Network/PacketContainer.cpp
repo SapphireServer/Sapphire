@@ -1,6 +1,7 @@
 #include "PacketContainer.h"
 
 #include "Common.h"
+#include "Forwards.h"
 
 #include <boost/format.hpp>
 
@@ -19,11 +20,11 @@ Core::Network::Packets::PacketContainer::~PacketContainer()
    m_entryList.clear();
 }
 
-void Core::Network::Packets::PacketContainer::addPacket( FFXIVPacketBase entry )
+void Core::Network::Packets::PacketContainer::addPacket( Core::Network::Packets::FFXIVPacketBasePtr entry )
 {
    m_entryList.push_back( entry );
 
-   m_ipcHdr.size += entry.getSize();
+   m_ipcHdr.size += entry->getSize();
    m_ipcHdr.count++;
 }
 
@@ -50,9 +51,9 @@ void Core::Network::Packets::PacketContainer::fillSendBuffer( std::vector< uint8
 
    for( ; it != m_entryList.end(); ++it )
    {
-      auto data = it->getData();
-      memcpy( &tempBuffer[0] + sizeof( FFXIVARR_PACKET_HEADER ) + offset, &data[0], it->getSize() );
-      offset += it->getSize();
+      auto data = (*it)->getData();
+      memcpy( &tempBuffer[0] + sizeof( FFXIVARR_PACKET_HEADER ) + offset, &data[0], (*it)->getSize() );
+      offset += (*it)->getSize();
    }
 
    sendBuffer.assign( &tempBuffer[0], &tempBuffer[0] + m_ipcHdr.size );
