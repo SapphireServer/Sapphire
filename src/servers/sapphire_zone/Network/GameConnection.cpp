@@ -303,7 +303,7 @@ void Core::Network::GameConnection::processOutQueue()
          break;
       }
 
-      pRP.addPacket( *pPacket );
+      pRP.addPacket( pPacket );
       totalSize += pPacket->getSize();
    }
 
@@ -315,7 +315,7 @@ void Core::Network::GameConnection::processOutQueue()
 void Core::Network::GameConnection::sendSinglePacket( Core::Network::Packets::FFXIVPacketBasePtr pPacket )
 {
    PacketContainer pRP = PacketContainer();
-   pRP.addPacket( *pPacket );
+   pRP.addPacket( pPacket );
    sendPackets( &pRP );
 }
 

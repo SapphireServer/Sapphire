@@ -19,11 +19,11 @@ public:
    PacketContainer();
    ~PacketContainer();
 
-   void addPacket( FFXIVPacketBase entry );
+   void addPacket( FFXIVPacketBasePtr entry );
 
    FFXIVARR_PACKET_HEADER m_ipcHdr;
 
-   std::vector< FFXIVPacketBase > m_entryList;
+   std::vector< FFXIVPacketBasePtr > m_entryList;
 
    std::string toString();
 
