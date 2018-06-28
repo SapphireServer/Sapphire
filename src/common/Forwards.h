@@ -24,8 +24,10 @@ namespace Core
       namespace Packets
       {
          class GamePacket;
+         class FFXIVPacketBase;
 
          typedef boost::shared_ptr< GamePacket > GamePacketPtr;
+         typedef boost::shared_ptr< FFXIVPacketBase > FFXIVPacketBasePtr;
       }
 
    }
