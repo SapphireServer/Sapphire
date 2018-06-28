@@ -80,6 +80,7 @@ public:
 
    virtual std::vector< uint8_t > getData() const
    {
+      std::cout << "konichiwa bitches" << std::endl;
       return {};
    }
 
