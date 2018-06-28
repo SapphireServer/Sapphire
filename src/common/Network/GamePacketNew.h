@@ -211,6 +211,7 @@ protected:
 
       // The IPC type itself.
       m_ipcHdr.type = static_cast< ServerZoneIpcType >( m_data._ServerIpcType );
+      m_segHdr.size = sizeof( T ) + sizeof( FFXIVARR_IPC_HEADER ) + sizeof( FFXIVARR_PACKET_SEGMENT_HEADER );
    };
 
 protected:
@@ -225,9 +226,9 @@ class FFXIVRawPacket : public FFXIVPacketBase
 {
 public:
    FFXIVRawPacket( uint16_t type, uint32_t size, uint32_t sourceActorId, uint32_t targetActorId ) :
+      m_data( std::vector< uint8_t >( size - sizeof( FFXIVARR_PACKET_SEGMENT_HEADER ) ) ),
       FFXIVPacketBase( type, sourceActorId, targetActorId )
    {
-      m_data.resize( size - sizeof( FFXIVARR_PACKET_SEGMENT_HEADER ) );
       initialize();
       m_segHdr.size = size;
    };
