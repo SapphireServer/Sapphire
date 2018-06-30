@@ -28,6 +28,7 @@ Core::Item::Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t mo
 {
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
    auto itemInfo = pExdData->get< Core::Data::Item >( catalogId );
+   
    m_delayMs = itemInfo->delayms;
    m_physicalDmg = itemInfo->damagePhys;
    m_magicalDmg = itemInfo->damageMag;
