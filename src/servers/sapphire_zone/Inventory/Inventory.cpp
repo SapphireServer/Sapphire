@@ -150,9 +150,7 @@ Core::ItemPtr Core::Inventory::createItem( uint32_t catalogId, uint16_t quantity
    ItemPtr pItem = make_Item( getNextUId(),
                               catalogId,
                               itemInfo->modelMain,
-                              itemInfo->modelSub,
-                              static_cast< ItemUICategory >( itemInfo->itemUICategory ),
-                              false );
+                              itemInfo->modelSub );
 
    pItem->setStackSize( itemAmount );
 
@@ -742,12 +740,13 @@ Core::ItemPtr Core::Inventory::loadItem( uint64_t uId )
    {
       auto itemInfo = pExdData->get< Core::Data::Item >( itemRes->getUInt( 1 ) );
       bool isHq = itemRes->getUInt( 3 ) == 1;
-      ItemPtr pItem( new Item( uId,
+
+      ItemPtr pItem = make_Item( uId,
                                itemRes->getUInt( 1 ),
                                itemInfo->modelMain,
                                itemInfo->modelSub,
-                               static_cast< ItemUICategory >( itemInfo->itemUICategory ),
-                               isHq ) );
+                               isHq );
+
       pItem->setStackSize( itemRes->getUInt( 2 ) );
 
       return pItem;
