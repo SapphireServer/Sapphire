@@ -134,7 +134,7 @@ Core::ItemPtr Core::Inventory::createItem( uint32_t catalogId, uint16_t quantity
    auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
    auto itemInfo = pExdData->get< Core::Data::Item >( catalogId );
 
-   uint8_t itemAmount = quantity;
+   uint16_t itemAmount = quantity;
 
    if( itemInfo->stackSize == 1 )
       itemAmount = 1;
@@ -146,14 +146,14 @@ Core::ItemPtr Core::Inventory::createItem( uint32_t catalogId, uint16_t quantity
 
 //   std::string itemName( itemInfo->name );
 
-   ItemPtr pItem( new Item( catalogId ) );
+   ItemPtr pItem = make_Item( catalogId );
 
    pItem->setStackSize( itemAmount );
    pItem->setUId( getNextUId() );
    pItem->setModelIds( itemInfo->modelMain, itemInfo->modelSub );
    pItem->setCategory( static_cast< ItemUICategory >( itemInfo->itemUICategory ) );
 
-  pDb->execute( "INSERT INTO charaglobalitem ( CharacterId, itemId, catalogId, stack, flags ) VALUES ( " +
+   pDb->execute( "INSERT INTO charaglobalitem ( CharacterId, itemId, catalogId, stack, flags ) VALUES ( " +
                       std::to_string( m_pOwner->getId() ) + ", " +
                       std::to_string( pItem->getUId() ) + ", " +
                       std::to_string( pItem->getId() ) + ", " +
