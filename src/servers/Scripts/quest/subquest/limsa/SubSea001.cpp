@@ -79,16 +79,16 @@ public:
             {
                Scene00003( player );
             },
-               nullptr, eventId );
+            nullptr, eventId );
       }
-      else if(actor == Eobject1 ) 
+      else if( actor == Eobject1 )
       {
          player.eventActionStart( getId(), 0x0E,
             [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
             {
                Scene00005( player );
             },
-               nullptr, eventId );
+            nullptr, eventId );
       }
       else if( actor == Eobject2 ) 
       {
@@ -97,7 +97,7 @@ public:
             {
                Scene00007( player );
             },
-               nullptr, eventId );
+            nullptr, eventId );
       }
       else if( actor == Eobject3 ) 
       {
@@ -106,7 +106,7 @@ public:
             {
                Scene00009( player );
             },
-               nullptr, eventId );
+            nullptr, eventId );
       }
       else if( actor == Eobject4 )
       {
@@ -124,13 +124,13 @@ public:
             {
                Scene00013( player );
             },
-               nullptr, eventId );
+            nullptr, eventId );
       }
    };
 
 private:
 
-   void checkQuestcompletion( Entity::Player& player )
+   void checkQuestCompletion( Entity::Player& player )
    {
       auto currentCC = player.getQuestUI8BH( getId() );
 
@@ -172,7 +172,7 @@ private:
       player.playScene( getId(), 2, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            if( player.hasQuest( 65644 ) || player.hasQuest( 65645 ) )
+            if( player.hasQuest( Quest0 ) || player.hasQuest( Quest1 ) )
             {
                if( result.param2 == 1 )
                {
@@ -199,7 +199,7 @@ private:
       player.playScene( getId(), 4, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            checkQuestcompletion( player );
+            checkQuestCompletion( player );
             player.setQuestBitFlag8( getId(), 7, true );
          } );
    }
@@ -218,7 +218,7 @@ private:
       player.playScene( getId(), 6, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            checkQuestcompletion( player );
+            checkQuestCompletion( player );
             player.setQuestBitFlag8( getId(), 6, true );
          } );
    }
@@ -237,7 +237,7 @@ private:
       player.playScene( getId(), 8, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            checkQuestcompletion( player );
+            checkQuestCompletion( player );
             player.setQuestBitFlag8( getId(), 5, true );
          } );
    }
@@ -256,7 +256,7 @@ private:
       player.playScene( getId(), 10, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            checkQuestcompletion( player );
+            checkQuestCompletion( player );
             player.setQuestBitFlag8( getId(), 4, true );
          } );
    }
@@ -275,7 +275,7 @@ private:
       player.playScene( getId(), 12, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            checkQuestcompletion( player );
+            checkQuestCompletion( player );
             player.setQuestBitFlag8( getId(), 3, true );
          } );
    }
@@ -294,7 +294,7 @@ private:
       player.playScene( getId(), 14, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            checkQuestcompletion( player );
+            checkQuestCompletion( player );
             player.setQuestBitFlag8( getId(), 2, true );
          } );
    }
