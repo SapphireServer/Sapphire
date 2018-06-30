@@ -9,10 +9,8 @@ class Item
 {
 
 public:
-   Item();
-   Item( uint32_t catalogId );
-   Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, Common::ItemUICategory categoryId, bool isHq = false );
-   ~Item();
+   Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, bool isHq = false );
+   ~Item() = default;
 
    uint32_t getId() const;
 
