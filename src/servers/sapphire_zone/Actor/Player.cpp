@@ -144,7 +144,8 @@ void Core::Entity::Player::setGmInvis( bool invis )
 
 const bool Core::Entity::Player::isActingAsGm()
 {
-	return getOnlineStatus() == OnlineStatus::GameMaster || getOnlineStatus() == OnlineStatus::GameMaster1 || getOnlineStatus() == OnlineStatus::GameMaster2;
+	auto status = getOnlineStatus();
+	return status == OnlineStatus::GameMaster || status == OnlineStatus::GameMaster1 || status == OnlineStatus::GameMaster2;
 }
 
 uint8_t Core::Entity::Player::getMode() const
