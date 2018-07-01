@@ -325,7 +325,7 @@ public:
    /*! sets players combat state */
    void setInCombat( bool mode );
    /*! return current online status depending on current state / activity */
-   Common::OnlineStatus getOnlineStatus();
+   Common::OnlineStatus getOnlineStatus() const;
    /*! sets the players zone, initiating a zoning process */
    void setZone( uint32_t zoneId );
    /*! sets the players instance & initiates zoning process */
@@ -551,7 +551,7 @@ public:
    bool getGmInvis() const;
    void setGmInvis( bool invis );
 
-   const bool isActingAsGm();
+   bool isActingAsGm() const;
 
    uint8_t getMode() const;
    void setMode( uint8_t mode );
