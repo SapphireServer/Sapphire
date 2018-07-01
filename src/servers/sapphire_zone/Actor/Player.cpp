@@ -142,7 +142,7 @@ void Core::Entity::Player::setGmInvis( bool invis )
    m_gmInvis = invis;
 }
 
-const bool Core::Entity::Player::isActingAsGm()
+bool Core::Entity::Player::isActingAsGm() const
 {
 	auto status = getOnlineStatus();
 	return status == OnlineStatus::GameMaster || status == OnlineStatus::GameMaster1 || status == OnlineStatus::GameMaster2;
@@ -173,7 +173,7 @@ bool Core::Entity::Player::isMarkedForRemoval() const
    return m_markedForRemoval;
 }
 
-Core::Common::OnlineStatus Core::Entity::Player::getOnlineStatus()
+Core::Common::OnlineStatus Core::Entity::Player::getOnlineStatus() const
 {
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
    if( !pExdData )
