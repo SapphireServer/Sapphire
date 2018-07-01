@@ -551,6 +551,8 @@ public:
    bool getGmInvis() const;
    void setGmInvis( bool invis );
 
+   const bool isActingAsGm();
+
    uint8_t getMode() const;
    void setMode( uint8_t mode );
 
