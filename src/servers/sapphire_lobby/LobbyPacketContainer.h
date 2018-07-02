@@ -1,5 +1,5 @@
-#ifndef _LobbyPacketContainer_H_
-#define _LobbyPacketContainer_H_
+#ifndef LOBBY_PACKET_CONTAINER_H_
+#define LOBBY_PACKET_CONTAINER_H_
 
 #include <vector>
 #include <string.h>
@@ -10,34 +10,35 @@
 #include "Forwards.h"
 
 namespace Core {
-   namespace Network {
-      namespace Packets {
-         class GamePacket;
+namespace Network {
+namespace Packets {
 
-         class LobbyPacketContainer 
-         {
-         public:
-            LobbyPacketContainer( uint8_t* encKey = nullptr );
-            ~LobbyPacketContainer();
+typedef boost::shared_ptr< FFXIVPacketBase > FFXIVPacketBasePtr;
 
-            void addPacket( GamePacketPtr pEntry );
+class LobbyPacketContainer
+{
+public:
+   LobbyPacketContainer( uint8_t* encKey = nullptr );
+   ~LobbyPacketContainer();
 
-            uint16_t getSize() const;
-            
-            uint8_t* getRawData( bool addstuff = true );
-            
-         private:
-            Core::Network::Packets::FFXIVARR_PACKET_HEADER m_header;
+   void addPacket( FFXIVPacketBasePtr pEntry );
 
-            uint8_t * m_encKey;
+   uint16_t getSize() const;
 
-            std::vector<GamePacket> m_entryList;
+   uint8_t* getRawData( bool addstuff = true );
 
-            uint8_t	m_dataBuf[0x2000];
+private:
+   Core::Network::Packets::FFXIVARR_PACKET_HEADER m_header;
 
-         };
+   uint8_t* m_encKey;
 
-      }
-   }
+   std::vector< FFXIVPacketBasePtr > m_entryList;
+
+   uint8_t m_dataBuf[0x2000];
+
+};
+
+}
+}
 }
 #endif

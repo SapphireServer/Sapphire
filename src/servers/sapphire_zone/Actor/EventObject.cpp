@@ -3,6 +3,10 @@
 #include "Zone/InstanceContent.h"
 #include "Actor/Player.h"
 
+#include "Network/PacketWrappers/ActorControlPacket142.h"
+#include "Network/PacketWrappers/ActorControlPacket143.h"
+#include "Network/PacketWrappers/ActorControlPacket144.h"
+
 #include <Logging/Logger.h>
 #include <Network/GamePacket.h>
 #include <Network/GamePacketNew.h>
@@ -78,27 +82,14 @@ void Core::Entity::EventObject::setState( uint8_t state )
 
    for( const auto& player : m_inRangePlayers )
    {
-      FFXIVPacketBasePtr packet = boost::make_shared< ZoneChannelPacket< FFXIVIpcActorControl142 > >(  getId(), player->getId() );
-      auto eobjUpdatePacket = dynamic_cast< ZoneChannelPacket< FFXIVIpcActorControl142 >& >( *packet );
-
-      eobjUpdatePacket.data().category = Common::ActorControlType::DirectorEObjMod;
-      eobjUpdatePacket.data().param1 = state;
-
-      player->queuePacket( packet );
+      player->queuePacket( boost::make_shared< ActorControlPacket142 >( getId(), DirectorEObjMod, state ) );
    }
 }
 
 void Core::Entity::EventObject::setAnimationFlag( uint32_t flag, uint32_t animationFlag ) {
    for( const auto& player : m_inRangePlayers )
    {
-      FFXIVPacketBasePtr packet = boost::make_shared< ZoneChannelPacket< FFXIVIpcActorControl142 > >(  getId(), player->getId() );
-      auto eobjUpdatePacket = dynamic_cast< ZoneChannelPacket< FFXIVIpcActorControl142 >& >( *packet );
-
-      eobjUpdatePacket.data().category = Common::ActorControlType::EObjAnimation;
-      eobjUpdatePacket.data().param1 = flag;
-      eobjUpdatePacket.data().param2 = animationFlag;
-
-      player->queuePacket( packet );
+      player->queuePacket( boost::make_shared< ActorControlPacket142 >( getId(), EObjAnimation, flag, animationFlag ) );
    }
 }
 
@@ -122,19 +113,17 @@ void Core::Entity::EventObject::spawn( Core::Entity::PlayerPtr pTarget )
 
    pLog->debug( "Spawning EObj: id:" + std::to_string( getId() ) + " name:" + getName() );
 
-   FFXIVPacketBasePtr packet = boost::make_shared< ZoneChannelPacket< FFXIVIpcObjectSpawn > >(  getId(), pTarget->getId()  );
-   auto eobjStatePacket = dynamic_cast< ZoneChannelPacket< FFXIVIpcObjectSpawn >& >( *packet );
-
-   eobjStatePacket.data().spawnIndex = spawnIndex;
-   eobjStatePacket.data().objKind = getObjKind();
-   eobjStatePacket.data().state = getState();
-   eobjStatePacket.data().objId = getObjectId();
-   eobjStatePacket.data().gimmickId = getGimmickId();
-   eobjStatePacket.data().position = getPos();
-   eobjStatePacket.data().scale = getScale();
-   eobjStatePacket.data().actorId = getId();
-   eobjStatePacket.data().rotation = Math::Util::floatToUInt16Rot( getRot() );
-   pTarget->queuePacket( packet );
+   auto eobjStatePacket = makeZonePacket< FFXIVIpcObjectSpawn >( getId(), pTarget->getId()  );
+   eobjStatePacket->data().spawnIndex = spawnIndex;
+   eobjStatePacket->data().objKind = getObjKind();
+   eobjStatePacket->data().state = getState();
+   eobjStatePacket->data().objId = getObjectId();
+   eobjStatePacket->data().gimmickId = getGimmickId();
+   eobjStatePacket->data().position = getPos();
+   eobjStatePacket->data().scale = getScale();
+   eobjStatePacket->data().actorId = getId();
+   eobjStatePacket->data().rotation = Math::Util::floatToUInt16Rot( getRot() );
+   pTarget->queuePacket( eobjStatePacket );
 }
 
 

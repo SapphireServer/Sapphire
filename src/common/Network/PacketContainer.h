@@ -6,12 +6,13 @@
 #include "Common.h"
 #include "CommonNetwork.h"
 #include "GamePacketNew.h"
+#include "Forwards.h"
 
 namespace Core {
 namespace Network {
 namespace Packets {
 
-class GamePacket;
+typedef boost::shared_ptr< FFXIVPacketBase > FFXIVPacketBasePtr;
 
 class PacketContainer
 {

@@ -204,14 +204,12 @@ uint64_t Core::Entity::Player::getOnlineStatusMask() const
 
 void Core::Entity::Player::prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadeOutTime, uint16_t animation )
 {
-   FFXIVPacketBasePtr packet = boost::make_shared< ZoneChannelPacket< FFXIVIpcPrepareZoning > >( getId() );
-   auto preparePacket = dynamic_cast< ZoneChannelPacket< FFXIVIpcPrepareZoning >& >( *packet );
-
-   preparePacket.data().targetZone = targetZone;
-   preparePacket.data().fadeOutTime = fadeOutTime;
-   preparePacket.data().animation = animation;
-   preparePacket.data().fadeOut = static_cast< uint8_t >( fadeOut ? 1 : 0 );
-   queuePacket( packet );
+   auto preparePacket = makeZonePacket< FFXIVIpcPrepareZoning >( getId() );
+   preparePacket->data().targetZone = targetZone;
+   preparePacket->data().fadeOutTime = fadeOutTime;
+   preparePacket->data().animation = animation;
+   preparePacket->data().fadeOut = static_cast< uint8_t >( fadeOut ? 1 : 0 );
+   queuePacket( preparePacket );
 }
 
 void Core::Entity::Player::calculateStats()
