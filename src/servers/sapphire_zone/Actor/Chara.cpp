@@ -396,25 +396,24 @@ void Core::Entity::Chara::autoAttack( CharaPtr pTarget )
       uint16_t damage = static_cast< uint16_t >( 10 + rand() % 12 );
       uint32_t variation = static_cast< uint32_t >( 0 + rand() % 4 );
 
-      FFXIVPacketBasePtr packet = boost::make_shared< ZoneChannelPacket< FFXIVIpcEffect > >( getId() );
-      auto ipcEffect = dynamic_cast< ZoneChannelPacket< FFXIVIpcEffect >& >( *packet );
-      ipcEffect.data().targetId = pTarget->getId();
-      ipcEffect.data().actionAnimationId = 0x366;
-      ipcEffect.data().unknown_2 = variation;
-//      effectPacket.data().unknown_3 = 1;
-      ipcEffect.data().actionTextId = 0x366;
-      ipcEffect.data().numEffects = 1;
-      ipcEffect.data().rotation = Math::Util::floatToUInt16Rot( getRot() );
-      ipcEffect.data().effectTarget = pTarget->getId();
-      ipcEffect.data().effects[0].value = damage;
-      ipcEffect.data().effects[0].effectType = ActionEffectType::Damage;
-      ipcEffect.data().effects[0].hitSeverity = static_cast< ActionHitSeverityType >( variation );
-      ipcEffect.data().effects[0].unknown_3 = 7;
+      auto ipcEffect = makeZonePacket< FFXIVIpcEffect >( getId() );
+      ipcEffect->data().targetId = pTarget->getId();
+      ipcEffect->data().actionAnimationId = 0x366;
+      ipcEffect->data().unknown_2 = variation;
+//      effectPacket->data().unknown_3 = 1;
+      ipcEffect->data().actionTextId = 0x366;
+      ipcEffect->data().numEffects = 1;
+      ipcEffect->data().rotation = Math::Util::floatToUInt16Rot( getRot() );
+      ipcEffect->data().effectTarget = pTarget->getId();
+      ipcEffect->data().effects[0].value = damage;
+      ipcEffect->data().effects[0].effectType = ActionEffectType::Damage;
+      ipcEffect->data().effects[0].hitSeverity = static_cast< ActionHitSeverityType >( variation );
+      ipcEffect->data().effects[0].unknown_3 = 7;
 
-      sendToInRangeSet( packet );
+      sendToInRangeSet( ipcEffect );
 
       if( isPlayer() )
-         getAsPlayer()->queuePacket( packet );
+         getAsPlayer()->queuePacket( ipcEffect );
 
       pTarget->takeDamage( damage );
    }
@@ -441,16 +440,16 @@ void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, u
    // Todo: Effect packet generator. 90% of this is basically setting params and it's basically unreadable.
    // Prepare packet. This is seemingly common for all packets in the action handler.
 
-   FFXIVPacketBasePtr packet = boost::make_shared< ZoneChannelPacket< FFXIVIpcEffect > >( getId() );
-   auto effectPacket = dynamic_cast< ZoneChannelPacket< FFXIVIpcEffect >& >( *packet );
-   effectPacket.data().targetId = target.getId();
-   effectPacket.data().actionAnimationId = actionId;
-   effectPacket.data().unknown_62 = 1; // Affects displaying action name next to number in floating text
-   effectPacket.data().unknown_2 = 1;  // This seems to have an effect on the "double-cast finish" animation
-   effectPacket.data().actionTextId = actionId;
-   effectPacket.data().numEffects = 1;
-   effectPacket.data().rotation = Math::Util::floatToUInt16Rot( getRot() );
-   effectPacket.data().effectTarget = target.getId();
+
+   auto effectPacket = makeZonePacket< FFXIVIpcEffect >( getId() );
+   effectPacket->data().targetId = target.getId();
+   effectPacket->data().actionAnimationId = actionId;
+   effectPacket->data().unknown_62 = 1; // Affects displaying action name next to number in floating text
+   effectPacket->data().unknown_2 = 1;  // This seems to have an effect on the "double-cast finish" animation
+   effectPacket->data().actionTextId = actionId;
+   effectPacket->data().numEffects = 1;
+   effectPacket->data().rotation = Math::Util::floatToUInt16Rot( getRot() );
+   effectPacket->data().effectTarget = target.getId();
 
    // Todo: for each actor, calculate how much damage the calculated value should deal to them - 2-step damage calc. we only have 1-step
    switch( type )
@@ -458,10 +457,10 @@ void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, u
 
    case ActionEffectType::Damage:
    {
-      effectPacket.data().effects[0].value = static_cast< uint16_t >( param1 );
-      effectPacket.data().effects[0].effectType = ActionEffectType::Damage;
-      effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::NormalDamage;
-      effectPacket.data().effects[0].unknown_3 = 7;
+      effectPacket->data().effects[0].value = static_cast< uint16_t >( param1 );
+      effectPacket->data().effects[0].effectType = ActionEffectType::Damage;
+      effectPacket->data().effects[0].hitSeverity = ActionHitSeverityType::NormalDamage;
+      effectPacket->data().effects[0].unknown_3 = 7;
 
       if( actionInfoPtr->castType == 1 && actionInfoPtr->effectRange != 0 || actionInfoPtr->castType != 1 )
       {
@@ -469,7 +468,7 @@ void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, u
          if ( isPlayer() && !ActionCollision::isActorApplicable( target, TargetFilter::Enemies ) )
             break;
 
-         sendToInRangeSet( packet, true );
+         sendToInRangeSet( effectPacket, true );
 
          if ( target.isAlive() )
             target.onActionHostile( *this );
@@ -485,11 +484,11 @@ void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, u
 
          for( const auto& pHitActor : actorsCollided )
          {
-            effectPacket.data().targetId = pHitActor->getId();
-            effectPacket.data().effectTarget = pHitActor->getId();
+            effectPacket->data().targetId = pHitActor->getId();
+            effectPacket->data().effectTarget = pHitActor->getId();
 
             // todo: send to range of what? ourselves? when mob script hits this is going to be lacking
-            sendToInRangeSet( packet, true );
+            sendToInRangeSet( effectPacket, true );
 
 
             if( pHitActor->getAsChara()->isAlive() )
@@ -516,16 +515,16 @@ void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, u
    {
       uint32_t calculatedHeal = Math::CalcBattle::calculateHealValue( getAsPlayer(), static_cast< uint32_t >( param1 ) );
 
-      effectPacket.data().effects[0].value = calculatedHeal;
-      effectPacket.data().effects[0].effectType = ActionEffectType::Heal;
-      effectPacket.data().effects[0].hitSeverity = ActionHitSeverityType::NormalHeal;
+      effectPacket->data().effects[0].value = calculatedHeal;
+      effectPacket->data().effects[0].effectType = ActionEffectType::Heal;
+      effectPacket->data().effects[0].hitSeverity = ActionHitSeverityType::NormalHeal;
 
       if( actionInfoPtr->castType == 1 && actionInfoPtr->effectRange != 0 || actionInfoPtr->castType != 1 )
       {
          if( isPlayer() && !ActionCollision::isActorApplicable( target, TargetFilter::Allies ) )
             break;
 
-         sendToInRangeSet( packet, true );
+         sendToInRangeSet( effectPacket, true );
          target.heal( calculatedHeal );
       }
       else
@@ -538,10 +537,10 @@ void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, u
 
          for( auto pHitActor : actorsCollided )
          {
-            effectPacket.data().targetId = target.getId();
-            effectPacket.data().effectTarget = pHitActor->getId();
+            effectPacket->data().targetId = target.getId();
+            effectPacket->data().effectTarget = pHitActor->getId();
 
-            sendToInRangeSet( packet, true );
+            sendToInRangeSet( effectPacket, true );
             pHitActor->getAsChara()->heal( calculatedHeal );
 
             // Debug
@@ -574,24 +573,23 @@ void Core::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEffect
    pEffect->applyStatus();
    m_statusEffectMap[nextSlot] = pEffect;
 
-   FFXIVPacketBasePtr packet = boost::make_shared< ZoneChannelPacket< FFXIVIpcAddStatusEffect > >( getId() );
-   auto statusEffectAdd = dynamic_cast< ZoneChannelPacket< FFXIVIpcAddStatusEffect >& >( *packet );
+   auto statusEffectAdd = makeZonePacket< FFXIVIpcAddStatusEffect >( getId() );
+  
+   statusEffectAdd->data().actor_id = pEffect->getTargetActorId();
+   statusEffectAdd->data().actor_id1 = pEffect->getSrcActorId(); 
+   statusEffectAdd->data().current_hp = getHp();
+   statusEffectAdd->data().current_mp = getMp();
+   statusEffectAdd->data().current_tp = getTp();
+   statusEffectAdd->data().duration = static_cast< float >( pEffect->getDuration() ) / 1000;
+   statusEffectAdd->data().effect_id = pEffect->getId();
+   statusEffectAdd->data().effect_index = nextSlot;
+   statusEffectAdd->data().max_hp = getMaxHp();
+   statusEffectAdd->data().max_mp = getMaxMp();
+   statusEffectAdd->data().max_something = 1;
+    //statusEffectAdd->data().unknown2 = 28;
+   statusEffectAdd->data().param = pEffect->getParam();
 
-   statusEffectAdd.data().actor_id = pEffect->getTargetActorId();
-   statusEffectAdd.data().actor_id1 = pEffect->getSrcActorId(); 
-   statusEffectAdd.data().current_hp = getHp();
-   statusEffectAdd.data().current_mp = getMp();
-   statusEffectAdd.data().current_tp = getTp();
-   statusEffectAdd.data().duration = static_cast< float >( pEffect->getDuration() ) / 1000;
-   statusEffectAdd.data().effect_id = pEffect->getId();
-   statusEffectAdd.data().effect_index = nextSlot;
-   statusEffectAdd.data().max_hp = getMaxHp();
-   statusEffectAdd.data().max_mp = getMaxMp();
-   statusEffectAdd.data().max_something = 1;
-    //statusEffectAdd.data().unknown2 = 28;
-   statusEffectAdd.data().param = pEffect->getParam();
-
-   sendToInRangeSet( packet, isPlayer() );
+   sendToInRangeSet( statusEffectAdd, isPlayer() );
 }
 
 /*! \param StatusEffectPtr to be applied to the actor */
@@ -671,7 +669,8 @@ void Core::Entity::Chara::sendStatusEffectUpdate()
 {
    uint64_t currentTimeMs = Util::getTimeMs();
 
-   auto statusEffectList = boost::make_shared< ZoneChannelPacket< FFXIVIpcStatusEffectList > >( getId() );
+
+   auto statusEffectList = makeZonePacket< FFXIVIpcStatusEffectList >( getId() );
    statusEffectList->data().classId = static_cast< uint8_t >( getClass() );
    statusEffectList->data().level = getLevel();
    statusEffectList->data().level1 = getLevel();

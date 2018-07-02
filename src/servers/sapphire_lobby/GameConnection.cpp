@@ -107,11 +107,10 @@ void Core::Network::GameConnection::OnError( const boost::system::error_code & e
 
 void Core::Network::GameConnection::sendError( uint64_t sequence, uint32_t errorcode, uint16_t messageId, uint32_t tmpId )
 {
-   GamePacketNew< FFXIVIpcLobbyError, ServerLobbyIpcType > errorPacket( tmpId );
-
-   errorPacket.data().seq = sequence;
-   errorPacket.data().error_id = errorcode;
-   errorPacket.data().message_id = messageId;
+   auto errorPacket = makeLobbyPacket< FFXIVIpcLobbyError >( tmpId );
+   errorPacket->data().seq = sequence;
+   errorPacket->data().error_id = errorcode;
+   errorPacket->data().message_id = messageId;
 
    Packets::LobbyPacketContainer pRP( m_encKey );
    pRP.addPacket( errorPacket );
@@ -126,20 +125,19 @@ void Core::Network::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet, ui
    g_log.info( "[" + std::to_string( m_pSession->getAccountID() ) + "] ReqCharList" );
    Packets::LobbyPacketContainer pRP( m_encKey );
 
-   GamePacketNew< FFXIVIpcServerList, ServerLobbyIpcType > serverListPacket( tmpId );
-   serverListPacket.data().seq = 1;
-   serverListPacket.data().offset = 0;
-   serverListPacket.data().numServers = 1;
-   serverListPacket.data().server[0].id = g_serverLobby.getConfig()->getValue<uint16_t>( "Lobby.WorldID", 1 );
-   serverListPacket.data().server[0].index = 0;
-   serverListPacket.data().final = 1;
-   strcpy( serverListPacket.data().server[0].name, g_serverLobby.getConfig()->getValue< std::string >( "Lobby.WorldName", "Sapphire" ).c_str() );
-
+   auto serverListPacket = makeLobbyPacket< FFXIVIpcServerList >( tmpId );
+   serverListPacket->data().seq = 1;
+   serverListPacket->data().offset = 0;
+   serverListPacket->data().numServers = 1;
+   serverListPacket->data().server[0].id = g_serverLobby.getConfig()->getValue<uint16_t>( "Lobby.WorldID", 1 );
+   serverListPacket->data().server[0].index = 0;
+   serverListPacket->data().final = 1;
+   strcpy( serverListPacket->data().server[0].name,
+           g_serverLobby.getConfig()->getValue< std::string >( "Lobby.WorldName", "Sapphire" ).c_str() );
    pRP.addPacket( serverListPacket );
 
-   GamePacketNew< FFXIVIpcRetainerList, ServerLobbyIpcType > retainerListPacket( tmpId );
-   retainerListPacket.data().padding[8] = 1;
-
+   auto retainerListPacket = makeLobbyPacket< FFXIVIpcRetainerList >( tmpId );
+   retainerListPacket->data().padding[8] = 1;
    pRP.addPacket( retainerListPacket );
 
    sendPacket( pRP );
@@ -150,11 +148,10 @@ void Core::Network::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet, ui
 
    for( uint8_t i = 0; i < 4; i++ )
    {
-      GamePacketNew< FFXIVIpcCharList, ServerLobbyIpcType > charListPacket( tmpId );
-
-      charListPacket.data().seq = sequence;
-      charListPacket.data().numInPacket = 2;
-      charListPacket.data().counter = i * 4;
+      auto charListPacket = makeLobbyPacket< FFXIVIpcCharList >( tmpId );
+      charListPacket->data().seq = sequence;
+      charListPacket->data().numInPacket = 2;
+      charListPacket->data().counter = i * 4;
 
       for( uint8_t j = 0; j < 2; j++ )
 
@@ -173,7 +170,7 @@ void Core::Network::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet, ui
             strcpy( details.nameChara, get< 0 >( charEntry ).c_str() );
             strcpy( details.nameServer, g_serverLobby.getConfig()->getValue< std::string >( "Lobby.WorldName", "Sapphire" ).c_str() );
 
-            charListPacket.data().charaDetails[j] = details;
+            charListPacket->data().charaDetails[j] = details;
 
             g_log.debug( "[" + std::to_string( charIndex ) + "] " + std::to_string( details.index ) + " - "
                          + get< 0 >( charEntry ) + " - " +
@@ -188,12 +185,12 @@ void Core::Network::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet, ui
       // TODO: Eventually move to account info storage
       if( i == 3 )
       {
-         charListPacket.data().entitledExpansion = 2;
-         charListPacket.data().maxCharOnWorld = 8;
-         charListPacket.data().unknown8 = 8;
-         charListPacket.data().veteranRank = 12;
-         charListPacket.data().counter = ( i * 4 ) + 1;
-         charListPacket.data().unknown4 = 128;
+         charListPacket->data().entitledExpansion = 2;
+         charListPacket->data().maxCharOnWorld = 8;
+         charListPacket->data().unknown8 = 8;
+         charListPacket->data().veteranRank = 12;
+         charListPacket->data().counter = ( i * 4 ) + 1;
+         charListPacket->data().unknown4 = 128;
       }
 
       Packets::LobbyPacketContainer pRP( m_encKey );
@@ -234,16 +231,14 @@ void Core::Network::GameConnection::enterWorld( FFXIVARR_PACKET_RAW& packet, uin
 
    Packets::LobbyPacketContainer pRP( m_encKey );
 
-   GamePacketNew< FFXIVIpcEnterWorld, ServerLobbyIpcType > enterWorldPacket( tmpId );
-
-   enterWorldPacket.data().contentId = lookupId;
-
-   enterWorldPacket.data().seq = sequence;
-   strcpy( enterWorldPacket.data().host, g_serverLobby.getConfig()->getValue< std::string >( "GlobalNetwork.ZoneHost" ).c_str() );
-   enterWorldPacket.data().port = g_serverLobby.getConfig()->getValue< uint16_t >( "GlobalNetwork.ZonePort" );
-   enterWorldPacket.data().charId = logInCharId;
-   memcpy( enterWorldPacket.data().sid, m_pSession->getSessionId(), 66 );
-
+   auto enterWorldPacket = makeLobbyPacket< FFXIVIpcEnterWorld >( tmpId );
+   enterWorldPacket->data().contentId = lookupId;
+   enterWorldPacket->data().seq = sequence;
+   strcpy( enterWorldPacket->data().host,
+           g_serverLobby.getConfig()->getValue< std::string >( "GlobalNetwork.ZoneHost" ).c_str() );
+   enterWorldPacket->data().port = g_serverLobby.getConfig()->getValue< uint16_t >( "GlobalNetwork.ZonePort" );
+   enterWorldPacket->data().charId = logInCharId;
+   memcpy( enterWorldPacket->data().sid, m_pSession->getSessionId(), 66 );
    pRP.addPacket( enterWorldPacket );
    sendPacket( pRP );
 }
@@ -265,13 +260,13 @@ bool Core::Network::GameConnection::sendServiceAccountList( FFXIVARR_PACKET_RAW&
    {
       g_log.Log( LoggingSeverity::info, "Found session linked to accountId: " + std::to_string( pSession->getAccountID() ) );
       m_pSession = pSession;
-      GamePacketNew< FFXIVIpcServiceIdInfo, ServerLobbyIpcType > serviceIdInfoPacket( tmpId );
-      sprintf( serviceIdInfoPacket.data().serviceAccount[0].name, "FINAL FANTASY XIV" );
-      serviceIdInfoPacket.data().numServiceAccounts = 1;
 
-      serviceIdInfoPacket.data().u1 = 3;
-      serviceIdInfoPacket.data().u2 = 0x99;
-      serviceIdInfoPacket.data().serviceAccount[0].id = 0x002E4A2B;
+      auto serviceIdInfoPacket = makeLobbyPacket< FFXIVIpcServiceIdInfo >( tmpId );
+      sprintf( serviceIdInfoPacket->data().serviceAccount[0].name, "FINAL FANTASY XIV" );
+      serviceIdInfoPacket->data().numServiceAccounts = 1;
+      serviceIdInfoPacket->data().u1 = 3;
+      serviceIdInfoPacket->data().u2 = 0x99;
+      serviceIdInfoPacket->data().serviceAccount[0].id = 0x002E4A2B;
 
       Packets::LobbyPacketContainer pRP( m_encKey );
       pRP.addPacket( serviceIdInfoPacket );
@@ -316,18 +311,17 @@ bool Core::Network::GameConnection::createOrModifyChar( FFXIVARR_PACKET_RAW& pac
          return true;
       }
 
-      GamePacketNew< FFXIVIpcCharCreate, ServerLobbyIpcType > charCreatePacket( tmpId );
-
-      charCreatePacket.data().content_id = newContentId;
-      strcpy( charCreatePacket.data().name, name.c_str() );
-      strcpy( charCreatePacket.data().world, g_serverLobby.getConfig()->getValue< std::string >( "Lobby.WorldName", "Sapphire" ).c_str() );
-      charCreatePacket.data().type = 1;
-      charCreatePacket.data().seq = sequence;
-      charCreatePacket.data().unknown = 1;
-      charCreatePacket.data().unknown_2 = 1;
-      charCreatePacket.data().unknown_7 = 1;
-      charCreatePacket.data().unknown_8 = 1;
-
+      auto charCreatePacket = makeLobbyPacket< FFXIVIpcCharCreate >( tmpId );
+      charCreatePacket->data().content_id = newContentId;
+      strcpy( charCreatePacket->data().name, name.c_str() );
+      strcpy( charCreatePacket->data().world,
+              g_serverLobby.getConfig()->getValue< std::string >( "Lobby.WorldName", "Sapphire" ).c_str() );
+      charCreatePacket->data().type = 1;
+      charCreatePacket->data().seq = sequence;
+      charCreatePacket->data().unknown = 1;
+      charCreatePacket->data().unknown_2 = 1;
+      charCreatePacket->data().unknown_7 = 1;
+      charCreatePacket->data().unknown_8 = 1;
       pRP.addPacket( charCreatePacket );
       sendPacket( pRP );
    }
@@ -340,18 +334,17 @@ bool Core::Network::GameConnection::createOrModifyChar( FFXIVARR_PACKET_RAW& pac
       {
          Packets::LobbyPacketContainer pRP( m_encKey );
 
-         GamePacketNew< FFXIVIpcCharCreate, ServerLobbyIpcType > charCreatePacket( tmpId );
-
-         charCreatePacket.data().content_id = newContentId;
-         strcpy( charCreatePacket.data().name, name.c_str() );
-         strcpy( charCreatePacket.data().world, g_serverLobby.getConfig()->getValue< std::string >( "Lobby.WorldName", "Sapphire" ).c_str() );
-         charCreatePacket.data().type = 2;
-         charCreatePacket.data().seq = sequence;
-         charCreatePacket.data().unknown = 1;
-         charCreatePacket.data().unknown_2 = 1;
-         charCreatePacket.data().unknown_7 = 1;
-         charCreatePacket.data().unknown_8 = 1;
-
+         auto charCreatePacket = makeLobbyPacket< FFXIVIpcCharCreate >( tmpId );
+         charCreatePacket->data().content_id = newContentId;
+         strcpy( charCreatePacket->data().name, name.c_str() );
+         strcpy( charCreatePacket->data().world,
+                 g_serverLobby.getConfig()->getValue< std::string >( "Lobby.WorldName", "Sapphire" ).c_str() );
+         charCreatePacket->data().type = 2;
+         charCreatePacket->data().seq = sequence;
+         charCreatePacket->data().unknown = 1;
+         charCreatePacket->data().unknown_2 = 1;
+         charCreatePacket->data().unknown_7 = 1;
+         charCreatePacket->data().unknown_8 = 1;
          pRP.addPacket( charCreatePacket );
          sendPacket( pRP );
       }
@@ -370,18 +363,17 @@ bool Core::Network::GameConnection::createOrModifyChar( FFXIVARR_PACKET_RAW& pac
       if( g_restConnector.deleteCharacter( ( char* )m_pSession->getSessionId(), name ) )
       {
 
-         GamePacketNew< FFXIVIpcCharCreate, ServerLobbyIpcType > charCreatePacket( tmpId );
-
-         //charCreatePacket.data().content_id = deletePlayer.getContentId();
-         charCreatePacket.data().content_id = 0;
-         strcpy( charCreatePacket.data().name, name.c_str() );
-         strcpy( charCreatePacket.data().world, g_serverLobby.getConfig()->getValue< std::string >( "Lobby.WorldName", "Sapphire" ).c_str() );
-         charCreatePacket.data().type = 4;
-         charCreatePacket.data().seq = sequence;
-         charCreatePacket.data().unknown = 1;
-         charCreatePacket.data().unknown_2 = 1;
-         charCreatePacket.data().unknown_7 = 1;
-         charCreatePacket.data().unknown_8 = 1;
+         auto charCreatePacket = makeLobbyPacket< FFXIVIpcCharCreate >( tmpId );
+         //charCreatePacket->data().content_id = deletePlayer.getContentId();
+         charCreatePacket->data().content_id = 0;
+         strcpy( charCreatePacket->data().name, name.c_str() );
+         strcpy( charCreatePacket->data().world, g_serverLobby.getConfig()->getValue< std::string >( "Lobby.WorldName", "Sapphire" ).c_str() );
+         charCreatePacket->data().type = 4;
+         charCreatePacket->data().seq = sequence;
+         charCreatePacket->data().unknown = 1;
+         charCreatePacket->data().unknown_2 = 1;
+         charCreatePacket->data().unknown_7 = 1;
+         charCreatePacket->data().unknown_8 = 1;
 
          Packets::LobbyPacketContainer pRP( m_encKey );
          pRP.addPacket( charCreatePacket );
@@ -454,14 +446,7 @@ void Core::Network::GameConnection::sendPackets( Packets::PacketContainer * pPac
    Send( sendBuffer );
 }
 
-void Core::Network::GameConnection::sendSinglePacket( Packets::GamePacket * pPacket )
-{
-   PacketContainer pRP = PacketContainer();
-   pRP.addPacket( *pPacket );
-   sendPackets( &pRP );
-}
-
-void Core::Network::GameConnection::sendSinglePacket( Packets::GamePacket & pPacket )
+void Core::Network::GameConnection::sendSinglePacket( FFXIVPacketBasePtr pPacket )
 {
    PacketContainer pRP = PacketContainer();
    pRP.addPacket( pPacket );
@@ -505,19 +490,14 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
             generateEncryptionKey( *reinterpret_cast< uint32_t* >( &inPacket.data[100] ), key_phrase );
             m_bEncryptionInitialized = true;
 
-            std::vector< uint8_t > samplePacket( 0x290 );
-            memset( &samplePacket[0], 0, 0x290 );
-
-            *reinterpret_cast< uint16_t* >( &samplePacket[0] ) = 0x290;
-            *reinterpret_cast< uint8_t* >( &samplePacket[0] + 0x0C ) = 0x0A;
-            *reinterpret_cast< uint32_t* >( &samplePacket[0] + 0x10 ) = 0xE0003C2A;
+            auto pe1 = boost::make_shared< FFXIVRawPacket >( 0x0A, 0x290, 0, 0 );
+            *reinterpret_cast< uint32_t* >(&pe1->data()[0]) = 0xE0003C2A;
 
             BlowFish blowfish;
             blowfish.initialize( m_encKey, 0x10 );
-            blowfish.Encode( &samplePacket[0] + 0x10, &samplePacket[0] + 0x10, 0x280 );
+            blowfish.Encode( &pe1->data()[0], &pe1->data()[0], 0x280 );
 
-            auto packet = GamePacket( reinterpret_cast< char* >( &samplePacket[0] ), static_cast< uint16_t >( samplePacket.size() ) );
-            sendSinglePacket( packet );
+            sendSinglePacket( pe1 );
             break;
          }
 
@@ -533,10 +513,10 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
             uint32_t id = *reinterpret_cast< uint32_t* >( &inPacket.data[0] );
             uint32_t timeStamp = *reinterpret_cast< uint32_t* >( &inPacket.data[4] );
 
-            GamePacket pPe( 0x00, 0x18, 0, 0, 0x08 );
-            pPe.setValAt< uint32_t >( 0x10, id );
-            pPe.setValAt< uint32_t >( 0x14, timeStamp );
-            sendSinglePacket( &pPe );
+            auto pe4 = boost::make_shared< FFXIVRawPacket >( 0x08, 0x18, 0, 0 );
+            *(unsigned int*)(&pe4->data()[0]) = id;
+            *(unsigned int*)(&pe4->data()[4]) = timeStamp;
+            sendSinglePacket( pe4 );
 
             break;
          }

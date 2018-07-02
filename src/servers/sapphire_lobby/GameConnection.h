@@ -65,15 +65,14 @@ public:
 
    void handleGamePacket( Packets::FFXIVARR_PACKET_RAW &pPacket );
 
-   void handlePacket( Packets::GamePacketPtr pPacket );
+   void handlePacket( Packets::FFXIVPacketBasePtr pPacket );
 
    void sendPackets( Packets::PacketContainer * pPacket );
 
    void sendPacket( Packets::LobbyPacketContainer& pLpc );
 
-   void sendSinglePacket( Packets::GamePacket * pPacket );
-   
-   void sendSinglePacket( Packets::GamePacket & pPacket );
+   void sendSinglePacket( Packets::FFXIVPacketBasePtr pPacket );
+
 
 };
 

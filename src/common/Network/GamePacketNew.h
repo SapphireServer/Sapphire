@@ -1,5 +1,5 @@
-#ifndef _GAMEPACKETNEW_H
-#define _GAMEPACKETNEW_H
+#ifndef _GAMEPACKET_NEW_H
+#define _GAMEPACKET_NEW_H
 
 #include <stdint.h>
 #include <iostream>
@@ -27,6 +27,10 @@ using ZoneChannelPacket = FFXIVIpcPacket< T, ServerZoneIpcType >;
 template< class T >
 using ChatChannelPacket = FFXIVIpcPacket< T, ServerChatIpcType >;
 
+template< class T >
+using LobbyChannelPacket = FFXIVIpcPacket< T, ServerLobbyIpcType >;
+
+
 template< class T, typename... Args >
 boost::shared_ptr< ZoneChannelPacket< T > > makeZonePacket( Args... args )
 {
@@ -37,6 +41,12 @@ template< class T, typename... Args >
 boost::shared_ptr< ChatChannelPacket< T > > makeChatPacket( Args... args )
 {
    return boost::make_shared< ChatChannelPacket< T > >( args... );
+}
+
+template< class T, typename... Args >
+boost::shared_ptr< LobbyChannelPacket< T > > makeLobbyPacket( Args... args )
+{
+   return boost::make_shared< LobbyChannelPacket< T > >( args... );
 }
 
 /**

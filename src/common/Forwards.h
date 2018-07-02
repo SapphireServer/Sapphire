@@ -1,5 +1,5 @@
-#ifndef _COMMON_FORWARDS_H
-#define _COMMON_FORWARDS_H
+#ifndef COMMON_FORWARDS_H
+#define COMMON_FORWARDS_H
 
 #include <boost/shared_ptr.hpp>
 

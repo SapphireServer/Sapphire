@@ -27,6 +27,7 @@ namespace Core
       namespace Packets
       {
          TYPE_FORWARD( GamePacket );
+         TYPE_FORWARD( FFXIVPacketBase );
       }
    }
 
