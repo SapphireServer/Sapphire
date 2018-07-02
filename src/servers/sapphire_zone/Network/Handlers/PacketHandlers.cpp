@@ -565,8 +565,8 @@ void Core::Network::GameConnection::logoutHandler( const Packets::GamePacket& in
 void Core::Network::GameConnection::tellHandler( const Packets::GamePacket& inPacket,
                                                  Entity::Player& player )
 {
-   std::string targetPcName = inPacket.getStringAt( 0x21 );
-   std::string msg = inPacket.getStringAt( 0x41 );
+   std::string targetPcName = inPacket.getStringAt( 0x24 );
+   std::string msg = inPacket.getStringAt( 0x44 );
 
    auto pZoneServer = g_fw.get< ServerZone >();
 
