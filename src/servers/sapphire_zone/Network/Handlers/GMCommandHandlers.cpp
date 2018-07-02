@@ -449,12 +449,13 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    case GmCommand::TeriInfo:
    {
       auto pCurrentZone = player.getCurrentZone();
-      player.sendNotice( "ZoneId: " + std::to_string( player.getZoneId() ) + "\nName: " +
-                         pCurrentZone->getName() + "\nInternalName: " +
-                         pCurrentZone->getInternalName() + "\nPopCount: " +
-                         std::to_string( pCurrentZone->getPopCount() ) +
-                         "\nCurrentWeather:" + std::to_string( static_cast< uint8_t >( pCurrentZone->getCurrentWeather() ) ) +
-                         "\nNextWeather:" + std::to_string( static_cast< uint8_t >( pCurrentZone->getNextWeather() ) ) );
+      player.sendNotice( "ZoneId: " + std::to_string( player.getZoneId() ) +
+                         "\nName: " + pCurrentZone->getName() +
+                         "\nInternalName: " + pCurrentZone->getInternalName() +
+                         "\nGuId: " + std::to_string( pCurrentZone->getGuId() ) +
+                         "\nPopCount: " + std::to_string( pCurrentZone->getPopCount() ) +
+                         "\nCurrentWeather: " + std::to_string( static_cast< uint8_t >( pCurrentZone->getCurrentWeather() ) ) +
+                         "\nNextWeather: " + std::to_string( static_cast< uint8_t >( pCurrentZone->getNextWeather() ) ) );
       break;
    }
    case GmCommand::Jump:
@@ -521,10 +522,8 @@ void Core::Network::GameConnection::gm2Handler( const Packets::GamePacket& inPac
       targetPlayer->resetHp();
       targetPlayer->resetMp();
       targetPlayer->setStatus( Entity::Chara::ActorStatus::Idle );
+      targetPlayer->sendZoneInPackets( 0x01, 0x01, 0, 113, true );
 
-      targetPlayer->sendToInRangeSet( ActorControlPacket143( player.getId(), ZoneIn, 0x01, 0x01, 0, 113 ), true );
-      targetPlayer->sendToInRangeSet( ActorControlPacket142( player.getId(), SetStatus,
-         static_cast< uint8_t >( Entity::Chara::ActorStatus::Idle ) ), true );
       player.sendNotice( "Raised  " + targetPlayer->getName() );
       break;
    }
