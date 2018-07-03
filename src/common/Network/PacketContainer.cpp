@@ -55,7 +55,7 @@ void Core::Network::Packets::PacketContainer::fillSendBuffer( std::vector< uint8
    {
       auto pPacket = (*it);
 
-      if( pPacket->getSegmentType() == SEGMENTTYPE_IPC )
+      if( m_segmentTargetOverride != 0 && pPacket->getSegmentType() == SEGMENTTYPE_IPC )
       {
          pPacket->setTargetActor( m_segmentTargetOverride );
       }
