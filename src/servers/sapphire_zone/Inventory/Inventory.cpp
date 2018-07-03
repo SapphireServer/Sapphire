@@ -134,7 +134,10 @@ Core::ItemPtr Core::Inventory::createItem( uint32_t catalogId, uint16_t quantity
    auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
    auto itemInfo = pExdData->get< Core::Data::Item >( catalogId );
 
-   uint8_t itemAmount = quantity;
+   if( !itemInfo )
+      return nullptr;
+
+   uint16_t itemAmount = quantity;
 
    if( itemInfo->stackSize == 1 )
       itemAmount = 1;
@@ -144,16 +147,14 @@ Core::ItemPtr Core::Inventory::createItem( uint32_t catalogId, uint16_t quantity
 
    uint8_t flags = 0;
 
-//   std::string itemName( itemInfo->name );
-
-   ItemPtr pItem( new Item( catalogId ) );
+   ItemPtr pItem = make_Item( getNextUId(),
+                              catalogId,
+                              itemInfo->modelMain,
+                              itemInfo->modelSub );
 
    pItem->setStackSize( itemAmount );
-   pItem->setUId( getNextUId() );
-   pItem->setModelIds( itemInfo->modelMain, itemInfo->modelSub );
-   pItem->setCategory( static_cast< ItemUICategory >( itemInfo->itemUICategory ) );
 
-  pDb->execute( "INSERT INTO charaglobalitem ( CharacterId, itemId, catalogId, stack, flags ) VALUES ( " +
+   pDb->execute( "INSERT INTO charaglobalitem ( CharacterId, itemId, catalogId, stack, flags ) VALUES ( " +
                       std::to_string( m_pOwner->getId() ) + ", " +
                       std::to_string( pItem->getUId() ) + ", " +
                       std::to_string( pItem->getId() ) + ", " +
@@ -161,7 +162,6 @@ Core::ItemPtr Core::Inventory::createItem( uint32_t catalogId, uint16_t quantity
                       std::to_string( flags ) + ");" );
 
    return pItem;
-
 }
 
 
@@ -741,13 +741,14 @@ Core::ItemPtr Core::Inventory::loadItem( uint64_t uId )
    try
    {
       auto itemInfo = pExdData->get< Core::Data::Item >( itemRes->getUInt( 1 ) );
-      bool isHq = itemRes->getUInt( 3 ) == 1 ? true : false;
-      ItemPtr pItem( new Item( uId,
+      bool isHq = itemRes->getUInt( 3 ) == 1;
+
+      ItemPtr pItem = make_Item( uId,
                                itemRes->getUInt( 1 ),
                                itemInfo->modelMain,
                                itemInfo->modelSub,
-                               static_cast< ItemUICategory >( itemInfo->itemUICategory ),
-                               isHq ) );
+                               isHq );
+
       pItem->setStackSize( itemRes->getUInt( 2 ) );
 
       return pItem;

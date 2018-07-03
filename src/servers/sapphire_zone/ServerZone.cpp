@@ -85,11 +85,11 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
          if( arg == "ip" )
          {
             // todo: ip addr in config
-            pConfig->setValue< std::string >( "GlobalNetwork.ZoneIP", val );
+            pConfig->setValue< std::string >( "ZoneNetwork.ListenIp", val );
          }
          else if( arg == "p" || arg == "port" )
          {
-            pConfig->setValue< std::string >( "GlobalNetwork.ZonePort", val );
+            pConfig->setValue< std::string >( "ZoneNetwork.ListenPort", val );
          }
          else if( arg == "exdpath" || arg == "datapath" )
          {
@@ -145,8 +145,8 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
    if( !loader.initDbs() )
       return false;
 
-   m_port = pConfig->getValue< uint16_t >( "GlobalNetwork.ZonePort", 54992 );
-   m_ip = pConfig->getValue< std::string >( "GlobalNetwork.ZoneIP", "0.0.0.0" );
+   m_port = pConfig->getValue< uint16_t >( "ZoneNetwork.ListenPort", 54992 );
+   m_ip = pConfig->getValue< std::string >( "ZoneNetwork.ListenIp", "0.0.0.0" );
 
    return true;
 }
@@ -184,8 +184,7 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
    std::vector< std::thread > thread_list;
    thread_list.emplace_back( std::thread( std::bind( &Network::Hive::Run, hive.get() ) ) );
 
-   pLog->info( "Server listening on port: " + std::to_string( m_port ) );
-   pLog->info( "Ready for connections..." );
+   pLog->info( "Zone server running on " + m_ip + ":" + std::to_string( m_port ) );
 
    mainLoop();
 

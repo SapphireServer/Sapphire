@@ -135,7 +135,7 @@ namespace Core
       TerritoryTypeDetailCache m_territoryTypeDetailCacheMap;
 
       /*! map holding actual instances of default territories */
-      TerritoryIdToInstanceMap m_territoryInstanceMap;
+      TerritoryIdToInstanceMap m_territoryIdToInstanceGuidMap;
 
       /*! map holding actual instances of InstanceContent */
       InstanceContentIdToInstanceMap m_instanceContentToInstanceMap;

@@ -132,7 +132,7 @@ bool Core::TerritoryMgr::createDefaultTerritories()
       InstanceIdToZonePtrMap instanceMap;
       instanceMap[guid] = pZone;
       m_instanceIdToZonePtrMap[guid] = pZone;
-      m_territoryInstanceMap[territoryId] = instanceMap;
+      m_territoryIdToInstanceGuidMap[territoryId] = instanceMap;
       m_zoneSet.insert( { pZone } );
 
    }
@@ -161,8 +161,9 @@ Core::ZonePtr Core::TerritoryMgr::createTerritoryInstance( uint32_t territoryTyp
    auto pZone = make_Zone( territoryTypeId, getNextInstanceId(), pTeri->name, pPlaceName->name );
    pZone->init();
 
-   m_territoryInstanceMap[pZone->getTerritoryId()][pZone->getGuId()] = pZone;
    m_instanceIdToZonePtrMap[pZone->getGuId()] = pZone;
+   m_territoryIdToInstanceGuidMap[pZone->getTerritoryId()][pZone->getGuId()] = pZone;
+   m_zoneSet.insert( { pZone } );
 
    return pZone;
 }
@@ -205,8 +206,8 @@ bool Core::TerritoryMgr::removeTerritoryInstance( uint32_t instanceId )
 
    m_instanceIdToZonePtrMap.erase( pZone->getGuId() );
 
-   if( m_instanceZoneSet.count( pZone ) )
-      m_instanceZoneSet.erase( pZone );
+   m_instanceZoneSet.erase( pZone );
+   m_zoneSet.erase( pZone );
 
    if( isInstanceContentTerritory( pZone->getTerritoryId() ) )
    {
@@ -214,7 +215,7 @@ bool Core::TerritoryMgr::removeTerritoryInstance( uint32_t instanceId )
       m_instanceContentToInstanceMap[instance->getInstanceContentId()].erase( pZone->getGuId() );
    }
    else
-      m_territoryInstanceMap[pZone->getTerritoryId()].erase( pZone->getGuId() );
+      m_territoryIdToInstanceGuidMap[pZone->getTerritoryId()].erase( pZone->getGuId() );
 
 
    return true;
@@ -275,8 +276,8 @@ Core::ZonePositionPtr Core::TerritoryMgr::getTerritoryPosition( uint32_t territo
 
 Core::ZonePtr Core::TerritoryMgr::getZoneByTerriId( uint32_t territoryId ) const
 {
-   auto zoneMap = m_territoryInstanceMap.find( territoryId );
-   if( zoneMap == m_territoryInstanceMap.end() )
+   auto zoneMap = m_territoryIdToInstanceGuidMap.find( territoryId );
+   if( zoneMap == m_territoryIdToInstanceGuidMap.end() )
       return nullptr;
 
    // TODO: actually select the proper one
