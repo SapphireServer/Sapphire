@@ -170,8 +170,8 @@ void Core::Network::GameConnection::eventHandlerEnterTerritory( const Packets::F
    auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
    Packets::FFXIVARR_PACKET_RAW copy = inPacket;
 
-   auto eventId = *reinterpret_cast< uint32_t* >( &copy.data[0x14] );
-   auto param1 = *reinterpret_cast< uint16_t* >( &copy.data[0x10] );
+   auto eventId = *reinterpret_cast< uint32_t* >( &copy.data[0x10] );
+   auto param1 = *reinterpret_cast< uint16_t* >( &copy.data[0x14] );
    auto param2 = *reinterpret_cast< uint16_t* >( &copy.data[0x16] );
 
    std::string eventName = "onEnterTerritory";
