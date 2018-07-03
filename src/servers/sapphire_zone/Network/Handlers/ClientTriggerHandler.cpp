@@ -39,7 +39,7 @@ using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 using namespace Core::Network::ActorControl;
 
-void Core::Network::GameConnection::clientActorControlHandler( const Packets::GamePacket& inPacket,
+void Core::Network::GameConnection::clientTriggerHandler( const Packets::GamePacket& inPacket,
                                                    Entity::Player& player )
 {
    auto pLog = g_fw.get< Logger >();
