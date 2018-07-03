@@ -9,7 +9,8 @@
 #include <string.h>
 #include <memory>
 
-Core::Network::Packets::PacketContainer::PacketContainer()
+Core::Network::Packets::PacketContainer::PacketContainer( uint32_t segmentTargetOverride ) :
+   m_segmentTargetOverride( segmentTargetOverride )
 {
    memset( &m_ipcHdr, 0, sizeof( FFXIVARR_PACKET_HEADER ) );
    m_ipcHdr.size = sizeof( FFXIVARR_PACKET_HEADER );
@@ -52,9 +53,16 @@ void Core::Network::Packets::PacketContainer::fillSendBuffer( std::vector< uint8
 
    for( ; it != m_entryList.end(); ++it )
    {
-      auto data = (*it)->getData();
-      memcpy( &tempBuffer[0] + sizeof( FFXIVARR_PACKET_HEADER ) + offset, &data[0], (*it)->getSize() );
-      offset += (*it)->getSize();
+      auto pPacket = (*it);
+
+      if( m_segmentTargetOverride != 0 && pPacket->getSegmentType() == SEGMENTTYPE_IPC )
+      {
+         pPacket->setTargetActor( m_segmentTargetOverride );
+      }
+
+      auto data = pPacket->getData();
+      memcpy( &tempBuffer[0] + sizeof( FFXIVARR_PACKET_HEADER ) + offset, &data[0], pPacket->getSize() );
+      offset += pPacket->getSize();
    }
 
    sendBuffer.assign( &tempBuffer[0], &tempBuffer[0] + m_ipcHdr.size );

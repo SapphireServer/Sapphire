@@ -17,7 +17,7 @@ typedef boost::shared_ptr< FFXIVPacketBase > FFXIVPacketBasePtr;
 class PacketContainer
 {
 public:
-   PacketContainer();
+   PacketContainer( uint32_t segmentTargetOverride = 0 );
    ~PacketContainer();
 
    void addPacket( FFXIVPacketBasePtr entry );
@@ -29,6 +29,9 @@ public:
    std::string toString();
 
    void fillSendBuffer( std::vector< uint8_t >& sendBuffer );
+
+private:
+   uint32_t m_segmentTargetOverride;
 
 };
 

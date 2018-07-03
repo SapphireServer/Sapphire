@@ -291,7 +291,7 @@ void Core::Network::GameConnection::processOutQueue()
    int32_t totalSize = 0;
 
    // create a new packet container
-   PacketContainer pRP = PacketContainer();
+   PacketContainer pRP = PacketContainer( m_pSession->getId() );
 
    // get next packet off the queue
    while( auto pPacket = m_outQueue.pop() )
