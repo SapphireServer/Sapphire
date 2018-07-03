@@ -6,7 +6,8 @@
 #include <boost/format.hpp>
 
 #include <chrono>
-
+#include <string.h>
+#include <memory>
 
 Core::Network::Packets::PacketContainer::PacketContainer()
 {

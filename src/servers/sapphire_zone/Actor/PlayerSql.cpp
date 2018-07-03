@@ -1,7 +1,6 @@
 #include <set>
 
 #include <Common.h>
-#include <Network/GamePacket.h>
 #include <Util/Util.h>
 #include <Util/UtilMath.h>
 #include <Logging/Logger.h>

@@ -1,6 +1,5 @@
 #include <Common.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
-#include <Network/GamePacket.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Network/PacketContainer.h>
 

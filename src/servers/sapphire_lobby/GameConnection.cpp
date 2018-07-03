@@ -4,7 +4,6 @@
 #include <Network/CommonNetwork.h>
 #include <Util/Util.h>
 #include <Logging/Logger.h>
-#include <Network/GamePacket.h>
 #include <Network/GamePacketNew.h>
 #include <Network/PacketDef/Lobby/ServerLobbyDef.h>
 #include <Network/GamePacketParser.h>
