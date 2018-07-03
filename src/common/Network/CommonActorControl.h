@@ -217,7 +217,7 @@ namespace Core {
             SetDutyActionRemaining = 0x5EB,
          };
 
-         enum ClientActorControlType
+         enum ClientTriggerType
          {
             ToggleSeathe = 0x01,
             ToggleAutoAttack = 0x02,

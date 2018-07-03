@@ -62,7 +62,7 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::GamePac
 
    switch( commandId )
    {
-       case ClientActorControlType::ToggleSeathe:  // Toggle sheathe
+       case ClientTriggerType::ToggleSeathe:  // Toggle sheathe
        {
           if ( param11 == 1 )
               player.setStance( Entity::Chara::Stance::Active );
@@ -76,7 +76,7 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::GamePac
 
           break;
        }
-       case ClientActorControlType::ToggleAutoAttack:  // Toggle auto-attack
+       case ClientTriggerType::ToggleAutoAttack:  // Toggle auto-attack
        {
           if ( param11 == 1 )
           {
@@ -90,51 +90,51 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::GamePac
 
           break;
        }
-       case ClientActorControlType::ChangeTarget: // Change target
+       case ClientTriggerType::ChangeTarget: // Change target
        {
 
           uint64_t targetId = inPacket.getValAt< uint64_t >( 0x24 );
           player.changeTarget( targetId );
           break;
        }
-       case ClientActorControlType::DismountReq:
+       case ClientTriggerType::DismountReq:
        {
           player.dismount();
           break;
        }
-       case ClientActorControlType::RemoveStatusEffect: // Remove status (clicking it off)
+       case ClientTriggerType::RemoveStatusEffect: // Remove status (clicking it off)
        {
           // todo: check if status can be removed by client from exd
           player.removeSingleStatusEffectById( static_cast< uint32_t >( param1 ) );
           break;
        }
-       case ClientActorControlType::CastCancel: // Cancel cast
+       case ClientTriggerType::CastCancel: // Cancel cast
        {
           if( player.getCurrentAction() )
               player.getCurrentAction()->setInterrupted();
           break;
        }
-       case ClientActorControlType::MarkPlayer: // Mark player
+       case ClientTriggerType::MarkPlayer: // Mark player
        {
           break;
        }
-       case ClientActorControlType::SetTitleReq: // Set player title
+       case ClientTriggerType::SetTitleReq: // Set player title
        {
           player.setTitle( static_cast< uint16_t >( param1 ) );
           break;
        }
-       case ClientActorControlType::TitleList: // Get title list
+       case ClientTriggerType::TitleList: // Get title list
        {
           player.sendTitleList();
           break;
        }
-       case ClientActorControlType::UpdatedSeenHowTos: // Update howtos seen
+       case ClientTriggerType::UpdatedSeenHowTos: // Update howtos seen
        {
           uint32_t howToId = param11;
           player.updateHowtosSeen( howToId );
           break;
        }
-       case ClientActorControlType::EmoteReq: // emote
+       case ClientTriggerType::EmoteReq: // emote
        {
           uint64_t targetId = player.getTargetId();
           uint32_t emoteId = inPacket.getValAt< uint32_t >( 0x24 );
@@ -142,23 +142,23 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::GamePac
           player.emote( emoteId, targetId );
           break;
        }
-       case ClientActorControlType::PersistantEmoteCancel: // cancel persistant emote
+       case ClientTriggerType::PersistantEmoteCancel: // cancel persistant emote
        {
           break;
        }
-       case ClientActorControlType::PoseChange: // change pose
+       case ClientTriggerType::PoseChange: // change pose
        {
           break;
        }
-       case ClientActorControlType::PoseReapply: // reapply pose
+       case ClientTriggerType::PoseReapply: // reapply pose
        {
           break;
        }
-       case ClientActorControlType::PoseCancel: // cancel pose
+       case ClientTriggerType::PoseCancel: // cancel pose
        {
           break;
        }
-       case ClientActorControlType::Return: // return dead / accept raise
+       case ClientTriggerType::Return: // return dead / accept raise
        {
           switch ( static_cast < ResurrectType >( param1 ) )
           {
@@ -174,38 +174,38 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::GamePac
           }
 
        }
-       case ClientActorControlType::FinishZoning: // Finish zoning
+       case ClientTriggerType::FinishZoning: // Finish zoning
        {
           player.finishZoning();
           break;
        }
 
-       case ClientActorControlType::Teleport: // Teleport
+       case ClientTriggerType::Teleport: // Teleport
        {
 
           player.teleportQuery( param11 );
           break;
        }
-       case ClientActorControlType::DyeItem: // Dye item
+       case ClientTriggerType::DyeItem: // Dye item
        {
           break;
        }
-       case ClientActorControlType::DirectorInitFinish: // Director init finish
+       case ClientTriggerType::DirectorInitFinish: // Director init finish
        {
           player.getCurrentZone()->onInitDirector( player );
           break;
        }
-       case ClientActorControlType::SomeDirectorEvent: // Director init finish
+       case ClientTriggerType::SomeDirectorEvent: // Director init finish
        {
           player.getCurrentZone()->onSomeDirectorEvent( player );
           break;
        }
-       case ClientActorControlType::EnterTerritoryEventFinished:// this may still be something else. I think i have seen it elsewhere
+       case ClientTriggerType::EnterTerritoryEventFinished:// this may still be something else. I think i have seen it elsewhere
        {
           player.setOnEnterEventDone( true );
           break;
        }
-       case ClientActorControlType::RequestInstanceLeave:
+       case ClientTriggerType::RequestInstanceLeave:
        {
           // todo: apply cf penalty if applicable, make sure player isnt in combat
           player.exitInstance();
