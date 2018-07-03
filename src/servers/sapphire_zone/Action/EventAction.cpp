@@ -1,6 +1,7 @@
 #include <Util/Util.h>
 #include <Logging/Logger.h>
 #include <Exd/ExdDataGenerated.h>
+#include <Network/CommonActorControl.h>
 
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
@@ -16,6 +17,7 @@ using namespace Core::Common;
 using namespace Core::Network;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
+using namespace Core::Network::ActorControl;
 
 Core::Action::EventAction::EventAction()
 {
@@ -50,7 +52,7 @@ void Core::Action::EventAction::onStart()
 
    m_startTime = Util::getTimeMs();
 
-   auto control = ActorControlPacket142( m_pSource->getId(), Common::ActorControlType::CastStart,
+   auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastStart,
                                          1, m_id, 0x4000004E );
 
    if( m_pSource->isPlayer() )
@@ -77,7 +79,7 @@ void Core::Action::EventAction::onFinish()
       if( m_onActionFinishClb )
          m_onActionFinishClb( *m_pSource->getAsPlayer(), m_eventId, m_additional );
 
-      auto control = ActorControlPacket142( m_pSource->getId(), Common::ActorControlType::CastStart, 0, m_id );
+      auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastStart, 0, m_id );
       
       if( !pEvent->hasPlayedScene() )
          m_pSource->getAsPlayer()->eventFinish( m_eventId, 1 );
