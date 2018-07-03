@@ -290,20 +290,20 @@ void Core::Entity::Actor::sendToInRangeSet( Network::Packets::FFXIVPacketBasePtr
 
       // it might be that the player DC'd in which case the session would be invalid
       if( pSession )
-         pSession->getZoneConnection()->queueOutPacket( std::move( pPacket ) );
+         pSession->getZoneConnection()->queueOutPacket( pPacket );
    }
 
    if( m_inRangePlayers.empty() )
       return;
 
+   pPacket->setSourceActor( m_id );
+
    for( const auto &pCurAct : m_inRangePlayers )
    {
       assert( pCurAct );
-      pPacket->setSourceActor( m_id );
-      pPacket->setTargetActor( pCurAct->getId() );
       // it might be that the player DC'd in which case the session would be invalid
       // TODO: copy packet to a new unique_ptr then move ownership
-      //pCurAct->queuePacket( pPacket );
+      pCurAct->queuePacket( pPacket );
    }
 }
 

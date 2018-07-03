@@ -131,6 +131,19 @@ struct FFXIVARR_PACKET_RAW
 };
 
 /**
+ * Indicates the type of the segment
+ * IPC type will contain an additional header: FFXIVARR_PACKET_SEGMENT_HEADER + FFXIVARR_IPC_HEADER + data
+ * The remaining types don't contain an additonal header, FFXIVARR_PACKET_SEGMENT_HEADER + data
+ */
+enum FFXIVARR_SEGMENT_TYPE
+{
+   SEGMENTTYPE_IPC = 3,
+   SEGMENTTYPE_RESPONSE = 7,
+   SEGMENTTYPE_KEEPALIVE = 8,
+   SEGMENTTYPE_ENCRYPTIONHANDSHAKE = 9,
+};
+
+/**
 * Structural representation of the common header for IPC packet segments.
 * NOTE: This is packet segment type 3.
 *
