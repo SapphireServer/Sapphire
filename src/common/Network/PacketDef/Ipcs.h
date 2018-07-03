@@ -227,7 +227,7 @@ namespace Packets {
       ReqCountdownCancel       = 0x012D, // updated 4.2
 
       ZoneLineHandler          = 0x013C, // updated 4.3
-      ClientActorControl            = 0x013D, // updated 4.3
+      ClientTrigger            = 0x013D, // updated 4.3
       DiscoveryHandler         = 0x013E, // updated 4.3
 
       SkillHandler             = 0x0140, // updated 4.3

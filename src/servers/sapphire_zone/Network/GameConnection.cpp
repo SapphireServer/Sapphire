@@ -66,7 +66,7 @@ Core::Network::GameConnection::GameConnection( Core::Network::HivePtr pHive,
    setZoneHandler( ClientZoneIpcType::FcInfoReqHandler,     "FcInfoReqHandler",         &GameConnection::fcInfoReqHandler );
 
    setZoneHandler( ClientZoneIpcType::ZoneLineHandler,      "ZoneLineHandler",          &GameConnection::zoneLineHandler );
-   setZoneHandler( ClientZoneIpcType::ClientActorControl,   "ClientActorControl",       &GameConnection::clientTriggerHandler );
+   setZoneHandler( ClientZoneIpcType::ClientTrigger,        "ClientTrigger",            &GameConnection::clientTriggerHandler );
 
    setZoneHandler( ClientZoneIpcType::DiscoveryHandler,     "DiscoveryHandler",         &GameConnection::discoveryHandler );
 
