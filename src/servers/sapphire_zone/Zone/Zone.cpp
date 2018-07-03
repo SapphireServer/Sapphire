@@ -550,7 +550,6 @@ void Core::Zone::updateActorPosition( Entity::Actor &actor )
       if( pOldCell )
       {
          auto pLog = g_fw.get< Logger >();
-         pLog->debug( std::string( __FUNCTION__ ) + " -> removeActor() ...moving cell..." );
          pOldCell->removeActor( actor.shared_from_this() );
       }
 
