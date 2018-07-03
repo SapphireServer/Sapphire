@@ -95,12 +95,11 @@ bool loadSettings( int32_t argc, char* argv[] )
 
          if( arg == "ip" )
          {
-            // todo: ip addr in config
-            m_pConfig->setValue< std::string >( "GlobalNetwork.RestHost", val );
+            m_pConfig->setValue< std::string >( "RestNetwork.ListenIp", val );
          }
          else if( arg == "p" || arg == "port" )
          {
-            m_pConfig->setValue< std::string >( "GlobalNetwork.RestPort", val );
+            m_pConfig->setValue< std::string >( "RestNetwork.ListenPort", val );
          }
          else if( arg == "exdpath" || arg == "datapath" )
          {
@@ -164,7 +163,8 @@ bool loadSettings( int32_t argc, char* argv[] )
    if( !loader.initDbs() )
       return false;
 
-   server.config.port = static_cast< uint16_t >( std::stoul( m_pConfig->getValue< std::string >( "GlobalNetwork.RestPort", "80" ) ) );
+   server.config.port = static_cast< uint16_t >( std::stoul( m_pConfig->getValue< std::string >( "RestNetwork.ListenPort", "80" ) ) );
+   server.config.address = m_pConfig->getValue< std::string >( "RestNetwork.ListenIp", "0.0.0.0" );
 
    g_log.info( "Database: Connected to " + info.host + ":" + std::to_string( info.port ) );
 
@@ -756,9 +756,6 @@ int main( int argc, char* argv[] )
    if( !loadSettings( argc, argv ) )
       throw std::exception();
 
-   server.config.port = stoi( m_pConfig->getValue< std::string >( "GlobalNetwork.RestPort", "80" ) );
-   g_log.info( "Starting API server at port " + m_pConfig->getValue< std::string >( "GlobalNetwork.RestPort", "80" ) + "..." );
-
    server.resource["^/ZoneName/([0-9]+)$"]["GET"] = &getZoneName; 
    server.resource["^/sapphire-api/lobby/createAccount"]["POST"] = &createAccount;
    server.resource["^/sapphire-api/lobby/login"]["POST"] = &login;
@@ -780,6 +777,8 @@ int main( int argc, char* argv[] )
       //Start server
       server.start();
    } );
+
+   g_log.info( "API server running on " + m_pConfig->getValue< std::string >( "RestNetwork.ListenIp", "0.0.0.0" ) + ":" + m_pConfig->getValue< std::string >( "RestNetwork.ListenPort", "80" ) );
 
    //Wait for server to start so that the client can connect
    this_thread::sleep_for( chrono::seconds( 1 ) );
