@@ -9,7 +9,6 @@
 #include <Network/Acceptor.h>
 #include <Network/PacketContainer.h>
 #include <Network/GamePacketParser.h>
-#include <Network/GamePacket.h>
 
 #include "Zone/Zone.h"
 

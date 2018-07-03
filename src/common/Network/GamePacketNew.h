@@ -4,12 +4,15 @@
 #include <stdint.h>
 #include <iostream>
 
-#include "GamePacket.h"
-
 #include <sstream>
 #include <time.h>
 
 #include <boost/make_shared.hpp>
+#include <string.h>
+#include <memory>
+
+#include "CommonNetwork.h"
+#include "PacketDef/Ipcs.h"
 
 namespace Core {
 namespace Network {

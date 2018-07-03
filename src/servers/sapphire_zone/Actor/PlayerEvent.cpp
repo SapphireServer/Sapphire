@@ -1,5 +1,4 @@
 #include <Common.h>
-#include <Network/GamePacket.h>
 #include <Logging/Logger.h>
 #include <Network/PacketContainer.h>
 #include <Config/ConfigMgr.h>

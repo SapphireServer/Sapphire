@@ -1,5 +1,4 @@
 #include <Common.h>
-#include <Network/GamePacket.h>
 #include <Logging/Logger.h>
 
 #include "Zone/Zone.h"

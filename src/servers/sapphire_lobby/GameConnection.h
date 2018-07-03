@@ -5,7 +5,6 @@
 #include <Network/Acceptor.h>
 #include <Network/CommonNetwork.h>
 
-#include <Network/GamePacket.h>
 #include <Network/PacketContainer.h>
 #include <Util/LockedQueue.h>
 

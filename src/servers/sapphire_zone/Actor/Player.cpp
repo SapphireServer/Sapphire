@@ -3,7 +3,6 @@
 #include <Common.h>
 #include <Util/Util.h>
 #include <Util/UtilMath.h>
-#include <Network/GamePacket.h>
 #include <Logging/Logger.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Network/PacketContainer.h>

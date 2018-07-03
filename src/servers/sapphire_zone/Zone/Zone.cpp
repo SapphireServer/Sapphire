@@ -5,7 +5,6 @@
 #include <Logging/Logger.h>
 #include <Util/Util.h>
 #include <Util/UtilMath.h>
-#include <Network/GamePacket.h>
 #include <Network/GamePacketNew.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Network/CommonNetwork.h>
