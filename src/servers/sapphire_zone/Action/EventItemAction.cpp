@@ -3,6 +3,7 @@
 #include <Util/Util.h>
 #include <Util/UtilMath.h>
 #include <Logging/Logger.h>
+#include <Network/CommonActorControl.h>
 
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
@@ -18,6 +19,7 @@ using namespace Core::Common;
 using namespace Core::Network;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
+using namespace Core::Network::ActorControl;
 
 Core::Action::EventItemAction::EventItemAction()
 {

@@ -15,6 +15,7 @@
 #include "ItemContainer.h"
 #include "Item.h"
 #include "Framework.h"
+#include <Network/CommonActorControl.h>
 
 extern Core::Framework g_fw;
 
@@ -22,6 +23,7 @@ using namespace Core::Common;
 using namespace Core::Network;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
+using namespace Core::Network::ActorControl;
 
 Core::Inventory::Inventory( Core::Entity::Player* pOwner )
 {

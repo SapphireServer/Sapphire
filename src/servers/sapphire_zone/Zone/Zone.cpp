@@ -10,6 +10,7 @@
 #include <Network/CommonNetwork.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Network/PacketContainer.h>
+#include <Network/CommonActorControl.h>
 #include <Database/DatabaseDef.h>
 #include <Network/PacketWrappers/ActorControlPacket143.h>
 
@@ -38,9 +39,9 @@
 using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
+using namespace Core::Network::ActorControl;
 
 extern Core::Framework g_fw;
-
 
 /**
 * \brief

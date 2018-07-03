@@ -5,6 +5,7 @@
 #include <Network/GamePacketNew.h>
 #include <Logging/Logger.h>
 #include <Network/PacketContainer.h>
+#include <Network/CommonActorControl.h>
 
 #include <unordered_map>
 
@@ -36,6 +37,7 @@ extern Core::Framework g_fw;
 using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
+using namespace Core::Network::ActorControl;
 
 enum GmCommand
 {

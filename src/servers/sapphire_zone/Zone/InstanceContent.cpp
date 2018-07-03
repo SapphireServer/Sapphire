@@ -4,6 +4,7 @@
 #include <Util/Util.h>
 #include <Util/UtilMath.h>
 #include <Exd/ExdDataGenerated.h>
+#include <Network/CommonActorControl.h>
 
 #include "Event/Director.h"
 #include "Event/EventDefs.h"
@@ -26,6 +27,7 @@ extern Core::Framework g_fw;
 using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
+using namespace Core::Network::ActorControl;
 
 Core::InstanceContent::InstanceContent( boost::shared_ptr< Core::Data::InstanceContent > pInstanceConfiguration,
                                         uint32_t guId,
