@@ -5,6 +5,7 @@
 #include <Exd/ExdDataGenerated.h>
 #include <Network/GamePacketNew.h>
 #include <Network/PacketContainer.h>
+#include <Network/CommonActorControl.h>
 #include <Logging/Logger.h>
 
 #include "Network/GameConnection.h"
@@ -32,6 +33,7 @@ extern Core::Framework g_fw;
 using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
+using namespace Core::Network::ActorControl;
 
 void Core::Network::GameConnection::skillHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                   Entity::Player& player )

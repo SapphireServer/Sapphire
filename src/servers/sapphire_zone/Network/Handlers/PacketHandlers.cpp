@@ -3,6 +3,7 @@
 #include <Common.h>
 #include <Network/CommonNetwork.h>
 #include <Network/GamePacketNew.h>
+#include <Network/CommonActorControl.h>
 #include <Logging/Logger.h>
 #include <Network/PacketContainer.h>
 #include <Network/PacketDef/Chat/ServerChatDef.h>
@@ -44,6 +45,7 @@ extern Core::Framework g_fw;
 using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
+using namespace Core::Network::ActorControl;
 
 void Core::Network::GameConnection::fcInfoReqHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                       Entity::Player& player )
@@ -575,8 +577,8 @@ void Core::Network::GameConnection::tellHandler( const Core::Network::Packets::F
 {
    Packets::FFXIVARR_PACKET_RAW copy = inPacket;
 
-   std::string targetPcName( reinterpret_cast< char* >( &copy.data[0x11] ) );
-   std::string msg( reinterpret_cast< char* >( &copy.data[0x31] ) );
+   std::string targetPcName( reinterpret_cast< char* >( &copy.data[0x14] ) );
+   std::string msg( reinterpret_cast< char* >( &copy.data[0x34] ) );
 
    auto pZoneServer = g_fw.get< ServerZone >();
 

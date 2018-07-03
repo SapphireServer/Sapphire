@@ -10,11 +10,13 @@
 #include <Logging/Logger.h>
 #include <Network/GamePacketNew.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
+#include <Network/CommonActorControl.h>
 #include <Util/UtilMath.h>
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
+using namespace Core::Network::ActorControl;
 
 #include "Framework.h"
 extern Core::Framework g_fw;

@@ -1,5 +1,6 @@
 #include <Common.h>
 #include <Logging/Logger.h>
+#include <Network/CommonActorControl.h>
 
 #include "Zone/Zone.h"
 
@@ -17,6 +18,7 @@ extern Core::Framework g_framework;
 using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
+using namespace Core::Network::ActorControl;
 
 Core::InventoryPtr Core::Entity::Player::getInventory() const
 {

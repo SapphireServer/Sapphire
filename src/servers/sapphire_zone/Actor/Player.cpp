@@ -6,6 +6,7 @@
 #include <Logging/Logger.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Network/PacketContainer.h>
+#include <Network/CommonActorControl.h>
 
 #include "Session.h"
 #include "Player.h"
@@ -44,6 +45,7 @@ extern Core::Framework g_fw;
 using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
+using namespace Core::Network::ActorControl;
 
 // player constructor
 Core::Entity::Player::Player() :
