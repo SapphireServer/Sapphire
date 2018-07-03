@@ -1,6 +1,5 @@
-#include <Script/NativeScriptApi.h>
 #include <Actor/Player.h>
-#include "Event/EventHelper.h"
+#include <Event/EventHelper.h>
 #include <ScriptObject.h>
 
 // Quest Script: SubFst009_00034
@@ -44,7 +43,7 @@ class SubFst009 : public EventScript
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
-      auto actor = Event::mapEventActorToRealActor( actorId );
+      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
       if( actor == Actor0 )
       {
@@ -65,7 +64,7 @@ class SubFst009 : public EventScript
          {
             if( result.param2 == 1 )
             {
-               player.updateQuest( getId(), 255 );
+               player.updateQuest( getId(), SeqFinish );
                player.setQuestUI8BH( getId(), 1 );
             }
          } );
