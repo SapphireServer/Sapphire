@@ -6,6 +6,7 @@
 #include <Logging/Logger.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Network/PacketContainer.h>
+#include <Network/CommonActorControl.h>
 
 #include "Zone/Zone.h"
 #include "Zone/ZonePosition.h"
@@ -17,11 +18,6 @@
 #include "Network/PacketWrappers/ChatPacket.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/ActorControlPacket142.h"
-#include "Network/PacketWrappers/ActorControlPacket143.h"
-#include "Network/PacketWrappers/ActorControlPacket144.h"
-#include "Network/PacketWrappers/EventStartPacket.h"
-#include "Network/PacketWrappers/EventFinishPacket.h"
-#include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
 
 #include "DebugCommand/DebugCommandHandler.h"
 
@@ -34,81 +30,16 @@
 #include "ServerZone.h"
 #include "Forwards.h"
 #include "Framework.h"
+#include <Network/PacketDef/Lobby/ServerLobbyDef.h>
 
 extern Core::Framework g_fw;
 
 using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
+using namespace Core::Network::ActorControl;
 
-enum ClientTrigger
-{
-   ToggleSeathe = 0x01,
-   ToggleAutoAttack = 0x02,
-   ChangeTarget = 0x03,
-
-   Dismount = 0x65,
-
-   RemoveStatusEffect = 0x68,
-   CastCancel = 0x69,
-
-   Return = 0xC8, // return dead / accept raise
-   FinishZoning = 0xC9,
-   Teleport = 0xCA,
-
-   MarkPlayer = 0x12D, // Mark player, visible to party only
-   SetTitle = 0x12E,
-   TitleList = 0x12F,
-
-   UpdatedSeenHowTos = 0x133,
-   AllotAttribute = 0x135,
-
-   ClearWaymarks = 0x13A,
-
-   HuntingLogDetails = 0x194,
-
-   Timers = 0x1AB,
-
-   DyeItem = 0x1B5,
-
-   RequestChocoboInventory = 0x1C4,
-
-   Emote = 0x1F4,
-   PersistantEmoteCancel = 0x1F7,
-   PoseChange = 0x1F9,
-   PoseReapply = 0x1FA,
-   PoseCancel = 0x1FB,
-
-   AchievementCrit = 0x202,
-   AchievementComp = 0x203,
-   AchievementCatChat = 0x206,
-
-
-   DirectorInitFinish = 0x321,
-
-   SomeDirectorEvent = 0x328, // unsure what exactly triggers it, starts director when returning to instance though
-
-   EnterTerritoryEventFinished = 0x330,
-   RequestInstanceLeave = 0x333, // df menu button
-
-   AchievementCritReq = 0x3E8,
-   AchievementList = 0x3E9,
-
-   CompanionAction = 0x6A4,
-   CompanionSetBarding = 0x6A5,
-   CompanionActionUnlock = 0x6A6,
-
-   OpenPerformInstrumentUI = 0x71C,
-
-   StartReplay = 0x7BC,
-   EndReplay = 0x7BD, // request for restoring the original player state (actor, buff, gauge, etc..)
-
-   OpenDuelUI = 0x898, // Open a duel ui
-   DuelRequestResult = 0x899, // either accept/reject
-
-};
-
-void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& inPacket,
+void Core::Network::GameConnection::clientTriggerHandler( const Packets::GamePacket& inPacket,
                                                    Entity::Player& player )
 {
    auto pLog = g_fw.get< Logger >();
@@ -131,7 +62,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
 
    switch( commandId )
    {
-       case ClientTrigger::ToggleSeathe:  // Toggle sheathe
+       case ClientTriggerType::ToggleSeathe:  // Toggle sheathe
        {
           if ( param11 == 1 )
               player.setStance( Entity::Chara::Stance::Active );
@@ -145,7 +76,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
 
           break;
        }
-       case ClientTrigger::ToggleAutoAttack:  // Toggle auto-attack
+       case ClientTriggerType::ToggleAutoAttack:  // Toggle auto-attack
        {
           if ( param11 == 1 )
           {
@@ -159,51 +90,51 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
 
           break;
        }
-       case ClientTrigger::ChangeTarget: // Change target
+       case ClientTriggerType::ChangeTarget: // Change target
        {
 
           uint64_t targetId = inPacket.getValAt< uint64_t >( 0x24 );
           player.changeTarget( targetId );
           break;
        }
-       case ClientTrigger::Dismount:
+       case ClientTriggerType::DismountReq:
        {
           player.dismount();
           break;
        }
-       case ClientTrigger::RemoveStatusEffect: // Remove status (clicking it off)
+       case ClientTriggerType::RemoveStatusEffect: // Remove status (clicking it off)
        {
           // todo: check if status can be removed by client from exd
           player.removeSingleStatusEffectById( static_cast< uint32_t >( param1 ) );
           break;
        }
-       case ClientTrigger::CastCancel: // Cancel cast
+       case ClientTriggerType::CastCancel: // Cancel cast
        {
           if( player.getCurrentAction() )
               player.getCurrentAction()->setInterrupted();
           break;
        }
-       case ClientTrigger::MarkPlayer: // Mark player
+       case ClientTriggerType::MarkPlayer: // Mark player
        {
           break;
        }
-       case ClientTrigger::SetTitle: // Set player title
+       case ClientTriggerType::SetTitleReq: // Set player title
        {
           player.setTitle( static_cast< uint16_t >( param1 ) );
           break;
        }
-       case ClientTrigger::TitleList: // Get title list
+       case ClientTriggerType::TitleList: // Get title list
        {
           player.sendTitleList();
           break;
        }
-       case ClientTrigger::UpdatedSeenHowTos: // Update howtos seen
+       case ClientTriggerType::UpdatedSeenHowTos: // Update howtos seen
        {
           uint32_t howToId = param11;
           player.updateHowtosSeen( howToId );
           break;
        }
-       case ClientTrigger::Emote: // emote
+       case ClientTriggerType::EmoteReq: // emote
        {
           uint64_t targetId = player.getTargetId();
           uint32_t emoteId = inPacket.getValAt< uint32_t >( 0x24 );
@@ -211,23 +142,23 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
           player.emote( emoteId, targetId );
           break;
        }
-       case ClientTrigger::PersistantEmoteCancel: // cancel persistant emote
+       case ClientTriggerType::PersistantEmoteCancel: // cancel persistant emote
        {
           break;
        }
-       case ClientTrigger::PoseChange: // change pose
+       case ClientTriggerType::PoseChange: // change pose
        {
           break;
        }
-       case ClientTrigger::PoseReapply: // reapply pose
+       case ClientTriggerType::PoseReapply: // reapply pose
        {
           break;
        }
-       case ClientTrigger::PoseCancel: // cancel pose
+       case ClientTriggerType::PoseCancel: // cancel pose
        {
           break;
        }
-       case ClientTrigger::Return: // return dead / accept raise
+       case ClientTriggerType::Return: // return dead / accept raise
        {
           switch ( static_cast < ResurrectType >( param1 ) )
           {
@@ -243,38 +174,38 @@ void Core::Network::GameConnection::actionHandler( const Packets::GamePacket& in
           }
 
        }
-       case ClientTrigger::FinishZoning: // Finish zoning
+       case ClientTriggerType::FinishZoning: // Finish zoning
        {
           player.finishZoning();
           break;
        }
 
-       case ClientTrigger::Teleport: // Teleport
+       case ClientTriggerType::Teleport: // Teleport
        {
 
           player.teleportQuery( param11 );
           break;
        }
-       case ClientTrigger::DyeItem: // Dye item
+       case ClientTriggerType::DyeItem: // Dye item
        {
           break;
        }
-       case ClientTrigger::DirectorInitFinish: // Director init finish
+       case ClientTriggerType::DirectorInitFinish: // Director init finish
        {
           player.getCurrentZone()->onInitDirector( player );
           break;
        }
-       case ClientTrigger::SomeDirectorEvent: // Director init finish
+       case ClientTriggerType::SomeDirectorEvent: // Director init finish
        {
           player.getCurrentZone()->onSomeDirectorEvent( player );
           break;
        }
-       case ClientTrigger::EnterTerritoryEventFinished:// this may still be something else. I think i have seen it elsewhere
+       case ClientTriggerType::EnterTerritoryEventFinished:// this may still be something else. I think i have seen it elsewhere
        {
           player.setOnEnterEventDone( true );
           break;
        }
-       case ClientTrigger::RequestInstanceLeave:
+       case ClientTriggerType::RequestInstanceLeave:
        {
           // todo: apply cf penalty if applicable, make sure player isnt in combat
           player.exitInstance();

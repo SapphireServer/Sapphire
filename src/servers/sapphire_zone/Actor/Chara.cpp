@@ -2,6 +2,7 @@
 #include <Util/UtilMath.h>
 #include <Network/PacketContainer.h>
 #include <Exd/ExdDataGenerated.h>
+#include <Network/CommonActorControl.h>
 
 #include "Forwards.h"
 #include "Action/Action.h"
@@ -29,6 +30,7 @@ extern Core::Framework g_fw;
 using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
+using namespace Core::Network::ActorControl;
 
 Core::Entity::Chara::Chara( ObjKind type ) :
    Actor( type )

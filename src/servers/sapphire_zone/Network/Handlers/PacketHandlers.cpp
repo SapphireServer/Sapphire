@@ -3,6 +3,7 @@
 #include <Common.h>
 #include <Network/CommonNetwork.h>
 #include <Network/GamePacketNew.h>
+#include <Network/CommonActorControl.h>
 #include <Logging/Logger.h>
 #include <Network/PacketContainer.h>
 #include <Network/PacketDef/Chat/ServerChatDef.h>
@@ -44,6 +45,7 @@ extern Core::Framework g_fw;
 using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
+using namespace Core::Network::ActorControl;
 
 void Core::Network::GameConnection::fcInfoReqHandler( const Packets::GamePacket& inPacket,
                                                       Entity::Player& player )
