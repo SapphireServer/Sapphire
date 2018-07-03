@@ -1,6 +1,5 @@
-#include <Script/NativeScriptApi.h>
 #include <Actor/Player.h>
-#include "Event/EventHelper.h"
+#include <Event/EventHelper.h>
 #include <ScriptObject.h>
 
 // Quest Script: SubFst015_00042
@@ -46,88 +45,76 @@ class SubFst015 : public EventScript
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
-      auto actor = Event::mapEventActorToRealActor( actorId );
+      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
-      if( actor == SubFst015::Actor0 && !player.hasQuest( getId() ) )
+      if( actor == Actor0 && !player.hasQuest( getId() ) )
       {
          Scene00000( player );
       }
-      else if( actor == SubFst015::Actor0 )
+      else if( actor == Actor0 )
       {
          Scene00007( player );
       }
       //EOBJECTS CHECK
-      else if( actor == SubFst015::Eobject0 )
+      else if( actor == Eobject0 )
       {
          player.eventActionStart( getId(), 0x01,
             [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-         {
-            Scene00001( player );
-         },
-            [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-         {},
-            eventId );
+            {
+               Scene00001( player );
+            },
+            nullptr, eventId );
       }
-      else if( actor == SubFst015::Eobject1 )
+      else if( actor == Eobject1 )
       {
          player.eventActionStart( getId(), 0x01,
             [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-         {
-            Scene00002( player );
-         },
-            [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-         {},
-            eventId );
+            {
+               Scene00002( player );
+            },
+            nullptr, eventId );
       }
-      else if( actor == SubFst015::Eobject2 )
+      else if( actor == Eobject2 )
       {
          player.eventActionStart( getId(), 0x01,
             [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-         {
-            Scene00003( player );
-         },
-            [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-         {},
-            eventId );
+            {
+               Scene00003( player );
+            },
+            nullptr, eventId );
       }
-      else if( actor == SubFst015::Eobject3 )
+      else if( actor == Eobject3 )
       {
          player.eventActionStart( getId(), 0x01,
             [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-         {
-            Scene00004( player );
-         },
-            [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-         {},
-            eventId );
+            {
+               Scene00004( player );
+            },
+            nullptr, eventId );
       }
-      else if( actor == SubFst015::Eobject4 )
+      else if( actor == Eobject4 )
       {
          player.eventActionStart( getId(), 0x01,
             [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-         {
-            Scene00005( player );
-         },
-            [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-         {},
-            eventId );
+            {
+               Scene00005( player );
+            },
+            nullptr, eventId );
       }
-      else if( actor == SubFst015::Eobject5 )
+      else if( actor == Eobject5 )
       {
          player.eventActionStart( getId(), 0x01,
             [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-         {
-            Scene00006( player );
-         },
-            [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-         {},
-            eventId );
+            {
+               Scene00006( player );
+            },
+            nullptr, eventId );
       }
    }
 
    private:
 
-   void checkQuestcompletion( Entity::Player& player )
+   void checkQuestCompletion( Entity::Player& player )
    {
       auto currentCC = player.getQuestUI8AL( getId() );
 
@@ -150,7 +137,7 @@ class SubFst015 : public EventScript
          {
             if( result.param2 == 1 )
                {
-                  player.updateQuest( getId(), 1 );
+                  player.updateQuest( getId(), Seq1 );
                }
          } );
    }
@@ -159,54 +146,54 @@ class SubFst015 : public EventScript
    {
       player.playScene( getId(), 1, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
-      {
-         Scene00100( player );
-      } );
+         {
+            Scene00100( player );
+         } );
    }
 
    void Scene00002( Entity::Player& player )
    {
       player.playScene( getId(), 2, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
-      {
-         Scene00098( player );
-      } );
+         {
+            Scene00098( player );
+         } );
    }
 
    void Scene00003( Entity::Player& player )
    {
       player.playScene( getId(), 3, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
-      {
-         Scene00096( player );
-      } );
+         {
+            Scene00096( player );
+         } );
    }
 
    void Scene00004( Entity::Player& player )
    {
       player.playScene( getId(), 4, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
-      {
-         Scene00094( player );
-      } );
+         {
+            Scene00094( player );
+         } );
    }
 
    void Scene00005( Entity::Player& player )
    {
       player.playScene( getId(), 5, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
-      {
-         Scene00092( player );
-      } );
+         {
+            Scene00092( player );
+         } );
    }
 
    void Scene00006( Entity::Player& player )
    {
       player.playScene( getId(), 6, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
-      {
-         Scene00090( player );
-      } );
+         {
+            Scene00090( player );
+         } );
    }
 
    void Scene00007( Entity::Player& player )
@@ -216,8 +203,10 @@ class SubFst015 : public EventScript
          {
             if( result.param2 == 1 )
             {
-               if( player.giveQuestRewards( getId(), 0 ) )
+               if (player.giveQuestRewards( getId(), 0) )
+               {
                   player.finishQuest( getId() );
+               }
             }
          } );
    }
@@ -235,8 +224,8 @@ class SubFst015 : public EventScript
       player.playScene( getId(), 90, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-         checkQuestcompletion( player );
-         player.setQuestBitFlag8( getId(), 2, true );
+            checkQuestCompletion( player );
+            player.setQuestBitFlag8( getId(), 2, true );
          } );
    }
 
@@ -253,8 +242,8 @@ class SubFst015 : public EventScript
       player.playScene( getId(), 92, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-         checkQuestcompletion( player );
-         player.setQuestBitFlag8( getId(), 3, true );
+            checkQuestCompletion( player );
+            player.setQuestBitFlag8( getId(), 3, true );
          } );
    }
 
@@ -271,8 +260,8 @@ class SubFst015 : public EventScript
       player.playScene( getId(), 94, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-         checkQuestcompletion( player );
-         player.setQuestBitFlag8( getId(), 4, true );
+            checkQuestCompletion( player );
+            player.setQuestBitFlag8( getId(), 4, true );
          } );
    }
 
@@ -289,8 +278,8 @@ class SubFst015 : public EventScript
       player.playScene( getId(), 96, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-         checkQuestcompletion( player );
-         player.setQuestBitFlag8( getId(), 5, true );
+            checkQuestCompletion( player );
+            player.setQuestBitFlag8( getId(), 5, true );
          } );
    }
 
@@ -307,8 +296,8 @@ class SubFst015 : public EventScript
       player.playScene( getId(), 98, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-         checkQuestcompletion( player );
-         player.setQuestBitFlag8( getId(), 6, true );
+            checkQuestCompletion( player );
+            player.setQuestBitFlag8( getId(), 6, true );
          } );
    }
 
@@ -325,8 +314,8 @@ class SubFst015 : public EventScript
       player.playScene( getId(), 100, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-         checkQuestcompletion( player );
-         player.setQuestBitFlag8( getId(), 7, true );
+            checkQuestCompletion( player );
+            player.setQuestBitFlag8( getId(), 7, true );
          } );
    }
 };

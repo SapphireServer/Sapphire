@@ -1,6 +1,5 @@
-#include <Script/NativeScriptApi.h>
 #include <Actor/Player.h>
-#include "Event/EventHelper.h"
+#include <Event/EventHelper.h>
 #include <ScriptObject.h>
 
 // Quest Script: SubFst011_00037
@@ -41,13 +40,13 @@ public:
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
-      auto actor = Event::mapEventActorToRealActor( actorId );
+      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
-      if( actor == SubFst011::Actor0 && !player.hasQuest( getId() ) )
+      if( actor == Actor0 && !player.hasQuest( getId() ) )
       {
          Scene00000( player );
       }
-      else if( actor == SubFst011::Actor0 && player.getQuestSeq( getId() ) == SeqFinish )
+      else if( actor == Actor0 && player.getQuestSeq( getId() ) == SeqFinish )
       {
          Scene00001( player );
       }
@@ -61,7 +60,7 @@ public:
       auto currentKC = player.getQuestUI8AL( getId() ) + 1;
 
       if( currentKC >= 6 )
-         player.updateQuest( getId(), 255 );
+         player.updateQuest( getId(), SeqFinish );
       else
       {
          player.setQuestUI8AL( getId(), currentKC );
@@ -75,22 +74,26 @@ private:
    {
       player.playScene( getId(), 0, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
-      {
-         if( result.param2 == 1 ) // accept quest
-            player.updateQuest( getId(), 1 );
-      } );
+         {
+            if( result.param2 == 1 )
+            {
+               player.updateQuest( getId(), Seq1 );
+            }
+         } );
    }
 
    void Scene00001( Entity::Player& player )
    {
       player.playScene( getId(), 1, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
-      {
-         if( result.param2 == 1 ) // finish quest
          {
-            if( player.giveQuestRewards( getId(), 0 ) )
-               player.finishQuest( getId() );
-         }
-      } );
+            if( result.param2 == 1 )
+            {
+               if (player.giveQuestRewards( getId(), 0 ) )
+               {
+                  player.finishQuest( getId() );
+               }
+            }
+         } );
    };
 };
