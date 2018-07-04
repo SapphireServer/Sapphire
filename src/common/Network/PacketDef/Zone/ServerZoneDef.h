@@ -661,7 +661,6 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    unsigned char companionUnk2E;
    unsigned char companionTimePassed[4];
    unsigned short unknown38[11];
-
    unsigned int exp[25];
    unsigned char unknown564[16];
    unsigned int pvpFrontlineOverall1st;
@@ -674,7 +673,6 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    unsigned short fishingRecordsFish[26];
    unsigned short fishingRecordsFishWeight[26];
    unsigned char unknownMask554[44];
-
    unsigned char companion_name[21];
    unsigned char companionDefRank;
    unsigned char companionAttRank;
@@ -682,6 +680,7 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    unsigned char mountGuideMask[16];
    char name[32];
    unsigned char unknownOword[16];
+   unsigned char unknown258;
    unsigned char unlockBitmask[64];
    unsigned char aetheryte[17];
    unsigned char discovery[421];
@@ -697,13 +696,9 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    unsigned char companionEquippedFeet;
    unsigned char companionUnk4[4];
    unsigned char companion_fields[11];
-
    unsigned char fishingGuideMask[89];
    unsigned char fishingSpotVisited[25];
-
-
    unsigned char unknownMask4Padding;
-
    unsigned char rankAmalJaa;
    unsigned char rankSylph;
    unsigned char rankKobold;
@@ -737,7 +732,6 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    unsigned char relicBookCompletion2[8];
    unsigned char sightseeingMask[26];
    unsigned short unknown_XXX;
-
    unsigned char unknown61E;
    unsigned char unknown61F[32];
    unsigned char unknown63F[22];
