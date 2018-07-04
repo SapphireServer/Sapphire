@@ -562,7 +562,7 @@ void Core::Entity::Player::changePosition( float x, float y, float z, float o )
    m_queuedZoneing = boost::make_shared<QueuedZoning>( getZoneId(), pos, Util::getTimeMs(), o );
 }
 
-void Core::Entity::Player::learnAction( uint8_t actionId )
+void Core::Entity::Player::learnAction( uint16_t actionId )
 {
    uint16_t index;
    uint8_t value;

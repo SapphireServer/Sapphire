@@ -362,8 +362,8 @@ void Core::Network::GameConnection::injectPacket( const std::string& packetpath,
       if( pSize == 0 )
          return;
 
-      // TODO: fix injection for new packets
-      //queueOutPacket( GamePacketPtr( new GamePacket( packet + k, pSize, false ) ) );
+      queueOutPacket( FFXIVPacketBasePtr( new FFXIVRawPacket( packet + k, pSize ) ) );
+
       k += ( pSize );
    }
 }
