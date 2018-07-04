@@ -246,6 +246,15 @@ public:
       m_segHdr.size = size;
    };
 
+   FFXIVRawPacket( char* data, uint16_t size ) :
+      m_data( std::vector< uint8_t >( size ) )
+   {
+      auto segmentHdrSize = sizeof( FFXIVARR_PACKET_SEGMENT_HEADER );
+
+      memcpy( &m_data[0], data + segmentHdrSize, size - segmentHdrSize );
+      memcpy( &m_segHdr, data, segmentHdrSize );
+   }
+
    uint32_t getContentSize() override
    {
       return m_data.size();
