@@ -423,6 +423,13 @@ void Core::DebugCommandHandler::add( char * data, Entity::Player& player, boost:
       player.queuePacket( controlPacket );*/
 
    }
+   else if( subCommand == "unlock" )
+   {
+      uint32_t id;
+
+      sscanf( params.c_str(), "%d", &id );
+      player.learnAction( id );
+   }
    else
    {
       player.sendUrgent( subCommand + " is not a valid ADD command." );
