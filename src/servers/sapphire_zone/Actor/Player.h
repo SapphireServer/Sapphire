@@ -419,7 +419,7 @@ public:
    /*! update bitmask for how-to's seen */
    void updateHowtosSeen( uint32_t howToId );
    /*! learn an action / update the unlock bitmask. */
-   void learnAction( uint8_t actionId );
+   void learnAction( uint16_t actionId );
    /*! learn a song / update the unlock bitmask. */
    void learnSong( uint8_t songId, uint32_t itemId );
    /*! check if an action is already unlocked in the bitmask. */
