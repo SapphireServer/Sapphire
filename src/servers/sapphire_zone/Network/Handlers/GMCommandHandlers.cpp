@@ -6,6 +6,7 @@
 #include <Logging/Logger.h>
 #include <Network/PacketContainer.h>
 #include <Network/CommonActorControl.h>
+#include <Network/PacketDef/Zone/ClientZoneDef.h>
 
 #include <unordered_map>
 
@@ -91,12 +92,11 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
    if( player.getGmRank() <= 0 )
       return;
 
-   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
-   auto commandId = *reinterpret_cast< uint32_t* >( &copy.data[0x10] );
-
-   uint32_t param1 = *reinterpret_cast< uint32_t* >( &copy.data[0x14] );
-   uint32_t param2 = *reinterpret_cast< uint32_t* >( &copy.data[0x18] );
-   uint32_t param3 = *reinterpret_cast< uint32_t* >( &copy.data[0x28] );
+   auto packet = ZoneChannelPacket< Client::FFXIVIpcGmCommand1 >( inPacket );
+   auto commandId = packet.data().commandId;
+   auto param1 = packet.data().param1;
+   auto param2 = packet.data().param2;
+   auto param3 = packet.data().param3;
 
    auto pLog = g_fw.get< Logger >();
    pLog->debug( player.getName() + " used GM1 commandId: " + std::to_string( commandId ) +

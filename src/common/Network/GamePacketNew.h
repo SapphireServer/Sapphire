@@ -178,6 +178,18 @@ public:
       initialize();
    };
 
+   FFXIVIpcPacket< T, T1 >( const FFXIVARR_PACKET_RAW& rawPacket )
+   {
+      auto segHdrSize = sizeof( FFXIVARR_PACKET_SEGMENT_HEADER );
+      auto copySize = std::min< uint32_t >( sizeof( T ), rawPacket.segHdr.size - segHdrSize );
+
+      memcpy( &m_segHdr, &rawPacket.segHdr, segHdrSize );
+      memcpy( &m_data, &rawPacket.data[0] + segHdrSize, copySize );
+
+      memset( &m_ipcHdr, 0, sizeof( FFXIVARR_IPC_HEADER ) );
+      m_ipcHdr.type = static_cast< ServerZoneIpcType >( m_data._ServerIpcType );
+   }
+
    uint32_t getContentSize() override
    {
       return sizeof( FFXIVARR_IPC_HEADER ) + sizeof( T );
