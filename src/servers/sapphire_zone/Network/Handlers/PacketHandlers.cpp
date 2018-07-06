@@ -347,7 +347,7 @@ void Core::Network::GameConnection::discoveryHandler( const Core::Network::Packe
 
    Packets::FFXIVARR_PACKET_RAW copy = inPacket;
 
-   auto packet = ZoneChannelPacket< Client::FFXIVIpcDiscoveryHandler >( inPacket );
+   const auto packet = ZoneChannelPacket< Client::FFXIVIpcDiscoveryHandler >( inPacket );
    const auto& positionRef = packet.data().positionRef;
 
    auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
