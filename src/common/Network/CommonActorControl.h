@@ -219,7 +219,7 @@ namespace Core {
 
          enum ClientTriggerType
          {
-            ToggleSeathe = 0x01,
+            ToggleSheathe = 0x01,
             ToggleAutoAttack = 0x02,
             ChangeTarget = 0x03,
 
