@@ -180,13 +180,13 @@ public:
 
    FFXIVIpcPacket< T, T1 >( const FFXIVARR_PACKET_RAW& rawPacket )
    {
-      auto segHdrSize = sizeof( FFXIVARR_PACKET_SEGMENT_HEADER );
-      auto copySize = std::min< uint32_t >( sizeof( T ), rawPacket.segHdr.size - segHdrSize );
+      auto ipcHdrSize = sizeof( FFXIVARR_IPC_HEADER );
+      auto copySize = std::min< uint32_t >( sizeof( T ), rawPacket.segHdr.size - ipcHdrSize );
 
-      memcpy( &m_segHdr, &rawPacket.segHdr, segHdrSize );
-      memcpy( &m_data, &rawPacket.data[0] + segHdrSize, copySize );
+      memcpy( &m_segHdr, &rawPacket.segHdr, sizeof( FFXIVARR_PACKET_SEGMENT_HEADER ) );
+      memcpy( &m_data, &rawPacket.data[0] + ipcHdrSize, copySize );
 
-      memset( &m_ipcHdr, 0, sizeof( FFXIVARR_IPC_HEADER ) );
+      memset( &m_ipcHdr, 0, ipcHdrSize );
       m_ipcHdr.type = static_cast< ServerZoneIpcType >( m_data._ServerIpcType );
    }
 
