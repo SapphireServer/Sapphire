@@ -64,7 +64,7 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
 
    switch( commandId )
    {
-       case ClientTriggerType::ToggleSeathe:  // Toggle sheathe
+       case ClientTriggerType::ToggleSheathe:  // Toggle sheathe
        {
           if ( param11 == 1 )
               player.setStance( Entity::Chara::Stance::Active );
