@@ -195,7 +195,7 @@ public:
       auto log = g_fw.get< Core::Logger >();
       if( log )
       {
-         log->debug( "rawpacket size" + std::to_string( rawPacket.segHdr.size )  + "\n" + Util::binaryToHexDump( const_cast< uint8_t* >( &rawPacket.data[0] ), rawPacket.segHdr.size ) );
+         log->debug( "rawpacket size " + std::to_string( rawPacket.segHdr.size )  + "\n" + Util::binaryToHexDump( const_cast< uint8_t* >( &rawPacket.data[0] ), rawPacket.segHdr.size ) );
          log->debug( "T size " + std::to_string( sizeof( T ) ) + "\n" + Util::binaryToHexDump( reinterpret_cast< uint8_t* >( &m_data ), sizeof( T ) ) );
       }
 

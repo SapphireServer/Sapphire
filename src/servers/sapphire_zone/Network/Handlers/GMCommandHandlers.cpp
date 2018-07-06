@@ -489,10 +489,10 @@ void Core::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACKET_R
    auto pLog = g_fw.get< Logger >();
    auto pServerZone = g_fw.get< ServerZone >();
 
-   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
-   auto commandId = *reinterpret_cast< uint32_t* >( &copy.data[0x10] );
+   auto packet = ZoneChannelPacket< Client::FFXIVIpcGmCommand2 >( inPacket );
 
-   auto param1 = std::string( reinterpret_cast< char* >( &copy.data[0x24] ) );
+   auto commandId = packet.data().commandId;
+   auto param1 = std::string( packet.data().param1 );
 
    pLog->debug( player.getName() + " used GM2 commandId: " + std::to_string( commandId ) + ", params: " + param1 );
 
