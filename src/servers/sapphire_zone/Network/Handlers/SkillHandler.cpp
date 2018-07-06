@@ -39,12 +39,12 @@ using namespace Core::Network::ActorControl;
 void Core::Network::GameConnection::skillHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                   Entity::Player& player )
 {
-   auto packet = ZoneChannelPacket< Client::FFXIVIpcSkillHandler >( inPacket );
+   const auto packet = ZoneChannelPacket< Client::FFXIVIpcSkillHandler >( inPacket );
 
-   auto type = packet.data().type;
-   auto action = packet.data().actionId;
-   auto useCount = packet.data().useCount;
-   auto targetId = packet.data().targetId;
+   const auto& type = packet.data().type;
+   const auto& action = packet.data().actionId;
+   const auto& useCount = packet.data().useCount;
+   const auto& targetId = packet.data().targetId;
 
    player.sendDebug( "Skill type:" + std::to_string( type ) );
 

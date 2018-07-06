@@ -46,6 +46,65 @@ struct FFXIVIpcSkillHandler : FFXIVIpcBasePacket< SkillHandler >
    /* 0010 */ uint64_t targetId;
 };
 
+struct FFXIVIpcZoneLineHandler : FFXIVIpcBasePacket< ZoneLineHandler >
+{
+   /* 0000 */ uint32_t zoneLineId;
+};
+
+struct FFXIVIpcDiscoveryHandler : FFXIVIpcBasePacket< DiscoveryHandler >
+{
+   /* 0000 */ uint32_t positionRef;
+};
+
+struct FFXIVIpcEventHandlerReturn : FFXIVIpcBasePacket< ReturnEventHandler >
+{
+   /* 0000 */ uint32_t eventId;
+   /* 0004 */ uint16_t scene;
+   /* 0006 */ uint16_t param1;
+   /* 0008 */ uint16_t param2;
+   /* 000A */ char pad_000A[2];
+   /* 000C */ uint16_t param3;
+};
+
+struct FFXIVIpcEnterTerritoryHandler : FFXIVIpcBasePacket< EnterTeriEventHandler >
+{
+   /* 0000 */ uint32_t eventId;
+   /* 0004 */ uint16_t param1;
+   /* 0006 */ uint16_t param2;
+};
+
+struct FFXIVIpcEventHandlerOutsideRange : FFXIVIpcBasePacket< OutOfRangeEventHandler >
+{
+   /* 0000 */ uint32_t param1;
+   /* 0004 */ uint32_t eventId;
+   /* 0008 */ Common::FFXIVARR_POSITION3 position;
+};
+
+struct FFXIVIpcEventHandlerWithinRange : FFXIVIpcBasePacket< WithinRangeEventHandler >
+{
+   /* 0000 */ uint32_t param1;
+   /* 0004 */ uint32_t eventId;
+   /* 0008 */ Common::FFXIVARR_POSITION3 position;
+};
+
+struct FFXIVIpcEventHandlerEmote : FFXIVIpcBasePacket< EmoteEventHandler >
+{
+   /* 0000 */ uint64_t actorId;
+   /* 0008 */ uint32_t eventId;
+   /* 000C */ uint16_t emoteId;
+};
+
+struct FFXIVIpcEventHandlerTalk : FFXIVIpcBasePacket< TalkEventHandler >
+{
+   /* 0000 */ uint64_t actorId;
+   /* 0008 */ uint32_t eventId;
+};
+
+struct FFXIVIpcPingHandler : FFXIVIpcBasePacket< PingHandler >
+{
+   /* 0000 */ uint32_t timestamp; // maybe lol..
+};
+
 }
 }
 }

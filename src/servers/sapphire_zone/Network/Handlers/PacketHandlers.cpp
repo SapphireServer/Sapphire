@@ -10,6 +10,7 @@
 #include <Database/DatabaseDef.h>
 
 #include <unordered_map>
+#include <Network/PacketDef/Zone/ClientZoneDef.h>
 #include "Network/GameConnection.h"
 
 #include "Zone/TerritoryMgr.h"
@@ -299,8 +300,8 @@ void Core::Network::GameConnection::zoneLineHandler( const Core::Network::Packet
 {
    auto pTeriMgr = g_fw.get< TerritoryMgr >();
 
-   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
-   auto zoneLineId = *reinterpret_cast< uint32_t* >( &copy.data[0x10] );
+   const auto packet = ZoneChannelPacket< Client::FFXIVIpcZoneLineHandler >( inPacket );
+   const auto& zoneLineId = packet.data().zoneLineId;
 
    player.sendDebug( "Walking ZoneLine " + std::to_string( zoneLineId ) );
 
@@ -346,17 +347,18 @@ void Core::Network::GameConnection::discoveryHandler( const Core::Network::Packe
 
    Packets::FFXIVARR_PACKET_RAW copy = inPacket;
 
-   auto ref_position_id = *reinterpret_cast< uint32_t* >( &copy.data[0x10] );
+   auto packet = ZoneChannelPacket< Client::FFXIVIpcDiscoveryHandler >( inPacket );
+   const auto& positionRef = packet.data().positionRef;
 
    auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
 
    auto pQR = pDb->query( "SELECT id, map_id, discover_id "
                                "FROM discoveryinfo "
-                               "WHERE id = " + std::to_string( ref_position_id ) + ";" );
+                               "WHERE id = " + std::to_string( positionRef ) + ";" );
 
    if( !pQR->next() )
    {
-      player.sendNotice( "Discovery ref pos ID: " + std::to_string( ref_position_id ) + " not found. " );
+      player.sendNotice( "Discovery ref pos ID: " + std::to_string( positionRef ) + " not found. " );
       return;
    }
 
@@ -365,7 +367,7 @@ void Core::Network::GameConnection::discoveryHandler( const Core::Network::Packe
    discoveryPacket->data().map_part_id = pQR->getUInt( 3 );
 
    player.queuePacket( discoveryPacket );
-   player.sendNotice( "Discovery ref pos ID: " + std::to_string( ref_position_id ) );
+   player.sendNotice( "Discovery ref pos ID: " + std::to_string( positionRef ) );
 
    player.discover( pQR->getUInt16( 2 ), pQR->getUInt16( 3 ) );
 
@@ -409,10 +411,9 @@ void Core::Network::GameConnection::blackListHandler( const Core::Network::Packe
 void Core::Network::GameConnection::pingHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                  Entity::Player& player )
 {
-   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
-   auto inVal = *reinterpret_cast< uint32_t* >( &copy.data[0x10] );
+   const auto packet = ZoneChannelPacket< Client::FFXIVIpcPingHandler >( inPacket );
 
-   queueOutPacket( boost::make_shared< PingPacket>( player, inVal ) );
+   queueOutPacket( boost::make_shared< Server::PingPacket >( player, packet.data().timestamp ) );
 
    player.setLastPing( static_cast< uint32_t >( time( nullptr ) ) );
 }
