@@ -223,12 +223,16 @@ namespace Packets {
 
 
       ReqJoinNoviceNetwork     = 0x0129, // updated 4.2
-      ReqCountdownInitiate     = 0x012C, // updated 4.2
-      ReqCountdownCancel       = 0x012D, // updated 4.2
+
+      ReqCountdownInitiate     = 0x0138, // updated 4.3
+      ReqCountdownCancel       = 0x0139, // updated 4.3
+      ClearWaymarks            = 0x013A, // updated 4.3
 
       ZoneLineHandler          = 0x013C, // updated 4.3
       ClientTrigger            = 0x013D, // updated 4.3
       DiscoveryHandler         = 0x013E, // updated 4.3
+
+      AddWaymark               = 0x013F, // updated 4.3
 
       SkillHandler             = 0x0140, // updated 4.3
       GMCommand1               = 0x0141, // updated 4.3
