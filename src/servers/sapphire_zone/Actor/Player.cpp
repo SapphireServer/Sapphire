@@ -68,7 +68,8 @@ Core::Entity::Player::Player() :
    m_markedForRemoval( false ),
    m_mount( 0 ),
    m_directorInitialized( false ),
-   m_onEnterEventDone( false )
+   m_onEnterEventDone( false ),
+   m_bJumping( false )
 {
    m_id = 0;
    m_currentStance = Stance::Passive;
