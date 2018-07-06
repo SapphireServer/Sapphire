@@ -239,6 +239,8 @@ public:
    /** Gets a reference to the underlying IPC data structure. */
    T& data() { return m_data; };
 
+   const T& data() const { return m_data; }
+
 protected:
    /** Initializes the fields of the header structures */
    virtual void initialize()
