@@ -8,9 +8,12 @@
 #include <Network/PacketContainer.h>
 #include <Network/PacketDef/Chat/ServerChatDef.h>
 #include <Database/DatabaseDef.h>
+#include <Util/Util.h>
 
 #include <unordered_map>
 #include <Network/PacketDef/Zone/ClientZoneDef.h>
+#include <Logging/Logger.h>
+
 #include "Network/GameConnection.h"
 
 #include "Zone/TerritoryMgr.h"
@@ -150,37 +153,12 @@ void Core::Network::GameConnection::updatePositionHandler( const Core::Network::
    auto flags = *reinterpret_cast< uint16_t* >( &copy.data[0x18] );
    memcpy( &IPC_OP_019AB, &flags, 2 );
 
-   auto flags1 = *reinterpret_cast< uint32_t* >( &copy.data[0x14] );
+   auto flags1 = *reinterpret_cast< uint32_t* >( &copy.data[0x18] );
    memcpy( &IPC_OP_019A, &flags1, 4 );
 
-   //g_log.Log(LoggingSeverity::debug, "" + boost::lexical_cast<std::string>((int)IPC_OP_019AB.bit1)
-   //                                     + boost::lexical_cast<std::string>((int)IPC_OP_019AB.bit2)
-   //                                     + boost::lexical_cast<std::string>((int)IPC_OP_019AB.bit3)
-   //                                     + boost::lexical_cast<std::string>((int)IPC_OP_019AB.bit4)
-   //                                     + boost::lexical_cast<std::string>((int)IPC_OP_019AB.bit5)
-   //                                     + boost::lexical_cast<std::string>((int)IPC_OP_019AB.bit6)
-   //                                     + boost::lexical_cast<std::string>((int)IPC_OP_019AB.bit7)
-   //                                     + boost::lexical_cast<std::string>((int)IPC_OP_019AB.bit8)
-   //                                     + boost::lexical_cast<std::string>((int)IPC_OP_019AB.bit9)
-   //                                     + boost::lexical_cast<std::string>((int)IPC_OP_019AB.bit10)
-   //                                     + boost::lexical_cast<std::string>((int)IPC_OP_019AB.bit11)
-   //                                     + boost::lexical_cast<std::string>((int)IPC_OP_019AB.bit12)
-   //                                     + boost::lexical_cast<std::string>((int)IPC_OP_019AB.bit13)
-   //                                     + boost::lexical_cast<std::string>((int)IPC_OP_019AB.bit14)
-   //                                     + boost::lexical_cast<std::string>((int)IPC_OP_019AB.bit15)
-   //                                     + boost::lexical_cast<std::string>((int)IPC_OP_019AB.bit16)
-   //                                     + " " + boost::lexical_cast<std::string>((int)flags));
 
-   //g_log.Log(LoggingSeverity::debug, "\n" + boost::lexical_cast<std::string>((int)IPC_OP_019A.specialMovement) + "\n"
-   //                                     + boost::lexical_cast<std::string>((int)IPC_OP_019A.strafe) + "\n"
-   //                                     + boost::lexical_cast<std::string>((int)IPC_OP_019A.moveBackward) + "\n"
-   //                                     + boost::lexical_cast<std::string>((int)IPC_OP_019A.strafeRight));
+   auto pLog = g_fw.get< Logger >();
 
-   //g_log.Log(LoggingSeverity::debug, pInPacket->toString());
-
-   //pInPacket->debugPrint();
-
-   ;
    bool bPosChanged = false;
    if( ( player.getPos().x != *reinterpret_cast< float* >( &copy.data[0x1C] ) ) ||
        ( player.getPos().y != *reinterpret_cast< float* >( &copy.data[0x20] ) ) ||
@@ -201,88 +179,69 @@ void Core::Network::GameConnection::updatePositionHandler( const Core::Network::
    if( !player.hasInRangeActor() )
       return;
 
-   auto unk = *reinterpret_cast< uint8_t* >( &copy.data[0x19] );
-
-   auto moveType = *reinterpret_cast< uint16_t* >( &copy.data[0x18] );
+   auto moveState = *reinterpret_cast< uint8_t* >( &copy.data[0x19] );
+   auto moveType = *reinterpret_cast< uint8_t* >( &copy.data[0x18] );
 
    uint8_t unk1 = 0;
    uint8_t unk2 = 0;
-   uint8_t unk3 = unk;
+   uint8_t unk3 = moveState;
    uint16_t unk4 = 0;
 
    // HACK: This part is hackish, we need to find out what all theese things really do.
-   switch( moveType )
+   //pLog->debug( std::to_string( moveState ) + " -- moveState " );
+   //pLog->debug( std::to_string( moveType ) + " -- moveType " );
+
+   if( moveType & MoveType::Strafing )
    {
-   case MoveType::Strafe:
-   {
+      unk2 = 0x40;
       if( IPC_OP_019A.strafeRight == 1 )
          unk1 = 0xbf;
       else
          unk1 = 0x5f;
       unk4 = 0x3C;
-      break;
    }
 
-   case 6:
+   if( moveType & MoveType::Walking )
    {
-      unk1 = 0xFF;
+      unk1 = 0x7F;
+      unk2 = 0x02;
+      unk3 = 0x00;
+      unk4 = 0x0518;
+   }
+
+   if( moveType & MoveType::BackWalk )
+   {
       unk2 = 0x06;
+      unk1 = 0xFF;
       unk4 = 0x18;
-      break;
    }
 
-   //   case MoveType::Land:
-   //	{
-   //           unk1 = 0x7F;
-   //		//unk2 = 0x40;
-   //		unk4 = 0x3C;
-   //		break;
-   //	}
-
-   //   case MoveType::Jump:
-   //	{
-   //		unk1 = 0x7F;
-   //		if(unk == 0x01)
-   //           {
-   //		//	unk2 = 0x20;
-   //			//unk4 = 0x32;
-   //               unk4 = 0x32;
-   //		}
-   //           else
-   //           {
-   //		//	unk2 = 0xA0;
-   //			unk4 = 0x3C;
-   //		}
-   //
-   //		break;
-   //	}
-   //   case MoveType::Fall:
-   //	{
-   //		unk1 = 0x7F;
-   //		//unk2 = 0xA0;
-   //		unk4 = 0x3C;
-   //
-   //		break;
-   //	}
-   default:
+   if( moveType & MoveType::Running )
    {
-      if( static_cast< int32_t >( IPC_OP_019A.moveBackward ) )
-      {
-         unk1 = 0xFF;
-         unk2 = 0x06;
-         unk4 = 0x18; // animation speed?
-      }
-      else
-      {
-         unk1 = 0x7F;
-         unk4 = 0x3C; // animation speed?
-      }
-
-      break;
-   }
+      unk1 = 0x7F;
+      unk4 = 0x3C;
    }
 
-   auto movePacket = boost::make_shared< MoveActorPacket >( player, unk1, unk2, unk3, unk4 );
+   if( moveType & MoveType::Jumping )
+   {
+
+      unk1 = 0x3F;
+      unk2 = 0x32;
+      unk4 = 0x5f18;
+      if( moveState == MoveState::Land )
+         unk2 = 0x02;
+
+   }
+
+   uint64_t currentTime = Util::getTimeMs();
+
+   if( ( currentTime - player.m_lastMoveTime ) < 100 && player.m_lastMoveflag == moveState )
+      return;
+
+   player.m_lastMoveTime = currentTime;
+   player.m_lastMoveflag = moveState;
+
+   auto movePacket = boost::make_shared< MoveActorPacket >( player, unk1, unk2, moveState, unk4 );
    player.sendToInRangeSet( movePacket );
 
 }

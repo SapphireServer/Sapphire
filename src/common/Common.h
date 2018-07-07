@@ -189,14 +189,20 @@ namespace Common {
 
    };
 
-   enum MoveType : uint16_t
+   enum MoveType : uint8_t
    {
-      Run = 0x00,
-      Walk = 0x02,
-      Strafe = 0x04,
-      Jump = 0x100,
-      Fall = 0x400,
-      Land = 0x200,
+      Running = 0x00,
+      Walking = 0x02,
+      Strafing = 0x04,
+      Jumping = 0x10,
+      BackWalk = Walking | Strafing,
+   };
+
+   enum MoveState : uint8_t
+   {
+      None = 0x00,
+      Land = 0x02,
+      Fall = 0x04,
    };
 
    struct QuestActive
