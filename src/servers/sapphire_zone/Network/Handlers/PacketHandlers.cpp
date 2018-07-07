@@ -63,15 +63,14 @@ void Core::Network::GameConnection::fcInfoReqHandler( const Core::Network::Packe
 void Core::Network::GameConnection::setSearchInfoHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                           Entity::Player& player )
 {
-   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
+   const auto packet = ZoneChannelPacket< Client::FFXIVIpcSetSearchInfo >( inPacket, true );
 
-   auto inval = *reinterpret_cast< uint32_t* >( &copy.data[0x10] );
-   auto inval1 = *reinterpret_cast< uint32_t* >( &copy.data[0x14] );
-   auto status = *reinterpret_cast< uint64_t* >( &copy.data[0x10] );
+   const auto& inval = packet.data().status1;
+   const auto& inval1 = packet.data().status2;
+   const auto& status = packet.data().status;
+   const auto& selectRegion = packet.data().language;
 
-   auto selectRegion = copy.data[0x21];
-
-   player.setSearchInfo( selectRegion, 0, reinterpret_cast< char* >( &copy.data[0x22] ) );
+   player.setSearchInfo( selectRegion, 0, packet.data().searchComment );
 
    player.setOnlineStatusMask( status );
 

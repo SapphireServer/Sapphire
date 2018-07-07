@@ -9,6 +9,8 @@ namespace Network {
 namespace Packets {
 namespace Client {
 
+#pragma pack(push, 1)
+
 struct FFXIVIpcGmCommand1 : FFXIVIpcBasePacket< GMCommand1 >
 {
    /* 0000 */ uint32_t commandId;
@@ -24,8 +26,6 @@ struct FFXIVIpcGmCommand2 : FFXIVIpcBasePacket< GMCommand2 >
    /* 0004 */ char unk_4[0x10];
    /* 0014 */ char param1[0x20];
 };
-
-#pragma pack(push, 4)
 
 struct FFXIVIpcClientTrigger : FFXIVIpcBasePacket< ClientTrigger >
 {
@@ -46,8 +46,6 @@ struct FFXIVIpcClientTrigger : FFXIVIpcBasePacket< ClientTrigger >
    /* 0010 */ char unk_10[8];
    /* 0018 */ uint64_t param3;
 };
-
-#pragma pack(pop)
 
 struct FFXIVIpcSkillHandler : FFXIVIpcBasePacket< SkillHandler >
 {
@@ -118,6 +116,25 @@ struct FFXIVIpcPingHandler : FFXIVIpcBasePacket< PingHandler >
 {
    /* 0000 */ uint32_t timestamp; // maybe lol..
 };
+
+struct FFXIVIpcSetSearchInfo : FFXIVIpcBasePacket< SetSearchInfoHandler >
+{
+   union
+   {
+      /* 0000 */ uint64_t status;
+      struct
+      {
+         /* 0000 */ uint32_t status1;
+         /* 0004 */ uint32_t status2;
+      };
+   };
+
+   /* 0008 */ char pad_0008[9];
+   /* 0011 */ Common::ClientLanguage language;
+   /* 0012 */ char searchComment[193];
+};
+
+#pragma pack(pop)
 
 }
 }

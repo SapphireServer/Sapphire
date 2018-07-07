@@ -27,6 +27,14 @@ namespace Common {
       float z;
    };
 
+   enum ClientLanguage : uint8_t
+   {
+      Japanese = 1,
+      English = 2,
+      German = 4,
+      French = 8
+   };
+
    enum EquipSlot : uint8_t
    {
       MainHand = 0,
