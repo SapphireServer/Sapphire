@@ -145,10 +145,8 @@ void Core::Network::GameConnection::eventHandlerOutsideRange( const Packets::FFX
                                                               Entity::Player& player )
 {
    auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
-   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
 
    const auto packet = ZoneChannelPacket< Client::FFXIVIpcEventHandlerOutsideRange >( inPacket );
-
    const auto& eventId = packet.data().eventId;
    const auto& param1 = packet.data().param1;
    const auto& pos = packet.data().position;

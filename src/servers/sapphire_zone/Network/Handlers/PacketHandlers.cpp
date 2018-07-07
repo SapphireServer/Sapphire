@@ -302,9 +302,6 @@ void Core::Network::GameConnection::zoneLineHandler( const Core::Network::Packet
 void Core::Network::GameConnection::discoveryHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                       Entity::Player& player )
 {
-
-   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
-
    const auto packet = ZoneChannelPacket< Client::FFXIVIpcDiscoveryHandler >( inPacket );
    const auto& positionRef = packet.data().positionRef;
 
