@@ -34,7 +34,8 @@ using namespace Core::Network::Packets::Server;
 using namespace Core::Network::ActorControl;
 
 Core::Entity::Chara::Chara( ObjKind type ) :
-   Actor( type )
+   Actor( type ),
+   m_targetId( INVALID_GAME_OBJECT_ID )
 {
    // initialize the free slot queue
    for( uint8_t i = 0; i < MAX_STATUS_EFFECTS; i++ )
