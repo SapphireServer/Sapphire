@@ -488,7 +488,7 @@ void Core::Entity::Player::updateDbSearchInfo() const
    stmtS1->setInt( 2, m_id );
    pDb->execute( stmtS1 );
 
-   auto stmtS2 = pDb->getPreparedStatement( Db::CHARA_SEARCHINFO_UP_SELECTREGION );
+   auto stmtS2 = pDb->getPreparedStatement( Db::CHARA_SEARCHINFO_UP_SEARCHCOMMENT );
    stmtS2->setString( 1, string( m_searchMessage != nullptr ? m_searchMessage : "" ) );
    stmtS2->setInt( 2, m_id );
    pDb->execute( stmtS2 );
