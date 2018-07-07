@@ -91,7 +91,7 @@ struct FFXIVIpcCharList : FFXIVIpcBasePacket<LobbyCharList>
       char nameChara[32];
       char nameServer[32];
       char nameServer1[32];
-      char charDetailJson[1030];
+      char charDetailJson[1028];
    } charaDetails[2];
 
 };
