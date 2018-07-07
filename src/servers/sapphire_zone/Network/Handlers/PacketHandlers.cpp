@@ -63,7 +63,7 @@ void Core::Network::GameConnection::fcInfoReqHandler( const Core::Network::Packe
 void Core::Network::GameConnection::setSearchInfoHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                           Entity::Player& player )
 {
-   const auto packet = ZoneChannelPacket< Client::FFXIVIpcSetSearchInfo >( inPacket, true );
+   const auto packet = ZoneChannelPacket< Client::FFXIVIpcSetSearchInfo >( inPacket );
 
    const auto& inval = packet.data().status1;
    const auto& inval1 = packet.data().status2;
@@ -459,23 +459,19 @@ void Core::Network::GameConnection::chatHandler( const Core::Network::Packets::F
 {
    auto pDebugCom = g_fw.get< DebugCommandHandler >();
 
-   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
+   const auto packet = ZoneChannelPacket< Client::FFXIVIpcChatHandler >( inPacket );
 
-   std::string chatString( reinterpret_cast< char* >( &copy.data[0x2a] ) );
-
-   auto sourceId = *reinterpret_cast< uint32_t* >( &copy.data[0x14] );
-
-   if( chatString.at( 0 ) == '!' )
+   if( packet.data().message[0] == '!' )
    {
       // execute game console command
-      pDebugCom->execCommand( const_cast< char * >( chatString.c_str() ) + 1, player );
+      pDebugCom->execCommand( const_cast< char* >( packet.data().message ) + 1, player );
       return;
    }
 
-   ChatType chatType = static_cast< ChatType >( inPacket.data[0x28] );
+   auto chatType = packet.data().chatType;
 
    //ToDo, need to implement sending GM chat types.
-   auto chatPacket = boost::make_shared< ChatPacket >( player, chatType, chatString );
+   auto chatPacket = boost::make_shared< Server::ChatPacket >( player, chatType, packet.data().message );
 
    switch( chatType )
    {
@@ -531,19 +527,16 @@ void Core::Network::GameConnection::logoutHandler( const Core::Network::Packets:
 void Core::Network::GameConnection::tellHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                  Entity::Player& player )
 {
-   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
-
-   std::string targetPcName( reinterpret_cast< char* >( &copy.data[0x14] ) );
-   std::string msg( reinterpret_cast< char* >( &copy.data[0x34] ) );
+   const auto packet = ZoneChannelPacket< Client::FFXIVIpcTellHandler >( inPacket );
 
    auto pZoneServer = g_fw.get< ServerZone >();
 
-   auto pSession = pZoneServer->getSession( targetPcName );
+   auto pSession = pZoneServer->getSession( packet.data().targetPCName );
 
    if( !pSession )
    {
       auto tellErrPacket = makeZonePacket< FFXIVIpcTellErrNotFound >( player.getId() );
-      strcpy( tellErrPacket->data().receipientName, targetPcName.c_str() );
+      strcpy( tellErrPacket->data().receipientName, packet.data().targetPCName );
       sendSinglePacket( tellErrPacket );
       return;
    }
@@ -572,7 +565,7 @@ void Core::Network::GameConnection::tellHandler( const Core::Network::Packets::F
    }
 
    auto tellPacket = makeChatPacket< FFXIVIpcTell >( player.getId() );
-   strcpy( tellPacket->data().msg, msg.c_str() );
+   strcpy( tellPacket->data().msg, packet.data().message );
    strcpy( tellPacket->data().receipientName, player.getName().c_str() );
    // TODO: do these have a meaning?
    //tellPacket.data().u1 = 0x92CD7337;
