@@ -191,7 +191,6 @@ void Core::Network::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet, ui
          charListPacket->data().counter = ( i * 4 ) + 1;
          charListPacket->data().unknown4 = 128;
       }
-
       Packets::LobbyPacketContainer pRP( m_encKey );
       pRP.addPacket( charListPacket );
       sendPacket( pRP );
