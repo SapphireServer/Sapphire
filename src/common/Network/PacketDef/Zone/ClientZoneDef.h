@@ -9,8 +9,6 @@ namespace Network {
 namespace Packets {
 namespace Client {
 
-#pragma pack(push, 1)
-
 struct FFXIVIpcGmCommand1 : FFXIVIpcBasePacket< GMCommand1 >
 {
    /* 0000 */ uint32_t commandId;
@@ -31,17 +29,8 @@ struct FFXIVIpcClientTrigger : FFXIVIpcBasePacket< ClientTrigger >
 {
    /* 0000 */ uint16_t commandId;
    /* 0002 */ uint8_t unk_2[2];
-
-   union
-   {
-      /* 0004 */ uint64_t param1;
-      struct
-      {
-         /* 0004 */ uint32_t param11;
-         /* 0008 */ uint32_t param12;
-      };
-   };
-
+   /* 0004 */ uint32_t param11;
+   /* 0008 */ uint32_t param12;
    /* 000C */ uint32_t param2;
    /* 0010 */ char unk_10[8];
    /* 0018 */ uint64_t param3;
@@ -134,7 +123,21 @@ struct FFXIVIpcSetSearchInfo : FFXIVIpcBasePacket< SetSearchInfoHandler >
    /* 0012 */ char searchComment[193];
 };
 
-#pragma pack(pop)
+struct FFXIVIpcTellHandler : FFXIVIpcBasePacket< TellReq >
+{
+   /* 0000 */ char pad_0000[4];
+   /* 0004 */ char targetPCName[32];
+   /* 0024 */ char message[1012];
+};
+
+struct FFXIVIpcChatHandler : FFXIVIpcBasePacket< ChatHandler >
+{
+   /* 0000 */ char pad_0000[4];
+   /* 0004 */ uint32_t sourceId;
+   /* 0008 */ char pad_0008[16];
+   /* 0018 */ Common::ChatType chatType;
+   /* 001A */ char message[1012];
+};
 
 }
 }
