@@ -184,7 +184,7 @@ public:
       initialize();
    };
 
-   FFXIVIpcPacket< T, T1 >( const FFXIVARR_PACKET_RAW& rawPacket )
+   FFXIVIpcPacket< T, T1 >( const FFXIVARR_PACKET_RAW& rawPacket, bool verbose = false )
    {
       auto ipcHdrSize = sizeof( FFXIVARR_IPC_HEADER );
       auto copySize = std::min< uint32_t >( sizeof( T ), rawPacket.segHdr.size - ipcHdrSize );
@@ -193,7 +193,7 @@ public:
       memcpy( &m_data, &rawPacket.data[0] + ipcHdrSize, copySize );
 
       auto log = g_fw.get< Core::Logger >();
-      if( log )
+      if( log && verbose )
       {
          log->debug( "rawpacket size " + std::to_string( rawPacket.segHdr.size )  + "\n" + Util::binaryToHexDump( const_cast< uint8_t* >( &rawPacket.data[0] ), rawPacket.segHdr.size ) );
          log->debug( "T size " + std::to_string( sizeof( T ) ) + "\n" + Util::binaryToHexDump( reinterpret_cast< uint8_t* >( &m_data ), sizeof( T ) ) );

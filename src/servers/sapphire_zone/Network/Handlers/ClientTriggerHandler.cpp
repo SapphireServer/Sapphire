@@ -49,8 +49,8 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
 
    const auto& commandId = packet.data().commandId;
    const auto& param1 = packet.data().param1;
-   const auto& param11 = *reinterpret_cast< const uint32_t* >( &packet.data().param1 );
-   const auto& param12 = *reinterpret_cast< const uint32_t* >( &packet.data().param1 + sizeof( uint32_t ) );
+   const auto& param11 = packet.data().param11;
+   const auto& param12 = packet.data().param12;
    const auto& param2 = packet.data().param2;
    const auto& param3 = packet.data().param3;
 
