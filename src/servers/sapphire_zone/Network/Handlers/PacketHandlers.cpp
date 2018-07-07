@@ -191,13 +191,21 @@ void Core::Network::GameConnection::updatePositionHandler( const Core::Network::
    //pLog->debug( std::to_string( moveState ) + " -- moveState " );
    //pLog->debug( std::to_string( moveType ) + " -- moveType " );
 
+   if( moveType & MoveType::Running )
+   {
+      unk1 = 0x7F;
+      unk2 = 0x00;
+      unk4 = 0x3C;
+   }
+
    if( moveType & MoveType::Strafing )
    {
       unk2 = 0x40;
-      if( IPC_OP_019A.strafeRight == 1 )
-         unk1 = 0xbf;
-      else
-         unk1 = 0x5f;
+      unk1 = 0x7F;
+      //if( IPC_OP_019A.strafeRight == 1 )
+      //   unk1 = 0xbf;
+      //else
+      //   unk1 = 0x5f;
       unk4 = 0x3C;
    }
 
@@ -206,20 +214,14 @@ void Core::Network::GameConnection::updatePositionHandler( const Core::Network::
       unk1 = 0x7F;
       unk2 = 0x02;
       unk3 = 0x00;
-      unk4 = 0x0518;
+      unk4 = 0x18;
    }
 
-   if( moveType & MoveType::BackWalk )
+   if( moveType & MoveType::Walking && moveType & MoveType::Strafing )
    {
       unk2 = 0x06;
       unk1 = 0xFF;
       unk4 = 0x18;
-   }
-
-   if( moveType & MoveType::Running )
-   {
-      unk1 = 0x7F;
-      unk4 = 0x3C;
    }
 
    if( moveType & MoveType::Jumping )
