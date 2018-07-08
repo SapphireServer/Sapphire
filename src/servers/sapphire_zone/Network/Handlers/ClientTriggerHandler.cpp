@@ -142,8 +142,9 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
        {
           uint64_t targetId = player.getTargetId();
           uint32_t emoteId = param11;
+          bool isSilent = param2 == 1;
 
-          player.emote( emoteId, targetId );
+          player.emote( emoteId, targetId, isSilent );
           break;
        }
        case ClientTriggerType::PersistantEmoteCancel: // cancel persistant emote

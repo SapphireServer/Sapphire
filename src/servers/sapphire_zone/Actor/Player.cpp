@@ -1650,9 +1650,10 @@ void Core::Entity::Player::finishZoning()
    }
 }
 
-void Core::Entity::Player::emote( uint32_t emoteId, uint64_t targetId )
+void Core::Entity::Player::emote( uint32_t emoteId, uint64_t targetId, bool isSilent )
 {
-   sendToInRangeSet( boost::make_shared< ActorControlPacket144 >( getId(), ActorControlType::Emote, emoteId, 0, 0, 0, targetId ) );
+   sendToInRangeSet( boost::make_shared< ActorControlPacket144 >( getId(), ActorControlType::Emote,
+                                                                  emoteId, 0, isSilent ? 1 : 0, 0, targetId ) );
 }
 
 void Core::Entity::Player::teleportQuery( uint16_t aetheryteId )
