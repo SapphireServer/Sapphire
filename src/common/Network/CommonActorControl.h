@@ -125,6 +125,7 @@ namespace Core {
             ActorFateOut1 = 0x110,
 
             Emote = 0x122,
+            EmoteInterrupt = 0x123,
 
             SetPose = 0x127,
 

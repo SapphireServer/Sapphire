@@ -508,6 +508,8 @@ public:
    bool isMarkedForZoning() const;
 
    void emote( uint32_t emoteId, uint64_t targetId, bool isSilent );
+   void emoteInterrupt();
+
 
    void sendZoneInPackets( uint32_t param1, uint32_t param2, uint32_t param3, uint32_t param4, bool pSetStatus );
 

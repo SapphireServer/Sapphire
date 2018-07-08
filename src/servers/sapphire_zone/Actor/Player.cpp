@@ -1656,6 +1656,11 @@ void Core::Entity::Player::emote( uint32_t emoteId, uint64_t targetId, bool isSi
                                                                   emoteId, 0, isSilent ? 1 : 0, 0, targetId ) );
 }
 
+void Core::Entity::Player::emoteInterrupt()
+{
+   sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( getId(), ActorControlType::EmoteInterrupt ) );
+}
+
 void Core::Entity::Player::teleportQuery( uint16_t aetheryteId )
 {
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();

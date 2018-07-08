@@ -147,8 +147,18 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
           player.emote( emoteId, targetId, isSilent );
           break;
        }
+       case ClientTriggerType::EmoteCancel: // emote
+       {
+          player.emoteInterrupt();
+          break;
+       }
        case ClientTriggerType::PersistantEmoteCancel: // cancel persistant emote
        {
+          player.emoteInterrupt();
+          auto SetStatusPacket = boost::make_shared< ActorControlPacket142 >( player.getId(),
+                                                                              SetStatus,
+                                                                              static_cast< uint8_t >( Entity::Chara::ActorStatus::Idle ) );
+          player.sendToInRangeSet( SetStatusPacket );
           break;
        }
        case ClientTriggerType::PoseChange: // change pose
