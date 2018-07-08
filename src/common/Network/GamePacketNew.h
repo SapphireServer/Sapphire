@@ -10,6 +10,7 @@
 #include <boost/make_shared.hpp>
 #include <string.h>
 #include <memory>
+#include <Util/Util.h>
 
 #include "CommonNetwork.h"
 #include "PacketDef/Ipcs.h"
@@ -238,6 +239,7 @@ protected:
 
       // The IPC type itself.
       m_ipcHdr.type = static_cast< ServerZoneIpcType >( m_data._ServerIpcType );
+      m_ipcHdr.timestamp = Util::getTimeSeconds();
       m_segHdr.size = sizeof( T ) + sizeof( FFXIVARR_IPC_HEADER ) + sizeof( FFXIVARR_PACKET_SEGMENT_HEADER );
    };
 
