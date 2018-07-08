@@ -91,8 +91,9 @@ namespace Packets {
       LogMessage                 = 0x00D0,
 
       LinkshellList              = 0x011C, // updated 4.3
-      SetCharaFCTag              = 0x013B, // updated 4.3
-      SetFreeCompanyInfo         = 0x013D, // updated 4.3
+      CharaFreeCompanyTag        = 0x013B, // updated 4.3
+      FreeCompanyBoardMsg        = 0x013C, // updated 4.3
+      FreeCompanyInfo            = 0x013D, // updated 4.3
 
       StatusEffectList           = 0x014E, // updated 4.3
       Effect                     = 0x0151, // updated 4.3
