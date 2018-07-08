@@ -147,6 +147,22 @@ struct FFXIVIpcLinkshellEventHandler : FFXIVIpcBasePacket< LinkshellEventHandler
    /* 0007 */ char lsName[21];
 };
 
+struct FFXIVIpcInventoryModifyHandler : FFXIVIpcBasePacket< InventoryModifyHandler >
+{
+   /* 0000 */ uint32_t seq;
+   /* 0004 */ Common::InventoryOperation action;
+   /* 0005 */ char pad_0005[3];
+   /* 0008 */ uint16_t splitCount; // todo: check packet handler in game and see if this is sent as a u16 or u32
+   /* 000A */ char pad_000A[2];
+   /* 000C */ uint16_t fromContainer;
+   /* 000E */ char pad_000E[2];
+   /* 0010 */ uint8_t fromSlot;
+   /* 0011 */ char pad_0011[15];
+   /* 0020 */ uint16_t toContainer;
+   /* 0022 */ char pad_0022[2];
+   /* 0024 */ uint8_t toSlot;
+};
+
 }
 }
 }

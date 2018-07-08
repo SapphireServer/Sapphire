@@ -5,6 +5,7 @@
 #include <Network/GamePacketNew.h>
 #include <Logging/Logger.h>
 #include <Network/PacketContainer.h>
+#include <Network/PacketDef/Zone/ClientZoneDef.h>
 
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
@@ -29,39 +30,26 @@ using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-enum InventoryOperation
-{
-   Discard = 0x07,
-   Move = 0x08,
-   Swap = 0x09,
-   Merge = 0x0C,
-   Split = 0x0A
-};
-
 void Core::Network::GameConnection::inventoryModifyHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                             Entity::Player& player )
 {
-   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
-   auto seq = *reinterpret_cast< uint32_t* >( &copy.data[0x1] ); //
-   auto action = *reinterpret_cast< uint8_t* >( &copy.data[0x4] ); //
-   auto fromSlot = *reinterpret_cast< uint8_t* >( &copy.data[0x10] );
-   auto toSlot = *reinterpret_cast< uint8_t* >( &copy.data[0x24] );
+   const auto packet = ZoneChannelPacket< Client::FFXIVIpcInventoryModifyHandler >( inPacket );
 
-   auto fromContainer = *reinterpret_cast< uint16_t* >( &copy.data[0xC] ); //
-   auto toContainer = *reinterpret_cast< uint16_t* >( &copy.data[0x20] );
+   const auto& action = packet.data().action;
+   const auto& splitCount = packet.data().splitCount;
 
-   // todo: check packet handler in game and see if this is sent as a u16 or u32
-   auto splitCount = *reinterpret_cast< uint16_t* >( &copy.data[0x28] );
+   const auto& fromSlot = packet.data().fromSlot;
+   const auto& fromContainer = packet.data().fromContainer;
+   const auto& toSlot = packet.data().toSlot;
+   const auto& toContainer = packet.data().toContainer;
 
-   auto ackPacket = makeZonePacket< FFXIVIpcInventoryActionAck >( player.getId() );
-   ackPacket->data().sequence = seq;
+   auto ackPacket = makeZonePacket< Server::FFXIVIpcInventoryActionAck >( player.getId() );
+   ackPacket->data().sequence = packet.data().seq;
    ackPacket->data().type = 7;
    player.queuePacket( ackPacket );
   
    auto pLog = g_fw.get< Logger >();
 
-
-   //pLog->debug( inPacket.toString() );
    pLog->debug( "InventoryAction: " + std::to_string( action ) );
 
    // TODO: other inventory operations need to be implemented
