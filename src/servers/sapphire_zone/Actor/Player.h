@@ -507,7 +507,7 @@ public:
    /*! return true if the player is marked for zoning */
    bool isMarkedForZoning() const;
 
-   void emote( uint32_t emoteId, uint64_t targetId );
+   void emote( uint32_t emoteId, uint64_t targetId, bool isSilent );
 
    void sendZoneInPackets( uint32_t param1, uint32_t param2, uint32_t param3, uint32_t param4, bool pSetStatus );
 
