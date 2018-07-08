@@ -243,15 +243,11 @@ void Core::Network::GameConnection::eventHandlerReturn( const Packets::FFXIVARR_
 void Core::Network::GameConnection::eventHandlerLinkshell( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                            Entity::Player& player )
 {
-   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
+   const auto packet = ZoneChannelPacket< Client::FFXIVIpcLinkshellEventHandler >( inPacket );
 
-   auto eventId = *reinterpret_cast< uint32_t* >( &copy.data[0x10] );
-   auto scene = *reinterpret_cast< uint16_t* >( &copy.data[0x14] );
-   auto lsName = std::string( reinterpret_cast< char* >( &copy.data[0x17] ) );
-
-   auto linkshellEvent = makeZonePacket< FFXIVIpcEventLinkshell >( player.getId() );
-   linkshellEvent->data().eventId = eventId;
-   linkshellEvent->data().scene = static_cast< uint8_t >( scene );
+   auto linkshellEvent = makeZonePacket< Server::FFXIVIpcEventLinkshell >( player.getId() );
+   linkshellEvent->data().eventId = packet.data().eventId;
+   linkshellEvent->data().scene = static_cast< uint8_t >( packet.data().scene );
    linkshellEvent->data().param3 = 1;
    linkshellEvent->data().unknown1 = 0x15a;
    player.queuePacket( linkshellEvent );

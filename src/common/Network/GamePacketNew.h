@@ -14,12 +14,6 @@
 #include "CommonNetwork.h"
 #include "PacketDef/Ipcs.h"
 
-#include <Framework.h>
-#include <Logging/Logger.h>
-#include <Util/Util.h>
-
-extern Core::Framework g_fw;
-
 namespace Core {
 namespace Network {
 namespace Packets {
@@ -184,20 +178,13 @@ public:
       initialize();
    };
 
-   FFXIVIpcPacket< T, T1 >( const FFXIVARR_PACKET_RAW& rawPacket, bool verbose = false )
+   FFXIVIpcPacket< T, T1 >( const FFXIVARR_PACKET_RAW& rawPacket )
    {
       auto ipcHdrSize = sizeof( FFXIVARR_IPC_HEADER );
       auto copySize = std::min< uint32_t >( sizeof( T ), rawPacket.segHdr.size - ipcHdrSize );
 
       memcpy( &m_segHdr, &rawPacket.segHdr, sizeof( FFXIVARR_PACKET_SEGMENT_HEADER ) );
       memcpy( &m_data, &rawPacket.data[0] + ipcHdrSize, copySize );
-
-      auto log = g_fw.get< Core::Logger >();
-      if( log && verbose )
-      {
-         log->debug( "rawpacket size " + std::to_string( rawPacket.segHdr.size )  + "\n" + Util::binaryToHexDump( const_cast< uint8_t* >( &rawPacket.data[0] ), rawPacket.segHdr.size ) );
-         log->debug( "T size " + std::to_string( sizeof( T ) ) + "\n" + Util::binaryToHexDump( reinterpret_cast< uint8_t* >( &m_data ), sizeof( T ) ) );
-      }
 
       memset( &m_ipcHdr, 0, ipcHdrSize );
       m_ipcHdr.type = static_cast< ServerZoneIpcType >( m_data._ServerIpcType );

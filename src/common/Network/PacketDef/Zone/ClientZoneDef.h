@@ -139,6 +139,14 @@ struct FFXIVIpcChatHandler : FFXIVIpcBasePacket< ChatHandler >
    /* 001A */ char message[1012];
 };
 
+struct FFXIVIpcLinkshellEventHandler : FFXIVIpcBasePacket< LinkshellEventHandler >
+{
+   /* 0000 */ uint32_t eventId;
+   /* 0004 */ uint16_t scene;
+   /* 0006 */ char pad_0006[1];
+   /* 0007 */ char lsName[21];
+};
+
 }
 }
 }
