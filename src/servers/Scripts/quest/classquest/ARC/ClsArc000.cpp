@@ -17,8 +17,6 @@ class ClsArc000 : public EventScript
       // GetQuestUI8BH
       // GetQuestUI8BL
 
-      // Steps in this quest ( 0 is before accepting, 
-      // 1 is first, 255 means ready for turning it in
       enum Sequence : uint8_t
       {
          Seq0 = 0,
@@ -54,17 +52,17 @@ class ClsArc000 : public EventScript
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
-      auto actor = Event::mapEventActorToRealActor( actorId );
+      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
       if( actor == Actor0 )
       {
          Scene00000( player );
       }
-      else if( actor == Actor1 && player.getQuestSeq( getId() ) == 1 )
+      if( actor == Actor1 && player.getQuestSeq( getId() ) == Seq1 )
       {
          Scene00001( player );
       }
-      else if( actor == Actor1 && player.getQuestSeq( getId() ) == SeqFinish )
+      if( actor == Actor1 && player.getQuestSeq( getId() ) == SeqFinish )
       {
          Scene00002( player );
       }
@@ -144,7 +142,9 @@ class ClsArc000 : public EventScript
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
             if( result.param2 == 1 )
-               player.updateQuest( getId() , 1 );
+            {
+               player.updateQuest( getId(), Seq1 );
+            }
          } );
    }
 
@@ -156,7 +156,7 @@ class ClsArc000 : public EventScript
             if( result.param2 == 1 )
             {
                player.sendQuestMessage( getId(), 0, 0, 0, 0 );
-               player.updateQuest( getId(), 2 );
+               player.updateQuest( getId(), Seq2 );
             }
          } );
    }

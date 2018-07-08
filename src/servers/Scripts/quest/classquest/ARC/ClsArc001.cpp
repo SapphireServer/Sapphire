@@ -62,11 +62,11 @@ class ClsArc001 : public EventScript
       {
          Scene00000( player );
       }
-      else if( actor == Actor0 && player.getQuestSeq( getId() ) == Seq2 )
+      if( actor == Actor0 && player.getQuestSeq( getId() ) == Seq2 )
       {
          Scene00025( player );
       }
-      else if( actor == Actor0 && player.getQuestSeq( getId() ) == SeqFinish )
+      if( actor == Actor0 && player.getQuestSeq( getId() ) == SeqFinish )
       {
          Scene00028( player );
       }
@@ -145,7 +145,7 @@ class ClsArc001 : public EventScript
       }
    }
 
-   void onMobKill(Entity::Player& player, uint64_t npcId)
+   void onMobKill( Entity::Player& player, uint64_t npcId )
    {
       if( npcId != Enemy0 || Enemy1 )
          return;
@@ -188,6 +188,7 @@ class ClsArc001 : public EventScript
          if( currentCC + 1 >= 6 )
          {
             player.updateQuest( getId(), Seq2 );
+            player.setQuestUI8AL( getId(), 0 );
          }
          else
          {

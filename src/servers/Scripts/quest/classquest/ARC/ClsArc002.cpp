@@ -159,7 +159,7 @@ class ClsArc002 : public EventScript
       }
    }
 
-   void onMobKill(Entity::Player& player, uint64_t npcId)
+   void onMobKill( Entity::Player& player, uint64_t npcId )
    {
       if( npcId != Enemy0 || Enemy1 )
          return;
@@ -202,6 +202,7 @@ class ClsArc002 : public EventScript
          if( currentCC + 1 >= 6 )
          {
             player.updateQuest( getId(), Seq3 );
+            player.setQuestUI8AL( getId(), 0 );
          }
          else
          {
