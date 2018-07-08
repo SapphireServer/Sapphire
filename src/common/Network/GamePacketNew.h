@@ -179,6 +179,18 @@ public:
       initialize();
    };
 
+   FFXIVIpcPacket< T, T1 >( const FFXIVARR_PACKET_RAW& rawPacket )
+   {
+      auto ipcHdrSize = sizeof( FFXIVARR_IPC_HEADER );
+      auto copySize = std::min< uint32_t >( sizeof( T ), rawPacket.segHdr.size - ipcHdrSize );
+
+      memcpy( &m_segHdr, &rawPacket.segHdr, sizeof( FFXIVARR_PACKET_SEGMENT_HEADER ) );
+      memcpy( &m_data, &rawPacket.data[0] + ipcHdrSize, copySize );
+
+      memset( &m_ipcHdr, 0, ipcHdrSize );
+      m_ipcHdr.type = static_cast< ServerZoneIpcType >( m_data._ServerIpcType );
+   }
+
    uint32_t getContentSize() override
    {
       return sizeof( FFXIVARR_IPC_HEADER ) + sizeof( T );
@@ -214,6 +226,8 @@ public:
 
    /** Gets a reference to the underlying IPC data structure. */
    T& data() { return m_data; };
+
+   const T& data() const { return m_data; }
 
 protected:
    /** Initializes the fields of the header structures */

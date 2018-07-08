@@ -482,7 +482,7 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
 
       switch( inPacket.segHdr.type )
       {
-         case 9: // Encryption init
+         case SEGMENTTYPE_ENCRYPTIONINIT: // Encryption init
          {
             std::string key_phrase( reinterpret_cast< char* >( &inPacket.data[36] ) );
             generateEncryptionKey( *reinterpret_cast< uint32_t* >( &inPacket.data[100] ), key_phrase );
@@ -500,13 +500,13 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
          }
 
 
-         case 3: // game packet
+         case SEGMENTTYPE_IPC: // game packet
          {
             g_log.info( "GamePacket [" + std::to_string( inPacket.segHdr.type ) + "]" );
             handleGamePacket( inPacket );
             break;
          }
-         case 7: // keep alive
+         case SEGMENTTYPE_KEEPALIVE: // keep alive
          {
             uint32_t id = *reinterpret_cast< uint32_t* >( &inPacket.data[0] );
             uint32_t timeStamp = *reinterpret_cast< uint32_t* >( &inPacket.data[4] );

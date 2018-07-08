@@ -6,6 +6,7 @@
 #include <Logging/Logger.h>
 #include <Network/PacketContainer.h>
 #include <Network/CommonActorControl.h>
+#include <Network/PacketDef/Zone/ClientZoneDef.h>
 
 #include <unordered_map>
 
@@ -91,12 +92,11 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
    if( player.getGmRank() <= 0 )
       return;
 
-   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
-   auto commandId = *reinterpret_cast< uint32_t* >( &copy.data[0x10] );
-
-   uint32_t param1 = *reinterpret_cast< uint32_t* >( &copy.data[0x14] );
-   uint32_t param2 = *reinterpret_cast< uint32_t* >( &copy.data[0x18] );
-   uint32_t param3 = *reinterpret_cast< uint32_t* >( &copy.data[0x28] );
+   const auto packet = ZoneChannelPacket< Client::FFXIVIpcGmCommand1 >( inPacket );
+   const auto& commandId = packet.data().commandId;
+   const auto& param1 = packet.data().param1;
+   const auto& param2 = packet.data().param2;
+   const auto& param3 = packet.data().param3;
 
    auto pLog = g_fw.get< Logger >();
    pLog->debug( player.getName() + " used GM1 commandId: " + std::to_string( commandId ) +
@@ -310,9 +310,11 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
    }
    case GmCommand::Item:
    {
-      if( param2 < 1 || param2 > 99 )
+      auto quantity = param2;
+
+      if( quantity < 1 || quantity > 999 )
       {
-         param2 = 1;
+         quantity = 1;
       }
 
       if( ( param1 == 0xcccccccc ) )
@@ -321,7 +323,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
          return;
       }
 
-      if( !targetPlayer->addItem( -1, param1, param2 ) )
+      if( !targetPlayer->addItem( -1, param1, quantity ) )
          player.sendUrgent( "Item " + std::to_string( param1 ) + " not found..." );
       break;
    }
@@ -489,10 +491,10 @@ void Core::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACKET_R
    auto pLog = g_fw.get< Logger >();
    auto pServerZone = g_fw.get< ServerZone >();
 
-   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
-   auto commandId = *reinterpret_cast< uint32_t* >( &copy.data[0x10] );
+   const auto packet = ZoneChannelPacket< Client::FFXIVIpcGmCommand2 >( inPacket );
 
-   auto param1 = std::string( reinterpret_cast< char* >( &copy.data[0x24] ) );
+   const auto& commandId = packet.data().commandId;
+   const auto& param1 = std::string( packet.data().param1 );
 
    pLog->debug( player.getName() + " used GM2 commandId: " + std::to_string( commandId ) + ", params: " + param1 );
 
