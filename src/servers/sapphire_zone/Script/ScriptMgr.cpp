@@ -76,7 +76,7 @@ bool Core::Scripting::ScriptMgr::init()
          scriptsLoaded++;
    }
 
-   pLog->info( "ScriptMgr: Loaded " + std::to_string( scriptsLoaded ) + "/" + std::to_string( scriptsFound ) + " scripts successfully" );
+   pLog->info( "ScriptMgr: Loaded " + std::to_string( scriptsLoaded ) + "/" + std::to_string( scriptsFound ) + " modules" );
 
    watchDirectories();
 

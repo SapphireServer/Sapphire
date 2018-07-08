@@ -42,12 +42,12 @@ void Core::Network::GameConnection::inventoryModifyHandler( const Packets::FFXIV
                                                             Entity::Player& player )
 {
    Packets::FFXIVARR_PACKET_RAW copy = inPacket;
-   auto seq = *reinterpret_cast< uint32_t* >( &copy.data[0x1] );
-   auto action = *reinterpret_cast< uint8_t* >( &copy.data[0x4] );
+   auto seq = *reinterpret_cast< uint32_t* >( &copy.data[0x1] ); //
+   auto action = *reinterpret_cast< uint8_t* >( &copy.data[0x4] ); //
    auto fromSlot = *reinterpret_cast< uint8_t* >( &copy.data[0x10] );
    auto toSlot = *reinterpret_cast< uint8_t* >( &copy.data[0x24] );
 
-   auto fromContainer = *reinterpret_cast< uint16_t* >( &copy.data[0xC] );
+   auto fromContainer = *reinterpret_cast< uint16_t* >( &copy.data[0xC] ); //
    auto toContainer = *reinterpret_cast< uint16_t* >( &copy.data[0x20] );
 
    // todo: check packet handler in game and see if this is sent as a u16 or u32
