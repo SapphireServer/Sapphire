@@ -6,6 +6,7 @@
 #include <Network/GamePacketNew.h>
 #include <Network/PacketContainer.h>
 #include <Network/CommonActorControl.h>
+#include <Network/PacketDef/Zone/ClientZoneDef.h>
 #include <Logging/Logger.h>
 
 #include "Network/GameConnection.h"
@@ -38,14 +39,12 @@ using namespace Core::Network::ActorControl;
 void Core::Network::GameConnection::skillHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                   Entity::Player& player )
 {
-   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
+   const auto packet = ZoneChannelPacket< Client::FFXIVIpcSkillHandler >( inPacket );
 
-   uint8_t type = inPacket.data[0x11];
-
-   auto action = *reinterpret_cast< uint32_t* >( &copy.data[0x14] );
-   auto useCount = *reinterpret_cast< uint32_t* >( &copy.data[0x18] );
-
-   auto targetId = *reinterpret_cast< uint64_t* >( &copy.data[0x20] );
+   const auto& type = packet.data().type;
+   const auto& action = packet.data().actionId;
+   const auto& useCount = packet.data().useCount;
+   const auto& targetId = packet.data().targetId;
 
    player.sendDebug( "Skill type:" + std::to_string( type ) );
 

@@ -211,7 +211,7 @@ void Core::Network::GameConnection::handleZonePacket( Core::Network::Packets::FF
       pLog->debug( sessionStr + " Undefined Zone IPC : Unknown ( " +
                    boost::str( boost::format( "%|04X|" ) %
                                       static_cast< uint32_t >( opcode ) ) + " )" );
-      //pLog->debug( "\n" + pPacket.toString() );
+      pLog->debug( "Dump:\n" + Util::binaryToHexDump( const_cast< uint8_t* >( &pPacket.data[0] ), pPacket.segHdr.size ) );
    }
 }
 
@@ -381,7 +381,7 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
    {
       switch( inPacket.segHdr.type )
       {
-      case 1:
+      case SEGMENTTYPE_SESSIONINIT:
       {
          char* id = ( char* ) &( inPacket.data[4] );
          uint32_t playerId = boost::lexical_cast< uint32_t >( id );
@@ -445,12 +445,12 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
          break;
 
       }
-      case 3: // game packet
+      case SEGMENTTYPE_IPC: // game packet
       {
          queueInPacket( inPacket );
          break;
       }
-      case 7: // keep alive
+      case SEGMENTTYPE_KEEPALIVE: // keep alive
       {
          uint32_t id = *( uint32_t* ) &inPacket.data[0];
          uint32_t timeStamp = *( uint32_t* ) &inPacket.data[4];

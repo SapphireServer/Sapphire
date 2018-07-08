@@ -11,7 +11,7 @@
 #include <Util/Util.h>
 
 #include <unordered_map>
-
+#include <Network/PacketDef/Zone/ClientZoneDef.h>
 #include <Logging/Logger.h>
 
 #include "Network/GameConnection.h"
@@ -63,15 +63,14 @@ void Core::Network::GameConnection::fcInfoReqHandler( const Core::Network::Packe
 void Core::Network::GameConnection::setSearchInfoHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                           Entity::Player& player )
 {
-   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
+   const auto packet = ZoneChannelPacket< Client::FFXIVIpcSetSearchInfo >( inPacket );
 
-   auto inval = *reinterpret_cast< uint32_t* >( &copy.data[0x10] );
-   auto inval1 = *reinterpret_cast< uint32_t* >( &copy.data[0x14] );
-   auto status = *reinterpret_cast< uint64_t* >( &copy.data[0x10] );
+   const auto& inval = packet.data().status1;
+   const auto& inval1 = packet.data().status2;
+   const auto& status = packet.data().status;
+   const auto& selectRegion = packet.data().language;
 
-   auto selectRegion = copy.data[0x21];
-
-   player.setSearchInfo( selectRegion, 0, reinterpret_cast< char* >( &copy.data[0x22] ) );
+   player.setSearchInfo( selectRegion, 0, packet.data().searchComment );
 
    player.setOnlineStatusMask( status );
 
@@ -261,8 +260,8 @@ void Core::Network::GameConnection::zoneLineHandler( const Core::Network::Packet
 {
    auto pTeriMgr = g_fw.get< TerritoryMgr >();
 
-   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
-   auto zoneLineId = *reinterpret_cast< uint32_t* >( &copy.data[0x10] );
+   const auto packet = ZoneChannelPacket< Client::FFXIVIpcZoneLineHandler >( inPacket );
+   const auto& zoneLineId = packet.data().zoneLineId;
 
    player.sendDebug( "Walking ZoneLine " + std::to_string( zoneLineId ) );
 
@@ -305,20 +304,18 @@ void Core::Network::GameConnection::zoneLineHandler( const Core::Network::Packet
 void Core::Network::GameConnection::discoveryHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                       Entity::Player& player )
 {
-
-   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
-
-   auto ref_position_id = *reinterpret_cast< uint32_t* >( &copy.data[0x10] );
+   const auto packet = ZoneChannelPacket< Client::FFXIVIpcDiscoveryHandler >( inPacket );
+   const auto& positionRef = packet.data().positionRef;
 
    auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
 
    auto pQR = pDb->query( "SELECT id, map_id, discover_id "
                                "FROM discoveryinfo "
-                               "WHERE id = " + std::to_string( ref_position_id ) + ";" );
+                               "WHERE id = " + std::to_string( positionRef ) + ";" );
 
    if( !pQR->next() )
    {
-      player.sendNotice( "Discovery ref pos ID: " + std::to_string( ref_position_id ) + " not found. " );
+      player.sendNotice( "Discovery ref pos ID: " + std::to_string( positionRef ) + " not found. " );
       return;
    }
 
@@ -327,7 +324,7 @@ void Core::Network::GameConnection::discoveryHandler( const Core::Network::Packe
    discoveryPacket->data().map_part_id = pQR->getUInt( 3 );
 
    player.queuePacket( discoveryPacket );
-   player.sendNotice( "Discovery ref pos ID: " + std::to_string( ref_position_id ) );
+   player.sendNotice( "Discovery ref pos ID: " + std::to_string( positionRef ) );
 
    player.discover( pQR->getUInt16( 2 ), pQR->getUInt16( 3 ) );
 
@@ -371,10 +368,9 @@ void Core::Network::GameConnection::blackListHandler( const Core::Network::Packe
 void Core::Network::GameConnection::pingHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                  Entity::Player& player )
 {
-   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
-   auto inVal = *reinterpret_cast< uint32_t* >( &copy.data[0x10] );
+   const auto packet = ZoneChannelPacket< Client::FFXIVIpcPingHandler >( inPacket );
 
-   queueOutPacket( boost::make_shared< PingPacket>( player, inVal ) );
+   queueOutPacket( boost::make_shared< Server::PingPacket >( player, packet.data().timestamp ) );
 
    player.setLastPing( static_cast< uint32_t >( time( nullptr ) ) );
 }
@@ -465,23 +461,19 @@ void Core::Network::GameConnection::chatHandler( const Core::Network::Packets::F
 {
    auto pDebugCom = g_fw.get< DebugCommandHandler >();
 
-   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
+   const auto packet = ZoneChannelPacket< Client::FFXIVIpcChatHandler >( inPacket );
 
-   std::string chatString( reinterpret_cast< char* >( &copy.data[0x2a] ) );
-
-   auto sourceId = *reinterpret_cast< uint32_t* >( &copy.data[0x14] );
-
-   if( chatString.at( 0 ) == '!' )
+   if( packet.data().message[0] == '!' )
    {
       // execute game console command
-      pDebugCom->execCommand( const_cast< char * >( chatString.c_str() ) + 1, player );
+      pDebugCom->execCommand( const_cast< char* >( packet.data().message ) + 1, player );
       return;
    }
 
-   ChatType chatType = static_cast< ChatType >( inPacket.data[0x28] );
+   auto chatType = packet.data().chatType;
 
    //ToDo, need to implement sending GM chat types.
-   auto chatPacket = boost::make_shared< ChatPacket >( player, chatType, chatString );
+   auto chatPacket = boost::make_shared< Server::ChatPacket >( player, chatType, packet.data().message );
 
    switch( chatType )
    {
@@ -537,19 +529,16 @@ void Core::Network::GameConnection::logoutHandler( const Core::Network::Packets:
 void Core::Network::GameConnection::tellHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                  Entity::Player& player )
 {
-   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
-
-   std::string targetPcName( reinterpret_cast< char* >( &copy.data[0x14] ) );
-   std::string msg( reinterpret_cast< char* >( &copy.data[0x34] ) );
+   const auto packet = ZoneChannelPacket< Client::FFXIVIpcTellHandler >( inPacket );
 
    auto pZoneServer = g_fw.get< ServerZone >();
 
-   auto pSession = pZoneServer->getSession( targetPcName );
+   auto pSession = pZoneServer->getSession( packet.data().targetPCName );
 
    if( !pSession )
    {
       auto tellErrPacket = makeZonePacket< FFXIVIpcTellErrNotFound >( player.getId() );
-      strcpy( tellErrPacket->data().receipientName, targetPcName.c_str() );
+      strcpy( tellErrPacket->data().receipientName, packet.data().targetPCName );
       sendSinglePacket( tellErrPacket );
       return;
    }
@@ -578,7 +567,7 @@ void Core::Network::GameConnection::tellHandler( const Core::Network::Packets::F
    }
 
    auto tellPacket = makeChatPacket< FFXIVIpcTell >( player.getId() );
-   strcpy( tellPacket->data().msg, msg.c_str() );
+   strcpy( tellPacket->data().msg, packet.data().message );
    strcpy( tellPacket->data().receipientName, player.getName().c_str() );
    // TODO: do these have a meaning?
    //tellPacket.data().u1 = 0x92CD7337;

@@ -7,6 +7,7 @@
 #include <Network/PacketContainer.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <sapphire_zone/Event/EventHandler.h>
+#include <Network/PacketDef/Zone/ClientZoneDef.h>
 
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
@@ -38,10 +39,12 @@ void Core::Network::GameConnection::eventHandlerTalk( const Packets::FFXIVARR_PA
 {
    auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
 
-   auto actorId = *reinterpret_cast< uint64_t* >( &copy.data[0x10] );
-   auto eventId = *reinterpret_cast< uint32_t* >( &copy.data[0x18] );
+   const auto packet = ZoneChannelPacket< Client::FFXIVIpcEventHandlerTalk >( inPacket );
+
+   const auto& actorId = packet.data().actorId;
+   const auto& eventId = packet.data().eventId;
+
    auto eventType = static_cast< uint16_t >( eventId >> 16 );
 
    std::string eventName = "onTalk";
@@ -81,12 +84,13 @@ void Core::Network::GameConnection::eventHandlerEmote( const Packets::FFXIVARR_P
 
    auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
 
-   auto actorId = *reinterpret_cast< uint64_t* >( &copy.data[0x10] );
-   auto eventId = *reinterpret_cast< uint32_t* >( &copy.data[0x18] );
-   auto emoteId = *reinterpret_cast< uint16_t* >( &copy.data[0x1C] );
-   auto eventType = static_cast< uint16_t >( eventId >> 16 );
+   const auto packet = ZoneChannelPacket< Client::FFXIVIpcEventHandlerEmote >( inPacket );
+
+   const auto& actorId = packet.data().actorId;
+   const auto& eventId = packet.data().eventId;
+   const auto& emoteId = packet.data().emoteId;
+   const auto eventType = static_cast< uint16_t >( eventId >> 16 );
 
    std::string eventName = "onEmote";
    std::string objName = Event::getEventName( eventId );
@@ -118,14 +122,12 @@ void Core::Network::GameConnection::eventHandlerWithinRange( const Packets::FFXI
                                                              Entity::Player& player )
 {
    auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
-   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
 
-   auto eventId = *reinterpret_cast< uint32_t* >( &copy.data[0x14] );
-   auto param1 = *reinterpret_cast< uint32_t* >( &copy.data[0x10] );
+   const auto packet = ZoneChannelPacket< Client::FFXIVIpcEventHandlerWithinRange >( inPacket );
 
-   auto x = *reinterpret_cast< float* >( &copy.data[0x18] );
-   auto y = *reinterpret_cast< float* >( &copy.data[0x1C] );
-   auto z = *reinterpret_cast< float* >( &copy.data[0x20] );
+   const auto& eventId = packet.data().eventId;
+   const auto& param1 = packet.data().param1;
+   const auto& pos = packet.data().position;
 
    std::string eventName = "onWithinRange";
    std::string objName = Event::getEventName( eventId );
@@ -134,7 +136,7 @@ void Core::Network::GameConnection::eventHandlerWithinRange( const Packets::FFXI
 
    player.eventStart( player.getId(), eventId, Event::EventHandler::WithinRange, 1, param1 );
 
-   pScriptMgr->onWithinRange( player, eventId, param1, x, y, z );
+   pScriptMgr->onWithinRange( player, eventId, param1, pos.x, pos.y, pos.z );
 
    player.checkEvent( eventId );
 }
@@ -143,14 +145,11 @@ void Core::Network::GameConnection::eventHandlerOutsideRange( const Packets::FFX
                                                               Entity::Player& player )
 {
    auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
-   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
 
-   auto eventId = *reinterpret_cast< uint32_t* >( &copy.data[0x14] );
-   auto param1 = *reinterpret_cast< uint32_t* >( &copy.data[0x10] );
-
-   auto x = *reinterpret_cast< float* >( &copy.data[0x18] );
-   auto y = *reinterpret_cast< float* >( &copy.data[0x1C] );
-   auto z = *reinterpret_cast< float* >( &copy.data[0x20] );
+   const auto packet = ZoneChannelPacket< Client::FFXIVIpcEventHandlerOutsideRange >( inPacket );
+   const auto& eventId = packet.data().eventId;
+   const auto& param1 = packet.data().param1;
+   const auto& pos = packet.data().position;
 
    std::string eventName = "onOutsideRange";
    std::string objName = Event::getEventName( eventId );
@@ -159,7 +158,7 @@ void Core::Network::GameConnection::eventHandlerOutsideRange( const Packets::FFX
 
    player.eventStart( player.getId(), eventId, Event::EventHandler::WithinRange, 1, param1 );
 
-   pScriptMgr->onOutsideRange( player, eventId, param1, x, y, z );
+   pScriptMgr->onOutsideRange( player, eventId, param1, pos.x, pos.y, pos.z );
 
    player.checkEvent( eventId );
 }
@@ -168,11 +167,12 @@ void Core::Network::GameConnection::eventHandlerEnterTerritory( const Packets::F
                                                                 Entity::Player& player )
 {
    auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
-   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
 
-   auto eventId = *reinterpret_cast< uint32_t* >( &copy.data[0x10] );
-   auto param1 = *reinterpret_cast< uint16_t* >( &copy.data[0x14] );
-   auto param2 = *reinterpret_cast< uint16_t* >( &copy.data[0x16] );
+   const auto packet = ZoneChannelPacket< Client::FFXIVIpcEnterTerritoryHandler >( inPacket );
+
+   const auto& eventId = packet.data().eventId;
+   const auto& param1 = packet.data().param1;
+   const auto& param2 = packet.data().param2;
 
    std::string eventName = "onEnterTerritory";
 
@@ -197,13 +197,12 @@ void Core::Network::GameConnection::eventHandlerEnterTerritory( const Packets::F
 void Core::Network::GameConnection::eventHandlerReturn( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                         Entity::Player& player )
 {
-   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
-
-   auto eventId = *reinterpret_cast< uint32_t* >( &copy.data[0x10] );
-   auto scene = *reinterpret_cast< uint16_t* >( &copy.data[0x14] );
-   auto param1 = *reinterpret_cast< uint16_t* >( &copy.data[0x16] );
-   auto param2 = *reinterpret_cast< uint16_t* >( &copy.data[0x18] );
-   auto param3 = *reinterpret_cast< uint16_t* >( &copy.data[0x1C] );
+   const auto packet = ZoneChannelPacket< Client::FFXIVIpcEventHandlerReturn >( inPacket );
+   const auto& eventId = packet.data().eventId;
+   const auto& scene = packet.data().scene;
+   const auto& param1 = packet.data().param1;
+   const auto& param2 = packet.data().param2;
+   const auto& param3 = packet.data().param3;
 
    std::string eventName = Event::getEventName( eventId );
 
@@ -244,15 +243,11 @@ void Core::Network::GameConnection::eventHandlerReturn( const Packets::FFXIVARR_
 void Core::Network::GameConnection::eventHandlerLinkshell( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                            Entity::Player& player )
 {
-   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
+   const auto packet = ZoneChannelPacket< Client::FFXIVIpcLinkshellEventHandler >( inPacket );
 
-   auto eventId = *reinterpret_cast< uint32_t* >( &copy.data[0x10] );
-   auto scene = *reinterpret_cast< uint16_t* >( &copy.data[0x14] );
-   auto lsName = std::string( reinterpret_cast< char* >( &copy.data[0x17] ) );
-
-   auto linkshellEvent = makeZonePacket< FFXIVIpcEventLinkshell >( player.getId() );
-   linkshellEvent->data().eventId = eventId;
-   linkshellEvent->data().scene = static_cast< uint8_t >( scene );
+   auto linkshellEvent = makeZonePacket< Server::FFXIVIpcEventLinkshell >( player.getId() );
+   linkshellEvent->data().eventId = packet.data().eventId;
+   linkshellEvent->data().scene = static_cast< uint8_t >( packet.data().scene );
    linkshellEvent->data().param3 = 1;
    linkshellEvent->data().unknown1 = 0x15a;
    player.queuePacket( linkshellEvent );

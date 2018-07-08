@@ -27,6 +27,23 @@ namespace Common {
       float z;
    };
 
+   enum InventoryOperation : uint8_t
+   {
+      Discard = 0x07,
+      Move = 0x08,
+      Swap = 0x09,
+      Merge = 0x0C,
+      Split = 0x0A
+   };
+
+   enum ClientLanguage : uint8_t
+   {
+      Japanese = 1,
+      English = 2,
+      German = 4,
+      French = 8
+   };
+
    enum EquipSlot : uint8_t
    {
       MainHand = 0,

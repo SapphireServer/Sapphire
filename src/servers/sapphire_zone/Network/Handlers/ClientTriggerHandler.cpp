@@ -7,6 +7,7 @@
 #include <Exd/ExdDataGenerated.h>
 #include <Network/PacketContainer.h>
 #include <Network/CommonActorControl.h>
+#include <Network/PacketDef/Zone/ClientZoneDef.h>
 
 #include "Zone/Zone.h"
 #include "Zone/ZonePosition.h"
@@ -42,15 +43,16 @@ using namespace Core::Network::ActorControl;
 void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                           Entity::Player& player )
 {
-   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
-
    auto pLog = g_fw.get< Logger >();
-   uint16_t commandId = *reinterpret_cast< uint16_t* >( &copy.data[0x10] );
-   uint64_t param1 = *reinterpret_cast< uint64_t* >( &copy.data[0x14] );
-   uint32_t param11 = *reinterpret_cast< uint32_t* >( &copy.data[0x14] );
-   uint32_t param12 = *reinterpret_cast< uint32_t* >( &copy.data[0x18] );
-   uint32_t param2 = *reinterpret_cast< uint32_t* >( &copy.data[0x1C] );
-   uint64_t param3 = *reinterpret_cast< uint64_t* >( &copy.data[0x28] );
+
+   const auto packet = ZoneChannelPacket< Client::FFXIVIpcClientTrigger >( inPacket );
+
+   const auto& commandId = packet.data().commandId;
+   const auto& param1 = *reinterpret_cast< const uint64_t* >( &packet.data().param11 );
+   const auto& param11 = packet.data().param11;
+   const auto& param12 = packet.data().param12;
+   const auto& param2 = packet.data().param2;
+   const auto& param3 = packet.data().param3;
 
    pLog->debug( "[" + std::to_string( m_pSession->getId() ) + "] Incoming action: " +
               boost::str( boost::format( "%|04X|" ) % ( uint32_t ) ( commandId & 0xFFFF ) ) +
@@ -64,7 +66,7 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
 
    switch( commandId )
    {
-       case ClientTriggerType::ToggleSeathe:  // Toggle sheathe
+       case ClientTriggerType::ToggleSheathe:  // Toggle sheathe
        {
           if ( param11 == 1 )
               player.setStance( Entity::Chara::Stance::Active );
