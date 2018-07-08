@@ -203,7 +203,7 @@ namespace Common {
       Walking = 0x02,
       Strafing = 0x04,
       Jumping = 0x10,
-      BackWalk = Walking | Strafing,
+      BackWalk = 0x06,
    };
 
    enum MoveState : uint8_t

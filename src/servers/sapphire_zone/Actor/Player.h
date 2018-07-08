@@ -595,12 +595,9 @@ public:
    /*! checks if a spawn index is valid */
    bool isObjSpawnIndexValid( uint8_t index );
 
-
    uint64_t m_lastMoveTime;
 
    uint8_t m_lastMoveflag;
-
-   bool m_bJumping;
 
 private:
    uint32_t m_lastWrite;
