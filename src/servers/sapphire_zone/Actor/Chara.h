@@ -46,7 +46,9 @@ public:
       Crafting = 0x05,
       Gathering = 0x06,
       Melding = 0x07,
-      SMachine = 0x08
+      SMachine = 0x08,
+      Carry = 0x09,
+      EmoteMode = 0x0B
    };
 
    /*! ModelType as found in eventsystemdefine.exd */

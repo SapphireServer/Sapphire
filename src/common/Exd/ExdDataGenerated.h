@@ -1603,6 +1603,7 @@ struct Emote
    uint16_t icon;
    uint16_t logMessageTargeted;
    uint16_t logMessageUntargeted;
+   uint8_t emoteMode;
 
    Emote( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
@@ -1612,6 +1613,19 @@ struct EmoteCategory
    std::string name;
 
    EmoteCategory( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+
+struct EmoteMode
+{
+   std::string name;
+   uint8_t emoteCategory;
+   int32_t textCommand;
+   uint16_t icon;
+   uint16_t logMessageTargeted;
+   uint16_t logMessageUntargeted;
+
+   EmoteMode( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct ENpcBase
@@ -4133,6 +4147,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_DpsChallengeTransientDat;
      xiv::exd::Exd m_EmoteDat;
      xiv::exd::Exd m_EmoteCategoryDat;
+     xiv::exd::Exd m_EmoteModeDat;
      xiv::exd::Exd m_ENpcBaseDat;
      xiv::exd::Exd m_ENpcResidentDat;
      xiv::exd::Exd m_EObjDat;
@@ -4861,6 +4876,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_DpsChallengeOfficerIdList;
      std::set< uint32_t > m_DpsChallengeTransientIdList;
      std::set< uint32_t > m_EmoteIdList;
+     std::set< uint32_t > m_EmoteModeIdList;
      std::set< uint32_t > m_EmoteCategoryIdList;
      std::set< uint32_t > m_ENpcBaseIdList;
      std::set< uint32_t > m_ENpcResidentIdList;
@@ -5822,6 +5838,12 @@ const std::set< uint32_t >& getEmoteIdList()
    if( m_EmoteIdList.size() == 0 )
       loadIdList( m_EmoteDat, m_EmoteIdList );
    return m_EmoteIdList;
+}
+const std::set< uint32_t >& getEmoteModeIdList()
+{
+  if( m_EmoteModeIdList.size() == 0 )
+     loadIdList( m_EmoteModeDat, m_EmoteModeIdList );
+  return m_EmoteModeIdList;
 }
 const std::set< uint32_t >& getEmoteCategoryIdList()
 {
