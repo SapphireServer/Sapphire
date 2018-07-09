@@ -381,7 +381,7 @@ struct FFXIVIpcPlayerSpawn : FFXIVIpcBasePacket<PlayerSpawn>
    uint16_t activeMinion;
    uint8_t spawnIndex;
    uint8_t state;
-   uint8_t persistantEmote;
+   uint8_t persistentEmote;
    uint8_t modelType; // modelType -> eventSystemDefine
    uint8_t subtype;
    uint8_t voice;

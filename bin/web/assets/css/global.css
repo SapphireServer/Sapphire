@@ -139,11 +139,25 @@ p.pageSubTitle{
 }
 
 .commit-history {
-  padding-left: 20px;
+  padding: 0;
+  list-style: none;
+  margin: 0 -15px 0 -15px;
 }
 
-.commit-history li a {
+.commit-history > li {
+
+}
+
+.commit-history > li:nth-child(odd) {
+  background: #444;
+}
+
+.commit-history> li > a {
   color: #fff;
+  padding: 5px 20px;
+  display: block;
+  font-size: 11px;
+  line-height: 12px;
 }
 
 .commit-history li a:hover {

@@ -144,6 +144,23 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
           uint32_t emoteId = param11;
           bool isSilent = param2 == 1;
 
+          auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+          auto emoteData = pExdData->get< Data::Emote >( emoteId );
+
+          if( !emoteData )
+             return;
+
+          // TODO: This is wrong!! EmoteCategory does not define whether an emote is persistent or not.
+          // What defines an emote as persistent is EmoteData != 0
+          bool isPersistent = emoteData->emoteCategory == static_cast< uint8_t >( EmoteCategory::Persistent );
+
+          if( isPersistent )
+          {
+             player.setStance( Entity::Chara::Stance::Passive );
+             player.setAutoattack( false );
+             player.setPersistentEmote( emoteId );
+          }
+
           player.emote( emoteId, targetId, isSilent );
           break;
        }
@@ -152,13 +169,14 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
           player.emoteInterrupt();
           break;
        }
-       case ClientTriggerType::PersistantEmoteCancel: // cancel persistant emote
+       case ClientTriggerType::PersistentEmoteCancel: // cancel persistent emote
        {
+          player.setPersistentEmote( 0 );
           player.emoteInterrupt();
-          auto SetStatusPacket = boost::make_shared< ActorControlPacket142 >( player.getId(),
+          auto pSetStatusPacket = boost::make_shared< ActorControlPacket142 >( player.getId(),
                                                                               SetStatus,
                                                                               static_cast< uint8_t >( Entity::Chara::ActorStatus::Idle ) );
-          player.sendToInRangeSet( SetStatusPacket );
+          player.sendToInRangeSet( pSetStatusPacket );
           break;
        }
        case ClientTriggerType::PoseChange: // change pose
