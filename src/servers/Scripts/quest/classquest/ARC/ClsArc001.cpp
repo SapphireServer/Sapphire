@@ -147,7 +147,7 @@ class ClsArc001 : public EventScript
 
    void onMobKill( Entity::Player& player, uint64_t npcId )
    {
-      if( npcId != Enemy0 || Enemy1 )
+      if( npcId != Enemy0 || npcId != Enemy1 )
          return;
 
       auto currentKC5 = player.getQuestUI8AL( getId() ) + 1;
@@ -202,7 +202,7 @@ class ClsArc001 : public EventScript
 
          if( QUEST_ONKILL_5 == 8 && QUEST_ONKILL_32 == 8 )
          {
-            player.updateQuest( getId() , SeqFinish );
+            player.updateQuest( getId(), SeqFinish );
          }
       }
    }

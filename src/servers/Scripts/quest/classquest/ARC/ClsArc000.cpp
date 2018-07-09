@@ -70,7 +70,7 @@ class ClsArc000 : public EventScript
 
    void onMobKill( Entity::Player& player, uint64_t npcId )
    {
-      if( npcId != Enemy0 || Enemy1 || Enemy2 )
+      if( npcId != Enemy0 || npcId != Enemy1 || npcId != Enemy2 )
          return;
 
       auto currentKC37 = player.getQuestUI8AL( getId() ) + 1;
@@ -92,18 +92,18 @@ class ClsArc000 : public EventScript
 
       else if( currentKC37 < 6 )
       {
-         player.setQuestUI8AL( getId() , currentKC37 );
-         player.sendQuestMessage( getId() , 0, 2, currentKC37, 6 );
+         player.setQuestUI8AL( getId(), currentKC37 );
+         player.sendQuestMessage( getId(), 0, 2, currentKC37, 6 );
       }
       else if( currentKC49 < 6 )
       {
-         player.setQuestUI8BH( getId() , currentKC49 );
-         player.sendQuestMessage( getId() , 0, 2, currentKC49, 6 );
+         player.setQuestUI8BH( getId(), currentKC49 );
+         player.sendQuestMessage( getId(), 0, 2, currentKC49, 6 );
       }
       else if( currentKC47 < 6 )
       {
-         player.setQuestUI8BL( getId() , currentKC47 );
-         player.sendQuestMessage( getId() , 0, 2, currentKC47, 6 );
+         player.setQuestUI8BL( getId(), currentKC47 );
+         player.sendQuestMessage( getId(), 0, 2, currentKC47, 6 );
       }
    }
 
@@ -138,7 +138,7 @@ class ClsArc000 : public EventScript
 
    void Scene00000( Entity::Player& player )
    {
-      player.playScene( getId() , 0, HIDE_HOTBAR,
+      player.playScene( getId(), 0, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
             if( result.param2 == 1 )
@@ -150,7 +150,7 @@ class ClsArc000 : public EventScript
 
    void Scene00001( Entity::Player& player )
    {
-      player.playScene( getId() , 1, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ,
+      player.playScene( getId(), 1, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
             if( result.param2 == 1 )
@@ -163,7 +163,7 @@ class ClsArc000 : public EventScript
 
    void Scene00002( Entity::Player& player )
    {
-      player.playScene( getId() , 2, HIDE_HOTBAR,
+      player.playScene( getId(), 2, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
             if( result.param2 == 1 )

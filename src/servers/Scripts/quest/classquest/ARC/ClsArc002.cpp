@@ -161,7 +161,7 @@ class ClsArc002 : public EventScript
 
    void onMobKill( Entity::Player& player, uint64_t npcId )
    {
-      if( npcId != Enemy0 || Enemy1 )
+      if( npcId != Enemy0 || npcId != Enemy1 )
          return;
 
       auto currentKC39 = player.getQuestUI8AL( getId() ) + 1;
