@@ -252,7 +252,7 @@ namespace Core {
 
             EmoteReq = 0x1F4,
             EmoteCancel = 0x1F6,
-            PersistantEmoteCancel = 0x1F7,
+            PersistentEmoteCancel = 0x1F7,
             PoseChange = 0x1F9,
             PoseReapply = 0x1FA,
             PoseCancel = 0x1FB,
