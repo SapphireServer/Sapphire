@@ -767,9 +767,10 @@ void Core::Entity::Player::setQuestBitFlag8( uint16_t questId, uint8_t index, bo
    {
       boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[idx];
 
-      uint8_t flag = val ? 1 : 0;
-
-      pNewQuest->a.BitFlag8 |= ( val << index );
+      if( val )
+         pNewQuest->a.BitFlag8 |= ( 1 << index );
+      else
+         pNewQuest->a.BitFlag8 &= ~( 1 << index );
 
       updateQuest( questId, pNewQuest->c.sequence );
    }
@@ -783,9 +784,10 @@ void Core::Entity::Player::setQuestBitFlag16( uint16_t questId, uint8_t index, b
    {
       boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[idx];
 
-      uint8_t flag = val ? 1 : 0;
-
-      pNewQuest->a.BitFlag16 |= ( val << index );
+      if( val )
+         pNewQuest->a.BitFlag16 |= ( 1 << index );
+      else
+         pNewQuest->a.BitFlag16 &= ~( 1 << index );
 
       updateQuest( questId, pNewQuest->c.sequence );
    }
@@ -799,13 +801,15 @@ void Core::Entity::Player::setQuestBitFlag24( uint16_t questId, uint8_t index, b
    {
       boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[idx];
 
-      uint8_t flag = val ? 1 : 0;
-
-      pNewQuest->a.BitFlag24 |= ( val << index );
+      if( val )
+         pNewQuest->a.BitFlag24 |= ( 1 << index );
+      else
+         pNewQuest->a.BitFlag24 &= ~( 1 << index );
 
       updateQuest( questId, pNewQuest->c.sequence );
    }
 }
+
 void Core::Entity::Player::setQuestBitFlag32( uint16_t questId, uint8_t index, bool val )
 {
    int8_t idx = getQuestIndex( questId );
@@ -814,9 +818,10 @@ void Core::Entity::Player::setQuestBitFlag32( uint16_t questId, uint8_t index, b
    {
       boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[idx];
 
-      uint8_t flag = val ? 1 : 0;
-
-      pNewQuest->a.BitFlag32 |= ( val << index );
+      if( val )
+         pNewQuest->a.BitFlag32 |= ( 1 << index );
+      else
+         pNewQuest->a.BitFlag32 &= ~( 1 << index );
 
       updateQuest( questId, pNewQuest->c.sequence );
    }
@@ -830,9 +835,10 @@ void Core::Entity::Player::setQuestBitFlag40( uint16_t questId, uint8_t index, b
    {
       boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[idx];
 
-      uint8_t flag = val ? 1 : 0;
-
-      pNewQuest->a.BitFlag40 |= ( val << index );
+      if( val )
+         pNewQuest->a.BitFlag40 |= ( 1 << index );
+      else
+         pNewQuest->a.BitFlag40 &= ~( 1 << index );
 
       updateQuest( questId, pNewQuest->c.sequence );
    }
@@ -846,14 +852,14 @@ void Core::Entity::Player::setQuestBitFlag48( uint16_t questId, uint8_t index, b
    {
       boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[idx];
 
-      uint8_t flag = val ? 1 : 0;
-
-      pNewQuest->a.BitFlag48 |= ( val << index );
+      if( val )
+         pNewQuest->a.BitFlag48 |= ( 1 << index );
+      else
+         pNewQuest->a.BitFlag48 &= ~( 1 << index );
 
       updateQuest( questId, pNewQuest->c.sequence );
    }
 }
-
 
 
 uint8_t Core::Entity::Player::getQuestSeq( uint16_t questId )
@@ -1027,7 +1033,7 @@ bool Core::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t optional
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
    uint32_t playerLevel = getLevel();
    auto questInfo = pExdData->get< Core::Data::Quest >( questId );
-   
+
 
    if( !questInfo )
       return false;
@@ -1062,7 +1068,7 @@ bool Core::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t optional
       auto itemId = questInfo->itemReward1.at( optionalChoice );
       addItem( -1, itemId, questInfo->itemCountReward1.at( optionalChoice ) );
    }
-   
+
    if( gilReward > 0 )
       addCurrency( 1, gilReward );
 
