@@ -175,6 +175,7 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
        {
           player.setPersistentEmote( 0 );
           player.emoteInterrupt();
+          player.setStatus( Entity::Chara::ActorStatus::Idle );
           auto pSetStatusPacket = boost::make_shared< ActorControlPacket142 >( player.getId(),
                                                                               SetStatus,
                                                                               static_cast< uint8_t >( Entity::Chara::ActorStatus::Idle ) );
