@@ -193,7 +193,7 @@ class ClsArc004 : public EventScript
       player.playScene( getId(), 3, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            player.setQuestBitFlag8( getId(), 1, true );
+            player.setQuestBitFlag8( getId(), 7, true );
             checkQuestCompletion( player );
          } );
    }
@@ -203,7 +203,7 @@ class ClsArc004 : public EventScript
       player.playScene( getId(), 4, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            player.setQuestBitFlag8( getId(), 2, true );
+            player.setQuestBitFlag8( getId(), 6, true );
             checkQuestCompletion( player );
          } );
    }
@@ -213,7 +213,7 @@ class ClsArc004 : public EventScript
       player.playScene( getId(), 5, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            player.setQuestBitFlag8( getId(), 3, true );
+            player.setQuestBitFlag8( getId(), 4, true );
             checkQuestCompletion( player );
          } );
    }
