@@ -125,6 +125,10 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
    m_birthDay = res->getUInt8( "BirthDay" );
    m_birthMonth = res->getUInt8( "BirthMonth" );
    m_status = static_cast< ActorStatus >( res->getUInt( "Status" ) );
+
+   if( m_status == Entity::Chara::ActorStatus::EmoteMode )
+      m_status = Entity::Chara::ActorStatus::Idle;
+
    m_class = static_cast< ClassJob >( res->getUInt( "Class" ) );
    m_homePoint = res->getUInt8( "Homepoint" );
 
