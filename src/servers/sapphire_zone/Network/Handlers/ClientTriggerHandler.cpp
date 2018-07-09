@@ -150,15 +150,17 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
           if( !emoteData )
              return;
 
-          // TODO: This is wrong!! EmoteCategory does not define whether an emote is persistent or not.
-          // What defines an emote as persistent is EmoteData != 0
-          bool isPersistent = emoteData->emoteCategory == static_cast< uint8_t >( EmoteCategory::Persistent );
+          bool isPersistent = emoteData->emoteMode != 0;
 
           if( isPersistent )
           {
              player.setStance( Entity::Chara::Stance::Passive );
              player.setAutoattack( false );
-             player.setPersistentEmote( emoteId );
+             player.setPersistentEmote( emoteData->emoteMode );
+             player.setStatus( Entity::Chara::ActorStatus::EmoteMode );
+             player.sendToInRangeSet(
+                     boost::make_shared< ActorControlPacket142 >( player.getId(), ActorControlType::SetStatus,
+                                                                  static_cast< uint8_t >( Entity::Chara::ActorStatus::EmoteMode ) ), true );
           }
 
           player.emote( emoteId, targetId, isSilent );
