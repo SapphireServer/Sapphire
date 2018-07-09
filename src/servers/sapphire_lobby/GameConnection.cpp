@@ -132,7 +132,7 @@ void Core::Network::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet, ui
    serverListPacket->data().server[0].index = 0;
    serverListPacket->data().final = 1;
    strcpy( serverListPacket->data().server[0].name,
-           g_serverLobby.getConfig()->getValue< std::string >( "Lobby.WorldName", "Sapphire" ).c_str() );
+   g_serverLobby.getConfig()->getValue< std::string >( "Lobby.WorldName", "Sapphire" ).c_str() );
    pRP.addPacket( serverListPacket );
 
    auto retainerListPacket = makeLobbyPacket< FFXIVIpcRetainerList >( tmpId );
@@ -233,7 +233,7 @@ void Core::Network::GameConnection::enterWorld( FFXIVARR_PACKET_RAW& packet, uin
    enterWorldPacket->data().contentId = lookupId;
    enterWorldPacket->data().seq = sequence;
    strcpy( enterWorldPacket->data().host,
-           g_serverLobby.getConfig()->getValue< std::string >( "GlobalNetwork.ZoneHost" ).c_str() );
+   g_serverLobby.getConfig()->getValue< std::string >( "GlobalNetwork.ZoneHost" ).c_str() );
    enterWorldPacket->data().port = g_serverLobby.getConfig()->getValue< uint16_t >( "GlobalNetwork.ZonePort" );
    enterWorldPacket->data().charId = logInCharId;
    memcpy( enterWorldPacket->data().sid, m_pSession->getSessionId(), 66 );
@@ -313,7 +313,7 @@ bool Core::Network::GameConnection::createOrModifyChar( FFXIVARR_PACKET_RAW& pac
       charCreatePacket->data().content_id = newContentId;
       strcpy( charCreatePacket->data().name, name.c_str() );
       strcpy( charCreatePacket->data().world,
-              g_serverLobby.getConfig()->getValue< std::string >( "Lobby.WorldName", "Sapphire" ).c_str() );
+      g_serverLobby.getConfig()->getValue< std::string >( "Lobby.WorldName", "Sapphire" ).c_str() );
       charCreatePacket->data().type = 1;
       charCreatePacket->data().seq = sequence;
       charCreatePacket->data().unknown = 1;
@@ -336,7 +336,7 @@ bool Core::Network::GameConnection::createOrModifyChar( FFXIVARR_PACKET_RAW& pac
          charCreatePacket->data().content_id = newContentId;
          strcpy( charCreatePacket->data().name, name.c_str() );
          strcpy( charCreatePacket->data().world,
-                 g_serverLobby.getConfig()->getValue< std::string >( "Lobby.WorldName", "Sapphire" ).c_str() );
+         g_serverLobby.getConfig()->getValue< std::string >( "Lobby.WorldName", "Sapphire" ).c_str() );
          charCreatePacket->data().type = 2;
          charCreatePacket->data().seq = sequence;
          charCreatePacket->data().unknown = 1;
@@ -489,7 +489,7 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
             m_bEncryptionInitialized = true;
 
             auto pe1 = boost::make_shared< FFXIVRawPacket >( 0x0A, 0x290, 0, 0 );
-            *reinterpret_cast< uint32_t* >(&pe1->data()[0]) = 0xE0003C2A;
+            *reinterpret_cast< uint32_t* >( &pe1->data()[0] ) = 0xE0003C2A;
 
             BlowFish blowfish;
             blowfish.initialize( m_encKey, 0x10 );

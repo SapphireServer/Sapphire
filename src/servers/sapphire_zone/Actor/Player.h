@@ -387,6 +387,10 @@ public:
    void dismount();
    /*! get the current mount */
    uint8_t getCurrentMount() const;
+   /*! set current persistent emote */
+   void setPersistentEmote( uint32_t emoteId );
+   /*! get current persistent emote */
+   uint32_t getPersistentEmote() const;
 
    void calculateStats() override;
    void sendStats();
@@ -714,6 +718,7 @@ private:
    uint32_t m_cfPenaltyUntil; // unix time
 
    uint8_t m_mount;
+   uint32_t m_emote;
 
    Util::SpawnIndexAllocator< uint8_t > m_objSpawnIndexAllocator;
    Util::SpawnIndexAllocator< uint8_t > m_actorSpawnIndexAllocator;

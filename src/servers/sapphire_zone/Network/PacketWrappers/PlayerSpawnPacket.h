@@ -118,6 +118,7 @@ namespace Server {
          }
 
          m_data.currentMount = player.getCurrentMount();
+         m_data.persistentEmote = player.getPersistentEmote();
 
          m_data.targetId = player.getTargetId();
          //m_data.type = 1;

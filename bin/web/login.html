@@ -18,11 +18,11 @@
 
 				xhr.onreadystatechange = function() {
 					if (xhr.readyState == 4) {
-						try{
+						try {
 							var response = readBody(xhr);
 							var parsed = JSON.parse(response);
 							window.external.Boot(parsed.sId, parsed.lobbyHost, parsed.frontierHost);
-						}catch(err){
+						} catch(err) {
 							document.getElementById("Error").innerHTML = "Login failed.";
 						}
 					}
@@ -54,7 +54,7 @@
 			<a href="https://discord.gg/KfrZCkx" class="s-link-badge s-link-badge-discord col-xs-5">
 				Join us on Discord!
 			</a>
-			<a href="https://github.com/SapphireMordred/Sapphire" class="s-link-badge s-link-badge-github col-xs-5 pull-left">
+			<a href="https://github.com/SapphireMordred/Sapphire" class="s-link-badge s-link-badge-github col-xs-5 pull-right">
 				Our Github repository
 			</a>
 		</div>
