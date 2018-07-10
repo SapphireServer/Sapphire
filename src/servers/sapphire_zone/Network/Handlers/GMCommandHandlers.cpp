@@ -554,7 +554,7 @@ void Core::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACKET_R
       // We shouldn't be able to call a player into an instance, only call them out of one
       if( player.getCurrentInstance() )
       {
-         player.sendUrgent("You are unable to call a player while bound to a battle instance.");
+         player.sendUrgent( "You are unable to call a player while bound to a battle instance." );
          return;
       }
 
