@@ -551,8 +551,14 @@ void Core::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACKET_R
    }
    case GmCommand::Call:
    {
-      if( targetPlayer->getZoneId() != player.getZoneId() )
-         targetPlayer->setZone( player.getZoneId() );
+      // We shouldn't be able to call a player into an instance, only call them out of one
+      if( player.getCurrentInstance() )
+      {
+         player.sendUrgent( "You are unable to call a player while bound to a battle instance." );
+         return;
+      }
+
+      targetPlayer->setInstance( player.getCurrentZone() );
 
       targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
       player.sendNotice( "Calling " + targetPlayer->getName() );
