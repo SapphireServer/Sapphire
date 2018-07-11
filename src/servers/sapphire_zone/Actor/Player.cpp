@@ -67,7 +67,7 @@ Core::Entity::Player::Player() :
    m_bAutoattack( false ),
    m_markedForRemoval( false ),
    m_mount( 0 ),
-   m_emote( 0 ),
+   m_emoteMode( 0 ),
    m_directorInitialized( false ),
    m_onEnterEventDone( false )
 {
@@ -1384,12 +1384,12 @@ uint8_t Core::Entity::Player::getCurrentMount() const
 
 void Core::Entity::Player::setPersistentEmote( uint32_t emoteId )
 {
-   m_emote = emoteId;
+   m_emoteMode = emoteId;
 }
 
 uint32_t Core::Entity::Player::getPersistentEmote() const
 {
-   return m_emote;
+   return m_emoteMode;
 }
 
 void Core::Entity::Player::autoAttack( CharaPtr pTarget )
