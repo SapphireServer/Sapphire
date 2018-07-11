@@ -158,9 +158,10 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
              player.setAutoattack( false );
              player.setPersistentEmote( emoteData->emoteMode );
              player.setStatus( Entity::Chara::ActorStatus::EmoteMode );
+
              player.sendToInRangeSet(
                      boost::make_shared< ActorControlPacket142 >( player.getId(), ActorControlType::SetStatus,
-                                                                  static_cast< uint8_t >( Entity::Chara::ActorStatus::EmoteMode ) ), true );
+                                                                  static_cast< uint8_t >( Entity::Chara::ActorStatus::EmoteMode ), emoteData->hasCancelEmote ? 1 : 0 ), true );
           }
 
           player.emote( emoteId, targetId, isSilent );
