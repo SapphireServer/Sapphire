@@ -29,7 +29,8 @@ void Core::Db::CharaDbConnection::doPrepareStatements()
                                        "FavoritePoint, RestPoint, StartTown, ActiveTitle, TitleList, Achievement, "
                                        "Aetheryte, HowTo, Minions, Mounts, Orchestrion, EquippedMannequin, ConfigFlags, "
                                        "QuestCompleteFlags, OpeningSequence, QuestTracking, GrandCompany, "
-                                       "GrandCompanyRank, Discovery, GMRank, EquipDisplayFlags, Unlocks, CFPenaltyUntil "
+                                       "GrandCompanyRank, Discovery, GMRank, EquipDisplayFlags, Unlocks, CFPenaltyUntil, "
+                                       "Pose "
                                        "FROM charainfo WHERE CharacterId = ?;", CONNECTION_SYNC );
 
 
@@ -44,7 +45,7 @@ void Core::Db::CharaDbConnection::doPrepareStatements()
                      "ActiveTitle = ?, TitleList = ?, Achievement = ?, Aetheryte = ?, HowTo = ?, Minions = ?, Mounts = ?, Orchestrion = ?, "
                      "EquippedMannequin = ?, ConfigFlags = ?, QuestCompleteFlags = ?, OpeningSequence = ?, "
                      "QuestTracking = ?, GrandCompany = ?, GrandCompanyRank = ?, Discovery = ?, GMRank = ?, EquipDisplayFlags = ?, Unlocks = ?, "
-                     "CFPenaltyUntil = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
+                     "CFPenaltyUntil = ?, Pose = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
 
 
    prepareStatement( CHARA_SEL_MINIMAL, "SELECT Name, Customize, ModelEquip, TerritoryId, GuardianDeity, "
