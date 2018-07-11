@@ -184,15 +184,22 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
           break;
        }
        case ClientTriggerType::PoseChange: // change pose
-       {
-          break;
-       }
        case ClientTriggerType::PoseReapply: // reapply pose
        {
+          player.setPose( param12 );
+          auto pSetStatusPacket = boost::make_shared< ActorControlPacket142 >( player.getId(),
+                                                                               SetPose,
+                                                                               param11, param12 );
+          player.sendToInRangeSet( pSetStatusPacket, true );
           break;
        }
        case ClientTriggerType::PoseCancel: // cancel pose
        {
+          player.setPose( param12 );
+          auto pSetStatusPacket = boost::make_shared< ActorControlPacket142 >( player.getId(),
+                                                                               SetPose,
+                                                                               param11, param12 );
+          player.sendToInRangeSet( pSetStatusPacket, true );
           break;
        }
        case ClientTriggerType::Return: // return dead / accept raise

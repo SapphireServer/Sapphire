@@ -277,6 +277,16 @@ bool Core::Entity::Player::isAutoattackOn() const
    return m_bAutoattack;
 }
 
+uint8_t Core::Entity::Player::getPose() const
+{
+   return m_pose;
+}
+
+void Core::Entity::Player::setPose( uint8_t pose )
+{
+   m_pose = pose;
+}
+
 void Core::Entity::Player::sendStats()
 {
 

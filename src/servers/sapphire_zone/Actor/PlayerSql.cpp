@@ -151,6 +151,8 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
 
    m_equipDisplayFlags = res->getUInt8( "EquipDisplayFlags" );
 
+   m_pose = res->getUInt8( "Pose" );
+
    // Blobs
 
    auto howTo = res->getBlobVector( "HowTo" );
@@ -328,7 +330,7 @@ void Core::Entity::Player::updateSql()
            "ActiveTitle 36, TitleList 37, Achievement 38, Aetheryte 39, HowTo 40, Minions 41, Mounts 42, Orchestrion 43, "
            "EquippedMannequin 44, ConfigFlags 45, QuestCompleteFlags 46, OpeningSequence 47, "
            "QuestTracking 48, GrandCompany 49, GrandCompanyRank 50, Discovery 51, GMRank 52, Unlocks 53, "
-           "CFPenaltyUntil 54"*/
+           "CFPenaltyUntil 54, Pose 55"*/
    auto stmt = pDb->getPreparedStatement( Db::CharaDbStatements::CHARA_UP );
 
    stmt->setInt( 1, getHp() );
@@ -438,7 +440,9 @@ void Core::Entity::Player::updateSql()
 
    stmt->setInt( 55, m_cfPenaltyUntil );
 
-   stmt->setInt( 56, m_id );
+   stmt->setInt( 56, m_pose );
+
+   stmt->setInt( 57, m_id );
 
    pDb->execute( stmt );
 
