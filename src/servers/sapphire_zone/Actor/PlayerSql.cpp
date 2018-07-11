@@ -125,9 +125,9 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
    m_birthDay = res->getUInt8( "BirthDay" );
    m_birthMonth = res->getUInt8( "BirthMonth" );
    m_status = static_cast< ActorStatus >( res->getUInt( "Status" ) );
+   m_emoteMode = res->getUInt( "EmoteModeType" );
 
-   if( m_status == Entity::Chara::ActorStatus::EmoteMode )
-      m_status = Entity::Chara::ActorStatus::Idle;
+   m_activeTitle = res->getUInt16( "ActiveTitle" );
 
    m_class = static_cast< ClassJob >( res->getUInt( "Class" ) );
    m_homePoint = res->getUInt8( "Homepoint" );
@@ -352,7 +352,7 @@ void Core::Entity::Player::updateSql()
    memcpy( modelVec.data(), m_modelEquip, sizeof( m_modelEquip ) );
    stmt->setBinary( 13, modelVec );
 
-   stmt->setInt( 14, 0 ); // EmodeModeType
+   stmt->setInt( 14, m_emoteMode ); // EmodeModeType
    stmt->setInt( 15, 0 ); // Language
 
    stmt->setInt( 16, static_cast< uint32_t >( m_bNewGame ) );
@@ -379,7 +379,7 @@ void Core::Entity::Player::updateSql()
 
    stmt->setBinary( 34, { 0, 0, 0 } ); // FavoritePoint
    stmt->setInt( 35, 0 ); // RestPoint
-   stmt->setInt( 36, 0 ); // ActiveTitle
+   stmt->setInt( 36, m_activeTitle ); // ActiveTitle
 
    std::vector< uint8_t > titleListVec( sizeof ( m_titleList ) );
    stmt->setBinary( 37, titleListVec );

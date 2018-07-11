@@ -718,7 +718,7 @@ private:
    uint32_t m_cfPenaltyUntil; // unix time
 
    uint8_t m_mount;
-   uint32_t m_emote;
+   uint32_t m_emoteMode;
 
    Util::SpawnIndexAllocator< uint8_t > m_objSpawnIndexAllocator;
    Util::SpawnIndexAllocator< uint8_t > m_actorSpawnIndexAllocator;
