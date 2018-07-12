@@ -150,6 +150,8 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
           if( !emoteData )
              return;
 
+          player.emote( emoteId, targetId, isSilent );
+
           bool isPersistent = emoteData->emoteMode != 0;
 
           if( isPersistent )
@@ -163,8 +165,6 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
                      boost::make_shared< ActorControlPacket142 >( player.getId(), ActorControlType::SetStatus,
                                                                   static_cast< uint8_t >( Entity::Chara::ActorStatus::EmoteMode ), emoteData->hasCancelEmote ? 1 : 0 ), true );
           }
-
-          player.emote( emoteId, targetId, isSilent );
 
           if( emoteData->drawsWeapon )
           {

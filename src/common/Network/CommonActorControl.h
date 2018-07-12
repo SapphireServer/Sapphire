@@ -18,7 +18,6 @@ namespace Core {
          enum ActorControlType : uint16_t
          {
             ToggleWeapon = 0x00,
-            ToggleAutoAttack = 0x01,
             SetStatus = 0x02,
             CastStart = 0x03,
             ToggleAggro = 0x04,
