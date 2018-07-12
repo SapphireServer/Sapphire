@@ -307,11 +307,11 @@ bool Core::Entity::Player::loadSearchInfo()
    if( !res->next() )
       return false;
 
-   m_searchSelectClass = res->getUInt8( 1 );
-   m_searchSelectRegion = res->getUInt8( 2 );
+   m_searchSelectClass = res->getUInt8( 2 );
+   m_searchSelectRegion = res->getUInt8( 3 );
 
    // todo: internally use an std::string instead of a char[]
-   auto searchMessage = res->getString( 3 );
+   auto searchMessage = res->getString( 4 );
    std::copy( searchMessage.begin(), searchMessage.end(), m_searchMessage );
 
    return true;
