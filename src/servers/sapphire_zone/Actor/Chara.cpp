@@ -257,7 +257,7 @@ void Core::Entity::Chara::setStance( Stance stance )
 {
    m_currentStance = stance;
 
-   FFXIVPacketBasePtr packet = boost::make_shared< ActorControlPacket142 >( m_id, ToggleAggro, stance, 1 );
+   FFXIVPacketBasePtr packet = boost::make_shared< ActorControlPacket142 >( m_id, ToggleWeapon, stance, 0 );
    sendToInRangeSet( packet );
 }
 
