@@ -1427,6 +1427,7 @@ Core::Data::Emote::Emote( uint32_t row_id, Core::Data::ExdDataGenerated* exdData
    emoteCategory = exdData->getField< uint8_t >( row, 11 );
    emoteMode = exdData->getField< uint8_t >( row, 12 );
    hasCancelEmote = exdData->getField< bool >( row, 15 );
+   drawsWeapon = exdData->getField< bool >( row, 16 );
    textCommand = exdData->getField< int32_t >( row, 18 );
    icon = exdData->getField< uint16_t >( row, 19 );
    logMessageTargeted = exdData->getField< uint16_t >( row, 20 );

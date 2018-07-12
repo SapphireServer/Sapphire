@@ -165,6 +165,12 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
           }
 
           player.emote( emoteId, targetId, isSilent );
+
+          if( emoteData->drawsWeapon )
+          {
+             player.setStance( Entity::Chara::Stance::Active );
+          }
+
           break;
        }
        case ClientTriggerType::EmoteCancel: // emote
