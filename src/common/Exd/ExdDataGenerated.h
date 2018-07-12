@@ -1605,6 +1605,7 @@ struct Emote
    uint16_t logMessageUntargeted;
    uint8_t emoteMode;
    bool hasCancelEmote;
+   bool drawsWeapon;
 
    Emote( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
