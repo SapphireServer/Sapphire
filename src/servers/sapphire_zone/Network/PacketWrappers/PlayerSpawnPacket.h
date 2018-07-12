@@ -46,7 +46,7 @@ namespace Server {
          //m_data.tPMax = 3000;
          m_data.level = player.getLevel();
          m_data.gmRank = player.getGmRank();
-         m_data.pose = 0;
+         m_data.pose = player.getPose();
 
          memcpy( m_data.look, player.getLookArray(), 26 );
 
