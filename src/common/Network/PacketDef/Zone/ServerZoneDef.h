@@ -704,7 +704,9 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    unsigned char unknown5A9[5];
    unsigned char unknown5AE[11];
    unsigned char beastRank[11];
-   unsigned char unknownMask5C4[5];
+   unsigned char pose;
+   unsigned char weaponPose;
+   unsigned char unknownMask5C4[3];
    unsigned char unknown5C9[20];
    unsigned char unknownMask5DD[28];
    unsigned char unknown_03411;

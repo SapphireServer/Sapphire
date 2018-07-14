@@ -68,6 +68,7 @@ Core::Entity::Player::Player() :
    m_markedForRemoval( false ),
    m_mount( 0 ),
    m_emoteMode( 0 ),
+   m_pose( 0 ),
    m_directorInitialized( false ),
    m_onEnterEventDone( false )
 {

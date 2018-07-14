@@ -47,6 +47,7 @@ private:
       //m_data.gcRank = GCRank::None;
 
       m_data.homepoint = player.getHomepoint();
+      m_data.pose = player.getPose();
 
       memset( &m_data.name[0], 0, sizeof( m_data.name ) );
 
