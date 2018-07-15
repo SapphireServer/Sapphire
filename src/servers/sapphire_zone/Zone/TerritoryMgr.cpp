@@ -7,6 +7,7 @@
 #include "Actor/Player.h"
 
 #include "Zone.h"
+#include "HousingZone.h"
 #include "ZonePosition.h"
 #include "InstanceContent.h"
 #include "TerritoryMgr.h"
@@ -45,6 +46,7 @@ bool Core::TerritoryMgr::init()
    loadTerritoryPositionMap();
 
    createDefaultTerritories();
+   createHosuingTerritories();
 
    return true;
 }
@@ -134,6 +136,52 @@ bool Core::TerritoryMgr::createDefaultTerritories()
       m_instanceIdToZonePtrMap[guid] = pZone;
       m_territoryIdToInstanceGuidMap[territoryId] = instanceMap;
       m_zoneSet.insert( { pZone } );
+
+   }
+
+   return true;
+}
+
+bool Core::TerritoryMgr::createHosuingTerritories()
+{
+   //separate housing zones from default
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+   auto pLog = g_fw.get< Logger >();
+   for ( const auto& territory : m_territoryTypeDetailCacheMap )
+   {
+      auto territoryId = territory.first;
+      auto territoryInfo = territory.second;
+      uint32_t wardNum;
+
+      if ( territoryInfo->name.empty() )
+         continue;
+
+      auto pPlaceName = pExdData->get< Core::Data::PlaceName >( territoryInfo->placeName );
+
+      if (!pPlaceName || pPlaceName->name.empty() || !isHousingTerritory( territoryId ) )
+         continue;
+
+      for ( wardNum = 0; wardNum < 18; wardNum++ )
+      {
+
+         uint32_t guid = getNextInstanceId();
+         pLog->info(std::to_string( territoryId ) +
+            "\t" + std::to_string( guid ) +
+            "\t" + std::to_string( territoryInfo->territoryIntendedUse ) +
+            "\t" + ( territoryInfo->name.length() <= 4 ? territoryInfo->name + "\t" : territoryInfo->name ) +
+            "\t" + "HOUSING" +
+            "\t" + pPlaceName->name +
+            "#" + std::to_string( wardNum ) );
+
+         auto pHousingZone = make_HousingZone( wardNum, territoryId, guid, territoryInfo->name, pPlaceName->name );
+         pHousingZone->init();
+
+         InstanceIdToZonePtrMap instanceMap;
+         instanceMap[guid] = pHousingZone;
+         m_instanceIdToZonePtrMap[guid] = pHousingZone;
+         m_territoryIdToInstanceGuidMap[territoryId][guid] = pHousingZone;
+         m_zoneSet.insert( { pHousingZone } );
+      }
 
    }
 
@@ -262,6 +310,16 @@ bool Core::TerritoryMgr::isDefaultTerritory( uint32_t territoryTypeId ) const
           pTeri->territoryIntendedUse == TerritoryIntendedUse::OpenWorld ||
           pTeri->territoryIntendedUse == TerritoryIntendedUse::OpeningArea;
 
+}
+
+bool Core::TerritoryMgr::isHousingTerritory(uint32_t territoryTypeId) const
+{
+   auto pTeri = getTerritoryDetail( territoryTypeId );
+
+   if (!pTeri)
+      return false;
+
+   return pTeri->territoryIntendedUse == TerritoryIntendedUse::HousingArea;
 }
 
 Core::ZonePositionPtr Core::TerritoryMgr::getTerritoryPosition( uint32_t territoryPositionId ) const
