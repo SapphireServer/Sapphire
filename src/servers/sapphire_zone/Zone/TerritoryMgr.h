@@ -66,6 +66,8 @@ namespace Core
 
       bool createDefaultTerritories();
 
+	  bool createHosuingTerritories();
+
       /*! caches TerritoryType details into m_territoryTypeMap */
       void loadTerritoryTypeDetailCache();
 
@@ -87,6 +89,9 @@ namespace Core
 
       /*! returns true if the territoryType is a default non-instanced zone */
       bool isDefaultTerritory( uint32_t territoryTypeId ) const;
+
+	  /*! returns true if the territoryType is a housing zone */
+	  bool isHousingTerritory(uint32_t territoryTypeId) const;
 
       /*! creates a new instance for a given territoryTypeId */
       ZonePtr createTerritoryInstance( uint32_t territoryTypeId );
