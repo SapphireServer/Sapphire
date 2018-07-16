@@ -46,7 +46,7 @@ bool Core::TerritoryMgr::init()
    loadTerritoryPositionMap();
 
    createDefaultTerritories();
-   createHosuingTerritories();
+   createHousingTerritories();
 
    return true;
 }
