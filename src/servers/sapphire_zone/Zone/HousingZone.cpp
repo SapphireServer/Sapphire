@@ -18,22 +18,22 @@ using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-Core::HousingZone::HousingZone(uint8_t wardNum,
-   uint16_t territoryId,
-   uint32_t guId,
-   const std::string& internalName,
-   const std::string& contentName)
-   : Zone(territoryId, guId, internalName, contentName),
-   m_wardNum( wardNum )
+Core::HousingZone::HousingZone( uint8_t wardNum,
+                                uint16_t territoryId,
+                                uint32_t guId,
+                                const std::string& internalName,
+                                const std::string& contentName )
+   : Zone( territoryId, guId, internalName, contentName ),
+     m_wardNum( wardNum )
 {
 
 }
 
 bool Core::HousingZone::init()
 {
-   uint32_t LandSetId;
+   uint32_t landSetId;
 
-   for ( LandSetId = 0; LandSetId < 60; LandSetId++ )
+   for( landSetId = 0; landSetId < 60; landSetId++ )
    {
       //TODO: load house information here
    }
@@ -46,7 +46,7 @@ Core::HousingZone::~HousingZone()
 
 }
 
-void Core::HousingZone::onPlayerZoneIn(Entity::Player& player)
+void Core::HousingZone::onPlayerZoneIn( Entity::Player& player )
 {
    auto pLog = g_fw.get< Logger >();
    pLog->debug( "HousingZone::onPlayerZoneIn: Zone#" + std::to_string(getGuId()) + "|" + 
@@ -56,29 +56,29 @@ void Core::HousingZone::onPlayerZoneIn(Entity::Player& player)
    uint32_t yardPacketNum;
 
    auto wardInfoPackage = makeZonePacket< FFXIVIpcWardInfo >( player.getId() );
-   auto wardYardInfoPackage = makeZonePacket< FFXIVIpcWardYardInfo >(player.getId());
+   auto wardYardInfoPackage = makeZonePacket< FFXIVIpcWardYardInfo >( player.getId() );
 
    wardInfoPackage->data().wardNum = m_wardNum;
    wardInfoPackage->data().zoneId = player.getZoneId();
    //TODO: get current WorldId
    wardInfoPackage->data().worldId = 67;
    //TODO: handle Subdivision
-   wardInfoPackage->data().SubInstance = 1;
+   wardInfoPackage->data().subInstance = 1;
 
-   for (landSetId = 0; landSetId < 30 ; landSetId++)
+   for( landSetId = 0; landSetId < 30 ; landSetId++ )
    {
-      wardInfoPackage->data().landSet[landSetId].HouseSize = 1;
-      wardInfoPackage->data().landSet[landSetId].HouseState = 1;
+      wardInfoPackage->data().landSet[landSetId].houseSize = 1;
+      wardInfoPackage->data().landSet[landSetId].houseState = 1;
    }
 
-   wardYardInfoPackage->data().pad1 = 0xFFFFFFFF;
-   wardYardInfoPackage->data().pad2 = 0xFFFFFFFF;
-   wardYardInfoPackage->data().pad3 = 0xFF;
+   wardYardInfoPackage->data().unknown1 = 0xFFFFFFFF;
+   wardYardInfoPackage->data().unknown2 = 0xFFFFFFFF;
+   wardYardInfoPackage->data().unknown3 = 0xFF;
    wardYardInfoPackage->data().packetTotal = 8;
 
    player.queuePacket( wardInfoPackage );
 
-   for (yardPacketNum = 0; yardPacketNum < wardYardInfoPackage->data().packetTotal; yardPacketNum++)
+   for( yardPacketNum = 0; yardPacketNum < wardYardInfoPackage->data().packetTotal; yardPacketNum++ )
    {
       //Add Objects here
       wardYardInfoPackage->data().packetNum = yardPacketNum;
