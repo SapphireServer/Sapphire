@@ -621,7 +621,7 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    unsigned int fishCaught;
    unsigned int useBaitCatalogId;
    unsigned int unknown28;
-   unsigned short unknown2C;
+   unsigned short unknownPvp2C;
    unsigned short unknown3;
    unsigned int pvpFrontlineOverallCampaigns;
    unsigned int unknownTimestamp34;
@@ -632,14 +632,15 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    float companionTimePassed;
    unsigned int unknown4C;
    unsigned short unknown50;
-   unsigned short unknown52[4];
+   unsigned short unknownPvp52[4];
    unsigned short playerCommendations;
    unsigned short unknown5C;
    unsigned short unknown5E;
    unsigned short pvpFrontlineWeeklyCampaigns;
    unsigned short enhancedAnimaGlassProgress;
-   unsigned short unknown64[7];
-   unsigned short unknown72;
+   unsigned short unknown64[4];
+   unsigned short unknownPvp6A[3];
+   unsigned short unknownPvp72;
    unsigned char maxLevel;
    unsigned char expansion;
    unsigned char unknown76;
@@ -658,7 +659,7 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    unsigned char companionRank;
    unsigned char companionStars;
    unsigned char companionSp;
-   unsigned char companionUnk2B;
+   unsigned char companionUnk86;
    unsigned char companionColor;
    unsigned char companionFavoFeed;
    unsigned char unknown89;
@@ -671,7 +672,9 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    unsigned char unknown9F[2];
    unsigned char unknownA1[3];
    unsigned int exp[25];
-   unsigned int unknown108[4];
+   unsigned int unknown108;
+   unsigned int pvpTotalExp;
+   unsigned int unknownPvp110[2];
    unsigned int pvpFrontlineOverallRanks[3];
    unsigned int exploratoryMissionNextTimestamp;
    unsigned short levels[25];
@@ -682,7 +685,7 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    unsigned short unknown1EA[5];
    unsigned short pvpFrontlineWeeklyRanks[3];
    unsigned short unknownMask1FA[3];
-   unsigned char companion_name[21];
+   unsigned char companionName[21];
    unsigned char companionDefRank;
    unsigned char companionAttRank;
    unsigned char companionHealRank;
@@ -706,7 +709,8 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    unsigned char fishingGuideMask[89];
    unsigned char fishingSpotVisited[25];
    unsigned char unknown59A[15];
-   unsigned char unknown5A9[5];
+   unsigned char unknown5A9[2];
+   unsigned char unknownPvp5AB[3];
    unsigned char beastRank[11];
    unsigned char unknown5B9[11];
    unsigned char pose;
@@ -722,7 +726,7 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    unsigned char tripleTriadCards[29];
    unsigned char unknownMask673[10];
    unsigned char unknown67D;
-   unsigned char unknown67E[22];
+   unsigned char aetherCurrentMask[22];
    unsigned char unknown694[3];
    unsigned char orchestrionMask[40];
    unsigned char hallOfNoviceCompleteMask[3];
