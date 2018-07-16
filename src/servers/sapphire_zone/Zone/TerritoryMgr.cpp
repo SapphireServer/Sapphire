@@ -152,6 +152,7 @@ bool Core::TerritoryMgr::createHosuingTerritories()
       auto territoryId = territory.first;
       auto territoryInfo = territory.second;
       uint32_t wardNum;
+      uint32_t wardMaxNum = 1;
 
       if( territoryInfo->name.empty() )
          continue;
@@ -161,7 +162,7 @@ bool Core::TerritoryMgr::createHosuingTerritories()
       if( !pPlaceName || pPlaceName->name.empty() || !isHousingTerritory( territoryId ) )
          continue;
 
-      for( wardNum = 0; wardNum < 18; wardNum++ )
+      for( wardNum = 0; wardNum < wardMaxNum; wardNum++ )
       {
          uint32_t guid = getNextInstanceId();
          pLog->info( std::to_string( territoryId ) +
@@ -174,6 +175,7 @@ bool Core::TerritoryMgr::createHosuingTerritories()
 
          auto pHousingZone = make_HousingZone( wardNum, territoryId, guid, territoryInfo->name, pPlaceName->name );
          pHousingZone->init();
+         wardMaxNum = pHousingZone->m_wardMaxNum;
 
          InstanceIdToZonePtrMap instanceMap;
          instanceMap[guid] = pHousingZone;
