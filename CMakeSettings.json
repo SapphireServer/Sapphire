@@ -18,6 +18,7 @@
     {
       "name": "x86-Release",
       "generator": "Visual Studio 14 2015",
+      "configurationType": "Release",
       "buildRoot": "${env.USERPROFILE}\\CMakeBuild\\${workspaceHash}\\build\\${name}",
       "cmakeCommandArgs": "",
       "buildCommandArgs": "-m -v:minimal",
