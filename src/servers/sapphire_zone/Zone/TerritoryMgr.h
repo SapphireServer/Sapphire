@@ -66,7 +66,7 @@ namespace Core
 
       bool createDefaultTerritories();
 
-      bool createHosuingTerritories();
+      bool createHousingTerritories();
 
       /*! caches TerritoryType details into m_territoryTypeMap */
       void loadTerritoryTypeDetailCache();

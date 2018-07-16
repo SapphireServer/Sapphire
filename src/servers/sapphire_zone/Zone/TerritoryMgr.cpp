@@ -142,7 +142,7 @@ bool Core::TerritoryMgr::createDefaultTerritories()
    return true;
 }
 
-bool Core::TerritoryMgr::createHosuingTerritories()
+bool Core::TerritoryMgr::createHousingTerritories()
 {
    //separate housing zones from default
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
