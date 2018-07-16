@@ -91,7 +91,7 @@ namespace Core
       bool isDefaultTerritory( uint32_t territoryTypeId ) const;
 
       /*! returns true if the territoryType is a housing zone */
-      bool isHousingTerritory(uint32_t territoryTypeId) const;
+      bool isHousingTerritory( uint32_t territoryTypeId ) const;
 
       /*! creates a new instance for a given territoryTypeId */
       ZonePtr createTerritoryInstance( uint32_t territoryTypeId );
