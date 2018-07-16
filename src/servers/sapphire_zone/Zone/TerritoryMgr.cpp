@@ -147,25 +147,24 @@ bool Core::TerritoryMgr::createHosuingTerritories()
    //separate housing zones from default
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
    auto pLog = g_fw.get< Logger >();
-   for ( const auto& territory : m_territoryTypeDetailCacheMap )
+   for( const auto& territory : m_territoryTypeDetailCacheMap )
    {
       auto territoryId = territory.first;
       auto territoryInfo = territory.second;
       uint32_t wardNum;
 
-      if ( territoryInfo->name.empty() )
+      if( territoryInfo->name.empty() )
          continue;
 
       auto pPlaceName = pExdData->get< Core::Data::PlaceName >( territoryInfo->placeName );
 
-      if (!pPlaceName || pPlaceName->name.empty() || !isHousingTerritory( territoryId ) )
+      if( !pPlaceName || pPlaceName->name.empty() || !isHousingTerritory( territoryId ) )
          continue;
 
-      for ( wardNum = 0; wardNum < 18; wardNum++ )
+      for( wardNum = 0; wardNum < 18; wardNum++ )
       {
-
          uint32_t guid = getNextInstanceId();
-         pLog->info(std::to_string( territoryId ) +
+         pLog->info( std::to_string( territoryId ) +
             "\t" + std::to_string( guid ) +
             "\t" + std::to_string( territoryInfo->territoryIntendedUse ) +
             "\t" + ( territoryInfo->name.length() <= 4 ? territoryInfo->name + "\t" : territoryInfo->name ) +
