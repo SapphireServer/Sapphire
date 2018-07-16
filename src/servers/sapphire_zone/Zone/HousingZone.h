@@ -21,8 +21,8 @@ class HousingZone : public Zone
 
 	   /* returns current ward number for this zone */
 	   uint8_t getWardNum() const;
-
       const uint32_t m_wardMaxNum = 18;
+
    private:
 	   uint8_t m_wardNum;
    };
