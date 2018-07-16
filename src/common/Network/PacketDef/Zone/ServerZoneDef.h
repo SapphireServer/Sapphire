@@ -1298,6 +1298,58 @@ struct FFXIVIpcPerformNote : FFXIVIpcBasePacket<PerformNote>
    uint8_t data[32];
 };
 
+struct FFXIVIpcWardInfo : FFXIVIpcBasePacket<WardInfo>
+{
+   uint16_t unknown0;
+   uint16_t wardNum; // set 1 for "Mist, Ward 2"
+   uint16_t zoneId;
+   uint16_t worldId;
+   uint8_t unknown1;
+   uint8_t subInstance; //  (default : 1/2)
+   uint8_t unknown3;
+   uint8_t unknown4;
+   uint8_t unknown5;
+   uint8_t unknown6;
+   uint8_t unknown7;
+   uint8_t unknown8;
+   struct {
+      uint8_t houseSize; //1 = small, 2 = middle, 3 = big; 1
+      uint8_t houseState; //1 = for sell, 2 = sold, 3 = hasOwner, 0x0A = House sharing; 2
+      uint8_t iconColor; //HouseState has to be 3; 1 = Private, 2 = FC House; 4
+      uint8_t iconAddIcon; //Heart Icon = 2; 6
+      uint32_t unknown9;  //can be 0 (default) maybe fcId; 8
+      uint32_t fcIcon; //can be 0 (default); 12
+      uint32_t fcIconColor; //can be 0 (default); 16
+      uint16_t houseRoofId; //18
+      uint16_t houseFacadeId;//20
+      uint16_t houseWindowId;//22
+      uint16_t houseDoorId;//24
+      uint8_t gardenData[4];//28
+      uint16_t gardenSignId; //For fcIcon; 30
+      uint16_t gardenFenceId; //32
+      uint8_t color[8]; //40
+   } landSet[30];
+};
+
+struct FFXIVIpcWardYardInfo : FFXIVIpcBasePacket<WardYardInfo>
+{
+   /* consistency check? */
+   uint32_t unknown1; //always 0xFFFFFFFF
+   uint32_t unknown2; //always 0xFFFFFFFF
+   uint8_t unknown3; //always 0xFF
+   /* --- */
+   uint8_t packetNum;
+   uint16_t packetTotal;
+   struct
+   {
+      uint32_t itemId;
+      uint16_t itemRotation;
+      uint16_t pos_x;
+      uint16_t pos_y;
+      uint16_t pos_z;
+   } object[100];
+};
+
 struct FFXIVIpcMSQTrackerProgress : FFXIVIpcBasePacket<MSQTrackerProgress>
 {
    uint32_t id;
