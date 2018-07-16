@@ -315,7 +315,7 @@ bool Core::TerritoryMgr::isHousingTerritory(uint32_t territoryTypeId) const
 {
    auto pTeri = getTerritoryDetail( territoryTypeId );
 
-   if (!pTeri)
+   if( !pTeri )
       return false;
 
    return pTeri->territoryIntendedUse == TerritoryIntendedUse::HousingArea;
