@@ -17,7 +17,7 @@ class HousingZone : public Zone
       virtual ~HousingZone();
 
       bool init() override;
-      void onPlayerZoneIn(Entity::Player& player) override;
+      void onPlayerZoneIn( Entity::Player& player ) override;
 
 	   /* returns current ward number for this zone */
 	   uint8_t getWardNum() const;

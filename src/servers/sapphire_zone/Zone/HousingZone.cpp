@@ -22,8 +22,8 @@ Core::HousingZone::HousingZone( uint8_t wardNum,
                                 uint16_t territoryId,
                                 uint32_t guId,
                                 const std::string& internalName,
-                                const std::string& contentName )
-   : Zone( territoryId, guId, internalName, contentName ),
+                                const std::string& contentName ) :
+     Zone( territoryId, guId, internalName, contentName ),
      m_wardNum( wardNum )
 {
 
@@ -49,41 +49,42 @@ Core::HousingZone::~HousingZone()
 void Core::HousingZone::onPlayerZoneIn( Entity::Player& player )
 {
    auto pLog = g_fw.get< Logger >();
-   pLog->debug( "HousingZone::onPlayerZoneIn: Zone#" + std::to_string(getGuId()) + "|" + 
+   pLog->debug( "HousingZone::onPlayerZoneIn: Zone#" + std::to_string( getGuId() ) + "|" + 
       + ", Entity#" + std::to_string( player.getId() ) );
 
    uint32_t landSetId;
    uint32_t yardPacketNum;
+   uint32_t yardPacketTotal = 8;
 
-   auto wardInfoPackage = makeZonePacket< FFXIVIpcWardInfo >( player.getId() );
-   auto wardYardInfoPackage = makeZonePacket< FFXIVIpcWardYardInfo >( player.getId() );
+   auto wardInfoPacket = makeZonePacket< FFXIVIpcWardInfo >( player.getId() );
 
-   wardInfoPackage->data().wardNum = m_wardNum;
-   wardInfoPackage->data().zoneId = player.getZoneId();
+   wardInfoPacket->data().wardNum = m_wardNum;
+   wardInfoPacket->data().zoneId = player.getZoneId();
    //TODO: get current WorldId
-   wardInfoPackage->data().worldId = 67;
+   wardInfoPacket->data().worldId = 67;
    //TODO: handle Subdivision
-   wardInfoPackage->data().subInstance = 1;
+   wardInfoPacket->data().subInstance = 1;
 
    for( landSetId = 0; landSetId < 30 ; landSetId++ )
    {
-      wardInfoPackage->data().landSet[landSetId].houseSize = 1;
-      wardInfoPackage->data().landSet[landSetId].houseState = 1;
+      wardInfoPacket->data().landSet[landSetId].houseSize = 1;
+      wardInfoPacket->data().landSet[landSetId].houseState = 1;
    }
 
-   wardYardInfoPackage->data().unknown1 = 0xFFFFFFFF;
-   wardYardInfoPackage->data().unknown2 = 0xFFFFFFFF;
-   wardYardInfoPackage->data().unknown3 = 0xFF;
-   wardYardInfoPackage->data().packetTotal = 8;
+   player.queuePacket( wardInfoPacket );
 
-   player.queuePacket( wardInfoPackage );
-
-   for( yardPacketNum = 0; yardPacketNum < wardYardInfoPackage->data().packetTotal; yardPacketNum++ )
+   for( yardPacketNum = 0; yardPacketNum < yardPacketTotal; yardPacketNum++ )
    {
-      //Add Objects here
-      wardYardInfoPackage->data().packetNum = yardPacketNum;
+      auto wardYardInfoPacket = makeZonePacket< FFXIVIpcWardYardInfo >( player.getId() );
+      wardYardInfoPacket->data().unknown1 = 0xFFFFFFFF;
+      wardYardInfoPacket->data().unknown2 = 0xFFFFFFFF;
+      wardYardInfoPacket->data().unknown3 = 0xFF;
+      wardYardInfoPacket->data().packetNum = yardPacketNum;
+      wardYardInfoPacket->data().packetTotal = yardPacketTotal;
 
-      player.queuePacket( wardYardInfoPackage );
+      //TODO: Add Objects here
+
+      player.queuePacket( wardYardInfoPacket );
    }
 
 }
