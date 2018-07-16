@@ -663,7 +663,7 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    unsigned char unknown8A[4];
    unsigned char hasRelicBook;
    unsigned char relicBookId;
-   unsigned char unknown8E[20];
+   unsigned char unknown90[20];
    unsigned int exp[25];
    unsigned int unknown108[4];
    unsigned int pvpFrontlineOverall1st;
@@ -693,7 +693,10 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    unsigned char minions[38];
    unsigned char chocoboTaxiMask[8];
    unsigned char contentClearMask[111];
-   unsigned char companion_fields[12];
+   unsigned char companionBardingMask[9];
+   unsigned char companionEquippedHead;
+   unsigned char companionEquippedBody;
+   unsigned char companionEquippedLegs;
    unsigned char unknown519[4];
    unsigned char unknownMask51D[11];
    unsigned char fishingGuideMask[89];
@@ -705,7 +708,9 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    unsigned char pose;
    unsigned char weaponPose;
    unsigned char unknownMask5C4[3];
-   unsigned char unknown5C9[20];
+   unsigned char unknown5C9[2];
+   unsigned char challengeLogComplete[9];
+   unsigned char unknown5CB[9];
    unsigned char unknownMask5DD[28];
    unsigned char relicCompletion[12];
    unsigned char sightseeingMask[26];
@@ -727,8 +732,7 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    unsigned char unlockedPvp[5];
    unsigned char unknownMask72D[28];
    unsigned char companionBardingMask[9];
-   unsigned char companionEquippedHead;
-   unsigned char companionEquippedBody;
+   unsigned char unknown764[14];
 
 };
 
