@@ -638,9 +638,11 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    unsigned short unknown5E;
    unsigned short pvpFrontlineWeeklyCampaigns;
    unsigned short enhancedAnimaGlassProgress;
-   unsigned short unknown64[4];
-   unsigned short unknownPvp6A[3];
-   unsigned short unknownPvp72;
+   unsigned short unknown64[4]; // needs confirmation, probably pvp total/weeklies
+   unsigned short pvpRivalWingsTotalMatches;
+   unsigned short pvpRivalWingsTotalVictories;
+   unsigned short pvpRivalWingsWeeklyMatches; // needs confirmation
+   unsigned short pvpRivalWingsWeeklyVictories; // needs confirmation
    unsigned char maxLevel;
    unsigned char expansion;
    unsigned char unknown76;
@@ -674,7 +676,8 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    unsigned int exp[25];
    unsigned int unknown108;
    unsigned int pvpTotalExp;
-   unsigned int unknownPvp110[2];
+   unsigned int unknownPvp110;
+   unsigned int pvpExp;
    unsigned int pvpFrontlineOverallRanks[3];
    unsigned int exploratoryMissionNextTimestamp;
    unsigned short levels[25];
@@ -710,7 +713,8 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    unsigned char fishingSpotVisited[25];
    unsigned char unknown59A[15];
    unsigned char unknown5A9[2];
-   unsigned char unknownPvp5AB[3];
+   unsigned char unknownPvp5AB[2];
+   unsigned char pvpLevel;
    unsigned char beastRank[11];
    unsigned char unknown5B9[11];
    unsigned char pose;
