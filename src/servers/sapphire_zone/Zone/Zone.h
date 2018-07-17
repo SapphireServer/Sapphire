@@ -77,7 +77,7 @@ public:
    virtual void onPlayerZoneIn( Entity::Player &player );
    virtual void onFinishLoading( Entity::Player& player );
    virtual void onInitDirector( Entity::Player& player );
-   virtual void onSomeDirectorEvent( Entity::Player& player ) {};
+   virtual void onDirectorSync( Entity::Player& player ) {};
    virtual void onLeaveTerritory( Entity::Player& player );
    virtual void onUpdate( uint32_t currTime );
    virtual void onRegisterEObj( Entity::EventObjectPtr object ) {};
