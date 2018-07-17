@@ -739,9 +739,11 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    unsigned char unlockedGuildhests[10];
    unsigned char unlockedTrials[7];
    unsigned char unlockedPvp[5];
-   unsigned char unknownMask72C[28];
-   unsigned char unknownMask748[18];
-   unsigned char unknown75A[22];
+   unsigned char clearedRaids[28];
+   unsigned char clearedDungeons[18];
+   unsigned char clearedGuildhests[10];
+   unsigned char clearedTrials[7];
+   unsigned char clearedPvp[5];
 
 };
 
