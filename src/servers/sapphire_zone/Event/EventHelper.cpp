@@ -81,7 +81,8 @@ std::string Core::Event::getEventName( uint32_t eventId )
       std::string name = shopInfo->name;
 
       if( shopInfo )
-         return "GilShop - " + name;
+         return name;
+      return unknown + "GilShop";
    }
    default:
    {
