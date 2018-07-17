@@ -699,7 +699,7 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    unsigned char howto[33];
    unsigned char minions[38];
    unsigned char chocoboTaxiMask[8];
-   unsigned char contentClearMask[111];
+   unsigned char watchedCutscenes[111];
    unsigned char companionBardingMask[9];
    unsigned char companionEquippedHead;
    unsigned char companionEquippedBody;
