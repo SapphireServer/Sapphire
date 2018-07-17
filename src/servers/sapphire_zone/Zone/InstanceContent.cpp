@@ -175,7 +175,7 @@ void Core::InstanceContent::onInitDirector( Entity::Player& player )
    player.setDirectorInitialized( true );
 }
 
-void Core::InstanceContent::onSomeDirectorEvent( Entity::Player& player )
+void Core::InstanceContent::onDirectorSync( Entity::Player& player )
 {
    player.queuePacket( boost::make_shared< ActorControlPacket143 >( player.getId(), DirectorUpdate, 0x00110001, 0x80000000, 1 ) );
 }

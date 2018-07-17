@@ -245,9 +245,9 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
           player.getCurrentZone()->onInitDirector( player );
           break;
        }
-       case ClientTriggerType::SomeDirectorEvent: // Director init finish
+       case ClientTriggerType::DirectorSync: // Director init finish
        {
-          player.getCurrentZone()->onSomeDirectorEvent( player );
+          player.getCurrentZone()->onDirectorSync( player );
           break;
        }
        case ClientTriggerType::EnterTerritoryEventFinished:// this may still be something else. I think i have seen it elsewhere

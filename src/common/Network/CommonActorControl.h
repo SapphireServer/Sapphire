@@ -265,7 +265,7 @@ namespace Core {
 
             DirectorInitFinish = 0x321,
 
-            SomeDirectorEvent = 0x328, // unsure what exactly triggers it, starts director when returning to instance though
+            DirectorSync = 0x328, // unsure what exactly triggers it, starts director when returning to instance though
 
             EnterTerritoryEventFinished = 0x330,
             RequestInstanceLeave = 0x333, // df menu button
