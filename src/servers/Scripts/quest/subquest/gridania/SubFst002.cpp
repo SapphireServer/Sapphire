@@ -66,7 +66,7 @@ public:
       if( npcId != ENEMY0 )
          return;
 
-      auto currentKC = player.getQuestUI8AL( getId()) + 1;
+      auto currentKC = player.getQuestUI8AL( getId() ) + 1;
 
       if( currentKC >= 6 )
          player.updateQuest( getId(), SEQ_FINISH );

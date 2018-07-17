@@ -73,9 +73,9 @@ class ClsArc000 : public EventScript
       if( npcId != Enemy0 || npcId != Enemy1 || npcId != Enemy2 )
          return;
 
-      auto currentKC37 = player.getQuestUI8AL( getId() );
-      auto currentKC49 = player.getQuestUI8BH( getId() );
-      auto currentKC47 = player.getQuestUI8BL( getId() );
+      auto currentKC37 = player.getQuestUI8AL( getId() ) + 1;
+      auto currentKC49 = player.getQuestUI8BH( getId() ) + 1;
+      auto currentKC47 = player.getQuestUI8BL( getId() ) + 1;
 
       if( currentKC37 >= 6 )
       {
