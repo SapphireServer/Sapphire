@@ -730,7 +730,7 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    unsigned char unknown694[3];
    unsigned char orchestrionMask[40];
    unsigned char hallOfNoviceCompleteMask[3];
-   unsigned char unknownMask6C2[11];
+   unsigned char animaCompletion[11];
    unsigned char unknown6CD[3];
    unsigned char unknownMask6C0[11];
    unsigned char unknownMask6DB[13];

@@ -241,6 +241,7 @@ namespace Core {
             AllotAttribute = 0x135,
 
             ClearWaymarks = 0x13A,
+            CameraMode = 0x13B, // param12, 1 = camera mode enable, 0 = disable
 
             HuntingLogDetails = 0x194,
 
