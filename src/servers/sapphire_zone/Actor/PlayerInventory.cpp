@@ -86,7 +86,7 @@ void Core::Entity::Player::equipWeapon( ItemPtr pItem )
 }
 
 // equip an item
-void Core::Entity::Player::equipItem( Inventory::EquipSlot equipSlotId, ItemPtr pItem, bool sendUpdate )
+void Core::Entity::Player::equipItem( Common::EquipSlot equipSlotId, ItemPtr pItem, bool sendUpdate )
 {
 
    //g_framework.getLogger().debug( "Equipping into slot " + std::to_string( equipSlotId ) );
@@ -96,18 +96,18 @@ void Core::Entity::Player::equipItem( Inventory::EquipSlot equipSlotId, ItemPtr 
 
    switch( equipSlotId )
    {
-   case Inventory::EquipSlot::MainHand:
+   case Common::EquipSlot::MainHand:
       m_modelMainWeapon = model;
       m_modelSubWeapon = model2;
       // TODO: add job change upon changing weapon if needed
       // equipWeapon( pItem );
       break;
 
-   case Inventory::EquipSlot::OffHand:
+   case Common::EquipSlot::OffHand:
       m_modelSubWeapon = model;
       break;
 
-   case Inventory::EquipSlot::SoulCrystal:
+   case Common::EquipSlot::SoulCrystal:
       // TODO: add Job change on equipping crystal
       // change job
       break;
@@ -126,7 +126,7 @@ void Core::Entity::Player::equipItem( Inventory::EquipSlot equipSlotId, ItemPtr 
    }
 }
 
-void Core::Entity::Player::unequipItem( Inventory::EquipSlot equipSlotId, ItemPtr pItem )
+void Core::Entity::Player::unequipItem( Common::EquipSlot equipSlotId, ItemPtr pItem )
 {
    m_modelEquip[static_cast< uint8_t >( equipSlotId )] = 0;
    sendModel();
@@ -137,19 +137,19 @@ void Core::Entity::Player::unequipItem( Inventory::EquipSlot equipSlotId, ItemPt
 
 uint32_t Core::Entity::Player::getCurrency( uint8_t type ) const
 {
-   return m_pInventory->getCurrency( static_cast< Inventory::CurrencyType >( type ) );
+   return m_pInventory->getCurrency( static_cast< Common::CurrencyType >( type ) );
 }
 
 // TODO: these next functions are so similar that they could likely be simplified
 void Core::Entity::Player::addCurrency( uint8_t type, uint32_t amount )
 {
-   if( !m_pInventory->addCurrency( static_cast< Inventory::CurrencyType >( type ), amount ) )
+   if( !m_pInventory->addCurrency( static_cast< Common::CurrencyType >( type ), amount ) )
       return;
 
    auto invUpPacket = makeZonePacket< FFXIVIpcUpdateInventorySlot >( getId() );
-   invUpPacket->data().containerId = Inventory::InventoryType::Currency;
+   invUpPacket->data().containerId = Common::InventoryType::Currency;
    invUpPacket->data().catalogId = 1;
-   invUpPacket->data().quantity = m_pInventory->getCurrency( static_cast< Inventory::CurrencyType >( type ) );
+   invUpPacket->data().quantity = m_pInventory->getCurrency( static_cast< Common::CurrencyType >( type ) );
    invUpPacket->data().slot = static_cast< uint8_t >( type ) - 1;
 
    queuePacket( invUpPacket );
@@ -157,13 +157,13 @@ void Core::Entity::Player::addCurrency( uint8_t type, uint32_t amount )
 
 void Core::Entity::Player::removeCurrency( uint8_t type, uint32_t amount )
 {
-   if( !m_pInventory->removeCurrency( static_cast< Inventory::CurrencyType >( type ), amount ) )
+   if( !m_pInventory->removeCurrency( static_cast< Common::CurrencyType >( type ), amount ) )
       return;
 
    auto invUpPacket = makeZonePacket< FFXIVIpcUpdateInventorySlot >( getId() );
-   invUpPacket->data().containerId = Inventory::InventoryType::Currency;
+   invUpPacket->data().containerId = Common::InventoryType::Currency;
    invUpPacket->data().catalogId = 1;
-   invUpPacket->data().quantity = m_pInventory->getCurrency( static_cast< Inventory::CurrencyType >( type ) );
+   invUpPacket->data().quantity = m_pInventory->getCurrency( static_cast< Common::CurrencyType >( type ) );
    invUpPacket->data().slot = static_cast< uint8_t >( type ) - 1;
 
    queuePacket( invUpPacket );
@@ -172,18 +172,18 @@ void Core::Entity::Player::removeCurrency( uint8_t type, uint32_t amount )
 
 uint32_t Core::Entity::Player::getCrystal( uint8_t type ) const
 {
-   return m_pInventory->getCrystal( static_cast< Inventory::CrystalType >( type ) );
+   return m_pInventory->getCrystal( static_cast< Common::CrystalType >( type ) );
 }
 
 void Core::Entity::Player::addCrystal( uint8_t type, uint32_t amount )
 {
-   if( !m_pInventory->addCrystal( static_cast< Inventory::CrystalType >( type ), amount ) )
+   if( !m_pInventory->addCrystal( static_cast< Common::CrystalType >( type ), amount ) )
       return;
 
    auto invUpPacket = makeZonePacket< FFXIVIpcUpdateInventorySlot >( getId() );
-   invUpPacket->data().containerId = Inventory::InventoryType::Crystal;
+   invUpPacket->data().containerId = Common::InventoryType::Crystal;
    invUpPacket->data().catalogId = static_cast< uint8_t >( type ) + 1;
-   invUpPacket->data().quantity = m_pInventory->getCrystal( static_cast< Inventory::CrystalType >( type ) );
+   invUpPacket->data().quantity = m_pInventory->getCrystal( static_cast< Common::CrystalType >( type ) );
    invUpPacket->data().slot = static_cast< uint8_t >( type ) - 1;
 
    queuePacket( invUpPacket );
@@ -194,13 +194,13 @@ void Core::Entity::Player::addCrystal( uint8_t type, uint32_t amount )
 
 void Core::Entity::Player::removeCrystal( uint8_t type, uint32_t amount )
 {
-   if( !m_pInventory->removeCrystal( static_cast< Inventory::CrystalType >( type ), amount ) )
+   if( !m_pInventory->removeCrystal( static_cast< Common::CrystalType >( type ), amount ) )
       return;
 
    auto invUpPacket = makeZonePacket< FFXIVIpcUpdateInventorySlot >( getId() );
-   invUpPacket->data().containerId = Inventory::InventoryType::Crystal;
+   invUpPacket->data().containerId = Common::InventoryType::Crystal;
    invUpPacket->data().catalogId = static_cast< uint8_t >( type ) + 1;
-   invUpPacket->data().quantity = m_pInventory->getCrystal( static_cast< Inventory::CrystalType >( type ) );
+   invUpPacket->data().quantity = m_pInventory->getCrystal( static_cast< Common::CrystalType >( type ) );
    invUpPacket->data().slot = static_cast< uint8_t >( type ) - 1;
 
    queuePacket( invUpPacket );

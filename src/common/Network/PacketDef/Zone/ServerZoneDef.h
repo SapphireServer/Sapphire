@@ -303,11 +303,11 @@ struct effectEntry
 {
    Common::ActionEffectType effectType;
    Common::ActionHitSeverityType hitSeverity;
-   uint8_t unknown_3;
+   uint8_t param;
    int8_t bonusPercent;
-   int16_t value;
    uint8_t valueMultiplier;      // This multiplies whatever value is in the 'value' param by 10. Possibly a workaround for big numbers
-   uint8_t unknown_6;
+   uint8_t flags;
+   int16_t value;
 };
 
 struct FFXIVIpcEffect : FFXIVIpcBasePacket<Effect>
@@ -318,17 +318,26 @@ struct FFXIVIpcEffect : FFXIVIpcBasePacket<Effect>
    uint32_t unknown_2;
    uint32_t unknown_5;
    uint32_t unknown_6;
-   uint32_t effectTargetId;
+   uint16_t unknown_7;
    uint16_t rotation;
    uint16_t actionTextId;
-   uint8_t unknown_61;
-   uint8_t unknown_62;
-   uint8_t unknown_10;
+   uint16_t unknown_8;
+
+   uint8_t unknown_9;
    uint8_t numEffects;
-   uint32_t u11;
+
+   uint16_t unknown_10;
+   uint32_t unknown_11;
+   uint16_t unknown_12;
+
    effectEntry effects[8];
-   uint32_t effectTarget;
-   uint64_t unknown_8;
+
+   uint32_t unknown_13;
+   uint16_t unknown_14;
+
+   uint32_t effectTargetId;
+
+   uint64_t unknown_15;
 };
 
 

@@ -223,9 +223,9 @@ public:
    /*! add an item to a given container */
    bool addItem( uint16_t containerId, uint16_t catalogId, uint32_t quantity );
    /*! equip an item to a specified slot */
-   void equipItem( Inventory::EquipSlot equipSlotId, ItemPtr pItem, bool sendModel );
+   void equipItem( Common::EquipSlot equipSlotId, ItemPtr pItem, bool sendModel );
    /*! remove an item from an equipment slot */
-   void unequipItem( Inventory::EquipSlot equipSlotId, ItemPtr pItem );
+   void unequipItem( Common::EquipSlot equipSlotId, ItemPtr pItem );
    /*! equip a weapon, possibly forcing a job change */
    void equipWeapon( ItemPtr pItem );
    /*! get player ilvl */
@@ -243,9 +243,9 @@ public:
    /*! return a const pointer to the model array */
    const uint32_t* getModelArray() const;
    /*! return the equipment model in a specified equipment slot */
-   uint32_t getModelForSlot( Inventory::EquipSlot slot );
+   uint32_t getModelForSlot( Common::EquipSlot slot );
    /*! set the equipment model in a specified equipment slot */
-   void setModelForSlot( Inventory::EquipSlot slot, uint32_t val );
+   void setModelForSlot( Common::EquipSlot slot, uint32_t val );
    /*! return the current amount of currency of type */
    uint32_t getCurrency( uint8_t type ) const;
    /*! add amount to the currency of type */

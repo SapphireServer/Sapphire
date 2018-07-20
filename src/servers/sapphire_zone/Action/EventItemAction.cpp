@@ -77,7 +77,7 @@ void Core::Action::EventItemAction::onFinish()
       effectPacket->data().unknown_5 = 2;
       effectPacket->data().numEffects = 1;
       effectPacket->data().rotation = Math::Util::floatToUInt16Rot( m_pSource->getRot() );
-      effectPacket->data().effectTarget = static_cast< uint32_t >( m_additional );
+      effectPacket->data().effectTargetId = static_cast< uint32_t >( m_additional );
 
       m_pSource->getAsPlayer()->unsetStateFlag( Common::PlayerStateFlag::Casting );
       m_pSource->sendToInRangeSet( effectPacket, true );
