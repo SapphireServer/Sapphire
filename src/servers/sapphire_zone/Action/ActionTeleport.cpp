@@ -68,13 +68,13 @@ void Core::Action::ActionTeleport::onFinish()
    auto pPlayer = m_pSource->getAsPlayer();
 
    // check we can finish teleporting
-   if( pPlayer->getCurrency( Inventory::CurrencyType::Gil ) < m_cost )
+   if( pPlayer->getCurrency( Common::CurrencyType::Gil ) < m_cost )
    {
       onInterrupt();
       return;
    }
 
-   pPlayer->removeCurrency( Inventory::CurrencyType::Gil, m_cost );
+   pPlayer->removeCurrency( Common::CurrencyType::Gil, m_cost );
  
    pPlayer->unsetStateFlag( PlayerStateFlag::Casting );
 
@@ -92,7 +92,7 @@ void Core::Action::ActionTeleport::onFinish()
    effectPacket->data().unknown_5 = 1;
    effectPacket->data().numEffects = 1;
    effectPacket->data().rotation = static_cast< uint16_t >( 0x8000 * ( ( pPlayer->getRot() + 3.1415926 ) ) / 3.1415926 );
-   effectPacket->data().effectTarget = pPlayer->getId();
+   effectPacket->data().effectTargetId = pPlayer->getId();
    pPlayer->sendToInRangeSet( effectPacket, true );
 
    pPlayer->teleport( m_targetAetheryte );

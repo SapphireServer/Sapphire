@@ -769,12 +769,12 @@ void Core::Entity::Player::sendModel()
    sendToInRangeSet( boost::make_shared< ModelEquipPacket >( *getAsPlayer() ), true );
 }
 
-uint32_t Core::Entity::Player::getModelForSlot( Inventory::EquipSlot slot )
+uint32_t Core::Entity::Player::getModelForSlot( Common::EquipSlot slot )
 {
    return m_modelEquip[slot];
 }
 
-void Core::Entity::Player::setModelForSlot( Inventory::EquipSlot slot, uint32_t val )
+void Core::Entity::Player::setModelForSlot( Common::EquipSlot slot, uint32_t val )
 {
    m_modelEquip[slot] = val;
 }
@@ -1023,7 +1023,7 @@ void Core::Entity::Player::update( int64_t currTime )
    {
       if( m_targetId && m_currentStance == Entity::Chara::Stance::Active && isAutoattackOn() )
       {
-         auto mainWeap = m_pInventory->getItemAt( Inventory::GearSet0, Inventory::EquipSlot::MainHand );
+         auto mainWeap = m_pInventory->getItemAt( Common::GearSet0, Common::EquipSlot::MainHand );
 
          // @TODO i dislike this, iterating over all in range actors when you already know the id of the actor you need...
          for( auto actor : m_inRangeActor )
@@ -1406,8 +1406,8 @@ uint32_t Core::Entity::Player::getPersistentEmote() const
 void Core::Entity::Player::autoAttack( CharaPtr pTarget )
 {
 
-   auto mainWeap = m_pInventory->getItemAt( Inventory::GearSet0,
-                                            Inventory::EquipSlot::MainHand );
+   auto mainWeap = m_pInventory->getItemAt( Common::GearSet0,
+                                            Common::EquipSlot::MainHand );
 
    pTarget->onActionHostile( *this );
    //uint64_t tick = Util::getTimeMs();
@@ -1423,16 +1423,16 @@ void Core::Entity::Player::autoAttack( CharaPtr pTarget )
       effectPacket->data().actionAnimationId = 8;
      // effectPacket.data().unknown_2 = variation;
       effectPacket->data().numEffects = 1;
-      effectPacket->data().unknown_61 = 1;
-      effectPacket->data().unknown_62 = 1;
+      //effectPacket->data().unknown_61 = 1;
+      //effectPacket->data().unknown_62 = 1;
       effectPacket->data().actionTextId = 8;
       effectPacket->data().rotation = Math::Util::floatToUInt16Rot( getRot() );
       effectPacket->data().effectTargetId = pTarget->getId();
-      effectPacket->data().effectTarget = pTarget->getId();
+      //effectPacket->data().effectTarget = pTarget->getId();
       effectPacket->data().effects[0].value = damage;
       effectPacket->data().effects[0].effectType = Common::ActionEffectType::Damage;
       effectPacket->data().effects[0].hitSeverity = Common::ActionHitSeverityType::NormalDamage;
-      effectPacket->data().effects[0].unknown_3 = 7;
+      //effectPacket->data().effects[0].unknown_3 = 7;
 
       sendToInRangeSet(effectPacket, true);
    }
@@ -1444,15 +1444,15 @@ void Core::Entity::Player::autoAttack( CharaPtr pTarget )
       effectPacket->data().actionAnimationId = 7;
       // effectPacket.data().unknown_2 = variation;
       effectPacket->data().numEffects = 1;
-      effectPacket->data().unknown_61 = 1;
-      effectPacket->data().unknown_62 = 1;
+      //effectPacket->data().unknown_61 = 1;
+      //effectPacket->data().unknown_62 = 1;
       effectPacket->data().actionTextId = 7;
       effectPacket->data().rotation = Math::Util::floatToUInt16Rot( getRot() );
-      effectPacket->data().effectTarget = pTarget->getId();
+      effectPacket->data().effectTargetId = pTarget->getId();
       effectPacket->data().effects[0].value = damage;
       effectPacket->data().effects[0].effectType = Common::ActionEffectType::Damage;
       effectPacket->data().effects[0].hitSeverity = Common::ActionHitSeverityType::NormalDamage;
-      effectPacket->data().effects[0].unknown_3 = 71;
+      //effectPacket->data().effects[0].unknown_3 = 71;
 
       sendToInRangeSet(effectPacket, true);
    }
@@ -1701,7 +1701,7 @@ void Core::Entity::Player::teleportQuery( uint16_t aetheryteId )
       // cap at 999 gil
       cost = cost > uint16_t{999} ? uint16_t{999} : cost;
 
-      bool insufficientGil = getCurrency( Inventory::CurrencyType::Gil ) < cost;
+      bool insufficientGil = getCurrency( Common::CurrencyType::Gil ) < cost;
       // TODO: figure out what param1 really does
       queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), TeleportStart, insufficientGil ? 2 : 0, aetheryteId ) );
 

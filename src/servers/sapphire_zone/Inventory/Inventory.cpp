@@ -983,7 +983,7 @@ uint8_t Core::Inventory::getFreeSlotsInBags()
 }
 
 
-Core::Inventory::ContainerType Core::Inventory::getContainerType( uint32_t containerId )
+Core::Common::ContainerType Core::Inventory::getContainerType( uint32_t containerId )
 {
    if( containerId < 5 )
    {
@@ -1003,7 +1003,7 @@ Core::Inventory::ContainerType Core::Inventory::getContainerType( uint32_t conta
    }
    else
    {
-      return Unknown;
+      return Common::Unknown;
    }
 }
 

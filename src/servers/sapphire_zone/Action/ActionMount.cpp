@@ -78,11 +78,11 @@ void Core::Action::ActionMount::onFinish()
    effectPacket->data().targetId = pPlayer->getId();
    effectPacket->data().actionAnimationId = m_id;
    // Affects displaying action name next to number in floating text
-   effectPacket->data().unknown_62 = 13;
+   //effectPacket->data().unknown_62 = 13;
    effectPacket->data().actionTextId = 4;
    effectPacket->data().numEffects = 1;
    effectPacket->data().rotation = Math::Util::floatToUInt16Rot( pPlayer->getRot() );
-   effectPacket->data().effectTarget = INVALID_GAME_OBJECT_ID;
+   //effectPacket->data().effectTarget = INVALID_GAME_OBJECT_ID;
    effectPacket->data().effects[0].effectType = ActionEffectType::Mount;
    effectPacket->data().effects[0].hitSeverity = ActionHitSeverityType::CritDamage;
    effectPacket->data().effects[0].value = m_id;

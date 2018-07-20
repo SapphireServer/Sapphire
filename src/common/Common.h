@@ -114,6 +114,57 @@ namespace Common {
       FreeCompanyCrystal = 22001
    };
 
+   enum ContainerType : uint16_t
+   {
+      Unknown = 0,
+      Bag = 1,
+      GearSet = 2,
+      CurrencyCrystal = 3,
+      Armory = 4
+   };
+
+
+   enum CurrencyType : uint8_t
+   {
+      Gil = 0x01,
+      StormSeal = 0x02,
+      SerpentSeal = 0x03,
+      FlameSeal = 0x04,
+      TomestonePhilo = 0x05,
+      TomestoneMytho = 0x06,
+      WolfMark = 0x07,
+      TomestoneSold = 0x08,
+      AlliedSeal = 0x09,
+      TomestonePoet = 0x0A,
+      Mgp = 0x0B,
+      TomestoneLaw = 0x0C,
+      TomestoneEso = 0x0D,
+      TomestoneLore = 0x0E
+   };
+
+   enum CrystalType : uint8_t
+   {
+      FireShard = 0x01,
+      IceShard = 0x02,
+      WindShard = 0x03,
+      EarthShard = 0x04,
+      LightningShard = 0x05,
+      WaterShard = 0x06,
+
+      FireCrystal = 0x07,
+      IceCrystal = 0x08,
+      WindCrystal = 0x09,
+      EarthCrystal = 0x0A,
+      LightningCrystal = 0x0B,
+      WaterCrystal = 0x0C,
+
+      FireCluster = 0x0D,
+      IceCluster = 0x0E,
+      WindCluster = 0x0F,
+      EarthCluster = 0x10,
+      LightningCluster = 0x11,
+      WaterCluster = 0x12
+   };
 
    enum struct ZoneingType : uint8_t
    {

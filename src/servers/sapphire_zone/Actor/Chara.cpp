@@ -407,11 +407,11 @@ void Core::Entity::Chara::autoAttack( CharaPtr pTarget )
       ipcEffect->data().actionTextId = 0x366;
       ipcEffect->data().numEffects = 1;
       ipcEffect->data().rotation = Math::Util::floatToUInt16Rot( getRot() );
-      ipcEffect->data().effectTarget = pTarget->getId();
+      ipcEffect->data().effectTargetId = pTarget->getId();
       ipcEffect->data().effects[0].value = damage;
       ipcEffect->data().effects[0].effectType = ActionEffectType::Damage;
       ipcEffect->data().effects[0].hitSeverity = static_cast< ActionHitSeverityType >( variation );
-      ipcEffect->data().effects[0].unknown_3 = 7;
+      //ipcEffect->data().effects[0].unknown_3 = 7;
 
       sendToInRangeSet( ipcEffect );
 
@@ -447,12 +447,12 @@ void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, u
    auto effectPacket = makeZonePacket< FFXIVIpcEffect >( getId() );
    effectPacket->data().targetId = target.getId();
    effectPacket->data().actionAnimationId = actionId;
-   effectPacket->data().unknown_62 = 1; // Affects displaying action name next to number in floating text
+   //effectPacket->data().unknown_62 = 1; // Affects displaying action name next to number in floating text
    effectPacket->data().unknown_2 = 1;  // This seems to have an effect on the "double-cast finish" animation
    effectPacket->data().actionTextId = actionId;
    effectPacket->data().numEffects = 1;
    effectPacket->data().rotation = Math::Util::floatToUInt16Rot( getRot() );
-   effectPacket->data().effectTarget = target.getId();
+   effectPacket->data().effectTargetId = target.getId();
 
    // Todo: for each actor, calculate how much damage the calculated value should deal to them - 2-step damage calc. we only have 1-step
    switch( type )
@@ -463,7 +463,7 @@ void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, u
       effectPacket->data().effects[0].value = static_cast< uint16_t >( param1 );
       effectPacket->data().effects[0].effectType = ActionEffectType::Damage;
       effectPacket->data().effects[0].hitSeverity = ActionHitSeverityType::NormalDamage;
-      effectPacket->data().effects[0].unknown_3 = 7;
+      //effectPacket->data().effects[0].unknown_3 = 7;
 
       if( actionInfoPtr->castType == 1 && actionInfoPtr->effectRange != 0 || actionInfoPtr->castType != 1 )
       {
@@ -488,7 +488,7 @@ void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, u
          for( const auto& pHitActor : actorsCollided )
          {
             effectPacket->data().targetId = pHitActor->getId();
-            effectPacket->data().effectTarget = pHitActor->getId();
+            effectPacket->data().effectTargetId = pHitActor->getId();
 
             // todo: send to range of what? ourselves? when mob script hits this is going to be lacking
             sendToInRangeSet( effectPacket, true );
@@ -541,7 +541,7 @@ void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, u
          for( auto pHitActor : actorsCollided )
          {
             effectPacket->data().targetId = target.getId();
-            effectPacket->data().effectTarget = pHitActor->getId();
+            effectPacket->data().effectTargetId = pHitActor->getId();
 
             sendToInRangeSet( effectPacket, true );
             pHitActor->getAsChara()->heal( calculatedHeal );
