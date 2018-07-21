@@ -423,6 +423,13 @@ namespace Common {
       CritDirectHitDamage = 3
    };
 
+   enum ActionEffectDisplayType : uint8_t
+   {
+      HideActionName = 0,
+      ShowActionName = 1,
+      ShowItemName = 2,
+   };
+
    enum class ActionCollisionType : uint8_t
    {
       None,

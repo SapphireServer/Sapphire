@@ -4,6 +4,7 @@
 #include <Exd/ExdDataGenerated.h>
 #include <utility>
 #include <Network/CommonActorControl.h>
+#include <sapphire_zone/Network/PacketWrappers/EffectPacket.h>
 
 #include "Forwards.h"
 #include "Action/Action.h"
@@ -399,21 +400,20 @@ void Core::Entity::Chara::autoAttack( CharaPtr pTarget )
       uint16_t damage = static_cast< uint16_t >( 10 + rand() % 12 );
       uint32_t variation = static_cast< uint32_t >( 0 + rand() % 4 );
 
-      auto ipcEffect = makeZonePacket< Server::FFXIVIpcEffect >( getId() );
-      ipcEffect->data().animationTargetId = pTarget->getId();
-      ipcEffect->data().actionAnimationId = 0x366;
-      ipcEffect->data().actionId = 0x366;
-      ipcEffect->data().numEffects = 1;
-      ipcEffect->data().rotation = Math::Util::floatToUInt16Rot( getRot() );
-      ipcEffect->data().effectTargetId = pTarget->getId();
-      ipcEffect->data().effects[0].value = damage;
-      ipcEffect->data().effects[0].effectType = ActionEffectType::Damage;
-      ipcEffect->data().effects[0].hitSeverity = static_cast< ActionHitSeverityType >( variation );
+      auto effectPacket = boost::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 0x336 );
+      effectPacket->setRotation( Math::Util::floatToUInt16Rot( getRot() ) );
 
-      sendToInRangeSet( ipcEffect );
+      Server::EffectEntry effectEntry{ };
+      effectEntry.value = damage;
+      effectEntry.effectType = ActionEffectType::Damage;
+      effectEntry.hitSeverity = static_cast< ActionHitSeverityType >( variation );
+
+      effectPacket->addEffect( effectEntry );
+
+      sendToInRangeSet( effectPacket );
 
       if( isPlayer() )
-         getAsPlayer()->queuePacket( ipcEffect );
+         getAsPlayer()->queuePacket( effectPacket );
 
       pTarget->takeDamage( damage );
    }
@@ -440,16 +440,8 @@ void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, u
    // Todo: Effect packet generator. 90% of this is basically setting params and it's basically unreadable.
    // Prepare packet. This is seemingly common for all packets in the action handler.
 
-
-   auto effectPacket = makeZonePacket< Server::FFXIVIpcEffect >( getId() );
-   effectPacket->data().animationTargetId = target.getId();
-   effectPacket->data().actionAnimationId = actionId;
-   //effectPacket->data().unknown_62 = 1; // Affects displaying action name next to number in floating text
-   //effectPacket->data().globalEffectCounter = 1;  // This seems to have an effect on the "double-cast finish" animation
-   effectPacket->data().actionId = actionId;
-   effectPacket->data().numEffects = 1;
-   effectPacket->data().rotation = Math::Util::floatToUInt16Rot( getRot() );
-   effectPacket->data().effectTargetId = target.getId();
+   auto effectPacket = boost::make_shared< Server::EffectPacket >( getId(), target.getId(), actionId );
+   effectPacket->setRotation( Math::Util::floatToUInt16Rot( getRot() ) );
 
    // Todo: for each actor, calculate how much damage the calculated value should deal to them - 2-step damage calc. we only have 1-step
    switch( type )
@@ -457,10 +449,12 @@ void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, u
 
    case ActionEffectType::Damage:
    {
-      effectPacket->data().effects[0].value = static_cast< uint16_t >( param1 );
-      effectPacket->data().effects[0].effectType = ActionEffectType::Damage;
-      effectPacket->data().effects[0].hitSeverity = ActionHitSeverityType::NormalDamage;
-      //effectPacket->data().effects[0].unknown_3 = 7;
+      Server::EffectEntry effectEntry{};
+      effectEntry.value = static_cast< uint16_t >( param1 );
+      effectEntry.effectType = ActionEffectType::Damage;
+      effectEntry.hitSeverity = ActionHitSeverityType::NormalDamage;
+
+      effectPacket->addEffect( effectEntry );
 
       if( actionInfoPtr->castType == 1 && actionInfoPtr->effectRange != 0 || actionInfoPtr->castType != 1 )
       {
@@ -484,8 +478,7 @@ void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, u
 
          for( const auto& pHitActor : actorsCollided )
          {
-            effectPacket->data().animationTargetId = pHitActor->getId();
-            effectPacket->data().effectTargetId = pHitActor->getId();
+            effectPacket->setTargetActor( pHitActor->getId() );
 
             // todo: send to range of what? ourselves? when mob script hits this is going to be lacking
             sendToInRangeSet( effectPacket, true );
@@ -515,9 +508,12 @@ void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, u
    {
       uint32_t calculatedHeal = Math::CalcBattle::calculateHealValue( getAsPlayer(), static_cast< uint32_t >( param1 ) );
 
-      effectPacket->data().effects[0].value = calculatedHeal;
-      effectPacket->data().effects[0].effectType = ActionEffectType::Heal;
-      effectPacket->data().effects[0].hitSeverity = ActionHitSeverityType::NormalHeal;
+      Server::EffectEntry effectEntry{};
+      effectEntry.value = calculatedHeal;
+      effectEntry.effectType = ActionEffectType::Heal;
+      effectEntry.hitSeverity = ActionHitSeverityType::NormalHeal;
+
+      effectPacket->addEffect( effectEntry );
 
       if( actionInfoPtr->castType == 1 && actionInfoPtr->effectRange != 0 || actionInfoPtr->castType != 1 )
       {
@@ -537,8 +533,7 @@ void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, u
 
          for( auto pHitActor : actorsCollided )
          {
-            effectPacket->data().animationTargetId = target.getId();
-            effectPacket->data().effectTargetId = pHitActor->getId();
+            effectPacket->setTargetActor( pHitActor->getId() );
 
             sendToInRangeSet( effectPacket, true );
             pHitActor->getAsChara()->heal( calculatedHeal );

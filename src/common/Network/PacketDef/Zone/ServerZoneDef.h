@@ -299,7 +299,7 @@ struct FFXIVIpcUpdateHpMpTp : FFXIVIpcBasePacket<UpdateHpMpTp>
 * Structural representation of the packet sent by the server
 * for battle actions
 */
-struct effectEntry
+struct EffectEntry
 {
    Common::ActionEffectType effectType;
    Common::ActionHitSeverityType hitSeverity;
@@ -322,24 +322,19 @@ struct FFXIVIpcEffect : FFXIVIpcBasePacket<Effect>
 
    uint16_t hiddenAnimation; // if 0, always shows animation, otherwise hides it. counts up by 1 for each animation skipped on a caster
 
-   int16_t rotation;
+   uint16_t rotation;
 
    uint16_t actionAnimationId; // the animation that is played by the casting character
    uint8_t unknown1E; // can be 0,1,2 - maybe other values? - doesn't do anything?
 
-   /* effectDisplayType
-    * 0 = only show damage/heal amount
-    * 1 = show damage/heal amount + name
-    * 2 = show damage/heal amount + name but name is from item.exd, name id is actionId
-    */
-   uint8_t effectDisplayType;
+   Common::ActionEffectDisplayType effectDisplayType;
 
    uint8_t unknown20; // is read by handler, runs code which gets the LODWORD of animationLockTime (wtf?)
-   uint8_t numEffects; // ignores effects if 0, otherwise parses all of them
+   uint8_t effectCount; // ignores effects if 0, otherwise parses all of them
 
    uint32_t padding_22[2];
 
-   effectEntry effects[8];
+   EffectEntry effects[8];
 
    uint16_t padding_6A[3];
 

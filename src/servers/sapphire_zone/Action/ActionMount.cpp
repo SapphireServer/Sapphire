@@ -3,6 +3,7 @@
 #include <Util/UtilMath.h>
 #include <Logging/Logger.h>
 #include <Network/CommonActorControl.h>
+#include <sapphire_zone/Network/PacketWrappers/EffectPacket.h>
 
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
@@ -73,19 +74,15 @@ void Core::Action::ActionMount::onFinish()
 
    pPlayer->unsetStateFlag( PlayerStateFlag::Casting );
 
-   auto effectPacket = makeZonePacket< Server::FFXIVIpcEffect >( getId() );
+   auto effectPacket = boost::make_shared< Server::EffectPacket >( getId(), pPlayer->getId(), 4 );
+   effectPacket->setRotation( Math::Util::floatToUInt16Rot( pPlayer->getRot() ) );
 
-   effectPacket->data().animationTargetId = pPlayer->getId();
-   effectPacket->data().actionAnimationId = m_id;
-   // Affects displaying action name next to number in floating text
-   //effectPacket->data().unknown_62 = 13;
-   effectPacket->data().actionAnimationId = 4;
-   effectPacket->data().numEffects = 1;
-   effectPacket->data().rotation = Math::Util::floatToUInt16Rot( pPlayer->getRot() );
-   //effectPacket->data().effectTarget = INVALID_GAME_OBJECT_ID;
-   effectPacket->data().effects[0].effectType = ActionEffectType::Mount;
-   effectPacket->data().effects[0].hitSeverity = ActionHitSeverityType::CritDamage;
-   effectPacket->data().effects[0].value = m_id;
+   Server::EffectEntry effectEntry{};
+   effectEntry.effectType = ActionEffectType::Mount;
+   effectEntry.hitSeverity = ActionHitSeverityType::CritDamage;
+   effectEntry.value = m_id;
+
+   effectPacket->addEffect( effectEntry );
 
    pPlayer->sendToInRangeSet( effectPacket, true );
 
