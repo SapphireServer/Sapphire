@@ -69,12 +69,10 @@ void Core::Action::EventItemAction::onFinish()
 
    try
    {
-      auto effectPacket = makeZonePacket< FFXIVIpcEffect >( m_pSource->getId() );
-      effectPacket->data().targetId = static_cast< uint32_t >( m_additional );
+      auto effectPacket = makeZonePacket< Server::FFXIVIpcEffect >( m_pSource->getId() );
+      effectPacket->data().animationTargetId = static_cast< uint32_t >( m_additional );
       effectPacket->data().actionAnimationId = 1;
-//      effectPacket.data().unknown_3 = 3;
-      effectPacket->data().actionTextId = m_id;
-      effectPacket->data().unknown_5 = 2;
+      effectPacket->data().actionId = m_id;
       effectPacket->data().numEffects = 1;
       effectPacket->data().rotation = Math::Util::floatToUInt16Rot( m_pSource->getRot() );
       effectPacket->data().effectTargetId = static_cast< uint32_t >( m_additional );

@@ -399,19 +399,16 @@ void Core::Entity::Chara::autoAttack( CharaPtr pTarget )
       uint16_t damage = static_cast< uint16_t >( 10 + rand() % 12 );
       uint32_t variation = static_cast< uint32_t >( 0 + rand() % 4 );
 
-      auto ipcEffect = makeZonePacket< FFXIVIpcEffect >( getId() );
-      ipcEffect->data().targetId = pTarget->getId();
+      auto ipcEffect = makeZonePacket< Server::FFXIVIpcEffect >( getId() );
+      ipcEffect->data().animationTargetId = pTarget->getId();
       ipcEffect->data().actionAnimationId = 0x366;
-      ipcEffect->data().unknown_2 = variation;
-//      effectPacket->data().unknown_3 = 1;
-      ipcEffect->data().actionTextId = 0x366;
+      ipcEffect->data().actionId = 0x366;
       ipcEffect->data().numEffects = 1;
       ipcEffect->data().rotation = Math::Util::floatToUInt16Rot( getRot() );
       ipcEffect->data().effectTargetId = pTarget->getId();
       ipcEffect->data().effects[0].value = damage;
       ipcEffect->data().effects[0].effectType = ActionEffectType::Damage;
       ipcEffect->data().effects[0].hitSeverity = static_cast< ActionHitSeverityType >( variation );
-      //ipcEffect->data().effects[0].unknown_3 = 7;
 
       sendToInRangeSet( ipcEffect );
 
@@ -444,12 +441,12 @@ void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, u
    // Prepare packet. This is seemingly common for all packets in the action handler.
 
 
-   auto effectPacket = makeZonePacket< FFXIVIpcEffect >( getId() );
-   effectPacket->data().targetId = target.getId();
+   auto effectPacket = makeZonePacket< Server::FFXIVIpcEffect >( getId() );
+   effectPacket->data().animationTargetId = target.getId();
    effectPacket->data().actionAnimationId = actionId;
    //effectPacket->data().unknown_62 = 1; // Affects displaying action name next to number in floating text
-   effectPacket->data().unknown_2 = 1;  // This seems to have an effect on the "double-cast finish" animation
-   effectPacket->data().actionTextId = actionId;
+   //effectPacket->data().globalEffectCounter = 1;  // This seems to have an effect on the "double-cast finish" animation
+   effectPacket->data().actionId = actionId;
    effectPacket->data().numEffects = 1;
    effectPacket->data().rotation = Math::Util::floatToUInt16Rot( getRot() );
    effectPacket->data().effectTargetId = target.getId();
@@ -487,7 +484,7 @@ void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, u
 
          for( const auto& pHitActor : actorsCollided )
          {
-            effectPacket->data().targetId = pHitActor->getId();
+            effectPacket->data().animationTargetId = pHitActor->getId();
             effectPacket->data().effectTargetId = pHitActor->getId();
 
             // todo: send to range of what? ourselves? when mob script hits this is going to be lacking
@@ -540,7 +537,7 @@ void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, u
 
          for( auto pHitActor : actorsCollided )
          {
-            effectPacket->data().targetId = target.getId();
+            effectPacket->data().animationTargetId = target.getId();
             effectPacket->data().effectTargetId = pHitActor->getId();
 
             sendToInRangeSet( effectPacket, true );

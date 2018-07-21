@@ -84,12 +84,11 @@ void Core::Action::ActionTeleport::onFinish()
 
    pPlayer->setZoningType( ZoneingType::Teleport );
 
-   auto effectPacket = makeZonePacket< FFXIVIpcEffect >( getId() );
-   effectPacket->data().targetId = pPlayer->getId();
+   auto effectPacket = makeZonePacket< Server::FFXIVIpcEffect >( getId() );
+   effectPacket->data().animationTargetId = pPlayer->getId();
    effectPacket->data().actionAnimationId = 5;
    //effectPacket.data().unknown_3 = 1;
-   effectPacket->data().actionTextId = 5;
-   effectPacket->data().unknown_5 = 1;
+   effectPacket->data().actionAnimationId = 5;
    effectPacket->data().numEffects = 1;
    effectPacket->data().rotation = static_cast< uint16_t >( 0x8000 * ( ( pPlayer->getRot() + 3.1415926 ) ) / 3.1415926 );
    effectPacket->data().effectTargetId = pPlayer->getId();

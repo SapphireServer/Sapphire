@@ -1418,14 +1418,14 @@ void Core::Entity::Player::autoAttack( CharaPtr pTarget )
 
    if( getClass() == ClassJob::Machinist || getClass() == ClassJob::Bard || getClass() == ClassJob::Archer )
    {
-      auto effectPacket = makeZonePacket< FFXIVIpcEffect >( getId() );
-      effectPacket->data().targetId = pTarget->getId();
+      auto effectPacket = makeZonePacket< Server::FFXIVIpcEffect >( getId() );
+      effectPacket->data().animationTargetId = pTarget->getId();
       effectPacket->data().actionAnimationId = 8;
      // effectPacket.data().unknown_2 = variation;
       effectPacket->data().numEffects = 1;
       //effectPacket->data().unknown_61 = 1;
       //effectPacket->data().unknown_62 = 1;
-      effectPacket->data().actionTextId = 8;
+      effectPacket->data().actionId = 8;
       effectPacket->data().rotation = Math::Util::floatToUInt16Rot( getRot() );
       effectPacket->data().effectTargetId = pTarget->getId();
       //effectPacket->data().effectTarget = pTarget->getId();
@@ -1439,14 +1439,14 @@ void Core::Entity::Player::autoAttack( CharaPtr pTarget )
    else
    {
 
-      auto effectPacket = makeZonePacket< FFXIVIpcEffect >( getId() );
-      effectPacket->data().targetId = pTarget->getId();
+      auto effectPacket = makeZonePacket< Server::FFXIVIpcEffect >( getId() );
+      effectPacket->data().animationTargetId = pTarget->getId();
       effectPacket->data().actionAnimationId = 7;
       // effectPacket.data().unknown_2 = variation;
       effectPacket->data().numEffects = 1;
       //effectPacket->data().unknown_61 = 1;
       //effectPacket->data().unknown_62 = 1;
-      effectPacket->data().actionTextId = 7;
+      effectPacket->data().actionId = 7;
       effectPacket->data().rotation = Math::Util::floatToUInt16Rot( getRot() );
       effectPacket->data().effectTargetId = pTarget->getId();
       effectPacket->data().effects[0].value = damage;
