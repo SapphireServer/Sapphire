@@ -97,6 +97,10 @@ namespace Packets {
 
       StatusEffectList           = 0x014E, // updated 4.3
       Effect                     = 0x0151, // updated 4.3
+      AoeEffect8                 = 0x0154, // updated 4.3
+      AoeEffect16                = 0x0155, // updated 4.3
+      AoeEffect24                = 0x0156, // updated 4.3
+      AoeEffect32                = 0x0157, // updated 4.3
       PersistantEffect           = 0x0158, // updated 4.3
 
       GCAffiliation              = 0xCCFC, // OUTDATED
