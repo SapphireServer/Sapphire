@@ -304,7 +304,7 @@ struct effectEntry
    Common::ActionEffectType effectType;
    Common::ActionHitSeverityType hitSeverity;
    uint8_t param;
-   int8_t bonusPercent;
+   int8_t bonusPercent; // shows an additional percentage in the battle log, will not change the damage number sent & shown
    uint8_t valueMultiplier;      // This multiplies whatever value is in the 'value' param by 10. Possibly a workaround for big numbers
    uint8_t flags;
    int16_t value;
@@ -312,32 +312,41 @@ struct effectEntry
 
 struct FFXIVIpcEffect : FFXIVIpcBasePacket<Effect>
 {
-   uint32_t targetId;
-   uint32_t unknown_1;
-   uint32_t actionAnimationId;
-   uint32_t unknown_2;
-   uint32_t unknown_5;
-   uint32_t unknown_6;
-   uint16_t unknown_7;
-   uint16_t rotation;
-   uint16_t actionTextId;
-   uint16_t unknown_8;
+   uint64_t animationTargetId; // who the animation targets
+   uint32_t actionId; // what the casting player casts, shown in battle log/ui
 
-   uint8_t unknown_9;
-   uint8_t numEffects;
+   uint32_t globalEffectCounter; // seems to only increment on retail?
+   float animationLockTime; // maybe? doesn't seem to do anything
 
-   uint16_t unknown_10;
-   uint32_t unknown_11;
-   uint16_t unknown_12;
+   uint32_t someTargetId; // always 00 00 00 E0, 0x0E000000 is the internal def for INVALID TARGET ID
+
+   uint16_t hiddenAnimation; // if 0, always shows animation, otherwise hides it. counts up by 1 for each animation skipped on a caster
+
+   int16_t rotation;
+
+   uint16_t actionAnimationId; // the animation that is played by the casting character
+   uint8_t unknown1E; // can be 0,1,2 - maybe other values? - doesn't do anything?
+
+   /* effectDisplayType
+    * 0 = only show damage/heal amount
+    * 1 = show damage/heal amount + name
+    * 2 = show damage/heal amount + name but name is from item.exd, name id is actionId
+    */
+   uint8_t effectDisplayType;
+
+   uint8_t unknown20; // is read by handler, runs code which gets the LODWORD of animationLockTime (wtf?)
+   uint8_t numEffects; // ignores effects if 0, otherwise parses all of them
+
+   uint32_t padding_22[2];
 
    effectEntry effects[8];
 
-   uint32_t unknown_13;
-   uint16_t unknown_14;
+   uint16_t padding_6A[3];
 
-   uint32_t effectTargetId;
+   uint32_t effectTargetId; // who the effect targets
+   uint32_t effectFlags; // nonzero = effects do nothing, no battle log, no ui text - only shows animations
 
-   uint64_t unknown_15;
+   uint32_t padding_78;
 };
 
 
