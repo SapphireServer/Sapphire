@@ -344,6 +344,46 @@ struct FFXIVIpcEffect : FFXIVIpcBasePacket<Effect>
    uint32_t padding_78;
 };
 
+template< int size >
+struct FFXIVIpcAoeEffect
+{
+   uint64_t animationTargetId;
+   uint32_t actionId;
+
+   uint32_t globalEffectCounter;
+   float animationLockTime;
+
+   uint32_t someTargetId;
+
+   uint16_t hiddenAnimation;
+
+   uint16_t rotation;
+
+   uint16_t actionAnimationId;
+   uint8_t unknown1E;
+
+   Common::ActionEffectDisplayType effectDisplayType;
+
+   uint8_t unknown20;
+   uint8_t effectCount;
+
+   uint32_t padding_22[2];
+
+   EffectEntry effects[size];
+
+   uint16_t padding_6A[3];
+
+   uint32_t effectTargetId[size];
+   uint32_t effectFlags;
+
+   uint32_t padding_78;
+};
+
+struct FFXIVIpcAoeEffect8 : FFXIVIpcBasePacket< AoeEffect8 >, FFXIVIpcAoeEffect< 8 > {};
+struct FFXIVIpcAoeEffect16 : FFXIVIpcBasePacket< AoeEffect16 >, FFXIVIpcAoeEffect< 16 > {};
+struct FFXIVIpcAoeEffect24 : FFXIVIpcBasePacket< AoeEffect24 >, FFXIVIpcAoeEffect< 24 > {};
+struct FFXIVIpcAoeEffect32 : FFXIVIpcBasePacket< AoeEffect32 >, FFXIVIpcAoeEffect< 32 > {};
+
 
 /**
 * Structural representation of the packet sent by the server
