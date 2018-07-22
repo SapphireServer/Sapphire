@@ -33,17 +33,17 @@ public:
       std::memcpy( &m_data.effects[m_data.header.effectCount++], &effect, sizeof( Server::EffectEntry ) );
    }
 
-   void setAnimationId( const uint16_t animationId )
+   void setAnimationId( uint16_t animationId )
    {
       m_data.header.actionAnimationId = animationId;
    }
 
-   void setEffectFlags( const uint32_t effectFlags )
+   void setEffectFlags( uint32_t effectFlags )
    {
       m_data.effectFlags = effectFlags;
    }
 
-   void setRotation( const uint16_t rotation )
+   void setRotation( uint16_t rotation )
    {
       m_data.header.rotation = rotation;
    }
