@@ -1,10 +1,10 @@
 #include <ScriptObject.h>
 #include <Actor/Player.h>
 
-class HouFurOrchestrion : public EventScript
+class CmnDefHousingSignboard : public EventScript
 {
 public:
-   HouFurOrchestrion() : EventScript( 721226 )
+   CmnDefHousingSignboard() : EventScript( 721031 )
    {}
 
    void Scene00000( Entity::Player& player )

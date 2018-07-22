@@ -1,10 +1,10 @@
 #include <ScriptObject.h>
 #include <Actor/Player.h>
 
-class HouFurOrchestrion : public EventScript
+class CmnDefNpcRepair : public EventScript
 {
 public:
-   HouFurOrchestrion() : EventScript( 721226 )
+   CmnDefNpcRepair() : EventScript( 0xB0013 )
    {}
 
    void Scene00000( Entity::Player& player )

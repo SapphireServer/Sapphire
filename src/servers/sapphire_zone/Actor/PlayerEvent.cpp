@@ -133,6 +133,27 @@ void Core::Entity::Player::playScene( uint32_t eventId, uint32_t scene,
    playScene( eventId, scene, flags, eventParam2, eventParam3, 0, eventCallback );
 }
 
+void Core::Entity::Player::playGilShop( uint32_t eventId, uint32_t flags,
+                                        Event::EventHandler::SceneReturnCallback eventCallback )
+{
+   auto pEvent = bootstrapSceneEvent( eventId, flags );
+   if( !pEvent )
+      return;
+
+   pEvent->setPlayedScene( true );
+   pEvent->setEventReturnCallback( eventCallback );
+   pEvent->setSceneChainCallback( nullptr );
+
+   auto openGilShopPacket = makeZonePacket< Server::FFXIVIpcEventOpenGilShop >( getId() );
+   openGilShopPacket->data().eventId = eventId;
+   openGilShopPacket->data().sceneFlags = flags;
+   openGilShopPacket->data().actorId = getId();
+
+   openGilShopPacket->data().scene = 10;
+
+   queuePacket( openGilShopPacket );
+}
+
 Core::Event::EventHandlerPtr Core::Entity::Player::bootstrapSceneEvent( uint32_t eventId, uint32_t flags )
 {
    if( flags & 0x02 )

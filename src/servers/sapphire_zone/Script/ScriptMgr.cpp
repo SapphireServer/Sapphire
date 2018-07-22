@@ -174,6 +174,7 @@ bool Core::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t actorI
    uint16_t eventType = eventId >> 16;
    uint32_t scriptId = eventId;
 
+   // todo: replace this shit with something more flexible allowing for handlers for an entire type without a bunch of if statements
    // aethernet/aetherytes need to be handled separately
    if( eventType == Event::EventHandler::EventHandlerType::Aetheryte )
    {
@@ -181,6 +182,10 @@ bool Core::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t actorI
       scriptId = EVENTSCRIPT_AETHERYTE_ID;
       if( !aetherInfo->isAetheryte )
          scriptId = EVENTSCRIPT_AETHERNET_ID;
+   }
+   else if( eventType == Event::EventHandler::EventHandlerType::Shop )
+   {
+      scriptId = 0x00040001;
    }
 
    auto script = m_nativeScriptMgr->getScript< EventScript >( scriptId );

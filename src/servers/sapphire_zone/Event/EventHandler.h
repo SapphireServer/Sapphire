@@ -12,6 +12,7 @@ namespace Core {
          uint16_t param1;
          uint16_t param2;
          uint16_t param3;
+         uint16_t param4;
       };
 
       class EventHandler
