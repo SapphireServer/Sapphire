@@ -1,10 +1,10 @@
 #include <ScriptObject.h>
 #include <Actor/Player.h>
 
-class CmnDefMarketBoardGridania : public EventScript
+class CmnDefNpcRepair : public EventScript
 {
 public:
-   CmnDefMarketBoardGridania() : EventScript( 0xB0027 )
+   CmnDefNpcRepair() : EventScript( 0xB0013 )
    {}
 
    void Scene00000( Entity::Player& player )

@@ -17,7 +17,7 @@ public:
          }
       };
 
-      player.playScene( getId(), 0, 0x2000, 0, 1, callback );
+      player.playScene( getId(), 0, HIDE_HOTBAR, 0, 1, callback );
    }
 
    void Scene00001( Entity::Player& player, uint16_t returnScene )
