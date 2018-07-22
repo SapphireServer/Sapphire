@@ -16,7 +16,7 @@ public:
       {
          //player.playGilShop( result.eventId, HIDE_HOTBAR | NO_DEFAULT_CAMERA, shopInteractionCallback );
 
-         player.sendDebug("got tradeQuantity: " + std::to_string( result.tradeQuantity ) );
+         player.sendDebug("got tradeQuantity: " + std::to_string( result.param4 ) );
          player.playScene( result.eventId, 10, SCENE_FLAGS, 0, 0, shopInteractionCallback );
          return;
       }

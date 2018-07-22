@@ -66,7 +66,7 @@ struct FFXIVIpcEventHandlerReturn : FFXIVIpcBasePacket< ReturnEventHandler >
    /* 000A */ char pad_000A[2];
    /* 000C */ uint16_t param3;
    /* 000E */ char pad_000E[2];
-   /* 0010 */ uint16_t tradeQuantity;
+   /* 0010 */ uint16_t param4;
 };
 
 struct FFXIVIpcEnterTerritoryHandler : FFXIVIpcBasePacket< EnterTeriEventHandler >
