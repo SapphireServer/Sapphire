@@ -203,6 +203,7 @@ void Core::Network::GameConnection::eventHandlerReturn( const Packets::FFXIVARR_
    const auto& param1 = packet.data().param1;
    const auto& param2 = packet.data().param2;
    const auto& param3 = packet.data().param3;
+   const auto& param4 = packet.data().param4;
 
    std::string eventName = Event::getEventName( eventId );
 
@@ -228,6 +229,7 @@ void Core::Network::GameConnection::eventHandlerReturn( const Packets::FFXIVARR_
          result.param1 = param1;
          result.param2 = param2;
          result.param3 = param3;
+         result.param4 = param4;
          eventCallback( player, result );
       }
       // we might have a scene chain callback instead so check for that too

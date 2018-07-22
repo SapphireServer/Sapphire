@@ -2,6 +2,8 @@
 #include <Exd/ExdDataGenerated.h>
 #include <Logging/Logger.h>
 #include <Network/CommonActorControl.h>
+#include <sapphire_zone/Network/PacketWrappers/EffectPacket.h>
+#include <Util/UtilMath.h>
 
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
@@ -84,20 +86,12 @@ void Core::Action::ActionTeleport::onFinish()
 
    pPlayer->setZoningType( ZoneingType::Teleport );
 
-   auto effectPacket = makeZonePacket< FFXIVIpcEffect >( getId() );
-   effectPacket->data().targetId = pPlayer->getId();
-   effectPacket->data().actionAnimationId = 5;
-   //effectPacket.data().unknown_3 = 1;
-   effectPacket->data().actionTextId = 5;
-   effectPacket->data().unknown_5 = 1;
-   effectPacket->data().numEffects = 1;
-   effectPacket->data().rotation = static_cast< uint16_t >( 0x8000 * ( ( pPlayer->getRot() + 3.1415926 ) ) / 3.1415926 );
-   effectPacket->data().effectTargetId = pPlayer->getId();
+   auto effectPacket = boost::make_shared< Server::EffectPacket >( getId(), pPlayer->getId(), 5 );
+   effectPacket->setRotation( Math::Util::floatToUInt16Rot( pPlayer->getRot() ) );
+
+
    pPlayer->sendToInRangeSet( effectPacket, true );
-
    pPlayer->teleport( m_targetAetheryte );
-
-
 }
 
 void Core::Action::ActionTeleport::onInterrupt()

@@ -7,6 +7,7 @@
 #include <Exd/ExdDataGenerated.h>
 #include <Network/PacketContainer.h>
 #include <Network/CommonActorControl.h>
+#include <Network/PacketWrappers/EffectPacket.h>
 
 #include "Session.h"
 #include "Player.h"
@@ -1418,46 +1419,35 @@ void Core::Entity::Player::autoAttack( CharaPtr pTarget )
 
    if( getClass() == ClassJob::Machinist || getClass() == ClassJob::Bard || getClass() == ClassJob::Archer )
    {
-      auto effectPacket = makeZonePacket< FFXIVIpcEffect >( getId() );
-      effectPacket->data().targetId = pTarget->getId();
-      effectPacket->data().actionAnimationId = 8;
-     // effectPacket.data().unknown_2 = variation;
-      effectPacket->data().numEffects = 1;
-      //effectPacket->data().unknown_61 = 1;
-      //effectPacket->data().unknown_62 = 1;
-      effectPacket->data().actionTextId = 8;
-      effectPacket->data().rotation = Math::Util::floatToUInt16Rot( getRot() );
-      effectPacket->data().effectTargetId = pTarget->getId();
-      //effectPacket->data().effectTarget = pTarget->getId();
-      effectPacket->data().effects[0].value = damage;
-      effectPacket->data().effects[0].effectType = Common::ActionEffectType::Damage;
-      effectPacket->data().effects[0].hitSeverity = Common::ActionHitSeverityType::NormalDamage;
-      //effectPacket->data().effects[0].unknown_3 = 7;
+      auto effectPacket = boost::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 8 );
+      effectPacket->setRotation( Math::Util::floatToUInt16Rot( getRot() ) );
 
-      sendToInRangeSet(effectPacket, true);
+      Server::EffectEntry entry;
+      entry.value = damage;
+      entry.effectType = Common::ActionEffectType::Damage;
+      entry.hitSeverity = Common::ActionHitSeverityType::NormalDamage;
+
+      effectPacket->addEffect( entry );
+
+      sendToInRangeSet( effectPacket, true );
    }
    else
    {
+      auto effectPacket = boost::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 7 );
+      effectPacket->setRotation( Math::Util::floatToUInt16Rot( getRot() ) );
 
-      auto effectPacket = makeZonePacket< FFXIVIpcEffect >( getId() );
-      effectPacket->data().targetId = pTarget->getId();
-      effectPacket->data().actionAnimationId = 7;
-      // effectPacket.data().unknown_2 = variation;
-      effectPacket->data().numEffects = 1;
-      //effectPacket->data().unknown_61 = 1;
-      //effectPacket->data().unknown_62 = 1;
-      effectPacket->data().actionTextId = 7;
-      effectPacket->data().rotation = Math::Util::floatToUInt16Rot( getRot() );
-      effectPacket->data().effectTargetId = pTarget->getId();
-      effectPacket->data().effects[0].value = damage;
-      effectPacket->data().effects[0].effectType = Common::ActionEffectType::Damage;
-      effectPacket->data().effects[0].hitSeverity = Common::ActionHitSeverityType::NormalDamage;
-      //effectPacket->data().effects[0].unknown_3 = 71;
+      Server::EffectEntry entry;
+      entry.value = damage;
+      entry.effectType = Common::ActionEffectType::Damage;
+      entry.hitSeverity = Common::ActionHitSeverityType::NormalDamage;
 
-      sendToInRangeSet(effectPacket, true);
+      effectPacket->addEffect( entry );
+
+      sendToInRangeSet( effectPacket, true );
+
    }
 
-   pTarget->takeDamage(damage);
+   pTarget->takeDamage( damage );
 
 }
 

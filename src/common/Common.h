@@ -409,6 +409,7 @@ namespace Common {
       TpLoss = 12,
       TpGain = 13,
       GpGain = 14,
+      Knockback = 33,
       Mount = 38
    };
 
@@ -420,6 +421,13 @@ namespace Common {
       NormalHeal = 1,
       DirectHitDamage = 2,
       CritDirectHitDamage = 3
+   };
+
+   enum ActionEffectDisplayType : uint8_t
+   {
+      HideActionName = 0,
+      ShowActionName = 1,
+      ShowItemName = 2,
    };
 
    enum class ActionCollisionType : uint8_t
