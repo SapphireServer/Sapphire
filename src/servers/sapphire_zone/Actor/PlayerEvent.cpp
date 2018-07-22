@@ -140,7 +140,9 @@ void Core::Entity::Player::playGilShop( uint32_t eventId, uint32_t flags,
    if( !pEvent )
       return;
 
+   pEvent->setPlayedScene( true );
    pEvent->setEventReturnCallback( eventCallback );
+   pEvent->setSceneChainCallback( nullptr );
 
    auto openGilShopPacket = makeZonePacket< Server::FFXIVIpcEventOpenGilShop >( getId() );
    openGilShopPacket->data().eventId = eventId;
