@@ -182,6 +182,10 @@ bool Core::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t actorI
       if( !aetherInfo->isAetheryte )
          scriptId = EVENTSCRIPT_AETHERNET_ID;
    }
+   else if( eventType == Event::EventHandler::EventHandlerType::Shop )
+   {
+      scriptId = 0x00041;
+   }
 
    auto script = m_nativeScriptMgr->getScript< EventScript >( scriptId );
    if( !script )

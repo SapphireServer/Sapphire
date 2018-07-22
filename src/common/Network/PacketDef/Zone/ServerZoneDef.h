@@ -1093,6 +1093,17 @@ struct FFXIVIpcEventFinish : FFXIVIpcBasePacket<EventFinish>
    /* 000C */ uint32_t padding1;
 };
 
+struct FFXIVIpcEventOpenGilShop : FFXIVIpcBasePacket<EventOpenGilShop>
+{
+   uint64_t actorId;
+   uint32_t eventId;
+   uint16_t scene;
+   uint16_t padding;
+   uint32_t sceneFlags;
+
+   uint32_t unknown_wtf[0x101];
+};
+
 
 /**
 * Structural representation of the packet sent by the server
