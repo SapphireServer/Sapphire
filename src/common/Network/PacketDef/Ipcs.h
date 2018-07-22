@@ -228,8 +228,11 @@ namespace Packets {
 
       LinkshellListHandler     = 0x00F4, // updated 4.3
 
+      SearchMarketboard        = 0x0103, // updated 4.3
+
       FcInfoReqHandler         = 0x011A, // updated 4.2
 
+      ReqMarketWishList        = 0x012C, // updated 4.3
 
       ReqJoinNoviceNetwork     = 0x0129, // updated 4.2
 
