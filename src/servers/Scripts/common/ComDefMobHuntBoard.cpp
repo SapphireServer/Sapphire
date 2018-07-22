@@ -1,10 +1,10 @@
 #include <ScriptObject.h>
 #include <Actor/Player.h>
 
-class CmnDefMarketBoardGridania : public EventScript
+class ComDefMobHuntBoard : public EventScript
 {
 public:
-   CmnDefMarketBoardGridania() : EventScript( 0xB0027 )
+   ComDefMobHuntBoard() : EventScript( 0xB00CA )
    {}
 
    void Scene00000( Entity::Player& player )
