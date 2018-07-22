@@ -310,7 +310,7 @@ struct EffectEntry
    int16_t value;
 };
 
-struct FFXIVIpcEffect : FFXIVIpcBasePacket<Effect>
+struct EffectHeader
 {
    uint64_t animationTargetId; // who the animation targets
    uint32_t actionId; // what the casting player casts, shown in battle log/ui
@@ -333,6 +333,11 @@ struct FFXIVIpcEffect : FFXIVIpcBasePacket<Effect>
    uint8_t effectCount; // ignores effects if 0, otherwise parses all of them
 
    uint32_t padding_22[2];
+};
+
+struct FFXIVIpcEffect : FFXIVIpcBasePacket<Effect>
+{
+   EffectHeader header;
 
    EffectEntry effects[8];
 
@@ -347,33 +352,14 @@ struct FFXIVIpcEffect : FFXIVIpcBasePacket<Effect>
 template< int size >
 struct FFXIVIpcAoeEffect
 {
-   uint64_t animationTargetId;
-   uint32_t actionId;
-
-   uint32_t globalEffectCounter;
-   float animationLockTime;
-
-   uint32_t someTargetId;
-
-   uint16_t hiddenAnimation;
-
-   uint16_t rotation;
-
-   uint16_t actionAnimationId;
-   uint8_t unknown1E;
-
-   Common::ActionEffectDisplayType effectDisplayType;
-
-   uint8_t unknown20;
-   uint8_t effectCount;
-
-   uint32_t padding_22[2];
+   EffectHeader header;
 
    EffectEntry effects[size];
 
    uint16_t padding_6A[3];
 
    uint32_t effectTargetId[size];
+   Common::FFXIVARR_POSITION3 position;
    uint32_t effectFlags;
 
    uint32_t padding_78;
