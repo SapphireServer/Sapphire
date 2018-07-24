@@ -17,7 +17,8 @@ namespace Core {
 namespace Scripting {
 
    /*!
-    * An internal class used to track information about loaded modules and their scripts.
+    * @brief An internal class used to track information about loaded modules and their scripts.
+    *
     * The main purpose of this is to maintain easy access to the module handle and the pointers to scripts that are loaded.
     * Furthermore, allows for quick and easy cross platform access to the module paths associated with the runtime module cache and its original path.
     */
@@ -36,12 +37,12 @@ namespace Scripting {
       std::string library_name;
 
       /*!
-       * The path to the module currently loaded in memory from the cached location.
+       * @brief The path to the module currently loaded in memory from the cached location.
        */
       std::string cache_path;
 
       /*!
-       * The original path of the module before it was copied to the cache location.
+       * @brief The original path of the module before it was copied to the cache location.
        */
       std::string library_path;
 
@@ -53,7 +54,7 @@ namespace Scripting {
       ModuleHandle handle;
 
       /*!
-       * @An internal list of all the pointers to each ScriptObject
+       * @brief An internal list of all the pointers to each ScriptObject
        *
        * This is tracked so when we unload this module we can call delete on each ScriptObject and correctly free it from memory.
        */
