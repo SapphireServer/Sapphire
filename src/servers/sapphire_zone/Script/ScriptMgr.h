@@ -16,23 +16,41 @@ namespace Core
       class ScriptMgr
       {
       private:
-
-          boost::shared_ptr< NativeScriptMgr > m_nativeScriptMgr;
+         /*!
+          * A shared ptr to NativeScriptMgr, used for accessing and managing the native script system.
+          */
+         boost::shared_ptr< NativeScriptMgr > m_nativeScriptMgr;
 
          std::function< std::string( Entity::Player& ) > m_onFirstEnterWorld;
-        // auto fn = m_pChaiHandler->eval< std::function<const std::string( Entity::Player ) > >( "onFirstEnterWorld" );
 
+         /*!
+          * Used to ignore the first change notification that Watchdog emits.
+          * Because reasons, it likes to emit an initial notification with all the files that match the filter, we don't want that so we ignore it.
+          */
          bool m_firstScriptChangeNotificiation;
 
       public:
          ScriptMgr();
          ~ScriptMgr();
 
+         /*!
+          * @brief Loads all the script modules and readies the ScriptMgr
+          *
+          * This gets all the modules inside the specified scripts folder and then attempts to load each one.
+          * After that, it starts the directory watcher so the server can reload modules at runtime when changes occur.
+          *
+          * @return true if init success
+          */
          bool init();
-         void reload();
 
+         /*!
+          * Called on each tick or at a regular interval. Allows for the NativeScriptMgr to process module loading and reloading.
+          */
          void update();
 
+         /*!
+          * Registers a directory watcher which allows for script modules to be reloaded when changes to the modules occur
+          */
          void watchDirectories();
 
          void onPlayerFirstEnterWorld( Entity::Player& player );
