@@ -17,14 +17,14 @@ namespace Core
       {
       private:
          /*!
-          * A shared ptr to NativeScriptMgr, used for accessing and managing the native script system.
+          * @brief A shared ptr to NativeScriptMgr, used for accessing and managing the native script system.
           */
          boost::shared_ptr< NativeScriptMgr > m_nativeScriptMgr;
 
          std::function< std::string( Entity::Player& ) > m_onFirstEnterWorld;
 
          /*!
-          * Used to ignore the first change notification that Watchdog emits.
+          * @brief Used to ignore the first change notification that Watchdog emits.
           * Because reasons, it likes to emit an initial notification with all the files that match the filter, we don't want that so we ignore it.
           */
          bool m_firstScriptChangeNotificiation;
@@ -44,12 +44,12 @@ namespace Core
          bool init();
 
          /*!
-          * Called on each tick or at a regular interval. Allows for the NativeScriptMgr to process module loading and reloading.
+          * @brief Called on each tick or at a regular interval. Allows for the NativeScriptMgr to process module loading and reloading.
           */
          void update();
 
          /*!
-          * Registers a directory watcher which allows for script modules to be reloaded when changes to the modules occur
+          * @brief Registers a directory watcher which allows for script modules to be reloaded when changes to the modules occur
           */
          void watchDirectories();
 

@@ -33,7 +33,10 @@ namespace Scripting {
       std::queue< std::string > m_scriptLoadQueue;
 
       /*!
+       * @brief Used to unload a script
+       *
        * Used to unload a script, clears m_scripts of any scripts assoicated with a ScriptInfo and then unloads that module
+       *
        * @param info A pointer to the ScriptInfo object that is to be erased
        * @return true if successful, false if not
        */
@@ -54,6 +57,7 @@ namespace Scripting {
 
       /*!
        * @brief Unloads a script
+       *
        * @param name The module name of the script to unload
        * @return true if successful
        */
@@ -71,31 +75,35 @@ namespace Scripting {
 
       /*!
        * @brief Case-insensitive search for modules, useful for debug commands
+       *
        * @param scripts a set of ScriptInfo ptrs
        * @param search the search term
        */
       void findScripts( std::set< Core::Scripting::ScriptInfo* >& scripts, const std::string& search );
 
       /*!
-       * Called on a regular interval, allows for scripts to be loaded from the internal load queue.
+       * @brief Called on a regular interval, allows for scripts to be loaded from the internal load queue.
        */
       void processLoadQueue();
 
       /*!
-       * Gets the module file extention for the current platform (windows, linux, osx)
+       * @brief Gets the module file extention for the current platform (windows, linux, osx)
+       *
        * @return The file extension for the current platform
        */
       const std::string getModuleExtension();
 
       /*!
-       * Checks to see if a module with the specified name exists
+       * @brief Checks to see if a module with the specified name exists
+       *
        * @param name The module name to lookup
        * @return true if loaded, false if not
        */
       bool isModuleLoaded( const std::string& name );
 
       /*!
-       * Get a specific script from the internal table
+       * @brief Get a specific script from the internal table
+       *
        * @tparam T The type of the script to search for
        * @param scriptId The ID of the script to search for
        * @return T* if successful, nullptr if the script doesn't exist
@@ -115,7 +123,8 @@ namespace Scripting {
 
 
    /*!
-    * Creates an instance of NativeScriptMgr
+    * @brief Creates an instance of NativeScriptMgr
+    *
     * @return a boost::shared_ptr to NativeScriptMgr
     */
    boost::shared_ptr< NativeScriptMgr > createNativeScriptMgr();
