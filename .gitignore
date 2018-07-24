@@ -121,3 +121,6 @@ cotire/
 
 *objects.txt
 *exports.def
+
+# doxygen output folder
+doxygen/generated/

@@ -17,7 +17,12 @@ namespace Core {
 
          enum ActorControlType : uint16_t
          {
+            /*! Toggles weapon status -> Sheathed/UnSheathed
+                \param param1 status 0|1 */
             ToggleWeapon = 0x00,
+            /*! Toggles Autoattack status on/off
+                \param param1 status 0|1 */
+            AutoAttack = 0x01,
             SetStatus = 0x02,
             CastStart = 0x03,
             ToggleAggro = 0x04,
