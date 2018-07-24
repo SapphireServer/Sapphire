@@ -1,9 +1,7 @@
-@import 'https://fonts.googleapis.com/css?family=Open+Sans';
-
 body {
-	font-family: 'Open Sans', sans-serif;
 	background-color: #222;
-	color: #ccc;
+	color: #ccc; 
+	overflow-x: hidden;
 }
 
 #nav-tree {
