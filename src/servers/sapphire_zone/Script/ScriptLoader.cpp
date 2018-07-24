@@ -14,9 +14,6 @@ extern Core::Framework g_fw;
 
 namespace fs = boost::filesystem;
 
-Core::Scripting::ScriptLoader::ScriptLoader()
-{}
-
 const std::string Core::Scripting::ScriptLoader::getModuleExtension()
 {
 #ifdef _WIN32

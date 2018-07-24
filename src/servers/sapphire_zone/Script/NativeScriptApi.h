@@ -19,6 +19,9 @@ using namespace Core;
 #define EVENTSCRIPT_AETHERYTE_ID 0x50000
 #define EVENTSCRIPT_AETHERNET_ID 0x50001
 
+/*!
+ * The base class that any script should inherit from and set the type param accordingly
+ */
 class ScriptObject
 {
 protected:
@@ -26,16 +29,28 @@ protected:
    std::size_t m_type;
 
 public:
+   /*!
+    * @param id an ID which uniquely identifies this script in relation to it's type
+    * @param type The RTTI hash code of the implementing type to uniquely identify it
+    */
    ScriptObject( uint32_t id, std::size_t type ) :
       m_id( id ),
       m_type( type )
    { }
 
+   /*!
+    * Gets the ID set for this script
+    * @return The allocated ID of the script set during object construction
+    */
    virtual uint32_t getId() const
    {
       return m_id;
    }
 
+   /*!
+    * Gets the unique identifier (hash_code) of the script
+    * @return The hash_code of the script
+    */
    virtual std::size_t getType() const
    {
       return m_type;
@@ -43,6 +58,9 @@ public:
 };
 
 
+/*!
+ * The base class for any scripts that implement behaviour related to status effects.
+ */
 class StatusEffectScript : public ScriptObject
 {
 public:
@@ -50,17 +68,60 @@ public:
       ScriptObject( effectId, typeid( StatusEffectScript ).hash_code() )
    { }
 
+   /*!
+    * @brief Called on each tick that a status effect is active on an actor
+    * @param actor the actor the status effect is ticking on
+    */
    virtual void onTick( Entity::Chara& actor ) { }
+
+   /*!
+    * @brief Called when the status effect is applied to an actor
+    * @param actor the actor on which the status effect was applied to
+    */
    virtual void onApply( Entity::Chara& actor ) { }
+
+   /*!
+    * @brief Called when the actor (usually a player) removes the status effect by right clicking it
+    * @param actor The actor on which the effect was removed from
+    */
    virtual void onRemove( Entity::Chara& actor ) { }
+
+   /*!
+    * @brief Called when the status effect expires
+    * @param actor The actor on which the efect expired on
+    */
    virtual void onExpire( Entity::Chara& actor ) { }
+
+   /*!
+    * @brief Called when the player with the status effect collides with another player, eg. hot potato
+    * @param actor The actor which has status effect
+    * @param actorHit The actor who collided with the status effect owner
+    */
    virtual void onPlayerCollision( Entity::Chara& actor, Entity::Chara& actorHit ) { }
+
+   /*!
+    * Called when the owner finishes a cast
+    * @param actor The actor who finished a cast
+    */
    virtual void onPlayerFinishCast( Entity::Chara& actor ) { }
+
+   /*!
+    * Called when the status effect owner was damaged
+    * @param actor The actor that was damaged
+    */
    virtual void onPlayerDamaged( Entity::Chara& actor ) { }
+
+   /*!
+    * Called when the status effect owner dies
+    * @param actor The actor that died
+    */
    virtual void onPlayerDeath( Entity::Chara& actor ) { }
 };
 
 
+/*!
+ * The base class for any scripts that implement behaviour related to actions
+ */
 class ActionScript : public ScriptObject
 {
 public:
@@ -74,6 +135,10 @@ public:
 };
 
 
+/*!
+ * The base class for any scripts that implement behaviour related to the event system.
+ * This includes but is not limited to: NPCs, shops, some world objects
+ */
 class EventScript : public ScriptObject
 {
 protected:
@@ -99,6 +164,9 @@ public:
 };
 
 
+/*!
+ * The base class for any scripts that implement behaviour related to BattleNPCs
+ */
 class BattleNpcScript : public ScriptObject
 {
 public:
@@ -107,6 +175,9 @@ public:
    { }
 };
 
+/*!
+ * The base class for any scripts that implement behaviour related to zones
+ */
 class ZoneScript : public ScriptObject
 {
 public:
@@ -117,6 +188,9 @@ public:
    virtual void onZoneInit() { }
 };
 
+/*!
+ * The base class for any scripts that implement behaviour related to instance content zones
+ */
 class InstanceContentScript : public ScriptObject
 {
 public:

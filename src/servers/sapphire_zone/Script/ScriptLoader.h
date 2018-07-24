@@ -1,7 +1,6 @@
 #ifndef CORE_SCRIPTLOADER_H
 #define CORE_SCRIPTLOADER_H
 
-#include <string>
 #include <unordered_map>
 #include <set>
 
@@ -21,28 +20,76 @@ using ModuleHandle = void*;
 namespace Core {
 namespace Scripting {
 
+   /*!
+    * Provides low level functionality for loading modules on different platforms along with managing those loaded modules.
+    */
    class ScriptLoader
    {
    protected:
+      /*!
+       * The internal list of all modules that are loaded.
+       */
       std::unordered_map< std::string, ScriptInfo* > m_scriptMap;
 
+      /*!
+       * Unload a loaded module from it's ModuleHandle
+       * @return true if the unload was successful, false if not
+       */
       bool unloadModule( ModuleHandle );
 
    public:
-      ScriptLoader();
+      ScriptLoader() = default;
 
+      /*!
+       * Gets the module file extention for the current platform (windows, linux, osx)
+       * @return The file extension for the current platform
+       */
       const std::string getModuleExtension();
+
+      /*!
+       * Load a module from a path
+       * @return A pointer to ScriptInfo if the load was successful, nullptr if it failed
+       */
       ScriptInfo* loadModule( const std::string& );
 
+      /*!
+       * Unload a script from it's ScriptInfo object
+       * @return true if successful, false if not
+       */
       bool unloadScript( ScriptInfo* );
+
+      /*!
+       * Unload a script via it's module handle
+       * @return true if successful, false if not
+       */
       bool unloadScript( ModuleHandle );
 
+      /*!
+       * Look up a ScriptInfo* by a module name
+       * @param name The exact module name to search for, case-sensitive
+       * @return The ScriptInfo ptr if successful, nullptr if it wasn't found
+       */
       ScriptInfo* getScriptInfo( std::string name );
 
+      /*!
+       * Get all scripts assoicated with a module
+       * @param handle The handle to the module
+       * @return An array of unknown size ending with nullptr if success, nullptr if not
+       */
       ScriptObject** getScripts( ModuleHandle handle );
 
+      /*!
+       * Checks to see if a module with the specified name exists
+       * @param name The module name to lookup
+       * @return true if loaded, false if not
+       */
       bool isModuleLoaded( std::string name );
 
+      /*!
+       * Case-insensitive search for modules, useful for debug commands
+       * @param scripts a set of ScriptInfo ptrs
+       * @param search the search term
+       */
       void findScripts( std::set< Core::Scripting::ScriptInfo* >& scripts, const std::string& search );
    };
 
