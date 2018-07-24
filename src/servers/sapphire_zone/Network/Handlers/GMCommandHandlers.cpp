@@ -196,7 +196,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
    case GmCommand::Inspect:
    {
       player.sendNotice( "Name: " + targetPlayer->getName() +
-         "\nGil: " + std::to_string( targetPlayer->getCurrency( 1 ) ) +
+         "\nGil: " + std::to_string( targetPlayer->getCurrency( CurrencyType::Gil ) ) +
          "\nZone: " + targetPlayer->getCurrentZone()->getName() +
          "(" + std::to_string( targetPlayer->getZoneId() ) + ")" +
          "\nClass: " + std::to_string( static_cast< uint8_t >( targetPlayer->getClass() ) ) +
@@ -329,13 +329,13 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
    }
    case GmCommand::Gil:
    {
-      targetPlayer->addCurrency( 1, param1 );
+      targetPlayer->addCurrency( CurrencyType::Gil, param1 );
       player.sendNotice( "Added  " + std::to_string( param1 ) + " Gil for " + targetPlayer->getName() );
       break;
    }
    case GmCommand::Collect:
    {
-      uint32_t gil = targetPlayer->getCurrency( 1 );
+      uint32_t gil = targetPlayer->getCurrency( CurrencyType::Gil );
 
       if( gil < param1 )
       {
