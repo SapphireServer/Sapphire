@@ -47,7 +47,10 @@ namespace Scripting {
       const std::string getModuleExtension();
 
       /*!
-       * Load a module from a path
+       * @brief Load a module from a path
+       *
+       * Internally, this will also copy the module from it's original folder into the cache folder.
+       *
        * @return A pointer to ScriptInfo if the load was successful, nullptr if it failed
        */
       ScriptInfo* loadModule( const std::string& );
