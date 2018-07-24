@@ -52,6 +52,8 @@ public:
 
    uint16_t getItemLevel() const;
 
+   uint32_t getMaxStackSize() const;
+
 
 protected:
    uint32_t                m_id;
@@ -61,6 +63,7 @@ protected:
    Common::ItemUICategory  m_category;
 
    uint32_t                m_stackSize;
+   uint32_t                m_maxStackSize;
    std::vector< uint8_t >  m_classJobList;
 
    uint64_t                m_model1;
