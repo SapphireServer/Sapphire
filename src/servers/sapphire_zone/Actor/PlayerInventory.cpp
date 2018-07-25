@@ -249,7 +249,7 @@ void Core::Entity::Player::removeCurrency( Common::CurrencyType type, uint32_t a
    auto currItem = m_inventoryMap[Currency]->getItem( static_cast< uint8_t >( type ) - 1 );
 
    if( !currItem )
-      return false;
+      return;
 
    uint32_t currentAmount = currItem->getStackSize();
    if( amount > currentAmount )
@@ -316,7 +316,7 @@ void Core::Entity::Player::removeCrystal( Common::CrystalType type, uint32_t amo
    auto invUpPacket = makeZonePacket< FFXIVIpcUpdateInventorySlot >( getId() );
    invUpPacket->data().containerId = Common::InventoryType::Crystal;
    invUpPacket->data().catalogId = static_cast< uint8_t >( type ) + 1;
-   invUpPacket->data().quantity = getCrystal( static_cast< Common::CrystalType >( type ) );
+   invUpPacket->data().quantity = getCrystal( type );
    invUpPacket->data().slot = static_cast< uint8_t >( type ) - 1;
 
    queuePacket( invUpPacket );
@@ -332,14 +332,6 @@ bool Core::Entity::Player::tryAddItem( uint16_t catalogId, uint32_t quantity )
    }
    return false;
 }
-
-/*bool Core::Entity::Player::addItem( uint16_t containerId, uint16_t catalogId, uint32_t quantity )
-{
-   if( addItem( containerId, -1, catalogId, quantity ) != -1 )
-      return true;
-
-   return false;
-}*/
 
 void Core::Entity::Player::sendInventory()
 {
@@ -863,6 +855,7 @@ uint8_t Core::Entity::Player::getFreeSlotsInBags()
    uint8_t slots = 0;
    for( uint8_t container : { 0, 1, 2, 3 } )
    {
+      // TODO: this feels hackish at best
       slots += 34 - m_inventoryMap[container]->getEntryCount();
    }
    return slots;
