@@ -44,64 +44,62 @@ using namespace Core::Network::ActorControl;
 
 void Core::Entity::Player::initInventory()
 {
-   auto setupContainer = [this]( InventoryType type )
-   { m_inventoryMap[type] = make_ItemContainer( type ); };
+   auto setupContainer = [this]( InventoryType type, uint8_t maxSize, const std::string& tableName, bool isMultiStorage )
+   { m_inventoryMap[type] = make_ItemContainer( type, maxSize, tableName, isMultiStorage ); };
 
    // main bags
-   setupContainer( Bag0 );
-   setupContainer( Bag1 );
-   setupContainer( Bag2 );
-   setupContainer( Bag3 );
+   setupContainer( Bag0, 34, "charaiteminventory", true );
+   setupContainer( Bag1, 34, "charaiteminventory", true );
+   setupContainer( Bag2, 34, "charaiteminventory", true );
+   setupContainer( Bag3, 34, "charaiteminventory", true );
 
    // gear set
-   setupContainer( GearSet0 );
+   setupContainer( GearSet0, 13, "charaitemgearset", true );
 
    // gil contianer
-   setupContainer( Currency );
+   setupContainer( Currency, 11, "charaitemcurrency", false );
 
    // crystals??
-   setupContainer( Crystal );
-   //m_inventoryMap[0x07D3] = ItemContainerPtr( new ItemContainer( UNKNOWN_0 ) );
-   //m_inventoryMap[0x07D8] = ItemContainerPtr( new ItemContainer( UNKNOWN_1 ) );
+   setupContainer( Crystal, 11, "charaitemcrystal", false );
 
    // armory weapons - 0
-   setupContainer( ArmoryMain );
+   setupContainer( ArmoryMain, 34, "charaiteminventory", true );
 
    // armory offhand - 1
-   setupContainer( ArmoryOff );
+   setupContainer( ArmoryOff, 34, "charaiteminventory", true );
 
    //armory head - 2
-   setupContainer( ArmoryHead );
+   setupContainer( ArmoryHead, 34, "charaiteminventory", true );
 
    //armory body - 3
-   setupContainer( ArmoryBody );
+   setupContainer( ArmoryBody, 34, "charaiteminventory", true );
 
    //armory hand - 4
-   setupContainer( ArmoryHand );
+   setupContainer( ArmoryHand, 34, "charaiteminventory", true );
 
    //armory waist - 5
-   setupContainer( ArmoryWaist );
+   setupContainer( ArmoryWaist, 34, "charaiteminventory", true );
 
    //armory legs - 6
-   setupContainer( ArmoryLegs );
+   setupContainer( ArmoryLegs, 34, "charaiteminventory", true );
 
    //armory feet - 7
-   setupContainer( ArmoryFeet );
+   setupContainer( ArmoryFeet, 34, "charaiteminventory", true );
 
    //neck
-   setupContainer( ArmotyNeck );
+   setupContainer( ArmotyNeck, 34, "charaiteminventory", true );
 
    //earring
-   setupContainer( ArmoryEar );
+   setupContainer( ArmoryEar, 34, "charaiteminventory", true );
 
    //wrist
-   setupContainer( ArmoryWrist );
+   setupContainer( ArmoryWrist, 34, "charaiteminventory", true );
 
    //armory rings - 11
-   setupContainer( ArmoryRing );
+   setupContainer( ArmoryRing, 34, "charaiteminventory", true );
 
    //soul crystals - 13
-   setupContainer( ArmorySoulCrystal );
+   setupContainer( ArmorySoulCrystal, 34, "charaiteminventory", true );
 
    loadInventory();
 
