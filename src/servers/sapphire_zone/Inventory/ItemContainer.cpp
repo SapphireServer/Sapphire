@@ -11,9 +11,11 @@
 
 extern Core::Framework g_fw;
 
-Core::ItemContainer::ItemContainer( uint16_t locationId ) : 
-   m_id( locationId ),
-   m_size( 35 )
+Core::ItemContainer::ItemContainer( uint16_t storageId, uint8_t maxSize, const std::string& tableName, bool isMultiStorage ) : 
+   m_id( storageId ),
+   m_size( maxSize ),
+   m_tableName( tableName ),
+   m_bMultiStorage( isMultiStorage )
 {
 
 }
@@ -63,7 +65,7 @@ const Core::ItemMap & Core::ItemContainer::getItemMap() const
    return m_itemMap;
 }
 
-int16_t Core::ItemContainer::getFreeSlot()
+int8_t Core::ItemContainer::getFreeSlot()
 {
    for( uint8_t slotId = 0; slotId < m_size; slotId++ )
    {
@@ -95,3 +97,20 @@ void Core::ItemContainer::setItem( uint8_t slotId, ItemPtr pItem )
 
    m_itemMap[slotId] = pItem;
 }
+
+uint8_t Core::ItemContainer::getMaxSize() const
+{
+   return m_size;
+}
+
+std::string Core::ItemContainer::getTableName() const
+{
+   return m_tableName;
+}
+
+bool Core::ItemContainer::isMultiStorage() const
+{
+   return m_bMultiStorage;
+}
+
+
