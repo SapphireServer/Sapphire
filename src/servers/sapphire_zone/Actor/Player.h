@@ -248,13 +248,9 @@ public:
    /*! add amount to the currency of type */
    void addCurrency( Common::CurrencyType type, uint32_t amount );
    /*! remove amount from the currency of type */
-   void removeCurrency( uint8_t type, uint32_t amount );
+   void removeCurrency( Common::CurrencyType type, uint32_t amount );
    /*! return the current amount of crystals of type */
    uint32_t getCrystal( uint8_t type ) const;
-   /*! add amount to the crystals of type */
-   void addCrystal( uint8_t type, uint32_t amount );
-   /*! remove amount from the crystals of type */
-   void removeCrystal( uint8_t type, uint32_t amount );
 
    // Class / Job / Exp
    //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -638,9 +634,9 @@ public:
    /*! return the crystal amount of currency of type */
    uint32_t getCrystal( Common::CrystalType type );
    /*! add amount to the crystal of type */
-   bool addCrystal( Common::CrystalType type, uint32_t amount );
+   void addCrystal( Common::CrystalType type, uint32_t amount );
    /*! remove amount from the crystals of type */
-   bool removeCrystal( Common::CrystalType type, uint32_t amount );
+   void removeCrystal( Common::CrystalType type, uint32_t amount );
    bool isObtainable( uint32_t catalogId, uint8_t quantity );
 
    void updateCrystalDb();

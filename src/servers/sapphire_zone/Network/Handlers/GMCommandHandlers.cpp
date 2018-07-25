@@ -343,7 +343,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
       }
       else
       {
-         targetPlayer->removeCurrency( 1, param1 );
+         targetPlayer->removeCurrency( CurrencyType::Gil, param1 );
          player.sendNotice( "Removed " + std::to_string( param1 ) +
             " Gil from " + targetPlayer->getName() +
             "(" + std::to_string( gil ) + " before)" );
