@@ -195,7 +195,8 @@ public:
 struct LGB_MAPRANGE_HEADER : public LGB_ENTRY_HEADER
 {
    uint32_t type;
-   uint16_t unknown2;
+   uint8_t unknown2;
+   uint8_t unknown2_1;
    uint16_t unknown3;
    uint8_t unknown4[0x10];
 };
