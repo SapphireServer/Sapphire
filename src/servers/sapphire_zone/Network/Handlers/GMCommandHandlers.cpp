@@ -330,7 +330,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
    case GmCommand::Gil:
    {
       targetPlayer->addCurrency( CurrencyType::Gil, param1 );
-      player.sendNotice( "Added  " + std::to_string( param1 ) + " Gil for " + targetPlayer->getName() );
+      player.sendNotice( "Added " + std::to_string( param1 ) + " Gil for " + targetPlayer->getName() );
       break;
    }
    case GmCommand::Collect:
