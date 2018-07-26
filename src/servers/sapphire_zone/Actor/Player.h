@@ -618,16 +618,15 @@ public:
 
    ItemPtr getItemAt( uint16_t containerId, uint8_t slotId );
 
-   bool updateContainer( uint16_t containerId, uint8_t slotId, ItemPtr pItem );
+   bool updateContainer( uint16_t storageId, uint8_t slotId, ItemPtr pItem );
 
    /*! calculate and return player ilvl based off equipped gear */
    uint16_t calculateEquippedGearItemLevel();
    /*! return the current amount of currency of type */
    uint32_t getCurrency( Common::CurrencyType type );
 
-   void updateBagDb( Common::InventoryType type );
-   void updateMannequinDb( Common::InventoryType type );
-   void updateItemDb( ItemPtr pItem ) const;
+   void writeInventory( Common::InventoryType type );
+   void writeItem( ItemPtr pItem ) const;
    void deleteItemDb( ItemPtr pItem ) const;
 
    /*! return the crystal amount of currency of type */
@@ -645,7 +644,6 @@ public:
    //////////////////////////////////////////////////////////////////////////////////////////////////////
 
    uint64_t m_lastMoveTime;
-
    uint8_t m_lastMoveflag;
 
 private:
@@ -667,7 +665,7 @@ private:
 private:
    using InventoryMap = std::map< uint16_t, Core::ItemContainerPtr >;
 
-   InventoryMap m_inventoryMap;
+   InventoryMap m_storageMap;
 
    Common::FFXIVARR_POSITION3 m_prevPos;
    uint32_t m_prevZoneType;

@@ -46,7 +46,7 @@ using namespace Core::Network::ActorControl;
 void Core::Entity::Player::initInventory()
 {
    auto setupContainer = [this]( InventoryType type, uint8_t maxSize, const std::string& tableName, bool isMultiStorage )
-   { m_inventoryMap[type] = make_ItemContainer( type, maxSize, tableName, isMultiStorage ); };
+   { m_storageMap[type] = make_ItemContainer( type, maxSize, tableName, isMultiStorage ); };
 
    // main bags
    setupContainer( Bag0, 34, "charaiteminventory", true );
@@ -220,18 +220,18 @@ void Core::Entity::Player::unequipItem( Common::EquipSlot equipSlotId, ItemPtr p
 void Core::Entity::Player::addCurrency( CurrencyType type, uint32_t amount )
 {
    auto slot = static_cast< uint8_t >( static_cast< uint8_t >( type ) - 1 );
-   auto currItem = m_inventoryMap[Currency]->getItem( slot );
+   auto currItem = m_storageMap[Currency]->getItem( slot );
 
    if( !currItem )
    {
       // TODO: map currency type to itemid
       currItem = createItem( 1 );
-      m_inventoryMap[Currency]->setItem( slot, currItem );
+      m_storageMap[Currency]->setItem( slot, currItem );
    }
 
    uint32_t currentAmount = currItem->getStackSize();
    currItem->setStackSize( currentAmount + amount );
-   updateItemDb( currItem );
+   writeItem(currItem);
 
    updateContainer( Currency, slot, currItem );
 
@@ -245,7 +245,7 @@ void Core::Entity::Player::addCurrency( CurrencyType type, uint32_t amount )
 void Core::Entity::Player::removeCurrency( Common::CurrencyType type, uint32_t amount )
 {
 
-   auto currItem = m_inventoryMap[Currency]->getItem( static_cast< uint8_t >( type ) - 1 );
+   auto currItem = m_storageMap[Currency]->getItem( static_cast< uint8_t >( type ) - 1 );
 
    if( !currItem )
       return;
@@ -255,7 +255,7 @@ void Core::Entity::Player::removeCurrency( Common::CurrencyType type, uint32_t a
       currItem->setStackSize( 0 );
    else
       currItem->setStackSize( currentAmount - amount );
-   updateItemDb( currItem );
+   writeItem(currItem);
 
    auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
                                                                      static_cast< uint8_t >( type ) - 1,
@@ -267,22 +267,22 @@ void Core::Entity::Player::removeCurrency( Common::CurrencyType type, uint32_t a
 
 void Core::Entity::Player::addCrystal( Common::CrystalType type, uint32_t amount )
 {
-   auto currItem = m_inventoryMap[Crystal]->getItem( static_cast< uint8_t >( type ) - 1 );
+   auto currItem = m_storageMap[Crystal]->getItem( static_cast< uint8_t >( type ) - 1 );
 
    if( !currItem )
    {
       // TODO: map currency type to itemid
       currItem = createItem( static_cast< uint8_t >( type ) + 1 );
-      m_inventoryMap[Crystal]->setItem( static_cast< uint8_t >( type ) - 1, currItem );
+      m_storageMap[Crystal]->setItem( static_cast< uint8_t >( type ) - 1, currItem );
    }
 
    uint32_t currentAmount = currItem->getStackSize();
 
    currItem->setStackSize( currentAmount + amount );
 
-   updateItemDb( currItem );
+   writeItem(currItem);
 
-   updateBagDb( Crystal );
+   writeInventory( Crystal );
 
 
    auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
@@ -296,7 +296,7 @@ void Core::Entity::Player::addCrystal( Common::CrystalType type, uint32_t amount
 
 void Core::Entity::Player::removeCrystal( Common::CrystalType type, uint32_t amount )
 {
-   auto currItem = m_inventoryMap[Crystal]->getItem( static_cast< uint8_t >( type ) - 1 );
+   auto currItem = m_storageMap[Crystal]->getItem( static_cast< uint8_t >( type ) - 1 );
 
    if( !currItem )
       return;
@@ -307,7 +307,7 @@ void Core::Entity::Player::removeCrystal( Common::CrystalType type, uint32_t amo
    else
       currItem->setStackSize( currentAmount - amount );
 
-   updateItemDb( currItem );
+   writeItem(currItem);
 
    auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
                                                                      static_cast< uint8_t >( type ) - 1,
@@ -332,7 +332,7 @@ void Core::Entity::Player::sendInventory()
    InventoryMap::iterator it;
 
    int32_t count = 0;
-   for( it = m_inventoryMap.begin(); it != m_inventoryMap.end(); ++it, count++ )
+   for( it = m_storageMap.begin(); it != m_storageMap.end(); ++it, count++ )
    {
 
       auto pMap = it->second->getItemMap();
@@ -385,7 +385,7 @@ Core::Entity::Player::InvSlotPairVec Core::Entity::Player::getSlotsOfItemsInInve
    InvSlotPairVec outVec;
    for( auto i : { Bag0, Bag1, Bag2, Bag3 } )
    {
-      auto inv = m_inventoryMap[i];
+      auto inv = m_storageMap[i];
       for( auto item : inv->getItemMap() )
       {
          if( item.second && item.second->getId() == catalogId )
@@ -399,7 +399,7 @@ Core::Entity::Player::InvSlotPair Core::Entity::Player::getFreeBagSlot()
 {
    for( auto i : { Bag0, Bag1, Bag2, Bag3 } )
    {
-      auto freeSlot = static_cast< int8_t >( m_inventoryMap[i]->getFreeSlot() );
+      auto freeSlot = static_cast< int8_t >( m_storageMap[i]->getFreeSlot() );
 
       if( freeSlot != -1 )
          return std::make_pair( i, freeSlot );
@@ -410,14 +410,14 @@ Core::Entity::Player::InvSlotPair Core::Entity::Player::getFreeBagSlot()
 
 Core::ItemPtr Core::Entity::Player::getItemAt( uint16_t containerId, uint8_t slotId )
 {
-   return m_inventoryMap[containerId]->getItem( slotId );
+   return m_storageMap[containerId]->getItem( slotId );
 }
 
 
 uint32_t Core::Entity::Player::getCurrency( CurrencyType type )
 {
 
-   auto currItem = m_inventoryMap[Currency]->getItem( static_cast< uint8_t >( type ) - 1 );
+   auto currItem = m_storageMap[Currency]->getItem( static_cast< uint8_t >( type ) - 1 );
 
    if( !currItem )
       return 0;
@@ -429,7 +429,7 @@ uint32_t Core::Entity::Player::getCurrency( CurrencyType type )
 uint32_t Core::Entity::Player::getCrystal( CrystalType type )
 {
 
-   auto currItem = m_inventoryMap[Crystal]->getItem( static_cast< uint8_t >( type ) - 1 );
+   auto currItem = m_storageMap[Crystal]->getItem( static_cast< uint8_t >( type ) - 1 );
 
    if( !currItem )
       return 0;
@@ -438,41 +438,18 @@ uint32_t Core::Entity::Player::getCrystal( CrystalType type )
 
 }
 
-void Core::Entity::Player::updateBagDb( InventoryType type )
-{
-   auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
-   std::string query = "UPDATE charaiteminventory SET ";
-
-   auto container = m_inventoryMap[type];
-
-   for( int32_t i = 0; i <= container->getMaxSize(); i++ )
-   {
-      auto currItem = container->getItem( i );
-
-      if( i > 0 )
-         query += ", ";
-
-      query += "container_" + std::to_string( i ) + " = " + std::to_string( currItem ? currItem->getUId() : 0 );
-   }
-
-   query += " WHERE CharacterId = " + std::to_string( getId() ) +
-            " AND storageId = " + std::to_string( static_cast< uint16_t >( type ) );
-
-   pDb->execute( query );
-}
-
-
-void Core::Entity::Player::updateMannequinDb( InventoryType type )
+void Core::Entity::Player::writeInventory( InventoryType type )
 {
    auto pLog = g_fw.get< Logger >();
    auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
-   std::string query = "UPDATE charaitemgearset SET ";
 
-   auto container = m_inventoryMap[type];
+   auto storage = m_storageMap[type];
 
-   for( int32_t i = 0; i <= container->getMaxSize(); i++ )
+   std::string query = "UPDATE " + storage->getTableName() + " SET ";
+
+   for( int32_t i = 0; i <= storage->getMaxSize(); i++ )
    {
-      auto currItem = container->getItem( i );
+      auto currItem = storage->getItem( i );
 
       if( i > 0 )
          query += ", ";
@@ -480,15 +457,16 @@ void Core::Entity::Player::updateMannequinDb( InventoryType type )
       query += "container_" + std::to_string( i ) + " = " + std::to_string( currItem ? currItem->getUId() : 0 );
    }
 
-   query += " WHERE CharacterId = " + std::to_string( getId() ) +
-            " AND storageId = " + std::to_string( static_cast< uint16_t >( type ) );
+   query += " WHERE CharacterId = " + std::to_string( getId() );
+
+   if( storage->isMultiStorage() )
+      query += " AND storageId = " + std::to_string( static_cast< uint16_t >( type ) );
 
    pLog->debug( query );
    pDb->execute( query );
 }
 
-
-void Core::Entity::Player::updateItemDb( Core::ItemPtr pItem ) const
+void Core::Entity::Player::writeItem( Core::ItemPtr pItem ) const
 {
    auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
    pDb->execute( "UPDATE charaglobalitem SET stack = " + std::to_string( pItem->getStackSize() ) + " " +
@@ -547,9 +525,11 @@ int16_t Core::Entity::Player::addItem( uint16_t inventoryId, int8_t slotId, uint
    if( rSlotId != -1 )
    {
 
-      m_inventoryMap[inventoryId]->setItem( rSlotId, item );
+      auto storage = m_storageMap[inventoryId];
+      storage->setItem( rSlotId, item );
 
-      pDb->execute( "UPDATE charaiteminventory SET container_" + std::to_string( rSlotId ) + " = " + std::to_string( item->getUId() ) +
+      pDb->execute( "UPDATE " + storage->getTableName() + " SET container_" +
+                    std::to_string( rSlotId ) + " = " + std::to_string( item->getUId() ) +
                     " WHERE storageId = " + std::to_string( inventoryId ) +
                     " AND CharacterId = " + std::to_string( getId() ) );
 
@@ -573,42 +553,35 @@ int16_t Core::Entity::Player::addItem( uint16_t inventoryId, int8_t slotId, uint
 void Core::Entity::Player::moveItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot )
 {
 
-   auto tmpItem = m_inventoryMap[fromInventoryId]->getItem( fromSlotId );
-   auto& itemMap = m_inventoryMap[fromInventoryId]->getItemMap();
+   auto tmpItem = m_storageMap[fromInventoryId]->getItem( fromSlotId );
+   auto& itemMap = m_storageMap[fromInventoryId]->getItemMap();
 
    if( tmpItem == nullptr )
       return;
 
    itemMap[fromSlotId].reset();
 
-   m_inventoryMap[toInventoryId]->setItem( toSlot, tmpItem );
+   m_storageMap[toInventoryId]->setItem( toSlot, tmpItem );
 
-   if( toInventoryId != GearSet0 )
-      updateBagDb( static_cast< InventoryType >( toInventoryId ) );
+   writeInventory( static_cast< InventoryType >( toInventoryId ) );
 
-   if( fromInventoryId != GearSet0 && fromInventoryId != toInventoryId )
-      updateBagDb( static_cast< InventoryType >( fromInventoryId ) );
+   if( fromInventoryId != toInventoryId )
+      writeInventory( static_cast< InventoryType >( fromInventoryId ) );
 
    if( static_cast< InventoryType >( toInventoryId ) == GearSet0 )
-   {
       equipItem( static_cast< EquipSlot >( toSlot ), tmpItem, true );
-      updateMannequinDb( static_cast< InventoryType >( toInventoryId ) );
-   }
 
    if( static_cast< InventoryType >( fromInventoryId ) == GearSet0 )
-   {
       unequipItem( static_cast< EquipSlot >( fromSlotId ), tmpItem );
-      updateMannequinDb( static_cast< InventoryType >( fromInventoryId ) );
-   }
 
 
 }
 
-bool Core::Entity::Player::updateContainer( uint16_t containerId, uint8_t slotId, ItemPtr pItem )
+bool Core::Entity::Player::updateContainer( uint16_t storageId, uint8_t slotId, ItemPtr pItem )
 {
-   auto containerType = Items::Util::getContainerType( containerId );
+   auto containerType = Items::Util::getContainerType( storageId );
 
-   m_inventoryMap[containerId]->setItem( slotId, pItem );
+   m_storageMap[storageId]->setItem( slotId, pItem );
 
    switch( containerType )
    {
@@ -616,7 +589,7 @@ bool Core::Entity::Player::updateContainer( uint16_t containerId, uint8_t slotId
       case Bag:
       case CurrencyCrystal:
       {
-         updateBagDb( static_cast< InventoryType >( containerId ) );
+         writeInventory( static_cast< InventoryType >( storageId ) );
          break;
       }
 
@@ -627,7 +600,7 @@ bool Core::Entity::Player::updateContainer( uint16_t containerId, uint8_t slotId
          else
             unequipItem( static_cast< EquipSlot >( slotId ), pItem );
 
-         updateMannequinDb( static_cast< InventoryType >( containerId ) );
+         writeInventory( static_cast< InventoryType >( storageId ) );
          break;
       }
       default:
@@ -640,7 +613,7 @@ bool Core::Entity::Player::updateContainer( uint16_t containerId, uint8_t slotId
 void Core::Entity::Player::splitItem( uint16_t fromInventoryId, uint8_t fromSlotId,
                                       uint16_t toInventoryId, uint8_t toSlot, uint16_t itemCount )
 {
-   auto fromItem = m_inventoryMap[fromInventoryId]->getItem( fromSlotId );
+   auto fromItem = m_storageMap[fromInventoryId]->getItem( fromSlotId );
    if( !fromItem )
       return;
 
@@ -651,7 +624,7 @@ void Core::Entity::Player::splitItem( uint16_t fromInventoryId, uint8_t fromSlot
       return;
 
    // make sure toInventoryId & toSlot are actually free so we don't orphan an item
-   if( m_inventoryMap[toInventoryId]->getItem( toSlot ) )
+   if( m_storageMap[toInventoryId]->getItem( toSlot ) )
       // todo: correct invalid move? again, not sure what retail does here
       return;
 
@@ -659,21 +632,21 @@ void Core::Entity::Player::splitItem( uint16_t fromInventoryId, uint8_t fromSlot
    if( newSlot == -1 )
       return;
 
-   auto newItem = m_inventoryMap[toInventoryId]->getItem( static_cast< uint8_t >( newSlot ) );
+   auto newItem = m_storageMap[toInventoryId]->getItem( static_cast< uint8_t >( newSlot ) );
 
    fromItem->setStackSize( fromItem->getStackSize() - itemCount );
 
    updateContainer( fromInventoryId, fromSlotId, fromItem );
    updateContainer( toInventoryId, toSlot, newItem );
 
-   updateItemDb( fromItem );
+   writeItem(fromItem);
 }
 
 void Core::Entity::Player::mergeItem( uint16_t fromInventoryId, uint8_t fromSlotId,
                                       uint16_t toInventoryId, uint8_t toSlot )
 {
-   auto fromItem = m_inventoryMap[fromInventoryId]->getItem( fromSlotId );
-   auto toItem = m_inventoryMap[toInventoryId]->getItem( toSlot );
+   auto fromItem = m_storageMap[fromInventoryId]->getItem( fromSlotId );
+   auto toItem = m_storageMap[toInventoryId]->getItem( toSlot );
 
    if( !fromItem || !toItem )
       return;
@@ -687,18 +660,18 @@ void Core::Entity::Player::mergeItem( uint16_t fromInventoryId, uint8_t fromSlot
    // we can destroy the original stack if there's no overflow
    if( stackOverflow == 0 )
    {
-      m_inventoryMap[fromInventoryId]->removeItem( fromSlotId );
+      m_storageMap[fromInventoryId]->removeItem( fromSlotId );
       deleteItemDb( fromItem );
    }
    else
    {
       fromItem->setStackSize( stackOverflow );
-      updateItemDb( fromItem );
+      writeItem(fromItem);
    }
 
 
    toItem->setStackSize( stackSize );
-   updateItemDb( toItem );
+   writeItem(toItem);
 
    updateContainer( fromInventoryId, fromSlotId, fromItem );
    updateContainer( toInventoryId, toSlot, toItem );
@@ -707,9 +680,9 @@ void Core::Entity::Player::mergeItem( uint16_t fromInventoryId, uint8_t fromSlot
 void Core::Entity::Player::swapItem( uint16_t fromInventoryId, uint8_t fromSlotId,
                                      uint16_t toInventoryId, uint8_t toSlot )
 {
-   auto fromItem = m_inventoryMap[fromInventoryId]->getItem( fromSlotId );
-   auto toItem = m_inventoryMap[toInventoryId]->getItem( toSlot );
-   auto& itemMap = m_inventoryMap[fromInventoryId]->getItemMap();
+   auto fromItem = m_storageMap[fromInventoryId]->getItem( fromSlotId );
+   auto toItem = m_storageMap[toInventoryId]->getItem( toSlot );
+   auto& itemMap = m_storageMap[fromInventoryId]->getItemMap();
 
    if( fromItem == nullptr || toItem == nullptr )
       return;
@@ -722,7 +695,7 @@ void Core::Entity::Player::swapItem( uint16_t fromInventoryId, uint8_t fromSlotI
    {
       updateContainer( fromInventoryId, fromSlotId, nullptr );
       fromInventoryId = Items::Util::getArmoryToEquipSlot( toSlot );
-      fromSlotId = static_cast < uint8_t >( m_inventoryMap[fromInventoryId]->getFreeSlot() );
+      fromSlotId = static_cast < uint8_t >( m_storageMap[fromInventoryId]->getFreeSlot() );
    }
 
    auto containerTypeFrom = Items::Util::getContainerType( fromInventoryId );
@@ -737,11 +710,11 @@ void Core::Entity::Player::discardItem( uint16_t fromInventoryId, uint8_t fromSl
    // i am not entirely sure how this should be generated or if it even is important for us...
    uint32_t transactionId = 1;
 
-   auto fromItem = m_inventoryMap[fromInventoryId]->getItem( fromSlotId );
+   auto fromItem = m_storageMap[fromInventoryId]->getItem( fromSlotId );
 
    deleteItemDb( fromItem );
 
-   m_inventoryMap[fromInventoryId]->removeItem( fromSlotId );
+   m_storageMap[fromInventoryId]->removeItem( fromSlotId );
    updateContainer( fromInventoryId, fromSlotId, nullptr );
 
    auto invTransPacket = makeZonePacket< FFXIVIpcInventoryTransaction >( getId() );
@@ -764,7 +737,7 @@ uint16_t Core::Entity::Player::calculateEquippedGearItemLevel()
 {
    uint32_t iLvlResult = 0;
 
-   auto gearSetMap = m_inventoryMap[GearSet0]->getItemMap();
+   auto gearSetMap = m_storageMap[GearSet0]->getItemMap();
 
    auto it = gearSetMap.begin();
 
@@ -795,7 +768,7 @@ uint8_t Core::Entity::Player::getFreeSlotsInBags()
    uint8_t slots = 0;
    for( uint8_t container : { Bag0, Bag1, Bag2, Bag3 } )
    { 
-      const auto& storage = m_inventoryMap[container];
+      const auto& storage = m_storageMap[container];
       slots += ( storage->getMaxSize() - storage->getEntryCount() );
    }
    return slots;

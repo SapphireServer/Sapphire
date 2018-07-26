@@ -616,7 +616,7 @@ bool Core::Entity::Player::loadInventory()
          if( pItem == nullptr )
             continue;
 
-         m_inventoryMap[storageId]->getItemMap()[i - 1] = pItem;
+         m_storageMap[storageId]->getItemMap()[i - 1] = pItem;
          equipItem( static_cast< EquipSlot >( i - 1 ), pItem, false );
       }
    }
@@ -638,7 +638,7 @@ bool Core::Entity::Player::loadInventory()
    while( bagRes->next() )
    {
       uint16_t storageId = bagRes->getUInt16( 1 );
-      for( uint32_t i = 1; i <= m_inventoryMap[storageId]->getMaxSize(); i++ )
+      for( uint32_t i = 1; i <= m_storageMap[storageId]->getMaxSize(); i++ )
       {
          uint64_t uItemId = bagRes->getUInt64( i + 1 );
          if( uItemId == 0 )
@@ -649,7 +649,7 @@ bool Core::Entity::Player::loadInventory()
          if( pItem == nullptr )
             continue;
 
-         m_inventoryMap[storageId]->getItemMap()[i - 1] = pItem;
+         m_storageMap[storageId]->getItemMap()[i - 1] = pItem;
       }
    }
 
