@@ -6,6 +6,7 @@
 
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
+#include "Network/PacketWrappers/UpdateInventorySlotPacket.h"
 
 #include "Inventory/Item.h"
 #include "Inventory/ItemContainer.h"
@@ -232,13 +233,11 @@ void Core::Entity::Player::addCurrency( CurrencyType type, uint32_t amount )
    currItem->setStackSize( currentAmount + amount );
    updateItemDb( currItem );
 
-   auto invUpPacket = makeZonePacket< FFXIVIpcUpdateInventorySlot >( getId() );
-   invUpPacket->data().containerId = Common::InventoryType::Currency;
-   invUpPacket->data().catalogId = 1;
-   invUpPacket->data().quantity = getCurrency( type );
-   invUpPacket->data().slot = static_cast< uint8_t >( type ) - 1;
-
-   queuePacket( invUpPacket );
+   auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
+                                                                     static_cast< uint8_t >( type ) - 1,
+                                                                     Common::InventoryType::Currency,
+                                                                     *currItem );
+   queuePacket( invUpdate );
 }
 
 void Core::Entity::Player::removeCurrency( Common::CurrencyType type, uint32_t amount )
@@ -254,15 +253,13 @@ void Core::Entity::Player::removeCurrency( Common::CurrencyType type, uint32_t a
       currItem->setStackSize( 0 );
    else
       currItem->setStackSize( currentAmount - amount );
-
    updateItemDb( currItem );
-   auto invUpPacket = makeZonePacket< FFXIVIpcUpdateInventorySlot >( getId() );
-   invUpPacket->data().containerId = Common::InventoryType::Currency;
-   invUpPacket->data().catalogId = 1;
-   invUpPacket->data().quantity = getCurrency( type );
-   invUpPacket->data().slot = static_cast< uint8_t >( type ) - 1;
 
-   queuePacket( invUpPacket );
+   auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
+                                                                     static_cast< uint8_t >( type ) - 1,
+                                                                     Common::InventoryType::Currency,
+                                                                     *currItem );
+   queuePacket( invUpdate );
 }
 
 
@@ -284,14 +281,12 @@ void Core::Entity::Player::addCrystal( Common::CrystalType type, uint32_t amount
 
    updateItemDb( currItem );
 
-   auto invUpPacket = makeZonePacket< FFXIVIpcUpdateInventorySlot >( getId() );
-   invUpPacket->data().containerId = Common::InventoryType::Crystal;
-   invUpPacket->data().catalogId = static_cast< uint8_t >( type ) + 1;
-   invUpPacket->data().quantity = getCrystal( type );
-   invUpPacket->data().slot = static_cast< uint8_t >( type ) - 1;
 
-   queuePacket( invUpPacket );
-
+   auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
+                                                                     static_cast< uint8_t >( type ) - 1,
+                                                                     Common::InventoryType::Crystal,
+                                                                     *currItem );
+   queuePacket( invUpdate );
    queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), ItemObtainIcon,
                                                              static_cast< uint8_t >( type ) + 1, amount ) );
 }
@@ -311,13 +306,11 @@ void Core::Entity::Player::removeCrystal( Common::CrystalType type, uint32_t amo
 
    updateItemDb( currItem );
 
-   auto invUpPacket = makeZonePacket< FFXIVIpcUpdateInventorySlot >( getId() );
-   invUpPacket->data().containerId = Common::InventoryType::Crystal;
-   invUpPacket->data().catalogId = static_cast< uint8_t >( type ) + 1;
-   invUpPacket->data().quantity = getCrystal( type );
-   invUpPacket->data().slot = static_cast< uint8_t >( type ) - 1;
-
-   queuePacket( invUpPacket );
+   auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
+                                                                     static_cast< uint8_t >( type ) - 1,
+                                                                     Common::InventoryType::Crystal,
+                                                                     *currItem );
+   queuePacket( invUpdate );
 }
 
 bool Core::Entity::Player::tryAddItem( uint16_t catalogId, uint32_t quantity )
@@ -609,14 +602,11 @@ int16_t Core::Entity::Player::addItem( uint16_t inventoryId, int8_t slotId, uint
                     " AND CharacterId = " + std::to_string( getId() ) );
 
 
-      auto invUpPacket = makeZonePacket< FFXIVIpcUpdateInventorySlot >( getId() );
-      invUpPacket->data().containerId = inventoryId;
-      invUpPacket->data().catalogId = catalogId;
-      invUpPacket->data().quantity = item->getStackSize();
-      invUpPacket->data().hqFlag = item->isHq() ? 1 : 0;
-      invUpPacket->data().slot = rSlotId;
-      invUpPacket->data().condition = 30000;
-      queuePacket( invUpPacket );
+      auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
+                                                                        rSlotId,
+                                                                        inventoryId,
+                                                                        *item );
+      queuePacket( invUpdate );
 
       if( !silent )
          queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), ItemObtainIcon,
@@ -851,10 +841,10 @@ uint16_t Core::Entity::Player::calculateEquippedGearItemLevel()
 uint8_t Core::Entity::Player::getFreeSlotsInBags()
 {
    uint8_t slots = 0;
-   for( uint8_t container : { 0, 1, 2, 3 } )
-   {
-      // TODO: this feels hackish at best
-      slots += 34 - m_inventoryMap[container]->getEntryCount();
+   for( uint8_t container : { Bag0, Bag1, Bag2, Bag3 } )
+   { 
+      const auto& storage = m_inventoryMap[container];
+      slots += ( storage->getMaxSize() - storage->getEntryCount() );
    }
    return slots;
 }

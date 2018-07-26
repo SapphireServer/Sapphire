@@ -55,12 +55,12 @@ void Core::ItemContainer::removeItem( uint8_t slotId )
    }
 }
 
-Core::ItemMap & Core::ItemContainer::getItemMap()
+Core::ItemMap& Core::ItemContainer::getItemMap()
 {
    return m_itemMap;
 }
 
-const Core::ItemMap & Core::ItemContainer::getItemMap() const
+const Core::ItemMap& Core::ItemContainer::getItemMap() const
 {
    return m_itemMap;
 }
