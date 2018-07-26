@@ -58,10 +58,10 @@ void Core::Entity::Player::initInventory()
    setupContainer( GearSet0, 13, "charaitemgearset", true );
 
    // gil contianer
-   setupContainer( Currency, 11, "charaitemcurrency", false );
+   setupContainer( Currency, 11, "charaiteminventory", false );
 
    // crystals??
-   setupContainer( Crystal, 11, "charaitemcrystal", false );
+   setupContainer( Crystal, 11, "charaiteminventory", false );
 
    // armory weapons - 0
    setupContainer( ArmoryMain, 34, "charaiteminventory", true );
@@ -219,19 +219,21 @@ void Core::Entity::Player::unequipItem( Common::EquipSlot equipSlotId, ItemPtr p
 // TODO: these next functions are so similar that they could likely be simplified
 void Core::Entity::Player::addCurrency( CurrencyType type, uint32_t amount )
 {
-   auto currItem = m_inventoryMap[Currency]->getItem( static_cast< uint8_t >( type ) - 1 );
+   auto slot = static_cast< uint8_t >( static_cast< uint8_t >( type ) - 1 );
+   auto currItem = m_inventoryMap[Currency]->getItem( slot );
 
    if( !currItem )
    {
       // TODO: map currency type to itemid
       currItem = createItem( 1 );
-      m_inventoryMap[Currency]->setItem( static_cast< uint8_t >( type ) - 1, currItem );
-      updateCurrencyDb();
+      m_inventoryMap[Currency]->setItem( slot, currItem );
    }
 
    uint32_t currentAmount = currItem->getStackSize();
    currItem->setStackSize( currentAmount + amount );
    updateItemDb( currItem );
+
+   updateContainer( Currency, slot, currItem );
 
    auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
                                                                      static_cast< uint8_t >( type ) - 1,
@@ -272,7 +274,6 @@ void Core::Entity::Player::addCrystal( Common::CrystalType type, uint32_t amount
       // TODO: map currency type to itemid
       currItem = createItem( static_cast< uint8_t >( type ) + 1 );
       m_inventoryMap[Crystal]->setItem( static_cast< uint8_t >( type ) - 1, currItem );
-      updateCrystalDb();
    }
 
    uint32_t currentAmount = currItem->getStackSize();
@@ -280,6 +281,8 @@ void Core::Entity::Player::addCrystal( Common::CrystalType type, uint32_t amount
    currItem->setStackSize( currentAmount + amount );
 
    updateItemDb( currItem );
+
+   updateBagDb( Crystal );
 
 
    auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
@@ -435,69 +438,16 @@ uint32_t Core::Entity::Player::getCrystal( CrystalType type )
 
 }
 
-void Core::Entity::Player::updateCurrencyDb()
-{
-   auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
-   int32_t firstItemPos = -1;
-   std::string query = "UPDATE charaitemcurrency SET ";
-
-   for( int32_t i = 0; i <= 11; i++ )
-   {
-      auto currItem = m_inventoryMap[Currency]->getItem( i );
-
-      if( currItem )
-      {
-         if( firstItemPos == -1 )
-            firstItemPos = i;
-
-         if( i > firstItemPos )
-            query += ", ";
-
-         query += "container_" + std::to_string( i ) + " = " + std::to_string( currItem->getUId() );
-      }
-   }
-
-   query += " WHERE CharacterId = " + std::to_string( getId() );
-
-   pDb->execute( query );
-}
-
-
-void Core::Entity::Player::updateCrystalDb()
-{
-   auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
-   int32_t firstItemPos = -1;
-   std::string query = "UPDATE charaitemcrystal SET ";
-
-   for( int32_t i = 0; i <= 11; i++ )
-   {
-      auto currItem = m_inventoryMap[Crystal]->getItem( i );
-
-      if( currItem )
-      {
-         if( firstItemPos == -1 )
-            firstItemPos = i;
-
-         if( i > firstItemPos )
-            query += ", ";
-
-         query += "container_" + std::to_string( i ) + " = " + std::to_string( currItem->getUId() );
-      }
-   }
-
-   query += " WHERE CharacterId = " + std::to_string( getId() );
-
-   pDb->execute( query );
-}
-
 void Core::Entity::Player::updateBagDb( InventoryType type )
 {
    auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
    std::string query = "UPDATE charaiteminventory SET ";
 
-   for( int32_t i = 0; i <= 34; i++ )
+   auto container = m_inventoryMap[type];
+
+   for( int32_t i = 0; i <= container->getMaxSize(); i++ )
    {
-      auto currItem = m_inventoryMap[type]->getItem( i );
+      auto currItem = container->getItem( i );
 
       if( i > 0 )
          query += ", ";
@@ -518,9 +468,11 @@ void Core::Entity::Player::updateMannequinDb( InventoryType type )
    auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
    std::string query = "UPDATE charaitemgearset SET ";
 
-   for( int32_t i = 0; i <= 13; i++ )
+   auto container = m_inventoryMap[type];
+
+   for( int32_t i = 0; i <= container->getMaxSize(); i++ )
    {
-      auto currItem = m_inventoryMap[type]->getItem( i );
+      auto currItem = container->getItem( i );
 
       if( i > 0 )
          query += ", ";
@@ -661,8 +613,8 @@ bool Core::Entity::Player::updateContainer( uint16_t containerId, uint8_t slotId
    switch( containerType )
    {
       case Armory:
-      case CurrencyCrystal:
       case Bag:
+      case CurrencyCrystal:
       {
          updateBagDb( static_cast< InventoryType >( containerId ) );
          break;
