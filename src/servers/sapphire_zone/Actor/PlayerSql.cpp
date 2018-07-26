@@ -566,10 +566,7 @@ Core::ItemPtr Core::Entity::Player::createItem( uint32_t catalogId, uint16_t qua
    if( !itemInfo )
       return nullptr;
 
-   uint16_t itemAmount = quantity;
-
-   if( itemInfo->stackSize == 1 )
-      itemAmount = 1;
+   auto itemAmount = std::min< uint16_t >( quantity, static_cast< uint16_t >( itemInfo->stackSize ) );
 
    if( !itemInfo )
       return nullptr;
