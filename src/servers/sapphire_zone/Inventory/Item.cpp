@@ -84,7 +84,7 @@ void Core::Item::setUId( uint64_t id )
 
 void Core::Item::setStackSize( uint32_t size )
 {
-   m_stackSize = size;
+   m_stackSize = std::min< uint32_t >( size, m_maxStackSize );
 }
 
 uint32_t Core::Item::getStackSize() const

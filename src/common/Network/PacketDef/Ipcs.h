@@ -130,8 +130,8 @@ namespace Packets {
       ContainerInfo              = 0x0192, // updated 4.3
       InventoryTransactionFinish = 0x0193, // updated 4.3
       InventoryTransaction       = 0x0194, // updated 4.3
+      CurrencyCrystalInfo        = 0x0195, // updated 4.3
       InventoryActionAck         = 0x0197, // updated 4.3
-      CurrencyCrystalInfo        = 0xFFFF, // updated 4.3 - wrong opcode
 
       UpdateInventorySlot        = 0x0198, // updated 4.3
 

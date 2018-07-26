@@ -557,7 +557,7 @@ void Core::Entity::Player::insertQuest( uint16_t questId, uint8_t index, uint8_t
    pDb->execute( stmt );
 }
 
-Core::ItemPtr Core::Entity::Player::createItem( uint32_t catalogId, uint16_t quantity )
+Core::ItemPtr Core::Entity::Player::createItem( uint32_t catalogId, uint32_t quantity )
 {
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
    auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
@@ -565,11 +565,6 @@ Core::ItemPtr Core::Entity::Player::createItem( uint32_t catalogId, uint16_t qua
 
    if( !itemInfo )
       return nullptr;
-
-   uint16_t itemAmount = quantity;
-
-   if( itemInfo->stackSize == 1 )
-      itemAmount = 1;
 
    if( !itemInfo )
       return nullptr;
@@ -581,13 +576,13 @@ Core::ItemPtr Core::Entity::Player::createItem( uint32_t catalogId, uint16_t qua
                               itemInfo->modelMain,
                               itemInfo->modelSub );
 
-   pItem->setStackSize( itemAmount );
+   pItem->setStackSize( quantity );
 
    pDb->execute( "INSERT INTO charaglobalitem ( CharacterId, itemId, catalogId, stack, flags ) VALUES ( " +
                  std::to_string( getId() ) + ", " +
                  std::to_string( pItem->getUId() ) + ", " +
                  std::to_string( pItem->getId() ) + ", " +
-                 std::to_string( itemAmount ) + ", " +
+                 std::to_string( quantity ) + ", " +
                  std::to_string( flags ) + ");" );
 
    return pItem;
@@ -627,7 +622,7 @@ bool Core::Entity::Player::loadInventory()
    }
 
    ///////////////////////////////////////////////////////////////////////////////////////////////////////
-   // Load Bags
+   // Load everything
    auto bagRes = pDb->query( "SELECT storageId, "
                              "container_0, container_1, container_2, container_3, container_4, "
                              "container_5, container_6, container_7, container_8, container_9, "
@@ -643,68 +638,9 @@ bool Core::Entity::Player::loadInventory()
    while( bagRes->next() )
    {
       uint16_t storageId = bagRes->getUInt16( 1 );
-      for( uint32_t i = 1; i <= 35; i++ )
+      for( uint32_t i = 1; i <= m_inventoryMap[storageId]->getMaxSize(); i++ )
       {
          uint64_t uItemId = bagRes->getUInt64( i + 1 );
-         if( uItemId == 0 )
-            continue;
-
-         ItemPtr pItem = Items::Util::loadItem( uItemId );
-
-         if( pItem == nullptr )
-            continue;
-
-         m_inventoryMap[storageId]->getItemMap()[i - 1] = pItem;
-      }
-   }
-
-
-   ///////////////////////////////////////////////////////////////////////////////////////////////////////
-   // Load Currency
-   auto curRes = pDb->query( "SELECT storageId, "
-                             "container_0, container_1, container_2, container_3, container_4, "
-                             "container_5, container_6, container_7, container_8, container_9, "
-                             "container_10, container_11 "
-                             "FROM charaitemcurrency " \
-                                  "WHERE CharacterId =  " + std::to_string( getId() ) + " " \
-                                  "ORDER BY storageId ASC;" );
-
-   while( curRes->next() )
-   {
-      uint16_t storageId = curRes->getUInt16( 1 );
-      for( uint32_t i = 1; i <= 12; i++ )
-      {
-         uint64_t uItemId = curRes->getUInt64( i + 1 );
-         if( uItemId == 0 )
-            continue;
-
-         ItemPtr pItem = Items::Util::loadItem( uItemId );
-
-         if( pItem == nullptr )
-            continue;
-
-         m_inventoryMap[storageId]->getItemMap()[i - 1] = pItem;
-      }
-   }
-
-
-   ///////////////////////////////////////////////////////////////////////////////////////////////////////
-   // Load Crystals
-   auto crystalRes = pDb->query( "SELECT storageId, "
-                                 "container_0, container_1, container_2, container_3, container_4, "
-                                 "container_5, container_6, container_7, container_8, container_9, "
-                                 "container_10, container_11, container_12, container_13, container_14, "
-                                 "container_15, container_16, container_17 "
-                                 "FROM charaitemcrystal " \
-                                      "WHERE CharacterId =  " + std::to_string( getId() ) + " " \
-                                      "ORDER BY storageId ASC;" );
-
-   while( crystalRes->next() )
-   {
-      uint16_t storageId = crystalRes->getUInt16( 1 );
-      for( int32_t i = 1; i <= 17; i++ )
-      {
-         uint64_t uItemId = crystalRes->getUInt64( i + 1 );
          if( uItemId == 0 )
             continue;
 
