@@ -1070,7 +1070,7 @@ bool Core::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t optional
    }
 
    if( gilReward > 0 )
-      addCurrency( 1, gilReward );
+      addCurrency( CurrencyType::Gil, gilReward );
 
    return true;
 }

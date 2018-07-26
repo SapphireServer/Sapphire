@@ -135,7 +135,7 @@ namespace Packets {
       InventoryTransactionFinish    = 0x0193, // updated 4.3
       InventoryTransaction          = 0x0194, // updated 4.3
       InventoryActionAck            = 0x0197, // updated 4.3
-      CurrencyCrystalInfo           = 0xFFFF, // updated 4.3 - wrong opcode
+      CurrencyCrystalInfo           = 0x0197, // updated 4.3 - wrong opcode
 
       UpdateInventorySlot           = 0x0198, // updated 4.3
 

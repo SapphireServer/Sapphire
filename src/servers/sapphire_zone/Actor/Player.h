@@ -7,7 +7,6 @@
 #include <Util/SpawnIndexAllocator.h>
 
 #include "Chara.h"
-#include "Inventory/Inventory.h"
 #include "Event/EventHandler.h"
 #include <map>
 #include <queue>
@@ -23,11 +22,13 @@ struct QueuedZoning
    float m_targetRotation;
    uint64_t m_queueTime;
 
-   QueuedZoning( uint16_t targetZone, const Common::FFXIVARR_POSITION3& targetPosition, uint64_t queuedTime, float targetRotation )
-      : m_targetZone( targetZone )
-      , m_targetPosition( targetPosition )
-      , m_queueTime( queuedTime )
-      , m_targetRotation( targetRotation ) {}
+   QueuedZoning( uint16_t targetZone, const Common::FFXIVARR_POSITION3& targetPosition,
+                 uint64_t queuedTime, float targetRotation ) :
+           m_targetZone( targetZone ),
+           m_targetPosition( targetPosition ),
+           m_queueTime( queuedTime ),
+           m_targetRotation( targetRotation )
+   {}
 };
 
 /** Class representing the Player
@@ -224,7 +225,7 @@ public:
    /*! add an item to the first free slot in one of the 4 main containers */
    bool tryAddItem( uint16_t catalogId, uint32_t quantity );
    /*! add an item to a given container */
-   bool addItem( uint16_t containerId, uint16_t catalogId, uint32_t quantity );
+//   bool addItem( uint16_t containerId, uint16_t catalogId, uint32_t quantity );
    /*! equip an item to a specified slot */
    void equipItem( Common::EquipSlot equipSlotId, ItemPtr pItem, bool sendModel );
    /*! remove an item from an equipment slot */
@@ -235,8 +236,6 @@ public:
    uint16_t getItemLevel() const;
    /*! send player ilvl */
    void sendItemLevel();
-   /*! get a const pointer to the inventory object */
-   InventoryPtr getInventory() const;
    /*! get the current main hand model */
    uint64_t getModelMainWeapon() const;
    /*! get the current off hand model */
@@ -249,18 +248,12 @@ public:
    uint32_t getModelForSlot( Common::EquipSlot slot );
    /*! set the equipment model in a specified equipment slot */
    void setModelForSlot( Common::EquipSlot slot, uint32_t val );
-   /*! return the current amount of currency of type */
-   uint32_t getCurrency( uint8_t type ) const;
    /*! add amount to the currency of type */
-   void addCurrency( uint8_t type, uint32_t amount );
+   void addCurrency( Common::CurrencyType type, uint32_t amount );
    /*! remove amount from the currency of type */
-   void removeCurrency( uint8_t type, uint32_t amount );
+   void removeCurrency( Common::CurrencyType type, uint32_t amount );
    /*! return the current amount of crystals of type */
    uint32_t getCrystal( uint8_t type ) const;
-   /*! add amount to the crystals of type */
-   void addCrystal( uint8_t type, uint32_t amount );
-   /*! remove amount from the crystals of type */
-   void removeCrystal( uint8_t type, uint32_t amount );
 
    // Class / Job / Exp
    //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -496,7 +489,7 @@ public:
    /*! send status update */
    void sendStatusUpdate( bool toSelf = true ) override;
    /*! send the entire inventory sequence */
-   void sendInventory() const;
+   void sendInventory();
    /*! send active quest list */
    void sendQuestInfo();
    /*! send a quest specific message */
@@ -607,8 +600,53 @@ public:
    /*! checks if a spawn index is valid */
    bool isObjSpawnIndexValid( uint8_t index );
 
-   uint64_t m_lastMoveTime;
 
+   // Inventory Handling
+   //////////////////////////////////////////////////////////////////////////////////////////////////////
+   void initInventory();
+
+   using InvSlotPair = std::pair< uint16_t, int8_t >;
+   using InvSlotPairVec = std::vector< InvSlotPair >;
+
+   ItemPtr createItem( uint32_t catalogId, uint32_t quantity = 1 );
+   bool loadInventory();
+   InvSlotPairVec getSlotsOfItemsInInventory( uint32_t catalogId );
+   InvSlotPair getFreeBagSlot();
+   int16_t addItem( uint16_t inventoryId, int8_t slotId, uint32_t catalogId, uint16_t quantity = 1, bool isHq = false, bool silent = false );
+   void moveItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot );
+   void swapItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot );
+   void discardItem( uint16_t fromInventoryId, uint8_t fromSlotId );
+   void splitItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot, uint16_t splitCount );
+   void mergeItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot );
+
+   ItemPtr getItemAt( uint16_t containerId, uint8_t slotId );
+
+   bool updateContainer( uint16_t storageId, uint8_t slotId, ItemPtr pItem );
+
+   /*! calculate and return player ilvl based off equipped gear */
+   uint16_t calculateEquippedGearItemLevel();
+   /*! return the current amount of currency of type */
+   uint32_t getCurrency( Common::CurrencyType type );
+
+   void writeInventory( Common::InventoryType type );
+   void writeItem( ItemPtr pItem ) const;
+   void deleteItemDb( ItemPtr pItem ) const;
+
+   /*! return the crystal amount of currency of type */
+   uint32_t getCrystal( Common::CrystalType type );
+   /*! add amount to the crystal of type */
+   void addCrystal( Common::CrystalType type, uint32_t amount );
+   /*! remove amount from the crystals of type */
+   void removeCrystal( Common::CrystalType type, uint32_t amount );
+   bool isObtainable( uint32_t catalogId, uint8_t quantity );
+
+   void send();
+
+   uint8_t getFreeSlotsInBags();
+
+   //////////////////////////////////////////////////////////////////////////////////////////////////////
+
+   uint64_t m_lastMoveTime;
    uint8_t m_lastMoveflag;
 
 private:
@@ -628,8 +666,9 @@ private:
    bool m_onEnterEventDone;
 
 private:
+   using InventoryMap = std::map< uint16_t, Core::ItemContainerPtr >;
 
-
+   InventoryMap m_storageMap;
 
    Common::FFXIVARR_POSITION3 m_prevPos;
    uint32_t m_prevZoneType;
@@ -681,8 +720,6 @@ private:
    uint8_t m_openingSequence;
 
    uint16_t m_itemLevel;
-   InventoryPtr m_pInventory;
-
    std::map< uint32_t, Event::EventHandlerPtr > m_eventHandlerMap;
 
    std::queue< uint8_t > m_freeHateSlotQueue; // queue with "hate slots" free to be assigned

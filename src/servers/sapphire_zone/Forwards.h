@@ -24,9 +24,7 @@ namespace Core
    TYPE_FORWARD( InstanceContent );
    TYPE_FORWARD( Item );
    TYPE_FORWARD( ItemContainer );
-   TYPE_FORWARD( Inventory );
    TYPE_FORWARD( Session );
-   TYPE_FORWARD( XMLConfig );
    TYPE_FORWARD( ZonePosition )
 
    namespace StatusEffect

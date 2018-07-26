@@ -24,6 +24,7 @@ Core::Item::Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t mo
    m_autoAttackDmg = static_cast< float >( m_weaponDmg * m_delayMs ) / 3000;
    m_category = static_cast< Common::ItemUICategory >( itemInfo->itemUICategory );
    m_itemLevel = itemInfo->levelItem;
+   m_maxStackSize = itemInfo->stackSize;
 }
 
 float Core::Item::getAutoAttackDmg() const
@@ -83,7 +84,7 @@ void Core::Item::setUId( uint64_t id )
 
 void Core::Item::setStackSize( uint32_t size )
 {
-   m_stackSize = size;
+   m_stackSize = std::min< uint32_t >( size, m_maxStackSize );
 }
 
 uint32_t Core::Item::getStackSize() const
@@ -125,4 +126,9 @@ bool Core::Item::isHq() const
 void Core::Item::setHq( bool isHq )
 {
    m_isHq = isHq;
+}
+
+uint32_t Core::Item::getMaxStackSize() const
+{
+   return m_maxStackSize;
 }
