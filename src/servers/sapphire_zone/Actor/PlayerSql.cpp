@@ -557,7 +557,7 @@ void Core::Entity::Player::insertQuest( uint16_t questId, uint8_t index, uint8_t
    pDb->execute( stmt );
 }
 
-Core::ItemPtr Core::Entity::Player::createItem( uint32_t catalogId, uint16_t quantity )
+Core::ItemPtr Core::Entity::Player::createItem( uint32_t catalogId, uint32_t quantity )
 {
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
    auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
@@ -565,8 +565,6 @@ Core::ItemPtr Core::Entity::Player::createItem( uint32_t catalogId, uint16_t qua
 
    if( !itemInfo )
       return nullptr;
-
-   auto itemAmount = std::min< uint16_t >( quantity, static_cast< uint16_t >( itemInfo->stackSize ) );
 
    if( !itemInfo )
       return nullptr;
@@ -578,13 +576,13 @@ Core::ItemPtr Core::Entity::Player::createItem( uint32_t catalogId, uint16_t qua
                               itemInfo->modelMain,
                               itemInfo->modelSub );
 
-   pItem->setStackSize( itemAmount );
+   pItem->setStackSize( quantity );
 
    pDb->execute( "INSERT INTO charaglobalitem ( CharacterId, itemId, catalogId, stack, flags ) VALUES ( " +
                  std::to_string( getId() ) + ", " +
                  std::to_string( pItem->getUId() ) + ", " +
                  std::to_string( pItem->getId() ) + ", " +
-                 std::to_string( itemAmount ) + ", " +
+                 std::to_string( quantity ) + ", " +
                  std::to_string( flags ) + ");" );
 
    return pItem;

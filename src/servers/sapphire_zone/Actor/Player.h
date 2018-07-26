@@ -605,7 +605,7 @@ public:
    using InvSlotPair = std::pair< uint16_t, int8_t >;
    using InvSlotPairVec = std::vector< InvSlotPair >;
 
-   ItemPtr createItem( uint32_t catalogId, uint16_t quantity = 1 );
+   ItemPtr createItem( uint32_t catalogId, uint32_t quantity = 1 );
    bool loadInventory();
    InvSlotPairVec getSlotsOfItemsInInventory( uint32_t catalogId );
    InvSlotPair getFreeBagSlot();
@@ -625,7 +625,6 @@ public:
    /*! return the current amount of currency of type */
    uint32_t getCurrency( Common::CurrencyType type );
 
-   void updateCurrencyDb();
    void updateBagDb( Common::InventoryType type );
    void updateMannequinDb( Common::InventoryType type );
    void updateItemDb( ItemPtr pItem ) const;
@@ -638,8 +637,6 @@ public:
    /*! remove amount from the crystals of type */
    void removeCrystal( Common::CrystalType type, uint32_t amount );
    bool isObtainable( uint32_t catalogId, uint8_t quantity );
-
-   void updateCrystalDb();
 
    void send();
 
