@@ -48,6 +48,10 @@ using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 using namespace Core::Network::ActorControl;
 
+using InventoryMap = std::map< uint16_t, Core::ItemContainerPtr >;
+using InvSlotPair = std::pair< uint16_t, int8_t >;
+using InvSlotPairVec = std::vector< InvSlotPair >;
+
 // player constructor
 Core::Entity::Player::Player() :
    Chara( ObjKind::Player ),
@@ -1024,7 +1028,7 @@ void Core::Entity::Player::update( int64_t currTime )
    {
       if( m_targetId && m_currentStance == Entity::Chara::Stance::Active && isAutoattackOn() )
       {
-         auto mainWeap = m_pInventory->getItemAt( Common::GearSet0, Common::EquipSlot::MainHand );
+         auto mainWeap = getItemAt( Common::GearSet0, Common::EquipSlot::MainHand );
 
          // @TODO i dislike this, iterating over all in range actors when you already know the id of the actor you need...
          for( auto actor : m_inRangeActor )
@@ -1407,8 +1411,7 @@ uint32_t Core::Entity::Player::getPersistentEmote() const
 void Core::Entity::Player::autoAttack( CharaPtr pTarget )
 {
 
-   auto mainWeap = m_pInventory->getItemAt( Common::GearSet0,
-                                            Common::EquipSlot::MainHand );
+   auto mainWeap = getItemAt( Common::GearSet0, Common::EquipSlot::MainHand );
 
    pTarget->onActionHostile( *this );
    //uint64_t tick = Util::getTimeMs();
@@ -1562,7 +1565,7 @@ void Core::Entity::Player::sendZonePackets()
       classInfoPacket->data().level1 = getLevel();
       queuePacket( classInfoPacket );
 
-      m_itemLevel = getInventory()->calculateEquippedGearItemLevel();
+      m_itemLevel = calculateEquippedGearItemLevel();
       sendItemLevel();
    }
 
@@ -1737,5 +1740,4 @@ bool Core::Entity::Player::isOnEnterEventDone() const
 {
    return m_onEnterEventDone;
 }
-
 

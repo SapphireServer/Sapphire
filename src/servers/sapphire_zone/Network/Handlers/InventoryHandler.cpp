@@ -58,31 +58,31 @@ void Core::Network::GameConnection::inventoryModifyHandler( const Packets::FFXIV
 
       case InventoryOperation::Discard: // discard item action
       {
-         player.getInventory()->discardItem( fromContainer, fromSlot );
+         player.discardItem( fromContainer, fromSlot );
       }
       break;
 
       case InventoryOperation::Move: // move item action
       {
-         player.getInventory()->moveItem( fromContainer, fromSlot, toContainer, toSlot );
+         player.moveItem( fromContainer, fromSlot, toContainer, toSlot );
       }
       break;
 
       case InventoryOperation::Swap: // swap item action
       {
-         player.getInventory()->swapItem( fromContainer, fromSlot, toContainer, toSlot );
+         player.swapItem( fromContainer, fromSlot, toContainer, toSlot );
       }
       break;
 
       case InventoryOperation::Merge: // merge stack action
       {
-         player.getInventory()->mergeItem( fromContainer, fromSlot, toContainer, toSlot );
+         player.mergeItem( fromContainer, fromSlot, toContainer, toSlot );
       }
       break;
 
       case InventoryOperation::Split: // split stack action
       {
-         player.getInventory()->splitItem( fromContainer, fromSlot, toContainer, toSlot, splitCount );
+         player.splitItem( fromContainer, fromSlot, toContainer, toSlot, splitCount );
       }
       break;
 

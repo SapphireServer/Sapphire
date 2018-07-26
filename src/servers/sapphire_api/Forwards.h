@@ -12,7 +12,6 @@ namespace Core
    class ItemContainer;
    class Inventory;
    class Session;
-   class XMLConfig;
    class ZonePosition;
 
    typedef boost::shared_ptr<Zone> ZonePtr;
@@ -20,7 +19,6 @@ namespace Core
    typedef boost::shared_ptr<ItemContainer> ItemContainerPtr;
    typedef boost::shared_ptr<Inventory> InventoryPtr;
    typedef boost::shared_ptr<Session> SessionPtr;
-   typedef boost::shared_ptr<XMLConfig> XMLConfigPtr;
    typedef boost::shared_ptr<ZonePosition> ZonePositionPtr;
 
    namespace StatusEffect

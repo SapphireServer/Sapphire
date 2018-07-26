@@ -6,7 +6,6 @@
 #include <Util/Util.h>
 #include "Actor/Player.h"
 #include "Forwards.h"
-#include "Inventory/Inventory.h"
 #include "Inventory/Item.h"
 #include "StatusEffect/StatusEffect.h"
 
@@ -50,7 +49,7 @@ namespace Server {
 
          memcpy( m_data.look, player.getLookArray(), 26 );
 
-         auto item = player.getInventory()->getItemAt( Common::GearSet0, Common::EquipSlot::MainHand );
+         auto item = player.getItemAt( Common::GearSet0, Common::EquipSlot::MainHand );
          if( item )
             m_data.mainWeaponModel = item->getModelId1();
          m_data.secWeaponModel = player.getModelSubWeapon();
