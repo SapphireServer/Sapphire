@@ -58,10 +58,10 @@ void Core::Entity::Player::initInventory()
    setupContainer( GearSet0, 13, "charaitemgearset", true );
 
    // gil contianer
-   setupContainer( Currency, 11, "charaiteminventory", false );
+   setupContainer( Currency, 11, "charaiteminventory", true );
 
    // crystals??
-   setupContainer( Crystal, 11, "charaiteminventory", false );
+   setupContainer( Crystal, 11, "charaiteminventory", true );
 
    // armory weapons - 0
    setupContainer( ArmoryMain, 34, "charaiteminventory", true );
