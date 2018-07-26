@@ -32,7 +32,7 @@
 bool ignoreModels = false;
 
 // parsing shit
-std::string gamePath( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
+std::string gamePath( "C:\\Program Files (x86)\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
 std::unordered_map< uint32_t, std::string > eobjNameMap;
 std::unordered_map< uint16_t, std::string > zoneNameMap;
 std::unordered_map< uint16_t, std::vector< std::pair< uint16_t, std::string > > > zoneInstanceMap;
@@ -68,22 +68,22 @@ struct DiscoveryMap
    uint32_t getColour( uint8_t mapIndex, float x, float y )
    {
       auto ogX = x, ogY = y;
-      int col = mapIndex % (img.width / tileWidth);
-      int row = mapIndex / (img.width / tileWidth);
-      x = ( x / 2048.0f ) * (float)tileWidth;
-      y = ( y / 2048.0f ) * (float)tileWidth;
-      int tileX = (col * tileWidth) + x;
-      int tileY = ( row * tileWidth ) + y;
+      int col = ( mapIndex % ( int )( ( float )img.width / ( float )tileWidth ) );
+      int row = ( mapIndex / ( ( float )img.width / ( float )tileWidth ) );
+      x = ( x / 2048.f ) * ( float )tileWidth;
+      y = ( y / 2048.f ) * ( float )tileWidth;
+      int tileX = ( col * ( float )tileWidth ) + x;
+      int tileY = ( row * ( float )tileWidth ) + y;
 
-      if (tileX < 0 || tileY < 0)
+      if( tileX < 0 || tileY < 0 )
       {
-         std::cout << "Unable to find tile coord for " << x << " " << y << " mapIndex " << mapIndex << "\n";
+         std::cout << "Unable to find tile coord for " << x << " " << y << " mapIndex " << std::to_string( mapIndex ) << "\n";
          return 0;
       }
-      if( tileY > img.data.size() )
+      if( tileY > img.data.size() - 1 )
          return 0;
 
-      if( tileX > img.data[0].size() )
+      if( tileX > img.data[0].size() - 1)
          return 0;
 
       //std::cout << "getColour col " << col << " row " << row << " tileX " << tileX << " tileY " << tileY << " tile index " << std::to_string( mapIndex ) << "\n";
@@ -95,22 +95,19 @@ struct DiscoveryMap
    vec3 get3dPosFrom2d( float x, float y )
    {
       vec3 ret;
-      float scale2 = mapScale / 100;
-      ret.x = ( x * scale2 ) + ( img.height * 2 ); //( x / scale2 ) - mapOffsetX;
-      ret.z = ( y * scale2 ) + ( img.height * 2 ); //( y / scale2 ) - mapOffsetY;
+      float scale2 = ( float )mapScale / 100.0f;
+      ret.x = ( x * scale2 ) + ( ( float )img.height * 2.f ); //( x / scale2 ) - mapOffsetX;
+      ret.z = ( y * scale2 ) + ( ( float )img.height * 2.f ); //( y / scale2 ) - mapOffsetY;
 
       return ret;
    }
 
-   vec2 get2dPosFrom3d( float x, float y )
+   vec2 get2dPosFrom3d( float x, float y, float scale )
    {
-      //int a = (mapPictureBox.Height / 2) + (x / (System.Convert.ToInt32(myMap.sizeFactor) / 100));
-      //int b = (mapPictureBox.Height / 2) + (y / (System.Convert.ToInt32(myMap.sizeFactor) / 100));
-
       vec2 ret;
-      float scale2 = mapScale / 100;
-      ret.x = ( x * scale2 ) + (2048.f /2);
-      ret.y = ( y * scale2 ) + (2048.f /2);
+      float scale2 = ( ( float )mapScale / 100.f );
+      ret.x = ( ( x * scale2 ) + 1024.f );
+      ret.y = ( ( y * scale2 ) + 1024.f );
       //ret.x = ( x * scale2 ) + mapOffsetX;
       //ret.y = ( y * scale2 ) + mapOffsetY;
 
@@ -142,61 +139,6 @@ void initExd( const std::string& gamePath )
    eData = eData ? eData : new xiv::exd::ExdData( *data1 );
 }
 
-int parseBlockEntry( char* data, std::vector<PCB_BLOCK_ENTRY>& entries, int gOff )
-{
-   int offset = 0;
-   bool isgroup = true;
-   while( isgroup )
-   {
-      PCB_BLOCK_ENTRY block_entry;
-      memcpy( &block_entry.header, data + offset, sizeof( block_entry.header ) );
-      isgroup = block_entry.header.type == 0x30;
-
-      //printf( " BLOCKHEADER_%X: type: %i, group_size: %i\n", gOff + offset, block_entry.header.type, block_entry.header.group_size );
-
-      if( isgroup )
-      {
-         parseBlockEntry( data + offset + 0x30, entries, gOff + offset );
-         offset += block_entry.header.group_size;
-      }
-      else
-      {
-         /*   printf( "\tnum_v16: %i, num_indices: %i, num_vertices: %i\n\n",
-                    block_entry.header.num_v16, block_entry.header.num_indices, block_entry.header.num_vertices );*/
-         int doffset = sizeof( block_entry.header ) + offset;
-         uint16_t block_size = sizeof( block_entry.header ) +
-            block_entry.header.num_vertices * 3 * 4 +
-            block_entry.header.num_v16 * 6 +
-            block_entry.header.num_indices * 6;
-
-         if( block_entry.header.num_vertices != 0 )
-         {
-            block_entry.data.vertices.resize( block_entry.header.num_vertices );
-
-            int32_t size_vertexbuffer = block_entry.header.num_vertices * 3;
-            memcpy( &block_entry.data.vertices[0], data + doffset, size_vertexbuffer * 4 );
-            doffset += size_vertexbuffer * 4;
-         }
-         if( block_entry.header.num_v16 != 0 )
-         {
-            block_entry.data.vertices_i16.resize( block_entry.header.num_v16 );
-            int32_t size_unknownbuffer = block_entry.header.num_v16 * 6;
-            memcpy( &block_entry.data.vertices_i16[0], data + doffset, size_unknownbuffer );
-            doffset += block_entry.header.num_v16 * 6;
-         }
-         if( block_entry.header.num_indices != 0 )
-         {
-            block_entry.data.indices.resize( block_entry.header.num_indices );
-            int32_t size_indexbuffer = block_entry.header.num_indices * 12;
-            memcpy( &block_entry.data.indices[0], data + doffset, size_indexbuffer );
-            doffset += size_indexbuffer;
-         }
-         entries.push_back( block_entry );
-      }
-   }
-
-   return 0;
-}
 
 std::string getMapExdEntries( uint32_t mapId )
 {
@@ -242,29 +184,36 @@ std::string getMapExdEntries( uint32_t mapId )
 
       if( discoveryMaps.find( territory ) == discoveryMaps.end() )
       {
-         auto texFile = data1->getFile( &texStr[0] );
-         std::string rawTexFile( teriStr + "0" + std::to_string( mapZoneIndex ) );
-         texFile->exportToFile( rawTexFile + "d.tex" );
-         auto tex = TEX_FILE( rawTexFile + "d.tex" );
+         try
+         {
+            auto texFile = data1->getFile( &texStr[0] );
+            std::string rawTexFile( teriStr + "0" + std::to_string( mapZoneIndex ) );
+            texFile->exportToFile( rawTexFile + "d.tex" );
+            auto tex = TEX_FILE( rawTexFile + "d.tex" );
 
-         int mipMapDivide = 1;
-         int h = tex.header.uncompressedHeight;
-         int w = tex.header.uncompressedWidth;
-         DiscoveryMap discoveryMap;
-         discoveryMap.img = DecodeTexDXT1( tex, tex.header.mipMaps[0], h / mipMapDivide, w / mipMapDivide,
-            ( h / mipMapDivide ) / 4, ( w / mipMapDivide ) / 4
-         );
-         
-         discoveryMap.img.toFile( rawTexFile + ".img" );
-         discoveryMap.mapId = id;
-         discoveryMap.path = &texStr[0];
-         discoveryMap.mapOffsetX = mapOffsetX;
-         discoveryMap.mapOffsetY = mapOffsetY;
-         discoveryMap.mapScale = sizeFactor;
+            int mipMapDivide = 1;
+            int h = tex.header.uncompressedHeight;
+            int w = tex.header.uncompressedWidth;
+            DiscoveryMap discoveryMap;
+            discoveryMap.img = DecodeTexDXT1( tex, tex.header.mipMaps[0], h / mipMapDivide, w / mipMapDivide,
+               ( h / mipMapDivide ) / 4, ( w / mipMapDivide ) / 4
+            );
 
-         std::cout << "Image Height: " << discoveryMap.img.height << " Width: " << discoveryMap.img.width << "\n";
+            discoveryMap.img.toFile( rawTexFile + ".img" );
+            discoveryMap.mapId = id;
+            discoveryMap.path = &texStr[0];
+            discoveryMap.mapOffsetX = mapOffsetX;
+            discoveryMap.mapOffsetY = mapOffsetY;
+            discoveryMap.mapScale = sizeFactor;
 
-         discoveryMaps.emplace( territory, discoveryMap );
+            std::cout << "Image Height: " << discoveryMap.img.height << " Width: " << discoveryMap.img.width << "\n";
+
+            discoveryMaps.emplace( territory, discoveryMap );
+         }
+         catch( std::exception& e )
+         {
+            std::cout << "[Error] " << std::string( texStr ) << " " << e.what() << "\n";
+         }
       }
       return std::string( std::to_string( mapZoneIndex ) + ", " + std::to_string( hierarchy ) + ", " + "\"" + std::string( &texStr[0] ) + "\", " +
                            std::to_string( discoveryIdx ) + ", " + std::to_string( discoveryCompleteBitmask )  );
@@ -414,20 +363,25 @@ void writeEobjEntry( std::ofstream& out, LGB_ENTRY* pObj )
 
    // discovery shit
    vec2 pos;
-   auto subArea = -1;
+   auto subArea = -255;
    auto mapId = -1;
 
+   vec3 translation = pObj->header.translation;
+   vec3 distanceVec = pObj->header.scale;
+
    bool found = false;
+   float scale = 100.f; // pMapRange->header.unknown2
+   
    auto it = discoveryMaps.find( zoneId );
    if( it != discoveryMaps.end() )
    {
-      auto map = it->second;
-      pos = map.get2dPosFrom3d( pObj->header.translation.x, pObj->header.translation.z );
+      auto& map = it->second;
+      pos = map.get2dPosFrom3d( translation.x, translation.z, scale );
       mapId = map.mapId;
 
       //std::cout << "3d coords " << pObj->header.translation.x << " " << pObj->header.translation.z << "\n";
       //std::cout << "2d coords " << pos.x << " " << pos.y << "\n";
-      for( auto i = 0; i < map.tiles; ++i )
+      for( int i = 0; i < map.tiles; ++i )
       {
          auto colour = map.getColour( i, pos.x, pos.y );
 
@@ -437,70 +391,32 @@ void writeEobjEntry( std::ofstream& out, LGB_ENTRY* pObj )
 
          //std::cout << "R " << r << " G " << g << " B " << b << "\n";
 
-         if( ( found = ( r != 0 || g != 0 || b != 0 ) ) )
          {
-            if( r != 0 )
+            if( b > 0x40 )
+            {
+               subArea = i * 3 + 3;
+               break;
+            }
+            else if( g > 0x40 )
+            {
+               subArea = i * 3 + 2;
+               break;
+            }
+            else if( r > 0x40 )
             {
                // out of bounds
                if( i == 0 )
                   break;
                subArea = i * 3 + 1;
-            }
-            else if( g != 0 )
-            {
-               subArea = i * 3 + 2;
-            }
-            else if( b != 0 )
-            {
-               subArea = i * 3 + 3;
-            }
-            break;
-         }
-      }
-   }
-   subArea--;
-
-   if( subArea == -2 || mapId == -1 )
-   {
-      if( it != discoveryMaps.end() )
-      {
-         auto map = it->second;
-         pos = map.get2dPosFrom3d( pObj->header.translation.x, pObj->header.translation.z );
-         mapId = map.mapId;
-
-         //std::cout << "3d coords " << pObj->header.translation.x << " " << pObj->header.translation.z << "\n";
-         //std::cout << "2d coords " << pos.x << " " << pos.y << "\n";
-         for( auto i = 0; i < map.tiles; ++i )
-         {
-            auto colour = map.getColour( i, pos.x, pos.y );
-
-            auto r = ( colour >> 16 ) & 0xFF;
-            auto g = ( colour >> 8 ) & 0xFF;
-            auto b = ( colour >> 0 ) & 0xFF;
-
-            //std::cout << "R " << r << " G " << g << " B " << b << "\n";
-
-            if( ( found = ( r != 0 || g != 0 || b != 0 ) ) )
-            {
-               if( r != 0 )
-               {
-                  // out of bounds
-                  if( i == 0 )
-                     break;
-                  //subArea = i * 3 + 1;
-               }
-               else if( g != 0 )
-               {
-         //         subArea = i * 3 + 2;
-               }
-               else if( b != 0 )
-               {
-        //          subArea = i * 3 + 3;
-               }
                break;
             }
          }
       }
+   }
+   subArea--;
+   
+   if( subArea < -254 )
+   {
       std::cout << "\tUnable to find subarea for maprange " << std::to_string( id ) << "\n";
       return;
    }
@@ -538,11 +454,11 @@ int main( int argc, char* argv[] )
 
    std::vector< std::string > argVec( argv + 1, argv + argc );
    // todo: support expansions
-   std::string zoneName = "f1f1";
+   std::string zoneName = "s1d1";
 
    bool dumpAll = ignoreModels = std::remove_if( argVec.begin(), argVec.end(), []( auto arg ){ return arg == "--dump-all"; } ) != argVec.end();
    dumpAll = true;
-   ignoreModels = false;
+   ignoreModels = true;
    if( argc > 1 )
    {
       zoneName = argv[1];
@@ -560,7 +476,7 @@ int main( int argc, char* argv[] )
 
    if( dumpAll )
    {
-      zoneNameToPath( "f1t1" );
+      zoneNameToPath( "w1f3" );
 
       for( const auto& zone : zoneNameMap )
          zoneDumpList.emplace( zone.second );
@@ -665,100 +581,6 @@ LABEL_DUMP:
 
       {
          std::map< std::string, PCB_FILE > pcbFiles;
-         std::map< std::string, SGB_FILE > sgbFiles;
-         std::map< std::string, uint32_t > objCount;
-         auto loadPcbFile = [&]( const std::string& fileName ) -> bool
-         {
-            if( ignoreModels )
-               return false;
-            try
-            {
-               if( fileName.find( '.' ) == std::string::npos )
-                  return false;
-               else if( fileName.substr( fileName.find_last_of( '.' ) ) != ".pcb" )
-                  throw std::runtime_error( "Not a PCB file." );
-
-               char* dataSection = nullptr;
-               //std::cout << fileName << " ";
-#ifndef STANDALONE
-               auto file = data1->getFile( fileName );
-               auto sections = file->get_data_sections();
-               dataSection = &sections.at( 0 )[0];
-#else
-               std::vector< char > buf;
-               readFileToBuffer( fileName, buf );
-               dataSection = &buf[0];
-#endif
-               //std::cout << sections.size() << "\n";
-
-               uint32_t offset = 0;
-               PCB_FILE pcb_file;
-               memcpy( &pcb_file.header, &dataSection[0], sizeof( pcb_file.header ) );
-               offset += sizeof( pcb_file.header );
-               pcb_file.entries.resize( pcb_file.header.num_entries );
-               bool isgroup = true;
-               while( isgroup )
-               {
-                  PCB_BLOCK_ENTRY block_entry;
-                  memcpy( &block_entry.header, &dataSection[0] + offset, sizeof( block_entry.header ) );
-                  isgroup = block_entry.header.type == 0x30;
-
-                  //printf( "BLOCKHEADER_%X: type: %i, group_size: %i\n", offset, block_entry.header.type, block_entry.header.group_size );
-                  //
-                  if( isgroup )
-                  {
-                     parseBlockEntry( &dataSection[0] + offset + 0x30, pcb_file.entries, offset );
-                     offset += block_entry.header.group_size;
-                  }
-                  else
-                  {
-                     parseBlockEntry( &dataSection[0] + offset, pcb_file.entries, offset );
-                  }
-               }
-               pcbFiles.insert( std::make_pair( fileName, pcb_file ) );
-               return true;
-            }
-            catch( std::exception& e )
-            {
-               std::cout << "[Error] " << "Unable to load collision mesh " << fileName << "\n\tError:\n\t" << e.what() << "\n";
-               return false;
-            }
-         };
-
-         auto loadSgbFile = [&]( const std::string& fileName ) -> bool
-         {
-            SGB_FILE sgbFile;
-            try
-            {
-               char* dataSection = nullptr;
-               //std::cout << fileName << " ";
-#ifndef STANDALONE
-               auto file = data1->getFile( fileName );
-               auto sections = file->get_data_sections();
-               dataSection = &sections.at( 0 )[0];
-#else
-               std::vector< char > buf;
-               readFileToBuffer( fileName, buf );
-               dataSection = &buf[0];
-#endif
-               sgbFile = SGB_FILE( &dataSection[0] );
-               sgbFiles.insert( std::make_pair( fileName, sgbFile ) );
-               return true;
-            }
-            catch( std::exception& e )
-            {
-               std::cout << "[Error] " << "Unable to load SGB " << fileName << "\n\tError:\n\t" << e.what() << "\n";
-               sgbFiles.insert( std::make_pair( fileName, sgbFile ) );
-            }
-            return false;
-         };
-
-         {
-            for( const auto& fileName : stringList )
-            {
-               loadPcbFile( fileName );
-            }
-         }
 
          std::cout << "[Info] " << ( ignoreModels ? "Dumping MapRange and EObj" : "Writing obj file " ) << "\n";
          uint32_t totalGroups = 0;
@@ -772,15 +594,9 @@ LABEL_DUMP:
                totalGroups++;
                for( const auto& pEntry : group.entries )
                {
-                  auto pGimmick = dynamic_cast< LGB_GIMMICK_ENTRY* >( pEntry.get() );
-                  auto pBgParts = dynamic_cast< LGB_BGPARTS_ENTRY* >( pEntry.get() );
-
-                  std::string fileName( "" );
-                  fileName.resize( 256 );
-                  totalGroupEntries++;
-
                   if( pEntry->getType() == LgbEntryType::MapRange )
                   {
+                     totalGroupEntries++;
                      writeEobjEntry( eobjOut, pEntry.get() );
                   }
                }
@@ -800,10 +616,14 @@ LABEL_DUMP:
       std::cout << "[Info] " << "Usage: pcb_reader2 territory \"path/to/game/sqpack/ffxiv\" " << std::endl;
    }
    std::cout << "\n\n\n";
+   if( discoverySql.good() )
+      discoverySql.flush();
+
    LABEL_NEXT_ZONE_ENTRY:
    zoneDumpList.erase( zoneName );
    if( !zoneDumpList.empty() )
       goto LABEL_DUMP;
+
 
    std::cout << "\n\n\n[Success] Finished all tasks in " <<
       std::chrono::duration_cast< std::chrono::seconds >( std::chrono::system_clock::now() - startTime ).count() << " seconds\n";
