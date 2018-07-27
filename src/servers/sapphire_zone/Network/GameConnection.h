@@ -117,7 +117,7 @@ public:
    DECLARE_HANDLER( cfDutyAccepted );
 
 
-   DECLARE_HANDLER( skillHandler );
+   DECLARE_HANDLER( actionHandler );
 
    DECLARE_HANDLER( gm1Handler );
    DECLARE_HANDLER( gm2Handler );

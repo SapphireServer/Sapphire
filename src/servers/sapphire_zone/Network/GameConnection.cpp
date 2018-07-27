@@ -70,7 +70,7 @@ Core::Network::GameConnection::GameConnection( Core::Network::HivePtr pHive,
 
    setZoneHandler( ClientZoneIpcType::DiscoveryHandler,     "DiscoveryHandler",         &GameConnection::discoveryHandler );
 
-   setZoneHandler( ClientZoneIpcType::SkillHandler,         "SkillHandler",             &GameConnection::skillHandler );
+   setZoneHandler( ClientZoneIpcType::SkillHandler,         "ActionHandler",            &GameConnection::actionHandler );
 
    setZoneHandler( ClientZoneIpcType::GMCommand1,           "GMCommand1",               &GameConnection::gm1Handler );
    setZoneHandler( ClientZoneIpcType::GMCommand2,           "GMCommand2",               &GameConnection::gm2Handler );
