@@ -128,7 +128,7 @@ class ManFst003 : public EventScript
 
       if( QUEST_VAR_ATTUNE == 1 && QUEST_VAR_CLASS == 1 && QUEST_VAR_TRADE == 1 )
       {
-         player.updateQuest( questId, 255 );
+         player.updateQuest( questId, SeqFinish );
       }
    }
 
@@ -209,7 +209,7 @@ class ManFst003 : public EventScript
       player.playScene( getId(), 50, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            player.updateQuest( getId(), 1 );
+            player.updateQuest( getId(), Seq1 );
             player.setQuestUI8CH( getId(), 1 );
             player.forceZoneing( 132 );
          } );
