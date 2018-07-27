@@ -22,7 +22,7 @@ namespace Server {
 struct FFXIVIpcPing : FFXIVIpcBasePacket<Ping>
 {
    /* 0000 */ uint64_t timeInMilliseconds;
-   /* 0008 */ uint8_t unknown_8[0x17];
+   /* 0008 */ uint8_t unknown_8[0x38];
 };
 
 /**
