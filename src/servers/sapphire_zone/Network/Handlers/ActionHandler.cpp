@@ -36,8 +36,8 @@ using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 using namespace Core::Network::ActorControl;
 
-void Core::Network::GameConnection::skillHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                  Entity::Player& player )
+void Core::Network::GameConnection::actionHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                   Entity::Player& player )
 {
    const auto packet = ZoneChannelPacket< Client::FFXIVIpcSkillHandler >( inPacket );
 
