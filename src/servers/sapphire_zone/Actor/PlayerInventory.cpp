@@ -231,7 +231,7 @@ void Core::Entity::Player::addCurrency( CurrencyType type, uint32_t amount )
 
    uint32_t currentAmount = currItem->getStackSize();
    currItem->setStackSize( currentAmount + amount );
-   writeItem(currItem);
+   writeItem( currItem );
 
    updateContainer( Currency, slot, currItem );
 
@@ -255,7 +255,7 @@ void Core::Entity::Player::removeCurrency( Common::CurrencyType type, uint32_t a
       currItem->setStackSize( 0 );
    else
       currItem->setStackSize( currentAmount - amount );
-   writeItem(currItem);
+   writeItem( currItem );
 
    auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
                                                                      static_cast< uint8_t >( type ) - 1,
@@ -280,7 +280,7 @@ void Core::Entity::Player::addCrystal( Common::CrystalType type, uint32_t amount
 
    currItem->setStackSize( currentAmount + amount );
 
-   writeItem(currItem);
+   writeItem( currItem );
 
    writeInventory( Crystal );
 
@@ -307,7 +307,7 @@ void Core::Entity::Player::removeCrystal( Common::CrystalType type, uint32_t amo
    else
       currItem->setStackSize( currentAmount - amount );
 
-   writeItem(currItem);
+   writeItem( currItem );
 
    auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
                                                                      static_cast< uint8_t >( type ) - 1,
@@ -639,7 +639,7 @@ void Core::Entity::Player::splitItem( uint16_t fromInventoryId, uint8_t fromSlot
    updateContainer( fromInventoryId, fromSlotId, fromItem );
    updateContainer( toInventoryId, toSlot, newItem );
 
-   writeItem(fromItem);
+   writeItem( fromItem );
 }
 
 void Core::Entity::Player::mergeItem( uint16_t fromInventoryId, uint8_t fromSlotId,
@@ -666,12 +666,12 @@ void Core::Entity::Player::mergeItem( uint16_t fromInventoryId, uint8_t fromSlot
    else
    {
       fromItem->setStackSize( stackOverflow );
-      writeItem(fromItem);
+      writeItem( fromItem );
    }
 
 
    toItem->setStackSize( stackSize );
-   writeItem(toItem);
+   writeItem( toItem );
 
    updateContainer( fromInventoryId, fromSlotId, fromItem );
    updateContainer( toInventoryId, toSlot, toItem );
