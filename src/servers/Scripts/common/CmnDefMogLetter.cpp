@@ -9,12 +9,12 @@ public:
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
-      Scene00001( player );
+      Scene00000( player );
    }
 
-   void Scene00001( Entity::Player& player )
+   void Scene00000( Entity::Player& player )
    {
-      player.playScene( getId(), 1, 0,
+      player.playScene( getId(), 0, 0,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
          } );
