@@ -1,18 +1,16 @@
 #include <Actor/Player.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Script/ScriptMgr.h>
+#include <Common.h>
 
 #include "ActionMgr.h"
 #include "Action/Action.h"
 #include "Action/ActionCast.h"
+#include "Action/ActionMount.h"
 
 #include "Framework.h"
 
 extern Core::Framework g_fw;
-
-Core::Action::ActionMgr::ActionMgr()
-{
-}
 
 void Core::Action::ActionMgr::actionRouter( Core::Entity::Player& player, uint8_t type,
                                             uint32_t actionId, uint32_t useCount, uint64_t targetId )
@@ -33,8 +31,7 @@ void Core::Action::ActionMgr::actionRouter( Core::Entity::Player& player, uint8_
 
       case Common::SkillType::MountSkill:
       {
-
-
+         handleMount( player, actionId );
 
          break;
       }
@@ -48,14 +45,13 @@ void Core::Action::ActionMgr::actionRouter( Core::Entity::Player& player, uint8_
 void Core::Action::ActionMgr::handleAction( Core::Entity::Player& player, uint32_t actionId, uint32_t useCount, uint64_t targetId )
 {
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-   auto pAction = pExdData->get< Core::Data::Action >( actionId );
+   auto pActionData = pExdData->get< Core::Data::Action >( actionId );
 
-   if( !pAction )
+   if( !pActionData )
       return;
 
    // teleport
-   // todo: is there a better way of handling this?
-   // we construct the cast from the actorcontrol event, is there a better way to deal with this?
+   // todo: we construct the cast from the actorcontrol event, that's pretty shit
    if( actionId == 5 )
    {
       auto action = player.getCurrentAction();
@@ -75,22 +71,27 @@ void Core::Action::ActionMgr::handleAction( Core::Entity::Player& player, uint32
 
    if( !targetActor )
    {
-      player.sendDebug( "Invalid target. " );
+      player.sendDebug( "Invalid target." );
       return;
    }
 
    // todo: check target validity: can target self, party member, enemy, etc
    // todo: check cooldowns, can't cast if its on cooldown
+   // todo: restrict pvp actions to pvp areas and etc
 
    ActionPtr action;
 
-   if( pAction->cast100ms == 0 )
+   if( pActionData->cast100ms == 0 )
       action = make_Action( player.getAsPlayer(), targetActor->getAsChara(), actionId );
    else
+   {
       action = make_ActionCast( player.getAsPlayer(), targetActor->getAsChara(), actionId );
 
-   player.setCurrentAction( action );
-   action->start();
+      // only set the current action when there's a cast time, useless otherwise
+      player.setCurrentAction( action );
+   }
+
+   action->startAction();
 }
 
 void Core::Action::ActionMgr::handleCraftAction( Core::Entity::Player& player, uint32_t actionId, uint32_t useCount, uint64_t targetId )
@@ -104,5 +105,20 @@ void Core::Action::ActionMgr::handleCraftAction( Core::Entity::Player& player, u
 
 void Core::Action::ActionMgr::handleItemAction( Core::Entity::Player& player, uint32_t actionId, uint32_t useCount, uint64_t targetId )
 {
+////     auto info = pExdData->get< Core::Data::EventItem >( action );
+////     if( info )
+////     {
+////         pScriptMgr->onEventItem( player, action, info->quest, info->castTime, targetId );
+////     }
+}
 
+void Core::Action::ActionMgr::handleMount( Core::Entity::Player& player, uint32_t mountId )
+{
+   if( player.hasStateFlag( Common::PlayerStateFlag::Casting ) )
+      return;
+
+   auto action = make_ActionMount( player.getAsChara(), mountId );
+
+   player.setCurrentAction( action );
+   action->startAction();
 }

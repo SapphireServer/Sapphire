@@ -12,7 +12,7 @@ namespace Action {
    class ActionMgr
    {
    public:
-      ActionMgr();
+      ActionMgr() = default;
 
       /*!
        * @brief Handler for all incoming actions
@@ -30,6 +30,8 @@ namespace Action {
       void handleAction( Entity::Player& player, uint32_t actionId, uint32_t useCount, uint64_t targetId );
       void handleCraftAction( Entity::Player& player, uint32_t actionId, uint32_t useCount, uint64_t targetId );
       void handleItemAction( Entity::Player& player, uint32_t actionId, uint32_t useCount, uint64_t targetId );
+
+      void handleMount( Entity::Player& player, uint32_t mountId );
    };
 
 }

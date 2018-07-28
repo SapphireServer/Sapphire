@@ -311,7 +311,7 @@ bool Core::Scripting::ScriptMgr::onCastStart( Entity::Chara& caster, Entity::Cha
 
    if( script )
    {
-      script->onCastStart( caster, target );
+      script->onCastStart( caster, target, action );
       return true;
    }
 
@@ -324,7 +324,7 @@ bool Core::Scripting::ScriptMgr::onCastFinish( Entity::Chara& caster, Entity::Ch
 
    if( script )
    {
-      script->onCastFinish( caster, target );
+      script->onCastFinish( caster, target, action );
       return true;
    }
 
@@ -333,7 +333,15 @@ bool Core::Scripting::ScriptMgr::onCastFinish( Entity::Chara& caster, Entity::Ch
 
 bool Core::Scripting::ScriptMgr::onCastInterrupt( Entity::Chara& caster, Action::Action& action )
 {
+   auto script = m_nativeScriptMgr->getScript< ActionScript >( action.getId() );
 
+   if( script )
+   {
+      script->onInterrupt( caster, action );
+      return true;
+   }
+
+   return false;
 }
 
 bool Core::Scripting::ScriptMgr::onStatusReceive( Entity::CharaPtr pActor, uint32_t effectId )

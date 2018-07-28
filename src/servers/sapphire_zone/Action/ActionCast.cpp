@@ -41,12 +41,20 @@ Core::Action::ActionCast::ActionCast( Entity::CharaPtr pActor, Entity::CharaPtr 
    m_bInterrupt = false;
 }
 
+void Core::Action::ActionCast::setIdOverride( uint32_t param )
+{
+   m_idOverride = param;
+}
+
+uint32_t Core::Action::ActionCast::getIdOverride() const
+{
+   return m_idOverride;
+}
+
 void Core::Action::ActionCast::onStart()
 {
    if( !m_pSource )
       return;
-
-   Action::onStart();
 
    m_pSource->getAsPlayer()->sendDebug( "ActionCast::onStart()" );
    m_startTime = Util::getTimeMs();
@@ -62,6 +70,8 @@ void Core::Action::ActionCast::onStart()
 
    m_pSource->sendToInRangeSet( castPacket, true );
    m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::Casting );
+
+   Action::onStart();
 }
 
 void Core::Action::ActionCast::onFinish()
@@ -69,24 +79,22 @@ void Core::Action::ActionCast::onFinish()
    if( !m_pSource )
       return;
 
-   Action::onFinish();
-
    auto pPlayer = m_pSource->getAsPlayer();
-   pPlayer->sendDebug( "onFinish()" );
+   pPlayer->sendDebug( "ActionCast::onFinish()" );
 
    pPlayer->unsetStateFlag( PlayerStateFlag::Casting );
 
    /*auto control = ActorControlPacket143( m_pTarget->getId(), ActorControlType::Unk7,
                                            0x219, m_id, m_id, m_id, m_id );
    m_pSource->sendToInRangeSet( control, true );*/
+
+   Action::onFinish();
 }
 
 void Core::Action::ActionCast::onInterrupt()
 {
    if( !m_pSource )
       return;
-
-   Action::onInterrupt();
 
    //m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied1 );
    m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Casting );
@@ -99,4 +107,6 @@ void Core::Action::ActionCast::onInterrupt()
 
    m_pSource->sendToInRangeSet( control, true );
 
+
+   Action::onInterrupt();
 }

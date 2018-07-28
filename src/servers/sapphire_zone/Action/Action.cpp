@@ -1,12 +1,23 @@
 #include "Action.h"
 
 #include <Util/Util.h>
+#include <Util/UtilMath.h>
 #include <Script/ScriptMgr.h>
+
+#include <Actor/Chara.h>
+#include <Actor/Player.h>
+
+#include <Exd/ExdDataGenerated.h>
+
+#include <Network/CommonNetwork.h>
+#include <Network/CommonActorControl.h>
+#include <Network/PacketWrappers/ActorControlPacket143.h>
 
 #include "Framework.h"
 
 extern Core::Framework g_fw;
 
+using namespace Core::Network::Packets;
 
 Core::Action::Action::Action( Entity::CharaPtr caster, Entity::CharaPtr target, uint32_t actionId ) :
    m_pSource( caster ),
@@ -14,6 +25,13 @@ Core::Action::Action::Action( Entity::CharaPtr caster, Entity::CharaPtr target, 
    m_id( actionId ),
    m_castTime( 0 )
 {
+   auto pExdData = g_fw.get< Core::Data::ExdDataGenerated >();
+   if( !pExdData )
+      return;
+
+   auto action = pExdData->get< Core::Data::Action >( actionId );
+
+   m_cooldown = static_cast< uint16_t >( action->recast100ms * 10 );
 }
 
 uint32_t Core::Action::Action::getId() const
@@ -66,11 +84,25 @@ Core::Entity::CharaPtr Core::Action::Action::getActionSource() const
    return m_pSource;
 }
 
-void Core::Action::Action::start()
+uint16_t Core::Action::Action::getCooldown() const
+{
+   return m_cooldown;
+}
+
+void Core::Action::Action::setCooldown( uint16_t cooldown )
+{
+   m_cooldown = cooldown;
+}
+
+void Core::Action::Action::startAction()
 {
    m_startTime = Util::getTimeMs();
 
    onStart();
+
+   // instantly fire the onFinish event when there's no cast time
+   if( m_castTime == 0 )
+      onFinish();
 }
 
 bool Core::Action::Action::update()
@@ -101,26 +133,36 @@ bool Core::Action::Action::update()
 void Core::Action::Action::onFinish()
 {
    auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
-   if( pScriptMgr )
+   if( !pScriptMgr )
+      return;
+
+   auto sourcePlayer = m_pSource->getAsPlayer();
+   if( sourcePlayer )
    {
-      pScriptMgr->onCastFinish( *m_pSource, *m_pTarget, *this );
+      // set cooldown on client
+      sourcePlayer->queuePacket( boost::make_shared< Server::ActorControlPacket143 >(
+                                 getId(), Network::ActorControl::ActionStart, 1, m_id, m_cooldown ) );
    }
+
+   // todo: handling aoes? we need to send effects relevant to hit entities
+
+   pScriptMgr->onCastFinish( *m_pSource, *m_pTarget, *this );
 }
 
 void Core::Action::Action::onInterrupt()
 {
    auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
-   if( pScriptMgr )
-   {
-      pScriptMgr->onCastInterrupt( *m_pSource, *this );
-   }
+   if( !pScriptMgr )
+      return;
+
+   pScriptMgr->onCastInterrupt( *m_pSource, *this );
 }
 
 void Core::Action::Action::onStart()
 {
    auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
    if( pScriptMgr )
-   {
-      pScriptMgr->onCastStart( *m_pSource, *m_pTarget, *this );
-   }
+      return;
+
+   pScriptMgr->onCastStart( *m_pSource, *m_pTarget, *this );
 }
