@@ -152,7 +152,7 @@ void Core::Action::Action::onInterrupt()
    {
       // set cooldown on client
       sourcePlayer->queuePacket( boost::make_shared< Server::ActorControlPacket143 >(
-         getId(), Network::ActorControl::SetActionCooldown, 1, m_id, 0 ) );
+         m_pSource->getId(), Network::ActorControl::SetActionCooldown, 1, m_id, 0 ) );
    }
 
    pScriptMgr->onCastInterrupt( *m_pSource, *this );
@@ -169,7 +169,7 @@ void Core::Action::Action::onStart()
    {
       // set cooldown on client
       sourcePlayer->queuePacket( boost::make_shared< Server::ActorControlPacket143 >(
-         getId(), Network::ActorControl::SetActionCooldown, 1, m_id, m_cooldown ) );
+         m_pSource->getId(), Network::ActorControl::SetActionCooldown, 1, m_id, m_cooldown ) );
    }
 
    pScriptMgr->onCastStart( *m_pSource, *m_pTarget, *this );
