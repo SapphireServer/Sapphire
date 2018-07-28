@@ -8,8 +8,9 @@ public:
    ActionReturn6() : ActionScript( 6 )
    {}
 
-   void onCastFinish( Core::Entity::Player& player, Core::Entity::Chara& targetActor ) override
+   void onCastFinish( Entity::Chara& caster, Entity::Chara& targetActor ) override
    {
-      player.returnToHomepoint();
+      if( auto player = caster.getAsPlayer() )
+         player->returnToHomepoint();
    }
 };

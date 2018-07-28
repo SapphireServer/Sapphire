@@ -20,6 +20,7 @@
 
 #include "DebugCommand/DebugCommandHandler.h"
 
+#include "Action/ActionMgr.h"
 #include "Action/Action.h"
 #include "Action/ActionCast.h"
 #include "Action/ActionMount.h"
@@ -51,88 +52,94 @@ void Core::Network::GameConnection::actionHandler( const Packets::FFXIVARR_PACKE
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
    auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
 
-   switch( type )
+   std::string actionIdStr = boost::str( boost::format( "%|04X|" ) % action );
+   player.sendDebug( "---------------------------------------" );
+   player.sendDebug( "ActionHandler ( " + actionIdStr + " | " +
+                     pExdData->get< Core::Data::Action >( action )->name +
+                     " | " + std::to_string( targetId ) + " )" );
+
+   auto pActionMgr = g_fw.get< Action::ActionMgr >();
+   if( pActionMgr )
    {
-   case Common::SkillType::Normal:
-
-   if( action < 1000000 ) // normal action
-   {
-      std::string actionIdStr = boost::str( boost::format( "%|04X|" ) % action );
-      player.sendDebug( "---------------------------------------" );
-      player.sendDebug( "ActionHandler ( " + actionIdStr + " | " +
-                        pExdData->get< Core::Data::Action >( action )->name +
-                        " | " + std::to_string( targetId ) + " )" );
-
-      player.queuePacket( boost::make_shared< ActorControlPacket142 >( player.getId(), ActorControlType::ActionStart, 0x01, action ) );
-
-      if( action == 5 )
-      {
-         auto currentAction = player.getCurrentAction();
-
-         // we should always have an action here, if not there is a bug
-         assert( currentAction );
-         currentAction->onStart();
-      }
-      else
-      {
-         Core::Entity::ActorPtr targetActor = player.getAsPlayer();
-
-         if( targetId != player.getId() )
-         {
-             targetActor = player.lookupTargetById( targetId );
-         }
-
-         // Check if we actually have an actor
-         if( !targetActor )
-         {
-            // todo: interrupt a cast.
-            player.sendDebug( "Invalid target." );
-            return;
-         }
-
-         if( !player.actionHasCastTime( action ) )
-         {
-            pScriptMgr->onCastFinish( player, targetActor->getAsChara(), action );
-         }
-         else
-         {
-            auto pActionCast = Action::make_ActionCast( player.getAsPlayer(), targetActor->getAsChara(), action );
-            player.setCurrentAction( pActionCast );
-            player.sendDebug( "setCurrentAction()" );
-            player.getCurrentAction()->onStart();
-         }
-      }
-   }
-   else if( action < 2000000 ) // craft action
-   {
-
-   }
-   else if( action < 3000000 ) // item action
-   {
-     auto info = pExdData->get< Core::Data::EventItem >( action );
-     if( info )
-     {
-         pScriptMgr->onEventItem( player, action, info->quest, info->castTime, targetId );
-     }
-   }
-   else if( action > 3000000 ) // unknown
-   {
-
+      pActionMgr->actionRouter( player, type, action, useCount, targetId );
    }
 
-   break;
-
-   case Common::SkillType::MountSkill:
-
-   player.sendDebug( "Request mount " + std::to_string( action ) );
-
-   auto pActionMount = Action::make_ActionMount( player.getAsPlayer(), action );
-   player.setCurrentAction( pActionMount );
-   player.sendDebug( "setCurrentAction()" );
-   player.getCurrentAction()->onStart();
-
-   break;
-
-   }
+////   switch( type )
+////   {
+////   case Common::SkillType::Normal:
+////
+////   if( action < 1000000 ) // normal action
+////   {
+////      player.queuePacket( boost::make_shared< ActorControlPacket142 >( player.getId(), ActorControlType::ActionStart, 0x01, action ) );
+////
+////      if( action == 5 )
+////      {
+////         auto currentAction = player.getCurrentAction();
+////
+////         // we should always have an action here, if not there is a bug
+////         assert( currentAction );
+////         currentAction->onStart();
+////      }
+////      else
+////      {
+////         Core::Entity::ActorPtr targetActor = player.getAsPlayer();
+////
+////         if( targetId != player.getId() )
+////         {
+////             targetActor = player.lookupTargetById( targetId );
+////         }
+////
+////         // Check if we actually have an actor
+////         if( !targetActor )
+////         {
+////            // todo: interrupt a cast.
+////            player.sendDebug( "Invalid target." );
+////            return;
+////         }
+////
+//////         if( !player.actionHasCastTime( action ) )
+//////         {
+//////            pScriptMgr->onCastFinish( player, targetActor->getAsChara(), action );
+//////         }
+//////         else
+//////         {
+//////            auto pActionCast = Action::make_ActionCast( player.getAsPlayer(), targetActor->getAsChara(), action );
+//////            player.setCurrentAction( pActionCast );
+//////            player.sendDebug( "setCurrentAction()" );
+//////            player.getCurrentAction()->onCastStart();
+//////         }
+////      }
+////   }
+////   else if( action < 2000000 ) // craft action
+////   {
+////
+////   }
+////   else if( action < 3000000 ) // item action
+////   {
+////     auto info = pExdData->get< Core::Data::EventItem >( action );
+////     if( info )
+////     {
+////         pScriptMgr->onEventItem( player, action, info->quest, info->castTime, targetId );
+////     }
+////   }
+////   else if( action > 3000000 ) // unknown
+////   {
+////
+////   }
+////
+////   break;
+////
+////   case Common::SkillType::MountSkill:
+////
+////   player.sendDebug( "Request mount " + std::to_string( action ) );
+////
+////   auto pActionMount = Action::make_ActionMount( player.getAsPlayer(), action );
+////   player.setCurrentAction( pActionMount );
+////   player.sendDebug( "setCurrentAction()" );
+////   player.getCurrentAction()->onStart();
+////
+////   break;
+//
+//   }
 
 }

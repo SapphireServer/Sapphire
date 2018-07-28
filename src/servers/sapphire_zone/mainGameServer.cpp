@@ -11,6 +11,7 @@
 #include "Linkshell/LinkshellMgr.h"
 #include "Zone/TerritoryMgr.h"
 #include "DebugCommand/DebugCommandHandler.h"
+#include "Action/ActionMgr.h"
 
 #include <Config/ConfigMgr.h>
 
@@ -29,6 +30,7 @@ bool setupFramework()
    auto pTeriMgr = boost::make_shared< TerritoryMgr >();
    auto pDebugCom = boost::make_shared< DebugCommandHandler >();
    auto pConfig = boost::make_shared< ConfigMgr >();
+   auto pActionMgr = boost::make_shared< Action::ActionMgr >();
 
    pLogger->setLogPath( "log/SapphireZone_" );
    pLogger->init();
@@ -42,6 +44,7 @@ bool setupFramework()
    g_fw.set< TerritoryMgr >( pTeriMgr );
    g_fw.set< DebugCommandHandler >( pDebugCom );
    g_fw.set< ConfigMgr >( pConfig );
+   g_fw.set< Action::ActionMgr >( pActionMgr );
 
    // actuall catch errors here...
    return true;

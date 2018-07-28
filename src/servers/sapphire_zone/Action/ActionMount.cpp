@@ -48,7 +48,7 @@ void Core::Action::ActionMount::onStart()
    if( !m_pSource )
       return;
 
-   m_pSource->getAsPlayer()->sendDebug( "ActionMount::onStart()" );
+   m_pSource->getAsPlayer()->sendDebug( "ActionMount::onCastStart()" );
    m_startTime = Util::getTimeMs();
 
    auto castPacket = makeZonePacket< FFXIVIpcActorCast >( getId() );

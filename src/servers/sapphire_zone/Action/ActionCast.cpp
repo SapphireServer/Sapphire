@@ -29,7 +29,7 @@ Core::Action::ActionCast::ActionCast()
    m_handleActionType = Common::HandleActionType::Event;
 }
 
-Core::Action::ActionCast::ActionCast( Entity::CharaPtr pActor, Entity::CharaPtr pTarget, uint16_t actionId )
+Core::Action::ActionCast::ActionCast( Entity::CharaPtr pActor, Entity::CharaPtr pTarget, uint32_t actionId )
 {
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
    m_startTime = 0;
@@ -41,14 +41,14 @@ Core::Action::ActionCast::ActionCast( Entity::CharaPtr pActor, Entity::CharaPtr 
    m_bInterrupt = false;
 }
 
-Core::Action::ActionCast::~ActionCast() = default;
-
 void Core::Action::ActionCast::onStart()
 {
    if( !m_pSource )
       return;
 
-   m_pSource->getAsPlayer()->sendDebug( "onStart()" );
+   Action::onStart();
+
+   m_pSource->getAsPlayer()->sendDebug( "ActionCast::onStart()" );
    m_startTime = Util::getTimeMs();
 
    auto castPacket = makeZonePacket< FFXIVIpcActorCast >( getId() );
@@ -62,7 +62,6 @@ void Core::Action::ActionCast::onStart()
 
    m_pSource->sendToInRangeSet( castPacket, true );
    m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::Casting );
-
 }
 
 void Core::Action::ActionCast::onFinish()
@@ -70,7 +69,7 @@ void Core::Action::ActionCast::onFinish()
    if( !m_pSource )
       return;
 
-   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
+   Action::onFinish();
 
    auto pPlayer = m_pSource->getAsPlayer();
    pPlayer->sendDebug( "onFinish()" );
@@ -80,14 +79,14 @@ void Core::Action::ActionCast::onFinish()
    /*auto control = ActorControlPacket143( m_pTarget->getId(), ActorControlType::Unk7,
                                            0x219, m_id, m_id, m_id, m_id );
    m_pSource->sendToInRangeSet( control, true );*/
-
-   pScriptMgr->onCastFinish( *pPlayer, m_pTarget, m_id );
 }
 
 void Core::Action::ActionCast::onInterrupt()
 {
    if( !m_pSource )
       return;
+
+   Action::onInterrupt();
 
    //m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied1 );
    m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Casting );

@@ -1,18 +1,22 @@
 #include "Action.h"
 
 #include <Util/Util.h>
+#include <Script/ScriptMgr.h>
+
+#include "Framework.h"
+
+extern Core::Framework g_fw;
 
 
-Core::Action::Action::Action()
+Core::Action::Action::Action( Entity::CharaPtr caster, Entity::CharaPtr target, uint32_t actionId ) :
+   m_pSource( caster ),
+   m_pTarget( target ),
+   m_id( actionId ),
+   m_castTime( 0 )
 {
 }
 
-Core::Action::Action::~Action()
-{
-
-}
-
-uint16_t Core::Action::Action::getId() const
+uint32_t Core::Action::Action::getId() const
 {
    return m_id;
 }
@@ -62,6 +66,13 @@ Core::Entity::CharaPtr Core::Action::Action::getActionSource() const
    return m_pSource;
 }
 
+void Core::Action::Action::start()
+{
+   m_startTime = Util::getTimeMs();
+
+   onStart();
+}
+
 bool Core::Action::Action::update()
 {
    // action has not been started yet
@@ -71,15 +82,45 @@ bool Core::Action::Action::update()
    if( m_bInterrupt )
    {
       onInterrupt();
+
       return true;
    }
 
    uint64_t currTime = Util::getTimeMs();
 
-   if( ( currTime - m_startTime ) > m_castTime )
+   if( std::difftime( currTime, m_startTime ) > m_castTime )
    {
       onFinish();
+
       return true;
    }
+
    return false;
+}
+
+void Core::Action::Action::onFinish()
+{
+   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
+   if( pScriptMgr )
+   {
+      pScriptMgr->onCastFinish( *m_pSource, *m_pTarget, *this );
+   }
+}
+
+void Core::Action::Action::onInterrupt()
+{
+   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
+   if( pScriptMgr )
+   {
+      pScriptMgr->onCastInterrupt( *m_pSource, *this );
+   }
+}
+
+void Core::Action::Action::onStart()
+{
+   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
+   if( pScriptMgr )
+   {
+      pScriptMgr->onCastStart( *m_pSource, *m_pTarget, *this );
+   }
 }

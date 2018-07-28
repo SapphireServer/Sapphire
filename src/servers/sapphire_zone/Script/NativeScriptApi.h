@@ -140,9 +140,9 @@ public:
       ScriptObject( abilityId, typeid( ActionScript ).hash_code() )
    { }
 
-   virtual void onStart( Entity::Chara& sourceActor, Entity::Chara& targetActor ) { }
-   virtual void onCastFinish( Entity::Player& player, Entity::Chara& targetActor ) { }
-   virtual void onInterrupt( Entity::Chara& sourceActor/*, Core::Entity::Chara targetActor*/ ) { }
+   virtual void onCastStart( Entity::Chara& caster, Entity::Chara& targetActor ) { }
+   virtual void onCastFinish( Entity::Chara& caster, Entity::Chara& targetActor ) { }
+   virtual void onInterrupt( Entity::Chara& caster ) { }
 };
 
 

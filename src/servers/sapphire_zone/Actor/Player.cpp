@@ -857,7 +857,7 @@ void Core::Entity::Player::despawn( Entity::PlayerPtr pTarget )
 Core::Entity::ActorPtr Core::Entity::Player::lookupTargetById( uint64_t targetId )
 {
    ActorPtr targetActor;
-   auto inRange = getInRangeActors(true);
+   auto inRange = getInRangeActors( true );
    for( auto actor : inRange )
    {
       if( actor->getId() == targetId )
@@ -908,17 +908,6 @@ void Core::Entity::Player::setGcRankAt( uint8_t index, uint8_t rank )
 const uint8_t* Core::Entity::Player::getStateFlags() const
 {
    return m_stateFlags;
-}
-
-bool Core::Entity::Player::actionHasCastTime( uint32_t actionId ) //TODO: Add logic for special cases
-{
-   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-   auto actionInfoPtr = pExdData->get< Core::Data::Action >( actionId );
-   if( actionInfoPtr->preservesCombo )
-      return false;
-
-   return actionInfoPtr->cast100ms != 0;
-
 }
 
 bool Core::Entity::Player::hasStateFlag( Common::PlayerStateFlag flag ) const

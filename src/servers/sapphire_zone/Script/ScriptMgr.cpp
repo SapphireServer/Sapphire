@@ -18,6 +18,8 @@
 #include "Event/EventHelper.h"
 
 #include "StatusEffect/StatusEffect.h"
+#include "Action/Action.h"
+
 
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 
@@ -303,13 +305,35 @@ bool Core::Scripting::ScriptMgr::onMobKill( Entity::Player& player, uint16_t nam
    return true;
 }
 
-bool Core::Scripting::ScriptMgr::onCastFinish( Entity::Player& player, Entity::CharaPtr pTarget, uint32_t actionId )
+bool Core::Scripting::ScriptMgr::onCastStart( Entity::Chara& caster, Entity::Chara& target, Action::Action& action )
 {
-   auto script = m_nativeScriptMgr->getScript< ActionScript >( actionId );
+   auto script = m_nativeScriptMgr->getScript< ActionScript >( action.getId() );
 
    if( script )
-      script->onCastFinish( player, *pTarget );
-   return true;
+   {
+      script->onCastStart( caster, target );
+      return true;
+   }
+
+   return false;
+}
+
+bool Core::Scripting::ScriptMgr::onCastFinish( Entity::Chara& caster, Entity::Chara& target, Action::Action& action )
+{
+   auto script = m_nativeScriptMgr->getScript< ActionScript >( action.getId() );
+
+   if( script )
+   {
+      script->onCastFinish( caster, target );
+      return true;
+   }
+
+   return false;
+}
+
+bool Core::Scripting::ScriptMgr::onCastInterrupt( Entity::Chara& caster, Action::Action& action )
+{
+
 }
 
 bool Core::Scripting::ScriptMgr::onStatusReceive( Entity::CharaPtr pActor, uint32_t effectId )

@@ -11,10 +11,12 @@ namespace Action {
    {
 
    public:
-      Action();
-      virtual ~Action();
+      virtual ~Action() = default;
 
-      uint16_t getId() const;
+      Action() = default;
+      Action( Entity::CharaPtr caster, Entity::CharaPtr target, uint32_t actionId );
+
+      uint32_t getId() const;
 
       Common::HandleActionType getHandleActionType() const;
 
@@ -34,15 +36,17 @@ namespace Action {
 
       Entity::CharaPtr getActionSource() const;
 
-      virtual void onStart() {};
-      virtual void onFinish() {};
-      virtual void onInterrupt() {};
+      void start();
+
+      virtual void onStart();
+      virtual void onFinish();
+      virtual void onInterrupt();
 
       // update action, if returns true, action is done and has to be removed from the actor
       virtual bool update();
 
    protected:
-      uint16_t	m_id;
+      uint32_t	m_id;
       Common::HandleActionType m_handleActionType;
 
       uint64_t	m_startTime;

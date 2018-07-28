@@ -538,8 +538,6 @@ public:
 
    void sendHateList();
 
-   bool actionHasCastTime( uint32_t actionId );
-
    Core::Entity::ActorPtr lookupTargetById( uint64_t targetId );
 
    bool isLogin() const;
