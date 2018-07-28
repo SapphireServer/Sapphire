@@ -47,12 +47,12 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
 
    const auto packet = ZoneChannelPacket< Client::FFXIVIpcClientTrigger >( inPacket );
 
-   const auto& commandId = packet.data().commandId;
-   const auto& param1 = *reinterpret_cast< const uint64_t* >( &packet.data().param11 );
-   const auto& param11 = packet.data().param11;
-   const auto& param12 = packet.data().param12;
-   const auto& param2 = packet.data().param2;
-   const auto& param3 = packet.data().param3;
+   const auto commandId = packet.data().commandId;
+   const auto param1 = *reinterpret_cast< const uint64_t* >( &packet.data().param11 );
+   const auto param11 = packet.data().param11;
+   const auto param12 = packet.data().param12;
+   const auto param2 = packet.data().param2;
+   const auto param3 = packet.data().param3;
 
    pLog->debug( "[" + std::to_string( m_pSession->getId() ) + "] Incoming action: " +
               boost::str( boost::format( "%|04X|" ) % ( uint32_t ) ( commandId & 0xFFFF ) ) +

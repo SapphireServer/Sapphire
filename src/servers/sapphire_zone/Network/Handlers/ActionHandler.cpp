@@ -41,10 +41,10 @@ void Core::Network::GameConnection::actionHandler( const Packets::FFXIVARR_PACKE
 {
    const auto packet = ZoneChannelPacket< Client::FFXIVIpcSkillHandler >( inPacket );
 
-   const auto& type = packet.data().type;
-   const auto& action = packet.data().actionId;
-   const auto& useCount = packet.data().useCount;
-   const auto& targetId = packet.data().targetId;
+   const auto type = packet.data().type;
+   const auto action = packet.data().actionId;
+   const auto useCount = packet.data().useCount;
+   const auto targetId = packet.data().targetId;
 
    player.sendDebug( "Skill type:" + std::to_string( type ) );
 
