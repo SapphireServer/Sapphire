@@ -31,9 +31,9 @@
 #include "Script/ScriptMgr.h"
 
 #include "Action/Action.h"
-#include "Action/ActionTeleport.h"
-#include "Action/EventAction.h"
-#include "Action/EventItemAction.h"
+#include "Action/Handlers/ActionTeleport.h"
+#include "Action/Handlers/EventAction.h"
+#include "Action/Handlers/EventItemAction.h"
 
 #include "Math/CalcStats.h"
 #include "Math/CalcBattle.h"

@@ -6,7 +6,7 @@
 #include "ActionMgr.h"
 #include "Action/Action.h"
 #include "Action/ActionCast.h"
-#include "Action/ActionMount.h"
+#include "sapphire_zone/Action/Handlers/ActionMount.h"
 
 #include "Framework.h"
 
@@ -45,9 +45,9 @@ void Core::Action::ActionMgr::actionRouter( Core::Entity::Player& player, uint8_
 void Core::Action::ActionMgr::handleAction( Core::Entity::Player& player, uint32_t actionId, uint32_t useCount, uint64_t targetId )
 {
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-   auto pActionData = pExdData->get< Core::Data::Action >( actionId );
+   auto pActionRow = pExdData->get< Core::Data::Action >( actionId );
 
-   if( !pActionData )
+   if( !pActionRow )
       return;
 
    // teleport
@@ -61,6 +61,20 @@ void Core::Action::ActionMgr::handleAction( Core::Entity::Player& player, uint32
 
       return;
    }
+
+   // not castable by a player, ever
+   if( pActionRow->classJob == -1 )
+      return;
+
+   auto pClassJobRow = pExdData->get< Core::Data::ClassJob >( pActionRow->classJob );
+
+   auto classJob = static_cast< int8_t >( player.getClass() );
+
+   // check if can be casted by current job/class
+   if( classJob != pActionRow->classJob &&
+       classJob != pClassJobRow->classJobParent &&
+      static_cast< uint8_t >( Common::ClassJob::Adventurer ) != pActionRow->classJob )
+      return;
 
    // check target
    Core::Entity::ActorPtr targetActor = player.getAsPlayer();
@@ -81,7 +95,7 @@ void Core::Action::ActionMgr::handleAction( Core::Entity::Player& player, uint32
 
    ActionPtr action;
 
-   if( pActionData->cast100ms == 0 )
+   if( pActionRow->cast100ms == 0 )
       action = make_Action( player.getAsPlayer(), targetActor->getAsChara(), actionId );
    else
    {
@@ -105,11 +119,14 @@ void Core::Action::ActionMgr::handleCraftAction( Core::Entity::Player& player, u
 
 void Core::Action::ActionMgr::handleItemAction( Core::Entity::Player& player, uint32_t actionId, uint32_t useCount, uint64_t targetId )
 {
-////     auto info = pExdData->get< Core::Data::EventItem >( action );
-////     if( info )
-////     {
-////         pScriptMgr->onEventItem( player, action, info->quest, info->castTime, targetId );
-////     }
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
+
+   auto info = pExdData->get< Core::Data::EventItem >( actionId );
+   if( info )
+   {
+       pScriptMgr->onEventItem( player, actionId, info->quest, info->castTime, targetId );
+   }
 }
 
 void Core::Action::ActionMgr::handleMount( Core::Entity::Player& player, uint32_t mountId )

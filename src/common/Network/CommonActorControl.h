@@ -37,7 +37,7 @@ namespace Core {
             DeathAnimation = 0x0E,
             CastInterrupt = 0x0F,
 
-            ActionStart = 0x11,
+            SetActionCooldown = 0x11,
 
             StatusEffectGain = 0x14,
             StatusEffectLose = 0x15,

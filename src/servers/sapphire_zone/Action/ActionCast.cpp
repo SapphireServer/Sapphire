@@ -41,16 +41,6 @@ Core::Action::ActionCast::ActionCast( Entity::CharaPtr pActor, Entity::CharaPtr 
    m_bInterrupt = false;
 }
 
-void Core::Action::ActionCast::setIdOverride( uint32_t param )
-{
-   m_idOverride = param;
-}
-
-uint32_t Core::Action::ActionCast::getIdOverride() const
-{
-   return m_idOverride;
-}
-
 void Core::Action::ActionCast::onStart()
 {
    if( !m_pSource )

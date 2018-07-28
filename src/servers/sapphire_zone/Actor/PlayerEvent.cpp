@@ -12,8 +12,8 @@
 #include "Network/PacketWrappers/EventFinishPacket.h"
 #include "Network/PacketWrappers/DirectorPlayScenePacket.h"
 
-#include "Action/EventAction.h"
-#include "Action/EventItemAction.h"
+#include "sapphire_zone/Action/Handlers/EventAction.h"
+#include "sapphire_zone/Action/Handlers/EventItemAction.h"
 
 #include "Zone/Zone.h"
 #include "ServerZone.h"

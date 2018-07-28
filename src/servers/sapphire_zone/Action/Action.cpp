@@ -136,14 +136,6 @@ void Core::Action::Action::onFinish()
    if( !pScriptMgr )
       return;
 
-   auto sourcePlayer = m_pSource->getAsPlayer();
-   if( sourcePlayer )
-   {
-      // set cooldown on client
-      sourcePlayer->queuePacket( boost::make_shared< Server::ActorControlPacket143 >(
-                                 getId(), Network::ActorControl::ActionStart, 1, m_id, m_cooldown ) );
-   }
-
    // todo: handling aoes? we need to send effects relevant to hit entities
 
    pScriptMgr->onCastFinish( *m_pSource, *m_pTarget, *this );
@@ -155,6 +147,14 @@ void Core::Action::Action::onInterrupt()
    if( !pScriptMgr )
       return;
 
+   auto sourcePlayer = m_pSource->getAsPlayer();
+   if( sourcePlayer )
+   {
+      // set cooldown on client
+      sourcePlayer->queuePacket( boost::make_shared< Server::ActorControlPacket143 >(
+         getId(), Network::ActorControl::SetActionCooldown, 1, m_id, 0 ) );
+   }
+
    pScriptMgr->onCastInterrupt( *m_pSource, *this );
 }
 
@@ -163,6 +163,14 @@ void Core::Action::Action::onStart()
    auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
    if( pScriptMgr )
       return;
+
+   auto sourcePlayer = m_pSource->getAsPlayer();
+   if( sourcePlayer )
+   {
+      // set cooldown on client
+      sourcePlayer->queuePacket( boost::make_shared< Server::ActorControlPacket143 >(
+         getId(), Network::ActorControl::SetActionCooldown, 1, m_id, m_cooldown ) );
+   }
 
    pScriptMgr->onCastStart( *m_pSource, *m_pTarget, *this );
 }
