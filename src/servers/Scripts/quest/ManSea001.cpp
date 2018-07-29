@@ -49,7 +49,7 @@ private:
 
    void Scene00002( Entity::Player& player )
    {
-      player.updateQuest( getId(), 1 );
+      player.updateQuest( getId(), SEQ_1 );
       player.playSceneChain( getId(), 2, NONE, bindScene( &ManSea001::Scene00003 ) );
    }
 
