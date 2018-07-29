@@ -95,7 +95,7 @@ private:
       auto QUEST_VAR_CLASS = player.getQuestUI8BH( questId );
       auto QUEST_VAR_TRADE = player.getQuestUI8BL( questId );
 
-      if ( QUEST_VAR_ATTUNE == 1 && QUEST_VAR_CLASS == 1 && QUEST_VAR_TRADE == 1 )
+      if( QUEST_VAR_ATTUNE == 1 && QUEST_VAR_CLASS == 1 && QUEST_VAR_TRADE == 1 )
       {
          player.updateQuest( questId, SEQ_FINISH );
       }
@@ -106,9 +106,9 @@ private:
       player.playScene( getId(), 0, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            if (result.param2 == 1)
+            if( result.param2 == 1 )
             {
-               Scene00001(player);
+               Scene00001( player );
             }
          } );
    }
@@ -181,9 +181,9 @@ private:
       player.playScene( getId(), 7, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ, 0, 0,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            if ( result.param2 == 1 )
+            if( result.param2 == 1 )
             {
-               if (player.giveQuestRewards( getId(), 0 ) )
+               if( player.giveQuestRewards( getId(), 0 ) )
                {
                   player.finishQuest( getId() );
                }
