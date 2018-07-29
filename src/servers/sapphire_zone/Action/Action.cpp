@@ -11,6 +11,7 @@
 
 #include <Network/CommonNetwork.h>
 #include <Network/CommonActorControl.h>
+#include <Network/PacketWrappers/ActorControlPacket142.h>
 #include <Network/PacketWrappers/ActorControlPacket143.h>
 #include <sapphire_zone/Network/PacketWrappers/EffectPacket.h>
 
@@ -18,13 +19,16 @@
 
 extern Core::Framework g_fw;
 
+using namespace Core::Common;
+using namespace Core::Network;
 using namespace Core::Network::Packets;
+using namespace Core::Network::ActorControl;
 
 Core::Action::Action::Action( Entity::CharaPtr caster, Entity::CharaPtr target, uint32_t actionId ) :
    m_pSource( caster ),
    m_pTarget( target ),
    m_id( actionId ),
-   m_castTime( 0 )
+   m_bInterrupt( false )
 {
    auto pExdData = g_fw.get< Core::Data::ExdDataGenerated >();
    if( !pExdData )
@@ -33,6 +37,7 @@ Core::Action::Action::Action( Entity::CharaPtr caster, Entity::CharaPtr target, 
    auto action = pExdData->get< Core::Data::Action >( actionId );
 
    m_cooldown = static_cast< uint16_t >( action->recast100ms * 10 );
+   m_castTime = static_cast< uint32_t >( action->cast100ms ) * 100;
 }
 
 uint32_t Core::Action::Action::getId() const
@@ -80,6 +85,11 @@ void Core::Action::Action::setCastTime( uint32_t castTime )
    m_castTime = castTime;
 }
 
+bool Core::Action::Action::isInstantCast() const
+{
+   return m_castTime == 0;
+}
+
 uint32_t Core::Action::Action::getParam() const
 {
    return m_param;
@@ -112,7 +122,7 @@ void Core::Action::Action::startAction()
    onStart();
 
    // instantly fire the onFinish event when there's no cast time
-   if( m_castTime == 0 )
+   if( isInstantCast() )
       onFinish();
 }
 
@@ -147,12 +157,21 @@ void Core::Action::Action::onFinish()
    if( !pScriptMgr )
       return;
 
+   if( !isInstantCast() )
+   {
+      if( auto player = m_pSource->getAsPlayer() )
+         player->unsetStateFlag( PlayerStateFlag::Casting );
+   }
+
    // todo: handling aoes? we need to send effects relevant to hit entities
 
    auto effectPacket = boost::make_shared< Server::EffectPacket >( m_pSource->getId(), m_pTarget->getId(), getId() );
    effectPacket->setRotation( Math::Util::floatToUInt16Rot( m_pSource->getRot() ) );
 
    m_pSource->sendToInRangeSet( effectPacket, true );
+
+   if( auto player = m_pSource->getAsPlayer() )
+      player->sendDebug( "Action::onFinish()" );
 
    pScriptMgr->onCastFinish( *m_pSource, *m_pTarget, *this );
 }
@@ -168,7 +187,19 @@ void Core::Action::Action::onInterrupt()
    {
       // set cooldown on client
       sourcePlayer->queuePacket( boost::make_shared< Server::ActorControlPacket143 >(
-         m_pSource->getId(), Network::ActorControl::SetActionCooldown, 1, m_id, 0 ) );
+         m_pSource->getId(), ActorControl::SetActionCooldown, 1, m_id, 0 ) );
+
+      if( !isInstantCast() )
+      {
+         sourcePlayer->unsetStateFlag( PlayerStateFlag::Casting );
+
+         auto interruptPacket = boost::make_shared< Server::ActorControlPacket142 >(
+            m_pSource->getId(), ActorControl::CastInterrupt, 0x219, 1, m_id, 0 );
+
+         sourcePlayer->queuePacket( interruptPacket );
+      }
+
+      sourcePlayer->sendDebug( "Action::onInterrupt()" );
    }
 
    pScriptMgr->onCastInterrupt( *m_pSource, *this );
@@ -177,15 +208,33 @@ void Core::Action::Action::onInterrupt()
 void Core::Action::Action::onStart()
 {
    auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
-   if( pScriptMgr )
+   if( !pScriptMgr )
       return;
 
    auto sourcePlayer = m_pSource->getAsPlayer();
    if( sourcePlayer )
    {
       // set cooldown on client
+      // todo: maintain a list of cooldowns for each player and check before casting
       sourcePlayer->queuePacket( boost::make_shared< Server::ActorControlPacket143 >(
-         m_pSource->getId(), Network::ActorControl::SetActionCooldown, 1, m_id, m_cooldown ) );
+         sourcePlayer->getId(), ActorControl::SetActionCooldown, 1, m_id, m_cooldown ) );
+
+      if( !isInstantCast() )
+      {
+         auto castPacket = makeZonePacket< Server::FFXIVIpcActorCast >( getId() );
+
+         castPacket->data().action_id = static_cast< uint16_t >( m_id );
+         castPacket->data().skillType = Common::SkillType::Normal;
+         castPacket->data().unknown_1 = m_id;
+         // This is used for the cast bar above the target bar of the caster.
+         castPacket->data().cast_time = static_cast< float >( m_castTime / 1000 );
+         castPacket->data().target_id = m_pTarget->getId();
+
+         m_pSource->sendToInRangeSet( castPacket, true );
+         sourcePlayer->setStateFlag( PlayerStateFlag::Casting );
+      }
+
+      sourcePlayer->sendDebug( "Action::onStart()" );
    }
 
    pScriptMgr->onCastStart( *m_pSource, *m_pTarget, *this );

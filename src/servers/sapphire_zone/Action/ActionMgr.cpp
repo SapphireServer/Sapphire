@@ -5,7 +5,6 @@
 
 #include "ActionMgr.h"
 #include "Action/Action.h"
-#include "Action/ActionCast.h"
 
 #include "Framework.h"
 
@@ -90,17 +89,11 @@ void Core::Action::ActionMgr::handleAction( Core::Entity::Player& player, uint32
    // todo: check cooldowns, can't cast if its on cooldown
    // todo: restrict pvp actions to pvp areas and etc
 
-   ActionPtr action;
+   auto action = make_Action( player.getAsPlayer(), targetActor->getAsChara(), actionId );
 
-   if( pActionRow->cast100ms == 0 )
-      action = make_Action( player.getAsPlayer(), targetActor->getAsChara(), actionId );
-   else
-   {
-      action = make_ActionCast( player.getAsPlayer(), targetActor->getAsChara(), actionId );
-
-      // only set the current action when there's a cast time, useless otherwise
+   // only set the action if it has a cast time, not much point otherwise
+   if( action->getCastTime() != 0 )
       player.setCurrentAction( action );
-   }
 
    action->setParam( param );
 

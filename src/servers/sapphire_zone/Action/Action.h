@@ -40,6 +40,8 @@ namespace Action {
       uint32_t getCastTime() const;
       void setCastTime( uint32_t castTime );
 
+      bool isInstantCast() const;
+
       uint32_t getParam() const;
       void setParam( uint32_t param );
 
