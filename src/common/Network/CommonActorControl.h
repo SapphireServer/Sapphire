@@ -37,6 +37,13 @@ namespace Core {
             DeathAnimation = 0x0E,
             CastInterrupt = 0x0F,
 
+            /*!
+             * @brief Sets the cooldown for an action
+             *
+             * @param param1 Seems to be always 1 from what I've seen, needs more research
+             * @param param2 The actionid to set the cooldown for
+             * @param param3 The time in milliseconds to apply the cooldown for, 0 resets the cooldown
+             */
             SetActionCooldown = 0x11,
 
             StatusEffectGain = 0x14,
