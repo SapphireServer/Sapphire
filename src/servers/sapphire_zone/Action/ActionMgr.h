@@ -12,7 +12,7 @@ namespace Action {
    class ActionMgr
    {
    public:
-      ActionMgr() = default;
+      ActionMgr();
 
       /*!
        * @brief Handler for all incoming actions
@@ -27,11 +27,11 @@ namespace Action {
       void actionRouter( Entity::Player& player, uint8_t type, uint32_t actionId, uint32_t useCount, uint64_t targetId );
 
    private:
-      void handleAction( Entity::Player& player, uint32_t actionId, uint32_t useCount, uint64_t targetId );
-      void handleCraftAction( Entity::Player& player, uint32_t actionId, uint32_t useCount, uint64_t targetId );
-      void handleItemAction( Entity::Player& player, uint32_t actionId, uint32_t useCount, uint64_t targetId );
+      void handleAction( Entity::Player& player, uint32_t actionId, uint32_t useCount, uint64_t targetId, uint32_t param = 0 );
+      void handleCraftAction( Entity::Player& player, uint32_t actionId, uint32_t useCount, uint64_t targetId, uint32_t param = 0 );
+      void handleItemAction( Entity::Player& player, uint32_t actionId, uint32_t useCount, uint64_t targetId, uint32_t param = 0 );
 
-      void handleMount( Entity::Player& player, uint32_t mountId );
+      std::unordered_map< uint8_t, uint32_t > m_skillTypeToActionIdMap;
    };
 
 }

@@ -408,6 +408,10 @@ namespace Common {
       TpLoss = 12,
       TpGain = 13,
       GpGain = 14,
+      /*!
+       *
+       */
+      StatusEffectGain = 15,
       Knockback = 33,
       Mount = 38
    };

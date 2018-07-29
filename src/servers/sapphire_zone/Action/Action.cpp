@@ -12,6 +12,7 @@
 #include <Network/CommonNetwork.h>
 #include <Network/CommonActorControl.h>
 #include <Network/PacketWrappers/ActorControlPacket143.h>
+#include <sapphire_zone/Network/PacketWrappers/EffectPacket.h>
 
 #include "Framework.h"
 
@@ -79,6 +80,16 @@ void Core::Action::Action::setCastTime( uint32_t castTime )
    m_castTime = castTime;
 }
 
+uint32_t Core::Action::Action::getParam() const
+{
+   return m_param;
+}
+
+void Core::Action::Action::setParam( uint32_t param )
+{
+   m_param = param;
+}
+
 Core::Entity::CharaPtr Core::Action::Action::getActionSource() const
 {
    return m_pSource;
@@ -137,6 +148,11 @@ void Core::Action::Action::onFinish()
       return;
 
    // todo: handling aoes? we need to send effects relevant to hit entities
+
+   auto effectPacket = boost::make_shared< Server::EffectPacket >( m_pSource->getId(), m_pTarget->getId(), getId() );
+   effectPacket->setRotation( Math::Util::floatToUInt16Rot( m_pSource->getRot() ) );
+
+   m_pSource->sendToInRangeSet( effectPacket, true );
 
    pScriptMgr->onCastFinish( *m_pSource, *m_pTarget, *this );
 }

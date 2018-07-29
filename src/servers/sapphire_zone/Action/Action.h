@@ -40,6 +40,9 @@ namespace Action {
       uint32_t getCastTime() const;
       void setCastTime( uint32_t castTime );
 
+      uint32_t getParam() const;
+      void setParam( uint32_t param );
+
       /*!
        * @brief Gets the action cooldown
        * @return the action cooldown in milliseconds
@@ -94,6 +97,7 @@ namespace Action {
       uint32_t	m_id;
       Common::HandleActionType m_handleActionType;
       Common::SkillType m_skillType;
+      uint32_t m_param;
 
       uint64_t	m_startTime;
       uint32_t	m_castTime;

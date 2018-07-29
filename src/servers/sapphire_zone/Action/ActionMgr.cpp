@@ -6,43 +6,40 @@
 #include "ActionMgr.h"
 #include "Action/Action.h"
 #include "Action/ActionCast.h"
-#include "sapphire_zone/Action/Handlers/ActionMount.h"
 
 #include "Framework.h"
 
 extern Core::Framework g_fw;
 
+Core::Action::ActionMgr::ActionMgr()
+{
+   m_skillTypeToActionIdMap[ Common::SkillType::MountSkill ] = 4;
+}
+
 void Core::Action::ActionMgr::actionRouter( Core::Entity::Player& player, uint8_t type,
                                             uint32_t actionId, uint32_t useCount, uint64_t targetId )
 {
-   switch( type )
+   if( type == Common::SkillType::Normal )
    {
-      case Common::SkillType::Normal:
-      {
-         if( actionId < 1000000 )
-            handleAction( player, actionId, useCount, targetId );
-         else if( actionId < 2000000 )
-            handleCraftAction( player, actionId, useCount, targetId );
-         else if( actionId < 3000000 )
-            handleItemAction( player, actionId, useCount, targetId );
+      if( actionId < 1000000 )
+         handleAction( player, actionId, useCount, targetId );
+      else if( actionId < 2000000 )
+         handleCraftAction( player, actionId, useCount, targetId );
+      else if( actionId < 3000000 )
+         handleItemAction( player, actionId, useCount, targetId );
 
-         break;
-      }
-
-      case Common::SkillType::MountSkill:
-      {
-         handleMount( player, actionId );
-
-         break;
-      }
-
-      default:
-         break;
+      return;
    }
 
+   // check if we have a skilltype to actionid mapping
+   auto mappedAction = m_skillTypeToActionIdMap.find( type );
+   if( mappedAction == m_skillTypeToActionIdMap.end() )
+      return;
+
+   handleAction( player, mappedAction->second, useCount, targetId, actionId );
 }
 
-void Core::Action::ActionMgr::handleAction( Core::Entity::Player& player, uint32_t actionId, uint32_t useCount, uint64_t targetId )
+void Core::Action::ActionMgr::handleAction( Core::Entity::Player& player, uint32_t actionId, uint32_t useCount, uint64_t targetId, uint32_t param )
 {
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
    auto pActionRow = pExdData->get< Core::Data::Action >( actionId );
@@ -105,10 +102,12 @@ void Core::Action::ActionMgr::handleAction( Core::Entity::Player& player, uint32
       player.setCurrentAction( action );
    }
 
+   action->setParam( param );
+
    action->startAction();
 }
 
-void Core::Action::ActionMgr::handleCraftAction( Core::Entity::Player& player, uint32_t actionId, uint32_t useCount, uint64_t targetId )
+void Core::Action::ActionMgr::handleCraftAction( Core::Entity::Player& player, uint32_t actionId, uint32_t useCount, uint64_t targetId, uint32_t param )
 {
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
    auto action = pExdData->get< Core::Data::CraftAction >( actionId );
@@ -117,7 +116,7 @@ void Core::Action::ActionMgr::handleCraftAction( Core::Entity::Player& player, u
       return;
 }
 
-void Core::Action::ActionMgr::handleItemAction( Core::Entity::Player& player, uint32_t actionId, uint32_t useCount, uint64_t targetId )
+void Core::Action::ActionMgr::handleItemAction( Core::Entity::Player& player, uint32_t actionId, uint32_t useCount, uint64_t targetId, uint32_t param )
 {
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
    auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
@@ -127,15 +126,4 @@ void Core::Action::ActionMgr::handleItemAction( Core::Entity::Player& player, ui
    {
        pScriptMgr->onEventItem( player, actionId, info->quest, info->castTime, targetId );
    }
-}
-
-void Core::Action::ActionMgr::handleMount( Core::Entity::Player& player, uint32_t mountId )
-{
-   if( player.hasStateFlag( Common::PlayerStateFlag::Casting ) )
-      return;
-
-   auto action = make_ActionMount( player.getAsChara(), mountId );
-
-   player.setCurrentAction( action );
-   action->startAction();
 }
