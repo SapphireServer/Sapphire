@@ -118,7 +118,7 @@ private:
       player.playScene( getId(), 1, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            player.updateQuest( getId(), 1 );
+            player.updateQuest( getId(), SEQ_1 );
             player.setQuestUI8CH( getId(), 1 );
          } );
    }
