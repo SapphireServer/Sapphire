@@ -1,7 +1,6 @@
 #include <Actor/Player.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Script/ScriptMgr.h>
-#include <Common.h>
 
 #include "ActionMgr.h"
 #include "Action/Action.h"
@@ -46,18 +45,6 @@ void Core::Action::ActionMgr::handleAction( Core::Entity::Player& player, uint32
 
    if( !pActionRow )
       return;
-
-   // teleport
-   // todo: we construct the cast from the actorcontrol event, that's pretty shit
-   if( actionId == 5 )
-   {
-      auto action = player.getCurrentAction();
-
-      if( action )
-         action->onStart();
-
-      return;
-   }
 
    // not castable by a player, ever
    if( pActionRow->classJob == -1 )

@@ -31,7 +31,6 @@
 #include "Script/ScriptMgr.h"
 
 #include "Action/Action.h"
-#include "Action/Handlers/ActionTeleport.h"
 #include "Action/Handlers/EventAction.h"
 #include "Action/Handlers/EventItemAction.h"
 
@@ -334,6 +333,9 @@ void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
    {
       return;
    }
+
+   // reset the teleport destination whenever we teleport, set via teleportquery when initiating a teleport
+   m_teleportDestination = 0;
 
    setStateFlag( PlayerStateFlag::BetweenAreas );
    auto targetPos = pTeriMgr->getTerritoryPosition( data->level.at( 0 ) );
@@ -1667,33 +1669,49 @@ void Core::Entity::Player::emoteInterrupt()
 
 void Core::Entity::Player::teleportQuery( uint16_t aetheryteId )
 {
+   auto cost = getTeleportCost( aetheryteId );
+   if( cost <= 999 )
+   {
+      bool insufficientGil = getCurrency( Common::CurrencyType::Gil ) < cost;
+
+      // TODO: figure out what param1 really does
+      queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), TeleportStart, insufficientGil ? 2 : 0, aetheryteId ) );
+
+      if( !insufficientGil )
+         m_teleportDestination = aetheryteId;
+
+      return;
+   }
+
+   m_teleportDestination = 0;
+}
+
+uint16_t Core::Entity::Player::getTeleportCost( uint16_t aetheryteId ) const
+{
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-   // TODO: only register this action if enough gil is in possession
    auto targetAetheryte = pExdData->get< Core::Data::Aetheryte >( aetheryteId );
 
    if( targetAetheryte )
    {
       auto fromAetheryte = pExdData->get< Core::Data::Aetheryte >(
-                             pExdData->get< Core::Data::TerritoryType >( getZoneId() )->aetheryte );
+         pExdData->get< Core::Data::TerritoryType >( getZoneId() )->aetheryte );
 
-      // calculate cost - does not apply for favorite points or homepoints neither checks for aether tickets
+      // todo: calculate cost - does not apply for favorite points or homepoints neither checks for aether tickets
       auto cost = static_cast< uint16_t > ( ( sqrt( pow( fromAetheryte->aetherstreamX - targetAetheryte->aetherstreamX, 2 ) +
                                                     pow( fromAetheryte->aetherstreamY - targetAetheryte->aetherstreamY, 2 ) ) / 2 ) + 100 );
 
       // cap at 999 gil
-      cost = cost > uint16_t{999} ? uint16_t{999} : cost;
+      cost = std::min< uint16_t >( 999, cost );
 
-      bool insufficientGil = getCurrency( Common::CurrencyType::Gil ) < cost;
-      // TODO: figure out what param1 really does
-      queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), TeleportStart, insufficientGil ? 2 : 0, aetheryteId ) );
-
-      if( !insufficientGil )
-      {
-         Action::ActionPtr pActionTeleport;
-         pActionTeleport = Action::make_ActionTeleport( getAsPlayer(), aetheryteId, cost );
-         setCurrentAction( pActionTeleport );
-      }
+      return cost;
    }
+
+   return 0xFF14;
+}
+
+uint16_t Core::Entity::Player::getTeleportDestination() const
+{
+   return m_teleportDestination;
 }
 
 uint8_t Core::Entity::Player::getNextObjSpawnIndexForActorId( uint32_t actorId )

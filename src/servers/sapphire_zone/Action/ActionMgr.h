@@ -2,7 +2,6 @@
 #define SAPPHIRE_ACTIONMGR_H
 
 #include <Forwards.h>
-#include <Common.h>
 
 #include <unordered_map>
 

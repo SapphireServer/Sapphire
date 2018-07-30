@@ -360,6 +360,10 @@ public:
    void teleport( uint16_t aetheryteId, uint8_t type = 1 );
    /*! query teleport of a specified type */
    void teleportQuery( uint16_t aetheryteId );
+   /*! get teleport cost to an aetheryte */
+   uint16_t getTeleportCost( uint16_t aetheryteId ) const;
+   /*! get the current teleport destination */
+   uint16_t getTeleportDestination() const;
    /*! prepares zoning / fades out the screen */
    void prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadoutTime = 0, uint16_t animation = 0 );
    /*! get player's title list (available titles) */
@@ -761,6 +765,8 @@ private:
    uint8_t m_mount;
    uint32_t m_emoteMode;
    uint8_t m_pose;
+
+   uint16_t m_teleportDestination;
 
    Util::SpawnIndexAllocator< uint8_t > m_objSpawnIndexAllocator;
    Util::SpawnIndexAllocator< uint8_t > m_actorSpawnIndexAllocator;

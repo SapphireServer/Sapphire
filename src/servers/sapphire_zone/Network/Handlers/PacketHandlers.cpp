@@ -37,7 +37,6 @@
 #include "Event/EventHelper.h"
 
 #include "Action/Action.h"
-#include "sapphire_zone/Action/Handlers/ActionTeleport.h"
 
 #include "Session.h"
 #include "ServerZone.h"
