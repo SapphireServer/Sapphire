@@ -325,7 +325,7 @@ void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost:
       uint16_t questId;
       uint8_t questBit;
       int8_t BitFlag;
-      sscanf( params.c_str(), "%hu %hhu %hu", &BitFlag, &questId, &questBit );
+      sscanf( params.c_str(), "%hhu %hu %hhu", &BitFlag, &questId, &questBit );
 
       if( !player.hasQuest( questId ) )
       {
