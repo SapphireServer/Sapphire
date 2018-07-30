@@ -159,7 +159,6 @@ void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost:
    pLog->debug( "[" + std::to_string( player.getId() ) + "] " +
                 "subCommand " + subCommand + " params: " + params );
 
-
    if( ( ( subCommand == "pos" ) || ( subCommand == "posr" ) ) && ( params != "" ) )
    {
       int32_t posX;
@@ -320,6 +319,102 @@ void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost:
    else if( subCommand == "festivaldisable" )
    {
       pTerriMgr->disableCurrentFestival();
+   }
+   else if ( subCommand == "BitFlag8" )
+   {
+      uint16_t questId;
+      uint8_t questBit;
+      sscanf( params.c_str(), "%hu %hhu", &questId, &questBit );
+
+      if ( player.hasQuest( questId ) )
+      {
+         if ( !questBit == 0 || !questId == 0 )
+            player.setQuestBitFlag8( questId, questBit, true );
+         else
+            player.sendDebug( "Params are not correct" );
+      }
+      else
+         player.sendDebug( "Player doesn't have the quest with ID: " + std::to_string( questId ) );
+   }
+   else if ( subCommand == "BitFlag16" )
+   {
+      uint16_t questId;
+      uint8_t questBit;
+      sscanf( params.c_str(), "%hu %hhu", &questId, &questBit );
+
+      if( player.hasQuest( questId ) )
+      {
+         if( !questBit == 0 || !questId == 0 )
+            player.setQuestBitFlag16( questId, questBit, true );
+         else
+            player.sendDebug( "Params are not correct" );
+      }
+      else
+         player.sendDebug( "Player doesn't have the quest with ID: " + std::to_string( questId ) );
+   }
+   else if ( subCommand == "BitFlag24" )
+   {
+      uint16_t questId;
+      uint8_t questBit;
+      sscanf( params.c_str(), "%hu %hhu", &questId, &questBit );
+
+      if( player.hasQuest( questId ) )
+      {
+         if( !questBit == 0 || !questId == 0 )
+            player.setQuestBitFlag24( questId, questBit, true );
+         else
+            player.sendDebug( "Params are not correct" );
+      }
+      else
+         player.sendDebug( "Player doesn't have the quest with ID: " + std::to_string( questId ) );
+   }
+   else if ( subCommand == "BitFlag32" )
+   {
+      uint16_t questId;
+      uint8_t questBit;
+      sscanf( params.c_str(), "%hu %hhu", &questId, &questBit );
+
+      if( player.hasQuest( questId ) )
+      {
+         if( !questBit == 0 || !questId == 0 )
+            player.setQuestBitFlag32( questId, questBit, true );
+         else
+            player.sendDebug( "Params are not correct" );
+      }
+      else
+         player.sendDebug( "Player doesn't have the quest with ID: " + std::to_string( questId ) );
+   }
+   else if ( subCommand == "BitFlag40" )
+   {
+      uint16_t questId;
+      uint8_t questBit;
+      sscanf( params.c_str(), "%hu %hhu", &questId, &questBit );
+
+      if( player.hasQuest( questId ) )
+      {
+         if( !questBit == 0 || !questId == 0 )
+            player.setQuestBitFlag40( questId, questBit, true );
+         else
+            player.sendDebug( "Params are not correct" );
+      }
+      else
+         player.sendDebug( "Player doesn't have the quest with ID: " + std::to_string( questId ) );
+   }
+   else if ( subCommand == "BitFlag48" )
+   {
+      uint16_t questId;
+      uint8_t questBit;
+      sscanf( params.c_str(), "%hu %hhu", &questId, &questBit );
+
+      if( player.hasQuest( questId ) )
+      {
+         if( !questBit == 0 || !questId == 0 )
+            player.setQuestBitFlag48( questId, questBit, true );
+         else
+            player.sendDebug( "Params are not correct" );
+      }
+      else
+         player.sendDebug( "Player doesn't have the quest with ID: " + std::to_string( questId ) );
    }
    else
    {
