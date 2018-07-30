@@ -21,24 +21,25 @@ void Core::Action::ActionMgr::actionRouter( Core::Entity::Player& player, uint8_
    if( type == Common::SkillType::Normal )
    {
       if( actionId < 1000000 )
-         handleAction( player, actionId, useCount, targetId );
+         handleAction( player, actionId, useCount, targetId, type );
       else if( actionId < 2000000 )
-         handleCraftAction( player, actionId, useCount, targetId );
+         handleCraftAction( player, actionId, useCount, targetId, type );
       else if( actionId < 3000000 )
-         handleItemAction( player, actionId, useCount, targetId );
+         handleItemAction( player, actionId, useCount, targetId, type );
 
       return;
    }
 
    // check if we have a skilltype to actionid mapping
+   // if we do, actionId becomes the action param and the map provides the new actionId
    auto mappedAction = m_skillTypeToActionIdMap.find( type );
    if( mappedAction == m_skillTypeToActionIdMap.end() )
       return;
 
-   handleAction( player, mappedAction->second, useCount, targetId, actionId );
+   handleAction( player, mappedAction->second, useCount, targetId, type, actionId );
 }
 
-void Core::Action::ActionMgr::handleAction( Core::Entity::Player& player, uint32_t actionId, uint32_t useCount, uint64_t targetId, uint32_t param )
+void Core::Action::ActionMgr::handleAction( Core::Entity::Player& player, uint32_t actionId, uint32_t useCount, uint64_t targetId, uint8_t skillType, uint32_t param )
 {
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
    auto pActionRow = pExdData->get< Core::Data::Action >( actionId );

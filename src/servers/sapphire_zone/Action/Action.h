@@ -40,10 +40,13 @@ namespace Action {
       uint32_t getCastTime() const;
       void setCastTime( uint32_t castTime );
 
-      bool isInstantCast() const;
+      bool hasCastTime() const;
 
       uint32_t getParam() const;
       void setParam( uint32_t param );
+
+      Common::SkillType getSkillType() const;
+      void setSkillType( uint8_t skillType );
 
       /*!
        * @brief Gets the action cooldown

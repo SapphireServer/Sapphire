@@ -85,9 +85,9 @@ void Core::Action::Action::setCastTime( uint32_t castTime )
    m_castTime = castTime;
 }
 
-bool Core::Action::Action::isInstantCast() const
+bool Core::Action::Action::hasCastTime() const
 {
-   return m_castTime == 0;
+   return m_castTime != 0;
 }
 
 uint32_t Core::Action::Action::getParam() const
@@ -115,6 +115,16 @@ void Core::Action::Action::setCooldown( uint16_t cooldown )
    m_cooldown = cooldown;
 }
 
+void Core::Action::Action::setSkillType( uint8_t skillType )
+{
+   m_skillType = static_cast< Common::SkillType >( skillType );
+}
+
+Core::Common::SkillType Core::Action::Action::getSkillType() const
+{
+   return m_skillType;
+}
+
 void Core::Action::Action::startAction()
 {
    m_startTime = Util::getTimeMs();
@@ -122,7 +132,7 @@ void Core::Action::Action::startAction()
    onStart();
 
    // instantly fire the onFinish event when there's no cast time
-   if( isInstantCast() )
+   if( !hasCastTime() )
       onFinish();
 }
 
@@ -157,13 +167,14 @@ void Core::Action::Action::onFinish()
    if( !pScriptMgr )
       return;
 
-   if( !isInstantCast() )
+   if( hasCastTime() )
    {
       if( auto player = m_pSource->getAsPlayer() )
          player->unsetStateFlag( PlayerStateFlag::Casting );
    }
 
    // todo: handling aoes? we need to send effects relevant to hit entities
+   // todo: combo actions?
 
    auto effectPacket = boost::make_shared< Server::EffectPacket >( m_pSource->getId(), m_pTarget->getId(), getId() );
    effectPacket->setRotation( Math::Util::floatToUInt16Rot( m_pSource->getRot() ) );
@@ -189,7 +200,7 @@ void Core::Action::Action::onInterrupt()
       sourcePlayer->queuePacket( boost::make_shared< Server::ActorControlPacket143 >(
          m_pSource->getId(), ActorControl::SetActionCooldown, 1, m_id, 0 ) );
 
-      if( !isInstantCast() )
+      if( hasCastTime() )
       {
          sourcePlayer->unsetStateFlag( PlayerStateFlag::Casting );
 
@@ -211,6 +222,20 @@ void Core::Action::Action::onStart()
    if( !pScriptMgr )
       return;
 
+   if( hasCastTime() )
+   {
+      auto castPacket = makeZonePacket< Server::FFXIVIpcActorCast >( m_pSource->getId() );
+
+      castPacket->data().action_id = static_cast< uint16_t >( m_id );
+      castPacket->data().skillType = m_skillType;
+      castPacket->data().unknown_1 = m_id;
+      // This is used for the cast bar above the target bar of the caster.
+      castPacket->data().cast_time = static_cast< float >( m_castTime / 1000 );
+      castPacket->data().target_id = m_pTarget->getId();
+
+      m_pSource->sendToInRangeSet( castPacket, true );
+   }
+
    auto sourcePlayer = m_pSource->getAsPlayer();
    if( sourcePlayer )
    {
@@ -219,20 +244,8 @@ void Core::Action::Action::onStart()
       sourcePlayer->queuePacket( boost::make_shared< Server::ActorControlPacket143 >(
          sourcePlayer->getId(), ActorControl::SetActionCooldown, 1, m_id, m_cooldown ) );
 
-      if( !isInstantCast() )
-      {
-         auto castPacket = makeZonePacket< Server::FFXIVIpcActorCast >( getId() );
-
-         castPacket->data().action_id = static_cast< uint16_t >( m_id );
-         castPacket->data().skillType = Common::SkillType::Normal;
-         castPacket->data().unknown_1 = m_id;
-         // This is used for the cast bar above the target bar of the caster.
-         castPacket->data().cast_time = static_cast< float >( m_castTime / 1000 );
-         castPacket->data().target_id = m_pTarget->getId();
-
-         m_pSource->sendToInRangeSet( castPacket, true );
+      if( hasCastTime() )
          sourcePlayer->setStateFlag( PlayerStateFlag::Casting );
-      }
 
       sourcePlayer->sendDebug( "Action::onStart()" );
    }
