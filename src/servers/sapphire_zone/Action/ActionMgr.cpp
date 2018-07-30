@@ -84,6 +84,7 @@ void Core::Action::ActionMgr::handleAction( Core::Entity::Player& player, uint32
       player.setCurrentAction( action );
 
    action->setParam( param );
+   action->setSkillType( skillType );
 
    action->startAction();
 }
