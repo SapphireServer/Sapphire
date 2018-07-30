@@ -49,7 +49,7 @@ private:
 
    void Scene00002( Entity::Player& player )
    {
-      player.updateQuest( getId(), 1 );
+      player.updateQuest( getId(), SEQ_1 );
       player.playSceneChain( getId(), 2, NONE, bindScene( &ManSea001::Scene00003 ) );
    }
 
@@ -57,9 +57,9 @@ private:
    {
       player.playScene( getId(), 3, NONE,
          [&]( Entity::Player& player, const Event::SceneResult& result )
-      {
-         player.playScene( OPENING_EVENT_HANDLER, 0x1E, HIDE_HOTBAR | NO_DEFAULT_CAMERA, 1, 0 );
-      } );
+         {
+            player.playScene( OPENING_EVENT_HANDLER, 0x1E, HIDE_HOTBAR | NO_DEFAULT_CAMERA, 1, 0 );
+         } );
    }
 
    void Scene00004( Entity::Player& player )
@@ -76,14 +76,14 @@ private:
    {
       player.playScene( getId(), 6, INVIS_OTHER_PC,
          [&]( Entity::Player& player, const Event::SceneResult& result )
-      {
-         if( result.param2 == 1 )
          {
-            player.updateQuest( getId(), SEQ_FINISH );
-            player.prepareZoning( player.getZoneId(), true, 1, 0 );
-            player.changePosition( 9, 40, 14, 2 );
-         }
-      } );
+            if( result.param2 == 1 )
+            {
+               player.updateQuest( getId(), SEQ_FINISH );
+               player.prepareZoning( player.getZoneId(), true, 1, 0 );
+               player.changePosition( 9, 40, 14, 2 );
+            }
+         } );
    }
 
    void Scene00007( Entity::Player& player )
@@ -115,13 +115,13 @@ private:
    {
       player.playScene( getId(), 12, INVIS_OTHER_PC,
          [&]( Entity::Player& player, const Event::SceneResult& result )
-      {
-         if( result.param2 == 1 ) // finish quest
          {
-            if(player.giveQuestRewards( getId(), 0 ) )
-               player.finishQuest( getId() );
-         }
-      } );
+            if( result.param2 == 1 ) // finish quest
+            {
+               if(player.giveQuestRewards( getId(), 0 ) )
+                  player.finishQuest( getId() );
+            }
+         } );
    }
 
    void Scene00013( Entity::Player& player )
