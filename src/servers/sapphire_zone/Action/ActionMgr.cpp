@@ -20,11 +20,11 @@ void Core::Action::ActionMgr::actionRouter( Core::Entity::Player& player, uint8_
    if( type == Common::SkillType::Normal )
    {
       if( actionId < 1000000 )
-         handleAction( player, actionId, useCount, targetId, type );
+         handleAction( player, actionId, targetId, type );
       else if( actionId < 2000000 )
-         handleCraftAction( player, actionId, useCount, targetId, type );
+         handleCraftAction( player, actionId, targetId, type );
       else if( actionId < 3000000 )
-         handleItemAction( player, actionId, useCount, targetId, type );
+         handleItemAction( player, actionId, targetId, type );
 
       return;
    }
@@ -35,10 +35,10 @@ void Core::Action::ActionMgr::actionRouter( Core::Entity::Player& player, uint8_
    if( mappedAction == m_skillTypeToActionIdMap.end() )
       return;
 
-   handleAction( player, mappedAction->second, useCount, targetId, type, actionId );
+   handleAction( player, mappedAction->second, targetId, type, actionId );
 }
 
-void Core::Action::ActionMgr::handleAction( Core::Entity::Player& player, uint32_t actionId, uint32_t useCount, uint64_t targetId, uint8_t skillType, uint32_t param )
+void Core::Action::ActionMgr::handleAction( Core::Entity::Player& player, uint32_t actionId, uint64_t targetId, uint8_t skillType, uint32_t param )
 {
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
    auto pActionRow = pExdData->get< Core::Data::Action >( actionId );
@@ -80,7 +80,7 @@ void Core::Action::ActionMgr::handleAction( Core::Entity::Player& player, uint32
    auto action = make_Action( player.getAsPlayer(), targetActor->getAsChara(), actionId );
 
    // only set the action if it has a cast time, not much point otherwise
-   if( action->getCastTime() != 0 )
+   if( action->hasCastTime() )
       player.setCurrentAction( action );
 
    action->setParam( param );
@@ -88,7 +88,7 @@ void Core::Action::ActionMgr::handleAction( Core::Entity::Player& player, uint32
    action->startAction();
 }
 
-void Core::Action::ActionMgr::handleCraftAction( Core::Entity::Player& player, uint32_t actionId, uint32_t useCount, uint64_t targetId, uint32_t param )
+void Core::Action::ActionMgr::handleCraftAction( Core::Entity::Player& player, uint32_t actionId, uint64_t targetId, uint32_t param )
 {
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
    auto action = pExdData->get< Core::Data::CraftAction >( actionId );
@@ -97,7 +97,7 @@ void Core::Action::ActionMgr::handleCraftAction( Core::Entity::Player& player, u
       return;
 }
 
-void Core::Action::ActionMgr::handleItemAction( Core::Entity::Player& player, uint32_t actionId, uint32_t useCount, uint64_t targetId, uint32_t param )
+void Core::Action::ActionMgr::handleItemAction( Core::Entity::Player& player, uint32_t actionId, uint64_t targetId, uint32_t param )
 {
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
    auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();

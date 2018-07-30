@@ -26,9 +26,9 @@ namespace Action {
       void actionRouter( Entity::Player& player, uint8_t type, uint32_t actionId, uint32_t useCount, uint64_t targetId );
 
    private:
-      void handleAction( Entity::Player& player, uint32_t actionId, uint32_t useCount, uint64_t targetId, uint8_t skillType, uint32_t param = 0 );
-      void handleCraftAction( Entity::Player& player, uint32_t actionId, uint32_t useCount, uint64_t targetId, uint32_t param = 0 );
-      void handleItemAction( Entity::Player& player, uint32_t actionId, uint32_t useCount, uint64_t targetId, uint32_t param = 0 );
+      void handleAction( Entity::Player& player, uint32_t actionId, uint64_t targetId, uint8_t skillType, uint32_t param = 0 );
+      void handleCraftAction( Entity::Player& player, uint32_t actionId, uint64_t targetId, uint32_t param = 0 );
+      void handleItemAction( Entity::Player& player, uint32_t actionId, uint64_t targetId, uint32_t param = 0 );
 
       std::unordered_map< uint8_t, uint32_t > m_skillTypeToActionIdMap;
    };

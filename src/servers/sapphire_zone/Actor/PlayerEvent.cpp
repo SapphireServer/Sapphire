@@ -13,7 +13,7 @@
 #include "Network/PacketWrappers/DirectorPlayScenePacket.h"
 
 #include "sapphire_zone/Action/Handlers/EventAction.h"
-#include "sapphire_zone/Action/Handlers/EventItemAction.h"
+#include <Action/ActionMgr.h>
 
 #include "Zone/Zone.h"
 #include "ServerZone.h"
@@ -318,12 +318,9 @@ void Core::Entity::Player::eventItemActionStart( uint32_t eventId,
                                                  ActionCallback interruptCallback,
                                                  uint64_t additional )
 {
-   Action::ActionPtr pEventItemAction = Action::make_EventItemAction( getAsChara(), eventId, action,
-                                                                      finishCallback, interruptCallback, additional );
-
-   setCurrentAction( pEventItemAction );
-
-   pEventItemAction->onStart();
+   // todo: this needs to be tested with a quest that actually handles this, but it *might* work
+   auto pActionMgr = g_fw.get< Action::ActionMgr >();
+   pActionMgr->actionRouter( *this, Common::SkillType::Normal, action, 0, getTargetId() );
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

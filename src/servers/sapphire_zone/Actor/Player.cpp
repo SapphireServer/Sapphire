@@ -32,7 +32,6 @@
 
 #include "Action/Action.h"
 #include "Action/Handlers/EventAction.h"
-#include "Action/Handlers/EventItemAction.h"
 
 #include "Math/CalcStats.h"
 #include "Math/CalcBattle.h"

@@ -90,12 +90,12 @@ bool Core::Action::Action::hasCastTime() const
    return m_castTime != 0;
 }
 
-uint32_t Core::Action::Action::getParam() const
+uint64_t Core::Action::Action::getParam() const
 {
    return m_param;
 }
 
-void Core::Action::Action::setParam( uint32_t param )
+void Core::Action::Action::setParam( uint64_t param )
 {
    m_param = param;
 }

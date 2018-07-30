@@ -42,8 +42,8 @@ namespace Action {
 
       bool hasCastTime() const;
 
-      uint32_t getParam() const;
-      void setParam( uint32_t param );
+      uint64_t getParam() const;
+      void setParam( uint64_t param );
 
       Common::SkillType getSkillType() const;
       void setSkillType( uint8_t skillType );
