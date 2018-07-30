@@ -320,101 +320,57 @@ void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost:
    {
       pTerriMgr->disableCurrentFestival();
    }
-   else if ( subCommand == "BitFlag8" )
+   else if ( subCommand == "BitFlag" )
    {
       uint16_t questId;
       uint8_t questBit;
-      sscanf( params.c_str(), "%hu %hhu", &questId, &questBit );
+      int8_t BitFlag;
+      sscanf( params.c_str(), "%hu %hhu %hu", &BitFlag, &questId, &questBit );
 
-      if ( player.hasQuest( questId ) )
+      if( !player.hasQuest( questId ) )
       {
-         if ( !questBit == 0 || !questId == 0 )
+         player.sendDebug( "Player doesn't have the quest with ID: " + std::to_string( questId ) );
+         return;
+      }
+      if( questBit == 0 || questId == 0 )
+      {
+         player.sendDebug( "Params are not correct" );
+         return;
+      }
+
+      switch ( BitFlag )
+      {
+         case 8:
+         {
             player.setQuestBitFlag8( questId, questBit, true );
-         else
-            player.sendDebug( "Params are not correct" );
-      }
-      else
-         player.sendDebug( "Player doesn't have the quest with ID: " + std::to_string( questId ) );
-   }
-   else if ( subCommand == "BitFlag16" )
-   {
-      uint16_t questId;
-      uint8_t questBit;
-      sscanf( params.c_str(), "%hu %hhu", &questId, &questBit );
-
-      if( player.hasQuest( questId ) )
-      {
-         if( !questBit == 0 || !questId == 0 )
+            break;
+         }
+         case 16:
+         {
             player.setQuestBitFlag16( questId, questBit, true );
-         else
-            player.sendDebug( "Params are not correct" );
-      }
-      else
-         player.sendDebug( "Player doesn't have the quest with ID: " + std::to_string( questId ) );
-   }
-   else if ( subCommand == "BitFlag24" )
-   {
-      uint16_t questId;
-      uint8_t questBit;
-      sscanf( params.c_str(), "%hu %hhu", &questId, &questBit );
-
-      if( player.hasQuest( questId ) )
-      {
-         if( !questBit == 0 || !questId == 0 )
+            break;
+         }
+         case 24:
+         {
             player.setQuestBitFlag24( questId, questBit, true );
-         else
-            player.sendDebug( "Params are not correct" );
-      }
-      else
-         player.sendDebug( "Player doesn't have the quest with ID: " + std::to_string( questId ) );
-   }
-   else if ( subCommand == "BitFlag32" )
-   {
-      uint16_t questId;
-      uint8_t questBit;
-      sscanf( params.c_str(), "%hu %hhu", &questId, &questBit );
-
-      if( player.hasQuest( questId ) )
-      {
-         if( !questBit == 0 || !questId == 0 )
+            break;
+         }
+         case 32:
+         {
             player.setQuestBitFlag32( questId, questBit, true );
-         else
-            player.sendDebug( "Params are not correct" );
-      }
-      else
-         player.sendDebug( "Player doesn't have the quest with ID: " + std::to_string( questId ) );
-   }
-   else if ( subCommand == "BitFlag40" )
-   {
-      uint16_t questId;
-      uint8_t questBit;
-      sscanf( params.c_str(), "%hu %hhu", &questId, &questBit );
-
-      if( player.hasQuest( questId ) )
-      {
-         if( !questBit == 0 || !questId == 0 )
+            break;
+         }
+         case 40:
+         {
             player.setQuestBitFlag40( questId, questBit, true );
-         else
-            player.sendDebug( "Params are not correct" );
-      }
-      else
-         player.sendDebug( "Player doesn't have the quest with ID: " + std::to_string( questId ) );
-   }
-   else if ( subCommand == "BitFlag48" )
-   {
-      uint16_t questId;
-      uint8_t questBit;
-      sscanf( params.c_str(), "%hu %hhu", &questId, &questBit );
-
-      if( player.hasQuest( questId ) )
-      {
-         if( !questBit == 0 || !questId == 0 )
+            break;
+         }
+         case 48:
+         {
             player.setQuestBitFlag48( questId, questBit, true );
-         else
-            player.sendDebug( "Params are not correct" );
+            break;
+         }
       }
-      else
-         player.sendDebug( "Player doesn't have the quest with ID: " + std::to_string( questId ) );
    }
    else
    {
