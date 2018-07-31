@@ -103,7 +103,7 @@ namespace Packets {
       AoeEffect32                   = 0x0157, // updated 4.3
       PersistantEffect              = 0x0158, // updated 4.3
 
-      GCAffiliation                 = 0xCCFC, // OUTDATED
+      GCAffiliation                 = 0x0162, // updated 4.3
 
       PlayerSpawn                   = 0x0172, // updated 4.3
       NpcSpawn                      = 0x0173, // updated 4.3
