@@ -103,7 +103,7 @@ namespace Packets {
       AoeEffect32                   = 0x0157, // updated 4.3
       PersistantEffect              = 0x0158, // updated 4.3
 
-      GCAffiliation                 = 0xCCFC, // OUTDATED
+      GCAffiliation                 = 0x0162, // updated 4.3
 
       PlayerSpawn                   = 0x0172, // updated 4.3
       NpcSpawn                      = 0x0173, // updated 4.3
@@ -134,9 +134,8 @@ namespace Packets {
       ContainerInfo                 = 0x0192, // updated 4.3
       InventoryTransactionFinish    = 0x0193, // updated 4.3
       InventoryTransaction          = 0x0194, // updated 4.3
+      CurrencyCrystalInfo           = 0x0195, // updated 4.3
       InventoryActionAck            = 0x0197, // updated 4.3
-      CurrencyCrystalInfo           = 0x0197, // updated 4.3 - wrong opcode
-
       UpdateInventorySlot           = 0x0198, // updated 4.3
 
       EventPlay                     = 0x01A6, // updated 4.3
