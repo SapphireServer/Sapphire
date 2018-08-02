@@ -30,6 +30,29 @@ private:
    {
       auto callback = [this]( Entity::Player& player, const Event::SceneResult& result )
       {
+         auto questionAnswer = result.param2;
+         int16_t rSlotId;
+
+         switch( questionAnswer )
+         {
+            case 1:  rSlotId = player.addItem( Common::InventoryType::ArmoryRing, -1, 4423, 1, false, true ); break;
+            case 2:  rSlotId = player.addItem( Common::InventoryType::ArmoryRing, -1, 4424, 1, false, true ); break;
+            case 3:  rSlotId = player.addItem( Common::InventoryType::ArmoryRing, -1, 4425, 1, false, true ); break;
+            case 4:  rSlotId = player.addItem( Common::InventoryType::ArmoryRing, -1, 4426, 1, false, true ); break;
+            default: rSlotId = player.addItem( Common::InventoryType::ArmoryRing, -1, 4426, 1, false, true ); break;
+         }
+
+         if( rSlotId != -1 )
+         {
+            auto pItem = player.getItemAt( Common::InventoryType::ArmoryRing, rSlotId );
+
+            player.sendDebug( std::to_string( rSlotId ) );
+
+            if( pItem )
+               player.equipItem( Common::EquipSlot::Ring2, pItem, true );
+
+         }
+
          player.setOpeningSequence( 1 );
          Scene00001( player );
       };
