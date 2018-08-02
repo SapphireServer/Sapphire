@@ -1,4 +1,3 @@
-#include <Common.h>
 #include <Actor/Player.h>
 #include <ScriptObject.h>
 
