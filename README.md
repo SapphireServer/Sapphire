@@ -13,7 +13,7 @@ Sapphire requires the following software:
 
 | *Name* | *Windows* | *Linux* |
 | ------ | --------- | ------- |
-| CMake 2.6+ and C++14 capable compiler | [Visual Studio 2017](https://www.visualstudio.com/) | `gcc 4.9` and `g++ 4.9` or newer |
+| CMake 3.0.2+ and C++14 capable compiler | [Visual Studio 2017](https://www.visualstudio.com/) | `gcc 4.9` and `g++ 4.9` or newer |
 | Boost 1.63.0 | [Win32 precompiled binaries](https://sourceforge.net/projects/boost/files/boost-binaries/1.63.0/boost_1_63_0-msvc-14.0-32.exe/download) | Boost libraries from your distribution's package manager |
 | MySQL Server 5.7 | [Official Site](https://dev.mysql.com/downloads/mysql/) | MySQL server from your distribution's package manager |
 
@@ -23,4 +23,4 @@ Please check the [wiki](https://github.com/SapphireMordred/Sapphire/wiki) for de
 
 * [Sapphire on YouTube](https://www.youtube.com/channel/UCJKYuovoGsq7PxSAfrNJKbw)
 
-Final Fantasy XIV © 2010-2017 SQUARE ENIX CO., LTD. All Rights Reserved. We are not affiliated with SQUARE ENIX CO., LTD. in any way.
+Final Fantasy XIV © 2010-2018 SQUARE ENIX CO., LTD. All Rights Reserved. We are not affiliated with SQUARE ENIX CO., LTD. in any way.
