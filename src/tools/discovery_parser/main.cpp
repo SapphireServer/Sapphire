@@ -16,9 +16,6 @@
 #include "tex.h"
 #include "tex_decode.h"
 
-//#include "s3tc/s3tc.h"
-
-#ifndef STANDALONE
 #include <GameData.h>
 #include <File.h>
 #include <DatCat.h>
@@ -26,15 +23,21 @@
 #include <ExdCat.h>
 #include <Exd.h>
 #include <boost/algorithm/string.hpp>
-#endif
 
 // garbage to ignore models
 bool ignoreModels = false;
 
+struct ZoneInfo
+{
+   uint16_t id;
+   std::string name;
+   std::string path;
+};
+
 // parsing shit
 std::string gamePath( "C:\\Program Files (x86)\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
 std::unordered_map< uint32_t, std::string > eobjNameMap;
-std::unordered_map< uint16_t, std::string > zoneNameMap;
+std::unordered_map< uint16_t, ZoneInfo > zoneInfoMap;
 std::unordered_map< uint16_t, std::vector< std::pair< uint16_t, std::string > > > zoneInstanceMap;
 uint32_t zoneId;
 
@@ -81,7 +84,7 @@ struct DiscoveryMap : std::enable_shared_from_this< DiscoveryMap >
          return 0;
       }
 
-      //std::cout << "getColour col " << col << " row " << row << " tileX " << tileX << " tileY " << tileY << " tile index " << std::to_string( mapIndex ) << "\n";
+      //std::cout << "getColour col " << col << " row " << row << " tileX " << tileX << " tileY " << tileY << " tile index " << std::to_string( unkFlag2 ) << "\n";
       auto colour = img.data[tileY][tileX];
 
       return colour;
@@ -100,11 +103,9 @@ struct DiscoveryMap : std::enable_shared_from_this< DiscoveryMap >
    vec2 get2dPosFrom3d( float x, float y, float scale )
    {
       vec2 ret;
-      float scale2 = ( ( float )mapScale / 100.f );
+      float scale2 = ( float )( ( float )mapScale / 100.f );
       ret.x = ( ( x * scale2 ) + 1024.f );
       ret.y = ( ( y * scale2 ) + 1024.f );
-      //ret.x = ( x * scale2 ) + mapOffsetX;
-      //ret.y = ( y * scale2 ) + mapOffsetY;
 
       return ret;
    }
@@ -173,40 +174,53 @@ void getMapExdEntries( uint32_t zoneId )
       auto discoveryCompleteBitmask = *boost::get< uint32_t >( &fields.at( 13 ) );
       char texStr[255];
       auto teriStr = pathStr.substr( 0, pathStr.find_first_of( '/' ) );
-      char discoveryFile[255];
-      sprintf( &discoveryFile[0], "%s%02u", teriStr.c_str(), mapZoneIndex );
-      sprintf( &texStr[0], "ui/map/%s/%sd.tex", pathStr.c_str(), &discoveryFile[0] );
+      char discoveryFileName[255];
+      sprintf( &discoveryFileName[0], "%s%02u", teriStr.c_str(), mapZoneIndex );
+      sprintf( &texStr[0], "ui/map/%s/%sd.tex", pathStr.c_str(), &discoveryFileName[0] );
 
-
-      //if( discoveryMaps[territory].size() < 1 || discoveryMaps[territory][mapZoneIndex].size() < 1 )
+      if( discoveryMaps[territory].find( mapZoneIndex ) == discoveryMaps[territory].end() ||
+         discoveryMaps[territory][mapZoneIndex].find( hierarchy ) == discoveryMaps[territory][mapZoneIndex].end() )
       {
+         std::string fileName( discoveryFileName );
+
          try
          {
-            auto texFile = data1->getFile( &texStr[0] );
-
             std::string rawTexFile( texStr );
-            texFile->exportToFile( discoveryFile );
-            auto tex = TEX_FILE( discoveryFile );
-
-            int mipMapDivide = 1;
-            int h = tex.header.uncompressedHeight;
-            int w = tex.header.uncompressedWidth;
             auto pDiscoveryMap = std::make_shared< DiscoveryMap >();
             auto& discoveryMap = *pDiscoveryMap;
-            discoveryMap.img = DecodeTexDXT1( tex, tex.header.mipMaps[0], h / mipMapDivide, w / mipMapDivide,
-               ( h / mipMapDivide ) / 4, ( w / mipMapDivide ) / 4
-            );
+            std::ifstream discoveryFile( fileName + ".img", std::ios::binary );
+            if( !discoveryFile.good() )
+            {
+               auto texFile = data1->getFile( rawTexFile );
+               texFile->exportToFile( fileName + ".tex" );
+               
+               auto tex = TEX_FILE( fileName + ".tex" );
 
-            discoveryMap.img.toFile( rawTexFile + ".img" );
+               int mipMapDivide = 1;
+               int h = tex.header.uncompressedHeight;
+               int w = tex.header.uncompressedWidth;
+               discoveryMap.img = DecodeTexDXT1( tex, tex.header.mipMaps[0], h / mipMapDivide, w / mipMapDivide,
+                  ( h / mipMapDivide ) / 4, ( w / mipMapDivide ) / 4
+               );
+               discoveryMap.img.toFile( fileName + ".img" );
+            }
+            else
+            {
+               std::stringstream ss;
+               ss << discoveryFile.rdbuf();
+               discoveryMap.img = std::move( Image( &ss.str()[0] ) );
+               discoveryFile.close();
+            }
+
             discoveryMap.mapId = id;
-            discoveryMap.path = &texStr[0];
+            discoveryMap.path = rawTexFile;
             discoveryMap.mapOffsetX = mapOffsetX;
             discoveryMap.mapOffsetY = mapOffsetY;
             discoveryMap.mapScale = sizeFactor;
 
             std::cout << "Image Height: " << discoveryMap.img.height << " Width: " << discoveryMap.img.width << "\n";
 
-            discoveryMaps[territory][mapZoneIndex][hierarchy] = std::move( pDiscoveryMap );
+            discoveryMaps[territory][mapZoneIndex][hierarchy] = pDiscoveryMap;
          }
          catch( std::exception& e )
          {
@@ -222,50 +236,45 @@ std::string zoneNameToPath( const std::string& name )
    std::string path;
    bool found = false;
 
-#ifdef STANDALONE
-   auto inFile = std::ifstream( "territorytype.exh.csv" );
-   if( inFile.good() )
-   {
-      std::string line;
-      std::regex re( "(\\d+),\"(.*)\",\"(.*)\",.*" );
-      while( std::getline( inFile, line ) )
-      {
-         std::smatch match;
-         if( std::regex_match( line, match, re )
-         {
-            auto tmpId = std::stoul( match[1].str() );
-            if( !found && name == match[2].str() )
-            {
-               zoneId = tmpId;
-               path = match[3].str();
-               found = true;
-            }
-            zoneNameMap[tmpId] = match[2].str();
-         }
-      }
-      inFile.close();
-   }
-#else
-
    static auto& cat = eData->get_category( "TerritoryType" );
    static auto exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::none ) );
    static auto& rows = exd.get_rows();
-   for( auto& row : rows )
+
+   if( zoneInfoMap.size() == 0 )
    {
-      auto& fields = row.second;
-      auto teriName = *boost::get< std::string >( &fields.at( static_cast< size_t >( TerritoryTypeExdIndexes::TerritoryType ) ) );
-      if( teriName.empty() )
-         continue;
-      auto teriPath = *boost::get< std::string >( &fields.at( static_cast< size_t >( TerritoryTypeExdIndexes::Path ) ) );
-      if( !found && boost::iequals( name, teriName ) )
+      for( auto& row : rows )
       {
-         path = teriPath;
-         found = true;
-         zoneId = row.first;
+         auto& fields = row.second;
+         auto teriName = *boost::get< std::string >( &fields.at( static_cast< size_t >( TerritoryTypeExdIndexes::TerritoryType ) ) );
+         if( teriName.empty() )
+            continue;
+         auto teriPath = *boost::get< std::string >( &fields.at( static_cast< size_t >( TerritoryTypeExdIndexes::Path ) ) );
+         ZoneInfo info;
+         info.id = row.first;
+         info.path = teriPath;
+         info.name = teriName;
+         zoneInfoMap[row.first] = info;
+
+         if( !found && boost::iequals( name, teriName ) )
+         {
+            found = true;
+            path = teriPath;
+            zoneId = info.id;
+         }
       }
-      zoneNameMap[row.first] = teriName;
    }
-#endif
+   else
+   {
+      for( const auto& entry : zoneInfoMap )
+      {
+         if( found = boost::iequals( name, entry.second.name ) )
+         {
+            path = entry.second.path;
+            zoneId = entry.second.id;
+            break;
+         }
+      }
+   }
 
    if( found )
    {
@@ -305,6 +314,7 @@ void writeEobjEntry( std::ofstream& out, LGB_ENTRY* pObj )
    std::string name;
    std::string typeStr;
    uint32_t eobjlevelHierachyId = 0;
+   static std::map< uint32_t, std::map< uint32_t, uint32_t > > exportedMapRange;
 
    auto pMapRange = reinterpret_cast< LGB_MAPRANGE_ENTRY* >( pObj );
    id = pMapRange->header.unknown;
@@ -314,79 +324,95 @@ void writeEobjEntry( std::ofstream& out, LGB_ENTRY* pObj )
    typeStr = mapRangeStr;
 
    // discovery shit
-   vec2 pos;
-   auto subArea = -255;
+   vec2 pos{0};
+   auto subArea = 0;
    auto mapId = -1;
+   auto discoveryIndex = pMapRange->header.discoveryIndex;
 
    vec3 translation = pObj->header.translation;
-   vec3 distanceVec = pObj->header.scale;
-   //translation = translation * matrix4::rotateX(pObj->header.rotation.x);
-   //translation = translation * matrix4::rotateY(-1.f * pObj->header.rotation.y);
-   //translation = translation * matrix4::rotateZ(pObj->header.rotation.z);
 
    bool found = false;
    float scale = 100.f; //pMapRange->header.unknown2
-   
-   auto it = discoveryMaps.find( zoneId );
-   if( it != discoveryMaps.end() )
-   {
-      for (const auto& mapHierarchy : it->second )
-      {
-         if( subArea > -1 )
-            break;
-         for (const auto& levelHierarchy : mapHierarchy.second)
-         {
-            if( subArea > -1 )
-               break;
-            auto& map = *levelHierarchy.second;
-            pos = map.get2dPosFrom3d(translation.x, translation.z, scale);
-            mapId = map.mapId;
 
-            //std::cout << "3d coords " << pObj->header.translation.x << " " << pObj->header.translation.z << "\n";
-            //std::cout << "2d coords " << pos.x << " " << pos.y << "\n";
-            for (int i = 0; i < map.tiles; ++i)
+   if( pMapRange->header.mapId == 0 )
+   {
+      auto it = discoveryMaps.find( zoneId );
+      if( it != discoveryMaps.end() )
+      {
+         for( const auto& mapHierarchy : it->second )
+         {
+            if( subArea > 0 )
+               break;
+            for( const auto& levelHierarchy : mapHierarchy.second )
             {
-               auto colour = map.getColour(i, pos.x, pos.y, scale);
-               auto a = (colour >> 24) & 0xFF;
-               auto r = (colour >> 16) & 0xFF;
-               auto g = (colour >> 8) & 0xFF;
-               auto b = (colour >> 0) & 0xFF;
-               //std::cout << "R " << r << " G " << g << " B " << b << "\n";
-               if( a > 0 && ( r + b + g ) > 0)
+               if( subArea > 0 )
+                  break;
+
+               auto& map = *levelHierarchy.second;
+               pos = map.get2dPosFrom3d( translation.x, translation.z, scale );
+
+               mapId = map.mapId;
+
+               for( int i = 0; i < map.tiles; i++ )
                {
-                  if( r >= g && r >= b )
+                  auto colour = map.getColour( i, pos.x, pos.y, scale );
+                  auto a = ( colour >> 24 ) & 0xFF;
+                  auto r = ( colour >> 16 ) & 0xFF;
+                  auto g = ( colour >> 8 ) & 0xFF;
+                  auto b = ( colour >> 0 ) & 0xFF;
+                  if( a > 0 && ( r + b + g ) > 0 )
                   {
-                     // out of bounds
-                     if (i == 0)
-                        continue;
-                     subArea = ( i * 3 ) + 1;
-                     break;
-                  }
-                  else if( g > b )
-                  {
-                     subArea = ( i * 3 ) + 2;
-                     break;
-                  }
-                  else
-                  {
-                     subArea = ( i * 3 ) + 3;
+                     if( r > 0 )
+                     {
+                        // out of bounds
+                        if( i == 0 )
+                           continue;
+                        subArea = ( i * 3 ) + 1;
+                     }
+                     else if( g > 0 )
+                     {
+                        subArea = ( i * 3 ) + 2;
+                     }
+                     else if( b > 0 )
+                     {
+                        subArea = ( i * 3 ) + 3;
+                     }
                      break;
                   }
                }
             }
          }
       }
+      subArea--;
    }
-   subArea--;
-   
-   if( subArea < -254 )
+   else
    {
-      std::cout << "\tUnable to find subarea for maprange " << std::to_string( id ) << " mapCoord " << pos.x << " " << pos.y <<
-         "\tzoneCoord " << translation.x << " " << translation.y << " " << translation.z << " " << "\n";
+      mapId = pMapRange->header.mapId;
+   }
+   
+   subArea = pMapRange->header.discoveryIndex + 1;
+
+   //if( discoveryIndex == subArea )
+   {
+      //std::cout << std::to_string( id ) << " discoveryIndex " << std::to_string( discoveryIndex ) << " subArea " << subArea << "\n";
+   }
+   
+   if( discoveryIndex == 0 )
+   {
+      //std::cout << "\tUnable to find subarea for maprange " << std::to_string( id ) << " mapCoord " << pos.x << " " << pos.y <<
+      //   "\tzoneCoord " << translation.x << " " << translation.y << " " << translation.z << " " << "\n";
       return;
    }
+   else if( mapId == -1 )
+   {
+      //std::cout << "\tUnable to find subarea for maprange " << std::to_string(id) << " " << "\n";
+      return;
+   }
+   if( exportedMapRange[id][mapId] == discoveryIndex )
+      return;
+   exportedMapRange[id][mapId] = discoveryIndex;
    std::string outStr( "INSERT INTO discoveryinfo VALUES (" +
-      std::to_string( id ) + ", " + std::to_string( mapId ) + ", " + std::to_string( subArea ) + ");\n"
+      std::to_string( id ) + ", " + std::to_string( mapId ) + ", " + std::to_string( discoveryIndex ) + ");\n"
       //std::to_string( pObj->header.translation.x ) + ", " + std::to_string( pObj->header.translation.y ) + ", " + std::to_string( pObj->header.translation.z ) +
       //", " + std::to_string( subArea ) + "" + "\n"
    );
@@ -420,7 +446,6 @@ int main( int argc, char* argv[] )
    auto entryStartTime = std::chrono::system_clock::now();
 
    std::vector< std::string > argVec( argv + 1, argv + argc );
-   // todo: support expansions
    std::string zoneName = "s1d1";
 
    bool dumpAll = ignoreModels = std::remove_if( argVec.begin(), argVec.end(), []( auto arg ){ return arg == "--dump-all"; } ) != argVec.end();
@@ -445,8 +470,8 @@ int main( int argc, char* argv[] )
    {
       zoneNameToPath( "r1f1" );
 
-      for( const auto& zone : zoneNameMap )
-         zoneDumpList.emplace( zone.second );
+      for( const auto& zone : zoneInfoMap )
+         zoneDumpList.emplace( zone.second.name );
    }
    else
    {
@@ -458,7 +483,7 @@ LABEL_DUMP:
    zoneName = *zoneDumpList.begin();
    try
    {
-      const auto& zonePath = zoneNameToPath( zoneName );
+      const auto zonePath = zoneNameToPath( zoneName );
 
       std::string listPcbPath( zonePath + "/collision/list.pcb" );
       std::string bgLgbPath( zonePath + "/level/bg.lgb" );
@@ -470,9 +495,6 @@ LABEL_DUMP:
       std::vector< char > section1;
       std::vector< char > section2;
 
-#ifndef STANDALONE
-      const xiv::dat::Cat& test = data1->getCategory( "bg" );
-
       auto test_file = data1->getFile( bgLgbPath );
       section = test_file->access_data_sections().at( 0 );
 
@@ -481,18 +503,12 @@ LABEL_DUMP:
 
       auto test_file1 = data1->getFile( listPcbPath );
       section1 = test_file1->access_data_sections().at( 0 );
-#else
-      {
-         readFileToBuffer( bgLgbPath, section );
-         readFileToBuffer( listPcbPath, section1 );
-      }
-#endif
 
       std::vector< std::string > stringList;
 
       uint32_t offset1 = 0x20;
 
-      loadEobjNames();
+      //loadEobjNames();
       getMapExdEntries( zoneId );
 
       std::string eobjFileName( zoneName + "_eobj.csv" );
