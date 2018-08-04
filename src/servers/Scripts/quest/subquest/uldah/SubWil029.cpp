@@ -90,7 +90,10 @@ class SubWil029 : public EventScript
             {
                Scene00003( player );
             }
-            else return;
+            else
+            {
+               Scene00004( player );
+            }
          } );
    }
 

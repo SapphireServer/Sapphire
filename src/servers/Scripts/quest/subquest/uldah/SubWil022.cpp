@@ -77,7 +77,10 @@ class SubWil022 : public EventScript
             {
                Scene00100( player );
             }
-            else return;
+            else
+            {
+               Scene00099( player );
+            }
          } );
    }
 
@@ -86,7 +89,7 @@ class SubWil022 : public EventScript
       player.playScene( getId(), 99, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-         });
+         } );
    }
 
    void Scene00100( Entity::Player& player )
