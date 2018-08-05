@@ -28,4 +28,24 @@ static vec3 operator *(const vec3& lhs, const matrix4& rhs)
    ret.z = rhs(2, 0) * lhs.x + rhs(2, 1) * lhs.y + rhs(2, 2) * lhs.z;
    return ret;
 };
+static vec3 operator *(const vec3& lhs, float scalar)
+{
+   return {lhs.x * scalar, lhs.y * scalar, lhs.z * scalar};
+}
+static vec3 operator +(const vec3& lhs, const vec3& rhs)
+{
+   return {lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z};
+}
+static vec3 operator -(const vec3& lhs, const vec3& rhs)
+{
+   return {lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z};
+}
+static vec3 operator /(const vec3& lhs, const vec3& rhs)
+{
+   return {lhs.x / rhs.x, lhs.y / rhs.y, lhs.z / rhs.z};
+}
+static vec3 operator /(const vec3& lhs, float scalar)
+{
+   return {lhs.x / scalar, lhs.y / scalar, lhs.z / scalar};
+}
 #endif
