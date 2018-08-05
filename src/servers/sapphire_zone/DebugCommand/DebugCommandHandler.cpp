@@ -159,7 +159,6 @@ void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost:
    pLog->debug( "[" + std::to_string( player.getId() ) + "] " +
                 "subCommand " + subCommand + " params: " + params );
 
-
    if( ( ( subCommand == "pos" ) || ( subCommand == "posr" ) ) && ( params != "" ) )
    {
       int32_t posX;
@@ -320,6 +319,58 @@ void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost:
    else if( subCommand == "festivaldisable" )
    {
       pTerriMgr->disableCurrentFestival();
+   }
+   else if ( subCommand == "BitFlag" )
+   {
+      uint16_t questId;
+      uint8_t questBit;
+      int8_t BitFlag;
+      sscanf( params.c_str(), "%hhu %hu %hhu", &BitFlag, &questId, &questBit );
+
+      if( !player.hasQuest( questId ) )
+      {
+         player.sendDebug( "Player doesn't have the quest with ID: " + std::to_string( questId ) );
+         return;
+      }
+      if( questBit == 0 || questId == 0 )
+      {
+         player.sendDebug( "Params are not correct" );
+         return;
+      }
+
+      switch ( BitFlag )
+      {
+         case 8:
+         {
+            player.setQuestBitFlag8( questId, questBit, true );
+            break;
+         }
+         case 16:
+         {
+            player.setQuestBitFlag16( questId, questBit, true );
+            break;
+         }
+         case 24:
+         {
+            player.setQuestBitFlag24( questId, questBit, true );
+            break;
+         }
+         case 32:
+         {
+            player.setQuestBitFlag32( questId, questBit, true );
+            break;
+         }
+         case 40:
+         {
+            player.setQuestBitFlag40( questId, questBit, true );
+            break;
+         }
+         case 48:
+         {
+            player.setQuestBitFlag48( questId, questBit, true );
+            break;
+         }
+      }
    }
    else
    {
