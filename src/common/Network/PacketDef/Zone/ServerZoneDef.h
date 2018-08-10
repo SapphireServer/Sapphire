@@ -481,7 +481,7 @@ struct FFXIVIpcNpcSpawn : FFXIVIpcBasePacket<NpcSpawn>
    uint32_t u19;
    uint32_t directorId;
    uint32_t ownerId;
-   uint32_t parentOwnerId;
+   uint32_t parentActorId;
    uint32_t hPMax;
    uint32_t hPCurr;
    uint32_t displayFlags;
@@ -521,7 +521,7 @@ struct FFXIVIpcNpcSpawn : FFXIVIpcBasePacket<NpcSpawn>
    char fcTag[6];
    uint32_t unk30;
    uint32_t unk31;
-   uint8_t bnpcPartSlot;
+   uint8_t bNPCPartSlot;
    uint8_t unk32;
    uint16_t unk33;
    uint32_t unk34;
