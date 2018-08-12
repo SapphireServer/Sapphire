@@ -11,11 +11,12 @@
 
 extern Core::Framework g_fw;
 
-Core::ItemContainer::ItemContainer( uint16_t storageId, uint8_t maxSize, const std::string& tableName, bool isMultiStorage ) : 
+Core::ItemContainer::ItemContainer( uint16_t storageId, uint8_t maxSize, const std::string& tableName, bool isMultiStorage, bool isPersistentStorage ) :
    m_id( storageId ),
    m_size( maxSize ),
    m_tableName( tableName ),
-   m_bMultiStorage( isMultiStorage )
+   m_bMultiStorage( isMultiStorage ),
+   m_isPersistentStorage( isPersistentStorage )
 {
 
 }
@@ -43,7 +44,8 @@ void Core::ItemContainer::removeItem( uint8_t slotId )
 
    if( it != m_itemMap.end() )
    {
-      pDb->execute( "DELETE FROM charaglobalitem WHERE itemId = " + std::to_string( it->second->getUId() ) );
+      if( m_isPersistentStorage )
+         pDb->execute( "DELETE FROM charaglobalitem WHERE itemId = " + std::to_string( it->second->getUId() ) );
 
       m_itemMap.erase( it );
 
@@ -111,6 +113,11 @@ std::string Core::ItemContainer::getTableName() const
 bool Core::ItemContainer::isMultiStorage() const
 {
    return m_bMultiStorage;
+}
+
+bool Core::ItemContainer::isPersistentStorage() const
+{
+   return m_isPersistentStorage;
 }
 
 

@@ -612,7 +612,7 @@ public:
    bool loadInventory();
    InvSlotPairVec getSlotsOfItemsInInventory( uint32_t catalogId );
    InvSlotPair getFreeBagSlot();
-   int16_t addItem( uint16_t inventoryId, int8_t slotId, uint32_t catalogId, uint16_t quantity = 1, bool isHq = false, bool silent = false );
+   Core::ItemPtr addItem( uint16_t inventoryId, int8_t slotId, uint32_t catalogId, uint16_t quantity = 1, bool isHq = false, bool slient = false );
    void moveItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot );
    void swapItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot );
    void discardItem( uint16_t fromInventoryId, uint8_t fromSlotId );
@@ -760,7 +760,7 @@ private:
    // content finder info
    uint32_t m_cfPenaltyUntil; // unix time
 
-   uint8_t m_mount;
+   uint32_t m_mount;
    uint32_t m_emoteMode;
    uint8_t m_pose;
 
