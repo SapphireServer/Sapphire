@@ -533,16 +533,19 @@ int16_t Core::Entity::Player::addItem( uint16_t inventoryId, int8_t slotId, uint
                     " WHERE storageId = " + std::to_string( inventoryId ) +
                     " AND CharacterId = " + std::to_string( getId() ) );
 
+      if( !slient )
+      {
+         auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
+                                                                           rSlotId,
+                                                                           inventoryId,
+                                                                           *item );
 
-      auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
-                                                                        rSlotId,
-                                                                        inventoryId,
-                                                                        *item );
-      queuePacket( invUpdate );
+         queuePacket( invUpdate );
 
-      if( !silent )
          queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), ItemObtainIcon,
                                                                    catalogId, item->getStackSize() ) );
+      }
+
 
    }
 
@@ -613,6 +616,9 @@ bool Core::Entity::Player::updateContainer( uint16_t storageId, uint8_t slotId, 
 void Core::Entity::Player::splitItem( uint16_t fromInventoryId, uint8_t fromSlotId,
                                       uint16_t toInventoryId, uint8_t toSlot, uint16_t itemCount )
 {
+   if( itemCount == 0 )
+      return;
+
    auto fromItem = m_storageMap[fromInventoryId]->getItem( fromSlotId );
    if( !fromItem )
       return;
