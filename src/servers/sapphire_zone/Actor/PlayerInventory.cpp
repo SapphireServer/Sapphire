@@ -449,7 +449,7 @@ void Core::Entity::Player::writeInventory( InventoryType type )
 
    auto storage = m_storageMap[type];
 
-   if( storage->isPersistentStorage() )
+   if( !storage->isPersistentStorage() )
       return;
 
    std::string query = "UPDATE " + storage->getTableName() + " SET ";
