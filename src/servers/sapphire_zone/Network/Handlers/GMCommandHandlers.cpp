@@ -324,7 +324,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
       }
 
       if( !targetPlayer->addItem( -1, param1, quantity ) )
-         player.sendUrgent( "Item " + std::to_string( param1 ) + " not found..." );
+         player.sendUrgent( "Item " + std::to_string( param1 ) + " could not be added to inventory." );
       break;
    }
    case GmCommand::Gil:

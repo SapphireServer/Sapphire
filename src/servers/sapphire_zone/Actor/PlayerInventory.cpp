@@ -45,8 +45,8 @@ using namespace Core::Network::ActorControl;
 
 void Core::Entity::Player::initInventory()
 {
-   auto setupContainer = [this]( InventoryType type, uint8_t maxSize, const std::string& tableName, bool isMultiStorage )
-   { m_storageMap[type] = make_ItemContainer( type, maxSize, tableName, isMultiStorage ); };
+   auto setupContainer = [this]( InventoryType type, uint8_t maxSize, const std::string& tableName, bool isMultiStorage, bool isPersistentStorage = true )
+   { m_storageMap[type] = make_ItemContainer( type, maxSize, tableName, isMultiStorage, isPersistentStorage ); };
 
    // main bags
    setupContainer( Bag0, 34, "charaiteminventory", true );
@@ -101,6 +101,10 @@ void Core::Entity::Player::initInventory()
 
    //soul crystals - 13
    setupContainer( ArmorySoulCrystal, 34, "charaiteminventory", true );
+
+   // item hand in container
+   // non-persistent container, will not save its contents
+   setupContainer( HandIn, 10, "", true, false );
 
    loadInventory();
 
@@ -321,7 +325,7 @@ bool Core::Entity::Player::tryAddItem( uint16_t catalogId, uint32_t quantity )
 
    for( uint16_t i = 0; i < 4; i++ )
    {
-      if( addItem( i, -1, catalogId, quantity ) != -1 )
+      if( addItem( i, -1, catalogId, quantity ) )
          return true;
    }
    return false;
@@ -445,6 +449,9 @@ void Core::Entity::Player::writeInventory( InventoryType type )
 
    auto storage = m_storageMap[type];
 
+   if( storage->isPersistentStorage() )
+      return;
+
    std::string query = "UPDATE " + storage->getTableName() + " SET ";
 
    for( int32_t i = 0; i <= storage->getMaxSize(); i++ )
@@ -488,7 +495,7 @@ bool Core::Entity::Player::isObtainable( uint32_t catalogId, uint8_t quantity )
 }
 
 
-int16_t Core::Entity::Player::addItem( uint16_t inventoryId, int8_t slotId, uint32_t catalogId, uint16_t quantity, bool isHq, bool silent )
+Core::ItemPtr Core::Entity::Player::addItem( uint16_t inventoryId, int8_t slotId, uint32_t catalogId, uint16_t quantity, bool isHq, bool silent )
 {
    auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
@@ -497,7 +504,7 @@ int16_t Core::Entity::Player::addItem( uint16_t inventoryId, int8_t slotId, uint
    // if item data doesn't exist or it's a blank field
    if( !itemInfo || itemInfo->levelItem == 0 )
    {
-      return -1;
+      return nullptr;
    }
 
    int8_t rSlotId = -1;
@@ -515,7 +522,7 @@ int16_t Core::Entity::Player::addItem( uint16_t inventoryId, int8_t slotId, uint
       rSlotId = freeSlot.second;
 
       if( rSlotId == -1 )
-         return -1;
+         return nullptr;
    }
 
    auto item = createItem( catalogId, quantity );
@@ -533,7 +540,7 @@ int16_t Core::Entity::Player::addItem( uint16_t inventoryId, int8_t slotId, uint
                     " WHERE storageId = " + std::to_string( inventoryId ) +
                     " AND CharacterId = " + std::to_string( getId() ) );
 
-      if( !slient )
+      if( !silent )
       {
          auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
                                                                            rSlotId,
@@ -549,7 +556,7 @@ int16_t Core::Entity::Player::addItem( uint16_t inventoryId, int8_t slotId, uint
 
    }
 
-   return rSlotId;
+   return item;
 
 }
 
@@ -634,11 +641,9 @@ void Core::Entity::Player::splitItem( uint16_t fromInventoryId, uint8_t fromSlot
       // todo: correct invalid move? again, not sure what retail does here
       return;
 
-   auto newSlot = addItem( toInventoryId, toSlot, fromItem->getId(), itemCount, fromItem->isHq(), true );
-   if( newSlot == -1 )
+   auto newItem = addItem( toInventoryId, toSlot, fromItem->getId(), itemCount, fromItem->isHq(), true );
+   if( !newItem )
       return;
-
-   auto newItem = m_storageMap[toInventoryId]->getItem( static_cast< uint8_t >( newSlot ) );
 
    fromItem->setStackSize( fromItem->getStackSize() - itemCount );
 

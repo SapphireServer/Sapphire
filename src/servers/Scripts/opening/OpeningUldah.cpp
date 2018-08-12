@@ -31,27 +31,22 @@ private:
       auto callback = [this]( Entity::Player& player, const Event::SceneResult& result )
       {
          auto questionAnswer = result.param2;
-         int16_t rSlotId;
+
+         uint16_t itemId = 0;
 
          switch( questionAnswer )
          {
-            case 1:  rSlotId = player.addItem( Common::InventoryType::ArmoryRing, -1, 4423, 1, false, true ); break;
-            case 2:  rSlotId = player.addItem( Common::InventoryType::ArmoryRing, -1, 4424, 1, false, true ); break;
-            case 3:  rSlotId = player.addItem( Common::InventoryType::ArmoryRing, -1, 4425, 1, false, true ); break;
-            case 4:  rSlotId = player.addItem( Common::InventoryType::ArmoryRing, -1, 4426, 1, false, true ); break;
-            default: rSlotId = player.addItem( Common::InventoryType::ArmoryRing, -1, 4426, 1, false, true ); break;
+            case 1:  itemId = 4423; break;
+            case 2:  itemId = 4424; break;
+            case 3:  itemId = 4425; break;
+            case 4:  itemId = 4426; break;
+            default: itemId = 4426; break;
          }
 
-         if( rSlotId != -1 )
-         {
-            auto pItem = player.getItemAt( Common::InventoryType::ArmoryRing, rSlotId );
+         auto item = player.addItem( Common::InventoryType::ArmoryRing, -1, itemId, 1, false, true );
 
-            player.sendDebug( std::to_string( rSlotId ) );
-
-            if( pItem )
-               player.equipItem( Common::EquipSlot::Ring2, pItem, true );
-
-         }
+         if( item )
+            player.equipItem( Common::EquipSlot::Ring2, item, true );
 
          player.setOpeningSequence( 1 );
          Scene00001( player );
