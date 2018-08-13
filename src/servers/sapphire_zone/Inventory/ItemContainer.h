@@ -16,7 +16,7 @@ namespace Core
    {
 
    public:
-      ItemContainer( uint16_t storageId, uint8_t maxSize, const std::string& tableName, bool isMultiStorage );
+      ItemContainer( uint16_t storageId, uint8_t maxSize, const std::string& tableName, bool isMultiStorage, bool isPersistentStorage = true );
       ~ItemContainer();
 
       uint16_t getId() const;
@@ -40,12 +40,15 @@ namespace Core
       std::string getTableName() const;
 
       bool isMultiStorage() const;
+
+      bool isPersistentStorage() const;
       
    private:
       uint16_t m_id;
       uint8_t m_size;
       std::string m_tableName;
       bool m_bMultiStorage;
+      bool m_isPersistentStorage;
       ItemMap m_itemMap;
       Entity::PlayerPtr m_pOwner;
    };

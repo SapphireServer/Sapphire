@@ -153,9 +153,7 @@ struct FFXIVIpcInventoryModifyHandler : FFXIVIpcBasePacket< InventoryModifyHandl
 {
    /* 0000 */ uint32_t seq;
    /* 0004 */ Common::InventoryOperation action;
-   /* 0005 */ char pad_0005[3];
-   /* 0008 */ uint16_t splitCount; // todo: check packet handler in game and see if this is sent as a u16 or u32
-   /* 000A */ char pad_000A[2];
+   /* 0005 */ char pad_0005[7];
    /* 000C */ uint16_t fromContainer;
    /* 000E */ char pad_000E[2];
    /* 0010 */ uint8_t fromSlot;
@@ -163,6 +161,8 @@ struct FFXIVIpcInventoryModifyHandler : FFXIVIpcBasePacket< InventoryModifyHandl
    /* 0020 */ uint16_t toContainer;
    /* 0022 */ char pad_0022[2];
    /* 0024 */ uint8_t toSlot;
+   /* 0025 */ uint8_t pad_0025[3];
+   /* 0028 */ uint32_t splitCount;
 };
 
 }

@@ -4,7 +4,7 @@
 #include <string>
 #include <typeinfo>
 #include <typeindex>
-#include <sapphire_zone/Event/EventHandler.h>
+#include <Event/EventHandler.h>
 #include "Forwards.h"
 
 #ifdef _MSC_VER
