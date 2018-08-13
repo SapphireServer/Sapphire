@@ -459,7 +459,7 @@ struct FFXIVIpcNpcSpawn : FFXIVIpcBasePacket<NpcSpawn>
    uint8_t gmRank;
    uint8_t u3b;
 
-   uint8_t u3a;
+   uint8_t aggressionMode; // 1 passive, 2 aggressive
    uint8_t onlineStatus;
    uint8_t u3c;
    uint8_t pose;
