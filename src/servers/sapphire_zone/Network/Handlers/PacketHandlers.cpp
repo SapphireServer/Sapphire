@@ -423,7 +423,7 @@ void Core::Network::GameConnection::socialListHandler( const Core::Network::Pack
 
       // todo: store language in db search info or something
       listPacket->data().entries[0].clientLanguage = Common::ClientLanguage::English; // todo: read from memory
-      listPacket->data().entries[0].knownLanguages = Common::ClientLanguage::English | Common::ClientLanguage::German; // todo: read from memory
+      listPacket->data().entries[0].knownLanguages = Common::ClientLanguage::EnglishMask | Common::ClientLanguage::GermanMask; // todo: read from memory
       listPacket->data().entries[0].classJob = player.getClass();
       listPacket->data().entries[0].contentId = player.getContentId();
       listPacket->data().entries[0].level = player.getLevel();

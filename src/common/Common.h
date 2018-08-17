@@ -38,10 +38,15 @@ namespace Common {
 
    enum ClientLanguage : uint8_t
    {
-      Japanese = 1,
-      English = 2,
-      German = 4,
-      French = 8
+      Japanese = 0,
+      English = 1,
+      German = 2,
+      French = 3,
+
+      JapaneseMask = 1 << Japanese,
+      EnglishMask = 1 << English,
+      GermanMask = 1 << German,
+      FrenchMask = 1 << French
    };
 
    enum EquipSlot : uint8_t
