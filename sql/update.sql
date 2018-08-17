@@ -51,5 +51,5 @@ ALTER TABLE `charainfo` ADD COLUMN `EquipDisplayFlags` INT(3) NULL DEFAULT '0' A
 ALTER TABLE `charainfo` ADD COLUMN `Pose` INT(3) NULL DEFAULT '0' AFTER `EquipDisplayFlags`;
 ALTER TABLE `charainfo` ADD COLUMN `EquipDisplayFlags` INT(3) NULL DEFAULT '0' AFTER `GMRank`;
 
-ALTER TABLE `charainfofriendlist` CHANGE `CharacterId` `ContentId` bigint(20) NULL DEFAULT NULL;
+ALTER TABLE `charainfofriendlist` CHANGE `CharacterId` `ContentId` bigint(20) DEFAULT 0;
 ALTER TABLE `charainfofriendlist` CHANGE `CharacterIdList` `ContentIdList` blob NULL DEFAULT NULL;
