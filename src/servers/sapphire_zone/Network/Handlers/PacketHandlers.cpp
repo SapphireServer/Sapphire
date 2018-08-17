@@ -538,9 +538,9 @@ void Core::Network::GameConnection::chatHandler( const Core::Network::Packets::F
 void Core::Network::GameConnection::socialReqProcessHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                               Entity::Player& player )
 {
-   auto targetId = *reinterpret_cast< const uint64_t* >( &inPacket.data[0x20] );
-   auto category = *reinterpret_cast< const Common::SocialCategory* >( &inPacket.data[0x28] );
-   auto execute = *reinterpret_cast< const Common::SocialRequestExecute* >( &inPacket.data[0x29] );
+   auto targetId = *reinterpret_cast< const uint64_t* >( &inPacket.data[0x10] );
+   auto category = *reinterpret_cast< const Common::SocialCategory* >( &inPacket.data[0x18] );
+   auto execute = *reinterpret_cast< const Common::SocialRequestExecute* >( &inPacket.data[0x19] );
 
    auto friendListMgr = g_fw.get< Social::SocialMgr< Social::FriendList > >();
 
@@ -573,6 +573,25 @@ void Core::Network::GameConnection::socialReqProcessHandler( const Packets::FFXI
 
          break;
       }
+      case SocialRequestExecute::Cancel:
+      {
+         g_fw.get< Logger >()->debug( "uguuuuuuuu" );
+         auto recipientFriendsList = g_fw.get< Social::SocialMgr< Social::FriendList > >()->findGroupById( player.getContentId() );
+
+         // Load our target's friendlist, hoping it's still in memory.. (target could have gone offline at this point)
+         if( !friendListMgr->loadFriendsList( targetId ) )
+         {
+            g_fw.get< Logger >()->error( "Failed to load friend list for character ID " + std::to_string( targetId ) + ", removing entry." );
+         }
+
+         auto senderFriendsList = friendListMgr->findGroupById( targetId );
+         
+         senderFriendsList->processInvite( player.getContentId(), SocialRequestExecute::Decline );
+         //todo: FICK
+         recipientFriendsList->processInvite( targetId, SocialRequestExecute::Decline );
+
+      }
+      break;
       default:
          break;
    }
@@ -607,7 +626,7 @@ void Core::Network::GameConnection::socialReqProcessHandler( const Packets::FFXI
       // If they're online, send a packet for them both.
       // First the sender, then recipient..
       auto name = player.getName();
-      response->data().execute = Common::SocialRequestExecute::Accept;
+      response->data().execute = execute;
       memcpy( &( response->data().name ), name.c_str(), 32 );
 
       pSession->getPlayer()->queuePacket( response );
@@ -620,9 +639,9 @@ void Core::Network::GameConnection::socialReqProcessHandler( const Packets::FFXI
 void Core::Network::GameConnection::socialReqRemoveHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
    Entity::Player& player )
 {
-   auto category = *reinterpret_cast< const Common::SocialCategory* >( &inPacket.data[0x20] );
-   auto targetId = inPacket.segHdr.target_actor;
-   auto execute = *reinterpret_cast< const Common::SocialRequestExecute* >( &inPacket.data[0x29] );
+   auto category = *reinterpret_cast< const Common::SocialCategory* >( &inPacket.data[0x10] );
+   auto targetId = *reinterpret_cast< const uint32_t* >( &inPacket.data[0x11] );
+   auto execute = *reinterpret_cast< const Common::SocialRequestExecute* >( &inPacket.data[0x19] );
 
    auto friendListMgr = g_fw.get< Social::SocialMgr< Social::FriendList > >();
 
@@ -680,8 +699,8 @@ void Core::Network::GameConnection::socialReqSendHandler( const Packets::FFXIVAR
                                                           Entity::Player& player )
 {
       // todo: handle all social request packets here
-   auto category = *reinterpret_cast< const Common::SocialCategory* >( &inPacket.data[0x20] );
-   auto name = std::string( reinterpret_cast< const char* >( &inPacket.data[0x21] ) );
+   auto category = *reinterpret_cast< const Common::SocialCategory* >( &inPacket.data[0x10] );
+   auto name = std::string( reinterpret_cast< const char* >( &inPacket.data[0x11] ) );
 
    auto pSession = g_fw.get< ServerZone >()->getSession( name );
 

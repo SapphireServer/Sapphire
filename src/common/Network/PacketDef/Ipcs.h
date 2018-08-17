@@ -67,7 +67,7 @@ namespace Packets {
       CFDutyInfo                    = 0x007A,
       CFPlayerInNeed                = 0x007F,
 
-      SocialRequestError            = 0x00AD,
+      SocialRequestError            = 0x00FA,
 
       CFRegistered                  = 0x00B8, // updated 4.1
       CancelAllianceForming         = 0x00C6, // updated 4.2
@@ -215,19 +215,23 @@ namespace Packets {
 
       CFDutyInfoHandler            = 0x0078, // updated 4.2
 
-      SocialReqSendHandler         = 0x00AE, // updated 4.1
-      SocialReqProcessHandler      = 0x00AB, // fake
-      SocialReqRemoveHandler       = 0x00AC, // fake
       CreateCrossWorldLS           = 0x00AF, // updated 4.3
 
       ChatHandler                  = 0x00D3, // updated 4.3
 
       SocialListHandler            = 0x00DB, // updated 4.3
       ReqSearchInfoHandler         = 0x00E0, // updated 4.3
+
+      SocialReqSendHandler         = 0x00D6, // updated 4.36
+      SocialReqProcessHandler      = 0x00D8, // updated 4.36
+
       SetSearchInfoHandler         = 0x00DE, // updated 4.3
 
-      BlackListHandler             = 0x00EC, // updated 4.3
       PlayerSearchHandler          = 0x00E2, // updated 4.2
+      PartyKickHandler             = 0x00E6, // updated 4.36
+
+      BlackListHandler             = 0x00EC, // updated 4.3
+      SocialReqRemoveHandler       = 0x00ED, // updated 4.36
 
       LinkshellListHandler         = 0x00F4, // updated 4.3
 
