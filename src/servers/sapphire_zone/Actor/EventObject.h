@@ -38,6 +38,8 @@ namespace Entity
       void spawn( PlayerPtr pTarget ) override;
       void despawn( PlayerPtr pTarget ) override;
 
+      void setAnimationFlag( uint32_t flag, uint32_t animationFlag );
+
    protected:
       uint32_t m_gimmickId;
       uint32_t m_objectId;
@@ -46,6 +48,8 @@ namespace Entity
       std::string m_name;
       InstanceContentPtr m_parentInstance;
       OnTalkEventHandler m_onTalkEventHandler;
+
+
    };
 }
 }

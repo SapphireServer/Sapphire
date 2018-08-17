@@ -70,7 +70,19 @@ std::string Core::Event::getEventName( uint32_t eventId )
 
    case Event::EventHandler::EventHandlerType::Warp:
    {
-      return "ChocoboTaxi";
+      auto warpInfo = pExdData->get< Core::Data::Warp >( eventId );
+      if( warpInfo )
+         return "WarpTaxi";
+      return unknown + "ChocoboWarp"; //who know
+   }
+   case Event::EventHandler::EventHandlerType::Shop:
+   {
+      auto shopInfo = pExdData->get< Core::Data::GilShop >( eventId );
+      std::string name = shopInfo->name;
+
+      if( shopInfo )
+         return name;
+      return unknown + "GilShop";
    }
    default:
    {

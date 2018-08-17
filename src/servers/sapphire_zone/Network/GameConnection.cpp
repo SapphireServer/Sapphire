@@ -4,11 +4,11 @@
 #include <Network/CommonNetwork.h>
 #include <Util/Util.h>
 #include <Logging/Logger.h>
+#include <utility>
 
 #include <Network/Acceptor.h>
 #include <Network/PacketContainer.h>
 #include <Network/GamePacketParser.h>
-#include <Network/GamePacket.h>
 
 #include "Zone/Zone.h"
 
@@ -69,11 +69,11 @@ Core::Network::GameConnection::GameConnection( Core::Network::HivePtr pHive,
    setZoneHandler( ClientZoneIpcType::FcInfoReqHandler,     "FcInfoReqHandler",         &GameConnection::fcInfoReqHandler );
 
    setZoneHandler( ClientZoneIpcType::ZoneLineHandler,      "ZoneLineHandler",          &GameConnection::zoneLineHandler );
-   setZoneHandler( ClientZoneIpcType::ActionHandler,        "ActionHandler",            &GameConnection::actionHandler );
+   setZoneHandler( ClientZoneIpcType::ClientTrigger,        "ClientTrigger",            &GameConnection::clientTriggerHandler );
 
    setZoneHandler( ClientZoneIpcType::DiscoveryHandler,     "DiscoveryHandler",         &GameConnection::discoveryHandler );
 
-   setZoneHandler( ClientZoneIpcType::SkillHandler,         "SkillHandler",             &GameConnection::skillHandler );
+   setZoneHandler( ClientZoneIpcType::SkillHandler,         "ActionHandler",            &GameConnection::actionHandler );
 
    setZoneHandler( ClientZoneIpcType::GMCommand1,           "GMCommand1",               &GameConnection::gm1Handler );
    setZoneHandler( ClientZoneIpcType::GMCommand2,           "GMCommand2",               &GameConnection::gm2Handler );
@@ -177,34 +177,35 @@ void Core::Network::GameConnection::OnError( const boost::system::error_code & e
    pLog->debug( "GameConnection ERROR: " + error.message() );
 }
 
-void Core::Network::GameConnection::queueInPacket( Core::Network::Packets::GamePacketPtr inPacket )
+void Core::Network::GameConnection::queueInPacket( Core::Network::Packets::FFXIVARR_PACKET_RAW inPacket )
 {
    m_inQueue.push( inPacket );
 }
 
-void Core::Network::GameConnection::queueOutPacket( Core::Network::Packets::GamePacketPtr outPacket )
+void Core::Network::GameConnection::queueOutPacket( Core::Network::Packets::FFXIVPacketBasePtr outPacket )
 {
    m_outQueue.push( outPacket );
 }
 
-void Core::Network::GameConnection::handleZonePacket( const Packets::GamePacket& pPacket )
+void Core::Network::GameConnection::handleZonePacket( Core::Network::Packets::FFXIVARR_PACKET_RAW& pPacket )
 {
    auto pLog = g_fw.get< Logger >();
-   auto it = m_zoneHandlerMap.find( pPacket.getSubType() );
+   uint16_t opcode = *reinterpret_cast< uint16_t* >( &pPacket.data[0x02] );
+   auto it = m_zoneHandlerMap.find( opcode );
 
    std::string sessionStr = "[" + std::to_string( m_pSession->getId() ) + "]";
 
    if( it != m_zoneHandlerMap.end() )
    {
-      auto itStr = m_zoneHandlerStrMap.find( pPacket.getSubType() );
+      auto itStr = m_zoneHandlerStrMap.find( opcode );
       std::string name = itStr != m_zoneHandlerStrMap.end() ? itStr->second : "unknown";
       // dont display packet notification if it is a ping or pos update, don't want the spam
-      if( pPacket.getSubType() != PingHandler &&
-          pPacket.getSubType() != UpdatePositionHandler )
+      if( opcode != PingHandler &&
+          opcode != UpdatePositionHandler )
 
          pLog->debug( sessionStr + " Handling Zone IPC : " + name + "( " +
                       boost::str( boost::format( "%|04X|" ) %
-                                         static_cast< uint32_t >( pPacket.getSubType() & 0xFFFF ) ) + " )" );
+                                         static_cast< uint32_t >( opcode ) ) + " )" );
 
       ( this->*( it->second ) )( pPacket, *m_pSession->getPlayer() );
    }
@@ -212,28 +213,29 @@ void Core::Network::GameConnection::handleZonePacket( const Packets::GamePacket&
    {
       pLog->debug( sessionStr + " Undefined Zone IPC : Unknown ( " +
                    boost::str( boost::format( "%|04X|" ) %
-                                      static_cast< uint32_t >( pPacket.getSubType() & 0xFFFF ) ) + " )" );
-      pLog->debug( "\n" + pPacket.toString() );
+                                      static_cast< uint32_t >( opcode ) ) + " )" );
+      pLog->debug( "Dump:\n" + Util::binaryToHexDump( const_cast< uint8_t* >( &pPacket.data[0] ), pPacket.segHdr.size ) );
    }
 }
 
 
-void Core::Network::GameConnection::handleChatPacket( const Packets::GamePacket& pPacket )
+void Core::Network::GameConnection::handleChatPacket( Core::Network::Packets::FFXIVARR_PACKET_RAW& pPacket )
 {
    auto pLog = g_fw.get< Logger >();
-   auto it = m_chatHandlerMap.find( pPacket.getSubType() );
+   uint16_t opcode = *reinterpret_cast< uint16_t* >( &pPacket.data[0x02] );
+   auto it = m_chatHandlerMap.find( opcode );
 
    std::string sessionStr = "[" + std::to_string( m_pSession->getId() ) + "]";
 
    if( it != m_chatHandlerMap.end() )
    {
-      auto itStr = m_chatHandlerStrMap.find( pPacket.getSubType() );
+      auto itStr = m_chatHandlerStrMap.find( opcode );
       std::string name = itStr != m_chatHandlerStrMap.end() ? itStr->second : "unknown";
       // dont display packet notification if it is a ping or pos update, don't want the spam
 
       pLog->debug( sessionStr + " Handling Chat IPC : " + name + "( " +
                    boost::str( boost::format( "%|04X|" ) %
-                                      static_cast< uint32_t >( pPacket.getSubType() & 0xFFFF ) ) + " )" );
+                                      static_cast< uint32_t >( opcode ) ) + " )" );
 
       ( this->*( it->second ) )( pPacket, *m_pSession->getPlayer() );
    }
@@ -241,12 +243,12 @@ void Core::Network::GameConnection::handleChatPacket( const Packets::GamePacket&
    {
       pLog->debug( sessionStr + " Undefined Chat IPC : Unknown ( " +
                   boost::str( boost::format( "%|04X|" ) %
-                                     static_cast< uint32_t >( pPacket.getSubType() & 0xFFFF ) ) + " )" );
-      pLog->debug( pPacket.toString() );
+                                     static_cast< uint32_t >( opcode ) ) + " )" );
+      //pLog->debug( pPacket.toString() );
    }
 }
 
-void Core::Network::GameConnection::handlePacket( Core::Network::Packets::GamePacketPtr pPacket )
+void Core::Network::GameConnection::handlePacket( Core::Network::Packets::FFXIVARR_PACKET_RAW& pPacket )
 {
    if( !m_pSession )
       return;
@@ -254,11 +256,11 @@ void Core::Network::GameConnection::handlePacket( Core::Network::Packets::GamePa
    switch( m_conType )
    {
       case Network::ConnectionType::Zone:
-         handleZonePacket( *pPacket );
+         handleZonePacket( pPacket );
          break;
 
       case Network::ConnectionType::Chat:
-         handleChatPacket( *pPacket );
+         handleChatPacket( pPacket );
          break;
    }
 
@@ -276,8 +278,9 @@ void Core::Network::GameConnection::sendPackets( Packets::PacketContainer* pPack
 void Core::Network::GameConnection::processInQueue()
 {
    // handle the incoming game packets
-   while( auto pPacket = m_inQueue.pop() )
+   while( m_inQueue.size() )
    {
+      auto pPacket = m_inQueue.pop();
       handlePacket( pPacket );
    }
 }
@@ -291,7 +294,7 @@ void Core::Network::GameConnection::processOutQueue()
    int32_t totalSize = 0;
 
    // create a new packet container
-   PacketContainer pRP = PacketContainer();
+   PacketContainer pRP = PacketContainer( m_pSession->getId() );
 
    // get next packet off the queue
    while( auto pPacket = m_outQueue.pop() )
@@ -302,7 +305,7 @@ void Core::Network::GameConnection::processOutQueue()
          break;
       }
 
-      pRP.addPacket( *pPacket );
+      pRP.addPacket( pPacket );
       totalSize += pPacket->getSize();
    }
 
@@ -311,10 +314,10 @@ void Core::Network::GameConnection::processOutQueue()
 
 }
 
-void Core::Network::GameConnection::sendSinglePacket( Packets::GamePacket* pPacket )
+void Core::Network::GameConnection::sendSinglePacket( Core::Network::Packets::FFXIVPacketBasePtr pPacket )
 {
    PacketContainer pRP = PacketContainer();
-   pRP.addPacket( *pPacket );
+   pRP.addPacket( pPacket );
    sendPackets( &pRP );
 }
 
@@ -362,7 +365,8 @@ void Core::Network::GameConnection::injectPacket( const std::string& packetpath,
       if( pSize == 0 )
          return;
 
-      queueOutPacket( GamePacketPtr( new GamePacket( packet + k, pSize, false ) ) );
+      queueOutPacket( FFXIVPacketBasePtr( new FFXIVRawPacket( packet + k, pSize ) ) );
+
       k += ( pSize );
    }
 }
@@ -380,7 +384,7 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
    {
       switch( inPacket.segHdr.type )
       {
-      case 1:
+      case SEGMENTTYPE_SESSIONINIT:
       {
          char* id = ( char* ) &( inPacket.data[4] );
          uint32_t playerId = boost::lexical_cast< uint32_t >( id );
@@ -412,52 +416,52 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
          if( !m_pSession && session )
             m_pSession = session;
 
-         GamePacket pPe( 0x00, 0x18, 0, 0, 0x07 );
-         //pPe.setValAt< uint32_t >( 0x10, 0xE0000005 );
-         pPe.setValAt< uint32_t >( 0x10, 0xE0037603 );
-         pPe.setValAt< uint32_t >( 0x14, static_cast< uint32_t >( time( nullptr ) ) );
-         sendSinglePacket( &pPe );
+         auto pe = boost::make_shared< FFXIVRawPacket >( 0x07, 0x18, 0, 0 );
+         *(unsigned int*)(&pe->data()[0]) = 0xE0037603;
+         *(unsigned int*)(&pe->data()[4]) = static_cast< uint32_t >( time( nullptr ) );
+         sendSinglePacket( pe );
 
          // main connection, assinging it to the session
          if( ipcHeader.connectionType == ConnectionType::Zone )
          {
-            pPe = GamePacket( 0x00, 0x38, 0, 0, 0x02 );
-            pPe.setValAt< uint32_t >( 0x10, playerId );
-            sendSinglePacket( &pPe );
+            auto pe1 = boost::make_shared< FFXIVRawPacket >( 0x02, 0x38, 0, 0 );
+            *(unsigned int*)(&pe1->data()[0]) = playerId;
+            sendSinglePacket( pe1 );
             pLog->info( "[" + std::string( id ) + "] Setting session for zone connection" );
             session->setZoneConnection( pCon );
          }
          // chat connection, assinging it to the session
          else if( ipcHeader.connectionType == ConnectionType::Chat )
          {
-            pPe = GamePacket( 0x00, 0x38, 0, 0, 0x02 );
-            pPe.setValAt< uint32_t >( 0x10, playerId );
-            sendSinglePacket( &pPe );
+            auto pe2 = boost::make_shared< FFXIVRawPacket >( 0x02, 0x38, 0, 0 );
+            *(unsigned int*)(&pe2->data()[0]) = playerId;
+            sendSinglePacket( pe2 );
+
+            auto pe3 = boost::make_shared< FFXIVRawPacket >( 0x03, 0x28, playerId, playerId );
+            *(unsigned short*)(&pe3->data()[2]) = 0x02;
+            sendSinglePacket( pe3 );
 
             pLog->info( "[" + std::string( id ) + "] Setting session for chat connection" );
             session->setChatConnection( pCon );
-            pPe = GamePacket( 0x02, 0x28, playerId, playerId, 0x03 );
-            sendSinglePacket( &pPe );
          }
 
          break;
 
       }
-      case 3: // game packet
+      case SEGMENTTYPE_IPC: // game packet
       {
-         auto pPacket = new GamePacket( inPacket );
-         queueInPacket( Packets::GamePacketPtr( pPacket ) );
+         queueInPacket( inPacket );
          break;
       }
-      case 7: // keep alive
+      case SEGMENTTYPE_KEEPALIVE: // keep alive
       {
          uint32_t id = *( uint32_t* ) &inPacket.data[0];
          uint32_t timeStamp = *( uint32_t* ) &inPacket.data[4];
 
-         GamePacket pPe( 0x00, 0x18, 0, 0, 0x08 );
-         pPe.setValAt< uint32_t >( 0x10, id );
-         pPe.setValAt< uint32_t >( 0x14, timeStamp );
-         sendSinglePacket( &pPe );
+         auto pe4 = boost::make_shared< FFXIVRawPacket >( 0x08, 0x18, 0, 0 );
+         *(unsigned int*)(&pe4->data()[0]) = id;
+         *(unsigned int*)(&pe4->data()[4]) = timeStamp;
+         sendSinglePacket( pe4 );
 
          break;
       }

@@ -1425,10 +1425,19 @@ Core::Data::Emote::Emote( uint32_t row_id, Core::Data::ExdDataGenerated* exdData
    auto row = exdData->m_EmoteDat.get_row( row_id );
    name = exdData->getField< std::string >( row, 0 );
    emoteCategory = exdData->getField< uint8_t >( row, 11 );
+   emoteMode = exdData->getField< uint8_t >( row, 12 );
+   hasCancelEmote = exdData->getField< bool >( row, 15 );
+   drawsWeapon = exdData->getField< bool >( row, 16 );
    textCommand = exdData->getField< int32_t >( row, 18 );
    icon = exdData->getField< uint16_t >( row, 19 );
    logMessageTargeted = exdData->getField< uint16_t >( row, 20 );
    logMessageUntargeted = exdData->getField< uint16_t >( row, 21 );
+}
+
+Core::Data::EmoteMode::EmoteMode( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
+{
+   auto row = exdData->m_EmoteDat.get_row( row_id );
+
 }
 
 Core::Data::EmoteCategory::EmoteCategory( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
@@ -4553,6 +4562,7 @@ bool Core::Data::ExdDataGenerated::init( const std::string& path )
       m_DpsChallengeTransientDat = setupDatAccess( "DpsChallengeTransient", xiv::exd::Language::none );
       m_EmoteDat = setupDatAccess( "Emote", xiv::exd::Language::en );
       m_EmoteCategoryDat = setupDatAccess( "EmoteCategory", xiv::exd::Language::en );
+      m_EmoteModeDat = setupDatAccess( "EmoteMode", xiv::exd::Language::none );
       m_ENpcBaseDat = setupDatAccess( "ENpcBase", xiv::exd::Language::none );
       m_ENpcResidentDat = setupDatAccess( "ENpcResident", xiv::exd::Language::en );
       m_EObjDat = setupDatAccess( "EObj", xiv::exd::Language::none );

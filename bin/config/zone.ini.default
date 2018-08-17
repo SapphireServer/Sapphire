@@ -1,0 +1,18 @@
+[Scripts]
+; where compiled script modules are located
+Path = ./compiledscripts/
+; relative to Path, where we copy and load modules from
+CachePath = ./cache/
+; whether we should detect changes to script modules and reload them
+HotSwap = true
+
+[Network]
+DisconnectTimeout = 20
+
+[ZoneNetwork]
+ListenIp = 0.0.0.0
+ListenPort = 54992
+
+[General]
+; Sent on login - each line must be shorter than 307 characters, split lines with ';'
+MotD = Welcome to Sapphire!;This is a very good server;You can change these messages by editing General.MotD in config/zone.ini

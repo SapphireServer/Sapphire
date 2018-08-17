@@ -3,6 +3,7 @@
 #include <Util/UtilMath.h>
 #include <Logging/Logger.h>
 #include <Exd/ExdDataGenerated.h>
+#include <Network/CommonActorControl.h>
 
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
@@ -19,6 +20,7 @@ using namespace Core::Common;
 using namespace Core::Network;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
+using namespace Core::Network::ActorControl;
 
 extern Core::Framework g_fw;
 
@@ -49,14 +51,14 @@ void Core::Action::ActionCast::onStart()
    m_pSource->getAsPlayer()->sendDebug( "onStart()" );
    m_startTime = Util::getTimeMs();
 
-   ZoneChannelPacket< FFXIVIpcActorCast > castPacket( m_pSource->getId() );
+   auto castPacket = makeZonePacket< FFXIVIpcActorCast >( getId() );
 
-   castPacket.data().action_id = m_id;
-   castPacket.data().skillType = Common::SkillType::Normal;
-   castPacket.data().unknown_1 = m_id;
+   castPacket->data().action_id = m_id;
+   castPacket->data().skillType = Common::SkillType::Normal;
+   castPacket->data().unknown_1 = m_id;
    // This is used for the cast bar above the target bar of the caster.
-   castPacket.data().cast_time = static_cast< float >( m_castTime / 1000 );
-   castPacket.data().target_id = m_pTarget->getId();
+   castPacket->data().cast_time = static_cast< float >( m_castTime / 1000 );
+   castPacket->data().target_id = m_pTarget->getId();
 
    m_pSource->sendToInRangeSet( castPacket, true );
    m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::Casting );
@@ -90,8 +92,8 @@ void Core::Action::ActionCast::onInterrupt()
    //m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied1 );
    m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Casting );
 
-   auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt,
-                                         0x219, 1, m_id, 0 );
+   auto control = boost::make_shared< ActorControlPacket142 >( m_pSource->getId(), ActorControlType::CastInterrupt,
+                                                               0x219, 1, m_id, 0 );
 
    // Note: When cast interrupt from taking too much damage, set the last value to 1. This enables the cast interrupt effect. Example:
    // auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt, 0x219, 1, m_id, 0 );

@@ -1,5 +1,5 @@
-#ifndef _COMMON_FORWARDS_H
-#define _COMMON_FORWARDS_H
+#ifndef COMMON_FORWARDS_H
+#define COMMON_FORWARDS_H
 
 #include <boost/shared_ptr.hpp>
 #include <chrono>
@@ -11,9 +11,9 @@ using duration = std::chrono::steady_clock::duration;
 namespace Core 
 {
 
-   class XMLConfig;
+   class ConfigMgr;
 
-   typedef boost::shared_ptr<XMLConfig> XMLConfigPtr;
+   typedef boost::shared_ptr< ConfigMgr > ConfigMgrPtr;
 
 
    namespace Network 
@@ -22,15 +22,17 @@ namespace Core
       class Acceptor;
       class Connection;
 
-      typedef boost::shared_ptr<Hive> HivePtr;
-      typedef boost::shared_ptr<Acceptor> AcceptorPtr;
-      typedef boost::shared_ptr<Connection> ConnectionPtr;
+      typedef boost::shared_ptr< Hive > HivePtr;
+      typedef boost::shared_ptr< Acceptor > AcceptorPtr;
+      typedef boost::shared_ptr< Connection > ConnectionPtr;
 
       namespace Packets
       {
          class GamePacket;
+         class FFXIVPacketBase;
 
-         typedef boost::shared_ptr<GamePacket> GamePacketPtr;
+         typedef boost::shared_ptr< GamePacket > GamePacketPtr;
+         typedef boost::shared_ptr< FFXIVPacketBase > FFXIVPacketBasePtr;
       }
 
    }

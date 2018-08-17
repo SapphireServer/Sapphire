@@ -30,6 +30,7 @@
 #include "Zone/Zone.h"
 #include "Zone/InstanceContent.h"
 #include "Zone/TerritoryMgr.h"
+#include "Event/EventDefs.h"
 
 #include "ServerZone.h"
 
@@ -37,6 +38,10 @@
 #include "Framework.h"
 
 extern Core::Framework g_fw;
+
+using namespace Network;
+using namespace Network::Packets;
+using namespace Network::Packets::Server;
 
 // instanciate and initialize commands
 Core::DebugCommandHandler::DebugCommandHandler()
@@ -155,7 +160,6 @@ void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost:
    pLog->debug( "[" + std::to_string( player.getId() ) + "] " +
                 "subCommand " + subCommand + " params: " + params );
 
-
    if( ( ( subCommand == "pos" ) || ( subCommand == "posr" ) ) && ( params != "" ) )
    {
       int32_t posX;
@@ -179,11 +183,10 @@ void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost:
                         player.getPos().y + static_cast< float >( posY ),
                         player.getPos().z + static_cast< float >( posZ ) );
 
-      Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcActorSetPos >
-         setActorPosPacket( player.getId() );
-      setActorPosPacket.data().x = player.getPos().x;
-      setActorPosPacket.data().y = player.getPos().y;
-      setActorPosPacket.data().z = player.getPos().z;
+      auto setActorPosPacket = makeZonePacket< FFXIVIpcActorSetPos >( player.getId() );
+      setActorPosPacket->data().x = player.getPos().x;
+      setActorPosPacket->data().y = player.getPos().y;
+      setActorPosPacket->data().z = player.getPos().z;
       player.queuePacket( setActorPosPacket );
 
    }
@@ -200,9 +203,9 @@ void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost:
       int32_t discover_id;
       sscanf( params.c_str(), "%i %i", &map_id, &discover_id );
 
-      Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcDiscovery > discoveryPacket( player.getId() );
-      discoveryPacket.data().map_id = map_id;
-      discoveryPacket.data().map_part_id = discover_id;
+      auto discoveryPacket = makeZonePacket< FFXIVIpcDiscovery >( player.getId() );
+      discoveryPacket->data().map_id = map_id;
+      discoveryPacket->data().map_part_id = discover_id;
       player.queuePacket( discoveryPacket );
    }
 
@@ -228,7 +231,7 @@ void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost:
    else if( subCommand == "discovery_reset" )
    {
       player.resetDiscovery();
-      player.queuePacket( Network::Packets::Server::InitUIPacket( player ) );
+      player.queuePacket( boost::make_shared< InitUIPacket >( player ) );
    }
    else if( subCommand == "classjob" )
    {
@@ -265,7 +268,7 @@ void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost:
       uint32_t val;
       sscanf( params.c_str(), "%d %d", &slot, &val );
 
-      player.setModelForSlot( static_cast< Inventory::EquipSlot >( slot ), val );
+      player.setModelForSlot( static_cast< Common::EquipSlot >( slot ), val );
       player.sendModel();
       player.sendDebug( "Model updated" );
    }
@@ -282,9 +285,8 @@ void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost:
       int32_t id;
       sscanf( params.c_str(), "%d", &id );
 
-      Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcMSQTrackerProgress > msqPacket(
-              player.getId());
-      msqPacket.data().id = id;
+      auto msqPacket = makeZonePacket< FFXIVIpcMSQTrackerProgress >( player.getId() );
+      msqPacket->data().id = id;
       player.queuePacket( msqPacket );
 
       player.sendDebug( "MSQ Guide updated " );
@@ -294,8 +296,8 @@ void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost:
       int32_t id;
       sscanf( params.c_str(), "%d", &id );
 
-      Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcMSQTrackerComplete > msqPacket ( player.getId() );
-      msqPacket.data().id = id;
+      auto msqPacket = makeZonePacket< FFXIVIpcMSQTrackerComplete >( player.getId() );
+      msqPacket->data().id = id;
       player.queuePacket( msqPacket );
 
       player.sendDebug( "MSQ Guide updated " );
@@ -318,6 +320,58 @@ void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost:
    else if( subCommand == "festivaldisable" )
    {
       pTerriMgr->disableCurrentFestival();
+   }
+   else if ( subCommand == "BitFlag" )
+   {
+      uint16_t questId;
+      uint8_t questBit;
+      int8_t BitFlag;
+      sscanf( params.c_str(), "%hhu %hu %hhu", &BitFlag, &questId, &questBit );
+
+      if( !player.hasQuest( questId ) )
+      {
+         player.sendDebug( "Player doesn't have the quest with ID: " + std::to_string( questId ) );
+         return;
+      }
+      if( questBit == 0 || questId == 0 )
+      {
+         player.sendDebug( "Params are not correct" );
+         return;
+      }
+
+      switch ( BitFlag )
+      {
+         case 8:
+         {
+            player.setQuestBitFlag8( questId, questBit, true );
+            break;
+         }
+         case 16:
+         {
+            player.setQuestBitFlag16( questId, questBit, true );
+            break;
+         }
+         case 24:
+         {
+            player.setQuestBitFlag24( questId, questBit, true );
+            break;
+         }
+         case 32:
+         {
+            player.setQuestBitFlag32( questId, questBit, true );
+            break;
+         }
+         case 40:
+         {
+            player.setQuestBitFlag40( questId, questBit, true );
+            break;
+         }
+         case 48:
+         {
+            player.setQuestBitFlag48( questId, questBit, true );
+            break;
+         }
+      }
    }
    else
    {
@@ -377,8 +431,9 @@ void Core::DebugCommandHandler::add( char * data, Entity::Player& player, boost:
       // temporary research packet
       int32_t opcode;
       sscanf( params.c_str(), "%x", &opcode );
-      auto pPe = Network::Packets::make_GamePacket( opcode, 0x30, player.getId(), player.getId() );
-      player.queuePacket( pPe );
+      // TODO: fix for new setup
+      //auto pPe = Network::Packets::make_GamePacket( opcode, 0x30, player.getId(), player.getId() );
+      //player.queuePacket( pPe );
    }
    else if( subCommand == "actrl" )
    {
@@ -398,14 +453,14 @@ void Core::DebugCommandHandler::add( char * data, Entity::Player& player, boost:
 
       player.sendNotice( "Injecting ACTOR_CONTROL " + std::to_string( opcode ) );
 
-      Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcActorControl143 > actorControl( playerId, player.getId() );
-      actorControl.data().category = opcode;
-      actorControl.data().param1 = param1;
-      actorControl.data().param2 = param2;
-      actorControl.data().param3 = param3;
-      actorControl.data().param4 = param4;
-      actorControl.data().param5 = param5;
-      actorControl.data().param6 = param6;
+      auto actorControl = makeZonePacket< FFXIVIpcActorControl143 >( playerId, player.getId() );
+      actorControl->data().category = opcode;
+      actorControl->data().param1 = param1;
+      actorControl->data().param2 = param2;
+      actorControl->data().param3 = param3;
+      actorControl->data().param4 = param4;
+      actorControl->data().param5 = param5;
+      actorControl->data().param6 = param6;
       player.queuePacket( actorControl );
 
 
@@ -419,6 +474,13 @@ void Core::DebugCommandHandler::add( char * data, Entity::Player& player, boost:
       param1, param2, param3, param4, param5, param6, playerId );
       player.queuePacket( controlPacket );*/
 
+   }
+   else if( subCommand == "unlock" )
+   {
+      uint32_t id;
+
+      sscanf( params.c_str(), "%d", &id );
+      player.learnAction( id );
    }
    else
    {
@@ -579,12 +641,11 @@ void Core::DebugCommandHandler::nudge( char * data, Entity::Player& player, boos
    }
    if( offset != 0 )
    {
-      Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcActorSetPos >
-         setActorPosPacket( player.getId() );
-      setActorPosPacket.data().x = player.getPos().x;
-      setActorPosPacket.data().y = player.getPos().y;
-      setActorPosPacket.data().z = player.getPos().z;
-      setActorPosPacket.data().r16 = Math::Util::floatToUInt16Rot( player.getRot() );
+      auto setActorPosPacket = makeZonePacket< FFXIVIpcActorSetPos >( player.getId() );
+      setActorPosPacket->data().x = player.getPos().x;
+      setActorPosPacket->data().y = player.getPos().y;
+      setActorPosPacket->data().z = player.getPos().z;
+      setActorPosPacket->data().r16 = Math::Util::floatToUInt16Rot( player.getRot() );
       player.queuePacket( setActorPosPacket );
    }
 }
@@ -814,6 +875,26 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
          return;
 
       obj->setState( state );
+   }
+   else if ( subCommand == "objflag" )
+   {
+      char objName[256];
+      uint32_t state1;
+      uint32_t state2;
+
+      sscanf( params.c_str(), "%s %i %i", objName, &state1, &state2 );
+
+      auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+      if( !instance )
+         return;
+
+      auto obj = instance->getEObjByName( objName );
+      if( !obj ) {
+         player.sendDebug( "No eobj found." );
+         return;
+      }
+
+      obj->setAnimationFlag( state1, state2 );
    }
    else if( subCommand == "seq" )
    {

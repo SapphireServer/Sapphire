@@ -1,0 +1,6 @@
+[CharacterCreation]
+DefaultGMRank = 255
+
+[RestNetwork]
+ListenIp = 0.0.0.0
+ListenPort = 80

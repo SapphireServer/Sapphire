@@ -35,7 +35,7 @@ public:
    void onLeaveTerritory( Entity::Player& player ) override;
    void onFinishLoading( Entity::Player& player ) override;
    void onInitDirector( Entity::Player& player ) override;
-   void onSomeDirectorEvent( Entity::Player& player ) override;
+   void onDirectorSync( Entity::Player& player ) override;
    void onUpdate( uint32_t currTime ) override;
    void onTalk( Entity::Player& player, uint32_t eventId, uint64_t actorId );
    void onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 ) override;
@@ -85,7 +85,7 @@ private:
    uint16_t m_currentBgm;
 
    int64_t m_instanceExpireTime;
-   int64_t m_instanceCommenceTime;
+   uint64_t m_instanceCommenceTime;
 
    Entity::EventObjectPtr m_pEntranceEObj;
 

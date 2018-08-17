@@ -9,6 +9,7 @@
 #include <sapphire_zone/Actor/Player.h>
 #include <sapphire_zone/ServerZone.h>
 #include <sapphire_zone/Zone/Zone.h>
+
 #include <Network/GamePacketNew.h>
 
 #include "Group.h"
@@ -21,6 +22,7 @@ extern Core::Framework g_fw;
 
 using namespace Core::Social;
 using namespace Core::Network;
+using namespace Core::Network::Packets;
 
 
 int32_t Group::findNextAvailableIndex() const
@@ -54,7 +56,7 @@ bool Group::hasMember( uint64_t contentId ) const
    return std::find( m_members.begin(), m_members.end(), contentId ) != m_members.end();
 }
 
-Core::Network::Packets::GamePacketPtr Group::processInvite( uint64_t recipientId, uint64_t senderId )
+Packets::FFXIVPacketBasePtr Group::processInvite( uint64_t recipientId, uint64_t senderId )
 {
    constexpr uint32_t logMessages[] = {
       0, // 
@@ -66,10 +68,10 @@ Core::Network::Packets::GamePacketPtr Group::processInvite( uint64_t recipientId
 
    uint64_t recipientContentId = 0;
 
-   auto packet = GamePacketNew< Server::FFXIVIpcSocialRequestResponse, ServerZoneIpcType >( recipientId, senderId );
-   packet.data().contentId = recipientContentId;
-   packet.data().category = Common::SocialCategory::Friends;
-   packet.data().execute = Common::SocialRequestExecute::Accept;
+   auto packet = makeZonePacket< Server::FFXIVIpcSocialRequestResponse>( recipientId, senderId );
+   packet->data().contentId = recipientContentId;
+   packet->data().category = Common::SocialCategory::Friends;
+   packet->data().execute = Common::SocialRequestExecute::Accept;
    //packet.data().
 
    if ( m_members.size() < m_maxCapacity )
@@ -87,15 +89,13 @@ Core::Network::Packets::GamePacketPtr Group::processInvite( uint64_t recipientId
    return packet;
 }
 
-Core::Network::Packets::GamePacketPtr Group::addMember2( Core::Entity::PlayerPtr pSender, Core::Entity::PlayerPtr pRecipient, uint64_t senderId, uint64_t recipientId )
+Packets::FFXIVPacketBasePtr Group::addMember2( Core::Entity::PlayerPtr pSender, Core::Entity::PlayerPtr pRecipient, uint64_t senderId, uint64_t recipientId )
 {
    constexpr uint32_t logMessages[] = {
       0, // 
       1
    };
    assert( pSender != nullptr || senderId != 0 );
-
-   using namespace Core::Network::Packets;
 
    uint64_t recipientContentId = 0;
 
@@ -110,9 +110,9 @@ Core::Network::Packets::GamePacketPtr Group::addMember2( Core::Entity::PlayerPtr
       recipientContentId = pRecipient->getContentId();
    }
 
-   auto packet = GamePacketNew< Server::FFXIVIpcSocialRequestResponse, ServerZoneIpcType >( recipientId, senderId );
-   packet.data().contentId = recipientContentId;
-   packet.data().category = Common::SocialCategory::Friends;
+   auto packet = makeZonePacket< Server::FFXIVIpcSocialRequestResponse >( recipientId, senderId );
+   packet->data().contentId = recipientContentId;
+   packet->data().category = Common::SocialCategory::Friends;
    /*
    if( m_members.size() < m_maxCapacity )
    {
@@ -133,14 +133,14 @@ Core::Network::Packets::GamePacketPtr Group::addMember2( Core::Entity::PlayerPtr
    return packet;
 }
 
-Packets::GamePacketPtr Group::inviteMember2( Core::Entity::PlayerPtr pSender, Core::Entity::PlayerPtr pRecipient, uint64_t senderId, uint64_t recipientId )
+Packets::FFXIVPacketBasePtr Group::inviteMember2( Core::Entity::PlayerPtr pSender, Core::Entity::PlayerPtr pRecipient, uint64_t senderId, uint64_t recipientId )
 {
    assert( pSender != nullptr || senderId != 0 );
 
 
-   auto packet = Packets::GamePacketNew< Packets::Server::FFXIVIpcSocialRequestResponse, Packets::ServerZoneIpcType >( recipientId, senderId );
-   packet.data().contentId = recipientId;
-   packet.data().category = Common::SocialCategory::Friends;
+   auto packet = makeZonePacket< Packets::Server::FFXIVIpcSocialRequestResponse >( recipientId, senderId );
+   packet->data().contentId = recipientId;
+   packet->data().category = Common::SocialCategory::Friends;
 /*
    if( m_invites.size() < m_maxCapacity )
    {
@@ -157,18 +157,18 @@ Packets::GamePacketPtr Group::inviteMember2( Core::Entity::PlayerPtr pSender, Co
 }
 
 // todo: fix
-Core::Network::Packets::GamePacketPtr Group::removeMember2( Core::Entity::PlayerPtr pSender, Core::Entity::PlayerPtr pRecipient, uint64_t senderId, uint64_t recipientId )
+Packets::FFXIVPacketBasePtr Group::removeMember2( Core::Entity::PlayerPtr pSender, Core::Entity::PlayerPtr pRecipient, uint64_t senderId, uint64_t recipientId )
 {
    assert( pSender != nullptr || senderId != 0 );
 
-   auto packet = Packets::GamePacketNew< Packets::Server::FFXIVIpcSocialRequestResponse, Packets::ServerZoneIpcType >( recipientId, senderId );
-   packet.data().contentId = recipientId;
-   packet.data().category = Common::SocialCategory::Friends;
+   auto packet = makeZonePacket< Packets::Server::FFXIVIpcSocialRequestResponse >( recipientId, senderId );
+   packet->data().contentId = recipientId;
+   packet->data().category = Common::SocialCategory::Friends;
 
    return packet;
 }
 
-void Group::sendPacketToMembers( Core::Network::Packets::GamePacketPtr pPacket, bool invitesToo )
+void Group::sendPacketToMembers( Packets::FFXIVPacketBasePtr pPacket, bool invitesToo )
 {
    assert( pPacket );
    for( const auto& member : m_members )

@@ -350,37 +350,76 @@ struct FFXIVIpcUpdateHpMpTp : FFXIVIpcBasePacket<UpdateHpMpTp>
 * Structural representation of the packet sent by the server
 * for battle actions
 */
-struct effectEntry
+struct EffectEntry
 {
    Common::ActionEffectType effectType;
    Common::ActionHitSeverityType hitSeverity;
-   uint8_t unknown_3;
-   int8_t bonusPercent;
-   int16_t value;
+   uint8_t param;
+   int8_t bonusPercent; // shows an additional percentage in the battle log, will not change the damage number sent & shown
    uint8_t valueMultiplier;      // This multiplies whatever value is in the 'value' param by 10. Possibly a workaround for big numbers
-   uint8_t unknown_6;
+   uint8_t flags;
+   int16_t value;
+};
+
+struct EffectHeader
+{
+   uint64_t animationTargetId; // who the animation targets
+   uint32_t actionId; // what the casting player casts, shown in battle log/ui
+
+   uint32_t globalEffectCounter; // seems to only increment on retail?
+   float animationLockTime; // maybe? doesn't seem to do anything
+
+   uint32_t someTargetId; // always 00 00 00 E0, 0x0E000000 is the internal def for INVALID TARGET ID
+
+   uint16_t hiddenAnimation; // if 0, always shows animation, otherwise hides it. counts up by 1 for each animation skipped on a caster
+
+   uint16_t rotation;
+
+   uint16_t actionAnimationId; // the animation that is played by the casting character
+   uint8_t unknown1E; // can be 0,1,2 - maybe other values? - doesn't do anything?
+
+   Common::ActionEffectDisplayType effectDisplayType;
+
+   uint8_t unknown20; // is read by handler, runs code which gets the LODWORD of animationLockTime (wtf?)
+   uint8_t effectCount; // ignores effects if 0, otherwise parses all of them
+
+   uint32_t padding_22[2];
 };
 
 struct FFXIVIpcEffect : FFXIVIpcBasePacket<Effect>
 {
-   uint32_t targetId;
-   uint32_t unknown_1;
-   uint32_t actionAnimationId;
-   uint32_t unknown_2;
-   uint32_t unknown_5;
-   uint32_t unknown_6;
-   uint32_t effectTargetId;
-   uint16_t rotation;
-   uint16_t actionTextId;
-   uint8_t unknown_61;
-   uint8_t unknown_62;
-   uint8_t unknown_10;
-   uint8_t numEffects;
-   uint32_t u11;
-   effectEntry effects[8];
-   uint32_t effectTarget;
-   uint64_t unknown_8;
+   EffectHeader header;
+
+   EffectEntry effects[8];
+
+   uint16_t padding_6A[3];
+
+   uint32_t effectTargetId; // who the effect targets
+   uint32_t effectFlags; // nonzero = effects do nothing, no battle log, no ui text - only shows animations
+
+   uint32_t padding_78;
 };
+
+template< int size >
+struct FFXIVIpcAoeEffect
+{
+   EffectHeader header;
+
+   EffectEntry effects[size];
+
+   uint16_t padding_6A[3];
+
+   uint32_t effectTargetId[size];
+   Common::FFXIVARR_POSITION3 position;
+   uint32_t effectFlags;
+
+   uint32_t padding_78;
+};
+
+struct FFXIVIpcAoeEffect8 : FFXIVIpcBasePacket< AoeEffect8 >, FFXIVIpcAoeEffect< 8 > {};
+struct FFXIVIpcAoeEffect16 : FFXIVIpcBasePacket< AoeEffect16 >, FFXIVIpcAoeEffect< 16 > {};
+struct FFXIVIpcAoeEffect24 : FFXIVIpcBasePacket< AoeEffect24 >, FFXIVIpcAoeEffect< 24 > {};
+struct FFXIVIpcAoeEffect32 : FFXIVIpcBasePacket< AoeEffect32 >, FFXIVIpcAoeEffect< 32 > {};
 
 
 /**
@@ -432,7 +471,7 @@ struct FFXIVIpcPlayerSpawn : FFXIVIpcBasePacket<PlayerSpawn>
    uint16_t activeMinion;
    uint8_t spawnIndex;
    uint8_t state;
-   uint8_t persistantEmote;
+   uint8_t persistentEmote;
    uint8_t modelType; // modelType -> eventSystemDefine
    uint8_t subtype;
    uint8_t voice;
@@ -492,8 +531,8 @@ struct FFXIVIpcNpcSpawn : FFXIVIpcBasePacket<NpcSpawn>
    uint32_t u18;
    uint32_t u19;
    uint32_t directorId;
-   uint32_t ownerId;
-   uint32_t u22;
+   uint32_t spawnerId;
+   uint32_t parentActorId;
    uint32_t hPMax;
    uint32_t hPCurr;
    uint32_t displayFlags;
@@ -532,6 +571,11 @@ struct FFXIVIpcNpcSpawn : FFXIVIpcBasePacket<NpcSpawn>
    uint8_t look[26];
    char fcTag[6];
    uint32_t unk30;
+   uint32_t unk31;
+   uint8_t bNPCPartSlot;
+   uint8_t unk32;
+   uint16_t unk33;
+   uint32_t unk34;
 };
 
 /**
@@ -663,146 +707,142 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    // plain C types for a bit until the packet is actually fixed.
    // makes conversion between different editors easier.
    uint64_t contentId;
-   uint32_t unknown8;
-   uint32_t unknownC;
-   uint32_t charId;
-   uint32_t restedExp;
-   uint32_t companionCurrentExp;
-   uint32_t unknown3C;
-   uint32_t fishCaught;
-   uint32_t useBaitCatalogId;
-   uint32_t pvpWolfFoldMatches;
-   uint16_t pvpWolfFoldWeeklyMatches;
-   uint16_t pvpWolfFoldWeeklyVictories;
-   uint16_t pvpStats[6];
-   uint16_t playerCommendations;
-   uint16_t pvpStats1;
-   uint16_t frontlineCampaigns[4];
-   uint16_t frontlineCampaignsWeekly;
-   uint16_t currentRelic;
-   uint16_t currentBook;
-   uint16_t masterCrafterMask;
-   uint16_t unknown69;
-   uint16_t unknown6A;
-   uint16_t unknown6B;
-   uint16_t unknown6C[4];
-   uint16_t unknown50[34];
-   uint16_t unknown18;
-   uint16_t maxLevel;
-   uint16_t expansion;
-   uint16_t unknown76;
-   uint16_t race;
-   uint16_t tribe;
-   uint16_t gender;
-   uint16_t currentJob;
-   uint16_t currentClass;
-   uint16_t deity;
-   uint16_t namedayMonth;
-   uint16_t namedayDay;
-   uint16_t cityState;
-   uint16_t homepoint;
-   uint16_t unknown26;
-   uint16_t petHotBar;
-   uint16_t companionRank;
-   uint16_t companionStars;
-   uint16_t companionSp;
-   uint16_t companionUnk2B;
-   uint16_t companionColor;
-   uint16_t companionFavoFeed;
-   uint16_t companionUnk89;
-   uint16_t companionUnk90[5];
-   uint16_t unknown90[7];
-   uint16_t unknown9E;
-   uint16_t unknownA0;
-   uint32_t exp[25];
-   uint16_t unknown564[16];
-   uint32_t pvpFrontlineOverall1st;
-   uint32_t pvpFrontlineOverall2nd;
-   uint32_t pvpFrontlineOverall3rd;
-   uint16_t relicBookCompletion1[4];
-   uint16_t levels[25];
-   uint16_t levelsPadding;
-   uint16_t unknown15C[8];
-   uint16_t fishingRecordsFish[26];
-   uint16_t fishingRecordsFishWeight[26];
-   uint16_t unknownMask554[44];
-   uint16_t companion_name[21];
-   uint16_t companionDefRank;
-   uint16_t companionAttRank;
-   uint16_t companionHealRank;
-   uint16_t mountGuideMask[16];
+   unsigned int unknown8;
+   unsigned int unknownC;
+   unsigned int charId;
+   unsigned int restedExp;
+   unsigned int companionCurrentExp;
+   unsigned int unknown1C;
+   unsigned int fishCaught;
+   unsigned int useBaitCatalogId;
+   unsigned int unknown28;
+   unsigned short unknownPvp2C;
+   unsigned short unknown3;
+   unsigned int pvpFrontlineOverallCampaigns;
+   unsigned int unknownTimestamp34;
+   unsigned int unknownTimestamp38;
+   unsigned int unknown3C;
+   unsigned int unknown40;
+   unsigned int unknown44;
+   float companionTimePassed;
+   unsigned int unknown4C;
+   unsigned short unknown50;
+   unsigned short unknownPvp52[4];
+   unsigned short playerCommendations;
+   unsigned short unknown5C;
+   unsigned short unknown5E;
+   unsigned short pvpFrontlineWeeklyCampaigns;
+   unsigned short enhancedAnimaGlassProgress;
+   unsigned short unknown64[4]; // needs confirmation, probably pvp total/weeklies
+   unsigned short pvpRivalWingsTotalMatches;
+   unsigned short pvpRivalWingsTotalVictories;
+   unsigned short pvpRivalWingsWeeklyMatches; // needs confirmation
+   unsigned short pvpRivalWingsWeeklyVictories; // needs confirmation
+   unsigned char maxLevel;
+   unsigned char expansion;
+   unsigned char unknown76;
+   unsigned char race;
+   unsigned char tribe;
+   unsigned char gender;
+   unsigned char currentJob;
+   unsigned char currentClass;
+   unsigned char deity;
+   unsigned char namedayMonth;
+   unsigned char namedayDay;
+   unsigned char cityState;
+   unsigned char homepoint;
+   unsigned char unknown81;
+   unsigned char petHotBar;
+   unsigned char companionRank;
+   unsigned char companionStars;
+   unsigned char companionSp;
+   unsigned char companionUnk86;
+   unsigned char companionColor;
+   unsigned char companionFavoFeed;
+   unsigned char unknown89;
+   unsigned char unknown8A[4];
+   unsigned char hasRelicBook;
+   unsigned char relicBookId;
+   unsigned char unknown90[4];
+   unsigned char craftingMasterMask;
+   unsigned char unknown95[10];
+   unsigned char unknown9F[2];
+   unsigned char unknownA1[3];
+   unsigned int exp[25];
+   unsigned int unknown108;
+   unsigned int pvpTotalExp;
+   unsigned int unknownPvp110;
+   unsigned int pvpExp;
+   unsigned int pvpFrontlineOverallRanks[3];
+   unsigned int exploratoryMissionNextTimestamp;
+   unsigned short levels[25];
+   unsigned short unknown15C[9];
+   unsigned short fishingRecordsFish[26];
+   unsigned short fishingRecordsFishWeight[26];
+   unsigned short beastExp[11];
+   unsigned short unknown1EA[5];
+   unsigned short pvpFrontlineWeeklyRanks[3];
+   unsigned short unknownMask1FA[3];
+   unsigned char companionName[21];
+   unsigned char companionDefRank;
+   unsigned char companionAttRank;
+   unsigned char companionHealRank;
+   unsigned char mountGuideMask[16];
    char name[32];
-   uint16_t unknownOword[16];
-   uint16_t unknown258;
-   uint16_t unlockBitmask[64];
-   uint16_t aetheryte[17];
-   uint16_t discovery[421];
-   uint16_t howto[33];
-   uint16_t minions[38];
-   uint16_t chocoboTaxiMask[8];
-   uint16_t contentClearMask[111];
-   uint16_t contentClearPadding;
-   uint16_t unknown428[8];
-   uint16_t companionBardingMask[8];
-   uint16_t companionEquippedHead;
-   uint16_t companionEquippedBody;
-   uint16_t companionEquippedFeet;
-   uint16_t companionUnk4[4];
-   uint16_t companion_fields[11];
-   uint16_t fishingGuideMask[89];
-   uint16_t fishingSpotVisited[25];
-   uint16_t unknownMask4Padding;
-   uint16_t rankAmalJaa;
-   uint16_t rankSylph;
-   uint16_t rankKobold;
-   uint16_t rankSahagin;
-   uint16_t rankIxal;
-   uint16_t rankVanu;
-   uint16_t rankVath;
-   uint16_t rankMoogle;
-   uint16_t rankKojin;
-   uint16_t rankAnata;
-   uint16_t expAmalJaa;
-   uint16_t expSylph;
-   uint16_t expKobold;
-   uint16_t expSahagin;
-   uint16_t expIxal;
-   uint16_t expVanu;
-   uint16_t expVath;
-   uint16_t expMoogle;
-   uint16_t expKojin;
-   uint16_t expAnata;
-   uint16_t unknown596[10];
-   uint16_t unknown5A0[5];
-   uint16_t unknownMask59E[5];
-   uint16_t unknown5A3[18];
-   uint16_t unknownMask5C1[28];
-   uint16_t unknown_03411;
-   uint32_t unknownDword5E0;
-   uint16_t pvpFrontlineWeekly1st;
-   uint16_t pvpFrontlineWeekly2nd;
-   uint16_t pvpFrontlineWeekly3rd;
-   uint16_t relicBookCompletion2[8];
-   uint16_t sightseeingMask[26];
-   uint16_t unknown_XXX;
-   uint16_t unknown61E[20];
-   uint16_t unknown656[29];
-   uint16_t unknown63F[22];
-   uint16_t tripleTriadCards[28];
-   uint16_t unknown671[11];
-   uint16_t unknownMask67C[22];
-   uint16_t unknown692[3];
-   uint16_t orchestrionMask[40];
-   uint16_t hallOfNoviceCompleteMask[3];
-   uint16_t unknownMask6C0[11];
-   uint16_t unknownMask6CB[16];
-   uint16_t unknown6DB[14];
-   uint16_t unlockedRaids[28];
-   uint16_t unlockedDungeons[18];
-   uint16_t unlockedGuildhests[10];
-   uint16_t unlockedTrials[7];
-   uint16_t unlockedPvp[5];
-   uint16_t unknownMask72D[28];
+   unsigned char unknownOword[16];
+   unsigned char unknown258;
+   unsigned char unlockBitmask[64];
+   unsigned char aetheryte[17];
+   unsigned char discovery[421];
+   unsigned char howto[33];
+   unsigned char minions[38];
+   unsigned char chocoboTaxiMask[8];
+   unsigned char watchedCutscenes[111];
+   unsigned char companionBardingMask[9];
+   unsigned char companionEquippedHead;
+   unsigned char companionEquippedBody;
+   unsigned char companionEquippedLegs;
+   unsigned char unknown519[4];
+   unsigned char unknownMask51D[11];
+   unsigned char fishingGuideMask[89];
+   unsigned char fishingSpotVisited[25];
+   unsigned char unknown59A[15];
+   unsigned char unknown5A9[2];
+   unsigned char unknownPvp5AB[2];
+   unsigned char pvpLevel;
+   unsigned char beastRank[11];
+   unsigned char unknown5B9[11];
+   unsigned char pose;
+   unsigned char weaponPose;
+   unsigned char unknownMask5C4[3];
+   unsigned char unknown5C9[2];
+   unsigned char challengeLogComplete[9];
+   unsigned char unknown5D4[9];
+   unsigned char unknownMask5DD[28];
+   unsigned char relicCompletion[12];
+   unsigned char sightseeingMask[26];
+   unsigned char huntingMarkMask[55];
+   unsigned char tripleTriadCards[29];
+   unsigned char unknownMask673[10];
+   unsigned char unknown67D;
+   unsigned char aetherCurrentMask[22];
+   unsigned char unknown694[3];
+   unsigned char orchestrionMask[40];
+   unsigned char hallOfNoviceCompleteMask[3];
+   unsigned char animaCompletion[11];
+   unsigned char unknown6CD[3];
+   unsigned char unknownMask6C0[11];
+   unsigned char unknownMask6DB[13];
+   unsigned char unlockedRaids[28];
+   unsigned char unlockedDungeons[18];
+   unsigned char unlockedGuildhests[10];
+   unsigned char unlockedTrials[7];
+   unsigned char unlockedPvp[5];
+   unsigned char clearedRaids[28];
+   unsigned char clearedDungeons[18];
+   unsigned char clearedGuildhests[10];
+   unsigned char clearedTrials[7];
+   unsigned char clearedPvp[5];
 
 };
 
@@ -1109,6 +1149,17 @@ struct FFXIVIpcEventFinish : FFXIVIpcBasePacket<EventFinish>
    /* 000C */ uint32_t padding1;
 };
 
+struct FFXIVIpcEventOpenGilShop : FFXIVIpcBasePacket<EventOpenGilShop>
+{
+   uint64_t actorId;
+   uint32_t eventId;
+   uint16_t scene;
+   uint16_t padding;
+   uint32_t sceneFlags;
+
+   uint32_t unknown_wtf[0x101];
+};
+
 
 /**
 * Structural representation of the packet sent by the server
@@ -1370,6 +1421,58 @@ struct FFXIVIpcActorGauge : FFXIVIpcBasePacket<ActorGauge>
 struct FFXIVIpcPerformNote : FFXIVIpcBasePacket<PerformNote>
 {
    uint8_t data[32];
+};
+
+struct FFXIVIpcWardInfo : FFXIVIpcBasePacket<WardInfo>
+{
+   uint16_t unknown0;
+   uint16_t wardNum; // set 1 for "Mist, Ward 2"
+   uint16_t zoneId;
+   uint16_t worldId;
+   uint8_t unknown1;
+   uint8_t subInstance; //  (default : 1/2)
+   uint8_t unknown3;
+   uint8_t unknown4;
+   uint8_t unknown5;
+   uint8_t unknown6;
+   uint8_t unknown7;
+   uint8_t unknown8;
+   struct {
+      uint8_t houseSize; //1 = small, 2 = middle, 3 = big; 1
+      uint8_t houseState; //1 = for sell, 2 = sold, 3 = hasOwner, 0x0A = House sharing; 2
+      uint8_t iconColor; //HouseState has to be 3; 1 = Private, 2 = FC House; 4
+      uint8_t iconAddIcon; //Heart Icon = 2; 6
+      uint32_t unknown9;  //can be 0 (default) maybe fcId; 8
+      uint32_t fcIcon; //can be 0 (default); 12
+      uint32_t fcIconColor; //can be 0 (default); 16
+      uint16_t houseRoofId; //18
+      uint16_t houseFacadeId;//20
+      uint16_t houseWindowId;//22
+      uint16_t houseDoorId;//24
+      uint8_t gardenData[4];//28
+      uint16_t gardenSignId; //For fcIcon; 30
+      uint16_t gardenFenceId; //32
+      uint8_t color[8]; //40
+   } landSet[30];
+};
+
+struct FFXIVIpcWardYardInfo : FFXIVIpcBasePacket<WardYardInfo>
+{
+   /* consistency check? */
+   uint32_t unknown1; //always 0xFFFFFFFF
+   uint32_t unknown2; //always 0xFFFFFFFF
+   uint8_t unknown3; //always 0xFF
+   /* --- */
+   uint8_t packetNum;
+   uint16_t packetTotal;
+   struct
+   {
+      uint32_t itemId;
+      uint16_t itemRotation;
+      uint16_t pos_x;
+      uint16_t pos_y;
+      uint16_t pos_z;
+   } object[100];
 };
 
 struct FFXIVIpcMSQTrackerProgress : FFXIVIpcBasePacket<MSQTrackerProgress>

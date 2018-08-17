@@ -3,12 +3,14 @@
 
 #include <utility>
 #include <boost/shared_ptr.hpp>
+#include <memory>
 #include <boost/make_shared.hpp>
 #include <vector>
 
 #define TYPE_FORWARD( x ) \
 class x; \
 typedef boost::shared_ptr< x > x ## Ptr; \
+typedef std::unique_ptr< x > x ## UPtr; \
 template< typename...Args > \
 x ## Ptr make_ ## x( Args &&...args ) { \
 return boost::make_shared< x >( std::forward< Args >( args ) ... ); }\
@@ -18,12 +20,11 @@ namespace Core
 {
    TYPE_FORWARD( Cell );
    TYPE_FORWARD( Zone );
+   TYPE_FORWARD( HousingZone );
    TYPE_FORWARD( InstanceContent );
    TYPE_FORWARD( Item );
    TYPE_FORWARD( ItemContainer );
-   TYPE_FORWARD( Inventory );
    TYPE_FORWARD( Session );
-   TYPE_FORWARD( XMLConfig );
    TYPE_FORWARD( ZonePosition )
 
    namespace StatusEffect
@@ -68,6 +69,7 @@ namespace Core
       namespace Packets
       {
          TYPE_FORWARD( GamePacket );
+         TYPE_FORWARD( FFXIVPacketBase );
       }
    }
 

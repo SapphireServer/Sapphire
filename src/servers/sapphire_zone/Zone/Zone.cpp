@@ -5,12 +5,12 @@
 #include <Logging/Logger.h>
 #include <Util/Util.h>
 #include <Util/UtilMath.h>
-#include <Network/GamePacket.h>
 #include <Network/GamePacketNew.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Network/CommonNetwork.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Network/PacketContainer.h>
+#include <Network/CommonActorControl.h>
 #include <Database/DatabaseDef.h>
 #include <Network/PacketWrappers/ActorControlPacket143.h>
 
@@ -39,9 +39,9 @@
 using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
+using namespace Core::Network::ActorControl;
 
 extern Core::Framework g_fw;
-
 
 /**
 * \brief
@@ -142,7 +142,7 @@ void Core::Zone::setCurrentFestival( uint16_t festivalId )
    {
       auto player = playerEntry.second;
 
-      ActorControlPacket143 enableFestival( player->getId(), SetFestival, m_currentFestivalId );
+      auto enableFestival = boost::make_shared< ActorControlPacket143 >( player->getId(), SetFestival, m_currentFestivalId );
       playerEntry.second->queuePacket( enableFestival );
    }
 }
@@ -265,7 +265,8 @@ void Core::Zone::removeActor( Entity::ActorPtr pActor )
 
 }
 
-void Core::Zone::queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range, GamePacketPtr pPacketEntry )
+void Core::Zone::queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range,
+                                         Network::Packets::FFXIVPacketBasePtr pPacketEntry )
 {
    auto pTeriMgr = g_fw.get< TerritoryMgr >();
    if( pTeriMgr->isPrivateTerritory( getTerritoryId() ) )
@@ -286,7 +287,7 @@ void Core::Zone::queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t 
       {
 
          auto pSession = pServerZone->getSession( player->getId() );
-         pPacketEntry->setValAt< uint32_t >( 0x08, player->getId() );
+         //pPacketEntry->setValAt< uint32_t >( 0x08, player->getId() );
          if( pSession )
             pSession->getZoneConnection()->queueOutPacket( pPacketEntry );
       }
@@ -433,9 +434,9 @@ void Core::Zone::updateSessions( bool changedWeather )
 
       if( changedWeather )
       {
-         ZoneChannelPacket< FFXIVIpcWeatherChange  > weatherChangePacket( pPlayer->getId() );
-         weatherChangePacket.data().weatherId = static_cast< uint8_t >( m_currentWeather );
-         weatherChangePacket.data().delay = 5.0f;
+         auto weatherChangePacket = makeZonePacket< FFXIVIpcWeatherChange >(pPlayer->getId() );
+         weatherChangePacket->data().weatherId = static_cast< uint8_t >( m_currentWeather );
+         weatherChangePacket->data().delay = 5.0f;
          pSession->getPlayer()->queuePacket( weatherChangePacket );
       }
 
@@ -549,7 +550,6 @@ void Core::Zone::updateActorPosition( Entity::Actor &actor )
       if( pOldCell )
       {
          auto pLog = g_fw.get< Logger >();
-         pLog->debug( std::string( __FUNCTION__ ) + " -> removeActor() ...moving cell..." );
          pOldCell->removeActor( actor.shared_from_this() );
       }
 

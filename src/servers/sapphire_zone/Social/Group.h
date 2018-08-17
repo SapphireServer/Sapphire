@@ -53,14 +53,14 @@ public:
    virtual uint32_t addMember( uint64_t contentId );
    //virtual uint32_t addInvite( uint64_t characterId );
    
-   virtual Core::Network::Packets::GamePacketPtr processInvite( uint64_t recipientId, uint64_t senderId );
+   virtual Core::Network::Packets::FFXIVPacketBasePtr processInvite( uint64_t recipientId, uint64_t senderId );
 
-   virtual Core::Network::Packets::GamePacketPtr addMember2( Entity::PlayerPtr pSender, Entity::PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
+   virtual Core::Network::Packets::FFXIVPacketBasePtr addMember2( Entity::PlayerPtr pSender, Entity::PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
    
-   virtual Core::Network::Packets::GamePacketPtr inviteMember2( Entity::PlayerPtr pSender, Entity::PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
-   virtual Core::Network::Packets::GamePacketPtr removeMember2( Entity::PlayerPtr pSender, Entity::PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
-   //virtual Core::Network::Packets::GamePacketPtr kickMember( PlayerPtr pSender, PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
-   virtual void sendPacketToMembers( Core::Network::Packets::GamePacketPtr pPacket, bool invitesToo = false );
+   virtual Core::Network::Packets::FFXIVPacketBasePtr inviteMember2( Entity::PlayerPtr pSender, Entity::PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
+   virtual Core::Network::Packets::FFXIVPacketBasePtr removeMember2( Entity::PlayerPtr pSender, Entity::PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
+   //virtual Core::Network::Core::Network::Packets::GamePacketPtr kickMember( PlayerPtr pSender, PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
+   virtual void sendPacketToMembers( Core::Network::Packets::FFXIVPacketBasePtr pPacket, bool invitesToo = false );
 
    //virtual void populateGroupMembers();
 

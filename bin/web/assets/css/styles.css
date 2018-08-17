@@ -95,7 +95,6 @@
 .s-login-btn {
   width: 150px;
   background: #0e6bc9;
-  right: -7px;    /* ugh. refer to padding-left on input above - more bounding box issues... */
   position: relative;
 }
 
@@ -153,7 +152,7 @@ h2.text-center{
 
 .s-link-badge-wrapper {
   clear: both;
-  
+  padding: 0 5px;
 }
 
 .s-link-badge {
@@ -166,12 +165,10 @@ h2.text-center{
   margin-top: 25px;
   color: white;
   border-bottom: 3px solid #43348D;
-  margin-bottom: 15px;
 }
 
 .s-link-badge-discord {
   background: #7082E1 url("../img/fa-discord-icon.png") 10px 7px no-repeat;
-  margin-right: 60px; /* Ideally we'd just use pull-right with the last col-xs-5 but IE7 bounding box render??? */
 }
 
 .s-link-badge-github {

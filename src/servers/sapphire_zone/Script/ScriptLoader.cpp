@@ -1,7 +1,7 @@
 #include "ScriptLoader.h"
 
 #include <Logging/Logger.h>
-#include <Config/XMLConfig.h>
+#include <Config/ConfigMgr.h>
 
 #include "ServerZone.h"
 
@@ -13,9 +13,6 @@
 extern Core::Framework g_fw;
 
 namespace fs = boost::filesystem;
-
-Core::Scripting::ScriptLoader::ScriptLoader()
-{}
 
 const std::string Core::Scripting::ScriptLoader::getModuleExtension()
 {
@@ -53,7 +50,7 @@ bool Core::Scripting::ScriptLoader::unloadModule( ModuleHandle handle )
 Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::loadModule( const std::string& path )
 {
    auto pLog = g_fw.get< Logger >();
-   auto pConfig = g_fw.get< XMLConfig >();
+   auto pConfig = g_fw.get< ConfigMgr >();
    fs::path f( path );
 
    if( isModuleLoaded( f.stem().string() ) )
@@ -63,7 +60,7 @@ Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::loadModule( const st
    }
 
    // copy to temp dir
-   fs::path cacheDir( f.parent_path() /= pConfig->getValue< std::string >( "Settings.General.Scripts.CachePath", "./cache/" ) );
+   fs::path cacheDir( f.parent_path() /= pConfig->getValue< std::string >( "Scripts.CachePath", "./cache/" ) );
    fs::create_directories( cacheDir );
    fs::path dest( cacheDir /= f.filename().string() );
 

@@ -9,10 +9,8 @@ class Item
 {
 
 public:
-   Item();
-   Item( uint32_t catalogId );
-   Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, Common::ItemUICategory categoryId, bool isHq = false );
-   ~Item();
+   Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, bool isHq = false );
+   ~Item() = default;
 
    uint32_t getId() const;
 
@@ -54,6 +52,8 @@ public:
 
    uint16_t getItemLevel() const;
 
+   uint32_t getMaxStackSize() const;
+
 
 protected:
    uint32_t                m_id;
@@ -63,6 +63,7 @@ protected:
    Common::ItemUICategory  m_category;
 
    uint32_t                m_stackSize;
+   uint32_t                m_maxStackSize;
    std::vector< uint8_t >  m_classJobList;
 
    uint64_t                m_model1;

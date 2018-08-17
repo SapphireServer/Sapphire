@@ -193,7 +193,7 @@ namespace Core {
 
       char m_name[34];
 
-      void insertDbGlobalItem( uint32_t weaponId, uint64_t uniqueId ) const;
+      void insertDbGlobalItem( uint32_t itemId, uint64_t uniqueId ) const;
    };
 
 }

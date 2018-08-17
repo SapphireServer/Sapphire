@@ -37,7 +37,6 @@ void Core::Cell::init( uint32_t x, uint32_t y, ZonePtr pZone )
 void Core::Cell::addActor( Entity::ActorPtr pAct )
 {
    auto pLog = g_fw.get< Core::Logger >();
-   pLog->debug( "Adding actor to cell in " + this->m_pZone->getName() );
    if( pAct->isPlayer() )
       ++m_playerCount;
 
@@ -47,7 +46,6 @@ void Core::Cell::addActor( Entity::ActorPtr pAct )
 void Core::Cell::removeActor( Entity::ActorPtr pAct )
 {
    auto pLog = g_fw.get< Core::Logger >();
-   pLog->debug( "Removing actor from cell in " + this->m_pZone->getName() );
    if( pAct->isPlayer() )
       --m_playerCount;
 

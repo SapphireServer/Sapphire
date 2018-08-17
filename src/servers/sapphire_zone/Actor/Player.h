@@ -7,7 +7,6 @@
 #include <Util/SpawnIndexAllocator.h>
 
 #include "Chara.h"
-#include "Inventory/Inventory.h"
 #include "Event/EventHandler.h"
 #include <map>
 #include <queue>
@@ -23,11 +22,13 @@ struct QueuedZoning
    float m_targetRotation;
    uint64_t m_queueTime;
 
-   QueuedZoning( uint16_t targetZone, const Common::FFXIVARR_POSITION3& targetPosition, uint64_t queuedTime, float targetRotation )
-      : m_targetZone( targetZone )
-      , m_targetPosition( targetPosition )
-      , m_queueTime( queuedTime )
-      , m_targetRotation( targetRotation ) {}
+   QueuedZoning( uint16_t targetZone, const Common::FFXIVARR_POSITION3& targetPosition,
+                 uint64_t queuedTime, float targetRotation ) :
+           m_targetZone( targetZone ),
+           m_targetPosition( targetPosition ),
+           m_queueTime( queuedTime ),
+           m_targetRotation( targetRotation )
+   {}
 };
 
 /** Class representing the Player
@@ -57,6 +58,9 @@ public:
    void eventStart( uint64_t actorId, uint32_t eventId, Event::EventHandler::EventType eventParam, uint8_t eventParam1, uint32_t eventParam2 );
    /*! play a subevent */
    void playScene( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t eventParam2, uint32_t eventParam3 );
+
+   void playGilShop( uint32_t eventId, uint32_t flags,
+                     Event::EventHandler::SceneReturnCallback eventCallback );
 
    void directorPlayScene( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t eventParam3, uint32_t eventParam4, uint32_t eventParam5 = 0 );
 
@@ -221,19 +225,17 @@ public:
    /*! add an item to the first free slot in one of the 4 main containers */
    bool tryAddItem( uint16_t catalogId, uint32_t quantity );
    /*! add an item to a given container */
-   bool addItem( uint16_t containerId, uint16_t catalogId, uint32_t quantity );
+//   bool addItem( uint16_t containerId, uint16_t catalogId, uint32_t quantity );
    /*! equip an item to a specified slot */
-   void equipItem( Inventory::EquipSlot equipSlotId, ItemPtr pItem, bool sendModel );
+   void equipItem( Common::EquipSlot equipSlotId, ItemPtr pItem, bool sendModel );
    /*! remove an item from an equipment slot */
-   void unequipItem( Inventory::EquipSlot equipSlotId, ItemPtr pItem );
+   void unequipItem( Common::EquipSlot equipSlotId, ItemPtr pItem );
    /*! equip a weapon, possibly forcing a job change */
    void equipWeapon( ItemPtr pItem );
    /*! get player ilvl */
    uint16_t getItemLevel() const;
    /*! send player ilvl */
    void sendItemLevel();
-   /*! get a const pointer to the inventory object */
-   InventoryPtr getInventory() const;
    /*! get the current main hand model */
    uint64_t getModelMainWeapon() const;
    /*! get the current off hand model */
@@ -243,21 +245,15 @@ public:
    /*! return a const pointer to the model array */
    const uint32_t* getModelArray() const;
    /*! return the equipment model in a specified equipment slot */
-   uint32_t getModelForSlot( Inventory::EquipSlot slot );
+   uint32_t getModelForSlot( Common::EquipSlot slot );
    /*! set the equipment model in a specified equipment slot */
-   void setModelForSlot( Inventory::EquipSlot slot, uint32_t val );
-   /*! return the current amount of currency of type */
-   uint32_t getCurrency( uint8_t type ) const;
+   void setModelForSlot( Common::EquipSlot slot, uint32_t val );
    /*! add amount to the currency of type */
-   void addCurrency( uint8_t type, uint32_t amount );
+   void addCurrency( Common::CurrencyType type, uint32_t amount );
    /*! remove amount from the currency of type */
-   void removeCurrency( uint8_t type, uint32_t amount );
+   void removeCurrency( Common::CurrencyType type, uint32_t amount );
    /*! return the current amount of crystals of type */
    uint32_t getCrystal( uint8_t type ) const;
-   /*! add amount to the crystals of type */
-   void addCrystal( uint8_t type, uint32_t amount );
-   /*! remove amount from the crystals of type */
-   void removeCrystal( uint8_t type, uint32_t amount );
 
    // Class / Job / Exp
    //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -325,7 +321,7 @@ public:
    /*! sets players combat state */
    void setInCombat( bool mode );
    /*! return current online status depending on current state / activity */
-   Common::OnlineStatus getOnlineStatus();
+   Common::OnlineStatus getOnlineStatus() const;
    /*! sets the players zone, initiating a zoning process */
    void setZone( uint32_t zoneId );
    /*! sets the players instance & initiates zoning process */
@@ -387,6 +383,10 @@ public:
    void dismount();
    /*! get the current mount */
    uint8_t getCurrentMount() const;
+   /*! set current persistent emote */
+   void setPersistentEmote( uint32_t emoteId );
+   /*! get current persistent emote */
+   uint32_t getPersistentEmote() const;
 
    void calculateStats() override;
    void sendStats();
@@ -424,7 +424,7 @@ public:
    /*! update bitmask for how-to's seen */
    void updateHowtosSeen( uint32_t howToId );
    /*! learn an action / update the unlock bitmask. */
-   void learnAction( uint8_t actionId );
+   void learnAction( uint16_t actionId );
    /*! learn a song / update the unlock bitmask. */
    void learnSong( uint8_t songId, uint32_t itemId );
    /*! check if an action is already unlocked in the bitmask. */
@@ -494,15 +494,15 @@ public:
    /*! send status update */
    void sendStatusUpdate( bool toSelf = true ) override;
    /*! send the entire inventory sequence */
-   void sendInventory() const;
+   void sendInventory();
    /*! send active quest list */
    void sendQuestInfo();
    /*! send a quest specific message */
    void sendQuestMessage( uint32_t questId, int8_t msgId, uint8_t type, uint32_t var1, uint32_t var2 );
    /*! queue a packet for the player */
-   void queuePacket( Network::Packets::GamePacketPtr pPacket );
+   void queuePacket( Network::Packets::FFXIVPacketBasePtr pPacket );
    /*! queue a char connection packet for the player */
-   void queueChatPacket( Network::Packets::GamePacketPtr pPacket );
+   void queueChatPacket( Network::Packets::FFXIVPacketBasePtr pPacket );
    /*! returns true if loading is complete ( 0x69 has been received ) */
    bool isLoadingComplete() const;
    /*! set the loading complete bool */
@@ -512,7 +512,9 @@ public:
    /*! return true if the player is marked for zoning */
    bool isMarkedForZoning() const;
 
-   void emote( uint32_t emoteId, uint64_t targetId );
+   void emote( uint32_t emoteId, uint64_t targetId, bool isSilent );
+   void emoteInterrupt();
+
 
    void sendZoneInPackets( uint32_t param1, uint32_t param2, uint32_t param3, uint32_t param4, bool pSetStatus );
 
@@ -556,11 +558,16 @@ public:
    bool getGmInvis() const;
    void setGmInvis( bool invis );
 
+   bool isActingAsGm() const;
+
    uint8_t getMode() const;
    void setMode( uint8_t mode );
 
    void setAutoattack( bool mode );
    bool isAutoattackOn() const;
+
+   uint8_t getPose() const;
+   void setPose( uint8_t pose );
 
    // Content Finder handling
    //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -598,6 +605,55 @@ public:
    /*! checks if a spawn index is valid */
    bool isObjSpawnIndexValid( uint8_t index );
 
+
+   // Inventory Handling
+   //////////////////////////////////////////////////////////////////////////////////////////////////////
+   void initInventory();
+
+   using InvSlotPair = std::pair< uint16_t, int8_t >;
+   using InvSlotPairVec = std::vector< InvSlotPair >;
+
+   ItemPtr createItem( uint32_t catalogId, uint32_t quantity = 1 );
+   bool loadInventory();
+   InvSlotPairVec getSlotsOfItemsInInventory( uint32_t catalogId );
+   InvSlotPair getFreeBagSlot();
+   Core::ItemPtr addItem( uint16_t inventoryId, int8_t slotId, uint32_t catalogId, uint16_t quantity = 1, bool isHq = false, bool slient = false );
+   void moveItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot );
+   void swapItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot );
+   void discardItem( uint16_t fromInventoryId, uint8_t fromSlotId );
+   void splitItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot, uint16_t splitCount );
+   void mergeItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot );
+
+   ItemPtr getItemAt( uint16_t containerId, uint8_t slotId );
+
+   bool updateContainer( uint16_t storageId, uint8_t slotId, ItemPtr pItem );
+
+   /*! calculate and return player ilvl based off equipped gear */
+   uint16_t calculateEquippedGearItemLevel();
+   /*! return the current amount of currency of type */
+   uint32_t getCurrency( Common::CurrencyType type );
+
+   void writeInventory( Common::InventoryType type );
+   void writeItem( ItemPtr pItem ) const;
+   void deleteItemDb( ItemPtr pItem ) const;
+
+   /*! return the crystal amount of currency of type */
+   uint32_t getCrystal( Common::CrystalType type );
+   /*! add amount to the crystal of type */
+   void addCrystal( Common::CrystalType type, uint32_t amount );
+   /*! remove amount from the crystals of type */
+   void removeCrystal( Common::CrystalType type, uint32_t amount );
+   bool isObtainable( uint32_t catalogId, uint8_t quantity );
+
+   void send();
+
+   uint8_t getFreeSlotsInBags();
+
+   //////////////////////////////////////////////////////////////////////////////////////////////////////
+
+   uint64_t m_lastMoveTime;
+   uint8_t m_lastMoveflag;
+
 private:
    uint32_t m_lastWrite;
    uint32_t m_lastPing;
@@ -615,6 +671,9 @@ private:
    bool m_onEnterEventDone;
 
 private:
+   using InventoryMap = std::map< uint16_t, Core::ItemContainerPtr >;
+
+   InventoryMap m_storageMap;
 
    Common::FFXIVARR_POSITION3 m_prevPos;
    uint32_t m_prevZoneType;
@@ -666,8 +725,6 @@ private:
    uint8_t m_openingSequence;
 
    uint16_t m_itemLevel;
-   InventoryPtr m_pInventory;
-
    std::map< uint32_t, Event::EventHandlerPtr > m_eventHandlerMap;
 
    std::queue< uint8_t > m_freeHateSlotQueue; // queue with "hate slots" free to be assigned
@@ -712,7 +769,9 @@ private:
    // content finder info
    uint32_t m_cfPenaltyUntil; // unix time
 
-   uint8_t m_mount;
+   uint32_t m_mount;
+   uint32_t m_emoteMode;
+   uint8_t m_pose;
 
    Util::SpawnIndexAllocator< uint8_t > m_objSpawnIndexAllocator;
    Util::SpawnIndexAllocator< uint8_t > m_actorSpawnIndexAllocator;

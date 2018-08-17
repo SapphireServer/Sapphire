@@ -77,7 +77,7 @@ public:
    virtual void onPlayerZoneIn( Entity::Player &player );
    virtual void onFinishLoading( Entity::Player& player );
    virtual void onInitDirector( Entity::Player& player );
-   virtual void onSomeDirectorEvent( Entity::Player& player ) {};
+   virtual void onDirectorSync( Entity::Player& player ) {};
    virtual void onLeaveTerritory( Entity::Player& player );
    virtual void onUpdate( uint32_t currTime );
    virtual void onRegisterEObj( Entity::EventObjectPtr object ) {};
@@ -97,7 +97,7 @@ public:
 
    void updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell );
 
-   void queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range, Network::Packets::GamePacketPtr pPacketEntry );
+   void queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range, Network::Packets::FFXIVPacketBasePtr pPacketEntry );
 
    uint32_t getGuId() const;
 

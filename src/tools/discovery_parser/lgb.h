@@ -195,9 +195,20 @@ public:
 struct LGB_MAPRANGE_HEADER : public LGB_ENTRY_HEADER
 {
    uint32_t type;
-   uint16_t unknown2;
+   uint8_t unknown2;
+   uint8_t unknown2_1;
    uint16_t unknown3;
-   uint8_t unknown4[0x10];
+   uint32_t unknown5;
+   uint32_t mapId;
+   uint32_t offsetX, offsetY;
+   uint32_t unkInts[4];
+   uint16_t unkShort;
+   uint8_t unkFlag;
+   uint8_t unkFlag2;
+   uint8_t discoveryIndex;
+   uint8_t unkFlag3;
+   uint8_t unkFlag4;
+   uint8_t unknown4[0x09];
 };
 
 struct LGB_MAPRANGE_ENTRY : public LGB_ENTRY
@@ -210,6 +221,7 @@ public:
    {
       header = *reinterpret_cast< LGB_MAPRANGE_HEADER* >( buf + offset );
       name = std::string( buf + offset + header.nameOffset );
+
    };
 };
 

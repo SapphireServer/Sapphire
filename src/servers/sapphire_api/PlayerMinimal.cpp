@@ -344,28 +344,49 @@ namespace Core {
       insertDbGlobalItem( legs, legsUid );
       insertDbGlobalItem( feet, feetUid );
 
+      // Universal accessories
+
+      uint64_t neckUid = getNextUId64();
+      uint64_t earUid = getNextUId64();
+      uint64_t wristUid = getNextUId64();
+      uint64_t ringUid = getNextUId64();
+      
+
+      insertDbGlobalItem( 15130, neckUid );
+      insertDbGlobalItem( 15131, earUid );
+      insertDbGlobalItem( 15132, wristUid );
+      insertDbGlobalItem( 15133, ringUid );
+
       g_charaDb.execute( "INSERT INTO charaitemgearset (storageId, CharacterId, "
          "container_" + std::to_string( EquipSlot::MainHand ) + ", "
          "container_" + std::to_string( EquipSlot::Body ) + ", "
          "container_" + std::to_string( EquipSlot::Hands ) + ", "
          "container_" + std::to_string( EquipSlot::Legs ) + ", "
          "container_" + std::to_string( EquipSlot::Feet ) + ", "
+         "container_" + std::to_string( EquipSlot::Neck ) + ", "
+         "container_" + std::to_string( EquipSlot::Ear ) + ", "
+         "container_" + std::to_string( EquipSlot::Wrist ) + ", "
+         "container_" + std::to_string( EquipSlot::Ring1 ) + ", "
          "UPDATE_DATE ) "
          "VALUES ( " + std::to_string( InventoryType::GearSet0 ) + ", " + std::to_string( m_id ) + ", " +
          std::to_string( uniqueId ) + ", " +
          std::to_string( bodyUid ) + ", " +
          std::to_string( handsUid ) + ", " +
          std::to_string( legsUid ) + ", " +
-         std::to_string( feetUid ) + ", NOW());" );
+         std::to_string( feetUid ) + ", " +
+         std::to_string( neckUid ) + ", " + 
+         std::to_string( earUid ) + ", " + 
+         std::to_string( wristUid ) + ", " + 
+         std::to_string( ringUid ) + ", NOW());" );
 
    }
 
-   void PlayerMinimal::insertDbGlobalItem( uint32_t weaponId, uint64_t uniqueId ) const
+   void PlayerMinimal::insertDbGlobalItem( uint32_t itemId, uint64_t uniqueId ) const
    {
       auto stmtItemGlobal = g_charaDb.getPreparedStatement( Db::CHARA_ITEMGLOBAL_INS );
       stmtItemGlobal->setInt( 1, m_id );
       stmtItemGlobal->setInt64( 2, uniqueId );
-      stmtItemGlobal->setInt( 3, weaponId );
+      stmtItemGlobal->setInt( 3, itemId );
       g_charaDb.directExecute( stmtItemGlobal );
    }
 

@@ -8,7 +8,7 @@
 
 #include <Version.h>
 #include <Logging/Logger.h>
-#include <Config/XMLConfig.h>
+#include <Config/ConfigMgr.h>
 
 //#include "LobbySession.h"
 
@@ -37,7 +37,7 @@ namespace Core {
       m_configPath( configPath ),
       m_numConnections( 0 )
    {
-      m_pConfig = boost::shared_ptr<XMLConfig>( new XMLConfig );
+      m_pConfig = boost::shared_ptr< ConfigMgr >( new ConfigMgr );
    }
 
    ServerLobby::~ServerLobby( void )
@@ -49,7 +49,7 @@ namespace Core {
       return g_restConnector.getSession( sessionId );
    }
 
-   XMLConfigPtr ServerLobby::getConfig() const
+   ConfigMgrPtr ServerLobby::getConfig() const
    {
       return m_pConfig;
    }
@@ -75,7 +75,7 @@ namespace Core {
       Network::HivePtr hive( new Network::Hive() );
       Network::addServerToHive< Network::GameConnection >( m_ip, m_port, hive );
 
-      g_log.info( "Lobbyserver ready for connections." );
+      g_log.info( "Lobby server running on " + m_pConfig->getValue< std::string >( "LobbyNetwork.ListenIp", "0.0.0.0" ) + ":" + m_pConfig->getValue< std::string >( "LobbyNetwork.ListenPort", "80" ) );
 
       boost::thread_group worker_threads;
       worker_threads.create_thread( boost::bind( &Network::Hive::Run, hive.get() ) );
@@ -109,23 +109,19 @@ namespace Core {
             if( arg == "ip" )
             {
                // todo: ip addr in config
-               m_pConfig->setValue< std::string >( "Settings.General.ListenIp", val );
+               m_pConfig->setValue< std::string >( "LobbyNetwork.ListenIp", val );
             }
             else if( arg == "p" || arg == "port" )
             {
-               m_pConfig->setValue< std::string >( "Settings.General.ListenPort", val );
-            }
-            else if( arg == "ap" || arg == "auth" || arg == "authport" )
-            {
-               m_pConfig->setValue< std::string>( "Settings.General.AuthPort", val );
+               m_pConfig->setValue< std::string >( "LobbyNetwork.LobbyPort", val );
             }
             else if( arg == "worldip" || arg == "worldip" )
             {
-               m_pConfig->setValue < std::string >( "Settings.General.WorldIp", val );
+               m_pConfig->setValue < std::string >( "GlobalNetwork.ZoneHost", val );
             }
             else if( arg == "worldport" )
             {
-               m_pConfig->setValue< std::string >( "Settings.General.WorldPort", val );
+               m_pConfig->setValue< std::string >( "GlobalNetwork.ZonePort", val );
             }
          }
          catch( ... )
@@ -135,11 +131,11 @@ namespace Core {
          }
       }
 
-      m_port = m_pConfig->getValue< uint16_t >( "Settings.General.ListenPort", 54994 );
-      m_ip = m_pConfig->getValue< std::string >( "Settings.General.ListenIp", "0.0.0.0" );
+      m_port = m_pConfig->getValue< uint16_t >( "LobbyNetwork.ListenPort", 54994 );
+      m_ip = m_pConfig->getValue< std::string >( "LobbyNetwork.ListenIp", "0.0.0.0" );
 
-      g_restConnector.restHost = m_pConfig->getValue< std::string >( "Settings.General.RestHost" );
-      g_restConnector.serverSecret = m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" );
+      g_restConnector.restHost = m_pConfig->getValue< std::string >( "GlobalNetwork.RestHost" ) + ":" + m_pConfig->getValue< std::string >( "GlobalNetwork.RestPort" );
+      g_restConnector.serverSecret = m_pConfig->getValue< std::string >( "GlobalParameters.ServerSecret" );
 
       return true;
    }

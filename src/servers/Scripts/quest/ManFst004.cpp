@@ -1,4 +1,3 @@
-#include <Script/NativeScriptApi.h>
 #include <Actor/Player.h>
 #include "Event/EventHelper.h"
 #include <ScriptObject.h>
@@ -20,8 +19,6 @@ private:
    // GetQuestUI8BL
    // GetQuestUI8CH
 
-   // Steps in this quest ( 0 is before accepting,
-   // 1 is first, 255 means ready for turning it in
    enum Sequence : uint8_t
    {
       Seq0 = 0,
@@ -75,8 +72,6 @@ public:
    ~ManFst004()
    { };
 
-   //////////////////////////////////////////////////////////////////////
-   // Event Handlers
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
       auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
@@ -98,9 +93,7 @@ public:
                player.learnAction( 1 );
                Scene00051( player );
             },
-            [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-            { },
-            eventId );
+               nullptr, eventId);
       }
       else if( actor == ManFst004::Actor2 )
       {
@@ -122,16 +115,18 @@ private:
    {
       if( varIdx == 3 )
       {
-         player.sendQuestMessage( m_id, 1, 0, 0, 0 );
-      } else if( varIdx == 2 )
+         player.sendQuestMessage( getId(), 1, 0, 0, 0 );
+      }
+      else if( varIdx == 2 )
       {
-         player.sendQuestMessage( m_id, 2, 0, 0, 0 );
-      } else
+         player.sendQuestMessage( getId(), 2, 0, 0, 0 );
+      }
+      else
       {
-         player.sendQuestMessage( m_id, 0, 0, 0, 0 );
+         player.sendQuestMessage( getId(), 0, 0, 0, 0 );
       }
 
-      auto questId = m_id;
+      auto questId = getId();
 
       auto QUEST_VAR_ATTUNE = player.getQuestUI8AL( questId );
       auto QUEST_VAR_CLASS = player.getQuestUI8BH( questId );
@@ -143,11 +138,9 @@ private:
       }
    }
 
-   //////////////////////////////////////////////////////////////////////
-   // Available Scenes in this quest, not necessarly all are used
    void Scene00000( Entity::Player& player )
    {
-      player.playScene( m_id, 0, 0x2000,
+      player.playScene( getId(), 0, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
             if( result.param2 == 1 ) // accept quest
@@ -159,27 +152,27 @@ private:
 
    void Scene00001( Entity::Player& player )
    {
-      player.playScene( m_id, 1, 0,
+      player.playScene( getId(), 1, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            player.setQuestUI8AL( m_id, 1 );
+            player.setQuestUI8AL( getId(), 1 );
             checkQuestCompletion( player, 0 );
          } );
    }
 
    void Scene00002( Entity::Player& player )
    {
-      player.playScene( m_id, 2, 0,
+      player.playScene( getId(), 2, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            player.setQuestUI8BH( m_id, 1 );
+            player.setQuestUI8BH( getId(), 1 );
             checkQuestCompletion( player, 3 );
          } );
    }
 
    void Scene00003( Entity::Player& player )
    {
-      player.playScene( m_id, 3, 0,
+      player.playScene( getId(), 3, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
             if( result.param2 == 1 )
@@ -194,19 +187,23 @@ private:
 
    void Scene00004( Entity::Player& player )
    {
-      player.playScene( m_id, 4, 0, 0, 0 );
+      player.playScene( getId(), 4, HIDE_HOTBAR,
+         [&]( Entity::Player& player, const Event::SceneResult& result )
+         {
+            player.playScene( getId(), 4, 0, 0, 0 );
+         } );
    }
 
    void Scene00005( Entity::Player& player )
    {
-      player.playScene( m_id, 5, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0, 0,
+      player.playScene( getId(), 5, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0, 0,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
             if( result.param2 == 1 ) // finish quest
             {
-               if( player.giveQuestRewards( m_id, 0 ) )
+               if( player.giveQuestRewards( getId(), 0 ) )
                {
-                  player.finishQuest( m_id );
+                  player.finishQuest( getId() );
                }
             }
          } );
@@ -214,12 +211,12 @@ private:
 
    void Scene00050( Entity::Player& player )
    {
-      player.playScene( m_id, 50, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0/*unk*/, 0/*unk*/,
+      player.playScene( getId(), 50, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0/*unk*/, 0/*unk*/,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
             // accepting quest "close to home"
-            player.updateQuest( m_id, 1 );
-            player.setQuestUI8CH( m_id, 1 ); // receive key item
+            player.updateQuest( getId(), 1 );
+            player.setQuestUI8CH( getId(), 1 ); // receive key item
             // event is done, need to teleport to real zone.
             player.setZone( 132 );
             //player.setZone(183); back to starting griania for debug purpose
@@ -228,7 +225,7 @@ private:
 
    void Scene00051( Entity::Player& player )
    {
-      player.playScene( m_id, 51, NONE,
+      player.playScene( getId(), 51, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
             Scene00001( player );
@@ -237,7 +234,7 @@ private:
 
    void Scene00099( Entity::Player& player )
    {
-      player.playScene( m_id, 99, NONE,
+      player.playScene( getId(), 99, HIDE_HOTBAR,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
             Scene00004( player );
@@ -246,13 +243,12 @@ private:
 
    void Scene00100( Entity::Player& player )
    {
-      player.playScene( m_id, 100, NONE,
+      player.playScene( getId(), 100, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ,
          [&]( Entity::Player& player, const Event::SceneResult& result )
          {
-            player.setQuestUI8CH( m_id, 0 ); // remove key item, since we have just traded it
-            player.setQuestUI8BL( m_id, 1 );
+            player.setQuestUI8CH( getId(), 0 ); // remove key item, since we have just traded it
+            player.setQuestUI8BL( getId(), 1 );
             checkQuestCompletion( player, 2 );
          } );
    }
-
 };

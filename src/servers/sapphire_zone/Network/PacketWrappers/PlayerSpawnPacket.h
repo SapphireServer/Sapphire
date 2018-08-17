@@ -6,7 +6,6 @@
 #include <Util/Util.h>
 #include "Actor/Player.h"
 #include "Forwards.h"
-#include "Inventory/Inventory.h"
 #include "Inventory/Item.h"
 #include "StatusEffect/StatusEffect.h"
 
@@ -19,11 +18,12 @@ namespace Server {
    * @brief The packet sent to spawn a player.
    */
    class PlayerSpawnPacket :
-      public GamePacketNew< FFXIVIpcPlayerSpawn, ServerZoneIpcType >
+      public ZoneChannelPacket< FFXIVIpcPlayerSpawn >
+
    {
    public:
       PlayerSpawnPacket( Entity::Player& player, Entity::Player& target ) :
-         GamePacketNew< FFXIVIpcPlayerSpawn, ServerZoneIpcType >( player.getId(), target.getId() )
+         ZoneChannelPacket< FFXIVIpcPlayerSpawn >( player.getId(), target.getId() )
       {
          initialize( player, target );
       };
@@ -45,20 +45,20 @@ namespace Server {
          //m_data.tPMax = 3000;
          m_data.level = player.getLevel();
          m_data.gmRank = player.getGmRank();
-         m_data.pose = 0;
+         m_data.pose = player.getPose();
 
          memcpy( m_data.look, player.getLookArray(), 26 );
 
-         auto item = player.getInventory()->getItemAt( Inventory::GearSet0, Inventory::EquipSlot::MainHand );
+         auto item = player.getItemAt( Common::GearSet0, Common::EquipSlot::MainHand );
          if( item )
             m_data.mainWeaponModel = item->getModelId1();
          m_data.secWeaponModel = player.getModelSubWeapon();
 
-         m_data.models[0] = player.getModelForSlot( Inventory::EquipSlot::Head );
-         m_data.models[1] = player.getModelForSlot( Inventory::EquipSlot::Body );
-         m_data.models[2] = player.getModelForSlot( Inventory::EquipSlot::Hands );
-         m_data.models[3] = player.getModelForSlot( Inventory::EquipSlot::Legs );
-         m_data.models[4] = player.getModelForSlot( Inventory::EquipSlot::Feet );
+         m_data.models[0] = player.getModelForSlot( Common::EquipSlot::Head );
+         m_data.models[1] = player.getModelForSlot( Common::EquipSlot::Body );
+         m_data.models[2] = player.getModelForSlot( Common::EquipSlot::Hands );
+         m_data.models[3] = player.getModelForSlot( Common::EquipSlot::Legs );
+         m_data.models[4] = player.getModelForSlot( Common::EquipSlot::Feet );
          strcpy( m_data.name, player.getName().c_str() );
 
          m_data.pos.x = player.getPos().x;
@@ -117,6 +117,7 @@ namespace Server {
          }
 
          m_data.currentMount = player.getCurrentMount();
+         m_data.persistentEmote = player.getPersistentEmote();
 
          m_data.targetId = player.getTargetId();
          //m_data.type = 1;

@@ -1,6 +1,6 @@
 #include "ServerLobby.h"
 
-Core::ServerLobby g_serverLobby( "config/settings_lobby.xml" );
+Core::ServerLobby g_serverLobby( "lobby.ini" );
 
 int main( int32_t argc, char* argv[] )
 {

@@ -1,4 +1,3 @@
-#include <Script/NativeScriptApi.h>
 #include <Actor/Player.h>
 #include <ScriptObject.h>
 
@@ -31,6 +30,24 @@ private:
    {
       auto callback = [this]( Entity::Player& player, const Event::SceneResult& result )
       {
+         auto questionAnswer = result.param2;
+
+         uint16_t itemId = 0;
+
+         switch( questionAnswer )
+         {
+            case 1:  itemId = 4423; break;
+            case 2:  itemId = 4424; break;
+            case 3:  itemId = 4425; break;
+            case 4:  itemId = 4426; break;
+            default: itemId = 4426; break;
+         }
+
+         auto item = player.addItem( Common::InventoryType::ArmoryRing, -1, itemId, 1, false, true );
+
+         if( item )
+            player.equipItem( Common::EquipSlot::Ring2, item, true );
+
          player.setOpeningSequence( 1 );
          Scene00001( player );
       };

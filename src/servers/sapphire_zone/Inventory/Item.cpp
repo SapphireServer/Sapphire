@@ -1,44 +1,30 @@
 #include <Common.h>
 #include <Exd/ExdDataGenerated.h>
+#include <CommonGen.h>
 
 #include "Framework.h"
 #include "Item.h"
 
 extern Core::Framework g_fw;
 
-Core::Item::Item()
-{
-
-}
-
-Core::Item::Item( uint32_t catalogId ) :
-   m_id( catalogId ),
-   m_isHq( false )
-{
-
-}
-
-Core::Item::Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, Common::ItemUICategory categoryId, bool isHq ) :
+Core::Item::Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, bool isHq ) :
    m_id( catalogId ),
    m_uId( uId ),
-   m_category( static_cast< Common::ItemUICategory >( categoryId ) ),
    m_model1( model1 ),
    m_model2( model2 ),
    m_isHq( isHq )
 {
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
    auto itemInfo = pExdData->get< Core::Data::Item >( catalogId );
+
    m_delayMs = itemInfo->delayms;
    m_physicalDmg = itemInfo->damagePhys;
    m_magicalDmg = itemInfo->damageMag;
    m_weaponDmg = ( m_physicalDmg != 0 ) ? m_physicalDmg : m_magicalDmg;
    m_autoAttackDmg = static_cast< float >( m_weaponDmg * m_delayMs ) / 3000;
+   m_category = static_cast< Common::ItemUICategory >( itemInfo->itemUICategory );
    m_itemLevel = itemInfo->levelItem;
-}
-
-Core::Item::~Item()
-{
-
+   m_maxStackSize = itemInfo->stackSize;
 }
 
 float Core::Item::getAutoAttackDmg() const
@@ -98,7 +84,7 @@ void Core::Item::setUId( uint64_t id )
 
 void Core::Item::setStackSize( uint32_t size )
 {
-   m_stackSize = size;
+   m_stackSize = std::min< uint32_t >( size, m_maxStackSize );
 }
 
 uint32_t Core::Item::getStackSize() const
@@ -140,4 +126,9 @@ bool Core::Item::isHq() const
 void Core::Item::setHq( bool isHq )
 {
    m_isHq = isHq;
+}
+
+uint32_t Core::Item::getMaxStackSize() const
+{
+   return m_maxStackSize;
 }

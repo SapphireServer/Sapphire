@@ -9,7 +9,7 @@
 
 #include "Forwards.h"
 
-#define DECLARE_HANDLER( x ) void x( const Packets::GamePacket& inPacket, Entity::Player& player )
+#define DECLARE_HANDLER( x ) void x( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 
 namespace Core {
 namespace Network {
@@ -28,7 +28,7 @@ class GameConnection : public Connection
 {
 
 private:
-   typedef void ( GameConnection::* Handler )( const Packets::GamePacket& inPacket, Entity::Player& player );
+   typedef void ( GameConnection::* Handler )( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player );
 
    using HandlerMap = std::map< uint16_t, Handler >;
    using HandlerStrMap = std::map< uint16_t, std::string >;
@@ -45,8 +45,8 @@ private:
 
    SessionPtr m_pSession;
 
-   LockedQueue< Packets::GamePacketPtr > m_inQueue;
-   LockedQueue< Packets::GamePacketPtr > m_outQueue;
+   LockedQueue< Core::Network::Packets::FFXIVARR_PACKET_RAW > m_inQueue;
+   LockedQueue< Packets::FFXIVPacketBasePtr > m_outQueue;
 
 public:
    ConnectionType m_conType;
@@ -67,21 +67,21 @@ public:
    void handlePackets( const Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
                        const std::vector< Packets::FFXIVARR_PACKET_RAW >& packetData );
 
-   void queueInPacket( Packets::GamePacketPtr inPacket );
-   void queueOutPacket( Packets::GamePacketPtr outPacket );
+   void queueInPacket( Core::Network::Packets::FFXIVARR_PACKET_RAW inPacket );
+   void queueOutPacket( Packets::FFXIVPacketBasePtr outPacket );
 
    void processInQueue();
    void processOutQueue();
 
-   void handlePacket( Packets::GamePacketPtr pPacket );
+   void handlePacket( Core::Network::Packets::FFXIVARR_PACKET_RAW& pPacket );
 
-   void handleZonePacket( const Packets::GamePacket& pPacket );
+   void handleZonePacket( Core::Network::Packets::FFXIVARR_PACKET_RAW& pPacket );
 
-   void handleChatPacket( const Packets::GamePacket& pPacket );
+   void handleChatPacket( Core::Network::Packets::FFXIVARR_PACKET_RAW& pPacket );
 
    void sendPackets( Packets::PacketContainer* pPacket );
 
-   void sendSinglePacket( Packets::GamePacket* pPacket );
+   void sendSinglePacket( Core::Network::Packets::FFXIVPacketBasePtr pPacket );
 
    void injectPacket( const std::string& packetpath, Entity::Player& player );
 
@@ -101,7 +101,7 @@ public:
    DECLARE_HANDLER( updatePositionHandler );
    DECLARE_HANDLER( chatHandler );
    DECLARE_HANDLER( zoneLineHandler );
-   DECLARE_HANDLER( actionHandler );
+   DECLARE_HANDLER( clientTriggerHandler );
    DECLARE_HANDLER( inventoryModifyHandler );
    DECLARE_HANDLER( discoveryHandler );
    DECLARE_HANDLER( eventHandlerTalk );
@@ -120,7 +120,7 @@ public:
    DECLARE_HANDLER( cfDutyAccepted );
 
 
-   DECLARE_HANDLER( skillHandler );
+   DECLARE_HANDLER( actionHandler );
 
    DECLARE_HANDLER( gm1Handler );
    DECLARE_HANDLER( gm2Handler );

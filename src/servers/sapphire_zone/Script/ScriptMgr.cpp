@@ -6,7 +6,7 @@
 
 #include <Logging/Logger.h>
 #include <Exd/ExdDataGenerated.h>
-#include <Config/XMLConfig.h>
+#include <Config/ConfigMgr.h>
 
 #include "watchdog/Watchdog.h"
 
@@ -51,10 +51,10 @@ void Core::Scripting::ScriptMgr::update()
 bool Core::Scripting::ScriptMgr::init()
 {
    std::set< std::string > files;
-   auto pConfig = g_fw.get< XMLConfig >();
+   auto pConfig = g_fw.get< ConfigMgr >();
    auto pLog = g_fw.get< Logger >();
 
-   auto status = loadDir( pConfig->getValue< std::string >( "Settings.General.Scripts.Path", "./compiledscripts/" ),
+   auto status = loadDir( pConfig->getValue< std::string >( "Scripts.Path", "./compiledscripts/" ),
             files, m_nativeScriptMgr->getModuleExtension() );
 
    if( !status )
@@ -76,7 +76,7 @@ bool Core::Scripting::ScriptMgr::init()
          scriptsLoaded++;
    }
 
-   pLog->info( "ScriptMgr: Loaded " + std::to_string( scriptsLoaded ) + "/" + std::to_string( scriptsFound ) + " scripts successfully" );
+   pLog->info( "ScriptMgr: Loaded " + std::to_string( scriptsLoaded ) + "/" + std::to_string( scriptsFound ) + " modules" );
 
    watchDirectories();
 
@@ -85,12 +85,12 @@ bool Core::Scripting::ScriptMgr::init()
 
 void Core::Scripting::ScriptMgr::watchDirectories()
 {
-   auto pConfig = g_fw.get< XMLConfig >();
-   auto shouldWatch = pConfig->getValue< bool >( "Settings.General.Scripts.HotSwap.Enabled", true );
+   auto pConfig = g_fw.get< ConfigMgr >();
+   auto shouldWatch = pConfig->getValue< bool >( "Scripts.HotSwap", true );
    if( !shouldWatch )
       return;
 
-   Watchdog::watchMany( pConfig->getValue< std::string >( "Settings.General.Scripts.Path", "./compiledscripts/" ) + "*" + m_nativeScriptMgr->getModuleExtension(),
+   Watchdog::watchMany( pConfig->getValue< std::string >( "Scripts.Path", "./compiledscripts/" ) + "*" + m_nativeScriptMgr->getModuleExtension(),
    [ this ]( const std::vector< ci::fs::path >& paths )
    {
       if( !m_firstScriptChangeNotificiation )
@@ -174,6 +174,7 @@ bool Core::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t actorI
    uint16_t eventType = eventId >> 16;
    uint32_t scriptId = eventId;
 
+   // todo: replace this shit with something more flexible allowing for handlers for an entire type without a bunch of if statements
    // aethernet/aetherytes need to be handled separately
    if( eventType == Event::EventHandler::EventHandlerType::Aetheryte )
    {
@@ -181,6 +182,10 @@ bool Core::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t actorI
       scriptId = EVENTSCRIPT_AETHERYTE_ID;
       if( !aetherInfo->isAetheryte )
          scriptId = EVENTSCRIPT_AETHERNET_ID;
+   }
+   else if( eventType == Event::EventHandler::EventHandlerType::Shop )
+   {
+      scriptId = 0x00040001;
    }
 
    auto script = m_nativeScriptMgr->getScript< EventScript >( scriptId );

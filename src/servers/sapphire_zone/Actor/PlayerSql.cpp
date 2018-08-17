@@ -1,10 +1,8 @@
 #include <set>
 
 #include <Common.h>
-#include <Network/GamePacket.h>
 #include <Util/Util.h>
 #include <Util/UtilMath.h>
-#include <Config/XMLConfig.h>
 #include <Logging/Logger.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Network/PacketContainer.h>
@@ -16,6 +14,9 @@
 
 #include "Zone/TerritoryMgr.h"
 #include "Zone/Zone.h"
+#include "Inventory/Item.h"
+#include "Inventory/ItemContainer.h"
+#include "Inventory/ItemUtil.h"
 
 #include "ServerZone.h"
 #include "Framework.h"
@@ -129,6 +130,10 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
    m_birthDay = res->getUInt8( "BirthDay" );
    m_birthMonth = res->getUInt8( "BirthMonth" );
    m_status = static_cast< ActorStatus >( res->getUInt( "Status" ) );
+   m_emoteMode = res->getUInt( "EmoteModeType" );
+
+   m_activeTitle = res->getUInt16( "ActiveTitle" );
+
    m_class = static_cast< ClassJob >( res->getUInt( "Class" ) );
    m_homePoint = res->getUInt8( "Homepoint" );
 
@@ -150,6 +155,8 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
    m_gmRank = res->getUInt8( "GMRank" );
 
    m_equipDisplayFlags = res->getUInt8( "EquipDisplayFlags" );
+
+   m_pose = res->getUInt8( "Pose" );
 
    // Blobs
 
@@ -198,9 +205,6 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
    m_modelSubWeapon = 0;
    m_lastTickTime = 0;
 
-   // TODO: remove Inventory and actually inline it in Player class
-   m_pInventory = make_Inventory( this );
-
    calculateStats();
 
    auto friendListMgr = g_fw.get< Social::SocialMgr < Social::FriendList > >();
@@ -235,7 +239,9 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
 
    setStateFlag( PlayerStateFlag::BetweenAreas );
 
-   m_pInventory->load();
+   //m_pInventory->load();
+
+   initInventory();
 
    initHateSlotQueue();
 
@@ -314,11 +320,11 @@ bool Core::Entity::Player::loadSearchInfo()
    if( !res->next() )
       return false;
 
-   m_searchSelectClass = res->getUInt8( 1 );
-   m_searchSelectRegion = res->getUInt8( 2 );
+   m_searchSelectClass = res->getUInt8( 2 );
+   m_searchSelectRegion = res->getUInt8( 3 );
 
    // todo: internally use an std::string instead of a char[]
-   auto searchMessage = res->getString( 3 );
+   auto searchMessage = res->getString( 4 );
    std::copy( searchMessage.begin(), searchMessage.end(), m_searchMessage );
 
    return true;
@@ -337,7 +343,7 @@ void Core::Entity::Player::updateSql()
            "ActiveTitle 36, TitleList 37, Achievement 38, Aetheryte 39, HowTo 40, Minions 41, Mounts 42, Orchestrion 43, "
            "EquippedMannequin 44, ConfigFlags 45, QuestCompleteFlags 46, OpeningSequence 47, "
            "QuestTracking 48, GrandCompany 49, GrandCompanyRank 50, Discovery 51, GMRank 52, Unlocks 53, "
-           "CFPenaltyUntil 54"*/
+           "CFPenaltyUntil 54, Pose 55"*/
    auto stmt = pDb->getPreparedStatement( Db::CharaDbStatements::CHARA_UP );
 
    stmt->setInt( 1, getHp() );
@@ -361,7 +367,7 @@ void Core::Entity::Player::updateSql()
    memcpy( modelVec.data(), m_modelEquip, sizeof( m_modelEquip ) );
    stmt->setBinary( 13, modelVec );
 
-   stmt->setInt( 14, 0 ); // EmodeModeType
+   stmt->setInt( 14, m_emoteMode ); // EmodeModeType
    stmt->setInt( 15, 0 ); // Language
 
    stmt->setInt( 16, static_cast< uint32_t >( m_bNewGame ) );
@@ -388,7 +394,7 @@ void Core::Entity::Player::updateSql()
 
    stmt->setBinary( 34, { 0, 0, 0 } ); // FavoritePoint
    stmt->setInt( 35, 0 ); // RestPoint
-   stmt->setInt( 36, 0 ); // ActiveTitle
+   stmt->setInt( 36, m_activeTitle ); // ActiveTitle
 
    std::vector< uint8_t > titleListVec( sizeof ( m_titleList ) );
    stmt->setBinary( 37, titleListVec );
@@ -447,7 +453,9 @@ void Core::Entity::Player::updateSql()
 
    stmt->setInt( 55, m_cfPenaltyUntil );
 
-   stmt->setInt( 56, m_id );
+   stmt->setInt( 56, m_pose );
+
+   stmt->setInt( 57, m_id );
 
    pDb->execute( stmt );
 
@@ -501,7 +509,7 @@ void Core::Entity::Player::updateDbSearchInfo() const
    stmtS1->setInt( 2, m_id );
    pDb->execute( stmtS1 );
 
-   auto stmtS2 = pDb->getPreparedStatement( Db::CHARA_SEARCHINFO_UP_SELECTREGION );
+   auto stmtS2 = pDb->getPreparedStatement( Db::CHARA_SEARCHINFO_UP_SEARCHCOMMENT );
    stmtS2->setString( 1, string( m_searchMessage != nullptr ? m_searchMessage : "" ) );
    stmtS2->setInt( 2, m_id );
    pDb->execute( stmtS2 );
@@ -558,4 +566,103 @@ void Core::Entity::Player::insertQuest( uint16_t questId, uint8_t index, uint8_t
    stmt->setInt( 11, 0 );
    stmt->setInt( 12, 0 );
    pDb->execute( stmt );
+}
+
+Core::ItemPtr Core::Entity::Player::createItem( uint32_t catalogId, uint32_t quantity )
+{
+   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+   auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+   auto itemInfo = pExdData->get< Core::Data::Item >( catalogId );
+
+   if( !itemInfo )
+      return nullptr;
+
+   if( !itemInfo )
+      return nullptr;
+
+   uint8_t flags = 0;
+
+   ItemPtr pItem = make_Item( Items::Util::getNextUId(),
+                              catalogId,
+                              itemInfo->modelMain,
+                              itemInfo->modelSub );
+
+   pItem->setStackSize( quantity );
+
+   pDb->execute( "INSERT INTO charaglobalitem ( CharacterId, itemId, catalogId, stack, flags ) VALUES ( " +
+                 std::to_string( getId() ) + ", " +
+                 std::to_string( pItem->getUId() ) + ", " +
+                 std::to_string( pItem->getId() ) + ", " +
+                 std::to_string( quantity ) + ", " +
+                 std::to_string( flags ) + ");" );
+
+   return pItem;
+}
+
+bool Core::Entity::Player::loadInventory()
+{
+   auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+   //////////////////////////////////////////////////////////////////////////////////////////////////////
+   // load active gearset
+   auto res = pDb->query( "SELECT storageId, container_0, container_1, container_2, container_3, "
+                          "container_4, container_5, container_6, container_7, "
+                          "container_8, container_9, container_10, container_11, "
+                          "container_12, container_13 "
+                          "FROM charaitemgearset " \
+                               "WHERE CharacterId =  " + std::to_string( getId() ) + " " \
+                               "ORDER BY storageId ASC;" );
+
+   while( res->next() )
+   {
+      uint16_t storageId = res->getUInt16( 1 );
+
+      for( uint32_t i = 1; i <= 14; i++ )
+      {
+         uint64_t uItemId = res->getUInt64( i + 1 );
+         if( uItemId == 0 )
+            continue;
+
+         ItemPtr pItem = Items::Util::loadItem( uItemId );
+
+         if( pItem == nullptr )
+            continue;
+
+         m_storageMap[storageId]->getItemMap()[i - 1] = pItem;
+         equipItem( static_cast< EquipSlot >( i - 1 ), pItem, false );
+      }
+   }
+
+   ///////////////////////////////////////////////////////////////////////////////////////////////////////
+   // Load everything
+   auto bagRes = pDb->query( "SELECT storageId, "
+                             "container_0, container_1, container_2, container_3, container_4, "
+                             "container_5, container_6, container_7, container_8, container_9, "
+                             "container_10, container_11, container_12, container_13, container_14, "
+                             "container_15, container_16, container_17, container_18, container_19, "
+                             "container_20, container_21, container_22, container_23, container_24, "
+                             "container_25, container_26, container_27, container_28, container_29, "
+                             "container_30, container_31, container_32, container_33, container_34 "
+                             "FROM charaiteminventory " \
+                                  "WHERE CharacterId =  " + std::to_string( getId() ) + " " \
+                                  "ORDER BY storageId ASC;" );
+
+   while( bagRes->next() )
+   {
+      uint16_t storageId = bagRes->getUInt16( 1 );
+      for( uint32_t i = 1; i <= m_storageMap[storageId]->getMaxSize(); i++ )
+      {
+         uint64_t uItemId = bagRes->getUInt64( i + 1 );
+         if( uItemId == 0 )
+            continue;
+
+         ItemPtr pItem = Items::Util::loadItem( uItemId );
+
+         if( pItem == nullptr )
+            continue;
+
+         m_storageMap[storageId]->getItemMap()[i - 1] = pItem;
+      }
+   }
+
+   return true;
 }

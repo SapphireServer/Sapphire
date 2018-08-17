@@ -7,7 +7,7 @@
 #include <boost/property_tree/json_parser.hpp>
 
 #include <Logging/Logger.h>
-#include <Config/XMLConfig.h>
+#include <Config/ConfigMgr.h>
 
 #include <Network/Connection.h>
 #include <Network/Hive.h>
@@ -52,13 +52,13 @@ void default_resource_send( const HttpServer &server, const shared_ptr< HttpServ
                             const shared_ptr< ifstream > &ifs );
 
 
-auto m_pConfig = boost::make_shared< Core::XMLConfig >();
+auto m_pConfig = boost::make_shared< Core::ConfigMgr >();
 HttpServer server;
-std::string configPath( "config/settings_rest.xml" );
+std::string configPath( "rest.ini" );
 
 void reloadConfig()
 {
-   m_pConfig = boost::make_shared< Core::XMLConfig >();
+   m_pConfig = boost::make_shared< Core::ConfigMgr >();
 
    if( !m_pConfig->loadConfig( configPath ) )
       throw "Error loading config ";
@@ -95,44 +95,43 @@ bool loadSettings( int32_t argc, char* argv[] )
 
          if( arg == "ip" )
          {
-            // todo: ip addr in config
-            m_pConfig->setValue< std::string >( "Settings.General.ListenIP", val );
+            m_pConfig->setValue< std::string >( "RestNetwork.ListenIp", val );
          }
          else if( arg == "p" || arg == "port" )
          {
-            m_pConfig->setValue< std::string >( "Settings.General.ListenPort", val );
+            m_pConfig->setValue< std::string >( "RestNetwork.ListenPort", val );
          }
          else if( arg == "exdpath" || arg == "datapath" )
          {
-            m_pConfig->setValue< std::string >( "Settings.General.DataPath", val );
+            m_pConfig->setValue< std::string >( "GlobalParameters.DataPath", val );
          }
          else if( arg == "h" || arg == "dbhost" )
          {
-            m_pConfig->setValue< std::string >( "Settings.General.Mysql.Host", val );
+            m_pConfig->setValue< std::string >( "Database.Host", val );
          }
          else if( arg == "dbport" )
          {
-            m_pConfig->setValue< std::string >( "Settings.General.Mysql.Port", val );
+            m_pConfig->setValue< std::string >( "Database.Port", val );
          }
          else if( arg == "u" || arg == "user" || arg == "dbuser" )
          {
-            m_pConfig->setValue< std::string >( "Settings.General.Mysql.Username", val );
+            m_pConfig->setValue< std::string >( "Database.Username", val );
          }
          else if( arg == "pass" || arg == "dbpass" )
          {
-            m_pConfig->setValue< std::string >( "Settings.General.Mysql.Pass", val );
+            m_pConfig->setValue< std::string >( "Database.Password", val );
          }
          else if( arg == "d" || arg == "db" || arg == "database" )
          {
-            m_pConfig->setValue< std::string >( "Settings.General.Mysql.Database", val );
+            m_pConfig->setValue< std::string >( "Database.Database", val );
          }
          else if ( arg == "lobbyip" || arg == "lobbyhost" )
          {
-            m_pConfig->setValue< std::string >( "Settings.General.LobbyHost", val );
+            m_pConfig->setValue< std::string >( "GlobalNetwork.LobbyHost", val );
          }
          else if ( arg == "lobbyport" )
          {
-            m_pConfig->setValue< std::string >( "Settings.General.LobbyPort", val );
+            m_pConfig->setValue< std::string >( "GlobalNetwork.LobbyPort", val );
          }
       }
       catch( ... )
@@ -143,7 +142,7 @@ bool loadSettings( int32_t argc, char* argv[] )
    }
 
    g_log.info( "Setting up generated EXD data" );
-   if( !g_exdDataGen.init( m_pConfig->getValue< std::string >( "Settings.General.DataPath", "" ) ) )
+   if( !g_exdDataGen.init( m_pConfig->getValue< std::string >( "GlobalParameters.DataPath", "" ) ) )
    {
       g_log.fatal( "Error setting up generated EXD data " );
       return false;
@@ -152,19 +151,20 @@ bool loadSettings( int32_t argc, char* argv[] )
    Core::Db::DbLoader loader;
 
    Core::Db::ConnectionInfo info;
-   info.password = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Pass", "" );
-   info.host = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Host", "127.0.0.1" );
-   info.database = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Database", "sapphire" );
-   info.port = m_pConfig->getValue< uint16_t >( "Settings.General.Mysql.Port", 3306 );
-   info.user = m_pConfig->getValue< std::string >( "Settings.General.Mysql.Username", "root" );
-   info.syncThreads = m_pConfig->getValue< uint8_t >( "Settings.General.Mysql.SyncThreads", 2 );
-   info.asyncThreads = m_pConfig->getValue< uint8_t >( "Settings.General.Mysql.AsyncThreads", 2 );
+   info.password = m_pConfig->getValue< std::string >( "Database.Password", "" );
+   info.host = m_pConfig->getValue< std::string >( "Database.Host", "127.0.0.1" );
+   info.database = m_pConfig->getValue< std::string >( "Database.Database", "sapphire" );
+   info.port = m_pConfig->getValue< uint16_t >( "Database.Port", 3306 );
+   info.user = m_pConfig->getValue< std::string >( "Database.Username", "root" );
+   info.syncThreads = m_pConfig->getValue< uint8_t >( "Database.SyncThreads", 2 );
+   info.asyncThreads = m_pConfig->getValue< uint8_t >( "Database.AsyncThreads", 2 );
 
    loader.addDb( g_charaDb, info );
    if( !loader.initDbs() )
       return false;
 
-   server.config.port = static_cast< uint16_t >( std::stoul( m_pConfig->getValue< std::string >( "Settings.General.HttpPort", "80" ) ) );
+   server.config.port = static_cast< uint16_t >( std::stoul( m_pConfig->getValue< std::string >( "RestNetwork.ListenPort", "80" ) ) );
+   server.config.address = m_pConfig->getValue< std::string >( "RestNetwork.ListenIp", "0.0.0.0" );
 
    g_log.info( "Database: Connected to " + info.host + ":" + std::to_string( info.port ) );
 
@@ -269,8 +269,8 @@ void createAccount( shared_ptr<HttpServer::Response> response, shared_ptr<HttpSe
       if( g_sapphireAPI.createAccount( user, pass, sId ) )
       {
          std::string json_string = "{\"sId\":\"" + sId + 
-                                    "\", \"lobbyHost\":\"" + m_pConfig->getValue< std::string >( "Settings.General.LobbyHost" ) + 
-                                    "\", \"frontierHost\":\"" + m_pConfig->getValue< std::string >( "Settings.General.FrontierHost" ) + "\"}";
+                                    "\", \"lobbyHost\":\"" + m_pConfig->getValue< std::string >( "GlobalNetwork.LobbyHost" ) +
+                                    "\", \"frontierHost\":\"" + m_pConfig->getValue< std::string >( "GlobalNetwork.RestHost" ) + "\"}";
          *response << buildHttpResponse( 200, json_string, JSON );
       }
       else
@@ -301,8 +301,8 @@ void login( shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Re
       if( g_sapphireAPI.login( user, pass, sId ) )
       {
          std::string json_string = "{\"sId\":\"" + sId + 
-                                    "\", \"lobbyHost\":\"" + m_pConfig->getValue< std::string >("Settings.General.LobbyHost") + 
-                                    "\", \"frontierHost\":\"" + m_pConfig->getValue< std::string >( "Settings.General.FrontierHost" ) + "\"}";
+                                    "\", \"lobbyHost\":\"" + m_pConfig->getValue< std::string >( "GlobalNetwork.LobbyHost" ) +
+                                    "\", \"frontierHost\":\"" + m_pConfig->getValue< std::string >( "GlobalNetwork.RestHost" ) + "\"}";
          *response << buildHttpResponse( 200, json_string, JSON );
       }
       else
@@ -333,7 +333,7 @@ void deleteCharacter( shared_ptr<HttpServer::Response> response, shared_ptr<Http
 
       int32_t accountId = g_sapphireAPI.checkSession( sId );
 
-      if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret )
+      if( m_pConfig->getValue< std::string >( "GlobalParameters.ServerSecret" ) != secret )
       {
          std::string json_string = "{\"result\":\"invalid_secret\"}";
          *response << buildHttpResponse( 403, json_string, JSON );
@@ -374,14 +374,14 @@ void createCharacter( shared_ptr<HttpServer::Response> response, shared_ptr<Http
 
       if( result != -1 )
       {
-         if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) 
+         if( m_pConfig->getValue< std::string >( "GlobalParameters.ServerSecret" ) != secret )
          {
             std::string json_string = "{\"result\":\"invalid_secret\"}";
             *response << buildHttpResponse( 403, json_string, JSON );
          }
          else
          {
-            int32_t charId = g_sapphireAPI.createCharacter( result, name, finalJson, m_pConfig->getValue< uint8_t >( "Settings.Parameters.DefaultGMRank", 255 ) );
+            int32_t charId = g_sapphireAPI.createCharacter( result, name, finalJson, m_pConfig->getValue< uint8_t >( "CharacterCreation.DefaultGMRank", 255 ) );
 
             std::string json_string = "{\"result\":\"" + std::to_string( charId ) + "\"}";
             *response << buildHttpResponse( 200, json_string, JSON );
@@ -414,7 +414,7 @@ void insertSession( shared_ptr<HttpServer::Response> response, shared_ptr<HttpSe
       uint32_t accountId = pt.get<uint32_t>( "accountId" );
       std::string secret = pt.get<string>( "secret" );
          // reloadConfig();
-      if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) 
+      if( m_pConfig->getValue< std::string >( "GlobalParameters.ServerSecret" ) != secret )
       {
          std::string json_string = "{\"result\":\"invalid_secret\"}";
          *response << buildHttpResponse( 403, json_string, JSON );
@@ -448,7 +448,7 @@ void checkNameTaken( shared_ptr<HttpServer::Response> response, shared_ptr<HttpS
 
       // reloadConfig();
 
-      if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) 
+      if( m_pConfig->getValue< std::string >( "GlobalParameters.ServerSecret" ) != secret )
       {
          std::string json_string = "{\"result\":\"invalid_secret\"}";
          *response << buildHttpResponse( 403, json_string, JSON );
@@ -486,7 +486,7 @@ void checkSession( shared_ptr<HttpServer::Response> response, shared_ptr<HttpSer
 
       if( result != -1 )
       {
-         if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) 
+         if( m_pConfig->getValue< std::string >( "GlobalParameters.ServerSecret" ) != secret )
          {
             std::string json_string = "{\"result\":\"invalid_secret\"}";
             *response << buildHttpResponse( 403, json_string, JSON );
@@ -523,7 +523,7 @@ void getNextCharId( shared_ptr<HttpServer::Response> response, shared_ptr<HttpSe
 
       // reloadConfig();
 
-      if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) 
+      if( m_pConfig->getValue< std::string >( "GlobalParameters.ServerSecret" ) != secret )
       {
          std::string json_string = "{\"result\":\"invalid_secret\"}";
          *response << buildHttpResponse( 403, json_string, JSON );
@@ -555,7 +555,7 @@ void getNextContentId( shared_ptr<HttpServer::Response> response, shared_ptr<Htt
 
       // reloadConfig();
 
-      if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) 
+      if( m_pConfig->getValue< std::string >( "GlobalParameters.ServerSecret" ) != secret )
       {
          std::string json_string = "{\"result\":\"invalid_secret\"}";
          *response << buildHttpResponse( 403, json_string, JSON );
@@ -591,7 +591,7 @@ void getCharacterList( shared_ptr<HttpServer::Response> response, shared_ptr<Htt
 
       if( result != -1 )
       {
-         if( m_pConfig->getValue< std::string >( "Settings.General.ServerSecret" ) != secret ) 
+         if( m_pConfig->getValue< std::string >( "GlobalParameters.ServerSecret" ) != secret )
          {
             std::string json_string = "{\"result\":\"invalid_secret\"}";
             *response << buildHttpResponse( 403, json_string, JSON );
@@ -756,9 +756,6 @@ int main( int argc, char* argv[] )
    if( !loadSettings( argc, argv ) )
       throw std::exception();
 
-   server.config.port = stoi( m_pConfig->getValue< std::string >( "Settings.General.HttpPort", "80" ) );
-   g_log.info( "Starting API server at port " + m_pConfig->getValue< std::string >( "Settings.General.HttpPort", "80" ) + "..." );
-
    server.resource["^/ZoneName/([0-9]+)$"]["GET"] = &getZoneName; 
    server.resource["^/sapphire-api/lobby/createAccount"]["POST"] = &createAccount;
    server.resource["^/sapphire-api/lobby/login"]["POST"] = &login;
@@ -780,6 +777,8 @@ int main( int argc, char* argv[] )
       //Start server
       server.start();
    } );
+
+   g_log.info( "API server running on " + m_pConfig->getValue< std::string >( "RestNetwork.ListenIp", "0.0.0.0" ) + ":" + m_pConfig->getValue< std::string >( "RestNetwork.ListenPort", "80" ) );
 
    //Wait for server to start so that the client can connect
    this_thread::sleep_for( chrono::seconds( 1 ) );

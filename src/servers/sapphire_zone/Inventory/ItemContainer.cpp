@@ -11,9 +11,12 @@
 
 extern Core::Framework g_fw;
 
-Core::ItemContainer::ItemContainer( uint16_t locationId ) : 
-   m_id( locationId ),
-   m_size( 35 )
+Core::ItemContainer::ItemContainer( uint16_t storageId, uint8_t maxSize, const std::string& tableName, bool isMultiStorage, bool isPersistentStorage ) :
+   m_id( storageId ),
+   m_size( maxSize ),
+   m_tableName( tableName ),
+   m_bMultiStorage( isMultiStorage ),
+   m_isPersistentStorage( isPersistentStorage )
 {
 
 }
@@ -41,7 +44,8 @@ void Core::ItemContainer::removeItem( uint8_t slotId )
 
    if( it != m_itemMap.end() )
    {
-      pDb->execute( "DELETE FROM charaglobalitem WHERE itemId = " + std::to_string( it->second->getUId() ) );
+      if( m_isPersistentStorage )
+         pDb->execute( "DELETE FROM charaglobalitem WHERE itemId = " + std::to_string( it->second->getUId() ) );
 
       m_itemMap.erase( it );
 
@@ -53,17 +57,17 @@ void Core::ItemContainer::removeItem( uint8_t slotId )
    }
 }
 
-Core::ItemMap & Core::ItemContainer::getItemMap()
+Core::ItemMap& Core::ItemContainer::getItemMap()
 {
    return m_itemMap;
 }
 
-const Core::ItemMap & Core::ItemContainer::getItemMap() const
+const Core::ItemMap& Core::ItemContainer::getItemMap() const
 {
    return m_itemMap;
 }
 
-int16_t Core::ItemContainer::getFreeSlot()
+int8_t Core::ItemContainer::getFreeSlot()
 {
    for( uint8_t slotId = 0; slotId < m_size; slotId++ )
    {
@@ -95,3 +99,25 @@ void Core::ItemContainer::setItem( uint8_t slotId, ItemPtr pItem )
 
    m_itemMap[slotId] = pItem;
 }
+
+uint8_t Core::ItemContainer::getMaxSize() const
+{
+   return m_size;
+}
+
+std::string Core::ItemContainer::getTableName() const
+{
+   return m_tableName;
+}
+
+bool Core::ItemContainer::isMultiStorage() const
+{
+   return m_bMultiStorage;
+}
+
+bool Core::ItemContainer::isPersistentStorage() const
+{
+   return m_isPersistentStorage;
+}
+
+
