@@ -76,7 +76,7 @@ public:
    uint64_t getId() const;
 
    /*! get total size of group (members + invites) */
-   uint32_t Group::getTotalSize() const;
+   uint32_t getTotalSize() const;
 
    /*! check if group has member */
    bool hasMember( uint64_t contentId ) const;

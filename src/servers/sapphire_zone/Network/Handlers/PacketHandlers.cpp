@@ -413,17 +413,17 @@ void Core::Network::GameConnection::socialListHandler( const Core::Network::Pack
 
       auto listPacket = makeZonePacket< FFXIVIpcSocialList >( player.getId() );
 
+      // todo: use socialmgr
+
       listPacket->data().type = 2;
       listPacket->data().sequence = count;
 
       int32_t entrysizes = sizeof( listPacket->data().entries );
       memset( listPacket->data().entries, 0, sizeof( listPacket->data().entries ) );
 
-      //listPacket->data().entries[0].bytes[2] = player.getCurrentZone()->getTerritoryId();
-      //listPacket->data().entries[0].bytes[3] = 0x80;
-      //listPacket->data().entries[0].bytes[4] = 0x02;
-      //listPacket->data().entries[0].bytes[6] = 0x3B;
-      //listPacket->data().entries[0].bytes[11] = 0x10;
+      // todo: store language in db search info or something
+      listPacket->data().entries[0].clientLanguage = Common::ClientLanguage::English; // todo: read from memory
+      listPacket->data().entries[0].knownLanguages = Common::ClientLanguage::English | Common::ClientLanguage::German; // todo: read from memory
       listPacket->data().entries[0].classJob = player.getClass();
       listPacket->data().entries[0].contentId = player.getContentId();
       listPacket->data().entries[0].level = player.getLevel();
@@ -452,13 +452,13 @@ void Core::Network::GameConnection::socialListHandler( const Core::Network::Pack
 
       uint16_t i = 0;
       auto test = g_fw.get< Social::SocialMgr< Social::FriendList > >();
-      auto playerFriendsList = test->findGroupById( player.getContentId() );
 
+      auto playerFriendsList = test->findGroupById( player.getContentId() );
       // todo: move this garbage else fucking where
       for ( auto member : playerFriendsList->getMembers() )
       {
          // more elegant way to break over list entries pls
-         if ( i == 10 )
+         if( i == 10 )
             break;
 
          if( member == 0 )
@@ -469,6 +469,7 @@ void Core::Network::GameConnection::socialListHandler( const Core::Network::Pack
          listPacket->data().entries[i] = playerFriendsList->generatePlayerEntry( member );
          i++;
       }
+      
 
       queueOutPacket( listPacket );
 
