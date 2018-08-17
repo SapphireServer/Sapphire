@@ -82,25 +82,28 @@ struct FFXIVIpcPlayTime : FFXIVIpcBasePacket<Playtime>
 struct PlayerEntry {
    uint64_t contentId;
    uint32_t timestamp;
-   uint8_t bytes[4];
+   uint32_t padding;
    uint8_t status;      // bitmask. friend: if it's a request, if added, recipient/sender
    uint8_t unknown;     // maybe bitmask? a value of 4 sets it to linkshell request
    uint8_t entryIcon;   // observed in friend group icon, sideffects for displaying text
    uint8_t unavailable; // bool
    uint16_t zoneId;
-   uint8_t grandCompany;
+   uint8_t unknown_43_1;
+   uint8_t unknown_43_2;
+   uint8_t grandCompany; 
    uint8_t clientLanguage;
-   uint8_t knownLanguages; // bitmask, J 0x01, E 0x02, D 0x04, F 0x08
-   uint8_t searchComment; // bool
-   char bytes1[6];
+   uint8_t knownLanguages;   // bitmask, J 0x01, E 0x02, D 0x04, F 0x08
+   uint8_t searchComment;    // bool
+   char bytes1[4];
    uint64_t onlineStatusMask;
    Common::ClassJob classJob;
-   uint8_t padding;
+   uint8_t padding_1;
    uint16_t level;
-   uint16_t padding2;
+   uint16_t padding_2;
    uint8_t one;
    char name[0x20];
    char fcTag[5];
+   uint32_t unknown_p1; // Added 4.2
 };
 
 struct FFXIVIpcSocialRequestReceive : FFXIVIpcBasePacket<SocialRequestReceive>
@@ -123,6 +126,8 @@ struct FFXIVIpcSocialRequestReceive : FFXIVIpcBasePacket<SocialRequestReceive>
 
 struct FFXIVIpcSocialRequestError : FFXIVIpcBasePacket<SocialRequestError>
 {
+   uint32_t unknown_p1;             // Added on 4.2, unknown. Possibly padding/crossworld related
+   uint32_t unknown_p2;
    uint32_t messageId;              // if 0 then type's message is used (type must 2/4/5 or it wont print)
    Common::SocialCategory category; // 2 - friend request, 4 - fc petition, 5 - fc invitation, anything else and wont print
    uint8_t unknown;                 // possibly padding
@@ -136,7 +141,8 @@ struct FFXIVIpcSocialRequestResponse : FFXIVIpcBasePacket<SocialRequestResponse>
    uint64_t contentId;
    uint32_t unknown;
    Common::SocialCategory category; // Common::SocialCategory
-   Common::SocialRequestResponse response; // Common::SocialRequestResponse
+   Common::SocialRequestExecute execute; // Common::SocialRequestResponse
+   uint8_t unknown2;                 // possibly padding
    char name[0x20];
    uint16_t padding;
 };
@@ -654,37 +660,14 @@ struct FFXIVIpcInitZone : FFXIVIpcBasePacket<InitZone>
 */
 struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
 {
+   // plain C types for a bit until the packet is actually fixed.
+   // makes conversion between different editors easier.
    uint64_t contentId;
    uint32_t unknown8;
    uint32_t unknownC;
    uint32_t charId;
    uint32_t restedExp;
-   uint16_t unknown18;
-   uint8_t maxLevel;
-   uint8_t expansion;
-   uint8_t unknown1A;
-   uint8_t race;
-   uint8_t tribe;
-   uint8_t gender;
-   uint8_t currentJob;
-   uint8_t currentClass;
-   uint8_t deity;
-   uint8_t namedayMonth;
-   uint8_t namedayDay;
-   uint8_t cityState;
-   uint8_t homepoint;
-   uint8_t unknown26; // 2 if "warrior of light"
-   uint8_t petHotBar;
-   uint8_t companionRank;
-   uint8_t companionStars;
-   uint8_t companionSp;
-   uint8_t companionUnk2B;
-   uint8_t companionColor;
-   uint8_t companionFavoFeed;
-   uint8_t companionUnk2E;
-   float companionTimePassed;
    uint32_t companionCurrentExp;
-   uint32_t unknown38;
    uint32_t unknown3C;
    uint32_t fishCaught;
    uint32_t useBaitCatalogId;
@@ -694,60 +677,91 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    uint16_t pvpStats[6];
    uint16_t playerCommendations;
    uint16_t pvpStats1;
-   uint8_t frontlineCampaigns[4];
+   uint16_t frontlineCampaigns[4];
    uint16_t frontlineCampaignsWeekly;
-   uint8_t currentRelic;
-   uint8_t currentBook;
-   uint8_t masterCrafterMask;
-   uint8_t unknown69;
-   uint8_t unknown6A;
-   uint8_t unknown6B;
-   uint8_t unknown6C[4];
-   uint8_t unknown70[61];
-   uint8_t preNamePadding;
-   char name[32];
-   uint8_t unknownOword[16];
-   uint8_t unknownDE[2];
+   uint16_t currentRelic;
+   uint16_t currentBook;
+   uint16_t masterCrafterMask;
+   uint16_t unknown69;
+   uint16_t unknown6A;
+   uint16_t unknown6B;
+   uint16_t unknown6C[4];
+   uint16_t unknown50[34];
+   uint16_t unknown18;
+   uint16_t maxLevel;
+   uint16_t expansion;
+   uint16_t unknown76;
+   uint16_t race;
+   uint16_t tribe;
+   uint16_t gender;
+   uint16_t currentJob;
+   uint16_t currentClass;
+   uint16_t deity;
+   uint16_t namedayMonth;
+   uint16_t namedayDay;
+   uint16_t cityState;
+   uint16_t homepoint;
+   uint16_t unknown26;
+   uint16_t petHotBar;
+   uint16_t companionRank;
+   uint16_t companionStars;
+   uint16_t companionSp;
+   uint16_t companionUnk2B;
+   uint16_t companionColor;
+   uint16_t companionFavoFeed;
+   uint16_t companionUnk89;
+   uint16_t companionUnk90[5];
+   uint16_t unknown90[7];
+   uint16_t unknown9E;
+   uint16_t unknownA0;
+   uint32_t exp[25];
+   uint16_t unknown564[16];
+   uint32_t pvpFrontlineOverall1st;
+   uint32_t pvpFrontlineOverall2nd;
+   uint32_t pvpFrontlineOverall3rd;
+   uint16_t relicBookCompletion1[4];
    uint16_t levels[25];
    uint16_t levelsPadding;
-   uint32_t exp[25];
-   uint8_t unlockBitmask[64];
-   uint8_t aetheryte[16];
-   uint8_t discovery[421];
-   uint8_t howto[33];
-   uint8_t minions[37];
-   uint8_t chocoboTaxiMask[8];
-   uint8_t contentClearMask[108];
-   uint8_t contentClearPadding;
-   uint16_t unknown428[8];
-   uint8_t companionBardingMask[8];
-   uint8_t companionEquippedHead;
-   uint8_t companionEquippedBody;
-   uint8_t companionEquippedFeet;
-   uint8_t companionUnk4[4];
-   uint8_t companion_fields[11];
-   uint8_t companion_name[21];
-   uint8_t companionDefRank;
-   uint8_t companionAttRank;
-   uint8_t companionHealRank;
-   uint8_t mountGuideMask[15];
-   uint8_t fishingGuideMask[89];
-   uint8_t fishingSpotVisited[25];
+   uint16_t unknown15C[8];
    uint16_t fishingRecordsFish[26];
    uint16_t fishingRecordsFishWeight[26];
-   uint8_t unknownMask554[15];
-   uint8_t unknownMask4Padding;
-   uint8_t unknown564[19];
-   uint8_t rankAmalJaa;
-   uint8_t rankSylph;
-   uint8_t rankKobold;
-   uint8_t rankSahagin;
-   uint8_t rankIxal;
-   uint8_t rankVanu;
-   uint8_t rankVath;
-   uint8_t rankMoogle;
-   uint8_t rankKojin;
-   uint8_t rankAnata;
+   uint16_t unknownMask554[44];
+   uint16_t companion_name[21];
+   uint16_t companionDefRank;
+   uint16_t companionAttRank;
+   uint16_t companionHealRank;
+   uint16_t mountGuideMask[16];
+   char name[32];
+   uint16_t unknownOword[16];
+   uint16_t unknown258;
+   uint16_t unlockBitmask[64];
+   uint16_t aetheryte[17];
+   uint16_t discovery[421];
+   uint16_t howto[33];
+   uint16_t minions[38];
+   uint16_t chocoboTaxiMask[8];
+   uint16_t contentClearMask[111];
+   uint16_t contentClearPadding;
+   uint16_t unknown428[8];
+   uint16_t companionBardingMask[8];
+   uint16_t companionEquippedHead;
+   uint16_t companionEquippedBody;
+   uint16_t companionEquippedFeet;
+   uint16_t companionUnk4[4];
+   uint16_t companion_fields[11];
+   uint16_t fishingGuideMask[89];
+   uint16_t fishingSpotVisited[25];
+   uint16_t unknownMask4Padding;
+   uint16_t rankAmalJaa;
+   uint16_t rankSylph;
+   uint16_t rankKobold;
+   uint16_t rankSahagin;
+   uint16_t rankIxal;
+   uint16_t rankVanu;
+   uint16_t rankVath;
+   uint16_t rankMoogle;
+   uint16_t rankKojin;
+   uint16_t rankAnata;
    uint16_t expAmalJaa;
    uint16_t expSylph;
    uint16_t expKobold;
@@ -758,42 +772,38 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket<InitUI>
    uint16_t expMoogle;
    uint16_t expKojin;
    uint16_t expAnata;
-   uint8_t unknown596[10];
+   uint16_t unknown596[10];
    uint16_t unknown5A0[5];
-   uint8_t unknownMask59E[5];
-   uint8_t unknown5A3[18];
-   uint8_t unknownMask5C1[28];
-   uint8_t unknown_03411;
+   uint16_t unknownMask59E[5];
+   uint16_t unknown5A3[18];
+   uint16_t unknownMask5C1[28];
+   uint16_t unknown_03411;
    uint32_t unknownDword5E0;
-   uint8_t relicBookCompletion[12];
-   uint8_t sightseeingMask[26];
-   uint16_t unknown_XXX;
-   uint32_t pvpFrontlineOverall1st;
-   uint32_t pvpFrontlineOverall2nd;
-   uint32_t pvpFrontlineOverall3rd;
    uint16_t pvpFrontlineWeekly1st;
    uint16_t pvpFrontlineWeekly2nd;
    uint16_t pvpFrontlineWeekly3rd;
-   uint8_t unknown61E;
-   uint8_t unknown61F[32];
-   uint8_t unknown63F[22];
-   uint8_t tripleTriadCards[28];
-   uint8_t unknown671[11];
-   uint8_t unknownMask67C[22];
-   uint8_t unknown692[3];
-   uint8_t orchestrionMask[40];
-   uint8_t hallOfNoviceCompleteMask[3];
-   uint8_t unknownMask6C0[11];
-   uint8_t unknownMask6CB[16];
-   uint8_t unknown6DB[14];
-   uint8_t unlockedRaids[28];
-   uint8_t unlockedDungeons[18];
-   uint8_t unlockedGuildhests[10];
-   uint8_t unlockedTrails[7];
-   uint8_t unlockedPvp[5];
-   uint8_t unknownMask72D[28];
-   uint8_t unknownMask749[18];
-   uint8_t unknown749[23];
+   uint16_t relicBookCompletion2[8];
+   uint16_t sightseeingMask[26];
+   uint16_t unknown_XXX;
+   uint16_t unknown61E[20];
+   uint16_t unknown656[29];
+   uint16_t unknown63F[22];
+   uint16_t tripleTriadCards[28];
+   uint16_t unknown671[11];
+   uint16_t unknownMask67C[22];
+   uint16_t unknown692[3];
+   uint16_t orchestrionMask[40];
+   uint16_t hallOfNoviceCompleteMask[3];
+   uint16_t unknownMask6C0[11];
+   uint16_t unknownMask6CB[16];
+   uint16_t unknown6DB[14];
+   uint16_t unlockedRaids[28];
+   uint16_t unlockedDungeons[18];
+   uint16_t unlockedGuildhests[10];
+   uint16_t unlockedTrials[7];
+   uint16_t unlockedPvp[5];
+   uint16_t unknownMask72D[28];
+
 };
 
 /**
@@ -1044,7 +1054,7 @@ struct FFXIVIpcEventStart : FFXIVIpcBasePacket<EventStart>
    /* 000D */ uint8_t param2;
    /* 000E */ uint16_t padding;
    /* 0010 */ uint32_t param3;
-   /* 0014 */ uint32_t contentId;
+   /* 0014 */ uint32_t padding1;
 };
 
 
@@ -1081,7 +1091,8 @@ struct FFXIVIpcDirectorPlayScene : FFXIVIpcBasePacket<DirectorPlayScene>
    uint8_t param4;
    uint8_t padding1[3];
    uint32_t param5;
-   uint8_t unknown[0x40];
+   uint8_t unknown8[0x08];
+   uint8_t unknown[0x38];
 };
 
 /**
@@ -1405,6 +1416,18 @@ struct FFXIVIpcObjectDespawn : FFXIVIpcBasePacket<ObjectDespawn>
 {
    uint8_t spawnIndex;
    uint8_t padding[7];
+};
+
+struct FFXIVIpcDuelChallenge : FFXIVIpcBasePacket<DuelChallenge>
+{
+   uint8_t otherClassJobId;
+   uint8_t otherLevel; // class job level
+   uint8_t challengeByYou; // 0 if the other challenges you, 1 if you challenges the other.
+   uint8_t otherItemLevel;
+
+   uint32_t otherActorId;
+
+   char otherName[32];
 };
 
 

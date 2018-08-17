@@ -43,33 +43,35 @@ private:
 
    void Scene00000( Entity::Player& player )
    {
-      auto callback = [ this ]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [this]( Entity::Player& player, const Event::SceneResult& result )
       {
          player.setOpeningSequence( 1 );
          Scene00001( player );
       };
 
-      player.eventPlay( getId(), 0, 0x04AC05, 0, 1, callback );
+      player.playScene( getId(), 0, NO_DEFAULT_CAMERA | INVIS_ENPC |
+                                    CONDITION_CUTSCENE | HIDE_UI |
+                                    HIDE_HOTBAR | SILENT_ENTER_TERRI_ENV, 0, 1, callback );
    }
 
    void Scene00001( Entity::Player& player )
    {
-      player.eventPlay( getId(), 1, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 1, 0x32 );
+      player.playScene( getId(), 1, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 1, 0x32 );
    }
 
    void Scene00020( Entity::Player& player )
    {
-      player.eventPlay( getId(), 20, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 0, 1 );
+      player.playScene( getId(), 20, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 0, 1 );
    }
 
    void Scene00030( Entity::Player& player )
    {
-      player.eventPlay( getId(), 30, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 0, 0 );
+      player.playScene( getId(), 30, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 0, 0 );
    }
 
    void Scene00040( Entity::Player& player )
    {
-      auto callback = [ this ]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [this]( Entity::Player& player, const Event::SceneResult& result )
       {
          if( player.getOpeningSequence() == 2 )
          {
@@ -78,14 +80,15 @@ private:
          }
       };
 
-      player.eventPlay( getId(), 40, NO_DEFAULT_CAMERA, 2, 1, callback );
+      player.playScene( getId(), 40, NO_DEFAULT_CAMERA, 2, 1, callback );
    }
 
 
 public:
-   OpeningLimsa() : EventScript( 1245185 ) {}
+   OpeningLimsa() : EventScript( 1245185 )
+   { }
 
-   void onEnterTerritory( Entity::Player &player, uint32_t eventId, uint16_t param1, uint16_t param2 ) override
+   void onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 ) override
    {
       if( player.getOpeningSequence() == 0 )
          Scene00000( player );

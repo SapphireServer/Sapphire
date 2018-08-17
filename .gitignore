@@ -113,7 +113,7 @@ src/common/Version\.cpp
 .mtime_cache
 
 # generated script loader files
-src/servers/sapphire_zone/Script/Scripts/*/ScriptLoader.cpp
+src/servers/Scripts/*/ScriptLoader.cpp
 
 # cotire generated files/folders
 cotire/

@@ -6,7 +6,7 @@
 #include <Exd/ExdDataGenerated.h>
 
 #include "Zone/TerritoryMgr.h"
-#include "Zone/Zone.h"
+#include "Zone/InstanceContent.h"
 
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
@@ -15,9 +15,6 @@
 #include "Network/PacketWrappers/ActorControlPacket144.h"
 #include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
 
-#include "Actor/Player.h"
-
-#include "Forwards.h"
 #include "Framework.h"
 #include "Session.h"
 
@@ -54,19 +51,25 @@ void Core::Network::GameConnection::cfRegisterDuty( const Packets::GamePacket& i
 {
    auto pTeriMgr = g_fw.get< TerritoryMgr >();
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-   // TODO use for loop for this
-   auto contentId1 = inPacket.getValAt< uint16_t >( 0x2E );
-   auto contentId2 = inPacket.getValAt< uint16_t >( 0x30 );
-   auto contentId3 = inPacket.getValAt< uint16_t >( 0x32 );
-   auto contentId4 = inPacket.getValAt< uint16_t >( 0x34 );
-   auto contentId5 = inPacket.getValAt< uint16_t >( 0x36 );
 
-   player.sendDebug( "Duty register request");
-   player.sendDebug( "ContentId1: " + std::to_string( contentId1 ) );
-   player.sendDebug( "ContentId2: " + std::to_string( contentId2 ) );
-   player.sendDebug( "ContentId3: " + std::to_string( contentId3 ) );
-   player.sendDebug( "ContentId4: " + std::to_string( contentId4 ) );
-   player.sendDebug( "ContentId5: " + std::to_string( contentId5 ) );
+   std::vector< uint16_t > selectedContent;
+
+   for( uint32_t offset = 0x2E; offset <= 0x36; offset += 0x2 )
+   {
+      auto id = inPacket.getValAt< uint16_t >( offset );
+      if( id == 0 )
+         break;
+
+      player.sendDebug( "got contentId: " + std::to_string( id ) );
+
+      selectedContent.push_back( id );
+   }
+
+   // todo: rand bias problem, will do for now tho
+   auto index = std::rand() % selectedContent.size();
+   auto contentId = selectedContent.at( index );
+
+   player.sendDebug( "Duty register request for contentid: " + std::to_string( contentId ) );
 
    // let's cancel it because otherwise you can't register it again
    ZoneChannelPacket< FFXIVIpcCFNotify > cfCancelPacket( player.getId() );
@@ -74,13 +77,16 @@ void Core::Network::GameConnection::cfRegisterDuty( const Packets::GamePacket& i
    cfCancelPacket.data().state2 = 1; // Your registration is withdrawn.
    queueOutPacket( cfCancelPacket );
 
-   auto cfCondition = pExdData->get< Core::Data::ContentFinderCondition >( contentId1 );
+   auto cfCondition = pExdData->get< Core::Data::ContentFinderCondition >( contentId );
    if( !cfCondition )
       return;
 
    auto instance = pTeriMgr->createInstanceContent( cfCondition->instanceContent );
    if( !instance )
       return;
+
+   auto pInstance = instance->getAsInstanceContent();
+   pInstance->bindPlayer( player.getId() );
 
    player.sendDebug( "Created instance with id: " + std::to_string( instance->getGuId() ) );
 
@@ -90,6 +96,11 @@ void Core::Network::GameConnection::cfRegisterDuty( const Packets::GamePacket& i
 void Core::Network::GameConnection::cfRegisterRoulette( const Packets::GamePacket& inPacket,
                                                         Entity::Player& player)
 {
+   ZoneChannelPacket< FFXIVIpcCFNotify > cfCancelPacket( player.getId() );
+   cfCancelPacket.data().state1 = 3;
+   cfCancelPacket.data().state2 = 1; // Your registration is withdrawn.
+   queueOutPacket( cfCancelPacket );
+
    player.sendDebug( "Roulette register" );
 }
 

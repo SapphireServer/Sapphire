@@ -7,7 +7,6 @@
 #include <Network/PacketContainer.h>
 
 #include <unordered_map>
-#include <boost/format.hpp>
 
 #include "Network/GameConnection.h"
 
@@ -15,9 +14,8 @@
 
 #include "Zone/TerritoryMgr.h"
 #include "Zone/Zone.h"
-#include "Zone/ZonePosition.h"
+#include "Zone/InstanceContent.h"
 
-#include "Network/GameConnection.h"
 #include "Network/PacketWrappers/InitUIPacket.h"
 #include "Network/PacketWrappers/PingPacket.h"
 #include "Network/PacketWrappers/MoveActorPacket.h"
@@ -30,20 +28,7 @@
 #include "Network/PacketWrappers/EventFinishPacket.h"
 #include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
 
-#include "DebugCommand/DebugCommandHandler.h"
-
-#include "Actor/Player.h"
-
-#include "Inventory/Inventory.h"
-
-#include "Event/EventHelper.h"
-
-#include "Action/Action.h"
-#include "Action/ActionTeleport.h"
-
-#include "Session.h"
 #include "ServerZone.h"
-#include "Forwards.h"
 #include "Framework.h"
 
 extern Core::Framework g_fw;
@@ -221,6 +206,19 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
    {
       targetPlayer->queuePacket( ActorControlPacket143( player.getId(), Flee, param1 ) );
       player.sendNotice( "Speed for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
+      break;
+   }
+   case GmCommand::Invis:
+   {
+      player.setGmInvis( !player.getGmInvis() );
+      player.sendNotice( "Invisibility flag for " + player.getName() +
+         " was toggled to " + std::to_string( !player.getGmInvis() ) );
+
+      for( auto actor : player.getInRangeActors() )
+      {
+         player.despawn( actor->getAsPlayer() );
+         player.spawn( actor->getAsPlayer() );
+      }
       break;
    }
    case GmCommand::Kill:
@@ -415,6 +413,17 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
       {
          player.sendDebug( "Found instance: " + instance->getName() + ", id: " + std::to_string( param1 ) );
 
+         // if the zone is an instanceContent instance, make sure the player is actually bound to it
+         auto pInstance = instance->getAsInstanceContent();
+
+         // pInstance will be nullptr if you're accessing a normal zone via its allocated instance id rather than its zoneid
+         if( pInstance && !pInstance->isPlayerBound( player.getId() ) )
+         {
+            player.sendUrgent( "Not able to join instance: " + std::to_string( param1 ) );
+            player.sendUrgent( "Player not bound! ( run !instance bind <instanceId> first ) " + std::to_string( param1 ) );
+            break;
+         }
+
          player.setInstance( instance );
       }
       else if( !pTeriMgr->isValidTerritory( param1 )  )
@@ -429,9 +438,11 @@ void Core::Network::GameConnection::gm1Handler( const Packets::GamePacket& inPac
             player.sendUrgent( "No zone instance found for " + std::to_string( param1 ) );
             break;
          }
+
          targetPlayer->setPos( targetPlayer->getPos() );
          targetPlayer->performZoning( param1, targetPlayer->getPos(), 0 );
-         player.sendNotice( targetPlayer->getName() + " was warped to zone " + std::to_string( param1 ) + " (" + pZone->getName() + ")" );
+         player.sendNotice( targetPlayer->getName() + " was warped to zone " +
+                            std::to_string( param1 ) + " (" + pZone->getName() + ")" );
       }
       break;
    }

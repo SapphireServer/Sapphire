@@ -1,6 +1,4 @@
 #include <set>
-#include <stdio.h>
-#include <time.h>
 
 #include <Common.h>
 #include <Network/GamePacket.h>
@@ -19,12 +17,10 @@
 #include "Zone/TerritoryMgr.h"
 #include "Zone/Zone.h"
 
-#include "Inventory/Inventory.h"
-
-#include "Player.h"
 #include "ServerZone.h"
-#include "Forwards.h"
 #include "Framework.h"
+
+#include "Social/Manager/SocialMgr.h"
 
 extern Core::Framework g_fw;
 
@@ -153,6 +149,8 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
 
    m_gmRank = res->getUInt8( "GMRank" );
 
+   m_equipDisplayFlags = res->getUInt8( "EquipDisplayFlags" );
+
    // Blobs
 
    auto howTo = res->getBlobVector( "HowTo" );
@@ -204,6 +202,15 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
    m_pInventory = make_Inventory( this );
 
    calculateStats();
+
+   auto friendListMgr = g_fw.get< Social::SocialMgr < Social::FriendList > >();
+
+   if( !friendListMgr->loadFriendsList( m_contentId ) )
+   {
+      pLog->error( "[" + std::to_string( m_contentId ) + "] Failed to load friends list!" );
+   }
+
+   pLog->debug( std::to_string( m_contentId ) + " ID, has group ID: " + std::to_string( m_friendsListId ) );
 
    // first login, run the script event
    if( m_bNewGame )
@@ -432,13 +439,15 @@ void Core::Entity::Player::updateSql()
 
    stmt->setInt( 52, m_gmRank );
 
+   stmt->setInt( 53, m_equipDisplayFlags );
+
    std::vector< uint8_t > unlockVec( sizeof( m_unlocks ) );
    memcpy( unlockVec.data(), m_unlocks, sizeof( m_unlocks ) );
-   stmt->setBinary( 53, unlockVec );
+   stmt->setBinary( 54, unlockVec );
 
-   stmt->setInt( 54, m_cfPenaltyUntil );
+   stmt->setInt( 55, m_cfPenaltyUntil );
 
-   stmt->setInt( 55, m_id );
+   stmt->setInt( 56, m_id );
 
    pDb->execute( stmt );
 

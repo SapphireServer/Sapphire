@@ -44,6 +44,21 @@ private:
       m_data.param3 = param3;
       m_data.param4 = param4;
       m_data.param5 = param5;
+      m_data.unknown[0] = 0x05;
+      m_data.unknown[4] = 0x22;
+      m_data.unknown[5] = 0xD6;
+      m_data.unknown[6] = 0x62;
+      m_data.unknown[7] = 0x59;
+      m_data.unknown[0x14] = 0x08;
+      m_data.unknown[0x15] = 0x02;
+
+      // time remaining in sec
+      m_data.unknown[0x18] = 0x19;
+      m_data.unknown[0x19] = 0x14;
+
+      m_data.unknown[0x1C] = 0x23;
+      m_data.unknown[0x20] = 0x40;
+      m_data.unknown[0x24] = 0x80;
    };
 };
 

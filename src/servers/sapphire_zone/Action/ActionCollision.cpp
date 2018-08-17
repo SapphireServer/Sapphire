@@ -9,7 +9,6 @@
 #include "Actor/Player.h"
 
 #include <cmath>
-#include <boost/make_shared.hpp>
 
 using namespace Core::Entity;
 using namespace Core::Common;

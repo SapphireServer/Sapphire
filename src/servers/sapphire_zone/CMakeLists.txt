@@ -16,7 +16,7 @@ file(GLOB SERVER_PUBLIC_INCLUDE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
         Network/*.h
         Network/Handlers/*.h
         Network/PacketWrappers/*.h
-		Social/*.h
+        Social/*.h
         Social/Manager/*.h
         Script/*.h
         StatusEffect/*.h
@@ -25,8 +25,6 @@ file(GLOB SERVER_PUBLIC_INCLUDE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 file(GLOB SERVER_SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
         *.c*
         Actor/*.c*
-        Actor/Social/*.c*
-        Actor/Social/Manager/*.c*
         Action/*.c*
         DebugCommand/*.c*
         Event/*.c*
@@ -36,7 +34,7 @@ file(GLOB SERVER_SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
         Network/*.c*
         Network/Handlers/*.c*
         Network/PacketWrappers/*.c*
-		Social/*.c*
+        Social/*.c*
         Social/Manager/*.c*
         Script/*.c*
         StatusEffect/*.c*
@@ -73,4 +71,6 @@ target_link_libraries( sapphire_zone ${Boost_LIBRARIES} )
 target_include_directories( sapphire_zone PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" )
 target_include_directories( sapphire_zone PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/Script" )
 target_include_directories( sapphire_zone PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/external" )
-#cotire( sapphire_zone )
+if (UNIX)
+  cotire( sapphire_zone )
+endif()

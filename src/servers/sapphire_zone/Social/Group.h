@@ -16,9 +16,9 @@ namespace Social {
 
 struct GroupMember
 {
-   uint64_t inviterId;
-   uint64_t contentId; // todo: maybe just use id..
-   std::string name;
+   //uint64_t inviterId;
+   uint64_t characterId; // todo: maybe just use id..
+   //std::string name;
    uint32_t role;
 };
 
@@ -48,22 +48,39 @@ public:
    bool isBlacklist() const;
    bool isContentGroup() const;
 
-   virtual Core::Network::Packets::GamePacketPtr addMember( Entity::PlayerPtr pSender, Entity::PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
+   // New group system: return error code for logmessage
+
+   virtual uint32_t addMember( uint64_t contentId );
+   //virtual uint32_t addInvite( uint64_t characterId );
    
-   virtual Core::Network::Packets::GamePacketPtr inviteMember( Entity::PlayerPtr pSender, Entity::PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
-   virtual Core::Network::Packets::GamePacketPtr removeMember( Entity::PlayerPtr pSender, Entity::PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
+   virtual Core::Network::Packets::GamePacketPtr processInvite( uint64_t recipientId, uint64_t senderId );
+
+   virtual Core::Network::Packets::GamePacketPtr addMember2( Entity::PlayerPtr pSender, Entity::PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
+   
+   virtual Core::Network::Packets::GamePacketPtr inviteMember2( Entity::PlayerPtr pSender, Entity::PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
+   virtual Core::Network::Packets::GamePacketPtr removeMember2( Entity::PlayerPtr pSender, Entity::PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
    //virtual Core::Network::Packets::GamePacketPtr kickMember( PlayerPtr pSender, PlayerPtr pRecipient, uint64_t senderId = 0, uint64_t recipientId = 0 );
    virtual void sendPacketToMembers( Core::Network::Packets::GamePacketPtr pPacket, bool invitesToo = false );
 
-   /*! generates a player entry used for lists (social, etc) */
-   static Core::Network::Packets::Server::PlayerEntry generatePlayerEntry( GroupMember groupMember );
+   //virtual void populateGroupMembers();
 
-   /*! access GroupMember vector */
+   int32_t findNextAvailableIndex() const;
 
-   std::map< uint64_t, GroupMember > getMembers() const;
+   /*! access member vector */
+   std::vector< uint64_t >& getMembers();
 
    /*! get container limit */
    uint32_t getCapacity() const;
+
+   /*! get group id */
+   uint64_t getId() const;
+
+   /*! get total size of group (members + invites) */
+   uint32_t Group::getTotalSize() const;
+
+   /*! check if group has member */
+   bool hasMember( uint64_t contentId ) const;
+
 
 protected:
    GroupType m_type{ GroupType::None };
@@ -72,8 +89,10 @@ protected:
    uint32_t m_maxCapacity{ 250 };
    uint32_t m_maxRoles{ 50 };
    std::chrono::steady_clock::time_point m_createTime{ std::chrono::steady_clock::now() };
-   std::map< uint64_t, GroupMember > m_members;
-   std::map< uint64_t, GroupMember > m_invites; // <recipient, groupmember (which contains senderId)>
+
+   // todo: it might be interesting to consider moving to a map with entries and sorting that out.
+   // it does imply useless information being stored in the case of a few groups, which is why I'm not doing it atm
+   std::vector< uint64_t > m_members;
 
 private:
    

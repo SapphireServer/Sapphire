@@ -18,8 +18,6 @@
 
 #include "DebugCommand/DebugCommandHandler.h"
 
-#include "Actor/Player.h"
-
 #include "Action/Action.h"
 #include "Action/ActionCast.h"
 #include "Action/ActionMount.h"
@@ -27,7 +25,6 @@
 #include "Script/ScriptMgr.h"
 
 #include "Session.h"
-#include "Forwards.h"
 #include "Framework.h"
 
 extern Core::Framework g_fw;
@@ -76,9 +73,18 @@ void Core::Network::GameConnection::skillHandler( const Packets::GamePacket& inP
         else
         {
             Core::Entity::ActorPtr targetActor = player.getAsPlayer();
+           
             if( targetId != player.getId() )
             {
                 targetActor = player.lookupTargetById( targetId );
+            }
+
+            // Check if we actually have an actor
+            if( !targetActor )
+            {
+               // todo: interrupt a cast.
+               player.sendDebug( "Invalid target." );
+               return;
             }
 
             if( !player.actionHasCastTime( action ) )

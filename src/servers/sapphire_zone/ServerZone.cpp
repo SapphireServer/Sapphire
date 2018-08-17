@@ -3,7 +3,6 @@
 #include <Version.h>
 #include <Logging/Logger.h>
 #include <Config/XMLConfig.h>
-#include <Version.h>
 
 #include <MySqlBase.h>
 #include <Connection.h>
@@ -26,17 +25,14 @@
 
 #include "Zone/TerritoryMgr.h"
 
-#include "DebugCommand/DebugCommandHandler.h"
-
 #include "Script/ScriptMgr.h"
 #include "Linkshell/LinkshellMgr.h"
 
 #include "Social/Manager/SocialMgr.h"
 
 #include "Forwards.h"
-#include <boost/foreach.hpp>
+
 #include <boost/make_shared.hpp>
-#include <boost/algorithm/string.hpp>
 #include <thread>
 
 #include "Framework.h"
@@ -167,12 +163,21 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
    auto pScript = g_fw.get< Scripting::ScriptMgr >();
    auto pLsMgr = g_fw.get< LinkshellMgr >();
    auto pTeriMgr = g_fw.get< TerritoryMgr >();
+   auto pFriendListMgr = g_fw.get< Social::SocialMgr< Social::FriendList > >();
 
    printBanner();
 
    if( !loadSettings( argc, argv ) )
    {
       pLog->fatal( "Unable to load settings!" );
+      return;
+   }
+   
+   pLog->info( "Initializing social groups" );
+
+   if( !pFriendListMgr->init() )
+   {
+      pLog->fatal( "Unable to initialize friend list manager!" );
       return;
    }
 
@@ -210,7 +215,7 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
 
 void Core::ServerZone::printBanner() const
 {
-   auto pLog = g_fw.get< Core::Logger>();
+   auto pLog = g_fw.get< Core::Logger >();
 
    pLog->info("===========================================================" );
    pLog->info( "Sapphire Server Project " );
@@ -329,6 +334,7 @@ bool Core::ServerZone::createSession( uint32_t sessionId )
    }
 
    m_sessionMapByName[newSession->getPlayer()->getName()] = newSession;
+   m_sessionMapByContentId[newSession->getPlayer()->getContentId()] = newSession;
 
    return true;
 
@@ -339,15 +345,6 @@ void Core::ServerZone::removeSession( uint32_t sessionId )
    m_sessionMapById.erase( sessionId );
 }
 
-void Core::ServerZone::updateSession( uint32_t id )
-{
-   std::lock_guard< std::mutex > lock( m_sessionMutex );
-   auto it = m_sessionMapById.find( id );
-
-   if( it != m_sessionMapById.end() )
-      it->second->loadPlayer();
-}
-
 Core::SessionPtr Core::ServerZone::getSession( uint32_t id )
 {
    //std::lock_guard<std::mutex> lock( m_sessionMutex );
@@ -355,6 +352,18 @@ Core::SessionPtr Core::ServerZone::getSession( uint32_t id )
    auto it = m_sessionMapById.find( id );
 
    if( it != m_sessionMapById.end() )
+      return ( it->second );
+
+   return nullptr;
+}
+
+Core::SessionPtr Core::ServerZone::getSession( uint64_t contentId )
+{
+   //std::lock_guard<std::mutex> lock( m_sessionMutex );
+
+   auto it = m_sessionMapByContentId.find( contentId );
+
+   if( it != m_sessionMapByContentId.end() )
       return ( it->second );
 
    return nullptr;
@@ -377,14 +386,6 @@ void Core::ServerZone::removeSession( std::string playerName )
    m_sessionMapByName.erase( playerName );
 }
 
-void Core::ServerZone::updateSession( std::string playerName )
-{
-   std::lock_guard< std::mutex > lock( m_sessionMutex );
-   auto it = m_sessionMapByName.find( playerName );
-
-   if( it != m_sessionMapByName.end() )
-      it->second->loadPlayer();
-}
 
 bool Core::ServerZone::isRunning() const
 {

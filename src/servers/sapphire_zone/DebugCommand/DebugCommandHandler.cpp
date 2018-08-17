@@ -7,7 +7,6 @@
 #include <Common.h>
 #include <Version.h>
 #include <Network/GamePacketNew.h>
-#include <Network/CommonNetwork.h>
 #include <Util/UtilMath.h>
 #include <Network/PacketContainer.h>
 #include <Logging/Logger.h>
@@ -26,7 +25,6 @@
 #include "Script/ScriptMgr.h"
 #include "Script/NativeScriptMgr.h"
 
-#include "Actor/Player.h"
 #include "Actor/EventObject.h"
 
 #include "Zone/Zone.h"
@@ -35,7 +33,6 @@
 
 #include "ServerZone.h"
 
-#include "StatusEffect/StatusEffect.h"
 #include "Session.h"
 #include "Framework.h"
 
@@ -135,6 +132,7 @@ void Core::DebugCommandHandler::help( char* data, Entity::Player& player, boost:
 void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
 {
    auto pLog = g_fw.get< Logger >();
+   auto pTerriMgr = g_fw.get< TerritoryMgr >();
    auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
    std::string subCommand = "";
    std::string params = "";
@@ -309,6 +307,17 @@ void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost:
       sscanf( params.c_str(), "%d", &weatherId );
 
       player.getCurrentZone()->setWeatherOverride( static_cast< Common::Weather >( weatherId ) );
+   }
+   else if( subCommand == "festival" )
+   {
+      uint16_t festivalId;
+      sscanf( params.c_str(), "%hu", &festivalId );
+
+      pTerriMgr->setCurrentFestival( festivalId );
+   }
+   else if( subCommand == "festivaldisable" )
+   {
+      pTerriMgr->disableCurrentFestival();
    }
    else
    {
@@ -710,6 +719,58 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
       else
          player.sendDebug( "Failed to create instance with id: " + std::to_string( instanceContentId ) );
    }
+   else if( subCommand == "bind" )
+   {
+      uint32_t instanceId;
+      sscanf( params.c_str(), "%d", &instanceId );
+
+      auto instance = pTeriMgr->getInstanceZonePtr( instanceId );
+      if( instance )
+      {
+         auto pInstanceContent = instance->getAsInstanceContent();
+         pInstanceContent->bindPlayer( player.getId() );
+         player.sendDebug(
+                 "Now bound to instance with id: " + std::to_string( pInstanceContent->getGuId() ) +
+                 " -> " + pInstanceContent->getName() );
+      }
+      else
+         player.sendDebug( "Unknown instance with id: " + std::to_string( instanceId ) );
+   }
+   else if( subCommand == "unbind" )
+   {
+      uint32_t instanceId;
+      sscanf( params.c_str(), "%d", &instanceId );
+
+      auto instance = pTeriMgr->getInstanceZonePtr( instanceId );
+      if( !instance )
+      {
+         player.sendDebug( "Unknown instance with id: " + std::to_string( instanceId ) );
+         return;
+      }
+
+      auto pInstanceContent = instance->getAsInstanceContent();
+      if( pInstanceContent->isPlayerBound( player.getId() ) )
+      {
+         pInstanceContent->unbindPlayer( player.getId() );
+         player.sendDebug(
+                 "Now unbound from instance with id: " + std::to_string( pInstanceContent->getGuId() ) +
+                 " -> " + pInstanceContent->getName() );
+      }
+      else
+         player.sendDebug( "Player not bound to instance with id: " + std::to_string( instanceId ) );
+
+   }
+   else if( subCommand == "createzone" || subCommand == "crz" )
+   {
+      uint32_t zoneId;
+      sscanf( params.c_str(), "%d", &zoneId );
+
+      auto instance = pTeriMgr->createTerritoryInstance( zoneId );
+      if( instance )
+         player.sendDebug( "Created instance with id: " + std::to_string( instance->getGuId() ) + " -> " + instance->getName() );
+      else
+         player.sendDebug( "Failed to create instance with id: " + std::to_string( zoneId ) );
+   }
    else if( subCommand == "remove" || subCommand == "rm" )
    {
       uint32_t terriId;
@@ -778,19 +839,43 @@ void Core::DebugCommandHandler::instance( char* data, Entity::Player &player, bo
 
       instance->setBranch( branch );
    }
-   else if( subCommand == "festival" )
+   else if ( subCommand == "qte_start" )
    {
-      uint32_t festivalId;
-      sscanf( params.c_str(), "%d", &festivalId );
+      auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+      if ( !instance )
+         return;
 
-      player.getCurrentZone()->setCurrentFestival( static_cast< uint16_t >( festivalId ) );
+      player.sendDebug( "qte start" );
+      instance->startQte();
    }
-   else if( subCommand == "disablefestival" )
+   else if ( subCommand == "event_start" )
    {
-      Network::Packets::ZoneChannelPacket< Network::Packets::Server::FFXIVIpcActorControl143 > actorControl( player.getId() );
-      actorControl.data().category = Core::Common::ActorControlType::DisableCurrentFestival;
-      player.queuePacket( actorControl );
+      auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+      if ( !instance )
+         return;
 
-      player.getCurrentZone()->setCurrentFestival( 0 );
+      player.sendDebug( "evt start" );
+      instance->startEventCutscene();
+   }
+   else if ( subCommand == "event_end" )
+   {
+      auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+      if ( !instance )
+         return;
+
+      player.sendDebug( "evt end" );
+      instance->endEventCutscene();
+   }
+   else if( subCommand == "bgm" )
+   {
+      uint16_t bgmId;
+      sscanf( params.c_str(), "%hd", &bgmId );
+
+      if( auto instance = player.getCurrentInstance() )
+         instance->setCurrentBGM( bgmId );
+   }
+   else
+   {
+      player.sendDebug( "Unknown sub command." );
    }
 }

@@ -23,20 +23,19 @@ public:
    {
       if( player.isAetheryteRegistered( eventId & 0xFFFF ) )
       {
-         player.eventPlay( eventId, 0, 1, []( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+         player.playScene( eventId, 0, 1, []( Entity::Player& player, const Event::SceneResult& result )
          {
-            if( param1 == 256 ) // set homepoint
+            if( result.param1 == 256 ) // set homepoint
             {
-               player.setHomepoint( eventId & 0xFFFF );
-               player.sendQuestMessage( eventId, 2, 0xEA, 0, 0 );
-            }
-            else if( param1 == 512 ) // aethernet access
+               player.setHomepoint( result.eventId & 0xFFFF );
+               player.sendQuestMessage( result.eventId, 2, 0xEA, 0, 0 );
+            } else if( result.param1 == 512 ) // aethernet access
             {
-               if( param2 == 4 )
+               if( result.param2 == 4 )
                {
-                  player.teleport( param3, 2 );
+                  player.teleport( result.param3, 2 );
                }
-               else if( param2 == 2 ) // register favored destination
+               else if( result.param2 == 2 ) // register favored destination
                {
 
                }

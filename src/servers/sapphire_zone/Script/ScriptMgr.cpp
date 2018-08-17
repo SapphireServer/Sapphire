@@ -54,8 +54,14 @@ bool Core::Scripting::ScriptMgr::init()
    auto pConfig = g_fw.get< XMLConfig >();
    auto pLog = g_fw.get< Logger >();
 
-   loadDir( pConfig->getValue< std::string >( "Settings.General.Scripts.Path", "./compiledscripts/" ),
+   auto status = loadDir( pConfig->getValue< std::string >( "Settings.General.Scripts.Path", "./compiledscripts/" ),
             files, m_nativeScriptMgr->getModuleExtension() );
+
+   if( !status )
+   {
+      pLog->error( std::string( __func__ ) + ": failed to load scripts, the server will not function correctly without scripts loaded." );
+      return false;
+   }
 
    uint32_t scriptsFound = 0;
    uint32_t scriptsLoaded = 0;
@@ -114,11 +120,17 @@ void Core::Scripting::ScriptMgr::watchDirectories()
    });
 }
 
-void Core::Scripting::ScriptMgr::loadDir( const std::string& dirname, std::set<std::string> &files, const std::string& ext )
+bool Core::Scripting::ScriptMgr::loadDir( const std::string& dirname, std::set<std::string>& files, const std::string& ext )
 {
 
    auto pLog = g_fw.get< Logger >();
-   pLog->info( "ScriptEngine: loading scripts from " + dirname );
+   pLog->info( "ScriptMgr: loading scripts from " + dirname );
+
+   if( !boost::filesystem::exists( dirname ) )
+   {
+      pLog->error( "ScriptMgr: scripts directory doesn't exist" );
+      return false;
+   }
 
    boost::filesystem::path targetDir( dirname );
 
@@ -131,6 +143,14 @@ void Core::Scripting::ScriptMgr::loadDir( const std::string& dirname, std::set<s
       {
          files.insert( i.string() );
       }
+   }
+
+   if( files.size() )
+      return true;
+   else
+   {
+      pLog->error( "ScriptMgr: couldn't find any script modules" );
+      return false;
    }
 }
 
@@ -375,7 +395,7 @@ bool Core::Scripting::ScriptMgr::onInstanceEnterTerritory( InstanceContentPtr in
    auto script = m_nativeScriptMgr->getScript< InstanceContentScript >( instance->getDirectorId() );
    if( script )
    {
-      script->onEnterTerritory( player, eventId, param1, param2 );
+      script->onEnterTerritory( instance, player, eventId, param1, param2 );
       return true;
    }
 

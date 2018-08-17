@@ -6,6 +6,7 @@
 #include <Network/GamePacketNew.h>
 #include <Network/PacketContainer.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
+#include <sapphire_zone/Event/EventHandler.h>
 
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
@@ -18,14 +19,12 @@
 
 #include "Script/ScriptMgr.h"
 
-#include "Actor/Player.h"
-
 #include "Event/EventHelper.h"
 
 #include "Zone/InstanceContent.h"
 
 #include "Session.h"
-#include "Forwards.h"
+
 #include "Framework.h"
 
 extern Core::Framework g_fw;
@@ -170,7 +169,7 @@ void Core::Network::GameConnection::eventHandlerEnterTerritory( const Packets::G
 
    if( auto instance = player.getCurrentInstance() )
    {
-      player.eventStart( player.getId(), eventId, Event::EventHandler::EnterTerritory, 0, player.getZoneId(), instance->getDirectorId() & 0xFFFF );
+      player.eventStart( player.getId(), eventId, Event::EventHandler::EnterTerritory, 1, player.getZoneId() );
       instance->onEnterTerritory( player, eventId, param1, param2 );
    }
    else
@@ -209,7 +208,18 @@ void Core::Network::GameConnection::eventHandlerReturn( const Packets::GamePacke
       auto eventCallback = pEvent->getEventReturnCallback();
       // if there is one, proceed to call it
       if( eventCallback )
-         eventCallback( player, eventId, param1, param2, param3 );
+      {
+         Event::SceneResult result;
+         result.eventId = eventId;
+         result.param1 = param1;
+         result.param2 = param2;
+         result.param3 = param3;
+         eventCallback( player, result );
+      }
+      // we might have a scene chain callback instead so check for that too
+      else if( auto chainCallback = pEvent->getSceneChainCallback() )
+         chainCallback( player );
+
    }
 
    player.checkEvent( eventId );

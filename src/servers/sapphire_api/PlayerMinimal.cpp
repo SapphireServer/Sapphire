@@ -110,12 +110,20 @@ namespace Core {
    std::string PlayerMinimal::getInfoJson()
    {
       std::string charDetails = "{\"content\":[\"" + std::string( getName() ) + "\"," +
-         "[" + getClassString() + "]," +
-         "\"0\",\"0\",\"0\",\"" + std::to_string( getBirthMonth() ) + "\",\"" + std::to_string( getBirthDay() ) + "\",\"" + std::to_string( getGuardianDeity() ) + "\",\"" + std::to_string( m_class ) + "\",\"0\",\"" + std::to_string( getZoneId() ) + "\"," +
+         //"[" + getClassString() + "]," +
+         "[\"0\",\"0\",\"0\",\"0\",\"0\",\"1\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\"],"
+         "\"0\",\"0\",\"0\",\"" +
+                                std::to_string( getBirthMonth() ) +
+                                "\",\"" + std::to_string( getBirthDay() ) +
+                                "\",\"" + std::to_string( getGuardianDeity() ) +
+                                "\",\"" + std::to_string( m_class ) +
+                                "\",\"0\",\"" + std::to_string( getZoneId() ) +
+                                "\",\"0\"," +
+
          "[" + getLookString() + "]," +
          "\"0\",\"0\"," +
          "[" + getModelString() + "]," +
-         "\"1\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\"]," +
+         "\"1\",\"0\",\"0\",\"0\",\"0\",\"0\",\"\",\"0\",\"0\"]," +
          "\"classname\":\"ClientSelectData\",\"classid\":116}";
       return charDetails;
    }
@@ -290,7 +298,12 @@ namespace Core {
       createInvDbContainer( InventoryType::Currency );
       createInvDbContainer( InventoryType::Crystal );
 
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /// SET UP SOCIAL GROUPS
+
+      createFriendsListContainer( m_contentId );
+
+      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       /// SETUP EQUIPMENT / STARTING GEAR
       auto classJobInfo = g_exdDataGen.get< Core::Data::ClassJob >( m_class );
       uint32_t weaponId = classJobInfo->itemStartingWeapon;
@@ -362,6 +375,21 @@ namespace Core {
       stmtCreateInv->setInt( 1, m_id );
       stmtCreateInv->setInt( 2, slot );
       g_charaDb.directExecute( stmtCreateInv );
+   }
+
+   void PlayerMinimal::createFriendsListContainer( uint64_t contentId ) const
+   {
+      // todo: check if size is a-ok
+      std::vector< uint8_t > friendsList( 1600 );
+      std::vector< uint8_t > inviteDateList( 1600 );
+
+      auto stmtCreateFrnList = g_charaDb.getPreparedStatement( Db::CHARA_SOCIAL_FRIENDS_INS );
+      stmtCreateFrnList->setInt64( 1, contentId );
+      stmtCreateFrnList->setBinary( 2, friendsList );
+      stmtCreateFrnList->setBinary( 3, inviteDateList );
+
+      g_charaDb.directExecute( stmtCreateFrnList );
+
    }
 
    uint64_t PlayerMinimal::getNextUId64() const

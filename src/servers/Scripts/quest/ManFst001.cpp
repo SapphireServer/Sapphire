@@ -1,5 +1,6 @@
 #include <Script/NativeScriptApi.h>
 #include <Actor/Player.h>
+#include <sapphire_zone/Event/EventHandler.h>
 #include "../ScriptObject.h"
 #include "Event/EventHelper.h"
 
@@ -34,66 +35,57 @@ private:
 
    void Scene00000( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
       {
-         if( param2 == 1 ) // accept quest
+         if( result.param2 == 1 ) // accept quest
          {
             player.setOpeningSequence( 2 );
             Scene00001( player );
          }
       };
 
-      player.eventPlay( getId(), 0, HIDE_HOTBAR, 0, 0, callback );
+      player.playScene( getId(), 0, HIDE_HOTBAR, 0, 0, callback );
    }
 
    void Scene00001( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
-      {
-         Scene00002( player );
-      };
-
-      player.eventPlay( getId(), 1, 0xF8482EFB, 0, 0, callback );
+      player.playSceneChain( getId(), 1, DISABLE_SKIP | HIDE_HOTBAR | SET_BASE, bindScene( &ManFst001::Scene00002 ) );
    }
 
    void Scene00002( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
       {
          player.updateQuest( getId(), SEQ_FINISH );
 
-         player.eventPlay( OPENING_EVENT_HANDLER, 0x1E, HIDE_HOTBAR | NO_DEFAULT_CAMERA, 0, 0 );
+         player.playScene( OPENING_EVENT_HANDLER, 0x1E, HIDE_HOTBAR | NO_DEFAULT_CAMERA, 0, 0 );
       };
 
-      player.eventPlay( getId(), 2, 0, 0, 0, callback );
+      player.playScene( getId(), 2, 0, 0, 0, callback );
    }
 
    void Scene00004( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
-      {
-         Scene00005( player );
-      };
-
-      player.eventPlay( getId(), 4, 0x2c02, 0, 0, callback );
+      player.playSceneChain( getId(), 4, FADE_OUT | HIDE_HOTBAR | CONDITION_CUTSCENE | HIDE_UI, bindScene( &ManFst001::Scene00005 ) );
    }
 
    void Scene00005( Entity::Player& player )
    {
-      auto callback = [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )
+      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
       {
-         if( param2 == 1 )
+         if( result.param2 == 1 )
          {
             if( player.giveQuestRewards( getId(), 0 ) )
                player.finishQuest( getId() );
          }
       };
 
-      player.eventPlay( getId(), 5, INVIS_OTHER_PC, 0, 0, callback );
+      player.playScene( getId(), 5, INVIS_OTHER_PC, 0, 0, callback );
    }
 
 public:
-   ManFst001() : EventScript( 65575 ) {}
+   ManFst001() : EventScript( 65575 )
+   {}
 
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
