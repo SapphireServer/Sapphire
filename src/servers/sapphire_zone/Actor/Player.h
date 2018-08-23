@@ -131,7 +131,7 @@ public:
    /*! update quest ( register it as active quest if new ) */
    void updateQuest( uint16_t questId, uint8_t sequence );
    /*! return true if quest is currently active */
-   bool hasQuest( uint16_t questId );
+   bool hasQuest( uint32_t questId );
    /*! return the current quest sequence */
    uint8_t getQuestSeq( uint16_t questId );
    /*! send the quest tracker packet */
