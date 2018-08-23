@@ -259,6 +259,9 @@ void Core::Network::GameConnection::handlePacket( Core::Network::Packets::FFXIVA
       case Network::ConnectionType::Chat:
          handleChatPacket( pPacket );
          break;
+
+      default:
+         break;
    }
 
 }

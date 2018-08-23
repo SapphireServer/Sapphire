@@ -72,9 +72,9 @@ void Core::Entity::Player::removeQuest( uint16_t questId )
 
 }
 
-bool Core::Entity::Player::hasQuest( uint16_t questId )
+bool Core::Entity::Player::hasQuest( uint32_t questId )
 {
-   return ( getQuestIndex( questId ) > -1 );
+   return ( getQuestIndex( static_cast< uint16_t>( questId ) ) > -1 );
 }
 
 int8_t Core::Entity::Player::getQuestIndex( uint16_t questId )
