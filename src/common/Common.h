@@ -600,6 +600,9 @@ namespace Common {
       HideWeapon = 0x2,
       HideLegacyMark = 0x4,
 
+      StoreNewItemsInArmouryChest = 0x5,
+      StoreCraftedItemsInInventory = 0x6,
+
       Visor = 0x40,
    };
 
