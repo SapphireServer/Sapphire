@@ -57,7 +57,7 @@ class SubFst008 : public EventScript
       {
          Scene00001( player );
       }
-      else if( Actor2 == Actor2 )
+      else if( actor == Actor2 )
       {
          Scene00002( player );
       }
