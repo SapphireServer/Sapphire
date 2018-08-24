@@ -536,6 +536,7 @@ Core::ItemPtr Core::Entity::Player::addItem( uint32_t catalogId, uint32_t quanti
             }
 
             item->setStackSize( newStackSize );
+            writeItem( item );
 
             auto slotUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(), slot, bag, *item );
             queuePacket( slotUpdate );
@@ -544,14 +545,17 @@ Core::ItemPtr Core::Entity::Player::addItem( uint32_t catalogId, uint32_t quanti
 
             // return existing stack if we have no overflow - items fit into a preexisting stack
             if( quantity == 0 )
+            {
+               queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), ItemObtainIcon, catalogId, originalQuantity ) );
+
                return item;
+            }
+
          }
          else if( !item && !foundFreeSlot )
          {
             freeBagSlot = { bag, slot };
             foundFreeSlot = true;
-
-            break;
          }
       }
    }
