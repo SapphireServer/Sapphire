@@ -323,7 +323,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
          return;
       }
 
-      if( !targetPlayer->addItem( -1, param1, quantity ) )
+      if( !targetPlayer->addItem( param1, quantity ) )
          player.sendUrgent( "Item " + std::to_string( param1 ) + " could not be added to inventory." );
       break;
    }

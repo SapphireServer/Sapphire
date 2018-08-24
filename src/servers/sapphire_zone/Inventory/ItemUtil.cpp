@@ -62,9 +62,10 @@ uint16_t Core::Items::Util::getArmoryToEquipSlot( uint8_t slotId )
 
       case Common::Wrist:
          return Common::ArmoryWrist;
-   }
 
-   return 0;
+      default:
+         return 0;
+   }
 }
 
 
