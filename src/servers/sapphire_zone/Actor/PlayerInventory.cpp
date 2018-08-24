@@ -320,17 +320,6 @@ void Core::Entity::Player::removeCrystal( Common::CrystalType type, uint32_t amo
    queuePacket( invUpdate );
 }
 
-bool Core::Entity::Player::tryAddItem( uint16_t catalogId, uint32_t quantity )
-{
-
-   for( uint16_t i = 0; i < 4; i++ )
-   {
-      if( addItem( i, -1, catalogId, quantity ) )
-         return true;
-   }
-   return false;
-}
-
 void Core::Entity::Player::sendInventory()
 {
    InventoryMap::iterator it;
@@ -495,7 +484,7 @@ bool Core::Entity::Player::isObtainable( uint32_t catalogId, uint8_t quantity )
 }
 
 
-Core::ItemPtr Core::Entity::Player::addItem( uint16_t inventoryId, int8_t slotId, uint32_t catalogId, uint16_t quantity, bool isHq, bool silent )
+Core::ItemPtr Core::Entity::Player::addItem( uint32_t catalogId, uint32_t quantity, bool isHq, bool silent )
 {
    auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
@@ -507,57 +496,87 @@ Core::ItemPtr Core::Entity::Player::addItem( uint16_t inventoryId, int8_t slotId
       return nullptr;
    }
 
-   int8_t rSlotId = -1;
+   if( itemInfo->isEquippable )
+      quantity = 1;
 
-   //if( itemInfo->stack_size > 1 )
-   //{
-   //   auto itemList = this->getSlotsOfItemsInInventory( catalogId );
-   //   // TODO: this is a stacked item so we need to see if the item is already in inventory and
-   //   //       check how much free space we have on existing stacks before looking for empty slots.
-   //}
-   //else
+   // used for item obtain notification
+   uint32_t originalQuantity = quantity;
+
+   // todo: for now we're just going to add any items to main inv
+
+   std::pair< uint8_t, uint8_t > freeBagSlot;
+   bool foundFreeSlot = false;
+
+   for( auto bag : { Bag0, Bag1, Bag2, Bag3 } )
    {
-      auto freeSlot = getFreeBagSlot();
-      inventoryId = freeSlot.first;
-      rSlotId = freeSlot.second;
+      auto storage = m_storageMap[bag];
 
-      if( rSlotId == -1 )
-         return nullptr;
+      for( uint8_t slot = 0; slot < storage->getMaxSize(); slot++ )
+      {
+         auto item = storage->getItem( slot );
+
+         // add any items that are stackable
+         if( item && !itemInfo->isEquippable && item->getId() == catalogId )
+         {
+            uint32_t count = item->getStackSize();
+            uint32_t maxStack = item->getMaxStackSize();
+
+            // if slot is full, skip it
+            if( count >= maxStack )
+               continue;
+
+            // update stack
+            uint32_t newStackSize = count + quantity;
+            uint32_t overflow = 0;
+
+            if( newStackSize > maxStack )
+            {
+               overflow = newStackSize - item->getMaxStackSize();
+               newStackSize = maxStack;
+            }
+
+            item->setStackSize( newStackSize );
+
+            auto slotUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(), slot, bag, *item );
+            queuePacket( slotUpdate );
+
+            quantity = overflow;
+
+            // return existing stack if we have no overflow - items fit into a preexisting stack
+            if( quantity == 0 )
+               return item;
+         }
+         else if( !item && !foundFreeSlot )
+         {
+            freeBagSlot = { bag, slot };
+            foundFreeSlot = true;
+
+            break;
+         }
+      }
    }
 
-   auto item = createItem( catalogId, quantity );
+   // couldn't find a free slot and we still have some quantity of items left, shits fucked
+   if( !foundFreeSlot )
+      return nullptr;
 
+   auto item = createItem( catalogId, quantity );
    item->setHq( isHq );
 
-   if( rSlotId != -1 )
+   auto storage = m_storageMap[freeBagSlot.first];
+   storage->setItem( freeBagSlot.second, item );
+
+   writeInventory( static_cast< InventoryType >( freeBagSlot.first ) );
+
+   if( !silent )
    {
+      auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(), freeBagSlot.second, freeBagSlot.first, *item );
+      queuePacket( invUpdate );
 
-      auto storage = m_storageMap[inventoryId];
-      storage->setItem( rSlotId, item );
-
-      pDb->execute( "UPDATE " + storage->getTableName() + " SET container_" +
-                    std::to_string( rSlotId ) + " = " + std::to_string( item->getUId() ) +
-                    " WHERE storageId = " + std::to_string( inventoryId ) +
-                    " AND CharacterId = " + std::to_string( getId() ) );
-
-      if( !silent )
-      {
-         auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
-                                                                           rSlotId,
-                                                                           inventoryId,
-                                                                           *item );
-
-         queuePacket( invUpdate );
-
-         queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), ItemObtainIcon,
-                                                                   catalogId, item->getStackSize() ) );
-      }
-
-
+      queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), ItemObtainIcon, catalogId, originalQuantity ) );
    }
 
    return item;
-
 }
 
 void Core::Entity::Player::moveItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot )
@@ -641,7 +660,7 @@ void Core::Entity::Player::splitItem( uint16_t fromInventoryId, uint8_t fromSlot
       // todo: correct invalid move? again, not sure what retail does here
       return;
 
-   auto newItem = addItem( toInventoryId, toSlot, fromItem->getId(), itemCount, fromItem->isHq(), true );
+   auto newItem = addItem( fromItem->getId(), itemCount, fromItem->isHq(), true );
    if( !newItem )
       return;
 

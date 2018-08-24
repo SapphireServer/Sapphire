@@ -222,10 +222,6 @@ public:
 
    // Inventory / Item / Currency
    //////////////////////////////////////////////////////////////////////////////////////////////////////
-   /*! add an item to the first free slot in one of the 4 main containers */
-   bool tryAddItem( uint16_t catalogId, uint32_t quantity );
-   /*! add an item to a given container */
-//   bool addItem( uint16_t containerId, uint16_t catalogId, uint32_t quantity );
    /*! equip an item to a specified slot */
    void equipItem( Common::EquipSlot equipSlotId, ItemPtr pItem, bool sendModel );
    /*! remove an item from an equipment slot */
@@ -612,7 +608,7 @@ public:
    bool loadInventory();
    InvSlotPairVec getSlotsOfItemsInInventory( uint32_t catalogId );
    InvSlotPair getFreeBagSlot();
-   Core::ItemPtr addItem( uint16_t inventoryId, int8_t slotId, uint32_t catalogId, uint16_t quantity = 1, bool isHq = false, bool slient = false );
+   Core::ItemPtr addItem( uint32_t catalogId, uint32_t quantity = 1, bool isHq = false, bool slient = false );
    void moveItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot );
    void swapItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot );
    void discardItem( uint16_t fromInventoryId, uint8_t fromSlotId );

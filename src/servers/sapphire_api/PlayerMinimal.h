@@ -155,7 +155,7 @@ namespace Core {
          return m_gmInvis;
       }
 
-      bool setGmInvis( bool invis )
+      void setGmInvis( bool invis )
       {
          m_gmInvis = invis;
       }
