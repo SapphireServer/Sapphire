@@ -44,7 +44,7 @@ namespace Common {
       French = 8
    };
 
-   enum EquipSlot : uint8_t
+   enum GearSetSlot : uint8_t
    {
       MainHand = 0,
       OffHand = 1,
@@ -64,7 +64,7 @@ namespace Common {
 
    enum EquipSlotCategory : uint8_t
    {
-      Unequippbale = 0,
+      Unequippable = 0,
 
       // main slots
 

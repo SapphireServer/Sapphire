@@ -353,15 +353,15 @@ namespace Core {
       insertDbGlobalItem( 15133, ringUid );
 
       g_charaDb.execute( "INSERT INTO charaitemgearset (storageId, CharacterId, "
-         "container_" + std::to_string( EquipSlot::MainHand ) + ", "
-         "container_" + std::to_string( EquipSlot::Body ) + ", "
-         "container_" + std::to_string( EquipSlot::Hands ) + ", "
-         "container_" + std::to_string( EquipSlot::Legs ) + ", "
-         "container_" + std::to_string( EquipSlot::Feet ) + ", "
-         "container_" + std::to_string( EquipSlot::Neck ) + ", "
-         "container_" + std::to_string( EquipSlot::Ear ) + ", "
-         "container_" + std::to_string( EquipSlot::Wrist ) + ", "
-         "container_" + std::to_string( EquipSlot::Ring1 ) + ", "
+         "container_" + std::to_string( GearSetSlot::MainHand ) + ", "
+         "container_" + std::to_string( GearSetSlot::Body ) + ", "
+         "container_" + std::to_string( GearSetSlot::Hands ) + ", "
+         "container_" + std::to_string( GearSetSlot::Legs ) + ", "
+         "container_" + std::to_string( GearSetSlot::Feet ) + ", "
+         "container_" + std::to_string( GearSetSlot::Neck ) + ", "
+         "container_" + std::to_string( GearSetSlot::Ear ) + ", "
+         "container_" + std::to_string( GearSetSlot::Wrist ) + ", "
+         "container_" + std::to_string( GearSetSlot::Ring1 ) + ", "
          "UPDATE_DATE ) "
          "VALUES ( " + std::to_string( InventoryType::GearSet0 ) + ", " + std::to_string( m_id ) + ", " +
          std::to_string( uniqueId ) + ", " +

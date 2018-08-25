@@ -171,7 +171,7 @@ void Core::Entity::Player::equipWeapon( ItemPtr pItem )
 }
 
 // equip an item
-void Core::Entity::Player::equipItem( Common::EquipSlot equipSlotId, ItemPtr pItem, bool sendUpdate )
+void Core::Entity::Player::equipItem( Common::GearSetSlot equipSlotId, ItemPtr pItem, bool sendUpdate )
 {
 
    //g_framework.getLogger().debug( "Equipping into slot " + std::to_string( equipSlotId ) );
@@ -181,18 +181,18 @@ void Core::Entity::Player::equipItem( Common::EquipSlot equipSlotId, ItemPtr pIt
 
    switch( equipSlotId )
    {
-   case Common::EquipSlot::MainHand:
+   case Common::GearSetSlot::MainHand:
       m_modelMainWeapon = model;
       m_modelSubWeapon = model2;
       // TODO: add job change upon changing weapon if needed
       // equipWeapon( pItem );
       break;
 
-   case Common::EquipSlot::OffHand:
+   case Common::GearSetSlot::OffHand:
       m_modelSubWeapon = model;
       break;
 
-   case Common::EquipSlot::SoulCrystal:
+   case Common::GearSetSlot::SoulCrystal:
       // TODO: add Job change on equipping crystal
       // change job
       break;
@@ -211,7 +211,7 @@ void Core::Entity::Player::equipItem( Common::EquipSlot equipSlotId, ItemPtr pIt
    }
 }
 
-void Core::Entity::Player::unequipItem( Common::EquipSlot equipSlotId, ItemPtr pItem )
+void Core::Entity::Player::unequipItem( Common::GearSetSlot equipSlotId, ItemPtr pItem )
 {
    m_modelEquip[static_cast< uint8_t >( equipSlotId )] = 0;
    sendModel();
@@ -611,10 +611,10 @@ void Core::Entity::Player::moveItem( uint16_t fromInventoryId, uint8_t fromSlotI
       writeInventory( static_cast< InventoryType >( fromInventoryId ) );
 
    if( static_cast< InventoryType >( toInventoryId ) == GearSet0 )
-      equipItem( static_cast< EquipSlot >( toSlot ), tmpItem, true );
+      equipItem( static_cast< GearSetSlot >( toSlot ), tmpItem, true );
 
    if( static_cast< InventoryType >( fromInventoryId ) == GearSet0 )
-      unequipItem( static_cast< EquipSlot >( fromSlotId ), tmpItem );
+      unequipItem( static_cast< GearSetSlot >( fromSlotId ), tmpItem );
 
 
 }
@@ -638,9 +638,9 @@ bool Core::Entity::Player::updateContainer( uint16_t storageId, uint8_t slotId, 
       case GearSet:
       {
          if( pItem )
-            equipItem( static_cast< EquipSlot >( slotId ), pItem, true );
+            equipItem( static_cast< GearSetSlot >( slotId ), pItem, true );
          else
-            unequipItem( static_cast< EquipSlot >( slotId ), pItem );
+            unequipItem( static_cast< GearSetSlot >( slotId ), pItem );
 
          writeInventory( static_cast< InventoryType >( storageId ) );
          break;

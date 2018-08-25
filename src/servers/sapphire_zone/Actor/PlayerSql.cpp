@@ -617,7 +617,7 @@ bool Core::Entity::Player::loadInventory()
             continue;
 
          m_storageMap[storageId]->getItemMap()[i - 1] = pItem;
-         equipItem( static_cast< EquipSlot >( i - 1 ), pItem, false );
+         equipItem( static_cast< GearSetSlot >( i - 1 ), pItem, false );
       }
    }
 
