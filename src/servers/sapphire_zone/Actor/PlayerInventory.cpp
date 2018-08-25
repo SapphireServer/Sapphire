@@ -496,8 +496,7 @@ Core::ItemPtr Core::Entity::Player::addItem( uint32_t catalogId, uint32_t quanti
       return nullptr;
    }
 
-   if( itemInfo->isEquippable )
-      quantity = 1;
+   quantity = std::min< uint32_t >( quantity, itemInfo->stackSize );
 
    // used for item obtain notification
    uint32_t originalQuantity = quantity;
@@ -523,6 +522,10 @@ Core::ItemPtr Core::Entity::Player::addItem( uint32_t catalogId, uint32_t quanti
 
             // if slot is full, skip it
             if( count >= maxStack )
+               continue;
+
+            // check slot is same quality
+            if( item->isHq() != isHq )
                continue;
 
             // update stack
