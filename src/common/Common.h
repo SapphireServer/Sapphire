@@ -89,7 +89,7 @@ namespace Common {
       /*! Can be equipped in either main or offhand slot */
       MainOrOffHand = 14, // unused
       /*! Cannot equip gear to head */
-      BodyAndHead = 15,
+      BodyDisallowHead = 15,
       /*! Cannot equip gear to hands, legs and feet slots */
       BodyDisallowHandsLegsFeet = 16,
       /*! Cannot equip gear to feet slot */

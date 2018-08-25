@@ -38,7 +38,7 @@ uint16_t Core::Items::Util::getCharaEquipSlotCategoryToArmoryId( uint8_t slotId 
          return Common::ArmoryHead;
 
       case Common::CharaBody:
-      case Common::BodyAndHead:
+      case Common::BodyDisallowHead:
       case Common::BodyDisallowHandsLegsFeet:
       case Common::BodyDisallowAll:
       case Common::BodyDisallowHands:
