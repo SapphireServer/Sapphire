@@ -530,11 +530,9 @@ Core::ItemPtr Core::Entity::Player::addItem( uint32_t catalogId, uint32_t quanti
 
             // update stack
             uint32_t newStackSize = count + quantity;
-            uint32_t overflow = 0;
-
             if( newStackSize > maxStack )
             {
-               overflow = newStackSize - item->getMaxStackSize();
+               quantity = newStackSize - maxStack;
                newStackSize = maxStack;
             }
 
@@ -543,8 +541,6 @@ Core::ItemPtr Core::Entity::Player::addItem( uint32_t catalogId, uint32_t quanti
 
             auto slotUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(), slot, bag, *item );
             queuePacket( slotUpdate );
-
-            quantity = overflow;
 
             // return existing stack if we have no overflow - items fit into a preexisting stack
             if( quantity == 0 )
