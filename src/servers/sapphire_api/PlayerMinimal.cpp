@@ -289,7 +289,7 @@ namespace Core {
       createInvDbContainer( InventoryType::ArmoryLegs );
       createInvDbContainer( InventoryType::ArmoryFeet );
 
-      createInvDbContainer( InventoryType::ArmotyNeck );
+      createInvDbContainer( InventoryType::ArmoryNeck );
       createInvDbContainer( InventoryType::ArmoryEar );
       createInvDbContainer( InventoryType::ArmoryWrist );
       createInvDbContainer( InventoryType::ArmoryRing );

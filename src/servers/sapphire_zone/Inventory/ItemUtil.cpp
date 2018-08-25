@@ -25,43 +25,61 @@ bool Core::Items::Util::isArmory( uint16_t containerId )
            containerId == Common::ArmoryOff ||
            containerId == Common::ArmoryRing ||
            containerId == Common::ArmoryWaist ||
-           containerId == Common::ArmoryWrist;
+           containerId == Common::ArmoryWrist ||
+           containerId == Common::ArmorySoulCrystal;
 }
 
-uint16_t Core::Items::Util::getArmoryToEquipSlot( uint8_t slotId )
+uint16_t Core::Items::Util::getCharaEquipSlotCategoryToArmoryId( uint8_t slotId )
 {
+
    switch( slotId )
    {
-      case Common::Body:
+      case Common::CharaHead:
+         return Common::ArmoryHead;
+
+      case Common::CharaBody:
+      case Common::BodyAndHead:
+      case Common::BodyDisallowHandsLegsFeet:
+      case Common::BodyDisallowAll:
+      case Common::BodyDisallowHands:
+      case Common::BodyDisallowLegsFeet:
          return Common::ArmoryBody;
 
-      case Common::Ear:
+      case Common::CharaEars:
          return Common::ArmoryEar;
 
-      case Common::Feet:
+      case Common::CharaFeet:
          return Common::ArmoryFeet;
 
-      case Common::Hands:
+      case Common::CharaHands:
          return Common::ArmoryHand;
 
-      case Common::Legs:
+      case Common::CharaLegs:
+      case Common::LegsDisallowFeet:
          return Common::ArmoryLegs;
 
-      case Common::MainHand:
+      case Common::CharaMainHand:
+      case Common::MainTwoHandedWeapon:
+      case Common::MainOrOffHand:
          return Common::ArmoryMain;
 
-      case Common::OffHand:
+      case Common::CharaOffHand:
          return Common::ArmoryOff;
 
-      case Common::Ring2:
-      case Common::Ring1:
+      case Common::CharaRing:
          return Common::ArmoryRing;
 
-      case Common::Waist:
+      case Common::CharaWaist:
          return Common::ArmoryWaist;
 
-      case Common::Wrist:
+      case Common::CharaWrist:
          return Common::ArmoryWrist;
+
+      case Common::CharaNeck:
+         return Common::ArmoryNeck;
+
+      case Common::CharaSoulCrystal:
+         return Common::ArmorySoulCrystal;
 
       default:
          return 0;
