@@ -513,8 +513,6 @@ Core::ItemPtr Core::Entity::Player::addItem( uint32_t catalogId, uint32_t quanti
    {
       auto bag = Items::Util::getCharaEquipSlotCategoryToArmoryId( itemInfo->equipSlotCategory );
 
-      sendDebug( "Got bag: " + std::to_string( bag ) + " for cat: " + std::to_string( itemInfo->equipSlotCategory ) );
-
       bags.insert( bags.begin(), bag );
    }
 
