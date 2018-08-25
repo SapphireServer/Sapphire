@@ -774,12 +774,12 @@ void Core::Entity::Player::sendModel()
    sendToInRangeSet( boost::make_shared< ModelEquipPacket >( *getAsPlayer() ), true );
 }
 
-uint32_t Core::Entity::Player::getModelForSlot( Common::EquipSlot slot )
+uint32_t Core::Entity::Player::getModelForSlot( Common::GearSetSlot slot )
 {
    return m_modelEquip[slot];
 }
 
-void Core::Entity::Player::setModelForSlot( Common::EquipSlot slot, uint32_t val )
+void Core::Entity::Player::setModelForSlot( Common::GearSetSlot slot, uint32_t val )
 {
    m_modelEquip[slot] = val;
 }
@@ -1028,7 +1028,7 @@ void Core::Entity::Player::update( int64_t currTime )
    {
       if( m_targetId && m_currentStance == Entity::Chara::Stance::Active && isAutoattackOn() )
       {
-         auto mainWeap = getItemAt( Common::GearSet0, Common::EquipSlot::MainHand );
+         auto mainWeap = getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand );
 
          // @TODO i dislike this, iterating over all in range actors when you already know the id of the actor you need...
          for( auto actor : m_inRangeActor )
@@ -1411,7 +1411,7 @@ uint32_t Core::Entity::Player::getPersistentEmote() const
 void Core::Entity::Player::autoAttack( CharaPtr pTarget )
 {
 
-   auto mainWeap = getItemAt( Common::GearSet0, Common::EquipSlot::MainHand );
+   auto mainWeap = getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand );
 
    pTarget->onActionHostile( *this );
    //uint64_t tick = Util::getTimeMs();

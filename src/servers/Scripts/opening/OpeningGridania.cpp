@@ -45,7 +45,7 @@ private:
          auto item = player.addItem( itemId, 1, false, true );
 
          if( item )
-            player.equipItem( Common::EquipSlot::Ring2, item, true );
+            player.equipItem( Common::GearSetSlot::Ring2, item, true );
 
          player.setOpeningSequence( 1 );
          Scene00001( player );
