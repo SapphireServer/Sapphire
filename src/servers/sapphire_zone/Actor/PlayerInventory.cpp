@@ -88,7 +88,7 @@ void Core::Entity::Player::initInventory()
    setupContainer( ArmoryFeet, 34, "charaiteminventory", true );
 
    //neck
-   setupContainer( ArmotyNeck, 34, "charaiteminventory", true );
+   setupContainer( ArmoryNeck, 34, "charaiteminventory", true );
 
    //earring
    setupContainer( ArmoryEar, 34, "charaiteminventory", true );
@@ -503,10 +503,22 @@ Core::ItemPtr Core::Entity::Player::addItem( uint32_t catalogId, uint32_t quanti
 
    // todo: for now we're just going to add any items to main inv
 
-   std::pair< uint8_t, uint8_t > freeBagSlot;
+   std::pair< uint16_t, uint8_t > freeBagSlot;
    bool foundFreeSlot = false;
 
-   for( auto bag : { Bag0, Bag1, Bag2, Bag3 } )
+   std::vector< uint16_t > bags = { Bag0, Bag1, Bag2, Bag3 };
+
+   // add the related armoury bag to the applicable bags and try and fill a free slot there before falling back to regular inventory
+   if( itemInfo->isEquippable && getEquipDisplayFlags() & StoreNewItemsInArmouryChest )
+   {
+      auto bag = Items::Util::getCharaEquipSlotCategoryToArmoryId( itemInfo->equipSlotCategory );
+
+      sendDebug( "Got bag: " + std::to_string( bag ) + " for cat: " + std::to_string( itemInfo->equipSlotCategory ) );
+
+      bags.insert( bags.begin(), bag );
+   }
+
+   for( auto bag : bags )
    {
       auto storage = m_storageMap[bag];
 
@@ -727,7 +739,7 @@ void Core::Entity::Player::swapItem( uint16_t fromInventoryId, uint8_t fromSlotI
        && !Items::Util::isArmory( fromInventoryId ) )
    {
       updateContainer( fromInventoryId, fromSlotId, nullptr );
-      fromInventoryId = Items::Util::getArmoryToEquipSlot( toSlot );
+      fromInventoryId = Items::Util::getCharaEquipSlotCategoryToArmoryId( toSlot );
       fromSlotId = static_cast < uint8_t >( m_storageMap[fromInventoryId]->getFreeSlot() );
    }
 
