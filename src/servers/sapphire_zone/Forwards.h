@@ -39,6 +39,7 @@ namespace Core
       TYPE_FORWARD( Chara );
       TYPE_FORWARD( Player );
       TYPE_FORWARD( EventObject );
+      TYPE_FORWARD( BNpcTemplate );
    }
 
    namespace Event
