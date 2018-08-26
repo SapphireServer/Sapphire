@@ -257,6 +257,8 @@ public:
    uint8_t getLevel() const override;
    /*! returns the level of the provided class / job */
    uint8_t getLevelForClass( Common::ClassJob pClass ) const;
+   /*! returns if the classjob is unlocked */
+   bool isClassJobUnlocked( Common::ClassJob classJob ) const;
    /*! returns the exp of the currently active class / job */
    uint32_t getExp() const;
    /*! sets the exp of the currently active class / job */

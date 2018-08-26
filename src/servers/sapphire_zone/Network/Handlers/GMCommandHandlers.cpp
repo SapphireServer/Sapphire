@@ -113,7 +113,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
    else
    {
       auto inRange = player.getInRangeActors();
-      for( auto actor : inRange )
+      for( auto& actor : inRange )
       {
          if( actor->getId() == param3 )
             targetActor = actor;

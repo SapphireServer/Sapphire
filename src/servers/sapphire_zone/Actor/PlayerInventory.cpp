@@ -115,59 +115,24 @@ void Core::Entity::Player::sendItemLevel()
    queuePacket( boost::make_shared< ActorControlPacket142 >( getId(), SetItemLevel, getItemLevel(), 0 ) );
 }
 
-// TODO: This has to be redone and simplified
 void Core::Entity::Player::equipWeapon( ItemPtr pItem )
 {
-   ClassJob currentClass = static_cast< ClassJob >( getClass() );
+   auto exdData = g_fw.get< Core::Data::ExdDataGenerated >();
+   if( !exdData )
+      return;
 
-   switch( pItem->getCategory() )
-   {
-   case ItemUICategory::PugilistsArm:
-      if( currentClass != ClassJob::Pugilist &&
-          currentClass != ClassJob::Monk )
-         setClassJob( ClassJob::Pugilist );
-      break;
-   case ItemUICategory::GladiatorsArm:
-      if( currentClass != ClassJob::Gladiator &&
-          currentClass != ClassJob::Paladin )
-         setClassJob( ClassJob::Gladiator );
-      break;
-   case ItemUICategory::MaraudersArm:
-      if( currentClass != ClassJob::Marauder &&
-          currentClass != ClassJob::Warrior )
-         setClassJob( ClassJob::Marauder );
-      break;
-   case ItemUICategory::ArchersArm:
-      if( currentClass != ClassJob::Archer &&
-          currentClass != ClassJob::Bard )
-         setClassJob( ClassJob::Archer );
-      break;
-   case ItemUICategory::LancersArm:
-      if( currentClass != ClassJob::Lancer &&
-          currentClass != ClassJob::Dragoon )
-         setClassJob( ClassJob::Lancer );
-      break;
-   case ItemUICategory::OnehandedThaumaturgesArm:
-   case ItemUICategory::TwohandedThaumaturgesArm:
-      if( currentClass != ClassJob::Thaumaturge &&
-          currentClass != ClassJob::Blackmage )
-         setClassJob( ClassJob::Thaumaturge );
-      break;
-   case ItemUICategory::OnehandedConjurersArm:
-   case ItemUICategory::TwohandedConjurersArm:
-      if( currentClass != ClassJob::Conjurer &&
-          currentClass != ClassJob::Whitemage )
-         setClassJob( ClassJob::Conjurer );
-      break;
-   case ItemUICategory::ArcanistsGrimoire:
-      if( currentClass != ClassJob::Arcanist &&
-          currentClass != ClassJob::Summoner &&
-          currentClass != ClassJob::Scholar )
-         setClassJob( ClassJob::Arcanist );
-      break;
-   default:
-      break;
-   }
+   auto itemInfo = exdData->get< Core::Data::Item >( pItem->getId() );
+   auto itemClassJob = itemInfo->classJobUse;
+
+   auto currentClass = getClass();
+   auto newClassJob = static_cast< ClassJob >( itemClassJob );
+
+   if( isClassJobUnlocked( newClassJob ) )
+      return;
+
+   // todo: check if soul crystal is equipped and use job instead
+
+   setClassJob( newClassJob );
 }
 
 // equip an item
