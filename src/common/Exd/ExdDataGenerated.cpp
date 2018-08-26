@@ -2314,6 +2314,7 @@ Core::Data::Item::Item( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
    isUnique = exdData->getField< bool >( row, 20 );
    isUntradable = exdData->getField< bool >( row, 21 );
    isIndisposable = exdData->getField< bool >( row, 22 );
+   isEquippable = exdData->getField< bool >( row, 23 );
    priceMid = exdData->getField< uint32_t >( row, 24 );
    priceLow = exdData->getField< uint32_t >( row, 25 );
    canBeHq = exdData->getField< bool >( row, 26 );

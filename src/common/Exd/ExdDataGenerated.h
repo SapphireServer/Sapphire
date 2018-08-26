@@ -2406,6 +2406,7 @@ struct Item
    bool isUnique;
    bool isUntradable;
    bool isIndisposable;
+   bool isEquippable;
    uint32_t priceMid;
    uint32_t priceLow;
    bool canBeHq;
