@@ -12,12 +12,13 @@ matrix:
       addons:
         apt:
           sources:
-            - ubuntu-toolchain-r-test
+          - ubuntu-toolchain-r-test
+          - llvm-toolchain-trusty-6.0
           packages:
-            - gcc-7
-            - g++-7
+          - clang-6.0
+          - g++-7
       env:
-        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+      - MATRIX_EVAL="CC=clang-6.0 && CXX=clang++-6.0"
 
 # Setup cache
 cache:

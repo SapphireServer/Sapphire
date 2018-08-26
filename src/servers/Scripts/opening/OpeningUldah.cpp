@@ -43,10 +43,10 @@ private:
             default: itemId = 4426; break;
          }
 
-         auto item = player.addItem( Common::InventoryType::ArmoryRing, -1, itemId, 1, false, true );
+         auto item = player.addItem( itemId, 1, false, true );
 
          if( item )
-            player.equipItem( Common::EquipSlot::Ring2, item, true );
+            player.equipItem( Common::GearSetSlot::Ring2, item, true );
 
          player.setOpeningSequence( 1 );
          Scene00001( player );

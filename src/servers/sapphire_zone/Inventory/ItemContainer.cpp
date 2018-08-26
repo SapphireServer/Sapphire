@@ -82,7 +82,7 @@ int8_t Core::ItemContainer::getFreeSlot()
 Core::ItemPtr Core::ItemContainer::getItem( uint8_t slotId )
 {
 
-   if( ( slotId > m_size ) || ( slotId == -1 ) )
+   if( ( slotId > m_size ) )
    {
       auto pLog = g_fw.get< Logger >();
       pLog->error( "Slot out of range " + std::to_string( slotId ) );
@@ -94,7 +94,7 @@ Core::ItemPtr Core::ItemContainer::getItem( uint8_t slotId )
 
 void Core::ItemContainer::setItem( uint8_t slotId, ItemPtr pItem )
 {
-   if( ( slotId > m_size ) )
+   if( slotId > m_size )
       return;
 
    m_itemMap[slotId] = pItem;

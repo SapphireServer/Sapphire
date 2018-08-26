@@ -88,7 +88,7 @@ void Core::Entity::Player::initInventory()
    setupContainer( ArmoryFeet, 34, "charaiteminventory", true );
 
    //neck
-   setupContainer( ArmotyNeck, 34, "charaiteminventory", true );
+   setupContainer( ArmoryNeck, 34, "charaiteminventory", true );
 
    //earring
    setupContainer( ArmoryEar, 34, "charaiteminventory", true );
@@ -115,63 +115,28 @@ void Core::Entity::Player::sendItemLevel()
    queuePacket( boost::make_shared< ActorControlPacket142 >( getId(), SetItemLevel, getItemLevel(), 0 ) );
 }
 
-// TODO: This has to be redone and simplified
 void Core::Entity::Player::equipWeapon( ItemPtr pItem )
 {
-   ClassJob currentClass = static_cast< ClassJob >( getClass() );
+   auto exdData = g_fw.get< Core::Data::ExdDataGenerated >();
+   if( !exdData )
+      return;
 
-   switch( pItem->getCategory() )
-   {
-   case ItemUICategory::PugilistsArm:
-      if( currentClass != ClassJob::Pugilist &&
-          currentClass != ClassJob::Monk )
-         setClassJob( ClassJob::Pugilist );
-      break;
-   case ItemUICategory::GladiatorsArm:
-      if( currentClass != ClassJob::Gladiator &&
-          currentClass != ClassJob::Paladin )
-         setClassJob( ClassJob::Gladiator );
-      break;
-   case ItemUICategory::MaraudersArm:
-      if( currentClass != ClassJob::Marauder &&
-          currentClass != ClassJob::Warrior )
-         setClassJob( ClassJob::Marauder );
-      break;
-   case ItemUICategory::ArchersArm:
-      if( currentClass != ClassJob::Archer &&
-          currentClass != ClassJob::Bard )
-         setClassJob( ClassJob::Archer );
-      break;
-   case ItemUICategory::LancersArm:
-      if( currentClass != ClassJob::Lancer &&
-          currentClass != ClassJob::Dragoon )
-         setClassJob( ClassJob::Lancer );
-      break;
-   case ItemUICategory::OnehandedThaumaturgesArm:
-   case ItemUICategory::TwohandedThaumaturgesArm:
-      if( currentClass != ClassJob::Thaumaturge &&
-          currentClass != ClassJob::Blackmage )
-         setClassJob( ClassJob::Thaumaturge );
-      break;
-   case ItemUICategory::OnehandedConjurersArm:
-   case ItemUICategory::TwohandedConjurersArm:
-      if( currentClass != ClassJob::Conjurer &&
-          currentClass != ClassJob::Whitemage )
-         setClassJob( ClassJob::Conjurer );
-      break;
-   case ItemUICategory::ArcanistsGrimoire:
-      if( currentClass != ClassJob::Arcanist &&
-          currentClass != ClassJob::Summoner &&
-          currentClass != ClassJob::Scholar )
-         setClassJob( ClassJob::Arcanist );
-      break;
-   default:
-      break;
-   }
+   auto itemInfo = exdData->get< Core::Data::Item >( pItem->getId() );
+   auto itemClassJob = itemInfo->classJobUse;
+
+   auto currentClass = getClass();
+   auto newClassJob = static_cast< ClassJob >( itemClassJob );
+
+   if( isClassJobUnlocked( newClassJob ) )
+      return;
+
+   // todo: check if soul crystal is equipped and use job instead
+
+   setClassJob( newClassJob );
 }
 
 // equip an item
-void Core::Entity::Player::equipItem( Common::EquipSlot equipSlotId, ItemPtr pItem, bool sendUpdate )
+void Core::Entity::Player::equipItem( Common::GearSetSlot equipSlotId, ItemPtr pItem, bool sendUpdate )
 {
 
    //g_framework.getLogger().debug( "Equipping into slot " + std::to_string( equipSlotId ) );
@@ -181,18 +146,18 @@ void Core::Entity::Player::equipItem( Common::EquipSlot equipSlotId, ItemPtr pIt
 
    switch( equipSlotId )
    {
-   case Common::EquipSlot::MainHand:
+   case Common::GearSetSlot::MainHand:
       m_modelMainWeapon = model;
       m_modelSubWeapon = model2;
       // TODO: add job change upon changing weapon if needed
       // equipWeapon( pItem );
       break;
 
-   case Common::EquipSlot::OffHand:
+   case Common::GearSetSlot::OffHand:
       m_modelSubWeapon = model;
       break;
 
-   case Common::EquipSlot::SoulCrystal:
+   case Common::GearSetSlot::SoulCrystal:
       // TODO: add Job change on equipping crystal
       // change job
       break;
@@ -211,7 +176,7 @@ void Core::Entity::Player::equipItem( Common::EquipSlot equipSlotId, ItemPtr pIt
    }
 }
 
-void Core::Entity::Player::unequipItem( Common::EquipSlot equipSlotId, ItemPtr pItem )
+void Core::Entity::Player::unequipItem( Common::GearSetSlot equipSlotId, ItemPtr pItem )
 {
    m_modelEquip[static_cast< uint8_t >( equipSlotId )] = 0;
    sendModel();
@@ -318,17 +283,6 @@ void Core::Entity::Player::removeCrystal( Common::CrystalType type, uint32_t amo
                                                                      Common::InventoryType::Crystal,
                                                                      *currItem );
    queuePacket( invUpdate );
-}
-
-bool Core::Entity::Player::tryAddItem( uint16_t catalogId, uint32_t quantity )
-{
-
-   for( uint16_t i = 0; i < 4; i++ )
-   {
-      if( addItem( i, -1, catalogId, quantity ) )
-         return true;
-   }
-   return false;
 }
 
 void Core::Entity::Player::sendInventory()
@@ -495,7 +449,7 @@ bool Core::Entity::Player::isObtainable( uint32_t catalogId, uint8_t quantity )
 }
 
 
-Core::ItemPtr Core::Entity::Player::addItem( uint16_t inventoryId, int8_t slotId, uint32_t catalogId, uint16_t quantity, bool isHq, bool silent )
+Core::ItemPtr Core::Entity::Player::addItem( uint32_t catalogId, uint32_t quantity, bool isHq, bool silent )
 {
    auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
@@ -507,57 +461,100 @@ Core::ItemPtr Core::Entity::Player::addItem( uint16_t inventoryId, int8_t slotId
       return nullptr;
    }
 
-   int8_t rSlotId = -1;
+   quantity = std::min< uint32_t >( quantity, itemInfo->stackSize );
 
-   //if( itemInfo->stack_size > 1 )
-   //{
-   //   auto itemList = this->getSlotsOfItemsInInventory( catalogId );
-   //   // TODO: this is a stacked item so we need to see if the item is already in inventory and
-   //   //       check how much free space we have on existing stacks before looking for empty slots.
-   //}
-   //else
+   // used for item obtain notification
+   uint32_t originalQuantity = quantity;
+
+   // todo: for now we're just going to add any items to main inv
+
+   std::pair< uint16_t, uint8_t > freeBagSlot;
+   bool foundFreeSlot = false;
+
+   std::vector< uint16_t > bags = { Bag0, Bag1, Bag2, Bag3 };
+
+   // add the related armoury bag to the applicable bags and try and fill a free slot there before falling back to regular inventory
+   if( itemInfo->isEquippable && getEquipDisplayFlags() & StoreNewItemsInArmouryChest )
    {
-      auto freeSlot = getFreeBagSlot();
-      inventoryId = freeSlot.first;
-      rSlotId = freeSlot.second;
+      auto bag = Items::Util::getCharaEquipSlotCategoryToArmoryId( itemInfo->equipSlotCategory );
 
-      if( rSlotId == -1 )
-         return nullptr;
+      bags.insert( bags.begin(), bag );
    }
 
-   auto item = createItem( catalogId, quantity );
+   for( auto bag : bags )
+   {
+      auto storage = m_storageMap[bag];
 
+      for( uint8_t slot = 0; slot < storage->getMaxSize(); slot++ )
+      {
+         auto item = storage->getItem( slot );
+
+         // add any items that are stackable
+         if( item && !itemInfo->isEquippable && item->getId() == catalogId )
+         {
+            uint32_t count = item->getStackSize();
+            uint32_t maxStack = item->getMaxStackSize();
+
+            // if slot is full, skip it
+            if( count >= maxStack )
+               continue;
+
+            // check slot is same quality
+            if( item->isHq() != isHq )
+               continue;
+
+            // update stack
+            uint32_t newStackSize = count + quantity;
+            if( newStackSize > maxStack )
+            {
+               quantity = newStackSize - maxStack;
+               newStackSize = maxStack;
+            }
+
+            item->setStackSize( newStackSize );
+            writeItem( item );
+
+            auto slotUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(), slot, bag, *item );
+            queuePacket( slotUpdate );
+
+            // return existing stack if we have no overflow - items fit into a preexisting stack
+            if( quantity == 0 )
+            {
+               queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), ItemObtainIcon, catalogId, originalQuantity ) );
+
+               return item;
+            }
+
+         }
+         else if( !item && !foundFreeSlot )
+         {
+            freeBagSlot = { bag, slot };
+            foundFreeSlot = true;
+         }
+      }
+   }
+
+   // couldn't find a free slot and we still have some quantity of items left, shits fucked
+   if( !foundFreeSlot )
+      return nullptr;
+
+   auto item = createItem( catalogId, quantity );
    item->setHq( isHq );
 
-   if( rSlotId != -1 )
+   auto storage = m_storageMap[freeBagSlot.first];
+   storage->setItem( freeBagSlot.second, item );
+
+   writeInventory( static_cast< InventoryType >( freeBagSlot.first ) );
+
+   if( !silent )
    {
+      auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(), freeBagSlot.second, freeBagSlot.first, *item );
+      queuePacket( invUpdate );
 
-      auto storage = m_storageMap[inventoryId];
-      storage->setItem( rSlotId, item );
-
-      pDb->execute( "UPDATE " + storage->getTableName() + " SET container_" +
-                    std::to_string( rSlotId ) + " = " + std::to_string( item->getUId() ) +
-                    " WHERE storageId = " + std::to_string( inventoryId ) +
-                    " AND CharacterId = " + std::to_string( getId() ) );
-
-      if( !silent )
-      {
-         auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
-                                                                           rSlotId,
-                                                                           inventoryId,
-                                                                           *item );
-
-         queuePacket( invUpdate );
-
-         queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), ItemObtainIcon,
-                                                                   catalogId, item->getStackSize() ) );
-      }
-
-
+      queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), ItemObtainIcon, catalogId, originalQuantity ) );
    }
 
    return item;
-
 }
 
 void Core::Entity::Player::moveItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot )
@@ -579,10 +576,10 @@ void Core::Entity::Player::moveItem( uint16_t fromInventoryId, uint8_t fromSlotI
       writeInventory( static_cast< InventoryType >( fromInventoryId ) );
 
    if( static_cast< InventoryType >( toInventoryId ) == GearSet0 )
-      equipItem( static_cast< EquipSlot >( toSlot ), tmpItem, true );
+      equipItem( static_cast< GearSetSlot >( toSlot ), tmpItem, true );
 
    if( static_cast< InventoryType >( fromInventoryId ) == GearSet0 )
-      unequipItem( static_cast< EquipSlot >( fromSlotId ), tmpItem );
+      unequipItem( static_cast< GearSetSlot >( fromSlotId ), tmpItem );
 
 
 }
@@ -606,9 +603,9 @@ bool Core::Entity::Player::updateContainer( uint16_t storageId, uint8_t slotId, 
       case GearSet:
       {
          if( pItem )
-            equipItem( static_cast< EquipSlot >( slotId ), pItem, true );
+            equipItem( static_cast< GearSetSlot >( slotId ), pItem, true );
          else
-            unequipItem( static_cast< EquipSlot >( slotId ), pItem );
+            unequipItem( static_cast< GearSetSlot >( slotId ), pItem );
 
          writeInventory( static_cast< InventoryType >( storageId ) );
          break;
@@ -641,7 +638,7 @@ void Core::Entity::Player::splitItem( uint16_t fromInventoryId, uint8_t fromSlot
       // todo: correct invalid move? again, not sure what retail does here
       return;
 
-   auto newItem = addItem( toInventoryId, toSlot, fromItem->getId(), itemCount, fromItem->isHq(), true );
+   auto newItem = addItem( fromItem->getId(), itemCount, fromItem->isHq(), true );
    if( !newItem )
       return;
 
@@ -705,7 +702,7 @@ void Core::Entity::Player::swapItem( uint16_t fromInventoryId, uint8_t fromSlotI
        && !Items::Util::isArmory( fromInventoryId ) )
    {
       updateContainer( fromInventoryId, fromSlotId, nullptr );
-      fromInventoryId = Items::Util::getArmoryToEquipSlot( toSlot );
+      fromInventoryId = Items::Util::getCharaEquipSlotCategoryToArmoryId( toSlot );
       fromSlotId = static_cast < uint8_t >( m_storageMap[fromInventoryId]->getFreeSlot() );
    }
 

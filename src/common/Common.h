@@ -44,7 +44,7 @@ namespace Common {
       French = 8
    };
 
-   enum EquipSlot : uint8_t
+   enum GearSetSlot : uint8_t
    {
       MainHand = 0,
       OffHand = 1,
@@ -60,6 +60,46 @@ namespace Common {
       Ring1 = 11,
       Ring2 = 12,
       SoulCrystal = 13,
+   };
+
+   enum EquipSlotCategory : uint8_t
+   {
+      Unequippable = 0,
+
+      // main slots
+
+      CharaMainHand = 1,
+      CharaOffHand = 2,
+      CharaHead = 3,
+      CharaBody = 4,
+      CharaHands = 5,
+      CharaWaist = 6,
+      CharaLegs =  7,
+      CharaFeet = 8,
+      CharaEars = 9,
+      CharaNeck = 10,
+      CharaWrist = 11,
+      CharaRing = 12,
+      CharaSoulCrystal = 17,
+
+      // specials
+
+      /*! Cannot equip gear to offhand slot */
+      MainTwoHandedWeapon = 13,
+      /*! Can be equipped in either main or offhand slot */
+      MainOrOffHand = 14, // unused
+      /*! Cannot equip gear to head */
+      BodyDisallowHead = 15,
+      /*! Cannot equip gear to hands, legs and feet slots */
+      BodyDisallowHandsLegsFeet = 16,
+      /*! Cannot equip gear to feet slot */
+      LegsDisallowFeet = 18,
+      /*! Cannot equp gear to head, hands, legs, feet slots */
+      BodyDisallowAll = 19,
+      /*! Cannot equip gear to hands slot */
+      BodyDisallowHands = 20,
+      /*! Cannot equip gear to legs & feet slots */
+      BodyDisallowLegsFeet = 21,
    };
 
    enum InventoryType : uint16_t
@@ -87,7 +127,7 @@ namespace Common {
       ArmoryWaist = 3204,
       ArmoryLegs = 3205,
       ArmoryFeet = 3206,
-      ArmotyNeck = 3207,
+      ArmoryNeck = 3207,
       ArmoryEar = 3208,
       ArmoryWrist = 3209,
       ArmoryRing = 3300,
@@ -599,6 +639,9 @@ namespace Common {
       HideHead = 0x1,
       HideWeapon = 0x2,
       HideLegacyMark = 0x4,
+
+      StoreNewItemsInArmouryChest = 0x10,
+      StoreCraftedItemsInInventory = 0x20,
 
       Visor = 0x40,
    };

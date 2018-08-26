@@ -267,7 +267,7 @@ void Core::DebugCommandHandler::set( char * data, Entity::Player& player, boost:
       uint32_t val;
       sscanf( params.c_str(), "%d %d", &slot, &val );
 
-      player.setModelForSlot( static_cast< Common::EquipSlot >( slot ), val );
+      player.setModelForSlot( static_cast< Common::GearSetSlot >( slot ), val );
       player.sendModel();
       player.sendDebug( "Model updated" );
    }
