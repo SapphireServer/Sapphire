@@ -131,7 +131,7 @@ public:
    /*! update quest ( register it as active quest if new ) */
    void updateQuest( uint16_t questId, uint8_t sequence );
    /*! return true if quest is currently active */
-   bool hasQuest( uint16_t questId );
+   bool hasQuest( uint32_t questId );
    /*! return the current quest sequence */
    uint8_t getQuestSeq( uint16_t questId );
    /*! send the quest tracker packet */
@@ -222,14 +222,10 @@ public:
 
    // Inventory / Item / Currency
    //////////////////////////////////////////////////////////////////////////////////////////////////////
-   /*! add an item to the first free slot in one of the 4 main containers */
-   bool tryAddItem( uint16_t catalogId, uint32_t quantity );
-   /*! add an item to a given container */
-//   bool addItem( uint16_t containerId, uint16_t catalogId, uint32_t quantity );
    /*! equip an item to a specified slot */
-   void equipItem( Common::EquipSlot equipSlotId, ItemPtr pItem, bool sendModel );
+   void equipItem( Common::GearSetSlot equipSlotId, ItemPtr pItem, bool sendModel );
    /*! remove an item from an equipment slot */
-   void unequipItem( Common::EquipSlot equipSlotId, ItemPtr pItem );
+   void unequipItem( Common::GearSetSlot equipSlotId, ItemPtr pItem );
    /*! equip a weapon, possibly forcing a job change */
    void equipWeapon( ItemPtr pItem );
    /*! get player ilvl */
@@ -245,9 +241,9 @@ public:
    /*! return a const pointer to the model array */
    const uint32_t* getModelArray() const;
    /*! return the equipment model in a specified equipment slot */
-   uint32_t getModelForSlot( Common::EquipSlot slot );
+   uint32_t getModelForSlot( Common::GearSetSlot slot );
    /*! set the equipment model in a specified equipment slot */
-   void setModelForSlot( Common::EquipSlot slot, uint32_t val );
+   void setModelForSlot( Common::GearSetSlot slot, uint32_t val );
    /*! add amount to the currency of type */
    void addCurrency( Common::CurrencyType type, uint32_t amount );
    /*! remove amount from the currency of type */
@@ -261,6 +257,8 @@ public:
    uint8_t getLevel() const override;
    /*! returns the level of the provided class / job */
    uint8_t getLevelForClass( Common::ClassJob pClass ) const;
+   /*! returns if the classjob is unlocked */
+   bool isClassJobUnlocked( Common::ClassJob classJob ) const;
    /*! returns the exp of the currently active class / job */
    uint32_t getExp() const;
    /*! sets the exp of the currently active class / job */
@@ -612,7 +610,7 @@ public:
    bool loadInventory();
    InvSlotPairVec getSlotsOfItemsInInventory( uint32_t catalogId );
    InvSlotPair getFreeBagSlot();
-   Core::ItemPtr addItem( uint16_t inventoryId, int8_t slotId, uint32_t catalogId, uint16_t quantity = 1, bool isHq = false, bool slient = false );
+   Core::ItemPtr addItem( uint32_t catalogId, uint32_t quantity = 1, bool isHq = false, bool slient = false );
    void moveItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot );
    void swapItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot );
    void discardItem( uint16_t fromInventoryId, uint8_t fromSlotId );

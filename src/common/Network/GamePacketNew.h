@@ -219,7 +219,7 @@ public:
       return data;
    }
 
-   virtual T1 ipcType()
+   T1 ipcType() override
    {
       return static_cast< T1 >( m_data._ServerIpcType );
    };
