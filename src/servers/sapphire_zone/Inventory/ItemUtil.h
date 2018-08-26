@@ -15,7 +15,7 @@ namespace Util {
 
    bool isArmory( uint16_t containerId );
    bool isEquipment( uint16_t containerId );
-   uint16_t getArmoryToEquipSlot( uint8_t slotId );
+   uint16_t getCharaEquipSlotCategoryToArmoryId( uint8_t slotId );
 
    Common::ContainerType getContainerType( uint32_t containerId );
 

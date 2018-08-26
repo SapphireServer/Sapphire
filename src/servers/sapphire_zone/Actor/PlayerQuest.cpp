@@ -1059,14 +1059,14 @@ bool Core::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t optional
    {
       for( uint32_t i = 0; i < questInfo->itemReward0.size(); i++ )
       {
-         addItem( -1, questInfo->itemReward0.at( i ), questInfo->itemCountReward0.at( i ) );
+         addItem( questInfo->itemCountReward0.at( i ) );
       }
    }
 
    if( optionalItemCount > 0 )
    {
       auto itemId = questInfo->itemReward1.at( optionalChoice );
-      addItem( -1, itemId, questInfo->itemCountReward1.at( optionalChoice ) );
+      addItem( questInfo->itemCountReward1.at( optionalChoice ) );
    }
 
    if( gilReward > 0 )

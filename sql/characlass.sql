@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS `characlass` (
   `ClassIdx` int(3) DEFAULT '0',
   `Exp` int(10) DEFAULT '0',
   `Lvl` int(5) DEFAULT '0',
-  PRIMARY KEY (`CharacterId`)
+  INDEX `CharacterId` (`CharacterId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- Dumping data for table sapphire.characlass: 0 rows

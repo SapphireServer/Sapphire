@@ -113,7 +113,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
    else
    {
       auto inRange = player.getInRangeActors();
-      for( auto actor : inRange )
+      for( auto& actor : inRange )
       {
          if( actor->getId() == param3 )
             targetActor = actor;
@@ -323,7 +323,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
          return;
       }
 
-      if( !targetPlayer->addItem( -1, param1, quantity ) )
+      if( !targetPlayer->addItem( param1, quantity ) )
          player.sendUrgent( "Item " + std::to_string( param1 ) + " could not be added to inventory." );
       break;
    }
