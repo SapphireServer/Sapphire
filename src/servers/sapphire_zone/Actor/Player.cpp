@@ -704,6 +704,12 @@ uint8_t Core::Entity::Player::getLevelForClass( Common::ClassJob pClass ) const
    return static_cast< uint8_t >( m_classArray[classJobIndex] );
 }
 
+bool Core::Entity::Player::isClassJobUnlocked( Common::ClassJob classJob ) const
+{
+   // todo: need to properly check if a job is unlocked, at the moment we just check the class array which will return true for every job if the base class is unlocked
+   return getLevelForClass( classJob ) != 0;
+}
+
 uint32_t Core::Entity::Player::getExp() const
 {
    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
