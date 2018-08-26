@@ -217,6 +217,9 @@ namespace Core {
          startTown = 3;
          startZone = 182;
          break;
+
+      default:
+         break;
       }
 
       //        "(AccountId, CharacterId, ContentId, Name, Hp, Mp, "
