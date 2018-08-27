@@ -83,7 +83,7 @@ Core::Entity::Player::Player() :
    m_queuedZoneing = nullptr;
    m_status = ActorStatus::Idle;
    m_invincibilityType = InvincibilityType::InvincibilityNone;
-   m_modelType = ModelType::Human;
+   m_modelType = ObjKind::Player;
 
    memset( m_questTracking, 0, sizeof( m_questTracking ) );
    memset( m_name, 0, sizeof( m_name ) );

@@ -763,7 +763,7 @@ bool Core::Entity::Chara::hasStatusEffect( uint32_t id )
    return false;
 }
 
-Chara::ModelType Chara::getModelType() const
+Core::Common::ObjKind Chara::getModelType() const
 {
    return m_modelType;
 }

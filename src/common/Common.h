@@ -44,6 +44,25 @@ namespace Common {
       French = 8
    };
 
+   enum ObjKind : uint8_t
+   {
+      None = 0x00,
+      Player = 0x01,
+      BattleNpc = 0x02,
+      EventNpc = 0x03,
+      Treasure = 0x04,
+      Aetheryte = 0x05,
+      GatheringPoint = 0x06,
+      EventObj = 0x07,
+      MountType = 0x08,
+      Companion = 0x09, // this probably actually means minion
+      Retainer = 0x0A,
+      Area = 0x0B,
+      Housing = 0x0C,
+      Cutscene = 0x0D,
+      CardStand = 0x0E,
+   };
+
    enum GearSetSlot : uint8_t
    {
       MainHand = 0,
@@ -308,7 +327,7 @@ namespace Common {
 
    enum MoveState : uint8_t
    {
-      None = 0x00,
+      No = 0x00,
       Land = 0x02,
       Fall = 0x04,
    };
