@@ -50,7 +50,7 @@ void Core::Entity::Actor::setId( uint32_t id )
    m_id = id;
 }
 
-Core::Entity::Actor::ObjKind Core::Entity::Actor::getObjKind() const
+Core::Common::ObjKind Core::Entity::Actor::getObjKind() const
 {
    return m_objKind;
 }

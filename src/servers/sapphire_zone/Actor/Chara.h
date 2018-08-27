@@ -141,7 +141,7 @@ protected:
    /*! Invincibility type */
    Common::InvincibilityType m_invincibilityType;
    /*! Type of model to use, humanoid for actors that use look data */
-   ModelType m_modelType;
+   Common::ObjKind m_modelType;
 
    /*! Status effects */
    const uint8_t MAX_STATUS_EFFECTS = 30;
@@ -150,7 +150,7 @@ protected:
    std::map< uint8_t, StatusEffect::StatusEffectPtr > m_statusEffectMap;
 
 public:
-   Chara( ObjKind type );
+   Chara( Common::ObjKind type );
 
    virtual ~Chara() override;
 
@@ -199,7 +199,7 @@ public:
 
    Common::ClassJob getClass() const;
 
-   ModelType getModelType() const;
+   Common::ObjKind getModelType() const;
 
    uint8_t getClassAsInt() const;
 
