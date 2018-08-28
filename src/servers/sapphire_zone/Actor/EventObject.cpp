@@ -83,14 +83,14 @@ void Core::Entity::EventObject::setState( uint8_t state )
 
    for( const auto& player : m_inRangePlayers )
    {
-      player->queuePacket( boost::make_shared< ActorControlPacket142 >( getId(), DirectorEObjMod, state ) );
+      player->queuePacket( makeActorControl142( getId(), DirectorEObjMod, state ) );
    }
 }
 
 void Core::Entity::EventObject::setAnimationFlag( uint32_t flag, uint32_t animationFlag ) {
    for( const auto& player : m_inRangePlayers )
    {
-      player->queuePacket( boost::make_shared< ActorControlPacket142 >( getId(), EObjAnimation, flag, animationFlag ) );
+      player->queuePacket( makeActorControl142( getId(), EObjAnimation, flag, animationFlag ) );
    }
 }
 

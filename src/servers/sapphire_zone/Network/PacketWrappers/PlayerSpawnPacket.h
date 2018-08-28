@@ -76,7 +76,7 @@ namespace Server {
          //m_data.u23 = 0x04;
          //m_data.u24 = 256;
          m_data.state = static_cast< uint8_t >( player.getStatus() );
-         m_data.modelType = player.getModelType();
+         m_data.modelType = player.getObjKind();
          if( target.getId() == player.getId() )
          {
             m_data.spawnIndex = 0x00;
@@ -93,22 +93,22 @@ namespace Server {
 
          if( player.getZoningType() != Common::ZoneingType::None || player.getGmInvis() == true )
          {
-            m_data.displayFlags |= Entity::Chara::DisplayFlags::Invisible;
+            m_data.displayFlags |= static_cast< uint8_t >( Common::DisplayFlags::Invisible );
          }
 
          if( player.getEquipDisplayFlags() & Core::Common::EquipDisplayFlags::HideHead )
          {
-            m_data.displayFlags |= Entity::Chara::DisplayFlags::HideHead;
+            m_data.displayFlags |= static_cast< uint8_t >( Common::DisplayFlags::HideHead );
          }
 
          if( player.getEquipDisplayFlags() & Core::Common::EquipDisplayFlags::HideWeapon )
          {
-            m_data.displayFlags |= Entity::Chara::DisplayFlags::HideWeapon;
+            m_data.displayFlags |= static_cast< uint8_t >( Common::DisplayFlags::HideWeapon );
          }
 
          if( player.getEquipDisplayFlags() & Core::Common::EquipDisplayFlags::Visor )
          {
-            m_data.displayFlags |= Entity::Chara::DisplayFlags::Visor;
+            m_data.displayFlags |= static_cast< uint8_t >( Common::DisplayFlags::Visor );
          }
 
          if( !( player.getEquipDisplayFlags() & Core::Common::EquipDisplayFlags::HideLegacyMark ) )

@@ -299,7 +299,7 @@ int main()
 
 
             //g_log.info( "|----> " + std::to_string( instance.bNPCBase ) + " " + std::to_string( instance.posX ) + ", " + std::to_string( instance.posY ) + ", " + std::to_string( instance.posZ )  );
-            g_log.info( "|----> " + std::to_string( instance.bNPCBase ) +
+            /*g_log.info( "|----> " + std::to_string( instance.bNPCBase ) +
                         " " + std::to_string( instance.mainWeaponModel ) +
                         ", " + std::to_string( instance.secWeaponModel ) +
                         ", " + std::to_string( instance.aggressionMode ) +
@@ -307,7 +307,30 @@ int main()
                         ", " + std::to_string( instance.onlineStatus ) +
                         ", " + std::to_string( instance.pose ) +
                         ", " + std::to_string( instance.modelChara ) +
-                        ", " + std::to_string( instance.displayFlags ) + ", " + modelStr + ", " + cusStr + ", " + std::to_string( instance.gimmickId ) );
+                        ", " + std::to_string( instance.displayFlags ) + ", " + modelStr + ", " + cusStr + ", " + std::to_string( instance.gimmickId ) );*/
+
+            g_log.info( "|----> " + std::to_string( instance.bNPCBase ) +
+                        " " + std::to_string( instance.u2ab ) +
+                        ", " + std::to_string( instance.u2b ) +
+                        ", " + std::to_string( instance.u3b ) +
+                        ", " + std::to_string( instance.u3c ) +
+                        ", " + std::to_string( instance.u4 ) +
+                        ", " + std::to_string( instance.u6 ) +
+                        ", " + std::to_string( instance.u7 ) +
+                        ", " + std::to_string( instance.u14 ) +
+                        ", " + std::to_string( instance.u15 ) +
+                        ", " + std::to_string( instance.u18 ) +
+                        ", " + std::to_string( instance.u19 ) +
+                        ", " + std::to_string( instance.u25c) +
+                        ", " + std::to_string( instance.u26d )  +
+                        ", " + std::to_string( instance.u27a ) +
+                        ", " + std::to_string( instance.u29b ) +
+                        ", " + std::to_string( instance.u30b ) +
+                        ", " + std::to_string( instance.unk30 ) +
+                        ", " + std::to_string( instance.unk31 ) +
+                        ", " + std::to_string( instance.unk32 ) +
+                        ", " + std::to_string( instance.unk33 ) +
+                        ", " + std::to_string( instance.unk34 ));
          }
       }
       nameToPacketList.clear();

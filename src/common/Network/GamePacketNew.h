@@ -42,6 +42,12 @@ boost::shared_ptr< ZoneChannelPacket< T > > makeZonePacket( Args... args )
 }
 
 template< class T, typename... Args >
+boost::shared_ptr< T > makeWrappedPacket( Args... args )
+{
+   return boost::make_shared< T >( args... );
+}
+
+template< class T, typename... Args >
 boost::shared_ptr< ChatChannelPacket< T > > makeChatPacket( Args... args )
 {
    return boost::make_shared< ChatChannelPacket< T > >( args... );

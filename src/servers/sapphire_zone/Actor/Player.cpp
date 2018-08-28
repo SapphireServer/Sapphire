@@ -358,19 +358,19 @@ void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
    if( type == 1 ) // teleport
    {
       prepareZoning( data->territory, true, 1, 112 ); // TODO: Really?
-      sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( getId(), ActorDespawnEffect, 0x04 ) );
+      sendToInRangeSet( makeActorControl142( getId(), ActorDespawnEffect, 0x04 ) );
       setZoningType( Common::ZoneingType::Teleport );
    }
    else if( type == 2 ) // aethernet
    {
       prepareZoning( data->territory, true, 1, 112 );
-      sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( getId(), ActorDespawnEffect, 0x04 ) );
+      sendToInRangeSet( makeActorControl142( getId(), ActorDespawnEffect, 0x04 ) );
       setZoningType( Common::ZoneingType::Teleport );
    }
    else if( type == 3 ) // return
    {
       prepareZoning( data->territory, true, 1, 111 );
-      sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( getId(), ActorDespawnEffect, 0x03 ) );
+      sendToInRangeSet( makeActorControl142( getId(), ActorDespawnEffect, 0x03 ) );
       setZoningType( Common::ZoneingType::Return );
    }
 
@@ -496,7 +496,7 @@ void Core::Entity::Player::registerAetheryte( uint8_t aetheryteId )
    Util::valueToFlagByteIndexValue( aetheryteId, value, index );
 
    m_aetheryte[index] |= value;
-   queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), LearnTeleport, aetheryteId, 1 ) );
+   queuePacket( makeActorControl143( getId(), LearnTeleport, aetheryteId, 1 ) );
 }
 
 bool Core::Entity::Player::isAetheryteRegistered( uint8_t aetheryteId ) const
@@ -587,7 +587,7 @@ void Core::Entity::Player::learnAction( uint16_t actionId )
 
    m_unlocks[index] |= value;
 
-   queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), ToggleActionUnlock, actionId, 1 ) );
+   queuePacket( makeActorControl143( getId(), ToggleActionUnlock, actionId, 1 ) );
 }
 
 void Core::Entity::Player::learnSong( uint8_t songId, uint32_t itemId )
@@ -598,7 +598,7 @@ void Core::Entity::Player::learnSong( uint8_t songId, uint32_t itemId )
 
    m_orchestrion[index] |= value;
 
-   queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), ToggleOrchestrionUnlock, songId, 1, itemId ) );
+   queuePacket( makeActorControl143( getId(), ToggleOrchestrionUnlock, songId, 1, itemId ) );
 }
 
 bool Core::Entity::Player::isActionLearned( uint8_t actionId ) const
@@ -622,11 +622,11 @@ void Core::Entity::Player::gainExp( uint32_t amount )
 
    uint32_t neededExpToLevelplus1 = pExdData->get< Core::Data::ParamGrow >( level + 1 )->expToNext;
 
-   queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), GainExpMsg, static_cast< uint8_t >( getClass() ), amount ) );
+   queuePacket( makeActorControl143( getId(), GainExpMsg, static_cast< uint8_t >( getClass() ), amount ) );
 
    if( level >= 70 ) // temporary fix for leveling over levelcap
    {
-      queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), amount ) );
+      queuePacket( makeActorControl143( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), amount ) );
       return;
    }
 
@@ -638,12 +638,12 @@ void Core::Entity::Player::gainExp( uint32_t amount )
                ( currentExp + amount - neededExpToLevel );
       setExp( amount );
       gainLevel();
-      queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), amount ) );
+      queuePacket( makeActorControl143( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), amount ) );
 
    }
    else
    {
-      queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), currentExp + amount ) );
+      queuePacket( makeActorControl143( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), currentExp + amount ) );
       setExp( currentExp + amount );
    }
 
@@ -672,7 +672,7 @@ void Core::Entity::Player::gainLevel()
    effectListPacket->data().max_mp = getMaxMp();
    sendToInRangeSet( effectListPacket, true );
 
-   sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( getId(), LevelUpEffect, static_cast< uint8_t >( getClass() ),
+   sendToInRangeSet( makeActorControl142( getId(), LevelUpEffect, static_cast< uint8_t >( getClass() ),
                                                                   getLevel(), getLevel() - 1 ), true );
 
    auto classInfoPacket = makeZonePacket< FFXIVIpcUpdateClassInfo >( getId() );
@@ -752,7 +752,7 @@ void Core::Entity::Player::setClassJob( Common::ClassJob classJob )
    classInfoPacket->data().level = getLevel();
    queuePacket( classInfoPacket );
 
-   sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( getId(), ClassJobChange, 0x04 ), true );
+   sendToInRangeSet( makeActorControl142( getId(), ClassJobChange, 0x04 ), true );
 
    sendStatusUpdate( true );
 }
@@ -857,7 +857,7 @@ void Core::Entity::Player::despawn( Entity::PlayerPtr pTarget )
 
    pPlayer->freePlayerSpawnId( getId() );
 
-   pPlayer->queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), DespawnZoneScreenMsg, 0x04, getId(), 0x01 ) );
+   pPlayer->queuePacket( makeActorControl143( getId(), DespawnZoneScreenMsg, 0x04, getId(), 0x01 ) );
 }
 
 Core::Entity::ActorPtr Core::Entity::Player::lookupTargetById( uint64_t targetId )
@@ -953,7 +953,7 @@ void Core::Entity::Player::setStateFlag( Common::PlayerStateFlag flag )
    auto newOnlineStatus = getOnlineStatus();
 
    if( prevOnlineStatus != newOnlineStatus )
-      sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( getId(), SetStatusIcon,
+      sendToInRangeSet( makeActorControl142( getId(), SetStatusIcon,
                                                                      static_cast< uint8_t >( getOnlineStatus() ) ), true );
 
 }
@@ -990,8 +990,7 @@ void Core::Entity::Player::unsetStateFlag( Common::PlayerStateFlag flag )
    auto newOnlineStatus = getOnlineStatus();
 
    if( prevOnlineStatus != newOnlineStatus )
-      sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( getId(), SetStatusIcon,
-                                                                     static_cast< uint8_t >( getOnlineStatus() ) ), true );
+      sendToInRangeSet( makeActorControl142( getId(), SetStatusIcon, static_cast< uint8_t >( getOnlineStatus() ) ), true );
 }
 
 void Core::Entity::Player::update( int64_t currTime )
@@ -1032,7 +1031,7 @@ void Core::Entity::Player::update( int64_t currTime )
 
    if( !checkAction() )
    {
-      if( m_targetId && m_currentStance == Entity::Chara::Stance::Active && isAutoattackOn() )
+      if( m_targetId && m_currentStance == Common::Stance::Active && isAutoattackOn() )
       {
          auto mainWeap = getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand );
 
@@ -1104,7 +1103,7 @@ void Core::Entity::Player::setHomepoint( uint8_t aetheryteId )
 {
    m_homePoint = aetheryteId;
 
-   queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), SetHomepoint, aetheryteId ) );
+   queuePacket( makeActorControl143( getId(), SetHomepoint, aetheryteId ) );
 }
 
 /*! get homepoint */
@@ -1364,7 +1363,7 @@ void Core::Entity::Player::setTitle( uint16_t titleId )
 
    m_activeTitle = titleId;
 
-   sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( getId(), SetTitle, titleId ), true );
+   sendToInRangeSet( makeActorControl142( getId(), SetTitle, titleId ), true );
 }
 
 void Core::Entity::Player::setEquipDisplayFlags( uint8_t state )
@@ -1383,8 +1382,9 @@ uint8_t Core::Entity::Player::getEquipDisplayFlags() const
 void Core::Entity::Player::mount( uint32_t id )
 {
    m_mount = id;
-   sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( getId(), ActorControlType::SetStatus, static_cast< uint8_t >( Entity::Chara::ActorStatus::Mounted )), true );
-   sendToInRangeSet( boost::make_shared< ActorControlPacket143 >( getId(), 0x39e, 12 ), true ); //?
+   sendToInRangeSet( makeActorControl142( getId(), ActorControlType::SetStatus,
+                                          static_cast< uint8_t >( Common::ActorStatus::Mounted ) ), true );
+   sendToInRangeSet( makeActorControl143( getId(), 0x39e, 12 ), true ); //?
 
    auto mountPacket = makeZonePacket< FFXIVIpcMount >( getId() );
    mountPacket->data().id = id;
@@ -1393,9 +1393,9 @@ void Core::Entity::Player::mount( uint32_t id )
 
 void Core::Entity::Player::dismount()
 {
-   sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( getId(), ActorControlType::SetStatus,
-                                                                  static_cast< uint8_t >( Entity::Chara::ActorStatus::Idle )), true );
-   sendToInRangeSet( boost::make_shared< ActorControlPacket143 >( getId(), ActorControlType::Dismount, 1 ), true );
+   sendToInRangeSet( makeActorControl142( getId(), ActorControlType::SetStatus,
+                                          static_cast< uint8_t >( Common::ActorStatus::Idle ) ), true );
+   sendToInRangeSet( makeActorControl143( getId(), ActorControlType::Dismount, 1 ), true );
    m_mount = 0;
 }
 
@@ -1541,7 +1541,7 @@ void Core::Entity::Player::sendZonePackets()
 
    if( isLogin() )
    {
-      queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), SetCharaGearParamUI, m_equipDisplayFlags, 1 ) );
+      queuePacket( makeActorControl143( getId(), SetCharaGearParamUI, m_equipDisplayFlags, 1 ) );
    }
 
    // set flags, will be reset automatically by zoning ( only on client side though )
@@ -1623,8 +1623,8 @@ void Core::Entity::Player::sendTitleList()
 
 void Core::Entity::Player::sendZoneInPackets( uint32_t param1, uint32_t param2 = 0, uint32_t param3 = 0, uint32_t param4 = 0, bool shouldSetStatus = false )
 {
-   auto zoneInPacket = boost::make_shared< ActorControlPacket143 >( getId(), ZoneIn, param1, param2, param3, param4 );
-   auto SetStatusPacket = boost::make_shared< ActorControlPacket142 >( getId(), SetStatus, static_cast< uint8_t >( Entity::Chara::ActorStatus::Idle ) );
+   auto zoneInPacket = makeActorControl143( getId(), ZoneIn, param1, param2, param3, param4 );
+   auto SetStatusPacket = makeActorControl142( getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
 
    if( !getGmInvis() )
       sendToInRangeSet( zoneInPacket, true );
@@ -1654,11 +1654,11 @@ void Core::Entity::Player::finishZoning()
       case ZoneingType::Return:
       case ZoneingType::ReturnDead:
       {
-         if( getStatus() == Entity::Chara::ActorStatus::Dead )
+         if( getStatus() == Common::ActorStatus::Dead )
          {
             resetHp();
             resetMp();
-            setStatus( Entity::Chara::ActorStatus::Idle );
+            setStatus( Common::ActorStatus::Idle );
             sendZoneInPackets( 0x01, 0x01, 0, 111, true );
          }
          else
@@ -1673,13 +1673,13 @@ void Core::Entity::Player::finishZoning()
 
 void Core::Entity::Player::emote( uint32_t emoteId, uint64_t targetId, bool isSilent )
 {
-   sendToInRangeSet( boost::make_shared< ActorControlPacket144 >( getId(), ActorControlType::Emote,
-                                                                  emoteId, 0, isSilent ? 1 : 0, 0, targetId ) );
+   sendToInRangeSet( makeActorControl144( getId(), ActorControlType::Emote,
+                                          emoteId, 0, isSilent ? 1 : 0, 0, targetId ) );
 }
 
 void Core::Entity::Player::emoteInterrupt()
 {
-   sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( getId(), ActorControlType::EmoteInterrupt ) );
+   sendToInRangeSet( makeActorControl142( getId(), ActorControlType::EmoteInterrupt ) );
 }
 
 void Core::Entity::Player::teleportQuery( uint16_t aetheryteId )
@@ -1702,7 +1702,7 @@ void Core::Entity::Player::teleportQuery( uint16_t aetheryteId )
 
       bool insufficientGil = getCurrency( Common::CurrencyType::Gil ) < cost;
       // TODO: figure out what param1 really does
-      queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), TeleportStart, insufficientGil ? 2 : 0, aetheryteId ) );
+      queuePacket( makeActorControl143( getId(), TeleportStart, insufficientGil ? 2 : 0, aetheryteId ) );
 
       if( !insufficientGil )
       {

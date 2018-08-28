@@ -26,6 +26,7 @@
 #include "Player.h"
 #include "Zone/TerritoryMgr.h"
 #include "Framework.h"
+#include "Common.h"
 
 extern Core::Framework g_fw;
 
@@ -57,7 +58,7 @@ std::string Core::Entity::Chara::getName() const
 
 
 /*! \return current stance of the actors */
-Core::Entity::Chara::Stance Core::Entity::Chara::getStance() const
+Core::Common::Stance Core::Entity::Chara::getStance() const
 {
    return m_currentStance;
 }
@@ -188,7 +189,7 @@ void Core::Entity::Chara::setInvincibilityType( Common::InvincibilityType type )
 }
 
 /*! \return current status of the actor */
-Core::Entity::Chara::ActorStatus Core::Entity::Chara::getStatus() const
+Core::Common::ActorStatus Core::Entity::Chara::getStatus() const
 {
    return m_status;
 }
@@ -216,15 +217,13 @@ void Core::Entity::Chara::die()
    // if the actor is a player, the update needs to be send to himself too
    bool selfNeedsUpdate = isPlayer();
 
-   FFXIVPacketBasePtr packet
-           = boost::make_shared< ActorControlPacket142 >( m_id, SetStatus, static_cast< uint8_t >( ActorStatus::Dead ) );
+   FFXIVPacketBasePtr packet = makeActorControl142( m_id, SetStatus, static_cast< uint8_t >( ActorStatus::Dead ) );
    sendToInRangeSet( packet, selfNeedsUpdate );
 
    // TODO: not all actor show the death animation when they die, some quest npcs might just despawn
    //       although that might be handled by setting the HP to 1 and doing some script magic
 
-   FFXIVPacketBasePtr packet1
-           = boost::make_shared< ActorControlPacket142 >( m_id, DeathAnimation, 0, 0, 0, 0x20 );
+   FFXIVPacketBasePtr packet1 = makeActorControl142( m_id, DeathAnimation, 0, 0, 0, 0x20 );
    sendToInRangeSet( packet1, selfNeedsUpdate );
 
 }
@@ -258,7 +257,7 @@ void Core::Entity::Chara::setStance( Stance stance )
 {
    m_currentStance = stance;
 
-   FFXIVPacketBasePtr packet = boost::make_shared< ActorControlPacket142 >( m_id, ToggleWeapon, stance, 0 );
+   FFXIVPacketBasePtr packet = makeActorControl142( m_id, ToggleWeapon, stance, 0 );
    sendToInRangeSet( packet );
 }
 
@@ -289,7 +288,7 @@ Change the current target and propagate to in range players
 void Core::Entity::Chara::changeTarget( uint64_t targetId )
 {
    setTargetId( targetId );
-   FFXIVPacketBasePtr packet = boost::make_shared< ActorControlPacket144 >( m_id, SetTarget, 0, 0, 0, 0, targetId );
+   FFXIVPacketBasePtr packet = makeActorControl144( m_id, SetTarget, 0, 0, 0, 0, targetId );
    sendToInRangeSet( packet );
 }
 
@@ -648,7 +647,7 @@ void Core::Entity::Chara::removeStatusEffect( uint8_t effectSlotId )
    auto pEffect = pEffectIt->second;
    pEffect->removeStatus();
 
-   sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( getId(), StatusEffectLose, pEffect->getId() ), isPlayer() );
+   sendToInRangeSet( makeActorControl142( getId(), StatusEffectLose, pEffect->getId() ), isPlayer() );
 
    m_statusEffectMap.erase( effectSlotId );
 
@@ -744,15 +743,15 @@ void Core::Entity::Chara::updateStatusEffects()
    if( thisTickDmg != 0 )
    {
       takeDamage( thisTickDmg );
-      sendToInRangeSet(
-              boost::make_shared< ActorControlPacket142 >( getId(), HPFloatingText, 0, static_cast< uint8_t >( ActionEffectType::Damage ), thisTickDmg ) );
+      sendToInRangeSet( makeActorControl142( getId(), HPFloatingText, 0,
+                                             static_cast< uint8_t >( ActionEffectType::Damage ), thisTickDmg ) );
    }
 
    if( thisTickHeal != 0 )
    {
       heal( thisTickDmg );
-      sendToInRangeSet(
-              boost::make_shared< ActorControlPacket142 >( getId(), HPFloatingText, 0, static_cast< uint8_t >( ActionEffectType::Heal ), thisTickHeal ) );
+      sendToInRangeSet( makeActorControl142( getId(), HPFloatingText, 0,
+                                             static_cast< uint8_t >( ActionEffectType::Heal ), thisTickHeal ) );
    }
 }
 
@@ -763,7 +762,7 @@ bool Core::Entity::Chara::hasStatusEffect( uint32_t id )
    return false;
 }
 
-Core::Common::ObjKind Chara::getModelType() const
+Core::Common::ObjKind Chara::getObjKind() const
 {
    return m_modelType;
 }

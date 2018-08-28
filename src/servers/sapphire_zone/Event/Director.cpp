@@ -43,7 +43,7 @@ uint8_t Core::Event::Director::getSequence() const
 
 void Core::Event::Director::sendDirectorClear( Core::Entity::Player& player ) const
 {
-   player.queuePacket( boost::make_shared< ActorControlPacket143 >( player.getId(), DirectorClear, m_directorId ) );
+   player.queuePacket( makeActorControl143( player.getId(), DirectorClear, m_directorId ) );
 }
 
 void Core::Event::Director::sendDirectorVars( Core::Entity::Player& player ) const
@@ -58,8 +58,7 @@ void Core::Event::Director::sendDirectorVars( Core::Entity::Player& player ) con
 
 void Core::Event::Director::sendDirectorInit( Core::Entity::Player& player ) const
 {
-   player.queuePacket( boost::make_shared< ActorControlPacket143 >( player.getId(), DirectorInit,
-                                                                    m_directorId, m_contentId ) );
+   player.queuePacket( makeActorControl143( player.getId(), DirectorInit, m_directorId, m_contentId ) );
 }
 
 Core::Event::Director::DirectorType Core::Event::Director::getType() const

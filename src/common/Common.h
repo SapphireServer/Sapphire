@@ -63,6 +63,36 @@ namespace Common {
       CardStand = 0x0E,
    };
 
+   enum Stance : uint8_t
+   {
+      Passive = 0,
+      Active = 1,
+   };
+
+   enum class DisplayFlags : uint16_t
+   {
+      ActiveStance = 0x001,
+      Invisible = 0x020,
+      HideHead = 0x040,
+      HideWeapon = 0x080,
+      Faded = 0x100,
+      Visor = 0x800,
+   };
+
+   enum struct ActorStatus : uint8_t
+   {
+      Idle = 0x01,
+      Dead = 0x02,
+      Sitting = 0x03,
+      Mounted = 0x04,
+      Crafting = 0x05,
+      Gathering = 0x06,
+      Melding = 0x07,
+      SMachine = 0x08,
+      Carry = 0x09,
+      EmoteMode = 0x0B
+   };
+
    enum GearSetSlot : uint8_t
    {
       MainHand = 0,

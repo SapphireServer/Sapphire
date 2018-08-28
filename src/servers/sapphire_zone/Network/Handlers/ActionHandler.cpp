@@ -63,7 +63,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::FFXIVARR_PACKE
                         pExdData->get< Core::Data::Action >( action )->name +
                         " | " + std::to_string( targetId ) + " )" );
 
-      player.queuePacket( boost::make_shared< ActorControlPacket142 >( player.getId(), ActorControlType::ActionStart, 0x01, action ) );
+      player.queuePacket( makeActorControl142( player.getId(), ActorControlType::ActionStart, 0x01, action ) );
 
       if( action == 5 )
       {

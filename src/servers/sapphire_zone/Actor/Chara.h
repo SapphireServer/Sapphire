@@ -21,46 +21,6 @@ namespace Entity {
 class Chara : public Actor
 {
 public:
-   enum Stance : uint8_t
-   {
-      Passive = 0,
-      Active = 1,
-   };
-
-   enum DisplayFlags : uint16_t
-   {
-      ActiveStance = 0x001,
-      Invisible = 0x020,
-      HideHead = 0x040,
-      HideWeapon = 0x080,
-      Faded = 0x100,
-      Visor = 0x800,
-   };
-
-   enum struct ActorStatus : uint8_t
-   {
-      Idle = 0x01,
-      Dead = 0x02,
-      Sitting = 0x03,
-      Mounted = 0x04,
-      Crafting = 0x05,
-      Gathering = 0x06,
-      Melding = 0x07,
-      SMachine = 0x08,
-      Carry = 0x09,
-      EmoteMode = 0x0B
-   };
-
-   /*! ModelType as found in eventsystemdefine.exd */
-   enum ModelType : uint8_t
-   {
-      Human = 1,
-      DemiHuman = 2,
-      Monster = 3,
-      SharedGroup = 4,
-      Parts = 5
-   };
-
    struct ActorStats
    {
       uint32_t max_mp = 0;
@@ -115,9 +75,9 @@ protected:
    /*! Last time the actor was updated ( in ms ) */
    uint64_t             m_lastUpdate;
    /*! Current stance of the actor */
-   Stance               m_currentStance;
+   Common::Stance       m_currentStance;
    /*! Current staus of the actor */
-   ActorStatus          m_status;
+   Common::ActorStatus  m_status;
    /*! Max HP of the actor ( based on job / class ) */
    uint32_t             m_maxHp;
    /*! Max MP of the actor ( based on job / class ) */
@@ -184,9 +144,9 @@ public:
 
    bool face( const Common::FFXIVARR_POSITION3& p );
 
-   Stance getStance() const;
+   Common::Stance getStance() const;
 
-   void setStance( Stance stance );
+   void setStance( Common::Stance stance );
 
    ActorStats getStats() const;
 
@@ -199,7 +159,7 @@ public:
 
    Common::ClassJob getClass() const;
 
-   Common::ObjKind getModelType() const;
+   Common::ObjKind getObjKind() const;
 
    uint8_t getClassAsInt() const;
 
@@ -225,9 +185,9 @@ public:
 
    void die();
 
-   ActorStatus getStatus() const;
+   Common::ActorStatus getStatus() const;
 
-   void setStatus( ActorStatus  status );
+   void setStatus( Common::ActorStatus  status );
 
    void handleScriptSkill( uint32_t type, uint16_t actionId, uint64_t param1, uint64_t param2, Entity::Chara& target );
 

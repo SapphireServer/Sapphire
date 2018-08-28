@@ -142,7 +142,7 @@ void Core::Zone::setCurrentFestival( uint16_t festivalId )
    {
       auto player = playerEntry.second;
 
-      auto enableFestival = boost::make_shared< ActorControlPacket143 >( player->getId(), SetFestival, m_currentFestivalId );
+      auto enableFestival = makeActorControl143( player->getId(), SetFestival, m_currentFestivalId );
       playerEntry.second->queuePacket( enableFestival );
    }
 }
