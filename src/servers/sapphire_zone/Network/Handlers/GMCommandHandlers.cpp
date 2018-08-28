@@ -80,6 +80,7 @@ enum GmCommand
    GC = 0x0154,
    GCRank = 0x0155,
    Aetheryte = 0x015E,
+   Wireframe = 0x0226,
    Teri = 0x0258,
    Kick = 0x025C,
    TeriInfo = 0x025D,
@@ -410,6 +411,12 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
          }
       }
 
+      break;
+   }
+   case GmCommand::Wireframe:
+   {
+      player.queuePacket( boost::make_shared< ActorControlPacket143 >( player.getId(), ActorControlType::ToggleWireframeRendering ) );
+      player.sendNotice( "Wireframe Rendering for " + player.getName() + "was toggled" );
       break;
    }
    case GmCommand::Teri:
