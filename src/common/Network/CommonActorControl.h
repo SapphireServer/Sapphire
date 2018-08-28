@@ -197,6 +197,7 @@ namespace Core {
             SetMaxGearSets = 0x230,
 
             SetCharaGearParamUI = 0x260,
+            ToggleWireframeRendering = 0x261,
 
             GearSetEquipMsg = 0x321,
 
