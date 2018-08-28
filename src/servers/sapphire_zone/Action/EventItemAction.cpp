@@ -96,8 +96,7 @@ void Core::Action::EventItemAction::onInterrupt()
    try
    {
 
-      auto control = boost::make_shared< ActorControlPacket142 >( m_pSource->getId(), ActorControlType::CastInterrupt,
-                                                                  0x219, 0x04, m_id );
+      auto control = makeActorControl142( m_pSource->getId(), ActorControlType::CastInterrupt, 0x219, 0x04, m_id );
       if( m_pSource->isPlayer() )
       {
          m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Casting );

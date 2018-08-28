@@ -208,7 +208,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
    }
    case GmCommand::Speed:
    {
-      targetPlayer->queuePacket( boost::make_shared< ActorControlPacket143 >( player.getId(), Flee, param1 ) );
+      targetPlayer->queuePacket( makeActorControl143( player.getId(), Flee, param1 ) );
       player.sendNotice( "Speed for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
       break;
    }
@@ -245,7 +245,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
       strcpy( searchInfoPacket->data().searchMessage, targetPlayer->getSearchMessage() );
       targetPlayer->queuePacket( searchInfoPacket );
 
-      targetPlayer->sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( player.getId(), SetStatusIcon,
+      targetPlayer->sendToInRangeSet( makeActorControl142( player.getId(), SetStatusIcon,
          static_cast< uint8_t >( player.getOnlineStatus() ) ),
          true );
       player.sendNotice( "Icon for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
@@ -529,13 +529,14 @@ void Core::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACKET_R
    {
       targetPlayer->resetHp();
       targetPlayer->resetMp();
-      targetPlayer->setStatus( Entity::Chara::ActorStatus::Idle );
+      targetPlayer->setStatus( Common::ActorStatus::Idle );
       targetPlayer->sendZoneInPackets( 0x01, 0x01, 0, 113, true );
 
-      targetPlayer->sendToInRangeSet( boost::make_shared< ActorControlPacket143 >( player.getId(), ZoneIn, 0x01, 0x01, 0, 113 ), true );
-      targetPlayer->sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( player.getId(), SetStatus,
-         static_cast< uint8_t >( Entity::Chara::ActorStatus::Idle ) ), true );
-      player.sendNotice( "Raised  " + targetPlayer->getName() );
+
+      targetPlayer->sendToInRangeSet( makeActorControl143( player.getId(), ZoneIn, 0x01, 0x01, 0, 113 ), true );
+      targetPlayer->sendToInRangeSet( makeActorControl142( player.getId(), SetStatus,
+                                                           static_cast< uint8_t >( Common::ActorStatus::Idle ) ), true );
+      player.sendNotice( "Raised " + targetPlayer->getName() );
       break;
    }
    case GmCommand::Jump:
@@ -545,7 +546,7 @@ void Core::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACKET_R
          player.setZone( targetPlayer->getZoneId() );
       }
       player.changePosition( targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z,
-         targetActor->getRot() );
+                             targetActor->getRot() );
       player.sendNotice( "Jumping to " + targetPlayer->getName() );
       break;
    }

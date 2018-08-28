@@ -69,14 +69,14 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
        case ClientTriggerType::ToggleSheathe:  // Toggle sheathe
        {
           if ( param11 == 1 )
-              player.setStance( Entity::Chara::Stance::Active );
+              player.setStance( Common::Stance::Active );
           else
           {
-              player.setStance( Entity::Chara::Stance::Passive );
+              player.setStance( Common::Stance::Passive );
               player.setAutoattack( false );
           }
 
-          player.sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( player.getId(), 0, param11, 1 ) );
+          player.sendToInRangeSet( makeActorControl142( player.getId(), 0, param11, 1 ) );
 
           break;
        }
@@ -85,12 +85,12 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
           if ( param11 == 1 )
           {
               player.setAutoattack( true );
-              player.setStance( Entity::Chara::Stance::Active );
+              player.setStance( Common::Stance::Active );
           }
           else
               player.setAutoattack( false );
 
-          player.sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( player.getId(), 1, param11, 1 ) );
+          player.sendToInRangeSet( makeActorControl142( player.getId(), 1, param11, 1 ) );
 
           break;
        }
@@ -156,19 +156,19 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
 
           if( isPersistent )
           {
-             player.setStance( Entity::Chara::Stance::Passive );
+             player.setStance( Common::Stance::Passive );
              player.setAutoattack( false );
              player.setPersistentEmote( emoteData->emoteMode );
-             player.setStatus( Entity::Chara::ActorStatus::EmoteMode );
+             player.setStatus( Common::ActorStatus::EmoteMode );
 
-             player.sendToInRangeSet(
-                     boost::make_shared< ActorControlPacket142 >( player.getId(), ActorControlType::SetStatus,
-                                                                  static_cast< uint8_t >( Entity::Chara::ActorStatus::EmoteMode ), emoteData->hasCancelEmote ? 1 : 0 ), true );
+             player.sendToInRangeSet( makeActorControl142( player.getId(), ActorControlType::SetStatus,
+                                                           static_cast< uint8_t >( Common::ActorStatus::EmoteMode ),
+                                                           emoteData->hasCancelEmote ? 1 : 0 ), true );
           }
 
           if( emoteData->drawsWeapon )
           {
-             player.setStance( Entity::Chara::Stance::Active );
+             player.setStance( Common::Stance::Active );
           }
 
           break;
@@ -182,10 +182,9 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
        {
           player.setPersistentEmote( 0 );
           player.emoteInterrupt();
-          player.setStatus( Entity::Chara::ActorStatus::Idle );
-          auto pSetStatusPacket = boost::make_shared< ActorControlPacket142 >( player.getId(),
-                                                                              SetStatus,
-                                                                              static_cast< uint8_t >( Entity::Chara::ActorStatus::Idle ) );
+          player.setStatus( Common::ActorStatus::Idle );
+          auto pSetStatusPacket = makeActorControl142( player.getId(), SetStatus,
+                                                       static_cast< uint8_t >( Common::ActorStatus::Idle ) );
           player.sendToInRangeSet( pSetStatusPacket );
           break;
        }
@@ -193,18 +192,14 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
        case ClientTriggerType::PoseReapply: // reapply pose
        {
           player.setPose( param12 );
-          auto pSetStatusPacket = boost::make_shared< ActorControlPacket142 >( player.getId(),
-                                                                               SetPose,
-                                                                               param11, param12 );
+          auto pSetStatusPacket = makeActorControl142( player.getId(), SetPose, param11, param12 );
           player.sendToInRangeSet( pSetStatusPacket, true );
           break;
        }
        case ClientTriggerType::PoseCancel: // cancel pose
        {
           player.setPose( param12 );
-          auto pSetStatusPacket = boost::make_shared< ActorControlPacket142 >( player.getId(),
-                                                                               SetPose,
-                                                                               param11, param12 );
+          auto pSetStatusPacket = makeActorControl142( player.getId(), SetPose, param11, param12 );
           player.sendToInRangeSet( pSetStatusPacket, true );
           break;
        }

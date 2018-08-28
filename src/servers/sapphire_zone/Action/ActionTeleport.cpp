@@ -81,7 +81,7 @@ void Core::Action::ActionTeleport::onFinish()
    pPlayer->unsetStateFlag( PlayerStateFlag::Casting );
 
    // TODO: not sure if this ever gets sent
-   //auto control = Network::Packets::Server::ActorControlPacket142( m_pSource->getId(), Common::ActorControlType::TeleportDone );
+   //auto control = makeActorControl142( m_pSource->getId(), Common::ActorControlType::TeleportDone );
    //m_pSource->sendToInRangeSet( control, false );
 
    pPlayer->setZoningType( ZoneingType::Teleport );
@@ -101,8 +101,7 @@ void Core::Action::ActionTeleport::onInterrupt()
 
    m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Casting );
 
-   auto control = boost::make_shared< ActorControlPacket142 >( m_pSource->getId(), ActorControlType::CastInterrupt,
-                                                               0x219, 0x04, m_id, 0 );
+   auto control = makeActorControl142( m_pSource->getId(), ActorControlType::CastInterrupt, 0x219, 0x04, m_id, 0 );
    m_pSource->sendToInRangeSet( control, true );
 
 }

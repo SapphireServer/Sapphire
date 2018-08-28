@@ -112,7 +112,7 @@ void Core::Entity::Player::initInventory()
 
 void Core::Entity::Player::sendItemLevel()
 {
-   queuePacket( boost::make_shared< ActorControlPacket142 >( getId(), SetItemLevel, getItemLevel(), 0 ) );
+   queuePacket( makeActorControl142( getId(), SetItemLevel, getItemLevel(), 0 ) );
 }
 
 void Core::Entity::Player::equipWeapon( ItemPtr pItem )
@@ -259,8 +259,7 @@ void Core::Entity::Player::addCrystal( Common::CrystalType type, uint32_t amount
                                                                      Common::InventoryType::Crystal,
                                                                      *currItem );
    queuePacket( invUpdate );
-   queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), ItemObtainIcon,
-                                                             static_cast< uint8_t >( type ) + 1, amount ) );
+   queuePacket( makeActorControl143( getId(), ItemObtainIcon, static_cast< uint8_t >( type ) + 1, amount ) );
 }
 
 void Core::Entity::Player::removeCrystal( Common::CrystalType type, uint32_t amount )
@@ -520,7 +519,7 @@ Core::ItemPtr Core::Entity::Player::addItem( uint32_t catalogId, uint32_t quanti
             // return existing stack if we have no overflow - items fit into a preexisting stack
             if( quantity == 0 )
             {
-               queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), ItemObtainIcon, catalogId, originalQuantity ) );
+               queuePacket( makeActorControl143( getId(), ItemObtainIcon, catalogId, originalQuantity ) );
 
                return item;
             }
@@ -551,7 +550,7 @@ Core::ItemPtr Core::Entity::Player::addItem( uint32_t catalogId, uint32_t quanti
       auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(), freeBagSlot.second, freeBagSlot.first, *item );
       queuePacket( invUpdate );
 
-      queuePacket( boost::make_shared< ActorControlPacket143 >( getId(), ItemObtainIcon, catalogId, originalQuantity ) );
+      queuePacket( makeActorControl143( getId(), ItemObtainIcon, catalogId, originalQuantity ) );
    }
 
    return item;

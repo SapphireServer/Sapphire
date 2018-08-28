@@ -44,6 +44,12 @@ private:
    };
 };
 
+template< typename... Args >
+boost::shared_ptr< ActorControlPacket143 > makeActorControl143( Args... args )
+{
+   return boost::make_shared< ActorControlPacket143 >( args... );
+}
+
 }
 }
 }

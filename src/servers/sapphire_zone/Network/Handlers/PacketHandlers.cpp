@@ -91,8 +91,8 @@ void Core::Network::GameConnection::setSearchInfoHandler( const Packets::FFXIVAR
    strcpy( searchInfoPacket->data().searchMessage, player.getSearchMessage() );
    queueOutPacket( searchInfoPacket );
 
-   player.sendToInRangeSet( boost::make_shared< ActorControlPacket142 >( player.getId(), SetStatusIcon,
-                                                   static_cast< uint8_t >( player.getOnlineStatus() ) ), true );
+   player.sendToInRangeSet( makeActorControl142( player.getId(), SetStatusIcon,
+                                                 static_cast< uint8_t >( player.getOnlineStatus() ) ), true );
 }
 
 void Core::Network::GameConnection::reqSearchInfoHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
