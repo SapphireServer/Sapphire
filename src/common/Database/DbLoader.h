@@ -8,44 +8,43 @@
 #include <string>
 #include "DbConnection.h"
 
-namespace Core
+namespace Core {
+namespace Db {
+
+template< class T >
+class DbWorkerPool;
+
+class DbLoader
 {
-   namespace Db
-   {
+public:
+  DbLoader();
 
-   template< class T >
-   class DbWorkerPool;
+  template< class T >
+  DbLoader& addDb( DbWorkerPool< T >& pool, const ConnectionInfo& info );
 
-   class DbLoader
-   {
-   public:
-      DbLoader();
+  bool initDbs();
 
-      template< class T >
-      DbLoader& addDb( DbWorkerPool< T >& pool, const ConnectionInfo& info );
+  enum DbTypeFlags
+  {
+    DATABASE_NONE = 0,
+    DATABASE_CHARACTER = 1,
+    DATABASE_MASK_ALL = DATABASE_CHARACTER
+  };
 
-      bool initDbs();
+private:
+  bool openDatabases();
 
-      enum DbTypeFlags
-      {
-         DATABASE_NONE        = 0,
-         DATABASE_CHARACTER   = 1,
-         DATABASE_MASK_ALL    = DATABASE_CHARACTER
-      };
+  bool prepareStatements();
 
-   private:
-      bool openDatabases();
-      bool prepareStatements();
+  using Predicate = std::function< bool() >;
+  using Closer = std::function< void() >;
 
-      using Predicate = std::function< bool() >;
-      using Closer = std::function< void() >;
+  bool process( std::queue< Predicate >& queue );
 
-      bool process( std::queue< Predicate >& queue );
-
-      std::queue< Predicate > m_open;
-      std::queue< Predicate > m_prepare;
-      std::stack< Closer > m_close;
-   };
+  std::queue< Predicate > m_open;
+  std::queue< Predicate > m_prepare;
+  std::stack< Closer > m_close;
+};
 }
 }
 

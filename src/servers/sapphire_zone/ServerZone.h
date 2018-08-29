@@ -11,49 +11,53 @@
 
 namespace Core {
 
-   class ServerZone
-   {
-   public:
-      ServerZone( const std::string& configName );
-      ~ServerZone();
+class ServerZone
+{
+public:
+  ServerZone( const std::string& configName );
 
-      void run( int32_t argc, char* argv[] );
+  ~ServerZone();
 
-      bool createSession( uint32_t sessionId );
-      void removeSession( uint32_t sessionId );
-      void removeSession( std::string playerName );
+  void run( int32_t argc, char* argv[] );
 
-      bool loadSettings( int32_t argc, char* argv[] );
+  bool createSession( uint32_t sessionId );
 
-      SessionPtr getSession( uint32_t id );
-      SessionPtr getSession( std::string playerName );
+  void removeSession( uint32_t sessionId );
 
-      size_t getSessionCount() const;
+  void removeSession( std::string playerName );
 
-      void mainLoop();
+  bool loadSettings( int32_t argc, char* argv[] );
 
-      bool isRunning() const;
+  SessionPtr getSession( uint32_t id );
 
-      void printBanner() const;
+  SessionPtr getSession( std::string playerName );
 
-   private:
+  size_t getSessionCount() const;
 
-      uint16_t m_port;
-      std::string m_ip;
-      int64_t m_lastDBPingTime;
+  void mainLoop();
 
-      bool m_bRunning;
+  bool isRunning() const;
 
-      std::string m_configName;
+  void printBanner() const;
 
-      std::mutex m_sessionMutex;
+private:
 
-      std::map< uint32_t, SessionPtr > m_sessionMapById;
-      std::map< std::string, SessionPtr > m_sessionMapByName;
+  uint16_t m_port;
+  std::string m_ip;
+  int64_t m_lastDBPingTime;
 
-      std::map< uint32_t, uint32_t > m_zones;
+  bool m_bRunning;
 
-   };
+  std::string m_configName;
+
+  std::mutex m_sessionMutex;
+
+  std::map< uint32_t, SessionPtr > m_sessionMapById;
+  std::map< std::string, SessionPtr > m_sessionMapByName;
+
+  std::map< uint32_t, uint32_t > m_zones;
+
+};
 
 }
 

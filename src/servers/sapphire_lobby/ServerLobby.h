@@ -11,45 +11,49 @@
 
 const std::string LOBBY_VERSION = "0.0.5";
 
-namespace Core
+namespace Core {
+class LobbySession;
+
+class ConfigMgr;
+
+typedef std::map< std::string, LobbySessionPtr > LobbySessionMap;
+
+class ServerLobby
 {
-   class LobbySession;
-   class ConfigMgr;
-   typedef std::map< std::string, LobbySessionPtr > LobbySessionMap;
 
-   class ServerLobby
-   {
+  friend class LobbyConnection;
 
-      friend class LobbyConnection;
-   private:
+private:
 
-      LobbySessionMap m_sessionMap;
-      std::string m_configPath;
+  LobbySessionMap m_sessionMap;
+  std::string m_configPath;
 
-      uint16_t m_port;
-      std::string m_ip;
+  uint16_t m_port;
+  std::string m_ip;
 
-      boost::shared_ptr< ConfigMgr > m_pConfig;
+  boost::shared_ptr< ConfigMgr > m_pConfig;
 
-   public:
-      ServerLobby( const std::string& configPath );
-      ~ServerLobby( void );
+public:
+  ServerLobby( const std::string& configPath );
 
-      void run( int32_t argc, char* argv[] );
+  ~ServerLobby( void );
 
-      bool loadSettings( int32_t argc, char* argv[] );
+  void run( int32_t argc, char* argv[] );
 
-      void addSession( char* sessionId, LobbySessionPtr pSession )
-      {
-         m_sessionMap[std::string( sessionId )] = pSession;
-      }
-      
-      boost::shared_ptr< ConfigMgr > getConfig() const;
+  bool loadSettings( int32_t argc, char* argv[] );
 
-      LobbySessionPtr getSession( char* sessionId );
-      uint32_t m_numConnections;
+  void addSession( char* sessionId, LobbySessionPtr pSession )
+  {
+    m_sessionMap[ std::string( sessionId ) ] = pSession;
+  }
 
-   };
+  boost::shared_ptr< ConfigMgr > getConfig() const;
+
+  LobbySessionPtr getSession( char* sessionId );
+
+  uint32_t m_numConnections;
+
+};
 
 
 }

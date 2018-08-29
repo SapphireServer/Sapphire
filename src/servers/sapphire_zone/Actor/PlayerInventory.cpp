@@ -41,742 +41,743 @@ using namespace Core::Network::Packets::Server;
 using namespace Core::Network::ActorControl;
 
 
-
-
 void Core::Entity::Player::initInventory()
 {
-   auto setupContainer = [this]( InventoryType type, uint8_t maxSize, const std::string& tableName, bool isMultiStorage, bool isPersistentStorage = true )
-   { m_storageMap[type] = make_ItemContainer( type, maxSize, tableName, isMultiStorage, isPersistentStorage ); };
+  auto setupContainer = [ this ]( InventoryType type, uint8_t maxSize, const std::string& tableName,
+                                  bool isMultiStorage, bool isPersistentStorage = true )
+  { m_storageMap[ type ] = make_ItemContainer( type, maxSize, tableName, isMultiStorage, isPersistentStorage ); };
 
-   // main bags
-   setupContainer( Bag0, 34, "charaiteminventory", true );
-   setupContainer( Bag1, 34, "charaiteminventory", true );
-   setupContainer( Bag2, 34, "charaiteminventory", true );
-   setupContainer( Bag3, 34, "charaiteminventory", true );
+  // main bags
+  setupContainer( Bag0, 34, "charaiteminventory", true );
+  setupContainer( Bag1, 34, "charaiteminventory", true );
+  setupContainer( Bag2, 34, "charaiteminventory", true );
+  setupContainer( Bag3, 34, "charaiteminventory", true );
 
-   // gear set
-   setupContainer( GearSet0, 13, "charaitemgearset", true );
+  // gear set
+  setupContainer( GearSet0, 13, "charaitemgearset", true );
 
-   // gil contianer
-   setupContainer( Currency, 11, "charaiteminventory", true );
+  // gil contianer
+  setupContainer( Currency, 11, "charaiteminventory", true );
 
-   // crystals??
-   setupContainer( Crystal, 11, "charaiteminventory", true );
+  // crystals??
+  setupContainer( Crystal, 11, "charaiteminventory", true );
 
-   // armory weapons - 0
-   setupContainer( ArmoryMain, 34, "charaiteminventory", true );
+  // armory weapons - 0
+  setupContainer( ArmoryMain, 34, "charaiteminventory", true );
 
-   // armory offhand - 1
-   setupContainer( ArmoryOff, 34, "charaiteminventory", true );
+  // armory offhand - 1
+  setupContainer( ArmoryOff, 34, "charaiteminventory", true );
 
-   //armory head - 2
-   setupContainer( ArmoryHead, 34, "charaiteminventory", true );
+  //armory head - 2
+  setupContainer( ArmoryHead, 34, "charaiteminventory", true );
 
-   //armory body - 3
-   setupContainer( ArmoryBody, 34, "charaiteminventory", true );
+  //armory body - 3
+  setupContainer( ArmoryBody, 34, "charaiteminventory", true );
 
-   //armory hand - 4
-   setupContainer( ArmoryHand, 34, "charaiteminventory", true );
+  //armory hand - 4
+  setupContainer( ArmoryHand, 34, "charaiteminventory", true );
 
-   //armory waist - 5
-   setupContainer( ArmoryWaist, 34, "charaiteminventory", true );
+  //armory waist - 5
+  setupContainer( ArmoryWaist, 34, "charaiteminventory", true );
 
-   //armory legs - 6
-   setupContainer( ArmoryLegs, 34, "charaiteminventory", true );
+  //armory legs - 6
+  setupContainer( ArmoryLegs, 34, "charaiteminventory", true );
 
-   //armory feet - 7
-   setupContainer( ArmoryFeet, 34, "charaiteminventory", true );
+  //armory feet - 7
+  setupContainer( ArmoryFeet, 34, "charaiteminventory", true );
 
-   //neck
-   setupContainer( ArmoryNeck, 34, "charaiteminventory", true );
+  //neck
+  setupContainer( ArmoryNeck, 34, "charaiteminventory", true );
 
-   //earring
-   setupContainer( ArmoryEar, 34, "charaiteminventory", true );
+  //earring
+  setupContainer( ArmoryEar, 34, "charaiteminventory", true );
 
-   //wrist
-   setupContainer( ArmoryWrist, 34, "charaiteminventory", true );
+  //wrist
+  setupContainer( ArmoryWrist, 34, "charaiteminventory", true );
 
-   //armory rings - 11
-   setupContainer( ArmoryRing, 34, "charaiteminventory", true );
+  //armory rings - 11
+  setupContainer( ArmoryRing, 34, "charaiteminventory", true );
 
-   //soul crystals - 13
-   setupContainer( ArmorySoulCrystal, 34, "charaiteminventory", true );
+  //soul crystals - 13
+  setupContainer( ArmorySoulCrystal, 34, "charaiteminventory", true );
 
-   // item hand in container
-   // non-persistent container, will not save its contents
-   setupContainer( HandIn, 10, "", true, false );
+  // item hand in container
+  // non-persistent container, will not save its contents
+  setupContainer( HandIn, 10, "", true, false );
 
-   loadInventory();
+  loadInventory();
 
 }
 
 void Core::Entity::Player::sendItemLevel()
 {
-   queuePacket( makeActorControl142( getId(), SetItemLevel, getItemLevel(), 0 ) );
+  queuePacket( makeActorControl142( getId(), SetItemLevel, getItemLevel(), 0 ) );
 }
 
 void Core::Entity::Player::equipWeapon( ItemPtr pItem )
 {
-   auto exdData = g_fw.get< Core::Data::ExdDataGenerated >();
-   if( !exdData )
-      return;
+  auto exdData = g_fw.get< Core::Data::ExdDataGenerated >();
+  if( !exdData )
+    return;
 
-   auto itemInfo = exdData->get< Core::Data::Item >( pItem->getId() );
-   auto itemClassJob = itemInfo->classJobUse;
+  auto itemInfo = exdData->get< Core::Data::Item >( pItem->getId() );
+  auto itemClassJob = itemInfo->classJobUse;
 
-   auto currentClass = getClass();
-   auto newClassJob = static_cast< ClassJob >( itemClassJob );
+  auto currentClass = getClass();
+  auto newClassJob = static_cast< ClassJob >( itemClassJob );
 
-   if( isClassJobUnlocked( newClassJob ) )
-      return;
+  if( isClassJobUnlocked( newClassJob ) )
+    return;
 
-   // todo: check if soul crystal is equipped and use job instead
+  // todo: check if soul crystal is equipped and use job instead
 
-   setClassJob( newClassJob );
+  setClassJob( newClassJob );
 }
 
 // equip an item
 void Core::Entity::Player::equipItem( Common::GearSetSlot equipSlotId, ItemPtr pItem, bool sendUpdate )
 {
 
-   //g_framework.getLogger().debug( "Equipping into slot " + std::to_string( equipSlotId ) );
+  //g_framework.getLogger().debug( "Equipping into slot " + std::to_string( equipSlotId ) );
 
-   uint64_t model = pItem->getModelId1();
-   uint64_t model2 = pItem->getModelId2();
+  uint64_t model = pItem->getModelId1();
+  uint64_t model2 = pItem->getModelId2();
 
-   switch( equipSlotId )
-   {
-   case Common::GearSetSlot::MainHand:
+  switch( equipSlotId )
+  {
+    case Common::GearSetSlot::MainHand:
       m_modelMainWeapon = model;
       m_modelSubWeapon = model2;
       // TODO: add job change upon changing weapon if needed
       // equipWeapon( pItem );
       break;
 
-   case Common::GearSetSlot::OffHand:
+    case Common::GearSetSlot::OffHand:
       m_modelSubWeapon = model;
       break;
 
-   case Common::GearSetSlot::SoulCrystal:
+    case Common::GearSetSlot::SoulCrystal:
       // TODO: add Job change on equipping crystal
       // change job
       break;
 
-   default: // any other slot
-      m_modelEquip[static_cast< uint8_t >( equipSlotId )] = static_cast< uint32_t >( model );
+    default: // any other slot
+      m_modelEquip[ static_cast< uint8_t >( equipSlotId ) ] = static_cast< uint32_t >( model );
       break;
 
-   }
+  }
 
-   if( sendUpdate )
-   { 
-      this->sendModel();
-      m_itemLevel = calculateEquippedGearItemLevel();
-      sendItemLevel();
-   }
+  if( sendUpdate )
+  {
+    this->sendModel();
+    m_itemLevel = calculateEquippedGearItemLevel();
+    sendItemLevel();
+  }
 }
 
 void Core::Entity::Player::unequipItem( Common::GearSetSlot equipSlotId, ItemPtr pItem )
 {
-   m_modelEquip[static_cast< uint8_t >( equipSlotId )] = 0;
-   sendModel();
+  m_modelEquip[ static_cast< uint8_t >( equipSlotId ) ] = 0;
+  sendModel();
 
-   m_itemLevel = calculateEquippedGearItemLevel();
-   sendItemLevel();
+  m_itemLevel = calculateEquippedGearItemLevel();
+  sendItemLevel();
 }
 
 // TODO: these next functions are so similar that they could likely be simplified
 void Core::Entity::Player::addCurrency( CurrencyType type, uint32_t amount )
 {
-   auto slot = static_cast< uint8_t >( static_cast< uint8_t >( type ) - 1 );
-   auto currItem = m_storageMap[Currency]->getItem( slot );
+  auto slot = static_cast< uint8_t >( static_cast< uint8_t >( type ) - 1 );
+  auto currItem = m_storageMap[ Currency ]->getItem( slot );
 
-   if( !currItem )
-   {
-      // TODO: map currency type to itemid
-      currItem = createItem( 1 );
-      m_storageMap[Currency]->setItem( slot, currItem );
-   }
+  if( !currItem )
+  {
+    // TODO: map currency type to itemid
+    currItem = createItem( 1 );
+    m_storageMap[ Currency ]->setItem( slot, currItem );
+  }
 
-   uint32_t currentAmount = currItem->getStackSize();
-   currItem->setStackSize( currentAmount + amount );
-   writeItem( currItem );
+  uint32_t currentAmount = currItem->getStackSize();
+  currItem->setStackSize( currentAmount + amount );
+  writeItem( currItem );
 
-   updateContainer( Currency, slot, currItem );
+  updateContainer( Currency, slot, currItem );
 
-   auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
-                                                                     static_cast< uint8_t >( type ) - 1,
-                                                                     Common::InventoryType::Currency,
-                                                                     *currItem );
-   queuePacket( invUpdate );
+  auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
+                                                                    static_cast< uint8_t >( type ) - 1,
+                                                                    Common::InventoryType::Currency,
+                                                                    *currItem );
+  queuePacket( invUpdate );
 }
 
 void Core::Entity::Player::removeCurrency( Common::CurrencyType type, uint32_t amount )
 {
 
-   auto currItem = m_storageMap[Currency]->getItem( static_cast< uint8_t >( type ) - 1 );
+  auto currItem = m_storageMap[ Currency ]->getItem( static_cast< uint8_t >( type ) - 1 );
 
-   if( !currItem )
-      return;
+  if( !currItem )
+    return;
 
-   uint32_t currentAmount = currItem->getStackSize();
-   if( amount > currentAmount )
-      currItem->setStackSize( 0 );
-   else
-      currItem->setStackSize( currentAmount - amount );
-   writeItem( currItem );
+  uint32_t currentAmount = currItem->getStackSize();
+  if( amount > currentAmount )
+    currItem->setStackSize( 0 );
+  else
+    currItem->setStackSize( currentAmount - amount );
+  writeItem( currItem );
 
-   auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
-                                                                     static_cast< uint8_t >( type ) - 1,
-                                                                     Common::InventoryType::Currency,
-                                                                     *currItem );
-   queuePacket( invUpdate );
+  auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
+                                                                    static_cast< uint8_t >( type ) - 1,
+                                                                    Common::InventoryType::Currency,
+                                                                    *currItem );
+  queuePacket( invUpdate );
 }
 
 
 void Core::Entity::Player::addCrystal( Common::CrystalType type, uint32_t amount )
 {
-   auto currItem = m_storageMap[Crystal]->getItem( static_cast< uint8_t >( type ) - 1 );
+  auto currItem = m_storageMap[ Crystal ]->getItem( static_cast< uint8_t >( type ) - 1 );
 
-   if( !currItem )
-   {
-      // TODO: map currency type to itemid
-      currItem = createItem( static_cast< uint8_t >( type ) + 1 );
-      m_storageMap[Crystal]->setItem( static_cast< uint8_t >( type ) - 1, currItem );
-   }
+  if( !currItem )
+  {
+    // TODO: map currency type to itemid
+    currItem = createItem( static_cast< uint8_t >( type ) + 1 );
+    m_storageMap[ Crystal ]->setItem( static_cast< uint8_t >( type ) - 1, currItem );
+  }
 
-   uint32_t currentAmount = currItem->getStackSize();
+  uint32_t currentAmount = currItem->getStackSize();
 
-   currItem->setStackSize( currentAmount + amount );
+  currItem->setStackSize( currentAmount + amount );
 
-   writeItem( currItem );
+  writeItem( currItem );
 
-   writeInventory( Crystal );
+  writeInventory( Crystal );
 
 
-   auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
-                                                                     static_cast< uint8_t >( type ) - 1,
-                                                                     Common::InventoryType::Crystal,
-                                                                     *currItem );
-   queuePacket( invUpdate );
-   queuePacket( makeActorControl143( getId(), ItemObtainIcon, static_cast< uint8_t >( type ) + 1, amount ) );
+  auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
+                                                                    static_cast< uint8_t >( type ) - 1,
+                                                                    Common::InventoryType::Crystal,
+                                                                    *currItem );
+  queuePacket( invUpdate );
+  queuePacket( makeActorControl143( getId(), ItemObtainIcon, static_cast< uint8_t >( type ) + 1, amount ) );
 }
 
 void Core::Entity::Player::removeCrystal( Common::CrystalType type, uint32_t amount )
 {
-   auto currItem = m_storageMap[Crystal]->getItem( static_cast< uint8_t >( type ) - 1 );
+  auto currItem = m_storageMap[ Crystal ]->getItem( static_cast< uint8_t >( type ) - 1 );
 
-   if( !currItem )
-      return;
+  if( !currItem )
+    return;
 
-   uint32_t currentAmount = currItem->getStackSize();
-   if( amount > currentAmount )
-      currItem->setStackSize( 0 );
-   else
-      currItem->setStackSize( currentAmount - amount );
+  uint32_t currentAmount = currItem->getStackSize();
+  if( amount > currentAmount )
+    currItem->setStackSize( 0 );
+  else
+    currItem->setStackSize( currentAmount - amount );
 
-   writeItem( currItem );
+  writeItem( currItem );
 
-   auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
-                                                                     static_cast< uint8_t >( type ) - 1,
-                                                                     Common::InventoryType::Crystal,
-                                                                     *currItem );
-   queuePacket( invUpdate );
+  auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
+                                                                    static_cast< uint8_t >( type ) - 1,
+                                                                    Common::InventoryType::Crystal,
+                                                                    *currItem );
+  queuePacket( invUpdate );
 }
 
 void Core::Entity::Player::sendInventory()
 {
-   InventoryMap::iterator it;
+  InventoryMap::iterator it;
 
-   int32_t count = 0;
-   for( it = m_storageMap.begin(); it != m_storageMap.end(); ++it, count++ )
-   {
+  int32_t count = 0;
+  for( it = m_storageMap.begin(); it != m_storageMap.end(); ++it, count++ )
+  {
 
-      auto pMap = it->second->getItemMap();
-      auto itM = pMap.begin();
+    auto pMap = it->second->getItemMap();
+    auto itM = pMap.begin();
 
-      for( ; itM != pMap.end(); ++itM )
+    for( ; itM != pMap.end(); ++itM )
+    {
+      if( !itM->second )
+        return;
+
+      if( it->second->getId() == InventoryType::Currency || it->second->getId() == InventoryType::Crystal )
       {
-         if( !itM->second )
-            return;
-
-         if( it->second->getId() == InventoryType::Currency || it->second->getId() == InventoryType::Crystal )
-         {
-            auto currencyInfoPacket = makeZonePacket< FFXIVIpcCurrencyCrystalInfo >( getId() );
-            currencyInfoPacket->data().sequence = count;
-            currencyInfoPacket->data().catalogId = itM->second->getId();
-            currencyInfoPacket->data().unknown = 1;
-            currencyInfoPacket->data().quantity = itM->second->getStackSize();
-            currencyInfoPacket->data().containerId = it->second->getId();
-            currencyInfoPacket->data().slot = 0;
-            queuePacket( currencyInfoPacket );
-         }
-         else
-         {
-            auto itemInfoPacket = makeZonePacket< FFXIVIpcItemInfo >( getId() );
-            itemInfoPacket->data().sequence = count;
-            itemInfoPacket->data().containerId = it->second->getId();
-            itemInfoPacket->data().slot = itM->first;
-            itemInfoPacket->data().quantity = itM->second->getStackSize();
-            itemInfoPacket->data().catalogId = itM->second->getId();
-            itemInfoPacket->data().condition = 30000;
-            itemInfoPacket->data().spiritBond = 0;
-            itemInfoPacket->data().hqFlag = itM->second->isHq() ? 1 : 0;
-            queuePacket( itemInfoPacket );
-         }
+        auto currencyInfoPacket = makeZonePacket< FFXIVIpcCurrencyCrystalInfo >( getId() );
+        currencyInfoPacket->data().sequence = count;
+        currencyInfoPacket->data().catalogId = itM->second->getId();
+        currencyInfoPacket->data().unknown = 1;
+        currencyInfoPacket->data().quantity = itM->second->getStackSize();
+        currencyInfoPacket->data().containerId = it->second->getId();
+        currencyInfoPacket->data().slot = 0;
+        queuePacket( currencyInfoPacket );
       }
+      else
+      {
+        auto itemInfoPacket = makeZonePacket< FFXIVIpcItemInfo >( getId() );
+        itemInfoPacket->data().sequence = count;
+        itemInfoPacket->data().containerId = it->second->getId();
+        itemInfoPacket->data().slot = itM->first;
+        itemInfoPacket->data().quantity = itM->second->getStackSize();
+        itemInfoPacket->data().catalogId = itM->second->getId();
+        itemInfoPacket->data().condition = 30000;
+        itemInfoPacket->data().spiritBond = 0;
+        itemInfoPacket->data().hqFlag = itM->second->isHq() ? 1 : 0;
+        queuePacket( itemInfoPacket );
+      }
+    }
 
-      auto containerInfoPacket = makeZonePacket< FFXIVIpcContainerInfo >( getId() );
-      containerInfoPacket->data().sequence = count;
-      containerInfoPacket->data().numItems = it->second->getEntryCount();
-      containerInfoPacket->data().containerId = it->second->getId();
-      queuePacket( containerInfoPacket );
+    auto containerInfoPacket = makeZonePacket< FFXIVIpcContainerInfo >( getId() );
+    containerInfoPacket->data().sequence = count;
+    containerInfoPacket->data().numItems = it->second->getEntryCount();
+    containerInfoPacket->data().containerId = it->second->getId();
+    queuePacket( containerInfoPacket );
 
 
-   }
+  }
 
 }
 
 Core::Entity::Player::InvSlotPairVec Core::Entity::Player::getSlotsOfItemsInInventory( uint32_t catalogId )
 {
-   InvSlotPairVec outVec;
-   for( auto i : { Bag0, Bag1, Bag2, Bag3 } )
-   {
-      auto inv = m_storageMap[i];
-      for( auto item : inv->getItemMap() )
-      {
-         if( item.second && item.second->getId() == catalogId )
-            outVec.push_back( std::make_pair( i, static_cast< int8_t >( item.first ) ) );
-      }
-   }
-   return outVec;
+  InvSlotPairVec outVec;
+  for( auto i : { Bag0, Bag1, Bag2, Bag3 } )
+  {
+    auto inv = m_storageMap[ i ];
+    for( auto item : inv->getItemMap() )
+    {
+      if( item.second && item.second->getId() == catalogId )
+        outVec.push_back( std::make_pair( i, static_cast< int8_t >( item.first ) ) );
+    }
+  }
+  return outVec;
 }
 
 Core::Entity::Player::InvSlotPair Core::Entity::Player::getFreeBagSlot()
 {
-   for( auto i : { Bag0, Bag1, Bag2, Bag3 } )
-   {
-      auto freeSlot = static_cast< int8_t >( m_storageMap[i]->getFreeSlot() );
+  for( auto i : { Bag0, Bag1, Bag2, Bag3 } )
+  {
+    auto freeSlot = static_cast< int8_t >( m_storageMap[ i ]->getFreeSlot() );
 
-      if( freeSlot != -1 )
-         return std::make_pair( i, freeSlot );
-   }
-   // no room in inventory
-   return std::make_pair( 0, -1 );
+    if( freeSlot != -1 )
+      return std::make_pair( i, freeSlot );
+  }
+  // no room in inventory
+  return std::make_pair( 0, -1 );
 }
 
 Core::ItemPtr Core::Entity::Player::getItemAt( uint16_t containerId, uint8_t slotId )
 {
-   return m_storageMap[containerId]->getItem( slotId );
+  return m_storageMap[ containerId ]->getItem( slotId );
 }
 
 
 uint32_t Core::Entity::Player::getCurrency( CurrencyType type )
 {
 
-   auto currItem = m_storageMap[Currency]->getItem( static_cast< uint8_t >( type ) - 1 );
+  auto currItem = m_storageMap[ Currency ]->getItem( static_cast< uint8_t >( type ) - 1 );
 
-   if( !currItem )
-      return 0;
+  if( !currItem )
+    return 0;
 
-   return currItem->getStackSize();
+  return currItem->getStackSize();
 
 }
 
 uint32_t Core::Entity::Player::getCrystal( CrystalType type )
 {
 
-   auto currItem = m_storageMap[Crystal]->getItem( static_cast< uint8_t >( type ) - 1 );
+  auto currItem = m_storageMap[ Crystal ]->getItem( static_cast< uint8_t >( type ) - 1 );
 
-   if( !currItem )
-      return 0;
+  if( !currItem )
+    return 0;
 
-   return currItem->getStackSize();
+  return currItem->getStackSize();
 
 }
 
 void Core::Entity::Player::writeInventory( InventoryType type )
 {
-   auto pLog = g_fw.get< Logger >();
-   auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+  auto pLog = g_fw.get< Logger >();
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
 
-   auto storage = m_storageMap[type];
+  auto storage = m_storageMap[ type ];
 
-   if( !storage->isPersistentStorage() )
-      return;
+  if( !storage->isPersistentStorage() )
+    return;
 
-   std::string query = "UPDATE " + storage->getTableName() + " SET ";
+  std::string query = "UPDATE " + storage->getTableName() + " SET ";
 
-   for( int32_t i = 0; i <= storage->getMaxSize(); i++ )
-   {
-      auto currItem = storage->getItem( i );
+  for( int32_t i = 0; i <= storage->getMaxSize(); i++ )
+  {
+    auto currItem = storage->getItem( i );
 
-      if( i > 0 )
-         query += ", ";
+    if( i > 0 )
+      query += ", ";
 
-      query += "container_" + std::to_string( i ) + " = " + std::to_string( currItem ? currItem->getUId() : 0 );
-   }
+    query += "container_" + std::to_string( i ) + " = " + std::to_string( currItem ? currItem->getUId() : 0 );
+  }
 
-   query += " WHERE CharacterId = " + std::to_string( getId() );
+  query += " WHERE CharacterId = " + std::to_string( getId() );
 
-   if( storage->isMultiStorage() )
-      query += " AND storageId = " + std::to_string( static_cast< uint16_t >( type ) );
+  if( storage->isMultiStorage() )
+    query += " AND storageId = " + std::to_string( static_cast< uint16_t >( type ) );
 
-   pLog->debug( query );
-   pDb->execute( query );
+  pLog->debug( query );
+  pDb->execute( query );
 }
 
 void Core::Entity::Player::writeItem( Core::ItemPtr pItem ) const
 {
-   auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
-   pDb->execute( "UPDATE charaglobalitem SET stack = " + std::to_string( pItem->getStackSize() ) + " " +
-                 // TODO: add other attributes
-                 " WHERE itemId = " + std::to_string( pItem->getUId() ) );
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+  pDb->execute( "UPDATE charaglobalitem SET stack = " + std::to_string( pItem->getStackSize() ) + " " +
+                // TODO: add other attributes
+                " WHERE itemId = " + std::to_string( pItem->getUId() ) );
 }
 
 void Core::Entity::Player::deleteItemDb( Core::ItemPtr item ) const
 {
-   auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
-   pDb->execute( "UPDATE charaglobalitem SET IS_DELETE = 1 WHERE itemId = " + std::to_string( item->getUId() ) );
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+  pDb->execute( "UPDATE charaglobalitem SET IS_DELETE = 1 WHERE itemId = " + std::to_string( item->getUId() ) );
 }
 
 
 bool Core::Entity::Player::isObtainable( uint32_t catalogId, uint8_t quantity )
 {
 
-   return true;
+  return true;
 }
 
 
 Core::ItemPtr Core::Entity::Player::addItem( uint32_t catalogId, uint32_t quantity, bool isHq, bool silent )
 {
-   auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
-   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-   auto itemInfo = pExdData->get< Core::Data::Item >( catalogId );
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto itemInfo = pExdData->get< Core::Data::Item >( catalogId );
 
-   // if item data doesn't exist or it's a blank field
-   if( !itemInfo || itemInfo->levelItem == 0 )
-   {
-      return nullptr;
-   }
+  // if item data doesn't exist or it's a blank field
+  if( !itemInfo || itemInfo->levelItem == 0 )
+  {
+    return nullptr;
+  }
 
-   quantity = std::min< uint32_t >( quantity, itemInfo->stackSize );
+  quantity = std::min< uint32_t >( quantity, itemInfo->stackSize );
 
-   // used for item obtain notification
-   uint32_t originalQuantity = quantity;
+  // used for item obtain notification
+  uint32_t originalQuantity = quantity;
 
-   // todo: for now we're just going to add any items to main inv
+  // todo: for now we're just going to add any items to main inv
 
-   std::pair< uint16_t, uint8_t > freeBagSlot;
-   bool foundFreeSlot = false;
+  std::pair< uint16_t, uint8_t > freeBagSlot;
+  bool foundFreeSlot = false;
 
-   std::vector< uint16_t > bags = { Bag0, Bag1, Bag2, Bag3 };
+  std::vector< uint16_t > bags = { Bag0, Bag1, Bag2, Bag3 };
 
-   // add the related armoury bag to the applicable bags and try and fill a free slot there before falling back to regular inventory
-   if( itemInfo->isEquippable && getEquipDisplayFlags() & StoreNewItemsInArmouryChest )
-   {
-      auto bag = Items::Util::getCharaEquipSlotCategoryToArmoryId( itemInfo->equipSlotCategory );
+  // add the related armoury bag to the applicable bags and try and fill a free slot there before falling back to regular inventory
+  if( itemInfo->isEquippable && getEquipDisplayFlags() & StoreNewItemsInArmouryChest )
+  {
+    auto bag = Items::Util::getCharaEquipSlotCategoryToArmoryId( itemInfo->equipSlotCategory );
 
-      bags.insert( bags.begin(), bag );
-   }
+    bags.insert( bags.begin(), bag );
+  }
 
-   for( auto bag : bags )
-   {
-      auto storage = m_storageMap[bag];
+  for( auto bag : bags )
+  {
+    auto storage = m_storageMap[ bag ];
 
-      for( uint8_t slot = 0; slot < storage->getMaxSize(); slot++ )
+    for( uint8_t slot = 0; slot < storage->getMaxSize(); slot++ )
+    {
+      auto item = storage->getItem( slot );
+
+      // add any items that are stackable
+      if( item && !itemInfo->isEquippable && item->getId() == catalogId )
       {
-         auto item = storage->getItem( slot );
+        uint32_t count = item->getStackSize();
+        uint32_t maxStack = item->getMaxStackSize();
 
-         // add any items that are stackable
-         if( item && !itemInfo->isEquippable && item->getId() == catalogId )
-         {
-            uint32_t count = item->getStackSize();
-            uint32_t maxStack = item->getMaxStackSize();
+        // if slot is full, skip it
+        if( count >= maxStack )
+          continue;
 
-            // if slot is full, skip it
-            if( count >= maxStack )
-               continue;
+        // check slot is same quality
+        if( item->isHq() != isHq )
+          continue;
 
-            // check slot is same quality
-            if( item->isHq() != isHq )
-               continue;
+        // update stack
+        uint32_t newStackSize = count + quantity;
+        if( newStackSize > maxStack )
+        {
+          quantity = newStackSize - maxStack;
+          newStackSize = maxStack;
+        }
 
-            // update stack
-            uint32_t newStackSize = count + quantity;
-            if( newStackSize > maxStack )
-            {
-               quantity = newStackSize - maxStack;
-               newStackSize = maxStack;
-            }
+        item->setStackSize( newStackSize );
+        writeItem( item );
 
-            item->setStackSize( newStackSize );
-            writeItem( item );
+        auto slotUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(), slot, bag, *item );
+        queuePacket( slotUpdate );
 
-            auto slotUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(), slot, bag, *item );
-            queuePacket( slotUpdate );
+        // return existing stack if we have no overflow - items fit into a preexisting stack
+        if( quantity == 0 )
+        {
+          queuePacket( makeActorControl143( getId(), ItemObtainIcon, catalogId, originalQuantity ) );
 
-            // return existing stack if we have no overflow - items fit into a preexisting stack
-            if( quantity == 0 )
-            {
-               queuePacket( makeActorControl143( getId(), ItemObtainIcon, catalogId, originalQuantity ) );
+          return item;
+        }
 
-               return item;
-            }
-
-         }
-         else if( !item && !foundFreeSlot )
-         {
-            freeBagSlot = { bag, slot };
-            foundFreeSlot = true;
-         }
       }
-   }
+      else if( !item && !foundFreeSlot )
+      {
+        freeBagSlot = { bag, slot };
+        foundFreeSlot = true;
+      }
+    }
+  }
 
-   // couldn't find a free slot and we still have some quantity of items left, shits fucked
-   if( !foundFreeSlot )
-      return nullptr;
+  // couldn't find a free slot and we still have some quantity of items left, shits fucked
+  if( !foundFreeSlot )
+    return nullptr;
 
-   auto item = createItem( catalogId, quantity );
-   item->setHq( isHq );
+  auto item = createItem( catalogId, quantity );
+  item->setHq( isHq );
 
-   auto storage = m_storageMap[freeBagSlot.first];
-   storage->setItem( freeBagSlot.second, item );
+  auto storage = m_storageMap[ freeBagSlot.first ];
+  storage->setItem( freeBagSlot.second, item );
 
-   writeInventory( static_cast< InventoryType >( freeBagSlot.first ) );
+  writeInventory( static_cast< InventoryType >( freeBagSlot.first ) );
 
-   if( !silent )
-   {
-      auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(), freeBagSlot.second, freeBagSlot.first, *item );
-      queuePacket( invUpdate );
+  if( !silent )
+  {
+    auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(), freeBagSlot.second, freeBagSlot.first,
+                                                                      *item );
+    queuePacket( invUpdate );
 
-      queuePacket( makeActorControl143( getId(), ItemObtainIcon, catalogId, originalQuantity ) );
-   }
+    queuePacket( makeActorControl143( getId(), ItemObtainIcon, catalogId, originalQuantity ) );
+  }
 
-   return item;
+  return item;
 }
 
-void Core::Entity::Player::moveItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot )
+void
+Core::Entity::Player::moveItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot )
 {
 
-   auto tmpItem = m_storageMap[fromInventoryId]->getItem( fromSlotId );
-   auto& itemMap = m_storageMap[fromInventoryId]->getItemMap();
+  auto tmpItem = m_storageMap[ fromInventoryId ]->getItem( fromSlotId );
+  auto& itemMap = m_storageMap[ fromInventoryId ]->getItemMap();
 
-   if( tmpItem == nullptr )
-      return;
+  if( tmpItem == nullptr )
+    return;
 
-   itemMap[fromSlotId].reset();
+  itemMap[ fromSlotId ].reset();
 
-   m_storageMap[toInventoryId]->setItem( toSlot, tmpItem );
+  m_storageMap[ toInventoryId ]->setItem( toSlot, tmpItem );
 
-   writeInventory( static_cast< InventoryType >( toInventoryId ) );
+  writeInventory( static_cast< InventoryType >( toInventoryId ) );
 
-   if( fromInventoryId != toInventoryId )
-      writeInventory( static_cast< InventoryType >( fromInventoryId ) );
+  if( fromInventoryId != toInventoryId )
+    writeInventory( static_cast< InventoryType >( fromInventoryId ) );
 
-   if( static_cast< InventoryType >( toInventoryId ) == GearSet0 )
-      equipItem( static_cast< GearSetSlot >( toSlot ), tmpItem, true );
+  if( static_cast< InventoryType >( toInventoryId ) == GearSet0 )
+    equipItem( static_cast< GearSetSlot >( toSlot ), tmpItem, true );
 
-   if( static_cast< InventoryType >( fromInventoryId ) == GearSet0 )
-      unequipItem( static_cast< GearSetSlot >( fromSlotId ), tmpItem );
+  if( static_cast< InventoryType >( fromInventoryId ) == GearSet0 )
+    unequipItem( static_cast< GearSetSlot >( fromSlotId ), tmpItem );
 
 
 }
 
 bool Core::Entity::Player::updateContainer( uint16_t storageId, uint8_t slotId, ItemPtr pItem )
 {
-   auto containerType = Items::Util::getContainerType( storageId );
+  auto containerType = Items::Util::getContainerType( storageId );
 
-   m_storageMap[storageId]->setItem( slotId, pItem );
+  m_storageMap[ storageId ]->setItem( slotId, pItem );
 
-   switch( containerType )
-   {
-      case Armory:
-      case Bag:
-      case CurrencyCrystal:
-      {
-         writeInventory( static_cast< InventoryType >( storageId ) );
-         break;
-      }
+  switch( containerType )
+  {
+    case Armory:
+    case Bag:
+    case CurrencyCrystal:
+    {
+      writeInventory( static_cast< InventoryType >( storageId ) );
+      break;
+    }
 
-      case GearSet:
-      {
-         if( pItem )
-            equipItem( static_cast< GearSetSlot >( slotId ), pItem, true );
-         else
-            unequipItem( static_cast< GearSetSlot >( slotId ), pItem );
+    case GearSet:
+    {
+      if( pItem )
+        equipItem( static_cast< GearSetSlot >( slotId ), pItem, true );
+      else
+        unequipItem( static_cast< GearSetSlot >( slotId ), pItem );
 
-         writeInventory( static_cast< InventoryType >( storageId ) );
-         break;
-      }
-      default:
-         break;
-   }
+      writeInventory( static_cast< InventoryType >( storageId ) );
+      break;
+    }
+    default:
+      break;
+  }
 
-   return true;
+  return true;
 }
 
 void Core::Entity::Player::splitItem( uint16_t fromInventoryId, uint8_t fromSlotId,
                                       uint16_t toInventoryId, uint8_t toSlot, uint16_t itemCount )
 {
-   if( itemCount == 0 )
-      return;
+  if( itemCount == 0 )
+    return;
 
-   auto fromItem = m_storageMap[fromInventoryId]->getItem( fromSlotId );
-   if( !fromItem )
-      return;
+  auto fromItem = m_storageMap[ fromInventoryId ]->getItem( fromSlotId );
+  if( !fromItem )
+    return;
 
-   // check we have enough items in the origin slot
-   // nb: don't let the client 'split' a whole stack into another slot
-   if( fromItem->getStackSize() < itemCount )
-      // todo: correct the invalid item split? does retail do this or does it just ignore it?
-      return;
+  // check we have enough items in the origin slot
+  // nb: don't let the client 'split' a whole stack into another slot
+  if( fromItem->getStackSize() < itemCount )
+    // todo: correct the invalid item split? does retail do this or does it just ignore it?
+    return;
 
-   // make sure toInventoryId & toSlot are actually free so we don't orphan an item
-   if( m_storageMap[toInventoryId]->getItem( toSlot ) )
-      // todo: correct invalid move? again, not sure what retail does here
-      return;
+  // make sure toInventoryId & toSlot are actually free so we don't orphan an item
+  if( m_storageMap[ toInventoryId ]->getItem( toSlot ) )
+    // todo: correct invalid move? again, not sure what retail does here
+    return;
 
-   auto newItem = addItem( fromItem->getId(), itemCount, fromItem->isHq(), true );
-   if( !newItem )
-      return;
+  auto newItem = addItem( fromItem->getId(), itemCount, fromItem->isHq(), true );
+  if( !newItem )
+    return;
 
-   fromItem->setStackSize( fromItem->getStackSize() - itemCount );
+  fromItem->setStackSize( fromItem->getStackSize() - itemCount );
 
-   updateContainer( fromInventoryId, fromSlotId, fromItem );
-   updateContainer( toInventoryId, toSlot, newItem );
+  updateContainer( fromInventoryId, fromSlotId, fromItem );
+  updateContainer( toInventoryId, toSlot, newItem );
 
-   writeItem( fromItem );
+  writeItem( fromItem );
 }
 
 void Core::Entity::Player::mergeItem( uint16_t fromInventoryId, uint8_t fromSlotId,
                                       uint16_t toInventoryId, uint8_t toSlot )
 {
-   auto fromItem = m_storageMap[fromInventoryId]->getItem( fromSlotId );
-   auto toItem = m_storageMap[toInventoryId]->getItem( toSlot );
+  auto fromItem = m_storageMap[ fromInventoryId ]->getItem( fromSlotId );
+  auto toItem = m_storageMap[ toInventoryId ]->getItem( toSlot );
 
-   if( !fromItem || !toItem )
-      return;
+  if( !fromItem || !toItem )
+    return;
 
-   if( fromItem->getId() != toItem->getId() )
-      return;
+  if( fromItem->getId() != toItem->getId() )
+    return;
 
-   uint32_t stackSize = fromItem->getStackSize() + toItem->getStackSize();
-   uint32_t stackOverflow = stackSize - std::min< uint32_t >( fromItem->getMaxStackSize(), stackSize );
+  uint32_t stackSize = fromItem->getStackSize() + toItem->getStackSize();
+  uint32_t stackOverflow = stackSize - std::min< uint32_t >( fromItem->getMaxStackSize(), stackSize );
 
-   // we can destroy the original stack if there's no overflow
-   if( stackOverflow == 0 )
-   {
-      m_storageMap[fromInventoryId]->removeItem( fromSlotId );
-      deleteItemDb( fromItem );
-   }
-   else
-   {
-      fromItem->setStackSize( stackOverflow );
-      writeItem( fromItem );
-   }
+  // we can destroy the original stack if there's no overflow
+  if( stackOverflow == 0 )
+  {
+    m_storageMap[ fromInventoryId ]->removeItem( fromSlotId );
+    deleteItemDb( fromItem );
+  }
+  else
+  {
+    fromItem->setStackSize( stackOverflow );
+    writeItem( fromItem );
+  }
 
 
-   toItem->setStackSize( stackSize );
-   writeItem( toItem );
+  toItem->setStackSize( stackSize );
+  writeItem( toItem );
 
-   updateContainer( fromInventoryId, fromSlotId, fromItem );
-   updateContainer( toInventoryId, toSlot, toItem );
+  updateContainer( fromInventoryId, fromSlotId, fromItem );
+  updateContainer( toInventoryId, toSlot, toItem );
 }
 
 void Core::Entity::Player::swapItem( uint16_t fromInventoryId, uint8_t fromSlotId,
                                      uint16_t toInventoryId, uint8_t toSlot )
 {
-   auto fromItem = m_storageMap[fromInventoryId]->getItem( fromSlotId );
-   auto toItem = m_storageMap[toInventoryId]->getItem( toSlot );
-   auto& itemMap = m_storageMap[fromInventoryId]->getItemMap();
+  auto fromItem = m_storageMap[ fromInventoryId ]->getItem( fromSlotId );
+  auto toItem = m_storageMap[ toInventoryId ]->getItem( toSlot );
+  auto& itemMap = m_storageMap[ fromInventoryId ]->getItemMap();
 
-   if( fromItem == nullptr || toItem == nullptr )
-      return;
+  if( fromItem == nullptr || toItem == nullptr )
+    return;
 
-   // An item is being moved from bag0-3 to equippment, meaning
-   // the swapped out item will be placed in the matching armory.
-   if( Items::Util::isEquipment( toInventoryId )
-       && !Items::Util::isEquipment( fromInventoryId )
-       && !Items::Util::isArmory( fromInventoryId ) )
-   {
-      updateContainer( fromInventoryId, fromSlotId, nullptr );
-      fromInventoryId = Items::Util::getCharaEquipSlotCategoryToArmoryId( toSlot );
-      fromSlotId = static_cast < uint8_t >( m_storageMap[fromInventoryId]->getFreeSlot() );
-   }
+  // An item is being moved from bag0-3 to equippment, meaning
+  // the swapped out item will be placed in the matching armory.
+  if( Items::Util::isEquipment( toInventoryId )
+      && !Items::Util::isEquipment( fromInventoryId )
+      && !Items::Util::isArmory( fromInventoryId ) )
+  {
+    updateContainer( fromInventoryId, fromSlotId, nullptr );
+    fromInventoryId = Items::Util::getCharaEquipSlotCategoryToArmoryId( toSlot );
+    fromSlotId = static_cast < uint8_t >( m_storageMap[ fromInventoryId ]->getFreeSlot() );
+  }
 
-   auto containerTypeFrom = Items::Util::getContainerType( fromInventoryId );
-   auto containerTypeTo = Items::Util::getContainerType( toInventoryId );
+  auto containerTypeFrom = Items::Util::getContainerType( fromInventoryId );
+  auto containerTypeTo = Items::Util::getContainerType( toInventoryId );
 
-   updateContainer( toInventoryId, toSlot, fromItem );
-   updateContainer( fromInventoryId, fromSlotId, toItem );
+  updateContainer( toInventoryId, toSlot, fromItem );
+  updateContainer( fromInventoryId, fromSlotId, toItem );
 }
 
 void Core::Entity::Player::discardItem( uint16_t fromInventoryId, uint8_t fromSlotId )
 {
-   // i am not entirely sure how this should be generated or if it even is important for us...
-   uint32_t transactionId = 1;
+  // i am not entirely sure how this should be generated or if it even is important for us...
+  uint32_t transactionId = 1;
 
-   auto fromItem = m_storageMap[fromInventoryId]->getItem( fromSlotId );
+  auto fromItem = m_storageMap[ fromInventoryId ]->getItem( fromSlotId );
 
-   deleteItemDb( fromItem );
+  deleteItemDb( fromItem );
 
-   m_storageMap[fromInventoryId]->removeItem( fromSlotId );
-   updateContainer( fromInventoryId, fromSlotId, nullptr );
+  m_storageMap[ fromInventoryId ]->removeItem( fromSlotId );
+  updateContainer( fromInventoryId, fromSlotId, nullptr );
 
-   auto invTransPacket = makeZonePacket< FFXIVIpcInventoryTransaction >( getId() );
-   invTransPacket->data().transactionId = transactionId;
-   invTransPacket->data().ownerId = getId();
-   invTransPacket->data().storageId = fromInventoryId;
-   invTransPacket->data().catalogId = fromItem->getId();
-   invTransPacket->data().stackSize = fromItem->getStackSize();
-   invTransPacket->data().slotId = fromSlotId;
-   invTransPacket->data().type = 7;
-   queuePacket( invTransPacket );
+  auto invTransPacket = makeZonePacket< FFXIVIpcInventoryTransaction >( getId() );
+  invTransPacket->data().transactionId = transactionId;
+  invTransPacket->data().ownerId = getId();
+  invTransPacket->data().storageId = fromInventoryId;
+  invTransPacket->data().catalogId = fromItem->getId();
+  invTransPacket->data().stackSize = fromItem->getStackSize();
+  invTransPacket->data().slotId = fromSlotId;
+  invTransPacket->data().type = 7;
+  queuePacket( invTransPacket );
 
-   auto invTransFinPacket = makeZonePacket< FFXIVIpcInventoryTransactionFinish >( getId() );
-   invTransFinPacket->data().transactionId = transactionId;
-   invTransFinPacket->data().transactionId1 = transactionId;
-   queuePacket( invTransFinPacket );
+  auto invTransFinPacket = makeZonePacket< FFXIVIpcInventoryTransactionFinish >( getId() );
+  invTransFinPacket->data().transactionId = transactionId;
+  invTransFinPacket->data().transactionId1 = transactionId;
+  queuePacket( invTransFinPacket );
 }
 
 uint16_t Core::Entity::Player::calculateEquippedGearItemLevel()
 {
-   uint32_t iLvlResult = 0;
+  uint32_t iLvlResult = 0;
 
-   auto gearSetMap = m_storageMap[GearSet0]->getItemMap();
+  auto gearSetMap = m_storageMap[ GearSet0 ]->getItemMap();
 
-   auto it = gearSetMap.begin();
+  auto it = gearSetMap.begin();
 
-   while( it != gearSetMap.end() )
-   {
-      auto currItem = it->second;
+  while( it != gearSetMap.end() )
+  {
+    auto currItem = it->second;
 
-      if( currItem )
+    if( currItem )
+    {
+      iLvlResult += currItem->getItemLevel();
+
+      // If item is weapon and isn't one-handed
+      if( currItem->isWeapon() && !Items::Util::isOneHandedWeapon( currItem->getCategory() ) )
       {
-         iLvlResult += currItem->getItemLevel();
-
-         // If item is weapon and isn't one-handed
-         if( currItem->isWeapon() && !Items::Util::isOneHandedWeapon( currItem->getCategory() ) )
-         {
-            iLvlResult += currItem->getItemLevel();
-         }
+        iLvlResult += currItem->getItemLevel();
       }
+    }
 
-      it++;
-   }
+    it++;
+  }
 
-   return boost::algorithm::clamp( iLvlResult / 13, 0, 9999 );
+  return boost::algorithm::clamp( iLvlResult / 13, 0, 9999 );
 }
 
 
 uint8_t Core::Entity::Player::getFreeSlotsInBags()
 {
-   uint8_t slots = 0;
-   for( uint8_t container : { Bag0, Bag1, Bag2, Bag3 } )
-   { 
-      const auto& storage = m_storageMap[container];
-      slots += ( storage->getMaxSize() - storage->getEntryCount() );
-   }
-   return slots;
+  uint8_t slots = 0;
+  for( uint8_t container : { Bag0, Bag1, Bag2, Bag3 } )
+  {
+    const auto& storage = m_storageMap[ container ];
+    slots += ( storage->getMaxSize() - storage->getEntryCount() );
+  }
+  return slots;
 }

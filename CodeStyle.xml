@@ -1,0 +1,103 @@
+<code_scheme name="Default" version="173">
+  <option name="AUTODETECT_INDENTS" value="false" />
+  <Objective-C>
+    <option name="INDENT_NAMESPACE_MEMBERS" value="0" />
+    <option name="INDENT_C_STRUCT_MEMBERS" value="2" />
+    <option name="INDENT_CLASS_MEMBERS" value="2" />
+    <option name="INDENT_INSIDE_CODE_BLOCK" value="2" />
+    <option name="FUNCTION_BRACE_PLACEMENT" value="2" />
+    <option name="BLOCK_BRACE_PLACEMENT" value="2" />
+    <option name="CLASS_CONSTRUCTOR_INIT_LIST_NEW_LINE_BEFORE_COLON" value="0" />
+    <option name="CLASS_CONSTRUCTOR_INIT_LIST_NEW_LINE_AFTER_COLON" value="1" />
+    <option name="SUPERCLASS_LIST_ALIGN_MULTILINE" value="false" />
+    <option name="SUPERCLASS_LIST_BEFORE_COLON" value="0" />
+    <option name="SUPERCLASS_LIST_AFTER_COLON" value="1" />
+    <option name="SPACE_WITHIN_TEMPLATE_DECLARATION_LTGT" value="true" />
+    <option name="SPACE_WITHIN_TEMPLATE_CALL_LTGT" value="true" />
+    <option name="SPACE_WITHIN_FUNCTION_DECLARATION_PARENTHESES" value="true" />
+    <option name="SPACE_WITHIN_FUNCTION_CALL_PARENTHESES" value="true" />
+    <option name="SPACE_WITHIN_LAMBDA_CAPTURE_LIST_BRACKET" value="true" />
+    <option name="SPACE_BEFORE_POINTER_IN_DECLARATION" value="false" />
+    <option name="SPACE_AFTER_POINTER_IN_DECLARATION" value="true" />
+    <option name="SPACE_BEFORE_REFERENCE_IN_DECLARATION" value="false" />
+    <option name="SPACE_AFTER_REFERENCE_IN_DECLARATION" value="true" />
+    <option name="SPACE_BETWEEN_ADJACENT_BRACKETS" value="true" />
+    <option name="DISCHARGED_SHORT_TERNARY_OPERATOR" value="true" />
+  </Objective-C>
+  <Objective-C-extensions>
+    <file>
+      <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Import" />
+      <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Macro" />
+      <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Typedef" />
+      <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Enum" />
+      <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Constant" />
+      <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Global" />
+      <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Struct" />
+      <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="FunctionPredecl" />
+      <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Function" />
+    </file>
+    <class>
+      <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Property" />
+      <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Synthesize" />
+      <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="InitMethod" />
+      <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="StaticMethod" />
+      <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="InstanceMethod" />
+      <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="DeallocMethod" />
+    </class>
+    <extensions>
+      <pair source="cpp" header="h" fileNamingConvention="NONE" />
+      <pair source="c" header="h" fileNamingConvention="NONE" />
+    </extensions>
+  </Objective-C-extensions>
+  <DBN-PSQL>
+    <case-options enabled="false">
+      <option name="KEYWORD_CASE" value="lower" />
+      <option name="FUNCTION_CASE" value="lower" />
+      <option name="PARAMETER_CASE" value="lower" />
+      <option name="DATATYPE_CASE" value="lower" />
+      <option name="OBJECT_CASE" value="preserve" />
+    </case-options>
+    <formatting-settings enabled="false" />
+  </DBN-PSQL>
+  <DBN-SQL>
+    <case-options enabled="false">
+      <option name="KEYWORD_CASE" value="lower" />
+      <option name="FUNCTION_CASE" value="lower" />
+      <option name="PARAMETER_CASE" value="lower" />
+      <option name="DATATYPE_CASE" value="lower" />
+      <option name="OBJECT_CASE" value="preserve" />
+    </case-options>
+    <formatting-settings enabled="false">
+      <option name="STATEMENT_SPACING" value="one_line" />
+      <option name="CLAUSE_CHOP_DOWN" value="chop_down_if_statement_long" />
+      <option name="ITERATION_ELEMENTS_WRAPPING" value="chop_down_if_not_single" />
+    </formatting-settings>
+  </DBN-SQL>
+  <codeStyleSettings language="ObjectiveC">
+    <option name="KEEP_CONTROL_STATEMENT_IN_ONE_LINE" value="false" />
+    <option name="BRACE_STYLE" value="2" />
+    <option name="CLASS_BRACE_STYLE" value="2" />
+    <option name="ELSE_ON_NEW_LINE" value="true" />
+    <option name="SPACE_AROUND_LAMBDA_ARROW" value="false" />
+    <option name="SPACE_WITHIN_PARENTHESES" value="true" />
+    <option name="SPACE_WITHIN_IF_PARENTHESES" value="true" />
+    <option name="SPACE_WITHIN_WHILE_PARENTHESES" value="true" />
+    <option name="SPACE_WITHIN_FOR_PARENTHESES" value="true" />
+    <option name="SPACE_WITHIN_CATCH_PARENTHESES" value="true" />
+    <option name="SPACE_WITHIN_SWITCH_PARENTHESES" value="true" />
+    <option name="SPACE_WITHIN_CAST_PARENTHESES" value="true" />
+    <option name="SPACE_WITHIN_BRACKETS" value="true" />
+    <option name="SPACE_WITHIN_ARRAY_INITIALIZER_BRACES" value="true" />
+    <option name="SPACE_BEFORE_IF_PARENTHESES" value="false" />
+    <option name="SPACE_BEFORE_WHILE_PARENTHESES" value="false" />
+    <option name="SPACE_BEFORE_FOR_PARENTHESES" value="false" />
+    <option name="SPACE_BEFORE_CATCH_PARENTHESES" value="false" />
+    <option name="SPACE_BEFORE_SWITCH_PARENTHESES" value="false" />
+    <option name="KEEP_SIMPLE_METHODS_IN_ONE_LINE" value="false" />
+    <indentOptions>
+      <option name="INDENT_SIZE" value="2" />
+      <option name="CONTINUATION_INDENT_SIZE" value="2" />
+      <option name="TAB_SIZE" value="2" />
+    </indentOptions>
+  </codeStyleSettings>
+</code_scheme>

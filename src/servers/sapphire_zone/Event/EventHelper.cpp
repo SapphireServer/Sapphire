@@ -15,88 +15,88 @@ using namespace Core::Common;
 
 std::string Core::Event::getEventName( uint32_t eventId )
 {
-   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-   uint16_t eventType = eventId >> 16;
+  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  uint16_t eventType = eventId >> 16;
 
-   auto unknown = std::string{ "unknown" };
+  auto unknown = std::string{ "unknown" };
 
-   switch( eventType )
-   {
-   case Event::EventHandler::EventHandlerType::Quest:
-   {
+  switch( eventType )
+  {
+    case Event::EventHandler::EventHandlerType::Quest:
+    {
       auto questInfo = pExdData->get< Core::Data::Quest >( eventId );
       if( !questInfo )
-         return unknown + "Quest";
+        return unknown + "Quest";
 
       std::string name = questInfo->id;
       std::size_t pos = name.find_first_of( "_" );
 
       return name.substr( 0, pos );
-   }
-   case Event::EventHandler::EventHandlerType::CustomTalk:
-   {
+    }
+    case Event::EventHandler::EventHandlerType::CustomTalk:
+    {
       auto customTalkInfo = pExdData->get< Core::Data::CustomTalk >( eventId );
       if( !customTalkInfo )
-         return unknown + "CustomTalk";
+        return unknown + "CustomTalk";
 
       std::string name = customTalkInfo->name;
       std::size_t pos = name.find_first_of( "_" );
 
       return customTalkInfo->name.substr( 0, pos );
-   }
-   case Event::EventHandler::EventHandlerType::Opening:
-   {
+    }
+    case Event::EventHandler::EventHandlerType::Opening:
+    {
       auto openingInfo = pExdData->get< Core::Data::Opening >( eventId );
       if( openingInfo )
-         return openingInfo->name;
+        return openingInfo->name;
       return unknown + "Opening";
-   }
-   case Event::EventHandler::EventHandlerType::Aetheryte:
-   {
+    }
+    case Event::EventHandler::EventHandlerType::Aetheryte:
+    {
       auto aetherInfo = pExdData->get< Core::Data::Aetheryte >( eventId & 0xFFFF );
       if( aetherInfo->isAetheryte )
-         return "Aetheryte";
+        return "Aetheryte";
       return "Aethernet";
-   }
-   case Event::EventHandler::EventHandlerType::ICDirector:
-   {
+    }
+    case Event::EventHandler::EventHandlerType::ICDirector:
+    {
       auto contentInfo = pExdData->get< Core::Data::InstanceContent >( eventId & 0xFFFF );
       std::string name = contentInfo->name;
 
       name.erase( boost::remove_if( name, boost::is_any_of( "â˜…_ '()[]-\x1a\x1\x2\x1f\x1\x3.:" ) ), name.end() );
-      name[0] = toupper( name[0] );
+      name[ 0 ] = toupper( name[ 0 ] );
       return name;
-   }
+    }
 
-   case Event::EventHandler::EventHandlerType::Warp:
-   {
+    case Event::EventHandler::EventHandlerType::Warp:
+    {
       auto warpInfo = pExdData->get< Core::Data::Warp >( eventId );
       if( warpInfo )
-         return "WarpTaxi";
+        return "WarpTaxi";
       return unknown + "ChocoboWarp"; //who know
-   }
-   case Event::EventHandler::EventHandlerType::Shop:
-   {
+    }
+    case Event::EventHandler::EventHandlerType::Shop:
+    {
       auto shopInfo = pExdData->get< Core::Data::GilShop >( eventId );
       std::string name = shopInfo->name;
 
       if( shopInfo )
-         return name;
+        return name;
       return unknown + "GilShop";
-   }
-   default:
-   {
+    }
+    default:
+    {
       return unknown;
-   }
-   }
+    }
+  }
 }
 
 uint32_t Core::Event::mapEventActorToRealActor( uint32_t eventActorId )
 {
-   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-   auto levelInfo = pExdData->get< Core::Data::Level >( eventActorId );
-   if( levelInfo )
-      return levelInfo->objectKey;
+  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto levelInfo = pExdData->get< Core::Data::Level >( eventActorId );
+  if( levelInfo )
+    return levelInfo->objectKey;
 
-   return 0;
+  return 0;
 }

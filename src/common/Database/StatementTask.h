@@ -5,47 +5,48 @@
 #include <boost/shared_ptr.hpp>
 #include "Operation.h"
 
-namespace Core
+namespace Core {
+namespace Db {
+class PreparedStatement;
+
+class StatementTask :
+  public Operation
 {
-namespace Db
-{
-   class PreparedStatement;
+public:
 
-   class StatementTask : public Operation
-   {
-   public:
+  StatementTask( const std::string& sql, bool async = false );
 
-      StatementTask( const std::string& sql, bool async = false );
+  ~StatementTask();
 
-      ~StatementTask();
+  bool execute() override;
 
-      bool execute() override;
+  //   QueryResultFuture getFuture() const
+  //   {
+  //      return m_result->get_future();
+  //   }
 
-   //   QueryResultFuture getFuture() const
-   //   {
-   //      return m_result->get_future();
-   //   }
-
-   private:
-      std::string m_sql;
-      bool m_hasResult;
+private:
+  std::string m_sql;
+  bool m_hasResult;
 //      QueryResultPromise *m_result;
-   };
+};
 
-   class PreparedStatementTask : public Operation
-   {
-   public:
-      PreparedStatementTask( boost::shared_ptr< PreparedStatement > stmt, bool async = false);
-      ~PreparedStatementTask();
+class PreparedStatementTask :
+  public Operation
+{
+public:
+  PreparedStatementTask( boost::shared_ptr< PreparedStatement > stmt, bool async = false );
 
-      bool execute() override;
-      //PreparedQueryResultFuture getFuture() { return m_result->get_future(); }
+  ~PreparedStatementTask();
 
-   protected:
-      boost::shared_ptr< PreparedStatement > m_stmt;
-      bool m_hasResult;
-      //PreparedQueryResultPromise* m_result;
-   };
+  bool execute() override;
+  //PreparedQueryResultFuture getFuture() { return m_result->get_future(); }
+
+protected:
+  boost::shared_ptr< PreparedStatement > m_stmt;
+  bool m_hasResult;
+  //PreparedQueryResultPromise* m_result;
+};
 
 }
 }
