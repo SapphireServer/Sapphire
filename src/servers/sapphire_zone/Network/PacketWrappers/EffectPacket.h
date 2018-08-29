@@ -15,7 +15,7 @@ class EffectPacket :
 {
 public:
   EffectPacket( uint64_t sourceId, uint32_t targetId, uint32_t actionId ) :
-    ZoneChannelPacket< FFXIVIpcEffect >( sourceId, targetId )
+    ZoneChannelPacket< FFXIVIpcEffect >( static_cast< uint32_t >( sourceId ), targetId )
   {
     m_data.header.actionId = actionId;
     m_data.header.actionAnimationId = static_cast< uint16_t >( actionId );

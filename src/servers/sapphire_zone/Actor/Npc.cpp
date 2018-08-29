@@ -24,6 +24,7 @@
 #include "Math/CalcBattle.h"
 #include "Chara.h"
 #include "Player.h"
+#include "Npc.h"
 #include "Zone/TerritoryMgr.h"
 #include "Framework.h"
 #include "Common.h"
@@ -36,8 +37,7 @@ using namespace Core::Network::Packets::Server;
 using namespace Core::Network::ActorControl;
 
 Core::Entity::Npc::Npc( ObjKind type ) :
-  Chara( type ),
-  m_targetId( INVALID_GAME_OBJECT_ID )
+  Chara( type )
 {
 
 }

@@ -6,6 +6,7 @@
 
 #include "Forwards.h"
 #include "Chara.h"
+#include "Npc.h"
 #include <set>
 #include <map>
 #include <queue>
@@ -14,8 +15,8 @@ namespace Core {
 namespace Entity {
 
 /*!
-\class Npc
-\brief Base class for all Npcs
+\class BNpc
+\brief Base class for all BNpcs
 
 */
 class BNpc :

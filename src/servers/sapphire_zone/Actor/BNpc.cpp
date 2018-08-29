@@ -24,6 +24,7 @@
 #include "Math/CalcBattle.h"
 #include "Chara.h"
 #include "Player.h"
+#include "BNpc.h"
 #include "Zone/TerritoryMgr.h"
 #include "Framework.h"
 #include "Common.h"
@@ -35,9 +36,8 @@ using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 using namespace Core::Network::ActorControl;
 
-Core::Entity::BNpc::BNpc( ObjKind type ) :
-  Npc( ObjKind::BattleNpc ),
-  m_targetId( INVALID_GAME_OBJECT_ID )
+Core::Entity::BNpc::BNpc() :
+  Npc( ObjKind::BattleNpc )
 {
 
 }
