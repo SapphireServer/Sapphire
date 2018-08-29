@@ -33,15 +33,15 @@ using namespace Core::Entity;
 
 uint32_t CalcBattle::calculateHealValue( PlayerPtr pPlayer, uint32_t potency )
 {
-   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-   auto classInfo = pExdData->get< Core::Data::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
-   auto paramGrowthInfo = pExdData->get< Core::Data::ParamGrow >( pPlayer->getLevel() );
+  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto classInfo = pExdData->get< Core::Data::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
+  auto paramGrowthInfo = pExdData->get< Core::Data::ParamGrow >( pPlayer->getLevel() );
 
-   if( !classInfo || !paramGrowthInfo )
-      return 0;
+  if( !classInfo || !paramGrowthInfo )
+    return 0;
 
-   //auto jobModVal = classInfoIt->second;
+  //auto jobModVal = classInfoIt->second;
 
-   // consider 3% variation
-   return potency / 10;
+  // consider 3% variation
+  return potency / 10;
 }

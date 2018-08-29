@@ -7,53 +7,62 @@
 namespace Core {
 namespace Action {
 
-   class Action 
-   {
+class Action
+{
 
-   public:
-      Action();
-      virtual ~Action();
+public:
+  Action();
 
-      uint16_t getId() const;
+  virtual ~Action();
 
-      Common::HandleActionType getHandleActionType() const;
+  uint16_t getId() const;
 
-      Entity::CharaPtr getTargetChara() const;
+  Common::HandleActionType getHandleActionType() const;
 
-      bool isInterrupted() const;
+  Entity::CharaPtr getTargetChara() const;
 
-      void setInterrupted();
+  bool isInterrupted() const;
 
-      uint64_t getStartTime() const;
+  void setInterrupted();
 
-      void setStartTime( uint64_t startTime );
+  uint64_t getStartTime() const;
 
-      uint32_t getCastTime() const;
+  void setStartTime( uint64_t startTime );
 
-      void setCastTime( uint32_t castTime );
+  uint32_t getCastTime() const;
 
-      Entity::CharaPtr getActionSource() const;
+  void setCastTime( uint32_t castTime );
 
-      virtual void onStart() {};
-      virtual void onFinish() {};
-      virtual void onInterrupt() {};
+  Entity::CharaPtr getActionSource() const;
 
-      // update action, if returns true, action is done and has to be removed from the actor
-      virtual bool update();
+  virtual void onStart()
+  {
+  };
 
-   protected:
-      uint16_t	m_id;
-      Common::HandleActionType m_handleActionType;
+  virtual void onFinish()
+  {
+  };
 
-      uint64_t	m_startTime;
-      uint32_t	m_castTime;
+  virtual void onInterrupt()
+  {
+  };
 
-      Entity::CharaPtr m_pSource;
-      Entity::CharaPtr m_pTarget;
+  // update action, if returns true, action is done and has to be removed from the actor
+  virtual bool update();
 
-      bool m_bInterrupt;
+protected:
+  uint16_t m_id;
+  Common::HandleActionType m_handleActionType;
 
-   };
+  uint64_t m_startTime;
+  uint32_t m_castTime;
+
+  Entity::CharaPtr m_pSource;
+  Entity::CharaPtr m_pTarget;
+
+  bool m_bInterrupt;
+
+};
 
 }
 }

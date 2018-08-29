@@ -5,55 +5,58 @@
 #define ACTION_RENAME 3
 #define ACTION_REMOVE 4
 
-class CmnDefLinkShell : public EventScript
+class CmnDefLinkShell :
+  public EventScript
 {
 public:
-   CmnDefLinkShell() : EventScript( 0xB0006 )
-   {}
+  CmnDefLinkShell() :
+    EventScript( 0xB0006 )
+  {
+  }
 
-   void Scene00001( Entity::Player& player )
-   {
-      auto callback = [this]( Entity::Player& player, const Event::SceneResult& result )
+  void Scene00001( Entity::Player& player )
+  {
+    auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
+    {
+      switch( result.param2 )
       {
-         switch( result.param2 )
-         {
-            case ACTION_CREATE:
-               Scene00002( player );
-               break;
+        case ACTION_CREATE:
+          Scene00002( player );
+          break;
 
-            case ACTION_RENAME:
-               Scene00003( player );
-               break;
+        case ACTION_RENAME:
+          Scene00003( player );
+          break;
 
-            case ACTION_REMOVE:
-               Scene00004( player );
-               break;
-         }
-      };
+        case ACTION_REMOVE:
+          Scene00004( player );
+          break;
+      }
+    };
 
-      player.playScene( getId(), 1, 0, 0, 0, callback );
-   }
+    player.playScene( getId(), 1, 0, 0, 0, callback );
+  }
 
-   // create linkshell
-   void Scene00002( Entity::Player& player )
-   {
-      player.playScene( getId(), 2, 0, 0, 0 );
-   }
+  // create linkshell
+  void Scene00002( Entity::Player& player )
+  {
+    player.playScene( getId(), 2, 0, 0, 0 );
+  }
 
-   // rename linkshell
-   void Scene00003( Entity::Player& player )
-   {
-      player.playScene( getId(), 3, 0, 0, 0 );
-   }
+  // rename linkshell
+  void Scene00003( Entity::Player& player )
+  {
+    player.playScene( getId(), 3, 0, 0, 0 );
+  }
 
-   // remove linkshell
-   void Scene00004( Entity::Player& player )
-   {
-      player.playScene( getId(), 4, 0, 0, 0 );
-   }
+  // remove linkshell
+  void Scene00004( Entity::Player& player )
+  {
+    player.playScene( getId(), 4, 0, 0, 0 );
+  }
 
-   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
-   {
-      Scene00001( player );
-   }
+  void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
+  {
+    Scene00001( player );
+  }
 };
