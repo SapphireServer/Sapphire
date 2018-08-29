@@ -200,25 +200,31 @@ int main()
       auto pos = file.find_last_of( "\\" );
       if( pos != std::string::npos )
       {
-        auto str = file.substr( 0, pos );
-        pos = str.find_last_of( "\\" );
-        auto zone = str.substr( pos + 1 );
-        //g_log.info( zone );
 
-        FFXIVIpcNpcSpawn packet;
-        std::ifstream is;
-        is.open( file, std::ios::binary );
-        is.seekg( 0x20, std::ios::beg );
-        is.read( ( char* ) &packet, sizeof( FFXIVIpcNpcSpawn ) );
-        is.close();
+        auto pos = file.find_last_of( filesys::path::preferred_separator );
+        if( pos != std::string::npos )
+        {
+          auto str = file.substr( 0, pos );
+          pos = str.find_last_of( filesys::path::preferred_separator );
+          auto zone = str.substr( pos + 1 );
+          //g_log.info( zone );
+
+          FFXIVIpcNpcSpawn packet;
+          std::ifstream is;
+          is.open( file, std::ios::binary );
+          is.seekg( 0x20, std::ios::beg );
+          is.read( ( char* ) &packet, sizeof( FFXIVIpcNpcSpawn ) );
+          is.close();
 
 
-        if( packet.subtype != 2 &&
-            packet.subtype != 3 &&
-            packet.enemyType != 0 &&
-            packet.spawnerId == 0xE0000000 &&
-            packet.fateID == 0 )
-          zoneToPacketList[ std::stoi( zone ) ].push_back( packet );
+          if( packet.subtype != 2 &&
+              packet.subtype != 3 &&
+              packet.enemyType != 0 &&
+              packet.spawnerId == 0xE0000000 &&
+              packet.fateID == 0 )
+            zoneToPacketList[ std::stoi( zone ) ].push_back( packet );
+
+        }
 
       }
 
