@@ -196,11 +196,11 @@ int main()
    {
       if( !filesys::is_directory( file ) )
       {
-         auto pos = file.find_last_of( "\\" );
+         auto pos = file.find_last_of( filesys::path::preferred_separator );
          if( pos != std::string::npos )
          {
             auto str = file.substr( 0, pos );
-            pos = str.find_last_of( "\\" );
+            pos = str.find_last_of( filesys::path::preferred_separator );
             auto zone = str.substr( pos + 1 );
             //g_log.info( zone );
 
