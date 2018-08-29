@@ -23,7 +23,7 @@ class Npc :
 {
 
 public:
-  Npc( ObjKind type );
+  Npc( Common::ObjKind type );
 
   virtual ~Npc() override;
 
