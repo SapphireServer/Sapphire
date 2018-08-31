@@ -318,9 +318,10 @@ void Core::Entity::Player::sendInventory()
         itemInfoPacket->data().slot = itM->first;
         itemInfoPacket->data().quantity = itM->second->getStackSize();
         itemInfoPacket->data().catalogId = itM->second->getId();
-        itemInfoPacket->data().condition = 30000;
+        itemInfoPacket->data().condition = itM->second->getDurability();
         itemInfoPacket->data().spiritBond = 0;
         itemInfoPacket->data().hqFlag = itM->second->isHq() ? 1 : 0;
+        itemInfoPacket->data().stain = itM->second->getStain();
         queuePacket( itemInfoPacket );
       }
     }
