@@ -269,6 +269,10 @@ enum ClientTriggerType
   AchievementComp = 0x203,
   AchievementCatChat = 0x206,
 
+  QuestJournalUpdateQuestVisibility = 0x2BE,
+  QuestJournalClosed = 0x2BF,
+
+  AbandonQuest = 0x320,
 
   DirectorInitFinish = 0x321,
 
