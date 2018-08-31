@@ -428,15 +428,26 @@ void Core::Entity::Player::writeInventory( InventoryType type )
 void Core::Entity::Player::writeItem( Core::ItemPtr pItem ) const
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
-  pDb->execute( "UPDATE charaglobalitem SET stack = " + std::to_string( pItem->getStackSize() ) + " " +
-                // TODO: add other attributes
-                " WHERE itemId = " + std::to_string( pItem->getUId() ) );
+  auto stmt = pDb->getPreparedStatement( Db::CHARA_ITEMGLOBAL_UP );
+
+  // todo: add more fields
+  stmt->setInt( 1, pItem->getStackSize() );
+  stmt->setInt( 2, pItem->getDurability() );
+  stmt->setInt( 3, pItem->getStain() );
+
+  stmt->setInt64( 4, pItem->getUId() );
+
+  pDb->directExecute( stmt );
 }
 
 void Core::Entity::Player::deleteItemDb( Core::ItemPtr item ) const
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
-  pDb->execute( "UPDATE charaglobalitem SET IS_DELETE = 1 WHERE itemId = " + std::to_string( item->getUId() ) );
+  auto stmt = pDb->getPreparedStatement( Db::CHARA_ITEMGLOBAL_DELETE );
+
+  stmt->setInt64( 1, item->getUId() );
+
+  pDb->directExecute( stmt );
 }
 
 
@@ -463,8 +474,6 @@ Core::ItemPtr Core::Entity::Player::addItem( uint32_t catalogId, uint32_t quanti
 
   // used for item obtain notification
   uint32_t originalQuantity = quantity;
-
-  // todo: for now we're just going to add any items to main inv
 
   std::pair< uint16_t, uint8_t > freeBagSlot;
   bool foundFreeSlot = false;

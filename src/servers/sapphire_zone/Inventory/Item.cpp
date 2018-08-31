@@ -132,3 +132,23 @@ uint32_t Core::Item::getMaxStackSize() const
 {
   return m_maxStackSize;
 }
+
+uint16_t Core::Item::getDurability() const
+{
+  return m_durability;
+}
+
+void Core::Item::setDurability( uint16_t durability )
+{
+  m_durability = durability;
+}
+
+uint16_t Core::Item::getStain() const
+{
+  return m_stain;
+}
+
+void Core::Item::setStain( uint16_t stain )
+{
+  m_stain = stain;
+}

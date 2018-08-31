@@ -175,5 +175,13 @@ void Core::Db::CharaDbConnection::doPrepareStatements()
                     "INSERT INTO charaglobalitem ( CharacterId, ItemId, catalogId, UPDATE_DATE ) VALUES ( ?, ?, ?, NOW() );",
                     CONNECTION_BOTH );
 
+  prepareStatement( CHARA_ITEMGLOBAL_UP,
+                    "UPDATE charaglobalitem SET stack = ?, durability = ?, stain = ? WHERE ItemId = ?;",
+                    CONNECTION_BOTH );
+
+  prepareStatement( CHARA_ITEMGLOBAL_DELETE,
+                    "UPDATE charaglobalitem SET IS_DELETE = 1 WHERE ItemId = ?;",
+                    CONNECTION_BOTH );
+
 
 }
