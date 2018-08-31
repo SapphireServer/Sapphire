@@ -781,3 +781,37 @@ uint8_t Core::Entity::Player::getFreeSlotsInBags()
   }
   return slots;
 }
+
+bool Core::Entity::Player::collectHandInItems( std::vector< uint32_t > itemIds )
+{
+  // todo: figure out how the game gets the required stack count
+  auto& container = m_storageMap[HandIn];
+
+  std::vector< uint8_t > foundItems;
+
+  auto itemMap = container->getItemMap();
+
+  for( auto& item : itemMap )
+  {
+    for( auto needle : itemIds )
+    {
+      if( item.second->getId() == needle )
+      {
+        foundItems.push_back( item.first );
+        break;
+      }
+    }
+  }
+
+  // couldn't find all the items required
+  if( foundItems.size() != itemIds.size() )
+    return false;
+
+  // remove items
+  for( auto item : foundItems )
+  {
+    container->removeItem( item );
+  }
+
+  return true;
+}

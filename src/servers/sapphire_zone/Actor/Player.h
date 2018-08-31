@@ -360,6 +360,13 @@ public:
   /*! return the current amount of crystals of type */
   uint32_t getCrystal( uint8_t type ) const;
 
+  /*!
+  * Collect real item handins from container
+  * @param itemIds a vector of each catalog id to collect
+  * @return true if all items were handed in
+  */
+  bool collectHandInItems( std::vector< uint32_t > itemIds );
+
   // Class / Job / Exp
   //////////////////////////////////////////////////////////////////////////////////////////////////////
   /*! returns the level of the currently active class / job */
