@@ -259,6 +259,7 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
     case ClientTriggerType::AbandonQuest:
     {
       player.removeQuest( static_cast< uint16_t >( param1 ) );
+      break;
     }
 
 
