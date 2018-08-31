@@ -12,7 +12,9 @@ Core::Item::Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t mo
   m_uId( uId ),
   m_model1( model1 ),
   m_model2( model2 ),
-  m_isHq( isHq )
+  m_isHq( isHq ),
+  m_stain( 0 ),
+  m_durability( 30000 )
 {
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
   auto itemInfo = pExdData->get< Core::Data::Item >( catalogId );

@@ -969,7 +969,7 @@ struct FFXIVIpcItemInfo :
   uint8_t unknown2;
   uint16_t condition;
   uint16_t spiritBond;
-  uint16_t color;
+  uint16_t stain;
   uint32_t glamourCatalogId;
   uint16_t materia1;
   uint16_t materia2;
