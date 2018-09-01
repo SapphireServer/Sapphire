@@ -1590,7 +1590,8 @@ void Core::Entity::Player::sendZonePackets()
   initZonePacket->data().weatherId = static_cast< uint8_t >( getCurrentZone()->getCurrentWeather() );
   initZonePacket->data().bitmask = 0x1;
   initZonePacket->data().unknown5 = 0x2A;
-  initZonePacket->data().festivalId = getCurrentZone()->getCurrentFestival();
+  initZonePacket->data().festivalId = getCurrentZone()->getCurrentFestival().first;
+  initZonePacket->data().additionalFestivalId = getCurrentZone()->getCurrentFestival().second;
   initZonePacket->data().pos.x = getPos().x;
   initZonePacket->data().pos.y = getPos().y;
   initZonePacket->data().pos.z = getPos().z;

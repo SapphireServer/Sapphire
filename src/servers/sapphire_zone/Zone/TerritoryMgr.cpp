@@ -417,18 +417,18 @@ Core::ZonePtr Core::TerritoryMgr::getLinkedInstance( uint32_t playerId ) const
   return nullptr;
 }
 
-const uint16_t Core::TerritoryMgr::getCurrentFestival() const
+const std::pair< uint16_t, uint16_t >& Core::TerritoryMgr::getCurrentFestival() const
 {
   return m_currentFestival;
 }
 
-void Core::TerritoryMgr::setCurrentFestival( uint16_t festivalId )
+void Core::TerritoryMgr::setCurrentFestival( uint16_t festivalId, uint16_t additionalFestival )
 {
-  m_currentFestival = festivalId;
+  m_currentFestival = { festivalId, additionalFestival };
 
   for( const auto& zone : m_zoneSet )
   {
-    zone->setCurrentFestival( m_currentFestival );
+    zone->setCurrentFestival( festivalId, additionalFestival );
   }
 }
 

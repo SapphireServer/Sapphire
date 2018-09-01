@@ -29,7 +29,7 @@ private:
 
   // Entities found in the script data of the quest
   static constexpr auto Actor0 = 1000430;
-  static constexpr auto Ritem0 = 4552;
+  static constexpr uint32_t Ritem0 = 4552;
   static constexpr auto Seq0Actor0 = 0;
   static constexpr auto Seq1Actor0 = 1;
   static constexpr auto Seq1Actor0Npctradeno = 99;
@@ -75,7 +75,7 @@ private:
     player.playScene( getId(), 1, HIDE_HOTBAR,
                       [ & ]( Entity::Player& player, const Event::SceneResult& result )
                       {
-                        if( result.param2 == 1 && player.collectHandInItems( { uint32_t{ Ritem0 } } ) )
+                        if( result.param2 == 1 && player.collectHandInItems( { Ritem0 } ) )
                         {
                           Scene00100( player );
                         }
