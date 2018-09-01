@@ -59,28 +59,28 @@ class SubSea051 :
    void Scene00000( Entity::Player& player )
    {
       player.playScene( getId(), 0, HIDE_HOTBAR,
-                       [&]( Entity::Player& player, const Event::SceneResult& result )
-                       {
-                          if( result.param2 == 1 )
-                          {
-                             player.updateQuest( getId(), SeqFinish );
-                          }
-                       } );
+                         [ & ]( Entity::Player& player, const Event::SceneResult& result )
+                         {
+                            if( result.param2 == 1 )
+                            {
+                               player.updateQuest( getId(), SeqFinish );
+                            }
+                         } );
    }
 
    void Scene00001( Entity::Player& player )
    {
       player.playScene( getId(), 1, HIDE_HOTBAR,
-                       [&]( Entity::Player& player, const Event::SceneResult& result )
-                       {
-                          if( result.param2 == 1 )
-                          {
-                             if( player.giveQuestRewards( getId(), 0 ) )
-                             {
-                                player.finishQuest( getId() );
-                             }
-                          }
-                       } );
+                         [ & ]( Entity::Player& player, const Event::SceneResult& result )
+                         {
+                            if( result.param2 == 1 )
+                            {
+                               if( player.giveQuestRewards( getId(), 0 ) )
+                               {
+                                  player.finishQuest( getId() );
+                               }
+                            }
+                         } );
    }
 };
 
