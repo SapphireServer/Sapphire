@@ -75,7 +75,7 @@ private:
     player.playScene( getId(), 1, HIDE_HOTBAR,
                       [ & ]( Entity::Player& player, const Event::SceneResult& result )
                       {
-                        if( result.param2 == 1 && player.collectHandInItems( { Ritem0 } ) )
+                        if( result.param2 == 1 && player.collectHandInItems( { uint32_t{ Ritem0 } } ) )
                         {
                           Scene00100( player );
                         }

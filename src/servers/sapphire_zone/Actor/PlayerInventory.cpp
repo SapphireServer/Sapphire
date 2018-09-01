@@ -795,7 +795,7 @@ uint8_t Core::Entity::Player::getFreeSlotsInBags()
 bool Core::Entity::Player::collectHandInItems( std::vector< uint32_t > itemIds )
 {
   // todo: figure out how the game gets the required stack count
-  auto& container = m_storageMap[HandIn];
+  const auto& container = m_storageMap[ HandIn ];
 
   std::vector< uint8_t > foundItems;
 
