@@ -123,11 +123,23 @@ public:
   /*! returns an instancePtr if the player is still bound to an isntance */
   ZonePtr getLinkedInstance( uint32_t playerId ) const;
 
-  void setCurrentFestival( uint16_t festivalId );
+  /*!
+   * @brief Sets the current festival for every zone
+   * @param festivalId A valid festival id from festival.exd
+   * @param additionalFestival A valid festival id from festival.exd, this is shown in addition to the first festival
+   */
+  void setCurrentFestival( uint16_t festivalId, uint16_t additionalFestival = 0 );
 
+  /*!
+   * @brief Disables the current festival(s) in every zone
+   */
   void disableCurrentFestival();
 
-  const uint16_t getCurrentFestival() const;
+  /*!
+   * @brief Gets the current festival set on the server
+   * @return a pair with the 2 festivals currently active
+   */
+  const std::pair< uint16_t, uint16_t >& getCurrentFestival() const;
 
 private:
   using TerritoryTypeDetailCache = std::unordered_map< uint16_t, Data::TerritoryTypePtr >;
@@ -165,8 +177,10 @@ private:
   /*! set of ZonePtrs for quick iteration*/
   std::set< ZonePtr > m_instanceZoneSet;
 
-  /*! id of current festival to set for public zones from festival.exd */
-  uint16_t m_currentFestival;
+  /*! current festival(s) to set for public zones from festival.exd */
+  std::pair< uint16_t, uint16_t > m_currentFestival;
+
+
 
 public:
   /*! returns a list of instanceContent InstanceIds currently active */
