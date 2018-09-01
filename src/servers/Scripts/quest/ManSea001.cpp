@@ -70,7 +70,14 @@ private:
 
   void Scene00005( Entity::Player& player )
   {
-    player.playSceneChain( getId(), 5, HIDE_HOTBAR, bindScene( &ManSea001::Scene00006 ) );
+     player.playScene( getId(), 5, HIDE_HOTBAR,
+                      [ & ]( Entity::Player& player, const Event::SceneResult& result)
+                      {
+                        if( result.param2 == 1 )
+                        {
+                            Scene00006( player );
+                        }
+                      } );
   }
 
   void Scene00006( Entity::Player& player )
