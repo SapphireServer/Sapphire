@@ -51,9 +51,7 @@ protected:
   uint64_t m_lastMobUpdate;
 
   FestivalPair m_currentFestival;
-
-  uint16_t m_currentFestivalId;
-  uint16_t m_currentAdditionalFestivalId;
+  
   boost::shared_ptr< Data::TerritoryType > m_territoryTypeInfo;
 
   std::map< uint8_t, int32_t > m_weatherRateMap;
