@@ -85,12 +85,9 @@ private:
     player.playScene( getId(), 6, INVIS_OTHER_PC,
                       [ & ]( Entity::Player& player, const Event::SceneResult& result )
                       {
-                        if( result.param2 == 1 )
-                        {
                           player.updateQuest( getId(), SEQ_FINISH );
                           player.prepareZoning( player.getZoneId(), true, 1, 0 );
                           player.changePosition( 9, 40, 14, 2 );
-                        }
                       } );
   }
 
