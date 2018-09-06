@@ -23,6 +23,8 @@ class Session;
 class ZonePosition;
 
 using SessionSet = std::set< SessionPtr >;
+using FestivalPair = std::pair< uint16_t, uint16_t >;
+
 namespace Data {
 struct InstanceContent;
 struct TerritoryType;
@@ -48,7 +50,8 @@ protected:
 
   uint64_t m_lastMobUpdate;
 
-  uint16_t m_currentFestivalId;
+  FestivalPair m_currentFestival;
+  
   boost::shared_ptr< Data::TerritoryType > m_territoryTypeInfo;
 
   std::map< uint8_t, int32_t > m_weatherRateMap;
@@ -67,9 +70,9 @@ public:
 
   Common::Weather getCurrentWeather() const;
 
-  uint16_t getCurrentFestival() const;
+  const FestivalPair& getCurrentFestival() const;
 
-  void setCurrentFestival( uint16_t festivalId );
+  void setCurrentFestival( uint16_t festivalId, uint16_t additionalFestivalId = 0 );
 
   virtual bool init();
 

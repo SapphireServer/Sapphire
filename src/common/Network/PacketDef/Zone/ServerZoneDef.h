@@ -685,7 +685,7 @@ struct FFXIVIpcInitZone :
   uint8_t bitmask;
   uint16_t unknown5;
   uint16_t festivalId;
-  uint16_t unknown7;
+  uint16_t additionalFestivalId;
   uint32_t unknown8;
   Common::FFXIVARR_POSITION3 pos;
 };
@@ -969,7 +969,7 @@ struct FFXIVIpcItemInfo :
   uint8_t unknown2;
   uint16_t condition;
   uint16_t spiritBond;
-  uint16_t color;
+  uint16_t stain;
   uint32_t glamourCatalogId;
   uint16_t materia1;
   uint16_t materia2;
