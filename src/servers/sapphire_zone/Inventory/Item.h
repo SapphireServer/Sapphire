@@ -55,6 +55,12 @@ public:
 
   uint32_t getMaxStackSize() const;
 
+  uint16_t getDurability() const;
+  void setDurability( uint16_t durability );
+
+  uint16_t getStain() const;
+  void setStain( uint16_t stain );
+
 
 protected:
   uint32_t m_id;
@@ -78,6 +84,8 @@ protected:
   uint16_t m_weaponDmg;
   float m_autoAttackDmg;
   uint16_t m_itemLevel;
+  uint16_t m_durability;
+  uint16_t m_stain;
 
 };
 

@@ -29,36 +29,31 @@ private:
 
   // Entities found in the script data of the quest
   static constexpr auto Actor0 = 1000430;
-  static constexpr auto Ritem0 = 4552;
+  static constexpr uint32_t Ritem0 = 4552;
   static constexpr auto Seq0Actor0 = 0;
   static constexpr auto Seq1Actor0 = 1;
   static constexpr auto Seq1Actor0Npctradeno = 99;
   static constexpr auto Seq1Actor0Npctradeok = 100;
 
 public:
-  SubFst029() :
-    EventScript( 65708 )
-  {
-  };
+  SubFst029() : EventScript( 65708 )
+  {};
 
   ~SubFst029()
-  {
-  };
+  {};
 
   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
   {
     auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
-    //NOT SAFE - CRASH
-
-    /*if( actor == SubFst029::Actor0 && !player.hasQuest( getId() ) )
+    if( actor == SubFst029::Actor0 && !player.hasQuest( getId() ) )
     {
        Scene00000( player );
     }
     if( actor == SubFst029::Actor0 && player.getQuestSeq ( getId() ) == 255 )
     {
        Scene00001( player );
-    }*/
+    }
   }
 
 private:
@@ -80,7 +75,7 @@ private:
     player.playScene( getId(), 1, HIDE_HOTBAR,
                       [ & ]( Entity::Player& player, const Event::SceneResult& result )
                       {
-                        if( result.param2 == 1 )
+                        if( result.param2 == 1 && player.collectHandInItems( { Ritem0 } ) )
                         {
                           Scene00100( player );
                         }
