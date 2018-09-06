@@ -8,15 +8,15 @@ using namespace Core::Entity;
 
 namespace Core {
 namespace Math {
-   
-   class CalcBattle
-   {
-   public:
-      static uint32_t calculateHealValue( PlayerPtr pPlayer, uint32_t potency );
 
-   private:
+class CalcBattle
+{
+public:
+  static uint32_t calculateHealValue( PlayerPtr pPlayer, uint32_t potency );
 
-   };
+private:
+
+};
 
 }
 }

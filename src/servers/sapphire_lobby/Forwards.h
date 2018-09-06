@@ -13,22 +13,24 @@ x ## Ptr make_ ## x( Args &&...args ) { \
 return boost::make_shared< x >( std::forward< Args >( args ) ... ); }\
 typedef std::vector< x > x ## PtrList;
 
-namespace Core 
-{
-   TYPE_FORWARD( LobbySession );
+namespace Core {
+TYPE_FORWARD( LobbySession );
 
-   namespace Network
-   {
-      TYPE_FORWARD( Hive );
-      TYPE_FORWARD( Acceptor );
-      TYPE_FORWARD( Connection );
-      TYPE_FORWARD( GameConnection );
+namespace Network {
+TYPE_FORWARD( Hive );
 
-      namespace Packets
-      {
-         TYPE_FORWARD( GamePacket );
-      }
-   }
+TYPE_FORWARD( Acceptor );
+
+TYPE_FORWARD( Connection );
+
+TYPE_FORWARD( GameConnection );
+
+namespace Packets {
+TYPE_FORWARD( GamePacket );
+
+TYPE_FORWARD( FFXIVPacketBase );
+}
+}
 
 
 }

@@ -6,122 +6,121 @@
 namespace Core {
 namespace Scripting {
 
-   bool NativeScriptMgr::loadScript( const std::string& path )
-   {
-      auto module = m_loader.loadModule( path );
-      if( !module )
-         return false;
+bool NativeScriptMgr::loadScript( const std::string& path )
+{
+  auto module = m_loader.loadModule( path );
+  if( !module )
+    return false;
 
-      auto scripts = m_loader.getScripts( module->handle );
-      if( !scripts )
-      {
-         m_loader.unloadScript( module );
-         return false;
-      }
+  auto scripts = m_loader.getScripts( module->handle );
+  if( !scripts )
+  {
+    m_loader.unloadScript( module );
+    return false;
+  }
 
-      //
-      bool success = false;
+  //
+  bool success = false;
 
-      for( int i = 0; ; i++ )
-      {
-         if( scripts[i] == nullptr )
-            break;
+  for( int i = 0;; i++ )
+  {
+    if( scripts[ i ] == nullptr )
+      break;
 
-         auto script = scripts[i];
-         module->scripts.push_back( script );
+    auto script = scripts[ i ];
+    module->scripts.push_back( script );
 
-         m_scripts[script->getType()][script->getId()] = script;
+    m_scripts[ script->getType() ][ script->getId() ] = script;
 
-         success = true;
-      }
+    success = true;
+  }
 
-      if( !success )
-      {
-         m_loader.unloadScript( module->handle );
-         return false;
-      }
+  if( !success )
+  {
+    m_loader.unloadScript( module->handle );
+    return false;
+  }
 
-      return true;
-   }
+  return true;
+}
 
-   const std::string NativeScriptMgr::getModuleExtension()
-   {
-      return m_loader.getModuleExtension();
-   }
+const std::string NativeScriptMgr::getModuleExtension()
+{
+  return m_loader.getModuleExtension();
+}
 
-   bool NativeScriptMgr::unloadScript( const std::string& name )
-   {
-      auto info = m_loader.getScriptInfo( name );
-      if( !info )
-         return false;
+bool NativeScriptMgr::unloadScript( const std::string& name )
+{
+  auto info = m_loader.getScriptInfo( name );
+  if( !info )
+    return false;
 
-      return unloadScript( info );
-   }
+  return unloadScript( info );
+}
 
-   bool NativeScriptMgr::unloadScript( ScriptInfo* info )
-   {
-      for( auto& script : info->scripts )
-      {
-         m_scripts[script->getType()].erase( script->getId() );
+bool NativeScriptMgr::unloadScript( ScriptInfo* info )
+{
+  for( auto& script : info->scripts )
+  {
+    m_scripts[ script->getType() ].erase( script->getId() );
 
-         delete script;
-      }
+    delete script;
+  }
 
-      return m_loader.unloadScript( info );
-   }
+  return m_loader.unloadScript( info );
+}
 
-   void NativeScriptMgr::queueScriptReload( const std::string &name )
-   {
-      auto info = m_loader.getScriptInfo( name );
-      if( !info )
-         return;
+void NativeScriptMgr::queueScriptReload( const std::string& name )
+{
+  auto info = m_loader.getScriptInfo( name );
+  if( !info )
+    return;
 
-      // backup actual lib path
-      std::string libPath( info->library_path );
+  // backup actual lib path
+  std::string libPath( info->library_path );
 
-      if( !unloadScript( info ) )
-         return;
+  if( !unloadScript( info ) )
+    return;
 
-      m_scriptLoadQueue.push( libPath );
-   }
+  m_scriptLoadQueue.push( libPath );
+}
 
-   void NativeScriptMgr::processLoadQueue()
-   {
-      std::vector< std::string > deferredLoads;
+void NativeScriptMgr::processLoadQueue()
+{
+  std::vector< std::string > deferredLoads;
 
-      while( !m_scriptLoadQueue.empty() )
-      {
-         auto item = m_scriptLoadQueue.front();
+  while( !m_scriptLoadQueue.empty() )
+  {
+    auto item = m_scriptLoadQueue.front();
 
-         // if it fails, we defer the loading to the next tick
-         if( !loadScript( item ) )
-            deferredLoads.push_back( item );
+    // if it fails, we defer the loading to the next tick
+    if( !loadScript( item ) )
+      deferredLoads.push_back( item );
 
-         m_scriptLoadQueue.pop();
-      }
+    m_scriptLoadQueue.pop();
+  }
 
-      if( !deferredLoads.empty() )
-      {
-         for( auto& item : deferredLoads )
-            m_scriptLoadQueue.push( item );
-      }
-   }
+  if( !deferredLoads.empty() )
+  {
+    for( auto& item : deferredLoads )
+      m_scriptLoadQueue.push( item );
+  }
+}
 
-   void NativeScriptMgr::findScripts( std::set< Core::Scripting::ScriptInfo* >& scripts, const std::string& search )
-   {
-      return m_loader.findScripts( scripts, search );
-   }
+void NativeScriptMgr::findScripts( std::set< Core::Scripting::ScriptInfo* >& scripts, const std::string& search )
+{
+  return m_loader.findScripts( scripts, search );
+}
 
-   bool NativeScriptMgr::isModuleLoaded( const std::string &name )
-   {
-      return m_loader.isModuleLoaded( name );
-   }
+bool NativeScriptMgr::isModuleLoaded( const std::string& name )
+{
+  return m_loader.isModuleLoaded( name );
+}
 
 
-
-   boost::shared_ptr< NativeScriptMgr > createNativeScriptMgr()
-   {
-      return boost::make_shared< NativeScriptMgr >();
-   }
+boost::shared_ptr< NativeScriptMgr > createNativeScriptMgr()
+{
+  return boost::make_shared< NativeScriptMgr >();
+}
 }
 }

@@ -18,11 +18,11 @@
 
 				xhr.onreadystatechange = function() {
 					if (xhr.readyState == 4) {
-						try{
+						try {
 							var response = readBody(xhr);
 							var parsed = JSON.parse(response);
 							window.external.Boot(parsed.sId, parsed.lobbyHost, parsed.frontierHost);
-						}catch(err){
+						} catch(err) {
 							document.getElementById("Error").innerHTML = "User creation failed.";
 						}
 					}
@@ -51,11 +51,14 @@
 			<a href="https://discord.gg/KfrZCkx" class="s-link-badge s-link-badge-discord col-xs-5">
 				Join us on Discord!
 			</a>
-			<a href="https://github.com/SapphireMordred/Sapphire" class="s-link-badge s-link-badge-github col-xs-5 pull-left">
+			<a href="https://github.com/SapphireMordred/Sapphire" class="s-link-badge s-link-badge-github col-xs-5 pull-right">
 				Our Github repository
 			</a>
 		</div>
-		<h2>Github stuff here soon!</h2>
+		<h2>Recent Activity</h2>
+		<ul id="commit-log" class="commit-history">
+
+		</ul>
 	</div>
 	<div class="s-full-split s-right-half col-xs-5">
 		<div class="s-logo">
@@ -94,6 +97,26 @@
     	$(function() {
 			$('[autofocus]:not(:focus)').eq(0).focus();
 		});
+
+
+		fetch( "https://api.github.com/repos/SapphireMordred/Sapphire/events" ).then( function( resp ) {
+			return resp.json();
+		}).then( function( data ) {
+			data = data.filter( function( e ) {
+				return e.type == "PushEvent";
+			});
+
+			let commitContainer = document.getElementById( 'commit-log' );
+			for ( var evnt of data ) {
+				for ( var commit of evnt.payload.commits ) {
+					let e = document.createElement( 'li' );
+					e.innerHTML = '<a href="https://github.com/SapphireMordred/Sapphire/commit/' + commit.sha + '">' + commit.message + '</a>';
+
+					commitContainer.appendChild( e );
+				}
+			}
+		});
+	
     </script>
 </body>
 

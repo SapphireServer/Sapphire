@@ -48,3 +48,6 @@ ALTER TABLE `charainfo` CHANGE `Orchestrion` `Orchestrion` BINARY(40) NULL DEFAU
 ALTER TABLE `charainfo` CHANGE `Minions` `Minions` BINARY(37) NULL DEFAULT NULL;
 ALTER TABLE `charainfo` CHANGE `QuestCompleteFlags` `QuestCompleteFlags` VARBINARY(396) NULL DEFAULT NULL;
 ALTER TABLE `charainfo` ADD COLUMN `EquipDisplayFlags` INT(3) NULL DEFAULT '0' AFTER `GMRank`;
+ALTER TABLE `charainfo` ADD COLUMN `Pose` INT(3) NULL DEFAULT '0' AFTER `EquipDisplayFlags`;
+
+ALTER TABLE `characlass` DROP PRIMARY KEY, ADD INDEX `CharacterId` (`CharacterId`);

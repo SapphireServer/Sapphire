@@ -7,33 +7,34 @@
 
 namespace Core {
 
-   class Session
-   {
+class Session
+{
 
-   private:
-      uint32_t	m_ip;
-      uint32_t	m_accountId;
+private:
+  uint32_t m_ip;
+  uint32_t m_accountId;
 
-      uint8_t	m_sessionId[56];
+  uint8_t m_sessionId[56];
 
-   public:
+public:
 
-      std::string newCharName;
+  std::string newCharName;
 
-      Session();
-      ~Session();
+  Session();
 
-      uint32_t getIp() const;
+  ~Session();
 
-      void setSessionId( uint8_t * sessionId );
+  uint32_t getIp() const;
 
-      void setIp( uint32_t ip );
+  void setSessionId( uint8_t* sessionId );
 
-      uint32_t getAccountId() const;
+  void setIp( uint32_t ip );
 
-      void setAccountId( uint32_t id );
+  uint32_t getAccountId() const;
 
-   };
+  void setAccountId( uint32_t id );
+
+};
 
 }
 

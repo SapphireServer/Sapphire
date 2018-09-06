@@ -5,12 +5,10 @@
 #include <Network/GamePacketNew.h>
 #include <Logging/Logger.h>
 #include <Network/PacketContainer.h>
+#include <Network/PacketDef/Zone/ClientZoneDef.h>
 
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
-#include "Network/PacketWrappers/ActorControlPacket142.h"
-#include "Network/PacketWrappers/ActorControlPacket143.h"
-#include "Network/PacketWrappers/ActorControlPacket144.h"
 
 #include "Zone/Zone.h"
 #include "Zone/ZonePosition.h"
@@ -29,75 +27,65 @@ using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-enum InventoryOperation
-{
-   Discard = 0x07,
-   Move = 0x08,
-   Swap = 0x09,
-   Merge = 0x0C,
-   Split = 0x0A
-};
-
-void Core::Network::GameConnection::inventoryModifyHandler( const Packets::GamePacket& inPacket,
+void Core::Network::GameConnection::inventoryModifyHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                             Entity::Player& player )
 {
-   uint32_t seq = inPacket.getValAt< uint32_t >( 0x20 );
-   uint8_t action = inPacket.getValAt< uint8_t >( 0x24 );
-   uint8_t fromSlot = inPacket.getValAt< uint8_t >( 0x30 );
-   uint8_t toSlot = inPacket.getValAt< uint8_t >( 0x44 );
-   uint16_t fromContainer = inPacket.getValAt< uint16_t >( 0x2C );
-   uint16_t toContainer = inPacket.getValAt< uint16_t >( 0x40 );
-   // todo: check packet handler in game and see if this is sent as a u16 or u32
-   uint16_t splitCount = inPacket.getValAt< uint16_t >( 0x48 );
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcInventoryModifyHandler >( inPacket );
 
-   ZoneChannelPacket< FFXIVIpcInventoryActionAck > ackPacket( player.getId() );
-   ackPacket.data().sequence = seq;
-   ackPacket.data().type = 7;
-   player.queuePacket( ackPacket );
-  
-   auto pLog = g_fw.get< Logger >();
+  const auto& action = packet.data().action;
+  const auto& splitCount = packet.data().splitCount;
 
+  const auto& fromSlot = packet.data().fromSlot;
+  const auto& fromContainer = packet.data().fromContainer;
+  const auto& toSlot = packet.data().toSlot;
+  const auto& toContainer = packet.data().toContainer;
 
-   pLog->debug( inPacket.toString() );
-   pLog->debug( "InventoryAction: " + std::to_string( action ) );
+  auto ackPacket = makeZonePacket< Server::FFXIVIpcInventoryActionAck >( player.getId() );
+  ackPacket->data().sequence = packet.data().seq;
+  ackPacket->data().type = 7;
+  player.queuePacket( ackPacket );
 
-   // TODO: other inventory operations need to be implemented
-   switch( action )
-   {
+  auto pLog = g_fw.get< Logger >();
 
-      case InventoryOperation::Discard: // discard item action
-      {
-         player.getInventory()->discardItem( fromContainer, fromSlot );
-      }
+  pLog->debug( "InventoryAction: " + std::to_string( action ) );
+
+  // TODO: other inventory operations need to be implemented
+  switch( action )
+  {
+
+    case InventoryOperation::Discard: // discard item action
+    {
+      player.discardItem( fromContainer, fromSlot );
+    }
       break;
 
-      case InventoryOperation::Move: // move item action
-      {
-         player.getInventory()->moveItem( fromContainer, fromSlot, toContainer, toSlot );
-      }
+    case InventoryOperation::Move: // move item action
+    {
+      player.moveItem( fromContainer, fromSlot, toContainer, toSlot );
+    }
       break;
 
-      case InventoryOperation::Swap: // swap item action
-      {
-         player.getInventory()->swapItem( fromContainer, fromSlot, toContainer, toSlot );
-      }
+    case InventoryOperation::Swap: // swap item action
+    {
+      player.swapItem( fromContainer, fromSlot, toContainer, toSlot );
+    }
       break;
 
-      case InventoryOperation::Merge: // merge stack action
-      {
-         player.getInventory()->mergeItem( fromContainer, fromSlot, toContainer, toSlot );
-      }
+    case InventoryOperation::Merge: // merge stack action
+    {
+      player.mergeItem( fromContainer, fromSlot, toContainer, toSlot );
+    }
       break;
 
-      case InventoryOperation::Split: // split stack action
-      {
-         player.getInventory()->splitItem( fromContainer, fromSlot, toContainer, toSlot, splitCount );
-      }
+    case InventoryOperation::Split: // split stack action
+    {
+      player.splitItem( fromContainer, fromSlot, toContainer, toSlot, splitCount );
+    }
       break;
 
-      default:
-         break;
+    default:
+      break;
 
-   }
+  }
 }
 

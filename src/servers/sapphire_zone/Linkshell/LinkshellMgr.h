@@ -4,24 +4,25 @@
 #include <boost/shared_ptr.hpp>
 #include <map>
 
-namespace Core
-{
+namespace Core {
 class Linkshell;
+
 using LinkshellPtr = boost::shared_ptr< Linkshell >;
 
 class LinkshellMgr
 {
 private:
-   std::map< uint64_t, LinkshellPtr > m_linkshellIdMap;
-   std::map< std::string, LinkshellPtr > m_linkshellNameMap;
+  std::map< uint64_t, LinkshellPtr > m_linkshellIdMap;
+  std::map< std::string, LinkshellPtr > m_linkshellNameMap;
 
-   LinkshellPtr getLinkshellByName( const std::string& name );
-   LinkshellPtr getLinkshellById( uint64_t lsId );
+  LinkshellPtr getLinkshellByName( const std::string& name );
+
+  LinkshellPtr getLinkshellById( uint64_t lsId );
 
 public:
-   LinkshellMgr();
+  LinkshellMgr();
 
-   bool loadLinkshells();
+  bool loadLinkshells();
 };
 
 }

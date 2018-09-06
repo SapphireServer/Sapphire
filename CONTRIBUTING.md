@@ -22,7 +22,7 @@ When making a PR, please make sure that it follows our style guidelines and good
 
 ### Coding style
 
-Indentations are Allman-style based, 3-space, no tabs.
+Indentations are Allman-style based, 2-space, no tabs.
 Space between arguments in function calls, as well as for types.
 
 Example (shortened from ActionHandler.cpp):
@@ -30,30 +30,30 @@ Example (shortened from ActionHandler.cpp):
 ```cpp
 switch( commandId )
 {
-   case 0x01:  // Toggle sheathe
-   {
-      if ( param11 == 1 )
-         pPlayer->setStance( Entity::Chara::Stance::Active );
-      else
-      {
-         pPlayer->setStance( Entity::Chara::Stance::Passive );
-         pPlayer->setAutoattack( false );
-      }
+  case 0x01:  // Toggle sheathe
+  {
+    if( param11 == 1 )
+       pPlayer->setStance( Entity::Chara::Stance::Active );
+    else
+    {
+      pPlayer->setStance( Entity::Chara::Stance::Passive );
+      pPlayer->setAutoattack( false );
+    }
 
-      pPlayer->sendToInRangeSet( ActorControlPacket142( pPlayer->getId(), 0, param11, 1 ) );
+    pPlayer->sendToInRangeSet( ActorControlPacket142( pPlayer->getId(), 0, param11, 1 ) );
 
-      break;
-   }
-   case 0x03: // Change target
-   {
-      uint64_t targetId = inPacket.getValAt< uint64_t >( 0x24 );
-      pPlayer->changeTarget( targetId );
-      break;
-   }
-   default:
-   {
-      break;
-   }
+    break;
+  }
+  case 0x03: // Change target
+  {
+    uint64_t targetId = inPacket.getValAt< uint64_t >( 0x24 );
+    pPlayer->changeTarget( targetId );
+    break;
+  }
+  default:
+  {
+    break;
+  }
 }
 ```
 

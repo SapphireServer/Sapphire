@@ -9,73 +9,83 @@ class Item
 {
 
 public:
-   Item();
-   Item( uint32_t catalogId );
-   Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, Common::ItemUICategory categoryId, bool isHq = false );
-   ~Item();
+  Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, bool isHq = false );
 
-   uint32_t getId() const;
+  ~Item() = default;
 
-   void setId( uint32_t id );
+  uint32_t getId() const;
 
-   uint64_t getUId() const;
+  void setId( uint32_t id );
 
-   void setUId( uint64_t id );
+  uint64_t getUId() const;
 
-   void setStackSize( uint32_t size );
+  void setUId( uint64_t id );
 
-   uint32_t getStackSize() const;
+  void setStackSize( uint32_t size );
 
-   void setCategory( Common::ItemUICategory categoryId );
+  uint32_t getStackSize() const;
 
-   Common::ItemUICategory getCategory() const;
+  void setCategory( Common::ItemUICategory categoryId );
 
-   void setModelIds( uint64_t model1, uint64_t model2 );
+  Common::ItemUICategory getCategory() const;
 
-   uint64_t getModelId1() const;
+  void setModelIds( uint64_t model1, uint64_t model2 );
 
-   uint64_t getModelId2() const;
+  uint64_t getModelId1() const;
 
-   bool isHq() const;
+  uint64_t getModelId2() const;
 
-   void setHq( bool isHq );
+  bool isHq() const;
 
-   uint16_t getDelay() const;
+  void setHq( bool isHq );
 
-   uint16_t getPhysicalDmg() const;
+  uint16_t getDelay() const;
 
-   uint16_t getMagicalDmg() const;
+  uint16_t getPhysicalDmg() const;
 
-   uint16_t getWeaponDmg() const;
+  uint16_t getMagicalDmg() const;
 
-   bool isWeapon() const;
+  uint16_t getWeaponDmg() const;
 
-   float getAutoAttackDmg() const;
+  bool isWeapon() const;
 
-   uint16_t getItemLevel() const;
+  float getAutoAttackDmg() const;
+
+  uint16_t getItemLevel() const;
+
+  uint32_t getMaxStackSize() const;
+
+  uint16_t getDurability() const;
+  void setDurability( uint16_t durability );
+
+  uint16_t getStain() const;
+  void setStain( uint16_t stain );
 
 
 protected:
-   uint32_t                m_id;
+  uint32_t m_id;
 
-   uint64_t                m_uId;
-   
-   Common::ItemUICategory  m_category;
+  uint64_t m_uId;
 
-   uint32_t                m_stackSize;
-   std::vector< uint8_t >  m_classJobList;
+  Common::ItemUICategory m_category;
 
-   uint64_t                m_model1;
-   uint64_t                m_model2;
+  uint32_t m_stackSize;
+  uint32_t m_maxStackSize;
+  std::vector< uint8_t > m_classJobList;
 
-   bool                    m_isHq;
+  uint64_t m_model1;
+  uint64_t m_model2;
 
-   uint16_t                m_delayMs;
-   uint16_t                m_physicalDmg;
-   uint16_t                m_magicalDmg;
-   uint16_t                m_weaponDmg;
-   float                   m_autoAttackDmg;
-   uint16_t                m_itemLevel;
+  bool m_isHq;
+
+  uint16_t m_delayMs;
+  uint16_t m_physicalDmg;
+  uint16_t m_magicalDmg;
+  uint16_t m_weaponDmg;
+  float m_autoAttackDmg;
+  uint16_t m_itemLevel;
+  uint16_t m_durability;
+  uint16_t m_stain;
 
 };
 
