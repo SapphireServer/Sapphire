@@ -5,7 +5,7 @@
 #include <Common.h>
 
 #include "DebugCommand.h"
-#include "Forwards.h"
+#include "ForwardsZone.h"
 
 namespace Core {
 

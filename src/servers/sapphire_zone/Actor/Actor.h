@@ -4,7 +4,7 @@
 #include <Common.h>
 #include <boost/enable_shared_from_this.hpp>
 
-#include "Forwards.h"
+#include "ForwardsZone.h"
 #include <set>
 #include <map>
 #include <queue>
@@ -17,8 +17,7 @@ namespace Entity {
 \brief Base class for all actor/objects
 
 */
-class Actor :
-  public boost::enable_shared_from_this< Actor >
+class Actor : public boost::enable_shared_from_this< Actor >
 {
 
 protected:
@@ -45,17 +44,11 @@ protected:
 public:
   explicit Actor( Common::ObjKind type );
 
-  virtual ~Actor()
-  {
-  };
+  virtual ~Actor() {};
 
-  virtual void spawn( PlayerPtr pTarget )
-  {
-  }
+  virtual void spawn( PlayerPtr pTarget ) {}
 
-  virtual void despawn( PlayerPtr pTarget )
-  {
-  }
+  virtual void despawn( PlayerPtr pTarget ) {}
 
   uint32_t getId() const;
 
@@ -126,6 +119,8 @@ public:
   PlayerPtr getAsPlayer();
 
   EventObjectPtr getAsEventObj();
+
+  BNpcPtr getAsBNpc();
 
   ZonePtr getCurrentZone() const;
 

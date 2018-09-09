@@ -1,7 +1,7 @@
 #ifndef SAPPHIRE_TERRITORYMGR_H
 #define SAPPHIRE_TERRITORYMGR_H
 
-#include "Forwards.h"
+#include "ForwardsZone.h"
 #include <set>
 #include <unordered_map>
 

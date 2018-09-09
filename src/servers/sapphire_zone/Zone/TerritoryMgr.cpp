@@ -282,7 +282,7 @@ Core::ZonePtr Core::TerritoryMgr::getInstanceZonePtr( uint32_t instanceId ) cons
 
 void Core::TerritoryMgr::loadTerritoryPositionMap()
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto pQR = pDb->query( "SELECT id, target_zone_id, pos_x, pos_y, pos_z, pos_o, radius FROM zonepositions;" );
 
   while( pQR->next() )

@@ -16,6 +16,7 @@
 #include "Chara.h"
 #include "EventObject.h"
 #include "Player.h"
+#include "BNpc.h"
 
 #include "ServerZone.h"
 #include "Session.h"
@@ -146,12 +147,20 @@ Core::Entity::PlayerPtr Core::Entity::Actor::getAsPlayer()
   return boost::dynamic_pointer_cast< Entity::Player, Entity::Actor >( shared_from_this() );
 }
 
-/*! \return pointer to this instance as PlayerPtr */
+/*! \return pointer to this instance as EventObjPtr */
 Core::Entity::EventObjectPtr Core::Entity::Actor::getAsEventObj()
 {
   if( !isEventObj() )
     return nullptr;
   return boost::dynamic_pointer_cast< Entity::EventObject, Entity::Actor >( shared_from_this() );
+}
+
+/*! \return pointer to this instance as BNpcPtr */
+Core::Entity::BNpcPtr Core::Entity::Actor::getAsBNpc()
+{
+  if( !isBattleNpc() )
+    return nullptr;
+  return boost::dynamic_pointer_cast< Entity::BNpc, Entity::Actor >( shared_from_this() );
 }
 
 /*!

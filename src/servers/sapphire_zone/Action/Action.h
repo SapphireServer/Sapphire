@@ -2,7 +2,7 @@
 #define _ACTION_H_
 
 #include <Common.h>
-#include "../Forwards.h"
+#include "../ForwardsZone.h"
 
 namespace Core {
 namespace Action {

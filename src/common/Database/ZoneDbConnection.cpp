@@ -1,22 +1,22 @@
-#include "CharaDbConnection.h"
+#include "ZoneDbConnection.h"
 #include <MySqlConnector.h>
 
-Core::Db::CharaDbConnection::CharaDbConnection( ConnectionInfo& connInfo ) :
+Core::Db::ZoneDbConnection::ZoneDbConnection( ConnectionInfo& connInfo ) :
   DbConnection( connInfo )
 {
 }
 
-Core::Db::CharaDbConnection::CharaDbConnection( Core::LockedWaitQueue< boost::shared_ptr< Operation > >* q,
+Core::Db::ZoneDbConnection::ZoneDbConnection( Core::LockedWaitQueue< boost::shared_ptr< Operation > >* q,
                                                 ConnectionInfo& connInfo ) :
   DbConnection( q, connInfo )
 {
 }
 
-Core::Db::CharaDbConnection::~CharaDbConnection()
+Core::Db::ZoneDbConnection::~ZoneDbConnection()
 {
 }
 
-void Core::Db::CharaDbConnection::doPrepareStatements()
+void Core::Db::ZoneDbConnection::doPrepareStatements()
 {
   if( !m_reconnecting )
     m_stmts.resize( MAX_STATEMENTS );
@@ -138,7 +138,7 @@ void Core::Db::CharaDbConnection::doPrepareStatements()
                     "UPDATE charainfosearch SET SelectRegion = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
   prepareStatement( CHARA_SEARCHINFO_UP_SEARCHCOMMENT,
                     "UPDATE charainfosearch SET SearchComment = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
-  prepareStatement( CHARA_SEARCHINFO_SEL, "SELECT * FROM charainfosearch WHERE CharacterId = ?;", CONNECTION_SYNC );
+  prepareStatement( CHARA_SEL_SEARCHINFO, "SELECT * FROM charainfosearch WHERE CharacterId = ?;", CONNECTION_SYNC );
 
   /// QUEST INFO
   prepareStatement( CHARA_QUEST_INS,
@@ -154,7 +154,7 @@ void Core::Db::CharaDbConnection::doPrepareStatements()
   prepareStatement( CHARA_QUEST_DEL, "DELETE FROM charaquestnew WHERE CharacterId = ? AND QuestId = ?;",
                     CONNECTION_ASYNC );
 
-  prepareStatement( CHARA_QUEST_SEL, "SELECT * FROM charaquestnew WHERE CharacterId = ?;", CONNECTION_SYNC );
+  prepareStatement( CHARA_SEL_QUEST, "SELECT * FROM charaquestnew WHERE CharacterId = ?;", CONNECTION_SYNC );
 
   /// CLASS INFO
   prepareStatement( CHARA_CLASS_SEL, "SELECT ClassIdx, Exp, Lvl FROM characlass WHERE CharacterId = ?;",
@@ -174,6 +174,14 @@ void Core::Db::CharaDbConnection::doPrepareStatements()
   prepareStatement( CHARA_ITEMGLOBAL_INS,
                     "INSERT INTO charaglobalitem ( CharacterId, ItemId, catalogId, UPDATE_DATE ) VALUES ( ?, ?, ?, NOW() );",
                     CONNECTION_BOTH );
+
+  /// BNPC TEMPLATES
+  prepareStatement( ZONE_SEL_BNPCTEMPLATES,
+                    "SELECT Id, Name, bNPCBaseId, bNPCNameId, mainWeaponModel, "
+                           "secWeaponModel, aggressionMode, enemyType, pose, "
+                           "modelChara, displayFlags, Look, Models "
+                    "FROM bnpctemplate WHERE 1;",
+                    CONNECTION_BOTH);
 
 
 }

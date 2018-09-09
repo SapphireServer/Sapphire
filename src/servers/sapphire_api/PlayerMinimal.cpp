@@ -31,7 +31,7 @@ PlayerMinimal::~PlayerMinimal( void )
 void PlayerMinimal::load( uint32_t charId )
 {
 
-  auto stmt = g_charaDb.getPreparedStatement( Db::CharaDbStatements::CHARA_SEL_MINIMAL );
+  auto stmt = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_SEL_MINIMAL );
 
   stmt->setUInt( 1, charId );
   auto res = g_charaDb.query( stmt );
@@ -63,7 +63,7 @@ void PlayerMinimal::load( uint32_t charId )
   m_zoneId = res->getUInt8( "TerritoryId" );
 
   // SELECT ClassIdx, Exp, Lvl
-  auto stmtClass = g_charaDb.getPreparedStatement( Db::CharaDbStatements::CHARA_SEL_MINIMAL );
+  auto stmtClass = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_SEL_MINIMAL );
   stmtClass->setInt( 1, m_id );
 
   auto resClass = g_charaDb.query( stmt );
@@ -230,14 +230,14 @@ void PlayerMinimal::saveAsNew()
   //        "Aetheryte, GMRank, UPDATE_DATE )
 
   // CharacterId, ClassIdx, Exp, Lvl
-  auto stmtClass = g_charaDb.getPreparedStatement( Db::CharaDbStatements::CHARA_CLASS_INS );
+  auto stmtClass = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_CLASS_INS );
   stmtClass->setInt( 1, m_id );
   stmtClass->setInt( 2, g_exdDataGen.get< Core::Data::ClassJob >( m_class )->expArrayIndex );
   stmtClass->setInt( 3, 0 );
   stmtClass->setInt( 4, 1 );
   g_charaDb.directExecute( stmtClass );
 
-  auto stmt = g_charaDb.getPreparedStatement( Db::CharaDbStatements::CHARA_INS );
+  auto stmt = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_INS );
   stmt->setInt( 1, m_accountId );
   stmt->setInt( 2, m_id );
   stmt->setInt64( 3, m_contentId );
@@ -273,7 +273,7 @@ void PlayerMinimal::saveAsNew()
   stmt->setBinary( 33, orchestrion );
   g_charaDb.directExecute( stmt );
 
-  auto stmtSearchInfo = g_charaDb.getPreparedStatement( Db::CharaDbStatements::CHARA_SEARCHINFO_INS );
+  auto stmtSearchInfo = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_SEARCHINFO_INS );
   stmtSearchInfo->setInt( 1, m_id );
   g_charaDb.directExecute( stmtSearchInfo );
 

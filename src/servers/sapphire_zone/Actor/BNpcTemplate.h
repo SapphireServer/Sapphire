@@ -3,19 +3,6 @@
 
 #include <stdint.h>
 
-/*g_log.info( "|----> " + std::to_string( instance.bNPCBase ) +
-            " " + std::to_string( instance.mainWeaponModel ) +
-            ", " + std::to_string( instance.secWeaponModel ) +
-            ", " + std::to_string( instance.aggressionMode ) +
-            ", " + std::to_string( instance.enemyType ) +
-            ", " + std::to_string( instance.onlineStatus ) +
-            ", " + std::to_string( instance.pose ) +
-            ", " + std::to_string( instance.modelChara ) +
-            ", " + std::to_string( instance.displayFlags ) +
-            ", " + modelStr +
-            ", " + cusStr +
-            ", " + std::to_string( instance.gimmickId ) */
-
 namespace Core {
 namespace Entity {
 
@@ -24,6 +11,7 @@ class BNpcTemplate
 {
 
 private:
+  uint32_t m_id;
   uint32_t m_bNpcBaseId;
   uint32_t m_bNpcNameId;
   uint64_t m_weaponMain;
@@ -38,16 +26,18 @@ private:
   uint8_t m_customize[26];
 
 public:
-  BNpcTemplate()
-  {
-  };
+  BNpcTemplate() {};
 
-  BNpcTemplate( uint32_t baseId, uint32_t nameId, uint64_t weaponMain, uint64_t weaponSub, uint8_t aggressionMode,
+  BNpcTemplate( uint32_t id, uint32_t baseId, uint32_t nameId, uint64_t weaponMain, uint64_t weaponSub, uint8_t aggressionMode,
                 uint8_t enemyType, uint8_t onlineStatus, uint8_t pose, uint16_t modelChara,
                 uint32_t displayFlags = 0,
                 uint32_t* modelEquip = nullptr, uint8_t* customize = nullptr );
 
   virtual ~BNpcTemplate();
+
+  uint32_t getId() const;
+
+  void setId( uint32_t id );
 
   uint32_t getBNpcBaseId() const;
 

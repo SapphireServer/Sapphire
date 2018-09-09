@@ -21,6 +21,7 @@
 #include "Session.h"
 #include "Actor/Chara.h"
 #include "Actor/Actor.h"
+#include "Actor/BNpc.h"
 #include "Actor/Player.h"
 #include "Actor/EventObject.h"
 
@@ -29,7 +30,7 @@
 #include "Script/ScriptMgr.h"
 
 #include "Session.h"
-#include "Forwards.h"
+#include "ForwardsZone.h"
 #include "ServerZone.h"
 #include "CellHandler.h"
 #include "Zone.h"
@@ -229,6 +230,14 @@ void Core::Zone::pushActor( Entity::ActorPtr pActor )
     m_playerMap[ pPlayer->getId() ] = pPlayer;
     updateCellActivity( cx, cy, 2 );
   }
+  else if( pActor->isBattleNpc() )
+  {
+    auto pBNpc = pActor->getAsBNpc();
+
+    m_bNpcMap[ pBNpc->getId() ] = pBNpc;
+    updateCellActivity( cx, cy, 2 );
+
+  }
 }
 
 void Core::Zone::removeActor( Entity::ActorPtr pActor )
@@ -257,6 +266,10 @@ void Core::Zone::removeActor( Entity::ActorPtr pActor )
 
     onLeaveTerritory( *pActor->getAsPlayer() );
 
+  }
+  else if( pActor->isBattleNpc() )
+  {
+    m_bNpcMap.erase( pActor->getId() );
   }
 
   // remove from lists of other actors
@@ -634,7 +647,7 @@ void Core::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
       pCurAct->addInRangeActor( pActor );
 
       // this is a hack to limit actor spawn in one packetset
-      if( count++ > 12 )
+      if( count++ > 10 )
         break;
     }
     else if( !isInRange && isInRangeSet )

@@ -120,7 +120,7 @@ bool Core::Items::Util::isOneHandedWeapon( Common::ItemUICategory weaponCategory
 Core::ItemPtr Core::Items::Util::loadItem( uint64_t uId )
 {
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   // load actual item
   auto itemRes = pDb->query(
     "SELECT catalogId, stack, flags FROM charaglobalitem WHERE itemId = " + std::to_string( uId ) + ";" );
@@ -176,7 +176,7 @@ Core::Common::ContainerType Core::Items::Util::getContainerType( uint32_t contai
 uint32_t Core::Items::Util::getNextUId()
 {
   uint32_t charId = 0;
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto pQR = pDb->query( "SELECT MAX(ItemId) FROM charaglobalitem" );
 
   if( !pQR->next() )

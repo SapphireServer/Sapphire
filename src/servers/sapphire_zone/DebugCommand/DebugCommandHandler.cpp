@@ -137,7 +137,7 @@ void Core::DebugCommandHandler::set( char* data, Entity::Player& player, boost::
 {
   auto pLog = g_fw.get< Logger >();
   auto pTerriMgr = g_fw.get< TerritoryMgr >();
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   std::string subCommand = "";
   std::string params = "";
 

@@ -4,7 +4,7 @@
 #include <MySqlConnector.h>
 #include "StatementTask.h"
 #include "Operation.h"
-#include "CharaDbConnection.h"
+#include "ZoneDbConnection.h"
 #include <boost/make_shared.hpp>
 #include "Framework.h"
 
@@ -284,4 +284,4 @@ void DatabaseWorkerPool<T>::ExecuteOrAppend(SQLTransaction& trans, PreparedState
 */
 
 template
-class Core::Db::DbWorkerPool< Core::Db::CharaDbConnection >;
+class Core::Db::DbWorkerPool< Core::Db::ZoneDbConnection >;

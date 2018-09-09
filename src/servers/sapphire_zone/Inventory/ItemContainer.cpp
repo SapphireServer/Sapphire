@@ -40,7 +40,7 @@ uint8_t Core::ItemContainer::getEntryCount() const
 void Core::ItemContainer::removeItem( uint8_t slotId )
 {
   auto pLog = g_fw.get< Logger >();
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   ItemMap::iterator it = m_itemMap.find( slotId );
 
   if( it != m_itemMap.end() )

@@ -5,8 +5,8 @@
 
 namespace Core {
 namespace Entity {
-class EventObject :
-  public Actor
+
+class EventObject : public Actor
 {
 public:
   EventObject( uint32_t actorId, uint32_t objectId, uint32_t gimmickId, uint8_t initialState,

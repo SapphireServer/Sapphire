@@ -16,6 +16,8 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/variant/detail/substitute.hpp>
+#include <boost/format.hpp>
 
 using namespace boost::system;
 namespace filesys = boost::filesystem;
@@ -117,6 +119,19 @@ struct FFXIVIpcNpcSpawn
   uint32_t unk34;
 };
 
+std::string binaryToHexString( uint8_t* pBinData, uint16_t size )
+{
+  std::string outStr;
+
+  for( uint32_t i = 0; i < size; i++ )
+  {
+    outStr += boost::str( boost::format( "%|02X|" ) % ( int32_t ) ( pBinData[ i ] & 0xFF ) );
+  }
+
+  return outStr;
+
+}
+
 
 std::vector< std::string > getAllFilesInDir( const std::string& dirPath,
                                              const std::vector< std::string > dirSkipList = {} )
@@ -175,7 +190,179 @@ std::vector< std::string > getAllFilesInDir( const std::string& dirPath,
 }
 
 
-int main()
+std::string delChar( std::string &str, char del )
+{
+  str.erase( std::remove( str.begin(), str.end(), del ), str.end() );
+  return str;
+}
+
+int dumpSpawns()
+{
+
+  g_log.init();
+
+  g_log.info( "Setting up EXD data" );
+  if( !g_exdData.init( datLocation ) )
+  {
+    g_log.fatal( "Error setting up EXD data " );
+    return 0;
+  }
+
+  std::map< int, std::vector< FFXIVIpcNpcSpawn > > nameToPacketList;
+  std::map< int, std::vector< FFXIVIpcNpcSpawn > > zoneToPacketList;
+
+  auto listOfFiles = getAllFilesInDir( "G:\\programming\\sapphire\\github\\ffxivmon\\bin\\CapturedNpcs",
+                                       { ".svn", "logs", "backup" } );
+
+  for( auto file : listOfFiles )
+  {
+    if( !filesys::is_directory( file ) )
+    {
+      auto pos = file.find_last_of( "\\" );
+      if( pos != std::string::npos )
+      {
+
+        auto pos = file.find_last_of( filesys::path::preferred_separator );
+        if( pos != std::string::npos )
+        {
+          auto str = file.substr( 0, pos );
+          pos = str.find_last_of( filesys::path::preferred_separator );
+          auto zone = str.substr( pos + 1 );
+          //g_log.info( zone );
+
+          FFXIVIpcNpcSpawn packet;
+          std::ifstream is;
+          is.open( file, std::ios::binary );
+          is.seekg( 0x20, std::ios::beg );
+          is.read( ( char* ) &packet, sizeof( FFXIVIpcNpcSpawn ) );
+          is.close();
+
+
+          if( packet.subtype != 2 &&
+              packet.subtype != 3 &&
+              packet.enemyType != 0 &&
+              packet.spawnerId == 0xE0000000 &&
+              packet.fateID == 0 &&
+              packet.directorId == 0 )
+            zoneToPacketList[ std::stoi( zone ) ].push_back( packet );
+
+        }
+
+      }
+
+    }
+
+  }
+
+  //std::ofstream out("output.txt");
+
+  int spawngroups = 0;
+  for( auto entry : zoneToPacketList )
+  {
+
+    //auto nameStruct = g_exdData.get< Core::Data::BNpcName >( entry.first );
+    auto teri1 = g_exdData.get< Core::Data::TerritoryType >( entry.first );
+    auto teriPlaceName = g_exdData.get< Core::Data::PlaceName >( teri1->placeName );
+    g_log.info( std::to_string( entry.first ) + " - " + teri1->name + " - " + teriPlaceName->name );
+    g_log.info( "Mob Count: " + std::to_string( entry.second.size() ) );
+
+    for( auto mob : entry.second )
+    {
+      nameToPacketList[ mob.bNPCBase ].push_back( mob );
+
+      auto nameStruct = g_exdData.get< Core::Data::BNpcName >( mob.bNPCName );
+      //g_log.info( nameStruct->singular + " " + std::to_string( packet.bNPCBase ) );
+    }
+
+    std::map< std::string, std::vector< FFXIVIpcNpcSpawn > > lvlToPacket;
+
+    for( auto mobName : nameToPacketList )
+    {
+      for( FFXIVIpcNpcSpawn instance : mobName.second )
+      {
+        lvlToPacket[ std::to_string( instance.level ) + "_" + std::to_string( instance.bNPCBase ) ].push_back( instance );
+      }
+    }
+
+    for( auto mobName : lvlToPacket )
+    {
+      auto nameStruct = g_exdData.get< Core::Data::BNpcName >( mobName.second.at(0).bNPCName );
+      g_log.info( "|--> " + nameStruct->singular + "(" + std::to_string( mobName.second.size() ) + ")" );
+
+      spawngroups++;
+      for( FFXIVIpcNpcSpawn instance : mobName.second )
+      {
+
+        std::string modelStr = "[";
+
+        for( auto modelEntry : instance.models )
+        {
+          modelStr += std::to_string( modelEntry ) + ", ";
+        }
+
+        modelStr += "]";
+
+
+        std::string cusStr = "[";
+
+        for( auto cusEntry : instance.look )
+        {
+          cusStr += std::to_string( cusEntry ) + ", ";
+        }
+
+        cusStr += "]";
+
+
+        modelStr = binaryToHexString( (uint8_t*)instance.models, 40 );
+
+        cusStr = binaryToHexString( (uint8_t*)instance.look, 26 );
+        std::string name = delChar( nameStruct->singular, ' ' );
+        name = delChar( name, '\'' );
+
+        g_log.info( "|----> " + name + "_" + std::to_string( instance.bNPCBase ) + " " +
+                    std::to_string( instance.posX ) + ", " +
+                    std::to_string( instance.posY ) + ", " +
+                    std::to_string( instance.posZ ) + ", " +
+                    std::to_string( instance.modelChara ) + ", " +
+                    std::to_string( instance.gimmickId ) + ", " +
+                    std::to_string( instance.level )  + ", " +
+                    std::to_string( instance.hPMax ) );
+        //g_log.info( "|----> " + name + " - " + std::to_string( instance.bNPCBase ) + ", " + std::to_string( instance.gimmickId ) );
+
+
+
+        /*std::string output = "INSERT IGNORE INTO `bnpctemplate` ( `Name`, `bNPCBaseId`, `bNPCNameId`, `mainWeaponModel`, `secWeaponModel`, `aggressionMode`, `enemyType`, `pose`, `modelChara`, `displayFlags`, `Look`, `Models`) "
+                             "VALUES ( \"" + name +"_" + std::to_string( instance.bNPCBase ) + "\", "
+                             + std::to_string( instance.bNPCBase ) + ", "
+                             + std::to_string( instance.bNPCName ) + ", "
+                             + std::to_string( instance.mainWeaponModel ) + ", "
+                             + std::to_string( instance.secWeaponModel ) + ", "
+                             + std::to_string( instance.aggressionMode ) + ", "
+                             + std::to_string( instance.enemyType ) + ", "
+                             + std::to_string( instance.pose ) + ", "
+                             + std::to_string( instance.modelChara ) + ", "
+                             + std::to_string( instance.displayFlags ) + ", "
+                             + "UNHEX( '" + cusStr + "'), "
+                             + "UNHEX( '" + modelStr + "') );\n";*/
+
+        //g_log.info( output );
+
+        //out << output;
+
+
+      }
+    }
+    nameToPacketList.clear();
+
+  }
+
+  g_log.info( "|--> Total SpawnGroups: " + std::to_string( spawngroups )  );
+
+  return 0;
+}
+
+
+int dumpTemplates()
 {
 
   g_log.init();
@@ -258,6 +445,8 @@ int main()
 
   }
 
+  std::ofstream out("output.txt");
+
   for( auto entry : zoneToPacketList )
   {
 
@@ -269,7 +458,7 @@ int main()
 
     for( auto mob : entry.second )
     {
-      nameToPacketList[ mob.bNPCName ].push_back( mob );
+      nameToPacketList[ mob.bNPCBase ].push_back( mob );
 
       auto nameStruct = g_exdData.get< Core::Data::BNpcName >( mob.bNPCName );
       //g_log.info( nameStruct->singular + " " + std::to_string( packet.bNPCBase ) );
@@ -279,10 +468,11 @@ int main()
 
     for( auto mobName : nameToPacketList )
     {
-      auto nameStruct = g_exdData.get< Core::Data::BNpcName >( mobName.first );
+      auto nameStruct = g_exdData.get< Core::Data::BNpcName >( mobName.second.at(0).bNPCName );
       g_log.info( "|--> " + nameStruct->singular + "(" + std::to_string( mobName.second.size() ) + ")" );
 
-      for( FFXIVIpcNpcSpawn instance : mobName.second )
+      auto instance = mobName.second.at(0);
+      //for( FFXIVIpcNpcSpawn instance : mobName.second )
       {
 
         std::string modelStr = "[";
@@ -305,44 +495,70 @@ int main()
         cusStr += "]";
 
 
-        //g_log.info( "|----> " + std::to_string( instance.bNPCBase ) + " " + std::to_string( instance.posX ) + ", " + std::to_string( instance.posY ) + ", " + std::to_string( instance.posZ )  );
-        /*g_log.info( "|----> " + std::to_string( instance.bNPCBase ) +
-                    " " + std::to_string( instance.mainWeaponModel ) +
-                    ", " + std::to_string( instance.secWeaponModel ) +
-                    ", " + std::to_string( instance.aggressionMode ) +
-                    ", " + std::to_string( instance.enemyType ) +
-                    ", " + std::to_string( instance.onlineStatus ) +
-                    ", " + std::to_string( instance.pose ) +
-                    ", " + std::to_string( instance.modelChara ) +
-                    ", " + std::to_string( instance.displayFlags ) + ", " + modelStr + ", " + cusStr + ", " + std::to_string( instance.gimmickId ) );*/
+        modelStr = binaryToHexString( (uint8_t*)instance.models, 40 );
 
-        g_log.info( "|----> " + std::to_string( instance.bNPCBase ) +
-                    " " + std::to_string( instance.u2ab ) +
-                    ", " + std::to_string( instance.u2b ) +
-                    ", " + std::to_string( instance.u3b ) +
-                    ", " + std::to_string( instance.u3c ) +
-                    ", " + std::to_string( instance.u4 ) +
-                    ", " + std::to_string( instance.u6 ) +
-                    ", " + std::to_string( instance.u7 ) +
-                    ", " + std::to_string( instance.u14 ) +
-                    ", " + std::to_string( instance.u15 ) +
-                    ", " + std::to_string( instance.u18 ) +
-                    ", " + std::to_string( instance.u19 ) +
-                    ", " + std::to_string( instance.u25c ) +
-                    ", " + std::to_string( instance.u26d ) +
-                    ", " + std::to_string( instance.u27a ) +
-                    ", " + std::to_string( instance.u29b ) +
-                    ", " + std::to_string( instance.u30b ) +
-                    ", " + std::to_string( instance.unk30 ) +
-                    ", " + std::to_string( instance.unk31 ) +
-                    ", " + std::to_string( instance.unk32 ) +
-                    ", " + std::to_string( instance.unk33 ) +
-                    ", " + std::to_string( instance.unk34 ) );
+        cusStr = binaryToHexString( (uint8_t*)instance.look, 26 );
+
+        //g_log.info( "|----> " + std::to_string( instance.bNPCBase ) + " " + std::to_string( instance.posX ) + ", " + std::to_string( instance.posY ) + ", " + std::to_string( instance.posZ )  );
+      //  g_log.info( "|----> " + std::to_string( instance.bNPCBase ) +
+      //              " " + std::to_string( instance.mainWeaponModel ) +
+      //              ", " + std::to_string( instance.secWeaponModel ) +
+      //              ", " + std::to_string( instance.aggressionMode ) +
+      //             ", " + std::to_string( instance.enemyType ) +
+      //              ", " + std::to_string( instance.onlineStatus ) +
+      //              ", " + std::to_string( instance.pose ) +
+      //              ", " + std::to_string( instance.modelChara ) +
+      //              ", " + std::to_string( instance.displayFlags ) + ", " + modelStr + ", " + cusStr + ", " + std::to_string( instance.gimmickId ) );
+
+        std::string name = delChar( nameStruct->singular, ' ' );
+        name = delChar( name, '\'' );
+
+        std::string output = "INSERT IGNORE INTO `bnpctemplate` ( `Name`, `bNPCBaseId`, `bNPCNameId`, `mainWeaponModel`, `secWeaponModel`, `aggressionMode`, `enemyType`, `pose`, `modelChara`, `displayFlags`, `Look`, `Models`) "
+                             "VALUES ( \"" + name +"_" + std::to_string( instance.bNPCBase ) + "\", "
+                             + std::to_string( instance.bNPCBase ) + ", "
+                             + std::to_string( instance.bNPCName ) + ", "
+                             + std::to_string( instance.mainWeaponModel ) + ", "
+                             + std::to_string( instance.secWeaponModel ) + ", "
+                             + std::to_string( instance.aggressionMode ) + ", "
+                             + std::to_string( instance.enemyType ) + ", "
+                             + std::to_string( instance.pose ) + ", "
+                             + std::to_string( instance.modelChara ) + ", "
+                             + std::to_string( instance.displayFlags ) + ", "
+                             + "UNHEX( '" + cusStr + "'), "
+                             + "UNHEX( '" + modelStr + "') );\n";
+
+        g_log.info( output );
+
+        out << output;
+
+        /* g_log.info( "|----> " + std::to_string( instance.bNPCBase ) +
+                     " " + std::to_string( instance.u2ab ) +
+                     ", " + std::to_string( instance.u2b ) +
+                     ", " + std::to_string( instance.u3b ) +
+                     ", " + std::to_string( instance.u3c ) +
+                     ", " + std::to_string( instance.u4 ) +
+                     ", " + std::to_string( instance.u6 ) +
+                     ", " + std::to_string( instance.u7 ) +
+                     ", " + std::to_string( instance.u14 ) +
+                     ", " + std::to_string( instance.u15 ) +
+                     ", " + std::to_string( instance.u18 ) +
+                     ", " + std::to_string( instance.u19 ) +
+                     ", " + std::to_string( instance.u25c ) +
+                     ", " + std::to_string( instance.u26d ) +
+                     ", " + std::to_string( instance.u27a ) +
+                     ", " + std::to_string( instance.u29b ) +
+                     ", " + std::to_string( instance.u30b ) +
+                     ", " + std::to_string( instance.unk30 ) +
+                     ", " + std::to_string( instance.unk31 ) +
+                     ", " + std::to_string( instance.unk32 ) +
+                     ", " + std::to_string( instance.unk33 ) +
+                     ", " + std::to_string( instance.unk34 ) );*/
       }
     }
     nameToPacketList.clear();
-  }
 
+  }
+  out.close();
   /*g_log.info( "getting id list " );
   auto idList = g_exdData.getTerritoryTypeIdList();
 
@@ -353,6 +569,14 @@ int main()
 
      g_log.info( teri1->name );
   }*/
+
+  return 0;
+}
+
+int main()
+{
+
+  dumpSpawns();
 
   return 0;
 }

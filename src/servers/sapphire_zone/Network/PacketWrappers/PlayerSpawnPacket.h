@@ -17,8 +17,7 @@ namespace Server {
 /**
 * @brief The packet sent to spawn a player.
 */
-class PlayerSpawnPacket :
-  public ZoneChannelPacket< FFXIVIpcPlayerSpawn >
+class PlayerSpawnPacket : public ZoneChannelPacket< FFXIVIpcPlayerSpawn >
 {
 public:
   PlayerSpawnPacket( Entity::Player& player, Entity::Player& target ) :
@@ -31,7 +30,6 @@ private:
   void initialize( Entity::Player& player, Entity::Player& target )
   {
     // todo: figure out unkown offsets
-
     m_data.classJob = static_cast< uint8_t >( player.getClass() );
     //m_data.status = static_cast< uint8_t >( pPlayer->getStatus() );
 
@@ -132,8 +130,7 @@ private:
       m_data.effect[ effect.first ].effect_id = effect.second->getId();
       m_data.effect[ effect.first ].duration = static_cast< float >( effect.second->getDuration() -
                                                                      ( currentTimeMs -
-                                                                       effect.second->getStartTimeMs() ) ) /
-                                               1000;
+                                                                       effect.second->getStartTimeMs() ) ) / 1000;
       m_data.effect[ effect.first ].sourceActorId = effect.second->getSrcActorId();
       m_data.effect[ effect.first ].unknown1 = effect.second->getParam();
     }
