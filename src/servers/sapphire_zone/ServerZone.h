@@ -7,7 +7,9 @@
 #include <mutex>
 #include <map>
 
-#include "Forwards.h"
+#include "ForwardsZone.h"
+
+#include "Actor/BNpcTemplate.h"
 
 namespace Core {
 
@@ -23,14 +25,10 @@ public:
   bool createSession( uint32_t sessionId );
 
   void removeSession( uint32_t sessionId );
-
-  void removeSession( std::string playerName );
-
-  bool loadSettings( int32_t argc, char* argv[] );
+  void removeSession( const std::string& playerName );
 
   SessionPtr getSession( uint32_t id );
-
-  SessionPtr getSession( std::string playerName );
+  SessionPtr getSession( const std::string& playerName );
 
   size_t getSessionCount() const;
 
@@ -40,8 +38,13 @@ public:
 
   void printBanner() const;
 
-private:
+  bool loadSettings( int32_t argc, char* argv[] );
+  void loadBNpcTemplates();
 
+  Entity::BNpcTemplatePtr getBNpcTemplate( const std::string& key );
+  Entity::BNpcTemplatePtr getBNpcTemplate( uint32_t id );
+
+private:
   uint16_t m_port;
   std::string m_ip;
   int64_t m_lastDBPingTime;
@@ -56,6 +59,8 @@ private:
   std::map< std::string, SessionPtr > m_sessionMapByName;
 
   std::map< uint32_t, uint32_t > m_zones;
+
+  std::map< std::string, Entity::BNpcTemplatePtr > m_bNpcTemplateMap;
 
 };
 

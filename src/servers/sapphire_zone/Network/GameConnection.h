@@ -7,7 +7,7 @@
 //#include <Network/GamePacket.h>
 #include <Util/LockedQueue.h>
 
-#include "Forwards.h"
+#include "ForwardsZone.h"
 
 #define DECLARE_HANDLER( x ) void x( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 

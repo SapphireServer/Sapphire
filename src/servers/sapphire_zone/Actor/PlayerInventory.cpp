@@ -397,7 +397,7 @@ uint32_t Core::Entity::Player::getCrystal( CrystalType type )
 void Core::Entity::Player::writeInventory( InventoryType type )
 {
   auto pLog = g_fw.get< Logger >();
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
 
   auto storage = m_storageMap[ type ];
 
@@ -427,7 +427,7 @@ void Core::Entity::Player::writeInventory( InventoryType type )
 
 void Core::Entity::Player::writeItem( Core::ItemPtr pItem ) const
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   pDb->execute( "UPDATE charaglobalitem SET stack = " + std::to_string( pItem->getStackSize() ) + " " +
                 // TODO: add other attributes
                 " WHERE itemId = " + std::to_string( pItem->getUId() ) );
@@ -435,7 +435,7 @@ void Core::Entity::Player::writeItem( Core::ItemPtr pItem ) const
 
 void Core::Entity::Player::deleteItemDb( Core::ItemPtr item ) const
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   pDb->execute( "UPDATE charaglobalitem SET IS_DELETE = 1 WHERE itemId = " + std::to_string( item->getUId() ) );
 }
 
@@ -449,7 +449,7 @@ bool Core::Entity::Player::isObtainable( uint32_t catalogId, uint8_t quantity )
 
 Core::ItemPtr Core::Entity::Player::addItem( uint32_t catalogId, uint32_t quantity, bool isHq, bool silent )
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
   auto itemInfo = pExdData->get< Core::Data::Item >( catalogId );
 

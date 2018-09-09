@@ -39,6 +39,7 @@ protected:
   std::string m_internalName;
 
   std::unordered_map< int32_t, Entity::PlayerPtr > m_playerMap;
+  std::unordered_map< int32_t, Entity::BNpcPtr > m_bNpcMap;
   std::unordered_map< int32_t, Entity::EventObjectPtr > m_eventObjects;
 
   SessionSet m_sessionSet;
@@ -77,9 +78,7 @@ public:
 
   virtual uint32_t getTerritoryId() const;
 
-  virtual void onBeforePlayerZoneIn( Entity::Player& player )
-  {
-  };
+  virtual void onBeforePlayerZoneIn( Entity::Player& player ) {};
 
   virtual void onPlayerZoneIn( Entity::Player& player );
 
@@ -87,17 +86,13 @@ public:
 
   virtual void onInitDirector( Entity::Player& player );
 
-  virtual void onDirectorSync( Entity::Player& player )
-  {
-  };
+  virtual void onDirectorSync( Entity::Player& player ) {};
 
   virtual void onLeaveTerritory( Entity::Player& player );
 
   virtual void onUpdate( uint32_t currTime );
 
-  virtual void onRegisterEObj( Entity::EventObjectPtr object )
-  {
-  };
+  virtual void onRegisterEObj( Entity::EventObjectPtr object ) {};
 
   virtual void onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 );
 

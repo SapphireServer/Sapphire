@@ -1,10 +1,11 @@
 #include "BNpcTemplate.h"
 #include <string>
 
-Core::Entity::BNpcTemplate::BNpcTemplate( uint32_t baseId, uint32_t nameId, uint64_t weaponMain, uint64_t weaponSub,
+Core::Entity::BNpcTemplate::BNpcTemplate( uint32_t id, uint32_t baseId, uint32_t nameId, uint64_t weaponMain, uint64_t weaponSub,
                                           uint8_t aggressionMode, uint8_t enemyType, uint8_t onlineStatus, uint8_t pose,
                                           uint16_t modelChara, uint32_t displayFlags, uint32_t* modelEquip,
                                           uint8_t* customize ) :
+  m_id( id ),
   m_bNpcBaseId( baseId ),
   m_bNpcNameId( nameId ),
   m_weaponMain( weaponMain ),
@@ -28,6 +29,16 @@ Core::Entity::BNpcTemplate::BNpcTemplate( uint32_t baseId, uint32_t nameId, uint
 Core::Entity::BNpcTemplate::~BNpcTemplate()
 {
 
+}
+
+uint32_t Core::Entity::BNpcTemplate::getId() const
+{
+  return m_id;
+}
+
+void Core::Entity::BNpcTemplate::setId( uint32_t id )
+{
+  m_id = id;
 }
 
 uint32_t Core::Entity::BNpcTemplate::getBNpcBaseId() const

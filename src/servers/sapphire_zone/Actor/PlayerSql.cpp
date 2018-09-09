@@ -30,13 +30,13 @@ using namespace Core::Network::Packets::Server;
 // load player from the db
 bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto pTeriMgr = g_fw.get< TerritoryMgr >();
   auto pLog = g_fw.get< Logger >();
 
   const std::string char_id_str = std::to_string( charId );
 
-  auto stmt = pDb->getPreparedStatement( Db::CharaDbStatements::CHARA_SEL );
+  auto stmt = pDb->getPreparedStatement( Db::ZoneDbStatements::CHARA_SEL );
 
   stmt->setUInt( 1, charId );
   auto res = pDb->query( stmt );
@@ -244,8 +244,8 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
 
 bool Core::Entity::Player::loadActiveQuests()
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
-  auto stmt = pDb->getPreparedStatement( Db::CharaDbStatements::CHARA_QUEST_SEL );
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto stmt = pDb->getPreparedStatement( Db::ZoneDbStatements::CHARA_SEL_QUEST );
 
   stmt->setUInt( 1, m_id );
   auto res = pDb->query( stmt );
@@ -280,9 +280,9 @@ bool Core::Entity::Player::loadActiveQuests()
 
 bool Core::Entity::Player::loadClassData()
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   // ClassIdx, Exp, Lvl
-  auto stmt = pDb->getPreparedStatement( Db::CharaDbStatements::CHARA_CLASS_SEL );
+  auto stmt = pDb->getPreparedStatement( Db::ZoneDbStatements::CHARA_CLASS_SEL );
   stmt->setUInt( 1, m_id );
   auto res = pDb->query( stmt );
 
@@ -301,8 +301,8 @@ bool Core::Entity::Player::loadClassData()
 
 bool Core::Entity::Player::loadSearchInfo()
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
-  auto stmt = pDb->getPreparedStatement( Db::CharaDbStatements::CHARA_SEARCHINFO_SEL );
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto stmt = pDb->getPreparedStatement( Db::ZoneDbStatements::CHARA_SEL_SEARCHINFO );
   stmt->setUInt( 1, m_id );
   auto res = pDb->query( stmt );
 
@@ -322,7 +322,7 @@ bool Core::Entity::Player::loadSearchInfo()
 
 void Core::Entity::Player::updateSql()
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   /*"Hp 1, Mp 2, Tp 3, Gp 4, Mode 5, Mount 6, InvincibleGM 7, Voice 8, "
   "Customize 9, ModelMainWeapon 10, ModelSubWeapon 11, ModelSystemWeapon 12, "
   "ModelEquip 13, EmoteModeType 14, Language 15, IsNewGame 16, IsNewAdventurer 17, "
@@ -333,7 +333,7 @@ void Core::Entity::Player::updateSql()
   "EquippedMannequin 44, ConfigFlags 45, QuestCompleteFlags 46, OpeningSequence 47, "
   "QuestTracking 48, GrandCompany 49, GrandCompanyRank 50, Discovery 51, GMRank 52, Unlocks 53, "
   "CFPenaltyUntil 54, Pose 55"*/
-  auto stmt = pDb->getPreparedStatement( Db::CharaDbStatements::CHARA_UP );
+  auto stmt = pDb->getPreparedStatement( Db::ZoneDbStatements::CHARA_UP );
 
   stmt->setInt( 1, getHp() );
   stmt->setInt( 2, getMp() );
@@ -461,7 +461,7 @@ void Core::Entity::Player::updateSql()
 
 void Core::Entity::Player::updateDbClass() const
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
   uint8_t classJobIndex = pExdData->get< Core::Data::ClassJob >( static_cast<uint8_t>( getClass() ) )->expArrayIndex;
 
@@ -476,7 +476,7 @@ void Core::Entity::Player::updateDbClass() const
 
 void Core::Entity::Player::insertDbClass( const uint8_t classJobIndex ) const
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto stmtClass = pDb->getPreparedStatement( Db::CHARA_CLASS_INS );
   stmtClass->setInt( 1, getId() );
   stmtClass->setInt( 2, classJobIndex );
@@ -487,7 +487,7 @@ void Core::Entity::Player::insertDbClass( const uint8_t classJobIndex ) const
 
 void Core::Entity::Player::updateDbSearchInfo() const
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto stmtS = pDb->getPreparedStatement( Db::CHARA_SEARCHINFO_UP_SELECTCLASS );
   stmtS->setInt( 1, m_searchSelectClass );
   stmtS->setInt( 2, m_id );
@@ -506,7 +506,7 @@ void Core::Entity::Player::updateDbSearchInfo() const
 
 void Core::Entity::Player::updateDbAllQuests() const
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   for( int32_t i = 0; i < 30; i++ )
   {
     if( !m_activeQuests[ i ] )
@@ -531,7 +531,7 @@ void Core::Entity::Player::updateDbAllQuests() const
 
 void Core::Entity::Player::deleteQuest( uint16_t questId ) const
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto stmt = pDb->getPreparedStatement( Db::CHARA_QUEST_DEL );
   stmt->setInt( 1, m_id );
   stmt->setInt( 2, questId );
@@ -540,7 +540,7 @@ void Core::Entity::Player::deleteQuest( uint16_t questId ) const
 
 void Core::Entity::Player::insertQuest( uint16_t questId, uint8_t index, uint8_t seq ) const
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto stmt = pDb->getPreparedStatement( Db::CHARA_QUEST_INS );
   stmt->setInt( 1, m_id );
   stmt->setInt( 2, index );
@@ -560,7 +560,7 @@ void Core::Entity::Player::insertQuest( uint16_t questId, uint8_t index, uint8_t
 Core::ItemPtr Core::Entity::Player::createItem( uint32_t catalogId, uint32_t quantity )
 {
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto itemInfo = pExdData->get< Core::Data::Item >( catalogId );
 
   if( !itemInfo )
@@ -590,7 +590,7 @@ Core::ItemPtr Core::Entity::Player::createItem( uint32_t catalogId, uint32_t qua
 
 bool Core::Entity::Player::loadInventory()
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   //////////////////////////////////////////////////////////////////////////////////////////////////////
   // load active gearset
   auto res = pDb->query( "SELECT storageId, container_0, container_1, container_2, container_3, "

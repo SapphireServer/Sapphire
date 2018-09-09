@@ -7,13 +7,12 @@ namespace Core {
 namespace Db {
 class DbConnectionInfo;
 
-enum CharaDbStatements :
-  uint32_t
+enum ZoneDbStatements : uint32_t
 {
   CHARA_SEL,
   CHARA_SEL_MINIMAL,
-  CHARA_SEARCHINFO_SEL,
-  CHARA_QUEST_SEL,
+  CHARA_SEL_SEARCHINFO,
+  CHARA_SEL_QUEST,
   CHARA_INS,
   CHARA_UP,
   CHARA_UP_NAME,
@@ -75,20 +74,21 @@ enum CharaDbStatements :
 
   CHARA_ITEMGLOBAL_INS,
 
+  ZONE_SEL_BNPCTEMPLATES,
+
   MAX_STATEMENTS
 };
 
-class CharaDbConnection :
-  public DbConnection
+class ZoneDbConnection : public DbConnection
 {
 public:
-  using Statements = CharaDbStatements;
+  using Statements = ZoneDbStatements;
 
-  CharaDbConnection( ConnectionInfo& connInfo );
+  ZoneDbConnection( ConnectionInfo& connInfo );
 
-  CharaDbConnection( Core::LockedWaitQueue< boost::shared_ptr< Operation > >* q, ConnectionInfo& connInfo );
+  ZoneDbConnection( Core::LockedWaitQueue< boost::shared_ptr< Operation > >* q, ConnectionInfo& connInfo );
 
-  ~CharaDbConnection();
+  ~ZoneDbConnection();
 
   void doPrepareStatements() override;
 

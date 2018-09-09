@@ -18,7 +18,7 @@
 #include <Crypt/base64.h>
 
 #include <Database/DbLoader.h>
-#include <Database/CharaDbConnection.h>
+#include <Database/ZoneDbConnection.h>
 #include <Database/DbWorkerPool.h>
 #include <Database/PreparedStatement.h>
 
@@ -38,7 +38,7 @@
 
 Core::Framework g_fw;
 Core::Logger g_log;
-Core::Db::DbWorkerPool< Core::Db::CharaDbConnection > g_charaDb;
+Core::Db::DbWorkerPool< Core::Db::ZoneDbConnection > g_charaDb;
 Core::Data::ExdDataGenerated g_exdDataGen;
 Core::Network::SapphireAPI g_sapphireAPI;
 

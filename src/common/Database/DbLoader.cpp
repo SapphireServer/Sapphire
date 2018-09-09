@@ -1,6 +1,6 @@
 #include "DbLoader.h"
 #include <mysqld_error.h>
-#include "CharaDbConnection.h"
+#include "ZoneDbConnection.h"
 #include "DbWorkerPool.h"
 #include "Logging/Logger.h"
 #include "Framework.h"
@@ -109,6 +109,6 @@ bool Core::Db::DbLoader::process( std::queue< Predicate >& queue )
 
 template
 Core::Db::DbLoader&
-Core::Db::DbLoader::addDb< Core::Db::CharaDbConnection >( Core::Db::DbWorkerPool< Core::Db::CharaDbConnection >&,
+Core::Db::DbLoader::addDb< Core::Db::ZoneDbConnection >( Core::Db::DbWorkerPool< Core::Db::ZoneDbConnection >&,
                                                           const ConnectionInfo& );
 

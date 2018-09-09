@@ -36,8 +36,7 @@ struct QueuedZoning
 *  Inheriting from Actor
 *
 */
-class Player :
-  public Chara
+class Player : public Chara
 {
 public:
   /*! Contructor */

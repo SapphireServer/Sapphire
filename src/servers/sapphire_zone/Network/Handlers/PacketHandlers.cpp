@@ -308,7 +308,7 @@ void Core::Network::GameConnection::discoveryHandler( const Core::Network::Packe
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcDiscoveryHandler >( inPacket );
   const auto& positionRef = packet.data().positionRef;
 
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
 
   auto pQR = pDb->query( "SELECT id, map_id, discover_id "
                          "FROM discoveryinfo "

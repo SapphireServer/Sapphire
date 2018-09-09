@@ -16,7 +16,7 @@ Core::LinkshellMgr::LinkshellMgr()
 
 bool Core::LinkshellMgr::loadLinkshells()
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto res = pDb->query( "SELECT LinkshellId, MasterCharacterId, CharacterIdList, "
                          "LinkshellName, LeaderIdList, InviteIdList "
                          "FROM infolinkshell "

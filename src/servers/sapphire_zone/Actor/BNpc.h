@@ -28,6 +28,8 @@ public:
 
   virtual ~BNpc() override;
 
+  void spawn( PlayerPtr pTarget ) override;
+
 private:
   uint32_t m_bNpcBaseId;
   uint32_t m_bNpcNameId;

@@ -12,13 +12,11 @@
 
 #include <Exd/ExdDataGenerated.h>
 #include <Network/PacketContainer.h>
-#include <Database/DbLoader.h>
-#include <Database/CharaDbConnection.h>
-#include <Database/DbWorkerPool.h>
-#include <Database/PreparedStatement.h>
+#include <Database/DatabaseDef.h>
 #include <Util/Util.h>
 
 #include "Actor/Player.h"
+#include "Actor/BNpcTemplate.h"
 
 #include "Network/GameConnection.h"
 #include "Session.h"
@@ -28,7 +26,7 @@
 #include "Script/ScriptMgr.h"
 #include "Linkshell/LinkshellMgr.h"
 
-#include "Forwards.h"
+#include "ForwardsZone.h"
 
 #include <boost/make_shared.hpp>
 #include <thread>
@@ -58,7 +56,7 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
   auto pLog = g_fw.get< Core::Logger >();
   auto pConfig = g_fw.get< Core::ConfigMgr >();
   auto pExd = g_fw.get< Data::ExdDataGenerated >();
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
 
   pLog->info( "Loading config " + m_configName );
 
@@ -181,6 +179,8 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
   pLog->info( "TerritoryMgr: Setting up zones" );
   pTeriMgr->init();
 
+  loadBNpcTemplates();
+
   std::vector< std::thread > thread_list;
   thread_list.emplace_back( std::thread( std::bind( &Network::Hive::Run, hive.get() ) ) );
 
@@ -212,7 +212,7 @@ void Core::ServerZone::mainLoop()
   auto pLog = g_fw.get< Logger >();
   auto pTeriMgr = g_fw.get< TerritoryMgr >();
   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
 
   while( isRunning() )
   {
@@ -224,8 +224,8 @@ void Core::ServerZone::mainLoop()
 
     pScriptMgr->update();
 
-    lock_guard< std::mutex > lock( this->m_sessionMutex );
-    for( auto sessionIt : this->m_sessionMapById )
+    lock_guard< std::mutex > lock( m_sessionMutex );
+    for( auto sessionIt : m_sessionMapById )
     {
       auto session = sessionIt.second;
       if( session && session->getPlayer() )
@@ -246,8 +246,8 @@ void Core::ServerZone::mainLoop()
     }
 
 
-    auto it = this->m_sessionMapById.begin();
-    for( ; it != this->m_sessionMapById.end(); )
+    auto it = m_sessionMapById.begin();
+    for( ; it != m_sessionMapById.end(); )
     {
       auto diff = std::difftime( currTime, it->second->getLastDataTime() );
 
@@ -260,7 +260,7 @@ void Core::ServerZone::mainLoop()
         // if( it->second.unique() )
         {
           pLog->info( "[" + std::to_string( it->second->getId() ) + "] Session removal" );
-          it = this->m_sessionMapById.erase( it );
+          it = m_sessionMapById.erase( it );
           removeSession( pPlayer->getName() );
           continue;
         }
@@ -274,7 +274,7 @@ void Core::ServerZone::mainLoop()
         it->second->close();
         // if( it->second.unique() )
         {
-          it = this->m_sessionMapById.erase( it );
+          it = m_sessionMapById.erase( it );
           removeSession( pPlayer->getName() );
         }
       }
@@ -338,7 +338,7 @@ Core::SessionPtr Core::ServerZone::getSession( uint32_t id )
   return nullptr;
 }
 
-Core::SessionPtr Core::ServerZone::getSession( std::string playerName )
+Core::SessionPtr Core::ServerZone::getSession( const std::string& playerName )
 {
   //std::lock_guard<std::mutex> lock( m_sessionMutex );
 
@@ -350,7 +350,7 @@ Core::SessionPtr Core::ServerZone::getSession( std::string playerName )
   return nullptr;
 }
 
-void Core::ServerZone::removeSession( std::string playerName )
+void Core::ServerZone::removeSession( const std::string& playerName )
 {
   m_sessionMapByName.erase( playerName );
 }
@@ -361,3 +361,66 @@ bool Core::ServerZone::isRunning() const
   return m_bRunning;
 }
 
+void Core::ServerZone::loadBNpcTemplates()
+{
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pTeriMgr = g_fw.get< TerritoryMgr >();
+  auto pLog = g_fw.get< Logger >();
+
+  auto stmt = pDb->getPreparedStatement( Db::ZoneDbStatements::ZONE_SEL_BNPCTEMPLATES );
+
+  auto res = pDb->query( stmt );
+
+  while( res->next() )
+  {
+    //Id, Name, bNPCBaseId, bNPCNameId, mainWeaponModel,
+    //secWeaponModel, aggressionMode, enemyType, pose,
+    //modelChara, displayFlags, Look, Models
+
+    auto id = res->getUInt( 1 );
+    auto name = res->getString( 2 );
+    auto bNPCBaseId = res->getUInt( 3 );
+    auto bNPCNameId = res->getUInt( 4 );
+    auto mainWeaponModel = res->getUInt64( 5 );
+    auto secWeaponModel = res->getUInt64( 6 );
+    auto aggressionMode = res->getUInt8( 7 );
+    auto enemyType = res->getUInt8( 8 );
+    auto pose = res->getUInt8( 9 );
+    auto modelChara = res->getUInt( 10 );
+    auto displayFlags = res->getUInt( 11 );
+    auto look = res->getBlobVector( 12 );
+    auto models = res->getBlobVector( 13 );
+
+    auto bnpcTemplate = boost::make_shared< Entity::BNpcTemplate >(
+                                              id, bNPCBaseId, bNPCNameId, mainWeaponModel, secWeaponModel,
+                                              aggressionMode, enemyType, 0, pose, modelChara, displayFlags,
+                                              reinterpret_cast< uint32_t* >( &models[ 0 ] ),
+                                              reinterpret_cast< uint8_t* >( &look[ 0 ] ) );
+
+    m_bNpcTemplateMap[ name ] = bnpcTemplate;
+  }
+
+  pLog->debug( "BNpc Templates loaded: " + std::to_string( m_bNpcTemplateMap.size() ) );
+
+}
+
+Core::Entity::BNpcTemplatePtr Core::ServerZone::getBNpcTemplate( const std::string& key )
+{
+  auto it = m_bNpcTemplateMap.find( key );
+
+  if( it == m_bNpcTemplateMap.end() )
+    return nullptr;
+
+  return it->second;
+}
+
+Core::Entity::BNpcTemplatePtr Core::ServerZone::getBNpcTemplate( uint32_t id )
+{
+  for( auto entry : m_bNpcTemplateMap )
+  {
+    if( entry.second->getId() == id )
+      return entry.second;
+  }
+
+  return nullptr;
+}

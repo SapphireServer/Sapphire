@@ -18,8 +18,7 @@ namespace Entity {
 \brief Base class for all Npcs
 
 */
-class Npc :
-  public Chara
+class Npc : public Chara
 {
 
 public:

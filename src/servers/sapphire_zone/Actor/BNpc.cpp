@@ -36,12 +36,15 @@ using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 using namespace Core::Network::ActorControl;
 
-Core::Entity::BNpc::BNpc() :
-  Npc( ObjKind::BattleNpc )
+Core::Entity::BNpc::BNpc() : Npc( ObjKind::BattleNpc )
 {
-
 }
 
 Core::Entity::BNpc::~BNpc()
 {
+}
+
+void Core::Entity::BNpc::spawn( PlayerPtr pTarget )
+{
+
 }

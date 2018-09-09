@@ -209,25 +209,15 @@ public:
 
   virtual void autoAttack( CharaPtr pTarget );
 
-  virtual void onDeath()
-  {
-  };
+  virtual void onDeath() {};
 
-  virtual void onDamageTaken( Chara& pSource )
-  {
-  };
+  virtual void onDamageTaken( Chara& pSource ) {};
 
-  virtual void onActionHostile( Chara& source )
-  {
-  };
+  virtual void onActionHostile( Chara& source ) {};
 
-  virtual void onActionFriendly( Chara& pSource )
-  {
-  };
+  virtual void onActionFriendly( Chara& pSource ) {};
 
-  virtual void onTick()
-  {
-  };
+  virtual void onTick() {};
 
   virtual void changeTarget( uint64_t targetId );
 
@@ -241,9 +231,7 @@ public:
 
   virtual bool checkAction();
 
-  virtual void update( int64_t currTime )
-  {
-  };
+  virtual void update( int64_t currTime ) {};
 
   Action::ActionPtr getCurrentAction() const;
 
