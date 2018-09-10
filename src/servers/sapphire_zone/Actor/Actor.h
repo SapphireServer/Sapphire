@@ -37,6 +37,7 @@ protected:
   /*! list of various actors in range */
   std::set< ActorPtr > m_inRangeActor;
   std::set< PlayerPtr > m_inRangePlayers;
+  std::set< BNpcPtr > m_inRangeBNpc;
 
   /*! Parent cell in the zone */
   Core::Cell* m_pCell;
@@ -85,9 +86,7 @@ public:
   bool isAetheryte() const;
 
   ///// IN RANGE LOGIC ///////////////////////////////
-  virtual void onRemoveInRangeActor( Actor& pActor )
-  {
-  }
+  virtual void onRemoveInRangeActor( Actor& pActor ) {}
 
   // check if another actor is in the actors in range set
   bool isInRangeSet( ActorPtr pActor ) const;

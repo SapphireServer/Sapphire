@@ -93,6 +93,8 @@ protected:
   uint16_t m_gp;
   /*! Additional look info of the actor */
   uint8_t m_customize[26];
+  /*! Additional model info */
+  uint32_t m_modelEquip[10];
   /*! Current class of the actor */
   Common::ClassJob m_class;
   /*! Id of the currently selected target actor */
@@ -115,9 +117,7 @@ public:
 
   virtual ~Chara() override;
 
-  virtual void calculateStats()
-  {
-  };
+  virtual void calculateStats() {};
 
   /// Status effect functions
   void addStatusEffect( StatusEffect::StatusEffectPtr pEffect );
@@ -137,6 +137,8 @@ public:
   std::map< uint8_t, Core::StatusEffect::StatusEffectPtr > getStatusEffectMap() const;
 
   void sendStatusEffectUpdate();
+
+  uint32_t* getModels();
 
   // add a status effect by id
   void addStatusEffectById( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param = 0 );

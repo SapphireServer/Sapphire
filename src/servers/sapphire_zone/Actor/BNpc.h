@@ -19,12 +19,12 @@ namespace Entity {
 \brief Base class for all BNpcs
 
 */
-class BNpc :
-  public Npc
+class BNpc : public Npc
 {
 
 public:
   BNpc();
+  BNpc( BNpcTemplatePtr pTemplate );
 
   virtual ~BNpc() override;
 

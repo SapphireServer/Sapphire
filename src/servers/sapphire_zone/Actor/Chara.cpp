@@ -662,6 +662,11 @@ std::map< uint8_t, Core::StatusEffect::StatusEffectPtr > Core::Entity::Chara::ge
   return m_statusEffectMap;
 }
 
+uint32_t* Core::Entity::Chara::getModels()
+{
+  return m_modelEquip;
+}
+
 void Core::Entity::Chara::sendStatusEffectUpdate()
 {
   uint64_t currentTimeMs = Util::getTimeMs();

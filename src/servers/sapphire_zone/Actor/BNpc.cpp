@@ -25,6 +25,7 @@
 #include "Chara.h"
 #include "Player.h"
 #include "BNpc.h"
+#include "BNpcTemplate.h"
 #include "Zone/TerritoryMgr.h"
 #include "Framework.h"
 #include "Common.h"
@@ -38,6 +39,22 @@ using namespace Core::Network::ActorControl;
 
 Core::Entity::BNpc::BNpc() : Npc( ObjKind::BattleNpc )
 {
+}
+
+Core::Entity::BNpc::BNpc( BNpcTemplatePtr pTemplate ) : Npc( ObjKind::BattleNpc )
+{
+  m_modelChara = pTemplate->getModelChara();
+  m_displayFlags = pTemplate->getDisplayFlags();
+  m_pose = pTemplate->getPose();
+  m_aggressionMode = pTemplate->getAggressionMode();
+  m_weaponMain = pTemplate->getWeaponMain();
+  m_weaponSub = pTemplate->getWeaponSub();
+  m_bNpcNameId = pTemplate->getBNpcNameId();
+  m_bNpcBaseId = pTemplate->getBNpcBaseId();
+
+  memcpy( m_customize, pTemplate->getCustomize(), sizeof( m_customize ) );
+  memcpy( m_modelEquip, pTemplate->getModelEquip(), sizeof( m_modelEquip ) );
+
 }
 
 Core::Entity::BNpc::~BNpc()
