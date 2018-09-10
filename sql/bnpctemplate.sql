@@ -25,7 +25,6 @@ CREATE TABLE `bnpctemplate` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 ALTER TABLE `bnpctemplate`
-  ADD PRIMARY KEY (`Id`),
   ADD UNIQUE KEY `bNPCBaseId_2` (`bNPCBaseId`,`bNPCNameId`),
   ADD KEY `Name` (`Name`),
   ADD KEY `bNPCBaseId` (`bNPCBaseId`),
