@@ -76,15 +76,19 @@ enum ServerZoneIpcType :
   SocialRequestResponse = 0x00BB, // updated 4.1
   CancelAllianceForming = 0x00C6, // updated 4.2
 
+
+
   Playtime = 0x00F5, // updated 4.3
   Chat = 0x00F7, // updated 4.3
   SocialList = 0x00FD, // updated 4.3
 
   UpdateSearchInfo = 0x0100, // updated 4.3
   InitSearchInfo = 0x0101, // updated 4.3
+  ExamineSearchComment = 0x0102, // updated 4.1
 
   ServerNotice = 0x0106, // updated 4.3
   SetOnlineStatus = 0x0107, // updated 4.3
+
 
   CountdownInitiate = 0x0111, // updated 4.3
   CountdownCancel = 0x0112, // updated 4.3
@@ -94,6 +98,8 @@ enum ServerZoneIpcType :
   LogMessage = 0x00D0,
 
   LinkshellList = 0x011C, // updated 4.3
+
+  ExamineFreeCompanyInfo = 0x013A, // updated 4.1
   CharaFreeCompanyTag = 0x013B, // updated 4.3
   FreeCompanyBoardMsg = 0x013C, // updated 4.3
   FreeCompanyInfo = 0x013D, // updated 4.3
@@ -130,7 +136,7 @@ enum ServerZoneIpcType :
   PlayerStateFlags = 0x0184, // updated 4.3
   PlayerClassInfo = 0x0185, // updated 4.3
   ModelEquip = 0x0186, // updated 4.3
-
+  Examine = 0x0187, // update 4.1
   UpdateClassInfo = 0x018A, // updated 4.3
 
   ItemInfo = 0x0190, // updated 4.3
@@ -190,7 +196,7 @@ enum ServerZoneIpcType :
 
   // Unknown IPC types that still need to be sent
   // TODO: figure all these out properly
-    IPCTYPE_UNK_320 = 0x024C, // updated 4.3
+  IPCTYPE_UNK_320 = 0x024C, // updated 4.3
   IPCTYPE_UNK_322 = 0x024E, // updated 4.3
 
 };
@@ -224,6 +230,8 @@ enum ClientZoneIpcType :
 
   SocialListHandler = 0x00DB, // updated 4.3
   ReqSearchInfoHandler = 0x00E0, // updated 4.3
+  ReqExamineSearchCommentHandler = 0x00E1, // updated 4.1
+
   SetSearchInfoHandler = 0x00DE, // updated 4.3
 
   BlackListHandler = 0x00EC, // updated 4.3
@@ -232,6 +240,7 @@ enum ClientZoneIpcType :
   LinkshellListHandler = 0x00F4, // updated 4.3
 
   SearchMarketboard = 0x0103, // updated 4.3
+  ReqExamineFcInfo = 0x010F, // updated 4.1
 
   FcInfoReqHandler = 0x011A, // updated 4.2
 

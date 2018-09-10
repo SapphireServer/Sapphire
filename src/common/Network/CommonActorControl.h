@@ -240,6 +240,7 @@ enum ClientTriggerType
   FinishZoning = 0xC9,
   Teleport = 0xCA,
 
+  Examine = 0x12C,
   MarkPlayer = 0x12D, // Mark player, visible to party only
   SetTitleReq = 0x12E,
   TitleList = 0x12F,
