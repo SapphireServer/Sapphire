@@ -42,6 +42,43 @@ using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 using namespace Core::Network::ActorControl;
 
+void examineHandler( Core::Entity::Player& player, uint32_t targetId )
+{
+  using namespace Core;
+
+  auto packet = makeZonePacket< FFXIVIpcExamine >( targetId, player.getId() );
+  auto pSession = g_fw.get< Core::ServerZone >()->getSession( targetId );
+  if( pSession )
+  {
+    auto pPlayer = pSession->getPlayer();
+    if( pPlayer )
+    {
+      // todo: this packet needs mapping out
+      strcpy( packet->data().name, pPlayer->getName().c_str() );
+      packet->data().classJob = static_cast< uint8_t >( pPlayer->getClass() );
+      packet->data().level = pPlayer->getLevel();
+      packet->data().unkFlag1 = 4;
+      packet->data().unkFlag2 = 1;
+      packet->data().titleId = pPlayer->getTitle();
+      //packet->data().grandCompany = 1;
+      //packet->data().grandCompanyRank = 2;
+      memcpy( packet->data().look, pPlayer->getLookArray(), sizeof( packet->data().look ) );
+      for( auto i = 0; i < Common::GearSetSlot::SoulCrystal + 1; ++i)
+      {
+        auto pItem = pPlayer->getItemAt( Common::InventoryType::GearSet0, i );
+        if( pItem )
+        {
+          auto& entry = packet->data().entries[i];
+          entry.catalogId = pItem->getId();
+          //entry.appearanceCatalogId = pItem->getGlamourId()
+          // todo: glamour/materia etc.
+        }
+      }
+    }
+  }
+  player.queuePacket( packet );
+}
+
 void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                           Entity::Player& player )
 {
@@ -123,36 +160,8 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
     case ClientTriggerType::Examine:
     {
       uint32_t targetId = param11;
-      auto packet = makeZonePacket< FFXIVIpcExamine >( targetId, player.getId() );
-      auto pSession = g_fw.get< Core::ServerZone >()->getSession( targetId );
-      if( pSession )
-      {
-        auto pPlayer = pSession->getPlayer();
-        if( pPlayer )
-        {
-          // todo: this packet needs mapping out
-          strcpy( packet->data().name, pPlayer->getName().c_str() );
-          packet->data().classJob = static_cast< uint8_t >( pPlayer->getClass() );
-          packet->data().level = pPlayer->getLevel();
-          packet->data().unkFlag1 = 4;
-          packet->data().unkFlag2 = 1;
-          //packet->data().grandCompany = 1;
-          //packet->data().grandCompanyRank = 2;
-          memcpy( packet->data().look, pPlayer->getLookArray(), sizeof( packet->data().look ) );
-          for( auto i = 0; i < Common::GearSetSlot::SoulCrystal + 1; ++i)
-          {
-            auto pItem = pPlayer->getItemAt( Common::InventoryType::GearSet0, i );
-            if( pItem )
-            {
-              auto& entry = packet->data().entries[i];
-              entry.catalogId = pItem->getId();
-              //entry.appearanceCatalogId = pItem->getGlamourId()
-              // todo: glamour/materia etc.
-            }
-          }
-        }
-      }
-      player.queuePacket( packet );
+      examineHandler( player, targetId );
+      break;
     }
     case ClientTriggerType::MarkPlayer: // Mark player
     {
