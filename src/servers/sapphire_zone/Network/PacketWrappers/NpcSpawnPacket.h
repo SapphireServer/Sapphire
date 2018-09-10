@@ -51,6 +51,7 @@ private:
     //  m_data.mainWeaponModel = item->getModelId1();
     //m_data.secWeaponModel = player.getModelSubWeapon();
 
+    memcpy( m_data.models, bnpc.getModels(), sizeof( m_data.models ) );
     m_data.models[ 0 ] = bnpc.getModelForSlot( Common::GearSetSlot::Head );
     m_data.models[ 1 ] = bnpc.getModelForSlot( Common::GearSetSlot::Body );
     m_data.models[ 2 ] = bnpc.getModelForSlot( Common::GearSetSlot::Hands );
@@ -87,29 +88,14 @@ private:
     // 0x20 == spawn hidden to be displayed by the spawneffect control
     m_data.displayFlags = bnpc.getStance();
 
-    if( bnpc.getZoningType() != Common::ZoneingType::None || bnpc.getGmInvis() == true )
+    if( bnpc.getZoningType() != Common::ZoneingType::None )
     {
       m_data.displayFlags |= static_cast< uint16_t >( Common::DisplayFlags::Invisible );
-    }
-
-    if( bnpc.getEquipDisplayFlags() & Core::Common::EquipDisplayFlags::HideHead )
-    {
-      m_data.displayFlags |= static_cast< uint16_t >( Common::DisplayFlags::HideHead );
-    }
-
-    if( bnpc.getEquipDisplayFlags() & Core::Common::EquipDisplayFlags::HideWeapon )
-    {
-      m_data.displayFlags |= static_cast< uint16_t >( Common::DisplayFlags::HideWeapon );
     }
 
     if( bnpc.getEquipDisplayFlags() & Core::Common::EquipDisplayFlags::Visor )
     {
       m_data.displayFlags |= static_cast< uint16_t >( Common::DisplayFlags::Visor );
-    }
-
-    if( !( bnpc.getEquipDisplayFlags() & Core::Common::EquipDisplayFlags::HideLegacyMark ) )
-    {
-      m_data.look[ 0xC ] = m_data.look[ 0xC ] | 1 << 7;
     }
 
     m_data.currentMount = bnpc.getCurrentMount();
@@ -121,6 +107,7 @@ private:
     //m_data.unknown_38 = 0x70;
     //m_data.unknown_60 = 3;
     //m_data.unknown_61 = 7;
+
 
     uint64_t currentTimeMs = Core::Util::getTimeMs();
 

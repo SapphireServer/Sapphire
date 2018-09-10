@@ -933,8 +933,6 @@ private:
   uint64_t m_modelSubWeapon;
   uint64_t m_modelSystemWeapon;
 
-  uint32_t m_modelEquip[10];
-
   bool m_bNewGame;
 
   uint8_t m_guardianDeity;

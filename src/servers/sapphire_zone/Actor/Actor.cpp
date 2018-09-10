@@ -187,6 +187,13 @@ void Core::Entity::Actor::addInRangeActor( ActorPtr pActor )
     // if actor is a player, add it to the in range player set
     m_inRangePlayers.insert( pPlayer );
   }
+  else if( pActor->isBattleNpc() )
+  {
+    auto pBNpc = pActor->getAsBNpc();
+
+    // if actor is a player, add it to the in range player set
+    m_inRangeBNpc.insert( pBNpc );
+  }
 }
 
 /*!
@@ -210,6 +217,9 @@ void Core::Entity::Actor::removeInRangeActor( Actor& actor )
 
   if( actor.isPlayer() )
     m_inRangePlayers.erase( actor.getAsPlayer() );
+
+  if( actor.isBattleNpc() )
+    m_inRangeBNpc.erase( actor.getAsBNpc() );
 }
 
 /*! \return true if there is at least one actor in the in range set */
@@ -280,6 +290,7 @@ void Core::Entity::Actor::clearInRangeSet()
 {
   m_inRangeActor.clear();
   m_inRangePlayers.clear();
+  m_inRangeBNpc.clear();
 }
 
 /*!
