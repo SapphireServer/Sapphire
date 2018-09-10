@@ -25,10 +25,7 @@ CREATE TABLE `bnpctemplate` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 ALTER TABLE `bnpctemplate`
-  ADD UNIQUE KEY `bNPCBaseId_2` (`bNPCBaseId`,`bNPCNameId`),
-  ADD KEY `Name` (`Name`),
-  ADD KEY `bNPCBaseId` (`bNPCBaseId`),
-  ADD KEY `bNPCNameId` (`bNPCNameId`);
+  ADD UNIQUE KEY `bNPCBaseId_2` (`bNPCBaseId`,`bNPCNameId`);
   
   INSERT INTO `bnpctemplate` (`Id`, `Name`, `bNPCBaseId`, `bNPCNameId`, `mainWeaponModel`, `secWeaponModel`, `aggressionMode`, `enemyType`, `pose`, `modelChara`, `displayFlags`, `Look`, `Models`) VALUES
 (4, 'beecloud_57', 57, 395, 0, 0, 1, 4, 4, 60, 0, 0x0000000000000000000000000000000000000000000000000000, 0x00000000000000000000000000000000000000000000000000000000000000000000000000000000),
