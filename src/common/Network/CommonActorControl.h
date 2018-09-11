@@ -250,7 +250,7 @@ enum ClientTriggerType
 
   ClearWaymarks = 0x13A,
   CameraMode = 0x13B, // param12, 1 = camera mode enable, 0 = disable
-
+  CharaNameReq = 0x13D, // requests character name by content id
   HuntingLogDetails = 0x194,
 
   Timers = 0x1AB,

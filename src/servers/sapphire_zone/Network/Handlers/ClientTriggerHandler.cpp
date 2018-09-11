@@ -60,16 +60,27 @@ void examineHandler( Core::Entity::Player& player, uint32_t targetId )
       packet->data().unkFlag1 = 4;
       packet->data().unkFlag2 = 1;
       packet->data().titleId = pPlayer->getTitle();
+
       //packet->data().grandCompany = 1;
       //packet->data().grandCompanyRank = 2;
       memcpy( packet->data().look, pPlayer->getLookArray(), sizeof( packet->data().look ) );
+      packet->data().models[ 0 ] = pPlayer->getModelForSlot( Common::GearSetSlot::Head );
+      packet->data().models[ 1 ] = pPlayer->getModelForSlot( Common::GearSetSlot::Body );
+      packet->data().models[ 2 ] = pPlayer->getModelForSlot( Common::GearSetSlot::Hands );
+      packet->data().models[ 3 ] = pPlayer->getModelForSlot( Common::GearSetSlot::Legs );
+      packet->data().models[ 4 ] = pPlayer->getModelForSlot( Common::GearSetSlot::Feet );
+
+      // todo: main/sub/other stuff too
+
       for( auto i = 0; i < Common::GearSetSlot::SoulCrystal + 1; ++i)
       {
         auto pItem = pPlayer->getItemAt( Common::InventoryType::GearSet0, i );
         if( pItem )
         {
+          auto slot = static_cast< Common::GearSetSlot >( i );
           auto& entry = packet->data().entries[i];
           entry.catalogId = pItem->getId();
+          entry.quality = pItem->isHq();
           //entry.appearanceCatalogId = pItem->getGlamourId()
           // todo: glamour/materia etc.
         }
@@ -182,6 +193,22 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
       uint32_t howToId = param11;
       player.updateHowtosSeen( howToId );
       break;
+    }
+    case ClientTriggerType::CharaNameReq:
+    {
+      uint64_t targetContentId = param1;
+      // todo: look up player by content id
+      /*
+        auto packet = makeZonePacket< FFXIVIpcCharaNameReq >( player.getId() );
+        packet->data().contentId = targetContentId;
+
+        // lookup the name
+
+        strcpy( packet->data().name, name );
+
+        player.queuePacket( packet );
+      */
+     break;
     }
     case ClientTriggerType::EmoteReq: // emote
     {

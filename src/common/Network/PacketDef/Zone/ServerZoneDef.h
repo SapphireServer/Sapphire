@@ -988,14 +988,17 @@ struct FFXIVIpcExamine :
   char level;
   uint16_t padding;
   uint16_t titleId;
+  //char grandCompany;
+  //char grandCompanyRank;
 
   char unknown[56];
   struct ItemData
   {
     uint32_t catalogId;
     uint32_t appearanceCatalogId;
-    uint64_t unknown2;
-    uint32_t unknown3;
+    uint64_t crafterId;
+    uint8_t quality;
+    uint8_t unknown[3];
     struct Materia
     {
       uint16_t materiaId;
@@ -1007,8 +1010,15 @@ struct FFXIVIpcExamine :
   char unk3[16];
   char look[26];
   char padding3[5];
-  //uint32_t models[10];
-  char unknown4[270];
+  uint32_t models[10];
+  char unknown4[200];
+};
+
+struct FFXIVIpcCharaNameReq :
+  FFXIVIpcBasePacket< CharaNameReq >
+{
+  uint64_t contentId;
+  char name[32];
 };
 
 /**
