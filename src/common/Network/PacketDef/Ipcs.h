@@ -136,7 +136,8 @@ enum ServerZoneIpcType :
   PlayerStateFlags = 0x0184, // updated 4.3
   PlayerClassInfo = 0x0185, // updated 4.3
   ModelEquip = 0x0186, // updated 4.3
-  Examine = 0x0187, // update 4.1
+  Examine = 0x0187, // updated 4.3
+  CharaNameReq = 0x0189, // updated 4.3
   UpdateClassInfo = 0x018A, // updated 4.3
 
   ItemInfo = 0x0190, // updated 4.3
