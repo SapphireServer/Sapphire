@@ -988,10 +988,16 @@ struct FFXIVIpcExamine :
   char level;
   uint16_t padding;
   uint16_t titleId;
-  //char grandCompany;
-  //char grandCompanyRank;
+  char grandCompany;
+  char grandCompanyRank;
 
-  char unknown[56];
+  char unknown[6];
+  uint32_t u6_fromPSpawn;
+  uint32_t u7_fromPSpawn;
+  char padding1[8];
+  uint64_t mainWeaponModel;
+  uint64_t secWeaponModel;
+  char unknown2[16];
   struct ItemData
   {
     uint32_t catalogId;
