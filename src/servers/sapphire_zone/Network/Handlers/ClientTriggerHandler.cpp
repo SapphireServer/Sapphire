@@ -57,12 +57,17 @@ void examineHandler( Core::Entity::Player& player, uint32_t targetId )
       strcpy( packet->data().name, pPlayer->getName().c_str() );
       packet->data().classJob = static_cast< uint8_t >( pPlayer->getClass() );
       packet->data().level = pPlayer->getLevel();
+
       packet->data().unkFlag1 = 4;
       packet->data().unkFlag2 = 1;
-      packet->data().titleId = pPlayer->getTitle();
 
-      //packet->data().grandCompany = 1;
-      //packet->data().grandCompanyRank = 2;
+      packet->data().titleId = pPlayer->getTitle();
+      packet->data().grandCompany = 1;
+      packet->data().grandCompanyRank = 10;
+
+      packet->data().mainWeaponModel = pPlayer->getModelMainWeapon();
+      packet->data().secWeaponModel = pPlayer->getModelSubWeapon();
+
       memcpy( packet->data().look, pPlayer->getLookArray(), sizeof( packet->data().look ) );
       packet->data().models[ 0 ] = pPlayer->getModelForSlot( Common::GearSetSlot::Head );
       packet->data().models[ 1 ] = pPlayer->getModelForSlot( Common::GearSetSlot::Body );
