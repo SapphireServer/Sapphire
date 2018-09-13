@@ -576,7 +576,7 @@ int dumpTemplates()
 int main()
 {
 
-  dumpSpawns();
+  dumpTemplates();
 
   return 0;
 }

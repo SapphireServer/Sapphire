@@ -73,7 +73,6 @@ Core::Entity::Player::Player() :
   m_markedForRemoval( false ),
   m_mount( 0 ),
   m_emoteMode( 0 ),
-  m_pose( 0 ),
   m_directorInitialized( false ),
   m_onEnterEventDone( false )
 {
@@ -83,7 +82,6 @@ Core::Entity::Player::Player() :
   m_queuedZoneing = nullptr;
   m_status = ActorStatus::Idle;
   m_invincibilityType = InvincibilityType::InvincibilityNone;
-  m_modelType = ObjKind::Player;
 
   memset( m_questTracking, 0, sizeof( m_questTracking ) );
   memset( m_name, 0, sizeof( m_name ) );
@@ -288,16 +286,6 @@ void Core::Entity::Player::setAutoattack( bool mode )
 bool Core::Entity::Player::isAutoattackOn() const
 {
   return m_bAutoattack;
-}
-
-uint8_t Core::Entity::Player::getPose() const
-{
-  return m_pose;
-}
-
-void Core::Entity::Player::setPose( uint8_t pose )
-{
-  m_pose = pose;
 }
 
 void Core::Entity::Player::sendStats()
@@ -1130,16 +1118,6 @@ uint16_t* Core::Entity::Player::getClassArray()
 const uint16_t* Core::Entity::Player::getClassArray() const
 {
   return m_classArray;
-}
-
-const uint8_t* Core::Entity::Player::getLookArray() const
-{
-  return m_customize;
-}
-
-const uint32_t* Core::Entity::Player::getModelArray() const
-{
-  return m_modelEquip;
 }
 
 uint32_t* Core::Entity::Player::getExpArray()

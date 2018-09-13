@@ -447,9 +447,6 @@ public:
   /*! set the grand company rank */
   void setGcRankAt( uint8_t index, uint8_t rank );
 
-  /*! return a const pointer to the look array */
-  const uint8_t* getLookArray() const;
-
   /*! returns true if the player is currently in combat */
   bool isInCombat() const;
 
@@ -785,10 +782,6 @@ public:
 
   bool isAutoattackOn() const;
 
-  uint8_t getPose() const;
-
-  void setPose( uint8_t pose );
-
   // Content Finder handling
   //////////////////////////////////////////////////////////////////////////////////////////////////////
   /*! Get an unix time when the player can register into content finder again. */
@@ -1012,7 +1005,6 @@ private:
 
   uint32_t m_mount;
   uint32_t m_emoteMode;
-  uint8_t m_pose;
 
   Util::SpawnIndexAllocator< uint8_t > m_objSpawnIndexAllocator;
   Util::SpawnIndexAllocator< uint8_t > m_actorSpawnIndexAllocator;
