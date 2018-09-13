@@ -37,6 +37,7 @@ using namespace Core::Network::ActorControl;
 
 Core::Entity::Chara::Chara( ObjKind type ) :
   Actor( type ),
+  m_pose( 0 ),
   m_targetId( INVALID_GAME_OBJECT_ID )
 {
   // initialize the free slot queue
@@ -662,9 +663,24 @@ std::map< uint8_t, Core::StatusEffect::StatusEffectPtr > Core::Entity::Chara::ge
   return m_statusEffectMap;
 }
 
-uint32_t* Core::Entity::Chara::getModels()
+const uint8_t* Core::Entity::Chara::getLookArray() const
+{
+  return m_customize;
+}
+
+const uint32_t* Core::Entity::Chara::getModelArray() const
 {
   return m_modelEquip;
+}
+
+uint8_t Core::Entity::Chara::getPose() const
+{
+  return m_pose;
+}
+
+void Core::Entity::Chara::setPose( uint8_t pose )
+{
+  m_pose = pose;
 }
 
 void Core::Entity::Chara::sendStatusEffectUpdate()
@@ -770,7 +786,3 @@ bool Core::Entity::Chara::hasStatusEffect( uint32_t id )
   return false;
 }
 
-Core::Common::ObjKind Chara::getObjKind() const
-{
-  return m_modelType;
-}

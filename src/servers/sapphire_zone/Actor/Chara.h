@@ -103,8 +103,8 @@ protected:
   Action::ActionPtr m_pCurrentAction;
   /*! Invincibility type */
   Common::InvincibilityType m_invincibilityType;
-  /*! Type of model to use, humanoid for actors that use look data */
-  Common::ObjKind m_modelType;
+
+  uint8_t m_pose;
 
   /*! Status effects */
   const uint8_t MAX_STATUS_EFFECTS = 30;
@@ -134,11 +134,18 @@ public:
 
   void statusEffectFreeSlot( uint8_t slotId );
 
+  uint8_t getPose() const;
+
+  void setPose( uint8_t pose );
+
   std::map< uint8_t, Core::StatusEffect::StatusEffectPtr > getStatusEffectMap() const;
 
   void sendStatusEffectUpdate();
 
-  uint32_t* getModels();
+  /*! return a const pointer to the look array */
+  const uint8_t* getLookArray() const;
+
+  const uint32_t* getModelArray() const;
 
   // add a status effect by id
   void addStatusEffectById( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param = 0 );
@@ -171,8 +178,6 @@ public:
   Common::InvincibilityType getInvincibilityType() const;
 
   Common::ClassJob getClass() const;
-
-  Common::ObjKind getObjKind() const;
 
   uint8_t getClassAsInt() const;
 

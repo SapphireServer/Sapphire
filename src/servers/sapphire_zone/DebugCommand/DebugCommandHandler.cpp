@@ -25,6 +25,7 @@
 #include "Script/NativeScriptMgr.h"
 
 #include "Actor/EventObject.h"
+#include "Actor/BNpc.h"
 
 #include "Zone/Zone.h"
 #include "Zone/InstanceContent.h"
@@ -425,6 +426,29 @@ void Core::DebugCommandHandler::add( char* data, Entity::Player& player, boost::
 
     player.addTitle( titleId );
     player.sendNotice( "Added title (ID: " + std::to_string( titleId ) + ")" );
+  }
+  else if( subCommand == "bnpc" )
+  {
+    auto serverZone = g_fw.get< ServerZone >();
+
+    auto bNpcTemplate = serverZone->getBNpcTemplate( params );
+
+    if( !bNpcTemplate )
+      player.sendNotice( "Template " + params + " not found in cache!" );
+
+    auto pBNpc = boost::make_shared< Entity::BNpc >( bNpcTemplate,
+                                                     player.getPos().x,
+                                                     player.getPos().y,
+                                                     player.getPos().z, 1 );
+
+    auto playerZone = player.getCurrentZone();
+
+    //pBNpc->setCurrentZone( playerZone );
+    //pBNpc->setPos( player.getPos().x, player.getPos().y, player.getPos().z );
+
+    playerZone->pushActor( pBNpc );
+
+
   }
   else if( subCommand == "op" )
   {
