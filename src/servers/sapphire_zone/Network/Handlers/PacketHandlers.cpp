@@ -105,6 +105,55 @@ void Core::Network::GameConnection::reqSearchInfoHandler( const Core::Network::P
   queueOutPacket( searchInfoPacket );
 }
 
+void Core::Network::GameConnection::reqExamineSearchCommentHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                          Entity::Player& player )
+{
+
+  auto targetId = *reinterpret_cast< const uint32_t* >( &inPacket.data[ 0x10 ] );
+  auto pSession = g_fw.get< Core::ServerZone >()->getSession( targetId );
+
+  g_fw.get< Core::Logger >()->debug( std::to_string( targetId ) );
+
+  if( pSession )
+  {
+    auto pPlayer = pSession->getPlayer();
+
+    if( pPlayer )
+    {
+      // retail sends the requester's id as both (isForSelf)
+      auto searchInfoPacket = makeZonePacket< FFXIVIpcExamineSearchComment >( player.getId() );
+      searchInfoPacket->data().charId = targetId;
+      strcpy( searchInfoPacket->data().searchComment, pPlayer->getSearchMessage() );
+      player.queuePacket( searchInfoPacket );
+    }
+  }
+}
+
+void Core::Network::GameConnection::reqExamineFcInfo( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                          Entity::Player& player )
+{
+
+  auto targetId = *reinterpret_cast< const uint32_t* >( &inPacket.data[ 0x18 ] );
+  auto pSession = g_fw.get< Core::ServerZone >()->getSession( targetId );
+
+  g_fw.get< Core::Logger >()->debug( std::to_string( targetId ) );
+
+  if( pSession )
+  {
+    auto pPlayer = pSession->getPlayer();
+
+    if( pPlayer )
+    {
+      // retail sends the requester's id as both (isForSelf)
+      auto examineFcInfoPacket = makeZonePacket< FFXIVIpcExamineFreeCompanyInfo >( player.getId() );
+      examineFcInfoPacket->data().charId = targetId;
+      // todo: populate with fc info
+
+      player.queuePacket( examineFcInfoPacket );
+    }
+  }
+}
+
 void Core::Network::GameConnection::linkshellListHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                           Entity::Player& player )
 {

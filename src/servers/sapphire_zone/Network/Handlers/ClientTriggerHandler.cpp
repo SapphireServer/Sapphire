@@ -13,6 +13,8 @@
 #include "Zone/ZonePosition.h"
 
 #include "Network/GameConnection.h"
+
+#include "Network/PacketWrappers/ExaminePacket.h"
 #include "Network/PacketWrappers/InitUIPacket.h"
 #include "Network/PacketWrappers/PingPacket.h"
 #include "Network/PacketWrappers/MoveActorPacket.h"
@@ -27,6 +29,7 @@
 #include "Action/Action.h"
 #include "Action/ActionTeleport.h"
 
+
 #include "Session.h"
 #include "ServerZone.h"
 #include "Forwards.h"
@@ -39,6 +42,21 @@ using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 using namespace Core::Network::ActorControl;
+
+void examineHandler( Core::Entity::Player& player, uint32_t targetId )
+{
+  using namespace Core;
+
+  auto pSession = g_fw.get< Core::ServerZone >()->getSession( targetId );
+  if( pSession )
+  {
+    auto pTarget = pSession->getPlayer();
+    if( pTarget )
+    {
+      player.queuePacket( boost::make_shared< ExaminePacket >( player, pTarget ) );
+    }
+  }
+}
 
 void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                           Entity::Player& player )
@@ -118,6 +136,12 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
         player.getCurrentAction()->setInterrupted();
       break;
     }
+    case ClientTriggerType::Examine:
+    {
+      uint32_t targetId = param11;
+      examineHandler( player, targetId );
+      break;
+    }
     case ClientTriggerType::MarkPlayer: // Mark player
     {
       break;
@@ -137,6 +161,22 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
       uint32_t howToId = param11;
       player.updateHowtosSeen( howToId );
       break;
+    }
+    case ClientTriggerType::CharaNameReq:
+    {
+      uint64_t targetContentId = param1;
+      // todo: look up player by content id
+      /*
+        auto packet = makeZonePacket< FFXIVIpcCharaNameReq >( player.getId() );
+        packet->data().contentId = targetContentId;
+
+        // lookup the name
+
+        strcpy( packet->data().name, name );
+
+        player.queuePacket( packet );
+      */
+     break;
     }
     case ClientTriggerType::EmoteReq: // emote
     {
