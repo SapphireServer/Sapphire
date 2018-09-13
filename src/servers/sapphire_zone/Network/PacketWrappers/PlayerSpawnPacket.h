@@ -53,11 +53,9 @@ private:
       m_data.mainWeaponModel = item->getModelId1();
     m_data.secWeaponModel = player.getModelSubWeapon();
 
-    m_data.models[ 0 ] = player.getModelForSlot( Common::GearSetSlot::Head );
-    m_data.models[ 1 ] = player.getModelForSlot( Common::GearSetSlot::Body );
-    m_data.models[ 2 ] = player.getModelForSlot( Common::GearSetSlot::Hands );
-    m_data.models[ 3 ] = player.getModelForSlot( Common::GearSetSlot::Legs );
-    m_data.models[ 4 ] = player.getModelForSlot( Common::GearSetSlot::Feet );
+    for( auto i = 2; i < Common::GearSetSlot::SoulCrystal; ++i )
+      m_data.models[ i - 2 ] = player.getModelForSlot( static_cast< Common::GearSetSlot >( i ) );
+
     strcpy( m_data.name, player.getName().c_str() );
 
     m_data.pos.x = player.getPos().x;

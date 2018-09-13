@@ -13,6 +13,8 @@
 #include "Zone/ZonePosition.h"
 
 #include "Network/GameConnection.h"
+
+#include "Network/PacketWrappers/ExaminePacket.h"
 #include "Network/PacketWrappers/InitUIPacket.h"
 #include "Network/PacketWrappers/PingPacket.h"
 #include "Network/PacketWrappers/MoveActorPacket.h"
@@ -27,7 +29,6 @@
 #include "Action/Action.h"
 #include "Action/ActionTeleport.h"
 
-#include "Inventory/Item.h"
 
 #include "Session.h"
 #include "ServerZone.h"
@@ -46,53 +47,15 @@ void examineHandler( Core::Entity::Player& player, uint32_t targetId )
 {
   using namespace Core;
 
-  auto packet = makeZonePacket< FFXIVIpcExamine >( targetId, player.getId() );
   auto pSession = g_fw.get< Core::ServerZone >()->getSession( targetId );
   if( pSession )
   {
-    auto pPlayer = pSession->getPlayer();
-    if( pPlayer )
+    auto pTarget = pSession->getPlayer();
+    if( pTarget )
     {
-      // todo: this packet needs mapping out
-      strcpy( packet->data().name, pPlayer->getName().c_str() );
-      packet->data().classJob = static_cast< uint8_t >( pPlayer->getClass() );
-      packet->data().level = pPlayer->getLevel();
-
-      packet->data().unkFlag1 = 4;
-      packet->data().unkFlag2 = 1;
-
-      packet->data().titleId = pPlayer->getTitle();
-      packet->data().grandCompany = 1;
-      packet->data().grandCompanyRank = 10;
-
-      packet->data().mainWeaponModel = pPlayer->getModelMainWeapon();
-      packet->data().secWeaponModel = pPlayer->getModelSubWeapon();
-
-      memcpy( packet->data().look, pPlayer->getLookArray(), sizeof( packet->data().look ) );
-      packet->data().models[ 0 ] = pPlayer->getModelForSlot( Common::GearSetSlot::Head );
-      packet->data().models[ 1 ] = pPlayer->getModelForSlot( Common::GearSetSlot::Body );
-      packet->data().models[ 2 ] = pPlayer->getModelForSlot( Common::GearSetSlot::Hands );
-      packet->data().models[ 3 ] = pPlayer->getModelForSlot( Common::GearSetSlot::Legs );
-      packet->data().models[ 4 ] = pPlayer->getModelForSlot( Common::GearSetSlot::Feet );
-
-      // todo: main/sub/other stuff too
-
-      for( auto i = 0; i < Common::GearSetSlot::SoulCrystal + 1; ++i)
-      {
-        auto pItem = pPlayer->getItemAt( Common::InventoryType::GearSet0, i );
-        if( pItem )
-        {
-          auto slot = static_cast< Common::GearSetSlot >( i );
-          auto& entry = packet->data().entries[i];
-          entry.catalogId = pItem->getId();
-          entry.quality = pItem->isHq();
-          //entry.appearanceCatalogId = pItem->getGlamourId()
-          // todo: glamour/materia etc.
-        }
-      }
+      player.queuePacket( boost::make_shared< ExaminePacket >( player, pTarget ) );
     }
   }
-  player.queuePacket( packet );
 }
 
 void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
