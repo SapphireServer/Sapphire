@@ -72,9 +72,9 @@ class ManFst005 :
                                   {
                                      Scene00002( player );
                                   },
-                                    [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-                                    {},
-                                      eventId );
+                                  [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
+                                  {},
+                                  eventId );
       }
       else if( actor == Eobject1 )
       {
@@ -83,9 +83,9 @@ class ManFst005 :
                                   {
                                      Scene00006( player );
                                   },
-                                    [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-                                    {},
-                                      eventId );
+                                  [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
+                                  {},
+                                  eventId );
       }
    }
 
