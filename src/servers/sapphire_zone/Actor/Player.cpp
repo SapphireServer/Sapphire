@@ -522,9 +522,9 @@ void Core::Entity::Player::discover( int16_t map_id, int16_t sub_id )
   auto info = pExdData->get< Core::Data::Map >(
     pExdData->get< Core::Data::TerritoryType >( getCurrentZone()->getTerritoryId() )->map );
   if( info->discoveryArrayByte )
-    offset = 4 + 2 * info->discoveryIndex;
+    offset = 5 + 2 * info->discoveryIndex;
   else
-    offset = 324 + 4 * info->discoveryIndex;
+    offset = 325 + 4 * info->discoveryIndex;
 
   int32_t index = offset + sub_id / 8;
   uint8_t bitIndex = sub_id % 8;
@@ -1568,7 +1568,8 @@ void Core::Entity::Player::sendZonePackets()
   initZonePacket->data().weatherId = static_cast< uint8_t >( getCurrentZone()->getCurrentWeather() );
   initZonePacket->data().bitmask = 0x1;
   initZonePacket->data().unknown5 = 0x2A;
-  initZonePacket->data().festivalId = getCurrentZone()->getCurrentFestival();
+  initZonePacket->data().festivalId = getCurrentZone()->getCurrentFestival().first;
+  initZonePacket->data().additionalFestivalId = getCurrentZone()->getCurrentFestival().second;
   initZonePacket->data().pos.x = getPos().x;
   initZonePacket->data().pos.y = getPos().y;
   initZonePacket->data().pos.z = getPos().z;

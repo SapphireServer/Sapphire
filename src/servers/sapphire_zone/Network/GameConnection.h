@@ -110,6 +110,10 @@ public:
 
   DECLARE_HANDLER( reqSearchInfoHandler );
 
+  DECLARE_HANDLER( reqExamineSearchCommentHandler );
+
+  DECLARE_HANDLER( reqExamineFcInfo );
+
   DECLARE_HANDLER( updatePositionHandler );
 
   DECLARE_HANDLER( chatHandler );

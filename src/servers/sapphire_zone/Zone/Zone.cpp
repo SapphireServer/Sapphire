@@ -53,7 +53,6 @@ Core::Zone::Zone() :
   m_currentWeather( Weather::FairSkies ),
   m_weatherOverride( Weather::None ),
   m_lastMobUpdate( 0 ),
-  m_currentFestivalId( 0 ),
   m_nextEObjId( 0x400D0000 )
 {
 }
@@ -130,20 +129,20 @@ Weather Core::Zone::getCurrentWeather() const
   return m_currentWeather;
 }
 
-uint16_t Core::Zone::getCurrentFestival() const
+const Core::FestivalPair& Core::Zone::getCurrentFestival() const
 {
-  return m_currentFestivalId;
+  return m_currentFestival;
 }
 
-void Core::Zone::setCurrentFestival( uint16_t festivalId )
+void Core::Zone::setCurrentFestival( uint16_t festivalId, uint16_t additionalFestivalId )
 {
-  m_currentFestivalId = festivalId;
+  m_currentFestival = { festivalId, additionalFestivalId };
 
   for( const auto& playerEntry : m_playerMap )
   {
     auto player = playerEntry.second;
 
-    auto enableFestival = makeActorControl143( player->getId(), SetFestival, m_currentFestivalId );
+    auto enableFestival = makeActorControl143( player->getId(), SetFestival, festivalId, additionalFestivalId );
     playerEntry.second->queuePacket( enableFestival );
   }
 }
