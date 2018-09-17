@@ -126,8 +126,8 @@ enum GearModelSlot : int8_t
   ModelHands = 2,
   ModelLegs = 3,
   ModelFeet = 4,
-  ModelNeck = 5,
-  ModelEar = 6,
+  ModelEar = 5,
+  ModelNeck = 6,
   ModelWrist = 7,
   ModelRing1 = 8,
   ModelRing2 = 9
