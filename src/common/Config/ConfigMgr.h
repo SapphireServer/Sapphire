@@ -3,43 +3,43 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-namespace Core
+namespace Core {
+class ConfigMgr
 {
-   class ConfigMgr
-   {
-   public:
-      ConfigMgr() = default;
-      ~ConfigMgr() = default;
+public:
+  ConfigMgr() = default;
 
-      bool loadConfig( const std::string& configName );
+  ~ConfigMgr() = default;
 
-      template< class T >
-      T getValue( const std::string& name, T defaultValue = T() )
-      {
-         try
-         {
-            return m_propTree.get< T >( name );
-         }
-         catch( ... )
-         {
-            return defaultValue;
-         }
-      }
+  bool loadConfig( const std::string& configName );
 
-      template< class T >
-      void setValue( const std::string& name, T defaultValue = T() )
-      {
-         m_propTree.put( name, defaultValue );
-      }
+  template< class T >
+  T getValue( const std::string& name, T defaultValue = T() )
+  {
+    try
+    {
+      return m_propTree.get< T >( name );
+    }
+    catch( ... )
+    {
+      return defaultValue;
+    }
+  }
 
-   private:
-      bool copyDefaultConfig( const std::string& configName );
+  template< class T >
+  void setValue( const std::string& name, T defaultValue = T() )
+  {
+    m_propTree.put( name, defaultValue );
+  }
 
-      boost::property_tree::ptree m_propTree;
-      const std::string m_globalConfigFile = "global.ini";
-      const std::string m_configFolderRoot = "./config/";
-      const std::string m_configDefaultSuffix = ".default";
-   };
+private:
+  bool copyDefaultConfig( const std::string& configName );
+
+  boost::property_tree::ptree m_propTree;
+  const std::string m_globalConfigFile = "global.ini";
+  const std::string m_configFolderRoot = "./config/";
+  const std::string m_configDefaultSuffix = ".default";
+};
 }
 
 #endif //SAPPHIRE_CONFIGMGR_H

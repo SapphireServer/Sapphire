@@ -8,52 +8,55 @@
 // Start NPC: 1000146
 // End NPC: 1000195
 
-class SubFst010 : public EventScript
+class SubFst010 :
+  public EventScript
 {
 private:
-   static constexpr auto SEQ_0 = 0;
-   static constexpr auto SEQ_FINISH = 255;
-   static constexpr auto ACTOR0 = 1000146;
-   static constexpr auto ACTOR1 = 1000195;
-   static constexpr auto SEQ_0_ACTOR0 = 0;
-   static constexpr auto SEQ_1_ACTOR1 = 1;
+  static constexpr auto SEQ_0 = 0;
+  static constexpr auto SEQ_FINISH = 255;
+  static constexpr auto ACTOR0 = 1000146;
+  static constexpr auto ACTOR1 = 1000195;
+  static constexpr auto SEQ_0_ACTOR0 = 0;
+  static constexpr auto SEQ_1_ACTOR1 = 1;
 
-   void Scene00000( Entity::Player& player )
-   {
-      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
+  void Scene00000( Entity::Player& player )
+  {
+    auto callback = [ & ]( Entity::Player& player, const Event::SceneResult& result )
+    {
+      if( result.param2 == 1 ) // accept quest
+        player.updateQuest( getId(), SEQ_FINISH );
+    };
+
+    player.playScene( getId(), 0, NONE, callback );
+  }
+
+  void Scene00001( Entity::Player& player )
+  {
+    auto callback = [ & ]( Entity::Player& player, const Event::SceneResult& result )
+    {
+      if( result.param2 == 1 ) // finish quest
       {
-         if( result.param2 == 1 ) // accept quest
-            player.updateQuest( getId(), SEQ_FINISH );
-      };
+        if( player.giveQuestRewards( getId(), 0 ) )
+          player.finishQuest( getId() );
+      }
+    };
 
-      player.playScene( getId(), 0, NONE, callback );
-   }
-
-   void Scene00001( Entity::Player& player )
-   {
-      auto callback = [&]( Entity::Player& player, const Event::SceneResult& result )
-      {
-         if( result.param2 == 1 ) // finish quest
-         {
-            if( player.giveQuestRewards( getId(), 0 ) )
-               player.finishQuest( getId() );
-         }
-      };
-
-      player.playScene( getId(), 1, NONE, callback );
-   }
+    player.playScene( getId(), 1, NONE, callback );
+  }
 
 public:
-   SubFst010() : EventScript( 65537 )
-   {}
+  SubFst010() :
+    EventScript( 65537 )
+  {
+  }
 
-   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
-   {
-      auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
+  void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
+  {
+    auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
-      if( actor == ACTOR0 )
-         Scene00000( player );
-      else if( actor == ACTOR1 )
-         Scene00001( player );
-   }
+    if( actor == ACTOR0 )
+      Scene00000( player );
+    else if( actor == ACTOR1 )
+      Scene00001( player );
+  }
 };

@@ -36,22 +36,22 @@ extern Core::Framework g_fw;
 
 float CalcStats::calculateBaseStat( PlayerPtr pPlayer )
 {
-   float base = 0.0f;
-   uint8_t level = pPlayer->getLevel();
+  float base = 0.0f;
+  uint8_t level = pPlayer->getLevel();
 
-   // SB Base Stat Formula  (Aligned)
-   if( level > 60 )
-   { 
-      base = static_cast< float >( ( ( ( level == 61 ) ? 224 : 220 ) + ( level - 61 ) * 8) );
-   }
-   // HW Base Stat Formula  (Aligned)
-   else if ( level > 50 )
-      base = 1.63f * level + 121.02f;
-   // ARR Base Stat Formula (Off by one in several cases)
-   else
-      base = 0.052602f * ( level * level ) + ( 1.0179f * level ) + 19.6f;
+  // SB Base Stat Formula  (Aligned)
+  if( level > 60 )
+  {
+    base = static_cast< float >( ( ( ( level == 61 ) ? 224 : 220 ) + ( level - 61 ) * 8 ) );
+  }
+    // HW Base Stat Formula  (Aligned)
+  else if( level > 50 )
+    base = 1.63f * level + 121.02f;
+    // ARR Base Stat Formula (Off by one in several cases)
+  else
+    base = 0.052602f * ( level * level ) + ( 1.0179f * level ) + 19.6f;
 
-   return base;
+  return base;
 }
 
 // Leggerless' HP Formula
@@ -59,37 +59,38 @@ float CalcStats::calculateBaseStat( PlayerPtr pPlayer )
 
 uint32_t CalcStats::calculateMaxHp( PlayerPtr pPlayer )
 {
-   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-   // TODO: Replace ApproxBaseHP with something that can get us an accurate BaseHP.
-   // Is there any way to pull reliable BaseHP without having to manually use a pet for every level, and using the values from a table?
-   // More info here: https://docs.google.com/spreadsheets/d/1de06KGT0cNRUvyiXNmjNgcNvzBCCQku7jte5QxEQRbs/edit?usp=sharing
-   
-   auto classInfo = pExdData->get< Core::Data::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
-   auto paramGrowthInfo = pExdData->get< Core::Data::ParamGrow >( pPlayer->getLevel() );
+  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  // TODO: Replace ApproxBaseHP with something that can get us an accurate BaseHP.
+  // Is there any way to pull reliable BaseHP without having to manually use a pet for every level, and using the values from a table?
+  // More info here: https://docs.google.com/spreadsheets/d/1de06KGT0cNRUvyiXNmjNgcNvzBCCQku7jte5QxEQRbs/edit?usp=sharing
 
-   if( !classInfo || !paramGrowthInfo )
-      return 0;
+  auto classInfo = pExdData->get< Core::Data::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
+  auto paramGrowthInfo = pExdData->get< Core::Data::ParamGrow >( pPlayer->getLevel() );
 
-   uint8_t level = pPlayer->getLevel();
+  if( !classInfo || !paramGrowthInfo )
+    return 0;
 
-   float baseStat = calculateBaseStat( pPlayer );
-   uint16_t vitStat = pPlayer->getStats().vit;
-   uint16_t hpMod = paramGrowthInfo->hpModifier;
-   uint16_t jobModHp = classInfo->modifierHitPoints;
-   float approxBaseHp = 0.0f; // Read above
+  uint8_t level = pPlayer->getLevel();
 
-   // These values are not precise.
+  float baseStat = calculateBaseStat( pPlayer );
+  uint16_t vitStat = pPlayer->getStats().vit;
+  uint16_t hpMod = paramGrowthInfo->hpModifier;
+  uint16_t jobModHp = classInfo->modifierHitPoints;
+  float approxBaseHp = 0.0f; // Read above
 
-   if ( level >= 60 )
-      approxBaseHp = static_cast< float >( 2600 + ( level - 60 ) * 100 );
-   else if ( level >= 50 )
-      approxBaseHp = 1700 + ( ( level - 50 ) * ( 1700 * 1.04325f ) );
-   else
-      approxBaseHp = paramGrowthInfo->mpModifier * 0.7667f;
+  // These values are not precise.
 
-   uint16_t result = static_cast< uint16_t >( floor( jobModHp * ( approxBaseHp / 100.0f ) ) + floor( hpMod / 100.0f * ( vitStat - baseStat ) ) );
+  if( level >= 60 )
+    approxBaseHp = static_cast< float >( 2600 + ( level - 60 ) * 100 );
+  else if( level >= 50 )
+    approxBaseHp = 1700 + ( ( level - 50 ) * ( 1700 * 1.04325f ) );
+  else
+    approxBaseHp = paramGrowthInfo->mpModifier * 0.7667f;
 
-   return result;
+  uint16_t result = static_cast< uint16_t >( floor( jobModHp * ( approxBaseHp / 100.0f ) ) +
+                                             floor( hpMod / 100.0f * ( vitStat - baseStat ) ) );
+
+  return result;
 }
 
 // Leggerless' MP Formula
@@ -97,20 +98,21 @@ uint32_t CalcStats::calculateMaxHp( PlayerPtr pPlayer )
 
 uint32_t CalcStats::calculateMaxMp( PlayerPtr pPlayer )
 {
-   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-   auto classInfo = pExdData->get< Core::Data::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
-   auto paramGrowthInfo = pExdData->get< Core::Data::ParamGrow >( pPlayer->getLevel() );
+  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto classInfo = pExdData->get< Core::Data::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
+  auto paramGrowthInfo = pExdData->get< Core::Data::ParamGrow >( pPlayer->getLevel() );
 
-   if( !classInfo || !paramGrowthInfo )
-      return 0;
+  if( !classInfo || !paramGrowthInfo )
+    return 0;
 
-   float baseStat = calculateBaseStat( pPlayer );
-   uint16_t piety = pPlayer->getStats().pie;
-   uint16_t pietyScalar = paramGrowthInfo->mpModifier;
-   uint16_t jobModMp = classInfo->modifierManaPoints;
-   uint16_t baseMp = paramGrowthInfo->mpModifier;
+  float baseStat = calculateBaseStat( pPlayer );
+  uint16_t piety = pPlayer->getStats().pie;
+  uint16_t pietyScalar = paramGrowthInfo->mpModifier;
+  uint16_t jobModMp = classInfo->modifierManaPoints;
+  uint16_t baseMp = paramGrowthInfo->mpModifier;
 
-   uint16_t result = static_cast< uint16_t >( floor( floor( piety - baseStat ) * ( pietyScalar / 100 ) + baseMp ) * jobModMp / 100 );
+  uint16_t result = static_cast< uint16_t >( floor( floor( piety - baseStat ) * ( pietyScalar / 100 ) + baseMp ) *
+                                             jobModMp / 100 );
 
-   return result;
+  return result;
 }

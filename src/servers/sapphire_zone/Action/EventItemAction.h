@@ -7,28 +7,32 @@
 namespace Core {
 namespace Action {
 
-   class EventItemAction : public Action 
-   {
+class EventItemAction :
+  public Action
+{
 
-   public:
-      EventItemAction();
-      ~EventItemAction();
-      
-      EventItemAction( Entity::CharaPtr pActor, uint32_t eventId, uint16_t action,
-                       ActionCallback finishRef, ActionCallback interruptRef, uint64_t additional );
+public:
+  EventItemAction();
 
-      void onStart() override;
-      void onFinish() override;
-      void onInterrupt() override;
+  ~EventItemAction();
 
-   private:
-      uint32_t m_eventId;
-      uint64_t m_additional;
-      
-      ActionCallback m_onActionFinishClb;
-      ActionCallback m_onActionInterruptClb;
+  EventItemAction( Entity::CharaPtr pActor, uint32_t eventId, uint16_t action,
+                   ActionCallback finishRef, ActionCallback interruptRef, uint64_t additional );
 
-   };
+  void onStart() override;
+
+  void onFinish() override;
+
+  void onInterrupt() override;
+
+private:
+  uint32_t m_eventId;
+  uint64_t m_additional;
+
+  ActionCallback m_onActionFinishClb;
+  ActionCallback m_onActionInterruptClb;
+
+};
 
 }
 }

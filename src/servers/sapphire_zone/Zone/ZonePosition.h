@@ -8,24 +8,27 @@ namespace Core {
 class ZonePosition
 {
 protected:
-   uint32_t	m_id;
-   uint32_t	m_targetZoneId;
-   Common::FFXIVARR_POSITION3	m_targetPos;
-   float m_rotation;
-   uint32_t	m_radius;
+  uint32_t m_id;
+  uint32_t m_targetZoneId;
+  Common::FFXIVARR_POSITION3 m_targetPos;
+  float m_rotation;
+  uint32_t m_radius;
 
 public:
-   ZonePosition();
-   ZonePosition( uint32_t id, uint32_t targetZoneId, const Common::FFXIVARR_POSITION3& targetPosition, uint32_t radius, float rotation );
-   virtual ~ZonePosition();
+  ZonePosition();
 
-   uint32_t getId() const;
+  ZonePosition( uint32_t id, uint32_t targetZoneId, const Common::FFXIVARR_POSITION3& targetPosition, uint32_t radius,
+                float rotation );
 
-   uint32_t getTargetZoneId() const;
+  virtual ~ZonePosition();
 
-   const Common::FFXIVARR_POSITION3& getTargetPosition() const;
+  uint32_t getId() const;
 
-   float getTargetRotation() const;
+  uint32_t getTargetZoneId() const;
+
+  const Common::FFXIVARR_POSITION3& getTargetPosition() const;
+
+  float getTargetRotation() const;
 
 };
 
