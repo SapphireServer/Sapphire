@@ -304,9 +304,11 @@ void Core::DebugCommandHandler::set( char* data, Entity::Player& player, boost::
   else if( subCommand == "festival" )
   {
     uint16_t festivalId;
-    sscanf( params.c_str(), "%hu", &festivalId );
+    uint16_t additionalId;
 
-    pTerriMgr->setCurrentFestival( festivalId );
+    sscanf( params.c_str(), "%hu %hu", &festivalId, &additionalId );
+
+    pTerriMgr->setCurrentFestival( festivalId, additionalId );
   }
   else if( subCommand == "festivaldisable" )
   {
