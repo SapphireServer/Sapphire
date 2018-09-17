@@ -3,7 +3,7 @@ root = true
 # find plugin for your editor here:  http://editorconfig.org/#download
 [*.{cpp,h,chai,inc}]
 indent_style = space
-indent_size = 3
+indent_size = 2
 end_of_line = lf
 trim_trailing_whitespace = true
 indent_brace_style = Allman
