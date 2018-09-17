@@ -428,7 +428,7 @@ void Core::Entity::Player::writeInventory( InventoryType type )
 
 void Core::Entity::Player::writeItem( Core::ItemPtr pItem ) const
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto stmt = pDb->getPreparedStatement( Db::CHARA_ITEMGLOBAL_UP );
 
   // todo: add more fields
@@ -443,7 +443,7 @@ void Core::Entity::Player::writeItem( Core::ItemPtr pItem ) const
 
 void Core::Entity::Player::deleteItemDb( Core::ItemPtr item ) const
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::CharaDbConnection > >();
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto stmt = pDb->getPreparedStatement( Db::CHARA_ITEMGLOBAL_DELETE );
 
   stmt->setInt64( 1, item->getUId() );
