@@ -263,16 +263,6 @@ void Core::DebugCommandHandler::set( char* data, Entity::Player& player, boost::
     player.setEorzeaTimeOffset( timestamp );
     player.sendNotice( "Eorzea time offset: " + std::to_string( timestamp ) );
   }
-  else if( subCommand == "model" )
-  {
-    uint32_t slot;
-    uint32_t val;
-    sscanf( params.c_str(), "%d %d", &slot, &val );
-
-    player.setModelForSlot( static_cast< Common::GearSetSlot >( slot ), val );
-    player.sendModel();
-    player.sendDebug( "Model updated" );
-  }
   else if( subCommand == "mount" )
   {
     int32_t id;
