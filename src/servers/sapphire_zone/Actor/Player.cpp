@@ -534,9 +534,9 @@ void Core::Entity::Player::discover( int16_t map_id, int16_t sub_id )
   auto info = pExdData->get< Core::Data::Map >(
     pExdData->get< Core::Data::TerritoryType >( getCurrentZone()->getTerritoryId() )->map );
   if( info->discoveryArrayByte )
-    offset = 4 + 2 * info->discoveryIndex;
+    offset = 5 + 2 * info->discoveryIndex;
   else
-    offset = 324 + 4 * info->discoveryIndex;
+    offset = 325 + 4 * info->discoveryIndex;
 
   int32_t index = offset + sub_id / 8;
   uint8_t bitIndex = sub_id % 8;
