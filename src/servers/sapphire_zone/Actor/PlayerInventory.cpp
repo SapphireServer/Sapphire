@@ -364,9 +364,10 @@ void Core::Entity::Player::sendInventory()
         itemInfoPacket->data().slot = itM->first;
         itemInfoPacket->data().quantity = itM->second->getStackSize();
         itemInfoPacket->data().catalogId = itM->second->getId();
-        itemInfoPacket->data().condition = 30000;
+        itemInfoPacket->data().condition = itM->second->getDurability();
         itemInfoPacket->data().spiritBond = 0;
         itemInfoPacket->data().hqFlag = itM->second->isHq() ? 1 : 0;
+        itemInfoPacket->data().stain = itM->second->getStain();
         queuePacket( itemInfoPacket );
       }
     }
@@ -474,15 +475,26 @@ void Core::Entity::Player::writeInventory( InventoryType type )
 void Core::Entity::Player::writeItem( Core::ItemPtr pItem ) const
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  pDb->execute( "UPDATE charaglobalitem SET stack = " + std::to_string( pItem->getStackSize() ) + " " +
-                // TODO: add other attributes
-                " WHERE itemId = " + std::to_string( pItem->getUId() ) );
+  auto stmt = pDb->getPreparedStatement( Db::CHARA_ITEMGLOBAL_UP );
+
+  // todo: add more fields
+  stmt->setInt( 1, pItem->getStackSize() );
+  stmt->setInt( 2, pItem->getDurability() );
+  stmt->setInt( 3, pItem->getStain() );
+
+  stmt->setInt64( 4, pItem->getUId() );
+
+  pDb->directExecute( stmt );
 }
 
 void Core::Entity::Player::deleteItemDb( Core::ItemPtr item ) const
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  pDb->execute( "UPDATE charaglobalitem SET IS_DELETE = 1 WHERE itemId = " + std::to_string( item->getUId() ) );
+  auto stmt = pDb->getPreparedStatement( Db::CHARA_ITEMGLOBAL_DELETE );
+
+  stmt->setInt64( 1, item->getUId() );
+
+  pDb->directExecute( stmt );
 }
 
 
@@ -509,8 +521,6 @@ Core::ItemPtr Core::Entity::Player::addItem( uint32_t catalogId, uint32_t quanti
 
   // used for item obtain notification
   uint32_t originalQuantity = quantity;
-
-  // todo: for now we're just going to add any items to main inv
 
   std::pair< uint16_t, uint8_t > freeBagSlot;
   bool foundFreeSlot = false;
@@ -826,4 +836,38 @@ uint8_t Core::Entity::Player::getFreeSlotsInBags()
     slots += ( storage->getMaxSize() - storage->getEntryCount() );
   }
   return slots;
+}
+
+bool Core::Entity::Player::collectHandInItems( std::vector< uint32_t > itemIds )
+{
+  // todo: figure out how the game gets the required stack count
+  const auto& container = m_storageMap[ HandIn ];
+
+  std::vector< uint8_t > foundItems;
+
+  auto itemMap = container->getItemMap();
+
+  for( auto& item : itemMap )
+  {
+    for( auto needle : itemIds )
+    {
+      if( item.second->getId() == needle )
+      {
+        foundItems.push_back( item.first );
+        break;
+      }
+    }
+  }
+
+  // couldn't find all the items required
+  if( foundItems.size() != itemIds.size() )
+    return false;
+
+  // remove items
+  for( auto item : foundItems )
+  {
+    container->removeItem( item );
+  }
+
+  return true;
 }

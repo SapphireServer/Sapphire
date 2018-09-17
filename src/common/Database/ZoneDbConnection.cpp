@@ -182,6 +182,12 @@ void Core::Db::ZoneDbConnection::doPrepareStatements()
                            "modelChara, displayFlags, Look, Models "
                     "FROM bnpctemplate WHERE 1;",
                     CONNECTION_BOTH);
+  
+  prepareStatement( CHARA_ITEMGLOBAL_UP,
+                    "UPDATE charaglobalitem SET stack = ?, durability = ?, stain = ? WHERE ItemId = ?;",
+                    CONNECTION_BOTH );
 
-
+  prepareStatement( CHARA_ITEMGLOBAL_DELETE,
+                    "UPDATE charaglobalitem SET IS_DELETE = 1 WHERE ItemId = ?;",
+                    CONNECTION_BOTH );
 }
