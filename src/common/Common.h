@@ -118,8 +118,22 @@ enum GearSetSlot :
   SoulCrystal = 13,
 };
 
-enum EquipSlotCategory :
-  uint8_t
+enum GearModelSlot : int8_t
+{
+  ModelInvalid = -1,
+  ModelHead = 0,
+  ModelBody = 1,
+  ModelHands = 2,
+  ModelLegs = 3,
+  ModelFeet = 4,
+  ModelNeck = 5,
+  ModelEar = 6,
+  ModelWrist = 7,
+  ModelRing1 = 8,
+  ModelRing2 = 9
+};
+
+enum EquipSlotCategory : uint8_t
 {
   Unequippable = 0,
 

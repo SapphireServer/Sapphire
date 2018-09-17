@@ -51,11 +51,16 @@ private:
       m_data.mainWeaponModel = item->getModelId1();
     m_data.secWeaponModel = player.getModelSubWeapon();
 
-    m_data.models[ 0 ] = player.getModelForSlot( Common::GearSetSlot::Head );
-    m_data.models[ 1 ] = player.getModelForSlot( Common::GearSetSlot::Body );
-    m_data.models[ 2 ] = player.getModelForSlot( Common::GearSetSlot::Hands );
-    m_data.models[ 3 ] = player.getModelForSlot( Common::GearSetSlot::Legs );
-    m_data.models[ 4 ] = player.getModelForSlot( Common::GearSetSlot::Feet );
+    m_data.models[ Common::GearModelSlot::ModelHead ] = player.getModelForSlot( Common::GearModelSlot::ModelHead );
+    m_data.models[ Common::GearModelSlot::ModelBody ] = player.getModelForSlot( Common::GearModelSlot::ModelBody );
+    m_data.models[ Common::GearModelSlot::ModelHands ] = player.getModelForSlot( Common::GearModelSlot::ModelHands );
+    m_data.models[ Common::GearModelSlot::ModelLegs ] = player.getModelForSlot( Common::GearModelSlot::ModelLegs );
+    m_data.models[ Common::GearModelSlot::ModelFeet ] = player.getModelForSlot( Common::GearModelSlot::ModelFeet );
+    m_data.models[ Common::GearModelSlot::ModelNeck ] = player.getModelForSlot( Common::GearModelSlot::ModelNeck );
+    m_data.models[ Common::GearModelSlot::ModelEar ] = player.getModelForSlot( Common::GearModelSlot::ModelEar );
+    m_data.models[ Common::GearModelSlot::ModelRing1 ] = player.getModelForSlot( Common::GearModelSlot::ModelRing1 );
+    m_data.models[ Common::GearModelSlot::ModelRing2 ] = player.getModelForSlot( Common::GearModelSlot::ModelRing2 );
+    m_data.models[ Common::GearModelSlot::ModelWrist ] = player.getModelForSlot( Common::GearModelSlot::ModelWrist );
     strcpy( m_data.name, player.getName().c_str() );
 
     m_data.pos.x = player.getPos().x;

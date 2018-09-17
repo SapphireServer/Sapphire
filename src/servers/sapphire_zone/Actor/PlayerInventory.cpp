@@ -140,32 +140,7 @@ void Core::Entity::Player::equipItem( Common::GearSetSlot equipSlotId, ItemPtr p
 
   //g_framework.getLogger().debug( "Equipping into slot " + std::to_string( equipSlotId ) );
 
-  uint64_t model = pItem->getModelId1();
-  uint64_t model2 = pItem->getModelId2();
-
-  switch( equipSlotId )
-  {
-    case Common::GearSetSlot::MainHand:
-      m_modelMainWeapon = model;
-      m_modelSubWeapon = model2;
-      // TODO: add job change upon changing weapon if needed
-      // equipWeapon( pItem );
-      break;
-
-    case Common::GearSetSlot::OffHand:
-      m_modelSubWeapon = model;
-      break;
-
-    case Common::GearSetSlot::SoulCrystal:
-      // TODO: add Job change on equipping crystal
-      // change job
-      break;
-
-    default: // any other slot
-      m_modelEquip[ static_cast< uint8_t >( equipSlotId ) ] = static_cast< uint32_t >( model );
-      break;
-
-  }
+  updateModels( equipSlotId, pItem );
 
   if( sendUpdate )
   {
@@ -175,9 +150,80 @@ void Core::Entity::Player::equipItem( Common::GearSetSlot equipSlotId, ItemPtr p
   }
 }
 
+void Core::Entity::Player::updateModels( GearSetSlot equipSlotId, const Core::ItemPtr& pItem )
+{
+  uint64_t model = pItem->getModelId1();
+  uint64_t model2 = pItem->getModelId2();
+
+  switch( equipSlotId )
+  {
+    case MainHand:
+      m_modelMainWeapon = model;
+      m_modelSubWeapon = model2;
+      // TODO: add job change upon changing weapon if needed
+      // equipWeapon( pItem );
+      break;
+
+    case OffHand:
+      m_modelSubWeapon = model;
+      break;
+
+    case SoulCrystal:
+      // TODO: add Job change on equipping crystal
+      // change job
+      break;
+
+    case Waist:
+      break;
+
+    default: // any other slot
+      auto modelSlot = equipSlotToModelSlot( equipSlotId );
+      if( modelSlot == GearModelSlot::ModelInvalid )
+        break;
+      m_modelEquip[ static_cast< uint8_t >( modelSlot ) ] = static_cast< uint32_t >( model );
+      break;
+
+  }
+}
+
+Core::Common::GearModelSlot Core::Entity::Player::equipSlotToModelSlot( Common::GearSetSlot slot )
+{
+  switch( slot )
+  {
+    case MainHand:
+    case OffHand:
+    case Waist:
+    case SoulCrystal:
+    default:
+      return GearModelSlot::ModelInvalid;
+    case Head:
+      return GearModelSlot::ModelHead;
+    case Body:
+      return GearModelSlot::ModelBody;
+    case Hands:
+      return GearModelSlot::ModelHands;
+    case Legs:
+      return GearModelSlot::ModelLegs;
+    case Feet:
+      return GearModelSlot::ModelFeet;
+    case Neck:
+      return GearModelSlot::ModelNeck;
+    case Ear:
+      return GearModelSlot::ModelEar;
+    case Wrist:
+      return GearModelSlot::ModelWrist;
+    case Ring1:
+      return GearModelSlot::ModelRing1;
+    case Ring2:
+      return GearModelSlot::ModelRing2;
+  }
+}
+
 void Core::Entity::Player::unequipItem( Common::GearSetSlot equipSlotId, ItemPtr pItem )
 {
-  m_modelEquip[ static_cast< uint8_t >( equipSlotId ) ] = 0;
+  auto modelSlot = equipSlotToModelSlot( equipSlotId );
+  if( modelSlot != GearModelSlot::ModelInvalid )
+    m_modelEquip[ static_cast< uint8_t >( modelSlot ) ] = 0;
   sendModel();
 
   m_itemLevel = calculateEquippedGearItemLevel();

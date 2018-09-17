@@ -136,7 +136,6 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
   m_homePoint = res->getUInt8( "Homepoint" );
 
   // Additional data
-
   m_contentId = res->getUInt64( "ContentId" );
   m_voice = res->getUInt8( "Voice" );
   m_startTown = res->getUInt8( "StartTown" );
@@ -333,6 +332,9 @@ void Core::Entity::Player::updateSql()
   "EquippedMannequin 44, ConfigFlags 45, QuestCompleteFlags 46, OpeningSequence 47, "
   "QuestTracking 48, GrandCompany 49, GrandCompanyRank 50, Discovery 51, GMRank 52, Unlocks 53, "
   "CFPenaltyUntil 54, Pose 55"*/
+
+
+
   auto stmt = pDb->getPreparedStatement( Db::ZoneDbStatements::CHARA_UP );
 
   stmt->setInt( 1, getHp() );
@@ -605,7 +607,7 @@ bool Core::Entity::Player::loadInventory()
   {
     uint16_t storageId = res->getUInt16( 1 );
 
-    for( uint32_t i = 1; i <= 14; i++ )
+    for( uint32_t i = 1; i <= 13; i++ )
     {
       uint64_t uItemId = res->getUInt64( i + 1 );
       if( uItemId == 0 )
