@@ -60,14 +60,15 @@ Core::Network::GameConnection::GameConnection( Core::Network::HivePtr pHive,
                   &GameConnection::setSearchInfoHandler );
   setZoneHandler( ClientZoneIpcType::ReqSearchInfoHandler, "ReqSearchInfoHandler",
                   &GameConnection::reqSearchInfoHandler );
-
+  setZoneHandler( ClientZoneIpcType::ReqExamineSearchCommentHandler, "ReqExamineSearchCommentHandler",
+                  &GameConnection::reqExamineSearchCommentHandler );
   setZoneHandler( ClientZoneIpcType::BlackListHandler, "BlackListHandler", &GameConnection::blackListHandler );
 
   setZoneHandler( ClientZoneIpcType::LinkshellListHandler, "LinkshellListHandler",
                   &GameConnection::linkshellListHandler );
 
   setZoneHandler( ClientZoneIpcType::FcInfoReqHandler, "FcInfoReqHandler", &GameConnection::fcInfoReqHandler );
-
+  setZoneHandler( ClientZoneIpcType::ReqExamineFcInfo, "ReqExamineFcInfo", &GameConnection::reqExamineFcInfo );
   setZoneHandler( ClientZoneIpcType::ZoneLineHandler, "ZoneLineHandler", &GameConnection::zoneLineHandler );
   setZoneHandler( ClientZoneIpcType::ClientTrigger, "ClientTrigger", &GameConnection::clientTriggerHandler );
 

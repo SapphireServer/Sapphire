@@ -12,7 +12,9 @@ Core::Item::Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t mo
   m_uId( uId ),
   m_model1( model1 ),
   m_model2( model2 ),
-  m_isHq( isHq )
+  m_isHq( isHq ),
+  m_stain( 0 ),
+  m_durability( 30000 )
 {
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
   auto itemInfo = pExdData->get< Core::Data::Item >( catalogId );
@@ -131,4 +133,24 @@ void Core::Item::setHq( bool isHq )
 uint32_t Core::Item::getMaxStackSize() const
 {
   return m_maxStackSize;
+}
+
+uint16_t Core::Item::getDurability() const
+{
+  return m_durability;
+}
+
+void Core::Item::setDurability( uint16_t durability )
+{
+  m_durability = durability;
+}
+
+uint16_t Core::Item::getStain() const
+{
+  return m_stain;
+}
+
+void Core::Item::setStain( uint16_t stain )
+{
+  m_stain = stain;
 }

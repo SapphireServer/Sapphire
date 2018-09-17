@@ -140,6 +140,16 @@ struct FFXIVIpcInitSearchInfo :
   char padding[5];
 };
 
+struct FFXIVIpcExamineSearchComment :
+  FFXIVIpcBasePacket< ExamineSearchComment >
+{
+  uint32_t charId;
+  // packet only has 196 bytes after the charid
+  // likely utf8
+  char searchComment[195];
+  char padding;
+};
+
 /**
 * Structural representation of the packet sent by the server
 * to display a server notice message
@@ -198,6 +208,25 @@ struct FFXIVIpcLinkshellList :
     uint16_t padding;
     uint8_t lsName[20];
   } entry[8];
+};
+
+struct FFXIVIpcExamineFreeCompanyInfo :
+  FFXIVIpcBasePacket< ExamineFreeCompanyInfo >
+{
+  char unknown[0x20]; // likely fc allegiance/icon/housing info etc
+  uint32_t charId;
+  uint32_t fcTimeCreated;
+  char unknown2[0x10];
+  uint16_t unknown3;
+  char fcName[0x14]; // 20 char limit
+  uint16_t padding;
+  char fcTag[0x05]; // 5 char tag limit
+  uint16_t padding2; // null terminator?
+  char fcLeader[0x20]; // leader name (32 bytes)
+  char fcSlogan[192]; // source: https://ffxiv.gamerescape.com/wiki/Free_Company (packet cap confirms this size also)
+  char padding3; // null terminator?
+  char fcEstateProfile[20]; // todo: size needs confirmation
+  uint32_t padding4;
 };
 
 struct FFXIVIpcStatusEffectList :
@@ -685,7 +714,7 @@ struct FFXIVIpcInitZone :
   uint8_t bitmask;
   uint16_t unknown5;
   uint16_t festivalId;
-  uint16_t unknown7;
+  uint16_t additionalFestivalId;
   uint32_t unknown8;
   Common::FFXIVARR_POSITION3 pos;
 };
@@ -950,6 +979,54 @@ struct FFXIVIpcModelEquip :
   /* 003C */ uint32_t padding2;
 };
 
+struct FFXIVIpcExamine :
+  FFXIVIpcBasePacket< Examine >
+{
+  uint8_t unkFlag1;
+  uint8_t unkFlag2;
+  char classJob;
+  char level;
+  uint16_t padding;
+  uint16_t titleId;
+  char grandCompany;
+  char grandCompanyRank;
+
+  char unknown[6];
+  uint32_t u6_fromPSpawn;
+  uint32_t u7_fromPSpawn;
+  char padding1[8];
+  uint64_t mainWeaponModel;
+  uint64_t secWeaponModel;
+  char unknown2[16];
+  struct ItemData
+  {
+    uint32_t catalogId;
+    uint32_t appearanceCatalogId;
+    uint64_t crafterId;
+    uint8_t quality;
+    uint8_t unknown[3];
+    struct Materia
+    {
+      uint16_t materiaId;
+      uint16_t tier;
+    } materia[5];
+  } entries[14];
+  char name[32];
+  char padding2;
+  char unk3[16];
+  char look[26];
+  char padding3[5];
+  uint32_t models[10];
+  char unknown4[200];
+};
+
+struct FFXIVIpcCharaNameReq :
+  FFXIVIpcBasePacket< CharaNameReq >
+{
+  uint64_t contentId;
+  char name[32];
+};
+
 /**
 * Structural representation of the packet sent by the server
 * to update a players appearance
@@ -969,7 +1046,7 @@ struct FFXIVIpcItemInfo :
   uint8_t unknown2;
   uint16_t condition;
   uint16_t spiritBond;
-  uint16_t color;
+  uint16_t stain;
   uint32_t glamourCatalogId;
   uint16_t materia1;
   uint16_t materia2;
