@@ -32,7 +32,7 @@ switch( commandId )
 {
   case 0x01:  // Toggle sheathe
   {
-    if ( param11 == 1 )
+    if( param11 == 1 )
        pPlayer->setStance( Entity::Chara::Stance::Active );
     else
     {

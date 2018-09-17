@@ -7,53 +7,62 @@
 #include <mutex>
 #include <map>
 
-#include "Forwards.h"
+#include "ForwardsZone.h"
+
+#include "Actor/BNpcTemplate.h"
 
 namespace Core {
 
-   class ServerZone
-   {
-   public:
-      ServerZone( const std::string& configName );
-      ~ServerZone();
+class ServerZone
+{
+public:
+  ServerZone( const std::string& configName );
 
-      void run( int32_t argc, char* argv[] );
+  ~ServerZone();
 
-      bool createSession( uint32_t sessionId );
-      void removeSession( uint32_t sessionId );
-      void removeSession( std::string playerName );
+  void run( int32_t argc, char* argv[] );
 
-      bool loadSettings( int32_t argc, char* argv[] );
+  bool createSession( uint32_t sessionId );
 
-      SessionPtr getSession( uint32_t id );
-      SessionPtr getSession( std::string playerName );
+  void removeSession( uint32_t sessionId );
+  void removeSession( const std::string& playerName );
 
-      size_t getSessionCount() const;
+  SessionPtr getSession( uint32_t id );
+  SessionPtr getSession( const std::string& playerName );
 
-      void mainLoop();
+  size_t getSessionCount() const;
 
-      bool isRunning() const;
+  void mainLoop();
 
-      void printBanner() const;
+  bool isRunning() const;
 
-   private:
+  void printBanner() const;
 
-      uint16_t m_port;
-      std::string m_ip;
-      int64_t m_lastDBPingTime;
+  bool loadSettings( int32_t argc, char* argv[] );
+  void loadBNpcTemplates();
 
-      bool m_bRunning;
+  Entity::BNpcTemplatePtr getBNpcTemplate( const std::string& key );
+  Entity::BNpcTemplatePtr getBNpcTemplate( uint32_t id );
 
-      std::string m_configName;
+private:
+  uint16_t m_port;
+  std::string m_ip;
+  int64_t m_lastDBPingTime;
 
-      std::mutex m_sessionMutex;
+  bool m_bRunning;
 
-      std::map< uint32_t, SessionPtr > m_sessionMapById;
-      std::map< std::string, SessionPtr > m_sessionMapByName;
+  std::string m_configName;
 
-      std::map< uint32_t, uint32_t > m_zones;
+  std::mutex m_sessionMutex;
 
-   };
+  std::map< uint32_t, SessionPtr > m_sessionMapById;
+  std::map< std::string, SessionPtr > m_sessionMapByName;
+
+  std::map< uint32_t, uint32_t > m_zones;
+
+  std::map< std::string, Entity::BNpcTemplatePtr > m_bNpcTemplateMap;
+
+};
 
 }
 

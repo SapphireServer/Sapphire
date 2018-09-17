@@ -4,195 +4,197 @@
 #include <map>
 #include <stdint.h>
 #include <string.h>
+
 namespace Core {
 
 
-   class PlayerMinimal
-   {
-   public:
-      PlayerMinimal( void );
-      ~PlayerMinimal( void );
+class PlayerMinimal
+{
+public:
+  PlayerMinimal( void );
 
-      // write player to the database
-      void write();
+  ~PlayerMinimal( void );
 
-      // load player from db, by id
-      void load( uint32_t charId );
+  // write player to the database
+  void write();
 
-      void saveAsNew();
+  // load player from db, by id
+  void load( uint32_t charId );
 
-      std::string getLookString();
+  void saveAsNew();
 
-      std::string getInfoJson();
+  std::string getLookString();
 
-      std::string getModelString();
+  std::string getInfoJson();
 
-      std::string getClassString();
+  std::string getModelString();
 
-      // return the id of the actor
-      uint32_t getId() const
-      {
-         return m_id;
-      }
+  std::string getClassString();
 
-      void setId( uint32_t id )
-      {
-         m_id = id;
-      }
+  // return the id of the actor
+  uint32_t getId() const
+  {
+    return m_id;
+  }
 
-      void setContentId( uint64_t id )
-      {
-         m_contentId = id;
-      }
+  void setId( uint32_t id )
+  {
+    m_id = id;
+  }
 
-      uint64_t getContentId() const
-      {
-         return m_contentId;
-      }
+  void setContentId( uint64_t id )
+  {
+    m_contentId = id;
+  }
 
-
-      uint32_t getAccountId() const
-      {
-         return m_accountId;
-      }
-
-      void setAccountId( uint32_t accountId )
-      {
-         m_accountId = accountId;
-      }
-
-      // return the actors name
-      char * getName()
-      {
-         return m_name;
-      }
-
-      void setLook( uint8_t index, uint32_t value )
-      {
-         m_lookMap[index] = value;
-      }
+  uint64_t getContentId() const
+  {
+    return m_contentId;
+  }
 
 
-      // return the actors name
-      void setName( const char* name )
-      {
-         strcpy( m_name, name );
-      }
+  uint32_t getAccountId() const
+  {
+    return m_accountId;
+  }
 
-      void setClass( uint8_t classId )
-      {
-         m_class = classId;
-      }
+  void setAccountId( uint32_t accountId )
+  {
+    m_accountId = accountId;
+  }
 
-      uint8_t getClass() const
-      {
-         return m_class;
-      }
+  // return the actors name
+  char* getName()
+  {
+    return m_name;
+  }
 
-      uint8_t getGuardianDeity() const
-      {
-         return m_guardianDeity;
-      }
+  void setLook( uint8_t index, uint32_t value )
+  {
+    m_lookMap[ index ] = value;
+  }
 
-      void setGuardianDeity( uint8_t guardianId )
-      {
-         m_guardianDeity = guardianId;
-      }
 
-      void setBirthDay( uint8_t day, uint8_t month )
-      {
-         m_birthDay = day;
-         m_birthMonth = month;
-      }
+  // return the actors name
+  void setName( const char* name )
+  {
+    strcpy( m_name, name );
+  }
 
-      uint8_t getBirthDay() const
-      {
-         return m_birthDay;
-      }
+  void setClass( uint8_t classId )
+  {
+    m_class = classId;
+  }
 
-      uint8_t getBirthMonth() const
-      {
-         return m_birthMonth;
-      }
+  uint8_t getClass() const
+  {
+    return m_class;
+  }
 
-      uint8_t getVoice() const
-      {
-         return m_birthMonth;
-      }
+  uint8_t getGuardianDeity() const
+  {
+    return m_guardianDeity;
+  }
 
-      void setVoice( uint8_t voice )
-      {
-         m_voice = voice;
-      }
+  void setGuardianDeity( uint8_t guardianId )
+  {
+    m_guardianDeity = guardianId;
+  }
 
-      uint32_t getZoneId() const
-      {
-         return m_zoneId;
-      }
+  void setBirthDay( uint8_t day, uint8_t month )
+  {
+    m_birthDay = day;
+    m_birthMonth = month;
+  }
 
-      uint32_t getTribe() const
-      {
-         return m_tribe;
-      }
+  uint8_t getBirthDay() const
+  {
+    return m_birthDay;
+  }
 
-      void setTribe( uint8_t tribe )
-      {
-         m_tribe = tribe;
-      }
+  uint8_t getBirthMonth() const
+  {
+    return m_birthMonth;
+  }
 
-      uint8_t getGmRank() const
-      {
-         return m_gmRank;
-      }
+  uint8_t getVoice() const
+  {
+    return m_birthMonth;
+  }
 
-      void setGmRank( uint8_t rank )
-      {
-         m_gmRank = rank;
-      }
+  void setVoice( uint8_t voice )
+  {
+    m_voice = voice;
+  }
 
-      bool getGmInvis() const
-      {
-         return m_gmInvis;
-      }
+  uint32_t getZoneId() const
+  {
+    return m_zoneId;
+  }
 
-      bool setGmInvis( bool invis )
-      {
-         m_gmInvis = invis;
-      }
+  uint32_t getTribe() const
+  {
+    return m_tribe;
+  }
 
-      void createInvDbContainer( uint16_t slot ) const;
+  void setTribe( uint8_t tribe )
+  {
+    m_tribe = tribe;
+  }
 
-      uint32_t m_modelEquip[10];
+  uint8_t getGmRank() const
+  {
+    return m_gmRank;
+  }
 
-      uint64_t getNextUId64() const;
+  void setGmRank( uint8_t rank )
+  {
+    m_gmRank = rank;
+  }
 
-   private:
-      uint32_t m_accountId;
-      uint32_t m_id;
-      uint64_t m_contentId;
+  bool getGmInvis() const
+  {
+    return m_gmInvis;
+  }
 
-      uint8_t m_guardianDeity;
-      uint8_t m_birthMonth;
-      uint8_t m_birthDay;
-      uint8_t m_class;
+  void setGmInvis( bool invis )
+  {
+    m_gmInvis = invis;
+  }
 
-      uint8_t m_voice;
+  void createInvDbContainer( uint16_t slot ) const;
 
-      uint8_t m_tribe;
+  uint32_t m_modelEquip[10];
 
-      uint16_t m_zoneId;
+  uint64_t getNextUId64() const;
 
-      std::map< uint8_t, uint8_t > m_lookMap;
-      std::map< uint8_t, uint16_t > m_classMap;
-      uint8_t m_look[26];
+private:
+  uint32_t m_accountId;
+  uint32_t m_id;
+  uint64_t m_contentId;
 
-      uint8_t m_gmRank;
-      bool m_gmInvis;
+  uint8_t m_guardianDeity;
+  uint8_t m_birthMonth;
+  uint8_t m_birthDay;
+  uint8_t m_class;
 
-      char m_name[34];
+  uint8_t m_voice;
 
-      void insertDbGlobalItem( uint32_t itemId, uint64_t uniqueId ) const;
-   };
+  uint8_t m_tribe;
+
+  uint16_t m_zoneId;
+
+  std::map< uint8_t, uint8_t > m_lookMap;
+  std::map< uint8_t, uint16_t > m_classMap;
+  uint8_t m_look[26];
+
+  uint8_t m_gmRank;
+  bool m_gmInvis;
+
+  char m_name[34];
+
+  void insertDbGlobalItem( uint32_t itemId, uint64_t uniqueId ) const;
+};
 
 }
 #endif

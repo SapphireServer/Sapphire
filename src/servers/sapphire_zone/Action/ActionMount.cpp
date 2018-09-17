@@ -25,17 +25,17 @@ extern Core::Framework g_framework;
 
 Core::Action::ActionMount::ActionMount()
 {
-   m_handleActionType = HandleActionType::Event;
+  m_handleActionType = HandleActionType::Event;
 }
 
 Core::Action::ActionMount::ActionMount( Entity::CharaPtr pActor, uint16_t mountId )
 {
-   m_startTime = 0;
-   m_id = mountId;
-   m_handleActionType = HandleActionType::Spell;
-   m_castTime = 1000;
-   m_pSource = pActor;
-   m_bInterrupt = false;
+  m_startTime = 0;
+  m_id = mountId;
+  m_handleActionType = HandleActionType::Spell;
+  m_castTime = 1000;
+  m_pSource = pActor;
+  m_bInterrupt = false;
 }
 
 Core::Action::ActionMount::~ActionMount()
@@ -45,64 +45,63 @@ Core::Action::ActionMount::~ActionMount()
 
 void Core::Action::ActionMount::onStart()
 {
-   if( !m_pSource )
-      return;
+  if( !m_pSource )
+    return;
 
-   m_pSource->getAsPlayer()->sendDebug( "ActionMount::onStart()" );
-   m_startTime = Util::getTimeMs();
+  m_pSource->getAsPlayer()->sendDebug( "ActionMount::onStart()" );
+  m_startTime = Util::getTimeMs();
 
-   auto castPacket = makeZonePacket< FFXIVIpcActorCast >( getId() );
-   castPacket->data().action_id = m_id;
-   castPacket->data().skillType = Common::SkillType::MountSkill;
-   castPacket->data().unknown_1 = m_id;
-   // This is used for the cast bar above the target bar of the caster.
-   castPacket->data().cast_time = static_cast< float >( m_castTime / 1000 );
-   castPacket->data().target_id = m_pSource->getAsPlayer()->getId();
+  auto castPacket = makeZonePacket< FFXIVIpcActorCast >( getId() );
+  castPacket->data().action_id = m_id;
+  castPacket->data().skillType = Common::SkillType::MountSkill;
+  castPacket->data().unknown_1 = m_id;
+  // This is used for the cast bar above the target bar of the caster.
+  castPacket->data().cast_time = static_cast< float >( m_castTime / 1000 );
+  castPacket->data().target_id = m_pSource->getAsPlayer()->getId();
 
-   m_pSource->sendToInRangeSet( castPacket, true );
-   m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::Casting );
+  m_pSource->sendToInRangeSet( castPacket, true );
+  m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::Casting );
 
 }
 
 void Core::Action::ActionMount::onFinish()
 {
-   if( !m_pSource )
-      return;
+  if( !m_pSource )
+    return;
 
-   auto pPlayer = m_pSource->getAsPlayer();
-   pPlayer->sendDebug( "ActionMount::onFinish()" );
+  auto pPlayer = m_pSource->getAsPlayer();
+  pPlayer->sendDebug( "ActionMount::onFinish()" );
 
-   pPlayer->unsetStateFlag( PlayerStateFlag::Casting );
+  pPlayer->unsetStateFlag( PlayerStateFlag::Casting );
 
-   auto effectPacket = boost::make_shared< Server::EffectPacket >( getId(), pPlayer->getId(), 4 );
-   effectPacket->setRotation( Math::Util::floatToUInt16Rot( pPlayer->getRot() ) );
+  auto effectPacket = boost::make_shared< Server::EffectPacket >( getId(), pPlayer->getId(), 4 );
+  effectPacket->setRotation( Math::Util::floatToUInt16Rot( pPlayer->getRot() ) );
 
-   Server::EffectEntry effectEntry{};
-   effectEntry.effectType = ActionEffectType::Mount;
-   effectEntry.hitSeverity = ActionHitSeverityType::CritDamage;
-   effectEntry.value = m_id;
+  Server::EffectEntry effectEntry{};
+  effectEntry.effectType = ActionEffectType::Mount;
+  effectEntry.hitSeverity = ActionHitSeverityType::CritDamage;
+  effectEntry.value = m_id;
 
-   effectPacket->addEffect( effectEntry );
+  effectPacket->addEffect( effectEntry );
 
-   pPlayer->sendToInRangeSet( effectPacket, true );
+  pPlayer->sendToInRangeSet( effectPacket, true );
 
-   pPlayer->mount( m_id );
+  pPlayer->mount( m_id );
 }
 
 void Core::Action::ActionMount::onInterrupt()
 {
-   if( !m_pSource )
-      return;
+  if( !m_pSource )
+    return;
 
-   //m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied1 );
-   m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Casting );
+  //m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied1 );
+  m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Casting );
 
-   auto control = boost::make_shared< ActorControlPacket142 >( m_pSource->getId(), ActorControlType::CastInterrupt,
-                                                               0x219, 1, m_id, 0 );
+  auto control = makeActorControl142( m_pSource->getId(), ActorControlType::CastInterrupt, 0x219, 1, m_id, 0 );
 
-   // Note: When cast interrupt from taking too much damage, set the last value to 1. This enables the cast interrupt effect. Example:
-   // auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt, 0x219, 1, m_id, 0 );
+  // Note: When cast interrupt from taking too much damage, set the last value to 1. This enables the cast interrupt effect. Example:
+  // auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt, 0x219, 1, m_id, 0 );
 
-   m_pSource->sendToInRangeSet( control, true );
+  m_pSource->sendToInRangeSet( control, true );
 
 }

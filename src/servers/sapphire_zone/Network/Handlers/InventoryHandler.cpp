@@ -9,9 +9,6 @@
 
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
-#include "Network/PacketWrappers/ActorControlPacket142.h"
-#include "Network/PacketWrappers/ActorControlPacket143.h"
-#include "Network/PacketWrappers/ActorControlPacket144.h"
 
 #include "Zone/Zone.h"
 #include "Zone/ZonePosition.h"
@@ -33,62 +30,62 @@ using namespace Core::Network::Packets::Server;
 void Core::Network::GameConnection::inventoryModifyHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                             Entity::Player& player )
 {
-   const auto packet = ZoneChannelPacket< Client::FFXIVIpcInventoryModifyHandler >( inPacket );
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcInventoryModifyHandler >( inPacket );
 
-   const auto& action = packet.data().action;
-   const auto& splitCount = packet.data().splitCount;
+  const auto& action = packet.data().action;
+  const auto& splitCount = packet.data().splitCount;
 
-   const auto& fromSlot = packet.data().fromSlot;
-   const auto& fromContainer = packet.data().fromContainer;
-   const auto& toSlot = packet.data().toSlot;
-   const auto& toContainer = packet.data().toContainer;
+  const auto& fromSlot = packet.data().fromSlot;
+  const auto& fromContainer = packet.data().fromContainer;
+  const auto& toSlot = packet.data().toSlot;
+  const auto& toContainer = packet.data().toContainer;
 
-   auto ackPacket = makeZonePacket< Server::FFXIVIpcInventoryActionAck >( player.getId() );
-   ackPacket->data().sequence = packet.data().seq;
-   ackPacket->data().type = 7;
-   player.queuePacket( ackPacket );
-  
-   auto pLog = g_fw.get< Logger >();
+  auto ackPacket = makeZonePacket< Server::FFXIVIpcInventoryActionAck >( player.getId() );
+  ackPacket->data().sequence = packet.data().seq;
+  ackPacket->data().type = 7;
+  player.queuePacket( ackPacket );
 
-   pLog->debug( "InventoryAction: " + std::to_string( action ) );
+  auto pLog = g_fw.get< Logger >();
 
-   // TODO: other inventory operations need to be implemented
-   switch( action )
-   {
+  pLog->debug( "InventoryAction: " + std::to_string( action ) );
 
-      case InventoryOperation::Discard: // discard item action
-      {
-         player.discardItem( fromContainer, fromSlot );
-      }
+  // TODO: other inventory operations need to be implemented
+  switch( action )
+  {
+
+    case InventoryOperation::Discard: // discard item action
+    {
+      player.discardItem( fromContainer, fromSlot );
+    }
       break;
 
-      case InventoryOperation::Move: // move item action
-      {
-         player.moveItem( fromContainer, fromSlot, toContainer, toSlot );
-      }
+    case InventoryOperation::Move: // move item action
+    {
+      player.moveItem( fromContainer, fromSlot, toContainer, toSlot );
+    }
       break;
 
-      case InventoryOperation::Swap: // swap item action
-      {
-         player.swapItem( fromContainer, fromSlot, toContainer, toSlot );
-      }
+    case InventoryOperation::Swap: // swap item action
+    {
+      player.swapItem( fromContainer, fromSlot, toContainer, toSlot );
+    }
       break;
 
-      case InventoryOperation::Merge: // merge stack action
-      {
-         player.mergeItem( fromContainer, fromSlot, toContainer, toSlot );
-      }
+    case InventoryOperation::Merge: // merge stack action
+    {
+      player.mergeItem( fromContainer, fromSlot, toContainer, toSlot );
+    }
       break;
 
-      case InventoryOperation::Split: // split stack action
-      {
-         player.splitItem( fromContainer, fromSlot, toContainer, toSlot, splitCount );
-      }
+    case InventoryOperation::Split: // split stack action
+    {
+      player.splitItem( fromContainer, fromSlot, toContainer, toSlot, splitCount );
+    }
       break;
 
-      default:
-         break;
+    default:
+      break;
 
-   }
+  }
 }
 

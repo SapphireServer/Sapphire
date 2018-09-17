@@ -1,15 +1,15 @@
 #include "LobbySession.h"
-namespace Core 
+
+namespace Core {
+LobbySession::LobbySession( void )
 {
-   LobbySession::LobbySession( void )
-   {
-      //setSocket(NULL);
+  //setSocket(NULL);
 
-   }
+}
 
-   LobbySession::~LobbySession( void )
-   {
+LobbySession::~LobbySession( void )
+{
 
-   }
+}
 }
 

@@ -5,11 +5,11 @@
 #include <string>
 
 namespace Core {
-   namespace Event {
+namespace Event {
 
-      std::string getEventName( uint32_t eventId );
+std::string getEventName( uint32_t eventId );
 
-      uint32_t mapEventActorToRealActor( uint32_t eventActorId );
-   }
+uint32_t mapEventActorToRealActor( uint32_t eventActorId );
+}
 }
 #endif

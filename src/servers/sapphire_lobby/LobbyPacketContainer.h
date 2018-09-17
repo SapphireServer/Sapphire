@@ -18,23 +18,24 @@ typedef boost::shared_ptr< FFXIVPacketBase > FFXIVPacketBasePtr;
 class LobbyPacketContainer
 {
 public:
-   LobbyPacketContainer( uint8_t* encKey = nullptr );
-   ~LobbyPacketContainer();
+  LobbyPacketContainer( uint8_t* encKey = nullptr );
 
-   void addPacket( FFXIVPacketBasePtr pEntry );
+  ~LobbyPacketContainer();
 
-   uint16_t getSize() const;
+  void addPacket( FFXIVPacketBasePtr pEntry );
 
-   uint8_t* getRawData( bool addstuff = true );
+  uint16_t getSize() const;
+
+  uint8_t* getRawData( bool addstuff = true );
 
 private:
-   Core::Network::Packets::FFXIVARR_PACKET_HEADER m_header;
+  Core::Network::Packets::FFXIVARR_PACKET_HEADER m_header;
 
-   uint8_t* m_encKey;
+  uint8_t* m_encKey;
 
-   std::vector< FFXIVPacketBasePtr > m_entryList;
+  std::vector< FFXIVPacketBasePtr > m_entryList;
 
-   uint8_t m_dataBuf[0x2000];
+  uint8_t m_dataBuf[0x2000];
 
 };
 
