@@ -358,21 +358,17 @@ void PlayerMinimal::saveAsNew()
 
   g_charaDb.execute( "INSERT INTO charaitemgearset (storageId, CharacterId, "
                      "container_" + std::to_string( GearSetSlot::MainHand ) + ", "
-                                                                              "container_" +
-                     std::to_string( GearSetSlot::Body ) + ", "
-                                                           "container_" + std::to_string( GearSetSlot::Hands ) + ", "
-                                                                                                                 "container_" +
-                     std::to_string( GearSetSlot::Legs ) + ", "
-                                                           "container_" + std::to_string( GearSetSlot::Feet ) + ", "
-                                                                                                                "container_" +
-                     std::to_string( GearSetSlot::Neck ) + ", "
-                                                           "container_" + std::to_string( GearSetSlot::Ear ) + ", "
-                                                                                                               "container_" +
-                     std::to_string( GearSetSlot::Wrist ) + ", "
-                                                            "container_" + std::to_string( GearSetSlot::Ring1 ) + ", "
-                                                                                                                  "UPDATE_DATE ) "
-                                                                                                                  "VALUES ( " +
-                     std::to_string( InventoryType::GearSet0 ) + ", " + std::to_string( m_id ) + ", " +
+                     "container_" + std::to_string( GearSetSlot::Body ) + ", "
+                     "container_" + std::to_string( GearSetSlot::Hands ) + ", "
+                     "container_" + std::to_string( GearSetSlot::Legs ) + ", "
+                     "container_" + std::to_string( GearSetSlot::Feet ) + ", "
+                     "container_" + std::to_string( GearSetSlot::Neck ) + ", "
+                     "container_" + std::to_string( GearSetSlot::Ear ) + ", "
+                     "container_" + std::to_string( GearSetSlot::Wrist ) + ", "
+                     "container_" + std::to_string( GearSetSlot::Ring1 ) + ", UPDATE_DATE ) "
+                     "VALUES ( " +
+                     std::to_string( InventoryType::GearSet0 ) + ", " +
+                     std::to_string( m_id ) + ", " +
                      std::to_string( uniqueId ) + ", " +
                      std::to_string( bodyUid ) + ", " +
                      std::to_string( handsUid ) + ", " +
