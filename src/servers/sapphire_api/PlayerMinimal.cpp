@@ -100,11 +100,11 @@ std::string PlayerMinimal::getLookString()
 std::string PlayerMinimal::getModelString()
 {
   std::string modelString = "\""
+                            + std::to_string( m_modelEquip[ 0 ] ) + "\",\""
+                            + std::to_string( m_modelEquip[ 1 ] ) + "\",\""
                             + std::to_string( m_modelEquip[ 2 ] ) + "\",\""
                             + std::to_string( m_modelEquip[ 3 ] ) + "\",\""
-                            + std::to_string( m_modelEquip[ 4 ] ) + "\",\""
-                            + std::to_string( m_modelEquip[ 6 ] ) + "\",\""
-                            + std::to_string( m_modelEquip[ 7 ] ) + "\",\"5\",\"6\",\"7\",\"8\",\"9\"";
+                            + std::to_string( m_modelEquip[ 4 ] ) + "\",\"5\",\"6\",\"7\",\"8\",\"9\"";
   return modelString;
 }
 

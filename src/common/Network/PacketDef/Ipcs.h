@@ -197,7 +197,7 @@ enum ServerZoneIpcType :
 
   // Unknown IPC types that still need to be sent
   // TODO: figure all these out properly
-  IPCTYPE_UNK_320 = 0x0248, // updated 4.4
+  IPCTYPE_UNK_320 = 0x0249, // updated 4.4
   IPCTYPE_UNK_322 = 0x024B, // updated 4.4
 
 };
@@ -249,40 +249,40 @@ enum ClientZoneIpcType :
 
   ReqJoinNoviceNetwork = 0x0129, // updated 4.2
 
-  ReqCountdownInitiate = 0x0138, // updated 4.3
-  ReqCountdownCancel = 0x0139, // updated 4.3
-  ClearWaymarks = 0x013A, // updated 4.3
+  ReqCountdownInitiate = 0x012F, // updated 4.4
+  ReqCountdownCancel = 0x0130, // updated 4.4
+  ClearWaymarks = 0x0131, // updated 4.4
 
-  ZoneLineHandler = 0x013C, // updated 4.3
-  ClientTrigger = 0x013D, // updated 4.3
-  DiscoveryHandler = 0x013E, // updated 4.3
+  ZoneLineHandler = 0x0133, // updated 4.4
+  ClientTrigger = 0x0134, // updated 4.4 was 13D in 4.3
+  DiscoveryHandler = 0x0135, // updated 4.4
 
   AddWaymark = 0x013F, // updated 4.3
 
-  SkillHandler = 0x0140, // updated 4.3
-  GMCommand1 = 0x0141, // updated 4.3
-  GMCommand2 = 0x0142, // updated 4.3
+  SkillHandler = 0x0137, // updated 4.4
+  GMCommand1 = 0x0138, // updated 4.4
+  GMCommand2 = 0x0139, // updated 4.4
 
-  UpdatePositionHandler = 0x0144, // updated 4.3
+  UpdatePositionHandler = 0x013B, // updated 4.4 was 144
   UpdatePositionInstance = 0x0183, // updated 4.3
 
-  InventoryModifyHandler = 0x014B, // updated 4.3
+  InventoryModifyHandler = 0x0142, // updated 4.4
 
-  TalkEventHandler = 0x0154, // updated 4.3
-  EmoteEventHandler = 0x0155, // updated 4.3
-  WithinRangeEventHandler = 0x0156, // updated 4.3
-  OutOfRangeEventHandler = 0x0157, // updated 4.3
-  EnterTeriEventHandler = 0x0158, // updated 4.3
+  TalkEventHandler = 0x014B, // updated 4.4
+  EmoteEventHandler = 0x014C, // updated 4.4
+  WithinRangeEventHandler = 0x014D, // updated 4.4
+  OutOfRangeEventHandler = 0x014E, // updated 4.4
+  EnterTeriEventHandler = 0x014F, // updated 4.4
 
-  ReturnEventHandler = 0x015D, // updated 4.3
-  TradeReturnEventHandler = 0x015E, // updated 4.3
+  ReturnEventHandler = 0x0154, // updated 4.4
+  TradeReturnEventHandler = 0x0155, // updated 4.4 
 
   LinkshellEventHandler = 0x0150, // updated 4.1 ??
   LinkshellEventHandler1 = 0x0151, // updated 4.1 ??
 
   PerformNoteHandler = 0x029B, // updated 4.3
 
-  ReqEquipDisplayFlagsChange = 0x0178, // updated 4.3
+  ReqEquipDisplayFlagsChange = 0x016F, // updated 4.4
 
 
 };

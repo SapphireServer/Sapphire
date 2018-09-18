@@ -716,6 +716,9 @@ struct FFXIVIpcInitZone :
   uint16_t festivalId;
   uint16_t additionalFestivalId;
   uint32_t unknown8;
+  uint32_t unknown9;
+  uint32_t unknown10;
+  uint32_t unknown11;
   Common::FFXIVARR_POSITION3 pos;
 };
 
