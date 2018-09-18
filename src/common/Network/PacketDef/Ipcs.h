@@ -157,40 +157,40 @@ enum ServerZoneIpcType :
 
   EventLinkshell = 0x1169,
 
-  QuestActiveList = 0x01C3, // updated 4.3
-  QuestUpdate = 0x01C4, // updated 4.3
-  QuestCompleteList = 0x01C5, // updated 4.3
+  QuestActiveList = 0x01BF, // updated 4.4
+  QuestUpdate = 0x01C0, // updated 4.4
+  QuestCompleteList = 0x01C1, // updated 4.4
 
-  QuestFinish = 0x01C6, // updated 4.3
-  MSQTrackerComplete = 0x01C7, // updated 4.3
-  MSQTrackerProgress = 0x01C8, // updated 4.3
+  QuestFinish = 0x01C2, // updated 4.4
+  MSQTrackerComplete = 0x01C3, // updated 4.4
+  MSQTrackerProgress = 0x01C4, // updated 4.4
 
-  QuestMessage = 0x01CE, // updated 4.3
+  QuestMessage = 0x01CA, // updated 4.4
 
-  QuestTracker = 0x01D3, // updated 4.3
+  QuestTracker = 0x01CF, // updated 4.4
 
-  Mount = 0x01E3, // updated 4.3
+  Mount = 0x01DF, // updated 4.4
 
-  DirectorVars = 0x01E5, // updated 4.3
+  DirectorVars = 0x01E1, // updated 4.4
 
   CFAvailableContents = 0x01FD, // updated 4.2
 
-  WeatherChange = 0x0200, // updated 4.3
-  PlayerTitleList = 0x0201, // updated 4.3
-  Discovery = 0x0202, // updated 4.3
+  WeatherChange = 0x01FC, // updated 4.4
+  PlayerTitleList = 0x01FD, // updated 4.4
+  Discovery = 0x01FE, // updated 4.4
 
-  EorzeaTimeOffset = 0x0204, // updated 4.3
+  EorzeaTimeOffset = 0x01FF, // updated 4.4
 
-  EquipDisplayFlags = 0x0210, // updated 4.3
+  EquipDisplayFlags = 0x020C, // updated 4.4
 
-  WardInfo = 0x0224, // updated 4.3
-  WardHousingPermission = 0x022D, // updated 4.3
+  WardInfo = 0x0220, // updated 4.4
+  WardHousingPermission = 0x0229, // updated 4.4
   WardYardInfo = 0x022F, // updated 4.3
 
   DuelChallenge = 0x0277, // 4.2; this is responsible for opening the ui
   PerformNote = 0x0286, // updated 4.3
 
-  PrepareZoning = 0x0291, // updated 4.3
+  PrepareZoning = 0x028F, // updated 4.4
   ActorGauge = 0x0292, // updated 4.3
 
 
