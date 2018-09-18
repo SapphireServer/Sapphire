@@ -59,8 +59,7 @@ struct FFXIVIpcServerList :
   } server[6];
 };
 
-struct FFXIVIpcCharList :
-  FFXIVIpcBasePacket< LobbyCharList >
+struct FFXIVIpcCharList : FFXIVIpcBasePacket< LobbyCharList >
 {
   uint64_t seq;
   uint8_t counter; // current packet count * 4, count * 4 +1 on last packet.
@@ -82,6 +81,8 @@ struct FFXIVIpcCharList :
   uint16_t unknown8;
   uint32_t entitledExpansion;
   uint32_t padding2;
+  uint32_t padding3;
+  uint32_t padding4;
 
   struct CharaDetails
   {
@@ -92,16 +93,16 @@ struct FFXIVIpcCharList :
     uint32_t padding2;
     uint16_t serverId;
     uint16_t serverId1;
+    uint8_t unknown[9];
     char nameChara[32];
     char nameServer[32];
     char nameServer1[32];
-    char charDetailJson[1028];
+    char charDetailJson[1051];
   } charaDetails[2];
 
 };
 
-struct FFXIVIpcEnterWorld :
-  FFXIVIpcBasePacket< LobbyEnterWorld >
+struct FFXIVIpcEnterWorld : FFXIVIpcBasePacket< LobbyEnterWorld >
 {
   uint64_t seq;
   uint32_t charId;
@@ -115,8 +116,7 @@ struct FFXIVIpcEnterWorld :
   uint64_t padding4;
 };
 
-struct FFXIVIpcCharCreate :
-  FFXIVIpcBasePacket< LobbyCharCreate >
+struct FFXIVIpcCharCreate : FFXIVIpcBasePacket< LobbyCharCreate >
 {
   uint64_t seq;
   uint8_t unknown;
@@ -126,17 +126,23 @@ struct FFXIVIpcCharCreate :
   uint32_t unknown_3;
   uint32_t unknown_4;
   uint32_t unknown_5;
+  uint64_t unknown_6;
+  uint64_t unknown_61;
+  uint64_t unknown_62;
+  uint64_t unknown_63;
   uint64_t content_id;
   uint16_t unknown_7;
   uint16_t unknown_8;
   uint32_t unknown_9;
   uint16_t unknown_10;
+  uint8_t unknown_11[11];
   char name[32];
   char world[32];
+  char world2[32];
+  uint8_t unknown_12[0x953];
 };
 
-struct FFXIVIpcLobbyError :
-  FFXIVIpcBasePacket< LobbyError >
+struct FFXIVIpcLobbyError : FFXIVIpcBasePacket< LobbyError >
 {
   uint64_t seq;
   uint32_t error_id;
