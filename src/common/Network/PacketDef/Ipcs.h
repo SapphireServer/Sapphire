@@ -49,7 +49,7 @@ enum ServerZoneIpcType :
 {
 
   // static opcode ( the ones that rarely, if ever, change )
-    Ping = 0x0065,
+  Ping = 0x0065,
   Init = 0x0066,
 
   ActorFreeSpawn = 0x0191,
@@ -87,35 +87,35 @@ enum ServerZoneIpcType :
   ExamineSearchComment = 0x0102, // updated 4.1
 
   ServerNotice = 0x0104, // updated 4.4
-  SetOnlineStatus = 0x0107, // updated 4.3
+  SetOnlineStatus = 0x0105, // updated 4.4
 
 
-  CountdownInitiate = 0x0111, // updated 4.3
-  CountdownCancel = 0x0112, // updated 4.3
+  CountdownInitiate = 0x010C, // updated 4.4
+  CountdownCancel = 0x010D, // updated 4.4
 
-  BlackList = 0x0115, // updated 4.3
+  BlackList = 0x0110, // updated 4.4
 
   LogMessage = 0x00D0,
 
-  LinkshellList = 0x011C, // updated 4.3
+  LinkshellList = 0x0117, // updated 4.4
 
   ExamineFreeCompanyInfo = 0x013A, // updated 4.1
-  CharaFreeCompanyTag = 0x013B, // updated 4.3
-  FreeCompanyBoardMsg = 0x013C, // updated 4.3
-  FreeCompanyInfo = 0x013D, // updated 4.3
+  CharaFreeCompanyTag = 0x0127, // updated 4.4
+  FreeCompanyBoardMsg = 0x0128, // updated 4.4
+  FreeCompanyInfo = 0x0129, // updated 4.4
 
-  StatusEffectList = 0x014E, // updated 4.3
-  Effect = 0x0151, // updated 4.3
-  AoeEffect8 = 0x0154, // updated 4.3
-  AoeEffect16 = 0x0155, // updated 4.3
-  AoeEffect24 = 0x0156, // updated 4.3
-  AoeEffect32 = 0x0157, // updated 4.3
+  StatusEffectList = 0x0149, // updated 4.4
+  Effect = 0x014C, // updated 4.4
+  AoeEffect8 = 0x014F, // updated 4.4
+  AoeEffect16 = 0x0150, // updated 4.4
+  AoeEffect24 = 0x0151, // updated 4.4
+  AoeEffect32 = 0x0152, // updated 4.4
   PersistantEffect = 0x0158, // updated 4.3
 
-  GCAffiliation = 0x0162, // updated 4.3
+  GCAffiliation = 0x015D, // updated 4.4
 
   PlayerSpawn = 0x016D, // updated 4.4
-  NpcSpawn = 0x017E, // updated 4.4
+  NpcSpawn = 0x016E, // updated 4.4
   ActorMove = 0x0170, // updated 4.4
   ActorSetPos = 0x0172, // updated 4.4
 
