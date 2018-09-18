@@ -465,8 +465,8 @@ void Core::Network::GameConnection::generateEncryptionKey( uint32_t key, const s
   m_baseKey[ 2 ] = 0x34;
   m_baseKey[ 3 ] = 0x12;
   memcpy( m_baseKey + 0x04, &key, 4 );
-  m_baseKey[ 8 ] = 0xCC;
-  m_baseKey[ 9 ] = 0x10;
+  m_baseKey[ 8 ] = 0x30;
+  m_baseKey[ 9 ] = 0x11;
   memcpy( ( char* ) m_baseKey + 0x0C, keyPhrase.c_str(), keyPhrase.size() );
   Core::Util::md5( m_baseKey, m_encKey, 0x2C );
 }

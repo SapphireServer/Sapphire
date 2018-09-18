@@ -119,34 +119,34 @@ enum ServerZoneIpcType :
   ActorMove = 0x0174, // updated 4.3
   ActorSetPos = 0x0176, // updated 4.3
 
-  ActorCast = 0x0178, // updated 4.3
+  ActorCast = 0x0174, // updated 4.4
 
-  PartyList = 0x017A, // updated 4.3
-  HateList = 0x017B, // updated 4.3
+  PartyList = 0x0176, // updated 4.4
+  HateList = 0x0177, // updated 4.4
 
-  ObjectSpawn = 0x017D, // updated 4.3
-  ObjectDespawn = 0x017E, // updated 4.3
+  ObjectSpawn = 0x0179, // updated 4.4
+  ObjectDespawn = 0x017A, // updated 4.4
 
-  SetLevelSync = 0x017F, // updated 4.3
-  SilentSetClassJob = 0x0180, // updated 4.3 - seems to be the case, not sure if it's actually used for anything
+  SetLevelSync = 0x017B, // updated 4.4
+  SilentSetClassJob = 0x017C, // updated 4.4 - seems to be the case, not sure if it's actually used for anything
 
-  InitUI = 0x0181, // updated 4.3
-  PlayerStats = 0x0182, // updated 4.3
-  ActorOwner = 0x0183, // updated 4.3 ?
-  PlayerStateFlags = 0x0184, // updated 4.3
-  PlayerClassInfo = 0x0185, // updated 4.3
-  ModelEquip = 0x0186, // updated 4.3
-  Examine = 0x0187, // updated 4.3
-  CharaNameReq = 0x0189, // updated 4.3
-  UpdateClassInfo = 0x018A, // updated 4.3
+  InitUI = 0x017D, // updated 4.4
+  PlayerStats = 0x017E, // updated 4.4
+  ActorOwner = 0x017F, // updated 4.4 ?
+  PlayerStateFlags = 0x0180, // updated 4.4
+  PlayerClassInfo = 0x0181, // updated 4.4
+  ModelEquip = 0x0182, // updated 4.4
+  Examine = 0x0183, // updated 4.4
+  CharaNameReq = 0x0185, // updated 4.4
+  UpdateClassInfo = 0x0186, // updated 4.4
 
-  ItemInfo = 0x0190, // updated 4.3
-  ContainerInfo = 0x0192, // updated 4.3
-  InventoryTransactionFinish = 0x0193, // updated 4.3
-  InventoryTransaction = 0x0194, // updated 4.3
-  CurrencyCrystalInfo = 0x0195, // updated 4.3
-  InventoryActionAck = 0x0197, // updated 4.3
-  UpdateInventorySlot = 0x0198, // updated 4.3
+  ItemInfo = 0x018C, // updated 4.4
+  ContainerInfo = 0x018D, // updated 4.4
+  InventoryTransactionFinish = 0x018E, // updated 4.4
+  InventoryTransaction = 0x018F, // updated 4.4
+  CurrencyCrystalInfo = 0x0190, // updated 4.4
+  InventoryActionAck = 0x0193, // updated 4.4
+  UpdateInventorySlot = 0x0194, // updated 4.4
 
   EventPlay = 0x01A6, // updated 4.3
   EventOpenGilShop = 0x01AD, // updated 4.3
@@ -197,8 +197,8 @@ enum ServerZoneIpcType :
 
   // Unknown IPC types that still need to be sent
   // TODO: figure all these out properly
-  IPCTYPE_UNK_320 = 0x024C, // updated 4.3
-  IPCTYPE_UNK_322 = 0x024E, // updated 4.3
+  IPCTYPE_UNK_320 = 0x0248, // updated 4.4
+  IPCTYPE_UNK_322 = 0x024B, // updated 4.4
 
 };
 
