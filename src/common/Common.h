@@ -110,16 +110,30 @@ enum GearSetSlot :
   Waist = 5,
   Legs = 6,
   Feet = 7,
-  Neck = 8,
-  Ear = 9,
+  Ear = 8,
+  Neck = 9,
   Wrist = 10,
   Ring1 = 11,
   Ring2 = 12,
   SoulCrystal = 13,
 };
 
-enum EquipSlotCategory :
-  uint8_t
+enum GearModelSlot : int8_t
+{
+  ModelInvalid = -1,
+  ModelHead = 0,
+  ModelBody = 1,
+  ModelHands = 2,
+  ModelLegs = 3,
+  ModelFeet = 4,
+  ModelEar = 5,
+  ModelNeck = 6,
+  ModelWrist = 7,
+  ModelRing1 = 8,
+  ModelRing2 = 9
+};
+
+enum EquipSlotCategory : uint8_t
 {
   Unequippable = 0,
 

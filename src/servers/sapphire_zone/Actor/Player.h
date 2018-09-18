@@ -345,10 +345,7 @@ public:
   const uint32_t* getModelArray() const;
 
   /*! return the equipment model in a specified equipment slot */
-  uint32_t getModelForSlot( Common::GearSetSlot slot );
-
-  /*! set the equipment model in a specified equipment slot */
-  void setModelForSlot( Common::GearSetSlot slot, uint32_t val );
+  uint32_t getModelForSlot( Common::GearModelSlot slot );
 
   /*! add amount to the currency of type */
   void addCurrency( Common::CurrencyType type, uint32_t amount );
@@ -358,6 +355,10 @@ public:
 
   /*! return the current amount of crystals of type */
   uint32_t getCrystal( uint8_t type ) const;
+
+  void updateModels( Common::GearSetSlot equipSlotId, const Core::ItemPtr& pItem );
+
+  Common::GearModelSlot equipSlotToModelSlot( Common::GearSetSlot slot );
 
   /*!
   * Collect real item handins from container
@@ -963,7 +964,7 @@ private:
 
   uint16_t m_classArray[25];
   uint32_t m_expArray[25];
-  uint8_t m_aetheryte[16];
+  uint8_t m_aetheryte[17];
   uint8_t m_unlocks[64];
   uint8_t m_orchestrion[40];
 

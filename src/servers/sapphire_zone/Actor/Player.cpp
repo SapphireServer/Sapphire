@@ -777,14 +777,9 @@ void Core::Entity::Player::sendModel()
   sendToInRangeSet( boost::make_shared< ModelEquipPacket >( *getAsPlayer() ), true );
 }
 
-uint32_t Core::Entity::Player::getModelForSlot( Common::GearSetSlot slot )
+uint32_t Core::Entity::Player::getModelForSlot( Common::GearModelSlot slot )
 {
   return m_modelEquip[ slot ];
-}
-
-void Core::Entity::Player::setModelForSlot( Common::GearSetSlot slot, uint32_t val )
-{
-  m_modelEquip[ slot ] = val;
 }
 
 uint64_t Core::Entity::Player::getModelMainWeapon() const
