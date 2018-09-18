@@ -4,28 +4,30 @@
 #include "Zone.h"
 #include "Forwards.h"
 
-namespace Core
+namespace Core {
+class HousingZone :
+  public Zone
 {
-class HousingZone : public Zone
-   {
-   public:
-      HousingZone( uint8_t wardNum,
-                   uint16_t territoryId,
-                   uint32_t guId,
-                   const std::string& internalName,
-                   const std::string& contentName );
-      virtual ~HousingZone();
+public:
+  HousingZone( uint8_t wardNum,
+               uint16_t territoryId,
+               uint32_t guId,
+               const std::string& internalName,
+               const std::string& contentName );
 
-      bool init() override;
-      void onPlayerZoneIn( Entity::Player& player ) override;
+  virtual ~HousingZone();
 
-	   /* returns current ward number for this zone */
-	   uint8_t getWardNum() const;
+  bool init() override;
 
-      const uint32_t m_wardMaxNum = 18;
-   private:
-	   uint8_t m_wardNum;
-   };
+  void onPlayerZoneIn( Entity::Player& player ) override;
+
+  /* returns current ward number for this zone */
+  uint8_t getWardNum() const;
+
+  const uint32_t m_wardMaxNum = 18;
+private:
+  uint8_t m_wardNum;
+};
 
 }
 #endif //SAPPHIRE_HOUSINGZONE_H

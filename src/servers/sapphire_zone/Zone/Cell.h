@@ -4,117 +4,120 @@
 
 #include <stdint.h>
 
-#include "Forwards.h"
+#include "ForwardsZone.h"
 #include <set>
 
 namespace Core {
 
-   typedef std::set< Entity::ActorPtr > ActorSet;
+typedef std::set< Entity::ActorPtr > ActorSet;
 
-   class Cell 
-   {
-      friend class Zone;
+class Cell
+{
+  friend class Zone;
 
-   private:
-      bool m_bForcedActive;
-      uint16_t m_posX;
-      uint16_t m_posY;
-      ActorSet m_actors;
-      bool m_bActive;
-      bool m_bLoaded;
-      bool m_bUnloadPending;
+private:
+  bool m_bForcedActive;
+  uint16_t m_posX;
+  uint16_t m_posY;
+  ActorSet m_actors;
+  bool m_bActive;
+  bool m_bLoaded;
+  bool m_bUnloadPending;
 
-      uint16_t m_playerCount;
-      ZonePtr m_pZone;
+  uint16_t m_playerCount;
+  ZonePtr m_pZone;
 
-   public:
-      Cell();
-      ~Cell();
+public:
+  Cell();
 
-      void init( uint32_t x, uint32_t y, ZonePtr pZone );
+  ~Cell();
 
-      void addActor( Entity::ActorPtr pAct );
+  void init( uint32_t x, uint32_t y, ZonePtr pZone );
 
-      void removeActor( Entity::ActorPtr pAct );
+  void addActor( Entity::ActorPtr pAct );
 
-      bool hasActor( Entity::ActorPtr pAct )
-      { 
-         return ( m_actors.find(pAct) != m_actors.end() );
-      }
+  void removeActor( Entity::ActorPtr pAct );
 
-      bool hasPlayers() const
-      { 
-         return ((m_playerCount > 0) ? true : false); 
-      }
+  bool hasActor( Entity::ActorPtr pAct )
+  {
+    return ( m_actors.find( pAct ) != m_actors.end() );
+  }
 
-      size_t getActorCount() const
-      { 
-         return m_actors.size();
-      }
+  bool hasPlayers() const
+  {
+    return ( ( m_playerCount > 0 ) ? true : false );
+  }
 
-      void removeActors();
+  size_t getActorCount() const
+  {
+    return m_actors.size();
+  }
 
-      ActorSet::iterator begin()
-      {
-         return m_actors.begin();
-      }
+  void removeActors();
 
-      ActorSet::iterator end()
-      {
-         return m_actors.end();
-      }
+  ActorSet::iterator begin()
+  {
+    return m_actors.begin();
+  }
 
-      void setActivity(bool state);
+  ActorSet::iterator end()
+  {
+    return m_actors.end();
+  }
 
-      bool isActive() const
-      {
-         return m_bActive; 
-      }
+  void setActivity( bool state );
 
-      bool isLoaded() const
-      { 
-         return m_bLoaded; 
-      }
+  bool isActive() const
+  {
+    return m_bActive;
+  }
 
-      uint32_t getPlayerCount() const
-      {
-         return m_playerCount; 
-      }
+  bool isLoaded() const
+  {
+    return m_bLoaded;
+  }
 
-      bool isUnloadPending() const
-      {
-         return m_bUnloadPending; 
-      }
+  uint32_t getPlayerCount() const
+  {
+    return m_playerCount;
+  }
 
-      void setUnloadPending(bool up) 
-      {
-         m_bUnloadPending = up; 
-      }
+  bool isUnloadPending() const
+  {
+    return m_bUnloadPending;
+  }
 
-      void queueUnloadPending();
-      void cancelPendingUnload();
-      void unload();
+  void setUnloadPending( bool up )
+  {
+    m_bUnloadPending = up;
+  }
 
-      void setPermanentActivity(bool val) 
-      {
-         m_bForcedActive = val; 
-      }
+  void queueUnloadPending();
 
-      bool isForcedActive() const
-      {
-         return m_bForcedActive; 
-      }
+  void cancelPendingUnload();
 
-      uint16_t getPosX() const
-      { 
-         return m_posX; 
-      }
+  void unload();
 
-      uint16_t getPosY() const
-      { 
-         return m_posY; 
-      }
-   };
+  void setPermanentActivity( bool val )
+  {
+    m_bForcedActive = val;
+  }
+
+  bool isForcedActive() const
+  {
+    return m_bForcedActive;
+  }
+
+  uint16_t getPosX() const
+  {
+    return m_posX;
+  }
+
+  uint16_t getPosY() const
+  {
+    return m_posY;
+  }
+};
 
 }
 #endif

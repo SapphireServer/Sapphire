@@ -1,0 +1,129 @@
+body {
+   background-color: #222;
+   color: #ccc; 
+   overflow-x: hidden;
+}
+
+#nav-tree {
+   background-color: #222;
+   background-image: none;
+}
+
+#side-nav {
+   width: 300px;
+}
+
+#titlearea {
+   border: none;
+   padding: 5px;
+}
+
+div.header {
+   background-color: #2a2a2a !important;
+}
+
+h2.groupheader {
+   color: #ccc;
+}
+
+.mdescLeft, .mdescRight, .memItemLeft, .memItemRight, .memTemplItemLeft, .memTemplItemRight, .memTemplParams {
+   background-color: #333;
+   color: #ccc;
+}
+
+.directory tr.even {
+   background-color: #3f3f3f;
+}
+
+a, .contents a:visited {
+   color: #548cff;
+}
+
+.memtitle {
+   background-color: #555 !important;
+   background-image: none;
+
+   border-top: 1px solid #717171;
+   border-left: 1px solid #717171;
+   border-right: 1px solid #717171;
+}
+
+.memdoc, dl.reflist dd {
+   background-color: #444;
+
+   border-bottom: 1px solid #717171;
+   border-left: 1px solid #717171;
+   border-right: 1px solid #717171;
+}
+
+.memproto, dl.reflist dt {
+   background-color: #555;
+   color: #ccc;
+   text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.9);
+
+   border-top: 1px solid #717171;
+   border-left: 1px solid #717171;
+   border-right: 1px solid #717171;
+}
+
+div.header {
+   border-bottom: 1px solid #717171;
+   background-image: none;
+}
+
+.paramname {
+   color: #ff5a5a;
+}
+
+.memtemplate {
+   color: #6e9eff;
+}
+
+.memSeparator, h2.groupheader {
+   border-bottom: 1px solid #545454;
+}
+
+.navelem, .navpath ul {
+   background-color: #333;
+   background-image: none;
+}
+
+.navpath ul {
+   border: solid 1px #717171;
+}
+
+.navpath li.footer {
+   color: #548cff;
+}
+
+.navpath li.navelem a, .navpath li.navelem a:visited {
+   color: #ccc;
+   text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.9);
+}
+
+.ui-resizable-e {
+   background-image: none;
+   background-color: #717171;
+}
+
+.sm-dox {
+   background-image: none;
+   background-color: #333;
+}
+
+.sm-dox a {
+   color: #ccc;
+   text-shadow: 0px 1px 1px #000;
+}
+
+.sm-dox a span.sub-arrow {
+   border-color: #ccc transparent transparent transparent;
+}
+
+.sm-dox a, .sm-dox a:focus, .sm-dox a:active, .sm-dox a:hover, .sm-dox a.highlighted {
+   background-image: none;
+}
+
+#main-nav {
+   border-top: 1px solid #717171;
+}

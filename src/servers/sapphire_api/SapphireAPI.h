@@ -8,47 +8,47 @@
 
 #include "PlayerMinimal.h"
 
-namespace Core
+namespace Core {
+class Session;
+
+namespace Network {
+
+class SapphireAPI
 {
-   class Session;
+public:
+  SapphireAPI();
 
-   namespace Network
-   {
+  ~SapphireAPI();
 
-      class SapphireAPI
-      {
-      public:
-         SapphireAPI();
-         ~SapphireAPI();
+  using SessionMap = std::map< std::string, boost::shared_ptr< Session > >;
 
-         using SessionMap = std::map< std::string, boost::shared_ptr< Session > >;
+  bool login( const std::string& username, const std::string& pass, std::string& sId );
 
-         bool login( const std::string& username, const std::string& pass, std::string& sId );
+  bool createAccount( const std::string& username, const std::string& pass, std::string& sId );
 
-         bool createAccount( const std::string& username, const std::string& pass, std::string& sId );
+  int32_t
+  createCharacter( const int& accountId, const std::string& name, const std::string& infoJson, const int& gmRank );
 
-         int32_t createCharacter( const int& accountId, const std::string& name, const std::string& infoJson, const int& gmRank );
-         
-         void deleteCharacter( std::string name, uint32_t accountId );
+  void deleteCharacter( std::string name, uint32_t accountId );
 
-		 bool insertSession( const uint32_t& accountId, std::string& sId );
+  bool insertSession( const uint32_t& accountId, std::string& sId );
 
-         std::vector<Core::PlayerMinimal> getCharList( uint32_t accountId );
+  std::vector< Core::PlayerMinimal > getCharList( uint32_t accountId );
 
-         bool checkNameTaken( std::string name );
+  bool checkNameTaken( std::string name );
 
-         uint32_t getNextCharId();
+  uint32_t getNextCharId();
 
-         uint64_t getNextContentId();
+  uint64_t getNextContentId();
 
-         int32_t checkSession( const std::string& sId );
+  int32_t checkSession( const std::string& sId );
 
-         bool removeSession( const std::string& sId );
+  bool removeSession( const std::string& sId );
 
-         SessionMap m_sessionMap;
+  SessionMap m_sessionMap;
 
-      };
-   }
+};
+}
 }
 
 #endif

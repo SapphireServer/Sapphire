@@ -4,12 +4,12 @@
 #include <string>
 
 namespace Core {
-   namespace Version {
+namespace Version {
 
-      extern const std::string GIT_HASH;
-      extern const std::string VERSION;
+extern const std::string GIT_HASH;
+extern const std::string VERSION;
 
-   } /* Version */
+} /* Version */
 } /* Core */
 
 #endif

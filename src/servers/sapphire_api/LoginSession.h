@@ -9,50 +9,57 @@
 
 namespace Core {
 
-   class LoginSession {
+class LoginSession
+{
 
-   private:
-      uint32_t	m_IP;
-      uint32_t	m_accountID;
+private:
+  uint32_t m_IP;
+  uint32_t m_accountID;
 
-      uint8_t	m_sessionId[56];
+  uint8_t m_sessionId[56];
 
-   public:
+public:
 
-      std::string newCharName;
+  std::string newCharName;
 
-      LoginSession(void);
-      ~LoginSession(void);
+  LoginSession( void );
 
-      uint32_t getIP() {
-         return m_IP;
-      }
+  ~LoginSession( void );
 
-      void setSessionId(uint8_t * sessionId) {
-         memcpy(m_sessionId, sessionId, 56);
-      }
+  uint32_t getIP()
+  {
+    return m_IP;
+  }
 
-      void setIP(uint32_t iP) {
-         m_IP = iP;
-      }
+  void setSessionId( uint8_t* sessionId )
+  {
+    memcpy( m_sessionId, sessionId, 56 );
+  }
 
-      uint32_t getAccountID() {
-         return m_accountID;
-      }
+  void setIP( uint32_t iP )
+  {
+    m_IP = iP;
+  }
 
-      void setAccountID(uint32_t iD) {
-         m_accountID = iD;
-      }
+  uint32_t getAccountID()
+  {
+    return m_accountID;
+  }
 
-      /*INLINE CLobbySocket* getSocket() {
-      return m_pGS;
-      }
+  void setAccountID( uint32_t iD )
+  {
+    m_accountID = iD;
+  }
 
-      INLINE void setSocket(CLobbySocket * pS) {
-      m_pGS = pS;
-      }*/
+  /*INLINE CLobbySocket* getSocket() {
+  return m_pGS;
+  }
 
-   };
+  INLINE void setSocket(CLobbySocket * pS) {
+  m_pGS = pS;
+  }*/
+
+};
 
 }
 

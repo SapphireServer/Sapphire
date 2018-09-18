@@ -23,105 +23,126 @@ class Session;
 class ZonePosition;
 
 using SessionSet = std::set< SessionPtr >;
-namespace Data
-{
-   struct InstanceContent;
-   struct TerritoryType;
+using FestivalPair = std::pair< uint16_t, uint16_t >;
+
+namespace Data {
+struct InstanceContent;
+struct TerritoryType;
 }
 
-class Zone : public CellHandler< Cell >, public boost::enable_shared_from_this< Zone >
+class Zone :
+  public CellHandler< Cell >, public boost::enable_shared_from_this< Zone >
 {
 protected:
-   uint32_t	m_territoryId;
-   uint32_t	m_guId;
+  uint32_t m_territoryId;
+  uint32_t m_guId;
 
-   std::string m_placeName;
-   std::string m_internalName;
+  std::string m_placeName;
+  std::string m_internalName;
 
-   std::unordered_map< int32_t, Entity::PlayerPtr > m_playerMap;
-   std::unordered_map< int32_t, Entity::EventObjectPtr > m_eventObjects;
+  std::unordered_map< int32_t, Entity::PlayerPtr > m_playerMap;
+  std::unordered_map< int32_t, Entity::BNpcPtr > m_bNpcMap;
+  std::unordered_map< int32_t, Entity::EventObjectPtr > m_eventObjects;
 
-   SessionSet m_sessionSet;
+  SessionSet m_sessionSet;
 
-   Common::Weather m_currentWeather;
-   Common::Weather m_weatherOverride;
+  Common::Weather m_currentWeather;
+  Common::Weather m_weatherOverride;
 
-   uint64_t m_lastMobUpdate;
+  uint64_t m_lastMobUpdate;
 
-   uint16_t m_currentFestivalId;
-   boost::shared_ptr< Data::TerritoryType > m_territoryTypeInfo;
+  FestivalPair m_currentFestival;
+  
+  boost::shared_ptr< Data::TerritoryType > m_territoryTypeInfo;
 
-   std::map< uint8_t, int32_t> m_weatherRateMap;
+  std::map< uint8_t, int32_t > m_weatherRateMap;
 
-   uint32_t m_nextEObjId;
+  uint32_t m_nextEObjId;
 
 public:
-   Zone();
+  Zone();
 
-   Zone( uint16_t territoryId, uint32_t guId, const std::string& internalName, const std::string& placeName );
-   virtual ~Zone();
+  Zone( uint16_t territoryId, uint32_t guId, const std::string& internalName, const std::string& placeName );
 
-   /*! overrides the zone's weather, set to 0 to unlock */
-   void setWeatherOverride( Common::Weather weather );
+  virtual ~Zone();
 
-   Common::Weather getCurrentWeather() const;
+  /*! overrides the zone's weather, set to 0 to unlock */
+  void setWeatherOverride( Common::Weather weather );
 
-   uint16_t getCurrentFestival() const;
-   void setCurrentFestival( uint16_t festivalId );
+  Common::Weather getCurrentWeather() const;
 
-   virtual bool init();
+  const FestivalPair& getCurrentFestival() const;
 
-   virtual void loadCellCache();
-   virtual uint32_t getTerritoryId() const;
-   virtual void onBeforePlayerZoneIn( Entity::Player &player ) {};
-   virtual void onPlayerZoneIn( Entity::Player &player );
-   virtual void onFinishLoading( Entity::Player& player );
-   virtual void onInitDirector( Entity::Player& player );
-   virtual void onDirectorSync( Entity::Player& player ) {};
-   virtual void onLeaveTerritory( Entity::Player& player );
-   virtual void onUpdate( uint32_t currTime );
-   virtual void onRegisterEObj( Entity::EventObjectPtr object ) {};
-   virtual void onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 );
+  void setCurrentFestival( uint16_t festivalId, uint16_t additionalFestivalId = 0 );
 
-   Common::Weather getNextWeather();
+  virtual bool init();
 
-   void pushActor( Entity::ActorPtr pActor );
+  virtual void loadCellCache();
 
-   void removeActor( Entity::ActorPtr pActor );
+  virtual uint32_t getTerritoryId() const;
 
-   void updateActorPosition( Entity::Actor &pActor );
+  virtual void onBeforePlayerZoneIn( Entity::Player& player ) {};
 
-   bool isCellActive( uint32_t x, uint32_t y );
+  virtual void onPlayerZoneIn( Entity::Player& player );
 
-   void updateCellActivity( uint32_t x, uint32_t y, int32_t radius );
+  virtual void onFinishLoading( Entity::Player& player );
 
-   void updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell );
+  virtual void onInitDirector( Entity::Player& player );
 
-   void queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range, Network::Packets::FFXIVPacketBasePtr pPacketEntry );
+  virtual void onDirectorSync( Entity::Player& player ) {};
 
-   uint32_t getGuId() const;
+  virtual void onLeaveTerritory( Entity::Player& player );
 
-   uint32_t getNextEObjId();
+  virtual void onUpdate( uint32_t currTime );
 
-   const std::string& getName() const;
-   const std::string& getInternalName() const;
+  virtual void onRegisterEObj( Entity::EventObjectPtr object ) {};
 
-   std::size_t getPopCount() const;
-   void loadWeatherRates();
-   bool checkWeather();
-   //void updateBnpcs( int64_t tickCount );
+  virtual void onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 );
 
-   bool update( uint32_t currTime );
+  Common::Weather getNextWeather();
 
-   void updateSessions( bool changedWeather );
+  void pushActor( Entity::ActorPtr pActor );
 
-   Entity::EventObjectPtr registerEObj( const std::string& name, uint32_t objectId, uint32_t mapLink,
-                                        uint8_t state, Common::FFXIVARR_POSITION3 pos, float scale, float rotation );
+  void removeActor( Entity::ActorPtr pActor );
 
-   void registerEObj( Entity::EventObjectPtr object );
-   Entity::EventObjectPtr getEObj( uint32_t objId );
+  void updateActorPosition( Entity::Actor& pActor );
 
-   InstanceContentPtr getAsInstanceContent();
+  bool isCellActive( uint32_t x, uint32_t y );
+
+  void updateCellActivity( uint32_t x, uint32_t y, int32_t radius );
+
+  void updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell );
+
+  void queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range,
+                               Network::Packets::FFXIVPacketBasePtr pPacketEntry );
+
+  uint32_t getGuId() const;
+
+  uint32_t getNextEObjId();
+
+  const std::string& getName() const;
+
+  const std::string& getInternalName() const;
+
+  std::size_t getPopCount() const;
+
+  void loadWeatherRates();
+
+  bool checkWeather();
+  //void updateBnpcs( int64_t tickCount );
+
+  bool update( uint32_t currTime );
+
+  void updateSessions( bool changedWeather );
+
+  Entity::EventObjectPtr registerEObj( const std::string& name, uint32_t objectId, uint32_t mapLink,
+                                       uint8_t state, Common::FFXIVARR_POSITION3 pos, float scale, float rotation );
+
+  void registerEObj( Entity::EventObjectPtr object );
+
+  Entity::EventObjectPtr getEObj( uint32_t objId );
+
+  InstanceContentPtr getAsInstanceContent();
 
 };
 
