@@ -275,7 +275,7 @@ enum ClientZoneIpcType :
   EnterTeriEventHandler = 0x014F, // updated 4.4
 
   ReturnEventHandler = 0x0154, // updated 4.4
-  TradeReturnEventHandler = 0x0155, // updated 4.4 
+  TradeReturnEventHandler = 0x0155, // updated 4.4
 
   LinkshellEventHandler = 0x0150, // updated 4.1 ??
   LinkshellEventHandler1 = 0x0151, // updated 4.1 ??
