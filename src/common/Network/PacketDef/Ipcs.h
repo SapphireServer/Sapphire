@@ -64,7 +64,7 @@ enum ServerZoneIpcType :
   ///////////////////////////////////////////////////
 
   ChatBanned = 0x006B,
-  Logout = 0x0077, // updated 4.3
+  Logout = 0x0077, // updated 4.4
   CFNotify = 0x0078,
   CFMemberStatus = 0x0079,
   CFDutyInfo = 0x007A,
@@ -86,7 +86,7 @@ enum ServerZoneIpcType :
   InitSearchInfo = 0x0101, // updated 4.3
   ExamineSearchComment = 0x0102, // updated 4.1
 
-  ServerNotice = 0x0106, // updated 4.3
+  ServerNotice = 0x0104, // updated 4.4
   SetOnlineStatus = 0x0107, // updated 4.3
 
 
@@ -114,10 +114,10 @@ enum ServerZoneIpcType :
 
   GCAffiliation = 0x0162, // updated 4.3
 
-  PlayerSpawn = 0x0172, // updated 4.3
-  NpcSpawn = 0x0173, // updated 4.3
-  ActorMove = 0x0174, // updated 4.3
-  ActorSetPos = 0x0176, // updated 4.3
+  PlayerSpawn = 0x016D, // updated 4.4
+  NpcSpawn = 0x017E, // updated 4.4
+  ActorMove = 0x0170, // updated 4.4
+  ActorSetPos = 0x0172, // updated 4.4
 
   ActorCast = 0x0174, // updated 4.4
 
