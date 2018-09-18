@@ -1,65 +1,74 @@
 #ifndef _SESSION_H_
 #define _SESSION_H_
+
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "Forwards.h"
+#include "ForwardsZone.h"
 
 namespace Core {
 
-   class Session : public boost::enable_shared_from_this< Session >
-   {
-   public:
-      Session( uint32_t sessionId );
-      ~Session();
+class Session :
+  public boost::enable_shared_from_this< Session >
+{
+public:
+  Session( uint32_t sessionId );
 
-      void setZoneConnection( Network::GameConnectionPtr zoneCon );
+  ~Session();
 
-      void setChatConnection( Network::GameConnectionPtr chatCon );
+  void setZoneConnection( Network::GameConnectionPtr zoneCon );
 
-      Network::GameConnectionPtr getZoneConnection() const;
-      Network::GameConnectionPtr getChatConnection() const;
+  void setChatConnection( Network::GameConnectionPtr chatCon );
 
-      int64_t getLastDataTime() const;
-      int64_t getLastSqlTime() const;
+  Network::GameConnectionPtr getZoneConnection() const;
 
-      void updateLastDataTime();
-      void updateLastSqlTime();
+  Network::GameConnectionPtr getChatConnection() const;
 
-      void startReplay( const std::string& folderpath );
-      void stopReplay();
-      void processReplay();
-      void sendReplayInfo();
+  int64_t getLastDataTime() const;
 
-      void close();
+  int64_t getLastSqlTime() const;
 
-      uint32_t getId() const;
+  void updateLastDataTime();
 
-      bool loadPlayer();
+  void updateLastSqlTime();
 
-      void update();
+  void startReplay( const std::string& folderpath );
 
-      bool isValid() const;
+  void stopReplay();
 
-      Entity::PlayerPtr getPlayer() const;
+  void processReplay();
 
-   private:
-      uint32_t m_sessionId;
+  void sendReplayInfo();
 
-      Entity::PlayerPtr m_pPlayer;
+  void close();
 
-      int64_t m_lastDataTime;
+  uint32_t getId() const;
 
-      int64_t m_lastSqlTime;
-      bool m_isValid;
+  bool loadPlayer();
 
-      bool m_isReplaying;
-      std::vector< std::tuple< uint64_t, std::string > > m_replayCache;
+  void update();
 
-      Network::GameConnectionPtr m_pZoneConnection;
-      Network::GameConnectionPtr m_pChatConnection;
+  bool isValid() const;
 
-   };
+  Entity::PlayerPtr getPlayer() const;
+
+private:
+  uint32_t m_sessionId;
+
+  Entity::PlayerPtr m_pPlayer;
+
+  int64_t m_lastDataTime;
+
+  int64_t m_lastSqlTime;
+  bool m_isValid;
+
+  bool m_isReplaying;
+  std::vector< std::tuple< uint64_t, std::string > > m_replayCache;
+
+  Network::GameConnectionPtr m_pZoneConnection;
+  Network::GameConnectionPtr m_pChatConnection;
+
+};
 
 }
 

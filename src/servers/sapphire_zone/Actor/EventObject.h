@@ -3,54 +3,59 @@
 
 #include "Actor.h"
 
-namespace Core
+namespace Core {
+namespace Entity {
+
+class EventObject : public Actor
 {
-namespace Entity
-{
-   class EventObject : public Actor
-   {
-   public:
-      EventObject( uint32_t actorId, uint32_t objectId, uint32_t gimmickId, uint8_t initialState,
-                   Common::FFXIVARR_POSITION3 pos, float rotation, const std::string& givenName = "none" );
+public:
+  EventObject( uint32_t actorId, uint32_t objectId, uint32_t gimmickId, uint8_t initialState,
+               Common::FFXIVARR_POSITION3 pos, float rotation, const std::string& givenName = "none" );
 
-      using OnTalkEventHandler = std::function< void( Entity::Player&, Entity::EventObjectPtr,
-                                                      InstanceContentPtr, uint64_t ) >;
+  using OnTalkEventHandler = std::function< void( Entity::Player&, Entity::EventObjectPtr,
+                                                  InstanceContentPtr, uint64_t ) >;
 
-      uint32_t getGimmickId() const;
-      void setGimmickId( uint32_t gimmickId );
+  uint32_t getGimmickId() const;
 
-      uint8_t getState() const;
-      void setState( uint8_t state );
+  void setGimmickId( uint32_t gimmickId );
 
-      float getScale() const;
-      void setScale( float scale );
+  uint8_t getState() const;
 
-      void setOnTalkHandler( OnTalkEventHandler handler );
-      OnTalkEventHandler getOnTalkHandler() const;
+  void setState( uint8_t state );
 
-      uint32_t getObjectId() const;
+  float getScale() const;
 
-      const std::string& getName() const;
+  void setScale( float scale );
 
-      InstanceContentPtr getParentInstance() const;
-      void setParentInstance( InstanceContentPtr instance );
+  void setOnTalkHandler( OnTalkEventHandler handler );
 
-      void spawn( PlayerPtr pTarget ) override;
-      void despawn( PlayerPtr pTarget ) override;
+  OnTalkEventHandler getOnTalkHandler() const;
 
-      void setAnimationFlag( uint32_t flag, uint32_t animationFlag );
+  uint32_t getObjectId() const;
 
-   protected:
-      uint32_t m_gimmickId;
-      uint32_t m_objectId;
-      uint8_t m_state;
-      float m_scale;
-      std::string m_name;
-      InstanceContentPtr m_parentInstance;
-      OnTalkEventHandler m_onTalkEventHandler;
+  const std::string& getName() const;
+
+  InstanceContentPtr getParentInstance() const;
+
+  void setParentInstance( InstanceContentPtr instance );
+
+  void spawn( PlayerPtr pTarget ) override;
+
+  void despawn( PlayerPtr pTarget ) override;
+
+  void setAnimationFlag( uint32_t flag, uint32_t animationFlag );
+
+protected:
+  uint32_t m_gimmickId;
+  uint32_t m_objectId;
+  uint8_t m_state;
+  float m_scale;
+  std::string m_name;
+  InstanceContentPtr m_parentInstance;
+  OnTalkEventHandler m_onTalkEventHandler;
 
 
-   };
+};
 }
 }
 

@@ -9,53 +9,54 @@
 
 namespace Core {
 
-   class LobbySession
-   {
+class LobbySession
+{
 
-   private:
-      uint32_t	m_IP;
-      uint32_t	m_accountID;
+private:
+  uint32_t m_IP;
+  uint32_t m_accountID;
 
-      uint8_t	m_sessionId[56];
+  uint8_t m_sessionId[56];
 
-   public:
+public:
 
-      std::string newCharName;
+  std::string newCharName;
 
-      LobbySession( void );
-      ~LobbySession( void );
+  LobbySession( void );
 
-      uint32_t getIP()
-      {
-         return m_IP;
-      }
+  ~LobbySession( void );
 
-      uint8_t * getSessionId()
-      {
-         return m_sessionId;
-      }
+  uint32_t getIP()
+  {
+    return m_IP;
+  }
 
-      void setSessionId( uint8_t * sessionId )
-      {
-         memcpy( m_sessionId, sessionId, 56 );
-      }
+  uint8_t* getSessionId()
+  {
+    return m_sessionId;
+  }
 
-      void setIP( uint32_t iP )
-      {
-         m_IP = iP;
-      }
+  void setSessionId( uint8_t* sessionId )
+  {
+    memcpy( m_sessionId, sessionId, 56 );
+  }
 
-      uint32_t getAccountID()
-      {
-         return m_accountID;
-      }
+  void setIP( uint32_t iP )
+  {
+    m_IP = iP;
+  }
 
-      void setAccountID( uint32_t iD )
-      {
-         m_accountID = iD;
-      }
+  uint32_t getAccountID()
+  {
+    return m_accountID;
+  }
 
-   };
+  void setAccountID( uint32_t iD )
+  {
+    m_accountID = iD;
+  }
+
+};
 
 }
 

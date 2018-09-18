@@ -2,6 +2,8 @@
 #include <Exd/ExdDataGenerated.h>
 #include <Logging/Logger.h>
 #include <Network/CommonActorControl.h>
+#include <sapphire_zone/Network/PacketWrappers/EffectPacket.h>
+#include <Util/UtilMath.h>
 
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
@@ -21,20 +23,20 @@ extern Core::Framework g_fw;
 
 Core::Action::ActionTeleport::ActionTeleport()
 {
-   m_handleActionType = HandleActionType::Event;
+  m_handleActionType = HandleActionType::Event;
 }
 
 Core::Action::ActionTeleport::ActionTeleport( Entity::CharaPtr pActor, uint16_t targetZone, uint16_t cost )
 {
-   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-   m_startTime = 0;
-   m_id = 5;
-   m_handleActionType = HandleActionType::Teleport;
-   m_castTime = pExdData->get< Core::Data::Action >( 5 )->cast100ms * 100; // TODO: Add security checks.
-   m_pSource = pActor;
-   m_bInterrupt = false;
-   m_targetAetheryte = targetZone;
-   m_cost = cost;
+  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  m_startTime = 0;
+  m_id = 5;
+  m_handleActionType = HandleActionType::Teleport;
+  m_castTime = pExdData->get< Core::Data::Action >( 5 )->cast100ms * 100; // TODO: Add security checks.
+  m_pSource = pActor;
+  m_bInterrupt = false;
+  m_targetAetheryte = targetZone;
+  m_cost = cost;
 }
 
 Core::Action::ActionTeleport::~ActionTeleport()
@@ -44,71 +46,62 @@ Core::Action::ActionTeleport::~ActionTeleport()
 
 void Core::Action::ActionTeleport::onStart()
 {
-   if( !m_pSource )
-      return;
+  if( !m_pSource )
+    return;
 
-   m_startTime = Util::getTimeMs();
+  m_startTime = Util::getTimeMs();
 
-   auto castPacket = makeZonePacket< FFXIVIpcActorCast >( getId() );
-   castPacket->data().action_id = 5;
-   castPacket->data().unknown = 1;
-   castPacket->data().cast_time = 5.0f;
-   castPacket->data().target_id = m_pSource->getId();
+  auto castPacket = makeZonePacket< FFXIVIpcActorCast >( getId() );
+  castPacket->data().action_id = 5;
+  castPacket->data().unknown = 1;
+  castPacket->data().cast_time = 5.0f;
+  castPacket->data().target_id = m_pSource->getId();
 
-   m_pSource->sendToInRangeSet( castPacket, true );
-   m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::Casting );
+  m_pSource->sendToInRangeSet( castPacket, true );
+  m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::Casting );
 
 }
 
 void Core::Action::ActionTeleport::onFinish()
 {
-   if( !m_pSource )
-      return;
+  if( !m_pSource )
+    return;
 
-   auto pPlayer = m_pSource->getAsPlayer();
+  auto pPlayer = m_pSource->getAsPlayer();
 
-   // check we can finish teleporting
-   if( pPlayer->getCurrency( Inventory::CurrencyType::Gil ) < m_cost )
-   {
-      onInterrupt();
-      return;
-   }
+  // check we can finish teleporting
+  if( pPlayer->getCurrency( Common::CurrencyType::Gil ) < m_cost )
+  {
+    onInterrupt();
+    return;
+  }
 
-   pPlayer->removeCurrency( Inventory::CurrencyType::Gil, m_cost );
- 
-   pPlayer->unsetStateFlag( PlayerStateFlag::Casting );
+  pPlayer->removeCurrency( Common::CurrencyType::Gil, m_cost );
 
-   // TODO: not sure if this ever gets sent
-   //auto control = Network::Packets::Server::ActorControlPacket142( m_pSource->getId(), Common::ActorControlType::TeleportDone );
-   //m_pSource->sendToInRangeSet( control, false );
+  pPlayer->unsetStateFlag( PlayerStateFlag::Casting );
 
-   pPlayer->setZoningType( ZoneingType::Teleport );
+  // TODO: not sure if this ever gets sent
+  //auto control = makeActorControl142( m_pSource->getId(), Common::ActorControlType::TeleportDone );
+  //m_pSource->sendToInRangeSet( control, false );
 
-   auto effectPacket = makeZonePacket< FFXIVIpcEffect >( getId() );
-   effectPacket->data().targetId = pPlayer->getId();
-   effectPacket->data().actionAnimationId = 5;
-   //effectPacket.data().unknown_3 = 1;
-   effectPacket->data().actionTextId = 5;
-   effectPacket->data().unknown_5 = 1;
-   effectPacket->data().numEffects = 1;
-   effectPacket->data().rotation = static_cast< uint16_t >( 0x8000 * ( ( pPlayer->getRot() + 3.1415926 ) ) / 3.1415926 );
-   effectPacket->data().effectTarget = pPlayer->getId();
-   pPlayer->sendToInRangeSet( effectPacket, true );
+  pPlayer->setZoningType( ZoneingType::Teleport );
 
-   pPlayer->teleport( m_targetAetheryte );
+  auto effectPacket = boost::make_shared< Server::EffectPacket >( getId(), pPlayer->getId(), 5 );
+  effectPacket->setRotation( Math::Util::floatToUInt16Rot( pPlayer->getRot() ) );
 
 
+  pPlayer->sendToInRangeSet( effectPacket, true );
+  pPlayer->teleport( m_targetAetheryte );
 }
 
 void Core::Action::ActionTeleport::onInterrupt()
 {
-   if( !m_pSource )
-      return;
+  if( !m_pSource )
+    return;
 
-   m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Casting );
+  m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Casting );
 
-   auto control = boost::make_shared< ActorControlPacket142 >( m_pSource->getId(), ActorControlType::CastInterrupt,
-                                                               0x219, 0x04, m_id, 0 );
-   m_pSource->sendToInRangeSet( control, true );
+  auto control = makeActorControl142( m_pSource->getId(), ActorControlType::CastInterrupt, 0x219, 0x04, m_id, 0 );
+  m_pSource->sendToInRangeSet( control, true );
 
 }

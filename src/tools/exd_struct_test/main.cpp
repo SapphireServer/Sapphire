@@ -32,26 +32,26 @@ const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
 int main()
 {
 
-   g_log.init();
+  g_log.init();
 
-   g_log.info( "Setting up EXD data" );
-   if( !g_exdData.init( datLocation ) )
-   {
-      g_log.fatal( "Error setting up EXD data " );
-      return 0;
-   }
+  g_log.info( "Setting up EXD data" );
+  if( !g_exdData.init( datLocation ) )
+  {
+    g_log.fatal( "Error setting up EXD data " );
+    return 0;
+  }
 
-   
-   g_log.info( "getting id list " );
-   auto idList = g_exdData.getTerritoryTypeIdList();
 
-   g_log.info( "getting id list done" );
-   for( auto id : idList )
-   {
-      auto teri1 = g_exdData.get<Core::Data::TerritoryType>( id );
+  g_log.info( "getting id list " );
+  auto idList = g_exdData.getTerritoryTypeIdList();
 
-      g_log.info( teri1->name );
-   }
+  g_log.info( "getting id list done" );
+  for( auto id : idList )
+  {
+    auto teri1 = g_exdData.get< Core::Data::TerritoryType >( id );
 
-   return 0;
+    g_log.info( teri1->name );
+  }
+
+  return 0;
 }

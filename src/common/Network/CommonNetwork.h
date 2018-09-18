@@ -53,31 +53,31 @@ namespace Packets {
 */
 struct FFXIVARR_PACKET_HEADER
 {
-   /** Unknown data, no actual use has been determined */
-   uint64_t unknown_0;
-   uint64_t unknown_8;
-   /** Represents the number of milliseconds since epoch that the packet was sent. */
-   uint64_t timestamp;
-   /** The size of the packet header and its payload */
-   uint32_t size;
-   /** The type of this connection - 1 zone, 2 chat*/
-   uint16_t connectionType;
-   /** The number of packet segments that follow. */
-   uint16_t count;
-   uint8_t unknown_20;
-   /** Indicates if the data segments of this packet are compressed. */
-   uint8_t isCompressed;
-   uint32_t unknown_24;
+  /** Unknown data, no actual use has been determined */
+  uint64_t unknown_0;
+  uint64_t unknown_8;
+  /** Represents the number of milliseconds since epoch that the packet was sent. */
+  uint64_t timestamp;
+  /** The size of the packet header and its payload */
+  uint32_t size;
+  /** The type of this connection - 1 zone, 2 chat*/
+  uint16_t connectionType;
+  /** The number of packet segments that follow. */
+  uint16_t count;
+  uint8_t unknown_20;
+  /** Indicates if the data segments of this packet are compressed. */
+  uint8_t isCompressed;
+  uint32_t unknown_24;
 };
 
-inline ostream& operator << ( ostream& os, const FFXIVARR_PACKET_HEADER& hdr )
+inline ostream& operator<<( ostream& os, const FFXIVARR_PACKET_HEADER& hdr )
 {
-   return os.write( reinterpret_cast< const char* >( &hdr ), sizeof hdr );
+  return os.write( reinterpret_cast< const char* >( &hdr ), sizeof hdr );
 }
 
-inline istream& operator >> ( istream& is, FFXIVARR_PACKET_HEADER& hdr )
+inline istream& operator>>( istream& is, FFXIVARR_PACKET_HEADER& hdr )
 {
-   return is.read( reinterpret_cast< char* >( &hdr ), sizeof hdr );
+  return is.read( reinterpret_cast< char* >( &hdr ), sizeof hdr );
 }
 
 /**
@@ -97,37 +97,41 @@ inline istream& operator >> ( istream& is, FFXIVARR_PACKET_HEADER& hdr )
 */
 struct FFXIVARR_PACKET_SEGMENT_HEADER
 {
-   /** The size of the segment header and its data. */
-   uint32_t size;
-   /** The session ID this segment describes. */
-   uint32_t source_actor;
-   /** The session ID this packet is being delivered to. */
-   uint32_t target_actor;
-   /** The segment type. (1, 2, 3, 7, 8, 9, 10) */
-   uint16_t type;
-   uint16_t padding;
+  /** The size of the segment header and its data. */
+  uint32_t size;
+  /** The session ID this segment describes. */
+  uint32_t source_actor;
+  /** The session ID this packet is being delivered to. */
+  uint32_t target_actor;
+  /** The segment type. (1, 2, 3, 7, 8, 9, 10) */
+  uint16_t type;
+  uint16_t padding;
 };
 
-inline ostream& operator << ( ostream& os, const FFXIVARR_PACKET_SEGMENT_HEADER& hdr )
+inline ostream& operator<<( ostream& os, const FFXIVARR_PACKET_SEGMENT_HEADER& hdr )
 {
-   return os.write( reinterpret_cast< const char* >( &hdr ), sizeof hdr );
+  return os.write( reinterpret_cast< const char* >( &hdr ), sizeof hdr );
 }
 
-inline istream& operator >> ( istream& is, FFXIVARR_PACKET_SEGMENT_HEADER& hdr )
+inline istream& operator>>( istream& is, FFXIVARR_PACKET_SEGMENT_HEADER& hdr )
 {
-   return is.read( reinterpret_cast< char* >( &hdr ), sizeof hdr );
+  return is.read( reinterpret_cast< char* >( &hdr ), sizeof hdr );
 }
 
-template < int T > struct FFXIVIpcBasePacket
+template< int T >
+struct FFXIVIpcBasePacket
 {
-   /** Creates a constant representing the IPC type */
-   enum { _ServerIpcType = T };
+  /** Creates a constant representing the IPC type */
+  enum
+  {
+    _ServerIpcType = T
+  };
 };
 
 struct FFXIVARR_PACKET_RAW
 {
-   FFXIVARR_PACKET_SEGMENT_HEADER segHdr;
-   std::vector< uint8_t > data;
+  FFXIVARR_PACKET_SEGMENT_HEADER segHdr;
+  std::vector< uint8_t > data;
 };
 
 /**
@@ -137,11 +141,11 @@ struct FFXIVARR_PACKET_RAW
  */
 enum FFXIVARR_SEGMENT_TYPE
 {
-   SEGMENTTYPE_SESSIONINIT = 1,
-   SEGMENTTYPE_IPC = 3,
-   SEGMENTTYPE_KEEPALIVE = 7,
-   //SEGMENTTYPE_RESPONSE = 8,
-   SEGMENTTYPE_ENCRYPTIONINIT = 9,
+  SEGMENTTYPE_SESSIONINIT = 1,
+  SEGMENTTYPE_IPC = 3,
+  SEGMENTTYPE_KEEPALIVE = 7,
+  //SEGMENTTYPE_RESPONSE = 8,
+    SEGMENTTYPE_ENCRYPTIONINIT = 9,
 };
 
 /**
@@ -159,22 +163,22 @@ enum FFXIVARR_SEGMENT_TYPE
 */
 struct FFXIVARR_IPC_HEADER
 {
-   uint16_t reserved;
-   uint16_t type;
-   uint16_t padding;
-   uint16_t serverId;
-   uint32_t timestamp;
-   uint32_t padding1;
+  uint16_t reserved;
+  uint16_t type;
+  uint16_t padding;
+  uint16_t serverId;
+  uint32_t timestamp;
+  uint32_t padding1;
 };
 
-inline ostream& operator << ( ostream& os, const FFXIVARR_IPC_HEADER& hdr )
+inline ostream& operator<<( ostream& os, const FFXIVARR_IPC_HEADER& hdr )
 {
-   return os.write( reinterpret_cast< const char* >( &hdr ), sizeof hdr );
+  return os.write( reinterpret_cast< const char* >( &hdr ), sizeof hdr );
 }
 
-inline istream& operator >> ( istream& is, FFXIVARR_IPC_HEADER& hdr )
+inline istream& operator>>( istream& is, FFXIVARR_IPC_HEADER& hdr )
 {
-   return is.read( reinterpret_cast< char* >( &hdr ), sizeof hdr );
+  return is.read( reinterpret_cast< char* >( &hdr ), sizeof hdr );
 }
 
 } /* Packets */
