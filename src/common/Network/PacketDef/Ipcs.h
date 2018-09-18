@@ -110,7 +110,7 @@ enum ServerZoneIpcType :
   AoeEffect16 = 0x0150, // updated 4.4
   AoeEffect24 = 0x0151, // updated 4.4
   AoeEffect32 = 0x0152, // updated 4.4
-  PersistantEffect = 0x0158, // updated 4.3
+  PersistantEffect = 0x0153, // updated 4.4
 
   GCAffiliation = 0x015D, // updated 4.4
 
@@ -119,7 +119,7 @@ enum ServerZoneIpcType :
   ActorMove = 0x0170, // updated 4.4
   ActorSetPos = 0x0172, // updated 4.4
 
-  ActorCast = 0x0174, // updated 4.4
+  ActorCast = 0x0170, // updated 4.4
 
   PartyList = 0x0176, // updated 4.4
   HateList = 0x0177, // updated 4.4
@@ -148,12 +148,12 @@ enum ServerZoneIpcType :
   InventoryActionAck = 0x0193, // updated 4.4
   UpdateInventorySlot = 0x0194, // updated 4.4
 
-  EventPlay = 0x01A6, // updated 4.3
-  EventOpenGilShop = 0x01AD, // updated 4.3
-  DirectorPlayScene = 0x01AA, // updated 4.3
+  EventPlay = 0x01A2, // updated 4.4
+  EventOpenGilShop = 0x01A9, // updated 4.4
+  DirectorPlayScene = 0x01A6, // updated 4.4
 
-  EventStart = 0x01AF, // updated 4.3
-  EventFinish = 0x01B0, // updated 4.3
+  EventStart = 0x01AB, // updated 4.4
+  EventFinish = 0x01AC, // updated 4.4
 
   EventLinkshell = 0x1169,
 
