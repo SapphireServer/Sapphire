@@ -79,11 +79,11 @@ enum ServerZoneIpcType :
 
 
   Playtime = 0x00F5, // updated 4.3
-  Chat = 0x00F7, // updated 4.3
-  SocialList = 0x00FD, // updated 4.3
+  Chat = 0x00F4, // updated 4.4
+  SocialList = 0x00FB, // updated 4.4
 
-  UpdateSearchInfo = 0x0100, // updated 4.3
-  InitSearchInfo = 0x0101, // updated 4.3
+  UpdateSearchInfo = 0x00FE, // updated 4.4
+  InitSearchInfo = 0x00FF, // updated 4.4
   ExamineSearchComment = 0x0102, // updated 4.1
 
   ServerNotice = 0x0104, // updated 4.4
