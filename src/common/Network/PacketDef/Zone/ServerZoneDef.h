@@ -709,8 +709,8 @@ struct FFXIVIpcInitZone : FFXIVIpcBasePacket< InitZone >
   uint32_t unknown3;
   uint32_t unknown4;
   uint8_t weatherId;
-  uint8_t bitmask;
-  uint16_t unknown5;
+  uint16_t bitmask;
+  uint8_t unknown5;
   uint16_t festivalId;
   uint16_t additionalFestivalId;
   uint32_t unknown8;
