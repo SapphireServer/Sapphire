@@ -218,17 +218,23 @@ Core::ZonePtr Core::TerritoryMgr::createTerritoryInstance( uint32_t territoryTyp
   return pZone;
 }
 
-Core::ZonePtr Core::TerritoryMgr::createInstanceContent( uint32_t instanceContentId )
+Core::ZonePtr Core::TerritoryMgr::createInstanceContent( uint32_t contentFinderConditionId )
 {
+
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pContentFinderCondition = pExdData->get< Core::Data::ContentFinderCondition >( contentFinderConditionId );
+  if( !pContentFinderCondition )
+    return nullptr;
+  auto instanceContentId = pContentFinderCondition->instanceContent;
+
   auto pInstanceContent = pExdData->get< Core::Data::InstanceContent >( instanceContentId );
   if( !pInstanceContent )
     return nullptr;
 
-  if( !isInstanceContentTerritory( pInstanceContent->territoryType ) )
+  if( !isInstanceContentTerritory( pContentFinderCondition->territoryType ) )
     return nullptr;
 
-  auto pTeri = getTerritoryDetail( pInstanceContent->territoryType );
+  auto pTeri = getTerritoryDetail( pContentFinderCondition->territoryType );
 
   if( !pTeri || pInstanceContent->name.empty() )
     return nullptr;
@@ -237,7 +243,7 @@ Core::ZonePtr Core::TerritoryMgr::createInstanceContent( uint32_t instanceConten
   pLog->debug( "Starting instance for InstanceContent id: " + std::to_string( instanceContentId ) +
                " (" + pInstanceContent->name + ")" );
 
-  auto pZone = make_InstanceContent( pInstanceContent, getNextInstanceId(),
+  auto pZone = make_InstanceContent( pInstanceContent, pContentFinderCondition->territoryType, getNextInstanceId(),
                                      pTeri->name, pInstanceContent->name, instanceContentId );
   pZone->init();
 

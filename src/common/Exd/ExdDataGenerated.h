@@ -1551,7 +1551,7 @@ struct ContentFinderCondition
 {
    uint16_t territoryType;
    uint8_t contentLinkType;
-   uint16_t content;
+   uint16_t instanceContent;
    uint8_t contentMemberType;
    uint8_t classJobLevelRequired;
    uint8_t classJobLevelSync;

@@ -1247,7 +1247,7 @@ Core::Data::ContentFinderCondition::ContentFinderCondition( uint32_t row_id, Cor
    auto row = exdData->m_ContentFinderConditionDat.get_row( row_id );
    territoryType = exdData->getField< uint16_t >( row, 1 );
    contentLinkType = exdData->getField< uint8_t >( row, 2 );
-   content = exdData->getField< uint16_t >( row, 3 );
+   instanceContent = exdData->getField< uint16_t >( row, 3 );
    contentMemberType = exdData->getField< uint8_t >( row, 9 );
    classJobLevelRequired = exdData->getField< uint8_t >( row, 15 );
    classJobLevelSync = exdData->getField< uint8_t >( row, 16 );
