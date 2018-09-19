@@ -22,6 +22,7 @@ public:
   };
 
   InstanceContent( boost::shared_ptr< Core::Data::InstanceContent > pInstanceConfiguration,
+                   uint16_t territoryType,
                    uint32_t guId,
                    const std::string& internalName,
                    const std::string& contentName,

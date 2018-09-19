@@ -77,12 +77,12 @@ void Core::Network::GameConnection::cfRegisterDuty( const Packets::FFXIVARR_PACK
   if( !cfCondition )
     return;
 
-  auto instance = pTeriMgr->createInstanceContent( cfCondition->content );
+  auto instance = pTeriMgr->createInstanceContent( cfCondition->instanceContent );
   if( !instance )
     return;
 
   auto pInstance = instance->getAsInstanceContent();
-  pInstance->bindPlayer( player.getId() );
+a  pInstance->bindPlayer( player.getId() );
 
   player.sendDebug( "Created instance with id: " + std::to_string( instance->getGuId() ) );
 
