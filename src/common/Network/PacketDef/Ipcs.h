@@ -119,7 +119,7 @@ enum ServerZoneIpcType :
   ActorMove = 0x0170, // updated 4.4
   ActorSetPos = 0x0172, // updated 4.4
 
-  ActorCast = 0x0170, // updated 4.4
+  ActorCast = 0x0174, // updated 4.4
 
   PartyList = 0x0176, // updated 4.4
   HateList = 0x0177, // updated 4.4
