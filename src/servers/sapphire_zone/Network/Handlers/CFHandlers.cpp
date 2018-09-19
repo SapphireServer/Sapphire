@@ -82,7 +82,7 @@ void Core::Network::GameConnection::cfRegisterDuty( const Packets::FFXIVARR_PACK
     return;
 
   auto pInstance = instance->getAsInstanceContent();
-a  pInstance->bindPlayer( player.getId() );
+  pInstance->bindPlayer( player.getId() );
 
   player.sendDebug( "Created instance with id: " + std::to_string( instance->getGuId() ) );
 
