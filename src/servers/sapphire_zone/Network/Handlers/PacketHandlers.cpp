@@ -365,7 +365,7 @@ void Core::Network::GameConnection::discoveryHandler( const Core::Network::Packe
 
   if( !pQR->next() )
   {
-    player.sendNotice( "Discovery ref pos ID: " + std::to_string( positionRef ) + " not found. " );
+    player.sendDebug( "Discovery ref pos ID: " + std::to_string( positionRef ) + " not found. " );
     return;
   }
 
@@ -374,7 +374,7 @@ void Core::Network::GameConnection::discoveryHandler( const Core::Network::Packe
   discoveryPacket->data().map_part_id = pQR->getUInt( 3 );
 
   player.queuePacket( discoveryPacket );
-  player.sendNotice( "Discovery ref pos ID: " + std::to_string( positionRef ) );
+  player.sendDebug( "Discovery ref pos ID: " + std::to_string( positionRef ) );
 
   player.discover( pQR->getUInt16( 2 ), pQR->getUInt16( 3 ) );
 
