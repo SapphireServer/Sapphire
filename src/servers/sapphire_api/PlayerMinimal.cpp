@@ -66,15 +66,21 @@ void PlayerMinimal::load( uint32_t charId )
   m_contentId = res->getUInt64( "ContentId" );
   m_zoneId = res->getUInt16( "TerritoryId" );
 
+  res.reset();
+
   // SELECT ClassIdx, Exp, Lvl
-  auto stmtClass = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_SEL_MINIMAL );
+  auto stmtClass = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_CLASS_SEL );
   stmtClass->setInt( 1, m_id );
 
-  auto resClass = g_charaDb.query( stmt );
+  auto resClass = g_charaDb.query( stmtClass );
 
   while( resClass->next() )
   {
-    m_classMap[ resClass->getUInt( 1 ) ] = resClass->getUInt( 3 );
+    auto classIdx = resClass->getUInt( 1 );
+    auto lvl = resClass->getUInt( 3 );
+
+    m_classMap[ classIdx ] = lvl;
+    m_classLevel = getClassLevel();
   }
 }
 
@@ -120,7 +126,7 @@ std::string PlayerMinimal::getModelString()
 std::string PlayerMinimal::getInfoJson()
 {
   std::string charDetails = "{\"content\":[\"" + std::string( getName() ) + "\"," +
-                            "[\"0\",\"0\",\"0\",\"0\",\"" + std::to_string( getClassLevel( m_class ) ) +
+                            "[\"0\",\"0\",\"0\",\"0\",\"" + std::to_string( m_classLevel ) +
                             "\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\"],"
                             "\"0\",\"0\",\"0\",\"" +
                             std::to_string( getBirthMonth() ) +
@@ -138,26 +144,10 @@ std::string PlayerMinimal::getInfoJson()
   return charDetails;
 }
 
-uint16_t PlayerMinimal::getClassLevel(uint8_t classId)
+uint8_t PlayerMinimal::getClassLevel()
 {
-
-  auto stmtClass = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_CLASS_SEL );
-  stmtClass->setInt( 1, m_id );
-
-  auto resClass = g_charaDb.query( stmtClass );
-
-  while( resClass->next() )
-  {
-    auto classIdx = resClass->getUInt16( 1 );
-    auto lvl = resClass->getUInt8( 3 );
-
-    if( classIdx == classId ) {
-      m_classLevel = lvl;
-      break;
-    }
-
-  }
-  return m_classLevel;
+  uint8_t classJobIndex = g_exdDataGen.get< Core::Data::ClassJob >( static_cast< uint8_t >( m_class ) )->expArrayIndex;
+  return static_cast< uint8_t >( m_classMap[ classJobIndex ] );
 }
 
 std::string PlayerMinimal::getClassString()

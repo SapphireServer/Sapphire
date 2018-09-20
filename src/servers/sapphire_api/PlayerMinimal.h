@@ -31,7 +31,7 @@ public:
 
   std::string getClassString();
 
-  uint16_t getClassLevel( uint8_t classId );
+  uint8_t getClassLevel();
 
   // return the id of the actor
   uint32_t getId() const
