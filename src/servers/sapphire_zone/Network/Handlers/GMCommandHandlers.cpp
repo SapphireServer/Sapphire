@@ -466,12 +466,15 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
         {
           auto data = pExdData->get< Core::Data::Aetheryte >( i );
 
-          if( !data ) {
+          if( !data )
+          {
             continue;
           }
 
-          if( data->territory == param1 ) {
-            if( data->isAetheryte ) {
+          if( data->territory == param1 )
+          {
+            if( data->isAetheryte )
+            {
               {
                 doTeleport = true;
                 teleport = i;
