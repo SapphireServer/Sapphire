@@ -475,11 +475,9 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
           {
             if( data->isAetheryte )
             {
-              {
-                doTeleport = true;
-                teleport = i;
-                break;
-              }
+              doTeleport = true;
+              teleport = i;
+              break;
             }
           }
         }
