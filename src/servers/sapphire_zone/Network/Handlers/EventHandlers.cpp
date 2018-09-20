@@ -6,7 +6,6 @@
 #include <Network/GamePacketNew.h>
 #include <Network/PacketContainer.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
-#include <sapphire_zone/Event/EventHandler.h>
 #include <Network/PacketDef/Zone/ClientZoneDef.h>
 
 #include "Network/GameConnection.h"
@@ -17,6 +16,7 @@
 
 #include "Script/ScriptMgr.h"
 
+#include "Event/EventHandler.h"
 #include "Event/EventHelper.h"
 
 #include "Zone/InstanceContent.h"
