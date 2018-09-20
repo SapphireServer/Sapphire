@@ -491,7 +491,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
         }
 
         player.sendNotice( targetPlayer->getName() + " was warped to zone " +
-          std::to_string( param1 ) + " (" + pZone->getName() + ")" );
+                           std::to_string( param1 ) + " (" + pZone->getName() + ")" );
       }
       break;
     }
