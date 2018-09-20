@@ -55,12 +55,16 @@ void PlayerMinimal::load( uint32_t charId )
   auto modelEquip = res->getBlobVector( "ModelEquip" );
   memcpy( ( char* ) m_modelEquip, modelEquip.data(), modelEquip.size() );
 
+  m_modelMainWeapon = res->getUInt64( "ModelMainWeapon" );
+  m_modelSubWeapon = res->getUInt64( "ModelSubWeapon" );
+  m_equipDisplayFlags = res->getUInt8( "EquipDisplayFlags" );
+
 
   setBirthDay( res->getUInt8( "BirthDay" ), res->getUInt8( "BirthMonth" ) );
   m_guardianDeity = res->getUInt8( "GuardianDeity" );
   m_class = res->getUInt8( "Class" );
   m_contentId = res->getUInt64( "ContentId" );
-  m_zoneId = res->getUInt8( "TerritoryId" );
+  m_zoneId = res->getUInt16( "TerritoryId" );
 
   // SELECT ClassIdx, Exp, Lvl
   auto stmtClass = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_SEL_MINIMAL );
@@ -104,15 +108,20 @@ std::string PlayerMinimal::getModelString()
                             + std::to_string( m_modelEquip[ 1 ] ) + "\",\""
                             + std::to_string( m_modelEquip[ 2 ] ) + "\",\""
                             + std::to_string( m_modelEquip[ 3 ] ) + "\",\""
-                            + std::to_string( m_modelEquip[ 4 ] ) + "\",\"5\",\"6\",\"7\",\"8\",\"9\"";
+                            + std::to_string( m_modelEquip[ 4 ] ) + "\",\""
+                            + std::to_string( m_modelEquip[ 5 ] ) + "\",\""
+                            + std::to_string( m_modelEquip[ 6 ] ) + "\",\""
+                            + std::to_string( m_modelEquip[ 7 ] ) + "\",\""
+                            + std::to_string( m_modelEquip[ 8 ] ) + "\",\""
+                            + std::to_string( m_modelEquip[ 9 ] ) + "\"";
   return modelString;
 }
 
 std::string PlayerMinimal::getInfoJson()
 {
   std::string charDetails = "{\"content\":[\"" + std::string( getName() ) + "\"," +
-                            //"[" + getClassString() + "]," +
-                            "[\"0\",\"0\",\"0\",\"0\",\"0\",\"1\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\"],"
+                            "[\"0\",\"0\",\"0\",\"0\",\"" + std::to_string( getClassLevel( m_class ) ) +
+                            "\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\"],"
                             "\"0\",\"0\",\"0\",\"" +
                             std::to_string( getBirthMonth() ) +
                             "\",\"" + std::to_string( getBirthDay() ) +
@@ -120,13 +129,35 @@ std::string PlayerMinimal::getInfoJson()
                             "\",\"" + std::to_string( m_class ) +
                             "\",\"0\",\"" + std::to_string( getZoneId() ) +
                             "\",\"0\"," +
-
                             "[" + getLookString() + "]," +
-                            "\"0\",\"0\"," +
+                            "\"" + std::to_string( m_modelMainWeapon ) + "\",\"" + std::to_string( m_modelSubWeapon ) + "\"," +
                             "[" + getModelString() + "]," +
-                            "\"1\",\"0\",\"0\",\"0\",\"0\",\"0\",\"\",\"0\",\"0\"]," +
+                            "\"1\",\"0\",\"0\",\"0\",\"" + std::to_string( m_equipDisplayFlags ) +
+                            "\",\"0\",\"\",\"0\",\"0\"]," +
                             "\"classname\":\"ClientSelectData\",\"classid\":116}";
   return charDetails;
+}
+
+uint16_t PlayerMinimal::getClassLevel(uint8_t classId)
+{
+
+  auto stmtClass = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_CLASS_SEL );
+  stmtClass->setInt( 1, m_id );
+
+  auto resClass = g_charaDb.query( stmtClass );
+
+  while( resClass->next() )
+  {
+    auto classIdx = resClass->getUInt16( 1 );
+    auto lvl = resClass->getUInt8( 3 );
+
+    if( classIdx == classId ) {
+      m_classLevel = lvl;
+      break;
+    }
+
+  }
+  return m_classLevel;
 }
 
 std::string PlayerMinimal::getClassString()
