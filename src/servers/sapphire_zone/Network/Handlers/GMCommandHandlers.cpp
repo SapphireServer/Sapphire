@@ -7,6 +7,7 @@
 #include <Network/PacketContainer.h>
 #include <Network/CommonActorControl.h>
 #include <Network/PacketDef/Zone/ClientZoneDef.h>
+#include <Exd/ExdDataGenerated.h>
 
 #include <unordered_map>
 
@@ -455,10 +456,42 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
           break;
         }
 
-        targetPlayer->setPos( targetPlayer->getPos() );
-        targetPlayer->performZoning( param1, targetPlayer->getPos(), 0 );
+        bool doTeleport = false;
+        uint16_t teleport;
+
+        auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+        auto idList = pExdData->getAetheryteIdList();
+
+        for( auto i : idList )
+        {
+          auto data = pExdData->get< Core::Data::Aetheryte >( i );
+
+          if( !data ) {
+            continue;
+          }
+
+          if( data->territory == param1 ) {
+            if( data->isAetheryte ) {
+              {
+                doTeleport = true;
+                teleport = i;
+                break;
+              }
+            }
+          }
+        }
+        if( doTeleport )
+        {
+          player.teleport( teleport );
+        }
+        else
+        {
+          targetPlayer->setPos( targetPlayer->getPos() );
+          targetPlayer->performZoning( param1, targetPlayer->getPos(), 0 );
+        }
+
         player.sendNotice( targetPlayer->getName() + " was warped to zone " +
-                           std::to_string( param1 ) + " (" + pZone->getName() + ")" );
+          std::to_string( param1 ) + " (" + pZone->getName() + ")" );
       }
       break;
     }
