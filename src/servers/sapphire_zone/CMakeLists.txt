@@ -37,8 +37,10 @@ set_target_properties( sapphire_zone PROPERTIES
 
 target_link_libraries( sapphire_zone common )
 
+target_link_libraries( sapphire_zone ${Boost_LIBRARIES} )
+
 target_include_directories( sapphire_zone PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" )
 
-if( UNIX )
+if (UNIX)
   cotire( sapphire_zone )
 endif()
