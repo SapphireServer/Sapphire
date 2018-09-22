@@ -8,7 +8,7 @@
 #include <Exd/ExdDataGenerated.h>
 #include <Config/ConfigMgr.h>
 
-#include "watchdog/Watchdog.h"
+#include "Watchdog.h"
 
 #include "Zone/Zone.h"
 #include "Zone/InstanceContent.h"
