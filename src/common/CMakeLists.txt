@@ -32,7 +32,7 @@ target_link_libraries( common PUBLIC xivdat )
 target_link_libraries( common PUBLIC mysqlConnector )
 
 if( UNIX )
-  target_link_libraries( common PUBLIC mysqlclient )
+  target_link_libraries( common PUBLIC mysqlclient pthread )
 else()
   target_link_libraries( common PUBLIC libmysql )
 endif()
