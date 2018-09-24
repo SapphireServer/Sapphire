@@ -9,8 +9,7 @@ namespace Core {
 namespace Data {
 struct InstanceContent;
 }
-class InstanceContent :
-  public Event::Director, public Zone
+class InstanceContent : public Event::Director, public Zone
 {
 public:
   enum InstanceContentState
