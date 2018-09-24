@@ -50,16 +50,16 @@ private:
 
       memcpy( m_data.look, pTarget->getLookArray(), sizeof( m_data.look ) );
 
-      m_data.models[ Common::GearModelSlot::ModelHead ] = player.getModelForSlot( Common::GearModelSlot::ModelHead );
-      m_data.models[ Common::GearModelSlot::ModelBody ] = player.getModelForSlot( Common::GearModelSlot::ModelBody );
-      m_data.models[ Common::GearModelSlot::ModelHands ] = player.getModelForSlot( Common::GearModelSlot::ModelHands );
-      m_data.models[ Common::GearModelSlot::ModelLegs ] = player.getModelForSlot( Common::GearModelSlot::ModelLegs );
-      m_data.models[ Common::GearModelSlot::ModelFeet ] = player.getModelForSlot( Common::GearModelSlot::ModelFeet );
-      m_data.models[ Common::GearModelSlot::ModelNeck ] = player.getModelForSlot( Common::GearModelSlot::ModelNeck );
-      m_data.models[ Common::GearModelSlot::ModelEar ] = player.getModelForSlot( Common::GearModelSlot::ModelEar );
-      m_data.models[ Common::GearModelSlot::ModelRing1 ] = player.getModelForSlot( Common::GearModelSlot::ModelRing1 );
-      m_data.models[ Common::GearModelSlot::ModelRing2 ] = player.getModelForSlot( Common::GearModelSlot::ModelRing2 );
-      m_data.models[ Common::GearModelSlot::ModelWrist ] = player.getModelForSlot( Common::GearModelSlot::ModelWrist );
+      m_data.models[ Common::GearModelSlot::ModelHead ] = pTarget->getModelForSlot( Common::GearModelSlot::ModelHead );
+      m_data.models[ Common::GearModelSlot::ModelBody ] = pTarget->getModelForSlot( Common::GearModelSlot::ModelBody );
+      m_data.models[ Common::GearModelSlot::ModelHands ] = pTarget->getModelForSlot( Common::GearModelSlot::ModelHands );
+      m_data.models[ Common::GearModelSlot::ModelLegs ] = pTarget->getModelForSlot( Common::GearModelSlot::ModelLegs );
+      m_data.models[ Common::GearModelSlot::ModelFeet ] = pTarget->getModelForSlot( Common::GearModelSlot::ModelFeet );
+      m_data.models[ Common::GearModelSlot::ModelNeck ] = pTarget->getModelForSlot( Common::GearModelSlot::ModelNeck );
+      m_data.models[ Common::GearModelSlot::ModelEar ] = pTarget->getModelForSlot( Common::GearModelSlot::ModelEar );
+      m_data.models[ Common::GearModelSlot::ModelRing1 ] = pTarget->getModelForSlot( Common::GearModelSlot::ModelRing1 );
+      m_data.models[ Common::GearModelSlot::ModelRing2 ] = pTarget->getModelForSlot( Common::GearModelSlot::ModelRing2 );
+      m_data.models[ Common::GearModelSlot::ModelWrist ] = pTarget->getModelForSlot( Common::GearModelSlot::ModelWrist );
 
       // todo: main/sub/other stuff too
 
