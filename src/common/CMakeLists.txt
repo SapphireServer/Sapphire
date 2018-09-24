@@ -29,11 +29,13 @@ set_target_properties( common PROPERTIES
 )
 target_link_libraries( common PUBLIC ${Boost_LIBRARIES} )
 target_link_libraries( common PUBLIC xivdat )
+
 target_link_libraries( common PUBLIC mysqlConnector )
-
 if( UNIX )
+  target_link_libraries( common PUBLIC mysqlclient )
   target_link_libraries( common PUBLIC pthread )
-
+else()
+  target_link_libraries( common PUBLIC libmysql )
 endif()
 
 target_include_directories( common PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/" )

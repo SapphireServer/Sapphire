@@ -18,10 +18,5 @@ set_target_properties(sapphire_api PROPERTIES
     VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../../../bin/"
 )
 
-if (UNIX)
-  target_link_libraries (sapphire_api common pthread dl z)
-else()
-  target_link_libraries (sapphire_api common zlib1)
-endif()
+target_link_libraries (sapphire_api common) 
 
-target_link_libraries( sapphire_api ${Boost_LIBRARIES} ${Boost_LIBRARIES} )
