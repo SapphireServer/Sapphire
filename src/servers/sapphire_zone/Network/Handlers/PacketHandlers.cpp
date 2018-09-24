@@ -120,6 +120,9 @@ void Core::Network::GameConnection::reqExamineSearchCommentHandler( const Core::
 
     if( pPlayer )
     {
+      if( pPlayer->isActingAsGm() || pPlayer->getZoneId() != player.getZoneId() )
+        return;
+
       // retail sends the requester's id as both (isForSelf)
       auto searchInfoPacket = makeZonePacket< FFXIVIpcExamineSearchComment >( player.getId() );
       searchInfoPacket->data().charId = targetId;
@@ -144,6 +147,9 @@ void Core::Network::GameConnection::reqExamineFcInfo( const Core::Network::Packe
 
     if( pPlayer )
     {
+      if( pPlayer->isActingAsGm() || pPlayer->getZoneId() != player.getZoneId() )
+        return;
+
       // retail sends the requester's id as both (isForSelf)
       auto examineFcInfoPacket = makeZonePacket< FFXIVIpcExamineFreeCompanyInfo >( player.getId() );
       examineFcInfoPacket->data().charId = targetId;
