@@ -39,7 +39,7 @@ foreach(_scriptDir ${children})
         target_link_libraries( "script_${_name}" sapphire_zone )
 
         if(MSVC)
-            target_link_libraries( "script_${_name}" ${Boost_LIBRARIES})
+            #target_link_libraries( "script_${_name}" ${Boost_LIBRARIES})
             set_target_properties( "script_${_name}" PROPERTIES
                 CXX_STANDARD 14
                 CXX_STANDARD_REQUIRED ON
