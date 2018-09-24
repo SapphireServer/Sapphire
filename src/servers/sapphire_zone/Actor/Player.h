@@ -1,7 +1,7 @@
 #ifndef _PLAYER_H
 #define _PLAYER_H
 
-#include "Forwards.h"
+#include "ForwardsZone.h"
 
 #include <Common.h>
 #include <Util/SpawnIndexAllocator.h>

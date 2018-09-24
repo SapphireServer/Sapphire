@@ -5,7 +5,7 @@
 #include <typeinfo>
 #include <typeindex>
 #include <Event/EventHandler.h>
-#include "Forwards.h"
+#include "ForwardsZone.h"
 
 #ifdef _MSC_VER
 #define EXPORT __declspec( dllexport )
