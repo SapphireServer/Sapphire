@@ -27,14 +27,13 @@ set_target_properties( common PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_CURRENT_SOURCE_DIR}/../../bin/"
     RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_CURRENT_SOURCE_DIR}/../../bin/"
 )
-
+target_link_libraries( common PUBLIC ${Boost_LIBRARIES} )
 target_link_libraries( common PUBLIC xivdat )
 target_link_libraries( common PUBLIC mysqlConnector )
 
 if( UNIX )
-  target_link_libraries( common PUBLIC mysqlclient pthread )
-else()
-  target_link_libraries( common PUBLIC libmysql )
+  target_link_libraries( common PUBLIC pthread )
+
 endif()
 
 target_include_directories( common PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/" )

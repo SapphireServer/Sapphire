@@ -19,11 +19,6 @@ set_target_properties(sapphire_lobby PROPERTIES
         VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../../../bin/"
         )
 
-if (UNIX)
-    target_link_libraries(sapphire_lobby common pthread dl z)
-else()
-    target_link_libraries(sapphire_lobby common zlib1)
-endif()
+target_link_libraries(sapphire_lobby PRIVATE common)
 
-target_link_libraries(sapphire_lobby ${Boost_LIBRARIES} ${Boost_LIBRARIES})
 cotire( sapphire_lobby )

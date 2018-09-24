@@ -35,17 +35,8 @@ set_target_properties(sapphire_zone PROPERTIES
         VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../../../bin/"
         )
 
-target_link_libraries( sapphire_zone common )
+target_link_libraries( sapphire_zone PUBLIC common )
 
-if (UNIX)
-    target_link_libraries( sapphire_zone pthread )
-    target_link_libraries( sapphire_zone dl )
-    target_link_libraries( sapphire_zone z )
-else()
-    target_link_libraries( sapphire_zone zlib1 )
-endif()
-
-target_link_libraries( sapphire_zone ${Boost_LIBRARIES} )
 target_include_directories( sapphire_zone PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" )
 
 if (UNIX)
