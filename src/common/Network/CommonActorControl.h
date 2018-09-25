@@ -287,6 +287,8 @@ enum ClientTriggerType
   AchievementCritReq = 0x3E8,
   AchievementList = 0x3E9,
 
+  RequestSharedEstateSettings = 0x46F,
+
   CompanionAction = 0x6A4,
   CompanionSetBarding = 0x6A5,
   CompanionActionUnlock = 0x6A6,

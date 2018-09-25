@@ -187,6 +187,8 @@ enum ServerZoneIpcType :
   WardHousingPermission = 0x0229, // updated 4.4
   WardYardInfo = 0x022B, // updated 4.4
 
+  SharedEstateSettingsResponse = 0x023C, // updated 4.4
+
   DuelChallenge = 0x0277, // 4.2; this is responsible for opening the ui
   PerformNote = 0x0286, // updated 4.3
 
@@ -279,6 +281,8 @@ enum ClientZoneIpcType :
 
   LinkshellEventHandler = 0x0150, // updated 4.1 ??
   LinkshellEventHandler1 = 0x0151, // updated 4.1 ??
+
+  SetSharedEstateSettings = 0x0177, // updated 4.4
 
   PerformNoteHandler = 0x029B, // updated 4.3
 
