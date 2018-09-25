@@ -6,6 +6,7 @@
 #include <memory>
 #include <boost/make_shared.hpp>
 #include <vector>
+#include "Common.h"
 
 #define TYPE_FORWARD( x ) \
 class x; \
