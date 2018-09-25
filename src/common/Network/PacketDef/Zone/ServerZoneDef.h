@@ -1592,6 +1592,27 @@ struct FFXIVIpcWardYardInfo :
   } object[100];
 };
 
+/**
+* Structural representation of the packet sent by the server
+* to show the shared estate settings
+*/
+struct FFXIVIpcActorFreeSpawn :
+  FFXIVIpcBasePacket< SharedEstateSettingsResponse >
+{
+  uint64_t char1ContentId;
+  uint8_t char1Permissions;
+  char char1Name[0x20];
+  char padding1[0x7];
+  uint64_t char2ContentId;
+  uint8_t char2Permissions;
+  char char2Name[0x20];
+  char padding2[0x7];
+  uint64_t char3ContentId;
+  uint8_t char3Permissions;
+  char char3Name[0x20];
+  char padding3[0x7];
+};
+
 struct FFXIVIpcMSQTrackerProgress :
   FFXIVIpcBasePacket< MSQTrackerProgress >
 {
