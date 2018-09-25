@@ -1594,7 +1594,7 @@ struct FFXIVIpcWardYardInfo :
 
 /**
 * Structural representation of the packet sent by the server
-* to show the shared estate settings
+* to show the current shared estate settings
 */
 struct FFXIVIpcActorFreeSpawn :
   FFXIVIpcBasePacket< SharedEstateSettingsResponse >
