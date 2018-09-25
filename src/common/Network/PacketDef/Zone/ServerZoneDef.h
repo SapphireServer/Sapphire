@@ -450,11 +450,14 @@ struct FFXIVIpcPlayerSpawn :
   uint8_t u3b;
 
   uint8_t gmRank;
-  uint8_t onlineStatus;
   uint8_t u3c;
-  uint8_t pose;
+  uint8_t u4;
+  uint8_t onlineStatus;
 
-  uint32_t u4;
+  uint8_t pose;
+  uint8_t u5a;
+  uint8_t u5b;
+  uint8_t u5c;
 
   uint64_t targetId;
   uint32_t u6;
