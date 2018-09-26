@@ -313,6 +313,7 @@ bool Core::Entity::Player::loadSearchInfo()
 
   // todo: internally use an std::string instead of a char[]
   auto searchMessage = res->getString( 4 );
+  memset( m_searchMessage, 0, sizeof( m_searchMessage ) );
   std::copy( searchMessage.begin(), searchMessage.end(), m_searchMessage );
 
   return true;
@@ -501,7 +502,7 @@ void Core::Entity::Player::updateDbSearchInfo() const
   pDb->execute( stmtS1 );
 
   auto stmtS2 = pDb->getPreparedStatement( Db::CHARA_SEARCHINFO_UP_SEARCHCOMMENT );
-  stmtS2->setString( 1, string( m_searchMessage != nullptr ? m_searchMessage : "" ) );
+  stmtS2->setString( 1, string( m_searchMessage ) );
   stmtS2->setInt( 2, m_id );
   pDb->execute( stmtS2 );
 }

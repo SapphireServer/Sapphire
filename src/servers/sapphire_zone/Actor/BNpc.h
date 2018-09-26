@@ -31,7 +31,7 @@ public:
   void spawn( PlayerPtr pTarget ) override;
 
   uint16_t getModelChara() const;
-  uint8_t getLevel() const;
+  uint8_t getLevel() const override;
 
   uint32_t getBNpcBaseId() const;
   uint32_t getBNpcNameId() const;
