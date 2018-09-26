@@ -458,7 +458,8 @@ void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, u
 
       effectPacket->addEffect( effectEntry );
 
-      if( actionInfoPtr->castType == 1 && actionInfoPtr->effectRange != 0 || actionInfoPtr->castType != 1 )
+      if( ( actionInfoPtr->castType == 1 && actionInfoPtr->effectRange != 0 ) ||
+	  ( actionInfoPtr->castType != 1 ) )
       {
         // If action on this specific target is valid...
         if( isPlayer() && !ActionCollision::isActorApplicable( target, TargetFilter::Enemies ) )
@@ -518,7 +519,7 @@ void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, u
 
       effectPacket->addEffect( effectEntry );
 
-      if( actionInfoPtr->castType == 1 && actionInfoPtr->effectRange != 0 || actionInfoPtr->castType != 1 )
+      if( ( actionInfoPtr->castType == 1 && actionInfoPtr->effectRange != 0 ) || actionInfoPtr->castType != 1 )
       {
         if( isPlayer() && !ActionCollision::isActorApplicable( target, TargetFilter::Allies ) )
           break;

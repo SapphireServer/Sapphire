@@ -207,7 +207,7 @@ boost::shared_ptr< Mysql::PreparedStatement > Core::Db::DbConnection::getPrepare
   assert( index < m_stmts.size() );
   auto ret = m_stmts[ index ];
   if( !ret )
-    nullptr;
+    return nullptr;
 
   return ret;
 }
