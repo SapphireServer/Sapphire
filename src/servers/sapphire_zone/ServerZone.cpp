@@ -216,7 +216,7 @@ void Core::ServerZone::mainLoop()
 
   while( isRunning() )
   {
-    this_thread::sleep_for( chrono::milliseconds( 50 ) );
+    std::this_thread::sleep_for( std::chrono::milliseconds( 50 ) );
 
     auto currTime = Util::getTimeSeconds();
 
@@ -224,7 +224,7 @@ void Core::ServerZone::mainLoop()
 
     pScriptMgr->update();
 
-    lock_guard< std::mutex > lock( m_sessionMutex );
+    std::lock_guard< std::mutex > lock( m_sessionMutex );
     for( auto sessionIt : m_sessionMapById )
     {
       auto session = sessionIt.second;
