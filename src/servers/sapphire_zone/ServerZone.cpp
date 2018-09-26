@@ -29,6 +29,7 @@
 #include "ForwardsZone.h"
 
 #include <boost/make_shared.hpp>
+#include <boost/lexical_cast.hpp>
 #include <thread>
 
 #include "Framework.h"
