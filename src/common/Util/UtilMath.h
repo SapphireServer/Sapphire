@@ -27,22 +27,18 @@ uint16_t floatToUInt16Rot( float val );
 
 uint8_t floatToUInt8Rot( float val );
 
-template
-  < typename T >
+template < typename T >
 T clamp( T val, T minimum, T maximum )
 {
   if( val > maximum )
-  {
     return maximum;
-  }
 
   if( val < minimum )
-  {
     return minimum;
-  }
 
   return val;
 }
+
 }
 }
 }

@@ -4,7 +4,6 @@
 #include <cstdint>
 #include <vector>
 
-#include <boost/make_shared.hpp>
 #include "CommonGen.h"
 
 // +---------------------------------------------------------------------------
@@ -27,8 +26,7 @@ struct FFXIVARR_POSITION3
   float z;
 };
 
-enum InventoryOperation :
-  uint8_t
+enum InventoryOperation : uint8_t
 {
   Discard = 0x07,
   Move = 0x08,
@@ -37,8 +35,7 @@ enum InventoryOperation :
   Split = 0x0A
 };
 
-enum ClientLanguage :
-  uint8_t
+enum ClientLanguage : uint8_t
 {
   Japanese = 1,
   English = 2,
@@ -46,8 +43,7 @@ enum ClientLanguage :
   French = 8
 };
 
-enum ObjKind :
-  uint8_t
+enum ObjKind : uint8_t
 {
   None = 0x00,
   Player = 0x01,
@@ -66,15 +62,13 @@ enum ObjKind :
   CardStand = 0x0E,
 };
 
-enum Stance :
-  uint8_t
+enum Stance : uint8_t
 {
   Passive = 0,
   Active = 1,
 };
 
-enum class DisplayFlags :
-  uint16_t
+enum class DisplayFlags : uint16_t
 {
   ActiveStance = 0x001,
   Invisible = 0x020,
@@ -84,8 +78,7 @@ enum class DisplayFlags :
   Visor = 0x800,
 };
 
-enum struct ActorStatus :
-  uint8_t
+enum struct ActorStatus : uint8_t
 {
   Idle = 0x01,
   Dead = 0x02,
@@ -99,8 +92,7 @@ enum struct ActorStatus :
   EmoteMode = 0x0B
 };
 
-enum GearSetSlot :
-  uint8_t
+enum GearSetSlot : uint8_t
 {
   MainHand = 0,
   OffHand = 1,
@@ -173,8 +165,7 @@ enum EquipSlotCategory : uint8_t
     BodyDisallowLegsFeet = 21,
 };
 
-enum InventoryType :
-  uint16_t
+enum InventoryType : uint16_t
 {
   Bag0 = 0,
   Bag1 = 1,
@@ -226,8 +217,7 @@ enum InventoryType :
   FreeCompanyCrystal = 22001
 };
 
-enum ContainerType :
-  uint16_t
+enum ContainerType : uint16_t
 {
   Unknown = 0,
   Bag = 1,
@@ -237,8 +227,7 @@ enum ContainerType :
 };
 
 
-enum CurrencyType :
-  uint8_t
+enum CurrencyType : uint8_t
 {
   Gil = 0x01,
   StormSeal = 0x02,
@@ -256,8 +245,7 @@ enum CurrencyType :
   TomestoneLore = 0x0E
 };
 
-enum CrystalType :
-  uint8_t
+enum CrystalType : uint8_t
 {
   FireShard = 0x01,
   IceShard = 0x02,
@@ -281,8 +269,7 @@ enum CrystalType :
   WaterCluster = 0x12
 };
 
-enum struct ZoneingType :
-  uint8_t
+enum struct ZoneingType : uint8_t
 {
   None = 1,
   Teleport = 2,
@@ -291,24 +278,21 @@ enum struct ZoneingType :
   FadeIn = 5,
 };
 
-enum struct ResurrectType :
-  uint8_t
+enum struct ResurrectType : uint8_t
 {
   None = 0,
   RaiseSpell = 5,
   Return = 8
 };
 
-enum Gender :
-  uint8_t
+enum Gender : uint8_t
 {
   Male = 0,
   Female = 1,
 };
 
 
-enum struct GCRank :
-  uint8_t
+enum struct GCRank : uint8_t
 {
   None = 0,
   PrivateThirdClass = 1,

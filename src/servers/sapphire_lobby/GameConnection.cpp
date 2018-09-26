@@ -160,13 +160,13 @@ void Core::Network::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet, ui
         memset( &details, 0, sizeof( FFXIVIpcCharList::CharaDetails ) );
 
         auto& charEntry = charList[ charIndex ];
-        details.uniqueId = get< 1 >( charEntry );
-        details.contentId = get< 2 >( charEntry );
+        details.uniqueId = std::get< 1 >( charEntry );
+        details.contentId = std::get< 2 >( charEntry );
         details.serverId = g_serverLobby.getConfig()->getValue< uint16_t >( "Lobby.WorldID", 1 );
         details.serverId1 = g_serverLobby.getConfig()->getValue< uint16_t >( "Lobby.WorldID", 1 );
         details.index = charIndex;
-        strcpy( details.charDetailJson, get< 3 >( charEntry ).c_str() );
-        strcpy( details.nameChara, get< 0 >( charEntry ).c_str() );
+        strcpy( details.charDetailJson, std::get< 3 >( charEntry ).c_str() );
+        strcpy( details.nameChara, std::get< 0 >( charEntry ).c_str() );
         strcpy( details.nameServer,
                 g_serverLobby.getConfig()->getValue< std::string >( "Lobby.WorldName", "Sapphire" ).c_str() );
         strcpy( details.nameServer1,
@@ -175,10 +175,10 @@ void Core::Network::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet, ui
         charListPacket->data().charaDetails[ j ] = details;
 
         g_log.debug( "[" + std::to_string( charIndex ) + "] " + std::to_string( details.index ) + " - "
-                     + get< 0 >( charEntry ) + " - " +
-                     std::to_string( get< 1 >( charEntry ) ) + " - " +
-                     std::to_string( get< 2 >( charEntry ) ) + " - " +
-                     get< 3 >( charEntry ) );
+                     + std::get< 0 >( charEntry ) + " - " +
+                     std::to_string( std::get< 1 >( charEntry ) ) + " - " +
+                     std::to_string( std::get< 2 >( charEntry ) ) + " - " +
+                     std::get< 3 >( charEntry ) );
       }
       charIndex++;
     }
@@ -215,12 +215,12 @@ void Core::Network::GameConnection::enterWorld( FFXIVARR_PACKET_RAW& packet, uin
   auto charList = g_restConnector.getCharList( ( char* ) m_pSession->getSessionId() );
   for( uint32_t i = 0; i < charList.size(); i++ )
   {
-    uint64_t thisContentId = get< 2 >( charList[ i ] );
+    uint64_t thisContentId = std::get< 2 >( charList[ i ] );
 
     if( thisContentId == lookupId )
     {
-      logInCharId = get< 1 >( charList[ i ] );
-      logInCharName = get< 0 >( charList[ i ] );
+      logInCharId = std::get< 1 >( charList[ i ] );
+      logInCharName = std::get< 0 >( charList[ i ] );
       break;
     }
   }

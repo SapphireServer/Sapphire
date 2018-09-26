@@ -141,13 +141,13 @@ bool Core::Scripting::ScriptMgr::loadDir( const std::string& dirname, std::set< 
   boost::filesystem::directory_iterator iter( targetDir );
   boost::filesystem::directory_iterator eod;
 
-  BOOST_FOREACH( boost::filesystem::path const& i, make_pair( iter, eod ) )
-        {
-          if( is_regular_file( i ) && boost::filesystem::extension( i.string() ) == ext )
-          {
-            files.insert( i.string() );
-          }
-        }
+  BOOST_FOREACH( boost::filesystem::path const& i, std::make_pair( iter, eod ) )
+  {
+    if( is_regular_file( i ) && boost::filesystem::extension( i.string() ) == ext )
+    {
+      files.insert( i.string() );
+    }
+  }
 
   if( files.size() )
     return true;
