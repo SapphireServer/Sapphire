@@ -18,8 +18,7 @@ struct SceneResult
 class EventHandler
 {
 public:
-  enum EventType :
-    uint8_t
+  enum EventType : uint8_t
   {
     Talk = 1,
     Emote = 2,
@@ -45,8 +44,7 @@ public:
     TableGame = 24,
   };
 
-  enum EventHandlerType :
-    uint16_t
+  enum EventHandlerType : uint16_t
   {
     Quest = 0x0001,
     Warp = 0x0002,

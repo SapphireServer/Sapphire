@@ -17,8 +17,7 @@
 namespace Core {
 namespace Network {
 
-class GameConnection :
-  public Connection
+class GameConnection : public Connection
 {
 
 private:

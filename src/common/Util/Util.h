@@ -2,7 +2,7 @@
 #define _UTIL_H
 
 #include <stdint.h>
-#include <boost/format.hpp>
+#include <string>
 
 namespace Core {
 namespace Util {

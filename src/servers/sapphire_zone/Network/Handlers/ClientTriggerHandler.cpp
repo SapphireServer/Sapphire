@@ -53,7 +53,14 @@ void examineHandler( Core::Entity::Player& player, uint32_t targetId )
     auto pTarget = pSession->getPlayer();
     if( pTarget )
     {
-      player.queuePacket( boost::make_shared< ExaminePacket >( player, pTarget ) );
+      if( pTarget->isActingAsGm() || pTarget->getZoneId() != player.getZoneId() )
+      {
+        player.queuePacket( makeActorControl142( player.getId(), ActorControlType::ExamineError ) );
+      }
+      else
+      {
+        player.queuePacket( boost::make_shared< ExaminePacket >( player, pTarget ) );
+      }
     }
   }
 }

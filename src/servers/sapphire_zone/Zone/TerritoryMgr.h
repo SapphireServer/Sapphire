@@ -95,7 +95,7 @@ public:
   /*! creates a new instance for a given territoryTypeId */
   ZonePtr createTerritoryInstance( uint32_t territoryTypeId );
 
-  ZonePtr createInstanceContent( uint32_t instanceContentId );
+  ZonePtr createInstanceContent( uint32_t contentFinderConditionId );
 
   /*! removes instance by instanceId, return true if successful */
   bool removeTerritoryInstance( uint32_t territoryTypeId );

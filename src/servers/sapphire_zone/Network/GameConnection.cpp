@@ -401,7 +401,7 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
       case SEGMENTTYPE_SESSIONINIT:
       {
         char* id = ( char* ) &( inPacket.data[ 4 ] );
-        uint32_t playerId = boost::lexical_cast< uint32_t >( id );
+        uint32_t playerId = std::stoi( id );
         auto pCon = boost::static_pointer_cast< GameConnection, Connection >( shared_from_this() );
 
         // try to retrieve the session for this id

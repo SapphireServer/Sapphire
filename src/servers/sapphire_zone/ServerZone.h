@@ -9,8 +9,6 @@
 
 #include "ForwardsZone.h"
 
-#include "Actor/BNpcTemplate.h"
-
 namespace Core {
 
 class ServerZone
