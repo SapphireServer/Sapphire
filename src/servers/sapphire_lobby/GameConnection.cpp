@@ -160,22 +160,25 @@ void Core::Network::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet, ui
         memset( &details, 0, sizeof( FFXIVIpcCharList::CharaDetails ) );
 
         auto& charEntry = charList[ charIndex ];
-        details.uniqueId = get< 1 >( charEntry );
-        details.contentId = get< 2 >( charEntry );
+        details.uniqueId = std::get< 1 >( charEntry );
+        details.contentId = std::get< 2 >( charEntry );
         details.serverId = g_serverLobby.getConfig()->getValue< uint16_t >( "Lobby.WorldID", 1 );
+        details.serverId1 = g_serverLobby.getConfig()->getValue< uint16_t >( "Lobby.WorldID", 1 );
         details.index = charIndex;
-        strcpy( details.charDetailJson, get< 3 >( charEntry ).c_str() );
-        strcpy( details.nameChara, get< 0 >( charEntry ).c_str() );
+        strcpy( details.charDetailJson, std::get< 3 >( charEntry ).c_str() );
+        strcpy( details.nameChara, std::get< 0 >( charEntry ).c_str() );
         strcpy( details.nameServer,
+                g_serverLobby.getConfig()->getValue< std::string >( "Lobby.WorldName", "Sapphire" ).c_str() );
+        strcpy( details.nameServer1,
                 g_serverLobby.getConfig()->getValue< std::string >( "Lobby.WorldName", "Sapphire" ).c_str() );
 
         charListPacket->data().charaDetails[ j ] = details;
 
         g_log.debug( "[" + std::to_string( charIndex ) + "] " + std::to_string( details.index ) + " - "
-                     + get< 0 >( charEntry ) + " - " +
-                     std::to_string( get< 1 >( charEntry ) ) + " - " +
-                     std::to_string( get< 2 >( charEntry ) ) + " - " +
-                     get< 3 >( charEntry ) );
+                     + std::get< 0 >( charEntry ) + " - " +
+                     std::to_string( std::get< 1 >( charEntry ) ) + " - " +
+                     std::to_string( std::get< 2 >( charEntry ) ) + " - " +
+                     std::get< 3 >( charEntry ) );
       }
       charIndex++;
     }
@@ -212,12 +215,12 @@ void Core::Network::GameConnection::enterWorld( FFXIVARR_PACKET_RAW& packet, uin
   auto charList = g_restConnector.getCharList( ( char* ) m_pSession->getSessionId() );
   for( uint32_t i = 0; i < charList.size(); i++ )
   {
-    uint64_t thisContentId = get< 2 >( charList[ i ] );
+    uint64_t thisContentId = std::get< 2 >( charList[ i ] );
 
     if( thisContentId == lookupId )
     {
-      logInCharId = get< 1 >( charList[ i ] );
-      logInCharName = get< 0 >( charList[ i ] );
+      logInCharId = std::get< 1 >( charList[ i ] );
+      logInCharName = std::get< 0 >( charList[ i ] );
       break;
     }
   }
@@ -342,6 +345,8 @@ bool Core::Network::GameConnection::createOrModifyChar( FFXIVARR_PACKET_RAW& pac
       strcpy( charCreatePacket->data().name, name.c_str() );
       strcpy( charCreatePacket->data().world,
               g_serverLobby.getConfig()->getValue< std::string >( "Lobby.WorldName", "Sapphire" ).c_str() );
+      strcpy( charCreatePacket->data().world2,
+              g_serverLobby.getConfig()->getValue< std::string >( "Lobby.WorldName", "Sapphire" ).c_str() );
       charCreatePacket->data().type = 2;
       charCreatePacket->data().seq = sequence;
       charCreatePacket->data().unknown = 1;
@@ -465,8 +470,8 @@ void Core::Network::GameConnection::generateEncryptionKey( uint32_t key, const s
   m_baseKey[ 2 ] = 0x34;
   m_baseKey[ 3 ] = 0x12;
   memcpy( m_baseKey + 0x04, &key, 4 );
-  m_baseKey[ 8 ] = 0xCC;
-  m_baseKey[ 9 ] = 0x10;
+  m_baseKey[ 8 ] = 0x30;
+  m_baseKey[ 9 ] = 0x11;
   memcpy( ( char* ) m_baseKey + 0x0C, keyPhrase.c_str(), keyPhrase.size() );
   Core::Util::md5( m_baseKey, m_encKey, 0x2C );
 }

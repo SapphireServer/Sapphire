@@ -96,7 +96,7 @@ uint32_t Core::Event::mapEventActorToRealActor( uint32_t eventActorId )
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
   auto levelInfo = pExdData->get< Core::Data::Level >( eventActorId );
   if( levelInfo )
-    return levelInfo->objectKey;
+    return levelInfo->object;
 
   return 0;
 }

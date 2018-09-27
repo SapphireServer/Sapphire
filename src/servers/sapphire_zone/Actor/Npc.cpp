@@ -4,7 +4,7 @@
 #include <Exd/ExdDataGenerated.h>
 #include <utility>
 #include <Network/CommonActorControl.h>
-#include <sapphire_zone/Network/PacketWrappers/EffectPacket.h>
+
 
 #include "Forwards.h"
 #include "Action/Action.h"
@@ -16,6 +16,7 @@
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 #include "Network/PacketWrappers/ActorControlPacket144.h"
 #include "Network/PacketWrappers/UpdateHpMpTpPacket.h"
+#include "Network/PacketWrappers/EffectPacket.h"
 
 #include "StatusEffect/StatusEffect.h"
 #include "Action/ActionCollision.h"

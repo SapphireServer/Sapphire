@@ -49,7 +49,7 @@ enum ServerZoneIpcType :
 {
 
   // static opcode ( the ones that rarely, if ever, change )
-    Ping = 0x0065,
+  Ping = 0x0065,
   Init = 0x0066,
 
   ActorFreeSpawn = 0x0191,
@@ -64,7 +64,7 @@ enum ServerZoneIpcType :
   ///////////////////////////////////////////////////
 
   ChatBanned = 0x006B,
-  Logout = 0x0077, // updated 4.3
+  Logout = 0x0077, // updated 4.4
   CFNotify = 0x0078,
   CFMemberStatus = 0x0079,
   CFDutyInfo = 0x007A,
@@ -79,126 +79,126 @@ enum ServerZoneIpcType :
 
 
   Playtime = 0x00F5, // updated 4.3
-  Chat = 0x00F7, // updated 4.3
-  SocialList = 0x00FD, // updated 4.3
+  Chat = 0x00F4, // updated 4.4
+  SocialList = 0x00FB, // updated 4.4
 
-  UpdateSearchInfo = 0x0100, // updated 4.3
-  InitSearchInfo = 0x0101, // updated 4.3
+  UpdateSearchInfo = 0x00FE, // updated 4.4
+  InitSearchInfo = 0x00FF, // updated 4.4
   ExamineSearchComment = 0x0102, // updated 4.1
 
-  ServerNotice = 0x0106, // updated 4.3
-  SetOnlineStatus = 0x0107, // updated 4.3
+  ServerNotice = 0x0104, // updated 4.4
+  SetOnlineStatus = 0x0105, // updated 4.4
 
 
-  CountdownInitiate = 0x0111, // updated 4.3
-  CountdownCancel = 0x0112, // updated 4.3
+  CountdownInitiate = 0x010C, // updated 4.4
+  CountdownCancel = 0x010D, // updated 4.4
 
-  BlackList = 0x0115, // updated 4.3
+  BlackList = 0x0110, // updated 4.4
 
   LogMessage = 0x00D0,
 
-  LinkshellList = 0x011C, // updated 4.3
+  LinkshellList = 0x0117, // updated 4.4
 
   ExamineFreeCompanyInfo = 0x013A, // updated 4.1
-  CharaFreeCompanyTag = 0x013B, // updated 4.3
-  FreeCompanyBoardMsg = 0x013C, // updated 4.3
-  FreeCompanyInfo = 0x013D, // updated 4.3
+  CharaFreeCompanyTag = 0x0127, // updated 4.4
+  FreeCompanyBoardMsg = 0x0128, // updated 4.4
+  FreeCompanyInfo = 0x0129, // updated 4.4
 
-  StatusEffectList = 0x014E, // updated 4.3
-  Effect = 0x0151, // updated 4.3
-  AoeEffect8 = 0x0154, // updated 4.3
-  AoeEffect16 = 0x0155, // updated 4.3
-  AoeEffect24 = 0x0156, // updated 4.3
-  AoeEffect32 = 0x0157, // updated 4.3
-  PersistantEffect = 0x0158, // updated 4.3
+  StatusEffectList = 0x0149, // updated 4.4
+  Effect = 0x014C, // updated 4.4
+  AoeEffect8 = 0x014F, // updated 4.4
+  AoeEffect16 = 0x0150, // updated 4.4
+  AoeEffect24 = 0x0151, // updated 4.4
+  AoeEffect32 = 0x0152, // updated 4.4
+  PersistantEffect = 0x0153, // updated 4.4
 
-  GCAffiliation = 0x0162, // updated 4.3
+  GCAffiliation = 0x015D, // updated 4.4
 
-  PlayerSpawn = 0x0172, // updated 4.3
-  NpcSpawn = 0x0173, // updated 4.3
-  ActorMove = 0x0174, // updated 4.3
-  ActorSetPos = 0x0176, // updated 4.3
+  PlayerSpawn = 0x016D, // updated 4.4
+  NpcSpawn = 0x016E, // updated 4.4
+  ActorMove = 0x0170, // updated 4.4
+  ActorSetPos = 0x0172, // updated 4.4
 
-  ActorCast = 0x0178, // updated 4.3
+  ActorCast = 0x0174, // updated 4.4
 
-  PartyList = 0x017A, // updated 4.3
-  HateList = 0x017B, // updated 4.3
+  PartyList = 0x0176, // updated 4.4
+  HateList = 0x0177, // updated 4.4
 
-  ObjectSpawn = 0x017D, // updated 4.3
-  ObjectDespawn = 0x017E, // updated 4.3
+  ObjectSpawn = 0x0179, // updated 4.4
+  ObjectDespawn = 0x017A, // updated 4.4
 
-  SetLevelSync = 0x017F, // updated 4.3
-  SilentSetClassJob = 0x0180, // updated 4.3 - seems to be the case, not sure if it's actually used for anything
+  SetLevelSync = 0x017B, // updated 4.4
+  SilentSetClassJob = 0x017C, // updated 4.4 - seems to be the case, not sure if it's actually used for anything
 
-  InitUI = 0x0181, // updated 4.3
-  PlayerStats = 0x0182, // updated 4.3
-  ActorOwner = 0x0183, // updated 4.3 ?
-  PlayerStateFlags = 0x0184, // updated 4.3
-  PlayerClassInfo = 0x0185, // updated 4.3
-  ModelEquip = 0x0186, // updated 4.3
-  Examine = 0x0187, // updated 4.3
-  CharaNameReq = 0x0189, // updated 4.3
-  UpdateClassInfo = 0x018A, // updated 4.3
+  InitUI = 0x017D, // updated 4.4
+  PlayerStats = 0x017E, // updated 4.4
+  ActorOwner = 0x017F, // updated 4.4 ?
+  PlayerStateFlags = 0x0180, // updated 4.4
+  PlayerClassInfo = 0x0181, // updated 4.4
+  ModelEquip = 0x0182, // updated 4.4
+  Examine = 0x0183, // updated 4.4
+  CharaNameReq = 0x0185, // updated 4.4
+  UpdateClassInfo = 0x0186, // updated 4.4
 
-  ItemInfo = 0x0190, // updated 4.3
-  ContainerInfo = 0x0192, // updated 4.3
-  InventoryTransactionFinish = 0x0193, // updated 4.3
-  InventoryTransaction = 0x0194, // updated 4.3
-  CurrencyCrystalInfo = 0x0195, // updated 4.3
-  InventoryActionAck = 0x0197, // updated 4.3
-  UpdateInventorySlot = 0x0198, // updated 4.3
+  ItemInfo = 0x018C, // updated 4.4
+  ContainerInfo = 0x018D, // updated 4.4
+  InventoryTransactionFinish = 0x018E, // updated 4.4
+  InventoryTransaction = 0x018F, // updated 4.4
+  CurrencyCrystalInfo = 0x0190, // updated 4.4
+  InventoryActionAck = 0x0193, // updated 4.4
+  UpdateInventorySlot = 0x0194, // updated 4.4
 
-  EventPlay = 0x01A6, // updated 4.3
-  EventOpenGilShop = 0x01AD, // updated 4.3
-  DirectorPlayScene = 0x01AA, // updated 4.3
+  EventPlay = 0x01A2, // updated 4.4
+  EventOpenGilShop = 0x01A9, // updated 4.4
+  DirectorPlayScene = 0x01A6, // updated 4.4
 
-  EventStart = 0x01AF, // updated 4.3
-  EventFinish = 0x01B0, // updated 4.3
+  EventStart = 0x01AB, // updated 4.4
+  EventFinish = 0x01AC, // updated 4.4
 
   EventLinkshell = 0x1169,
 
-  QuestActiveList = 0x01C3, // updated 4.3
-  QuestUpdate = 0x01C4, // updated 4.3
-  QuestCompleteList = 0x01C5, // updated 4.3
+  QuestActiveList = 0x01BF, // updated 4.4
+  QuestUpdate = 0x01C0, // updated 4.4
+  QuestCompleteList = 0x01C1, // updated 4.4
 
-  QuestFinish = 0x01C6, // updated 4.3
-  MSQTrackerComplete = 0x01C7, // updated 4.3
-  MSQTrackerProgress = 0x01C8, // updated 4.3
+  QuestFinish = 0x01C2, // updated 4.4
+  MSQTrackerComplete = 0x01C3, // updated 4.4
+  MSQTrackerProgress = 0x01C4, // updated 4.4
 
-  QuestMessage = 0x01CE, // updated 4.3
+  QuestMessage = 0x01CA, // updated 4.4
 
-  QuestTracker = 0x01D3, // updated 4.3
+  QuestTracker = 0x01CF, // updated 4.4
 
-  Mount = 0x01E3, // updated 4.3
+  Mount = 0x01DF, // updated 4.4
 
-  DirectorVars = 0x01E5, // updated 4.3
+  DirectorVars = 0x01E1, // updated 4.4
 
   CFAvailableContents = 0x01FD, // updated 4.2
 
-  WeatherChange = 0x0200, // updated 4.3
-  PlayerTitleList = 0x0201, // updated 4.3
-  Discovery = 0x0202, // updated 4.3
+  WeatherChange = 0x01FC, // updated 4.4
+  PlayerTitleList = 0x01FD, // updated 4.4
+  Discovery = 0x01FE, // updated 4.4
 
-  EorzeaTimeOffset = 0x0204, // updated 4.3
+  EorzeaTimeOffset = 0x01FF, // updated 4.4
 
-  EquipDisplayFlags = 0x0210, // updated 4.3
+  EquipDisplayFlags = 0x020C, // updated 4.4
 
-  WardInfo = 0x0224, // updated 4.3
-  WardHousingPermission = 0x022D, // updated 4.3
-  WardYardInfo = 0x022F, // updated 4.3
+  WardInfo = 0x0220, // updated 4.4
+  WardHousingPermission = 0x0229, // updated 4.4
+  WardYardInfo = 0x022B, // updated 4.4
 
   DuelChallenge = 0x0277, // 4.2; this is responsible for opening the ui
   PerformNote = 0x0286, // updated 4.3
 
-  PrepareZoning = 0x0291, // updated 4.3
+  PrepareZoning = 0x028F, // updated 4.4
   ActorGauge = 0x0292, // updated 4.3
 
 
 
   // Unknown IPC types that still need to be sent
   // TODO: figure all these out properly
-  IPCTYPE_UNK_320 = 0x024C, // updated 4.3
-  IPCTYPE_UNK_322 = 0x024E, // updated 4.3
+  IPCTYPE_UNK_320 = 0x0249, // updated 4.4
+  IPCTYPE_UNK_322 = 0x024B, // updated 4.4
 
 };
 
@@ -249,40 +249,40 @@ enum ClientZoneIpcType :
 
   ReqJoinNoviceNetwork = 0x0129, // updated 4.2
 
-  ReqCountdownInitiate = 0x0138, // updated 4.3
-  ReqCountdownCancel = 0x0139, // updated 4.3
-  ClearWaymarks = 0x013A, // updated 4.3
+  ReqCountdownInitiate = 0x012F, // updated 4.4
+  ReqCountdownCancel = 0x0130, // updated 4.4
+  ClearWaymarks = 0x0131, // updated 4.4
 
-  ZoneLineHandler = 0x013C, // updated 4.3
-  ClientTrigger = 0x013D, // updated 4.3
-  DiscoveryHandler = 0x013E, // updated 4.3
+  ZoneLineHandler = 0x0133, // updated 4.4
+  ClientTrigger = 0x0134, // updated 4.4 was 13D in 4.3
+  DiscoveryHandler = 0x0135, // updated 4.4
 
   AddWaymark = 0x013F, // updated 4.3
 
-  SkillHandler = 0x0140, // updated 4.3
-  GMCommand1 = 0x0141, // updated 4.3
-  GMCommand2 = 0x0142, // updated 4.3
+  SkillHandler = 0x0137, // updated 4.4
+  GMCommand1 = 0x0138, // updated 4.4
+  GMCommand2 = 0x0139, // updated 4.4
 
-  UpdatePositionHandler = 0x0144, // updated 4.3
+  UpdatePositionHandler = 0x013B, // updated 4.4 was 144
   UpdatePositionInstance = 0x0183, // updated 4.3
 
-  InventoryModifyHandler = 0x014B, // updated 4.3
+  InventoryModifyHandler = 0x0142, // updated 4.4
 
-  TalkEventHandler = 0x0154, // updated 4.3
-  EmoteEventHandler = 0x0155, // updated 4.3
-  WithinRangeEventHandler = 0x0156, // updated 4.3
-  OutOfRangeEventHandler = 0x0157, // updated 4.3
-  EnterTeriEventHandler = 0x0158, // updated 4.3
+  TalkEventHandler = 0x014B, // updated 4.4
+  EmoteEventHandler = 0x014C, // updated 4.4
+  WithinRangeEventHandler = 0x014D, // updated 4.4
+  OutOfRangeEventHandler = 0x014E, // updated 4.4
+  EnterTeriEventHandler = 0x014F, // updated 4.4
 
-  ReturnEventHandler = 0x015D, // updated 4.3
-  TradeReturnEventHandler = 0x015E, // updated 4.3
+  ReturnEventHandler = 0x0154, // updated 4.4
+  TradeReturnEventHandler = 0x0155, // updated 4.4
 
   LinkshellEventHandler = 0x0150, // updated 4.1 ??
   LinkshellEventHandler1 = 0x0151, // updated 4.1 ??
 
   PerformNoteHandler = 0x029B, // updated 4.3
 
-  ReqEquipDisplayFlagsChange = 0x0178, // updated 4.3
+  ReqEquipDisplayFlagsChange = 0x016F, // updated 4.4
 
 
 };

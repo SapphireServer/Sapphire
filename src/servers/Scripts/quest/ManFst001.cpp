@@ -1,7 +1,7 @@
 #include <Actor/Player.h>
-#include <sapphire_zone/Event/EventHandler.h>
 #include <ScriptObject.h>
 #include "Event/EventHelper.h"
+#include "Event/EventHandler.h"
 
 // Quest Script: ManFst001_00039
 // Quest Name: Coming to Gridania

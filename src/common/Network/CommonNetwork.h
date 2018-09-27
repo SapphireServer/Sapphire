@@ -5,8 +5,6 @@
 #include <vector>
 #include "PacketDef/Ipcs.h"
 
-using namespace std;
-
 namespace Core {
 namespace Network {
 namespace Packets {
@@ -70,12 +68,12 @@ struct FFXIVARR_PACKET_HEADER
   uint32_t unknown_24;
 };
 
-inline ostream& operator<<( ostream& os, const FFXIVARR_PACKET_HEADER& hdr )
+inline std::ostream& operator<<( std::ostream& os, const FFXIVARR_PACKET_HEADER& hdr )
 {
   return os.write( reinterpret_cast< const char* >( &hdr ), sizeof hdr );
 }
 
-inline istream& operator>>( istream& is, FFXIVARR_PACKET_HEADER& hdr )
+inline std::istream& operator>>( std::istream& is, FFXIVARR_PACKET_HEADER& hdr )
 {
   return is.read( reinterpret_cast< char* >( &hdr ), sizeof hdr );
 }
@@ -108,12 +106,12 @@ struct FFXIVARR_PACKET_SEGMENT_HEADER
   uint16_t padding;
 };
 
-inline ostream& operator<<( ostream& os, const FFXIVARR_PACKET_SEGMENT_HEADER& hdr )
+inline std::ostream& operator<<( std::ostream& os, const FFXIVARR_PACKET_SEGMENT_HEADER& hdr )
 {
   return os.write( reinterpret_cast< const char* >( &hdr ), sizeof hdr );
 }
 
-inline istream& operator>>( istream& is, FFXIVARR_PACKET_SEGMENT_HEADER& hdr )
+inline std::istream& operator>>( std::istream& is, FFXIVARR_PACKET_SEGMENT_HEADER& hdr )
 {
   return is.read( reinterpret_cast< char* >( &hdr ), sizeof hdr );
 }
@@ -145,7 +143,7 @@ enum FFXIVARR_SEGMENT_TYPE
   SEGMENTTYPE_IPC = 3,
   SEGMENTTYPE_KEEPALIVE = 7,
   //SEGMENTTYPE_RESPONSE = 8,
-    SEGMENTTYPE_ENCRYPTIONINIT = 9,
+  SEGMENTTYPE_ENCRYPTIONINIT = 9,
 };
 
 /**
@@ -171,12 +169,12 @@ struct FFXIVARR_IPC_HEADER
   uint32_t padding1;
 };
 
-inline ostream& operator<<( ostream& os, const FFXIVARR_IPC_HEADER& hdr )
+inline std::ostream& operator<<( std::ostream& os, const FFXIVARR_IPC_HEADER& hdr )
 {
   return os.write( reinterpret_cast< const char* >( &hdr ), sizeof hdr );
 }
 
-inline istream& operator>>( istream& is, FFXIVARR_IPC_HEADER& hdr )
+inline std::istream& operator>>( std::istream& is, FFXIVARR_IPC_HEADER& hdr )
 {
   return is.read( reinterpret_cast< char* >( &hdr ), sizeof hdr );
 }

@@ -120,6 +120,9 @@ void Core::Network::GameConnection::reqExamineSearchCommentHandler( const Core::
 
     if( pPlayer )
     {
+      if( pPlayer->isActingAsGm() || pPlayer->getZoneId() != player.getZoneId() )
+        return;
+
       // retail sends the requester's id as both (isForSelf)
       auto searchInfoPacket = makeZonePacket< FFXIVIpcExamineSearchComment >( player.getId() );
       searchInfoPacket->data().charId = targetId;
@@ -144,6 +147,9 @@ void Core::Network::GameConnection::reqExamineFcInfo( const Core::Network::Packe
 
     if( pPlayer )
     {
+      if( pPlayer->isActingAsGm() || pPlayer->getZoneId() != player.getZoneId() )
+        return;
+
       // retail sends the requester's id as both (isForSelf)
       auto examineFcInfoPacket = makeZonePacket< FFXIVIpcExamineFreeCompanyInfo >( player.getId() );
       examineFcInfoPacket->data().charId = targetId;
@@ -365,7 +371,7 @@ void Core::Network::GameConnection::discoveryHandler( const Core::Network::Packe
 
   if( !pQR->next() )
   {
-    player.sendNotice( "Discovery ref pos ID: " + std::to_string( positionRef ) + " not found. " );
+    player.sendDebug( "Discovery ref pos ID: " + std::to_string( positionRef ) + " not found. " );
     return;
   }
 
@@ -374,7 +380,7 @@ void Core::Network::GameConnection::discoveryHandler( const Core::Network::Packe
   discoveryPacket->data().map_part_id = pQR->getUInt( 3 );
 
   player.queuePacket( discoveryPacket );
-  player.sendNotice( "Discovery ref pos ID: " + std::to_string( positionRef ) );
+  player.sendDebug( "Discovery ref pos ID: " + std::to_string( positionRef ) );
 
   player.discover( pQR->getUInt16( 2 ), pQR->getUInt16( 3 ) );
 

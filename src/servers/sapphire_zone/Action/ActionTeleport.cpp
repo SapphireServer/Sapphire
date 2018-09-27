@@ -2,11 +2,11 @@
 #include <Exd/ExdDataGenerated.h>
 #include <Logging/Logger.h>
 #include <Network/CommonActorControl.h>
-#include <sapphire_zone/Network/PacketWrappers/EffectPacket.h>
 #include <Util/UtilMath.h>
 
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
+#include "Network/PacketWrappers/EffectPacket.h"
 
 #include "Actor/Player.h"
 

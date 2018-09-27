@@ -9,8 +9,7 @@ namespace Core {
 namespace Data {
 struct InstanceContent;
 }
-class InstanceContent :
-  public Event::Director, public Zone
+class InstanceContent : public Event::Director, public Zone
 {
 public:
   enum InstanceContentState
@@ -22,6 +21,7 @@ public:
   };
 
   InstanceContent( boost::shared_ptr< Core::Data::InstanceContent > pInstanceConfiguration,
+                   uint16_t territoryType,
                    uint32_t guId,
                    const std::string& internalName,
                    const std::string& contentName,

@@ -446,15 +446,18 @@ struct FFXIVIpcPlayerSpawn :
   uint16_t u1b;
   uint8_t u2b;
   uint8_t u2ab;
-  uint8_t gmRank;
+  uint8_t u3a;
   uint8_t u3b;
 
-  uint8_t u3a;
-  uint8_t onlineStatus;
+  uint8_t gmRank;
   uint8_t u3c;
-  uint8_t pose;
+  uint8_t u4;
+  uint8_t onlineStatus;
 
-  uint32_t u4;
+  uint8_t pose;
+  uint8_t u5a;
+  uint8_t u5b;
+  uint8_t u5c;
 
   uint64_t targetId;
   uint32_t u6;
@@ -691,8 +694,7 @@ struct FFXIVIpcUpdateClassInfo :
  * Structural representation of the packet sent by the server
  * to send the titles available to the player
  */
-struct FFXIVIpcPlayerTitleList :
-  FFXIVIpcBasePacket< PlayerTitleList >
+struct FFXIVIpcPlayerTitleList : FFXIVIpcBasePacket< PlayerTitleList >
 {
   uint8_t titleList[48];
 };
@@ -701,8 +703,7 @@ struct FFXIVIpcPlayerTitleList :
 * Structural representation of the packet sent by the server
 * to initialize a zone for the player
 */
-struct FFXIVIpcInitZone :
-  FFXIVIpcBasePacket< InitZone >
+struct FFXIVIpcInitZone : FFXIVIpcBasePacket< InitZone >
 {
   uint16_t serverId;
   uint16_t zoneId;
@@ -711,11 +712,14 @@ struct FFXIVIpcInitZone :
   uint32_t unknown3;
   uint32_t unknown4;
   uint8_t weatherId;
-  uint8_t bitmask;
-  uint16_t unknown5;
+  uint16_t bitmask;
+  uint8_t unknown5;
   uint16_t festivalId;
   uint16_t additionalFestivalId;
   uint32_t unknown8;
+  uint32_t unknown9;
+  uint32_t unknown10;
+  uint32_t unknown11;
   Common::FFXIVARR_POSITION3 pos;
 };
 
@@ -724,8 +728,7 @@ struct FFXIVIpcInitZone :
 * Structural representation of the packet sent by the server to initialize
 * the client UI upon initial connection.
 */
-struct FFXIVIpcInitUI :
-  FFXIVIpcBasePacket< InitUI >
+struct FFXIVIpcInitUI : FFXIVIpcBasePacket< InitUI >
 {
   // plain C types for a bit until the packet is actually fixed.
   // makes conversion between different editors easier.
@@ -756,11 +759,11 @@ struct FFXIVIpcInitUI :
   unsigned short unknown5E;
   unsigned short pvpFrontlineWeeklyCampaigns;
   unsigned short enhancedAnimaGlassProgress;
-  unsigned short unknown64[4]; // needs confirmation, probably pvp total/weeklies
+  unsigned short unknown64[4];
   unsigned short pvpRivalWingsTotalMatches;
   unsigned short pvpRivalWingsTotalVictories;
-  unsigned short pvpRivalWingsWeeklyMatches; // needs confirmation
-  unsigned short pvpRivalWingsWeeklyVictories; // needs confirmation
+  unsigned short pvpRivalWingsWeeklyMatches;
+  unsigned short pvpRivalWingsWeeklyVictories;
   unsigned char maxLevel;
   unsigned char expansion;
   unsigned char unknown76;
@@ -810,7 +813,7 @@ struct FFXIVIpcInitUI :
   unsigned char companionDefRank;
   unsigned char companionAttRank;
   unsigned char companionHealRank;
-  unsigned char mountGuideMask[16];
+  unsigned char mountGuideMask[17];
   char name[32];
   unsigned char unknownOword[16];
   unsigned char unknown258;
@@ -818,9 +821,9 @@ struct FFXIVIpcInitUI :
   unsigned char aetheryte[17];
   unsigned char discovery[421];
   unsigned char howto[33];
-  unsigned char minions[38];
+  unsigned char minions[40];
   unsigned char chocoboTaxiMask[8];
-  unsigned char watchedCutscenes[111];
+  unsigned char watchedCutscenes[115];
   unsigned char companionBardingMask[9];
   unsigned char companionEquippedHead;
   unsigned char companionEquippedBody;
@@ -840,12 +843,12 @@ struct FFXIVIpcInitUI :
   unsigned char unknownMask5C4[3];
   unsigned char unknown5C9[2];
   unsigned char challengeLogComplete[9];
-  unsigned char unknown5D4[9];
+  unsigned char unknown5D4[11];
   unsigned char unknownMask5DD[28];
   unsigned char relicCompletion[12];
   unsigned char sightseeingMask[26];
   unsigned char huntingMarkMask[55];
-  unsigned char tripleTriadCards[29];
+  unsigned char tripleTriadCards[30];
   unsigned char unknownMask673[10];
   unsigned char unknown67D;
   unsigned char aetherCurrentMask[22];
@@ -853,18 +856,17 @@ struct FFXIVIpcInitUI :
   unsigned char orchestrionMask[40];
   unsigned char hallOfNoviceCompleteMask[3];
   unsigned char animaCompletion[11];
-  unsigned char unknown6CD[3];
-  unsigned char unknownMask6C0[11];
-  unsigned char unknownMask6DB[13];
+  unsigned char unknown6CD[16];
+  unsigned char unknownMask6DB[11];
   unsigned char unlockedRaids[28];
   unsigned char unlockedDungeons[18];
   unsigned char unlockedGuildhests[10];
-  unsigned char unlockedTrials[7];
+  unsigned char unlockedTrials[8];
   unsigned char unlockedPvp[5];
   unsigned char clearedRaids[28];
   unsigned char clearedDungeons[18];
   unsigned char clearedGuildhests[10];
-  unsigned char clearedTrials[7];
+  unsigned char clearedTrials[8];
   unsigned char clearedPvp[5];
 
 };
