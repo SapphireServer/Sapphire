@@ -217,7 +217,8 @@ struct FFXIVIpcLinkshellList :
 struct FFXIVIpcReqMoogleMailList :
   FFXIVIpcBasePacket< ReqMoogleMailList >
 {
-  struct letterEntry {
+  struct letterEntry
+  {
     char unk[0x8];
     uint32_t timeStamp; // The time the mail was sent (this also seems to be used as a Id)
     char unk1[0x30]; // This should be items, gil, etc for the letter
