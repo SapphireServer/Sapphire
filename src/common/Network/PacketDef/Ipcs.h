@@ -98,6 +98,11 @@ enum ServerZoneIpcType :
   LogMessage = 0x00D0,
 
   LinkshellList = 0x0117, // updated 4.4
+  
+  MailDeleteRequest = 0x0118, // updated 4.4
+  ReqMoogleMailList = 0x0119, // updated 4.4
+  ReqMoogleMailLetter = 0x01A, // updated 4.4
+  MailLetterNotification = 0x011B, // updated 4.4
 
   ExamineFreeCompanyInfo = 0x013A, // updated 4.1
   CharaFreeCompanyTag = 0x0127, // updated 4.4
@@ -185,7 +190,7 @@ enum ServerZoneIpcType :
 
   WardInfo = 0x0220, // updated 4.4
   WardHousingPermission = 0x0229, // updated 4.4
-  WardYardInfo = 0x022B, // updated 4.4
+  WardYardInfo = 0x022C, // updated 4.4
 
   DuelChallenge = 0x0277, // 4.2; this is responsible for opening the ui
   PerformNote = 0x0286, // updated 4.3
