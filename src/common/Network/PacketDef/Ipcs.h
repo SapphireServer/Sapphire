@@ -184,7 +184,7 @@ enum ServerZoneIpcType :
   PlayerTitleList = 0x01FD, // updated 4.4
   Discovery = 0x01FE, // updated 4.4
 
-  EorzeaTimeOffset = 0x01FF, // updated 4.4
+  EorzeaTimeOffset = 0x0200, // updated 4.4
 
   EquipDisplayFlags = 0x020C, // updated 4.4
 
