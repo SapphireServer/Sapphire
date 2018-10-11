@@ -1630,6 +1630,22 @@ struct FFXIVIpcWardYardInfo :
   } object[100];
 };
 
+/**
+* Structural representation of the packet sent by the server
+* to show the current shared estate settings
+*/
+struct FFXIVIpcSharedEstateSettingsResponse :
+  FFXIVIpcBasePacket< SharedEstateSettingsResponse >
+{
+  struct playerEntry
+  {
+    uint64_t contentId;
+    uint8_t permissions;
+    char name[0x20];
+    char padding[0x7];
+  } entry[3];
+};
+
 struct FFXIVIpcMSQTrackerProgress :
   FFXIVIpcBasePacket< MSQTrackerProgress >
 {

@@ -183,6 +183,20 @@ struct FFXIVIpcInventoryModifyHandler :
   /* 0028 */ uint32_t splitCount;
 };
 
+struct FFXIVIpcSetSharedEstateSettings :
+  FFXIVIpcBasePacket< SetSharedEstateSettings >
+{
+  /* 0000 */ uint64_t char1ContentId;
+  /* 0008 */ uint64_t char2ContentId;
+  /* 0010 */ uint64_t char3ContentId;
+  /* 0018 */ uint8_t char1Permissions;
+  /* 0019 */ char padding1[0x7];
+  /* 0020 */ uint8_t char2Permissions;
+  /* 0021 */ char padding2[0x7];
+  /* 0028 */ uint8_t char3Permissions;
+  /* 0029 */ char padding3[0x7];
+};
+
 }
 }
 }
