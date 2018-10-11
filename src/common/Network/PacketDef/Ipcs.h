@@ -132,7 +132,7 @@ enum ServerZoneIpcType :
   ObjectSpawn = 0x0179, // updated 4.4
   ObjectDespawn = 0x017A, // updated 4.4
 
-  SetLevelSync = 0x017B, // updated 4.4
+  UpdateClassInfo = 0x017B, // updated 4.4
   SilentSetClassJob = 0x017C, // updated 4.4 - seems to be the case, not sure if it's actually used for anything
 
   InitUI = 0x017D, // updated 4.4
@@ -143,7 +143,7 @@ enum ServerZoneIpcType :
   ModelEquip = 0x0182, // updated 4.4
   Examine = 0x0183, // updated 4.4
   CharaNameReq = 0x0185, // updated 4.4
-  UpdateClassInfo = 0x0186, // updated 4.4
+  SetLevelSync = 0x0186, // not updated for 4.4, not sure what it is anymore
 
   ItemInfo = 0x018C, // updated 4.4
   ContainerInfo = 0x018D, // updated 4.4
@@ -191,6 +191,8 @@ enum ServerZoneIpcType :
   WardInfo = 0x0220, // updated 4.4
   WardHousingPermission = 0x0229, // updated 4.4
   WardYardInfo = 0x022C, // updated 4.4
+
+  SharedEstateSettingsResponse = 0x023C, // updated 4.4
 
   DuelChallenge = 0x0277, // 4.2; this is responsible for opening the ui
   PerformNote = 0x0286, // updated 4.3
@@ -284,6 +286,8 @@ enum ClientZoneIpcType :
 
   LinkshellEventHandler = 0x0150, // updated 4.1 ??
   LinkshellEventHandler1 = 0x0151, // updated 4.1 ??
+
+  SetSharedEstateSettings = 0x0177, // updated 4.4
 
   PerformNoteHandler = 0x029B, // updated 4.3
 
