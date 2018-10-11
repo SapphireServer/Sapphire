@@ -127,7 +127,7 @@ enum ServerZoneIpcType :
   ObjectSpawn = 0x0179, // updated 4.4
   ObjectDespawn = 0x017A, // updated 4.4
 
-  SetLevelSync = 0x017B, // updated 4.4
+  UpdateClassInfo = 0x017B, // updated 4.4
   SilentSetClassJob = 0x017C, // updated 4.4 - seems to be the case, not sure if it's actually used for anything
 
   InitUI = 0x017D, // updated 4.4
@@ -138,7 +138,7 @@ enum ServerZoneIpcType :
   ModelEquip = 0x0182, // updated 4.4
   Examine = 0x0183, // updated 4.4
   CharaNameReq = 0x0185, // updated 4.4
-  UpdateClassInfo = 0x0186, // updated 4.4
+  SetLevelSync = 0x0186, // not updated for 4.4, not sure what it is anymore
 
   ItemInfo = 0x018C, // updated 4.4
   ContainerInfo = 0x018D, // updated 4.4
