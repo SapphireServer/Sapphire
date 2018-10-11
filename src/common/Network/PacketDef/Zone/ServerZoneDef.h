@@ -1599,7 +1599,8 @@ struct FFXIVIpcWardYardInfo :
 struct FFXIVIpcSharedEstateSettingsResponse :
   FFXIVIpcBasePacket< SharedEstateSettingsResponse >
 {
-  struct playerEntry {
+  struct playerEntry
+  {
     uint64_t contentId;
     uint8_t permissions;
     char name[0x20];
