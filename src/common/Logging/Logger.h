@@ -5,9 +5,7 @@
 
 namespace Core {
 
-
-enum struct LoggingSeverity :
-  uint8_t
+enum struct LoggingSeverity : uint8_t
 {
   trace = 0,
   debug = 1,

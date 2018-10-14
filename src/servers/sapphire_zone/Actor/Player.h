@@ -1,7 +1,7 @@
 #ifndef _PLAYER_H
 #define _PLAYER_H
 
-#include "Forwards.h"
+#include "ForwardsZone.h"
 
 #include <Common.h>
 #include <Util/SpawnIndexAllocator.h>
@@ -953,8 +953,8 @@ private:
   uint16_t m_activeTitle;
   uint8_t m_titleList[48];
   uint8_t m_howTo[33];
-  uint8_t m_minions[37];
-  uint8_t m_mountGuide[15];
+  uint8_t m_minions[40];
+  uint8_t m_mountGuide[17];
   uint8_t m_homePoint;
   uint8_t m_startTown;
   uint16_t m_townWarpFstFlags;

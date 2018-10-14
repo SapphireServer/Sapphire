@@ -4,7 +4,7 @@
 #include <Exd/ExdDataGenerated.h>
 #include <utility>
 #include <Network/CommonActorControl.h>
-#include <sapphire_zone/Network/PacketWrappers/EffectPacket.h>
+
 
 #include "Forwards.h"
 #include "Action/Action.h"
@@ -16,6 +16,7 @@
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 #include "Network/PacketWrappers/ActorControlPacket144.h"
 #include "Network/PacketWrappers/UpdateHpMpTpPacket.h"
+#include "Network/PacketWrappers/EffectPacket.h"
 
 #include "StatusEffect/StatusEffect.h"
 #include "Action/ActionCollision.h"
@@ -457,7 +458,8 @@ void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, u
 
       effectPacket->addEffect( effectEntry );
 
-      if( actionInfoPtr->castType == 1 && actionInfoPtr->effectRange != 0 || actionInfoPtr->castType != 1 )
+      if( ( actionInfoPtr->castType == 1 && actionInfoPtr->effectRange != 0 ) ||
+	  ( actionInfoPtr->castType != 1 ) )
       {
         // If action on this specific target is valid...
         if( isPlayer() && !ActionCollision::isActorApplicable( target, TargetFilter::Enemies ) )
@@ -517,7 +519,7 @@ void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, u
 
       effectPacket->addEffect( effectEntry );
 
-      if( actionInfoPtr->castType == 1 && actionInfoPtr->effectRange != 0 || actionInfoPtr->castType != 1 )
+      if( ( actionInfoPtr->castType == 1 && actionInfoPtr->effectRange != 0 ) || actionInfoPtr->castType != 1 )
       {
         if( isPlayer() && !ActionCollision::isActorApplicable( target, TargetFilter::Allies ) )
           break;

@@ -31,6 +31,8 @@ public:
 
   std::string getClassString();
 
+  uint8_t getClassLevel();
+
   // return the id of the actor
   uint32_t getId() const
   {
@@ -177,6 +179,7 @@ private:
   uint8_t m_birthMonth;
   uint8_t m_birthDay;
   uint8_t m_class;
+  uint8_t m_classLevel;
 
   uint8_t m_voice;
 
@@ -184,9 +187,14 @@ private:
 
   uint16_t m_zoneId;
 
+  uint64_t m_modelMainWeapon;
+  uint64_t m_modelSubWeapon;
+  uint8_t m_equipDisplayFlags;
+
   std::map< uint8_t, uint8_t > m_lookMap;
   std::map< uint8_t, uint16_t > m_classMap;
   uint8_t m_look[26];
+
 
   uint8_t m_gmRank;
   bool m_gmInvis;

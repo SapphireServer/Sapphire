@@ -200,6 +200,8 @@ enum ActorControlType :
   SetCharaGearParamUI = 0x260,
   ToggleWireframeRendering = 0x261,
 
+  ExamineError = 0x2BF,
+
   GearSetEquipMsg = 0x321,
 
   SetFestival = 0x386, // param1: festival.exd index
@@ -284,6 +286,8 @@ enum ClientTriggerType
 
   AchievementCritReq = 0x3E8,
   AchievementList = 0x3E9,
+
+  RequestSharedEstateSettings = 0x46F,
 
   CompanionAction = 0x6A4,
   CompanionSetBarding = 0x6A5,

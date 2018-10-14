@@ -1,15 +1,14 @@
-cmake_policy(SET CMP0014 NEW)
-cmake_minimum_required(VERSION 3.0.2)
-project (Sapphire)
+cmake_policy( SET CMP0014 NEW )
+cmake_minimum_required( VERSION 3.0.2 )
+project( Sapphire )
 
-set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin)
+set( CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin )
 
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
-set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
-set(EXECUTABLE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+set( EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin )
+set( LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin )
+set( EXECUTABLE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin )
 
-set(PROJECT_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
+set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake )
 
 ##########################################################################
 # Boost stuff
