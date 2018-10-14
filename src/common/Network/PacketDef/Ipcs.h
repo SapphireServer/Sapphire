@@ -64,6 +64,7 @@ enum ServerZoneIpcType :
   ///////////////////////////////////////////////////
 
   ChatBanned = 0x006B,
+  Playtime = 0x006C, // updated 4.4
   Logout = 0x0077, // updated 4.4
   CFNotify = 0x0078,
   CFMemberStatus = 0x0079,
@@ -78,7 +79,6 @@ enum ServerZoneIpcType :
 
 
 
-  Playtime = 0x00F5, // updated 4.3
   Chat = 0x00F4, // updated 4.4
   SocialList = 0x00FB, // updated 4.4
 
