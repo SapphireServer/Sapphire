@@ -32,13 +32,13 @@ void Core::Network::GameConnection::inventoryModifyHandler( const Packets::FFXIV
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcInventoryModifyHandler >( inPacket );
 
-  const auto& action = packet.data().action;
-  const auto& splitCount = packet.data().splitCount;
+  const auto action = packet.data().action;
+  const auto splitCount = packet.data().splitCount;
 
-  const auto& fromSlot = packet.data().fromSlot;
-  const auto& fromContainer = packet.data().fromContainer;
-  const auto& toSlot = packet.data().toSlot;
-  const auto& toContainer = packet.data().toContainer;
+  const auto fromSlot = packet.data().fromSlot;
+  const auto fromContainer = packet.data().fromContainer;
+  const auto toSlot = packet.data().toSlot;
+  const auto toContainer = packet.data().toContainer;
 
   auto ackPacket = makeZonePacket< Server::FFXIVIpcInventoryActionAck >( player.getId() );
   ackPacket->data().sequence = packet.data().seq;
