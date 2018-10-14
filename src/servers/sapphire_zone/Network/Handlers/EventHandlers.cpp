@@ -39,8 +39,8 @@ void Core::Network::GameConnection::eventHandlerTalk( const Packets::FFXIVARR_PA
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcEventHandlerTalk >( inPacket );
 
-  const auto& actorId = packet.data().actorId;
-  const auto& eventId = packet.data().eventId;
+  const auto actorId = packet.data().actorId;
+  const auto eventId = packet.data().eventId;
 
   auto eventType = static_cast< uint16_t >( eventId >> 16 );
 
@@ -84,9 +84,9 @@ void Core::Network::GameConnection::eventHandlerEmote( const Packets::FFXIVARR_P
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcEventHandlerEmote >( inPacket );
 
-  const auto& actorId = packet.data().actorId;
-  const auto& eventId = packet.data().eventId;
-  const auto& emoteId = packet.data().emoteId;
+  const auto actorId = packet.data().actorId;
+  const auto eventId = packet.data().eventId;
+  const auto emoteId = packet.data().emoteId;
   const auto eventType = static_cast< uint16_t >( eventId >> 16 );
 
   std::string eventName = "onEmote";
@@ -122,8 +122,8 @@ void Core::Network::GameConnection::eventHandlerWithinRange( const Packets::FFXI
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcEventHandlerWithinRange >( inPacket );
 
-  const auto& eventId = packet.data().eventId;
-  const auto& param1 = packet.data().param1;
+  const auto eventId = packet.data().eventId;
+  const auto param1 = packet.data().param1;
   const auto& pos = packet.data().position;
 
   std::string eventName = "onWithinRange";
@@ -144,8 +144,8 @@ void Core::Network::GameConnection::eventHandlerOutsideRange( const Packets::FFX
   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcEventHandlerOutsideRange >( inPacket );
-  const auto& eventId = packet.data().eventId;
-  const auto& param1 = packet.data().param1;
+  const auto eventId = packet.data().eventId;
+  const auto param1 = packet.data().param1;
   const auto& pos = packet.data().position;
 
   std::string eventName = "onOutsideRange";
@@ -167,9 +167,9 @@ void Core::Network::GameConnection::eventHandlerEnterTerritory( const Packets::F
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcEnterTerritoryHandler >( inPacket );
 
-  const auto& eventId = packet.data().eventId;
-  const auto& param1 = packet.data().param1;
-  const auto& param2 = packet.data().param2;
+  const auto eventId = packet.data().eventId;
+  const auto param1 = packet.data().param1;
+  const auto param2 = packet.data().param2;
 
   std::string eventName = "onEnterTerritory";
 
@@ -195,12 +195,12 @@ void Core::Network::GameConnection::eventHandlerReturn( const Packets::FFXIVARR_
                                                         Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcEventHandlerReturn >( inPacket );
-  const auto& eventId = packet.data().eventId;
-  const auto& scene = packet.data().scene;
-  const auto& param1 = packet.data().param1;
-  const auto& param2 = packet.data().param2;
-  const auto& param3 = packet.data().param3;
-  const auto& param4 = packet.data().param4;
+  const auto eventId = packet.data().eventId;
+  const auto scene = packet.data().scene;
+  const auto param1 = packet.data().param1;
+  const auto param2 = packet.data().param2;
+  const auto param3 = packet.data().param3;
+  const auto param4 = packet.data().param4;
 
   std::string eventName = Event::getEventName( eventId );
 
