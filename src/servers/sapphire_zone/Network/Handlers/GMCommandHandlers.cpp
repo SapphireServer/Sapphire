@@ -99,16 +99,19 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
   const auto& param1 = packet.data().param1;
   const auto& param2 = packet.data().param2;
   const auto& param3 = packet.data().param3;
+  const auto& param4 = packet.data().param4;
+  const auto& target = packet.data().target;
 
   auto pLog = g_fw.get< Logger >();
   pLog->debug( player.getName() + " used GM1 commandId: " + std::to_string( commandId ) +
                ", params: " + std::to_string( param1 ) + ", " +
-               std::to_string( param2 ) + ", " + std::to_string( param3 ) );
+               std::to_string( param2 ) + ", " + std::to_string( param3 ) + ", " + std::to_string( param4 ) +
+               ", target: " + std::to_string( target ) );
 
   Core::Entity::ActorPtr targetActor;
 
 
-  if( player.getId() == param3 )
+  if( player.getId() == target )
   {
     targetActor = player.getAsPlayer();
   }
@@ -117,7 +120,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
     auto inRange = player.getInRangeActors();
     for( auto& actor : inRange )
     {
-      if( actor->getId() == param3 )
+      if( actor->getId() == target )
         targetActor = actor;
     }
   }
@@ -540,11 +543,18 @@ void Core::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACKET_R
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcGmCommand2 >( inPacket );
 
   const auto& commandId = packet.data().commandId;
-  const auto& param1 = std::string( packet.data().param1 );
+  const auto& param1 = packet.data().param1;
+  const auto& param2 = packet.data().param2;
+  const auto& param3 = packet.data().param3;
+  const auto& param4 = packet.data().param4;
+  const auto& target = std::string( packet.data().target );
 
-  pLog->debug( player.getName() + " used GM2 commandId: " + std::to_string( commandId ) + ", params: " + param1 );
+  pLog->debug( player.getName() + " used GM2 commandId: " + std::to_string( commandId ) +
+               ", params: " + std::to_string( param1 ) + ", " +
+               std::to_string( param2 ) + ", " + std::to_string( param3 ) + ", " + std::to_string( param4 ) +
+               ", target: " + target );
 
-  auto targetSession = pServerZone->getSession( param1 );
+  auto targetSession = pServerZone->getSession( target );
   Core::Entity::CharaPtr targetActor;
 
   if( targetSession != nullptr )
@@ -553,13 +563,13 @@ void Core::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACKET_R
   }
   else
   {
-    if( param1 == "self" )
+    if( target == "self" )
     {
       targetActor = player.getAsPlayer();
     }
     else
     {
-      player.sendUrgent( "Player " + param1 + " not found on this server." );
+      player.sendUrgent( "Player " + target + " not found on this server." );
       return;
     }
   }

@@ -15,16 +15,22 @@ struct FFXIVIpcGmCommand1 :
   /* 0000 */ uint32_t commandId;
   /* 0004 */ uint32_t param1;
   /* 0008 */ uint32_t param2;
-  /* 000C */ uint8_t unknown_C[0xC];
-  /* 0018 */ uint32_t param3;
+  /* 000C */ uint32_t param3;
+  /* 0010 */ uint32_t param4;
+  /* 0014 */ uint32_t unknown1;
+  /* 0018 */ uint32_t target;
 };
 
 struct FFXIVIpcGmCommand2 :
   FFXIVIpcBasePacket< GMCommand2 >
 {
   /* 0000 */ uint32_t commandId;
-  /* 0004 */ char unk_4[0x10];
-  /* 0014 */ char param1[0x20];
+  /* 0004 */ uint32_t param1;
+  /* 0008 */ uint32_t param2;
+  /* 000C */ uint32_t param3;
+  /* 0010 */ uint32_t param4;
+  /* 0014 */ char target[0x20];
+  /* 0034 */ uint32_t unknown1;
 };
 
 struct FFXIVIpcClientTrigger :
