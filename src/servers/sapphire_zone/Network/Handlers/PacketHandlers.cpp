@@ -65,10 +65,10 @@ void Core::Network::GameConnection::setSearchInfoHandler( const Packets::FFXIVAR
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcSetSearchInfo >( inPacket );
 
-  const auto& inval = packet.data().status1;
-  const auto& inval1 = packet.data().status2;
-  const auto& status = packet.data().status;
-  const auto& selectRegion = packet.data().language;
+  const auto inval = packet.data().status1;
+  const auto inval1 = packet.data().status2;
+  const auto status = packet.data().status;
+  const auto selectRegion = packet.data().language;
 
   player.setSearchInfo( selectRegion, 0, packet.data().searchComment );
 
@@ -317,7 +317,7 @@ void Core::Network::GameConnection::zoneLineHandler( const Core::Network::Packet
   auto pTeriMgr = g_fw.get< TerritoryMgr >();
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcZoneLineHandler >( inPacket );
-  const auto& zoneLineId = packet.data().zoneLineId;
+  const auto zoneLineId = packet.data().zoneLineId;
 
   player.sendDebug( "Walking ZoneLine " + std::to_string( zoneLineId ) );
 
@@ -361,7 +361,7 @@ void Core::Network::GameConnection::discoveryHandler( const Core::Network::Packe
                                                       Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcDiscoveryHandler >( inPacket );
-  const auto& positionRef = packet.data().positionRef;
+  const auto positionRef = packet.data().positionRef;
 
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
 
