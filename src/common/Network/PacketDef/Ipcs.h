@@ -33,7 +33,7 @@ enum ClientLobbyIpcType :
 {
   ReqCharList = 0x0003,
   ReqEnterWorld = 0x0004,
-  ReqServiceAccountList = 0x0005,
+  ClientVersionInfo = 0x0005,
 
   ReqCharDelete = 0x000A,
   ReqCharCreate = 0x000B,
