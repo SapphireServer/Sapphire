@@ -30,12 +30,13 @@ using namespace Core::Network::Packets::Server;
 using namespace Core::Network::ActorControl;
 
 Core::InstanceContent::InstanceContent( boost::shared_ptr< Core::Data::InstanceContent > pInstanceConfiguration,
+                                        uint16_t territoryType,
                                         uint32_t guId,
                                         const std::string& internalName,
                                         const std::string& contentName,
                                         uint32_t instanceContentId )
   :
-  Zone( static_cast< uint16_t >( pInstanceConfiguration->territoryType ), guId, internalName, contentName ),
+  Zone( static_cast< uint16_t >( territoryType ), guId, internalName, contentName ),
   Director( Event::Director::InstanceContent, instanceContentId ),
   m_instanceConfiguration( pInstanceConfiguration ),
   m_instanceContentId( instanceContentId ),

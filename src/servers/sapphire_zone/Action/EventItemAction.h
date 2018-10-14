@@ -1,14 +1,13 @@
 #ifndef _EVENTITEMACTION_H_
 #define _EVENTITEMACTION_H_
 
-#include "Forwards.h"
+#include "ForwardsZone.h"
 #include "Action.h"
 
 namespace Core {
 namespace Action {
 
-class EventItemAction :
-  public Action
+class EventItemAction :  public Action
 {
 
 public:

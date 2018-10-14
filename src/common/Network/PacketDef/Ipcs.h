@@ -64,6 +64,7 @@ enum ServerZoneIpcType :
   ///////////////////////////////////////////////////
 
   ChatBanned = 0x006B,
+  Playtime = 0x006C, // updated 4.4
   Logout = 0x0077, // updated 4.4
   CFNotify = 0x0078,
   CFMemberStatus = 0x0079,
@@ -78,7 +79,6 @@ enum ServerZoneIpcType :
 
 
 
-  Playtime = 0x00F5, // updated 4.3
   Chat = 0x00F4, // updated 4.4
   SocialList = 0x00FB, // updated 4.4
 
@@ -98,6 +98,11 @@ enum ServerZoneIpcType :
   LogMessage = 0x00D0,
 
   LinkshellList = 0x0117, // updated 4.4
+  
+  MailDeleteRequest = 0x0118, // updated 4.4
+  ReqMoogleMailList = 0x0119, // updated 4.4
+  ReqMoogleMailLetter = 0x01A, // updated 4.4
+  MailLetterNotification = 0x011B, // updated 4.4
 
   ExamineFreeCompanyInfo = 0x013A, // updated 4.1
   CharaFreeCompanyTag = 0x0127, // updated 4.4
@@ -119,7 +124,7 @@ enum ServerZoneIpcType :
   ActorMove = 0x0170, // updated 4.4
   ActorSetPos = 0x0172, // updated 4.4
 
-  ActorCast = 0x0170, // updated 4.4
+  ActorCast = 0x0174, // updated 4.4
 
   PartyList = 0x0176, // updated 4.4
   HateList = 0x0177, // updated 4.4
@@ -127,7 +132,7 @@ enum ServerZoneIpcType :
   ObjectSpawn = 0x0179, // updated 4.4
   ObjectDespawn = 0x017A, // updated 4.4
 
-  SetLevelSync = 0x017B, // updated 4.4
+  UpdateClassInfo = 0x017B, // updated 4.4
   SilentSetClassJob = 0x017C, // updated 4.4 - seems to be the case, not sure if it's actually used for anything
 
   InitUI = 0x017D, // updated 4.4
@@ -138,7 +143,7 @@ enum ServerZoneIpcType :
   ModelEquip = 0x0182, // updated 4.4
   Examine = 0x0183, // updated 4.4
   CharaNameReq = 0x0185, // updated 4.4
-  UpdateClassInfo = 0x0186, // updated 4.4
+  SetLevelSync = 0x0186, // not updated for 4.4, not sure what it is anymore
 
   ItemInfo = 0x018C, // updated 4.4
   ContainerInfo = 0x018D, // updated 4.4
@@ -179,13 +184,15 @@ enum ServerZoneIpcType :
   PlayerTitleList = 0x01FD, // updated 4.4
   Discovery = 0x01FE, // updated 4.4
 
-  EorzeaTimeOffset = 0x01FF, // updated 4.4
+  EorzeaTimeOffset = 0x0200, // updated 4.4
 
   EquipDisplayFlags = 0x020C, // updated 4.4
 
   WardInfo = 0x0220, // updated 4.4
   WardHousingPermission = 0x0229, // updated 4.4
-  WardYardInfo = 0x022B, // updated 4.4
+  WardYardInfo = 0x022C, // updated 4.4
+
+  SharedEstateSettingsResponse = 0x023C, // updated 4.4
 
   DuelChallenge = 0x0277, // 4.2; this is responsible for opening the ui
   PerformNote = 0x0286, // updated 4.3
@@ -197,7 +204,7 @@ enum ServerZoneIpcType :
 
   // Unknown IPC types that still need to be sent
   // TODO: figure all these out properly
-  IPCTYPE_UNK_320 = 0x0248, // updated 4.4
+  IPCTYPE_UNK_320 = 0x0249, // updated 4.4
   IPCTYPE_UNK_322 = 0x024B, // updated 4.4
 
 };
@@ -249,40 +256,42 @@ enum ClientZoneIpcType :
 
   ReqJoinNoviceNetwork = 0x0129, // updated 4.2
 
-  ReqCountdownInitiate = 0x0138, // updated 4.3
-  ReqCountdownCancel = 0x0139, // updated 4.3
-  ClearWaymarks = 0x013A, // updated 4.3
+  ReqCountdownInitiate = 0x012F, // updated 4.4
+  ReqCountdownCancel = 0x0130, // updated 4.4
+  ClearWaymarks = 0x0131, // updated 4.4
 
-  ZoneLineHandler = 0x013C, // updated 4.3
-  ClientTrigger = 0x013D, // updated 4.3
-  DiscoveryHandler = 0x013E, // updated 4.3
+  ZoneLineHandler = 0x0133, // updated 4.4
+  ClientTrigger = 0x0134, // updated 4.4 was 13D in 4.3
+  DiscoveryHandler = 0x0135, // updated 4.4
 
   AddWaymark = 0x013F, // updated 4.3
 
-  SkillHandler = 0x0140, // updated 4.3
-  GMCommand1 = 0x0141, // updated 4.3
-  GMCommand2 = 0x0142, // updated 4.3
+  SkillHandler = 0x0137, // updated 4.4
+  GMCommand1 = 0x0138, // updated 4.4
+  GMCommand2 = 0x0139, // updated 4.4
 
-  UpdatePositionHandler = 0x0144, // updated 4.3
+  UpdatePositionHandler = 0x013B, // updated 4.4 was 144
   UpdatePositionInstance = 0x0183, // updated 4.3
 
-  InventoryModifyHandler = 0x014B, // updated 4.3
+  InventoryModifyHandler = 0x0142, // updated 4.4
 
-  TalkEventHandler = 0x0154, // updated 4.3
-  EmoteEventHandler = 0x0155, // updated 4.3
-  WithinRangeEventHandler = 0x0156, // updated 4.3
-  OutOfRangeEventHandler = 0x0157, // updated 4.3
-  EnterTeriEventHandler = 0x0158, // updated 4.3
+  TalkEventHandler = 0x014B, // updated 4.4
+  EmoteEventHandler = 0x014C, // updated 4.4
+  WithinRangeEventHandler = 0x014D, // updated 4.4
+  OutOfRangeEventHandler = 0x014E, // updated 4.4
+  EnterTeriEventHandler = 0x014F, // updated 4.4
 
-  ReturnEventHandler = 0x015D, // updated 4.3
-  TradeReturnEventHandler = 0x015E, // updated 4.3
+  ReturnEventHandler = 0x0154, // updated 4.4
+  TradeReturnEventHandler = 0x0155, // updated 4.4
 
   LinkshellEventHandler = 0x0150, // updated 4.1 ??
   LinkshellEventHandler1 = 0x0151, // updated 4.1 ??
 
+  SetSharedEstateSettings = 0x0177, // updated 4.4
+
   PerformNoteHandler = 0x029B, // updated 4.3
 
-  ReqEquipDisplayFlagsChange = 0x0178, // updated 4.3
+  ReqEquipDisplayFlagsChange = 0x016F, // updated 4.4
 
 
 };

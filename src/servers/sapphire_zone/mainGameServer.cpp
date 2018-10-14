@@ -1,7 +1,6 @@
 #include <iostream>
 
 #include "ServerZone.h"
-#include <boost/algorithm/string.hpp>
 #include <Framework.h>
 #include <Logging/Logger.h>
 #include <Exd/ExdDataGenerated.h>

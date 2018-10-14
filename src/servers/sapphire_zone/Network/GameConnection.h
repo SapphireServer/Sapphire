@@ -25,8 +25,7 @@ enum ConnectionType :
   None
 };
 
-class GameConnection :
-  public Connection
+class GameConnection : public Connection
 {
 
 private:
