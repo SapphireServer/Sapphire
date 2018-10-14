@@ -185,7 +185,7 @@ enum ServerZoneIpcType :
 
   WardInfo = 0x0220, // updated 4.4
   WardHousingPermission = 0x0229, // updated 4.4
-  WardYardInfo = 0x022F, // updated 4.3
+  WardYardInfo = 0x022B, // updated 4.4
 
   DuelChallenge = 0x0277, // 4.2; this is responsible for opening the ui
   PerformNote = 0x0286, // updated 4.3
