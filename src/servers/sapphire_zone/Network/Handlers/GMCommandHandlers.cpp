@@ -94,10 +94,10 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
     return;
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcGmCommand1 >( inPacket );
-  const auto& commandId = packet.data().commandId;
-  const auto& param1 = packet.data().param1;
-  const auto& param2 = packet.data().param2;
-  const auto& param3 = packet.data().param3;
+  const auto commandId = packet.data().commandId;
+  const auto param1 = packet.data().param1;
+  const auto param2 = packet.data().param2;
+  const auto param3 = packet.data().param3;
 
   auto pLog = g_fw.get< Logger >();
   pLog->debug( player.getName() + " used GM1 commandId: " + std::to_string( commandId ) +
@@ -505,8 +505,8 @@ void Core::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACKET_R
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcGmCommand2 >( inPacket );
 
-  const auto& commandId = packet.data().commandId;
-  const auto& param1 = std::string( packet.data().param1 );
+  const auto commandId = packet.data().commandId;
+  const auto param1 = std::string( packet.data().param1 );
 
   pLog->debug( player.getName() + " used GM2 commandId: " + std::to_string( commandId ) + ", params: " + param1 );
 
