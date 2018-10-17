@@ -122,16 +122,12 @@ void Core::Entity::Player::equipWeapon( ItemPtr pItem )
 
   auto itemInfo = exdData->get< Core::Data::Item >( pItem->getId() );
   auto itemClassJob = itemInfo->classJobUse;
-
-  auto currentClass = getClass();
+  auto classJobInfo = exdData->get< Core::Data::ClassJob >( (uint32_t)getClass() );
+  auto currentParentClass = static_cast< ClassJob >(classJobInfo->classJobParent);
   auto newClassJob = static_cast< ClassJob >( itemClassJob );
 
-  if( isClassJobUnlocked( newClassJob ) )
-    return;
-
-  // todo: check if soul crystal is equipped and use job instead
-
-  setClassJob( newClassJob );
+  if( ( isClassJobUnlocked( newClassJob ) ) && ( currentParentClass != newClassJob ) )
+    setClassJob( newClassJob );
 }
 
 // equip an item
@@ -160,8 +156,7 @@ void Core::Entity::Player::updateModels( GearSetSlot equipSlotId, const Core::It
     case MainHand:
       m_modelMainWeapon = model;
       m_modelSubWeapon = model2;
-      // TODO: add job change upon changing weapon if needed
-      // equipWeapon( pItem );
+      equipWeapon( pItem );
       break;
 
     case OffHand:
