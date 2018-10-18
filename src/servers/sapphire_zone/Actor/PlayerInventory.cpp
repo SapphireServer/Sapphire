@@ -122,8 +122,8 @@ void Core::Entity::Player::equipWeapon( ItemPtr pItem )
 
   auto itemInfo = exdData->get< Core::Data::Item >( pItem->getId() );
   auto itemClassJob = itemInfo->classJobUse;
-  auto classJobInfo = exdData->get< Core::Data::ClassJob >( (uint32_t)getClass() );
-  auto currentParentClass = static_cast< ClassJob >(classJobInfo->classJobParent);
+  auto classJobInfo = exdData->get< Core::Data::ClassJob >( ( uint32_t )getClass() );
+  auto currentParentClass = static_cast< ClassJob >( classJobInfo->classJobParent );
   auto newClassJob = static_cast< ClassJob >( itemClassJob );
 
   if( ( isClassJobUnlocked( newClassJob ) ) && ( currentParentClass != newClassJob ) )
