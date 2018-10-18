@@ -976,7 +976,10 @@ struct FFXIVIpcModelEquip :
 {
   /* 0000 */ uint64_t mainWeapon;
   /* 0008 */ uint64_t offWeapon;
-  /* 0010 */ uint32_t padding1;
+  /* 0010 */ uint8_t unk1;
+  /* 0011 */ uint8_t classJobId;
+  /* 0012 */ uint8_t level;
+  /* 0013 */ uint8_t unk2;
   /* 0014 */ uint32_t models[10];
   /* 003C */ uint32_t padding2;
 };
