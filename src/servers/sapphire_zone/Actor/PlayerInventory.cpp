@@ -122,7 +122,7 @@ void Core::Entity::Player::equipWeapon( ItemPtr pItem, bool updateClass )
 
   auto itemInfo = exdData->get< Core::Data::Item >( pItem->getId() );
   auto itemClassJob = itemInfo->classJobUse;
-  auto classJobInfo = exdData->get< Core::Data::ClassJob >( ( uint32_t )getClass() );
+  auto classJobInfo = exdData->get< Core::Data::ClassJob >( static_cast< uint32_t >( getClass() ) );
   auto currentParentClass = static_cast< ClassJob >( classJobInfo->classJobParent );
   auto newClassJob = static_cast< ClassJob >( itemClassJob );
 
