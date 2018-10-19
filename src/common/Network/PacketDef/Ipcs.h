@@ -33,7 +33,7 @@ enum ClientLobbyIpcType :
 {
   ReqCharList = 0x0003,
   ReqEnterWorld = 0x0004,
-  ReqServiceAccountList = 0x0005,
+  ClientVersionInfo = 0x0005,
 
   ReqCharDelete = 0x000A,
   ReqCharCreate = 0x000B,
@@ -64,6 +64,7 @@ enum ServerZoneIpcType :
   ///////////////////////////////////////////////////
 
   ChatBanned = 0x006B,
+  Playtime = 0x006C, // updated 4.4
   Logout = 0x0077, // updated 4.4
   CFNotify = 0x0078,
   CFMemberStatus = 0x0079,
@@ -78,7 +79,6 @@ enum ServerZoneIpcType :
 
 
 
-  Playtime = 0x00F5, // updated 4.3
   Chat = 0x00F4, // updated 4.4
   SocialList = 0x00FB, // updated 4.4
 
@@ -98,6 +98,11 @@ enum ServerZoneIpcType :
   LogMessage = 0x00D0,
 
   LinkshellList = 0x0117, // updated 4.4
+  
+  MailDeleteRequest = 0x0118, // updated 4.4
+  ReqMoogleMailList = 0x0119, // updated 4.4
+  ReqMoogleMailLetter = 0x01A, // updated 4.4
+  MailLetterNotification = 0x011B, // updated 4.4
 
   ExamineFreeCompanyInfo = 0x013A, // updated 4.1
   CharaFreeCompanyTag = 0x0127, // updated 4.4
@@ -127,7 +132,7 @@ enum ServerZoneIpcType :
   ObjectSpawn = 0x0179, // updated 4.4
   ObjectDespawn = 0x017A, // updated 4.4
 
-  SetLevelSync = 0x017B, // updated 4.4
+  UpdateClassInfo = 0x017B, // updated 4.4
   SilentSetClassJob = 0x017C, // updated 4.4 - seems to be the case, not sure if it's actually used for anything
 
   InitUI = 0x017D, // updated 4.4
@@ -138,7 +143,7 @@ enum ServerZoneIpcType :
   ModelEquip = 0x0182, // updated 4.4
   Examine = 0x0183, // updated 4.4
   CharaNameReq = 0x0185, // updated 4.4
-  UpdateClassInfo = 0x0186, // updated 4.4
+  SetLevelSync = 0x0186, // not updated for 4.4, not sure what it is anymore
 
   ItemInfo = 0x018C, // updated 4.4
   ContainerInfo = 0x018D, // updated 4.4
@@ -179,13 +184,15 @@ enum ServerZoneIpcType :
   PlayerTitleList = 0x01FD, // updated 4.4
   Discovery = 0x01FE, // updated 4.4
 
-  EorzeaTimeOffset = 0x01FF, // updated 4.4
+  EorzeaTimeOffset = 0x0200, // updated 4.4
 
   EquipDisplayFlags = 0x020C, // updated 4.4
 
   WardInfo = 0x0220, // updated 4.4
   WardHousingPermission = 0x0229, // updated 4.4
-  WardYardInfo = 0x022B, // updated 4.4
+  WardYardInfo = 0x022C, // updated 4.4
+
+  SharedEstateSettingsResponse = 0x023C, // updated 4.4
 
   DuelChallenge = 0x0277, // 4.2; this is responsible for opening the ui
   PerformNote = 0x0286, // updated 4.3
@@ -279,6 +286,8 @@ enum ClientZoneIpcType :
 
   LinkshellEventHandler = 0x0150, // updated 4.1 ??
   LinkshellEventHandler1 = 0x0151, // updated 4.1 ??
+
+  SetSharedEstateSettings = 0x0177, // updated 4.4
 
   PerformNoteHandler = 0x029B, // updated 4.3
 

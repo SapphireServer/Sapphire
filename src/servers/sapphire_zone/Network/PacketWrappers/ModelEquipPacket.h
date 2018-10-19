@@ -28,6 +28,8 @@ private:
   {
     m_data.mainWeapon = player.getModelMainWeapon();
     m_data.offWeapon = player.getModelSubWeapon();
+    m_data.classJobId = static_cast< uint8_t >( player.getClass() );
+    m_data.level = player.getLevel();
     m_data.models[ Common::GearModelSlot::ModelHead ] = player.getModelForSlot( Common::GearModelSlot::ModelHead );
     m_data.models[ Common::GearModelSlot::ModelBody ] = player.getModelForSlot( Common::GearModelSlot::ModelBody );
     m_data.models[ Common::GearModelSlot::ModelHands ] = player.getModelForSlot( Common::GearModelSlot::ModelHands );

@@ -210,6 +210,44 @@ struct FFXIVIpcLinkshellList :
   } entry[8];
 };
 
+/**
+* Structural representation of the packet sent by the server
+* to send a list of mail the player has
+*/
+struct FFXIVIpcReqMoogleMailList :
+  FFXIVIpcBasePacket< ReqMoogleMailList >
+{
+  struct letterEntry
+  {
+    char unk[0x8];
+    uint32_t timeStamp; // The time the mail was sent (this also seems to be used as a Id)
+    char unk1[0x30]; // This should be items, gil, etc for the letter
+    uint8_t read; // 0 = false | 1 = true
+    uint8_t type; // 0 = Friends | 1 = Rewards | 2 = GM
+    uint8_t unk2;
+    char senderName[0x20]; // The name of the sender
+    char summary[0x3C]; // The start of the full letter text
+    char padding2[0x5];
+  } letter[5];
+  char unk3[0x08];
+};
+
+/**
+* Structural representation of the packet sent by the server
+* to show the mail delivery notification
+*/
+struct FFXIVIpcMailLetterNotificationt :
+  FFXIVIpcBasePacket< MailLetterNotification >
+{
+  uint32_t sendbackCount; // The amount of letters sent back since you ran out of room (moogle dialog changes based on this)
+  uint16_t friendLetters; // The amount of letters in the friends section of the letterbox
+  uint16_t unreadCount; // The amount of unreads in the letterbox (this is the number that shows up)
+  uint16_t rewardLetters; // The amount of letters in the rewards section of the letterbox
+  uint8_t isGmLetter; // Makes the letter notification flash red
+  uint8_t isSupportDesk; // After setting this to 1 we can no longer update mail notifications (more research needed on the support desk)
+  char unk2[0x4]; // This has probs something to do with the support desk (inquiry id?)
+};
+
 struct FFXIVIpcExamineFreeCompanyInfo :
   FFXIVIpcBasePacket< ExamineFreeCompanyInfo >
 {
@@ -976,7 +1014,10 @@ struct FFXIVIpcModelEquip :
 {
   /* 0000 */ uint64_t mainWeapon;
   /* 0008 */ uint64_t offWeapon;
-  /* 0010 */ uint32_t padding1;
+  /* 0010 */ uint8_t unk1;
+  /* 0011 */ uint8_t classJobId;
+  /* 0012 */ uint8_t level;
+  /* 0013 */ uint8_t unk2;
   /* 0014 */ uint32_t models[10];
   /* 003C */ uint32_t padding2;
 };
@@ -1590,6 +1631,22 @@ struct FFXIVIpcWardYardInfo :
     uint16_t pos_y;
     uint16_t pos_z;
   } object[100];
+};
+
+/**
+* Structural representation of the packet sent by the server
+* to show the current shared estate settings
+*/
+struct FFXIVIpcSharedEstateSettingsResponse :
+  FFXIVIpcBasePacket< SharedEstateSettingsResponse >
+{
+  struct playerEntry
+  {
+    uint64_t contentId;
+    uint8_t permissions;
+    char name[0x20];
+    char padding[0x7];
+  } entry[3];
 };
 
 struct FFXIVIpcMSQTrackerProgress :

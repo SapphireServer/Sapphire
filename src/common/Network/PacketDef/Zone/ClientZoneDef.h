@@ -15,16 +15,22 @@ struct FFXIVIpcGmCommand1 :
   /* 0000 */ uint32_t commandId;
   /* 0004 */ uint32_t param1;
   /* 0008 */ uint32_t param2;
-  /* 000C */ uint8_t unknown_C[0xC];
-  /* 0018 */ uint32_t param3;
+  /* 000C */ uint32_t param3;
+  /* 0010 */ uint32_t param4;
+  /* 0014 */ uint32_t unknown1;
+  /* 0018 */ uint32_t target;
 };
 
 struct FFXIVIpcGmCommand2 :
   FFXIVIpcBasePacket< GMCommand2 >
 {
   /* 0000 */ uint32_t commandId;
-  /* 0004 */ char unk_4[0x10];
-  /* 0014 */ char param1[0x20];
+  /* 0004 */ uint32_t param1;
+  /* 0008 */ uint32_t param2;
+  /* 000C */ uint32_t param3;
+  /* 0010 */ uint32_t param4;
+  /* 0014 */ char target[0x20];
+  /* 0034 */ uint32_t unknown1;
 };
 
 struct FFXIVIpcClientTrigger :
@@ -181,6 +187,20 @@ struct FFXIVIpcInventoryModifyHandler :
   /* 0024 */ uint8_t toSlot;
   /* 0025 */ uint8_t pad_0025[3];
   /* 0028 */ uint32_t splitCount;
+};
+
+struct FFXIVIpcSetSharedEstateSettings :
+  FFXIVIpcBasePacket< SetSharedEstateSettings >
+{
+  /* 0000 */ uint64_t char1ContentId;
+  /* 0008 */ uint64_t char2ContentId;
+  /* 0010 */ uint64_t char3ContentId;
+  /* 0018 */ uint8_t char1Permissions;
+  /* 0019 */ char padding1[0x7];
+  /* 0020 */ uint8_t char2Permissions;
+  /* 0021 */ char padding2[0x7];
+  /* 0028 */ uint8_t char3Permissions;
+  /* 0029 */ char padding3[0x7];
 };
 
 }
