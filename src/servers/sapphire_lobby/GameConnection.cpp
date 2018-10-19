@@ -409,8 +409,9 @@ void Core::Network::GameConnection::handleGamePacket( Packets::FFXIVARR_PACKET_R
 
   switch( *reinterpret_cast< uint16_t* >( &packet.data[ 2 ] ) )
   {
-    case ReqServiceAccountList:
+    case ClientVersionInfo:
     {
+      // todo: validate client version based on sha1 or gamever/bootver
       sendServiceAccountList( packet, tmpId );
     }
       break;
