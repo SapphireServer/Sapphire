@@ -1000,8 +1000,8 @@ struct FFXIVIpcPlayerClassInfo :
   uint16_t classId;
   uint8_t unknown;
   uint8_t isSpecialist;
-  uint16_t level;   // Locks actions, equipment, prob more
-  uint16_t level1;  // Locks roles, prob more
+  uint16_t level;   // Locks actions, equipment, prob more. Player's current level (synced).
+  uint16_t level1;  // Locks roles, prob more. Player's actual unsynced level.
   uint32_t roleActions[10];
 };
 

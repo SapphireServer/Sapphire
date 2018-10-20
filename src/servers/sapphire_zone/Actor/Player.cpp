@@ -746,6 +746,7 @@ void Core::Entity::Player::setClassJob( Common::ClassJob classJob )
 
   auto classInfoPacket = makeZonePacket< FFXIVIpcPlayerClassInfo >( getId() );
   classInfoPacket->data().classId = static_cast< uint8_t >( getClass() );
+  classInfoPacket->data().level1 = getLevel();
   classInfoPacket->data().level = getLevel();
   queuePacket( classInfoPacket );
 
@@ -1733,4 +1734,3 @@ bool Core::Entity::Player::isOnEnterEventDone() const
 {
   return m_onEnterEventDone;
 }
-
