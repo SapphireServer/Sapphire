@@ -326,6 +326,12 @@ public:
   /*! equip a weapon, possibly forcing a job change */
   void equipWeapon( ItemPtr pItem, bool updateClass );
 
+  /*! equip a soul crystal, possibly forcing a job change*/
+  void equipSoulCrystal( ItemPtr pItem, bool updateClass );
+
+  /*! unequip a soul crystal, returning to the base class*/
+  void unequipSoulCrystal( ItemPtr pItem );
+
   /*! get player ilvl */
   uint16_t getItemLevel() const;
 

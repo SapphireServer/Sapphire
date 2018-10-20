@@ -746,7 +746,8 @@ void Core::Entity::Player::setClassJob( Common::ClassJob classJob )
 
   auto classInfoPacket = makeZonePacket< FFXIVIpcPlayerClassInfo >( getId() );
   classInfoPacket->data().classId = static_cast< uint8_t >( getClass() );
-  classInfoPacket->data().level = getLevel();
+  classInfoPacket->data().classLevel = getLevel();
+  classInfoPacket->data().syncedLevel = getLevel();
   queuePacket( classInfoPacket );
 
   sendToInRangeSet( makeActorControl142( getId(), ClassJobChange, 0x04 ), true );
@@ -1550,8 +1551,8 @@ void Core::Entity::Player::sendZonePackets()
     auto classInfoPacket = makeZonePacket< FFXIVIpcPlayerClassInfo >( getId() );
     classInfoPacket->data().classId = static_cast< uint8_t >( getClass() );
     classInfoPacket->data().unknown = 1;
-    classInfoPacket->data().level = getLevel();
-    classInfoPacket->data().level1 = getLevel();
+    classInfoPacket->data().syncedLevel = getLevel();
+    classInfoPacket->data().classLevel = getLevel();
     queuePacket( classInfoPacket );
 
     m_itemLevel = calculateEquippedGearItemLevel();
@@ -1733,4 +1734,3 @@ bool Core::Entity::Player::isOnEnterEventDone() const
 {
   return m_onEnterEventDone;
 }
-
