@@ -135,6 +135,20 @@ void Core::Entity::Player::equipWeapon( ItemPtr pItem, bool updateClass )
   }
 }
 
+void Core::Entity::Player::equipSoulCrystal( ItemPtr pItem, bool updateJob )
+{
+  auto exdData = g_fw.get< Core::Data::ExdDataGenerated >();
+  if ( !exdData )
+    return;
+
+  auto itemInfo = exdData->get< Core::Data::Item >( pItem->getId() );
+  auto itemClassJob = itemInfo->classJobUse;
+  auto newClassJob = static_cast< ClassJob >( itemClassJob );
+
+  if ( isClassJobUnlocked( newClassJob ) && updateJob )
+    setClassJob( newClassJob );
+}
+
 // equip an item
 void Core::Entity::Player::equipItem( Common::GearSetSlot equipSlotId, ItemPtr pItem, bool sendUpdate )
 {
@@ -169,8 +183,7 @@ void Core::Entity::Player::updateModels( GearSetSlot equipSlotId, const Core::It
       break;
 
     case SoulCrystal:
-      // TODO: add Job change on equipping crystal
-      // change job
+      equipSoulCrystal( pItem, updateClass );
       break;
 
     case Waist:
@@ -228,6 +241,20 @@ void Core::Entity::Player::unequipItem( Common::GearSetSlot equipSlotId, ItemPtr
 
   m_itemLevel = calculateEquippedGearItemLevel();
   sendItemLevel();
+
+  if ( equipSlotId == SoulCrystal )
+    unequipSoulCrystal( pItem );
+}
+
+void Core::Entity::Player::unequipSoulCrystal( ItemPtr pItem )
+{
+  auto exdData = g_fw.get< Core::Data::ExdDataGenerated >();
+  if ( !exdData )
+    return;
+
+  auto currentClassJob = exdData->get< Core::Data::ClassJob >( static_cast< uint32_t >( getClass() ) );
+  auto parentClass = static_cast< ClassJob >( currentClassJob->classJobParent );
+  setClassJob ( parentClass );
 }
 
 // TODO: these next functions are so similar that they could likely be simplified
