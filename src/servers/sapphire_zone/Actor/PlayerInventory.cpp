@@ -254,7 +254,7 @@ void Core::Entity::Player::unequipSoulCrystal( ItemPtr pItem )
 
   auto currentClassJob = exdData->get< Core::Data::ClassJob >( static_cast< uint32_t >( getClass() ) );
   auto parentClass = static_cast< ClassJob >( currentClassJob->classJobParent );
-  setClassJob ( parentClass );
+  setClassJob( parentClass );
 }
 
 // TODO: these next functions are so similar that they could likely be simplified
