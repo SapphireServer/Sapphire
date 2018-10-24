@@ -1,7 +1,7 @@
 #include "ConfigMgr.h"
-
-#include <boost/property_tree/ini_parser.hpp>
-#include <boost/filesystem.hpp>
+#include <iostream>
+#include <fstream>
+#include <experimental/filesystem>
 
 /**
  * Loads an ini file and parses it
@@ -13,15 +13,15 @@ bool Core::ConfigMgr::loadConfig( const std::string& configName )
   std::stringstream configStream;
 
   // get global config
-  auto configDir = boost::filesystem::path( m_configFolderRoot );
+  auto configDir = std::experimental::filesystem::path( m_configFolderRoot );
 
-  if( !boost::filesystem::exists( configDir ) )
+  if( !std::experimental::filesystem::exists( configDir ) )
   {
     return false;
   }
 
-  auto globalConfig = boost::filesystem::path( configDir / m_globalConfigFile );
-  if( !boost::filesystem::exists( globalConfig ) )
+  auto globalConfig = std::experimental::filesystem::path( configDir / m_globalConfigFile );
+  if( !std::experimental::filesystem::exists( globalConfig ) )
   {
     if( !copyDefaultConfig( globalConfig.filename().string() ) )
       return false;
@@ -34,8 +34,8 @@ bool Core::ConfigMgr::loadConfig( const std::string& configName )
   configStream << "\n\n";
 
   // get local config
-  auto localConfig = boost::filesystem::path( configDir / configName );
-  if( !boost::filesystem::exists( localConfig ) )
+  auto localConfig = std::experimental::filesystem::path( configDir / configName );
+  if( !std::experimental::filesystem::exists( localConfig ) )
   {
     if( !copyDefaultConfig( localConfig.filename().string() ) )
       return false;
@@ -44,23 +44,28 @@ bool Core::ConfigMgr::loadConfig( const std::string& configName )
   configStream << configFile.rdbuf();
 
   // parse the tree and we're fuckin done
-  boost::property_tree::read_ini( configStream, m_propTree );
+  //boost::property_tree::read_ini( configStream, m_propTree );
+  
+  m_pInih = std::unique_ptr< INIReader >(new INIReader( localConfig ) );
+
+  if( m_pInih->ParseError() < 0 )
+    return false;
 
   return true;
 }
 
 bool Core::ConfigMgr::copyDefaultConfig( const std::string& configName )
 {
-  boost::filesystem::path configPath( m_configFolderRoot );
+  std::experimental::filesystem::path configPath( m_configFolderRoot );
   configPath /= configName;
 
-  if( !boost::filesystem::exists( configPath.string() + m_configDefaultSuffix ) )
+  if( !std::experimental::filesystem::exists( configPath.string() + m_configDefaultSuffix ) )
   {
     // no default file :(
     return false;
   }
 
-  boost::filesystem::copy_file( configPath.string() + m_configDefaultSuffix, configPath );
+  std::experimental::filesystem::copy_file( configPath.string() + m_configDefaultSuffix, configPath );
 
   return true;
 }
