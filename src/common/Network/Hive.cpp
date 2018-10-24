@@ -1,6 +1,5 @@
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/interprocess/detail/atomic.hpp>
 #include "Hive.h"
 
 namespace Core {
@@ -8,9 +7,8 @@ namespace Network {
 
 //-----------------------------------------------------------------------------
 
-Hive::Hive()
-  :
-  m_work_ptr( new boost::asio::io_service::work( m_io_service ) ),
+Hive::Hive() :
+  m_work_ptr( new asio::io_service::work( m_io_service ) ),
   m_shutdown( 0 )
 {
 }
@@ -19,7 +17,7 @@ Hive::~Hive()
 {
 }
 
-boost::asio::io_service& Hive::GetService()
+asio::io_service& Hive::GetService()
 {
   return m_io_service;
 }
@@ -60,7 +58,7 @@ void Hive::Reset()
   if( m_shutdown.compare_exchange_strong( v1, v2 ) )
   {
     m_io_service.reset();
-    m_work_ptr.reset( new boost::asio::io_service::work( m_io_service ) );
+    m_work_ptr.reset( new asio::io_service::work( m_io_service ) );
   }
 }
 
