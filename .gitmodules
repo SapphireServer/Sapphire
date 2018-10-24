@@ -1,4 +1,0 @@
-[submodule "src/libraries"]
-	path = src/libraries
-	url = https://github.com/SapphireMordred/SapphireLibs.git
-	ignore = dirty
