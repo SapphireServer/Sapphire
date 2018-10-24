@@ -23,7 +23,7 @@ file(GLOB SERVER_SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 add_executable( sapphire_zone ${SERVER_SOURCE_FILES} )
 
 set_target_properties(sapphire_zone PROPERTIES
-        CXX_STANDARD 14
+        CXX_STANDARD 17
         CXX_STANDARD_REQUIRED ON
         CXX_EXTENSIONS ON
         ENABLE_EXPORTS ON
