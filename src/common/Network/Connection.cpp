@@ -67,7 +67,9 @@ void Connection::StartRecv( int32_t total_bytes )
 
 void Connection::StartError( const boost::system::error_code& error )
 {
-  if( boost::interprocess::ipcdetail::atomic_cas32( &m_error_state, 1, 0 ) == 0 )
+  uint32_t v1 = 1;
+  uint32_t v2 = 0;
+  if( !m_error_state.compare_exchange_strong( v1, v2 ) )
   {
     boost::system::error_code ec;
     m_socket.shutdown( boost::asio::ip::tcp::socket::shutdown_both, ec );
@@ -204,7 +206,9 @@ int32_t Connection::GetReceiveBufferSize() const
 
 bool Connection::HasError()
 {
-  return ( boost::interprocess::ipcdetail::atomic_cas32( &m_error_state, 1, 1 ) == 1 );
+  uint32_t v1 = 1;
+  uint32_t v2 = 1;
+  return ( m_error_state.compare_exchange_strong( v1, v2 ) );
 }
 
 

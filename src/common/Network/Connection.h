@@ -8,6 +8,7 @@
 #include <vector>
 #include <list>
 #include <boost/cstdint.hpp>
+#include <atomic>
 
 #include "Forwards.h"
 #include "Acceptor.h"
@@ -40,7 +41,7 @@ protected:
   std::list< int32_t > m_pending_recvs;
   std::list< std::vector< uint8_t > > m_pending_sends;
   int32_t m_receive_buffer_size;
-  volatile uint32_t m_error_state;
+  std::atomic< uint32_t > m_error_state;
 
 
   Connection( HivePtr hive );
