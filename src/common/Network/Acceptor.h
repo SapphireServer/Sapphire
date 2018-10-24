@@ -4,6 +4,7 @@
 #include <boost/asio.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
+#include <atomic>
 #include "Forwards.h"
 
 namespace Core {
@@ -20,7 +21,7 @@ private:
   HivePtr m_hive;
   boost::asio::ip::tcp::acceptor m_acceptor;
   boost::asio::strand m_io_strand;
-  volatile uint32_t m_error_state;
+  std::atomic< uint32_t > m_error_state;
 
 private:
   Acceptor( const Acceptor& rhs );

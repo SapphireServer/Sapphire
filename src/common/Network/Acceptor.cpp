@@ -1,7 +1,6 @@
 #include "Hive.h"
 #include "Acceptor.h"
 #include "Connection.h"
-#include <boost/interprocess/detail/atomic.hpp>
 #include <boost/bind.hpp>
 
 namespace Core {
@@ -36,7 +35,9 @@ void Acceptor::OnError( const boost::system::error_code& error )
 
 void Acceptor::StartError( const boost::system::error_code& error )
 {
-  if( boost::interprocess::ipcdetail::atomic_cas32( &m_error_state, 1, 0 ) == 0 )
+  uint32_t v1 = 1;
+  uint32_t v2 = 0;
+  if( m_error_state.compare_exchange_strong( v1, v2 ) )
   {
     boost::system::error_code ec;
     m_acceptor.cancel( ec );
@@ -123,7 +124,9 @@ boost::asio::ip::tcp::acceptor& Acceptor::GetAcceptor()
 
 bool Acceptor::HasError()
 {
-  return ( boost::interprocess::ipcdetail::atomic_cas32( &m_error_state, 1, 1 ) == 1 );
+  uint32_t v1 = 1;
+  uint32_t v2 = 1;
+  return ( m_error_state.compare_exchange_strong( v1, v2 ) );
 }
 
 }

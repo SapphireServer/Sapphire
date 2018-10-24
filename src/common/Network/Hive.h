@@ -4,6 +4,7 @@
 #include <boost/asio.hpp>
 
 #include <boost/enable_shared_from_this.hpp>
+#include <atomic>
 
 namespace Core {
 namespace Network {
@@ -14,7 +15,7 @@ class Hive :
 private:
   boost::asio::io_service m_io_service;
   boost::shared_ptr< boost::asio::io_service::work > m_work_ptr;
-  volatile uint32_t m_shutdown;
+  std::atomic< uint32_t > m_shutdown;
 
 private:
   Hive( const Hive& rhs );
