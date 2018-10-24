@@ -46,6 +46,6 @@ target_include_directories( common
                               PUBLIC
                                 "${CMAKE_CURRENT_SOURCE_DIR}/"
                               PRIVATE
-                                "${CMAKE_CURRENT_SOURCE_DIR}/src/libraries/external/"
-			        "${CMAKE_CURRENT_SOURCE_DIR}/../../deps/asio/include/")
+                                "${CMAKE_CURRENT_SOURCE_DIR}/../../deps/"
+                                "${CMAKE_CURRENT_SOURCE_DIR}/../../deps/asio/asio/include/")
 
