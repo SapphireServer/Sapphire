@@ -608,7 +608,7 @@ bool Core::Entity::Player::loadInventory()
   {
     uint16_t storageId = res->getUInt16( 1 );
 
-    for( uint32_t i = 1; i <= 13; i++ )
+    for( uint32_t i = 1; i <= 14; i++ )
     {
       uint64_t uItemId = res->getUInt64( i + 1 );
       if( uItemId == 0 )
