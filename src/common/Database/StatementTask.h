@@ -35,7 +35,7 @@ class PreparedStatementTask :
   public Operation
 {
 public:
-  PreparedStatementTask( boost::shared_ptr< PreparedStatement > stmt, bool async = false );
+  PreparedStatementTask( std::shared_ptr< PreparedStatement > stmt, bool async = false );
 
   ~PreparedStatementTask();
 
@@ -43,7 +43,7 @@ public:
   //PreparedQueryResultFuture getFuture() { return m_result->get_future(); }
 
 protected:
-  boost::shared_ptr< PreparedStatement > m_stmt;
+  std::shared_ptr< PreparedStatement > m_stmt;
   bool m_hasResult;
   //PreparedQueryResultPromise* m_result;
 };
