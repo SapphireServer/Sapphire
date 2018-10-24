@@ -7,7 +7,6 @@
 #include <sstream>
 #include <time.h>
 
-#include <boost/make_shared.hpp>
 #include <string.h>
 #include <memory>
 #include <Util/Util.h>
@@ -36,27 +35,27 @@ using LobbyChannelPacket = FFXIVIpcPacket< T, ServerLobbyIpcType >;
 
 
 template< class T, typename... Args >
-boost::shared_ptr< ZoneChannelPacket< T > > makeZonePacket( Args... args )
+std::shared_ptr< ZoneChannelPacket< T > > makeZonePacket( Args... args )
 {
-  return boost::make_shared< ZoneChannelPacket< T > >( args... );
+  return std::make_shared< ZoneChannelPacket< T > >( args... );
 }
 
 template< class T, typename... Args >
-boost::shared_ptr< T > makeWrappedPacket( Args... args )
+std::shared_ptr< T > makeWrappedPacket( Args... args )
 {
-  return boost::make_shared< T >( args... );
+  return std::make_shared< T >( args... );
 }
 
 template< class T, typename... Args >
-boost::shared_ptr< ChatChannelPacket< T > > makeChatPacket( Args... args )
+std::shared_ptr< ChatChannelPacket< T > > makeChatPacket( Args... args )
 {
-  return boost::make_shared< ChatChannelPacket< T > >( args... );
+  return std::make_shared< ChatChannelPacket< T > >( args... );
 }
 
 template< class T, typename... Args >
-boost::shared_ptr< LobbyChannelPacket< T > > makeLobbyPacket( Args... args )
+std::shared_ptr< LobbyChannelPacket< T > > makeLobbyPacket( Args... args )
 {
-  return boost::make_shared< LobbyChannelPacket< T > >( args... );
+  return std::make_shared< LobbyChannelPacket< T > >( args... );
 }
 
 /**

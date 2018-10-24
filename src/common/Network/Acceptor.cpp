@@ -1,7 +1,6 @@
 #include "Hive.h"
 #include "Acceptor.h"
 #include "Connection.h"
-#include <boost/bind.hpp>
 
 namespace Core {
 namespace Network {
@@ -48,10 +47,10 @@ void Acceptor::StartError( const asio::error_code& error )
 void Acceptor::DispatchAccept( ConnectionPtr connection )
 {
   m_acceptor.async_accept( connection->GetSocket(),
-                           connection->GetStrand().wrap( boost::bind( &Acceptor::HandleAccept,
-                                                                      shared_from_this(),
-                                                                      _1,
-                                                                      connection ) ) );
+                           connection->GetStrand().wrap( std::bind( &Acceptor::HandleAccept,
+                                                                    shared_from_this(),
+                                                                    std::placeholders::_1,
+                                                                    connection ) ) );
 }
 
 void Acceptor::HandleAccept( const asio::error_code& error, ConnectionPtr connection )
@@ -87,7 +86,7 @@ void Acceptor::Stop()
 
 void Acceptor::Accept( ConnectionPtr connection )
 {
-  m_io_strand.post( boost::bind( &Acceptor::DispatchAccept, shared_from_this(), connection ) );
+  m_io_strand.post( std::bind( &Acceptor::DispatchAccept, shared_from_this(), connection ) );
 }
 
 void Acceptor::Listen( const std::string& host, const uint16_t& port )

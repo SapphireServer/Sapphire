@@ -45,7 +45,7 @@ endif()
 target_include_directories( common
                               PUBLIC
                                 "${CMAKE_CURRENT_SOURCE_DIR}/"
+			        "${CMAKE_CURRENT_SOURCE_DIR}/../../deps/asio/asio/include/"
                               PRIVATE
-                                "${CMAKE_CURRENT_SOURCE_DIR}/src/libraries/external/"
-			        "${CMAKE_CURRENT_SOURCE_DIR}/../../deps/asio/asio/include/")
+                                "${CMAKE_CURRENT_SOURCE_DIR}/src/libraries/external/")
 

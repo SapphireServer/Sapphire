@@ -2,18 +2,17 @@
 #define HIVE_H_
 
 #include <asio.hpp>
-
-#include <boost/enable_shared_from_this.hpp>
 #include <atomic>
+#include <memory>
 
 namespace Core {
 namespace Network {
 
-class Hive : public boost::enable_shared_from_this< Hive >
+class Hive : public std::enable_shared_from_this< Hive >
 {
 private:
   asio::io_service m_io_service;
-  boost::shared_ptr< asio::io_service::work > m_work_ptr;
+  std::shared_ptr< asio::io_service::work > m_work_ptr;
   std::atomic< uint32_t > m_shutdown;
 
 private:

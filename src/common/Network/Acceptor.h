@@ -2,14 +2,12 @@
 #define ACCEPTOR_H_
 
 #include <asio.hpp>
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/shared_ptr.hpp>
 #include <atomic>
 #include "Forwards.h"
-#include <system_error>
 #include <condition_variable>
 #include <deque>
 #include <memory>
+#include <functional>
 #include <mutex>
 #include <typeinfo>
 #include <vector>
@@ -20,7 +18,7 @@ namespace Network {
 
 class Connection;
 
-class Acceptor : public boost::enable_shared_from_this< Acceptor >
+class Acceptor : public std::enable_shared_from_this< Acceptor >
 {
   friend class Hive;
 

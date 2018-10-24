@@ -1,5 +1,5 @@
-#include <boost/bind.hpp>
-#include <boost/lexical_cast.hpp>
+#include <memory>
+#include <functional>
 #include "Hive.h"
 
 namespace Core {
