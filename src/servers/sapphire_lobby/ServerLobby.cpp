@@ -22,10 +22,7 @@
 #include <thread>
 #include <boost/thread.hpp>
 
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/foreach.hpp>
 
 Core::Logger g_log;
 Core::Network::RestConnector g_restConnector;
@@ -37,7 +34,7 @@ ServerLobby::ServerLobby( const std::string& configPath ) :
   m_configPath( configPath ),
   m_numConnections( 0 )
 {
-  m_pConfig = boost::shared_ptr< ConfigMgr >( new ConfigMgr );
+  m_pConfig = std::shared_ptr< ConfigMgr >( new ConfigMgr );
 }
 
 ServerLobby::~ServerLobby( void )

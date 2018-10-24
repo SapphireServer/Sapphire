@@ -4,8 +4,7 @@
 #define _CSERVERLOBBY_H_
 
 #include <map>
-
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include "Forwards.h"
 
@@ -31,7 +30,7 @@ private:
   uint16_t m_port;
   std::string m_ip;
 
-  boost::shared_ptr< ConfigMgr > m_pConfig;
+  std::shared_ptr< ConfigMgr > m_pConfig;
 
 public:
   ServerLobby( const std::string& configPath );
@@ -47,7 +46,7 @@ public:
     m_sessionMap[ std::string( sessionId ) ] = pSession;
   }
 
-  boost::shared_ptr< ConfigMgr > getConfig() const;
+  std::shared_ptr< ConfigMgr > getConfig() const;
 
   LobbySessionPtr getSession( char* sessionId );
 
