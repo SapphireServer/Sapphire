@@ -1,7 +1,11 @@
 #ifndef SAPPHIRE_CONFIGMGR_H
 #define SAPPHIRE_CONFIGMGR_H
 
-#include <boost/property_tree/ptree.hpp>
+#include <memory>
+#include <type_traits>
+#include <inih/INIReader.h>
+#include <string>
+#include <stdint.h>
 
 namespace Core {
 class ConfigMgr
@@ -12,30 +16,48 @@ public:
   ~ConfigMgr() = default;
 
   bool loadConfig( const std::string& configName );
+  
+  template<class T> struct always_false : std::false_type {};
 
   template< class T >
   T getValue( const std::string& name, T defaultValue = T() )
   {
-    try
-    {
-      return m_propTree.get< T >( name );
-    }
-    catch( ... )
-    {
-      return defaultValue;
-    }
+    if constexpr (std::is_same_v<T, uint32_t>) 
+      return m_pInih->GetInteger( "", name, defaultValue );
+    else if constexpr (std::is_same_v<T, int32_t>) 
+      return m_pInih->GetInteger( "", name, defaultValue );
+    else if constexpr (std::is_same_v<T, uint16_t>) 
+      return m_pInih->GetInteger( "", name, defaultValue );
+    else if constexpr (std::is_same_v<T, int16_t>) 
+      return m_pInih->GetInteger( "", name, defaultValue );
+    else if constexpr (std::is_same_v<T, uint8_t>) 
+      return m_pInih->GetInteger( "", name, defaultValue );
+    else if constexpr (std::is_same_v<T, int8_t>) 
+      return m_pInih->GetInteger( "", name, defaultValue );
+    else if constexpr (std::is_same_v<T, long>)
+      return m_pInih->GetInteger( "", name, defaultValue );
+    else if constexpr (std::is_same_v<T, double>)
+      return m_pInih->GetReal( "", name, defaultValue );
+    else if constexpr (std::is_same_v<T, float>)
+      return m_pInih->GetReal( "", name, defaultValue );
+    else if constexpr (std::is_same_v<T, std::string>)
+      return m_pInih->Get( "", name, defaultValue );
+    else 
+      static_assert(always_false<T>::value, "non-exhaustive getter!"); 
   }
 
   template< class T >
   void setValue( const std::string& name, T defaultValue = T() )
   {
-    m_propTree.put( name, defaultValue );
+    // TODO: reimplement this...	  
+    //m_propTree.put( name, defaultValue );
   }
 
 private:
   bool copyDefaultConfig( const std::string& configName );
 
-  boost::property_tree::ptree m_propTree;
+  std::unique_ptr< INIReader > m_pInih;
+
   const std::string m_globalConfigFile = "global.ini";
   const std::string m_configFolderRoot = "./config/";
   const std::string m_configDefaultSuffix = ".default";
