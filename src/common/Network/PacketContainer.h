@@ -12,7 +12,7 @@ namespace Core {
 namespace Network {
 namespace Packets {
 
-typedef boost::shared_ptr< FFXIVPacketBase > FFXIVPacketBasePtr;
+typedef std::shared_ptr< FFXIVPacketBase > FFXIVPacketBasePtr;
 
 class PacketContainer
 {

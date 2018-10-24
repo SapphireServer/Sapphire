@@ -1,7 +1,7 @@
 #include "ExdDataGenerated.h"
-#include <boost/make_shared.hpp>
+#include <memory>
 
-#include <boost/variant.hpp>
+#include <variant>
 
 
 
@@ -5284,8 +5284,8 @@ bool Core::Data::ExdDataGenerated::init( const std::string& path )
 {
    try
    {
-      m_data = boost::make_shared< xiv::dat::GameData >( path );
-      m_exd_data = boost::make_shared< xiv::exd::ExdData >( *m_data );
+      m_data = std::make_shared< xiv::dat::GameData >( path );
+      m_exd_data = std::make_shared< xiv::exd::ExdData >( *m_data );
 
       m_AchievementDat = setupDatAccess( "Achievement", xiv::exd::Language::en );
       m_AchievementCategoryDat = setupDatAccess( "AchievementCategory", xiv::exd::Language::en );
