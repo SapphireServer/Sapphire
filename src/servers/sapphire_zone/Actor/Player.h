@@ -324,7 +324,13 @@ public:
   void unequipItem( Common::GearSetSlot equipSlotId, ItemPtr pItem );
 
   /*! equip a weapon, possibly forcing a job change */
-  void equipWeapon( ItemPtr pItem );
+  void equipWeapon( ItemPtr pItem, bool updateClass );
+
+  /*! equip a soul crystal, possibly forcing a job change*/
+  void equipSoulCrystal( ItemPtr pItem, bool updateClass );
+
+  /*! unequip a soul crystal, returning to the base class*/
+  void unequipSoulCrystal( ItemPtr pItem );
 
   /*! get player ilvl */
   uint16_t getItemLevel() const;
@@ -356,7 +362,7 @@ public:
   /*! return the current amount of crystals of type */
   uint32_t getCrystal( uint8_t type ) const;
 
-  void updateModels( Common::GearSetSlot equipSlotId, const Core::ItemPtr& pItem );
+  void updateModels( Common::GearSetSlot equipSlotId, const Core::ItemPtr& pItem, bool updateClass );
 
   Common::GearModelSlot equipSlotToModelSlot( Common::GearSetSlot slot );
 
