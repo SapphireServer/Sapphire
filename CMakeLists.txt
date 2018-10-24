@@ -40,8 +40,8 @@ configure_file( "${CMAKE_CURRENT_SOURCE_DIR}/src/common/Version.cpp.in"
                 "${CMAKE_CURRENT_SOURCE_DIR}/src/common/Version.cpp" @ONLY )
 
 ##########################################################################
-add_subdirectory( "src/libraries/sapphire/datReader" )
-add_subdirectory( "src/libraries/sapphire/mysqlConnector" )
+add_subdirectory( "deps/datReader" )
+add_subdirectory( "deps/mysqlConnector" )
 add_subdirectory( "src/common" )
 
 add_subdirectory( "src/servers" )
