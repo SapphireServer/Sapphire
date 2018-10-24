@@ -7,11 +7,6 @@
 #include <atomic>
 #include "Forwards.h"
 #include <system_error>
-#include <asio/defer.hpp>
-#include <asio/executor.hpp>
-#include <asio/post.hpp>
-#include <asio/strand.hpp>
-#include <asio/system_executor.hpp>
 #include <condition_variable>
 #include <deque>
 #include <memory>
@@ -19,11 +14,6 @@
 #include <typeinfo>
 #include <vector>
 
-using asio::defer;
-using asio::executor;
-using asio::post;
-using asio::strand;
-using asio::system_executor;
 
 namespace Core {
 namespace Network {
@@ -76,7 +66,7 @@ public:
   asio::ip::tcp::acceptor& GetAcceptor();
 
   // Returns the strand object.
-  asio::strand< executor >& GetStrand();
+  asio::strand& GetStrand();
 
   // Returns true if this object has an error associated with it.
   bool HasError();

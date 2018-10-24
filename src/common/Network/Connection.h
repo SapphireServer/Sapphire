@@ -3,7 +3,7 @@
 
 //-----------------------------------------------------------------------------
 
-#include <boost/asio.hpp>
+#include <asio.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <vector>
 #include <list>
@@ -26,8 +26,7 @@ class Connection;
 
 //-----------------------------------------------------------------------------
 
-class Connection :
-  public boost::enable_shared_from_this< Connection >
+class Connection : public boost::enable_shared_from_this< Connection >
 {
   friend class Acceptor;
 
@@ -35,8 +34,8 @@ class Connection :
 
 protected:
   HivePtr m_hive;
-  boost::asio::ip::tcp::socket m_socket;
-  boost::asio::strand m_io_strand;
+  asio::ip::tcp::socket m_socket;
+  asio::strand m_io_strand;
   std::vector< uint8_t > m_recv_buffer;
   std::list< int32_t > m_pending_recvs;
   std::list< std::vector< uint8_t > > m_pending_sends;
@@ -57,17 +56,17 @@ private:
 
   void StartRecv( int32_t total_bytes );
 
-  void StartError( const boost::system::error_code& error );
+  void StartError( const asio::error_code& error );
 
   void DispatchSend( std::vector< uint8_t > buffer );
 
   void DispatchRecv( int32_t total_bytes );
 
-  void HandleConnect( const boost::system::error_code& error );
+  void HandleConnect( const asio::error_code& error );
 
-  void HandleSend( const boost::system::error_code& error, std::list< std::vector< uint8_t > >::iterator itr );
+  void HandleSend( const asio::error_code& error, std::list< std::vector< uint8_t > >::iterator itr );
 
-  void HandleRecv( const boost::system::error_code& error, int32_t actual_bytes );
+  void HandleRecv( const asio::error_code& error, int32_t actual_bytes );
 
 
 private:
@@ -92,7 +91,7 @@ private:
   };
 
   // Called when an error is encountered.
-  virtual void OnError( const boost::system::error_code& error )
+  virtual void OnError( const asio::error_code& error )
   {
   };
 
@@ -106,10 +105,10 @@ public:
   HivePtr GetHive();
 
   // Returns the socket object.
-  boost::asio::ip::tcp::socket& GetSocket();
+  asio::ip::tcp::socket& GetSocket();
 
   // Returns the strand object.
-  boost::asio::strand& GetStrand();
+  asio::strand& GetStrand();
 
   // Sets the application specific receive buffer size used. For stream
   // based protocols such as HTTP, you want this to be pretty large, like

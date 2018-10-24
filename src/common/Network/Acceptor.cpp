@@ -38,7 +38,7 @@ void Acceptor::StartError( const asio::error_code& error )
   uint32_t v2 = 0;
   if( m_error_state.compare_exchange_strong( v1, v2 ) )
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     m_acceptor.cancel( ec );
     m_acceptor.close( ec );
     OnError( error );
