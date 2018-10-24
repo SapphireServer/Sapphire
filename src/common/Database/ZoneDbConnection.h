@@ -88,7 +88,7 @@ public:
 
   ZoneDbConnection( ConnectionInfo& connInfo );
 
-  ZoneDbConnection( Core::LockedWaitQueue< boost::shared_ptr< Operation > >* q, ConnectionInfo& connInfo );
+  ZoneDbConnection( Core::LockedWaitQueue< std::shared_ptr< Operation > >* q, ConnectionInfo& connInfo );
 
   ~ZoneDbConnection();
 

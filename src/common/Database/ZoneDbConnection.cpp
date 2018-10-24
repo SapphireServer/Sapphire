@@ -6,7 +6,7 @@ Core::Db::ZoneDbConnection::ZoneDbConnection( ConnectionInfo& connInfo ) :
 {
 }
 
-Core::Db::ZoneDbConnection::ZoneDbConnection( Core::LockedWaitQueue< boost::shared_ptr< Operation > >* q,
+Core::Db::ZoneDbConnection::ZoneDbConnection( Core::LockedWaitQueue< std::shared_ptr< Operation > >* q,
                                                 ConnectionInfo& connInfo ) :
   DbConnection( q, connInfo )
 {
