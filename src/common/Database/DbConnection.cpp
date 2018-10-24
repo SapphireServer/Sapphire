@@ -4,7 +4,6 @@
 #include "Logging/Logger.h"
 
 #include "PreparedStatement.h"
-#include <boost/make_shared.hpp>
 #include "Framework.h"
 
 extern Core::Framework g_fw;
@@ -20,7 +19,7 @@ Core::Db::DbConnection::DbConnection( ConnectionInfo& connInfo ) :
 
 }
 
-Core::Db::DbConnection::DbConnection( Core::LockedWaitQueue< boost::shared_ptr< Operation > >* queue,
+Core::Db::DbConnection::DbConnection( Core::LockedWaitQueue< std::shared_ptr< Operation > >* queue,
                                       Core::Db::ConnectionInfo& connInfo ) :
   m_reconnecting( false ),
   m_prepareError( false ),
@@ -29,7 +28,7 @@ Core::Db::DbConnection::DbConnection( Core::LockedWaitQueue< boost::shared_ptr< 
   m_connectionInfo( connInfo ),
   m_connectionFlags( CONNECTION_ASYNC )
 {
-  m_worker = boost::make_shared< DbWorker >( m_queue, this );
+  m_worker = std::make_shared< DbWorker >( m_queue, this );
 }
 
 Core::Db::DbConnection::~DbConnection()
@@ -53,7 +52,7 @@ void Core::Db::DbConnection::close()
 
 uint32_t Core::Db::DbConnection::open()
 {
-  boost::shared_ptr< Mysql::MySqlBase > base( new Mysql::MySqlBase() );
+  std::shared_ptr< Mysql::MySqlBase > base( new Mysql::MySqlBase() );
   Mysql::optionMap options;
   options[ MYSQL_OPT_RECONNECT ] = "1";
   options[ MYSQL_SET_CHARSET_NAME ] = "utf8";
@@ -124,7 +123,7 @@ bool Core::Db::DbConnection::execute( const std::string& sql )
   }
 }
 
-boost::shared_ptr< Mysql::ResultSet > Core::Db::DbConnection::query( const std::string& sql )
+std::shared_ptr< Mysql::ResultSet > Core::Db::DbConnection::query( const std::string& sql )
 {
   try
   {
@@ -140,10 +139,10 @@ boost::shared_ptr< Mysql::ResultSet > Core::Db::DbConnection::query( const std::
 }
 
 
-boost::shared_ptr< Mysql::ResultSet >
-Core::Db::DbConnection::query( boost::shared_ptr< Core::Db::PreparedStatement > stmt )
+std::shared_ptr< Mysql::ResultSet >
+Core::Db::DbConnection::query( std::shared_ptr< Core::Db::PreparedStatement > stmt )
 {
-  boost::shared_ptr< Mysql::ResultSet > res( nullptr );
+  std::shared_ptr< Mysql::ResultSet > res( nullptr );
   if( !stmt )
     return nullptr;
 
@@ -177,7 +176,7 @@ Core::Db::DbConnection::query( boost::shared_ptr< Core::Db::PreparedStatement > 
 
 }
 
-bool Core::Db::DbConnection::execute( boost::shared_ptr< Core::Db::PreparedStatement > stmt )
+bool Core::Db::DbConnection::execute( std::shared_ptr< Core::Db::PreparedStatement > stmt )
 {
   if( !stmt )
     return false;
@@ -202,7 +201,7 @@ bool Core::Db::DbConnection::execute( boost::shared_ptr< Core::Db::PreparedState
   }
 }
 
-boost::shared_ptr< Mysql::PreparedStatement > Core::Db::DbConnection::getPreparedStatement( uint32_t index )
+std::shared_ptr< Mysql::PreparedStatement > Core::Db::DbConnection::getPreparedStatement( uint32_t index )
 {
   assert( index < m_stmts.size() );
   auto ret = m_stmts[ index ];
@@ -225,7 +224,7 @@ void Core::Db::DbConnection::prepareStatement( uint32_t index, const std::string
     return;
   }
 
-  boost::shared_ptr< Mysql::PreparedStatement > pStmt( nullptr );
+  std::shared_ptr< Mysql::PreparedStatement > pStmt( nullptr );
 
   try
   {
@@ -237,7 +236,7 @@ void Core::Db::DbConnection::prepareStatement( uint32_t index, const std::string
     m_prepareError = true;
   }
 
-  m_stmts[ index ] = boost::shared_ptr< Mysql::PreparedStatement >( pStmt );
+  m_stmts[ index ] = std::shared_ptr< Mysql::PreparedStatement >( pStmt );
 
 }
 

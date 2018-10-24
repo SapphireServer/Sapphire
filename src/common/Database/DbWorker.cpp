@@ -2,7 +2,7 @@
 #include "Operation.h"
 #include "Util/LockedWaitQueue.h"
 
-Core::Db::DbWorker::DbWorker( Core::LockedWaitQueue< boost::shared_ptr< Operation > >* newQueue, DbConnection* pConn )
+Core::Db::DbWorker::DbWorker( Core::LockedWaitQueue< std::shared_ptr< Operation > >* newQueue, DbConnection* pConn )
 {
   m_pConn = pConn;
   m_queue = newQueue;
@@ -24,7 +24,7 @@ void Core::Db::DbWorker::workerThread()
 
   while( true )
   {
-    boost::shared_ptr< Operation > operation = nullptr;
+    std::shared_ptr< Operation > operation = nullptr;
 
     m_queue->waitAndPop( operation );
 

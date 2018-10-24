@@ -5,7 +5,6 @@
 #include "StatementTask.h"
 #include "Operation.h"
 #include "ZoneDbConnection.h"
-#include <boost/make_shared.hpp>
 #include "Framework.h"
 
 #include "Logging/Logger.h"
@@ -25,7 +24,7 @@ class PingOperation :
 template< class T >
 Core::Db::DbWorkerPool< T >::DbWorkerPool()
   :
-  m_queue( new Core::LockedWaitQueue< boost::shared_ptr< Operation > >() ),
+  m_queue( new Core::LockedWaitQueue< std::shared_ptr< Operation > >() ),
   m_asyncThreads( 0 ),
   m_synchThreads( 0 )
 {
@@ -103,34 +102,34 @@ bool Core::Db::DbWorkerPool< T >::prepareStatements()
 }
 
 template< class T >
-boost::shared_ptr< Mysql::ResultSet >
-Core::Db::DbWorkerPool< T >::query( const std::string& sql, boost::shared_ptr< T > connection )
+std::shared_ptr< Mysql::ResultSet >
+Core::Db::DbWorkerPool< T >::query( const std::string& sql, std::shared_ptr< T > connection )
 {
   if( !connection )
     connection = getFreeConnection();
 
-  boost::shared_ptr< Mysql::ResultSet > result = connection->query( sql );
+  std::shared_ptr< Mysql::ResultSet > result = connection->query( sql );
   connection->unlock();
 
   return result;
 }
 
 template< class T >
-boost::shared_ptr< Mysql::PreparedResultSet >
-Core::Db::DbWorkerPool< T >::query( boost::shared_ptr< PreparedStatement > stmt )
+std::shared_ptr< Mysql::PreparedResultSet >
+Core::Db::DbWorkerPool< T >::query( std::shared_ptr< PreparedStatement > stmt )
 {
   auto connection = getFreeConnection();
-  auto ret = boost::static_pointer_cast< Mysql::PreparedResultSet >( connection->query( stmt ) );
+  auto ret = std::static_pointer_cast< Mysql::PreparedResultSet >( connection->query( stmt ) );
   connection->unlock();
 
   return ret;
 }
 
 template< class T >
-boost::shared_ptr< Core::Db::PreparedStatement >
+std::shared_ptr< Core::Db::PreparedStatement >
 Core::Db::DbWorkerPool< T >::getPreparedStatement( PreparedStatementIndex index )
 {
-  return boost::make_shared< PreparedStatement >( index );
+  return std::make_shared< PreparedStatement >( index );
 }
 
 template< class T >
@@ -159,7 +158,7 @@ void Core::Db::DbWorkerPool< T >::keepAlive()
 
   const auto count = m_connections[ IDX_ASYNC ].size();
   for( uint8_t i = 0; i < count; ++i )
-    enqueue( boost::make_shared< PingOperation >() );
+    enqueue( std::make_shared< PingOperation >() );
 }
 
 template< class T >
@@ -173,11 +172,11 @@ uint32_t Core::Db::DbWorkerPool< T >::openConnections( InternalIndex type, uint8
       switch( type )
       {
         case IDX_ASYNC:
-          return boost::make_shared< T >( m_queue.get(), m_connectionInfo );
+          return std::make_shared< T >( m_queue.get(), m_connectionInfo );
         case IDX_SYNCH:
-          return boost::make_shared< T >( m_connectionInfo );
+          return std::make_shared< T >( m_connectionInfo );
         default:
-          return boost::shared_ptr< T >( nullptr );
+          return std::shared_ptr< T >( nullptr );
       }
     }();
 
@@ -204,17 +203,17 @@ unsigned long Core::Db::DbWorkerPool< T >::escapeString( char* to, const char* f
 }
 
 template< class T >
-void Core::Db::DbWorkerPool< T >::enqueue( boost::shared_ptr< Operation > op )
+void Core::Db::DbWorkerPool< T >::enqueue( std::shared_ptr< Operation > op )
 {
   m_queue->push( op );
 }
 
 template< class T >
-boost::shared_ptr< T > Core::Db::DbWorkerPool< T >::getFreeConnection()
+std::shared_ptr< T > Core::Db::DbWorkerPool< T >::getFreeConnection()
 {
   uint8_t i = 0;
   const auto numCons = m_connections[ IDX_SYNCH ].size();
-  boost::shared_ptr< T > connection = nullptr;
+  std::shared_ptr< T > connection = nullptr;
 
   while( true )
   {
@@ -236,14 +235,14 @@ const std::string& Core::Db::DbWorkerPool< T >::getDatabaseName() const
 template< class T >
 void Core::Db::DbWorkerPool< T >::execute( const std::string& sql )
 {
-  auto task = boost::make_shared< StatementTask >( sql );
+  auto task = std::make_shared< StatementTask >( sql );
   enqueue( task );
 }
 
 template< class T >
-void Core::Db::DbWorkerPool< T >::execute( boost::shared_ptr< PreparedStatement > stmt )
+void Core::Db::DbWorkerPool< T >::execute( std::shared_ptr< PreparedStatement > stmt )
 {
-  auto task = boost::make_shared< PreparedStatementTask >( stmt );
+  auto task = std::make_shared< PreparedStatementTask >( stmt );
   enqueue( task );
 }
 
@@ -256,7 +255,7 @@ void Core::Db::DbWorkerPool< T >::directExecute( const std::string& sql )
 }
 
 template< class T >
-void Core::Db::DbWorkerPool< T >::directExecute( boost::shared_ptr< PreparedStatement > stmt )
+void Core::Db::DbWorkerPool< T >::directExecute( std::shared_ptr< PreparedStatement > stmt )
 {
   auto connection = getFreeConnection();
   connection->execute( stmt );

@@ -5,6 +5,7 @@
 
 #include <string.h>
 #include <sstream>
+#include <cassert>
 
 Core::Db::PreparedStatement::PreparedStatement( uint32_t index ) :
   m_stmt( nullptr ),
@@ -150,7 +151,7 @@ uint32_t Core::Db::PreparedStatement::getIndex() const
   return m_index;
 }
 
-void Core::Db::PreparedStatement::setMysqlPS( boost::shared_ptr< Mysql::PreparedStatement > pStmt )
+void Core::Db::PreparedStatement::setMysqlPS( std::shared_ptr< Mysql::PreparedStatement > pStmt )
 {
   m_stmt = pStmt;
 }
