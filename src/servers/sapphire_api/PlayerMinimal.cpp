@@ -319,6 +319,7 @@ void PlayerMinimal::saveAsNew()
   createInvDbContainer( InventoryType::ArmoryWrist );
   createInvDbContainer( InventoryType::ArmoryRing );
   createInvDbContainer( InventoryType::ArmoryMain );
+  createInvDbContainer( InventoryType::ArmorySoulCrystal );
 
   createInvDbContainer( InventoryType::Currency );
   createInvDbContainer( InventoryType::Crystal );
