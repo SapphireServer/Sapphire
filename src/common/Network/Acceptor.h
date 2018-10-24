@@ -1,26 +1,43 @@
 #ifndef ACCEPTOR_H_
 #define ACCEPTOR_H_
 
-#include <boost/asio.hpp>
+#include <asio.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 #include <atomic>
 #include "Forwards.h"
+#include <system_error>
+#include <asio/defer.hpp>
+#include <asio/executor.hpp>
+#include <asio/post.hpp>
+#include <asio/strand.hpp>
+#include <asio/system_executor.hpp>
+#include <condition_variable>
+#include <deque>
+#include <memory>
+#include <mutex>
+#include <typeinfo>
+#include <vector>
+
+using asio::defer;
+using asio::executor;
+using asio::post;
+using asio::strand;
+using asio::system_executor;
 
 namespace Core {
 namespace Network {
 
 class Connection;
 
-class Acceptor :
-  public boost::enable_shared_from_this< Acceptor >
+class Acceptor : public boost::enable_shared_from_this< Acceptor >
 {
   friend class Hive;
 
 private:
   HivePtr m_hive;
-  boost::asio::ip::tcp::acceptor m_acceptor;
-  boost::asio::strand m_io_strand;
+  asio::ip::tcp::acceptor m_acceptor;
+  asio::strand m_io_strand;
   std::atomic< uint32_t > m_error_state;
 
 private:
@@ -28,11 +45,11 @@ private:
 
   Acceptor& operator=( const Acceptor& rhs );
 
-  void StartError( const boost::system::error_code& error );
+  void StartError( const asio::error_code& error );
 
   void DispatchAccept( ConnectionPtr connection );
 
-  void HandleAccept( const boost::system::error_code& error, ConnectionPtr connection );
+  void HandleAccept( const asio::error_code& error, ConnectionPtr connection );
 
 private:
   // Called when a connection has connected to the server. This function
@@ -45,7 +62,7 @@ private:
   // Called when an error is encountered. Most typically, this is when the
   // acceptor is being closed via the Stop function or if the Listen is
   // called on an address that is not available.
-  virtual void OnError( const boost::system::error_code& error );
+  virtual void OnError( const asio::error_code& error );
 
 public:
   Acceptor( HivePtr hive );
@@ -56,10 +73,10 @@ public:
   HivePtr GetHive();
 
   // Returns the acceptor object.
-  boost::asio::ip::tcp::acceptor& GetAcceptor();
+  asio::ip::tcp::acceptor& GetAcceptor();
 
   // Returns the strand object.
-  boost::asio::strand& GetStrand();
+  asio::strand< executor >& GetStrand();
 
   // Returns true if this object has an error associated with it.
   bool HasError();

@@ -8,8 +8,7 @@ namespace Network {
 
 //-----------------------------------------------------------------------------
 
-Acceptor::Acceptor( HivePtr hive )
-  :
+Acceptor::Acceptor( HivePtr hive ) :
   m_hive( hive ),
   m_acceptor( hive->GetService() ),
   m_io_strand( hive->GetService() ),
@@ -27,13 +26,13 @@ bool Acceptor::OnAccept( ConnectionPtr connection, const std::string& host, uint
   return true;
 }
 
-void Acceptor::OnError( const boost::system::error_code& error )
+void Acceptor::OnError( const asio::error_code& error )
 {
 
 }
 
 
-void Acceptor::StartError( const boost::system::error_code& error )
+void Acceptor::StartError( const asio::error_code& error )
 {
   uint32_t v1 = 1;
   uint32_t v2 = 0;
@@ -55,7 +54,7 @@ void Acceptor::DispatchAccept( ConnectionPtr connection )
                                                                       connection ) ) );
 }
 
-void Acceptor::HandleAccept( const boost::system::error_code& error, ConnectionPtr connection )
+void Acceptor::HandleAccept( const asio::error_code& error, ConnectionPtr connection )
 {
   if( error || HasError() || m_hive->HasStopped() )
   {
@@ -95,14 +94,14 @@ void Acceptor::Listen( const std::string& host, const uint16_t& port )
 {
   try
   {
-    boost::asio::ip::tcp::resolver resolver( m_hive->GetService() );
-    boost::asio::ip::tcp::resolver::query query( host, std::to_string( port ) );
-    boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve( query );
+    asio::ip::tcp::resolver resolver( m_hive->GetService() );
+    asio::ip::tcp::resolver::query query( host, std::to_string( port ) );
+    asio::ip::tcp::endpoint endpoint = *resolver.resolve( query );
 
     m_acceptor.open( endpoint.protocol() );
-    m_acceptor.set_option( boost::asio::ip::tcp::acceptor::reuse_address( false ) );
+    m_acceptor.set_option( asio::ip::tcp::acceptor::reuse_address( false ) );
     m_acceptor.bind( endpoint );
-    m_acceptor.listen( boost::asio::socket_base::max_connections );
+    m_acceptor.listen( asio::socket_base::max_connections );
   }
   catch( ... )
   {
@@ -117,7 +116,7 @@ HivePtr Acceptor::GetHive()
   return m_hive;
 }
 
-boost::asio::ip::tcp::acceptor& Acceptor::GetAcceptor()
+asio::ip::tcp::acceptor& Acceptor::GetAcceptor()
 {
   return m_acceptor;
 }
