@@ -45,7 +45,7 @@ add_subdirectory( "src/libraries/sapphire/mysqlConnector" )
 add_subdirectory( "src/common" )
 
 add_subdirectory( "src/servers" )
-add_subdirectory( "src/dbm" )
+#add_subdirectory( "src/dbm" )
 
 add_subdirectory( "src/tools/exd_common_gen" )
 add_subdirectory( "src/tools/exd_struct_gen" )
