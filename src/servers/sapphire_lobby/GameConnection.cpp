@@ -11,8 +11,6 @@
 #include <Crypt/blowfish.h>
 #include <Config/ConfigMgr.h>
 
-#include <boost/property_tree/json_parser.hpp>
-
 #include "ServerLobby.h"
 #include "RestConnector.h"
 #include "LobbySession.h"
@@ -98,7 +96,7 @@ void Core::Network::GameConnection::OnRecv( std::vector< uint8_t >& buffer )
 
 }
 
-void Core::Network::GameConnection::OnError( const boost::system::error_code& error )
+void Core::Network::GameConnection::OnError( const asio::error_code& error )
 {
   g_log.info( "GameConnection closed: " + error.message() );
 }
@@ -500,7 +498,7 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
         generateEncryptionKey( *reinterpret_cast< uint32_t* >( &inPacket.data[ 100 ] ), key_phrase );
         m_bEncryptionInitialized = true;
 
-        auto pe1 = boost::make_shared< FFXIVRawPacket >( 0x0A, 0x290, 0, 0 );
+        auto pe1 = std::make_shared< FFXIVRawPacket >( 0x0A, 0x290, 0, 0 );
         *reinterpret_cast< uint32_t* >( &pe1->data()[ 0 ] ) = 0xE0003C2A;
 
         BlowFish blowfish;
@@ -523,7 +521,7 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
         uint32_t id = *reinterpret_cast< uint32_t* >( &inPacket.data[ 0 ] );
         uint32_t timeStamp = *reinterpret_cast< uint32_t* >( &inPacket.data[ 4 ] );
 
-        auto pe4 = boost::make_shared< FFXIVRawPacket >( 0x08, 0x18, 0, 0 );
+        auto pe4 = std::make_shared< FFXIVRawPacket >( 0x08, 0x18, 0, 0 );
         *( unsigned int* ) ( &pe4->data()[ 0 ] ) = id;
         *( unsigned int* ) ( &pe4->data()[ 4 ] ) = timeStamp;
         sendSinglePacket( pe4 );

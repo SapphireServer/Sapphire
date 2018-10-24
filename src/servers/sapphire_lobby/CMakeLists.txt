@@ -9,7 +9,7 @@ file(GLOB SERVER_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}*.c*")
 add_executable(sapphire_lobby ${SERVER_PUBLIC_INCLUDE_FILES} ${SERVER_SOURCE_FILES})
 
 set_target_properties(sapphire_lobby PROPERTIES
-        CXX_STANDARD 14
+        CXX_STANDARD 17
         CXX_STANDARD_REQUIRED ON
         CXX_EXTENSIONS ON
         RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_SOURCE_DIR}/../../../bin/"
@@ -19,6 +19,6 @@ set_target_properties(sapphire_lobby PROPERTIES
         VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../../../bin/"
         )
 
-target_link_libraries(sapphire_lobby PRIVATE common)
+target_link_libraries( sapphire_lobby PRIVATE common )
 
 cotire( sapphire_lobby )

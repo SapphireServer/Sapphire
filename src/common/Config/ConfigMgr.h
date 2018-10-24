@@ -42,6 +42,8 @@ public:
       return m_pInih->GetReal( "", name, defaultValue );
     else if constexpr (std::is_same_v<T, std::string>)
       return m_pInih->Get( "", name, defaultValue );
+    else if constexpr (std::is_same_v<T, bool>)
+      return m_pInih->GetBoolean( "", name, defaultValue );
     else 
       static_assert(always_false<T>::value, "non-exhaustive getter!"); 
   }

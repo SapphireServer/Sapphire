@@ -8,6 +8,7 @@
 #include <Network/PacketContainer.h>
 #include <Util/LockedQueue.h>
 
+#include <asio.hpp>
 #include "LobbyPacketContainer.h"
 
 #include "Forwards.h"
@@ -51,7 +52,7 @@ public:
 
   void OnRecv( std::vector< uint8_t >& buffer ) override;
 
-  void OnError( const boost::system::error_code& error ) override;
+  void OnError( const asio::error_code& error ) override;
 
   void sendError( uint64_t sequence, uint32_t errorcode, uint16_t messageId, uint32_t tmpId );
 
