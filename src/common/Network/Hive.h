@@ -2,7 +2,6 @@
 #define HIVE_H_
 
 #include <asio.hpp>
-#include <boost/asio.hpp>
 
 #include <boost/enable_shared_from_this.hpp>
 #include <atomic>
