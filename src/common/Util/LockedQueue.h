@@ -4,7 +4,8 @@
 #include <thread>
 #include <mutex>
 #include <queue>
-#include <boost/utility.hpp>
+#include <algorithm>
+#include <utility>
 
 namespace Core {
 
@@ -95,7 +96,7 @@ void LockedQueue< T >::push_swap( T& object )
   //this is a special swap that will do a legit naive swap normally,
   // except if there exists a function called T::swap(), which is
   // specialized and possibly faster.
-  boost::swap( object, default_ctored_object );
+  std::swap( object, default_ctored_object );
 
 
 

@@ -4,15 +4,13 @@
 //-----------------------------------------------------------------------------
 
 #include <asio.hpp>
-#include <boost/enable_shared_from_this.hpp>
 #include <vector>
 #include <list>
-#include <boost/cstdint.hpp>
 #include <atomic>
 
 #include "Forwards.h"
 #include "Acceptor.h"
-
+#include <memory>
 
 namespace Core {
 namespace Network {
@@ -26,7 +24,7 @@ class Connection;
 
 //-----------------------------------------------------------------------------
 
-class Connection : public boost::enable_shared_from_this< Connection >
+class Connection : public std::enable_shared_from_this< Connection >
 {
   friend class Acceptor;
 
@@ -147,13 +145,13 @@ public:
 //-----------------------------------------------------------------------------
 
 template< class T >
-boost::shared_ptr< T > addServerToHive( const std::string& listenIp, uint32_t port, HivePtr pHive )
+std::shared_ptr< T > addServerToHive( const std::string& listenIp, uint32_t port, HivePtr pHive )
 {
   try
   {
     AcceptorPtr acceptor( new Acceptor( pHive ) );
     acceptor->Listen( listenIp, port );
-    boost::shared_ptr< T > connection( new T( pHive, acceptor ) );
+    std::shared_ptr< T > connection( new T( pHive, acceptor ) );
     acceptor->Accept( connection );
     return connection;
   }
