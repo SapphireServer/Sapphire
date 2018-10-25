@@ -27,7 +27,6 @@ Exh::Exh(const dat::File& i_file)
         auto member = extract<ExhMember>(iss);
         _members[member.offset] = member;
         _exh_defs.push_back( member );
-	std::cout << "member_offset: " << member.offset << "\n";
     }
 
     // Extract all the exd_defs
