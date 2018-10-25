@@ -804,7 +804,7 @@ void default_resource_send( const HttpServer& server, const shared_ptr< HttpServ
     response->write( &buffer[ 0 ], read_length );
     if( read_length == static_cast< streamsize >( buffer.size() ) )
     {
-      server.send( response, [ &server, response, ifs ]( const boost::system::error_code& ec )
+      server.send( response, [ &server, response, ifs ]( const std::error_code& ec )
       {
         if( !ec )
           default_resource_send( server, response, ifs );
