@@ -28,11 +28,11 @@ namespace xiv
          _name(i_name)
       {
          //XIV_INFO(xiv_exd_logger, "Initializing Cat with name: " << i_name);
-
          // creates the header .exh
          {
             auto header_file = i_game_data.getFile("exd/" + i_name + ".exh");
-            _header = std::shared_ptr<Exh>(new Exh(*header_file));
+            _header = std::shared_ptr< Exh >( new Exh( *header_file ) );
+
          }
 
          for(auto language: _header->get_languages())

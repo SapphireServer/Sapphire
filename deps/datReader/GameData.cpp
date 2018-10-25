@@ -57,7 +57,7 @@ GameData::GameData(const std::experimental::filesystem::path& path) try :
     m_path(path)
 {
    int maxExLevel = 0;
-   
+  
    // Determine which expansions are available
    while( std::experimental::filesystem::exists( std::experimental::filesystem::path( m_path.string() + "\\ex" + std::to_string( maxExLevel + 1) + "\\ex" + std::to_string( maxExLevel + 1) + ".ver" ) ) )
    {
