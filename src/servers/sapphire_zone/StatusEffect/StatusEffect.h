@@ -1,8 +1,6 @@
 #ifndef _STATUSEFFECT_H_
 #define _STATUSEFFECT_H_
 
-#include <boost/shared_ptr.hpp>
-
 #include "Forwards.h"
 
 namespace Core {

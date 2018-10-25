@@ -1,9 +1,3 @@
-#include <boost/lexical_cast.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/format.hpp>
-#include <boost/foreach.hpp>
-
 #include <Logging/Logger.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Config/ConfigMgr.h>
@@ -141,13 +135,12 @@ bool Core::Scripting::ScriptMgr::loadDir( const std::string& dirname, std::set< 
   fs::path targetDir( dirname );
 
   fs::directory_iterator iter( targetDir );
-  fs::directory_iterator eod;
 
-  BOOST_FOREACH( fs::path const& i, std::make_pair( iter, eod ) )
+  for( const auto& i : iter )
   {
-    if( fs::is_regular_file( i ) && fs::path( i.string() ).extension() == ext )
+    if( fs::is_regular_file( i ) && fs::path( i ).extension() == ext )
     {
-      files.insert( i.string() );
+      files.insert( fs::path( i ) );
     }
   }
 

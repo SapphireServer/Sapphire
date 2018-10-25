@@ -1,5 +1,3 @@
-#include <boost/make_shared.hpp>
-
 #include <Logging/Logger.h>
 #include <Database/DatabaseDef.h>
 

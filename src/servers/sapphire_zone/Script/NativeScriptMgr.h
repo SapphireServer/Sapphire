@@ -5,9 +5,6 @@
 #include <set>
 #include <queue>
 
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
-
 #include "ScriptLoader.h"
 
 namespace Core {
@@ -125,7 +122,7 @@ public:
 /*!
  * @brief Creates an instance of NativeScriptMgr
  *
- * @return a boost::shared_ptr to NativeScriptMgr
+ * @return a std::shared_ptr to NativeScriptMgr
  */
 std::shared_ptr< NativeScriptMgr > createNativeScriptMgr();
 }
