@@ -53,7 +53,7 @@ protected:
 
   FestivalPair m_currentFestival;
   
-  boost::shared_ptr< Data::TerritoryType > m_territoryTypeInfo;
+  std::shared_ptr< Data::TerritoryType > m_territoryTypeInfo;
 
   std::map< uint8_t, int32_t > m_weatherRateMap;
 

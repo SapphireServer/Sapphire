@@ -8,7 +8,7 @@
 #include <Exd/ExdDataGenerated.h>
 #include <Config/ConfigMgr.h>
 
-#include "Watchdog.h"
+#include <watchdog/Watchdog.h>
 
 #include "Zone/Zone.h"
 #include "Zone/InstanceContent.h"
@@ -31,6 +31,8 @@
 #define WIN_AMBIGUITY_FIX
 
 extern Core::Framework g_fw;
+
+namespace fs = std::experimental::filesystem;
 
 Core::Scripting::ScriptMgr::ScriptMgr() :
   m_firstScriptChangeNotificiation( false )
@@ -130,20 +132,20 @@ bool Core::Scripting::ScriptMgr::loadDir( const std::string& dirname, std::set< 
   auto pLog = g_fw.get< Logger >();
   pLog->info( "ScriptMgr: loading scripts from " + dirname );
 
-  if( !boost::filesystem::exists( dirname ) )
+  if( !fs::exists( dirname ) )
   {
     pLog->error( "ScriptMgr: scripts directory doesn't exist" );
     return false;
   }
 
-  boost::filesystem::path targetDir( dirname );
+  fs::path targetDir( dirname );
 
-  boost::filesystem::directory_iterator iter( targetDir );
-  boost::filesystem::directory_iterator eod;
+  fs::directory_iterator iter( targetDir );
+  fs::directory_iterator eod;
 
-  BOOST_FOREACH( boost::filesystem::path const& i, std::make_pair( iter, eod ) )
+  BOOST_FOREACH( fs::path const& i, std::make_pair( iter, eod ) )
   {
-    if( is_regular_file( i ) && boost::filesystem::extension( i.string() ) == ext )
+    if( fs::is_regular_file( i ) && fs::path( i.string() ).extension() == ext )
     {
       files.insert( i.string() );
     }

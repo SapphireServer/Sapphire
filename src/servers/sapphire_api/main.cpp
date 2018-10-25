@@ -25,8 +25,7 @@
 //Added for the default_resource example
 #include <fstream>
 #include <string>
-#include <boost/filesystem.hpp>
-#include <boost/make_shared.hpp>
+#include <experimental/filesystem>
 #include <vector>
 #include <algorithm>
 
@@ -41,6 +40,8 @@ Core::Logger g_log;
 Core::Db::DbWorkerPool< Core::Db::ZoneDbConnection > g_charaDb;
 Core::Data::ExdDataGenerated g_exdDataGen;
 Core::Network::SapphireAPI g_sapphireAPI;
+
+namespace fs = std::experimental::filesystem;
 
 using namespace std;
 
@@ -643,13 +644,13 @@ void get_init( shared_ptr< HttpServer::Response > response, shared_ptr< HttpServ
   print_request_info( request );
   try
   {
-    auto web_root_path = boost::filesystem::canonical( "web" );
-    auto path = boost::filesystem::canonical( web_root_path / "news.xml" );
+    auto web_root_path = fs::canonical( "web" );
+    auto path = fs::canonical( web_root_path / "news.xml" );
     //Check if path is within web_root_path
     if( distance( web_root_path.begin(), web_root_path.end() ) > distance( path.begin(), path.end() ) ||
         !std::equal( web_root_path.begin(), web_root_path.end(), path.begin() ) )
       throw invalid_argument( "path must be within root path" );
-    if( !( boost::filesystem::exists( path ) && boost::filesystem::is_regular_file( path ) ) )
+    if( !( fs::exists( path ) && fs::is_regular_file( path ) ) )
       throw invalid_argument( "file does not exist" );
 
     auto ifs = make_shared< ifstream >();
@@ -678,13 +679,13 @@ void get_headline_all( shared_ptr< HttpServer::Response > response, shared_ptr< 
   print_request_info( request );
   try
   {
-    auto web_root_path = boost::filesystem::canonical( "web" );
-    auto path = boost::filesystem::canonical( web_root_path / "headlines.xml" );
+    auto web_root_path = fs::canonical( "web" );
+    auto path = fs::canonical( web_root_path / "headlines.xml" );
     //Check if path is within web_root_path
     if( distance( web_root_path.begin(), web_root_path.end() ) > distance( path.begin(), path.end() ) ||
         !std::equal( web_root_path.begin(), web_root_path.end(), path.begin() ) )
       throw invalid_argument( "path must be within root path" );
-    if( !( boost::filesystem::exists( path ) && boost::filesystem::is_regular_file( path ) ) )
+    if( !( fs::exists( path ) && fs::is_regular_file( path ) ) )
       throw invalid_argument( "file does not exist" );
 
     auto ifs = make_shared< ifstream >();
@@ -712,15 +713,15 @@ void defaultGet( shared_ptr< HttpServer::Response > response, shared_ptr< HttpSe
   print_request_info( request );
   try
   {
-    auto web_root_path = boost::filesystem::canonical( "web" );
-    auto path = boost::filesystem::canonical( web_root_path / request->path );
+    auto web_root_path = fs::canonical( "web" );
+    auto path = fs::canonical( web_root_path / request->path );
     //Check if path is within web_root_path
     if( distance( web_root_path.begin(), web_root_path.end() ) > distance( path.begin(), path.end() ) ||
         !std::equal( web_root_path.begin(), web_root_path.end(), path.begin() ) )
       throw invalid_argument( "path must be within root path" );
-    if( boost::filesystem::is_directory( path ) )
+    if( fs::is_directory( path ) )
       path /= "index.html";
-    if( !( boost::filesystem::exists( path ) && boost::filesystem::is_regular_file( path ) ) )
+    if( !( fs::exists( path ) && fs::is_regular_file( path ) ) )
       throw invalid_argument( "file does not exist" );
 
     auto ifs = make_shared< ifstream >();

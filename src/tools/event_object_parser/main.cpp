@@ -25,7 +25,11 @@
 #include <boost/range/algorithm/remove_if.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
+#include <experimental/filesystem>
+
 #endif
+
+namespace fs = std::experimental::filesystem;
 
 // garbage to ignore models
 bool ignoreModels = false;
@@ -390,7 +394,7 @@ int main( int argc, char* argv[] )
   contentTypeMap[ 11 ] = "events";
   contentTypeMap[ 12 ] = "pvp";
 
-  if( !boost::filesystem::exists( "instance.tmpl" ) )
+  if( !fs::exists( "instance.tmpl" ) )
     throw std::runtime_error( "instance.tmpl is missing in working directory" );
 
   initExd( gamePath );
@@ -663,8 +667,8 @@ int main( int argc, char* argv[] )
     if( subdirIt != contentTypeMap.end() )
       subdir = subdirIt->second + "/";
 
-    boost::filesystem::path outDir( "instances/" + subdir );
-    boost::filesystem::create_directories( outDir );
+    fs::path outDir( "instances/" + subdir );
+    fs::create_directories( outDir );
 
     std::ofstream outH( outDir.string() + entry.name + ".cpp" );
     outH << result;

@@ -181,7 +181,7 @@ void Core::Network::GameConnection::OnRecv( std::vector< uint8_t >& buffer )
   handlePackets( packetHeader, packetList );
 }
 
-void Core::Network::GameConnection::OnError( const boost::system::error_code& error )
+void Core::Network::GameConnection::OnError( const asio::error_code& error )
 {
   auto pLog = g_fw.get< Logger >();
   pLog->debug( "GameConnection ERROR: " + error.message() );
