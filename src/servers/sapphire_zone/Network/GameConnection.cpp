@@ -1,5 +1,3 @@
-#include <boost/format.hpp>
-
 #include <Common.h>
 #include <Network/CommonNetwork.h>
 #include <Util/Util.h>
@@ -214,16 +212,14 @@ void Core::Network::GameConnection::handleZonePacket( Core::Network::Packets::FF
         opcode != UpdatePositionHandler )
 
       pLog->debug( sessionStr + " Handling Zone IPC : " + name + "( " +
-                   boost::str( boost::format( "%|04X|" ) %
-                               static_cast< uint32_t >( opcode ) ) + " )" );
+                   Util::intToHexString( static_cast< uint32_t >( opcode ), 4 ) + " )" );
 
     ( this->*( it->second ) )( pPacket, *m_pSession->getPlayer() );
   }
   else
   {
     pLog->debug( sessionStr + " Undefined Zone IPC : Unknown ( " +
-                 boost::str( boost::format( "%|04X|" ) %
-                             static_cast< uint32_t >( opcode ) ) + " )" );
+		 Util::intToHexString( static_cast< uint32_t >( opcode ), 4 ) + " )" );    
     pLog->debug(
       "Dump:\n" + Util::binaryToHexDump( const_cast< uint8_t* >( &pPacket.data[ 0 ] ), pPacket.segHdr.size ) );
   }
@@ -245,16 +241,14 @@ void Core::Network::GameConnection::handleChatPacket( Core::Network::Packets::FF
     // dont display packet notification if it is a ping or pos update, don't want the spam
 
     pLog->debug( sessionStr + " Handling Chat IPC : " + name + "( " +
-                 boost::str( boost::format( "%|04X|" ) %
-                             static_cast< uint32_t >( opcode ) ) + " )" );
+                 Util::intToHexString( static_cast< uint32_t >( opcode ), 4 ) + " )" );
 
     ( this->*( it->second ) )( pPacket, *m_pSession->getPlayer() );
   }
   else
   {
     pLog->debug( sessionStr + " Undefined Chat IPC : Unknown ( " +
-                 boost::str( boost::format( "%|04X|" ) %
-                             static_cast< uint32_t >( opcode ) ) + " )" );
+                 Util::intToHexString( static_cast< uint32_t >( opcode ), 4 ) + " )" );
     //pLog->debug( pPacket.toString() );
   }
 }

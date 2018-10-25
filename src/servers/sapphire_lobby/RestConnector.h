@@ -3,7 +3,6 @@
 
 #include <string>
 #include <map>
-#include <boost/shared_ptr.hpp>
 
 #include "client_http.hpp"
 #include "Forwards.h"

@@ -2,11 +2,9 @@
 
 #include <Logging/Logger.h>
 #include <Config/ConfigMgr.h>
-
+#include <Util/Util.h>
 #include "ServerZone.h"
 
-#include <boost/format.hpp>
-#include <boost/algorithm/string/predicate.hpp>
 #include <experimental/filesystem>
 
 #include "Framework.h"
@@ -38,12 +36,12 @@ bool Core::Scripting::ScriptLoader::unloadModule( ModuleHandle handle )
 
   if( !success )
   {
-    pLog->error( "Failed to unload module @ 0x" + boost::str( boost::format( "%|08X|" ) % handle ) );
+    pLog->error( "Failed to unload module " );
 
     return false;
   }
 
-  pLog->debug( "Unloaded module @ 0x" + boost::str( boost::format( "%|08X|" ) % handle ) );
+  pLog->debug( "Unloaded module" );
 
   return true;
 }
@@ -90,8 +88,7 @@ Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::loadModule( const st
     return nullptr;
   }
 
-  pLog->debug(
-    "Loaded module '" + f.filename().string() + "' @ 0x" + boost::str( boost::format( "%|08X|" ) % handle ) );
+  pLog->debug( "Loaded module '" + f.filename().string() );
 
   auto info = new ScriptInfo;
   info->handle = handle;
@@ -118,8 +115,6 @@ ScriptObject** Core::Scripting::ScriptLoader::getScripts( ModuleHandle handle )
   if( func )
   {
     auto ptr = func();
-
-    pLog->debug( "got ScriptObject array @ 0x" + boost::str( boost::format( "%|08X|" ) % ptr ) );
 
     return ptr;
   }
@@ -166,7 +161,8 @@ bool Core::Scripting::ScriptLoader::isModuleLoaded( std::string name )
 {
   for( auto it = m_scriptMap.begin(); it != m_scriptMap.end(); ++it )
   {
-    if( boost::iequals( it->second->library_name, name ) )
+
+    if( Util::toLowerCopy( it->second->library_name) == Util::toLowerCopy( name ) )
       return true;
   }
 

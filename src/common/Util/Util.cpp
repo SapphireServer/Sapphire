@@ -2,6 +2,8 @@
 #include <chrono>
 #include <sstream>
 #include <iomanip>
+#include <algorithm>
+#include <string>
 
 std::string Core::Util::binaryToHexString( uint8_t* pBinData, uint16_t size )
 {
@@ -9,15 +11,20 @@ std::string Core::Util::binaryToHexString( uint8_t* pBinData, uint16_t size )
 
   for( uint32_t i = 0; i < size; i++ )
   {
-// TODO:: std::hex stream	  
-//    outStr += boost::str( boost::format( "%|02X|" ) % ( int32_t ) ( pBinData[ i ] & 0xFF ) );
+    outStr += Util::intToHexString( static_cast< int8_t>( pBinData[ i ] & 0xFF ) );
   }
 
   return outStr;
 
 }
+std::string Core::Util::toLowerCopy( const std::string& inStr )
+{
+  std::string out;	
+  std::transform( inStr.begin(), inStr.end(), out.begin(), ::tolower );
+  return out;
+}
 
-std::string intToHexString( uint64_t intValue, uint8_t width ) 
+std::string Core::Util::intToHexString( uint64_t intValue, uint8_t width ) 
 {
     std::string hexStr;
 
