@@ -12,9 +12,9 @@ struct PlaceName;
 struct TerritoryType;
 struct InstanceContent;
 
-using PlaceNamePtr = boost::shared_ptr< PlaceName >;
-using TerritoryTypePtr = boost::shared_ptr< TerritoryType >;
-using InstanceContentPtr = boost::shared_ptr< InstanceContent >;
+using PlaceNamePtr = std::shared_ptr< PlaceName >;
+using TerritoryTypePtr = std::shared_ptr< TerritoryType >;
+using InstanceContentPtr = std::shared_ptr< InstanceContent >;
 }
 
 /*!

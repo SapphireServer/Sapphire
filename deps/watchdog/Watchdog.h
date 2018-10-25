@@ -30,8 +30,8 @@
 #include <atomic>
 #include <mutex>
 
-#include <boost/filesystem.hpp>
-namespace ci { namespace fs = boost::filesystem; }
+#include <experimental/filesystem>
+namespace ci { namespace fs = std::experimental::filesystem; }
 
 //! Exception for when Watchdog can't locate a file or parse the wildcard
 class WatchedFileSystemExc : public std::exception {
@@ -72,7 +72,7 @@ public:
       watchImpl( ci::fs::path() );
    }
    //! Sets the last modification time of a file or directory. by default sets the time to the current time
-   static void touch( const ci::fs::path &path, std::time_t time = std::time( nullptr ) )
+   static void touch( const ci::fs::path &path, ci::fs::file_time_type time = ci::fs::file_time_type::clock::now() )
    {
 
       // if the file or directory exists change its last write time
@@ -308,11 +308,11 @@ protected:
       };
 
    protected:
-      ci::fs::path                                            mPath;
-      std::string                                             mFilter;
-      std::function<void(const ci::fs::path&)>                mCallback;
-      std::function<void(const std::vector<ci::fs::path>&)>   mListCallback;
-      std::map< std::string, std::time_t >                    mModificationTimes;
+      ci::fs::path                                                              mPath;
+      std::string                                                               mFilter;
+      std::function<void(const ci::fs::path&)>                                  mCallback;
+      std::function<void(const std::vector<ci::fs::path>&)>                     mListCallback;
+      std::map< std::string, std::experimental::filesystem::file_time_type >    mModificationTimes;
    };
 
    std::mutex                      mMutex;

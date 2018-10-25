@@ -127,7 +127,7 @@ public:
  *
  * @return a boost::shared_ptr to NativeScriptMgr
  */
-boost::shared_ptr< NativeScriptMgr > createNativeScriptMgr();
+std::shared_ptr< NativeScriptMgr > createNativeScriptMgr();
 }
 }
 

@@ -19,15 +19,15 @@ using namespace Core;
 
 bool setupFramework()
 {
-  auto pServer = boost::make_shared< ServerZone >( "zone.ini" );
-  auto pLogger = boost::make_shared< Logger >();
-  auto pExdData = boost::make_shared< Data::ExdDataGenerated >();
-  auto pScript = boost::make_shared< Scripting::ScriptMgr >();
-  auto pDb = boost::make_shared< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  auto pLsMgr = boost::make_shared< LinkshellMgr >();
-  auto pTeriMgr = boost::make_shared< TerritoryMgr >();
-  auto pDebugCom = boost::make_shared< DebugCommandHandler >();
-  auto pConfig = boost::make_shared< ConfigMgr >();
+  auto pServer = std::make_shared< ServerZone >( "zone.ini" );
+  auto pLogger = std::make_shared< Logger >();
+  auto pExdData = std::make_shared< Data::ExdDataGenerated >();
+  auto pScript = std::make_shared< Scripting::ScriptMgr >();
+  auto pDb = std::make_shared< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pLsMgr = std::make_shared< LinkshellMgr >();
+  auto pTeriMgr = std::make_shared< TerritoryMgr >();
+  auto pDebugCom = std::make_shared< DebugCommandHandler >();
+  auto pConfig = std::make_shared< ConfigMgr >();
 
   pLogger->setLogPath( "log/SapphireZone_" );
   pLogger->init();

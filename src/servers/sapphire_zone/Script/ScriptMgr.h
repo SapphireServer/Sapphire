@@ -1,7 +1,7 @@
 #ifndef _ScriptMgr_H_
 #define _ScriptMgr_H_
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <mutex>
 #include <set>
 
@@ -17,7 +17,7 @@ private:
   /*!
    * @brief A shared ptr to NativeScriptMgr, used for accessing and managing the native script system.
    */
-  boost::shared_ptr< NativeScriptMgr > m_nativeScriptMgr;
+  std::shared_ptr< NativeScriptMgr > m_nativeScriptMgr;
 
   std::function< std::string( Entity::Player & ) > m_onFirstEnterWorld;
 

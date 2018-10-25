@@ -1,7 +1,9 @@
 #ifndef _LOGGER_H
 #define _LOGGER_H
 
-#include <boost/log/trivial.hpp>
+// #include <boost/log/trivial.hpp>
+
+#include <spdlog/spdlog.h>
 
 namespace Core {
 
@@ -19,9 +21,9 @@ class Logger
 {
 
 private:
-  boost::log::sources::severity_logger_mt< boost::log::trivial::severity_level > m_lg;
-
   std::string m_logFile;
+
+  std::shared_ptr< spdlog::logger > m_logger;
 
 public:
   Logger();

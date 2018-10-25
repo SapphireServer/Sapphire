@@ -54,7 +54,7 @@ bool ActionCollision::isActorApplicable( Actor& actor, TargetFilter targetFilter
 
 std::set< Core::Entity::ActorPtr > ActionCollision::getActorsHitFromAction( FFXIVARR_POSITION3 aoePosition,
                                                                             std::set< ActorPtr > actorsInRange,
-                                                                            boost::shared_ptr< Core::Data::Action > actionInfo,
+                                                                            std::shared_ptr< Core::Data::Action > actionInfo,
                                                                             TargetFilter targetFilter )
 {
   std::set< ActorPtr > actorsCollided;

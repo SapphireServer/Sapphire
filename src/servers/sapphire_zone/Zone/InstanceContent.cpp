@@ -29,7 +29,7 @@ using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 using namespace Core::Network::ActorControl;
 
-Core::InstanceContent::InstanceContent( boost::shared_ptr< Core::Data::InstanceContent > pInstanceConfiguration,
+Core::InstanceContent::InstanceContent( std::shared_ptr< Core::Data::InstanceContent > pInstanceConfiguration,
                                         uint16_t territoryType,
                                         uint32_t guId,
                                         const std::string& internalName,

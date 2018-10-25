@@ -59,7 +59,7 @@ void examineHandler( Core::Entity::Player& player, uint32_t targetId )
       }
       else
       {
-        player.queuePacket( boost::make_shared< ExaminePacket >( player, pTarget ) );
+        player.queuePacket( std::make_shared< ExaminePacket >( player, pTarget ) );
       }
     }
   }

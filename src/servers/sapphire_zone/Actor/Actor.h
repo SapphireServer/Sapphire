@@ -2,7 +2,7 @@
 #define _GAME_OBJECT_H_
 
 #include <Common.h>
-#include <boost/enable_shared_from_this.hpp>
+#include <memory>
 
 #include "ForwardsZone.h"
 #include <set>
@@ -17,7 +17,7 @@ namespace Entity {
 \brief Base class for all actor/objects
 
 */
-class Actor : public boost::enable_shared_from_this< Actor >
+class Actor : public std::enable_shared_from_this< Actor >
 {
 
 protected:

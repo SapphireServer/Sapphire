@@ -41,7 +41,7 @@ foreach(_scriptDir ${children})
         if(MSVC)
             #target_link_libraries( "script_${_name}" ${Boost_LIBRARIES})
             set_target_properties( "script_${_name}" PROPERTIES
-                CXX_STANDARD 14
+                CXX_STANDARD 17
                 CXX_STANDARD_REQUIRED ON
                 CXX_EXTENSIONS ON
                 LIBRARY_OUTPUT_DIRECTORY_DEBUG "${SCRIPT_LIB_DIR}"

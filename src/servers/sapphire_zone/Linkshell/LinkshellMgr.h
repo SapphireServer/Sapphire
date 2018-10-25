@@ -1,13 +1,13 @@
 #ifndef CORE_LINKSHELLMGR_H
 #define CORE_LINKSHELLMGR_H
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <map>
 
 namespace Core {
 class Linkshell;
 
-using LinkshellPtr = boost::shared_ptr< Linkshell >;
+using LinkshellPtr = std::shared_ptr< Linkshell >;
 
 class LinkshellMgr
 {
