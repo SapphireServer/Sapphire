@@ -30,9 +30,14 @@ void Logger::init()
   std::vector< spdlog::sink_ptr > sinks;
 
   sinks.push_back( std::make_shared< spdlog::sinks::stdout_color_sink_mt >() );
-  sinks.push_back( std::make_shared< spdlog::sinks::daily_file_sink_mt >( m_logFile, 0, 0 ) );
+  sinks.push_back( std::make_shared< spdlog::sinks::daily_file_sink_mt >( m_logFile + ".log", 0, 0 ) );
 
   m_logger = std::make_shared< spdlog::logger >( "logger", std::begin( sinks ), std::end( sinks ) );
+
+  // always flush the log on criticial messages, otherwise it's done by libc
+  // see: https://github.com/gabime/spdlog/wiki/7.-Flush-policy
+  // nb: if the server crashes, log data can be missing from the file unless something logs critical just before it does
+  m_logger->flush_on( spdlog::level::critical );
 
   //spdlog::set_pattern( "[%H:%M:%S] [%l] %v" );
 }
