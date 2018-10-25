@@ -27,7 +27,6 @@ set_target_properties( common PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_CURRENT_SOURCE_DIR}/../../bin/"
 )
 
-target_link_libraries( common PUBLIC ${Boost_LIBRARIES} )
 target_link_libraries( common PUBLIC xivdat )
 
 target_link_libraries( common PUBLIC mysqlConnector )
@@ -45,8 +44,9 @@ endif()
 target_include_directories( common
                               PUBLIC
                                 "${CMAKE_CURRENT_SOURCE_DIR}/"
-			        "${CMAKE_CURRENT_SOURCE_DIR}/../../deps/asio/asio/include/"
-			        "${CMAKE_CURRENT_SOURCE_DIR}/../../deps/"
+                                "${CMAKE_CURRENT_SOURCE_DIR}/../../deps/"
+                                "${CMAKE_CURRENT_SOURCE_DIR}/../../deps/asio/asio/include/"
+                                "${CMAKE_CURRENT_SOURCE_DIR}/../../deps/spdlog/include/"
                               PRIVATE
                                 "${CMAKE_CURRENT_SOURCE_DIR}/src/libraries/external/")
 

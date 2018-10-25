@@ -1,7 +1,7 @@
 #ifndef _FORWARDS_H
 #define _FORWARDS_H
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 namespace Core {
 
@@ -19,20 +19,20 @@ class Session;
 
 class ZonePosition;
 
-typedef boost::shared_ptr< Zone > ZonePtr;
-typedef boost::shared_ptr< Item > ItemPtr;
-typedef boost::shared_ptr< ItemContainer > ItemContainerPtr;
-typedef boost::shared_ptr< Inventory > InventoryPtr;
-typedef boost::shared_ptr< Session > SessionPtr;
-typedef boost::shared_ptr< ZonePosition > ZonePositionPtr;
+typedef std::shared_ptr< Zone > ZonePtr;
+typedef std::shared_ptr< Item > ItemPtr;
+typedef std::shared_ptr< ItemContainer > ItemContainerPtr;
+typedef std::shared_ptr< Inventory > InventoryPtr;
+typedef std::shared_ptr< Session > SessionPtr;
+typedef std::shared_ptr< ZonePosition > ZonePositionPtr;
 
 namespace StatusEffect {
 class StatusEffect;
 
 class StatusEffectContainer;
 
-typedef boost::shared_ptr< StatusEffect > StatusEffectPtr;
-typedef boost::shared_ptr< StatusEffectContainer > StatusEffectContainerPtr;
+typedef std::shared_ptr< StatusEffect > StatusEffectPtr;
+typedef std::shared_ptr< StatusEffectContainer > StatusEffectContainerPtr;
 }
 
 namespace Entity {
@@ -42,15 +42,15 @@ class Player;
 
 class BattleNpc;
 
-typedef boost::shared_ptr< Chara > ActorPtr;
-typedef boost::shared_ptr< Player > PlayerPtr;
-typedef boost::shared_ptr< BattleNpc > BattleNpcPtr;
+typedef std::shared_ptr< Chara > ActorPtr;
+typedef std::shared_ptr< Player > PlayerPtr;
+typedef std::shared_ptr< BattleNpc > BattleNpcPtr;
 }
 
 namespace Event {
 class EventHandler;
 
-typedef boost::shared_ptr< EventHandler > EventPtr;
+typedef std::shared_ptr< EventHandler > EventPtr;
 }
 
 namespace Action {
@@ -60,9 +60,9 @@ class ActionTeleport;
 
 class EventAction;
 
-typedef boost::shared_ptr< Action > ActionPtr;
-typedef boost::shared_ptr< ActionTeleport > ActionTeleportPtr;
-typedef boost::shared_ptr< EventAction > EventActionPtr;
+typedef std::shared_ptr< Action > ActionPtr;
+typedef std::shared_ptr< ActionTeleport > ActionTeleportPtr;
+typedef std::shared_ptr< EventAction > EventActionPtr;
 }
 
 
@@ -79,18 +79,18 @@ class SessionConnection;
 
 class ZoneConnection;
 
-typedef boost::shared_ptr< Hive > HivePtr;
-typedef boost::shared_ptr< Acceptor > AcceptorPtr;
-typedef boost::shared_ptr< Connection > ConnectionPtr;
-typedef boost::shared_ptr< WorldConnection > WorldConnectionPtr;
-typedef boost::shared_ptr< ZoneConnection > ZoneConnectionPtr;
-typedef boost::shared_ptr< SessionConnection > SessionConnectionPtr;
+typedef std::shared_ptr< Hive > HivePtr;
+typedef std::shared_ptr< Acceptor > AcceptorPtr;
+typedef std::shared_ptr< Connection > ConnectionPtr;
+typedef std::shared_ptr< WorldConnection > WorldConnectionPtr;
+typedef std::shared_ptr< ZoneConnection > ZoneConnectionPtr;
+typedef std::shared_ptr< SessionConnection > SessionConnectionPtr;
 
 namespace Packets {
 class GamePacket;
 
 
-typedef boost::shared_ptr< GamePacket > GamePacketPtr;
+typedef std::shared_ptr< GamePacket > GamePacketPtr;
 
 
 }
