@@ -1,5 +1,7 @@
 #include "Util.h"
 #include <chrono>
+#include <sstream>
+#include <iomanip>
 
 std::string Core::Util::binaryToHexString( uint8_t* pBinData, uint16_t size )
 {
@@ -13,6 +15,21 @@ std::string Core::Util::binaryToHexString( uint8_t* pBinData, uint16_t size )
 
   return outStr;
 
+}
+
+std::string intToHexString( uint64_t intValue, uint8_t width ) 
+{
+    std::string hexStr;
+
+    /// integer value to hex-string
+    std::stringstream sstream;
+    sstream << std::setfill ('0') << std::setw( width )
+            << std::hex << intValue;
+
+    hexStr = sstream.str();
+    sstream.clear();
+
+    return hexStr;
 }
 
 std::string Core::Util::binaryToHexDump( uint8_t* pBinData, uint16_t size )
