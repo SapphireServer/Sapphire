@@ -2,7 +2,6 @@
 #define	CLIENT_HTTP_HPP
 
 #include <asio.hpp>
-#include <boost/utility/string_ref.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/functional/hash.hpp>
 
@@ -52,7 +51,7 @@ namespace SimpleWeb {
         /// Set before calling request
         Config config;
         
-        std::shared_ptr<Response> request(const std::string& request_type, const std::string& path="/", boost::string_ref content="",
+        std::shared_ptr<Response> request(const std::string& request_type, const std::string& path="/", std::string_view content="",
                 const std::map<std::string, std::string>& header=std::map<std::string, std::string>()) {
             auto corrected_path=path;
             if(corrected_path=="")
