@@ -73,8 +73,8 @@ void ServerLobby::run( int32_t argc, char* argv[] )
   Network::addServerToHive< Network::GameConnection >( m_ip, m_port, hive );
 
   g_log.info(
-    "Lobby server running on " + m_pConfig->getValue< std::string >( "LobbyNetwork.ListenIp", "0.0.0.0" ) + ":" +
-    m_pConfig->getValue< std::string >( "LobbyNetwork.ListenPort", "80" ) );
+    "Lobby server running on " + m_pConfig->getValue< std::string >( "LobbyNetwork", "ListenIp", "0.0.0.0" ) + ":" +
+    m_pConfig->getValue< std::string >( "LobbyNetwork", "ListenPort", "80" ) );
 
   boost::thread_group worker_threads;
   worker_threads.create_thread( boost::bind( &Network::Hive::Run, hive.get() ) );
@@ -130,12 +130,12 @@ bool ServerLobby::loadSettings( int32_t argc, char* argv[] )
     }
   }
 
-  m_port = m_pConfig->getValue< uint16_t >( "LobbyNetwork.ListenPort", 54994 );
-  m_ip = m_pConfig->getValue< std::string >( "LobbyNetwork.ListenIp", "0.0.0.0" );
+  m_port = m_pConfig->getValue< uint16_t >( "LobbyNetwork", "ListenPort", 54994 );
+  m_ip = m_pConfig->getValue< std::string >( "LobbyNetwork", "ListenIp", "0.0.0.0" );
 
-  g_restConnector.restHost = m_pConfig->getValue< std::string >( "GlobalNetwork.RestHost" ) + ":" +
-                             m_pConfig->getValue< std::string >( "GlobalNetwork.RestPort" );
-  g_restConnector.serverSecret = m_pConfig->getValue< std::string >( "GlobalParameters.ServerSecret" );
+  g_restConnector.restHost = m_pConfig->getValue< std::string >( "GlobalNetwork", "RestHost" ) + ":" +
+                             m_pConfig->getValue< std::string >( "GlobalNetwork", "RestPort" );
+  g_restConnector.serverSecret = m_pConfig->getValue< std::string >( "GlobalParameters", "ServerSecret" );
 
   return true;
 }

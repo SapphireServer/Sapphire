@@ -333,7 +333,7 @@ void Core::Entity::Player::eventItemActionStart( uint32_t eventId,
 void Core::Entity::Player::onLogin()
 {
   auto pConfig = g_fw.get< ConfigMgr >();
-  auto motd = pConfig->getValue< std::string >( "General.MotD", "" );
+  auto motd = pConfig->getValue< std::string >( "General", "MotD", "" );
 
   std::istringstream ss( motd );
   std::string msg;

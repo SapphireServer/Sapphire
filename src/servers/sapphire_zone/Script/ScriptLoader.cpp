@@ -61,7 +61,7 @@ Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::loadModule( const st
   }
 
   // copy to temp dir
-  fs::path cacheDir( f.parent_path() /= pConfig->getValue< std::string >( "Scripts.CachePath", "./cache/" ) );
+  fs::path cacheDir( f.parent_path() /= pConfig->getValue< std::string >( "Scripts", "CachePath", "./cache/" ) );
   fs::create_directories( cacheDir );
   fs::path dest( cacheDir /= f.filename().string() );
 
