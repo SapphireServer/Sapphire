@@ -1,3 +1,6 @@
 [submodule "deps/asio"]
 	path = deps/asio
 	url = https://github.com/chriskohlhoff/asio.git
+[submodule "deps/spdlog"]
+	path = deps/spdlog
+	url = https://github.com/gabime/spdlog.git

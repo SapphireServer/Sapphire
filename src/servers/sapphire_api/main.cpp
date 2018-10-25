@@ -43,7 +43,6 @@ Core::Data::ExdDataGenerated g_exdDataGen;
 Core::Network::SapphireAPI g_sapphireAPI;
 
 using namespace std;
-using namespace boost::property_tree;
 
 using HttpServer = SimpleWeb::Server< SimpleWeb::HTTP >;
 using HttpClient = SimpleWeb::Client< SimpleWeb::HTTP >;
@@ -53,13 +52,13 @@ void default_resource_send( const HttpServer& server, const shared_ptr< HttpServ
                             const shared_ptr< ifstream >& ifs );
 
 
-auto m_pConfig = boost::make_shared< Core::ConfigMgr >();
+auto m_pConfig = std::make_shared< Core::ConfigMgr >();
 HttpServer server;
 std::string configPath( "rest.ini" );
 
 void reloadConfig()
 {
-  m_pConfig = boost::make_shared< Core::ConfigMgr >();
+  m_pConfig = std::make_shared< Core::ConfigMgr >();
 
   if( !m_pConfig->loadConfig( configPath ) )
     throw "Error loading config ";
@@ -747,7 +746,7 @@ void defaultGet( shared_ptr< HttpServer::Response > response, shared_ptr< HttpSe
 
 int main( int argc, char* argv[] )
 {
-  auto pLog = boost::shared_ptr< Core::Logger >( new Core::Logger() );
+  auto pLog = std::shared_ptr< Core::Logger >( new Core::Logger() );
   g_fw.set< Core::Logger >( pLog );
   g_log.setLogPath( "log/SapphireAPI" );
   g_log.init();

@@ -8,16 +8,17 @@
 #include <iostream>
 #include <cctype>
 #include <set>
-#include <Exd/ExdData.h>
+#include <Exd/ExdDataGenerated.h>
 #include <Logging/Logger.h>
 #include <boost/range/algorithm/remove_if.hpp>
-#include <boost/algorithm/string/classification.hpp>
+#include <algorithm>
+
 
 #include <fstream>
 
 
 Core::Logger g_log;
-Core::Data::ExdData g_exdData;
+Core::Data::ExdDataGenerated g_exdData;
 
 
 //const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
@@ -44,11 +45,11 @@ std::string generateEnum( const std::string& exd, int8_t nameIndex, const std::s
   {
     auto& fields = row.second;
     uint32_t id = row.first;
-    auto test = boost::get< std::string >( &fields.at( nameIndex ) );
+    auto test = std::get< std::string >( fields.at( nameIndex ) );
     if( !test )
       continue;
     auto str = *test;
-    str.erase( boost::remove_if( str, boost::is_any_of( ",_-':!(){} \x02\x1f\x01\x03" ) ), str.end() );
+    str.erase( std::remove_if( str.begin(), str.end(), std::is_any_of( ",_-':!(){} \x02\x1f\x01\x03" ) ) );
     if( str.empty() )
       continue;
     str[ 0 ] = std::toupper( str[ 0 ] );
