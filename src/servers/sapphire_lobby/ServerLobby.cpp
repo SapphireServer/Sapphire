@@ -20,9 +20,6 @@
 #include <Forwards.h>
 
 #include <thread>
-#include <boost/thread.hpp>
-
-#include <boost/algorithm/string.hpp>
 
 Core::Logger g_log;
 Core::Network::RestConnector g_restConnector;
@@ -76,9 +73,13 @@ void ServerLobby::run( int32_t argc, char* argv[] )
     "Lobby server running on " + m_pConfig->getValue< std::string >( "LobbyNetwork.ListenIp", "0.0.0.0" ) + ":" +
     m_pConfig->getValue< std::string >( "LobbyNetwork.ListenPort", "80" ) );
 
-  boost::thread_group worker_threads;
-  worker_threads.create_thread( boost::bind( &Network::Hive::Run, hive.get() ) );
-  worker_threads.join_all();
+  std::vector< std::thread > threadGroup;
+
+  threadGroup.emplace_back( std::bind( &Network::Hive::Run, hive.get() ) );
+
+  for( auto& thread : threadGroup )
+    if( thread.joinable() )
+      thread.join();
 
 }
 
@@ -99,7 +100,7 @@ bool ServerLobby::loadSettings( int32_t argc, char* argv[] )
 
     try
     {
-      arg = boost::to_lower_copy( std::string( args[ i ] ) );
+      std::transform( arg.begin(), arg.end(), arg.begin(), [](unsigned char c){ return std::tolower( c ); } );
       val = std::string( args[ i + 1 ] );
 
       // trim '-' from start of arg

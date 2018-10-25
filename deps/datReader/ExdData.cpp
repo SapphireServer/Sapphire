@@ -23,7 +23,6 @@ ExdData::ExdData(dat::GameData& i_game_data) try :
     xiv::utils::stream::vectorwrapbuf<char> databuf(dataCpy);
     std::istream stream(&databuf);
 
-
     // Iterates over the lines while skipping the first one
     std::string line;
     std::getline(stream, line); // extract first line EXLT,2

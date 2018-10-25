@@ -3,6 +3,7 @@
 #include "stream.h"
 
 #include "File.h"
+#include <sstream>
 
 using xiv::utils::bparse::extract;
 
@@ -10,38 +11,37 @@ namespace xiv
 {
 namespace exd
 {
-
 Exh::Exh(const dat::File& i_file)
 {
     // Get a stream from the file
     std::vector< char > dataCpy = i_file.get_data_sections().front();
-    xiv::utils::stream::vectorwrapbuf<char> databuf(dataCpy);
-    std::istream stream(&databuf);
+    std::istringstream iss( std::string( dataCpy.begin(), dataCpy.end() ) );
 
     // Extract header and skip to member definitions
-    _header = extract<ExhHeader>(stream);
-    stream.seekg(0x20);
+    _header = extract<ExhHeader>(iss);
+    iss.seekg(0x20);
 
     // Extract all the members and feed the _members map
     for (auto i = 0; i < _header.field_count; ++i)
     {
-        auto member = extract<ExhMember>(stream);
+        auto member = extract<ExhMember>(iss);
         _members[member.offset] = member;
         _exh_defs.push_back( member );
+	std::cout << "member_offset: " << member.offset << "\n";
     }
 
     // Extract all the exd_defs
     _exd_defs.reserve(_header.exd_count);
     for (auto i = 0; i < _header.exd_count; ++i)
     {
-        _exd_defs.emplace_back(extract<ExhExdDef>(stream));
+        _exd_defs.emplace_back(extract<ExhExdDef>(iss));
     }
 
     // Extract all the languages
     _languages.reserve(_header.language_count);
     for (auto i = 0; i < _header.language_count; ++i)
     {
-        _languages.emplace_back(Language(extract<uint16_t>(stream, "language")));
+        _languages.emplace_back(Language(extract<uint16_t>(iss, "language")));
     }
 }
 
