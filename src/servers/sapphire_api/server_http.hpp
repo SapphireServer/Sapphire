@@ -275,7 +275,7 @@ namespace SimpleWeb {
                         }
                         catch( const std::exception & ) {
                             if(on_error)
-                                on_error( request, std::error_code( std::errc::protocol_error, std::generic_category() ) );
+                                on_error( request, std::make_error_code( std::errc::protocol_error ) );
                             return;
                         }
                         if(content_length>num_additional_bytes) {
@@ -390,7 +390,7 @@ namespace SimpleWeb {
                         }
                         catch( const std::exception & ){
                             if(on_error)
-                                on_error( request, std::error_code( std::errc::protocol_error, std::generic_category() ) );
+                                on_error( request, std::make_error_code( std::errc::protocol_error ) );
                             return;
                         }
                         
@@ -412,7 +412,7 @@ namespace SimpleWeb {
             }
             catch( const std::exception & ) {
                 if(on_error)
-                    on_error( request, std::error_code( std::errc::protocol_error, std::generic_category() ) );
+                    on_error( request, std::make_error_code( std::errc::protocol_error ) );
                 return;
             }
         }
