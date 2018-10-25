@@ -64,7 +64,7 @@ public:
 
   void OnRecv( std::vector< uint8_t >& buffer ) override;
 
-  void OnError( const boost::system::error_code& error ) override;
+  void OnError( const asio::error_code& error ) override;
 
   void handlePackets( const Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
                       const std::vector< Packets::FFXIVARR_PACKET_RAW >& packetData );

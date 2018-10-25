@@ -91,12 +91,12 @@ void Core::Zone::loadWeatherRates()
   auto weatherRateFields = pExdData->m_WeatherRateDat.get_row( weatherRateId );
   for( size_t i = 0; i < 16; )
   {
-    int32_t weatherId = boost::get< int32_t >( weatherRateFields[ i ] );
+    int32_t weatherId = std::get< int32_t >( weatherRateFields[ i ] );
 
     if( weatherId == 0 )
       break;
 
-    sumPc += boost::get< uint8_t >( weatherRateFields[ i + 1 ] );
+    sumPc += std::get< uint8_t >( weatherRateFields[ i + 1 ] );
     m_weatherRateMap[ sumPc ] = weatherId;
     i += 2;
   }
