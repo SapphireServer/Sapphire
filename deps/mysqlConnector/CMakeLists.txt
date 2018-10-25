@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.10.0)
 project(Sapphire)
 
 
@@ -8,11 +8,18 @@ file( GLOB UTILS_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*" )
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} )
 
 add_library( mysqlConnector ${UTILS_PUBLIC_INCLUDE_FILES} ${UTILS_SOURCE_FILES} )
+
+set_target_properties( mysqlConnector PROPERTIES
+        CXX_STANDARD 17
+        CXX_STANDARD_REQUIRED ON
+        CXX_EXTENSIONS ON
+        )
+
 target_include_directories( mysqlConnector PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} )
 if(UNIX)
   target_include_directories( mysqlConnector PUBLIC "/usr/include/mysql/" )
   
 else()
-  target_include_directories( mysqlConnector PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../../external/MySQL/" )
+  target_include_directories( mysqlConnector PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../MySQL/" )
 endif()
 cotire(mysqlConnector)
