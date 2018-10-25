@@ -124,7 +124,7 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
   }
 
   pLog->info( "Setting up generated EXD data" );
-  if( !pExd->init( pConfig->getValue< std::string >( "GlobalParameters.DataPath", "" ) ) )
+  if( !pExd->init( pConfig->getValue< std::string >( "GlobalParameters", "DataPath", "" ) ) )
   {
     pLog->fatal( "Error setting up generated EXD data " );
     return false;
@@ -133,20 +133,20 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
   Core::Db::DbLoader loader;
 
   Core::Db::ConnectionInfo info;
-  info.password = pConfig->getValue< std::string >( "Database.Password", "" );
-  info.host = pConfig->getValue< std::string >( "Database.Host", "127.0.0.1" );
-  info.database = pConfig->getValue< std::string >( "Database.Database", "sapphire" );
-  info.port = pConfig->getValue< uint16_t >( "Database.Port", 3306 );
-  info.user = pConfig->getValue< std::string >( "Database.Username", "root" );
-  info.syncThreads = pConfig->getValue< uint8_t >( "Database.SyncThreads", 2 );
-  info.asyncThreads = pConfig->getValue< uint8_t >( "Database.AsyncThreads", 2 );
+  info.password = pConfig->getValue< std::string >( "Database", "Password", "" );
+  info.host = pConfig->getValue< std::string >( "Database", "Host", "127.0.0.1" );
+  info.database = pConfig->getValue< std::string >( "Database", "Database", "sapphire" );
+  info.port = pConfig->getValue< uint16_t >( "Database", "Port", 3306 );
+  info.user = pConfig->getValue< std::string >( "Database", "Username", "root" );
+  info.syncThreads = pConfig->getValue< uint8_t >( "Database", "SyncThreads", 2 );
+  info.asyncThreads = pConfig->getValue< uint8_t >( "Database", "AsyncThreads", 2 );
 
   loader.addDb( *pDb, info );
   if( !loader.initDbs() )
     return false;
 
-  m_port = pConfig->getValue< uint16_t >( "ZoneNetwork.ListenPort", 54992 );
-  m_ip = pConfig->getValue< std::string >( "ZoneNetwork.ListenIp", "0.0.0.0" );
+  m_port = pConfig->getValue< uint16_t >( "ZoneNetwork", "ListenPort", 54992 );
+  m_ip = pConfig->getValue< std::string >( "ZoneNetwork", "ListenIp", "0.0.0.0" );
 
   return true;
 }
