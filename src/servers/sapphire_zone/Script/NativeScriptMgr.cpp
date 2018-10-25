@@ -118,9 +118,9 @@ bool NativeScriptMgr::isModuleLoaded( const std::string& name )
 }
 
 
-boost::shared_ptr< NativeScriptMgr > createNativeScriptMgr()
+std::shared_ptr< NativeScriptMgr > createNativeScriptMgr()
 {
-  return boost::make_shared< NativeScriptMgr >();
+  return std::make_shared< NativeScriptMgr >();
 }
 }
 }

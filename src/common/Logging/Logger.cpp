@@ -1,18 +1,10 @@
 #include "Logger.h"
 
-#include <boost/log/core.hpp>
-#include <boost/log/trivial.hpp>
-#include <boost/log/expressions.hpp>
-#include <boost/log/sinks/text_file_backend.hpp>
-#include <boost/log/utility/setup/file.hpp>
-#include <boost/log/utility/setup/common_attributes.hpp>
-#include <boost/log/sources/severity_logger.hpp>
-#include <boost/log/sources/record_ostream.hpp>
-#include <boost/log/sources/global_logger_storage.hpp>
-#include <boost/log/support/date_time.hpp>
-#include <boost/log/utility/manipulators/add_value.hpp>
-#include <boost/log/utility/setup/console.hpp>
-#include <iostream>
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/sinks/daily_file_sink.h>
+
+// #include <iostream>
 
 namespace Core {
 
@@ -35,56 +27,45 @@ void Logger::setLogPath( const std::string& logPath )
 void Logger::init()
 {
 
-  auto format = (
-    boost::log::expressions::stream <<
-                                    boost::log::expressions::format_date_time< boost::posix_time::ptime >(
-                                      "TimeStamp", "[%H:%M:%S]" ) <<
-                                    "[" << boost::log::trivial::severity << "] " <<
-                                    boost::log::expressions::smessage
-  );
+  std::vector< spdlog::sink_ptr > sinks;
 
-  boost::log::add_file_log
-    (
-      boost::log::keywords::file_name =
-        m_logFile + "%Y-%m-%d.log",                                        /*< file name pattern >*/
-      boost::log::keywords::rotation_size =
-        10 * 1024 * 1024,                                   /*< rotate files every 10 MiB... >*/
-      boost::log::keywords::time_based_rotation = boost::log::sinks::file::rotation_at_time_point( 0, 0,
-                                                                                                   0 ), /*< ...or at midnight >*/
-      boost::log::keywords::open_mode = std::ios::app,
-      boost::log::keywords::format = format,
-      boost::log::keywords::auto_flush = true
-    );
+  sinks.push_back( std::make_shared< spdlog::sinks::stdout_color_sink_mt >() );
+  sinks.push_back( std::make_shared< spdlog::sinks::daily_file_sink_mt >( m_logFile + ".log", 0, 0 ) );
 
-  boost::log::add_console_log( std::cout, boost::log::keywords::format = format );
+  m_logger = std::make_shared< spdlog::logger >( "logger", std::begin( sinks ), std::end( sinks ) );
 
-  boost::log::add_common_attributes();
+  // always flush the log on criticial messages, otherwise it's done by libc
+  // see: https://github.com/gabime/spdlog/wiki/7.-Flush-policy
+  // nb: if the server crashes, log data can be missing from the file unless something logs critical just before it does
+  m_logger->flush_on( spdlog::level::critical );
+
+  //spdlog::set_pattern( "[%H:%M:%S] [%l] %v" );
 }
 
 
 void Logger::Log( LoggingSeverity logSev, const std::string& text )
 {
-  BOOST_LOG_SEV( m_lg, ( boost::log::trivial::severity_level ) logSev ) << text;
+  // BOOST_LOG_SEV( m_lg, ( boost::log::trivial::severity_level ) logSev ) << text;
 }
 
 void Logger::error( const std::string& text )
 {
-  BOOST_LOG_SEV( m_lg, boost::log::trivial::severity_level::error ) << text;
+  m_logger->error( text );
 }
 
 void Logger::info( const std::string& text )
 {
-  BOOST_LOG_SEV( m_lg, boost::log::trivial::severity_level::info ) << text;
+  m_logger->info( text );
 }
 
 void Logger::debug( const std::string& text )
 {
-  BOOST_LOG_SEV( m_lg, boost::log::trivial::severity_level::debug ) << text;
+  m_logger->debug( text );
 }
 
 void Logger::fatal( const std::string& text )
 {
-  BOOST_LOG_SEV( m_lg, boost::log::trivial::severity_level::fatal ) << text;
+  m_logger->critical( text );
 }
 
 

@@ -43,10 +43,10 @@ bool Core::ConfigMgr::loadConfig( const std::string& configName )
   std::ifstream configFile( localConfig.c_str() );
   configStream << configFile.rdbuf();
 
-  // parse the tree and we're fuckin done
+  // parse the trxee and we're fuckin done
   //boost::property_tree::read_ini( configStream, m_propTree );
   
-  m_pInih = std::unique_ptr< INIReader >(new INIReader( localConfig ) );
+  m_pInih = std::unique_ptr< INIReader >( new INIReader( localConfig ) );
 
   if( m_pInih->ParseError() < 0 )
     return false;

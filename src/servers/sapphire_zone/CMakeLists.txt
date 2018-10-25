@@ -23,7 +23,7 @@ file(GLOB SERVER_SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 add_executable( sapphire_zone ${SERVER_SOURCE_FILES} )
 
 set_target_properties(sapphire_zone PROPERTIES
-        CXX_STANDARD 14
+        CXX_STANDARD 17
         CXX_STANDARD_REQUIRED ON
         CXX_EXTENSIONS ON
         ENABLE_EXPORTS ON
@@ -35,7 +35,7 @@ set_target_properties(sapphire_zone PROPERTIES
         VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../../../bin/"
         )
 
-target_link_libraries( sapphire_zone PUBLIC common )
+target_link_libraries( sapphire_zone PUBLIC common stdc++fs )
 
 target_include_directories( sapphire_zone PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" )
 

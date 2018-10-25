@@ -74,7 +74,7 @@ void Core::Action::ActionMount::onFinish()
 
   pPlayer->unsetStateFlag( PlayerStateFlag::Casting );
 
-  auto effectPacket = boost::make_shared< Server::EffectPacket >( getId(), pPlayer->getId(), 4 );
+  auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pPlayer->getId(), 4 );
   effectPacket->setRotation( Math::Util::floatToUInt16Rot( pPlayer->getRot() ) );
 
   Server::EffectEntry effectEntry{};

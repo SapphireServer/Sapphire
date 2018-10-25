@@ -15,7 +15,7 @@ class DebugCommandHandler
 {
 private:
   // container mapping command string to command object
-  std::map< std::string, boost::shared_ptr< DebugCommand > > m_commandMap;
+  std::map< std::string, std::shared_ptr< DebugCommand > > m_commandMap;
 
 public:
   DebugCommandHandler();
@@ -29,31 +29,31 @@ public:
   void execCommand( char* data, Entity::Player& player );
 
   // help command
-  void help( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command );
+  void help( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
   // command handler callbacks
-  void set( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command );
+  void set( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
-  void get( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command );
+  void get( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
-  void add( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command );
-  //void debug( char * data, Entity::Player& player, boost::shared_ptr< DebugCommand > command );
+  void add( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
+  //void debug( char * data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
-  void injectPacket( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command );
+  void injectPacket( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
-  void injectChatPacket( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command );
+  void injectChatPacket( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
-  void replay( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command );
+  void replay( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
-  void nudge( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command );
+  void nudge( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
-  void serverInfo( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command );
+  void serverInfo( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
-  void unlockCharacter( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command );
+  void unlockCharacter( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
-  void instance( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command );
+  void instance( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
-  void script( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command );
+  void script( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
 };
 

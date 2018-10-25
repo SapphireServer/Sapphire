@@ -6,7 +6,7 @@
 #include <string>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/filesystem.hpp>
+#include <experimental/filesystem>
 
 #include <Exd.h>
 #include <ExdCat.h>
@@ -22,6 +22,7 @@
 
 Core::Logger g_log;
 Core::Data::ExdDataGenerated g_exdDataGen;
+namespace fs = std::experimental::filesystem;
 
 const std::string onTalkStr(
   "   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override\n"
@@ -345,8 +346,8 @@ int main( int argc, char** argv )
 
   auto rows = g_exdDataGen.getQuestIdList();
 
-  if( !boost::filesystem::exists( "./generated" ) )
-    boost::filesystem::create_directory( "./generated" );
+  if( !fs::exists( "./generated" ) )
+    fs::create_directory( "./generated" );
 
   g_log.info( "Export in progress" );
 

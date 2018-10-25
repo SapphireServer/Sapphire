@@ -11,16 +11,17 @@
 #include <set>
 #include <Exd/ExdDataGenerated.h>
 #include <Logging/Logger.h>
+
 #include <boost/range/algorithm/remove_if.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/variant/detail/substitute.hpp>
 #include <boost/format.hpp>
 
-using namespace boost::system;
-namespace filesys = boost::filesystem;
+#include <experimental/filesystem>
+
+namespace filesys = std::experimental::filesystem;
 
 #include <fstream>
 #include <streambuf>
@@ -171,8 +172,8 @@ std::vector< std::string > getAllFilesInDir( const std::string& dirPath,
           // Add the name in vector
           listOfFiles.push_back( iter->path().string() );
         }
-
-        error_code ec;
+        
+        std::error_code ec;
         // Increment the iterator to point to next entry in recursive iteration
         iter.increment( ec );
         if( ec )

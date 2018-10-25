@@ -7,13 +7,13 @@
 
 #include <boost/format.hpp>
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/filesystem.hpp>
+#include <experimental/filesystem>
 
 #include "Framework.h"
 
 extern Core::Framework g_fw;
 
-namespace fs = boost::filesystem;
+namespace fs = std::experimental::filesystem;
 
 const std::string Core::Scripting::ScriptLoader::getModuleExtension()
 {
@@ -67,9 +67,9 @@ Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::loadModule( const st
 
   try
   {
-    fs::copy_file( f, dest, fs::copy_option::overwrite_if_exists );
+    fs::copy_file( f, dest, fs::copy_options::overwrite_existing );
   }
-  catch( const boost::filesystem::filesystem_error& err )
+  catch( const fs::filesystem_error& err )
   {
     pLog->error( "Error copying file to cache: " + err.code().message() );
 
@@ -78,9 +78,9 @@ Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::loadModule( const st
 
 
 #ifdef _WIN32
-  ModuleHandle handle = LoadLibrary( dest.string().c_str() );
+  ModuleHandle handle = LoadLibrary( dest.c_str() );
 #else
-  ModuleHandle handle = dlopen( dest.string().c_str(), RTLD_LAZY );
+  ModuleHandle handle = dlopen( dest.c_str(), RTLD_LAZY );
 #endif
 
   if( !handle )

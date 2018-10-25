@@ -13,7 +13,7 @@ class DebugCommand
 {
 public:
 
-  using pFunc = void ( DebugCommandHandler::* )( char*, Entity::Player&, boost::shared_ptr< DebugCommand > );
+  using pFunc = void ( DebugCommandHandler::* )( char*, Entity::Player&, std::shared_ptr< DebugCommand > );
 
   // String for the command
   std::string m_commandName;

@@ -59,7 +59,7 @@ void Core::Entity::Player::removeQuest( uint16_t questId )
         m_questTracking[ ii ] = -1;
     }
 
-    boost::shared_ptr< QuestActive > pQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pQuest = m_activeQuests[ idx ];
     m_activeQuests[ idx ].reset();
 
     m_questIdToQuestIdx.erase( questId );
@@ -92,7 +92,7 @@ bool Core::Entity::Player::getQuestBitFlag8( uint16_t questId, uint8_t index )
   uint8_t value = 0;
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
     return pNewQuest->a.BitFlag8 & ( 1 << index );
   }
 
@@ -105,7 +105,7 @@ bool Core::Entity::Player::getQuestBitFlag16( uint16_t questId, uint8_t index )
   uint8_t value = 0;
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
     return pNewQuest->a.BitFlag16 & ( 1 << index );
   }
 
@@ -118,7 +118,7 @@ bool Core::Entity::Player::getQuestBitFlag24( uint16_t questId, uint8_t index )
   uint8_t value = 0;
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
     return pNewQuest->a.BitFlag24 & ( 1 << index );
   }
 
@@ -131,7 +131,7 @@ bool Core::Entity::Player::getQuestBitFlag32( uint16_t questId, uint8_t index )
   uint8_t value = 0;
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
     return pNewQuest->a.BitFlag32 & ( 1 << index );
   }
 
@@ -144,7 +144,7 @@ bool Core::Entity::Player::getQuestBitFlag40( uint16_t questId, uint8_t index )
   uint8_t value = 0;
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
     return pNewQuest->a.BitFlag40 & ( 1 << index );
   }
 
@@ -157,7 +157,7 @@ bool Core::Entity::Player::getQuestBitFlag48( uint16_t questId, uint8_t index )
   uint8_t value = 0;
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
     return pNewQuest->a.BitFlag48 & ( 1 << index );
   }
 
@@ -170,7 +170,7 @@ uint8_t Core::Entity::Player::getQuestUI8A( uint16_t questId )
   uint8_t value = 0;
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
     value = pNewQuest->c.UI8A;
   }
 
@@ -183,7 +183,7 @@ uint8_t Core::Entity::Player::getQuestUI8B( uint16_t questId )
   uint8_t value = 0;
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
     value = pNewQuest->c.UI8B;
   }
 
@@ -196,7 +196,7 @@ uint8_t Core::Entity::Player::getQuestUI8C( uint16_t questId )
   uint8_t value = 0;
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
     value = pNewQuest->c.UI8C;
   }
 
@@ -209,7 +209,7 @@ uint8_t Core::Entity::Player::getQuestUI8D( uint16_t questId )
   uint8_t value = 0;
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
     value = pNewQuest->c.UI8D;
   }
 
@@ -222,7 +222,7 @@ uint8_t Core::Entity::Player::getQuestUI8E( uint16_t questId )
   uint8_t value = 0;
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
     value = pNewQuest->c.UI8E;
   }
 
@@ -235,7 +235,7 @@ uint8_t Core::Entity::Player::getQuestUI8F( uint16_t questId )
   uint8_t value = 0;
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
     value = pNewQuest->c.UI8F;
   }
 
@@ -248,7 +248,7 @@ uint8_t Core::Entity::Player::getQuestUI8AH( uint16_t questId )
   uint8_t value = 0;
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
     value = pNewQuest->b.UI8AH;
   }
 
@@ -261,7 +261,7 @@ uint8_t Core::Entity::Player::getQuestUI8BH( uint16_t questId )
   uint8_t value = 0;
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
     value = pNewQuest->b.UI8BH;
   }
 
@@ -274,7 +274,7 @@ uint8_t Core::Entity::Player::getQuestUI8CH( uint16_t questId )
   uint8_t value = 0;
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
     value = pNewQuest->b.UI8CH;
   }
 
@@ -287,7 +287,7 @@ uint8_t Core::Entity::Player::getQuestUI8DH( uint16_t questId )
   uint8_t value = 0;
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
     value = pNewQuest->b.UI8DH;
   }
 
@@ -300,7 +300,7 @@ uint8_t Core::Entity::Player::getQuestUI8EH( uint16_t questId )
   uint8_t value = 0;
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
     value = pNewQuest->b.UI8EH;
   }
 
@@ -313,7 +313,7 @@ uint8_t Core::Entity::Player::getQuestUI8FH( uint16_t questId )
   uint8_t value = 0;
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
     value = pNewQuest->b.UI8FH;
   }
 
@@ -326,7 +326,7 @@ uint8_t Core::Entity::Player::getQuestUI8AL( uint16_t questId )
   uint8_t value = 0;
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
     value = pNewQuest->b.UI8AL;
   }
 
@@ -339,7 +339,7 @@ uint8_t Core::Entity::Player::getQuestUI8BL( uint16_t questId )
   uint8_t value = 0;
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
     value = pNewQuest->b.UI8BL;
   }
 
@@ -352,7 +352,7 @@ uint8_t Core::Entity::Player::getQuestUI8CL( uint16_t questId )
   uint8_t value = 0;
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
     value = pNewQuest->b.UI8CL;
   }
 
@@ -365,7 +365,7 @@ uint8_t Core::Entity::Player::getQuestUI8DL( uint16_t questId )
   uint8_t value = 0;
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
     value = pNewQuest->b.UI8DL;
   }
 
@@ -378,7 +378,7 @@ uint8_t Core::Entity::Player::getQuestUI8EL( uint16_t questId )
   uint8_t value = 0;
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
     value = pNewQuest->b.UI8EL;
   }
 
@@ -391,7 +391,7 @@ uint8_t Core::Entity::Player::getQuestUI8FL( uint16_t questId )
   uint8_t value = 0;
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
     value = pNewQuest->b.UI8FL;
   }
 
@@ -404,7 +404,7 @@ uint16_t Core::Entity::Player::getQuestUI16A( uint16_t questId )
   uint16_t value = 0;
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
     //   value = pNewQuest->d.UI16A;
   }
 
@@ -417,7 +417,7 @@ uint16_t Core::Entity::Player::getQuestUI16B( uint16_t questId )
   uint16_t value = 0;
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
     //   value = pNewQuest->d.UI16B;
   }
 
@@ -430,7 +430,7 @@ uint16_t Core::Entity::Player::getQuestUI16C( uint16_t questId )
   uint16_t value = 0;
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
     //  value = pNewQuest->d.UI16C;
   }
 
@@ -443,7 +443,7 @@ uint32_t Core::Entity::Player::getQuestUI32A( uint16_t questId )
   uint32_t value = 0;
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
     // value = pNewQuest->e.UI32A;
   }
 
@@ -456,7 +456,7 @@ void Core::Entity::Player::setQuestUI8A( uint16_t questId, uint8_t val )
 
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
 
     pNewQuest->c.UI8A = val;
 
@@ -470,7 +470,7 @@ void Core::Entity::Player::setQuestUI8B( uint16_t questId, uint8_t val )
 
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
 
     pNewQuest->c.UI8B = val;
 
@@ -484,7 +484,7 @@ void Core::Entity::Player::setQuestUI8C( uint16_t questId, uint8_t val )
 
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
 
     pNewQuest->c.UI8C = val;
 
@@ -498,7 +498,7 @@ void Core::Entity::Player::setQuestUI8D( uint16_t questId, uint8_t val )
 
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
 
     pNewQuest->c.UI8D = val;
 
@@ -512,7 +512,7 @@ void Core::Entity::Player::setQuestUI8E( uint16_t questId, uint8_t val )
 
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
 
     pNewQuest->c.UI8E = val;
 
@@ -526,7 +526,7 @@ void Core::Entity::Player::setQuestUI8F( uint16_t questId, uint8_t val )
 
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
 
     pNewQuest->c.UI8F = val;
 
@@ -540,7 +540,7 @@ void Core::Entity::Player::setQuestUI8AH( uint16_t questId, uint8_t val )
 
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
 
     pNewQuest->b.UI8AH = val;
 
@@ -554,7 +554,7 @@ void Core::Entity::Player::setQuestUI8BH( uint16_t questId, uint8_t val )
 
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
 
     pNewQuest->b.UI8BH = val;
 
@@ -568,7 +568,7 @@ void Core::Entity::Player::setQuestUI8CH( uint16_t questId, uint8_t val )
 
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
 
     pNewQuest->b.UI8CH = val;
 
@@ -582,7 +582,7 @@ void Core::Entity::Player::setQuestUI8DH( uint16_t questId, uint8_t val )
 
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
 
     pNewQuest->b.UI8DH = val;
 
@@ -596,7 +596,7 @@ void Core::Entity::Player::setQuestUI8EH( uint16_t questId, uint8_t val )
 
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
 
     pNewQuest->b.UI8EH = val;
 
@@ -610,7 +610,7 @@ void Core::Entity::Player::setQuestUI8FH( uint16_t questId, uint8_t val )
 
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
 
     pNewQuest->b.UI8FH = val;
 
@@ -624,7 +624,7 @@ void Core::Entity::Player::setQuestUI8AL( uint16_t questId, uint8_t val )
 
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
 
     pNewQuest->b.UI8AL = val;
 
@@ -638,7 +638,7 @@ void Core::Entity::Player::setQuestUI8BL( uint16_t questId, uint8_t val )
 
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
 
     pNewQuest->b.UI8BL = val;
 
@@ -652,7 +652,7 @@ void Core::Entity::Player::setQuestUI8CL( uint16_t questId, uint8_t val )
 
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
 
     pNewQuest->b.UI8CL = val;
 
@@ -666,7 +666,7 @@ void Core::Entity::Player::setQuestUI8DL( uint16_t questId, uint8_t val )
 
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
 
     pNewQuest->b.UI8DL = val;
 
@@ -680,7 +680,7 @@ void Core::Entity::Player::setQuestUI8EL( uint16_t questId, uint8_t val )
 
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
 
     pNewQuest->b.UI8EL = val;
 
@@ -694,7 +694,7 @@ void Core::Entity::Player::setQuestUI8FL( uint16_t questId, uint8_t val )
 
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
 
     pNewQuest->b.UI8FL = val;
 
@@ -708,7 +708,7 @@ void Core::Entity::Player::setQuestUI16A( uint16_t questId, uint16_t val )
 
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
 
     //   pNewQuest->d.UI16A = val;
 
@@ -722,7 +722,7 @@ void Core::Entity::Player::setQuestUI16B( uint16_t questId, uint16_t val )
 
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
 
     //  pNewQuest->d.UI16B = val;
 
@@ -736,7 +736,7 @@ void Core::Entity::Player::setQuestUI16C( uint16_t questId, uint16_t val )
 
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
 
 //      pNewQuest->d.UI16C = val;
 
@@ -750,7 +750,7 @@ void Core::Entity::Player::setQuestUI32A( uint16_t questId, uint32_t val )
 
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
 
     // pNewQuest->e.UI32A = val;
 
@@ -764,7 +764,7 @@ void Core::Entity::Player::setQuestBitFlag8( uint16_t questId, uint8_t index, bo
 
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
 
     if( val )
       pNewQuest->a.BitFlag8 |= ( 1 << index );
@@ -781,7 +781,7 @@ void Core::Entity::Player::setQuestBitFlag16( uint16_t questId, uint8_t index, b
 
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
 
     if( val )
       pNewQuest->a.BitFlag16 |= ( 1 << index );
@@ -798,7 +798,7 @@ void Core::Entity::Player::setQuestBitFlag24( uint16_t questId, uint8_t index, b
 
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
 
     if( val )
       pNewQuest->a.BitFlag24 |= ( 1 << index );
@@ -815,7 +815,7 @@ void Core::Entity::Player::setQuestBitFlag32( uint16_t questId, uint8_t index, b
 
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
 
     if( val )
       pNewQuest->a.BitFlag32 |= ( 1 << index );
@@ -832,7 +832,7 @@ void Core::Entity::Player::setQuestBitFlag40( uint16_t questId, uint8_t index, b
 
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
 
     if( val )
       pNewQuest->a.BitFlag40 |= ( 1 << index );
@@ -849,7 +849,7 @@ void Core::Entity::Player::setQuestBitFlag48( uint16_t questId, uint8_t index, b
 
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
 
     if( val )
       pNewQuest->a.BitFlag48 |= ( 1 << index );
@@ -867,7 +867,7 @@ uint8_t Core::Entity::Player::getQuestSeq( uint16_t questId )
 
   if( idx != -1 )
   {
-    boost::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
+    std::shared_ptr< QuestActive > pNewQuest = m_activeQuests[ idx ];
     return pNewQuest->c.sequence;
   }
   return 0;
@@ -902,7 +902,7 @@ void Core::Entity::Player::updateQuest( uint16_t questId, uint8_t sequence )
     if( !hasFreeSlot )
       return;
 
-    boost::shared_ptr< QuestActive > pNewQuest( new QuestActive() );
+    std::shared_ptr< QuestActive > pNewQuest( new QuestActive() );
     pNewQuest->c.questId = questId;
     pNewQuest->c.sequence = sequence;
     pNewQuest->c.padding = 0;
@@ -1003,7 +1003,7 @@ void Core::Entity::Player::sendQuestInfo()
 void
 Core::Entity::Player::sendQuestMessage( uint32_t questId, int8_t msgId, uint8_t type, uint32_t var1, uint32_t var2 )
 {
-  queuePacket( boost::make_shared< QuestMessagePacket >( getAsPlayer(), questId, msgId, type, var1, var2 ) );
+  queuePacket( std::make_shared< QuestMessagePacket >( getAsPlayer(), questId, msgId, type, var1, var2 ) );
 }
 
 
@@ -1076,7 +1076,7 @@ bool Core::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t optional
   return true;
 }
 
-boost::shared_ptr< QuestActive > Core::Entity::Player::getQuestActive( uint16_t index )
+std::shared_ptr< QuestActive > Core::Entity::Player::getQuestActive( uint16_t index )
 {
   return m_activeQuests[ index ];
 }

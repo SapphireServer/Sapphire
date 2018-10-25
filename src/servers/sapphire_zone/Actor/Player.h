@@ -200,7 +200,7 @@ public:
 
   bool giveQuestRewards( uint32_t questId, uint32_t optionalChoice );
 
-  boost::shared_ptr< Common::QuestActive > getQuestActive( uint16_t index );
+  std::shared_ptr< Common::QuestActive > getQuestActive( uint16_t index );
 
   uint8_t getQuestUI8A( uint16_t questId );
 
@@ -984,7 +984,7 @@ private:
 
   std::map< uint32_t, uint8_t > m_questIdToQuestIdx; // quest mapping, quest id to quest container index
   std::map< uint8_t, uint32_t > m_questIdxToQuestId; // quest mapping, quest container index to questId
-  boost::shared_ptr< Common::QuestActive > m_activeQuests[30];
+  std::shared_ptr< Common::QuestActive > m_activeQuests[30];
   int16_t m_questTracking[5];
 
   uint8_t m_stateFlags[12];
@@ -1003,7 +1003,7 @@ private:
   bool m_bMarkedForZoning;
   bool m_bNewAdventurer;
   uint64_t m_onlineStatus;
-  boost::shared_ptr< QueuedZoning > m_queuedZoneing;
+  std::shared_ptr< QueuedZoning > m_queuedZoneing;
 
   // search info
   char m_searchMessage[193]; // searchmessage to show in profile

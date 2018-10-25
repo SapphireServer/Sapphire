@@ -25,8 +25,7 @@
 //Added for the default_resource example
 #include <fstream>
 #include <string>
-#include <boost/filesystem.hpp>
-#include <boost/make_shared.hpp>
+#include <experimental/filesystem>
 #include <vector>
 #include <algorithm>
 
@@ -42,8 +41,9 @@ Core::Db::DbWorkerPool< Core::Db::ZoneDbConnection > g_charaDb;
 Core::Data::ExdDataGenerated g_exdDataGen;
 Core::Network::SapphireAPI g_sapphireAPI;
 
+namespace fs = std::experimental::filesystem;
+
 using namespace std;
-using namespace boost::property_tree;
 
 using HttpServer = SimpleWeb::Server< SimpleWeb::HTTP >;
 using HttpClient = SimpleWeb::Client< SimpleWeb::HTTP >;
@@ -53,13 +53,13 @@ void default_resource_send( const HttpServer& server, const shared_ptr< HttpServ
                             const shared_ptr< ifstream >& ifs );
 
 
-auto m_pConfig = boost::make_shared< Core::ConfigMgr >();
+auto m_pConfig = std::make_shared< Core::ConfigMgr >();
 HttpServer server;
 std::string configPath( "rest.ini" );
 
 void reloadConfig()
 {
-  m_pConfig = boost::make_shared< Core::ConfigMgr >();
+  m_pConfig = std::make_shared< Core::ConfigMgr >();
 
   if( !m_pConfig->loadConfig( configPath ) )
     throw "Error loading config ";
@@ -644,13 +644,13 @@ void get_init( shared_ptr< HttpServer::Response > response, shared_ptr< HttpServ
   print_request_info( request );
   try
   {
-    auto web_root_path = boost::filesystem::canonical( "web" );
-    auto path = boost::filesystem::canonical( web_root_path / "news.xml" );
+    auto web_root_path = fs::canonical( "web" );
+    auto path = fs::canonical( web_root_path / "news.xml" );
     //Check if path is within web_root_path
     if( distance( web_root_path.begin(), web_root_path.end() ) > distance( path.begin(), path.end() ) ||
         !std::equal( web_root_path.begin(), web_root_path.end(), path.begin() ) )
       throw invalid_argument( "path must be within root path" );
-    if( !( boost::filesystem::exists( path ) && boost::filesystem::is_regular_file( path ) ) )
+    if( !( fs::exists( path ) && fs::is_regular_file( path ) ) )
       throw invalid_argument( "file does not exist" );
 
     auto ifs = make_shared< ifstream >();
@@ -679,13 +679,13 @@ void get_headline_all( shared_ptr< HttpServer::Response > response, shared_ptr< 
   print_request_info( request );
   try
   {
-    auto web_root_path = boost::filesystem::canonical( "web" );
-    auto path = boost::filesystem::canonical( web_root_path / "headlines.xml" );
+    auto web_root_path = fs::canonical( "web" );
+    auto path = fs::canonical( web_root_path / "headlines.xml" );
     //Check if path is within web_root_path
     if( distance( web_root_path.begin(), web_root_path.end() ) > distance( path.begin(), path.end() ) ||
         !std::equal( web_root_path.begin(), web_root_path.end(), path.begin() ) )
       throw invalid_argument( "path must be within root path" );
-    if( !( boost::filesystem::exists( path ) && boost::filesystem::is_regular_file( path ) ) )
+    if( !( fs::exists( path ) && fs::is_regular_file( path ) ) )
       throw invalid_argument( "file does not exist" );
 
     auto ifs = make_shared< ifstream >();
@@ -713,15 +713,15 @@ void defaultGet( shared_ptr< HttpServer::Response > response, shared_ptr< HttpSe
   print_request_info( request );
   try
   {
-    auto web_root_path = boost::filesystem::canonical( "web" );
-    auto path = boost::filesystem::canonical( web_root_path / request->path );
+    auto web_root_path = fs::canonical( "web" );
+    auto path = fs::canonical( web_root_path / request->path );
     //Check if path is within web_root_path
     if( distance( web_root_path.begin(), web_root_path.end() ) > distance( path.begin(), path.end() ) ||
         !std::equal( web_root_path.begin(), web_root_path.end(), path.begin() ) )
       throw invalid_argument( "path must be within root path" );
-    if( boost::filesystem::is_directory( path ) )
+    if( fs::is_directory( path ) )
       path /= "index.html";
-    if( !( boost::filesystem::exists( path ) && boost::filesystem::is_regular_file( path ) ) )
+    if( !( fs::exists( path ) && fs::is_regular_file( path ) ) )
       throw invalid_argument( "file does not exist" );
 
     auto ifs = make_shared< ifstream >();
@@ -747,7 +747,7 @@ void defaultGet( shared_ptr< HttpServer::Response > response, shared_ptr< HttpSe
 
 int main( int argc, char* argv[] )
 {
-  auto pLog = boost::shared_ptr< Core::Logger >( new Core::Logger() );
+  auto pLog = std::shared_ptr< Core::Logger >( new Core::Logger() );
   g_fw.set< Core::Logger >( pLog );
   g_log.setLogPath( "log/SapphireAPI" );
   g_log.init();
@@ -804,7 +804,7 @@ void default_resource_send( const HttpServer& server, const shared_ptr< HttpServ
     response->write( &buffer[ 0 ], read_length );
     if( read_length == static_cast< streamsize >( buffer.size() ) )
     {
-      server.send( response, [ &server, response, ifs ]( const boost::system::error_code& ec )
+      server.send( response, [ &server, response, ifs ]( const std::error_code& ec )
       {
         if( !ec )
           default_resource_send( server, response, ifs );

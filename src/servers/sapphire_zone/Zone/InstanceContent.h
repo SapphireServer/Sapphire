@@ -20,7 +20,7 @@ public:
     DutyFinished
   };
 
-  InstanceContent( boost::shared_ptr< Core::Data::InstanceContent > pInstanceConfiguration,
+  InstanceContent( std::shared_ptr< Core::Data::InstanceContent > pInstanceConfiguration,
                    uint16_t territoryType,
                    uint32_t guId,
                    const std::string& internalName,
@@ -76,7 +76,7 @@ public:
 
   InstanceContentState getState() const;
 
-  boost::shared_ptr< Core::Data::InstanceContent > getInstanceConfiguration() const;
+  std::shared_ptr< Core::Data::InstanceContent > getInstanceConfiguration() const;
 
   uint32_t getInstanceContentId() const;
 
@@ -95,7 +95,7 @@ public:
   const uint32_t instanceStartDelay = 1250;
 
 private:
-  boost::shared_ptr< Core::Data::InstanceContent > m_instanceConfiguration;
+  std::shared_ptr< Core::Data::InstanceContent > m_instanceConfiguration;
   uint32_t m_instanceContentId;
   InstanceContentState m_state;
   uint16_t m_currentBgm;
