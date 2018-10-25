@@ -56,7 +56,7 @@ bool Core::Scripting::ScriptMgr::init()
   auto pConfig = g_fw.get< ConfigMgr >();
   auto pLog = g_fw.get< Logger >();
 
-  auto status = loadDir( pConfig->getValue< std::string >( "Scripts.Path", "./compiledscripts/" ),
+  auto status = loadDir( pConfig->getValue< std::string >( "Scripts", "Path", "./compiledscripts/" ),
                          files, m_nativeScriptMgr->getModuleExtension() );
 
   if( !status )
@@ -90,11 +90,11 @@ bool Core::Scripting::ScriptMgr::init()
 void Core::Scripting::ScriptMgr::watchDirectories()
 {
   auto pConfig = g_fw.get< ConfigMgr >();
-  auto shouldWatch = pConfig->getValue< bool >( "Scripts.HotSwap", true );
+  auto shouldWatch = pConfig->getValue< bool >( "Scripts", "HotSwap", true );
   if( !shouldWatch )
     return;
 
-  Watchdog::watchMany( pConfig->getValue< std::string >( "Scripts.Path", "./compiledscripts/" ) + "*" +
+  Watchdog::watchMany( pConfig->getValue< std::string >( "Scripts", "Path", "./compiledscripts/" ) + "*" +
                        m_nativeScriptMgr->getModuleExtension(),
                        [ this ]( const std::vector< ci::fs::path >& paths )
                        {
