@@ -86,7 +86,7 @@ void Core::Action::ActionTeleport::onFinish()
 
   pPlayer->setZoningType( ZoneingType::Teleport );
 
-  auto effectPacket = boost::make_shared< Server::EffectPacket >( getId(), pPlayer->getId(), 5 );
+  auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pPlayer->getId(), 5 );
   effectPacket->setRotation( Math::Util::floatToUInt16Rot( pPlayer->getRot() ) );
 
 

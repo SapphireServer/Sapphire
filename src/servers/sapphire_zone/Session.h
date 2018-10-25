@@ -1,15 +1,14 @@
 #ifndef _SESSION_H_
 #define _SESSION_H_
 
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include "ForwardsZone.h"
 
 namespace Core {
 
 class Session :
-  public boost::enable_shared_from_this< Session >
+  public std::enable_shared_from_this< Session >
 {
 public:
   Session( uint32_t sessionId );

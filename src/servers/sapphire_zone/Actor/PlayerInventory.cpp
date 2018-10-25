@@ -276,7 +276,7 @@ void Core::Entity::Player::addCurrency( CurrencyType type, uint32_t amount )
 
   updateContainer( Currency, slot, currItem );
 
-  auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
+  auto invUpdate = std::make_shared< UpdateInventorySlotPacket >( getId(),
                                                                     static_cast< uint8_t >( type ) - 1,
                                                                     Common::InventoryType::Currency,
                                                                     *currItem );
@@ -298,7 +298,7 @@ void Core::Entity::Player::removeCurrency( Common::CurrencyType type, uint32_t a
     currItem->setStackSize( currentAmount - amount );
   writeItem( currItem );
 
-  auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
+  auto invUpdate = std::make_shared< UpdateInventorySlotPacket >( getId(),
                                                                     static_cast< uint8_t >( type ) - 1,
                                                                     Common::InventoryType::Currency,
                                                                     *currItem );
@@ -326,7 +326,7 @@ void Core::Entity::Player::addCrystal( Common::CrystalType type, uint32_t amount
   writeInventory( Crystal );
 
 
-  auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
+  auto invUpdate = std::make_shared< UpdateInventorySlotPacket >( getId(),
                                                                     static_cast< uint8_t >( type ) - 1,
                                                                     Common::InventoryType::Crystal,
                                                                     *currItem );
@@ -349,7 +349,7 @@ void Core::Entity::Player::removeCrystal( Common::CrystalType type, uint32_t amo
 
   writeItem( currItem );
 
-  auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
+  auto invUpdate = std::make_shared< UpdateInventorySlotPacket >( getId(),
                                                                     static_cast< uint8_t >( type ) - 1,
                                                                     Common::InventoryType::Crystal,
                                                                     *currItem );
@@ -595,7 +595,7 @@ Core::ItemPtr Core::Entity::Player::addItem( uint32_t catalogId, uint32_t quanti
         item->setStackSize( newStackSize );
         writeItem( item );
 
-        auto slotUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(), slot, bag, *item );
+        auto slotUpdate = std::make_shared< UpdateInventorySlotPacket >( getId(), slot, bag, *item );
         queuePacket( slotUpdate );
 
         // return existing stack if we have no overflow - items fit into a preexisting stack
@@ -629,7 +629,7 @@ Core::ItemPtr Core::Entity::Player::addItem( uint32_t catalogId, uint32_t quanti
 
   if( !silent )
   {
-    auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(), freeBagSlot.second, freeBagSlot.first,
+    auto invUpdate = std::make_shared< UpdateInventorySlotPacket >( getId(), freeBagSlot.second, freeBagSlot.first,
                                                                       *item );
     queuePacket( invUpdate );
 

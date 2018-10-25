@@ -297,7 +297,7 @@ void Core::Network::GameConnection::updatePositionHandler( const Core::Network::
   player.m_lastMoveTime = currentTime;
   player.m_lastMoveflag = moveState;
 
-  auto movePacket = boost::make_shared< MoveActorPacket >( player, unk1, unk2, moveState, unk4 );
+  auto movePacket = std::make_shared< MoveActorPacket >( player, unk1, unk2, moveState, unk4 );
   player.sendToInRangeSet( movePacket );
 
 }
@@ -426,7 +426,7 @@ void Core::Network::GameConnection::pingHandler( const Core::Network::Packets::F
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcPingHandler >( inPacket );
 
-  queueOutPacket( boost::make_shared< Server::PingPacket >( player, packet.data().timestamp ) );
+  queueOutPacket( std::make_shared< Server::PingPacket >( player, packet.data().timestamp ) );
 
   player.setLastPing( static_cast< uint32_t >( time( nullptr ) ) );
 }
@@ -529,7 +529,7 @@ void Core::Network::GameConnection::chatHandler( const Core::Network::Packets::F
   auto chatType = packet.data().chatType;
 
   //ToDo, need to implement sending GM chat types.
-  auto chatPacket = boost::make_shared< Server::ChatPacket >( player, chatType, packet.data().message );
+  auto chatPacket = std::make_shared< Server::ChatPacket >( player, chatType, packet.data().message );
 
   switch( chatType )
   {

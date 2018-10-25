@@ -308,7 +308,7 @@ bool Core::ServerZone::createSession( uint32_t sessionId )
 
   pLog->info( "[" + session_id_str + "] Creating new session" );
 
-  boost::shared_ptr< Session > newSession( new Session( sessionId ) );
+  std::shared_ptr< Session > newSession( new Session( sessionId ) );
   m_sessionMapById[ sessionId ] = newSession;
 
   if( !newSession->loadPlayer() )
@@ -393,7 +393,7 @@ void Core::ServerZone::loadBNpcTemplates()
     auto look = res->getBlobVector( 12 );
     auto models = res->getBlobVector( 13 );
 
-    auto bnpcTemplate = boost::make_shared< Entity::BNpcTemplate >(
+    auto bnpcTemplate = std::make_shared< Entity::BNpcTemplate >(
                                               id, bNPCBaseId, bNPCNameId, mainWeaponModel, secWeaponModel,
                                               aggressionMode, enemyType, 0, pose, modelChara, displayFlags,
                                               reinterpret_cast< uint32_t* >( &models[ 0 ] ),

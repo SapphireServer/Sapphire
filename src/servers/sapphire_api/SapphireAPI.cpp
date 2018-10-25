@@ -50,7 +50,7 @@ bool Core::Network::SapphireAPI::login( const std::string& username, const std::
   }
 
   // create session for the new sessionid and store to sessionlist
-  auto pSession = boost::make_shared< Session >();
+  auto pSession = std::make_shared< Session >();
   pSession->setAccountId( accountId );
   pSession->setSessionId( sid );
 
@@ -75,7 +75,7 @@ bool Core::Network::SapphireAPI::login( const std::string& username, const std::
 bool Core::Network::SapphireAPI::insertSession( const uint32_t& accountId, std::string& sId )
 {
   // create session for the new sessionid and store to sessionlist
-  auto pSession = boost::make_shared< Session >();
+  auto pSession = std::make_shared< Session >();
   pSession->setAccountId( accountId );
   pSession->setSessionId( ( uint8_t* ) sId.c_str() );
 
