@@ -1,5 +1,4 @@
 #include "NativeScriptMgr.h"
-#include <boost/filesystem.hpp>
 
 #include <Crypt/md5.h>
 

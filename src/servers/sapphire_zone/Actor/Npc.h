@@ -2,7 +2,6 @@
 #define _NPC_H_
 
 #include <Common.h>
-#include <boost/enable_shared_from_this.hpp>
 
 #include "Forwards.h"
 #include "Chara.h"

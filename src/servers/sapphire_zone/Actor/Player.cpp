@@ -1,5 +1,3 @@
-#include <boost/make_shared.hpp>
-
 #include <Common.h>
 #include <Util/Util.h>
 #include <Util/UtilMath.h>

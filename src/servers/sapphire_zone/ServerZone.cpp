@@ -28,7 +28,6 @@
 
 #include "ForwardsZone.h"
 
-#include <boost/make_shared.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <thread>

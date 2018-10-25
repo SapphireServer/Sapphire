@@ -3,7 +3,6 @@
 
 #include <Common.h>
 
-#include <boost/shared_ptr.hpp>
 #include <mutex>
 #include <map>
 

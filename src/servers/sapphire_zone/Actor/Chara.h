@@ -2,7 +2,6 @@
 #define _CHARA_H_
 
 #include <Common.h>
-#include <boost/enable_shared_from_this.hpp>
 
 #include "Forwards.h"
 #include "Actor.h"
@@ -18,8 +17,7 @@ namespace Entity {
 \brief Base class for all animate actors
 
 */
-class Chara :
-  public Actor
+class Chara : public Actor
 {
 public:
   struct ActorStats
