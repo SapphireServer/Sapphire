@@ -117,5 +117,5 @@ uint32_t Core::Entity::BNpc::getBNpcNameId() const
 
 void Core::Entity::BNpc::spawn( PlayerPtr pTarget )
 {
-  pTarget->queuePacket( boost::make_shared< NpcSpawnPacket >( *getAsBNpc(), *pTarget ) );
+  pTarget->queuePacket( std::make_shared< NpcSpawnPacket >( *getAsBNpc(), *pTarget ) );
 }

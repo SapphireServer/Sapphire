@@ -254,7 +254,7 @@ bool Core::Entity::Player::loadActiveQuests()
 
     auto slotId = res->getUInt8( 2 );
 
-    boost::shared_ptr< QuestActive > pActiveQuest( new QuestActive() );
+    std::shared_ptr< QuestActive > pActiveQuest( new QuestActive() );
     pActiveQuest->c.questId = res->getUInt16( 3 );
     pActiveQuest->c.sequence = res->getUInt8( 4 );
     pActiveQuest->c.flags = res->getUInt8( 5 );

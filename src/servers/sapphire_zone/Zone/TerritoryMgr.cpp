@@ -267,7 +267,7 @@ bool Core::TerritoryMgr::removeTerritoryInstance( uint32_t instanceId )
 
   if( isInstanceContentTerritory( pZone->getTerritoryId() ) )
   {
-    auto instance = boost::dynamic_pointer_cast< InstanceContent >( pZone );
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( pZone );
     m_instanceContentToInstanceMap[ instance->getInstanceContentId() ].erase( pZone->getGuId() );
   }
   else

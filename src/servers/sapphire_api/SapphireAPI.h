@@ -20,7 +20,7 @@ public:
 
   ~SapphireAPI();
 
-  using SessionMap = std::map< std::string, boost::shared_ptr< Session > >;
+  using SessionMap = std::map< std::string, std::shared_ptr< Session > >;
 
   bool login( const std::string& username, const std::string& pass, std::string& sId );
 

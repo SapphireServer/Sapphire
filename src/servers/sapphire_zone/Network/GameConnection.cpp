@@ -402,7 +402,7 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
       {
         char* id = ( char* ) &( inPacket.data[ 4 ] );
         uint32_t playerId = std::stoi( id );
-        auto pCon = boost::static_pointer_cast< GameConnection, Connection >( shared_from_this() );
+        auto pCon = std::static_pointer_cast< GameConnection, Connection >( shared_from_this() );
 
         // try to retrieve the session for this id
         auto session = pServerZone->getSession( playerId );
@@ -430,7 +430,7 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
         if( !m_pSession && session )
           m_pSession = session;
 
-        auto pe = boost::make_shared< FFXIVRawPacket >( 0x07, 0x18, 0, 0 );
+        auto pe = std::make_shared< FFXIVRawPacket >( 0x07, 0x18, 0, 0 );
         *( unsigned int* ) ( &pe->data()[ 0 ] ) = 0xE0037603;
         *( unsigned int* ) ( &pe->data()[ 4 ] ) = static_cast< uint32_t >( time( nullptr ) );
         sendSinglePacket( pe );
@@ -438,7 +438,7 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
         // main connection, assinging it to the session
         if( ipcHeader.connectionType == ConnectionType::Zone )
         {
-          auto pe1 = boost::make_shared< FFXIVRawPacket >( 0x02, 0x38, 0, 0 );
+          auto pe1 = std::make_shared< FFXIVRawPacket >( 0x02, 0x38, 0, 0 );
           *( unsigned int* ) ( &pe1->data()[ 0 ] ) = playerId;
           sendSinglePacket( pe1 );
           pLog->info( "[" + std::string( id ) + "] Setting session for zone connection" );
@@ -447,11 +447,11 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
           // chat connection, assinging it to the session
         else if( ipcHeader.connectionType == ConnectionType::Chat )
         {
-          auto pe2 = boost::make_shared< FFXIVRawPacket >( 0x02, 0x38, 0, 0 );
+          auto pe2 = std::make_shared< FFXIVRawPacket >( 0x02, 0x38, 0, 0 );
           *( unsigned int* ) ( &pe2->data()[ 0 ] ) = playerId;
           sendSinglePacket( pe2 );
 
-          auto pe3 = boost::make_shared< FFXIVRawPacket >( 0x03, 0x28, playerId, playerId );
+          auto pe3 = std::make_shared< FFXIVRawPacket >( 0x03, 0x28, playerId, playerId );
           *( unsigned short* ) ( &pe3->data()[ 2 ] ) = 0x02;
           sendSinglePacket( pe3 );
 
@@ -472,7 +472,7 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
         uint32_t id = *( uint32_t* ) &inPacket.data[ 0 ];
         uint32_t timeStamp = *( uint32_t* ) &inPacket.data[ 4 ];
 
-        auto pe4 = boost::make_shared< FFXIVRawPacket >( 0x08, 0x18, 0, 0 );
+        auto pe4 = std::make_shared< FFXIVRawPacket >( 0x08, 0x18, 0, 0 );
         *( unsigned int* ) ( &pe4->data()[ 0 ] ) = id;
         *( unsigned int* ) ( &pe4->data()[ 4 ] ) = timeStamp;
         sendSinglePacket( pe4 );

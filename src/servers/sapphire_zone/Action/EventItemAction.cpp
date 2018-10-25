@@ -71,7 +71,7 @@ void Core::Action::EventItemAction::onFinish()
 
   try
   {
-    auto effectPacket = boost::make_shared< Server::EffectPacket >( m_pSource->getId(), m_additional, m_id );
+    auto effectPacket = std::make_shared< Server::EffectPacket >( m_pSource->getId(), m_additional, m_id );
     effectPacket->setAnimationId( 1 );
     effectPacket->setRotation( Math::Util::floatToUInt16Rot( m_pSource->getRot() ) );
 

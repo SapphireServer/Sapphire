@@ -719,7 +719,7 @@ Core::Entity::EventObjectPtr Core::Zone::getEObj( uint32_t objId )
 
 Core::InstanceContentPtr Core::Zone::getAsInstanceContent()
 {
-  return boost::dynamic_pointer_cast< InstanceContent, Zone >( shared_from_this() );
+  return std::dynamic_pointer_cast< InstanceContent, Zone >( shared_from_this() );
 }
 
 uint32_t Core::Zone::getNextEObjId()

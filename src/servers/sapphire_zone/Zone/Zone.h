@@ -11,7 +11,7 @@
 
 #include <set>
 #include <map>
-#include <boost/enable_shared_from_this.hpp>
+#include <memory>
 
 #include <stdio.h>
 #include <string.h>
@@ -31,7 +31,7 @@ struct TerritoryType;
 }
 
 class Zone :
-  public CellHandler< Cell >, public boost::enable_shared_from_this< Zone >
+  public CellHandler< Cell >, public std::enable_shared_from_this< Zone >
 {
 protected:
   uint32_t m_territoryId;

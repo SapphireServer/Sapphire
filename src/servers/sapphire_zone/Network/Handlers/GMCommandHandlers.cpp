@@ -421,7 +421,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
     case GmCommand::Wireframe:
     {
       player.queuePacket(
-        boost::make_shared< ActorControlPacket143 >( player.getId(), ActorControlType::ToggleWireframeRendering ) );
+        std::make_shared< ActorControlPacket143 >( player.getId(), ActorControlType::ToggleWireframeRendering ) );
       player.sendNotice( "Wireframe Rendering for " + player.getName() + " was toggled" );
       break;
     }
