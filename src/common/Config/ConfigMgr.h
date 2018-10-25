@@ -20,30 +20,30 @@ public:
   template<class T> struct always_false : std::false_type {};
 
   template< class T >
-  T getValue( const std::string& name, T defaultValue = T() )
+  T getValue( const std::string& section, const std::string& name, T defaultValue = T() )
   {
     if constexpr (std::is_same_v<T, uint32_t>) 
-      return m_pInih->GetInteger( "", name, defaultValue );
+      return m_pInih->GetInteger( section, name, defaultValue );
     else if constexpr (std::is_same_v<T, int32_t>) 
-      return m_pInih->GetInteger( "", name, defaultValue );
+      return m_pInih->GetInteger( section, name, defaultValue );
     else if constexpr (std::is_same_v<T, uint16_t>) 
-      return m_pInih->GetInteger( "", name, defaultValue );
+      return m_pInih->GetInteger( section, name, defaultValue );
     else if constexpr (std::is_same_v<T, int16_t>) 
-      return m_pInih->GetInteger( "", name, defaultValue );
+      return m_pInih->GetInteger( section, name, defaultValue );
     else if constexpr (std::is_same_v<T, uint8_t>) 
-      return m_pInih->GetInteger( "", name, defaultValue );
+      return m_pInih->GetInteger( section, name, defaultValue );
     else if constexpr (std::is_same_v<T, int8_t>) 
-      return m_pInih->GetInteger( "", name, defaultValue );
+      return m_pInih->GetInteger( section, name, defaultValue );
     else if constexpr (std::is_same_v<T, long>)
-      return m_pInih->GetInteger( "", name, defaultValue );
+      return m_pInih->GetInteger( section, name, defaultValue );
     else if constexpr (std::is_same_v<T, double>)
-      return m_pInih->GetReal( "", name, defaultValue );
+      return m_pInih->GetReal( section, name, defaultValue );
     else if constexpr (std::is_same_v<T, float>)
-      return m_pInih->GetReal( "", name, defaultValue );
+      return m_pInih->GetReal( section, name, defaultValue );
     else if constexpr (std::is_same_v<T, std::string>)
-      return m_pInih->Get( "", name, defaultValue );
+      return m_pInih->Get( section, name, defaultValue );
     else if constexpr (std::is_same_v<T, bool>)
-      return m_pInih->GetBoolean( "", name, defaultValue );
+      return m_pInih->GetBoolean( section, name, defaultValue );
     else 
       static_assert(always_false<T>::value, "non-exhaustive getter!"); 
   }

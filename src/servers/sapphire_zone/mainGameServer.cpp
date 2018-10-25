@@ -19,7 +19,7 @@ using namespace Core;
 
 bool setupFramework()
 {
-  auto pServer = std::make_shared< ServerZone >( "zone.ini" );
+  auto pServer = std::make_shared< ServerZone >( "config.ini" );
   auto pLogger = std::make_shared< Logger >();
   auto pExdData = std::make_shared< Data::ExdDataGenerated >();
   auto pScript = std::make_shared< Scripting::ScriptMgr >();
