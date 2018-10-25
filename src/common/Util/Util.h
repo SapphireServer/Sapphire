@@ -11,6 +11,8 @@ std::string binaryToHexString( uint8_t* pBinData, uint16_t size );
 
 std::string binaryToHexDump( uint8_t* pBinData, uint16_t size );
 
+std::string intToHexString( uint32_t intValue, uint8_t width = 2 );
+
 uint64_t getTimeMs();
 
 int64_t getTimeSeconds();
