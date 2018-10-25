@@ -1,8 +1,6 @@
 #ifndef _LOGGER_H
 #define _LOGGER_H
 
-// #include <boost/log/trivial.hpp>
-
 #include <spdlog/spdlog.h>
 
 namespace Core {

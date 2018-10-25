@@ -1,9 +1,9 @@
-#include <boost/format.hpp>
 #include <cinttypes>
 
 #include <Common.h>
 #include <Version.h>
 #include <Network/GamePacketNew.h>
+#include <Util/Util.h>
 #include <Util/UtilMath.h>
 #include <Network/PacketContainer.h>
 #include <Logging/Logger.h>
@@ -727,8 +727,7 @@ void Core::DebugCommandHandler::script( char* data, Entity::Player& player, std:
         for( auto it = scripts.begin(); it != scripts.end(); ++it )
         {
           auto script = *it;
-          player.sendDebug( " - '" + script->library_name + "' loaded at @ 0x" +
-                            boost::str( boost::format( "%|X|" ) % script->handle ) +
+          player.sendDebug( " - '" + script->library_name + 
                             ", num scripts: " + std::to_string( script->scripts.size() ) );
         }
       }

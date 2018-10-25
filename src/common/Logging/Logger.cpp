@@ -39,33 +39,32 @@ void Logger::init()
   // nb: if the server crashes, log data can be missing from the file unless something logs critical just before it does
   m_logger->flush_on( spdlog::level::critical );
 
-  //spdlog::set_pattern( "[%H:%M:%S] [%l] %v" );
+  spdlog::set_pattern( "[%H:%M:%S] [%l] %v" );
 }
 
 
 void Logger::Log( LoggingSeverity logSev, const std::string& text )
 {
-  // BOOST_LOG_SEV( m_lg, ( boost::log::trivial::severity_level ) logSev ) << text;
 }
 
 void Logger::error( const std::string& text )
 {
-	spdlog::get( "logger" )->error( text );
+  spdlog::get( "logger" )->error( text );
 }
 
 void Logger::info( const std::string& text )
 {
-	spdlog::get( "logger" )->info( text );
+  spdlog::get( "logger" )->info( text );
 }
 
 void Logger::debug( const std::string& text )
 {
-	spdlog::get( "logger" )->debug( text );
+  spdlog::get( "logger" )->debug( text );
 }
 
 void Logger::fatal( const std::string& text )
 {
-	spdlog::get( "logger" )->critical( text );
+  spdlog::get( "logger" )->critical( text );
 }
 
 
