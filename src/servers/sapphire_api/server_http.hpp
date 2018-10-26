@@ -2,7 +2,6 @@
 #define	SERVER_HTTP_HPP
 
 #include <asio.hpp>
-#include <boost/algorithm/string/predicate.hpp>
 
 #include <Util/Util.h>
 #include <map>
@@ -14,7 +13,7 @@
 
 #ifndef CASE_INSENSITIVE_EQUALS_AND_HASH
 #define CASE_INSENSITIVE_EQUALS_AND_HASH
-//Based on http://www.boost.org/doc/libs/1_60_0/doc/html/unordered/hash_equality.html
+
 class case_insensitive_equals {
 public:
   bool operator()(const std::string &key1, const std::string &key2) const {

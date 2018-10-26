@@ -52,10 +52,6 @@ bool Core::Network::SapphireAPI::login( const std::string& username, const std::
   pSession->setAccountId( accountId );
   pSession->setSessionId( sid );
 
-  //auto ip2 = boost::asio::ip::address::from_string( request->remote_endpoint_address );
-
-  //pSession->setIP( ip2.to_v4().to_ulong() );
-
   std::stringstream ss;
 
   for( size_t i = 0; i < 56; i++ )
