@@ -8,9 +8,7 @@
 
 #define BOOST_SPIRIT_THREADSAFE
 
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
-#include <boost/property_tree/json_parser.hpp>
+#include <nlohmann/json.hpp>
 
 extern Core::Logger g_log;
 
@@ -57,15 +55,11 @@ Core::LobbySessionPtr Core::Network::RestConnector::getSession( char* sId )
   std::string content = std::string( std::istreambuf_iterator< char >( r->content ), {} );
   if( r->status_code.find( "200" ) != std::string::npos )
   {
-    using namespace boost::property_tree;
-    ptree pt;
+    nlohmann::json json;  
 
     try
     {
-      std::stringstream ss;
-      ss << content;
-
-      read_json( ss, pt );
+      json.parse( content );
     }
     catch( std::exception& e )
     {
@@ -76,7 +70,7 @@ Core::LobbySessionPtr Core::Network::RestConnector::getSession( char* sId )
     if( content.find( "invalid" ) == std::string::npos )
     {
       LobbySessionPtr pSession( new Core::LobbySession() );
-      pSession->setAccountID( atoi( pt.get< std::string >( "result" ).c_str() ) );
+      pSession->setAccountID( json["result"].get< uint32_t >() );
       pSession->setSessionId( ( uint8_t* ) sId );
       return pSession;
     }
