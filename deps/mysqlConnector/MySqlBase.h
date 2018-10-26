@@ -4,13 +4,13 @@
 #include <memory>
 #include <string>
 #include <map>
+#include "MysqlCommon.h"
 
-enum mysql_option;
 
 namespace Mysql
 {
 
-using optionMap = std::map< enum ::mysql_option, std::string >;
+using optionMap = std::map< enum mysqlOption, std::string >;
 
 class Connection;
 

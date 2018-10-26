@@ -5,7 +5,6 @@
 
 #include "PreparedStatement.h"
 #include "Framework.h"
-#include <mysql.h>
 
 extern Core::Framework g_fw;
 
@@ -55,8 +54,8 @@ uint32_t Core::Db::DbConnection::open()
 {
   std::shared_ptr< Mysql::MySqlBase > base( new Mysql::MySqlBase() );
   Mysql::optionMap options;
-  options[ MYSQL_OPT_RECONNECT ] = "1";
-  options[ MYSQL_SET_CHARSET_NAME ] = "utf8";
+  options[ Mysql::mysqlOption::MYSQL_OPT_RECONNECT ] = "1";
+  options[ Mysql::mysqlOption::MYSQL_SET_CHARSET_NAME ] = "utf8";
 
   try
   {

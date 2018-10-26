@@ -113,26 +113,26 @@ Mysql::Connection::~Connection()
 {
 }
 
-void Mysql::Connection::setOption( enum mysql_option option, const void *arg )
+void Mysql::Connection::setOption( enum mysqlOption option, const void *arg )
 {
 
-   if( mysql_options( m_pRawCon, option, arg ) != 0  )
+   if( mysql_options( m_pRawCon, static_cast< mysql_option>( option ), arg ) != 0  )
       throw std::runtime_error( "Connection::setOption failed!" );
 
 }
 
-void Mysql::Connection::setOption( enum mysql_option option, uint32_t arg )
+void Mysql::Connection::setOption( enum mysqlOption option, uint32_t arg )
 {
  
-   if( mysql_options( m_pRawCon, option, &arg ) != 0  )
+   if( mysql_options( m_pRawCon,  static_cast< mysql_option>( option ), &arg ) != 0  )
       throw std::runtime_error( "Connection::setOption failed!" );
 
 }
 
-void Mysql::Connection::setOption( enum mysql_option option, const std::string& arg )
+void Mysql::Connection::setOption( enum mysqlOption option, const std::string& arg )
 {
 
-   if( mysql_options( m_pRawCon, option, arg.c_str() ) != 0 )
+   if( mysql_options( m_pRawCon,  static_cast< mysql_option>( option ), arg.c_str() ) != 0 )
       throw std::runtime_error( "Connection::setOption failed!" );
 
 }
