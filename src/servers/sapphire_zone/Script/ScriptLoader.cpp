@@ -76,7 +76,7 @@ Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::loadModule( const st
 
 
 #ifdef _WIN32
-  ModuleHandle handle = LoadLibrary( dest.c_str() );
+  ModuleHandle handle = LoadLibrary( dest.string().c_str() );
 #else
   ModuleHandle handle = dlopen( dest.c_str(), RTLD_LAZY );
 #endif
