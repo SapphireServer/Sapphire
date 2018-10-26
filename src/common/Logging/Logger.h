@@ -1,7 +1,8 @@
 #ifndef _LOGGER_H
-#define _LOGGER_H
+#define _LOGGER_H 
 
 #include <spdlog/spdlog.h>
+#include <spdlog/async.h>
 
 namespace Core {
 
