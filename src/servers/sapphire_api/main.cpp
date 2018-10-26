@@ -89,7 +89,7 @@ bool loadSettings( int32_t argc, char* argv[] )
 
     try
     {
-      arg = Util::toLowerCopy( std::string( args[ i ] ) );
+      arg = Core::Util::toLowerCopy( std::string( args[ i ] ) );
       val = std::string( args[ i + 1 ] );
 
       // trim '-' from start of arg
