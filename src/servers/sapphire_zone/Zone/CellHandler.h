@@ -1,5 +1,6 @@
 #ifndef _CELLHANDLER_H
 #define _CELLHANDLER_H
+#include <cassert>
 
 #define TilesCount 32
 #define TileSize 250.0f

@@ -4,6 +4,7 @@
 #include <utility>
 #include <memory>
 #include <vector>
+#include <functional>
 #include "Common.h"
 
 #define TYPE_FORWARD( x ) \
