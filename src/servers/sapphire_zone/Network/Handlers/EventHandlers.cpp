@@ -1,5 +1,3 @@
-#include <boost/format.hpp>
-
 #include <Common.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Network/CommonNetwork.h>
@@ -15,6 +13,8 @@
 #include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
 
 #include "Script/ScriptMgr.h"
+
+#include <Util/Util.h>
 
 #include "Event/EventHandler.h"
 #include "Event/EventHelper.h"
@@ -52,8 +52,7 @@ void Core::Network::GameConnection::eventHandlerTalk( const Packets::FFXIVARR_PA
                     std::to_string( Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) ) ) +
                     " \neventId: " +
                     std::to_string( eventId ) +
-                    " (0x" + boost::str( boost::format( "%|08X|" )
-                                         % static_cast< uint64_t >( eventId & 0xFFFFFFF ) ) + ")" );
+                    " (0x" + Util::intToHexString( static_cast< uint64_t >( eventId & 0xFFFFFFF ), 8 ) + ")" );
 
 
   player.sendDebug( "Calling: " + objName + "." + eventName );
@@ -97,8 +96,7 @@ void Core::Network::GameConnection::eventHandlerEmote( const Packets::FFXIVARR_P
                     std::to_string( Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) ) ) +
                     " \neventId: " +
                     std::to_string( eventId ) +
-                    " (0x" + boost::str( boost::format( "%|08X|" )
-                                         % static_cast< uint64_t >( eventId & 0xFFFFFFF ) ) + ")" );
+                    " (0x" + Util::intToHexString( static_cast< uint64_t >( eventId & 0xFFFFFFF ), 8 ) + ")" );
 
   player.sendDebug( "Calling: " + objName + "." + eventName );
 
@@ -206,7 +204,7 @@ void Core::Network::GameConnection::eventHandlerReturn( const Packets::FFXIVARR_
 
   player.sendDebug( "eventId: " +
                     std::to_string( eventId ) +
-                    " ( 0x" + boost::str( boost::format( "%|08X|" ) % ( uint64_t ) ( eventId & 0xFFFFFFF ) ) + " ) " +
+                    " ( 0x" + Util::intToHexString( static_cast< uint64_t >( eventId & 0xFFFFFFF ), 8 ) + " ) " +
                     " scene: " + std::to_string( scene ) +
                     " p1: " + std::to_string( param1 ) +
                     " p2: " + std::to_string( param2 ) +

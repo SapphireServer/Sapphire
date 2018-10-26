@@ -1,12 +1,8 @@
-#include <boost/algorithm/string.hpp>
-#include <algorithm>
-
 #include <Exd/ExdDataGenerated.h>
 #include <Util/Util.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Logging/Logger.h>
 
-#include <boost/algorithm/string.hpp>
 #include <algorithm>
 
 #include "Actor/Chara.h"
@@ -37,11 +33,11 @@ Core::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPtr so
   std::replace( m_name.begin(), m_name.end(), ':', '_' );
   std::replace( m_name.begin(), m_name.end(), '&', '_' );
   std::replace( m_name.begin(), m_name.end(), '+', 'p' );
-  boost::erase_all( m_name, "\'" );
-  boost::erase_all( m_name, "&" );
-  boost::erase_all( m_name, "-" );
-  boost::erase_all( m_name, "(" );
-  boost::erase_all( m_name, ")" );
+  Util::eraseAll( m_name, '\'' );
+  Util::eraseAll( m_name, '&' );
+  Util::eraseAll( m_name, '-' );
+  Util::eraseAll( m_name, '(' );
+  Util::eraseAll( m_name, ')' );
 }
 
 

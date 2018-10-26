@@ -24,6 +24,12 @@ std::string Core::Util::toLowerCopy( const std::string& inStr )
   return out;
 }
 
+void Core::Util::eraseAll( std::string& inOutStr, char remove )
+{
+  inOutStr.erase( std::remove( inOutStr.begin(), inOutStr.end(), remove ), inOutStr.end() );
+}
+
+
 std::string Core::Util::intToHexString( uint64_t intValue, uint8_t width ) 
 {
     std::string hexStr;

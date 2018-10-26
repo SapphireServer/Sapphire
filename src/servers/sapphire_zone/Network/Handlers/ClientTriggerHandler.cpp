@@ -1,5 +1,3 @@
-#include <boost/format.hpp>
-
 #include <Common.h>
 #include <Network/CommonNetwork.h>
 #include <Network/GamePacketNew.h>
@@ -8,6 +6,7 @@
 #include <Network/PacketContainer.h>
 #include <Network/CommonActorControl.h>
 #include <Network/PacketDef/Zone/ClientZoneDef.h>
+#include <Util/Util.h>
 
 #include "Zone/Zone.h"
 #include "Zone/ZonePosition.h"
@@ -80,10 +79,10 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
   const auto param3 = packet.data().param3;
 
   pLog->debug( "[" + std::to_string( m_pSession->getId() ) + "] Incoming action: " +
-               boost::str( boost::format( "%|04X|" ) % ( uint32_t ) ( commandId & 0xFFFF ) ) +
-               "\nparam1: " + boost::str( boost::format( "%|016X|" ) % ( uint64_t ) ( param1 & 0xFFFFFFFFFFFFFFF ) ) +
-               "\nparam2: " + boost::str( boost::format( "%|08X|" ) % ( uint32_t ) ( param2 & 0xFFFFFFFF ) ) +
-               "\nparam3: " + boost::str( boost::format( "%|016X|" ) % ( uint64_t ) ( param3 & 0xFFFFFFFFFFFFFFF ) )
+               Util::intToHexString( static_cast< uint32_t >( commandId & 0xFFFF ), 4 ) +
+               "\nparam1: " + Util::intToHexString( static_cast< uint64_t >( param1 & 0xFFFFFFFFFFFFFFF ), 16 ) +
+               "\nparam2: " + Util::intToHexString( static_cast< uint32_t >( param2 & 0xFFFFFFFF ), 8 ) +
+               "\nparam3: " + Util::intToHexString( static_cast< uint64_t >( param3 & 0xFFFFFFFFFFFFFFF ), 16 )
   );
 
 
@@ -313,7 +312,7 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
     default:
     {
       pLog->debug( "[" + std::to_string( m_pSession->getId() ) + "] Unhandled action: " +
-                   boost::str( boost::format( "%|04X|" ) % ( uint32_t ) ( commandId & 0xFFFF ) ) );
+                   Util::intToHexString( static_cast< uint32_t >( commandId & 0xFFFF ), 4 ) );
       break;
     }
   }

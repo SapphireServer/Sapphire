@@ -15,9 +15,6 @@
 #include "Player.h"
 #include "Framework.h"
 
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/clamp.hpp>
-
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 
 #include <Exd/ExdDataGenerated.h>
@@ -850,7 +847,7 @@ uint16_t Core::Entity::Player::calculateEquippedGearItemLevel()
     it++;
   }
 
-  return boost::algorithm::clamp( iLvlResult / 13, 0, 9999 );
+  return std::max( iLvlResult / 13, 9999 );
 }
 
 

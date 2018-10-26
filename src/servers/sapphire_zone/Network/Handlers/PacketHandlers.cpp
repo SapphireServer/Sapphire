@@ -1,5 +1,3 @@
-#include <boost/format.hpp>
-
 #include <Common.h>
 #include <Network/CommonNetwork.h>
 #include <Network/GamePacketNew.h>

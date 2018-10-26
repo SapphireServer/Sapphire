@@ -21,6 +21,7 @@
 #include <Database/ZoneDbConnection.h>
 #include <Database/DbWorkerPool.h>
 #include <Database/PreparedStatement.h>
+#include <Util/Util.h>
 
 //Added for the default_resource example
 #include <fstream>
@@ -88,7 +89,7 @@ bool loadSettings( int32_t argc, char* argv[] )
 
     try
     {
-      arg = boost::to_lower_copy( std::string( args[ i ] ) );
+      arg = Util::toLowerCopy( std::string( args[ i ] ) );
       val = std::string( args[ i + 1 ] );
 
       // trim '-' from start of arg
