@@ -2,6 +2,7 @@
 #include "MySqlBase.h"
 #include "Statement.h"
 #include "PreparedStatement.h"
+#include <mysql.h>
 
 #include <vector>
 

@@ -8,6 +8,7 @@
 #include "Framework.h"
 
 #include "Logging/Logger.h"
+#include <mysql.h>
 
 extern Core::Framework g_fw;
 

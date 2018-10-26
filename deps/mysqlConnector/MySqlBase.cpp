@@ -1,6 +1,7 @@
 #include "MySqlBase.h"
 #include "Connection.h"
 #include <memory>
+#include <mysql.h>
 
 Mysql::MySqlBase::MySqlBase() 
 {

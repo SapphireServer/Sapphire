@@ -2,14 +2,15 @@
 #define SAPPHIRE_MYSQLBASE_H
 
 #include <memory>
-#include <mysql.h>
 #include <string>
 #include <map>
+
+enum mysql_option;
 
 namespace Mysql
 {
 
-using optionMap = std::map< enum mysql_option, std::string >;
+using optionMap = std::map< enum ::mysql_option, std::string >;
 
 class Connection;
 
