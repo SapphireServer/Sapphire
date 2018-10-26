@@ -9,6 +9,7 @@
 #include <Util/LockedQueue.h>
 
 #include <asio.hpp>
+#include <map>
 #include "LobbyPacketContainer.h"
 
 #include "Forwards.h"
