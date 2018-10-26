@@ -30,10 +30,10 @@ configure_file( "${CMAKE_CURRENT_SOURCE_DIR}/src/common/Version.cpp.in"
 find_package( MySQL )
 
 ##########################################################################
+add_subdirectory( "deps/zlib" )
+add_subdirectory( "deps/MySQL" )
 add_subdirectory( "deps/datReader" )
 add_subdirectory( "deps/mysqlConnector" )
-add_subdirectory( "deps/zlib" )
-add_subdirectory( "deps/MySql" )
 add_subdirectory( "src/common" )
 
 add_subdirectory( "src/servers" )
