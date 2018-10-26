@@ -1,6 +1,7 @@
 #include <Common.h>
 #include <Logging/Logger.h>
 #include <Network/CommonActorControl.h>
+#include <algorithm>
 
 #include "Zone/Zone.h"
 
@@ -847,7 +848,7 @@ uint16_t Core::Entity::Player::calculateEquippedGearItemLevel()
     it++;
   }
 
-  return std::max( iLvlResult / 13, 9999 );
+  return std::max( static_cast< int32_t >( iLvlResult / 13 ), 9999 );
 }
 
 
