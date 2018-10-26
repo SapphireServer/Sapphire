@@ -35,11 +35,12 @@ set_target_properties(sapphire_zone PROPERTIES
         VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../../../bin/"
         )
 
-target_link_libraries( sapphire_zone PUBLIC common stdc++fs )
 
+target_link_libraries( sapphire_zone PUBLIC common )
 target_include_directories( sapphire_zone PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" )
 
 
 if (UNIX)
 	#    cotire( sapphire_zone )
+    target_link_libraries( sapphire_zone PUBLIC stdc++fs )
 endif()

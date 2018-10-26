@@ -19,10 +19,14 @@ set_target_properties( sapphire_lobby
                            RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_CURRENT_SOURCE_DIR}/../../../bin/"
                            VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../../../bin/"
                      )
-
 target_link_libraries( sapphire_lobby 
 	                 PRIVATE 
-			   common 
-			   stdc++fs )
+			   common )
+if( UNIX )
+  target_link_libraries( sapphire_lobby 
+  	                   PRIVATE 
+			     stdc++fs )
+
+endif()
 
 		   #cotire( sapphire_lobby )
