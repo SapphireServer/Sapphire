@@ -4,12 +4,7 @@
 #include "PlayerMinimal.h"
 #include <time.h>
 
-#define BOOST_SPIRIT_THREADSAFE
-
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/foreach.hpp>
+#include <sstream>
 
 #include <nlohmann/json.hpp>
 
@@ -122,14 +117,7 @@ Core::Network::SapphireAPI::createCharacter( const int& accountId, const std::st
   newPlayer.setContentId( getNextContentId() );
   newPlayer.setName( name.c_str() );
 
-  boost::property_tree::ptree pt;
-
   auto json = nlohmann::json::parse( infoJson );
-
-  std::stringstream ss;
-  ss << infoJson;
-
-  boost::property_tree::read_json( ss, pt );
 
   const char* ptr = infoJson.c_str() + 50;
 
@@ -143,18 +131,31 @@ Core::Network::SapphireAPI::createCharacter( const int& accountId, const std::st
   std::vector< int32_t > tmpVector;
   std::vector< int32_t > tmpVector2;
 
-  BOOST_FOREACH( boost::property_tree::ptree::value_type& v, pt.get_child( "content" ) )
-        {
-          boost::property_tree::ptree subtree1 = v.second;
-          BOOST_FOREACH( boost::property_tree::ptree::value_type& vs, subtree1 )
-                {
-                  boost::property_tree::ptree subtree2 = vs.second;
-                  //std::cout << vs.second.data();
-                  tmpVector.push_back( std::stoi( vs.second.data() ) );
-                }
-          if( !v.second.data().empty() )
-            tmpVector2.push_back( std::stoi( v.second.data() ) );
-        }
+  for( auto& v : json["content"] )
+  {
+    for( auto& vs : v )
+    {
+      tmpVector.push_back( vs.get< int >() );
+    }
+
+    if( !v.empty() )
+      tmpVector2.push_back( v.get< int >() );
+  }
+
+  // leaving this in for now for reference
+  // BOOST_FOREACH( boost::property_tree::ptree::value_type& v, pt.get_child( "content" ) )
+  //       {
+  //         boost::property_tree::ptree subtree1 = v.second;
+  //         BOOST_FOREACH( boost::property_tree::ptree::value_type& vs, subtree1 )
+  //               {
+  //                 boost::property_tree::ptree subtree2 = vs.second;
+  //                 //std::cout << vs.second.data();
+  //                 tmpVector.push_back( std::stoi( vs.second.data() ) );
+  //               }
+  //         if( !v.second.data().empty() )
+  //           tmpVector2.push_back( std::stoi( v.second.data() ) );
+  //       }
+  
   std::vector< int32_t >::iterator it = tmpVector.begin();
   for( int32_t i = 0; it != tmpVector.end(); ++it, i++ )
   {

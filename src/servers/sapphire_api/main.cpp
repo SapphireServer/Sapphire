@@ -1,8 +1,6 @@
 #include "server_http.hpp"
 #include "client_http.hpp"
 
-#define BOOST_SPIRIT_THREADSAFE
-
 #include <nlohmann/json.hpp>
 
 #include <Logging/Logger.h>
