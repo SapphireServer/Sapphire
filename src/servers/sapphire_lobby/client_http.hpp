@@ -209,7 +209,7 @@ namespace SimpleWeb {
 				return nullptr;
 
 			auto timer = std::make_shared< asio::deadline_timer >( io_service );
-			timer->expires_from_now( boost::posix_time::seconds( config.timeout ) );
+			timer->expires_from_now( std::chrono::seconds( config.timeout ) );
 			timer->async_wait( [this]( const std::error_code& ec ) {
 				if( !ec ) {
 					close();

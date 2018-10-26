@@ -225,7 +225,7 @@ namespace SimpleWeb {
                 return nullptr;
             
             auto timer=std::make_shared<asio::deadline_timer>(*io_service);
-            timer->expires_from_now(boost::posix_time::seconds(seconds));
+            timer->expires_from_now( std::chrono::seconds( seconds ) );
             timer->async_wait([socket](const std::error_code& ec){
                 if(!ec) {
                     std::error_code ec;
