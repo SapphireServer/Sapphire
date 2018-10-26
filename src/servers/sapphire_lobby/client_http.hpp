@@ -1,10 +1,9 @@
 #ifndef CLIENT_HTTP_HPP
 #define	CLIENT_HTTP_HPP
 
-#include <boost/algorithm/string/predicate.hpp>
-
 #include <asio.hpp>
 
+#include <Util/Util.h>
 #include <unordered_map>
 #include <map>
 #include <random>
@@ -15,7 +14,7 @@
 class case_insensitive_equals {
 public:
 	bool operator()( const std::string &key1, const std::string &key2 ) const {
-		return boost::algorithm::iequals( key1, key2 );
+		return Core::Util::toLowerCopy( key1 ) == Core::Util::toLowerCopy( key2 );
 	}
 };
 class case_insensitive_hash {
