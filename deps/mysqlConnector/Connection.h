@@ -2,9 +2,10 @@
 #define SAPPHIRE_CONNECTION_H
 
 #include <memory>
-#include <mysql.h>
 #include <map>
 
+typedef struct st_mysql MYSQL;
+enum mysql_option;
 
 namespace Mysql
 {

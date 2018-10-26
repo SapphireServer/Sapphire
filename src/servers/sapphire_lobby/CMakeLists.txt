@@ -20,8 +20,8 @@ set_target_properties( sapphire_lobby
                            VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../../../bin/"
                      )
 target_link_libraries( sapphire_lobby 
-	                 PRIVATE 
-			   common )
+	                     PRIVATE
+			               common mysql )
 if( UNIX )
   target_link_libraries( sapphire_lobby 
   	                   PRIVATE 

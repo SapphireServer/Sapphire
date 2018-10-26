@@ -1,37 +1,30 @@
+
+#include <Connection.h>
+#include <Network/Connection.h>
+#include <Network/Hive.h>
+#include <Network/PacketContainer.h>
+
+#include "Network/GameConnection.h"
 #include "ServerZone.h"
+#include "Framework.h"
 
 #include <Version.h>
 #include <Logging/Logger.h>
 #include <Config/ConfigMgr.h>
 
-#include <MySqlBase.h>
-#include <Connection.h>
-
-#include <Network/Connection.h>
-#include <Network/Hive.h>
-
 #include <Exd/ExdDataGenerated.h>
-#include <Network/PacketContainer.h>
 #include <Database/DatabaseDef.h>
-#include <Util/Util.h>
 
 #include "Actor/Player.h"
 #include "Actor/BNpcTemplate.h"
 
-#include "Network/GameConnection.h"
+
 #include "Session.h"
 
 #include "Zone/TerritoryMgr.h"
 
 #include "Script/ScriptMgr.h"
 #include "Linkshell/LinkshellMgr.h"
-
-#include "ForwardsZone.h"
-
-#include <Util/Util.h>
-#include <thread>
-
-#include "Framework.h"
 
 extern Core::Framework g_fw;
 

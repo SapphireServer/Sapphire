@@ -5,6 +5,7 @@
 #include <variant>
 #include <errmsg.h>
 #include <string.h>
+#include <mysql.h>
 
 static const unsigned int MAX_SEND_LONGDATA_BUFFER = 1 << 18; //1<<18=256k (for istream)
 static const unsigned int MAX_SEND_LONGDATA_CHUNK =  1 << 18; //1<<19=512k (for string)

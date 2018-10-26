@@ -7,6 +7,7 @@
 #include <vector>
 #include <string.h>
 #include <algorithm>
+#include <mysql.h>
 
 Mysql::ResultSet::ResultSet( MYSQL_RES* res, std::shared_ptr< Mysql::Statement > par )
 {

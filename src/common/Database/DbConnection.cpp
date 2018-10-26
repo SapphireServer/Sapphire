@@ -5,6 +5,7 @@
 
 #include "PreparedStatement.h"
 #include "Framework.h"
+#include <mysql.h>
 
 extern Core::Framework g_fw;
 

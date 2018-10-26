@@ -4,8 +4,11 @@
 #include <vector>
 
 #include "ResultSetBase.h"
-#include <mysql.h>
 #include <memory>
+
+typedef char **MYSQL_ROW;
+typedef struct st_mysql_res MYSQL_RES;
+typedef struct st_mysql_field MYSQL_FIELD;
 
 namespace Mysql
 {

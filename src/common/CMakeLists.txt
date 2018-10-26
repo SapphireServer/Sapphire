@@ -38,7 +38,7 @@ if( UNIX )
 else()
   target_link_libraries( common
                            PUBLIC
-                             libmysql )
+                             mysql )
 endif()
 
 target_include_directories( common

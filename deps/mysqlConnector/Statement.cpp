@@ -2,6 +2,7 @@
 #include "Connection.h"
 #include "ResultSet.h"
 #include "mysql_util.h"
+#include <mysql.h>
 
 std::shared_ptr< Mysql::Connection > Mysql::Statement::getConnection()
 {
