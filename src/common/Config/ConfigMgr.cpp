@@ -14,7 +14,7 @@ bool Core::ConfigMgr::loadConfig( const std::string& configName )
   auto configDir = std::experimental::filesystem::path( m_configFolderRoot );
 
   m_pInih = std::unique_ptr< INIReader >( new INIReader( 
-    std::experimental::filesystem::path( configDir / configName ) ) );
+    std::experimental::filesystem::path( configDir / configName ) ).string() );
 
   if( m_pInih->ParseError() < 0 )
     return false;
