@@ -1,7 +1,6 @@
 #include <Common.h>
 #include <Exd/ExdDataGenerated.h>
-#include <boost/range/algorithm/remove_if.hpp>
-#include <boost/algorithm/string/classification.hpp>
+#include <Util/Util.h>
 
 #include "Framework.h"
 #include "EventHelper.h"
@@ -62,8 +61,8 @@ std::string Core::Event::getEventName( uint32_t eventId )
     {
       auto contentInfo = pExdData->get< Core::Data::InstanceContent >( eventId & 0xFFFF );
       std::string name = contentInfo->name;
-
-      name.erase( boost::remove_if( name, boost::is_any_of( "â˜…_ '()[]-\x1a\x1\x2\x1f\x1\x3.:" ) ), name.end() );
+      std::string remove( "â˜…_ '()[]-\x1a\x1\x2\x1f\x1\x3.:" );
+      Util::eraseAllIn( name, remove );
       name[ 0 ] = toupper( name[ 0 ] );
       return name;
     }

@@ -29,6 +29,12 @@ void Core::Util::eraseAll( std::string& inOutStr, char remove )
   inOutStr.erase( std::remove( inOutStr.begin(), inOutStr.end(), remove ), inOutStr.end() );
 }
 
+void Core::Util::eraseAllIn( std::string& inOutStr, std::string& remove )
+{
+  for( auto rem : remove )
+    inOutStr.erase( std::remove( inOutStr.begin(), inOutStr.end(), rem ), inOutStr.end() );
+}
+
 
 std::string Core::Util::intToHexString( uint64_t intValue, uint8_t width ) 
 {
