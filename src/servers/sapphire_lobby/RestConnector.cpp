@@ -57,7 +57,7 @@ Core::LobbySessionPtr Core::Network::RestConnector::getSession( char* sId )
 
     try
     {
-      json.parse( content );
+      json = json.parse( content );
     }
     catch( std::exception& e )
     {
@@ -99,7 +99,7 @@ bool Core::Network::RestConnector::checkNameTaken( std::string name )
 
     try
     {
-      json.parse( content );
+      json = json.parse( content );
     }
     catch( std::exception& e )
     {
@@ -133,7 +133,7 @@ uint32_t Core::Network::RestConnector::getNextCharId()
 
     try
     {
-      json.parse( content );
+      json = json.parse( content );
     }
     catch( std::exception& e )
     {
@@ -172,7 +172,7 @@ uint64_t Core::Network::RestConnector::getNextContentId()
 
     try
     {
-      json.parse( content );
+      json = json.parse( content );
     }
     catch( std::exception& e )
     {
@@ -213,7 +213,7 @@ CharList Core::Network::RestConnector::getCharList( char* sId )
 
     try
     {
-      json.parse( content );
+      json = json.parse( content );
     }
     catch( std::exception& e )
     {
@@ -230,10 +230,11 @@ CharList Core::Network::RestConnector::getCharList( char* sId )
       {
         g_log.debug( child["contentId"] );
         //std::string, uint32_t, uint64_t, std::string
-        list.push_back( std::make_tuple( child["name"].get< std::string >() ),
-                                         child["charId"].get< uint32_t >(),
-                                         child["contentId"].get< uint64_t >(),
-                                         child["infoJson"].get< std::string >() );
+        list.push_back( { child["name"].get< std::string >(),
+                          child["charId"].get< uint32_t >(),
+                          child["contentId"].get< uint64_t >(),
+                          child["infoJson"].get< std::string >() 
+                        } );
       }
 
       return list;
@@ -266,7 +267,7 @@ bool Core::Network::RestConnector::deleteCharacter( char* sId, std::string name 
     auto json = nlohmann::json();
     try
     {
-      json.parse( content );
+      json = json.parse( content );
     }
     catch( std::exception& e )
     {
@@ -303,7 +304,7 @@ int Core::Network::RestConnector::createCharacter( char* sId, std::string name, 
 
     try
     {
-      json.parse( content );
+      json = json.parse( content );
     }
     catch( std::exception& e )
     {
