@@ -28,8 +28,7 @@
 
 #include "ForwardsZone.h"
 
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string/case_conv.hpp>
+#include <Util/Util.h>
 #include <thread>
 
 #include "Framework.h"
@@ -75,7 +74,7 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
 
     try
     {
-      arg = boost::to_lower_copy( std::string( args[ i ] ) );
+      arg = Util::toLowerCopy( std::string( args[ i ] ) );
       val = std::string( args[ i + 1 ] );
 
       // trim '-' from start of arg

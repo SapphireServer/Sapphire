@@ -10,10 +10,8 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <Database/DatabaseDef.h>
-#include <boost/make_shared.hpp>
 
 Core::Network::SapphireAPI::SapphireAPI()
 {

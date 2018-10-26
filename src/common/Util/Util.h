@@ -13,6 +13,8 @@ std::string binaryToHexDump( uint8_t* pBinData, uint16_t size );
 
 std::string intToHexString( uint64_t intValue, uint8_t width = 2 );
 
+void eraseAll( std::string& inOutStr, char remove );
+
 std::string toLowerCopy( const std::string& inStr );
 
 uint64_t getTimeMs();
