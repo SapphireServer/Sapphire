@@ -3,9 +3,8 @@
 
 #define BOOST_SPIRIT_THREADSAFE
 
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
-#include <boost/property_tree/json_parser.hpp>
+#include <nlohmann/json.hpp>
+
 #include <Logging/Logger.h>
 #include <Config/ConfigMgr.h>
 
@@ -256,18 +255,16 @@ void createAccount( shared_ptr< HttpServer::Response > response, shared_ptr< Htt
   print_request_info( request );
   try
   {
+    auto json = nlohmann::json::parse( request->content );
 
-    using namespace boost::property_tree;
-    ptree pt;
-    read_json( request->content, pt );
-
-    std::string pass = pt.get< string >( "pass" );
-    std::string user = pt.get< string >( "username" );
+    std::string pass = json["pass"];
+    std::string user = json["username"];
     // reloadConfig();
 
     std::string sId;
     if( g_sapphireAPI.createAccount( user, pass, sId ) )
     {
+      // todo: construct proper json object here
       std::string json_string = "{\"sId\":\"" + sId +
                                 "\", \"lobbyHost\":\"" +
                                 m_pConfig->getValue< std::string >( "GlobalNetwork", "LobbyHost" ) +
@@ -290,18 +287,17 @@ void login( shared_ptr< HttpServer::Response > response, shared_ptr< HttpServer:
   print_request_info( request );
   try
   {
-    using namespace boost::property_tree;
-    ptree pt;
-    read_json( request->content, pt );
+    auto json = nlohmann::json::parse( request->content );
 
-    std::string pass = pt.get< string >( "pass" );
-    std::string user = pt.get< string >( "username" );
+    std::string pass = json["pass"];
+    std::string user = json["username"];
 
     std::string sId;
 
     // reloadConfig();
     if( g_sapphireAPI.login( user, pass, sId ) )
     {
+      // todo: build proper json object and stringify it
       std::string json_string = "{\"sId\":\"" + sId +
                                 "\", \"lobbyHost\":\"" +
                                 m_pConfig->getValue< std::string >( "GlobalNetwork", "LobbyHost" ) +
@@ -326,12 +322,11 @@ void deleteCharacter( shared_ptr< HttpServer::Response > response, shared_ptr< H
   print_request_info( request );
   try
   {
-    using namespace boost::property_tree;
-    ptree pt;
-    read_json( request->content, pt );
-    std::string sId = pt.get< string >( "sId" );
-    std::string secret = pt.get< string >( "secret" );
-    std::string name = pt.get< string >( "name" );
+    auto json = nlohmann::json::parse( request->content );
+
+    std::string sId = json["sId"];
+    std::string secret = json["secret"];
+    std::string name = json["name"];
 
     // reloadConfig();
 
@@ -362,13 +357,12 @@ void createCharacter( shared_ptr< HttpServer::Response > response, shared_ptr< H
   print_request_info( request );
   try
   {
-    using namespace boost::property_tree;
-    ptree pt;
-    read_json( request->content, pt );
-    std::string sId = pt.get< string >( "sId" );
-    std::string secret = pt.get< string >( "secret" );
-    std::string name = pt.get< string >( "name" );
-    std::string infoJson = pt.get< string >( "infoJson" );
+    auto json = nlohmann::json::parse( request->content );
+
+    std::string sId = json["sId"];
+    std::string secret = json["secret"];
+    std::string name = json["name"];
+    std::string infoJson = json["infoJson"];
 
     std::string finalJson = Core::Util::base64_decode( infoJson );
 
@@ -412,12 +406,12 @@ void insertSession( shared_ptr< HttpServer::Response > response, shared_ptr< Htt
 
   try
   {
-    using namespace boost::property_tree;
-    ptree pt;
-    read_json( request->content, pt );
-    std::string sId = pt.get< string >( "sId" );
-    uint32_t accountId = pt.get< uint32_t >( "accountId" );
-    std::string secret = pt.get< string >( "secret" );
+    auto json = nlohmann::json::parse( request->content );
+
+    std::string sId = json["sId"];
+    uint32_t accountId = json["accountId"].get< uint32_t >();
+    std::string secret = json["secret"];
+
     // reloadConfig();
     if( m_pConfig->getValue< std::string >( "GlobalParameters", "ServerSecret" ) != secret )
     {
@@ -444,12 +438,10 @@ void checkNameTaken( shared_ptr< HttpServer::Response > response, shared_ptr< Ht
 
   try
   {
-    using namespace boost::property_tree;
-    ptree pt;
-    read_json( request->content, pt );
+    auto json = nlohmann::json::parse( request->content );
 
-    std::string name = pt.get< string >( "name" );
-    std::string secret = pt.get< string >( "secret" );
+    std::string name = json["name"];
+    std::string secret = json["secret"];
 
     // reloadConfig();
 
@@ -480,11 +472,10 @@ void checkSession( shared_ptr< HttpServer::Response > response, shared_ptr< Http
   print_request_info( request );
   try
   {
-    using namespace boost::property_tree;
-    ptree pt;
-    read_json( request->content, pt );
-    std::string sId = pt.get< string >( "sId" );
-    std::string secret = pt.get< string >( "secret" );
+    auto json = nlohmann::json::parse( request->content );
+
+    std::string sId = json["sId"];
+    std::string secret = json["secret"];
     int32_t result = g_sapphireAPI.checkSession( sId );
 
     // reloadConfig();
@@ -521,10 +512,9 @@ void getNextCharId( shared_ptr< HttpServer::Response > response, shared_ptr< Htt
   print_request_info( request );
   try
   {
-    using namespace boost::property_tree;
-    ptree pt;
-    read_json( request->content, pt );
-    std::string secret = pt.get< string >( "secret" );
+    auto json = nlohmann::json::parse( request->content );
+
+    std::string secret = json["secret"];
 
     // reloadConfig();
 
@@ -553,10 +543,9 @@ void getNextContentId( shared_ptr< HttpServer::Response > response, shared_ptr< 
 
   try
   {
-    using namespace boost::property_tree;
-    ptree pt;
-    read_json( request->content, pt );
-    std::string secret = pt.get< string >( "secret" );
+    auto json = nlohmann::json::parse( request->content );
+
+    std::string secret = json["secret"];
 
     // reloadConfig();
 
@@ -584,11 +573,10 @@ void getCharacterList( shared_ptr< HttpServer::Response > response, shared_ptr< 
   print_request_info( request );
   try
   {
-    using namespace boost::property_tree;
-    ptree pt;
-    read_json( request->content, pt );
-    std::string sId = pt.get< string >( "sId" );
-    std::string secret = pt.get< string >( "secret" );
+    auto json = nlohmann::json::parse( request->content );
+
+    std::string sId = json["sId"];
+    std::string secret = json["secret"];
 
     // reloadConfig();
 
@@ -604,26 +592,22 @@ void getCharacterList( shared_ptr< HttpServer::Response > response, shared_ptr< 
       else
       {
         auto charList = g_sapphireAPI.getCharList( result );
-        using boost::property_tree::ptree;
-        ptree pt;
-        ptree char_tree;
+
+        auto json = nlohmann::json();
 
         for( auto entry : charList )
         {
-          ptree tree_entry;
-          tree_entry.put( "name", std::string( entry.getName() ) );
-          tree_entry.put( "charId", std::to_string( entry.getId() ) );
-          tree_entry.put( "contentId", std::to_string( entry.getContentId() ) );
-          tree_entry.put( "infoJson", std::string( entry.getInfoJson() ) );
-          char_tree.push_back( std::make_pair( "", tree_entry ) );
+          json["charArray"].push_back( {
+            { "name", std::string( entry.getName() ) },
+            { "charId", std::to_string( entry.getId() ) },
+            { "contentId", std::to_string( entry.getContentId() ) },
+            { "infoJson", std::string( entry.getInfoJson() ) }
+          } );
         }
-
-        pt.add_child( "charArray", char_tree );
-        pt.put( "result", "success" );
-        std::ostringstream oss;
-        write_json( oss, pt );
-        std::string responseStr = oss.str();
-        *response << buildHttpResponse( 200, responseStr, JSON );
+        
+        json["result"] = "success";
+        
+        *response << buildHttpResponse( 200, json.dump(), JSON );
       }
     }
     else
