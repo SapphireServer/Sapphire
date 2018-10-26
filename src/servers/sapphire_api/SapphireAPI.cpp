@@ -11,6 +11,8 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
 
+#include <nlohmann/json.hpp>
+
 #include <Database/DatabaseDef.h>
 
 Core::Network::SapphireAPI::SapphireAPI()
@@ -121,6 +123,8 @@ Core::Network::SapphireAPI::createCharacter( const int& accountId, const std::st
   newPlayer.setName( name.c_str() );
 
   boost::property_tree::ptree pt;
+
+  auto json = nlohmann::json::parse( infoJson );
 
   std::stringstream ss;
   ss << infoJson;

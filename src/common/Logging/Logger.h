@@ -1,7 +1,7 @@
 #ifndef _LOGGER_H
-#define _LOGGER_H
+#define _LOGGER_H 
 
-#include <spdlog/spdlog.h>
+#include <string>
 
 namespace Core {
 
@@ -20,8 +20,6 @@ class Logger
 
 private:
   std::string m_logFile;
-
-  std::shared_ptr< spdlog::logger > m_logger;
 
 public:
   Logger();
