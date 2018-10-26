@@ -2,8 +2,6 @@
 #define	CLIENT_HTTP_HPP
 
 #include <asio.hpp>
-#include <boost/algorithm/string/predicate.hpp>
-#include <boost/functional/hash.hpp>
 
 #include <unordered_map>
 #include <map>
