@@ -487,7 +487,12 @@ void checkSession( shared_ptr< HttpServer::Response > response, shared_ptr< Http
       }
       else
       {
-        std::string json_string = "{\"result\":\"" + std::to_string( result ) + "\"}";
+        std::string json_string = nlohmann::json( {
+          { "result", result },
+          { "result2", "penis" },
+          { "result3", "wtf" }
+        } ).dump()
+        ;
         *response << buildHttpResponse( 200, json_string, JSON );
       }
     }
