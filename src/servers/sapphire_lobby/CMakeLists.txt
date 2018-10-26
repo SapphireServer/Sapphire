@@ -25,4 +25,4 @@ target_link_libraries( sapphire_lobby
 			   common 
 			   stdc++fs )
 
-cotire( sapphire_lobby )
+		   #cotire( sapphire_lobby )

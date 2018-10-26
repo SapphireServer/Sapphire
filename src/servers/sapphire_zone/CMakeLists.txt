@@ -41,5 +41,5 @@ target_include_directories( sapphire_zone PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" )
 
 
 if (UNIX)
-    cotire( sapphire_zone )
+	#    cotire( sapphire_zone )
 endif()
