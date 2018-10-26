@@ -187,11 +187,11 @@ namespace SimpleWeb {
         
         virtual void connect()=0;
         
-        std::shared_ptr<asio::deadline_timer> get_timeout_timer() {
+        std::shared_ptr< asio::basic_waitable_timer< std::chrono::steady_clock > > get_timeout_timer() {
             if(config.timeout==0)
                 return nullptr;
             
-            auto timer=std::make_shared<asio::deadline_timer>(io_service);
+            auto timer=std::make_shared< asio::basic_waitable_timer< std::chrono::steady_clock > >(io_service);
             timer->expires_from_now( std::chrono::seconds( config.timeout ) );
             timer->async_wait([this](const std::error_code& ec) {
                 if(!ec) {
