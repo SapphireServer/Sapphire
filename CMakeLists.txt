@@ -11,10 +11,6 @@ set( EXECUTABLE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin )
 set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake )
 
 ##########################################################################
-# Common and library path
-set( LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/deps" )
-
-##########################################################################
 # Dependencies and compiler settings
 include( "cmake/mysql.cmake" )
 include( "cmake/compiler.cmake" )
@@ -28,10 +24,16 @@ git_describe( VERSION --all --dirty=-d )
 configure_file( "${CMAKE_CURRENT_SOURCE_DIR}/src/common/Version.cpp.in"
                 "${CMAKE_CURRENT_SOURCE_DIR}/src/common/Version.cpp" @ONLY )
 
+##############################
+#             Mysql          #
+##############################
+find_package( MySQL )
+
 ##########################################################################
 add_subdirectory( "deps/datReader" )
 add_subdirectory( "deps/mysqlConnector" )
 add_subdirectory( "deps/zlib" )
+add_subdirectory( "deps/MySql" )
 add_subdirectory( "src/common" )
 
 add_subdirectory( "src/servers" )
