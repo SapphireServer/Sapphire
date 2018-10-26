@@ -18,7 +18,10 @@ set_target_properties(sapphire_api PROPERTIES
     VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../../../bin/"
 )
 
-target_link_libraries( sapphire_api common ) 
+target_link_libraries( sapphire_api common )
 if( UNIX )
-    target_link_libraries( sapphire_api stdc++fs )   
+    target_link_libraries( sapphire_api mysqlclient stdc++fs )
+
+else()
+    target_link_libraries( sapphire_api mysql )
 endif()
