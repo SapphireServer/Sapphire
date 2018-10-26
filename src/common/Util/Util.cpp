@@ -19,8 +19,8 @@ std::string Core::Util::binaryToHexString( uint8_t* pBinData, uint16_t size )
 }
 std::string Core::Util::toLowerCopy( const std::string& inStr )
 {
-  std::string out;	
-  std::transform( inStr.begin(), inStr.end(), out.begin(), ::tolower );
+  std::string out = inStr;
+  std::transform( inStr.begin(), inStr.end(), out.begin(), [](unsigned char c) -> unsigned char { return ::tolower(c); });
   return out;
 }
 

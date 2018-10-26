@@ -228,12 +228,12 @@ CharList Core::Network::RestConnector::getCharList( char* sId )
 
       for( auto& child : json["charArray"] )
       {
-        g_log.debug( child["contentId"] );
+        g_log.info( child["contentId"] );
         //std::string, uint32_t, uint64_t, std::string
-        list.push_back( { child["name"].get< std::string >(),
-                          child["charId"].get< uint32_t >(),
-                          child["contentId"].get< uint64_t >(),
-                          child["infoJson"].get< std::string >() 
+        list.push_back( { child["name"],
+                          std::stoi( std::string( child["charId"] ) ),
+                          std::stoll( std::string( child["contentId"] ) ),
+                          child["infoJson"] 
                         } );
       }
 
