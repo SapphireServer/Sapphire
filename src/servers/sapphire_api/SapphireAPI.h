@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
-
+#include <memory>
 #include "PlayerMinimal.h"
 
 namespace Core {

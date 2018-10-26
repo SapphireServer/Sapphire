@@ -94,7 +94,7 @@ namespace SimpleWeb {
 
             std::unordered_multimap<std::string, std::string, case_insensitive_hash, case_insensitive_equals> header;
 
-            REGEX_NS::smatch path_match;
+	    std::smatch path_match;
             
             std::string remote_endpoint_address;
             unsigned short remote_endpoint_port;
@@ -134,11 +134,11 @@ namespace SimpleWeb {
         Config config;
         
     private:
-        class regex_orderable : public REGEX_NS::regex {
+        class regex_orderable : public std::regex {
             std::string str;
         public:
-            regex_orderable(const char *regex_cstr) : REGEX_NS::regex(regex_cstr), str(regex_cstr) {}
-            regex_orderable(const std::string &regex_str) : REGEX_NS::regex(regex_str), str(regex_str) {}
+            regex_orderable(const char *regex_cstr) : std::regex(regex_cstr), str(regex_cstr) {}
+            regex_orderable(const std::string &regex_str) : std::regex(regex_str), str(regex_str) {}
             bool operator<(const regex_orderable &rhs) const {
                 return str<rhs.str;
             }
@@ -350,8 +350,8 @@ namespace SimpleWeb {
             for(auto &regex_method: resource) {
                 auto it=regex_method.second.find(request->method);
                 if(it!=regex_method.second.end()) {
-                    REGEX_NS::smatch sm_res;
-                    if(REGEX_NS::regex_match(request->path, sm_res, regex_method.first)) {
+                    std::smatch sm_res;
+                    if(std::regex_match(request->path, sm_res, regex_method.first)) {
                         request->path_match=std::move(sm_res);
                         write_response(socket, request, it->second);
                         return;
@@ -388,7 +388,7 @@ namespace SimpleWeb {
                         
                         auto range=request->header.equal_range("Connection");
                         for(auto it=range.first;it!=range.second;it++) {
-                            if( Core::Util::toLoweCopy( it->second ) == "close" )
+                            if( Core::Util::toLowerCopy( it->second ) == "close" )
                                 return;
                         }
                         if(http_version>1.05)

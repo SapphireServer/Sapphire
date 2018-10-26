@@ -9,7 +9,7 @@
 #include <random>
 #include <mutex>
 #include <type_traits>
-#include <hash>
+#include <functional>
 
 class case_insensitive_equals {
 public:
