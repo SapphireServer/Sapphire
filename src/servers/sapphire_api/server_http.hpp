@@ -10,6 +10,7 @@
 #include <functional>
 #include <iostream>
 #include <sstream>
+#include <regex>
 
 #ifndef CASE_INSENSITIVE_EQUALS_AND_HASH
 #define CASE_INSENSITIVE_EQUALS_AND_HASH
@@ -17,7 +18,7 @@
 class case_insensitive_equals {
 public:
   bool operator()(const std::string &key1, const std::string &key2) const {
-    return boost::algorithm::iequals(key1, key2);
+    return Core::Util::toLowerCopy( key1 ) == Core::Util::toLowerCopy( key2 );
   }
 };
 class case_insensitive_hash {
@@ -30,15 +31,6 @@ public:
     return seed;
   }
 };
-#endif
-
-// Late 2017 TODO: remove the following checks and always use std::regex
-#ifdef USE_BOOST_REGEX
-#include <boost/regex.hpp>
-#define REGEX_NS boost
-#else
-#include <regex>
-#define REGEX_NS std
 #endif
 
 // TODO when switching to c++14, use [[deprecated]] instead
@@ -396,7 +388,7 @@ namespace SimpleWeb {
                         
                         auto range=request->header.equal_range("Connection");
                         for(auto it=range.first;it!=range.second;it++) {
-                            if(boost::iequals(it->second, "close"))
+                            if( Core::Util::toLoweCopy( it->second ) == "close" )
                                 return;
                         }
                         if(http_version>1.05)
