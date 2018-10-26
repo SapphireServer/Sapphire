@@ -3,9 +3,9 @@
 
 #include <stdint.h>
 #include <string>
+#include <functional>
 
-namespace Core {
-namespace Util {
+namespace Core::Util {
 
 std::string binaryToHexString( uint8_t* pBinData, uint16_t size );
 
@@ -24,7 +24,14 @@ int64_t getTimeSeconds();
 uint64_t getEorzeanTimeStamp();
 
 void valueToFlagByteIndexValue( uint32_t inVal, uint8_t& outVal, uint16_t& outIndex );
+
+template <class T>
+inline void hashCombine( std::size_t& seed, const T& v )
+{
+    std::hash<T> hasher;
+    seed ^= hasher( v ) + 0x9e3779b9 + ( seed << 6 ) + ( seed >> 2 );
 }
+
 }
 
 #endif

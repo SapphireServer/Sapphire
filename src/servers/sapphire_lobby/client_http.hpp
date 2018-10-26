@@ -2,7 +2,6 @@
 #define	CLIENT_HTTP_HPP
 
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/functional/hash.hpp>
 
 #include <asio.hpp>
 
@@ -11,6 +10,7 @@
 #include <random>
 #include <mutex>
 #include <type_traits>
+#include <hash>
 
 class case_insensitive_equals {
 public:
@@ -23,7 +23,7 @@ public:
 	size_t operator()( const std::string &key ) const {
 		std::size_t seed = 0;
 		for( auto &c : key )
-			boost::hash_combine( seed, std::tolower( c ) );
+			Core::Util::hashCombine< char >( seed, std::tolower( c ) );
 		return seed;
 	}
 };

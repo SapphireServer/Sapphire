@@ -3,8 +3,8 @@
 
 #include <asio.hpp>
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/functional/hash.hpp>
 
+#include <Util/Util.h>
 #include <map>
 #include <unordered_map>
 #include <thread>
@@ -23,10 +23,11 @@ public:
 };
 class case_insensitive_hash {
 public:
-  size_t operator()(const std::string &key) const {
+  size_t operator()( const std::string &key ) const 
+  {
     std::size_t seed=0;
-    for(auto &c: key)
-      boost::hash_combine(seed, std::tolower(c));
+    for( auto &c : key )
+      Core::Util::hashCombine< char >( seed, std::tolower( c ) );
     return seed;
   }
 };
