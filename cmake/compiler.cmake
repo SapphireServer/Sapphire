@@ -28,4 +28,5 @@ else()
   endif()
 endif()
 
-
+# force standalone asio
+add_definitions( -DASIO_STANDALONE )
