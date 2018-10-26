@@ -35,10 +35,11 @@ void Logger::init()
   std::vector<spdlog::sink_ptr> sinks { stdout_sink, daily_sink };
   
   auto logger = std::make_shared< spdlog::async_logger >( "logger", sinks.begin(), sinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::block );
-  
+
+
   spdlog::register_logger( logger );
   spdlog::set_pattern( "[%H:%M:%S.%e] [%^%l%$] %v" );
-
+  spdlog::set_level( spdlog::level::debug );
   // always flush the log on criticial messages, otherwise it's done by libc
   // see: https://github.com/gabime/spdlog/wiki/7.-Flush-policy
   // nb: if the server crashes, log data can be missing from the file unless something logs critical just before it does
