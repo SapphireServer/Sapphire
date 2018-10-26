@@ -220,11 +220,11 @@ namespace SimpleWeb {
         
         virtual void accept()=0;
         
-        std::shared_ptr<asio::deadline_timer> get_timeout_timer(const std::shared_ptr<socket_type> &socket, long seconds) {
+        std::shared_ptr< asio::basic_waitable_timer< std::chrono::steady_clock > > get_timeout_timer(const std::shared_ptr<socket_type> &socket, long seconds) {
             if(seconds==0)
                 return nullptr;
             
-            auto timer=std::make_shared<asio::deadline_timer>(*io_service);
+            auto timer = std::make_shared< asio::basic_waitable_timer< std::chrono::steady_clock > >(*io_service);
             timer->expires_from_now( std::chrono::seconds( seconds ) );
             timer->async_wait([socket](const std::error_code& ec){
                 if(!ec) {
