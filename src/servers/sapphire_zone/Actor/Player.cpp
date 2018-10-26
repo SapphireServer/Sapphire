@@ -6,6 +6,7 @@
 #include <Network/PacketContainer.h>
 #include <Network/CommonActorControl.h>
 #include <Network/PacketWrappers/EffectPacket.h>
+#include <cmath>
 
 #include "Session.h"
 #include "Player.h"
@@ -1466,7 +1467,7 @@ uint32_t Core::Entity::Player::getCFPenaltyMinutes() const
     return 0;
 
   auto deltaTime = endTimestamp - currentTimestamp;
-  return static_cast< uint32_t > ( ceil( static_cast< float > (deltaTime) / 60 ) );
+  return static_cast< uint32_t > ( std::ceil( static_cast< float > (deltaTime) / 60 ) );
 }
 
 void Core::Entity::Player::setCFPenaltyMinutes( uint32_t minutes )
@@ -1680,8 +1681,8 @@ void Core::Entity::Player::teleportQuery( uint16_t aetheryteId )
 
     // calculate cost - does not apply for favorite points or homepoints neither checks for aether tickets
     auto cost = static_cast< uint16_t > (
-      ( sqrt( pow( fromAetheryte->aetherstreamX - targetAetheryte->aetherstreamX, 2 ) +
-              pow( fromAetheryte->aetherstreamY - targetAetheryte->aetherstreamY, 2 ) ) / 2 ) + 100 );
+      ( std::sqrt( std::pow( fromAetheryte->aetherstreamX - targetAetheryte->aetherstreamX, 2 ) +
+                   std::pow( fromAetheryte->aetherstreamY - targetAetheryte->aetherstreamY, 2 ) ) / 2 ) + 100 );
 
     // cap at 999 gil
     cost = cost > uint16_t{ 999 } ? uint16_t{ 999 } : cost;

@@ -9,6 +9,7 @@
 #include <Logging/Logger.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Database/DatabaseDef.h>
+#include <cmath>
 
 #include "DebugCommand.h"
 #include "DebugCommandHandler.h"

@@ -30,6 +30,7 @@
 #include <atomic>
 #include <mutex>
 
+#include <functional>
 #include <experimental/filesystem>
 namespace ci { namespace fs = std::experimental::filesystem; }
 
