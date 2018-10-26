@@ -1,5 +1,6 @@
 #include "BNpcTemplate.h"
 #include <string>
+#include <cstring>
 
 Core::Entity::BNpcTemplate::BNpcTemplate( uint32_t id, uint32_t baseId, uint32_t nameId, uint64_t weaponMain, uint64_t weaponSub,
                                           uint8_t aggressionMode, uint8_t enemyType, uint8_t onlineStatus, uint8_t pose,
@@ -19,10 +20,10 @@ Core::Entity::BNpcTemplate::BNpcTemplate( uint32_t id, uint32_t baseId, uint32_t
 {
 
   if( modelEquip )
-    memcpy( m_modelEquip, modelEquip, sizeof( m_modelEquip ) );
+    std::memcpy( m_modelEquip, modelEquip, sizeof( m_modelEquip ) );
 
   if( customize )
-    memcpy( m_customize, customize, sizeof( m_customize ) );
+    std::memcpy( m_customize, customize, sizeof( m_customize ) );
 
 }
 

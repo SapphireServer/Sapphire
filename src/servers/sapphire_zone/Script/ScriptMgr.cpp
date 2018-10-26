@@ -140,7 +140,7 @@ bool Core::Scripting::ScriptMgr::loadDir( const std::string& dirname, std::set< 
   {
     if( fs::is_regular_file( i ) && fs::path( i ).extension() == ext )
     {
-      files.insert( fs::path( i ) );
+      files.insert( fs::path( i ).string() );
     }
   }
 

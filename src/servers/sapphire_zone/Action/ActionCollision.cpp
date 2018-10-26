@@ -9,6 +9,7 @@
 #include "Actor/Player.h"
 
 #include <cmath>
+#include <cassert>
 
 using namespace Core::Entity;
 using namespace Core::Common;

@@ -4,6 +4,9 @@
 #include <Network/GamePacketNew.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include "Forwards.h"
+#include <string>
+#include <cstring>
+#include <cassert>
 
 namespace Core {
 namespace Network {
