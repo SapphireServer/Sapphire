@@ -4,8 +4,8 @@
 #include <Network/Connection.h>
 
 #include <Network/CommonNetwork.h>
-//#include <Network/GamePacket.h>
 #include <Util/LockedQueue.h>
+#include <map>
 
 #include "ForwardsZone.h"
 
