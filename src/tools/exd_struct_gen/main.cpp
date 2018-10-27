@@ -9,27 +9,20 @@
 #include <iostream>
 #include <cctype>
 #include <set>
-#include <Exd/ExdData.h>
+#include <Exd/ExdDataGenerated.h>
 #include <Logging/Logger.h>
-#include <boost/range/algorithm/remove_if.hpp>
-#include <boost/algorithm/string/classification.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/xml_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/foreach.hpp>
-#include <boost/algorithm/string/replace.hpp>
-#include <boost/lexical_cast.hpp>
+
+#include <nlohmann/json.hpp>
 
 #include <fstream>
 #include <streambuf>
 #include <regex>
-#include <boost/archive/iterators/ostream_iterator.hpp>
+#include <algorithm>
+
 
 
 Core::Logger g_log;
-Core::Data::ExdData g_exdData;
+Core::Data::ExdDataGenerated g_exdData;
 bool skipUnmapped = true;
 
 std::map< char, std::string > numberToStringMap
@@ -69,7 +62,7 @@ std::string generateIdListDecl( const std::string& exd )
 
 std::string generateDirectGetters( const std::string& exd )
 {
-  return "     using " + exd + "Ptr =  boost::shared_ptr< " + exd + " >;\n";
+  return "     using " + exd + "Ptr = std::shared_ptr< " + exd + " >;\n";
 }
 
 std::string generateIdListGetter( const std::string& exd )
@@ -119,65 +112,38 @@ std::string generateStruct( const std::string& exd )
 
   int count = 0;
 
-  using boost::property_tree::ptree;
-  ptree m_propTree;
-  boost::property_tree::read_json( "ex.json", m_propTree );
+  auto json = nlohmann::json();
 
-  BOOST_FOREACH( boost::property_tree::ptree::value_type& sheet, m_propTree.get_child( "sheets" ) )
-        {
-          std::string name = sheet.second.get< std::string >( "sheet" );
-          if( name != exd )
-            continue;
+  std::ifstream exJson( "ex.json" );
+  exJson >> json;
 
-          BOOST_FOREACH( boost::property_tree::ptree::value_type& show, sheet.second.get_child( "definitions" ) )
-                {
-                  uint32_t index;
-                  std::string converterTarget = "";
-                  bool isRepeat = false;
-                  int num = 0;
-                  try
-                  {
-                    index = show.second.get< uint32_t >( "index" );
-                  }
-                  catch( ... )
-                  {
-                    index = 0;
-                  }
-                  try
-                  {
-                    std::string fieldName = show.second.get< std::string >( "name" );
-                    indexToNameMap[ index ] = fieldName;
-                  }
-                  catch( ... )
-                  {
-                  }
+  for( auto& definition : json["sheets"][exd] )
+  {
+    uint32_t index;
+    std::string converterTarget = "";
+    bool isRepeat = false;
+    int num = 0;
 
-                  try
-                  {
-                    converterTarget = show.second.get< std::string >( "converter.target" );
-                    if( nameTaken.find( converterTarget ) != nameTaken.end() )
-                      indexToTarget[ index ] = converterTarget;
-                  }
-                  catch( ... )
-                  {
-                  }
+    index = definition["index"].get< uint32_t >();
+    indexToNameMap[ index ] = std::string( definition["name"] );
 
-                  try
-                  {
-                    show.second.get< std::string >( "type" );
-                    num = show.second.get< uint8_t >( "count" );
-                    isRepeat = true;
-                    indexIsArrayMap[ index ] = true;
-                    indexCountMap[ index ] = num;
-                    std::string fName = show.second.get< std::string >( "definition.name" );
-                    indexToNameMap[ index ] = fName;
-                  }
-                  catch( ... )
-                  {
-                  }
+    converterTarget = std::string( definition["converter"]["target"] );
+    if( nameTaken.find( converterTarget ) != nameTaken.end() )
+      indexToTarget[ index ] = converterTarget;
 
-                }
-        }
+    if( auto count = definition["count"] )
+    {
+      num = std::stoi( std::string( count ) );
+      isRepeat = true;
+      indexIsArrayMap[ index ] = true;
+      indexCountMap[ index ] = num;
+
+      std::string fName = definition["definition"]["name"];
+      indexToNameMap[ index ] = fName;
+    }
+
+
+  }
 
   std::string result = "struct " + exd + "\n{\n";
 
@@ -208,8 +174,12 @@ std::string generateStruct( const std::string& exd )
       fieldName = indexToNameMap[ count ];
     }
     fieldName[ 0 ] = std::tolower( fieldName[ 0 ] );
-    fieldName.erase( boost::remove_if( fieldName, boost::is_any_of( ",-':![](){}<>% \x02\x1f\x01\x03" ) ),
-                     fieldName.end() );
+
+    std::string badChars = ",-':![](){}<>% \x02\x1f\x01\x03";
+    std::for_each( badChars.begin(), badChars.end(), [ &fieldName ]( const char c ) 
+    {
+      fieldName.erase( std::remove( fieldName.begin(), fieldName.end(), c ), fieldName.end() );
+    });
 
     for( auto entry : numberToStringMap )
     {
@@ -229,7 +199,7 @@ std::string generateStruct( const std::string& exd )
     indexToNameMap[ count ] = fieldName;
     indexToTypeMap[ count ] = type;
     if( indexToTarget.find( count ) != indexToTarget.end() )
-      result += "   boost::shared_ptr< " + indexToTarget[ count ] + "> " + fieldName + ";\n";
+      result += "   std::shared_ptr< " + indexToTarget[ count ] + "> " + fieldName + ";\n";
     else
     {
       if( indexIsArrayMap.find( count ) != indexIsArrayMap.end() )
@@ -272,7 +242,7 @@ std::string generateConstructorsDecl( const std::string& exd )
       continue;
     }
     if( indexToTarget.find( count ) != indexToTarget.end() )
-      result += indent + indexToNameMap[ count ] + " = boost::make_shared< " + indexToTarget[ count ] +
+      result += indent + indexToNameMap[ count ] + " = std::make_shared< " + indexToTarget[ count ] +
                 ">( exdData->getField< " +
                 indexToTypeMap[ count ] + " >( row, " + std::to_string( count ) + " ), exdData );\n";
     else
@@ -337,9 +307,10 @@ int main( int argc, char** argv )
                     std::istreambuf_iterator< char >() );
 
 
-  using boost::property_tree::ptree;
-  ptree m_propTree;
-  boost::property_tree::read_json( "ex.json", m_propTree );
+  std::ifstream exJson( "ex.json" );
+
+  auto json = nlohmann::json();
+  exJson >> json;
 
   g_log.info( "Setting up EXD data" );
   if( !g_exdData.init( datLocation ) )
@@ -366,27 +337,27 @@ int main( int argc, char** argv )
   //nameTaken[name] = "1";
   //}
 
-  BOOST_FOREACH( boost::property_tree::ptree::value_type& sheet, m_propTree.get_child( "sheets" ) )
-        {
-          std::string name = sheet.second.get< std::string >( "sheet" );
+  for( auto& sheet : json["sheets"] )
+  {
+    std::string name = json["sheet"];
 
-          forwards += "struct " + name + ";\n";
-          structDefs += generateStruct( name );
-          dataDecl += generateDatAccessDecl( name );
-          idListsDecl += generateIdListDecl( name );
-          getterDecl += generateDirectGetters( name );
-          datAccCall += generateSetDatAccessCall( name );
-          constructorDecl += generateConstructorsDecl( name );
-          idListGetters += generateIdListGetter( name );
-        }
+    forwards += "struct " + name + ";\n";
+    structDefs += generateStruct( name );
+    dataDecl += generateDatAccessDecl( name );
+    idListsDecl += generateIdListDecl( name );
+    getterDecl += generateDirectGetters( name );
+    datAccCall += generateSetDatAccessCall( name );
+    constructorDecl += generateConstructorsDecl( name );
+    idListGetters += generateIdListGetter( name );
+  }
 
   getterDecl +=
     "\n     template< class T >\n"
-    "     boost::shared_ptr< T > get( uint32_t id )\n"
+    "     std::shared_ptr< T > get( uint32_t id )\n"
     "     {\n"
     "        try\n"
     "        {\n"
-    "           auto info = boost::make_shared< T >( id, this );\n"
+    "           auto info = std::make_shared< T >( id, this );\n"
     "           return info;\n"
     "        }\n"
     "        catch( ... )\n"

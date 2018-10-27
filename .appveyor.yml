@@ -5,7 +5,7 @@ configuration:
   - Debug
 
 platform:
-  - Win32
+  - Win64
 
 environment:
   MSVC_DEFAULT_OPTIONS: ON
@@ -20,7 +20,7 @@ before_build:
   - git submodule update --init
   - mkdir build
   - cd build
-  - cmake .. -G "Visual Studio 15 2017" 
+  - cmake .. -G "Visual Studio 15 2017 Win64" 
   - cmake --build . --target ALL_BUILD --config Debug
 
 build_script:
