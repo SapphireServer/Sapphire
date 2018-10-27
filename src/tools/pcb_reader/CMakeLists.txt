@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 2.6)
 cmake_policy(SET CMP0015 NEW)
 project(Tool_pcb_reader2)
 
-set(SAPPHIRE_BOOST_VER 1.63.0)
-set(SAPPHIRE_BOOST_FOLDER_NAME boost_1_63_0)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_CURRENT_SOURCE_DIR}/../bin/")
 
 
@@ -24,10 +22,9 @@ set_target_properties(pcb_reader2 PROPERTIES
 )
 
 if (UNIX)
-  target_link_libraries (pcb_reader2 common xivdat pthread mysqlclient dl z)
+    target_link_libraries (pcb_reader2 common xivdat pthread mysqlclient dl z stdc++fs )
 else()
-  target_link_libraries (pcb_reader2 common xivdat libmysql zlib1)
+    target_link_libraries (pcb_reader2 common xivdat mysql zlib)
 endif()
 
-target_link_libraries(pcb_reader2 ${Boost_LIBRARIES} ${Boost_LIBRARIES})
 

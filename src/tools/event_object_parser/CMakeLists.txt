@@ -24,10 +24,9 @@ set_target_properties(event_object_parser PROPERTIES
 )
 
 if (UNIX)
-  target_link_libraries (event_object_parser common xivdat pthread mysqlclient dl z)
+    target_link_libraries (event_object_parser common xivdat pthread mysqlclient dl z stdc++fs)
 else()
-  target_link_libraries (event_object_parser common xivdat libmysql zlib1)
+    target_link_libraries (event_object_parser common xivdat mysql zlib)
 endif()
 
-target_link_libraries(event_object_parser ${Boost_LIBRARIES} ${Boost_LIBRARIES})
 
