@@ -20,8 +20,8 @@ before_build:
   - git submodule update --init
   - mkdir build
   - cd build
-  - cmake .. -G "Visual Studio 15 2017" 
-  - cmake --build . --target ALL_BUILD --config Debug -DCMAKE_GENERATOR_PLATFORM=x64
+  - cmake .. -G "Visual Studio 15 2017 Win64" 
+  - cmake --build . --target ALL_BUILD --config Debug
 
 build_script:
   - cd ..
