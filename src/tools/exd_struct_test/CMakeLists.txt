@@ -24,6 +24,6 @@ set_target_properties(exd_struct_test PROPERTIES
 if (UNIX)
   target_link_libraries (exd_struct_test common xivdat pthread mysqlclient dl z stdc++fs )
 else()
-  target_link_libraries (exd_struct_test common xivdat libmysql zlib)
+  target_link_libraries (exd_struct_test common xivdat mysql zlib)
 endif()
 
