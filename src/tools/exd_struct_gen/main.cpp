@@ -17,6 +17,7 @@
 #include <fstream>
 #include <streambuf>
 #include <regex>
+#include <algorithm>
 
 
 
@@ -111,76 +112,38 @@ std::string generateStruct( const std::string& exd )
 
   int count = 0;
 
-
   auto json = nlohmann::json();
 
-  std::istream exJson( "ex.json" );
+  std::ifstream exJson( "ex.json" );
   exJson >> json;
 
-  for( auto& sheet : json["sheets"] )
+  for( auto& definition : json["sheets"][exd] )
   {
-    std::string name = json["sheet"];
-    if( name != exd )
-      continue;
+    uint32_t index;
+    std::string converterTarget = "";
+    bool isRepeat = false;
+    int num = 0;
 
-    
+    index = definition["index"].get< uint32_t >();
+    indexToNameMap[ index ] = std::string( definition["name"] );
+
+    converterTarget = std::string( definition["converter"]["target"] );
+    if( nameTaken.find( converterTarget ) != nameTaken.end() )
+      indexToTarget[ index ] = converterTarget;
+
+    if( auto count = definition["count"] )
+    {
+      num = std::stoi( std::string( count ) );
+      isRepeat = true;
+      indexIsArrayMap[ index ] = true;
+      indexCountMap[ index ] = num;
+
+      std::string fName = definition["definition"]["name"];
+      indexToNameMap[ index ] = fName;
+    }
+
+
   }
-
-  BOOST_FOREACH( boost::property_tree::ptree::value_type& sheet, m_propTree.get_child( "sheets" ) )
-        {
-          std::string name = sheet.second.get< std::string >( "sheet" );
-          if( name != exd )
-            continue;
-
-          BOOST_FOREACH( boost::property_tree::ptree::value_type& show, sheet.second.get_child( "definitions" ) )
-                {
-                  uint32_t index;
-                  std::string converterTarget = "";
-                  bool isRepeat = false;
-                  int num = 0;
-                  try
-                  {
-                    index = show.second.get< uint32_t >( "index" );
-                  }
-                  catch( ... )
-                  {
-                    index = 0;
-                  }
-                  try
-                  {
-                    std::string fieldName = show.second.get< std::string >( "name" );
-                    indexToNameMap[ index ] = fieldName;
-                  }
-                  catch( ... )
-                  {
-                  }
-
-                  try
-                  {
-                    converterTarget = show.second.get< std::string >( "converter.target" );
-                    if( nameTaken.find( converterTarget ) != nameTaken.end() )
-                      indexToTarget[ index ] = converterTarget;
-                  }
-                  catch( ... )
-                  {
-                  }
-
-                  try
-                  {
-                    show.second.get< std::string >( "type" );
-                    num = show.second.get< uint8_t >( "count" );
-                    isRepeat = true;
-                    indexIsArrayMap[ index ] = true;
-                    indexCountMap[ index ] = num;
-                    std::string fName = show.second.get< std::string >( "definition.name" );
-                    indexToNameMap[ index ] = fName;
-                  }
-                  catch( ... )
-                  {
-                  }
-
-                }
-        }
 
   std::string result = "struct " + exd + "\n{\n";
 
@@ -211,8 +174,12 @@ std::string generateStruct( const std::string& exd )
       fieldName = indexToNameMap[ count ];
     }
     fieldName[ 0 ] = std::tolower( fieldName[ 0 ] );
-    fieldName.erase( std::remove_if( fieldName, std::is_any_of( ",-':![](){}<>% \x02\x1f\x01\x03" ) ),
-                     fieldName.end() );
+
+    std::string badChars = ",-':![](){}<>% \x02\x1f\x01\x03";
+    std::for_each( badChars.begin(), badChars.end(), [ &fieldName ]( const char c ) 
+    {
+      fieldName.erase( std::remove( fieldName.begin(), fieldName.end(), c ), fieldName.end() );
+    });
 
     for( auto entry : numberToStringMap )
     {
@@ -340,9 +307,10 @@ int main( int argc, char** argv )
                     std::istreambuf_iterator< char >() );
 
 
-  using boost::property_tree::ptree;
-  ptree m_propTree;
-  boost::property_tree::read_json( "ex.json", m_propTree );
+  std::ifstream exJson( "ex.json" );
+
+  auto json = nlohmann::json();
+  exJson >> json;
 
   g_log.info( "Setting up EXD data" );
   if( !g_exdData.init( datLocation ) )
@@ -369,19 +337,19 @@ int main( int argc, char** argv )
   //nameTaken[name] = "1";
   //}
 
-  BOOST_FOREACH( boost::property_tree::ptree::value_type& sheet, m_propTree.get_child( "sheets" ) )
-        {
-          std::string name = sheet.second.get< std::string >( "sheet" );
+  for( auto& sheet : json["sheets"] )
+  {
+    std::string name = json["sheet"];
 
-          forwards += "struct " + name + ";\n";
-          structDefs += generateStruct( name );
-          dataDecl += generateDatAccessDecl( name );
-          idListsDecl += generateIdListDecl( name );
-          getterDecl += generateDirectGetters( name );
-          datAccCall += generateSetDatAccessCall( name );
-          constructorDecl += generateConstructorsDecl( name );
-          idListGetters += generateIdListGetter( name );
-        }
+    forwards += "struct " + name + ";\n";
+    structDefs += generateStruct( name );
+    dataDecl += generateDatAccessDecl( name );
+    idListsDecl += generateIdListDecl( name );
+    getterDecl += generateDirectGetters( name );
+    datAccCall += generateSetDatAccessCall( name );
+    constructorDecl += generateConstructorsDecl( name );
+    idListGetters += generateIdListGetter( name );
+  }
 
   getterDecl +=
     "\n     template< class T >\n"
