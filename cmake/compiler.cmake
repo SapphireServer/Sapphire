@@ -17,7 +17,7 @@ else()
 
     # edit and continue
     message(STATUS "Enabling Edit and Continue..")
-    add_definitions(/ZI)
+    add_definitions(/Zi)
 
     # incremental linking
     message(STATUS "Enabling Incremental Linking..")
