@@ -4,8 +4,8 @@
 #include <locale>
 #include <set>
 #include <string>
+#include <cstring>
 
-#include <boost/algorithm/string.hpp>
 #include <experimental/filesystem>
 
 #include <Exd.h>
@@ -15,9 +15,10 @@
 #include <GameData.h>
 #include <DatCat.h>
 
-#include <Exd/ExdData.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Logging/Logger.h>
+
+#include <algorithm>
 
 
 Core::Logger g_log;
@@ -62,7 +63,7 @@ std::string titleCase( const std::string& str )
 }
 
 void
-createScript( boost::shared_ptr< Core::Data::Quest >& pQuestData, std::set< std::string >& additionalList, int questId )
+createScript( std::shared_ptr< Core::Data::Quest >& pQuestData, std::set< std::string >& additionalList, int questId )
 {
   std::string header(
     "// This is an automatically generated C++ script template\n"
@@ -125,7 +126,10 @@ createScript( boost::shared_ptr< Core::Data::Quest >& pQuestData, std::set< std:
       else
       {
         std::string seqName = titleCase( entry );
-        boost::replace_all( seqName, "_", "" );
+
+        seqName.erase( std::remove_if( seqName.begin(), seqName.end(), []( const char c ) {
+          return c == '_';
+        }), seqName.end());
 
         std::string seqId = entry.substr( 4 );
         seqStr += "         " + seqName + " = " + seqId + ",\n";
@@ -252,7 +256,11 @@ createScript( boost::shared_ptr< Core::Data::Quest >& pQuestData, std::set< std:
   for( auto& entity : script_entities )
   {
     auto name = titleCase( entity );
-    boost::replace_all( name, "_", "" );
+
+    name.erase( std::remove_if( name.begin(), name.end(), []( const char c ) {
+      return c == '_';
+    }), name.end());
+
     sentities += "      static constexpr auto " + name + ";\n";
   }
 
