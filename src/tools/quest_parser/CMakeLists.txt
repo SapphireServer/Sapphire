@@ -32,6 +32,6 @@ set_target_properties(quest_parse PROPERTIES
 if (UNIX)
   target_link_libraries (quest_parse common xivdat pthread mysqlclient dl z stdc++fs)
 else()
-  target_link_libraries (quest_parse common xivdat mysql zlib1)
+  target_link_libraries (quest_parse common xivdat mysql zlib)
 endif()
 

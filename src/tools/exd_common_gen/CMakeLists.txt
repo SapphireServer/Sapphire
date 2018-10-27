@@ -26,7 +26,7 @@ set_target_properties(exd_common_gen PROPERTIES
 if (UNIX)
   target_link_libraries (exd_common_gen common xivdat pthread mysqlclient dl z)
 else()
-  target_link_libraries (exd_common_gen common xivdat libmysql zlib1)
+  target_link_libraries (exd_common_gen common xivdat libmysql zlib)
 
   # ignore unchecked iterators warnings from msvc
   add_definitions(-D_SCL_SECURE_NO_WARNINGS)
