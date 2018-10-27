@@ -7,7 +7,8 @@
 
 // #include <iostream>
 
-namespace Core {
+namespace Core
+{
 
 
 Logger::Logger()
@@ -34,7 +35,8 @@ void Logger::init()
 
   std::vector<spdlog::sink_ptr> sinks { stdout_sink, daily_sink };
   
-  auto logger = std::make_shared< spdlog::async_logger >( "logger", sinks.begin(), sinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::block );
+  auto logger = std::make_shared< spdlog::async_logger >( "logger", sinks.begin(), sinks.end(),
+                                                          spdlog::thread_pool(), spdlog::async_overflow_policy::block );
 
 
   spdlog::register_logger( logger );
