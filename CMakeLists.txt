@@ -41,7 +41,7 @@ add_subdirectory( "src/servers" )
 
 #add_subdirectory( "src/tools/exd_common_gen" )
 add_subdirectory( "src/tools/exd_struct_gen" )
-#add_subdirectory( "src/tools/exd_struct_test" )
+add_subdirectory( "src/tools/exd_struct_test" )
 #add_subdirectory( "src/tools/quest_parser" )
 #add_subdirectory( "src/tools/discovery_parser" )
 #add_subdirectory( "src/tools/mob_parse" )
