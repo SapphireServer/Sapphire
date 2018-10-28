@@ -38,9 +38,9 @@
 
 extern Core::Framework g_fw;
 
-using namespace Network;
-using namespace Network::Packets;
-using namespace Network::Packets::Server;
+using namespace Core::Network;
+using namespace Core::Network::Packets;
+using namespace Core::Network::Packets::Server;
 
 // instanciate and initialize commands
 Core::DebugCommandHandler::DebugCommandHandler()

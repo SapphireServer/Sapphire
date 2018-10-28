@@ -9,6 +9,8 @@
 // Start NPC: 1001140
 // End NPC: 1000100
 
+using namespace Core;
+
 class ManFst002 : public EventScript
 {
 private:

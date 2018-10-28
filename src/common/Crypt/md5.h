@@ -3,25 +3,25 @@
 
 #include <stdint.h>
 
-namespace Core {
-namespace Util {
-using md5_context = struct
+namespace Core::Util
 {
-  uint32_t total[2];
-  uint32_t state[4];
-  uint8_t buffer[64];
-};
+  using md5_context = struct
+  {
+    uint32_t total[2];
+    uint32_t state[4];
+    uint8_t buffer[64];
+  };
 
 
-void md5( uint8_t* text, uint8_t* hash, int32_t size );
+  void md5( uint8_t* text, uint8_t* hash, int32_t size );
 
-void md5_starts( md5_context* ctx );
+  void md5_starts( md5_context* ctx );
 
-void md5_update( md5_context* ctx, uint8_t* input, uint32_t length );
+  void md5_update( md5_context* ctx, uint8_t* input, uint32_t length );
 
-void md5_finish( md5_context* ctx, uint8_t digest[16] );
+  void md5_finish( md5_context* ctx, uint8_t digest[16] );
 
-static const char* msg[] =
+  static const char* msg[] =
   {
     "",
     "a",
@@ -33,7 +33,7 @@ static const char* msg[] =
          "345678901234567890"
   };
 
-static const char* val[] =
+  static const char* val[] =
   {
     "d41d8cd98f00b204e9800998ecf8427e",
     "0cc175b9c0f1b6a831c399e269772661",
@@ -45,7 +45,7 @@ static const char* val[] =
   };
 
 }
-}
+
 
 
 #endif /* md5.h */

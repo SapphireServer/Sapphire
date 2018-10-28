@@ -8,6 +8,8 @@
 // Start NPC: 1001028
 // End NPC: 1002697
 
+using namespace Core;
+
 class ManSea001 :
   public EventScript
 {

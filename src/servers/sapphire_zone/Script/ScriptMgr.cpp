@@ -407,7 +407,7 @@ bool Core::Scripting::ScriptMgr::onInstanceEnterTerritory( InstanceContentPtr in
   return false;
 }
 
-Scripting::NativeScriptMgr& Core::Scripting::ScriptMgr::getNativeScriptHandler()
+Core::Scripting::NativeScriptMgr& Core::Scripting::ScriptMgr::getNativeScriptHandler()
 {
   return *m_nativeScriptMgr;
 }

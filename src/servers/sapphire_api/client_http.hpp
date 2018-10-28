@@ -10,7 +10,8 @@
 #include <type_traits>
 
 
-namespace SimpleWeb {
+namespace SimpleWeb
+{
     template <class socket_type>
     class Client;
     

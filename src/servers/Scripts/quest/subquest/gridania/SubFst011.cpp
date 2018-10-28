@@ -2,6 +2,8 @@
 #include <Event/EventHelper.h>
 #include <ScriptObject.h>
 
+using namespace Core;
+
 // Quest Script: SubFst011_00037
 // Quest Name: Population Control
 // Quest ID: 65573

@@ -2,6 +2,8 @@
 #include <Event/EventHelper.h>
 #include <ScriptObject.h>
 
+using namespace Core;
+
 // Quest Script: SubWil028_00389
 // Quest Name: Fantastic Voyage
 // Quest ID: 65925

@@ -3,34 +3,30 @@
 
 #include <memory>
 
-namespace Core {
+namespace Core
+{
 
-class ConfigMgr;
+  class ConfigMgr;
+  using ConfigMgrPtr = std::shared_ptr< ConfigMgr >;
 
-typedef std::shared_ptr< ConfigMgr > ConfigMgrPtr;
+  namespace Network
+  {
+    class Hive;
+    class Acceptor;
+    class Connection;
+    using HivePtr = std::shared_ptr< Hive >;
+    using AcceptorPtr = std::shared_ptr< Acceptor >;
+    using ConnectionPtr = std::shared_ptr< Connection >;
 
+    namespace Packets
+    {
+      class GamePacket;
+      class FFXIVPacketBase;
+      using GamePacketPtr = std::shared_ptr< GamePacket >;
+      using FFXIVPacketBasePtr = std::shared_ptr< FFXIVPacketBase >;
+    }
 
-namespace Network {
-class Hive;
-
-class Acceptor;
-
-class Connection;
-
-typedef std::shared_ptr< Hive > HivePtr;
-typedef std::shared_ptr< Acceptor > AcceptorPtr;
-typedef std::shared_ptr< Connection > ConnectionPtr;
-
-namespace Packets {
-class GamePacket;
-
-class FFXIVPacketBase;
-
-typedef std::shared_ptr< GamePacket > GamePacketPtr;
-typedef std::shared_ptr< FFXIVPacketBase > FFXIVPacketBasePtr;
-}
-
-}
+  }
 
 
 }

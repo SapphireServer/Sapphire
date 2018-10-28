@@ -7,29 +7,30 @@
 #include <memory>
 #include <cassert>
 
-namespace Core {
-
-class Framework
+namespace Core
 {
-  using TypenameToObject = std::map< std::type_index, std::shared_ptr< void > >;
-  TypenameToObject ObjectMap;
 
-public:
-  template< typename T >
-  std::shared_ptr< T > get()
+  class Framework
   {
-    auto iType = ObjectMap.find( typeid( T ) );
-    assert( !( iType == ObjectMap.end() ) );
-    return std::static_pointer_cast< T >( iType->second );
-  }
+    using TypenameToObject = std::map< std::type_index, std::shared_ptr< void > >;
+    TypenameToObject ObjectMap;
 
-  template< typename T >
-  void set( std::shared_ptr< T > value )
-  {
-    assert( value ); // why would anyone store nullptrs....
-    ObjectMap[ typeid( T ) ] = value;
-  }
-};
+  public:
+    template< typename T >
+    std::shared_ptr< T > get()
+    {
+      auto iType = ObjectMap.find( typeid( T ) );
+      assert( !( iType == ObjectMap.end() ) );
+      return std::static_pointer_cast< T >( iType->second );
+    }
+
+    template< typename T >
+    void set( std::shared_ptr< T > value )
+    {
+      assert( value ); // why would anyone store nullptrs....
+      ObjectMap[ typeid( T ) ] = value;
+    }
+  };
 
 }
 

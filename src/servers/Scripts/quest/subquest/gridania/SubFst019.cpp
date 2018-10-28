@@ -2,6 +2,8 @@
 #include <Event/EventHelper.h>
 #include <ScriptObject.h>
 
+using namespace Core;
+
 // Quest Script: SubFst019_00049
 // Quest Name: I Am Millicent, Hear Me Roar
 // Quest ID: 65585

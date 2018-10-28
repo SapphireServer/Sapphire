@@ -13,8 +13,8 @@
 #include <set>
 #include <variant>
 
-namespace Core {
-namespace Data {
+namespace Core::Data
+{
 
 class ExdDataGenerated;
 
@@ -8693,7 +8693,6 @@ const std::set< uint32_t >& getZoneSharedGroupIdList()
 
   };
 
-}
 }
 
 #endif

@@ -2,6 +2,8 @@
 #include <Event/EventHelper.h>
 #include <ScriptObject.h>
 
+using namespace Core;
+
 // Quest Script: SubWil029_00390
 // Quest Name: Catch Your Breath
 // Quest ID: 65926

@@ -3,45 +3,33 @@
 
 #include <string>
 
-namespace Core {
-
-enum struct LoggingSeverity : uint8_t
-{
-  trace = 0,
-  debug = 1,
-  info = 2,
-  warning = 3,
-  error = 4,
-  fatal = 5
-};
-
-class Logger
+namespace Core
 {
 
-private:
-  std::string m_logFile;
+  class Logger
+  {
 
-public:
-  Logger();
+  private:
+    std::string m_logFile;
 
-  ~Logger();
+  public:
+    Logger();
 
-  void init();
+    ~Logger();
 
-  void Log( LoggingSeverity logSev, const std::string& text );
+    void init();
 
-  void error( const std::string& text );
+    void error( const std::string& text );
 
-  void info( const std::string& text );
+    void info( const std::string& text );
 
-  void debug( const std::string& text );
+    void debug( const std::string& text );
 
-  void fatal( const std::string& text );
+    void fatal( const std::string& text );
 
-  void setLogPath( const std::string& logPath );
+    void setLogPath( const std::string& logPath );
 
-};
-
+  };
 
 }
 

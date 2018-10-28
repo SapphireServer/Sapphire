@@ -3,60 +3,59 @@
 
 #include "Actor.h"
 
-namespace Core {
-namespace Entity {
-
-class EventObject : public Actor
+namespace Core::Entity
 {
-public:
-  EventObject( uint32_t actorId, uint32_t objectId, uint32_t gimmickId, uint8_t initialState,
-               Common::FFXIVARR_POSITION3 pos, float rotation, const std::string& givenName = "none" );
 
-  using OnTalkEventHandler = std::function< void( Entity::Player&, Entity::EventObjectPtr,
-                                                  InstanceContentPtr, uint64_t ) >;
+  class EventObject : public Actor
+  {
+  public:
+    EventObject( uint32_t actorId, uint32_t objectId, uint32_t gimmickId, uint8_t initialState,
+                 Common::FFXIVARR_POSITION3 pos, float rotation, const std::string& givenName = "none" );
 
-  uint32_t getGimmickId() const;
+    using OnTalkEventHandler = std::function< void( Entity::Player&, Entity::EventObjectPtr,
+                                                    InstanceContentPtr, uint64_t ) >;
 
-  void setGimmickId( uint32_t gimmickId );
+    uint32_t getGimmickId() const;
 
-  uint8_t getState() const;
+    void setGimmickId( uint32_t gimmickId );
 
-  void setState( uint8_t state );
+    uint8_t getState() const;
 
-  float getScale() const;
+    void setState( uint8_t state );
 
-  void setScale( float scale );
+    float getScale() const;
 
-  void setOnTalkHandler( OnTalkEventHandler handler );
+    void setScale( float scale );
 
-  OnTalkEventHandler getOnTalkHandler() const;
+    void setOnTalkHandler( OnTalkEventHandler handler );
 
-  uint32_t getObjectId() const;
+    OnTalkEventHandler getOnTalkHandler() const;
 
-  const std::string& getName() const;
+    uint32_t getObjectId() const;
 
-  InstanceContentPtr getParentInstance() const;
+    const std::string& getName() const;
 
-  void setParentInstance( InstanceContentPtr instance );
+    InstanceContentPtr getParentInstance() const;
 
-  void spawn( PlayerPtr pTarget ) override;
+    void setParentInstance( InstanceContentPtr instance );
 
-  void despawn( PlayerPtr pTarget ) override;
+    void spawn( PlayerPtr pTarget ) override;
 
-  void setAnimationFlag( uint32_t flag, uint32_t animationFlag );
+    void despawn( PlayerPtr pTarget ) override;
 
-protected:
-  uint32_t m_gimmickId;
-  uint32_t m_objectId;
-  uint8_t m_state;
-  float m_scale;
-  std::string m_name;
-  InstanceContentPtr m_parentInstance;
-  OnTalkEventHandler m_onTalkEventHandler;
+    void setAnimationFlag( uint32_t flag, uint32_t animationFlag );
+
+  protected:
+    uint32_t m_gimmickId;
+    uint32_t m_objectId;
+    uint8_t m_state;
+    float m_scale;
+    std::string m_name;
+    InstanceContentPtr m_parentInstance;
+    OnTalkEventHandler m_onTalkEventHandler;
 
 
-};
-}
+  };
 }
 
 #endif //SAPPHIRE_INSTANCEOBJECT_H

@@ -8,6 +8,8 @@
 // Start NPC: 1003988
 // End NPC: 1001353
 
+using namespace Core;
+
 class ManWil002 :
   public EventScript
 {

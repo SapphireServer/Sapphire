@@ -2,6 +2,8 @@
 #include <Event/EventHelper.h>
 #include <ScriptObject.h>
 
+using namespace Core;
+
 // Quest Script: SubFst009_00034
 // Quest Name: Derision of Labor
 // Quest ID: 65570

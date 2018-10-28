@@ -1,6 +1,8 @@
 #include <Actor/Player.h>
 #include <ScriptObject.h>
 
+using namespace Core;
+
 // Opening Script: OpeningLimsaLominsa
 // Quest Name: OpeningLimsaLominsa
 // Quest ID: 1245185

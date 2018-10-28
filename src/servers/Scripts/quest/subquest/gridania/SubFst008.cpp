@@ -2,6 +2,8 @@
 #include <Event/EventHelper.h>
 #include <ScriptObject.h>
 
+using namespace Core;
+
 // Quest Script: SubFst008_00032
 // Quest Name: A Hard Nut to Crack
 // Quest ID: 65568

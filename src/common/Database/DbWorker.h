@@ -6,35 +6,32 @@
 #include "Util/LockedWaitQueue.h"
 #include <memory>
 
-namespace Core {
-namespace Db {
-class DbConnection;
-
-class Operation;
-
-class DbWorker
+namespace Core::Db
 {
-public:
-  DbWorker( LockedWaitQueue< std::shared_ptr< Operation > >* newQueue, DbConnection* connection );
+  class DbConnection;
+  class Operation;
 
-  ~DbWorker();
+  class DbWorker
+  {
+  public:
+    DbWorker( LockedWaitQueue< std::shared_ptr< Operation > >* newQueue, DbConnection* connection );
 
-private:
-  LockedWaitQueue< std::shared_ptr< Operation > >* m_queue;
-  DbConnection* m_pConn;
+    ~DbWorker();
 
-  void workerThread();
+  private:
+    LockedWaitQueue< std::shared_ptr< Operation > >* m_queue;
+    DbConnection* m_pConn;
 
-  std::thread m_workerThread;
+    void workerThread();
 
-  std::atomic< bool > m_cancelationToken;
+    std::thread m_workerThread;
 
-  DbWorker( DbWorker const& right ) = delete;
+    std::atomic< bool > m_cancelationToken;
 
-  DbWorker& operator=( DbWorker const& right ) = delete;
-};
+    DbWorker( DbWorker const& right ) = delete;
+
+    DbWorker& operator=( DbWorker const& right ) = delete;
+  };
 }
-}
-
 
 #endif //SAPPHIRE_DBWORKER_H

@@ -2,6 +2,8 @@
 #include <Event/EventHelper.h>
 #include <ScriptObject.h>
 
+using namespace Core;
+
 // Quest Script: SubFst004_00027
 // Quest Name: Preserving the Past
 // Quest ID: 65563

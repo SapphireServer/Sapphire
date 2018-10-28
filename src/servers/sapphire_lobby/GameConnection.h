@@ -16,73 +16,71 @@
 
 #define DECLARE_HANDLER( x ) void x( Packets::GamePacketPtr pInPacket, Entity::PlayerPtr pPlayer )
 
-namespace Core {
-namespace Network {
-
-class GameConnection : public Connection
+namespace Core::Network
 {
 
-private:
-  // TODO move the next three params to the session, makes more sense there
-  // encryption key
-  uint8_t m_encKey[0x10];
+  class GameConnection : public Connection
+  {
 
-  // base key, the encryption key is generated from this
-  uint8_t m_baseKey[0x2C];
+  private:
+    // TODO move the next three params to the session, makes more sense there
+    // encryption key
+    uint8_t m_encKey[0x10];
 
-  bool m_bEncryptionInitialized;
+    // base key, the encryption key is generated from this
+    uint8_t m_baseKey[0x2C];
 
-  AcceptorPtr m_pAcceptor;
+    bool m_bEncryptionInitialized;
 
-  LobbySessionPtr m_pSession;
+    AcceptorPtr m_pAcceptor;
 
-  LockedQueue< Packets::GamePacketPtr > m_inQueue;
-  LockedQueue< Packets::GamePacketPtr > m_outQueue;
+    LobbySessionPtr m_pSession;
 
-public:
-  GameConnection( HivePtr pHive, AcceptorPtr pAcceptor );
+    LockedQueue< Packets::GamePacketPtr > m_inQueue;
+    LockedQueue< Packets::GamePacketPtr > m_outQueue;
 
-  ~GameConnection();
+  public:
+    GameConnection( HivePtr pHive, AcceptorPtr pAcceptor );
 
-  void generateEncryptionKey( uint32_t key, const std::string& keyPhrase );
+    ~GameConnection();
 
-  // overwrite the parents onConnect for our game socket needs
-  void OnAccept( const std::string& host, uint16_t port ) override;
+    void generateEncryptionKey( uint32_t key, const std::string& keyPhrase );
 
-  void OnDisconnect() override;
+    // overwrite the parents onConnect for our game socket needs
+    void OnAccept( const std::string& host, uint16_t port ) override;
 
-  void OnRecv( std::vector< uint8_t >& buffer ) override;
+    void OnDisconnect() override;
 
-  void OnError( const asio::error_code& error ) override;
+    void OnRecv( std::vector< uint8_t >& buffer ) override;
 
-  void sendError( uint64_t sequence, uint32_t errorcode, uint16_t messageId, uint32_t tmpId );
+    void OnError( const asio::error_code& error ) override;
 
-  void getCharList( Packets::FFXIVARR_PACKET_RAW& packet, uint32_t tmpId );
+    void sendError( uint64_t sequence, uint32_t errorcode, uint16_t messageId, uint32_t tmpId );
 
-  void enterWorld( Packets::FFXIVARR_PACKET_RAW& packet, uint32_t tmpId );
+    void getCharList( Packets::FFXIVARR_PACKET_RAW& packet, uint32_t tmpId );
 
-  bool sendServiceAccountList( Packets::FFXIVARR_PACKET_RAW& packet, uint32_t tmpId );
+    void enterWorld( Packets::FFXIVARR_PACKET_RAW& packet, uint32_t tmpId );
 
-  bool createOrModifyChar( Packets::FFXIVARR_PACKET_RAW& packet, uint32_t tmpId );
+    bool sendServiceAccountList( Packets::FFXIVARR_PACKET_RAW& packet, uint32_t tmpId );
 
-  void handlePackets( const Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
-                      const std::vector< Packets::FFXIVARR_PACKET_RAW >& packetData );
+    bool createOrModifyChar( Packets::FFXIVARR_PACKET_RAW& packet, uint32_t tmpId );
 
-  void handleGamePacket( Packets::FFXIVARR_PACKET_RAW& pPacket );
+    void handlePackets( const Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
+                        const std::vector< Packets::FFXIVARR_PACKET_RAW >& packetData );
 
-  void handlePacket( Packets::FFXIVPacketBasePtr pPacket );
+    void handleGamePacket( Packets::FFXIVARR_PACKET_RAW& pPacket );
 
-  void sendPackets( Packets::PacketContainer* pPacket );
+    void handlePacket( Packets::FFXIVPacketBasePtr pPacket );
 
-  void sendPacket( Packets::LobbyPacketContainer& pLpc );
+    void sendPackets( Packets::PacketContainer* pPacket );
 
-  void sendSinglePacket( Packets::FFXIVPacketBasePtr pPacket );
+    void sendPacket( Packets::LobbyPacketContainer& pLpc );
+
+    void sendSinglePacket( Packets::FFXIVPacketBasePtr pPacket );
 
 
-};
+  };
 
-
-}
 }
 
 

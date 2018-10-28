@@ -4,30 +4,28 @@
 #include "ForwardsZone.h"
 #include "Action.h"
 
-namespace Core {
-namespace Action {
-
-class ActionCast :
-  public Action
+namespace Core::Action
 {
-private:
 
-public:
-  ActionCast();
+  class ActionCast : public Action
+  {
+  private:
 
-  ~ActionCast();
+  public:
+    ActionCast();
 
-  ActionCast( Entity::CharaPtr pActor, Entity::CharaPtr pTarget, uint16_t actionId );
+    ~ActionCast();
 
-  void onStart() override;
+    ActionCast( Entity::CharaPtr pActor, Entity::CharaPtr pTarget, uint16_t actionId );
 
-  void onFinish() override;
+    void onStart() override;
 
-  void onInterrupt() override;
+    void onFinish() override;
 
-};
+    void onInterrupt() override;
 
-}
+  };
+
 }
 
 #endif
