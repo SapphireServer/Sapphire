@@ -9,24 +9,23 @@
 #include <map>
 #include <queue>
 
-namespace Core {
-namespace Entity {
-
-/*!
-\class Npc
-\brief Base class for all Npcs
-
-*/
-class Npc : public Chara
+namespace Core::Entity
 {
 
-public:
-  Npc( Common::ObjKind type );
+  /*!
+  \class Npc
+  \brief Base class for all Npcs
 
-  virtual ~Npc() override;
+  */
+  class Npc : public Chara
+  {
 
-};
+  public:
+    Npc( Common::ObjKind type );
 
-}
+    virtual ~Npc() override;
+
+  };
+
 }
 #endif

@@ -2,6 +2,8 @@
 #include <Event/EventHelper.h>
 #include <ScriptObject.h>
 
+using namespace Core;
+
 // Quest Script: SubWil022_00395
 // Quest Name: The Wealth of Nations
 // Quest ID: 65931

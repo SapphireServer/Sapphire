@@ -2,6 +2,8 @@
 #include <Event/EventHelper.h>
 #include <ScriptObject.h>
 
+using namespace Core;
+
 // Quest Script: SubWil001_00150
 // Quest Name: Motivational Speaking
 // Quest ID: 65686

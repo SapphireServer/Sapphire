@@ -2,6 +2,8 @@
 #include <Event/EventHelper.h>
 #include <ScriptObject.h>
 
+using namespace Core;
+
 // Quest Script: SubWil021_00394
 // Quest Name: A Luxury Long Lost
 // Quest ID: 65930

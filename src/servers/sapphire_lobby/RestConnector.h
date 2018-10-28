@@ -7,43 +7,45 @@
 #include "client_http.hpp"
 #include "Forwards.h"
 
-typedef SimpleWeb::Client< SimpleWeb::HTTP > HttpClient;
-typedef std::shared_ptr< SimpleWeb::ClientBase< SimpleWeb::HTTP >::Response > HttpResponse;
+using HttpClient = SimpleWeb::Client< SimpleWeb::HTTP >;
+using HttpResponse = std::shared_ptr< SimpleWeb::ClientBase< SimpleWeb::HTTP >::Response >;
 
-namespace Core {
-class Session;
-
-namespace Network {
-class LobbySession;
-
-class RestConnector
+namespace Core
 {
-public:
-  RestConnector();
-
-  ~RestConnector();
-
-  HttpResponse requestApi( std::string endpoint, std::string data );
-
-  LobbySessionPtr getSession( char* sId );
-
-  int32_t createCharacter( char* sId, std::string name, std::string infoJson );
-
-  std::vector< std::tuple< std::string, uint32_t, uint64_t, std::string>> getCharList( char* sId );
-
-  bool deleteCharacter( char* sId, std::string name );
-
-  bool checkNameTaken( std::string name );
-
-  uint32_t getNextCharId();
-
-  uint64_t getNextContentId();
-
-  std::string serverSecret;
-  std::string restHost;
-
-};
+  class Session;
 }
+
+namespace Core::Network
+{
+  class LobbySession;
+
+  class RestConnector
+  {
+  public:
+    RestConnector();
+
+    ~RestConnector();
+
+    HttpResponse requestApi( std::string endpoint, std::string data );
+
+    LobbySessionPtr getSession( char* sId );
+
+    int32_t createCharacter( char* sId, std::string name, std::string infoJson );
+
+    std::vector< std::tuple< std::string, uint32_t, uint64_t, std::string>> getCharList( char* sId );
+
+    bool deleteCharacter( char* sId, std::string name );
+
+    bool checkNameTaken( std::string name );
+
+    uint32_t getNextCharId();
+
+    uint64_t getNextContentId();
+
+    std::string serverSecret;
+    std::string restHost;
+
+  };
 }
 
 #endif

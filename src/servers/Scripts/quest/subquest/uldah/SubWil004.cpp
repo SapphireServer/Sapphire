@@ -2,6 +2,8 @@
 #include <Event/EventHelper.h>
 #include <ScriptObject.h>
 
+using namespace Core;
+
 // Quest Script: SubWil004_00153
 // Quest Name: Unholy Matrimony
 // Quest ID: 65689

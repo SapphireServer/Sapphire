@@ -5,36 +5,35 @@
 #include <string>
 #include <string.h>
 
-namespace Core {
-
-class Session
+namespace Core
 {
 
-private:
-  uint32_t m_ip;
-  uint32_t m_accountId;
+  class Session
+  {
 
-  uint8_t m_sessionId[56];
+  private:
+    uint32_t m_ip;
+    uint32_t m_accountId;
+    uint8_t m_sessionId[56];
 
-public:
+  public:
+    std::string newCharName;
 
-  std::string newCharName;
+    Session();
 
-  Session();
+    ~Session();
 
-  ~Session();
+    uint32_t getIp() const;
 
-  uint32_t getIp() const;
+    void setSessionId( uint8_t* sessionId );
 
-  void setSessionId( uint8_t* sessionId );
+    void setIp( uint32_t ip );
 
-  void setIp( uint32_t ip );
+    uint32_t getAccountId() const;
 
-  uint32_t getAccountId() const;
+    void setAccountId( uint32_t id );
 
-  void setAccountId( uint32_t id );
-
-};
+  };
 
 }
 

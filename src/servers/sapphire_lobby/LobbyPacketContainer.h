@@ -9,37 +9,34 @@
 
 #include "Forwards.h"
 
-namespace Core {
-namespace Network {
-namespace Packets {
-
-typedef std::shared_ptr< FFXIVPacketBase > FFXIVPacketBasePtr;
-
-class LobbyPacketContainer
+namespace Core::Network::Packets
 {
-public:
-  LobbyPacketContainer( uint8_t* encKey = nullptr );
 
-  ~LobbyPacketContainer();
+  using FFXIVPacketBasePtr = std::shared_ptr< FFXIVPacketBase >;
 
-  void addPacket( FFXIVPacketBasePtr pEntry );
+  class LobbyPacketContainer
+  {
+  public:
+    LobbyPacketContainer( uint8_t* encKey = nullptr );
 
-  uint16_t getSize() const;
+    ~LobbyPacketContainer();
 
-  uint8_t* getRawData( bool addstuff = true );
+    void addPacket( FFXIVPacketBasePtr pEntry );
 
-private:
-  Core::Network::Packets::FFXIVARR_PACKET_HEADER m_header;
+    uint16_t getSize() const;
 
-  uint8_t* m_encKey;
+    uint8_t* getRawData( bool addstuff = true );
 
-  std::vector< FFXIVPacketBasePtr > m_entryList;
+  private:
+    Core::Network::Packets::FFXIVARR_PACKET_HEADER m_header;
 
-  uint8_t m_dataBuf[0x2000];
+    uint8_t* m_encKey;
 
-};
+    std::vector< FFXIVPacketBasePtr > m_entryList;
 
-}
-}
+    uint8_t m_dataBuf[0x2000];
+
+  };
+
 }
 #endif

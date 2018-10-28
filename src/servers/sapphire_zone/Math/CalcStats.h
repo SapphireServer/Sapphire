@@ -4,25 +4,22 @@
 #include <Common.h>
 #include "Forwards.h"
 
-using namespace Core::Entity;
-
-namespace Core {
-namespace Math {
-
-class CalcStats
+namespace Core::Math
 {
-public:
-  static float calculateBaseStat( PlayerPtr pPlayer );
 
-  static uint32_t calculateMaxMp( PlayerPtr pPlayer );
+  class CalcStats
+  {
+  public:
+    static float calculateBaseStat( Core::Entity::PlayerPtr pPlayer );
 
-  static uint32_t calculateMaxHp( PlayerPtr pPlayer );
+    static uint32_t calculateMaxMp( Core::Entity::PlayerPtr pPlayer );
 
-private:
+    static uint32_t calculateMaxHp( Core::Entity::PlayerPtr pPlayer );
 
-};
+  private:
 
-}
+  };
+
 }
 
 #endif

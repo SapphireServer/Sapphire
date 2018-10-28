@@ -5,6 +5,8 @@
 #define ACTION_RENAME 3
 #define ACTION_REMOVE 4
 
+using namespace Core;
+
 class CmnDefLinkShell :
   public EventScript
 {

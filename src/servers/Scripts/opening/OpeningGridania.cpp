@@ -1,8 +1,9 @@
 #include <Actor/Player.h>
 #include <ScriptObject.h>
 
-class OpeningGridania :
-  public EventScript
+using namespace Core;
+
+class OpeningGridania : public EventScript
 {
 private:
   static constexpr auto ERANGE_HOWTO_ANN_AND_QUEST = 2117539;

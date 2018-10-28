@@ -2,6 +2,8 @@
 #include <Zone/InstanceContent.h>
 #include <Actor/Player.h>
 
+using namespace Core;
+
 class Sastasha :
   public InstanceContentScript
 {

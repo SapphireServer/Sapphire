@@ -13,75 +13,74 @@
 #include <vector>
 
 
-namespace Core {
-namespace Network {
-
-class Connection;
-
-class Acceptor : public std::enable_shared_from_this< Acceptor >
+namespace Core::Network
 {
-  friend class Hive;
 
-private:
-  HivePtr m_hive;
-  asio::ip::tcp::acceptor m_acceptor;
-  asio::strand m_io_strand;
-  std::atomic< uint32_t > m_error_state;
+  class Connection;
 
-private:
-  Acceptor( const Acceptor& rhs );
+  class Acceptor : public std::enable_shared_from_this< Acceptor >
+  {
+    friend class Hive;
 
-  Acceptor& operator=( const Acceptor& rhs );
+  private:
+    HivePtr m_hive;
+    asio::ip::tcp::acceptor m_acceptor;
+    asio::strand m_io_strand;
+    std::atomic< uint32_t > m_error_state;
 
-  void StartError( const asio::error_code& error );
+  private:
+    Acceptor( const Acceptor& rhs );
 
-  void DispatchAccept( ConnectionPtr connection );
+    Acceptor& operator=( const Acceptor& rhs );
 
-  void HandleAccept( const asio::error_code& error, ConnectionPtr connection );
+    void StartError( const asio::error_code& error );
 
-private:
-  // Called when a connection has connected to the server. This function
-  // should return true to invoke the connection's OnAccept function if the
-  // connection will be kept. If the connection will not be kept, the
-  // connection's Disconnect function should be called and the function
-  // should return false.
-  virtual bool OnAccept( ConnectionPtr connection, const std::string& host, uint16_t port );
+    void DispatchAccept( ConnectionPtr connection );
 
-  // Called when an error is encountered. Most typically, this is when the
-  // acceptor is being closed via the Stop function or if the Listen is
-  // called on an address that is not available.
-  virtual void OnError( const asio::error_code& error );
+    void HandleAccept( const asio::error_code& error, ConnectionPtr connection );
 
-public:
-  Acceptor( HivePtr hive );
+  private:
+    // Called when a connection has connected to the server. This function
+    // should return true to invoke the connection's OnAccept function if the
+    // connection will be kept. If the connection will not be kept, the
+    // connection's Disconnect function should be called and the function
+    // should return false.
+    virtual bool OnAccept( ConnectionPtr connection, const std::string& host, uint16_t port );
 
-  virtual ~Acceptor();
+    // Called when an error is encountered. Most typically, this is when the
+    // acceptor is being closed via the Stop function or if the Listen is
+    // called on an address that is not available.
+    virtual void OnError( const asio::error_code& error );
 
-  // Returns the Hive object.
-  HivePtr GetHive();
+  public:
+    Acceptor( HivePtr hive );
 
-  // Returns the acceptor object.
-  asio::ip::tcp::acceptor& GetAcceptor();
+    virtual ~Acceptor();
 
-  // Returns the strand object.
-  asio::strand& GetStrand();
+    // Returns the Hive object.
+    HivePtr GetHive();
 
-  // Returns true if this object has an error associated with it.
-  bool HasError();
+    // Returns the acceptor object.
+    asio::ip::tcp::acceptor& GetAcceptor();
 
-public:
-  // Begin listening on the specific network interface.
-  void Listen( const std::string& host, const uint16_t& port );
+    // Returns the strand object.
+    asio::strand& GetStrand();
 
-  // Posts the connection to the listening interface. The next client that
-  // connections will be given this connection. If multiple calls to Accept
-  // are called at a time, then they are accepted in a FIFO order.
-  void Accept( ConnectionPtr connection );
+    // Returns true if this object has an error associated with it.
+    bool HasError();
 
-  // Stop the Acceptor from listening.
-  void Stop();
-};
+  public:
+    // Begin listening on the specific network interface.
+    void Listen( const std::string& host, const uint16_t& port );
 
-}
+    // Posts the connection to the listening interface. The next client that
+    // connections will be given this connection. If multiple calls to Accept
+    // are called at a time, then they are accepted in a FIFO order.
+    void Accept( ConnectionPtr connection );
+
+    // Stop the Acceptor from listening.
+    void Stop();
+  };
+
 }
 #endif

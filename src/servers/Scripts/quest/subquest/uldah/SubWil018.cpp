@@ -2,6 +2,8 @@
 #include <Event/EventHelper.h>
 #include <ScriptObject.h>
 
+using namespace Core;
+
 // Quest Script: SubWil018_00396
 // Quest Name: No Lady Is an Island
 // Quest ID: 65932

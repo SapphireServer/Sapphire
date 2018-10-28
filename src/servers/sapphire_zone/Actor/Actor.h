@@ -9,132 +9,131 @@
 #include <map>
 #include <queue>
 
-namespace Core {
-namespace Entity {
-
-/*!
-\class GameObject
-\brief Base class for all actor/objects
-
-*/
-class Actor : public std::enable_shared_from_this< Actor >
+namespace Core::Entity
 {
 
-protected:
-  /*! Position of the object */
-  Common::FFXIVARR_POSITION3 m_pos;
-  /*! Rotation of the object */
-  float m_rot;
-  /*! Id of the actor */
-  uint32_t m_id;
-  /*! Type of the actor */
-  Common::ObjKind m_objKind;
-  /*! Id of the zone the actor currently is in */
-  uint32_t m_zoneId;
-  /*! Ptr to the ZoneObj the actor belongs to */
-  ZonePtr m_pCurrentZone;
+  /*!
+  \class GameObject
+  \brief Base class for all actor/objects
 
-  /*! list of various actors in range */
-  std::set< ActorPtr > m_inRangeActor;
-  std::set< PlayerPtr > m_inRangePlayers;
-  std::set< BNpcPtr > m_inRangeBNpc;
+  */
+  class Actor : public std::enable_shared_from_this< Actor >
+  {
 
-  /*! Parent cell in the zone */
-  Core::Cell* m_pCell;
+  protected:
+    /*! Position of the object */
+    Common::FFXIVARR_POSITION3 m_pos;
+    /*! Rotation of the object */
+    float m_rot;
+    /*! Id of the actor */
+    uint32_t m_id;
+    /*! Type of the actor */
+    Common::ObjKind m_objKind;
+    /*! Id of the zone the actor currently is in */
+    uint32_t m_zoneId;
+    /*! Ptr to the ZoneObj the actor belongs to */
+    ZonePtr m_pCurrentZone;
 
-public:
-  explicit Actor( Common::ObjKind type );
+    /*! list of various actors in range */
+    std::set< ActorPtr > m_inRangeActor;
+    std::set< PlayerPtr > m_inRangePlayers;
+    std::set< BNpcPtr > m_inRangeBNpc;
 
-  virtual ~Actor() {};
+    /*! Parent cell in the zone */
+    Core::Cell* m_pCell;
 
-  virtual void spawn( PlayerPtr pTarget ) {}
+  public:
+    explicit Actor( Common::ObjKind type );
 
-  virtual void despawn( PlayerPtr pTarget ) {}
+    virtual ~Actor() {};
 
-  uint32_t getId() const;
+    virtual void spawn( PlayerPtr pTarget ) {}
 
-  void setId( uint32_t id );
+    virtual void despawn( PlayerPtr pTarget ) {}
 
-  Common::ObjKind getObjKind() const;
+    uint32_t getId() const;
 
-  Common::FFXIVARR_POSITION3& getPos();
+    void setId( uint32_t id );
 
-  void setPos( const Common::FFXIVARR_POSITION3& pos );
+    Common::ObjKind getObjKind() const;
 
-  void setPos( float x, float y, float z );
+    Common::FFXIVARR_POSITION3& getPos();
 
-  float getRot() const;
+    void setPos( const Common::FFXIVARR_POSITION3& pos );
 
-  void setRot( float rot );
+    void setPos( float x, float y, float z );
 
-  bool isChara() const;
+    float getRot() const;
 
-  bool isPlayer() const;
+    void setRot( float rot );
 
-  bool isEventNpc() const;
+    bool isChara() const;
 
-  bool isBattleNpc() const;
+    bool isPlayer() const;
 
-  bool isRetainer() const;
+    bool isEventNpc() const;
 
-  bool isCompanion() const;
+    bool isBattleNpc() const;
 
-  bool isEventObj() const;
+    bool isRetainer() const;
 
-  bool isHousingEventObj() const;
+    bool isCompanion() const;
 
-  bool isAetheryte() const;
+    bool isEventObj() const;
 
-  ///// IN RANGE LOGIC ///////////////////////////////
-  virtual void onRemoveInRangeActor( Actor& pActor ) {}
+    bool isHousingEventObj() const;
 
-  // check if another actor is in the actors in range set
-  bool isInRangeSet( ActorPtr pActor ) const;
+    bool isAetheryte() const;
 
-  ActorPtr getClosestActor();
+    ///// IN RANGE LOGIC ///////////////////////////////
+    virtual void onRemoveInRangeActor( Actor& pActor ) {}
 
-  void sendToInRangeSet( Network::Packets::FFXIVPacketBasePtr pPacket, bool bToSelf = false );
+    // check if another actor is in the actors in range set
+    bool isInRangeSet( ActorPtr pActor ) const;
 
-  // add an actor to in range set
-  void addInRangeActor( ActorPtr pActor );
+    ActorPtr getClosestActor();
 
-  // remove an actor from the in range set
-  void removeInRangeActor( Actor& actor );
+    void sendToInRangeSet( Network::Packets::FFXIVPacketBasePtr pPacket, bool bToSelf = false );
 
-  // return true if there is at least one actor in the in range set
-  bool hasInRangeActor() const;
+    // add an actor to in range set
+    void addInRangeActor( ActorPtr pActor );
 
-  void removeFromInRange();
+    // remove an actor from the in range set
+    void removeInRangeActor( Actor& actor );
 
-  // clear the whole in range set, this does no cleanup
-  virtual void clearInRangeSet();
+    // return true if there is at least one actor in the in range set
+    bool hasInRangeActor() const;
 
-  std::set< ActorPtr > getInRangeActors( bool includeSelf = false );
+    void removeFromInRange();
 
-  ////////////////////////////////////////////////////
+    // clear the whole in range set, this does no cleanup
+    virtual void clearInRangeSet();
 
-  CharaPtr getAsChara();
+    std::set< ActorPtr > getInRangeActors( bool includeSelf = false );
 
-  PlayerPtr getAsPlayer();
+    ////////////////////////////////////////////////////
 
-  EventObjectPtr getAsEventObj();
+    CharaPtr getAsChara();
 
-  BNpcPtr getAsBNpc();
+    PlayerPtr getAsPlayer();
 
-  ZonePtr getCurrentZone() const;
+    EventObjectPtr getAsEventObj();
 
-  void setCurrentZone( ZonePtr currZone );
+    BNpcPtr getAsBNpc();
 
-  InstanceContentPtr getCurrentInstance() const;
+    ZonePtr getCurrentZone() const;
 
-  // get the current cell of a region the actor is in
-  Cell* getCellPtr();
+    void setCurrentZone( ZonePtr currZone );
 
-  // set the current cell
-  void setCell( Cell* pCell );
+    InstanceContentPtr getCurrentInstance() const;
 
-};
+    // get the current cell of a region the actor is in
+    Cell* getCellPtr();
 
-}
+    // set the current cell
+    void setCell( Cell* pCell );
+
+  };
+
 }
 #endif

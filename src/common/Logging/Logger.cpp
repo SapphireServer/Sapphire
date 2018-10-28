@@ -48,11 +48,6 @@ void Logger::init()
   spdlog::flush_on( spdlog::level::critical );
 }
 
-
-void Logger::Log( LoggingSeverity logSev, const std::string& text )
-{
-}
-
 void Logger::error( const std::string& text )
 {
   spdlog::get( "logger" )->error( text );

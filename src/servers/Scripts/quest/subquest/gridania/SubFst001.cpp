@@ -2,6 +2,8 @@
 #include "Event/EventHelper.h"
 #include <ScriptObject.h>
 
+using namespace Core;
+
 // Quest Script: SubFst001_00024
 // Quest Name: Coarse Correspondence
 // Quest ID: 65560

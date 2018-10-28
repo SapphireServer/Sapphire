@@ -2,6 +2,8 @@
 #include <Event/EventHelper.h>
 #include <ScriptObject.h>
 
+using namespace Core;
+
 // Quest Script: SubFst026_00170
 // Quest Name: Jumping at Shadows
 // Quest ID: 65706

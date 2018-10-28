@@ -253,14 +253,12 @@ bool Core::Network::GameConnection::sendServiceAccountList( FFXIVARR_PACKET_RAW&
     session->setAccountID( 0 );
     session->setSessionId( ( uint8_t* ) &packet.data[ 0 ] + 0x20 );
     pSession = session;
-    g_log.Log( LoggingSeverity::info,
-               "Allowed connection with no session: " + std::string( ( char* ) &packet.data[ 0 ] + 0x20 ) );
+    g_log.info( "Allowed connection with no session: " + std::string( ( char* ) &packet.data[ 0 ] + 0x20 ) );
   }
 
   if( pSession != nullptr )
   {
-    g_log.Log( LoggingSeverity::info,
-               "Found session linked to accountId: " + std::to_string( pSession->getAccountID() ) );
+    g_log.info( "Found session linked to accountId: " + std::to_string( pSession->getAccountID() ) );
     m_pSession = pSession;
 
     auto serviceIdInfoPacket = makeLobbyPacket< FFXIVIpcServiceIdInfo >( tmpId );
@@ -276,8 +274,7 @@ bool Core::Network::GameConnection::sendServiceAccountList( FFXIVARR_PACKET_RAW&
   }
   else
   {
-    g_log.Log( LoggingSeverity::info,
-               "Could not retrieve session: " + std::string( ( char* ) &packet.data[ 0 ] + 0x20 ) );
+    g_log.info( "Could not retrieve session: " + std::string( ( char* ) &packet.data[ 0 ] + 0x20 ) );
     sendError( 1, 5006, 13001, tmpId );
 
     return true;
@@ -302,7 +299,7 @@ bool Core::Network::GameConnection::createOrModifyChar( FFXIVARR_PACKET_RAW& pac
   {
     name = std::string( ( char* ) &packet.data[ 0 ] + 0x2C );
 
-    g_log.Log( LoggingSeverity::info, "[" + std::to_string( m_pSession->getAccountID() ) + "] Type 1: " + name );
+    g_log.info( "[" + std::to_string( m_pSession->getAccountID() ) + "] Type 1: " + name );
 
     Packets::LobbyPacketContainer pRP( m_encKey );
 
@@ -331,7 +328,7 @@ bool Core::Network::GameConnection::createOrModifyChar( FFXIVARR_PACKET_RAW& pac
   else if( type == 2 ) //Character creation finalize
   {
     std::string charDetails( ( char* ) &packet.data[ 0 ] + 0x4C );
-    g_log.Log( LoggingSeverity::info, "[" + std::to_string( m_pSession->getAccountID() ) + "] Type 2: " + charDetails );
+    g_log.info( "[" + std::to_string( m_pSession->getAccountID() ) + "] Type 2: " + charDetails );
 
     if( g_restConnector.createCharacter( ( char* ) m_pSession->getSessionId(), m_pSession->newCharName, charDetails ) !=
         -1 )

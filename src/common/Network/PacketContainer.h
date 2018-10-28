@@ -8,36 +8,33 @@
 #include "GamePacketNew.h"
 #include "Forwards.h"
 
-namespace Core {
-namespace Network {
-namespace Packets {
-
-typedef std::shared_ptr< FFXIVPacketBase > FFXIVPacketBasePtr;
-
-class PacketContainer
+namespace Core::Network::Packets
 {
-public:
-  PacketContainer( uint32_t segmentTargetOverride = 0 );
 
-  ~PacketContainer();
+  using FFXIVPacketBasePtr = std::shared_ptr< FFXIVPacketBase >;
 
-  void addPacket( FFXIVPacketBasePtr entry );
+  class PacketContainer
+  {
+  public:
+    PacketContainer( uint32_t segmentTargetOverride = 0 );
 
-  FFXIVARR_PACKET_HEADER m_ipcHdr;
+    ~PacketContainer();
 
-  std::vector< FFXIVPacketBasePtr > m_entryList;
+    void addPacket( FFXIVPacketBasePtr entry );
 
-  std::string toString();
+    FFXIVARR_PACKET_HEADER m_ipcHdr;
 
-  void fillSendBuffer( std::vector< uint8_t >& sendBuffer );
+    std::vector< FFXIVPacketBasePtr > m_entryList;
 
-private:
-  uint32_t m_segmentTargetOverride;
+    std::string toString();
 
-};
+    void fillSendBuffer( std::vector< uint8_t >& sendBuffer );
 
-}
-}
+  private:
+    uint32_t m_segmentTargetOverride;
+
+  };
+
 }
 
 #endif

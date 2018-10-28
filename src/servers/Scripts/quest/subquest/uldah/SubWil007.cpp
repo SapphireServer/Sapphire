@@ -3,6 +3,8 @@
 #include <ScriptObject.h>
 #include <ctime>
 
+using namespace Core;
+
 // Quest Script: SubWil007_00167
 // Quest Name: With Open Arms
 // Quest ID: 65703

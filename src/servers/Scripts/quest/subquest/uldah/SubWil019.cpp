@@ -2,6 +2,8 @@
 #include <Event/EventHelper.h>
 #include <ScriptObject.h>
 
+using namespace Core;
+
 // Quest Script: SubWil019_00392
 // Quest Name: Decisions, Decisions
 // Quest ID: 65928

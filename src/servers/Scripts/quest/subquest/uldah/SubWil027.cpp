@@ -2,6 +2,8 @@
 #include <Event/EventHelper.h>
 #include <ScriptObject.h>
 
+using namespace Core;
+
 // Quest Script: SubWil027_00595
 // Quest Name: We Must Rebuild
 // Quest ID: 66131

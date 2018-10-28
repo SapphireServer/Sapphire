@@ -2,6 +2,8 @@
 #include <Event/EventHelper.h>
 #include <ScriptObject.h>
 
+using namespace Core;
+
 // Quest Script: SubFst015_00042
 // Quest Name: Sylphic Gratitude
 // Quest ID: 65578
