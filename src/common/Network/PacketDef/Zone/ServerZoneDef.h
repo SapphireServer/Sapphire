@@ -1578,8 +1578,53 @@ struct FFXIVIpcPerformNote :
   uint8_t data[32];
 };
 
-struct FFXIVIpcWardInfo :
-  FFXIVIpcBasePacket< WardInfo >
+//IPCs
+struct FFXIVIpcLandsetPermission :
+  FFXIVIpcBasePacket<LandsetPermission >
+{
+  Common::HousePermissionSet freeCompanyHouse; // 00
+  uint64_t unkown1;
+  Common::HousePermissionSet privateHouse; // 24
+  uint64_t unkown2;
+  Common::HousePermissionSet apartment; // 48
+  uint64_t unkown3;
+  Common::HousePermissionSet sharedHouse[2]; //72
+  uint64_t unkown4;
+  Common::HousePermissionSet unkownHouse;
+  uint64_t unkown5;
+};
+
+struct FFXIVIpcLandsetUpdate :
+  FFXIVIpcBasePacket< LandsetUpdate >
+{
+  uint16_t landSetId;
+  uint16_t unknow0;
+  uint16_t unknow1;
+  uint16_t unknow2;
+  Common::LandsetStruct landset;
+};
+
+struct FFXIVIpcLandsetPriceUpdate :
+  FFXIVIpcBasePacket< LandsetPriceUpdate >
+{
+  uint32_t price;
+  uint32_t timeLeft;
+};
+
+struct FFXIVIpcLandsetExtend :
+  FFXIVIpcBasePacket< LandsetExtending >
+{
+  struct
+  {
+    uint8_t houseSize;
+    uint8_t houseState;
+    uint8_t iconColor;
+    uint8_t iconIconAdd;
+  } landset[30];
+};
+
+struct FFXIVIpcLandsetInitialize :
+  FFXIVIpcBasePacket< LandsetInitialize >
 {
   uint16_t unknown0;
   uint16_t wardNum; // set 1 for "Mist, Ward 2"
@@ -1593,44 +1638,46 @@ struct FFXIVIpcWardInfo :
   uint8_t unknown6;
   uint8_t unknown7;
   uint8_t unknown8;
-  struct
-  {
-    uint8_t houseSize; //1 = small, 2 = middle, 3 = big; 1
-    uint8_t houseState; //1 = for sell, 2 = sold, 3 = hasOwner, 0x0A = House sharing; 2
-    uint8_t iconColor; //HouseState has to be 3; 1 = Private, 2 = FC House; 4
-    uint8_t iconAddIcon; //Heart Icon = 2; 6
-    uint32_t unknown9;  //can be 0 (default) maybe fcId; 8
-    uint32_t fcIcon; //can be 0 (default); 12
-    uint32_t fcIconColor; //can be 0 (default); 16
-    uint16_t houseRoofId; //18
-    uint16_t houseFacadeId;//20
-    uint16_t houseWindowId;//22
-    uint16_t houseDoorId;//24
-    uint8_t gardenData[4];//28
-    uint16_t gardenSignId; //For fcIcon; 30
-    uint16_t gardenFenceId; //32
-    uint8_t color[8]; //40
-  } landSet[30];
+  Common::LandsetStruct landset[30];
 };
 
-struct FFXIVIpcWardYardInfo :
-  FFXIVIpcBasePacket< WardYardInfo >
+struct FFXIVIpcYardObjectSpawn :
+  FFXIVIpcBasePacket<YardObjectSpawn>
 {
-  /* consistency check? */
+  uint8_t landSetId;
+  uint8_t objectArray;
+  uint16_t unknown1;
+  uint32_t itemId;
+  uint16_t itemRotation;
+  uint16_t pos_x;
+  uint16_t pos_y;
+  uint16_t pos_z;
+};
+
+struct FFXIVIpcYardObjectMove :
+  FFXIVIpcBasePacket<YardObjectMove>
+{
+  uint16_t itemRotation;
+  uint8_t objectArray;
+  uint8_t landSetId;
+  uint16_t pos_x;
+  uint16_t pos_y;
+  uint16_t pos_z;
+  uint16_t unknown1;
+  uint16_t unknown2;
+  uint16_t unknown3;
+};
+
+struct FFXIVIpcLandsetYardInitialize :
+  FFXIVIpcBasePacket< LandsetYardInitialize >
+{
   uint32_t unknown1; //always 0xFFFFFFFF
   uint32_t unknown2; //always 0xFFFFFFFF
   uint8_t unknown3; //always 0xFF
-  /* --- */
   uint8_t packetNum;
   uint16_t packetTotal;
-  struct
-  {
-    uint32_t itemId;
-    uint16_t itemRotation;
-    uint16_t pos_x;
-    uint16_t pos_y;
-    uint16_t pos_z;
-  } object[100];
+  Common::YardObject object[100];
+  uint32_t unknown4; //unused
 };
 
 /**

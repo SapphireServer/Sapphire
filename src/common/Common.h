@@ -214,7 +214,8 @@ namespace Core::Common
     FreeCompanyBag1 = 20001,
     FreeCompanyBag2 = 20002,
     FreeCompanyGil = 22000,
-    FreeCompanyCrystal = 22001
+    FreeCompanyCrystal = 22001,
+    HousingOutdoorItems = 25001
   };
 
   enum ContainerType : uint16_t
@@ -730,6 +731,47 @@ namespace Core::Common
     Normal = 0x1,
     MountSkill = 0xD,
   };
+
+//Structs
+struct LandsetStruct
+{
+  uint8_t houseSize; //0
+  uint8_t houseState; // 2
+  uint8_t iconColor; // 4
+  uint8_t iconAddIcon; // 6
+  uint32_t fcId; //8
+  uint32_t fcIcon;// 12
+  uint32_t fcIconColor; // 16
+  uint16_t exteriorRoof; //20
+  uint16_t exteriorWall; //22
+  uint16_t exteriorWindow; //24
+  uint16_t exteriorDoor;// 26
+  uint16_t otherFloorWall; // 28
+  uint16_t otherFloorFlooring; //30
+  uint16_t basementWall; // 32
+  uint16_t gardenSign; // 34
+  uint8_t color[8]; // 36
+  //44
+};
+
+struct HousePermissionSet
+{
+  uint16_t landSetId; //00
+  uint16_t wardNum; //02
+  uint16_t zoneId; //04
+  uint16_t worldId; //06
+  uint32_t permissionMask; //08
+  uint32_t unkown1; //12
+};
+
+struct YardObject
+{
+  uint32_t itemId;
+  uint16_t itemRotation;
+  uint16_t pos_x;
+  uint16_t pos_y;
+  uint16_t pos_z;
+};
 
   using PlayerStateFlagList = std::vector< PlayerStateFlag >;
 

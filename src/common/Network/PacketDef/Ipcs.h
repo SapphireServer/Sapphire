@@ -188,9 +188,14 @@ enum ServerZoneIpcType :
 
   EquipDisplayFlags = 0x020C, // updated 4.4
 
-  WardInfo = 0x0220, // updated 4.4
-  WardHousingPermission = 0x0229, // updated 4.4
-  WardYardInfo = 0x022C, // updated 4.4
+  LandsetInitialize = 0x0220, // updated 4.4
+  YardObjectSpawn = 0x0222, // updated 4.4
+  LandsetPriceUpdate = 0x0225, // updated 4.3
+  LandsetPermission = 0x0229, // updated 4.4
+  LandsetYardInitialize = 0x022C, // updated 4.4
+  YardObjectMove = 0x0230, // updated 4.4
+  LandsetExtending = 0x0251, // updated 4.4
+  LandsetUpdate = 0x0221, // updated 4.4
 
   SharedEstateSettingsResponse = 0x023C, // updated 4.4
 
@@ -199,8 +204,6 @@ enum ServerZoneIpcType :
 
   PrepareZoning = 0x028F, // updated 4.4
   ActorGauge = 0x0292, // updated 4.3
-
-
 
   // Unknown IPC types that still need to be sent
   // TODO: figure all these out properly
