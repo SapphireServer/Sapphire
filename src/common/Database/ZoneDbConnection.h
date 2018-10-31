@@ -78,6 +78,11 @@ namespace Core::Db
 
     ZONE_SEL_BNPCTEMPLATES,
 
+    LAND_INS,
+    LAND_SEL,
+    LAND_UP,
+
+
     MAX_STATEMENTS
   };
 

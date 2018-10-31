@@ -190,4 +190,26 @@ void Core::Db::ZoneDbConnection::doPrepareStatements()
   prepareStatement( CHARA_ITEMGLOBAL_DELETE,
                     "UPDATE charaglobalitem SET IS_DELETE = 1 WHERE ItemId = ?;",
                     CONNECTION_BOTH );
+
+  prepareStatement( LAND_INS,
+                    "INSERT INTO land ( LandSetId ) VALUES ( ? );",
+                    CONNECTION_BOTH );
+
+  prepareStatement( LAND_SEL,
+                    "SELECT LandSetId, Size, houseState, iconColor, iconAddIcon, fcId, fcIcon, fcIconColor, exteriorRoof, "
+                    "exteriorWall, exteriorWindow, exteriorDoor, otherFloorWall, otherFloorFlooring, basementWall, "
+                    "gardenSign, colorSlot_0, colorSlot_1, colorSlot_2, colorSlot_3, colorSlot_4, colorSlot_5, "
+                    "colorSlot_6, colorSlot_7, ownerPlayerId, nextDrop, dropCount, currentPrice "
+                    "FROM land WHERE LandSetId = ?;",
+                    CONNECTION_BOTH );
+
+  prepareStatement( LAND_UP,
+                    "UPDATE land SET Size = ?, houseState = ?, iconColor = ?, iconAddIcon = ?, fcId = ?, "
+                    "fcIcon = ?, fcIconColor = ?, exteriorRoof = ?, exteriorWall = ?, exteriorWindow = ?, "
+                    "exteriorDoor = ?, otherFloorWall = ?, otherFloorFlooring = ?, basementWall = ?, gardenSign = ?, "
+                    "colorSlot_0 = ?, colorSlot_1 = ?, colorSlot_2 = ?, colorSlot_3 = ?, colorSlot_4 = ?, "
+                    "colorSlot_5 = ?, colorSlot_6 = ?, colorSlot_7 = ?, ownerPlayerId = ?, nextDrop = ?, "
+                    "dropCount = ?, currentPrice = ?"
+                    " WHERE LandSetId = ?;",
+                    CONNECTION_BOTH );
 }

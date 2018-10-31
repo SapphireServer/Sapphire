@@ -4,30 +4,38 @@
 #include "Zone.h"
 #include "Forwards.h"
 
-namespace Core {
-class HousingZone :
-  public Zone
+namespace Core
 {
-public:
-  HousingZone( uint8_t wardNum,
-               uint16_t territoryId,
-               uint32_t guId,
-               const std::string& internalName,
-               const std::string& contentName );
+  class HousingZone : public Zone
+  {
+  public:
+    HousingZone( uint8_t wardNum,
+                 uint16_t territoryId,
+                 uint32_t guId,
+                 const std::string& internalName,
+                 const std::string& contentName );
 
-  virtual ~HousingZone();
+    virtual ~HousingZone();
 
-  bool init() override;
+    bool init() override;
 
-  void onPlayerZoneIn( Entity::Player& player ) override;
+    void onPlayerZoneIn( Entity::Player& player ) override;
+    void onUpdate( uint32_t currTime ) override;
 
-  /* returns current ward number for this zone */
-  uint8_t getWardNum() const;
+    void sendMap( Entity::Player& player );
+    bool isPlayerSubInstance( Entity::Player& player );
 
-  const uint32_t m_wardMaxNum = 18;
-private:
-  uint8_t m_wardNum;
-};
+    /* returns current ward number for this zone */
+    uint8_t getWardNum() const;
+    Core::LandsetPtr getLandset( uint8_t id );
+
+    const uint32_t m_wardMaxNum = 18;
+  private:
+    using LandsetPtrMap = std::unordered_map< uint8_t, Core::LandsetPtr >;
+    LandsetPtrMap m_landsetPtrMap;
+    uint8_t m_wardNum;
+    uint32_t m_zoneId;
+  };
 
 }
 #endif //SAPPHIRE_HOUSINGZONE_H

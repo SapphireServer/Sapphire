@@ -24,7 +24,8 @@ TYPE_FORWARD( InstanceContent );
 TYPE_FORWARD( Item );
 TYPE_FORWARD( ItemContainer );
 TYPE_FORWARD( Session );
-TYPE_FORWARD( ZonePosition )
+TYPE_FORWARD( ZonePosition );
+TYPE_FORWARD( Landset )
 
 namespace StatusEffect {
 TYPE_FORWARD( StatusEffect );
