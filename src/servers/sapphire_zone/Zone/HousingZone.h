@@ -9,7 +9,7 @@ namespace Core
   class HousingZone : public Zone
   {
   public:
-    HousingZone( uint8_t wardNum,
+    HousingZone( uint8_t landSetId,
                  uint16_t territoryId,
                  uint32_t guId,
                  const std::string& internalName,
@@ -26,14 +26,14 @@ namespace Core
     bool isPlayerSubInstance( Entity::Player& player );
 
     /* returns current ward number for this zone */
-    uint8_t getWardNum() const;
-    Core::LandsetPtr getLandset( uint8_t id );
+    uint8_t getLandSetId() const;
+    Core::LandPtr getLand( uint8_t id );
 
     const uint32_t m_wardMaxNum = 18;
   private:
-    using LandsetPtrMap = std::unordered_map< uint8_t, Core::LandsetPtr >;
-    LandsetPtrMap m_landsetPtrMap;
-    uint8_t m_wardNum;
+    using LandPtrMap = std::unordered_map< uint8_t, Core::LandPtr >;
+    LandPtrMap m_landPtrMap;
+    uint8_t m_landSetId;
     uint32_t m_zoneId;
   };
 

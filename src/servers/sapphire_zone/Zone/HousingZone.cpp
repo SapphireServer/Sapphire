@@ -9,7 +9,7 @@
 
 #include "Actor/Player.h"
 #include "Actor/Actor.h"
-#include "Landset.h"
+#include "Land.h"
 
 #include "Forwards.h"
 #include "HousingZone.h"
@@ -21,13 +21,13 @@ using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-Core::HousingZone::HousingZone( uint8_t wardNum,
+Core::HousingZone::HousingZone( uint8_t landSetId,
                                 uint16_t territoryId,
                                 uint32_t guId,
                                 const std::string& internalName,
                                 const std::string& contentName ) :
   Zone( territoryId, guId, internalName, contentName ),
-  m_wardNum( wardNum ),
+  m_landSetId( landSetId ),
   m_zoneId( territoryId )
 {
 
@@ -35,12 +35,12 @@ Core::HousingZone::HousingZone( uint8_t wardNum,
 
 bool Core::HousingZone::init()
 {
-  uint32_t landsetId;
-  for( landsetId = 0; landsetId < 60; landsetId++ )
+  uint32_t landId;
+  for( landId = 0; landId < 60; landId++ )
   {
-    auto pObject = make_Landset( m_territoryId, getWardNum(), landsetId );
+    auto pObject = make_Land( m_territoryId, getLandSetId(), landId );
     pObject->setHouseSize( 1 );
-    m_landsetPtrMap[ landsetId ] = pObject;
+    m_landPtrMap[ landId ] = pObject;
   }
 
   return true;
@@ -54,7 +54,7 @@ Core::HousingZone::~HousingZone()
 void Core::HousingZone::onPlayerZoneIn(Entity::Player& player)
 {
   auto pLog = g_fw.get< Logger >();
-  pLog->debug( "HousingZone::onPlayerZoneIn: Zone#" + std::to_string(getGuId()) + "|"
+  pLog->debug( "HousingZone::onPlayerZoneIn: Zone#" + std::to_string( getGuId() ) + "|"
                ", Entity#" + std::to_string( player.getId() ) );
 
   uint32_t yardPacketNum;
@@ -64,7 +64,7 @@ void Core::HousingZone::onPlayerZoneIn(Entity::Player& player)
 
   for( yardPacketNum = 0; yardPacketNum < yardPacketTotal; yardPacketNum++ )
   {
-    auto landsetYardInitializePacket = makeZonePacket< FFXIVIpcLandsetYardInitialize >(player.getId());
+    auto landsetYardInitializePacket = makeZonePacket< FFXIVIpcLandSetYardInitialize >( player.getId() );
     landsetYardInitializePacket->data().unknown1 = 0xFFFFFFFF;
     landsetYardInitializePacket->data().unknown2 = 0xFFFFFFFF;
     landsetYardInitializePacket->data().unknown3 = 0xFF;
@@ -80,9 +80,9 @@ void Core::HousingZone::onPlayerZoneIn(Entity::Player& player)
 
 void Core::HousingZone::sendMap( Entity::Player& player )
 {
-  auto landsetInitializePacket = makeZonePacket< FFXIVIpcLandsetInitialize >( player.getId() );
+  auto landsetInitializePacket = makeZonePacket< FFXIVIpcLandSetInitialize >( player.getId() );
 
-  landsetInitializePacket->data().wardNum = m_wardNum;
+  landsetInitializePacket->data().landSetId = m_landSetId;
   landsetInitializePacket->data().zoneId = m_territoryId;
   //TODO: get current WorldId
   landsetInitializePacket->data().worldId = 67;
@@ -92,8 +92,7 @@ void Core::HousingZone::sendMap( Entity::Player& player )
   uint8_t count = 0;
   for( uint8_t i = startIndex; i < ( startIndex + 30 ); i++ )
   {
-    memcpy( &landsetInitializePacket->data().landset[ count ],
-            &getLandset( i )->getLandset(), sizeof( Common::LandsetStruct ) );
+    memcpy( &landsetInitializePacket->data().land[ count ], &getLand( i )->getLand(), sizeof( Common::LandStruct ) );
     count++;
   }
 
@@ -109,19 +108,19 @@ void Core::HousingZone::onUpdate( uint32_t currTime )
 {
   for( uint8_t i = 0; i < 60; i++ )
   {
-    getLandset( i )->Update( currTime );
+    getLand( i )->Update( currTime );
   }
 }
 
-uint8_t Core::HousingZone::getWardNum() const
+uint8_t Core::HousingZone::getLandSetId() const
 {
-  return m_wardNum;
+  return m_landSetId;
 }
 
-Core::LandsetPtr Core::HousingZone::getLandset( uint8_t id )
+Core::LandPtr Core::HousingZone::getLand( uint8_t id )
 {
-  auto it = m_landsetPtrMap.find( id );
-  if( it == m_landsetPtrMap.end() )
+  auto it = m_landPtrMap.find( id );
+  if( it == m_landPtrMap.end() )
     return nullptr;
 
   return it->second;

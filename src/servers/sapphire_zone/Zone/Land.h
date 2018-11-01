@@ -1,11 +1,11 @@
-#ifndef LANDSET_H_
-#define LANDSET_H_
+#ifndef LAND_H_
+#define LAND_H_
 #include <Common.h>
 #include "ForwardsZone.h"
 
 namespace Core
 {
-  class Landset
+  class Land
   {
   public:
     enum HouseSizeType : uint8_t
@@ -19,7 +19,7 @@ namespace Core
     enum HouseStateType : uint8_t
     {
       none,
-      forSell,
+      forSale,
       sold,
       fcHouse,
       privateHouse
@@ -30,8 +30,8 @@ namespace Core
       heart = 0x06
     };
 
-    Landset( uint16_t zoneId, uint8_t wardNum, uint8_t landsetId );
-    virtual ~Landset();
+    Land( uint16_t zoneId, uint8_t wardNum, uint8_t landId );
+    virtual ~Land();
 
     void load();
 
@@ -85,20 +85,20 @@ namespace Core
     void UpdateDatabase();
     void Update( uint32_t currTime );
     void onUpdate();
-    uint32_t getLandsetKey();
+    uint32_t getLandKey();
 
-    Common::LandsetStruct getLandset();
+    Common::LandStruct getLand();
     uint32_t getMaxItems();
 
   private:
     uint32_t convertItemIdToHousingItemId( uint32_t itemId );
     void Init();
 
-    uint32_t m_landsetKey;
+    uint32_t m_landKey;
     uint8_t m_wardNum;
-    uint8_t m_landsetId;
+    uint8_t m_landId;
     uint16_t m_zoneId;
-    Common::LandsetStruct m_landset;
+    Common::LandStruct m_land;
     uint32_t m_ownerPlayerId;
 
 

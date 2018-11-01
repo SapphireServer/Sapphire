@@ -191,7 +191,7 @@ void Core::Db::ZoneDbConnection::doPrepareStatements()
                     "UPDATE charaglobalitem SET IS_DELETE = 1 WHERE ItemId = ?;",
                     CONNECTION_BOTH );
 
-  prepareStatement( LAND_INS,
+  /*prepareStatement( LAND_INS,
                     "INSERT INTO land ( LandSetId ) VALUES ( ? );",
                     CONNECTION_BOTH );
 
@@ -211,5 +211,5 @@ void Core::Db::ZoneDbConnection::doPrepareStatements()
                     "colorSlot_5 = ?, colorSlot_6 = ?, colorSlot_7 = ?, ownerPlayerId = ?, nextDrop = ?, "
                     "dropCount = ?, currentPrice = ?"
                     " WHERE LandSetId = ?;",
-                    CONNECTION_BOTH );
+                    CONNECTION_BOTH );*/
 }

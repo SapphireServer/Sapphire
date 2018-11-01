@@ -1541,8 +1541,7 @@ struct FFXIVIpcEquipDisplayFlags :
 * Structural representation of the packet sent by the server
 * to mount a player
 */
-struct FFXIVIpcMount :
-  FFXIVIpcBasePacket< Mount >
+struct FFXIVIpcMount : FFXIVIpcBasePacket< Mount >
 {
   uint32_t id;
 };
@@ -1551,8 +1550,7 @@ struct FFXIVIpcMount :
 * Structural representation of the packet sent by the server
 * to mount a player
 */
-struct FFXIVIpcDirectorVars :
-  FFXIVIpcBasePacket< DirectorVars >
+struct FFXIVIpcDirectorVars : FFXIVIpcBasePacket< DirectorVars >
 {
   /*! DirectorType | ContentId */
   uint32_t m_directorId;
@@ -1565,22 +1563,19 @@ struct FFXIVIpcDirectorVars :
 };
 
 
-struct FFXIVIpcActorGauge :
-  FFXIVIpcBasePacket< ActorGauge >
+struct FFXIVIpcActorGauge : FFXIVIpcBasePacket< ActorGauge >
 {
   uint8_t classJobId;
   uint8_t data[15]; // depends on classJobId
 };
 
-struct FFXIVIpcPerformNote :
-  FFXIVIpcBasePacket< PerformNote >
+struct FFXIVIpcPerformNote : FFXIVIpcBasePacket< PerformNote >
 {
   uint8_t data[32];
 };
 
 //IPCs
-struct FFXIVIpcLandsetPermission :
-  FFXIVIpcBasePacket<LandsetPermission >
+struct FFXIVIpcLandPermission : FFXIVIpcBasePacket<LandPermission >
 {
   Common::HousePermissionSet freeCompanyHouse; // 00
   uint64_t unkown1;
@@ -1594,25 +1589,22 @@ struct FFXIVIpcLandsetPermission :
   uint64_t unkown5;
 };
 
-struct FFXIVIpcLandsetUpdate :
-  FFXIVIpcBasePacket< LandsetUpdate >
+struct FFXIVIpcLandUpdate : FFXIVIpcBasePacket< LandUpdate >
 {
   uint16_t landSetId;
   uint16_t unknow0;
   uint16_t unknow1;
   uint16_t unknow2;
-  Common::LandsetStruct landset;
+  Common::LandStruct land;
 };
 
-struct FFXIVIpcLandsetPriceUpdate :
-  FFXIVIpcBasePacket< LandsetPriceUpdate >
+struct FFXIVIpcLandPriceUpdate :  FFXIVIpcBasePacket< LandPriceUpdate >
 {
   uint32_t price;
   uint32_t timeLeft;
 };
 
-struct FFXIVIpcLandsetExtend :
-  FFXIVIpcBasePacket< LandsetExtending >
+struct FFXIVIpcLandSetExtend : FFXIVIpcBasePacket< LandSetExtending >
 {
   struct
   {
@@ -1623,11 +1615,10 @@ struct FFXIVIpcLandsetExtend :
   } landset[30];
 };
 
-struct FFXIVIpcLandsetInitialize :
-  FFXIVIpcBasePacket< LandsetInitialize >
+struct FFXIVIpcLandSetInitialize : FFXIVIpcBasePacket< LandSetInitialize >
 {
   uint16_t unknown0;
-  uint16_t wardNum; // set 1 for "Mist, Ward 2"
+  uint16_t landSetId; // set 1 for "Mist, Ward 2"
   uint16_t zoneId;
   uint16_t worldId;
   uint8_t unknown1;
@@ -1638,11 +1629,10 @@ struct FFXIVIpcLandsetInitialize :
   uint8_t unknown6;
   uint8_t unknown7;
   uint8_t unknown8;
-  Common::LandsetStruct landset[30];
+  Common::LandStruct land[30];
 };
 
-struct FFXIVIpcYardObjectSpawn :
-  FFXIVIpcBasePacket<YardObjectSpawn>
+struct FFXIVIpcYardObjectSpawn : FFXIVIpcBasePacket<YardObjectSpawn>
 {
   uint8_t landSetId;
   uint8_t objectArray;
@@ -1654,8 +1644,7 @@ struct FFXIVIpcYardObjectSpawn :
   uint16_t pos_z;
 };
 
-struct FFXIVIpcYardObjectMove :
-  FFXIVIpcBasePacket<YardObjectMove>
+struct FFXIVIpcYardObjectMove : FFXIVIpcBasePacket<YardObjectMove>
 {
   uint16_t itemRotation;
   uint8_t objectArray;
@@ -1668,8 +1657,7 @@ struct FFXIVIpcYardObjectMove :
   uint16_t unknown3;
 };
 
-struct FFXIVIpcLandsetYardInitialize :
-  FFXIVIpcBasePacket< LandsetYardInitialize >
+struct FFXIVIpcLandSetYardInitialize : FFXIVIpcBasePacket< LandSetYardInitialize >
 {
   uint32_t unknown1; //always 0xFFFFFFFF
   uint32_t unknown2; //always 0xFFFFFFFF
