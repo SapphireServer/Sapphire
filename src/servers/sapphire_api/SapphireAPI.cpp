@@ -133,13 +133,16 @@ Core::Network::SapphireAPI::createCharacter( const int& accountId, const std::st
 
   for( auto& v : json["content"] )
   {
-    for( auto& vs : v )
+    if( v.is_array() )
     {
-      tmpVector.push_back( vs.get< int >() );
+      for( auto& vs : v )
+      {
+        tmpVector.push_back( std::stoi( std::string( vs ) ) );
+      }
     }
 
-    if( !v.empty() )
-      tmpVector2.push_back( v.get< int >() );
+    if( !v.empty() && !v.is_array() )
+      tmpVector2.push_back( std::stoi( std::string( v ) ) );
   }
 
   // leaving this in for now for reference
