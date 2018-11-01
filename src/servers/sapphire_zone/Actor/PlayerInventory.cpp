@@ -848,7 +848,7 @@ uint16_t Core::Entity::Player::calculateEquippedGearItemLevel()
     it++;
   }
 
-  return std::max( static_cast< int32_t >( iLvlResult / 13 ), 9999 );
+  return static_cast< uint16_t >( std::min( static_cast< int32_t >( iLvlResult / 13 ), 9999 ) );
 }
 
 

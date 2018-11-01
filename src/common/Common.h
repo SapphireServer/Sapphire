@@ -733,7 +733,7 @@ namespace Core::Common
   };
 
 //Structs
-struct LandsetStruct
+struct LandStruct
 {
   uint8_t houseSize; //0
   uint8_t houseState; // 2
