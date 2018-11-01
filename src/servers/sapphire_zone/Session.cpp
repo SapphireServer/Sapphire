@@ -77,8 +77,12 @@ void Core::Session::close()
 
   // remove the session from the player
   if( m_pPlayer )
+  {
+    // do one last update to db
+    m_pPlayer->updateSql();
     // reset the zone, so the zone handler knows to remove the actor
     m_pPlayer->setCurrentZone( nullptr );
+  }
 }
 
 uint32_t Core::Session::getId() const
