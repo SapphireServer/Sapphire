@@ -756,7 +756,6 @@ namespace Core::Common
     uint32_t fcIconColor; // 16
     uint16_t housePart[ 8 ]; // 34
     uint8_t color[ 8 ]; // 36
-    //44
   };
 
   struct HousePermissionSet
@@ -794,6 +793,7 @@ namespace Core::Common
     fcHouse,
     privateHouse
   };
+
   enum HouseIconAdd : uint8_t
   {
     heart = 0x06

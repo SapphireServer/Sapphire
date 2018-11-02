@@ -44,6 +44,7 @@ Core::Land::~Land()
 
 void Core::Land::load()
 {
+//  setPreset( 262145 );
 /*  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto res = pDb->query( "SELECT * FROM land WHERE Id = " + std::to_string( m_landKey ) );
   if( !res->next() )
@@ -199,7 +200,7 @@ uint32_t Core::Land::getLandKey()
   return m_landKey;
 }
 
-LandStruct Core::Land::getLand()
+const LandStruct& Core::Land::getLand()
 {
   return m_land;
 }
@@ -209,7 +210,7 @@ uint32_t Core::Land::getMaxItems()
   return m_maxItems;
 }
 
-void Core::Land::Init()
+void Core::Land::init()
 {
 
 

@@ -50,12 +50,12 @@ namespace Core
     void onUpdate();
     uint32_t getLandKey();
 
-    Common::LandStruct getLand();
+    const Common::LandStruct& getLand();
     uint32_t getMaxItems();
 
   private:
     uint16_t convertItemIdToHousingItemId( uint16_t itemId );
-    void Init();
+    void init();
 
     uint32_t m_landKey;
     uint8_t m_wardNum;

@@ -73,7 +73,7 @@ void Core::HousingZone::onPlayerZoneIn(Entity::Player& player)
 
     //TODO: Add Objects here
 
-    player.queuePacket(landsetYardInitializePacket);
+    player.queuePacket( landsetYardInitializePacket );
   }
 
 }
