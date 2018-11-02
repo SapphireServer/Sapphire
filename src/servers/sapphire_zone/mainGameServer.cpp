@@ -29,7 +29,7 @@ bool setupFramework()
   auto pDebugCom = std::make_shared< DebugCommandHandler >();
   auto pConfig = std::make_shared< ConfigMgr >();
 
-  pLogger->setLogPath( "log/SapphireZone_" );
+  pLogger->setLogPath( "log/SapphireZone" );
   pLogger->init();
 
   g_fw.set< ServerZone >( pServer );
