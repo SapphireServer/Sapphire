@@ -78,7 +78,7 @@ void Core::Land::load()
                                               "housingoutdooritems", true );*/
 }
 
-uint32_t Core::Land::convertItemIdToHousingItemId( uint32_t itemId )
+uint16_t Core::Land::convertItemIdToHousingItemId( uint16_t itemId )
 {
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
   auto info = pExdData->get< Core::Data::Item >( itemId );
@@ -89,12 +89,12 @@ void Core::Land::setPreset( uint32_t id )
 {
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
   auto info = pExdData->get< Core::Data::HousingPreset >( convertItemIdToHousingItemId( id ) );
-  setRoof( info->exteriorRoof );
-  setWall( info->exteriorWall );
-  setWindow( info->exteriorWindow );
-  setBasementWall( info->basementWall );
-  setFloorFlooring( info->otherFloorFlooring );
-  setFloorWall( info->otherFloorWall );
+  setHousePart( Common::HousePartSlot::ExteriorRoof, info->exteriorRoof );
+  setHousePart( Common::HousePartSlot::ExteriorWall, info->exteriorWall );
+  setHousePart( Common::HousePartSlot::ExteriorWindow, info->exteriorWindow );
+  setHousePart( Common::HousePartSlot::BasementWall, info->basementWall );
+  setHousePart( Common::HousePartSlot::OtherFloorFlooring, info->otherFloorFlooring );
+  setHousePart( Common::HousePartSlot::OtherFloorWall, info->otherFloorWall );
 }
 
 //Primary State
@@ -162,94 +162,14 @@ uint32_t Core::Land::getFcColor()
 }
 
 //House Data
-void Core::Land::setRoof( uint16_t id )
+void Core::Land::setHousePart( Common::HousePartSlot slot, uint16_t id )
 {
-  m_land.exteriorRoof = convertItemIdToHousingItemId( id );
+  m_land.housePart[ slot ] = convertItemIdToHousingItemId( id );
 }
 
-void Core::Land::setFacade( uint16_t id )
+uint16_t Core::Land::getHousePart( Common::HousePartSlot slot )
 {
-  m_land.exteriorWall = convertItemIdToHousingItemId( id );
-}
-
-void Core::Land::setWindow( uint16_t id )
-{
-  m_land.exteriorWindow = convertItemIdToHousingItemId( id );
-}
-
-void Core::Land::setDoor( uint16_t id )
-{
-  m_land.exteriorDoor = convertItemIdToHousingItemId( id );
-}
-
-void Core::Land::setFloorWall( uint16_t id )
-{
-  m_land.otherFloorWall = convertItemIdToHousingItemId( id );
-}
-
-void Core::Land::setFloorFlooring( uint16_t id )
-{
-  m_land.otherFloorFlooring = convertItemIdToHousingItemId( id );
-}
-
-void Core::Land::setWall( uint16_t id )
-{
-  m_land.exteriorWall = convertItemIdToHousingItemId( id );
-}
-
-void Core::Land::setSign( uint16_t id )
-{
-  m_land.gardenSign = convertItemIdToHousingItemId( id );
-}
-
-void Core::Land::setBasementWall( uint16_t id )
-{
-  m_land.basementWall = convertItemIdToHousingItemId( id );
-}
-
-uint16_t Core::Land::getRoof()
-{
-  return m_land.exteriorRoof;
-}
-
-uint16_t Core::Land::getFacade()
-{
-  return m_land.exteriorWall;
-}
-
-uint16_t Core::Land::getWindow()
-{
-  return m_land.exteriorWindow;
-}
-
-uint16_t Core::Land::getDoor()
-{
-  return m_land.exteriorDoor;
-}
-
-uint16_t Core::Land::getSign()
-{
-  return m_land.gardenSign;
-}
-
-uint16_t Core::Land::getWall()
-{
-  return m_land.basementWall;
-}
-
-uint16_t Core::Land::getFloorWall()
-{
-  return m_land.otherFloorFlooring;
-}
-
-uint16_t Core::Land::getFloorFlooring()
-{
-  return m_land.otherFloorFlooring;
-}
-
-uint16_t Core::Land::getBasememtWall()
-{
-  return m_land.basementWall;
+  return m_land.housePart[ slot ];
 }
 
 //Color
