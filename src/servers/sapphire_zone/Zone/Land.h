@@ -8,27 +8,6 @@ namespace Core
   class Land
   {
   public:
-    enum HouseSizeType : uint8_t
-    {
-      //noneHouse,
-      smallHouse,
-      mediumHouse,
-      bigHouse
-    };
-
-    enum HouseStateType : uint8_t
-    {
-      none,
-      forSale,
-      sold,
-      fcHouse,
-      privateHouse
-    };
-
-    enum HouseIconAdd : uint8_t
-    {
-      heart = 0x06
-    };
 
     Land( uint16_t zoneId, uint8_t wardNum, uint8_t landId );
     virtual ~Land();
@@ -54,25 +33,9 @@ namespace Core
     uint32_t getFcColor();
 
     //House data
-    void setRoof( uint16_t itemId );
-    void setFacade( uint16_t itemId );
-    void setWindow( uint16_t itemId );
-    void setDoor( uint16_t itemId );
-    void setFloorWall( uint16_t itemId );
-    void setFloorFlooring( uint16_t itemId );
-    void setWall( uint16_t itemId );
-    void setSign( uint16_t itemId );
-    void setBasementWall( uint16_t itemId );
+    void setHousePart( Common::HousePartSlot slot, uint16_t itemId );
 
-    uint16_t getRoof();
-    uint16_t getFacade();
-    uint16_t getWindow();
-    uint16_t getDoor();
-    uint16_t getFloorWall();
-    uint16_t getFloorFlooring();
-    uint16_t getWall();
-    uint16_t getSign();
-    uint16_t getBasememtWall();
+    uint16_t getHousePart( Common::HousePartSlot slot );
 
     //Color
     void setColor( uint8_t slot, uint8_t color );
@@ -91,7 +54,7 @@ namespace Core
     uint32_t getMaxItems();
 
   private:
-    uint32_t convertItemIdToHousingItemId( uint32_t itemId );
+    uint16_t convertItemIdToHousingItemId( uint16_t itemId );
     void Init();
 
     uint32_t m_landKey;
