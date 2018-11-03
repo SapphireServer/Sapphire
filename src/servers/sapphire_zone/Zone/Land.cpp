@@ -44,6 +44,8 @@ Core::Land::~Land()
 
 void Core::Land::load()
 {
+  m_land.houseSize = 1;
+  m_land.houseState = 1;
 //  setPreset( 262145 );
 /*  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto res = pDb->query( "SELECT * FROM land WHERE Id = " + std::to_string( m_landKey ) );
