@@ -45,7 +45,7 @@ Core::Land::~Land()
 void Core::Land::load()
 {
   m_land.houseSize = 1;
-  m_land.houseState = 1;
+  m_land.houseState = HouseState::forSale;
 //  setPreset( 262145 );
 /*  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto res = pDb->query( "SELECT * FROM land WHERE Id = " + std::to_string( m_landKey ) );
@@ -218,15 +218,15 @@ void Core::Land::init()
 
   switch( getHouseSize() )
   {
-    case HouseSizeType::smallHouse:
+    case HouseSize::small:
       m_initPrice = 3750000;
       m_maxItems = 20;
       break;
-    case HouseSizeType::mediumHouse:
+    case HouseSize::medium:
       m_initPrice = 20000000;
       m_maxItems = 30;
       break;
-    case HouseSizeType::bigHouse:
+    case HouseSize::big:
       m_initPrice = 50000000;
       m_maxItems = 40;
       break;
@@ -248,13 +248,13 @@ void Core::Land::UpdateDatabase()
 
 void Core::Land::Update( uint32_t currTime )
 {
-  if( m_currentPrice == 0 && getState() == HouseStateType::forSale )
+  if( m_currentPrice == 0 && getState() == HouseState::forSale )
   {
     m_currentPrice = m_initPrice;
     m_nextDrop = 0;
     UpdateDatabase();
   }
-  if( m_nextDrop < currTime  && getState() == HouseStateType::forSale )
+  if( m_nextDrop < currTime  && getState() == HouseState::forSale )
   {
     m_currentPrice = ( m_currentPrice / 100 ) * 90;
     m_nextDrop = currTime + 86400;

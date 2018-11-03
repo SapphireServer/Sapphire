@@ -777,15 +777,14 @@ namespace Core::Common
     uint16_t pos_z;
   };
 
-  enum HouseSizeType : uint8_t
+  enum HouseSize : uint8_t
   {
-    //noneHouse,
-    smallHouse,
-    mediumHouse,
-    bigHouse
+    small,
+    medium,
+    big
   };
 
-  enum HouseStateType : uint8_t
+  enum HouseState : uint8_t
   {
     none,
     forSale,
