@@ -5,11 +5,16 @@
 
 namespace Core
 {
+  namespace Data
+  {
+     using HousingLandSetPtr = std::shared_ptr< HousingLandSet >;
+  }
+
   class Land
   {
   public:
 
-    Land( uint16_t zoneId, uint8_t wardNum, uint8_t landId );
+    Land( uint16_t zoneId, uint8_t wardNum, uint8_t landId, uint32_t landSetId, Core::Data::HousingLandSetPtr info );
     virtual ~Land();
 
     void load();
@@ -48,21 +53,23 @@ namespace Core
     void UpdateDatabase();
     void Update( uint32_t currTime );
     void onUpdate();
-    uint32_t getLandKey();
 
     const Common::LandStruct& getLand();
     uint32_t getMaxItems();
+
+    uint32_t getCurrentPrice() const;
 
   private:
     uint16_t convertItemIdToHousingItemId( uint16_t itemId );
     void init();
 
-    uint32_t m_landKey;
     uint8_t m_wardNum;
     uint8_t m_landId;
+    uint32_t m_landSetId;
     uint16_t m_zoneId;
     Common::LandStruct m_land;
     uint32_t m_ownerPlayerId;
+    Core::Data::HousingLandSetPtr m_landInfo;
 
 
     //item storage

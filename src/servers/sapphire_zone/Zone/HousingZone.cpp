@@ -3,7 +3,7 @@
 #include <Util/Util.h>
 #include <Util/UtilMath.h>
 #include <Database/DatabaseDef.h>
-
+#include <Exd/ExdDataGenerated.h>
 #include <Network/GamePacketNew.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 
@@ -21,24 +21,46 @@ using namespace Core::Common;
 using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
-Core::HousingZone::HousingZone( uint8_t landSetId,
+Core::HousingZone::HousingZone( uint8_t wardNum,
                                 uint16_t territoryId,
                                 uint32_t guId,
                                 const std::string& internalName,
                                 const std::string& contentName ) :
   Zone( territoryId, guId, internalName, contentName ),
-  m_landSetId( landSetId ),
-  m_zoneId( territoryId )
+  m_wardNum( wardNum ),
+  m_zoneId( territoryId ),
+  m_landSetId( ( static_cast< uint32_t >( territoryId ) << 16 ) | wardNum )
 {
 
 }
 
 bool Core::HousingZone::init()
 {
+
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto res = pDb->query( "SELECT * FROM landset WHERE landsetid = " + std::to_string( m_landSetId ) );
+  if( !res->next() )
+  {
+    pDb->directExecute( "INSERT INTO landset ( landsetid ) VALUES ( " + std::to_string( m_landSetId ) + " );" );
+  }
+
+  int housingIndex;
+  if( m_zoneId == 339 )
+    housingIndex = 0;
+  else if( m_zoneId == 340 )
+    housingIndex = 1;
+  else if( m_zoneId == 341 )
+    housingIndex = 2;
+  else if( m_zoneId == 641 )
+    housingIndex = 3;
+
+  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto info = pExdData->get< Core::Data::HousingLandSet >( housingIndex );
+
   uint32_t landId;
   for( landId = 0; landId < 60; landId++ )
   {
-    auto pObject = make_Land( m_territoryId, getLandSetId(), landId );
+    auto pObject = make_Land( m_territoryId, getWardNum(), landId, m_landSetId, info );
     pObject->setHouseSize( 1 );
     m_landPtrMap[ landId ] = pObject;
   }
@@ -51,7 +73,7 @@ Core::HousingZone::~HousingZone()
 
 }
 
-void Core::HousingZone::onPlayerZoneIn(Entity::Player& player)
+void Core::HousingZone::onPlayerZoneIn( Entity::Player& player )
 {
   auto pLog = g_fw.get< Logger >();
   pLog->debug( "HousingZone::onPlayerZoneIn: Zone#" + std::to_string( getGuId() ) + "|"
@@ -60,7 +82,7 @@ void Core::HousingZone::onPlayerZoneIn(Entity::Player& player)
   uint32_t yardPacketNum;
   uint32_t yardPacketTotal = 8;
 
-  sendMap( player );
+  sendLandSet( player );
 
   for( yardPacketNum = 0; yardPacketNum < yardPacketTotal; yardPacketNum++ )
   {
@@ -78,7 +100,7 @@ void Core::HousingZone::onPlayerZoneIn(Entity::Player& player)
 
 }
 
-void Core::HousingZone::sendMap( Entity::Player& player )
+void Core::HousingZone::sendLandSet( Entity::Player& player )
 {
   auto landsetInitializePacket = makeZonePacket< FFXIVIpcLandSetInitialize >( player.getId() );
 
@@ -89,11 +111,10 @@ void Core::HousingZone::sendMap( Entity::Player& player )
   landsetInitializePacket->data().subInstance = isPlayerSubInstance( player ) == false ? 1 : 2;
 
   uint8_t startIndex = isPlayerSubInstance( player ) == false ? 0 : 30;
-  uint8_t count = 0;
-  for( uint8_t i = startIndex; i < ( startIndex + 30 ); i++ )
+
+  for( uint8_t i = startIndex, count = 0; i < ( startIndex + 30 ); i++ )
   {
-    memcpy( &landsetInitializePacket->data().land[ count ], &getLand( i )->getLand(), sizeof( Common::LandStruct ) );
-    count++;
+    memcpy( &landsetInitializePacket->data().land[ count++ ], &getLand( i )->getLand(), sizeof( Common::LandStruct ) );
   }
 
   player.queuePacket( landsetInitializePacket );
@@ -112,7 +133,12 @@ void Core::HousingZone::onUpdate( uint32_t currTime )
   }
 }
 
-uint8_t Core::HousingZone::getLandSetId() const
+uint8_t Core::HousingZone::getWardNum() const
+{
+  return m_wardNum;
+}
+
+uint32_t Core::HousingZone::getLandSetId() const
 {
   return m_landSetId;
 }

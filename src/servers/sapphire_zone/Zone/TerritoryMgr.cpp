@@ -175,7 +175,7 @@ bool Core::TerritoryMgr::createHousingTerritories()
 
       auto pHousingZone = make_HousingZone( wardNum, territoryId, guid, territoryInfo->name, pPlaceName->name );
       pHousingZone->init();
-      wardMaxNum = pHousingZone->m_wardMaxNum;
+      wardMaxNum = 18;
 
       InstanceIdToZonePtrMap instanceMap;
       instanceMap[ guid ] = pHousingZone;
