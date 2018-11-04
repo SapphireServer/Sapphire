@@ -2740,6 +2740,16 @@ Core::Data::HousingFurniture::HousingFurniture( uint32_t row_id, Core::Data::Exd
    tooltip = exdData->getField< bool >( row, 9 );
 }
 
+Core::Data::HousingLandSet::HousingLandSet( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
+{
+  auto row = exdData->m_HousingLandSetDat.get_row( row_id );
+  for ( int i = 0; i < 60; i++ )
+    sizes.push_back( exdData->getField< uint8_t >( row, i ) );
+  for ( int i = 300; i < 300 + 60; i++ )
+    prices.push_back( exdData->getField< uint32_t >( row, i ) );
+
+}
+
 Core::Data::HousingPlacement::HousingPlacement( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )
 {
    auto row = exdData->m_HousingPlacementDat.get_row( row_id );
@@ -5525,6 +5535,7 @@ bool Core::Data::ExdDataGenerated::init( const std::string& path )
       m_HousingEmploymentNpcListDat = setupDatAccess( "HousingEmploymentNpcList", xiv::exd::Language::none );
       m_HousingEmploymentNpcRaceDat = setupDatAccess( "HousingEmploymentNpcRace", xiv::exd::Language::en );
       m_HousingFurnitureDat = setupDatAccess( "HousingFurniture", xiv::exd::Language::none );
+      m_HousingLandSetDat = setupDatAccess( "HousingLandSet", xiv::exd::Language::none );
       m_HousingPlacementDat = setupDatAccess( "HousingPlacement", xiv::exd::Language::en );
       m_HousingPresetDat = setupDatAccess( "HousingPreset", xiv::exd::Language::en );
       m_HousingYardObjectDat = setupDatAccess( "HousingYardObject", xiv::exd::Language::none );

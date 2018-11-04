@@ -256,6 +256,7 @@ struct HousingAethernet;
 struct HousingEmploymentNpcList;
 struct HousingEmploymentNpcRace;
 struct HousingFurniture;
+struct HousingLandSet;
 struct HousingPlacement;
 struct HousingPreset;
 struct HousingYardObject;
@@ -2849,6 +2850,14 @@ struct HousingPlacement
    HousingPlacement( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
+struct HousingLandSet
+{
+  std::vector< uint8_t > sizes;
+  std::vector< uint32_t > prices;
+
+  HousingLandSet( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
 struct HousingPreset
 {
    std::string singular;
@@ -5054,6 +5063,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_HousingEmploymentNpcListDat;
      xiv::exd::Exd m_HousingEmploymentNpcRaceDat;
      xiv::exd::Exd m_HousingFurnitureDat;
+     xiv::exd::Exd m_HousingLandSetDat;
      xiv::exd::Exd m_HousingPlacementDat;
      xiv::exd::Exd m_HousingPresetDat;
      xiv::exd::Exd m_HousingYardObjectDat;
@@ -5484,6 +5494,7 @@ struct ZoneSharedGroup
      using HousingEmploymentNpcListPtr =  std::shared_ptr< HousingEmploymentNpcList >;
      using HousingEmploymentNpcRacePtr =  std::shared_ptr< HousingEmploymentNpcRace >;
      using HousingFurniturePtr =  std::shared_ptr< HousingFurniture >;
+     using HousingLandSetPtr =  std::shared_ptr< HousingLandSet >;
      using HousingPlacementPtr =  std::shared_ptr< HousingPlacement >;
      using HousingPresetPtr =  std::shared_ptr< HousingPreset >;
      using HousingYardObjectPtr =  std::shared_ptr< HousingYardObject >;
@@ -5929,6 +5940,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_HousingEmploymentNpcListIdList;
      std::set< uint32_t > m_HousingEmploymentNpcRaceIdList;
      std::set< uint32_t > m_HousingFurnitureIdList;
+     std::set< uint32_t > m_HousingLandSetIdList;
      std::set< uint32_t > m_HousingPlacementIdList;
      std::set< uint32_t > m_HousingPresetIdList;
      std::set< uint32_t > m_HousingYardObjectIdList;
@@ -7548,6 +7560,12 @@ const std::set< uint32_t >& getHousingFurnitureIdList()
    if( m_HousingFurnitureIdList.size() == 0 )
       loadIdList( m_HousingFurnitureDat, m_HousingFurnitureIdList );
    return m_HousingFurnitureIdList;
+}
+const std::set< uint32_t >& getHousingLandSetIdList()
+{
+  if( m_HousingLandSetIdList.size() == 0 )
+    loadIdList( m_HousingLandSetDat, m_HousingLandSetIdList );
+  return m_HousingLandSetIdList;
 }
 const std::set< uint32_t >& getHousingPlacementIdList()
 {

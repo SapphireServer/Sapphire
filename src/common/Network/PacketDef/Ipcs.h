@@ -188,7 +188,8 @@ namespace Core::Network::Packets
     LandSetInitialize = 0x0220, // updated 4.4
     LandUpdate = 0x0221, // updated 4.4
     YardObjectSpawn = 0x0222, // updated 4.4
-    LandPriceUpdate = 0x0225, // updated 4.3
+
+    LandPriceUpdate = 0x0224, // updated 4.3
     LandPermission = 0x0229, // updated 4.4
     LandSetYardInitialize = 0x022C, // updated 4.4
     YardObjectMove = 0x0230, // updated 4.4

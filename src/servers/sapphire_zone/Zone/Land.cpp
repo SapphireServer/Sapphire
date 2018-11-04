@@ -25,14 +25,16 @@ extern Core::Framework g_fw;
 
 using namespace Core::Common;
 
-Core::Land::Land( uint16_t zoneId, uint8_t wardNum, uint8_t landId ) :
+Core::Land::Land( uint16_t zoneId, uint8_t wardNum, uint8_t landId, uint32_t landSetId,
+                  Core::Data::HousingLandSetPtr info ) :
   m_zoneId( zoneId ),
   m_wardNum( wardNum ),
   m_landId( landId ),
   m_currentPrice( 0 ),
-  m_nextDrop( 0 )
+  m_nextDrop( 0 ),
+  m_landSetId( landSetId ),
+  m_landInfo( info )
 {
-  m_landKey = ( m_zoneId << 16 ) | ( m_wardNum << 8 ) | m_landId;
   memset( &m_land, 0x00, sizeof( LandStruct ) );
   load();
 }
@@ -44,8 +46,31 @@ Core::Land::~Land()
 
 void Core::Land::load()
 {
-  m_land.houseSize = 1;
+
   m_land.houseState = HouseState::forSale;
+
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto res = pDb->query( "SELECT * FROM land WHERE landsetid = " + std::to_string( m_landSetId ) + " "
+                                            "AND landid = " + std::to_string( m_landId ) );
+  if( !res->next() )
+  {
+
+
+    pDb->directExecute( "INSERT INTO land ( landsetid, landid, size, status, landprice ) "
+                        "VALUES ( " + std::to_string( m_landSetId ) + "," + std::to_string( m_landId ) + ","
+                        + std::to_string( m_landInfo->sizes[ m_landId ] ) + ","
+                        + " 1, " + std::to_string( m_landInfo->prices[ m_landId ] ) + " );" );
+
+    m_currentPrice = m_landInfo->prices[ m_landId ];
+    m_land.houseSize = m_landInfo->sizes[ m_landId ];
+  }
+  else
+  {
+    m_land.houseSize = res->getUInt( "size" );
+    m_land.houseState = res->getUInt( "status" );
+    m_currentPrice = res->getUInt( "LandPrice" );;
+  }
+  init();
 //  setPreset( 262145 );
 /*  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto res = pDb->query( "SELECT * FROM land WHERE Id = " + std::to_string( m_landKey ) );
@@ -86,6 +111,11 @@ uint16_t Core::Land::convertItemIdToHousingItemId( uint16_t itemId )
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
   auto info = pExdData->get< Core::Data::Item >( itemId );
   return info->additionalData;
+}
+
+uint32_t Core::Land::getCurrentPrice() const
+{
+  return m_currentPrice;
 }
 
 void Core::Land::setPreset( uint32_t id )
@@ -197,11 +227,6 @@ uint32_t Core::Land::getPlayerOwner()
   return m_ownerPlayerId;
 }
 
-uint32_t Core::Land::getLandKey()
-{
-  return m_landKey;
-}
-
 const LandStruct& Core::Land::getLand()
 {
   return m_land;
@@ -215,19 +240,15 @@ uint32_t Core::Land::getMaxItems()
 void Core::Land::init()
 {
 
-
   switch( getHouseSize() )
   {
     case HouseSize::small:
-      m_initPrice = 3750000;
       m_maxItems = 20;
       break;
     case HouseSize::medium:
-      m_initPrice = 20000000;
       m_maxItems = 30;
       break;
     case HouseSize::big:
-      m_initPrice = 50000000;
       m_maxItems = 40;
       break;
     default:

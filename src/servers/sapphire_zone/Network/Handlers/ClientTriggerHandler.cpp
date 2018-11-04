@@ -10,6 +10,8 @@
 
 #include "Zone/Zone.h"
 #include "Zone/ZonePosition.h"
+#include "Zone/HousingZone.h"
+#include "Zone/Land.h"
 
 #include "Network/GameConnection.h"
 
@@ -307,7 +309,28 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
       player.removeQuest( static_cast< uint16_t >( param1 ) );
       break;
     }
+    case ClientTriggerType::RequestHousingSign:
+    {
+      auto plotPricePacket = makeZonePacket< Server::FFXIVIpcLandPriceUpdate >( player.getId() );
 
+      uint8_t ward = ( param12 & 0xFF00 ) >> 8;
+      uint8_t plot = ( param12 & 0xFF );
+      pLog->debug( " Ward: " + std::to_string( ward ) + " Plot: " + std::to_string( plot ) );
+
+      auto zone = player.getCurrentZone();
+
+      auto hZone = std::dynamic_pointer_cast< HousingZone >( zone );
+
+      if( !hZone )
+        return;
+
+      auto land = hZone->getLand( plot );
+      plotPricePacket->data().price = land->getCurrentPrice();
+
+      player.queuePacket( plotPricePacket );
+
+      break;
+    }
 
     default:
     {
