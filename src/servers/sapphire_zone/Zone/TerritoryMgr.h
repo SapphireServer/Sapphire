@@ -29,7 +29,7 @@ class TerritoryMgr
 
 public:
   enum TerritoryIntendedUse :
-    uint8_t //ToDo: Add The Rest of The Territory Types and Have Better Names For Them
+    uint8_t //TODO: Add the rest of the territory types and have better names for them
   {
     Town = 0,
     OpenWorld = 1,
