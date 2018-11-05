@@ -456,6 +456,12 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
           player.sendUrgent( "No zone instance found for " + std::to_string( param1 ) );
           break;
         }
+        
+        if( !pTeriMgr->isDefaultTerritory( param1 ) )
+        {
+          player.sendUrgent( pZone->getName() + " is an instanced area - instance ID required to zone in." );
+          break;
+        }
 
         bool doTeleport = false;
         uint16_t teleport;
