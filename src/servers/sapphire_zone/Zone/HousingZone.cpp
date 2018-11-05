@@ -76,8 +76,9 @@ Core::HousingZone::~HousingZone()
 void Core::HousingZone::onPlayerZoneIn( Entity::Player& player )
 {
   auto pLog = g_fw.get< Logger >();
-  pLog->debug( "HousingZone::onPlayerZoneIn: Zone#" + std::to_string( getGuId() ) + "|"
-               ", Entity#" + std::to_string( player.getId() ) );
+  pLog->debug(
+    "HousingZone::onPlayerZoneIn: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryTypeId() ) +
+    ", Entity#" + std::to_string( player.getId() ) );
 
   uint32_t yardPacketNum;
   uint32_t yardPacketTotal = 8;
