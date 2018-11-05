@@ -10,7 +10,7 @@ namespace Core
   {
   public:
     HousingZone( uint8_t landSetId,
-                 uint16_t territoryId,
+                 uint16_t territoryTypeId,
                  uint32_t guId,
                  const std::string& internalName,
                  const std::string& contentName );

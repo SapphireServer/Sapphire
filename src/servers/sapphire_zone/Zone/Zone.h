@@ -30,11 +30,10 @@ struct InstanceContent;
 struct TerritoryType;
 }
 
-class Zone :
-  public CellHandler< Cell >, public std::enable_shared_from_this< Zone >
+class Zone : public CellHandler< Cell >, public std::enable_shared_from_this< Zone >
 {
 protected:
-  uint32_t m_territoryId;
+  uint32_t m_territoryTypeId;
   uint32_t m_guId;
 
   std::string m_placeName;
@@ -62,7 +61,7 @@ protected:
 public:
   Zone();
 
-  Zone( uint16_t territoryId, uint32_t guId, const std::string& internalName, const std::string& placeName );
+  Zone( uint16_t territoryTypeId, uint32_t guId, const std::string& internalName, const std::string& placeName );
 
   virtual ~Zone();
 
@@ -79,7 +78,7 @@ public:
 
   virtual void loadCellCache();
 
-  virtual uint32_t getTerritoryId() const;
+  virtual uint32_t getTerritoryTypeId() const;
 
   virtual void onBeforePlayerZoneIn( Entity::Player& player ) {};
 

@@ -112,11 +112,11 @@ public:
   /*! returns a ZonePositionPtr if found, else nullptr */
   ZonePositionPtr getTerritoryPosition( uint32_t territoryPositionId ) const;
 
-  /*! returns a default Zone by territoryId
+  /*! returns a default Zone by territoryTypeId
       TODO: Mind multiple instances?! */
-  ZonePtr getZoneByTerriId( uint32_t territoryId ) const;
+  ZonePtr getZoneByTerritoryTypeId( uint32_t territoryTypeId ) const;
 
-  bool movePlayer( uint32_t territoryId, Entity::PlayerPtr pPlayer );
+  bool movePlayer( uint32_t territoryTypeId, Entity::PlayerPtr pPlayer );
 
   bool movePlayer( ZonePtr, Entity::PlayerPtr pPlayer );
 
@@ -144,7 +144,7 @@ public:
 private:
   using TerritoryTypeDetailCache = std::unordered_map< uint16_t, Data::TerritoryTypePtr >;
   using InstanceIdToZonePtrMap = std::unordered_map< uint32_t, ZonePtr >;
-  using TerritoryIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToZonePtrMap >;
+  using TerritoryTypeIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToZonePtrMap >;
   using InstanceContentIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToZonePtrMap >;
   using PlayerIdToInstanceIdMap = std::unordered_map< uint32_t, uint32_t >;
   using PositionMap = std::unordered_map< int32_t, ZonePositionPtr >;
@@ -154,7 +154,7 @@ private:
   TerritoryTypeDetailCache m_territoryTypeDetailCacheMap;
 
   /*! map holding actual instances of default territories */
-  TerritoryIdToInstanceMap m_territoryIdToInstanceGuidMap;
+  TerritoryTypeIdToInstanceMap m_territoryTypeIdToInstanceGuidMap;
 
   /*! map holding actual instances of InstanceContent */
   InstanceContentIdToInstanceMap m_instanceContentToInstanceMap;

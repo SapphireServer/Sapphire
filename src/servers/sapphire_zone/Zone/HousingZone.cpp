@@ -22,14 +22,14 @@ using namespace Core::Network::Packets;
 using namespace Core::Network::Packets::Server;
 
 Core::HousingZone::HousingZone( uint8_t wardNum,
-                                uint16_t territoryId,
+                                uint16_t territoryTypeId,
                                 uint32_t guId,
                                 const std::string& internalName,
                                 const std::string& contentName ) :
-  Zone( territoryId, guId, internalName, contentName ),
+  Zone( territoryTypeId, guId, internalName, contentName ),
   m_wardNum( wardNum ),
-  m_zoneId( territoryId ),
-  m_landSetId( ( static_cast< uint32_t >( territoryId ) << 16 ) | wardNum )
+  m_zoneId( territoryTypeId ),
+  m_landSetId( ( static_cast< uint32_t >( territoryTypeId ) << 16 ) | wardNum )
 {
 
 }
@@ -60,7 +60,7 @@ bool Core::HousingZone::init()
   uint32_t landId;
   for( landId = 0; landId < 60; landId++ )
   {
-    auto pObject = make_Land( m_territoryId, getWardNum(), landId, m_landSetId, info );
+    auto pObject = make_Land( m_territoryTypeId, getWardNum(), landId, m_landSetId, info );
     pObject->setHouseSize( 1 );
     m_landPtrMap[ landId ] = pObject;
   }
@@ -105,7 +105,7 @@ void Core::HousingZone::sendLandSet( Entity::Player& player )
   auto landsetInitializePacket = makeZonePacket< FFXIVIpcLandSetInitialize >( player.getId() );
 
   landsetInitializePacket->data().landSetId = m_landSetId;
-  landsetInitializePacket->data().zoneId = m_territoryId;
+  landsetInitializePacket->data().zoneId = m_territoryTypeId;
   //TODO: get current WorldId
   landsetInitializePacket->data().worldId = 67;
   landsetInitializePacket->data().subInstance = isPlayerSubInstance( player ) == false ? 1 : 2;

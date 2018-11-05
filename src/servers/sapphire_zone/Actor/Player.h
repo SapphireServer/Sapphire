@@ -481,11 +481,11 @@ namespace Core::Entity
     /*! returns the player to their position before zoning into an instance */
     bool exitInstance();
 
-    /*! sets the players territoryId */
-    void setTerritoryId( uint32_t territoryId );
+    /*! sets the players territoryTypeId */
+    void setTerritoryTypeId( uint32_t territoryTypeId );
 
-    /*! gets the players territoryId */
-    uint32_t getTerritoryId() const;
+    /*! gets the players territoryTypeId */
+    uint32_t getTerritoryTypeId() const;
 
     void forceZoneing( uint32_t zoneId );
 

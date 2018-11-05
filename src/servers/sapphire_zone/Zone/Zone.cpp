@@ -48,7 +48,7 @@ extern Core::Framework g_fw;
 * \brief
 */
 Core::Zone::Zone() :
-  m_territoryId( 0 ),
+  m_territoryTypeId( 0 ),
   m_guId( 0 ),
   m_currentWeather( Weather::FairSkies ),
   m_weatherOverride( Weather::None ),
@@ -57,20 +57,20 @@ Core::Zone::Zone() :
 {
 }
 
-Core::Zone::Zone( uint16_t territoryId, uint32_t guId, const std::string& internalName, const std::string& placeName ) :
+Core::Zone::Zone( uint16_t territoryTypeId, uint32_t guId, const std::string& internalName, const std::string& placeName ) :
   m_currentWeather( Weather::FairSkies ),
   m_nextEObjId( 0x400D0000 )
 {
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
   m_guId = guId;
 
-  m_territoryId = territoryId;
+  m_territoryTypeId = territoryTypeId;
   m_internalName = internalName;
   m_placeName = placeName;
   m_lastMobUpdate = 0;
 
   m_weatherOverride = Weather::None;
-  m_territoryTypeInfo = pExdData->get< Core::Data::TerritoryType >( territoryId );
+  m_territoryTypeInfo = pExdData->get< Core::Data::TerritoryType >( territoryTypeId );
 
   loadWeatherRates();
 
@@ -281,7 +281,7 @@ void Core::Zone::queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t 
                                          Network::Packets::FFXIVPacketBasePtr pPacketEntry )
 {
   auto pTeriMgr = g_fw.get< TerritoryMgr >();
-  if( pTeriMgr->isPrivateTerritory( getTerritoryId() ) )
+  if( pTeriMgr->isPrivateTerritory( getTerritoryTypeId() ) )
     return;
 
   auto pServerZone = g_fw.get< ServerZone >();
@@ -306,9 +306,9 @@ void Core::Zone::queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t 
   }
 }
 
-uint32_t Core::Zone::getTerritoryId() const
+uint32_t Core::Zone::getTerritoryTypeId() const
 {
-  return m_territoryId;
+  return m_territoryTypeId;
 }
 
 uint32_t Core::Zone::getGuId() const
@@ -611,7 +611,7 @@ void Core::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
 
   auto pTeriMgr = g_fw.get< TerritoryMgr >();
   // TODO: make sure gms can overwrite this. Potentially temporary solution
-  if( pTeriMgr->isPrivateTerritory( getTerritoryId() ) )
+  if( pTeriMgr->isPrivateTerritory( getTerritoryTypeId() ) )
     return;
 
   auto iter = pCell->m_actors.begin();
@@ -661,7 +661,7 @@ void Core::Zone::onPlayerZoneIn( Entity::Player& player )
 {
   auto pLog = g_fw.get< Logger >();
   pLog->debug(
-    "Zone::onEnterTerritory: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryId() ) +
+    "Zone::onEnterTerritory: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryTypeId() ) +
     +", Entity#" + std::to_string( player.getId() ) );
 }
 
@@ -669,7 +669,7 @@ void Core::Zone::onLeaveTerritory( Entity::Player& player )
 {
   auto pLog = g_fw.get< Logger >();
   pLog->debug(
-    "Zone::onLeaveTerritory: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryId() ) +
+    "Zone::onLeaveTerritory: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryTypeId() ) +
     +", Entity#" + std::to_string( player.getId() ) );
 }
 

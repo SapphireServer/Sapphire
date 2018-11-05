@@ -450,7 +450,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
       }
       else
       {
-        auto pZone = pTeriMgr->getZoneByTerriId( param1 );
+        auto pZone = pTeriMgr->getZoneByTerritoryTypeId( param1 );
         if( !pZone )
         {
           player.sendUrgent( "No zone instance found for " + std::to_string( param1 ) );

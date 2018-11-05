@@ -50,12 +50,12 @@ void Core::Db::ZoneDbConnection::doPrepareStatements()
                     "CFPenaltyUntil = ?, Pose = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
 
 
-  prepareStatement( CHARA_SEL_MINIMAL, "SELECT Name, Customize, ModelMainWeapon, ModelSubWeapon, ModelEquip, TerritoryId, GuardianDeity, "
+  prepareStatement( CHARA_SEL_MINIMAL, "SELECT Name, Customize, ModelMainWeapon, ModelSubWeapon, ModelEquip, TerritoryType, GuardianDeity, "
                                        "Class, ContentId, BirthDay, BirthMonth, EquipDisplayFlags "
                                        "FROM charainfo WHERE CharacterId = ?;", CONNECTION_SYNC );
 
   prepareStatement( CHARA_INS, "INSERT INTO charainfo (AccountId, CharacterId, ContentId, Name, Hp, Mp, "
-                               "Customize, Voice, IsNewGame, TerritoryId, PosX, PosY, PosZ, PosR, ModelEquip, "
+                               "Customize, Voice, IsNewGame, TerritoryType, PosX, PosY, PosZ, PosR, ModelEquip, "
                                "IsNewAdventurer, GuardianDeity, Birthday, BirthMonth, Class, Status, FirstClass, "
                                "HomePoint, StartTown, Discovery, HowTo, QuestCompleteFlags, Unlocks, QuestTracking, "
                                "Aetheryte, GMRank, Mounts, Orchestrion, UPDATE_DATE ) "

@@ -108,7 +108,7 @@ bool Core::TerritoryMgr::createDefaultTerritories()
   // for each entry in territoryTypeExd, check if it is a normal and if so, add the zone object
   for( const auto& territory : m_territoryTypeDetailCacheMap )
   {
-    auto territoryId = territory.first;
+    auto territoryTypeId = territory.first;
     auto territoryInfo = territory.second;
 
     // if the zone has no name set
@@ -117,24 +117,24 @@ bool Core::TerritoryMgr::createDefaultTerritories()
 
     auto pPlaceName = pExdData->get< Core::Data::PlaceName >( territoryInfo->placeName );
 
-    if( !pPlaceName || pPlaceName->name.empty() || !isDefaultTerritory( territoryId ) )
+    if( !pPlaceName || pPlaceName->name.empty() || !isDefaultTerritory( territoryTypeId ) )
       continue;
 
     uint32_t guid = getNextInstanceId();
-    pLog->info( std::to_string( territoryId ) +
+    pLog->info( std::to_string( territoryTypeId ) +
                 "\t" + std::to_string( guid ) +
                 "\t" + std::to_string( territoryInfo->territoryIntendedUse ) +
                 "\t" + ( territoryInfo->name.length() <= 4 ? territoryInfo->name + "\t" : territoryInfo->name ) +
-                "\t" + ( isPrivateTerritory( territoryId ) ? "PRIVATE" : "PUBLIC" ) +
+                "\t" + ( isPrivateTerritory( territoryTypeId ) ? "PRIVATE" : "PUBLIC" ) +
                 "\t" + pPlaceName->name );
 
-    auto pZone = make_Zone( territoryId, guid, territoryInfo->name, pPlaceName->name );
+    auto pZone = make_Zone( territoryTypeId, guid, territoryInfo->name, pPlaceName->name );
     pZone->init();
 
     InstanceIdToZonePtrMap instanceMap;
     instanceMap[ guid ] = pZone;
     m_instanceIdToZonePtrMap[ guid ] = pZone;
-    m_territoryIdToInstanceGuidMap[ territoryId ] = instanceMap;
+    m_territoryTypeIdToInstanceGuidMap[ territoryTypeId ] = instanceMap;
     m_zoneSet.insert( { pZone } );
 
   }
@@ -149,7 +149,7 @@ bool Core::TerritoryMgr::createHousingTerritories()
   auto pLog = g_fw.get< Logger >();
   for( const auto& territory : m_territoryTypeDetailCacheMap )
   {
-    auto territoryId = territory.first;
+    auto territoryTypeId = territory.first;
     auto territoryInfo = territory.second;
     uint32_t wardNum;
     uint32_t wardMaxNum = 1;
@@ -159,13 +159,13 @@ bool Core::TerritoryMgr::createHousingTerritories()
 
     auto pPlaceName = pExdData->get< Core::Data::PlaceName >( territoryInfo->placeName );
 
-    if( !pPlaceName || pPlaceName->name.empty() || !isHousingTerritory( territoryId ) )
+    if( !pPlaceName || pPlaceName->name.empty() || !isHousingTerritory( territoryTypeId ) )
       continue;
 
     for( wardNum = 0; wardNum < wardMaxNum; wardNum++ )
     {
       uint32_t guid = getNextInstanceId();
-      pLog->info( std::to_string( territoryId ) +
+      pLog->info( std::to_string( territoryTypeId ) +
                   "\t" + std::to_string( guid ) +
                   "\t" + std::to_string( territoryInfo->territoryIntendedUse ) +
                   "\t" + ( territoryInfo->name.length() <= 4 ? territoryInfo->name + "\t" : territoryInfo->name ) +
@@ -173,14 +173,14 @@ bool Core::TerritoryMgr::createHousingTerritories()
                   "\t" + pPlaceName->name +
                   "#" + std::to_string( wardNum ) );
 
-      auto pHousingZone = make_HousingZone( wardNum, territoryId, guid, territoryInfo->name, pPlaceName->name );
+      auto pHousingZone = make_HousingZone( wardNum, territoryTypeId, guid, territoryInfo->name, pPlaceName->name );
       pHousingZone->init();
       wardMaxNum = 18;
 
       InstanceIdToZonePtrMap instanceMap;
       instanceMap[ guid ] = pHousingZone;
       m_instanceIdToZonePtrMap[ guid ] = pHousingZone;
-      m_territoryIdToInstanceGuidMap[ territoryId ][ guid ] = pHousingZone;
+      m_territoryTypeIdToInstanceGuidMap[ territoryTypeId ][ guid ] = pHousingZone;
       m_zoneSet.insert( { pHousingZone } );
     }
 
@@ -212,7 +212,7 @@ Core::ZonePtr Core::TerritoryMgr::createTerritoryInstance( uint32_t territoryTyp
   pZone->init();
 
   m_instanceIdToZonePtrMap[ pZone->getGuId() ] = pZone;
-  m_territoryIdToInstanceGuidMap[ pZone->getTerritoryId() ][ pZone->getGuId() ] = pZone;
+  m_territoryTypeIdToInstanceGuidMap[ pZone->getTerritoryTypeId() ][ pZone->getGuId() ] = pZone;
   m_zoneSet.insert( { pZone } );
 
   return pZone;
@@ -265,13 +265,13 @@ bool Core::TerritoryMgr::removeTerritoryInstance( uint32_t instanceId )
   m_instanceZoneSet.erase( pZone );
   m_zoneSet.erase( pZone );
 
-  if( isInstanceContentTerritory( pZone->getTerritoryId() ) )
+  if( isInstanceContentTerritory( pZone->getTerritoryTypeId() ) )
   {
     auto instance = std::dynamic_pointer_cast< InstanceContent >( pZone );
     m_instanceContentToInstanceMap[ instance->getInstanceContentId() ].erase( pZone->getGuId() );
   }
   else
-    m_territoryIdToInstanceGuidMap[ pZone->getTerritoryId() ].erase( pZone->getGuId() );
+    m_territoryTypeIdToInstanceGuidMap[ pZone->getTerritoryTypeId() ].erase( pZone->getGuId() );
 
 
   return true;
@@ -340,10 +340,10 @@ Core::ZonePositionPtr Core::TerritoryMgr::getTerritoryPosition( uint32_t territo
   return nullptr;
 }
 
-Core::ZonePtr Core::TerritoryMgr::getZoneByTerriId( uint32_t territoryId ) const
+Core::ZonePtr Core::TerritoryMgr::getZoneByTerritoryTypeId( uint32_t territoryTypeId ) const
 {
-  auto zoneMap = m_territoryIdToInstanceGuidMap.find( territoryId );
-  if( zoneMap == m_territoryIdToInstanceGuidMap.end() )
+  auto zoneMap = m_territoryTypeIdToInstanceGuidMap.find( territoryTypeId );
+  if( zoneMap == m_territoryTypeIdToInstanceGuidMap.end() )
     return nullptr;
 
   // TODO: actually select the proper one
@@ -378,9 +378,9 @@ Core::TerritoryMgr::InstanceIdList Core::TerritoryMgr::getInstanceContentIdList(
   return idList;
 }
 
-bool Core::TerritoryMgr::movePlayer( uint32_t territoryId, Core::Entity::PlayerPtr pPlayer )
+bool Core::TerritoryMgr::movePlayer( uint32_t territoryTypeId, Core::Entity::PlayerPtr pPlayer )
 {
-  auto pZone = getZoneByTerriId( territoryId );
+  auto pZone = getZoneByTerritoryTypeId( territoryTypeId );
   assert( pZone );
   return movePlayer( pZone, pPlayer );
 }
@@ -396,7 +396,7 @@ bool Core::TerritoryMgr::movePlayer( ZonePtr pZone, Core::Entity::PlayerPtr pPla
 
   pPlayer->initSpawnIdQueue();
 
-  pPlayer->setTerritoryId( pZone->getTerritoryId() );
+  pPlayer->setTerritoryTypeId( pZone->getTerritoryTypeId() );
 
   // mark character as zoning in progress
   pPlayer->setLoadingComplete( false );

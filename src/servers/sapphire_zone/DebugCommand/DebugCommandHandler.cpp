@@ -535,7 +535,7 @@ void Core::DebugCommandHandler::get( char* data, Entity::Player& player, std::sh
   if( ( subCommand == "pos" ) )
   {
 
-    int16_t map_id = pExdData->get< Core::Data::TerritoryType >( player.getCurrentZone()->getTerritoryId() )->map;
+    int16_t map_id = pExdData->get< Core::Data::TerritoryType >( player.getCurrentZone()->getTerritoryTypeId() )->map;
 
     player.sendNotice( "Pos:\n" +
                        std::to_string( player.getPos().x ) + "\n" +
@@ -543,7 +543,7 @@ void Core::DebugCommandHandler::get( char* data, Entity::Player& player, std::sh
                        std::to_string( player.getPos().z ) + "\n" +
                        std::to_string( player.getRot() ) + "\nMapId: " +
                        std::to_string( map_id ) + "\nZoneID: " +
-                       std::to_string( player.getCurrentZone()->getTerritoryId() ) + "\n" );
+                       std::to_string( player.getCurrentZone()->getTerritoryTypeId() ) + "\n" );
   }
   else
   {
