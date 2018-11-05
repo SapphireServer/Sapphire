@@ -348,7 +348,7 @@ void Core::Network::GameConnection::zoneLineHandler( const Core::Network::Packet
     targetPos.x = 0;
     targetPos.y = 0;
     targetPos.z = 0;
-    targetZone = pZone->getTerritoryId();
+    targetZone = pZone->getTerritoryTypeId();
   }
 
   player.performZoning( targetZone, targetPos, rotation );
@@ -471,7 +471,7 @@ void Core::Network::GameConnection::socialListHandler( const Core::Network::Pack
     int32_t entrysizes = sizeof( listPacket->data().entries );
     memset( listPacket->data().entries, 0, sizeof( listPacket->data().entries ) );
 
-    listPacket->data().entries[ 0 ].bytes[ 2 ] = player.getCurrentZone()->getTerritoryId();
+    listPacket->data().entries[ 0 ].bytes[ 2 ] = player.getCurrentZone()->getTerritoryTypeId();
     listPacket->data().entries[ 0 ].bytes[ 3 ] = 0x80;
     listPacket->data().entries[ 0 ].bytes[ 4 ] = 0x02;
     listPacket->data().entries[ 0 ].bytes[ 6 ] = 0x3B;
@@ -479,7 +479,7 @@ void Core::Network::GameConnection::socialListHandler( const Core::Network::Pack
     listPacket->data().entries[ 0 ].classJob = static_cast< uint8_t >( player.getClass() );
     listPacket->data().entries[ 0 ].contentId = player.getContentId();
     listPacket->data().entries[ 0 ].level = player.getLevel();
-    listPacket->data().entries[ 0 ].zoneId = player.getCurrentZone()->getTerritoryId();
+    listPacket->data().entries[ 0 ].zoneId = player.getCurrentZone()->getTerritoryTypeId();
     listPacket->data().entries[ 0 ].zoneId1 = 0x0100;
     // TODO: no idea what this does
     //listPacket.data().entries[0].one = 1;

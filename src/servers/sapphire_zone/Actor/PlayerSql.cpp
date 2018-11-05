@@ -49,9 +49,8 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
   auto name = res->getString( "Name" );
   strcpy( m_name, name.c_str() );
 
-  auto zoneId = res->getUInt( "TerritoryId" );
-  m_prevZoneId = res->getUInt( "OTerritoryId" );
-  m_prevZoneType = res->getUInt( "OTerritoryType" );
+  auto zoneId = res->getUInt( "TerritoryType" );
+  m_prevZoneId = res->getUInt( "OTerritoryType" );
 
   // Position
   m_pos.x = res->getFloat( "PosX" );
@@ -79,12 +78,12 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
       m_pos.y = m_prevPos.y;
       m_pos.z = m_prevPos.z;
       setRot( m_prevRot );
-      pCurrZone = pTeriMgr->getZoneByTerriId( zoneId );
+      pCurrZone = pTeriMgr->getZoneByTerritoryTypeId( zoneId );
     }
   }
   else
   {
-    pCurrZone = pTeriMgr->getZoneByTerriId( zoneId );
+    pCurrZone = pTeriMgr->getZoneByTerritoryTypeId( zoneId );
   }
 
   m_zoneId = zoneId;
@@ -98,7 +97,7 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
 
     // default to new gridania
     // TODO: should probably just abort and mark character as corrupt
-    pCurrZone = pTeriMgr->getZoneByTerriId( 132 );
+    pCurrZone = pTeriMgr->getZoneByTerritoryTypeId( 132 );
 
     m_pos.x = 0.0f;
     m_pos.y = 0.0f;
@@ -365,15 +364,15 @@ void Core::Entity::Player::updateSql()
   stmt->setInt( 16, static_cast< uint32_t >( m_bNewGame ) );
   stmt->setInt( 17, static_cast< uint32_t >( m_bNewAdventurer ) );
 
-  stmt->setInt( 18, 0 ); // TerritoryType
-  stmt->setInt( 19, m_zoneId ); // TerritoryId
+  stmt->setInt( 18, m_zoneId ); // TerritoryType
+  stmt->setInt( 19, 0 ); // TerritoryId
   stmt->setDouble( 20, m_pos.x );
   stmt->setDouble( 21, m_pos.y );
   stmt->setDouble( 22, m_pos.z );
   stmt->setDouble( 23, getRot() );
 
-  stmt->setInt( 24, m_prevZoneType ); // OTerritoryType
-  stmt->setInt( 25, m_prevZoneId ); // OTerritoryId
+  stmt->setInt( 24, m_prevZoneId ); // OTerritoryType
+  stmt->setInt( 25, m_prevZoneType ); // OTerritoryId
   stmt->setDouble( 26, m_prevPos.x );
   stmt->setDouble( 27, m_prevPos.y );
   stmt->setDouble( 28, m_prevPos.z );

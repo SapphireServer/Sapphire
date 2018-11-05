@@ -64,7 +64,7 @@ void PlayerMinimal::load( uint32_t charId )
   m_guardianDeity = res->getUInt8( "GuardianDeity" );
   m_class = res->getUInt8( "Class" );
   m_contentId = res->getUInt64( "ContentId" );
-  m_zoneId = res->getUInt16( "TerritoryId" );
+  m_zoneId = res->getUInt16( "TerritoryType" );
 
   res.reset();
 
@@ -245,7 +245,7 @@ void PlayerMinimal::saveAsNew()
   }
 
   //        "(AccountId, CharacterId, ContentId, Name, Hp, Mp, "
-  //        "Customize, Voice, IsNewGame, TerritoryId, PosX, PosY, PosZ, PosR, ModelEquip, "
+  //        "Customize, Voice, IsNewGame, TerritoryType, PosX, PosY, PosZ, PosR, ModelEquip, "
   //        "IsNewAdventurer, GuardianDeity, Birthday, BirthMonth, Class, Status, FirstClass, "
   //        "HomePoint, StartTown, Discovery, HowTo, QuestCompleteFlags, Unlocks, QuestTracking, "
   //        "Aetheryte, GMRank, UPDATE_DATE )

@@ -423,7 +423,7 @@ bool Core::Entity::Player::setInstance( ZonePtr instance )
   auto pTeriMgr = g_fw.get< TerritoryMgr >();
 
   // zoning within the same zone won't cause the prev data to be overwritten
-  if( instance->getTerritoryId() != m_zoneId )
+  if( instance->getTerritoryTypeId() != m_zoneId )
   {
     m_prevPos = m_pos;
     m_prevRot = m_rot;
@@ -519,7 +519,7 @@ void Core::Entity::Player::discover( int16_t map_id, int16_t sub_id )
   int32_t offset = 4;
 
   auto info = pExdData->get< Core::Data::Map >(
-    pExdData->get< Core::Data::TerritoryType >( getCurrentZone()->getTerritoryId() )->map );
+    pExdData->get< Core::Data::TerritoryType >( getCurrentZone()->getTerritoryTypeId() )->map );
   if( info->discoveryArrayByte )
     offset = 5 + 2 * info->discoveryIndex;
   else
@@ -993,7 +993,7 @@ void Core::Entity::Player::update( int64_t currTime )
   if( m_queuedZoneing && ( currTime - m_queuedZoneing->m_queueTime ) > 800 )
   {
     Common::FFXIVARR_POSITION3 targetPos = m_queuedZoneing->m_targetPosition;
-    if( getCurrentZone()->getTerritoryId() != m_queuedZoneing->m_targetZone )
+    if( getCurrentZone()->getTerritoryTypeId() != m_queuedZoneing->m_targetZone )
     {
       performZoning( m_queuedZoneing->m_targetZone, targetPos, m_queuedZoneing->m_targetRotation );
     }
@@ -1502,12 +1502,12 @@ void Core::Entity::Player::setEorzeaTimeOffset( uint64_t timestamp )
   queuePacket( packet );
 }
 
-void Core::Entity::Player::setTerritoryId( uint32_t territoryId )
+void Core::Entity::Player::setTerritoryTypeId( uint32_t territoryTypeId )
 {
-  m_zoneId = territoryId;
+  m_zoneId = territoryTypeId;
 }
 
-uint32_t Core::Entity::Player::getTerritoryId() const
+uint32_t Core::Entity::Player::getTerritoryTypeId() const
 {
   return m_zoneId;
 }
@@ -1559,7 +1559,7 @@ void Core::Entity::Player::sendZonePackets()
   }
 
   auto initZonePacket = makeZonePacket< FFXIVIpcInitZone >( getId() );
-  initZonePacket->data().zoneId = getCurrentZone()->getTerritoryId();
+  initZonePacket->data().zoneId = getCurrentZone()->getTerritoryTypeId();
   initZonePacket->data().weatherId = static_cast< uint8_t >( getCurrentZone()->getCurrentWeather() );
   initZonePacket->data().bitmask = 0x1; //Setting this to 16 (deciaml) makes it so you can fly in the area (more research needed!)
   initZonePacket->data().unknown5 = 0x2A;
