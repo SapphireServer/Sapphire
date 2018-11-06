@@ -100,6 +100,29 @@ bool Core::TerritoryMgr::isPrivateTerritory( uint32_t territoryTypeId ) const
          pTeri->territoryIntendedUse == TerritoryIntendedUse::MSQPrivateArea;
 }
 
+bool Core::TerritoryMgr::isDefaultTerritory( uint32_t territoryTypeId ) const
+{
+  auto pTeri = getTerritoryDetail( territoryTypeId );
+
+  if( !pTeri )
+    return false;
+
+  return pTeri->territoryIntendedUse == TerritoryIntendedUse::Inn ||
+         pTeri->territoryIntendedUse == TerritoryIntendedUse::Town ||
+         pTeri->territoryIntendedUse == TerritoryIntendedUse::OpenWorld ||
+         pTeri->territoryIntendedUse == TerritoryIntendedUse::OpeningArea;
+
+}
+
+bool Core::TerritoryMgr::isHousingTerritory( uint32_t territoryTypeId ) const
+{
+  auto pTeri = getTerritoryDetail( territoryTypeId );
+
+  if( !pTeri )
+    return false;
+
+  return pTeri->territoryIntendedUse == TerritoryIntendedUse::HousingArea;
+}
 
 bool Core::TerritoryMgr::createDefaultTerritories()
 {
@@ -181,6 +204,7 @@ bool Core::TerritoryMgr::createHousingTerritories()
       instanceMap[ guid ] = pHousingZone;
       m_instanceIdToZonePtrMap[ guid ] = pHousingZone;
       m_territoryTypeIdToInstanceGuidMap[ territoryTypeId ][ guid ] = pHousingZone;
+      m_landSetIdToZonePtrMap[ pHousingZone->getLandSetId() ] = pHousingZone;
       m_zoneSet.insert( { pHousingZone } );
     }
 
@@ -306,30 +330,6 @@ void Core::TerritoryMgr::loadTerritoryPositionMap()
   }
 }
 
-bool Core::TerritoryMgr::isDefaultTerritory( uint32_t territoryTypeId ) const
-{
-  auto pTeri = getTerritoryDetail( territoryTypeId );
-
-  if( !pTeri )
-    return false;
-
-  return pTeri->territoryIntendedUse == TerritoryIntendedUse::Inn ||
-         pTeri->territoryIntendedUse == TerritoryIntendedUse::Town ||
-         pTeri->territoryIntendedUse == TerritoryIntendedUse::OpenWorld ||
-         pTeri->territoryIntendedUse == TerritoryIntendedUse::OpeningArea;
-
-}
-
-bool Core::TerritoryMgr::isHousingTerritory( uint32_t territoryTypeId ) const
-{
-  auto pTeri = getTerritoryDetail( territoryTypeId );
-
-  if( !pTeri )
-    return false;
-
-  return pTeri->territoryIntendedUse == TerritoryIntendedUse::HousingArea;
-}
-
 Core::ZonePositionPtr Core::TerritoryMgr::getTerritoryPosition( uint32_t territoryPositionId ) const
 {
   auto it = m_territoryPositionMap.find( territoryPositionId );
@@ -348,6 +348,15 @@ Core::ZonePtr Core::TerritoryMgr::getZoneByTerritoryTypeId( uint32_t territoryTy
 
   // TODO: actually select the proper one
   return zoneMap->second.begin()->second;
+}
+
+Core::ZonePtr Core::TerritoryMgr::getZoneByLandSetId( uint32_t landSetId ) const
+{
+  auto zoneMap = m_landSetIdToZonePtrMap.find( landSetId );
+  if( zoneMap == m_landSetIdToZonePtrMap.end() )
+    return nullptr;
+
+  return zoneMap->second;
 }
 
 void Core::TerritoryMgr::updateTerritoryInstances( uint32_t currentTime )
@@ -398,6 +407,17 @@ bool Core::TerritoryMgr::movePlayer( ZonePtr pZone, Core::Entity::PlayerPtr pPla
 
   pPlayer->setTerritoryTypeId( pZone->getTerritoryTypeId() );
 
+  if( isHousingTerritory( pZone->getTerritoryTypeId() ) )
+  {
+    auto pHousing = std::dynamic_pointer_cast< HousingZone >( pZone );
+    if( pHousing )  
+      pPlayer->setTerritoryId( pHousing->getLandSetId() );
+  }  
+  else
+  {
+    pPlayer->setTerritoryId( 0 );
+  }
+  
   // mark character as zoning in progress
   pPlayer->setLoadingComplete( false );
 
