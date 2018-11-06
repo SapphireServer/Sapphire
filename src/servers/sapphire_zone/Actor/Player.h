@@ -998,6 +998,7 @@ namespace Core::Entity
     bool m_bAutoattack;
 
     Common::ZoneingType m_zoningType;
+    uint16_t m_territoryId;
 
     bool m_bMarkedForZoning;
     bool m_bNewAdventurer;

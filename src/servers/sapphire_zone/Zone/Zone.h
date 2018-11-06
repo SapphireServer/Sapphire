@@ -16,7 +16,8 @@
 #include <stdio.h>
 #include <string.h>
 
-namespace Core {
+namespace Core 
+{
 
 class Session;
 
@@ -25,9 +26,10 @@ class ZonePosition;
 using SessionSet = std::set< SessionPtr >;
 using FestivalPair = std::pair< uint16_t, uint16_t >;
 
-namespace Data {
-struct InstanceContent;
-struct TerritoryType;
+namespace Data 
+{
+  struct InstanceContent;
+  struct TerritoryType;
 }
 
 class Zone : public CellHandler< Cell >, public std::enable_shared_from_this< Zone >

@@ -50,6 +50,7 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
   strcpy( m_name, name.c_str() );
 
   auto zoneId = res->getUInt( "TerritoryType" );
+  m_territoryId = res->getUInt( "TerritoryId" );
   m_prevZoneId = res->getUInt( "OTerritoryType" );
 
   // Position
@@ -365,7 +366,7 @@ void Core::Entity::Player::updateSql()
   stmt->setInt( 17, static_cast< uint32_t >( m_bNewAdventurer ) );
 
   stmt->setInt( 18, m_zoneId ); // TerritoryType
-  stmt->setInt( 19, 0 ); // TerritoryId
+  stmt->setInt( 19, m_territoryId ); // TerritoryId
   stmt->setDouble( 20, m_pos.x );
   stmt->setDouble( 21, m_pos.y );
   stmt->setDouble( 22, m_pos.z );
