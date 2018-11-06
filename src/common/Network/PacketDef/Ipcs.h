@@ -193,7 +193,7 @@ namespace Core::Network::Packets
     LandPermission = 0x0229, // updated 4.4
     LandSetYardInitialize = 0x022C, // updated 4.4
     YardObjectMove = 0x0230, // updated 4.4
-    LandSetExtending = 0x0251, // updated 4.4
+    LandSetMap = 0x0251, // updated 4.4
 
     SharedEstateSettingsResponse = 0x023C, // updated 4.4
 

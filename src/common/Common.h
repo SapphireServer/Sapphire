@@ -393,6 +393,7 @@ namespace Core::Common
       c.UI8E = 0;
       c.UI8F = 0;
       c.padding = 0;
+      c.padding1 = 0;
     }
 
 
@@ -760,10 +761,10 @@ namespace Core::Common
 
   struct HousePermissionSet
   {
-    uint16_t landSetId; //00
-    uint16_t wardNum; //02
-    uint16_t zoneId; //04
-    uint16_t worldId; //06
+    int16_t landSetId; //00
+    int16_t wardNum; //02
+    int16_t zoneId; //04
+    int16_t worldId; //06
     uint32_t permissionMask; //08
     uint32_t unkown1; //12
   };
