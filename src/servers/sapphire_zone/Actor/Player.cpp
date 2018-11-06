@@ -121,6 +121,16 @@ uint16_t Core::Entity::Player::getZoneId() const
   return m_zoneId;
 }
 
+uint16_t Core::Entity::Player::getTerritoryId() const
+{
+  return m_territoryId;
+}
+
+void Core::Entity::Player::setTerritoryId( uint16_t territoryId )
+{
+  m_territoryId = territoryId;
+}
+
 uint8_t Core::Entity::Player::getGmRank() const
 {
   return m_gmRank;

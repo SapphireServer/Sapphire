@@ -777,6 +777,9 @@ namespace Core::Entity
 
     uint16_t getZoneId() const;
 
+    uint16_t getTerritoryId() const;
+    void setTerritoryId( uint16_t territoryId );
+
     uint8_t getGmRank() const;
 
     void setGmRank( uint8_t rank );
