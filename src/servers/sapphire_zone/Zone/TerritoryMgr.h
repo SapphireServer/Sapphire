@@ -5,18 +5,20 @@
 #include <set>
 #include <unordered_map>
 
-namespace Core {
-namespace Data {
-// TODO: this should actually not be here but should be generated in exdData aswell
-struct PlaceName;
-struct TerritoryType;
-struct InstanceContent;
+namespace Core::Data 
+{
+  // TODO: this should actually not be here but should be generated in exdData aswell
+  struct PlaceName;
+  struct TerritoryType;
+  struct InstanceContent;
 
-using PlaceNamePtr = std::shared_ptr< PlaceName >;
-using TerritoryTypePtr = std::shared_ptr< TerritoryType >;
-using InstanceContentPtr = std::shared_ptr< InstanceContent >;
+  using PlaceNamePtr = std::shared_ptr< PlaceName >;
+  using TerritoryTypePtr = std::shared_ptr< TerritoryType >;
+  using InstanceContentPtr = std::shared_ptr< InstanceContent >;
 }
 
+namespace Core
+{
 /*!
    \class TerritoryMgr_c
    \brief A class managing zones
@@ -115,6 +117,9 @@ public:
   /*! returns a default Zone by territoryTypeId
       TODO: Mind multiple instances?! */
   ZonePtr getZoneByTerritoryTypeId( uint32_t territoryTypeId ) const;
+  
+  /*! returns a Zone by landSetId */
+  ZonePtr getZoneByLandSetId( uint32_t landSetId ) const;
 
   bool movePlayer( uint32_t territoryTypeId, Entity::PlayerPtr pPlayer );
 
@@ -144,6 +149,7 @@ public:
 private:
   using TerritoryTypeDetailCache = std::unordered_map< uint16_t, Data::TerritoryTypePtr >;
   using InstanceIdToZonePtrMap = std::unordered_map< uint32_t, ZonePtr >;
+  using LandSetIdToZonePtrMap = std::unordered_map< uint32_t, ZonePtr >;
   using TerritoryTypeIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToZonePtrMap >;
   using InstanceContentIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToZonePtrMap >;
   using PlayerIdToInstanceIdMap = std::unordered_map< uint32_t, uint32_t >;
@@ -155,6 +161,9 @@ private:
 
   /*! map holding actual instances of default territories */
   TerritoryTypeIdToInstanceMap m_territoryTypeIdToInstanceGuidMap;
+
+  /*! map holding actual instances of default territories */
+  LandSetIdToZonePtrMap m_landSetIdToZonePtrMap;
 
   /*! map holding actual instances of InstanceContent */
   InstanceContentIdToInstanceMap m_instanceContentToInstanceMap;

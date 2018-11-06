@@ -82,6 +82,10 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
       pCurrZone = pTeriMgr->getZoneByTerritoryTypeId( zoneId );
     }
   }
+  else if( pTeriMgr->isHousingTerritory( zoneId ) )
+  {
+    pCurrZone = pTeriMgr->getZoneByLandSetId( m_territoryId );
+  }
   else
   {
     pCurrZone = pTeriMgr->getZoneByTerritoryTypeId( zoneId );
