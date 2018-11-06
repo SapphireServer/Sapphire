@@ -777,8 +777,8 @@ namespace Core::Entity
 
     uint16_t getZoneId() const;
 
-    uint16_t getTerritoryId() const;
-    void setTerritoryId( uint16_t territoryId );
+    uint32_t getTerritoryId() const;
+    void setTerritoryId( uint32_t territoryId );
 
     uint8_t getGmRank() const;
 
@@ -1001,7 +1001,7 @@ namespace Core::Entity
     bool m_bAutoattack;
 
     Common::ZoneingType m_zoningType;
-    uint16_t m_territoryId;
+    uint32_t m_territoryId;
 
     bool m_bMarkedForZoning;
     bool m_bNewAdventurer;

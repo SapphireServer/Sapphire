@@ -121,12 +121,12 @@ uint16_t Core::Entity::Player::getZoneId() const
   return m_zoneId;
 }
 
-uint16_t Core::Entity::Player::getTerritoryId() const
+uint32_t Core::Entity::Player::getTerritoryId() const
 {
   return m_territoryId;
 }
 
-void Core::Entity::Player::setTerritoryId( uint16_t territoryId )
+void Core::Entity::Player::setTerritoryId( uint32_t territoryId )
 {
   m_territoryId = territoryId;
 }
@@ -1580,6 +1580,8 @@ void Core::Entity::Player::sendZonePackets()
   initZonePacket->data().pos.z = getPos().z;
   queuePacket( initZonePacket );
 
+  getCurrentZone()->onPlayerZoneIn( *this );
+
   if( isLogin() )
   {
     auto unk322 = makeZonePacket< FFXIVARR_IPC_UNK322 >( getId() );
@@ -1591,8 +1593,6 @@ void Core::Entity::Player::sendZonePackets()
 
   if( getLastPing() == 0 )
     sendQuestInfo();
-
-  getCurrentZone()->onPlayerZoneIn( *this );
 
   m_bMarkedForZoning = false;
 }
