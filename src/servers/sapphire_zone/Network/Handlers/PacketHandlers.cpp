@@ -433,6 +433,7 @@ void Core::Network::GameConnection::pingHandler( const Core::Network::Packets::F
 void Core::Network::GameConnection::finishLoadingHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                           Entity::Player& player )
 {
+  player.sendQuestInfo();
   player.getCurrentZone()->onFinishLoading( player );
 
   // player is done zoning

@@ -1634,8 +1634,8 @@ void Core::Entity::Player::sendZonePackets()
     queuePacket( unk320 );
   }
 
-  if( getLastPing() == 0 )
-    sendQuestInfo();
+//  if( getLastPing() == 0 )
+//    sendQuestInfo();
 
   m_bMarkedForZoning = false;
 }
