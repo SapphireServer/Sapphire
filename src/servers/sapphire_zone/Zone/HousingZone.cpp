@@ -99,6 +99,16 @@ void Core::HousingZone::onPlayerZoneIn( Entity::Player& player )
     player.queuePacket( landsetYardInitializePacket );
   }
 
+  auto landSetMap = makeZonePacket< FFXIVIpcLandSetMap >( player.getId() );
+  landSetMap->data().subdivision = isPlayerSubInstance( player ) == false ? 1 : 2;
+  uint8_t startIndex = isPlayerSubInstance( player ) == false ? 0 : 30;
+  for( uint8_t i = startIndex, count = 0; i < ( startIndex + 30 ); i++, count++ )
+  {
+    landSetMap->data().landInfo[ count ].status = 1;
+    //memcpy( , &getLand( i )->getLand(), sizeof( Common::LandStruct ) );
+  }
+  player.queuePacket( landSetMap );
+
 }
 
 void Core::HousingZone::sendLandSet( Entity::Player& player )

@@ -750,7 +750,8 @@ struct FFXIVIpcInitZone : FFXIVIpcBasePacket< InitZone >
   uint32_t unknown3;
   uint32_t unknown4;
   uint8_t weatherId;
-  uint16_t bitmask;
+  uint8_t bitmask;
+  uint8_t bitmask1;
   uint8_t unknown5;
   uint16_t festivalId;
   uint16_t additionalFestivalId;
@@ -1339,7 +1340,7 @@ struct FFXIVIpcQuestUpdate :
 struct FFXIVIpcQuestCompleteList :
   FFXIVIpcBasePacket< QuestCompleteList >
 {
-  uint8_t questCompleteMask[396];
+  uint8_t questCompleteMask[480];
   uint8_t unknownCompleteMask[32];
 };
 
@@ -1604,15 +1605,18 @@ struct FFXIVIpcLandPriceUpdate :  FFXIVIpcBasePacket< LandPriceUpdate >
   uint32_t timeLeft;
 };
 
-struct FFXIVIpcLandSetExtend : FFXIVIpcBasePacket< LandSetExtending >
+struct FFXIVIpcLandSetMap : FFXIVIpcBasePacket< LandSetMap >
 {
+  uint8_t u1;
+  uint8_t subdivision;
+  uint8_t u3;
   struct
   {
-    uint8_t houseSize;
-    uint8_t houseState;
-    uint8_t iconColor;
-    uint8_t iconIconAdd;
-  } landset[30];
+    uint8_t status;
+    uint8_t size;
+    uint8_t isPrivate;
+  } landInfo[ 30 ];
+  uint8_t padding[ 3 ];
 };
 
 struct FFXIVIpcLandSetInitialize : FFXIVIpcBasePacket< LandSetInitialize >
