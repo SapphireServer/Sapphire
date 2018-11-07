@@ -58,6 +58,7 @@ namespace Core
     uint32_t getMaxItems();
 
     uint32_t getCurrentPrice() const;
+    uint32_t getDevaluationTime();
 
   private:
     uint16_t convertItemIdToHousingItemId( uint16_t itemId );
@@ -79,6 +80,7 @@ namespace Core
     //price
     uint32_t m_initPrice;
     uint32_t m_nextDrop;
+    uint32_t m_devaluationTime;
     uint32_t m_currentPrice;
   };
 

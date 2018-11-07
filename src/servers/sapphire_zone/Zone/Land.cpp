@@ -237,6 +237,11 @@ uint32_t Core::Land::getMaxItems()
   return m_maxItems;
 }
 
+uint32_t Core::Land::getDevaluationTime()
+{
+  return m_devaluationTime;
+}
+
 void Core::Land::init()
 {
 
@@ -269,18 +274,23 @@ void Core::Land::UpdateDatabase()
 
 void Core::Land::Update( uint32_t currTime )
 {
-  if( m_currentPrice == 0 && getState() == HouseState::forSale )
+  if( getState() == HouseState::forSale )
   {
-    m_currentPrice = m_initPrice;
-    m_nextDrop = 0;
+    if( m_nextDrop < currTime )
+    {
+      m_nextDrop = currTime + 21600; // +6 hours
+      if( m_currentPrice == 0 )
+      {
+        m_currentPrice = m_initPrice;
+      }
+      else
+      {
+        m_currentPrice = ( m_currentPrice / 100 ) * 99.58;
+      }
+    }
     UpdateDatabase();
   }
-  if( m_nextDrop < currTime  && getState() == HouseState::forSale )
-  {
-    m_currentPrice = ( m_currentPrice / 100 ) * 90;
-    m_nextDrop = currTime + 86400;
-    UpdateDatabase();
-  }
+  m_devaluationTime = m_nextDrop - currTime;
   onUpdate();
 }
 

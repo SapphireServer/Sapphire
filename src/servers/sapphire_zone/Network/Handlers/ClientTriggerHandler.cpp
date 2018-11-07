@@ -326,6 +326,7 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
 
       auto land = hZone->getLand( plot );
       plotPricePacket->data().price = land->getCurrentPrice();
+      plotPricePacket->data().timeLeft = land->getDevaluationTime();
 
       player.queuePacket( plotPricePacket );
 
