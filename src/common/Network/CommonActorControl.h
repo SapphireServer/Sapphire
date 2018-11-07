@@ -212,6 +212,9 @@ enum ActorControlType :
     BeginReplayAck = 0x3A1,
   EndReplayAck = 0x3A2,
 
+  // Housing
+    ShowHousingItemUI = 0x3F7,
+
   // PvP Duel
     SetPvPState = 0x5E0, // param3 must be 6 to engage a duel (hardcoded in the client)
   EndDuelSession = 0x5E1, // because someone went oob?
@@ -287,6 +290,7 @@ enum ClientTriggerType
   AchievementList = 0x3E9,
 
   RequestHousingSign = 0x451,
+  RequestHousingItemUI = 0x463,
   RequestSharedEstateSettings = 0x46F,
 
   CompanionAction = 0x6A4,
