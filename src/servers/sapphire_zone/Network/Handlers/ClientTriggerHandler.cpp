@@ -334,12 +334,13 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
 
     case ClientTriggerType::RequestHousingItemUI:
     {
-      uint8_t plot = param2;
+      uint32_t plot = param2;
       auto pShowHousingItemUIPacket = makeActorControl142(player.getId(), ShowHousingItemUI, 0, plot);
+
+      player.queuePacket( pShowHousingItemUIPacket );
 
       //TODO: show item housing container
 
-      player.queuePacket( pShowHousingItemUIPacket );
       break;
     }
 
