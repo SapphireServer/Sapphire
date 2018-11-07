@@ -331,7 +331,6 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
 
       break;
     }
-
     case ClientTriggerType::RequestHousingItemUI:
     {
       uint32_t plot = param2;
