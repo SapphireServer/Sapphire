@@ -33,7 +33,8 @@ Core::Land::Land( uint16_t zoneId, uint8_t wardNum, uint8_t landId, uint32_t lan
   m_currentPrice( 0 ),
   m_nextDrop( 0 ),
   m_landSetId( landSetId ),
-  m_landInfo( info )
+  m_landInfo( info ),
+  m_devaluationTime( 0 )
 {
   memset( &m_land, 0x00, sizeof( LandStruct ) );
   load();
