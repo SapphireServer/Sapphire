@@ -332,6 +332,17 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
       break;
     }
 
+    case ClientTriggerType::RequestHousingItemUI:
+    {
+      uint8_t plot = param2;
+      auto pShowHousingItemUIPacket = makeActorControl142(player.getId(), ShowHousingItemUI, 0, plot);
+
+      //TODO: show item housing container
+
+      player.queuePacket( pShowHousingItemUIPacket );
+      break;
+    }
+
     default:
     {
       pLog->debug( "[" + std::to_string( m_pSession->getId() ) + "] Unhandled action: " +
