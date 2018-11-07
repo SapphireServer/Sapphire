@@ -288,13 +288,7 @@ void Core::Land::Update( uint32_t currTime )
         m_currentPrice = ( m_currentPrice / 100 ) * 99.58;
       }
     }
+    m_devaluationTime = m_nextDrop - currTime;
     UpdateDatabase();
   }
-  m_devaluationTime = m_nextDrop - currTime;
-  onUpdate();
-}
-
-void Core::Land::onUpdate()
-{
-
 }

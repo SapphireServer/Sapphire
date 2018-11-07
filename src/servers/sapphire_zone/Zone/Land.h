@@ -52,7 +52,6 @@ namespace Core
     void setPreset( uint32_t itemId );
     void UpdateDatabase();
     void Update( uint32_t currTime );
-    void onUpdate();
 
     const Common::LandStruct& getLand();
     uint32_t getMaxItems();
