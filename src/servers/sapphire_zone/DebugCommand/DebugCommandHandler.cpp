@@ -1015,7 +1015,7 @@ void Core::DebugCommandHandler::housing( char* data, Entity::Player& player, std
       auto pZone = player.getCurrentZone();
       if( pTeriMgr->isHousingTerritory( pZone->getTerritoryTypeId() ) )
       {
-        auto pHousing = std::dynamic_pointer_cast<HousingZone>( pZone );
+        auto pHousing = std::dynamic_pointer_cast< HousingZone >( pZone );
         if( pHousing )
           player.setLandPermissions( permissionSet, 8, pHousing->getLandSetId(), pHousing->getWardNum(), pHousing->getTerritoryTypeId() );
         else
