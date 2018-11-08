@@ -335,7 +335,7 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
     case ClientTriggerType::RequestHousingItemUI:
     {
       uint32_t plot = param2;
-      auto pShowHousingItemUIPacket = makeActorControl142(player.getId(), ShowHousingItemUI, 0, plot);
+      auto pShowHousingItemUIPacket = makeActorControl142( player.getId(), ShowHousingItemUI, 0, plot );
 
       player.queuePacket( pShowHousingItemUIPacket );
 
