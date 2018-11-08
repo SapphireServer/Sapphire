@@ -27,6 +27,7 @@
 #include "Actor/BNpc.h"
 
 #include "Zone/Zone.h"
+#include "Zone/HousingZone.h"
 #include "Zone/InstanceContent.h"
 #include "Zone/TerritoryMgr.h"
 #include "Event/EventDefs.h"
@@ -57,6 +58,7 @@ Core::DebugCommandHandler::DebugCommandHandler()
   registerCommand( "help", &DebugCommandHandler::help, "Shows registered commands.", 0 );
   registerCommand( "script", &DebugCommandHandler::script, "Server script utilities.", 1 );
   registerCommand( "instance", &DebugCommandHandler::instance, "Instance utilities", 1 );
+  registerCommand( "housing", &DebugCommandHandler::housing, "Housing utilities", 1 );
 }
 
 // clear all loaded commands
@@ -975,6 +977,53 @@ Core::DebugCommandHandler::instance( char* data, Entity::Player& player, std::sh
 
     if( auto instance = player.getCurrentInstance() )
       instance->setCurrentBGM( bgmId );
+  }
+  else
+  {
+    player.sendDebug( "Unknown sub command." );
+  }
+}
+
+void Core::DebugCommandHandler::housing( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
+{
+  auto pTeriMgr = g_fw.get< TerritoryMgr >();
+  std::string cmd( data ), params, subCommand;
+  auto cmdPos = cmd.find_first_of( ' ' );
+
+  if( cmdPos != std::string::npos )
+  {
+    params = cmd.substr( cmdPos + 1 );
+
+    auto p = params.find_first_of( ' ' );
+
+    if( p != std::string::npos )
+    {
+      subCommand = params.substr( 0, p );
+      params = params.substr( subCommand.length() + 1 );
+    }
+    else
+      subCommand = params;
+  }
+
+  if( subCommand == "permission" || subCommand == "perm" )
+  {
+    uint8_t permissionSet;
+    sscanf( params.c_str(), "%hhu", &permissionSet );
+
+    if ( permissionSet < 5 )
+    {
+      auto pZone = player.getCurrentZone();
+      if( pTeriMgr->isHousingTerritory( pZone->getTerritoryTypeId() ) )
+      {
+        auto pHousing = std::dynamic_pointer_cast<HousingZone>( pZone );
+        if( pHousing )
+          player.setLandPermissions( permissionSet, 8, pHousing->getLandSetId(), pHousing->getWardNum(), pHousing->getTerritoryTypeId() );
+        else
+          player.sendDebug( "You aren't in a housing Zone." );
+      }
+    }
+    else
+      player.sendDebug( "PermissionSet out of range." );
   }
   else
   {

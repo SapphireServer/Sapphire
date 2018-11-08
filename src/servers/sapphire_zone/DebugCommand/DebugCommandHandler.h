@@ -53,6 +53,8 @@ namespace Core
 
     void instance( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
+    void housing( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command) ;
+
     void script( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
   };
