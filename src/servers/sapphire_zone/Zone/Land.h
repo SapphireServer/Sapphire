@@ -79,7 +79,6 @@ namespace Core
     //price
     uint32_t m_initPrice;
     uint32_t m_nextDrop;
-    uint32_t m_devaluationTime;
     uint32_t m_currentPrice;
     uint32_t m_minPrice;
   };

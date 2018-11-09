@@ -31,10 +31,10 @@ Core::Land::Land( uint16_t zoneId, uint8_t wardNum, uint8_t landId, uint32_t lan
   m_wardNum( wardNum ),
   m_landId( landId ),
   m_currentPrice( 0 ),
+  m_minPrice( 0 ),
   m_nextDrop( 0 ),
   m_landSetId( landSetId ),
-  m_landInfo( info ),
-  m_devaluationTime( 0 )
+  m_landInfo( info )
 {
   memset( &m_land, 0x00, sizeof( LandStruct ) );
   load();
@@ -238,7 +238,7 @@ uint32_t Core::Land::getMaxItems()
 
 uint32_t Core::Land::getDevaluationTime()
 {
-  return m_devaluationTime;
+  return m_nextDrop - Util::getTimeSeconds();
 }
 
 void Core::Land::init()
@@ -280,7 +280,6 @@ void Core::Land::Update( uint32_t currTime )
       m_nextDrop = currTime + 21600;
       m_currentPrice = ( m_currentPrice / 100 ) * 99.58;
     }
-    m_devaluationTime = m_nextDrop - currTime;
     UpdateDatabase();
   }
 }
