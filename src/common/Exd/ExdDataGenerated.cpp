@@ -2745,6 +2745,8 @@ Core::Data::HousingLandSet::HousingLandSet( uint32_t row_id, Core::Data::ExdData
   auto row = exdData->m_HousingLandSetDat.get_row( row_id );
   for ( int i = 0; i < 60; i++ )
     sizes.push_back( exdData->getField< uint8_t >( row, i ) );
+  for ( int i = 60; i < 60 + 60; i++ )
+    minPrices.push_back( exdData->getField< uint32_t >( row, i ) );
   for ( int i = 300; i < 300 + 60; i++ )
     prices.push_back( exdData->getField< uint32_t >( row, i ) );
 

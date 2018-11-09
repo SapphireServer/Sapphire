@@ -131,6 +131,20 @@ void Core::HousingZone::sendLandSet( Entity::Player& player )
   player.queuePacket( landsetInitializePacket );
 }
 
+void Core::HousingZone::sendLandUpdate( uint8_t landId )
+{
+  for( const auto& playerIt : m_playerMap )
+  {
+    auto pPlayer = playerIt.second;
+
+    auto landUpdatePacket = makeZonePacket< FFXIVIpcLandUpdate >( pPlayer->getId() );
+    landUpdatePacket->data().landId = landId;
+    landUpdatePacket->data().land = getLand( landId )->getLand();
+
+    pPlayer->queuePacket( landUpdatePacket );
+  }
+}
+
 bool Core::HousingZone::isPlayerSubInstance( Entity::Player& player )
 {
   return player.getPos().x < -15000.0f; //ToDo: get correct pos

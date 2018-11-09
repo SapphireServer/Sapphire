@@ -326,8 +326,20 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
 
       auto land = hZone->getLand( plot );
       plotPricePacket->data().price = land->getCurrentPrice();
+      plotPricePacket->data().timeLeft = land->getDevaluationTime();
 
       player.queuePacket( plotPricePacket );
+
+      break;
+    }
+    case ClientTriggerType::RequestHousingItemUI:
+    {
+      uint32_t plot = param2;
+      auto pShowHousingItemUIPacket = makeActorControl142( player.getId(), ShowHousingItemUI, 0, plot );
+
+      player.queuePacket( pShowHousingItemUIPacket );
+
+      //TODO: show item housing container
 
       break;
     }

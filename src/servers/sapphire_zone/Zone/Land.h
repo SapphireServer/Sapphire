@@ -52,12 +52,12 @@ namespace Core
     void setPreset( uint32_t itemId );
     void UpdateDatabase();
     void Update( uint32_t currTime );
-    void onUpdate();
 
     const Common::LandStruct& getLand();
     uint32_t getMaxItems();
 
     uint32_t getCurrentPrice() const;
+    uint32_t getDevaluationTime();
 
   private:
     uint16_t convertItemIdToHousingItemId( uint16_t itemId );
@@ -80,6 +80,7 @@ namespace Core
     uint32_t m_initPrice;
     uint32_t m_nextDrop;
     uint32_t m_currentPrice;
+    uint32_t m_minPrice;
   };
 
 }

@@ -761,6 +761,12 @@ namespace Core::Entity
 
     void setDirectorInitialized( bool isInitialized );
 
+    // Housing Handling
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    void setLandPermissions( uint8_t permissionSet, uint32_t permissionMask, int16_t landSetId, int16_t wardNum, int16_t zoneId );
+
+    void sendLandPermissions();
+
     // Player Battle Handling
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     void initHateSlotQueue();
@@ -1012,6 +1018,9 @@ namespace Core::Entity
     char m_searchMessage[193]; // searchmessage to show in profile
     uint8_t m_searchSelectRegion; // regions selected to show up in profile
     uint8_t m_searchSelectClass; // class selected to show up in profile
+
+    // housing info
+    Common::LandPermissionSet m_housePermission[5];
 
     // gc info
     uint8_t m_gc;

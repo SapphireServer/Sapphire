@@ -23,6 +23,7 @@ namespace Core
     void onUpdate( uint32_t currTime ) override;
 
     void sendLandSet( Entity::Player& player );
+    void sendLandUpdate( uint8_t landId );
     bool isPlayerSubInstance( Entity::Player& player );
 
     /* returns current ward number for this zone */

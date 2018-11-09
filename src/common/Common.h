@@ -759,7 +759,16 @@ namespace Core::Common
     uint8_t color[ 8 ]; // 36
   };
 
-  struct HousePermissionSet
+  enum LandPermissionSlot
+  {
+    FreeCompany,
+    Private,
+    Apartment,
+    SharedHouse1,
+    SharedHouse2
+  };
+
+  struct LandPermissionSet
   {
     int16_t landSetId; //00
     int16_t wardNum; //02
