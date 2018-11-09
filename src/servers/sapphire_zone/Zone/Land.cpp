@@ -47,7 +47,6 @@ Core::Land::~Land()
 
 void Core::Land::load()
 {
-
   m_land.houseState = HouseState::forSale;
 
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
@@ -55,14 +54,13 @@ void Core::Land::load()
                                             "AND landid = " + std::to_string( m_landId ) );
   if( !res->next() )
   {
-
-
     pDb->directExecute( "INSERT INTO land ( landsetid, landid, size, status, landprice ) "
                         "VALUES ( " + std::to_string( m_landSetId ) + "," + std::to_string( m_landId ) + ","
                         + std::to_string( m_landInfo->sizes[ m_landId ] ) + ","
                         + " 1, " + std::to_string( m_landInfo->prices[ m_landId ] ) + " );" );
 
     m_currentPrice = m_landInfo->prices[ m_landId ];
+    m_minPrice = m_landInfo->minPrices[ m_landId ];
     m_land.houseSize = m_landInfo->sizes[ m_landId ];
   }
   else
@@ -284,12 +282,16 @@ void Core::Land::Update( uint32_t currTime )
       {
         m_currentPrice = m_initPrice;
       }
-      else
+      else if( m_minPrice < m_currentPrice )
       {
         m_currentPrice = ( m_currentPrice / 100 ) * 99.58;
+        m_devaluationTime = m_nextDrop - currTime;
+      }
+      else
+      {
+        m_devaluationTime = 0;
       }
     }
-    m_devaluationTime = m_nextDrop - currTime;
     UpdateDatabase();
   }
 }
