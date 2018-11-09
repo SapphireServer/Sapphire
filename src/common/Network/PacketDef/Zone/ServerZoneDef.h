@@ -1578,21 +1578,21 @@ struct FFXIVIpcPerformNote : FFXIVIpcBasePacket< PerformNote >
 //IPCs
 struct FFXIVIpcLandPermission : FFXIVIpcBasePacket<LandPermission >
 {
-  Common::HousePermissionSet freeCompanyHouse; // 00
+  Common::LandPermissionSet freeCompanyHouse; // 00
   uint64_t unkown1;
-  Common::HousePermissionSet privateHouse; // 24
+  Common::LandPermissionSet privateHouse; // 24
   uint64_t unkown2;
-  Common::HousePermissionSet apartment; // 48
+  Common::LandPermissionSet apartment; // 48
   uint64_t unkown3;
-  Common::HousePermissionSet sharedHouse[2]; //72
+  Common::LandPermissionSet sharedHouse[2]; //72
   uint64_t unkown4;
-  Common::HousePermissionSet unkownHouse;
+  Common::LandPermissionSet unkownHouse;
   uint64_t unkown5;
 };
 
 struct FFXIVIpcLandUpdate : FFXIVIpcBasePacket< LandUpdate >
 {
-  uint16_t landSetId;
+  uint16_t landId;
   uint16_t unknow0;
   uint16_t unknow1;
   uint16_t unknow2;

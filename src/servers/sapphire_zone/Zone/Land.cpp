@@ -31,6 +31,7 @@ Core::Land::Land( uint16_t zoneId, uint8_t wardNum, uint8_t landId, uint32_t lan
   m_wardNum( wardNum ),
   m_landId( landId ),
   m_currentPrice( 0 ),
+  m_minPrice( 0 ),
   m_nextDrop( 0 ),
   m_landSetId( landSetId ),
   m_landInfo( info )
@@ -46,7 +47,6 @@ Core::Land::~Land()
 
 void Core::Land::load()
 {
-
   m_land.houseState = HouseState::forSale;
 
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
@@ -54,14 +54,13 @@ void Core::Land::load()
                                             "AND landid = " + std::to_string( m_landId ) );
   if( !res->next() )
   {
-
-
     pDb->directExecute( "INSERT INTO land ( landsetid, landid, size, status, landprice ) "
                         "VALUES ( " + std::to_string( m_landSetId ) + "," + std::to_string( m_landId ) + ","
                         + std::to_string( m_landInfo->sizes[ m_landId ] ) + ","
                         + " 1, " + std::to_string( m_landInfo->prices[ m_landId ] ) + " );" );
 
     m_currentPrice = m_landInfo->prices[ m_landId ];
+    m_minPrice = m_landInfo->minPrices[ m_landId ];
     m_land.houseSize = m_landInfo->sizes[ m_landId ];
   }
   else
@@ -237,6 +236,11 @@ uint32_t Core::Land::getMaxItems()
   return m_maxItems;
 }
 
+uint32_t Core::Land::getDevaluationTime()
+{
+  return m_nextDrop - Util::getTimeSeconds();
+}
+
 void Core::Land::init()
 {
 
@@ -269,22 +273,13 @@ void Core::Land::UpdateDatabase()
 
 void Core::Land::Update( uint32_t currTime )
 {
-  if( m_currentPrice == 0 && getState() == HouseState::forSale )
+  if( getState() == HouseState::forSale )
   {
-    m_currentPrice = m_initPrice;
-    m_nextDrop = 0;
+    if( m_nextDrop < currTime && m_minPrice < m_currentPrice )
+    {
+      m_nextDrop = currTime + 21600;
+      m_currentPrice = ( m_currentPrice / 100 ) * 99.58;
+    }
     UpdateDatabase();
   }
-  if( m_nextDrop < currTime  && getState() == HouseState::forSale )
-  {
-    m_currentPrice = ( m_currentPrice / 100 ) * 90;
-    m_nextDrop = currTime + 86400;
-    UpdateDatabase();
-  }
-  onUpdate();
-}
-
-void Core::Land::onUpdate()
-{
-
 }

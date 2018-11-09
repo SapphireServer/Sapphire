@@ -89,6 +89,12 @@ Core::Entity::Player::Player() :
   memset( m_classArray, 0, sizeof( m_classArray ) );
   memset( m_expArray, 0, sizeof( m_expArray ) );
 
+  for ( uint8_t i = 0; i < 5; i++ )
+  {
+    memset( &m_housePermission[i], 0xFF, 8 );
+    memset( &m_housePermission[i].permissionMask, 0, 8 );
+  }
+
   m_objSpawnIndexAllocator.init( MAX_DISPLAYED_EOBJS );
   m_actorSpawnIndexAllocator.init( MAX_DISPLAYED_ACTORS, true );
 }
@@ -1568,48 +1574,7 @@ void Core::Entity::Player::sendZonePackets()
     sendItemLevel();
   }
 
-  struct HousePermissionSet
-  {
-    int16_t landSetId; //00
-    int16_t wardNum; //02
-    int16_t zoneId; //04
-    int16_t worldId; //06
-    uint32_t permissionMask; //08
-    uint32_t unkown1; //12
-  };
-
-  auto landPermissions = makeZonePacket< FFXIVIpcLandPermission >( getId() );
-  landPermissions->data().freeCompanyHouse.landSetId = -1;
-  landPermissions->data().freeCompanyHouse.wardNum = -1;
-  landPermissions->data().freeCompanyHouse.zoneId = -1;
-  landPermissions->data().freeCompanyHouse.worldId = -1;
-  landPermissions->data().unkown1 = 0;
-  landPermissions->data().privateHouse.landSetId = -1;
-  landPermissions->data().privateHouse.wardNum = -1;
-  landPermissions->data().privateHouse.zoneId = -1;
-  landPermissions->data().privateHouse.worldId = -1;
-  landPermissions->data().unkown2 = 0;
-  landPermissions->data().apartment.landSetId = -1;
-  landPermissions->data().apartment.wardNum = -1;
-  landPermissions->data().apartment.zoneId = -1;
-  landPermissions->data().apartment.worldId = -1;
-  landPermissions->data().unkown3 = 0;
-  landPermissions->data().sharedHouse[0].landSetId = -1;
-  landPermissions->data().sharedHouse[0].wardNum = -1;
-  landPermissions->data().sharedHouse[0].zoneId = -1;
-  landPermissions->data().sharedHouse[0].worldId = -1;
-  landPermissions->data().sharedHouse[1].landSetId = -1;
-  landPermissions->data().sharedHouse[1].wardNum = -1;
-  landPermissions->data().sharedHouse[1].zoneId = -1;
-  landPermissions->data().sharedHouse[1].worldId = -1;
-  landPermissions->data().unkown4 = 0;
-  landPermissions->data().unkownHouse.landSetId = -1;
-  landPermissions->data().unkownHouse.wardNum = -1;
-  landPermissions->data().unkownHouse.zoneId = -1;
-  landPermissions->data().unkownHouse.worldId = -1;
-  landPermissions->data().unkown5 = 2;
-  queuePacket( landPermissions );
-
+  sendLandPermissions();
 
   auto initZonePacket = makeZonePacket< FFXIVIpcInitZone >( getId() );
   initZonePacket->data().zoneId = getCurrentZone()->getTerritoryTypeId();
@@ -1785,4 +1750,34 @@ void Core::Entity::Player::setOnEnterEventDone( bool isDone )
 bool Core::Entity::Player::isOnEnterEventDone() const
 {
   return m_onEnterEventDone;
+}
+
+void Core::Entity::Player::setLandPermissions( uint8_t permissionSet, uint32_t permissionMask, int16_t landSetId, int16_t wardNum, int16_t zoneId )
+{
+  m_housePermission[permissionSet].landSetId = landSetId;
+  m_housePermission[permissionSet].permissionMask = permissionMask;
+  m_housePermission[permissionSet].wardNum = wardNum;
+  m_housePermission[permissionSet].worldId = 67;
+  m_housePermission[permissionSet].unkown1 = 0;
+}
+
+void Core::Entity::Player::sendLandPermissions()
+{
+  auto landPermissions = makeZonePacket< FFXIVIpcLandPermission >( getId() );
+
+  landPermissions->data().freeCompanyHouse = m_housePermission[Common::LandPermissionSlot::FreeCompany];
+  landPermissions->data().privateHouse = m_housePermission[Common::LandPermissionSlot::Private];
+  landPermissions->data().apartment = m_housePermission[Common::LandPermissionSlot::Apartment];
+  landPermissions->data().sharedHouse[0] = m_housePermission[Common::LandPermissionSlot::SharedHouse1];
+  landPermissions->data().sharedHouse[1] = m_housePermission[Common::LandPermissionSlot::SharedHouse2];
+  memset( &landPermissions->data().unkownHouse, 0xFF, 8 );
+  memset( &landPermissions->data().unkownHouse.permissionMask, 0, 8 );
+  landPermissions->data().unkownHouse.permissionMask = 2;
+  landPermissions->data().unkown1 = 0;
+  landPermissions->data().unkown2 = 0;
+  landPermissions->data().unkown3 = 0;
+  landPermissions->data().unkown4 = 0;
+  landPermissions->data().unkown5 = 0;
+
+  queuePacket( landPermissions );
 }
