@@ -2853,6 +2853,7 @@ struct HousingPlacement
 struct HousingLandSet
 {
   std::vector< uint8_t > sizes;
+  std::vector< uint32_t > minPrices;
   std::vector< uint32_t > prices;
 
   HousingLandSet( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );

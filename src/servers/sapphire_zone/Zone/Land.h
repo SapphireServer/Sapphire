@@ -81,6 +81,7 @@ namespace Core
     uint32_t m_nextDrop;
     uint32_t m_devaluationTime;
     uint32_t m_currentPrice;
+    uint32_t m_minPrice;
   };
 
 }
