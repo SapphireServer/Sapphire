@@ -143,7 +143,7 @@ uint32_t Core::Network::RestConnector::getNextCharId()
 
     if( content.find( "invalid" ) == std::string::npos )
     {
-      return json["result"].get< uint32_t >();
+      return std::stoi( std::string( json["result"] ) );
     }
     else
     {
@@ -182,7 +182,7 @@ uint64_t Core::Network::RestConnector::getNextContentId()
 
     if( content.find( "invalid" ) == std::string::npos )
     {
-      return json["result"].get< uint64_t >();
+      return std::stoll( std::string( json["result"] ) );
     }
     else
     {
@@ -313,7 +313,7 @@ int Core::Network::RestConnector::createCharacter( char* sId, std::string name, 
     }
 
     if( content.find( "invalid" ) == std::string::npos )
-      return json["result"].get< int >();
+      return std::stoi( json["result"].get< std::string >() );
     return -1;
   }
   else

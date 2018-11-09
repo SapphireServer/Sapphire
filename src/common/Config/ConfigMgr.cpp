@@ -3,6 +3,8 @@
 #include <fstream>
 #include <experimental/filesystem>
 
+namespace fs = std::experimental::filesystem;
+
 /**
  * Loads an ini file and parses it
  * @param configName the name of ini file relative to m_configFolderRoot to load alongside global.ini
@@ -11,10 +13,14 @@
 bool Core::ConfigMgr::loadConfig( const std::string& configName )
 {
   // get global config
-  auto configDir = std::experimental::filesystem::path( m_configFolderRoot );
+  auto configFile = fs::path( fs::path( m_configFolderRoot ) / configName );
 
-  m_pInih = std::unique_ptr< INIReader >( new INIReader( 
-    std::experimental::filesystem::path( configDir / configName ).string() ) );
+  if( !fs::exists( configFile ) )
+  {
+    copyDefaultConfig( configName );
+  }
+
+  m_pInih = std::unique_ptr< INIReader >( new INIReader( configFile.string() ) );
 
   if( m_pInih->ParseError() < 0 )
     return false;
@@ -24,16 +30,16 @@ bool Core::ConfigMgr::loadConfig( const std::string& configName )
 
 bool Core::ConfigMgr::copyDefaultConfig( const std::string& configName )
 {
-  std::experimental::filesystem::path configPath( m_configFolderRoot );
+  fs::path configPath( m_configFolderRoot );
   configPath /= configName;
 
-  if( !std::experimental::filesystem::exists( configPath.string() + m_configDefaultSuffix ) )
+  if( !fs::exists( configPath.string() + m_configDefaultSuffix ) )
   {
     // no default file :(
     return false;
   }
 
-  std::experimental::filesystem::copy_file( configPath.string() + m_configDefaultSuffix, configPath );
+  fs::copy_file( configPath.string() + m_configDefaultSuffix, configPath );
 
   return true;
 }
