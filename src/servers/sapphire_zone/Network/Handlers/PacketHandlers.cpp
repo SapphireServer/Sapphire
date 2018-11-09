@@ -434,6 +434,15 @@ void Core::Network::GameConnection::finishLoadingHandler( const Core::Network::P
                                                           Entity::Player& player )
 {
   player.sendQuestInfo();
+
+  // TODO: load and save this data instead of hardcoding
+  auto gcPacket = makeZonePacket< FFXIVGCAffiliation >( player.getId() );
+  gcPacket->data().gcId = player.getGc();
+  gcPacket->data().gcRank[ 0 ] = player.getGcRankArray()[ 0 ];
+  gcPacket->data().gcRank[ 1 ] = player.getGcRankArray()[ 1 ];
+  gcPacket->data().gcRank[ 2 ] = player.getGcRankArray()[ 2 ];
+  player.queuePacket( gcPacket );
+  
   player.getCurrentZone()->onFinishLoading( player );
 
   // player is done zoning
