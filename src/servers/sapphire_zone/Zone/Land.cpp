@@ -275,23 +275,17 @@ void Core::Land::Update( uint32_t currTime )
 {
   if( getState() == HouseState::forSale )
   {
-    if( m_nextDrop < currTime )
+    if( m_nextDrop < currTime && m_minPrice < m_currentPrice )
     {
-      m_nextDrop = currTime + 21600; // +6 hours
-      if( m_currentPrice == 0 )
-      {
-        m_currentPrice = m_initPrice;
-      }
-      else if( m_minPrice < m_currentPrice )
-      {
-        m_currentPrice = ( m_currentPrice / 100 ) * 99.58;
-        m_devaluationTime = m_nextDrop - currTime;
-      }
-      else
-      {
-        m_devaluationTime = 0;
-      }
+      m_nextDrop = currTime + 21600;
+      m_currentPrice = ( m_currentPrice / 100 ) * 99.58;
     }
+    else if( m_currentPrice == 0 )
+    {
+      m_nextDrop = currTime + 21600;
+      m_currentPrice = m_initPrice;
+    }
+    m_devaluationTime = m_nextDrop - currTime;
     UpdateDatabase();
   }
 }
