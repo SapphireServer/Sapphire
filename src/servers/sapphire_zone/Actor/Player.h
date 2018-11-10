@@ -911,6 +911,10 @@ namespace Core::Entity
 
     uint8_t getFreeSlotsInBags();
 
+    void setActiveLand( uint8_t land, uint8_t ward );
+    Common::ActiveLand getActiveLand() const;
+
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 
     uint64_t m_lastMoveTime;
@@ -1020,7 +1024,9 @@ namespace Core::Entity
     uint8_t m_searchSelectClass; // class selected to show up in profile
 
     // housing info
-    Common::LandPermissionSet m_housePermission[5];
+    Common::LandPermissionSet m_landPermission[5];
+
+    Common::ActiveLand m_activeLand;
 
     // gc info
     uint8_t m_gc;

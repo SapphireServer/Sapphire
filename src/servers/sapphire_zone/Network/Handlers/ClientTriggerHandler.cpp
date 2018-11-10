@@ -311,11 +311,14 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
     }
     case ClientTriggerType::RequestHousingSign:
     {
+
       auto plotPricePacket = makeZonePacket< Server::FFXIVIpcLandPriceUpdate >( player.getId() );
 
       uint8_t ward = ( param12 & 0xFF00 ) >> 8;
       uint8_t plot = ( param12 & 0xFF );
       pLog->debug( " Ward: " + std::to_string( ward ) + " Plot: " + std::to_string( plot ) );
+
+      player.setActiveLand( plot, ward );
 
       auto zone = player.getCurrentZone();
 

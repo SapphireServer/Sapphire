@@ -822,6 +822,17 @@ void Core::Entity::Player::discardItem( uint16_t fromInventoryId, uint8_t fromSl
   queuePacket( invTransFinPacket );
 }
 
+void Core::Entity::Player::setActiveLand( uint8_t land, uint8_t ward )
+{
+  m_activeLand.plot = land;
+  m_activeLand.ward = ward;
+}
+
+Core::Common::ActiveLand Core::Entity::Player::getActiveLand() const
+{
+  return m_activeLand;
+}
+
 uint16_t Core::Entity::Player::calculateEquippedGearItemLevel()
 {
   uint32_t iLvlResult = 0;

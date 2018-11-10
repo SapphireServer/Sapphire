@@ -442,7 +442,7 @@ void Core::Network::GameConnection::finishLoadingHandler( const Core::Network::P
   gcPacket->data().gcRank[ 1 ] = player.getGcRankArray()[ 1 ];
   gcPacket->data().gcRank[ 2 ] = player.getGcRankArray()[ 2 ];
   player.queuePacket( gcPacket );
-  
+
   player.getCurrentZone()->onFinishLoading( player );
 
   // player is done zoning
