@@ -58,7 +58,7 @@ Core::LandPtr Core::HousingMgr::getLandByOwnerId( uint32_t id )
   for( const auto& hZoneIt : m_housingZonePtrMap )
   {
     auto pHousingZone = hZoneIt.second;
-    for( uint8_t landId = 0;landId < 60;landId++ )
+    for( uint8_t landId = 0; landId < 60; landId++ )
     {
       if( pHousingZone->getLand( landId )->getPlayerOwner() == id )
       {
