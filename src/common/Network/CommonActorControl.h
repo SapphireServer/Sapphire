@@ -184,7 +184,7 @@ enum ActorControlType :
 
   AchievementPopup = 0x203,
 
-  Unk7 = 0x205,                 // LogMessage?
+  LogMsg = 0x205,                 // LogMessage?
   AchievementMsg = 0x206,
 
   SetItemLevel = 0x209,

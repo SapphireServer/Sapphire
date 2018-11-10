@@ -154,29 +154,45 @@ bool Core::HousingZone::isPlayerSubInstance( Entity::Player& player )
   return player.getPos().x < -15000.0f; //ToDo: get correct pos
 }
 
-void Core::HousingZone::playerPurchseLand( Entity::Player & player, uint8_t plot, uint8_t state )
+Core::PurchaseResult Core::HousingZone::purchseLand( Entity::Player& player, uint8_t plot, uint8_t state )
 {
-  uint32_t plotPrice = getLand( plot )->getCurrentPrice();
-  if( plotPrice <= player.getCurrency( CurrencyType::Gil ) )
+
+  auto plotPrice = getLand( plot )->getCurrentPrice();
+  auto gilAvailable = player.getCurrency( CurrencyType::Gil );
+  auto pLand = getLand( plot );
+
+  if( !pLand )
+    return PurchaseResult::ERR_INTERNAL;
+
+  if( pLand->getState() != HouseState::forSale )
+    return PurchaseResult::ERR_NOT_AVAILABLE;
+
+  if( gilAvailable < plotPrice )
+    return PurchaseResult::ERR_NOT_ENOUGH_GIL;
+
+  auto pHousing = std::dynamic_pointer_cast< HousingZone >( player.getCurrentZone() );
+
+  switch( state )
   {
-    auto pHousing = std::dynamic_pointer_cast< HousingZone >( player.getCurrentZone() );
-    if( state == 1 ) //TODO: add Free company purchase
+    case 1:
       player.sendDebug( "Free company house purchase aren't supported at this time." );
-    if( state == 2 ) //Private Purchase
-    {
-      getLand( plot )->setPlayerOwner( player.getId() );
-      getLand( plot )->setState( HouseState::sold );
+      return PurchaseResult::ERR_INTERNAL;
 
+    case 2:
       player.removeCurrency( CurrencyType::Gil, plotPrice );
-      player.setLandPermissions( LandPermissionSlot::Private, 0x0B, plot, pHousing->getWardNum(), pHousing->getTerritoryTypeId() );
+      pLand->setPlayerOwner( player.getId() );
+      pLand->setState( HouseState::sold );
+      player.setLandPermissions( LandPermissionSlot::Private, 0x0B, plot,
+                                 pHousing->getWardNum(), pHousing->getTerritoryTypeId() );
       player.sendLandPermissions();
-
-      getLand( plot )->UpdateLandDb();
+      pLand->UpdateLandDb();
       sendLandUpdate( plot );
-    }
+      return PurchaseResult::SUCCESS;
+
+    default:
+      return PurchaseResult::ERR_INTERNAL;
   }
-  //else
-    //TOD: add error msg - insufficient gil
+
 }
 
 void Core::HousingZone::onUpdate( uint32_t currTime )
