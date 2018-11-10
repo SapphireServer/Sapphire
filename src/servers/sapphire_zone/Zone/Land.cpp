@@ -32,11 +32,13 @@ Core::Land::Land( uint16_t zoneId, uint8_t wardNum, uint8_t landId, uint32_t lan
   m_landId( landId ),
   m_currentPrice( 0 ),
   m_minPrice( 0 ),
-  m_nextDrop( 0 ),
+  m_nextDrop( Util::getTimeSeconds() + 21600 ),
+  m_ownerPlayerId( 0 ),
   m_landSetId( landSetId ),
   m_landInfo( info )
 {
   memset( &m_land, 0x00, sizeof( LandStruct ) );
+  memset( &m_tag, 0x00, 3 );
   load();
 }
 
@@ -47,11 +49,9 @@ Core::Land::~Land()
 
 void Core::Land::load()
 {
-  m_land.houseState = HouseState::forSale;
-
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  auto res = pDb->query( "SELECT * FROM land WHERE landsetid = " + std::to_string( m_landSetId ) + " "
-                                            "AND landid = " + std::to_string( m_landId ) );
+  auto res = pDb->query( "SELECT * FROM land WHERE LandSetId = " + std::to_string( m_landSetId ) + " "
+                                            "AND LandId = " + std::to_string( m_landId ) );
   if( !res->next() )
   {
     pDb->directExecute( "INSERT INTO land ( landsetid, landid, size, status, landprice ) "
@@ -65,9 +65,11 @@ void Core::Land::load()
   }
   else
   {
-    m_land.houseSize = res->getUInt( "size" );
-    m_land.houseState = res->getUInt( "status" );
-    m_currentPrice = res->getUInt( "LandPrice" );;
+    m_land.houseSize = res->getUInt( "Size" );
+    m_land.houseState = res->getUInt( "Status" );
+    m_currentPrice = res->getUInt( "LandPrice" );
+    m_ownerPlayerId = res->getUInt( "OwnerId" );
+    m_minPrice = m_landInfo->minPrices[ m_landId ];
   }
   init();
 //  setPreset( 262145 );
@@ -170,6 +172,26 @@ uint8_t Core::Land::getSharing()
   return m_land.iconAddIcon;
 }
 
+uint32_t Core::Land::getLandSetId()
+{
+  return m_landSetId;
+}
+
+uint8_t Core::Land::getWardNum()
+{
+  return m_wardNum;
+}
+
+uint8_t Core::Land::getLandId()
+{
+  return m_landId;
+}
+
+uint16_t Core::Land::getZoneId()
+{
+  return m_zoneId;
+}
+
 //Free Comapny
 void Core::Land::setFreeCompany( uint32_t id, uint32_t icon, uint32_t color )
 {
@@ -241,6 +263,16 @@ uint32_t Core::Land::getDevaluationTime()
   return m_nextDrop - Util::getTimeSeconds();
 }
 
+void Core::Land::setLandTag( uint8_t slot, uint8_t tag )
+{
+  m_tag[ slot ] = tag;
+}
+
+uint8_t Core::Land::getLandTag( uint8_t slot )
+{
+  return m_tag[ slot ];
+}
+
 void Core::Land::init()
 {
 
@@ -260,15 +292,16 @@ void Core::Land::init()
   }
 }
 
-void Core::Land::UpdateDatabase()
+void Core::Land::UpdateLandDb()
 {
-  /*auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  std::string exec = "UPDATE land SET landset='" +
-                     std::string( reinterpret_cast< const char* >( &m_land ) ) + "', nextDrop=" +
-                     std::to_string( m_nextDrop ) + ", currentPrice=" +
-                     std::to_string( m_currentPrice ) +
-                     " WHERE Id =" + std::to_string( m_landKey );
-  pDb->execute( exec );*/
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  pDb->directExecute( "UPDATE land SET status = " + std::to_string( m_land.houseState )
+  + ", LandPrice = " + std::to_string( getCurrentPrice() )
+  + ", UpdateTime = " + std::to_string( getDevaluationTime() )
+  + ", OwnerId = " + std::to_string( getPlayerOwner() ) 
+  + ", HouseId = " + std::to_string( 0 ) //TODO: add house id
+  + " WHERE LandSetId = " + std::to_string( m_landSetId )
+  + " AND LandId = " + std::to_string( m_landId ) + ";" );
 }
 
 void Core::Land::Update( uint32_t currTime )
@@ -279,7 +312,7 @@ void Core::Land::Update( uint32_t currTime )
     {
       m_nextDrop = currTime + 21600;
       m_currentPrice = ( m_currentPrice / 100 ) * 99.58;
+      UpdateLandDb();
     }
-    UpdateDatabase();
   }
 }

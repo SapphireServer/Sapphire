@@ -15,6 +15,9 @@
 #include "Zone/Zone.h"
 #include "Zone/ZonePosition.h"
 
+#include "Zone//HousingMgr.h"
+#include "Zone/Land.h"
+
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
@@ -1574,6 +1577,12 @@ void Core::Entity::Player::sendZonePackets()
     sendItemLevel();
   }
 
+  auto pHousingMgr = g_fw.get< HousingMgr >();
+  if( Core::LandPtr pLand = pHousingMgr->getLandByOwnerId( getId() ) )
+  {
+    setLandPermissions( LandPermissionSlot::Private, 0x0B, pLand->getLandId(), pLand->getWardNum(), pLand->getZoneId() );
+  }
+
   sendLandPermissions();
 
   auto initZonePacket = makeZonePacket< FFXIVIpcInitZone >( getId() );
@@ -1752,11 +1761,12 @@ bool Core::Entity::Player::isOnEnterEventDone() const
   return m_onEnterEventDone;
 }
 
-void Core::Entity::Player::setLandPermissions( uint8_t permissionSet, uint32_t permissionMask, int16_t landSetId, int16_t wardNum, int16_t zoneId )
+void Core::Entity::Player::setLandPermissions( uint8_t permissionSet, uint32_t permissionMask, int16_t landId, int16_t wardNum, int16_t zoneId )
 {
-  m_landPermission[permissionSet].landId = landSetId;
+  m_landPermission[permissionSet].landId = landId;
   m_landPermission[permissionSet].permissionMask = permissionMask;
   m_landPermission[permissionSet].wardNum = wardNum;
+  m_landPermission[permissionSet].zoneId = zoneId;
   m_landPermission[permissionSet].worldId = 67;
   m_landPermission[permissionSet].unkown1 = 0;
 }

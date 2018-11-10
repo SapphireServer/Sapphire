@@ -24,6 +24,9 @@ public:
 
         auto pTerritory = player.getCurrentZone();
         auto pHousing = std::dynamic_pointer_cast< HousingZone >( pTerritory );
+        
+        pHousing->playerPurchseLand( player, activeLand.plot, result.param2 );
+
       }
     };
 

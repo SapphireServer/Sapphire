@@ -751,6 +751,13 @@ namespace Core::Common
     YardSign
   };
 
+  enum HouseTagSlot
+  {
+    MainTag,
+    SubTag1,
+    SubTag2
+  };
+
   //Structs
   struct LandStruct
   {

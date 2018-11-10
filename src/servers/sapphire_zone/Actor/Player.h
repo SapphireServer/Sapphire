@@ -763,7 +763,7 @@ namespace Core::Entity
 
     // Housing Handling
     //////////////////////////////////////////////////////////////////////////////////////////////////////
-    void setLandPermissions( uint8_t permissionSet, uint32_t permissionMask, int16_t landSetId, int16_t wardNum, int16_t zoneId );
+    void setLandPermissions( uint8_t permissionSet, uint32_t permissionMask, int16_t landId, int16_t wardNum, int16_t zoneId );
 
     void sendLandPermissions();
 
