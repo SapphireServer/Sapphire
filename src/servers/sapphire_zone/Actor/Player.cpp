@@ -1767,9 +1767,6 @@ void Core::Entity::Player::setLandPermissions( uint8_t permissionSet, uint32_t p
   m_landPermission[permissionSet].permissionMask = permissionMask;
   m_landPermission[permissionSet].wardNum = wardNum;
   m_landPermission[permissionSet].zoneId = zoneId;
-  m_landPermission[permissionSet].worldId = 67;
-  m_landPermission[permissionSet].unkown1 = 0;
-}
 
 void Core::Entity::Player::sendLandPermissions()
 {
