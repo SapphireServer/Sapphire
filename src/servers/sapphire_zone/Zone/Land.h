@@ -30,6 +30,10 @@ namespace Core
     uint8_t getState();
     uint8_t getOwnership();
     uint8_t getSharing();
+    uint32_t getLandSetId();
+    uint8_t getWardNum();
+    uint8_t getLandId();
+    uint16_t getZoneId();
 
     //Free Comapny
     void setFreeCompany( uint32_t id, uint32_t icon, uint32_t color );
@@ -50,7 +54,7 @@ namespace Core
     uint32_t getPlayerOwner();
     //Housing Functions
     void setPreset( uint32_t itemId );
-    void UpdateDatabase();
+    void UpdateLandDb();
     void Update( uint32_t currTime );
 
     const Common::LandStruct& getLand();
@@ -58,6 +62,10 @@ namespace Core
 
     uint32_t getCurrentPrice() const;
     uint32_t getDevaluationTime();
+
+    //House tags
+    void setLandTag( uint8_t slot, uint8_t tag );
+    uint8_t getLandTag( uint8_t slot );
 
   private:
     uint16_t convertItemIdToHousingItemId( uint16_t itemId );
@@ -81,6 +89,9 @@ namespace Core
     uint32_t m_nextDrop;
     uint32_t m_currentPrice;
     uint32_t m_minPrice;
+
+    //Tags
+    uint8_t m_tag[3];
   };
 
 }
