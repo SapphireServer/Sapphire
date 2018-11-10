@@ -91,8 +91,8 @@ Core::Entity::Player::Player() :
 
   for ( uint8_t i = 0; i < 5; i++ )
   {
-    memset( &m_housePermission[i], 0xFF, 8 );
-    memset( &m_housePermission[i].permissionMask, 0, 8 );
+    memset( &m_landPermission[i], 0xFF, 8 );
+    memset( &m_landPermission[i].permissionMask, 0, 8 );
   }
 
   m_objSpawnIndexAllocator.init( MAX_DISPLAYED_EOBJS );
@@ -1754,22 +1754,22 @@ bool Core::Entity::Player::isOnEnterEventDone() const
 
 void Core::Entity::Player::setLandPermissions( uint8_t permissionSet, uint32_t permissionMask, int16_t landSetId, int16_t wardNum, int16_t zoneId )
 {
-  m_housePermission[permissionSet].landSetId = landSetId;
-  m_housePermission[permissionSet].permissionMask = permissionMask;
-  m_housePermission[permissionSet].wardNum = wardNum;
-  m_housePermission[permissionSet].worldId = 67;
-  m_housePermission[permissionSet].unkown1 = 0;
+  m_landPermission[permissionSet].landId = landSetId;
+  m_landPermission[permissionSet].permissionMask = permissionMask;
+  m_landPermission[permissionSet].wardNum = wardNum;
+  m_landPermission[permissionSet].worldId = 67;
+  m_landPermission[permissionSet].unkown1 = 0;
 }
 
 void Core::Entity::Player::sendLandPermissions()
 {
   auto landPermissions = makeZonePacket< FFXIVIpcLandPermission >( getId() );
 
-  landPermissions->data().freeCompanyHouse = m_housePermission[Common::LandPermissionSlot::FreeCompany];
-  landPermissions->data().privateHouse = m_housePermission[Common::LandPermissionSlot::Private];
-  landPermissions->data().apartment = m_housePermission[Common::LandPermissionSlot::Apartment];
-  landPermissions->data().sharedHouse[0] = m_housePermission[Common::LandPermissionSlot::SharedHouse1];
-  landPermissions->data().sharedHouse[1] = m_housePermission[Common::LandPermissionSlot::SharedHouse2];
+  landPermissions->data().freeCompanyHouse = m_landPermission[Common::LandPermissionSlot::FreeCompany];
+  landPermissions->data().privateHouse = m_landPermission[Common::LandPermissionSlot::Private];
+  landPermissions->data().apartment = m_landPermission[Common::LandPermissionSlot::Apartment];
+  landPermissions->data().sharedHouse[0] = m_landPermission[Common::LandPermissionSlot::SharedHouse1];
+  landPermissions->data().sharedHouse[1] = m_landPermission[Common::LandPermissionSlot::SharedHouse2];
   memset( &landPermissions->data().unkownHouse, 0xFF, 8 );
   memset( &landPermissions->data().unkownHouse.permissionMask, 0, 8 );
   landPermissions->data().unkownHouse.permissionMask = 2;

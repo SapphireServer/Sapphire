@@ -26,6 +26,12 @@ namespace Core::Common
     float z;
   };
 
+  struct ActiveLand
+  {
+    uint8_t ward;
+    uint8_t plot;
+  };
+
   enum InventoryOperation : uint8_t
   {
     Discard = 0x07,
@@ -770,7 +776,7 @@ namespace Core::Common
 
   struct LandPermissionSet
   {
-    int16_t landSetId; //00
+    int16_t landId; //00
     int16_t wardNum; //02
     int16_t zoneId; //04
     int16_t worldId; //06
