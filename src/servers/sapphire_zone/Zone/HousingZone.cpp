@@ -13,6 +13,7 @@
 
 #include "Forwards.h"
 #include "HousingZone.h"
+#include "HousingMgr.h"
 #include "Framework.h"
 
 extern Core::Framework g_fw;
@@ -61,9 +62,11 @@ bool Core::HousingZone::init()
   for( landId = 0; landId < 60; landId++ )
   {
     auto pObject = make_Land( m_territoryTypeId, getWardNum(), landId, m_landSetId, info );
-    pObject->setHouseSize( 1 );
     m_landPtrMap[ landId ] = pObject;
   }
+
+  auto pHousingMgr = g_fw.get< HousingMgr >();
+  pHousingMgr->insertHousingZone( (HousingZonePtr)this );
 
   return true;
 }
@@ -100,13 +103,14 @@ void Core::HousingZone::onPlayerZoneIn( Entity::Player& player )
   }
 
   auto landSetMap = makeZonePacket< FFXIVIpcLandSetMap >( player.getId() );
-  landSetMap->data().subdivision = isPlayerSubInstance( player ) == false ? 1 : 2;
+  landSetMap->data().subdivision = isPlayerSubInstance( player ) == false ? 2 : 1;
   uint8_t startIndex = isPlayerSubInstance( player ) == false ? 0 : 30;
   for( uint8_t i = startIndex, count = 0; i < ( startIndex + 30 ); i++, count++ )
   {
     landSetMap->data().landInfo[ count ].status = 1;
     //memcpy( , &getLand( i )->getLand(), sizeof( Common::LandStruct ) );
   }
+
   player.queuePacket( landSetMap );
 
 }
@@ -148,6 +152,31 @@ void Core::HousingZone::sendLandUpdate( uint8_t landId )
 bool Core::HousingZone::isPlayerSubInstance( Entity::Player& player )
 {
   return player.getPos().x < -15000.0f; //ToDo: get correct pos
+}
+
+void Core::HousingZone::playerPurchseLand( Entity::Player & player, uint8_t plot, uint8_t state )
+{
+  uint32_t plotPrice = getLand( plot )->getCurrentPrice();
+  if( plotPrice <= player.getCurrency( CurrencyType::Gil ) )
+  {
+    auto pHousing = std::dynamic_pointer_cast< HousingZone >( player.getCurrentZone() );
+    if( state == 1 ) //TODO: add Free company purchase
+      player.sendDebug( "Free company house purchase aren't supported at this time." );
+    if( state == 2 ) //Private Purchase
+    {
+      getLand( plot )->setPlayerOwner( player.getId() );
+      getLand( plot )->setState( HouseState::sold );
+
+      player.removeCurrency( CurrencyType::Gil, plotPrice );
+      player.setLandPermissions( LandPermissionSlot::Private, 0x0B, plot, pHousing->getWardNum(), pHousing->getTerritoryTypeId() );
+      player.sendLandPermissions();
+
+      getLand( plot )->UpdateLandDb();
+      sendLandUpdate( plot );
+    }
+  }
+  //else
+    //TOD: add error msg - insufficient gil
 }
 
 void Core::HousingZone::onUpdate( uint32_t currTime )
