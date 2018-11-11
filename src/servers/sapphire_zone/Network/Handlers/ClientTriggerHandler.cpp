@@ -359,8 +359,7 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
       }
 
       memcpy( &LandInfoSignPacket->data().landMsg, "Hello World", 11 );
-      //memcpy( &LandInfoSignPacket->data().landName, &land->getLandName(), 20 );
-      memcpy( &LandInfoSignPacket->data().landName, "Hello World", 11 );
+      memcpy( &LandInfoSignPacket->data().landName, land->getLandName().c_str(), 20 );
       LandInfoSignPacket->data().houseSize = land->getHouseSize();
       LandInfoSignPacket->data().houseState = land->getState();
       LandInfoSignPacket->data().landId = land->getLandId();
@@ -397,7 +396,7 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
       landRenamePacket->data().wardNum = land->getWardNum();
       landRenamePacket->data().worldId = 67;
       landRenamePacket->data().zoneId = land->getZoneId();
-      memcpy( &landRenamePacket->data().landName, &land->getLandName(), 20 );
+      memcpy( &landRenamePacket->data().landName, land->getLandName().c_str(), 20 );
 
       player.queuePacket( landRenamePacket );
 
