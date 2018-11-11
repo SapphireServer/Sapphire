@@ -24,7 +24,7 @@ namespace Core
     void setState( uint8_t state );
     void setOwnership( uint8_t state );
     void setSharing( uint8_t state );
-    void setLandName( std::string& name );
+    void setLandName( const std::string& name );
 
     //Gerneral
     uint8_t getHouseSize();

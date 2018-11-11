@@ -155,7 +155,7 @@ void Core::Land::setSharing( uint8_t state )
   m_land.iconAddIcon = state;
 }
 
-void Core::Land::setLandName( std::string& name )
+void Core::Land::setLandName( const std::string& name )
 {
   memcpy( &m_landName, &name, 20 );
 }
