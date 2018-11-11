@@ -24,6 +24,7 @@ namespace Core
     void setState( uint8_t state );
     void setOwnership( uint8_t state );
     void setSharing( uint8_t state );
+    void setLandName( std::string& name );
 
     //Gerneral
     uint8_t getHouseSize();
@@ -34,6 +35,7 @@ namespace Core
     uint8_t getWardNum();
     uint8_t getLandId();
     uint16_t getZoneId();
+    std::string getLandName();
 
     //Free Comapny
     void setFreeCompany( uint32_t id, uint32_t icon, uint32_t color );
@@ -90,7 +92,11 @@ namespace Core
     uint32_t m_currentPrice;
     uint32_t m_minPrice;
 
-    //Tags
+    //information
+    char m_landName[23];
+    char m_landMsg[193];
+    char m_ownerName[31];
+    char fcTag[7];
     uint8_t m_tag[3];
   };
 

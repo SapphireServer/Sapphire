@@ -25,6 +25,7 @@ namespace Core
     uint16_t getNexLandId();
     void insertHousingZone( Core::Data::HousingZonePtr hZone );
     Core::Data::HousingZonePtr getHousingZone( uint16_t id );
+    Core::Data::HousingZonePtr getHousingZoneByLandSetId( uint32_t id );
     Core::LandPtr getLandByOwnerId( uint32_t id );
 
   private:
