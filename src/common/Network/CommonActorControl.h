@@ -290,6 +290,8 @@ enum ClientTriggerType
   AchievementList = 0x3E9,
 
   RequestHousingSign = 0x451,
+  RequestHousingInfoSign = 0x452,
+  RequestHousingRename = 0x45A,
   RequestHousingItemUI = 0x463,
   RequestSharedEstateSettings = 0x46F,
 

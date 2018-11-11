@@ -11,6 +11,7 @@
 #include "Zone/Zone.h"
 #include "Zone/ZonePosition.h"
 #include "Zone/HousingZone.h"
+#include "Zone/HousingMgr.h"
 #include "Zone/Land.h"
 
 #include "Network/GameConnection.h"
@@ -335,9 +336,77 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
 
       break;
     }
+    case ClientTriggerType::RequestHousingInfoSign:
+    {
+
+      auto LandInfoSignPacket = makeZonePacket< Server::FFXIVIpcLandInfoSign >( player.getId() );
+
+      uint8_t ward = ( param12 & 0xFF00 ) >> 8;
+      uint8_t plot = ( param12 & 0xFF );
+      pLog->debug( " Ward: " + std::to_string( ward ) + " Plot: " + std::to_string( plot ) );
+
+      player.setActiveLand( plot, ward );
+
+      auto zone = player.getCurrentZone();
+
+      auto hZone = std::dynamic_pointer_cast< HousingZone >( zone );
+
+      auto land = hZone->getLand( plot );
+      if( !land )
+      {
+        auto pHousingMgr = g_fw.get< HousingMgr >();
+        land = pHousingMgr->getLandByOwnerId( player.getId() );
+      }
+
+      memcpy( &LandInfoSignPacket->data().landMsg, "Hello World", 11 );
+      //memcpy( &LandInfoSignPacket->data().landName, &land->getLandName(), 20 );
+      memcpy( &LandInfoSignPacket->data().landName, "Hello World", 11 );
+      LandInfoSignPacket->data().houseSize = land->getHouseSize();
+      LandInfoSignPacket->data().houseState = land->getState();
+      LandInfoSignPacket->data().landId = land->getLandId();
+      LandInfoSignPacket->data().ownerId = land->getPlayerOwner();
+      memcpy( &LandInfoSignPacket->data().ownerName, "Hello World", 11 );
+      LandInfoSignPacket->data().wardNum = land->getWardNum();
+      LandInfoSignPacket->data().worldId = 67;
+      LandInfoSignPacket->data().zoneId = land->getZoneId();
+
+      player.queuePacket( LandInfoSignPacket );
+
+      break;
+    }
+    case ClientTriggerType::RequestHousingRename:
+    {
+      auto landRenamePacket = makeZonePacket< Server::FFXIVIpcRenameLand >( player.getId() );
+
+      uint8_t ward = ( param12 & 0xFF00 ) >> 8;
+      uint8_t plot = ( param12 & 0xFF );
+
+      auto zone = player.getCurrentZone();
+
+      auto hZone = std::dynamic_pointer_cast< HousingZone >( zone );
+
+      auto land = hZone->getLand( plot );
+
+      if( !land )
+      {
+        auto pHousingMgr = g_fw.get< HousingMgr >();
+        land = pHousingMgr->getLandByOwnerId( player.getId() );
+      }
+
+      landRenamePacket->data().landId = land->getLandId();
+      landRenamePacket->data().wardNum = land->getWardNum();
+      landRenamePacket->data().worldId = 67;
+      landRenamePacket->data().zoneId = land->getZoneId();
+      memcpy( &landRenamePacket->data().landName, &land->getLandName(), 20 );
+
+      player.queuePacket( landRenamePacket );
+
+      break;
+    }
     case ClientTriggerType::RequestHousingItemUI:
     {
-      uint32_t plot = param2;
+      uint8_t ward = ( param12 & 0xFF00 ) >> 8;
+      uint8_t plot = ( param12 & 0xFF );
       auto pShowHousingItemUIPacket = makeActorControl142( player.getId(), ShowHousingItemUI, 0, plot );
 
       player.queuePacket( pShowHousingItemUIPacket );
