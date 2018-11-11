@@ -1575,8 +1575,14 @@ struct FFXIVIpcPerformNote : FFXIVIpcBasePacket< PerformNote >
   uint8_t data[32];
 };
 
-//IPCs
-struct FFXIVIpcLandPermission : FFXIVIpcBasePacket<LandPermission >
+struct FFXIVIpcLandPermissionSlot : FFXIVIpcBasePacket< LandPermissionSlot >
+{
+  uint32_t type;
+  uint32_t unknown;
+  Common::LandPermissionSet permissionSet;
+};
+
+struct FFXIVIpcLandPermission : FFXIVIpcBasePacket< LandPermission >
 {
   Common::LandPermissionSet freeCompanyHouse; // 00
   uint64_t unkown1;

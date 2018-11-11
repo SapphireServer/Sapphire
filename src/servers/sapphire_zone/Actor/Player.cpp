@@ -1580,7 +1580,7 @@ void Core::Entity::Player::sendZonePackets()
   auto pHousingMgr = g_fw.get< HousingMgr >();
   if( Core::LandPtr pLand = pHousingMgr->getLandByOwnerId( getId() ) )
   {
-    setLandPermissions( LandPermissionSlot::Private, 0x0B, pLand->getLandId(), pLand->getWardNum(), pLand->getZoneId() );
+    setLandPermissions( LandPermissionSlot::Private, 0x00, pLand->getLandId(), pLand->getWardNum(), pLand->getZoneId() );
   }
 
   sendLandPermissions();
@@ -1761,14 +1761,15 @@ bool Core::Entity::Player::isOnEnterEventDone() const
   return m_onEnterEventDone;
 }
 
-void Core::Entity::Player::setLandPermissions( uint8_t permissionSet, uint32_t permissionMask, int16_t landId, int16_t wardNum, int16_t zoneId )
+void Core::Entity::Player::setLandPermissions( uint8_t permissionSet, uint32_t permissionMask,
+                                               int16_t landId, int16_t wardNum, int16_t zoneId )
 {
-  m_landPermission[permissionSet].landId = landId;
-  m_landPermission[permissionSet].permissionMask = permissionMask;
-  m_landPermission[permissionSet].wardNum = wardNum;
-  m_landPermission[permissionSet].zoneId = zoneId;
-  m_landPermission[permissionSet].worldId = 67;
-  m_landPermission[permissionSet].unkown1 = 0;
+  m_landPermission[ permissionSet ].landId = landId;
+  m_landPermission[ permissionSet ].permissionMask = permissionMask;
+  m_landPermission[ permissionSet ].wardNum = wardNum;
+  m_landPermission[ permissionSet ].zoneId = zoneId;
+  m_landPermission[ permissionSet ].worldId = 67;
+  m_landPermission[ permissionSet ].unkown1 = 0;
 }
 
 void Core::Entity::Player::sendLandPermissions()
