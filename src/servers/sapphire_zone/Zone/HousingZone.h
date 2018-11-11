@@ -6,6 +6,14 @@
 
 namespace Core
 {
+  enum class PurchaseResult
+  {
+    SUCCESS,
+    ERR_NOT_ENOUGH_GIL,
+    ERR_NOT_AVAILABLE,
+    ERR_INTERNAL,
+  };
+
   class HousingZone : public Zone
   {
   public:
@@ -26,7 +34,7 @@ namespace Core
     void sendLandUpdate( uint8_t landId );
     bool isPlayerSubInstance( Entity::Player& player );
 
-    void playerPurchseLand( Entity::Player& player, uint8_t plot, uint8_t state );
+    PurchaseResult purchseLand( Entity::Player& player, uint8_t plot, uint8_t state );
 
     /* returns current ward number for this zone */
     uint8_t getWardNum() const;
