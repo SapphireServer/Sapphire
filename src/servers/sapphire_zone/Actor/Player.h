@@ -46,7 +46,7 @@ namespace Core::Entity
 
     void autoAttack( CharaPtr pTarget ) override;
 
-    void injectPacket( std::string path );
+    void injectPacket( const std::string& path );
 
     // EventHandlers
     //////////////////////////////////////////////////////////////////////////////////////////////////////

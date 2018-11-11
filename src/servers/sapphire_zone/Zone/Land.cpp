@@ -32,7 +32,7 @@ Core::Land::Land( uint16_t zoneId, uint8_t wardNum, uint8_t landId, uint32_t lan
   m_landId( landId ),
   m_currentPrice( 0 ),
   m_minPrice( 0 ),
-  m_nextDrop( Util::getTimeSeconds() + 21600 ),
+  m_nextDrop( static_cast< uint32_t >( Util::getTimeSeconds() ) + 21600 ),
   m_ownerPlayerId( 0 ),
   m_landSetId( landSetId ),
   m_landInfo( info )
@@ -260,7 +260,7 @@ uint32_t Core::Land::getMaxItems()
 
 uint32_t Core::Land::getDevaluationTime()
 {
-  return m_nextDrop - Util::getTimeSeconds();
+  return m_nextDrop - static_cast< uint32_t >( Util::getTimeSeconds() );
 }
 
 void Core::Land::setLandTag( uint8_t slot, uint8_t tag )

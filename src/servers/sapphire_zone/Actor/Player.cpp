@@ -106,7 +106,7 @@ Core::Entity::Player::~Player()
 {
 }
 
-void Core::Entity::Player::injectPacket( std::string path )
+void Core::Entity::Player::injectPacket( const std::string& path )
 {
   auto pServerZone = g_fw.get< ServerZone >();
   auto session = pServerZone->getSession( getId() );
