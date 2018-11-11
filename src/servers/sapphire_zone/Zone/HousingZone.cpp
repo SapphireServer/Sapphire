@@ -111,7 +111,7 @@ void Core::HousingZone::onPlayerZoneIn( Entity::Player& player )
     //memcpy( , &getLand( i )->getLand(), sizeof( Common::LandStruct ) );
   }
 
-  player.queuePacket( landSetMap );
+  //player.queuePacket( landSetMap );
 
 }
 
@@ -190,7 +190,7 @@ Core::LandPurchaseResult Core::HousingZone::purchseLand( Entity::Player& player,
       player.removeCurrency( CurrencyType::Gil, plotPrice );
       pLand->setPlayerOwner( player.getId() );
       pLand->setState( HouseState::sold );
-      player.setLandPermissions( LandPermissionSlot::Private, 0x0B, plot,
+      player.setLandPermissions( LandPermissionSlot::Private, 0x00, plot,
                                  pHousing->getWardNum(), pHousing->getTerritoryTypeId() );
       player.sendLandPermissions();
       pLand->UpdateLandDb();

@@ -40,6 +40,9 @@ public:
           {
             auto screenMsgPkt = makeActorControl143( player.getId(), ActorControl::DutyQuestScreenMsg, m_id, 0x98 );
             player.queuePacket( screenMsgPkt );
+            auto screenMsgPkt2 = makeActorControl143( player.getId(), ActorControl::LogMsg, 0x0D16, 0x1AA,
+                                                      activeLand.ward + 1, activeLand.plot + 1 );
+            player.queuePacket( screenMsgPkt2 );
             break;
           }
 

@@ -73,8 +73,6 @@ namespace Core::Network::Packets
     SocialRequestResponse = 0x00BB, // updated 4.1
     CancelAllianceForming = 0x00C6, // updated 4.2
 
-
-
     Chat = 0x00F4, // updated 4.4
     SocialList = 0x00FB, // updated 4.4
 
@@ -84,8 +82,7 @@ namespace Core::Network::Packets
 
     ServerNotice = 0x0104, // updated 4.4
     SetOnlineStatus = 0x0105, // updated 4.4
-
-
+    
     CountdownInitiate = 0x010C, // updated 4.4
     CountdownCancel = 0x010D, // updated 4.4
 
@@ -184,18 +181,26 @@ namespace Core::Network::Packets
 
     EquipDisplayFlags = 0x020C, // updated 4.4
 
-    // housing
+    /// Housing //////////////////////////////////////
+
     LandSetInitialize = 0x0220, // updated 4.4
     LandUpdate = 0x0221, // updated 4.4
     YardObjectSpawn = 0x0222, // updated 4.4
 
     LandPriceUpdate = 0x0224, // updated 4.3
+
+    LandPermissionSlot = 0x0228, // updated 4.4
     LandPermission = 0x0229, // updated 4.4
+
     LandSetYardInitialize = 0x022C, // updated 4.4
+
     YardObjectMove = 0x0230, // updated 4.4
-    LandSetMap = 0x0251, // updated 4.4
 
     SharedEstateSettingsResponse = 0x023C, // updated 4.4
+
+    LandSetMap = 0x0251, // updated 4.4
+
+    //////////////////////////////////////////////////
 
     DuelChallenge = 0x0277, // 4.2; this is responsible for opening the ui
     PerformNote = 0x0286, // updated 4.3
