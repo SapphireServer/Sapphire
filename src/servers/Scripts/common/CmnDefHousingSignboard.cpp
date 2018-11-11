@@ -7,6 +7,9 @@
 
 
 using namespace Core;
+using namespace Network;
+using namespace Packets;
+using namespace Server;
 
 class CmnDefHousingSignboard : public EventScript
 {
@@ -31,23 +34,27 @@ public:
         PurchaseResult res = pHousing->purchseLand( player, activeLand.plot,
                                                     static_cast< uint8_t >( result.param2 ) );
 
-
         switch( res )
         {
           case PurchaseResult::SUCCESS:
           {
-            auto screenMsgPkt = Network::Packets::Server::makeActorControl143( player.getId(),
-                                                                               Network::ActorControl::DutyQuestScreenMsg,
-                                                                               m_id, 0x98 );
+            auto screenMsgPkt = makeActorControl143( player.getId(), ActorControl::DutyQuestScreenMsg, m_id, 0x98 );
             player.queuePacket( screenMsgPkt );
+            break;
           }
+
           case PurchaseResult::ERR_NOT_ENOUGH_GIL:
           {
-            auto errorMsg = Network::Packets::Server::makeActorControl143( player.getId(),
-                                                                           Network::ActorControl::LogMsg,
-                                                                           4027 );
+            auto errorMsg = makeActorControl143( player.getId(), ActorControl::LogMsg, 4027 );
             player.queuePacket( errorMsg );
+            break;
           }
+
+          case PurchaseResult::ERR_NOT_AVAILABLE:
+            break;
+
+          case PurchaseResult::ERR_INTERNAL:
+            break;
         }
 
       }

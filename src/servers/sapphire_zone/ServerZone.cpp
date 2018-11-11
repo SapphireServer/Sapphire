@@ -213,7 +213,7 @@ void Core::ServerZone::mainLoop()
 
     auto currTime = Util::getTimeSeconds();
 
-    pTeriMgr->updateTerritoryInstances( currTime );
+    pTeriMgr->updateTerritoryInstances( static_cast< uint32_t >( currTime ) );
 
     pScriptMgr->update();
 
