@@ -356,7 +356,7 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
     case ClientTriggerType::RequestHousingInfoSign:
     {
 
-      auto LandInfoSignPacket = makeZonePacket< Server::FFXIVIpcLandInfoSign >( player.getId() );
+      auto landInfoSignPacket = makeZonePacket< Server::FFXIVIpcLandInfoSign >( player.getId() );
 
       uint8_t ward = ( param12 & 0xFF00 ) >> 8;
       uint8_t plot = ( param12 & 0xFF );
@@ -375,18 +375,19 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
         land = pHousingMgr->getLandByOwnerId( player.getId() );
       }
 
-      memcpy( &LandInfoSignPacket->data().landMsg, "Hello World", 11 );
-      memcpy( &LandInfoSignPacket->data().landName, land->getLandName().c_str(), 20 );
-      LandInfoSignPacket->data().houseSize = land->getHouseSize();
-      LandInfoSignPacket->data().houseState = land->getState();
-      LandInfoSignPacket->data().landId = land->getLandId();
-      LandInfoSignPacket->data().ownerId = land->getPlayerOwner();
-      memcpy( &LandInfoSignPacket->data().ownerName, "Hello World", 11 );
-      LandInfoSignPacket->data().wardNum = land->getWardNum();
-      LandInfoSignPacket->data().worldId = 67;
-      LandInfoSignPacket->data().zoneId = land->getZoneId();
-
-      player.queuePacket( LandInfoSignPacket );
+      uint32_t playerId = land->getPlayerOwner();
+      std::string playerName = g_fw.get< Core::ServerZone >()->getPlayerNameFromDb( playerId );
+      //memcpy( &landInfoSignPacket->data().estateGreeting, "Hello World", 11 );
+      //memcpy( &landInfoSignPacket->data().estateName, land->getLandName().c_str(), land->getLandName().size() );
+      //landInfoSignPacket->data().houseSize = land->getPlotSize();
+      landInfoSignPacket->data().houseType = 2; // we really need to save this in the plot
+      landInfoSignPacket->data().landId = land->getLandId();
+      landInfoSignPacket->data().ownerId = player.getContentId(); // should be real owner contentId, not player.contentId()
+      memcpy( &landInfoSignPacket->data().ownerName, playerName.c_str(), playerName.size() );
+      landInfoSignPacket->data().wardNum = land->getWardNum();
+      landInfoSignPacket->data().worldId = 67;
+      landInfoSignPacket->data().zoneId = land->getZoneId();
+      player.queuePacket( landInfoSignPacket );
 
       break;
     }

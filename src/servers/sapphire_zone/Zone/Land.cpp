@@ -64,12 +64,12 @@ void Core::Land::load()
 
     m_currentPrice = m_landInfo->prices[ m_landId ];
     m_minPrice = m_landInfo->minPrices[ m_landId ];
-    m_land.houseSize = m_landInfo->sizes[ m_landId ];
+    m_land.plotSize = m_landInfo->sizes[ m_landId ];
     m_land.houseState = HouseState::forSale;
   }
   else
   {
-    m_land.houseSize = res->getUInt( "Size" );
+    m_land.plotSize = res->getUInt( "Size" );
     m_land.houseState = res->getUInt( "Status" );
     m_currentPrice = res->getUInt( "LandPrice" );
     m_ownerPlayerId = res->getUInt( "OwnerId" );
@@ -138,7 +138,7 @@ void Core::Land::setPreset( uint32_t id )
 //Primary State
 void Core::Land::setHouseSize( uint8_t size )
 {
-  m_land.houseSize = size;
+  m_land.plotSize = size;
 }
 
 void Core::Land::setState( uint8_t state )
@@ -161,9 +161,9 @@ void Core::Land::setLandName( const std::string& name )
   memcpy( &m_landName, name.c_str(), 20 );
 }
 
-uint8_t Core::Land::getHouseSize()
+uint8_t Core::Land::getPlotSize()
 {
-  return m_land.houseSize;
+  return m_land.plotSize;
 }
 
 uint8_t Core::Land::getState()
@@ -290,7 +290,7 @@ uint8_t Core::Land::getLandTag( uint8_t slot )
 void Core::Land::init()
 {
 
-  switch( getHouseSize() )
+  switch( getPlotSize() )
   {
     case HouseSize::small:
       m_maxItems = 20;

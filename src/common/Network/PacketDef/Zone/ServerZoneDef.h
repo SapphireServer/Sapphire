@@ -1617,16 +1617,13 @@ struct FFXIVIpcLandInfoSign : FFXIVIpcBasePacket< LandInfoSign >
   uint16_t wardNum;
   uint16_t zoneId;
   uint16_t worldId;
-  uint32_t ownerId;
-  uint16_t someState1;//private 0x0 : fc 0x17
-  uint8_t someState2;//private 0x21 : fc 0x40
-  uint8_t someState3; //private 0x80 : fc 0
-  uint32_t unknow1; //seems like not always 0 (6 of 5 times 0, one time it was 0x14)
+  uint64_t ownerId; // ither contentId or fcId
+  uint32_t unknow1;
   uint8_t houseIconAdd;
-  uint8_t houseState;
   uint8_t houseSize;
-  char landName[23];
-  char landMsg[193];
+  uint8_t houseType;
+  char estateName[23];
+  char estateGreeting[193];
   char ownerName[31];
   char fcTag[7];
   uint8_t tag[3];

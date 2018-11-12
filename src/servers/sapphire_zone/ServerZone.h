@@ -41,6 +41,8 @@ public:
   Entity::BNpcTemplatePtr getBNpcTemplate( const std::string& key );
   Entity::BNpcTemplatePtr getBNpcTemplate( uint32_t id );
 
+  std::string getPlayerNameFromDb( uint32_t playerId );
+
 private:
   uint16_t m_port;
   std::string m_ip;
