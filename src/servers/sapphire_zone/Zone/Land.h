@@ -1,6 +1,7 @@
 #ifndef LAND_H_
 #define LAND_H_
 #include <Common.h>
+#include "Exd/ExdDataGenerated.h"
 #include "ForwardsZone.h"
 
 namespace Core

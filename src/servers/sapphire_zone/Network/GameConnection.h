@@ -164,6 +164,8 @@ namespace Core::Network
 
     DECLARE_HANDLER( renameLandHandler );
 
+    DECLARE_HANDLER( buildPresetHandler );
+
     DECLARE_HANDLER( tellHandler );
 
   };

@@ -277,6 +277,7 @@ namespace Core::Network::Packets
 
     InventoryModifyHandler = 0x0142, // updated 4.4
 
+    BuildPresetHandler = 0x014A, // updated 4.4
     TalkEventHandler = 0x014B, // updated 4.4
     EmoteEventHandler = 0x014C, // updated 4.4
     WithinRangeEventHandler = 0x014D, // updated 4.4

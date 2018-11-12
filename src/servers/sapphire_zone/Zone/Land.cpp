@@ -65,6 +65,7 @@ void Core::Land::load()
     m_currentPrice = m_landInfo->prices[ m_landId ];
     m_minPrice = m_landInfo->minPrices[ m_landId ];
     m_land.houseSize = m_landInfo->sizes[ m_landId ];
+    m_land.houseState = HouseState::forSale;
   }
   else
   {
@@ -157,7 +158,7 @@ void Core::Land::setSharing( uint8_t state )
 
 void Core::Land::setLandName( const std::string& name )
 {
-  memcpy( &m_landName, &name, 20 );
+  memcpy( &m_landName, name.c_str(), 20 );
 }
 
 uint8_t Core::Land::getHouseSize()
