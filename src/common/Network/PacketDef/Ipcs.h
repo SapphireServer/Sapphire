@@ -187,9 +187,12 @@ namespace Core::Network::Packets
     LandUpdate = 0x0221, // updated 4.4
     YardObjectSpawn = 0x0222, // updated 4.4
 
-    LandPriceUpdate = 0x0224, // updated 4.3
+    LandPriceUpdate = 0x0224, // updated 4.4
+    LandInfoSign = 0x0225, // updated 4.4
+    LandRename = 0x0226, // updated 4.4
 
     LandPermissionSlot = 0x0228, // updated 4.4
+
     LandPermission = 0x0229, // updated 4.4
 
     LandSetYardInitialize = 0x022C, // updated 4.4
@@ -280,6 +283,7 @@ namespace Core::Network::Packets
 
     InventoryModifyHandler = 0x0142, // updated 4.4
 
+    BuildPresetHandler = 0x014A, // updated 4.4
     TalkEventHandler = 0x014B, // updated 4.4
     EmoteEventHandler = 0x014C, // updated 4.4
     WithinRangeEventHandler = 0x014D, // updated 4.4
@@ -291,6 +295,8 @@ namespace Core::Network::Packets
 
     LinkshellEventHandler = 0x0150, // updated 4.1 ??
     LinkshellEventHandler1 = 0x0151, // updated 4.1 ??
+
+    LandRenameHandler = 0x0171, // updated 4.4
 
     SetSharedEstateSettings = 0x0177, // updated 4.4
 

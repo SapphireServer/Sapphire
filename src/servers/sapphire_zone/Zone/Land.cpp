@@ -39,6 +39,9 @@ Core::Land::Land( uint16_t zoneId, uint8_t wardNum, uint8_t landId, uint32_t lan
 {
   memset( &m_land, 0x00, sizeof( LandStruct ) );
   memset( &m_tag, 0x00, 3 );
+  memset( &m_landMsg, 0x00, 193 );
+  memset( &m_landName, 0x00, 23 );
+
   load();
 }
 
@@ -62,6 +65,7 @@ void Core::Land::load()
     m_currentPrice = m_landInfo->prices[ m_landId ];
     m_minPrice = m_landInfo->minPrices[ m_landId ];
     m_land.houseSize = m_landInfo->sizes[ m_landId ];
+    m_land.houseState = HouseState::forSale;
   }
   else
   {
@@ -152,6 +156,11 @@ void Core::Land::setSharing( uint8_t state )
   m_land.iconAddIcon = state;
 }
 
+void Core::Land::setLandName( const std::string& name )
+{
+  memcpy( &m_landName, name.c_str(), 20 );
+}
+
 uint8_t Core::Land::getHouseSize()
 {
   return m_land.houseSize;
@@ -190,6 +199,11 @@ uint8_t Core::Land::getLandId()
 uint16_t Core::Land::getZoneId()
 {
   return m_zoneId;
+}
+
+std::string Core::Land::getLandName()
+{
+  return std::string( m_landName );
 }
 
 //Free Comapny

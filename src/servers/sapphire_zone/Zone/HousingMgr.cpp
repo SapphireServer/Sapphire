@@ -53,6 +53,22 @@ Core::Data::HousingZonePtr Core::HousingMgr::getHousingZone( uint16_t id )
   return it->second;
 }
 
+Core::Data::HousingZonePtr Core::HousingMgr::getHousingZoneByLandSetId( uint32_t id )
+{
+  for( const auto& hZoneIt : m_housingZonePtrMap )
+  {
+    auto pHousingZone = hZoneIt.second;
+    for( uint8_t landId = 0; landId < 60; landId++ )
+    {
+      if( pHousingZone->getLandSetId() == id )
+      {
+        return pHousingZone;
+      }
+    }
+  }
+  return nullptr;
+}
+
 Core::LandPtr Core::HousingMgr::getLandByOwnerId( uint32_t id )
 {
   for( const auto& hZoneIt : m_housingZonePtrMap )

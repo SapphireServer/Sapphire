@@ -214,6 +214,8 @@ enum ActorControlType :
 
   // Housing
     ShowHousingItemUI = 0x3F7,
+  ShowBuildPresetUI = 0x3E9,
+  BuildPresetResponse = 0x3ED,
 
   // PvP Duel
     SetPvPState = 0x5E0, // param3 must be 6 to engage a duel (hardcoded in the client)
@@ -289,7 +291,10 @@ enum ClientTriggerType
   AchievementCritReq = 0x3E8,
   AchievementList = 0x3E9,
 
+  RequestHousingBuildPreset = 0x44C,
   RequestHousingSign = 0x451,
+  RequestHousingInfoSign = 0x452,
+  RequestHousingRename = 0x45A,
   RequestHousingItemUI = 0x463,
   RequestSharedEstateSettings = 0x46F,
 
