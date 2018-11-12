@@ -652,7 +652,7 @@ void Core::Network::GameConnection::performNoteHandler( const Core::Network::Pac
   player.sendToInRangeSet( performPacket );
 }
 
-void Core::Network::GameConnection::renameLandHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Core::Network::GameConnection::landRenameHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
   Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcRenameLandHandler >( inPacket );

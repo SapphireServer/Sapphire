@@ -162,7 +162,7 @@ namespace Core::Network
 
     DECLARE_HANDLER( performNoteHandler );
 
-    DECLARE_HANDLER( renameLandHandler );
+    DECLARE_HANDLER( landRenameHandler );
 
     DECLARE_HANDLER( buildPresetHandler );
 

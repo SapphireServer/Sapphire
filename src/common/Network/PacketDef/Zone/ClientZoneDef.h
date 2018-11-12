@@ -190,7 +190,7 @@ struct FFXIVIpcInventoryModifyHandler :
 };
 
 struct FFXIVIpcRenameLandHandler :
-  FFXIVIpcBasePacket< RenameLandHandler >
+  FFXIVIpcBasePacket< LandRenameHandler >
 {
   /* 0000 */ uint16_t landId;
   /* 0002 */ uint16_t wardNum;

@@ -1632,7 +1632,7 @@ struct FFXIVIpcLandInfoSign : FFXIVIpcBasePacket< LandInfoSign >
   uint8_t tag[3];
 };
 
-struct FFXIVIpcRenameLand : FFXIVIpcBasePacket< RenameLand >
+struct FFXIVIpcLandRename : FFXIVIpcBasePacket< LandRename >
 {
   uint16_t landId;
   uint16_t wardNum;

@@ -84,7 +84,7 @@ Core::Network::GameConnection::GameConnection( Core::Network::HivePtr pHive,
                   &GameConnection::inventoryModifyHandler );
 
   setZoneHandler( ClientZoneIpcType::BuildPresetHandler, "BuildPresetHandler", &GameConnection::eventHandlerTalk );
-  setZoneHandler( ClientZoneIpcType::RenameLandHandler, "RenameLandHandler", &GameConnection::renameLandHandler );
+  setZoneHandler( ClientZoneIpcType::LandRenameHandler, "LandRenameHandler", &GameConnection::landRenameHandler );
   setZoneHandler( ClientZoneIpcType::TalkEventHandler, "EventHandlerTalk", &GameConnection::eventHandlerTalk );
   setZoneHandler( ClientZoneIpcType::EmoteEventHandler, "EventHandlerEmote", &GameConnection::eventHandlerEmote );
   setZoneHandler( ClientZoneIpcType::WithinRangeEventHandler, "EventHandlerWithinRange",
