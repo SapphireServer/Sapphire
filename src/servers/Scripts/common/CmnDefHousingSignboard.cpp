@@ -31,30 +31,49 @@ public:
         auto pTerritory = player.getCurrentZone();
         auto pHousing = std::dynamic_pointer_cast< HousingZone >( pTerritory );
         
-        PurchaseResult res = pHousing->purchseLand( player, activeLand.plot,
-                                                    static_cast< uint8_t >( result.param2 ) );
+        LandPurchaseResult res = pHousing->purchseLand( player, activeLand.plot,
+                                                        static_cast< uint8_t >( result.param2 ) );
 
         switch( res )
         {
-          case PurchaseResult::SUCCESS:
+          case LandPurchaseResult::SUCCESS:
           {
             auto screenMsgPkt = makeActorControl143( player.getId(), ActorControl::DutyQuestScreenMsg, m_id, 0x98 );
             player.queuePacket( screenMsgPkt );
+            auto screenMsgPkt2 = makeActorControl143( player.getId(), ActorControl::LogMsg, 0x0D16, 0x1AA,
+                                                      activeLand.ward + 1, activeLand.plot + 1 );
+            player.queuePacket( screenMsgPkt2 );
             break;
           }
 
-          case PurchaseResult::ERR_NOT_ENOUGH_GIL:
+          case LandPurchaseResult::ERR_NOT_ENOUGH_GIL:
           {
-            auto errorMsg = makeActorControl143( player.getId(), ActorControl::LogMsg, 4027 );
+            auto errorMsg = makeActorControl143( player.getId(), ActorControl::LogMsg, 3314 );
             player.queuePacket( errorMsg );
             break;
           }
 
-          case PurchaseResult::ERR_NOT_AVAILABLE:
+          case LandPurchaseResult::ERR_NOT_AVAILABLE:
+          {
+            auto errorMsg = makeActorControl143( player.getId(), ActorControl::LogMsg, 3312 );
+            player.queuePacket( errorMsg );
             break;
+          }
 
-          case PurchaseResult::ERR_INTERNAL:
+          case LandPurchaseResult::ERR_NO_MORE_LANDS_FOR_CHAR:
+          {
+            auto errorMsg = makeActorControl143( player.getId(), ActorControl::LogMsg, 3313 );
+            player.queuePacket( errorMsg );
             break;
+          }
+
+
+          case LandPurchaseResult::ERR_INTERNAL:
+          {
+            auto errorMsg = makeActorControl143( player.getId(), ActorControl::LogMsg, 1995 );
+            player.queuePacket( errorMsg );
+            break;
+          }
         }
 
       }
