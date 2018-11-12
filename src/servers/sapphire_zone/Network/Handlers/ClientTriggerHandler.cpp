@@ -310,6 +310,23 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
       player.removeQuest( static_cast< uint16_t >( param1 ) );
       break;
     }
+    case ClientTriggerType::RequestHousingBuildPreset:
+    {
+      auto pShowBuildPresetUIPacket = makeActorControl142( player.getId(), ShowBuildPresetUI, param11 );
+
+      auto zone = player.getCurrentZone();
+
+      auto hZone = std::dynamic_pointer_cast< HousingZone >( zone );
+
+      if (!hZone)
+        return;
+
+      player.setActiveLand( param11, hZone->getWardNum() );
+
+      player.queuePacket( pShowBuildPresetUIPacket );
+
+      break;
+    }
     case ClientTriggerType::RequestHousingSign:
     {
 

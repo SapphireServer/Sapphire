@@ -16,6 +16,9 @@
 
 #include "Zone/TerritoryMgr.h"
 #include "Zone/Zone.h"
+#include "Zone/HousingZone.h"
+#include "Zone/HousingMgr.h"
+#include "Zone/Land.h"
 #include "Zone/ZonePosition.h"
 
 #include "Network/PacketWrappers/InitUIPacket.h"
@@ -654,4 +657,55 @@ void Core::Network::GameConnection::renameLandHandler( const Core::Network::Pack
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcRenameLandHandler >( inPacket );
 
+  uint32_t landSetId = ( static_cast< uint32_t >( packet.data().zoneId ) << 16 ) | packet.data().wardNum;
+  auto pHousingMgr = g_fw.get< HousingMgr >();
+  auto pLand = pHousingMgr->getHousingZoneByLandSetId( landSetId )->getLand( packet.data().landId );
+
+  if( !pLand )
+    return;
+
+  pLand->setLandName( packet.data().landName );
+}
+
+void Core::Network::GameConnection::buildPresetHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
+  Entity::Player& player )
+{
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcBuildPresetHandler >( inPacket );
+
+  auto zone = player.getCurrentZone();
+  auto plotNum = packet.data().plotNum;
+  auto preset = packet.data().itemId;
+  std::string landString = std::string( packet.data().stateString );
+  auto hZone = std::dynamic_pointer_cast< HousingZone >( zone );
+
+  if( !hZone )
+    return;
+
+  auto pLand = hZone->getLand( plotNum );
+  /*
+  if (!pLand)
+    player.sendDebug( "Something went wrong..." );
+
+  if( stateString.find( "Private" ) )
+  {
+    pLand->setPreset( preset );
+    pLand->setState( HouseState::privateHouse );
+    pLand->UpdateLandDb();
+    hZone->sendLandUpdate( plotNum );
+  }
+  else if( stateString.find("Free") )
+  {
+    pLand->setPreset( preset );
+    pLand->setState( HouseState::fcHouse );
+    pLand->UpdateLandDb();
+    hZone->sendLandUpdate( plotNum );
+  }
+  else
+  {
+    player.sendDebug( "You tried to build a preset on not supported land." );
+  }
+
+  auto pSuccessBuildingPacket = makeActorControl142( player.getId(), BuildPresetResponse, plotNum );
+
+  player.queuePacket( pSuccessBuildingPacket );*/
 }

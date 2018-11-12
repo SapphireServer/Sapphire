@@ -200,6 +200,13 @@ struct FFXIVIpcRenameLandHandler :
   /* 0028 */ uint32_t padding;
 };
 
+struct FFXIVIpcBuildPresetHandler :
+  FFXIVIpcBasePacket< BuildPresetHandler >
+{
+  /* 0000 */ uint32_t itemId;
+  /* 0004 */ uint8_t plotNum;
+  /* 0005 */ char landSetString[27];
+};
 
 struct FFXIVIpcSetSharedEstateSettings :
   FFXIVIpcBasePacket< SetSharedEstateSettings >
