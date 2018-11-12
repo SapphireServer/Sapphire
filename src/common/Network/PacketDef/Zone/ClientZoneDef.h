@@ -189,6 +189,25 @@ struct FFXIVIpcInventoryModifyHandler :
   /* 0028 */ uint32_t splitCount;
 };
 
+struct FFXIVIpcRenameLandHandler :
+  FFXIVIpcBasePacket< LandRenameHandler >
+{
+  /* 0000 */ uint16_t landId;
+  /* 0002 */ uint16_t wardNum;
+  /* 0004 */ uint16_t zoneId;
+  /* 0006 */ uint16_t worldId;
+  /* 0008 */ char landName[20];
+  /* 0028 */ uint32_t padding;
+};
+
+struct FFXIVIpcBuildPresetHandler :
+  FFXIVIpcBasePacket< BuildPresetHandler >
+{
+  /* 0000 */ uint32_t itemId;
+  /* 0004 */ uint8_t plotNum;
+  /* 0005 */ char stateString[27];
+};
+
 struct FFXIVIpcSetSharedEstateSettings :
   FFXIVIpcBasePacket< SetSharedEstateSettings >
 {
