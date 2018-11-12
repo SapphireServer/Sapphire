@@ -28,7 +28,7 @@ namespace Core
     void setLandName( const std::string& name );
 
     //Gerneral
-    uint8_t getHouseSize();
+    uint8_t getPlotSize();
     uint8_t getState();
     uint8_t getOwnership();
     uint8_t getSharing();

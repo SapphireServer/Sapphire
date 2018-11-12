@@ -354,6 +354,17 @@ bool Core::ServerZone::isRunning() const
   return m_bRunning;
 }
 
+std::string Core::ServerZone::getPlayerNameFromDb( uint32_t playerId )
+{
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto res = pDb->query( "SELECT name FROM charainfo WHERE characterid = " + std::to_string( playerId ) );
+
+  if( !res->next() )
+    return "Unknown";
+
+  return res->getString( 1 );
+}
+
 void Core::ServerZone::loadBNpcTemplates()
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();

@@ -761,7 +761,7 @@ namespace Core::Common
   //Structs
   struct LandStruct
   {
-    uint8_t houseSize; //0
+    uint8_t plotSize; //0
     uint8_t houseState; // 2
     uint8_t iconColor; // 4
     uint8_t iconAddIcon; // 6
