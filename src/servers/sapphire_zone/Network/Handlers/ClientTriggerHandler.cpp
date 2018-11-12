@@ -392,7 +392,7 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
     }
     case ClientTriggerType::RequestHousingRename:
     {
-      auto landRenamePacket = makeZonePacket< Server::FFXIVIpcRenameLand >( player.getId() );
+      auto landRenamePacket = makeZonePacket< Server::FFXIVIpcLandRename >( player.getId() );
 
       uint8_t ward = ( param12 & 0xFF00 ) >> 8;
       uint8_t plot = ( param12 & 0xFF );
