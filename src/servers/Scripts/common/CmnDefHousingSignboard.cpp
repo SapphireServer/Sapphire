@@ -2,6 +2,7 @@
 #include <Actor/Player.h>
 #include <Zone/Zone.h>
 #include <Zone/HousingZone.h>
+#include <Zone/Land.h>
 #include <Network/PacketWrappers/ActorControlPacket143.h>
 #include <Network/CommonActorControl.h>
 
@@ -38,6 +39,8 @@ public:
         {
           case LandPurchaseResult::SUCCESS:
           {
+            pHousing->getLand( activeLand.plot )->setLandName( "Private Estate" + std::to_string( activeLand.ward ) + "-" + std::to_string( activeLand.plot ) );
+
             auto screenMsgPkt = makeActorControl143( player.getId(), ActorControl::DutyQuestScreenMsg, m_id, 0x98 );
             player.queuePacket( screenMsgPkt );
             auto screenMsgPkt2 = makeActorControl143( player.getId(), ActorControl::LogMsg, 0x0D16, 0x1AA,
