@@ -193,6 +193,7 @@ Core::LandPurchaseResult Core::HousingZone::purchseLand( Entity::Player& player,
       player.setLandPermissions( LandPermissionSlot::Private, 0x00, plot,
                                  pHousing->getWardNum(), pHousing->getTerritoryTypeId() );
       player.sendLandPermissions();
+      pLand->setLandName( "Private Estate" + std::to_string( pHousing->getWardNum() ) + "-" + std::to_string( plot ) );
       pLand->UpdateLandDb();
       sendLandUpdate( plot );
       return LandPurchaseResult::SUCCESS;
