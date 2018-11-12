@@ -111,7 +111,7 @@ void Core::HousingZone::onPlayerZoneIn( Entity::Player& player )
     //memcpy( , &getLand( i )->getLand(), sizeof( Common::LandStruct ) );
   }
 
-  player.queuePacket( landSetMap );
+  //player.queuePacket( landSetMap );
 
 }
 
@@ -154,7 +154,7 @@ bool Core::HousingZone::isPlayerSubInstance( Entity::Player& player )
   return player.getPos().x < -15000.0f; //ToDo: get correct pos
 }
 
-Core::PurchaseResult Core::HousingZone::purchseLand( Entity::Player& player, uint8_t plot, uint8_t state )
+Core::LandPurchaseResult Core::HousingZone::purchseLand( Entity::Player& player, uint8_t plot, uint8_t state )
 {
 
   auto plotPrice = getLand( plot )->getCurrentPrice();
@@ -162,35 +162,44 @@ Core::PurchaseResult Core::HousingZone::purchseLand( Entity::Player& player, uin
   auto pLand = getLand( plot );
 
   if( !pLand )
-    return PurchaseResult::ERR_INTERNAL;
+    return LandPurchaseResult::ERR_INTERNAL;
 
   if( pLand->getState() != HouseState::forSale )
-    return PurchaseResult::ERR_NOT_AVAILABLE;
+    return LandPurchaseResult::ERR_NOT_AVAILABLE;
 
   if( gilAvailable < plotPrice )
-    return PurchaseResult::ERR_NOT_ENOUGH_GIL;
+    return LandPurchaseResult::ERR_NOT_ENOUGH_GIL;
 
   auto pHousing = std::dynamic_pointer_cast< HousingZone >( player.getCurrentZone() );
 
-  switch( state )
+  switch( static_cast< LandPurchaseMode >( state ) )
   {
-    case 1:
+    case LandPurchaseMode::FC:
       player.sendDebug( "Free company house purchase aren't supported at this time." );
-      return PurchaseResult::ERR_INTERNAL;
+      return LandPurchaseResult::ERR_INTERNAL;
 
-    case 2:
+    case LandPurchaseMode::PRIVATE:
+    {
+
+      auto pHousingMgr = g_fw.get< HousingMgr >();
+      auto pOldLand = pHousingMgr->getLandByOwnerId( player.getId() );
+
+      if( pOldLand )
+        return LandPurchaseResult::ERR_NO_MORE_LANDS_FOR_CHAR;
+
       player.removeCurrency( CurrencyType::Gil, plotPrice );
       pLand->setPlayerOwner( player.getId() );
       pLand->setState( HouseState::sold );
-      player.setLandPermissions( LandPermissionSlot::Private, 0x0B, plot,
+      player.setLandPermissions( LandPermissionSlot::Private, 0x00, plot,
                                  pHousing->getWardNum(), pHousing->getTerritoryTypeId() );
       player.sendLandPermissions();
       pLand->UpdateLandDb();
       sendLandUpdate( plot );
-      return PurchaseResult::SUCCESS;
+      return LandPurchaseResult::SUCCESS;
+    }
 
     default:
-      return PurchaseResult::ERR_INTERNAL;
+      return LandPurchaseResult::ERR_INTERNAL;
   }
 
 }
