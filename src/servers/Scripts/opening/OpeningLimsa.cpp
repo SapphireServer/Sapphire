@@ -8,7 +8,7 @@ using namespace Core;
 // Quest ID: 1245185
 
 class OpeningLimsa :
-  public EventScript
+  public Sapphire::ScriptAPI::EventScript
 {
 private:
   static constexpr auto ERANGE_HOWTO_ANN_AND_QUEST = 4101831;
@@ -116,7 +116,7 @@ private:
 
 public:
   OpeningLimsa() :
-    EventScript( 1245185 )
+    Sapphire::ScriptAPI::EventScript( 1245185 )
   {
   }
 

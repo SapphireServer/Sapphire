@@ -4,11 +4,11 @@
 using namespace Core;
 
 class HalataliHard :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   HalataliHard() :
-    InstanceContentScript( 21 )
+    Sapphire::ScriptAPI::InstanceContentScript( 21 )
   {
   }
 

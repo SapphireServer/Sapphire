@@ -4,11 +4,11 @@
 using namespace Core;
 
 class SaintMociannesArboretum :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   SaintMociannesArboretum() :
-    InstanceContentScript( 41 )
+    Sapphire::ScriptAPI::InstanceContentScript( 41 )
   {
   }
 

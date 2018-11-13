@@ -60,7 +60,7 @@ namespace Core::Scripting
      *
      * This is tracked so when we unload this module we can call delete on each ScriptObject and correctly free it from memory.
      */
-    std::vector< ScriptObject* > scripts;
+    std::vector< Sapphire::ScriptAPI::ScriptObject* > scripts;
   };
 
 }

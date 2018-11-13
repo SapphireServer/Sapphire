@@ -4,11 +4,11 @@
 using namespace Core;
 
 class WithHeartandSteel :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   WithHeartandSteel() :
-    InstanceContentScript( 5007 )
+    Sapphire::ScriptAPI::InstanceContentScript( 5007 )
   {
   }
 

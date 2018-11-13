@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheAquapolis :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheAquapolis() :
-    InstanceContentScript( 55001 )
+    Sapphire::ScriptAPI::InstanceContentScript( 55001 )
   {
   }
 

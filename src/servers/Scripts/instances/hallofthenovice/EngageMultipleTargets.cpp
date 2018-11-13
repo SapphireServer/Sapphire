@@ -4,11 +4,11 @@
 using namespace Core;
 
 class EngageMultipleTargets :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   EngageMultipleTargets() :
-    InstanceContentScript( 15005 )
+    Sapphire::ScriptAPI::InstanceContentScript( 15005 )
   {
   }
 

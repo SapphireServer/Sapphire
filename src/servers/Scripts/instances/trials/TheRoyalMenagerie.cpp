@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheRoyalMenagerie :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheRoyalMenagerie() :
-    InstanceContentScript( 20045 )
+    Sapphire::ScriptAPI::InstanceContentScript( 20045 )
   {
   }
 

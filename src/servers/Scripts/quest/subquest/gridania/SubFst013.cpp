@@ -11,7 +11,7 @@ using namespace Core;
 // End NPC: 1000162
 
 class SubFst013 :
-  public EventScript
+  public Sapphire::ScriptAPI::EventScript
 {
 private:
   static constexpr auto SEQ_0 = 0;
@@ -154,7 +154,7 @@ private:
 
 public:
   SubFst013() :
-    EventScript( 65576 )
+    Sapphire::ScriptAPI::EventScript( 65576 )
   {
   }
 

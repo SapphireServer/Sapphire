@@ -4,11 +4,11 @@
 using namespace Core;
 
 class GilShop :
-  public EventScript
+  public Sapphire::ScriptAPI::EventScript
 {
 public:
   GilShop() :
-    EventScript( 0x00040001 )
+    Sapphire::ScriptAPI::EventScript( 0x00040001 )
   {
   }
 

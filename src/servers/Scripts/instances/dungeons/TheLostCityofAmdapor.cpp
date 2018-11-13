@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheLostCityofAmdapor :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheLostCityofAmdapor() :
-    InstanceContentScript( 22 )
+    Sapphire::ScriptAPI::InstanceContentScript( 22 )
   {
   }
 

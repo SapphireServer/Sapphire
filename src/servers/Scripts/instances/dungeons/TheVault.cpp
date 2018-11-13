@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheVault :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheVault() :
-    InstanceContentScript( 34 )
+    Sapphire::ScriptAPI::InstanceContentScript( 34 )
   {
   }
 

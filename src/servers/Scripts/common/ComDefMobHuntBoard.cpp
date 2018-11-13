@@ -4,11 +4,11 @@
 using namespace Core;
 
 class ComDefMobHuntBoard :
-  public EventScript
+  public Sapphire::ScriptAPI::EventScript
 {
 public:
   ComDefMobHuntBoard() :
-    EventScript( 0xB00CA )
+    Sapphire::ScriptAPI::EventScript( 0xB00CA )
   {
   }
 

@@ -4,11 +4,11 @@
 using namespace Core;
 
 class BasicTrainingEnemyParties :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   BasicTrainingEnemyParties() :
-    InstanceContentScript( 10001 )
+    Sapphire::ScriptAPI::InstanceContentScript( 10001 )
   {
   }
 

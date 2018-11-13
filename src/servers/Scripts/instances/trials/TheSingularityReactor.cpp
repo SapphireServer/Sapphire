@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheSingularityReactor :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheSingularityReactor() :
-    InstanceContentScript( 20035 )
+    Sapphire::ScriptAPI::InstanceContentScript( 20035 )
   {
   }
 

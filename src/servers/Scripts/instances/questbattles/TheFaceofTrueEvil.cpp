@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheFaceofTrueEvil :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheFaceofTrueEvil() :
-    InstanceContentScript( 5010 )
+    Sapphire::ScriptAPI::InstanceContentScript( 5010 )
   {
   }
 

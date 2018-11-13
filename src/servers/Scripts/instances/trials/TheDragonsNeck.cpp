@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheDragonsNeck :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheDragonsNeck() :
-    InstanceContentScript( 20026 )
+    Sapphire::ScriptAPI::InstanceContentScript( 20026 )
   {
   }
 

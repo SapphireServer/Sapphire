@@ -4,11 +4,11 @@
 using namespace Core;
 
 class HellsLid :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   HellsLid() :
-    InstanceContentScript( 59 )
+    Sapphire::ScriptAPI::InstanceContentScript( 59 )
   {
   }
 

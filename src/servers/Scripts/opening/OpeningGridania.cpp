@@ -3,7 +3,7 @@
 
 using namespace Core;
 
-class OpeningGridania : public EventScript
+class OpeningGridania : public Sapphire::ScriptAPI::EventScript
 {
 private:
   static constexpr auto ERANGE_HOWTO_ANN_AND_QUEST = 2117539;
@@ -99,7 +99,7 @@ private:
 
 public:
   OpeningGridania() :
-    EventScript( 1245186 )
+    Sapphire::ScriptAPI::EventScript( 1245186 )
   {
   }
 

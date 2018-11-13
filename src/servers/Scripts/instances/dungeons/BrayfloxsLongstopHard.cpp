@@ -4,11 +4,11 @@
 using namespace Core;
 
 class BrayfloxsLongstopHard :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   BrayfloxsLongstopHard() :
-    InstanceContentScript( 20 )
+    Sapphire::ScriptAPI::InstanceContentScript( 20 )
   {
   }
 

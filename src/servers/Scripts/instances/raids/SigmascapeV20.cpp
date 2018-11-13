@@ -4,11 +4,11 @@
 using namespace Core;
 
 class SigmascapeV20 :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   SigmascapeV20() :
-    InstanceContentScript( 30060 )
+    Sapphire::ScriptAPI::InstanceContentScript( 30060 )
   {
   }
 

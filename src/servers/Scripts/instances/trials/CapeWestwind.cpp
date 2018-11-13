@@ -4,11 +4,11 @@
 using namespace Core;
 
 class CapeWestwind :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   CapeWestwind() :
-    InstanceContentScript( 20007 )
+    Sapphire::ScriptAPI::InstanceContentScript( 20007 )
   {
   }
 

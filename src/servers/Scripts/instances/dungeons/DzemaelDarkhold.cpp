@@ -4,11 +4,11 @@
 using namespace Core;
 
 class DzemaelDarkhold :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   DzemaelDarkhold() :
-    InstanceContentScript( 13 )
+    Sapphire::ScriptAPI::InstanceContentScript( 13 )
   {
   }
 

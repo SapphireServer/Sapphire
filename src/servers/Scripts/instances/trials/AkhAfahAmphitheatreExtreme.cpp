@@ -3,10 +3,10 @@
 
 using namespace Core;
 
-class AkhAfahAmphitheatreExtreme : public InstanceContentScript
+class AkhAfahAmphitheatreExtreme : public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
-  AkhAfahAmphitheatreExtreme() : InstanceContentScript( 20025 )
+  AkhAfahAmphitheatreExtreme() : Sapphire::ScriptAPI::InstanceContentScript( 20025 )
   {
   }
 

@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheHiddenCanalsofUznair :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheHiddenCanalsofUznair() :
-    InstanceContentScript( 55003 )
+    Sapphire::ScriptAPI::InstanceContentScript( 55003 )
   {
   }
 

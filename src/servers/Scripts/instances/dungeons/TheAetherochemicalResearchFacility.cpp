@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheAetherochemicalResearchFacility :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheAetherochemicalResearchFacility() :
-    InstanceContentScript( 38 )
+    Sapphire::ScriptAPI::InstanceContentScript( 38 )
   {
   }
 

@@ -31,7 +31,7 @@ foreach(_scriptDir ${children})
                     set(ScriptIncludes "#include \"${_script}\"")
                 endif()
 
-                set(ScriptNames "${ScriptNames}   static_cast< ScriptObject* >( new ${_scriptname} ),\n")
+                set(ScriptNames "${ScriptNames}   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new ${_scriptname} ),\n")
             endif()
         endforeach()
 

@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheFeastCustomMatchLichenweed :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheFeastCustomMatchLichenweed() :
-    InstanceContentScript( 40021 )
+    Sapphire::ScriptAPI::InstanceContentScript( 40021 )
   {
   }
 

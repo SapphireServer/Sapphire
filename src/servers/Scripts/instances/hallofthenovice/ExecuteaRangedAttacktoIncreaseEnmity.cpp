@@ -4,11 +4,11 @@
 using namespace Core;
 
 class ExecuteaRangedAttacktoIncreaseEnmity :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   ExecuteaRangedAttacktoIncreaseEnmity() :
-    InstanceContentScript( 15006 )
+    Sapphire::ScriptAPI::InstanceContentScript( 15006 )
   {
   }
 

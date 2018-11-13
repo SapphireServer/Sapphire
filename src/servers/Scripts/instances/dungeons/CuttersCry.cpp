@@ -4,11 +4,11 @@
 using namespace Core;
 
 class CuttersCry :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   CuttersCry() :
-    InstanceContentScript( 12 )
+    Sapphire::ScriptAPI::InstanceContentScript( 12 )
   {
   }
 

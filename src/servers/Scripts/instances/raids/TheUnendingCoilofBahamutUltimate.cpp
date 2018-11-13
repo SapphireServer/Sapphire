@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheUnendingCoilofBahamutUltimate :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheUnendingCoilofBahamutUltimate() :
-    InstanceContentScript( 30057 )
+    Sapphire::ScriptAPI::InstanceContentScript( 30057 )
   {
   }
 

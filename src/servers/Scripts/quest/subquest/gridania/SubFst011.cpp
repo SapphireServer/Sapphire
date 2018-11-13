@@ -13,7 +13,7 @@ using namespace Core;
 //NEED TEST KILLCREDIT
 
 class SubFst011 :
-  public EventScript
+  public Sapphire::ScriptAPI::EventScript
 {
 private:
   // GetQuestUI8AL
@@ -38,7 +38,7 @@ private:
 
 public:
   SubFst011() :
-    EventScript( 65573 )
+    Sapphire::ScriptAPI::EventScript( 65573 )
   {
   };
 

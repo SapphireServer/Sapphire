@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheStrikingTreeExtreme :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheStrikingTreeExtreme() :
-    InstanceContentScript( 20023 )
+    Sapphire::ScriptAPI::InstanceContentScript( 20023 )
   {
   }
 

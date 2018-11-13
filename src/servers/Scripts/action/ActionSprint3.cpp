@@ -2,11 +2,11 @@
 #include <Actor/Player.h>
 
 class ActionSprint3 :
-  public ActionScript
+  public Sapphire::ScriptAPI::ActionScript
 {
 public:
   ActionSprint3() :
-    ActionScript( 3 )
+    Sapphire::ScriptAPI::ActionScript( 3 )
   {
   }
 

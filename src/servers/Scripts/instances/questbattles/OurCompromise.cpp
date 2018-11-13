@@ -4,11 +4,11 @@
 using namespace Core;
 
 class OurCompromise :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   OurCompromise() :
-    InstanceContentScript( 5020 )
+    Sapphire::ScriptAPI::InstanceContentScript( 5020 )
   {
   }
 

@@ -4,11 +4,11 @@
 using namespace Core;
 
 class DeltascapeV20Savage :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   DeltascapeV20Savage() :
-    InstanceContentScript( 30054 )
+    Sapphire::ScriptAPI::InstanceContentScript( 30054 )
   {
   }
 

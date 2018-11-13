@@ -4,11 +4,11 @@
 using namespace Core;
 
 class ThornmarchExtreme :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   ThornmarchExtreme() :
-    InstanceContentScript( 20012 )
+    Sapphire::ScriptAPI::InstanceContentScript( 20012 )
   {
   }
 

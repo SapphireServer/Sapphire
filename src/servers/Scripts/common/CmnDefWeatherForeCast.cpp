@@ -4,11 +4,11 @@
 using namespace Core;
 
 class CmnDefWeatherForeCast :
-  public EventScript
+  public Sapphire::ScriptAPI::EventScript
 {
 public:
   CmnDefWeatherForeCast() :
-    EventScript( 721100 )
+    Sapphire::ScriptAPI::EventScript( 721100 )
   {
   }
 

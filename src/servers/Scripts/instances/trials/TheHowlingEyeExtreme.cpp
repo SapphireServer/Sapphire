@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheHowlingEyeExtreme :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheHowlingEyeExtreme() :
-    InstanceContentScript( 20010 )
+    Sapphire::ScriptAPI::InstanceContentScript( 20010 )
   {
   }
 

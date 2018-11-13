@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheDuskVigil :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheDuskVigil() :
-    InstanceContentScript( 36 )
+    Sapphire::ScriptAPI::InstanceContentScript( 36 )
   {
   }
 

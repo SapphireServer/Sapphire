@@ -4,11 +4,11 @@
 using namespace Core;
 
 class OneLifeforOneWorld :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   OneLifeforOneWorld() :
-    InstanceContentScript( 5003 )
+    Sapphire::ScriptAPI::InstanceContentScript( 5003 )
   {
   }
 

@@ -4,11 +4,11 @@
 using namespace Core;
 
 class ARelicReborntheChimera :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   ARelicReborntheChimera() :
-    InstanceContentScript( 20019 )
+    Sapphire::ScriptAPI::InstanceContentScript( 20019 )
   {
   }
 

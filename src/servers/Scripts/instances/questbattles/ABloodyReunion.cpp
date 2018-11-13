@@ -4,11 +4,11 @@
 using namespace Core;
 
 class ABloodyReunion :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   ABloodyReunion() :
-    InstanceContentScript( 5002 )
+    Sapphire::ScriptAPI::InstanceContentScript( 5002 )
   {
   }
 

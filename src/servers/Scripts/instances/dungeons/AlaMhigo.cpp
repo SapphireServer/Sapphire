@@ -4,11 +4,11 @@
 using namespace Core;
 
 class AlaMhigo :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   AlaMhigo() :
-    InstanceContentScript( 56 )
+    Sapphire::ScriptAPI::InstanceContentScript( 56 )
   {
   }
 

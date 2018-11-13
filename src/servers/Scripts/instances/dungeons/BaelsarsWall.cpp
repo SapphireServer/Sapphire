@@ -4,11 +4,11 @@
 using namespace Core;
 
 class BaelsarsWall :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   BaelsarsWall() :
-    InstanceContentScript( 48 )
+    Sapphire::ScriptAPI::InstanceContentScript( 48 )
   {
   }
 

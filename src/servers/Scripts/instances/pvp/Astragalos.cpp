@@ -4,11 +4,11 @@
 using namespace Core;
 
 class Astragalos :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   Astragalos() :
-    InstanceContentScript( 51001 )
+    Sapphire::ScriptAPI::InstanceContentScript( 51001 )
   {
   }
 

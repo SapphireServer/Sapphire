@@ -4,11 +4,11 @@
 using namespace Core;
 
 class Xelphatol :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   Xelphatol() :
-    InstanceContentScript( 46 )
+    Sapphire::ScriptAPI::InstanceContentScript( 46 )
   {
   }
 

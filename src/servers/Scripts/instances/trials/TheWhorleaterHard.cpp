@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheWhorleaterHard :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheWhorleaterHard() :
-    InstanceContentScript( 20017 )
+    Sapphire::ScriptAPI::InstanceContentScript( 20017 )
   {
   }
 
