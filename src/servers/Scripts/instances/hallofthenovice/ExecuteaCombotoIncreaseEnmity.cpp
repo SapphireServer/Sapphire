@@ -4,11 +4,11 @@
 using namespace Core;
 
 class ExecuteaCombotoIncreaseEnmity :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   ExecuteaCombotoIncreaseEnmity() :
-    InstanceContentScript( 15002 )
+    Sapphire::ScriptAPI::InstanceContentScript( 15002 )
   {
   }
 

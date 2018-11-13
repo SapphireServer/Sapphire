@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheVoidArk :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheVoidArk() :
-    InstanceContentScript( 30029 )
+    Sapphire::ScriptAPI::InstanceContentScript( 30029 )
   {
   }
 

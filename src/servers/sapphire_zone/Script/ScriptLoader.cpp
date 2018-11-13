@@ -101,9 +101,9 @@ Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::loadModule( const st
   return info;
 }
 
-ScriptObject** Core::Scripting::ScriptLoader::getScripts( ModuleHandle handle )
+Sapphire::ScriptAPI::ScriptObject** Core::Scripting::ScriptLoader::getScripts( ModuleHandle handle )
 {
-  using getScripts = ScriptObject** ( * )();
+  using getScripts = Sapphire::ScriptAPI::ScriptObject** ( * )();
   auto pLog = g_fw.get< Logger >();
 
 #ifdef _WIN32

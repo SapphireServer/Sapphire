@@ -15,11 +15,11 @@
 using namespace Core;
 
 class Aetheryte :
-  public EventScript
+  public Sapphire::ScriptAPI::EventScript
 {
 public:
   Aetheryte() :
-    EventScript( EVENTSCRIPT_AETHERYTE_ID )
+    Sapphire::ScriptAPI::EventScript( EVENTSCRIPT_AETHERYTE_ID )
   {
   }
 

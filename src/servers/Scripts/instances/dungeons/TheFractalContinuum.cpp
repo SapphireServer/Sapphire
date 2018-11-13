@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheFractalContinuum :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheFractalContinuum() :
-    InstanceContentScript( 35 )
+    Sapphire::ScriptAPI::InstanceContentScript( 35 )
   {
   }
 

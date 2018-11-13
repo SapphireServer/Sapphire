@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheSirensongSea :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheSirensongSea() :
-    InstanceContentScript( 52 )
+    Sapphire::ScriptAPI::InstanceContentScript( 52 )
   {
   }
 

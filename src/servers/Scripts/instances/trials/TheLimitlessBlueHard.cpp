@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheLimitlessBlueHard :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheLimitlessBlueHard() :
-    InstanceContentScript( 20033 )
+    Sapphire::ScriptAPI::InstanceContentScript( 20033 )
   {
   }
 

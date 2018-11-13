@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheFinalStepsofFaith :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheFinalStepsofFaith() :
-    InstanceContentScript( 20039 )
+    Sapphire::ScriptAPI::InstanceContentScript( 20039 )
   {
   }
 

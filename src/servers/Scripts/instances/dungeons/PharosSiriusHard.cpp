@@ -4,11 +4,11 @@
 using namespace Core;
 
 class PharosSiriusHard :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   PharosSiriusHard() :
-    InstanceContentScript( 40 )
+    Sapphire::ScriptAPI::InstanceContentScript( 40 )
   {
   }
 

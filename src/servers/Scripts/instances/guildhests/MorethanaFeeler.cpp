@@ -4,11 +4,11 @@
 using namespace Core;
 
 class MorethanaFeeler :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   MorethanaFeeler() :
-    InstanceContentScript( 10009 )
+    Sapphire::ScriptAPI::InstanceContentScript( 10009 )
   {
   }
 

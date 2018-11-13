@@ -4,11 +4,11 @@
 using namespace Core;
 
 class WardUp :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   WardUp() :
-    InstanceContentScript( 10013 )
+    Sapphire::ScriptAPI::InstanceContentScript( 10013 )
   {
   }
 

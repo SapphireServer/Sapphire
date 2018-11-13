@@ -4,11 +4,11 @@
 using namespace Core;
 
 class AssistAlliesinDefeatingaTarget :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   AssistAlliesinDefeatingaTarget() :
-    InstanceContentScript( 15008 )
+    Sapphire::ScriptAPI::InstanceContentScript( 15008 )
   {
   }
 

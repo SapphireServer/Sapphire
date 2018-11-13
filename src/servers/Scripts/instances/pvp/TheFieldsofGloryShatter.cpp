@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheFieldsofGloryShatter :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheFieldsofGloryShatter() :
-    InstanceContentScript( 50005 )
+    Sapphire::ScriptAPI::InstanceContentScript( 50005 )
   {
   }
 

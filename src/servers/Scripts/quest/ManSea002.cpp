@@ -11,7 +11,7 @@
 using namespace Core;
 
 class ManSea002 :
-  public EventScript
+  public Sapphire::ScriptAPI::EventScript
 {
 private:
   static constexpr auto SEQ_0 = 0;
@@ -37,7 +37,7 @@ private:
 
 public:
   ManSea002() :
-    EventScript( 65644 )
+    Sapphire::ScriptAPI::EventScript( 65644 )
   {
   }
 

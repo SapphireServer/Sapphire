@@ -3,7 +3,7 @@
 
 using namespace Core;
 
-class OpeningUldah : public EventScript
+class OpeningUldah : public Sapphire::ScriptAPI::EventScript
 {
 private:
   static constexpr auto ERANGE_HOWTO_ANN_AND_QUEST = 4101650;
@@ -98,7 +98,7 @@ private:
 
 public:
   OpeningUldah() :
-    EventScript( 1245187 )
+    Sapphire::ScriptAPI::EventScript( 1245187 )
   {
   }
 

@@ -4,11 +4,11 @@
 using namespace Core;
 
 class CmnDefInnBed :
-  public EventScript
+  public Sapphire::ScriptAPI::EventScript
 {
 public:
   CmnDefInnBed() :
-    EventScript( 720916 )
+    Sapphire::ScriptAPI::EventScript( 720916 )
   {
   }
 

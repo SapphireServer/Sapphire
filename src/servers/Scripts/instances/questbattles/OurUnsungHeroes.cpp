@@ -4,11 +4,11 @@
 using namespace Core;
 
 class OurUnsungHeroes :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   OurUnsungHeroes() :
-    InstanceContentScript( 5014 )
+    Sapphire::ScriptAPI::InstanceContentScript( 5014 )
   {
   }
 

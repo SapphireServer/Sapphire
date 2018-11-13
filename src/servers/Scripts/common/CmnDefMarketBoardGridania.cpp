@@ -4,11 +4,11 @@
 using namespace Core;
 
 class CmnDefMarketBoardGridania :
-  public EventScript
+  public Sapphire::ScriptAPI::EventScript
 {
 public:
   CmnDefMarketBoardGridania() :
-    EventScript( 0xB0027 )
+    Sapphire::ScriptAPI::EventScript( 0xB0027 )
   {
   }
 

@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheLabyrinthoftheAncients :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheLabyrinthoftheAncients() :
-    InstanceContentScript( 30001 )
+    Sapphire::ScriptAPI::InstanceContentScript( 30001 )
   {
   }
 

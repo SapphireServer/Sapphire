@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheStoneVigil :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheStoneVigil() :
-    InstanceContentScript( 11 )
+    Sapphire::ScriptAPI::InstanceContentScript( 11 )
   {
   }
 

@@ -4,11 +4,11 @@
 using namespace Core;
 
 class SohmAl :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   SohmAl() :
-    InstanceContentScript( 37 )
+    Sapphire::ScriptAPI::InstanceContentScript( 37 )
   {
   }
 

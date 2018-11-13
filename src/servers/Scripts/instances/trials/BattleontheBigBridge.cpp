@@ -4,11 +4,11 @@
 using namespace Core;
 
 class BattleontheBigBridge :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   BattleontheBigBridge() :
-    InstanceContentScript( 20021 )
+    Sapphire::ScriptAPI::InstanceContentScript( 20021 )
   {
   }
 

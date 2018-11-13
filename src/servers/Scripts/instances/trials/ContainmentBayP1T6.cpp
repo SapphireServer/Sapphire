@@ -4,11 +4,11 @@
 using namespace Core;
 
 class ContainmentBayP1T6 :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   ContainmentBayP1T6() :
-    InstanceContentScript( 20041 )
+    Sapphire::ScriptAPI::InstanceContentScript( 20041 )
   {
   }
 

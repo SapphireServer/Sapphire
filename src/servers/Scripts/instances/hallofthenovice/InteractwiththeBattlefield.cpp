@@ -4,11 +4,11 @@
 using namespace Core;
 
 class InteractwiththeBattlefield :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   InteractwiththeBattlefield() :
-    InstanceContentScript( 15012 )
+    Sapphire::ScriptAPI::InstanceContentScript( 15012 )
   {
   }
 

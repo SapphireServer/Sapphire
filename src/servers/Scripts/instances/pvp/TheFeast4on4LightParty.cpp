@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheFeast4on4LightParty :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheFeast4on4LightParty() :
-    InstanceContentScript( 40012 )
+    Sapphire::ScriptAPI::InstanceContentScript( 40012 )
   {
   }
 

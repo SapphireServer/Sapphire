@@ -8,11 +8,11 @@
 using namespace Core;
 
 class CmnDefLinkShell :
-  public EventScript
+  public Sapphire::ScriptAPI::EventScript
 {
 public:
   CmnDefLinkShell() :
-    EventScript( 0xB0006 )
+    Sapphire::ScriptAPI::EventScript( 0xB0006 )
   {
   }
 

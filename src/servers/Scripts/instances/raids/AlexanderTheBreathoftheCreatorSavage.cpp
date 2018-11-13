@@ -4,11 +4,11 @@
 using namespace Core;
 
 class AlexanderTheBreathoftheCreatorSavage :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   AlexanderTheBreathoftheCreatorSavage() :
-    InstanceContentScript( 30044 )
+    Sapphire::ScriptAPI::InstanceContentScript( 30044 )
   {
   }
 

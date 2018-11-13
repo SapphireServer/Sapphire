@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheGreatGubalLibrary :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheGreatGubalLibrary() :
-    InstanceContentScript( 31 )
+    Sapphire::ScriptAPI::InstanceContentScript( 31 )
   {
   }
 

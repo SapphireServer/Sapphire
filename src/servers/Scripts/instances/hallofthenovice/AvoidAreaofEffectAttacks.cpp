@@ -4,11 +4,11 @@
 using namespace Core;
 
 class AvoidAreaofEffectAttacks :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   AvoidAreaofEffectAttacks() :
-    InstanceContentScript( 15001 )
+    Sapphire::ScriptAPI::InstanceContentScript( 15001 )
   {
   }
 

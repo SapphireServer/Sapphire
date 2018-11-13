@@ -2,13 +2,13 @@
 
 @ScriptIncludes@
 
-const ScriptObject* ptrs[] =
+const Sapphire::ScriptAPI::ScriptObject* ptrs[] =
 {
 @ScriptNames@
    nullptr
 };
 
-extern "C" EXPORT const ScriptObject** getScripts()
+extern "C" EXPORT const Sapphire::ScriptAPI::ScriptObject** getScripts()
 {
    return ptrs;
 }

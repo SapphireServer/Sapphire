@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheDrownedCityofSkalla :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheDrownedCityofSkalla() :
-    InstanceContentScript( 58 )
+    Sapphire::ScriptAPI::InstanceContentScript( 58 )
   {
   }
 

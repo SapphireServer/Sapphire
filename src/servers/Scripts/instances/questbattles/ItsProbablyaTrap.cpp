@@ -4,11 +4,11 @@
 using namespace Core;
 
 class ItsProbablyaTrap :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   ItsProbablyaTrap() :
-    InstanceContentScript( 5005 )
+    Sapphire::ScriptAPI::InstanceContentScript( 5005 )
   {
   }
 

@@ -4,11 +4,11 @@
 using namespace Core;
 
 class BardamsMettle :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   BardamsMettle() :
-    InstanceContentScript( 53 )
+    Sapphire::ScriptAPI::InstanceContentScript( 53 )
   {
   }
 

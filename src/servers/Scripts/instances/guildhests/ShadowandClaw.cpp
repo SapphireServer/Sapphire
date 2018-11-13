@@ -4,11 +4,11 @@
 using namespace Core;
 
 class ShadowandClaw :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   ShadowandClaw() :
-    InstanceContentScript( 10011 )
+    Sapphire::ScriptAPI::InstanceContentScript( 10011 )
   {
   }
 

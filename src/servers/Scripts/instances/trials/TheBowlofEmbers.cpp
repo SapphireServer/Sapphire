@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheBowlofEmbers :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheBowlofEmbers() :
-    InstanceContentScript( 20001 )
+    Sapphire::ScriptAPI::InstanceContentScript( 20001 )
   {
   }
 

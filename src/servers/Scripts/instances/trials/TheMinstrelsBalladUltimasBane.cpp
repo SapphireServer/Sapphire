@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheMinstrelsBalladUltimasBane :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheMinstrelsBalladUltimasBane() :
-    InstanceContentScript( 20013 )
+    Sapphire::ScriptAPI::InstanceContentScript( 20013 )
   {
   }
 

@@ -4,11 +4,11 @@
 using namespace Core;
 
 class WhenClansCollide :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   WhenClansCollide() :
-    InstanceContentScript( 5022 )
+    Sapphire::ScriptAPI::InstanceContentScript( 5022 )
   {
   }
 

@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheWeepingCityofMhach :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheWeepingCityofMhach() :
-    InstanceContentScript( 30038 )
+    Sapphire::ScriptAPI::InstanceContentScript( 30038 )
   {
   }
 

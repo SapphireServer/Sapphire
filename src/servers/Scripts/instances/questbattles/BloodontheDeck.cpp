@@ -4,11 +4,11 @@
 using namespace Core;
 
 class BloodontheDeck :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   BloodontheDeck() :
-    InstanceContentScript( 5009 )
+    Sapphire::ScriptAPI::InstanceContentScript( 5009 )
   {
   }
 

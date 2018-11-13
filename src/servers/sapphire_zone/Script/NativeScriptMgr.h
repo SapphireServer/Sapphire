@@ -19,7 +19,7 @@ namespace Core::Scripting
     /*!
      * @brief An internal list that maps script types to another list containing scripts indexed by their assoicated id
      */
-    std::unordered_map< std::size_t, std::unordered_map< uint32_t, ScriptObject* > > m_scripts;
+    std::unordered_map< std::size_t, std::unordered_map< uint32_t, Sapphire::ScriptAPI::ScriptObject* > > m_scripts;
 
 
     ScriptLoader m_loader;

@@ -187,7 +187,7 @@ bool Core::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t actorI
     scriptId = 0x00040001;
   }
 
-  auto script = m_nativeScriptMgr->getScript< EventScript >( scriptId );
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( scriptId );
   if( !script )
     return false;
   script->onTalk( eventId, player, actorId );
@@ -197,7 +197,7 @@ bool Core::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t actorI
 bool Core::Scripting::ScriptMgr::onEnterTerritory( Entity::Player& player, uint32_t eventId,
                                                    uint16_t param1, uint16_t param2 )
 {
-  auto script = m_nativeScriptMgr->getScript< EventScript >( eventId );
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
   if( !script )
     return false;
   script->onEnterTerritory( player, eventId, param1, param2 );
@@ -207,7 +207,7 @@ bool Core::Scripting::ScriptMgr::onEnterTerritory( Entity::Player& player, uint3
 bool Core::Scripting::ScriptMgr::onWithinRange( Entity::Player& player, uint32_t eventId, uint32_t param1,
                                                 float x, float y, float z )
 {
-  auto script = m_nativeScriptMgr->getScript< EventScript >( eventId );
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
   if( !script )
     return false;
   script->onWithinRange( player, eventId, param1, x, y, z );
@@ -217,7 +217,7 @@ bool Core::Scripting::ScriptMgr::onWithinRange( Entity::Player& player, uint32_t
 bool Core::Scripting::ScriptMgr::onOutsideRange( Entity::Player& player, uint32_t eventId, uint32_t param1,
                                                  float x, float y, float z )
 {
-  auto script = m_nativeScriptMgr->getScript< EventScript >( eventId );
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
   if( !script )
     return false;
   script->onOutsideRange( player, eventId, param1, x, y, z );
@@ -227,7 +227,7 @@ bool Core::Scripting::ScriptMgr::onOutsideRange( Entity::Player& player, uint32_
 bool Core::Scripting::ScriptMgr::onEmote( Entity::Player& player, uint64_t actorId,
                                           uint32_t eventId, uint8_t emoteId )
 {
-  auto script = m_nativeScriptMgr->getScript< EventScript >( eventId );
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
   if( !script )
     return false;
   script->onEmote( actorId, eventId, emoteId, player );
@@ -245,7 +245,7 @@ bool Core::Scripting::ScriptMgr::onEventHandlerReturn( Entity::Player& player, u
 bool Core::Scripting::ScriptMgr::onEventHandlerTradeReturn( Entity::Player& player, uint32_t eventId,
                                                             uint16_t subEvent, uint16_t param, uint32_t catalogId )
 {
-  auto script = m_nativeScriptMgr->getScript< EventScript >( eventId );
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
   if( script )
   {
     script->onEventHandlerTradeReturn( player, eventId, subEvent, param, catalogId );
@@ -262,7 +262,7 @@ bool Core::Scripting::ScriptMgr::onEventItem( Entity::Player& player, uint32_t e
   std::string objName = Event::getEventName( eventId );
   player.sendDebug( "Calling: " + objName + "." + eventName + " - " + std::to_string( eventId ) );
 
-  auto script = m_nativeScriptMgr->getScript< EventScript >( eventId );
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
   if( script )
   {
     player.eventStart( targetId, eventId, Event::EventHandler::Item, 0, 0 );
@@ -288,7 +288,7 @@ bool Core::Scripting::ScriptMgr::onMobKill( Entity::Player& player, uint16_t nam
 
     uint16_t questId = activeQuests->c.questId;
 
-    auto script = m_nativeScriptMgr->getScript< EventScript >( questId );
+    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( questId );
     if( script )
     {
       std::string objName = Event::getEventName( 0x00010000 | questId );
@@ -304,7 +304,7 @@ bool Core::Scripting::ScriptMgr::onMobKill( Entity::Player& player, uint16_t nam
 
 bool Core::Scripting::ScriptMgr::onCastFinish( Entity::Player& player, Entity::CharaPtr pTarget, uint32_t actionId )
 {
-  auto script = m_nativeScriptMgr->getScript< ActionScript >( actionId );
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( actionId );
 
   if( script )
     script->onCastFinish( player, *pTarget );
@@ -313,7 +313,7 @@ bool Core::Scripting::ScriptMgr::onCastFinish( Entity::Player& player, Entity::C
 
 bool Core::Scripting::ScriptMgr::onStatusReceive( Entity::CharaPtr pActor, uint32_t effectId )
 {
-  auto script = m_nativeScriptMgr->getScript< StatusEffectScript >( effectId );
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::StatusEffectScript >( effectId );
 
   if( script )
   {
@@ -329,7 +329,7 @@ bool Core::Scripting::ScriptMgr::onStatusReceive( Entity::CharaPtr pActor, uint3
 
 bool Core::Scripting::ScriptMgr::onStatusTick( Entity::CharaPtr pChara, Core::StatusEffect::StatusEffect& effect )
 {
-  auto script = m_nativeScriptMgr->getScript< StatusEffectScript >( effect.getId() );
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::StatusEffectScript >( effect.getId() );
   if( script )
   {
     if( pChara->isPlayer() )
@@ -344,7 +344,7 @@ bool Core::Scripting::ScriptMgr::onStatusTick( Entity::CharaPtr pChara, Core::St
 
 bool Core::Scripting::ScriptMgr::onStatusTimeOut( Entity::CharaPtr pChara, uint32_t effectId )
 {
-  auto script = m_nativeScriptMgr->getScript< StatusEffectScript >( effectId );
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::StatusEffectScript >( effectId );
   if( script )
   {
     if( pChara->isPlayer() )
@@ -359,7 +359,7 @@ bool Core::Scripting::ScriptMgr::onStatusTimeOut( Entity::CharaPtr pChara, uint3
 
 bool Core::Scripting::ScriptMgr::onZoneInit( ZonePtr pZone )
 {
-  auto script = m_nativeScriptMgr->getScript< ZoneScript >( pZone->getTerritoryTypeId() );
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ZoneScript >( pZone->getTerritoryTypeId() );
   if( script )
   {
     script->onZoneInit();
@@ -371,7 +371,7 @@ bool Core::Scripting::ScriptMgr::onZoneInit( ZonePtr pZone )
 
 bool Core::Scripting::ScriptMgr::onInstanceInit( InstanceContentPtr instance )
 {
-  auto script = m_nativeScriptMgr->getScript< InstanceContentScript >( instance->getDirectorId() );
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance->getDirectorId() );
   if( script )
   {
     script->onInit( instance );
@@ -383,7 +383,7 @@ bool Core::Scripting::ScriptMgr::onInstanceInit( InstanceContentPtr instance )
 
 bool Core::Scripting::ScriptMgr::onInstanceUpdate( InstanceContentPtr instance, uint32_t currTime )
 {
-  auto script = m_nativeScriptMgr->getScript< InstanceContentScript >( instance->getDirectorId() );
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance->getDirectorId() );
 
   if( script )
   {
@@ -397,7 +397,7 @@ bool Core::Scripting::ScriptMgr::onInstanceUpdate( InstanceContentPtr instance, 
 bool Core::Scripting::ScriptMgr::onInstanceEnterTerritory( InstanceContentPtr instance, Entity::Player& player,
                                                            uint32_t eventId, uint16_t param1, uint16_t param2 )
 {
-  auto script = m_nativeScriptMgr->getScript< InstanceContentScript >( instance->getDirectorId() );
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance->getDirectorId() );
   if( script )
   {
     script->onEnterTerritory( instance, player, eventId, param1, param2 );

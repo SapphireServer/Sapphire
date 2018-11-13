@@ -4,11 +4,11 @@
 using namespace Core;
 
 class ThePoolofTributeExtreme :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   ThePoolofTributeExtreme() :
-    InstanceContentScript( 20047 )
+    Sapphire::ScriptAPI::InstanceContentScript( 20047 )
   {
   }
 
