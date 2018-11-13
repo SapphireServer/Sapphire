@@ -4,11 +4,11 @@
 using namespace Core;
 
 class DefeatanOccupiedTarget :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   DefeatanOccupiedTarget() :
-    InstanceContentScript( 15009 )
+    Sapphire::ScriptAPI::InstanceContentScript( 15009 )
   {
   }
 

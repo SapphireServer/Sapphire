@@ -4,11 +4,11 @@
 using namespace Core;
 
 class EngageEnemyReinforcements :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   EngageEnemyReinforcements() :
-    InstanceContentScript( 15011 )
+    Sapphire::ScriptAPI::InstanceContentScript( 15011 )
   {
   }
 

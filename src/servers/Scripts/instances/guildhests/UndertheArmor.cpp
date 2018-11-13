@@ -4,11 +4,11 @@
 using namespace Core;
 
 class UndertheArmor :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   UndertheArmor() :
-    InstanceContentScript( 10002 )
+    Sapphire::ScriptAPI::InstanceContentScript( 10002 )
   {
   }
 

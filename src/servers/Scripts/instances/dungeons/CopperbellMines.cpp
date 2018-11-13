@@ -4,11 +4,11 @@
 using namespace Core;
 
 class CopperbellMines :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   CopperbellMines() :
-    InstanceContentScript( 3 )
+    Sapphire::ScriptAPI::InstanceContentScript( 3 )
   {
   }
 

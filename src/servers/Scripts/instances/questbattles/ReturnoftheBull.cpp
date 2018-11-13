@@ -4,11 +4,11 @@
 using namespace Core;
 
 class ReturnoftheBull :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   ReturnoftheBull() :
-    InstanceContentScript( 5024 )
+    Sapphire::ScriptAPI::InstanceContentScript( 5024 )
   {
   }
 

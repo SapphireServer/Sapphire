@@ -4,11 +4,11 @@
 using namespace Core;
 
 class MatsubaMayhem :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   MatsubaMayhem() :
-    InstanceContentScript( 5011 )
+    Sapphire::ScriptAPI::InstanceContentScript( 5011 )
   {
   }
 

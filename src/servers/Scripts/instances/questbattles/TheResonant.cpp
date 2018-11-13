@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheResonant :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheResonant() :
-    InstanceContentScript( 5017 )
+    Sapphire::ScriptAPI::InstanceContentScript( 5017 )
   {
   }
 

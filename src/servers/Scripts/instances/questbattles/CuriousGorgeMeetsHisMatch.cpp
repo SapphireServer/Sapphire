@@ -4,11 +4,11 @@
 using namespace Core;
 
 class CuriousGorgeMeetsHisMatch :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   CuriousGorgeMeetsHisMatch() :
-    InstanceContentScript( 5013 )
+    Sapphire::ScriptAPI::InstanceContentScript( 5013 )
   {
   }
 

@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheOrphansandtheBrokenBlade :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheOrphansandtheBrokenBlade() :
-    InstanceContentScript( 5019 )
+    Sapphire::ScriptAPI::InstanceContentScript( 5019 )
   {
   }
 

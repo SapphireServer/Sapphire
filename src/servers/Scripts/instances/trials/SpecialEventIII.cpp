@@ -4,11 +4,11 @@
 using namespace Core;
 
 class SpecialEventIII :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   SpecialEventIII() :
-    InstanceContentScript( 20016 )
+    Sapphire::ScriptAPI::InstanceContentScript( 20016 )
   {
   }
 

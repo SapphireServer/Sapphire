@@ -4,11 +4,11 @@
 using namespace Core;
 
 class ThokastThokHard :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   ThokastThokHard() :
-    InstanceContentScript( 20031 )
+    Sapphire::ScriptAPI::InstanceContentScript( 20031 )
   {
   }
 

@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheThousandMawsofTotoRak :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheThousandMawsofTotoRak() :
-    InstanceContentScript( 1 )
+    Sapphire::ScriptAPI::InstanceContentScript( 1 )
   {
   }
 

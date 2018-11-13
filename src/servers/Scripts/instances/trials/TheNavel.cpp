@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheNavel :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheNavel() :
-    InstanceContentScript( 20002 )
+    Sapphire::ScriptAPI::InstanceContentScript( 20002 )
   {
   }
 

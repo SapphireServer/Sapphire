@@ -4,11 +4,11 @@
 using namespace Core;
 
 class LongLivetheQueen :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   LongLivetheQueen() :
-    InstanceContentScript( 10012 )
+    Sapphire::ScriptAPI::InstanceContentScript( 10012 )
   {
   }
 

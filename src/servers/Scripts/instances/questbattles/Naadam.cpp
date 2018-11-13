@@ -4,11 +4,11 @@
 using namespace Core;
 
 class Naadam :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   Naadam() :
-    InstanceContentScript( 5008 )
+    Sapphire::ScriptAPI::InstanceContentScript( 5008 )
   {
   }
 

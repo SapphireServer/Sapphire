@@ -4,11 +4,11 @@
 using namespace Core;
 
 class AccrueEnmityfromMultipleTargets :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   AccrueEnmityfromMultipleTargets() :
-    InstanceContentScript( 15004 )
+    Sapphire::ScriptAPI::InstanceContentScript( 15004 )
   {
   }
 

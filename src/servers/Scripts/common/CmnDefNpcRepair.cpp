@@ -4,11 +4,11 @@
 using namespace Core;
 
 class CmnDefNpcRepair :
-  public EventScript
+  public Sapphire::ScriptAPI::EventScript
 {
 public:
   CmnDefNpcRepair() :
-    EventScript( 0xB0013 )
+    Sapphire::ScriptAPI::EventScript( 0xB0013 )
   {
   }
 

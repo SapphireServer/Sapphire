@@ -4,11 +4,11 @@
 using namespace Core;
 
 class StingingBack :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   StingingBack() :
-    InstanceContentScript( 10006 )
+    Sapphire::ScriptAPI::InstanceContentScript( 10006 )
   {
   }
 

@@ -4,11 +4,11 @@
 using namespace Core;
 
 class AnnoytheVoid :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   AnnoytheVoid() :
-    InstanceContentScript( 10010 )
+    Sapphire::ScriptAPI::InstanceContentScript( 10010 )
   {
   }
 

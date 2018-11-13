@@ -4,11 +4,11 @@
 using namespace Core;
 
 class Snowcloak :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   Snowcloak() :
-    InstanceContentScript( 27 )
+    Sapphire::ScriptAPI::InstanceContentScript( 27 )
   {
   }
 

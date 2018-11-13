@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheWanderersPalace :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheWanderersPalace() :
-    InstanceContentScript( 10 )
+    Sapphire::ScriptAPI::InstanceContentScript( 10 )
   {
   }
 

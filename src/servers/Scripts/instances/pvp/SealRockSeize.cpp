@@ -4,11 +4,11 @@
 using namespace Core;
 
 class SealRockSeize :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   SealRockSeize() :
-    InstanceContentScript( 50004 )
+    Sapphire::ScriptAPI::InstanceContentScript( 50004 )
   {
   }
 

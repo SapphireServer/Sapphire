@@ -4,11 +4,11 @@
 using namespace Core;
 
 class DomaCastle :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   DomaCastle() :
-    InstanceContentScript( 54 )
+    Sapphire::ScriptAPI::InstanceContentScript( 54 )
   {
   }
 

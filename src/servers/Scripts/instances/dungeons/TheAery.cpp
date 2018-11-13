@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheAery :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheAery() :
-    InstanceContentScript( 39 )
+    Sapphire::ScriptAPI::InstanceContentScript( 39 )
   {
   }
 

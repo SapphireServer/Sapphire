@@ -4,11 +4,11 @@
 using namespace Core;
 
 class SolemnTrinity :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   SolemnTrinity() :
-    InstanceContentScript( 10014 )
+    Sapphire::ScriptAPI::InstanceContentScript( 10014 )
   {
   }
 

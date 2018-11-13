@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheBindingCoilofBahamutTurn3 :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheBindingCoilofBahamutTurn3() :
-    InstanceContentScript( 30004 )
+    Sapphire::ScriptAPI::InstanceContentScript( 30004 )
   {
   }
 

@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheSunkenTempleofQarn :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheSunkenTempleofQarn() :
-    InstanceContentScript( 9 )
+    Sapphire::ScriptAPI::InstanceContentScript( 9 )
   {
   }
 

@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheKeeperoftheLake :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheKeeperoftheLake() :
-    InstanceContentScript( 32 )
+    Sapphire::ScriptAPI::InstanceContentScript( 32 )
   {
   }
 

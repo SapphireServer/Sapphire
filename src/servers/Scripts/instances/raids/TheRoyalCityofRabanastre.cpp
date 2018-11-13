@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheRoyalCityofRabanastre :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheRoyalCityofRabanastre() :
-    InstanceContentScript( 30058 )
+    Sapphire::ScriptAPI::InstanceContentScript( 30058 )
   {
   }
 

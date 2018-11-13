@@ -11,10 +11,10 @@ using namespace Network;
 using namespace Packets;
 using namespace Server;
 
-class CmnDefHousingSignboard : public EventScript
+class CmnDefHousingSignboard : public Sapphire::ScriptAPI::EventScript
 {
 public:
-  CmnDefHousingSignboard() : EventScript( 721031 )
+  CmnDefHousingSignboard() : Sapphire::ScriptAPI::EventScript( 721031 )
   {
   }
 

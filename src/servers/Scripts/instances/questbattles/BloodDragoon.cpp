@@ -4,11 +4,11 @@
 using namespace Core;
 
 class BloodDragoon :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   BloodDragoon() :
-    InstanceContentScript( 5021 )
+    Sapphire::ScriptAPI::InstanceContentScript( 5021 )
   {
   }
 

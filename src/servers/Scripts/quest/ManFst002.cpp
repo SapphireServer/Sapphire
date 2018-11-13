@@ -11,7 +11,7 @@
 
 using namespace Core;
 
-class ManFst002 : public EventScript
+class ManFst002 : public Sapphire::ScriptAPI::EventScript
 {
 private:
 
@@ -186,7 +186,7 @@ private:
 
 public:
   ManFst002() :
-    EventScript( 65621 )
+    Sapphire::ScriptAPI::EventScript( 65621 )
   {
   }
 

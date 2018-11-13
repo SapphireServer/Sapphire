@@ -11,7 +11,7 @@
 using namespace Core;
 
 class ManFst004 :
-  public EventScript
+  public Sapphire::ScriptAPI::EventScript
 {
 private:
   // Basic quest information
@@ -71,7 +71,7 @@ private:
 
 public:
   ManFst004() :
-    EventScript( 65660 )
+    Sapphire::ScriptAPI::EventScript( 65660 )
   {
   };
 

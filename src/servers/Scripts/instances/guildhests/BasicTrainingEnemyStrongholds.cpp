@@ -4,11 +4,11 @@
 using namespace Core;
 
 class BasicTrainingEnemyStrongholds :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   BasicTrainingEnemyStrongholds() :
-    InstanceContentScript( 10003 )
+    Sapphire::ScriptAPI::InstanceContentScript( 10003 )
   {
   }
 

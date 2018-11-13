@@ -4,11 +4,11 @@
 using namespace Core;
 
 class ShisuioftheVioletTides :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   ShisuioftheVioletTides() :
-    InstanceContentScript( 50 )
+    Sapphire::ScriptAPI::InstanceContentScript( 50 )
   {
   }
 

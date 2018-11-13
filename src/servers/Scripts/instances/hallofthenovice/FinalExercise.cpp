@@ -4,11 +4,11 @@
 using namespace Core;
 
 class FinalExercise :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   FinalExercise() :
-    InstanceContentScript( 15016 )
+    Sapphire::ScriptAPI::InstanceContentScript( 15016 )
   {
   }
 

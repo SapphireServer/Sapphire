@@ -4,11 +4,11 @@
 using namespace Core;
 
 class RaisingtheSword :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   RaisingtheSword() :
-    InstanceContentScript( 5018 )
+    Sapphire::ScriptAPI::InstanceContentScript( 5018 )
   {
   }
 

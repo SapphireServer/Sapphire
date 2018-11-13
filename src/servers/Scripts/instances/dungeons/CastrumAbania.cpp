@@ -4,11 +4,11 @@
 using namespace Core;
 
 class CastrumAbania :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   CastrumAbania() :
-    InstanceContentScript( 55 )
+    Sapphire::ScriptAPI::InstanceContentScript( 55 )
   {
   }
 

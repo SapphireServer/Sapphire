@@ -86,7 +86,7 @@ namespace Core::Scripting
      * @param handle The handle to the module
      * @return An array of unknown size ending with nullptr if success, nullptr if not
      */
-    ScriptObject** getScripts( ModuleHandle handle );
+    Sapphire::ScriptAPI::ScriptObject** getScripts( ModuleHandle handle );
 
     /*!
      * @brief Checks to see if a module with the specified name exists

@@ -13,11 +13,11 @@
 using namespace Core;
 
 class Aethernet :
-  public EventScript
+  public Sapphire::ScriptAPI::EventScript
 {
 public:
   Aethernet() :
-    EventScript( EVENTSCRIPT_AETHERNET_ID )
+    Sapphire::ScriptAPI::EventScript( EVENTSCRIPT_AETHERNET_ID )
   {
   }
 

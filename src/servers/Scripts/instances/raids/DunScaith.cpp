@@ -4,11 +4,11 @@
 using namespace Core;
 
 class DunScaith :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   DunScaith() :
-    InstanceContentScript( 30047 )
+    Sapphire::ScriptAPI::InstanceContentScript( 30047 )
   {
   }
 

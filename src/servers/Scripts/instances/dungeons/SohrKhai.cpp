@@ -4,11 +4,11 @@
 using namespace Core;
 
 class SohrKhai :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   SohrKhai() :
-    InstanceContentScript( 44 )
+    Sapphire::ScriptAPI::InstanceContentScript( 44 )
   {
   }
 

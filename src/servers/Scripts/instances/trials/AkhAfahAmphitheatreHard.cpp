@@ -4,11 +4,11 @@
 using namespace Core;
 
 class AkhAfahAmphitheatreHard :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   AkhAfahAmphitheatreHard() :
-    InstanceContentScript( 20024 )
+    Sapphire::ScriptAPI::InstanceContentScript( 20024 )
   {
   }
 

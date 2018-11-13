@@ -4,11 +4,11 @@
 using namespace Core;
 
 class DarkwingDragon :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   DarkwingDragon() :
-    InstanceContentScript( 5016 )
+    Sapphire::ScriptAPI::InstanceContentScript( 5016 )
   {
   }
 

@@ -11,7 +11,7 @@
 using namespace Core;
 
 class ManSea001 :
-  public EventScript
+  public Sapphire::ScriptAPI::EventScript
 {
 private:
 
@@ -134,7 +134,7 @@ private:
 
 public:
   ManSea001() :
-    EventScript( 65643 )
+    Sapphire::ScriptAPI::EventScript( 65643 )
   {
   }
 

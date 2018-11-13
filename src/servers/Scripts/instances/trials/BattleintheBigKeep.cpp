@@ -4,11 +4,11 @@
 using namespace Core;
 
 class BattleintheBigKeep :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   BattleintheBigKeep() :
-    InstanceContentScript( 20030 )
+    Sapphire::ScriptAPI::InstanceContentScript( 20030 )
   {
   }
 

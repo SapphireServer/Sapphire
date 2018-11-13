@@ -4,11 +4,11 @@
 using namespace Core;
 
 class SastashaHard :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   SastashaHard() :
-    InstanceContentScript( 28 )
+    Sapphire::ScriptAPI::InstanceContentScript( 28 )
   {
   }
 
