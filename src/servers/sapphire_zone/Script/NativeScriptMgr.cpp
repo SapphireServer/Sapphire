@@ -2,6 +2,10 @@
 
 #include <Crypt/md5.h>
 
+#include "Framework.h"
+
+extern Core::Framework g_fw;
+
 namespace Core {
 namespace Scripting {
 
@@ -28,6 +32,8 @@ bool NativeScriptMgr::loadScript( const std::string& path )
 
     auto script = scripts[ i ];
     module->scripts.push_back( script );
+
+    script->setFramework( &g_fw );
 
     m_scripts[ script->getType() ][ script->getId() ] = script;
 

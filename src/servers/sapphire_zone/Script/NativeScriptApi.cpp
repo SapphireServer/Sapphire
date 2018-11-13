@@ -3,6 +3,7 @@
 #include <typeindex>
 #include <Event/EventHandler.h>
 #include "NativeScriptApi.h"
+#include <cassert>
 
 #ifdef _MSC_VER
 #define EXPORT __declspec( dllexport )
@@ -26,6 +27,17 @@ uint32_t ScriptObject::getId() const
 std::size_t ScriptObject::getType() const
 {
   return m_type;
+}
+
+void ScriptObject::setFramework( Core::Framework* fw )
+{
+  assert( fw );
+  m_framework = fw;
+}
+
+Core::Framework* ScriptObject::getFramework() const
+{
+  return m_framework;
 }
 
 ///////////////////////////////////////////////////////////////////
