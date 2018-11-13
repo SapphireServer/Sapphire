@@ -327,71 +327,23 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
 
       break;
     }
-    case ClientTriggerType::RequestHousingSign:
+    case ClientTriggerType::RequestLandSignFree:
     {
-
-      auto plotPricePacket = makeZonePacket< Server::FFXIVIpcLandPriceUpdate >( player.getId() );
-
-      uint8_t ward = ( param12 & 0xFF00 ) >> 8;
-      uint8_t plot = ( param12 & 0xFF );
-      pLog->debug( " Ward: " + std::to_string( ward ) + " Plot: " + std::to_string( plot ) );
-
-      player.setActiveLand( plot, ward );
-
-      auto zone = player.getCurrentZone();
-
-      auto hZone = std::dynamic_pointer_cast< HousingZone >( zone );
-
-      if( !hZone )
-        return;
-
-      auto land = hZone->getLand( plot );
-      plotPricePacket->data().price = land->getCurrentPrice();
-      plotPricePacket->data().timeLeft = land->getDevaluationTime();
-
-      player.queuePacket( plotPricePacket );
-
+      auto ward = static_cast< uint8_t >( ( param12 & 0xFF00 ) >> 8 );
+      auto plot = static_cast< uint8_t >( param12 & 0xFF );
+      auto pHousingMgr = g_fw.get< HousingMgr >();
+      pHousingMgr->sendLandSignFree( player, ward, plot );
       break;
     }
-    case ClientTriggerType::RequestHousingInfoSign:
+    case ClientTriggerType::RequestLandSignOwned:
     {
-
-      auto landInfoSignPacket = makeZonePacket< Server::FFXIVIpcLandInfoSign >( player.getId() );
-
-      uint8_t ward = ( param12 & 0xFF00 ) >> 8;
-      uint8_t plot = ( param12 & 0xFF );
-      pLog->debug( " Ward: " + std::to_string( ward ) + " Plot: " + std::to_string( plot ) );
-
-      player.setActiveLand( plot, ward );
-
-      auto zone = player.getCurrentZone();
-
-      auto hZone = std::dynamic_pointer_cast< HousingZone >( zone );
-
-      auto land = hZone->getLand( plot );
-      if( !land )
-      {
-        auto pHousingMgr = g_fw.get< HousingMgr >();
-        land = pHousingMgr->getLandByOwnerId( player.getId() );
-      }
-
-      uint32_t playerId = land->getPlayerOwner();
-      std::string playerName = g_fw.get< Core::ServerZone >()->getPlayerNameFromDb( playerId );
-      //memcpy( &landInfoSignPacket->data().estateGreeting, "Hello World", 11 );
-      //memcpy( &landInfoSignPacket->data().estateName, land->getLandName().c_str(), land->getLandName().size() );
-      landInfoSignPacket->data().houseSize = land->getPlotSize();
-      landInfoSignPacket->data().houseType = static_cast< uint8_t >( land->getLandType() );
-      landInfoSignPacket->data().landId = land->getLandId();
-      landInfoSignPacket->data().ownerId = player.getContentId(); // should be real owner contentId, not player.contentId()
-      memcpy( &landInfoSignPacket->data().ownerName, playerName.c_str(), playerName.size() );
-      landInfoSignPacket->data().wardNum = land->getWardNum();
-      landInfoSignPacket->data().worldId = 67;
-      landInfoSignPacket->data().zoneId = land->getZoneId();
-      player.queuePacket( landInfoSignPacket );
-
+      auto ward = static_cast< uint8_t >( ( param12 & 0xFF00 ) >> 8 );
+      auto plot = static_cast< uint8_t >( param12 & 0xFF );
+      auto pHousingMgr = g_fw.get< HousingMgr >();
+      pHousingMgr->sendLandSignOwned( player, ward, plot );
       break;
     }
-    case ClientTriggerType::RequestHousingRename:
+    case ClientTriggerType::RequestEstateRename:
     {
       auto landRenamePacket = makeZonePacket< Server::FFXIVIpcLandRename >( player.getId() );
 

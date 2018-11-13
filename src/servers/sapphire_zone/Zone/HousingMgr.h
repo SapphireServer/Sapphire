@@ -28,6 +28,9 @@ namespace Core
     Core::Data::HousingZonePtr getHousingZoneByLandSetId( uint32_t id );
     Core::LandPtr getLandByOwnerId( uint32_t id );
 
+    void sendLandSignOwned( Entity::Player& player, uint8_t ward, uint8_t plot );
+    void sendLandSignFree( Entity::Player& player, uint8_t ward, uint8_t plot );
+
   private:
     using HousingZonePtrMap = std::unordered_map< uint16_t, Core::Data::HousingZonePtr >;
     uint16_t m_lastLandId;
