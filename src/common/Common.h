@@ -781,6 +781,13 @@ namespace Core::Common
     SharedHouse2
   };
 
+  enum class LandType : uint8_t
+  {
+    none = 0,
+    FreeCompany = 1,
+    Private = 2,
+  };
+
   struct LandPermissionSet
   {
     int16_t landId; //00

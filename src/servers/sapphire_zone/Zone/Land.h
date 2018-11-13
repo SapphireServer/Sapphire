@@ -26,17 +26,19 @@ namespace Core
     void setOwnership( uint8_t state );
     void setSharing( uint8_t state );
     void setLandName( const std::string& name );
+    void setLandType( Common::LandType type );
 
     //Gerneral
-    uint8_t getPlotSize();
-    uint8_t getState();
-    uint8_t getOwnership();
-    uint8_t getSharing();
-    uint32_t getLandSetId();
-    uint8_t getWardNum();
-    uint8_t getLandId();
-    uint16_t getZoneId();
-    std::string getLandName();
+    uint8_t getPlotSize() const;
+    uint8_t getState() const;
+    uint8_t getOwnership() const;
+    uint8_t getSharing() const;
+    uint32_t getLandSetId() const;
+    uint8_t getWardNum() const;
+    uint8_t getLandId() const;
+    uint16_t getZoneId() const;
+    std::string getLandName() const;
+    Common::LandType getLandType() const;
 
     //Free Comapny
     void setFreeCompany( uint32_t id, uint32_t icon, uint32_t color );
@@ -79,6 +81,7 @@ namespace Core
     uint32_t m_landSetId;
     uint16_t m_zoneId;
     Common::LandStruct m_land;
+    Common::LandType m_type;
     uint32_t m_ownerPlayerId;
     Core::Data::HousingLandSetPtr m_landInfo;
 

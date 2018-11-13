@@ -35,7 +35,8 @@ Core::Land::Land( uint16_t zoneId, uint8_t wardNum, uint8_t landId, uint32_t lan
   m_nextDrop( static_cast< uint32_t >( Util::getTimeSeconds() ) + 21600 ),
   m_ownerPlayerId( 0 ),
   m_landSetId( landSetId ),
-  m_landInfo( info )
+  m_landInfo( info ),
+  m_type( Common::LandType::Private )
 {
   memset( &m_land, 0x00, sizeof( LandStruct ) );
   memset( &m_tag, 0x00, 3 );
@@ -57,8 +58,9 @@ void Core::Land::load()
                                             "AND LandId = " + std::to_string( m_landId ) );
   if( !res->next() )
   {
-    pDb->directExecute( "INSERT INTO land ( landsetid, landid, size, status, landprice ) "
+    pDb->directExecute( "INSERT INTO land ( landsetid, landid, type, size, status, landprice ) "
                         "VALUES ( " + std::to_string( m_landSetId ) + "," + std::to_string( m_landId ) + ","
+                        + std::to_string( static_cast< uint8_t >( m_type ) ) + ","
                         + std::to_string( m_landInfo->sizes[ m_landId ] ) + ","
                         + " 1, " + std::to_string( m_landInfo->prices[ m_landId ] ) + " );" );
 
@@ -69,6 +71,7 @@ void Core::Land::load()
   }
   else
   {
+    m_type = static_cast< Common::LandType >( res->getUInt( "Type" ) );
     m_land.plotSize = res->getUInt( "Size" );
     m_land.houseState = res->getUInt( "Status" );
     m_currentPrice = res->getUInt( "LandPrice" );
@@ -161,49 +164,59 @@ void Core::Land::setLandName( const std::string& name )
   memcpy( &m_landName, name.c_str(), 20 );
 }
 
-uint8_t Core::Land::getPlotSize()
+void Core::Land::setLandType( Common::LandType type )
+{
+  m_type = type;
+}
+
+uint8_t Core::Land::getPlotSize() const
 {
   return m_land.plotSize;
 }
 
-uint8_t Core::Land::getState()
+uint8_t Core::Land::getState() const
 {
   return m_land.houseState;
 }
 
-uint8_t Core::Land::getOwnership()
+uint8_t Core::Land::getOwnership() const
 {
   return m_land.iconColor;
 }
 
-uint8_t Core::Land::getSharing()
+uint8_t Core::Land::getSharing() const
 {
   return m_land.iconAddIcon;
 }
 
-uint32_t Core::Land::getLandSetId()
+uint32_t Core::Land::getLandSetId() const
 {
   return m_landSetId;
 }
 
-uint8_t Core::Land::getWardNum()
+uint8_t Core::Land::getWardNum() const
 {
   return m_wardNum;
 }
 
-uint8_t Core::Land::getLandId()
+uint8_t Core::Land::getLandId() const
 {
   return m_landId;
 }
 
-uint16_t Core::Land::getZoneId()
+uint16_t Core::Land::getZoneId() const
 {
   return m_zoneId;
 }
 
-std::string Core::Land::getLandName()
+std::string Core::Land::getLandName() const
 {
   return std::string( m_landName );
+}
+
+Core::Common::LandType Core::Land::getLandType() const
+{
+  return m_type;
 }
 
 //Free Comapny
@@ -314,6 +327,7 @@ void Core::Land::UpdateLandDb()
   + ", UpdateTime = " + std::to_string( getDevaluationTime() )
   + ", OwnerId = " + std::to_string( getPlayerOwner() ) 
   + ", HouseId = " + std::to_string( 0 ) //TODO: add house id
+  + ", Type = " + std::to_string( static_cast< uint32_t >( m_type ) ) //TODO: add house id
   + " WHERE LandSetId = " + std::to_string( m_landSetId )
   + " AND LandId = " + std::to_string( m_landId ) + ";" );
 }

@@ -379,8 +379,8 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
       std::string playerName = g_fw.get< Core::ServerZone >()->getPlayerNameFromDb( playerId );
       //memcpy( &landInfoSignPacket->data().estateGreeting, "Hello World", 11 );
       //memcpy( &landInfoSignPacket->data().estateName, land->getLandName().c_str(), land->getLandName().size() );
-      //landInfoSignPacket->data().houseSize = land->getPlotSize();
-      landInfoSignPacket->data().houseType = 2; // we really need to save this in the plot
+      landInfoSignPacket->data().houseSize = land->getPlotSize();
+      landInfoSignPacket->data().houseType = static_cast< uint8_t >( land->getLandType() );
       landInfoSignPacket->data().landId = land->getLandId();
       landInfoSignPacket->data().ownerId = player.getContentId(); // should be real owner contentId, not player.contentId()
       memcpy( &landInfoSignPacket->data().ownerName, playerName.c_str(), playerName.size() );
