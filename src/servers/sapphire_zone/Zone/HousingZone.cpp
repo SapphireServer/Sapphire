@@ -190,6 +190,7 @@ Core::LandPurchaseResult Core::HousingZone::purchseLand( Entity::Player& player,
       player.removeCurrency( CurrencyType::Gil, plotPrice );
       pLand->setPlayerOwner( player.getId() );
       pLand->setState( HouseState::sold );
+      pLand->setLandType( Common::LandType::Private );
       player.setLandPermissions( LandPermissionSlot::Private, 0x00, plot,
                                  pHousing->getWardNum(), pHousing->getTerritoryTypeId() );
       player.sendLandPermissions();
