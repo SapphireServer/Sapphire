@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheCarteneauFlatsHeliodrome :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheCarteneauFlatsHeliodrome() :
-    InstanceContentScript( 5004 )
+    Sapphire::ScriptAPI::InstanceContentScript( 5004 )
   {
   }
 

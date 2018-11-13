@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheMinstrelsBalladThordansReign :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheMinstrelsBalladThordansReign() :
-    InstanceContentScript( 20036 )
+    Sapphire::ScriptAPI::InstanceContentScript( 20036 )
   {
   }
 

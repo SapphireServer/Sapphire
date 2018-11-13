@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheBattleonBekko :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheBattleonBekko() :
-    InstanceContentScript( 5012 )
+    Sapphire::ScriptAPI::InstanceContentScript( 5012 )
   {
   }
 

@@ -4,11 +4,11 @@
 using namespace Core;
 
 class AmdaporKeep :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   AmdaporKeep() :
-    InstanceContentScript( 14 )
+    Sapphire::ScriptAPI::InstanceContentScript( 14 )
   {
   }
 

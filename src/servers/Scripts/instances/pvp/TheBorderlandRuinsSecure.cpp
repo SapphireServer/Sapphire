@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheBorderlandRuinsSecure :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheBorderlandRuinsSecure() :
-    InstanceContentScript( 50001 )
+    Sapphire::ScriptAPI::InstanceContentScript( 50001 )
   {
   }
 

@@ -4,11 +4,11 @@
 using namespace Core;
 
 class AvoidEngagedTargets :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   AvoidEngagedTargets() :
-    InstanceContentScript( 15015 )
+    Sapphire::ScriptAPI::InstanceContentScript( 15015 )
   {
   }
 

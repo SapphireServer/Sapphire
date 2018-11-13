@@ -4,11 +4,11 @@
 using namespace Core;
 
 class HouFurOrchestrion :
-  public EventScript
+  public Sapphire::ScriptAPI::EventScript
 {
 public:
   HouFurOrchestrion() :
-    EventScript( 721226 )
+    Sapphire::ScriptAPI::EventScript( 721226 )
   {
   }
 

@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheStrikingTreeHard :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheStrikingTreeHard() :
-    InstanceContentScript( 20022 )
+    Sapphire::ScriptAPI::InstanceContentScript( 20022 )
   {
   }
 

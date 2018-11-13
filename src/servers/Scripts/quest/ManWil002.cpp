@@ -11,7 +11,7 @@
 using namespace Core;
 
 class ManWil002 :
-  public EventScript
+  public Sapphire::ScriptAPI::EventScript
 {
 private:
   // Basic quest information
@@ -59,7 +59,7 @@ private:
 
 public:
   ManWil002() :
-    EventScript( 66104 )
+    Sapphire::ScriptAPI::EventScript( 66104 )
   {
   };
 

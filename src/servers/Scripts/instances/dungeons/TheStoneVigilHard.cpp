@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheStoneVigilHard :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheStoneVigilHard() :
-    InstanceContentScript( 25 )
+    Sapphire::ScriptAPI::InstanceContentScript( 25 )
   {
   }
 

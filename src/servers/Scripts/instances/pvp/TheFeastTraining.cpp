@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheFeastTraining :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheFeastTraining() :
-    InstanceContentScript( 40024 )
+    Sapphire::ScriptAPI::InstanceContentScript( 40024 )
   {
   }
 

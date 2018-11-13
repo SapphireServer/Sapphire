@@ -12,7 +12,7 @@ using namespace Core;
 // End NPC: 1003604
 
 class SubSea001 :
-  public EventScript
+  public Sapphire::ScriptAPI::EventScript
 {
 private:
   // Basic quest information
@@ -54,7 +54,7 @@ private:
 
 public:
   SubSea001() :
-    EventScript( 65647 )
+    Sapphire::ScriptAPI::EventScript( 65647 )
   {
   };
 

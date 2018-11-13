@@ -4,11 +4,11 @@
 using namespace Core;
 
 class PullingPoisonPosies :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   PullingPoisonPosies() :
-    InstanceContentScript( 10005 )
+    Sapphire::ScriptAPI::InstanceContentScript( 10005 )
   {
   }
 

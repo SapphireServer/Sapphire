@@ -4,11 +4,11 @@
 using namespace Core;
 
 class Emanation :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   Emanation() :
-    InstanceContentScript( 20048 )
+    Sapphire::ScriptAPI::InstanceContentScript( 20048 )
   {
   }
 

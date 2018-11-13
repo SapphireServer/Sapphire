@@ -4,11 +4,11 @@
 using namespace Core;
 
 class UrthsFount :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   UrthsFount() :
-    InstanceContentScript( 20027 )
+    Sapphire::ScriptAPI::InstanceContentScript( 20027 )
   {
   }
 

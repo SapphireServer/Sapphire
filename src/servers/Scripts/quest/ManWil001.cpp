@@ -11,7 +11,7 @@
 using namespace Core;
 
 class ManWil001 :
-  public EventScript
+  public Sapphire::ScriptAPI::EventScript
 {
 private:
   static constexpr auto SEQ_0 = 0;
@@ -166,7 +166,7 @@ private:
 
 public:
   ManWil001() :
-    EventScript( 66130 )
+    Sapphire::ScriptAPI::EventScript( 66130 )
   {
   }
 

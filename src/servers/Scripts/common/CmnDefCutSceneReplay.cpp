@@ -4,11 +4,11 @@
 using namespace Core;
 
 class CmnDefCutSceneReplay :
-  public EventScript
+  public Sapphire::ScriptAPI::EventScript
 {
 public:
   CmnDefCutSceneReplay() :
-    EventScript( 721028 )
+    Sapphire::ScriptAPI::EventScript( 721028 )
   {
   }
 

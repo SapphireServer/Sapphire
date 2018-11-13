@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheChrysalis :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheChrysalis() :
-    InstanceContentScript( 20029 )
+    Sapphire::ScriptAPI::InstanceContentScript( 20029 )
   {
   }
 

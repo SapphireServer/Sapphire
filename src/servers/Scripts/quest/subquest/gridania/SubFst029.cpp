@@ -11,7 +11,7 @@ using namespace Core;
 // End NPC: 1000430
 
 class SubFst029 :
-  public EventScript
+  public Sapphire::ScriptAPI::EventScript
 {
 private:
   // Basic quest information
@@ -38,7 +38,7 @@ private:
   static constexpr auto Seq1Actor0Npctradeok = 100;
 
 public:
-  SubFst029() : EventScript( 65708 )
+  SubFst029() : Sapphire::ScriptAPI::EventScript( 65708 )
   {};
 
   ~SubFst029()

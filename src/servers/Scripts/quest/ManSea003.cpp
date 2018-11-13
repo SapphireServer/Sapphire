@@ -11,7 +11,7 @@
 using namespace Core;
 
 class ManSea003 :
-  public EventScript
+  public Sapphire::ScriptAPI::EventScript
 {
 private:
   // Basic quest information
@@ -53,7 +53,7 @@ private:
 
 public:
   ManSea003() :
-    EventScript( 65645 )
+    Sapphire::ScriptAPI::EventScript( 65645 )
   {
   };
 

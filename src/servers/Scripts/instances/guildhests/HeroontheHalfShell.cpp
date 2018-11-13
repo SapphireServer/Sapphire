@@ -4,11 +4,11 @@
 using namespace Core;
 
 class HeroontheHalfShell :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   HeroontheHalfShell() :
-    InstanceContentScript( 10004 )
+    Sapphire::ScriptAPI::InstanceContentScript( 10004 )
   {
   }
 

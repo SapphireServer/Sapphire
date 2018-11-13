@@ -4,11 +4,11 @@
 using namespace Core;
 
 class ExecuteaComboinBattle :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   ExecuteaComboinBattle() :
-    InstanceContentScript( 15003 )
+    Sapphire::ScriptAPI::InstanceContentScript( 15003 )
   {
   }
 

@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheWeaponsRefrainUltimate :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheWeaponsRefrainUltimate() :
-    InstanceContentScript( 30067 )
+    Sapphire::ScriptAPI::InstanceContentScript( 30067 )
   {
   }
 

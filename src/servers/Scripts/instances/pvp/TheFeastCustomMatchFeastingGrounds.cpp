@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheFeastCustomMatchFeastingGrounds :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheFeastCustomMatchFeastingGrounds() :
-    InstanceContentScript( 40014 )
+    Sapphire::ScriptAPI::InstanceContentScript( 40014 )
   {
   }
 

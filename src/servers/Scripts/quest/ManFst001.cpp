@@ -12,7 +12,7 @@
 using namespace Core;
 
 class ManFst001 :
-  public EventScript
+  public Sapphire::ScriptAPI::EventScript
 {
 private:
   static constexpr auto SEQ_0 = 0;
@@ -88,7 +88,7 @@ private:
 
 public:
   ManFst001() :
-    EventScript( 65575 )
+    Sapphire::ScriptAPI::EventScript( 65575 )
   {
   }
 

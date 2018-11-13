@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheMinstrelsBalladShinryusDomain :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheMinstrelsBalladShinryusDomain() :
-    InstanceContentScript( 20050 )
+    Sapphire::ScriptAPI::InstanceContentScript( 20050 )
   {
   }
 

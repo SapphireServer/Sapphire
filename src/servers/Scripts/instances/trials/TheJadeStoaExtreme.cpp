@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheJadeStoaExtreme :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheJadeStoaExtreme() :
-    InstanceContentScript( 20052 )
+    Sapphire::ScriptAPI::InstanceContentScript( 20052 )
   {
   }
 

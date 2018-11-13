@@ -4,11 +4,11 @@
 using namespace Core;
 
 class HullbreakerIsle :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   HullbreakerIsle() :
-    InstanceContentScript( 23 )
+    Sapphire::ScriptAPI::InstanceContentScript( 23 )
   {
   }
 

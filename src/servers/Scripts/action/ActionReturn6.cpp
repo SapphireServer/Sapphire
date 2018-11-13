@@ -3,11 +3,11 @@
 #include <Actor/Player.h>
 
 class ActionReturn6 :
-  public ActionScript
+  public Sapphire::ScriptAPI::ActionScript
 {
 public:
   ActionReturn6() :
-    ActionScript( 6 )
+    Sapphire::ScriptAPI::ActionScript( 6 )
   {
   }
 

@@ -4,11 +4,11 @@
 using namespace Core;
 
 class ThePraetorium :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   ThePraetorium() :
-    InstanceContentScript( 16 )
+    Sapphire::ScriptAPI::InstanceContentScript( 16 )
   {
   }
 

@@ -4,11 +4,11 @@
 using namespace Core;
 
 class HealMultipleAllies :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   HealMultipleAllies() :
-    InstanceContentScript( 15014 )
+    Sapphire::ScriptAPI::InstanceContentScript( 15014 )
   {
   }
 

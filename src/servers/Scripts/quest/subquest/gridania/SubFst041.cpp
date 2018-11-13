@@ -13,7 +13,7 @@ using namespace Core;
 //NEED TEST KILLCREDIT
 
 class SubFst041 :
-  public EventScript
+  public Sapphire::ScriptAPI::EventScript
 {
 private:
   // Basic quest information
@@ -46,7 +46,7 @@ private:
 
 public:
   SubFst041() :
-    EventScript( 65733 )
+    Sapphire::ScriptAPI::EventScript( 65733 )
   {
   };
 

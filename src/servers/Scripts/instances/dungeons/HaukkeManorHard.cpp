@@ -4,11 +4,11 @@
 using namespace Core;
 
 class HaukkeManorHard :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   HaukkeManorHard() :
-    InstanceContentScript( 19 )
+    Sapphire::ScriptAPI::InstanceContentScript( 19 )
   {
   }
 

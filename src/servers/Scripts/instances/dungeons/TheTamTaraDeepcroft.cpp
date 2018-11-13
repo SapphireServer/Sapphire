@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheTamTaraDeepcroft :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheTamTaraDeepcroft() :
-    InstanceContentScript( 2 )
+    Sapphire::ScriptAPI::InstanceContentScript( 2 )
   {
   }
 

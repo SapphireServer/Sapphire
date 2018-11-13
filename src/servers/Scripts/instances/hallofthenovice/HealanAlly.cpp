@@ -4,11 +4,11 @@
 using namespace Core;
 
 class HealanAlly :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   HealanAlly() :
-    InstanceContentScript( 15013 )
+    Sapphire::ScriptAPI::InstanceContentScript( 15013 )
   {
   }
 

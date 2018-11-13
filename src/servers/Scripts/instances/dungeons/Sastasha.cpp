@@ -5,11 +5,11 @@
 using namespace Core;
 
 class Sastasha :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   Sastasha() :
-    InstanceContentScript( 4 )
+    Sapphire::ScriptAPI::InstanceContentScript( 4 )
   {
   }
 

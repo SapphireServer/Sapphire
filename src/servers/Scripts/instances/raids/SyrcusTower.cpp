@@ -4,11 +4,11 @@
 using namespace Core;
 
 class SyrcusTower :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   SyrcusTower() :
-    InstanceContentScript( 30011 )
+    Sapphire::ScriptAPI::InstanceContentScript( 30011 )
   {
   }
 

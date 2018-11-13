@@ -4,11 +4,11 @@
 using namespace Core;
 
 class InterdimensionalRift :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   InterdimensionalRift() :
-    InstanceContentScript( 5023 )
+    Sapphire::ScriptAPI::InstanceContentScript( 5023 )
   {
   }
 

@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheSecondCoilofBahamutSavageTurn1 :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheSecondCoilofBahamutSavageTurn1() :
-    InstanceContentScript( 30012 )
+    Sapphire::ScriptAPI::InstanceContentScript( 30012 )
   {
   }
 

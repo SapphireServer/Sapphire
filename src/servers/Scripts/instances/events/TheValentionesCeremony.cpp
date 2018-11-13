@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheValentionesCeremony :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheValentionesCeremony() :
-    InstanceContentScript( 25002 )
+    Sapphire::ScriptAPI::InstanceContentScript( 25002 )
   {
   }
 

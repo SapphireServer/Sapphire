@@ -4,11 +4,11 @@
 using namespace Core;
 
 class AllsWellthatEndsintheWell :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   AllsWellthatEndsintheWell() :
-    InstanceContentScript( 10007 )
+    Sapphire::ScriptAPI::InstanceContentScript( 10007 )
   {
   }
 

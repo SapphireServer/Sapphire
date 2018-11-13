@@ -4,11 +4,11 @@
 using namespace Core;
 
 class Neverreap :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   Neverreap() :
-    InstanceContentScript( 33 )
+    Sapphire::ScriptAPI::InstanceContentScript( 33 )
   {
   }
 

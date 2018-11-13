@@ -4,11 +4,11 @@
 using namespace Core;
 
 class ThePalaceoftheDeadFloors8190 :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   ThePalaceoftheDeadFloors8190() :
-    InstanceContentScript( 60009 )
+    Sapphire::ScriptAPI::InstanceContentScript( 60009 )
   {
   }
 

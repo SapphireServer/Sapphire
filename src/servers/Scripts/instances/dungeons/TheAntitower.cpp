@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheAntitower :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheAntitower() :
-    InstanceContentScript( 43 )
+    Sapphire::ScriptAPI::InstanceContentScript( 43 )
   {
   }
 

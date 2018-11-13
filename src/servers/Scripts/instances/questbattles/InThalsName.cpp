@@ -4,11 +4,11 @@
 using namespace Core;
 
 class InThalsName :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   InThalsName() :
-    InstanceContentScript( 5006 )
+    Sapphire::ScriptAPI::InstanceContentScript( 5006 )
   {
   }
 

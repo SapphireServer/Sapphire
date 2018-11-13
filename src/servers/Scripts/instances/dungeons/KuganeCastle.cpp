@@ -4,11 +4,11 @@
 using namespace Core;
 
 class KuganeCastle :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   KuganeCastle() :
-    InstanceContentScript( 57 )
+    Sapphire::ScriptAPI::InstanceContentScript( 57 )
   {
   }
 

@@ -11,7 +11,7 @@ using namespace Core;
 // End NPC: 1001675
 
 class SubWil018 :
-  public EventScript
+  public Sapphire::ScriptAPI::EventScript
 {
 private:
   // Basic quest information
@@ -44,7 +44,7 @@ private:
 
 public:
   SubWil018() :
-    EventScript( 65932 )
+    Sapphire::ScriptAPI::EventScript( 65932 )
   {
   };
 

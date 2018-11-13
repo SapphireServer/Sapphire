@@ -4,11 +4,11 @@
 using namespace Core;
 
 class CastrumMeridianum :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   CastrumMeridianum() :
-    InstanceContentScript( 15 )
+    Sapphire::ScriptAPI::InstanceContentScript( 15 )
   {
   }
 

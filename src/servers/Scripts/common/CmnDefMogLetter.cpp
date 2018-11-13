@@ -4,11 +4,11 @@
 using namespace Core;
 
 class CmnDefMogLetter :
-  public EventScript
+  public Sapphire::ScriptAPI::EventScript
 {
 public:
   CmnDefMogLetter() :
-    EventScript( 720898 )
+    Sapphire::ScriptAPI::EventScript( 720898 )
   {
   }
 

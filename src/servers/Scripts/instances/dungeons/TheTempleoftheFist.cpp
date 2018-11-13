@@ -4,11 +4,11 @@
 using namespace Core;
 
 class TheTempleoftheFist :
-  public InstanceContentScript
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
   TheTempleoftheFist() :
-    InstanceContentScript( 51 )
+    Sapphire::ScriptAPI::InstanceContentScript( 51 )
   {
   }
 

@@ -11,7 +11,7 @@ using namespace Core;
 // End NPC: 1000429
 
 class SubFst019 :
-  public EventScript
+  public Sapphire::ScriptAPI::EventScript
 {
 private:
   // Basic quest information
@@ -38,7 +38,7 @@ private:
 
 public:
   SubFst019() :
-    EventScript( 65585 )
+    Sapphire::ScriptAPI::EventScript( 65585 )
   {
   };
 
