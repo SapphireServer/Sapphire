@@ -118,7 +118,7 @@ void Core::HousingMgr::sendLandSignOwned( Entity::Player& player, uint8_t ward, 
   std::string playerName = g_fw.get< Core::ServerZone >()->getPlayerNameFromDb( playerId );
   //memcpy( &landInfoSignPacket->data().estateGreeting, "Hello World", 11 );
   //memcpy( &landInfoSignPacket->data().estateName, land->getLandName().c_str(), land->getLandName().size() );
-  landInfoSignPacket->data().houseSize = land->getPlotSize();
+  landInfoSignPacket->data().houseSize = land->getSize();
   landInfoSignPacket->data().houseType = static_cast< uint8_t >( land->getLandType() );
   landInfoSignPacket->data().landId = land->getLandId();
   landInfoSignPacket->data().ownerId = player.getContentId(); // should be real owner contentId, not player.contentId()

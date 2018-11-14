@@ -39,8 +39,6 @@ Core::Land::Land( uint16_t zoneId, uint8_t wardNum, uint8_t landId, uint32_t lan
   m_type( Common::LandType::Private )
 {
   memset( &m_tag, 0x00, 3 );
-  memset( &m_landMsg, 0x00, 193 );
-  memset( &m_landName, 0x00, 23 );
 
   load();
 }
@@ -93,7 +91,7 @@ uint32_t Core::Land::getCurrentPrice() const
 }
 
 //Primary State
-void Core::Land::setHouseSize( uint8_t size )
+void Core::Land::setSize( uint8_t size )
 {
   m_size = size;
 }
@@ -103,19 +101,9 @@ void Core::Land::setState( uint8_t state )
   m_state = state;
 }
 
-void Core::Land::setOwnership( uint8_t state )
-{
-  m_iconColor = state;
-}
-
 void Core::Land::setSharing( uint8_t state )
 {
   m_iconAddIcon = state;
-}
-
-void Core::Land::setLandName( const std::string& name )
-{
-  memcpy( &m_landName, name.c_str(), 20 );
 }
 
 void Core::Land::setLandType( Common::LandType type )
@@ -123,7 +111,7 @@ void Core::Land::setLandType( Common::LandType type )
   m_type = type;
 }
 
-uint8_t Core::Land::getPlotSize() const
+uint8_t Core::Land::getSize() const
 {
   return m_size;
 }
@@ -131,11 +119,6 @@ uint8_t Core::Land::getPlotSize() const
 uint8_t Core::Land::getState() const
 {
   return m_state;
-}
-
-uint8_t Core::Land::getOwnership() const
-{
-  return m_iconColor;
 }
 
 uint8_t Core::Land::getSharing() const
@@ -161,11 +144,6 @@ uint8_t Core::Land::getLandId() const
 uint16_t Core::Land::getZoneId() const
 {
   return m_zoneId;
-}
-
-std::string Core::Land::getLandName() const
-{
-  return std::string( m_landName );
 }
 
 Core::Common::LandType Core::Land::getLandType() const
@@ -230,7 +208,7 @@ uint8_t Core::Land::getLandTag( uint8_t slot )
 void Core::Land::init()
 {
 
-  switch( getPlotSize() )
+  switch( m_size )
   {
     case HouseSize::small:
       m_maxItems = 20;

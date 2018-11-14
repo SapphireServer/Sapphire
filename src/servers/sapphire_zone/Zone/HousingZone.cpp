@@ -129,13 +129,13 @@ void Core::HousingZone::sendLandSet( Entity::Player& player )
 
   for( uint8_t i = startIndex, count = 0; i < ( startIndex + 30 ); ++i, ++count )
   {
-    landsetInitializePacket->data().land[ count ].plotSize =  getLand( i )->getPlotSize();
-    landsetInitializePacket->data().land[ count ].houseState =  getLand( i )->getState();
-    landsetInitializePacket->data().land[ count ].iconColor =  getLand( i )->getOwnership();
-    landsetInitializePacket->data().land[ count ].iconAddIcon =  getLand( i )->getPlotSize();
-    landsetInitializePacket->data().land[ count ].fcId =  getLand( i )->getFcId();
-    landsetInitializePacket->data().land[ count ].fcIcon =  getLand( i )->getFcIcon();
-    landsetInitializePacket->data().land[ count ].fcIconColor =  getLand( i )->getFcColor();
+    landsetInitializePacket->data().land[ count ].plotSize = getLand( i )->getSize();
+    landsetInitializePacket->data().land[ count ].houseState = getLand( i )->getState();
+    landsetInitializePacket->data().land[ count ].type = static_cast< uint8_t >( getLand( i )->getLandType() );
+    landsetInitializePacket->data().land[ count ].iconAddIcon = getLand( i )->getSharing();
+    landsetInitializePacket->data().land[ count ].fcId = getLand( i )->getFcId();
+    landsetInitializePacket->data().land[ count ].fcIcon = getLand( i )->getFcIcon();
+    landsetInitializePacket->data().land[ count ].fcIconColor = getLand( i )->getFcColor();
   }
 
   player.queuePacket( landsetInitializePacket );
@@ -150,10 +150,10 @@ void Core::HousingZone::sendLandUpdate( uint8_t landId )
 
     auto landUpdatePacket = makeZonePacket< FFXIVIpcLandUpdate >( pPlayer->getId() );
     landUpdatePacket->data().landId = landId;
-    landUpdatePacket->data().land.plotSize = pLand->getPlotSize();
+    landUpdatePacket->data().land.plotSize = pLand->getSize();
     landUpdatePacket->data().land.houseState = pLand->getState();
-    landUpdatePacket->data().land.iconColor = pLand->getOwnership();
-    landUpdatePacket->data().land.iconAddIcon = pLand->getPlotSize();
+    landUpdatePacket->data().land.type = static_cast< uint8_t >( pLand->getLandType() );
+    landUpdatePacket->data().land.iconAddIcon = pLand->getSharing();
     landUpdatePacket->data().land.fcId = pLand->getFcId();
     landUpdatePacket->data().land.fcIcon = pLand->getFcIcon();
     landUpdatePacket->data().land.fcIconColor = pLand->getFcColor();
@@ -207,7 +207,7 @@ Core::LandPurchaseResult Core::HousingZone::purchseLand( Entity::Player& player,
       player.setLandPermissions( LandPermissionSlot::Private, 0x00, plot,
                                  pHousing->getWardNum(), pHousing->getTerritoryTypeId() );
       player.sendLandPermissions();
-      pLand->setLandName( "Private Estate" + std::to_string( pHousing->getWardNum() ) + "-" + std::to_string( plot ) );
+      //pLand->setLandName( "Private Estate" + std::to_string( pHousing->getWardNum() ) + "-" + std::to_string( plot ) );
       pLand->UpdateLandDb();
       sendLandUpdate( plot );
       return LandPurchaseResult::SUCCESS;
