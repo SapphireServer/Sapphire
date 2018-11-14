@@ -2,6 +2,8 @@
 #include <Event/EventHelper.h>
 #include <ScriptObject.h>
 
+using namespace Core;
+
 // Quest Script: SubFst041_00197
 // Quest Name: Splitting Shells
 // Quest ID: 65733

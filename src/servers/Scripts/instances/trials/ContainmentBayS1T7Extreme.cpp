@@ -1,6 +1,8 @@
 #include <ScriptObject.h>
 #include <Zone/InstanceContent.h>
 
+using namespace Core;
+
 class ContainmentBayS1T7Extreme :
   public InstanceContentScript
 {

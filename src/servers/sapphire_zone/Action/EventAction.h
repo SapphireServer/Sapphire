@@ -3,40 +3,38 @@
 
 #include <Common.h>
 
-#include "Forwards.h"
+#include "ForwardsZone.h"
 #include "Action.h"
 
-namespace Core {
-namespace Action {
-
-class EventAction :
-  public Action
+namespace Core::Action
 {
 
-public:
-  EventAction();
+  class EventAction : public Action
+  {
 
-  ~EventAction();
+  public:
+    EventAction();
 
-  EventAction( Entity::CharaPtr pActor, uint32_t eventId, uint16_t action,
-               ActionCallback finishRef, ActionCallback interruptRef, uint64_t additional );
+    ~EventAction();
 
-  void onStart() override;
+    EventAction( Entity::CharaPtr pActor, uint32_t eventId, uint16_t action,
+                 ActionCallback finishRef, ActionCallback interruptRef, uint64_t additional );
 
-  void onFinish() override;
+    void onStart() override;
 
-  void onInterrupt() override;
+    void onFinish() override;
 
-private:
-  uint32_t m_eventId;
-  uint64_t m_additional;
+    void onInterrupt() override;
 
-  ActionCallback m_onActionFinishClb;
-  ActionCallback m_onActionInterruptClb;
+  private:
+    uint32_t m_eventId;
+    uint64_t m_additional;
 
-};
+    ActionCallback m_onActionFinishClb;
+    ActionCallback m_onActionInterruptClb;
 
-}
+  };
+
 }
 
 #endif

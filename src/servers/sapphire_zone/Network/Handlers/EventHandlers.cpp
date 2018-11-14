@@ -1,12 +1,9 @@
-#include <boost/format.hpp>
-
 #include <Common.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Network/CommonNetwork.h>
 #include <Network/GamePacketNew.h>
 #include <Network/PacketContainer.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
-#include <sapphire_zone/Event/EventHandler.h>
 #include <Network/PacketDef/Zone/ClientZoneDef.h>
 
 #include "Network/GameConnection.h"
@@ -17,6 +14,9 @@
 
 #include "Script/ScriptMgr.h"
 
+#include <Util/Util.h>
+
+#include "Event/EventHandler.h"
 #include "Event/EventHelper.h"
 
 #include "Zone/InstanceContent.h"
@@ -39,8 +39,8 @@ void Core::Network::GameConnection::eventHandlerTalk( const Packets::FFXIVARR_PA
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcEventHandlerTalk >( inPacket );
 
-  const auto& actorId = packet.data().actorId;
-  const auto& eventId = packet.data().eventId;
+  const auto actorId = packet.data().actorId;
+  const auto eventId = packet.data().eventId;
 
   auto eventType = static_cast< uint16_t >( eventId >> 16 );
 
@@ -52,8 +52,7 @@ void Core::Network::GameConnection::eventHandlerTalk( const Packets::FFXIVARR_PA
                     std::to_string( Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) ) ) +
                     " \neventId: " +
                     std::to_string( eventId ) +
-                    " (0x" + boost::str( boost::format( "%|08X|" )
-                                         % static_cast< uint64_t >( eventId & 0xFFFFFFF ) ) + ")" );
+                    " (0x" + Util::intToHexString( static_cast< uint64_t >( eventId & 0xFFFFFFF ), 8 ) + ")" );
 
 
   player.sendDebug( "Calling: " + objName + "." + eventName );
@@ -84,9 +83,9 @@ void Core::Network::GameConnection::eventHandlerEmote( const Packets::FFXIVARR_P
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcEventHandlerEmote >( inPacket );
 
-  const auto& actorId = packet.data().actorId;
-  const auto& eventId = packet.data().eventId;
-  const auto& emoteId = packet.data().emoteId;
+  const auto actorId = packet.data().actorId;
+  const auto eventId = packet.data().eventId;
+  const auto emoteId = packet.data().emoteId;
   const auto eventType = static_cast< uint16_t >( eventId >> 16 );
 
   std::string eventName = "onEmote";
@@ -97,8 +96,7 @@ void Core::Network::GameConnection::eventHandlerEmote( const Packets::FFXIVARR_P
                     std::to_string( Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) ) ) +
                     " \neventId: " +
                     std::to_string( eventId ) +
-                    " (0x" + boost::str( boost::format( "%|08X|" )
-                                         % static_cast< uint64_t >( eventId & 0xFFFFFFF ) ) + ")" );
+                    " (0x" + Util::intToHexString( static_cast< uint64_t >( eventId & 0xFFFFFFF ), 8 ) + ")" );
 
   player.sendDebug( "Calling: " + objName + "." + eventName );
 
@@ -122,8 +120,8 @@ void Core::Network::GameConnection::eventHandlerWithinRange( const Packets::FFXI
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcEventHandlerWithinRange >( inPacket );
 
-  const auto& eventId = packet.data().eventId;
-  const auto& param1 = packet.data().param1;
+  const auto eventId = packet.data().eventId;
+  const auto param1 = packet.data().param1;
   const auto& pos = packet.data().position;
 
   std::string eventName = "onWithinRange";
@@ -144,8 +142,8 @@ void Core::Network::GameConnection::eventHandlerOutsideRange( const Packets::FFX
   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcEventHandlerOutsideRange >( inPacket );
-  const auto& eventId = packet.data().eventId;
-  const auto& param1 = packet.data().param1;
+  const auto eventId = packet.data().eventId;
+  const auto param1 = packet.data().param1;
   const auto& pos = packet.data().position;
 
   std::string eventName = "onOutsideRange";
@@ -167,9 +165,9 @@ void Core::Network::GameConnection::eventHandlerEnterTerritory( const Packets::F
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcEnterTerritoryHandler >( inPacket );
 
-  const auto& eventId = packet.data().eventId;
-  const auto& param1 = packet.data().param1;
-  const auto& param2 = packet.data().param2;
+  const auto eventId = packet.data().eventId;
+  const auto param1 = packet.data().param1;
+  const auto param2 = packet.data().param2;
 
   std::string eventName = "onEnterTerritory";
 
@@ -195,18 +193,18 @@ void Core::Network::GameConnection::eventHandlerReturn( const Packets::FFXIVARR_
                                                         Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcEventHandlerReturn >( inPacket );
-  const auto& eventId = packet.data().eventId;
-  const auto& scene = packet.data().scene;
-  const auto& param1 = packet.data().param1;
-  const auto& param2 = packet.data().param2;
-  const auto& param3 = packet.data().param3;
-  const auto& param4 = packet.data().param4;
+  const auto eventId = packet.data().eventId;
+  const auto scene = packet.data().scene;
+  const auto param1 = packet.data().param1;
+  const auto param2 = packet.data().param2;
+  const auto param3 = packet.data().param3;
+  const auto param4 = packet.data().param4;
 
   std::string eventName = Event::getEventName( eventId );
 
   player.sendDebug( "eventId: " +
                     std::to_string( eventId ) +
-                    " ( 0x" + boost::str( boost::format( "%|08X|" ) % ( uint64_t ) ( eventId & 0xFFFFFFF ) ) + " ) " +
+                    " ( 0x" + Util::intToHexString( static_cast< uint64_t >( eventId & 0xFFFFFFF ), 8 ) + " ) " +
                     " scene: " + std::to_string( scene ) +
                     " p1: " + std::to_string( param1 ) +
                     " p2: " + std::to_string( param2 ) +

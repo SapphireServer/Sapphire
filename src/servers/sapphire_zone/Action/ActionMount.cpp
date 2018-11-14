@@ -3,11 +3,11 @@
 #include <Util/UtilMath.h>
 #include <Logging/Logger.h>
 #include <Network/CommonActorControl.h>
-#include <sapphire_zone/Network/PacketWrappers/EffectPacket.h>
 
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 #include "Network/PacketWrappers/ActorControlPacket144.h"
+#include "Network/PacketWrappers/EffectPacket.h"
 
 #include "Actor/Player.h"
 #include "Script/ScriptMgr.h"
@@ -74,7 +74,7 @@ void Core::Action::ActionMount::onFinish()
 
   pPlayer->unsetStateFlag( PlayerStateFlag::Casting );
 
-  auto effectPacket = boost::make_shared< Server::EffectPacket >( getId(), pPlayer->getId(), 4 );
+  auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pPlayer->getId(), 4 );
   effectPacket->setRotation( Math::Util::floatToUInt16Rot( pPlayer->getRot() ) );
 
   Server::EffectEntry effectEntry{};

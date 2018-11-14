@@ -2,11 +2,11 @@
 #include <Exd/ExdDataGenerated.h>
 #include <Logging/Logger.h>
 #include <Network/CommonActorControl.h>
-#include <sapphire_zone/Network/PacketWrappers/EffectPacket.h>
 #include <Util/UtilMath.h>
 
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
+#include "Network/PacketWrappers/EffectPacket.h"
 
 #include "Actor/Player.h"
 
@@ -86,7 +86,7 @@ void Core::Action::ActionTeleport::onFinish()
 
   pPlayer->setZoningType( ZoneingType::Teleport );
 
-  auto effectPacket = boost::make_shared< Server::EffectPacket >( getId(), pPlayer->getId(), 5 );
+  auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pPlayer->getId(), 5 );
   effectPacket->setRotation( Math::Util::floatToUInt16Rot( pPlayer->getRot() ) );
 
 

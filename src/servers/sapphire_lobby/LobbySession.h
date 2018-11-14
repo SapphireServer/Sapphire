@@ -7,56 +7,55 @@
 #include <string>
 #include <string.h>
 
-namespace Core {
-
-class LobbySession
+namespace Core
 {
 
-private:
-  uint32_t m_IP;
-  uint32_t m_accountID;
-
-  uint8_t m_sessionId[56];
-
-public:
-
-  std::string newCharName;
-
-  LobbySession( void );
-
-  ~LobbySession( void );
-
-  uint32_t getIP()
+  class LobbySession
   {
-    return m_IP;
-  }
 
-  uint8_t* getSessionId()
-  {
-    return m_sessionId;
-  }
+  private:
+    uint32_t m_IP;
+    uint32_t m_accountID;
+    uint8_t m_sessionId[56];
 
-  void setSessionId( uint8_t* sessionId )
-  {
-    memcpy( m_sessionId, sessionId, 56 );
-  }
+  public:
+    std::string newCharName;
 
-  void setIP( uint32_t iP )
-  {
-    m_IP = iP;
-  }
+    LobbySession( void );
 
-  uint32_t getAccountID()
-  {
-    return m_accountID;
-  }
+    ~LobbySession( void );
 
-  void setAccountID( uint32_t iD )
-  {
-    m_accountID = iD;
-  }
+    uint32_t getIP()
+    {
+      return m_IP;
+    }
 
-};
+    uint8_t* getSessionId()
+    {
+      return m_sessionId;
+    }
+
+    void setSessionId( uint8_t* sessionId )
+    {
+      memcpy( m_sessionId, sessionId, 56 );
+    }
+
+    void setIP( uint32_t iP )
+    {
+      m_IP = iP;
+    }
+
+    uint32_t getAccountID()
+    {
+      return m_accountID;
+    }
+
+    void setAccountID( uint32_t iD )
+    {
+      m_accountID = iD;
+    }
+
+  };
 
 }
 

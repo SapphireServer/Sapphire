@@ -3,6 +3,8 @@
 #include "Event/EventHelper.h"
 #include <ScriptObject.h>
 
+using namespace Core;
+
 // Quest Script: SubSea001_00111
 // Quest Name: Making a Name
 // Quest ID: 65647

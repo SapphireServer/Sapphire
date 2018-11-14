@@ -1,14 +1,12 @@
 #include "Connection.h"
 #include "Hive.h"
-#include <boost/interprocess/detail/atomic.hpp>
-#include <boost/bind.hpp>
+#include <functional>
 
 namespace Core {
 namespace Network {
 //-----------------------------------------------------------------------------
 
-Connection::Connection( HivePtr hive )
-  :
+Connection::Connection( HivePtr hive ) :
   m_hive( hive ),
   m_socket( hive->GetService() ),
   m_io_strand( hive->GetService() ),
@@ -23,9 +21,9 @@ Connection::~Connection()
 
 void Connection::Bind( const std::string& ip, uint16_t port )
 {
-  boost::asio::ip::tcp::endpoint endpoint( boost::asio::ip::address::from_string( ip ), port );
+  asio::ip::tcp::endpoint endpoint( asio::ip::address::from_string( ip ), port );
   m_socket.open( endpoint.protocol() );
-  m_socket.set_option( boost::asio::ip::tcp::acceptor::reuse_address( false ) );
+  m_socket.set_option( asio::ip::tcp::acceptor::reuse_address( false ) );
   m_socket.bind( endpoint );
 }
 
@@ -33,12 +31,12 @@ void Connection::StartSend()
 {
   if( !m_pending_sends.empty() )
   {
-    boost::asio::async_write( m_socket,
-                              boost::asio::buffer( m_pending_sends.front() ),
-                              m_io_strand.wrap( boost::bind( &Connection::HandleSend,
-                                                             shared_from_this(),
-                                                             boost::asio::placeholders::error,
-                                                             m_pending_sends.begin() ) ) );
+    asio::async_write( m_socket,
+                       asio::buffer( m_pending_sends.front() ),
+                       m_io_strand.wrap( std::bind( &Connection::HandleSend,
+                                                    shared_from_this(),
+                                                    std::placeholders::_1,
+                                                    m_pending_sends.begin() ) ) );
   }
 }
 
@@ -47,36 +45,38 @@ void Connection::StartRecv( int32_t total_bytes )
   if( total_bytes > 0 )
   {
     m_recv_buffer.resize( total_bytes );
-    boost::asio::async_read( m_socket,
-                             boost::asio::buffer( m_recv_buffer ),
-                             m_io_strand.wrap( boost::bind( &Connection::HandleRecv,
-                                                            shared_from_this(),
-                                                            _1,
-                                                            _2 ) ) );
+    asio::async_read( m_socket,
+                      asio::buffer( m_recv_buffer ),
+                      m_io_strand.wrap( std::bind( &Connection::HandleRecv,
+                                                   shared_from_this(),
+                                                   std::placeholders::_1,
+                                                   std::placeholders::_2 ) ) );
   }
   else
   {
     m_recv_buffer.resize( m_receive_buffer_size );
-    m_socket.async_read_some( boost::asio::buffer( m_recv_buffer ),
-                              m_io_strand.wrap( boost::bind( &Connection::HandleRecv,
-                                                             shared_from_this(),
-                                                             _1,
-                                                             _2 ) ) );
+    m_socket.async_read_some( asio::buffer( m_recv_buffer ),
+                              m_io_strand.wrap( std::bind( &Connection::HandleRecv,
+                                                           shared_from_this(),
+                                                           std::placeholders::_1,
+                                                           std::placeholders::_2 ) ) );
   }
 }
 
-void Connection::StartError( const boost::system::error_code& error )
+void Connection::StartError( const asio::error_code& error )
 {
-  if( boost::interprocess::ipcdetail::atomic_cas32( &m_error_state, 1, 0 ) == 0 )
+  uint32_t v1 = 1;
+  uint32_t v2 = 0;
+  if( !m_error_state.compare_exchange_strong( v1, v2 ) )
   {
-    boost::system::error_code ec;
-    m_socket.shutdown( boost::asio::ip::tcp::socket::shutdown_both, ec );
+    asio::error_code ec;
+    m_socket.shutdown( asio::ip::tcp::socket::shutdown_both, ec );
     m_socket.close( ec );
     OnError( error );
   }
 }
 
-void Connection::HandleConnect( const boost::system::error_code& error )
+void Connection::HandleConnect( const asio::error_code& error )
 {
   if( error || HasError() || m_hive->HasStopped() )
   {
@@ -97,7 +97,7 @@ void Connection::HandleConnect( const boost::system::error_code& error )
 }
 
 void
-Connection::HandleSend( const boost::system::error_code& error, std::list< std::vector< uint8_t > >::iterator itr )
+Connection::HandleSend( const asio::error_code& error, std::list< std::vector< uint8_t > >::iterator itr )
 {
   if( error || HasError() || m_hive->HasStopped() )
   {
@@ -111,7 +111,7 @@ Connection::HandleSend( const boost::system::error_code& error, std::list< std::
   }
 }
 
-void Connection::HandleRecv( const boost::system::error_code& error, int32_t actual_bytes )
+void Connection::HandleRecv( const asio::error_code& error, int32_t actual_bytes )
 {
   if( error || HasError() || m_hive->HasStopped() )
   {
@@ -153,11 +153,11 @@ void Connection::DispatchRecv( int32_t total_bytes )
 
 void Connection::Connect( const std::string& host, uint16_t port )
 {
-  boost::asio::ip::tcp::resolver resolver( m_hive->GetService() );
-  boost::asio::ip::tcp::resolver::query query( host, std::to_string( port ) );
-  boost::asio::ip::tcp::resolver::iterator iterator = resolver.resolve( query );
+  asio::ip::tcp::resolver resolver( m_hive->GetService() );
+  asio::ip::tcp::resolver::query query( host, std::to_string( port ) );
+  asio::ip::tcp::resolver::iterator iterator = resolver.resolve( query );
   m_socket.async_connect( *iterator,
-                          m_io_strand.wrap( boost::bind( &Connection::HandleConnect, shared_from_this(), _1 ) ) );
+                          m_io_strand.wrap( std::bind( &Connection::HandleConnect, shared_from_this(), std::placeholders::_1 ) ) );
 
 }
 
@@ -169,20 +169,20 @@ void Connection::Disconnect()
 
 void Connection::Recv( int32_t total_bytes )
 {
-  m_io_strand.post( boost::bind( &Connection::DispatchRecv, shared_from_this(), total_bytes ) );
+  m_io_strand.post( std::bind( &Connection::DispatchRecv, shared_from_this(), total_bytes ) );
 }
 
 void Connection::Send( const std::vector< uint8_t >& buffer )
 {
-  m_io_strand.post( boost::bind( &Connection::DispatchSend, shared_from_this(), buffer ) );
+  m_io_strand.post( std::bind( &Connection::DispatchSend, shared_from_this(), buffer ) );
 }
 
-boost::asio::ip::tcp::socket& Connection::GetSocket()
+asio::ip::tcp::socket& Connection::GetSocket()
 {
   return m_socket;
 }
 
-boost::asio::strand& Connection::GetStrand()
+asio::strand& Connection::GetStrand()
 {
   return m_io_strand;
 }
@@ -204,7 +204,9 @@ int32_t Connection::GetReceiveBufferSize() const
 
 bool Connection::HasError()
 {
-  return ( boost::interprocess::ipcdetail::atomic_cas32( &m_error_state, 1, 1 ) == 1 );
+  uint32_t v1 = 1;
+  uint32_t v2 = 1;
+  return ( m_error_state.compare_exchange_strong( v1, v2 ) );
 }
 
 

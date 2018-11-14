@@ -2,6 +2,8 @@
 #include <Event/EventHelper.h>
 #include <ScriptObject.h>
 
+using namespace Core;
+
 // Quest Script: SubFst003_00026
 // Quest Name: Once Bitten, Twice Shy
 // Quest ID: 65562

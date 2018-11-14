@@ -1,16 +1,14 @@
 os:
-  - Visual Studio 2015
+  - Visual Studio 2017
 
 configuration:
   - Debug
 
 platform:
-  - Win32
+  - Win64
 
 environment:
   MSVC_DEFAULT_OPTIONS: ON
-  BOOST_ROOT_DIR: "C:\\Libraries\\boost_1_63_0"
-  BOOST_LIB_DIR: "C:\\Libraries\\boost_1_63_0\\lib32-msvc-14.0"
   MYSQL_PWD: "Password12!"
 
 services:
@@ -22,7 +20,7 @@ before_build:
   - git submodule update --init
   - mkdir build
   - cd build
-  - cmake .. -G "Visual Studio 14 2015" 
+  - cmake .. -G "Visual Studio 15 2017 Win64" 
   - cmake --build . --target ALL_BUILD --config Debug
 
 build_script:

@@ -6,7 +6,7 @@ Core::Db::ZoneDbConnection::ZoneDbConnection( ConnectionInfo& connInfo ) :
 {
 }
 
-Core::Db::ZoneDbConnection::ZoneDbConnection( Core::LockedWaitQueue< boost::shared_ptr< Operation > >* q,
+Core::Db::ZoneDbConnection::ZoneDbConnection( Core::LockedWaitQueue< std::shared_ptr< Operation > >* q,
                                                 ConnectionInfo& connInfo ) :
   DbConnection( q, connInfo )
 {
@@ -50,8 +50,8 @@ void Core::Db::ZoneDbConnection::doPrepareStatements()
                     "CFPenaltyUntil = ?, Pose = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
 
 
-  prepareStatement( CHARA_SEL_MINIMAL, "SELECT Name, Customize, ModelEquip, TerritoryId, GuardianDeity, "
-                                       "Class, ContentId, BirthDay, BirthMonth "
+  prepareStatement( CHARA_SEL_MINIMAL, "SELECT Name, Customize, ModelMainWeapon, ModelSubWeapon, ModelEquip, TerritoryId, GuardianDeity, "
+                                       "Class, ContentId, BirthDay, BirthMonth, EquipDisplayFlags "
                                        "FROM charainfo WHERE CharacterId = ?;", CONNECTION_SYNC );
 
   prepareStatement( CHARA_INS, "INSERT INTO charainfo (AccountId, CharacterId, ContentId, Name, Hp, Mp, "

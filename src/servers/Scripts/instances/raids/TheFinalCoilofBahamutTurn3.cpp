@@ -1,6 +1,8 @@
 #include <ScriptObject.h>
 #include <Zone/InstanceContent.h>
 
+using namespace Core;
+
 class TheFinalCoilofBahamutTurn3 :
   public InstanceContentScript
 {

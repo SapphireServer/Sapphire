@@ -8,6 +8,8 @@
 #include <map>
 #include <vector>
 #include <set>
+#include <variant>
+#include <Util/Util.h>
 
 #include "pcb.h"
 #include "lgb.h"
@@ -21,11 +23,12 @@
 #include <ExdData.h>
 #include <ExdCat.h>
 #include <Exd.h>
-#include <boost/algorithm/string.hpp>
-#include <boost/range/algorithm/remove_if.hpp>
-#include <boost/algorithm/string/classification.hpp>
+
+#include <experimental/filesystem>
 
 #endif
+
+namespace fs = std::experimental::filesystem;
 
 // garbage to ignore models
 bool ignoreModels = false;
@@ -144,14 +147,14 @@ void dumpLevelExdEntries( uint32_t zoneId, const std::string& name = std::string
     {
       auto id = row.first;
       auto& fields = row.second;
-      auto x = *boost::get< float >( &fields.at( 0 ) );
-      auto y = *boost::get< float >( &fields.at( 1 ) );
-      auto z = *boost::get< float >( &fields.at( 2 ) );
-      auto yaw = *boost::get< float >( &fields.at( 3 ) );
-      auto radius = *boost::get< float >( &fields.at( 4 ) );
-      auto type = *boost::get< uint8_t >( &fields.at( 5 ) );
-      auto objectid = *boost::get< uint32_t >( &fields.at( 6 ) );
-      auto zone = *boost::get< uint16_t >( &fields.at( 9 ) );
+      auto x = std::get< float >( fields.at( 0 ) );
+      auto y = std::get< float >( fields.at( 1 ) );
+      auto z = std::get< float >( fields.at( 2 ) );
+      auto yaw = std::get< float >( fields.at( 3 ) );
+      auto radius = std::get< float >( fields.at( 4 ) );
+      auto type = std::get< uint8_t >( fields.at( 5 ) );
+      auto objectid = std::get< uint32_t >( fields.at( 6 ) );
+      auto zone = std::get< uint16_t >( fields.at( 9 ) );
 
       if( zone == zoneId )
       {
@@ -201,12 +204,12 @@ std::string zoneNameToPath( const std::string& name )
   for( auto& row : exd.get_rows() )
   {
     auto& fields = row.second;
-    auto teriName = *boost::get< std::string >(
-      &fields.at( static_cast< size_t >( TerritoryTypeExdIndexes::TerritoryType ) ) );
+    auto teriName = std::get< std::string >(
+      fields.at( static_cast< size_t >( TerritoryTypeExdIndexes::TerritoryType ) ) );
     if( teriName.empty() )
       continue;
-    auto teriPath = *boost::get< std::string >( &fields.at( static_cast< size_t >( TerritoryTypeExdIndexes::Path ) ) );
-    if( !found && boost::iequals( name, teriName ) )
+    auto teriPath = std::get< std::string >( fields.at( static_cast< size_t >( TerritoryTypeExdIndexes::Path ) ) );
+    if( !found && ( Core::Util::toLowerCopy( name) == Core::Util::toLowerCopy( teriName ) ) )
     {
       path = teriPath;
       found = true;
@@ -240,7 +243,7 @@ void loadEobjNames()
   {
     auto id = row.first;
     auto& fields = row.second;
-    auto name = *boost::get< std::string >( &fields.at( 0 ) );
+    auto name = std::get< std::string >( fields.at( 0 ) );
 
     if( !name.empty() )
       eobjNameMap[ id ] = name;
@@ -312,11 +315,11 @@ void loadAllInstanceContentEntries()
     auto id = row.first;
     auto& fields = row.second;
 
-    auto name = *boost::get< std::string >( &fields.at( 3 ) );
+    auto name = std::get< std::string >( fields.at( 3 ) );
     if( name.empty() )
       continue;
-    auto type = *boost::get< uint8_t >( &fields.at( 0 ) );
-    auto teri = *boost::get< uint32_t >( &fields.at( 9 ) );
+    auto type = std::get< uint8_t >( fields.at( 0 ) );
+    auto teri = std::get< uint32_t >( fields.at( 9 ) );
     auto i = 0;
     while( ( i = name.find( ' ' ) ) != std::string::npos )
       name = name.replace( name.begin() + i, name.begin() + i + 1, { '_' } );
@@ -327,7 +330,8 @@ void loadAllInstanceContentEntries()
     //zoneInstanceMap[zoneId].push_back( std::make_pair( id, name ) );
     zoneDumpList.emplace( zoneNameMap[ teri ] );
 
-    name.erase( boost::remove_if( name, boost::is_any_of( "★_ '()[]-\x1a\x1\x2\x1f\x1\x3.:" ) ), name.end() );
+    std::string remove = "★_ '()[]-\x1a\x1\x2\x1f\x1\x3.:";
+    Core::Util::eraseAllIn( name, remove );
     name[ 0 ] = toupper( name[ 0 ] );
     contentList.push_back( { id, name, zoneNameMap[ teri ], type } );
   }
@@ -390,7 +394,7 @@ int main( int argc, char* argv[] )
   contentTypeMap[ 11 ] = "events";
   contentTypeMap[ 12 ] = "pvp";
 
-  if( !boost::filesystem::exists( "instance.tmpl" ) )
+  if( !fs::exists( "instance.tmpl" ) )
     throw std::runtime_error( "instance.tmpl is missing in working directory" );
 
   initExd( gamePath );
@@ -580,8 +584,9 @@ int main( int argc, char* argv[] )
                 if( eobjNameMap.find( id ) != eobjNameMap.end() )
                 {
                   name = eobjNameMap[ id ];
-                  name.erase( boost::remove_if( name, boost::is_any_of( "★_ '()[]-\x1a\x1\x2\x1f\x1\x3.:" ) ),
-                              name.end() );
+                  std::string remove = "★_ '()[]-\x1a\x1\x2\x1f\x1\x3.:";
+                  Core::Util::eraseAllIn( name, remove );
+
                   name[ 0 ] = toupper( name[ 0 ] );
                 }
                 if( name.empty() )
@@ -663,8 +668,8 @@ int main( int argc, char* argv[] )
     if( subdirIt != contentTypeMap.end() )
       subdir = subdirIt->second + "/";
 
-    boost::filesystem::path outDir( "instances/" + subdir );
-    boost::filesystem::create_directories( outDir );
+    fs::path outDir( "instances/" + subdir );
+    fs::create_directories( outDir );
 
     std::ofstream outH( outDir.string() + entry.name + ".cpp" );
     outH << result;

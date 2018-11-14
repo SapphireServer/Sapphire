@@ -38,7 +38,7 @@ bool Core::Db::StatementTask::execute()
 }
 
 
-Core::Db::PreparedStatementTask::PreparedStatementTask( boost::shared_ptr< Core::Db::PreparedStatement > stmt,
+Core::Db::PreparedStatementTask::PreparedStatementTask( std::shared_ptr< Core::Db::PreparedStatement > stmt,
                                                         bool async ) :
   m_stmt( stmt )
 //, m_result(nullptr)

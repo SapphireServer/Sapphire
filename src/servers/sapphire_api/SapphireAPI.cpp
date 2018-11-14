@@ -4,16 +4,11 @@
 #include "PlayerMinimal.h"
 #include <time.h>
 
-#define BOOST_SPIRIT_THREADSAFE
+#include <sstream>
 
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/foreach.hpp>
-#include <boost/shared_ptr.hpp>
+#include <nlohmann/json.hpp>
 
 #include <Database/DatabaseDef.h>
-#include <boost/make_shared.hpp>
 
 Core::Network::SapphireAPI::SapphireAPI()
 {
@@ -50,13 +45,9 @@ bool Core::Network::SapphireAPI::login( const std::string& username, const std::
   }
 
   // create session for the new sessionid and store to sessionlist
-  auto pSession = boost::make_shared< Session >();
+  auto pSession = std::make_shared< Session >();
   pSession->setAccountId( accountId );
   pSession->setSessionId( sid );
-
-  //auto ip2 = boost::asio::ip::address::from_string( request->remote_endpoint_address );
-
-  //pSession->setIP( ip2.to_v4().to_ulong() );
 
   std::stringstream ss;
 
@@ -75,7 +66,7 @@ bool Core::Network::SapphireAPI::login( const std::string& username, const std::
 bool Core::Network::SapphireAPI::insertSession( const uint32_t& accountId, std::string& sId )
 {
   // create session for the new sessionid and store to sessionlist
-  auto pSession = boost::make_shared< Session >();
+  auto pSession = std::make_shared< Session >();
   pSession->setAccountId( accountId );
   pSession->setSessionId( ( uint8_t* ) sId.c_str() );
 
@@ -126,12 +117,7 @@ Core::Network::SapphireAPI::createCharacter( const int& accountId, const std::st
   newPlayer.setContentId( getNextContentId() );
   newPlayer.setName( name.c_str() );
 
-  boost::property_tree::ptree pt;
-
-  std::stringstream ss;
-  ss << infoJson;
-
-  boost::property_tree::read_json( ss, pt );
+  auto json = nlohmann::json::parse( infoJson );
 
   const char* ptr = infoJson.c_str() + 50;
 
@@ -145,18 +131,34 @@ Core::Network::SapphireAPI::createCharacter( const int& accountId, const std::st
   std::vector< int32_t > tmpVector;
   std::vector< int32_t > tmpVector2;
 
-  BOOST_FOREACH( boost::property_tree::ptree::value_type& v, pt.get_child( "content" ) )
-        {
-          boost::property_tree::ptree subtree1 = v.second;
-          BOOST_FOREACH( boost::property_tree::ptree::value_type& vs, subtree1 )
-                {
-                  boost::property_tree::ptree subtree2 = vs.second;
-                  //std::cout << vs.second.data();
-                  tmpVector.push_back( std::stoi( vs.second.data() ) );
-                }
-          if( !v.second.data().empty() )
-            tmpVector2.push_back( std::stoi( v.second.data() ) );
-        }
+  for( auto& v : json["content"] )
+  {
+    if( v.is_array() )
+    {
+      for( auto& vs : v )
+      {
+        tmpVector.push_back( std::stoi( std::string( vs ) ) );
+      }
+    }
+
+    if( !v.empty() && !v.is_array() )
+      tmpVector2.push_back( std::stoi( std::string( v ) ) );
+  }
+
+  // leaving this in for now for reference
+  // BOOST_FOREACH( boost::property_tree::ptree::value_type& v, pt.get_child( "content" ) )
+  //       {
+  //         boost::property_tree::ptree subtree1 = v.second;
+  //         BOOST_FOREACH( boost::property_tree::ptree::value_type& vs, subtree1 )
+  //               {
+  //                 boost::property_tree::ptree subtree2 = vs.second;
+  //                 //std::cout << vs.second.data();
+  //                 tmpVector.push_back( std::stoi( vs.second.data() ) );
+  //               }
+  //         if( !v.second.data().empty() )
+  //           tmpVector2.push_back( std::stoi( v.second.data() ) );
+  //       }
+  
   std::vector< int32_t >::iterator it = tmpVector.begin();
   for( int32_t i = 0; it != tmpVector.end(); ++it, i++ )
   {

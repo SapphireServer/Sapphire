@@ -11,16 +11,11 @@
 #include <set>
 #include <Exd/ExdDataGenerated.h>
 #include <Logging/Logger.h>
-#include <boost/range/algorithm/remove_if.hpp>
-#include <boost/algorithm/string/classification.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/variant/detail/substitute.hpp>
-#include <boost/format.hpp>
+#include <Util/Util.h>
 
-using namespace boost::system;
-namespace filesys = boost::filesystem;
+#include <experimental/filesystem>
+
+namespace filesys = std::experimental::filesystem;
 
 #include <fstream>
 #include <streambuf>
@@ -125,7 +120,7 @@ std::string binaryToHexString( uint8_t* pBinData, uint16_t size )
 
   for( uint32_t i = 0; i < size; i++ )
   {
-    outStr += boost::str( boost::format( "%|02X|" ) % ( int32_t ) ( pBinData[ i ] & 0xFF ) );
+    outStr += Core::Util::intToHexString( pBinData[ i ] & 0xFF );
   }
 
   return outStr;
@@ -171,8 +166,8 @@ std::vector< std::string > getAllFilesInDir( const std::string& dirPath,
           // Add the name in vector
           listOfFiles.push_back( iter->path().string() );
         }
-
-        error_code ec;
+        
+        std::error_code ec;
         // Increment the iterator to point to next entry in recursive iteration
         iter.increment( ec );
         if( ec )

@@ -4,21 +4,16 @@
 #include <Common.h>
 #include "Forwards.h"
 
-using namespace Core::Entity;
-
-namespace Core {
-namespace Math {
-
-class CalcBattle
+namespace Core::Math
 {
-public:
-  static uint32_t calculateHealValue( PlayerPtr pPlayer, uint32_t potency );
 
-private:
+  class CalcBattle
+  {
+  public:
+    static uint32_t calculateHealValue( Core::Entity::PlayerPtr pPlayer, uint32_t potency );
 
-};
+  };
 
-}
 }
 
 #endif

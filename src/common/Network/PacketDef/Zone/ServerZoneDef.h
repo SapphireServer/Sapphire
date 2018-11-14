@@ -210,6 +210,44 @@ struct FFXIVIpcLinkshellList :
   } entry[8];
 };
 
+/**
+* Structural representation of the packet sent by the server
+* to send a list of mail the player has
+*/
+struct FFXIVIpcReqMoogleMailList :
+  FFXIVIpcBasePacket< ReqMoogleMailList >
+{
+  struct letterEntry
+  {
+    char unk[0x8];
+    uint32_t timeStamp; // The time the mail was sent (this also seems to be used as a Id)
+    char unk1[0x30]; // This should be items, gil, etc for the letter
+    uint8_t read; // 0 = false | 1 = true
+    uint8_t type; // 0 = Friends | 1 = Rewards | 2 = GM
+    uint8_t unk2;
+    char senderName[0x20]; // The name of the sender
+    char summary[0x3C]; // The start of the full letter text
+    char padding2[0x5];
+  } letter[5];
+  char unk3[0x08];
+};
+
+/**
+* Structural representation of the packet sent by the server
+* to show the mail delivery notification
+*/
+struct FFXIVIpcMailLetterNotificationt :
+  FFXIVIpcBasePacket< MailLetterNotification >
+{
+  uint32_t sendbackCount; // The amount of letters sent back since you ran out of room (moogle dialog changes based on this)
+  uint16_t friendLetters; // The amount of letters in the friends section of the letterbox
+  uint16_t unreadCount; // The amount of unreads in the letterbox (this is the number that shows up)
+  uint16_t rewardLetters; // The amount of letters in the rewards section of the letterbox
+  uint8_t isGmLetter; // Makes the letter notification flash red
+  uint8_t isSupportDesk; // After setting this to 1 we can no longer update mail notifications (more research needed on the support desk)
+  char unk2[0x4]; // This has probs something to do with the support desk (inquiry id?)
+};
+
 struct FFXIVIpcExamineFreeCompanyInfo :
   FFXIVIpcBasePacket< ExamineFreeCompanyInfo >
 {
@@ -446,15 +484,18 @@ struct FFXIVIpcPlayerSpawn :
   uint16_t u1b;
   uint8_t u2b;
   uint8_t u2ab;
-  uint8_t gmRank;
+  uint8_t u3a;
   uint8_t u3b;
 
-  uint8_t u3a;
-  uint8_t onlineStatus;
+  uint8_t gmRank;
   uint8_t u3c;
-  uint8_t pose;
+  uint8_t u4;
+  uint8_t onlineStatus;
 
-  uint32_t u4;
+  uint8_t pose;
+  uint8_t u5a;
+  uint8_t u5b;
+  uint8_t u5c;
 
   uint64_t targetId;
   uint32_t u6;
@@ -691,8 +732,7 @@ struct FFXIVIpcUpdateClassInfo :
  * Structural representation of the packet sent by the server
  * to send the titles available to the player
  */
-struct FFXIVIpcPlayerTitleList :
-  FFXIVIpcBasePacket< PlayerTitleList >
+struct FFXIVIpcPlayerTitleList : FFXIVIpcBasePacket< PlayerTitleList >
 {
   uint8_t titleList[48];
 };
@@ -701,8 +741,7 @@ struct FFXIVIpcPlayerTitleList :
 * Structural representation of the packet sent by the server
 * to initialize a zone for the player
 */
-struct FFXIVIpcInitZone :
-  FFXIVIpcBasePacket< InitZone >
+struct FFXIVIpcInitZone : FFXIVIpcBasePacket< InitZone >
 {
   uint16_t serverId;
   uint16_t zoneId;
@@ -711,11 +750,14 @@ struct FFXIVIpcInitZone :
   uint32_t unknown3;
   uint32_t unknown4;
   uint8_t weatherId;
-  uint8_t bitmask;
-  uint16_t unknown5;
+  uint16_t bitmask;
+  uint8_t unknown5;
   uint16_t festivalId;
   uint16_t additionalFestivalId;
   uint32_t unknown8;
+  uint32_t unknown9;
+  uint32_t unknown10;
+  uint32_t unknown11;
   Common::FFXIVARR_POSITION3 pos;
 };
 
@@ -724,8 +766,7 @@ struct FFXIVIpcInitZone :
 * Structural representation of the packet sent by the server to initialize
 * the client UI upon initial connection.
 */
-struct FFXIVIpcInitUI :
-  FFXIVIpcBasePacket< InitUI >
+struct FFXIVIpcInitUI : FFXIVIpcBasePacket< InitUI >
 {
   // plain C types for a bit until the packet is actually fixed.
   // makes conversion between different editors easier.
@@ -756,11 +797,11 @@ struct FFXIVIpcInitUI :
   unsigned short unknown5E;
   unsigned short pvpFrontlineWeeklyCampaigns;
   unsigned short enhancedAnimaGlassProgress;
-  unsigned short unknown64[4]; // needs confirmation, probably pvp total/weeklies
+  unsigned short unknown64[4];
   unsigned short pvpRivalWingsTotalMatches;
   unsigned short pvpRivalWingsTotalVictories;
-  unsigned short pvpRivalWingsWeeklyMatches; // needs confirmation
-  unsigned short pvpRivalWingsWeeklyVictories; // needs confirmation
+  unsigned short pvpRivalWingsWeeklyMatches;
+  unsigned short pvpRivalWingsWeeklyVictories;
   unsigned char maxLevel;
   unsigned char expansion;
   unsigned char unknown76;
@@ -810,7 +851,7 @@ struct FFXIVIpcInitUI :
   unsigned char companionDefRank;
   unsigned char companionAttRank;
   unsigned char companionHealRank;
-  unsigned char mountGuideMask[16];
+  unsigned char mountGuideMask[17];
   char name[32];
   unsigned char unknownOword[16];
   unsigned char unknown258;
@@ -818,9 +859,9 @@ struct FFXIVIpcInitUI :
   unsigned char aetheryte[17];
   unsigned char discovery[421];
   unsigned char howto[33];
-  unsigned char minions[38];
+  unsigned char minions[40];
   unsigned char chocoboTaxiMask[8];
-  unsigned char watchedCutscenes[111];
+  unsigned char watchedCutscenes[115];
   unsigned char companionBardingMask[9];
   unsigned char companionEquippedHead;
   unsigned char companionEquippedBody;
@@ -840,12 +881,12 @@ struct FFXIVIpcInitUI :
   unsigned char unknownMask5C4[3];
   unsigned char unknown5C9[2];
   unsigned char challengeLogComplete[9];
-  unsigned char unknown5D4[9];
+  unsigned char unknown5D4[11];
   unsigned char unknownMask5DD[28];
   unsigned char relicCompletion[12];
   unsigned char sightseeingMask[26];
   unsigned char huntingMarkMask[55];
-  unsigned char tripleTriadCards[29];
+  unsigned char tripleTriadCards[30];
   unsigned char unknownMask673[10];
   unsigned char unknown67D;
   unsigned char aetherCurrentMask[22];
@@ -853,18 +894,17 @@ struct FFXIVIpcInitUI :
   unsigned char orchestrionMask[40];
   unsigned char hallOfNoviceCompleteMask[3];
   unsigned char animaCompletion[11];
-  unsigned char unknown6CD[3];
-  unsigned char unknownMask6C0[11];
-  unsigned char unknownMask6DB[13];
+  unsigned char unknown6CD[16];
+  unsigned char unknownMask6DB[11];
   unsigned char unlockedRaids[28];
   unsigned char unlockedDungeons[18];
   unsigned char unlockedGuildhests[10];
-  unsigned char unlockedTrials[7];
+  unsigned char unlockedTrials[8];
   unsigned char unlockedPvp[5];
   unsigned char clearedRaids[28];
   unsigned char clearedDungeons[18];
   unsigned char clearedGuildhests[10];
-  unsigned char clearedTrials[7];
+  unsigned char clearedTrials[8];
   unsigned char clearedPvp[5];
 
 };
@@ -960,8 +1000,8 @@ struct FFXIVIpcPlayerClassInfo :
   uint16_t classId;
   uint8_t unknown;
   uint8_t isSpecialist;
-  uint16_t level;   // Locks actions, equipment, prob more
-  uint16_t level1;  // Locks roles, prob more
+  uint16_t syncedLevel;   // Locks actions, equipment, prob more. Player's current level (synced).
+  uint16_t classLevel;  // Locks roles, prob more. Player's actual unsynced level.
   uint32_t roleActions[10];
 };
 
@@ -974,7 +1014,10 @@ struct FFXIVIpcModelEquip :
 {
   /* 0000 */ uint64_t mainWeapon;
   /* 0008 */ uint64_t offWeapon;
-  /* 0010 */ uint32_t padding1;
+  /* 0010 */ uint8_t unk1;
+  /* 0011 */ uint8_t classJobId;
+  /* 0012 */ uint8_t level;
+  /* 0013 */ uint8_t unk2;
   /* 0014 */ uint32_t models[10];
   /* 003C */ uint32_t padding2;
 };
@@ -1588,6 +1631,22 @@ struct FFXIVIpcWardYardInfo :
     uint16_t pos_y;
     uint16_t pos_z;
   } object[100];
+};
+
+/**
+* Structural representation of the packet sent by the server
+* to show the current shared estate settings
+*/
+struct FFXIVIpcSharedEstateSettingsResponse :
+  FFXIVIpcBasePacket< SharedEstateSettingsResponse >
+{
+  struct playerEntry
+  {
+    uint64_t contentId;
+    uint8_t permissions;
+    char name[0x20];
+    char padding[0x7];
+  } entry[3];
 };
 
 struct FFXIVIpcMSQTrackerProgress :

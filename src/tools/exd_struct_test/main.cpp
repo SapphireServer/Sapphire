@@ -11,10 +11,6 @@
 #include <set>
 #include <Exd/ExdDataGenerated.h>
 #include <Logging/Logger.h>
-#include <boost/range/algorithm/remove_if.hpp>
-#include <boost/algorithm/string/classification.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
 
 #include <fstream>
 #include <streambuf>

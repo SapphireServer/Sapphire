@@ -20,7 +20,7 @@ file(GLOB SERVER_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}*.c*")
 add_executable(quest_parse ${SERVER_PUBLIC_INCLUDE_FILES} ${SERVER_SOURCE_FILES})
 
 set_target_properties(quest_parse PROPERTIES
-    CXX_STANDARD 14
+    CXX_STANDARD 17
     CXX_STANDARD_REQUIRED ON
     CXX_EXTENSIONS ON
     RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_SOURCE_DIR}/../bin/"
@@ -30,10 +30,8 @@ set_target_properties(quest_parse PROPERTIES
 )
 
 if (UNIX)
-  target_link_libraries (quest_parse common xivdat pthread mysqlclient dl z)
+  target_link_libraries (quest_parse common xivdat pthread mysqlclient dl z stdc++fs)
 else()
-  target_link_libraries (quest_parse common xivdat libmysql zlib1)
+  target_link_libraries (quest_parse common xivdat mysql zlib)
 endif()
-
-target_link_libraries(quest_parse ${Boost_LIBRARIES} ${Boost_LIBRARIES})
 

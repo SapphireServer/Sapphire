@@ -1,14 +1,8 @@
-#include <boost/lexical_cast.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/format.hpp>
-#include <boost/foreach.hpp>
-
 #include <Logging/Logger.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Config/ConfigMgr.h>
 
-#include "watchdog/Watchdog.h"
+#include <watchdog/Watchdog.h>
 
 #include "Zone/Zone.h"
 #include "Zone/InstanceContent.h"
@@ -32,6 +26,8 @@
 
 extern Core::Framework g_fw;
 
+namespace fs = std::experimental::filesystem;
+
 Core::Scripting::ScriptMgr::ScriptMgr() :
   m_firstScriptChangeNotificiation( false )
 {
@@ -54,7 +50,7 @@ bool Core::Scripting::ScriptMgr::init()
   auto pConfig = g_fw.get< ConfigMgr >();
   auto pLog = g_fw.get< Logger >();
 
-  auto status = loadDir( pConfig->getValue< std::string >( "Scripts.Path", "./compiledscripts/" ),
+  auto status = loadDir( pConfig->getValue< std::string >( "Scripts", "Path", "./compiledscripts/" ),
                          files, m_nativeScriptMgr->getModuleExtension() );
 
   if( !status )
@@ -88,11 +84,11 @@ bool Core::Scripting::ScriptMgr::init()
 void Core::Scripting::ScriptMgr::watchDirectories()
 {
   auto pConfig = g_fw.get< ConfigMgr >();
-  auto shouldWatch = pConfig->getValue< bool >( "Scripts.HotSwap", true );
+  auto shouldWatch = pConfig->getValue< bool >( "Scripts", "HotSwap", true );
   if( !shouldWatch )
     return;
 
-  Watchdog::watchMany( pConfig->getValue< std::string >( "Scripts.Path", "./compiledscripts/" ) + "*" +
+  Watchdog::watchMany( pConfig->getValue< std::string >( "Scripts", "Path", "./compiledscripts/" ) + "*" +
                        m_nativeScriptMgr->getModuleExtension(),
                        [ this ]( const std::vector< ci::fs::path >& paths )
                        {
@@ -130,24 +126,23 @@ bool Core::Scripting::ScriptMgr::loadDir( const std::string& dirname, std::set< 
   auto pLog = g_fw.get< Logger >();
   pLog->info( "ScriptMgr: loading scripts from " + dirname );
 
-  if( !boost::filesystem::exists( dirname ) )
+  if( !fs::exists( dirname ) )
   {
     pLog->error( "ScriptMgr: scripts directory doesn't exist" );
     return false;
   }
 
-  boost::filesystem::path targetDir( dirname );
+  fs::path targetDir( dirname );
 
-  boost::filesystem::directory_iterator iter( targetDir );
-  boost::filesystem::directory_iterator eod;
+  fs::directory_iterator iter( targetDir );
 
-  BOOST_FOREACH( boost::filesystem::path const& i, make_pair( iter, eod ) )
-        {
-          if( is_regular_file( i ) && boost::filesystem::extension( i.string() ) == ext )
-          {
-            files.insert( i.string() );
-          }
-        }
+  for( const auto& i : iter )
+  {
+    if( fs::is_regular_file( i ) && fs::path( i ).extension() == ext )
+    {
+      files.insert( fs::path( i ).string() );
+    }
+  }
 
   if( files.size() )
     return true;
@@ -412,7 +407,7 @@ bool Core::Scripting::ScriptMgr::onInstanceEnterTerritory( InstanceContentPtr in
   return false;
 }
 
-Scripting::NativeScriptMgr& Core::Scripting::ScriptMgr::getNativeScriptHandler()
+Core::Scripting::NativeScriptMgr& Core::Scripting::ScriptMgr::getNativeScriptHandler()
 {
   return *m_nativeScriptMgr;
 }

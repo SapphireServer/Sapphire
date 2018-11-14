@@ -4,170 +4,168 @@
 #include <Network/Connection.h>
 
 #include <Network/CommonNetwork.h>
-//#include <Network/GamePacket.h>
 #include <Util/LockedQueue.h>
+#include <map>
 
 #include "ForwardsZone.h"
 
 #define DECLARE_HANDLER( x ) void x( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 
-namespace Core {
-namespace Network {
-namespace Packets {
-class GamePacket;
-}
-enum ConnectionType :
-  uint8_t
+namespace Core::Network::Packets
 {
-  Zone = 1,
-  Chat = 2,
-  Lobby = 3,
-  None
-};
+  class GamePacket;
+}
 
-class GameConnection :
-  public Connection
+namespace Core::Network
 {
 
-private:
-  typedef void ( GameConnection::* Handler )( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                              Entity::Player& player );
+  enum ConnectionType : uint8_t
+  {
+    Zone = 1,
+    Chat = 2,
+    Lobby = 3,
+    None
+  };
 
-  using HandlerMap = std::map< uint16_t, Handler >;
-  using HandlerStrMap = std::map< uint16_t, std::string >;
+  class GameConnection : public Connection
+  {
 
-  AcceptorPtr m_pAcceptor;
+  private:
+    typedef void ( GameConnection::* Handler )( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                Entity::Player& player );
 
-  // handler for game packets ( main type 0x03, connection type 1 )
-  HandlerMap m_zoneHandlerMap;
-  HandlerStrMap m_zoneHandlerStrMap;
+    using HandlerMap = std::map< uint16_t, Handler >;
+    using HandlerStrMap = std::map< uint16_t, std::string >;
 
-  // handler for game packets ( main type 0x03, connection type 2 )
-  HandlerMap m_chatHandlerMap;
-  HandlerStrMap m_chatHandlerStrMap;
+    AcceptorPtr m_pAcceptor;
 
-  SessionPtr m_pSession;
+    // handler for game packets ( main type 0x03, connection type 1 )
+    HandlerMap m_zoneHandlerMap;
+    HandlerStrMap m_zoneHandlerStrMap;
 
-  LockedQueue< Core::Network::Packets::FFXIVARR_PACKET_RAW > m_inQueue;
-  LockedQueue< Packets::FFXIVPacketBasePtr > m_outQueue;
+    // handler for game packets ( main type 0x03, connection type 2 )
+    HandlerMap m_chatHandlerMap;
+    HandlerStrMap m_chatHandlerStrMap;
 
-public:
-  ConnectionType m_conType;
+    SessionPtr m_pSession;
 
-  GameConnection( HivePtr pHive, AcceptorPtr pAcceptor );
+    LockedQueue< Core::Network::Packets::FFXIVARR_PACKET_RAW > m_inQueue;
+    LockedQueue< Packets::FFXIVPacketBasePtr > m_outQueue;
 
-  ~GameConnection();
+  public:
+    ConnectionType m_conType;
 
-  // overwrite the parents onConnect for our game socket needs
-  void OnAccept( const std::string& host, uint16_t port ) override;
+    GameConnection( HivePtr pHive, AcceptorPtr pAcceptor );
 
-  void OnDisconnect() override;
+    ~GameConnection();
 
-  void OnRecv( std::vector< uint8_t >& buffer ) override;
+    // overwrite the parents onConnect for our game socket needs
+    void OnAccept( const std::string& host, uint16_t port ) override;
 
-  void OnError( const boost::system::error_code& error ) override;
+    void OnDisconnect() override;
 
-  void handlePackets( const Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
-                      const std::vector< Packets::FFXIVARR_PACKET_RAW >& packetData );
+    void OnRecv( std::vector< uint8_t >& buffer ) override;
 
-  void queueInPacket( Core::Network::Packets::FFXIVARR_PACKET_RAW inPacket );
+    void OnError( const asio::error_code& error ) override;
 
-  void queueOutPacket( Packets::FFXIVPacketBasePtr outPacket );
+    void handlePackets( const Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
+                        const std::vector< Packets::FFXIVARR_PACKET_RAW >& packetData );
 
-  void processInQueue();
+    void queueInPacket( Core::Network::Packets::FFXIVARR_PACKET_RAW inPacket );
 
-  void processOutQueue();
+    void queueOutPacket( Packets::FFXIVPacketBasePtr outPacket );
 
-  void handlePacket( Core::Network::Packets::FFXIVARR_PACKET_RAW& pPacket );
+    void processInQueue();
 
-  void handleZonePacket( Core::Network::Packets::FFXIVARR_PACKET_RAW& pPacket );
+    void processOutQueue();
 
-  void handleChatPacket( Core::Network::Packets::FFXIVARR_PACKET_RAW& pPacket );
+    void handlePacket( Core::Network::Packets::FFXIVARR_PACKET_RAW& pPacket );
 
-  void sendPackets( Packets::PacketContainer* pPacket );
+    void handleZonePacket( Core::Network::Packets::FFXIVARR_PACKET_RAW& pPacket );
 
-  void sendSinglePacket( Core::Network::Packets::FFXIVPacketBasePtr pPacket );
+    void handleChatPacket( Core::Network::Packets::FFXIVARR_PACKET_RAW& pPacket );
 
-  void injectPacket( const std::string& packetpath, Entity::Player& player );
+    void sendPackets( Packets::PacketContainer* pPacket );
 
-  DECLARE_HANDLER( initHandler );
+    void sendSinglePacket( Core::Network::Packets::FFXIVPacketBasePtr pPacket );
 
-  DECLARE_HANDLER( finishLoadingHandler );
+    void injectPacket( const std::string& packetpath, Entity::Player& player );
 
-  DECLARE_HANDLER( blackListHandler );
+    DECLARE_HANDLER( initHandler );
 
-  DECLARE_HANDLER( socialListHandler );
+    DECLARE_HANDLER( finishLoadingHandler );
 
-  DECLARE_HANDLER( linkshellListHandler );
+    DECLARE_HANDLER( blackListHandler );
 
-  DECLARE_HANDLER( playTimeHandler );
+    DECLARE_HANDLER( socialListHandler );
 
-  DECLARE_HANDLER( pingHandler );
+    DECLARE_HANDLER( linkshellListHandler );
 
-  DECLARE_HANDLER( fcInfoReqHandler );
+    DECLARE_HANDLER( playTimeHandler );
 
-  DECLARE_HANDLER( setSearchInfoHandler );
+    DECLARE_HANDLER( pingHandler );
 
-  DECLARE_HANDLER( reqSearchInfoHandler );
+    DECLARE_HANDLER( fcInfoReqHandler );
 
-  DECLARE_HANDLER( reqExamineSearchCommentHandler );
+    DECLARE_HANDLER( setSearchInfoHandler );
 
-  DECLARE_HANDLER( reqExamineFcInfo );
+    DECLARE_HANDLER( reqSearchInfoHandler );
 
-  DECLARE_HANDLER( updatePositionHandler );
+    DECLARE_HANDLER( reqExamineSearchCommentHandler );
 
-  DECLARE_HANDLER( chatHandler );
+    DECLARE_HANDLER( reqExamineFcInfo );
 
-  DECLARE_HANDLER( zoneLineHandler );
+    DECLARE_HANDLER( updatePositionHandler );
 
-  DECLARE_HANDLER( clientTriggerHandler );
+    DECLARE_HANDLER( chatHandler );
 
-  DECLARE_HANDLER( inventoryModifyHandler );
+    DECLARE_HANDLER( zoneLineHandler );
 
-  DECLARE_HANDLER( discoveryHandler );
+    DECLARE_HANDLER( clientTriggerHandler );
 
-  DECLARE_HANDLER( eventHandlerTalk );
+    DECLARE_HANDLER( inventoryModifyHandler );
 
-  DECLARE_HANDLER( eventHandlerEmote );
+    DECLARE_HANDLER( discoveryHandler );
 
-  DECLARE_HANDLER( eventHandlerWithinRange );
+    DECLARE_HANDLER( eventHandlerTalk );
 
-  DECLARE_HANDLER( eventHandlerOutsideRange );
+    DECLARE_HANDLER( eventHandlerEmote );
 
-  DECLARE_HANDLER( eventHandlerEnterTerritory );
+    DECLARE_HANDLER( eventHandlerWithinRange );
 
-  DECLARE_HANDLER( eventHandlerReturn );
+    DECLARE_HANDLER( eventHandlerOutsideRange );
 
-  DECLARE_HANDLER( eventHandlerLinkshell );
+    DECLARE_HANDLER( eventHandlerEnterTerritory );
 
-  DECLARE_HANDLER( logoutHandler );
+    DECLARE_HANDLER( eventHandlerReturn );
 
-  DECLARE_HANDLER( cfDutyInfoRequest );
+    DECLARE_HANDLER( eventHandlerLinkshell );
 
-  DECLARE_HANDLER( cfRegisterDuty );
+    DECLARE_HANDLER( logoutHandler );
 
-  DECLARE_HANDLER( cfRegisterRoulette );
+    DECLARE_HANDLER( cfDutyInfoRequest );
 
-  DECLARE_HANDLER( cfDutyAccepted );
+    DECLARE_HANDLER( cfRegisterDuty );
+
+    DECLARE_HANDLER( cfRegisterRoulette );
+
+    DECLARE_HANDLER( cfDutyAccepted );
 
 
-  DECLARE_HANDLER( actionHandler );
+    DECLARE_HANDLER( actionHandler );
 
-  DECLARE_HANDLER( gm1Handler );
+    DECLARE_HANDLER( gm1Handler );
 
-  DECLARE_HANDLER( gm2Handler );
+    DECLARE_HANDLER( gm2Handler );
 
-  DECLARE_HANDLER( reqEquipDisplayFlagsHandler );
+    DECLARE_HANDLER( reqEquipDisplayFlagsHandler );
 
-  DECLARE_HANDLER( performNoteHandler );
+    DECLARE_HANDLER( performNoteHandler );
 
-  DECLARE_HANDLER( tellHandler );
+    DECLARE_HANDLER( tellHandler );
 
-};
-
+  };
 
 }
-}
-
 
 #endif

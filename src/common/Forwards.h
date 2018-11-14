@@ -1,36 +1,32 @@
 #ifndef COMMON_FORWARDS_H
 #define COMMON_FORWARDS_H
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
-namespace Core {
+namespace Core
+{
 
-class ConfigMgr;
+  class ConfigMgr;
+  using ConfigMgrPtr = std::shared_ptr< ConfigMgr >;
 
-typedef boost::shared_ptr< ConfigMgr > ConfigMgrPtr;
+  namespace Network
+  {
+    class Hive;
+    class Acceptor;
+    class Connection;
+    using HivePtr = std::shared_ptr< Hive >;
+    using AcceptorPtr = std::shared_ptr< Acceptor >;
+    using ConnectionPtr = std::shared_ptr< Connection >;
 
+    namespace Packets
+    {
+      class GamePacket;
+      class FFXIVPacketBase;
+      using GamePacketPtr = std::shared_ptr< GamePacket >;
+      using FFXIVPacketBasePtr = std::shared_ptr< FFXIVPacketBase >;
+    }
 
-namespace Network {
-class Hive;
-
-class Acceptor;
-
-class Connection;
-
-typedef boost::shared_ptr< Hive > HivePtr;
-typedef boost::shared_ptr< Acceptor > AcceptorPtr;
-typedef boost::shared_ptr< Connection > ConnectionPtr;
-
-namespace Packets {
-class GamePacket;
-
-class FFXIVPacketBase;
-
-typedef boost::shared_ptr< GamePacket > GamePacketPtr;
-typedef boost::shared_ptr< FFXIVPacketBase > FFXIVPacketBasePtr;
-}
-
-}
+  }
 
 
 }

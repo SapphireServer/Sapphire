@@ -2,6 +2,8 @@
 #include <Event/EventHelper.h>
 #include <ScriptObject.h>
 
+using namespace Core;
+
 // Quest Script: SubWil006_00165
 // Quest Name: The Great Gladiator
 // Quest ID: 65701

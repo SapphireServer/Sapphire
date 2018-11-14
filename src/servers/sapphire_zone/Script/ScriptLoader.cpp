@@ -2,18 +2,16 @@
 
 #include <Logging/Logger.h>
 #include <Config/ConfigMgr.h>
-
+#include <Util/Util.h>
 #include "ServerZone.h"
 
-#include <boost/format.hpp>
-#include <boost/algorithm/string/predicate.hpp>
-#include <boost/filesystem.hpp>
+#include <experimental/filesystem>
 
 #include "Framework.h"
 
 extern Core::Framework g_fw;
 
-namespace fs = boost::filesystem;
+namespace fs = std::experimental::filesystem;
 
 const std::string Core::Scripting::ScriptLoader::getModuleExtension()
 {
@@ -38,12 +36,12 @@ bool Core::Scripting::ScriptLoader::unloadModule( ModuleHandle handle )
 
   if( !success )
   {
-    pLog->error( "Failed to unload module @ 0x" + boost::str( boost::format( "%|08X|" ) % handle ) );
+    pLog->error( "Failed to unload module " );
 
     return false;
   }
 
-  pLog->debug( "Unloaded module @ 0x" + boost::str( boost::format( "%|08X|" ) % handle ) );
+  pLog->debug( "Unloaded module" );
 
   return true;
 }
@@ -61,15 +59,15 @@ Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::loadModule( const st
   }
 
   // copy to temp dir
-  fs::path cacheDir( f.parent_path() /= pConfig->getValue< std::string >( "Scripts.CachePath", "./cache/" ) );
+  fs::path cacheDir( f.parent_path() /= pConfig->getValue< std::string >( "Scripts", "CachePath", "./cache/" ) );
   fs::create_directories( cacheDir );
   fs::path dest( cacheDir /= f.filename().string() );
 
   try
   {
-    fs::copy_file( f, dest, fs::copy_option::overwrite_if_exists );
+    fs::copy_file( f, dest, fs::copy_options::overwrite_existing );
   }
-  catch( const boost::filesystem::filesystem_error& err )
+  catch( const fs::filesystem_error& err )
   {
     pLog->error( "Error copying file to cache: " + err.code().message() );
 
@@ -80,7 +78,7 @@ Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::loadModule( const st
 #ifdef _WIN32
   ModuleHandle handle = LoadLibrary( dest.string().c_str() );
 #else
-  ModuleHandle handle = dlopen( dest.string().c_str(), RTLD_LAZY );
+  ModuleHandle handle = dlopen( dest.c_str(), RTLD_LAZY );
 #endif
 
   if( !handle )
@@ -90,8 +88,7 @@ Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::loadModule( const st
     return nullptr;
   }
 
-  pLog->debug(
-    "Loaded module '" + f.filename().string() + "' @ 0x" + boost::str( boost::format( "%|08X|" ) % handle ) );
+  pLog->debug( "Loaded module '" + f.filename().string() );
 
   auto info = new ScriptInfo;
   info->handle = handle;
@@ -118,8 +115,6 @@ ScriptObject** Core::Scripting::ScriptLoader::getScripts( ModuleHandle handle )
   if( func )
   {
     auto ptr = func();
-
-    pLog->debug( "got ScriptObject array @ 0x" + boost::str( boost::format( "%|08X|" ) % ptr ) );
 
     return ptr;
   }
@@ -166,7 +161,8 @@ bool Core::Scripting::ScriptLoader::isModuleLoaded( std::string name )
 {
   for( auto it = m_scriptMap.begin(); it != m_scriptMap.end(); ++it )
   {
-    if( boost::iequals( it->second->library_name, name ) )
+
+    if( Util::toLowerCopy( it->second->library_name ) == Util::toLowerCopy( name ) )
       return true;
   }
 

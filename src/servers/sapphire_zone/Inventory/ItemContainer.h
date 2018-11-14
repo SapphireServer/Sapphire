@@ -2,57 +2,56 @@
 #define _ITEMCONTAINER_H_
 
 #include <map>
-
 #include <Common.h>
-
 #include "ForwardsZone.h"
 
-namespace Core {
-
-using ItemMap = std::map< uint8_t, ItemPtr >;
-
-class ItemContainer
+namespace Core
 {
 
-public:
-  ItemContainer( uint16_t storageId, uint8_t maxSize, const std::string& tableName, bool isMultiStorage,
-                 bool isPersistentStorage = true );
+  using ItemMap = std::map< uint8_t, ItemPtr >;
 
-  ~ItemContainer();
+  class ItemContainer
+  {
 
-  uint16_t getId() const;
+  public:
+    ItemContainer( uint16_t storageId, uint8_t maxSize, const std::string& tableName, bool isMultiStorage,
+                   bool isPersistentStorage = true );
 
-  uint8_t getEntryCount() const;
+    ~ItemContainer();
 
-  void removeItem( uint8_t slotId );
+    uint16_t getId() const;
 
-  ItemMap& getItemMap();
+    uint8_t getEntryCount() const;
 
-  const ItemMap& getItemMap() const;
+    void removeItem( uint8_t slotId );
 
-  ItemPtr getItem( uint8_t slotId );
+    ItemMap& getItemMap();
 
-  void setItem( uint8_t slotId, ItemPtr item );
+    const ItemMap& getItemMap() const;
 
-  int8_t getFreeSlot();
+    ItemPtr getItem( uint8_t slotId );
 
-  uint8_t getMaxSize() const;
+    void setItem( uint8_t slotId, ItemPtr item );
 
-  std::string getTableName() const;
+    int8_t getFreeSlot();
 
-  bool isMultiStorage() const;
+    uint8_t getMaxSize() const;
 
-  bool isPersistentStorage() const;
+    std::string getTableName() const;
 
-private:
-  uint16_t m_id;
-  uint8_t m_size;
-  std::string m_tableName;
-  bool m_bMultiStorage;
-  bool m_isPersistentStorage;
-  ItemMap m_itemMap;
-  Entity::PlayerPtr m_pOwner;
-};
+    bool isMultiStorage() const;
+
+    bool isPersistentStorage() const;
+
+  private:
+    uint16_t m_id;
+    uint8_t m_size;
+    std::string m_tableName;
+    bool m_bMultiStorage;
+    bool m_isPersistentStorage;
+    ItemMap m_itemMap;
+    Entity::PlayerPtr m_pOwner;
+  };
 
 }
 

@@ -1,4 +1,4 @@
-#include <boost/filesystem/operations.hpp>
+#include <experimental/filesystem>
 #include <time.h>
 
 #include <Util/Util.h>
@@ -13,6 +13,7 @@
 
 
 extern Core::Framework g_fw;
+namespace fs = std::experimental::filesystem;
 
 Core::Session::Session( uint32_t sessionId ) :
   m_sessionId( sessionId ),
@@ -76,8 +77,12 @@ void Core::Session::close()
 
   // remove the session from the player
   if( m_pPlayer )
+  {
+    // do one last update to db
+    m_pPlayer->updateSql();
     // reset the zone, so the zone handler knows to remove the actor
     m_pPlayer->setCurrentZone( nullptr );
+  }
 }
 
 uint32_t Core::Session::getId() const
@@ -113,7 +118,7 @@ void Core::Session::updateLastSqlTime()
 void Core::Session::startReplay( const std::string& path )
 {
   auto pLog = g_fw.get< Logger >();
-  if( !boost::filesystem::exists( path ) )
+  if( !fs::exists( path ) )
   {
     getPlayer()->sendDebug( "Couldn't find folder." );
     return;
@@ -123,8 +128,8 @@ void Core::Session::startReplay( const std::string& path )
 
   std::vector< std::tuple< uint64_t, std::string > > loadedSets;
 
-  for( auto it = boost::filesystem::directory_iterator( boost::filesystem::path( path ) );
-       it != boost::filesystem::directory_iterator(); ++it )
+  for( auto it = fs::directory_iterator( fs::path( path ) );
+       it != fs::directory_iterator(); ++it )
   {
     // Get the filename of the current element
     auto fileName = it->path().filename().string();

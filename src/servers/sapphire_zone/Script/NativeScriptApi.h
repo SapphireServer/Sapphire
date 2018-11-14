@@ -2,18 +2,13 @@
 #define NATIVE_SCRIPT_API
 
 #include <string>
-#include <typeinfo>
-#include <typeindex>
-#include <Event/EventHandler.h>
-#include "Forwards.h"
+#include "ForwardsZone.h"
 
 #ifdef _MSC_VER
 #define EXPORT __declspec( dllexport )
 #else
 #define EXPORT __attribute__((visibility("default")))
 #endif
-
-using namespace Core;
 
 // todo: this is shit
 // constant script ids for certain events
@@ -34,81 +29,59 @@ public:
    * @param id an ID which uniquely identifies this script in relation to it's type
    * @param type The RTTI hash code of the implementing type to uniquely identify it
    */
-  ScriptObject( uint32_t id, std::size_t type ) :
-    m_id( id ),
-    m_type( type )
-  {
-  }
+  ScriptObject( uint32_t id, std::size_t type );
 
   /*!
    * @brief Gets the ID set for this script
    *
    * @return The allocated ID of the script set during object construction
    */
-  virtual uint32_t getId() const
-  {
-    return m_id;
-  }
+  virtual uint32_t getId() const;
 
   /*!
    * @brief Gets the unique identifier (hash_code) of the script
    *
    * @return The hash_code of the script
    */
-  virtual std::size_t getType() const
-  {
-    return m_type;
-  }
+  virtual std::size_t getType() const;
 };
 
 
 /*!
  * @brief The base class for any scripts that implement behaviour related to status effects.
  */
-class StatusEffectScript :
-  public ScriptObject
+class StatusEffectScript : public ScriptObject
 {
 public:
-  explicit StatusEffectScript( uint32_t effectId ) :
-    ScriptObject( effectId, typeid( StatusEffectScript ).hash_code() )
-  {
-  }
+  explicit StatusEffectScript( uint32_t effectId );
 
   /*!
    * @brief Called on each tick that a status effect is active on an actor
    *
    * @param actor the actor the status effect is ticking on
    */
-  virtual void onTick( Entity::Chara& actor )
-  {
-  }
+  virtual void onTick( Core::Entity::Chara& actor );
 
   /*!
    * @brief Called when the status effect is applied to an actor
    *
    * @param actor the actor on which the status effect was applied to
    */
-  virtual void onApply( Entity::Chara& actor )
-  {
-  }
+  virtual void onApply( Core::Entity::Chara& actor );
 
   /*!
    * @brief Called when the actor (usually a player) removes the status effect by right clicking it
    *
    * @param actor The actor on which the effect was removed from
    */
-  virtual void onRemove( Entity::Chara& actor )
-  {
-  }
+  virtual void onRemove( Core::Entity::Chara& actor );
 
   /*!
    * @brief Called when the status effect expires
    *
    * @param actor The actor on which the efect expired on
    */
-  virtual void onExpire( Entity::Chara& actor )
-  {
-  }
+  virtual void onExpire( Core::Entity::Chara& actor );
 
   /*!
    * @brief Called when the player with the status effect collides with another player, eg. hot potato
@@ -116,175 +89,116 @@ public:
    * @param actor The actor which has status effect
    * @param actorHit The actor who collided with the status effect owner
    */
-  virtual void onPlayerCollision( Entity::Chara& actor, Entity::Chara& actorHit )
-  {
-  }
+  virtual void onPlayerCollision( Core::Entity::Chara& actor, Core::Entity::Chara& actorHit );
 
   /*!
    * @brief Called when the owner finishes a cast
    *
    * @param actor The actor who finished a cast
    */
-  virtual void onPlayerFinishCast( Entity::Chara& actor )
-  {
-  }
+  virtual void onPlayerFinishCast( Core::Entity::Chara& actor );
 
   /*!
    * @brief Called when the status effect owner was damaged
    *
    * @param actor The actor that was damaged
    */
-  virtual void onPlayerDamaged( Entity::Chara& actor )
-  {
-  }
+  virtual void onPlayerDamaged( Core::Entity::Chara& actor );
 
   /*!
    * @brief Called when the status effect owner dies
    *
    * @param actor The actor that died
    */
-  virtual void onPlayerDeath( Entity::Chara& actor )
-  {
-  }
+  virtual void onPlayerDeath( Core::Entity::Chara& actor );
 };
 
 
 /*!
  * @brief The base class for any scripts that implement behaviour related to actions
  */
-class ActionScript :
-  public ScriptObject
+class ActionScript :  public ScriptObject
 {
 public:
-  explicit ActionScript( uint32_t abilityId ) :
-    ScriptObject( abilityId, typeid( ActionScript ).hash_code() )
-  {
-  }
+  explicit ActionScript( uint32_t abilityId );
 
-  virtual void onStart( Entity::Chara& sourceActor, Entity::Chara& targetActor )
-  {
-  }
+  virtual void onStart( Core::Entity::Chara& sourceActor, Core::Entity::Chara& targetActor );
 
-  virtual void onCastFinish( Entity::Player& player, Entity::Chara& targetActor )
-  {
-  }
+  virtual void onCastFinish( Core::Entity::Player& player, Core::Entity::Chara& targetActor );
 
-  virtual void onInterrupt( Entity::Chara& sourceActor/*, Core::Entity::Chara targetActor*/ )
-  {
-  }
+  virtual void onInterrupt( Core::Entity::Chara& sourceActor/*, Core::Entity::Chara targetActor*/ );
 };
-
 
 /*!
  * @brief The base class for any scripts that implement behaviour related to the event system.
  * This includes but is not limited to: NPCs, shops, some world objects
  */
-class EventScript :
-  public ScriptObject
+class EventScript : public ScriptObject
 {
 protected:
   template< typename Ret, class Obj >
-  inline Event::EventHandler::SceneChainCallback bindScene( Ret ( Obj::*f )( Entity::Player& ) )
+  inline std::function< void( Core::Entity::Player& ) > bindScene( Ret ( Obj::*f )( Core::Entity::Player& ) )
   {
     return std::bind( f, static_cast< Obj* >( this ), std::placeholders::_1 );
   }
 
 public:
-  explicit EventScript( uint32_t questId ) :
-    ScriptObject( questId, typeid( EventScript ).hash_code() )
-  {
-  }
+  explicit EventScript( uint32_t questId );
 
-  virtual void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId )
-  {
-  }
+  virtual void onTalk( uint32_t eventId, Core::Entity::Player& player, uint64_t actorId );
 
-  virtual void onNpcKill( uint32_t npcId, Entity::Player& player )
-  {
-  }
+  virtual void onNpcKill( uint32_t npcId, Core::Entity::Player& player );
 
-  virtual void onEmote( uint64_t actorId, uint32_t eventId, uint32_t emoteId, Entity::Player& player )
-  {
-  }
+  virtual void onEmote( uint64_t actorId, uint32_t eventId, uint32_t emoteId, Core::Entity::Player& player );
 
-  virtual void onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 )
-  {
-  }
+  virtual void onEnterTerritory( Core::Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 );
 
-  virtual void onWithinRange( Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z )
-  {
-  }
+  virtual void onWithinRange( Core::Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z );
 
-  virtual void onOutsideRange( Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z )
-  {
-  }
+  virtual void onOutsideRange( Core::Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z );
 
   virtual void
-  onEventItem( Entity::Player& player, uint32_t eventItemId, uint32_t eventId, uint32_t castTime, uint64_t targetId )
-  {
-  }
+    onEventItem( Core::Entity::Player& player, uint32_t eventItemId, uint32_t eventId, uint32_t castTime, uint64_t targetId );
 
-  virtual void onEventHandlerTradeReturn( Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param,
-                                          uint32_t catalogId )
-  {
-  }
+  virtual void onEventHandlerTradeReturn( Core::Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param,
+                                          uint32_t catalogId );
 };
 
 
 /*!
  * @brief The base class for any scripts that implement behaviour related to BattleNPCs
  */
-class BattleNpcScript :
-  public ScriptObject
+class BattleNpcScript : public ScriptObject
 {
 public:
-  explicit BattleNpcScript( uint32_t npcId ) :
-    ScriptObject( npcId, typeid( BattleNpcScript ).hash_code() )
-  {
-  }
+  explicit BattleNpcScript( uint32_t npcId );
 };
 
 /*!
  * @brief The base class for any scripts that implement behaviour related to zones
  */
-class ZoneScript :
-  public ScriptObject
+class ZoneScript : public ScriptObject
 {
 public:
-  explicit ZoneScript( uint32_t zoneId ) :
-    ScriptObject( zoneId, typeid( ZoneScript ).hash_code() )
-  {
-  }
+  explicit ZoneScript( uint32_t zoneId );
 
-  virtual void onZoneInit()
-  {
-  }
+  virtual void onZoneInit();
 };
 
 /*!
  * @brief The base class for any scripts that implement behaviour related to instance content zones
  */
-class InstanceContentScript :
-  public ScriptObject
+class InstanceContentScript : public ScriptObject
 {
 public:
-  explicit InstanceContentScript( uint32_t instanceContentId ) :
-    ScriptObject( uint32_t{ 0x8003 } << 16 | instanceContentId, typeid( InstanceContentScript ).hash_code() )
-  {
-  }
+  explicit InstanceContentScript( uint32_t instanceContentId );
 
-  virtual void onInit( InstanceContentPtr instance )
-  {
-  }
+  virtual void onInit( Core::InstanceContentPtr instance );
 
-  virtual void onUpdate( InstanceContentPtr instance, uint32_t currTime )
-  {
-  }
+  virtual void onUpdate( Core::InstanceContentPtr instance, uint32_t currTime );
 
-  virtual void onEnterTerritory( InstanceContentPtr instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
-                                 uint16_t param2 )
-  {
-  }
+  virtual void onEnterTerritory( Core::InstanceContentPtr instance, Core::Entity::Player& player, uint32_t eventId,
+                                 uint16_t param1, uint16_t param2 );
 };
 
 #endif

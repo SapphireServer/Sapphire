@@ -15,11 +15,10 @@ file(GLOB UTILS_SOURCE_FILES
 
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} )
 
-
 add_library( common ${UTILS_PUBLIC_INCLUDE_FILES} ${UTILS_SOURCE_FILES} )
 
 set_target_properties( common PROPERTIES
-    CXX_STANDARD 14
+    CXX_STANDARD 17
     CXX_STANDARD_REQUIRED ON
     CXX_EXTENSIONS ON
     RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_SOURCE_DIR}/../../bin/"
@@ -29,13 +28,25 @@ set_target_properties( common PROPERTIES
 )
 
 target_link_libraries( common PUBLIC xivdat )
-target_link_libraries( common PUBLIC mysqlConnector )
 
+target_link_libraries( common PUBLIC mysqlConnector )
 if( UNIX )
+
   target_link_libraries( common PUBLIC mysqlclient )
+  target_link_libraries( common PUBLIC pthread )
+
 else()
-  target_link_libraries( common PUBLIC libmysql )
+  target_link_libraries( common
+                           PUBLIC
+                             mysql )
 endif()
 
-target_include_directories( common PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/" )
-target_include_directories( common PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/libraries/external/")
+target_include_directories( common
+                              PUBLIC
+                                "${CMAKE_CURRENT_SOURCE_DIR}/"
+                                "${CMAKE_CURRENT_SOURCE_DIR}/../../deps/"
+                                "${CMAKE_CURRENT_SOURCE_DIR}/../../deps/asio/asio/include/"
+                                "${CMAKE_CURRENT_SOURCE_DIR}/../../deps/spdlog/include/"
+                              PRIVATE
+                                "${CMAKE_CURRENT_SOURCE_DIR}/src/libraries/external/")
+

@@ -1,6 +1,9 @@
 #include "Util.h"
 #include <chrono>
-#include <boost/variant/detail/substitute.hpp>
+#include <sstream>
+#include <iomanip>
+#include <algorithm>
+#include <string>
 
 std::string Core::Util::binaryToHexString( uint8_t* pBinData, uint16_t size )
 {
@@ -8,11 +11,44 @@ std::string Core::Util::binaryToHexString( uint8_t* pBinData, uint16_t size )
 
   for( uint32_t i = 0; i < size; i++ )
   {
-    outStr += boost::str( boost::format( "%|02X|" ) % ( int32_t ) ( pBinData[ i ] & 0xFF ) );
+    outStr += Util::intToHexString( static_cast< int8_t>( pBinData[ i ] & 0xFF ) );
   }
 
   return outStr;
 
+}
+std::string Core::Util::toLowerCopy( const std::string& inStr )
+{
+  std::string out = inStr;
+  std::transform( inStr.begin(), inStr.end(), out.begin(), [](unsigned char c) -> unsigned char { return ::tolower(c); });
+  return out;
+}
+
+void Core::Util::eraseAll( std::string& inOutStr, char remove )
+{
+  inOutStr.erase( std::remove( inOutStr.begin(), inOutStr.end(), remove ), inOutStr.end() );
+}
+
+void Core::Util::eraseAllIn( std::string& inOutStr, std::string& remove )
+{
+  for( auto rem : remove )
+    inOutStr.erase( std::remove( inOutStr.begin(), inOutStr.end(), rem ), inOutStr.end() );
+}
+
+
+std::string Core::Util::intToHexString( uint64_t intValue, uint8_t width ) 
+{
+    std::string hexStr;
+
+    /// integer value to hex-string
+    std::stringstream sstream;
+    sstream << std::setfill ('0') << std::setw( width )
+            << std::hex << intValue;
+
+    hexStr = sstream.str();
+    sstream.clear();
+
+    return hexStr;
 }
 
 std::string Core::Util::binaryToHexDump( uint8_t* pBinData, uint16_t size )

@@ -1,9 +1,7 @@
 #include "PacketContainer.h"
-
+#include "Util/Util.h"
 #include "Common.h"
 #include "Forwards.h"
-
-#include <boost/format.hpp>
 
 #include <chrono>
 #include <string.h>
@@ -78,7 +76,7 @@ std::string Core::Network::Packets::PacketContainer::toString()
   std::string str = "\n";
   for( uint32_t i = 0; i < m_ipcHdr.size; i++ )
   {
-    str += boost::str( boost::format( "%|02X|" ) % static_cast< int32_t >( tmpBuffer[ i ] & 0xFF ) ) + " ";
+    str += Util::intToHexString( static_cast< int32_t >( tmpBuffer[ i ] & 0xFF ) ) + " ";
 
     if( ( i + 1 ) % 16 == 0 )
       str += "\n";

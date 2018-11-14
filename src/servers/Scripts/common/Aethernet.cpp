@@ -10,6 +10,8 @@
 #define AETHERYTE_MENU_FAVORITE_POINT 4
 #define AETHERYTE_MENU_FAVORITE_POINT_SECURITY_TOKEN 5
 
+using namespace Core;
+
 class Aethernet :
   public EventScript
 {

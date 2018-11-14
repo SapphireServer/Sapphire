@@ -4,43 +4,43 @@
 #include <Common.h>
 #include "ForwardsZone.h"
 
-namespace Core {
-namespace Data {
-struct Action;
+namespace Core::Data
+{
+  struct Action;
 }
 
-namespace Entity {
-
-enum class TargetFilter
+namespace Core::Entity
 {
-  All,        // All actors in the AoE are applicable for collision
-  Players,    // Only players
-  Allies,     // Only allies (players, ally NPCs)
-  Party,      // Only party members
-  Enemies     // Only enemies
-};
 
-class ActionCollision
-{
-public:
+  enum class TargetFilter
+  {
+    All,        // All actors in the AoE are applicable for collision
+    Players,    // Only players
+    Allies,     // Only allies (players, ally NPCs)
+    Party,      // Only party members
+    Enemies     // Only enemies
+  };
 
-  static bool isActorApplicable( Actor& actor, TargetFilter targetFilter );
+  class ActionCollision
+  {
+  public:
 
-  static std::set< ActorPtr > getActorsHitFromAction( Common::FFXIVARR_POSITION3 aoePosition,
-                                                      std::set< ActorPtr > actorsInRange,
-                                                      boost::shared_ptr< Data::Action > actionInfo,
-                                                      TargetFilter targetFilter );
+    static bool isActorApplicable( Actor& actor, TargetFilter targetFilter );
 
-private:
-  static bool radiusCollision( Common::FFXIVARR_POSITION3 actorPosition, Common::FFXIVARR_POSITION3 aoePosition,
-                               uint16_t radius );
+    static std::set< ActorPtr > getActorsHitFromAction( Common::FFXIVARR_POSITION3 aoePosition,
+                                                        std::set< ActorPtr > actorsInRange,
+                                                        std::shared_ptr< Data::Action > actionInfo,
+                                                        TargetFilter targetFilter );
 
-  static bool boxCollision( Common::FFXIVARR_POSITION3 actorPosition, Common::FFXIVARR_POSITION3 aoePosition,
-                            uint16_t width, uint16_t height );
+  private:
+    static bool radiusCollision( Common::FFXIVARR_POSITION3 actorPosition, Common::FFXIVARR_POSITION3 aoePosition,
+                                 uint16_t radius );
 
-};
+    static bool boxCollision( Common::FFXIVARR_POSITION3 actorPosition, Common::FFXIVARR_POSITION3 aoePosition,
+                              uint16_t width, uint16_t height );
 
-}
+  };
+
 }
 
 #endif

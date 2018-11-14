@@ -1,5 +1,3 @@
-#include <boost/format.hpp>
-
 #include <Common.h>
 #include <Network/CommonNetwork.h>
 #include <Network/GamePacketNew.h>
@@ -8,6 +6,7 @@
 #include <Network/PacketContainer.h>
 #include <Network/CommonActorControl.h>
 #include <Network/PacketDef/Zone/ClientZoneDef.h>
+#include <Util/Util.h>
 
 #include "Zone/Zone.h"
 #include "Zone/ZonePosition.h"
@@ -53,7 +52,14 @@ void examineHandler( Core::Entity::Player& player, uint32_t targetId )
     auto pTarget = pSession->getPlayer();
     if( pTarget )
     {
-      player.queuePacket( boost::make_shared< ExaminePacket >( player, pTarget ) );
+      if( pTarget->isActingAsGm() || pTarget->getZoneId() != player.getZoneId() )
+      {
+        player.queuePacket( makeActorControl142( player.getId(), ActorControlType::ExamineError ) );
+      }
+      else
+      {
+        player.queuePacket( std::make_shared< ExaminePacket >( player, pTarget ) );
+      }
     }
   }
 }
@@ -65,18 +71,18 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcClientTrigger >( inPacket );
 
-  const auto& commandId = packet.data().commandId;
-  const auto& param1 = *reinterpret_cast< const uint64_t* >( &packet.data().param11 );
-  const auto& param11 = packet.data().param11;
-  const auto& param12 = packet.data().param12;
-  const auto& param2 = packet.data().param2;
-  const auto& param3 = packet.data().param3;
+  const auto commandId = packet.data().commandId;
+  const auto param1 = *reinterpret_cast< const uint64_t* >( &packet.data().param11 );
+  const auto param11 = packet.data().param11;
+  const auto param12 = packet.data().param12;
+  const auto param2 = packet.data().param2;
+  const auto param3 = packet.data().param3;
 
   pLog->debug( "[" + std::to_string( m_pSession->getId() ) + "] Incoming action: " +
-               boost::str( boost::format( "%|04X|" ) % ( uint32_t ) ( commandId & 0xFFFF ) ) +
-               "\nparam1: " + boost::str( boost::format( "%|016X|" ) % ( uint64_t ) ( param1 & 0xFFFFFFFFFFFFFFF ) ) +
-               "\nparam2: " + boost::str( boost::format( "%|08X|" ) % ( uint32_t ) ( param2 & 0xFFFFFFFF ) ) +
-               "\nparam3: " + boost::str( boost::format( "%|016X|" ) % ( uint64_t ) ( param3 & 0xFFFFFFFFFFFFFFF ) )
+               Util::intToHexString( static_cast< uint32_t >( commandId & 0xFFFF ), 4 ) +
+               "\nparam1: " + Util::intToHexString( static_cast< uint64_t >( param1 & 0xFFFFFFFFFFFFFFF ), 16 ) +
+               "\nparam2: " + Util::intToHexString( static_cast< uint32_t >( param2 & 0xFFFFFFFF ), 8 ) +
+               "\nparam3: " + Util::intToHexString( static_cast< uint64_t >( param3 & 0xFFFFFFFFFFFFFFF ), 16 )
   );
 
 
@@ -306,7 +312,7 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
     default:
     {
       pLog->debug( "[" + std::to_string( m_pSession->getId() ) + "] Unhandled action: " +
-                   boost::str( boost::format( "%|04X|" ) % ( uint32_t ) ( commandId & 0xFFFF ) ) );
+                   Util::intToHexString( static_cast< uint32_t >( commandId & 0xFFFF ), 4 ) );
       break;
     }
   }

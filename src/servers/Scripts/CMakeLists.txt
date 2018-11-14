@@ -39,9 +39,8 @@ foreach(_scriptDir ${children})
         target_link_libraries( "script_${_name}" sapphire_zone )
 
         if(MSVC)
-            target_link_libraries( "script_${_name}" ${Boost_LIBRARIES})
             set_target_properties( "script_${_name}" PROPERTIES
-                CXX_STANDARD 14
+                CXX_STANDARD 17
                 CXX_STANDARD_REQUIRED ON
                 CXX_EXTENSIONS ON
                 LIBRARY_OUTPUT_DIRECTORY_DEBUG "${SCRIPT_LIB_DIR}"
@@ -57,7 +56,7 @@ foreach(_scriptDir ${children})
 
         configure_file("${CMAKE_CURRENT_SOURCE_DIR}/ScriptLoader.cpp.in" "${_scriptDir}/ScriptLoader.cpp")
 
-        cotire("script_${_name}")
+        #cotire("script_${_name}")
 
         if(MSVC)
             add_custom_command(TARGET "script_${_name}" POST_BUILD

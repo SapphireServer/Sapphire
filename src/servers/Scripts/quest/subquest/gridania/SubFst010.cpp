@@ -2,6 +2,8 @@
 #include "Event/EventHelper.h"
 #include <ScriptObject.h>
 
+using namespace Core;
+
 // Quest Script: SubFst010_00001
 // Quest Name: A Good Adventurer Is Hard to Find
 // Quest ID: 65537

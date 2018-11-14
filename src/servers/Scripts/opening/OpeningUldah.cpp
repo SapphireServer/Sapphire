@@ -1,8 +1,9 @@
 #include <Actor/Player.h>
 #include <ScriptObject.h>
 
-class OpeningUldah :
-  public EventScript
+using namespace Core;
+
+class OpeningUldah : public EventScript
 {
 private:
   static constexpr auto ERANGE_HOWTO_ANN_AND_QUEST = 4101650;

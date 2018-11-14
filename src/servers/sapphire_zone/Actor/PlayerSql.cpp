@@ -254,7 +254,7 @@ bool Core::Entity::Player::loadActiveQuests()
 
     auto slotId = res->getUInt8( 2 );
 
-    boost::shared_ptr< QuestActive > pActiveQuest( new QuestActive() );
+    std::shared_ptr< QuestActive > pActiveQuest( new QuestActive() );
     pActiveQuest->c.questId = res->getUInt16( 3 );
     pActiveQuest->c.sequence = res->getUInt8( 4 );
     pActiveQuest->c.flags = res->getUInt8( 5 );
@@ -313,6 +313,7 @@ bool Core::Entity::Player::loadSearchInfo()
 
   // todo: internally use an std::string instead of a char[]
   auto searchMessage = res->getString( 4 );
+  memset( m_searchMessage, 0, sizeof( m_searchMessage ) );
   std::copy( searchMessage.begin(), searchMessage.end(), m_searchMessage );
 
   return true;
@@ -501,7 +502,7 @@ void Core::Entity::Player::updateDbSearchInfo() const
   pDb->execute( stmtS1 );
 
   auto stmtS2 = pDb->getPreparedStatement( Db::CHARA_SEARCHINFO_UP_SEARCHCOMMENT );
-  stmtS2->setString( 1, string( m_searchMessage != nullptr ? m_searchMessage : "" ) );
+  stmtS2->setString( 1, std::string( m_searchMessage ) );
   stmtS2->setInt( 2, m_id );
   pDb->execute( stmtS2 );
 }
@@ -607,7 +608,7 @@ bool Core::Entity::Player::loadInventory()
   {
     uint16_t storageId = res->getUInt16( 1 );
 
-    for( uint32_t i = 1; i <= 13; i++ )
+    for( uint32_t i = 1; i <= 14; i++ )
     {
       uint64_t uItemId = res->getUInt64( i + 1 );
       if( uItemId == 0 )
