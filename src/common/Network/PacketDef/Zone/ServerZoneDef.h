@@ -1596,13 +1596,27 @@ struct FFXIVIpcLandPermission : FFXIVIpcBasePacket< LandPermission >
   uint64_t unkown5;
 };
 
+//Structs
+struct LandStruct
+{
+  uint8_t plotSize; //0
+  uint8_t houseState; // 2
+  uint8_t type; // 4  1 == FC, 2 == Private
+  uint8_t iconAddIcon; // 6
+  uint32_t fcId; //8
+  uint32_t fcIcon;// 12
+  uint32_t fcIconColor; // 16
+  uint16_t housePart[ 8 ]; // 34
+  uint8_t color[ 8 ]; // 36
+};
+
 struct FFXIVIpcLandUpdate : FFXIVIpcBasePacket< LandUpdate >
 {
   uint16_t landId;
   uint16_t unknow0;
   uint16_t unknow1;
   uint16_t unknow2;
-  Common::LandStruct land;
+  LandStruct land;
 };
 
 struct FFXIVIpcLandPriceUpdate :  FFXIVIpcBasePacket< LandPriceUpdate >
@@ -1667,7 +1681,7 @@ struct FFXIVIpcLandSetInitialize : FFXIVIpcBasePacket< LandSetInitialize >
   uint8_t unknown6;
   uint8_t unknown7;
   uint8_t unknown8;
-  Common::LandStruct land[30];
+  LandStruct land[ 30 ];
 };
 
 struct FFXIVIpcYardObjectSpawn : FFXIVIpcBasePacket<YardObjectSpawn>

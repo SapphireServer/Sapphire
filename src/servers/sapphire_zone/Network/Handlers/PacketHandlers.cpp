@@ -664,7 +664,8 @@ void Core::Network::GameConnection::landRenameHandler( const Core::Network::Pack
   if( !pLand )
     return;
 
-  pLand->setLandName( packet.data().landName );
+  // TODO set estate name
+  //pLand->setLandName( packet.data().landName );
 }
 
 void Core::Network::GameConnection::buildPresetHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,

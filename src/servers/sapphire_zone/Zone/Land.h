@@ -21,23 +21,19 @@ namespace Core
     void load();
 
     //Primary state
-    void setHouseSize( uint8_t size );
+    void setSize( uint8_t size );
     void setState( uint8_t state );
-    void setOwnership( uint8_t state );
     void setSharing( uint8_t state );
-    void setLandName( const std::string& name );
     void setLandType( Common::LandType type );
 
     //Gerneral
-    uint8_t getPlotSize() const;
+    uint8_t getSize() const;
     uint8_t getState() const;
-    uint8_t getOwnership() const;
     uint8_t getSharing() const;
     uint32_t getLandSetId() const;
     uint8_t getWardNum() const;
     uint8_t getLandId() const;
     uint16_t getZoneId() const;
-    std::string getLandName() const;
     Common::LandType getLandType() const;
 
     //Free Comapny
@@ -46,14 +42,6 @@ namespace Core
     uint32_t getFcIcon();
     uint32_t getFcColor();
 
-    //House data
-    void setHousePart( Common::HousePartSlot slot, uint16_t itemId );
-
-    uint16_t getHousePart( Common::HousePartSlot slot );
-
-    //Color
-    void setColor( uint8_t slot, uint8_t color );
-    uint8_t getColor( uint8_t slot );
     //Player
     void setPlayerOwner( uint32_t id );
     uint32_t getPlayerOwner();
@@ -63,7 +51,6 @@ namespace Core
     void Update( uint32_t currTime );
 
     uint32_t getMaxItems();
-
     uint32_t getCurrentPrice() const;
     uint32_t getDevaluationTime();
 
@@ -81,16 +68,14 @@ namespace Core
     uint16_t m_zoneId;
     uint8_t m_size;
     uint8_t m_state;
-    uint8_t m_iconColor;
+    Common::LandType m_type;
     uint8_t m_iconAddIcon;
-    uint32_t m_fcId;
+    uint32_t m_fcId; // unclear, may be wrong
     uint32_t m_fcIcon;
     uint32_t m_fcIconColor;
 
-    Common::LandType m_type;
     uint32_t m_ownerPlayerId;
     Core::Data::HousingLandSetPtr m_landInfo;
-
 
     //item storage
     Core::ItemContainerPtr ItemsOutdoorContainer;
@@ -103,9 +88,6 @@ namespace Core
     uint32_t m_minPrice;
 
     //information
-    char m_landName[23];
-    char m_landMsg[193];
-    char m_ownerName[31];
     char fcTag[7];
     uint8_t m_tag[3];
   };

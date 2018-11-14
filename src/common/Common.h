@@ -758,20 +758,6 @@ namespace Core::Common
     SubTag2
   };
 
-  //Structs
-  struct LandStruct
-  {
-    uint8_t plotSize; //0
-    uint8_t houseState; // 2
-    uint8_t iconColor; // 4
-    uint8_t iconAddIcon; // 6
-    uint32_t fcId; //8
-    uint32_t fcIcon;// 12
-    uint32_t fcIconColor; // 16
-    uint16_t housePart[ 8 ]; // 34
-    uint8_t color[ 8 ]; // 36
-  };
-
   enum LandPermissionSlot
   {
     FreeCompany,

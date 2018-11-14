@@ -345,7 +345,8 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
     }
     case ClientTriggerType::RequestEstateRename:
     {
-      auto landRenamePacket = makeZonePacket< Server::FFXIVIpcLandRename >( player.getId() );
+      // removed temporarly, there is no such thing as a LandName	    
+/*      auto landRenamePacket = makeZonePacket< Server::FFXIVIpcLandRename >( player.getId() );
 
       uint8_t ward = ( param12 & 0xFF00 ) >> 8;
       uint8_t plot = ( param12 & 0xFF );
@@ -368,7 +369,7 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
       landRenamePacket->data().zoneId = land->getZoneId();
       memcpy( &landRenamePacket->data().landName, land->getLandName().c_str(), 20 );
 
-      player.queuePacket( landRenamePacket );
+      player.queuePacket( landRenamePacket ); */
 
       break;
     }
