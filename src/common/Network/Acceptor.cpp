@@ -1,16 +1,13 @@
 #include "Hive.h"
 #include "Acceptor.h"
 #include "Connection.h"
-#include <boost/interprocess/detail/atomic.hpp>
-#include <boost/bind.hpp>
 
 namespace Core {
 namespace Network {
 
 //-----------------------------------------------------------------------------
 
-Acceptor::Acceptor( HivePtr hive )
-  :
+Acceptor::Acceptor( HivePtr hive ) :
   m_hive( hive ),
   m_acceptor( hive->GetService() ),
   m_io_strand( hive->GetService() ),
@@ -28,17 +25,19 @@ bool Acceptor::OnAccept( ConnectionPtr connection, const std::string& host, uint
   return true;
 }
 
-void Acceptor::OnError( const boost::system::error_code& error )
+void Acceptor::OnError( const asio::error_code& error )
 {
 
 }
 
 
-void Acceptor::StartError( const boost::system::error_code& error )
+void Acceptor::StartError( const asio::error_code& error )
 {
-  if( boost::interprocess::ipcdetail::atomic_cas32( &m_error_state, 1, 0 ) == 0 )
+  uint32_t v1 = 1;
+  uint32_t v2 = 0;
+  if( m_error_state.compare_exchange_strong( v1, v2 ) )
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     m_acceptor.cancel( ec );
     m_acceptor.close( ec );
     OnError( error );
@@ -48,13 +47,13 @@ void Acceptor::StartError( const boost::system::error_code& error )
 void Acceptor::DispatchAccept( ConnectionPtr connection )
 {
   m_acceptor.async_accept( connection->GetSocket(),
-                           connection->GetStrand().wrap( boost::bind( &Acceptor::HandleAccept,
-                                                                      shared_from_this(),
-                                                                      _1,
-                                                                      connection ) ) );
+                           connection->GetStrand().wrap( std::bind( &Acceptor::HandleAccept,
+                                                                    shared_from_this(),
+                                                                    std::placeholders::_1,
+                                                                    connection ) ) );
 }
 
-void Acceptor::HandleAccept( const boost::system::error_code& error, ConnectionPtr connection )
+void Acceptor::HandleAccept( const asio::error_code& error, ConnectionPtr connection )
 {
   if( error || HasError() || m_hive->HasStopped() )
   {
@@ -87,21 +86,21 @@ void Acceptor::Stop()
 
 void Acceptor::Accept( ConnectionPtr connection )
 {
-  m_io_strand.post( boost::bind( &Acceptor::DispatchAccept, shared_from_this(), connection ) );
+  m_io_strand.post( std::bind( &Acceptor::DispatchAccept, shared_from_this(), connection ) );
 }
 
 void Acceptor::Listen( const std::string& host, const uint16_t& port )
 {
   try
   {
-    boost::asio::ip::tcp::resolver resolver( m_hive->GetService() );
-    boost::asio::ip::tcp::resolver::query query( host, std::to_string( port ) );
-    boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve( query );
+    asio::ip::tcp::resolver resolver( m_hive->GetService() );
+    asio::ip::tcp::resolver::query query( host, std::to_string( port ) );
+    asio::ip::tcp::endpoint endpoint = *resolver.resolve( query );
 
     m_acceptor.open( endpoint.protocol() );
-    m_acceptor.set_option( boost::asio::ip::tcp::acceptor::reuse_address( false ) );
+    m_acceptor.set_option( asio::ip::tcp::acceptor::reuse_address( false ) );
     m_acceptor.bind( endpoint );
-    m_acceptor.listen( boost::asio::socket_base::max_connections );
+    m_acceptor.listen( asio::socket_base::max_connections );
   }
   catch( ... )
   {
@@ -116,14 +115,16 @@ HivePtr Acceptor::GetHive()
   return m_hive;
 }
 
-boost::asio::ip::tcp::acceptor& Acceptor::GetAcceptor()
+asio::ip::tcp::acceptor& Acceptor::GetAcceptor()
 {
   return m_acceptor;
 }
 
 bool Acceptor::HasError()
 {
-  return ( boost::interprocess::ipcdetail::atomic_cas32( &m_error_state, 1, 1 ) == 1 );
+  uint32_t v1 = 1;
+  uint32_t v2 = 1;
+  return ( m_error_state.compare_exchange_strong( v1, v2 ) );
 }
 
 }

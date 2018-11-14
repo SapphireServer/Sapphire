@@ -1,7 +1,7 @@
 #include <Actor/Player.h>
-#include <sapphire_zone/Event/EventHandler.h>
-#include "Event/EventHelper.h"
 #include <ScriptObject.h>
+#include "Event/EventHandler.h"
+#include "Event/EventHelper.h"
 
 // Quest Script: ManFst002_00124
 // Quest Name: Close to Home
@@ -9,8 +9,9 @@
 // Start NPC: 1001140
 // End NPC: 1000100
 
-class ManFst002 :
-  public EventScript
+using namespace Core;
+
+class ManFst002 : public EventScript
 {
 private:
 

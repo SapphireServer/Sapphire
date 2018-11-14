@@ -1,5 +1,3 @@
-#include <boost/make_shared.hpp>
-
 #include <Common.h>
 #include <Util/Util.h>
 #include <Util/UtilMath.h>
@@ -8,6 +6,7 @@
 #include <Network/PacketContainer.h>
 #include <Network/CommonActorControl.h>
 #include <Network/PacketWrappers/EffectPacket.h>
+#include <cmath>
 
 #include "Session.h"
 #include "Player.h"
@@ -369,14 +368,14 @@ void Core::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
     setZoningType( Common::ZoneingType::Return );
   }
 
-  m_queuedZoneing = boost::make_shared< QueuedZoning >( data->territory, pos, Util::getTimeMs(), rot );
+  m_queuedZoneing = std::make_shared< QueuedZoning >( data->territory, pos, Util::getTimeMs(), rot );
 
 
 }
 
 void Core::Entity::Player::forceZoneing( uint32_t zoneId )
 {
-  m_queuedZoneing = boost::make_shared< QueuedZoning >( zoneId, getPos(), Util::getTimeMs(), 0.f );
+  m_queuedZoneing = std::make_shared< QueuedZoning >( zoneId, getPos(), Util::getTimeMs(), 0.f );
   //performZoning( zoneId, Common::ZoneingType::None, getPos() );
 }
 
@@ -571,7 +570,7 @@ void Core::Entity::Player::changePosition( float x, float y, float z, float o )
   pos.x = x;
   pos.y = y;
   pos.z = z;
-  m_queuedZoneing = boost::make_shared< QueuedZoning >( getZoneId(), pos, Util::getTimeMs(), o );
+  m_queuedZoneing = std::make_shared< QueuedZoning >( getZoneId(), pos, Util::getTimeMs(), o );
 }
 
 void Core::Entity::Player::learnAction( uint16_t actionId )
@@ -683,7 +682,7 @@ void Core::Entity::Player::gainLevel()
 
 void Core::Entity::Player::sendStatusUpdate( bool toSelf )
 {
-  sendToInRangeSet( boost::make_shared< UpdateHpMpTpPacket >( *this ), true );
+  sendToInRangeSet( std::make_shared< UpdateHpMpTpPacket >( *this ), true );
 }
 
 uint8_t Core::Entity::Player::getLevel() const
@@ -746,7 +745,8 @@ void Core::Entity::Player::setClassJob( Common::ClassJob classJob )
 
   auto classInfoPacket = makeZonePacket< FFXIVIpcPlayerClassInfo >( getId() );
   classInfoPacket->data().classId = static_cast< uint8_t >( getClass() );
-  classInfoPacket->data().level = getLevel();
+  classInfoPacket->data().classLevel = getLevel();
+  classInfoPacket->data().syncedLevel = getLevel();
   queuePacket( classInfoPacket );
 
   sendToInRangeSet( makeActorControl142( getId(), ClassJobChange, 0x04 ), true );
@@ -774,7 +774,7 @@ void Core::Entity::Player::setLevelForClass( uint8_t level, Common::ClassJob cla
 
 void Core::Entity::Player::sendModel()
 {
-  sendToInRangeSet( boost::make_shared< ModelEquipPacket >( *getAsPlayer() ), true );
+  sendToInRangeSet( std::make_shared< ModelEquipPacket >( *getAsPlayer() ), true );
 }
 
 uint32_t Core::Entity::Player::getModelForSlot( Common::GearModelSlot slot )
@@ -837,7 +837,7 @@ void Core::Entity::Player::spawn( Entity::PlayerPtr pTarget )
                getName() + " for " +
                pTarget->getName() );
 
-  pTarget->queuePacket( boost::make_shared< PlayerSpawnPacket >( *getAsPlayer(), *pTarget ) );
+  pTarget->queuePacket( std::make_shared< PlayerSpawnPacket >( *getAsPlayer(), *pTarget ) );
 }
 
 // despawn
@@ -960,7 +960,7 @@ void Core::Entity::Player::setStateFlags( std::vector< Common::PlayerStateFlag >
 
 void Core::Entity::Player::sendStateFlags()
 {
-  queuePacket( boost::make_shared< PlayerStateFlagsPacket >( *getAsPlayer() ) );
+  queuePacket( std::make_shared< PlayerStateFlagsPacket >( *getAsPlayer() ) );
 }
 
 void Core::Entity::Player::unsetStateFlag( Common::PlayerStateFlag flag )
@@ -1258,17 +1258,17 @@ uint8_t Core::Entity::Player::getSearchSelectClass() const
 
 void Core::Entity::Player::sendNotice( const std::string& message ) //Purple Text
 {
-  queuePacket( boost::make_shared< ServerNoticePacket >( getId(), message ) );
+  queuePacket( std::make_shared< ServerNoticePacket >( getId(), message ) );
 }
 
 void Core::Entity::Player::sendUrgent( const std::string& message ) //Red Text
 {
-  queuePacket( boost::make_shared< ChatPacket >( *getAsPlayer(), ChatType::ServerUrgent, message ) );
+  queuePacket( std::make_shared< ChatPacket >( *getAsPlayer(), ChatType::ServerUrgent, message ) );
 }
 
 void Core::Entity::Player::sendDebug( const std::string& message ) //Grey Text
 {
-  queuePacket( boost::make_shared< ChatPacket >( *getAsPlayer(), ChatType::ServerDebug, message ) );
+  queuePacket( std::make_shared< ChatPacket >( *getAsPlayer(), ChatType::ServerDebug, message ) );
 }
 
 void Core::Entity::Player::updateHowtosSeen( uint32_t howToId )
@@ -1411,7 +1411,7 @@ void Core::Entity::Player::autoAttack( CharaPtr pTarget )
 
   if( getClass() == ClassJob::Machinist || getClass() == ClassJob::Bard || getClass() == ClassJob::Archer )
   {
-    auto effectPacket = boost::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 8 );
+    auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 8 );
     effectPacket->setRotation( Math::Util::floatToUInt16Rot( getRot() ) );
 
     Server::EffectEntry entry;
@@ -1425,7 +1425,7 @@ void Core::Entity::Player::autoAttack( CharaPtr pTarget )
   }
   else
   {
-    auto effectPacket = boost::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 7 );
+    auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 7 );
     effectPacket->setRotation( Math::Util::floatToUInt16Rot( getRot() ) );
 
     Server::EffectEntry entry;
@@ -1467,7 +1467,7 @@ uint32_t Core::Entity::Player::getCFPenaltyMinutes() const
     return 0;
 
   auto deltaTime = endTimestamp - currentTimestamp;
-  return static_cast< uint32_t > ( ceil( static_cast< float > (deltaTime) / 60 ) );
+  return static_cast< uint32_t > ( std::ceil( static_cast< float > (deltaTime) / 60 ) );
 }
 
 void Core::Entity::Player::setCFPenaltyMinutes( uint32_t minutes )
@@ -1545,13 +1545,13 @@ void Core::Entity::Player::sendZonePackets()
     }
     queuePacket( contentFinderList );
 
-    queuePacket( boost::make_shared< InitUIPacket >( *this ) );
+    queuePacket( std::make_shared< InitUIPacket >( *this ) );
 
     auto classInfoPacket = makeZonePacket< FFXIVIpcPlayerClassInfo >( getId() );
     classInfoPacket->data().classId = static_cast< uint8_t >( getClass() );
     classInfoPacket->data().unknown = 1;
-    classInfoPacket->data().level = getLevel();
-    classInfoPacket->data().level1 = getLevel();
+    classInfoPacket->data().syncedLevel = getLevel();
+    classInfoPacket->data().classLevel = getLevel();
     queuePacket( classInfoPacket );
 
     m_itemLevel = calculateEquippedGearItemLevel();
@@ -1561,7 +1561,7 @@ void Core::Entity::Player::sendZonePackets()
   auto initZonePacket = makeZonePacket< FFXIVIpcInitZone >( getId() );
   initZonePacket->data().zoneId = getCurrentZone()->getTerritoryId();
   initZonePacket->data().weatherId = static_cast< uint8_t >( getCurrentZone()->getCurrentWeather() );
-  initZonePacket->data().bitmask = 0x1;
+  initZonePacket->data().bitmask = 0x1; //Setting this to 16 (deciaml) makes it so you can fly in the area (more research needed!)
   initZonePacket->data().unknown5 = 0x2A;
   initZonePacket->data().festivalId = getCurrentZone()->getCurrentFestival().first;
   initZonePacket->data().additionalFestivalId = getCurrentZone()->getCurrentFestival().second;
@@ -1681,8 +1681,8 @@ void Core::Entity::Player::teleportQuery( uint16_t aetheryteId )
 
     // calculate cost - does not apply for favorite points or homepoints neither checks for aether tickets
     auto cost = static_cast< uint16_t > (
-      ( sqrt( pow( fromAetheryte->aetherstreamX - targetAetheryte->aetherstreamX, 2 ) +
-              pow( fromAetheryte->aetherstreamY - targetAetheryte->aetherstreamY, 2 ) ) / 2 ) + 100 );
+      ( std::sqrt( std::pow( fromAetheryte->aetherstreamX - targetAetheryte->aetherstreamX, 2 ) +
+                   std::pow( fromAetheryte->aetherstreamY - targetAetheryte->aetherstreamY, 2 ) ) / 2 ) + 100 );
 
     // cap at 999 gil
     cost = cost > uint16_t{ 999 } ? uint16_t{ 999 } : cost;
@@ -1733,4 +1733,3 @@ bool Core::Entity::Player::isOnEnterEventDone() const
 {
   return m_onEnterEventDone;
 }
-

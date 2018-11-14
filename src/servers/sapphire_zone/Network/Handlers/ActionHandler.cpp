@@ -1,5 +1,3 @@
-#include <boost/format.hpp>
-
 #include <Common.h>
 #include <Network/CommonNetwork.h>
 #include <Exd/ExdDataGenerated.h>
@@ -8,6 +6,7 @@
 #include <Network/CommonActorControl.h>
 #include <Network/PacketDef/Zone/ClientZoneDef.h>
 #include <Logging/Logger.h>
+#include <Util/Util.h>
 
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
@@ -41,10 +40,10 @@ void Core::Network::GameConnection::actionHandler( const Packets::FFXIVARR_PACKE
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcSkillHandler >( inPacket );
 
-  const auto& type = packet.data().type;
-  const auto& action = packet.data().actionId;
-  const auto& useCount = packet.data().useCount;
-  const auto& targetId = packet.data().targetId;
+  const auto type = packet.data().type;
+  const auto action = packet.data().actionId;
+  const auto useCount = packet.data().useCount;
+  const auto targetId = packet.data().targetId;
 
   player.sendDebug( "Skill type:" + std::to_string( type ) );
 
@@ -57,7 +56,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::FFXIVARR_PACKE
 
       if( action < 1000000 ) // normal action
       {
-        std::string actionIdStr = boost::str( boost::format( "%|04X|" ) % action );
+        std::string actionIdStr = Util::intToHexString( action, 4 );
         player.sendDebug( "---------------------------------------" );
         player.sendDebug( "ActionHandler ( " + actionIdStr + " | " +
                           pExdData->get< Core::Data::Action >( action )->name +

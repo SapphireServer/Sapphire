@@ -1,5 +1,3 @@
-#include <boost/make_shared.hpp>
-
 #include <Logging/Logger.h>
 #include <Database/DatabaseDef.h>
 
@@ -53,7 +51,7 @@ bool Core::LinkshellMgr::loadLinkshells()
     invitesBin = res->getBlobVector( 6 );
     func( members, invitesBin );
 
-    auto lsPtr = boost::make_shared< Linkshell >( linkshellId, name, masterId, members, leaders, invites );
+    auto lsPtr = std::make_shared< Linkshell >( linkshellId, name, masterId, members, leaders, invites );
     m_linkshellIdMap[ linkshellId ] = lsPtr;
     m_linkshellNameMap[ name ] = lsPtr;
 

@@ -1,40 +1,38 @@
 #ifndef _EVENTITEMACTION_H_
 #define _EVENTITEMACTION_H_
 
-#include "Forwards.h"
+#include "ForwardsZone.h"
 #include "Action.h"
 
-namespace Core {
-namespace Action {
-
-class EventItemAction :
-  public Action
+namespace Core::Action
 {
 
-public:
-  EventItemAction();
+  class EventItemAction : public Action
+  {
 
-  ~EventItemAction();
+  public:
+    EventItemAction();
 
-  EventItemAction( Entity::CharaPtr pActor, uint32_t eventId, uint16_t action,
-                   ActionCallback finishRef, ActionCallback interruptRef, uint64_t additional );
+    ~EventItemAction();
 
-  void onStart() override;
+    EventItemAction( Entity::CharaPtr pActor, uint32_t eventId, uint16_t action,
+                     ActionCallback finishRef, ActionCallback interruptRef, uint64_t additional );
 
-  void onFinish() override;
+    void onStart() override;
 
-  void onInterrupt() override;
+    void onFinish() override;
 
-private:
-  uint32_t m_eventId;
-  uint64_t m_additional;
+    void onInterrupt() override;
 
-  ActionCallback m_onActionFinishClb;
-  ActionCallback m_onActionInterruptClb;
+  private:
+    uint32_t m_eventId;
+    uint64_t m_additional;
 
-};
+    ActionCallback m_onActionFinishClb;
+    ActionCallback m_onActionInterruptClb;
 
-}
+  };
+
 }
 
 #endif

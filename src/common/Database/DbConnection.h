@@ -7,123 +7,113 @@
 #include <string>
 #include <vector>
 #include "Util/LockedWaitQueue.h"
-#include <boost/scoped_ptr.hpp>
-#include <boost/enable_shared_from_this.hpp>
 
-namespace Mysql {
-class Connection;
-
-class ResultSet;
-
-class PreparedResultSet;
-
-class PreparedStatement;
+namespace Mysql
+{
+  class Connection;
+  class ResultSet;
+  class PreparedResultSet;
+  class PreparedStatement;
 }
 
-namespace Core {
-namespace Db {
-class DatabaseWorker;
-
-class PreparedStatement;
-
-class Operation;
-
-class DbWorker;
-
-using PreparedStmtScopedPtr = boost::scoped_ptr< PreparedStatement >;
-
-enum ConnectionFlags
+namespace Core::Db
 {
-  CONNECTION_ASYNC = 0x1,
-  CONNECTION_SYNC = 0x2,
-  CONNECTION_BOTH = CONNECTION_ASYNC | CONNECTION_SYNC
-};
+  class DatabaseWorker;
+  class PreparedStatement;
+  class Operation;
+  class DbWorker;
+  using PreparedStmtScopedPtr = std::unique_ptr< PreparedStatement >;
 
-struct ConnectionInfo
-{
-  std::string user;
-  std::string password;
-  std::string database;
-  std::string host;
-  uint16_t port;
-  uint8_t syncThreads;
-  uint8_t asyncThreads;
-};
-
-using PreparedStatementMap = std::map< uint32_t, std::pair< std::string, ConnectionFlags > >;
-
-class DbConnection :
-  public boost::enable_shared_from_this< DbConnection >
-{
-public:
-  // Constructor for synchronous connections.
-  DbConnection( ConnectionInfo& connInfo );
-
-  // Constructor for asynchronous connections.
-  DbConnection( Core::LockedWaitQueue< boost::shared_ptr< Operation > >* queue, ConnectionInfo& connInfo );
-
-  virtual ~DbConnection();
-
-  virtual uint32_t open();
-
-  void close();
-
-  bool prepareStatements();
-
-  bool execute( const std::string& sql );
-
-  bool execute( boost::shared_ptr< PreparedStatement > stmt );
-
-  boost::shared_ptr< Mysql::ResultSet > query( const std::string& sql );
-
-  boost::shared_ptr< Mysql::ResultSet > query( boost::shared_ptr< PreparedStatement > stmt );
-
-  void beginTransaction();
-
-  void rollbackTransaction();
-
-  void commitTransaction();
-
-  bool ping();
-
-  uint32_t getLastError();
-
-  bool lockIfReady();
-
-  void unlock();
-
-  boost::shared_ptr< Mysql::Connection > getConnection()
+  enum ConnectionFlags
   {
-    return m_pConnection;
-  }
+    CONNECTION_ASYNC = 0x1,
+    CONNECTION_SYNC = 0x2,
+    CONNECTION_BOTH = CONNECTION_ASYNC | CONNECTION_SYNC
+  };
 
-  boost::shared_ptr< Mysql::PreparedStatement > getPreparedStatement( uint32_t index );
+  struct ConnectionInfo
+  {
+    std::string user;
+    std::string password;
+    std::string database;
+    std::string host;
+    uint16_t port;
+    uint8_t syncThreads;
+    uint8_t asyncThreads;
+  };
 
-  void prepareStatement( uint32_t index, const std::string& sql, ConnectionFlags flags );
+  using PreparedStatementMap = std::map< uint32_t, std::pair< std::string, ConnectionFlags > >;
 
-  virtual void doPrepareStatements() = 0;
+  class DbConnection :
+    public std::enable_shared_from_this< DbConnection >
+  {
+  public:
+    // Constructor for synchronous connections.
+    DbConnection( ConnectionInfo& connInfo );
 
-protected:
-  std::vector< boost::shared_ptr< Mysql::PreparedStatement > > m_stmts;
-  PreparedStatementMap m_queries;
-  bool m_reconnecting;
-  bool m_prepareError;
+    // Constructor for asynchronous connections.
+    DbConnection( Core::LockedWaitQueue< std::shared_ptr< Operation > >* queue, ConnectionInfo& connInfo );
 
-private:
-  LockedWaitQueue< boost::shared_ptr< Operation > >* m_queue;
-  boost::shared_ptr< DbWorker > m_worker;
-  boost::shared_ptr< Mysql::Connection > m_pConnection;
-  ConnectionInfo& m_connectionInfo;
-  ConnectionFlags m_connectionFlags;
-  std::mutex m_mutex;
+    virtual ~DbConnection();
 
-  DbConnection( DbConnection const& right ) = delete;
+    virtual uint32_t open();
 
-  DbConnection& operator=( DbConnection const& right ) = delete;
-};
+    void close();
+
+    bool prepareStatements();
+
+    bool execute( const std::string& sql );
+
+    bool execute( std::shared_ptr< PreparedStatement > stmt );
+
+    std::shared_ptr< Mysql::ResultSet > query( const std::string& sql );
+
+    std::shared_ptr< Mysql::ResultSet > query( std::shared_ptr< PreparedStatement > stmt );
+
+    void beginTransaction();
+
+    void rollbackTransaction();
+
+    void commitTransaction();
+
+    bool ping();
+
+    uint32_t getLastError();
+
+    bool lockIfReady();
+
+    void unlock();
+
+    std::shared_ptr< Mysql::Connection > getConnection()
+    {
+      return m_pConnection;
+    }
+
+    std::shared_ptr< Mysql::PreparedStatement > getPreparedStatement( uint32_t index );
+
+    void prepareStatement( uint32_t index, const std::string& sql, ConnectionFlags flags );
+
+    virtual void doPrepareStatements() = 0;
+
+  protected:
+    std::vector< std::shared_ptr< Mysql::PreparedStatement > > m_stmts;
+    PreparedStatementMap m_queries;
+    bool m_reconnecting;
+    bool m_prepareError;
+
+  private:
+    LockedWaitQueue< std::shared_ptr< Operation > >* m_queue;
+    std::shared_ptr< DbWorker > m_worker;
+    std::shared_ptr< Mysql::Connection > m_pConnection;
+    ConnectionInfo& m_connectionInfo;
+    ConnectionFlags m_connectionFlags;
+    std::mutex m_mutex;
+
+    DbConnection( DbConnection const& right ) = delete;
+
+    DbConnection& operator=( DbConnection const& right ) = delete;
+  };
 
 }
-}
-
 
 #endif

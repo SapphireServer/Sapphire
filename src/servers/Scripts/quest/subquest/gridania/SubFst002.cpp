@@ -2,6 +2,8 @@
 #include "Event/EventHelper.h"
 #include <ScriptObject.h>
 
+using namespace Core;
+
 // Quest Script: SubFst002_00025
 // Quest Name: Quarrels with Squirrels
 // Quest ID: 65561

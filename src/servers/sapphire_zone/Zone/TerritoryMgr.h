@@ -12,9 +12,9 @@ struct PlaceName;
 struct TerritoryType;
 struct InstanceContent;
 
-using PlaceNamePtr = boost::shared_ptr< PlaceName >;
-using TerritoryTypePtr = boost::shared_ptr< TerritoryType >;
-using InstanceContentPtr = boost::shared_ptr< InstanceContent >;
+using PlaceNamePtr = std::shared_ptr< PlaceName >;
+using TerritoryTypePtr = std::shared_ptr< TerritoryType >;
+using InstanceContentPtr = std::shared_ptr< InstanceContent >;
 }
 
 /*!
@@ -95,7 +95,7 @@ public:
   /*! creates a new instance for a given territoryTypeId */
   ZonePtr createTerritoryInstance( uint32_t territoryTypeId );
 
-  ZonePtr createInstanceContent( uint32_t instanceContentId );
+  ZonePtr createInstanceContent( uint32_t contentFinderConditionId );
 
   /*! removes instance by instanceId, return true if successful */
   bool removeTerritoryInstance( uint32_t territoryTypeId );

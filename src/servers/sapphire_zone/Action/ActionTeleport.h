@@ -1,35 +1,33 @@
 #ifndef _ACTIONTELEPORT_H_
 #define _ACTIONTELEPORT_H_
 
-#include "Forwards.h"
+#include "ForwardsZone.h"
 #include "Action.h"
 
-namespace Core {
-namespace Action {
-
-class ActionTeleport :
-  public Action
+namespace Core::Action
 {
-private:
-  uint16_t m_targetAetheryte;
-  uint16_t m_cost;
 
-public:
-  ActionTeleport();
+  class ActionTeleport : public Action
+  {
+  private:
+    uint16_t m_targetAetheryte;
+    uint16_t m_cost;
 
-  ~ActionTeleport();
+  public:
+    ActionTeleport();
 
-  ActionTeleport( Entity::CharaPtr pActor, uint16_t action, uint16_t cost );
+    ~ActionTeleport();
 
-  void onStart() override;
+    ActionTeleport( Entity::CharaPtr pActor, uint16_t action, uint16_t cost );
 
-  void onFinish() override;
+    void onStart() override;
 
-  void onInterrupt() override;
+    void onFinish() override;
 
-};
+    void onInterrupt() override;
 
-}
+  };
+
 }
 
 #endif

@@ -2,6 +2,8 @@
 #include <Event/EventHelper.h>
 #include <ScriptObject.h>
 
+using namespace Core;
+
 // Quest Script: SubFst029_00172
 // Quest Name: More than a Flesh Wound
 // Quest ID: 65708

@@ -3,13 +3,10 @@
 
 #include <Common.h>
 
-#include <boost/shared_ptr.hpp>
 #include <mutex>
 #include <map>
 
 #include "ForwardsZone.h"
-
-#include "Actor/BNpcTemplate.h"
 
 namespace Core {
 

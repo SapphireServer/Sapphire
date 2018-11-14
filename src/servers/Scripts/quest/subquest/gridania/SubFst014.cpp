@@ -2,6 +2,8 @@
 #include <Event/EventHelper.h>
 #include <ScriptObject.h>
 
+using namespace Core;
+
 // Quest Script: SubFst014_00041
 // Quest Name: Covered in Roses
 // Quest ID: 65577

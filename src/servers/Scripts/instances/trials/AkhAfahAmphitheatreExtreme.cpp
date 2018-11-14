@@ -1,12 +1,12 @@
 #include <ScriptObject.h>
 #include <Zone/InstanceContent.h>
 
-class AkhAfahAmphitheatreExtreme :
-  public InstanceContentScript
+using namespace Core;
+
+class AkhAfahAmphitheatreExtreme : public InstanceContentScript
 {
 public:
-  AkhAfahAmphitheatreExtreme() :
-    InstanceContentScript( 20025 )
+  AkhAfahAmphitheatreExtreme() : InstanceContentScript( 20025 )
   {
   }
 

@@ -1,37 +1,30 @@
+
+#include <Connection.h>
+#include <Network/Connection.h>
+#include <Network/Hive.h>
+#include <Network/PacketContainer.h>
+
+#include "Network/GameConnection.h"
 #include "ServerZone.h"
+#include "Framework.h"
 
 #include <Version.h>
 #include <Logging/Logger.h>
 #include <Config/ConfigMgr.h>
 
-#include <MySqlBase.h>
-#include <Connection.h>
-
-#include <Network/Connection.h>
-#include <Network/Hive.h>
-
 #include <Exd/ExdDataGenerated.h>
-#include <Network/PacketContainer.h>
 #include <Database/DatabaseDef.h>
-#include <Util/Util.h>
 
 #include "Actor/Player.h"
 #include "Actor/BNpcTemplate.h"
 
-#include "Network/GameConnection.h"
+
 #include "Session.h"
 
 #include "Zone/TerritoryMgr.h"
 
 #include "Script/ScriptMgr.h"
 #include "Linkshell/LinkshellMgr.h"
-
-#include "ForwardsZone.h"
-
-#include <boost/make_shared.hpp>
-#include <thread>
-
-#include "Framework.h"
 
 extern Core::Framework g_fw;
 
@@ -74,7 +67,7 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
 
     try
     {
-      arg = boost::to_lower_copy( std::string( args[ i ] ) );
+      arg = Util::toLowerCopy( std::string( args[ i ] ) );
       val = std::string( args[ i + 1 ] );
 
       // trim '-' from start of arg
@@ -122,7 +115,7 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
   }
 
   pLog->info( "Setting up generated EXD data" );
-  if( !pExd->init( pConfig->getValue< std::string >( "GlobalParameters.DataPath", "" ) ) )
+  if( !pExd->init( pConfig->getValue< std::string >( "GlobalParameters", "DataPath", "" ) ) )
   {
     pLog->fatal( "Error setting up generated EXD data " );
     return false;
@@ -131,20 +124,20 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
   Core::Db::DbLoader loader;
 
   Core::Db::ConnectionInfo info;
-  info.password = pConfig->getValue< std::string >( "Database.Password", "" );
-  info.host = pConfig->getValue< std::string >( "Database.Host", "127.0.0.1" );
-  info.database = pConfig->getValue< std::string >( "Database.Database", "sapphire" );
-  info.port = pConfig->getValue< uint16_t >( "Database.Port", 3306 );
-  info.user = pConfig->getValue< std::string >( "Database.Username", "root" );
-  info.syncThreads = pConfig->getValue< uint8_t >( "Database.SyncThreads", 2 );
-  info.asyncThreads = pConfig->getValue< uint8_t >( "Database.AsyncThreads", 2 );
+  info.password = pConfig->getValue< std::string >( "Database", "Password", "" );
+  info.host = pConfig->getValue< std::string >( "Database", "Host", "127.0.0.1" );
+  info.database = pConfig->getValue< std::string >( "Database", "Database", "sapphire" );
+  info.port = pConfig->getValue< uint16_t >( "Database", "Port", 3306 );
+  info.user = pConfig->getValue< std::string >( "Database", "Username", "root" );
+  info.syncThreads = pConfig->getValue< uint8_t >( "Database", "SyncThreads", 2 );
+  info.asyncThreads = pConfig->getValue< uint8_t >( "Database", "AsyncThreads", 2 );
 
   loader.addDb( *pDb, info );
   if( !loader.initDbs() )
     return false;
 
-  m_port = pConfig->getValue< uint16_t >( "ZoneNetwork.ListenPort", 54992 );
-  m_ip = pConfig->getValue< std::string >( "ZoneNetwork.ListenIp", "0.0.0.0" );
+  m_port = pConfig->getValue< uint16_t >( "ZoneNetwork", "ListenPort", 54992 );
+  m_ip = pConfig->getValue< std::string >( "ZoneNetwork", "ListenIp", "0.0.0.0" );
 
   return true;
 }
@@ -216,7 +209,7 @@ void Core::ServerZone::mainLoop()
 
   while( isRunning() )
   {
-    this_thread::sleep_for( chrono::milliseconds( 50 ) );
+    std::this_thread::sleep_for( std::chrono::milliseconds( 50 ) );
 
     auto currTime = Util::getTimeSeconds();
 
@@ -224,7 +217,7 @@ void Core::ServerZone::mainLoop()
 
     pScriptMgr->update();
 
-    lock_guard< std::mutex > lock( m_sessionMutex );
+    std::lock_guard< std::mutex > lock( m_sessionMutex );
     for( auto sessionIt : m_sessionMapById )
     {
       auto session = sessionIt.second;
@@ -306,7 +299,7 @@ bool Core::ServerZone::createSession( uint32_t sessionId )
 
   pLog->info( "[" + session_id_str + "] Creating new session" );
 
-  boost::shared_ptr< Session > newSession( new Session( sessionId ) );
+  std::shared_ptr< Session > newSession( new Session( sessionId ) );
   m_sessionMapById[ sessionId ] = newSession;
 
   if( !newSession->loadPlayer() )
@@ -391,7 +384,7 @@ void Core::ServerZone::loadBNpcTemplates()
     auto look = res->getBlobVector( 12 );
     auto models = res->getBlobVector( 13 );
 
-    auto bnpcTemplate = boost::make_shared< Entity::BNpcTemplate >(
+    auto bnpcTemplate = std::make_shared< Entity::BNpcTemplate >(
                                               id, bNPCBaseId, bNPCNameId, mainWeaponModel, secWeaponModel,
                                               aggressionMode, enemyType, 0, pose, modelChara, displayFlags,
                                               reinterpret_cast< uint32_t* >( &models[ 0 ] ),

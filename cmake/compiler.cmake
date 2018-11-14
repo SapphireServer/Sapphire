@@ -1,10 +1,11 @@
 
 if(UNIX)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 #  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
 else()
   add_definitions(-D_WIN32_WINNT=0x601)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+  add_definitions(-DNOMINMAX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHc")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
@@ -16,7 +17,7 @@ else()
 
     # edit and continue
     message(STATUS "Enabling Edit and Continue..")
-    add_definitions(/ZI)
+    add_definitions(/Zi)
 
     # incremental linking
     message(STATUS "Enabling Incremental Linking..")
@@ -28,4 +29,5 @@ else()
   endif()
 endif()
 
-
+# force standalone asio
+add_definitions( -DASIO_STANDALONE )

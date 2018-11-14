@@ -2,6 +2,8 @@
 #include <Event/EventHelper.h>
 #include <ScriptObject.h>
 
+using namespace Core;
+
 // Quest Script: SubWil002_00151
 // Quest Name: Gil for Gold
 // Quest ID: 65687

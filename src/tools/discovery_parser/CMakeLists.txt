@@ -2,10 +2,7 @@ cmake_minimum_required(VERSION 2.6)
 cmake_policy(SET CMP0015 NEW)
 project(Tool_discovery_parser)
 
-set(SAPPHIRE_BOOST_VER 1.63.0)
-set(SAPPHIRE_BOOST_FOLDER_NAME boost_1_63_0)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_CURRENT_SOURCE_DIR}/../bin/")
-
 
 file(GLOB SERVER_PUBLIC_INCLUDE_FILES 
   "${CMAKE_CURRENT_SOURCE_DIR}/*"
@@ -20,7 +17,7 @@ file(GLOB SERVER_SOURCE_FILES
 add_executable(discovery_parser ${SERVER_PUBLIC_INCLUDE_FILES} ${SERVER_SOURCE_FILES})
 
 set_target_properties(discovery_parser PROPERTIES
-    CXX_STANDARD 14
+    CXX_STANDARD 17
     CXX_STANDARD_REQUIRED ON
     CXX_EXTENSIONS ON
     RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_SOURCE_DIR}/../bin/"
@@ -30,10 +27,10 @@ set_target_properties(discovery_parser PROPERTIES
 )
 
 if (UNIX)
-  target_link_libraries (discovery_parser common xivdat pthread mysqlclient dl z)
+    target_link_libraries (discovery_parser common xivdat pthread mysqlclient dl z stdc++fs)
 else()
-  target_link_libraries (discovery_parser common xivdat libmysql zlib1)
+    target_link_libraries (discovery_parser common xivdat mysql zlib)
 endif()
 
-target_link_libraries(discovery_parser ${Boost_LIBRARIES} ${Boost_LIBRARIES})
+
 

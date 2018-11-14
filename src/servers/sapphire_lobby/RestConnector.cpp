@@ -6,18 +6,11 @@
 #include <time.h>
 #include <iomanip>
 
-#define BOOST_SPIRIT_THREADSAFE
-
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/foreach.hpp>
+#include <nlohmann/json.hpp>
 
 extern Core::Logger g_log;
 
-typedef std::vector< std::tuple< std::string, uint32_t, uint64_t, std::string>> CharList;
+typedef std::vector< std::tuple< std::string, uint32_t, uint64_t, std::string > > CharList;
 
 Core::Network::RestConnector::RestConnector()
 {
@@ -60,15 +53,11 @@ Core::LobbySessionPtr Core::Network::RestConnector::getSession( char* sId )
   std::string content = std::string( std::istreambuf_iterator< char >( r->content ), {} );
   if( r->status_code.find( "200" ) != std::string::npos )
   {
-    using namespace boost::property_tree;
-    ptree pt;
+    nlohmann::json json;  
 
     try
     {
-      std::stringstream ss;
-      ss << content;
-
-      read_json( ss, pt );
+      json = json.parse( content );
     }
     catch( std::exception& e )
     {
@@ -79,7 +68,7 @@ Core::LobbySessionPtr Core::Network::RestConnector::getSession( char* sId )
     if( content.find( "invalid" ) == std::string::npos )
     {
       LobbySessionPtr pSession( new Core::LobbySession() );
-      pSession->setAccountID( atoi( pt.get< std::string >( "result" ).c_str() ) );
+      pSession->setAccountID( json["result"].get< uint32_t >() );
       pSession->setSessionId( ( uint8_t* ) sId );
       return pSession;
     }
@@ -106,15 +95,11 @@ bool Core::Network::RestConnector::checkNameTaken( std::string name )
   std::string content = std::string( std::istreambuf_iterator< char >( r->content ), {} );
   if( r->status_code.find( "200" ) != std::string::npos )
   {
-    using namespace boost::property_tree;
-    ptree pt;
+    auto json = nlohmann::json();
 
     try
     {
-      std::stringstream ss;
-      ss << content;
-
-      read_json( ss, pt );
+      json = json.parse( content );
     }
     catch( std::exception& e )
     {
@@ -122,7 +107,7 @@ bool Core::Network::RestConnector::checkNameTaken( std::string name )
       return true;
     }
 
-    if( pt.get< std::string >( "result" ) != "invalid" && pt.get< std::string >( "result" ) == "false" )
+    if( json["result"] != "invalid" && json["result"] == "false" )
       return false;
     return true;
   }
@@ -144,15 +129,11 @@ uint32_t Core::Network::RestConnector::getNextCharId()
   std::string content = std::string( std::istreambuf_iterator< char >( r->content ), {} );
   if( r->status_code.find( "200" ) != std::string::npos )
   {
-    using namespace boost::property_tree;
-    ptree pt;
+    auto json = nlohmann::json();
 
     try
     {
-      std::stringstream ss;
-      ss << content;
-
-      read_json( ss, pt );
+      json = json.parse( content );
     }
     catch( std::exception& e )
     {
@@ -162,7 +143,7 @@ uint32_t Core::Network::RestConnector::getNextCharId()
 
     if( content.find( "invalid" ) == std::string::npos )
     {
-      return pt.get< uint32_t >( "result" );
+      return std::stoi( std::string( json["result"] ) );
     }
     else
     {
@@ -187,15 +168,11 @@ uint64_t Core::Network::RestConnector::getNextContentId()
   std::string content = std::string( std::istreambuf_iterator< char >( r->content ), {} );
   if( r->status_code.find( "200" ) != std::string::npos )
   {
-    using namespace boost::property_tree;
-    ptree pt;
+    auto json = nlohmann::json();
 
     try
     {
-      std::stringstream ss;
-      ss << content;
-
-      read_json( ss, pt );
+      json = json.parse( content );
     }
     catch( std::exception& e )
     {
@@ -205,7 +182,7 @@ uint64_t Core::Network::RestConnector::getNextContentId()
 
     if( content.find( "invalid" ) == std::string::npos )
     {
-      return pt.get< uint64_t >( "result" );
+      return std::stoll( std::string( json["result"] ) );
     }
     else
     {
@@ -232,15 +209,11 @@ CharList Core::Network::RestConnector::getCharList( char* sId )
   g_log.debug( content );
   if( r->status_code.find( "200" ) != std::string::npos )
   {
-    using namespace boost::property_tree;
-    ptree pt;
+    auto json = nlohmann::json();
 
     try
     {
-      std::stringstream ss;
-      ss << content;
-
-      read_json( ss, pt );
+      json = json.parse( content );
     }
     catch( std::exception& e )
     {
@@ -248,18 +221,20 @@ CharList Core::Network::RestConnector::getCharList( char* sId )
       return list;
     }
 
-    if( pt.get< std::string >( "result" ).find( "invalid" ) == std::string::npos )
+    if( json["result"].get< std::string >().find( "invalid" ) == std::string::npos )
     {
 
-      g_log.debug( pt.get_value< std::string >( "result" ) );
+      g_log.debug( json["result"] );
 
-      for( auto& child : pt.get_child( "charArray" ) )
+      for( auto& child : json["charArray"] )
       {
-        g_log.debug( child.second.get< std::string >( "contentId" ) );
-        list.push_back( std::make_tuple( child.second.get< std::string >( "name" ),
-                                         atoi( child.second.get< std::string >( "charId" ).c_str() ),
-                                         child.second.get< uint64_t >( "contentId" ),
-                                         child.second.get< std::string >( "infoJson" ) ) );
+        g_log.info( child["contentId"] );
+        //std::string, uint32_t, uint64_t, std::string
+        list.push_back( { child["name"],
+                          std::stoi( std::string( child["charId"] ) ),
+                          std::stoll( std::string( child["contentId"] ) ),
+                          child["infoJson"] 
+                        } );
       }
 
       return list;
@@ -289,15 +264,10 @@ bool Core::Network::RestConnector::deleteCharacter( char* sId, std::string name 
   std::string content = std::string( std::istreambuf_iterator< char >( r->content ), {} );
   if( r->status_code.find( "200" ) != std::string::npos )
   {
-    using namespace boost::property_tree;
-    ptree pt;
-
+    auto json = nlohmann::json();
     try
     {
-      std::stringstream ss;
-      ss << content;
-
-      read_json( ss, pt );
+      json = json.parse( content );
     }
     catch( std::exception& e )
     {
@@ -330,15 +300,11 @@ int Core::Network::RestConnector::createCharacter( char* sId, std::string name, 
   g_log.debug( content );
   if( r->status_code.find( "200" ) != std::string::npos )
   {
-    using namespace boost::property_tree;
-    ptree pt;
+    auto json = nlohmann::json();
 
     try
     {
-      std::stringstream ss;
-      ss << content;
-
-      read_json( ss, pt );
+      json = json.parse( content );
     }
     catch( std::exception& e )
     {
@@ -347,7 +313,7 @@ int Core::Network::RestConnector::createCharacter( char* sId, std::string name, 
     }
 
     if( content.find( "invalid" ) == std::string::npos )
-      return atoi( pt.get< std::string >( "result" ).c_str() );
+      return std::stoi( json["result"].get< std::string >() );
     return -1;
   }
   else

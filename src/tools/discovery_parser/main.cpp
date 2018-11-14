@@ -9,6 +9,9 @@
 #include <vector>
 #include <set>
 #include <memory>
+#include <variant>
+
+#include <Util/Util.h>
 
 #include "pcb.h"
 #include "lgb.h"
@@ -22,7 +25,6 @@
 #include <ExdData.h>
 #include <ExdCat.h>
 #include <Exd.h>
-#include <boost/algorithm/string.hpp>
 
 // garbage to ignore models
 bool ignoreModels = false;
@@ -162,17 +164,17 @@ void getMapExdEntries( uint32_t zoneId )
     case DataType::float32: 8
     case DataType::uint64: 9
     */
-    auto territory = *boost::get< uint16_t >( &fields.at( 14 ) );
+    auto territory = std::get< uint16_t >( fields.at( 14 ) );
     if( territory != zoneId )
       continue;
-    auto mapZoneIndex = *boost::get< int8_t >( &fields.at( 2 ) );
-    auto hierarchy = *boost::get< uint8_t >( &fields.at( 3 ) );
-    auto pathStr = *boost::get< std::string >( &fields.at( 5 ) );
-    auto sizeFactor = *boost::get< uint16_t >( &fields.at( 6 ) );
-    auto mapOffsetX = *boost::get< int16_t >( &fields.at( 7 ) );
-    auto mapOffsetY = *boost::get< int16_t >( &fields.at( 8 ) );
-    auto discoveryIdx = *boost::get< int16_t >( &fields.at( 12 ) );
-    auto discoveryCompleteBitmask = *boost::get< uint32_t >( &fields.at( 13 ) );
+    auto mapZoneIndex = std::get< int8_t >( fields.at( 2 ) );
+    auto hierarchy = std::get< uint8_t >( fields.at( 3 ) );
+    auto pathStr = std::get< std::string >( fields.at( 5 ) );
+    auto sizeFactor = std::get< uint16_t >( fields.at( 6 ) );
+    auto mapOffsetX = std::get< int16_t >( fields.at( 7 ) );
+    auto mapOffsetY = std::get< int16_t >( fields.at( 8 ) );
+    auto discoveryIdx = std::get< int16_t >( fields.at( 12 ) );
+    auto discoveryCompleteBitmask = std::get< uint32_t >( fields.at( 13 ) );
     char texStr[255];
     auto teriStr = pathStr.substr( 0, pathStr.find_first_of( '/' ) );
     char discoveryFileName[255];
@@ -247,19 +249,19 @@ std::string zoneNameToPath( const std::string& name )
     for( auto& row : rows )
     {
       auto& fields = row.second;
-      auto teriName = *boost::get< std::string >(
-        &fields.at( static_cast< size_t >( TerritoryTypeExdIndexes::TerritoryType ) ) );
+      auto teriName = std::get< std::string >(
+        fields.at( static_cast< size_t >( TerritoryTypeExdIndexes::TerritoryType ) ) );
       if( teriName.empty() )
         continue;
-      auto teriPath = *boost::get< std::string >(
-        &fields.at( static_cast< size_t >( TerritoryTypeExdIndexes::Path ) ) );
+      auto teriPath = std::get< std::string >(
+        fields.at( static_cast< size_t >( TerritoryTypeExdIndexes::Path ) ) );
       ZoneInfo info;
       info.id = row.first;
       info.path = teriPath;
       info.name = teriName;
       zoneInfoMap[ row.first ] = info;
 
-      if( !found && boost::iequals( name, teriName ) )
+      if( !found && ( Core::Util::toLowerCopy( name ) == Core::Util::toLowerCopy( teriName ) ) )
       {
         found = true;
         path = teriPath;
@@ -271,7 +273,7 @@ std::string zoneNameToPath( const std::string& name )
   {
     for( const auto& entry : zoneInfoMap )
     {
-      if( found = boost::iequals( name, entry.second.name ) )
+      if( found = Core::Util::toLowerCopy( name ) == Core::Util::toLowerCopy( entry.second.name ) )
       {
         path = entry.second.path;
         zoneId = entry.second.id;
@@ -304,7 +306,7 @@ void loadEobjNames()
   {
     auto id = row.first;
     auto& fields = row.second;
-    auto name = *boost::get< std::string >( &fields.at( 0 ) );
+    auto name = std::get< std::string >( fields.at( 0 ) );
     eobjNameMap[ id ] = name;
   }
 }

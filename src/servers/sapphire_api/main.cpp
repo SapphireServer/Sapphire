@@ -1,11 +1,7 @@
 #include "server_http.hpp"
 #include "client_http.hpp"
 
-#define BOOST_SPIRIT_THREADSAFE
-
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
-#include <boost/property_tree/json_parser.hpp>
+#include <nlohmann/json.hpp>
 
 #include <Logging/Logger.h>
 #include <Config/ConfigMgr.h>
@@ -21,12 +17,12 @@
 #include <Database/ZoneDbConnection.h>
 #include <Database/DbWorkerPool.h>
 #include <Database/PreparedStatement.h>
+#include <Util/Util.h>
 
 //Added for the default_resource example
 #include <fstream>
 #include <string>
-#include <boost/filesystem.hpp>
-#include <boost/make_shared.hpp>
+#include <experimental/filesystem>
 #include <vector>
 #include <algorithm>
 
@@ -42,8 +38,9 @@ Core::Db::DbWorkerPool< Core::Db::ZoneDbConnection > g_charaDb;
 Core::Data::ExdDataGenerated g_exdDataGen;
 Core::Network::SapphireAPI g_sapphireAPI;
 
+namespace fs = std::experimental::filesystem;
+
 using namespace std;
-using namespace boost::property_tree;
 
 using HttpServer = SimpleWeb::Server< SimpleWeb::HTTP >;
 using HttpClient = SimpleWeb::Client< SimpleWeb::HTTP >;
@@ -53,13 +50,13 @@ void default_resource_send( const HttpServer& server, const shared_ptr< HttpServ
                             const shared_ptr< ifstream >& ifs );
 
 
-auto m_pConfig = boost::make_shared< Core::ConfigMgr >();
+auto m_pConfig = std::make_shared< Core::ConfigMgr >();
 HttpServer server;
-std::string configPath( "rest.ini" );
+std::string configPath( "config.ini" );
 
 void reloadConfig()
 {
-  m_pConfig = boost::make_shared< Core::ConfigMgr >();
+  m_pConfig = std::make_shared< Core::ConfigMgr >();
 
   if( !m_pConfig->loadConfig( configPath ) )
     throw "Error loading config ";
@@ -88,7 +85,7 @@ bool loadSettings( int32_t argc, char* argv[] )
 
     try
     {
-      arg = boost::to_lower_copy( std::string( args[ i ] ) );
+      arg = Core::Util::toLowerCopy( std::string( args[ i ] ) );
       val = std::string( args[ i + 1 ] );
 
       // trim '-' from start of arg
@@ -143,7 +140,7 @@ bool loadSettings( int32_t argc, char* argv[] )
   }
 
   g_log.info( "Setting up generated EXD data" );
-  if( !g_exdDataGen.init( m_pConfig->getValue< std::string >( "GlobalParameters.DataPath", "" ) ) )
+  if( !g_exdDataGen.init( m_pConfig->getValue< std::string >( "GlobalParameters", "DataPath", "" ) ) )
   {
     g_log.fatal( "Error setting up generated EXD data " );
     return false;
@@ -152,21 +149,21 @@ bool loadSettings( int32_t argc, char* argv[] )
   Core::Db::DbLoader loader;
 
   Core::Db::ConnectionInfo info;
-  info.password = m_pConfig->getValue< std::string >( "Database.Password", "" );
-  info.host = m_pConfig->getValue< std::string >( "Database.Host", "127.0.0.1" );
-  info.database = m_pConfig->getValue< std::string >( "Database.Database", "sapphire" );
-  info.port = m_pConfig->getValue< uint16_t >( "Database.Port", 3306 );
-  info.user = m_pConfig->getValue< std::string >( "Database.Username", "root" );
-  info.syncThreads = m_pConfig->getValue< uint8_t >( "Database.SyncThreads", 2 );
-  info.asyncThreads = m_pConfig->getValue< uint8_t >( "Database.AsyncThreads", 2 );
+  info.password = m_pConfig->getValue< std::string >( "Database", "Password", "" );
+  info.host = m_pConfig->getValue< std::string >( "Database", "Host", "127.0.0.1" );
+  info.database = m_pConfig->getValue< std::string >( "Database", "Database", "sapphire" );
+  info.port = m_pConfig->getValue< uint16_t >( "Database", "Port", 3306 );
+  info.user = m_pConfig->getValue< std::string >( "Database", "Username", "root" );
+  info.syncThreads = m_pConfig->getValue< uint8_t >( "Database", "SyncThreads", 2 );
+  info.asyncThreads = m_pConfig->getValue< uint8_t >( "Database", "AsyncThreads", 2 );
 
   loader.addDb( g_charaDb, info );
   if( !loader.initDbs() )
     return false;
 
   server.config.port = static_cast< uint16_t >( std::stoul(
-    m_pConfig->getValue< std::string >( "RestNetwork.ListenPort", "80" ) ) );
-  server.config.address = m_pConfig->getValue< std::string >( "RestNetwork.ListenIp", "0.0.0.0" );
+    m_pConfig->getValue< std::string >( "RestNetwork", "ListenPort", "80" ) ) );
+  server.config.address = m_pConfig->getValue< std::string >( "RestNetwork", "ListenIp", "0.0.0.0" );
 
   g_log.info( "Database: Connected to " + info.host + ":" + std::to_string( info.port ) );
 
@@ -256,23 +253,21 @@ void createAccount( shared_ptr< HttpServer::Response > response, shared_ptr< Htt
   print_request_info( request );
   try
   {
+    auto json = nlohmann::json::parse( request->content );
 
-    using namespace boost::property_tree;
-    ptree pt;
-    read_json( request->content, pt );
-
-    std::string pass = pt.get< string >( "pass" );
-    std::string user = pt.get< string >( "username" );
+    std::string pass = json["pass"];
+    std::string user = json["username"];
     // reloadConfig();
 
     std::string sId;
     if( g_sapphireAPI.createAccount( user, pass, sId ) )
     {
+      // todo: construct proper json object here
       std::string json_string = "{\"sId\":\"" + sId +
                                 "\", \"lobbyHost\":\"" +
-                                m_pConfig->getValue< std::string >( "GlobalNetwork.LobbyHost" ) +
+                                m_pConfig->getValue< std::string >( "GlobalNetwork", "LobbyHost" ) +
                                 "\", \"frontierHost\":\"" +
-                                m_pConfig->getValue< std::string >( "GlobalNetwork.RestHost" ) + "\"}";
+                                m_pConfig->getValue< std::string >( "GlobalNetwork", "RestHost" ) + "\"}";
       *response << buildHttpResponse( 200, json_string, JSON );
     }
     else
@@ -290,23 +285,22 @@ void login( shared_ptr< HttpServer::Response > response, shared_ptr< HttpServer:
   print_request_info( request );
   try
   {
-    using namespace boost::property_tree;
-    ptree pt;
-    read_json( request->content, pt );
+    auto json = nlohmann::json::parse( request->content );
 
-    std::string pass = pt.get< string >( "pass" );
-    std::string user = pt.get< string >( "username" );
+    std::string pass = json["pass"];
+    std::string user = json["username"];
 
     std::string sId;
 
     // reloadConfig();
     if( g_sapphireAPI.login( user, pass, sId ) )
     {
+      // todo: build proper json object and stringify it
       std::string json_string = "{\"sId\":\"" + sId +
                                 "\", \"lobbyHost\":\"" +
-                                m_pConfig->getValue< std::string >( "GlobalNetwork.LobbyHost" ) +
+                                m_pConfig->getValue< std::string >( "GlobalNetwork", "LobbyHost" ) +
                                 "\", \"frontierHost\":\"" +
-                                m_pConfig->getValue< std::string >( "GlobalNetwork.RestHost" ) + "\"}";
+                                m_pConfig->getValue< std::string >( "GlobalNetwork", "RestHost" ) + "\"}";
       *response << buildHttpResponse( 200, json_string, JSON );
     }
     else
@@ -326,18 +320,17 @@ void deleteCharacter( shared_ptr< HttpServer::Response > response, shared_ptr< H
   print_request_info( request );
   try
   {
-    using namespace boost::property_tree;
-    ptree pt;
-    read_json( request->content, pt );
-    std::string sId = pt.get< string >( "sId" );
-    std::string secret = pt.get< string >( "secret" );
-    std::string name = pt.get< string >( "name" );
+    auto json = nlohmann::json::parse( request->content );
+
+    std::string sId = json["sId"];
+    std::string secret = json["secret"];
+    std::string name = json["name"];
 
     // reloadConfig();
 
     int32_t accountId = g_sapphireAPI.checkSession( sId );
 
-    if( m_pConfig->getValue< std::string >( "GlobalParameters.ServerSecret" ) != secret )
+    if( m_pConfig->getValue< std::string >( "GlobalParameters", "ServerSecret" ) != secret )
     {
       std::string json_string = "{\"result\":\"invalid_secret\"}";
       *response << buildHttpResponse( 403, json_string, JSON );
@@ -362,13 +355,12 @@ void createCharacter( shared_ptr< HttpServer::Response > response, shared_ptr< H
   print_request_info( request );
   try
   {
-    using namespace boost::property_tree;
-    ptree pt;
-    read_json( request->content, pt );
-    std::string sId = pt.get< string >( "sId" );
-    std::string secret = pt.get< string >( "secret" );
-    std::string name = pt.get< string >( "name" );
-    std::string infoJson = pt.get< string >( "infoJson" );
+    auto json = nlohmann::json::parse( request->content );
+
+    std::string sId = json["sId"];
+    std::string secret = json["secret"];
+    std::string name = json["name"];
+    std::string infoJson = json["infoJson"];
 
     std::string finalJson = Core::Util::base64_decode( infoJson );
 
@@ -378,7 +370,7 @@ void createCharacter( shared_ptr< HttpServer::Response > response, shared_ptr< H
 
     if( result != -1 )
     {
-      if( m_pConfig->getValue< std::string >( "GlobalParameters.ServerSecret" ) != secret )
+      if( m_pConfig->getValue< std::string >( "GlobalParameters", "ServerSecret" ) != secret )
       {
         std::string json_string = "{\"result\":\"invalid_secret\"}";
         *response << buildHttpResponse( 403, json_string, JSON );
@@ -386,7 +378,7 @@ void createCharacter( shared_ptr< HttpServer::Response > response, shared_ptr< H
       else
       {
         int32_t charId = g_sapphireAPI.createCharacter( result, name, finalJson, m_pConfig->getValue< uint8_t >(
-          "CharacterCreation.DefaultGMRank", 255 ) );
+          "CharacterCreation", "DefaultGMRank", 255 ) );
 
         std::string json_string = "{\"result\":\"" + std::to_string( charId ) + "\"}";
         *response << buildHttpResponse( 200, json_string, JSON );
@@ -412,14 +404,14 @@ void insertSession( shared_ptr< HttpServer::Response > response, shared_ptr< Htt
 
   try
   {
-    using namespace boost::property_tree;
-    ptree pt;
-    read_json( request->content, pt );
-    std::string sId = pt.get< string >( "sId" );
-    uint32_t accountId = pt.get< uint32_t >( "accountId" );
-    std::string secret = pt.get< string >( "secret" );
+    auto json = nlohmann::json::parse( request->content );
+
+    std::string sId = json["sId"];
+    uint32_t accountId = json["accountId"].get< uint32_t >();
+    std::string secret = json["secret"];
+
     // reloadConfig();
-    if( m_pConfig->getValue< std::string >( "GlobalParameters.ServerSecret" ) != secret )
+    if( m_pConfig->getValue< std::string >( "GlobalParameters", "ServerSecret" ) != secret )
     {
       std::string json_string = "{\"result\":\"invalid_secret\"}";
       *response << buildHttpResponse( 403, json_string, JSON );
@@ -444,16 +436,14 @@ void checkNameTaken( shared_ptr< HttpServer::Response > response, shared_ptr< Ht
 
   try
   {
-    using namespace boost::property_tree;
-    ptree pt;
-    read_json( request->content, pt );
+    auto json = nlohmann::json::parse( request->content );
 
-    std::string name = pt.get< string >( "name" );
-    std::string secret = pt.get< string >( "secret" );
+    std::string name = json["name"];
+    std::string secret = json["secret"];
 
     // reloadConfig();
 
-    if( m_pConfig->getValue< std::string >( "GlobalParameters.ServerSecret" ) != secret )
+    if( m_pConfig->getValue< std::string >( "GlobalParameters", "ServerSecret" ) != secret )
     {
       std::string json_string = "{\"result\":\"invalid_secret\"}";
       *response << buildHttpResponse( 403, json_string, JSON );
@@ -480,25 +470,27 @@ void checkSession( shared_ptr< HttpServer::Response > response, shared_ptr< Http
   print_request_info( request );
   try
   {
-    using namespace boost::property_tree;
-    ptree pt;
-    read_json( request->content, pt );
-    std::string sId = pt.get< string >( "sId" );
-    std::string secret = pt.get< string >( "secret" );
+    auto json = nlohmann::json::parse( request->content );
+
+    std::string sId = json["sId"];
+    std::string secret = json["secret"];
     int32_t result = g_sapphireAPI.checkSession( sId );
 
     // reloadConfig();
 
     if( result != -1 )
     {
-      if( m_pConfig->getValue< std::string >( "GlobalParameters.ServerSecret" ) != secret )
+      if( m_pConfig->getValue< std::string >( "GlobalParameters", "ServerSecret" ) != secret )
       {
         std::string json_string = "{\"result\":\"invalid_secret\"}";
         *response << buildHttpResponse( 403, json_string, JSON );
       }
       else
       {
-        std::string json_string = "{\"result\":\"" + std::to_string( result ) + "\"}";
+        std::string json_string = nlohmann::json( {
+          { "result", result }
+        } ).dump()
+        ;
         *response << buildHttpResponse( 200, json_string, JSON );
       }
     }
@@ -521,14 +513,13 @@ void getNextCharId( shared_ptr< HttpServer::Response > response, shared_ptr< Htt
   print_request_info( request );
   try
   {
-    using namespace boost::property_tree;
-    ptree pt;
-    read_json( request->content, pt );
-    std::string secret = pt.get< string >( "secret" );
+    auto json = nlohmann::json::parse( request->content );
+
+    std::string secret = json["secret"];
 
     // reloadConfig();
 
-    if( m_pConfig->getValue< std::string >( "GlobalParameters.ServerSecret" ) != secret )
+    if( m_pConfig->getValue< std::string >( "GlobalParameters", "ServerSecret" ) != secret )
     {
       std::string json_string = "{\"result\":\"invalid_secret\"}";
       *response << buildHttpResponse( 403, json_string, JSON );
@@ -553,14 +544,13 @@ void getNextContentId( shared_ptr< HttpServer::Response > response, shared_ptr< 
 
   try
   {
-    using namespace boost::property_tree;
-    ptree pt;
-    read_json( request->content, pt );
-    std::string secret = pt.get< string >( "secret" );
+    auto json = nlohmann::json::parse( request->content );
+
+    std::string secret = json["secret"];
 
     // reloadConfig();
 
-    if( m_pConfig->getValue< std::string >( "GlobalParameters.ServerSecret" ) != secret )
+    if( m_pConfig->getValue< std::string >( "GlobalParameters", "ServerSecret" ) != secret )
     {
       std::string json_string = "{\"result\":\"invalid_secret\"}";
       *response << buildHttpResponse( 403, json_string, JSON );
@@ -584,11 +574,10 @@ void getCharacterList( shared_ptr< HttpServer::Response > response, shared_ptr< 
   print_request_info( request );
   try
   {
-    using namespace boost::property_tree;
-    ptree pt;
-    read_json( request->content, pt );
-    std::string sId = pt.get< string >( "sId" );
-    std::string secret = pt.get< string >( "secret" );
+    auto json = nlohmann::json::parse( request->content );
+
+    std::string sId = json["sId"];
+    std::string secret = json["secret"];
 
     // reloadConfig();
 
@@ -596,7 +585,7 @@ void getCharacterList( shared_ptr< HttpServer::Response > response, shared_ptr< 
 
     if( result != -1 )
     {
-      if( m_pConfig->getValue< std::string >( "GlobalParameters.ServerSecret" ) != secret )
+      if( m_pConfig->getValue< std::string >( "GlobalParameters", "ServerSecret" ) != secret )
       {
         std::string json_string = "{\"result\":\"invalid_secret\"}";
         *response << buildHttpResponse( 403, json_string, JSON );
@@ -604,26 +593,22 @@ void getCharacterList( shared_ptr< HttpServer::Response > response, shared_ptr< 
       else
       {
         auto charList = g_sapphireAPI.getCharList( result );
-        using boost::property_tree::ptree;
-        ptree pt;
-        ptree char_tree;
+
+        auto json = nlohmann::json();
 
         for( auto entry : charList )
         {
-          ptree tree_entry;
-          tree_entry.put( "name", std::string( entry.getName() ) );
-          tree_entry.put( "charId", std::to_string( entry.getId() ) );
-          tree_entry.put( "contentId", std::to_string( entry.getContentId() ) );
-          tree_entry.put( "infoJson", std::string( entry.getInfoJson() ) );
-          char_tree.push_back( std::make_pair( "", tree_entry ) );
+          json["charArray"].push_back( {
+            { "name", std::string( entry.getName() ) },
+            { "charId", std::to_string( entry.getId() ) },
+            { "contentId", std::to_string( entry.getContentId() ) },
+            { "infoJson", std::string( entry.getInfoJson() ) }
+          } );
         }
-
-        pt.add_child( "charArray", char_tree );
-        pt.put( "result", "success" );
-        std::ostringstream oss;
-        write_json( oss, pt );
-        std::string responseStr = oss.str();
-        *response << buildHttpResponse( 200, responseStr, JSON );
+        
+        json["result"] = "success";
+        
+        *response << buildHttpResponse( 200, json.dump(), JSON );
       }
     }
     else
@@ -644,13 +629,13 @@ void get_init( shared_ptr< HttpServer::Response > response, shared_ptr< HttpServ
   print_request_info( request );
   try
   {
-    auto web_root_path = boost::filesystem::canonical( "web" );
-    auto path = boost::filesystem::canonical( web_root_path / "news.xml" );
+    auto web_root_path = fs::canonical( "web" );
+    auto path = fs::canonical( web_root_path / "news.xml" );
     //Check if path is within web_root_path
     if( distance( web_root_path.begin(), web_root_path.end() ) > distance( path.begin(), path.end() ) ||
         !std::equal( web_root_path.begin(), web_root_path.end(), path.begin() ) )
       throw invalid_argument( "path must be within root path" );
-    if( !( boost::filesystem::exists( path ) && boost::filesystem::is_regular_file( path ) ) )
+    if( !( fs::exists( path ) && fs::is_regular_file( path ) ) )
       throw invalid_argument( "file does not exist" );
 
     auto ifs = make_shared< ifstream >();
@@ -679,13 +664,13 @@ void get_headline_all( shared_ptr< HttpServer::Response > response, shared_ptr< 
   print_request_info( request );
   try
   {
-    auto web_root_path = boost::filesystem::canonical( "web" );
-    auto path = boost::filesystem::canonical( web_root_path / "headlines.xml" );
+    auto web_root_path = fs::canonical( "web" );
+    auto path = fs::canonical( web_root_path / "headlines.xml" );
     //Check if path is within web_root_path
     if( distance( web_root_path.begin(), web_root_path.end() ) > distance( path.begin(), path.end() ) ||
         !std::equal( web_root_path.begin(), web_root_path.end(), path.begin() ) )
       throw invalid_argument( "path must be within root path" );
-    if( !( boost::filesystem::exists( path ) && boost::filesystem::is_regular_file( path ) ) )
+    if( !( fs::exists( path ) && fs::is_regular_file( path ) ) )
       throw invalid_argument( "file does not exist" );
 
     auto ifs = make_shared< ifstream >();
@@ -713,15 +698,15 @@ void defaultGet( shared_ptr< HttpServer::Response > response, shared_ptr< HttpSe
   print_request_info( request );
   try
   {
-    auto web_root_path = boost::filesystem::canonical( "web" );
-    auto path = boost::filesystem::canonical( web_root_path / request->path );
+    auto web_root_path = fs::canonical( "web" );
+    auto path = fs::canonical( web_root_path / request->path );
     //Check if path is within web_root_path
     if( distance( web_root_path.begin(), web_root_path.end() ) > distance( path.begin(), path.end() ) ||
         !std::equal( web_root_path.begin(), web_root_path.end(), path.begin() ) )
       throw invalid_argument( "path must be within root path" );
-    if( boost::filesystem::is_directory( path ) )
+    if( fs::is_directory( path ) )
       path /= "index.html";
-    if( !( boost::filesystem::exists( path ) && boost::filesystem::is_regular_file( path ) ) )
+    if( !( fs::exists( path ) && fs::is_regular_file( path ) ) )
       throw invalid_argument( "file does not exist" );
 
     auto ifs = make_shared< ifstream >();
@@ -747,7 +732,7 @@ void defaultGet( shared_ptr< HttpServer::Response > response, shared_ptr< HttpSe
 
 int main( int argc, char* argv[] )
 {
-  auto pLog = boost::shared_ptr< Core::Logger >( new Core::Logger() );
+  auto pLog = std::shared_ptr< Core::Logger >( new Core::Logger() );
   g_fw.set< Core::Logger >( pLog );
   g_log.setLogPath( "log/SapphireAPI" );
   g_log.init();
@@ -783,8 +768,8 @@ int main( int argc, char* argv[] )
                           server.start();
                         } );
 
-  g_log.info( "API server running on " + m_pConfig->getValue< std::string >( "RestNetwork.ListenIp", "0.0.0.0" ) + ":" +
-              m_pConfig->getValue< std::string >( "RestNetwork.ListenPort", "80" ) );
+  g_log.info( "API server running on " + m_pConfig->getValue< std::string >( "RestNetwork", "ListenIp", "0.0.0.0" ) + ":" +
+              m_pConfig->getValue< std::string >( "RestNetwork", "ListenPort", "80" ) );
 
   //Wait for server to start so that the client can connect
   this_thread::sleep_for( chrono::seconds( 1 ) );
@@ -804,7 +789,7 @@ void default_resource_send( const HttpServer& server, const shared_ptr< HttpServ
     response->write( &buffer[ 0 ], read_length );
     if( read_length == static_cast< streamsize >( buffer.size() ) )
     {
-      server.send( response, [ &server, response, ifs ]( const boost::system::error_code& ec )
+      server.send( response, [ &server, response, ifs ]( const std::error_code& ec )
       {
         if( !ec )
           default_resource_send( server, response, ifs );

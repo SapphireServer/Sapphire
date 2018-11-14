@@ -1,5 +1,3 @@
-#include <boost/format.hpp>
-
 #include <Common.h>
 #include <Network/CommonNetwork.h>
 #include <Network/GamePacketNew.h>
@@ -65,10 +63,10 @@ void Core::Network::GameConnection::setSearchInfoHandler( const Packets::FFXIVAR
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcSetSearchInfo >( inPacket );
 
-  const auto& inval = packet.data().status1;
-  const auto& inval1 = packet.data().status2;
-  const auto& status = packet.data().status;
-  const auto& selectRegion = packet.data().language;
+  const auto inval = packet.data().status1;
+  const auto inval1 = packet.data().status2;
+  const auto status = packet.data().status;
+  const auto selectRegion = packet.data().language;
 
   player.setSearchInfo( selectRegion, 0, packet.data().searchComment );
 
@@ -120,6 +118,9 @@ void Core::Network::GameConnection::reqExamineSearchCommentHandler( const Core::
 
     if( pPlayer )
     {
+      if( pPlayer->isActingAsGm() || pPlayer->getZoneId() != player.getZoneId() )
+        return;
+
       // retail sends the requester's id as both (isForSelf)
       auto searchInfoPacket = makeZonePacket< FFXIVIpcExamineSearchComment >( player.getId() );
       searchInfoPacket->data().charId = targetId;
@@ -144,6 +145,9 @@ void Core::Network::GameConnection::reqExamineFcInfo( const Core::Network::Packe
 
     if( pPlayer )
     {
+      if( pPlayer->isActingAsGm() || pPlayer->getZoneId() != player.getZoneId() )
+        return;
+
       // retail sends the requester's id as both (isForSelf)
       auto examineFcInfoPacket = makeZonePacket< FFXIVIpcExamineFreeCompanyInfo >( player.getId() );
       examineFcInfoPacket->data().charId = targetId;
@@ -291,7 +295,7 @@ void Core::Network::GameConnection::updatePositionHandler( const Core::Network::
   player.m_lastMoveTime = currentTime;
   player.m_lastMoveflag = moveState;
 
-  auto movePacket = boost::make_shared< MoveActorPacket >( player, unk1, unk2, moveState, unk4 );
+  auto movePacket = std::make_shared< MoveActorPacket >( player, unk1, unk2, moveState, unk4 );
   player.sendToInRangeSet( movePacket );
 
 }
@@ -311,7 +315,7 @@ void Core::Network::GameConnection::zoneLineHandler( const Core::Network::Packet
   auto pTeriMgr = g_fw.get< TerritoryMgr >();
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcZoneLineHandler >( inPacket );
-  const auto& zoneLineId = packet.data().zoneLineId;
+  const auto zoneLineId = packet.data().zoneLineId;
 
   player.sendDebug( "Walking ZoneLine " + std::to_string( zoneLineId ) );
 
@@ -355,7 +359,7 @@ void Core::Network::GameConnection::discoveryHandler( const Core::Network::Packe
                                                       Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcDiscoveryHandler >( inPacket );
-  const auto& positionRef = packet.data().positionRef;
+  const auto positionRef = packet.data().positionRef;
 
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
 
@@ -365,7 +369,7 @@ void Core::Network::GameConnection::discoveryHandler( const Core::Network::Packe
 
   if( !pQR->next() )
   {
-    player.sendNotice( "Discovery ref pos ID: " + std::to_string( positionRef ) + " not found. " );
+    player.sendDebug( "Discovery ref pos ID: " + std::to_string( positionRef ) + " not found. " );
     return;
   }
 
@@ -374,7 +378,7 @@ void Core::Network::GameConnection::discoveryHandler( const Core::Network::Packe
   discoveryPacket->data().map_part_id = pQR->getUInt( 3 );
 
   player.queuePacket( discoveryPacket );
-  player.sendNotice( "Discovery ref pos ID: " + std::to_string( positionRef ) );
+  player.sendDebug( "Discovery ref pos ID: " + std::to_string( positionRef ) );
 
   player.discover( pQR->getUInt16( 2 ), pQR->getUInt16( 3 ) );
 
@@ -420,7 +424,7 @@ void Core::Network::GameConnection::pingHandler( const Core::Network::Packets::F
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcPingHandler >( inPacket );
 
-  queueOutPacket( boost::make_shared< Server::PingPacket >( player, packet.data().timestamp ) );
+  queueOutPacket( std::make_shared< Server::PingPacket >( player, packet.data().timestamp ) );
 
   player.setLastPing( static_cast< uint32_t >( time( nullptr ) ) );
 }
@@ -523,7 +527,7 @@ void Core::Network::GameConnection::chatHandler( const Core::Network::Packets::F
   auto chatType = packet.data().chatType;
 
   //ToDo, need to implement sending GM chat types.
-  auto chatPacket = boost::make_shared< Server::ChatPacket >( player, chatType, packet.data().message );
+  auto chatPacket = std::make_shared< Server::ChatPacket >( player, chatType, packet.data().message );
 
   switch( chatType )
   {

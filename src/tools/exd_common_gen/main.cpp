@@ -8,16 +8,17 @@
 #include <iostream>
 #include <cctype>
 #include <set>
-#include <Exd/ExdData.h>
+#include <Exd/ExdDataGenerated.h>
 #include <Logging/Logger.h>
-#include <boost/range/algorithm/remove_if.hpp>
-#include <boost/algorithm/string/classification.hpp>
+#include <algorithm>
+#include <Util/Util.h>
+
 
 #include <fstream>
 
 
 Core::Logger g_log;
-Core::Data::ExdData g_exdData;
+Core::Data::ExdDataGenerated g_exdData;
 
 
 //const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
@@ -44,27 +45,34 @@ std::string generateEnum( const std::string& exd, int8_t nameIndex, const std::s
   {
     auto& fields = row.second;
     uint32_t id = row.first;
-    auto test = boost::get< std::string >( &fields.at( nameIndex ) );
-    if( !test )
-      continue;
-    auto str = *test;
-    str.erase( boost::remove_if( str, boost::is_any_of( ",_-':!(){} \x02\x1f\x01\x03" ) ), str.end() );
-    if( str.empty() )
-      continue;
-    str[ 0 ] = std::toupper( str[ 0 ] );
 
-    auto it = nameMap.find( str );
+    std::string value;
+    try
+    {
+      value = std::get< std::string >( fields.at( nameIndex ) );
+    }
+    catch( std::bad_variant_access& )
+    {
+      continue;
+    }
+
+    std::string remove = ",_-':!(){} \x02\x1f\x01\x03";
+    Core::Util::eraseAllIn( value, remove );
+
+    value[ 0 ] = std::toupper( value[ 0 ] );
+
+    auto it = nameMap.find( value );
     if( it != nameMap.end() )
     {
-      nameMap[ str ]++;
-      str = str + std::to_string( nameMap[ str ] );
+      nameMap[ value ]++;
+      value = value + std::to_string( nameMap[ value ] );
     }
     else
     {
-      nameMap[ str ] = 0;
+      nameMap[ value ] = 0;
     }
 
-    result += "      " + str + " = " + std::to_string( id ) + ",\n";
+    result += "      " + value + " = " + std::to_string( id ) + ",\n";
 
   }
 

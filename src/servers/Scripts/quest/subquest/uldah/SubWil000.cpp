@@ -2,6 +2,8 @@
 #include <Event/EventHelper.h>
 #include <ScriptObject.h>
 
+using namespace Core;
+
 // Quest Script: SubWil000_00149
 // Quest Name: Due Diligence
 // Quest ID: 65685

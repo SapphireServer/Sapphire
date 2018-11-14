@@ -1,33 +1,31 @@
 #ifndef _ACTIONMOUNT_H_
 #define _ACTIONMOUNT_H_
 
-#include "Forwards.h"
+#include "ForwardsZone.h"
 #include "Action.h"
 
-namespace Core {
-namespace Action {
-
-class ActionMount :
-  public Action
+namespace Core::Action
 {
-private:
 
-public:
-  ActionMount();
+  class ActionMount : public Action
+  {
+  private:
 
-  ~ActionMount();
+  public:
+    ActionMount();
 
-  ActionMount( Entity::CharaPtr pActor, uint16_t mountId );
+    ~ActionMount();
 
-  void onStart() override;
+    ActionMount( Entity::CharaPtr pActor, uint16_t mountId );
 
-  void onFinish() override;
+    void onStart() override;
 
-  void onInterrupt() override;
+    void onFinish() override;
 
-};
+    void onInterrupt() override;
 
-}
+  };
+
 }
 
 #endif

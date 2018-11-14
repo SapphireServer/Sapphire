@@ -1,6 +1,7 @@
 #include <Common.h>
 #include <Logging/Logger.h>
 #include <Network/CommonActorControl.h>
+#include <algorithm>
 
 #include "Zone/Zone.h"
 
@@ -14,9 +15,6 @@
 
 #include "Player.h"
 #include "Framework.h"
-
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/clamp.hpp>
 
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 
@@ -114,7 +112,7 @@ void Core::Entity::Player::sendItemLevel()
   queuePacket( makeActorControl142( getId(), SetItemLevel, getItemLevel(), 0 ) );
 }
 
-void Core::Entity::Player::equipWeapon( ItemPtr pItem )
+void Core::Entity::Player::equipWeapon( ItemPtr pItem, bool updateClass )
 {
   auto exdData = g_fw.get< Core::Data::ExdDataGenerated >();
   if( !exdData )
@@ -122,16 +120,31 @@ void Core::Entity::Player::equipWeapon( ItemPtr pItem )
 
   auto itemInfo = exdData->get< Core::Data::Item >( pItem->getId() );
   auto itemClassJob = itemInfo->classJobUse;
-
-  auto currentClass = getClass();
+  auto classJobInfo = exdData->get< Core::Data::ClassJob >( static_cast< uint32_t >( getClass() ) );
+  auto currentParentClass = static_cast< ClassJob >( classJobInfo->classJobParent );
   auto newClassJob = static_cast< ClassJob >( itemClassJob );
 
-  if( isClassJobUnlocked( newClassJob ) )
+  if( ( isClassJobUnlocked( newClassJob ) ) && ( currentParentClass != newClassJob ) )
+  {
+    if ( updateClass )
+      setClassJob( newClassJob );
+    else
+      return;
+  }
+}
+
+void Core::Entity::Player::equipSoulCrystal( ItemPtr pItem, bool updateJob )
+{
+  auto exdData = g_fw.get< Core::Data::ExdDataGenerated >();
+  if ( !exdData )
     return;
 
-  // todo: check if soul crystal is equipped and use job instead
+  auto itemInfo = exdData->get< Core::Data::Item >( pItem->getId() );
+  auto itemClassJob = itemInfo->classJobUse;
+  auto newClassJob = static_cast< ClassJob >( itemClassJob );
 
-  setClassJob( newClassJob );
+  if ( isClassJobUnlocked( newClassJob ) && updateJob )
+    setClassJob( newClassJob );
 }
 
 // equip an item
@@ -139,18 +152,18 @@ void Core::Entity::Player::equipItem( Common::GearSetSlot equipSlotId, ItemPtr p
 {
 
   //g_framework.getLogger().debug( "Equipping into slot " + std::to_string( equipSlotId ) );
-
-  updateModels( equipSlotId, pItem );
-
   if( sendUpdate )
   {
+    updateModels( equipSlotId, pItem, true );
     this->sendModel();
     m_itemLevel = calculateEquippedGearItemLevel();
     sendItemLevel();
   }
+  else
+    updateModels( equipSlotId, pItem, false );
 }
 
-void Core::Entity::Player::updateModels( GearSetSlot equipSlotId, const Core::ItemPtr& pItem )
+void Core::Entity::Player::updateModels( GearSetSlot equipSlotId, const Core::ItemPtr& pItem, bool updateClass )
 {
   uint64_t model = pItem->getModelId1();
   uint64_t model2 = pItem->getModelId2();
@@ -160,8 +173,7 @@ void Core::Entity::Player::updateModels( GearSetSlot equipSlotId, const Core::It
     case MainHand:
       m_modelMainWeapon = model;
       m_modelSubWeapon = model2;
-      // TODO: add job change upon changing weapon if needed
-      // equipWeapon( pItem );
+      equipWeapon( pItem, updateClass );
       break;
 
     case OffHand:
@@ -169,8 +181,7 @@ void Core::Entity::Player::updateModels( GearSetSlot equipSlotId, const Core::It
       break;
 
     case SoulCrystal:
-      // TODO: add Job change on equipping crystal
-      // change job
+      equipSoulCrystal( pItem, updateClass );
       break;
 
     case Waist:
@@ -228,6 +239,20 @@ void Core::Entity::Player::unequipItem( Common::GearSetSlot equipSlotId, ItemPtr
 
   m_itemLevel = calculateEquippedGearItemLevel();
   sendItemLevel();
+
+  if ( equipSlotId == SoulCrystal )
+    unequipSoulCrystal( pItem );
+}
+
+void Core::Entity::Player::unequipSoulCrystal( ItemPtr pItem )
+{
+  auto exdData = g_fw.get< Core::Data::ExdDataGenerated >();
+  if ( !exdData )
+    return;
+
+  auto currentClassJob = exdData->get< Core::Data::ClassJob >( static_cast< uint32_t >( getClass() ) );
+  auto parentClass = static_cast< ClassJob >( currentClassJob->classJobParent );
+  setClassJob( parentClass );
 }
 
 // TODO: these next functions are so similar that they could likely be simplified
@@ -249,7 +274,7 @@ void Core::Entity::Player::addCurrency( CurrencyType type, uint32_t amount )
 
   updateContainer( Currency, slot, currItem );
 
-  auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
+  auto invUpdate = std::make_shared< UpdateInventorySlotPacket >( getId(),
                                                                     static_cast< uint8_t >( type ) - 1,
                                                                     Common::InventoryType::Currency,
                                                                     *currItem );
@@ -271,7 +296,7 @@ void Core::Entity::Player::removeCurrency( Common::CurrencyType type, uint32_t a
     currItem->setStackSize( currentAmount - amount );
   writeItem( currItem );
 
-  auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
+  auto invUpdate = std::make_shared< UpdateInventorySlotPacket >( getId(),
                                                                     static_cast< uint8_t >( type ) - 1,
                                                                     Common::InventoryType::Currency,
                                                                     *currItem );
@@ -299,7 +324,7 @@ void Core::Entity::Player::addCrystal( Common::CrystalType type, uint32_t amount
   writeInventory( Crystal );
 
 
-  auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
+  auto invUpdate = std::make_shared< UpdateInventorySlotPacket >( getId(),
                                                                     static_cast< uint8_t >( type ) - 1,
                                                                     Common::InventoryType::Crystal,
                                                                     *currItem );
@@ -322,7 +347,7 @@ void Core::Entity::Player::removeCrystal( Common::CrystalType type, uint32_t amo
 
   writeItem( currItem );
 
-  auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(),
+  auto invUpdate = std::make_shared< UpdateInventorySlotPacket >( getId(),
                                                                     static_cast< uint8_t >( type ) - 1,
                                                                     Common::InventoryType::Crystal,
                                                                     *currItem );
@@ -568,7 +593,7 @@ Core::ItemPtr Core::Entity::Player::addItem( uint32_t catalogId, uint32_t quanti
         item->setStackSize( newStackSize );
         writeItem( item );
 
-        auto slotUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(), slot, bag, *item );
+        auto slotUpdate = std::make_shared< UpdateInventorySlotPacket >( getId(), slot, bag, *item );
         queuePacket( slotUpdate );
 
         // return existing stack if we have no overflow - items fit into a preexisting stack
@@ -602,7 +627,7 @@ Core::ItemPtr Core::Entity::Player::addItem( uint32_t catalogId, uint32_t quanti
 
   if( !silent )
   {
-    auto invUpdate = boost::make_shared< UpdateInventorySlotPacket >( getId(), freeBagSlot.second, freeBagSlot.first,
+    auto invUpdate = std::make_shared< UpdateInventorySlotPacket >( getId(), freeBagSlot.second, freeBagSlot.first,
                                                                       *item );
     queuePacket( invUpdate );
 
@@ -823,7 +848,7 @@ uint16_t Core::Entity::Player::calculateEquippedGearItemLevel()
     it++;
   }
 
-  return boost::algorithm::clamp( iLvlResult / 13, 0, 9999 );
+  return std::min( static_cast< int32_t >( iLvlResult / 13 ), 9999 );
 }
 
 

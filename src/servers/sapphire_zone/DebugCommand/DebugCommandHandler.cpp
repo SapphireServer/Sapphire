@@ -1,16 +1,15 @@
-#include <boost/lexical_cast.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/format.hpp>
 #include <cinttypes>
 
 #include <Common.h>
 #include <Version.h>
 #include <Network/GamePacketNew.h>
+#include <Util/Util.h>
 #include <Util/UtilMath.h>
 #include <Network/PacketContainer.h>
 #include <Logging/Logger.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Database/DatabaseDef.h>
+#include <cmath>
 
 #include "DebugCommand.h"
 #include "DebugCommandHandler.h"
@@ -39,9 +38,9 @@
 
 extern Core::Framework g_fw;
 
-using namespace Network;
-using namespace Network::Packets;
-using namespace Network::Packets::Server;
+using namespace Core::Network;
+using namespace Core::Network::Packets;
+using namespace Core::Network::Packets::Server;
 
 // instanciate and initialize commands
 Core::DebugCommandHandler::DebugCommandHandler()
@@ -71,7 +70,7 @@ Core::DebugCommandHandler::~DebugCommandHandler()
 void Core::DebugCommandHandler::registerCommand( const std::string& n, DebugCommand::pFunc functionPtr,
                                                  const std::string& hText, uint8_t uLevel )
 {
-  m_commandMap[ std::string( n ) ] = boost::make_shared< DebugCommand >( n, functionPtr, hText, uLevel );
+  m_commandMap[ std::string( n ) ] = std::make_shared< DebugCommand >( n, functionPtr, hText, uLevel );
 }
 
 // try to retrieve the command in question, execute if found
@@ -79,7 +78,7 @@ void Core::DebugCommandHandler::execCommand( char* data, Entity::Player& player 
 {
 
   // define callback pointer
-  void ( DebugCommandHandler::*pf )( char*, Entity::Player&, boost::shared_ptr< DebugCommand > );
+  void ( DebugCommandHandler::*pf )( char*, Entity::Player&, std::shared_ptr< DebugCommand > );
 
   std::string commandString;
 
@@ -122,7 +121,7 @@ void Core::DebugCommandHandler::execCommand( char* data, Entity::Player& player 
 // Definition of the commands
 ///////////////////////////////////////////////////////////////////////////////////////
 
-void Core::DebugCommandHandler::help( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
+void Core::DebugCommandHandler::help( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   player.sendDebug( "Registered debug commands:" );
   for( auto cmd : m_commandMap )
@@ -134,7 +133,7 @@ void Core::DebugCommandHandler::help( char* data, Entity::Player& player, boost:
   }
 }
 
-void Core::DebugCommandHandler::set( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
+void Core::DebugCommandHandler::set( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto pLog = g_fw.get< Logger >();
   auto pTerriMgr = g_fw.get< TerritoryMgr >();
@@ -232,7 +231,7 @@ void Core::DebugCommandHandler::set( char* data, Entity::Player& player, boost::
   else if( subCommand == "discovery_reset" )
   {
     player.resetDiscovery();
-    player.queuePacket( boost::make_shared< InitUIPacket >( player ) );
+    player.queuePacket( std::make_shared< InitUIPacket >( player ) );
   }
   else if( subCommand == "classjob" )
   {
@@ -373,7 +372,7 @@ void Core::DebugCommandHandler::set( char* data, Entity::Player& player, boost::
 
 }
 
-void Core::DebugCommandHandler::add( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
+void Core::DebugCommandHandler::add( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto pLog = g_fw.get< Logger >();
   std::string subCommand;
@@ -428,7 +427,7 @@ void Core::DebugCommandHandler::add( char* data, Entity::Player& player, boost::
     if( !bNpcTemplate )
       player.sendNotice( "Template " + params + " not found in cache!" );
 
-    auto pBNpc = boost::make_shared< Entity::BNpc >( bNpcTemplate,
+    auto pBNpc = std::make_shared< Entity::BNpc >( bNpcTemplate,
                                                      player.getPos().x,
                                                      player.getPos().y,
                                                      player.getPos().z, 1 );
@@ -507,7 +506,7 @@ void Core::DebugCommandHandler::add( char* data, Entity::Player& player, boost::
 
 }
 
-void Core::DebugCommandHandler::get( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
+void Core::DebugCommandHandler::get( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto pLog = g_fw.get< Logger >();
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
@@ -554,7 +553,7 @@ void Core::DebugCommandHandler::get( char* data, Entity::Player& player, boost::
 }
 
 void
-Core::DebugCommandHandler::injectPacket( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
+Core::DebugCommandHandler::injectPacket( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto pServerZone = g_fw.get< ServerZone >();
   auto pSession = pServerZone->getSession( player.getId() );
@@ -563,7 +562,7 @@ Core::DebugCommandHandler::injectPacket( char* data, Entity::Player& player, boo
 }
 
 void Core::DebugCommandHandler::injectChatPacket( char* data, Entity::Player& player,
-                                                  boost::shared_ptr< DebugCommand > command )
+                                                  std::shared_ptr< DebugCommand > command )
 {
   auto pServerZone = g_fw.get< ServerZone >();
   auto pSession = pServerZone->getSession( player.getId() );
@@ -571,7 +570,7 @@ void Core::DebugCommandHandler::injectChatPacket( char* data, Entity::Player& pl
     pSession->getChatConnection()->injectPacket( data + 8, player );
 }
 
-void Core::DebugCommandHandler::replay( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
+void Core::DebugCommandHandler::replay( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto pLog = g_fw.get< Logger >();
   auto pServerZone = g_fw.get< ServerZone >();
@@ -623,7 +622,7 @@ void Core::DebugCommandHandler::replay( char* data, Entity::Player& player, boos
 
 }
 
-void Core::DebugCommandHandler::nudge( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
+void Core::DebugCommandHandler::nudge( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   std::string subCommand;
 
@@ -670,7 +669,7 @@ void Core::DebugCommandHandler::nudge( char* data, Entity::Player& player, boost
 }
 
 void
-Core::DebugCommandHandler::serverInfo( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
+Core::DebugCommandHandler::serverInfo( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto pServerZone = g_fw.get< ServerZone >();
   player.sendDebug( "SapphireZone " + Version::VERSION + "\nRev: " + Version::GIT_HASH );
@@ -678,7 +677,7 @@ Core::DebugCommandHandler::serverInfo( char* data, Entity::Player& player, boost
   player.sendDebug( "Sessions: " + std::to_string( pServerZone->getSessionCount() ) );
 }
 
-void Core::DebugCommandHandler::script( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
+void Core::DebugCommandHandler::script( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto pLog = g_fw.get< Logger >();
   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
@@ -729,8 +728,7 @@ void Core::DebugCommandHandler::script( char* data, Entity::Player& player, boos
         for( auto it = scripts.begin(); it != scripts.end(); ++it )
         {
           auto script = *it;
-          player.sendDebug( " - '" + script->library_name + "' loaded at @ 0x" +
-                            boost::str( boost::format( "%|X|" ) % script->handle ) +
+          player.sendDebug( " - '" + script->library_name + 
                             ", num scripts: " + std::to_string( script->scripts.size() ) );
         }
       }
@@ -768,7 +766,7 @@ void Core::DebugCommandHandler::script( char* data, Entity::Player& player, boos
 }
 
 void
-Core::DebugCommandHandler::instance( char* data, Entity::Player& player, boost::shared_ptr< DebugCommand > command )
+Core::DebugCommandHandler::instance( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto pTeriMgr = g_fw.get< TerritoryMgr >();
   std::string cmd( data ), params, subCommand;
@@ -875,7 +873,7 @@ Core::DebugCommandHandler::instance( char* data, Entity::Player& player, boost::
     sscanf( params.c_str(), "%d %d", &index, &value );
 
 
-    auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
     if( !instance )
       return;
 
@@ -888,7 +886,7 @@ Core::DebugCommandHandler::instance( char* data, Entity::Player& player, boost::
 
     sscanf( params.c_str(), "%s %hhu", objName, &state );
 
-    auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
     if( !instance )
       return;
 
@@ -906,7 +904,7 @@ Core::DebugCommandHandler::instance( char* data, Entity::Player& player, boost::
 
     sscanf( params.c_str(), "%s %i %i", objName, &state1, &state2 );
 
-    auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
     if( !instance )
       return;
 
@@ -925,7 +923,7 @@ Core::DebugCommandHandler::instance( char* data, Entity::Player& player, boost::
 
     sscanf( params.c_str(), "%hhu", &seq );
 
-    auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
     if( !instance )
       return;
 
@@ -937,7 +935,7 @@ Core::DebugCommandHandler::instance( char* data, Entity::Player& player, boost::
 
     sscanf( params.c_str(), "%hhu", &branch );
 
-    auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
     if( !instance )
       return;
 
@@ -945,7 +943,7 @@ Core::DebugCommandHandler::instance( char* data, Entity::Player& player, boost::
   }
   else if( subCommand == "qte_start" )
   {
-    auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
     if( !instance )
       return;
 
@@ -954,7 +952,7 @@ Core::DebugCommandHandler::instance( char* data, Entity::Player& player, boost::
   }
   else if( subCommand == "event_start" )
   {
-    auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
     if( !instance )
       return;
 
@@ -963,7 +961,7 @@ Core::DebugCommandHandler::instance( char* data, Entity::Player& player, boost::
   }
   else if( subCommand == "event_end" )
   {
-    auto instance = boost::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
     if( !instance )
       return;
 
