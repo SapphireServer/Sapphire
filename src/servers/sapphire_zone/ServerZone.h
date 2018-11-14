@@ -29,6 +29,9 @@ public:
 
   size_t getSessionCount() const;
 
+  uint16_t getWorldId() const;
+  void setWorldId( uint16_t worldId );
+
   void mainLoop();
 
   bool isRunning() const;
@@ -47,8 +50,8 @@ private:
   uint16_t m_port;
   std::string m_ip;
   int64_t m_lastDBPingTime;
-
   bool m_bRunning;
+  uint16_t m_worldId;
 
   std::string m_configName;
 
@@ -56,9 +59,7 @@ private:
 
   std::map< uint32_t, SessionPtr > m_sessionMapById;
   std::map< std::string, SessionPtr > m_sessionMapByName;
-
   std::map< uint32_t, uint32_t > m_zones;
-
   std::map< std::string, Entity::BNpcTemplatePtr > m_bNpcTemplateMap;
 
 };
