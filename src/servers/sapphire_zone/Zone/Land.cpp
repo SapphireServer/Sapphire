@@ -38,7 +38,6 @@ Core::Land::Land( uint16_t zoneId, uint8_t wardNum, uint8_t landId, uint32_t lan
   m_landInfo( info ),
   m_type( Common::LandType::Private )
 {
-  memset( &m_land, 0x00, sizeof( LandStruct ) );
   memset( &m_tag, 0x00, 3 );
   memset( &m_landMsg, 0x00, 193 );
   memset( &m_landName, 0x00, 23 );
@@ -66,52 +65,19 @@ void Core::Land::load()
 
     m_currentPrice = m_landInfo->prices[ m_landId ];
     m_minPrice = m_landInfo->minPrices[ m_landId ];
-    m_land.plotSize = m_landInfo->sizes[ m_landId ];
-    m_land.houseState = HouseState::forSale;
+    m_size = m_landInfo->sizes[ m_landId ];
+    m_state = HouseState::forSale;
   }
   else
   {
     m_type = static_cast< Common::LandType >( res->getUInt( "Type" ) );
-    m_land.plotSize = res->getUInt( "Size" );
-    m_land.houseState = res->getUInt( "Status" );
+    m_size = res->getUInt( "Size" );
+    m_state = res->getUInt( "Status" );
     m_currentPrice = res->getUInt( "LandPrice" );
     m_ownerPlayerId = res->getUInt( "OwnerId" );
     m_minPrice = m_landInfo->minPrices[ m_landId ];
   }
   init();
-//  setPreset( 262145 );
-/*  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  auto res = pDb->query( "SELECT * FROM land WHERE Id = " + std::to_string( m_landKey ) );
-  if( !res->next() )
-  {
-    setHouseSize( HouseSizeType::smallHouse );//ToDo: get house site from ExD (Landset first 60 rows)
-    m_currentPrice = m_initPrice;
-    m_land.color[ 7 ] = 0xFF;
-    m_ownerPlayerId = 0;
-    m_nextDrop = 0;
-    setState( HouseStateType::forSell );
-    auto stmt = pDb->getPreparedStatement( Db::ZoneDbStatements::LAND_INS );
-    stmt->setUInt( 1, m_landKey );
-    pDb->directExecute( stmt );
-    Init();
-  }
-  else
-  {
-    Init();
-    if( getState() == HouseStateType::privateHouse || getState() == HouseStateType::sold )
-    {
-      m_ownerPlayerId = res->getUInt( "ownerPlayerId" );
-    }
-    else if( getState() == HouseStateType::forSell )
-    {
-      m_currentPrice = res->getUInt( "currentPrice" );
-      m_nextDrop = res->getUInt( "nextDrop" );
-      m_ownerPlayerId = 0;
-    }
-  }
-  ItemsOutdoorContainer = make_ItemContainer( InventoryType::HousingOutdoorItems,
-                                              m_maxItems,
-                                              "housingoutdooritems", true );*/
 }
 
 uint16_t Core::Land::convertItemIdToHousingItemId( uint16_t itemId )
@@ -126,37 +92,25 @@ uint32_t Core::Land::getCurrentPrice() const
   return m_currentPrice;
 }
 
-void Core::Land::setPreset( uint32_t id )
-{
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-  auto info = pExdData->get< Core::Data::HousingPreset >( convertItemIdToHousingItemId( id ) );
-  setHousePart( Common::HousePartSlot::ExteriorRoof, info->exteriorRoof );
-  setHousePart( Common::HousePartSlot::ExteriorWall, info->exteriorWall );
-  setHousePart( Common::HousePartSlot::ExteriorWindow, info->exteriorWindow );
-  setHousePart( Common::HousePartSlot::BasementWall, info->basementWall );
-  setHousePart( Common::HousePartSlot::OtherFloorFlooring, info->otherFloorFlooring );
-  setHousePart( Common::HousePartSlot::OtherFloorWall, info->otherFloorWall );
-}
-
 //Primary State
 void Core::Land::setHouseSize( uint8_t size )
 {
-  m_land.plotSize = size;
+  m_size = size;
 }
 
 void Core::Land::setState( uint8_t state )
 {
-  m_land.houseState = state;
+  m_state = state;
 }
 
 void Core::Land::setOwnership( uint8_t state )
 {
-  m_land.iconColor = state;
+  m_iconColor = state;
 }
 
 void Core::Land::setSharing( uint8_t state )
 {
-  m_land.iconAddIcon = state;
+  m_iconAddIcon = state;
 }
 
 void Core::Land::setLandName( const std::string& name )
@@ -171,22 +125,22 @@ void Core::Land::setLandType( Common::LandType type )
 
 uint8_t Core::Land::getPlotSize() const
 {
-  return m_land.plotSize;
+  return m_size;
 }
 
 uint8_t Core::Land::getState() const
 {
-  return m_land.houseState;
+  return m_state;
 }
 
 uint8_t Core::Land::getOwnership() const
 {
-  return m_land.iconColor;
+  return m_iconColor;
 }
 
 uint8_t Core::Land::getSharing() const
 {
-  return m_land.iconAddIcon;
+  return m_iconAddIcon;
 }
 
 uint32_t Core::Land::getLandSetId() const
@@ -222,46 +176,24 @@ Core::Common::LandType Core::Land::getLandType() const
 //Free Comapny
 void Core::Land::setFreeCompany( uint32_t id, uint32_t icon, uint32_t color )
 {
-  m_land.fcId = id;
-  m_land.fcIcon = icon;
-  m_land.fcIconColor = color; //RGBA
+  m_fcId = id;
+  m_fcIcon = icon;
+  m_fcIconColor = color; //RGBA
 }
 
 uint32_t Core::Land::getFcId()
 {
-  return m_land.fcIcon;
+  return m_fcIcon;
 }
 
 uint32_t Core::Land::getFcIcon()
 {
-  return m_land.fcIcon;
+  return m_fcIcon;
 }
 
 uint32_t Core::Land::getFcColor()
 {
-  return m_land.fcIconColor;
-}
-
-//House Data
-void Core::Land::setHousePart( Common::HousePartSlot slot, uint16_t id )
-{
-  m_land.housePart[ slot ] = convertItemIdToHousingItemId( id );
-}
-
-uint16_t Core::Land::getHousePart( Common::HousePartSlot slot )
-{
-  return m_land.housePart[ slot ];
-}
-
-//Color
-void Core::Land::setColor( uint8_t slot, uint8_t color )
-{
-  m_land.color[ slot ] = color;
-}
-
-uint8_t Core::Land::getColor( uint8_t slot )
-{
-  return m_land.color[ slot ];
+  return m_fcIconColor;
 }
 
 //Player
@@ -273,11 +205,6 @@ void Core::Land::setPlayerOwner( uint32_t id )
 uint32_t Core::Land::getPlayerOwner()
 {
   return m_ownerPlayerId;
-}
-
-const LandStruct& Core::Land::getLand()
-{
-  return m_land;
 }
 
 uint32_t Core::Land::getMaxItems()
@@ -322,7 +249,7 @@ void Core::Land::init()
 void Core::Land::UpdateLandDb()
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  pDb->directExecute( "UPDATE land SET status = " + std::to_string( m_land.houseState )
+  pDb->directExecute( "UPDATE land SET status = " + std::to_string( m_state )
   + ", LandPrice = " + std::to_string( getCurrentPrice() )
   + ", UpdateTime = " + std::to_string( getDevaluationTime() )
   + ", OwnerId = " + std::to_string( getPlayerOwner() ) 

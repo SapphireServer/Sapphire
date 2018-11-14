@@ -62,7 +62,6 @@ namespace Core
     void UpdateLandDb();
     void Update( uint32_t currTime );
 
-    const Common::LandStruct& getLand();
     uint32_t getMaxItems();
 
     uint32_t getCurrentPrice() const;
@@ -80,7 +79,14 @@ namespace Core
     uint8_t m_landId;
     uint32_t m_landSetId;
     uint16_t m_zoneId;
-    Common::LandStruct m_land;
+    uint8_t m_size;
+    uint8_t m_state;
+    uint8_t m_iconColor;
+    uint8_t m_iconAddIcon;
+    uint32_t m_fcId;
+    uint32_t m_fcIcon;
+    uint32_t m_fcIconColor;
+
     Common::LandType m_type;
     uint32_t m_ownerPlayerId;
     Core::Data::HousingLandSetPtr m_landInfo;

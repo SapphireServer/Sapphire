@@ -127,9 +127,15 @@ void Core::HousingZone::sendLandSet( Entity::Player& player )
 
   uint8_t startIndex = isPlayerSubInstance( player ) == false ? 0 : 30;
 
-  for( uint8_t i = startIndex, count = 0; i < ( startIndex + 30 ); i++ )
+  for( uint8_t i = startIndex, count = 0; i < ( startIndex + 30 ); ++i, ++count )
   {
-    memcpy( &landsetInitializePacket->data().land[ count++ ], &getLand( i )->getLand(), sizeof( Common::LandStruct ) );
+    landsetInitializePacket->data().land[ count ].plotSize =  getLand( i )->getPlotSize();
+    landsetInitializePacket->data().land[ count ].houseState =  getLand( i )->getState();
+    landsetInitializePacket->data().land[ count ].iconColor =  getLand( i )->getOwnership();
+    landsetInitializePacket->data().land[ count ].iconAddIcon =  getLand( i )->getPlotSize();
+    landsetInitializePacket->data().land[ count ].fcId =  getLand( i )->getFcId();
+    landsetInitializePacket->data().land[ count ].fcIcon =  getLand( i )->getFcIcon();
+    landsetInitializePacket->data().land[ count ].fcIconColor =  getLand( i )->getFcColor();
   }
 
   player.queuePacket( landsetInitializePacket );
@@ -140,10 +146,17 @@ void Core::HousingZone::sendLandUpdate( uint8_t landId )
   for( const auto& playerIt : m_playerMap )
   {
     auto pPlayer = playerIt.second;
+    auto pLand = getLand( landId );
 
     auto landUpdatePacket = makeZonePacket< FFXIVIpcLandUpdate >( pPlayer->getId() );
     landUpdatePacket->data().landId = landId;
-    landUpdatePacket->data().land = getLand( landId )->getLand();
+    landUpdatePacket->data().land.plotSize = pLand->getPlotSize();
+    landUpdatePacket->data().land.houseState = pLand->getState();
+    landUpdatePacket->data().land.iconColor = pLand->getOwnership();
+    landUpdatePacket->data().land.iconAddIcon = pLand->getPlotSize();
+    landUpdatePacket->data().land.fcId = pLand->getFcId();
+    landUpdatePacket->data().land.fcIcon = pLand->getFcIcon();
+    landUpdatePacket->data().land.fcIconColor = pLand->getFcColor();
 
     pPlayer->queuePacket( landUpdatePacket );
   }

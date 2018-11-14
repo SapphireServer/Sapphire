@@ -31,7 +31,8 @@ extern Core::Framework g_fw;
 Core::ServerZone::ServerZone( const std::string& configName ) :
   m_configName( configName ),
   m_bRunning( true ),
-  m_lastDBPingTime( 0 )
+  m_lastDBPingTime( 0 ),
+  m_worldId( 67 )
 {
 }
 
@@ -186,6 +187,16 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
     thread_entry.join();
   }
 
+}
+
+uint16_t Core::ServerZone::getWorldId() const
+{
+  return m_worldId;
+}
+
+void Core::ServerZone::setWorldId( uint16_t worldId )
+{
+  m_worldId = worldId;
 }
 
 void Core::ServerZone::printBanner() const
