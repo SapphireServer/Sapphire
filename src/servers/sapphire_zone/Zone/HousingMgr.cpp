@@ -176,15 +176,21 @@ Core::LandPurchaseResult Core::HousingMgr::purchseLand( Entity::Player& player, 
 
       if( pOldLand )
         return LandPurchaseResult::ERR_NO_MORE_LANDS_FOR_CHAR;
+
       player.removeCurrency( CurrencyType::Gil, plotPrice );
       pLand->setPlayerOwner( player.getId() );
       pLand->setState( HouseState::sold );
       pLand->setLandType( Common::LandType::Private );
+
       player.setLandPermissions( LandPermissionSlot::Private, 0x00, plot,
                                  pHousing->getWardNum(), pHousing->getTerritoryTypeId() );
-      player.sendLandPermissions();
+
+      player.sendLandPermissionSlot( static_cast< uint8_t >( LandType::Private ), plot, pHousing->getWardNum(),
+                                     pHousing->getTerritoryTypeId() );
+
       //pLand->setLandName( "Private Estate" + std::to_string( pHousing->getWardNum() ) + "-" + std::to_string( plot )   );
       pLand->updateLandDb();
+
       pHousing->sendLandUpdate( plot );
       return LandPurchaseResult::SUCCESS;
     }

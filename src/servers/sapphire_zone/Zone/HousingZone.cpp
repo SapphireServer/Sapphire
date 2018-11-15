@@ -144,10 +144,10 @@ void Core::HousingZone::sendLandSet( Entity::Player& player )
 
 void Core::HousingZone::sendLandUpdate( uint8_t landId )
 {
+  auto pLand = getLand( landId );
   for( const auto& playerIt : m_playerMap )
   {
     auto pPlayer = playerIt.second;
-    auto pLand = getLand( landId );
 
     auto landUpdatePacket = makeZonePacket< FFXIVIpcLandUpdate >( pPlayer->getId() );
     landUpdatePacket->data().landId = landId;
