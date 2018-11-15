@@ -224,7 +224,7 @@ void Core::Land::init()
   }
 }
 
-void Core::Land::UpdateLandDb()
+void Core::Land::updateLandDb()
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   pDb->directExecute( "UPDATE land SET status = " + std::to_string( m_state )
@@ -237,7 +237,7 @@ void Core::Land::UpdateLandDb()
   + " AND LandId = " + std::to_string( m_landId ) + ";" );
 }
 
-void Core::Land::Update( uint32_t currTime )
+void Core::Land::update( uint32_t currTime )
 {
   if( getState() == HouseState::forSale )
   {
@@ -245,7 +245,7 @@ void Core::Land::Update( uint32_t currTime )
     {
       m_nextDrop = currTime + 21600;
       m_currentPrice = ( m_currentPrice / 100 ) * 99.58;
-      UpdateLandDb();
+      updateLandDb();
     }
   }
 }
