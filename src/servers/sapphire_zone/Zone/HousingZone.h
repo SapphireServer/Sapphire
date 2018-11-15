@@ -42,8 +42,6 @@ namespace Core
     void sendLandUpdate( uint8_t landId );
     bool isPlayerSubInstance( Entity::Player& player );
 
-    LandPurchaseResult purchseLand( Entity::Player& player, uint8_t plot, uint8_t state );
-
     /* returns current ward number for this zone */
     uint8_t getWardNum() const;
 

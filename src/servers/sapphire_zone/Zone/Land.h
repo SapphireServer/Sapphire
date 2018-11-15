@@ -47,8 +47,8 @@ namespace Core
     uint32_t getPlayerOwner();
     //Housing Functions
     void setPreset( uint32_t itemId );
-    void UpdateLandDb();
-    void Update( uint32_t currTime );
+    void updateLandDb();
+    void update( uint32_t currTime );
 
     uint32_t getMaxItems();
     uint32_t getCurrentPrice() const;
