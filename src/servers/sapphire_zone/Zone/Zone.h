@@ -114,8 +114,11 @@ public:
 
   void updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell );
 
-  void queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range,
-                               Network::Packets::FFXIVPacketBasePtr pPacketEntry );
+  void queuePacketForRange( Entity::Player& sourcePlayer, uint32_t range,
+                            Network::Packets::FFXIVPacketBasePtr pPacketEntry );
+
+  void queuePacketForZone( Entity::Player& sourcePlayer, Network::Packets::FFXIVPacketBasePtr pPacketEntry,
+                           bool forSelf = false );
 
   uint32_t getGuId() const;
 
