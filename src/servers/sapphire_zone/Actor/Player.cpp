@@ -1792,3 +1792,16 @@ void Core::Entity::Player::sendLandPermissions()
 
   queuePacket( landPermissions );
 }
+
+void Core::Entity::Player::sendLandPermissionSlot( uint8_t slotId, uint8_t landId, uint8_t wardId, uint16_t zoneId )
+{
+  auto landPermissions = makeZonePacket< FFXIVIpcLandPermissionSlot >( getId() );
+  landPermissions->data().type = slotId;
+
+  landPermissions->data().permissionSet.landId = landId;
+  landPermissions->data().permissionSet.wardNum = wardId;
+  landPermissions->data().permissionSet.zoneId = zoneId;
+  landPermissions->data().permissionSet.worldId = 67;
+  landPermissions->data().permissionSet.permissionMask = 0;
+  queuePacket( landPermissions );
+}

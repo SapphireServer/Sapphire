@@ -766,6 +766,7 @@ namespace Core::Entity
     void setLandPermissions( uint8_t permissionSet, uint32_t permissionMask, int16_t landId, int16_t wardNum, int16_t zoneId );
 
     void sendLandPermissions();
+    void sendLandPermissionSlot( uint8_t slotId, uint8_t landId, uint8_t wardId, uint16_t zoneId );
 
     // Player Battle Handling
     //////////////////////////////////////////////////////////////////////////////////////////////////////

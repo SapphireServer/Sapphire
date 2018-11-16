@@ -312,17 +312,14 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
     }
     case ClientTriggerType::RequestHousingBuildPreset:
     {
-      auto pShowBuildPresetUIPacket = makeActorControl142( player.getId(), ShowBuildPresetUI, param11 );
-
       auto zone = player.getCurrentZone();
-
       auto hZone = std::dynamic_pointer_cast< HousingZone >( zone );
-
       if (!hZone)
         return;
 
       player.setActiveLand( param11, hZone->getWardNum() );
 
+      auto pShowBuildPresetUIPacket = makeActorControl142( player.getId(), ShowBuildPresetUI, param11 );
       player.queuePacket( pShowBuildPresetUIPacket );
 
       break;
@@ -341,6 +338,15 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
       auto plot = static_cast< uint8_t >( param12 & 0xFF );
       auto pHousingMgr = g_fw.get< HousingMgr >();
       pHousingMgr->sendLandSignOwned( player, ward, plot );
+      break;
+    }
+    case ClientTriggerType::RequestLandRelinquish:
+    {
+      auto ward = static_cast< uint8_t >( ( param12 & 0xFF00 ) >> 8 );
+      auto plot = static_cast< uint8_t >( param12 & 0xFF );
+      auto pHousingMgr = g_fw.get< HousingMgr >();
+      pLog->debug( "Request to relinquish plot " + std::to_string( plot ) );
+      // TODO: do stuff!
       break;
     }
     case ClientTriggerType::RequestEstateRename:

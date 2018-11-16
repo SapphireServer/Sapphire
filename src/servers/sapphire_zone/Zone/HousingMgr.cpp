@@ -1,5 +1,4 @@
 #include "HousingMgr.h"
-#include "HousingMgr.h"
 #include <Logging/Logger.h>
 #include <Database/DatabaseDef.h>
 #include <Exd/ExdDataGenerated.h>
@@ -145,3 +144,60 @@ void Core::HousingMgr::sendLandSignFree( Entity::Player& player, uint8_t ward, u
   plotPricePacket->data().timeLeft = land->getDevaluationTime();
   player.queuePacket( plotPricePacket );
 }
+
+Core::LandPurchaseResult Core::HousingMgr::purchseLand( Entity::Player& player, uint8_t plot, uint8_t state )
+{
+  auto pHousing = std::dynamic_pointer_cast< HousingZone >( player.getCurrentZone() );
+
+  auto plotPrice = pHousing->getLand( plot )->getCurrentPrice();
+  auto gilAvailable = player.getCurrency( CurrencyType::Gil );
+  auto pLand = pHousing->getLand( plot );
+
+  if( !pLand )
+    return LandPurchaseResult::ERR_INTERNAL;
+
+  if( pLand->getState() != HouseState::forSale )
+    return LandPurchaseResult::ERR_NOT_AVAILABLE;
+  
+  if( gilAvailable < plotPrice )
+    return LandPurchaseResult::ERR_NOT_ENOUGH_GIL;
+  
+  
+  switch( static_cast< LandPurchaseMode >( state ) )
+  {
+    case LandPurchaseMode::FC:
+      player.sendDebug( "Free company house purchase aren't supported at this time." );
+      return LandPurchaseResult::ERR_INTERNAL;
+  
+    case LandPurchaseMode::PRIVATE:
+    {
+
+      auto pOldLand = getLandByOwnerId( player.getId() );
+
+      if( pOldLand )
+        return LandPurchaseResult::ERR_NO_MORE_LANDS_FOR_CHAR;
+
+      player.removeCurrency( CurrencyType::Gil, plotPrice );
+      pLand->setPlayerOwner( player.getId() );
+      pLand->setState( HouseState::sold );
+      pLand->setLandType( Common::LandType::Private );
+
+      player.setLandPermissions( LandPermissionSlot::Private, 0x00, plot,
+                                 pHousing->getWardNum(), pHousing->getTerritoryTypeId() );
+
+      player.sendLandPermissionSlot( static_cast< uint8_t >( LandType::Private ), plot, pHousing->getWardNum(),
+                                     pHousing->getTerritoryTypeId() );
+
+      //pLand->setLandName( "Private Estate" + std::to_string( pHousing->getWardNum() ) + "-" + std::to_string( plot )   );
+      pLand->updateLandDb();
+
+      pHousing->sendLandUpdate( plot );
+      return LandPurchaseResult::SUCCESS;
+    }
+  
+    default:
+      return LandPurchaseResult::ERR_INTERNAL;
+  }
+  
+}
+
