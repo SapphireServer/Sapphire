@@ -7,7 +7,7 @@ CREATE TABLE `house` (
 	`Comment` binary(193) DEFAULT "", 
 	`Endorsements` BIGINT NULL, 
 	UPDATE_DATE DATETIME NULL,
-    PRIMARY KEY(`HouseId`)
+        PRIMARY KEY(`HouseId`)
 )
 COLLATE='latin1_swedish_ci'
 ENGINE=InnoDB;
