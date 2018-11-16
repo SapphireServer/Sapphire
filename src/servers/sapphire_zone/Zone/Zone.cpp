@@ -277,8 +277,8 @@ void Core::Zone::removeActor( Entity::ActorPtr pActor )
 
 }
 
-void Core::Zone::queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t range,
-                                         Network::Packets::FFXIVPacketBasePtr pPacketEntry )
+void Core::Zone::queuePacketForRange( Entity::Player& sourcePlayer, uint32_t range,
+                                      Network::Packets::FFXIVPacketBasePtr pPacketEntry )
 {
   auto pTeriMgr = g_fw.get< TerritoryMgr >();
   if( pTeriMgr->isPrivateTerritory( getTerritoryTypeId() ) )
@@ -300,6 +300,28 @@ void Core::Zone::queueOutPacketForRange( Entity::Player& sourcePlayer, uint32_t 
 
       auto pSession = pServerZone->getSession( player->getId() );
       //pPacketEntry->setValAt< uint32_t >( 0x08, player->getId() );
+      if( pSession )
+        pSession->getZoneConnection()->queueOutPacket( pPacketEntry );
+    }
+  }
+}
+
+void Core::Zone::queuePacketForZone( Entity::Player& sourcePlayer,
+                                     Network::Packets::FFXIVPacketBasePtr pPacketEntry,
+                                     bool forSelf )
+{
+  auto pTeriMgr = g_fw.get< TerritoryMgr >();
+  if( pTeriMgr->isPrivateTerritory( getTerritoryTypeId() ) )
+    return;
+
+  auto pServerZone = g_fw.get< ServerZone >();
+  for( auto entry : m_playerMap )
+  {
+    auto player = entry.second;
+    if( ( sourcePlayer.getId() != player->getId() ) ||
+        ( ( sourcePlayer.getId() == player->getId() ) && forSelf ) )
+    {
+      auto pSession = pServerZone->getSession( player->getId() );
       if( pSession )
         pSession->getZoneConnection()->queueOutPacket( pPacketEntry );
     }

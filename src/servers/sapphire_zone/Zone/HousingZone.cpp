@@ -129,13 +129,14 @@ void Core::HousingZone::sendLandSet( Entity::Player& player )
 
   for( uint8_t i = startIndex, count = 0; i < ( startIndex + 30 ); ++i, ++count )
   {
-    landsetInitializePacket->data().land[ count ].plotSize = getLand( i )->getSize();
-    landsetInitializePacket->data().land[ count ].houseState = getLand( i )->getState();
-    landsetInitializePacket->data().land[ count ].type = static_cast< uint8_t >( getLand( i )->getLandType() );
-    landsetInitializePacket->data().land[ count ].iconAddIcon = getLand( i )->getSharing();
-    landsetInitializePacket->data().land[ count ].fcId = getLand( i )->getFcId();
-    landsetInitializePacket->data().land[ count ].fcIcon = getLand( i )->getFcIcon();
-    landsetInitializePacket->data().land[ count ].fcIconColor = getLand( i )->getFcColor();
+    auto pLand = getLand( i );
+    landsetInitializePacket->data().land[ count ].plotSize = pLand->getSize();
+    landsetInitializePacket->data().land[ count ].houseState = pLand->getState();
+    landsetInitializePacket->data().land[ count ].type = static_cast< uint8_t >( pLand->getLandType() );
+    landsetInitializePacket->data().land[ count ].iconAddIcon = pLand->getSharing();
+    landsetInitializePacket->data().land[ count ].fcId = pLand->getFcId();
+    landsetInitializePacket->data().land[ count ].fcIcon = pLand->getFcIcon();
+    landsetInitializePacket->data().land[ count ].fcIconColor = pLand->getFcColor();
   }
 
   player.queuePacket( landsetInitializePacket );
@@ -143,10 +144,10 @@ void Core::HousingZone::sendLandSet( Entity::Player& player )
 
 void Core::HousingZone::sendLandUpdate( uint8_t landId )
 {
+  auto pLand = getLand( landId );
   for( const auto& playerIt : m_playerMap )
   {
     auto pPlayer = playerIt.second;
-    auto pLand = getLand( landId );
 
     auto landUpdatePacket = makeZonePacket< FFXIVIpcLandUpdate >( pPlayer->getId() );
     landUpdatePacket->data().landId = landId;
@@ -167,63 +168,11 @@ bool Core::HousingZone::isPlayerSubInstance( Entity::Player& player )
   return player.getPos().x < -15000.0f; //ToDo: get correct pos
 }
 
-Core::LandPurchaseResult Core::HousingZone::purchseLand( Entity::Player& player, uint8_t plot, uint8_t state )
-{
-
-  auto plotPrice = getLand( plot )->getCurrentPrice();
-  auto gilAvailable = player.getCurrency( CurrencyType::Gil );
-  auto pLand = getLand( plot );
-
-  if( !pLand )
-    return LandPurchaseResult::ERR_INTERNAL;
-
-  if( pLand->getState() != HouseState::forSale )
-    return LandPurchaseResult::ERR_NOT_AVAILABLE;
-
-  if( gilAvailable < plotPrice )
-    return LandPurchaseResult::ERR_NOT_ENOUGH_GIL;
-
-  auto pHousing = std::dynamic_pointer_cast< HousingZone >( player.getCurrentZone() );
-
-  switch( static_cast< LandPurchaseMode >( state ) )
-  {
-    case LandPurchaseMode::FC:
-      player.sendDebug( "Free company house purchase aren't supported at this time." );
-      return LandPurchaseResult::ERR_INTERNAL;
-
-    case LandPurchaseMode::PRIVATE:
-    {
-
-      auto pHousingMgr = g_fw.get< HousingMgr >();
-      auto pOldLand = pHousingMgr->getLandByOwnerId( player.getId() );
-
-      if( pOldLand )
-        return LandPurchaseResult::ERR_NO_MORE_LANDS_FOR_CHAR;
-
-      player.removeCurrency( CurrencyType::Gil, plotPrice );
-      pLand->setPlayerOwner( player.getId() );
-      pLand->setState( HouseState::sold );
-      pLand->setLandType( Common::LandType::Private );
-      player.setLandPermissions( LandPermissionSlot::Private, 0x00, plot,
-                                 pHousing->getWardNum(), pHousing->getTerritoryTypeId() );
-      player.sendLandPermissions();
-      //pLand->setLandName( "Private Estate" + std::to_string( pHousing->getWardNum() ) + "-" + std::to_string( plot ) );
-      pLand->UpdateLandDb();
-      sendLandUpdate( plot );
-      return LandPurchaseResult::SUCCESS;
-    }
-
-    default:
-      return LandPurchaseResult::ERR_INTERNAL;
-  }
-
-}
-
 void Core::HousingZone::onUpdate( uint32_t currTime )
 {
-  for( uint8_t i = 0; i < 60; i++ )
+  for( auto pLandItr : m_landPtrMap )
   {
-    getLand( i )->Update( currTime );
+    pLandItr.second->update( currTime );
   }
 }
 

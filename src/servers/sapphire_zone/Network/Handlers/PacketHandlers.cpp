@@ -549,7 +549,7 @@ void Core::Network::GameConnection::chatHandler( const Core::Network::Packets::F
       if( player.isActingAsGm() )
         chatPacket->data().chatType = ChatType::GMSay;
 
-      player.getCurrentZone()->queueOutPacketForRange( player, 50, chatPacket );
+      player.getCurrentZone()->queuePacketForRange( player, 50, chatPacket );
       break;
     }
     case ChatType::Yell:
@@ -557,7 +557,7 @@ void Core::Network::GameConnection::chatHandler( const Core::Network::Packets::F
       if( player.isActingAsGm() )
         chatPacket->data().chatType = ChatType::GMYell;
 
-      player.getCurrentZone()->queueOutPacketForRange( player, 6000, chatPacket );
+      player.getCurrentZone()->queuePacketForRange( player, 6000, chatPacket );
       break;
     }
     case ChatType::Shout:
@@ -565,12 +565,12 @@ void Core::Network::GameConnection::chatHandler( const Core::Network::Packets::F
       if( player.isActingAsGm() )
         chatPacket->data().chatType = ChatType::GMShout;
 
-      player.getCurrentZone()->queueOutPacketForRange( player, 6000, chatPacket );
+      player.getCurrentZone()->queuePacketForRange( player, 6000, chatPacket );
       break;
     }
     default:
     {
-      player.getCurrentZone()->queueOutPacketForRange( player, 50, chatPacket );
+      player.getCurrentZone()->queuePacketForRange( player, 50, chatPacket );
       break;
     }
   }

@@ -292,6 +292,7 @@ enum ActorControlType : uint16_t
     RequestHousingBuildPreset = 0x44C,
     RequestLandSignFree = 0x451,
     RequestLandSignOwned = 0x452,
+    RequestLandRelinquish = 0x454,
     RequestEstateRename = 0x45A,
     RequestHousingItemUI = 0x463,
     RequestSharedEstateSettings = 0x46F,
