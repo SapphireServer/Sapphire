@@ -35,7 +35,7 @@ public:
 
         auto pTerritory = player.getCurrentZone();
         auto pHousing = std::dynamic_pointer_cast< HousingZone >( pTerritory );
-	auto pHouMgr = pFw->get< Core::HousingMgr >();
+        auto pHouMgr = pFw->get< Core::HousingMgr >();
         
         LandPurchaseResult res = pHouMgr->purchseLand( player, activeLand.plot,
                                                         static_cast< uint8_t >( result.param2 ) );
