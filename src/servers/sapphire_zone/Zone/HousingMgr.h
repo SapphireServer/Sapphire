@@ -33,6 +33,8 @@ namespace Core
     void sendLandSignFree( Entity::Player& player, uint8_t wardId, uint8_t plotId, uint16_t territoryTypeId );
     LandPurchaseResult purchseLand( Entity::Player& player, uint8_t plot, uint8_t state );
 
+    bool relinquishLand( Entity::Player& player, uint8_t plot );
+
   private:
     using HousingZonePtrMap = std::unordered_map< uint16_t, Core::Data::HousingZonePtr >;
     uint16_t m_lastLandId;

@@ -346,12 +346,10 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
     }
     case ClientTriggerType::RequestLandRelinquish:
     {
-      auto ward = static_cast< uint8_t >( ( param12 & 0xFF00 ) >> 8 );
       auto plot = static_cast< uint8_t >( param12 & 0xFF );
       auto pHousingMgr = g_fw.get< HousingMgr >();
+      pHousingMgr->relinquishLand( player, plot );
 
-      pLog->debug( "Request to relinquish plot " + std::to_string( plot ) );
-      // TODO: do stuff!
       break;
     }
     case ClientTriggerType::RequestEstateRename:
