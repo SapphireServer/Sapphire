@@ -18,8 +18,8 @@ Core::House::House( uint32_t houseId, uint32_t landSetId, uint8_t landId, uint8_
   m_wardNum( wardNum ),
   m_territoryTypeId( territoryTypeId )
 {
-  std::memset( &m_houseParts, 0x00, sizeof( m_houseParts ) );
-  std::memset( &m_commentMsg, 0x00, 193 );
+  memset( &m_houseParts, 0x00, sizeof( m_houseParts ) );
+  memset( &m_commentMsg, 0x00, 193 );
 }
 
 Core::House::~House()
