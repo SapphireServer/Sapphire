@@ -38,7 +38,7 @@ public:
         auto pHouMgr = pFw->get< Core::HousingMgr >();
         
         LandPurchaseResult res = pHouMgr->purchaseLand( player, activeLand.plot,
-                                                       static_cast< uint8_t >( result.param2 ) );
+                                                        static_cast< uint8_t >( result.param2 ) );
 
         switch( res )
         {
