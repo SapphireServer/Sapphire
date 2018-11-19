@@ -1,4 +1,5 @@
 #include <set>
+#include <string.h>
 
 #include <Logging/Logger.h>
 #include <Exd/ExdDataGenerated.h>
