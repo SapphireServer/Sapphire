@@ -10,15 +10,15 @@
 
 extern Core::Framework g_fw;
 
-Core::House::House( uint32_t houseId, uint32_t landSetId, uint8_t landId, uint8_t wardNum, uint16_t zoneId ) :
+Core::House::House( uint32_t houseId, uint32_t landSetId, uint8_t landId, uint8_t wardNum, uint16_t territoryTypeId ) :
   m_houseId( houseId ),
   m_landSetId( landSetId ),
   m_landId( landId ),
   m_wardNum( wardNum ),
-  m_zoneId( zoneId )
+  m_territoryTypeId( territoryTypeId )
 {
-  memset( &m_houseParts, 0x00, 8 );
-  memset( &m_HouseMsg, 0x00, 193 );
+  std::memset( &m_houseParts, 0x00, sizeof( m_houseParts ) );
+  std::memset( &m_commentMsg, 0x00, 193 );
 }
 
 Core::House::~House()
@@ -26,27 +26,32 @@ Core::House::~House()
 
 }
 
-uint32_t Core::House::getLandSetId()
+uint32_t Core::House::getLandSetId() const
 {
   return m_landSetId;
 }
 
-uint8_t Core::House::getLandId()
+uint8_t Core::House::getLandId() const
 {
   return m_landId;
 }
 
-uint8_t Core::House::getWardNum()
+uint8_t Core::House::getWardNum() const
 {
   return m_wardNum;
 }
 
-uint32_t Core::House::getHouseId()
+uint16_t Core::House::getTerritoryTypeId() const
+{
+  return m_territoryTypeId;
+}
+
+uint32_t Core::House::getHouseId() const
 {
   return m_houseId;
 }
 
-uint8_t Core::House::getHousePartColor( Common::HousePartSlot slot )
+uint8_t Core::House::getHousePartColor( Common::HousePartSlot slot ) const
 {
   return m_housePartsColor[ slot ];
 }
@@ -61,7 +66,7 @@ void Core::House::setHousePartColor( Common::HousePartSlot slot, uint32_t id )
   m_housePartsColor[ slot ] = id;
 }
 
-uint32_t Core::House::getHousePart( Common::HousePartSlot slot )
+uint32_t Core::House::getHousePart( Common::HousePartSlot slot ) const
 {
   return m_houseParts[ slot ];
 }
