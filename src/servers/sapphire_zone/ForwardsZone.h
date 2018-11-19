@@ -21,6 +21,7 @@ TYPE_FORWARD( Cell );
 TYPE_FORWARD( Zone );
 TYPE_FORWARD( HousingZone );
 TYPE_FORWARD( HousingMgr );
+TYPE_FORWARD( House );
 TYPE_FORWARD( InstanceContent );
 TYPE_FORWARD( Item );
 TYPE_FORWARD( ItemContainer );

@@ -43,7 +43,7 @@ bool Core::HousingMgr::init()
   return true;
 }
 
-uint16_t Core::HousingMgr::getNexLandId()
+uint16_t Core::HousingMgr::getNextLandId()
 {
   return ++m_lastLandId;
 }
@@ -55,7 +55,7 @@ uint32_t Core::HousingMgr::toLandSetId( uint16_t territoryTypeId, uint8_t wardId
 
 void Core::HousingMgr::insertHousingZone( Core::Data::HousingZonePtr hZone )
 {
-  uint16_t id = getNexLandId();
+  uint16_t id = getNextLandId();
   m_housingZonePtrMap[id] = hZone;
 }
 
@@ -149,7 +149,7 @@ void Core::HousingMgr::sendLandSignFree( Entity::Player& player, uint8_t wardId,
   player.queuePacket( plotPricePacket );
 }
 
-Core::LandPurchaseResult Core::HousingMgr::purchseLand( Entity::Player& player, uint8_t plot, uint8_t state )
+Core::LandPurchaseResult Core::HousingMgr::purchaseLand( Entity::Player& player, uint8_t plot, uint8_t state )
 {
   auto pHousing = std::dynamic_pointer_cast< HousingZone >( player.getCurrentZone() );
 
