@@ -19,7 +19,7 @@ Core::House::House( uint32_t houseId, uint32_t landSetId, uint8_t landId, uint8_
   m_territoryTypeId( territoryTypeId )
 {
   memset( &m_houseParts, 0x00, sizeof( m_houseParts ) );
-  memset( &m_commentMsg, 0x00, 193 );
+  memset( &m_commentMsg, 0x00, sizeof( m_commentMsg ) );
 }
 
 Core::House::~House()
