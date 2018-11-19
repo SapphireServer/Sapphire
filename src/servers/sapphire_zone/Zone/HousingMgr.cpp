@@ -48,6 +48,11 @@ uint16_t Core::HousingMgr::getNexLandId()
   return ++m_lastLandId;
 }
 
+uint32_t Core::HousingMgr::toLandSetId( uint16_t territoryTypeId, uint8_t wardId ) const
+{
+  return ( static_cast< uint32_t >( territoryTypeId ) << 16 ) | wardId;
+}
+
 void Core::HousingMgr::insertHousingZone( Core::Data::HousingZonePtr hZone )
 {
   uint16_t id = getNexLandId();
@@ -95,18 +100,17 @@ Core::LandPtr Core::HousingMgr::getLandByOwnerId( uint32_t id )
   return nullptr;
 }
 
-void Core::HousingMgr::sendLandSignOwned( Entity::Player& player, uint8_t ward, uint8_t plot )
+void Core::HousingMgr::sendLandSignOwned( Entity::Player& player, uint8_t wardId, uint8_t plotId, uint16_t territoryTypeId )
 {
-  player.setActiveLand( plot, ward );
+  player.setActiveLand( plotId, wardId );
 
-  auto zone = player.getCurrentZone();
-
-  auto hZone = std::dynamic_pointer_cast< HousingZone >( zone );
+  auto landSetId = toLandSetId( territoryTypeId, wardId );
+  auto hZone = getHousingZoneByLandSetId( landSetId );
 
   if( !hZone )
     return;
 
-  auto land = hZone->getLand( plot );
+  auto land = hZone->getLand( plotId );
   if( !land )
   {
     land = getLandByOwnerId( player.getId() );
@@ -128,17 +132,17 @@ void Core::HousingMgr::sendLandSignOwned( Entity::Player& player, uint8_t ward, 
   player.queuePacket( landInfoSignPacket );
 }
 
-void Core::HousingMgr::sendLandSignFree( Entity::Player& player, uint8_t ward, uint8_t plot )
+void Core::HousingMgr::sendLandSignFree( Entity::Player& player, uint8_t wardId, uint8_t plotId, uint16_t territoryTypeId )
 {
-  player.setActiveLand( plot, ward );
+  player.setActiveLand( plotId, wardId );
 
-  auto zone = player.getCurrentZone();
-  auto hZone = std::dynamic_pointer_cast< HousingZone >( zone );
+  auto landSetId = toLandSetId( territoryTypeId, wardId );
+  auto hZone = getHousingZoneByLandSetId( landSetId );
 
   if( !hZone )
     return;
 
-  auto land = hZone->getLand( plot );
+  auto land = hZone->getLand( plotId );
   auto plotPricePacket = makeZonePacket< Server::FFXIVIpcLandPriceUpdate >( player.getId() );
   plotPricePacket->data().price = land->getCurrentPrice();
   plotPricePacket->data().timeLeft = land->getDevaluationTime();
@@ -199,5 +203,32 @@ Core::LandPurchaseResult Core::HousingMgr::purchseLand( Entity::Player& player, 
       return LandPurchaseResult::ERR_INTERNAL;
   }
   
+}
+
+bool Core::HousingMgr::relinquishLand( Entity::Player& player, uint8_t plot )
+{
+  // TODO: Fix "permissions" being sent incorrectly
+  // TODO: Add checks for land state before relinquishing
+  auto pHousing = std::dynamic_pointer_cast< HousingZone >( player.getCurrentZone() );
+
+  auto pLand = pHousing->getLand( plot );
+  auto plotMaxPrice = pLand->getCurrentPrice();
+
+  pLand->setCurrentPrice( pLand->getMaxPrice() );
+  pLand->setPlayerOwner( 0 );
+  pLand->setState( HouseState::forSale );
+  pLand->setLandType( Common::LandType::none );
+  pLand->updateLandDb();
+
+  player.setLandPermissions( LandPermissionSlot::Private, 0x00, 0xFF, 0xFF, 0xFF );
+
+  player.sendLandPermissionSlot( static_cast< uint8_t >( LandType::Private ), 0xFF, 0xFF, 0xFF );
+
+  auto screenMsgPkt2 = makeActorControl143( player.getId(), ActorControl::LogMsg, 3351, 0x1AA,
+                                            pLand->getWardNum() + 1, plot + 1 );
+  player.queuePacket( screenMsgPkt2 );
+  pHousing->sendLandUpdate( plot );
+
+  return true;
 }
 
