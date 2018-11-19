@@ -35,6 +35,7 @@ namespace Core
     uint8_t getLandId() const;
     uint16_t getZoneId() const;
     Common::LandType getLandType() const;
+    Core::HousePtr getHouse() const;
 
     //Free Comapny
     void setFreeCompany( uint32_t id, uint32_t icon, uint32_t color );
@@ -78,6 +79,8 @@ namespace Core
 
     uint32_t m_ownerPlayerId;
     Core::Data::HousingLandSetPtr m_landInfo;
+
+    Core::HousePtr m_pHouse;
 
     //item storage
     Core::ItemContainerPtr ItemsOutdoorContainer;

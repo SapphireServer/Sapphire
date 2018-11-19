@@ -37,8 +37,8 @@ public:
         auto pHousing = std::dynamic_pointer_cast< HousingZone >( pTerritory );
         auto pHouMgr = pFw->get< Core::HousingMgr >();
         
-        LandPurchaseResult res = pHouMgr->purchseLand( player, activeLand.plot,
-                                                       static_cast< uint8_t >( result.param2 ) );
+        LandPurchaseResult res = pHouMgr->purchaseLand( player, activeLand.plot,
+                                                        static_cast< uint8_t >( result.param2 ) );
 
         switch( res )
         {

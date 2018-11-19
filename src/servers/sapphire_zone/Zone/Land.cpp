@@ -152,6 +152,11 @@ uint16_t Core::Land::getZoneId() const
   return m_zoneId;
 }
 
+Core::HousePtr Core::Land::getHouse() const
+{
+  return m_pHouse;
+}
+
 Core::Common::LandType Core::Land::getLandType() const
 {
   return m_type;
