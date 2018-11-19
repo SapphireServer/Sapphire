@@ -65,9 +65,6 @@ bool Core::HousingZone::init()
     m_landPtrMap[ landId ] = pObject;
   }
 
-  auto pHousingMgr = g_fw.get< HousingMgr >();
-  pHousingMgr->insertHousingZone( (HousingZonePtr)this );
-
   return true;
 }
 

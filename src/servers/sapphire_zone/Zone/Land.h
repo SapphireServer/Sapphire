@@ -80,7 +80,7 @@ namespace Core
     uint32_t m_ownerPlayerId;
     Core::Data::HousingLandSetPtr m_landInfo;
 
-    Core::HousePtr m_house;
+    Core::HousePtr m_pHouse;
 
     //item storage
     Core::ItemContainerPtr ItemsOutdoorContainer;
