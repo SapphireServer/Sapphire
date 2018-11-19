@@ -36,10 +36,10 @@ namespace Core
     uint16_t m_territoryTypeId;
     uint32_t m_houseId;
 
-    uint32_t m_houseParts[8];
-    uint8_t m_housePartsColor[8];
+    uint32_t m_houseParts[ 8 ];
+    uint8_t m_housePartsColor[ 8 ];
 
-    char m_commentMsg[193];
+    char m_commentMsg[ 193 ];
   };
 
 }
