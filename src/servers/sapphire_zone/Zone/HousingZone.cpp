@@ -108,10 +108,9 @@ void Core::HousingZone::onPlayerZoneIn( Entity::Player& player )
   for( uint8_t i = startIndex, count = 0; i < ( startIndex + 30 ); i++, count++ )
   {
     landSetMap->data().landInfo[ count ].status = 1;
-    //memcpy( , &getLand( i )->getLand(), sizeof( Common::LandStruct ) );
   }
 
-  //player.queuePacket( landSetMap );
+  player.queuePacket( landSetMap );
 
 }
 
