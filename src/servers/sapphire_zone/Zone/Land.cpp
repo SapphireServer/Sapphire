@@ -74,6 +74,7 @@ void Core::Land::load()
     m_currentPrice = res->getUInt( "LandPrice" );
     m_ownerPlayerId = res->getUInt( "OwnerId" );
     m_minPrice = m_landInfo->minPrices[ m_landId ];
+    m_maxPrice = m_landInfo->prices[ m_landId ];
   }
   init();
 }
@@ -88,6 +89,11 @@ uint16_t Core::Land::convertItemIdToHousingItemId( uint16_t itemId )
 uint32_t Core::Land::getCurrentPrice() const
 {
   return m_currentPrice;
+}
+
+uint32_t Core::Land::getMaxPrice() const
+{
+  return m_maxPrice;
 }
 
 //Primary State
@@ -193,6 +199,11 @@ uint32_t Core::Land::getMaxItems()
 uint32_t Core::Land::getDevaluationTime()
 {
   return m_nextDrop - static_cast< uint32_t >( Util::getTimeSeconds() );
+}
+
+void Core::Land::setCurrentPrice( uint32_t currentPrice )
+{
+  m_currentPrice = currentPrice;
 }
 
 void Core::Land::setLandTag( uint8_t slot, uint8_t tag )

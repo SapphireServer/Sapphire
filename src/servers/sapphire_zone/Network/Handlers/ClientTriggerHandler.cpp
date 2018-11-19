@@ -328,25 +328,28 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
     {
       auto ward = static_cast< uint8_t >( ( param12 & 0xFF00 ) >> 8 );
       auto plot = static_cast< uint8_t >( param12 & 0xFF );
+      auto territoryId = static_cast< uint16_t >( param11 & 0xFFFF );
+
       auto pHousingMgr = g_fw.get< HousingMgr >();
-      pHousingMgr->sendLandSignFree( player, ward, plot );
+      pHousingMgr->sendLandSignFree( player, ward, plot, territoryId );
       break;
     }
     case ClientTriggerType::RequestLandSignOwned:
     {
       auto ward = static_cast< uint8_t >( ( param12 & 0xFF00 ) >> 8 );
       auto plot = static_cast< uint8_t >( param12 & 0xFF );
+      auto territoryId = static_cast< uint16_t >( param11 & 0xFFFF );
+
       auto pHousingMgr = g_fw.get< HousingMgr >();
-      pHousingMgr->sendLandSignOwned( player, ward, plot );
+      pHousingMgr->sendLandSignOwned( player, ward, plot, territoryId );
       break;
     }
     case ClientTriggerType::RequestLandRelinquish:
     {
-      auto ward = static_cast< uint8_t >( ( param12 & 0xFF00 ) >> 8 );
       auto plot = static_cast< uint8_t >( param12 & 0xFF );
       auto pHousingMgr = g_fw.get< HousingMgr >();
-      pLog->debug( "Request to relinquish plot " + std::to_string( plot ) );
-      // TODO: do stuff!
+      pHousingMgr->relinquishLand( player, plot );
+
       break;
     }
     case ClientTriggerType::RequestEstateRename:

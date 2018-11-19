@@ -22,15 +22,18 @@ namespace Core
 
     bool init();
 
+    uint32_t toLandSetId( uint16_t territoryTypeId, uint8_t wardId ) const;
     uint16_t getNexLandId();
     void insertHousingZone( Core::Data::HousingZonePtr hZone );
     Core::Data::HousingZonePtr getHousingZone( uint16_t id );
     Core::Data::HousingZonePtr getHousingZoneByLandSetId( uint32_t id );
     Core::LandPtr getLandByOwnerId( uint32_t id );
 
-    void sendLandSignOwned( Entity::Player& player, uint8_t ward, uint8_t plot );
-    void sendLandSignFree( Entity::Player& player, uint8_t ward, uint8_t plot );
+    void sendLandSignOwned( Entity::Player& player, uint8_t wardId, uint8_t plotId, uint16_t territoryTypeId );
+    void sendLandSignFree( Entity::Player& player, uint8_t wardId, uint8_t plotId, uint16_t territoryTypeId );
     LandPurchaseResult purchseLand( Entity::Player& player, uint8_t plot, uint8_t state );
+
+    bool relinquishLand( Entity::Player& player, uint8_t plot );
 
   private:
     using HousingZonePtrMap = std::unordered_map< uint16_t, Core::Data::HousingZonePtr >;

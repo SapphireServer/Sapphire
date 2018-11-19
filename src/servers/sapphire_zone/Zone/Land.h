@@ -46,12 +46,14 @@ namespace Core
     void setPlayerOwner( uint32_t id );
     uint32_t getPlayerOwner();
     //Housing Functions
+    void setCurrentPrice( uint32_t currentPrice );
     void setPreset( uint32_t itemId );
     void updateLandDb();
     void update( uint32_t currTime );
 
     uint32_t getMaxItems();
     uint32_t getCurrentPrice() const;
+    uint32_t getMaxPrice() const;
     uint32_t getDevaluationTime();
 
     //House tags
@@ -86,6 +88,7 @@ namespace Core
     uint32_t m_nextDrop;
     uint32_t m_currentPrice;
     uint32_t m_minPrice;
+    uint32_t m_maxPrice;
 
     //information
     char fcTag[7];
