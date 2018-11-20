@@ -10,12 +10,12 @@
 
 namespace Core {
 
-class ServerZone
+class ServerMgr
 {
 public:
-  ServerZone( const std::string& configName );
+  ServerMgr( const std::string& configName );
 
-  ~ServerZone();
+  ~ServerMgr();
 
   void run( int32_t argc, char* argv[] );
 

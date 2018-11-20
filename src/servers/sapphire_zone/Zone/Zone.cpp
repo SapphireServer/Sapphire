@@ -31,7 +31,7 @@
 
 #include "Session.h"
 #include "ForwardsZone.h"
-#include "ServerZone.h"
+#include "ServerMgr.h"
 #include "CellHandler.h"
 #include "Zone.h"
 #include "TerritoryMgr.h"
@@ -222,7 +222,7 @@ void Core::Zone::pushActor( Entity::ActorPtr pActor )
   {
     auto pPlayer = pActor->getAsPlayer();
 
-    auto pServerZone = g_fw.get< ServerZone >();
+    auto pServerZone = g_fw.get< ServerMgr >();
     auto pSession = pServerZone->getSession( pPlayer->getId() );
     if( pSession )
       m_sessionSet.insert( pSession );
@@ -284,7 +284,7 @@ void Core::Zone::queuePacketForRange( Entity::Player& sourcePlayer, uint32_t ran
   if( pTeriMgr->isPrivateTerritory( getTerritoryTypeId() ) )
     return;
 
-  auto pServerZone = g_fw.get< ServerZone >();
+  auto pServerZone = g_fw.get< ServerMgr >();
   for( auto entry : m_playerMap )
   {
     auto player = entry.second;
@@ -314,7 +314,7 @@ void Core::Zone::queuePacketForZone( Entity::Player& sourcePlayer,
   if( pTeriMgr->isPrivateTerritory( getTerritoryTypeId() ) )
     return;
 
-  auto pServerZone = g_fw.get< ServerZone >();
+  auto pServerZone = g_fw.get< ServerMgr >();
   for( auto entry : m_playerMap )
   {
     auto player = entry.second;

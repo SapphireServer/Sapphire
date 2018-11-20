@@ -15,7 +15,7 @@
 #include "DebugCommand/DebugCommandHandler.h"
 
 #include "GameConnection.h"
-#include "ServerZone.h"
+#include "ServerMgr.h"
 #include "Session.h"
 #include "Framework.h"
 #include "Forwards.h"
@@ -385,7 +385,7 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
                                                    const std::vector< Core::Network::Packets::FFXIVARR_PACKET_RAW >& packetData )
 {
   auto pLog = g_fw.get< Logger >();
-  auto pServerZone = g_fw.get< ServerZone >();
+  auto pServerZone = g_fw.get< ServerMgr >();
   // if a session is set, update the last time it recieved a game packet
   if( m_pSession )
     m_pSession->updateLastDataTime();

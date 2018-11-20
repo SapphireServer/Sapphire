@@ -16,7 +16,7 @@
 #include "Action/EventItemAction.h"
 
 #include "Zone/Zone.h"
-#include "ServerZone.h"
+#include "ServerMgr.h"
 #include "Framework.h"
 
 extern Core::Framework g_fw;

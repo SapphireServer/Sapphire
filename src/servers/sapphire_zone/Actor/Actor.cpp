@@ -18,7 +18,7 @@
 #include "Player.h"
 #include "BNpc.h"
 
-#include "ServerZone.h"
+#include "ServerMgr.h"
 #include "Session.h"
 
 #include "Zone/TerritoryMgr.h"
@@ -301,7 +301,7 @@ Send a packet to all players in range, potentially to self if set and is player
 */
 void Core::Entity::Actor::sendToInRangeSet( Network::Packets::FFXIVPacketBasePtr pPacket, bool bToSelf )
 {
-  auto pServerZone = g_fw.get< ServerZone >();
+  auto pServerZone = g_fw.get< ServerMgr >();
   if( bToSelf && isPlayer() )
   {
     auto pPlayer = getAsPlayer();

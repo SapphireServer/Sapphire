@@ -7,7 +7,7 @@
 #include "Zone/Zone.h"
 #include "Zone/InstanceContent.h"
 #include "Actor/Player.h"
-#include "ServerZone.h"
+#include "ServerMgr.h"
 #include "Event/EventHandler.h"
 #include "Event/EventHelper.h"
 
@@ -18,7 +18,7 @@
 #include "Script/ScriptMgr.h"
 
 #include "NativeScriptMgr.h"
-#include "ServerZone.h"
+#include "ServerMgr.h"
 #include "Framework.h"
 
 // enable the ambiguity fix for every platform to avoid #define nonsense

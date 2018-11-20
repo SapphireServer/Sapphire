@@ -18,7 +18,7 @@
 #include "Inventory/ItemContainer.h"
 #include "Inventory/ItemUtil.h"
 
-#include "ServerZone.h"
+#include "ServerMgr.h"
 #include "Framework.h"
 
 extern Core::Framework g_fw;
