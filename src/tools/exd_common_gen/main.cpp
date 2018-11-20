@@ -127,7 +127,7 @@ int main()
   result += generateEnum( "Tribe", 0, "uint8_t" );
   result += generateEnum( "Town", 0, "uint8_t" );
   result += generateEnum( "Weather", 1, "uint8_t" );
-  result += generateEnum( "HosuingAppeal", 0, "uint8_t" );
+  result += generateEnum( "HousingAppeal", 0, "uint8_t" );
   result += "}\n";
   result += "}\n#endif\n";
   g_log.info( result );
