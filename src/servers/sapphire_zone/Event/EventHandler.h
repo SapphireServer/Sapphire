@@ -75,6 +75,7 @@ namespace Core::Event
 
     using SceneReturnCallback = std::function< void( Entity::Player&, const SceneResult& ) >;
     using SceneChainCallback = std::function< void( Entity::Player& ) >;
+    using EventFinishCallback = std::function< void( Entity::Player&, uint64_t ) >;
 
     EventHandler( Entity::Player* pOwner, uint64_t actorId, uint32_t eventId, EventType eventType,
                   uint32_t eventParam );
@@ -107,6 +108,10 @@ namespace Core::Event
 
     void setSceneChainCallback( SceneChainCallback callback );
 
+    EventFinishCallback getEventFinishCallback() const;
+
+    void setEventFinishCallback( EventFinishCallback callback );
+
     bool hasNestedEvent() const;
 
     void removeNestedEvent();
@@ -125,6 +130,7 @@ namespace Core::Event
     bool m_playedScene;
     SceneReturnCallback m_returnCallback;
     SceneChainCallback m_chainCallback;
+    EventFinishCallback m_finishCallback;
   };
 
 }
