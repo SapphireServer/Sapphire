@@ -344,6 +344,16 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
       pHousingMgr->sendLandSignOwned( player, ward, plot, territoryId );
       break;
     }
+    case ClientTriggerType::RequestWardLandInfo:
+    {
+      auto pHousingMgr = g_fw.get< HousingMgr >();
+      if( !pHousingMgr )
+        break;
+
+      pHousingMgr->sendWardLandInfo( player, param12, param11 );
+
+      break;
+    }
     case ClientTriggerType::RequestLandRelinquish:
     {
       auto plot = static_cast< uint8_t >( param12 & 0xFF );
@@ -354,7 +364,7 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
     }
     case ClientTriggerType::RequestEstateRename:
     {
-      // removed temporarly, there is no such thing as a LandName	    
+      // removed temporarly, there is no such thing as a LandName
 /*      auto landRenamePacket = makeZonePacket< Server::FFXIVIpcLandRename >( player.getId() );
 
       uint8_t ward = ( param12 & 0xFF00 ) >> 8;

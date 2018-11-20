@@ -30,6 +30,8 @@ namespace Core
     void sendLandSignFree( Entity::Player& player, uint8_t wardId, uint8_t plotId, uint16_t territoryTypeId );
     LandPurchaseResult purchaseLand( Entity::Player& player, uint8_t plot, uint8_t state );
 
+    void sendWardLandInfo( Entity::Player& player, uint8_t wardId, uint16_t territoryTypeId );
+
     bool relinquishLand( Entity::Player& player, uint8_t plot );
 
   private:
