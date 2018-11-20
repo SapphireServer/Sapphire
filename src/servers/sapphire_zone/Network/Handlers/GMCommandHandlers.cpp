@@ -456,7 +456,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
           player.sendUrgent( "No zone instance found for " + std::to_string( param1 ) );
           break;
         }
-        
+
         if( !pTeriMgr->isDefaultTerritory( param1 ) )
         {
           player.sendUrgent( pZone->getName() + " is an instanced area - instance ID required to zone in." );
@@ -501,6 +501,15 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
         player.sendNotice( targetPlayer->getName() + " was warped to zone " +
                            std::to_string( param1 ) + " (" + pZone->getName() + ")" );
       }
+      break;
+    }
+    case GmCommand::Kick:
+    {
+      // todo: this doesn't kill their session straight away, should do this properly but its good for when you get stuck for now
+      targetPlayer->setMarkedForRemoval();
+
+      player.sendNotice( "Kicked " + targetPlayer->getName() );
+
       break;
     }
     case GmCommand::TeriInfo:

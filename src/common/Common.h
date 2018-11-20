@@ -814,6 +814,30 @@ namespace Core::Common
     heart = 0x06
   };
 
+  enum HousingAppeal : uint8_t
+  {
+    NoAppeal = 0,
+    Emporium = 1,
+    Botique = 2,
+    DesignerHome = 3,
+    MessageBook = 4,
+    Tavern = 5,
+    Eatery = 6,
+    ImmersiveExperience = 7,
+    Aquarium = 9,
+    Sanctum = 10,
+    Venue = 11,
+  };
+
+  enum WardEstateFlags : uint8_t
+  {
+    IsEstateOwned = 1,
+    IsPublicEstate = 2,
+    HasEstateMessage = 4,
+    EstateFlagUnknown = 8,
+    IsFreeCompanyEstate = 16,
+  };
+
   using PlayerStateFlagList = std::vector< PlayerStateFlag >;
 
 }

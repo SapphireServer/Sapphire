@@ -1720,6 +1720,24 @@ struct FFXIVIpcLandSetYardInitialize : FFXIVIpcBasePacket< LandSetYardInitialize
   uint32_t unknown4; //unused
 };
 
+struct FFXIVIpcHousingWardInfo : FFXIVIpcBasePacket< HousingWardInfo >
+{
+  uint16_t unknown1;
+
+  uint16_t wardId;
+  uint16_t territoryTypeId;
+
+  uint16_t unknown2;
+
+  struct HouseInfoEntry
+  {
+    uint32_t housePrice;
+    uint8_t infoFlags;
+    Common::HousingAppeal houseAppeal[3];
+    char estateOwnerName[30];
+  } houseInfoEntry[60];
+};
+
 /**
 * Structural representation of the packet sent by the server
 * to show the current shared estate settings
