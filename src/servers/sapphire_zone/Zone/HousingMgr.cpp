@@ -184,6 +184,25 @@ bool Core::HousingMgr::relinquishLand( Entity::Player& player, uint8_t plot )
 
   auto pLand = pHousing->getLand( plot );
   auto plotMaxPrice = pLand->getCurrentPrice();
+  auto landOwnerId = pLand->getPlayerOwner();
+
+  // can't relinquish when you are not the owner
+  // TODO: actually use permissions here for FC houses
+  if( landOwnerId != player.getId() )
+  {
+    auto msgPkt = makeActorControl143( player.getId(), ActorControl::LogMsg, 3304, 0 );
+    player.queuePacket( msgPkt );
+    return false;
+  }
+
+  // unable to relinquish if there is a house built
+  // TODO: additionally check for yard items
+  if( pLand->getHouse() )
+  {
+    auto msgPkt = makeActorControl143( player.getId(), ActorControl::LogMsg, 3315, 0 );
+    player.queuePacket( msgPkt );
+    return false;
+  }
 
   pLand->setCurrentPrice( pLand->getMaxPrice() );
   pLand->setPlayerOwner( 0 );
