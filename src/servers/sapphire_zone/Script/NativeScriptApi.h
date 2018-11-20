@@ -10,11 +10,6 @@
 #define EXPORT __attribute__((visibility("default")))
 #endif
 
-// todo: this is shit
-// constant script ids for certain events
-#define EVENTSCRIPT_AETHERYTE_ID 0x50000
-#define EVENTSCRIPT_AETHERNET_ID 0x50001
-
 namespace Core
 {
   class Framework;
@@ -56,14 +51,14 @@ namespace Sapphire::ScriptAPI
 
     /*!
     * @brief Sets the ptr to the framework for use inside scripts
-    * 
+    *
     * @param fw The ptr to g_fw (Core::Framework)
     */
     virtual void setFramework( Core::Framework* fw );
 
     /*!
     * @brief Returns the current ptr to framework set for the current script
-    * 
+    *
     * @return A pointer to Core::Framework
     */
     virtual Core::Framework* getFramework() const;
