@@ -61,7 +61,7 @@ namespace Core::Entity
     /*! start/register a normal event */
     void
     eventStart( uint64_t actorId, uint32_t eventId, Event::EventHandler::EventType eventParam, uint8_t eventParam1,
-                uint32_t eventParam2 );
+                uint32_t eventParam2, Event::EventHandler::EventFinishCallback callback = nullptr );
 
     /*! play a subevent */
     void playScene( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t eventParam2, uint32_t eventParam3 );

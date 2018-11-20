@@ -92,10 +92,12 @@ void Core::Entity::Player::directorPlayScene( uint32_t eventId, uint32_t scene, 
 
 void Core::Entity::Player::eventStart( uint64_t actorId, uint32_t eventId,
                                        Event::EventHandler::EventType eventType, uint8_t eventParam1,
-                                       uint32_t eventParam2 )
+                                       uint32_t eventParam2, Event::EventHandler::EventFinishCallback callback )
 {
 
   auto newEvent = Event::make_EventHandler( this, actorId, eventId, eventType, eventParam2 );
+
+  newEvent->setEventFinishCallback( callback );
 
   addEvent( newEvent );
 
@@ -163,8 +165,8 @@ Core::Event::EventHandlerPtr Core::Entity::Player::bootstrapSceneEvent( uint32_t
   if( !pEvent && getEventCount() )
   {
     // We're trying to play a nested event, need to start it first.
-    eventStart( getId(), eventId, Event::EventHandler::Nest, 0, 0 );
-    pEvent = getEvent( eventId );
+    //eventStart( getId(), eventId, Event::EventHandler::Nest, 0, 0 );
+    //pEvent = getEvent( eventId );
   }
   else if( !pEvent )
   {
@@ -184,6 +186,16 @@ void Core::Entity::Player::playScene( uint32_t eventId, uint32_t scene,
   auto pEvent = bootstrapSceneEvent( eventId, flags );
   if( !pEvent )
     return;
+
+  if( pEvent->getEventType() == Event::EventHandler::Nest  )
+  {
+    auto events = eventList();
+
+    for( auto it : events )
+    {
+      it.second->setPlayedScene( true );
+    }
+  }
 
   pEvent->setPlayedScene( true );
   pEvent->setEventReturnCallback( eventCallback );
@@ -246,12 +258,17 @@ void Core::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlayer )
     case Event::EventHandler::Nest:
     {
       queuePacket( std::make_shared< EventFinishPacket >( getId(), pEvent->getId(),
-                                                            pEvent->getEventType(), pEvent->getEventParam() ) );
+                                                          pEvent->getEventType(), pEvent->getEventParam() ) );
       removeEvent( pEvent->getId() );
+
+      auto callback = pEvent->getEventFinishCallback();
+
+      if( callback )
+        callback( *this, pEvent->getActorId() );
 
       auto events = eventList();
 
-      for( auto it : events )
+      /*for( auto it : events )
       {
 
         if( it.second->hasPlayedScene() == false )
@@ -262,14 +279,14 @@ void Core::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlayer )
                                                                 it.second->getEventParam() ) );
           removeEvent( it.second->getId() );
         }
-      }
+      }*/
 
       break;
     }
     default:
     {
       queuePacket( std::make_shared< EventFinishPacket >( getId(), pEvent->getId(),
-                                                            pEvent->getEventType(), pEvent->getEventParam() ) );
+                                                          pEvent->getEventType(), pEvent->getEventParam() ) );
       break;
     }
   }

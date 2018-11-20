@@ -64,6 +64,16 @@ void Core::Event::EventHandler::setSceneChainCallback( Core::Event::EventHandler
   m_chainCallback = callback;
 }
 
+Core::Event::EventHandler::EventFinishCallback Core::Event::EventHandler::getEventFinishCallback() const
+{
+  return m_finishCallback;
+}
+
+void Core::Event::EventHandler::setEventFinishCallback( EventFinishCallback callback )
+{
+  m_finishCallback = callback;
+}
+
 bool Core::Event::EventHandler::hasPlayedScene() const
 {
   return m_playedScene;
