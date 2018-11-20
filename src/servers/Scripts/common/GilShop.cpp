@@ -8,7 +8,7 @@ class GilShop :
 {
 public:
   GilShop() :
-    Sapphire::ScriptAPI::EventScript( 0x00040001 )
+    Sapphire::ScriptAPI::EventScript( 0x00040000 )
   {
   }
 
