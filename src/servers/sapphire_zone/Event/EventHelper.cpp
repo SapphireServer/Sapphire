@@ -77,10 +77,10 @@ std::string Core::Event::getEventName( uint32_t eventId )
     case Event::EventHandler::EventHandlerType::Shop:
     {
       auto shopInfo = pExdData->get< Core::Data::GilShop >( eventId );
-      std::string name = shopInfo->name;
 
       if( shopInfo )
-        return name;
+        return shopInfo->name;
+
       return unknown + "GilShop";
     }
     default:

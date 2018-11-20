@@ -133,17 +133,17 @@ Core::LandPurchaseResult Core::HousingMgr::purchaseLand( Entity::Player& player,
 
   if( pLand->getState() != HouseState::forSale )
     return LandPurchaseResult::ERR_NOT_AVAILABLE;
-  
+
   if( gilAvailable < plotPrice )
     return LandPurchaseResult::ERR_NOT_ENOUGH_GIL;
-  
-  
+
+
   switch( static_cast< LandPurchaseMode >( state ) )
   {
     case LandPurchaseMode::FC:
       player.sendDebug( "Free company house purchase aren't supported at this time." );
       return LandPurchaseResult::ERR_INTERNAL;
-  
+
     case LandPurchaseMode::PRIVATE:
     {
 
@@ -169,11 +169,11 @@ Core::LandPurchaseResult Core::HousingMgr::purchaseLand( Entity::Player& player,
       pHousing->sendLandUpdate( plot );
       return LandPurchaseResult::SUCCESS;
     }
-  
+
     default:
       return LandPurchaseResult::ERR_INTERNAL;
   }
-  
+
 }
 
 bool Core::HousingMgr::relinquishLand( Entity::Player& player, uint8_t plot )
@@ -201,5 +201,52 @@ bool Core::HousingMgr::relinquishLand( Entity::Player& player, uint8_t plot )
   pHousing->sendLandUpdate( plot );
 
   return true;
+}
+
+void Core::HousingMgr::sendWardLandInfo( Entity::Player& player, uint8_t wardId, uint16_t territoryTypeId )
+{
+  auto landSetId = toLandSetId( territoryTypeId, wardId );
+  auto hZone = getHousingZoneByLandSetId( landSetId );
+
+  if( !hZone )
+    return;
+
+  auto wardInfoPacket = makeZonePacket< Server::FFXIVIpcHousingWardInfo >( player.getId() );
+  wardInfoPacket->data().wardId = wardId;
+  wardInfoPacket->data().territoryTypeId = territoryTypeId;
+
+  for( int i = 0; i < 60; i++ )
+  {
+    auto land = hZone->getLand( i );
+    assert( land );
+
+    auto& entry = wardInfoPacket->data().houseInfoEntry[ i ];
+
+    entry.housePrice = land->getCurrentPrice();
+
+    switch( land->getLandType() )
+    {
+      case LandType::FreeCompany:
+        entry.infoFlags = Common::WardEstateFlags::IsEstateOwned | Common::WardEstateFlags::IsFreeCompanyEstate;
+
+        // todo: send FC name
+
+        break;
+
+      case LandType::Private:
+        entry.infoFlags = Common::WardEstateFlags::IsEstateOwned;
+
+        auto owner = land->getPlayerOwner();
+        std::string playerName = g_fw.get< Core::ServerZone >()->getPlayerNameFromDb( owner );
+        memcpy( &entry.estateOwnerName, playerName.c_str(), playerName.size() );
+
+        break;
+    }
+
+    // todo: check we have an estate message and set the flag
+    // todo: check if estate allows public entry
+  }
+
+  player.queuePacket( wardInfoPacket );
 }
 

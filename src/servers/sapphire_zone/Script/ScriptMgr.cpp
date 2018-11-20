@@ -168,29 +168,22 @@ void Core::Scripting::ScriptMgr::onPlayerFirstEnterWorld( Entity::Player& player
 
 bool Core::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t actorId, uint32_t eventId )
 {
-
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-  uint16_t eventType = eventId >> 16;
-  uint32_t scriptId = eventId;
-
-  // todo: replace this shit with something more flexible allowing for handlers for an entire type without a bunch of if statements
-  // aethernet/aetherytes need to be handled separately
-  if( eventType == Event::EventHandler::EventHandlerType::Aetheryte )
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId & 0xFFFF0000 );
+  if( script )
   {
-    auto aetherInfo = pExdData->get< Core::Data::Aetheryte >( eventId & 0xFFFF );
-    scriptId = EVENTSCRIPT_AETHERYTE_ID;
-    if( !aetherInfo->isAetheryte )
-      scriptId = EVENTSCRIPT_AETHERNET_ID;
+    script->onTalk( eventId, player, actorId );
+    return true;
   }
-  else if( eventType == Event::EventHandler::EventHandlerType::Shop )
+  else
   {
-    scriptId = 0x00040001;
+    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
+    if( !script )
+      return false;
+
+    script->onTalk( eventId, player, actorId );
+    return true;
   }
 
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( scriptId );
-  if( !script )
-    return false;
-  script->onTalk( eventId, player, actorId );
   return true;
 }
 
