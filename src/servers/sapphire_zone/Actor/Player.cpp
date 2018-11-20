@@ -40,7 +40,7 @@
 #include "Math/CalcStats.h"
 #include "Math/CalcBattle.h"
 
-#include "ServerZone.h"
+#include "ServerMgr.h"
 #include "Framework.h"
 
 extern Core::Framework g_fw;
@@ -108,7 +108,7 @@ Core::Entity::Player::~Player()
 
 void Core::Entity::Player::injectPacket( const std::string& path )
 {
-  auto pServerZone = g_fw.get< ServerZone >();
+  auto pServerZone = g_fw.get< ServerMgr >();
   auto session = pServerZone->getSession( getId() );
   if( session )
     session->getZoneConnection()->injectPacket( path, *this );
@@ -1191,7 +1191,7 @@ const uint8_t* Core::Entity::Player::getGcRankArray() const
 
 void Core::Entity::Player::queuePacket( Network::Packets::FFXIVPacketBasePtr pPacket )
 {
-  auto pServerZone = g_fw.get< ServerZone >();
+  auto pServerZone = g_fw.get< ServerMgr >();
   auto pSession = pServerZone->getSession( m_id );
 
   if( !pSession )
@@ -1206,7 +1206,7 @@ void Core::Entity::Player::queuePacket( Network::Packets::FFXIVPacketBasePtr pPa
 
 void Core::Entity::Player::queueChatPacket( Network::Packets::FFXIVPacketBasePtr pPacket )
 {
-  auto pServerZone = g_fw.get< ServerZone >();
+  auto pServerZone = g_fw.get< ServerMgr >();
   auto pSession = pServerZone->getSession( m_id );
 
   if( !pSession )

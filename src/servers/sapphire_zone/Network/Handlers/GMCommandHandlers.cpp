@@ -29,7 +29,7 @@
 #include "Network/PacketWrappers/EventFinishPacket.h"
 #include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
 
-#include "ServerZone.h"
+#include "ServerMgr.h"
 #include "Framework.h"
 
 extern Core::Framework g_fw;
@@ -551,7 +551,7 @@ void Core::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACKET_R
     return;
 
   auto pLog = g_fw.get< Logger >();
-  auto pServerZone = g_fw.get< ServerZone >();
+  auto pServerZone = g_fw.get< ServerMgr >();
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcGmCommand2 >( inPacket );
 

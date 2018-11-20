@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "ServerZone.h"
+#include "ServerMgr.h"
 #include <Framework.h>
 #include <Logging/Logger.h>
 #include <Exd/ExdDataGenerated.h>
@@ -20,7 +20,7 @@ using namespace Core;
 
 bool setupFramework()
 {
-  auto pServer = std::make_shared< ServerZone >( "config.ini" );
+  auto pServer = std::make_shared< ServerMgr >( "config.ini" );
   auto pLogger = std::make_shared< Logger >();
   auto pExdData = std::make_shared< Data::ExdDataGenerated >();
   auto pScript = std::make_shared< Scripting::ScriptMgr >();
@@ -34,7 +34,7 @@ bool setupFramework()
   pLogger->setLogPath( "log/SapphireZone" );
   pLogger->init();
 
-  g_fw.set< ServerZone >( pServer );
+  g_fw.set< ServerMgr >( pServer );
   g_fw.set< Logger >( pLogger );
   g_fw.set< Data::ExdDataGenerated >( pExdData );
   g_fw.set< Scripting::ScriptMgr >( pScript );
@@ -54,6 +54,6 @@ int main( int32_t argc, char* argv[] )
   if( !setupFramework() )
     return 0; // too fucking bad...
 
-  g_fw.get< ServerZone >()->run( argc, argv );
+  g_fw.get< ServerMgr >()->run( argc, argv );
   return 0;
 }

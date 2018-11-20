@@ -18,7 +18,7 @@
 #include "HousingMgr.h"
 #include "Land.h"
 #include "Framework.h"
-#include "ServerZone.h"
+#include "ServerMgr.h"
 
 using namespace Core::Common;
 using namespace Core::Network;
@@ -42,7 +42,6 @@ bool Core::HousingMgr::init()
 
   return true;
 }
-
 
 uint32_t Core::HousingMgr::toLandSetId( uint16_t territoryTypeId, uint8_t wardId ) const
 {
@@ -89,7 +88,7 @@ void Core::HousingMgr::sendLandSignOwned( Entity::Player& player, uint8_t wardId
 
   auto landInfoSignPacket = makeZonePacket< Server::FFXIVIpcLandInfoSign >( player.getId() );
   uint32_t playerId = land->getPlayerOwner();
-  std::string playerName = g_fw.get< Core::ServerZone >()->getPlayerNameFromDb( playerId );
+  std::string playerName = g_fw.get< Core::ServerMgr >()->getPlayerNameFromDb( playerId );
   //memcpy( &landInfoSignPacket->data().estateGreeting, "Hello World", 11 );
   //memcpy( &landInfoSignPacket->data().estateName, land->getLandName().c_str(), land->getLandName().size() );
   landInfoSignPacket->data().houseSize = land->getSize();
@@ -256,7 +255,7 @@ void Core::HousingMgr::sendWardLandInfo( Entity::Player& player, uint8_t wardId,
         entry.infoFlags = Common::WardEstateFlags::IsEstateOwned;
 
         auto owner = land->getPlayerOwner();
-        std::string playerName = g_fw.get< Core::ServerZone >()->getPlayerNameFromDb( owner );
+        std::string playerName = g_fw.get< Core::ServerMgr >()->getPlayerNameFromDb( owner );
         memcpy( &entry.estateOwnerName, playerName.c_str(), playerName.size() );
 
         break;
