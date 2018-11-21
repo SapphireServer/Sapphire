@@ -291,11 +291,13 @@ namespace Core::Network::Packets
     OutOfRangeEventHandler = 0x014E, // updated 4.4
     EnterTeriEventHandler = 0x014F, // updated 4.4
 
+    ShopEventHandler = 0x0151, // updated 4.4
+
     ReturnEventHandler = 0x0154, // updated 4.4
     TradeReturnEventHandler = 0x0155, // updated 4.4
 
-    LinkshellEventHandler = 0x0150, // updated 4.1 ??
-    LinkshellEventHandler1 = 0x0151, // updated 4.1 ??
+    LinkshellEventHandler = 0x1150, // updated 4.1 ??
+    LinkshellEventHandler1 = 0x1151, // updated 4.1 ??
 
     LandRenameHandler = 0x0171, // updated 4.4
 

@@ -139,6 +139,8 @@ namespace Core::Network
 
     DECLARE_HANDLER( eventHandlerReturn );
 
+    DECLARE_HANDLER( eventHandlerShop );
+
     DECLARE_HANDLER( eventHandlerLinkshell );
 
     DECLARE_HANDLER( logoutHandler );
