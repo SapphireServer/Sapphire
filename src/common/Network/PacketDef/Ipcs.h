@@ -94,7 +94,7 @@ namespace Core::Network::Packets
 
     MailDeleteRequest = 0x0118, // updated 4.4
     ReqMoogleMailList = 0x0119, // updated 4.4
-    ReqMoogleMailLetter = 0x01A, // updated 4.4
+    ReqMoogleMailLetter = 0x011A, // updated 4.4
     MailLetterNotification = 0x011B, // updated 4.4
 
     ExamineFreeCompanyInfo = 0x013A, // updated 4.1
