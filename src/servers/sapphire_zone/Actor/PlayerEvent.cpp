@@ -158,7 +158,7 @@ void Core::Entity::Player::playGilShop( uint32_t eventId, uint32_t flags,
 
 Core::Event::EventHandlerPtr Core::Entity::Player::bootstrapSceneEvent( uint32_t eventId, uint32_t flags )
 {
-  
+
   auto pEvent = getEvent( eventId );
   if( !pEvent )
   {

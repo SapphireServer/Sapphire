@@ -98,8 +98,12 @@ Core::Network::GameConnection::GameConnection( Core::Network::HivePtr pHive,
   setZoneHandler( ClientZoneIpcType::TradeReturnEventHandler, "EventHandlerReturn",
                   &GameConnection::eventHandlerReturn );
 
+  setZoneHandler( ClientZoneIpcType::ShopEventHandler, "ShopEventHandler",
+                  &GameConnection::eventHandlerShop );
+
   setZoneHandler( ClientZoneIpcType::LinkshellEventHandler, "LinkshellEventHandler",
                   &GameConnection::eventHandlerLinkshell );
+
   setZoneHandler( ClientZoneIpcType::LinkshellEventHandler1, "LinkshellEventHandler1",
                   &GameConnection::eventHandlerLinkshell );
 
