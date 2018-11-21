@@ -12,6 +12,7 @@ file(GLOB SERVER_SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
         Event/*.c*
         Inventory/*.c*
         Linkshell/*.c*
+        Manager/*.c*
         Math/*.c*
         Network/*.c*
         Network/Handlers/*.c*
