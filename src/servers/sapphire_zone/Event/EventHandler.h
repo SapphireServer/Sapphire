@@ -69,6 +69,7 @@ namespace Core::Event
       Story = 0x001A,
       SpecialShop = 0x001B,
       BahamutGuide = 0x001C,
+      HousingAethernet = 0x001E,
       FcTalk = 0x001F,
       ICDirector = 0x8003,
     };
