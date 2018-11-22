@@ -223,10 +223,10 @@ private:
                       [ & ]( Entity::Player& player, const Event::SceneResult& result )
                       {
                         // accepting quest "close to home"
-                        player.updateQuest( getId(), 1 );
+                        player.updateQuest( getId(), Seq1 );
                         player.setQuestUI8CH( getId(), 1 ); // receive key item
                         // event is done, need to teleport to real zone.
-                        player.setZone( 132 );
+                        player.forceZoneing( Territorytype0 );
                         //player.setZone(183); back to starting griania for debug purpose
                       } );
   }
