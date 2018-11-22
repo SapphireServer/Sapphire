@@ -191,6 +191,8 @@ namespace Core::Network::Packets
     LandInfoSign = 0x0225, // updated 4.4
     LandRename = 0x0226, // updated 4.4
 
+    HousingEstateGreeting = 0x0227, // updated 4.4
+
     LandPermissionSlot = 0x0228, // updated 4.4
     LandPermission = 0x0229, // updated 4.4
 

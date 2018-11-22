@@ -168,7 +168,7 @@ void Core::Scripting::ScriptMgr::onPlayerFirstEnterWorld( Entity::Player& player
 
 bool Core::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t actorId, uint32_t eventId )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId & 0xFFFF0000 );
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
   if( script )
   {
     script->onTalk( eventId, player, actorId );
@@ -176,7 +176,7 @@ bool Core::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t actorI
   }
   else
   {
-    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
+    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId & 0xFFFF0000 );
     if( !script )
       return false;
 
@@ -184,7 +184,7 @@ bool Core::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t actorI
     return true;
   }
 
-  return true;
+  return false;
 }
 
 bool Core::Scripting::ScriptMgr::onEnterTerritory( Entity::Player& player, uint32_t eventId,
