@@ -25,7 +25,7 @@ void Sapphire::World::Manager::PlayerMgr::movePlayerToLandDestination( Core::Ent
   if( terriPos )
   {
     // check if its a housing zone, zoning is different here
-    if( terriMgr->isHousingTerritory( terriPos->getTargetZoneId() ) && param != 0 )
+    if( terriMgr->isHousingTerritory( terriPos->getTargetZoneId() ) )
     {
       auto housingMgr = g_fw.get< Core::HousingMgr >();
       auto landSetId = housingMgr->toLandSetId( terriPos->getTargetZoneId(), param );
