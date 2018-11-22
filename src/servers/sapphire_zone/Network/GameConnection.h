@@ -152,8 +152,7 @@ namespace Core::Network
     DECLARE_HANDLER( cfRegisterRoulette );
 
     DECLARE_HANDLER( cfDutyAccepted );
-
-
+    
     DECLARE_HANDLER( actionHandler );
 
     DECLARE_HANDLER( gm1Handler );
