@@ -11,7 +11,7 @@
 #include <ExdCat.h>
 #include <Exd.h>
 #include <set>
-#include <boost/make_shared.hpp>
+#include <variant>
 
 namespace Core {
 namespace Data {
@@ -35,13 +35,13 @@ STRUCTS
      template< class T >
      T getField( std::vector< xiv::exd::Field >& fields, uint32_t index )
      {
-        return *boost::get< T >( &fields.at( index ) );
+        return boost::get< T >( fields.at( index ) );
      }
 
      void loadIdList( xiv::exd::Exd& data, std::set< uint32_t >& outIdList );
 
-     boost::shared_ptr< xiv::dat::GameData > m_data;
-     boost::shared_ptr< xiv::exd::ExdData > m_exd_data;
+     std::shared_ptr< xiv::dat::GameData > m_data;
+     std::shared_ptr< xiv::exd::ExdData > m_exd_data;
 
 DATACCESS
 

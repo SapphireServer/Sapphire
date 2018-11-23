@@ -58,12 +58,12 @@ void Core::Land::load()
     pDb->directExecute( "INSERT INTO land ( landsetid, landid, type, size, status, landprice ) "
                         "VALUES ( " + std::to_string( m_landSetId ) + "," + std::to_string( m_landId ) + ","
                         + std::to_string( static_cast< uint8_t >( m_type ) ) + ","
-                        + std::to_string( m_landInfo->sizes[ m_landId ] ) + ","
-                        + " 1, " + std::to_string( m_landInfo->prices[ m_landId ] ) + " );" );
+                        + std::to_string( m_landInfo->plotSize[ m_landId ] ) + ","
+                        + " 1, " + std::to_string( m_landInfo->initialPrice[ m_landId ] ) + " );" );
 
-    m_currentPrice = m_landInfo->prices[ m_landId ];
-    m_minPrice = m_landInfo->minPrices[ m_landId ];
-    m_size = m_landInfo->sizes[ m_landId ];
+    m_currentPrice = m_landInfo->initialPrice[ m_landId ];
+    m_minPrice = m_landInfo->minPrice[ m_landId ];
+    m_size = m_landInfo->plotSize[ m_landId ];
     m_state = HouseState::forSale;
   }
   else
@@ -73,8 +73,8 @@ void Core::Land::load()
     m_state = res->getUInt( "Status" );
     m_currentPrice = res->getUInt( "LandPrice" );
     m_ownerPlayerId = res->getUInt( "OwnerId" );
-    m_minPrice = m_landInfo->minPrices[ m_landId ];
-    m_maxPrice = m_landInfo->prices[ m_landId ];
+    m_minPrice = m_landInfo->minPrice[ m_landId ];
+    m_maxPrice = m_landInfo->initialPrice[ m_landId ];
   }
   init();
 }

@@ -45,8 +45,8 @@ std::vector< std::string > cppKeyWords
     "class"
   };
 
-std::string datLocation( "/home/mordred/sqpack" );
-//std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
+//std::string datLocation( "/home/mordred/sqpack" );
+std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
 std::map< uint8_t, std::string > g_typeMap;
 
 
