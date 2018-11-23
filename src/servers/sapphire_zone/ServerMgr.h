@@ -44,7 +44,7 @@ public:
   Entity::BNpcTemplatePtr getBNpcTemplate( const std::string& key );
   Entity::BNpcTemplatePtr getBNpcTemplate( uint32_t id );
 
-  std::string getPlayerNameFromDb( uint32_t playerId );
+  std::string getPlayerNameFromDb( uint32_t playerId, bool forceDbLoad = false );
   void updatePlayerName( uint32_t playerId, const std::string& playerNewName );
 
 private:

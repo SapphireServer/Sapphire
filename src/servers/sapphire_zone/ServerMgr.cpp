@@ -365,12 +365,15 @@ bool Core::ServerMgr::isRunning() const
   return m_bRunning;
 }
 
-std::string Core::ServerMgr::getPlayerNameFromDb( uint32_t playerId )
+std::string Core::ServerMgr::getPlayerNameFromDb( uint32_t playerId, bool forceDbLoad )
 {
-  auto it = m_playerNameMapById.find( playerId );
+  if( !forceDbLoad )
+  {
+    auto it = m_playerNameMapById.find( playerId );
 
-  if( it != m_playerNameMapById.end() )
-    return ( it->second );
+    if( it != m_playerNameMapById.end() )
+      return ( it->second );
+  }
 
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto res = pDb->query( "SELECT name FROM charainfo WHERE characterid = " + std::to_string( playerId ) );
@@ -387,9 +390,6 @@ std::string Core::ServerMgr::getPlayerNameFromDb( uint32_t playerId )
 
 void Core::ServerMgr::updatePlayerName( uint32_t playerId, const std::string & playerNewName )
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  pDb->execute( "UPDATE charainfo SET name = '" + playerNewName + "' WHERE characterid = " + std::to_string( playerId ) );
-
   m_playerNameMapById[ playerId ] = playerNewName;
 }
 
