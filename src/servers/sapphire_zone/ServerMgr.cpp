@@ -367,13 +367,22 @@ bool Core::ServerMgr::isRunning() const
 
 std::string Core::ServerMgr::getPlayerNameFromDb( uint32_t playerId )
 {
+  auto it = m_payerNameMap.find( playerId );
+
+  if( it != m_payerNameMap.end() )
+    return ( it->second );
+
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto res = pDb->query( "SELECT name FROM charainfo WHERE characterid = " + std::to_string( playerId ) );
 
   if( !res->next() )
     return "Unknown";
 
-  return res->getString( 1 );
+  std::string playerName = res->getString( 1 );
+
+  m_payerNameMap[ playerId ] = playerName;
+
+  return playerName;
 }
 
 void Core::ServerMgr::loadBNpcTemplates()
