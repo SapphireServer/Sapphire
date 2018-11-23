@@ -382,8 +382,7 @@ std::string Core::ServerMgr::getPlayerNameFromDb( uint32_t playerId, bool forceD
     return "Unknown";
 
   std::string playerName = res->getString( 1 );
-
-  m_playerNameMapById[ playerId ] = playerName;
+  updatePlayerName( playerId, playerName );
 
   return playerName;
 }
