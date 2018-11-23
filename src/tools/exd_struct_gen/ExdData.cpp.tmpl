@@ -36,8 +36,8 @@ bool Core::Data::ExdDataGenerated::init( const std::string& path )
 {
    try
    {
-      m_data = boost::make_shared< xiv::dat::GameData >( path );
-      m_exd_data = boost::make_shared< xiv::exd::ExdData >( *m_data );
+      m_data = std::make_shared< xiv::dat::GameData >( path );
+      m_exd_data = std::make_shared< xiv::exd::ExdData >( *m_data );
 
 SETUPDATACCESS
    }

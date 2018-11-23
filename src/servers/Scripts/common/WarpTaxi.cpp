@@ -61,7 +61,8 @@ public:
     if( !warp )
       return;
 
-    player.eventStart( actorId, warp->defaultTalk1, Event::EventHandler::Nest, 0, 0, std::bind( &WarpTaxi::inner2, this, std::placeholders::_1, std::placeholders::_2 ) );
-    player.playScene( warp->defaultTalk1, 0, HIDE_HOTBAR, 0, 0, 7, nullptr );
+    player.eventStart( actorId, warp->conditionSuccessEvent, Event::EventHandler::Nest, 0, 0,
+                       std::bind( &WarpTaxi::inner2, this, std::placeholders::_1, std::placeholders::_2 ) );
+    player.playScene( warp->conditionSuccessEvent, 0, HIDE_HOTBAR, 0, 0, 7, nullptr );
   }
 };
