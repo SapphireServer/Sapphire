@@ -60,7 +60,7 @@ private:
 
   std::map< uint32_t, SessionPtr > m_sessionMapById;
   std::map< std::string, SessionPtr > m_sessionMapByName;
-  std::map< uint32_t, std::string > m_payerNameMapById;
+  std::map< uint32_t, std::string > m_playerNameMapById;
   std::map< uint32_t, uint32_t > m_zones;
   std::map< std::string, Entity::BNpcTemplatePtr > m_bNpcTemplateMap;
 

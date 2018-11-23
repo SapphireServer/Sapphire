@@ -367,9 +367,9 @@ bool Core::ServerMgr::isRunning() const
 
 std::string Core::ServerMgr::getPlayerNameFromDb( uint32_t playerId )
 {
-  auto it = m_payerNameMapById.find( playerId );
+  auto it = m_playerNameMapById.find( playerId );
 
-  if( it != m_payerNameMapById.end() )
+  if( it != m_playerNameMapById.end() )
     return ( it->second );
 
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
@@ -380,7 +380,7 @@ std::string Core::ServerMgr::getPlayerNameFromDb( uint32_t playerId )
 
   std::string playerName = res->getString( 1 );
 
-  m_payerNameMapById[ playerId ] = playerName;
+  m_playerNameMapById[ playerId ] = playerName;
 
   return playerName;
 }
@@ -390,7 +390,7 @@ void Core::ServerMgr::updatePlayerName( uint32_t playerId, const std::string & p
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   pDb->execute( "UPDATE charainfo SET name = '" + playerNewName + "' WHERE name = " + std::to_string( playerId ) );
 
-  m_payerNameMapById[ playerId ] = playerNewName;
+  m_playerNameMapById[ playerId ] = playerNewName;
 }
 
 void Core::ServerMgr::loadBNpcTemplates()
