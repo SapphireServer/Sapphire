@@ -240,7 +240,12 @@ void Core::HousingMgr::sendWardLandInfo( Entity::Player& player, uint8_t wardId,
 
     auto& entry = wardInfoPacket->data().houseInfoEntry[ i ];
 
+    // retail always sends the house price in this packet, even after the house has been sold
+    // so I guess we do the same
     entry.housePrice = land->getCurrentPrice();
+
+    if( land->getState() == Common::HouseState::forSale )
+      continue;
 
     switch( land->getLandType() )
     {
