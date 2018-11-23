@@ -35,7 +35,7 @@ STRUCTS
      template< class T >
      T getField( std::vector< xiv::exd::Field >& fields, uint32_t index )
      {
-        return boost::get< T >( fields.at( index ) );
+        return std::get< T >( fields.at( index ) );
      }
 
      void loadIdList( xiv::exd::Exd& data, std::set< uint32_t >& outIdList );
