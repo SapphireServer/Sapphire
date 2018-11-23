@@ -388,7 +388,7 @@ std::string Core::ServerMgr::getPlayerNameFromDb( uint32_t playerId )
 void Core::ServerMgr::updatePlayerName( uint32_t playerId, const std::string & playerNewName )
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  pDb->execute( "UPDATE charainfo SET name = '" + playerNewName + "' WHERE name = " + std::to_string( playerId ) );
+  pDb->execute( "UPDATE charainfo SET name = '" + playerNewName + "' WHERE characterid = " + std::to_string( playerId ) );
 
   m_playerNameMapById[ playerId ] = playerNewName;
 }
