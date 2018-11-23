@@ -74,14 +74,19 @@ std::string Core::Event::getEventName( uint32_t eventId )
         return "WarpTaxi";
       return unknown + "ChocoboWarp"; //who know
     }
+
     case Event::EventHandler::EventHandlerType::Shop:
     {
       auto shopInfo = pExdData->get< Core::Data::GilShop >( eventId );
 
-      if( shopInfo )
+      return "GilShop" + std::to_string( eventId );
+      /*if( shopInfo )
+      {
+        if( shopInfo->name.empty() || shopInfo->name == " " )
+          return "GilShop" + std::to_string( eventId );
         return shopInfo->name;
-
-      return unknown + "GilShop";
+      }*/
+      //return unknown + "GilShop";
     }
     default:
     {
