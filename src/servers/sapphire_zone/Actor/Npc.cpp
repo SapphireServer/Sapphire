@@ -20,7 +20,7 @@
 
 #include "StatusEffect/StatusEffect.h"
 #include "Action/ActionCollision.h"
-#include "ServerZone.h"
+#include "ServerMgr.h"
 #include "Session.h"
 #include "Math/CalcBattle.h"
 #include "Chara.h"

@@ -94,7 +94,7 @@ namespace Core::Network::Packets
 
     MailDeleteRequest = 0x0118, // updated 4.4
     ReqMoogleMailList = 0x0119, // updated 4.4
-    ReqMoogleMailLetter = 0x01A, // updated 4.4
+    ReqMoogleMailLetter = 0x011A, // updated 4.4
     MailLetterNotification = 0x011B, // updated 4.4
 
     ExamineFreeCompanyInfo = 0x013A, // updated 4.1
@@ -190,6 +190,8 @@ namespace Core::Network::Packets
     LandPriceUpdate = 0x0224, // updated 4.4
     LandInfoSign = 0x0225, // updated 4.4
     LandRename = 0x0226, // updated 4.4
+
+    HousingEstateGreeting = 0x0227, // updated 4.4
 
     LandPermissionSlot = 0x0228, // updated 4.4
     LandPermission = 0x0229, // updated 4.4
@@ -291,11 +293,13 @@ namespace Core::Network::Packets
     OutOfRangeEventHandler = 0x014E, // updated 4.4
     EnterTeriEventHandler = 0x014F, // updated 4.4
 
+    ShopEventHandler = 0x0151, // updated 4.4
+
     ReturnEventHandler = 0x0154, // updated 4.4
     TradeReturnEventHandler = 0x0155, // updated 4.4
 
-    LinkshellEventHandler = 0x0150, // updated 4.1 ??
-    LinkshellEventHandler1 = 0x0151, // updated 4.1 ??
+    LinkshellEventHandler = 0x1150, // updated 4.1 ??
+    LinkshellEventHandler1 = 0x1151, // updated 4.1 ??
 
     LandRenameHandler = 0x0171, // updated 4.4
 

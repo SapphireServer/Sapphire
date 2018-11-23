@@ -1738,6 +1738,15 @@ struct FFXIVIpcHousingWardInfo : FFXIVIpcBasePacket< HousingWardInfo >
   } houseInfoEntry[60];
 };
 
+struct FFXIVIpcHousingEstateGreeting : FFXIVIpcBasePacket< HousingEstateGreeting >
+{
+  uint8_t plotId;
+  uint8_t pad[3]; // unsure
+  uint16_t territoryTypeId;
+  uint16_t unk;
+  char message[200];
+};
+
 /**
 * Structural representation of the packet sent by the server
 * to show the current shared estate settings

@@ -32,7 +32,7 @@
 #include "Zone/TerritoryMgr.h"
 #include "Event/EventDefs.h"
 
-#include "ServerZone.h"
+#include "ServerMgr.h"
 
 #include "Session.h"
 #include "Framework.h"
@@ -422,7 +422,7 @@ void Core::DebugCommandHandler::add( char* data, Entity::Player& player, std::sh
   }
   else if( subCommand == "bnpc" )
   {
-    auto serverZone = g_fw.get< ServerZone >();
+    auto serverZone = g_fw.get< ServerMgr >();
 
     auto bNpcTemplate = serverZone->getBNpcTemplate( params );
 
@@ -557,7 +557,7 @@ void Core::DebugCommandHandler::get( char* data, Entity::Player& player, std::sh
 void
 Core::DebugCommandHandler::injectPacket( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
-  auto pServerZone = g_fw.get< ServerZone >();
+  auto pServerZone = g_fw.get< ServerMgr >();
   auto pSession = pServerZone->getSession( player.getId() );
   if( pSession )
     pSession->getZoneConnection()->injectPacket( data + 7, player );
@@ -566,7 +566,7 @@ Core::DebugCommandHandler::injectPacket( char* data, Entity::Player& player, std
 void Core::DebugCommandHandler::injectChatPacket( char* data, Entity::Player& player,
                                                   std::shared_ptr< DebugCommand > command )
 {
-  auto pServerZone = g_fw.get< ServerZone >();
+  auto pServerZone = g_fw.get< ServerMgr >();
   auto pSession = pServerZone->getSession( player.getId() );
   if( pSession )
     pSession->getChatConnection()->injectPacket( data + 8, player );
@@ -575,7 +575,7 @@ void Core::DebugCommandHandler::injectChatPacket( char* data, Entity::Player& pl
 void Core::DebugCommandHandler::replay( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto pLog = g_fw.get< Logger >();
-  auto pServerZone = g_fw.get< ServerZone >();
+  auto pServerZone = g_fw.get< ServerMgr >();
   std::string subCommand;
   std::string params = "";
 
@@ -673,7 +673,7 @@ void Core::DebugCommandHandler::nudge( char* data, Entity::Player& player, std::
 void
 Core::DebugCommandHandler::serverInfo( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
-  auto pServerZone = g_fw.get< ServerZone >();
+  auto pServerZone = g_fw.get< ServerMgr >();
   player.sendDebug( "SapphireZone " + Version::VERSION + "\nRev: " + Version::GIT_HASH );
   player.sendDebug( "Compiled: " __DATE__ " " __TIME__ );
   player.sendDebug( "Sessions: " + std::to_string( pServerZone->getSessionCount() ) );

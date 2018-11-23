@@ -41,7 +41,7 @@
 #include "Action/ActionTeleport.h"
 
 #include "Session.h"
-#include "ServerZone.h"
+#include "ServerMgr.h"
 #include "Forwards.h"
 #include "Framework.h"
 
@@ -111,7 +111,7 @@ void Core::Network::GameConnection::reqExamineSearchCommentHandler( const Core::
 {
 
   auto targetId = *reinterpret_cast< const uint32_t* >( &inPacket.data[ 0x10 ] );
-  auto pSession = g_fw.get< Core::ServerZone >()->getSession( targetId );
+  auto pSession = g_fw.get< Core::ServerMgr >()->getSession( targetId );
 
   g_fw.get< Core::Logger >()->debug( std::to_string( targetId ) );
 
@@ -138,7 +138,7 @@ void Core::Network::GameConnection::reqExamineFcInfo( const Core::Network::Packe
 {
 
   auto targetId = *reinterpret_cast< const uint32_t* >( &inPacket.data[ 0x18 ] );
-  auto pSession = g_fw.get< Core::ServerZone >()->getSession( targetId );
+  auto pSession = g_fw.get< Core::ServerMgr >()->getSession( targetId );
 
   g_fw.get< Core::Logger >()->debug( std::to_string( targetId ) );
 
@@ -598,7 +598,7 @@ void Core::Network::GameConnection::tellHandler( const Core::Network::Packets::F
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcTellHandler >( inPacket );
 
-  auto pZoneServer = g_fw.get< ServerZone >();
+  auto pZoneServer = g_fw.get< ServerMgr >();
 
   auto pSession = pZoneServer->getSession( packet.data().targetPCName );
 

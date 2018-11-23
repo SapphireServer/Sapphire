@@ -1,4 +1,5 @@
 #include <Common.h>
+#include <Logging/Logger.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Network/CommonNetwork.h>
 #include <Network/GamePacketNew.h>
@@ -250,5 +251,30 @@ void Core::Network::GameConnection::eventHandlerLinkshell( const Packets::FFXIVA
   player.queuePacket( linkshellEvent );
 
 }
+
+void Core::Network::GameConnection::eventHandlerShop( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                         Entity::Player& player )
+{
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcShopEventHandler >( inPacket );
+
+  auto pLog = g_fw.get< Logger >();
+  auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
+  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+
+  const auto eventId = packet.data().eventId;
+
+  auto eventType = static_cast< uint16_t >( eventId >> 16 );
+
+  std::string eventName = "onOpen";
+  std::string objName = Event::getEventName( eventId );
+
+  player.sendDebug( "EventId: " +
+                    std::to_string( eventId ) +
+                    " (0x" + Util::intToHexString( static_cast< uint64_t >( eventId & 0xFFFFFFF ), 8 ) + ")" );
+
+  player.sendDebug( "Calling: " + objName + "." + eventName );
+  player.eventStart( 0, eventId, Event::EventHandler::UI, 0, packet.data().param );
+}
+
 
 

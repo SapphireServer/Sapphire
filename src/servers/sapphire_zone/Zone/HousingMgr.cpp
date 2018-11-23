@@ -18,7 +18,7 @@
 #include "HousingMgr.h"
 #include "Land.h"
 #include "Framework.h"
-#include "ServerZone.h"
+#include "ServerMgr.h"
 
 using namespace Core::Common;
 using namespace Core::Network;
@@ -42,7 +42,6 @@ bool Core::HousingMgr::init()
 
   return true;
 }
-
 
 uint32_t Core::HousingMgr::toLandSetId( uint16_t territoryTypeId, uint8_t wardId ) const
 {
@@ -89,7 +88,7 @@ void Core::HousingMgr::sendLandSignOwned( Entity::Player& player, uint8_t wardId
 
   auto landInfoSignPacket = makeZonePacket< Server::FFXIVIpcLandInfoSign >( player.getId() );
   uint32_t playerId = land->getPlayerOwner();
-  std::string playerName = g_fw.get< Core::ServerZone >()->getPlayerNameFromDb( playerId );
+  std::string playerName = g_fw.get< Core::ServerMgr >()->getPlayerNameFromDb( playerId );
   //memcpy( &landInfoSignPacket->data().estateGreeting, "Hello World", 11 );
   //memcpy( &landInfoSignPacket->data().estateName, land->getLandName().c_str(), land->getLandName().size() );
   landInfoSignPacket->data().houseSize = land->getSize();
@@ -184,6 +183,25 @@ bool Core::HousingMgr::relinquishLand( Entity::Player& player, uint8_t plot )
 
   auto pLand = pHousing->getLand( plot );
   auto plotMaxPrice = pLand->getCurrentPrice();
+  auto landOwnerId = pLand->getPlayerOwner();
+
+  // can't relinquish when you are not the owner
+  // TODO: actually use permissions here for FC houses
+  if( landOwnerId != player.getId() )
+  {
+    auto msgPkt = makeActorControl143( player.getId(), ActorControl::LogMsg, 3304, 0 );
+    player.queuePacket( msgPkt );
+    return false;
+  }
+
+  // unable to relinquish if there is a house built
+  // TODO: additionally check for yard items
+  if( pLand->getHouse() )
+  {
+    auto msgPkt = makeActorControl143( player.getId(), ActorControl::LogMsg, 3315, 0 );
+    player.queuePacket( msgPkt );
+    return false;
+  }
 
   pLand->setCurrentPrice( pLand->getMaxPrice() );
   pLand->setPlayerOwner( 0 );
@@ -222,7 +240,12 @@ void Core::HousingMgr::sendWardLandInfo( Entity::Player& player, uint8_t wardId,
 
     auto& entry = wardInfoPacket->data().houseInfoEntry[ i ];
 
+    // retail always sends the house price in this packet, even after the house has been sold
+    // so I guess we do the same
     entry.housePrice = land->getCurrentPrice();
+
+    if( land->getState() == Common::HouseState::forSale )
+      continue;
 
     switch( land->getLandType() )
     {
@@ -237,7 +260,7 @@ void Core::HousingMgr::sendWardLandInfo( Entity::Player& player, uint8_t wardId,
         entry.infoFlags = Common::WardEstateFlags::IsEstateOwned;
 
         auto owner = land->getPlayerOwner();
-        std::string playerName = g_fw.get< Core::ServerZone >()->getPlayerNameFromDb( owner );
+        std::string playerName = g_fw.get< Core::ServerMgr >()->getPlayerNameFromDb( owner );
         memcpy( &entry.estateOwnerName, playerName.c_str(), playerName.size() );
 
         break;
