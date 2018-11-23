@@ -15,7 +15,7 @@
 #include "DebugCommand/DebugCommandHandler.h"
 
 #include "GameConnection.h"
-#include "ServerZone.h"
+#include "ServerMgr.h"
 #include "Session.h"
 #include "Framework.h"
 #include "Forwards.h"
@@ -83,7 +83,7 @@ Core::Network::GameConnection::GameConnection( Core::Network::HivePtr pHive,
   setZoneHandler( ClientZoneIpcType::InventoryModifyHandler, "InventoryModifyHandler",
                   &GameConnection::inventoryModifyHandler );
 
-  setZoneHandler( ClientZoneIpcType::BuildPresetHandler, "BuildPresetHandler", &GameConnection::eventHandlerTalk );
+  setZoneHandler( ClientZoneIpcType::BuildPresetHandler, "BuildPresetHandler", &GameConnection::buildPresetHandler );
   setZoneHandler( ClientZoneIpcType::LandRenameHandler, "LandRenameHandler", &GameConnection::landRenameHandler );
   setZoneHandler( ClientZoneIpcType::TalkEventHandler, "EventHandlerTalk", &GameConnection::eventHandlerTalk );
   setZoneHandler( ClientZoneIpcType::EmoteEventHandler, "EventHandlerEmote", &GameConnection::eventHandlerEmote );
@@ -98,8 +98,12 @@ Core::Network::GameConnection::GameConnection( Core::Network::HivePtr pHive,
   setZoneHandler( ClientZoneIpcType::TradeReturnEventHandler, "EventHandlerReturn",
                   &GameConnection::eventHandlerReturn );
 
+  setZoneHandler( ClientZoneIpcType::ShopEventHandler, "ShopEventHandler",
+                  &GameConnection::eventHandlerShop );
+
   setZoneHandler( ClientZoneIpcType::LinkshellEventHandler, "LinkshellEventHandler",
                   &GameConnection::eventHandlerLinkshell );
+
   setZoneHandler( ClientZoneIpcType::LinkshellEventHandler1, "LinkshellEventHandler1",
                   &GameConnection::eventHandlerLinkshell );
 
@@ -385,7 +389,7 @@ void Core::Network::GameConnection::handlePackets( const Core::Network::Packets:
                                                    const std::vector< Core::Network::Packets::FFXIVARR_PACKET_RAW >& packetData )
 {
   auto pLog = g_fw.get< Logger >();
-  auto pServerZone = g_fw.get< ServerZone >();
+  auto pServerZone = g_fw.get< ServerMgr >();
   // if a session is set, update the last time it recieved a game packet
   if( m_pSession )
     m_pSession->updateLastDataTime();

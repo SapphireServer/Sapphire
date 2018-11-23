@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "ServerZone.h"
+#include "ServerMgr.h"
 #include <Framework.h>
 #include <Logging/Logger.h>
 #include <Exd/ExdDataGenerated.h>
@@ -11,6 +11,7 @@
 #include "Zone/TerritoryMgr.h"
 #include "Zone/HousingMgr.h"
 #include "DebugCommand/DebugCommandHandler.h"
+#include "Manager/PlayerMgr.h"
 
 #include <Config/ConfigMgr.h>
 
@@ -20,7 +21,7 @@ using namespace Core;
 
 bool setupFramework()
 {
-  auto pServer = std::make_shared< ServerZone >( "config.ini" );
+  auto pServer = std::make_shared< ServerMgr >( "config.ini" );
   auto pLogger = std::make_shared< Logger >();
   auto pExdData = std::make_shared< Data::ExdDataGenerated >();
   auto pScript = std::make_shared< Scripting::ScriptMgr >();
@@ -30,11 +31,12 @@ bool setupFramework()
   auto pTeriMgr = std::make_shared< TerritoryMgr >();
   auto pDebugCom = std::make_shared< DebugCommandHandler >();
   auto pConfig = std::make_shared< ConfigMgr >();
+  auto pPlayerMgr = std::make_shared< Sapphire::World::Manager::PlayerMgr >();
 
   pLogger->setLogPath( "log/SapphireZone" );
   pLogger->init();
 
-  g_fw.set< ServerZone >( pServer );
+  g_fw.set< ServerMgr >( pServer );
   g_fw.set< Logger >( pLogger );
   g_fw.set< Data::ExdDataGenerated >( pExdData );
   g_fw.set< Scripting::ScriptMgr >( pScript );
@@ -44,6 +46,7 @@ bool setupFramework()
   g_fw.set< TerritoryMgr >( pTeriMgr );
   g_fw.set< DebugCommandHandler >( pDebugCom );
   g_fw.set< ConfigMgr >( pConfig );
+  g_fw.set< Sapphire::World::Manager::PlayerMgr >( pPlayerMgr );
 
   // actuall catch errors here...
   return true;
@@ -54,6 +57,6 @@ int main( int32_t argc, char* argv[] )
   if( !setupFramework() )
     return 0; // too fucking bad...
 
-  g_fw.get< ServerZone >()->run( argc, argv );
+  g_fw.get< ServerMgr >()->run( argc, argv );
   return 0;
 }

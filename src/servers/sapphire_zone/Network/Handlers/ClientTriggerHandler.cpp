@@ -33,7 +33,7 @@
 
 
 #include "Session.h"
-#include "ServerZone.h"
+#include "ServerMgr.h"
 #include "Forwards.h"
 #include "Framework.h"
 #include <Network/PacketDef/Lobby/ServerLobbyDef.h>
@@ -49,7 +49,7 @@ void examineHandler( Core::Entity::Player& player, uint32_t targetId )
 {
   using namespace Core;
 
-  auto pSession = g_fw.get< Core::ServerZone >()->getSession( targetId );
+  auto pSession = g_fw.get< Core::ServerMgr >()->getSession( targetId );
   if( pSession )
   {
     auto pTarget = pSession->getPlayer();

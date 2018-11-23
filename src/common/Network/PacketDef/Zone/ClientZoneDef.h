@@ -163,6 +163,13 @@ struct FFXIVIpcChatHandler :
   /* 001A */ char message[1012];
 };
 
+struct FFXIVIpcShopEventHandler :
+  FFXIVIpcBasePacket< ShopEventHandler >
+{
+  /* 0000 */ uint32_t eventId;
+  /* 0004 */ uint32_t param;
+};
+
 struct FFXIVIpcLinkshellEventHandler :
   FFXIVIpcBasePacket< LinkshellEventHandler >
 {

@@ -5,7 +5,7 @@
 #include <Network/PacketContainer.h>
 
 #include "Network/GameConnection.h"
-#include "ServerZone.h"
+#include "ServerMgr.h"
 #include "Framework.h"
 
 #include <Version.h>
@@ -28,7 +28,7 @@
 
 extern Core::Framework g_fw;
 
-Core::ServerZone::ServerZone( const std::string& configName ) :
+Core::ServerMgr::ServerMgr( const std::string& configName ) :
   m_configName( configName ),
   m_bRunning( true ),
   m_lastDBPingTime( 0 ),
@@ -36,16 +36,16 @@ Core::ServerZone::ServerZone( const std::string& configName ) :
 {
 }
 
-Core::ServerZone::~ServerZone()
+Core::ServerMgr::~ServerMgr()
 {
 }
 
-size_t Core::ServerZone::getSessionCount() const
+size_t Core::ServerMgr::getSessionCount() const
 {
   return m_sessionMapById.size();
 }
 
-bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
+bool Core::ServerMgr::loadSettings( int32_t argc, char* argv[] )
 {
   auto pLog = g_fw.get< Core::Logger >();
   auto pConfig = g_fw.get< Core::ConfigMgr >();
@@ -143,7 +143,7 @@ bool Core::ServerZone::loadSettings( int32_t argc, char* argv[] )
   return true;
 }
 
-void Core::ServerZone::run( int32_t argc, char* argv[] )
+void Core::ServerMgr::run( int32_t argc, char* argv[] )
 {
   auto pLog = g_fw.get< Core::Logger >();
   auto pScript = g_fw.get< Scripting::ScriptMgr >();
@@ -189,17 +189,17 @@ void Core::ServerZone::run( int32_t argc, char* argv[] )
 
 }
 
-uint16_t Core::ServerZone::getWorldId() const
+uint16_t Core::ServerMgr::getWorldId() const
 {
   return m_worldId;
 }
 
-void Core::ServerZone::setWorldId( uint16_t worldId )
+void Core::ServerMgr::setWorldId( uint16_t worldId )
 {
   m_worldId = worldId;
 }
 
-void Core::ServerZone::printBanner() const
+void Core::ServerMgr::printBanner() const
 {
   auto pLog = g_fw.get< Core::Logger >();
 
@@ -211,7 +211,7 @@ void Core::ServerZone::printBanner() const
   pLog->info( "===========================================================" );
 }
 
-void Core::ServerZone::mainLoop()
+void Core::ServerMgr::mainLoop()
 {
   auto pLog = g_fw.get< Logger >();
   auto pTeriMgr = g_fw.get< TerritoryMgr >();
@@ -292,7 +292,7 @@ void Core::ServerZone::mainLoop()
   }
 }
 
-bool Core::ServerZone::createSession( uint32_t sessionId )
+bool Core::ServerMgr::createSession( uint32_t sessionId )
 {
   auto pLog = g_fw.get< Core::Logger >();
 
@@ -325,12 +325,12 @@ bool Core::ServerZone::createSession( uint32_t sessionId )
 
 }
 
-void Core::ServerZone::removeSession( uint32_t sessionId )
+void Core::ServerMgr::removeSession( uint32_t sessionId )
 {
   m_sessionMapById.erase( sessionId );
 }
 
-Core::SessionPtr Core::ServerZone::getSession( uint32_t id )
+Core::SessionPtr Core::ServerMgr::getSession( uint32_t id )
 {
   //std::lock_guard<std::mutex> lock( m_sessionMutex );
 
@@ -342,7 +342,7 @@ Core::SessionPtr Core::ServerZone::getSession( uint32_t id )
   return nullptr;
 }
 
-Core::SessionPtr Core::ServerZone::getSession( const std::string& playerName )
+Core::SessionPtr Core::ServerMgr::getSession( const std::string& playerName )
 {
   //std::lock_guard<std::mutex> lock( m_sessionMutex );
 
@@ -354,18 +354,18 @@ Core::SessionPtr Core::ServerZone::getSession( const std::string& playerName )
   return nullptr;
 }
 
-void Core::ServerZone::removeSession( const std::string& playerName )
+void Core::ServerMgr::removeSession( const std::string& playerName )
 {
   m_sessionMapByName.erase( playerName );
 }
 
 
-bool Core::ServerZone::isRunning() const
+bool Core::ServerMgr::isRunning() const
 {
   return m_bRunning;
 }
 
-std::string Core::ServerZone::getPlayerNameFromDb( uint32_t playerId )
+std::string Core::ServerMgr::getPlayerNameFromDb( uint32_t playerId )
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto res = pDb->query( "SELECT name FROM charainfo WHERE characterid = " + std::to_string( playerId ) );
@@ -376,7 +376,7 @@ std::string Core::ServerZone::getPlayerNameFromDb( uint32_t playerId )
   return res->getString( 1 );
 }
 
-void Core::ServerZone::loadBNpcTemplates()
+void Core::ServerMgr::loadBNpcTemplates()
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto pTeriMgr = g_fw.get< TerritoryMgr >();
@@ -419,7 +419,7 @@ void Core::ServerZone::loadBNpcTemplates()
 
 }
 
-Core::Entity::BNpcTemplatePtr Core::ServerZone::getBNpcTemplate( const std::string& key )
+Core::Entity::BNpcTemplatePtr Core::ServerMgr::getBNpcTemplate( const std::string& key )
 {
   auto it = m_bNpcTemplateMap.find( key );
 
@@ -429,7 +429,7 @@ Core::Entity::BNpcTemplatePtr Core::ServerZone::getBNpcTemplate( const std::stri
   return it->second;
 }
 
-Core::Entity::BNpcTemplatePtr Core::ServerZone::getBNpcTemplate( uint32_t id )
+Core::Entity::BNpcTemplatePtr Core::ServerMgr::getBNpcTemplate( uint32_t id )
 {
   for( auto entry : m_bNpcTemplateMap )
   {

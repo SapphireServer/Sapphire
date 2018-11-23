@@ -16,7 +16,7 @@
 #include "Action/EventItemAction.h"
 
 #include "Zone/Zone.h"
-#include "ServerZone.h"
+#include "ServerMgr.h"
 #include "Framework.h"
 
 extern Core::Framework g_fw;
@@ -158,22 +158,17 @@ void Core::Entity::Player::playGilShop( uint32_t eventId, uint32_t flags,
 
 Core::Event::EventHandlerPtr Core::Entity::Player::bootstrapSceneEvent( uint32_t eventId, uint32_t flags )
 {
-  if( flags & 0x02 )
-    setStateFlag( PlayerStateFlag::WatchingCutscene );
 
   auto pEvent = getEvent( eventId );
-  if( !pEvent && getEventCount() )
-  {
-    // We're trying to play a nested event, need to start it first.
-    //eventStart( getId(), eventId, Event::EventHandler::Nest, 0, 0 );
-    //pEvent = getEvent( eventId );
-  }
-  else if( !pEvent )
+  if( !pEvent )
   {
     auto pLog = g_fw.get< Logger >();
     pLog->error( "Could not find event " + std::to_string( eventId ) + ", event has not been started!" );
     return nullptr;
   }
+
+  if( flags & 0x02 )
+    setStateFlag( PlayerStateFlag::WatchingCutscene );
 
   return pEvent;
 }
@@ -265,21 +260,6 @@ void Core::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlayer )
 
       if( callback )
         callback( *this, pEvent->getActorId() );
-
-      auto events = eventList();
-
-      /*for( auto it : events )
-      {
-
-        if( it.second->hasPlayedScene() == false )
-        {
-          // TODO: not happy with this, this is also prone to break wit more than one remaining event in there
-          queuePacket( std::make_shared< EventFinishPacket >( getId(), it.second->getId(),
-                                                                it.second->getEventType(),
-                                                                it.second->getEventParam() ) );
-          removeEvent( it.second->getId() );
-        }
-      }*/
 
       break;
     }

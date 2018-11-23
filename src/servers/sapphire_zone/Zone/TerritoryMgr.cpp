@@ -410,14 +410,18 @@ bool Core::TerritoryMgr::movePlayer( ZonePtr pZone, Core::Entity::PlayerPtr pPla
   if( isHousingTerritory( pZone->getTerritoryTypeId() ) )
   {
     auto pHousing = std::dynamic_pointer_cast< HousingZone >( pZone );
-    if( pHousing )  
+    if( pHousing )
       pPlayer->setTerritoryId( pHousing->getLandSetId() );
-  }  
+  }
+  else if( isInstanceContentTerritory( pZone->getTerritoryTypeId() ) )
+  {
+    pPlayer->setTerritoryId( pZone->getGuId() );
+  }
   else
   {
     pPlayer->setTerritoryId( 0 );
   }
-  
+
   // mark character as zoning in progress
   pPlayer->setLoadingComplete( false );
 

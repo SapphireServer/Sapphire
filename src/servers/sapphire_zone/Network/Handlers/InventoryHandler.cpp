@@ -15,7 +15,7 @@
 #include "Actor/Player.h"
 
 #include "Session.h"
-#include "ServerZone.h"
+#include "ServerMgr.h"
 
 #include "Framework.h"
 

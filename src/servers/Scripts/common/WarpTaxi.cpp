@@ -2,10 +2,8 @@
 #include <Actor/Player.h>
 
 #include <Exd/ExdDataGenerated.h>
-#include <Zone/TerritoryMgr.h>
-#include <Zone/HousingMgr.h>
-#include <Zone/ZonePosition.h>
 #include <Framework.h>
+#include <Manager/PlayerMgr.h>
 
 using namespace Core;
 
@@ -29,37 +27,13 @@ public:
       player.eventFinish( 1310721, 0 );
       player.eventFinish( getId(), 1 );
 
-      // todo: this is shit, move to housingmgr? handle moving players in and out of it there?
       auto exdData = getFramework()->get< Core::Data::ExdDataGenerated >();
-
       auto warp = exdData->get< Core::Data::Warp >( getId() );
       if( !warp )
         return;
 
-      auto level = exdData->get< Core::Data::Level >( warp->level );
-      if( !level )
-      {
-
-        // fetch from cache
-        auto teriMgr = getFramework()->get< Core::TerritoryMgr >();
-
-        auto pos = teriMgr->getTerritoryPosition( warp->level );
-        if( !pos )
-          return;
-
-        // lookup instance
-        auto housingMgr = getFramework()->get< Core::HousingMgr >();
-        auto landSetId = housingMgr->toLandSetId( 341, result.param3 );
-        auto hZone = housingMgr->getHousingZoneByLandSetId( landSetId );
-
-        if( !hZone )
-          return;
-
-        player.setPos( pos->getTargetPosition() );
-        player.setRot( pos->getTargetRotation() );
-        player.setInstance( hZone );
-
-      }
+      auto playerMgr = getFramework()->get< Sapphire::World::Manager::PlayerMgr >();
+      playerMgr->movePlayerToLandDestination( player, warp->level, result.param3 );
     }
     else
     {

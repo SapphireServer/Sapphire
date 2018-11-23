@@ -139,6 +139,8 @@ namespace Core::Network
 
     DECLARE_HANDLER( eventHandlerReturn );
 
+    DECLARE_HANDLER( eventHandlerShop );
+
     DECLARE_HANDLER( eventHandlerLinkshell );
 
     DECLARE_HANDLER( logoutHandler );
@@ -150,8 +152,7 @@ namespace Core::Network
     DECLARE_HANDLER( cfRegisterRoulette );
 
     DECLARE_HANDLER( cfDutyAccepted );
-
-
+    
     DECLARE_HANDLER( actionHandler );
 
     DECLARE_HANDLER( gm1Handler );
