@@ -31,6 +31,9 @@ namespace xiv
          uint16_t field_count;
          uint16_t exd_count;
          uint16_t language_count;
+	 uint16_t unknown1;
+	 uint8_t u2;
+	 uint8_t variant;
       };
 
       struct ExhMember
