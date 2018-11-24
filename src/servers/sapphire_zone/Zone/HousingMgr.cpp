@@ -98,7 +98,7 @@ void Core::HousingMgr::sendLandSignOwned( Entity::Player& player, uint8_t wardId
   memcpy( &landInfoSignPacket->data().ownerName, playerName.c_str(), playerName.size() );
   landInfoSignPacket->data().wardNum = land->getWardNum();
   landInfoSignPacket->data().worldId = 67;
-  landInfoSignPacket->data().zoneId = land->getZoneId();
+  landInfoSignPacket->data().zoneId = land->getTerritoryTypeId();
   player.queuePacket( landInfoSignPacket );
 }
 
@@ -290,7 +290,9 @@ void Core::HousingMgr::buildPresetEstate( Entity::Player& player, uint8_t plotNu
 
   // todo: check if permit is in inventory and remove one
 
-  pLand->setPreset( presetItem );
+  if( !pLand->setPreset( presetItem ) )
+    return;
+
   pLand->setState( HouseState::privateHouse );
   pLand->setLandType( LandType::Private );
   pLand->updateLandDb();

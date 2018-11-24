@@ -33,7 +33,7 @@ namespace Core
     uint32_t getLandSetId() const;
     uint8_t getWardNum() const;
     uint8_t getLandId() const;
-    uint16_t getZoneId() const;
+    uint16_t getTerritoryTypeId() const;
     Common::LandType getLandType() const;
     Core::HousePtr getHouse() const;
 
@@ -64,11 +64,12 @@ namespace Core
   private:
     uint32_t convertItemIdToHousingItemId( uint32_t itemId );
     void init();
+    uint32_t getNextHouseId();
 
     uint8_t m_wardNum;
     uint8_t m_landId;
     uint32_t m_landSetId;
-    uint16_t m_zoneId;
+    uint16_t m_territoryTypeId;
     uint8_t m_size;
     uint8_t m_state;
     Common::LandType m_type;
