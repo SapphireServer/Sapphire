@@ -1,6 +1,9 @@
 #include <ScriptObject.h>
 #include <Actor/Player.h>
 
+#include <Framework.h>
+#include <Manager/ShopMgr.h>
+
 using namespace Core;
 
 class GilShop :
@@ -16,11 +19,11 @@ public:
 
   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
   {
-    player.playScene( eventId, 0, SCENE_FLAGS, 0, 2, shopCallback );
+    player.playScene( eventId, 0, SCENE_FLAGS, 0, 2, std::bind( &GilShop::shopCallback, this, std::placeholders::_1, std::placeholders::_2 ) );
   }
 
 private:
-  static void shopInteractionCallback( Entity::Player& player, const Event::SceneResult& result )
+  void shopInteractionCallback( Entity::Player& player, const Event::SceneResult& result )
   {
     // item purchase
     if( result.param1 == 768 )
@@ -28,17 +31,20 @@ private:
       // buy
       if( result.param2 == 1 )
       {
+        auto shopMgr = getFramework()->get< Sapphire::World::Manager::ShopMgr >();
 
+        shopMgr->purchaseGilShopItem( player, result.eventId, result.param3, result.param4 );
       }
 
-        // sell
+      // sell
       else if( result.param2 == 2 )
       {
-
+        // so apparently shops will always show a sell window
+        // BUT won't always let you sell stuff (eg, housing permit menu)
+        // there doesn't seem to be anything in gilshop exd for that, so maybe it's some shitty server hack?
       }
 
-      player.sendDebug( "got tradeQuantity: " + std::to_string( result.param4 ) );
-      player.playGilShop( result.eventId, SCENE_FLAGS, shopInteractionCallback );
+      player.playGilShop( result.eventId, SCENE_FLAGS, std::bind( &GilShop::shopInteractionCallback, this, std::placeholders::_1, std::placeholders::_2 ) );
       return;
     }
 
@@ -46,8 +52,8 @@ private:
     player.playScene( result.eventId, 255, SCENE_FLAGS );
   }
 
-  static void shopCallback( Entity::Player& player, const Event::SceneResult& result )
+  void shopCallback( Entity::Player& player, const Event::SceneResult& result )
   {
-    player.playGilShop( result.eventId, SCENE_FLAGS, shopInteractionCallback );
+    player.playGilShop( result.eventId, SCENE_FLAGS, std::bind( &GilShop::shopInteractionCallback, this, std::placeholders::_1, std::placeholders::_2 ) );
   }
 };

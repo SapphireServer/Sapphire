@@ -79,7 +79,7 @@ void Core::Land::load()
   init();
 }
 
-uint16_t Core::Land::convertItemIdToHousingItemId( uint16_t itemId )
+uint32_t Core::Land::convertItemIdToHousingItemId( uint32_t itemId )
 {
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
   auto info = pExdData->get< Core::Data::Item >( itemId );
@@ -246,7 +246,7 @@ void Core::Land::updateLandDb()
   pDb->directExecute( "UPDATE land SET status = " + std::to_string( m_state )
   + ", LandPrice = " + std::to_string( getCurrentPrice() )
   + ", UpdateTime = " + std::to_string( getDevaluationTime() )
-  + ", OwnerId = " + std::to_string( getPlayerOwner() ) 
+  + ", OwnerId = " + std::to_string( getPlayerOwner() )
   + ", HouseId = " + std::to_string( 0 ) //TODO: add house id
   + ", Type = " + std::to_string( static_cast< uint32_t >( m_type ) ) //TODO: add house id
   + " WHERE LandSetId = " + std::to_string( m_landSetId )
@@ -264,4 +264,16 @@ void Core::Land::update( uint32_t currTime )
       updateLandDb();
     }
   }
+}
+
+bool Core::Land::setPreset( uint32_t itemId )
+{
+  auto housingItemId = convertItemIdToHousingItemId( itemId );
+
+  auto exdData = g_fw.get< Core::Data::ExdDataGenerated >();
+  if( !exdData )
+    return false;
+
+  auto housingPreset = exdData->get< Core::Data::HousingPreset >( housingItemId );
+
 }
