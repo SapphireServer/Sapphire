@@ -273,7 +273,9 @@ void Core::Network::GameConnection::eventHandlerShop( const Packets::FFXIVARR_PA
                     " (0x" + Util::intToHexString( static_cast< uint64_t >( eventId & 0xFFFFFFF ), 8 ) + ")" );
 
   player.sendDebug( "Calling: " + objName + "." + eventName );
-  player.eventStart( 0, eventId, Event::EventHandler::UI, 0, packet.data().param );
+  player.eventStart( player.getId(), eventId, Event::EventHandler::UI, 0, packet.data().param );
+
+  pScriptMgr->onTalk( player, player.getId(), eventId );
 }
 
 

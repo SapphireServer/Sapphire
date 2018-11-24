@@ -6127,7 +6127,7 @@ struct ZoneSharedGroup
       }
       catch( std::runtime_error error )
       {
-        std::cout << error.what();
+        // std::cout << error.what();
         return nullptr;
       }
       return nullptr;
