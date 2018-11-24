@@ -1580,7 +1580,7 @@ void Core::Entity::Player::sendZonePackets()
   auto pHousingMgr = g_fw.get< HousingMgr >();
   if( Core::LandPtr pLand = pHousingMgr->getLandByOwnerId( getId() ) )
   {
-    setLandPermissions( LandPermissionSlot::Private, 0x00, pLand->getLandId(), pLand->getWardNum(), pLand->getZoneId() );
+    setLandPermissions( LandPermissionSlot::Private, 0x00, pLand->getLandId(), pLand->getWardNum(), pLand->getTerritoryTypeId() );
   }
 
   sendLandPermissions();
