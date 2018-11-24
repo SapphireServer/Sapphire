@@ -273,3 +273,30 @@ void Core::HousingMgr::sendWardLandInfo( Entity::Player& player, uint8_t wardId,
   player.queuePacket( wardInfoPacket );
 }
 
+void Core::HousingMgr::buildPresetEstate( Entity::Player& player, uint8_t plotNum, uint32_t presetItem )
+{
+  auto hZone = std::dynamic_pointer_cast< HousingZone >( player.getCurrentZone() );
+
+  if( !hZone )
+    return;
+
+  auto pLand = hZone->getLand( plotNum );
+  if( !pLand )
+    return;
+
+  // todo: when doing FC houses, look up the type from the original purchase and check perms from FC and set state accordingly
+  if( pLand->getPlayerOwner() != player.getId() )
+    return;
+
+  // todo: check if permit is in inventory and remove one
+
+  pLand->setPreset( presetItem );
+  pLand->setState( HouseState::privateHouse );
+  pLand->setLandType( LandType::Private );
+  pLand->updateLandDb();
+  hZone->sendLandUpdate( plotNum );
+
+  auto pSuccessBuildingPacket = makeActorControl142( player.getId(), ActorControl::BuildPresetResponse, plotNum );
+
+  player.queuePacket( pSuccessBuildingPacket );
+}

@@ -48,7 +48,7 @@ namespace Core
     uint32_t getPlayerOwner();
     //Housing Functions
     void setCurrentPrice( uint32_t currentPrice );
-    void setPreset( uint32_t itemId );
+    bool setPreset( uint32_t itemId );
     void updateLandDb();
     void update( uint32_t currTime );
 
@@ -62,7 +62,7 @@ namespace Core
     uint8_t getLandTag( uint8_t slot );
 
   private:
-    uint16_t convertItemIdToHousingItemId( uint16_t itemId );
+    uint32_t convertItemIdToHousingItemId( uint32_t itemId );
     void init();
 
     uint8_t m_wardNum;
