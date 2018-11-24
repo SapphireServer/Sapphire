@@ -6117,6 +6117,22 @@ struct ZoneSharedGroup
         return nullptr;
      }
 
+    template< class T >
+    std::shared_ptr< T > get( uint32_t id, uint32_t slotId )
+    {
+      try
+      {
+        auto info = std::make_shared< T >( id, slotId, this );
+        return info;
+      }
+      catch( std::runtime_error error )
+      {
+        std::cout << error.what();
+        return nullptr;
+      }
+      return nullptr;
+    }
+
 
      std::set< uint32_t > m_AchievementIdList;
      std::set< uint32_t > m_AchievementCategoryIdList;
