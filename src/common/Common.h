@@ -805,8 +805,8 @@ namespace Core::Common
     none,
     forSale,
     sold,
+    privateHouse,
     fcHouse,
-    privateHouse
   };
 
   enum HouseIconAdd : uint8_t

@@ -12,6 +12,7 @@
 #include "Zone/HousingMgr.h"
 #include "DebugCommand/DebugCommandHandler.h"
 #include "Manager/PlayerMgr.h"
+#include "Manager/ShopMgr.h"
 
 #include <Config/ConfigMgr.h>
 
@@ -32,6 +33,7 @@ bool setupFramework()
   auto pDebugCom = std::make_shared< DebugCommandHandler >();
   auto pConfig = std::make_shared< ConfigMgr >();
   auto pPlayerMgr = std::make_shared< Sapphire::World::Manager::PlayerMgr >();
+  auto pShopMgr = std::make_shared< Sapphire::World::Manager::ShopMgr >();
 
   pLogger->setLogPath( "log/SapphireZone" );
   pLogger->init();
@@ -47,6 +49,7 @@ bool setupFramework()
   g_fw.set< DebugCommandHandler >( pDebugCom );
   g_fw.set< ConfigMgr >( pConfig );
   g_fw.set< Sapphire::World::Manager::PlayerMgr >( pPlayerMgr );
+  g_fw.set< Sapphire::World::Manager::ShopMgr >( pShopMgr );
 
   // actuall catch errors here...
   return true;

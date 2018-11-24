@@ -290,6 +290,8 @@ enum ActorControlType : uint16_t
     AchievementList = 0x3E9,
 
     RequestHousingBuildPreset = 0x44C,
+    RequestEstateHallRemoval = 0x44F,
+    RequestBuildPreset = 0x450, // no idea what this is, it gets sent with BuildPresetHandler and has the plot id in param1
     RequestLandSignFree = 0x451,
     RequestLandSignOwned = 0x452,
     RequestWardLandInfo = 0x453,

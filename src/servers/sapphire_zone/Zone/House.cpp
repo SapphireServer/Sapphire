@@ -3,6 +3,7 @@
 
 #include <Logging/Logger.h>
 #include <Exd/ExdDataGenerated.h>
+#include <Database/DatabaseDef.h>
 
 #include "House.h"
 
@@ -20,6 +21,18 @@ Core::House::House( uint32_t houseId, uint32_t landSetId, uint8_t landId, uint8_
 {
   memset( &m_houseParts, 0x00, sizeof( m_houseParts ) );
   memset( &m_commentMsg, 0x00, sizeof( m_commentMsg ) );
+
+  auto pDB = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto res = pDB->query("SELECT * FROM house WHERE HouseId = " + std::to_string( houseId ) );
+
+  if( !res->next() )
+  {
+    pDB->directExecute("INSERT INTO house ( LandSetId, HouseId ) VALUES ( " + std::to_string( m_landSetId ) + ", " + std::to_string( m_houseId ) + " )" );
+  }
+  else
+  {
+    // todo
+  }
 }
 
 Core::House::~House()
