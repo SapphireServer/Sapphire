@@ -37,7 +37,7 @@ Core::Land::Land( uint16_t territoryTypeId, uint8_t wardNum, uint8_t landId, uin
   m_ownerPlayerId( 0 ),
   m_landSetId( landSetId ),
   m_landInfo( info ),
-  m_type( Common::LandType::Private ),
+  m_type( Common::LandType::none ),
   m_fcIcon( 0 ),
   m_fcIconColor( 0 ),
   m_fcId( 0 ),
@@ -60,11 +60,11 @@ void Core::Land::load()
                                             "AND LandId = " + std::to_string( m_landId ) );
   if( !res->next() )
   {
-    pDb->directExecute( "INSERT INTO land ( landsetid, landid, type, size, status, landprice ) "
+    pDb->directExecute( "INSERT INTO land ( landsetid, landid, type, size, status, landprice, UpdateTime, OwnerId, HouseId ) "
                         "VALUES ( " + std::to_string( m_landSetId ) + "," + std::to_string( m_landId ) + ","
                         + std::to_string( static_cast< uint8_t >( m_type ) ) + ","
                         + std::to_string( m_landInfo->plotSize[ m_landId ] ) + ","
-                        + " 1, " + std::to_string( m_landInfo->initialPrice[ m_landId ] ) + " );" );
+                        + " 1, " + std::to_string( m_landInfo->initialPrice[ m_landId ] ) + ", 0, 0, 0 );" );
 
     m_currentPrice = m_landInfo->initialPrice[ m_landId ];
     m_minPrice = m_landInfo->minPrice[ m_landId ];
