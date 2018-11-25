@@ -8,6 +8,7 @@ namespace Core::Event
 
   struct SceneResult
   {
+    uint64_t actorId;
     uint32_t eventId;
     uint16_t param1;
     uint16_t param2;
