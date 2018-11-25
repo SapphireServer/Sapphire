@@ -221,6 +221,7 @@ void Core::Network::GameConnection::eventHandlerReturn( const Packets::FFXIVARR_
     if( eventCallback )
     {
       Event::SceneResult result;
+      result.actorId = pEvent->getActorId();
       result.eventId = eventId;
       result.param1 = param1;
       result.param2 = param2;

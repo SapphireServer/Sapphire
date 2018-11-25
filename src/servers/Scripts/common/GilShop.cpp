@@ -37,11 +37,10 @@ private:
       }
 
       // sell
-      else if( result.param2 == 2 )
+      // can't sell if the vendor is yourself (eg, housing permit shop)
+      else if( result.param2 == 2 && result.actorId != player.getId() )
       {
-        // so apparently shops will always show a sell window
-        // BUT won't always let you sell stuff (eg, housing permit menu)
-        // there doesn't seem to be anything in gilshop exd for that, so maybe it's some shitty server hack?
+
       }
 
       player.playGilShop( result.eventId, SCENE_FLAGS, std::bind( &GilShop::shopInteractionCallback, this, std::placeholders::_1, std::placeholders::_2 ) );
