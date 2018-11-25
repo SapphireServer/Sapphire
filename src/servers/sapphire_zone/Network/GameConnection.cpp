@@ -323,7 +323,7 @@ void Core::Network::GameConnection::processOutQueue()
     totalSize += pPacket->getSize();
 
     // todo: figure out a good max set size and make it configurable
-    if( totalSize > 5000 )
+    if( totalSize > 15000 )
       break;
   }
 
