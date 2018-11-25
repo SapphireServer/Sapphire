@@ -221,6 +221,7 @@ void Core::Network::GameConnection::eventHandlerReturn( const Packets::FFXIVARR_
     if( eventCallback )
     {
       Event::SceneResult result;
+      result.actorId = pEvent->getActorId();
       result.eventId = eventId;
       result.param1 = param1;
       result.param2 = param2;
@@ -273,7 +274,9 @@ void Core::Network::GameConnection::eventHandlerShop( const Packets::FFXIVARR_PA
                     " (0x" + Util::intToHexString( static_cast< uint64_t >( eventId & 0xFFFFFFF ), 8 ) + ")" );
 
   player.sendDebug( "Calling: " + objName + "." + eventName );
-  player.eventStart( 0, eventId, Event::EventHandler::UI, 0, packet.data().param );
+  player.eventStart( player.getId(), eventId, Event::EventHandler::UI, 0, packet.data().param );
+
+  pScriptMgr->onTalk( player, player.getId(), eventId );
 }
 
 

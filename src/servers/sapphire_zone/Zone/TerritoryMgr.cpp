@@ -249,7 +249,7 @@ Core::ZonePtr Core::TerritoryMgr::createInstanceContent( uint32_t contentFinderC
   auto pContentFinderCondition = pExdData->get< Core::Data::ContentFinderCondition >( contentFinderConditionId );
   if( !pContentFinderCondition )
     return nullptr;
-  auto instanceContentId = pContentFinderCondition->instanceContent;
+  auto instanceContentId = pContentFinderCondition->content;
 
   auto pInstanceContent = pExdData->get< Core::Data::InstanceContent >( instanceContentId );
   if( !pInstanceContent )

@@ -10,6 +10,7 @@
 #include "Actor/Player.h"
 #include "Actor/Actor.h"
 #include "Land.h"
+#include "House.h"
 
 #include "Forwards.h"
 #include "HousingZone.h"
@@ -149,11 +150,23 @@ void Core::HousingZone::sendLandUpdate( uint8_t landId )
     landUpdatePacket->data().landId = landId;
     landUpdatePacket->data().land.plotSize = pLand->getSize();
     landUpdatePacket->data().land.houseState = pLand->getState();
-    landUpdatePacket->data().land.type = static_cast< uint8_t >( pLand->getLandType() );
+    landUpdatePacket->data().land.type = 0;
     landUpdatePacket->data().land.iconAddIcon = pLand->getSharing();
     landUpdatePacket->data().land.fcId = pLand->getFcId();
     landUpdatePacket->data().land.fcIcon = pLand->getFcIcon();
     landUpdatePacket->data().land.fcIconColor = pLand->getFcColor();
+
+    if( auto house = pLand->getHouse() )
+    {
+      // todo: this is retarded, need a getter to the internal array
+      for( int i = 0; i < 8; i++ )
+      {
+        auto slot = static_cast< Common::HousePartSlot >( i );
+        auto part = pLand->getHouse()->getHousePart( slot );
+
+        landUpdatePacket->data().land.housePart[ slot ] = part;
+      }
+    }
 
     pPlayer->queuePacket( landUpdatePacket );
   }

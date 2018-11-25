@@ -13,8 +13,8 @@
 #include <set>
 #include <variant>
 
-namespace Core::Data
-{
+namespace Core {
+namespace Data {
 
 class ExdDataGenerated;
 
@@ -174,8 +174,13 @@ struct EObj;
 struct EObjName;
 struct EquipRaceCategory;
 struct EquipSlotCategory;
+struct EurekaAetherItem;
 struct EurekaAethernet;
 struct EurekaGrowData;
+struct EurekaLogosMixerProbability;
+struct EurekaMagiaAction;
+struct EurekaMagiciteItem;
+struct EurekaMagiciteItemType;
 struct EurekaSphereElementAdjust;
 struct EventAction;
 struct EventIconPriority;
@@ -197,7 +202,9 @@ struct FCHierarchy;
 struct FCProfile;
 struct FCReputation;
 struct FCRights;
+struct Festival;
 struct FieldMarker;
+struct FishingRecordType;
 struct FishingRecordTypeTransient;
 struct FishingSpot;
 struct FishParameter;
@@ -239,6 +246,9 @@ struct GCSupplyDuty;
 struct GCSupplyDutyReward;
 struct GeneralAction;
 struct GFATE;
+struct GFateClimbing2;
+struct GFateClimbing2Content;
+struct GFateClimbing2TotemType;
 struct GilShop;
 struct GilShopItem;
 struct GoldSaucerArcadeMachine;
@@ -253,12 +263,17 @@ struct GuildOrderOfficer;
 struct HairMakeType;
 struct HouseRetainerPose;
 struct HousingAethernet;
+struct HousingAppeal;
 struct HousingEmploymentNpcList;
 struct HousingEmploymentNpcRace;
+struct HousingExterior;
 struct HousingFurniture;
+struct HousingMapMarkerInfo;
+struct HousingMerchantPose;
 struct HousingLandSet;
 struct HousingPlacement;
 struct HousingPreset;
+struct HousingUnitedExterior;
 struct HousingYardObject;
 struct HowTo;
 struct HowToCategory;
@@ -269,6 +284,7 @@ struct InstanceContentTextData;
 struct Item;
 struct ItemAction;
 struct ItemFood;
+struct ItemLevel;
 struct ItemSearchCategory;
 struct ItemSeries;
 struct ItemSpecialBonus;
@@ -301,6 +317,7 @@ struct Marker;
 struct MasterpieceSupplyDuty;
 struct MasterpieceSupplyMultiplier;
 struct Materia;
+struct MiniGameRA;
 struct MinionRace;
 struct MinionRules;
 struct MinionSkillType;
@@ -328,7 +345,9 @@ struct OrchestrionCategory;
 struct OrchestrionPath;
 struct OrchestrionUiparam;
 struct ParamGrow;
+struct PartyContent;
 struct PartyContentCutscene;
+struct PartyContentTextData;
 struct Perform;
 struct PerformTransient;
 struct Pet;
@@ -430,6 +449,7 @@ struct Tutorial;
 struct TutorialDPS;
 struct TutorialHealer;
 struct TutorialTank;
+struct UIColor;
 struct VaseFlower;
 struct VFX;
 struct Warp;
@@ -462,6 +482,7 @@ struct Achievement
    int32_t key;
    std::vector< int32_t > data;
    uint16_t order;
+   bool initialHide;
 
    Achievement( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
@@ -470,6 +491,7 @@ struct AchievementCategory
 {
    std::string name;
    uint8_t achievementKind;
+   bool hideCategory;
 
    AchievementCategory( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
@@ -652,9 +674,9 @@ struct Addon
 
 struct AddonHud
 {
-   std::string longs;
-   std::string shorts;
-   std::string function;
+   std::string _long;
+   std::string _short;
+   std::string _function;
 
    AddonHud( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
@@ -713,6 +735,13 @@ struct AetherialWheel
 
 struct Aetheryte
 {
+   std::string singular;
+   int8_t adjective;
+   std::string plural;
+   int8_t possessivePronoun;
+   int8_t startsWithVowel;
+   int8_t pronoun;
+   int8_t article;
    uint16_t placeName;
    uint16_t aethernetName;
    uint16_t territory;
@@ -810,7 +839,7 @@ struct AnimaWeapon5SpiritTalk
 {
    int32_t dialogue;
 
-   AnimaWeapon5SpiritTalk( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+   AnimaWeapon5SpiritTalk( uint32_t row_id, uint32_t subRow, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct AnimaWeapon5SpiritTalkParam
@@ -834,7 +863,7 @@ struct AnimaWeaponFUITalk
 {
    int32_t dialogue;
 
-   AnimaWeaponFUITalk( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+   AnimaWeaponFUITalk( uint32_t row_id, uint32_t subRow, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct AnimaWeaponFUITalkParam
@@ -909,6 +938,7 @@ struct Balloon
 
 struct BaseParam
 {
+   int8_t order;
    std::string name;
    std::string description;
    uint8_t oneHWpn;
@@ -983,7 +1013,7 @@ struct Behavior
 {
    uint16_t balloon;
 
-   Behavior( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+   Behavior( uint32_t row_id, uint32_t subRow, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct BGM
@@ -1015,7 +1045,7 @@ struct BGMSwitch
    uint8_t bGMSystemDefine;
    uint32_t quest;
 
-   BGMSwitch( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+   BGMSwitch( uint32_t row_id, uint32_t subRow, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct BGMSystemDefine
@@ -1081,8 +1111,12 @@ struct BNpcCustomize
 struct BNpcName
 {
    std::string singular;
+   int8_t adjective;
    std::string plural;
+   int8_t possessivePronoun;
    int8_t startsWithVowel;
+   int8_t pronoun;
+   int8_t article;
 
    BNpcName( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
@@ -1148,9 +1182,12 @@ struct BuddyAction
 struct BuddyEquip
 {
    std::string singular;
+   int8_t adjective;
    std::string plural;
+   int8_t possessivePronoun;
    int8_t startsWithVowel;
-   int8_t rarity;
+   int8_t pronoun;
+   int8_t article;
    std::string name;
    int32_t modelTop;
    int32_t modelBody;
@@ -1398,9 +1435,13 @@ struct ClassJobCategory
 struct Companion
 {
    std::string singular;
+   int8_t adjective;
    std::string plural;
+   int8_t possessivePronoun;
    int8_t startsWithVowel;
-   int8_t rarity;
+   int8_t pronoun;
+   int8_t article;
+   uint16_t model;
    uint8_t behavior;
    uint16_t icon;
    uint8_t cost;
@@ -1552,7 +1593,7 @@ struct ContentFinderCondition
 {
    uint16_t territoryType;
    uint8_t contentLinkType;
-   uint16_t instanceContent;
+   uint16_t content;
    uint8_t contentMemberType;
    uint8_t classJobLevelRequired;
    uint8_t classJobLevelSync;
@@ -1560,6 +1601,7 @@ struct ContentFinderCondition
    uint16_t itemLevelSync;
    bool allowReplacement;
    bool highEndDuty;
+   bool dutyRecorderAllowed;
    std::string name;
    uint8_t contentType;
    uint8_t transient;
@@ -1743,7 +1785,7 @@ struct Credit
    uint16_t frenchCast2;
    uint16_t germanCast2;
 
-   Credit( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+   Credit( uint32_t row_id, uint32_t subRow, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct CreditCast
@@ -1822,9 +1864,12 @@ struct DeepDungeonEquipment
 {
    uint32_t icon;
    std::string singular;
+   int8_t adjective;
    std::string plural;
+   int8_t possessivePronoun;
    int8_t startsWithVowel;
-   int8_t rarity;
+   int8_t pronoun;
+   int8_t article;
    std::string name;
    std::string description;
 
@@ -1844,9 +1889,12 @@ struct DeepDungeonItem
 {
    uint32_t icon;
    std::string singular;
+   int8_t adjective;
    std::string plural;
+   int8_t possessivePronoun;
    int8_t startsWithVowel;
-   int8_t rarity;
+   int8_t pronoun;
+   int8_t article;
    std::string name;
    std::string tooltip;
    uint32_t action;
@@ -1865,9 +1913,12 @@ struct DeepDungeonMagicStone
 {
    uint32_t icon;
    std::string singular;
+   int8_t adjective;
    std::string plural;
+   int8_t possessivePronoun;
    int8_t startsWithVowel;
-   int8_t rarity;
+   int8_t pronoun;
+   int8_t article;
    std::string name;
    std::string tooltip;
 
@@ -1878,7 +1929,7 @@ struct DeepDungeonMap5X
 {
    std::vector< uint16_t > deepDungeonRoom;
 
-   DeepDungeonMap5X( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+   DeepDungeonMap5X( uint32_t row_id, uint32_t subRow, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct DeepDungeonRoom
@@ -1939,7 +1990,7 @@ struct DisposalShopItem
    int32_t itemReceived;
    uint32_t quantityReceived;
 
-   DisposalShopItem( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+   DisposalShopItem( uint32_t row_id, uint32_t subRow, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct DpsChallenge
@@ -2057,7 +2108,12 @@ struct ENpcBase
 struct ENpcResident
 {
    std::string singular;
+   int8_t adjective;
    std::string plural;
+   int8_t possessivePronoun;
+   int8_t startsWithVowel;
+   int8_t pronoun;
+   int8_t article;
    std::string title;
    uint8_t map;
 
@@ -2075,6 +2131,12 @@ struct EObj
 struct EObjName
 {
    std::string singular;
+   int8_t adjective;
+   std::string plural;
+   int8_t possessivePronoun;
+   int8_t startsWithVowel;
+   int8_t pronoun;
+   int8_t article;
 
    EObjName( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
@@ -2113,6 +2175,20 @@ struct EquipSlotCategory
    EquipSlotCategory( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
+struct EurekaAetherItem
+{
+   std::string singular;
+   int8_t adjective;
+   std::string plural;
+   int8_t possessivePronoun;
+   int8_t startsWithVowel;
+   int8_t pronoun;
+   int8_t article;
+   std::string name;
+
+   EurekaAetherItem( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
 struct EurekaAethernet
 {
    uint16_t location;
@@ -2125,6 +2201,37 @@ struct EurekaGrowData
    uint16_t baseResistance;
 
    EurekaGrowData( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct EurekaLogosMixerProbability
+{
+   uint8_t probability;
+
+   EurekaLogosMixerProbability( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct EurekaMagiaAction
+{
+   uint32_t action;
+   uint8_t maxUses;
+
+   EurekaMagiaAction( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct EurekaMagiciteItem
+{
+   uint8_t eurekaMagiciteItemType;
+   uint8_t classJobCategory;
+   uint32_t item;
+
+   EurekaMagiciteItem( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct EurekaMagiciteItemType
+{
+   std::string type;
+
+   EurekaMagiciteItemType( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct EurekaSphereElementAdjust
@@ -2165,9 +2272,12 @@ struct EventIconType
 struct EventItem
 {
    std::string singular;
+   int8_t adjective;
    std::string plural;
+   int8_t possessivePronoun;
    int8_t startsWithVowel;
-   int8_t rarity;
+   int8_t pronoun;
+   int8_t article;
    std::string name;
    uint16_t icon;
    uint16_t action;
@@ -2223,6 +2333,7 @@ struct Fate
    uint32_t iconObjective;
    uint32_t iconMap;
    int32_t music;
+   bool hasWorldMapIcon;
    std::string name;
    std::string description;
    std::string objective;
@@ -2309,12 +2420,26 @@ struct FCRights
    FCRights( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
+struct Festival
+{
+   std::string name;
+
+   Festival( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
 struct FieldMarker
 {
    int32_t vFX;
    uint16_t icon;
 
    FieldMarker( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct FishingRecordType
+{
+   int32_t addon;
+
+   FishingRecordType( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct FishingRecordTypeTransient
@@ -2345,8 +2470,12 @@ struct FishParameter
    std::string text;
    int32_t item;
    uint16_t gatheringItemLevel;
+   bool isHidden;
+   uint8_t fishingRecordType;
    int32_t territoryType;
-   bool isFish;
+   bool isInLog;
+   bool timeRestricted;
+   bool weatherRestricted;
    uint16_t gatheringSubCategory;
 
    FishParameter( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
@@ -2415,7 +2544,7 @@ struct GatheringItemPoint
 {
    uint32_t gatheringPoint;
 
-   GatheringItemPoint( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+   GatheringItemPoint( uint32_t row_id, uint32_t subRow, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct GatheringLeve
@@ -2481,8 +2610,12 @@ struct GatheringPointBonusType
 struct GatheringPointName
 {
    std::string singular;
+   int8_t adjective;
    std::string plural;
+   int8_t possessivePronoun;
    int8_t startsWithVowel;
+   int8_t pronoun;
+   int8_t article;
 
    GatheringPointName( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
@@ -2568,8 +2701,13 @@ struct GcArmyTraining
 
 struct GCRankGridaniaFemaleText
 {
-   std::string name;
+   std::string singular;
+   int8_t adjective;
    std::string plural;
+   int8_t possessivePronoun;
+   int8_t startsWithVowel;
+   int8_t pronoun;
+   int8_t article;
    std::string nameRank;
 
    GCRankGridaniaFemaleText( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
@@ -2577,8 +2715,13 @@ struct GCRankGridaniaFemaleText
 
 struct GCRankGridaniaMaleText
 {
-   std::string name;
+   std::string singular;
+   int8_t adjective;
    std::string plural;
+   int8_t possessivePronoun;
+   int8_t startsWithVowel;
+   int8_t pronoun;
+   int8_t article;
    std::string nameRank;
 
    GCRankGridaniaMaleText( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
@@ -2586,8 +2729,13 @@ struct GCRankGridaniaMaleText
 
 struct GCRankLimsaFemaleText
 {
-   std::string name;
+   std::string singular;
+   int8_t adjective;
    std::string plural;
+   int8_t possessivePronoun;
+   int8_t startsWithVowel;
+   int8_t pronoun;
+   int8_t article;
    std::string nameRank;
 
    GCRankLimsaFemaleText( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
@@ -2595,8 +2743,13 @@ struct GCRankLimsaFemaleText
 
 struct GCRankLimsaMaleText
 {
-   std::string name;
+   std::string singular;
+   int8_t adjective;
    std::string plural;
+   int8_t possessivePronoun;
+   int8_t startsWithVowel;
+   int8_t pronoun;
+   int8_t article;
    std::string nameRank;
 
    GCRankLimsaMaleText( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
@@ -2604,8 +2757,13 @@ struct GCRankLimsaMaleText
 
 struct GCRankUldahFemaleText
 {
-   std::string name;
+   std::string singular;
+   int8_t adjective;
    std::string plural;
+   int8_t possessivePronoun;
+   int8_t startsWithVowel;
+   int8_t pronoun;
+   int8_t article;
    std::string nameRank;
 
    GCRankUldahFemaleText( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
@@ -2613,8 +2771,13 @@ struct GCRankUldahFemaleText
 
 struct GCRankUldahMaleText
 {
-   std::string name;
+   std::string singular;
+   int8_t adjective;
    std::string plural;
+   int8_t possessivePronoun;
+   int8_t startsWithVowel;
+   int8_t pronoun;
+   int8_t article;
    std::string nameRank;
 
    GCRankUldahMaleText( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
@@ -2636,7 +2799,7 @@ struct GCScripShopItem
    uint32_t costGCSeals;
    uint8_t sortKey;
 
-   GCScripShopItem( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+   GCScripShopItem( uint32_t row_id, uint32_t subRow, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct GCShop
@@ -2688,6 +2851,27 @@ struct GFATE
    GFATE( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
+struct GFateClimbing2
+{
+   uint32_t contentEntry;
+
+   GFateClimbing2( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct GFateClimbing2Content
+{
+   uint32_t publicContentTextData;
+
+   GFateClimbing2Content( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct GFateClimbing2TotemType
+{
+   uint32_t publicContentTextData;
+
+   GFateClimbing2TotemType( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
 struct GilShop
 {
    std::string name;
@@ -2706,7 +2890,7 @@ struct GilShopItem
    uint16_t stateRequired;
    uint16_t patch;
 
-   GilShopItem( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+   GilShopItem( uint32_t row_id, uint32_t subRow, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct GoldSaucerArcadeMachine
@@ -2812,12 +2996,21 @@ struct HousingAethernet
    HousingAethernet( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
+struct HousingAppeal
+{
+   std::string tag;
+   uint32_t icon;
+   uint8_t order;
+
+   HousingAppeal( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
 struct HousingEmploymentNpcList
 {
    uint8_t race;
    std::vector< uint32_t > eNpcBase;
 
-   HousingEmploymentNpcList( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+   HousingEmploymentNpcList( uint32_t row_id, uint32_t subRow, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct HousingEmploymentNpcRace
@@ -2827,6 +3020,15 @@ struct HousingEmploymentNpcRace
    HousingEmploymentNpcRace( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
+struct HousingExterior
+{
+   uint16_t placeName;
+   uint8_t housingSize;
+   std::string model;
+
+   HousingExterior( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
 struct HousingFurniture
 {
    uint16_t modelKey;
@@ -2834,13 +3036,37 @@ struct HousingFurniture
    uint8_t usageType;
    uint32_t usageParameter;
    uint8_t housingLayoutLimit;
-   uint8_t customTalk;
-   uint32_t event;
+   uint8_t aquariumTier;
+   uint32_t customTalk;
    uint32_t item;
    bool destroyOnRemoval;
    bool tooltip;
 
    HousingFurniture( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct HousingMapMarkerInfo
+{
+   uint16_t map;
+
+   HousingMapMarkerInfo( uint32_t row_id, uint32_t subRow, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct HousingMerchantPose
+{
+   uint16_t actionTimeline;
+   std::string pose;
+
+   HousingMerchantPose( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct HousingLandSet
+{
+   std::vector< uint8_t > plotSize;
+   std::vector< uint32_t > minPrice;
+   std::vector< uint32_t > initialPrice;
+
+   HousingLandSet( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct HousingPlacement
@@ -2850,19 +3076,17 @@ struct HousingPlacement
    HousingPlacement( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
-struct HousingLandSet
-{
-  std::vector< uint8_t > sizes;
-  std::vector< uint32_t > minPrices;
-  std::vector< uint32_t > prices;
-
-  HousingLandSet( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
-};
-
 struct HousingPreset
 {
    std::string singular;
+   int8_t adjective;
    std::string plural;
+   int8_t possessivePronoun;
+   int8_t startsWithVowel;
+   int8_t pronoun;
+   int8_t article;
+   uint16_t placeName;
+   uint8_t housingSize;
    int32_t exteriorRoof;
    int32_t exteriorWall;
    int32_t exteriorWindow;
@@ -2879,6 +3103,13 @@ struct HousingPreset
    int32_t mansionLighting;
 
    HousingPreset( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct HousingUnitedExterior
+{
+   std::vector< uint32_t > item;
+
+   HousingUnitedExterior( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct HousingYardObject
@@ -2941,7 +3172,7 @@ struct InstanceContent
    uint16_t finalBossCurrencyC;
    uint32_t instanceClearExp;
    int32_t instanceContentBuff;
-   uint32_t territoryType;
+   uint32_t reqInstance;
    uint8_t partyCondition;
 
    InstanceContent( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
@@ -2965,8 +3196,12 @@ struct InstanceContentTextData
 struct Item
 {
    std::string singular;
+   int8_t adjective;
    std::string plural;
+   int8_t possessivePronoun;
    int8_t startsWithVowel;
+   int8_t pronoun;
+   int8_t article;
    std::string description;
    std::string name;
    uint16_t icon;
@@ -3035,6 +3270,85 @@ struct ItemFood
 {
 
    ItemFood( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct ItemLevel
+{
+   uint16_t strength;
+   uint16_t dexterity;
+   uint16_t vitality;
+   uint16_t intelligence;
+   uint16_t mind;
+   uint16_t piety;
+   uint16_t hP;
+   uint16_t mP;
+   uint16_t tP;
+   uint16_t gP;
+   uint16_t cP;
+   uint16_t physicalDamage;
+   uint16_t magicalDamage;
+   uint16_t delay;
+   uint16_t additionalEffect;
+   uint16_t attackSpeed;
+   uint16_t blockRate;
+   uint16_t blockStrength;
+   uint16_t tenacity;
+   uint16_t attackPower;
+   uint16_t defense;
+   uint16_t directHitRate;
+   uint16_t evasion;
+   uint16_t magicDefense;
+   uint16_t criticalHitPower;
+   uint16_t criticalHitResilience;
+   uint16_t criticalHit;
+   uint16_t criticalHitEvasion;
+   uint16_t slashingResistance;
+   uint16_t piercingResistance;
+   uint16_t bluntResistance;
+   uint16_t projectileResistance;
+   uint16_t attackMagicPotency;
+   uint16_t healingMagicPotency;
+   uint16_t enhancementMagicPotency;
+   uint16_t enfeeblingMagicPotency;
+   uint16_t fireResistance;
+   uint16_t iceResistance;
+   uint16_t windResistance;
+   uint16_t earthResistance;
+   uint16_t lightningResistance;
+   uint16_t waterResistance;
+   uint16_t magicResistance;
+   uint16_t determination;
+   uint16_t skillSpeed;
+   uint16_t spellSpeed;
+   uint16_t haste;
+   uint16_t morale;
+   uint16_t enmity;
+   uint16_t enmityReduction;
+   uint16_t carefulDesynthesis;
+   uint16_t eXPBonus;
+   uint16_t regen;
+   uint16_t refresh;
+   uint16_t movementSpeed;
+   uint16_t spikes;
+   uint16_t slowResistance;
+   uint16_t petrificationResistance;
+   uint16_t paralysisResistance;
+   uint16_t silenceResistance;
+   uint16_t blindResistance;
+   uint16_t poisonResistance;
+   uint16_t stunResistance;
+   uint16_t sleepResistance;
+   uint16_t bindResistance;
+   uint16_t heavyResistance;
+   uint16_t doomResistance;
+   uint16_t reducedDurabilityLoss;
+   uint16_t increasedSpiritbondGain;
+   uint16_t craftsmanship;
+   uint16_t control;
+   uint16_t gathering;
+   uint16_t perception;
+
+   ItemLevel( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct ItemSearchCategory
@@ -3288,7 +3602,7 @@ struct MapMarker
    uint8_t dataType;
    uint16_t dataKey;
 
-   MapMarker( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+   MapMarker( uint32_t row_id, uint32_t subRow, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct MapMarkerRegion
@@ -3338,6 +3652,14 @@ struct Materia
    std::vector< uint8_t > value;
 
    Materia( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct MiniGameRA
+{
+   int32_t icon;
+   int32_t bGM;
+
+   MiniGameRA( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct MinionRace
@@ -3420,8 +3742,12 @@ struct MonsterNoteTarget
 struct Mount
 {
    std::string singular;
+   int8_t adjective;
    std::string plural;
+   int8_t possessivePronoun;
    int8_t startsWithVowel;
+   int8_t pronoun;
+   int8_t article;
    int32_t modelChara;
    uint8_t flyingCondition;
    uint8_t isFlying;
@@ -3429,8 +3755,11 @@ struct Mount
    uint16_t rideBGM;
    int16_t order;
    uint16_t icon;
+   uint8_t extraSeats;
    uint16_t mountAction;
    bool isAirborne;
+   bool useEP;
+   bool isImmobile;
 
    Mount( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
@@ -3456,6 +3785,18 @@ struct MountCustomize
    float roeFemaleScale;
    float auRaMaleScale;
    float auRaFemaleScale;
+   uint8_t hyurMaleCameraHeight;
+   uint8_t hyurFemaleCameraHeight;
+   uint8_t elezenMaleCameraHeight;
+   uint8_t elezenFemaleCameraHeight;
+   uint8_t lalaMaleCameraHeight;
+   uint8_t lalaFemaleCameraHeight;
+   uint8_t miqoMaleCameraHeight;
+   uint8_t miqoFemaleCameraHeight;
+   uint8_t roeMaleCameraHeight;
+   uint8_t roeFemaleCameraHeight;
+   uint8_t auRaMaleCameraHeight;
+   uint8_t auRaFemaleCameraHeight;
 
    MountCustomize( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
@@ -3613,11 +3954,31 @@ struct ParamGrow
    ParamGrow( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
+struct PartyContent
+{
+   uint8_t key;
+   uint16_t timeLimit;
+   std::string name;
+   uint32_t textDataStart;
+   uint32_t textDataEnd;
+   uint16_t contentFinderCondition;
+   uint32_t image;
+
+   PartyContent( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
 struct PartyContentCutscene
 {
    uint32_t cutscene;
 
    PartyContentCutscene( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
+struct PartyContentTextData
+{
+   std::string data;
+
+   PartyContentTextData( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct Perform
@@ -3695,13 +4056,14 @@ struct PreHandler
 
 struct PublicContent
 {
+   uint8_t type;
    uint16_t timeLimit;
    uint32_t mapIcon;
    std::string name;
    uint32_t textDataStart;
    uint32_t textDataEnd;
    uint16_t contentFinderCondition;
-   uint16_t eureka;
+   uint16_t additionalData;
 
    PublicContent( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
@@ -3733,7 +4095,7 @@ struct PvPActionSort
    uint8_t name;
    uint16_t action;
 
-   PvPActionSort( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+   PvPActionSort( uint32_t row_id, uint32_t subRow, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct PvPRank
@@ -3769,6 +4131,7 @@ struct Quest
    uint8_t classJobCategory0;
    uint16_t classJobLevel0;
    uint8_t questLevelOffset;
+   uint16_t levelMax;
    uint8_t classJobCategory1;
    uint16_t classJobLevel1;
    uint8_t previousQuestJoin;
@@ -3782,6 +4145,7 @@ struct Quest
    uint8_t grandCompanyRank;
    uint8_t instanceContentJoin;
    std::vector< uint32_t > instanceContent;
+   uint8_t festival;
    uint16_t bellStart;
    uint16_t bellEnd;
    uint8_t beastTribe;
@@ -3792,6 +4156,7 @@ struct Quest
    uint32_t eNpcResidentEnd;
    bool isRepeatable;
    uint8_t repeatIntervalType;
+   uint8_t questRepeatFlag;
    std::vector< std::string > scriptInstruction;
    std::vector< uint32_t > scriptArg;
    std::vector< uint32_t > level;
@@ -3835,7 +4200,7 @@ struct QuestClassJobReward
    std::vector< uint32_t > requiredItem;
    std::vector< uint8_t > requiredAmount;
 
-   QuestClassJobReward( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+   QuestClassJobReward( uint32_t row_id, uint32_t subRow, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct QuestClassJobSupply
@@ -3844,7 +4209,7 @@ struct QuestClassJobSupply
    uint32_t eNpcResident;
    uint32_t item;
 
-   QuestClassJobSupply( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+   QuestClassJobSupply( uint32_t row_id, uint32_t subRow, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct QuestRepeatFlag
@@ -4052,7 +4417,7 @@ struct Resident
    int32_t npcYell;
    uint8_t residentMotionType;
 
-   Resident( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+   Resident( uint32_t row_id, uint32_t subRow, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct RetainerTask
@@ -4145,7 +4510,7 @@ struct SatisfactionSupply
    uint16_t collectabilityHigh;
    uint16_t reward;
 
-   SatisfactionSupply( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+   SatisfactionSupply( uint32_t row_id, uint32_t subRow, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct SatisfactionSupplyReward
@@ -4183,7 +4548,7 @@ struct ScenarioTreeTipsClassQuest
    uint8_t requiredExpansion;
    uint32_t requiredQuest;
 
-   ScenarioTreeTipsClassQuest( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+   ScenarioTreeTipsClassQuest( uint32_t row_id, uint32_t subRow, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct ScenarioTreeTipsQuest
@@ -4441,6 +4806,7 @@ struct Title
    std::string masculine;
    std::string feminine;
    bool isPrefix;
+   uint16_t order;
 
    Title( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
@@ -4656,6 +5022,14 @@ struct TutorialTank
    TutorialTank( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
 
+struct UIColor
+{
+   uint32_t foreground;
+   uint32_t background;
+
+   UIColor( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+};
+
 struct VaseFlower
 {
    uint32_t item;
@@ -4674,9 +5048,9 @@ struct Warp
 {
    uint32_t level;
    uint16_t placeName;
-   uint32_t defaultTalk1;
-   uint32_t defaultTalk2;
-   uint32_t defaultTalk3;
+   uint32_t conditionSuccessEvent;
+   uint32_t conditionFailEvent;
+   uint32_t confirmEvent;
    uint16_t warpCondition;
    uint16_t warpLogic;
 
@@ -4695,12 +5069,12 @@ struct WarpCondition
 
 struct WarpLogic
 {
-   bool warpName;
+   std::string warpName;
    std::vector< std::string > function;
    std::vector< uint32_t > argument;
-   std::string textString;
-   std::string response1;
-   std::string response2;
+   std::string question;
+   std::string responseYes;
+   std::string responseNo;
 
    WarpLogic( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
@@ -4718,7 +5092,7 @@ struct WeatherGroup
 {
    int32_t weatherRate;
 
-   WeatherGroup( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+   WeatherGroup( uint32_t row_id, uint32_t subRow, Core::Data::ExdDataGenerated* exdData );
 };
 
 struct WeatherRate
@@ -4772,6 +5146,7 @@ struct World
 {
    std::string name;
    uint8_t dataCenter;
+   bool isPublic;
 
    World( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
 };
@@ -4800,7 +5175,7 @@ struct ZoneSharedGroup
    uint32_t quest5;
    uint32_t quest6;
 
-   ZoneSharedGroup( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );
+   ZoneSharedGroup( uint32_t row_id, uint32_t subRow, Core::Data::ExdDataGenerated* exdData );
 };
 
 
@@ -4982,8 +5357,13 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_EObjNameDat;
      xiv::exd::Exd m_EquipRaceCategoryDat;
      xiv::exd::Exd m_EquipSlotCategoryDat;
+     xiv::exd::Exd m_EurekaAetherItemDat;
      xiv::exd::Exd m_EurekaAethernetDat;
      xiv::exd::Exd m_EurekaGrowDataDat;
+     xiv::exd::Exd m_EurekaLogosMixerProbabilityDat;
+     xiv::exd::Exd m_EurekaMagiaActionDat;
+     xiv::exd::Exd m_EurekaMagiciteItemDat;
+     xiv::exd::Exd m_EurekaMagiciteItemTypeDat;
      xiv::exd::Exd m_EurekaSphereElementAdjustDat;
      xiv::exd::Exd m_EventActionDat;
      xiv::exd::Exd m_EventIconPriorityDat;
@@ -5005,7 +5385,9 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_FCProfileDat;
      xiv::exd::Exd m_FCReputationDat;
      xiv::exd::Exd m_FCRightsDat;
+     xiv::exd::Exd m_FestivalDat;
      xiv::exd::Exd m_FieldMarkerDat;
+     xiv::exd::Exd m_FishingRecordTypeDat;
      xiv::exd::Exd m_FishingRecordTypeTransientDat;
      xiv::exd::Exd m_FishingSpotDat;
      xiv::exd::Exd m_FishParameterDat;
@@ -5047,6 +5429,9 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_GCSupplyDutyRewardDat;
      xiv::exd::Exd m_GeneralActionDat;
      xiv::exd::Exd m_GFATEDat;
+     xiv::exd::Exd m_GFateClimbing2Dat;
+     xiv::exd::Exd m_GFateClimbing2ContentDat;
+     xiv::exd::Exd m_GFateClimbing2TotemTypeDat;
      xiv::exd::Exd m_GilShopDat;
      xiv::exd::Exd m_GilShopItemDat;
      xiv::exd::Exd m_GoldSaucerArcadeMachineDat;
@@ -5061,12 +5446,17 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_HairMakeTypeDat;
      xiv::exd::Exd m_HouseRetainerPoseDat;
      xiv::exd::Exd m_HousingAethernetDat;
+     xiv::exd::Exd m_HousingAppealDat;
      xiv::exd::Exd m_HousingEmploymentNpcListDat;
      xiv::exd::Exd m_HousingEmploymentNpcRaceDat;
+     xiv::exd::Exd m_HousingExteriorDat;
      xiv::exd::Exd m_HousingFurnitureDat;
+     xiv::exd::Exd m_HousingMapMarkerInfoDat;
+     xiv::exd::Exd m_HousingMerchantPoseDat;
      xiv::exd::Exd m_HousingLandSetDat;
      xiv::exd::Exd m_HousingPlacementDat;
      xiv::exd::Exd m_HousingPresetDat;
+     xiv::exd::Exd m_HousingUnitedExteriorDat;
      xiv::exd::Exd m_HousingYardObjectDat;
      xiv::exd::Exd m_HowToDat;
      xiv::exd::Exd m_HowToCategoryDat;
@@ -5077,6 +5467,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_ItemDat;
      xiv::exd::Exd m_ItemActionDat;
      xiv::exd::Exd m_ItemFoodDat;
+     xiv::exd::Exd m_ItemLevelDat;
      xiv::exd::Exd m_ItemSearchCategoryDat;
      xiv::exd::Exd m_ItemSeriesDat;
      xiv::exd::Exd m_ItemSpecialBonusDat;
@@ -5109,6 +5500,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_MasterpieceSupplyDutyDat;
      xiv::exd::Exd m_MasterpieceSupplyMultiplierDat;
      xiv::exd::Exd m_MateriaDat;
+     xiv::exd::Exd m_MiniGameRADat;
      xiv::exd::Exd m_MinionRaceDat;
      xiv::exd::Exd m_MinionRulesDat;
      xiv::exd::Exd m_MinionSkillTypeDat;
@@ -5136,7 +5528,9 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_OrchestrionPathDat;
      xiv::exd::Exd m_OrchestrionUiparamDat;
      xiv::exd::Exd m_ParamGrowDat;
+     xiv::exd::Exd m_PartyContentDat;
      xiv::exd::Exd m_PartyContentCutsceneDat;
+     xiv::exd::Exd m_PartyContentTextDataDat;
      xiv::exd::Exd m_PerformDat;
      xiv::exd::Exd m_PerformTransientDat;
      xiv::exd::Exd m_PetDat;
@@ -5238,6 +5632,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_TutorialDPSDat;
      xiv::exd::Exd m_TutorialHealerDat;
      xiv::exd::Exd m_TutorialTankDat;
+     xiv::exd::Exd m_UIColorDat;
      xiv::exd::Exd m_VaseFlowerDat;
      xiv::exd::Exd m_VFXDat;
      xiv::exd::Exd m_WarpDat;
@@ -5257,435 +5652,455 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_ZoneSharedGroupDat;
 
 
-     using AchievementPtr =  std::shared_ptr< Achievement >;
-     using AchievementCategoryPtr =  std::shared_ptr< AchievementCategory >;
-     using AchievementKindPtr =  std::shared_ptr< AchievementKind >;
-     using ActionPtr =  std::shared_ptr< Action >;
-     using ActionCastTimelinePtr =  std::shared_ptr< ActionCastTimeline >;
-     using ActionCastVFXPtr =  std::shared_ptr< ActionCastVFX >;
-     using ActionCategoryPtr =  std::shared_ptr< ActionCategory >;
-     using ActionComboRoutePtr =  std::shared_ptr< ActionComboRoute >;
-     using ActionIndirectionPtr =  std::shared_ptr< ActionIndirection >;
-     using ActionParamPtr =  std::shared_ptr< ActionParam >;
-     using ActionProcStatusPtr =  std::shared_ptr< ActionProcStatus >;
-     using ActionTimelinePtr =  std::shared_ptr< ActionTimeline >;
-     using ActionTimelineMovePtr =  std::shared_ptr< ActionTimelineMove >;
-     using ActionTimelineReplacePtr =  std::shared_ptr< ActionTimelineReplace >;
-     using ActionTransientPtr =  std::shared_ptr< ActionTransient >;
-     using ActivityFeedButtonsPtr =  std::shared_ptr< ActivityFeedButtons >;
-     using ActivityFeedCaptionsPtr =  std::shared_ptr< ActivityFeedCaptions >;
-     using ActivityFeedGroupCaptionsPtr =  std::shared_ptr< ActivityFeedGroupCaptions >;
-     using ActivityFeedImagesPtr =  std::shared_ptr< ActivityFeedImages >;
-     using AddonPtr =  std::shared_ptr< Addon >;
-     using AddonHudPtr =  std::shared_ptr< AddonHud >;
-     using AdventurePtr =  std::shared_ptr< Adventure >;
-     using AdventureExPhasePtr =  std::shared_ptr< AdventureExPhase >;
-     using AetherCurrentPtr =  std::shared_ptr< AetherCurrent >;
-     using AetherCurrentCompFlgSetPtr =  std::shared_ptr< AetherCurrentCompFlgSet >;
-     using AetherialWheelPtr =  std::shared_ptr< AetherialWheel >;
-     using AetherytePtr =  std::shared_ptr< Aetheryte >;
-     using AetheryteSystemDefinePtr =  std::shared_ptr< AetheryteSystemDefine >;
-     using AirshipExplorationLevelPtr =  std::shared_ptr< AirshipExplorationLevel >;
-     using AirshipExplorationLogPtr =  std::shared_ptr< AirshipExplorationLog >;
-     using AirshipExplorationParamTypePtr =  std::shared_ptr< AirshipExplorationParamType >;
-     using AirshipExplorationPartPtr =  std::shared_ptr< AirshipExplorationPart >;
-     using AirshipExplorationPointPtr =  std::shared_ptr< AirshipExplorationPoint >;
-     using AnimaWeapon5Ptr =  std::shared_ptr< AnimaWeapon5 >;
-     using AnimaWeapon5ParamPtr =  std::shared_ptr< AnimaWeapon5Param >;
-     using AnimaWeapon5PatternGroupPtr =  std::shared_ptr< AnimaWeapon5PatternGroup >;
-     using AnimaWeapon5SpiritTalkPtr =  std::shared_ptr< AnimaWeapon5SpiritTalk >;
-     using AnimaWeapon5SpiritTalkParamPtr =  std::shared_ptr< AnimaWeapon5SpiritTalkParam >;
-     using AnimaWeapon5TradeItemPtr =  std::shared_ptr< AnimaWeapon5TradeItem >;
-     using AnimaWeaponFUITalkPtr =  std::shared_ptr< AnimaWeaponFUITalk >;
-     using AnimaWeaponFUITalkParamPtr =  std::shared_ptr< AnimaWeaponFUITalkParam >;
-     using AnimaWeaponIconPtr =  std::shared_ptr< AnimaWeaponIcon >;
-     using AnimaWeaponItemPtr =  std::shared_ptr< AnimaWeaponItem >;
-     using AquariumFishPtr =  std::shared_ptr< AquariumFish >;
-     using AquariumWaterPtr =  std::shared_ptr< AquariumWater >;
-     using ArrayEventHandlerPtr =  std::shared_ptr< ArrayEventHandler >;
-     using AttackTypePtr =  std::shared_ptr< AttackType >;
-     using BacklightColorPtr =  std::shared_ptr< BacklightColor >;
-     using BalloonPtr =  std::shared_ptr< Balloon >;
-     using BaseParamPtr =  std::shared_ptr< BaseParam >;
-     using BattleLevePtr =  std::shared_ptr< BattleLeve >;
-     using BeastRankBonusPtr =  std::shared_ptr< BeastRankBonus >;
-     using BeastReputationRankPtr =  std::shared_ptr< BeastReputationRank >;
-     using BeastTribePtr =  std::shared_ptr< BeastTribe >;
-     using BehaviorPtr =  std::shared_ptr< Behavior >;
-     using BGMPtr =  std::shared_ptr< BGM >;
-     using BGMFadePtr =  std::shared_ptr< BGMFade >;
-     using BGMSituationPtr =  std::shared_ptr< BGMSituation >;
-     using BGMSwitchPtr =  std::shared_ptr< BGMSwitch >;
-     using BGMSystemDefinePtr =  std::shared_ptr< BGMSystemDefine >;
-     using BNpcAnnounceIconPtr =  std::shared_ptr< BNpcAnnounceIcon >;
-     using BNpcBasePtr =  std::shared_ptr< BNpcBase >;
-     using BNpcCustomizePtr =  std::shared_ptr< BNpcCustomize >;
-     using BNpcNamePtr =  std::shared_ptr< BNpcName >;
-     using BNpcPartsPtr =  std::shared_ptr< BNpcParts >;
-     using BuddyPtr =  std::shared_ptr< Buddy >;
-     using BuddyActionPtr =  std::shared_ptr< BuddyAction >;
-     using BuddyEquipPtr =  std::shared_ptr< BuddyEquip >;
-     using BuddyItemPtr =  std::shared_ptr< BuddyItem >;
-     using BuddyRankPtr =  std::shared_ptr< BuddyRank >;
-     using BuddySkillPtr =  std::shared_ptr< BuddySkill >;
-     using CabinetPtr =  std::shared_ptr< Cabinet >;
-     using CabinetCategoryPtr =  std::shared_ptr< CabinetCategory >;
-     using CalendarPtr =  std::shared_ptr< Calendar >;
-     using CharaMakeCustomizePtr =  std::shared_ptr< CharaMakeCustomize >;
-     using CharaMakeTypePtr =  std::shared_ptr< CharaMakeType >;
-     using ChocoboRacePtr =  std::shared_ptr< ChocoboRace >;
-     using ChocoboRaceAbilityPtr =  std::shared_ptr< ChocoboRaceAbility >;
-     using ChocoboRaceAbilityTypePtr =  std::shared_ptr< ChocoboRaceAbilityType >;
-     using ChocoboRaceItemPtr =  std::shared_ptr< ChocoboRaceItem >;
-     using ChocoboRaceRankPtr =  std::shared_ptr< ChocoboRaceRank >;
-     using ChocoboRaceStatusPtr =  std::shared_ptr< ChocoboRaceStatus >;
-     using ChocoboRaceTerritoryPtr =  std::shared_ptr< ChocoboRaceTerritory >;
-     using ChocoboRaceTutorialPtr =  std::shared_ptr< ChocoboRaceTutorial >;
-     using ChocoboRaceWeatherPtr =  std::shared_ptr< ChocoboRaceWeather >;
-     using ChocoboTaxiPtr =  std::shared_ptr< ChocoboTaxi >;
-     using ChocoboTaxiStandPtr =  std::shared_ptr< ChocoboTaxiStand >;
-     using ClassJobPtr =  std::shared_ptr< ClassJob >;
-     using ClassJobCategoryPtr =  std::shared_ptr< ClassJobCategory >;
-     using CompanionPtr =  std::shared_ptr< Companion >;
-     using CompanionMovePtr =  std::shared_ptr< CompanionMove >;
-     using CompanionTransientPtr =  std::shared_ptr< CompanionTransient >;
-     using CompanyActionPtr =  std::shared_ptr< CompanyAction >;
-     using CompanyCraftDraftPtr =  std::shared_ptr< CompanyCraftDraft >;
-     using CompanyCraftDraftCategoryPtr =  std::shared_ptr< CompanyCraftDraftCategory >;
-     using CompanyCraftManufactoryStatePtr =  std::shared_ptr< CompanyCraftManufactoryState >;
-     using CompanyCraftPartPtr =  std::shared_ptr< CompanyCraftPart >;
-     using CompanyCraftProcessPtr =  std::shared_ptr< CompanyCraftProcess >;
-     using CompanyCraftSequencePtr =  std::shared_ptr< CompanyCraftSequence >;
-     using CompanyCraftSupplyItemPtr =  std::shared_ptr< CompanyCraftSupplyItem >;
-     using CompanyCraftTypePtr =  std::shared_ptr< CompanyCraftType >;
-     using CompleteJournalPtr =  std::shared_ptr< CompleteJournal >;
-     using CompleteJournalCategoryPtr =  std::shared_ptr< CompleteJournalCategory >;
-     using ContentCloseCyclePtr =  std::shared_ptr< ContentCloseCycle >;
-     using ContentExActionPtr =  std::shared_ptr< ContentExAction >;
-     using ContentFinderConditionPtr =  std::shared_ptr< ContentFinderCondition >;
-     using ContentFinderConditionTransientPtr =  std::shared_ptr< ContentFinderConditionTransient >;
-     using ContentGaugePtr =  std::shared_ptr< ContentGauge >;
-     using ContentGaugeColorPtr =  std::shared_ptr< ContentGaugeColor >;
-     using ContentMemberTypePtr =  std::shared_ptr< ContentMemberType >;
-     using ContentNpcTalkPtr =  std::shared_ptr< ContentNpcTalk >;
-     using ContentRoulettePtr =  std::shared_ptr< ContentRoulette >;
-     using ContentRouletteOpenRulePtr =  std::shared_ptr< ContentRouletteOpenRule >;
-     using ContentRouletteRoleBonusPtr =  std::shared_ptr< ContentRouletteRoleBonus >;
-     using ContentsNotePtr =  std::shared_ptr< ContentsNote >;
-     using ContentTalkPtr =  std::shared_ptr< ContentTalk >;
-     using ContentTalkParamPtr =  std::shared_ptr< ContentTalkParam >;
-     using ContentTypePtr =  std::shared_ptr< ContentType >;
-     using CraftActionPtr =  std::shared_ptr< CraftAction >;
-     using CraftLevePtr =  std::shared_ptr< CraftLeve >;
-     using CraftTypePtr =  std::shared_ptr< CraftType >;
-     using CreditPtr =  std::shared_ptr< Credit >;
-     using CreditCastPtr =  std::shared_ptr< CreditCast >;
-     using CurrencyPtr =  std::shared_ptr< Currency >;
-     using CustomTalkPtr =  std::shared_ptr< CustomTalk >;
-     using CutscenePtr =  std::shared_ptr< Cutscene >;
-     using CutScreenImagePtr =  std::shared_ptr< CutScreenImage >;
-     using DailySupplyItemPtr =  std::shared_ptr< DailySupplyItem >;
-     using DeepDungeonPtr =  std::shared_ptr< DeepDungeon >;
-     using DeepDungeonBanPtr =  std::shared_ptr< DeepDungeonBan >;
-     using DeepDungeonDangerPtr =  std::shared_ptr< DeepDungeonDanger >;
-     using DeepDungeonEquipmentPtr =  std::shared_ptr< DeepDungeonEquipment >;
-     using DeepDungeonFloorEffectUIPtr =  std::shared_ptr< DeepDungeonFloorEffectUI >;
-     using DeepDungeonItemPtr =  std::shared_ptr< DeepDungeonItem >;
-     using DeepDungeonLayerPtr =  std::shared_ptr< DeepDungeonLayer >;
-     using DeepDungeonMagicStonePtr =  std::shared_ptr< DeepDungeonMagicStone >;
-     using DeepDungeonMap5XPtr =  std::shared_ptr< DeepDungeonMap5X >;
-     using DeepDungeonRoomPtr =  std::shared_ptr< DeepDungeonRoom >;
-     using DeepDungeonStatusPtr =  std::shared_ptr< DeepDungeonStatus >;
-     using DefaultTalkPtr =  std::shared_ptr< DefaultTalk >;
-     using DefaultTalkLipSyncTypePtr =  std::shared_ptr< DefaultTalkLipSyncType >;
-     using DeliveryQuestPtr =  std::shared_ptr< DeliveryQuest >;
-     using DisposalShopPtr =  std::shared_ptr< DisposalShop >;
-     using DisposalShopFilterTypePtr =  std::shared_ptr< DisposalShopFilterType >;
-     using DisposalShopItemPtr =  std::shared_ptr< DisposalShopItem >;
-     using DpsChallengePtr =  std::shared_ptr< DpsChallenge >;
-     using DpsChallengeOfficerPtr =  std::shared_ptr< DpsChallengeOfficer >;
-     using DpsChallengeTransientPtr =  std::shared_ptr< DpsChallengeTransient >;
-     using EmotePtr =  std::shared_ptr< Emote >;
-     using EmoteCategoryPtr =  std::shared_ptr< EmoteCategory >;
-     using ENpcBasePtr =  std::shared_ptr< ENpcBase >;
-     using ENpcResidentPtr =  std::shared_ptr< ENpcResident >;
-     using EObjPtr =  std::shared_ptr< EObj >;
-     using EObjNamePtr =  std::shared_ptr< EObjName >;
-     using EquipRaceCategoryPtr =  std::shared_ptr< EquipRaceCategory >;
-     using EquipSlotCategoryPtr =  std::shared_ptr< EquipSlotCategory >;
-     using EurekaAethernetPtr =  std::shared_ptr< EurekaAethernet >;
-     using EurekaGrowDataPtr =  std::shared_ptr< EurekaGrowData >;
-     using EurekaSphereElementAdjustPtr =  std::shared_ptr< EurekaSphereElementAdjust >;
-     using EventActionPtr =  std::shared_ptr< EventAction >;
-     using EventIconPriorityPtr =  std::shared_ptr< EventIconPriority >;
-     using EventIconTypePtr =  std::shared_ptr< EventIconType >;
-     using EventItemPtr =  std::shared_ptr< EventItem >;
-     using EventItemCastTimelinePtr =  std::shared_ptr< EventItemCastTimeline >;
-     using EventItemHelpPtr =  std::shared_ptr< EventItemHelp >;
-     using EventItemTimelinePtr =  std::shared_ptr< EventItemTimeline >;
-     using ExportedSGPtr =  std::shared_ptr< ExportedSG >;
-     using ExVersionPtr =  std::shared_ptr< ExVersion >;
-     using FatePtr =  std::shared_ptr< Fate >;
-     using FCActivityPtr =  std::shared_ptr< FCActivity >;
-     using FCActivityCategoryPtr =  std::shared_ptr< FCActivityCategory >;
-     using FCAuthorityPtr =  std::shared_ptr< FCAuthority >;
-     using FCAuthorityCategoryPtr =  std::shared_ptr< FCAuthorityCategory >;
-     using FCChestNamePtr =  std::shared_ptr< FCChestName >;
-     using FccShopPtr =  std::shared_ptr< FccShop >;
-     using FCHierarchyPtr =  std::shared_ptr< FCHierarchy >;
-     using FCProfilePtr =  std::shared_ptr< FCProfile >;
-     using FCReputationPtr =  std::shared_ptr< FCReputation >;
-     using FCRightsPtr =  std::shared_ptr< FCRights >;
-     using FieldMarkerPtr =  std::shared_ptr< FieldMarker >;
-     using FishingRecordTypeTransientPtr =  std::shared_ptr< FishingRecordTypeTransient >;
-     using FishingSpotPtr =  std::shared_ptr< FishingSpot >;
-     using FishParameterPtr =  std::shared_ptr< FishParameter >;
-     using Frontline03Ptr =  std::shared_ptr< Frontline03 >;
-     using Frontline04Ptr =  std::shared_ptr< Frontline04 >;
-     using GardeningSeedPtr =  std::shared_ptr< GardeningSeed >;
-     using GatheringConditionPtr =  std::shared_ptr< GatheringCondition >;
-     using GatheringExpPtr =  std::shared_ptr< GatheringExp >;
-     using GatheringItemPtr =  std::shared_ptr< GatheringItem >;
-     using GatheringItemLevelConvertTablePtr =  std::shared_ptr< GatheringItemLevelConvertTable >;
-     using GatheringItemPointPtr =  std::shared_ptr< GatheringItemPoint >;
-     using GatheringLevePtr =  std::shared_ptr< GatheringLeve >;
-     using GatheringLeveRoutePtr =  std::shared_ptr< GatheringLeveRoute >;
-     using GatheringNotebookListPtr =  std::shared_ptr< GatheringNotebookList >;
-     using GatheringPointPtr =  std::shared_ptr< GatheringPoint >;
-     using GatheringPointBasePtr =  std::shared_ptr< GatheringPointBase >;
-     using GatheringPointBonusPtr =  std::shared_ptr< GatheringPointBonus >;
-     using GatheringPointBonusTypePtr =  std::shared_ptr< GatheringPointBonusType >;
-     using GatheringPointNamePtr =  std::shared_ptr< GatheringPointName >;
-     using GatheringSubCategoryPtr =  std::shared_ptr< GatheringSubCategory >;
-     using GatheringTypePtr =  std::shared_ptr< GatheringType >;
-     using GcArmyCaptureTacticsPtr =  std::shared_ptr< GcArmyCaptureTactics >;
-     using GcArmyExpeditionPtr =  std::shared_ptr< GcArmyExpedition >;
-     using GcArmyExpeditionMemberBonusPtr =  std::shared_ptr< GcArmyExpeditionMemberBonus >;
-     using GcArmyExpeditionTypePtr =  std::shared_ptr< GcArmyExpeditionType >;
-     using GcArmyMemberGrowPtr =  std::shared_ptr< GcArmyMemberGrow >;
-     using GcArmyTrainingPtr =  std::shared_ptr< GcArmyTraining >;
-     using GCRankGridaniaFemaleTextPtr =  std::shared_ptr< GCRankGridaniaFemaleText >;
-     using GCRankGridaniaMaleTextPtr =  std::shared_ptr< GCRankGridaniaMaleText >;
-     using GCRankLimsaFemaleTextPtr =  std::shared_ptr< GCRankLimsaFemaleText >;
-     using GCRankLimsaMaleTextPtr =  std::shared_ptr< GCRankLimsaMaleText >;
-     using GCRankUldahFemaleTextPtr =  std::shared_ptr< GCRankUldahFemaleText >;
-     using GCRankUldahMaleTextPtr =  std::shared_ptr< GCRankUldahMaleText >;
-     using GCScripShopCategoryPtr =  std::shared_ptr< GCScripShopCategory >;
-     using GCScripShopItemPtr =  std::shared_ptr< GCScripShopItem >;
-     using GCShopPtr =  std::shared_ptr< GCShop >;
-     using GCShopItemCategoryPtr =  std::shared_ptr< GCShopItemCategory >;
-     using GCSupplyDutyPtr =  std::shared_ptr< GCSupplyDuty >;
-     using GCSupplyDutyRewardPtr =  std::shared_ptr< GCSupplyDutyReward >;
-     using GeneralActionPtr =  std::shared_ptr< GeneralAction >;
-     using GFATEPtr =  std::shared_ptr< GFATE >;
-     using GilShopPtr =  std::shared_ptr< GilShop >;
-     using GilShopItemPtr =  std::shared_ptr< GilShopItem >;
-     using GoldSaucerArcadeMachinePtr =  std::shared_ptr< GoldSaucerArcadeMachine >;
-     using GoldSaucerTextDataPtr =  std::shared_ptr< GoldSaucerTextData >;
-     using GrandCompanyPtr =  std::shared_ptr< GrandCompany >;
-     using GrandCompanyRankPtr =  std::shared_ptr< GrandCompanyRank >;
-     using GuardianDeityPtr =  std::shared_ptr< GuardianDeity >;
-     using GuildleveAssignmentPtr =  std::shared_ptr< GuildleveAssignment >;
-     using GuildleveAssignmentCategoryPtr =  std::shared_ptr< GuildleveAssignmentCategory >;
-     using GuildOrderGuidePtr =  std::shared_ptr< GuildOrderGuide >;
-     using GuildOrderOfficerPtr =  std::shared_ptr< GuildOrderOfficer >;
-     using HairMakeTypePtr =  std::shared_ptr< HairMakeType >;
-     using HouseRetainerPosePtr =  std::shared_ptr< HouseRetainerPose >;
-     using HousingAethernetPtr =  std::shared_ptr< HousingAethernet >;
-     using HousingEmploymentNpcListPtr =  std::shared_ptr< HousingEmploymentNpcList >;
-     using HousingEmploymentNpcRacePtr =  std::shared_ptr< HousingEmploymentNpcRace >;
-     using HousingFurniturePtr =  std::shared_ptr< HousingFurniture >;
-     using HousingLandSetPtr =  std::shared_ptr< HousingLandSet >;
-     using HousingPlacementPtr =  std::shared_ptr< HousingPlacement >;
-     using HousingPresetPtr =  std::shared_ptr< HousingPreset >;
-     using HousingYardObjectPtr =  std::shared_ptr< HousingYardObject >;
-     using HowToPtr =  std::shared_ptr< HowTo >;
-     using HowToCategoryPtr =  std::shared_ptr< HowToCategory >;
-     using HowToPagePtr =  std::shared_ptr< HowToPage >;
-     using InstanceContentPtr =  std::shared_ptr< InstanceContent >;
-     using InstanceContentBuffPtr =  std::shared_ptr< InstanceContentBuff >;
-     using InstanceContentTextDataPtr =  std::shared_ptr< InstanceContentTextData >;
-     using ItemPtr =  std::shared_ptr< Item >;
-     using ItemActionPtr =  std::shared_ptr< ItemAction >;
-     using ItemFoodPtr =  std::shared_ptr< ItemFood >;
-     using ItemSearchCategoryPtr =  std::shared_ptr< ItemSearchCategory >;
-     using ItemSeriesPtr =  std::shared_ptr< ItemSeries >;
-     using ItemSpecialBonusPtr =  std::shared_ptr< ItemSpecialBonus >;
-     using ItemUICategoryPtr =  std::shared_ptr< ItemUICategory >;
-     using JournalCategoryPtr =  std::shared_ptr< JournalCategory >;
-     using JournalGenrePtr =  std::shared_ptr< JournalGenre >;
-     using JournalSectionPtr =  std::shared_ptr< JournalSection >;
-     using LevePtr =  std::shared_ptr< Leve >;
-     using LeveAssignmentTypePtr =  std::shared_ptr< LeveAssignmentType >;
-     using LeveClientPtr =  std::shared_ptr< LeveClient >;
-     using LevelPtr =  std::shared_ptr< Level >;
-     using LeveRewardItemPtr =  std::shared_ptr< LeveRewardItem >;
-     using LeveRewardItemGroupPtr =  std::shared_ptr< LeveRewardItemGroup >;
-     using LeveVfxPtr =  std::shared_ptr< LeveVfx >;
-     using LogFilterPtr =  std::shared_ptr< LogFilter >;
-     using LogKindPtr =  std::shared_ptr< LogKind >;
-     using LogKindCategoryTextPtr =  std::shared_ptr< LogKindCategoryText >;
-     using LogMessagePtr =  std::shared_ptr< LogMessage >;
-     using LotteryExchangeShopPtr =  std::shared_ptr< LotteryExchangeShop >;
-     using MacroIconPtr =  std::shared_ptr< MacroIcon >;
-     using MacroIconRedirectOldPtr =  std::shared_ptr< MacroIconRedirectOld >;
-     using MainCommandPtr =  std::shared_ptr< MainCommand >;
-     using MainCommandCategoryPtr =  std::shared_ptr< MainCommandCategory >;
-     using ManeuversArmorPtr =  std::shared_ptr< ManeuversArmor >;
-     using MapPtr =  std::shared_ptr< Map >;
-     using MapMarkerPtr =  std::shared_ptr< MapMarker >;
-     using MapMarkerRegionPtr =  std::shared_ptr< MapMarkerRegion >;
-     using MapSymbolPtr =  std::shared_ptr< MapSymbol >;
-     using MarkerPtr =  std::shared_ptr< Marker >;
-     using MasterpieceSupplyDutyPtr =  std::shared_ptr< MasterpieceSupplyDuty >;
-     using MasterpieceSupplyMultiplierPtr =  std::shared_ptr< MasterpieceSupplyMultiplier >;
-     using MateriaPtr =  std::shared_ptr< Materia >;
-     using MinionRacePtr =  std::shared_ptr< MinionRace >;
-     using MinionRulesPtr =  std::shared_ptr< MinionRules >;
-     using MinionSkillTypePtr =  std::shared_ptr< MinionSkillType >;
-     using MobHuntOrderTypePtr =  std::shared_ptr< MobHuntOrderType >;
-     using MobHuntTargetPtr =  std::shared_ptr< MobHuntTarget >;
-     using ModelCharaPtr =  std::shared_ptr< ModelChara >;
-     using ModelStatePtr =  std::shared_ptr< ModelState >;
-     using MonsterNotePtr =  std::shared_ptr< MonsterNote >;
-     using MonsterNoteTargetPtr =  std::shared_ptr< MonsterNoteTarget >;
-     using MountPtr =  std::shared_ptr< Mount >;
-     using MountActionPtr =  std::shared_ptr< MountAction >;
-     using MountCustomizePtr =  std::shared_ptr< MountCustomize >;
-     using MountFlyingConditionPtr =  std::shared_ptr< MountFlyingCondition >;
-     using MountSpeedPtr =  std::shared_ptr< MountSpeed >;
-     using MountTransientPtr =  std::shared_ptr< MountTransient >;
-     using MoveTimelinePtr =  std::shared_ptr< MoveTimeline >;
-     using MoveVfxPtr =  std::shared_ptr< MoveVfx >;
-     using NpcEquipPtr =  std::shared_ptr< NpcEquip >;
-     using NpcYellPtr =  std::shared_ptr< NpcYell >;
-     using OmenPtr =  std::shared_ptr< Omen >;
-     using OnlineStatusPtr =  std::shared_ptr< OnlineStatus >;
-     using OpeningPtr =  std::shared_ptr< Opening >;
-     using OrchestrionPtr =  std::shared_ptr< Orchestrion >;
-     using OrchestrionCategoryPtr =  std::shared_ptr< OrchestrionCategory >;
-     using OrchestrionPathPtr =  std::shared_ptr< OrchestrionPath >;
-     using OrchestrionUiparamPtr =  std::shared_ptr< OrchestrionUiparam >;
-     using ParamGrowPtr =  std::shared_ptr< ParamGrow >;
-     using PartyContentCutscenePtr =  std::shared_ptr< PartyContentCutscene >;
-     using PerformPtr =  std::shared_ptr< Perform >;
-     using PerformTransientPtr =  std::shared_ptr< PerformTransient >;
-     using PetPtr =  std::shared_ptr< Pet >;
-     using PetActionPtr =  std::shared_ptr< PetAction >;
-     using PicturePtr =  std::shared_ptr< Picture >;
-     using PlaceNamePtr =  std::shared_ptr< PlaceName >;
-     using PlantPotFlowerSeedPtr =  std::shared_ptr< PlantPotFlowerSeed >;
-     using PreHandlerPtr =  std::shared_ptr< PreHandler >;
-     using PublicContentPtr =  std::shared_ptr< PublicContent >;
-     using PublicContentCutscenePtr =  std::shared_ptr< PublicContentCutscene >;
-     using PublicContentTextDataPtr =  std::shared_ptr< PublicContentTextData >;
-     using PvPActionPtr =  std::shared_ptr< PvPAction >;
-     using PvPActionSortPtr =  std::shared_ptr< PvPActionSort >;
-     using PvPRankPtr =  std::shared_ptr< PvPRank >;
-     using PvPSelectTraitPtr =  std::shared_ptr< PvPSelectTrait >;
-     using PvPTraitPtr =  std::shared_ptr< PvPTrait >;
-     using QuestPtr =  std::shared_ptr< Quest >;
-     using QuestClassJobRewardPtr =  std::shared_ptr< QuestClassJobReward >;
-     using QuestClassJobSupplyPtr =  std::shared_ptr< QuestClassJobSupply >;
-     using QuestRepeatFlagPtr =  std::shared_ptr< QuestRepeatFlag >;
-     using QuestRewardOtherPtr =  std::shared_ptr< QuestRewardOther >;
-     using QuickChatPtr =  std::shared_ptr< QuickChat >;
-     using QuickChatTransientPtr =  std::shared_ptr< QuickChatTransient >;
-     using RacePtr =  std::shared_ptr< Race >;
-     using RacingChocoboItemPtr =  std::shared_ptr< RacingChocoboItem >;
-     using RacingChocoboNamePtr =  std::shared_ptr< RacingChocoboName >;
-     using RacingChocoboNameCategoryPtr =  std::shared_ptr< RacingChocoboNameCategory >;
-     using RacingChocoboNameInfoPtr =  std::shared_ptr< RacingChocoboNameInfo >;
-     using RacingChocoboParamPtr =  std::shared_ptr< RacingChocoboParam >;
-     using RecipePtr =  std::shared_ptr< Recipe >;
-     using RecipeElementPtr =  std::shared_ptr< RecipeElement >;
-     using RecipeLevelTablePtr =  std::shared_ptr< RecipeLevelTable >;
-     using RecipeNotebookListPtr =  std::shared_ptr< RecipeNotebookList >;
-     using RecommendContentsPtr =  std::shared_ptr< RecommendContents >;
-     using RelicPtr =  std::shared_ptr< Relic >;
-     using Relic3Ptr =  std::shared_ptr< Relic3 >;
-     using RelicItemPtr =  std::shared_ptr< RelicItem >;
-     using RelicNotePtr =  std::shared_ptr< RelicNote >;
-     using RelicNoteCategoryPtr =  std::shared_ptr< RelicNoteCategory >;
-     using ResidentPtr =  std::shared_ptr< Resident >;
-     using RetainerTaskPtr =  std::shared_ptr< RetainerTask >;
-     using RetainerTaskLvRangePtr =  std::shared_ptr< RetainerTaskLvRange >;
-     using RetainerTaskNormalPtr =  std::shared_ptr< RetainerTaskNormal >;
-     using RetainerTaskParameterPtr =  std::shared_ptr< RetainerTaskParameter >;
-     using RetainerTaskRandomPtr =  std::shared_ptr< RetainerTaskRandom >;
-     using RPParameterPtr =  std::shared_ptr< RPParameter >;
-     using SalvagePtr =  std::shared_ptr< Salvage >;
-     using SatisfactionNpcPtr =  std::shared_ptr< SatisfactionNpc >;
-     using SatisfactionSupplyPtr =  std::shared_ptr< SatisfactionSupply >;
-     using SatisfactionSupplyRewardPtr =  std::shared_ptr< SatisfactionSupplyReward >;
-     using ScenarioTreePtr =  std::shared_ptr< ScenarioTree >;
-     using ScenarioTreeTipsPtr =  std::shared_ptr< ScenarioTreeTips >;
-     using ScenarioTreeTipsClassQuestPtr =  std::shared_ptr< ScenarioTreeTipsClassQuest >;
-     using ScenarioTreeTipsQuestPtr =  std::shared_ptr< ScenarioTreeTipsQuest >;
-     using ScenarioTypePtr =  std::shared_ptr< ScenarioType >;
-     using ScreenImagePtr =  std::shared_ptr< ScreenImage >;
-     using SecretRecipeBookPtr =  std::shared_ptr< SecretRecipeBook >;
-     using SkyIsland2MissionPtr =  std::shared_ptr< SkyIsland2Mission >;
-     using SkyIsland2MissionDetailPtr =  std::shared_ptr< SkyIsland2MissionDetail >;
-     using SkyIsland2MissionTypePtr =  std::shared_ptr< SkyIsland2MissionType >;
-     using SkyIsland2RangeTypePtr =  std::shared_ptr< SkyIsland2RangeType >;
-     using SpearfishingItemPtr =  std::shared_ptr< SpearfishingItem >;
-     using SpearfishingNotebookPtr =  std::shared_ptr< SpearfishingNotebook >;
-     using SpearfishingRecordPagePtr =  std::shared_ptr< SpearfishingRecordPage >;
-     using SpecialShopPtr =  std::shared_ptr< SpecialShop >;
-     using SpecialShopItemCategoryPtr =  std::shared_ptr< SpecialShopItemCategory >;
-     using StainPtr =  std::shared_ptr< Stain >;
-     using StainTransientPtr =  std::shared_ptr< StainTransient >;
-     using StatusPtr =  std::shared_ptr< Status >;
-     using StatusHitEffectPtr =  std::shared_ptr< StatusHitEffect >;
-     using StatusLoopVFXPtr =  std::shared_ptr< StatusLoopVFX >;
-     using StoryPtr =  std::shared_ptr< Story >;
-     using SubmarineExplorationPtr =  std::shared_ptr< SubmarineExploration >;
-     using SubmarinePartPtr =  std::shared_ptr< SubmarinePart >;
-     using SubmarineRankPtr =  std::shared_ptr< SubmarineRank >;
-     using SwitchTalkPtr =  std::shared_ptr< SwitchTalk >;
-     using TerritoryTypePtr =  std::shared_ptr< TerritoryType >;
-     using TextCommandPtr =  std::shared_ptr< TextCommand >;
-     using TitlePtr =  std::shared_ptr< Title >;
-     using TomestonesPtr =  std::shared_ptr< Tomestones >;
-     using TomestonesItemPtr =  std::shared_ptr< TomestonesItem >;
-     using TopicSelectPtr =  std::shared_ptr< TopicSelect >;
-     using TownPtr =  std::shared_ptr< Town >;
-     using TraitPtr =  std::shared_ptr< Trait >;
-     using TraitRecastPtr =  std::shared_ptr< TraitRecast >;
-     using TraitTransientPtr =  std::shared_ptr< TraitTransient >;
-     using TransformationPtr =  std::shared_ptr< Transformation >;
-     using TreasurePtr =  std::shared_ptr< Treasure >;
-     using TreasureHuntRankPtr =  std::shared_ptr< TreasureHuntRank >;
-     using TribePtr =  std::shared_ptr< Tribe >;
-     using TripleTriadPtr =  std::shared_ptr< TripleTriad >;
-     using TripleTriadCardPtr =  std::shared_ptr< TripleTriadCard >;
-     using TripleTriadCardRarityPtr =  std::shared_ptr< TripleTriadCardRarity >;
-     using TripleTriadCardResidentPtr =  std::shared_ptr< TripleTriadCardResident >;
-     using TripleTriadCardTypePtr =  std::shared_ptr< TripleTriadCardType >;
-     using TripleTriadCompetitionPtr =  std::shared_ptr< TripleTriadCompetition >;
-     using TripleTriadRulePtr =  std::shared_ptr< TripleTriadRule >;
-     using TutorialPtr =  std::shared_ptr< Tutorial >;
-     using TutorialDPSPtr =  std::shared_ptr< TutorialDPS >;
-     using TutorialHealerPtr =  std::shared_ptr< TutorialHealer >;
-     using TutorialTankPtr =  std::shared_ptr< TutorialTank >;
-     using VaseFlowerPtr =  std::shared_ptr< VaseFlower >;
-     using VFXPtr =  std::shared_ptr< VFX >;
-     using WarpPtr =  std::shared_ptr< Warp >;
-     using WarpConditionPtr =  std::shared_ptr< WarpCondition >;
-     using WarpLogicPtr =  std::shared_ptr< WarpLogic >;
-     using WeatherPtr =  std::shared_ptr< Weather >;
-     using WeatherGroupPtr =  std::shared_ptr< WeatherGroup >;
-     using WeatherRatePtr =  std::shared_ptr< WeatherRate >;
-     using WeddingBGMPtr =  std::shared_ptr< WeddingBGM >;
-     using WeeklyBingoOrderDataPtr =  std::shared_ptr< WeeklyBingoOrderData >;
-     using WeeklyBingoRewardDataPtr =  std::shared_ptr< WeeklyBingoRewardData >;
-     using WeeklyBingoTextPtr =  std::shared_ptr< WeeklyBingoText >;
-     using WeeklyLotBonusPtr =  std::shared_ptr< WeeklyLotBonus >;
-     using WorldPtr =  std::shared_ptr< World >;
-     using WorldDCGroupTypePtr =  std::shared_ptr< WorldDCGroupType >;
-     using YKWPtr =  std::shared_ptr< YKW >;
-     using ZoneSharedGroupPtr =  std::shared_ptr< ZoneSharedGroup >;
+     using AchievementPtr = std::shared_ptr< Achievement >;
+     using AchievementCategoryPtr = std::shared_ptr< AchievementCategory >;
+     using AchievementKindPtr = std::shared_ptr< AchievementKind >;
+     using ActionPtr = std::shared_ptr< Action >;
+     using ActionCastTimelinePtr = std::shared_ptr< ActionCastTimeline >;
+     using ActionCastVFXPtr = std::shared_ptr< ActionCastVFX >;
+     using ActionCategoryPtr = std::shared_ptr< ActionCategory >;
+     using ActionComboRoutePtr = std::shared_ptr< ActionComboRoute >;
+     using ActionIndirectionPtr = std::shared_ptr< ActionIndirection >;
+     using ActionParamPtr = std::shared_ptr< ActionParam >;
+     using ActionProcStatusPtr = std::shared_ptr< ActionProcStatus >;
+     using ActionTimelinePtr = std::shared_ptr< ActionTimeline >;
+     using ActionTimelineMovePtr = std::shared_ptr< ActionTimelineMove >;
+     using ActionTimelineReplacePtr = std::shared_ptr< ActionTimelineReplace >;
+     using ActionTransientPtr = std::shared_ptr< ActionTransient >;
+     using ActivityFeedButtonsPtr = std::shared_ptr< ActivityFeedButtons >;
+     using ActivityFeedCaptionsPtr = std::shared_ptr< ActivityFeedCaptions >;
+     using ActivityFeedGroupCaptionsPtr = std::shared_ptr< ActivityFeedGroupCaptions >;
+     using ActivityFeedImagesPtr = std::shared_ptr< ActivityFeedImages >;
+     using AddonPtr = std::shared_ptr< Addon >;
+     using AddonHudPtr = std::shared_ptr< AddonHud >;
+     using AdventurePtr = std::shared_ptr< Adventure >;
+     using AdventureExPhasePtr = std::shared_ptr< AdventureExPhase >;
+     using AetherCurrentPtr = std::shared_ptr< AetherCurrent >;
+     using AetherCurrentCompFlgSetPtr = std::shared_ptr< AetherCurrentCompFlgSet >;
+     using AetherialWheelPtr = std::shared_ptr< AetherialWheel >;
+     using AetherytePtr = std::shared_ptr< Aetheryte >;
+     using AetheryteSystemDefinePtr = std::shared_ptr< AetheryteSystemDefine >;
+     using AirshipExplorationLevelPtr = std::shared_ptr< AirshipExplorationLevel >;
+     using AirshipExplorationLogPtr = std::shared_ptr< AirshipExplorationLog >;
+     using AirshipExplorationParamTypePtr = std::shared_ptr< AirshipExplorationParamType >;
+     using AirshipExplorationPartPtr = std::shared_ptr< AirshipExplorationPart >;
+     using AirshipExplorationPointPtr = std::shared_ptr< AirshipExplorationPoint >;
+     using AnimaWeapon5Ptr = std::shared_ptr< AnimaWeapon5 >;
+     using AnimaWeapon5ParamPtr = std::shared_ptr< AnimaWeapon5Param >;
+     using AnimaWeapon5PatternGroupPtr = std::shared_ptr< AnimaWeapon5PatternGroup >;
+     using AnimaWeapon5SpiritTalkPtr = std::shared_ptr< AnimaWeapon5SpiritTalk >;
+     using AnimaWeapon5SpiritTalkParamPtr = std::shared_ptr< AnimaWeapon5SpiritTalkParam >;
+     using AnimaWeapon5TradeItemPtr = std::shared_ptr< AnimaWeapon5TradeItem >;
+     using AnimaWeaponFUITalkPtr = std::shared_ptr< AnimaWeaponFUITalk >;
+     using AnimaWeaponFUITalkParamPtr = std::shared_ptr< AnimaWeaponFUITalkParam >;
+     using AnimaWeaponIconPtr = std::shared_ptr< AnimaWeaponIcon >;
+     using AnimaWeaponItemPtr = std::shared_ptr< AnimaWeaponItem >;
+     using AquariumFishPtr = std::shared_ptr< AquariumFish >;
+     using AquariumWaterPtr = std::shared_ptr< AquariumWater >;
+     using ArrayEventHandlerPtr = std::shared_ptr< ArrayEventHandler >;
+     using AttackTypePtr = std::shared_ptr< AttackType >;
+     using BacklightColorPtr = std::shared_ptr< BacklightColor >;
+     using BalloonPtr = std::shared_ptr< Balloon >;
+     using BaseParamPtr = std::shared_ptr< BaseParam >;
+     using BattleLevePtr = std::shared_ptr< BattleLeve >;
+     using BeastRankBonusPtr = std::shared_ptr< BeastRankBonus >;
+     using BeastReputationRankPtr = std::shared_ptr< BeastReputationRank >;
+     using BeastTribePtr = std::shared_ptr< BeastTribe >;
+     using BehaviorPtr = std::shared_ptr< Behavior >;
+     using BGMPtr = std::shared_ptr< BGM >;
+     using BGMFadePtr = std::shared_ptr< BGMFade >;
+     using BGMSituationPtr = std::shared_ptr< BGMSituation >;
+     using BGMSwitchPtr = std::shared_ptr< BGMSwitch >;
+     using BGMSystemDefinePtr = std::shared_ptr< BGMSystemDefine >;
+     using BNpcAnnounceIconPtr = std::shared_ptr< BNpcAnnounceIcon >;
+     using BNpcBasePtr = std::shared_ptr< BNpcBase >;
+     using BNpcCustomizePtr = std::shared_ptr< BNpcCustomize >;
+     using BNpcNamePtr = std::shared_ptr< BNpcName >;
+     using BNpcPartsPtr = std::shared_ptr< BNpcParts >;
+     using BuddyPtr = std::shared_ptr< Buddy >;
+     using BuddyActionPtr = std::shared_ptr< BuddyAction >;
+     using BuddyEquipPtr = std::shared_ptr< BuddyEquip >;
+     using BuddyItemPtr = std::shared_ptr< BuddyItem >;
+     using BuddyRankPtr = std::shared_ptr< BuddyRank >;
+     using BuddySkillPtr = std::shared_ptr< BuddySkill >;
+     using CabinetPtr = std::shared_ptr< Cabinet >;
+     using CabinetCategoryPtr = std::shared_ptr< CabinetCategory >;
+     using CalendarPtr = std::shared_ptr< Calendar >;
+     using CharaMakeCustomizePtr = std::shared_ptr< CharaMakeCustomize >;
+     using CharaMakeTypePtr = std::shared_ptr< CharaMakeType >;
+     using ChocoboRacePtr = std::shared_ptr< ChocoboRace >;
+     using ChocoboRaceAbilityPtr = std::shared_ptr< ChocoboRaceAbility >;
+     using ChocoboRaceAbilityTypePtr = std::shared_ptr< ChocoboRaceAbilityType >;
+     using ChocoboRaceItemPtr = std::shared_ptr< ChocoboRaceItem >;
+     using ChocoboRaceRankPtr = std::shared_ptr< ChocoboRaceRank >;
+     using ChocoboRaceStatusPtr = std::shared_ptr< ChocoboRaceStatus >;
+     using ChocoboRaceTerritoryPtr = std::shared_ptr< ChocoboRaceTerritory >;
+     using ChocoboRaceTutorialPtr = std::shared_ptr< ChocoboRaceTutorial >;
+     using ChocoboRaceWeatherPtr = std::shared_ptr< ChocoboRaceWeather >;
+     using ChocoboTaxiPtr = std::shared_ptr< ChocoboTaxi >;
+     using ChocoboTaxiStandPtr = std::shared_ptr< ChocoboTaxiStand >;
+     using ClassJobPtr = std::shared_ptr< ClassJob >;
+     using ClassJobCategoryPtr = std::shared_ptr< ClassJobCategory >;
+     using CompanionPtr = std::shared_ptr< Companion >;
+     using CompanionMovePtr = std::shared_ptr< CompanionMove >;
+     using CompanionTransientPtr = std::shared_ptr< CompanionTransient >;
+     using CompanyActionPtr = std::shared_ptr< CompanyAction >;
+     using CompanyCraftDraftPtr = std::shared_ptr< CompanyCraftDraft >;
+     using CompanyCraftDraftCategoryPtr = std::shared_ptr< CompanyCraftDraftCategory >;
+     using CompanyCraftManufactoryStatePtr = std::shared_ptr< CompanyCraftManufactoryState >;
+     using CompanyCraftPartPtr = std::shared_ptr< CompanyCraftPart >;
+     using CompanyCraftProcessPtr = std::shared_ptr< CompanyCraftProcess >;
+     using CompanyCraftSequencePtr = std::shared_ptr< CompanyCraftSequence >;
+     using CompanyCraftSupplyItemPtr = std::shared_ptr< CompanyCraftSupplyItem >;
+     using CompanyCraftTypePtr = std::shared_ptr< CompanyCraftType >;
+     using CompleteJournalPtr = std::shared_ptr< CompleteJournal >;
+     using CompleteJournalCategoryPtr = std::shared_ptr< CompleteJournalCategory >;
+     using ContentCloseCyclePtr = std::shared_ptr< ContentCloseCycle >;
+     using ContentExActionPtr = std::shared_ptr< ContentExAction >;
+     using ContentFinderConditionPtr = std::shared_ptr< ContentFinderCondition >;
+     using ContentFinderConditionTransientPtr = std::shared_ptr< ContentFinderConditionTransient >;
+     using ContentGaugePtr = std::shared_ptr< ContentGauge >;
+     using ContentGaugeColorPtr = std::shared_ptr< ContentGaugeColor >;
+     using ContentMemberTypePtr = std::shared_ptr< ContentMemberType >;
+     using ContentNpcTalkPtr = std::shared_ptr< ContentNpcTalk >;
+     using ContentRoulettePtr = std::shared_ptr< ContentRoulette >;
+     using ContentRouletteOpenRulePtr = std::shared_ptr< ContentRouletteOpenRule >;
+     using ContentRouletteRoleBonusPtr = std::shared_ptr< ContentRouletteRoleBonus >;
+     using ContentsNotePtr = std::shared_ptr< ContentsNote >;
+     using ContentTalkPtr = std::shared_ptr< ContentTalk >;
+     using ContentTalkParamPtr = std::shared_ptr< ContentTalkParam >;
+     using ContentTypePtr = std::shared_ptr< ContentType >;
+     using CraftActionPtr = std::shared_ptr< CraftAction >;
+     using CraftLevePtr = std::shared_ptr< CraftLeve >;
+     using CraftTypePtr = std::shared_ptr< CraftType >;
+     using CreditPtr = std::shared_ptr< Credit >;
+     using CreditCastPtr = std::shared_ptr< CreditCast >;
+     using CurrencyPtr = std::shared_ptr< Currency >;
+     using CustomTalkPtr = std::shared_ptr< CustomTalk >;
+     using CutscenePtr = std::shared_ptr< Cutscene >;
+     using CutScreenImagePtr = std::shared_ptr< CutScreenImage >;
+     using DailySupplyItemPtr = std::shared_ptr< DailySupplyItem >;
+     using DeepDungeonPtr = std::shared_ptr< DeepDungeon >;
+     using DeepDungeonBanPtr = std::shared_ptr< DeepDungeonBan >;
+     using DeepDungeonDangerPtr = std::shared_ptr< DeepDungeonDanger >;
+     using DeepDungeonEquipmentPtr = std::shared_ptr< DeepDungeonEquipment >;
+     using DeepDungeonFloorEffectUIPtr = std::shared_ptr< DeepDungeonFloorEffectUI >;
+     using DeepDungeonItemPtr = std::shared_ptr< DeepDungeonItem >;
+     using DeepDungeonLayerPtr = std::shared_ptr< DeepDungeonLayer >;
+     using DeepDungeonMagicStonePtr = std::shared_ptr< DeepDungeonMagicStone >;
+     using DeepDungeonMap5XPtr = std::shared_ptr< DeepDungeonMap5X >;
+     using DeepDungeonRoomPtr = std::shared_ptr< DeepDungeonRoom >;
+     using DeepDungeonStatusPtr = std::shared_ptr< DeepDungeonStatus >;
+     using DefaultTalkPtr = std::shared_ptr< DefaultTalk >;
+     using DefaultTalkLipSyncTypePtr = std::shared_ptr< DefaultTalkLipSyncType >;
+     using DeliveryQuestPtr = std::shared_ptr< DeliveryQuest >;
+     using DisposalShopPtr = std::shared_ptr< DisposalShop >;
+     using DisposalShopFilterTypePtr = std::shared_ptr< DisposalShopFilterType >;
+     using DisposalShopItemPtr = std::shared_ptr< DisposalShopItem >;
+     using DpsChallengePtr = std::shared_ptr< DpsChallenge >;
+     using DpsChallengeOfficerPtr = std::shared_ptr< DpsChallengeOfficer >;
+     using DpsChallengeTransientPtr = std::shared_ptr< DpsChallengeTransient >;
+     using EmotePtr = std::shared_ptr< Emote >;
+     using EmoteCategoryPtr = std::shared_ptr< EmoteCategory >;
+     using ENpcBasePtr = std::shared_ptr< ENpcBase >;
+     using ENpcResidentPtr = std::shared_ptr< ENpcResident >;
+     using EObjPtr = std::shared_ptr< EObj >;
+     using EObjNamePtr = std::shared_ptr< EObjName >;
+     using EquipRaceCategoryPtr = std::shared_ptr< EquipRaceCategory >;
+     using EquipSlotCategoryPtr = std::shared_ptr< EquipSlotCategory >;
+     using EurekaAetherItemPtr = std::shared_ptr< EurekaAetherItem >;
+     using EurekaAethernetPtr = std::shared_ptr< EurekaAethernet >;
+     using EurekaGrowDataPtr = std::shared_ptr< EurekaGrowData >;
+     using EurekaLogosMixerProbabilityPtr = std::shared_ptr< EurekaLogosMixerProbability >;
+     using EurekaMagiaActionPtr = std::shared_ptr< EurekaMagiaAction >;
+     using EurekaMagiciteItemPtr = std::shared_ptr< EurekaMagiciteItem >;
+     using EurekaMagiciteItemTypePtr = std::shared_ptr< EurekaMagiciteItemType >;
+     using EurekaSphereElementAdjustPtr = std::shared_ptr< EurekaSphereElementAdjust >;
+     using EventActionPtr = std::shared_ptr< EventAction >;
+     using EventIconPriorityPtr = std::shared_ptr< EventIconPriority >;
+     using EventIconTypePtr = std::shared_ptr< EventIconType >;
+     using EventItemPtr = std::shared_ptr< EventItem >;
+     using EventItemCastTimelinePtr = std::shared_ptr< EventItemCastTimeline >;
+     using EventItemHelpPtr = std::shared_ptr< EventItemHelp >;
+     using EventItemTimelinePtr = std::shared_ptr< EventItemTimeline >;
+     using ExportedSGPtr = std::shared_ptr< ExportedSG >;
+     using ExVersionPtr = std::shared_ptr< ExVersion >;
+     using FatePtr = std::shared_ptr< Fate >;
+     using FCActivityPtr = std::shared_ptr< FCActivity >;
+     using FCActivityCategoryPtr = std::shared_ptr< FCActivityCategory >;
+     using FCAuthorityPtr = std::shared_ptr< FCAuthority >;
+     using FCAuthorityCategoryPtr = std::shared_ptr< FCAuthorityCategory >;
+     using FCChestNamePtr = std::shared_ptr< FCChestName >;
+     using FccShopPtr = std::shared_ptr< FccShop >;
+     using FCHierarchyPtr = std::shared_ptr< FCHierarchy >;
+     using FCProfilePtr = std::shared_ptr< FCProfile >;
+     using FCReputationPtr = std::shared_ptr< FCReputation >;
+     using FCRightsPtr = std::shared_ptr< FCRights >;
+     using FestivalPtr = std::shared_ptr< Festival >;
+     using FieldMarkerPtr = std::shared_ptr< FieldMarker >;
+     using FishingRecordTypePtr = std::shared_ptr< FishingRecordType >;
+     using FishingRecordTypeTransientPtr = std::shared_ptr< FishingRecordTypeTransient >;
+     using FishingSpotPtr = std::shared_ptr< FishingSpot >;
+     using FishParameterPtr = std::shared_ptr< FishParameter >;
+     using Frontline03Ptr = std::shared_ptr< Frontline03 >;
+     using Frontline04Ptr = std::shared_ptr< Frontline04 >;
+     using GardeningSeedPtr = std::shared_ptr< GardeningSeed >;
+     using GatheringConditionPtr = std::shared_ptr< GatheringCondition >;
+     using GatheringExpPtr = std::shared_ptr< GatheringExp >;
+     using GatheringItemPtr = std::shared_ptr< GatheringItem >;
+     using GatheringItemLevelConvertTablePtr = std::shared_ptr< GatheringItemLevelConvertTable >;
+     using GatheringItemPointPtr = std::shared_ptr< GatheringItemPoint >;
+     using GatheringLevePtr = std::shared_ptr< GatheringLeve >;
+     using GatheringLeveRoutePtr = std::shared_ptr< GatheringLeveRoute >;
+     using GatheringNotebookListPtr = std::shared_ptr< GatheringNotebookList >;
+     using GatheringPointPtr = std::shared_ptr< GatheringPoint >;
+     using GatheringPointBasePtr = std::shared_ptr< GatheringPointBase >;
+     using GatheringPointBonusPtr = std::shared_ptr< GatheringPointBonus >;
+     using GatheringPointBonusTypePtr = std::shared_ptr< GatheringPointBonusType >;
+     using GatheringPointNamePtr = std::shared_ptr< GatheringPointName >;
+     using GatheringSubCategoryPtr = std::shared_ptr< GatheringSubCategory >;
+     using GatheringTypePtr = std::shared_ptr< GatheringType >;
+     using GcArmyCaptureTacticsPtr = std::shared_ptr< GcArmyCaptureTactics >;
+     using GcArmyExpeditionPtr = std::shared_ptr< GcArmyExpedition >;
+     using GcArmyExpeditionMemberBonusPtr = std::shared_ptr< GcArmyExpeditionMemberBonus >;
+     using GcArmyExpeditionTypePtr = std::shared_ptr< GcArmyExpeditionType >;
+     using GcArmyMemberGrowPtr = std::shared_ptr< GcArmyMemberGrow >;
+     using GcArmyTrainingPtr = std::shared_ptr< GcArmyTraining >;
+     using GCRankGridaniaFemaleTextPtr = std::shared_ptr< GCRankGridaniaFemaleText >;
+     using GCRankGridaniaMaleTextPtr = std::shared_ptr< GCRankGridaniaMaleText >;
+     using GCRankLimsaFemaleTextPtr = std::shared_ptr< GCRankLimsaFemaleText >;
+     using GCRankLimsaMaleTextPtr = std::shared_ptr< GCRankLimsaMaleText >;
+     using GCRankUldahFemaleTextPtr = std::shared_ptr< GCRankUldahFemaleText >;
+     using GCRankUldahMaleTextPtr = std::shared_ptr< GCRankUldahMaleText >;
+     using GCScripShopCategoryPtr = std::shared_ptr< GCScripShopCategory >;
+     using GCScripShopItemPtr = std::shared_ptr< GCScripShopItem >;
+     using GCShopPtr = std::shared_ptr< GCShop >;
+     using GCShopItemCategoryPtr = std::shared_ptr< GCShopItemCategory >;
+     using GCSupplyDutyPtr = std::shared_ptr< GCSupplyDuty >;
+     using GCSupplyDutyRewardPtr = std::shared_ptr< GCSupplyDutyReward >;
+     using GeneralActionPtr = std::shared_ptr< GeneralAction >;
+     using GFATEPtr = std::shared_ptr< GFATE >;
+     using GFateClimbing2Ptr = std::shared_ptr< GFateClimbing2 >;
+     using GFateClimbing2ContentPtr = std::shared_ptr< GFateClimbing2Content >;
+     using GFateClimbing2TotemTypePtr = std::shared_ptr< GFateClimbing2TotemType >;
+     using GilShopPtr = std::shared_ptr< GilShop >;
+     using GilShopItemPtr = std::shared_ptr< GilShopItem >;
+     using GoldSaucerArcadeMachinePtr = std::shared_ptr< GoldSaucerArcadeMachine >;
+     using GoldSaucerTextDataPtr = std::shared_ptr< GoldSaucerTextData >;
+     using GrandCompanyPtr = std::shared_ptr< GrandCompany >;
+     using GrandCompanyRankPtr = std::shared_ptr< GrandCompanyRank >;
+     using GuardianDeityPtr = std::shared_ptr< GuardianDeity >;
+     using GuildleveAssignmentPtr = std::shared_ptr< GuildleveAssignment >;
+     using GuildleveAssignmentCategoryPtr = std::shared_ptr< GuildleveAssignmentCategory >;
+     using GuildOrderGuidePtr = std::shared_ptr< GuildOrderGuide >;
+     using GuildOrderOfficerPtr = std::shared_ptr< GuildOrderOfficer >;
+     using HairMakeTypePtr = std::shared_ptr< HairMakeType >;
+     using HouseRetainerPosePtr = std::shared_ptr< HouseRetainerPose >;
+     using HousingAethernetPtr = std::shared_ptr< HousingAethernet >;
+     using HousingAppealPtr = std::shared_ptr< HousingAppeal >;
+     using HousingEmploymentNpcListPtr = std::shared_ptr< HousingEmploymentNpcList >;
+     using HousingEmploymentNpcRacePtr = std::shared_ptr< HousingEmploymentNpcRace >;
+     using HousingExteriorPtr = std::shared_ptr< HousingExterior >;
+     using HousingFurniturePtr = std::shared_ptr< HousingFurniture >;
+     using HousingMapMarkerInfoPtr = std::shared_ptr< HousingMapMarkerInfo >;
+     using HousingMerchantPosePtr = std::shared_ptr< HousingMerchantPose >;
+     using HousingLandSetPtr = std::shared_ptr< HousingLandSet >;
+     using HousingPlacementPtr = std::shared_ptr< HousingPlacement >;
+     using HousingPresetPtr = std::shared_ptr< HousingPreset >;
+     using HousingUnitedExteriorPtr = std::shared_ptr< HousingUnitedExterior >;
+     using HousingYardObjectPtr = std::shared_ptr< HousingYardObject >;
+     using HowToPtr = std::shared_ptr< HowTo >;
+     using HowToCategoryPtr = std::shared_ptr< HowToCategory >;
+     using HowToPagePtr = std::shared_ptr< HowToPage >;
+     using InstanceContentPtr = std::shared_ptr< InstanceContent >;
+     using InstanceContentBuffPtr = std::shared_ptr< InstanceContentBuff >;
+     using InstanceContentTextDataPtr = std::shared_ptr< InstanceContentTextData >;
+     using ItemPtr = std::shared_ptr< Item >;
+     using ItemActionPtr = std::shared_ptr< ItemAction >;
+     using ItemFoodPtr = std::shared_ptr< ItemFood >;
+     using ItemLevelPtr = std::shared_ptr< ItemLevel >;
+     using ItemSearchCategoryPtr = std::shared_ptr< ItemSearchCategory >;
+     using ItemSeriesPtr = std::shared_ptr< ItemSeries >;
+     using ItemSpecialBonusPtr = std::shared_ptr< ItemSpecialBonus >;
+     using ItemUICategoryPtr = std::shared_ptr< ItemUICategory >;
+     using JournalCategoryPtr = std::shared_ptr< JournalCategory >;
+     using JournalGenrePtr = std::shared_ptr< JournalGenre >;
+     using JournalSectionPtr = std::shared_ptr< JournalSection >;
+     using LevePtr = std::shared_ptr< Leve >;
+     using LeveAssignmentTypePtr = std::shared_ptr< LeveAssignmentType >;
+     using LeveClientPtr = std::shared_ptr< LeveClient >;
+     using LevelPtr = std::shared_ptr< Level >;
+     using LeveRewardItemPtr = std::shared_ptr< LeveRewardItem >;
+     using LeveRewardItemGroupPtr = std::shared_ptr< LeveRewardItemGroup >;
+     using LeveVfxPtr = std::shared_ptr< LeveVfx >;
+     using LogFilterPtr = std::shared_ptr< LogFilter >;
+     using LogKindPtr = std::shared_ptr< LogKind >;
+     using LogKindCategoryTextPtr = std::shared_ptr< LogKindCategoryText >;
+     using LogMessagePtr = std::shared_ptr< LogMessage >;
+     using LotteryExchangeShopPtr = std::shared_ptr< LotteryExchangeShop >;
+     using MacroIconPtr = std::shared_ptr< MacroIcon >;
+     using MacroIconRedirectOldPtr = std::shared_ptr< MacroIconRedirectOld >;
+     using MainCommandPtr = std::shared_ptr< MainCommand >;
+     using MainCommandCategoryPtr = std::shared_ptr< MainCommandCategory >;
+     using ManeuversArmorPtr = std::shared_ptr< ManeuversArmor >;
+     using MapPtr = std::shared_ptr< Map >;
+     using MapMarkerPtr = std::shared_ptr< MapMarker >;
+     using MapMarkerRegionPtr = std::shared_ptr< MapMarkerRegion >;
+     using MapSymbolPtr = std::shared_ptr< MapSymbol >;
+     using MarkerPtr = std::shared_ptr< Marker >;
+     using MasterpieceSupplyDutyPtr = std::shared_ptr< MasterpieceSupplyDuty >;
+     using MasterpieceSupplyMultiplierPtr = std::shared_ptr< MasterpieceSupplyMultiplier >;
+     using MateriaPtr = std::shared_ptr< Materia >;
+     using MiniGameRAPtr = std::shared_ptr< MiniGameRA >;
+     using MinionRacePtr = std::shared_ptr< MinionRace >;
+     using MinionRulesPtr = std::shared_ptr< MinionRules >;
+     using MinionSkillTypePtr = std::shared_ptr< MinionSkillType >;
+     using MobHuntOrderTypePtr = std::shared_ptr< MobHuntOrderType >;
+     using MobHuntTargetPtr = std::shared_ptr< MobHuntTarget >;
+     using ModelCharaPtr = std::shared_ptr< ModelChara >;
+     using ModelStatePtr = std::shared_ptr< ModelState >;
+     using MonsterNotePtr = std::shared_ptr< MonsterNote >;
+     using MonsterNoteTargetPtr = std::shared_ptr< MonsterNoteTarget >;
+     using MountPtr = std::shared_ptr< Mount >;
+     using MountActionPtr = std::shared_ptr< MountAction >;
+     using MountCustomizePtr = std::shared_ptr< MountCustomize >;
+     using MountFlyingConditionPtr = std::shared_ptr< MountFlyingCondition >;
+     using MountSpeedPtr = std::shared_ptr< MountSpeed >;
+     using MountTransientPtr = std::shared_ptr< MountTransient >;
+     using MoveTimelinePtr = std::shared_ptr< MoveTimeline >;
+     using MoveVfxPtr = std::shared_ptr< MoveVfx >;
+     using NpcEquipPtr = std::shared_ptr< NpcEquip >;
+     using NpcYellPtr = std::shared_ptr< NpcYell >;
+     using OmenPtr = std::shared_ptr< Omen >;
+     using OnlineStatusPtr = std::shared_ptr< OnlineStatus >;
+     using OpeningPtr = std::shared_ptr< Opening >;
+     using OrchestrionPtr = std::shared_ptr< Orchestrion >;
+     using OrchestrionCategoryPtr = std::shared_ptr< OrchestrionCategory >;
+     using OrchestrionPathPtr = std::shared_ptr< OrchestrionPath >;
+     using OrchestrionUiparamPtr = std::shared_ptr< OrchestrionUiparam >;
+     using ParamGrowPtr = std::shared_ptr< ParamGrow >;
+     using PartyContentPtr = std::shared_ptr< PartyContent >;
+     using PartyContentCutscenePtr = std::shared_ptr< PartyContentCutscene >;
+     using PartyContentTextDataPtr = std::shared_ptr< PartyContentTextData >;
+     using PerformPtr = std::shared_ptr< Perform >;
+     using PerformTransientPtr = std::shared_ptr< PerformTransient >;
+     using PetPtr = std::shared_ptr< Pet >;
+     using PetActionPtr = std::shared_ptr< PetAction >;
+     using PicturePtr = std::shared_ptr< Picture >;
+     using PlaceNamePtr = std::shared_ptr< PlaceName >;
+     using PlantPotFlowerSeedPtr = std::shared_ptr< PlantPotFlowerSeed >;
+     using PreHandlerPtr = std::shared_ptr< PreHandler >;
+     using PublicContentPtr = std::shared_ptr< PublicContent >;
+     using PublicContentCutscenePtr = std::shared_ptr< PublicContentCutscene >;
+     using PublicContentTextDataPtr = std::shared_ptr< PublicContentTextData >;
+     using PvPActionPtr = std::shared_ptr< PvPAction >;
+     using PvPActionSortPtr = std::shared_ptr< PvPActionSort >;
+     using PvPRankPtr = std::shared_ptr< PvPRank >;
+     using PvPSelectTraitPtr = std::shared_ptr< PvPSelectTrait >;
+     using PvPTraitPtr = std::shared_ptr< PvPTrait >;
+     using QuestPtr = std::shared_ptr< Quest >;
+     using QuestClassJobRewardPtr = std::shared_ptr< QuestClassJobReward >;
+     using QuestClassJobSupplyPtr = std::shared_ptr< QuestClassJobSupply >;
+     using QuestRepeatFlagPtr = std::shared_ptr< QuestRepeatFlag >;
+     using QuestRewardOtherPtr = std::shared_ptr< QuestRewardOther >;
+     using QuickChatPtr = std::shared_ptr< QuickChat >;
+     using QuickChatTransientPtr = std::shared_ptr< QuickChatTransient >;
+     using RacePtr = std::shared_ptr< Race >;
+     using RacingChocoboItemPtr = std::shared_ptr< RacingChocoboItem >;
+     using RacingChocoboNamePtr = std::shared_ptr< RacingChocoboName >;
+     using RacingChocoboNameCategoryPtr = std::shared_ptr< RacingChocoboNameCategory >;
+     using RacingChocoboNameInfoPtr = std::shared_ptr< RacingChocoboNameInfo >;
+     using RacingChocoboParamPtr = std::shared_ptr< RacingChocoboParam >;
+     using RecipePtr = std::shared_ptr< Recipe >;
+     using RecipeElementPtr = std::shared_ptr< RecipeElement >;
+     using RecipeLevelTablePtr = std::shared_ptr< RecipeLevelTable >;
+     using RecipeNotebookListPtr = std::shared_ptr< RecipeNotebookList >;
+     using RecommendContentsPtr = std::shared_ptr< RecommendContents >;
+     using RelicPtr = std::shared_ptr< Relic >;
+     using Relic3Ptr = std::shared_ptr< Relic3 >;
+     using RelicItemPtr = std::shared_ptr< RelicItem >;
+     using RelicNotePtr = std::shared_ptr< RelicNote >;
+     using RelicNoteCategoryPtr = std::shared_ptr< RelicNoteCategory >;
+     using ResidentPtr = std::shared_ptr< Resident >;
+     using RetainerTaskPtr = std::shared_ptr< RetainerTask >;
+     using RetainerTaskLvRangePtr = std::shared_ptr< RetainerTaskLvRange >;
+     using RetainerTaskNormalPtr = std::shared_ptr< RetainerTaskNormal >;
+     using RetainerTaskParameterPtr = std::shared_ptr< RetainerTaskParameter >;
+     using RetainerTaskRandomPtr = std::shared_ptr< RetainerTaskRandom >;
+     using RPParameterPtr = std::shared_ptr< RPParameter >;
+     using SalvagePtr = std::shared_ptr< Salvage >;
+     using SatisfactionNpcPtr = std::shared_ptr< SatisfactionNpc >;
+     using SatisfactionSupplyPtr = std::shared_ptr< SatisfactionSupply >;
+     using SatisfactionSupplyRewardPtr = std::shared_ptr< SatisfactionSupplyReward >;
+     using ScenarioTreePtr = std::shared_ptr< ScenarioTree >;
+     using ScenarioTreeTipsPtr = std::shared_ptr< ScenarioTreeTips >;
+     using ScenarioTreeTipsClassQuestPtr = std::shared_ptr< ScenarioTreeTipsClassQuest >;
+     using ScenarioTreeTipsQuestPtr = std::shared_ptr< ScenarioTreeTipsQuest >;
+     using ScenarioTypePtr = std::shared_ptr< ScenarioType >;
+     using ScreenImagePtr = std::shared_ptr< ScreenImage >;
+     using SecretRecipeBookPtr = std::shared_ptr< SecretRecipeBook >;
+     using SkyIsland2MissionPtr = std::shared_ptr< SkyIsland2Mission >;
+     using SkyIsland2MissionDetailPtr = std::shared_ptr< SkyIsland2MissionDetail >;
+     using SkyIsland2MissionTypePtr = std::shared_ptr< SkyIsland2MissionType >;
+     using SkyIsland2RangeTypePtr = std::shared_ptr< SkyIsland2RangeType >;
+     using SpearfishingItemPtr = std::shared_ptr< SpearfishingItem >;
+     using SpearfishingNotebookPtr = std::shared_ptr< SpearfishingNotebook >;
+     using SpearfishingRecordPagePtr = std::shared_ptr< SpearfishingRecordPage >;
+     using SpecialShopPtr = std::shared_ptr< SpecialShop >;
+     using SpecialShopItemCategoryPtr = std::shared_ptr< SpecialShopItemCategory >;
+     using StainPtr = std::shared_ptr< Stain >;
+     using StainTransientPtr = std::shared_ptr< StainTransient >;
+     using StatusPtr = std::shared_ptr< Status >;
+     using StatusHitEffectPtr = std::shared_ptr< StatusHitEffect >;
+     using StatusLoopVFXPtr = std::shared_ptr< StatusLoopVFX >;
+     using StoryPtr = std::shared_ptr< Story >;
+     using SubmarineExplorationPtr = std::shared_ptr< SubmarineExploration >;
+     using SubmarinePartPtr = std::shared_ptr< SubmarinePart >;
+     using SubmarineRankPtr = std::shared_ptr< SubmarineRank >;
+     using SwitchTalkPtr = std::shared_ptr< SwitchTalk >;
+     using TerritoryTypePtr = std::shared_ptr< TerritoryType >;
+     using TextCommandPtr = std::shared_ptr< TextCommand >;
+     using TitlePtr = std::shared_ptr< Title >;
+     using TomestonesPtr = std::shared_ptr< Tomestones >;
+     using TomestonesItemPtr = std::shared_ptr< TomestonesItem >;
+     using TopicSelectPtr = std::shared_ptr< TopicSelect >;
+     using TownPtr = std::shared_ptr< Town >;
+     using TraitPtr = std::shared_ptr< Trait >;
+     using TraitRecastPtr = std::shared_ptr< TraitRecast >;
+     using TraitTransientPtr = std::shared_ptr< TraitTransient >;
+     using TransformationPtr = std::shared_ptr< Transformation >;
+     using TreasurePtr = std::shared_ptr< Treasure >;
+     using TreasureHuntRankPtr = std::shared_ptr< TreasureHuntRank >;
+     using TribePtr = std::shared_ptr< Tribe >;
+     using TripleTriadPtr = std::shared_ptr< TripleTriad >;
+     using TripleTriadCardPtr = std::shared_ptr< TripleTriadCard >;
+     using TripleTriadCardRarityPtr = std::shared_ptr< TripleTriadCardRarity >;
+     using TripleTriadCardResidentPtr = std::shared_ptr< TripleTriadCardResident >;
+     using TripleTriadCardTypePtr = std::shared_ptr< TripleTriadCardType >;
+     using TripleTriadCompetitionPtr = std::shared_ptr< TripleTriadCompetition >;
+     using TripleTriadRulePtr = std::shared_ptr< TripleTriadRule >;
+     using TutorialPtr = std::shared_ptr< Tutorial >;
+     using TutorialDPSPtr = std::shared_ptr< TutorialDPS >;
+     using TutorialHealerPtr = std::shared_ptr< TutorialHealer >;
+     using TutorialTankPtr = std::shared_ptr< TutorialTank >;
+     using UIColorPtr = std::shared_ptr< UIColor >;
+     using VaseFlowerPtr = std::shared_ptr< VaseFlower >;
+     using VFXPtr = std::shared_ptr< VFX >;
+     using WarpPtr = std::shared_ptr< Warp >;
+     using WarpConditionPtr = std::shared_ptr< WarpCondition >;
+     using WarpLogicPtr = std::shared_ptr< WarpLogic >;
+     using WeatherPtr = std::shared_ptr< Weather >;
+     using WeatherGroupPtr = std::shared_ptr< WeatherGroup >;
+     using WeatherRatePtr = std::shared_ptr< WeatherRate >;
+     using WeddingBGMPtr = std::shared_ptr< WeddingBGM >;
+     using WeeklyBingoOrderDataPtr = std::shared_ptr< WeeklyBingoOrderData >;
+     using WeeklyBingoRewardDataPtr = std::shared_ptr< WeeklyBingoRewardData >;
+     using WeeklyBingoTextPtr = std::shared_ptr< WeeklyBingoText >;
+     using WeeklyLotBonusPtr = std::shared_ptr< WeeklyLotBonus >;
+     using WorldPtr = std::shared_ptr< World >;
+     using WorldDCGroupTypePtr = std::shared_ptr< WorldDCGroupType >;
+     using YKWPtr = std::shared_ptr< YKW >;
+     using ZoneSharedGroupPtr = std::shared_ptr< ZoneSharedGroup >;
 
      template< class T >
      std::shared_ptr< T > get( uint32_t id )
@@ -5701,6 +6116,22 @@ struct ZoneSharedGroup
         }
         return nullptr;
      }
+
+    template< class T >
+    std::shared_ptr< T > get( uint32_t id, uint32_t slotId )
+    {
+      try
+      {
+        auto info = std::make_shared< T >( id, slotId, this );
+        return info;
+      }
+      catch( std::runtime_error error )
+      {
+        // std::cout << error.what();
+        return nullptr;
+      }
+      return nullptr;
+    }
 
 
      std::set< uint32_t > m_AchievementIdList;
@@ -5859,8 +6290,13 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_EObjNameIdList;
      std::set< uint32_t > m_EquipRaceCategoryIdList;
      std::set< uint32_t > m_EquipSlotCategoryIdList;
+     std::set< uint32_t > m_EurekaAetherItemIdList;
      std::set< uint32_t > m_EurekaAethernetIdList;
      std::set< uint32_t > m_EurekaGrowDataIdList;
+     std::set< uint32_t > m_EurekaLogosMixerProbabilityIdList;
+     std::set< uint32_t > m_EurekaMagiaActionIdList;
+     std::set< uint32_t > m_EurekaMagiciteItemIdList;
+     std::set< uint32_t > m_EurekaMagiciteItemTypeIdList;
      std::set< uint32_t > m_EurekaSphereElementAdjustIdList;
      std::set< uint32_t > m_EventActionIdList;
      std::set< uint32_t > m_EventIconPriorityIdList;
@@ -5882,7 +6318,9 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_FCProfileIdList;
      std::set< uint32_t > m_FCReputationIdList;
      std::set< uint32_t > m_FCRightsIdList;
+     std::set< uint32_t > m_FestivalIdList;
      std::set< uint32_t > m_FieldMarkerIdList;
+     std::set< uint32_t > m_FishingRecordTypeIdList;
      std::set< uint32_t > m_FishingRecordTypeTransientIdList;
      std::set< uint32_t > m_FishingSpotIdList;
      std::set< uint32_t > m_FishParameterIdList;
@@ -5924,6 +6362,9 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_GCSupplyDutyRewardIdList;
      std::set< uint32_t > m_GeneralActionIdList;
      std::set< uint32_t > m_GFATEIdList;
+     std::set< uint32_t > m_GFateClimbing2IdList;
+     std::set< uint32_t > m_GFateClimbing2ContentIdList;
+     std::set< uint32_t > m_GFateClimbing2TotemTypeIdList;
      std::set< uint32_t > m_GilShopIdList;
      std::set< uint32_t > m_GilShopItemIdList;
      std::set< uint32_t > m_GoldSaucerArcadeMachineIdList;
@@ -5938,12 +6379,17 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_HairMakeTypeIdList;
      std::set< uint32_t > m_HouseRetainerPoseIdList;
      std::set< uint32_t > m_HousingAethernetIdList;
+     std::set< uint32_t > m_HousingAppealIdList;
      std::set< uint32_t > m_HousingEmploymentNpcListIdList;
      std::set< uint32_t > m_HousingEmploymentNpcRaceIdList;
+     std::set< uint32_t > m_HousingExteriorIdList;
      std::set< uint32_t > m_HousingFurnitureIdList;
+     std::set< uint32_t > m_HousingMapMarkerInfoIdList;
+     std::set< uint32_t > m_HousingMerchantPoseIdList;
      std::set< uint32_t > m_HousingLandSetIdList;
      std::set< uint32_t > m_HousingPlacementIdList;
      std::set< uint32_t > m_HousingPresetIdList;
+     std::set< uint32_t > m_HousingUnitedExteriorIdList;
      std::set< uint32_t > m_HousingYardObjectIdList;
      std::set< uint32_t > m_HowToIdList;
      std::set< uint32_t > m_HowToCategoryIdList;
@@ -5954,6 +6400,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_ItemIdList;
      std::set< uint32_t > m_ItemActionIdList;
      std::set< uint32_t > m_ItemFoodIdList;
+     std::set< uint32_t > m_ItemLevelIdList;
      std::set< uint32_t > m_ItemSearchCategoryIdList;
      std::set< uint32_t > m_ItemSeriesIdList;
      std::set< uint32_t > m_ItemSpecialBonusIdList;
@@ -5986,6 +6433,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_MasterpieceSupplyDutyIdList;
      std::set< uint32_t > m_MasterpieceSupplyMultiplierIdList;
      std::set< uint32_t > m_MateriaIdList;
+     std::set< uint32_t > m_MiniGameRAIdList;
      std::set< uint32_t > m_MinionRaceIdList;
      std::set< uint32_t > m_MinionRulesIdList;
      std::set< uint32_t > m_MinionSkillTypeIdList;
@@ -6013,7 +6461,9 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_OrchestrionPathIdList;
      std::set< uint32_t > m_OrchestrionUiparamIdList;
      std::set< uint32_t > m_ParamGrowIdList;
+     std::set< uint32_t > m_PartyContentIdList;
      std::set< uint32_t > m_PartyContentCutsceneIdList;
+     std::set< uint32_t > m_PartyContentTextDataIdList;
      std::set< uint32_t > m_PerformIdList;
      std::set< uint32_t > m_PerformTransientIdList;
      std::set< uint32_t > m_PetIdList;
@@ -6115,6 +6565,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_TutorialDPSIdList;
      std::set< uint32_t > m_TutorialHealerIdList;
      std::set< uint32_t > m_TutorialTankIdList;
+     std::set< uint32_t > m_UIColorIdList;
      std::set< uint32_t > m_VaseFlowerIdList;
      std::set< uint32_t > m_VFXIdList;
      std::set< uint32_t > m_WarpIdList;
@@ -7070,6 +7521,12 @@ const std::set< uint32_t >& getEquipSlotCategoryIdList()
       loadIdList( m_EquipSlotCategoryDat, m_EquipSlotCategoryIdList );
    return m_EquipSlotCategoryIdList;
 }
+const std::set< uint32_t >& getEurekaAetherItemIdList()
+{
+   if( m_EurekaAetherItemIdList.size() == 0 )
+      loadIdList( m_EurekaAetherItemDat, m_EurekaAetherItemIdList );
+   return m_EurekaAetherItemIdList;
+}
 const std::set< uint32_t >& getEurekaAethernetIdList()
 {
    if( m_EurekaAethernetIdList.size() == 0 )
@@ -7081,6 +7538,30 @@ const std::set< uint32_t >& getEurekaGrowDataIdList()
    if( m_EurekaGrowDataIdList.size() == 0 )
       loadIdList( m_EurekaGrowDataDat, m_EurekaGrowDataIdList );
    return m_EurekaGrowDataIdList;
+}
+const std::set< uint32_t >& getEurekaLogosMixerProbabilityIdList()
+{
+   if( m_EurekaLogosMixerProbabilityIdList.size() == 0 )
+      loadIdList( m_EurekaLogosMixerProbabilityDat, m_EurekaLogosMixerProbabilityIdList );
+   return m_EurekaLogosMixerProbabilityIdList;
+}
+const std::set< uint32_t >& getEurekaMagiaActionIdList()
+{
+   if( m_EurekaMagiaActionIdList.size() == 0 )
+      loadIdList( m_EurekaMagiaActionDat, m_EurekaMagiaActionIdList );
+   return m_EurekaMagiaActionIdList;
+}
+const std::set< uint32_t >& getEurekaMagiciteItemIdList()
+{
+   if( m_EurekaMagiciteItemIdList.size() == 0 )
+      loadIdList( m_EurekaMagiciteItemDat, m_EurekaMagiciteItemIdList );
+   return m_EurekaMagiciteItemIdList;
+}
+const std::set< uint32_t >& getEurekaMagiciteItemTypeIdList()
+{
+   if( m_EurekaMagiciteItemTypeIdList.size() == 0 )
+      loadIdList( m_EurekaMagiciteItemTypeDat, m_EurekaMagiciteItemTypeIdList );
+   return m_EurekaMagiciteItemTypeIdList;
 }
 const std::set< uint32_t >& getEurekaSphereElementAdjustIdList()
 {
@@ -7208,11 +7689,23 @@ const std::set< uint32_t >& getFCRightsIdList()
       loadIdList( m_FCRightsDat, m_FCRightsIdList );
    return m_FCRightsIdList;
 }
+const std::set< uint32_t >& getFestivalIdList()
+{
+   if( m_FestivalIdList.size() == 0 )
+      loadIdList( m_FestivalDat, m_FestivalIdList );
+   return m_FestivalIdList;
+}
 const std::set< uint32_t >& getFieldMarkerIdList()
 {
    if( m_FieldMarkerIdList.size() == 0 )
       loadIdList( m_FieldMarkerDat, m_FieldMarkerIdList );
    return m_FieldMarkerIdList;
+}
+const std::set< uint32_t >& getFishingRecordTypeIdList()
+{
+   if( m_FishingRecordTypeIdList.size() == 0 )
+      loadIdList( m_FishingRecordTypeDat, m_FishingRecordTypeIdList );
+   return m_FishingRecordTypeIdList;
 }
 const std::set< uint32_t >& getFishingRecordTypeTransientIdList()
 {
@@ -7460,6 +7953,24 @@ const std::set< uint32_t >& getGFATEIdList()
       loadIdList( m_GFATEDat, m_GFATEIdList );
    return m_GFATEIdList;
 }
+const std::set< uint32_t >& getGFateClimbing2IdList()
+{
+   if( m_GFateClimbing2IdList.size() == 0 )
+      loadIdList( m_GFateClimbing2Dat, m_GFateClimbing2IdList );
+   return m_GFateClimbing2IdList;
+}
+const std::set< uint32_t >& getGFateClimbing2ContentIdList()
+{
+   if( m_GFateClimbing2ContentIdList.size() == 0 )
+      loadIdList( m_GFateClimbing2ContentDat, m_GFateClimbing2ContentIdList );
+   return m_GFateClimbing2ContentIdList;
+}
+const std::set< uint32_t >& getGFateClimbing2TotemTypeIdList()
+{
+   if( m_GFateClimbing2TotemTypeIdList.size() == 0 )
+      loadIdList( m_GFateClimbing2TotemTypeDat, m_GFateClimbing2TotemTypeIdList );
+   return m_GFateClimbing2TotemTypeIdList;
+}
 const std::set< uint32_t >& getGilShopIdList()
 {
    if( m_GilShopIdList.size() == 0 )
@@ -7544,6 +8055,12 @@ const std::set< uint32_t >& getHousingAethernetIdList()
       loadIdList( m_HousingAethernetDat, m_HousingAethernetIdList );
    return m_HousingAethernetIdList;
 }
+const std::set< uint32_t >& getHousingAppealIdList()
+{
+   if( m_HousingAppealIdList.size() == 0 )
+      loadIdList( m_HousingAppealDat, m_HousingAppealIdList );
+   return m_HousingAppealIdList;
+}
 const std::set< uint32_t >& getHousingEmploymentNpcListIdList()
 {
    if( m_HousingEmploymentNpcListIdList.size() == 0 )
@@ -7556,17 +8073,35 @@ const std::set< uint32_t >& getHousingEmploymentNpcRaceIdList()
       loadIdList( m_HousingEmploymentNpcRaceDat, m_HousingEmploymentNpcRaceIdList );
    return m_HousingEmploymentNpcRaceIdList;
 }
+const std::set< uint32_t >& getHousingExteriorIdList()
+{
+   if( m_HousingExteriorIdList.size() == 0 )
+      loadIdList( m_HousingExteriorDat, m_HousingExteriorIdList );
+   return m_HousingExteriorIdList;
+}
 const std::set< uint32_t >& getHousingFurnitureIdList()
 {
    if( m_HousingFurnitureIdList.size() == 0 )
       loadIdList( m_HousingFurnitureDat, m_HousingFurnitureIdList );
    return m_HousingFurnitureIdList;
 }
+const std::set< uint32_t >& getHousingMapMarkerInfoIdList()
+{
+   if( m_HousingMapMarkerInfoIdList.size() == 0 )
+      loadIdList( m_HousingMapMarkerInfoDat, m_HousingMapMarkerInfoIdList );
+   return m_HousingMapMarkerInfoIdList;
+}
+const std::set< uint32_t >& getHousingMerchantPoseIdList()
+{
+   if( m_HousingMerchantPoseIdList.size() == 0 )
+      loadIdList( m_HousingMerchantPoseDat, m_HousingMerchantPoseIdList );
+   return m_HousingMerchantPoseIdList;
+}
 const std::set< uint32_t >& getHousingLandSetIdList()
 {
-  if( m_HousingLandSetIdList.size() == 0 )
-    loadIdList( m_HousingLandSetDat, m_HousingLandSetIdList );
-  return m_HousingLandSetIdList;
+   if( m_HousingLandSetIdList.size() == 0 )
+      loadIdList( m_HousingLandSetDat, m_HousingLandSetIdList );
+   return m_HousingLandSetIdList;
 }
 const std::set< uint32_t >& getHousingPlacementIdList()
 {
@@ -7579,6 +8114,12 @@ const std::set< uint32_t >& getHousingPresetIdList()
    if( m_HousingPresetIdList.size() == 0 )
       loadIdList( m_HousingPresetDat, m_HousingPresetIdList );
    return m_HousingPresetIdList;
+}
+const std::set< uint32_t >& getHousingUnitedExteriorIdList()
+{
+   if( m_HousingUnitedExteriorIdList.size() == 0 )
+      loadIdList( m_HousingUnitedExteriorDat, m_HousingUnitedExteriorIdList );
+   return m_HousingUnitedExteriorIdList;
 }
 const std::set< uint32_t >& getHousingYardObjectIdList()
 {
@@ -7639,6 +8180,12 @@ const std::set< uint32_t >& getItemFoodIdList()
    if( m_ItemFoodIdList.size() == 0 )
       loadIdList( m_ItemFoodDat, m_ItemFoodIdList );
    return m_ItemFoodIdList;
+}
+const std::set< uint32_t >& getItemLevelIdList()
+{
+   if( m_ItemLevelIdList.size() == 0 )
+      loadIdList( m_ItemLevelDat, m_ItemLevelIdList );
+   return m_ItemLevelIdList;
 }
 const std::set< uint32_t >& getItemSearchCategoryIdList()
 {
@@ -7832,6 +8379,12 @@ const std::set< uint32_t >& getMateriaIdList()
       loadIdList( m_MateriaDat, m_MateriaIdList );
    return m_MateriaIdList;
 }
+const std::set< uint32_t >& getMiniGameRAIdList()
+{
+   if( m_MiniGameRAIdList.size() == 0 )
+      loadIdList( m_MiniGameRADat, m_MiniGameRAIdList );
+   return m_MiniGameRAIdList;
+}
 const std::set< uint32_t >& getMinionRaceIdList()
 {
    if( m_MinionRaceIdList.size() == 0 )
@@ -7994,11 +8547,23 @@ const std::set< uint32_t >& getParamGrowIdList()
       loadIdList( m_ParamGrowDat, m_ParamGrowIdList );
    return m_ParamGrowIdList;
 }
+const std::set< uint32_t >& getPartyContentIdList()
+{
+   if( m_PartyContentIdList.size() == 0 )
+      loadIdList( m_PartyContentDat, m_PartyContentIdList );
+   return m_PartyContentIdList;
+}
 const std::set< uint32_t >& getPartyContentCutsceneIdList()
 {
    if( m_PartyContentCutsceneIdList.size() == 0 )
       loadIdList( m_PartyContentCutsceneDat, m_PartyContentCutsceneIdList );
    return m_PartyContentCutsceneIdList;
+}
+const std::set< uint32_t >& getPartyContentTextDataIdList()
+{
+   if( m_PartyContentTextDataIdList.size() == 0 )
+      loadIdList( m_PartyContentTextDataDat, m_PartyContentTextDataIdList );
+   return m_PartyContentTextDataIdList;
 }
 const std::set< uint32_t >& getPerformIdList()
 {
@@ -8606,6 +9171,12 @@ const std::set< uint32_t >& getTutorialTankIdList()
       loadIdList( m_TutorialTankDat, m_TutorialTankIdList );
    return m_TutorialTankIdList;
 }
+const std::set< uint32_t >& getUIColorIdList()
+{
+   if( m_UIColorIdList.size() == 0 )
+      loadIdList( m_UIColorDat, m_UIColorIdList );
+   return m_UIColorIdList;
+}
 const std::set< uint32_t >& getVaseFlowerIdList()
 {
    if( m_VaseFlowerIdList.size() == 0 )
@@ -8712,6 +9283,7 @@ const std::set< uint32_t >& getZoneSharedGroupIdList()
 
   };
 
+}
 }
 
 #endif

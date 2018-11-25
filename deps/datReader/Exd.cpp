@@ -2,7 +2,7 @@
 
 #include "bparse.h"
 #include "stream.h"
-
+#include <fstream>
 #include "Exh.h"
 
 using xiv::utils::bparse::extract;
@@ -58,7 +58,7 @@ namespace xiv
          for ( auto &file_ptr : _files )
          {
             // Get a stream
-	    std::vector< char > dataCpy = file_ptr->get_data_sections().front();
+            std::vector< char > dataCpy = file_ptr->get_data_sections().front();
             std::istringstream iss( std::string( dataCpy.begin(), dataCpy.end() ) );
 
             // Extract the header and skip to the record indices
@@ -101,12 +101,17 @@ namespace xiv
          iss.seekg( cacheEntryIt->second.offset + 6 );
   
          uint8_t subRows = *reinterpret_cast< uint8_t* >( &dataCpy[ cacheEntryIt->second.offset + 5 ] );
-  
+
+         if( subRow >= subRows )
+           throw std::runtime_error( "Out of bounds sub-row!" );
+
+         int offset = cacheEntryIt->second.offset + 6 + ( subRow * _exh->get_header().data_offset + 2 * ( subRow + 1 ) );
+
          for( auto& member_entry : _exh->get_exh_members() )
          {
-              // Seek to the position of the member to extract.
+            // Seek to the position of the member to extract.
             // 6 is because we have uint32_t/uint16_t at the start of each record
-            iss.seekg( cacheEntryIt->second.offset + 6 + member_entry.offset );
+            iss.seekg( offset + member_entry.offset );
   
             // Switch depending on the type to extract
             switch( member_entry.type )
@@ -115,9 +120,10 @@ namespace xiv
                // Extract the offset to the actual string
                // Seek to it then extract the actual string
             {
-               auto string_offset = extract<uint32_t>( iss, "string_offset", false );
-               iss.seekg( cacheEntryIt->second.offset + 6 + _exh->get_header().data_offset + string_offset );
-               fields.emplace_back( utils::bparse::extract_cstring( iss, "string" ) );
+               throw std::runtime_error( "String not implemented for variant 2!" );
+               //auto string_offset = extract<uint32_t>( iss, "string_offset", false );
+               //iss.seekg( cacheEntryIt->second.offset + 6 + _exh->get_header().data_offset + string_offset );
+               //fields.emplace_back( utils::bparse::extract_cstring( iss, "string" ) );
             }
             break;
   
@@ -129,9 +135,18 @@ namespace xiv
                fields.emplace_back( extract<int8_t>( iss, "int8_t" ) );
                break;
 
+            case DataType::uint8:
+               fields.emplace_back( extract<uint8_t>( iss, "uint8_t" ) );
+               break;
+
             case DataType::int16:
                fields.emplace_back( extract<int16_t>( iss, "int16_t", false ) );
                break;
+
+            case DataType::uint16:
+               fields.emplace_back( extract<uint16_t>( iss, "uint16_t", false ) );
+               break;
+
             case DataType::int32:
                fields.emplace_back( extract<int32_t>( iss, "int32_t", false ) );
                break;
@@ -184,7 +199,7 @@ namespace xiv
          fields.reserve( member_count );
          iss.seekg( cacheEntryIt->second.offset + 6 );
 
-	 uint8_t subRows = *reinterpret_cast< uint8_t* >( &dataCpy[ cacheEntryIt->second.offset + 5 ] );
+         uint8_t subRows = *reinterpret_cast< uint8_t* >( &dataCpy[ cacheEntryIt->second.offset + 5 ] );
 
          for( auto& member_entry : _exh->get_exh_members() )
          {

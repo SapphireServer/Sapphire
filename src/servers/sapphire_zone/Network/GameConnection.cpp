@@ -321,6 +321,10 @@ void Core::Network::GameConnection::processOutQueue()
 
     pRP.addPacket( pPacket );
     totalSize += pPacket->getSize();
+
+    // todo: figure out a good max set size and make it configurable
+    if( totalSize > 15000 )
+      break;
   }
 
   if( totalSize > 0 )

@@ -20,14 +20,15 @@
 #include "Forwards.h"
 #include "Land.h"
 #include "Framework.h"
+#include "House.h"
 
 extern Core::Framework g_fw;
 
 using namespace Core::Common;
 
-Core::Land::Land( uint16_t zoneId, uint8_t wardNum, uint8_t landId, uint32_t landSetId,
+Core::Land::Land( uint16_t territoryTypeId, uint8_t wardNum, uint8_t landId, uint32_t landSetId,
                   Core::Data::HousingLandSetPtr info ) :
-  m_zoneId( zoneId ),
+  m_territoryTypeId( territoryTypeId ),
   m_wardNum( wardNum ),
   m_landId( landId ),
   m_currentPrice( 0 ),
@@ -36,7 +37,11 @@ Core::Land::Land( uint16_t zoneId, uint8_t wardNum, uint8_t landId, uint32_t lan
   m_ownerPlayerId( 0 ),
   m_landSetId( landSetId ),
   m_landInfo( info ),
-  m_type( Common::LandType::Private )
+  m_type( Common::LandType::none ),
+  m_fcIcon( 0 ),
+  m_fcIconColor( 0 ),
+  m_fcId( 0 ),
+  m_iconAddIcon( 0 )
 {
   memset( &m_tag, 0x00, 3 );
 
@@ -55,15 +60,15 @@ void Core::Land::load()
                                             "AND LandId = " + std::to_string( m_landId ) );
   if( !res->next() )
   {
-    pDb->directExecute( "INSERT INTO land ( landsetid, landid, type, size, status, landprice ) "
+    pDb->directExecute( "INSERT INTO land ( landsetid, landid, type, size, status, landprice, UpdateTime, OwnerId, HouseId ) "
                         "VALUES ( " + std::to_string( m_landSetId ) + "," + std::to_string( m_landId ) + ","
                         + std::to_string( static_cast< uint8_t >( m_type ) ) + ","
-                        + std::to_string( m_landInfo->sizes[ m_landId ] ) + ","
-                        + " 1, " + std::to_string( m_landInfo->prices[ m_landId ] ) + " );" );
+                        + std::to_string( m_landInfo->plotSize[ m_landId ] ) + ","
+                        + " 1, " + std::to_string( m_landInfo->initialPrice[ m_landId ] ) + ", 0, 0, 0 );" );
 
-    m_currentPrice = m_landInfo->prices[ m_landId ];
-    m_minPrice = m_landInfo->minPrices[ m_landId ];
-    m_size = m_landInfo->sizes[ m_landId ];
+    m_currentPrice = m_landInfo->initialPrice[ m_landId ];
+    m_minPrice = m_landInfo->minPrice[ m_landId ];
+    m_size = m_landInfo->plotSize[ m_landId ];
     m_state = HouseState::forSale;
   }
   else
@@ -73,13 +78,13 @@ void Core::Land::load()
     m_state = res->getUInt( "Status" );
     m_currentPrice = res->getUInt( "LandPrice" );
     m_ownerPlayerId = res->getUInt( "OwnerId" );
-    m_minPrice = m_landInfo->minPrices[ m_landId ];
-    m_maxPrice = m_landInfo->prices[ m_landId ];
+    m_minPrice = m_landInfo->minPrice[ m_landId ];
+    m_maxPrice = m_landInfo->initialPrice[ m_landId ];
   }
   init();
 }
 
-uint16_t Core::Land::convertItemIdToHousingItemId( uint16_t itemId )
+uint32_t Core::Land::convertItemIdToHousingItemId( uint32_t itemId )
 {
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
   auto info = pExdData->get< Core::Data::Item >( itemId );
@@ -147,9 +152,9 @@ uint8_t Core::Land::getLandId() const
   return m_landId;
 }
 
-uint16_t Core::Land::getZoneId() const
+uint16_t Core::Land::getTerritoryTypeId() const
 {
-  return m_zoneId;
+  return m_territoryTypeId;
 }
 
 Core::HousePtr Core::Land::getHouse() const
@@ -242,12 +247,17 @@ void Core::Land::init()
 
 void Core::Land::updateLandDb()
 {
+  uint32_t houseId = 0;
+
+  if( getHouse() )
+    houseId = getHouse()->getHouseId();
+
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   pDb->directExecute( "UPDATE land SET status = " + std::to_string( m_state )
   + ", LandPrice = " + std::to_string( getCurrentPrice() )
   + ", UpdateTime = " + std::to_string( getDevaluationTime() )
-  + ", OwnerId = " + std::to_string( getPlayerOwner() ) 
-  + ", HouseId = " + std::to_string( 0 ) //TODO: add house id
+  + ", OwnerId = " + std::to_string( getPlayerOwner() )
+  + ", HouseId = " + std::to_string( houseId )
   + ", Type = " + std::to_string( static_cast< uint32_t >( m_type ) ) //TODO: add house id
   + " WHERE LandSetId = " + std::to_string( m_landSetId )
   + " AND LandId = " + std::to_string( m_landId ) + ";" );
@@ -264,4 +274,42 @@ void Core::Land::update( uint32_t currTime )
       updateLandDb();
     }
   }
+}
+
+uint32_t Core::Land::getNextHouseId()
+{
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pQR = pDb->query( "SELECT MAX( HouseId ) FROM house" );
+
+  if( !pQR->next() )
+    return 0;
+
+  return pQR->getUInt( 1 ) + 1;
+}
+
+bool Core::Land::setPreset( uint32_t itemId )
+{
+  auto housingItemId = convertItemIdToHousingItemId( itemId );
+
+  auto exdData = g_fw.get< Core::Data::ExdDataGenerated >();
+  if( !exdData )
+    return false;
+
+  auto housingPreset = exdData->get< Core::Data::HousingPreset >( housingItemId );
+  if( !housingPreset )
+    return false;
+
+  if( !getHouse() )
+  {
+    // todo: i guess we'd create a house here?
+    auto newId = getNextHouseId();
+    m_pHouse = make_House( newId, getLandSetId(), getLandId(), getWardNum(), getTerritoryTypeId() );
+  }
+
+  getHouse()->setHousePart( Common::HousePartSlot::ExteriorRoof, housingPreset->exteriorRoof );
+  getHouse()->setHousePart( Common::HousePartSlot::ExteriorWall, housingPreset->exteriorWall );
+  getHouse()->setHousePart( Common::HousePartSlot::ExteriorWindow, housingPreset->exteriorWindow );
+  getHouse()->setHousePart( Common::HousePartSlot::ExteriorDoor, housingPreset->exteriorDoor );
+
+  return true;
 }
