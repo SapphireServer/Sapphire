@@ -14,6 +14,21 @@ DbManager::~DbManager()
 
 }
 
+bool DbManager::execute( const std::string& sql )
+{
+  try
+  {
+    auto stmt = m_pConnection->createStatement();
+    bool result = stmt->execute( sql );
+    return result;
+  }
+  catch( std::runtime_error& e )
+  {
+    m_lastError = e.what();
+    return false;
+  }
+}
+
 bool DbManager::connect()
 {
   std::shared_ptr< Mysql::MySqlBase > base( new Mysql::MySqlBase() );
@@ -66,4 +81,56 @@ void DbManager::setMode( Mode mode )
 Mode DbManager::getMode() const
 {
   return m_mode;
+}
+
+bool DbManager::performAction()
+{
+  bool result = false;
+  execute( " SET autocommit = 0 " );
+  m_pConnection->beginTransaction();
+
+  switch( m_mode )
+  {
+    case Mode::INIT:
+      result = modeInit();
+      break;
+    case Mode::LIQUIDATE:
+      break;
+    case Mode::UPDATE:
+      break;
+    case Mode::CHECK:
+      break;
+    case Mode::CLEAN_CHARS:
+      break;
+  }
+  if( !result )
+    m_pConnection->rollbackTransaction();
+  else
+    m_pConnection->commitTransaction();
+
+  return result;
+}
+
+bool DbManager::modeInit()
+{
+
+  bool result = false;
+
+  if( selectSchema() )
+  {
+    m_lastError = "Database already existing, use <liquidate> mode first to remove it.";
+    return false;
+  }
+
+  if( !execute( "CREATE DATABASE " + m_database ) )
+    return false;
+
+  if( !execute( "CREATE TABLE `dbversion` (\n"
+                "  `major` int(11) NOT NULL,\n"
+                "  `minor` int(11) NOT NULL\n"
+                ") ENGINE=InnoDB DEFAULT CHARSET=latin1;" ) )
+    return false;
+
+
+  return false;
 }

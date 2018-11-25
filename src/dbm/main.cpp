@@ -43,13 +43,8 @@ std::vector< std::string > getAllFilesInDir( const std::string& dirPath,
             ( std::find( dirSkipList.begin(), dirSkipList.end(), iter->path().filename() ) != dirSkipList.end() ) )
         {
           // Skip the iteration of current directory pointed by iterator
-#ifdef USING_BOOST
-          // Boost Fileystsem  API to skip current directory iteration
-          iter.no_push();
-#else
           // c++17 Filesystem API to skip current directory iteration
           iter.disable_recursion_pending();
-#endif
         }
         else
         {
@@ -57,7 +52,7 @@ std::vector< std::string > getAllFilesInDir( const std::string& dirPath,
           listOfFiles.push_back( iter->path().string() );
         }
 
-	std::error_code ec;
+        std::error_code ec;
         // Increment the iterator to point to next entry in recursive iteration
         iter.increment( ec );
         if( ec )
@@ -176,12 +171,18 @@ int main( int32_t argc, char* argv[] )
     return 0;
   }
 
-  if( !dbm.selectSchema() )
+  if( !dbm.performAction() )
   {
-    g_log.fatal( "Could not set schema!" );
+    g_log.fatal( "Could not perform action!" );
     g_log.fatal( dbm.getLastError() );
-    return 0;
   }
+
+  //if( !dbm.selectSchema() )
+  //{
+  //  g_log.fatal( "Could not set schema!" );
+  //  g_log.fatal( dbm.getLastError() );
+  //  return 0;
+  //}
 
 
 

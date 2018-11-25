@@ -29,6 +29,12 @@ class DbManager
     bool connect();
     bool selectSchema();
 
+    bool execute( const std::string& sql );
+
+    bool performAction();
+
+    bool modeInit();
+
     virtual ~DbManager();
 
     const std::string& getLastError();
