@@ -673,40 +673,6 @@ void Core::Network::GameConnection::buildPresetHandler( const Core::Network::Pac
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcBuildPresetHandler >( inPacket );
 
-  auto zone = player.getCurrentZone();
-  auto plotNum = packet.data().plotNum;
-  auto preset = packet.data().itemId;
-  std::string landString = std::string( packet.data().stateString );
-  auto hZone = std::dynamic_pointer_cast< HousingZone >( zone );
-
-  if( !hZone )
-    return;
-
-  auto pLand = hZone->getLand( plotNum );
-  /*
-  if (!pLand)
-    player.sendDebug( "Something went wrong..." );
-
-  if( stateString.find( "Private" ) )
-  {
-    pLand->setPreset( preset );
-    pLand->setState( HouseState::privateHouse );
-    pLand->UpdateLandDb();
-    hZone->sendLandUpdate( plotNum );
-  }
-  else if( stateString.find("Free") )
-  {
-    pLand->setPreset( preset );
-    pLand->setState( HouseState::fcHouse );
-    pLand->UpdateLandDb();
-    hZone->sendLandUpdate( plotNum );
-  }
-  else
-  {
-    player.sendDebug( "You tried to build a preset on not supported land." );
-  }
-
-  auto pSuccessBuildingPacket = makeActorControl142( player.getId(), BuildPresetResponse, plotNum );
-
-  player.queuePacket( pSuccessBuildingPacket );*/
+  auto pHousingMgr = g_fw.get< HousingMgr >();
+  pHousingMgr->buildPresetEstate( player, packet.data().plotNum, packet.data().itemId );
 }

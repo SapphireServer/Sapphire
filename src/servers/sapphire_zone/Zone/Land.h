@@ -33,7 +33,7 @@ namespace Core
     uint32_t getLandSetId() const;
     uint8_t getWardNum() const;
     uint8_t getLandId() const;
-    uint16_t getZoneId() const;
+    uint16_t getTerritoryTypeId() const;
     Common::LandType getLandType() const;
     Core::HousePtr getHouse() const;
 
@@ -48,7 +48,7 @@ namespace Core
     uint32_t getPlayerOwner();
     //Housing Functions
     void setCurrentPrice( uint32_t currentPrice );
-    void setPreset( uint32_t itemId );
+    bool setPreset( uint32_t itemId );
     void updateLandDb();
     void update( uint32_t currTime );
 
@@ -62,13 +62,14 @@ namespace Core
     uint8_t getLandTag( uint8_t slot );
 
   private:
-    uint16_t convertItemIdToHousingItemId( uint16_t itemId );
+    uint32_t convertItemIdToHousingItemId( uint32_t itemId );
     void init();
+    uint32_t getNextHouseId();
 
     uint8_t m_wardNum;
     uint8_t m_landId;
     uint32_t m_landSetId;
-    uint16_t m_zoneId;
+    uint16_t m_territoryTypeId;
     uint8_t m_size;
     uint8_t m_state;
     Common::LandType m_type;
