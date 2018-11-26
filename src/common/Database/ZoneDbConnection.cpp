@@ -181,14 +181,23 @@ void Core::Db::ZoneDbConnection::doPrepareStatements()
                            "secWeaponModel, aggressionMode, enemyType, pose, "
                            "modelChara, displayFlags, Look, Models "
                     "FROM bnpctemplate WHERE 1;",
-                    CONNECTION_BOTH);
-  
+                    CONNECTION_BOTH );
+
   prepareStatement( CHARA_ITEMGLOBAL_UP,
                     "UPDATE charaglobalitem SET stack = ?, durability = ?, stain = ? WHERE ItemId = ?;",
                     CONNECTION_BOTH );
 
   prepareStatement( CHARA_ITEMGLOBAL_DELETE,
                     "UPDATE charaglobalitem SET IS_DELETE = 1 WHERE ItemId = ?;",
+                    CONNECTION_BOTH );
+
+  /// HOUSING
+  prepareStatement( HOUSING_HOUSE_INS,
+                    "INSERT INTO house ( LandSetId, HouseId ) VALUES ( ?, ? );",
+                    CONNECTION_BOTH );
+
+  prepareStatement( HOUSING_HOUSE_UP,
+                    "UPDATE house SET BuildTime = ?, Aetheryte = ?, Comment = ?, HouseName = ?, Endorsements = ?, HousePartModels = ?, HousePartColours = ? WHERE HouseId = ?;",
                     CONNECTION_BOTH );
 
   /*prepareStatement( LAND_INS,

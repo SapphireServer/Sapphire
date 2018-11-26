@@ -145,10 +145,8 @@ void Core::HousingZone::sendLandSet( Entity::Player& player )
 
       for( auto i = 0; i != parts.size(); i++ )
       {
-        auto [ part, colour ] = parts[ i ];
-
-        landData.housePart[ i ] = part;
-        landData.houseColour[ i ] = colour;
+        landData.housePart[ i ] = parts[ i ].first;
+        landData.houseColour[ i ] = parts[ i ].second;
       }
     }
   }
@@ -183,10 +181,8 @@ void Core::HousingZone::sendLandUpdate( uint8_t landId )
 
       for( auto i = 0; i != parts.size(); i++ )
       {
-        auto [ part, colour ] = parts[ i ];
-
-        landData.housePart[ i ] = part;
-        landData.houseColour[ i ] = colour;
+        landData.housePart[ i ] = parts[ i ].first;
+        landData.houseColour[ i ] = parts[ i ].second;
       }
     }
 
