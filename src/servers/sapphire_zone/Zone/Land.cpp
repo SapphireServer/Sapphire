@@ -306,10 +306,10 @@ bool Core::Land::setPreset( uint32_t itemId )
     m_pHouse = make_House( newId, getLandSetId(), getLandId(), getWardNum(), getTerritoryTypeId() );
   }
 
-  getHouse()->setHousePart( Common::HousePartSlot::ExteriorRoof, housingPreset->exteriorRoof );
-  getHouse()->setHousePart( Common::HousePartSlot::ExteriorWall, housingPreset->exteriorWall );
-  getHouse()->setHousePart( Common::HousePartSlot::ExteriorWindow, housingPreset->exteriorWindow );
-  getHouse()->setHousePart( Common::HousePartSlot::ExteriorDoor, housingPreset->exteriorDoor );
+  getHouse()->setHousePart( Common::HousePartSlot::ExteriorRoof, convertItemIdToHousingItemId( housingPreset->exteriorRoof ) );
+  getHouse()->setHousePart( Common::HousePartSlot::ExteriorWall, convertItemIdToHousingItemId( housingPreset->exteriorWall ) );
+  getHouse()->setHousePart( Common::HousePartSlot::ExteriorWindow, convertItemIdToHousingItemId( housingPreset->exteriorWindow ) );
+  getHouse()->setHousePart( Common::HousePartSlot::ExteriorDoor, convertItemIdToHousingItemId( housingPreset->exteriorDoor ) );
 
   return true;
 }
