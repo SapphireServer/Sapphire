@@ -774,12 +774,17 @@ namespace Core::Common
     Private = 2,
   };
 
-  struct LandPermissionSet
+  struct LandIdent
   {
     int16_t landId; //00
     int16_t wardNum; //02
-    int16_t zoneId; //04
+    int16_t territoryTypeId; //04
     int16_t worldId; //06
+  };
+
+  struct LandPermissionSet
+  {
+    LandIdent landIdent;
     uint32_t permissionMask; //08
     uint32_t unkown1; //12
   };
