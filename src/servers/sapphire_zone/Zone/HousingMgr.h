@@ -34,6 +34,8 @@ namespace Core
 
     bool relinquishLand( Entity::Player& player, uint8_t plot );
 
+    void buildPresetEstate( Entity::Player& player, uint8_t plotNum, uint32_t presetItem );
+
   private:
 
   };

@@ -1607,7 +1607,7 @@ struct LandStruct
   uint32_t fcIcon;// 12
   uint32_t fcIconColor; // 16
   uint16_t housePart[ 8 ]; // 34
-  uint8_t color[ 8 ]; // 36
+  uint8_t houseColour[ 8 ]; // 36
 };
 
 struct FFXIVIpcLandUpdate : FFXIVIpcBasePacket< LandUpdate >

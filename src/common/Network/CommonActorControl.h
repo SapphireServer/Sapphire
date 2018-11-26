@@ -290,12 +290,18 @@ enum ActorControlType : uint16_t
     AchievementList = 0x3E9,
 
     RequestHousingBuildPreset = 0x44C,
+    RequestEstateHallRemoval = 0x44F,
+    RequestBuildPreset = 0x450, // no idea what this is, it gets sent with BuildPresetHandler and has the plot id in param1
     RequestLandSignFree = 0x451,
     RequestLandSignOwned = 0x452,
     RequestWardLandInfo = 0x453,
     RequestLandRelinquish = 0x454,
     RequestEstateRename = 0x45A,
+    RequestEstateEditGreeting = 0x45B,
     RequestEstateGreeting = 0x45C, // sends FFXIVIpcHousingEstateGreeting in return
+    RequestEstateEditGuestAccessSettings = 0x45D,
+    RequestEstateTagSettings = 0x45F,
+
     RequestHousingItemUI = 0x463,
     RequestSharedEstateSettings = 0x46F,
 

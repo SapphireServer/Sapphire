@@ -10,6 +10,7 @@
 #include "Actor/Player.h"
 #include "Actor/Actor.h"
 #include "Land.h"
+#include "House.h"
 
 #include "Forwards.h"
 #include "HousingZone.h"
@@ -126,13 +127,28 @@ void Core::HousingZone::sendLandSet( Entity::Player& player )
   for( uint8_t i = startIndex, count = 0; i < ( startIndex + 30 ); ++i, ++count )
   {
     auto pLand = getLand( i );
-    landsetInitializePacket->data().land[ count ].plotSize = pLand->getSize();
-    landsetInitializePacket->data().land[ count ].houseState = pLand->getState();
-    landsetInitializePacket->data().land[ count ].type = static_cast< uint8_t >( pLand->getLandType() );
-    landsetInitializePacket->data().land[ count ].iconAddIcon = pLand->getSharing();
-    landsetInitializePacket->data().land[ count ].fcId = pLand->getFcId();
-    landsetInitializePacket->data().land[ count ].fcIcon = pLand->getFcIcon();
-    landsetInitializePacket->data().land[ count ].fcIconColor = pLand->getFcColor();
+
+    // todo: move this and sendLandUpdate building logic to its own function
+    auto& landData = landsetInitializePacket->data().land[ count ];
+
+    landData.plotSize = pLand->getSize();
+    landData.houseState = pLand->getState();
+    landData.type = static_cast< uint8_t >( pLand->getLandType() );
+    landData.iconAddIcon = pLand->getSharing();
+    landData.fcId = pLand->getFcId();
+    landData.fcIcon = pLand->getFcIcon();
+    landData.fcIconColor = pLand->getFcColor();
+
+    if( auto house = pLand->getHouse() )
+    {
+      auto& parts = house->getHouseParts();
+
+      for( auto i = 0; i != parts.size(); i++ )
+      {
+        landData.housePart[ i ] = parts[ i ].first;
+        landData.houseColour[ i ] = parts[ i ].second;
+      }
+    }
   }
 
   player.queuePacket( landsetInitializePacket );
@@ -147,13 +163,28 @@ void Core::HousingZone::sendLandUpdate( uint8_t landId )
 
     auto landUpdatePacket = makeZonePacket< FFXIVIpcLandUpdate >( pPlayer->getId() );
     landUpdatePacket->data().landId = landId;
-    landUpdatePacket->data().land.plotSize = pLand->getSize();
-    landUpdatePacket->data().land.houseState = pLand->getState();
-    landUpdatePacket->data().land.type = static_cast< uint8_t >( pLand->getLandType() );
-    landUpdatePacket->data().land.iconAddIcon = pLand->getSharing();
-    landUpdatePacket->data().land.fcId = pLand->getFcId();
-    landUpdatePacket->data().land.fcIcon = pLand->getFcIcon();
-    landUpdatePacket->data().land.fcIconColor = pLand->getFcColor();
+
+    auto& landData = landUpdatePacket->data().land;
+
+    landData.plotSize = pLand->getSize();
+    landData.houseState = pLand->getState();
+    landData.type = static_cast< uint8_t >( pLand->getLandType() );
+    landData.iconAddIcon = pLand->getSharing();
+    landData.fcId = pLand->getFcId();
+    landData.fcIcon = pLand->getFcIcon();
+    landData.fcIconColor = pLand->getFcColor();
+
+
+    if( auto house = pLand->getHouse() )
+    {
+      auto& parts = house->getHouseParts();
+
+      for( auto i = 0; i != parts.size(); i++ )
+      {
+        landData.housePart[ i ] = parts[ i ].first;
+        landData.houseColour[ i ] = parts[ i ].second;
+      }
+    }
 
     pPlayer->queuePacket( landUpdatePacket );
   }

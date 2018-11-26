@@ -77,7 +77,7 @@ void Core::Network::GameConnection::cfRegisterDuty( const Packets::FFXIVARR_PACK
   if( !cfCondition )
     return;
 
-  auto instance = pTeriMgr->createInstanceContent( cfCondition->instanceContent );
+  auto instance = pTeriMgr->createInstanceContent( cfCondition->content );
   if( !instance )
     return;
 
