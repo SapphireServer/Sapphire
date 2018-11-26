@@ -295,10 +295,19 @@ void Core::HousingMgr::buildPresetEstate( Entity::Player& player, uint8_t plotNu
 
   pLand->setState( HouseState::privateHouse );
   pLand->setLandType( LandType::Private );
-  pLand->updateLandDb();
   hZone->sendLandUpdate( plotNum );
 
   auto pSuccessBuildingPacket = makeActorControl142( player.getId(), ActorControl::BuildPresetResponse, plotNum );
 
   player.queuePacket( pSuccessBuildingPacket );
+
+  pLand->updateLandDb();
+
+  // start house built event
+  // CmnDefHousingBuildHouse_00149
+  player.eventStart( player.getId(), 0x000B0095, Event::EventHandler::EventType::Housing, 1, 1 );
+  // todo: wtf are these flags
+  player.playScene( 0x000B0095, 0, 4164955899, 0, 1, plotNum, nullptr );
+
+  // todo: send perms/flags for house
 }

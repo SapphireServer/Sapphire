@@ -80,6 +80,13 @@ void Core::Land::load()
     m_ownerPlayerId = res->getUInt( "OwnerId" );
     m_minPrice = m_landInfo->minPrice[ m_landId ];
     m_maxPrice = m_landInfo->initialPrice[ m_landId ];
+
+    auto houseId = res->getUInt( "HouseId" );
+
+    // fetch the house if we have one for this land
+    if( houseId > 0 )
+      m_pHouse = make_House( houseId, m_landSetId, m_landId, m_wardNum, m_territoryTypeId );
+
   }
   init();
 }
@@ -252,6 +259,7 @@ void Core::Land::updateLandDb()
   if( getHouse() )
     houseId = getHouse()->getHouseId();
 
+  // todo: change to prepared statement
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   pDb->directExecute( "UPDATE land SET status = " + std::to_string( m_state )
   + ", LandPrice = " + std::to_string( getCurrentPrice() )
@@ -261,6 +269,9 @@ void Core::Land::updateLandDb()
   + ", Type = " + std::to_string( static_cast< uint32_t >( m_type ) ) //TODO: add house id
   + " WHERE LandSetId = " + std::to_string( m_landSetId )
   + " AND LandId = " + std::to_string( m_landId ) + ";" );
+
+  if( auto house = getHouse() )
+    house->updateHouseDb();
 }
 
 void Core::Land::update( uint32_t currTime )
@@ -306,10 +317,10 @@ bool Core::Land::setPreset( uint32_t itemId )
     m_pHouse = make_House( newId, getLandSetId(), getLandId(), getWardNum(), getTerritoryTypeId() );
   }
 
-  getHouse()->setHousePart( Common::HousePartSlot::ExteriorRoof, housingPreset->exteriorRoof );
-  getHouse()->setHousePart( Common::HousePartSlot::ExteriorWall, housingPreset->exteriorWall );
-  getHouse()->setHousePart( Common::HousePartSlot::ExteriorWindow, housingPreset->exteriorWindow );
-  getHouse()->setHousePart( Common::HousePartSlot::ExteriorDoor, housingPreset->exteriorDoor );
+  getHouse()->setHousePart( Common::HousePartSlot::ExteriorRoof, convertItemIdToHousingItemId( housingPreset->exteriorRoof ) );
+  getHouse()->setHousePart( Common::HousePartSlot::ExteriorWall, convertItemIdToHousingItemId( housingPreset->exteriorWall ) );
+  getHouse()->setHousePart( Common::HousePartSlot::ExteriorWindow, convertItemIdToHousingItemId( housingPreset->exteriorWindow ) );
+  getHouse()->setHousePart( Common::HousePartSlot::ExteriorDoor, convertItemIdToHousingItemId( housingPreset->exteriorDoor ) );
 
   return true;
 }
