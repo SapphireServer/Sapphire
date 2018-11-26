@@ -15,7 +15,7 @@ namespace Core
     House( uint32_t houseId, uint32_t landSetId, uint8_t landId, uint8_t wardNum, uint16_t territoryTypeId );
     virtual ~House();
 
-    using HousePart = std::tuple< uint32_t, uint8_t >;
+    using HousePart = std::pair< uint32_t, uint8_t >;
     using HousePartsArray = std::array< HousePart, 8 >;
 
     //gerneral
@@ -33,6 +33,8 @@ namespace Core
 
     HousePartsArray const& getHouseParts() const;
 
+    void updateHouseDb();
+
   private:
     uint32_t m_landSetId;
     uint8_t m_landId;
@@ -40,9 +42,12 @@ namespace Core
     uint16_t m_territoryTypeId;
     uint32_t m_houseId;
 
+    uint64_t m_buildTime;
+
     HousePartsArray m_houseParts;
 
-    char m_commentMsg[ 193 ];
+    std::string m_estateMessage;
+    std::string m_houseName;
   };
 
 }
