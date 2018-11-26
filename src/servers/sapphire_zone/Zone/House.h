@@ -11,10 +11,12 @@ namespace Core
 
   class House
   {
-
   public:
     House( uint32_t houseId, uint32_t landSetId, uint8_t landId, uint8_t wardNum, uint16_t territoryTypeId );
     virtual ~House();
+
+    using HousePart = std::tuple< uint32_t, uint8_t >;
+    using HousePartsArray = std::array< HousePart, 8 >;
 
     //gerneral
     uint32_t getLandSetId() const;
@@ -29,6 +31,8 @@ namespace Core
     uint32_t getHousePart( Common::HousePartSlot slot ) const;
     uint8_t getHousePartColor( Common::HousePartSlot slot ) const;
 
+    HousePartsArray const& getHouseParts() const;
+
   private:
     uint32_t m_landSetId;
     uint8_t m_landId;
@@ -36,8 +40,7 @@ namespace Core
     uint16_t m_territoryTypeId;
     uint32_t m_houseId;
 
-    uint32_t m_houseParts[ 8 ];
-    uint8_t m_housePartsColor[ 8 ];
+    HousePartsArray m_houseParts;
 
     char m_commentMsg[ 193 ];
   };

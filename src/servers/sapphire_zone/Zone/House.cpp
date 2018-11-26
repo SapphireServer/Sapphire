@@ -67,20 +67,25 @@ uint32_t Core::House::getHouseId() const
 
 uint8_t Core::House::getHousePartColor( Common::HousePartSlot slot ) const
 {
-  return m_housePartsColor[ slot ];
+  return std::get< 1 >( m_houseParts[ slot ] );
 }
 
 void Core::House::setHousePart( Common::HousePartSlot slot, uint32_t id )
 {
-  m_houseParts[ slot ] = id;
+  std::get< 0 >( m_houseParts[ slot ] ) = id;
 }
 
 void Core::House::setHousePartColor( Common::HousePartSlot slot, uint32_t id )
 {
-  m_housePartsColor[ slot ] = id;
+  std::get< 1 >( m_houseParts[ slot ] ) = id;
 }
 
 uint32_t Core::House::getHousePart( Common::HousePartSlot slot ) const
 {
-  return m_houseParts[ slot ];
+  return std::get< 0 >( m_houseParts[ slot ] );
+}
+
+Core::House::HousePartsArray const& Core::House::getHouseParts() const
+{
+  return m_houseParts;
 }
