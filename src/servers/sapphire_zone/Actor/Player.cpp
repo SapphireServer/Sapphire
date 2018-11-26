@@ -1533,6 +1533,13 @@ uint32_t Core::Entity::Player::getTerritoryTypeId() const
 
 void Core::Entity::Player::sendZonePackets()
 {
+  if( isLogin() )
+  {
+    //Update player map in servermgr - in case player name has been changed
+    auto pServerMgr = g_fw.get< Core::ServerMgr >();
+    pServerMgr->updatePlayerName( getId(), getName() );
+  }
+
   getCurrentZone()->onBeforePlayerZoneIn( *this );
 
   auto initPacket = makeZonePacket< FFXIVIpcInit >( getId() );

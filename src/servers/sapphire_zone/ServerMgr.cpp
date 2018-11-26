@@ -365,15 +365,31 @@ bool Core::ServerMgr::isRunning() const
   return m_bRunning;
 }
 
-std::string Core::ServerMgr::getPlayerNameFromDb( uint32_t playerId )
+std::string Core::ServerMgr::getPlayerNameFromDb( uint32_t playerId, bool forceDbLoad )
 {
+  if( !forceDbLoad )
+  {
+    auto it = m_playerNameMapById.find( playerId );
+
+    if( it != m_playerNameMapById.end() )
+      return ( it->second );
+  }
+
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto res = pDb->query( "SELECT name FROM charainfo WHERE characterid = " + std::to_string( playerId ) );
 
   if( !res->next() )
     return "Unknown";
 
-  return res->getString( 1 );
+  std::string playerName = res->getString( 1 );
+  updatePlayerName( playerId, playerName );
+
+  return playerName;
+}
+
+void Core::ServerMgr::updatePlayerName( uint32_t playerId, const std::string & playerNewName )
+{
+  m_playerNameMapById[ playerId ] = playerNewName;
 }
 
 void Core::ServerMgr::loadBNpcTemplates()
