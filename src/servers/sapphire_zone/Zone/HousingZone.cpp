@@ -116,10 +116,11 @@ void Core::HousingZone::sendLandSet( Entity::Player& player )
 {
   auto landsetInitializePacket = makeZonePacket< FFXIVIpcLandSetInitialize >( player.getId() );
 
-  landsetInitializePacket->data().landSetId = m_landSetId;
-  landsetInitializePacket->data().zoneId = m_territoryTypeId;
+  landsetInitializePacket->data().landIdent.wardNum = m_wardNum;
+  //landsetInitializePacket->data().landIdent.landSetId = m_landSetId;
+  landsetInitializePacket->data().landIdent.territoryTypeId = m_territoryTypeId;
   //TODO: get current WorldId
-  landsetInitializePacket->data().worldId = 67;
+  landsetInitializePacket->data().landIdent.worldId = 67;
   landsetInitializePacket->data().subInstance = isPlayerSubInstance( player ) == false ? 1 : 2;
 
   uint8_t startIndex = isPlayerSubInstance( player ) == false ? 0 : 30;
@@ -162,7 +163,7 @@ void Core::HousingZone::sendLandUpdate( uint8_t landId )
     auto pPlayer = playerIt.second;
 
     auto landUpdatePacket = makeZonePacket< FFXIVIpcLandUpdate >( pPlayer->getId() );
-    landUpdatePacket->data().landId = landId;
+    landUpdatePacket->data().landIdent.landId = landId;
 
     auto& landData = landUpdatePacket->data().land;
 

@@ -1771,11 +1771,11 @@ bool Core::Entity::Player::isOnEnterEventDone() const
 void Core::Entity::Player::setLandPermissions( uint8_t permissionSet, uint32_t permissionMask,
                                                int16_t landId, int16_t wardNum, int16_t zoneId )
 {
-  m_landPermission[ permissionSet ].landId = landId;
+  m_landPermission[ permissionSet ].landIdent.landId = landId;
+  m_landPermission[ permissionSet ].landIdent.wardNum = wardNum;
+  m_landPermission[ permissionSet ].landIdent.territoryTypeId = zoneId;
+  m_landPermission[ permissionSet ].landIdent.worldId = 67;
   m_landPermission[ permissionSet ].permissionMask = permissionMask;
-  m_landPermission[ permissionSet ].wardNum = wardNum;
-  m_landPermission[ permissionSet ].zoneId = zoneId;
-  m_landPermission[ permissionSet ].worldId = 67;
   m_landPermission[ permissionSet ].unkown1 = 0;
 }
 
@@ -1805,10 +1805,10 @@ void Core::Entity::Player::sendLandPermissionSlot( uint8_t slotId, uint8_t landI
   auto landPermissions = makeZonePacket< FFXIVIpcLandPermissionSlot >( getId() );
   landPermissions->data().type = slotId;
 
-  landPermissions->data().permissionSet.landId = landId;
-  landPermissions->data().permissionSet.wardNum = wardId;
-  landPermissions->data().permissionSet.zoneId = zoneId;
-  landPermissions->data().permissionSet.worldId = 67;
+  landPermissions->data().permissionSet.landIdent.landId = landId;
+  landPermissions->data().permissionSet.landIdent.wardNum = wardId;
+  landPermissions->data().permissionSet.landIdent.territoryTypeId = zoneId;
+  landPermissions->data().permissionSet.landIdent.worldId = 67;
   landPermissions->data().permissionSet.permissionMask = 0;
   queuePacket( landPermissions );
 }
