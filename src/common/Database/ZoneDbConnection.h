@@ -81,6 +81,9 @@ namespace Core::Db
     LAND_INS,
     LAND_SEL,
     LAND_UP,
+    HOUSING_HOUSE_INS,
+    HOUSING_HOUSE_UP,
+    HOUSING_HOUSE_DEL,
 
 
     MAX_STATEMENTS
