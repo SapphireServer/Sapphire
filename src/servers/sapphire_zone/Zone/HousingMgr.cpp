@@ -9,6 +9,7 @@
 #include <Network/CommonActorControl.h>
 
 #include <unordered_map>
+#include <cstring>
 
 #include "Actor/Player.h"
 
@@ -19,6 +20,7 @@
 #include "Land.h"
 #include "Framework.h"
 #include "ServerMgr.h"
+#include "House.h"
 
 using namespace Core::Common;
 using namespace Core::Network;
@@ -97,7 +99,15 @@ void Core::HousingMgr::sendLandSignOwned( Entity::Player& player, uint8_t wardId
   landInfoSignPacket->data().landIdent.wardNum = land->getWardNum();
   landInfoSignPacket->data().landIdent.worldId = 67;
   landInfoSignPacket->data().landIdent.territoryTypeId = land->getTerritoryTypeId();
+  landInfoSignPacket->data().houseIconAdd = land->getSharing();
   landInfoSignPacket->data().ownerId = player.getContentId(); // should be real owner contentId, not player.contentId()
+
+  if( auto house = land->getHouse() )
+  {
+    std::strcpy( landInfoSignPacket->data().estateName, house->getHouseName().c_str() );
+    std::strcpy( landInfoSignPacket->data().estateGreeting, house->getHouseGreeting().c_str() );
+  }
+
   memcpy( &landInfoSignPacket->data().ownerName, playerName.c_str(), playerName.size() );
 
   player.queuePacket( landInfoSignPacket );
