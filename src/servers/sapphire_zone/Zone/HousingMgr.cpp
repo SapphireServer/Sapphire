@@ -157,10 +157,10 @@ Core::LandPurchaseResult Core::HousingMgr::purchaseLand( Entity::Player& player,
       pLand->setState( HouseState::sold );
       pLand->setLandType( Common::LandType::Private );
 
-      player.setLandPermissions( LandPermissionSlot::Private, 0x00, plot,
+      player.setLandState( LandStateSlot::Private, 0x00, plot,
                                  pHousing->getWardNum(), pHousing->getTerritoryTypeId() );
 
-      player.sendLandPermissionSlot( static_cast< uint8_t >( LandType::Private ), plot, pHousing->getWardNum(),
+      player.sendLandStateSlot( static_cast< uint8_t >( LandType::Private ), plot, pHousing->getWardNum(),
                                      pHousing->getTerritoryTypeId() );
 
       //pLand->setLandName( "Private Estate" + std::to_string( pHousing->getWardNum() ) + "-" + std::to_string( plot )   );
@@ -210,9 +210,9 @@ bool Core::HousingMgr::relinquishLand( Entity::Player& player, uint8_t plot )
   pLand->setLandType( Common::LandType::none );
   pLand->updateLandDb();
 
-  player.setLandPermissions( LandPermissionSlot::Private, 0x00, 0xFF, 0xFF, 0xFF );
+  player.setLandState( LandStateSlot::Private, 0x00, 0xFF, 0xFF, 0xFF );
 
-  player.sendLandPermissionSlot( static_cast< uint8_t >( LandType::Private ), 0xFF, 0xFF, 0xFF );
+  player.sendLandStateSlot( static_cast< uint8_t >( LandType::Private ), 0xFF, 0xFF, 0xFF );
 
   auto screenMsgPkt2 = makeActorControl143( player.getId(), ActorControl::LogMsg, 3351, 0x1AA,
                                             pLand->getWardNum() + 1, plot + 1 );

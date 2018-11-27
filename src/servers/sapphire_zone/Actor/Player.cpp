@@ -1587,7 +1587,7 @@ void Core::Entity::Player::sendZonePackets()
   auto pHousingMgr = g_fw.get< HousingMgr >();
   if( Core::LandPtr pLand = pHousingMgr->getLandByOwnerId( getId() ) )
   {
-    setLandPermissions( LandPermissionSlot::Private, 0x00, pLand->getLandId(), pLand->getWardNum(), pLand->getTerritoryTypeId() );
+    setLandState( LandStateSlot::Private, 0x00, pLand->getLandId(), pLand->getWardNum(), pLand->getTerritoryTypeId() );
   }
 
   sendLandPermissions();
@@ -1768,7 +1768,7 @@ bool Core::Entity::Player::isOnEnterEventDone() const
   return m_onEnterEventDone;
 }
 
-void Core::Entity::Player::setLandPermissions( uint8_t permissionSet, uint32_t permissionMask,
+void Core::Entity::Player::setLandState( uint8_t permissionSet, uint32_t permissionMask,
                                                int16_t landId, int16_t wardNum, int16_t zoneId )
 {
   m_landPermission[ permissionSet ].landIdent.landId = landId;
@@ -1783,11 +1783,11 @@ void Core::Entity::Player::sendLandPermissions()
 {
   auto landPermissions = makeZonePacket< FFXIVIpcLandPermission >( getId() );
 
-  landPermissions->data().freeCompanyHouse = m_landPermission[Common::LandPermissionSlot::FreeCompany];
-  landPermissions->data().privateHouse = m_landPermission[Common::LandPermissionSlot::Private];
-  landPermissions->data().apartment = m_landPermission[Common::LandPermissionSlot::Apartment];
-  landPermissions->data().sharedHouse[0] = m_landPermission[Common::LandPermissionSlot::SharedHouse1];
-  landPermissions->data().sharedHouse[1] = m_landPermission[Common::LandPermissionSlot::SharedHouse2];
+  landPermissions->data().freeCompanyHouse = m_landPermission[Common::LandStateSlot::FreeCompany];
+  landPermissions->data().privateHouse = m_landPermission[Common::LandStateSlot::Private];
+  landPermissions->data().apartment = m_landPermission[Common::LandStateSlot::Apartment];
+  landPermissions->data().sharedHouse[0] = m_landPermission[Common::LandStateSlot::SharedHouse1];
+  landPermissions->data().sharedHouse[1] = m_landPermission[Common::LandStateSlot::SharedHouse2];
   memset( &landPermissions->data().unkownHouse, 0xFF, 8 );
   memset( &landPermissions->data().unkownHouse.permissionMask, 0, 8 );
   landPermissions->data().unkownHouse.permissionMask = 2;
@@ -1800,9 +1800,9 @@ void Core::Entity::Player::sendLandPermissions()
   queuePacket( landPermissions );
 }
 
-void Core::Entity::Player::sendLandPermissionSlot( uint8_t slotId, uint8_t landId, uint8_t wardId, uint16_t zoneId )
+void Core::Entity::Player::sendLandStateSlot( uint8_t slotId, uint8_t landId, uint8_t wardId, uint16_t zoneId )
 {
-  auto landPermissions = makeZonePacket< FFXIVIpcLandPermissionSlot >( getId() );
+  auto landPermissions = makeZonePacket< FFXIVIpcLandStateSlot >( getId() );
   landPermissions->data().type = slotId;
 
   landPermissions->data().permissionSet.landIdent.landId = landId;
