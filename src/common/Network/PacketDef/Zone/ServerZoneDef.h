@@ -1579,20 +1579,20 @@ struct FFXIVIpcLandStateSlot : FFXIVIpcBasePacket< LandStateSlot >
 {
   uint32_t type;
   uint32_t unknown;
-  Common::LandStateSet permissionSet;
+  Common::LandFlagSet permissionSet;
 };
 
 struct FFXIVIpcLandPermission : FFXIVIpcBasePacket< LandPermission >
 {
-  Common::LandStateSet freeCompanyHouse; // 00
+  Common::LandFlagSet freeCompanyHouse; // 00
   uint64_t unkown1;
-  Common::LandStateSet privateHouse; // 24
+  Common::LandFlagSet privateHouse; // 24
   uint64_t unkown2;
-  Common::LandStateSet apartment; // 48
+  Common::LandFlagSet apartment; // 48
   uint64_t unkown3;
-  Common::LandStateSet sharedHouse[2]; //72
+  Common::LandFlagSet sharedHouse[2]; //72
   uint64_t unkown4;
-  Common::LandStateSet unkownHouse;
+  Common::LandFlagSet unkownHouse;
   uint64_t unkown5;
 };
 

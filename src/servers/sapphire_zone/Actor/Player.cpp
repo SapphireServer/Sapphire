@@ -95,7 +95,7 @@ Core::Entity::Player::Player() :
   for ( uint8_t i = 0; i < 5; i++ )
   {
     memset( &m_landPermission[i], 0xFF, 8 );
-    memset( &m_landPermission[i].estateFlags, 0, 8 );
+    memset( &m_landPermission[i].landFlags, 0, 8 );
   }
 
   m_objSpawnIndexAllocator.init( MAX_DISPLAYED_EOBJS );
@@ -1597,10 +1597,10 @@ void Core::Entity::Player::sendZonePackets()
       state |= ESTATE_HAS_AETHERYTE;
     }
 
-    setLandState( LandStateSlot::Private, state, pLand->getLandId(), pLand->getWardNum(), pLand->getTerritoryTypeId() );
+    setLandFlags( LandStateSlot::Private, state, pLand->getLandId(), pLand->getWardNum(), pLand->getTerritoryTypeId() );
   }
 
-  sendLandStates();
+  sendLandFlags();
 
   auto initZonePacket = makeZonePacket< FFXIVIpcInitZone >( getId() );
   initZonePacket->data().zoneId = getCurrentZone()->getTerritoryTypeId();
@@ -1778,18 +1778,18 @@ bool Core::Entity::Player::isOnEnterEventDone() const
   return m_onEnterEventDone;
 }
 
-void Core::Entity::Player::setLandState( uint8_t permissionSet, uint32_t estateFlags,
+void Core::Entity::Player::setLandFlags( uint8_t permissionSet, uint32_t landFlags,
                                                int16_t landId, int16_t wardNum, int16_t zoneId )
 {
   m_landPermission[ permissionSet ].landIdent.landId = landId;
   m_landPermission[ permissionSet ].landIdent.wardNum = wardNum;
   m_landPermission[ permissionSet ].landIdent.territoryTypeId = zoneId;
   m_landPermission[ permissionSet ].landIdent.worldId = 67;
-  m_landPermission[ permissionSet ].estateFlags = estateFlags;
+  m_landPermission[ permissionSet ].landFlags = landFlags;
   m_landPermission[ permissionSet ].unkown1 = 0;
 }
 
-void Core::Entity::Player::sendLandStates()
+void Core::Entity::Player::sendLandFlags()
 {
   auto landPermissions = makeZonePacket< FFXIVIpcLandPermission >( getId() );
 
@@ -1802,7 +1802,7 @@ void Core::Entity::Player::sendLandStates()
   queuePacket( landPermissions );
 }
 
-void Core::Entity::Player::sendLandStateSlot( Common::LandStateSlot slot )
+void Core::Entity::Player::sendLandFlagsSlot( Common::LandStateSlot slot )
 {
   auto landPermissions = makeZonePacket< FFXIVIpcLandStateSlot >( getId() );
 
