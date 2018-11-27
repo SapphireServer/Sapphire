@@ -1018,8 +1018,8 @@ void Core::DebugCommandHandler::housing( char* data, Entity::Player& player, std
         auto pHousing = std::dynamic_pointer_cast< HousingZone >( pZone );
         if( pHousing )
         {
-          player.setLandState( permissionSet, 0, pHousing->getLandSetId(), pHousing->getWardNum(), pHousing->getTerritoryTypeId() );
-          player.sendLandStates();
+          player.setLandFlags( permissionSet, 0, pHousing->getLandSetId(), pHousing->getWardNum(), pHousing->getTerritoryTypeId() );
+          player.sendLandFlags();
         }
         else
           player.sendDebug( "You aren't in a housing Zone." );

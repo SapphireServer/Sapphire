@@ -774,7 +774,7 @@ namespace Core::Common
     Private = 2,
   };
 
-  enum LandEstateFlags : uint32_t
+  enum LandFlags : uint32_t
   {
     ESTATE_BUILT = 0x1,
     ESTATE_HAS_AETHERYTE = 0x2,
@@ -791,10 +791,10 @@ namespace Core::Common
     int16_t worldId; //06
   };
 
-  struct LandStateSet
+  struct LandFlagSet
   {
     LandIdent landIdent;
-    uint32_t estateFlags; //08
+    uint32_t landFlags; //08
     uint32_t unkown1; //12
   };
 
@@ -843,7 +843,7 @@ namespace Core::Common
     Venue = 11,
   };
 
-  enum WardEstateFlags : uint8_t
+  enum WardlandFlags : uint8_t
   {
     IsEstateOwned = 1,
     IsPublicEstate = 2,

@@ -167,10 +167,10 @@ Core::LandPurchaseResult Core::HousingMgr::purchaseLand( Entity::Player& player,
       pLand->setState( HouseState::sold );
       pLand->setLandType( Common::LandType::Private );
 
-      player.setLandState( LandStateSlot::Private, 0x00, plot,
+      player.setLandFlags( LandStateSlot::Private, 0x00, plot,
                                  pHousing->getWardNum(), pHousing->getTerritoryTypeId() );
 
-      player.sendLandStateSlot( LandStateSlot::Private );
+      player.sendLandFlagsSlot( LandStateSlot::Private );
 
       //pLand->setLandName( "Private Estate" + std::to_string( pHousing->getWardNum() ) + "-" + std::to_string( plot )   );
       pLand->updateLandDb();
@@ -219,9 +219,9 @@ bool Core::HousingMgr::relinquishLand( Entity::Player& player, uint8_t plot )
   pLand->setLandType( Common::LandType::none );
   pLand->updateLandDb();
 
-  player.setLandState( LandStateSlot::Private, 0x00, 0xFF, 0xFF, 0xFF );
+  player.setLandFlags( LandStateSlot::Private, 0x00, 0xFF, 0xFF, 0xFF );
 
-  player.sendLandStateSlot( LandStateSlot::Private );
+  player.sendLandFlagsSlot( LandStateSlot::Private );
 
   auto screenMsgPkt2 = makeActorControl143( player.getId(), ActorControl::LogMsg, 3351, 0x1AA,
                                             pLand->getWardNum() + 1, plot + 1 );
@@ -260,14 +260,14 @@ void Core::HousingMgr::sendWardLandInfo( Entity::Player& player, uint8_t wardId,
     switch( land->getLandType() )
     {
       case LandType::FreeCompany:
-        entry.infoFlags = Common::WardEstateFlags::IsEstateOwned | Common::WardEstateFlags::IsFreeCompanyEstate;
+        entry.infoFlags = Common::WardlandFlags::IsEstateOwned | Common::WardlandFlags::IsFreeCompanyEstate;
 
         // todo: send FC name
 
         break;
 
       case LandType::Private:
-        entry.infoFlags = Common::WardEstateFlags::IsEstateOwned;
+        entry.infoFlags = Common::WardlandFlags::IsEstateOwned;
 
         auto owner = land->getPlayerOwner();
         std::string playerName = g_fw.get< Core::ServerMgr >()->getPlayerNameFromDb( owner );
@@ -319,8 +319,6 @@ void Core::HousingMgr::buildPresetEstate( Entity::Player& player, uint8_t plotNu
   // todo: wtf are these flags
   player.playScene( 0x000B0095, 0, 4164955899, 0, 1, plotNum, nullptr );
 
-  // todo: send perms/flags for house
-
-  player.setLandState( LandStateSlot::Private, ESTATE_BUILT, pLand->getLandId(), pLand->getWardNum(), pLand->getTerritoryTypeId() );
-  player.sendLandStateSlot( LandStateSlot::Private );
+  player.setLandFlags( LandStateSlot::Private, ESTATE_BUILT, pLand->getLandId(), pLand->getWardNum(), pLand->getTerritoryTypeId() );
+  player.sendLandFlagsSlot( LandStateSlot::Private );
 }
