@@ -1575,24 +1575,24 @@ struct FFXIVIpcPerformNote : FFXIVIpcBasePacket< PerformNote >
   uint8_t data[32];
 };
 
-struct FFXIVIpcLandPermissionSlot : FFXIVIpcBasePacket< LandPermissionSlot >
+struct FFXIVIpcLandStateSlot : FFXIVIpcBasePacket< LandStateSlot >
 {
   uint32_t type;
   uint32_t unknown;
-  Common::LandPermissionSet permissionSet;
+  Common::LandStateSet permissionSet;
 };
 
 struct FFXIVIpcLandPermission : FFXIVIpcBasePacket< LandPermission >
 {
-  Common::LandPermissionSet freeCompanyHouse; // 00
+  Common::LandStateSet freeCompanyHouse; // 00
   uint64_t unkown1;
-  Common::LandPermissionSet privateHouse; // 24
+  Common::LandStateSet privateHouse; // 24
   uint64_t unkown2;
-  Common::LandPermissionSet apartment; // 48
+  Common::LandStateSet apartment; // 48
   uint64_t unkown3;
-  Common::LandPermissionSet sharedHouse[2]; //72
+  Common::LandStateSet sharedHouse[2]; //72
   uint64_t unkown4;
-  Common::LandPermissionSet unkownHouse;
+  Common::LandStateSet unkownHouse;
   uint64_t unkown5;
 };
 

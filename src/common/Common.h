@@ -758,7 +758,7 @@ namespace Core::Common
     SubTag2
   };
 
-  enum LandPermissionSlot
+  enum LandStateSlot
   {
     FreeCompany,
     Private,
@@ -782,7 +782,7 @@ namespace Core::Common
     int16_t worldId; //06
   };
 
-  struct LandPermissionSet
+  struct LandStateSet
   {
     LandIdent landIdent;
     uint32_t permissionMask; //08

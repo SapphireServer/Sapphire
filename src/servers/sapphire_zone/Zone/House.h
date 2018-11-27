@@ -25,6 +25,12 @@ namespace Core
     uint16_t getTerritoryTypeId() const;
     uint32_t getHouseId() const;
 
+    const std::string& getHouseName() const;
+    void setHouseName( std::string& name );
+
+    const std::string& getHouseGreeting() const;
+    void setHouseGreeting( std::string& greeting );
+
     //functions
     void setHousePart( Common::HousePartSlot slot, uint32_t id );
     void setHousePartColor( Common::HousePartSlot slot, uint32_t id );
