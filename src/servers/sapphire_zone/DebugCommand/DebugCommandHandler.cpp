@@ -730,7 +730,7 @@ void Core::DebugCommandHandler::script( char* data, Entity::Player& player, std:
         for( auto it = scripts.begin(); it != scripts.end(); ++it )
         {
           auto script = *it;
-          player.sendDebug( " - '" + script->library_name + 
+          player.sendDebug( " - '" + script->library_name +
                             ", num scripts: " + std::to_string( script->scripts.size() ) );
         }
       }
@@ -1019,7 +1019,7 @@ void Core::DebugCommandHandler::housing( char* data, Entity::Player& player, std
         if( pHousing )
         {
           player.setLandState( permissionSet, 0, pHousing->getLandSetId(), pHousing->getWardNum(), pHousing->getTerritoryTypeId() );
-          player.sendLandPermissions();
+          player.sendLandStates();
         }
         else
           player.sendDebug( "You aren't in a housing Zone." );
