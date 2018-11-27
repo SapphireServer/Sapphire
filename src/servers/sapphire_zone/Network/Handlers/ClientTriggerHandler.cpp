@@ -365,27 +365,29 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
     }
     case ClientTriggerType::RequestEstateRename:
     {
-      // removed temporarly, there is no such thing as a LandName
-      auto landRenamePacket = makeZonePacket< Server::FFXIVIpcLandRename >( player.getId() );
+      uint16_t territoryTypeId = param11 & 0xFFFF;
+      uint16_t worldId = param11 >> 16;
 
       uint8_t ward = ( param12 & 0xFF00 ) >> 8;
       uint8_t plot = ( param12 & 0xFF );
 
-      auto zone = player.getCurrentZone();
+      auto pHousingMgr = g_fw.get< HousingMgr >();
+      if( !pHousingMgr )
+        break;
 
-      auto hZone = std::dynamic_pointer_cast< HousingZone >( zone );
+      auto landSetId = pHousingMgr->toLandSetId( territoryTypeId, ward );
+      auto hZone = pHousingMgr->getHousingZoneByLandSetId( landSetId );
+
+      if( !hZone )
+        break;
 
       auto land = hZone->getLand( plot );
-
-      if( !land )
-      {
-        auto pHousingMgr = g_fw.get< HousingMgr >();
-        land = pHousingMgr->getLandByOwnerId( player.getId() );
-      }
 
       auto house = land->getHouse();
       if( !house )
         break;
+
+      auto landRenamePacket = makeZonePacket< Server::FFXIVIpcLandRename >( player.getId() );
 
       landRenamePacket->data().landIdent.landId = land->getLandId();
       landRenamePacket->data().landIdent.wardNum = land->getWardNum();
@@ -394,6 +396,44 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
       memcpy( &landRenamePacket->data().houseName, house->getHouseName().c_str(), 20 );
 
       player.queuePacket( landRenamePacket );
+
+      break;
+    }
+    case ClientTriggerType::RequestEstateEditGreeting:
+    {
+      uint16_t territoryTypeId = param11 & 0xFFFF;
+      uint16_t worldId = param11 >> 16;
+
+      uint8_t ward = ( param12 & 0xFF00 ) >> 8;
+      uint8_t plot = ( param12 & 0xFF );
+
+      auto pHousingMgr = g_fw.get< HousingMgr >();
+      if( !pHousingMgr )
+        break;
+
+      auto landSetId = pHousingMgr->toLandSetId( territoryTypeId, ward );
+      auto hZone = pHousingMgr->getHousingZoneByLandSetId( landSetId );
+
+      if( !hZone )
+        break;
+
+      auto land = hZone->getLand( plot );
+      if( !land )
+        break;
+
+      auto house = land->getHouse();
+      if( !house )
+        break;
+
+      auto estateGreetingPacket = makeZonePacket< Server::FFXIVIpcHousingEstateGreeting >( player.getId() );
+
+      estateGreetingPacket->data().landIdent.landId = land->getLandId();
+      estateGreetingPacket->data().landIdent.wardNum = land->getWardNum();
+      estateGreetingPacket->data().landIdent.worldId = 67;
+      estateGreetingPacket->data().landIdent.territoryTypeId = land->getTerritoryTypeId();
+      memcpy( &estateGreetingPacket->data().message, house->getHouseGreeting().c_str(), sizeof( estateGreetingPacket->data().message ) );
+
+      player.queuePacket( estateGreetingPacket );
 
       break;
     }

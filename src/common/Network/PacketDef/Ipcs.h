@@ -304,6 +304,7 @@ namespace Core::Network::Packets
     LinkshellEventHandler1 = 0x1151, // updated 4.1 ??
 
     LandRenameHandler = 0x0171, // updated 4.4
+    LandChangeEstateMessageHandler = 0x0172, // updated 4.4
 
     SetSharedEstateSettings = 0x0177, // updated 4.4
 

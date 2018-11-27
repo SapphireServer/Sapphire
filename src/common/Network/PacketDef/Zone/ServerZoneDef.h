@@ -1730,10 +1730,7 @@ struct FFXIVIpcHousingWardInfo : FFXIVIpcBasePacket< HousingWardInfo >
 
 struct FFXIVIpcHousingEstateGreeting : FFXIVIpcBasePacket< HousingEstateGreeting >
 {
-  uint8_t plotId;
-  uint8_t pad[3]; // unsure
-  uint16_t territoryTypeId;
-  uint16_t unk;
+  Common::LandIdent landIdent;
   char message[200];
 };
 
