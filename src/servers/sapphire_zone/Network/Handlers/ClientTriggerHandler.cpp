@@ -13,6 +13,7 @@
 #include "Zone/HousingZone.h"
 #include "Zone/HousingMgr.h"
 #include "Zone/Land.h"
+#include "Zone/House.h"
 
 #include "Network/GameConnection.h"
 
@@ -365,7 +366,7 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
     case ClientTriggerType::RequestEstateRename:
     {
       // removed temporarly, there is no such thing as a LandName
-/*      auto landRenamePacket = makeZonePacket< Server::FFXIVIpcLandRename >( player.getId() );
+      auto landRenamePacket = makeZonePacket< Server::FFXIVIpcLandRename >( player.getId() );
 
       uint8_t ward = ( param12 & 0xFF00 ) >> 8;
       uint8_t plot = ( param12 & 0xFF );
@@ -382,13 +383,17 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
         land = pHousingMgr->getLandByOwnerId( player.getId() );
       }
 
-      landRenamePacket->data().landId = land->getLandId();
-      landRenamePacket->data().wardNum = land->getWardNum();
-      landRenamePacket->data().worldId = 67;
-      landRenamePacket->data().zoneId = land->getZoneId();
-      memcpy( &landRenamePacket->data().landName, land->getLandName().c_str(), 20 );
+      auto house = land->getHouse();
+      if( !house )
+        break;
 
-      player.queuePacket( landRenamePacket ); */
+      landRenamePacket->data().landIdent.landId = land->getLandId();
+      landRenamePacket->data().landIdent.wardNum = land->getWardNum();
+      landRenamePacket->data().landIdent.worldId = 67;
+      landRenamePacket->data().landIdent.territoryTypeId = land->getTerritoryTypeId();
+      memcpy( &landRenamePacket->data().houseName, house->getHouseName().c_str(), 20 );
+
+      player.queuePacket( landRenamePacket );
 
       break;
     }

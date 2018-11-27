@@ -20,6 +20,7 @@
 #include "Zone/HousingMgr.h"
 #include "Zone/Land.h"
 #include "Zone/ZonePosition.h"
+#include "Zone/House.h"
 
 #include "Network/PacketWrappers/InitUIPacket.h"
 #include "Network/PacketWrappers/PingPacket.h"
@@ -664,8 +665,20 @@ void Core::Network::GameConnection::landRenameHandler( const Core::Network::Pack
   if( !pLand )
     return;
 
-  // TODO set estate name
-  //pLand->setLandName( packet.data().landName );
+  // todo: check perms for fc houses and shit
+  if( pLand->getPlayerOwner() != player.getId() )
+    return;
+
+  auto pHouse = pLand->getHouse();
+  if( pHouse )
+    pHouse->setHouseName( packet.data().houseName );
+
+  // todo: this packet is weird, retail sends it with some unknown shit at the start but it doesn't seem to do anything
+  auto nameUpdatePacket = makeZonePacket< Server::FFXIVIpcLandUpdateHouseName >( player.getId() );
+  memcpy( &nameUpdatePacket->data().houseName, &packet.data().houseName, sizeof( packet.data().houseName ) );
+
+  // todo: who does this get sent to? just the person who renamed it?
+  player.queuePacket( nameUpdatePacket );
 }
 
 void Core::Network::GameConnection::buildPresetHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,

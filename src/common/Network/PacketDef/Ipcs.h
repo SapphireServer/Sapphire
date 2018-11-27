@@ -204,6 +204,8 @@ namespace Core::Network::Packets
 
     SharedEstateSettingsResponse = 0x023C, // updated 4.4
 
+    LandUpdateHouseName = 0x024D, // updated 4.4
+
     LandSetMap = 0x0251, // updated 4.4
 
     //////////////////////////////////////////////////

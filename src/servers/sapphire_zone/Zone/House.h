@@ -26,10 +26,10 @@ namespace Core
     uint32_t getHouseId() const;
 
     const std::string& getHouseName() const;
-    void setHouseName( std::string& name );
+    void setHouseName( const std::string& name );
 
     const std::string& getHouseGreeting() const;
-    void setHouseGreeting( std::string& greeting );
+    void setHouseGreeting( const std::string& greeting );
 
     //functions
     void setHousePart( Common::HousePartSlot slot, uint32_t id );
