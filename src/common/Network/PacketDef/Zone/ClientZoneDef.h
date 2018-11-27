@@ -203,7 +203,7 @@ struct FFXIVIpcRenameLandHandler :
   /* 0002 */ uint16_t wardNum;
   /* 0004 */ uint16_t zoneId;
   /* 0006 */ uint16_t worldId;
-  /* 0008 */ char landName[20];
+  /* 0008 */ char houseName[20];
   /* 0028 */ uint32_t padding;
 };
 

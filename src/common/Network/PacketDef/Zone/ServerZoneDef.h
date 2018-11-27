@@ -1640,8 +1640,15 @@ struct FFXIVIpcLandInfoSign : FFXIVIpcBasePacket< LandInfoSign >
 struct FFXIVIpcLandRename : FFXIVIpcBasePacket< LandRename >
 {
   Common::LandIdent landIdent;
-  char landName[20];
+  char houseName[20];
   uint32_t padding;
+};
+
+struct FFXIVIpcLandUpdateHouseName : FFXIVIpcBasePacket< LandUpdateHouseName >
+{
+  uint32_t unknown[3];
+  char houseName[20];
+  uint32_t unknown2[2];
 };
 
 struct FFXIVIpcLandSetMap : FFXIVIpcBasePacket< LandSetMap >

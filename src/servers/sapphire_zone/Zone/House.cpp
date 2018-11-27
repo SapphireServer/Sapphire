@@ -156,3 +156,17 @@ const std::string& Core::House::getHouseGreeting() const
 {
   return m_estateMessage;
 }
+
+void Core::House::setHouseGreeting( const std::string& greeting )
+{
+  m_estateMessage = greeting;
+
+  updateHouseDb();
+}
+
+void Core::House::setHouseName( const std::string& name )
+{
+  m_houseName = name;
+
+  updateHouseDb();
+}
