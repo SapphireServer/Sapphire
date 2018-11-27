@@ -17,7 +17,8 @@ bool Core::ConfigMgr::loadConfig( const std::string& configName )
 
   if( !fs::exists( configFile ) )
   {
-    copyDefaultConfig( configName );
+    if( !copyDefaultConfig( configName ) )
+      return false;
   }
 
   m_pInih = std::unique_ptr< INIReader >( new INIReader( configFile.string() ) );
