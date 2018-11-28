@@ -768,7 +768,7 @@ namespace Core::Entity
     void setLandFlags( uint8_t permissionSet, uint32_t landFlags, int16_t landId, int16_t wardNum, int16_t zoneId );
 
     void sendLandFlags();
-    void sendLandFlagsSlot( Common::LandStateSlot slot );
+    void sendLandFlagsSlot( Common::LandFlagsSlot slot );
 
     // Player Battle Handling
     //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1027,7 +1027,7 @@ namespace Core::Entity
     uint8_t m_searchSelectClass; // class selected to show up in profile
 
     // housing info
-    Common::LandFlagSet m_landPermission[5];
+    Common::LandFlagSet m_landFlags[5];
 
     Common::ActiveLand m_activeLand;
 

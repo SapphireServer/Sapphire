@@ -167,10 +167,10 @@ Core::LandPurchaseResult Core::HousingMgr::purchaseLand( Entity::Player& player,
       pLand->setState( HouseState::sold );
       pLand->setLandType( Common::LandType::Private );
 
-      player.setLandFlags( LandStateSlot::Private, 0x00, plot,
+      player.setLandFlags( LandFlagsSlot::Private, 0x00, plot,
                                  pHousing->getWardNum(), pHousing->getTerritoryTypeId() );
 
-      player.sendLandFlagsSlot( LandStateSlot::Private );
+      player.sendLandFlagsSlot( LandFlagsSlot::Private );
 
       //pLand->setLandName( "Private Estate" + std::to_string( pHousing->getWardNum() ) + "-" + std::to_string( plot )   );
       pLand->updateLandDb();
@@ -219,9 +219,9 @@ bool Core::HousingMgr::relinquishLand( Entity::Player& player, uint8_t plot )
   pLand->setLandType( Common::LandType::none );
   pLand->updateLandDb();
 
-  player.setLandFlags( LandStateSlot::Private, 0x00, 0xFF, 0xFF, 0xFF );
+  player.setLandFlags( LandFlagsSlot::Private, 0x00, 0xFF, 0xFF, 0xFF );
 
-  player.sendLandFlagsSlot( LandStateSlot::Private );
+  player.sendLandFlagsSlot( LandFlagsSlot::Private );
 
   auto screenMsgPkt2 = makeActorControl143( player.getId(), ActorControl::LogMsg, 3351, 0x1AA,
                                             pLand->getWardNum() + 1, plot + 1 );
@@ -319,8 +319,8 @@ void Core::HousingMgr::buildPresetEstate( Entity::Player& player, uint8_t plotNu
   // todo: wtf are these flags
   player.playScene( 0x000B0095, 0, 4164955899, 0, 1, plotNum, nullptr );
 
-  player.setLandFlags( LandStateSlot::Private, ESTATE_BUILT, pLand->getLandId(), pLand->getWardNum(), pLand->getTerritoryTypeId() );
-  player.sendLandFlagsSlot( LandStateSlot::Private );
+  player.setLandFlags( LandFlagsSlot::Private, ESTATE_BUILT, pLand->getLandId(), pLand->getWardNum(), pLand->getTerritoryTypeId() );
+  player.sendLandFlagsSlot( LandFlagsSlot::Private );
 }
 
 void Core::HousingMgr::requestEstateRename( Entity::Player& player, uint16_t territoryTypeId, uint16_t worldId, uint8_t wardId, uint8_t plotId )
@@ -397,5 +397,6 @@ void Core::HousingMgr::updateEstateGreeting( Entity::Player& player, const Commo
 
   house->setHouseGreeting( greeting );
 
+  // Greeting updated.
   player.sendLogMessage( 3381 );
 }
