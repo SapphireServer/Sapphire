@@ -319,7 +319,7 @@ void Core::HousingMgr::buildPresetEstate( Entity::Player& player, uint8_t plotNu
   // todo: wtf are these flags
   player.playScene( 0x000B0095, 0, 4164955899, 0, 1, plotNum, nullptr );
 
-  player.setLandFlags( LandFlagsSlot::Private, ESTATE_BUILT, pLand->getLandId(), pLand->getWardNum(), pLand->getTerritoryTypeId() );
+  player.setLandFlags( LandFlagsSlot::Private, EstateBuilt, pLand->getLandId(), pLand->getWardNum(), pLand->getTerritoryTypeId() );
   player.sendLandFlagsSlot( LandFlagsSlot::Private );
 }
 
