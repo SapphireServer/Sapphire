@@ -365,7 +365,7 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
       uint16_t territoryTypeId = param11 & 0xFFFF;
       uint16_t worldId = param11 >> 16;
 
-      uint8_t ward = ( param12 & 0xFF00 ) >> 8;
+      uint8_t ward = ( param12 >> 16 ) & 0xFF;
       uint8_t plot = ( param12 & 0xFF );
 
       auto pHousingMgr = g_fw.get< HousingMgr >();
@@ -381,7 +381,7 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
       uint16_t territoryTypeId = param11 & 0xFFFF;
       uint16_t worldId = param11 >> 16;
 
-      uint8_t ward = ( param12 & 0xFF00 ) >> 8;
+      uint8_t ward = ( param12 >> 16 ) & 0xFF;
       uint8_t plot = ( param12 & 0xFF );
 
       auto pHousingMgr = g_fw.get< HousingMgr >();
@@ -397,7 +397,7 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
       uint16_t territoryTypeId = param11 & 0xFFFF;
       uint16_t worldId = param11 >> 16;
 
-      uint8_t ward = ( param12 & 0xFF00 ) >> 8;
+      uint8_t ward = ( param12 >> 16 ) & 0xFF;
       uint8_t plot = ( param12 & 0xFF );
 
       auto pHousingMgr = g_fw.get< HousingMgr >();

@@ -776,8 +776,8 @@ namespace Core::Common
 
   enum LandFlags : uint32_t
   {
-    ESTATE_BUILT = 0x1,
-    ESTATE_HAS_AETHERYTE = 0x2,
+    EstateBuilt = 0x1,
+    HasAetheryte = 0x2,
     UNKNOWN_1 = 0x4,
     UNKNOWN_2 = 0x8,
     UNKNOWN_3 = 0x10,

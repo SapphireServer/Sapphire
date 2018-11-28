@@ -1597,10 +1597,10 @@ void Core::Entity::Player::sendZonePackets()
 
     if( pLand->getHouse() )
     {
-      state |= ESTATE_BUILT;
+      state |= EstateBuilt;
 
       // todo: remove this, debug for now
-      state |= ESTATE_HAS_AETHERYTE;
+      state |= HasAetheryte;
     }
 
     setLandFlags( LandFlagsSlot::Private, state, pLand->getLandId(), pLand->getWardNum(), pLand->getTerritoryTypeId() );
