@@ -658,10 +658,15 @@ void Core::Network::GameConnection::landRenameHandler( const Core::Network::Pack
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcRenameLandHandler >( inPacket );
 
-  uint32_t landSetId = ( static_cast< uint32_t >( packet.data().zoneId ) << 16 ) | packet.data().wardNum;
   auto pHousingMgr = g_fw.get< HousingMgr >();
-  auto pLand = pHousingMgr->getHousingZoneByLandSetId( landSetId )->getLand( packet.data().landId );
 
+  auto landSetId = pHousingMgr->toLandSetId( packet.data().ident.territoryTypeId, packet.data().ident.wardNum );
+
+  auto pZone = pHousingMgr->getHousingZoneByLandSetId( landSetId );
+  if( !pZone )
+    return;
+
+  auto pLand = pZone->getLand( packet.data().ident.landId );
   if( !pLand )
     return;
 
@@ -688,4 +693,14 @@ void Core::Network::GameConnection::buildPresetHandler( const Core::Network::Pac
 
   auto pHousingMgr = g_fw.get< HousingMgr >();
   pHousingMgr->buildPresetEstate( player, packet.data().plotNum, packet.data().itemId );
+}
+
+void Core::Network::GameConnection::housingUpdateGreetingHandler( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
+  Entity::Player& player )
+{
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcHousingUpdateHouseGreeting >( inPacket );
+
+  auto pHousingMgr = g_fw.get< HousingMgr >();
+
+  pHousingMgr->updateEstateGreeting( player, packet.data().ident, std::string( packet.data().greeting ) );
 }

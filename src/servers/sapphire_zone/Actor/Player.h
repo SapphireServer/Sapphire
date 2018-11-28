@@ -757,6 +757,8 @@ namespace Core::Entity
 
     void sendDebug( const std::string& message );
 
+    void sendLogMessage( uint32_t messageId, uint32_t param2 = 0, uint32_t param3 = 0, uint32_t param4 = 0, uint32_t param5 = 0, uint32_t param6 = 0 );
+
     bool isDirectorInitialized() const;
 
     void setDirectorInitialized( bool isInitialized );
