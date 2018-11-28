@@ -322,3 +322,55 @@ void Core::HousingMgr::buildPresetEstate( Entity::Player& player, uint8_t plotNu
   player.setLandFlags( LandStateSlot::Private, ESTATE_BUILT, pLand->getLandId(), pLand->getWardNum(), pLand->getTerritoryTypeId() );
   player.sendLandFlagsSlot( LandStateSlot::Private );
 }
+
+void Core::HousingMgr::requestEstateRename( Entity::Player& player, uint16_t territoryTypeId, uint16_t worldId, uint8_t wardId, uint8_t plotId )
+{
+  auto landSetId = toLandSetId( territoryTypeId, wardId );
+  auto hZone = getHousingZoneByLandSetId( landSetId );
+
+  if( !hZone )
+    return;
+
+  auto land = hZone->getLand( plotId );
+
+  auto house = land->getHouse();
+  if( !house )
+    return;
+
+  auto landRenamePacket = makeZonePacket< Server::FFXIVIpcLandRename >( player.getId() );
+
+  landRenamePacket->data().landIdent.landId = land->getLandId();
+  landRenamePacket->data().landIdent.wardNum = land->getWardNum();
+  landRenamePacket->data().landIdent.worldId = 67;
+  landRenamePacket->data().landIdent.territoryTypeId = land->getTerritoryTypeId();
+  memcpy( &landRenamePacket->data().houseName, house->getHouseName().c_str(), 20 );
+
+  player.queuePacket( landRenamePacket );
+}
+
+void Core::HousingMgr::requestEstateEditGreeting( Entity::Player& player, uint16_t territoryTypeId, uint16_t worldId, uint8_t wardId, uint8_t plotId )
+{
+  auto landSetId = toLandSetId( territoryTypeId, wardId );
+  auto hZone = getHousingZoneByLandSetId( landSetId );
+
+  if( !hZone )
+    return;
+
+  auto land = hZone->getLand( plotId );
+  if( !land )
+    return;
+
+  auto house = land->getHouse();
+  if( !house )
+    return;
+
+  auto estateGreetingPacket = makeZonePacket< Server::FFXIVIpcHousingEstateGreeting >( player.getId() );
+
+  estateGreetingPacket->data().landIdent.landId = land->getLandId();
+  estateGreetingPacket->data().landIdent.wardNum = land->getWardNum();
+  estateGreetingPacket->data().landIdent.worldId = 67;
+  estateGreetingPacket->data().landIdent.territoryTypeId = land->getTerritoryTypeId();
+  memcpy( &estateGreetingPacket->data().message, house->getHouseGreeting().c_str(), sizeof( estateGreetingPacket->data().message ) );
+
+  player.queuePacket( estateGreetingPacket );
+}
