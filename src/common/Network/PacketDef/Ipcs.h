@@ -216,7 +216,9 @@ namespace Core::Network::Packets
 
     // Unknown IPC types that still need to be sent
     // TODO: figure all these out properly
+    // Quests related op codes
     IPCTYPE_UNK_320 = 0x0249, // updated 4.4
+    IPCTYPE_UPDATE_320 = 0x024A, // updated 4.4
     IPCTYPE_UNK_322 = 0x024B, // updated 4.4
 
   };

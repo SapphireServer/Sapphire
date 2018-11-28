@@ -24,6 +24,7 @@ namespace Core
     uint8_t getWardNum() const;
     uint16_t getTerritoryTypeId() const;
     uint32_t getHouseId() const;
+    Common::FFXIVARR_POSITION3 getDoorPosition() const;
 
     //functions
     void setHousePart( Common::HousePartSlot slot, uint32_t id );
@@ -48,6 +49,8 @@ namespace Core
 
     std::string m_estateMessage;
     std::string m_houseName;
+
+    Common::FFXIVARR_POSITION3 m_doorPosition;
   };
 
 }

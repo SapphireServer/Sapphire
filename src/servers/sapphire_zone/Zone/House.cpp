@@ -52,6 +52,16 @@ Core::House::House( uint32_t houseId, uint32_t landSetId, uint8_t landId, uint8_
       m_houseParts[ i ] = { models[ i ], colours[ i ] };
     }
   }
+
+  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto mapMarker = pExdData->get< Core::Data::HousingMapMarkerInfo >( getTerritoryTypeId(), getLandId() );
+
+  if( mapMarker )
+  {
+    m_doorPosition.x = mapMarker->x;
+    m_doorPosition.y = mapMarker->y;
+    m_doorPosition.z = mapMarker->z;
+  }
 }
 
 Core::House::~House()
@@ -118,6 +128,11 @@ uint16_t Core::House::getTerritoryTypeId() const
 uint32_t Core::House::getHouseId() const
 {
   return m_houseId;
+}
+
+Core::Common::FFXIVARR_POSITION3 Core::House::getDoorPosition() const
+{
+  return m_doorPosition;
 }
 
 uint8_t Core::House::getHousePartColor( Common::HousePartSlot slot ) const

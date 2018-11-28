@@ -2909,6 +2909,9 @@ Core::Data::HousingFurniture::HousingFurniture( uint32_t row_id, Core::Data::Exd
 Core::Data::HousingMapMarkerInfo::HousingMapMarkerInfo( uint32_t row_id, uint32_t subRow, Core::Data::ExdDataGenerated* exdData )
 {
    auto row = exdData->m_HousingMapMarkerInfoDat.get_row( row_id, subRow );
+   x = exdData->getField< float >( row, 0 );
+   y = exdData->getField< float >( row, 1 );
+   z = exdData->getField< float >( row, 2 );
    map = exdData->getField< uint16_t >( row, 4 );
 }
 
