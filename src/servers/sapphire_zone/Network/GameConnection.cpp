@@ -85,6 +85,9 @@ Core::Network::GameConnection::GameConnection( Core::Network::HivePtr pHive,
 
   setZoneHandler( ClientZoneIpcType::BuildPresetHandler, "BuildPresetHandler", &GameConnection::buildPresetHandler );
   setZoneHandler( ClientZoneIpcType::LandRenameHandler, "LandRenameHandler", &GameConnection::landRenameHandler );
+  setZoneHandler( ClientZoneIpcType::HousingUpdateHouseGreeting, "HousingUpdateHouseGreeting",
+                  &GameConnection::housingUpdateGreetingHandler );
+
   setZoneHandler( ClientZoneIpcType::TalkEventHandler, "EventHandlerTalk", &GameConnection::eventHandlerTalk );
   setZoneHandler( ClientZoneIpcType::EmoteEventHandler, "EventHandlerEmote", &GameConnection::eventHandlerEmote );
   setZoneHandler( ClientZoneIpcType::WithinRangeEventHandler, "EventHandlerWithinRange",
@@ -225,7 +228,7 @@ void Core::Network::GameConnection::handleZonePacket( Core::Network::Packets::FF
   else
   {
     pLog->debug( sessionStr + " Undefined Zone IPC : Unknown ( " +
-		 Util::intToHexString( static_cast< uint32_t >( opcode ), 4 ) + " )" );    
+		 Util::intToHexString( static_cast< uint32_t >( opcode ), 4 ) + " )" );
     pLog->debug(
       "Dump:\n" + Util::binaryToHexDump( const_cast< uint8_t* >( &pPacket.data[ 0 ] ), pPacket.segHdr.size ) );
   }

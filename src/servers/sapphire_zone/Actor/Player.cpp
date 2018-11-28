@@ -1290,6 +1290,12 @@ void Core::Entity::Player::sendDebug( const std::string& message ) //Grey Text
   queuePacket( std::make_shared< ChatPacket >( *getAsPlayer(), ChatType::ServerDebug, message ) );
 }
 
+void Core::Entity::Player::sendLogMessage( uint32_t messageId, uint32_t param2, uint32_t param3,
+                                           uint32_t param4, uint32_t param5, uint32_t param6 )
+{
+  queuePacket( makeActorControl144( getId(), ActorControlType::LogMsg, messageId, param2, param3, param4, param5, param6 ) );
+}
+
 void Core::Entity::Player::updateHowtosSeen( uint32_t howToId )
 {
   uint8_t index = howToId / 8;

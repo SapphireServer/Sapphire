@@ -199,12 +199,16 @@ struct FFXIVIpcInventoryModifyHandler :
 struct FFXIVIpcRenameLandHandler :
   FFXIVIpcBasePacket< LandRenameHandler >
 {
-  /* 0000 */ uint16_t landId;
-  /* 0002 */ uint16_t wardNum;
-  /* 0004 */ uint16_t zoneId;
-  /* 0006 */ uint16_t worldId;
+  /* 0000 */ Common::LandIdent ident;
   /* 0008 */ char houseName[20];
   /* 0028 */ uint32_t padding;
+};
+
+struct FFXIVIpcHousingUpdateHouseGreeting :
+  FFXIVIpcBasePacket< HousingUpdateHouseGreeting >
+{
+  /* 0000 */ Common::LandIdent ident;
+  /* 0008 */ char greeting[200];
 };
 
 struct FFXIVIpcBuildPresetHandler :

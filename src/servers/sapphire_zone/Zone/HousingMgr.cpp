@@ -374,3 +374,28 @@ void Core::HousingMgr::requestEstateEditGreeting( Entity::Player& player, uint16
 
   player.queuePacket( estateGreetingPacket );
 }
+
+void Core::HousingMgr::updateEstateGreeting( Entity::Player& player, const Common::LandIdent& ident, const std::string& greeting )
+{
+  auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
+  auto zone = getHousingZoneByLandSetId( landSetId );
+
+  if( !zone )
+    return;
+
+  auto land = zone->getLand( ident.landId );
+  if( !land )
+    return;
+
+  // todo: implement proper permissions checks
+  if( land->getPlayerOwner() != player.getId() )
+    return;
+
+  auto house = land->getHouse();
+  if( !house )
+    return;
+
+  house->setHouseGreeting( greeting );
+
+  player.sendLogMessage( 3381 );
+}
