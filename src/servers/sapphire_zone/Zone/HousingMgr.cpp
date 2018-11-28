@@ -9,6 +9,7 @@
 #include <Network/CommonActorControl.h>
 
 #include <unordered_map>
+#include <cstring>
 
 #include "Actor/Player.h"
 
@@ -19,6 +20,7 @@
 #include "Land.h"
 #include "Framework.h"
 #include "ServerMgr.h"
+#include "House.h"
 
 using namespace Core::Common;
 using namespace Core::Network;
@@ -97,7 +99,15 @@ void Core::HousingMgr::sendLandSignOwned( Entity::Player& player, uint8_t wardId
   landInfoSignPacket->data().landIdent.wardNum = land->getWardNum();
   landInfoSignPacket->data().landIdent.worldId = 67;
   landInfoSignPacket->data().landIdent.territoryTypeId = land->getTerritoryTypeId();
+  landInfoSignPacket->data().houseIconAdd = land->getSharing();
   landInfoSignPacket->data().ownerId = player.getContentId(); // should be real owner contentId, not player.contentId()
+
+  if( auto house = land->getHouse() )
+  {
+    std::strcpy( landInfoSignPacket->data().estateName, house->getHouseName().c_str() );
+    std::strcpy( landInfoSignPacket->data().estateGreeting, house->getHouseGreeting().c_str() );
+  }
+
   memcpy( &landInfoSignPacket->data().ownerName, playerName.c_str(), playerName.size() );
 
   player.queuePacket( landInfoSignPacket );
@@ -157,11 +167,10 @@ Core::LandPurchaseResult Core::HousingMgr::purchaseLand( Entity::Player& player,
       pLand->setState( HouseState::sold );
       pLand->setLandType( Common::LandType::Private );
 
-      player.setLandPermissions( LandPermissionSlot::Private, 0x00, plot,
+      player.setLandFlags( LandFlagsSlot::Private, 0x00, plot,
                                  pHousing->getWardNum(), pHousing->getTerritoryTypeId() );
 
-      player.sendLandPermissionSlot( static_cast< uint8_t >( LandType::Private ), plot, pHousing->getWardNum(),
-                                     pHousing->getTerritoryTypeId() );
+      player.sendLandFlagsSlot( LandFlagsSlot::Private );
 
       //pLand->setLandName( "Private Estate" + std::to_string( pHousing->getWardNum() ) + "-" + std::to_string( plot )   );
       pLand->updateLandDb();
@@ -210,9 +219,9 @@ bool Core::HousingMgr::relinquishLand( Entity::Player& player, uint8_t plot )
   pLand->setLandType( Common::LandType::none );
   pLand->updateLandDb();
 
-  player.setLandPermissions( LandPermissionSlot::Private, 0x00, 0xFF, 0xFF, 0xFF );
+  player.setLandFlags( LandFlagsSlot::Private, 0x00, 0xFF, 0xFF, 0xFF );
 
-  player.sendLandPermissionSlot( static_cast< uint8_t >( LandType::Private ), 0xFF, 0xFF, 0xFF );
+  player.sendLandFlagsSlot( LandFlagsSlot::Private );
 
   auto screenMsgPkt2 = makeActorControl143( player.getId(), ActorControl::LogMsg, 3351, 0x1AA,
                                             pLand->getWardNum() + 1, plot + 1 );
@@ -251,14 +260,14 @@ void Core::HousingMgr::sendWardLandInfo( Entity::Player& player, uint8_t wardId,
     switch( land->getLandType() )
     {
       case LandType::FreeCompany:
-        entry.infoFlags = Common::WardEstateFlags::IsEstateOwned | Common::WardEstateFlags::IsFreeCompanyEstate;
+        entry.infoFlags = Common::WardlandFlags::IsEstateOwned | Common::WardlandFlags::IsFreeCompanyEstate;
 
         // todo: send FC name
 
         break;
 
       case LandType::Private:
-        entry.infoFlags = Common::WardEstateFlags::IsEstateOwned;
+        entry.infoFlags = Common::WardlandFlags::IsEstateOwned;
 
         auto owner = land->getPlayerOwner();
         std::string playerName = g_fw.get< Core::ServerMgr >()->getPlayerNameFromDb( owner );
@@ -310,5 +319,110 @@ void Core::HousingMgr::buildPresetEstate( Entity::Player& player, uint8_t plotNu
   // todo: wtf are these flags
   player.playScene( 0x000B0095, 0, 4164955899, 0, 1, plotNum, nullptr );
 
-  // todo: send perms/flags for house
+  player.setLandFlags( LandFlagsSlot::Private, ESTATE_BUILT, pLand->getLandId(), pLand->getWardNum(), pLand->getTerritoryTypeId() );
+  player.sendLandFlagsSlot( LandFlagsSlot::Private );
+}
+
+void Core::HousingMgr::requestEstateRename( Entity::Player& player, uint16_t territoryTypeId, uint16_t worldId, uint8_t wardId, uint8_t plotId )
+{
+  auto landSetId = toLandSetId( territoryTypeId, wardId );
+  auto hZone = getHousingZoneByLandSetId( landSetId );
+
+  if( !hZone )
+    return;
+
+  auto land = hZone->getLand( plotId );
+
+  auto house = land->getHouse();
+  if( !house )
+    return;
+
+  auto landRenamePacket = makeZonePacket< Server::FFXIVIpcLandRename >( player.getId() );
+
+  landRenamePacket->data().landIdent.landId = land->getLandId();
+  landRenamePacket->data().landIdent.wardNum = land->getWardNum();
+  landRenamePacket->data().landIdent.worldId = 67;
+  landRenamePacket->data().landIdent.territoryTypeId = land->getTerritoryTypeId();
+  memcpy( &landRenamePacket->data().houseName, house->getHouseName().c_str(), 20 );
+
+  player.queuePacket( landRenamePacket );
+}
+
+void Core::HousingMgr::requestEstateEditGreeting( Entity::Player& player, uint16_t territoryTypeId, uint16_t worldId, uint8_t wardId, uint8_t plotId )
+{
+  auto landSetId = toLandSetId( territoryTypeId, wardId );
+  auto hZone = getHousingZoneByLandSetId( landSetId );
+
+  if( !hZone )
+    return;
+
+  auto land = hZone->getLand( plotId );
+  if( !land )
+    return;
+
+  auto house = land->getHouse();
+  if( !house )
+    return;
+
+  auto estateGreetingPacket = makeZonePacket< Server::FFXIVIpcHousingEstateGreeting >( player.getId() );
+
+  estateGreetingPacket->data().landIdent.landId = land->getLandId();
+  estateGreetingPacket->data().landIdent.wardNum = land->getWardNum();
+  estateGreetingPacket->data().landIdent.worldId = 67;
+  estateGreetingPacket->data().landIdent.territoryTypeId = land->getTerritoryTypeId();
+  memcpy( &estateGreetingPacket->data().message, house->getHouseGreeting().c_str(), sizeof( estateGreetingPacket->data().message ) );
+
+  player.queuePacket( estateGreetingPacket );
+}
+
+void Core::HousingMgr::updateEstateGreeting( Entity::Player& player, const Common::LandIdent& ident, const std::string& greeting )
+{
+  auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
+  auto zone = getHousingZoneByLandSetId( landSetId );
+
+  if( !zone )
+    return;
+
+  auto land = zone->getLand( ident.landId );
+  if( !land )
+    return;
+
+  // todo: implement proper permissions checks
+  if( land->getPlayerOwner() != player.getId() )
+    return;
+
+  auto house = land->getHouse();
+  if( !house )
+    return;
+
+  house->setHouseGreeting( greeting );
+
+  // Greeting updated.
+  player.sendLogMessage( 3381 );
+}
+
+void Core::HousingMgr::requestEstateEditGuestAccess( Entity::Player& player, uint16_t territoryTypeId, uint16_t worldId, uint8_t wardId, uint8_t plotId )
+{
+  auto landSetId = toLandSetId( territoryTypeId, wardId );
+  auto hZone = getHousingZoneByLandSetId( landSetId );
+
+  if( !hZone )
+    return;
+
+  auto land = hZone->getLand( plotId );
+  if( !land )
+    return;
+
+  // todo: add proper permission check
+  if( land->getPlayerOwner() != player.getId() )
+    return;
+
+  auto packet = makeZonePacket< FFXIVIpcHousingShowEstateGuestAccess >( player.getId() );
+
+  packet->data().ident.landId = plotId;
+  packet->data().ident.territoryTypeId = territoryTypeId;
+  packet->data().ident.wardNum = wardId;
+  packet->data().ident.worldId = worldId;
+
+  player.queuePacket( packet );
 }

@@ -10,9 +10,7 @@
 
 #include "Zone/Zone.h"
 #include "Zone/ZonePosition.h"
-#include "Zone/HousingZone.h"
 #include "Zone/HousingMgr.h"
-#include "Zone/Land.h"
 
 #include "Network/GameConnection.h"
 
@@ -364,31 +362,49 @@ void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVAR
     }
     case ClientTriggerType::RequestEstateRename:
     {
-      // removed temporarly, there is no such thing as a LandName
-/*      auto landRenamePacket = makeZonePacket< Server::FFXIVIpcLandRename >( player.getId() );
+      uint16_t territoryTypeId = param11 & 0xFFFF;
+      uint16_t worldId = param11 >> 16;
 
       uint8_t ward = ( param12 & 0xFF00 ) >> 8;
       uint8_t plot = ( param12 & 0xFF );
 
-      auto zone = player.getCurrentZone();
+      auto pHousingMgr = g_fw.get< HousingMgr >();
+      if( !pHousingMgr )
+        break;
 
-      auto hZone = std::dynamic_pointer_cast< HousingZone >( zone );
+      pHousingMgr->requestEstateRename( player, territoryTypeId, worldId, ward, plot );
 
-      auto land = hZone->getLand( plot );
+      break;
+    }
+    case ClientTriggerType::RequestEstateEditGreeting:
+    {
+      uint16_t territoryTypeId = param11 & 0xFFFF;
+      uint16_t worldId = param11 >> 16;
 
-      if( !land )
-      {
-        auto pHousingMgr = g_fw.get< HousingMgr >();
-        land = pHousingMgr->getLandByOwnerId( player.getId() );
-      }
+      uint8_t ward = ( param12 & 0xFF00 ) >> 8;
+      uint8_t plot = ( param12 & 0xFF );
 
-      landRenamePacket->data().landId = land->getLandId();
-      landRenamePacket->data().wardNum = land->getWardNum();
-      landRenamePacket->data().worldId = 67;
-      landRenamePacket->data().zoneId = land->getZoneId();
-      memcpy( &landRenamePacket->data().landName, land->getLandName().c_str(), 20 );
+      auto pHousingMgr = g_fw.get< HousingMgr >();
+      if( !pHousingMgr )
+        break;
 
-      player.queuePacket( landRenamePacket ); */
+      pHousingMgr->requestEstateEditGreeting( player, territoryTypeId, worldId, ward, plot );
+
+      break;
+    }
+    case ClientTriggerType::RequestEstateEditGuestAccessSettings:
+    {
+      uint16_t territoryTypeId = param11 & 0xFFFF;
+      uint16_t worldId = param11 >> 16;
+
+      uint8_t ward = ( param12 & 0xFF00 ) >> 8;
+      uint8_t plot = ( param12 & 0xFF );
+
+      auto pHousingMgr = g_fw.get< HousingMgr >();
+      if( !pHousingMgr )
+        break;
+
+      pHousingMgr->requestEstateEditGuestAccess( player, territoryTypeId, worldId, ward, plot );
 
       break;
     }

@@ -35,6 +35,9 @@ Core::House::House( uint32_t houseId, uint32_t landSetId, uint8_t landId, uint8_
     stmt->setUInt( 2, m_houseId );
 
     pDB->execute( stmt );
+
+    // todo: make this nicer/configurable?
+    m_houseName = "Estate #" + std::to_string( landId + 1 );
   }
   else
   {
@@ -45,11 +48,10 @@ Core::House::House( uint32_t houseId, uint32_t landSetId, uint8_t landId, uint8_
     auto housePartColours = res->getBlobVector( "HousePartColours" );
 
     auto models = reinterpret_cast< uint32_t* >( &housePartModels[ 0 ] );
-    auto colours = &housePartColours[ 0 ];
 
     for( auto i = 0; i < 8; i++ )
     {
-      m_houseParts[ i ] = { models[ i ], colours[ i ] };
+      m_houseParts[ i ] = { models[ i ], housePartColours[ i ] };
     }
   }
 }
@@ -143,4 +145,28 @@ uint32_t Core::House::getHousePart( Common::HousePartSlot slot ) const
 Core::House::HousePartsArray const& Core::House::getHouseParts() const
 {
   return m_houseParts;
+}
+
+const std::string& Core::House::getHouseName() const
+{
+  return m_houseName;
+}
+
+const std::string& Core::House::getHouseGreeting() const
+{
+  return m_estateMessage;
+}
+
+void Core::House::setHouseGreeting( const std::string& greeting )
+{
+  m_estateMessage = greeting;
+
+  updateHouseDb();
+}
+
+void Core::House::setHouseName( const std::string& name )
+{
+  m_houseName = name;
+
+  updateHouseDb();
 }

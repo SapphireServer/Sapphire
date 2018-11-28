@@ -758,7 +758,7 @@ namespace Core::Common
     SubTag2
   };
 
-  enum LandPermissionSlot
+  enum LandFlagsSlot
   {
     FreeCompany,
     Private,
@@ -774,6 +774,15 @@ namespace Core::Common
     Private = 2,
   };
 
+  enum LandFlags : uint32_t
+  {
+    ESTATE_BUILT = 0x1,
+    ESTATE_HAS_AETHERYTE = 0x2,
+    UNKNOWN_1 = 0x4,
+    UNKNOWN_2 = 0x8,
+    UNKNOWN_3 = 0x10,
+  };
+
   struct LandIdent
   {
     int16_t landId; //00
@@ -782,10 +791,10 @@ namespace Core::Common
     int16_t worldId; //06
   };
 
-  struct LandPermissionSet
+  struct LandFlagSet
   {
     LandIdent landIdent;
-    uint32_t permissionMask; //08
+    uint32_t landFlags; //08
     uint32_t unkown1; //12
   };
 
@@ -834,7 +843,7 @@ namespace Core::Common
     Venue = 11,
   };
 
-  enum WardEstateFlags : uint8_t
+  enum WardlandFlags : uint8_t
   {
     IsEstateOwned = 1,
     IsPublicEstate = 2,

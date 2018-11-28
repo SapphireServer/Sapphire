@@ -94,8 +94,8 @@ Core::Entity::Player::Player() :
 
   for ( uint8_t i = 0; i < 5; i++ )
   {
-    memset( &m_landPermission[i], 0xFF, 8 );
-    memset( &m_landPermission[i].permissionMask, 0, 8 );
+    memset( &m_landFlags[i], 0xFF, 8 );
+    memset( &m_landFlags[i].landFlags, 0, 8 );
   }
 
   m_objSpawnIndexAllocator.init( MAX_DISPLAYED_EOBJS );
@@ -1290,6 +1290,12 @@ void Core::Entity::Player::sendDebug( const std::string& message ) //Grey Text
   queuePacket( std::make_shared< ChatPacket >( *getAsPlayer(), ChatType::ServerDebug, message ) );
 }
 
+void Core::Entity::Player::sendLogMessage( uint32_t messageId, uint32_t param2, uint32_t param3,
+                                           uint32_t param4, uint32_t param5, uint32_t param6 )
+{
+  queuePacket( makeActorControl144( getId(), ActorControlType::LogMsg, messageId, param2, param3, param4, param5, param6 ) );
+}
+
 void Core::Entity::Player::updateHowtosSeen( uint32_t howToId )
 {
   uint8_t index = howToId / 8;
@@ -1587,10 +1593,20 @@ void Core::Entity::Player::sendZonePackets()
   auto pHousingMgr = g_fw.get< HousingMgr >();
   if( Core::LandPtr pLand = pHousingMgr->getLandByOwnerId( getId() ) )
   {
-    setLandPermissions( LandPermissionSlot::Private, 0x00, pLand->getLandId(), pLand->getWardNum(), pLand->getTerritoryTypeId() );
+    uint32_t state = 0;
+
+    if( pLand->getHouse() )
+    {
+      state |= ESTATE_BUILT;
+
+      // todo: remove this, debug for now
+      state |= ESTATE_HAS_AETHERYTE;
+    }
+
+    setLandFlags( LandFlagsSlot::Private, state, pLand->getLandId(), pLand->getWardNum(), pLand->getTerritoryTypeId() );
   }
 
-  sendLandPermissions();
+  sendLandFlags();
 
   auto initZonePacket = makeZonePacket< FFXIVIpcInitZone >( getId() );
   initZonePacket->data().zoneId = getCurrentZone()->getTerritoryTypeId();
@@ -1768,47 +1784,53 @@ bool Core::Entity::Player::isOnEnterEventDone() const
   return m_onEnterEventDone;
 }
 
-void Core::Entity::Player::setLandPermissions( uint8_t permissionSet, uint32_t permissionMask,
+void Core::Entity::Player::setLandFlags( uint8_t flagSlot, uint32_t landFlags,
                                                int16_t landId, int16_t wardNum, int16_t zoneId )
 {
-  m_landPermission[ permissionSet ].landIdent.landId = landId;
-  m_landPermission[ permissionSet ].landIdent.wardNum = wardNum;
-  m_landPermission[ permissionSet ].landIdent.territoryTypeId = zoneId;
-  m_landPermission[ permissionSet ].landIdent.worldId = 67;
-  m_landPermission[ permissionSet ].permissionMask = permissionMask;
-  m_landPermission[ permissionSet ].unkown1 = 0;
+  m_landFlags[ flagSlot ].landIdent.landId = landId;
+  m_landFlags[ flagSlot ].landIdent.wardNum = wardNum;
+  m_landFlags[ flagSlot ].landIdent.territoryTypeId = zoneId;
+  m_landFlags[ flagSlot ].landIdent.worldId = 67;
+  m_landFlags[ flagSlot ].landFlags = landFlags;
+  m_landFlags[ flagSlot ].unkown1 = 0;
 }
 
-void Core::Entity::Player::sendLandPermissions()
+void Core::Entity::Player::sendLandFlags()
 {
-  auto landPermissions = makeZonePacket< FFXIVIpcLandPermission >( getId() );
+  auto landFlags = makeZonePacket< FFXIVIpcHousingLandFlags >( getId() );
 
-  landPermissions->data().freeCompanyHouse = m_landPermission[Common::LandPermissionSlot::FreeCompany];
-  landPermissions->data().privateHouse = m_landPermission[Common::LandPermissionSlot::Private];
-  landPermissions->data().apartment = m_landPermission[Common::LandPermissionSlot::Apartment];
-  landPermissions->data().sharedHouse[0] = m_landPermission[Common::LandPermissionSlot::SharedHouse1];
-  landPermissions->data().sharedHouse[1] = m_landPermission[Common::LandPermissionSlot::SharedHouse2];
-  memset( &landPermissions->data().unkownHouse, 0xFF, 8 );
-  memset( &landPermissions->data().unkownHouse.permissionMask, 0, 8 );
-  landPermissions->data().unkownHouse.permissionMask = 2;
-  landPermissions->data().unkown1 = 0;
-  landPermissions->data().unkown2 = 0;
-  landPermissions->data().unkown3 = 0;
-  landPermissions->data().unkown4 = 0;
-  landPermissions->data().unkown5 = 0;
+  landFlags->data().freeCompanyHouse = m_landFlags[ Common::LandFlagsSlot::FreeCompany ];
+  landFlags->data().privateHouse = m_landFlags[ Common::LandFlagsSlot::Private ];
+  landFlags->data().apartment = m_landFlags[ Common::LandFlagsSlot::Apartment ];
+  landFlags->data().sharedHouse[ 0 ] = m_landFlags[ Common::LandFlagsSlot::SharedHouse1 ];
+  landFlags->data().sharedHouse[ 1 ] = m_landFlags[ Common::LandFlagsSlot::SharedHouse2 ];
 
-  queuePacket( landPermissions );
+  queuePacket( landFlags );
 }
 
-void Core::Entity::Player::sendLandPermissionSlot( uint8_t slotId, uint8_t landId, uint8_t wardId, uint16_t zoneId )
+void Core::Entity::Player::sendLandFlagsSlot( Common::LandFlagsSlot slot )
 {
-  auto landPermissions = makeZonePacket< FFXIVIpcLandPermissionSlot >( getId() );
-  landPermissions->data().type = slotId;
+  auto landFlags = makeZonePacket< FFXIVIpcHousingUpdateLandFlagsSlot >( getId() );
 
-  landPermissions->data().permissionSet.landIdent.landId = landId;
-  landPermissions->data().permissionSet.landIdent.wardNum = wardId;
-  landPermissions->data().permissionSet.landIdent.territoryTypeId = zoneId;
-  landPermissions->data().permissionSet.landIdent.worldId = 67;
-  landPermissions->data().permissionSet.permissionMask = 0;
-  queuePacket( landPermissions );
+  uint32_t type = 0;
+
+  switch( slot )
+  {
+    case LandFlagsSlot::Private:
+      type = static_cast< uint32_t >( LandType::Private );
+      break;
+
+    case LandFlagsSlot::FreeCompany:
+      type = static_cast< uint32_t >( LandType::FreeCompany );
+      break;
+
+    default:
+      // todo: other/unsupported land types
+      return;
+  }
+
+  landFlags->data().type = type;
+  landFlags->data().flagSet = m_landFlags[ slot ];
+
+  queuePacket( landFlags );
 }
