@@ -400,3 +400,29 @@ void Core::HousingMgr::updateEstateGreeting( Entity::Player& player, const Commo
   // Greeting updated.
   player.sendLogMessage( 3381 );
 }
+
+void Core::HousingMgr::requestEstateEditGuestAccess( Entity::Player& player, uint16_t territoryTypeId, uint16_t worldId, uint8_t wardId, uint8_t plotId )
+{
+  auto landSetId = toLandSetId( territoryTypeId, wardId );
+  auto hZone = getHousingZoneByLandSetId( landSetId );
+
+  if( !hZone )
+    return;
+
+  auto land = hZone->getLand( plotId );
+  if( !land )
+    return;
+
+  // todo: add proper permission check
+  if( land->getPlayerOwner() != player.getId() )
+    return;
+
+  auto packet = makeZonePacket< FFXIVIpcHousingShowEstateGuestAccess >( player.getId() );
+
+  packet->data().ident.landId = plotId;
+  packet->data().ident.territoryTypeId = territoryTypeId;
+  packet->data().ident.wardNum = wardId;
+  packet->data().ident.worldId = worldId;
+
+  player.queuePacket( packet );
+}

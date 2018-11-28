@@ -195,6 +195,7 @@ namespace Core::Network::Packets
 
     HousingUpdateLandFlagsSlot = 0x0228, // updated 4.4
     HousingLandFlags = 0x0229, // updated 4.4
+    HousingShowEstateGuestAccess = 0x022A, // updated 4.4
 
     LandSetYardInitialize = 0x022C, // updated 4.4
 

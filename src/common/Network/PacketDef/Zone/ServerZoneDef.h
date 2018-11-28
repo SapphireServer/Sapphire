@@ -1734,6 +1734,13 @@ struct FFXIVIpcHousingEstateGreeting : FFXIVIpcBasePacket< HousingEstateGreeting
   char message[200];
 };
 
+struct FFXIVIpcHousingShowEstateGuestAccess :
+  FFXIVIpcBasePacket< HousingShowEstateGuestAccess >
+{
+  uint32_t unknown[2];
+  Common::LandIdent ident;
+};
+
 /**
 * Structural representation of the packet sent by the server
 * to show the current shared estate settings
