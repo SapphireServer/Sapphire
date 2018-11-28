@@ -193,8 +193,8 @@ namespace Core::Network::Packets
 
     HousingEstateGreeting = 0x0227, // updated 4.4
 
-    LandStateSlot = 0x0228, // updated 4.4
-    LandPermission = 0x0229, // updated 4.4
+    HousingUpdateLandFlagsSlot = 0x0228, // updated 4.4
+    HousingLandFlags = 0x0229, // updated 4.4
 
     LandSetYardInitialize = 0x022C, // updated 4.4
 

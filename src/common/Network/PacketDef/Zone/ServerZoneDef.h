@@ -1575,14 +1575,14 @@ struct FFXIVIpcPerformNote : FFXIVIpcBasePacket< PerformNote >
   uint8_t data[32];
 };
 
-struct FFXIVIpcLandStateSlot : FFXIVIpcBasePacket< LandStateSlot >
+struct FFXIVIpcHousingUpdateLandFlagsSlot : FFXIVIpcBasePacket< HousingUpdateLandFlagsSlot >
 {
   uint32_t type;
   uint32_t unknown;
-  Common::LandFlagSet permissionSet;
+  Common::LandFlagSet flagSet;
 };
 
-struct FFXIVIpcLandPermission : FFXIVIpcBasePacket< LandPermission >
+struct FFXIVIpcHousingLandFlags : FFXIVIpcBasePacket< HousingLandFlags >
 {
   Common::LandFlagSet freeCompanyHouse; // 00
   uint64_t unkown1;

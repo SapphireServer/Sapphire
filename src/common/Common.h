@@ -758,7 +758,7 @@ namespace Core::Common
     SubTag2
   };
 
-  enum LandStateSlot
+  enum LandFlagsSlot
   {
     FreeCompany,
     Private,
