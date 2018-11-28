@@ -1612,10 +1612,7 @@ struct LandStruct
 
 struct FFXIVIpcLandUpdate : FFXIVIpcBasePacket< LandUpdate >
 {
-  uint16_t landId;
-  uint16_t unknow0;
-  uint16_t unknow1;
-  uint16_t unknow2;
+  Common::LandIdent landIdent;
   LandStruct land;
 };
 
@@ -1627,10 +1624,7 @@ struct FFXIVIpcLandPriceUpdate :  FFXIVIpcBasePacket< LandPriceUpdate >
 
 struct FFXIVIpcLandInfoSign : FFXIVIpcBasePacket< LandInfoSign >
 {
-  uint16_t landId;
-  uint16_t wardNum;
-  uint16_t zoneId;
-  uint16_t worldId;
+  Common::LandIdent landIdent;
   uint64_t ownerId; // ither contentId or fcId
   uint32_t unknow1;
   uint8_t houseIconAdd;
@@ -1645,10 +1639,7 @@ struct FFXIVIpcLandInfoSign : FFXIVIpcBasePacket< LandInfoSign >
 
 struct FFXIVIpcLandRename : FFXIVIpcBasePacket< LandRename >
 {
-  uint16_t landId;
-  uint16_t wardNum;
-  uint16_t zoneId;
-  uint16_t worldId;
+  Common::LandIdent landIdent;
   char landName[20];
   uint32_t padding;
 };
@@ -1669,10 +1660,7 @@ struct FFXIVIpcLandSetMap : FFXIVIpcBasePacket< LandSetMap >
 
 struct FFXIVIpcLandSetInitialize : FFXIVIpcBasePacket< LandSetInitialize >
 {
-  uint16_t unknown0;
-  uint16_t landSetId; // set 1 for "Mist, Ward 2"
-  uint16_t zoneId;
-  uint16_t worldId;
+  Common::LandIdent landIdent;
   uint8_t unknown1;
   uint8_t subInstance; //  (default : 1/2)
   uint8_t unknown3;
@@ -1722,12 +1710,7 @@ struct FFXIVIpcLandSetYardInitialize : FFXIVIpcBasePacket< LandSetYardInitialize
 
 struct FFXIVIpcHousingWardInfo : FFXIVIpcBasePacket< HousingWardInfo >
 {
-  uint16_t unknown1;
-
-  uint16_t wardId;
-  uint16_t territoryTypeId;
-
-  uint16_t unknown2;
+  Common::LandIdent landIdent;
 
   struct HouseInfoEntry
   {

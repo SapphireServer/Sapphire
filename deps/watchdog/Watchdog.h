@@ -119,7 +119,13 @@ protected:
          // keep watching for modifications every ms milliseconds
          auto ms = std::chrono::milliseconds( 500 );
          while( mWatching ) {
+            if( mFileWatchers.empty() )
+            {
+              std::this_thread::sleep_for( ms );
+              continue;
+            }
             do {
+
                // iterate through each watcher and check for modification
                std::lock_guard<std::mutex> lock( mMutex );
                auto end = mFileWatchers.end();

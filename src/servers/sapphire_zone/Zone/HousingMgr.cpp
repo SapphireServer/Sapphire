@@ -93,12 +93,13 @@ void Core::HousingMgr::sendLandSignOwned( Entity::Player& player, uint8_t wardId
   //memcpy( &landInfoSignPacket->data().estateName, land->getLandName().c_str(), land->getLandName().size() );
   landInfoSignPacket->data().houseSize = land->getSize();
   landInfoSignPacket->data().houseType = static_cast< uint8_t >( land->getLandType() );
-  landInfoSignPacket->data().landId = land->getLandId();
+  landInfoSignPacket->data().landIdent.landId = land->getLandId();
+  landInfoSignPacket->data().landIdent.wardNum = land->getWardNum();
+  landInfoSignPacket->data().landIdent.worldId = 67;
+  landInfoSignPacket->data().landIdent.territoryTypeId = land->getTerritoryTypeId();
   landInfoSignPacket->data().ownerId = player.getContentId(); // should be real owner contentId, not player.contentId()
   memcpy( &landInfoSignPacket->data().ownerName, playerName.c_str(), playerName.size() );
-  landInfoSignPacket->data().wardNum = land->getWardNum();
-  landInfoSignPacket->data().worldId = 67;
-  landInfoSignPacket->data().zoneId = land->getTerritoryTypeId();
+
   player.queuePacket( landInfoSignPacket );
 }
 
@@ -230,8 +231,8 @@ void Core::HousingMgr::sendWardLandInfo( Entity::Player& player, uint8_t wardId,
     return;
 
   auto wardInfoPacket = makeZonePacket< Server::FFXIVIpcHousingWardInfo >( player.getId() );
-  wardInfoPacket->data().wardId = wardId;
-  wardInfoPacket->data().territoryTypeId = territoryTypeId;
+  wardInfoPacket->data().landIdent.wardNum = wardId;
+  wardInfoPacket->data().landIdent.territoryTypeId = territoryTypeId;
 
   for( int i = 0; i < 60; i++ )
   {
