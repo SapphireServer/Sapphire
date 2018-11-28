@@ -757,16 +757,18 @@ namespace Core::Entity
 
     void sendDebug( const std::string& message );
 
+    void sendLogMessage( uint32_t messageId, uint32_t param2 = 0, uint32_t param3 = 0, uint32_t param4 = 0, uint32_t param5 = 0, uint32_t param6 = 0 );
+
     bool isDirectorInitialized() const;
 
     void setDirectorInitialized( bool isInitialized );
 
     // Housing Handling
     //////////////////////////////////////////////////////////////////////////////////////////////////////
-    void setLandPermissions( uint8_t permissionSet, uint32_t permissionMask, int16_t landId, int16_t wardNum, int16_t zoneId );
+    void setLandFlags( uint8_t permissionSet, uint32_t landFlags, int16_t landId, int16_t wardNum, int16_t zoneId );
 
-    void sendLandPermissions();
-    void sendLandPermissionSlot( uint8_t slotId, uint8_t landId, uint8_t wardId, uint16_t zoneId );
+    void sendLandFlags();
+    void sendLandFlagsSlot( Common::LandFlagsSlot slot );
 
     // Player Battle Handling
     //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1025,7 +1027,7 @@ namespace Core::Entity
     uint8_t m_searchSelectClass; // class selected to show up in profile
 
     // housing info
-    Common::LandPermissionSet m_landPermission[5];
+    Common::LandFlagSet m_landFlags[5];
 
     Common::ActiveLand m_activeLand;
 

@@ -1575,24 +1575,24 @@ struct FFXIVIpcPerformNote : FFXIVIpcBasePacket< PerformNote >
   uint8_t data[32];
 };
 
-struct FFXIVIpcLandPermissionSlot : FFXIVIpcBasePacket< LandPermissionSlot >
+struct FFXIVIpcHousingUpdateLandFlagsSlot : FFXIVIpcBasePacket< HousingUpdateLandFlagsSlot >
 {
   uint32_t type;
   uint32_t unknown;
-  Common::LandPermissionSet permissionSet;
+  Common::LandFlagSet flagSet;
 };
 
-struct FFXIVIpcLandPermission : FFXIVIpcBasePacket< LandPermission >
+struct FFXIVIpcHousingLandFlags : FFXIVIpcBasePacket< HousingLandFlags >
 {
-  Common::LandPermissionSet freeCompanyHouse; // 00
+  Common::LandFlagSet freeCompanyHouse; // 00
   uint64_t unkown1;
-  Common::LandPermissionSet privateHouse; // 24
+  Common::LandFlagSet privateHouse; // 24
   uint64_t unkown2;
-  Common::LandPermissionSet apartment; // 48
+  Common::LandFlagSet apartment; // 48
   uint64_t unkown3;
-  Common::LandPermissionSet sharedHouse[2]; //72
+  Common::LandFlagSet sharedHouse[2]; //72
   uint64_t unkown4;
-  Common::LandPermissionSet unkownHouse;
+  Common::LandFlagSet unkownHouse;
   uint64_t unkown5;
 };
 
@@ -1640,8 +1640,15 @@ struct FFXIVIpcLandInfoSign : FFXIVIpcBasePacket< LandInfoSign >
 struct FFXIVIpcLandRename : FFXIVIpcBasePacket< LandRename >
 {
   Common::LandIdent landIdent;
-  char landName[20];
+  char houseName[20];
   uint32_t padding;
+};
+
+struct FFXIVIpcLandUpdateHouseName : FFXIVIpcBasePacket< LandUpdateHouseName >
+{
+  uint32_t unknown[3];
+  char houseName[20];
+  uint32_t unknown2[2];
 };
 
 struct FFXIVIpcLandSetMap : FFXIVIpcBasePacket< LandSetMap >
@@ -1723,11 +1730,15 @@ struct FFXIVIpcHousingWardInfo : FFXIVIpcBasePacket< HousingWardInfo >
 
 struct FFXIVIpcHousingEstateGreeting : FFXIVIpcBasePacket< HousingEstateGreeting >
 {
-  uint8_t plotId;
-  uint8_t pad[3]; // unsure
-  uint16_t territoryTypeId;
-  uint16_t unk;
+  Common::LandIdent landIdent;
   char message[200];
+};
+
+struct FFXIVIpcHousingShowEstateGuestAccess :
+  FFXIVIpcBasePacket< HousingShowEstateGuestAccess >
+{
+  uint32_t unknown[2];
+  Common::LandIdent ident;
 };
 
 /**
