@@ -152,7 +152,7 @@ namespace Core::Network
     DECLARE_HANDLER( cfRegisterRoulette );
 
     DECLARE_HANDLER( cfDutyAccepted );
-    
+
     DECLARE_HANDLER( actionHandler );
 
     DECLARE_HANDLER( gm1Handler );
@@ -164,6 +164,8 @@ namespace Core::Network
     DECLARE_HANDLER( performNoteHandler );
 
     DECLARE_HANDLER( landRenameHandler );
+
+    DECLARE_HANDLER( housingUpdateGreetingHandler );
 
     DECLARE_HANDLER( buildPresetHandler );
 

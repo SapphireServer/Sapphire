@@ -36,6 +36,13 @@ namespace Core
 
     void buildPresetEstate( Entity::Player& player, uint8_t plotNum, uint32_t presetItem );
 
+    void requestEstateRename( Entity::Player& player, uint16_t territoryTypeId, uint16_t worldId, uint8_t wardId, uint8_t plotId );
+
+    void requestEstateEditGreeting( Entity::Player& player, uint16_t territoryTypeId, uint16_t worldId, uint8_t wardId, uint8_t plotId );
+    void updateEstateGreeting( Entity::Player& player, const Common::LandIdent& ident, const std::string& greeting );
+
+    void requestEstateEditGuestAccess( Entity::Player& player, uint16_t territoryTypeId, uint16_t worldId, uint8_t wardId, uint8_t plotId );
+
   private:
 
   };

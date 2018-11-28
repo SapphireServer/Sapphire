@@ -193,8 +193,9 @@ namespace Core::Network::Packets
 
     HousingEstateGreeting = 0x0227, // updated 4.4
 
-    LandPermissionSlot = 0x0228, // updated 4.4
-    LandPermission = 0x0229, // updated 4.4
+    HousingUpdateLandFlagsSlot = 0x0228, // updated 4.4
+    HousingLandFlags = 0x0229, // updated 4.4
+    HousingShowEstateGuestAccess = 0x022A, // updated 4.4
 
     LandSetYardInitialize = 0x022C, // updated 4.4
 
@@ -203,6 +204,8 @@ namespace Core::Network::Packets
     YardObjectMove = 0x0230, // updated 4.4
 
     SharedEstateSettingsResponse = 0x023C, // updated 4.4
+
+    LandUpdateHouseName = 0x024D, // updated 4.4
 
     LandSetMap = 0x0251, // updated 4.4
 
@@ -302,6 +305,7 @@ namespace Core::Network::Packets
     LinkshellEventHandler1 = 0x1151, // updated 4.1 ??
 
     LandRenameHandler = 0x0171, // updated 4.4
+    HousingUpdateHouseGreeting = 0x0172, // updated 4.4
 
     SetSharedEstateSettings = 0x0177, // updated 4.4
 
