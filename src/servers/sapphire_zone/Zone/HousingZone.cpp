@@ -134,7 +134,7 @@ void Sapphire::HousingZone::sendLandSet( Entity::Player& player )
 
     landData.plotSize = pLand->getSize();
     landData.houseState = pLand->getState();
-    landData.hasPublicAccess = 1;
+    landData.flags = 1;
     landData.iconAddIcon = pLand->getSharing();
     landData.fcId = pLand->getFcId();
     landData.fcIcon = pLand->getFcIcon();
@@ -169,7 +169,7 @@ void Sapphire::HousingZone::sendLandUpdate( uint8_t landId )
 
     landData.plotSize = pLand->getSize();
     landData.houseState = pLand->getState();
-    landData.hasPublicAccess = 1;
+    landData.flags = 1;
     landData.iconAddIcon = pLand->getSharing();
     landData.fcId = pLand->getFcId();
     landData.fcIcon = pLand->getFcIcon();
