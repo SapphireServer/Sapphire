@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <string.h>
 
-namespace Core
+namespace Sapphire
 {
 
   class PlayerMinimal

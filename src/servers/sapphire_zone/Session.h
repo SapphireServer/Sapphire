@@ -5,7 +5,7 @@
 
 #include "ForwardsZone.h"
 
-namespace Core {
+namespace Sapphire {
 
 class Session :
   public std::enable_shared_from_this< Session >

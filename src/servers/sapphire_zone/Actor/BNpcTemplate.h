@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-namespace Core::Entity
+namespace Sapphire::Entity
 {
 
   class BNpcTemplate

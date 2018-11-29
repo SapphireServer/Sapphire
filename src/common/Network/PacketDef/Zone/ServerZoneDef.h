@@ -10,7 +10,7 @@
 #include <Common.h>
 #include <Network/CommonNetwork.h>
 
-namespace Core {
+namespace Sapphire {
 namespace Network {
 namespace Packets {
 namespace Server {
@@ -1824,7 +1824,7 @@ struct FFXIVIpcDuelChallenge :
 } /* Server */
 } /* Packets */
 } /* Network */
-} /* Core */
+} /* Sapphire */
 
 
 

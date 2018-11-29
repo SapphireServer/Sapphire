@@ -13,20 +13,20 @@
 #include "StatusEffect.h"
 #include "Framework.h"
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
-using namespace Core::Common;
-using namespace Core::Network::Packets;
-using namespace Core::Network::Packets::Server;
+using namespace Sapphire::Common;
+using namespace Sapphire::Network::Packets;
+using namespace Sapphire::Network::Packets::Server;
 
-Core::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
+Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
                                                 uint32_t duration, uint32_t tickRate )
   :
   m_id( id ), m_sourceActor( sourceActor ), m_targetActor( targetActor ), m_duration( duration ), m_startTime( 0 ),
   m_tickRate( tickRate ), m_lastTick( 0 )
 {
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-  auto entry = pExdData->get< Core::Data::Status >( id );
+  auto entry = pExdData->get< Sapphire::Data::Status >( id );
   m_name = entry->name;
 
   std::replace( m_name.begin(), m_name.end(), ' ', '_' );
@@ -41,45 +41,45 @@ Core::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPtr so
 }
 
 
-Core::StatusEffect::StatusEffect::~StatusEffect()
+Sapphire::StatusEffect::StatusEffect::~StatusEffect()
 {
 }
 
-void Core::StatusEffect::StatusEffect::registerTickEffect( uint8_t type, uint32_t param )
+void Sapphire::StatusEffect::StatusEffect::registerTickEffect( uint8_t type, uint32_t param )
 {
   m_currTickEffect = std::make_pair( type, param );
 }
 
-std::pair< uint8_t, uint32_t > Core::StatusEffect::StatusEffect::getTickEffect()
+std::pair< uint8_t, uint32_t > Sapphire::StatusEffect::StatusEffect::getTickEffect()
 {
   auto thisTick = m_currTickEffect;
   m_currTickEffect = std::make_pair( 0, 0 );
   return thisTick;
 }
 
-void Core::StatusEffect::StatusEffect::onTick()
+void Sapphire::StatusEffect::StatusEffect::onTick()
 {
   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
   m_lastTick = Util::getTimeMs();
   pScriptMgr->onStatusTick( m_targetActor, *this );
 }
 
-uint32_t Core::StatusEffect::StatusEffect::getSrcActorId() const
+uint32_t Sapphire::StatusEffect::StatusEffect::getSrcActorId() const
 {
   return m_sourceActor->getId();
 }
 
-uint32_t Core::StatusEffect::StatusEffect::getTargetActorId() const
+uint32_t Sapphire::StatusEffect::StatusEffect::getTargetActorId() const
 {
   return m_targetActor->getId();
 }
 
-uint16_t Core::StatusEffect::StatusEffect::getParam() const
+uint16_t Sapphire::StatusEffect::StatusEffect::getParam() const
 {
   return m_param;
 }
 
-void Core::StatusEffect::StatusEffect::applyStatus()
+void Sapphire::StatusEffect::StatusEffect::applyStatus()
 {
   m_startTime = Util::getTimeMs();
   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
@@ -105,48 +105,48 @@ void Core::StatusEffect::StatusEffect::applyStatus()
   pScriptMgr->onStatusReceive( m_targetActor, m_id );
 }
 
-void Core::StatusEffect::StatusEffect::removeStatus()
+void Sapphire::StatusEffect::StatusEffect::removeStatus()
 {
   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
   pScriptMgr->onStatusTimeOut( m_targetActor, m_id );
 }
 
-uint32_t Core::StatusEffect::StatusEffect::getId() const
+uint32_t Sapphire::StatusEffect::StatusEffect::getId() const
 {
   return m_id;
 }
 
-uint32_t Core::StatusEffect::StatusEffect::getDuration() const
+uint32_t Sapphire::StatusEffect::StatusEffect::getDuration() const
 {
   return m_duration;
 }
 
-uint32_t Core::StatusEffect::StatusEffect::getTickRate() const
+uint32_t Sapphire::StatusEffect::StatusEffect::getTickRate() const
 {
   return m_tickRate;
 }
 
-uint64_t Core::StatusEffect::StatusEffect::getLastTickMs() const
+uint64_t Sapphire::StatusEffect::StatusEffect::getLastTickMs() const
 {
   return m_lastTick;
 }
 
-uint64_t Core::StatusEffect::StatusEffect::getStartTimeMs() const
+uint64_t Sapphire::StatusEffect::StatusEffect::getStartTimeMs() const
 {
   return m_startTime;
 }
 
-void Core::StatusEffect::StatusEffect::setLastTick( uint64_t lastTick )
+void Sapphire::StatusEffect::StatusEffect::setLastTick( uint64_t lastTick )
 {
   m_lastTick = lastTick;
 }
 
-void Core::StatusEffect::StatusEffect::setParam( uint16_t param )
+void Sapphire::StatusEffect::StatusEffect::setParam( uint16_t param )
 {
   m_param = param;
 }
 
-const std::string& Core::StatusEffect::StatusEffect::getName() const
+const std::string& Sapphire::StatusEffect::StatusEffect::getName() const
 {
   return m_name;
 }

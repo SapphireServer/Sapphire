@@ -30,19 +30,19 @@
 #include "Framework.h"
 #include "Common.h"
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
-using namespace Core::Common;
-using namespace Core::Network::Packets;
-using namespace Core::Network::Packets::Server;
-using namespace Core::Network::ActorControl;
+using namespace Sapphire::Common;
+using namespace Sapphire::Network::Packets;
+using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::Network::ActorControl;
 
-Core::Entity::Npc::Npc( ObjKind type ) :
+Sapphire::Entity::Npc::Npc( ObjKind type ) :
   Chara( type )
 {
 
 }
 
-Core::Entity::Npc::~Npc()
+Sapphire::Entity::Npc::~Npc()
 {
 }

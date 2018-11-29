@@ -17,13 +17,13 @@
 #include "HousingMgr.h"
 #include "Framework.h"
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
-using namespace Core::Common;
-using namespace Core::Network::Packets;
-using namespace Core::Network::Packets::Server;
+using namespace Sapphire::Common;
+using namespace Sapphire::Network::Packets;
+using namespace Sapphire::Network::Packets::Server;
 
-Core::HousingZone::HousingZone( uint8_t wardNum,
+Sapphire::HousingZone::HousingZone( uint8_t wardNum,
                                 uint16_t territoryTypeId,
                                 uint32_t guId,
                                 const std::string& internalName,
@@ -36,7 +36,7 @@ Core::HousingZone::HousingZone( uint8_t wardNum,
 
 }
 
-bool Core::HousingZone::init()
+bool Sapphire::HousingZone::init()
 {
 
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
@@ -57,7 +57,7 @@ bool Core::HousingZone::init()
     housingIndex = 3;
 
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-  auto info = pExdData->get< Core::Data::HousingLandSet >( housingIndex );
+  auto info = pExdData->get< Sapphire::Data::HousingLandSet >( housingIndex );
 
   uint32_t landId;
   for( landId = 0; landId < 60; landId++ )
@@ -69,12 +69,12 @@ bool Core::HousingZone::init()
   return true;
 }
 
-Core::HousingZone::~HousingZone()
+Sapphire::HousingZone::~HousingZone()
 {
 
 }
 
-void Core::HousingZone::onPlayerZoneIn( Entity::Player& player )
+void Sapphire::HousingZone::onPlayerZoneIn( Entity::Player& player )
 {
   auto pLog = g_fw.get< Logger >();
   pLog->debug(
@@ -112,7 +112,7 @@ void Core::HousingZone::onPlayerZoneIn( Entity::Player& player )
 
 }
 
-void Core::HousingZone::sendLandSet( Entity::Player& player )
+void Sapphire::HousingZone::sendLandSet( Entity::Player& player )
 {
   auto landsetInitializePacket = makeZonePacket< FFXIVIpcLandSetInitialize >( player.getId() );
 
@@ -155,7 +155,7 @@ void Core::HousingZone::sendLandSet( Entity::Player& player )
   player.queuePacket( landsetInitializePacket );
 }
 
-void Core::HousingZone::sendLandUpdate( uint8_t landId )
+void Sapphire::HousingZone::sendLandUpdate( uint8_t landId )
 {
   auto pLand = getLand( landId );
   for( const auto& playerIt : m_playerMap )
@@ -191,12 +191,12 @@ void Core::HousingZone::sendLandUpdate( uint8_t landId )
   }
 }
 
-bool Core::HousingZone::isPlayerSubInstance( Entity::Player& player )
+bool Sapphire::HousingZone::isPlayerSubInstance( Entity::Player& player )
 {
   return player.getPos().x < -15000.0f; //ToDo: get correct pos
 }
 
-void Core::HousingZone::onUpdate( uint32_t currTime )
+void Sapphire::HousingZone::onUpdate( uint32_t currTime )
 {
   for( auto pLandItr : m_landPtrMap )
   {
@@ -204,17 +204,17 @@ void Core::HousingZone::onUpdate( uint32_t currTime )
   }
 }
 
-uint8_t Core::HousingZone::getWardNum() const
+uint8_t Sapphire::HousingZone::getWardNum() const
 {
   return m_wardNum;
 }
 
-uint32_t Core::HousingZone::getLandSetId() const
+uint32_t Sapphire::HousingZone::getLandSetId() const
 {
   return m_landSetId;
 }
 
-Core::LandPtr Core::HousingZone::getLand( uint8_t id )
+Sapphire::LandPtr Sapphire::HousingZone::getLand( uint8_t id )
 {
   auto it = m_landPtrMap.find( id );
   if( it == m_landPtrMap.end() )

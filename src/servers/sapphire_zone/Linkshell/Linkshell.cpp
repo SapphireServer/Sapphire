@@ -1,7 +1,7 @@
 #include "Linkshell.h"
 
 
-Core::Linkshell::Linkshell( uint64_t id,
+Sapphire::Linkshell::Linkshell( uint64_t id,
                             const std::string& name,
                             uint64_t masterId,
                             const std::set< uint64_t >& members,
@@ -17,77 +17,77 @@ Core::Linkshell::Linkshell( uint64_t id,
 
 }
 
-uint64_t Core::Linkshell::getId() const
+uint64_t Sapphire::Linkshell::getId() const
 {
   return m_linkshellId;
 }
 
-uint64_t Core::Linkshell::getMasterId() const
+uint64_t Sapphire::Linkshell::getMasterId() const
 {
   return m_masterCharacterId;
 }
 
-const std::set< uint64_t >& Core::Linkshell::getMemberIdList() const
+const std::set< uint64_t >& Sapphire::Linkshell::getMemberIdList() const
 {
   return m_memberIds;
 }
 
-std::set< uint64_t >& Core::Linkshell::getMemberIdList()
+std::set< uint64_t >& Sapphire::Linkshell::getMemberIdList()
 {
   return m_memberIds;
 }
 
-const std::string& Core::Linkshell::getName() const
+const std::string& Sapphire::Linkshell::getName() const
 {
   return m_name;
 }
 
-const std::set< uint64_t >& Core::Linkshell::getLeaderIdList() const
+const std::set< uint64_t >& Sapphire::Linkshell::getLeaderIdList() const
 {
   return m_leaderIds;
 }
 
-std::set< uint64_t >& Core::Linkshell::getLeaderIdList()
+std::set< uint64_t >& Sapphire::Linkshell::getLeaderIdList()
 {
   return m_leaderIds;
 }
 
-const std::set< uint64_t >& Core::Linkshell::getInviteIdList() const
+const std::set< uint64_t >& Sapphire::Linkshell::getInviteIdList() const
 {
   return m_inviteIds;
 }
 
-std::set< uint64_t >& Core::Linkshell::getInviteIdList()
+std::set< uint64_t >& Sapphire::Linkshell::getInviteIdList()
 {
   return m_inviteIds;
 }
 
-void Core::Linkshell::addMember( uint64_t memberId )
+void Sapphire::Linkshell::addMember( uint64_t memberId )
 {
   m_memberIds.insert( memberId );
 }
 
-void Core::Linkshell::removeMember( uint64_t memberId )
+void Sapphire::Linkshell::removeMember( uint64_t memberId )
 {
   m_memberIds.erase( memberId );
 }
 
-void Core::Linkshell::addLeader( uint64_t memberId )
+void Sapphire::Linkshell::addLeader( uint64_t memberId )
 {
   m_leaderIds.insert( memberId );
 }
 
-void Core::Linkshell::removeLeader( uint64_t memberId )
+void Sapphire::Linkshell::removeLeader( uint64_t memberId )
 {
   m_leaderIds.erase( memberId );
 }
 
-void Core::Linkshell::addInvite( uint64_t memberId )
+void Sapphire::Linkshell::addInvite( uint64_t memberId )
 {
   m_inviteIds.insert( memberId );
 }
 
-void Core::Linkshell::removeInvite( uint64_t memberId )
+void Sapphire::Linkshell::removeInvite( uint64_t memberId )
 {
   m_inviteIds.erase( memberId );
 }

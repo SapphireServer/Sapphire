@@ -5,7 +5,7 @@
 #include <Common.h>
 #include "ForwardsZone.h"
 
-namespace Core
+namespace Sapphire
 {
 
   using ItemMap = std::map< uint8_t, ItemPtr >;

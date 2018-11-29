@@ -31,18 +31,18 @@
 #include "Framework.h"
 #include "Common.h"
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
-using namespace Core::Common;
-using namespace Core::Network::Packets;
-using namespace Core::Network::Packets::Server;
-using namespace Core::Network::ActorControl;
+using namespace Sapphire::Common;
+using namespace Sapphire::Network::Packets;
+using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::Network::ActorControl;
 
-Core::Entity::BNpc::BNpc() : Npc( ObjKind::BattleNpc )
+Sapphire::Entity::BNpc::BNpc() : Npc( ObjKind::BattleNpc )
 {
 }
 
-Core::Entity::BNpc::BNpc( BNpcTemplatePtr pTemplate, float posX, float posY, float posZ, uint8_t level ) : Npc( ObjKind::BattleNpc )
+Sapphire::Entity::BNpc::BNpc( BNpcTemplatePtr pTemplate, float posX, float posY, float posZ, uint8_t level ) : Npc( ObjKind::BattleNpc )
 {
   m_modelChara = pTemplate->getModelChara();
   m_displayFlags = pTemplate->getDisplayFlags();
@@ -71,51 +71,51 @@ Core::Entity::BNpc::BNpc( BNpcTemplatePtr pTemplate, float posX, float posY, flo
 
 }
 
-Core::Entity::BNpc::~BNpc()
+Sapphire::Entity::BNpc::~BNpc()
 {
 }
 
-uint8_t Core::Entity::BNpc::getAggressionMode() const
+uint8_t Sapphire::Entity::BNpc::getAggressionMode() const
 {
   return m_aggressionMode;
 }
 
-uint8_t Core::Entity::BNpc::getEnemyType() const
+uint8_t Sapphire::Entity::BNpc::getEnemyType() const
 {
   return m_enemyType;
 }
 
-uint64_t Core::Entity::BNpc::getWeaponMain() const
+uint64_t Sapphire::Entity::BNpc::getWeaponMain() const
 {
   return m_weaponMain;
 }
 
-uint64_t Core::Entity::BNpc::getWeaponSub() const
+uint64_t Sapphire::Entity::BNpc::getWeaponSub() const
 {
   return m_weaponSub;
 }
 
-uint16_t Core::Entity::BNpc::getModelChara() const
+uint16_t Sapphire::Entity::BNpc::getModelChara() const
 {
   return m_modelChara;
 }
 
-uint8_t Core::Entity::BNpc::getLevel() const
+uint8_t Sapphire::Entity::BNpc::getLevel() const
 {
   return m_level;
 }
 
-uint32_t Core::Entity::BNpc::getBNpcBaseId() const
+uint32_t Sapphire::Entity::BNpc::getBNpcBaseId() const
 {
   return m_bNpcBaseId;
 }
 
-uint32_t Core::Entity::BNpc::getBNpcNameId() const
+uint32_t Sapphire::Entity::BNpc::getBNpcNameId() const
 {
   return m_bNpcNameId;
 }
 
-void Core::Entity::BNpc::spawn( PlayerPtr pTarget )
+void Sapphire::Entity::BNpc::spawn( PlayerPtr pTarget )
 {
   pTarget->queuePacket( std::make_shared< NpcSpawnPacket >( *getAsBNpc(), *pTarget ) );
 }

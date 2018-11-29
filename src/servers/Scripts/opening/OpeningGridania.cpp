@@ -1,7 +1,7 @@
 #include <Actor/Player.h>
 #include <ScriptObject.h>
 
-using namespace Core;
+using namespace Sapphire;
 
 class OpeningGridania : public Sapphire::ScriptAPI::EventScript
 {

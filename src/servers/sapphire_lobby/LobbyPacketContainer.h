@@ -9,7 +9,7 @@
 
 #include "Forwards.h"
 
-namespace Core::Network::Packets
+namespace Sapphire::Network::Packets
 {
 
   using FFXIVPacketBasePtr = std::shared_ptr< FFXIVPacketBase >;
@@ -28,7 +28,7 @@ namespace Core::Network::Packets
     uint8_t* getRawData( bool addstuff = true );
 
   private:
-    Core::Network::Packets::FFXIVARR_PACKET_HEADER m_header;
+    Sapphire::Network::Packets::FFXIVARR_PACKET_HEADER m_header;
 
     uint8_t* m_encKey;
 

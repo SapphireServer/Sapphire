@@ -9,7 +9,7 @@
 #include <map>
 #include <queue>
 
-namespace Core::Entity
+namespace Sapphire::Entity
 {
 
   /*!

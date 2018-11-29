@@ -8,7 +8,7 @@
 #include <Common.h>
 #include "Forwards.h"
 
-namespace Core::Scripting
+namespace Sapphire::Scripting
 {
 
   class ScriptMgr
@@ -73,7 +73,7 @@ namespace Core::Scripting
 
     bool onStatusReceive( Entity::CharaPtr pActor, uint32_t effectId );
 
-    bool onStatusTick( Entity::CharaPtr pActor, Core::StatusEffect::StatusEffect& effect );
+    bool onStatusTick( Entity::CharaPtr pActor, Sapphire::StatusEffect::StatusEffect& effect );
 
     bool onStatusTimeOut( Entity::CharaPtr pActor, uint32_t effectId );
 

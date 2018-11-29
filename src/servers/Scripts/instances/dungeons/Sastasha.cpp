@@ -2,7 +2,7 @@
 #include <Zone/InstanceContent.h>
 #include <Actor/Player.h>
 
-using namespace Core;
+using namespace Sapphire;
 
 class Sastasha :
   public Sapphire::ScriptAPI::InstanceContentScript

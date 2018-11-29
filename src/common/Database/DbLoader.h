@@ -8,7 +8,7 @@
 #include <string>
 #include "DbConnection.h"
 
-namespace Core::Db
+namespace Sapphire::Db
 {
 
   template< class T >

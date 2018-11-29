@@ -22,12 +22,12 @@
 #include "Framework.h"
 #include "House.h"
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
-using namespace Core::Common;
+using namespace Sapphire::Common;
 
-Core::Land::Land( uint16_t territoryTypeId, uint8_t wardNum, uint8_t landId, uint32_t landSetId,
-                  Core::Data::HousingLandSetPtr info ) :
+Sapphire::Land::Land( uint16_t territoryTypeId, uint8_t wardNum, uint8_t landId, uint32_t landSetId,
+                  Sapphire::Data::HousingLandSetPtr info ) :
   m_territoryTypeId( territoryTypeId ),
   m_wardNum( wardNum ),
   m_landId( landId ),
@@ -48,12 +48,12 @@ Core::Land::Land( uint16_t territoryTypeId, uint8_t wardNum, uint8_t landId, uin
   load();
 }
 
-Core::Land::~Land()
+Sapphire::Land::~Land()
 {
 
 }
 
-void Core::Land::load()
+void Sapphire::Land::load()
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto res = pDb->query( "SELECT * FROM land WHERE LandSetId = " + std::to_string( m_landSetId ) + " "
@@ -91,149 +91,149 @@ void Core::Land::load()
   init();
 }
 
-uint32_t Core::Land::convertItemIdToHousingItemId( uint32_t itemId )
+uint32_t Sapphire::Land::convertItemIdToHousingItemId( uint32_t itemId )
 {
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-  auto info = pExdData->get< Core::Data::Item >( itemId );
+  auto info = pExdData->get< Sapphire::Data::Item >( itemId );
   return info->additionalData;
 }
 
-uint32_t Core::Land::getCurrentPrice() const
+uint32_t Sapphire::Land::getCurrentPrice() const
 {
   return m_currentPrice;
 }
 
-uint32_t Core::Land::getMaxPrice() const
+uint32_t Sapphire::Land::getMaxPrice() const
 {
   return m_maxPrice;
 }
 
 //Primary State
-void Core::Land::setSize( uint8_t size )
+void Sapphire::Land::setSize( uint8_t size )
 {
   m_size = size;
 }
 
-void Core::Land::setState( uint8_t state )
+void Sapphire::Land::setState( uint8_t state )
 {
   m_state = state;
 }
 
-void Core::Land::setSharing( uint8_t state )
+void Sapphire::Land::setSharing( uint8_t state )
 {
   m_iconAddIcon = state;
 }
 
-void Core::Land::setLandType( Common::LandType type )
+void Sapphire::Land::setLandType( Common::LandType type )
 {
   m_type = type;
 }
 
-uint8_t Core::Land::getSize() const
+uint8_t Sapphire::Land::getSize() const
 {
   return m_size;
 }
 
-uint8_t Core::Land::getState() const
+uint8_t Sapphire::Land::getState() const
 {
   return m_state;
 }
 
-uint8_t Core::Land::getSharing() const
+uint8_t Sapphire::Land::getSharing() const
 {
   return m_iconAddIcon;
 }
 
-uint32_t Core::Land::getLandSetId() const
+uint32_t Sapphire::Land::getLandSetId() const
 {
   return m_landSetId;
 }
 
-uint8_t Core::Land::getWardNum() const
+uint8_t Sapphire::Land::getWardNum() const
 {
   return m_wardNum;
 }
 
-uint8_t Core::Land::getLandId() const
+uint8_t Sapphire::Land::getLandId() const
 {
   return m_landId;
 }
 
-uint16_t Core::Land::getTerritoryTypeId() const
+uint16_t Sapphire::Land::getTerritoryTypeId() const
 {
   return m_territoryTypeId;
 }
 
-Core::HousePtr Core::Land::getHouse() const
+Sapphire::HousePtr Sapphire::Land::getHouse() const
 {
   return m_pHouse;
 }
 
-Core::Common::LandType Core::Land::getLandType() const
+Sapphire::Common::LandType Sapphire::Land::getLandType() const
 {
   return m_type;
 }
 
 //Free Comapny
-void Core::Land::setFreeCompany( uint32_t id, uint32_t icon, uint32_t color )
+void Sapphire::Land::setFreeCompany( uint32_t id, uint32_t icon, uint32_t color )
 {
   m_fcId = id;
   m_fcIcon = icon;
   m_fcIconColor = color; //RGBA
 }
 
-uint32_t Core::Land::getFcId()
+uint32_t Sapphire::Land::getFcId()
 {
   return m_fcIcon;
 }
 
-uint32_t Core::Land::getFcIcon()
+uint32_t Sapphire::Land::getFcIcon()
 {
   return m_fcIcon;
 }
 
-uint32_t Core::Land::getFcColor()
+uint32_t Sapphire::Land::getFcColor()
 {
   return m_fcIconColor;
 }
 
 //Player
-void Core::Land::setPlayerOwner( uint32_t id )
+void Sapphire::Land::setPlayerOwner( uint32_t id )
 {
   m_ownerPlayerId = id;
 }
 
-uint32_t Core::Land::getPlayerOwner()
+uint32_t Sapphire::Land::getPlayerOwner()
 {
   return m_ownerPlayerId;
 }
 
-uint32_t Core::Land::getMaxItems()
+uint32_t Sapphire::Land::getMaxItems()
 {
   return m_maxItems;
 }
 
-uint32_t Core::Land::getDevaluationTime()
+uint32_t Sapphire::Land::getDevaluationTime()
 {
   return m_nextDrop - static_cast< uint32_t >( Util::getTimeSeconds() );
 }
 
-void Core::Land::setCurrentPrice( uint32_t currentPrice )
+void Sapphire::Land::setCurrentPrice( uint32_t currentPrice )
 {
   m_currentPrice = currentPrice;
 }
 
-void Core::Land::setLandTag( uint8_t slot, uint8_t tag )
+void Sapphire::Land::setLandTag( uint8_t slot, uint8_t tag )
 {
   m_tag[ slot ] = tag;
 }
 
-uint8_t Core::Land::getLandTag( uint8_t slot )
+uint8_t Sapphire::Land::getLandTag( uint8_t slot )
 {
   return m_tag[ slot ];
 }
 
-void Core::Land::init()
+void Sapphire::Land::init()
 {
 
   switch( m_size )
@@ -252,7 +252,7 @@ void Core::Land::init()
   }
 }
 
-void Core::Land::updateLandDb()
+void Sapphire::Land::updateLandDb()
 {
   uint32_t houseId = 0;
 
@@ -274,7 +274,7 @@ void Core::Land::updateLandDb()
     house->updateHouseDb();
 }
 
-void Core::Land::update( uint32_t currTime )
+void Sapphire::Land::update( uint32_t currTime )
 {
   if( getState() == HouseState::forSale )
   {
@@ -287,7 +287,7 @@ void Core::Land::update( uint32_t currTime )
   }
 }
 
-uint32_t Core::Land::getNextHouseId()
+uint32_t Sapphire::Land::getNextHouseId()
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto pQR = pDb->query( "SELECT MAX( HouseId ) FROM house" );
@@ -298,15 +298,15 @@ uint32_t Core::Land::getNextHouseId()
   return pQR->getUInt( 1 ) + 1;
 }
 
-bool Core::Land::setPreset( uint32_t itemId )
+bool Sapphire::Land::setPreset( uint32_t itemId )
 {
   auto housingItemId = convertItemIdToHousingItemId( itemId );
 
-  auto exdData = g_fw.get< Core::Data::ExdDataGenerated >();
+  auto exdData = g_fw.get< Sapphire::Data::ExdDataGenerated >();
   if( !exdData )
     return false;
 
-  auto housingPreset = exdData->get< Core::Data::HousingPreset >( housingItemId );
+  auto housingPreset = exdData->get< Sapphire::Data::HousingPreset >( housingItemId );
   if( !housingPreset )
     return false;
 

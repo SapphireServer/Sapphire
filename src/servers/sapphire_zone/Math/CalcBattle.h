@@ -4,13 +4,13 @@
 #include <Common.h>
 #include "Forwards.h"
 
-namespace Core::Math
+namespace Sapphire::Math
 {
 
   class CalcBattle
   {
   public:
-    static uint32_t calculateHealValue( Core::Entity::PlayerPtr pPlayer, uint32_t potency );
+    static uint32_t calculateHealValue( Sapphire::Entity::PlayerPtr pPlayer, uint32_t potency );
 
   };
 

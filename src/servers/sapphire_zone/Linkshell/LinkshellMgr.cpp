@@ -5,14 +5,14 @@
 #include "Framework.h"
 #include "LinkshellMgr.h"
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
-Core::LinkshellMgr::LinkshellMgr()
+Sapphire::LinkshellMgr::LinkshellMgr()
 {
 
 }
 
-bool Core::LinkshellMgr::loadLinkshells()
+bool Sapphire::LinkshellMgr::loadLinkshells()
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto res = pDb->query( "SELECT LinkshellId, MasterCharacterId, CharacterIdList, "
@@ -61,7 +61,7 @@ bool Core::LinkshellMgr::loadLinkshells()
 
 }
 
-Core::LinkshellPtr Core::LinkshellMgr::getLinkshellByName( const std::string& name )
+Sapphire::LinkshellPtr Sapphire::LinkshellMgr::getLinkshellByName( const std::string& name )
 {
   auto it = m_linkshellNameMap.find( name );
   if( it == m_linkshellNameMap.end() )
@@ -70,7 +70,7 @@ Core::LinkshellPtr Core::LinkshellMgr::getLinkshellByName( const std::string& na
     return it->second;
 }
 
-Core::LinkshellPtr Core::LinkshellMgr::getLinkshellById( uint64_t lsId )
+Sapphire::LinkshellPtr Sapphire::LinkshellMgr::getLinkshellById( uint64_t lsId )
 {
   auto it = m_linkshellIdMap.find( lsId );
   if( it == m_linkshellIdMap.end() )

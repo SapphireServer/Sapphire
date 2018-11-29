@@ -5,7 +5,7 @@
 #include <Framework.h>
 #include <Manager/PlayerMgr.h>
 
-using namespace Core;
+using namespace Sapphire;
 
 class WarpTaxi : public Sapphire::ScriptAPI::EventScript
 {
@@ -27,8 +27,8 @@ public:
       player.eventFinish( 1310721, 0 );
       player.eventFinish( getId(), 1 );
 
-      auto exdData = getFramework()->get< Core::Data::ExdDataGenerated >();
-      auto warp = exdData->get< Core::Data::Warp >( getId() );
+      auto exdData = getFramework()->get< Sapphire::Data::ExdDataGenerated >();
+      auto warp = exdData->get< Sapphire::Data::Warp >( getId() );
       if( !warp )
         return;
 
@@ -53,11 +53,11 @@ public:
 
   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
   {
-    auto exdData = getFramework()->get< Core::Data::ExdDataGenerated >();
+    auto exdData = getFramework()->get< Sapphire::Data::ExdDataGenerated >();
     if( !exdData )
       return;
 
-    auto warp = exdData->get< Core::Data::Warp >( eventId );
+    auto warp = exdData->get< Sapphire::Data::Warp >( eventId );
     if( !warp )
       return;
 

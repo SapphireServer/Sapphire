@@ -1,6 +1,6 @@
 #include "Session.h"
 
-namespace Core {
+namespace Sapphire {
 Session::Session()
 {
 

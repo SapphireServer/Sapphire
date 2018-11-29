@@ -3,7 +3,7 @@
 
 #include <Common.h>
 
-namespace Core {
+namespace Sapphire {
 
 class ZonePosition
 {

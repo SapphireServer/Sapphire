@@ -8,7 +8,7 @@
 
 const std::string LOBBY_VERSION = "0.0.5";
 
-namespace Core
+namespace Sapphire
 {
   class LobbySession;
   class ConfigMgr;

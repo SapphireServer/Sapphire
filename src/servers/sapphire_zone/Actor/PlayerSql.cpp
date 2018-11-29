@@ -21,14 +21,14 @@
 #include "ServerMgr.h"
 #include "Framework.h"
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
-using namespace Core::Common;
-using namespace Core::Network::Packets;
-using namespace Core::Network::Packets::Server;
+using namespace Sapphire::Common;
+using namespace Sapphire::Network::Packets;
+using namespace Sapphire::Network::Packets::Server;
 
 // load player from the db
-bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
+bool Sapphire::Entity::Player::load( uint32_t charId, SessionPtr pSession )
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto pTeriMgr = g_fw.get< TerritoryMgr >();
@@ -245,7 +245,7 @@ bool Core::Entity::Player::load( uint32_t charId, SessionPtr pSession )
   return true;
 }
 
-bool Core::Entity::Player::loadActiveQuests()
+bool Sapphire::Entity::Player::loadActiveQuests()
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto stmt = pDb->getPreparedStatement( Db::ZoneDbStatements::CHARA_SEL_QUEST );
@@ -281,7 +281,7 @@ bool Core::Entity::Player::loadActiveQuests()
 
 }
 
-bool Core::Entity::Player::loadClassData()
+bool Sapphire::Entity::Player::loadClassData()
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   // ClassIdx, Exp, Lvl
@@ -302,7 +302,7 @@ bool Core::Entity::Player::loadClassData()
   return true;
 }
 
-bool Core::Entity::Player::loadSearchInfo()
+bool Sapphire::Entity::Player::loadSearchInfo()
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto stmt = pDb->getPreparedStatement( Db::ZoneDbStatements::CHARA_SEL_SEARCHINFO );
@@ -324,7 +324,7 @@ bool Core::Entity::Player::loadSearchInfo()
 }
 
 
-void Core::Entity::Player::updateSql()
+void Sapphire::Entity::Player::updateSql()
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   /*"Hp 1, Mp 2, Tp 3, Gp 4, Mode 5, Mount 6, InvincibleGM 7, Voice 8, "
@@ -466,11 +466,11 @@ void Core::Entity::Player::updateSql()
 
 }
 
-void Core::Entity::Player::updateDbClass() const
+void Sapphire::Entity::Player::updateDbClass() const
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-  uint8_t classJobIndex = pExdData->get< Core::Data::ClassJob >( static_cast<uint8_t>( getClass() ) )->expArrayIndex;
+  uint8_t classJobIndex = pExdData->get< Sapphire::Data::ClassJob >( static_cast<uint8_t>( getClass() ) )->expArrayIndex;
 
   //Exp = ?, Lvl = ? WHERE CharacterId = ? AND ClassIdx = ?
   auto stmtS = pDb->getPreparedStatement( Db::CHARA_CLASS_UP );
@@ -481,7 +481,7 @@ void Core::Entity::Player::updateDbClass() const
   pDb->execute( stmtS );
 }
 
-void Core::Entity::Player::insertDbClass( const uint8_t classJobIndex ) const
+void Sapphire::Entity::Player::insertDbClass( const uint8_t classJobIndex ) const
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto stmtClass = pDb->getPreparedStatement( Db::CHARA_CLASS_INS );
@@ -492,7 +492,7 @@ void Core::Entity::Player::insertDbClass( const uint8_t classJobIndex ) const
   pDb->directExecute( stmtClass );
 }
 
-void Core::Entity::Player::updateDbSearchInfo() const
+void Sapphire::Entity::Player::updateDbSearchInfo() const
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto stmtS = pDb->getPreparedStatement( Db::CHARA_SEARCHINFO_UP_SELECTCLASS );
@@ -511,7 +511,7 @@ void Core::Entity::Player::updateDbSearchInfo() const
   pDb->execute( stmtS2 );
 }
 
-void Core::Entity::Player::updateDbAllQuests() const
+void Sapphire::Entity::Player::updateDbAllQuests() const
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   for( int32_t i = 0; i < 30; i++ )
@@ -536,7 +536,7 @@ void Core::Entity::Player::updateDbAllQuests() const
   }
 }
 
-void Core::Entity::Player::deleteQuest( uint16_t questId ) const
+void Sapphire::Entity::Player::deleteQuest( uint16_t questId ) const
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto stmt = pDb->getPreparedStatement( Db::CHARA_QUEST_DEL );
@@ -545,7 +545,7 @@ void Core::Entity::Player::deleteQuest( uint16_t questId ) const
   pDb->execute( stmt );
 }
 
-void Core::Entity::Player::insertQuest( uint16_t questId, uint8_t index, uint8_t seq ) const
+void Sapphire::Entity::Player::insertQuest( uint16_t questId, uint8_t index, uint8_t seq ) const
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto stmt = pDb->getPreparedStatement( Db::CHARA_QUEST_INS );
@@ -564,11 +564,11 @@ void Core::Entity::Player::insertQuest( uint16_t questId, uint8_t index, uint8_t
   pDb->execute( stmt );
 }
 
-Core::ItemPtr Core::Entity::Player::createItem( uint32_t catalogId, uint32_t quantity )
+Sapphire::ItemPtr Sapphire::Entity::Player::createItem( uint32_t catalogId, uint32_t quantity )
 {
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  auto itemInfo = pExdData->get< Core::Data::Item >( catalogId );
+  auto itemInfo = pExdData->get< Sapphire::Data::Item >( catalogId );
 
   if( !itemInfo )
     return nullptr;
@@ -595,7 +595,7 @@ Core::ItemPtr Core::Entity::Player::createItem( uint32_t catalogId, uint32_t qua
   return pItem;
 }
 
-bool Core::Entity::Player::loadInventory()
+bool Sapphire::Entity::Player::loadInventory()
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   //////////////////////////////////////////////////////////////////////////////////////////////////////

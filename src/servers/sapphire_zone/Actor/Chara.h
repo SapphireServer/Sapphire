@@ -9,7 +9,7 @@
 #include <map>
 #include <queue>
 
-namespace Core::Entity
+namespace Sapphire::Entity
 {
 
   /*!
@@ -136,7 +136,7 @@ namespace Core::Entity
 
     void setPose( uint8_t pose );
 
-    std::map< uint8_t, Core::StatusEffect::StatusEffectPtr > getStatusEffectMap() const;
+    std::map< uint8_t, Sapphire::StatusEffect::StatusEffectPtr > getStatusEffectMap() const;
 
     void sendStatusEffectUpdate();
 

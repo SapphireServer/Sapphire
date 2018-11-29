@@ -15,20 +15,20 @@
 #include "ActionMount.h"
 #include "Framework.h"
 
-using namespace Core::Common;
-using namespace Core::Network;
-using namespace Core::Network::Packets;
-using namespace Core::Network::Packets::Server;
-using namespace Core::Network::ActorControl;
+using namespace Sapphire::Common;
+using namespace Sapphire::Network;
+using namespace Sapphire::Network::Packets;
+using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::Network::ActorControl;
 
-extern Core::Framework g_framework;
+extern Sapphire::Framework g_framework;
 
-Core::Action::ActionMount::ActionMount()
+Sapphire::Action::ActionMount::ActionMount()
 {
   m_handleActionType = HandleActionType::Event;
 }
 
-Core::Action::ActionMount::ActionMount( Entity::CharaPtr pActor, uint16_t mountId )
+Sapphire::Action::ActionMount::ActionMount( Entity::CharaPtr pActor, uint16_t mountId )
 {
   m_startTime = 0;
   m_id = mountId;
@@ -38,12 +38,12 @@ Core::Action::ActionMount::ActionMount( Entity::CharaPtr pActor, uint16_t mountI
   m_bInterrupt = false;
 }
 
-Core::Action::ActionMount::~ActionMount()
+Sapphire::Action::ActionMount::~ActionMount()
 {
 
 }
 
-void Core::Action::ActionMount::onStart()
+void Sapphire::Action::ActionMount::onStart()
 {
   if( !m_pSource )
     return;
@@ -64,7 +64,7 @@ void Core::Action::ActionMount::onStart()
 
 }
 
-void Core::Action::ActionMount::onFinish()
+void Sapphire::Action::ActionMount::onFinish()
 {
   if( !m_pSource )
     return;
@@ -89,7 +89,7 @@ void Core::Action::ActionMount::onFinish()
   pPlayer->mount( m_id );
 }
 
-void Core::Action::ActionMount::onInterrupt()
+void Sapphire::Action::ActionMount::onInterrupt()
 {
   if( !m_pSource )
     return;

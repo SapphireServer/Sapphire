@@ -29,39 +29,39 @@
 
 #include "Framework.h"
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
-using namespace Core::Common;
-using namespace Core::Network::Packets;
-//using namespace Core::Network::Packets::Server;
+using namespace Sapphire::Common;
+using namespace Sapphire::Network::Packets;
+//using namespace Sapphire::Network::Packets::Server;
 
-Core::Entity::Actor::Actor( ObjKind type ) :
+Sapphire::Entity::Actor::Actor( ObjKind type ) :
   m_objKind( type )
 {
 
 }
 
-uint32_t Core::Entity::Actor::getId() const
+uint32_t Sapphire::Entity::Actor::getId() const
 {
   return m_id;
 }
 
-void Core::Entity::Actor::setId( uint32_t id )
+void Sapphire::Entity::Actor::setId( uint32_t id )
 {
   m_id = id;
 }
 
-Core::Common::ObjKind Core::Entity::Actor::getObjKind() const
+Sapphire::Common::ObjKind Sapphire::Entity::Actor::getObjKind() const
 {
   return m_objKind;
 }
 
-Core::Common::FFXIVARR_POSITION3& Core::Entity::Actor::getPos()
+Sapphire::Common::FFXIVARR_POSITION3& Sapphire::Entity::Actor::getPos()
 {
   return m_pos;
 }
 
-void Core::Entity::Actor::setPos( float x, float y, float z )
+void Sapphire::Entity::Actor::setPos( float x, float y, float z )
 {
   m_pos.x = x;
   m_pos.y = y;
@@ -69,70 +69,70 @@ void Core::Entity::Actor::setPos( float x, float y, float z )
   m_pCurrentZone->updateActorPosition( *this );
 }
 
-void Core::Entity::Actor::setPos( const Core::Common::FFXIVARR_POSITION3& pos )
+void Sapphire::Entity::Actor::setPos( const Sapphire::Common::FFXIVARR_POSITION3& pos )
 {
   m_pos = pos;
   m_pCurrentZone->updateActorPosition( *this );
 }
 
-float Core::Entity::Actor::getRot() const
+float Sapphire::Entity::Actor::getRot() const
 {
   return m_rot;
 }
 
-void Core::Entity::Actor::setRot( float rot )
+void Sapphire::Entity::Actor::setRot( float rot )
 {
   m_rot = rot;
 }
 
-bool Core::Entity::Actor::isChara() const
+bool Sapphire::Entity::Actor::isChara() const
 {
   return isPlayer() || isBattleNpc() || isEventNpc() || isRetainer() || isCompanion();
 }
 
-bool Core::Entity::Actor::isPlayer() const
+bool Sapphire::Entity::Actor::isPlayer() const
 {
   return m_objKind == ObjKind::Player;
 }
 
-bool Core::Entity::Actor::isEventNpc() const
+bool Sapphire::Entity::Actor::isEventNpc() const
 {
   return m_objKind == ObjKind::EventNpc;
 }
 
-bool Core::Entity::Actor::isBattleNpc() const
+bool Sapphire::Entity::Actor::isBattleNpc() const
 {
   return m_objKind == ObjKind::BattleNpc;
 }
 
-bool Core::Entity::Actor::isRetainer() const
+bool Sapphire::Entity::Actor::isRetainer() const
 {
   return m_objKind == ObjKind::Retainer;
 }
 
-bool Core::Entity::Actor::isCompanion() const
+bool Sapphire::Entity::Actor::isCompanion() const
 {
   return m_objKind == ObjKind::Companion;
 }
 
-bool Core::Entity::Actor::isEventObj() const
+bool Sapphire::Entity::Actor::isEventObj() const
 {
   return m_objKind == ObjKind::EventObj;
 }
 
-bool Core::Entity::Actor::isHousingEventObj() const
+bool Sapphire::Entity::Actor::isHousingEventObj() const
 {
   return m_objKind == ObjKind::Housing;
 }
 
-bool Core::Entity::Actor::isAetheryte() const
+bool Sapphire::Entity::Actor::isAetheryte() const
 {
   return m_objKind == ObjKind::Aetheryte;
 }
 
 
 /*! \return pointer to this instance as ActorPtr */
-Core::Entity::CharaPtr Core::Entity::Actor::getAsChara()
+Sapphire::Entity::CharaPtr Sapphire::Entity::Actor::getAsChara()
 {
   if( !isChara() )
     return nullptr;
@@ -140,7 +140,7 @@ Core::Entity::CharaPtr Core::Entity::Actor::getAsChara()
 }
 
 /*! \return pointer to this instance as PlayerPtr */
-Core::Entity::PlayerPtr Core::Entity::Actor::getAsPlayer()
+Sapphire::Entity::PlayerPtr Sapphire::Entity::Actor::getAsPlayer()
 {
   if( !isPlayer() )
     return nullptr;
@@ -148,7 +148,7 @@ Core::Entity::PlayerPtr Core::Entity::Actor::getAsPlayer()
 }
 
 /*! \return pointer to this instance as EventObjPtr */
-Core::Entity::EventObjectPtr Core::Entity::Actor::getAsEventObj()
+Sapphire::Entity::EventObjectPtr Sapphire::Entity::Actor::getAsEventObj()
 {
   if( !isEventObj() )
     return nullptr;
@@ -156,7 +156,7 @@ Core::Entity::EventObjectPtr Core::Entity::Actor::getAsEventObj()
 }
 
 /*! \return pointer to this instance as BNpcPtr */
-Core::Entity::BNpcPtr Core::Entity::Actor::getAsBNpc()
+Sapphire::Entity::BNpcPtr Sapphire::Entity::Actor::getAsBNpc()
 {
   if( !isBattleNpc() )
     return nullptr;
@@ -169,7 +169,7 @@ but also to the global actor map
 
 \param ActorPtr to add
 */
-void Core::Entity::Actor::addInRangeActor( ActorPtr pActor )
+void Sapphire::Entity::Actor::addInRangeActor( ActorPtr pActor )
 {
 
   // if this is null, something went wrong
@@ -202,7 +202,7 @@ but also to the global actor map
 
 \param ActorPtr to remove
 */
-void Core::Entity::Actor::removeInRangeActor( Actor& actor )
+void Sapphire::Entity::Actor::removeInRangeActor( Actor& actor )
 {
   // call virtual event
   onRemoveInRangeActor( actor );
@@ -223,12 +223,12 @@ void Core::Entity::Actor::removeInRangeActor( Actor& actor )
 }
 
 /*! \return true if there is at least one actor in the in range set */
-bool Core::Entity::Actor::hasInRangeActor() const
+bool Sapphire::Entity::Actor::hasInRangeActor() const
 {
   return ( m_inRangeActor.size() > 0 );
 }
 
-void Core::Entity::Actor::removeFromInRange()
+void Sapphire::Entity::Actor::removeFromInRange()
 {
   if( !hasInRangeActor() )
     return;
@@ -248,14 +248,14 @@ check if a given actor is in the actors in range set
 \param ActorPtr to be checked for
 \return true if the actor was found
 */
-bool Core::Entity::Actor::isInRangeSet( ActorPtr pActor ) const
+bool Sapphire::Entity::Actor::isInRangeSet( ActorPtr pActor ) const
 {
   return !( m_inRangeActor.find( pActor ) == m_inRangeActor.end() );
 }
 
 
 /*! \return ActorPtr of the closest actor in range, if none, nullptr */
-Core::Entity::ActorPtr Core::Entity::Actor::getClosestActor()
+Sapphire::Entity::ActorPtr Sapphire::Entity::Actor::getClosestActor()
 {
   if( m_inRangeActor.empty() )
     // no actors in range, don't bother
@@ -286,7 +286,7 @@ Core::Entity::ActorPtr Core::Entity::Actor::getClosestActor()
 }
 
 /*! Clear the whole in range set, this does no cleanup */
-void Core::Entity::Actor::clearInRangeSet()
+void Sapphire::Entity::Actor::clearInRangeSet()
 {
   m_inRangeActor.clear();
   m_inRangePlayers.clear();
@@ -299,7 +299,7 @@ Send a packet to all players in range, potentially to self if set and is player
 \param GamePacketPtr to send
 \param bool should be send to self?
 */
-void Core::Entity::Actor::sendToInRangeSet( Network::Packets::FFXIVPacketBasePtr pPacket, bool bToSelf )
+void Sapphire::Entity::Actor::sendToInRangeSet( Network::Packets::FFXIVPacketBasePtr pPacket, bool bToSelf )
 {
   auto pServerZone = g_fw.get< ServerMgr >();
   if( bToSelf && isPlayer() )
@@ -328,7 +328,7 @@ void Core::Entity::Actor::sendToInRangeSet( Network::Packets::FFXIVPacketBasePtr
 }
 
 /*! \return list of actors currently in range */
-std::set< Core::Entity::ActorPtr > Core::Entity::Actor::getInRangeActors( bool includeSelf )
+std::set< Sapphire::Entity::ActorPtr > Sapphire::Entity::Actor::getInRangeActors( bool includeSelf )
 {
   auto tempInRange = m_inRangeActor;
 
@@ -339,19 +339,19 @@ std::set< Core::Entity::ActorPtr > Core::Entity::Actor::getInRangeActors( bool i
 }
 
 /*! \return ZonePtr to the current zone, nullptr if not set */
-Core::ZonePtr Core::Entity::Actor::getCurrentZone() const
+Sapphire::ZonePtr Sapphire::Entity::Actor::getCurrentZone() const
 {
   return m_pCurrentZone;
 }
 
 /*! \param ZonePtr to the zone to be set as current */
-void Core::Entity::Actor::setCurrentZone( ZonePtr currZone )
+void Sapphire::Entity::Actor::setCurrentZone( ZonePtr currZone )
 {
   m_pCurrentZone = currZone;
 }
 
 /*! \return InstanceContentPtr to the current instance, nullptr if not an instance or not set */
-Core::InstanceContentPtr Core::Entity::Actor::getCurrentInstance() const
+Sapphire::InstanceContentPtr Sapphire::Entity::Actor::getCurrentInstance() const
 {
   if( m_pCurrentZone )
     return m_pCurrentZone->getAsInstanceContent();
@@ -364,7 +364,7 @@ Get the current cell of a region the actor is in
 
 \return Cell*
 */
-Core::Cell* Core::Entity::Actor::getCellPtr()
+Sapphire::Cell* Sapphire::Entity::Actor::getCellPtr()
 {
   return m_pCell;
 }
@@ -374,7 +374,7 @@ Set the current cell the actor is in
 
 \param Cell* for the cell to be set
 */
-void Core::Entity::Actor::setCell( Cell* pCell )
+void Sapphire::Entity::Actor::setCell( Cell* pCell )
 {
   m_pCell = pCell;
 }

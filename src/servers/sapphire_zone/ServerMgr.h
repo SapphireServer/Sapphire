@@ -8,63 +8,64 @@
 
 #include "ForwardsZone.h"
 
-namespace Core {
-
-class ServerMgr
+namespace Sapphire
 {
-public:
-  ServerMgr( const std::string& configName );
 
-  ~ServerMgr();
+  class ServerMgr
+  {
+  public:
+    ServerMgr( const std::string& configName );
 
-  void run( int32_t argc, char* argv[] );
+    ~ServerMgr();
 
-  bool createSession( uint32_t sessionId );
+    void run( int32_t argc, char* argv[] );
 
-  void removeSession( uint32_t sessionId );
-  void removeSession( const std::string& playerName );
+    bool createSession( uint32_t sessionId );
 
-  SessionPtr getSession( uint32_t id );
-  SessionPtr getSession( const std::string& playerName );
+    void removeSession( uint32_t sessionId );
+    void removeSession( const std::string& playerName );
 
-  size_t getSessionCount() const;
+    SessionPtr getSession( uint32_t id );
+    SessionPtr getSession( const std::string& playerName );
 
-  uint16_t getWorldId() const;
-  void setWorldId( uint16_t worldId );
+    size_t getSessionCount() const;
 
-  void mainLoop();
+    uint16_t getWorldId() const;
+    void setWorldId( uint16_t worldId );
 
-  bool isRunning() const;
+    void mainLoop();
 
-  void printBanner() const;
+    bool isRunning() const;
 
-  bool loadSettings( int32_t argc, char* argv[] );
-  void loadBNpcTemplates();
+    void printBanner() const;
 
-  Entity::BNpcTemplatePtr getBNpcTemplate( const std::string& key );
-  Entity::BNpcTemplatePtr getBNpcTemplate( uint32_t id );
+    bool loadSettings( int32_t argc, char* argv[] );
+    void loadBNpcTemplates();
 
-  std::string getPlayerNameFromDb( uint32_t playerId, bool forceDbLoad = false );
-  void updatePlayerName( uint32_t playerId, const std::string& playerNewName );
+    Entity::BNpcTemplatePtr getBNpcTemplate( const std::string& key );
+    Entity::BNpcTemplatePtr getBNpcTemplate( uint32_t id );
 
-private:
-  uint16_t m_port;
-  std::string m_ip;
-  int64_t m_lastDBPingTime;
-  bool m_bRunning;
-  uint16_t m_worldId;
+    std::string getPlayerNameFromDb( uint32_t playerId, bool forceDbLoad = false );
+    void updatePlayerName( uint32_t playerId, const std::string& playerNewName );
 
-  std::string m_configName;
+  private:
+    uint16_t m_port;
+    std::string m_ip;
+    int64_t m_lastDBPingTime;
+    bool m_bRunning;
+    uint16_t m_worldId;
 
-  std::mutex m_sessionMutex;
+    std::string m_configName;
 
-  std::map< uint32_t, SessionPtr > m_sessionMapById;
-  std::map< std::string, SessionPtr > m_sessionMapByName;
-  std::map< uint32_t, std::string > m_playerNameMapById;
-  std::map< uint32_t, uint32_t > m_zones;
-  std::map< std::string, Entity::BNpcTemplatePtr > m_bNpcTemplateMap;
+    std::mutex m_sessionMutex;
 
-};
+    std::map< uint32_t, SessionPtr > m_sessionMapById;
+    std::map< std::string, SessionPtr > m_sessionMapByName;
+    std::map< uint32_t, std::string > m_playerNameMapById;
+    std::map< uint32_t, uint32_t > m_zones;
+    std::map< std::string, Entity::BNpcTemplatePtr > m_bNpcTemplateMap;
+
+  };
 
 }
 

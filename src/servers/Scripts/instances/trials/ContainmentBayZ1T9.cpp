@@ -1,7 +1,7 @@
 #include <ScriptObject.h>
 #include <Zone/InstanceContent.h>
 
-using namespace Core;
+using namespace Sapphire;
 
 class ContainmentBayZ1T9 :
   public Sapphire::ScriptAPI::InstanceContentScript

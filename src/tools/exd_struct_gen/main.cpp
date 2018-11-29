@@ -21,8 +21,8 @@
 
 
 
-Core::Logger g_log;
-Core::Data::ExdDataGenerated g_exdData;
+Sapphire::Logger g_log;
+Sapphire::Data::ExdDataGenerated g_exdData;
 bool skipUnmapped = true;
 
 std::map< char, std::string > numberToStringMap
@@ -244,11 +244,11 @@ std::string generateStruct( const std::string& exd )
   auto exhHead = exh.get_header();
   if( exhHead.variant == 2 )
   {
-    result += "\n   " + exd + "( uint32_t row_id, uint32_t subRow, Core::Data::ExdDataGenerated* exdData );\n";
+    result += "\n   " + exd + "( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );\n";
   }
   else
   {
-    result += "\n   " + exd + "( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );\n";
+    result += "\n   " + exd + "( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );\n";
   }
   result += "};\n\n";
 
@@ -269,13 +269,13 @@ std::string generateConstructorsDecl( const std::string& exd )
   auto exhHead = exh.get_header();
   if( exhHead.variant == 2 )
   {
-    result += "\nCore::Data::" + exd + "::" + exd + "( uint32_t row_id, uint32_t subRow, Core::Data::ExdDataGenerated* exdData )\n";
+    result += "\nSapphire::Data::" + exd + "::" + exd + "( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData )\n";
     result += "{\n";
     result += indent + "auto row = exdData->m_" + exd + "Dat.get_row( row_id, subRow );\n";
   }
   else
   {
-    result += "\nCore::Data::" + exd + "::" + exd + "( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )\n";
+    result += "\nSapphire::Data::" + exd + "::" + exd + "( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )\n";
     result += "{\n";
     result += indent + "auto row = exdData->m_" + exd + "Dat.get_row( row_id );\n";
   }

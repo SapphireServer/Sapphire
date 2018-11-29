@@ -3,7 +3,7 @@
 
 #include "Actor.h"
 
-namespace Core::Entity
+namespace Sapphire::Entity
 {
 
   class EventObject : public Actor

@@ -5,8 +5,8 @@
 #include <Actor/Player.h>
 #include <Common.h>
 
-extern Core::Framework g_fw;
-using namespace Core;
+extern Sapphire::Framework g_fw;
+using namespace Sapphire;
 
 bool Sapphire::World::Manager::ShopMgr::purchaseGilShopItem( Entity::Player& player, uint32_t shopId, uint16_t itemId, uint32_t quantity )
 {

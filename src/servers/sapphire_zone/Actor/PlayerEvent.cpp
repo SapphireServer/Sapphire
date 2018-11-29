@@ -19,23 +19,23 @@
 #include "ServerMgr.h"
 #include "Framework.h"
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
-using namespace Core::Common;
-using namespace Core::Network::Packets;
-using namespace Core::Network::Packets::Server;
+using namespace Sapphire::Common;
+using namespace Sapphire::Network::Packets;
+using namespace Sapphire::Network::Packets::Server;
 
-void Core::Entity::Player::addEvent( Event::EventHandlerPtr pEvent )
+void Sapphire::Entity::Player::addEvent( Event::EventHandlerPtr pEvent )
 {
   m_eventHandlerMap[ pEvent->getId() ] = pEvent;
 }
 
-std::map< uint32_t, Core::Event::EventHandlerPtr >& Core::Entity::Player::eventList()
+std::map< uint32_t, Sapphire::Event::EventHandlerPtr >& Sapphire::Entity::Player::eventList()
 {
   return m_eventHandlerMap;
 }
 
-Core::Event::EventHandlerPtr Core::Entity::Player::getEvent( uint32_t eventId )
+Sapphire::Event::EventHandlerPtr Sapphire::Entity::Player::getEvent( uint32_t eventId )
 {
   auto it = m_eventHandlerMap.find( eventId );
   if( it != m_eventHandlerMap.end() )
@@ -44,12 +44,12 @@ Core::Event::EventHandlerPtr Core::Entity::Player::getEvent( uint32_t eventId )
   return Event::EventHandlerPtr( nullptr );
 }
 
-size_t Core::Entity::Player::getEventCount()
+size_t Sapphire::Entity::Player::getEventCount()
 {
   return m_eventHandlerMap.size();
 }
 
-void Core::Entity::Player::removeEvent( uint32_t eventId )
+void Sapphire::Entity::Player::removeEvent( uint32_t eventId )
 {
   auto it = m_eventHandlerMap.find( eventId );
   if( it != m_eventHandlerMap.end() )
@@ -59,7 +59,7 @@ void Core::Entity::Player::removeEvent( uint32_t eventId )
   }
 }
 
-void Core::Entity::Player::checkEvent( uint32_t eventId )
+void Sapphire::Entity::Player::checkEvent( uint32_t eventId )
 {
   auto pEvent = getEvent( eventId );
 
@@ -68,7 +68,7 @@ void Core::Entity::Player::checkEvent( uint32_t eventId )
 }
 
 
-void Core::Entity::Player::directorPlayScene( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t eventParam3,
+void Sapphire::Entity::Player::directorPlayScene( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t eventParam3,
                                               uint32_t eventParam4, uint32_t eventParam5 )
 {
   if( flags & 0x02 )
@@ -90,7 +90,7 @@ void Core::Entity::Player::directorPlayScene( uint32_t eventId, uint32_t scene, 
   queuePacket( eventPlay );
 }
 
-void Core::Entity::Player::eventStart( uint64_t actorId, uint32_t eventId,
+void Sapphire::Entity::Player::eventStart( uint64_t actorId, uint32_t eventId,
                                        Event::EventHandler::EventType eventType, uint8_t eventParam1,
                                        uint32_t eventParam2, Event::EventHandler::EventFinishCallback callback )
 {
@@ -110,32 +110,32 @@ void Core::Entity::Player::eventStart( uint64_t actorId, uint32_t eventId,
 
 }
 
-void Core::Entity::Player::playScene( uint32_t eventId, uint32_t scene,
+void Sapphire::Entity::Player::playScene( uint32_t eventId, uint32_t scene,
                                       uint32_t flags, uint32_t eventParam2,
                                       uint32_t eventParam3 )
 {
   playScene( eventId, scene, flags, eventParam2, eventParam3, nullptr );
 }
 
-void Core::Entity::Player::playScene( uint32_t eventId, uint32_t scene,
+void Sapphire::Entity::Player::playScene( uint32_t eventId, uint32_t scene,
                                       uint32_t flags, Event::EventHandler::SceneReturnCallback eventCallback )
 {
   playScene( eventId, scene, flags, 0, 0, eventCallback );
 }
 
-void Core::Entity::Player::playScene( uint32_t eventId, uint32_t scene, uint32_t flags )
+void Sapphire::Entity::Player::playScene( uint32_t eventId, uint32_t scene, uint32_t flags )
 {
   playScene( eventId, scene, flags, 0, 0, nullptr );
 }
 
-void Core::Entity::Player::playScene( uint32_t eventId, uint32_t scene,
+void Sapphire::Entity::Player::playScene( uint32_t eventId, uint32_t scene,
                                       uint32_t flags, uint32_t eventParam2,
                                       uint32_t eventParam3, Event::EventHandler::SceneReturnCallback eventCallback )
 {
   playScene( eventId, scene, flags, eventParam2, eventParam3, 0, eventCallback );
 }
 
-void Core::Entity::Player::playGilShop( uint32_t eventId, uint32_t flags,
+void Sapphire::Entity::Player::playGilShop( uint32_t eventId, uint32_t flags,
                                         Event::EventHandler::SceneReturnCallback eventCallback )
 {
   auto pEvent = bootstrapSceneEvent( eventId, flags );
@@ -156,7 +156,7 @@ void Core::Entity::Player::playGilShop( uint32_t eventId, uint32_t flags,
   queuePacket( openGilShopPacket );
 }
 
-Core::Event::EventHandlerPtr Core::Entity::Player::bootstrapSceneEvent( uint32_t eventId, uint32_t flags )
+Sapphire::Event::EventHandlerPtr Sapphire::Entity::Player::bootstrapSceneEvent( uint32_t eventId, uint32_t flags )
 {
 
   auto pEvent = getEvent( eventId );
@@ -173,7 +173,7 @@ Core::Event::EventHandlerPtr Core::Entity::Player::bootstrapSceneEvent( uint32_t
   return pEvent;
 }
 
-void Core::Entity::Player::playScene( uint32_t eventId, uint32_t scene,
+void Sapphire::Entity::Player::playScene( uint32_t eventId, uint32_t scene,
                                       uint32_t flags, uint32_t eventParam2,
                                       uint32_t eventParam3, uint32_t eventParam4,
                                       Event::EventHandler::SceneReturnCallback eventCallback )
@@ -201,9 +201,9 @@ void Core::Entity::Player::playScene( uint32_t eventId, uint32_t scene,
   queuePacket( eventPlay );
 }
 
-void Core::Entity::Player::playSceneChain( uint32_t eventId, uint32_t scene, uint32_t flags,
+void Sapphire::Entity::Player::playSceneChain( uint32_t eventId, uint32_t scene, uint32_t flags,
                                            uint32_t eventParam2, uint32_t eventParam3, uint32_t eventParam4,
-                                           Core::Event::EventHandler::SceneChainCallback sceneChainCallback )
+                                           Sapphire::Event::EventHandler::SceneChainCallback sceneChainCallback )
 {
   auto pEvent = bootstrapSceneEvent( eventId, flags );
   if( !pEvent )
@@ -218,20 +218,20 @@ void Core::Entity::Player::playSceneChain( uint32_t eventId, uint32_t scene, uin
   queuePacket( eventPlay );
 }
 
-void Core::Entity::Player::playSceneChain( uint32_t eventId, uint32_t scene, uint32_t flags,
+void Sapphire::Entity::Player::playSceneChain( uint32_t eventId, uint32_t scene, uint32_t flags,
                                            uint32_t eventParam2, uint32_t eventParam3,
-                                           Core::Event::EventHandler::SceneChainCallback sceneChainCallback )
+                                           Sapphire::Event::EventHandler::SceneChainCallback sceneChainCallback )
 {
   playSceneChain( eventId, scene, flags, eventParam2, eventParam3, 0, sceneChainCallback );
 }
 
-void Core::Entity::Player::playSceneChain( uint32_t eventId, uint32_t scene, uint32_t flags,
-                                           Core::Event::EventHandler::SceneChainCallback sceneChainCallback )
+void Sapphire::Entity::Player::playSceneChain( uint32_t eventId, uint32_t scene, uint32_t flags,
+                                           Sapphire::Event::EventHandler::SceneChainCallback sceneChainCallback )
 {
   playSceneChain( eventId, scene, flags, 0, 0, 0, sceneChainCallback );
 }
 
-void Core::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlayer )
+void Sapphire::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlayer )
 {
   auto pEvent = getEvent( eventId );
 
@@ -280,7 +280,7 @@ void Core::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlayer )
     unsetStateFlag( PlayerStateFlag::InNpcEvent );
 }
 
-void Core::Entity::Player::eventActionStart( uint32_t eventId,
+void Sapphire::Entity::Player::eventActionStart( uint32_t eventId,
                                              uint32_t action,
                                              ActionCallback finishCallback,
                                              ActionCallback interruptCallback,
@@ -311,7 +311,7 @@ void Core::Entity::Player::eventActionStart( uint32_t eventId,
 }
 
 
-void Core::Entity::Player::eventItemActionStart( uint32_t eventId,
+void Sapphire::Entity::Player::eventItemActionStart( uint32_t eventId,
                                                  uint32_t action,
                                                  ActionCallback finishCallback,
                                                  ActionCallback interruptCallback,
@@ -327,7 +327,7 @@ void Core::Entity::Player::eventItemActionStart( uint32_t eventId,
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Core::Entity::Player::onLogin()
+void Sapphire::Entity::Player::onLogin()
 {
   auto pConfig = g_fw.get< ConfigMgr >();
   auto motd = pConfig->getValue< std::string >( "General", "MotD", "" );
@@ -340,23 +340,23 @@ void Core::Entity::Player::onLogin()
   }
 }
 
-void Core::Entity::Player::onZoneStart()
+void Sapphire::Entity::Player::onZoneStart()
 {
 
 }
 
-void Core::Entity::Player::onZoneDone()
+void Sapphire::Entity::Player::onZoneDone()
 {
 
 }
 
-void Core::Entity::Player::onDeath()
+void Sapphire::Entity::Player::onDeath()
 {
 
 }
 
 // TODO: slightly ugly here and way too static. Needs too be done properly
-void Core::Entity::Player::onTick()
+void Sapphire::Entity::Player::onTick()
 {
 
   bool sendUpdate = false;

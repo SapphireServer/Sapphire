@@ -3,7 +3,7 @@
 #include "Event/EventHelper.h"
 #include <ScriptObject.h>
 
-using namespace Core;
+using namespace Sapphire;
 
 // Quest Script: SubSea001_00111
 // Quest Name: Making a Name

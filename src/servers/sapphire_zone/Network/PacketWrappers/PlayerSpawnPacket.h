@@ -9,7 +9,7 @@
 #include "Inventory/Item.h"
 #include "StatusEffect/StatusEffect.h"
 
-namespace Core::Network::Packets::Server
+namespace Sapphire::Network::Packets::Server
 {
 
   /**
@@ -97,22 +97,22 @@ namespace Core::Network::Packets::Server
         m_data.displayFlags |= static_cast< uint16_t >( Common::DisplayFlags::Invisible );
       }
 
-      if( player.getEquipDisplayFlags() & Core::Common::EquipDisplayFlags::HideHead )
+      if( player.getEquipDisplayFlags() & Sapphire::Common::EquipDisplayFlags::HideHead )
       {
         m_data.displayFlags |= static_cast< uint16_t >( Common::DisplayFlags::HideHead );
       }
 
-      if( player.getEquipDisplayFlags() & Core::Common::EquipDisplayFlags::HideWeapon )
+      if( player.getEquipDisplayFlags() & Sapphire::Common::EquipDisplayFlags::HideWeapon )
       {
         m_data.displayFlags |= static_cast< uint16_t >( Common::DisplayFlags::HideWeapon );
       }
 
-      if( player.getEquipDisplayFlags() & Core::Common::EquipDisplayFlags::Visor )
+      if( player.getEquipDisplayFlags() & Sapphire::Common::EquipDisplayFlags::Visor )
       {
         m_data.displayFlags |= static_cast< uint16_t >( Common::DisplayFlags::Visor );
       }
 
-      if( !( player.getEquipDisplayFlags() & Core::Common::EquipDisplayFlags::HideLegacyMark ) )
+      if( !( player.getEquipDisplayFlags() & Sapphire::Common::EquipDisplayFlags::HideLegacyMark ) )
       {
         m_data.look[ 0xC ] = m_data.look[ 0xC ] | 1 << 7;
       }
@@ -127,7 +127,7 @@ namespace Core::Network::Packets::Server
       //m_data.unknown_60 = 3;
       //m_data.unknown_61 = 7;
 
-      uint64_t currentTimeMs = Core::Util::getTimeMs();
+      uint64_t currentTimeMs = Sapphire::Util::getTimeMs();
 
       for( auto const& effect : player.getStatusEffectMap() )
       {

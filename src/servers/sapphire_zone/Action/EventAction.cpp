@@ -11,20 +11,20 @@
 #include "EventAction.h"
 #include "Framework.h"
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
-using namespace Core::Common;
-using namespace Core::Network;
-using namespace Core::Network::Packets;
-using namespace Core::Network::Packets::Server;
-using namespace Core::Network::ActorControl;
+using namespace Sapphire::Common;
+using namespace Sapphire::Network;
+using namespace Sapphire::Network::Packets;
+using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::Network::ActorControl;
 
-Core::Action::EventAction::EventAction()
+Sapphire::Action::EventAction::EventAction()
 {
   m_handleActionType = HandleActionType::Event;
 }
 
-Core::Action::EventAction::EventAction( Entity::CharaPtr pActor, uint32_t eventId, uint16_t action,
+Sapphire::Action::EventAction::EventAction( Entity::CharaPtr pActor, uint32_t eventId, uint16_t action,
                                         ActionCallback finishRef, ActionCallback interruptRef, uint64_t additional )
 {
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
@@ -33,19 +33,19 @@ Core::Action::EventAction::EventAction( Entity::CharaPtr pActor, uint32_t eventI
   m_handleActionType = HandleActionType::Event;
   m_eventId = eventId;
   m_id = action;
-  m_castTime = pExdData->get< Core::Data::EventAction >( action )->castTime * 1000; // TODO: Add security checks.
+  m_castTime = pExdData->get< Sapphire::Data::EventAction >( action )->castTime * 1000; // TODO: Add security checks.
   m_onActionFinishClb = finishRef;
   m_onActionInterruptClb = interruptRef;
   m_pSource = pActor;
   m_bInterrupt = false;
 }
 
-Core::Action::EventAction::~EventAction()
+Sapphire::Action::EventAction::~EventAction()
 {
 
 }
 
-void Core::Action::EventAction::onStart()
+void Sapphire::Action::EventAction::onStart()
 {
   if( !m_pSource )
     return;
@@ -64,7 +64,7 @@ void Core::Action::EventAction::onStart()
     m_pSource->sendToInRangeSet( control );
 }
 
-void Core::Action::EventAction::onFinish()
+void Sapphire::Action::EventAction::onFinish()
 {
   if( !m_pSource )
     return;
@@ -101,7 +101,7 @@ void Core::Action::EventAction::onFinish()
 
 }
 
-void Core::Action::EventAction::onInterrupt()
+void Sapphire::Action::EventAction::onInterrupt()
 {
   if( !m_pSource )
     return;

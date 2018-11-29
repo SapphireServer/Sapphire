@@ -3,7 +3,7 @@
 
 #include "DbConnection.h"
 
-namespace Core::Db
+namespace Sapphire::Db
 {
   class DbConnectionInfo;
 
@@ -96,7 +96,7 @@ namespace Core::Db
 
     ZoneDbConnection( ConnectionInfo& connInfo );
 
-    ZoneDbConnection( Core::LockedWaitQueue< std::shared_ptr< Operation > >* q, ConnectionInfo& connInfo );
+    ZoneDbConnection( Sapphire::LockedWaitQueue< std::shared_ptr< Operation > >* q, ConnectionInfo& connInfo );
 
     ~ZoneDbConnection();
 

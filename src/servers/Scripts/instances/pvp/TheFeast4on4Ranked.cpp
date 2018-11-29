@@ -1,7 +1,7 @@
 #include <ScriptObject.h>
 #include <Zone/InstanceContent.h>
 
-using namespace Core;
+using namespace Sapphire;
 
 class TheFeast4on4Ranked :
   public Sapphire::ScriptAPI::InstanceContentScript

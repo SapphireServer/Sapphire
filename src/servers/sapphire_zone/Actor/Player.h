@@ -11,7 +11,7 @@
 #include <map>
 #include <queue>
 
-namespace Core::Entity
+namespace Sapphire::Entity
 {
 
   struct QueuedZoning
@@ -361,7 +361,7 @@ namespace Core::Entity
     /*! return the current amount of crystals of type */
     uint32_t getCrystal( uint8_t type ) const;
 
-    void updateModels( Common::GearSetSlot equipSlotId, const Core::ItemPtr& pItem, bool updateClass );
+    void updateModels( Common::GearSetSlot equipSlotId, const Sapphire::ItemPtr& pItem, bool updateClass );
 
     Common::GearModelSlot equipSlotToModelSlot( Common::GearSetSlot slot );
 
@@ -778,7 +778,7 @@ namespace Core::Entity
 
     bool actionHasCastTime( uint32_t actionId );
 
-    Core::Entity::ActorPtr lookupTargetById( uint64_t targetId );
+    Sapphire::Entity::ActorPtr lookupTargetById( uint64_t targetId );
 
     bool isLogin() const;
 
@@ -870,7 +870,7 @@ namespace Core::Entity
 
     InvSlotPair getFreeBagSlot();
 
-    Core::ItemPtr addItem( uint32_t catalogId, uint32_t quantity = 1, bool isHq = false, bool slient = false );
+    Sapphire::ItemPtr addItem( uint32_t catalogId, uint32_t quantity = 1, bool isHq = false, bool slient = false );
 
     void moveItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot );
 
@@ -940,7 +940,7 @@ namespace Core::Entity
     bool m_onEnterEventDone;
 
   private:
-    using InventoryMap = std::map< uint16_t, Core::ItemContainerPtr >;
+    using InventoryMap = std::map< uint16_t, Sapphire::ItemContainerPtr >;
 
     InventoryMap m_storageMap;
 

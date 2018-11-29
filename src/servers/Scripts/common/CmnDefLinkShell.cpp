@@ -5,7 +5,7 @@
 #define ACTION_RENAME 3
 #define ACTION_REMOVE 4
 
-using namespace Core;
+using namespace Sapphire;
 
 class CmnDefLinkShell :
   public Sapphire::ScriptAPI::EventScript

@@ -8,7 +8,7 @@
 // Start NPC: 1001028
 // End NPC: 1002697
 
-using namespace Core;
+using namespace Sapphire;
 
 class ManSea001 :
   public Sapphire::ScriptAPI::EventScript

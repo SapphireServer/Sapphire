@@ -3,7 +3,7 @@
 #include "Event/EventHelper.h"
 #include <ScriptObject.h>
 
-using namespace Core;
+using namespace Sapphire;
 
 // Quest Script: SubFst030_00173
 // Quest Name: The Nose Knows

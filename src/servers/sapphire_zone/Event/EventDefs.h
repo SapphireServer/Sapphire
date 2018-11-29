@@ -1,7 +1,7 @@
 #ifndef SAPPHIRE_EVENTDEFS_H
 #define SAPPHIRE_EVENTDEFS_H
 
-namespace Core
+namespace Sapphire
 {
   enum EventFlags
   {

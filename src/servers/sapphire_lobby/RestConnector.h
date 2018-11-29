@@ -10,12 +10,12 @@
 using HttpClient = SimpleWeb::Client< SimpleWeb::HTTP >;
 using HttpResponse = std::shared_ptr< SimpleWeb::ClientBase< SimpleWeb::HTTP >::Response >;
 
-namespace Core
+namespace Sapphire
 {
   class Session;
 }
 
-namespace Core::Network
+namespace Sapphire::Network
 {
   class LobbySession;
 

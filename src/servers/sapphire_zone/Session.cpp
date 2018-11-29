@@ -12,10 +12,10 @@
 #include "Framework.h"
 
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 namespace fs = std::experimental::filesystem;
 
-Core::Session::Session( uint32_t sessionId ) :
+Sapphire::Session::Session( uint32_t sessionId ) :
   m_sessionId( sessionId ),
   m_lastDataTime( Util::getTimeSeconds() ),
   m_lastSqlTime( Util::getTimeSeconds() ),
@@ -23,34 +23,34 @@ Core::Session::Session( uint32_t sessionId ) :
 {
 }
 
-Core::Session::~Session()
+Sapphire::Session::~Session()
 {
 }
 
-void Core::Session::setZoneConnection( Network::GameConnectionPtr pZoneCon )
+void Sapphire::Session::setZoneConnection( Network::GameConnectionPtr pZoneCon )
 {
   pZoneCon->m_conType = Network::ConnectionType::Zone;
   m_pZoneConnection = pZoneCon;
 }
 
-void Core::Session::setChatConnection( Network::GameConnectionPtr pChatCon )
+void Sapphire::Session::setChatConnection( Network::GameConnectionPtr pChatCon )
 {
   pChatCon->m_conType = Network::ConnectionType::Chat;
   m_pChatConnection = pChatCon;
 }
 
-Core::Network::GameConnectionPtr Core::Session::getZoneConnection() const
+Sapphire::Network::GameConnectionPtr Sapphire::Session::getZoneConnection() const
 {
   return m_pZoneConnection;
 }
 
-Core::Network::GameConnectionPtr Core::Session::getChatConnection() const
+Sapphire::Network::GameConnectionPtr Sapphire::Session::getChatConnection() const
 {
   return m_pChatConnection;
 }
 
 
-bool Core::Session::loadPlayer()
+bool Sapphire::Session::loadPlayer()
 {
 
   m_pPlayer = Entity::make_Player();
@@ -67,7 +67,7 @@ bool Core::Session::loadPlayer()
 
 }
 
-void Core::Session::close()
+void Sapphire::Session::close()
 {
   if( m_pZoneConnection )
     m_pZoneConnection->Disconnect();
@@ -85,37 +85,37 @@ void Core::Session::close()
   }
 }
 
-uint32_t Core::Session::getId() const
+uint32_t Sapphire::Session::getId() const
 {
   return m_sessionId;
 }
 
-int64_t Core::Session::getLastDataTime() const
+int64_t Sapphire::Session::getLastDataTime() const
 {
   return m_lastDataTime;
 }
 
-int64_t Core::Session::getLastSqlTime() const
+int64_t Sapphire::Session::getLastSqlTime() const
 {
   return m_lastSqlTime;
 }
 
-bool Core::Session::isValid() const
+bool Sapphire::Session::isValid() const
 {
   return m_isValid;
 }
 
-void Core::Session::updateLastDataTime()
+void Sapphire::Session::updateLastDataTime()
 {
   m_lastDataTime = Util::getTimeSeconds();
 }
 
-void Core::Session::updateLastSqlTime()
+void Sapphire::Session::updateLastSqlTime()
 {
   m_lastSqlTime = Util::getTimeSeconds();
 }
 
-void Core::Session::startReplay( const std::string& path )
+void Sapphire::Session::startReplay( const std::string& path )
 {
   auto pLog = g_fw.get< Logger >();
   if( !fs::exists( path ) )
@@ -161,13 +161,13 @@ void Core::Session::startReplay( const std::string& path )
   m_isReplaying = true;
 }
 
-void Core::Session::stopReplay()
+void Sapphire::Session::stopReplay()
 {
   m_isReplaying = false;
   m_replayCache.clear();
 }
 
-void Core::Session::processReplay()
+void Sapphire::Session::processReplay()
 {
   int at = 0;
   for( const auto& set : m_replayCache )
@@ -185,7 +185,7 @@ void Core::Session::processReplay()
     m_isReplaying = false;
 }
 
-void Core::Session::sendReplayInfo()
+void Sapphire::Session::sendReplayInfo()
 {
   std::string message = std::to_string( m_replayCache.size() ) + " Sets left in cache, ";
 
@@ -197,7 +197,7 @@ void Core::Session::sendReplayInfo()
   getPlayer()->sendDebug( message );
 }
 
-void Core::Session::update()
+void Sapphire::Session::update()
 {
   if( m_isReplaying )
     processReplay();
@@ -226,7 +226,7 @@ void Core::Session::update()
 
 }
 
-Core::Entity::PlayerPtr Core::Session::getPlayer() const
+Sapphire::Entity::PlayerPtr Sapphire::Session::getPlayer() const
 {
   return m_pPlayer;
 }

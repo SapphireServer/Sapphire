@@ -1,22 +1,22 @@
 #include "ZoneDbConnection.h"
 #include <MySqlConnector.h>
 
-Core::Db::ZoneDbConnection::ZoneDbConnection( ConnectionInfo& connInfo ) :
+Sapphire::Db::ZoneDbConnection::ZoneDbConnection( ConnectionInfo& connInfo ) :
   DbConnection( connInfo )
 {
 }
 
-Core::Db::ZoneDbConnection::ZoneDbConnection( Core::LockedWaitQueue< std::shared_ptr< Operation > >* q,
+Sapphire::Db::ZoneDbConnection::ZoneDbConnection( Sapphire::LockedWaitQueue< std::shared_ptr< Operation > >* q,
                                                 ConnectionInfo& connInfo ) :
   DbConnection( q, connInfo )
 {
 }
 
-Core::Db::ZoneDbConnection::~ZoneDbConnection()
+Sapphire::Db::ZoneDbConnection::~ZoneDbConnection()
 {
 }
 
-void Core::Db::ZoneDbConnection::doPrepareStatements()
+void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
 {
   if( !m_reconnecting )
     m_stmts.resize( MAX_STATEMENTS );

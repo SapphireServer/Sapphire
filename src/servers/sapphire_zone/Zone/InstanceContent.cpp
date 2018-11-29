@@ -22,14 +22,14 @@
 #include "InstanceContent.h"
 #include "Framework.h"
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
-using namespace Core::Common;
-using namespace Core::Network::Packets;
-using namespace Core::Network::Packets::Server;
-using namespace Core::Network::ActorControl;
+using namespace Sapphire::Common;
+using namespace Sapphire::Network::Packets;
+using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::Network::ActorControl;
 
-Core::InstanceContent::InstanceContent( std::shared_ptr< Core::Data::InstanceContent > pInstanceConfiguration,
+Sapphire::InstanceContent::InstanceContent( std::shared_ptr< Sapphire::Data::InstanceContent > pInstanceConfiguration,
                                         uint16_t territoryType,
                                         uint32_t guId,
                                         const std::string& internalName,
@@ -48,7 +48,7 @@ Core::InstanceContent::InstanceContent( std::shared_ptr< Core::Data::InstanceCon
 
 }
 
-bool Core::InstanceContent::init()
+bool Sapphire::InstanceContent::init()
 {
   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
   pScriptMgr->onInstanceInit( getAsInstanceContent() );
@@ -57,22 +57,22 @@ bool Core::InstanceContent::init()
 }
 
 
-Core::InstanceContent::~InstanceContent()
+Sapphire::InstanceContent::~InstanceContent()
 {
 
 }
 
-uint32_t Core::InstanceContent::getInstanceContentId() const
+uint32_t Sapphire::InstanceContent::getInstanceContentId() const
 {
   return m_instanceContentId;
 }
 
-Core::Data::ExdDataGenerated::InstanceContentPtr Core::InstanceContent::getInstanceConfiguration() const
+Sapphire::Data::ExdDataGenerated::InstanceContentPtr Sapphire::InstanceContent::getInstanceConfiguration() const
 {
   return m_instanceConfiguration;
 }
 
-void Core::InstanceContent::onPlayerZoneIn( Entity::Player& player )
+void Sapphire::InstanceContent::onPlayerZoneIn( Entity::Player& player )
 {
   auto pLog = g_fw.get< Logger >();
   pLog->debug( "InstanceContent::onPlayerZoneIn: Zone#" + std::to_string( getGuId() ) + "|"
@@ -89,7 +89,7 @@ void Core::InstanceContent::onPlayerZoneIn( Entity::Player& player )
 
 }
 
-void Core::InstanceContent::onLeaveTerritory( Entity::Player& player )
+void Sapphire::InstanceContent::onLeaveTerritory( Entity::Player& player )
 {
   auto pLog = g_fw.get< Logger >();
   pLog->debug( "InstanceContent::onLeaveTerritory: Zone#" + std::to_string( getGuId() ) + "|"
@@ -102,7 +102,7 @@ void Core::InstanceContent::onLeaveTerritory( Entity::Player& player )
   player.unsetStateFlag( PlayerStateFlag::BoundByDuty );
 }
 
-void Core::InstanceContent::onUpdate( uint32_t currTime )
+void Sapphire::InstanceContent::onUpdate( uint32_t currTime )
 {
   switch( m_state )
   {
@@ -166,24 +166,24 @@ void Core::InstanceContent::onUpdate( uint32_t currTime )
   pScriptMgr->onInstanceUpdate( getAsInstanceContent(), currTime );
 }
 
-void Core::InstanceContent::onFinishLoading( Entity::Player& player )
+void Sapphire::InstanceContent::onFinishLoading( Entity::Player& player )
 {
   sendDirectorInit( player );
 }
 
-void Core::InstanceContent::onInitDirector( Entity::Player& player )
+void Sapphire::InstanceContent::onInitDirector( Entity::Player& player )
 {
   sendDirectorVars( player );
   player.setDirectorInitialized( true );
 }
 
-void Core::InstanceContent::onDirectorSync( Entity::Player& player )
+void Sapphire::InstanceContent::onDirectorSync( Entity::Player& player )
 {
   player.queuePacket( makeActorControl143( player.getId(), DirectorUpdate, 0x00110001, 0x80000000, 1 ) );
 }
 
 
-void Core::InstanceContent::setVar( uint8_t index, uint8_t value )
+void Sapphire::InstanceContent::setVar( uint8_t index, uint8_t value )
 {
   if( index > 19 )
     return;
@@ -260,7 +260,7 @@ void Core::InstanceContent::setVar( uint8_t index, uint8_t value )
   }
 }
 
-void Core::InstanceContent::setSequence( uint8_t value )
+void Sapphire::InstanceContent::setSequence( uint8_t value )
 {
   setDirectorSequence( value );
 
@@ -270,7 +270,7 @@ void Core::InstanceContent::setSequence( uint8_t value )
   }
 }
 
-void Core::InstanceContent::setBranch( uint8_t value )
+void Sapphire::InstanceContent::setBranch( uint8_t value )
 {
   setDirectorBranch( value );
 
@@ -280,7 +280,7 @@ void Core::InstanceContent::setBranch( uint8_t value )
   }
 }
 
-void Core::InstanceContent::startQte()
+void Sapphire::InstanceContent::startQte()
 {
   for( const auto& playerIt : m_playerMap )
   {
@@ -289,7 +289,7 @@ void Core::InstanceContent::startQte()
   }
 }
 
-void Core::InstanceContent::startEventCutscene()
+void Sapphire::InstanceContent::startEventCutscene()
 {
   // TODO: lock player movement
   for( const auto& playerIt : m_playerMap )
@@ -299,7 +299,7 @@ void Core::InstanceContent::startEventCutscene()
   }
 }
 
-void Core::InstanceContent::endEventCutscene()
+void Sapphire::InstanceContent::endEventCutscene()
 {
   for( const auto& playerIt : m_playerMap )
   {
@@ -308,7 +308,7 @@ void Core::InstanceContent::endEventCutscene()
   }
 }
 
-void Core::InstanceContent::onRegisterEObj( Entity::EventObjectPtr object )
+void Sapphire::InstanceContent::onRegisterEObj( Entity::EventObjectPtr object )
 {
   if( object->getName() != "none" )
     m_eventObjectMap[ object->getName() ] = object;
@@ -317,7 +317,7 @@ void Core::InstanceContent::onRegisterEObj( Entity::EventObjectPtr object )
 
   auto pLog = g_fw.get< Logger >();
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-  auto objData = pExdData->get< Core::Data::EObj >( object->getObjectId() );
+  auto objData = pExdData->get< Sapphire::Data::EObj >( object->getObjectId() );
   if( objData )
     // todo: data should be renamed to eventId
     m_eventIdToObjectMap[ objData->data ] = object;
@@ -327,18 +327,18 @@ void Core::InstanceContent::onRegisterEObj( Entity::EventObjectPtr object )
                  std::to_string( object->getObjectId() ) );
 }
 
-bool Core::InstanceContent::hasPlayerPreviouslySpawned( Entity::Player& player ) const
+bool Sapphire::InstanceContent::hasPlayerPreviouslySpawned( Entity::Player& player ) const
 {
   auto it = m_spawnedPlayers.find( player.getId() );
   return it != m_spawnedPlayers.end();
 }
 
-Core::InstanceContent::InstanceContentState Core::InstanceContent::getState() const
+Sapphire::InstanceContent::InstanceContentState Sapphire::InstanceContent::getState() const
 {
   return m_state;
 }
 
-void Core::InstanceContent::onBeforePlayerZoneIn( Core::Entity::Player& player )
+void Sapphire::InstanceContent::onBeforePlayerZoneIn( Sapphire::Entity::Player& player )
 {
   // remove any players from the instance who aren't bound on zone in
   if( !isPlayerBound( player.getId() ) )
@@ -362,7 +362,7 @@ void Core::InstanceContent::onBeforePlayerZoneIn( Core::Entity::Player& player )
   player.resetObjSpawnIndex();
 }
 
-Core::Entity::EventObjectPtr Core::InstanceContent::getEObjByName( const std::string& name )
+Sapphire::Entity::EventObjectPtr Sapphire::InstanceContent::getEObjByName( const std::string& name )
 {
   auto it = m_eventObjectMap.find( name );
   if( it == m_eventObjectMap.end() )
@@ -371,7 +371,7 @@ Core::Entity::EventObjectPtr Core::InstanceContent::getEObjByName( const std::st
   return it->second;
 }
 
-void Core::InstanceContent::onTalk( Core::Entity::Player& player, uint32_t eventId, uint64_t actorId )
+void Sapphire::InstanceContent::onTalk( Sapphire::Entity::Player& player, uint32_t eventId, uint64_t actorId )
 {
   // todo: handle exit (and maybe shortcut?) behaviour here
 
@@ -387,7 +387,7 @@ void Core::InstanceContent::onTalk( Core::Entity::Player& player, uint32_t event
 }
 
 void
-Core::InstanceContent::onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 )
+Sapphire::InstanceContent::onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 )
 {
   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
   pScriptMgr->onInstanceEnterTerritory( getAsInstanceContent(), player, eventId, param1, param2 );
@@ -405,7 +405,7 @@ Core::InstanceContent::onEnterTerritory( Entity::Player& player, uint32_t eventI
     player.directorPlayScene( getDirectorId(), 2, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 0, 0x9, getCurrentBGM() );
 }
 
-void Core::InstanceContent::setCurrentBGM( uint16_t bgmIndex )
+void Sapphire::InstanceContent::setCurrentBGM( uint16_t bgmIndex )
 {
   m_currentBgm = bgmIndex;
 
@@ -420,17 +420,17 @@ void Core::InstanceContent::setCurrentBGM( uint16_t bgmIndex )
   }
 }
 
-void Core::InstanceContent::setPlayerBGM( Core::Entity::Player& player, uint16_t bgmId )
+void Sapphire::InstanceContent::setPlayerBGM( Sapphire::Entity::Player& player, uint16_t bgmId )
 {
   player.queuePacket( makeActorControl143( player.getId(), DirectorUpdate, getDirectorId(), 0x80000001, bgmId ) );
 }
 
-uint16_t Core::InstanceContent::getCurrentBGM() const
+uint16_t Sapphire::InstanceContent::getCurrentBGM() const
 {
   return m_currentBgm;
 }
 
-bool Core::InstanceContent::bindPlayer( uint32_t playerId )
+bool Sapphire::InstanceContent::bindPlayer( uint32_t playerId )
 {
   // if player already bound, return false
   if( m_boundPlayerIds.count( playerId ) )
@@ -444,12 +444,12 @@ bool Core::InstanceContent::bindPlayer( uint32_t playerId )
   return true;
 }
 
-bool Core::InstanceContent::isPlayerBound( uint32_t playerId ) const
+bool Sapphire::InstanceContent::isPlayerBound( uint32_t playerId ) const
 {
   return m_boundPlayerIds.count( playerId ) > 0;
 }
 
-void Core::InstanceContent::unbindPlayer( uint32_t playerId )
+void Sapphire::InstanceContent::unbindPlayer( uint32_t playerId )
 {
   m_boundPlayerIds.erase( playerId );
 

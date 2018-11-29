@@ -4,7 +4,7 @@
 #include "Zone.h"
 #include "Forwards.h"
 
-namespace Core
+namespace Sapphire
 {
   enum class LandPurchaseResult
   {
@@ -46,10 +46,10 @@ namespace Core
     uint8_t getWardNum() const;
 
     uint32_t getLandSetId() const;
-    Core::LandPtr getLand( uint8_t id );
+    Sapphire::LandPtr getLand( uint8_t id );
 
   private:
-    using LandPtrMap = std::unordered_map< uint8_t, Core::LandPtr >;
+    using LandPtrMap = std::unordered_map< uint8_t, Sapphire::LandPtr >;
     const uint32_t m_landSetMax = 18;
     LandPtrMap m_landPtrMap;
     uint8_t m_wardNum;

@@ -2,7 +2,7 @@
 #include "Event/EventHelper.h"
 #include <ScriptObject.h>
 
-using namespace Core;
+using namespace Sapphire;
 
 // Quest Script: SubFst010_00001
 // Quest Name: A Good Adventurer Is Hard to Find

@@ -16,9 +16,9 @@
 
 #include <Config/ConfigMgr.h>
 
-Core::Framework g_fw;
+Sapphire::Framework g_fw;
 
-using namespace Core;
+using namespace Sapphire;
 
 bool setupFramework()
 {

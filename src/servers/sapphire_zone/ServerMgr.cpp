@@ -26,9 +26,9 @@
 #include "Script/ScriptMgr.h"
 #include "Linkshell/LinkshellMgr.h"
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
-Core::ServerMgr::ServerMgr( const std::string& configName ) :
+Sapphire::ServerMgr::ServerMgr( const std::string& configName ) :
   m_configName( configName ),
   m_bRunning( true ),
   m_lastDBPingTime( 0 ),
@@ -36,19 +36,19 @@ Core::ServerMgr::ServerMgr( const std::string& configName ) :
 {
 }
 
-Core::ServerMgr::~ServerMgr()
+Sapphire::ServerMgr::~ServerMgr()
 {
 }
 
-size_t Core::ServerMgr::getSessionCount() const
+size_t Sapphire::ServerMgr::getSessionCount() const
 {
   return m_sessionMapById.size();
 }
 
-bool Core::ServerMgr::loadSettings( int32_t argc, char* argv[] )
+bool Sapphire::ServerMgr::loadSettings( int32_t argc, char* argv[] )
 {
-  auto pLog = g_fw.get< Core::Logger >();
-  auto pConfig = g_fw.get< Core::ConfigMgr >();
+  auto pLog = g_fw.get< Sapphire::Logger >();
+  auto pConfig = g_fw.get< Sapphire::ConfigMgr >();
   auto pExd = g_fw.get< Data::ExdDataGenerated >();
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
 
@@ -122,9 +122,9 @@ bool Core::ServerMgr::loadSettings( int32_t argc, char* argv[] )
     return false;
   }
 
-  Core::Db::DbLoader loader;
+  Sapphire::Db::DbLoader loader;
 
-  Core::Db::ConnectionInfo info;
+  Sapphire::Db::ConnectionInfo info;
   info.password = pConfig->getValue< std::string >( "Database", "Password", "" );
   info.host = pConfig->getValue< std::string >( "Database", "Host", "127.0.0.1" );
   info.database = pConfig->getValue< std::string >( "Database", "Database", "sapphire" );
@@ -143,9 +143,9 @@ bool Core::ServerMgr::loadSettings( int32_t argc, char* argv[] )
   return true;
 }
 
-void Core::ServerMgr::run( int32_t argc, char* argv[] )
+void Sapphire::ServerMgr::run( int32_t argc, char* argv[] )
 {
-  auto pLog = g_fw.get< Core::Logger >();
+  auto pLog = g_fw.get< Sapphire::Logger >();
   auto pScript = g_fw.get< Scripting::ScriptMgr >();
   auto pLsMgr = g_fw.get< LinkshellMgr >();
   auto pTeriMgr = g_fw.get< TerritoryMgr >();
@@ -189,19 +189,19 @@ void Core::ServerMgr::run( int32_t argc, char* argv[] )
 
 }
 
-uint16_t Core::ServerMgr::getWorldId() const
+uint16_t Sapphire::ServerMgr::getWorldId() const
 {
   return m_worldId;
 }
 
-void Core::ServerMgr::setWorldId( uint16_t worldId )
+void Sapphire::ServerMgr::setWorldId( uint16_t worldId )
 {
   m_worldId = worldId;
 }
 
-void Core::ServerMgr::printBanner() const
+void Sapphire::ServerMgr::printBanner() const
 {
-  auto pLog = g_fw.get< Core::Logger >();
+  auto pLog = g_fw.get< Sapphire::Logger >();
 
   pLog->info( "===========================================================" );
   pLog->info( "Sapphire Server Project " );
@@ -211,7 +211,7 @@ void Core::ServerMgr::printBanner() const
   pLog->info( "===========================================================" );
 }
 
-void Core::ServerMgr::mainLoop()
+void Sapphire::ServerMgr::mainLoop()
 {
   auto pLog = g_fw.get< Logger >();
   auto pTeriMgr = g_fw.get< TerritoryMgr >();
@@ -292,9 +292,9 @@ void Core::ServerMgr::mainLoop()
   }
 }
 
-bool Core::ServerMgr::createSession( uint32_t sessionId )
+bool Sapphire::ServerMgr::createSession( uint32_t sessionId )
 {
-  auto pLog = g_fw.get< Core::Logger >();
+  auto pLog = g_fw.get< Sapphire::Logger >();
 
   std::lock_guard< std::mutex > lock( m_sessionMutex );
 
@@ -325,12 +325,12 @@ bool Core::ServerMgr::createSession( uint32_t sessionId )
 
 }
 
-void Core::ServerMgr::removeSession( uint32_t sessionId )
+void Sapphire::ServerMgr::removeSession( uint32_t sessionId )
 {
   m_sessionMapById.erase( sessionId );
 }
 
-Core::SessionPtr Core::ServerMgr::getSession( uint32_t id )
+Sapphire::SessionPtr Sapphire::ServerMgr::getSession( uint32_t id )
 {
   //std::lock_guard<std::mutex> lock( m_sessionMutex );
 
@@ -342,7 +342,7 @@ Core::SessionPtr Core::ServerMgr::getSession( uint32_t id )
   return nullptr;
 }
 
-Core::SessionPtr Core::ServerMgr::getSession( const std::string& playerName )
+Sapphire::SessionPtr Sapphire::ServerMgr::getSession( const std::string& playerName )
 {
   //std::lock_guard<std::mutex> lock( m_sessionMutex );
 
@@ -354,18 +354,18 @@ Core::SessionPtr Core::ServerMgr::getSession( const std::string& playerName )
   return nullptr;
 }
 
-void Core::ServerMgr::removeSession( const std::string& playerName )
+void Sapphire::ServerMgr::removeSession( const std::string& playerName )
 {
   m_sessionMapByName.erase( playerName );
 }
 
 
-bool Core::ServerMgr::isRunning() const
+bool Sapphire::ServerMgr::isRunning() const
 {
   return m_bRunning;
 }
 
-std::string Core::ServerMgr::getPlayerNameFromDb( uint32_t playerId, bool forceDbLoad )
+std::string Sapphire::ServerMgr::getPlayerNameFromDb( uint32_t playerId, bool forceDbLoad )
 {
   if( !forceDbLoad )
   {
@@ -387,12 +387,12 @@ std::string Core::ServerMgr::getPlayerNameFromDb( uint32_t playerId, bool forceD
   return playerName;
 }
 
-void Core::ServerMgr::updatePlayerName( uint32_t playerId, const std::string & playerNewName )
+void Sapphire::ServerMgr::updatePlayerName( uint32_t playerId, const std::string & playerNewName )
 {
   m_playerNameMapById[ playerId ] = playerNewName;
 }
 
-void Core::ServerMgr::loadBNpcTemplates()
+void Sapphire::ServerMgr::loadBNpcTemplates()
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto pTeriMgr = g_fw.get< TerritoryMgr >();
@@ -435,7 +435,7 @@ void Core::ServerMgr::loadBNpcTemplates()
 
 }
 
-Core::Entity::BNpcTemplatePtr Core::ServerMgr::getBNpcTemplate( const std::string& key )
+Sapphire::Entity::BNpcTemplatePtr Sapphire::ServerMgr::getBNpcTemplate( const std::string& key )
 {
   auto it = m_bNpcTemplateMap.find( key );
 
@@ -445,7 +445,7 @@ Core::Entity::BNpcTemplatePtr Core::ServerMgr::getBNpcTemplate( const std::strin
   return it->second;
 }
 
-Core::Entity::BNpcTemplatePtr Core::ServerMgr::getBNpcTemplate( uint32_t id )
+Sapphire::Entity::BNpcTemplatePtr Sapphire::ServerMgr::getBNpcTemplate( uint32_t id )
 {
   for( auto entry : m_bNpcTemplateMap )
   {

@@ -1,7 +1,7 @@
 #include <ScriptObject.h>
 #include <Actor/Player.h>
 
-using namespace Core;
+using namespace Sapphire;
 
 class CmnDefNpcRepair :
   public Sapphire::ScriptAPI::EventScript

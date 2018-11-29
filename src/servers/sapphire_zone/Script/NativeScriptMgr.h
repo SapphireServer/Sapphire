@@ -7,7 +7,7 @@
 
 #include "ScriptLoader.h"
 
-namespace Core::Scripting
+namespace Sapphire::Scripting
 {
 
   /*!
@@ -76,7 +76,7 @@ namespace Core::Scripting
      * @param scripts a set of ScriptInfo ptrs
      * @param search the search term
      */
-    void findScripts( std::set< Core::Scripting::ScriptInfo* >& scripts, const std::string& search );
+    void findScripts( std::set< Sapphire::Scripting::ScriptInfo* >& scripts, const std::string& search );
 
     /*!
      * @brief Called on a regular interval, allows for scripts to be loaded from the internal load queue.

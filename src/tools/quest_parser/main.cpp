@@ -21,8 +21,8 @@
 #include <algorithm>
 
 
-Core::Logger g_log;
-Core::Data::ExdDataGenerated g_exdDataGen;
+Sapphire::Logger g_log;
+Sapphire::Data::ExdDataGenerated g_exdDataGen;
 namespace fs = std::experimental::filesystem;
 
 const std::string onTalkStr(
@@ -63,7 +63,7 @@ std::string titleCase( const std::string& str )
 }
 
 void
-createScript( std::shared_ptr< Core::Data::Quest >& pQuestData, std::set< std::string >& additionalList, int questId )
+createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< std::string >& additionalList, int questId )
 {
   std::string header(
     "// This is an automatically generated C++ script template\n"
@@ -364,7 +364,7 @@ int main( int argc, char** argv )
   for( const auto& row : rows )
   {
     g_log.info( "Generating " + std::to_string( row ) );
-    auto questInfo = g_exdDataGen.get< Core::Data::Quest >( row );
+    auto questInfo = g_exdDataGen.get< Sapphire::Data::Quest >( row );
 
     if( questInfo->name.empty() || questInfo->id.empty() )
     {

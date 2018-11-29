@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-namespace Core {
+namespace Sapphire {
 namespace Common {
 
 bool operator==( const ActionCategory& t, const uint8_t& g )

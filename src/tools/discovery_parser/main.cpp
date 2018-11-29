@@ -261,7 +261,7 @@ std::string zoneNameToPath( const std::string& name )
       info.name = teriName;
       zoneInfoMap[ row.first ] = info;
 
-      if( !found && ( Core::Util::toLowerCopy( name ) == Core::Util::toLowerCopy( teriName ) ) )
+      if( !found && ( Sapphire::Util::toLowerCopy( name ) == Sapphire::Util::toLowerCopy( teriName ) ) )
       {
         found = true;
         path = teriPath;
@@ -273,7 +273,7 @@ std::string zoneNameToPath( const std::string& name )
   {
     for( const auto& entry : zoneInfoMap )
     {
-      if( found = Core::Util::toLowerCopy( name ) == Core::Util::toLowerCopy( entry.second.name ) )
+      if( found = Sapphire::Util::toLowerCopy( name ) == Sapphire::Util::toLowerCopy( entry.second.name ) )
       {
         path = entry.second.path;
         zoneId = entry.second.id;

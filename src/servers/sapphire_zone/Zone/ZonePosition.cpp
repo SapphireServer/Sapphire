@@ -1,12 +1,12 @@
 #include "ZonePosition.h"
 
-Core::ZonePosition::ZonePosition()
+Sapphire::ZonePosition::ZonePosition()
   :
   m_id( 0 ), m_targetZoneId( 0 ), m_radius( 0 )
 {
 }
 
-Core::ZonePosition::ZonePosition( uint32_t id, uint32_t targetZoneId, const Common::FFXIVARR_POSITION3& targetPosition,
+Sapphire::ZonePosition::ZonePosition( uint32_t id, uint32_t targetZoneId, const Common::FFXIVARR_POSITION3& targetPosition,
                                   uint32_t radius, float rotation )
 {
   m_id = id;
@@ -16,26 +16,26 @@ Core::ZonePosition::ZonePosition( uint32_t id, uint32_t targetZoneId, const Comm
   m_rotation = rotation;
 }
 
-Core::ZonePosition::~ZonePosition()
+Sapphire::ZonePosition::~ZonePosition()
 {
 }
 
-uint32_t Core::ZonePosition::getId() const
+uint32_t Sapphire::ZonePosition::getId() const
 {
   return m_id;
 }
 
-uint32_t Core::ZonePosition::getTargetZoneId() const
+uint32_t Sapphire::ZonePosition::getTargetZoneId() const
 {
   return m_targetZoneId;
 }
 
-const Core::Common::FFXIVARR_POSITION3& Core::ZonePosition::getTargetPosition() const
+const Sapphire::Common::FFXIVARR_POSITION3& Sapphire::ZonePosition::getTargetPosition() const
 {
   return m_targetPos;
 }
 
-float Core::ZonePosition::getTargetRotation() const
+float Sapphire::ZonePosition::getTargetRotation() const
 {
   return m_rotation;
 }

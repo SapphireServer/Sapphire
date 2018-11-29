@@ -7,12 +7,12 @@
 #include "EventHandler.h"
 
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
 
-using namespace Core::Common;
+using namespace Sapphire::Common;
 
-std::string Core::Event::getEventName( uint32_t eventId )
+std::string Sapphire::Event::getEventName( uint32_t eventId )
 {
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
   uint16_t eventType = eventId >> 16;
@@ -23,7 +23,7 @@ std::string Core::Event::getEventName( uint32_t eventId )
   {
     case Event::EventHandler::EventHandlerType::Quest:
     {
-      auto questInfo = pExdData->get< Core::Data::Quest >( eventId );
+      auto questInfo = pExdData->get< Sapphire::Data::Quest >( eventId );
       if( !questInfo )
         return unknown + "Quest";
 
@@ -34,7 +34,7 @@ std::string Core::Event::getEventName( uint32_t eventId )
     }
     case Event::EventHandler::EventHandlerType::CustomTalk:
     {
-      auto customTalkInfo = pExdData->get< Core::Data::CustomTalk >( eventId );
+      auto customTalkInfo = pExdData->get< Sapphire::Data::CustomTalk >( eventId );
       if( !customTalkInfo )
         return unknown + "CustomTalk";
 
@@ -45,21 +45,21 @@ std::string Core::Event::getEventName( uint32_t eventId )
     }
     case Event::EventHandler::EventHandlerType::Opening:
     {
-      auto openingInfo = pExdData->get< Core::Data::Opening >( eventId );
+      auto openingInfo = pExdData->get< Sapphire::Data::Opening >( eventId );
       if( openingInfo )
         return openingInfo->name;
       return unknown + "Opening";
     }
     case Event::EventHandler::EventHandlerType::Aetheryte:
     {
-      auto aetherInfo = pExdData->get< Core::Data::Aetheryte >( eventId & 0xFFFF );
+      auto aetherInfo = pExdData->get< Sapphire::Data::Aetheryte >( eventId & 0xFFFF );
       if( aetherInfo->isAetheryte )
         return "Aetheryte";
       return "Aethernet";
     }
     case Event::EventHandler::EventHandlerType::ICDirector:
     {
-      auto contentInfo = pExdData->get< Core::Data::InstanceContent >( eventId & 0xFFFF );
+      auto contentInfo = pExdData->get< Sapphire::Data::InstanceContent >( eventId & 0xFFFF );
       std::string name = contentInfo->name;
       std::string remove( "â˜…_ '()[]-\x1a\x1\x2\x1f\x1\x3.:" );
       Util::eraseAllIn( name, remove );
@@ -69,7 +69,7 @@ std::string Core::Event::getEventName( uint32_t eventId )
 
     case Event::EventHandler::EventHandlerType::Warp:
     {
-      auto warpInfo = pExdData->get< Core::Data::Warp >( eventId );
+      auto warpInfo = pExdData->get< Sapphire::Data::Warp >( eventId );
       if( warpInfo )
         return "WarpTaxi";
       return unknown + "ChocoboWarp"; //who know
@@ -77,7 +77,7 @@ std::string Core::Event::getEventName( uint32_t eventId )
 
     case Event::EventHandler::EventHandlerType::Shop:
     {
-      auto shopInfo = pExdData->get< Core::Data::GilShop >( eventId );
+      auto shopInfo = pExdData->get< Sapphire::Data::GilShop >( eventId );
 
       return "GilShop" + std::to_string( eventId );
       /*if( shopInfo )
@@ -95,10 +95,10 @@ std::string Core::Event::getEventName( uint32_t eventId )
   }
 }
 
-uint32_t Core::Event::mapEventActorToRealActor( uint32_t eventActorId )
+uint32_t Sapphire::Event::mapEventActorToRealActor( uint32_t eventActorId )
 {
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-  auto levelInfo = pExdData->get< Core::Data::Level >( eventActorId );
+  auto levelInfo = pExdData->get< Sapphire::Data::Level >( eventActorId );
   if( levelInfo )
     return levelInfo->object;
 

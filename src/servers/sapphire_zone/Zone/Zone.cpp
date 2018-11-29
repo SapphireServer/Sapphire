@@ -37,17 +37,17 @@
 #include "TerritoryMgr.h"
 #include "Framework.h"
 
-using namespace Core::Common;
-using namespace Core::Network::Packets;
-using namespace Core::Network::Packets::Server;
-using namespace Core::Network::ActorControl;
+using namespace Sapphire::Common;
+using namespace Sapphire::Network::Packets;
+using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::Network::ActorControl;
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
 /**
 * \brief
 */
-Core::Zone::Zone() :
+Sapphire::Zone::Zone() :
   m_territoryTypeId( 0 ),
   m_guId( 0 ),
   m_currentWeather( Weather::FairSkies ),
@@ -57,7 +57,7 @@ Core::Zone::Zone() :
 {
 }
 
-Core::Zone::Zone( uint16_t territoryTypeId, uint32_t guId, const std::string& internalName, const std::string& placeName ) :
+Sapphire::Zone::Zone( uint16_t territoryTypeId, uint32_t guId, const std::string& internalName, const std::string& placeName ) :
   m_currentWeather( Weather::FairSkies ),
   m_nextEObjId( 0x400D0000 )
 {
@@ -70,14 +70,14 @@ Core::Zone::Zone( uint16_t territoryTypeId, uint32_t guId, const std::string& in
   m_lastMobUpdate = 0;
 
   m_weatherOverride = Weather::None;
-  m_territoryTypeInfo = pExdData->get< Core::Data::TerritoryType >( territoryTypeId );
+  m_territoryTypeInfo = pExdData->get< Sapphire::Data::TerritoryType >( territoryTypeId );
 
   loadWeatherRates();
 
   m_currentWeather = getNextWeather();
 }
 
-void Core::Zone::loadWeatherRates()
+void Sapphire::Zone::loadWeatherRates()
 {
   if( !m_territoryTypeInfo )
     return;
@@ -102,11 +102,11 @@ void Core::Zone::loadWeatherRates()
   }
 }
 
-Core::Zone::~Zone()
+Sapphire::Zone::~Zone()
 {
 }
 
-bool Core::Zone::init()
+bool Sapphire::Zone::init()
 {
   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
 
@@ -119,22 +119,22 @@ bool Core::Zone::init()
   return true;
 }
 
-void Core::Zone::setWeatherOverride( Weather weather )
+void Sapphire::Zone::setWeatherOverride( Weather weather )
 {
   m_weatherOverride = weather;
 }
 
-Weather Core::Zone::getCurrentWeather() const
+Weather Sapphire::Zone::getCurrentWeather() const
 {
   return m_currentWeather;
 }
 
-const Core::FestivalPair& Core::Zone::getCurrentFestival() const
+const Sapphire::FestivalPair& Sapphire::Zone::getCurrentFestival() const
 {
   return m_currentFestival;
 }
 
-void Core::Zone::setCurrentFestival( uint16_t festivalId, uint16_t additionalFestivalId )
+void Sapphire::Zone::setCurrentFestival( uint16_t festivalId, uint16_t additionalFestivalId )
 {
   m_currentFestival = { festivalId, additionalFestivalId };
 
@@ -147,11 +147,11 @@ void Core::Zone::setCurrentFestival( uint16_t festivalId, uint16_t additionalFes
   }
 }
 
-void Core::Zone::loadCellCache()
+void Sapphire::Zone::loadCellCache()
 {
 }
 
-Weather Core::Zone::getNextWeather()
+Weather Sapphire::Zone::getNextWeather()
 {
   uint32_t unixTime = static_cast< uint32_t >( Util::getTimeSeconds() );
   // Get Eorzea hour for weather start
@@ -181,7 +181,7 @@ Weather Core::Zone::getNextWeather()
   return Weather::FairSkies;
 }
 
-void Core::Zone::pushActor( Entity::ActorPtr pActor )
+void Sapphire::Zone::pushActor( Entity::ActorPtr pActor )
 {
   float mx = pActor->getPos().x;
   float my = pActor->getPos().z;
@@ -239,7 +239,7 @@ void Core::Zone::pushActor( Entity::ActorPtr pActor )
   }
 }
 
-void Core::Zone::removeActor( Entity::ActorPtr pActor )
+void Sapphire::Zone::removeActor( Entity::ActorPtr pActor )
 {
   float mx = pActor->getPos().x;
   float my = pActor->getPos().z;
@@ -277,7 +277,7 @@ void Core::Zone::removeActor( Entity::ActorPtr pActor )
 
 }
 
-void Core::Zone::queuePacketForRange( Entity::Player& sourcePlayer, uint32_t range,
+void Sapphire::Zone::queuePacketForRange( Entity::Player& sourcePlayer, uint32_t range,
                                       Network::Packets::FFXIVPacketBasePtr pPacketEntry )
 {
   auto pTeriMgr = g_fw.get< TerritoryMgr >();
@@ -306,7 +306,7 @@ void Core::Zone::queuePacketForRange( Entity::Player& sourcePlayer, uint32_t ran
   }
 }
 
-void Core::Zone::queuePacketForZone( Entity::Player& sourcePlayer,
+void Sapphire::Zone::queuePacketForZone( Entity::Player& sourcePlayer,
                                      Network::Packets::FFXIVPacketBasePtr pPacketEntry,
                                      bool forSelf )
 {
@@ -328,32 +328,32 @@ void Core::Zone::queuePacketForZone( Entity::Player& sourcePlayer,
   }
 }
 
-uint32_t Core::Zone::getTerritoryTypeId() const
+uint32_t Sapphire::Zone::getTerritoryTypeId() const
 {
   return m_territoryTypeId;
 }
 
-uint32_t Core::Zone::getGuId() const
+uint32_t Sapphire::Zone::getGuId() const
 {
   return m_guId;
 }
 
-const std::string& Core::Zone::getName() const
+const std::string& Sapphire::Zone::getName() const
 {
   return m_placeName;
 }
 
-const std::string& Core::Zone::getInternalName() const
+const std::string& Sapphire::Zone::getInternalName() const
 {
   return m_internalName;
 }
 
-std::size_t Core::Zone::getPopCount() const
+std::size_t Sapphire::Zone::getPopCount() const
 {
   return m_playerMap.size();
 }
 
-bool Core::Zone::checkWeather()
+bool Sapphire::Zone::checkWeather()
 {
   if( m_weatherOverride != Weather::None )
   {
@@ -376,7 +376,7 @@ bool Core::Zone::checkWeather()
 }
 
 /*
-void Core::Zone::updateBnpcs( int64_t tickCount )
+void Sapphire::Zone::updateBnpcs( int64_t tickCount )
 {
    if( ( tickCount - m_lastMobUpdate ) > 250 )
    {
@@ -425,7 +425,7 @@ void Core::Zone::updateBnpcs( int64_t tickCount )
 }
 */
 
-bool Core::Zone::update( uint32_t currTime )
+bool Sapphire::Zone::update( uint32_t currTime )
 {
   int64_t tickCount = Util::getTimeMs();
 
@@ -439,7 +439,7 @@ bool Core::Zone::update( uint32_t currTime )
   return true;
 }
 
-void Core::Zone::updateSessions( bool changedWeather )
+void Sapphire::Zone::updateSessions( bool changedWeather )
 {
   auto it = m_sessionSet.begin();
 
@@ -480,7 +480,7 @@ void Core::Zone::updateSessions( bool changedWeather )
   }
 }
 
-bool Core::Zone::isCellActive( uint32_t x, uint32_t y )
+bool Sapphire::Zone::isCellActive( uint32_t x, uint32_t y )
 {
   uint32_t endX = ( ( x + 1 ) <= _sizeX ) ? x + 1 : ( _sizeX - 1 );
   uint32_t endY = ( ( y + 1 ) <= _sizeY ) ? y + 1 : ( _sizeY - 1 );
@@ -505,7 +505,7 @@ bool Core::Zone::isCellActive( uint32_t x, uint32_t y )
   return false;
 }
 
-void Core::Zone::updateCellActivity( uint32_t x, uint32_t y, int32_t radius )
+void Sapphire::Zone::updateCellActivity( uint32_t x, uint32_t y, int32_t radius )
 {
 
   uint32_t endX = ( x + radius ) <= _sizeX ? x + radius : ( _sizeX - 1 );
@@ -554,7 +554,7 @@ void Core::Zone::updateCellActivity( uint32_t x, uint32_t y, int32_t radius )
   }
 }
 
-void Core::Zone::updateActorPosition( Entity::Actor& actor )
+void Sapphire::Zone::updateActorPosition( Entity::Actor& actor )
 {
 
   if( actor.getCurrentZone() != shared_from_this() )
@@ -626,7 +626,7 @@ void Core::Zone::updateActorPosition( Entity::Actor& actor )
 }
 
 
-void Core::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
+void Sapphire::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
 {
   if( pCell == nullptr )
     return;
@@ -679,7 +679,7 @@ void Core::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
   }
 }
 
-void Core::Zone::onPlayerZoneIn( Entity::Player& player )
+void Sapphire::Zone::onPlayerZoneIn( Entity::Player& player )
 {
   auto pLog = g_fw.get< Logger >();
   pLog->debug(
@@ -687,7 +687,7 @@ void Core::Zone::onPlayerZoneIn( Entity::Player& player )
     +", Entity#" + std::to_string( player.getId() ) );
 }
 
-void Core::Zone::onLeaveTerritory( Entity::Player& player )
+void Sapphire::Zone::onLeaveTerritory( Entity::Player& player )
 {
   auto pLog = g_fw.get< Logger >();
   pLog->debug(
@@ -695,27 +695,27 @@ void Core::Zone::onLeaveTerritory( Entity::Player& player )
     +", Entity#" + std::to_string( player.getId() ) );
 }
 
-void Core::Zone::onUpdate( uint32_t currTime )
+void Sapphire::Zone::onUpdate( uint32_t currTime )
 {
 
 }
 
-void Core::Zone::onFinishLoading( Entity::Player& player )
+void Sapphire::Zone::onFinishLoading( Entity::Player& player )
 {
 
 }
 
-void Core::Zone::onInitDirector( Entity::Player& player )
+void Sapphire::Zone::onInitDirector( Entity::Player& player )
 {
 
 }
 
-void Core::Zone::onEnterTerritory( Core::Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 )
+void Sapphire::Zone::onEnterTerritory( Sapphire::Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 )
 {
 
 }
 
-void Core::Zone::registerEObj( Entity::EventObjectPtr object )
+void Sapphire::Zone::registerEObj( Entity::EventObjectPtr object )
 {
   if( !object )
     return;
@@ -730,7 +730,7 @@ void Core::Zone::registerEObj( Entity::EventObjectPtr object )
   pLog->debug( "Registered instance eobj: " + std::to_string( object->getId() ) );
 }
 
-Core::Entity::EventObjectPtr Core::Zone::getEObj( uint32_t objId )
+Sapphire::Entity::EventObjectPtr Sapphire::Zone::getEObj( uint32_t objId )
 {
   auto obj = m_eventObjects.find( objId );
   if( obj == m_eventObjects.end() )
@@ -739,17 +739,17 @@ Core::Entity::EventObjectPtr Core::Zone::getEObj( uint32_t objId )
   return obj->second;
 }
 
-Core::InstanceContentPtr Core::Zone::getAsInstanceContent()
+Sapphire::InstanceContentPtr Sapphire::Zone::getAsInstanceContent()
 {
   return std::dynamic_pointer_cast< InstanceContent, Zone >( shared_from_this() );
 }
 
-uint32_t Core::Zone::getNextEObjId()
+uint32_t Sapphire::Zone::getNextEObjId()
 {
   return ++m_nextEObjId;
 }
 
-Core::Entity::EventObjectPtr Core::Zone::registerEObj( const std::string& name, uint32_t objectId, uint32_t mapLink,
+Sapphire::Entity::EventObjectPtr Sapphire::Zone::registerEObj( const std::string& name, uint32_t objectId, uint32_t mapLink,
                                                        uint8_t state, FFXIVARR_POSITION3 pos, float scale,
                                                        float rotation )
 {

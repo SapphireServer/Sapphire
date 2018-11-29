@@ -8,7 +8,7 @@
 // Start NPC: 1003988
 // End NPC: 1001353
 
-using namespace Core;
+using namespace Sapphire;
 
 class ManWil002 :
   public Sapphire::ScriptAPI::EventScript

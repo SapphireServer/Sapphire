@@ -4,7 +4,7 @@
 #include <Common.h>
 #include <set>
 
-namespace Core
+namespace Sapphire
 {
 
   class Linkshell

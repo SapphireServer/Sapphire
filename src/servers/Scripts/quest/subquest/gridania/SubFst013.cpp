@@ -2,7 +2,7 @@
 #include <Actor/Player.h>
 #include "Event/EventHelper.h"
 
-using namespace Core;
+using namespace Sapphire;
 
 // Quest Script: SubFst013_00040
 // Quest Name: For Friendship

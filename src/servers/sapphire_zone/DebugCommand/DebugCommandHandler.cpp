@@ -37,14 +37,14 @@
 #include "Session.h"
 #include "Framework.h"
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
-using namespace Core::Network;
-using namespace Core::Network::Packets;
-using namespace Core::Network::Packets::Server;
+using namespace Sapphire::Network;
+using namespace Sapphire::Network::Packets;
+using namespace Sapphire::Network::Packets::Server;
 
 // instanciate and initialize commands
-Core::DebugCommandHandler::DebugCommandHandler()
+Sapphire::DebugCommandHandler::DebugCommandHandler()
 {
   // Push all commands onto the register map ( command name - function - description - required GM level )
   registerCommand( "set", &DebugCommandHandler::set, "Executes SET commands.", 1 );
@@ -62,21 +62,21 @@ Core::DebugCommandHandler::DebugCommandHandler()
 }
 
 // clear all loaded commands
-Core::DebugCommandHandler::~DebugCommandHandler()
+Sapphire::DebugCommandHandler::~DebugCommandHandler()
 {
   for( auto it = m_commandMap.begin(); it != m_commandMap.end(); ++it )
     ( *it ).second.reset();
 }
 
 // add a command set to the register map
-void Core::DebugCommandHandler::registerCommand( const std::string& n, DebugCommand::pFunc functionPtr,
+void Sapphire::DebugCommandHandler::registerCommand( const std::string& n, DebugCommand::pFunc functionPtr,
                                                  const std::string& hText, uint8_t uLevel )
 {
   m_commandMap[ std::string( n ) ] = std::make_shared< DebugCommand >( n, functionPtr, hText, uLevel );
 }
 
 // try to retrieve the command in question, execute if found
-void Core::DebugCommandHandler::execCommand( char* data, Entity::Player& player )
+void Sapphire::DebugCommandHandler::execCommand( char* data, Entity::Player& player )
 {
 
   // define callback pointer
@@ -123,7 +123,7 @@ void Core::DebugCommandHandler::execCommand( char* data, Entity::Player& player 
 // Definition of the commands
 ///////////////////////////////////////////////////////////////////////////////////////
 
-void Core::DebugCommandHandler::help( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
+void Sapphire::DebugCommandHandler::help( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   player.sendDebug( "Registered debug commands:" );
   for( auto cmd : m_commandMap )
@@ -135,7 +135,7 @@ void Core::DebugCommandHandler::help( char* data, Entity::Player& player, std::s
   }
 }
 
-void Core::DebugCommandHandler::set( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
+void Sapphire::DebugCommandHandler::set( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto pLog = g_fw.get< Logger >();
   auto pTerriMgr = g_fw.get< TerritoryMgr >();
@@ -374,7 +374,7 @@ void Core::DebugCommandHandler::set( char* data, Entity::Player& player, std::sh
 
 }
 
-void Core::DebugCommandHandler::add( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
+void Sapphire::DebugCommandHandler::add( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto pLog = g_fw.get< Logger >();
   std::string subCommand;
@@ -508,7 +508,7 @@ void Core::DebugCommandHandler::add( char* data, Entity::Player& player, std::sh
 
 }
 
-void Core::DebugCommandHandler::get( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
+void Sapphire::DebugCommandHandler::get( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto pLog = g_fw.get< Logger >();
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
@@ -537,7 +537,7 @@ void Core::DebugCommandHandler::get( char* data, Entity::Player& player, std::sh
   if( ( subCommand == "pos" ) )
   {
 
-    int16_t map_id = pExdData->get< Core::Data::TerritoryType >( player.getCurrentZone()->getTerritoryTypeId() )->map;
+    int16_t map_id = pExdData->get< Sapphire::Data::TerritoryType >( player.getCurrentZone()->getTerritoryTypeId() )->map;
 
     player.sendNotice( "Pos:\n" +
                        std::to_string( player.getPos().x ) + "\n" +
@@ -555,7 +555,7 @@ void Core::DebugCommandHandler::get( char* data, Entity::Player& player, std::sh
 }
 
 void
-Core::DebugCommandHandler::injectPacket( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
+Sapphire::DebugCommandHandler::injectPacket( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto pServerZone = g_fw.get< ServerMgr >();
   auto pSession = pServerZone->getSession( player.getId() );
@@ -563,7 +563,7 @@ Core::DebugCommandHandler::injectPacket( char* data, Entity::Player& player, std
     pSession->getZoneConnection()->injectPacket( data + 7, player );
 }
 
-void Core::DebugCommandHandler::injectChatPacket( char* data, Entity::Player& player,
+void Sapphire::DebugCommandHandler::injectChatPacket( char* data, Entity::Player& player,
                                                   std::shared_ptr< DebugCommand > command )
 {
   auto pServerZone = g_fw.get< ServerMgr >();
@@ -572,7 +572,7 @@ void Core::DebugCommandHandler::injectChatPacket( char* data, Entity::Player& pl
     pSession->getChatConnection()->injectPacket( data + 8, player );
 }
 
-void Core::DebugCommandHandler::replay( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
+void Sapphire::DebugCommandHandler::replay( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto pLog = g_fw.get< Logger >();
   auto pServerZone = g_fw.get< ServerMgr >();
@@ -624,7 +624,7 @@ void Core::DebugCommandHandler::replay( char* data, Entity::Player& player, std:
 
 }
 
-void Core::DebugCommandHandler::nudge( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
+void Sapphire::DebugCommandHandler::nudge( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   std::string subCommand;
 
@@ -671,7 +671,7 @@ void Core::DebugCommandHandler::nudge( char* data, Entity::Player& player, std::
 }
 
 void
-Core::DebugCommandHandler::serverInfo( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
+Sapphire::DebugCommandHandler::serverInfo( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto pServerZone = g_fw.get< ServerMgr >();
   player.sendDebug( "SapphireZone " + Version::VERSION + "\nRev: " + Version::GIT_HASH );
@@ -679,7 +679,7 @@ Core::DebugCommandHandler::serverInfo( char* data, Entity::Player& player, std::
   player.sendDebug( "Sessions: " + std::to_string( pServerZone->getSessionCount() ) );
 }
 
-void Core::DebugCommandHandler::script( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
+void Sapphire::DebugCommandHandler::script( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto pLog = g_fw.get< Logger >();
   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
@@ -720,7 +720,7 @@ void Core::DebugCommandHandler::script( char* data, Entity::Player& player, std:
       player.sendDebug( "Because reasons of filling chat with nonsense, please enter a search term" );
     else
     {
-      std::set< Core::Scripting::ScriptInfo* > scripts;
+      std::set< Sapphire::Scripting::ScriptInfo* > scripts;
       pScriptMgr->getNativeScriptHandler().findScripts( scripts, params );
 
       if( !scripts.empty() )
@@ -768,7 +768,7 @@ void Core::DebugCommandHandler::script( char* data, Entity::Player& player, std:
 }
 
 void
-Core::DebugCommandHandler::instance( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
+Sapphire::DebugCommandHandler::instance( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto pTeriMgr = g_fw.get< TerritoryMgr >();
   std::string cmd( data ), params, subCommand;
@@ -984,7 +984,7 @@ Core::DebugCommandHandler::instance( char* data, Entity::Player& player, std::sh
   }
 }
 
-void Core::DebugCommandHandler::housing( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
+void Sapphire::DebugCommandHandler::housing( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto pTeriMgr = g_fw.get< TerritoryMgr >();
   std::string cmd( data ), params, subCommand;

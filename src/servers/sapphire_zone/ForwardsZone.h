@@ -16,7 +16,7 @@ x ## Ptr make_ ## x( Args &&...args ) { \
 return std::make_shared< x >( std::forward< Args >( args ) ... ); }\
 typedef std::vector< x > x ## PtrList;
 
-namespace Core {
+namespace Sapphire {
 TYPE_FORWARD( Cell );
 TYPE_FORWARD( Zone );
 TYPE_FORWARD( HousingZone );

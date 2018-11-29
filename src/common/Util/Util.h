@@ -5,7 +5,7 @@
 #include <string>
 #include <functional>
 
-namespace Core::Util
+namespace Sapphire::Util
 {
 
   std::string binaryToHexString( uint8_t* pBinData, uint16_t size );

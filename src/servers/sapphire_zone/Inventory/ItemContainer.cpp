@@ -9,9 +9,9 @@
 #include "Forwards.h"
 #include "ItemContainer.h"
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
-Core::ItemContainer::ItemContainer( uint16_t storageId, uint8_t maxSize, const std::string& tableName,
+Sapphire::ItemContainer::ItemContainer( uint16_t storageId, uint8_t maxSize, const std::string& tableName,
                                     bool isMultiStorage, bool isPersistentStorage ) :
   m_id( storageId ),
   m_size( maxSize ),
@@ -22,22 +22,22 @@ Core::ItemContainer::ItemContainer( uint16_t storageId, uint8_t maxSize, const s
 
 }
 
-Core::ItemContainer::~ItemContainer()
+Sapphire::ItemContainer::~ItemContainer()
 {
 
 }
 
-uint16_t Core::ItemContainer::getId() const
+uint16_t Sapphire::ItemContainer::getId() const
 {
   return m_id;
 }
 
-uint8_t Core::ItemContainer::getEntryCount() const
+uint8_t Sapphire::ItemContainer::getEntryCount() const
 {
   return static_cast< uint8_t >( m_itemMap.size() );
 }
 
-void Core::ItemContainer::removeItem( uint8_t slotId )
+void Sapphire::ItemContainer::removeItem( uint8_t slotId )
 {
   auto pLog = g_fw.get< Logger >();
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
@@ -58,17 +58,17 @@ void Core::ItemContainer::removeItem( uint8_t slotId )
   }
 }
 
-Core::ItemMap& Core::ItemContainer::getItemMap()
+Sapphire::ItemMap& Sapphire::ItemContainer::getItemMap()
 {
   return m_itemMap;
 }
 
-const Core::ItemMap& Core::ItemContainer::getItemMap() const
+const Sapphire::ItemMap& Sapphire::ItemContainer::getItemMap() const
 {
   return m_itemMap;
 }
 
-int8_t Core::ItemContainer::getFreeSlot()
+int8_t Sapphire::ItemContainer::getFreeSlot()
 {
   for( uint8_t slotId = 0; slotId < m_size; slotId++ )
   {
@@ -80,7 +80,7 @@ int8_t Core::ItemContainer::getFreeSlot()
   return -1;
 }
 
-Core::ItemPtr Core::ItemContainer::getItem( uint8_t slotId )
+Sapphire::ItemPtr Sapphire::ItemContainer::getItem( uint8_t slotId )
 {
 
   if( ( slotId > m_size ) )
@@ -93,7 +93,7 @@ Core::ItemPtr Core::ItemContainer::getItem( uint8_t slotId )
   return m_itemMap[ slotId ];
 }
 
-void Core::ItemContainer::setItem( uint8_t slotId, ItemPtr pItem )
+void Sapphire::ItemContainer::setItem( uint8_t slotId, ItemPtr pItem )
 {
   if( slotId > m_size )
     return;
@@ -101,22 +101,22 @@ void Core::ItemContainer::setItem( uint8_t slotId, ItemPtr pItem )
   m_itemMap[ slotId ] = pItem;
 }
 
-uint8_t Core::ItemContainer::getMaxSize() const
+uint8_t Sapphire::ItemContainer::getMaxSize() const
 {
   return m_size;
 }
 
-std::string Core::ItemContainer::getTableName() const
+std::string Sapphire::ItemContainer::getTableName() const
 {
   return m_tableName;
 }
 
-bool Core::ItemContainer::isMultiStorage() const
+bool Sapphire::ItemContainer::isMultiStorage() const
 {
   return m_bMultiStorage;
 }
 
-bool Core::ItemContainer::isPersistentStorage() const
+bool Sapphire::ItemContainer::isPersistentStorage() const
 {
   return m_isPersistentStorage;
 }

@@ -7,12 +7,12 @@
 
 #include "Framework.h"
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
 // TODO: the entire zone / areahandling is a bit outdated ( in parts i used this for the 1.0 iteration )
 // likely this could be greatly improved or redone
 
-Core::Cell::Cell() :
+Sapphire::Cell::Cell() :
   m_bActive( false ),
   m_bLoaded( false ),
   m_playerCount( 0 ),
@@ -21,12 +21,12 @@ Core::Cell::Cell() :
   m_bForcedActive = false;
 }
 
-Core::Cell::~Cell()
+Sapphire::Cell::~Cell()
 {
   removeActors();
 }
 
-void Core::Cell::init( uint32_t x, uint32_t y, ZonePtr pZone )
+void Sapphire::Cell::init( uint32_t x, uint32_t y, ZonePtr pZone )
 {
   m_pZone = pZone;
   m_posX = x;
@@ -35,25 +35,25 @@ void Core::Cell::init( uint32_t x, uint32_t y, ZonePtr pZone )
   m_actors.clear();
 }
 
-void Core::Cell::addActor( Entity::ActorPtr pAct )
+void Sapphire::Cell::addActor( Entity::ActorPtr pAct )
 {
-  auto pLog = g_fw.get< Core::Logger >();
+  auto pLog = g_fw.get< Sapphire::Logger >();
   if( pAct->isPlayer() )
     ++m_playerCount;
 
   m_actors.insert( pAct );
 }
 
-void Core::Cell::removeActor( Entity::ActorPtr pAct )
+void Sapphire::Cell::removeActor( Entity::ActorPtr pAct )
 {
-  auto pLog = g_fw.get< Core::Logger >();
+  auto pLog = g_fw.get< Sapphire::Logger >();
   if( pAct->isPlayer() )
     --m_playerCount;
 
   m_actors.erase( pAct );
 }
 
-void Core::Cell::setActivity( bool state )
+void Sapphire::Cell::setActivity( bool state )
 {
   if( !m_bActive && state )
   {
@@ -82,7 +82,7 @@ void Core::Cell::setActivity( bool state )
 
 }
 
-void Core::Cell::removeActors()
+void Sapphire::Cell::removeActors()
 {
   //uint32_t ltime = getMSTime();
 
@@ -111,7 +111,7 @@ void Core::Cell::removeActors()
   m_bLoaded = false;
 }
 
-void Core::Cell::queueUnloadPending()
+void Sapphire::Cell::queueUnloadPending()
 {
   if( m_bUnloadPending )
     return;
@@ -120,13 +120,13 @@ void Core::Cell::queueUnloadPending()
 
 }
 
-void Core::Cell::cancelPendingUnload()
+void Sapphire::Cell::cancelPendingUnload()
 {
   if( !m_bUnloadPending )
     return;
 }
 
-void Core::Cell::unload()
+void Sapphire::Cell::unload()
 {
 
   assert( m_bUnloadPending );

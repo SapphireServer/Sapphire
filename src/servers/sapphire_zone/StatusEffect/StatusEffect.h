@@ -3,7 +3,7 @@
 
 #include "Forwards.h"
 
-namespace Core {
+namespace Sapphire {
 namespace StatusEffect {
 
 

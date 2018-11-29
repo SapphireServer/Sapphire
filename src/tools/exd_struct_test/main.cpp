@@ -17,8 +17,8 @@
 #include <regex>
 
 
-Core::Logger g_log;
-Core::Data::ExdDataGenerated g_exdData;
+Sapphire::Logger g_log;
+Sapphire::Data::ExdDataGenerated g_exdData;
 
 
 //const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
@@ -44,13 +44,13 @@ int main()
   //g_log.info( "getting id list done" );
   //for( auto id : idList )
   {
-    auto teri1 = g_exdData.get< Core::Data::GilShopItem >( 262440, 0 );
+    auto teri1 = g_exdData.get< Sapphire::Data::GilShopItem >( 262440, 0 );
     g_log.info( "0 -> " + std::to_string( teri1->item ) );
 
-    auto teri2 = g_exdData.get< Core::Data::GilShopItem >( 262440, 1 );
+    auto teri2 = g_exdData.get< Sapphire::Data::GilShopItem >( 262440, 1 );
     g_log.info( "1 -> " + std::to_string( teri2->item ) );
 
-    auto teri3 = g_exdData.get< Core::Data::GilShopItem >( 262440, 2 );
+    auto teri3 = g_exdData.get< Sapphire::Data::GilShopItem >( 262440, 2 );
     g_log.info( "2 -> " + std::to_string( teri3->item ) );
   }
 

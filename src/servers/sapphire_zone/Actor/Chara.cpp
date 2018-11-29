@@ -29,14 +29,14 @@
 #include "Framework.h"
 #include "Common.h"
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
-using namespace Core::Common;
-using namespace Core::Network::Packets;
-using namespace Core::Network::Packets::Server;
-using namespace Core::Network::ActorControl;
+using namespace Sapphire::Common;
+using namespace Sapphire::Network::Packets;
+using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::Network::ActorControl;
 
-Core::Entity::Chara::Chara( ObjKind type ) :
+Sapphire::Entity::Chara::Chara( ObjKind type ) :
   Actor( type ),
   m_pose( 0 ),
   m_targetId( INVALID_GAME_OBJECT_ID )
@@ -48,156 +48,156 @@ Core::Entity::Chara::Chara( ObjKind type ) :
   }
 }
 
-Core::Entity::Chara::~Chara()
+Sapphire::Entity::Chara::~Chara()
 {
 }
 
 /*! \return the actors name */
-std::string Core::Entity::Chara::getName() const
+std::string Sapphire::Entity::Chara::getName() const
 {
   return std::string( m_name );
 }
 
 
 /*! \return current stance of the actors */
-Core::Common::Stance Core::Entity::Chara::getStance() const
+Sapphire::Common::Stance Sapphire::Entity::Chara::getStance() const
 {
   return m_currentStance;
 }
 
 /*! \return actor stats */
-Core::Entity::Chara::ActorStats Core::Entity::Chara::getStats() const
+Sapphire::Entity::Chara::ActorStats Sapphire::Entity::Chara::getStats() const
 {
   return m_baseStats;
 }
 
 /*! \return current HP */
-uint32_t Core::Entity::Chara::getHp() const
+uint32_t Sapphire::Entity::Chara::getHp() const
 {
   return m_hp;
 }
 
 /*! \return current MP */
-uint32_t Core::Entity::Chara::getMp() const
+uint32_t Sapphire::Entity::Chara::getMp() const
 {
   return m_mp;
 }
 
 /*! \return current TP */
-uint16_t Core::Entity::Chara::getTp() const
+uint16_t Sapphire::Entity::Chara::getTp() const
 {
   return m_tp;
 }
 
 /*! \return current GP */
-uint16_t Core::Entity::Chara::getGp() const
+uint16_t Sapphire::Entity::Chara::getGp() const
 {
   return m_gp;
 }
 
 /*! \return current invincibility type */
-InvincibilityType Core::Entity::Chara::getInvincibilityType() const
+InvincibilityType Sapphire::Entity::Chara::getInvincibilityType() const
 {
   return m_invincibilityType;
 }
 
 /*! \return current class or job */
-Core::Common::ClassJob Core::Entity::Chara::getClass() const
+Sapphire::Common::ClassJob Sapphire::Entity::Chara::getClass() const
 {
   return m_class;
 }
 
 /*! \return current class or job as int32_t ( this feels pointless ) */
-uint8_t Core::Entity::Chara::getClassAsInt() const
+uint8_t Sapphire::Entity::Chara::getClassAsInt() const
 {
   return static_cast< uint8_t >( m_class );
 }
 
 /*! \param ClassJob to set */
-void Core::Entity::Chara::setClass( Common::ClassJob classJob )
+void Sapphire::Entity::Chara::setClass( Common::ClassJob classJob )
 {
   m_class = classJob;
 }
 
 /*! \param Id of the target to set */
-void Core::Entity::Chara::setTargetId( uint64_t targetId )
+void Sapphire::Entity::Chara::setTargetId( uint64_t targetId )
 {
   m_targetId = targetId;
 }
 
 /*! \return Id of the current target */
-uint64_t Core::Entity::Chara::getTargetId() const
+uint64_t Sapphire::Entity::Chara::getTargetId() const
 {
   return m_targetId;
 }
 
 /*! \return True if the actor is alive */
-bool Core::Entity::Chara::isAlive() const
+bool Sapphire::Entity::Chara::isAlive() const
 {
   return ( m_hp > 0 );
 }
 
 /*! \return max hp for the actor */
-uint32_t Core::Entity::Chara::getMaxHp() const
+uint32_t Sapphire::Entity::Chara::getMaxHp() const
 {
   return m_baseStats.max_hp;
 }
 
 /*! \return max mp for the actor */
-uint32_t Core::Entity::Chara::getMaxMp() const
+uint32_t Sapphire::Entity::Chara::getMaxMp() const
 {
   return m_baseStats.max_mp;
 }
 
 /*! \return reset hp to current max hp */
-void Core::Entity::Chara::resetHp()
+void Sapphire::Entity::Chara::resetHp()
 {
   m_hp = getMaxHp();
   sendStatusUpdate( true );
 }
 
 /*! \return reset mp to current max mp */
-void Core::Entity::Chara::resetMp()
+void Sapphire::Entity::Chara::resetMp()
 {
   m_mp = getMaxMp();
   sendStatusUpdate( true );
 }
 
 /*! \param hp amount to set ( caps to maxHp ) */
-void Core::Entity::Chara::setHp( uint32_t hp )
+void Sapphire::Entity::Chara::setHp( uint32_t hp )
 {
   m_hp = hp < getMaxHp() ? hp : getMaxHp();
   sendStatusUpdate( true );
 }
 
 /*! \param mp amount to set ( caps to maxMp ) */
-void Core::Entity::Chara::setMp( uint32_t mp )
+void Sapphire::Entity::Chara::setMp( uint32_t mp )
 {
   m_mp = mp < getMaxMp() ? mp : getMaxMp();
   sendStatusUpdate( true );
 }
 
 /*! \param gp amount to set*/
-void Core::Entity::Chara::setGp( uint32_t gp )
+void Sapphire::Entity::Chara::setGp( uint32_t gp )
 {
   m_gp = gp;
   sendStatusUpdate( true );
 }
 
 /*! \param type invincibility type to set */
-void Core::Entity::Chara::setInvincibilityType( Common::InvincibilityType type )
+void Sapphire::Entity::Chara::setInvincibilityType( Common::InvincibilityType type )
 {
   m_invincibilityType = type;
 }
 
 /*! \return current status of the actor */
-Core::Common::ActorStatus Core::Entity::Chara::getStatus() const
+Sapphire::Common::ActorStatus Sapphire::Entity::Chara::getStatus() const
 {
   return m_status;
 }
 
 /*! \param status to set */
-void Core::Entity::Chara::setStatus( ActorStatus status )
+void Sapphire::Entity::Chara::setStatus( ActorStatus status )
 {
   m_status = status;
 }
@@ -206,7 +206,7 @@ void Core::Entity::Chara::setStatus( ActorStatus status )
 Performs necessary steps to mark an actor dead.
 Sets hp/mp/tp, sets status, plays animation and fires onDeath event
 */
-void Core::Entity::Chara::die()
+void Sapphire::Entity::Chara::die()
 {
   m_status = ActorStatus::Dead;
   m_hp = 0;
@@ -236,7 +236,7 @@ position
 
 \param Position to look towards
 */
-bool Core::Entity::Chara::face( const Common::FFXIVARR_POSITION3& p )
+bool Sapphire::Entity::Chara::face( const Common::FFXIVARR_POSITION3& p )
 {
   float oldRot = getRot();
   float rot = Math::Util::calcAngFrom( getPos().x, getPos().z, p.x, p.z );
@@ -255,7 +255,7 @@ Set and propagate the actor stance to in range players
 
 \param stance to set
 */
-void Core::Entity::Chara::setStance( Stance stance )
+void Sapphire::Entity::Chara::setStance( Stance stance )
 {
   m_currentStance = stance;
 
@@ -269,7 +269,7 @@ and if fully performed, clean up again.
 
 \return true if a queued action has been updated
 */
-bool Core::Entity::Chara::checkAction()
+bool Sapphire::Entity::Chara::checkAction()
 {
 
   if( m_pCurrentAction == nullptr )
@@ -287,7 +287,7 @@ Change the current target and propagate to in range players
 
 \param target actor id
 */
-void Core::Entity::Chara::changeTarget( uint64_t targetId )
+void Sapphire::Entity::Chara::changeTarget( uint64_t targetId )
 {
   setTargetId( targetId );
   FFXIVPacketBasePtr packet = makeActorControl144( m_id, SetTarget, 0, 0, 0, 0, targetId );
@@ -297,7 +297,7 @@ void Core::Entity::Chara::changeTarget( uint64_t targetId )
 /*!
 Dummy function \return 0
 */
-uint8_t Core::Entity::Chara::getLevel() const
+uint8_t Sapphire::Entity::Chara::getLevel() const
 {
   return 0;
 }
@@ -311,7 +311,7 @@ magical dmg and take status effects into account
 
 \param amount of damage to be taken
 */
-void Core::Entity::Chara::takeDamage( uint32_t damage )
+void Sapphire::Entity::Chara::takeDamage( uint32_t damage )
 {
   if( damage >= m_hp )
   {
@@ -342,7 +342,7 @@ in range
 
 \param amount of hp to be healed
 */
-void Core::Entity::Chara::heal( uint32_t amount )
+void Sapphire::Entity::Chara::heal( uint32_t amount )
 {
   if( ( m_hp + amount ) > getMaxHp() )
   {
@@ -361,20 +361,20 @@ so players can have their own version and we can abolish the param.
 
 \param true if the update should also be sent to the actor ( player ) himself
 */
-void Core::Entity::Chara::sendStatusUpdate( bool toSelf )
+void Sapphire::Entity::Chara::sendStatusUpdate( bool toSelf )
 {
   FFXIVPacketBasePtr packet = std::make_shared< UpdateHpMpTpPacket >( *this );
   sendToInRangeSet( packet );
 }
 
 /*! \return ActionPtr of the currently registered action, or nullptr */
-Core::Action::ActionPtr Core::Entity::Chara::getCurrentAction() const
+Sapphire::Action::ActionPtr Sapphire::Entity::Chara::getCurrentAction() const
 {
   return m_pCurrentAction;
 }
 
 /*! \param ActionPtr of the action to be registered */
-void Core::Entity::Chara::setCurrentAction( Core::Action::ActionPtr pAction )
+void Sapphire::Entity::Chara::setCurrentAction( Sapphire::Action::ActionPtr pAction )
 {
   m_pCurrentAction = pAction;
 }
@@ -388,7 +388,7 @@ Will have to be extended for ranged attacks.
 
 \param ActorPtr the autoAttack is performed on
 */
-void Core::Entity::Chara::autoAttack( CharaPtr pTarget )
+void Sapphire::Entity::Chara::autoAttack( CharaPtr pTarget )
 {
 
   uint64_t tick = Util::getTimeMs();
@@ -427,7 +427,7 @@ ChaiScript Skill Handler.
 \param GamePacketPtr to send
 \param bool should be send to self?
 */
-void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, uint64_t param1,
+void Sapphire::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, uint64_t param1,
                                              uint64_t param2, Entity::Chara& target )
 {
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
@@ -437,7 +437,7 @@ void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, u
     getAsPlayer()->sendDebug( "Handle script skill type: " + std::to_string( type ) );
   }
 
-  auto actionInfoPtr = pExdData->get< Core::Data::Action >( actionId );
+  auto actionInfoPtr = pExdData->get< Sapphire::Data::Action >( actionId );
 
   // Todo: Effect packet generator. 90% of this is basically setting params and it's basically unreadable.
   // Prepare packet. This is seemingly common for all packets in the action handler.
@@ -562,7 +562,7 @@ void Core::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, u
 }
 
 /*! \param StatusEffectPtr to be applied to the actor */
-void Core::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEffect )
+void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEffect )
 {
   int8_t nextSlot = getStatusEffectFreeSlot();
   // if there is no slot left, do not add the effect
@@ -592,7 +592,7 @@ void Core::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEffect
 }
 
 /*! \param StatusEffectPtr to be applied to the actor */
-void Core::Entity::Chara::addStatusEffectById( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param )
+void Sapphire::Entity::Chara::addStatusEffectById( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param )
 {
   auto effect = StatusEffect::make_StatusEffect( id, source.getAsChara(), getAsChara(), duration, 3000 );
   effect->setParam( param );
@@ -600,7 +600,7 @@ void Core::Entity::Chara::addStatusEffectById( uint32_t id, int32_t duration, En
 }
 
 /*! \param StatusEffectPtr to be applied to the actor */
-void Core::Entity::Chara::addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source,
+void Sapphire::Entity::Chara::addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source,
                                                          uint16_t param )
 {
   if( hasStatusEffect( id ) )
@@ -612,7 +612,7 @@ void Core::Entity::Chara::addStatusEffectByIdIfNotExist( uint32_t id, int32_t du
 
 }
 
-int8_t Core::Entity::Chara::getStatusEffectFreeSlot()
+int8_t Sapphire::Entity::Chara::getStatusEffectFreeSlot()
 {
   int8_t freeEffectSlot = -1;
 
@@ -625,12 +625,12 @@ int8_t Core::Entity::Chara::getStatusEffectFreeSlot()
   return freeEffectSlot;
 }
 
-void Core::Entity::Chara::statusEffectFreeSlot( uint8_t slotId )
+void Sapphire::Entity::Chara::statusEffectFreeSlot( uint8_t slotId )
 {
   m_statusEffectFreeSlotQueue.push( slotId );
 }
 
-void Core::Entity::Chara::removeSingleStatusEffectById( uint32_t id )
+void Sapphire::Entity::Chara::removeSingleStatusEffectById( uint32_t id )
 {
   for( auto effectIt : m_statusEffectMap )
   {
@@ -642,7 +642,7 @@ void Core::Entity::Chara::removeSingleStatusEffectById( uint32_t id )
   }
 }
 
-void Core::Entity::Chara::removeStatusEffect( uint8_t effectSlotId )
+void Sapphire::Entity::Chara::removeStatusEffect( uint8_t effectSlotId )
 {
   auto pEffectIt = m_statusEffectMap.find( effectSlotId );
   if( pEffectIt == m_statusEffectMap.end() )
@@ -660,32 +660,32 @@ void Core::Entity::Chara::removeStatusEffect( uint8_t effectSlotId )
   sendStatusEffectUpdate();
 }
 
-std::map< uint8_t, Core::StatusEffect::StatusEffectPtr > Core::Entity::Chara::getStatusEffectMap() const
+std::map< uint8_t, Sapphire::StatusEffect::StatusEffectPtr > Sapphire::Entity::Chara::getStatusEffectMap() const
 {
   return m_statusEffectMap;
 }
 
-const uint8_t* Core::Entity::Chara::getLookArray() const
+const uint8_t* Sapphire::Entity::Chara::getLookArray() const
 {
   return m_customize;
 }
 
-const uint32_t* Core::Entity::Chara::getModelArray() const
+const uint32_t* Sapphire::Entity::Chara::getModelArray() const
 {
   return m_modelEquip;
 }
 
-uint8_t Core::Entity::Chara::getPose() const
+uint8_t Sapphire::Entity::Chara::getPose() const
 {
   return m_pose;
 }
 
-void Core::Entity::Chara::setPose( uint8_t pose )
+void Sapphire::Entity::Chara::setPose( uint8_t pose )
 {
   m_pose = pose;
 }
 
-void Core::Entity::Chara::sendStatusEffectUpdate()
+void Sapphire::Entity::Chara::sendStatusEffectUpdate()
 {
   uint64_t currentTimeMs = Util::getTimeMs();
 
@@ -714,7 +714,7 @@ void Core::Entity::Chara::sendStatusEffectUpdate()
 
 }
 
-void Core::Entity::Chara::updateStatusEffects()
+void Sapphire::Entity::Chara::updateStatusEffects()
 {
   uint64_t currentTimeMs = Util::getTimeMs();
 
@@ -781,7 +781,7 @@ void Core::Entity::Chara::updateStatusEffects()
   }
 }
 
-bool Core::Entity::Chara::hasStatusEffect( uint32_t id )
+bool Sapphire::Entity::Chara::hasStatusEffect( uint32_t id )
 {
   if( m_statusEffectMap.find( id ) != m_statusEffectMap.end() )
     return true;

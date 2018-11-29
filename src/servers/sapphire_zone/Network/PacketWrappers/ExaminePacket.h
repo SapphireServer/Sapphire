@@ -10,7 +10,7 @@
 #include "StatusEffect/StatusEffect.h"
 
 
-namespace Core::Network::Packets::Server
+namespace Sapphire::Network::Packets::Server
 {
 
   /**

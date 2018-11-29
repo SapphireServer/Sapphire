@@ -4,7 +4,7 @@
 #include <Common.h>
 #include "ForwardsZone.h"
 
-namespace Core::Action
+namespace Sapphire::Action
 {
 
   class Action

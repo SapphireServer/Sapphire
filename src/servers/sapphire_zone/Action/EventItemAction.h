@@ -4,7 +4,7 @@
 #include "ForwardsZone.h"
 #include "Action.h"
 
-namespace Core::Action
+namespace Sapphire::Action
 {
 
   class EventItemAction : public Action

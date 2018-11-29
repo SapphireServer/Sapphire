@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-namespace Core::Network::Packets
+namespace Sapphire::Network::Packets
 {
 
   ////////////////////////////////////////////////////////////////////////////////

@@ -16,7 +16,7 @@
 
 #define DECLARE_HANDLER( x ) void x( Packets::GamePacketPtr pInPacket, Entity::PlayerPtr pPlayer )
 
-namespace Core::Network
+namespace Sapphire::Network
 {
 
   class GameConnection : public Connection

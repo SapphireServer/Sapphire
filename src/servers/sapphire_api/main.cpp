@@ -32,11 +32,11 @@
 #include "SapphireAPI.h"
 
 
-Core::Framework g_fw;
-Core::Logger g_log;
-Core::Db::DbWorkerPool< Core::Db::ZoneDbConnection > g_charaDb;
-Core::Data::ExdDataGenerated g_exdDataGen;
-Core::Network::SapphireAPI g_sapphireAPI;
+Sapphire::Framework g_fw;
+Sapphire::Logger g_log;
+Sapphire::Db::DbWorkerPool< Sapphire::Db::ZoneDbConnection > g_charaDb;
+Sapphire::Data::ExdDataGenerated g_exdDataGen;
+Sapphire::Network::SapphireAPI g_sapphireAPI;
 
 namespace fs = std::experimental::filesystem;
 
@@ -50,13 +50,13 @@ void default_resource_send( const HttpServer& server, const shared_ptr< HttpServ
                             const shared_ptr< ifstream >& ifs );
 
 
-auto m_pConfig = std::make_shared< Core::ConfigMgr >();
+auto m_pConfig = std::make_shared< Sapphire::ConfigMgr >();
 HttpServer server;
 std::string configPath( "config.ini" );
 
 void reloadConfig()
 {
-  m_pConfig = std::make_shared< Core::ConfigMgr >();
+  m_pConfig = std::make_shared< Sapphire::ConfigMgr >();
 
   if( !m_pConfig->loadConfig( configPath ) )
     throw "Error loading config ";
@@ -85,7 +85,7 @@ bool loadSettings( int32_t argc, char* argv[] )
 
     try
     {
-      arg = Core::Util::toLowerCopy( std::string( args[ i ] ) );
+      arg = Sapphire::Util::toLowerCopy( std::string( args[ i ] ) );
       val = std::string( args[ i + 1 ] );
 
       // trim '-' from start of arg
@@ -146,9 +146,9 @@ bool loadSettings( int32_t argc, char* argv[] )
     return false;
   }
 
-  Core::Db::DbLoader loader;
+  Sapphire::Db::DbLoader loader;
 
-  Core::Db::ConnectionInfo info;
+  Sapphire::Db::ConnectionInfo info;
   info.password = m_pConfig->getValue< std::string >( "Database", "Password", "" );
   info.host = m_pConfig->getValue< std::string >( "Database", "Host", "127.0.0.1" );
   info.database = m_pConfig->getValue< std::string >( "Database", "Database", "sapphire" );
@@ -241,7 +241,7 @@ std::string buildHttpResponse( uint16_t rCode, const std::string& content = "", 
 void getZoneName( shared_ptr< HttpServer::Response > response, shared_ptr< HttpServer::Request > request )
 {
   string number = request->path_match[ 1 ];
-  auto info = g_exdDataGen.get< Core::Data::TerritoryType >( atoi( number.c_str() ) );
+  auto info = g_exdDataGen.get< Sapphire::Data::TerritoryType >( atoi( number.c_str() ) );
   std::string responseStr = "Not found!";
   if( info )
     responseStr = info->name + ", " + info->bg;
@@ -362,7 +362,7 @@ void createCharacter( shared_ptr< HttpServer::Response > response, shared_ptr< H
     std::string name = json["name"];
     std::string infoJson = json["infoJson"];
 
-    std::string finalJson = Core::Util::base64_decode( infoJson );
+    std::string finalJson = Sapphire::Util::base64_decode( infoJson );
 
     // reloadConfig();
 
@@ -732,8 +732,8 @@ void defaultGet( shared_ptr< HttpServer::Response > response, shared_ptr< HttpSe
 
 int main( int argc, char* argv[] )
 {
-  auto pLog = std::shared_ptr< Core::Logger >( new Core::Logger() );
-  g_fw.set< Core::Logger >( pLog );
+  auto pLog = std::shared_ptr< Sapphire::Logger >( new Sapphire::Logger() );
+  g_fw.set< Sapphire::Logger >( pLog );
   g_log.setLogPath( "log/SapphireAPI" );
   g_log.init();
 

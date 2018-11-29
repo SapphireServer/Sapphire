@@ -16,7 +16,7 @@
 #include <stdio.h>
 #include <string.h>
 
-namespace Core 
+namespace Sapphire 
 {
 
 class Session;

@@ -1,7 +1,7 @@
 #include <ScriptObject.h>
 #include <Zone/InstanceContent.h>
 
-using namespace Core;
+using namespace Sapphire;
 
 class TheSecondCoilofBahamutTurn2 :
   public Sapphire::ScriptAPI::InstanceContentScript
