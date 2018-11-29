@@ -1601,7 +1601,7 @@ struct LandStruct
 {
   uint8_t plotSize; //0
   uint8_t houseState; // 2
-  uint8_t type; // 4  1 == FC, 2 == Private
+  uint8_t hasPublicAccess;
   uint8_t iconAddIcon; // 6
   uint32_t fcId; //8
   uint32_t fcIcon;// 12
