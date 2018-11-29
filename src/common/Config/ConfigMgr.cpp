@@ -10,7 +10,7 @@ namespace fs = std::experimental::filesystem;
  * @param configName the name of ini file relative to m_configFolderRoot to load alongside global.ini
  * @return true if loading was successful
  */
-bool Core::ConfigMgr::loadConfig( const std::string& configName )
+bool Sapphire::ConfigMgr::loadConfig( const std::string& configName )
 {
   // get global config
   auto configFile = fs::path( fs::path( m_configFolderRoot ) / configName );
@@ -29,7 +29,7 @@ bool Core::ConfigMgr::loadConfig( const std::string& configName )
   return true;
 }
 
-bool Core::ConfigMgr::copyDefaultConfig( const std::string& configName )
+bool Sapphire::ConfigMgr::copyDefaultConfig( const std::string& configName )
 {
   fs::path configPath( m_configFolderRoot );
   configPath /= configName;

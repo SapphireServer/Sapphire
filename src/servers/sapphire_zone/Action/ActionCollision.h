@@ -4,12 +4,12 @@
 #include <Common.h>
 #include "ForwardsZone.h"
 
-namespace Core::Data
+namespace Sapphire::Data
 {
   struct Action;
 }
 
-namespace Core::Entity
+namespace Sapphire::Entity
 {
 
   enum class TargetFilter

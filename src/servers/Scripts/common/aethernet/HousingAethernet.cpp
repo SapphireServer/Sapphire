@@ -5,7 +5,7 @@
 #include <Exd/ExdDataGenerated.h>
 #include <Zone/Zone.h>
 
-using namespace Core;
+using namespace Sapphire;
 
 class HousingAethernet :
   public Sapphire::ScriptAPI::EventScript
@@ -20,7 +20,7 @@ public:
   {
     player.playScene( eventId, 0, HIDE_HOTBAR | NO_DEFAULT_CAMERA, [this, eventId]( Entity::Player& player, const Event::SceneResult& result )
     {
-      auto pExdData = getFramework()->get< Core::Data::ExdDataGenerated >();
+      auto pExdData = getFramework()->get< Sapphire::Data::ExdDataGenerated >();
       if( !pExdData )
         return;
 
@@ -28,7 +28,7 @@ public:
       auto terrritoryTypeId = player.getCurrentZone()->getTerritoryTypeId();
 
       // param2 is the index starting from 0 inside housingaethernet.exd, but the ID column starts at 0x001E0000........ wtf
-      auto pHousingAethernet = pExdData->get< Core::Data::HousingAethernet >( getId() + result.param2 );
+      auto pHousingAethernet = pExdData->get< Sapphire::Data::HousingAethernet >( getId() + result.param2 );
       if( !pHousingAethernet )
         return;
 

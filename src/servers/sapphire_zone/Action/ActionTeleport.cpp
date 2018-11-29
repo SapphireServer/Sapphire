@@ -13,38 +13,38 @@
 #include "ActionTeleport.h"
 #include "Framework.h"
 
-using namespace Core::Common;
-using namespace Core::Network;
-using namespace Core::Network::Packets;
-using namespace Core::Network::Packets::Server;
-using namespace Core::Network::ActorControl;
+using namespace Sapphire::Common;
+using namespace Sapphire::Network;
+using namespace Sapphire::Network::Packets;
+using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::Network::ActorControl;
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
-Core::Action::ActionTeleport::ActionTeleport()
+Sapphire::Action::ActionTeleport::ActionTeleport()
 {
   m_handleActionType = HandleActionType::Event;
 }
 
-Core::Action::ActionTeleport::ActionTeleport( Entity::CharaPtr pActor, uint16_t targetZone, uint16_t cost )
+Sapphire::Action::ActionTeleport::ActionTeleport( Entity::CharaPtr pActor, uint16_t targetZone, uint16_t cost )
 {
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
   m_startTime = 0;
   m_id = 5;
   m_handleActionType = HandleActionType::Teleport;
-  m_castTime = pExdData->get< Core::Data::Action >( 5 )->cast100ms * 100; // TODO: Add security checks.
+  m_castTime = pExdData->get< Sapphire::Data::Action >( 5 )->cast100ms * 100; // TODO: Add security checks.
   m_pSource = pActor;
   m_bInterrupt = false;
   m_targetAetheryte = targetZone;
   m_cost = cost;
 }
 
-Core::Action::ActionTeleport::~ActionTeleport()
+Sapphire::Action::ActionTeleport::~ActionTeleport()
 {
 
 }
 
-void Core::Action::ActionTeleport::onStart()
+void Sapphire::Action::ActionTeleport::onStart()
 {
   if( !m_pSource )
     return;
@@ -62,7 +62,7 @@ void Core::Action::ActionTeleport::onStart()
 
 }
 
-void Core::Action::ActionTeleport::onFinish()
+void Sapphire::Action::ActionTeleport::onFinish()
 {
   if( !m_pSource )
     return;
@@ -94,7 +94,7 @@ void Core::Action::ActionTeleport::onFinish()
   pPlayer->teleport( m_targetAetheryte );
 }
 
-void Core::Action::ActionTeleport::onInterrupt()
+void Sapphire::Action::ActionTeleport::onInterrupt()
 {
   if( !m_pSource )
     return;

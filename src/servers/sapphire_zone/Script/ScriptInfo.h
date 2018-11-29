@@ -15,7 +15,7 @@ using ModuleHandle = HMODULE;
 using ModuleHandle = void*;
 #endif
 
-namespace Core::Scripting
+namespace Sapphire::Scripting
 {
 
   /*!

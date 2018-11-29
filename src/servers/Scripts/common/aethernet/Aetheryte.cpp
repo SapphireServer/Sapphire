@@ -6,7 +6,7 @@
 
 
 
-using namespace Core;
+using namespace Sapphire;
 
 class Aetheryte :
   public Sapphire::ScriptAPI::EventScript
@@ -108,11 +108,11 @@ public:
 
   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
   {
-    auto pExdData = getFramework()->get< Core::Data::ExdDataGenerated >();
+    auto pExdData = getFramework()->get< Sapphire::Data::ExdDataGenerated >();
     if( !pExdData )
       return;
 
-    auto aetherInfo = pExdData->get< Core::Data::Aetheryte >( eventId & 0xFFFF );
+    auto aetherInfo = pExdData->get< Sapphire::Data::Aetheryte >( eventId & 0xFFFF );
     if( !aetherInfo )
       return;
 

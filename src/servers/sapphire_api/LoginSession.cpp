@@ -1,6 +1,6 @@
 #include "LoginSession.h"
 
-namespace Core {
+namespace Sapphire {
 LoginSession::LoginSession( void )
 {
   //setSocket(NULL);

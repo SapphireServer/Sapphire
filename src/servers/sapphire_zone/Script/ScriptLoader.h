@@ -18,7 +18,7 @@ using ModuleHandle = HMODULE;
 using ModuleHandle = void*;
 #endif
 
-namespace Core::Scripting
+namespace Sapphire::Scripting
 {
 
   /*!
@@ -102,7 +102,7 @@ namespace Core::Scripting
      * @param scripts a set of ScriptInfo ptrs
      * @param search the search term
      */
-    void findScripts( std::set< Core::Scripting::ScriptInfo* >& scripts, const std::string& search );
+    void findScripts( std::set< Sapphire::Scripting::ScriptInfo* >& scripts, const std::string& search );
   };
 
 }

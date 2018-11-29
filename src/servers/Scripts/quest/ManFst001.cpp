@@ -9,7 +9,7 @@
 // Start NPC: 1001148
 // End NPC: 1001140
 
-using namespace Core;
+using namespace Sapphire;
 
 class ManFst001 :
   public Sapphire::ScriptAPI::EventScript

@@ -4,7 +4,7 @@
 #include <Framework.h>
 #include <Manager/ShopMgr.h>
 
-using namespace Core;
+using namespace Sapphire;
 
 class GilShop :
   public Sapphire::ScriptAPI::EventScript

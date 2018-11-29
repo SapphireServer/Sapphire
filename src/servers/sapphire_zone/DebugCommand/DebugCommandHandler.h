@@ -7,7 +7,7 @@
 #include "DebugCommand.h"
 #include "ForwardsZone.h"
 
-namespace Core
+namespace Sapphire
 {
 
   // handler for in game commands

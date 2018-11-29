@@ -24,27 +24,27 @@
 // enable the ambiguity fix for every platform to avoid #define nonsense
 #define WIN_AMBIGUITY_FIX
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
 namespace fs = std::experimental::filesystem;
 
-Core::Scripting::ScriptMgr::ScriptMgr() :
+Sapphire::Scripting::ScriptMgr::ScriptMgr() :
   m_firstScriptChangeNotificiation( false )
 {
   m_nativeScriptMgr = createNativeScriptMgr();
 }
 
-Core::Scripting::ScriptMgr::~ScriptMgr()
+Sapphire::Scripting::ScriptMgr::~ScriptMgr()
 {
   Watchdog::unwatchAll();
 }
 
-void Core::Scripting::ScriptMgr::update()
+void Sapphire::Scripting::ScriptMgr::update()
 {
   m_nativeScriptMgr->processLoadQueue();
 }
 
-bool Core::Scripting::ScriptMgr::init()
+bool Sapphire::Scripting::ScriptMgr::init()
 {
   std::set< std::string > files;
   auto pConfig = g_fw.get< ConfigMgr >();
@@ -81,7 +81,7 @@ bool Core::Scripting::ScriptMgr::init()
   return true;
 }
 
-void Core::Scripting::ScriptMgr::watchDirectories()
+void Sapphire::Scripting::ScriptMgr::watchDirectories()
 {
   auto pConfig = g_fw.get< ConfigMgr >();
   auto shouldWatch = pConfig->getValue< bool >( "Scripts", "HotSwap", true );
@@ -119,7 +119,7 @@ void Core::Scripting::ScriptMgr::watchDirectories()
                        } );
 }
 
-bool Core::Scripting::ScriptMgr::loadDir( const std::string& dirname, std::set< std::string >& files,
+bool Sapphire::Scripting::ScriptMgr::loadDir( const std::string& dirname, std::set< std::string >& files,
                                           const std::string& ext )
 {
 
@@ -153,7 +153,7 @@ bool Core::Scripting::ScriptMgr::loadDir( const std::string& dirname, std::set< 
   }
 }
 
-void Core::Scripting::ScriptMgr::onPlayerFirstEnterWorld( Entity::Player& player )
+void Sapphire::Scripting::ScriptMgr::onPlayerFirstEnterWorld( Entity::Player& player )
 {
 //   try
 //   {
@@ -166,7 +166,7 @@ void Core::Scripting::ScriptMgr::onPlayerFirstEnterWorld( Entity::Player& player
 //   }
 }
 
-bool Core::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t actorId, uint32_t eventId )
+bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t actorId, uint32_t eventId )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
   if( script )
@@ -187,7 +187,7 @@ bool Core::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t actorI
   return false;
 }
 
-bool Core::Scripting::ScriptMgr::onEnterTerritory( Entity::Player& player, uint32_t eventId,
+bool Sapphire::Scripting::ScriptMgr::onEnterTerritory( Entity::Player& player, uint32_t eventId,
                                                    uint16_t param1, uint16_t param2 )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
@@ -197,7 +197,7 @@ bool Core::Scripting::ScriptMgr::onEnterTerritory( Entity::Player& player, uint3
   return true;
 }
 
-bool Core::Scripting::ScriptMgr::onWithinRange( Entity::Player& player, uint32_t eventId, uint32_t param1,
+bool Sapphire::Scripting::ScriptMgr::onWithinRange( Entity::Player& player, uint32_t eventId, uint32_t param1,
                                                 float x, float y, float z )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
@@ -207,7 +207,7 @@ bool Core::Scripting::ScriptMgr::onWithinRange( Entity::Player& player, uint32_t
   return true;
 }
 
-bool Core::Scripting::ScriptMgr::onOutsideRange( Entity::Player& player, uint32_t eventId, uint32_t param1,
+bool Sapphire::Scripting::ScriptMgr::onOutsideRange( Entity::Player& player, uint32_t eventId, uint32_t param1,
                                                  float x, float y, float z )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
@@ -217,7 +217,7 @@ bool Core::Scripting::ScriptMgr::onOutsideRange( Entity::Player& player, uint32_
   return true;
 }
 
-bool Core::Scripting::ScriptMgr::onEmote( Entity::Player& player, uint64_t actorId,
+bool Sapphire::Scripting::ScriptMgr::onEmote( Entity::Player& player, uint64_t actorId,
                                           uint32_t eventId, uint8_t emoteId )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
@@ -227,7 +227,7 @@ bool Core::Scripting::ScriptMgr::onEmote( Entity::Player& player, uint64_t actor
   return true;
 }
 
-bool Core::Scripting::ScriptMgr::onEventHandlerReturn( Entity::Player& player, uint32_t eventId,
+bool Sapphire::Scripting::ScriptMgr::onEventHandlerReturn( Entity::Player& player, uint32_t eventId,
                                                        uint16_t subEvent, uint16_t param1, uint16_t param2,
                                                        uint16_t param3 )
 {
@@ -235,7 +235,7 @@ bool Core::Scripting::ScriptMgr::onEventHandlerReturn( Entity::Player& player, u
   return false;
 }
 
-bool Core::Scripting::ScriptMgr::onEventHandlerTradeReturn( Entity::Player& player, uint32_t eventId,
+bool Sapphire::Scripting::ScriptMgr::onEventHandlerTradeReturn( Entity::Player& player, uint32_t eventId,
                                                             uint16_t subEvent, uint16_t param, uint32_t catalogId )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
@@ -248,7 +248,7 @@ bool Core::Scripting::ScriptMgr::onEventHandlerTradeReturn( Entity::Player& play
   return false;
 }
 
-bool Core::Scripting::ScriptMgr::onEventItem( Entity::Player& player, uint32_t eventItemId,
+bool Sapphire::Scripting::ScriptMgr::onEventItem( Entity::Player& player, uint32_t eventItemId,
                                               uint32_t eventId, uint32_t castTime, uint64_t targetId )
 {
   std::string eventName = "onEventItem";
@@ -267,7 +267,7 @@ bool Core::Scripting::ScriptMgr::onEventItem( Entity::Player& player, uint32_t e
   return false;
 }
 
-bool Core::Scripting::ScriptMgr::onMobKill( Entity::Player& player, uint16_t nameId )
+bool Sapphire::Scripting::ScriptMgr::onMobKill( Entity::Player& player, uint16_t nameId )
 {
   std::string eventName = "onBnpcKill_" + std::to_string( nameId );
 
@@ -295,7 +295,7 @@ bool Core::Scripting::ScriptMgr::onMobKill( Entity::Player& player, uint16_t nam
   return true;
 }
 
-bool Core::Scripting::ScriptMgr::onCastFinish( Entity::Player& player, Entity::CharaPtr pTarget, uint32_t actionId )
+bool Sapphire::Scripting::ScriptMgr::onCastFinish( Entity::Player& player, Entity::CharaPtr pTarget, uint32_t actionId )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( actionId );
 
@@ -304,7 +304,7 @@ bool Core::Scripting::ScriptMgr::onCastFinish( Entity::Player& player, Entity::C
   return true;
 }
 
-bool Core::Scripting::ScriptMgr::onStatusReceive( Entity::CharaPtr pActor, uint32_t effectId )
+bool Sapphire::Scripting::ScriptMgr::onStatusReceive( Entity::CharaPtr pActor, uint32_t effectId )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::StatusEffectScript >( effectId );
 
@@ -320,7 +320,7 @@ bool Core::Scripting::ScriptMgr::onStatusReceive( Entity::CharaPtr pActor, uint3
   return false;
 }
 
-bool Core::Scripting::ScriptMgr::onStatusTick( Entity::CharaPtr pChara, Core::StatusEffect::StatusEffect& effect )
+bool Sapphire::Scripting::ScriptMgr::onStatusTick( Entity::CharaPtr pChara, Sapphire::StatusEffect::StatusEffect& effect )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::StatusEffectScript >( effect.getId() );
   if( script )
@@ -335,7 +335,7 @@ bool Core::Scripting::ScriptMgr::onStatusTick( Entity::CharaPtr pChara, Core::St
   return false;
 }
 
-bool Core::Scripting::ScriptMgr::onStatusTimeOut( Entity::CharaPtr pChara, uint32_t effectId )
+bool Sapphire::Scripting::ScriptMgr::onStatusTimeOut( Entity::CharaPtr pChara, uint32_t effectId )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::StatusEffectScript >( effectId );
   if( script )
@@ -350,7 +350,7 @@ bool Core::Scripting::ScriptMgr::onStatusTimeOut( Entity::CharaPtr pChara, uint3
   return false;
 }
 
-bool Core::Scripting::ScriptMgr::onZoneInit( ZonePtr pZone )
+bool Sapphire::Scripting::ScriptMgr::onZoneInit( ZonePtr pZone )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ZoneScript >( pZone->getTerritoryTypeId() );
   if( script )
@@ -362,7 +362,7 @@ bool Core::Scripting::ScriptMgr::onZoneInit( ZonePtr pZone )
   return false;
 }
 
-bool Core::Scripting::ScriptMgr::onInstanceInit( InstanceContentPtr instance )
+bool Sapphire::Scripting::ScriptMgr::onInstanceInit( InstanceContentPtr instance )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance->getDirectorId() );
   if( script )
@@ -374,7 +374,7 @@ bool Core::Scripting::ScriptMgr::onInstanceInit( InstanceContentPtr instance )
   return false;
 }
 
-bool Core::Scripting::ScriptMgr::onInstanceUpdate( InstanceContentPtr instance, uint32_t currTime )
+bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( InstanceContentPtr instance, uint32_t currTime )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance->getDirectorId() );
 
@@ -387,7 +387,7 @@ bool Core::Scripting::ScriptMgr::onInstanceUpdate( InstanceContentPtr instance, 
   return false;
 }
 
-bool Core::Scripting::ScriptMgr::onInstanceEnterTerritory( InstanceContentPtr instance, Entity::Player& player,
+bool Sapphire::Scripting::ScriptMgr::onInstanceEnterTerritory( InstanceContentPtr instance, Entity::Player& player,
                                                            uint32_t eventId, uint16_t param1, uint16_t param2 )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance->getDirectorId() );
@@ -400,7 +400,7 @@ bool Core::Scripting::ScriptMgr::onInstanceEnterTerritory( InstanceContentPtr in
   return false;
 }
 
-Core::Scripting::NativeScriptMgr& Core::Scripting::ScriptMgr::getNativeScriptHandler()
+Sapphire::Scripting::NativeScriptMgr& Sapphire::Scripting::ScriptMgr::getNativeScriptHandler()
 {
   return *m_nativeScriptMgr;
 }

@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <string>
 
-namespace Core::Event
+namespace Sapphire::Event
 {
 
   std::string getEventName( uint32_t eventId );

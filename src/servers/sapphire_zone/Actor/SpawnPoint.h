@@ -3,7 +3,7 @@
 
 #include "ForwardsZone.h"
 
-namespace Core::Entity
+namespace Sapphire::Entity
 {
 
   class SpawnPoint

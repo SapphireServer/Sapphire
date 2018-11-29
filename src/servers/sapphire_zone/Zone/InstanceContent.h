@@ -5,7 +5,7 @@
 #include "Event/Director.h"
 #include "Forwards.h"
 
-namespace Core {
+namespace Sapphire {
 namespace Data {
 struct InstanceContent;
 }
@@ -20,7 +20,7 @@ public:
     DutyFinished
   };
 
-  InstanceContent( std::shared_ptr< Core::Data::InstanceContent > pInstanceConfiguration,
+  InstanceContent( std::shared_ptr< Sapphire::Data::InstanceContent > pInstanceConfiguration,
                    uint16_t territoryType,
                    uint32_t guId,
                    const std::string& internalName,
@@ -76,7 +76,7 @@ public:
 
   InstanceContentState getState() const;
 
-  std::shared_ptr< Core::Data::InstanceContent > getInstanceConfiguration() const;
+  std::shared_ptr< Sapphire::Data::InstanceContent > getInstanceConfiguration() const;
 
   uint32_t getInstanceContentId() const;
 
@@ -95,7 +95,7 @@ public:
   const uint32_t instanceStartDelay = 1250;
 
 private:
-  std::shared_ptr< Core::Data::InstanceContent > m_instanceConfiguration;
+  std::shared_ptr< Sapphire::Data::InstanceContent > m_instanceConfiguration;
   uint32_t m_instanceContentId;
   InstanceContentState m_state;
   uint16_t m_currentBgm;

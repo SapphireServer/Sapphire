@@ -2,7 +2,7 @@
 #include <Event/EventHelper.h>
 #include <ScriptObject.h>
 
-using namespace Core;
+using namespace Sapphire;
 
 // Quest Script: SubWil022_00395
 // Quest Name: The Wealth of Nations

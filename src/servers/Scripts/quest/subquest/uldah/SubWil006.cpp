@@ -2,7 +2,7 @@
 #include <Event/EventHelper.h>
 #include <ScriptObject.h>
 
-using namespace Core;
+using namespace Sapphire;
 
 // Quest Script: SubWil006_00165
 // Quest Name: The Great Gladiator

@@ -4,7 +4,7 @@
 #include "Exd/ExdDataGenerated.h"
 #include "ForwardsZone.h"
 
-namespace Core
+namespace Sapphire
 {
   namespace Data
   {
@@ -15,7 +15,7 @@ namespace Core
   {
   public:
 
-    Land( uint16_t zoneId, uint8_t wardNum, uint8_t landId, uint32_t landSetId, Core::Data::HousingLandSetPtr info );
+    Land( uint16_t zoneId, uint8_t wardNum, uint8_t landId, uint32_t landSetId, Sapphire::Data::HousingLandSetPtr info );
     virtual ~Land();
 
     void load();
@@ -35,7 +35,7 @@ namespace Core
     uint8_t getLandId() const;
     uint16_t getTerritoryTypeId() const;
     Common::LandType getLandType() const;
-    Core::HousePtr getHouse() const;
+    Sapphire::HousePtr getHouse() const;
 
     //Free Comapny
     void setFreeCompany( uint32_t id, uint32_t icon, uint32_t color );
@@ -79,12 +79,12 @@ namespace Core
     uint32_t m_fcIconColor;
 
     uint32_t m_ownerPlayerId;
-    Core::Data::HousingLandSetPtr m_landInfo;
+    Sapphire::Data::HousingLandSetPtr m_landInfo;
 
-    Core::HousePtr m_pHouse;
+    Sapphire::HousePtr m_pHouse;
 
     //item storage
-    Core::ItemContainerPtr ItemsOutdoorContainer;
+    Sapphire::ItemContainerPtr ItemsOutdoorContainer;
     uint32_t m_maxItems;
 
     //price

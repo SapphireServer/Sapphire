@@ -2,7 +2,7 @@
 #include <Event/EventHelper.h>
 #include <ScriptObject.h>
 
-using namespace Core;
+using namespace Sapphire;
 
 // Quest Script: SubWil019_00392
 // Quest Name: Decisions, Decisions

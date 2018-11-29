@@ -5,7 +5,7 @@
 
 #include "ForwardsZone.h"
 
-namespace Core::Event
+namespace Sapphire::Event
 {
 
   /*!

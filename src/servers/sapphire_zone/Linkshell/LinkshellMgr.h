@@ -4,7 +4,7 @@
 #include <memory>
 #include <map>
 
-namespace Core
+namespace Sapphire
 {
   class Linkshell;
 

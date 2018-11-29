@@ -11,9 +11,9 @@
 #include <unordered_map>
 #include "Framework.h"
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
-Core::House::House( uint32_t houseId, uint32_t landSetId, uint8_t landId, uint8_t wardNum, uint16_t territoryTypeId ) :
+Sapphire::House::House( uint32_t houseId, uint32_t landSetId, uint8_t landId, uint8_t wardNum, uint16_t territoryTypeId ) :
   m_houseId( houseId ),
   m_landSetId( landSetId ),
   m_landId( landId ),
@@ -27,7 +27,7 @@ Core::House::House( uint32_t houseId, uint32_t landSetId, uint8_t landId, uint8_
 
   if( !res->next() )
   {
-    g_fw.get< Core::Logger >()->info( "Creating house House#" + std::to_string( houseId ) + " in LandSet#" + std::to_string( landSetId ) );
+    g_fw.get< Sapphire::Logger >()->info( "Creating house House#" + std::to_string( houseId ) + " in LandSet#" + std::to_string( landSetId ) );
 
     auto stmt = pDB->getPreparedStatement( Db::HOUSING_HOUSE_INS );
 
@@ -56,11 +56,11 @@ Core::House::House( uint32_t houseId, uint32_t landSetId, uint8_t landId, uint8_
   }
 }
 
-Core::House::~House()
+Sapphire::House::~House()
 {
 }
 
-void Core::House::updateHouseDb()
+void Sapphire::House::updateHouseDb()
 {
   auto pDB = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
 
@@ -97,74 +97,74 @@ void Core::House::updateHouseDb()
   pDB->execute( stmt );
 }
 
-uint32_t Core::House::getLandSetId() const
+uint32_t Sapphire::House::getLandSetId() const
 {
   return m_landSetId;
 }
 
-uint8_t Core::House::getLandId() const
+uint8_t Sapphire::House::getLandId() const
 {
   return m_landId;
 }
 
-uint8_t Core::House::getWardNum() const
+uint8_t Sapphire::House::getWardNum() const
 {
   return m_wardNum;
 }
 
-uint16_t Core::House::getTerritoryTypeId() const
+uint16_t Sapphire::House::getTerritoryTypeId() const
 {
   return m_territoryTypeId;
 }
 
-uint32_t Core::House::getHouseId() const
+uint32_t Sapphire::House::getHouseId() const
 {
   return m_houseId;
 }
 
-uint8_t Core::House::getHousePartColor( Common::HousePartSlot slot ) const
+uint8_t Sapphire::House::getHousePartColor( Common::HousePartSlot slot ) const
 {
   return m_houseParts[ slot ].second;
 }
 
-void Core::House::setHousePart( Common::HousePartSlot slot, uint32_t id )
+void Sapphire::House::setHousePart( Common::HousePartSlot slot, uint32_t id )
 {
   m_houseParts[ slot ].first = id;
 }
 
-void Core::House::setHousePartColor( Common::HousePartSlot slot, uint32_t id )
+void Sapphire::House::setHousePartColor( Common::HousePartSlot slot, uint32_t id )
 {
   m_houseParts[ slot ].second = id;
 }
 
-uint32_t Core::House::getHousePart( Common::HousePartSlot slot ) const
+uint32_t Sapphire::House::getHousePart( Common::HousePartSlot slot ) const
 {
   return m_houseParts[ slot ].first;
 }
 
-Core::House::HousePartsArray const& Core::House::getHouseParts() const
+Sapphire::House::HousePartsArray const& Sapphire::House::getHouseParts() const
 {
   return m_houseParts;
 }
 
-const std::string& Core::House::getHouseName() const
+const std::string& Sapphire::House::getHouseName() const
 {
   return m_houseName;
 }
 
-const std::string& Core::House::getHouseGreeting() const
+const std::string& Sapphire::House::getHouseGreeting() const
 {
   return m_estateMessage;
 }
 
-void Core::House::setHouseGreeting( const std::string& greeting )
+void Sapphire::House::setHouseGreeting( const std::string& greeting )
 {
   m_estateMessage = greeting;
 
   updateHouseDb();
 }
 
-void Core::House::setHouseName( const std::string& name )
+void Sapphire::House::setHouseName( const std::string& name )
 {
   m_houseName = name;
 

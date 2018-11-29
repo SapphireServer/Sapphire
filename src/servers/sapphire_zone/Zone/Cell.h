@@ -7,7 +7,7 @@
 #include "ForwardsZone.h"
 #include <set>
 
-namespace Core {
+namespace Sapphire {
 
 typedef std::set< Entity::ActorPtr > ActorSet;
 

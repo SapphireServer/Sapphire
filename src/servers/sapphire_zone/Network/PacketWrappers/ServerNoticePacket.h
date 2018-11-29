@@ -5,7 +5,7 @@
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include "Forwards.h"
 
-namespace Core::Network::Packets::Server
+namespace Sapphire::Network::Packets::Server
 {
 
   /**

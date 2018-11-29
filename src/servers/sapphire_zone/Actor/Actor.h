@@ -9,7 +9,7 @@
 #include <map>
 #include <queue>
 
-namespace Core::Entity
+namespace Sapphire::Entity
 {
 
   /*!
@@ -40,7 +40,7 @@ namespace Core::Entity
     std::set< BNpcPtr > m_inRangeBNpc;
 
     /*! Parent cell in the zone */
-    Core::Cell* m_pCell;
+    Sapphire::Cell* m_pCell;
 
   public:
     explicit Actor( Common::ObjKind type );

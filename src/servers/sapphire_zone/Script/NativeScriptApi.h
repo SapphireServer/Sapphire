@@ -10,7 +10,7 @@
 #define EXPORT __attribute__((visibility("default")))
 #endif
 
-namespace Core
+namespace Sapphire
 {
   class Framework;
 }
@@ -26,7 +26,7 @@ namespace Sapphire::ScriptAPI
     uint32_t m_id;
     std::size_t m_type;
 
-    Core::Framework* m_framework;
+    Sapphire::Framework* m_framework;
 
   public:
     /*!
@@ -54,14 +54,14 @@ namespace Sapphire::ScriptAPI
     *
     * @param fw The ptr to g_fw (Core::Framework)
     */
-    virtual void setFramework( Core::Framework* fw );
+    virtual void setFramework( Sapphire::Framework* fw );
 
     /*!
     * @brief Returns the current ptr to framework set for the current script
     *
     * @return A pointer to Core::Framework
     */
-    virtual Core::Framework* getFramework() const;
+    virtual Sapphire::Framework* getFramework() const;
   };
 
 
@@ -78,28 +78,28 @@ namespace Sapphire::ScriptAPI
     *
     * @param actor the actor the status effect is ticking on
     */
-    virtual void onTick( Core::Entity::Chara& actor );
+    virtual void onTick( Sapphire::Entity::Chara& actor );
 
     /*!
     * @brief Called when the status effect is applied to an actor
     *
     * @param actor the actor on which the status effect was applied to
     */
-    virtual void onApply( Core::Entity::Chara& actor );
+    virtual void onApply( Sapphire::Entity::Chara& actor );
 
     /*!
     * @brief Called when the actor (usually a player) removes the status effect by right clicking it
     *
     * @param actor The actor on which the effect was removed from
     */
-    virtual void onRemove( Core::Entity::Chara& actor );
+    virtual void onRemove( Sapphire::Entity::Chara& actor );
 
     /*!
     * @brief Called when the status effect expires
     *
     * @param actor The actor on which the efect expired on
     */
-    virtual void onExpire( Core::Entity::Chara& actor );
+    virtual void onExpire( Sapphire::Entity::Chara& actor );
 
     /*!
     * @brief Called when the player with the status effect collides with another player, eg. hot potato
@@ -107,28 +107,28 @@ namespace Sapphire::ScriptAPI
     * @param actor The actor which has status effect
     * @param actorHit The actor who collided with the status effect owner
     */
-    virtual void onPlayerCollision( Core::Entity::Chara& actor, Core::Entity::Chara& actorHit );
+    virtual void onPlayerCollision( Sapphire::Entity::Chara& actor, Sapphire::Entity::Chara& actorHit );
 
     /*!
     * @brief Called when the owner finishes a cast
     *
     * @param actor The actor who finished a cast
     */
-    virtual void onPlayerFinishCast( Core::Entity::Chara& actor );
+    virtual void onPlayerFinishCast( Sapphire::Entity::Chara& actor );
 
     /*!
     * @brief Called when the status effect owner was damaged
     *
     * @param actor The actor that was damaged
     */
-    virtual void onPlayerDamaged( Core::Entity::Chara& actor );
+    virtual void onPlayerDamaged( Sapphire::Entity::Chara& actor );
 
     /*!
     * @brief Called when the status effect owner dies
     *
     * @param actor The actor that died
     */
-    virtual void onPlayerDeath( Core::Entity::Chara& actor );
+    virtual void onPlayerDeath( Sapphire::Entity::Chara& actor );
   };
 
 
@@ -140,11 +140,11 @@ namespace Sapphire::ScriptAPI
   public:
     explicit ActionScript( uint32_t abilityId );
 
-    virtual void onStart( Core::Entity::Chara& sourceActor, Core::Entity::Chara& targetActor );
+    virtual void onStart( Sapphire::Entity::Chara& sourceActor, Sapphire::Entity::Chara& targetActor );
 
-    virtual void onCastFinish( Core::Entity::Player& player, Core::Entity::Chara& targetActor );
+    virtual void onCastFinish( Sapphire::Entity::Player& player, Sapphire::Entity::Chara& targetActor );
 
-    virtual void onInterrupt( Core::Entity::Chara& sourceActor/*, Core::Entity::Chara targetActor*/ );
+    virtual void onInterrupt( Sapphire::Entity::Chara& sourceActor/*, Sapphire::Entity::Chara targetActor*/ );
   };
 
   /*!
@@ -155,7 +155,7 @@ namespace Sapphire::ScriptAPI
   {
   protected:
     template< typename Ret, class Obj >
-    inline std::function< void( Core::Entity::Player& ) > bindScene( Ret ( Obj::*f )( Core::Entity::Player& ) )
+    inline std::function< void( Sapphire::Entity::Player& ) > bindScene( Ret ( Obj::*f )( Sapphire::Entity::Player& ) )
     {
       return std::bind( f, static_cast< Obj* >( this ), std::placeholders::_1 );
     }
@@ -163,22 +163,22 @@ namespace Sapphire::ScriptAPI
   public:
     explicit EventScript( uint32_t questId );
 
-    virtual void onTalk( uint32_t eventId, Core::Entity::Player& player, uint64_t actorId );
+    virtual void onTalk( uint32_t eventId, Sapphire::Entity::Player& player, uint64_t actorId );
 
-    virtual void onNpcKill( uint32_t npcId, Core::Entity::Player& player );
+    virtual void onNpcKill( uint32_t npcId, Sapphire::Entity::Player& player );
 
-    virtual void onEmote( uint64_t actorId, uint32_t eventId, uint32_t emoteId, Core::Entity::Player& player );
+    virtual void onEmote( uint64_t actorId, uint32_t eventId, uint32_t emoteId, Sapphire::Entity::Player& player );
 
-    virtual void onEnterTerritory( Core::Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 );
+    virtual void onEnterTerritory( Sapphire::Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 );
 
-    virtual void onWithinRange( Core::Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z );
+    virtual void onWithinRange( Sapphire::Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z );
 
-    virtual void onOutsideRange( Core::Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z );
+    virtual void onOutsideRange( Sapphire::Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z );
 
     virtual void
-      onEventItem( Core::Entity::Player& player, uint32_t eventItemId, uint32_t eventId, uint32_t castTime, uint64_t targetId );
+      onEventItem( Sapphire::Entity::Player& player, uint32_t eventItemId, uint32_t eventId, uint32_t castTime, uint64_t targetId );
 
-    virtual void onEventHandlerTradeReturn( Core::Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param,
+    virtual void onEventHandlerTradeReturn( Sapphire::Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param,
                                             uint32_t catalogId );
   };
 
@@ -211,11 +211,11 @@ namespace Sapphire::ScriptAPI
   public:
     explicit InstanceContentScript( uint32_t instanceContentId );
 
-    virtual void onInit( Core::InstanceContentPtr instance );
+    virtual void onInit( Sapphire::InstanceContentPtr instance );
 
-    virtual void onUpdate( Core::InstanceContentPtr instance, uint32_t currTime );
+    virtual void onUpdate( Sapphire::InstanceContentPtr instance, uint32_t currTime );
 
-    virtual void onEnterTerritory( Core::InstanceContentPtr instance, Core::Entity::Player& player, uint32_t eventId,
+    virtual void onEnterTerritory( Sapphire::InstanceContentPtr instance, Sapphire::Entity::Player& player, uint32_t eventId,
                                   uint16_t param1, uint16_t param2 );
   };
 

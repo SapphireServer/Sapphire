@@ -5,14 +5,14 @@
 #include "Logging/Logger.h"
 #include "Framework.h"
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
-Core::Db::DbLoader::DbLoader()
+Sapphire::Db::DbLoader::DbLoader()
 {
 }
 
 template< class T >
-Core::Db::DbLoader& Core::Db::DbLoader::addDb( Core::Db::DbWorkerPool< T >& pool, const ConnectionInfo& info )
+Sapphire::Db::DbLoader& Sapphire::Db::DbLoader::addDb( Sapphire::Db::DbWorkerPool< T >& pool, const ConnectionInfo& info )
 {
 
   m_open.push( [ this, info, &pool ]()->bool
@@ -65,7 +65,7 @@ Core::Db::DbLoader& Core::Db::DbLoader::addDb( Core::Db::DbWorkerPool< T >& pool
   return *this;
 }
 
-bool Core::Db::DbLoader::initDbs()
+bool Sapphire::Db::DbLoader::initDbs()
 {
   if( !openDatabases() )
     return false;
@@ -76,17 +76,17 @@ bool Core::Db::DbLoader::initDbs()
   return true;
 }
 
-bool Core::Db::DbLoader::openDatabases()
+bool Sapphire::Db::DbLoader::openDatabases()
 {
   return process( m_open );
 }
 
-bool Core::Db::DbLoader::prepareStatements()
+bool Sapphire::Db::DbLoader::prepareStatements()
 {
   return process( m_prepare );
 }
 
-bool Core::Db::DbLoader::process( std::queue< Predicate >& queue )
+bool Sapphire::Db::DbLoader::process( std::queue< Predicate >& queue )
 {
   while( !queue.empty() )
   {
@@ -108,7 +108,7 @@ bool Core::Db::DbLoader::process( std::queue< Predicate >& queue )
 }
 
 template
-Core::Db::DbLoader&
-Core::Db::DbLoader::addDb< Core::Db::ZoneDbConnection >( Core::Db::DbWorkerPool< Core::Db::ZoneDbConnection >&,
+Sapphire::Db::DbLoader&
+Sapphire::Db::DbLoader::addDb< Sapphire::Db::ZoneDbConnection >( Sapphire::Db::DbWorkerPool< Sapphire::Db::ZoneDbConnection >&,
                                                           const ConnectionInfo& );
 

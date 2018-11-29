@@ -4,7 +4,7 @@
 #include <Common.h>
 #include "ForwardsZone.h"
 
-namespace Core::Items::Util
+namespace Sapphire::Items::Util
 {
 
   ItemPtr loadItem( uint64_t uId );

@@ -11,7 +11,7 @@
 #define EXPORT __attribute__((visibility("default")))
 #endif
 
-using namespace Core;
+using namespace Sapphire;
 
 namespace Sapphire::ScriptAPI
 {
@@ -31,13 +31,13 @@ namespace Sapphire::ScriptAPI
     return m_type;
   }
 
-  void ScriptObject::setFramework( Core::Framework* fw )
+  void ScriptObject::setFramework( Sapphire::Framework* fw )
   {
     assert( fw );
     m_framework = fw;
   }
 
-  Core::Framework* ScriptObject::getFramework() const
+  Sapphire::Framework* ScriptObject::getFramework() const
   {
     return m_framework;
   }
@@ -96,7 +96,7 @@ namespace Sapphire::ScriptAPI
   {
   }
 
-  void ActionScript::onInterrupt( Entity::Chara& sourceActor/*, Core::Entity::Chara targetActor*/ )
+  void ActionScript::onInterrupt( Entity::Chara& sourceActor/*, Sapphire::Entity::Chara targetActor*/ )
   {
   }
 
@@ -174,8 +174,8 @@ namespace Sapphire::ScriptAPI
   {
   }
 
-  void InstanceContentScript::onEnterTerritory( InstanceContentPtr instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
-                                                uint16_t param2 )
+  void InstanceContentScript::onEnterTerritory( InstanceContentPtr instance, Entity::Player& player, uint32_t eventId,
+                                                uint16_t param1, uint16_t param2 )
   {
   }
 

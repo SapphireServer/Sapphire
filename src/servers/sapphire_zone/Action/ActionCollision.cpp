@@ -11,8 +11,8 @@
 #include <cmath>
 #include <cassert>
 
-using namespace Core::Entity;
-using namespace Core::Common;
+using namespace Sapphire::Entity;
+using namespace Sapphire::Common;
 
 // todo: add AoE actor limits (16, 32)
 
@@ -53,9 +53,9 @@ bool ActionCollision::isActorApplicable( Actor& actor, TargetFilter targetFilter
   return ( actorApplicable && actor.getAsChara()->isAlive() );
 }
 
-std::set< Core::Entity::ActorPtr > ActionCollision::getActorsHitFromAction( FFXIVARR_POSITION3 aoePosition,
+std::set< Sapphire::Entity::ActorPtr > ActionCollision::getActorsHitFromAction( FFXIVARR_POSITION3 aoePosition,
                                                                             std::set< ActorPtr > actorsInRange,
-                                                                            std::shared_ptr< Core::Data::Action > actionInfo,
+                                                                            std::shared_ptr< Sapphire::Data::Action > actionInfo,
                                                                             TargetFilter targetFilter )
 {
   std::set< ActorPtr > actorsCollided;
@@ -129,7 +129,7 @@ std::set< Core::Entity::ActorPtr > ActionCollision::getActorsHitFromAction( FFXI
 bool
 ActionCollision::radiusCollision( FFXIVARR_POSITION3 actorPosition, FFXIVARR_POSITION3 aoePosition, uint16_t radius )
 {
-  return Core::Math::Util::distance( actorPosition.x, actorPosition.y, actorPosition.z,
+  return Sapphire::Math::Util::distance( actorPosition.x, actorPosition.y, actorPosition.z,
                                      aoePosition.x, aoePosition.y, aoePosition.z ) <= radius;
 }
 

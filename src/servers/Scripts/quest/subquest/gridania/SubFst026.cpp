@@ -2,7 +2,7 @@
 #include <Event/EventHelper.h>
 #include <ScriptObject.h>
 
-using namespace Core;
+using namespace Sapphire;
 
 // Quest Script: SubFst026_00170
 // Quest Name: Jumping at Shadows

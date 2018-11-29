@@ -31,15 +31,15 @@
 #include "Framework.h"
 #include <Network/CommonActorControl.h>
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
-using namespace Core::Common;
-using namespace Core::Network::Packets;
-using namespace Core::Network::Packets::Server;
-using namespace Core::Network::ActorControl;
+using namespace Sapphire::Common;
+using namespace Sapphire::Network::Packets;
+using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::Network::ActorControl;
 
 
-void Core::Entity::Player::initInventory()
+void Sapphire::Entity::Player::initInventory()
 {
   auto setupContainer = [ this ]( InventoryType type, uint8_t maxSize, const std::string& tableName,
                                   bool isMultiStorage, bool isPersistentStorage = true )
@@ -107,20 +107,20 @@ void Core::Entity::Player::initInventory()
 
 }
 
-void Core::Entity::Player::sendItemLevel()
+void Sapphire::Entity::Player::sendItemLevel()
 {
   queuePacket( makeActorControl142( getId(), SetItemLevel, getItemLevel(), 0 ) );
 }
 
-void Core::Entity::Player::equipWeapon( ItemPtr pItem, bool updateClass )
+void Sapphire::Entity::Player::equipWeapon( ItemPtr pItem, bool updateClass )
 {
-  auto exdData = g_fw.get< Core::Data::ExdDataGenerated >();
+  auto exdData = g_fw.get< Sapphire::Data::ExdDataGenerated >();
   if( !exdData )
     return;
 
-  auto itemInfo = exdData->get< Core::Data::Item >( pItem->getId() );
+  auto itemInfo = exdData->get< Sapphire::Data::Item >( pItem->getId() );
   auto itemClassJob = itemInfo->classJobUse;
-  auto classJobInfo = exdData->get< Core::Data::ClassJob >( static_cast< uint32_t >( getClass() ) );
+  auto classJobInfo = exdData->get< Sapphire::Data::ClassJob >( static_cast< uint32_t >( getClass() ) );
   auto currentParentClass = static_cast< ClassJob >( classJobInfo->classJobParent );
   auto newClassJob = static_cast< ClassJob >( itemClassJob );
 
@@ -133,13 +133,13 @@ void Core::Entity::Player::equipWeapon( ItemPtr pItem, bool updateClass )
   }
 }
 
-void Core::Entity::Player::equipSoulCrystal( ItemPtr pItem, bool updateJob )
+void Sapphire::Entity::Player::equipSoulCrystal( ItemPtr pItem, bool updateJob )
 {
-  auto exdData = g_fw.get< Core::Data::ExdDataGenerated >();
+  auto exdData = g_fw.get< Sapphire::Data::ExdDataGenerated >();
   if ( !exdData )
     return;
 
-  auto itemInfo = exdData->get< Core::Data::Item >( pItem->getId() );
+  auto itemInfo = exdData->get< Sapphire::Data::Item >( pItem->getId() );
   auto itemClassJob = itemInfo->classJobUse;
   auto newClassJob = static_cast< ClassJob >( itemClassJob );
 
@@ -148,7 +148,7 @@ void Core::Entity::Player::equipSoulCrystal( ItemPtr pItem, bool updateJob )
 }
 
 // equip an item
-void Core::Entity::Player::equipItem( Common::GearSetSlot equipSlotId, ItemPtr pItem, bool sendUpdate )
+void Sapphire::Entity::Player::equipItem( Common::GearSetSlot equipSlotId, ItemPtr pItem, bool sendUpdate )
 {
 
   //g_framework.getLogger().debug( "Equipping into slot " + std::to_string( equipSlotId ) );
@@ -163,7 +163,7 @@ void Core::Entity::Player::equipItem( Common::GearSetSlot equipSlotId, ItemPtr p
     updateModels( equipSlotId, pItem, false );
 }
 
-void Core::Entity::Player::updateModels( GearSetSlot equipSlotId, const Core::ItemPtr& pItem, bool updateClass )
+void Sapphire::Entity::Player::updateModels( GearSetSlot equipSlotId, const Sapphire::ItemPtr& pItem, bool updateClass )
 {
   uint64_t model = pItem->getModelId1();
   uint64_t model2 = pItem->getModelId2();
@@ -197,7 +197,7 @@ void Core::Entity::Player::updateModels( GearSetSlot equipSlotId, const Core::It
   }
 }
 
-Core::Common::GearModelSlot Core::Entity::Player::equipSlotToModelSlot( Common::GearSetSlot slot )
+Sapphire::Common::GearModelSlot Sapphire::Entity::Player::equipSlotToModelSlot( Common::GearSetSlot slot )
 {
   switch( slot )
   {
@@ -230,7 +230,7 @@ Core::Common::GearModelSlot Core::Entity::Player::equipSlotToModelSlot( Common::
   }
 }
 
-void Core::Entity::Player::unequipItem( Common::GearSetSlot equipSlotId, ItemPtr pItem )
+void Sapphire::Entity::Player::unequipItem( Common::GearSetSlot equipSlotId, ItemPtr pItem )
 {
   auto modelSlot = equipSlotToModelSlot( equipSlotId );
   if( modelSlot != GearModelSlot::ModelInvalid )
@@ -244,19 +244,19 @@ void Core::Entity::Player::unequipItem( Common::GearSetSlot equipSlotId, ItemPtr
     unequipSoulCrystal( pItem );
 }
 
-void Core::Entity::Player::unequipSoulCrystal( ItemPtr pItem )
+void Sapphire::Entity::Player::unequipSoulCrystal( ItemPtr pItem )
 {
-  auto exdData = g_fw.get< Core::Data::ExdDataGenerated >();
+  auto exdData = g_fw.get< Sapphire::Data::ExdDataGenerated >();
   if ( !exdData )
     return;
 
-  auto currentClassJob = exdData->get< Core::Data::ClassJob >( static_cast< uint32_t >( getClass() ) );
+  auto currentClassJob = exdData->get< Sapphire::Data::ClassJob >( static_cast< uint32_t >( getClass() ) );
   auto parentClass = static_cast< ClassJob >( currentClassJob->classJobParent );
   setClassJob( parentClass );
 }
 
 // TODO: these next functions are so similar that they could likely be simplified
-void Core::Entity::Player::addCurrency( CurrencyType type, uint32_t amount )
+void Sapphire::Entity::Player::addCurrency( CurrencyType type, uint32_t amount )
 {
   auto slot = static_cast< uint8_t >( static_cast< uint8_t >( type ) - 1 );
   auto currItem = m_storageMap[ Currency ]->getItem( slot );
@@ -281,7 +281,7 @@ void Core::Entity::Player::addCurrency( CurrencyType type, uint32_t amount )
   queuePacket( invUpdate );
 }
 
-void Core::Entity::Player::removeCurrency( Common::CurrencyType type, uint32_t amount )
+void Sapphire::Entity::Player::removeCurrency( Common::CurrencyType type, uint32_t amount )
 {
 
   auto currItem = m_storageMap[ Currency ]->getItem( static_cast< uint8_t >( type ) - 1 );
@@ -304,7 +304,7 @@ void Core::Entity::Player::removeCurrency( Common::CurrencyType type, uint32_t a
 }
 
 
-void Core::Entity::Player::addCrystal( Common::CrystalType type, uint32_t amount )
+void Sapphire::Entity::Player::addCrystal( Common::CrystalType type, uint32_t amount )
 {
   auto currItem = m_storageMap[ Crystal ]->getItem( static_cast< uint8_t >( type ) - 1 );
 
@@ -332,7 +332,7 @@ void Core::Entity::Player::addCrystal( Common::CrystalType type, uint32_t amount
   queuePacket( makeActorControl143( getId(), ItemObtainIcon, static_cast< uint8_t >( type ) + 1, amount ) );
 }
 
-void Core::Entity::Player::removeCrystal( Common::CrystalType type, uint32_t amount )
+void Sapphire::Entity::Player::removeCrystal( Common::CrystalType type, uint32_t amount )
 {
   auto currItem = m_storageMap[ Crystal ]->getItem( static_cast< uint8_t >( type ) - 1 );
 
@@ -354,7 +354,7 @@ void Core::Entity::Player::removeCrystal( Common::CrystalType type, uint32_t amo
   queuePacket( invUpdate );
 }
 
-void Core::Entity::Player::sendInventory()
+void Sapphire::Entity::Player::sendInventory()
 {
   InventoryMap::iterator it;
 
@@ -408,7 +408,7 @@ void Core::Entity::Player::sendInventory()
 
 }
 
-Core::Entity::Player::InvSlotPairVec Core::Entity::Player::getSlotsOfItemsInInventory( uint32_t catalogId )
+Sapphire::Entity::Player::InvSlotPairVec Sapphire::Entity::Player::getSlotsOfItemsInInventory( uint32_t catalogId )
 {
   InvSlotPairVec outVec;
   for( auto i : { Bag0, Bag1, Bag2, Bag3 } )
@@ -423,7 +423,7 @@ Core::Entity::Player::InvSlotPairVec Core::Entity::Player::getSlotsOfItemsInInve
   return outVec;
 }
 
-Core::Entity::Player::InvSlotPair Core::Entity::Player::getFreeBagSlot()
+Sapphire::Entity::Player::InvSlotPair Sapphire::Entity::Player::getFreeBagSlot()
 {
   for( auto i : { Bag0, Bag1, Bag2, Bag3 } )
   {
@@ -436,13 +436,13 @@ Core::Entity::Player::InvSlotPair Core::Entity::Player::getFreeBagSlot()
   return std::make_pair( 0, -1 );
 }
 
-Core::ItemPtr Core::Entity::Player::getItemAt( uint16_t containerId, uint8_t slotId )
+Sapphire::ItemPtr Sapphire::Entity::Player::getItemAt( uint16_t containerId, uint8_t slotId )
 {
   return m_storageMap[ containerId ]->getItem( slotId );
 }
 
 
-uint32_t Core::Entity::Player::getCurrency( CurrencyType type )
+uint32_t Sapphire::Entity::Player::getCurrency( CurrencyType type )
 {
 
   auto currItem = m_storageMap[ Currency ]->getItem( static_cast< uint8_t >( type ) - 1 );
@@ -454,7 +454,7 @@ uint32_t Core::Entity::Player::getCurrency( CurrencyType type )
 
 }
 
-uint32_t Core::Entity::Player::getCrystal( CrystalType type )
+uint32_t Sapphire::Entity::Player::getCrystal( CrystalType type )
 {
 
   auto currItem = m_storageMap[ Crystal ]->getItem( static_cast< uint8_t >( type ) - 1 );
@@ -466,7 +466,7 @@ uint32_t Core::Entity::Player::getCrystal( CrystalType type )
 
 }
 
-void Core::Entity::Player::writeInventory( InventoryType type )
+void Sapphire::Entity::Player::writeInventory( InventoryType type )
 {
   auto pLog = g_fw.get< Logger >();
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
@@ -497,7 +497,7 @@ void Core::Entity::Player::writeInventory( InventoryType type )
   pDb->execute( query );
 }
 
-void Core::Entity::Player::writeItem( Core::ItemPtr pItem ) const
+void Sapphire::Entity::Player::writeItem( Sapphire::ItemPtr pItem ) const
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto stmt = pDb->getPreparedStatement( Db::CHARA_ITEMGLOBAL_UP );
@@ -512,7 +512,7 @@ void Core::Entity::Player::writeItem( Core::ItemPtr pItem ) const
   pDb->directExecute( stmt );
 }
 
-void Core::Entity::Player::deleteItemDb( Core::ItemPtr item ) const
+void Sapphire::Entity::Player::deleteItemDb( Sapphire::ItemPtr item ) const
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto stmt = pDb->getPreparedStatement( Db::CHARA_ITEMGLOBAL_DELETE );
@@ -523,18 +523,18 @@ void Core::Entity::Player::deleteItemDb( Core::ItemPtr item ) const
 }
 
 
-bool Core::Entity::Player::isObtainable( uint32_t catalogId, uint8_t quantity )
+bool Sapphire::Entity::Player::isObtainable( uint32_t catalogId, uint8_t quantity )
 {
 
   return true;
 }
 
 
-Core::ItemPtr Core::Entity::Player::addItem( uint32_t catalogId, uint32_t quantity, bool isHq, bool silent )
+Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_t quantity, bool isHq, bool silent )
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-  auto itemInfo = pExdData->get< Core::Data::Item >( catalogId );
+  auto itemInfo = pExdData->get< Sapphire::Data::Item >( catalogId );
 
   // if item data doesn't exist or it's a blank field
   if( !itemInfo || itemInfo->levelItem == 0 )
@@ -638,7 +638,7 @@ Core::ItemPtr Core::Entity::Player::addItem( uint32_t catalogId, uint32_t quanti
 }
 
 void
-Core::Entity::Player::moveItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot )
+Sapphire::Entity::Player::moveItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot )
 {
 
   auto tmpItem = m_storageMap[ fromInventoryId ]->getItem( fromSlotId );
@@ -665,7 +665,7 @@ Core::Entity::Player::moveItem( uint16_t fromInventoryId, uint8_t fromSlotId, ui
 
 }
 
-bool Core::Entity::Player::updateContainer( uint16_t storageId, uint8_t slotId, ItemPtr pItem )
+bool Sapphire::Entity::Player::updateContainer( uint16_t storageId, uint8_t slotId, ItemPtr pItem )
 {
   auto containerType = Items::Util::getContainerType( storageId );
 
@@ -698,7 +698,7 @@ bool Core::Entity::Player::updateContainer( uint16_t storageId, uint8_t slotId, 
   return true;
 }
 
-void Core::Entity::Player::splitItem( uint16_t fromInventoryId, uint8_t fromSlotId,
+void Sapphire::Entity::Player::splitItem( uint16_t fromInventoryId, uint8_t fromSlotId,
                                       uint16_t toInventoryId, uint8_t toSlot, uint16_t itemCount )
 {
   if( itemCount == 0 )
@@ -731,7 +731,7 @@ void Core::Entity::Player::splitItem( uint16_t fromInventoryId, uint8_t fromSlot
   writeItem( fromItem );
 }
 
-void Core::Entity::Player::mergeItem( uint16_t fromInventoryId, uint8_t fromSlotId,
+void Sapphire::Entity::Player::mergeItem( uint16_t fromInventoryId, uint8_t fromSlotId,
                                       uint16_t toInventoryId, uint8_t toSlot )
 {
   auto fromItem = m_storageMap[ fromInventoryId ]->getItem( fromSlotId );
@@ -766,7 +766,7 @@ void Core::Entity::Player::mergeItem( uint16_t fromInventoryId, uint8_t fromSlot
   updateContainer( toInventoryId, toSlot, toItem );
 }
 
-void Core::Entity::Player::swapItem( uint16_t fromInventoryId, uint8_t fromSlotId,
+void Sapphire::Entity::Player::swapItem( uint16_t fromInventoryId, uint8_t fromSlotId,
                                      uint16_t toInventoryId, uint8_t toSlot )
 {
   auto fromItem = m_storageMap[ fromInventoryId ]->getItem( fromSlotId );
@@ -794,7 +794,7 @@ void Core::Entity::Player::swapItem( uint16_t fromInventoryId, uint8_t fromSlotI
   updateContainer( fromInventoryId, fromSlotId, toItem );
 }
 
-void Core::Entity::Player::discardItem( uint16_t fromInventoryId, uint8_t fromSlotId )
+void Sapphire::Entity::Player::discardItem( uint16_t fromInventoryId, uint8_t fromSlotId )
 {
   // i am not entirely sure how this should be generated or if it even is important for us...
   uint32_t transactionId = 1;
@@ -822,18 +822,18 @@ void Core::Entity::Player::discardItem( uint16_t fromInventoryId, uint8_t fromSl
   queuePacket( invTransFinPacket );
 }
 
-void Core::Entity::Player::setActiveLand( uint8_t land, uint8_t ward )
+void Sapphire::Entity::Player::setActiveLand( uint8_t land, uint8_t ward )
 {
   m_activeLand.plot = land;
   m_activeLand.ward = ward;
 }
 
-Core::Common::ActiveLand Core::Entity::Player::getActiveLand() const
+Sapphire::Common::ActiveLand Sapphire::Entity::Player::getActiveLand() const
 {
   return m_activeLand;
 }
 
-uint16_t Core::Entity::Player::calculateEquippedGearItemLevel()
+uint16_t Sapphire::Entity::Player::calculateEquippedGearItemLevel()
 {
   uint32_t iLvlResult = 0;
 
@@ -863,7 +863,7 @@ uint16_t Core::Entity::Player::calculateEquippedGearItemLevel()
 }
 
 
-uint8_t Core::Entity::Player::getFreeSlotsInBags()
+uint8_t Sapphire::Entity::Player::getFreeSlotsInBags()
 {
   uint8_t slots = 0;
   for( uint8_t container : { Bag0, Bag1, Bag2, Bag3 } )
@@ -874,7 +874,7 @@ uint8_t Core::Entity::Player::getFreeSlotsInBags()
   return slots;
 }
 
-bool Core::Entity::Player::collectHandInItems( std::vector< uint32_t > itemIds )
+bool Sapphire::Entity::Player::collectHandInItems( std::vector< uint32_t > itemIds )
 {
   // todo: figure out how the game gets the required stack count
   const auto& container = m_storageMap[ HandIn ];

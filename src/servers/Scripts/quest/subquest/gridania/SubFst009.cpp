@@ -2,7 +2,7 @@
 #include <Event/EventHelper.h>
 #include <ScriptObject.h>
 
-using namespace Core;
+using namespace Sapphire;
 
 // Quest Script: SubFst009_00034
 // Quest Name: Derision of Labor

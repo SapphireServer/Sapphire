@@ -36,18 +36,18 @@
 #include "Framework.h"
 #include <Network/PacketDef/Lobby/ServerLobbyDef.h>
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
-using namespace Core::Common;
-using namespace Core::Network::Packets;
-using namespace Core::Network::Packets::Server;
-using namespace Core::Network::ActorControl;
+using namespace Sapphire::Common;
+using namespace Sapphire::Network::Packets;
+using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::Network::ActorControl;
 
-void examineHandler( Core::Entity::Player& player, uint32_t targetId )
+void examineHandler( Sapphire::Entity::Player& player, uint32_t targetId )
 {
-  using namespace Core;
+  using namespace Sapphire;
 
-  auto pSession = g_fw.get< Core::ServerMgr >()->getSession( targetId );
+  auto pSession = g_fw.get< Sapphire::ServerMgr >()->getSession( targetId );
   if( pSession )
   {
     auto pTarget = pSession->getPlayer();
@@ -65,7 +65,7 @@ void examineHandler( Core::Entity::Player& player, uint32_t targetId )
   }
 }
 
-void Core::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                           Entity::Player& player )
 {
   auto pLog = g_fw.get< Logger >();

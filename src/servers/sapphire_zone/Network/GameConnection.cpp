@@ -20,16 +20,17 @@
 #include "Framework.h"
 #include "Forwards.h"
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
-using namespace Core::Common;
-using namespace Core::Network::Packets;
-using namespace Core::Network::Packets::Server;
+using namespace Sapphire::Common;
+using namespace Sapphire::Network::Packets;
+using namespace Sapphire::Network::Packets::Server;
 
-Core::Network::GameConnection::GameConnection( Core::Network::HivePtr pHive,
-                                               Core::Network::AcceptorPtr pAcceptor )
-  :
-  Connection( pHive ), m_pAcceptor( pAcceptor ), m_conType( ConnectionType::None )
+Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pHive,
+                                                   Sapphire::Network::AcceptorPtr pAcceptor ) :
+  Connection( pHive ),
+  m_pAcceptor( pAcceptor ),
+  m_conType( ConnectionType::None )
 {
   auto setZoneHandler = [ = ]( uint16_t opcode, std::string handlerName, GameConnection::Handler pHandler )
   {
@@ -124,11 +125,11 @@ Core::Network::GameConnection::GameConnection( Core::Network::HivePtr pHive,
 
 }
 
-Core::Network::GameConnection::~GameConnection() = default;
+Sapphire::Network::GameConnection::~GameConnection() = default;
 
 
 // overwrite the parents onConnect for our game socket needs
-void Core::Network::GameConnection::OnAccept( const std::string& host, uint16_t port )
+void Sapphire::Network::GameConnection::OnAccept( const std::string& host, uint16_t port )
 {
   GameConnectionPtr connection( new GameConnection( m_hive, m_pAcceptor ) );
   m_pAcceptor->Accept( connection );
@@ -137,14 +138,14 @@ void Core::Network::GameConnection::OnAccept( const std::string& host, uint16_t 
 }
 
 
-void Core::Network::GameConnection::OnDisconnect()
+void Sapphire::Network::GameConnection::OnDisconnect()
 {
   auto pLog = g_fw.get< Logger >();
   pLog->debug( "GameConnection DISCONNECT" );
   m_pSession = nullptr;
 }
 
-void Core::Network::GameConnection::OnRecv( std::vector< uint8_t >& buffer )
+void Sapphire::Network::GameConnection::OnRecv( std::vector< uint8_t >& buffer )
 {
   // This is assumed packet always start with valid FFXIVARR_PACKET_HEADER for now.
   auto pLog = g_fw.get< Logger >();
@@ -188,23 +189,23 @@ void Core::Network::GameConnection::OnRecv( std::vector< uint8_t >& buffer )
   handlePackets( packetHeader, packetList );
 }
 
-void Core::Network::GameConnection::OnError( const asio::error_code& error )
+void Sapphire::Network::GameConnection::OnError( const asio::error_code& error )
 {
   auto pLog = g_fw.get< Logger >();
   pLog->debug( "GameConnection ERROR: " + error.message() );
 }
 
-void Core::Network::GameConnection::queueInPacket( Core::Network::Packets::FFXIVARR_PACKET_RAW inPacket )
+void Sapphire::Network::GameConnection::queueInPacket( Sapphire::Network::Packets::FFXIVARR_PACKET_RAW inPacket )
 {
   m_inQueue.push( inPacket );
 }
 
-void Core::Network::GameConnection::queueOutPacket( Core::Network::Packets::FFXIVPacketBasePtr outPacket )
+void Sapphire::Network::GameConnection::queueOutPacket( Sapphire::Network::Packets::FFXIVPacketBasePtr outPacket )
 {
   m_outQueue.push( outPacket );
 }
 
-void Core::Network::GameConnection::handleZonePacket( Core::Network::Packets::FFXIVARR_PACKET_RAW& pPacket )
+void Sapphire::Network::GameConnection::handleZonePacket( Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& pPacket )
 {
   auto pLog = g_fw.get< Logger >();
   uint16_t opcode = *reinterpret_cast< uint16_t* >( &pPacket.data[ 0x02 ] );
@@ -235,7 +236,7 @@ void Core::Network::GameConnection::handleZonePacket( Core::Network::Packets::FF
 }
 
 
-void Core::Network::GameConnection::handleChatPacket( Core::Network::Packets::FFXIVARR_PACKET_RAW& pPacket )
+void Sapphire::Network::GameConnection::handleChatPacket( Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& pPacket )
 {
   auto pLog = g_fw.get< Logger >();
   uint16_t opcode = *reinterpret_cast< uint16_t* >( &pPacket.data[ 0x02 ] );
@@ -262,7 +263,7 @@ void Core::Network::GameConnection::handleChatPacket( Core::Network::Packets::FF
   }
 }
 
-void Core::Network::GameConnection::handlePacket( Core::Network::Packets::FFXIVARR_PACKET_RAW& pPacket )
+void Sapphire::Network::GameConnection::handlePacket( Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& pPacket )
 {
   if( !m_pSession )
     return;
@@ -283,7 +284,7 @@ void Core::Network::GameConnection::handlePacket( Core::Network::Packets::FFXIVA
 
 }
 
-void Core::Network::GameConnection::sendPackets( Packets::PacketContainer* pPacket )
+void Sapphire::Network::GameConnection::sendPackets( Packets::PacketContainer* pPacket )
 {
   //g_log.Log(LoggingSeverity::info, pPacket->toString());
   std::vector< uint8_t > sendBuffer;
@@ -292,7 +293,7 @@ void Core::Network::GameConnection::sendPackets( Packets::PacketContainer* pPack
   Send( sendBuffer );
 }
 
-void Core::Network::GameConnection::processInQueue()
+void Sapphire::Network::GameConnection::processInQueue()
 {
   // handle the incoming game packets
   while( m_inQueue.size() )
@@ -302,7 +303,7 @@ void Core::Network::GameConnection::processInQueue()
   }
 }
 
-void Core::Network::GameConnection::processOutQueue()
+void Sapphire::Network::GameConnection::processOutQueue()
 {
   auto pLog = g_fw.get< Logger >();
   if( m_outQueue.size() < 1 )
@@ -335,14 +336,14 @@ void Core::Network::GameConnection::processOutQueue()
 
 }
 
-void Core::Network::GameConnection::sendSinglePacket( Core::Network::Packets::FFXIVPacketBasePtr pPacket )
+void Sapphire::Network::GameConnection::sendSinglePacket( Sapphire::Network::Packets::FFXIVPacketBasePtr pPacket )
 {
   PacketContainer pRP = PacketContainer();
   pRP.addPacket( pPacket );
   sendPackets( &pRP );
 }
 
-void Core::Network::GameConnection::injectPacket( const std::string& packetpath, Core::Entity::Player& player )
+void Sapphire::Network::GameConnection::injectPacket( const std::string& packetpath, Sapphire::Entity::Player& player )
 {
 
   char packet[0x11570];
@@ -392,8 +393,8 @@ void Core::Network::GameConnection::injectPacket( const std::string& packetpath,
   }
 }
 
-void Core::Network::GameConnection::handlePackets( const Core::Network::Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
-                                                   const std::vector< Core::Network::Packets::FFXIVARR_PACKET_RAW >& packetData )
+void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
+                                                       const std::vector< Sapphire::Network::Packets::FFXIVARR_PACKET_RAW >& packetData )
 {
   auto pLog = g_fw.get< Logger >();
   auto pServerZone = g_fw.get< ServerMgr >();

@@ -10,7 +10,7 @@
 #include "Inventory/Item.h"
 #include "StatusEffect/StatusEffect.h"
 
-namespace Core::Network::Packets::Server
+namespace Sapphire::Network::Packets::Server
 {
 
   /**
@@ -106,7 +106,7 @@ namespace Core::Network::Packets::Server
       //m_data.unknown_61 = 7;
 
 
-      uint64_t currentTimeMs = Core::Util::getTimeMs();
+      uint64_t currentTimeMs = Sapphire::Util::getTimeMs();
 
       for( auto const& effect : bnpc.getStatusEffectMap() )
       {

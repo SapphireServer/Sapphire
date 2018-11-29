@@ -8,7 +8,7 @@
 #include <cstring>
 #include <cassert>
 
-namespace Core::Network::Packets::Server
+namespace Sapphire::Network::Packets::Server
 {
 
   class EffectPacket : public ZoneChannelPacket< FFXIVIpcEffect >

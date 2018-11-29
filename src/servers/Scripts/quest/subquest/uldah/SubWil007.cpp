@@ -3,7 +3,7 @@
 #include <ScriptObject.h>
 #include <ctime>
 
-using namespace Core;
+using namespace Sapphire;
 
 // Quest Script: SubWil007_00167
 // Quest Name: With Open Arms

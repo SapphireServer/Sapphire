@@ -6,13 +6,13 @@
 #include <set>
 #include <unordered_map>
 
-namespace Core
+namespace Sapphire::Data
 {
-  namespace Data
-  {
-    using HousingZonePtr = std::shared_ptr< HousingZone >;
-  }
+  using HousingZonePtr = std::shared_ptr< HousingZone >;
+}
 
+namespace Sapphire
+{
   class HousingMgr
   {
 
@@ -23,8 +23,8 @@ namespace Core
     bool init();
 
     uint32_t toLandSetId( uint16_t territoryTypeId, uint8_t wardId ) const;
-    Core::Data::HousingZonePtr getHousingZoneByLandSetId( uint32_t id );
-    Core::LandPtr getLandByOwnerId( uint32_t id );
+    Sapphire::Data::HousingZonePtr getHousingZoneByLandSetId( uint32_t id );
+    Sapphire::LandPtr getLandByOwnerId( uint32_t id );
 
     void sendLandSignOwned( Entity::Player& player, uint8_t wardId, uint8_t plotId, uint16_t territoryTypeId );
     void sendLandSignFree( Entity::Player& player, uint8_t wardId, uint8_t plotId, uint16_t territoryTypeId );
@@ -42,8 +42,6 @@ namespace Core
     void updateEstateGreeting( Entity::Player& player, const Common::LandIdent& ident, const std::string& greeting );
 
     void requestEstateEditGuestAccess( Entity::Player& player, uint16_t territoryTypeId, uint16_t worldId, uint8_t wardId, uint8_t plotId );
-
-  private:
 
   };
 

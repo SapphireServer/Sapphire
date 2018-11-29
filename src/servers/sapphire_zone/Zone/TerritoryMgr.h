@@ -5,7 +5,7 @@
 #include <set>
 #include <unordered_map>
 
-namespace Core::Data 
+namespace Sapphire::Data 
 {
   // TODO: this should actually not be here but should be generated in exdData aswell
   struct PlaceName;
@@ -17,7 +17,7 @@ namespace Core::Data
   using InstanceContentPtr = std::shared_ptr< InstanceContent >;
 }
 
-namespace Core
+namespace Sapphire
 {
 /*!
    \class TerritoryMgr_c

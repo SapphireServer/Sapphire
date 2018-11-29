@@ -6,7 +6,7 @@
 /* This file has been automatically generated.
    Changes will be lost upon regeneration.
    To change the content edit tools/exd_common_gen */
-namespace Core {
+namespace Sapphire {
 namespace Common {
 
 ///////////////////////////////////////////////////////////

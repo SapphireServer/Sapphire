@@ -1,6 +1,6 @@
 #include "EventHandler.h"
 
-Core::Event::EventHandler::EventHandler( Entity::Player* pOwner, uint64_t actorId, uint32_t eventId,
+Sapphire::Event::EventHandler::EventHandler( Entity::Player* pOwner, uint64_t actorId, uint32_t eventId,
                                          EventType eventType, uint32_t eventParam ) :
   m_pOwner( pOwner ),
   m_actorId( actorId ),
@@ -14,82 +14,82 @@ Core::Event::EventHandler::EventHandler( Entity::Player* pOwner, uint64_t actorI
   m_returnCallback = nullptr;
 }
 
-uint64_t Core::Event::EventHandler::getActorId() const
+uint64_t Sapphire::Event::EventHandler::getActorId() const
 {
   return m_actorId;
 }
 
-uint32_t Core::Event::EventHandler::getId() const
+uint32_t Sapphire::Event::EventHandler::getId() const
 {
   return m_eventId;
 }
 
-uint8_t Core::Event::EventHandler::getEventType() const
+uint8_t Sapphire::Event::EventHandler::getEventType() const
 {
   return m_eventType;
 }
 
-uint16_t Core::Event::EventHandler::getType() const
+uint16_t Sapphire::Event::EventHandler::getType() const
 {
   return m_type;
 }
 
-uint16_t Core::Event::EventHandler::getEntryId() const
+uint16_t Sapphire::Event::EventHandler::getEntryId() const
 {
   return m_entryId;
 }
 
-uint32_t Core::Event::EventHandler::getEventParam() const
+uint32_t Sapphire::Event::EventHandler::getEventParam() const
 {
   return m_eventParam;
 }
 
-Core::Event::EventHandler::SceneReturnCallback Core::Event::EventHandler::getEventReturnCallback() const
+Sapphire::Event::EventHandler::SceneReturnCallback Sapphire::Event::EventHandler::getEventReturnCallback() const
 {
   return m_returnCallback;
 }
 
-void Core::Event::EventHandler::setEventReturnCallback( SceneReturnCallback callback )
+void Sapphire::Event::EventHandler::setEventReturnCallback( SceneReturnCallback callback )
 {
   m_returnCallback = callback;
 }
 
-Core::Event::EventHandler::SceneChainCallback Core::Event::EventHandler::getSceneChainCallback() const
+Sapphire::Event::EventHandler::SceneChainCallback Sapphire::Event::EventHandler::getSceneChainCallback() const
 {
   return m_chainCallback;
 }
 
-void Core::Event::EventHandler::setSceneChainCallback( Core::Event::EventHandler::SceneChainCallback callback )
+void Sapphire::Event::EventHandler::setSceneChainCallback( Sapphire::Event::EventHandler::SceneChainCallback callback )
 {
   m_chainCallback = callback;
 }
 
-Core::Event::EventHandler::EventFinishCallback Core::Event::EventHandler::getEventFinishCallback() const
+Sapphire::Event::EventHandler::EventFinishCallback Sapphire::Event::EventHandler::getEventFinishCallback() const
 {
   return m_finishCallback;
 }
 
-void Core::Event::EventHandler::setEventFinishCallback( EventFinishCallback callback )
+void Sapphire::Event::EventHandler::setEventFinishCallback( EventFinishCallback callback )
 {
   m_finishCallback = callback;
 }
 
-bool Core::Event::EventHandler::hasPlayedScene() const
+bool Sapphire::Event::EventHandler::hasPlayedScene() const
 {
   return m_playedScene;
 }
 
-void Core::Event::EventHandler::setPlayedScene( bool playedScene )
+void Sapphire::Event::EventHandler::setPlayedScene( bool playedScene )
 {
   m_playedScene = playedScene;
 }
 
-bool Core::Event::EventHandler::hasNestedEvent() const
+bool Sapphire::Event::EventHandler::hasNestedEvent() const
 {
   return m_pNestedEvent != nullptr;
 }
 
-void Core::Event::EventHandler::removeNestedEvent()
+void Sapphire::Event::EventHandler::removeNestedEvent()
 {
   m_pNestedEvent.reset();
 }

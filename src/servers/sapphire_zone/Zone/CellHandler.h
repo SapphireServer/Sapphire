@@ -16,7 +16,7 @@
 #define _sizeY (TilesCount*CellsPerTile)
 
 #define GetRelatCoord( Coord, CellCoord ) ((_maxX-Coord)-CellCoord*_cellSize)
-namespace Core {
+namespace Sapphire {
 
 class Zone;
 

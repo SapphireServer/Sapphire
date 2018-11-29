@@ -9,11 +9,11 @@
 
 #include "Framework.h"
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
 namespace fs = std::experimental::filesystem;
 
-const std::string Core::Scripting::ScriptLoader::getModuleExtension()
+const std::string Sapphire::Scripting::ScriptLoader::getModuleExtension()
 {
 #ifdef _WIN32
   return ".dll";
@@ -24,7 +24,7 @@ const std::string Core::Scripting::ScriptLoader::getModuleExtension()
 #endif
 }
 
-bool Core::Scripting::ScriptLoader::unloadModule( ModuleHandle handle )
+bool Sapphire::Scripting::ScriptLoader::unloadModule( ModuleHandle handle )
 {
 #ifdef _WIN32
   bool success = FreeLibrary( handle ) != 0;
@@ -46,7 +46,7 @@ bool Core::Scripting::ScriptLoader::unloadModule( ModuleHandle handle )
   return true;
 }
 
-Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::loadModule( const std::string& path )
+Sapphire::Scripting::ScriptInfo* Sapphire::Scripting::ScriptLoader::loadModule( const std::string& path )
 {
   auto pLog = g_fw.get< Logger >();
   auto pConfig = g_fw.get< ConfigMgr >();
@@ -101,7 +101,7 @@ Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::loadModule( const st
   return info;
 }
 
-Sapphire::ScriptAPI::ScriptObject** Core::Scripting::ScriptLoader::getScripts( ModuleHandle handle )
+Sapphire::ScriptAPI::ScriptObject** Sapphire::Scripting::ScriptLoader::getScripts( ModuleHandle handle )
 {
   using getScripts = Sapphire::ScriptAPI::ScriptObject** ( * )();
   auto pLog = g_fw.get< Logger >();
@@ -122,12 +122,12 @@ Sapphire::ScriptAPI::ScriptObject** Core::Scripting::ScriptLoader::getScripts( M
     return nullptr;
 }
 
-bool Core::Scripting::ScriptLoader::unloadScript( Core::Scripting::ScriptInfo* info )
+bool Sapphire::Scripting::ScriptLoader::unloadScript( Sapphire::Scripting::ScriptInfo* info )
 {
   return unloadScript( info->handle );
 }
 
-bool Core::Scripting::ScriptLoader::unloadScript( ModuleHandle handle )
+bool Sapphire::Scripting::ScriptLoader::unloadScript( ModuleHandle handle )
 {
   auto pLog = g_fw.get< Logger >();
   for( auto it = m_scriptMap.begin(); it != m_scriptMap.end(); ++it )
@@ -157,7 +157,7 @@ bool Core::Scripting::ScriptLoader::unloadScript( ModuleHandle handle )
   return false;
 }
 
-bool Core::Scripting::ScriptLoader::isModuleLoaded( std::string name )
+bool Sapphire::Scripting::ScriptLoader::isModuleLoaded( std::string name )
 {
   for( auto it = m_scriptMap.begin(); it != m_scriptMap.end(); ++it )
   {
@@ -169,7 +169,7 @@ bool Core::Scripting::ScriptLoader::isModuleLoaded( std::string name )
   return false;
 }
 
-Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::getScriptInfo( std::string name )
+Sapphire::Scripting::ScriptInfo* Sapphire::Scripting::ScriptLoader::getScriptInfo( std::string name )
 {
   for( auto it = m_scriptMap.begin(); it != m_scriptMap.end(); ++it )
   {
@@ -182,7 +182,7 @@ Core::Scripting::ScriptInfo* Core::Scripting::ScriptLoader::getScriptInfo( std::
   return nullptr;
 }
 
-void Core::Scripting::ScriptLoader::findScripts( std::set< Core::Scripting::ScriptInfo* >& scripts,
+void Sapphire::Scripting::ScriptLoader::findScripts( std::set< Sapphire::Scripting::ScriptInfo* >& scripts,
                                                  const std::string& search )
 {
   for( auto it = m_scriptMap.begin(); it != m_scriptMap.end(); ++it )

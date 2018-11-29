@@ -28,15 +28,15 @@
 #include "Session.h"
 #include "Framework.h"
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
-using namespace Core::Common;
-using namespace Core::Network::Packets;
-using namespace Core::Network::Packets::Server;
-using namespace Core::Network::ActorControl;
+using namespace Sapphire::Common;
+using namespace Sapphire::Network::Packets;
+using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::Network::ActorControl;
 
-void Core::Network::GameConnection::actionHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                   Entity::Player& player )
+void Sapphire::Network::GameConnection::actionHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                       Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcSkillHandler >( inPacket );
 
@@ -59,7 +59,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::FFXIVARR_PACKE
         std::string actionIdStr = Util::intToHexString( action, 4 );
         player.sendDebug( "---------------------------------------" );
         player.sendDebug( "ActionHandler ( " + actionIdStr + " | " +
-                          pExdData->get< Core::Data::Action >( action )->name +
+                          pExdData->get< Sapphire::Data::Action >( action )->name +
                           " | " + std::to_string( targetId ) + " )" );
 
         player.queuePacket( makeActorControl142( player.getId(), ActorControlType::ActionStart, 0x01, action ) );
@@ -74,7 +74,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::FFXIVARR_PACKE
         }
         else
         {
-          Core::Entity::ActorPtr targetActor = player.getAsPlayer();
+          Sapphire::Entity::ActorPtr targetActor = player.getAsPlayer();
 
           if( targetId != player.getId() )
           {
@@ -108,7 +108,7 @@ void Core::Network::GameConnection::actionHandler( const Packets::FFXIVARR_PACKE
       }
       else if( action < 3000000 ) // item action
       {
-        auto info = pExdData->get< Core::Data::EventItem >( action );
+        auto info = pExdData->get< Sapphire::Data::EventItem >( action );
         if( info )
         {
           pScriptMgr->onEventItem( player, action, info->quest, info->castTime, targetId );

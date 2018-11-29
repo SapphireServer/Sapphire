@@ -2,7 +2,7 @@
 #include "Hive.h"
 #include <functional>
 
-namespace Core {
+namespace Sapphire {
 namespace Network {
 //-----------------------------------------------------------------------------
 

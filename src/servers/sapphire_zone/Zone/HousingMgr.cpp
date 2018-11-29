@@ -22,41 +22,41 @@
 #include "ServerMgr.h"
 #include "House.h"
 
-using namespace Core::Common;
-using namespace Core::Network;
-using namespace Core::Network::Packets;
-using namespace Core::Network::Packets::Server;
+using namespace Sapphire::Common;
+using namespace Sapphire::Network;
+using namespace Sapphire::Network::Packets;
+using namespace Sapphire::Network::Packets::Server;
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
-Core::HousingMgr::HousingMgr()
+Sapphire::HousingMgr::HousingMgr()
 {
 
 }
 
-Core::HousingMgr::~HousingMgr()
+Sapphire::HousingMgr::~HousingMgr()
 {
 
 }
 
-bool Core::HousingMgr::init()
+bool Sapphire::HousingMgr::init()
 {
 
   return true;
 }
 
-uint32_t Core::HousingMgr::toLandSetId( uint16_t territoryTypeId, uint8_t wardId ) const
+uint32_t Sapphire::HousingMgr::toLandSetId( uint16_t territoryTypeId, uint8_t wardId ) const
 {
   return ( static_cast< uint32_t >( territoryTypeId ) << 16 ) | wardId;
 }
 
-Core::Data::HousingZonePtr Core::HousingMgr::getHousingZoneByLandSetId( uint32_t id )
+Sapphire::Data::HousingZonePtr Sapphire::HousingMgr::getHousingZoneByLandSetId( uint32_t id )
 {
   auto pTeriMgr = g_fw.get< TerritoryMgr >();
   return std::dynamic_pointer_cast< HousingZone >( pTeriMgr->getZoneByLandSetId( id ) );
 }
 
-Core::LandPtr Core::HousingMgr::getLandByOwnerId( uint32_t id )
+Sapphire::LandPtr Sapphire::HousingMgr::getLandByOwnerId( uint32_t id )
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto res = pDb->query( "SELECT LandSetId, LandId FROM land WHERE OwnerId = " + std::to_string( id ) );
@@ -72,7 +72,7 @@ Core::LandPtr Core::HousingMgr::getLandByOwnerId( uint32_t id )
   return hZone->getLand( res->getUInt( 2 ) );
 }
 
-void Core::HousingMgr::sendLandSignOwned( Entity::Player& player, uint8_t wardId, uint8_t plotId, uint16_t territoryTypeId )
+void Sapphire::HousingMgr::sendLandSignOwned( Entity::Player& player, uint8_t wardId, uint8_t plotId, uint16_t territoryTypeId )
 {
   player.setActiveLand( plotId, wardId );
 
@@ -90,7 +90,7 @@ void Core::HousingMgr::sendLandSignOwned( Entity::Player& player, uint8_t wardId
 
   auto landInfoSignPacket = makeZonePacket< Server::FFXIVIpcLandInfoSign >( player.getId() );
   uint32_t playerId = land->getPlayerOwner();
-  std::string playerName = g_fw.get< Core::ServerMgr >()->getPlayerNameFromDb( playerId );
+  std::string playerName = g_fw.get< Sapphire::ServerMgr >()->getPlayerNameFromDb( playerId );
   //memcpy( &landInfoSignPacket->data().estateGreeting, "Hello World", 11 );
   //memcpy( &landInfoSignPacket->data().estateName, land->getLandName().c_str(), land->getLandName().size() );
   landInfoSignPacket->data().houseSize = land->getSize();
@@ -113,7 +113,7 @@ void Core::HousingMgr::sendLandSignOwned( Entity::Player& player, uint8_t wardId
   player.queuePacket( landInfoSignPacket );
 }
 
-void Core::HousingMgr::sendLandSignFree( Entity::Player& player, uint8_t wardId, uint8_t plotId, uint16_t territoryTypeId )
+void Sapphire::HousingMgr::sendLandSignFree( Entity::Player& player, uint8_t wardId, uint8_t plotId, uint16_t territoryTypeId )
 {
   player.setActiveLand( plotId, wardId );
 
@@ -130,7 +130,7 @@ void Core::HousingMgr::sendLandSignFree( Entity::Player& player, uint8_t wardId,
   player.queuePacket( plotPricePacket );
 }
 
-Core::LandPurchaseResult Core::HousingMgr::purchaseLand( Entity::Player& player, uint8_t plot, uint8_t state )
+Sapphire::LandPurchaseResult Sapphire::HousingMgr::purchaseLand( Entity::Player& player, uint8_t plot, uint8_t state )
 {
   auto pHousing = std::dynamic_pointer_cast< HousingZone >( player.getCurrentZone() );
 
@@ -185,7 +185,7 @@ Core::LandPurchaseResult Core::HousingMgr::purchaseLand( Entity::Player& player,
 
 }
 
-bool Core::HousingMgr::relinquishLand( Entity::Player& player, uint8_t plot )
+bool Sapphire::HousingMgr::relinquishLand( Entity::Player& player, uint8_t plot )
 {
   // TODO: Fix "permissions" being sent incorrectly
   // TODO: Add checks for land state before relinquishing
@@ -231,7 +231,7 @@ bool Core::HousingMgr::relinquishLand( Entity::Player& player, uint8_t plot )
   return true;
 }
 
-void Core::HousingMgr::sendWardLandInfo( Entity::Player& player, uint8_t wardId, uint16_t territoryTypeId )
+void Sapphire::HousingMgr::sendWardLandInfo( Entity::Player& player, uint8_t wardId, uint16_t territoryTypeId )
 {
   auto landSetId = toLandSetId( territoryTypeId, wardId );
   auto hZone = getHousingZoneByLandSetId( landSetId );
@@ -270,7 +270,7 @@ void Core::HousingMgr::sendWardLandInfo( Entity::Player& player, uint8_t wardId,
         entry.infoFlags = Common::WardlandFlags::IsEstateOwned;
 
         auto owner = land->getPlayerOwner();
-        std::string playerName = g_fw.get< Core::ServerMgr >()->getPlayerNameFromDb( owner );
+        std::string playerName = g_fw.get< Sapphire::ServerMgr >()->getPlayerNameFromDb( owner );
         memcpy( &entry.estateOwnerName, playerName.c_str(), playerName.size() );
 
         break;
@@ -283,7 +283,7 @@ void Core::HousingMgr::sendWardLandInfo( Entity::Player& player, uint8_t wardId,
   player.queuePacket( wardInfoPacket );
 }
 
-void Core::HousingMgr::buildPresetEstate( Entity::Player& player, uint8_t plotNum, uint32_t presetItem )
+void Sapphire::HousingMgr::buildPresetEstate( Entity::Player& player, uint8_t plotNum, uint32_t presetItem )
 {
   auto hZone = std::dynamic_pointer_cast< HousingZone >( player.getCurrentZone() );
 
@@ -323,7 +323,7 @@ void Core::HousingMgr::buildPresetEstate( Entity::Player& player, uint8_t plotNu
   player.sendLandFlagsSlot( LandFlagsSlot::Private );
 }
 
-void Core::HousingMgr::requestEstateRename( Entity::Player& player, uint16_t territoryTypeId, uint16_t worldId, uint8_t wardId, uint8_t plotId )
+void Sapphire::HousingMgr::requestEstateRename( Entity::Player& player, uint16_t territoryTypeId, uint16_t worldId, uint8_t wardId, uint8_t plotId )
 {
   auto landSetId = toLandSetId( territoryTypeId, wardId );
   auto hZone = getHousingZoneByLandSetId( landSetId );
@@ -348,7 +348,7 @@ void Core::HousingMgr::requestEstateRename( Entity::Player& player, uint16_t ter
   player.queuePacket( landRenamePacket );
 }
 
-void Core::HousingMgr::requestEstateEditGreeting( Entity::Player& player, uint16_t territoryTypeId, uint16_t worldId, uint8_t wardId, uint8_t plotId )
+void Sapphire::HousingMgr::requestEstateEditGreeting( Entity::Player& player, uint16_t territoryTypeId, uint16_t worldId, uint8_t wardId, uint8_t plotId )
 {
   auto landSetId = toLandSetId( territoryTypeId, wardId );
   auto hZone = getHousingZoneByLandSetId( landSetId );
@@ -375,7 +375,7 @@ void Core::HousingMgr::requestEstateEditGreeting( Entity::Player& player, uint16
   player.queuePacket( estateGreetingPacket );
 }
 
-void Core::HousingMgr::updateEstateGreeting( Entity::Player& player, const Common::LandIdent& ident, const std::string& greeting )
+void Sapphire::HousingMgr::updateEstateGreeting( Entity::Player& player, const Common::LandIdent& ident, const std::string& greeting )
 {
   auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
   auto zone = getHousingZoneByLandSetId( landSetId );
@@ -401,7 +401,7 @@ void Core::HousingMgr::updateEstateGreeting( Entity::Player& player, const Commo
   player.sendLogMessage( 3381 );
 }
 
-void Core::HousingMgr::requestEstateEditGuestAccess( Entity::Player& player, uint16_t territoryTypeId, uint16_t worldId, uint8_t wardId, uint8_t plotId )
+void Sapphire::HousingMgr::requestEstateEditGuestAccess( Entity::Player& player, uint16_t territoryTypeId, uint16_t worldId, uint8_t wardId, uint8_t plotId )
 {
   auto landSetId = toLandSetId( territoryTypeId, wardId );
   auto hZone = getHousingZoneByLandSetId( landSetId );

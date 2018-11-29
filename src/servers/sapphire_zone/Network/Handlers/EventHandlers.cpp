@@ -26,14 +26,14 @@
 
 #include "Framework.h"
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
-using namespace Core::Common;
-using namespace Core::Network::Packets;
-using namespace Core::Network::Packets::Server;
+using namespace Sapphire::Common;
+using namespace Sapphire::Network::Packets;
+using namespace Sapphire::Network::Packets::Server;
 
-void Core::Network::GameConnection::eventHandlerTalk( const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                      Entity::Player& player )
+void Sapphire::Network::GameConnection::eventHandlerTalk( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                          Entity::Player& player )
 {
   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
@@ -66,7 +66,7 @@ void Core::Network::GameConnection::eventHandlerTalk( const Packets::FFXIVARR_PA
   else if( !pScriptMgr->onTalk( player, actorId, eventId ) &&
            eventType == Event::EventHandler::EventHandlerType::Quest )
   {
-    auto questInfo = pExdData->get< Core::Data::Quest >( eventId );
+    auto questInfo = pExdData->get< Sapphire::Data::Quest >( eventId );
     if( questInfo )
       player.sendUrgent( "Quest not implemented: " + questInfo->name + " (" + questInfo->id + ")" );
   }
@@ -75,7 +75,7 @@ void Core::Network::GameConnection::eventHandlerTalk( const Packets::FFXIVARR_PA
 
 }
 
-void Core::Network::GameConnection::eventHandlerEmote( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::eventHandlerEmote( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                        Entity::Player& player )
 {
 
@@ -106,7 +106,7 @@ void Core::Network::GameConnection::eventHandlerEmote( const Packets::FFXIVARR_P
   if( !pScriptMgr->onEmote( player, actorId, eventId, static_cast< uint8_t >( emoteId ) ) &&
       eventType == Event::EventHandler::EventHandlerType::Quest )
   {
-    auto questInfo = pExdData->get< Core::Data::Quest >( eventId );
+    auto questInfo = pExdData->get< Sapphire::Data::Quest >( eventId );
     if( questInfo )
       player.sendUrgent( "Quest not implemented: " + questInfo->name );
   }
@@ -114,7 +114,7 @@ void Core::Network::GameConnection::eventHandlerEmote( const Packets::FFXIVARR_P
   player.checkEvent( eventId );
 }
 
-void Core::Network::GameConnection::eventHandlerWithinRange( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::eventHandlerWithinRange( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                              Entity::Player& player )
 {
   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
@@ -137,7 +137,7 @@ void Core::Network::GameConnection::eventHandlerWithinRange( const Packets::FFXI
   player.checkEvent( eventId );
 }
 
-void Core::Network::GameConnection::eventHandlerOutsideRange( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::eventHandlerOutsideRange( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                               Entity::Player& player )
 {
   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
@@ -159,7 +159,7 @@ void Core::Network::GameConnection::eventHandlerOutsideRange( const Packets::FFX
   player.checkEvent( eventId );
 }
 
-void Core::Network::GameConnection::eventHandlerEnterTerritory( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::eventHandlerEnterTerritory( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                                 Entity::Player& player )
 {
   auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
@@ -190,7 +190,7 @@ void Core::Network::GameConnection::eventHandlerEnterTerritory( const Packets::F
   player.checkEvent( eventId );
 }
 
-void Core::Network::GameConnection::eventHandlerReturn( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::eventHandlerReturn( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                         Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcEventHandlerReturn >( inPacket );
@@ -239,7 +239,7 @@ void Core::Network::GameConnection::eventHandlerReturn( const Packets::FFXIVARR_
 
 }
 
-void Core::Network::GameConnection::eventHandlerLinkshell( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::eventHandlerLinkshell( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                            Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcLinkshellEventHandler >( inPacket );
@@ -253,7 +253,7 @@ void Core::Network::GameConnection::eventHandlerLinkshell( const Packets::FFXIVA
 
 }
 
-void Core::Network::GameConnection::eventHandlerShop( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::eventHandlerShop( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                          Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcShopEventHandler >( inPacket );

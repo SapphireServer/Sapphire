@@ -16,34 +16,34 @@
 #include "ActionCast.h"
 #include "Framework.h"
 
-using namespace Core::Common;
-using namespace Core::Network;
-using namespace Core::Network::Packets;
-using namespace Core::Network::Packets::Server;
-using namespace Core::Network::ActorControl;
+using namespace Sapphire::Common;
+using namespace Sapphire::Network;
+using namespace Sapphire::Network::Packets;
+using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::Network::ActorControl;
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
-Core::Action::ActionCast::ActionCast()
+Sapphire::Action::ActionCast::ActionCast()
 {
   m_handleActionType = Common::HandleActionType::Event;
 }
 
-Core::Action::ActionCast::ActionCast( Entity::CharaPtr pActor, Entity::CharaPtr pTarget, uint16_t actionId )
+Sapphire::Action::ActionCast::ActionCast( Entity::CharaPtr pActor, Entity::CharaPtr pTarget, uint16_t actionId )
 {
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
   m_startTime = 0;
   m_id = actionId;
   m_handleActionType = HandleActionType::Spell;
-  m_castTime = pExdData->get< Core::Data::Action >( actionId )->cast100ms * 100; // TODO: Add security checks.
+  m_castTime = pExdData->get< Sapphire::Data::Action >( actionId )->cast100ms * 100; // TODO: Add security checks.
   m_pSource = pActor;
   m_pTarget = pTarget;
   m_bInterrupt = false;
 }
 
-Core::Action::ActionCast::~ActionCast() = default;
+Sapphire::Action::ActionCast::~ActionCast() = default;
 
-void Core::Action::ActionCast::onStart()
+void Sapphire::Action::ActionCast::onStart()
 {
   if( !m_pSource )
     return;
@@ -65,7 +65,7 @@ void Core::Action::ActionCast::onStart()
 
 }
 
-void Core::Action::ActionCast::onFinish()
+void Sapphire::Action::ActionCast::onFinish()
 {
   if( !m_pSource )
     return;
@@ -84,7 +84,7 @@ void Core::Action::ActionCast::onFinish()
   pScriptMgr->onCastFinish( *pPlayer, m_pTarget, m_id );
 }
 
-void Core::Action::ActionCast::onInterrupt()
+void Sapphire::Action::ActionCast::onInterrupt()
 {
   if( !m_pSource )
     return;

@@ -17,7 +17,7 @@
 class case_insensitive_equals {
 public:
   bool operator()(const std::string &key1, const std::string &key2) const {
-    return Core::Util::toLowerCopy( key1 ) == Core::Util::toLowerCopy( key2 );
+    return Sapphire::Util::toLowerCopy( key1 ) == Sapphire::Util::toLowerCopy( key2 );
   }
 };
 class case_insensitive_hash {
@@ -26,7 +26,7 @@ public:
   {
     std::size_t seed=0;
     for( auto &c : key )
-      Core::Util::hashCombine< char >( seed, std::tolower( c ) );
+      Sapphire::Util::hashCombine< char >( seed, std::tolower( c ) );
     return seed;
   }
 };

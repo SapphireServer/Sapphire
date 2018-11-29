@@ -16,7 +16,7 @@ namespace filesys = std::experimental::filesystem;
 
 #include "DbManager.h"
 
-Core::Logger g_log;
+Sapphire::Logger g_log;
 
 std::vector< std::string > getAllFilesInDir( const std::string& dirPath,
                                              const std::vector< std::string > dirSkipList = {} )

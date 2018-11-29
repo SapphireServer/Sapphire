@@ -21,10 +21,10 @@
 
 #include <thread>
 
-Core::Logger g_log;
-Core::Network::RestConnector g_restConnector;
+Sapphire::Logger g_log;
+Sapphire::Network::RestConnector g_restConnector;
 
-namespace Core {
+namespace Sapphire {
 
 
 ServerLobby::ServerLobby( const std::string& configPath ) :

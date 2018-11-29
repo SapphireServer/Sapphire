@@ -32,12 +32,12 @@
 #include "ServerMgr.h"
 #include "Framework.h"
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
-using namespace Core::Common;
-using namespace Core::Network::Packets;
-using namespace Core::Network::Packets::Server;
-using namespace Core::Network::ActorControl;
+using namespace Sapphire::Common;
+using namespace Sapphire::Network::Packets;
+using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::Network::ActorControl;
 
 enum GmCommand
 {
@@ -87,7 +87,7 @@ enum GmCommand
   JumpNpc = 0x025F,
 };
 
-void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
   if( player.getGmRank() <= 0 )
     return;
@@ -106,7 +106,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
                std::to_string( param2 ) + ", " + std::to_string( param3 ) + ", " + std::to_string( param4 ) +
                ", target: " + std::to_string( target ) );
 
-  Core::Entity::ActorPtr targetActor;
+  Sapphire::Entity::ActorPtr targetActor;
 
 
   if( player.getId() == target )
@@ -471,7 +471,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
 
         for( auto i : idList )
         {
-          auto data = pExdData->get< Core::Data::Aetheryte >( i );
+          auto data = pExdData->get< Sapphire::Data::Aetheryte >( i );
 
           if( !data )
           {
@@ -545,7 +545,7 @@ void Core::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_R
 
 }
 
-void Core::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
   if( player.getGmRank() <= 0 )
     return;
@@ -568,7 +568,7 @@ void Core::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACKET_R
                ", target: " + target );
 
   auto targetSession = pServerZone->getSession( target );
-  Core::Entity::CharaPtr targetActor;
+  Sapphire::Entity::CharaPtr targetActor;
 
   if( targetSession != nullptr )
   {

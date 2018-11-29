@@ -16,15 +16,15 @@
 #include "Session.h"
 
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
-using namespace Core::Common;
-using namespace Core::Network::Packets;
-using namespace Core::Network::Packets::Server;
+using namespace Sapphire::Common;
+using namespace Sapphire::Network::Packets;
+using namespace Sapphire::Network::Packets::Server;
 
 
-void Core::Network::GameConnection::cfDutyInfoRequest( const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                       Entity::Player& player )
+void Sapphire::Network::GameConnection::cfDutyInfoRequest( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                           Entity::Player& player )
 {
   auto dutyInfoPacket = makeZonePacket< FFXIVIpcCFDutyInfo >( player.getId() );
   auto penaltyMinutes = player.getCFPenaltyMinutes();
@@ -41,7 +41,7 @@ void Core::Network::GameConnection::cfDutyInfoRequest( const Packets::FFXIVARR_P
 
 }
 
-void Core::Network::GameConnection::cfRegisterDuty( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::cfRegisterDuty( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                     Entity::Player& player )
 {
   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
@@ -73,7 +73,7 @@ void Core::Network::GameConnection::cfRegisterDuty( const Packets::FFXIVARR_PACK
   cfCancelPacket->data().state2 = 1; // Your registration is withdrawn.
   queueOutPacket( cfCancelPacket );
 
-  auto cfCondition = pExdData->get< Core::Data::ContentFinderCondition >( contentId );
+  auto cfCondition = pExdData->get< Sapphire::Data::ContentFinderCondition >( contentId );
   if( !cfCondition )
     return;
 
@@ -89,7 +89,7 @@ void Core::Network::GameConnection::cfRegisterDuty( const Packets::FFXIVARR_PACK
   player.setInstance( instance );
 }
 
-void Core::Network::GameConnection::cfRegisterRoulette( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::cfRegisterRoulette( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                         Entity::Player& player )
 {
   auto cfCancelPacket = makeZonePacket< FFXIVIpcCFNotify >( player.getId() );
@@ -100,7 +100,7 @@ void Core::Network::GameConnection::cfRegisterRoulette( const Packets::FFXIVARR_
   player.sendDebug( "Roulette register" );
 }
 
-void Core::Network::GameConnection::cfDutyAccepted( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::cfDutyAccepted( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                     Entity::Player& player )
 {
   player.sendDebug( "TODO: Duty accept" );

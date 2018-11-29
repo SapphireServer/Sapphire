@@ -9,14 +9,14 @@
 
 #include "ForwardsZone.h"
 
-#define DECLARE_HANDLER( x ) void x( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+#define DECLARE_HANDLER( x ) void x( const Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 
-namespace Core::Network::Packets
+namespace Sapphire::Network::Packets
 {
   class GamePacket;
 }
 
-namespace Core::Network
+namespace Sapphire::Network
 {
 
   enum ConnectionType : uint8_t
@@ -31,7 +31,7 @@ namespace Core::Network
   {
 
   private:
-    typedef void ( GameConnection::* Handler )( const Core::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
+    typedef void ( GameConnection::* Handler )( const Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                 Entity::Player& player );
 
     using HandlerMap = std::map< uint16_t, Handler >;
@@ -49,7 +49,7 @@ namespace Core::Network
 
     SessionPtr m_pSession;
 
-    LockedQueue< Core::Network::Packets::FFXIVARR_PACKET_RAW > m_inQueue;
+    LockedQueue< Sapphire::Network::Packets::FFXIVARR_PACKET_RAW > m_inQueue;
     LockedQueue< Packets::FFXIVPacketBasePtr > m_outQueue;
 
   public:
@@ -71,7 +71,7 @@ namespace Core::Network
     void handlePackets( const Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
                         const std::vector< Packets::FFXIVARR_PACKET_RAW >& packetData );
 
-    void queueInPacket( Core::Network::Packets::FFXIVARR_PACKET_RAW inPacket );
+    void queueInPacket( Sapphire::Network::Packets::FFXIVARR_PACKET_RAW inPacket );
 
     void queueOutPacket( Packets::FFXIVPacketBasePtr outPacket );
 
@@ -79,15 +79,15 @@ namespace Core::Network
 
     void processOutQueue();
 
-    void handlePacket( Core::Network::Packets::FFXIVARR_PACKET_RAW& pPacket );
+    void handlePacket( Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& pPacket );
 
-    void handleZonePacket( Core::Network::Packets::FFXIVARR_PACKET_RAW& pPacket );
+    void handleZonePacket( Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& pPacket );
 
-    void handleChatPacket( Core::Network::Packets::FFXIVARR_PACKET_RAW& pPacket );
+    void handleChatPacket( Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& pPacket );
 
     void sendPackets( Packets::PacketContainer* pPacket );
 
-    void sendSinglePacket( Core::Network::Packets::FFXIVPacketBasePtr pPacket );
+    void sendSinglePacket( Sapphire::Network::Packets::FFXIVPacketBasePtr pPacket );
 
     void injectPacket( const std::string& packetpath, Entity::Player& player );
 

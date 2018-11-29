@@ -3,9 +3,9 @@
 
 #include <string.h>   // memcpy
 
-using namespace Core::Network::Packets;
+using namespace Sapphire::Network::Packets;
 
-PacketParseResult Core::Network::Packets::getHeader( const std::vector< uint8_t >& buffer,
+PacketParseResult Sapphire::Network::Packets::getHeader( const std::vector< uint8_t >& buffer,
                                                      const uint32_t offset,
                                                      FFXIVARR_PACKET_HEADER& header )
 {
@@ -25,7 +25,7 @@ PacketParseResult Core::Network::Packets::getHeader( const std::vector< uint8_t 
   return Success;
 }
 
-PacketParseResult Core::Network::Packets::getSegmentHeader( const std::vector< uint8_t >& buffer,
+PacketParseResult Sapphire::Network::Packets::getSegmentHeader( const std::vector< uint8_t >& buffer,
                                                             const uint32_t offset,
                                                             FFXIVARR_PACKET_SEGMENT_HEADER& header )
 {
@@ -42,7 +42,7 @@ PacketParseResult Core::Network::Packets::getSegmentHeader( const std::vector< u
   return Success;
 }
 
-PacketParseResult Core::Network::Packets::getPackets( const std::vector< uint8_t >& buffer,
+PacketParseResult Sapphire::Network::Packets::getPackets( const std::vector< uint8_t >& buffer,
                                                       const uint32_t offset,
                                                       const FFXIVARR_PACKET_HEADER& packetHeader,
                                                       std::vector< FFXIVARR_PACKET_RAW >& packets )
@@ -81,7 +81,7 @@ PacketParseResult Core::Network::Packets::getPackets( const std::vector< uint8_t
   return Success;
 }
 
-PacketParseResult Core::Network::Packets::getPacket( const std::vector< uint8_t >& buffer, const uint32_t offset,
+PacketParseResult Sapphire::Network::Packets::getPacket( const std::vector< uint8_t >& buffer, const uint32_t offset,
                                                      FFXIVARR_PACKET_RAW& packet )
 {
   // Copy segment header
@@ -103,7 +103,7 @@ PacketParseResult Core::Network::Packets::getPacket( const std::vector< uint8_t 
   return Success;
 }
 
-bool Core::Network::Packets::checkHeader( const FFXIVARR_PACKET_HEADER& header )
+bool Sapphire::Network::Packets::checkHeader( const FFXIVARR_PACKET_HEADER& header )
 {
   // Max size of the packet is capped at 1MB for now.
   if( header.size > 1 * 1024 * 1024 )
@@ -116,7 +116,7 @@ bool Core::Network::Packets::checkHeader( const FFXIVARR_PACKET_HEADER& header )
   return true;
 }
 
-bool Core::Network::Packets::checkSegmentHeader( const FFXIVARR_PACKET_SEGMENT_HEADER& header )
+bool Sapphire::Network::Packets::checkSegmentHeader( const FFXIVARR_PACKET_SEGMENT_HEADER& header )
 {
   // Max size of individual message is capped at 256KB for now.
   if( header.size > 256 * 1024 )

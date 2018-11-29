@@ -5,7 +5,7 @@
 #include <atomic>
 #include <memory>
 
-namespace Core:: Network
+namespace Sapphire:: Network
 {
 
   class Hive : public std::enable_shared_from_this< Hive >

@@ -10,10 +10,10 @@
 #include "CalcStats.h"
 #include "Framework.h"
 
-using namespace Core::Math;
-using namespace Core::Entity;
+using namespace Sapphire::Math;
+using namespace Sapphire::Entity;
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
 /*
    Class used for battle-related formulas and calculations.
@@ -64,8 +64,8 @@ uint32_t CalcStats::calculateMaxHp( PlayerPtr pPlayer )
   // Is there any way to pull reliable BaseHP without having to manually use a pet for every level, and using the values from a table?
   // More info here: https://docs.google.com/spreadsheets/d/1de06KGT0cNRUvyiXNmjNgcNvzBCCQku7jte5QxEQRbs/edit?usp=sharing
 
-  auto classInfo = pExdData->get< Core::Data::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
-  auto paramGrowthInfo = pExdData->get< Core::Data::ParamGrow >( pPlayer->getLevel() );
+  auto classInfo = pExdData->get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
+  auto paramGrowthInfo = pExdData->get< Sapphire::Data::ParamGrow >( pPlayer->getLevel() );
 
   if( !classInfo || !paramGrowthInfo )
     return 0;
@@ -99,8 +99,8 @@ uint32_t CalcStats::calculateMaxHp( PlayerPtr pPlayer )
 uint32_t CalcStats::calculateMaxMp( PlayerPtr pPlayer )
 {
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-  auto classInfo = pExdData->get< Core::Data::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
-  auto paramGrowthInfo = pExdData->get< Core::Data::ParamGrow >( pPlayer->getLevel() );
+  auto classInfo = pExdData->get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
+  auto paramGrowthInfo = pExdData->get< Sapphire::Data::ParamGrow >( pPlayer->getLevel() );
 
   if( !classInfo || !paramGrowthInfo )
     return 0;

@@ -4,25 +4,25 @@
 #include <Crypt/blowfish.h>
 #include <Common.h>
 
-using namespace Core::Common;
-using namespace Core::Network::Packets;
+using namespace Sapphire::Common;
+using namespace Sapphire::Network::Packets;
 
-Core::Network::Packets::LobbyPacketContainer::LobbyPacketContainer( uint8_t* encKey )
+Sapphire::Network::Packets::LobbyPacketContainer::LobbyPacketContainer( uint8_t* encKey )
 {
-  memset( &m_header, 0, sizeof( Core::Network::Packets::FFXIVARR_PACKET_HEADER ) );
-  m_header.size = sizeof( Core::Network::Packets::FFXIVARR_PACKET_HEADER );
+  memset( &m_header, 0, sizeof( Sapphire::Network::Packets::FFXIVARR_PACKET_HEADER ) );
+  m_header.size = sizeof( Sapphire::Network::Packets::FFXIVARR_PACKET_HEADER );
 
   m_encKey = encKey;
 
   memset( m_dataBuf, 0, 0x1570 );
 }
 
-Core::Network::Packets::LobbyPacketContainer::~LobbyPacketContainer()
+Sapphire::Network::Packets::LobbyPacketContainer::~LobbyPacketContainer()
 {
   m_entryList.clear();
 }
 
-void Core::Network::Packets::LobbyPacketContainer::addPacket( FFXIVPacketBasePtr pEntry )
+void Sapphire::Network::Packets::LobbyPacketContainer::addPacket( FFXIVPacketBasePtr pEntry )
 {
   memcpy( m_dataBuf + m_header.size, &pEntry->getData()[ 0 ], pEntry->getSize() );
 
@@ -38,18 +38,18 @@ void Core::Network::Packets::LobbyPacketContainer::addPacket( FFXIVPacketBasePtr
   m_header.count++;
 }
 
-uint16_t Core::Network::Packets::LobbyPacketContainer::getSize() const
+uint16_t Sapphire::Network::Packets::LobbyPacketContainer::getSize() const
 {
   return m_header.size;
 }
 
-uint8_t* Core::Network::Packets::LobbyPacketContainer::getRawData( bool addstuff )
+uint8_t* Sapphire::Network::Packets::LobbyPacketContainer::getRawData( bool addstuff )
 {
   if( addstuff )
   {
     m_header.unknown_0 = 0xff41a05252;
-    m_header.timestamp = Core::Util::getTimeMs();
+    m_header.timestamp = Sapphire::Util::getTimeMs();
   }
-  memcpy( m_dataBuf, &m_header, sizeof( Core::Network::Packets::FFXIVARR_PACKET_HEADER ) );
+  memcpy( m_dataBuf, &m_header, sizeof( Sapphire::Network::Packets::FFXIVARR_PACKET_HEADER ) );
   return m_dataBuf;
 }

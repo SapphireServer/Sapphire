@@ -5,7 +5,7 @@
 #include "Actor/Player.h"
 #include "Forwards.h"
 
-namespace Core::Network::Packets::Server
+namespace Sapphire::Network::Packets::Server
 {
 
   /**

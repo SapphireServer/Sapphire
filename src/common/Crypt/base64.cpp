@@ -39,7 +39,7 @@ static inline bool is_base64( uint8_t c )
   return ( isalnum( c ) || ( c == '+' ) || ( c == '/' ) );
 }
 
-std::string Core::Util::base64_encode( uint8_t const* bytes_to_encode, uint32_t in_len )
+std::string Sapphire::Util::base64_encode( uint8_t const* bytes_to_encode, uint32_t in_len )
 {
   std::string ret;
   int32_t i = 0;
@@ -85,7 +85,7 @@ std::string Core::Util::base64_encode( uint8_t const* bytes_to_encode, uint32_t 
 
 }
 
-std::string Core::Util::base64_decode( std::string const& encoded_string )
+std::string Sapphire::Util::base64_decode( std::string const& encoded_string )
 {
   int32_t in_len = encoded_string.size();
   int32_t i = 0;

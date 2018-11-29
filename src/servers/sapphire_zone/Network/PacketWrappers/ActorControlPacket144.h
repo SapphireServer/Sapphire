@@ -4,7 +4,7 @@
 #include <Network/GamePacketNew.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 
-namespace Core::Network::Packets::Server
+namespace Sapphire::Network::Packets::Server
 {
 
   /**

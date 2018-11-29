@@ -14,20 +14,20 @@
 #include "EventItemAction.h"
 #include "Framework.h"
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
-using namespace Core::Common;
-using namespace Core::Network;
-using namespace Core::Network::Packets;
-using namespace Core::Network::Packets::Server;
-using namespace Core::Network::ActorControl;
+using namespace Sapphire::Common;
+using namespace Sapphire::Network;
+using namespace Sapphire::Network::Packets;
+using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::Network::ActorControl;
 
-Core::Action::EventItemAction::EventItemAction()
+Sapphire::Action::EventItemAction::EventItemAction()
 {
   m_handleActionType = HandleActionType::Event;
 }
 
-Core::Action::EventItemAction::EventItemAction( Entity::CharaPtr pActor, uint32_t eventId, uint16_t action,
+Sapphire::Action::EventItemAction::EventItemAction( Entity::CharaPtr pActor, uint32_t eventId, uint16_t action,
                                                 ActionCallback finishRef, ActionCallback interruptRef,
                                                 uint64_t additional )
 {
@@ -43,9 +43,9 @@ Core::Action::EventItemAction::EventItemAction( Entity::CharaPtr pActor, uint32_
   m_bInterrupt = false;
 }
 
-Core::Action::EventItemAction::~EventItemAction() = default;
+Sapphire::Action::EventItemAction::~EventItemAction() = default;
 
-void Core::Action::EventItemAction::onStart()
+void Sapphire::Action::EventItemAction::onStart()
 {
   if( !m_pSource )
     return;
@@ -64,7 +64,7 @@ void Core::Action::EventItemAction::onStart()
 
 }
 
-void Core::Action::EventItemAction::onFinish()
+void Sapphire::Action::EventItemAction::onFinish()
 {
   if( !m_pSource )
     return;
@@ -89,7 +89,7 @@ void Core::Action::EventItemAction::onFinish()
 
 }
 
-void Core::Action::EventItemAction::onInterrupt()
+void Sapphire::Action::EventItemAction::onInterrupt()
 {
   if( !m_pSource )
     return;

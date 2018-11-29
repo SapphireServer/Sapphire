@@ -5,9 +5,9 @@
 #include "Framework.h"
 #include "Item.h"
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
-Core::Item::Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, bool isHq ) :
+Sapphire::Item::Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, bool isHq ) :
   m_id( catalogId ),
   m_uId( uId ),
   m_model1( model1 ),
@@ -17,7 +17,7 @@ Core::Item::Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t mo
   m_durability( 30000 )
 {
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-  auto itemInfo = pExdData->get< Core::Data::Item >( catalogId );
+  auto itemInfo = pExdData->get< Sapphire::Data::Item >( catalogId );
 
   m_delayMs = itemInfo->delayms;
   m_physicalDmg = itemInfo->damagePhys;
@@ -29,128 +29,128 @@ Core::Item::Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t mo
   m_maxStackSize = itemInfo->stackSize;
 }
 
-float Core::Item::getAutoAttackDmg() const
+float Sapphire::Item::getAutoAttackDmg() const
 {
   return m_autoAttackDmg;
 }
 
-uint16_t Core::Item::getDelay() const
+uint16_t Sapphire::Item::getDelay() const
 {
   return m_delayMs;
 }
 
-uint16_t Core::Item::getPhysicalDmg() const
+uint16_t Sapphire::Item::getPhysicalDmg() const
 {
   return m_physicalDmg;
 }
 
-uint16_t Core::Item::getMagicalDmg() const
+uint16_t Sapphire::Item::getMagicalDmg() const
 {
   return m_magicalDmg;
 }
 
-uint16_t Core::Item::getItemLevel() const
+uint16_t Sapphire::Item::getItemLevel() const
 {
   return m_itemLevel;
 }
 
-uint16_t Core::Item::getWeaponDmg() const
+uint16_t Sapphire::Item::getWeaponDmg() const
 {
   return m_weaponDmg;
 }
 
-bool Core::Item::isWeapon() const
+bool Sapphire::Item::isWeapon() const
 {
   return ( m_weaponDmg != 0 );
 }
 
-uint32_t Core::Item::getId() const
+uint32_t Sapphire::Item::getId() const
 {
   return m_id;
 }
 
-void Core::Item::setId( uint32_t id )
+void Sapphire::Item::setId( uint32_t id )
 {
   m_id = id;
 }
 
-uint64_t Core::Item::getUId() const
+uint64_t Sapphire::Item::getUId() const
 {
   return m_uId;
 }
 
-void Core::Item::setUId( uint64_t id )
+void Sapphire::Item::setUId( uint64_t id )
 {
   m_uId = id;
 }
 
-void Core::Item::setStackSize( uint32_t size )
+void Sapphire::Item::setStackSize( uint32_t size )
 {
   m_stackSize = std::min< uint32_t >( size, m_maxStackSize );
 }
 
-uint32_t Core::Item::getStackSize() const
+uint32_t Sapphire::Item::getStackSize() const
 {
   return m_stackSize;
 }
 
-void Core::Item::setCategory( Common::ItemUICategory categoryId )
+void Sapphire::Item::setCategory( Common::ItemUICategory categoryId )
 {
   m_category = categoryId;
 }
 
-Core::Common::ItemUICategory Core::Item::getCategory() const
+Sapphire::Common::ItemUICategory Sapphire::Item::getCategory() const
 {
   return m_category;
 }
 
-void Core::Item::setModelIds( uint64_t model1, uint64_t model2 )
+void Sapphire::Item::setModelIds( uint64_t model1, uint64_t model2 )
 {
   m_model1 = model1;
   m_model2 = model2;
 }
 
-uint64_t Core::Item::getModelId1() const
+uint64_t Sapphire::Item::getModelId1() const
 {
   return m_model1;
 }
 
-uint64_t Core::Item::getModelId2() const
+uint64_t Sapphire::Item::getModelId2() const
 {
   return m_model2;
 }
 
-bool Core::Item::isHq() const
+bool Sapphire::Item::isHq() const
 {
   return m_isHq;
 }
 
-void Core::Item::setHq( bool isHq )
+void Sapphire::Item::setHq( bool isHq )
 {
   m_isHq = isHq;
 }
 
-uint32_t Core::Item::getMaxStackSize() const
+uint32_t Sapphire::Item::getMaxStackSize() const
 {
   return m_maxStackSize;
 }
 
-uint16_t Core::Item::getDurability() const
+uint16_t Sapphire::Item::getDurability() const
 {
   return m_durability;
 }
 
-void Core::Item::setDurability( uint16_t durability )
+void Sapphire::Item::setDurability( uint16_t durability )
 {
   m_durability = durability;
 }
 
-uint16_t Core::Item::getStain() const
+uint16_t Sapphire::Item::getStain() const
 {
   return m_stain;
 }
 
-void Core::Item::setStain( uint16_t stain )
+void Sapphire::Item::setStain( uint16_t stain )
 {
   m_stain = stain;
 }

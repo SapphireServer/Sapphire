@@ -6,7 +6,7 @@
 #include <set>
 #include <unordered_map>
 
-namespace Core
+namespace Sapphire
 {
 
   class House

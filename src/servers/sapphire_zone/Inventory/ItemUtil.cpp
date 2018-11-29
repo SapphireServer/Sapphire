@@ -10,9 +10,9 @@
 #include <Database/DatabaseDef.h>
 
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
-bool Core::Items::Util::isArmory( uint16_t containerId )
+bool Sapphire::Items::Util::isArmory( uint16_t containerId )
 {
   return
     containerId == Common::ArmoryBody ||
@@ -29,7 +29,7 @@ bool Core::Items::Util::isArmory( uint16_t containerId )
     containerId == Common::ArmorySoulCrystal;
 }
 
-uint16_t Core::Items::Util::getCharaEquipSlotCategoryToArmoryId( uint8_t slotId )
+uint16_t Sapphire::Items::Util::getCharaEquipSlotCategoryToArmoryId( uint8_t slotId )
 {
 
   switch( slotId )
@@ -87,13 +87,13 @@ uint16_t Core::Items::Util::getCharaEquipSlotCategoryToArmoryId( uint8_t slotId 
 }
 
 
-bool Core::Items::Util::isEquipment( uint16_t containerId )
+bool Sapphire::Items::Util::isEquipment( uint16_t containerId )
 {
   return containerId == Common::GearSet0;
 }
 
 
-bool Core::Items::Util::isOneHandedWeapon( Common::ItemUICategory weaponCategory )
+bool Sapphire::Items::Util::isOneHandedWeapon( Common::ItemUICategory weaponCategory )
 {
   switch( weaponCategory )
   {
@@ -117,7 +117,7 @@ bool Core::Items::Util::isOneHandedWeapon( Common::ItemUICategory weaponCategory
   }
 }
 
-Core::ItemPtr Core::Items::Util::loadItem( uint64_t uId )
+Sapphire::ItemPtr Sapphire::Items::Util::loadItem( uint64_t uId )
 {
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
@@ -129,7 +129,7 @@ Core::ItemPtr Core::Items::Util::loadItem( uint64_t uId )
 
   try
   {
-    auto itemInfo = pExdData->get< Core::Data::Item >( itemRes->getUInt( 1 ) );
+    auto itemInfo = pExdData->get< Sapphire::Data::Item >( itemRes->getUInt( 1 ) );
     bool isHq = itemRes->getUInt( 3 ) == 1;
 
     ItemPtr pItem = make_Item( uId,
@@ -148,7 +148,7 @@ Core::ItemPtr Core::Items::Util::loadItem( uint64_t uId )
   }
 }
 
-Core::Common::ContainerType Core::Items::Util::getContainerType( uint32_t containerId )
+Sapphire::Common::ContainerType Sapphire::Items::Util::getContainerType( uint32_t containerId )
 {
   if( containerId < 5 )
   {
@@ -173,7 +173,7 @@ Core::Common::ContainerType Core::Items::Util::getContainerType( uint32_t contai
 }
 
 
-uint32_t Core::Items::Util::getNextUId()
+uint32_t Sapphire::Items::Util::getNextUId()
 {
   uint32_t charId = 0;
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();

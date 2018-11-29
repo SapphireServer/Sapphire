@@ -1,6 +1,6 @@
 #include "LobbySession.h"
 
-namespace Core {
+namespace Sapphire {
 LobbySession::LobbySession( void )
 {
   //setSocket(NULL);

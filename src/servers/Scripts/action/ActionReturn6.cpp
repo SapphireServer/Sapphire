@@ -11,7 +11,7 @@ public:
   {
   }
 
-  void onCastFinish( Core::Entity::Player& player, Core::Entity::Chara& targetActor ) override
+  void onCastFinish( Sapphire::Entity::Player& player, Sapphire::Entity::Chara& targetActor ) override
   {
     player.returnToHomepoint();
   }

@@ -6,9 +6,9 @@
 
 #include <Database/DatabaseDef.h>
 
-extern Core::Data::ExdDataGenerated g_exdDataGen;
+extern Sapphire::Data::ExdDataGenerated g_exdDataGen;
 
-namespace Core {
+namespace Sapphire {
 
 using namespace Common;
 
@@ -146,7 +146,7 @@ std::string PlayerMinimal::getInfoJson()
 
 uint8_t PlayerMinimal::getClassLevel()
 {
-  uint8_t classJobIndex = g_exdDataGen.get< Core::Data::ClassJob >( static_cast< uint8_t >( m_class ) )->expArrayIndex;
+  uint8_t classJobIndex = g_exdDataGen.get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( m_class ) )->expArrayIndex;
   return static_cast< uint8_t >( m_classMap[ classJobIndex ] );
 }
 
@@ -206,11 +206,11 @@ void PlayerMinimal::saveAsNew()
   float x, y, z, o;
   int32_t startTown = 0;
 
-  switch( static_cast< Core::Common::ClassJob >( m_class ) )
+  switch( static_cast< Sapphire::Common::ClassJob >( m_class ) )
   {
-    case Core::Common::ClassJob::Conjurer:
-    case Core::Common::ClassJob::Lancer:
-    case Core::Common::ClassJob::Archer:
+    case Sapphire::Common::ClassJob::Conjurer:
+    case Sapphire::Common::ClassJob::Lancer:
+    case Sapphire::Common::ClassJob::Archer:
       x = 127.0f;
       y = -13.0f;
       z = 147.0f;
@@ -219,8 +219,8 @@ void PlayerMinimal::saveAsNew()
       startTown = 2;
       break;
 
-    case Core::Common::ClassJob::Marauder:
-    case Core::Common::ClassJob::Arcanist:
+    case Sapphire::Common::ClassJob::Marauder:
+    case Sapphire::Common::ClassJob::Arcanist:
       x = -53.0f;
       y = 18.0f;
       z = 0.0f;
@@ -229,9 +229,9 @@ void PlayerMinimal::saveAsNew()
       startZone = 181;
       break;
 
-    case Core::Common::ClassJob::Thaumaturge:
-    case Core::Common::ClassJob::Pugilist:
-    case Core::Common::ClassJob::Gladiator:
+    case Sapphire::Common::ClassJob::Thaumaturge:
+    case Sapphire::Common::ClassJob::Pugilist:
+    case Sapphire::Common::ClassJob::Gladiator:
       x = 42.0f;
       y = 4.0f;
       z = -157.6f;
@@ -253,7 +253,7 @@ void PlayerMinimal::saveAsNew()
   // CharacterId, ClassIdx, Exp, Lvl
   auto stmtClass = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_CLASS_INS );
   stmtClass->setInt( 1, m_id );
-  stmtClass->setInt( 2, g_exdDataGen.get< Core::Data::ClassJob >( m_class )->expArrayIndex );
+  stmtClass->setInt( 2, g_exdDataGen.get< Sapphire::Data::ClassJob >( m_class )->expArrayIndex );
   stmtClass->setInt( 3, 0 );
   stmtClass->setInt( 4, 1 );
   g_charaDb.directExecute( stmtClass );
@@ -326,14 +326,14 @@ void PlayerMinimal::saveAsNew()
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /// SETUP EQUIPMENT / STARTING GEAR
-  auto classJobInfo = g_exdDataGen.get< Core::Data::ClassJob >( m_class );
+  auto classJobInfo = g_exdDataGen.get< Sapphire::Data::ClassJob >( m_class );
   uint32_t weaponId = classJobInfo->itemStartingWeapon;
   uint64_t uniqueId = getNextUId64();
 
   uint8_t race = customize[ CharaLook::Race ];
   uint8_t gender = customize[ CharaLook::Gender ];
 
-  auto raceInfo = g_exdDataGen.get< Core::Data::Race >( race );
+  auto raceInfo = g_exdDataGen.get< Sapphire::Data::Race >( race );
 
   uint32_t body;
   uint32_t hands;
