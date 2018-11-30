@@ -3,7 +3,7 @@
 
 #include <Framework.h>
 #include <Exd/ExdDataGenerated.h>
-#include <Zone/Zone.h>
+#include <Territory/Zone.h>
 
 using namespace Sapphire;
 

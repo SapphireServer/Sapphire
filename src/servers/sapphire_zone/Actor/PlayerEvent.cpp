@@ -15,7 +15,7 @@
 #include "Action/EventAction.h"
 #include "Action/EventItemAction.h"
 
-#include "Zone/Zone.h"
+#include "Territory/Zone.h"
 #include "ServerMgr.h"
 #include "Framework.h"
 

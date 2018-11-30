@@ -14,13 +14,13 @@
 
 #include "Network/GameConnection.h"
 
-#include "Zone/TerritoryMgr.h"
-#include "Zone/Zone.h"
-#include "Zone/HousingZone.h"
-#include "Zone/HousingMgr.h"
-#include "Zone/Land.h"
-#include "Zone/ZonePosition.h"
-#include "Zone/House.h"
+#include "Manager/TerritoryMgr.h"
+#include "Territory/Zone.h"
+#include "Territory/HousingZone.h"
+#include "Manager/HousingMgr.h"
+#include "Territory/Land.h"
+#include "Territory/ZonePosition.h"
+#include "Territory/House.h"
 
 #include "Network/PacketWrappers/InitUIPacket.h"
 #include "Network/PacketWrappers/PingPacket.h"
@@ -52,6 +52,7 @@ using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
+using namespace Sapphire::World::Manager;
 
 void Sapphire::Network::GameConnection::fcInfoReqHandler( const Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                           Entity::Player& player )

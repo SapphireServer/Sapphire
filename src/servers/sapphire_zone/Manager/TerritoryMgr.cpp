@@ -6,22 +6,22 @@
 
 #include "Actor/Player.h"
 
-#include "Zone.h"
-#include "HousingZone.h"
-#include "ZonePosition.h"
-#include "InstanceContent.h"
+#include "Territory/Zone.h"
+#include "Territory/HousingZone.h"
+#include "Territory/ZonePosition.h"
+#include "Territory/InstanceContent.h"
 #include "TerritoryMgr.h"
 #include "Framework.h"
 
 extern Sapphire::Framework g_fw;
 
-Sapphire::TerritoryMgr::TerritoryMgr() :
+Sapphire::World::Manager::TerritoryMgr::TerritoryMgr() :
   m_lastInstanceId( 10000 )
 {
 
 }
 
-void Sapphire::TerritoryMgr::loadTerritoryTypeDetailCache()
+void Sapphire::World::Manager::TerritoryMgr::loadTerritoryTypeDetailCache()
 {
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
   auto idList = pExdData->getTerritoryTypeIdList();
@@ -35,12 +35,12 @@ void Sapphire::TerritoryMgr::loadTerritoryTypeDetailCache()
   }
 }
 
-bool Sapphire::TerritoryMgr::isValidTerritory( uint32_t territoryTypeId ) const
+bool Sapphire::World::Manager::TerritoryMgr::isValidTerritory( uint32_t territoryTypeId ) const
 {
   return !( m_territoryTypeDetailCacheMap.find( territoryTypeId ) == m_territoryTypeDetailCacheMap.end() );
 }
 
-bool Sapphire::TerritoryMgr::init()
+bool Sapphire::World::Manager::TerritoryMgr::init()
 {
   loadTerritoryTypeDetailCache();
   loadTerritoryPositionMap();
@@ -51,12 +51,12 @@ bool Sapphire::TerritoryMgr::init()
   return true;
 }
 
-uint32_t Sapphire::TerritoryMgr::getNextInstanceId()
+uint32_t Sapphire::World::Manager::TerritoryMgr::getNextInstanceId()
 {
   return ++m_lastInstanceId;
 }
 
-Sapphire::Data::TerritoryTypePtr Sapphire::TerritoryMgr::getTerritoryDetail( uint32_t territoryTypeId ) const
+Sapphire::Data::TerritoryTypePtr Sapphire::World::Manager::TerritoryMgr::getTerritoryDetail( uint32_t territoryTypeId ) const
 {
   auto tIt = m_territoryTypeDetailCacheMap.find( territoryTypeId );
   if( tIt == m_territoryTypeDetailCacheMap.end() )
@@ -65,7 +65,7 @@ Sapphire::Data::TerritoryTypePtr Sapphire::TerritoryMgr::getTerritoryDetail( uin
   return tIt->second;
 }
 
-bool Sapphire::TerritoryMgr::isInstanceContentTerritory( uint32_t territoryTypeId ) const
+bool Sapphire::World::Manager::TerritoryMgr::isInstanceContentTerritory( uint32_t territoryTypeId ) const
 {
   auto pTeri = getTerritoryDetail( territoryTypeId );
 
@@ -86,7 +86,7 @@ bool Sapphire::TerritoryMgr::isInstanceContentTerritory( uint32_t territoryTypeI
          intendedUse == TerritoryIntendedUse::EventTrial;
 }
 
-bool Sapphire::TerritoryMgr::isPrivateTerritory( uint32_t territoryTypeId ) const
+bool Sapphire::World::Manager::TerritoryMgr::isPrivateTerritory( uint32_t territoryTypeId ) const
 {
   auto pTeri = getTerritoryDetail( territoryTypeId );
 
@@ -100,7 +100,7 @@ bool Sapphire::TerritoryMgr::isPrivateTerritory( uint32_t territoryTypeId ) cons
          pTeri->territoryIntendedUse == TerritoryIntendedUse::MSQPrivateArea;
 }
 
-bool Sapphire::TerritoryMgr::isDefaultTerritory( uint32_t territoryTypeId ) const
+bool Sapphire::World::Manager::TerritoryMgr::isDefaultTerritory( uint32_t territoryTypeId ) const
 {
   auto pTeri = getTerritoryDetail( territoryTypeId );
 
@@ -114,7 +114,7 @@ bool Sapphire::TerritoryMgr::isDefaultTerritory( uint32_t territoryTypeId ) cons
 
 }
 
-bool Sapphire::TerritoryMgr::isHousingTerritory( uint32_t territoryTypeId ) const
+bool Sapphire::World::Manager::TerritoryMgr::isHousingTerritory( uint32_t territoryTypeId ) const
 {
   auto pTeri = getTerritoryDetail( territoryTypeId );
 
@@ -124,7 +124,7 @@ bool Sapphire::TerritoryMgr::isHousingTerritory( uint32_t territoryTypeId ) cons
   return pTeri->territoryIntendedUse == TerritoryIntendedUse::HousingArea;
 }
 
-bool Sapphire::TerritoryMgr::createDefaultTerritories()
+bool Sapphire::World::Manager::TerritoryMgr::createDefaultTerritories()
 {
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
   auto pLog = g_fw.get< Logger >();
@@ -165,7 +165,7 @@ bool Sapphire::TerritoryMgr::createDefaultTerritories()
   return true;
 }
 
-bool Sapphire::TerritoryMgr::createHousingTerritories()
+bool Sapphire::World::Manager::TerritoryMgr::createHousingTerritories()
 {
   //separate housing zones from default
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
@@ -213,7 +213,7 @@ bool Sapphire::TerritoryMgr::createHousingTerritories()
   return true;
 }
 
-Sapphire::ZonePtr Sapphire::TerritoryMgr::createTerritoryInstance( uint32_t territoryTypeId )
+Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createTerritoryInstance( uint32_t territoryTypeId )
 {
   if( !isValidTerritory( territoryTypeId ) )
     return nullptr;
@@ -242,7 +242,7 @@ Sapphire::ZonePtr Sapphire::TerritoryMgr::createTerritoryInstance( uint32_t terr
   return pZone;
 }
 
-Sapphire::ZonePtr Sapphire::TerritoryMgr::createInstanceContent( uint32_t contentFinderConditionId )
+Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createInstanceContent( uint32_t contentFinderConditionId )
 {
 
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
@@ -278,7 +278,12 @@ Sapphire::ZonePtr Sapphire::TerritoryMgr::createInstanceContent( uint32_t conten
   return pZone;
 }
 
-bool Sapphire::TerritoryMgr::removeTerritoryInstance( uint32_t instanceId )
+Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createHousingInterior( const Common::LandIdent& landIdent )
+{
+
+}
+
+bool Sapphire::World::Manager::TerritoryMgr::removeTerritoryInstance( uint32_t instanceId )
 {
   ZonePtr pZone;
   if( ( pZone = getInstanceZonePtr( instanceId ) ) == nullptr )
@@ -301,7 +306,7 @@ bool Sapphire::TerritoryMgr::removeTerritoryInstance( uint32_t instanceId )
   return true;
 }
 
-Sapphire::ZonePtr Sapphire::TerritoryMgr::getInstanceZonePtr( uint32_t instanceId ) const
+Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::getInstanceZonePtr( uint32_t instanceId ) const
 {
   auto it = m_instanceIdToZonePtrMap.find( instanceId );
   if( it == m_instanceIdToZonePtrMap.end() )
@@ -310,7 +315,7 @@ Sapphire::ZonePtr Sapphire::TerritoryMgr::getInstanceZonePtr( uint32_t instanceI
   return it->second;
 }
 
-void Sapphire::TerritoryMgr::loadTerritoryPositionMap()
+void Sapphire::World::Manager::TerritoryMgr::loadTerritoryPositionMap()
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto pQR = pDb->query( "SELECT id, target_zone_id, pos_x, pos_y, pos_z, pos_o, radius FROM zonepositions;" );
@@ -330,7 +335,7 @@ void Sapphire::TerritoryMgr::loadTerritoryPositionMap()
   }
 }
 
-Sapphire::ZonePositionPtr Sapphire::TerritoryMgr::getTerritoryPosition( uint32_t territoryPositionId ) const
+Sapphire::ZonePositionPtr Sapphire::World::Manager::TerritoryMgr::getTerritoryPosition( uint32_t territoryPositionId ) const
 {
   auto it = m_territoryPositionMap.find( territoryPositionId );
 
@@ -340,7 +345,7 @@ Sapphire::ZonePositionPtr Sapphire::TerritoryMgr::getTerritoryPosition( uint32_t
   return nullptr;
 }
 
-Sapphire::ZonePtr Sapphire::TerritoryMgr::getZoneByTerritoryTypeId( uint32_t territoryTypeId ) const
+Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::getZoneByTerritoryTypeId( uint32_t territoryTypeId ) const
 {
   auto zoneMap = m_territoryTypeIdToInstanceGuidMap.find( territoryTypeId );
   if( zoneMap == m_territoryTypeIdToInstanceGuidMap.end() )
@@ -350,7 +355,7 @@ Sapphire::ZonePtr Sapphire::TerritoryMgr::getZoneByTerritoryTypeId( uint32_t ter
   return zoneMap->second.begin()->second;
 }
 
-Sapphire::ZonePtr Sapphire::TerritoryMgr::getZoneByLandSetId( uint32_t landSetId ) const
+Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::getZoneByLandSetId( uint32_t landSetId ) const
 {
   auto zoneMap = m_landSetIdToZonePtrMap.find( landSetId );
   if( zoneMap == m_landSetIdToZonePtrMap.end() )
@@ -359,7 +364,7 @@ Sapphire::ZonePtr Sapphire::TerritoryMgr::getZoneByLandSetId( uint32_t landSetId
   return zoneMap->second;
 }
 
-void Sapphire::TerritoryMgr::updateTerritoryInstances( uint32_t currentTime )
+void Sapphire::World::Manager::TerritoryMgr::updateTerritoryInstances( uint32_t currentTime )
 {
   for( auto& zone : m_zoneSet )
   {
@@ -372,7 +377,7 @@ void Sapphire::TerritoryMgr::updateTerritoryInstances( uint32_t currentTime )
   }
 }
 
-Sapphire::TerritoryMgr::InstanceIdList Sapphire::TerritoryMgr::getInstanceContentIdList( uint16_t instanceContentId ) const
+Sapphire::World::Manager::TerritoryMgr::InstanceIdList Sapphire::World::Manager::TerritoryMgr::getInstanceContentIdList( uint16_t instanceContentId ) const
 {
   std::vector< uint32_t > idList;
   auto zoneMap = m_instanceContentToInstanceMap.find( instanceContentId );
@@ -387,14 +392,14 @@ Sapphire::TerritoryMgr::InstanceIdList Sapphire::TerritoryMgr::getInstanceConten
   return idList;
 }
 
-bool Sapphire::TerritoryMgr::movePlayer( uint32_t territoryTypeId, Sapphire::Entity::PlayerPtr pPlayer )
+bool Sapphire::World::Manager::TerritoryMgr::movePlayer( uint32_t territoryTypeId, Sapphire::Entity::PlayerPtr pPlayer )
 {
   auto pZone = getZoneByTerritoryTypeId( territoryTypeId );
   assert( pZone );
   return movePlayer( pZone, pPlayer );
 }
 
-bool Sapphire::TerritoryMgr::movePlayer( ZonePtr pZone, Sapphire::Entity::PlayerPtr pPlayer )
+bool Sapphire::World::Manager::TerritoryMgr::movePlayer( ZonePtr pZone, Sapphire::Entity::PlayerPtr pPlayer )
 {
   auto pLog = g_fw.get< Logger >();
   if( !pZone )
@@ -437,7 +442,7 @@ bool Sapphire::TerritoryMgr::movePlayer( ZonePtr pZone, Sapphire::Entity::Player
   return true;
 }
 
-Sapphire::ZonePtr Sapphire::TerritoryMgr::getLinkedInstance( uint32_t playerId ) const
+Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::getLinkedInstance( uint32_t playerId ) const
 {
   auto it = m_playerIdToInstanceMap.find( playerId );
   if( it != m_playerIdToInstanceMap.end() )
@@ -447,12 +452,12 @@ Sapphire::ZonePtr Sapphire::TerritoryMgr::getLinkedInstance( uint32_t playerId )
   return nullptr;
 }
 
-const std::pair< uint16_t, uint16_t >& Sapphire::TerritoryMgr::getCurrentFestival() const
+const std::pair< uint16_t, uint16_t >& Sapphire::World::Manager::TerritoryMgr::getCurrentFestival() const
 {
   return m_currentFestival;
 }
 
-void Sapphire::TerritoryMgr::setCurrentFestival( uint16_t festivalId, uint16_t additionalFestival )
+void Sapphire::World::Manager::TerritoryMgr::setCurrentFestival( uint16_t festivalId, uint16_t additionalFestival )
 {
   m_currentFestival = { festivalId, additionalFestival };
 
@@ -462,7 +467,7 @@ void Sapphire::TerritoryMgr::setCurrentFestival( uint16_t festivalId, uint16_t a
   }
 }
 
-void Sapphire::TerritoryMgr::disableCurrentFestival()
+void Sapphire::World::Manager::TerritoryMgr::disableCurrentFestival()
 {
   setCurrentFestival( 0 );
 }

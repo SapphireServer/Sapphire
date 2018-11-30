@@ -42,6 +42,8 @@ namespace Sapphire
     void sendLandUpdate( uint8_t landId );
     bool isPlayerSubInstance( Entity::Player& player );
 
+    bool onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId );
+
     /* returns current ward number for this zone */
     uint8_t getWardNum() const;
 

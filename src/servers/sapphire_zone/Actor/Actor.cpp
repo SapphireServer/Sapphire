@@ -9,7 +9,7 @@
 #include "Action/Action.h"
 #include "Action/ActionCollision.h"
 
-#include "Zone/Zone.h"
+#include "Territory/Zone.h"
 
 #include "Network/GameConnection.h"
 
@@ -21,7 +21,7 @@
 #include "ServerMgr.h"
 #include "Session.h"
 
-#include "Zone/TerritoryMgr.h"
+#include "Manager/TerritoryMgr.h"
 
 #include "StatusEffect/StatusEffect.h"
 

@@ -11,12 +11,12 @@
 #include "Session.h"
 #include "Player.h"
 
-#include "Zone/TerritoryMgr.h"
-#include "Zone/Zone.h"
-#include "Zone/ZonePosition.h"
+#include "Manager/TerritoryMgr.h"
+#include "Territory/Zone.h"
+#include "Territory/ZonePosition.h"
 
-#include "Zone//HousingMgr.h"
-#include "Zone/Land.h"
+#include "Manager/HousingMgr.h"
+#include "Territory/Land.h"
 
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ActorControlPacket142.h"
@@ -49,6 +49,7 @@ using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
+using namespace Sapphire::World::Manager;
 
 using InventoryMap = std::map< uint16_t, Sapphire::ItemContainerPtr >;
 using InvSlotPair = std::pair< uint16_t, int8_t >;
