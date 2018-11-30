@@ -29,7 +29,8 @@ Sapphire::Entity::EventObject::EventObject( uint32_t actorId, uint32_t objectId,
   m_gimmickId( gimmickId ),
   m_state( initialState ),
   m_objectId( objectId ),
-  m_name( givenName )
+  m_name( givenName ),
+  m_housingLink( 0 )
 {
   m_id = actorId;
   m_pos.x = pos.x;
@@ -96,6 +97,16 @@ void Sapphire::Entity::EventObject::setAnimationFlag( uint32_t flag, uint32_t an
   }
 }
 
+void Sapphire::Entity::EventObject::setHousingLink( uint32_t housingLink )
+{
+  m_housingLink = housingLink;
+}
+
+uint32_t Sapphire::Entity::EventObject::getHousingLink() const
+{
+  return m_housingLink;
+}
+
 void Sapphire::Entity::EventObject::setParentInstance( Sapphire::InstanceContentPtr instance )
 {
   m_parentInstance = instance;
@@ -125,6 +136,7 @@ void Sapphire::Entity::EventObject::spawn( Sapphire::Entity::PlayerPtr pTarget )
   eobjStatePacket->data().position = getPos();
   eobjStatePacket->data().scale = getScale();
   eobjStatePacket->data().actorId = getId();
+  eobjStatePacket->data().housingLink = getHousingLink();
   eobjStatePacket->data().rotation = Math::Util::floatToUInt16Rot( getRot() );
   pTarget->queuePacket( eobjStatePacket );
 }

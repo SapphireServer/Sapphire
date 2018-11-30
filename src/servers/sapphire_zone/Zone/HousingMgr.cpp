@@ -12,6 +12,7 @@
 #include <cstring>
 
 #include "Actor/Player.h"
+#include "Actor/EventObject.h"
 
 #include "TerritoryMgr.h"
 #include "Zone.h"
@@ -321,6 +322,9 @@ void Sapphire::HousingMgr::buildPresetEstate( Entity::Player& player, uint8_t pl
 
   player.setLandFlags( LandFlagsSlot::Private, EstateBuilt, pLand->getLandId(), pLand->getWardNum(), pLand->getTerritoryTypeId() );
   player.sendLandFlagsSlot( LandFlagsSlot::Private );
+
+  auto eobj = hZone->registerEObj( "entrance", 2002737, 0, 4, pLand->getMapMarkerPosition(), 1.f, 0.f );
+  eobj->setHousingLink( plotNum << 8 );
 }
 
 void Sapphire::HousingMgr::requestEstateRename( Entity::Player& player, uint16_t territoryTypeId, uint16_t worldId, uint8_t wardId, uint8_t plotId )
