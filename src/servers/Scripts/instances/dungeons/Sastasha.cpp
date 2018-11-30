@@ -1,5 +1,5 @@
 #include <ScriptObject.h>
-#include <Zone/InstanceContent.h>
+#include <Territory/InstanceContent.h>
 #include <Actor/Player.h>
 
 using namespace Sapphire;

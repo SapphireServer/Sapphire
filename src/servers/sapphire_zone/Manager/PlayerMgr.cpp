@@ -3,19 +3,20 @@
 #include <Framework.h>
 #include <Exd/ExdDataGenerated.h>
 
-#include <Zone/TerritoryMgr.h>
-#include <Zone/ZonePosition.h>
+#include <Manager/TerritoryMgr.h>
+#include <Territory/ZonePosition.h>
 
-#include <Zone/HousingMgr.h>
+#include <Manager/HousingMgr.h>
 
 #include <Actor/Player.h>
 
 extern Sapphire::Framework g_fw;
+using namespace Sapphire::World::Manager;
 
 void Sapphire::World::Manager::PlayerMgr::movePlayerToLandDestination( Sapphire::Entity::Player& player, uint32_t landId, uint16_t param )
 {
   // check if we have one in the db first
-  auto terriMgr = g_fw.get< Sapphire::TerritoryMgr >();
+  auto terriMgr = g_fw.get< TerritoryMgr >();
   if( !terriMgr )
     return;
 
@@ -27,7 +28,7 @@ void Sapphire::World::Manager::PlayerMgr::movePlayerToLandDestination( Sapphire:
     // check if its a housing zone, zoning is different here
     if( terriMgr->isHousingTerritory( terriPos->getTargetZoneId() ) )
     {
-      auto housingMgr = g_fw.get< Sapphire::HousingMgr >();
+      auto housingMgr = g_fw.get< HousingMgr >();
       auto landSetId = housingMgr->toLandSetId( terriPos->getTargetZoneId(), param );
 
       auto housingZone = housingMgr->getHousingZoneByLandSetId( landSetId );

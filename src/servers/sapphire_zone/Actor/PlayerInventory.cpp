@@ -3,7 +3,7 @@
 #include <Network/CommonActorControl.h>
 #include <algorithm>
 
-#include "Zone/Zone.h"
+#include "Territory/Zone.h"
 
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"

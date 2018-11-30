@@ -13,9 +13,9 @@
 
 #include "Session.h"
 
-#include "Zone/TerritoryMgr.h"
-#include "Zone/Zone.h"
-#include "Zone/InstanceContent.h"
+#include "Manager/TerritoryMgr.h"
+#include "Territory/Zone.h"
+#include "Territory/InstanceContent.h"
 
 #include "Network/PacketWrappers/InitUIPacket.h"
 #include "Network/PacketWrappers/PingPacket.h"
@@ -38,6 +38,7 @@ using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
+using namespace Sapphire::World::Manager;
 
 enum GmCommand
 {

@@ -8,9 +8,9 @@
 #include <Network/PacketDef/Zone/ClientZoneDef.h>
 #include <Util/Util.h>
 
-#include "Zone/Zone.h"
-#include "Zone/ZonePosition.h"
-#include "Zone/HousingMgr.h"
+#include "Territory/Zone.h"
+#include "Territory/ZonePosition.h"
+#include "Manager/HousingMgr.h"
 
 #include "Network/GameConnection.h"
 
@@ -42,6 +42,7 @@ using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
+using namespace Sapphire::World::Manager;
 
 void examineHandler( Sapphire::Entity::Player& player, uint32_t targetId )
 {

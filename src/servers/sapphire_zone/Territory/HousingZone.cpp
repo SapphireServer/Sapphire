@@ -15,7 +15,7 @@
 
 #include "Forwards.h"
 #include "HousingZone.h"
-#include "HousingMgr.h"
+#include "Manager/HousingMgr.h"
 #include "Framework.h"
 
 extern Sapphire::Framework g_fw;
@@ -23,6 +23,7 @@ extern Sapphire::Framework g_fw;
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::World::Manager;
 
 Sapphire::HousingZone::HousingZone( uint8_t wardNum,
                                 uint16_t territoryTypeId,

@@ -5,11 +5,11 @@
 
 using namespace Sapphire;
 
-class HousingEstateEntranceWarpTaxi :
+class HousingEstateEntrance :
   public Sapphire::ScriptAPI::EventObjectScript
 {
 public:
-  HousingEstateEntranceWarpTaxi() :
+  HousingEstateEntrance() :
     Sapphire::ScriptAPI::EventObjectScript( 2002737 )
   {
   }

@@ -1,6 +1,6 @@
 #include "EventObject.h"
 
-#include "Zone/InstanceContent.h"
+#include "Territory/InstanceContent.h"
 #include "Actor/Player.h"
 
 #include "Network/PacketWrappers/ActorControlPacket142.h"

@@ -2,7 +2,7 @@
 #define SAPPHIRE_HOUSINGMGR_H
 
 #include "Forwards.h"
-#include "HousingZone.h"
+#include "Territory/HousingZone.h"
 #include <set>
 #include <unordered_map>
 
@@ -11,7 +11,7 @@ namespace Sapphire::Data
   using HousingZonePtr = std::shared_ptr< HousingZone >;
 }
 
-namespace Sapphire
+namespace Sapphire::World::Manager
 {
   class HousingMgr
   {
