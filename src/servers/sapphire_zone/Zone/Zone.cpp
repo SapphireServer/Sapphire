@@ -727,7 +727,7 @@ void Sapphire::Zone::registerEObj( Entity::EventObjectPtr object )
 
   onRegisterEObj( object );
 
-  pLog->debug( "Registered instance eobj: " + std::to_string( object->getId() ) );
+  //pLog->debug( "Registered instance eobj: " + std::to_string( object->getId() ) );
 }
 
 Sapphire::Entity::EventObjectPtr Sapphire::Zone::getEObj( uint32_t objId )

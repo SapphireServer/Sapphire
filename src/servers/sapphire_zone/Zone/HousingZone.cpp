@@ -9,6 +9,7 @@
 
 #include "Actor/Player.h"
 #include "Actor/Actor.h"
+#include "Actor/EventObject.h"
 #include "Land.h"
 #include "House.h"
 
@@ -62,8 +63,14 @@ bool Sapphire::HousingZone::init()
   uint32_t landId;
   for( landId = 0; landId < 60; landId++ )
   {
-    auto pObject = make_Land( m_territoryTypeId, getWardNum(), landId, m_landSetId, info );
-    m_landPtrMap[ landId ] = pObject;
+    auto pLand = make_Land( m_territoryTypeId, getWardNum(), landId, m_landSetId, info );
+    m_landPtrMap[ landId ] = pLand;
+
+    if( auto house = pLand->getHouse() )
+    {
+      auto eobj = registerEObj( "entrance", 2002737, 0, 4, pLand->getMapMarkerPosition(), 1.f, 0.f );
+      eobj->setHousingLink( landId << 8 );
+    }
   }
 
   return true;
@@ -134,7 +141,6 @@ void Sapphire::HousingZone::sendLandSet( Entity::Player& player )
 
     landData.plotSize = pLand->getSize();
     landData.houseState = pLand->getState();
-    landData.flags = 1;
     landData.iconAddIcon = pLand->getSharing();
     landData.fcId = pLand->getFcId();
     landData.fcIcon = pLand->getFcIcon();
@@ -142,6 +148,8 @@ void Sapphire::HousingZone::sendLandSet( Entity::Player& player )
 
     if( auto house = pLand->getHouse() )
     {
+      landData.flags = 1;
+
       auto& parts = house->getHouseParts();
 
       for( auto i = 0; i != parts.size(); i++ )
@@ -169,7 +177,6 @@ void Sapphire::HousingZone::sendLandUpdate( uint8_t landId )
 
     landData.plotSize = pLand->getSize();
     landData.houseState = pLand->getState();
-    landData.flags = 1;
     landData.iconAddIcon = pLand->getSharing();
     landData.fcId = pLand->getFcId();
     landData.fcIcon = pLand->getFcIcon();
@@ -178,6 +185,8 @@ void Sapphire::HousingZone::sendLandUpdate( uint8_t landId )
 
     if( auto house = pLand->getHouse() )
     {
+      landData.flags = 1;
+
       auto& parts = house->getHouseParts();
 
       for( auto i = 0; i != parts.size(); i++ )
