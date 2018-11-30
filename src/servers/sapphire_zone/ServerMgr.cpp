@@ -21,12 +21,14 @@
 
 #include "Session.h"
 
-#include "Zone/TerritoryMgr.h"
+#include "Manager/TerritoryMgr.h"
 
 #include "Script/ScriptMgr.h"
 #include "Linkshell/LinkshellMgr.h"
 
 extern Sapphire::Framework g_fw;
+
+using namespace Sapphire::World::Manager;
 
 Sapphire::ServerMgr::ServerMgr( const std::string& configName ) :
   m_configName( configName ),

@@ -26,10 +26,10 @@
 #include "Actor/EventObject.h"
 #include "Actor/BNpc.h"
 
-#include "Zone/Zone.h"
-#include "Zone/HousingZone.h"
-#include "Zone/InstanceContent.h"
-#include "Zone/TerritoryMgr.h"
+#include "Territory/Zone.h"
+#include "Territory/HousingZone.h"
+#include "Territory/InstanceContent.h"
+#include "Manager/TerritoryMgr.h"
 #include "Event/EventDefs.h"
 
 #include "ServerMgr.h"
@@ -42,6 +42,7 @@ extern Sapphire::Framework g_fw;
 using namespace Sapphire::Network;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::World::Manager;
 
 // instanciate and initialize commands
 Sapphire::DebugCommandHandler::DebugCommandHandler()

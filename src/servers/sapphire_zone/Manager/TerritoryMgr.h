@@ -5,7 +5,7 @@
 #include <set>
 #include <unordered_map>
 
-namespace Sapphire::Data 
+namespace Sapphire::Data
 {
   // TODO: this should actually not be here but should be generated in exdData aswell
   struct PlaceName;
@@ -17,7 +17,7 @@ namespace Sapphire::Data
   using InstanceContentPtr = std::shared_ptr< InstanceContent >;
 }
 
-namespace Sapphire
+namespace Sapphire::World::Manager
 {
 /*!
    \class TerritoryMgr_c
@@ -99,6 +99,8 @@ public:
 
   ZonePtr createInstanceContent( uint32_t contentFinderConditionId );
 
+  ZonePtr createHousingInterior( const Common::LandIdent& landIdent );
+
   /*! removes instance by instanceId, return true if successful */
   bool removeTerritoryInstance( uint32_t territoryTypeId );
 
@@ -117,7 +119,7 @@ public:
   /*! returns a default Zone by territoryTypeId
       TODO: Mind multiple instances?! */
   ZonePtr getZoneByTerritoryTypeId( uint32_t territoryTypeId ) const;
-  
+
   /*! returns a Zone by landSetId */
   ZonePtr getZoneByLandSetId( uint32_t landSetId ) const;
 

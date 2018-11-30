@@ -4,8 +4,8 @@
 
 #include <watchdog/Watchdog.h>
 
-#include "Zone/Zone.h"
-#include "Zone/InstanceContent.h"
+#include "Territory/Zone.h"
+#include "Territory/InstanceContent.h"
 #include "Actor/Player.h"
 #include "Actor/EventObject.h"
 #include "ServerMgr.h"

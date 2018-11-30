@@ -20,7 +20,6 @@ namespace Sapphire {
 TYPE_FORWARD( Cell );
 TYPE_FORWARD( Zone );
 TYPE_FORWARD( HousingZone );
-TYPE_FORWARD( HousingMgr );
 TYPE_FORWARD( House );
 TYPE_FORWARD( InstanceContent );
 TYPE_FORWARD( Item );
@@ -28,6 +27,11 @@ TYPE_FORWARD( ItemContainer );
 TYPE_FORWARD( Session );
 TYPE_FORWARD( ZonePosition );
 TYPE_FORWARD( Land )
+
+namespace World::Manager
+{
+TYPE_FORWARD( HousingMgr );
+}
 
 namespace StatusEffect {
 TYPE_FORWARD( StatusEffect );
