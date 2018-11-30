@@ -143,6 +143,17 @@ namespace Sapphire::ScriptAPI
 
   ///////////////////////////////////////////////////////////////////
 
+  EventObjectScript::EventObjectScript( uint32_t eobjId ) :
+    ScriptObject( eobjId, typeid( EventObjectScript ).hash_code() )
+  {
+  }
+
+  void EventObjectScript::onTalk( uint32_t eventId, Sapphire::Entity::Player& player, Entity::EventObject& eobj )
+  {
+  }
+
+  ///////////////////////////////////////////////////////////////////
+
   BattleNpcScript::BattleNpcScript( uint32_t npcId ) :
     ScriptObject( npcId, typeid( BattleNpcScript ).hash_code() )
   {
