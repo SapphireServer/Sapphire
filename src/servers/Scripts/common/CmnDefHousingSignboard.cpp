@@ -1,8 +1,8 @@
 #include <ScriptObject.h>
 #include <Actor/Player.h>
-#include <Zone/Zone.h>
-#include <Zone/HousingZone.h>
-#include <Zone/HousingMgr.h>
+#include <Territory/Zone.h>
+#include <Territory/HousingZone.h>
+#include <Manager/HousingMgr.h>
 #include <Network/PacketWrappers/ActorControlPacket143.h>
 #include <Network/CommonActorControl.h>
 #include "Framework.h"
@@ -12,6 +12,7 @@ using namespace Sapphire;
 using namespace Network;
 using namespace Packets;
 using namespace Server;
+using namespace Sapphire::World::Manager;
 
 class CmnDefHousingSignboard : public Sapphire::ScriptAPI::EventScript
 {
@@ -26,7 +27,7 @@ public:
     {
       auto pFw = getFramework();
       if( !pFw )
-        return LandPurchaseResult::ERR_INTERNAL;      
+        return LandPurchaseResult::ERR_INTERNAL;
       // Purchase Land
       if( result.param2 == 2 )
       {
@@ -35,8 +36,8 @@ public:
 
         auto pTerritory = player.getCurrentZone();
         auto pHousing = std::dynamic_pointer_cast< HousingZone >( pTerritory );
-        auto pHouMgr = pFw->get< Sapphire::HousingMgr >();
-        
+        auto pHouMgr = pFw->get< HousingMgr >();
+
         LandPurchaseResult res = pHouMgr->purchaseLand( player, activeLand.plot,
                                                         static_cast< uint8_t >( result.param2 ) );
 

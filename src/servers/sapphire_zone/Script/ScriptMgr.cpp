@@ -4,9 +4,10 @@
 
 #include <watchdog/Watchdog.h>
 
-#include "Zone/Zone.h"
-#include "Zone/InstanceContent.h"
+#include "Territory/Zone.h"
+#include "Territory/InstanceContent.h"
 #include "Actor/Player.h"
+#include "Actor/EventObject.h"
 #include "ServerMgr.h"
 #include "Event/EventHandler.h"
 #include "Event/EventHelper.h"
@@ -168,6 +169,19 @@ void Sapphire::Scripting::ScriptMgr::onPlayerFirstEnterWorld( Entity::Player& pl
 
 bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t actorId, uint32_t eventId )
 {
+  // check if the actor is an eobj and call its script if we have one
+  auto zone = player.getCurrentZone();
+  if( auto eobj = zone->getEObj( actorId ) )
+  {
+    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventObjectScript >( eobj->getObjectId() );
+    if( script )
+    {
+      script->onTalk( eventId, player, *eobj );
+      return true;
+    }
+  }
+
+  // check for a direct eventid match first, otherwise default to base type
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
   if( script )
   {

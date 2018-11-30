@@ -3048,6 +3048,10 @@ struct HousingFurniture
 struct HousingMapMarkerInfo
 {
    uint16_t map;
+   float x;
+   float y;
+   float z;
+   float plotNumberDistance;
 
    HousingMapMarkerInfo( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
