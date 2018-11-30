@@ -45,7 +45,12 @@ namespace Sapphire::Entity
 
     void setAnimationFlag( uint32_t flag, uint32_t animationFlag );
 
+    void setHousingLink( uint32_t housingLink );
+
+    uint32_t getHousingLink() const;
+
   protected:
+    uint32_t m_housingLink;
     uint32_t m_gimmickId;
     uint32_t m_objectId;
     uint8_t m_state;

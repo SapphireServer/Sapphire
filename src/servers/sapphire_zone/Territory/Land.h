@@ -36,6 +36,7 @@ namespace Sapphire
     uint16_t getTerritoryTypeId() const;
     Common::LandType getLandType() const;
     Sapphire::HousePtr getHouse() const;
+    Common::FFXIVARR_POSITION3 getMapMarkerPosition();
 
     //Free Comapny
     void setFreeCompany( uint32_t id, uint32_t icon, uint32_t color );
@@ -77,6 +78,8 @@ namespace Sapphire
     uint32_t m_fcId; // unclear, may be wrong
     uint32_t m_fcIcon;
     uint32_t m_fcIconColor;
+
+    Common::FFXIVARR_POSITION3 m_mapMarkerPosition;
 
     uint32_t m_ownerPlayerId;
     Sapphire::Data::HousingLandSetPtr m_landInfo;

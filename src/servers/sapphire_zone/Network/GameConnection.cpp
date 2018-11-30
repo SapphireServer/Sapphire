@@ -8,7 +8,7 @@
 #include <Network/PacketContainer.h>
 #include <Network/GamePacketParser.h>
 
-#include "Zone/Zone.h"
+#include "Territory/Zone.h"
 
 #include "Network/PacketWrappers/InitUIPacket.h"
 

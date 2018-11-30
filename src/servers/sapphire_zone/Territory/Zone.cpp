@@ -16,7 +16,7 @@
 
 #include "Zone.h"
 #include "InstanceContent.h"
-#include "TerritoryMgr.h"
+#include "Manager/TerritoryMgr.h"
 
 #include "Session.h"
 #include "Actor/Chara.h"
@@ -34,13 +34,13 @@
 #include "ServerMgr.h"
 #include "CellHandler.h"
 #include "Zone.h"
-#include "TerritoryMgr.h"
 #include "Framework.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
+using namespace Sapphire::World::Manager;
 
 extern Sapphire::Framework g_fw;
 
@@ -727,7 +727,7 @@ void Sapphire::Zone::registerEObj( Entity::EventObjectPtr object )
 
   onRegisterEObj( object );
 
-  pLog->debug( "Registered instance eobj: " + std::to_string( object->getId() ) );
+  //pLog->debug( "Registered instance eobj: " + std::to_string( object->getId() ) );
 }
 
 Sapphire::Entity::EventObjectPtr Sapphire::Zone::getEObj( uint32_t objId )

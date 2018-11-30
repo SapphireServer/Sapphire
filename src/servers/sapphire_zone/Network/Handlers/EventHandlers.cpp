@@ -20,7 +20,7 @@
 #include "Event/EventHandler.h"
 #include "Event/EventHelper.h"
 
-#include "Zone/InstanceContent.h"
+#include "Territory/InstanceContent.h"
 
 #include "Session.h"
 
