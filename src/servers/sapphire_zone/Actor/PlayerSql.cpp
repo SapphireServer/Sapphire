@@ -12,8 +12,8 @@
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/InitUIPacket.h"
 
-#include "Zone/TerritoryMgr.h"
-#include "Zone/Zone.h"
+#include "Manager/TerritoryMgr.h"
+#include "Territory/Zone.h"
 #include "Inventory/Item.h"
 #include "Inventory/ItemContainer.h"
 #include "Inventory/ItemUtil.h"
@@ -26,6 +26,7 @@ extern Sapphire::Framework g_fw;
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::World::Manager;
 
 // load player from the db
 bool Sapphire::Entity::Player::load( uint32_t charId, SessionPtr pSession )

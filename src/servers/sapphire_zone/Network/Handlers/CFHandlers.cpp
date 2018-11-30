@@ -5,8 +5,8 @@
 #include <Network/PacketContainer.h>
 #include <Exd/ExdDataGenerated.h>
 
-#include "Zone/TerritoryMgr.h"
-#include "Zone/InstanceContent.h"
+#include "Manager/TerritoryMgr.h"
+#include "Territory/InstanceContent.h"
 
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
@@ -21,6 +21,7 @@ extern Sapphire::Framework g_fw;
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::World::Manager;
 
 
 void Sapphire::Network::GameConnection::cfDutyInfoRequest( const Packets::FFXIVARR_PACKET_RAW& inPacket,

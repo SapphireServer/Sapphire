@@ -8,8 +8,8 @@
 #include <Database/ZoneDbConnection.h>
 #include <Database/DbWorkerPool.h>
 #include "Linkshell/LinkshellMgr.h"
-#include "Zone/TerritoryMgr.h"
-#include "Zone/HousingMgr.h"
+#include "Manager/TerritoryMgr.h"
+#include "Manager/HousingMgr.h"
 #include "DebugCommand/DebugCommandHandler.h"
 #include "Manager/PlayerMgr.h"
 #include "Manager/ShopMgr.h"
@@ -19,6 +19,7 @@
 Sapphire::Framework g_fw;
 
 using namespace Sapphire;
+using namespace Sapphire::World;
 
 bool setupFramework()
 {
@@ -28,12 +29,12 @@ bool setupFramework()
   auto pScript = std::make_shared< Scripting::ScriptMgr >();
   auto pDb = std::make_shared< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto pLsMgr = std::make_shared< LinkshellMgr >();
-  auto pHousingMgr = std::make_shared< HousingMgr >();
-  auto pTeriMgr = std::make_shared< TerritoryMgr >();
+  auto pHousingMgr = std::make_shared< Manager::HousingMgr >();
+  auto pTeriMgr = std::make_shared< Manager::TerritoryMgr >();
   auto pDebugCom = std::make_shared< DebugCommandHandler >();
   auto pConfig = std::make_shared< ConfigMgr >();
-  auto pPlayerMgr = std::make_shared< Sapphire::World::Manager::PlayerMgr >();
-  auto pShopMgr = std::make_shared< Sapphire::World::Manager::ShopMgr >();
+  auto pPlayerMgr = std::make_shared< Manager::PlayerMgr >();
+  auto pShopMgr = std::make_shared< Manager::ShopMgr >();
 
   pLogger->setLogPath( "log/SapphireZone" );
   pLogger->init();
@@ -44,12 +45,12 @@ bool setupFramework()
   g_fw.set< Scripting::ScriptMgr >( pScript );
   g_fw.set< Db::DbWorkerPool< Db::ZoneDbConnection > >( pDb );
   g_fw.set< LinkshellMgr >( pLsMgr );
-  g_fw.set< HousingMgr >( pHousingMgr );
-  g_fw.set< TerritoryMgr >( pTeriMgr );
+  g_fw.set< Manager::HousingMgr >( pHousingMgr );
+  g_fw.set< Manager::TerritoryMgr >( pTeriMgr );
   g_fw.set< DebugCommandHandler >( pDebugCom );
   g_fw.set< ConfigMgr >( pConfig );
-  g_fw.set< Sapphire::World::Manager::PlayerMgr >( pPlayerMgr );
-  g_fw.set< Sapphire::World::Manager::ShopMgr >( pShopMgr );
+  g_fw.set< Manager::PlayerMgr >( pPlayerMgr );
+  g_fw.set< Manager::ShopMgr >( pShopMgr );
 
   // actuall catch errors here...
   return true;

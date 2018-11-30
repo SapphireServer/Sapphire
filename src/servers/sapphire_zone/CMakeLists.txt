@@ -19,7 +19,7 @@ file(GLOB SERVER_SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
         Network/PacketWrappers/*.c*
         Script/*.c*
         StatusEffect/*.c*
-        Zone/*.c*)
+        Territory/*.c*)
 
 add_executable( sapphire_zone ${SERVER_SOURCE_FILES} )
 

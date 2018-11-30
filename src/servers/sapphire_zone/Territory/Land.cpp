@@ -88,6 +88,16 @@ void Sapphire::Land::load()
       m_pHouse = make_House( houseId, m_landSetId, m_landId, m_wardNum, m_territoryTypeId );
 
   }
+
+  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto info = pExdData->get< Sapphire::Data::HousingMapMarkerInfo >( getTerritoryTypeId(), getLandId() );
+  if( info )
+  {
+    m_mapMarkerPosition.x = info->x;
+    m_mapMarkerPosition.y = info->y;
+    m_mapMarkerPosition.z = info->z;
+  }
+
   init();
 }
 
@@ -167,6 +177,11 @@ uint16_t Sapphire::Land::getTerritoryTypeId() const
 Sapphire::HousePtr Sapphire::Land::getHouse() const
 {
   return m_pHouse;
+}
+
+FFXIVARR_POSITION3 Sapphire::Land::getMapMarkerPosition()
+{
+  return m_mapMarkerPosition;
 }
 
 Sapphire::Common::LandType Sapphire::Land::getLandType() const

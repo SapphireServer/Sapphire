@@ -1794,7 +1794,7 @@ struct FFXIVIpcObjectSpawn :
   int16_t unknown24b;
   uint16_t unknown28a;
   int16_t unknown28c;
-  uint32_t unknown2C;
+  uint32_t housingLink;
   Common::FFXIVARR_POSITION3 position;
   int16_t unknown3C;
   int16_t unknown3E;

@@ -8,8 +8,8 @@
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 
-#include "Zone/Zone.h"
-#include "Zone/ZonePosition.h"
+#include "Territory/Zone.h"
+#include "Territory/ZonePosition.h"
 
 #include "DebugCommand/DebugCommandHandler.h"
 #include "Actor/Player.h"

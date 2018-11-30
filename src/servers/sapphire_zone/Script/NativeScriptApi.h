@@ -182,6 +182,16 @@ namespace Sapphire::ScriptAPI
                                             uint32_t catalogId );
   };
 
+  /*!
+   * @brief The base class for scripts that implement behaviour related to Event Objects (EObjs)
+   */
+  class EventObjectScript : public ScriptObject
+  {
+  public:
+    explicit EventObjectScript( uint32_t eobjId );
+
+    virtual void onTalk( uint32_t eventId, Sapphire::Entity::Player& player, Entity::EventObject& eobj );
+  };
 
   /*!
   * @brief The base class for any scripts that implement behaviour related to BattleNPCs
