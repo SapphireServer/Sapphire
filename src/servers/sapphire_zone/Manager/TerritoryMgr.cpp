@@ -7,11 +7,15 @@
 #include "Actor/Player.h"
 
 #include "Territory/Zone.h"
-#include "Territory/HousingZone.h"
 #include "Territory/ZonePosition.h"
 #include "Territory/InstanceContent.h"
 #include "TerritoryMgr.h"
+#include "HousingMgr.h"
 #include "Framework.h"
+
+#include "Territory/Land.h"
+#include "Territory/House.h"
+#include "Territory/Housing/HousingInteriorTerritory.h"
 
 extern Sapphire::Framework g_fw;
 
@@ -278,9 +282,75 @@ Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createInstanceContent(
   return pZone;
 }
 
-Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createHousingInterior( const Common::LandIdent& landIdent )
+Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::findOrCreateHousingInterior( const Common::LandIdent landIdent )
 {
+  // check if zone already spawned first
+  auto ident = *reinterpret_cast< const uint64_t* >( &landIdent );
 
+  auto it = m_landIdentToZonePtrMap.find( ident );
+  if( it != m_landIdentToZonePtrMap.end() )
+  {
+    return it->second;
+  }
+
+  // otherwise, create it
+  auto housingMgr = g_fw.get< Manager::HousingMgr >();
+
+  auto parentZone = std::dynamic_pointer_cast< HousingZone >(
+    getZoneByLandSetId( housingMgr->toLandSetId( landIdent.territoryTypeId, landIdent.wardNum ) ) );
+
+  if( !parentZone )
+    return nullptr;
+
+  auto land = parentZone->getLand( landIdent.landId );
+  if( !land )
+    return nullptr;
+
+  auto house = land->getHouse();
+  if( !house )
+    return nullptr;
+
+  // get house instance id
+  uint16_t territoryTypeId = 0;
+  switch( landIdent.territoryTypeId )
+  {
+    case 339: // mist
+      territoryTypeId = 282;
+      break;
+
+    case 340: // lavender beds
+      territoryTypeId = 342;
+      break;
+
+    case 341: // goblet
+      territoryTypeId = 345;
+      break;
+
+    case 641: // shirogane
+      territoryTypeId = 649;
+      break;
+
+    default:
+      return nullptr;
+  }
+
+  // zones are sequential in the exd for small, med, large
+  territoryTypeId += land->getSize();
+
+  auto terriInfo = getTerritoryDetail( territoryTypeId );
+  if( !terriInfo )
+    return nullptr;
+
+  auto zone = World::Territory::Housing::make_HousingInteriorTerritory( ident, territoryTypeId, getNextInstanceId(),
+                                                                        terriInfo->name, house->getHouseName() );
+
+  zone->init();
+
+  m_landIdentToZonePtrMap[ ident ] = zone;
+  m_instanceIdToZonePtrMap[ zone->getGuId() ] = zone;
+  m_zoneSet.insert( { zone } );
+
+  return zone;
 }
 
 bool Sapphire::World::Manager::TerritoryMgr::removeTerritoryInstance( uint32_t instanceId )
