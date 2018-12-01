@@ -28,6 +28,11 @@ TYPE_FORWARD( Session );
 TYPE_FORWARD( ZonePosition );
 TYPE_FORWARD( Land )
 
+namespace World::Territory::Housing
+{
+TYPE_FORWARD( HousingInteriorTerritory );
+}
+
 namespace World::Manager
 {
 TYPE_FORWARD( HousingMgr );

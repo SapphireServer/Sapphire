@@ -98,7 +98,7 @@ namespace Sapphire::World::Manager
 
     ZonePtr createInstanceContent( uint32_t contentFinderConditionId );
 
-    ZonePtr createHousingInterior( const Common::LandIdent& landIdent );
+    ZonePtr findOrCreateHousingInterior( const Common::LandIdent landIdent );
 
     /*! removes instance by instanceId, return true if successful */
     bool removeTerritoryInstance( uint32_t territoryTypeId );
@@ -156,6 +156,7 @@ namespace Sapphire::World::Manager
     using PlayerIdToInstanceIdMap = std::unordered_map< uint32_t, uint32_t >;
     using PositionMap = std::unordered_map< int32_t, ZonePositionPtr >;
     using InstanceIdList = std::vector< uint32_t >;
+    using LandIdentToZonePtrMap = std::unordered_map< uint64_t, ZonePtr >;
 
     /*! map holding details for territory templates */
     TerritoryTypeDetailCache m_territoryTypeDetailCacheMap;
@@ -177,6 +178,9 @@ namespace Sapphire::World::Manager
 
     /*! map storing playerIds to instanceIds, used for instanceContent */
     PlayerIdToInstanceIdMap m_playerIdToInstanceMap;
+
+    /*! map for storing landident to zones, used for internal housing zones */
+    LandIdentToZonePtrMap m_landIdentToZonePtrMap;
 
     /*! internal counter for instanceIds */
     uint32_t m_lastInstanceId;
