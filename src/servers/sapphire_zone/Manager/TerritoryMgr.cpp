@@ -341,7 +341,7 @@ Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::findOrCreateHousingInt
   if( !terriInfo )
     return nullptr;
 
-  auto zone = World::Territory::Housing::make_HousingInteriorTerritory( ident, territoryTypeId, getNextInstanceId(),
+  auto zone = World::Territory::Housing::make_HousingInteriorTerritory( landIdent, territoryTypeId, getNextInstanceId(),
                                                                         terriInfo->name, house->getHouseName() );
 
   zone->init();
