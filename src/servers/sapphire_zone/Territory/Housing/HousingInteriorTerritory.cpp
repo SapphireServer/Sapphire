@@ -1,10 +1,34 @@
+#include <Common.h>
+#include <Logging/Logger.h>
+#include <Util/Util.h>
+#include <Util/UtilMath.h>
+#include <Database/DatabaseDef.h>
+#include <Exd/ExdDataGenerated.h>
+#include <Network/GamePacketNew.h>
+#include <Network/PacketDef/Zone/ServerZoneDef.h>
+
+#include "Actor/Player.h"
+#include "Actor/Actor.h"
+#include "Actor/EventObject.h"
+#include "Manager/HousingMgr.h"
+#include "Territory/Land.h"
+#include "Territory/House.h"
+
+#include "Forwards.h"
 #include "HousingInteriorTerritory.h"
-#include "Common.h"
+#include "Framework.h"
+
+extern Sapphire::Framework g_fw;
+
+using namespace Sapphire::Common;
+using namespace Sapphire::Network::Packets;
+using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::World::Manager;
 
 using namespace Sapphire;
 using namespace Sapphire::World::Territory;
 
-Housing::HousingInteriorTerritory::HousingInteriorTerritory( uint64_t ident, uint16_t territoryTypeId,
+Housing::HousingInteriorTerritory::HousingInteriorTerritory( Common::LandIdent ident, uint16_t territoryTypeId,
                                                              uint32_t guId,
                                                              const std::string& internalName,
                                                              const std::string& contentName ) :
@@ -21,11 +45,52 @@ Housing::HousingInteriorTerritory::~HousingInteriorTerritory()
 
 bool Housing::HousingInteriorTerritory::init()
 {
-
+  return false;
 }
 
 void Housing::HousingInteriorTerritory::onPlayerZoneIn( Entity::Player& player )
 {
+  auto pHousingMgr = g_fw.get< HousingMgr >();
+  auto pLog = g_fw.get< Logger >();
+  pLog->debug(
+    "HousingInteriorTerritory::onPlayerZoneIn: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryTypeId() ) +
+    ", Entity#" + std::to_string( player.getId() ) );
+
+  auto housingIndoorInitializPacket = makeZonePacket< FFXIVIpcHousingIndoorInitialize >( player.getId() );
+  housingIndoorInitializPacket->data().u1 = 2578;
+  housingIndoorInitializPacket->data().u2 = 10;
+  housingIndoorInitializPacket->data().u3 = 530;
+  housingIndoorInitializPacket->data().u4 = 266;
+
+  auto landSetId = pHousingMgr->toLandSetId( m_landIdent.territoryTypeId, m_landIdent.wardNum );
+  auto pLand = pHousingMgr->getHousingZoneByLandSetId( landSetId )->getLand( m_landIdent.landId );
+  auto pHouse = pLand->getHouse();
+
+
+  uint32_t yardPacketNum;
+  uint32_t yardPacketTotal = 2 + pLand->getSize();
+
+  for( auto i = 0; i < 10; i++ )
+  {
+    housingIndoorInitializPacket->data().indoorItems[ i ] = pHouse->getHouseInteriorPart( (Common::HousingInteriorSlot)i );
+  }
+
+  player.queuePacket( housingIndoorInitializPacket );
+
+  for( yardPacketNum = 0; yardPacketNum < yardPacketTotal; yardPacketNum++ )
+  {
+    auto housingObjectInitializPacket = makeZonePacket< FFXIVIpcHousingObjectInitialize >( player.getId() );
+    memcpy( &housingObjectInitializPacket->data().landIdent, &m_landIdent, sizeof( Common::LandIdent ) );
+    housingObjectInitializPacket->data().landIdent.worldId = 67;
+    housingObjectInitializPacket->data().u1 = 0;
+    housingObjectInitializPacket->data().u2 = 100;
+    housingObjectInitializPacket->data().packetNum = yardPacketNum;
+    housingObjectInitializPacket->data().packetTotal = yardPacketTotal;
+
+    //TODO: Add Objects here
+
+    player.queuePacket( housingObjectInitializPacket );
+  }
 
 }
 
