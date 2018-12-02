@@ -207,23 +207,38 @@ enum ActorControlType : uint16_t
     Dismount = 0x3A0,
 
     // Duty Recorder
-      BeginReplayAck = 0x3A1,
+    BeginReplayAck = 0x3A1,
     EndReplayAck = 0x3A2,
 
     // Housing
-      ShowHousingItemUI = 0x3F7,
+    ShowHousingItemUI = 0x3F7,
     ShowBuildPresetUI = 0x3E9,
     BuildPresetResponse = 0x3ED,
 
+    /*!
+     * param1 = outdoor furnishings
+     *          u8 0 - relocation available, 1 = available
+     *          u8 1 - outoor furnishings placed
+     *          u8 2 - outdoor furnishings in storeroom
+     *          u8 3 - outdoor funishings limit
+     * param2 = indoor furnishings
+     *          u16 0 - relocation available, 1 = available
+     *          u16 1 - furnishings placed
+     * param3 = indoor furnishings
+     *          u16 0 - in storeroom
+     *          u16 1 - indoor furnishings limit
+     */
+    HousingStoreroomStatus = 0x419,
+
     // PvP Duel
-      SetPvPState = 0x5E0, // param3 must be 6 to engage a duel (hardcoded in the client)
+    SetPvPState = 0x5E0, // param3 must be 6 to engage a duel (hardcoded in the client)
     EndDuelSession = 0x5E1, // because someone went oob?
     StartDuelCountdown = 0x5E2, // begins a countdown; also does some duel bgm thing.
     StartDuel = 0x5E3, // actually all it does is set the challenger actor id;
     DuelResultScreen = 0x5E4, // win/lose thing, also reset a target id just like what EndDuelSession does.
 
     // Duty Action
-      SetDutyActionId = 0x5E8,  // ContentExAction
+    SetDutyActionId = 0x5E8,  // ContentExAction
     SetDutyActionHud = 0x5E9, // disable/enable
     SetDutyActionActive = 0x5EA,
     SetDutyActionRemaining = 0x5EB,
