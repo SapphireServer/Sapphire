@@ -945,8 +945,8 @@ namespace Sapphire::Entity
     InventoryMap m_storageMap;
 
     Common::FFXIVARR_POSITION3 m_prevPos;
-    uint32_t m_prevZoneType;
-    uint32_t m_prevZoneId;
+    uint32_t m_prevTerritoryTypeId;
+    uint32_t m_prevTerritoryId;
     float m_prevRot;
 
     uint8_t m_voice;

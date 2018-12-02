@@ -756,3 +756,8 @@ Sapphire::Entity::EventObjectPtr Sapphire::Zone::registerEObj( const std::string
 
   return eObj;
 }
+
+Sapphire::Data::TerritoryTypePtr Sapphire::Zone::getTerritoryTypeInfo() const
+{
+  return m_territoryTypeInfo;
+}

@@ -16,7 +16,7 @@
 #include <stdio.h>
 #include <string.h>
 
-namespace Sapphire 
+namespace Sapphire
 {
 
   class Session;
@@ -75,6 +75,8 @@ namespace Sapphire
     const FestivalPair& getCurrentFestival() const;
 
     void setCurrentFestival( uint16_t festivalId, uint16_t additionalFestivalId = 0 );
+
+    std::shared_ptr< Data::TerritoryType > getTerritoryTypeInfo() const;
 
     virtual bool init();
 

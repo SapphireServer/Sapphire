@@ -52,7 +52,8 @@ bool Sapphire::Entity::Player::load( uint32_t charId, SessionPtr pSession )
 
   auto zoneId = res->getUInt( "TerritoryType" );
   m_territoryId = res->getUInt( "TerritoryId" );
-  m_prevZoneId = res->getUInt( "OTerritoryType" );
+  m_prevTerritoryTypeId = res->getUInt( "OTerritoryType" );
+  m_prevTerritoryId = res->getUInt( "OTerritoryId" );
 
   // Position
   m_pos.x = res->getFloat( "PosX" );
@@ -75,7 +76,7 @@ bool Sapphire::Entity::Player::load( uint32_t charId, SessionPtr pSession )
     // if none found, revert to previous zone and position
     if( !pCurrZone )
     {
-      zoneId = m_prevZoneId;
+      zoneId = m_prevTerritoryTypeId;
       m_pos.x = m_prevPos.x;
       m_pos.y = m_prevPos.y;
       m_pos.z = m_prevPos.z;
@@ -92,7 +93,7 @@ bool Sapphire::Entity::Player::load( uint32_t charId, SessionPtr pSession )
     pCurrZone = pTeriMgr->getZoneByTerritoryTypeId( zoneId );
   }
 
-  m_zoneId = zoneId;
+  m_territoryTypeId = zoneId;
 
   // TODO: logic for instances needs to be added here
   // see if a valid zone could be found for the character
@@ -370,15 +371,15 @@ void Sapphire::Entity::Player::updateSql()
   stmt->setInt( 16, static_cast< uint32_t >( m_bNewGame ) );
   stmt->setInt( 17, static_cast< uint32_t >( m_bNewAdventurer ) );
 
-  stmt->setInt( 18, m_zoneId ); // TerritoryType
+  stmt->setInt( 18, m_territoryTypeId ); // TerritoryType
   stmt->setInt( 19, m_territoryId ); // TerritoryId
   stmt->setDouble( 20, m_pos.x );
   stmt->setDouble( 21, m_pos.y );
   stmt->setDouble( 22, m_pos.z );
   stmt->setDouble( 23, getRot() );
 
-  stmt->setInt( 24, m_prevZoneId ); // OTerritoryType
-  stmt->setInt( 25, m_prevZoneType ); // OTerritoryId
+  stmt->setInt( 24, m_prevTerritoryTypeId ); // OTerritoryType
+  stmt->setInt( 25, m_prevTerritoryId ); // OTerritoryId
   stmt->setDouble( 26, m_prevPos.x );
   stmt->setDouble( 27, m_prevPos.y );
   stmt->setDouble( 28, m_prevPos.z );

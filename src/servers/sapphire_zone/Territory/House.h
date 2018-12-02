@@ -34,8 +34,10 @@ namespace Sapphire
     //functions
     void setHousePart( Common::HousePartSlot slot, uint32_t id );
     void setHousePartColor( Common::HousePartSlot slot, uint32_t id );
+    void setHouseInteriorPart( Common::HousingInteriorSlot slot, uint32_t id );
     uint32_t getHousePart( Common::HousePartSlot slot ) const;
     uint8_t getHousePartColor( Common::HousePartSlot slot ) const;
+    uint32_t getHouseInteriorPart( Common::HousingInteriorSlot slot ) const;
 
     HousePartsArray const& getHouseParts() const;
 
@@ -51,6 +53,7 @@ namespace Sapphire
     uint64_t m_buildTime;
 
     HousePartsArray m_houseParts;
+    uint32_t m_houseInteriorParts[10];
 
     std::string m_estateMessage;
     std::string m_houseName;

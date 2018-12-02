@@ -97,10 +97,15 @@ namespace Sapphire::Network::Packets
     ReqMoogleMailLetter = 0x011A, // updated 4.4
     MailLetterNotification = 0x011B, // updated 4.4
 
-    ExamineFreeCompanyInfo = 0x013A, // updated 4.1
+    MarketBoardItemListingCount = 0x011C, // updated 4.4
+    MarketBoardItemListing = 0x011D, // updated 4.4
+    MarketBoardItemListingHistory = 0x0121, // updated 4.4
+    MarketBoardSearchResult = 0x0125, // updated 4.4
+
     CharaFreeCompanyTag = 0x0127, // updated 4.4
     FreeCompanyBoardMsg = 0x0128, // updated 4.4
     FreeCompanyInfo = 0x0129, // updated 4.4
+    ExamineFreeCompanyInfo = 0x013A, // updated 4.1
 
     StatusEffectList = 0x0149, // updated 4.4
     Effect = 0x014C, // updated 4.4
@@ -186,7 +191,7 @@ namespace Sapphire::Network::Packets
     LandSetInitialize = 0x0220, // updated 4.4
     LandUpdate = 0x0221, // updated 4.4
     YardObjectSpawn = 0x0222, // updated 4.4
-
+    HousingIndoorInitialize = 0x0223,
     LandPriceUpdate = 0x0224, // updated 4.4
     LandInfoSign = 0x0225, // updated 4.4
     LandRename = 0x0226, // updated 4.4
@@ -195,7 +200,7 @@ namespace Sapphire::Network::Packets
     HousingLandFlags = 0x0229, // updated 4.4
     HousingShowEstateGuestAccess = 0x022A, // updated 4.4
 
-    LandSetYardInitialize = 0x022C, // updated 4.4
+    HousingObjectInitialize = 0x022C, // updated 4.4
 
     HousingWardInfo = 0x022F, // updated 4.4
     YardObjectMove = 0x0230, // updated 4.4
@@ -257,6 +262,9 @@ namespace Sapphire::Network::Packets
     PlayerSearchHandler = 0x00E2, // updated 4.2
 
     LinkshellListHandler = 0x00F4, // updated 4.3
+
+    MarketBoardRequestItemInformation = 0x00FE, // updated 4.4
+    MarketBoardRequestItemListings = 0x00FF, // updated 4.4
 
     SearchMarketboard = 0x0103, // updated 4.3
     ReqExamineFcInfo = 0x010F, // updated 4.1

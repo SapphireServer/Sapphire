@@ -197,7 +197,7 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     CONNECTION_BOTH );
 
   prepareStatement( HOUSING_HOUSE_UP,
-                    "UPDATE house SET BuildTime = ?, Aetheryte = ?, Comment = ?, HouseName = ?, Endorsements = ?, HousePartModels = ?, HousePartColours = ? WHERE HouseId = ?;",
+                    "UPDATE house SET BuildTime = ?, Aetheryte = ?, Comment = ?, HouseName = ?, Endorsements = ?, HousePartModels = ?, HousePartColours = ?, HouseInteriorModels = ? WHERE HouseId = ?;",
                     CONNECTION_BOTH );
 
   /*prepareStatement( LAND_INS,
