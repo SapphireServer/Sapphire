@@ -1830,12 +1830,12 @@ struct FFXIVIpcDuelChallenge :
   char otherName[32];
 };
 
-struct FFXIVIpcMarketBoardItemSummaryListResponse :
-  FFXIVIpcBasePacket< MarketBoardItemSummaryListResponse >
+struct FFXIVIpcMarketBoardSearchResultResponse :
+  FFXIVIpcBasePacket< MarketBoardSearchResultResponse >
 {
-    struct MarketBoardItemSummary
+    struct MarketBoardItem
     {
-        uint32_t itemId;
+        uint32_t itemCatalogId;
         uint32_t quantity;
     } items[20];
 
@@ -1843,6 +1843,16 @@ struct FFXIVIpcMarketBoardItemSummaryListResponse :
     uint32_t padding1;
     uint32_t itemIndexStart;
     uint32_t padding2;
+};
+
+struct FFFXIVIpcMarketBoardItemListingCountResponse :
+  FFXIVIpcBasePacket< MarketBoardItemListingCountResponse >
+{
+    uint32_t itemCatalogId;
+    uint32_t unknown1; // does some shit if nonzero
+    uint16_t unknown2;
+    uint16_t quantity; // high/low u8s read separately?
+    uint32_t padding3;
 };
 
 
