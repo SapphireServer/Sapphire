@@ -42,16 +42,14 @@ public:
         player.sendDebug( "created zone with guid: " + std::to_string( internalZone->getGuId() ) + "\nname: " + internalZone->getName() );
       }
 
+      // param2 == 1 when player wants to enter house
       if( result.param2 != 1 )
         return;
 
-      if( result.param2 == 1 )
-      {
-        //player.eventFinish( 131148, 0 );
-        //player.eventFinish( this->getId(), 1 );
-        player.setPos( {0, 0, 0} );
-        player.setInstance( internalZone );
-      }
+      player.eventFinish( result.eventId, 1 );
+
+      player.setPos( { 0.f, 0.f, 0.f } );
+      player.setInstance( internalZone );
     } );
   }
 };
