@@ -131,7 +131,7 @@ namespace Sapphire
 
     uint32_t getZoneId() const
     {
-      return m_zoneId;
+      return m_territoryTypeId;
     }
 
     uint32_t getTribe() const
@@ -185,7 +185,7 @@ namespace Sapphire
 
     uint8_t m_tribe;
 
-    uint16_t m_zoneId;
+    uint16_t m_territoryTypeId;
 
     uint64_t m_modelMainWeapon;
     uint64_t m_modelSubWeapon;

@@ -128,7 +128,7 @@ uint32_t Sapphire::Entity::Player::getMaxMp()
 
 uint16_t Sapphire::Entity::Player::getZoneId() const
 {
-  return m_zoneId;
+  return m_territoryTypeId;
 }
 
 uint32_t Sapphire::Entity::Player::getTerritoryId() const
@@ -414,9 +414,9 @@ void Sapphire::Entity::Player::setZone( uint32_t zoneId )
     // todo: this will require proper handling, for now just return the player to their previous area
     m_pos = m_prevPos;
     m_rot = m_prevRot;
-    m_zoneId = m_prevZoneId;
+    m_territoryTypeId = m_prevTerritoryTypeId;
 
-    if( !pTeriMgr->movePlayer( m_zoneId, getAsPlayer() ) )
+    if( !pTeriMgr->movePlayer( m_territoryTypeId, getAsPlayer() ) )
       return;
   }
 
@@ -442,12 +442,15 @@ bool Sapphire::Entity::Player::setInstance( ZonePtr instance )
 
   auto pTeriMgr = g_fw.get< TerritoryMgr >();
 
+  auto currentZone = getCurrentZone();
+
   // zoning within the same zone won't cause the prev data to be overwritten
-  if( instance->getTerritoryTypeId() != m_zoneId )
+  if( instance->getTerritoryTypeId() != m_territoryTypeId )
   {
     m_prevPos = m_pos;
     m_prevRot = m_rot;
-    m_prevZoneId = m_zoneId;
+    m_prevTerritoryTypeId = currentZone->getTerritoryTypeId();
+    m_prevTerritoryId = getTerritoryId();
   }
 
   if( !pTeriMgr->movePlayer( instance, getAsPlayer() ) )
@@ -461,12 +464,23 @@ bool Sapphire::Entity::Player::setInstance( ZonePtr instance )
 bool Sapphire::Entity::Player::exitInstance()
 {
   auto pTeriMgr = g_fw.get< TerritoryMgr >();
-  if( !pTeriMgr->movePlayer( m_prevZoneId, getAsPlayer() ) )
-    return false;
+
+  // check if housing zone
+  if( pTeriMgr->isHousingTerritory( m_prevTerritoryTypeId ) )
+  {
+    if( !pTeriMgr->movePlayer( pTeriMgr->getZoneByLandSetId( m_prevTerritoryId ), getAsPlayer() ) )
+      return false;
+  }
+  else
+  {
+    if( !pTeriMgr->movePlayer( m_prevTerritoryTypeId, getAsPlayer() ) )
+      return false;
+  }
 
   m_pos = m_prevPos;
   m_rot = m_prevRot;
-  m_zoneId = m_prevZoneId;
+  m_territoryTypeId = m_prevTerritoryTypeId;
+  m_territoryId = m_prevTerritoryId;
 
   sendZonePackets();
 
@@ -1232,7 +1246,7 @@ void Sapphire::Entity::Player::setLoadingComplete( bool bComplete )
 void Sapphire::Entity::Player::performZoning( uint16_t zoneId, const Common::FFXIVARR_POSITION3& pos, float rotation )
 {
   m_pos = pos;
-  m_zoneId = zoneId;
+  m_territoryTypeId = zoneId;
   m_bMarkedForZoning = true;
   setRot( rotation );
   setZone( zoneId );
@@ -1530,12 +1544,12 @@ void Sapphire::Entity::Player::setEorzeaTimeOffset( uint64_t timestamp )
 
 void Sapphire::Entity::Player::setTerritoryTypeId( uint32_t territoryTypeId )
 {
-  m_zoneId = territoryTypeId;
+  m_territoryTypeId = territoryTypeId;
 }
 
 uint32_t Sapphire::Entity::Player::getTerritoryTypeId() const
 {
-  return m_zoneId;
+  return m_territoryTypeId;
 }
 
 void Sapphire::Entity::Player::sendZonePackets()
