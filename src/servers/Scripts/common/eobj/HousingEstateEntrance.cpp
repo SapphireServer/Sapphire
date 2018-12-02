@@ -23,6 +23,10 @@ public:
 
     player.playScene( eventId, 0, 0, [this, eobj]( Entity::Player& player, const Event::SceneResult& result )
     {
+      // param2 == 1 when player wants to enter house
+      if( result.param2 != 1 )
+        return;
+
       auto terriMgr = getFramework()->get< Sapphire::World::Manager::TerritoryMgr >();
       if( !terriMgr )
         return;
@@ -42,10 +46,6 @@ public:
       {
         player.sendDebug( "created zone with guid: " + std::to_string( internalZone->getGuId() ) + "\nname: " + internalZone->getName() );
       }
-
-      // param2 == 1 when player wants to enter house
-      if( result.param2 != 1 )
-        return;
 
       player.eventFinish( result.eventId, 1 );
 
