@@ -129,8 +129,8 @@ std::set< Sapphire::Entity::ActorPtr > ActionCollision::getActorsHitFromAction( 
 bool
 ActionCollision::radiusCollision( FFXIVARR_POSITION3 actorPosition, FFXIVARR_POSITION3 aoePosition, uint16_t radius )
 {
-  return Sapphire::Math::Util::distance( actorPosition.x, actorPosition.y, actorPosition.z,
-                                     aoePosition.x, aoePosition.y, aoePosition.z ) <= radius;
+  return Sapphire::Util::distance( actorPosition.x, actorPosition.y, actorPosition.z,
+                                   aoePosition.x, aoePosition.y, aoePosition.z ) <= radius;
 }
 
 bool ActionCollision::boxCollision( FFXIVARR_POSITION3 actorPosition, FFXIVARR_POSITION3 aoePosition, uint16_t width,

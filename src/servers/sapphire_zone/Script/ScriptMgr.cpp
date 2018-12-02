@@ -121,7 +121,7 @@ void Sapphire::Scripting::ScriptMgr::watchDirectories()
 }
 
 bool Sapphire::Scripting::ScriptMgr::loadDir( const std::string& dirname, std::set< std::string >& files,
-                                          const std::string& ext )
+                                              const std::string& ext )
 {
 
   auto pLog = g_fw.get< Logger >();
@@ -190,19 +190,17 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
   }
   else
   {
-    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId & 0xFFFF0000 );
+    script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId & 0xFFFF0000 );
     if( !script )
       return false;
 
     script->onTalk( eventId, player, actorId );
     return true;
   }
-
-  return false;
 }
 
 bool Sapphire::Scripting::ScriptMgr::onEnterTerritory( Entity::Player& player, uint32_t eventId,
-                                                   uint16_t param1, uint16_t param2 )
+                                                       uint16_t param1, uint16_t param2 )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
   if( !script )
@@ -212,7 +210,7 @@ bool Sapphire::Scripting::ScriptMgr::onEnterTerritory( Entity::Player& player, u
 }
 
 bool Sapphire::Scripting::ScriptMgr::onWithinRange( Entity::Player& player, uint32_t eventId, uint32_t param1,
-                                                float x, float y, float z )
+                                                    float x, float y, float z )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
   if( !script )
@@ -222,7 +220,7 @@ bool Sapphire::Scripting::ScriptMgr::onWithinRange( Entity::Player& player, uint
 }
 
 bool Sapphire::Scripting::ScriptMgr::onOutsideRange( Entity::Player& player, uint32_t eventId, uint32_t param1,
-                                                 float x, float y, float z )
+                                                     float x, float y, float z )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
   if( !script )
@@ -232,7 +230,7 @@ bool Sapphire::Scripting::ScriptMgr::onOutsideRange( Entity::Player& player, uin
 }
 
 bool Sapphire::Scripting::ScriptMgr::onEmote( Entity::Player& player, uint64_t actorId,
-                                          uint32_t eventId, uint8_t emoteId )
+                                              uint32_t eventId, uint8_t emoteId )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
   if( !script )
@@ -242,15 +240,15 @@ bool Sapphire::Scripting::ScriptMgr::onEmote( Entity::Player& player, uint64_t a
 }
 
 bool Sapphire::Scripting::ScriptMgr::onEventHandlerReturn( Entity::Player& player, uint32_t eventId,
-                                                       uint16_t subEvent, uint16_t param1, uint16_t param2,
-                                                       uint16_t param3 )
+                                                           uint16_t subEvent, uint16_t param1, uint16_t param2,
+                                                           uint16_t param3 )
 {
 
   return false;
 }
 
 bool Sapphire::Scripting::ScriptMgr::onEventHandlerTradeReturn( Entity::Player& player, uint32_t eventId,
-                                                            uint16_t subEvent, uint16_t param, uint32_t catalogId )
+                                                                uint16_t subEvent, uint16_t param, uint32_t catalogId )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
   if( script )
@@ -263,7 +261,7 @@ bool Sapphire::Scripting::ScriptMgr::onEventHandlerTradeReturn( Entity::Player& 
 }
 
 bool Sapphire::Scripting::ScriptMgr::onEventItem( Entity::Player& player, uint32_t eventItemId,
-                                              uint32_t eventId, uint32_t castTime, uint64_t targetId )
+                                                  uint32_t eventId, uint32_t castTime, uint64_t targetId )
 {
   std::string eventName = "onEventItem";
   std::string objName = Event::getEventName( eventId );
@@ -402,7 +400,7 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( InstanceContentPtr instan
 }
 
 bool Sapphire::Scripting::ScriptMgr::onInstanceEnterTerritory( InstanceContentPtr instance, Entity::Player& player,
-                                                           uint32_t eventId, uint16_t param1, uint16_t param2 )
+                                                               uint32_t eventId, uint16_t param1, uint16_t param2 )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance->getDirectorId() );
   if( script )

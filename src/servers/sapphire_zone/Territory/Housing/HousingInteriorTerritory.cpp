@@ -21,7 +21,7 @@ Housing::HousingInteriorTerritory::~HousingInteriorTerritory()
 
 bool Housing::HousingInteriorTerritory::init()
 {
-
+  return false;
 }
 
 void Housing::HousingInteriorTerritory::onPlayerZoneIn( Entity::Player& player )

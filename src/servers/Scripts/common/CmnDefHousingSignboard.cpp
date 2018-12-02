@@ -83,6 +83,7 @@ public:
         }
 
       }
+      return LandPurchaseResult::ERR_INTERNAL;
     };
 
     player.playScene( getId(), 0, HIDE_HOTBAR, 0, 0, callback );
