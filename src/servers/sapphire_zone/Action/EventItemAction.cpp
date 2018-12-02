@@ -73,7 +73,7 @@ void Sapphire::Action::EventItemAction::onFinish()
   {
     auto effectPacket = std::make_shared< Server::EffectPacket >( m_pSource->getId(), m_additional, m_id );
     effectPacket->setAnimationId( 1 );
-    effectPacket->setRotation( Math::Util::floatToUInt16Rot( m_pSource->getRot() ) );
+    effectPacket->setRotation( Util::floatToUInt16Rot( m_pSource->getRot() ) );
 
     m_pSource->getAsPlayer()->unsetStateFlag( Common::PlayerStateFlag::Casting );
     m_pSource->sendToInRangeSet( effectPacket, true );

@@ -296,7 +296,7 @@ void Sapphire::Land::update( uint32_t currTime )
     if( m_nextDrop < currTime && m_minPrice < m_currentPrice )
     {
       m_nextDrop = currTime + 21600;
-      m_currentPrice = ( m_currentPrice / 100 ) * 99.58;
+      m_currentPrice = static_cast< uint32_t >( ( m_currentPrice / 100 ) * 99.58f );
       updateLandDb();
     }
   }

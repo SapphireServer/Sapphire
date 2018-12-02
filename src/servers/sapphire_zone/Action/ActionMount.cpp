@@ -75,7 +75,7 @@ void Sapphire::Action::ActionMount::onFinish()
   pPlayer->unsetStateFlag( PlayerStateFlag::Casting );
 
   auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pPlayer->getId(), 4 );
-  effectPacket->setRotation( Math::Util::floatToUInt16Rot( pPlayer->getRot() ) );
+  effectPacket->setRotation( Util::floatToUInt16Rot( pPlayer->getRot() ) );
 
   Server::EffectEntry effectEntry{};
   effectEntry.effectType = ActionEffectType::Mount;

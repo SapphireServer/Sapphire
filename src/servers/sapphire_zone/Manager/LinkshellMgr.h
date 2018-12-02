@@ -1,14 +1,12 @@
-#ifndef CORE_LINKSHELLMGR_H
-#define CORE_LINKSHELLMGR_H
+#ifndef SAPPHIRE_LINKSHELLMGR_H
+#define SAPPHIRE_LINKSHELLMGR_H
 
 #include <memory>
 #include <map>
+#include "ForwardsZone.h"
 
-namespace Sapphire
+namespace Sapphire::World::Manager
 {
-  class Linkshell;
-
-  using LinkshellPtr = std::shared_ptr< Linkshell >;
 
   class LinkshellMgr
   {
@@ -27,4 +25,4 @@ namespace Sapphire
   };
 
 }
-#endif //CORE_LINKSHELLMGR_H
+#endif //SAPPHIRE_LINKSHELLMGR_H

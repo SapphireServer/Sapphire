@@ -1020,7 +1020,7 @@ void Sapphire::Entity::Player::update( int64_t currTime )
     else
     {
       auto setActorPosPacket = makeZonePacket< FFXIVIpcActorSetPos >( getId() );
-      setActorPosPacket->data().r16 = Math::Util::floatToUInt16Rot( m_queuedZoneing->m_targetRotation );
+      setActorPosPacket->data().r16 = Util::floatToUInt16Rot( m_queuedZoneing->m_targetRotation );
       setActorPosPacket->data().waitForLoad = 0x04;
       setActorPosPacket->data().x = targetPos.x;
       setActorPosPacket->data().y = targetPos.y;
@@ -1064,8 +1064,8 @@ void Sapphire::Entity::Player::update( int64_t currTime )
             range = 25;
 
 
-          if( Math::Util::distance( getPos().x, getPos().y, getPos().z,
-                                    actor->getPos().x, actor->getPos().y, actor->getPos().z ) <= range )
+          if( Util::distance( getPos().x, getPos().y, getPos().z,
+                              actor->getPos().x, actor->getPos().y, actor->getPos().z ) <= range )
           {
 
             if( ( currTime - m_lastAttack ) > mainWeap->getDelay() )
@@ -1438,7 +1438,7 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
   if( getClass() == ClassJob::Machinist || getClass() == ClassJob::Bard || getClass() == ClassJob::Archer )
   {
     auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 8 );
-    effectPacket->setRotation( Math::Util::floatToUInt16Rot( getRot() ) );
+    effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
 
     Server::EffectEntry entry;
     entry.value = damage;
@@ -1452,7 +1452,7 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
   else
   {
     auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 7 );
-    effectPacket->setRotation( Math::Util::floatToUInt16Rot( getRot() ) );
+    effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
 
     Server::EffectEntry entry;
     entry.value = damage;

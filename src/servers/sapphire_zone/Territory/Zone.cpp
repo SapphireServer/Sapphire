@@ -57,7 +57,8 @@ Sapphire::Zone::Zone() :
 {
 }
 
-Sapphire::Zone::Zone( uint16_t territoryTypeId, uint32_t guId, const std::string& internalName, const std::string& placeName ) :
+Sapphire::Zone::Zone( uint16_t territoryTypeId, uint32_t guId,
+                      const std::string& internalName, const std::string& placeName ) :
   m_currentWeather( Weather::FairSkies ),
   m_nextEObjId( 0x400D0000 )
 {
@@ -278,7 +279,7 @@ void Sapphire::Zone::removeActor( Entity::ActorPtr pActor )
 }
 
 void Sapphire::Zone::queuePacketForRange( Entity::Player& sourcePlayer, uint32_t range,
-                                      Network::Packets::FFXIVPacketBasePtr pPacketEntry )
+                                          Network::Packets::FFXIVPacketBasePtr pPacketEntry )
 {
   auto pTeriMgr = g_fw.get< TerritoryMgr >();
   if( pTeriMgr->isPrivateTerritory( getTerritoryTypeId() ) )
@@ -288,12 +289,8 @@ void Sapphire::Zone::queuePacketForRange( Entity::Player& sourcePlayer, uint32_t
   for( auto entry : m_playerMap )
   {
     auto player = entry.second;
-    float distance = Math::Util::distance( sourcePlayer.getPos().x,
-                                           sourcePlayer.getPos().y,
-                                           sourcePlayer.getPos().z,
-                                           player->getPos().x,
-                                           player->getPos().y,
-                                           player->getPos().z );
+    float distance = Util::distance( sourcePlayer.getPos().x, sourcePlayer.getPos().y, sourcePlayer.getPos().z,
+                                     player->getPos().x, player->getPos().y, player->getPos().z );
 
     if( ( distance < range ) && sourcePlayer.getId() != player->getId() )
     {
@@ -307,8 +304,8 @@ void Sapphire::Zone::queuePacketForRange( Entity::Player& sourcePlayer, uint32_t
 }
 
 void Sapphire::Zone::queuePacketForZone( Entity::Player& sourcePlayer,
-                                     Network::Packets::FFXIVPacketBasePtr pPacketEntry,
-                                     bool forSelf )
+                                         Network::Packets::FFXIVPacketBasePtr pPacketEntry,
+                                         bool forSelf )
 {
   auto pTeriMgr = g_fw.get< TerritoryMgr >();
   if( pTeriMgr->isPrivateTerritory( getTerritoryTypeId() ) )
@@ -648,8 +645,8 @@ void Sapphire::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
     if( !pCurAct || pCurAct == pActor )
       continue;
 
-    float distance = Math::Util::distance( pCurAct->getPos().x, pCurAct->getPos().y, pCurAct->getPos().z,
-                                           pActor->getPos().x, pActor->getPos().y, pActor->getPos().z );
+    float distance = Util::distance( pCurAct->getPos().x, pCurAct->getPos().y, pCurAct->getPos().z,
+                                     pActor->getPos().x, pActor->getPos().y, pActor->getPos().z );
 
     bool isInRange = ( fRange == 0.0f || distance <= fRange );
     bool isInRangeSet = pActor->isInRangeSet( pCurAct );
@@ -750,8 +747,8 @@ uint32_t Sapphire::Zone::getNextEObjId()
 }
 
 Sapphire::Entity::EventObjectPtr Sapphire::Zone::registerEObj( const std::string& name, uint32_t objectId, uint32_t mapLink,
-                                                       uint8_t state, FFXIVARR_POSITION3 pos, float scale,
-                                                       float rotation )
+                                                               uint8_t state, FFXIVARR_POSITION3 pos, float scale,
+                                                               float rotation )
 {
   auto eObj = Entity::make_EventObject( getNextEObjId(), objectId, mapLink, state, pos, rotation, name );
   eObj->setScale( scale );
