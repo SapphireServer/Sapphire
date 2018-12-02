@@ -446,6 +446,29 @@ void Sapphire::World::Manager::TerritoryMgr::updateTerritoryInstances( uint32_t 
   {
     zone->update( currentTime );
   }
+
+  auto pLog = g_fw.get< Logger >();
+
+  // remove internal house zones with nobody in them
+  for( auto it = m_landIdentToZonePtrMap.begin(); it != m_landIdentToZonePtrMap.end(); )
+  {
+    auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( it->second );
+    assert( zone ); // wtf??
+
+    auto diff = std::difftime( currentTime, zone->getLastActivityTime() );
+
+    // todo: make this timeout configurable, though should be pretty relaxed in any case
+    if( diff > 60 )
+    {
+      pLog->info( "Removing HousingInteriorTerritory#" + std::to_string( zone->getGuId() ) + " - has been inactive for 60 seconds" );
+
+      // remove zone from maps
+      m_zoneSet.erase( zone );
+      it = m_landIdentToZonePtrMap.erase( it );
+    }
+    else
+      it++;
+  }
 }
 
 Sapphire::World::Manager::TerritoryMgr::InstanceIdList Sapphire::World::Manager::TerritoryMgr::getInstanceContentIdList( uint16_t instanceContentId ) const
