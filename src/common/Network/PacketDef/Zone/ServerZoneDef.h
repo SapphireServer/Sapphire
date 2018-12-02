@@ -1830,6 +1830,21 @@ struct FFXIVIpcDuelChallenge :
   char otherName[32];
 };
 
+struct FFXIVIpcMarketBoardItemSummaryListResponse :
+  FFXIVIpcBasePacket< MarketBoardItemSummaryListResponse >
+{
+    struct MarketBoardItemSummary
+    {
+        uint32_t itemId;
+        uint32_t quantity;
+    } items[20];
+
+    uint32_t itemIndexEnd;
+    uint32_t padding1;
+    uint32_t itemIndexStart;
+    uint32_t padding2;
+};
+
 
 } /* Server */
 } /* Packets */

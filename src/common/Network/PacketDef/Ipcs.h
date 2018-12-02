@@ -97,10 +97,12 @@ namespace Sapphire::Network::Packets
     ReqMoogleMailLetter = 0x011A, // updated 4.4
     MailLetterNotification = 0x011B, // updated 4.4
 
-    ExamineFreeCompanyInfo = 0x013A, // updated 4.1
+    MarketBoardItemSummaryListResponse = 0x0125, // updated 4.4
+
     CharaFreeCompanyTag = 0x0127, // updated 4.4
     FreeCompanyBoardMsg = 0x0128, // updated 4.4
     FreeCompanyInfo = 0x0129, // updated 4.4
+    ExamineFreeCompanyInfo = 0x013A, // updated 4.1
 
     StatusEffectList = 0x0149, // updated 4.4
     Effect = 0x014C, // updated 4.4
@@ -257,6 +259,8 @@ namespace Sapphire::Network::Packets
     PlayerSearchHandler = 0x00E2, // updated 4.2
 
     LinkshellListHandler = 0x00F4, // updated 4.3
+
+    MarketBoardRequestItemListings = 0x00FE, // updated 4.4
 
     SearchMarketboard = 0x0103, // updated 4.3
     ReqExamineFcInfo = 0x010F, // updated 4.1
