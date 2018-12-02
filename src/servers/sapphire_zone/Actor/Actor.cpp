@@ -268,12 +268,8 @@ Sapphire::Entity::ActorPtr Sapphire::Entity::Actor::getClosestActor()
 
   for( const auto& pCurAct : m_inRangeActor )
   {
-    float distance = Math::Util::distance( getPos().x,
-                                           getPos().y,
-                                           getPos().z,
-                                           pCurAct->getPos().x,
-                                           pCurAct->getPos().y,
-                                           pCurAct->getPos().z );
+    float distance = Util::distance( getPos().x, getPos().y, getPos().z,
+                                     pCurAct->getPos().x, pCurAct->getPos().y, pCurAct->getPos().z );
 
     if( distance < minDistance )
     {

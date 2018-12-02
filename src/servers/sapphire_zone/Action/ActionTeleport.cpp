@@ -87,7 +87,7 @@ void Sapphire::Action::ActionTeleport::onFinish()
   pPlayer->setZoningType( ZoneingType::Teleport );
 
   auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pPlayer->getId(), 5 );
-  effectPacket->setRotation( Math::Util::floatToUInt16Rot( pPlayer->getRot() ) );
+  effectPacket->setRotation( Util::floatToUInt16Rot( pPlayer->getRot() ) );
 
 
   pPlayer->sendToInRangeSet( effectPacket, true );

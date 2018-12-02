@@ -137,7 +137,7 @@ void Sapphire::Entity::EventObject::spawn( Sapphire::Entity::PlayerPtr pTarget )
   eobjStatePacket->data().scale = getScale();
   eobjStatePacket->data().actorId = getId();
   eobjStatePacket->data().housingLink = getHousingLink();
-  eobjStatePacket->data().rotation = Math::Util::floatToUInt16Rot( getRot() );
+  eobjStatePacket->data().rotation = Util::floatToUInt16Rot( getRot() );
   pTarget->queuePacket( eobjStatePacket );
 }
 

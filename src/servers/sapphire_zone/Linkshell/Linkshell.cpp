@@ -1,6 +1,5 @@
 #include "Linkshell.h"
 
-
 Sapphire::Linkshell::Linkshell( uint64_t id,
                             const std::string& name,
                             uint64_t masterId,

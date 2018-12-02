@@ -239,7 +239,7 @@ position
 bool Sapphire::Entity::Chara::face( const Common::FFXIVARR_POSITION3& p )
 {
   float oldRot = getRot();
-  float rot = Math::Util::calcAngFrom( getPos().x, getPos().z, p.x, p.z );
+  float rot = Util::calcAngFrom( getPos().x, getPos().z, p.x, p.z );
   float newRot = PI - rot + ( PI / 2 );
 
   m_pCell = nullptr;
@@ -403,7 +403,7 @@ void Sapphire::Entity::Chara::autoAttack( CharaPtr pTarget )
     uint32_t variation = static_cast< uint32_t >( 0 + rand() % 4 );
 
     auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 0x336 );
-    effectPacket->setRotation( Math::Util::floatToUInt16Rot( getRot() ) );
+    effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
 
     Server::EffectEntry effectEntry{};
     effectEntry.value = damage;
@@ -443,7 +443,7 @@ void Sapphire::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionI
   // Prepare packet. This is seemingly common for all packets in the action handler.
 
   auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), target.getId(), actionId );
-  effectPacket->setRotation( Math::Util::floatToUInt16Rot( getRot() ) );
+  effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
 
   // Todo: for each actor, calculate how much damage the calculated value should deal to them - 2-step damage calc. we only have 1-step
   switch( type )

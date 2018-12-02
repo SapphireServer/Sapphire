@@ -1,18 +1,17 @@
 #include <Logging/Logger.h>
 #include <Database/DatabaseDef.h>
 
-#include "Linkshell.h"
+#include "Linkshell/Linkshell.h"
 #include "Framework.h"
 #include "LinkshellMgr.h"
 
 extern Sapphire::Framework g_fw;
 
-Sapphire::LinkshellMgr::LinkshellMgr()
+Sapphire::World::Manager::LinkshellMgr::LinkshellMgr()
 {
-
 }
 
-bool Sapphire::LinkshellMgr::loadLinkshells()
+bool Sapphire::World::Manager::LinkshellMgr::loadLinkshells()
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto res = pDb->query( "SELECT LinkshellId, MasterCharacterId, CharacterIdList, "
@@ -61,7 +60,7 @@ bool Sapphire::LinkshellMgr::loadLinkshells()
 
 }
 
-Sapphire::LinkshellPtr Sapphire::LinkshellMgr::getLinkshellByName( const std::string& name )
+Sapphire::LinkshellPtr Sapphire::World::Manager::LinkshellMgr::getLinkshellByName( const std::string& name )
 {
   auto it = m_linkshellNameMap.find( name );
   if( it == m_linkshellNameMap.end() )
@@ -70,7 +69,7 @@ Sapphire::LinkshellPtr Sapphire::LinkshellMgr::getLinkshellByName( const std::st
     return it->second;
 }
 
-Sapphire::LinkshellPtr Sapphire::LinkshellMgr::getLinkshellById( uint64_t lsId )
+Sapphire::LinkshellPtr Sapphire::World::Manager::LinkshellMgr::getLinkshellById( uint64_t lsId )
 {
   auto it = m_linkshellIdMap.find( lsId );
   if( it == m_linkshellIdMap.end() )

@@ -22,9 +22,10 @@
 #include "Session.h"
 
 #include "Manager/TerritoryMgr.h"
+#include "Manager/LinkshellMgr.h"
 
 #include "Script/ScriptMgr.h"
-#include "Linkshell/LinkshellMgr.h"
+
 
 extern Sapphire::Framework g_fw;
 

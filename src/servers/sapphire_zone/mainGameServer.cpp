@@ -7,7 +7,7 @@
 #include "Script/ScriptMgr.h"
 #include <Database/ZoneDbConnection.h>
 #include <Database/DbWorkerPool.h>
-#include "Linkshell/LinkshellMgr.h"
+#include "Manager/LinkshellMgr.h"
 #include "Manager/TerritoryMgr.h"
 #include "Manager/HousingMgr.h"
 #include "DebugCommand/DebugCommandHandler.h"
@@ -28,13 +28,13 @@ bool setupFramework()
   auto pExdData = std::make_shared< Data::ExdDataGenerated >();
   auto pScript = std::make_shared< Scripting::ScriptMgr >();
   auto pDb = std::make_shared< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  auto pLsMgr = std::make_shared< LinkshellMgr >();
-  auto pHousingMgr = std::make_shared< Manager::HousingMgr >();
-  auto pTeriMgr = std::make_shared< Manager::TerritoryMgr >();
   auto pDebugCom = std::make_shared< DebugCommandHandler >();
   auto pConfig = std::make_shared< ConfigMgr >();
   auto pPlayerMgr = std::make_shared< Manager::PlayerMgr >();
   auto pShopMgr = std::make_shared< Manager::ShopMgr >();
+  auto pLsMgr = std::make_shared< Manager::LinkshellMgr >();
+  auto pTeriMgr = std::make_shared< Manager::TerritoryMgr >();
+  auto pHousingMgr = std::make_shared< Manager::HousingMgr >();
 
   pLogger->setLogPath( "log/SapphireZone" );
   pLogger->init();
@@ -44,7 +44,7 @@ bool setupFramework()
   g_fw.set< Data::ExdDataGenerated >( pExdData );
   g_fw.set< Scripting::ScriptMgr >( pScript );
   g_fw.set< Db::DbWorkerPool< Db::ZoneDbConnection > >( pDb );
-  g_fw.set< LinkshellMgr >( pLsMgr );
+  g_fw.set< Manager::LinkshellMgr >( pLsMgr );
   g_fw.set< Manager::HousingMgr >( pHousingMgr );
   g_fw.set< Manager::TerritoryMgr >( pTeriMgr );
   g_fw.set< DebugCommandHandler >( pDebugCom );
