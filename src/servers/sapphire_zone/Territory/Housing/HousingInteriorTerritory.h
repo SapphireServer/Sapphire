@@ -18,7 +18,10 @@ namespace Sapphire::World::Territory::Housing
     void onPlayerZoneIn( Entity::Player& player ) override;
     void onUpdate( uint32_t currTime ) override;
 
+    uint32_t getLastActivityTime() const;
+
   private:
     Common::LandIdent m_landIdent;
+    uint32_t m_lastActivityTime;
   };
 }

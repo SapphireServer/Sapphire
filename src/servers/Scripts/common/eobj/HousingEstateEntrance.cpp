@@ -35,6 +35,7 @@ public:
       ident.landId = eobj.getHousingLink() >> 8;
       ident.territoryTypeId = zone->getTerritoryTypeId();
       ident.wardNum = zone->getWardNum();
+      ident.worldId = 67;
 
       auto internalZone = terriMgr->findOrCreateHousingInterior( ident );
       if( internalZone )
