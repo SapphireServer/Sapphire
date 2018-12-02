@@ -332,21 +332,22 @@ bool Sapphire::Land::setPreset( uint32_t itemId )
     m_pHouse = make_House( newId, getLandSetId(), getLandId(), getWardNum(), getTerritoryTypeId() );
   }
 
+
   getHouse()->setHousePart( Common::HousePartSlot::ExteriorRoof, convertItemIdToHousingItemId( housingPreset->exteriorRoof ) );
   getHouse()->setHousePart( Common::HousePartSlot::ExteriorWall, convertItemIdToHousingItemId( housingPreset->exteriorWall ) );
   getHouse()->setHousePart( Common::HousePartSlot::ExteriorWindow, convertItemIdToHousingItemId( housingPreset->exteriorWindow ) );
   getHouse()->setHousePart( Common::HousePartSlot::ExteriorDoor, convertItemIdToHousingItemId( housingPreset->exteriorDoor ) );
 
-  getHouse()->setHouseInteriorPart(Common::HousingInteriorSlot::InteriorWall, convertItemIdToHousingItemId( housingPreset->interiorWall ) );
-  getHouse()->setHouseInteriorPart(Common::HousingInteriorSlot::InteriorFloor, convertItemIdToHousingItemId( housingPreset->interiorFlooring ) );
-  getHouse()->setHouseInteriorPart(Common::HousingInteriorSlot::InteriorLight, convertItemIdToHousingItemId( housingPreset->interiorLighting ) );
-  getHouse()->setHouseInteriorPart(Common::HousingInteriorSlot::InteriorWall_Attic, convertItemIdToHousingItemId( housingPreset->otherFloorWall ) );
-  getHouse()->setHouseInteriorPart(Common::HousingInteriorSlot::InteriorFloor_Attic, convertItemIdToHousingItemId( housingPreset->otherFloorFlooring ) );
-  getHouse()->setHouseInteriorPart(Common::HousingInteriorSlot::InteriorLight_Attic, convertItemIdToHousingItemId( housingPreset->otherFloorLighting ) );
-  getHouse()->setHouseInteriorPart(Common::HousingInteriorSlot::InteriorWall_Basement, convertItemIdToHousingItemId( housingPreset->basementWall ) );
-  getHouse()->setHouseInteriorPart(Common::HousingInteriorSlot::InteriorFloor_Basement, convertItemIdToHousingItemId( housingPreset->basementFlooring ) );
-  getHouse()->setHouseInteriorPart(Common::HousingInteriorSlot::InteriorLight_Basement, convertItemIdToHousingItemId( housingPreset->basementLighting ) );
-  getHouse()->setHouseInteriorPart(Common::HousingInteriorSlot::InteriorLight_Mansion, convertItemIdToHousingItemId( housingPreset->mansionLighting ) );
+  getHouse()->setHouseInteriorPart( Common::HousingInteriorSlot::InteriorWall, convertItemIdToHousingItemId( housingPreset->interiorWall ) );
+  getHouse()->setHouseInteriorPart( Common::HousingInteriorSlot::InteriorFloor, convertItemIdToHousingItemId( housingPreset->interiorFlooring ) );
+  getHouse()->setHouseInteriorPart( Common::HousingInteriorSlot::InteriorLight, convertItemIdToHousingItemId( housingPreset->interiorLighting ) );
+  getHouse()->setHouseInteriorPart( Common::HousingInteriorSlot::InteriorWall_Attic, convertItemIdToHousingItemId( housingPreset->otherFloorWall ) );
+  getHouse()->setHouseInteriorPart( Common::HousingInteriorSlot::InteriorFloor_Attic, convertItemIdToHousingItemId( housingPreset->otherFloorFlooring ) );
+  getHouse()->setHouseInteriorPart( Common::HousingInteriorSlot::InteriorLight_Attic, convertItemIdToHousingItemId( housingPreset->otherFloorLighting ) );
+  getHouse()->setHouseInteriorPart( Common::HousingInteriorSlot::InteriorWall_Basement, convertItemIdToHousingItemId( housingPreset->basementWall ) );
+  getHouse()->setHouseInteriorPart( Common::HousingInteriorSlot::InteriorFloor_Basement, convertItemIdToHousingItemId( housingPreset->basementFlooring ) );
+  getHouse()->setHouseInteriorPart( Common::HousingInteriorSlot::InteriorLight_Basement, convertItemIdToHousingItemId( housingPreset->basementLighting ) );
+  getHouse()->setHouseInteriorPart( Common::HousingInteriorSlot::InteriorLight_Mansion, convertItemIdToHousingItemId( housingPreset->mansionLighting ) );
 
 
   return true;

@@ -55,10 +55,10 @@ Sapphire::House::House( uint32_t houseId, uint32_t landSetId, uint8_t landId, ui
 
     auto houseInteriorModels = res->getBlobVector( "HouseInteriorModels" );
 
-    models = reinterpret_cast<uint32_t*>( &houseInteriorModels[0] );
+    auto interiorModels = reinterpret_cast< uint32_t* >( &houseInteriorModels[ 0 ] );
     for( auto i = 0; i < 10; i++ )
     {
-      m_houseInteriorParts[ i ] = houseInteriorModels[ i ];
+      m_houseInteriorParts[ i ] = interiorModels[ i ];
     }
   }
 }
