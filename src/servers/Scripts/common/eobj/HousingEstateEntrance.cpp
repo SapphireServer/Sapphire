@@ -45,7 +45,13 @@ public:
       if( result.param2 != 1 )
         return;
 
-      // param2 == 1, zone into instance
+      if( result.param2 == 1 )
+      {
+        //player.eventFinish( 131148, 0 );
+        //player.eventFinish( this->getId(), 1 );
+        player.setPos( {0, 0, 0} );
+        player.setInstance( internalZone );
+      }
     } );
   }
 };

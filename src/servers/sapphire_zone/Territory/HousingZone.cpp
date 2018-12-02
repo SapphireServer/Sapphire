@@ -96,16 +96,15 @@ void Sapphire::HousingZone::onPlayerZoneIn( Entity::Player& player )
 
   for( yardPacketNum = 0; yardPacketNum < yardPacketTotal; yardPacketNum++ )
   {
-    auto landsetYardInitializePacket = makeZonePacket< FFXIVIpcLandSetYardInitialize >( player.getId() );
-    landsetYardInitializePacket->data().unknown1 = 0xFFFFFFFF;
-    landsetYardInitializePacket->data().unknown2 = 0xFFFFFFFF;
-    landsetYardInitializePacket->data().unknown3 = 0xFF;
-    landsetYardInitializePacket->data().packetNum = yardPacketNum;
-    landsetYardInitializePacket->data().packetTotal = yardPacketTotal;
+    auto housingObjectInitializPacket = makeZonePacket< FFXIVIpcHousingObjectInitialize >( player.getId() );
+    memset( &housingObjectInitializPacket->data().landIdent, 0xFF, sizeof( Common::LandIdent ) );
+    housingObjectInitializPacket->data().u1 = 0xFF;
+    housingObjectInitializPacket->data().packetNum = yardPacketNum;
+    housingObjectInitializPacket->data().packetTotal = yardPacketTotal;
 
     //TODO: Add Objects here
 
-    player.queuePacket( landsetYardInitializePacket );
+    player.queuePacket( housingObjectInitializPacket );
   }
 
   auto landSetMap = makeZonePacket< FFXIVIpcLandSetMap >( player.getId() );

@@ -751,6 +751,20 @@ namespace Sapphire::Common
     YardSign
   };
 
+  enum HousingInteriorSlot
+  {
+    InteriorWall,
+    InteriorFloor,
+    InteriorLight,
+    InteriorWall_Attic,
+    InteriorFloor_Attic,
+    InteriorLight_Attic,
+    InteriorWall_Basement,
+    InteriorFloor_Basement,
+    InteriorLight_Basement,
+    InteriorLight_Mansion
+  };
+
   enum HouseTagSlot
   {
     MainTag,
