@@ -411,7 +411,13 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
     }
     case ClientTriggerType::RequestHousingItemUI:
     {
-      uint8_t ward = ( param12 & 0xFF00 ) >> 8;
+      // close ui
+      if( param11 == 1 )
+        break;
+
+      // param12 is 0 when inside a house
+
+      uint8_t ward = ( param12 >> 16 ) & 0xFF;
       uint8_t plot = ( param12 & 0xFF );
       auto pShowHousingItemUIPacket = makeActorControl142( player.getId(), ShowHousingItemUI, 0, plot );
 

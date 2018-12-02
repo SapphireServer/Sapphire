@@ -5,6 +5,7 @@
 #include <Manager/HousingMgr.h>
 #include <Network/PacketWrappers/ActorControlPacket143.h>
 #include <Network/CommonActorControl.h>
+#include <Exd/ExdDataGenerated.h>
 #include "Framework.h"
 
 
@@ -47,37 +48,32 @@ public:
           {
             auto screenMsgPkt = makeActorControl143( player.getId(), ActorControl::DutyQuestScreenMsg, m_id, 0x98 );
             player.queuePacket( screenMsgPkt );
-            auto screenMsgPkt2 = makeActorControl143( player.getId(), ActorControl::LogMsg, 0x0D16, 0x1AA,
-                                                      activeLand.ward + 1, activeLand.plot + 1 );
-            player.queuePacket( screenMsgPkt2 );
+
+            player.sendLogMessage( 0x0D16, pTerritory->getTerritoryTypeInfo()->placeName, activeLand.ward + 1, activeLand.plot + 1 );
             break;
           }
 
           case LandPurchaseResult::ERR_NOT_ENOUGH_GIL:
           {
-            auto errorMsg = makeActorControl143( player.getId(), ActorControl::LogMsg, 3314 );
-            player.queuePacket( errorMsg );
+            player.sendLogMessage( 3314 );
             break;
           }
 
           case LandPurchaseResult::ERR_NOT_AVAILABLE:
           {
-            auto errorMsg = makeActorControl143( player.getId(), ActorControl::LogMsg, 3312 );
-            player.queuePacket( errorMsg );
+            player.sendLogMessage( 3312 );
             break;
           }
 
           case LandPurchaseResult::ERR_NO_MORE_LANDS_FOR_CHAR:
           {
-            auto errorMsg = makeActorControl143( player.getId(), ActorControl::LogMsg, 3313 );
-            player.queuePacket( errorMsg );
+            player.sendLogMessage( 3313 );
             break;
           }
 
           case LandPurchaseResult::ERR_INTERNAL:
           {
-            auto errorMsg = makeActorControl143( player.getId(), ActorControl::LogMsg, 1995 );
-            player.queuePacket( errorMsg );
+            player.sendLogMessage( 1995 );
             break;
           }
         }

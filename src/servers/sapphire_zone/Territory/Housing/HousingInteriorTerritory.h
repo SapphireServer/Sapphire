@@ -6,7 +6,7 @@ namespace Sapphire::World::Territory::Housing
   class HousingInteriorTerritory : public Zone
   {
   public:
-    HousingInteriorTerritory( uint64_t ident, uint16_t territoryTypeId,
+    HousingInteriorTerritory( Common::LandIdent ident, uint16_t territoryTypeId,
                               uint32_t guId,
                               const std::string& internalName,
                               const std::string& contentName );
@@ -18,7 +18,10 @@ namespace Sapphire::World::Territory::Housing
     void onPlayerZoneIn( Entity::Player& player ) override;
     void onUpdate( uint32_t currTime ) override;
 
+    uint32_t getLastActivityTime() const;
+
   private:
-    uint64_t m_landIdent;
+    Common::LandIdent m_landIdent;
+    uint32_t m_lastActivityTime;
   };
 }

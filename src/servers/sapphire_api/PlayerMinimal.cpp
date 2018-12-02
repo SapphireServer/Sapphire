@@ -64,7 +64,7 @@ void PlayerMinimal::load( uint32_t charId )
   m_guardianDeity = res->getUInt8( "GuardianDeity" );
   m_class = res->getUInt8( "Class" );
   m_contentId = res->getUInt64( "ContentId" );
-  m_zoneId = res->getUInt16( "TerritoryType" );
+  m_territoryTypeId = res->getUInt16( "TerritoryType" );
 
   res.reset();
 

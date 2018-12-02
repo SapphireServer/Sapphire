@@ -30,7 +30,7 @@ namespace Sapphire::Entity
     /*! Type of the actor */
     Common::ObjKind m_objKind;
     /*! Id of the zone the actor currently is in */
-    uint32_t m_zoneId;
+    uint32_t m_territoryTypeId;
     /*! Ptr to the ZoneObj the actor belongs to */
     ZonePtr m_pCurrentZone;
 

@@ -1704,16 +1704,26 @@ struct FFXIVIpcYardObjectMove : FFXIVIpcBasePacket<YardObjectMove>
   uint16_t unknown3;
 };
 
-struct FFXIVIpcLandSetYardInitialize : FFXIVIpcBasePacket< LandSetYardInitialize >
+struct FFXIVIpcHousingObjectInitialize : FFXIVIpcBasePacket< HousingObjectInitialize >
 {
-  uint32_t unknown1; //always 0xFFFFFFFF
-  uint32_t unknown2; //always 0xFFFFFFFF
-  uint8_t unknown3; //always 0xFF
+  Common::LandIdent landIdent;
+  int8_t u1; //Outdoor -1 / Indoor 0 - probably indicator
   uint8_t packetNum;
-  uint16_t packetTotal;
+  uint8_t packetTotal;
+  uint8_t u2; //Outdoor 0 / Indoor 100(?)
   Common::YardObject object[100];
   uint32_t unknown4; //unused
 };
+
+struct FFXIVIpcHousingIndoorInitialize : FFXIVIpcBasePacket< HousingIndoorInitialize >
+{
+  uint16_t u1;
+  uint16_t u2;
+  uint16_t u3;
+  uint16_t u4;
+  uint32_t indoorItems[10];
+};
+
 
 struct FFXIVIpcHousingWardInfo : FFXIVIpcBasePacket< HousingWardInfo >
 {
@@ -1818,6 +1828,52 @@ struct FFXIVIpcDuelChallenge :
   uint32_t otherActorId;
 
   char otherName[32];
+};
+
+struct FFXIVIpcMarketBoardSearchResult :
+  FFXIVIpcBasePacket< MarketBoardSearchResult >
+{
+    struct MarketBoardItem
+    {
+        uint32_t itemCatalogId;
+        uint32_t quantity;
+    } items[20];
+
+    uint32_t itemIndexEnd;
+    uint32_t padding1;
+    uint32_t itemIndexStart;
+    uint32_t padding2;
+};
+
+struct FFFXIVIpcMarketBoardItemListingCount :
+  FFXIVIpcBasePacket< MarketBoardItemListingCount >
+{
+    uint32_t itemCatalogId;
+    uint32_t unknown1; // does some shit if nonzero
+    uint16_t unknown2;
+    uint16_t quantity; // high/low u8s read separately?
+    uint32_t padding3;
+};
+
+struct FFXIVIpcMarketBoardItemListingHistory :
+  FFXIVIpcBasePacket< MarketBoardItemListingHistory >
+{
+    uint32_t itemCatalogId;
+    uint32_t itemCatalogId2;
+
+    struct MarketListing
+    {
+        uint32_t salePrice;
+        time_t purchaseTime;
+        uint32_t quantity;
+        uint16_t unknown1;
+        uint8_t unknown2;
+
+        char sellerName[32];
+
+        uint8_t unknown3;
+        uint32_t itemCatalogId;
+    } listing[20];
 };
 
 
