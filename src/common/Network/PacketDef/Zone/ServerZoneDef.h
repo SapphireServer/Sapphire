@@ -1830,8 +1830,8 @@ struct FFXIVIpcDuelChallenge :
   char otherName[32];
 };
 
-struct FFXIVIpcMarketBoardSearchResultResponse :
-  FFXIVIpcBasePacket< MarketBoardSearchResultResponse >
+struct FFXIVIpcMarketBoardSearchResult :
+  FFXIVIpcBasePacket< MarketBoardSearchResult >
 {
     struct MarketBoardItem
     {
@@ -1845,14 +1845,35 @@ struct FFXIVIpcMarketBoardSearchResultResponse :
     uint32_t padding2;
 };
 
-struct FFFXIVIpcMarketBoardItemListingCountResponse :
-  FFXIVIpcBasePacket< MarketBoardItemListingCountResponse >
+struct FFFXIVIpcMarketBoardItemListingCount :
+  FFXIVIpcBasePacket< MarketBoardItemListingCount >
 {
     uint32_t itemCatalogId;
     uint32_t unknown1; // does some shit if nonzero
     uint16_t unknown2;
     uint16_t quantity; // high/low u8s read separately?
     uint32_t padding3;
+};
+
+struct FFXIVIpcMarketBoardItemListingHistory :
+  FFXIVIpcBasePacket< MarketBoardItemListingHistory >
+{
+    uint32_t itemCatalogId;
+    uint32_t itemCatalogId2;
+
+    struct MarketListing
+    {
+        uint32_t salePrice;
+        time_t purchaseTime;
+        uint32_t quantity;
+        uint16_t unknown1;
+        uint8_t unknown2;
+
+        char sellerName[32];
+
+        uint8_t unknown3;
+        uint32_t itemCatalogId;
+    } listing[20];
 };
 
 
