@@ -32,7 +32,7 @@ Sapphire::HousingZone::HousingZone( uint8_t wardNum,
                                 const std::string& contentName ) :
   Zone( territoryTypeId, guId, internalName, contentName ),
   m_wardNum( wardNum ),
-  m_zoneId( territoryTypeId ),
+  m_territoryTypeId( territoryTypeId ),
   m_landSetId( ( static_cast< uint32_t >( territoryTypeId ) << 16 ) | wardNum )
 {
 
@@ -49,13 +49,13 @@ bool Sapphire::HousingZone::init()
   }
 
   int housingIndex;
-  if( m_zoneId == 339 )
+  if( m_territoryTypeId == 339 )
     housingIndex = 0;
-  else if( m_zoneId == 340 )
+  else if( m_territoryTypeId == 340 )
     housingIndex = 1;
-  else if( m_zoneId == 341 )
+  else if( m_territoryTypeId == 341 )
     housingIndex = 2;
-  else if( m_zoneId == 641 )
+  else if( m_territoryTypeId == 641 )
     housingIndex = 3;
 
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
