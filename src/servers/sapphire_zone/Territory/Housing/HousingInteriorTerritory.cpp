@@ -35,7 +35,7 @@ Housing::HousingInteriorTerritory::HousingInteriorTerritory( Common::LandIdent i
   Zone( territoryTypeId, guId, internalName, contentName ),
   m_landIdent( ident )
 {
-
+  m_lastActivityTime = static_cast< uint32_t >( Util::getTimeSeconds() );
 }
 
 Housing::HousingInteriorTerritory::~HousingInteriorTerritory()
@@ -79,22 +79,27 @@ void Housing::HousingInteriorTerritory::onPlayerZoneIn( Entity::Player& player )
 
   for( yardPacketNum = 0; yardPacketNum < yardPacketTotal; yardPacketNum++ )
   {
-    auto housingObjectInitializPacket = makeZonePacket< FFXIVIpcHousingObjectInitialize >( player.getId() );
-    memcpy( &housingObjectInitializPacket->data().landIdent, &m_landIdent, sizeof( Common::LandIdent ) );
-    housingObjectInitializPacket->data().landIdent.worldId = 67;
-    housingObjectInitializPacket->data().u1 = 0;
-    housingObjectInitializPacket->data().u2 = 100;
-    housingObjectInitializPacket->data().packetNum = yardPacketNum;
-    housingObjectInitializPacket->data().packetTotal = yardPacketTotal;
+    auto objectInitPacket = makeZonePacket< FFXIVIpcHousingObjectInitialize >( player.getId() );
+    memcpy( &objectInitPacket->data().landIdent, &m_landIdent, sizeof( Common::LandIdent ) );
+    objectInitPacket->data().u1 = 0;
+    objectInitPacket->data().u2 = 100;
+    objectInitPacket->data().packetNum = yardPacketNum;
+    objectInitPacket->data().packetTotal = yardPacketTotal;
 
     //TODO: Add Objects here
 
-    player.queuePacket( housingObjectInitializPacket );
+    player.queuePacket( objectInitPacket );
   }
 
 }
 
 void Housing::HousingInteriorTerritory::onUpdate( uint32_t currTime )
 {
+  if( m_playerMap.size() > 0 )
+    m_lastActivityTime = currTime;
+}
 
+uint32_t Housing::HousingInteriorTerritory::getLastActivityTime() const
+{
+  return m_lastActivityTime;
 }
