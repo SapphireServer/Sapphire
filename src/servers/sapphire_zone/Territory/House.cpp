@@ -48,10 +48,17 @@ Sapphire::House::House( uint32_t houseId, uint32_t landSetId, uint8_t landId, ui
     auto housePartColours = res->getBlobVector( "HousePartColours" );
 
     auto models = reinterpret_cast< uint32_t* >( &housePartModels[ 0 ] );
-
     for( auto i = 0; i < 8; i++ )
     {
       m_houseParts[ i ] = { models[ i ], housePartColours[ i ] };
+    }
+
+    auto houseInteriorModels = res->getBlobVector( "HouseInteriorModels" );
+
+    models = reinterpret_cast<uint32_t*>( &houseInteriorModels[0] );
+    for( auto i = 0; i < 10; i++ )
+    {
+      m_houseInteriorParts[ i ] = houseInteriorModels[ i ];
     }
   }
 }
@@ -67,7 +74,7 @@ void Sapphire::House::updateHouseDb()
   // BuildTime = 1, Aetheryte = 2, Comment = 3, HouseName = 4, Endorsements = 5,
   // HousePartModels = 6, HousePartColours = 7, HouseId = 8
   auto stmt = pDB->getPreparedStatement( Db::HOUSING_HOUSE_UP );
-  stmt->setUInt( 8, m_houseId );
+  stmt->setUInt( 9, m_houseId );
 
   stmt->setInt64( 1, m_buildTime );
   stmt->setInt( 2, 0 );
@@ -93,6 +100,18 @@ void Sapphire::House::updateHouseDb()
 
   stmt->setBinary( 6, tmpModels );
   stmt->setBinary( 7, colours );
+
+  models.clear();
+
+  for( auto i = 0; i < 10; i++ )
+  {
+    models.push_back( m_houseInteriorParts[ i ] );
+  }
+
+  std::vector< uint8_t > tmp2Models( models.size() * 4 );
+  memcpy( tmp2Models.data(), models.data(), tmp2Models.size() );
+
+  stmt->setBinary( 8, tmp2Models );
 
   pDB->execute( stmt );
 }
@@ -127,6 +146,11 @@ uint8_t Sapphire::House::getHousePartColor( Common::HousePartSlot slot ) const
   return m_houseParts[ slot ].second;
 }
 
+uint32_t Sapphire::House::getHouseInteriorPart( Common::HousingInteriorSlot slot ) const
+{
+  return m_houseInteriorParts[ slot ];
+}
+
 void Sapphire::House::setHousePart( Common::HousePartSlot slot, uint32_t id )
 {
   m_houseParts[ slot ].first = id;
@@ -135,6 +159,11 @@ void Sapphire::House::setHousePart( Common::HousePartSlot slot, uint32_t id )
 void Sapphire::House::setHousePartColor( Common::HousePartSlot slot, uint32_t id )
 {
   m_houseParts[ slot ].second = id;
+}
+
+void Sapphire::House::setHouseInteriorPart( Common::HousingInteriorSlot slot, uint32_t id )
+{
+  m_houseInteriorParts[ slot ] = id;
 }
 
 uint32_t Sapphire::House::getHousePart( Common::HousePartSlot slot ) const

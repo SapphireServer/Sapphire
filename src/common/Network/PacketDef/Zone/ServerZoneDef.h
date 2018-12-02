@@ -1704,16 +1704,26 @@ struct FFXIVIpcYardObjectMove : FFXIVIpcBasePacket<YardObjectMove>
   uint16_t unknown3;
 };
 
-struct FFXIVIpcLandSetYardInitialize : FFXIVIpcBasePacket< LandSetYardInitialize >
+struct FFXIVIpcHousingObjectInitialize : FFXIVIpcBasePacket< HousingObjectInitialize >
 {
-  uint32_t unknown1; //always 0xFFFFFFFF
-  uint32_t unknown2; //always 0xFFFFFFFF
-  uint8_t unknown3; //always 0xFF
+  Common::LandIdent landIdent;
+  int8_t u1; //Outdoor -1 / Indoor 0 - probably indicator
   uint8_t packetNum;
-  uint16_t packetTotal;
+  uint8_t packetTotal;
+  uint8_t u2; //Outdoor 0 / Indoor 100(?)
   Common::YardObject object[100];
   uint32_t unknown4; //unused
 };
+
+struct FFXIVIpcHousingIndoorInitialize : FFXIVIpcBasePacket< HousingIndoorInitialize >
+{
+  uint16_t u1;
+  uint16_t u2;
+  uint16_t u3;
+  uint16_t u4;
+  uint32_t indoorItems[10];
+};
+
 
 struct FFXIVIpcHousingWardInfo : FFXIVIpcBasePacket< HousingWardInfo >
 {
