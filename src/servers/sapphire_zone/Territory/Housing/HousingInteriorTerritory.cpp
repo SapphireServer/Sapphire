@@ -56,26 +56,26 @@ void Housing::HousingInteriorTerritory::onPlayerZoneIn( Entity::Player& player )
     "HousingInteriorTerritory::onPlayerZoneIn: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryTypeId() ) +
     ", Entity#" + std::to_string( player.getId() ) );
 
-  auto housingIndoorInitializPacket = makeZonePacket< FFXIVIpcHousingIndoorInitialize >( player.getId() );
-  housingIndoorInitializPacket->data().u1 = 2578;
-  housingIndoorInitializPacket->data().u2 = 10;
-  housingIndoorInitializPacket->data().u3 = 530;
-  housingIndoorInitializPacket->data().u4 = 266;
+  auto indoorInitPacket = makeZonePacket< FFXIVIpcHousingIndoorInitialize >( player.getId() );
+  indoorInitPacket->data().u1 = 0;
+  indoorInitPacket->data().u2 = 0;
+  indoorInitPacket->data().u3 = 0;
+  indoorInitPacket->data().u4 = 0;
 
   auto landSetId = pHousingMgr->toLandSetId( m_landIdent.territoryTypeId, m_landIdent.wardNum );
   auto pLand = pHousingMgr->getHousingZoneByLandSetId( landSetId )->getLand( m_landIdent.landId );
   auto pHouse = pLand->getHouse();
 
+  for( auto i = 0; i < 10; i++ )
+  {
+    indoorInitPacket->data().indoorItems[ i ] = pHouse->getHouseInteriorPart( (Common::HousingInteriorSlot)i );
+  }
+
 
   uint32_t yardPacketNum;
   uint32_t yardPacketTotal = 2 + pLand->getSize();
 
-  for( auto i = 0; i < 10; i++ )
-  {
-    housingIndoorInitializPacket->data().indoorItems[ i ] = pHouse->getHouseInteriorPart( (Common::HousingInteriorSlot)i );
-  }
-
-  player.queuePacket( housingIndoorInitializPacket );
+  player.queuePacket( indoorInitPacket );
 
   for( yardPacketNum = 0; yardPacketNum < yardPacketTotal; yardPacketNum++ )
   {
