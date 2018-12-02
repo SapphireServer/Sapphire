@@ -97,8 +97,10 @@ namespace Sapphire::Network::Packets
     ReqMoogleMailLetter = 0x011A, // updated 4.4
     MailLetterNotification = 0x011B, // updated 4.4
 
-    MarketBoardItemListingCountResponse = 0x011C, // updated 4.4
-    MarketBoardSearchResultResponse = 0x0125, // updated 4.4
+    MarketBoardItemListingCount = 0x011C, // updated 4.4
+    MarketBoardItemListing = 0x011D, // updated 4.4
+    MarketBoardItemListingHistory = 0x0121, // updated 4.4
+    MarketBoardSearchResult = 0x0125, // updated 4.4
 
     CharaFreeCompanyTag = 0x0127, // updated 4.4
     FreeCompanyBoardMsg = 0x0128, // updated 4.4
@@ -262,6 +264,7 @@ namespace Sapphire::Network::Packets
     LinkshellListHandler = 0x00F4, // updated 4.3
 
     MarketBoardRequestItemListings = 0x00FE, // updated 4.4
+    MarketBoardRequestScopedItemListings = 0x00FF, // updated 4.4
 
     SearchMarketboard = 0x0103, // updated 4.3
     ReqExamineFcInfo = 0x010F, // updated 4.1
