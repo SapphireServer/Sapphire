@@ -297,7 +297,8 @@ Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::findOrCreateHousingInt
   auto housingMgr = g_fw.get< Manager::HousingMgr >();
 
   auto parentZone = std::dynamic_pointer_cast< HousingZone >(
-    getZoneByLandSetId( housingMgr->toLandSetId( landIdent.territoryTypeId, landIdent.wardNum ) ) );
+    getZoneByLandSetId( housingMgr->toLandSetId( static_cast< uint16_t >( landIdent.territoryTypeId ),
+                                                 static_cast< uint8_t >( landIdent.wardNum ) ) ) );
 
   if( !parentZone )
     return nullptr;

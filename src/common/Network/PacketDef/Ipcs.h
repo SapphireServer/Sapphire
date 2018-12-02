@@ -190,9 +190,7 @@ namespace Sapphire::Network::Packets
     LandPriceUpdate = 0x0224, // updated 4.4
     LandInfoSign = 0x0225, // updated 4.4
     LandRename = 0x0226, // updated 4.4
-
     HousingEstateGreeting = 0x0227, // updated 4.4
-
     HousingUpdateLandFlagsSlot = 0x0228, // updated 4.4
     HousingLandFlags = 0x0229, // updated 4.4
     HousingShowEstateGuestAccess = 0x022A, // updated 4.4
@@ -200,7 +198,6 @@ namespace Sapphire::Network::Packets
     HousingObjectInitialize = 0x022C, // updated 4.4
 
     HousingWardInfo = 0x022F, // updated 4.4
-
     YardObjectMove = 0x0230, // updated 4.4
 
     SharedEstateSettingsResponse = 0x023C, // updated 4.4
