@@ -233,6 +233,13 @@ struct FFXIVIpcSetSharedEstateSettings :
   /* 0029 */ char padding3[0x7];
 };
 
+struct FFXIVIpcMarketBoardRequestItemListings :
+  FFXIVIpcBasePacket< MarketBoardRequestItemListings >
+{
+  /* 0000 */ uint32_t itemCatalogId;
+  /* 0004 */ uint32_t padding;
+};
+
 }
 }
 }
