@@ -76,6 +76,8 @@ namespace Sapphire
 
     void setCurrentFestival( uint16_t festivalId, uint16_t additionalFestivalId = 0 );
 
+    std::shared_ptr< Data::TerritoryType > getTerritoryTypeInfo() const;
+
     virtual bool init();
 
     virtual void loadCellCache();
