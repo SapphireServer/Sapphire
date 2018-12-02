@@ -97,7 +97,8 @@ namespace Sapphire::Network::Packets
     ReqMoogleMailLetter = 0x011A, // updated 4.4
     MailLetterNotification = 0x011B, // updated 4.4
 
-    MarketBoardItemSummaryListResponse = 0x0125, // updated 4.4
+    MarketBoardItemListingCountResponse = 0x011C, // updated 4.4
+    MarketBoardSearchResultResponse = 0x0125, // updated 4.4
 
     CharaFreeCompanyTag = 0x0127, // updated 4.4
     FreeCompanyBoardMsg = 0x0128, // updated 4.4
