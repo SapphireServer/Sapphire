@@ -263,8 +263,8 @@ namespace Sapphire::Network::Packets
 
     LinkshellListHandler = 0x00F4, // updated 4.3
 
-    MarketBoardRequestItemListings = 0x00FE, // updated 4.4
-    MarketBoardRequestScopedItemListings = 0x00FF, // updated 4.4
+    MarketBoardRequestItemInformation = 0x00FE, // updated 4.4
+    MarketBoardRequestItemListings = 0x00FF, // updated 4.4
 
     SearchMarketboard = 0x0103, // updated 4.3
     ReqExamineFcInfo = 0x010F, // updated 4.1
