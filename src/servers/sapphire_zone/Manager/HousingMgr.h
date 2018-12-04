@@ -43,6 +43,8 @@ namespace Sapphire::World::Manager
 
     void requestEstateEditGuestAccess( Entity::Player& player, uint16_t territoryTypeId, uint16_t worldId, uint8_t wardId, uint8_t plotId );
 
+    void sendEstateGreeting( Entity::Player& player, const Common::LandIdent ident );
+
   };
 
 }

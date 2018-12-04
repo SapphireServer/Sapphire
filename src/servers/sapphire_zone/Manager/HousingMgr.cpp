@@ -244,6 +244,9 @@ void Sapphire::World::Manager::HousingMgr::sendWardLandInfo( Entity::Player& pla
   wardInfoPacket->data().landIdent.wardNum = wardId;
   wardInfoPacket->data().landIdent.territoryTypeId = territoryTypeId;
 
+  // todo: properly get worldId
+  wardInfoPacket->data().landIdent.worldId = 67;
+
   for( int i = 0; i < 60; i++ )
   {
     auto land = hZone->getLand( i );
@@ -258,20 +261,26 @@ void Sapphire::World::Manager::HousingMgr::sendWardLandInfo( Entity::Player& pla
     if( land->getState() == Common::HouseState::forSale )
       continue;
 
+    if( auto house = land->getHouse() )
+    {
+      if( !house->getHouseGreeting().empty() )
+        entry.infoFlags |= WardlandFlags::HasEstateGreeting;
+    }
+
     switch( land->getLandType() )
     {
       case LandType::FreeCompany:
-        entry.infoFlags = Common::WardlandFlags::IsEstateOwned | Common::WardlandFlags::IsFreeCompanyEstate;
+        entry.infoFlags |= Common::WardlandFlags::IsEstateOwned | Common::WardlandFlags::IsFreeCompanyEstate;
 
         // todo: send FC name
 
         break;
 
       case LandType::Private:
-        entry.infoFlags = Common::WardlandFlags::IsEstateOwned;
+        entry.infoFlags |= Common::WardlandFlags::IsEstateOwned;
 
         auto owner = land->getPlayerOwner();
-        std::string playerName = g_fw.get< Sapphire::ServerMgr >()->getPlayerNameFromDb( owner );
+        auto playerName = g_fw.get< Sapphire::ServerMgr >()->getPlayerNameFromDb( owner );
         memcpy( &entry.estateOwnerName, playerName.c_str(), playerName.size() );
 
         break;
@@ -282,6 +291,32 @@ void Sapphire::World::Manager::HousingMgr::sendWardLandInfo( Entity::Player& pla
   }
 
   player.queuePacket( wardInfoPacket );
+}
+
+void Sapphire::World::Manager::HousingMgr::sendEstateGreeting( Entity::Player& player, const Common::LandIdent ident )
+{
+  auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
+  auto hZone = getHousingZoneByLandSetId( landSetId );
+
+  if( !hZone )
+    return;
+
+  auto land = hZone->getLand( ident.landId );
+  if( !land )
+    return;
+
+  auto house = land->getHouse();
+  if( !house )
+    return;
+
+  auto greetingPacket = makeZonePacket< FFXIVIpcHousingEstateGreeting >( player.getId() );
+
+  greetingPacket->data().landIdent = ident;
+
+  auto greeting = house->getHouseGreeting();
+  memcpy( &greetingPacket->data().message, greeting.c_str(), greeting.size() );
+
+  player.queuePacket( greetingPacket );
 }
 
 void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& player, uint8_t plotNum, uint32_t presetItem )

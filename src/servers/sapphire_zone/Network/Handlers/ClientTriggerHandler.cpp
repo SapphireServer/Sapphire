@@ -427,6 +427,28 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
 
       break;
     }
+    case ClientTriggerType::RequestEstateGreeting:
+    {
+      uint16_t territoryTypeId = param11 & 0xFFFF;
+      uint16_t worldId = param11 >> 16;
+
+      uint8_t ward = ( param12 >> 16 ) & 0xFF;
+      uint8_t plot = ( param12 & 0xFF );
+
+      auto housingMgr = g_fw.get< HousingMgr >();
+      if( !housingMgr )
+        break;
+
+      Common::LandIdent ident;
+      ident.territoryTypeId = territoryTypeId;
+      ident.worldId = worldId;
+      ident.wardNum = ward;
+      ident.landId = plot;
+
+      housingMgr->sendEstateGreeting( player, ident );
+
+      break;
+    }
 
     default:
     {

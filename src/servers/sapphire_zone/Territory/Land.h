@@ -18,7 +18,7 @@ namespace Sapphire
     Land( uint16_t zoneId, uint8_t wardNum, uint8_t landId, uint32_t landSetId, Sapphire::Data::HousingLandSetPtr info );
     virtual ~Land();
 
-    void load();
+    using LandInventoryMap = std::unordered_map< uint32_t, ItemContainerPtr >;
 
     //Primary state
     void setSize( uint8_t size );
@@ -53,7 +53,6 @@ namespace Sapphire
     void updateLandDb();
     void update( uint32_t currTime );
 
-    uint32_t getMaxItems();
     uint32_t getCurrentPrice() const;
     uint32_t getMaxPrice() const;
     uint32_t getDevaluationTime();
@@ -87,8 +86,9 @@ namespace Sapphire
     Sapphire::HousePtr m_pHouse;
 
     //item storage
-    Sapphire::ItemContainerPtr ItemsOutdoorContainer;
-    uint32_t m_maxItems;
+    LandInventoryMap m_landInventoryMap;
+    uint32_t m_maxPlacedExternalItems;
+    uint32_t m_maxPlacedInternalItems;
 
     //price
     uint32_t m_initPrice;
