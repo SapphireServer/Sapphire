@@ -45,7 +45,7 @@ Sapphire::Land::Land( uint16_t territoryTypeId, uint8_t wardNum, uint8_t landId,
 {
   memset( &m_tag, 0x00, 3 );
 
-  load();
+  init();
 }
 
 Sapphire::Land::~Land()
@@ -53,7 +53,7 @@ Sapphire::Land::~Land()
 
 }
 
-void Sapphire::Land::load()
+void Sapphire::Land::init()
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto res = pDb->query( "SELECT * FROM land WHERE LandSetId = " + std::to_string( m_landSetId ) + " "
@@ -98,7 +98,34 @@ void Sapphire::Land::load()
     m_mapMarkerPosition.z = info->z;
   }
 
-  init();
+  switch( m_size )
+  {
+    case HouseSize::Cottage:
+      m_maxPlacedExternalItems = 20;
+      m_maxPlacedInternalItems = 200;
+      break;
+    case HouseSize::House:
+      m_maxPlacedExternalItems = 30;
+      m_maxPlacedInternalItems = 300;
+      break;
+    case HouseSize::Mansion:
+      m_maxPlacedExternalItems = 40;
+      m_maxPlacedInternalItems = 400;
+      break;
+    default:
+      break;
+  }
+
+  // init item containers
+  auto setupContainer = [ this ]( InventoryType type, uint8_t maxSize )
+  {
+    m_landInventoryMap[ type ] = make_ItemContainer( type, maxSize, "houseiteminventory", true, true );
+  };
+
+  setupContainer( InventoryType::HousingExternalAppearance, 8 );
+  setupContainer( InventoryType::HousingInternalAppearance, 8 );
+  setupContainer( InventoryType::HousingOutdoorItemStoreroom, m_maxPlacedExternalItems );
+  setupContainer( InventoryType::HousingIndoorItemStoreroom, m_maxPlacedInternalItems );
 }
 
 uint32_t Sapphire::Land::convertItemIdToHousingItemId( uint32_t itemId )
@@ -223,11 +250,6 @@ uint32_t Sapphire::Land::getPlayerOwner()
   return m_ownerPlayerId;
 }
 
-uint32_t Sapphire::Land::getMaxItems()
-{
-  return m_maxItems;
-}
-
 uint32_t Sapphire::Land::getDevaluationTime()
 {
   return m_nextDrop - static_cast< uint32_t >( Util::getTimeSeconds() );
@@ -246,25 +268,6 @@ void Sapphire::Land::setLandTag( uint8_t slot, uint8_t tag )
 uint8_t Sapphire::Land::getLandTag( uint8_t slot )
 {
   return m_tag[ slot ];
-}
-
-void Sapphire::Land::init()
-{
-
-  switch( m_size )
-  {
-    case HouseSize::small:
-      m_maxItems = 20;
-      break;
-    case HouseSize::medium:
-      m_maxItems = 30;
-      break;
-    case HouseSize::big:
-      m_maxItems = 40;
-      break;
-    default:
-      break;
-  }
 }
 
 void Sapphire::Land::updateLandDb()
