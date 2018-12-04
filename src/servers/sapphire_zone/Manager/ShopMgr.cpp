@@ -22,13 +22,15 @@ bool Sapphire::World::Manager::ShopMgr::purchaseGilShopItem( Entity::Player& pla
   if( !item )
     return false;
 
-  if( player.getCurrency( Common::CurrencyType::Gil ) < item->priceMid )
+  auto price = item->priceMid * quantity;
+
+  if( player.getCurrency( Common::CurrencyType::Gil ) < price )
     return false;
 
   if( !player.addItem( gilShopItem->item, quantity ) )
     return false;
 
-  player.removeCurrency( Common::CurrencyType::Gil, item->priceMid );
+  player.removeCurrency( Common::CurrencyType::Gil, price );
 
   return true;
 }
