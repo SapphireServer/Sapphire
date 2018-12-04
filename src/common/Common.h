@@ -223,8 +223,9 @@ namespace Sapphire::Common
     FreeCompanyCrystal = 22001,
 
     HousingExternalAppearance = 25000,
-    HousingOutdoorItems = 25001,
+    HousingOutdoorItemStoreroom = 25001,
     HousingInternalAppearance = 25002,
+    HousingIndoorItemStoreroom = 25003,
   };
 
   enum ContainerType : uint16_t
@@ -826,9 +827,9 @@ namespace Sapphire::Common
 
   enum HouseSize : uint8_t
   {
-    small,
-    medium,
-    big
+    Cottage,
+    House,
+    Mansion
   };
 
   enum HouseState : uint8_t
