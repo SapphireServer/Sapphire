@@ -864,7 +864,7 @@ namespace Sapphire::Common
   {
     IsEstateOwned = 1,
     IsPublicEstate = 2,
-    HasEstateMessage = 4,
+    HasEstateGreeting = 4,
     EstateFlagUnknown = 8,
     IsFreeCompanyEstate = 16,
   };
