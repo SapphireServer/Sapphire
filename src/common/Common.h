@@ -221,7 +221,10 @@ namespace Sapphire::Common
     FreeCompanyBag2 = 20002,
     FreeCompanyGil = 22000,
     FreeCompanyCrystal = 22001,
-    HousingOutdoorItems = 25001
+
+    HousingExternalAppearance = 25000,
+    HousingOutdoorItems = 25001,
+    HousingInternalAppearance = 25002,
   };
 
   enum ContainerType : uint16_t
