@@ -421,6 +421,35 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
 
       break;
     }
+    case ClientTriggerType::RequestExternalHousingInventory:
+    {
+      if( param2 != 1 )
+        return;
+
+      uint8_t plot = ( param12 & 0xFF );
+
+      auto housingMgr = g_fw.get< HousingMgr >();
+      if( !housingMgr )
+        break;
+
+      housingMgr->sendHousingInventory( player, Common::InventoryType::HousingOutdoorItemStoreroom, plot );
+
+      break;
+    }
+    case ClientTriggerType::RequestInternalHousingInventory:
+    {
+      // only sent if param1 is 1, because the client sends this with 0 when you open the ui for whatever reason
+      if( param1 != 1 )
+        return;
+
+      auto housingMgr = g_fw.get< HousingMgr >();
+      if( !housingMgr )
+        break;
+
+      housingMgr->sendHousingInventory( player, Common::InventoryType::HousingIndoorItemStoreroom, 255 );
+
+      break;
+    }
 
     default:
     {

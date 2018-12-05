@@ -18,7 +18,7 @@ namespace Sapphire
     Land( uint16_t zoneId, uint8_t wardNum, uint8_t landId, uint32_t landSetId, Sapphire::Data::HousingLandSetPtr info );
     virtual ~Land();
 
-    using LandInventoryMap = std::unordered_map< uint32_t, ItemContainerPtr >;
+    using LandInventoryMap = std::unordered_map< uint16_t, ItemContainerPtr >;
 
     //Primary state
     void setSize( uint8_t size );
@@ -60,6 +60,8 @@ namespace Sapphire
     //House tags
     void setLandTag( uint8_t slot, uint8_t tag );
     uint8_t getLandTag( uint8_t slot );
+
+    ItemContainerPtr getInventory( uint16_t inventoryType ) const;
 
   private:
     uint32_t convertItemIdToHousingItemId( uint32_t itemId );

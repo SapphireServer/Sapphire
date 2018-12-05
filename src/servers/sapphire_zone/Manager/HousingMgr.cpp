@@ -17,6 +17,7 @@
 #include "TerritoryMgr.h"
 #include "Territory/Zone.h"
 #include "Territory/HousingZone.h"
+#include "Territory/Housing/HousingInteriorTerritory.h"
 #include "HousingMgr.h"
 #include "Territory/Land.h"
 #include "Framework.h"
@@ -462,4 +463,45 @@ Sapphire::Common::LandIdent Sapphire::World::Manager::HousingMgr::clientTriggerP
   ident.landId = param12 & 0xFFFF;
 
   return ident;
+}
+
+void Sapphire::World::Manager::HousingMgr::sendHousingInventory( Entity::Player& player, uint16_t inventoryType, uint8_t plotNum )
+{
+  Sapphire::LandPtr targetLand;
+
+  // plotNum will be 255 in the event that it's an internal zone
+  // and we have to switch up our way of getting the LandPtr
+  if( plotNum == 255 )
+  {
+    auto internalZone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( player.getCurrentZone() );
+    if( !internalZone )
+      return;
+
+    auto ident = internalZone->getIdent();
+
+    auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
+    auto exteriorZone = getHousingZoneByLandSetId( landSetId );
+
+    if( !exteriorZone )
+      return;
+
+    targetLand = exteriorZone->getLand( ident.landId );
+  }
+  else
+  {
+    auto zone = std::dynamic_pointer_cast< HousingZone >( player.getCurrentZone() );
+    if( !zone )
+      return;
+
+    targetLand = zone->getLand( plotNum );
+  }
+
+  if( !targetLand )
+    return;
+
+  // todo: add proper permissions checks
+  if( targetLand->getPlayerOwner() != player.getId() )
+    return;
+
+  player.sendDebug( "got inventory for plot: " + targetLand->getHouse()->getHouseName() );
 }

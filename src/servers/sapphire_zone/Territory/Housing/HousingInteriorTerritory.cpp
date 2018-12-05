@@ -68,7 +68,7 @@ void Housing::HousingInteriorTerritory::onPlayerZoneIn( Entity::Player& player )
 
   for( auto i = 0; i < 10; i++ )
   {
-    indoorInitPacket->data().indoorItems[ i ] = pHouse->getHouseInteriorPart( (Common::HousingInteriorSlot)i );
+    indoorInitPacket->data().indoorItems[ i ] = pHouse->getHouseInteriorPart( static_cast< Common::HousingInteriorSlot >( i ) );
   }
 
 
@@ -102,4 +102,9 @@ void Housing::HousingInteriorTerritory::onUpdate( uint32_t currTime )
 uint32_t Housing::HousingInteriorTerritory::getLastActivityTime() const
 {
   return m_lastActivityTime;
+}
+
+const Common::LandIdent Housing::HousingInteriorTerritory::getIdent() const
+{
+  return m_landIdent;
 }

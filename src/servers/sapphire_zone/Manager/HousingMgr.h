@@ -30,6 +30,9 @@ namespace Sapphire::World::Manager
     void sendLandSignFree( Entity::Player& player, const Common::LandIdent ident );
     LandPurchaseResult purchaseLand( Entity::Player& player, uint8_t plot, uint8_t state );
 
+    /*!
+     * @brief Converts param1 of a client trigger into a Common::LandIndent
+     */
     Common::LandIdent clientTriggerParamsToLandIdent( uint32_t param11, uint32_t param12 ) const;
 
     void sendWardLandInfo( Entity::Player& player, uint8_t wardId, uint16_t territoryTypeId );
@@ -46,6 +49,13 @@ namespace Sapphire::World::Manager
     void requestEstateEditGuestAccess( Entity::Player& player, const Common::LandIdent ident );
 
     void sendEstateGreeting( Entity::Player& player, const Common::LandIdent ident );
+
+    /*!
+     * @brief Sends the house inventory for the specified type to a player.
+     *
+     * This enforces permissions on the inventory too so random players can't request a houses items
+     */
+    void sendHousingInventory( Entity::Player& player, uint16_t inventoryType, uint8_t plotNum );
 
   };
 
