@@ -73,17 +73,17 @@ Sapphire::LandPtr Sapphire::World::Manager::HousingMgr::getLandByOwnerId( uint32
   return hZone->getLand( res->getUInt( 2 ) );
 }
 
-void Sapphire::World::Manager::HousingMgr::sendLandSignOwned( Entity::Player& player, uint8_t wardId, uint8_t plotId, uint16_t territoryTypeId )
+void Sapphire::World::Manager::HousingMgr::sendLandSignOwned( Entity::Player& player, const Common::LandIdent ident )
 {
-  player.setActiveLand( plotId, wardId );
+  player.setActiveLand( ident.landId, ident.wardNum );
 
-  auto landSetId = toLandSetId( territoryTypeId, wardId );
+  auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
   auto hZone = getHousingZoneByLandSetId( landSetId );
 
   if( !hZone )
     return;
 
-  auto land = hZone->getLand( plotId );
+  auto land = hZone->getLand( ident.landId );
   if( !land )
   {
     land = getLandByOwnerId( player.getId() );
@@ -96,10 +96,7 @@ void Sapphire::World::Manager::HousingMgr::sendLandSignOwned( Entity::Player& pl
   //memcpy( &landInfoSignPacket->data().estateName, land->getLandName().c_str(), land->getLandName().size() );
   landInfoSignPacket->data().houseSize = land->getSize();
   landInfoSignPacket->data().houseType = static_cast< uint8_t >( land->getLandType() );
-  landInfoSignPacket->data().landIdent.landId = land->getLandId();
-  landInfoSignPacket->data().landIdent.wardNum = land->getWardNum();
-  landInfoSignPacket->data().landIdent.worldId = 67;
-  landInfoSignPacket->data().landIdent.territoryTypeId = land->getTerritoryTypeId();
+  landInfoSignPacket->data().landIdent = ident;
   landInfoSignPacket->data().houseIconAdd = land->getSharing();
   landInfoSignPacket->data().ownerId = player.getContentId(); // should be real owner contentId, not player.contentId()
 
@@ -114,17 +111,17 @@ void Sapphire::World::Manager::HousingMgr::sendLandSignOwned( Entity::Player& pl
   player.queuePacket( landInfoSignPacket );
 }
 
-void Sapphire::World::Manager::HousingMgr::sendLandSignFree( Entity::Player& player, uint8_t wardId, uint8_t plotId, uint16_t territoryTypeId )
+void Sapphire::World::Manager::HousingMgr::sendLandSignFree( Entity::Player& player, const Common::LandIdent ident )
 {
-  player.setActiveLand( plotId, wardId );
+  player.setActiveLand( ident.landId, ident.wardNum );
 
-  auto landSetId = toLandSetId( territoryTypeId, wardId );
+  auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
   auto hZone = getHousingZoneByLandSetId( landSetId );
 
   if( !hZone )
     return;
 
-  auto land = hZone->getLand( plotId );
+  auto land = hZone->getLand( ident.landId );
   auto plotPricePacket = makeZonePacket< Server::FFXIVIpcLandPriceUpdate >( player.getId() );
   plotPricePacket->data().price = land->getCurrentPrice();
   plotPricePacket->data().timeLeft = land->getDevaluationTime();
@@ -362,15 +359,15 @@ void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& pl
   eobj->setHousingLink( plotNum << 8 );
 }
 
-void Sapphire::World::Manager::HousingMgr::requestEstateRename( Entity::Player& player, uint16_t territoryTypeId, uint16_t worldId, uint8_t wardId, uint8_t plotId )
+void Sapphire::World::Manager::HousingMgr::requestEstateRename( Entity::Player& player, const Common::LandIdent ident )
 {
-  auto landSetId = toLandSetId( territoryTypeId, wardId );
+  auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
   auto hZone = getHousingZoneByLandSetId( landSetId );
 
   if( !hZone )
     return;
 
-  auto land = hZone->getLand( plotId );
+  auto land = hZone->getLand( ident.landId );
 
   auto house = land->getHouse();
   if( !house )
@@ -378,24 +375,21 @@ void Sapphire::World::Manager::HousingMgr::requestEstateRename( Entity::Player& 
 
   auto landRenamePacket = makeZonePacket< Server::FFXIVIpcLandRename >( player.getId() );
 
-  landRenamePacket->data().landIdent.landId = land->getLandId();
-  landRenamePacket->data().landIdent.wardNum = land->getWardNum();
-  landRenamePacket->data().landIdent.worldId = 67;
-  landRenamePacket->data().landIdent.territoryTypeId = land->getTerritoryTypeId();
+  landRenamePacket->data().landIdent = ident;
   memcpy( &landRenamePacket->data().houseName, house->getHouseName().c_str(), 20 );
 
   player.queuePacket( landRenamePacket );
 }
 
-void Sapphire::World::Manager::HousingMgr::requestEstateEditGreeting( Entity::Player& player, uint16_t territoryTypeId, uint16_t worldId, uint8_t wardId, uint8_t plotId )
+void Sapphire::World::Manager::HousingMgr::requestEstateEditGreeting( Entity::Player& player, const Common::LandIdent ident )
 {
-  auto landSetId = toLandSetId( territoryTypeId, wardId );
+  auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
   auto hZone = getHousingZoneByLandSetId( landSetId );
 
   if( !hZone )
     return;
 
-  auto land = hZone->getLand( plotId );
+  auto land = hZone->getLand( ident.landId );
   if( !land )
     return;
 
@@ -405,16 +399,13 @@ void Sapphire::World::Manager::HousingMgr::requestEstateEditGreeting( Entity::Pl
 
   auto estateGreetingPacket = makeZonePacket< Server::FFXIVIpcHousingEstateGreeting >( player.getId() );
 
-  estateGreetingPacket->data().landIdent.landId = land->getLandId();
-  estateGreetingPacket->data().landIdent.wardNum = land->getWardNum();
-  estateGreetingPacket->data().landIdent.worldId = 67;
-  estateGreetingPacket->data().landIdent.territoryTypeId = land->getTerritoryTypeId();
+  estateGreetingPacket->data().landIdent = ident;
   memcpy( &estateGreetingPacket->data().message, house->getHouseGreeting().c_str(), sizeof( estateGreetingPacket->data().message ) );
 
   player.queuePacket( estateGreetingPacket );
 }
 
-void Sapphire::World::Manager::HousingMgr::updateEstateGreeting( Entity::Player& player, const Common::LandIdent& ident, const std::string& greeting )
+void Sapphire::World::Manager::HousingMgr::updateEstateGreeting( Entity::Player& player, const Common::LandIdent ident, const std::string& greeting )
 {
   auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
   auto zone = getHousingZoneByLandSetId( landSetId );
@@ -440,15 +431,15 @@ void Sapphire::World::Manager::HousingMgr::updateEstateGreeting( Entity::Player&
   player.sendLogMessage( 3381 );
 }
 
-void Sapphire::World::Manager::HousingMgr::requestEstateEditGuestAccess( Entity::Player& player, uint16_t territoryTypeId, uint16_t worldId, uint8_t wardId, uint8_t plotId )
+void Sapphire::World::Manager::HousingMgr::requestEstateEditGuestAccess( Entity::Player& player, const Common::LandIdent ident )
 {
-  auto landSetId = toLandSetId( territoryTypeId, wardId );
+  auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
   auto hZone = getHousingZoneByLandSetId( landSetId );
 
   if( !hZone )
     return;
 
-  auto land = hZone->getLand( plotId );
+  auto land = hZone->getLand( ident.landId );
   if( !land )
     return;
 
@@ -457,11 +448,18 @@ void Sapphire::World::Manager::HousingMgr::requestEstateEditGuestAccess( Entity:
     return;
 
   auto packet = makeZonePacket< FFXIVIpcHousingShowEstateGuestAccess >( player.getId() );
-
-  packet->data().ident.landId = plotId;
-  packet->data().ident.territoryTypeId = territoryTypeId;
-  packet->data().ident.wardNum = wardId;
-  packet->data().ident.worldId = worldId;
+  packet->data().ident = ident;
 
   player.queuePacket( packet );
+}
+
+Sapphire::Common::LandIdent Sapphire::World::Manager::HousingMgr::clientTriggerParamsToLandIdent( uint32_t param11, uint32_t param12 ) const
+{
+  Common::LandIdent ident;
+  ident.worldId = param11 >> 16;
+  ident.territoryTypeId = param11 & 0xFFFF;
+  ident.wardNum = param12 >> 16;
+  ident.landId = param12 & 0xFFFF;
+
+  return ident;
 }
