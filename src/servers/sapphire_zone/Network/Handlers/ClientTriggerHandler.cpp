@@ -325,22 +325,20 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
     }
     case ClientTriggerType::RequestLandSignFree:
     {
-      auto ward = static_cast< uint8_t >( ( param12 & 0xFF00 ) >> 8 );
-      auto plot = static_cast< uint8_t >( param12 & 0xFF );
-      auto territoryId = static_cast< uint16_t >( param11 & 0xFFFF );
-
       auto pHousingMgr = g_fw.get< HousingMgr >();
-      pHousingMgr->sendLandSignFree( player, ward, plot, territoryId );
+
+      auto ident = pHousingMgr->clientTriggerParamsToLandIdent( param11, param12 );
+      pHousingMgr->sendLandSignFree( player, ident );
+
       break;
     }
     case ClientTriggerType::RequestLandSignOwned:
     {
-      auto ward = static_cast< uint8_t >( ( param12 & 0xFF00 ) >> 8 );
-      auto plot = static_cast< uint8_t >( param12 & 0xFF );
-      auto territoryId = static_cast< uint16_t >( param11 & 0xFFFF );
-
       auto pHousingMgr = g_fw.get< HousingMgr >();
-      pHousingMgr->sendLandSignOwned( player, ward, plot, territoryId );
+
+      auto ident = pHousingMgr->clientTriggerParamsToLandIdent( param11, param12 );
+      pHousingMgr->sendLandSignOwned( player, ident );
+
       break;
     }
     case ClientTriggerType::RequestWardLandInfo:
@@ -363,49 +361,34 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
     }
     case ClientTriggerType::RequestEstateRename:
     {
-      uint16_t territoryTypeId = param11 & 0xFFFF;
-      uint16_t worldId = param11 >> 16;
-
-      uint8_t ward = ( param12 >> 16 ) & 0xFF;
-      uint8_t plot = ( param12 & 0xFF );
-
       auto pHousingMgr = g_fw.get< HousingMgr >();
       if( !pHousingMgr )
         break;
 
-      pHousingMgr->requestEstateRename( player, territoryTypeId, worldId, ward, plot );
+      auto ident = pHousingMgr->clientTriggerParamsToLandIdent( param11, param12 );
+      pHousingMgr->requestEstateRename( player, ident );
 
       break;
     }
     case ClientTriggerType::RequestEstateEditGreeting:
     {
-      uint16_t territoryTypeId = param11 & 0xFFFF;
-      uint16_t worldId = param11 >> 16;
-
-      uint8_t ward = ( param12 >> 16 ) & 0xFF;
-      uint8_t plot = ( param12 & 0xFF );
-
       auto pHousingMgr = g_fw.get< HousingMgr >();
       if( !pHousingMgr )
         break;
 
-      pHousingMgr->requestEstateEditGreeting( player, territoryTypeId, worldId, ward, plot );
+      auto ident = pHousingMgr->clientTriggerParamsToLandIdent( param11, param12 );
+      pHousingMgr->requestEstateEditGreeting( player, ident );
 
       break;
     }
     case ClientTriggerType::RequestEstateEditGuestAccessSettings:
     {
-      uint16_t territoryTypeId = param11 & 0xFFFF;
-      uint16_t worldId = param11 >> 16;
-
-      uint8_t ward = ( param12 >> 16 ) & 0xFF;
-      uint8_t plot = ( param12 & 0xFF );
-
       auto pHousingMgr = g_fw.get< HousingMgr >();
       if( !pHousingMgr )
         break;
 
-      pHousingMgr->requestEstateEditGuestAccess( player, territoryTypeId, worldId, ward, plot );
+      auto ident = pHousingMgr->clientTriggerParamsToLandIdent( param11, param12 );
+      pHousingMgr->requestEstateEditGuestAccess( player, ident );
 
       break;
     }
@@ -429,22 +412,11 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
     }
     case ClientTriggerType::RequestEstateGreeting:
     {
-      uint16_t territoryTypeId = param11 & 0xFFFF;
-      uint16_t worldId = param11 >> 16;
-
-      uint8_t ward = ( param12 >> 16 ) & 0xFF;
-      uint8_t plot = ( param12 & 0xFF );
-
       auto housingMgr = g_fw.get< HousingMgr >();
       if( !housingMgr )
         break;
 
-      Common::LandIdent ident;
-      ident.territoryTypeId = territoryTypeId;
-      ident.worldId = worldId;
-      ident.wardNum = ward;
-      ident.landId = plot;
-
+      auto ident = housingMgr->clientTriggerParamsToLandIdent( param11, param12 );
       housingMgr->sendEstateGreeting( player, ident );
 
       break;
