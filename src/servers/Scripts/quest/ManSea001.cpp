@@ -61,6 +61,7 @@ private:
     player.playScene( getId(), 3, NONE,
                       [ & ]( Entity::Player& player, const Event::SceneResult& result )
                       {
+                        player.eventStart( result.actorId, OPENING_EVENT_HANDLER, Event::EventHandler::Nest, 0, 0 );
                         player.playScene( OPENING_EVENT_HANDLER, 0x1E, HIDE_HOTBAR | NO_DEFAULT_CAMERA, 1, 0 );
                       } );
   }

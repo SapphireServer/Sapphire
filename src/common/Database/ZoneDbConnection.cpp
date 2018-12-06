@@ -142,19 +142,19 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
 
   /// QUEST INFO
   prepareStatement( CHARA_QUEST_INS,
-                    "INSERT INTO charaquestnew ( CharacterId, SlotId, QuestId, Sequence, Flags, Variables_0, "
+                    "INSERT INTO charaquest ( CharacterId, SlotId, QuestId, Sequence, Flags, Variables_0, "
                     "Variables_1, Variables_2, Variables_3, Variables_4, "
                     "Variables_5, Variables_6 ) VALUES( ?,?,?,?,?,?,?,?,?,?,?,? );", CONNECTION_ASYNC );
 
-  prepareStatement( CHARA_QUEST_UP, "UPDATE charaquestnew SET Sequence = ?, Flags = ?, Variables_0 = ?, "
+  prepareStatement( CHARA_QUEST_UP, "UPDATE charaquest SET Sequence = ?, Flags = ?, Variables_0 = ?, "
                                     "Variables_1 = ?, Variables_2 = ?, Variables_3 = ?, "
                                     "Variables_4 = ?, Variables_5 = ?, Variables_6 = ? "
                                     "WHERE CharacterId = ? AND QuestId = ?;", CONNECTION_ASYNC );
 
-  prepareStatement( CHARA_QUEST_DEL, "DELETE FROM charaquestnew WHERE CharacterId = ? AND QuestId = ?;",
+  prepareStatement( CHARA_QUEST_DEL, "DELETE FROM charaquest WHERE CharacterId = ? AND QuestId = ?;",
                     CONNECTION_ASYNC );
 
-  prepareStatement( CHARA_SEL_QUEST, "SELECT * FROM charaquestnew WHERE CharacterId = ?;", CONNECTION_SYNC );
+  prepareStatement( CHARA_SEL_QUEST, "SELECT * FROM charaquest WHERE CharacterId = ?;", CONNECTION_SYNC );
 
   /// CLASS INFO
   prepareStatement( CHARA_CLASS_SEL, "SELECT ClassIdx, Exp, Lvl FROM characlass WHERE CharacterId = ?;",
@@ -188,7 +188,7 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     CONNECTION_BOTH );
 
   prepareStatement( CHARA_ITEMGLOBAL_DELETE,
-                    "UPDATE charaglobalitem SET IS_DELETE = 1 WHERE ItemId = ?;",
+                    "UPDATE charaglobalitem SET deleted = 1 WHERE ItemId = ?;",
                     CONNECTION_BOTH );
 
   /// HOUSING

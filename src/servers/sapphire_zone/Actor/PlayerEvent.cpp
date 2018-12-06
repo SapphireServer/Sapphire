@@ -69,7 +69,7 @@ void Sapphire::Entity::Player::checkEvent( uint32_t eventId )
 
 
 void Sapphire::Entity::Player::directorPlayScene( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t eventParam3,
-                                              uint32_t eventParam4, uint32_t eventParam5 )
+                                                  uint32_t eventParam4, uint32_t eventParam5 )
 {
   if( flags & 0x02 )
     setStateFlag( PlayerStateFlag::WatchingCutscene );
@@ -85,14 +85,14 @@ void Sapphire::Entity::Player::directorPlayScene( uint32_t eventId, uint32_t sce
   pEvent->setPlayedScene( true );
   pEvent->setEventReturnCallback( nullptr );
   auto eventPlay = std::make_shared< DirectorPlayScenePacket >( getId(), getId(), pEvent->getId(),
-                                                                  scene, flags, eventParam3, eventParam4, eventParam5 );
+                                                                scene, flags, eventParam3, eventParam4, eventParam5 );
 
   queuePacket( eventPlay );
 }
 
 void Sapphire::Entity::Player::eventStart( uint64_t actorId, uint32_t eventId,
-                                       Event::EventHandler::EventType eventType, uint8_t eventParam1,
-                                       uint32_t eventParam2, Event::EventHandler::EventFinishCallback callback )
+                                           Event::EventHandler::EventType eventType, uint8_t eventParam1,
+                                           uint32_t eventParam2, Event::EventHandler::EventFinishCallback callback )
 {
 
   auto newEvent = Event::make_EventHandler( this, actorId, eventId, eventType, eventParam2 );
@@ -104,21 +104,21 @@ void Sapphire::Entity::Player::eventStart( uint64_t actorId, uint32_t eventId,
   setStateFlag( PlayerStateFlag::InNpcEvent );
 
   auto eventStart = std::make_shared< EventStartPacket >( getId(), actorId, eventId,
-                                                            eventType, eventParam1, eventParam2 );
+                                                          eventType, eventParam1, eventParam2 );
 
   queuePacket( eventStart );
 
 }
 
 void Sapphire::Entity::Player::playScene( uint32_t eventId, uint32_t scene,
-                                      uint32_t flags, uint32_t eventParam2,
-                                      uint32_t eventParam3 )
+                                          uint32_t flags, uint32_t eventParam2,
+                                          uint32_t eventParam3 )
 {
   playScene( eventId, scene, flags, eventParam2, eventParam3, nullptr );
 }
 
 void Sapphire::Entity::Player::playScene( uint32_t eventId, uint32_t scene,
-                                      uint32_t flags, Event::EventHandler::SceneReturnCallback eventCallback )
+                                          uint32_t flags, Event::EventHandler::SceneReturnCallback eventCallback )
 {
   playScene( eventId, scene, flags, 0, 0, eventCallback );
 }
@@ -129,14 +129,14 @@ void Sapphire::Entity::Player::playScene( uint32_t eventId, uint32_t scene, uint
 }
 
 void Sapphire::Entity::Player::playScene( uint32_t eventId, uint32_t scene,
-                                      uint32_t flags, uint32_t eventParam2,
-                                      uint32_t eventParam3, Event::EventHandler::SceneReturnCallback eventCallback )
+                                          uint32_t flags, uint32_t eventParam2,
+                                          uint32_t eventParam3, Event::EventHandler::SceneReturnCallback eventCallback )
 {
   playScene( eventId, scene, flags, eventParam2, eventParam3, 0, eventCallback );
 }
 
 void Sapphire::Entity::Player::playGilShop( uint32_t eventId, uint32_t flags,
-                                        Event::EventHandler::SceneReturnCallback eventCallback )
+                                            Event::EventHandler::SceneReturnCallback eventCallback )
 {
   auto pEvent = bootstrapSceneEvent( eventId, flags );
   if( !pEvent )
@@ -174,36 +174,26 @@ Sapphire::Event::EventHandlerPtr Sapphire::Entity::Player::bootstrapSceneEvent( 
 }
 
 void Sapphire::Entity::Player::playScene( uint32_t eventId, uint32_t scene,
-                                      uint32_t flags, uint32_t eventParam2,
-                                      uint32_t eventParam3, uint32_t eventParam4,
-                                      Event::EventHandler::SceneReturnCallback eventCallback )
+                                          uint32_t flags, uint32_t eventParam2,
+                                          uint32_t eventParam3, uint32_t eventParam4,
+                                          Event::EventHandler::SceneReturnCallback eventCallback )
 {
   auto pEvent = bootstrapSceneEvent( eventId, flags );
   if( !pEvent )
     return;
 
-  if( pEvent->getEventType() == Event::EventHandler::Nest  )
-  {
-    auto events = eventList();
-
-    for( auto it : events )
-    {
-      it.second->setPlayedScene( true );
-    }
-  }
-
   pEvent->setPlayedScene( true );
   pEvent->setEventReturnCallback( eventCallback );
   pEvent->setSceneChainCallback( nullptr );
   auto eventPlay = std::make_shared< EventPlayPacket >( getId(), pEvent->getActorId(), pEvent->getId(),
-                                                          scene, flags, eventParam2, eventParam3, eventParam4 );
+                                                        scene, flags, eventParam2, eventParam3, eventParam4 );
 
   queuePacket( eventPlay );
 }
 
 void Sapphire::Entity::Player::playSceneChain( uint32_t eventId, uint32_t scene, uint32_t flags,
-                                           uint32_t eventParam2, uint32_t eventParam3, uint32_t eventParam4,
-                                           Sapphire::Event::EventHandler::SceneChainCallback sceneChainCallback )
+                                               uint32_t eventParam2, uint32_t eventParam3, uint32_t eventParam4,
+                                               Sapphire::Event::EventHandler::SceneChainCallback sceneChainCallback )
 {
   auto pEvent = bootstrapSceneEvent( eventId, flags );
   if( !pEvent )
@@ -213,20 +203,20 @@ void Sapphire::Entity::Player::playSceneChain( uint32_t eventId, uint32_t scene,
   pEvent->setSceneChainCallback( sceneChainCallback );
   pEvent->setEventReturnCallback( nullptr );
   auto eventPlay = std::make_shared< EventPlayPacket >( getId(), pEvent->getActorId(), pEvent->getId(),
-                                                          scene, flags, eventParam2, eventParam3, eventParam4 );
+                                                        scene, flags, eventParam2, eventParam3, eventParam4 );
 
   queuePacket( eventPlay );
 }
 
 void Sapphire::Entity::Player::playSceneChain( uint32_t eventId, uint32_t scene, uint32_t flags,
-                                           uint32_t eventParam2, uint32_t eventParam3,
-                                           Sapphire::Event::EventHandler::SceneChainCallback sceneChainCallback )
+                                               uint32_t eventParam2, uint32_t eventParam3,
+                                               Sapphire::Event::EventHandler::SceneChainCallback sceneChainCallback )
 {
   playSceneChain( eventId, scene, flags, eventParam2, eventParam3, 0, sceneChainCallback );
 }
 
 void Sapphire::Entity::Player::playSceneChain( uint32_t eventId, uint32_t scene, uint32_t flags,
-                                           Sapphire::Event::EventHandler::SceneChainCallback sceneChainCallback )
+                                               Sapphire::Event::EventHandler::SceneChainCallback sceneChainCallback )
 {
   playSceneChain( eventId, scene, flags, 0, 0, 0, sceneChainCallback );
 }
@@ -260,7 +250,20 @@ void Sapphire::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlaye
 
       if( callback )
         callback( *this, pEvent->getActorId() );
-
+      else
+      {
+        auto events = eventList();
+        for( auto it : events )
+        {
+          if( !it.second->hasPlayedScene() )
+          {
+            queuePacket( std::make_shared< EventFinishPacket >( getId(), it.second->getId(),
+                                                                it.second->getEventType(),
+                                                                it.second->getEventParam() ) );
+            removeEvent( it.second->getId() );
+          }
+        }
+      }
       break;
     }
     default:
@@ -281,10 +284,10 @@ void Sapphire::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlaye
 }
 
 void Sapphire::Entity::Player::eventActionStart( uint32_t eventId,
-                                             uint32_t action,
-                                             ActionCallback finishCallback,
-                                             ActionCallback interruptCallback,
-                                             uint64_t additional )
+                                                 uint32_t action,
+                                                 ActionCallback finishCallback,
+                                                 ActionCallback interruptCallback,
+                                                 uint64_t additional )
 {
   auto pEventAction = Action::make_EventAction( getAsChara(), eventId, action,
                                                 finishCallback, interruptCallback, additional );
@@ -312,10 +315,10 @@ void Sapphire::Entity::Player::eventActionStart( uint32_t eventId,
 
 
 void Sapphire::Entity::Player::eventItemActionStart( uint32_t eventId,
-                                                 uint32_t action,
-                                                 ActionCallback finishCallback,
-                                                 ActionCallback interruptCallback,
-                                                 uint64_t additional )
+                                                     uint32_t action,
+                                                     ActionCallback finishCallback,
+                                                     ActionCallback interruptCallback,
+                                                     uint64_t additional )
 {
   Action::ActionPtr pEventItemAction = Action::make_EventItemAction( getAsChara(), eventId, action,
                                                                      finishCallback, interruptCallback, additional );

@@ -206,7 +206,7 @@ void Sapphire::Network::SapphireAPI::deleteCharacter( std::string name, uint32_t
   g_charaDb.execute( "DELETE FROM charaitemcrystal WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
   g_charaDb.execute( "DELETE FROM charaiteminventory WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
   g_charaDb.execute( "DELETE FROM charaitemgearset WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
-  g_charaDb.execute( "DELETE FROM charaquestnew WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
+  g_charaDb.execute( "DELETE FROM charaquest WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
 }
 
 std::vector< Sapphire::PlayerMinimal > Sapphire::Network::SapphireAPI::getCharList( uint32_t accountId )
