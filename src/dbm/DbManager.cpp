@@ -1,5 +1,10 @@
 #include "DbManager.h"
 #include <MySqlConnector.h>
+#include <string>
+#include <fstream>
+#include <streambuf>
+#include <sstream>
+
 DbManager::DbManager( const std::string& host, const std::string& database, const std::string& user, const std::string& pw, uint16_t port ) :
   m_host( host ),
   m_database( database ),
@@ -114,10 +119,18 @@ bool DbManager::performAction()
 bool DbManager::modeInit()
 {
 
+  const std::string schemaFile = "sql/schema/schema.sql";
+  const std::string insertFile = "sql/schema/inserts.sql";
+
   bool result = false;
 
   if( selectSchema() )
   {
+    // TODO: allow init if database is empty
+    // select count(*)
+    //  from information_schema.tables
+    // where table_type = 'BASE TABLE'
+    //   and table_schema = 'your_database_name_here'
     m_lastError = "Database already existing, use <liquidate> mode first to remove it.";
     return false;
   }
@@ -125,12 +138,41 @@ bool DbManager::modeInit()
   if( !execute( "CREATE DATABASE " + m_database ) )
     return false;
 
-  if( !execute( "CREATE TABLE `dbversion` (\n"
-                "  `major` int(11) NOT NULL,\n"
-                "  `minor` int(11) NOT NULL\n"
-                ") ENGINE=InnoDB DEFAULT CHARSET=latin1;" ) )
+  if( !selectSchema() )
+  {
+    m_lastError = "Database not created.";
+    return false;
+  }
+
+  std::ifstream t( schemaFile );
+  if( !t.is_open() )
+  {
+    m_lastError = "File " + schemaFile + " does not exist!";
+    return false;
+  }
+  std::string content( ( std::istreambuf_iterator< char >( t ) ),
+                       ( std::istreambuf_iterator< char >( )    ) );
+  std::string delimiter = ";";
+
+  size_t pos = 0;
+  std::string token;
+  while( ( pos = content.find( delimiter ) ) != std::string::npos )
+  {
+    token = content.substr( 1, pos );
+    size_t pos1 = token.find_first_not_of( "\r\n" );
+    token = token.substr( pos1, token.size() );
+    size_t pos2 = token.find_first_of( "\r\n" );
+    std::cout << token.substr( 0, pos2 - 1 ) << std::endl;
+
+    if( !execute( token ) )
+      return false;
+
+    content.erase(0, pos + delimiter.length());
+  }
+
+  // we do not actually want this to stay atm...
+  if( !execute( "DROP DATABASE " + m_database ) )
     return false;
 
-
-  return false;
+  return true;
 }

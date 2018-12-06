@@ -60,6 +60,7 @@ private:
     {
       player.updateQuest( getId(), SEQ_FINISH );
 
+      player.eventStart( result.actorId, OPENING_EVENT_HANDLER, Event::EventHandler::Nest, 0, 0 );
       player.playScene( OPENING_EVENT_HANDLER, 0x1E, HIDE_HOTBAR | NO_DEFAULT_CAMERA, 0, 0 );
     };
 

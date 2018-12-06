@@ -250,14 +250,6 @@ void PlayerMinimal::saveAsNew()
   //        "HomePoint, StartTown, Discovery, HowTo, QuestCompleteFlags, Unlocks, QuestTracking, "
   //        "Aetheryte, GMRank, UPDATE_DATE )
 
-  // CharacterId, ClassIdx, Exp, Lvl
-  auto stmtClass = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_CLASS_INS );
-  stmtClass->setInt( 1, m_id );
-  stmtClass->setInt( 2, g_exdDataGen.get< Sapphire::Data::ClassJob >( m_class )->expArrayIndex );
-  stmtClass->setInt( 3, 0 );
-  stmtClass->setInt( 4, 1 );
-  g_charaDb.directExecute( stmtClass );
-
   auto stmt = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_INS );
   stmt->setInt( 1, m_accountId );
   stmt->setInt( 2, m_id );
@@ -293,6 +285,14 @@ void PlayerMinimal::saveAsNew()
   stmt->setBinary( 32, mountGuide );
   stmt->setBinary( 33, orchestrion );
   g_charaDb.directExecute( stmt );
+
+  // CharacterId, ClassIdx, Exp, Lvl
+  auto stmtClass = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_CLASS_INS );
+  stmtClass->setInt( 1, m_id );
+  stmtClass->setInt( 2, g_exdDataGen.get< Sapphire::Data::ClassJob >( m_class )->expArrayIndex );
+  stmtClass->setInt( 3, 0 );
+  stmtClass->setInt( 4, 1 );
+  g_charaDb.directExecute( stmtClass );
 
   auto stmtSearchInfo = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_SEARCHINFO_INS );
   stmtSearchInfo->setInt( 1, m_id );
