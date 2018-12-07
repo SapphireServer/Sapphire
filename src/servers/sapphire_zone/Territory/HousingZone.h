@@ -50,6 +50,8 @@ namespace Sapphire
     uint32_t getLandSetId() const;
     Sapphire::LandPtr getLand( uint8_t id );
 
+    Entity::EventObjectPtr registerHouseEntranceEObj( uint8_t plotId );
+
   private:
     using LandPtrMap = std::unordered_map< uint8_t, Sapphire::LandPtr >;
     const uint32_t m_landSetMax = 18;
