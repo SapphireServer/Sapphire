@@ -421,7 +421,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
 
       break;
     }
-    case ClientTriggerType::RequestExternalHousingInventory:
+    case ClientTriggerType::RequestHousingLandInventory:
     {
       if( param2 != 1 )
         return;
@@ -436,7 +436,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
 
       break;
     }
-    case ClientTriggerType::RequestInternalHousingInventory:
+    case ClientTriggerType::RequestHousingEstateInventory:
     {
       // only sent if param1 is 1, because the client sends this with 0 when you open the ui for whatever reason
       if( param1 != 1 )

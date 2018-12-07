@@ -803,10 +803,10 @@ namespace Sapphire::Common
 
   struct LandIdent
   {
-    uint16_t landId; //00
-    uint16_t wardNum; //02
-    uint16_t territoryTypeId; //04
-    uint16_t worldId; //06
+    int16_t landId; //00
+    int16_t wardNum; //02
+    int16_t territoryTypeId; //04
+    int16_t worldId; //06
   };
 
   struct LandFlagSet

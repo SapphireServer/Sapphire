@@ -12,7 +12,7 @@
 extern Sapphire::Framework g_fw;
 
 Sapphire::ItemContainer::ItemContainer( uint16_t storageId, uint16_t maxSize, const std::string& tableName,
-                                    bool isMultiStorage, bool isPersistentStorage ) :
+                                        bool isMultiStorage, bool isPersistentStorage ) :
   m_id( storageId ),
   m_size( maxSize ),
   m_tableName( tableName ),
