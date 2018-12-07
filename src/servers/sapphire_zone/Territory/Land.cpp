@@ -356,7 +356,7 @@ bool Sapphire::Land::setPreset( uint32_t itemId )
   return true;
 }
 
-Sapphire::ItemContainerPtr Sapphire::Land::getInventory( uint16_t inventoryType ) const
+Sapphire::ItemContainerPtr Sapphire::Land::getItemContainer( uint16_t inventoryType ) const
 {
   auto container = m_landInventoryMap.find( inventoryType );
   if( container == m_landInventoryMap.end() )
