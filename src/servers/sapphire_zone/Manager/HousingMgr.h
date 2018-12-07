@@ -26,9 +26,14 @@ namespace Sapphire::World::Manager
     Sapphire::Data::HousingZonePtr getHousingZoneByLandSetId( uint32_t id );
     Sapphire::LandPtr getLandByOwnerId( uint32_t id );
 
-    void sendLandSignOwned( Entity::Player& player, uint8_t wardId, uint8_t plotId, uint16_t territoryTypeId );
-    void sendLandSignFree( Entity::Player& player, uint8_t wardId, uint8_t plotId, uint16_t territoryTypeId );
+    void sendLandSignOwned( Entity::Player& player, const Common::LandIdent ident );
+    void sendLandSignFree( Entity::Player& player, const Common::LandIdent ident );
     LandPurchaseResult purchaseLand( Entity::Player& player, uint8_t plot, uint8_t state );
+
+    /*!
+     * @brief Converts param1 of a client trigger into a Common::LandIndent
+     */
+    Common::LandIdent clientTriggerParamsToLandIdent( uint32_t param11, uint32_t param12 ) const;
 
     void sendWardLandInfo( Entity::Player& player, uint8_t wardId, uint16_t territoryTypeId );
 
@@ -36,14 +41,21 @@ namespace Sapphire::World::Manager
 
     void buildPresetEstate( Entity::Player& player, uint8_t plotNum, uint32_t presetItem );
 
-    void requestEstateRename( Entity::Player& player, uint16_t territoryTypeId, uint16_t worldId, uint8_t wardId, uint8_t plotId );
+    void requestEstateRename( Entity::Player& player, const Common::LandIdent ident );
 
-    void requestEstateEditGreeting( Entity::Player& player, uint16_t territoryTypeId, uint16_t worldId, uint8_t wardId, uint8_t plotId );
-    void updateEstateGreeting( Entity::Player& player, const Common::LandIdent& ident, const std::string& greeting );
+    void requestEstateEditGreeting( Entity::Player& player, const Common::LandIdent ident );
+    void updateEstateGreeting( Entity::Player& player, const Common::LandIdent ident, const std::string& greeting );
 
-    void requestEstateEditGuestAccess( Entity::Player& player, uint16_t territoryTypeId, uint16_t worldId, uint8_t wardId, uint8_t plotId );
+    void requestEstateEditGuestAccess( Entity::Player& player, const Common::LandIdent ident );
 
     void sendEstateGreeting( Entity::Player& player, const Common::LandIdent ident );
+
+    /*!
+     * @brief Sends the house inventory for the specified type to a player.
+     *
+     * This enforces permissions on the inventory too so random players can't request a houses items
+     */
+    void sendHousingInventory( Entity::Player& player, uint16_t inventoryType, uint8_t plotNum );
 
   };
 
