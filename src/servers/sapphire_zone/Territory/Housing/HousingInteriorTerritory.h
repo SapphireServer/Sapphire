@@ -20,6 +20,8 @@ namespace Sapphire::World::Territory::Housing
 
     uint32_t getLastActivityTime() const;
 
+    const Common::LandIdent getIdent() const;
+
   private:
     Common::LandIdent m_landIdent;
     uint32_t m_lastActivityTime;
