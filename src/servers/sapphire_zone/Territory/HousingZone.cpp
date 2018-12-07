@@ -69,8 +69,7 @@ bool Sapphire::HousingZone::init()
 
     if( auto house = pLand->getHouse() )
     {
-      auto eobj = registerEObj( "entrance", 2002737, 0, 4, pLand->getMapMarkerPosition(), 1.f, 0.f );
-      eobj->setHousingLink( landId << 8 );
+      registerHouseEntranceEObj( landId << 8 );
     }
   }
 
@@ -230,4 +229,18 @@ Sapphire::LandPtr Sapphire::HousingZone::getLand( uint8_t id )
     return nullptr;
 
   return it->second;
+}
+
+Sapphire::Entity::EventObjectPtr Sapphire::HousingZone::registerHouseEntranceEObj( uint8_t plotId )
+{
+  auto land = getLand( plotId );
+  assert( land );
+
+  auto eObj = Entity::make_EventObject( getNextEObjId(), 2002737, 0, 4, land->getMapMarkerPosition(), 0.f, "entrance" );
+  eObj->setHousingLink( plotId << 8 );
+  eObj->setScale( 1.f );
+
+  registerEObj( eObj );
+
+  return eObj;
 }
