@@ -123,20 +123,41 @@ bool DbManager::modeInit()
   const std::string insertFile = "sql/schema/inserts.sql";
 
   bool result = false;
+  bool dbCreated = false;
 
   if( selectSchema() )
   {
-    // TODO: allow init if database is empty
-    // select count(*)
-    //  from information_schema.tables
-    // where table_type = 'BASE TABLE'
-    //   and table_schema = 'your_database_name_here'
-    m_lastError = "Database already existing, use <liquidate> mode first to remove it.";
-    return false;
+    std::string query = "SELECT COUNT(*) "
+                        "FROM information_schema.tables "
+                        "WHERE table_type = 'BASE TABLE' "
+                        "AND table_schema = '" + m_database + "';";
+    dbCreated = true;
+    try
+    {
+      auto stmt = m_pConnection->createStatement();
+      auto resultSet = stmt->executeQuery( query );
+
+      if( !resultSet->next() )
+        return false;
+
+      auto count = resultSet->getUInt( 1 );
+      if( count )
+      {
+        m_lastError = "Database " + m_database + " still contains tables. <Liquidate> it first!";
+        return false;
+      }
+
+    }
+    catch( std::runtime_error& e )
+    {
+      m_lastError = e.what();
+      return false;
+    }
   }
 
-  if( !execute( "CREATE DATABASE " + m_database ) )
-    return false;
+  if( !dbCreated )
+    if( !execute( "CREATE DATABASE " + m_database ) )
+      return false;
 
   if( !selectSchema() )
   {
