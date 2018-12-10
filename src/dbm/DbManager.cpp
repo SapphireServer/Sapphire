@@ -100,6 +100,7 @@ bool DbManager::performAction()
       result = modeInit();
       break;
     case Mode::LIQUIDATE:
+      result = modeLiquidate();
       break;
     case Mode::UPDATE:
       break;
@@ -172,7 +173,7 @@ bool DbManager::modeInit()
     return false;
   }
   std::string content( ( std::istreambuf_iterator< char >( t ) ),
-                       ( std::istreambuf_iterator< char >( )    ) );
+                       ( std::istreambuf_iterator< char >( ) ) );
   std::string delimiter = ";";
 
   size_t pos = 0;
@@ -188,12 +189,105 @@ bool DbManager::modeInit()
     if( !execute( token ) )
       return false;
 
-    content.erase(0, pos + delimiter.length());
+    content.erase( 0, pos + delimiter.length() );
   }
 
-  // we do not actually want this to stay atm...
-  if( !execute( "DROP DATABASE " + m_database ) )
+  std::cout << "======================================================" << std::endl;
+  std::cout << "Inserting default values..." << std::endl;
+
+
+  std::ifstream t1( insertFile );
+  if( !t1.is_open() )
+  {
+    m_lastError = "File " + insertFile + " does not exist!";
     return false;
+  }
+  std::string content1( ( std::istreambuf_iterator< char >( t1 ) ),
+                        ( std::istreambuf_iterator< char >( ) ) );
+  std::string delimiter1 = ";";
+
+  size_t pos_ = 0;
+  std::string token1;
+  while( ( pos_ = content1.find( delimiter1 ) ) != std::string::npos )
+  {
+    token1 = content1.substr( 1, pos_ );
+    size_t pos_1 = token1.find_first_not_of( "\r\n" );
+    token1 = token1.substr( pos_1, token1.size() );
+    size_t pos_2 = token1.find_first_of( "(" );
+    std::cout << token1.substr( 0, pos_2 - 1 ) << std::endl;
+
+    if( !execute( token1 ) )
+      return false;
+
+    content1.erase( 0, pos_ + delimiter1.length() );
+  }
 
   return true;
+}
+
+bool promptForChar( const char* prompt, char& readch )
+{
+  std::string tmp;
+  std::cout << prompt << std::endl;
+  if( std::getline( std::cin, tmp ) )
+  {
+    if( tmp.length() == 1 )
+    {
+      readch = tmp[ 0 ];
+    }
+    else
+    {
+      readch = '\0';
+    }
+    return true;
+  }
+  return false;
+}
+
+bool DbManager::modeLiquidate()
+{
+  if( !selectSchema() )
+    return false;
+
+  char type = '\0';
+
+  while( promptForChar( "This action will drop all tables in the database. Are you sure? [y/n]", type ) )
+  {
+    if( type == 'y' )
+      break;
+    if( type == 'n' )
+      return true;
+  }
+
+  std::string query = "SELECT TABLE_NAME "
+                      "FROM information_schema.tables "
+                      "WHERE table_type = 'BASE TABLE' "
+                      "AND table_schema = '" + m_database + "';";
+  try
+  {
+    auto stmt = m_pConnection->createStatement();
+    auto resultSet = stmt->executeQuery( query );
+
+    while( resultSet->next() )
+    {
+      std::cout << resultSet->getString( 1 ) << "\n";
+    }
+    return false;
+
+    auto count = resultSet->getUInt( 1 );
+    if( count )
+    {
+      m_lastError = "Database " + m_database + " still contains tables. <Liquidate> it first!";
+      return false;
+    }
+
+  }
+  catch( std::runtime_error& e )
+  {
+    m_lastError = e.what();
+    return false;
+  }
+
+
+  return false;
 }
