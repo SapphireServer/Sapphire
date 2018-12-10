@@ -35,6 +35,8 @@ class DbManager
 
     bool modeInit();
 
+    bool modeLiquidate();
+
     virtual ~DbManager();
 
     const std::string& getLastError();
