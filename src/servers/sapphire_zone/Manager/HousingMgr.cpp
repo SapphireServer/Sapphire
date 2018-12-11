@@ -13,6 +13,7 @@
 
 #include "Actor/Player.h"
 #include "Actor/EventObject.h"
+#include "Event/EventDefs.h"
 
 #include "TerritoryMgr.h"
 #include "Territory/Zone.h"
@@ -350,8 +351,7 @@ void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& pl
   // start house built event
   // CmnDefHousingBuildHouse_00149
   player.eventStart( player.getId(), 0x000B0095, Event::EventHandler::EventType::Housing, 1, 1 );
-  // todo: wtf are these flags
-  player.playScene( 0x000B0095, 0, 4164955899, 0, 1, plotNum, nullptr );
+  player.playScene( 0x000B0095, 0, SET_BASE | HIDE_HOTBAR , 0, 1, plotNum, nullptr );
 
   player.setLandFlags( LandFlagsSlot::Private, EstateBuilt, pLand->getLandId(), pLand->getWardNum(), pLand->getTerritoryTypeId() );
   player.sendLandFlagsSlot( LandFlagsSlot::Private );
