@@ -10,7 +10,9 @@ DbManager::DbManager( const std::string& host, const std::string& database, cons
   m_database( database ),
   m_user( user ),
   m_password( pw ),
-  m_port( port )	
+  m_port( port ),	
+  m_sFile( "sql/schema/schema.sql" ),
+  m_iFile( "sql/schema/inserts.sql" )
 {
 }
 
@@ -120,8 +122,6 @@ bool DbManager::performAction()
 bool DbManager::modeInit()
 {
 
-  const std::string schemaFile = "sql/schema/schema.sql";
-  const std::string insertFile = "sql/schema/inserts.sql";
 
   bool result = false;
   bool dbCreated = false;
@@ -166,10 +166,10 @@ bool DbManager::modeInit()
     return false;
   }
 
-  std::ifstream t( schemaFile );
+  std::ifstream t( m_sFile );
   if( !t.is_open() )
   {
-    m_lastError = "File " + schemaFile + " does not exist!";
+    m_lastError = "File " + m_sFile + " does not exist!";
     return false;
   }
   std::string content( ( std::istreambuf_iterator< char >( t ) ),
@@ -196,10 +196,10 @@ bool DbManager::modeInit()
   std::cout << "Inserting default values..." << std::endl;
 
 
-  std::ifstream t1( insertFile );
+  std::ifstream t1( m_iFile );
   if( !t1.is_open() )
   {
-    m_lastError = "File " + insertFile + " does not exist!";
+    m_lastError = "File " + m_iFile + " does not exist!";
     return false;
   }
   std::string content1( ( std::istreambuf_iterator< char >( t1 ) ),
@@ -270,17 +270,10 @@ bool DbManager::modeLiquidate()
 
     while( resultSet->next() )
     {
-      std::cout << resultSet->getString( 1 ) << "\n";
+      std::cout << "DROP TABLE `" + resultSet->getString( 1 ) + "`;" << "\n";
+      if( !execute( "DROP TABLE `" + resultSet->getString( 1 ) + "`;" ) )
+        return false;
     }
-    return false;
-
-    auto count = resultSet->getUInt( 1 );
-    if( count )
-    {
-      m_lastError = "Database " + m_database + " still contains tables. <Liquidate> it first!";
-      return false;
-    }
-
   }
   catch( std::runtime_error& e )
   {
@@ -288,6 +281,17 @@ bool DbManager::modeLiquidate()
     return false;
   }
 
-
-  return false;
+  return true;
 }
+
+void DbManager::setInsertFile( const std::string& iFile )
+{
+  m_iFile = iFile;
+}
+
+void DbManager::setSchemaFile( const std::string& sFile )
+{
+  m_sFile = sFile;
+}
+
+

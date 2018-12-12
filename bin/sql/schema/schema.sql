@@ -152,7 +152,7 @@ CREATE TABLE `charainfolinkshell` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `charainfosearch` (
-  `CharacterId` int(20) DEFAULT NULL,
+  `CharacterId` int(20) NOT NULL,
   `SelectClassId` int(3) DEFAULT '0',
   `SelectRegion` int(3) DEFAULT '0',
   `SearchComment` binary(193) DEFAULT '\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0',
@@ -293,7 +293,7 @@ CREATE TABLE `charaquest` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `charastatus` (
-  `CharacterId` int(20) DEFAULT NULL,
+  `CharacterId` int(20) NOT NULL,
   `Recast_0` binary(24) DEFAULT NULL,
   `Recast_1` binary(24) DEFAULT NULL,
   `Recast_2` binary(24) DEFAULT NULL,
@@ -412,7 +412,7 @@ CREATE TABLE `house` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `housepartsitem` (
-  `HouseId` bigint(20) UNSIGNED DEFAULT NULL,
+  `HouseId` bigint(20) UNSIGNED NOT NULL,
   `itemId` bigint(20) UNSIGNED DEFAULT NULL,
   `CharacterId` bigint(20) UNSIGNED DEFAULT NULL,
   `UPDATE_DATE` datetime DEFAULT CURRENT_TIMESTAMP,
@@ -421,11 +421,11 @@ CREATE TABLE `housepartsitem` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `housepartsstorage` (
-  `LandSetId` bigint(20) UNSIGNED DEFAULT NULL,
-  `HouseId` bigint(20) UNSIGNED DEFAULT NULL,
-  `storageId` bigint(20) DEFAULT NULL,
+  `LandSetId` bigint(20) UNSIGNED NOT NULL,
+  `HouseId` bigint(20) UNSIGNED NOT NULL,
+  `storageId` bigint(20) NOT NULL,
   `type` int(11) DEFAULT NULL,
-  `index` int(11) DEFAULT NULL,
+  `index` int(11) NOT NULL,
   `container_0` bigint(20) UNSIGNED DEFAULT NULL,
   `container_1` bigint(20) UNSIGNED DEFAULT NULL,
   `container_2` bigint(20) UNSIGNED DEFAULT NULL,
