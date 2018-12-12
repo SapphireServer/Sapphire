@@ -256,14 +256,14 @@ bool DbManager::modeLiquidate()
     return false;
 
   char type = '\0';
-  if( !m_force )
+/*  if( !m_force )
     while( promptForChar( "This action will drop all tables in the database. Are you sure? [y/n]", type ) )
     {
       if( type == 'y' )
         break;
       if( type == 'n' )
         return true;
-    }
+    }*/
 
   std::string query = "SELECT TABLE_NAME "
                       "FROM information_schema.tables "
