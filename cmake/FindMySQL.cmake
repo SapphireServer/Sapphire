@@ -139,7 +139,7 @@ endif( UNIX )
 if( WIN32 )
   find_library( MYSQL_LIBRARY
     NAMES
-      mysqlclient
+      libmysql
     PATHS
       ${MYSQL_ADD_LIBRARIES_PATH}
       "${PROGRAM_FILES_32}/MySQL/MySQL Server 5.7/lib"
