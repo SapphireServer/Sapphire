@@ -25,4 +25,7 @@ before_build:
 
 build_script:
   - cd ..
+  - cd bin  
+  - copy "C:\Program Files\MySQL\MySQL Server 5.7\lib\libmysql.dll" libmysql.dll
+  - cd ..  
   - sh sql_import.sh
