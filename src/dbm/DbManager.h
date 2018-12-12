@@ -47,6 +47,8 @@ class DbManager
     void setSchemaFile( const std::string& schemaFile );
     void setInsertFile( const std::string& insertFile );
 
+    void setForceMode( bool );
+
   private:
     std::string m_host;
     std::string m_database;
@@ -58,6 +60,7 @@ class DbManager
     Mode m_mode;
     std::string m_iFile;
     std::string m_sFile;
+    bool m_force;
 };
 
 

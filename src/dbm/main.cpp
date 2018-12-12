@@ -90,8 +90,7 @@ void printUsage()
   g_log.info( "\t --port <mysqlPort> ( default 3306 )" );
   g_log.info( "\t --database <mysqlDatabase>" );
   g_log.info( "\t --sfile <path/to/schemafile> ( default sql/schema/schema.sql )" );
-  g_log.info( "\t --ifile <path/to/insertsfile> ( default sql/schema/inserts.sql )" );
-
+  g_log.info( "\t --force ( skips user input / auto Yes )" );
 }
 
 int main( int32_t argc, char* argv[] )
@@ -109,6 +108,8 @@ int main( int32_t argc, char* argv[] )
 
   std::string sFile;
   std::string iFile;
+
+  bool force = false;
 
   std::vector< std::string > args( argv + 1, argv + argc );
   for( uint32_t i = 0; i + 1 < args.size(); i += 2 )
@@ -132,7 +133,8 @@ int main( int32_t argc, char* argv[] )
       sFile = val;
     else if( arg == "ifile" )
       iFile = val;
-	    
+    else if( arg == "force" )
+      force = true;	    
   }	  
 
   if( host.empty() )
@@ -150,8 +152,9 @@ int main( int32_t argc, char* argv[] )
   {
     dbm.setInsertFile( iFile );
     dbm.setSchemaFile( sFile );
-
   }
+  if( force ) 
+    dbm.setForceMode( true );
   //initialize|check|update|clearchars|liquidate
   if( mode.find( "initialize" ) != std::string::npos )
   {
