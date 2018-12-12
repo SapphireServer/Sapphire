@@ -16,11 +16,5 @@ set_target_properties( mysqlConnector PROPERTIES
         )
 
 target_include_directories( mysqlConnector PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} )
-if(UNIX)
-  target_include_directories( mysqlConnector PUBLIC "/usr/include/mysql/" )
-  
-else()
-  target_include_directories( mysqlConnector PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../MySQL/" )
-endif()
 target_link_libraries( mysqlConnector PUBLIC mysql )
 #cotire(mysqlConnector)
