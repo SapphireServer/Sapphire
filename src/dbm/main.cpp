@@ -89,6 +89,8 @@ void printUsage()
   g_log.info( "\t --host <mysqlHost> ( default 127.0.0.1 )" );
   g_log.info( "\t --port <mysqlPort> ( default 3306 )" );
   g_log.info( "\t --database <mysqlDatabase>" );
+  g_log.info( "\t --sfile <path/to/schemafile> ( default sql/schema/schema.sql )" );
+  g_log.info( "\t --ifile <path/to/insertsfile> ( default sql/schema/inserts.sql )" );
 
 }
 
@@ -105,6 +107,8 @@ int main( int32_t argc, char* argv[] )
   g_log.setLogPath( "log/SapphireDbm" );
   g_log.init();
 
+  std::string sFile;
+  std::string iFile;
 
   std::vector< std::string > args( argv + 1, argv + argc );
   for( uint32_t i = 0; i + 1 < args.size(); i += 2 )
@@ -116,12 +120,19 @@ int main( int32_t argc, char* argv[] )
     arg = arg.erase( 0, arg.find_first_not_of( '-' ) );
     if( arg == "mode" )
       mode = val;
+    else if( arg == "initialize" || arg == "liquidate" )
+      mode = arg;
     else if( arg == "user" )
       user = val;
     else if( arg == "host" )
       host = val;
     else if( arg == "database" )
       database = val;
+    else if( arg == "sfile" )
+      sFile = val;
+    else if( arg == "ifile" )
+      iFile = val;
+	    
   }	  
 
   if( host.empty() )
@@ -135,6 +146,12 @@ int main( int32_t argc, char* argv[] )
 
   auto dbm = DbManager( host, database, user, "", 3306 );
   
+  if( !sFile.empty() && !iFile.empty() )
+  {
+    dbm.setInsertFile( iFile );
+    dbm.setSchemaFile( sFile );
+
+  }
   //initialize|check|update|clearchars|liquidate
   if( mode.find( "initialize" ) != std::string::npos )
   {
@@ -159,7 +176,7 @@ int main( int32_t argc, char* argv[] )
   else
   { 
     g_log.fatal( "Not a valid mode: " + mode + " !" );
-    return 0;
+    return 1;
   }	  
 	
   g_log.info( "Launching in " + mode + " mode..." );
@@ -168,22 +185,15 @@ int main( int32_t argc, char* argv[] )
   {
     g_log.fatal( "Could not connect to server!" );
     g_log.fatal( dbm.getLastError() );
-    return 0;
+    return 1;
   }
 
   if( !dbm.performAction() )
   {
     g_log.fatal( "Could not perform action!" );
     g_log.fatal( dbm.getLastError() );
+    return 1;
   }
-
-  //if( !dbm.selectSchema() )
-  //{
-  //  g_log.fatal( "Could not set schema!" );
-  //  g_log.fatal( dbm.getLastError() );
-  //  return 0;
-  //}
-
 
 
   return 0;

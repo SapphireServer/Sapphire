@@ -41,6 +41,12 @@ class DbManager
 
     const std::string& getLastError();
 
+    const std::string& getSchemaFile() const;
+    const std::string& getInsertFile() const;
+    
+    void setSchemaFile( const std::string& schemaFile );
+    void setInsertFile( const std::string& insertFile );
+
   private:
     std::string m_host;
     std::string m_database;
@@ -50,6 +56,8 @@ class DbManager
     std::shared_ptr< Mysql::Connection > m_pConnection;
     std::string m_lastError;
     Mode m_mode;
+    std::string m_iFile;
+    std::string m_sFile;
 };
 
 

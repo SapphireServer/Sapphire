@@ -1,5 +1,12 @@
 ﻿# Output Directory
-[Bb]in/
+[Bb]in/*.exe
+[Bb]in/*.pdb
+[Bb]in/sapphire_api
+[Bb]in/sapphire_zone
+[Bb]in/sapphire_lobby
+[Bb]in/sapphire_dbm
+
+
 
 # Script Directory
 # TODO: Sperate script directory from bin
