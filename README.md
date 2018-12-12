@@ -6,7 +6,7 @@
 
 [![Discord Server](https://img.shields.io/badge/discord-Sapphire-7289DA.svg)](https://discord.gg/xxcdCER)
 [![Linux Build Status](https://api.travis-ci.org/SapphireServer/Sapphire.svg?branch=master)](https://travis-ci.org/SapphireMordred/Sapphire)
-[![Windows Build Status](https://ci.appveyor.com/api/projects/status/lil7lxa3ty165emm?svg=true)](https://ci.appveyor.com/project/SapphireMordred/Sapphire)
+[![Windows Build Status](https://ci.appveyor.com/api/projects/status/ab52dmvq3ictvd39?svg=true)](https://ci.appveyor.com/project/SapphireMordred/Sapphire)
 
 
 Sapphire is a FINAL FANTASY XIV 4.0+ Server Emulator currently in development.
