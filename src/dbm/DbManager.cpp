@@ -12,7 +12,8 @@ DbManager::DbManager( const std::string& host, const std::string& database, cons
   m_password( pw ),
   m_port( port ),	
   m_sFile( "sql/schema/schema.sql" ),
-  m_iFile( "sql/schema/inserts.sql" )
+  m_iFile( "sql/schema/inserts.sql" ),
+  m_force( false )
 {
 }
 
@@ -34,6 +35,11 @@ bool DbManager::execute( const std::string& sql )
     m_lastError = e.what();
     return false;
   }
+}
+
+void DbManager::setForceMode( bool mode )
+{
+  m_force = mode;
 }
 
 bool DbManager::connect()
@@ -250,14 +256,14 @@ bool DbManager::modeLiquidate()
     return false;
 
   char type = '\0';
-
-  while( promptForChar( "This action will drop all tables in the database. Are you sure? [y/n]", type ) )
-  {
-    if( type == 'y' )
-      break;
-    if( type == 'n' )
-      return true;
-  }
+  if( !m_force )
+    while( promptForChar( "This action will drop all tables in the database. Are you sure? [y/n]", type ) )
+    {
+      if( type == 'y' )
+        break;
+      if( type == 'n' )
+        return true;
+    }
 
   std::string query = "SELECT TABLE_NAME "
                       "FROM information_schema.tables "
