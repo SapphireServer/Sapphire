@@ -41,8 +41,8 @@ target_link_libraries( world PUBLIC common )
 target_include_directories( world PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" )
 
 
-if (UNIX)
-#    cotire( world )
+if( UNIX )
+    cotire( world )
     target_link_libraries( world PUBLIC stdc++fs )
 else()
     target_link_libraries( world PUBLIC mysql )
