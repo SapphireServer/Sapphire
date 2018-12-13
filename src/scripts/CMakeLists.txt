@@ -56,7 +56,9 @@ foreach(_scriptDir ${children})
 
         configure_file("${CMAKE_CURRENT_SOURCE_DIR}/ScriptLoader.cpp.in" "${_scriptDir}/ScriptLoader.cpp")
 
-        cotire("script_${_name}")
+	if( UNIX )
+          cotire("script_${_name}")
+        endif()
 
         if(MSVC)
             add_custom_command(TARGET "script_${_name}" POST_BUILD
