@@ -1,13 +1,13 @@
-cmake_minimum_required(VERSION 2.6)
-cmake_policy(SET CMP0015 NEW)
-project(Sapphire)
+cmake_minimum_required( VERSION 2.6 )
+cmake_policy( SET CMP0015 NEW )
+project( Sapphire )
 
-file(GLOB SERVER_PUBLIC_INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*")
-file(GLOB SERVER_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}*.c*")
+file( GLOB SERVER_PUBLIC_INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*" )
+file( GLOB SERVER_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}*.c*" )
 
-add_executable(sapphire_api ${SERVER_PUBLIC_INCLUDE_FILES} ${SERVER_SOURCE_FILES})
+add_executable( api ${SERVER_PUBLIC_INCLUDE_FILES} ${SERVER_SOURCE_FILES} )
 
-set_target_properties(sapphire_api PROPERTIES
+set_target_properties( api PROPERTIES
     CXX_STANDARD 17
     CXX_STANDARD_REQUIRED ON
     CXX_EXTENSIONS ON
@@ -18,10 +18,10 @@ set_target_properties(sapphire_api PROPERTIES
     VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../../../bin/"
 )
 
-target_link_libraries( sapphire_api common )
+target_link_libraries( api common )
 if( UNIX )
-    target_link_libraries( sapphire_api mysqlclient stdc++fs )
+    target_link_libraries( api mysqlclient stdc++fs )
 
 else()
-    target_link_libraries( sapphire_api mysql )
+    target_link_libraries( api mysql )
 endif()
