@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(Sapphire_Script)
+project(Script)
 
 file(GLOB SCRIPT_INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 
@@ -36,7 +36,7 @@ foreach(_scriptDir ${children})
         endforeach()
 
         add_library("script_${_name}" MODULE ${SCRIPT_BUILD_FILES} "${SCRIPT_INCLUDE_FILES}" "${_scriptDir}/ScriptLoader.cpp")
-        target_link_libraries( "script_${_name}" sapphire_zone )
+        target_link_libraries( "script_${_name}" world )
 
         if(MSVC)
             set_target_properties( "script_${_name}" PROPERTIES
@@ -56,7 +56,7 @@ foreach(_scriptDir ${children})
 
         configure_file("${CMAKE_CURRENT_SOURCE_DIR}/ScriptLoader.cpp.in" "${_scriptDir}/ScriptLoader.cpp")
 
-        #cotire("script_${_name}")
+        cotire("script_${_name}")
 
         if(MSVC)
             add_custom_command(TARGET "script_${_name}" POST_BUILD

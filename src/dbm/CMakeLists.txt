@@ -1,13 +1,13 @@
-cmake_minimum_required(VERSION 3.0)
-cmake_policy(SET CMP0015 NEW)
-project(sapphire_dbm)
+cmake_minimum_required( VERSION 3.0 )
+cmake_policy( SET CMP0015 NEW )
+project( dbm )
 
-file(GLOB SERVER_PUBLIC_INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*" )
-file(GLOB SERVER_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}*.c*")
+file( GLOB SERVER_PUBLIC_INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*" )
+file( GLOB SERVER_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}*.c*" )
 
-add_executable(sapphire_dbm ${SERVER_PUBLIC_INCLUDE_FILES} ${SERVER_SOURCE_FILES})
+add_executable( dbm ${SERVER_PUBLIC_INCLUDE_FILES} ${SERVER_SOURCE_FILES} )
 
-set_target_properties(sapphire_dbm PROPERTIES
+set_target_properties( dbm PROPERTIES
     CXX_STANDARD 17
     CXX_STANDARD_REQUIRED ON
     CXX_EXTENSIONS ON
@@ -17,15 +17,15 @@ set_target_properties(sapphire_dbm PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_CURRENT_SOURCE_DIR}/../../bin/"
 )
 
-target_include_directories( sapphire_dbm
+target_include_directories( dbm
                               PUBLIC
                                 "${CMAKE_CURRENT_SOURCE_DIR}/"
                               PRIVATE
                                 "${CMAKE_CURRENT_SOURCE_DIR}/../" )
-			target_link_libraries( sapphire_dbm PRIVATE mysqlConnector common xivdat )
+target_link_libraries( dbm PRIVATE mysqlConnector common xivdat )
 if (UNIX)
-    target_link_libraries( sapphire_dbm PRIVATE stdc++fs )
+    target_link_libraries( dbm PRIVATE stdc++fs )
 else()
-    target_link_libraries( sapphire_dbm PRIVATE mysql )
+    target_link_libraries( dbm PRIVATE mysql )
 endif()
 
