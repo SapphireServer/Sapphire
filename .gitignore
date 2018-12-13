@@ -1,12 +1,10 @@
 ﻿# Output Directory
 [Bb]in/*.exe
 [Bb]in/*.pdb
-[Bb]in/sapphire_api
-[Bb]in/sapphire_zone
-[Bb]in/sapphire_lobby
-[Bb]in/sapphire_dbm
-
-
+[Bb]in/api
+[Bb]in/zone
+[Bb]in/lobby
+[Bb]in/dbm
 
 # Script Directory
 # TODO: Sperate script directory from bin
@@ -71,10 +69,6 @@ CTestTestfile.cmake
 # Binary Template
 *.bt
 
-# Boost
-/lib/boost_1_63_0
-src/libraries/external/boost_*
-
 # EasyHook
 !EasyHook32.dll
 !EasyHook32Svc.exe
@@ -120,7 +114,7 @@ src/common/Version\.cpp
 .mtime_cache
 
 # generated script loader files
-src/servers/Scripts/*/ScriptLoader.cpp
+src/scripts/*/ScriptLoader.cpp
 
 # cotire generated files/folders
 cotire/
