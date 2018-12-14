@@ -1,4 +1,4 @@
-﻿# Output Directory
+# Output Directory
 [Bb]in/*.exe
 [Bb]in/*.pdb
 [Bb]in/api
@@ -9,6 +9,9 @@
 # Script Directory
 # TODO: Sperate script directory from bin
 !bin/scripts/**/*
+
+# decompiled scripts
+src/tools/bin/generated/*
 
 # Build Directory
 build/
@@ -114,7 +117,7 @@ src/common/Version\.cpp
 .mtime_cache
 
 # generated script loader files
-src/scripts/*/ScriptLoader.cpp
+**/ScriptLoader.cpp
 
 # cotire generated files/folders
 cotire/
