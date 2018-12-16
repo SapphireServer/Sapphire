@@ -46,11 +46,18 @@ bool Sapphire::World::Manager::TerritoryMgr::isValidTerritory( uint32_t territor
 
 bool Sapphire::World::Manager::TerritoryMgr::init()
 {
-  loadTerritoryTypeDetailCache();
-  loadTerritoryPositionMap();
+  try
+  {
+    loadTerritoryTypeDetailCache();
+    loadTerritoryPositionMap();
 
-  createDefaultTerritories();
-  createHousingTerritories();
+    createDefaultTerritories();
+    createHousingTerritories();
+  }
+  catch( std::runtime_error& )
+  {
+    return false;
+  }
 
   return true;
 }

@@ -26,6 +26,17 @@
 
 #include "Script/ScriptMgr.h"
 
+#include <Exd/ExdDataGenerated.h>
+
+#include <Database/ZoneDbConnection.h>
+#include <Database/DbWorkerPool.h>
+#include "Manager/LinkshellMgr.h"
+#include "Manager/TerritoryMgr.h"
+#include "Manager/HousingMgr.h"
+#include "DebugCommand/DebugCommandHandler.h"
+#include "Manager/PlayerMgr.h"
+#include "Manager/ShopMgr.h"
+
 
 extern Sapphire::Framework g_fw;
 
@@ -52,8 +63,6 @@ bool Sapphire::ServerMgr::loadSettings( int32_t argc, char* argv[] )
 {
   auto pLog = g_fw.get< Sapphire::Logger >();
   auto pConfig = g_fw.get< Sapphire::ConfigMgr >();
-  auto pExd = g_fw.get< Data::ExdDataGenerated >();
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
 
   pLog->info( "Loading config " + m_configName );
 
@@ -63,69 +72,40 @@ bool Sapphire::ServerMgr::loadSettings( int32_t argc, char* argv[] )
     return false;
   }
 
-  std::vector< std::string > args( argv + 1, argv + argc );
-  for( uint32_t i = 0; i + 1 < args.size(); i += 2 )
+  m_port = pConfig->getValue< uint16_t >( "ZoneNetwork", "ListenPort", 54992 );
+  m_ip = pConfig->getValue< std::string >( "ZoneNetwork", "ListenIp", "0.0.0.0" );
+
+  return true;
+}
+
+void Sapphire::ServerMgr::run( int32_t argc, char* argv[] )
+{
+  using namespace Sapphire;
+  using namespace Sapphire::World;
+
+  auto pLog = std::make_shared< Logger >();
+  pLog->setLogPath( "log/world" );
+  pLog->init();
+  g_fw.set< Logger >( pLog );
+
+  printBanner();
+
+  auto pConfig = std::make_shared< ConfigMgr >();
+  g_fw.set< ConfigMgr >( pConfig );
+  if( !loadSettings( argc, argv ) )
   {
-    std::string arg( "" );
-    std::string val( "" );
-
-    try
-    {
-      arg = Util::toLowerCopy( std::string( args[ i ] ) );
-      val = std::string( args[ i + 1 ] );
-
-      // trim '-' from start of arg
-      arg = arg.erase( 0, arg.find_first_not_of( '-' ) );
-
-      if( arg == "ip" )
-      {
-        // todo: ip addr in config
-        pConfig->setValue< std::string >( "ZoneNetwork.ListenIp", val );
-      }
-      else if( arg == "p" || arg == "port" )
-      {
-        pConfig->setValue< std::string >( "ZoneNetwork.ListenPort", val );
-      }
-      else if( arg == "exdpath" || arg == "datapath" )
-      {
-        pConfig->setValue< std::string >( "GlobalParameters.DataPath", val );
-      }
-      else if( arg == "h" || arg == "dbhost" )
-      {
-        pConfig->setValue< std::string >( "Database.Host", val );
-      }
-      else if( arg == "dbport" )
-      {
-        pConfig->setValue< std::string >( "Database.Port", val );
-      }
-      else if( arg == "u" || arg == "user" || arg == "dbuser" )
-      {
-        pConfig->setValue< std::string >( "Database.Username", val );
-      }
-      else if( arg == "pass" || arg == "dbpass" )
-      {
-        pConfig->setValue< std::string >( "Database.Password", val );
-      }
-      else if( arg == "d" || arg == "db" || arg == "database" )
-      {
-        pConfig->setValue< std::string >( "Database.Database", val );
-      }
-    }
-    catch( ... )
-    {
-      pLog->error( "Error parsing argument: " + arg + " " + "value: " + val + "\n" );
-      pLog->error( "Usage: <arg> <val> \n" );
-    }
+    pLog->fatal( "Unable to load settings!" );
+    return;
   }
 
   pLog->info( "Setting up generated EXD data" );
-  if( !pExd->init( pConfig->getValue< std::string >( "GlobalParameters", "DataPath", "" ) ) )
+  auto pExdData = std::make_shared< Data::ExdDataGenerated >();
+  if( !pExdData->init( pConfig->getValue< std::string >( "GlobalParameters", "DataPath", "" ) ) )
   {
     pLog->fatal( "Error setting up generated EXD data " );
-    return false;
+    return;
   }
-
-  Sapphire::Db::DbLoader loader;
+  g_fw.set< Data::ExdDataGenerated >( pExdData );
 
   Sapphire::Db::ConnectionInfo info;
   info.password = pConfig->getValue< std::string >( "Database", "Password", "" );
@@ -136,52 +116,61 @@ bool Sapphire::ServerMgr::loadSettings( int32_t argc, char* argv[] )
   info.syncThreads = pConfig->getValue< uint8_t >( "Database", "SyncThreads", 2 );
   info.asyncThreads = pConfig->getValue< uint8_t >( "Database", "AsyncThreads", 2 );
 
+  auto pDb = std::make_shared< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  Sapphire::Db::DbLoader loader;
   loader.addDb( *pDb, info );
   if( !loader.initDbs() )
-    return false;
-
-  m_port = pConfig->getValue< uint16_t >( "ZoneNetwork", "ListenPort", 54992 );
-  m_ip = pConfig->getValue< std::string >( "ZoneNetwork", "ListenIp", "0.0.0.0" );
-
-  return true;
-}
-
-void Sapphire::ServerMgr::run( int32_t argc, char* argv[] )
-{
-  auto pLog = g_fw.get< Sapphire::Logger >();
-  auto pScript = g_fw.get< Scripting::ScriptMgr >();
-  auto pLsMgr = g_fw.get< LinkshellMgr >();
-  auto pTeriMgr = g_fw.get< TerritoryMgr >();
-
-  printBanner();
-
-  if( !loadSettings( argc, argv ) )
   {
-    pLog->fatal( "Unable to load settings!" );
+    pLog->fatal( "Database not initialized properly!" );
     return;
   }
+  g_fw.set< Db::DbWorkerPool< Db::ZoneDbConnection > >( pDb );
 
   pLog->info( "LinkshellMgr: Caching linkshells" );
+  auto pLsMgr = std::make_shared< Manager::LinkshellMgr >();
   if( !pLsMgr->loadLinkshells() )
   {
     pLog->fatal( "Unable to load linkshells!" );
     return;
   }
+  g_fw.set< Manager::LinkshellMgr >( pLsMgr );
+
+  auto pScript = std::make_shared< Scripting::ScriptMgr >();
+  if( !pScript->init() )
+  {
+    pLog->fatal( "Failed to setup scripts!" );
+    return;
+  }
+  g_fw.set< Scripting::ScriptMgr >( pScript );
+
+  pLog->info( "TerritoryMgr: Setting up zones" );
+  auto pTeriMgr = std::make_shared< Manager::TerritoryMgr >();
+  auto pHousingMgr = std::make_shared< Manager::HousingMgr >();
+  g_fw.set< Manager::HousingMgr >( pHousingMgr );
+  g_fw.set< Manager::TerritoryMgr >( pTeriMgr );
+  if( !pTeriMgr->init() )
+  {
+    pLog->fatal( "Failed to setup zones!" );
+    return;
+  }
+
+  loadBNpcTemplates();
 
   Network::HivePtr hive( new Network::Hive() );
   Network::addServerToHive< Network::GameConnection >( m_ip, m_port, hive );
 
-  pScript->init();
-
-  pLog->info( "TerritoryMgr: Setting up zones" );
-  pTeriMgr->init();
-
-  loadBNpcTemplates();
-
   std::vector< std::thread > thread_list;
   thread_list.emplace_back( std::thread( std::bind( &Network::Hive::Run, hive.get() ) ) );
 
-  pLog->info( "Zone server running on " + m_ip + ":" + std::to_string( m_port ) );
+  auto pDebugCom = std::make_shared< DebugCommandHandler >();
+  auto pPlayerMgr = std::make_shared< Manager::PlayerMgr >();
+  auto pShopMgr = std::make_shared< Manager::ShopMgr >();
+
+  g_fw.set< DebugCommandHandler >( pDebugCom );
+  g_fw.set< Manager::PlayerMgr >( pPlayerMgr );
+  g_fw.set< Manager::ShopMgr >( pShopMgr );
+
+  pLog->info( "World server running on " + m_ip + ":" + std::to_string( m_port ) );
 
   mainLoop();
 
