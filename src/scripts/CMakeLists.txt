@@ -49,8 +49,8 @@ foreach(_scriptDir ${children})
                 LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL "${SCRIPT_LIB_DIR}"
             )
         endif()
-        target_include_directories("script_${_name}" PUBLIC "${CMAKE_SOURCE_DIR}/src/servers/sapphire_zone/")
-        target_include_directories("script_${_name}" PUBLIC "${CMAKE_SOURCE_DIR}/src/servers/Script/Scripts")
+        target_include_directories("script_${_name}" PUBLIC "${CMAKE_SOURCE_DIR}/src/world/")
+        target_include_directories("script_${_name}" PUBLIC "${CMAKE_SOURCE_DIR}/src/scripts")
         target_include_directories("script_${_name}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
         target_include_directories("script_${_name}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/Scripts")
 
