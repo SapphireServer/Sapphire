@@ -27,6 +27,7 @@
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 
+#include "Manager/InventoryMgr.h"
 
 #include "Framework.h"
 #include <Network/CommonActorControl.h>
@@ -358,54 +359,13 @@ void Sapphire::Entity::Player::sendInventory()
 {
   InventoryMap::iterator it;
 
-  int32_t count = 0;
-  for( it = m_storageMap.begin(); it != m_storageMap.end(); ++it, count++ )
+  auto pInvMgr = g_fw.get< World::Manager::InventoryMgr >();
+
+  uint32_t count = 0;
+  for( it = m_storageMap.begin(); it != m_storageMap.end(); ++it, ++count )
   {
-
-    auto pMap = it->second->getItemMap();
-    auto itM = pMap.begin();
-
-    for( ; itM != pMap.end(); ++itM )
-    {
-      if( !itM->second )
-        return;
-
-      if( it->second->getId() == InventoryType::Currency || it->second->getId() == InventoryType::Crystal )
-      {
-        auto currencyInfoPacket = makeZonePacket< FFXIVIpcCurrencyCrystalInfo >( getId() );
-        currencyInfoPacket->data().sequence = count;
-        currencyInfoPacket->data().catalogId = itM->second->getId();
-        currencyInfoPacket->data().unknown = 1;
-        currencyInfoPacket->data().quantity = itM->second->getStackSize();
-        currencyInfoPacket->data().containerId = it->second->getId();
-        currencyInfoPacket->data().slot = 0;
-        queuePacket( currencyInfoPacket );
-      }
-      else
-      {
-        auto itemInfoPacket = makeZonePacket< FFXIVIpcItemInfo >( getId() );
-        itemInfoPacket->data().sequence = count;
-        itemInfoPacket->data().containerId = it->second->getId();
-        itemInfoPacket->data().slot = itM->first;
-        itemInfoPacket->data().quantity = itM->second->getStackSize();
-        itemInfoPacket->data().catalogId = itM->second->getId();
-        itemInfoPacket->data().condition = itM->second->getDurability();
-        itemInfoPacket->data().spiritBond = 0;
-        itemInfoPacket->data().hqFlag = itM->second->isHq() ? 1 : 0;
-        itemInfoPacket->data().stain = itM->second->getStain();
-        queuePacket( itemInfoPacket );
-      }
-    }
-
-    auto containerInfoPacket = makeZonePacket< FFXIVIpcContainerInfo >( getId() );
-    containerInfoPacket->data().sequence = count;
-    containerInfoPacket->data().numItems = it->second->getEntryCount();
-    containerInfoPacket->data().containerId = it->second->getId();
-    queuePacket( containerInfoPacket );
-
-
+    pInvMgr->sendInventoryContainer( *this, it->second, count );
   }
-
 }
 
 Sapphire::Entity::Player::InvSlotPairVec Sapphire::Entity::Player::getSlotsOfItemsInInventory( uint32_t catalogId )
