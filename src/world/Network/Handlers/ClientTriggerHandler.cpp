@@ -336,7 +336,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
     {
       auto pHousingMgr = g_fw.get< HousingMgr >();
 
-      auto ident = pHousingMgr->clientTriggerParamsToLandIdent( param11, param12 );
+      auto ident = pHousingMgr->clientTriggerParamsToLandIdent( param11, param12, false );
       pHousingMgr->sendLandSignOwned( player, ident );
 
       break;

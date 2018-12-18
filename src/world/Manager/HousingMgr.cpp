@@ -450,13 +450,22 @@ void Sapphire::World::Manager::HousingMgr::requestEstateEditGuestAccess( Entity:
   player.queuePacket( packet );
 }
 
-Sapphire::Common::LandIdent Sapphire::World::Manager::HousingMgr::clientTriggerParamsToLandIdent( uint32_t param11, uint32_t param12 ) const
+Sapphire::Common::LandIdent Sapphire::World::Manager::HousingMgr::clientTriggerParamsToLandIdent( uint32_t param11, uint32_t param12, bool use16bits ) const
 {
   Common::LandIdent ident;
   ident.worldId = param11 >> 16;
   ident.territoryTypeId = param11 & 0xFFFF;
-  ident.wardNum = (param12 >> 8) & 0xFF;
-  ident.landId = param12 & 0xFF;
+
+  if( use16bits )
+  {
+    ident.wardNum = param12 >> 16;
+    ident.landId = param12 & 0xFFFF;
+  }
+  else
+  {
+    ident.wardNum = (param12 >> 8) & 0xFF;
+    ident.landId = param12 & 0xFF;
+  }
 
   return ident;
 }
