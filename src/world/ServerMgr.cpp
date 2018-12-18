@@ -36,6 +36,7 @@
 #include "DebugCommand/DebugCommandHandler.h"
 #include "Manager/PlayerMgr.h"
 #include "Manager/ShopMgr.h"
+#include "Manager/InventoryMgr.h"
 
 
 extern Sapphire::Framework g_fw;
@@ -168,10 +169,12 @@ void Sapphire::ServerMgr::run( int32_t argc, char* argv[] )
   auto pDebugCom = std::make_shared< DebugCommandHandler >();
   auto pPlayerMgr = std::make_shared< Manager::PlayerMgr >();
   auto pShopMgr = std::make_shared< Manager::ShopMgr >();
+  auto pInventoryMgr = std::make_shared< Manager::InventoryMgr >();
 
   g_fw.set< DebugCommandHandler >( pDebugCom );
   g_fw.set< Manager::PlayerMgr >( pPlayerMgr );
   g_fw.set< Manager::ShopMgr >( pShopMgr );
+  g_fw.set< Manager::InventoryMgr >( pInventoryMgr );
 
   pLog->info( "World server running on " + m_ip + ":" + std::to_string( m_port ) );
 
