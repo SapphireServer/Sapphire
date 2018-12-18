@@ -129,3 +129,7 @@ cotire/
 # doxygen output folder
 doxygen/generated/
 doxygen/*.tmp
+
+# ignore config directory contents except the default file
+bin/config/*.ini
+!bin/config/config.ini.default
