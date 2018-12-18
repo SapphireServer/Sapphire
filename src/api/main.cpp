@@ -74,6 +74,7 @@ bool loadSettings( int32_t argc, char* argv[] )
   if( !m_pConfig->loadConfig( configPath ) )
   {
     g_log.fatal( "Error loading config " + configPath );
+    g_log.fatal( "If this is the first time starting the server, we've copied the default one for your editing pleasure." );
     return false;
   }
 
@@ -140,9 +141,11 @@ bool loadSettings( int32_t argc, char* argv[] )
   }
 
   g_log.info( "Setting up generated EXD data" );
-  if( !g_exdDataGen.init( m_pConfig->getValue< std::string >( "GlobalParameters", "DataPath", "" ) ) )
+  auto dataPath = m_pConfig->getValue< std::string >( "GlobalParameters", "DataPath", "" );
+  if( !g_exdDataGen.init( dataPath ) )
   {
-    g_log.fatal( "Error setting up generated EXD data " );
+    g_log.fatal( "Error setting up generated EXD data. Make sure that DataPath is set correctly in config.ini" );
+    g_log.fatal( "DataPath: " + dataPath );
     return false;
   }
 

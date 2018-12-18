@@ -45,8 +45,8 @@ namespace Sapphire
     uint32_t getFcColor();
 
     //Player
-    void setPlayerOwner( uint32_t id );
-    uint32_t getPlayerOwner();
+    void setPlayerOwner( uint64_t id );
+    uint64_t getPlayerOwner();
     //Housing Functions
     void setCurrentPrice( uint32_t currentPrice );
     bool setPreset( uint32_t itemId );
@@ -82,7 +82,7 @@ namespace Sapphire
 
     Common::FFXIVARR_POSITION3 m_mapMarkerPosition;
 
-    uint32_t m_ownerPlayerId;
+    uint64_t m_ownerPlayerId;
     Sapphire::Data::HousingLandSetPtr m_landInfo;
 
     Sapphire::HousePtr m_pHouse;

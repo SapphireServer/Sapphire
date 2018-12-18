@@ -1078,7 +1078,7 @@ struct FFXIVIpcCharaNameReq :
 struct FFXIVIpcItemInfo :
   FFXIVIpcBasePacket< ItemInfo >
 {
-  uint32_t sequence;
+  uint32_t containerSequence;
   uint32_t unknown;
   uint16_t containerId;
   uint16_t slot;
@@ -1113,7 +1113,7 @@ struct FFXIVIpcItemInfo :
 struct FFXIVIpcContainerInfo :
   FFXIVIpcBasePacket< ContainerInfo >
 {
-  uint32_t sequence;
+  uint32_t containerSequence;
   uint32_t numItems;
   uint32_t containerId;
   uint32_t unknown;
@@ -1126,7 +1126,7 @@ struct FFXIVIpcContainerInfo :
 struct FFXIVIpcCurrencyCrystalInfo :
   FFXIVIpcBasePacket< CurrencyCrystalInfo >
 {
-  uint32_t sequence;
+  uint32_t containerSequence;
   uint16_t containerId;
   uint16_t slot;
   uint32_t quantity;

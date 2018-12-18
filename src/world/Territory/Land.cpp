@@ -77,7 +77,7 @@ void Sapphire::Land::init()
     m_size = res->getUInt( "Size" );
     m_state = res->getUInt( "Status" );
     m_currentPrice = res->getUInt( "LandPrice" );
-    m_ownerPlayerId = res->getUInt( "OwnerId" );
+    m_ownerPlayerId = res->getUInt64( "OwnerId" );
     m_minPrice = m_landInfo->minPrice[ m_landId ];
     m_maxPrice = m_landInfo->initialPrice[ m_landId ];
 
@@ -240,12 +240,12 @@ uint32_t Sapphire::Land::getFcColor()
 }
 
 //Player
-void Sapphire::Land::setPlayerOwner( uint32_t id )
+void Sapphire::Land::setPlayerOwner( uint64_t id )
 {
   m_ownerPlayerId = id;
 }
 
-uint32_t Sapphire::Land::getPlayerOwner()
+uint64_t Sapphire::Land::getPlayerOwner()
 {
   return m_ownerPlayerId;
 }

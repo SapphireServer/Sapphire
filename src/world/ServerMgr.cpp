@@ -36,6 +36,7 @@
 #include "DebugCommand/DebugCommandHandler.h"
 #include "Manager/PlayerMgr.h"
 #include "Manager/ShopMgr.h"
+#include "Manager/InventoryMgr.h"
 
 
 extern Sapphire::Framework g_fw;
@@ -69,6 +70,7 @@ bool Sapphire::ServerMgr::loadSettings( int32_t argc, char* argv[] )
   if( !pConfig->loadConfig( m_configName ) )
   {
     pLog->fatal( "Error loading config " + m_configName );
+    pLog->fatal( "If this is the first time starting the server, we've copied the default one for your editing pleasure." );
     return false;
   }
 
@@ -100,9 +102,11 @@ void Sapphire::ServerMgr::run( int32_t argc, char* argv[] )
 
   pLog->info( "Setting up generated EXD data" );
   auto pExdData = std::make_shared< Data::ExdDataGenerated >();
-  if( !pExdData->init( pConfig->getValue< std::string >( "GlobalParameters", "DataPath", "" ) ) )
+  auto dataPath = pConfig->getValue< std::string >( "GlobalParameters", "DataPath", "" );
+  if( !pExdData->init( dataPath ) )
   {
-    pLog->fatal( "Error setting up generated EXD data " );
+    pLog->fatal( "Error setting up generated EXD data. Make sure that DataPath is set correctly in config.ini" );
+    pLog->fatal( "DataPath: " + dataPath );
     return;
   }
   g_fw.set< Data::ExdDataGenerated >( pExdData );
@@ -165,10 +169,12 @@ void Sapphire::ServerMgr::run( int32_t argc, char* argv[] )
   auto pDebugCom = std::make_shared< DebugCommandHandler >();
   auto pPlayerMgr = std::make_shared< Manager::PlayerMgr >();
   auto pShopMgr = std::make_shared< Manager::ShopMgr >();
+  auto pInventoryMgr = std::make_shared< Manager::InventoryMgr >();
 
   g_fw.set< DebugCommandHandler >( pDebugCom );
   g_fw.set< Manager::PlayerMgr >( pPlayerMgr );
   g_fw.set< Manager::ShopMgr >( pShopMgr );
+  g_fw.set< Manager::InventoryMgr >( pInventoryMgr );
 
   pLog->info( "World server running on " + m_ip + ":" + std::to_string( m_port ) );
 

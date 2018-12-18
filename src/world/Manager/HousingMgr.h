@@ -33,7 +33,7 @@ namespace Sapphire::World::Manager
     /*!
      * @brief Converts param1 of a client trigger into a Common::LandIndent
      */
-    Common::LandIdent clientTriggerParamsToLandIdent( uint32_t param11, uint32_t param12 ) const;
+    Common::LandIdent clientTriggerParamsToLandIdent( uint32_t param11, uint32_t param12, bool use16bits = true ) const;
 
     void sendWardLandInfo( Entity::Player& player, uint8_t wardId, uint16_t territoryTypeId );
 
