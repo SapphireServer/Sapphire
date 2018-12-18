@@ -69,6 +69,7 @@ bool Sapphire::ServerMgr::loadSettings( int32_t argc, char* argv[] )
   if( !pConfig->loadConfig( m_configName ) )
   {
     pLog->fatal( "Error loading config " + m_configName );
+    pLog->fatal( "If this is the first time starting the server, we've copied the default one for your editing pleasure." );
     return false;
   }
 
@@ -100,9 +101,11 @@ void Sapphire::ServerMgr::run( int32_t argc, char* argv[] )
 
   pLog->info( "Setting up generated EXD data" );
   auto pExdData = std::make_shared< Data::ExdDataGenerated >();
-  if( !pExdData->init( pConfig->getValue< std::string >( "GlobalParameters", "DataPath", "" ) ) )
+  auto dataPath = pConfig->getValue< std::string >( "GlobalParameters", "DataPath", "" );
+  if( !pExdData->init( dataPath ) )
   {
-    pLog->fatal( "Error setting up generated EXD data " );
+    pLog->fatal( "Error setting up generated EXD data. Make sure that DataPath is set correctly in config.ini" );
+    pLog->fatal( "DataPath: " + dataPath );
     return;
   }
   g_fw.set< Data::ExdDataGenerated >( pExdData );
