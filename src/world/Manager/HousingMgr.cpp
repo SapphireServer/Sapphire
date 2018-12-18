@@ -87,26 +87,23 @@ void Sapphire::World::Manager::HousingMgr::sendLandSignOwned( Entity::Player& pl
 
   auto land = hZone->getLand( ident.landId );
   if( !land )
-  {
-    land = getLandByOwnerId( player.getId() );
-  }
+    return;
 
   auto landInfoSignPacket = makeZonePacket< Server::FFXIVIpcLandInfoSign >( player.getId() );
-  uint32_t playerId = land->getPlayerOwner();
-  std::string playerName = g_fw.get< Sapphire::ServerMgr >()->getPlayerNameFromDb( playerId );
-  //memcpy( &landInfoSignPacket->data().estateGreeting, "Hello World", 11 );
-  //memcpy( &landInfoSignPacket->data().estateName, land->getLandName().c_str(), land->getLandName().size() );
   landInfoSignPacket->data().houseSize = land->getSize();
   landInfoSignPacket->data().houseType = static_cast< uint8_t >( land->getLandType() );
   landInfoSignPacket->data().landIdent = ident;
   landInfoSignPacket->data().houseIconAdd = land->getSharing();
-  landInfoSignPacket->data().ownerId = player.getContentId(); // should be real owner contentId, not player.contentId()
+  landInfoSignPacket->data().ownerId = player.getContentId(); // todo: should be real owner contentId, not player.contentId()
 
   if( auto house = land->getHouse() )
   {
     std::strcpy( landInfoSignPacket->data().estateName, house->getHouseName().c_str() );
     std::strcpy( landInfoSignPacket->data().estateGreeting, house->getHouseGreeting().c_str() );
   }
+
+  uint32_t playerId = land->getPlayerOwner();
+  std::string playerName = g_fw.get< Sapphire::ServerMgr >()->getPlayerNameFromDb( playerId );
 
   memcpy( &landInfoSignPacket->data().ownerName, playerName.c_str(), playerName.size() );
 
@@ -453,13 +450,22 @@ void Sapphire::World::Manager::HousingMgr::requestEstateEditGuestAccess( Entity:
   player.queuePacket( packet );
 }
 
-Sapphire::Common::LandIdent Sapphire::World::Manager::HousingMgr::clientTriggerParamsToLandIdent( uint32_t param11, uint32_t param12 ) const
+Sapphire::Common::LandIdent Sapphire::World::Manager::HousingMgr::clientTriggerParamsToLandIdent( uint32_t param11, uint32_t param12, bool use16bits ) const
 {
   Common::LandIdent ident;
   ident.worldId = param11 >> 16;
   ident.territoryTypeId = param11 & 0xFFFF;
-  ident.wardNum = param12 >> 16;
-  ident.landId = param12 & 0xFFFF;
+
+  if( use16bits )
+  {
+    ident.wardNum = param12 >> 16;
+    ident.landId = param12 & 0xFFFF;
+  }
+  else
+  {
+    ident.wardNum = (param12 >> 8) & 0xFF;
+    ident.landId = param12 & 0xFF;
+  }
 
   return ident;
 }

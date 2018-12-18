@@ -17,8 +17,8 @@ bool Sapphire::ConfigMgr::loadConfig( const std::string& configName )
 
   if( !fs::exists( configFile ) )
   {
-    if( !copyDefaultConfig( configName ) )
-      return false;
+    copyDefaultConfig( configName );
+    return false;
   }
 
   m_pInih = std::unique_ptr< INIReader >( new INIReader( configFile.string() ) );

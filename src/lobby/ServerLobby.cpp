@@ -90,6 +90,7 @@ bool ServerLobby::loadSettings( int32_t argc, char* argv[] )
   if( !m_pConfig->loadConfig( m_configPath ) )
   {
     g_log.fatal( "Error loading config " + m_configPath );
+    g_log.fatal( "If this is the first time starting the server, we've copied the default one for your editing pleasure." );
     return false;
   }
   std::vector< std::string > args( argv + 1, argv + argc );
