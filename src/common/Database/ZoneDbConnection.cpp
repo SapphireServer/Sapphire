@@ -1,22 +1,22 @@
 #include "ZoneDbConnection.h"
 #include <MySqlConnector.h>
 
-Core::Db::ZoneDbConnection::ZoneDbConnection( ConnectionInfo& connInfo ) :
+Sapphire::Db::ZoneDbConnection::ZoneDbConnection( ConnectionInfo& connInfo ) :
   DbConnection( connInfo )
 {
 }
 
-Core::Db::ZoneDbConnection::ZoneDbConnection( Core::LockedWaitQueue< std::shared_ptr< Operation > >* q,
+Sapphire::Db::ZoneDbConnection::ZoneDbConnection( Sapphire::LockedWaitQueue< std::shared_ptr< Operation > >* q,
                                                 ConnectionInfo& connInfo ) :
   DbConnection( q, connInfo )
 {
 }
 
-Core::Db::ZoneDbConnection::~ZoneDbConnection()
+Sapphire::Db::ZoneDbConnection::~ZoneDbConnection()
 {
 }
 
-void Core::Db::ZoneDbConnection::doPrepareStatements()
+void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
 {
   if( !m_reconnecting )
     m_stmts.resize( MAX_STATEMENTS );
@@ -50,12 +50,12 @@ void Core::Db::ZoneDbConnection::doPrepareStatements()
                     "CFPenaltyUntil = ?, Pose = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
 
 
-  prepareStatement( CHARA_SEL_MINIMAL, "SELECT Name, Customize, ModelMainWeapon, ModelSubWeapon, ModelEquip, TerritoryId, GuardianDeity, "
+  prepareStatement( CHARA_SEL_MINIMAL, "SELECT Name, Customize, ModelMainWeapon, ModelSubWeapon, ModelEquip, TerritoryType, GuardianDeity, "
                                        "Class, ContentId, BirthDay, BirthMonth, EquipDisplayFlags "
                                        "FROM charainfo WHERE CharacterId = ?;", CONNECTION_SYNC );
 
   prepareStatement( CHARA_INS, "INSERT INTO charainfo (AccountId, CharacterId, ContentId, Name, Hp, Mp, "
-                               "Customize, Voice, IsNewGame, TerritoryId, PosX, PosY, PosZ, PosR, ModelEquip, "
+                               "Customize, Voice, IsNewGame, TerritoryType, PosX, PosY, PosZ, PosR, ModelEquip, "
                                "IsNewAdventurer, GuardianDeity, Birthday, BirthMonth, Class, Status, FirstClass, "
                                "HomePoint, StartTown, Discovery, HowTo, QuestCompleteFlags, Unlocks, QuestTracking, "
                                "Aetheryte, GMRank, Mounts, Orchestrion, UPDATE_DATE ) "
@@ -142,19 +142,19 @@ void Core::Db::ZoneDbConnection::doPrepareStatements()
 
   /// QUEST INFO
   prepareStatement( CHARA_QUEST_INS,
-                    "INSERT INTO charaquestnew ( CharacterId, SlotId, QuestId, Sequence, Flags, Variables_0, "
+                    "INSERT INTO charaquest ( CharacterId, SlotId, QuestId, Sequence, Flags, Variables_0, "
                     "Variables_1, Variables_2, Variables_3, Variables_4, "
                     "Variables_5, Variables_6 ) VALUES( ?,?,?,?,?,?,?,?,?,?,?,? );", CONNECTION_ASYNC );
 
-  prepareStatement( CHARA_QUEST_UP, "UPDATE charaquestnew SET Sequence = ?, Flags = ?, Variables_0 = ?, "
+  prepareStatement( CHARA_QUEST_UP, "UPDATE charaquest SET Sequence = ?, Flags = ?, Variables_0 = ?, "
                                     "Variables_1 = ?, Variables_2 = ?, Variables_3 = ?, "
                                     "Variables_4 = ?, Variables_5 = ?, Variables_6 = ? "
                                     "WHERE CharacterId = ? AND QuestId = ?;", CONNECTION_ASYNC );
 
-  prepareStatement( CHARA_QUEST_DEL, "DELETE FROM charaquestnew WHERE CharacterId = ? AND QuestId = ?;",
+  prepareStatement( CHARA_QUEST_DEL, "DELETE FROM charaquest WHERE CharacterId = ? AND QuestId = ?;",
                     CONNECTION_ASYNC );
 
-  prepareStatement( CHARA_SEL_QUEST, "SELECT * FROM charaquestnew WHERE CharacterId = ?;", CONNECTION_SYNC );
+  prepareStatement( CHARA_SEL_QUEST, "SELECT * FROM charaquest WHERE CharacterId = ?;", CONNECTION_SYNC );
 
   /// CLASS INFO
   prepareStatement( CHARA_CLASS_SEL, "SELECT ClassIdx, Exp, Lvl FROM characlass WHERE CharacterId = ?;",
@@ -181,13 +181,44 @@ void Core::Db::ZoneDbConnection::doPrepareStatements()
                            "secWeaponModel, aggressionMode, enemyType, pose, "
                            "modelChara, displayFlags, Look, Models "
                     "FROM bnpctemplate WHERE 1;",
-                    CONNECTION_BOTH);
-  
+                    CONNECTION_BOTH );
+
   prepareStatement( CHARA_ITEMGLOBAL_UP,
                     "UPDATE charaglobalitem SET stack = ?, durability = ?, stain = ? WHERE ItemId = ?;",
                     CONNECTION_BOTH );
 
   prepareStatement( CHARA_ITEMGLOBAL_DELETE,
-                    "UPDATE charaglobalitem SET IS_DELETE = 1 WHERE ItemId = ?;",
+                    "UPDATE charaglobalitem SET deleted = 1 WHERE ItemId = ?;",
                     CONNECTION_BOTH );
+
+  /// HOUSING
+  prepareStatement( HOUSING_HOUSE_INS,
+                    "INSERT INTO house ( LandSetId, HouseId ) VALUES ( ?, ? );",
+                    CONNECTION_BOTH );
+
+  prepareStatement( HOUSING_HOUSE_UP,
+                    "UPDATE house SET BuildTime = ?, Aetheryte = ?, Comment = ?, HouseName = ?, Endorsements = ?, HousePartModels = ?, HousePartColours = ?, HouseInteriorModels = ? WHERE HouseId = ?;",
+                    CONNECTION_BOTH );
+
+  /*prepareStatement( LAND_INS,
+                    "INSERT INTO land ( LandSetId ) VALUES ( ? );",
+                    CONNECTION_BOTH );
+
+  prepareStatement( LAND_SEL,
+                    "SELECT LandSetId, Size, houseState, iconColor, iconAddIcon, fcId, fcIcon, fcIconColor, exteriorRoof, "
+                    "exteriorWall, exteriorWindow, exteriorDoor, otherFloorWall, otherFloorFlooring, basementWall, "
+                    "gardenSign, colorSlot_0, colorSlot_1, colorSlot_2, colorSlot_3, colorSlot_4, colorSlot_5, "
+                    "colorSlot_6, colorSlot_7, ownerPlayerId, nextDrop, dropCount, currentPrice "
+                    "FROM land WHERE LandSetId = ?;",
+                    CONNECTION_BOTH );
+
+  prepareStatement( LAND_UP,
+                    "UPDATE land SET Size = ?, houseState = ?, iconColor = ?, iconAddIcon = ?, fcId = ?, "
+                    "fcIcon = ?, fcIconColor = ?, exteriorRoof = ?, exteriorWall = ?, exteriorWindow = ?, "
+                    "exteriorDoor = ?, otherFloorWall = ?, otherFloorFlooring = ?, basementWall = ?, gardenSign = ?, "
+                    "colorSlot_0 = ?, colorSlot_1 = ?, colorSlot_2 = ?, colorSlot_3 = ?, colorSlot_4 = ?, "
+                    "colorSlot_5 = ?, colorSlot_6 = ?, colorSlot_7 = ?, ownerPlayerId = ?, nextDrop = ?, "
+                    "dropCount = ?, currentPrice = ?"
+                    " WHERE LandSetId = ?;",
+                    CONNECTION_BOTH );*/
 }

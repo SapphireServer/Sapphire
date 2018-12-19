@@ -209,7 +209,7 @@ std::string zoneNameToPath( const std::string& name )
     if( teriName.empty() )
       continue;
     auto teriPath = std::get< std::string >( fields.at( static_cast< size_t >( TerritoryTypeExdIndexes::Path ) ) );
-    if( !found && ( Core::Util::toLowerCopy( name) == Core::Util::toLowerCopy( teriName ) ) )
+    if( !found && ( Sapphire::Util::toLowerCopy( name) == Sapphire::Util::toLowerCopy( teriName ) ) )
     {
       path = teriPath;
       found = true;
@@ -331,7 +331,7 @@ void loadAllInstanceContentEntries()
     zoneDumpList.emplace( zoneNameMap[ teri ] );
 
     std::string remove = "★_ '()[]-\x1a\x1\x2\x1f\x1\x3.:";
-    Core::Util::eraseAllIn( name, remove );
+    Sapphire::Util::eraseAllIn( name, remove );
     name[ 0 ] = toupper( name[ 0 ] );
     contentList.push_back( { id, name, zoneNameMap[ teri ], type } );
   }
@@ -585,7 +585,7 @@ int main( int argc, char* argv[] )
                 {
                   name = eobjNameMap[ id ];
                   std::string remove = "★_ '()[]-\x1a\x1\x2\x1f\x1\x3.:";
-                  Core::Util::eraseAllIn( name, remove );
+                  Sapphire::Util::eraseAllIn( name, remove );
 
                   name[ 0 ] = toupper( name[ 0 ] );
                 }

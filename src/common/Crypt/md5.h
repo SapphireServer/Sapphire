@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-namespace Core::Util
+namespace Sapphire::Util
 {
   using md5_context = struct
   {

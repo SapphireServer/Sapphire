@@ -8,9 +8,9 @@
 
 // +---------------------------------------------------------------------------
 // The following enumerations are structures to require their type be included.
-// They are also defined within the Core::Common namespace to avoid collisions.
+// They are also defined within the Sapphire::Common namespace to avoid collisions.
 // +---------------------------------------------------------------------------
-namespace Core::Common
+namespace Sapphire::Common
 {
 
   // 99 is the last spawn id that seems to spawn any actor
@@ -24,6 +24,12 @@ namespace Core::Common
     float x;
     float y;
     float z;
+  };
+
+  struct ActiveLand
+  {
+    uint8_t ward;
+    uint8_t plot;
   };
 
   enum InventoryOperation : uint8_t
@@ -214,7 +220,12 @@ namespace Core::Common
     FreeCompanyBag1 = 20001,
     FreeCompanyBag2 = 20002,
     FreeCompanyGil = 22000,
-    FreeCompanyCrystal = 22001
+    FreeCompanyCrystal = 22001,
+
+    HousingExternalAppearance = 25000,
+    HousingOutdoorItemStoreroom = 25001,
+    HousingInternalAppearance = 25002,
+    HousingIndoorItemStoreroom = 25003,
   };
 
   enum ContainerType : uint16_t
@@ -392,6 +403,7 @@ namespace Core::Common
       c.UI8E = 0;
       c.UI8F = 0;
       c.padding = 0;
+      c.padding1 = 0;
     }
 
 
@@ -729,6 +741,133 @@ namespace Core::Common
   {
     Normal = 0x1,
     MountSkill = 0xD,
+  };
+
+  enum HousePartSlot
+  {
+    ExteriorRoof,
+    ExteriorWall,
+    ExteriorWindow,
+    ExteriorDoor,
+    OtherFloorWall,
+    OtherFloorFlooring,
+    BasementWall,
+    YardSign
+  };
+
+  enum HousingInteriorSlot
+  {
+    InteriorWall,
+    InteriorFloor,
+    InteriorLight,
+    InteriorWall_Attic,
+    InteriorFloor_Attic,
+    InteriorLight_Attic,
+    InteriorWall_Basement,
+    InteriorFloor_Basement,
+    InteriorLight_Basement,
+    InteriorLight_Mansion
+  };
+
+  enum HouseTagSlot
+  {
+    MainTag,
+    SubTag1,
+    SubTag2
+  };
+
+  enum LandFlagsSlot
+  {
+    FreeCompany,
+    Private,
+    Apartment,
+    SharedHouse1,
+    SharedHouse2
+  };
+
+  enum class LandType : uint8_t
+  {
+    none = 0,
+    FreeCompany = 1,
+    Private = 2,
+  };
+
+  enum LandFlags : uint32_t
+  {
+    EstateBuilt = 0x1,
+    HasAetheryte = 0x2,
+    UNKNOWN_1 = 0x4,
+    UNKNOWN_2 = 0x8,
+    UNKNOWN_3 = 0x10,
+  };
+
+  struct LandIdent
+  {
+    int16_t landId; //00
+    int16_t wardNum; //02
+    int16_t territoryTypeId; //04
+    int16_t worldId; //06
+  };
+
+  struct LandFlagSet
+  {
+    LandIdent landIdent;
+    uint32_t landFlags; //08
+    uint32_t unkown1; //12
+  };
+
+  struct YardObject
+  {
+    uint32_t itemId;
+    uint16_t itemRotation;
+    uint16_t pos_x;
+    uint16_t pos_y;
+    uint16_t pos_z;
+  };
+
+  enum HouseSize : uint8_t
+  {
+    Cottage,
+    House,
+    Mansion
+  };
+
+  enum HouseState : uint8_t
+  {
+    none,
+    forSale,
+    sold,
+    privateHouse,
+    fcHouse,
+  };
+
+  enum HouseIconAdd : uint8_t
+  {
+    heart = 0x06
+  };
+
+  enum HousingAppeal : uint8_t
+  {
+    NoAppeal = 0,
+    Emporium = 1,
+    Botique = 2,
+    DesignerHome = 3,
+    MessageBook = 4,
+    Tavern = 5,
+    Eatery = 6,
+    ImmersiveExperience = 7,
+    Aquarium = 9,
+    Sanctum = 10,
+    Venue = 11,
+  };
+
+  enum WardlandFlags : uint8_t
+  {
+    IsEstateOwned = 1,
+    IsPublicEstate = 2,
+    HasEstateGreeting = 4,
+    EstateFlagUnknown = 8,
+    IsFreeCompanyEstate = 16,
   };
 
   using PlayerStateFlagList = std::vector< PlayerStateFlag >;

@@ -10,10 +10,10 @@
 #include "Logging/Logger.h"
 #include <mysql.h>
 
-extern Core::Framework g_fw;
+extern Sapphire::Framework g_fw;
 
 class PingOperation :
-  public Core::Db::Operation
+  public Sapphire::Db::Operation
 {
   bool execute() override
   {
@@ -23,22 +23,22 @@ class PingOperation :
 };
 
 template< class T >
-Core::Db::DbWorkerPool< T >::DbWorkerPool()
+Sapphire::Db::DbWorkerPool< T >::DbWorkerPool()
   :
-  m_queue( new Core::LockedWaitQueue< std::shared_ptr< Operation > >() ),
+  m_queue( new Sapphire::LockedWaitQueue< std::shared_ptr< Operation > >() ),
   m_asyncThreads( 0 ),
   m_synchThreads( 0 )
 {
 }
 
 template< class T >
-Core::Db::DbWorkerPool< T >::~DbWorkerPool()
+Sapphire::Db::DbWorkerPool< T >::~DbWorkerPool()
 {
   m_queue->cancel();
 }
 
 template< class T >
-void Core::Db::DbWorkerPool< T >::setConnectionInfo( const ConnectionInfo& info,
+void Sapphire::Db::DbWorkerPool< T >::setConnectionInfo( const ConnectionInfo& info,
                                                      uint8_t asyncThreads,
                                                      uint8_t synchThreads )
 {
@@ -48,7 +48,7 @@ void Core::Db::DbWorkerPool< T >::setConnectionInfo( const ConnectionInfo& info,
 }
 
 template< class T >
-uint32_t Core::Db::DbWorkerPool< T >::open()
+uint32_t Sapphire::Db::DbWorkerPool< T >::open()
 {
   auto pLog = g_fw.get< Logger >();
   pLog->info( "[DbPool] Opening DatabasePool " + getDatabaseName() +
@@ -73,7 +73,7 @@ uint32_t Core::Db::DbWorkerPool< T >::open()
 }
 
 template< class T >
-void Core::Db::DbWorkerPool< T >::close()
+void Sapphire::Db::DbWorkerPool< T >::close()
 {
   auto pLog = g_fw.get< Logger >();
   pLog->info( "[DbPool] Closing down DatabasePool " + getDatabaseName() );
@@ -83,7 +83,7 @@ void Core::Db::DbWorkerPool< T >::close()
 }
 
 template< class T >
-bool Core::Db::DbWorkerPool< T >::prepareStatements()
+bool Sapphire::Db::DbWorkerPool< T >::prepareStatements()
 {
   for( auto& connections : m_connections )
     for( auto& connection : connections )
@@ -104,7 +104,7 @@ bool Core::Db::DbWorkerPool< T >::prepareStatements()
 
 template< class T >
 std::shared_ptr< Mysql::ResultSet >
-Core::Db::DbWorkerPool< T >::query( const std::string& sql, std::shared_ptr< T > connection )
+Sapphire::Db::DbWorkerPool< T >::query( const std::string& sql, std::shared_ptr< T > connection )
 {
   if( !connection )
     connection = getFreeConnection();
@@ -117,7 +117,7 @@ Core::Db::DbWorkerPool< T >::query( const std::string& sql, std::shared_ptr< T >
 
 template< class T >
 std::shared_ptr< Mysql::PreparedResultSet >
-Core::Db::DbWorkerPool< T >::query( std::shared_ptr< PreparedStatement > stmt )
+Sapphire::Db::DbWorkerPool< T >::query( std::shared_ptr< PreparedStatement > stmt )
 {
   auto connection = getFreeConnection();
   auto ret = std::static_pointer_cast< Mysql::PreparedResultSet >( connection->query( stmt ) );
@@ -127,14 +127,14 @@ Core::Db::DbWorkerPool< T >::query( std::shared_ptr< PreparedStatement > stmt )
 }
 
 template< class T >
-std::shared_ptr< Core::Db::PreparedStatement >
-Core::Db::DbWorkerPool< T >::getPreparedStatement( PreparedStatementIndex index )
+std::shared_ptr< Sapphire::Db::PreparedStatement >
+Sapphire::Db::DbWorkerPool< T >::getPreparedStatement( PreparedStatementIndex index )
 {
   return std::make_shared< PreparedStatement >( index );
 }
 
 template< class T >
-void Core::Db::DbWorkerPool< T >::escapeString( std::string& str )
+void Sapphire::Db::DbWorkerPool< T >::escapeString( std::string& str )
 {
   if( str.empty() )
     return;
@@ -146,7 +146,7 @@ void Core::Db::DbWorkerPool< T >::escapeString( std::string& str )
 }
 
 template< class T >
-void Core::Db::DbWorkerPool< T >::keepAlive()
+void Sapphire::Db::DbWorkerPool< T >::keepAlive()
 {
   for( auto& connection : m_connections[ IDX_SYNCH ] )
   {
@@ -163,7 +163,7 @@ void Core::Db::DbWorkerPool< T >::keepAlive()
 }
 
 template< class T >
-uint32_t Core::Db::DbWorkerPool< T >::openConnections( InternalIndex type, uint8_t numConnections )
+uint32_t Sapphire::Db::DbWorkerPool< T >::openConnections( InternalIndex type, uint8_t numConnections )
 {
   for( uint8_t i = 0; i < numConnections; ++i )
   {
@@ -194,7 +194,7 @@ uint32_t Core::Db::DbWorkerPool< T >::openConnections( InternalIndex type, uint8
 }
 
 template< class T >
-unsigned long Core::Db::DbWorkerPool< T >::escapeString( char* to, const char* from, unsigned long length )
+unsigned long Sapphire::Db::DbWorkerPool< T >::escapeString( char* to, const char* from, unsigned long length )
 {
   if( !to || !from || !length )
     return 0;
@@ -204,13 +204,13 @@ unsigned long Core::Db::DbWorkerPool< T >::escapeString( char* to, const char* f
 }
 
 template< class T >
-void Core::Db::DbWorkerPool< T >::enqueue( std::shared_ptr< Operation > op )
+void Sapphire::Db::DbWorkerPool< T >::enqueue( std::shared_ptr< Operation > op )
 {
   m_queue->push( op );
 }
 
 template< class T >
-std::shared_ptr< T > Core::Db::DbWorkerPool< T >::getFreeConnection()
+std::shared_ptr< T > Sapphire::Db::DbWorkerPool< T >::getFreeConnection()
 {
   uint8_t i = 0;
   const auto numCons = m_connections[ IDX_SYNCH ].size();
@@ -228,27 +228,27 @@ std::shared_ptr< T > Core::Db::DbWorkerPool< T >::getFreeConnection()
 }
 
 template< class T >
-const std::string& Core::Db::DbWorkerPool< T >::getDatabaseName() const
+const std::string& Sapphire::Db::DbWorkerPool< T >::getDatabaseName() const
 {
   return m_connectionInfo.database;
 }
 
 template< class T >
-void Core::Db::DbWorkerPool< T >::execute( const std::string& sql )
+void Sapphire::Db::DbWorkerPool< T >::execute( const std::string& sql )
 {
   auto task = std::make_shared< StatementTask >( sql );
   enqueue( task );
 }
 
 template< class T >
-void Core::Db::DbWorkerPool< T >::execute( std::shared_ptr< PreparedStatement > stmt )
+void Sapphire::Db::DbWorkerPool< T >::execute( std::shared_ptr< PreparedStatement > stmt )
 {
   auto task = std::make_shared< PreparedStatementTask >( stmt );
   enqueue( task );
 }
 
 template< class T >
-void Core::Db::DbWorkerPool< T >::directExecute( const std::string& sql )
+void Sapphire::Db::DbWorkerPool< T >::directExecute( const std::string& sql )
 {
   auto connection = getFreeConnection();
   connection->execute( sql );
@@ -256,7 +256,7 @@ void Core::Db::DbWorkerPool< T >::directExecute( const std::string& sql )
 }
 
 template< class T >
-void Core::Db::DbWorkerPool< T >::directExecute( std::shared_ptr< PreparedStatement > stmt )
+void Sapphire::Db::DbWorkerPool< T >::directExecute( std::shared_ptr< PreparedStatement > stmt )
 {
   auto connection = getFreeConnection();
   connection->execute( stmt );
@@ -284,4 +284,4 @@ void DatabaseWorkerPool<T>::ExecuteOrAppend(SQLTransaction& trans, PreparedState
 */
 
 template
-class Core::Db::DbWorkerPool< Core::Db::ZoneDbConnection >;
+class Sapphire::Db::DbWorkerPool< Sapphire::Db::ZoneDbConnection >;

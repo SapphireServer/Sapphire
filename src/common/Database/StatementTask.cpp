@@ -4,7 +4,7 @@
 #include "DbConnection.h"
 #include "PreparedStatement.h"
 
-Core::Db::StatementTask::StatementTask( const std::string& sql, bool async )
+Sapphire::Db::StatementTask::StatementTask( const std::string& sql, bool async )
 {
   m_sql = sql;
   m_hasResult = async; // If the operation is async, then there's a result
@@ -12,13 +12,13 @@ Core::Db::StatementTask::StatementTask( const std::string& sql, bool async )
   //   m_result = new QueryResultPromise();
 }
 
-Core::Db::StatementTask::~StatementTask()
+Sapphire::Db::StatementTask::~StatementTask()
 {
   //if( m_hasResult && m_result != nullptr)
   //   delete m_result;
 }
 
-bool Core::Db::StatementTask::execute()
+bool Sapphire::Db::StatementTask::execute()
 {
   if( m_hasResult )
   {
@@ -38,7 +38,7 @@ bool Core::Db::StatementTask::execute()
 }
 
 
-Core::Db::PreparedStatementTask::PreparedStatementTask( std::shared_ptr< Core::Db::PreparedStatement > stmt,
+Sapphire::Db::PreparedStatementTask::PreparedStatementTask( std::shared_ptr< Sapphire::Db::PreparedStatement > stmt,
                                                         bool async ) :
   m_stmt( stmt )
 //, m_result(nullptr)
@@ -46,13 +46,13 @@ Core::Db::PreparedStatementTask::PreparedStatementTask( std::shared_ptr< Core::D
   m_hasResult = async; // If the operation is async, then there's a result
 }
 
-Core::Db::PreparedStatementTask::~PreparedStatementTask()
+Sapphire::Db::PreparedStatementTask::~PreparedStatementTask()
 {
   //if (m_has_result && m_result != nullptr)
   //   delete m_result;
 }
 
-bool Core::Db::PreparedStatementTask::execute()
+bool Sapphire::Db::PreparedStatementTask::execute()
 {
   //if (m_has_result)
   //{

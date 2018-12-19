@@ -4,7 +4,7 @@
 #include <Common.h>
 #include <Network/CommonNetwork.h>
 
-namespace Core {
+namespace Sapphire {
 namespace Network {
 namespace Packets {
 namespace Client {
@@ -163,6 +163,13 @@ struct FFXIVIpcChatHandler :
   /* 001A */ char message[1012];
 };
 
+struct FFXIVIpcShopEventHandler :
+  FFXIVIpcBasePacket< ShopEventHandler >
+{
+  /* 0000 */ uint32_t eventId;
+  /* 0004 */ uint32_t param;
+};
+
 struct FFXIVIpcLinkshellEventHandler :
   FFXIVIpcBasePacket< LinkshellEventHandler >
 {
@@ -189,6 +196,29 @@ struct FFXIVIpcInventoryModifyHandler :
   /* 0028 */ uint32_t splitCount;
 };
 
+struct FFXIVIpcRenameLandHandler :
+  FFXIVIpcBasePacket< LandRenameHandler >
+{
+  /* 0000 */ Common::LandIdent ident;
+  /* 0008 */ char houseName[20];
+  /* 0028 */ uint32_t padding;
+};
+
+struct FFXIVIpcHousingUpdateHouseGreeting :
+  FFXIVIpcBasePacket< HousingUpdateHouseGreeting >
+{
+  /* 0000 */ Common::LandIdent ident;
+  /* 0008 */ char greeting[200];
+};
+
+struct FFXIVIpcBuildPresetHandler :
+  FFXIVIpcBasePacket< BuildPresetHandler >
+{
+  /* 0000 */ uint32_t itemId;
+  /* 0004 */ uint8_t plotNum;
+  /* 0005 */ char stateString[27];
+};
+
 struct FFXIVIpcSetSharedEstateSettings :
   FFXIVIpcBasePacket< SetSharedEstateSettings >
 {
@@ -201,6 +231,13 @@ struct FFXIVIpcSetSharedEstateSettings :
   /* 0021 */ char padding2[0x7];
   /* 0028 */ uint8_t char3Permissions;
   /* 0029 */ char padding3[0x7];
+};
+
+struct FFXIVIpcMarketBoardRequestItemListings :
+  FFXIVIpcBasePacket< MarketBoardRequestItemListings >
+{
+  /* 0000 */ uint32_t itemCatalogId;
+  /* 0004 */ uint32_t padding;
 };
 
 }
