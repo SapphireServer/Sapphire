@@ -8,7 +8,7 @@
 		<script>
 			function doLogin(){
 				var url = "sapphire-api/lobby/insertSession";
-				var params = "{\"sId\":\"" + document.getElementsByName('sid')[0].value + "\",\"secret\":\"" + document.getElementsByName('secret')[0].value + "\",\"accountId\":\"" + document.getElementsByName('accountId')[0].value + "\"}";
+				var params = "{\"sId\":\"" + document.getElementsByName('sid')[0].value + "\",\"secret\":\"" + document.getElementsByName('secret')[0].value + "\",\"accountId\":" + document.getElementsByName('accountId')[0].value + "}";
 				var xhr = new XMLHttpRequest();
 				xhr.open("POST", url, true);
 

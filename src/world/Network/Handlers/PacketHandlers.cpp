@@ -672,7 +672,7 @@ void Sapphire::Network::GameConnection::landRenameHandler( const Packets::FFXIVA
     return;
 
   // todo: check perms for fc houses and shit
-  if( pLand->getPlayerOwner() != player.getId() )
+  if( pLand->getOwnerId() != player.getId() )
     return;
 
   auto pHouse = pLand->getHouse();
