@@ -10,7 +10,7 @@
 #include <Common.h>
 #include <Network/CommonNetwork.h>
 
-namespace Core {
+namespace Sapphire {
 namespace Network {
 namespace Packets {
 namespace Server {
@@ -750,7 +750,8 @@ struct FFXIVIpcInitZone : FFXIVIpcBasePacket< InitZone >
   uint32_t unknown3;
   uint32_t unknown4;
   uint8_t weatherId;
-  uint16_t bitmask;
+  uint8_t bitmask;
+  uint8_t bitmask1;
   uint8_t unknown5;
   uint16_t festivalId;
   uint16_t additionalFestivalId;
@@ -1077,7 +1078,7 @@ struct FFXIVIpcCharaNameReq :
 struct FFXIVIpcItemInfo :
   FFXIVIpcBasePacket< ItemInfo >
 {
-  uint32_t sequence;
+  uint32_t containerSequence;
   uint32_t unknown;
   uint16_t containerId;
   uint16_t slot;
@@ -1112,7 +1113,7 @@ struct FFXIVIpcItemInfo :
 struct FFXIVIpcContainerInfo :
   FFXIVIpcBasePacket< ContainerInfo >
 {
-  uint32_t sequence;
+  uint32_t containerSequence;
   uint32_t numItems;
   uint32_t containerId;
   uint32_t unknown;
@@ -1125,7 +1126,7 @@ struct FFXIVIpcContainerInfo :
 struct FFXIVIpcCurrencyCrystalInfo :
   FFXIVIpcBasePacket< CurrencyCrystalInfo >
 {
-  uint32_t sequence;
+  uint32_t containerSequence;
   uint16_t containerId;
   uint16_t slot;
   uint32_t quantity;
@@ -1339,7 +1340,7 @@ struct FFXIVIpcQuestUpdate :
 struct FFXIVIpcQuestCompleteList :
   FFXIVIpcBasePacket< QuestCompleteList >
 {
-  uint8_t questCompleteMask[396];
+  uint8_t questCompleteMask[480];
   uint8_t unknownCompleteMask[32];
 };
 
@@ -1541,8 +1542,7 @@ struct FFXIVIpcEquipDisplayFlags :
 * Structural representation of the packet sent by the server
 * to mount a player
 */
-struct FFXIVIpcMount :
-  FFXIVIpcBasePacket< Mount >
+struct FFXIVIpcMount : FFXIVIpcBasePacket< Mount >
 {
   uint32_t id;
 };
@@ -1551,8 +1551,7 @@ struct FFXIVIpcMount :
 * Structural representation of the packet sent by the server
 * to mount a player
 */
-struct FFXIVIpcDirectorVars :
-  FFXIVIpcBasePacket< DirectorVars >
+struct FFXIVIpcDirectorVars : FFXIVIpcBasePacket< DirectorVars >
 {
   /*! DirectorType | ContentId */
   uint32_t m_directorId;
@@ -1565,26 +1564,110 @@ struct FFXIVIpcDirectorVars :
 };
 
 
-struct FFXIVIpcActorGauge :
-  FFXIVIpcBasePacket< ActorGauge >
+struct FFXIVIpcActorGauge : FFXIVIpcBasePacket< ActorGauge >
 {
   uint8_t classJobId;
   uint8_t data[15]; // depends on classJobId
 };
 
-struct FFXIVIpcPerformNote :
-  FFXIVIpcBasePacket< PerformNote >
+struct FFXIVIpcPerformNote : FFXIVIpcBasePacket< PerformNote >
 {
   uint8_t data[32];
 };
 
-struct FFXIVIpcWardInfo :
-  FFXIVIpcBasePacket< WardInfo >
+struct FFXIVIpcHousingUpdateLandFlagsSlot : FFXIVIpcBasePacket< HousingUpdateLandFlagsSlot >
 {
-  uint16_t unknown0;
-  uint16_t wardNum; // set 1 for "Mist, Ward 2"
-  uint16_t zoneId;
-  uint16_t worldId;
+  uint32_t type;
+  uint32_t unknown;
+  Common::LandFlagSet flagSet;
+};
+
+struct FFXIVIpcHousingLandFlags : FFXIVIpcBasePacket< HousingLandFlags >
+{
+  Common::LandFlagSet freeCompanyHouse; // 00
+  uint64_t unkown1;
+  Common::LandFlagSet privateHouse; // 24
+  uint64_t unkown2;
+  Common::LandFlagSet apartment; // 48
+  uint64_t unkown3;
+  Common::LandFlagSet sharedHouse[2]; //72
+  uint64_t unkown4;
+  Common::LandFlagSet unkownHouse;
+  uint64_t unkown5;
+};
+
+//Structs
+struct LandStruct
+{
+  uint8_t plotSize; //0
+  uint8_t houseState; // 2
+  uint8_t flags; // bit1 -> hasPublicAccess; bit2 -> isPersonalHouse
+  uint8_t iconAddIcon; // 6
+  uint32_t fcId; //8
+  uint32_t fcIcon;// 12
+  uint32_t fcIconColor; // 16
+  uint16_t housePart[ 8 ]; // 34
+  uint8_t houseColour[ 8 ]; // 36
+};
+
+struct FFXIVIpcLandUpdate : FFXIVIpcBasePacket< LandUpdate >
+{
+  Common::LandIdent landIdent;
+  LandStruct land;
+};
+
+struct FFXIVIpcLandPriceUpdate :  FFXIVIpcBasePacket< LandPriceUpdate >
+{
+  uint32_t price;
+  uint32_t timeLeft;
+};
+
+struct FFXIVIpcLandInfoSign : FFXIVIpcBasePacket< LandInfoSign >
+{
+  Common::LandIdent landIdent;
+  uint64_t ownerId; // ither contentId or fcId
+  uint32_t unknow1;
+  uint8_t houseIconAdd;
+  uint8_t houseSize;
+  uint8_t houseType;
+  char estateName[23];
+  char estateGreeting[193];
+  char ownerName[31];
+  char fcTag[7];
+  uint8_t tag[3];
+};
+
+struct FFXIVIpcLandRename : FFXIVIpcBasePacket< LandRename >
+{
+  Common::LandIdent landIdent;
+  char houseName[20];
+  uint32_t padding;
+};
+
+struct FFXIVIpcLandUpdateHouseName : FFXIVIpcBasePacket< LandUpdateHouseName >
+{
+  uint32_t unknown[3];
+  char houseName[20];
+  uint32_t unknown2[2];
+};
+
+struct FFXIVIpcLandSetMap : FFXIVIpcBasePacket< LandSetMap >
+{
+  uint8_t u1;
+  uint8_t subdivision;
+  uint8_t u3;
+  struct
+  {
+    uint8_t status;
+    uint8_t size;
+    uint8_t isPrivate;
+  } landInfo[ 30 ];
+  uint8_t padding[ 3 ];
+};
+
+struct FFXIVIpcLandSetInitialize : FFXIVIpcBasePacket< LandSetInitialize >
+{
+  Common::LandIdent landIdent;
   uint8_t unknown1;
   uint8_t subInstance; //  (default : 1/2)
   uint8_t unknown3;
@@ -1593,44 +1676,79 @@ struct FFXIVIpcWardInfo :
   uint8_t unknown6;
   uint8_t unknown7;
   uint8_t unknown8;
-  struct
-  {
-    uint8_t houseSize; //1 = small, 2 = middle, 3 = big; 1
-    uint8_t houseState; //1 = for sell, 2 = sold, 3 = hasOwner, 0x0A = House sharing; 2
-    uint8_t iconColor; //HouseState has to be 3; 1 = Private, 2 = FC House; 4
-    uint8_t iconAddIcon; //Heart Icon = 2; 6
-    uint32_t unknown9;  //can be 0 (default) maybe fcId; 8
-    uint32_t fcIcon; //can be 0 (default); 12
-    uint32_t fcIconColor; //can be 0 (default); 16
-    uint16_t houseRoofId; //18
-    uint16_t houseFacadeId;//20
-    uint16_t houseWindowId;//22
-    uint16_t houseDoorId;//24
-    uint8_t gardenData[4];//28
-    uint16_t gardenSignId; //For fcIcon; 30
-    uint16_t gardenFenceId; //32
-    uint8_t color[8]; //40
-  } landSet[30];
+  LandStruct land[ 30 ];
 };
 
-struct FFXIVIpcWardYardInfo :
-  FFXIVIpcBasePacket< WardYardInfo >
+struct FFXIVIpcYardObjectSpawn : FFXIVIpcBasePacket<YardObjectSpawn>
 {
-  /* consistency check? */
-  uint32_t unknown1; //always 0xFFFFFFFF
-  uint32_t unknown2; //always 0xFFFFFFFF
-  uint8_t unknown3; //always 0xFF
-  /* --- */
+  uint8_t landSetId;
+  uint8_t objectArray;
+  uint16_t unknown1;
+  uint32_t itemId;
+  uint16_t itemRotation;
+  uint16_t pos_x;
+  uint16_t pos_y;
+  uint16_t pos_z;
+};
+
+struct FFXIVIpcYardObjectMove : FFXIVIpcBasePacket<YardObjectMove>
+{
+  uint16_t itemRotation;
+  uint8_t objectArray;
+  uint8_t landSetId;
+  uint16_t pos_x;
+  uint16_t pos_y;
+  uint16_t pos_z;
+  uint16_t unknown1;
+  uint16_t unknown2;
+  uint16_t unknown3;
+};
+
+struct FFXIVIpcHousingObjectInitialize : FFXIVIpcBasePacket< HousingObjectInitialize >
+{
+  Common::LandIdent landIdent;
+  int8_t u1; //Outdoor -1 / Indoor 0 - probably indicator
   uint8_t packetNum;
-  uint16_t packetTotal;
-  struct
+  uint8_t packetTotal;
+  uint8_t u2; //Outdoor 0 / Indoor 100(?)
+  Common::YardObject object[100];
+  uint32_t unknown4; //unused
+};
+
+struct FFXIVIpcHousingIndoorInitialize : FFXIVIpcBasePacket< HousingIndoorInitialize >
+{
+  uint16_t u1;
+  uint16_t u2;
+  uint16_t u3;
+  uint16_t u4;
+  uint32_t indoorItems[10];
+};
+
+
+struct FFXIVIpcHousingWardInfo : FFXIVIpcBasePacket< HousingWardInfo >
+{
+  Common::LandIdent landIdent;
+
+  struct HouseInfoEntry
   {
-    uint32_t itemId;
-    uint16_t itemRotation;
-    uint16_t pos_x;
-    uint16_t pos_y;
-    uint16_t pos_z;
-  } object[100];
+    uint32_t housePrice;
+    uint8_t infoFlags;
+    Common::HousingAppeal houseAppeal[3];
+    char estateOwnerName[30];
+  } houseInfoEntry[60];
+};
+
+struct FFXIVIpcHousingEstateGreeting : FFXIVIpcBasePacket< HousingEstateGreeting >
+{
+  Common::LandIdent landIdent;
+  char message[200];
+};
+
+struct FFXIVIpcHousingShowEstateGuestAccess :
+  FFXIVIpcBasePacket< HousingShowEstateGuestAccess >
+{
+  uint32_t unknown[2];
+  Common::LandIdent ident;
 };
 
 /**
@@ -1686,7 +1804,7 @@ struct FFXIVIpcObjectSpawn :
   int16_t unknown24b;
   uint16_t unknown28a;
   int16_t unknown28c;
-  uint32_t unknown2C;
+  uint32_t housingLink;
   Common::FFXIVARR_POSITION3 position;
   int16_t unknown3C;
   int16_t unknown3E;
@@ -1712,11 +1830,57 @@ struct FFXIVIpcDuelChallenge :
   char otherName[32];
 };
 
+struct FFXIVIpcMarketBoardSearchResult :
+  FFXIVIpcBasePacket< MarketBoardSearchResult >
+{
+    struct MarketBoardItem
+    {
+        uint32_t itemCatalogId;
+        uint32_t quantity;
+    } items[20];
+
+    uint32_t itemIndexEnd;
+    uint32_t padding1;
+    uint32_t itemIndexStart;
+    uint32_t padding2;
+};
+
+struct FFFXIVIpcMarketBoardItemListingCount :
+  FFXIVIpcBasePacket< MarketBoardItemListingCount >
+{
+    uint32_t itemCatalogId;
+    uint32_t unknown1; // does some shit if nonzero
+    uint16_t unknown2;
+    uint16_t quantity; // high/low u8s read separately?
+    uint32_t padding3;
+};
+
+struct FFXIVIpcMarketBoardItemListingHistory :
+  FFXIVIpcBasePacket< MarketBoardItemListingHistory >
+{
+    uint32_t itemCatalogId;
+    uint32_t itemCatalogId2;
+
+    struct MarketListing
+    {
+        uint32_t salePrice;
+        time_t purchaseTime;
+        uint32_t quantity;
+        uint16_t unknown1;
+        uint8_t unknown2;
+
+        char sellerName[32];
+
+        uint8_t unknown3;
+        uint32_t itemCatalogId;
+    } listing[20];
+};
+
 
 } /* Server */
 } /* Packets */
 } /* Network */
-} /* Core */
+} /* Sapphire */
 
 
 

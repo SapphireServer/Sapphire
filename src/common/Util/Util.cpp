@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <string>
 
-std::string Core::Util::binaryToHexString( uint8_t* pBinData, uint16_t size )
+std::string Sapphire::Util::binaryToHexString( uint8_t* pBinData, uint16_t size )
 {
   std::string outStr;
 
@@ -17,26 +17,26 @@ std::string Core::Util::binaryToHexString( uint8_t* pBinData, uint16_t size )
   return outStr;
 
 }
-std::string Core::Util::toLowerCopy( const std::string& inStr )
+std::string Sapphire::Util::toLowerCopy( const std::string& inStr )
 {
   std::string out = inStr;
   std::transform( inStr.begin(), inStr.end(), out.begin(), [](unsigned char c) -> unsigned char { return ::tolower(c); });
   return out;
 }
 
-void Core::Util::eraseAll( std::string& inOutStr, char remove )
+void Sapphire::Util::eraseAll( std::string& inOutStr, char remove )
 {
   inOutStr.erase( std::remove( inOutStr.begin(), inOutStr.end(), remove ), inOutStr.end() );
 }
 
-void Core::Util::eraseAllIn( std::string& inOutStr, std::string& remove )
+void Sapphire::Util::eraseAllIn( std::string& inOutStr, std::string& remove )
 {
   for( auto rem : remove )
     inOutStr.erase( std::remove( inOutStr.begin(), inOutStr.end(), rem ), inOutStr.end() );
 }
 
 
-std::string Core::Util::intToHexString( uint64_t intValue, uint8_t width ) 
+std::string Sapphire::Util::intToHexString( uint64_t intValue, uint8_t width )
 {
     std::string hexStr;
 
@@ -51,7 +51,7 @@ std::string Core::Util::intToHexString( uint64_t intValue, uint8_t width )
     return hexStr;
 }
 
-std::string Core::Util::binaryToHexDump( uint8_t* pBinData, uint16_t size )
+std::string Sapphire::Util::binaryToHexDump( uint8_t* pBinData, uint16_t size )
 {
   int bytesPerLine = 16;
   constexpr char hexChars[] = "0123456789ABCDEF";
@@ -112,25 +112,25 @@ std::string Core::Util::binaryToHexDump( uint8_t* pBinData, uint16_t size )
 
 }
 
-uint64_t Core::Util::getTimeMs()
+uint64_t Sapphire::Util::getTimeMs()
 {
   std::chrono::milliseconds epoch = std::chrono::duration_cast< std::chrono::milliseconds >
     ( std::chrono::system_clock::now().time_since_epoch() );
   return epoch.count();
 }
 
-int64_t Core::Util::getTimeSeconds()
+int64_t Sapphire::Util::getTimeSeconds()
 {
   std::chrono::seconds epoch = std::chrono::seconds( std::time( nullptr ) );
   return epoch.count();
 }
 
-uint64_t Core::Util::getEorzeanTimeStamp()
+uint64_t Sapphire::Util::getEorzeanTimeStamp()
 {
   return static_cast< uint64_t >( getTimeSeconds() * 20.571428571428573f );
 }
 
-void Core::Util::valueToFlagByteIndexValue( uint32_t inVal, uint8_t& outVal, uint16_t& outIndex )
+void Sapphire::Util::valueToFlagByteIndexValue( uint32_t inVal, uint8_t& outVal, uint16_t& outIndex )
 {
   uint32_t id = inVal;
   outIndex = id / 8;

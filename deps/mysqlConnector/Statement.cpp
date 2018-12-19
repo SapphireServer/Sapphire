@@ -60,7 +60,7 @@ std::shared_ptr< Mysql::ResultSet > Mysql::Statement::getResultSet()
 {
    if( errNo() != 0 )
       throw std::runtime_error( "Error during getResultSet() : " + std::to_string( errNo() ) + ": " +
-                                        m_pConnection->getError() );
+                                m_pConnection->getError() );
 
    return std::make_shared< ResultSet >( mysql_store_result( m_pConnection->getRawCon() ), shared_from_this() );
 }

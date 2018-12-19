@@ -1,10 +1,10 @@
 #include "Version.h"
 
-namespace Core { 
+namespace Sapphire {
 namespace Version {
 
 const std::string GIT_HASH = "@GIT_SHA1@";
 const std::string VERSION = "@VERSION@";
 
 } /* Version */
-} /* Core */
+} /* Sapphire */

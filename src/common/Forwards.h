@@ -3,7 +3,7 @@
 
 #include <memory>
 
-namespace Core
+namespace Sapphire
 {
 
   class ConfigMgr;

@@ -195,7 +195,7 @@ std::string zoneNameToPath( const std::string& name )
     if( teriName.empty() )
       continue;
     auto teriPath = std::get< std::string >( fields.at( static_cast< size_t >( TerritoryTypeExdIndexes::Path ) ) );
-    if( !found && ( Core::Util::toLowerCopy( name ) == Core::Util::toLowerCopy( teriName ) ) )
+    if( !found && ( Sapphire::Util::toLowerCopy( name ) == Sapphire::Util::toLowerCopy( teriName ) ) )
     {
       path = teriPath;
       found = true;

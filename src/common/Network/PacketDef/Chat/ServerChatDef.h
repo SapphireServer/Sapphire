@@ -4,7 +4,7 @@
 #include <Common.h>
 #include <Network/CommonNetwork.h>
 
-namespace Core {
+namespace Sapphire {
 namespace Network {
 namespace Packets {
 namespace Server {
@@ -39,7 +39,7 @@ struct FFXIVIpcTellErrNotFound :
 } /* Server */
 } /* Packets */
 } /* Network */
-} /* Core */
+} /* Sapphire */
 
 
 

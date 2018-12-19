@@ -10,7 +10,7 @@
 
 namespace fs = std::experimental::filesystem;
 
-namespace Core
+namespace Sapphire
 {
 
   Logger::Logger()

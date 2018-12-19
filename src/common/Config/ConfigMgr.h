@@ -7,7 +7,7 @@
 #include <string>
 #include <stdint.h>
 
-namespace Core
+namespace Sapphire
 {
     class ConfigMgr
     {

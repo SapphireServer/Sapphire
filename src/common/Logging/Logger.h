@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace Core
+namespace Sapphire
 {
 
   class Logger

@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace Core::Version
+namespace Sapphire::Version
 {
   extern const std::string GIT_HASH;
   extern const std::string VERSION;
