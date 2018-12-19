@@ -12,7 +12,7 @@ namespace Mysql
   class PreparedStatement;
 }
 
-namespace Core::Db
+namespace Sapphire::Db
 {
   union PreparedStatementDataUnion
   {

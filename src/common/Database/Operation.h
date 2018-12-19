@@ -6,7 +6,7 @@ namespace Mysql
   class Connection;
 }
 
-namespace Core::Db
+namespace Sapphire::Db
 {
   class DbConnection;
 

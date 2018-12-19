@@ -21,8 +21,11 @@ before_build:
   - mkdir build
   - cd build
   - cmake .. -G "Visual Studio 15 2017 Win64" 
-  - cmake --build . --target ALL_BUILD --config Debug
+  - cmake --build . --target ALL_BUILD --config Release
 
 build_script:
   - cd ..
+  - cd bin  
+  - copy "C:\Program Files\MySQL\MySQL Server 5.7\lib\libmysql.dll" libmysql.dll
+  - cd ..  
   - sh sql_import.sh

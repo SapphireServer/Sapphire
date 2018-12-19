@@ -3,7 +3,7 @@
 
 #include "DbConnection.h"
 
-namespace Core::Db
+namespace Sapphire::Db
 {
   class DbConnectionInfo;
 
@@ -78,6 +78,14 @@ namespace Core::Db
 
     ZONE_SEL_BNPCTEMPLATES,
 
+    LAND_INS,
+    LAND_SEL,
+    LAND_UP,
+    HOUSING_HOUSE_INS,
+    HOUSING_HOUSE_UP,
+    HOUSING_HOUSE_DEL,
+
+
     MAX_STATEMENTS
   };
 
@@ -88,7 +96,7 @@ namespace Core::Db
 
     ZoneDbConnection( ConnectionInfo& connInfo );
 
-    ZoneDbConnection( Core::LockedWaitQueue< std::shared_ptr< Operation > >* q, ConnectionInfo& connInfo );
+    ZoneDbConnection( Sapphire::LockedWaitQueue< std::shared_ptr< Operation > >* q, ConnectionInfo& connInfo );
 
     ~ZoneDbConnection();
 

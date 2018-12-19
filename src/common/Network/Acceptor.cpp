@@ -2,7 +2,7 @@
 #include "Acceptor.h"
 #include "Connection.h"
 
-namespace Core {
+namespace Sapphire {
 namespace Network {
 
 //-----------------------------------------------------------------------------

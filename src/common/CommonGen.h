@@ -6,7 +6,7 @@
 /* This file has been automatically generated.
    Changes will be lost upon regeneration.
    To change the content edit tools/exd_common_gen */
-namespace Core {
+namespace Sapphire {
 namespace Common {
 
 ///////////////////////////////////////////////////////////
@@ -148,10 +148,9 @@ enum class ExVersion :
 
 ///////////////////////////////////////////////////////////
 //GrandCompany.exd
-enum class GrandCompany :
-  uint8_t
+enum GrandCompany : uint8_t
 {
-  None = 0,
+  NoGc = 0,
   Maelstrom = 1,
   OrderoftheTwinAdder = 2,
   ImmortalFlames = 3,
@@ -159,8 +158,7 @@ enum class GrandCompany :
 
 ///////////////////////////////////////////////////////////
 //GuardianDeity.exd
-enum class GuardianDeity :
-  uint8_t
+enum class GuardianDeity : uint8_t
 {
   HalonetheFury = 1,
   MenphinatheLover = 2,

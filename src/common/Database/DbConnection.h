@@ -16,7 +16,7 @@ namespace Mysql
   class PreparedStatement;
 }
 
-namespace Core::Db
+namespace Sapphire::Db
 {
   class DatabaseWorker;
   class PreparedStatement;
@@ -52,7 +52,7 @@ namespace Core::Db
     DbConnection( ConnectionInfo& connInfo );
 
     // Constructor for asynchronous connections.
-    DbConnection( Core::LockedWaitQueue< std::shared_ptr< Operation > >* queue, ConnectionInfo& connInfo );
+    DbConnection( Sapphire::LockedWaitQueue< std::shared_ptr< Operation > >* queue, ConnectionInfo& connInfo );
 
     virtual ~DbConnection();
 

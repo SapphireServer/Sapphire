@@ -7,6 +7,6 @@
 #include "Database/DbWorkerPool.h"
 #include "Database/PreparedStatement.h"
 
-extern Core::Db::DbWorkerPool< Core::Db::ZoneDbConnection > g_charaDb;
+extern Sapphire::Db::DbWorkerPool< Sapphire::Db::ZoneDbConnection > g_charaDb;
 
 #endif
