@@ -102,7 +102,8 @@ int main( int32_t argc, char* argv[] )
   std::string user;
   std::string host;
   std::string database;
-  
+  std::string pass;
+
   g_log.setLogPath( "log/SapphireDbm" );
   g_log.init();
 
@@ -129,13 +130,15 @@ int main( int32_t argc, char* argv[] )
       host = val;
     else if( arg == "database" )
       database = val;
+    else if( arg == "pass" )
+      pass = val;
     else if( arg == "sfile" )
       sFile = val;
     else if( arg == "ifile" )
       iFile = val;
     else if( arg == "force" )
-      force = true;	    
-  }	  
+      force = true;
+  }
 
   if( host.empty() )
     host = "127.0.0.1";
@@ -146,14 +149,14 @@ int main( int32_t argc, char* argv[] )
     return 0;
   }
 
-  auto dbm = DbManager( host, database, user, "", 3306 );
-  
+  auto dbm = DbManager( host, database, user, pass, 3306 );
+
   if( !sFile.empty() && !iFile.empty() )
   {
     dbm.setInsertFile( iFile );
     dbm.setSchemaFile( sFile );
   }
-  if( force ) 
+  if( force )
     dbm.setForceMode( true );
   //initialize|check|update|clearchars|liquidate
   if( mode.find( "initialize" ) != std::string::npos )
@@ -177,11 +180,11 @@ int main( int32_t argc, char* argv[] )
     dbm.setMode( Mode::LIQUIDATE );
   }
   else
-  { 
+  {
     g_log.fatal( "Not a valid mode: " + mode + " !" );
     return 1;
-  }	  
-	
+  }
+
   g_log.info( "Launching in " + mode + " mode..." );
 
   if( !dbm.connect() )
