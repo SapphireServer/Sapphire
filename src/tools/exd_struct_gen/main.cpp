@@ -21,8 +21,8 @@
 
 
 
-Core::Logger g_log;
-Core::Data::ExdDataGenerated g_exdData;
+Sapphire::Logger g_log;
+Sapphire::Data::ExdDataGenerated g_exdData;
 bool skipUnmapped = true;
 
 std::map< char, std::string > numberToStringMap
@@ -45,7 +45,7 @@ std::vector< std::string > cppKeyWords
     "class"
   };
 
-//std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
+//std::string datLocation( "/home/mordred/sqpack" );
 std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
 std::map< uint8_t, std::string > g_typeMap;
 
@@ -117,29 +117,57 @@ std::string generateStruct( const std::string& exd )
   std::ifstream exJson( "ex.json" );
   exJson >> json;
 
-  for( auto& definition : json["sheets"][exd] )
+  for( auto& sheet : json[ "sheets" ] )
   {
-    uint32_t index;
-    std::string converterTarget = "";
-    bool isRepeat = false;
-    int num = 0;
-
-    index = definition["index"].get< uint32_t >();
-    indexToNameMap[ index ] = std::string( definition["name"] );
-
-    converterTarget = std::string( definition["converter"]["target"] );
-    if( nameTaken.find( converterTarget ) != nameTaken.end() )
-      indexToTarget[ index ] = converterTarget;
-
-    if( auto count = definition["count"] )
+    if( sheet[ "sheet" ] != exd )
+      continue;
+  
+    for( auto& definition : sheet[ "definitions" ] )
     {
-      num = std::stoi( std::string( count ) );
-      isRepeat = true;
-      indexIsArrayMap[ index ] = true;
-      indexCountMap[ index ] = num;
+      uint32_t index;
+      std::string converterTarget = "";
+      bool isRepeat = false;
+      int num = 0;
+      try
+      {
+        index = definition.at( "index" );
+      }
+      catch( ... )
+      {
+        index = 0;
+      }
+ 
+      try
+      {
+        std::string fieldName = std::string( definition.at( "name" ) );
+        indexToNameMap[ index ] = fieldName;
+      }
+      catch( ... )
+      {
+      }
 
-      std::string fName = definition["definition"]["name"];
-      indexToNameMap[ index ] = fName;
+      try
+      {
+        converterTarget = std::string( definition.at( "converter" ).at( "target" ) );
+        if( nameTaken.find( converterTarget ) != nameTaken.end() )
+          indexToTarget[ index ] = converterTarget;
+      }
+      catch( ... )
+      {
+      }
+ 
+      try
+      {
+        num = definition.at( "count" );
+        isRepeat = true;
+        indexIsArrayMap[ index ] = true;
+        indexCountMap[ index ] = num;
+        std::string fName = definition.at( "definition" ).at( "name" );
+        indexToNameMap[ index ] = fName;
+      }
+      catch( ... )
+      {
+      }
     }
 
 
@@ -213,7 +241,15 @@ std::string generateStruct( const std::string& exd )
     count++;
   }
 
-  result += "\n   " + exd + "( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );\n";
+  auto exhHead = exh.get_header();
+  if( exhHead.variant == 2 )
+  {
+    result += "\n   " + exd + "( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );\n";
+  }
+  else
+  {
+    result += "\n   " + exd + "( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );\n";
+  }
   result += "};\n\n";
 
   return result;
@@ -229,11 +265,20 @@ std::string generateConstructorsDecl( const std::string& exd )
 
   int count = 0;
 
-
-  result += "\nCore::Data::" + exd + "::" + exd + "( uint32_t row_id, Core::Data::ExdDataGenerated* exdData )\n";
-  result += "{\n";
   std::string indent = "   ";
-  result += indent + "auto row = exdData->m_" + exd + "Dat.get_row( row_id );\n";
+  auto exhHead = exh.get_header();
+  if( exhHead.variant == 2 )
+  {
+    result += "\nSapphire::Data::" + exd + "::" + exd + "( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData )\n";
+    result += "{\n";
+    result += indent + "auto row = exdData->m_" + exd + "Dat.get_row( row_id, subRow );\n";
+  }
+  else
+  {
+    result += "\nSapphire::Data::" + exd + "::" + exd + "( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )\n";
+    result += "{\n";
+    result += indent + "auto row = exdData->m_" + exd + "Dat.get_row( row_id );\n";
+  }
   for( auto member : exhMem )
   {
     if( indexToNameMap.find( count ) == indexToNameMap.end() )
@@ -333,22 +378,20 @@ int main( int argc, char** argv )
 
   //BOOST_FOREACH( boost::property_tree::ptree::value_type &sheet, m_propTree.get_child( "sheets" ) )
   //{
-  //std::string name = sheet.second.get< std::string >( "sheet" );
   //nameTaken[name] = "1";
   //}
-
-  for( auto& sheet : json["sheets"] )
-  {
-    std::string name = json["sheet"];
-
-    forwards += "struct " + name + ";\n";
-    structDefs += generateStruct( name );
-    dataDecl += generateDatAccessDecl( name );
-    idListsDecl += generateIdListDecl( name );
-    getterDecl += generateDirectGetters( name );
-    datAccCall += generateSetDatAccessCall( name );
-    constructorDecl += generateConstructorsDecl( name );
-    idListGetters += generateIdListGetter( name );
+  //
+  for( auto& sheet : json[ "sheets" ] )
+  { 
+      std::string name = sheet[ "sheet" ];
+      forwards += "struct " + name + ";\n";
+      structDefs += generateStruct( name );
+      dataDecl += generateDatAccessDecl( name );
+      idListsDecl += generateIdListDecl( name );
+      getterDecl += generateDirectGetters( name );
+      datAccCall += generateSetDatAccessCall( name );
+      constructorDecl += generateConstructorsDecl( name );
+      idListGetters += generateIdListGetter( name );
   }
 
   getterDecl +=

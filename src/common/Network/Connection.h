@@ -12,7 +12,7 @@
 #include "Acceptor.h"
 #include <memory>
 
-namespace Core::Network
+namespace Sapphire::Network
 {
 
   class Hive;

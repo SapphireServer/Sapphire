@@ -8,302 +8,334 @@
 
 // +---------------------------------------------------------------------------
 // The following enumerations are structures to require their type be included.
-// They are also defined within the Core::Common namespace to avoid collisions.
+// They are also defined within the Sapphire::Common namespace to avoid collisions.
 // +---------------------------------------------------------------------------
-namespace Core {
-namespace Network {
-namespace ActorControl {
-
-enum ActorControlType :
-  uint16_t
+namespace Sapphire::Network::ActorControl
 {
-  /*! Toggles weapon status -> Sheathed/UnSheathed
-      \param param1 status 0|1 */
-    ToggleWeapon = 0x00,
-  /*! Toggles Autoattack status on/off
-      \param param1 status 0|1 */
-    AutoAttack = 0x01,
-  SetStatus = 0x02,
-  CastStart = 0x03,
-  ToggleAggro = 0x04,
-  ClassJobChange = 0x05,
-  DefeatMsg = 0x06,
-  GainExpMsg = 0x07,
 
-  LevelUpEffect = 0x0A,
+enum ActorControlType : uint16_t
+{
+    /*! Toggles weapon status -> Sheathed/UnSheathed
+        \param param1 status 0|1 */
+      ToggleWeapon = 0x00,
+    /*! Toggles Autoattack status on/off
+        \param param1 status 0|1 */
+      AutoAttack = 0x01,
+    SetStatus = 0x02,
+    CastStart = 0x03,
+    ToggleAggro = 0x04,
+    ClassJobChange = 0x05,
+    DefeatMsg = 0x06,
+    GainExpMsg = 0x07,
 
-  ExpChainMsg = 0x0C,
-  HpSetStat = 0x0D,
-  DeathAnimation = 0x0E,
-  CastInterrupt = 0x0F,
+    LevelUpEffect = 0x0A,
 
-  ActionStart = 0x11,
+    ExpChainMsg = 0x0C,
+    HpSetStat = 0x0D,
+    DeathAnimation = 0x0E,
+    CastInterrupt = 0x0F,
 
-  StatusEffectGain = 0x14,
-  StatusEffectLose = 0x15,
+    ActionStart = 0x11,
 
-  HPFloatingText = 0x17,
-  UpdateRestedExp = 0x018,
-  Unk2 = 0x19,
+    StatusEffectGain = 0x14,
+    StatusEffectLose = 0x15,
 
-  Flee = 0x1B,
+    HPFloatingText = 0x17,
+    UpdateRestedExp = 0x018,
+    Unk2 = 0x19,
 
-  Unk3 = 0x20,                  // Animation related?
+    Flee = 0x1B,
 
-  CombatIndicationShow = 0x22,
+    Unk3 = 0x20,                  // Animation related?
 
-  SpawnEffect = 0x25,
-  ToggleInvisible = 0x26,
+    CombatIndicationShow = 0x22,
 
-  ToggleActionUnlock = 0x29,
+    SpawnEffect = 0x25,
+    ToggleInvisible = 0x26,
 
-  UpdateUiExp = 0x2B,
-  DmgTakenMsg = 0x2D,
+    ToggleActionUnlock = 0x29,
 
-  SetTarget = 0x32,
-  ToggleNameHidden = 0x36,
+    UpdateUiExp = 0x2B,
+    DmgTakenMsg = 0x2D,
 
-  LimitbreakStart = 0x47,
-  LimitbreakPartyStart = 0x48,
-  BubbleText = 0x49,
+    SetTarget = 0x32,
+    ToggleNameHidden = 0x36,
 
-  DamageEffect = 0x50,
-  RaiseAnimation = 0x51,
-  TreasureScreenMsg = 0x57,
-  SetOwnerId = 0x59,
-  ItemRepairMsg = 0x5C,
+    LimitbreakStart = 0x47,
+    LimitbreakPartyStart = 0x48,
+    BubbleText = 0x49,
 
-  DirectorInit = 0x64,
-  DirectorClear = 0x65,
+    DamageEffect = 0x50,
+    RaiseAnimation = 0x51,
+    TreasureScreenMsg = 0x57,
+    SetOwnerId = 0x59,
+    ItemRepairMsg = 0x5C,
 
-  LeveStartAnim = 0x66,
-  LeveStartError = 0x67,
-  DirectorEObjMod = 0x6A,
+    DirectorInit = 0x64,
+    DirectorClear = 0x65,
 
-  DirectorUpdate = 0x6D,
+    LeveStartAnim = 0x66,
+    LeveStartError = 0x67,
+    DirectorEObjMod = 0x6A,
 
-  ItemObtainMsg = 0x75,
-  DutyQuestScreenMsg = 0x7B,
+    DirectorUpdate = 0x6D,
 
-  ItemObtainIcon = 0x84,
-  FateItemFailMsg = 0x85,
-  ItemFailMsg = 0x86,
-  ActionLearnMsg1 = 0x87,
+    ItemObtainMsg = 0x75,
+    DutyQuestScreenMsg = 0x7B,
 
-  FreeEventPos = 0x8A,
+    ItemObtainIcon = 0x84,
+    FateItemFailMsg = 0x85,
+    ItemFailMsg = 0x86,
+    ActionLearnMsg1 = 0x87,
 
-  SetBGM = 0xA1,
+    FreeEventPos = 0x8A,
 
-  UnlockAetherCurrentMsg = 0xA4,
+    SetBGM = 0xA1,
 
-  RemoveName = 0xA8,
+    UnlockAetherCurrentMsg = 0xA4,
 
-  ScreenFadeOut = 0xAA,
+    RemoveName = 0xA8,
 
-  ZoneIn = 0xC8,
-  ZoneInDefaultPos = 0xC9,
+    ScreenFadeOut = 0xAA,
 
-  TeleportStart = 0xCB,
+    ZoneIn = 0xC8,
+    ZoneInDefaultPos = 0xC9,
 
-  TeleportDone = 0xCD,
-  TeleportDoneFadeOut = 0xCE,
-  DespawnZoneScreenMsg = 0xCF,
+    TeleportStart = 0xCB,
 
-  InstanceSelectDlg = 0xD2,
-  ActorDespawnEffect = 0xD4,
+    TeleportDone = 0xCD,
+    TeleportDoneFadeOut = 0xCE,
+    DespawnZoneScreenMsg = 0xCF,
 
-  CompanionUnlock = 0xFD,
-  ObtainBarding = 0xFE,
-  EquipBarding = 0xFF,
+    InstanceSelectDlg = 0xD2,
+    ActorDespawnEffect = 0xD4,
 
-  CompanionMsg1 = 0x102,
-  CompanionMsg2 = 0x103,
-  ShowPetHotbar = 0x104,
+    CompanionUnlock = 0xFD,
+    ObtainBarding = 0xFE,
+    EquipBarding = 0xFF,
 
-  ActionLearnMsg = 0x109,
-  ActorFadeOut = 0x10A,
-  ActorFadeIn = 0x10B,
-  WithdrawMsg = 0x10C,
-  OrderMinion = 0x10D,
-  ToggleMinion = 0x10E,
-  LearnMinion = 0x10F,
-  ActorFateOut1 = 0x110,
+    CompanionMsg1 = 0x102,
+    CompanionMsg2 = 0x103,
+    ShowPetHotbar = 0x104,
 
-  Emote = 0x122,
-  EmoteInterrupt = 0x123,
+    ActionLearnMsg = 0x109,
+    ActorFadeOut = 0x10A,
+    ActorFadeIn = 0x10B,
+    WithdrawMsg = 0x10C,
+    OrderMinion = 0x10D,
+    ToggleMinion = 0x10E,
+    LearnMinion = 0x10F,
+    ActorFateOut1 = 0x110,
 
-  SetPose = 0x127,
+    Emote = 0x122,
+    EmoteInterrupt = 0x123,
 
-  CraftingUnk = 0x12C,
+    SetPose = 0x127,
 
-  GatheringSenseMsg = 0x130,
-  PartyMsg = 0x131,
-  GatheringSenseMsg1 = 0x132,
+    CraftingUnk = 0x12C,
 
-  GatheringSenseMsg2 = 0x138,
+    GatheringSenseMsg = 0x130,
+    PartyMsg = 0x131,
+    GatheringSenseMsg1 = 0x132,
 
-  FishingMsg = 0x140,
+    GatheringSenseMsg2 = 0x138,
 
-  FishingBaitMsg = 0x145,
+    FishingMsg = 0x140,
 
-  FishingReachMsg = 0x147,
-  FishingFailMsg = 0x148,
+    FishingBaitMsg = 0x145,
 
-  MateriaConvertMsg = 0x15E,
-  MeldSuccessMsg = 0x15F,
-  MeldFailMsg = 0x160,
-  MeldModeToggle = 0x161,
+    FishingReachMsg = 0x147,
+    FishingFailMsg = 0x148,
 
-  AetherRestoreMsg = 0x163,
+    MateriaConvertMsg = 0x15E,
+    MeldSuccessMsg = 0x15F,
+    MeldFailMsg = 0x160,
+    MeldModeToggle = 0x161,
 
-  DyeMsg = 0x168,
+    AetherRestoreMsg = 0x163,
 
-  ToggleCrestMsg = 0x16A,
-  ToggleBulkCrestMsg = 0x16B,
-  MateriaRemoveMsg = 0x16C,
-  GlamourCastMsg = 0x16D,
-  GlamourRemoveMsg = 0x16E,
+    DyeMsg = 0x168,
 
-  RelicInfuseMsg = 0x179,
+    ToggleCrestMsg = 0x16A,
+    ToggleBulkCrestMsg = 0x16B,
+    MateriaRemoveMsg = 0x16C,
+    GlamourCastMsg = 0x16D,
+    GlamourRemoveMsg = 0x16E,
 
-  AetherReductionDlg = 0x17D,
+    RelicInfuseMsg = 0x179,
 
-  Unk6 = 0x19C,
-  EObjAnimation = 0x19D,
+    AetherReductionDlg = 0x17D,
 
-  SetTitle = 0x1F4,
+    Unk6 = 0x19C,
+    EObjAnimation = 0x19D,
 
-  SetStatusIcon = 0x1F8,
-  LimitBreakGauge = 0x1F9, // Max level, amount, build type (chop sound), lb type(0=pve lb 1=pvp lb)
-  SetHomepoint = 0x1FB,
-  SetFavorite = 0x1FC,
-  LearnTeleport = 0x1FD,
+    SetTitle = 0x1F4,
 
-  OpenRecommendationGuide = 0x200,
-  ArmoryErrorMsg = 0x201,
+    SetStatusIcon = 0x1F8,
+    LimitBreakGauge = 0x1F9, // Max level, amount, build type (chop sound), lb type(0=pve lb 1=pvp lb)
+    SetHomepoint = 0x1FB,
+    SetFavorite = 0x1FC,
+    LearnTeleport = 0x1FD,
 
-  AchievementPopup = 0x203,
+    OpenRecommendationGuide = 0x200,
+    ArmoryErrorMsg = 0x201,
 
-  Unk7 = 0x205,                 // LogMessage?
-  AchievementMsg = 0x206,
+    AchievementPopup = 0x203,
 
-  SetItemLevel = 0x209,
+    LogMsg = 0x205,                 // LogMessage?
+    AchievementMsg = 0x206,
 
-  ChallengeEntryCompleteMsg = 0x20B,
-  ChallengeEntryUnlockMsg = 0x20C,
+    SetItemLevel = 0x209,
 
-  GilTrailMsg = 0x211,
+    ChallengeEntryCompleteMsg = 0x20B,
+    ChallengeEntryUnlockMsg = 0x20C,
 
-  SetMaxGearSets = 0x230,
+    GilTrailMsg = 0x211,
 
-  SetCharaGearParamUI = 0x260,
-  ToggleWireframeRendering = 0x261,
+    SetMaxGearSets = 0x230,
 
-  ExamineError = 0x2BF,
+    SetCharaGearParamUI = 0x260,
+    ToggleWireframeRendering = 0x261,
 
-  GearSetEquipMsg = 0x321,
+    ExamineError = 0x2BF,
 
-  SetFestival = 0x386, // param1: festival.exd index
+    GearSetEquipMsg = 0x321,
 
-  ToggleOrchestrionUnlock = 0x396,
-  Dismount = 0x3A0,
+    SetFestival = 0x386, // param1: festival.exd index
 
-  // Duty Recorder
+    ToggleOrchestrionUnlock = 0x396,
+    Dismount = 0x3A0,
+
+    // Duty Recorder
     BeginReplayAck = 0x3A1,
-  EndReplayAck = 0x3A2,
+    EndReplayAck = 0x3A2,
 
-  // PvP Duel
+    // Housing
+    ShowHousingItemUI = 0x3F7,
+    ShowBuildPresetUI = 0x3E9,
+    BuildPresetResponse = 0x3ED,
+
+    /*!
+     * param1 = outdoor furnishings
+     *          u8 0 - relocation available, 1 = available
+     *          u8 1 - outoor furnishings placed
+     *          u8 2 - outdoor furnishings in storeroom
+     *          u8 3 - outdoor funishings limit
+     * param2 = indoor furnishings
+     *          u16 0 - relocation available, 1 = available
+     *          u16 1 - furnishings placed
+     * param3 = indoor furnishings
+     *          u16 0 - in storeroom
+     *          u16 1 - indoor furnishings limit
+     */
+    HousingStoreroomStatus = 0x419,
+
+    // PvP Duel
     SetPvPState = 0x5E0, // param3 must be 6 to engage a duel (hardcoded in the client)
-  EndDuelSession = 0x5E1, // because someone went oob?
-  StartDuelCountdown = 0x5E2, // begins a countdown; also does some duel bgm thing.
-  StartDuel = 0x5E3, // actually all it does is set the challenger actor id;
-  DuelResultScreen = 0x5E4, // win/lose thing, also reset a target id just like what EndDuelSession does.
+    EndDuelSession = 0x5E1, // because someone went oob?
+    StartDuelCountdown = 0x5E2, // begins a countdown; also does some duel bgm thing.
+    StartDuel = 0x5E3, // actually all it does is set the challenger actor id;
+    DuelResultScreen = 0x5E4, // win/lose thing, also reset a target id just like what EndDuelSession does.
 
-  // Duty Action
+    // Duty Action
     SetDutyActionId = 0x5E8,  // ContentExAction
-  SetDutyActionHud = 0x5E9, // disable/enable
-  SetDutyActionActive = 0x5EA,
-  SetDutyActionRemaining = 0x5EB,
-};
+    SetDutyActionHud = 0x5E9, // disable/enable
+    SetDutyActionActive = 0x5EA,
+    SetDutyActionRemaining = 0x5EB,
+  };
 
-enum ClientTriggerType
-{
-  ToggleSheathe = 0x01,
-  ToggleAutoAttack = 0x02,
-  ChangeTarget = 0x03,
+  enum ClientTriggerType
+  {
+    ToggleSheathe = 0x01,
+    ToggleAutoAttack = 0x02,
+    ChangeTarget = 0x03,
 
-  DismountReq = 0x65,
+    DismountReq = 0x65,
 
-  RemoveStatusEffect = 0x68,
-  CastCancel = 0x69,
+    RemoveStatusEffect = 0x68,
+    CastCancel = 0x69,
 
-  Return = 0xC8, // return dead / accept raise
-  FinishZoning = 0xC9,
-  Teleport = 0xCA,
+    Return = 0xC8, // return dead / accept raise
+    FinishZoning = 0xC9,
+    Teleport = 0xCA,
 
-  Examine = 0x12C,
-  MarkPlayer = 0x12D, // Mark player, visible to party only
-  SetTitleReq = 0x12E,
-  TitleList = 0x12F,
+    Examine = 0x12C,
+    MarkPlayer = 0x12D, // Mark player, visible to party only
+    SetTitleReq = 0x12E,
+    TitleList = 0x12F,
 
-  UpdatedSeenHowTos = 0x133,
-  AllotAttribute = 0x135,
+    UpdatedSeenHowTos = 0x133,
+    AllotAttribute = 0x135,
 
-  ClearWaymarks = 0x13A,
-  CameraMode = 0x13B, // param12, 1 = camera mode enable, 0 = disable
-  CharaNameReq = 0x13D, // requests character name by content id
-  HuntingLogDetails = 0x194,
+    ClearWaymarks = 0x13A,
+    CameraMode = 0x13B, // param12, 1 = camera mode enable, 0 = disable
+    CharaNameReq = 0x13D, // requests character name by content id
+    HuntingLogDetails = 0x194,
 
-  Timers = 0x1AB,
+    Timers = 0x1AB,
 
-  DyeItem = 0x1B5,
+    DyeItem = 0x1B5,
 
-  RequestChocoboInventory = 0x1C4,
+    RequestChocoboInventory = 0x1C4,
 
-  EmoteReq = 0x1F4,
-  EmoteCancel = 0x1F6,
-  PersistentEmoteCancel = 0x1F7,
-  PoseChange = 0x1F9,
-  PoseReapply = 0x1FA,
-  PoseCancel = 0x1FB,
+    EmoteReq = 0x1F4,
+    EmoteCancel = 0x1F6,
+    PersistentEmoteCancel = 0x1F7,
+    PoseChange = 0x1F9,
+    PoseReapply = 0x1FA,
+    PoseCancel = 0x1FB,
 
-  AchievementCrit = 0x202,
-  AchievementComp = 0x203,
-  AchievementCatChat = 0x206,
+    AchievementCrit = 0x202,
+    AchievementComp = 0x203,
+    AchievementCatChat = 0x206,
 
-  QuestJournalUpdateQuestVisibility = 0x2BE,
-  QuestJournalClosed = 0x2BF,
+    QuestJournalUpdateQuestVisibility = 0x2BE,
+    QuestJournalClosed = 0x2BF,
 
-  AbandonQuest = 0x320,
+    AbandonQuest = 0x320,
 
-  DirectorInitFinish = 0x321,
+    DirectorInitFinish = 0x321,
 
-  DirectorSync = 0x328, // unsure what exactly triggers it, starts director when returning to instance though
+    DirectorSync = 0x328, // unsure what exactly triggers it, starts director when returning to instance though
 
-  EnterTerritoryEventFinished = 0x330,
-  RequestInstanceLeave = 0x333, // df menu button
+    EnterTerritoryEventFinished = 0x330,
+    RequestInstanceLeave = 0x333, // df menu button
 
-  AchievementCritReq = 0x3E8,
-  AchievementList = 0x3E9,
+    AchievementCritReq = 0x3E8,
+    AchievementList = 0x3E9,
 
-  RequestSharedEstateSettings = 0x46F,
+    RequestHousingBuildPreset = 0x44C,
+    RequestEstateHallRemoval = 0x44F,
+    RequestBuildPreset = 0x450, // no idea what this is, it gets sent with BuildPresetHandler and has the plot id in param1
+    RequestLandSignFree = 0x451,
+    RequestLandSignOwned = 0x452,
+    RequestWardLandInfo = 0x453,
+    RequestLandRelinquish = 0x454,
+    RequestLandInventory = 0x0458,
+    RequestEstateRename = 0x45A,
+    RequestEstateEditGreeting = 0x45B,
+    RequestEstateGreeting = 0x45C, // sends FFXIVIpcHousingEstateGreeting in return
+    RequestEstateEditGuestAccessSettings = 0x45D,
+    RequestEstateTagSettings = 0x45F,
+    RequestEstateInventory = 0x0461,
+    RequestHousingItemUI = 0x463,
+    RequestSharedEstateSettings = 0x46F,
+    UpdateEstateLightingLevel = 0x471,
 
-  CompanionAction = 0x6A4,
-  CompanionSetBarding = 0x6A5,
-  CompanionActionUnlock = 0x6A6,
+    CompanionAction = 0x6A4,
+    CompanionSetBarding = 0x6A5,
+    CompanionActionUnlock = 0x6A6,
 
-  OpenPerformInstrumentUI = 0x71C,
+    OpenPerformInstrumentUI = 0x71C,
 
-  StartReplay = 0x7BC,
-  EndReplay = 0x7BD, // request for restoring the original player state (actor, buff, gauge, etc..)
+    StartReplay = 0x7BC,
+    EndReplay = 0x7BD, // request for restoring the original player state (actor, buff, gauge, etc..)
 
-  OpenDuelUI = 0x898, // Open a duel ui
-  DuelRequestResult = 0x899, // either accept/reject
+    OpenDuelUI = 0x898, // Open a duel ui
+    DuelRequestResult = 0x899, // either accept/reject
 
-};
+  };
 
-} /* ActorControl */
-} /* Common */
-} /* Core */
+}
 
 #endif

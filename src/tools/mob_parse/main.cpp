@@ -22,8 +22,8 @@ namespace filesys = std::experimental::filesystem;
 #include <regex>
 #include <map>
 
-Core::Logger g_log;
-Core::Data::ExdDataGenerated g_exdData;
+Sapphire::Logger g_log;
+Sapphire::Data::ExdDataGenerated g_exdData;
 
 //const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
 const std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
@@ -120,7 +120,7 @@ std::string binaryToHexString( uint8_t* pBinData, uint16_t size )
 
   for( uint32_t i = 0; i < size; i++ )
   {
-    outStr += Core::Util::intToHexString( pBinData[ i ] & 0xFF );
+    outStr += Sapphire::Util::intToHexString( pBinData[ i ] & 0xFF );
   }
 
   return outStr;
@@ -255,9 +255,9 @@ int dumpSpawns()
   for( auto entry : zoneToPacketList )
   {
 
-    //auto nameStruct = g_exdData.get< Core::Data::BNpcName >( entry.first );
-    auto teri1 = g_exdData.get< Core::Data::TerritoryType >( entry.first );
-    auto teriPlaceName = g_exdData.get< Core::Data::PlaceName >( teri1->placeName );
+    //auto nameStruct = g_exdData.get< Sapphire::Data::BNpcName >( entry.first );
+    auto teri1 = g_exdData.get< Sapphire::Data::TerritoryType >( entry.first );
+    auto teriPlaceName = g_exdData.get< Sapphire::Data::PlaceName >( teri1->placeName );
     g_log.info( std::to_string( entry.first ) + " - " + teri1->name + " - " + teriPlaceName->name );
     g_log.info( "Mob Count: " + std::to_string( entry.second.size() ) );
 
@@ -265,7 +265,7 @@ int dumpSpawns()
     {
       nameToPacketList[ mob.bNPCBase ].push_back( mob );
 
-      auto nameStruct = g_exdData.get< Core::Data::BNpcName >( mob.bNPCName );
+      auto nameStruct = g_exdData.get< Sapphire::Data::BNpcName >( mob.bNPCName );
       //g_log.info( nameStruct->singular + " " + std::to_string( packet.bNPCBase ) );
     }
 
@@ -281,7 +281,7 @@ int dumpSpawns()
 
     for( auto mobName : lvlToPacket )
     {
-      auto nameStruct = g_exdData.get< Core::Data::BNpcName >( mobName.second.at(0).bNPCName );
+      auto nameStruct = g_exdData.get< Sapphire::Data::BNpcName >( mobName.second.at(0).bNPCName );
       g_log.info( "|--> " + nameStruct->singular + "(" + std::to_string( mobName.second.size() ) + ")" );
 
       spawngroups++;
@@ -418,7 +418,7 @@ int dumpTemplates()
          if( pos != std::string::npos )
          {
             auto zoneIdStr = file.substr( pos + 1 );
-            auto teri1 = g_exdData.get< Core::Data::TerritoryType >( std::stoi( zoneIdStr ) );
+            auto teri1 = g_exdData.get< Sapphire::Data::TerritoryType >( std::stoi( zoneIdStr ) );
             g_log.info( zoneIdStr + " - " + teri1->name );
          }
       }
@@ -433,7 +433,7 @@ int dumpTemplates()
 
          nameToPacketList[ packet.bNPCName ].push_back( packet );
 
-         auto nameStruct = g_exdData.get< Core::Data::BNpcName >( packet.bNPCName );
+         auto nameStruct = g_exdData.get< Sapphire::Data::BNpcName >( packet.bNPCName );
          //g_log.info( nameStruct->singular + " " + std::to_string( packet.bNPCBase ) );
       }
 */
@@ -445,9 +445,9 @@ int dumpTemplates()
   for( auto entry : zoneToPacketList )
   {
 
-    //auto nameStruct = g_exdData.get< Core::Data::BNpcName >( entry.first );
-    auto teri1 = g_exdData.get< Core::Data::TerritoryType >( entry.first );
-    auto teriPlaceName = g_exdData.get< Core::Data::PlaceName >( teri1->placeName );
+    //auto nameStruct = g_exdData.get< Sapphire::Data::BNpcName >( entry.first );
+    auto teri1 = g_exdData.get< Sapphire::Data::TerritoryType >( entry.first );
+    auto teriPlaceName = g_exdData.get< Sapphire::Data::PlaceName >( teri1->placeName );
     g_log.info( std::to_string( entry.first ) + " - " + teri1->name + " - " + teriPlaceName->name );
     g_log.info( "Mob Count: " + std::to_string( entry.second.size() ) );
 
@@ -455,7 +455,7 @@ int dumpTemplates()
     {
       nameToPacketList[ mob.bNPCBase ].push_back( mob );
 
-      auto nameStruct = g_exdData.get< Core::Data::BNpcName >( mob.bNPCName );
+      auto nameStruct = g_exdData.get< Sapphire::Data::BNpcName >( mob.bNPCName );
       //g_log.info( nameStruct->singular + " " + std::to_string( packet.bNPCBase ) );
     }
 
@@ -463,7 +463,7 @@ int dumpTemplates()
 
     for( auto mobName : nameToPacketList )
     {
-      auto nameStruct = g_exdData.get< Core::Data::BNpcName >( mobName.second.at(0).bNPCName );
+      auto nameStruct = g_exdData.get< Sapphire::Data::BNpcName >( mobName.second.at(0).bNPCName );
       g_log.info( "|--> " + nameStruct->singular + "(" + std::to_string( mobName.second.size() ) + ")" );
 
       auto instance = mobName.second.at(0);
@@ -560,7 +560,7 @@ int dumpTemplates()
   g_log.info( "getting id list done" );
   for( auto id : idList )
   {
-     auto teri1 = g_exdData.get<Core::Data::TerritoryType>( id );
+     auto teri1 = g_exdData.get<Sapphire::Data::TerritoryType>( id );
 
      g_log.info( teri1->name );
   }*/

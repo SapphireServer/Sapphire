@@ -7,17 +7,17 @@
 #include <sstream>
 #include <cassert>
 
-Core::Db::PreparedStatement::PreparedStatement( uint32_t index ) :
+Sapphire::Db::PreparedStatement::PreparedStatement( uint32_t index ) :
   m_stmt( nullptr ),
   m_index( index )
 {
 }
 
-Core::Db::PreparedStatement::~PreparedStatement()
+Sapphire::Db::PreparedStatement::~PreparedStatement()
 {
 }
 
-void Core::Db::PreparedStatement::bindParameters()
+void Sapphire::Db::PreparedStatement::bindParameters()
 {
   assert( m_stmt );
 
@@ -65,7 +65,7 @@ void Core::Db::PreparedStatement::bindParameters()
 }
 
 //- Bind to buffer
-void Core::Db::PreparedStatement::setBool( uint8_t index, const bool value )
+void Sapphire::Db::PreparedStatement::setBool( uint8_t index, const bool value )
 {
   if( index >= m_statementData.size() )
     m_statementData.resize( index + 1 );
@@ -74,7 +74,7 @@ void Core::Db::PreparedStatement::setBool( uint8_t index, const bool value )
   m_statementData[ index ].type = TYPE_BOOL;
 }
 
-void Core::Db::PreparedStatement::setUInt( uint8_t index, uint32_t value )
+void Sapphire::Db::PreparedStatement::setUInt( uint8_t index, uint32_t value )
 {
   if( index >= m_statementData.size() )
     m_statementData.resize( index + 1 );
@@ -83,7 +83,7 @@ void Core::Db::PreparedStatement::setUInt( uint8_t index, uint32_t value )
   m_statementData[ index ].type = TYPE_UI;
 }
 
-void Core::Db::PreparedStatement::setUInt64( uint8_t index, uint64_t value )
+void Sapphire::Db::PreparedStatement::setUInt64( uint8_t index, uint64_t value )
 {
   if( index >= m_statementData.size() )
     m_statementData.resize( index + 1 );
@@ -92,7 +92,7 @@ void Core::Db::PreparedStatement::setUInt64( uint8_t index, uint64_t value )
   m_statementData[ index ].type = TYPE_UI64;
 }
 
-void Core::Db::PreparedStatement::setInt( uint8_t index, int32_t value )
+void Sapphire::Db::PreparedStatement::setInt( uint8_t index, int32_t value )
 {
   if( index >= m_statementData.size() )
     m_statementData.resize( index + 1 );
@@ -101,7 +101,7 @@ void Core::Db::PreparedStatement::setInt( uint8_t index, int32_t value )
   m_statementData[ index ].type = TYPE_I;
 }
 
-void Core::Db::PreparedStatement::setInt64( uint8_t index, int64_t value )
+void Sapphire::Db::PreparedStatement::setInt64( uint8_t index, int64_t value )
 {
   if( index >= m_statementData.size() )
     m_statementData.resize( index + 1 );
@@ -110,7 +110,7 @@ void Core::Db::PreparedStatement::setInt64( uint8_t index, int64_t value )
   m_statementData[ index ].type = TYPE_I64;
 }
 
-void Core::Db::PreparedStatement::setDouble( uint8_t index, double value )
+void Sapphire::Db::PreparedStatement::setDouble( uint8_t index, double value )
 {
   if( index >= m_statementData.size() )
     m_statementData.resize( index + 1 );
@@ -119,7 +119,7 @@ void Core::Db::PreparedStatement::setDouble( uint8_t index, double value )
   m_statementData[ index ].type = TYPE_DOUBLE;
 }
 
-void Core::Db::PreparedStatement::setString( uint8_t index, const std::string& value )
+void Sapphire::Db::PreparedStatement::setString( uint8_t index, const std::string& value )
 {
   if( index >= m_statementData.size() )
     m_statementData.resize( index + 1 );
@@ -129,7 +129,7 @@ void Core::Db::PreparedStatement::setString( uint8_t index, const std::string& v
   m_statementData[ index ].type = TYPE_STRING;
 }
 
-void Core::Db::PreparedStatement::setBinary( uint8_t index, const std::vector< uint8_t >& value )
+void Sapphire::Db::PreparedStatement::setBinary( uint8_t index, const std::vector< uint8_t >& value )
 {
   if( index >= m_statementData.size() )
     m_statementData.resize( index + 1 );
@@ -138,7 +138,7 @@ void Core::Db::PreparedStatement::setBinary( uint8_t index, const std::vector< u
   m_statementData[ index ].type = TYPE_BINARY;
 }
 
-void Core::Db::PreparedStatement::setNull( uint8_t index )
+void Sapphire::Db::PreparedStatement::setNull( uint8_t index )
 {
   if( index >= m_statementData.size() )
     m_statementData.resize( index + 1 );
@@ -146,12 +146,12 @@ void Core::Db::PreparedStatement::setNull( uint8_t index )
   m_statementData[ index ].type = TYPE_NULL;
 }
 
-uint32_t Core::Db::PreparedStatement::getIndex() const
+uint32_t Sapphire::Db::PreparedStatement::getIndex() const
 {
   return m_index;
 }
 
-void Core::Db::PreparedStatement::setMysqlPS( std::shared_ptr< Mysql::PreparedStatement > pStmt )
+void Sapphire::Db::PreparedStatement::setMysqlPS( std::shared_ptr< Mysql::PreparedStatement > pStmt )
 {
   m_stmt = pStmt;
 }

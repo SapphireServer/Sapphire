@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <type_traits>
 
-namespace Core::Util
+namespace Sapphire::Util
 {
 
   template< typename T, typename ActorIdType = uint32_t >
