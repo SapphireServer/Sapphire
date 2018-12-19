@@ -102,7 +102,7 @@ void Sapphire::World::Manager::HousingMgr::sendLandSignOwned( Entity::Player& pl
     std::strcpy( landInfoSignPacket->data().estateGreeting, house->getHouseGreeting().c_str() );
   }
 
-  uint32_t playerId = land->getPlayerOwner();
+  uint32_t playerId = land->getOwnerId();
   std::string playerName = g_fw.get< Sapphire::ServerMgr >()->getPlayerNameFromDb( playerId );
 
   memcpy( &landInfoSignPacket->data().ownerName, playerName.c_str(), playerName.size() );
@@ -160,7 +160,7 @@ Sapphire::LandPurchaseResult Sapphire::World::Manager::HousingMgr::purchaseLand(
         return LandPurchaseResult::ERR_NO_MORE_LANDS_FOR_CHAR;
 
       player.removeCurrency( CurrencyType::Gil, plotPrice );
-      pLand->setPlayerOwner( player.getId() );
+      pLand->setOwnerId( player.getId() );
       pLand->setState( HouseState::sold );
       pLand->setLandType( Common::LandType::Private );
 
@@ -190,7 +190,7 @@ bool Sapphire::World::Manager::HousingMgr::relinquishLand( Entity::Player& playe
 
   auto pLand = pHousing->getLand( plot );
   auto plotMaxPrice = pLand->getCurrentPrice();
-  auto landOwnerId = pLand->getPlayerOwner();
+  auto landOwnerId = pLand->getOwnerId();
 
   // can't relinquish when you are not the owner
   // TODO: actually use permissions here for FC houses
@@ -211,7 +211,7 @@ bool Sapphire::World::Manager::HousingMgr::relinquishLand( Entity::Player& playe
   }
 
   pLand->setCurrentPrice( pLand->getMaxPrice() );
-  pLand->setPlayerOwner( 0 );
+  pLand->setOwnerId( 0 );
   pLand->setState( HouseState::forSale );
   pLand->setLandType( Common::LandType::none );
   pLand->updateLandDb();
@@ -275,7 +275,7 @@ void Sapphire::World::Manager::HousingMgr::sendWardLandInfo( Entity::Player& pla
       case LandType::Private:
         entry.infoFlags |= Common::WardlandFlags::IsEstateOwned;
 
-        auto owner = land->getPlayerOwner();
+        auto owner = land->getOwnerId();
         auto playerName = g_fw.get< Sapphire::ServerMgr >()->getPlayerNameFromDb( owner );
         memcpy( &entry.estateOwnerName, playerName.c_str(), playerName.size() );
 
@@ -327,7 +327,7 @@ void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& pl
     return;
 
   // todo: when doing FC houses, look up the type from the original purchase and check perms from FC and set state accordingly
-  if( pLand->getPlayerOwner() != player.getId() )
+  if( pLand->getOwnerId() != player.getId() )
     return;
 
   // todo: check if permit is in inventory and remove one
@@ -415,7 +415,7 @@ void Sapphire::World::Manager::HousingMgr::updateEstateGreeting( Entity::Player&
     return;
 
   // todo: implement proper permissions checks
-  if( land->getPlayerOwner() != player.getId() )
+  if( land->getOwnerId() != player.getId() )
     return;
 
   auto house = land->getHouse();
@@ -441,7 +441,7 @@ void Sapphire::World::Manager::HousingMgr::requestEstateEditGuestAccess( Entity:
     return;
 
   // todo: add proper permission check
-  if( land->getPlayerOwner() != player.getId() )
+  if( land->getOwnerId() != player.getId() )
     return;
 
   auto packet = makeZonePacket< FFXIVIpcHousingShowEstateGuestAccess >( player.getId() );
@@ -505,7 +505,7 @@ void Sapphire::World::Manager::HousingMgr::sendHousingInventory( Entity::Player&
     return;
 
   // todo: add proper permissions checks
-  if( targetLand->getPlayerOwner() != player.getId() )
+  if( targetLand->getOwnerId() != player.getId() )
     return;
 
   player.sendDebug( "got inventory for plot: " + targetLand->getHouse()->getHouseName() );

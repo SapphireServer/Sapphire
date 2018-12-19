@@ -34,7 +34,7 @@ Sapphire::Land::Land( uint16_t territoryTypeId, uint8_t wardNum, uint8_t landId,
   m_currentPrice( 0 ),
   m_minPrice( 0 ),
   m_nextDrop( static_cast< uint32_t >( Util::getTimeSeconds() ) + 21600 ),
-  m_ownerPlayerId( 0 ),
+  m_ownerId( 0 ),
   m_landSetId( landSetId ),
   m_landInfo( info ),
   m_type( Common::LandType::none ),
@@ -77,7 +77,7 @@ void Sapphire::Land::init()
     m_size = res->getUInt( "Size" );
     m_state = res->getUInt( "Status" );
     m_currentPrice = res->getUInt( "LandPrice" );
-    m_ownerPlayerId = res->getUInt64( "OwnerId" );
+    m_ownerId = res->getUInt64( "OwnerId" );
     m_minPrice = m_landInfo->minPrice[ m_landId ];
     m_maxPrice = m_landInfo->initialPrice[ m_landId ];
 
@@ -240,14 +240,14 @@ uint32_t Sapphire::Land::getFcColor()
 }
 
 //Player
-void Sapphire::Land::setPlayerOwner( uint64_t id )
+void Sapphire::Land::setOwnerId( uint64_t id )
 {
-  m_ownerPlayerId = id;
+  m_ownerId = id;
 }
 
-uint64_t Sapphire::Land::getPlayerOwner()
+uint64_t Sapphire::Land::getOwnerId()
 {
-  return m_ownerPlayerId;
+  return m_ownerId;
 }
 
 uint32_t Sapphire::Land::getDevaluationTime()
@@ -282,7 +282,7 @@ void Sapphire::Land::updateLandDb()
   pDb->directExecute( "UPDATE land SET status = " + std::to_string( m_state )
   + ", LandPrice = " + std::to_string( getCurrentPrice() )
   + ", UpdateTime = " + std::to_string( getDevaluationTime() )
-  + ", OwnerId = " + std::to_string( getPlayerOwner() )
+  + ", OwnerId = " + std::to_string( getOwnerId() )
   + ", HouseId = " + std::to_string( houseId )
   + ", Type = " + std::to_string( static_cast< uint32_t >( m_type ) ) //TODO: add house id
   + " WHERE LandSetId = " + std::to_string( m_landSetId )
