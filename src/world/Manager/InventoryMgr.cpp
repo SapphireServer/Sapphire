@@ -10,9 +10,9 @@
 using namespace Sapphire::Network::Packets;
 
 void Sapphire::World::Manager::InventoryMgr::sendInventoryContainer( Sapphire::Entity::Player& player,
-                                                                     Sapphire::ItemContainerPtr container,
-                                                                     uint32_t sequence )
+                                                                     Sapphire::ItemContainerPtr container )
 {
+  auto sequence = player.getNextInventorySequence();
   auto pMap = container->getItemMap();
 
   for( auto itM = pMap.begin(); itM != pMap.end(); ++itM )

@@ -24,6 +24,7 @@
 #include "Framework.h"
 #include "ServerMgr.h"
 #include "Territory/House.h"
+#include "InventoryMgr.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network;
@@ -508,5 +509,12 @@ void Sapphire::World::Manager::HousingMgr::sendHousingInventory( Entity::Player&
   if( targetLand->getOwnerId() != player.getId() )
     return;
 
+  auto container = targetLand->getItemContainer( inventoryType );
+  if( !container )
+    return;
+
   player.sendDebug( "got inventory for plot: " + targetLand->getHouse()->getHouseName() );
+
+  auto invMgr = g_fw.get< Manager::InventoryMgr >();
+  invMgr->sendInventoryContainer( player, container );
 }
