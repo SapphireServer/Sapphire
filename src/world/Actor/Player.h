@@ -910,6 +910,8 @@ namespace Sapphire::Entity
 
     bool isObtainable( uint32_t catalogId, uint8_t quantity );
 
+    uint32_t getNextInventorySequence();
+
     void send();
 
     uint8_t getFreeSlotsInBags();
@@ -938,6 +940,8 @@ namespace Sapphire::Entity
     bool m_directorInitialized;
 
     bool m_onEnterEventDone;
+
+    uint32_t m_inventorySequence;
 
   private:
     using InventoryMap = std::map< uint16_t, Sapphire::ItemContainerPtr >;
