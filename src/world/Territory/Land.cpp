@@ -122,10 +122,23 @@ void Sapphire::Land::init()
     m_landInventoryMap[ type ] = make_ItemContainer( type, maxSize, "houseiteminventory", true, true );
   };
 
-  setupContainer( InventoryType::HousingExternalAppearance, 8 );
-  setupContainer( InventoryType::HousingInternalAppearance, 8 );
-  setupContainer( InventoryType::HousingOutdoorItemStoreroom, m_maxPlacedExternalItems );
-  setupContainer( InventoryType::HousingIndoorItemStoreroom, m_maxPlacedInternalItems );
+  setupContainer( InventoryType::HousingOutdoorAppearance, 8 );
+  setupContainer( InventoryType::HousingOutdoorPlacedItems, m_maxPlacedExternalItems );
+  setupContainer( InventoryType::HousingOutdoorStoreroom, m_maxPlacedExternalItems );
+
+  setupContainer( InventoryType::HousingInteriorAppearance, 9 );
+
+  //uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, bool isHq
+  auto item = make_Item( 0x1000, 6600, 0, 0, false );
+  item->setStackSize(1);
+
+  m_landInventoryMap[ InventoryType::HousingOutdoorPlacedItems ]->setItem( 0, item );
+  m_landInventoryMap[ InventoryType::HousingOutdoorStoreroom ]->setItem( 0, item );
+}
+
+void Sapphire::Land::loadItemContainerContents()
+{
+
 }
 
 uint32_t Sapphire::Land::convertItemIdToHousingItemId( uint32_t itemId )

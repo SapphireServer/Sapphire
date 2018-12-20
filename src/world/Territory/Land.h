@@ -62,6 +62,7 @@ namespace Sapphire
     uint8_t getLandTag( uint8_t slot );
 
     ItemContainerPtr getItemContainer( uint16_t inventoryType ) const;
+    void loadItemContainerContents();
 
   private:
     uint32_t convertItemIdToHousingItemId( uint32_t itemId );
