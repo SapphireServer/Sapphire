@@ -513,8 +513,6 @@ void Sapphire::World::Manager::HousingMgr::sendHousingInventory( Entity::Player&
   if( !container )
     return;
 
-  player.sendDebug( "got inventory for plot: " + targetLand->getHouse()->getHouseName() );
-
   auto invMgr = g_fw.get< Manager::InventoryMgr >();
   invMgr->sendInventoryContainer( player, container );
 }

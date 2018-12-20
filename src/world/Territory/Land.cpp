@@ -117,7 +117,7 @@ void Sapphire::Land::init()
   }
 
   // init item containers
-  auto setupContainer = [ this ]( InventoryType type, uint8_t maxSize )
+  auto setupContainer = [ this ]( InventoryType type, uint16_t maxSize )
   {
     m_landInventoryMap[ type ] = make_ItemContainer( type, maxSize, "houseiteminventory", true, true );
   };
@@ -127,13 +127,6 @@ void Sapphire::Land::init()
   setupContainer( InventoryType::HousingOutdoorStoreroom, m_maxPlacedExternalItems );
 
   setupContainer( InventoryType::HousingInteriorAppearance, 9 );
-
-  //uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, bool isHq
-  auto item = make_Item( 0x1000, 6600, 0, 0, false );
-  item->setStackSize(1);
-
-  m_landInventoryMap[ InventoryType::HousingOutdoorPlacedItems ]->setItem( 0, item );
-  m_landInventoryMap[ InventoryType::HousingOutdoorStoreroom ]->setItem( 0, item );
 }
 
 void Sapphire::Land::loadItemContainerContents()
