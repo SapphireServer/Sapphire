@@ -29,7 +29,7 @@ cache:
 # Setup build matrix and dependencies
 before_install:
   - eval "${MATRIX_EVAL}"
-  - echo "gem: --no-document" >> ~/.gemrc
+  - echo 'gem: --no-document' >> ~/.gemrc
   - gem install mtime_cache
   - sudo apt-get update
   - sudo apt-get install -y libmysqlclient-dev
