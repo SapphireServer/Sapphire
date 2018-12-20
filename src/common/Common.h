@@ -225,7 +225,7 @@ namespace Sapphire::Common
     // housing interior containers
     HousingInteriorAppearance = 25002,
 
-    // 50 in each container max
+    // 50 in each container max, 300 slots max
     HousingInteriorPlacedItems1 = 25003,
     HousingInteriorPlacedItems2 = 25004,
     HousingInteriorPlacedItems3 = 25005,
@@ -233,7 +233,9 @@ namespace Sapphire::Common
     HousingInteriorPlacedItems5 = 25007,
     HousingInteriorPlacedItems6 = 25008,
 
-    // 50 max per container?
+    // 50 max per container, 400 slots max
+    // slot limit increased 'temporarily' for relocation for all estates
+    // see: https://na.finalfantasyxiv.com/lodestone/topics/detail/d781e0d538428aef93b8bed4b50dd62c3c50fc74
     HousingInteriorStoreroom1 = 27001,
     HousingInteriorStoreroom2 = 27002,
     HousingInteriorStoreroom3 = 27003,
