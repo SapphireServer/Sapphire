@@ -9,8 +9,7 @@ namespace Sapphire::World::Manager
   class InventoryMgr
   {
   public:
-    void sendInventoryContainer( Sapphire::Entity::Player& player, Sapphire::ItemContainerPtr container,
-                                 uint32_t sequence = 0 );
+    void sendInventoryContainer( Sapphire::Entity::Player& player, Sapphire::ItemContainerPtr container );
   };
 
 }
