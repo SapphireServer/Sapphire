@@ -16,6 +16,7 @@
 #include "Actor/Player.h"
 #include "Inventory/ItemContainer.h"
 #include "Inventory/Item.h"
+#include "Inventory/ItemUtil.h"
 
 #include "Forwards.h"
 #include "Land.h"
@@ -28,9 +29,6 @@ using namespace Sapphire::Common;
 
 Sapphire::Land::Land( uint16_t territoryTypeId, uint8_t wardNum, uint8_t landId, uint32_t landSetId,
                   Sapphire::Data::HousingLandSetPtr info ) :
-  m_territoryTypeId( territoryTypeId ),
-  m_wardNum( wardNum ),
-  m_landId( landId ),
   m_currentPrice( 0 ),
   m_minPrice( 0 ),
   m_nextDrop( static_cast< uint32_t >( Util::getTimeSeconds() ) + 21600 ),
@@ -45,52 +43,31 @@ Sapphire::Land::Land( uint16_t territoryTypeId, uint8_t wardNum, uint8_t landId,
 {
   memset( &m_tag, 0x00, 3 );
 
-  init();
+  m_landIdent.landId = landId;
+  m_landIdent.territoryTypeId = territoryTypeId;
+  m_landIdent.wardNum = wardNum;
+  m_landIdent.worldId = 67; // todo: fix this
+
+  m_minPrice = m_landInfo->minPrice[ m_landIdent.landId ];
+  m_maxPrice = m_landInfo->initialPrice[ m_landIdent.landId ];
 }
 
-Sapphire::Land::~Land()
+Sapphire::Land::~Land() = default;
+
+void Sapphire::Land::init( Common::LandType type, uint8_t size, uint8_t state, uint32_t currentPrice, uint64_t ownerId, uint64_t houseId )
 {
+  m_type = type;
+  m_size = size;
+  m_state = state;
+  m_currentPrice = currentPrice;
+  m_ownerId = ownerId;
 
-}
-
-void Sapphire::Land::init()
-{
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  auto res = pDb->query( "SELECT * FROM land WHERE LandSetId = " + std::to_string( m_landSetId ) + " "
-                                            "AND LandId = " + std::to_string( m_landId ) );
-  if( !res->next() )
-  {
-    pDb->directExecute( "INSERT INTO land ( landsetid, landid, type, size, status, landprice, UpdateTime, OwnerId, HouseId ) "
-                        "VALUES ( " + std::to_string( m_landSetId ) + "," + std::to_string( m_landId ) + ","
-                        + std::to_string( static_cast< uint8_t >( m_type ) ) + ","
-                        + std::to_string( m_landInfo->plotSize[ m_landId ] ) + ","
-                        + " 1, " + std::to_string( m_landInfo->initialPrice[ m_landId ] ) + ", 0, 0, 0 );" );
-
-    m_currentPrice = m_landInfo->initialPrice[ m_landId ];
-    m_minPrice = m_landInfo->minPrice[ m_landId ];
-    m_size = m_landInfo->plotSize[ m_landId ];
-    m_state = HouseState::forSale;
-  }
-  else
-  {
-    m_type = static_cast< Common::LandType >( res->getUInt( "Type" ) );
-    m_size = res->getUInt( "Size" );
-    m_state = res->getUInt( "Status" );
-    m_currentPrice = res->getUInt( "LandPrice" );
-    m_ownerId = res->getUInt64( "OwnerId" );
-    m_minPrice = m_landInfo->minPrice[ m_landId ];
-    m_maxPrice = m_landInfo->initialPrice[ m_landId ];
-
-    auto houseId = res->getUInt( "HouseId" );
-
-    // fetch the house if we have one for this land
-    if( houseId > 0 )
-      m_pHouse = make_House( houseId, m_landSetId, m_landId, m_wardNum, m_territoryTypeId );
-
-  }
+  // fetch the house if we have one for this land
+  if( houseId > 0 )
+    m_pHouse = make_House( houseId, m_landSetId, getLandIdent() );
 
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-  auto info = pExdData->get< Sapphire::Data::HousingMapMarkerInfo >( getTerritoryTypeId(), getLandId() );
+  auto info = pExdData->get< Sapphire::Data::HousingMapMarkerInfo >( m_landIdent.territoryTypeId, m_landIdent.landId );
   if( info )
   {
     m_mapMarkerPosition.x = info->x;
@@ -127,11 +104,55 @@ void Sapphire::Land::init()
   setupContainer( InventoryType::HousingOutdoorStoreroom, m_maxPlacedExternalItems );
 
   setupContainer( InventoryType::HousingInteriorAppearance, 9 );
+
+  // nb: so we're going to store these internally in one container because SE is fucked in the head
+  // but when an inventory is requested, we will split them into groups of 50
+  setupContainer( InventoryType::HousingInteriorPlacedItems1, m_maxPlacedInternalItems );
+  setupContainer( InventoryType::HousingInteriorStoreroom1, m_maxPlacedInternalItems );
+
+  loadItemContainerContents();
 }
 
 void Sapphire::Land::loadItemContainerContents()
 {
+  if( !m_pHouse )
+    return;
 
+  auto ident = *reinterpret_cast< uint64_t* >( &m_landIdent );
+  g_fw.get< Sapphire::Logger >()->debug( "Loading housing inventory for ident: " + std::to_string( ident ) );
+
+  auto pDB = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+
+  auto stmt = pDB->getPreparedStatement( Db::LAND_INV_SEL_HOUSE );
+  stmt->setUInt64( 1, ident );
+
+  auto res = pDB->query( stmt );
+
+  std::unordered_map< uint16_t, std::vector< std::pair< uint16_t, uint32_t > > > items;
+
+  while( res->next() )
+  {
+    auto containerId = res->getUInt( "ContainerId" );
+    auto itemId = res->getUInt64( "ItemId" );
+    auto slotId = res->getUInt( "SlotId" );
+
+    items[ containerId ].push_back( std::make_pair( slotId, itemId ) );
+  }
+
+  res.reset();
+
+  for( auto it = items.begin(); it != items.end(); it++ )
+  {
+    auto container = m_landInventoryMap[ it->first ];
+
+    // todo: delet this
+    for( auto fuck = it->second.begin(); fuck != it->second.end(); fuck++ )
+    {
+      auto item = Sapphire::Items::Util::loadItem( fuck->second );
+      if( item )
+        container->setItem( fuck->first, item );
+    }
+  }
 }
 
 uint32_t Sapphire::Land::convertItemIdToHousingItemId( uint32_t itemId )
@@ -192,19 +213,9 @@ uint32_t Sapphire::Land::getLandSetId() const
   return m_landSetId;
 }
 
-uint8_t Sapphire::Land::getWardNum() const
+Sapphire::Common::LandIdent Sapphire::Land::getLandIdent() const
 {
-  return m_wardNum;
-}
-
-uint8_t Sapphire::Land::getLandId() const
-{
-  return m_landId;
-}
-
-uint16_t Sapphire::Land::getTerritoryTypeId() const
-{
-  return m_territoryTypeId;
+  return m_landIdent;
 }
 
 Sapphire::HousePtr Sapphire::Land::getHouse() const
@@ -292,7 +303,7 @@ void Sapphire::Land::updateLandDb()
   + ", HouseId = " + std::to_string( houseId )
   + ", Type = " + std::to_string( static_cast< uint32_t >( m_type ) ) //TODO: add house id
   + " WHERE LandSetId = " + std::to_string( m_landSetId )
-  + " AND LandId = " + std::to_string( m_landId ) + ";" );
+  + " AND LandId = " + std::to_string( m_landIdent.landId ) + ";" );
 
   if( auto house = getHouse() )
     house->updateHouseDb();
@@ -338,7 +349,7 @@ bool Sapphire::Land::setPreset( uint32_t itemId )
   {
     // todo: i guess we'd create a house here?
     auto newId = getNextHouseId();
-    m_pHouse = make_House( newId, getLandSetId(), getLandId(), getWardNum(), getTerritoryTypeId() );
+    m_pHouse = make_House( newId, getLandSetId(), getLandIdent() );
   }
 
 
