@@ -222,7 +222,7 @@ bool Sapphire::World::Manager::HousingMgr::relinquishLand( Entity::Player& playe
   player.sendLandFlagsSlot( LandFlagsSlot::Private );
 
   auto screenMsgPkt2 = makeActorControl143( player.getId(), ActorControl::LogMsg, 3351, 0x1AA,
-                                            pLand->getWardNum() + 1, plot + 1 );
+                                            pLand->getLandIdent().wardNum + 1, plot + 1 );
   player.queuePacket( screenMsgPkt2 );
   pHousing->sendLandUpdate( plot );
 
@@ -351,7 +351,9 @@ void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& pl
   player.eventStart( player.getId(), 0x000B0095, Event::EventHandler::EventType::Housing, 1, 1 );
   player.playScene( 0x000B0095, 0, SET_BASE | HIDE_HOTBAR , 0, 1, plotNum, nullptr );
 
-  player.setLandFlags( LandFlagsSlot::Private, EstateBuilt, pLand->getLandId(), pLand->getWardNum(), pLand->getTerritoryTypeId() );
+  auto ident = pLand->getLandIdent();
+
+  player.setLandFlags( LandFlagsSlot::Private, EstateBuilt, ident.landId, ident.wardNum, ident.territoryTypeId );
   player.sendLandFlagsSlot( LandFlagsSlot::Private );
 
   hZone->registerHouseEntranceEObj( plotNum );

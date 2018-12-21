@@ -200,6 +200,14 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     "UPDATE house SET BuildTime = ?, Aetheryte = ?, Comment = ?, HouseName = ?, Endorsements = ?, HousePartModels = ?, HousePartColours = ?, HouseInteriorModels = ? WHERE HouseId = ?;",
                     CONNECTION_BOTH );
 
+  prepareStatement( LAND_INV_SEL_ALL,
+                    "SELECT LandIdent, ContainerId, ItemId, SlotId FROM houseiteminventory;",
+                    CONNECTION_BOTH );
+
+  prepareStatement( LAND_INV_SEL_HOUSE,
+                    "SELECT LandIdent, ContainerId, ItemId, SlotId FROM houseiteminventory WHERE LandIdent = ?",
+                    CONNECTION_BOTH );
+
   /*prepareStatement( LAND_INS,
                     "INSERT INTO land ( LandSetId ) VALUES ( ? );",
                     CONNECTION_BOTH );
