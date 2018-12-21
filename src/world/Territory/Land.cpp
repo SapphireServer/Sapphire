@@ -16,6 +16,7 @@
 #include "Actor/Player.h"
 #include "Inventory/ItemContainer.h"
 #include "Inventory/Item.h"
+#include "Inventory/ItemUtil.h"
 
 #include "Forwards.h"
 #include "Land.h"
@@ -72,6 +73,8 @@ void Sapphire::Land::init()
 
   auto houseId = res->getUInt( "HouseId" );
 
+  res.reset();
+
   // fetch the house if we have one for this land
   if( houseId > 0 )
     m_pHouse = make_House( houseId, m_landSetId, getLandIdent() );
@@ -119,11 +122,37 @@ void Sapphire::Land::init()
   // but when an inventory is requested, we will split them into groups of 50
   setupContainer( InventoryType::HousingInteriorPlacedItems1, m_maxPlacedInternalItems );
   setupContainer( InventoryType::HousingInteriorStoreroom1, m_maxPlacedInternalItems );
+
+  loadItemContainerContents();
 }
 
 void Sapphire::Land::loadItemContainerContents()
 {
+  if( !m_pHouse )
+    return;
 
+  auto ident = *reinterpret_cast< uint64_t* >( &m_landIdent );
+  g_fw.get< Sapphire::Logger >()->debug( "Loading housing inventory for ident:" + std::to_string( ident ) );
+
+  auto pDB = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+
+//  auto stmt = pDB->getPreparedStatement( Db::LAND_INV_SEL_HOUSE );
+//  stmt->setUInt64( 1, ident );
+
+  auto res = pDB->query( "SELECT LandIdent, ContainerId, ItemId, SlotId FROM houseiteminventory WHERE LandIdent = " + std::to_string( ident ) );
+
+  while( res->next() )
+  {
+    auto containerId = res->getUInt( "ContainerId" );
+    auto itemId = res->getUInt64( "ItemId" );
+    auto slotId = res->getUInt( "SlotId" );
+
+    auto container = m_landInventoryMap[ containerId ];
+
+    auto item = Sapphire::Items::Util::loadItem( itemId );
+    if( item )
+      container->setItem( slotId, item );
+  }
 
 }
 
