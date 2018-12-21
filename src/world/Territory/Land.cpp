@@ -139,6 +139,7 @@ void Sapphire::Land::loadItemContainerContents()
     items[ containerId ].push_back( std::make_pair( slotId, itemId ) );
   }
 
+  // fuck the query off
   res.reset();
 
   for( auto it = items.begin(); it != items.end(); it++ )
