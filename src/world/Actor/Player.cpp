@@ -1618,8 +1618,7 @@ void Sapphire::Entity::Player::sendZonePackets()
       state |= HasAetheryte;
     }
 
-    auto ident = pLand->getLandIdent();
-    setLandFlags( LandFlagsSlot::Private, state, ident.landId, ident.wardNum, ident.territoryTypeId );
+    setLandFlags( LandFlagsSlot::Private, state, pLand->getLandIdent() );
   }
 
   sendLandFlags();
@@ -1800,12 +1799,10 @@ bool Sapphire::Entity::Player::isOnEnterEventDone() const
   return m_onEnterEventDone;
 }
 
-void Sapphire::Entity::Player::setLandFlags( uint8_t flagSlot, uint32_t landFlags,
-                                               int16_t landId, int16_t wardNum, int16_t zoneId )
+void Sapphire::Entity::Player::setLandFlags( uint8_t flagSlot, uint32_t landFlags, Common::LandIdent ident )
 {
-  m_landFlags[ flagSlot ].landIdent.landId = landId;
-  m_landFlags[ flagSlot ].landIdent.wardNum = wardNum;
-  m_landFlags[ flagSlot ].landIdent.territoryTypeId = zoneId;
+  m_landFlags[ flagSlot ].landIdent = ident;
+  // todo: leave this in for now but we really need to handle this world id shit properly
   m_landFlags[ flagSlot ].landIdent.worldId = 67;
   m_landFlags[ flagSlot ].landFlags = landFlags;
   m_landFlags[ flagSlot ].unkown1 = 0;
