@@ -85,6 +85,11 @@ namespace Sapphire::Db
     HOUSING_HOUSE_UP,
     HOUSING_HOUSE_DEL,
 
+    LAND_INV_SEL_ALL,
+    LAND_INV_SEL_HOUSE,
+    LAND_INV_DEL,
+    LAND_INV_UP,
+
 
     MAX_STATEMENTS
   };

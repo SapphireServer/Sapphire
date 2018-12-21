@@ -1618,7 +1618,8 @@ void Sapphire::Entity::Player::sendZonePackets()
       state |= HasAetheryte;
     }
 
-    setLandFlags( LandFlagsSlot::Private, state, pLand->getLandId(), pLand->getWardNum(), pLand->getTerritoryTypeId() );
+    auto ident = pLand->getLandIdent();
+    setLandFlags( LandFlagsSlot::Private, state, ident.landId, ident.wardNum, ident.territoryTypeId );
   }
 
   sendLandFlags();
