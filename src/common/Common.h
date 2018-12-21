@@ -222,10 +222,36 @@ namespace Sapphire::Common
     FreeCompanyGil = 22000,
     FreeCompanyCrystal = 22001,
 
-    HousingExternalAppearance = 25000,
-    HousingOutdoorItemStoreroom = 25001,
-    HousingInternalAppearance = 25002,
-    HousingIndoorItemStoreroom = 25003,
+    // housing interior containers
+    HousingInteriorAppearance = 25002,
+
+    // 50 in each container max, 300 slots max
+    HousingInteriorPlacedItems1 = 25003,
+    HousingInteriorPlacedItems2 = 25004,
+    HousingInteriorPlacedItems3 = 25005,
+    HousingInteriorPlacedItems4 = 25006,
+    HousingInteriorPlacedItems5 = 25007,
+    HousingInteriorPlacedItems6 = 25008,
+
+    // 50 max per container, 400 slots max
+    // slot limit increased 'temporarily' for relocation for all estates
+    // see: https://na.finalfantasyxiv.com/lodestone/topics/detail/d781e0d538428aef93b8bed4b50dd62c3c50fc74
+    HousingInteriorStoreroom1 = 27001,
+    HousingInteriorStoreroom2 = 27002,
+    HousingInteriorStoreroom3 = 27003,
+    HousingInteriorStoreroom4 = 27004,
+    HousingInteriorStoreroom5 = 27005,
+    HousingInteriorStoreroom6 = 27006,
+    HousingInteriorStoreroom7 = 27007,
+    HousingInteriorStoreroom8 = 27008,
+
+
+    // housing exterior containers
+    HousingOutdoorPlacedItems = 25001,
+    HousingOutdoorAppearance = 25000,
+    HousingOutdoorStoreroom = 27000,
+
+
   };
 
   enum ContainerType : uint16_t

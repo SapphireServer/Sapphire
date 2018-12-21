@@ -13,12 +13,10 @@
 
 extern Sapphire::Framework g_fw;
 
-Sapphire::House::House( uint32_t houseId, uint32_t landSetId, uint8_t landId, uint8_t wardNum, uint16_t territoryTypeId ) :
+Sapphire::House::House( uint32_t houseId, uint32_t landSetId, Common::LandIdent ident ) :
   m_houseId( houseId ),
   m_landSetId( landSetId ),
-  m_landId( landId ),
-  m_wardNum( wardNum ),
-  m_territoryTypeId( territoryTypeId )
+  m_landIdent( ident )
 {
   auto pDB = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
 
@@ -37,7 +35,7 @@ Sapphire::House::House( uint32_t houseId, uint32_t landSetId, uint8_t landId, ui
     pDB->execute( stmt );
 
     // todo: make this nicer/configurable?
-    m_houseName = "Estate #" + std::to_string( landId + 1 );
+    m_houseName = "Estate #" + std::to_string( m_landIdent.landId + 1 );
   }
   else
   {
@@ -121,19 +119,9 @@ uint32_t Sapphire::House::getLandSetId() const
   return m_landSetId;
 }
 
-uint8_t Sapphire::House::getLandId() const
+Sapphire::Common::LandIdent Sapphire::House::getLandIdent() const
 {
-  return m_landId;
-}
-
-uint8_t Sapphire::House::getWardNum() const
-{
-  return m_wardNum;
-}
-
-uint16_t Sapphire::House::getTerritoryTypeId() const
-{
-  return m_territoryTypeId;
+  return m_landIdent;
 }
 
 uint32_t Sapphire::House::getHouseId() const

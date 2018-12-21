@@ -304,6 +304,7 @@ enum ActorControlType : uint16_t
     AchievementCritReq = 0x3E8,
     AchievementList = 0x3E9,
 
+    SetEstateLightingLevel = 0x40B, // param1 = light level 0 - 5 maps to UI val 5-0
     RequestHousingBuildPreset = 0x44C,
     RequestEstateHallRemoval = 0x44F,
     RequestBuildPreset = 0x450, // no idea what this is, it gets sent with BuildPresetHandler and has the plot id in param1

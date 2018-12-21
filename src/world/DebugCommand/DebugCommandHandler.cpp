@@ -1006,29 +1006,34 @@ void Sapphire::DebugCommandHandler::housing( char* data, Entity::Player& player,
       subCommand = params;
   }
 
-  if( subCommand == "permission" || subCommand == "perm" )
-  {
-    uint8_t permissionSet;
-    sscanf( params.c_str(), "%hhu", &permissionSet );
-
-    if ( permissionSet < 5 )
-    {
-      auto pZone = player.getCurrentZone();
-      if( pTeriMgr->isHousingTerritory( pZone->getTerritoryTypeId() ) )
-      {
-        auto pHousing = std::dynamic_pointer_cast< HousingZone >( pZone );
-        if( pHousing )
-        {
-          player.setLandFlags( permissionSet, 0, pHousing->getLandSetId(), pHousing->getWardNum(), pHousing->getTerritoryTypeId() );
-          player.sendLandFlags();
-        }
-        else
-          player.sendDebug( "You aren't in a housing Zone." );
-      }
-    }
-    else
-      player.sendDebug( "PermissionSet out of range." );
-  }
+//  if( subCommand == "permission" || subCommand == "perm" )
+//  {
+//    uint8_t permissionSet;
+//    sscanf( params.c_str(), "%hhu", &permissionSet );
+//
+//    if ( permissionSet < 5 )
+//    {
+//      auto pZone = player.getCurrentZone();
+//      if( pTeriMgr->isHousingTerritory( pZone->getTerritoryTypeId() ) )
+//      {
+//        auto pHousing = std::dynamic_pointer_cast< HousingZone >( pZone );
+//        if( pHousing )
+//        {
+//          // todo: wat?
+//          Common::LandIdent ident {};
+//          ident.wardNum = pHousing->getWardNum();
+//          ident.territoryTypeId = pHousing->getTerritoryTypeId();
+//
+//          player.setLandFlags( permissionSet, 0, pHousing->getLandSetId(), ident );
+//          player.sendLandFlags();
+//        }
+//        else
+//          player.sendDebug( "You aren't in a housing Zone." );
+//      }
+//    }
+//    else
+//      player.sendDebug( "PermissionSet out of range." );
+//  }
   else
   {
     player.sendDebug( "Unknown sub command." );

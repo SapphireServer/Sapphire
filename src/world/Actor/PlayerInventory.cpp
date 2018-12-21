@@ -357,14 +357,11 @@ void Sapphire::Entity::Player::removeCrystal( Common::CrystalType type, uint32_t
 
 void Sapphire::Entity::Player::sendInventory()
 {
-  InventoryMap::iterator it;
-
   auto pInvMgr = g_fw.get< World::Manager::InventoryMgr >();
 
-  uint32_t count = 0;
-  for( it = m_storageMap.begin(); it != m_storageMap.end(); ++it, ++count )
+  for( auto it = m_storageMap.begin(); it != m_storageMap.end(); ++it )
   {
-    pInvMgr->sendInventoryContainer( *this, it->second, count );
+    pInvMgr->sendInventoryContainer( *this, it->second );
   }
 }
 
@@ -866,4 +863,9 @@ bool Sapphire::Entity::Player::collectHandInItems( std::vector< uint32_t > itemI
   }
 
   return true;
+}
+
+uint32_t Sapphire::Entity::Player::getNextInventorySequence()
+{
+  return m_inventorySequence++;
 }
