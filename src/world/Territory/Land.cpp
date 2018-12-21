@@ -48,32 +48,20 @@ Sapphire::Land::Land( uint16_t territoryTypeId, uint8_t wardNum, uint8_t landId,
   m_landIdent.wardNum = wardNum;
   m_landIdent.worldId = 67; // todo: fix this
 
-  init();
+  m_minPrice = m_landInfo->minPrice[ m_landIdent.landId ];
+  m_maxPrice = m_landInfo->initialPrice[ m_landIdent.landId ];
 }
 
 Sapphire::Land::~Land() = default;
 
-void Sapphire::Land::init()
+void Sapphire::Land::init( Common::LandType type, uint8_t size, uint8_t state, uint32_t currentPrice, uint64_t ownerId, uint64_t houseId )
 {
-  // todo: move this loading logic outside of land and fetch all houses in 1 query
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  auto res = pDb->query( "SELECT * FROM land WHERE LandSetId = " + std::to_string( m_landSetId ) + " "
-                                            "AND LandId = " + std::to_string( m_landIdent.landId ) );
 
-  // we're not going to be building the land table at runtime
-  assert( res->next() );
-
-  m_type = static_cast< Common::LandType >( res->getUInt( "Type" ) );
-  m_size = res->getUInt( "Size" );
-  m_state = res->getUInt( "Status" );
-  m_currentPrice = res->getUInt( "LandPrice" );
-  m_ownerId = res->getUInt64( "OwnerId" );
-  m_minPrice = m_landInfo->minPrice[ m_landIdent.landId ];
-  m_maxPrice = m_landInfo->initialPrice[ m_landIdent.landId ];
-
-  auto houseId = res->getUInt( "HouseId" );
-
-  res.reset();
+  m_type = type;
+  m_size = size;
+  m_state = state;
+  m_currentPrice = currentPrice;
+  m_ownerId = ownerId;
 
   // fetch the house if we have one for this land
   if( houseId > 0 )
@@ -123,7 +111,7 @@ void Sapphire::Land::init()
   setupContainer( InventoryType::HousingInteriorPlacedItems1, m_maxPlacedInternalItems );
   setupContainer( InventoryType::HousingInteriorStoreroom1, m_maxPlacedInternalItems );
 
-  loadItemContainerContents();
+//  loadItemContainerContents();
 }
 
 void Sapphire::Land::loadItemContainerContents()
