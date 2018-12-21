@@ -212,6 +212,13 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     "SELECT * FROM land WHERE LandSetId = ?;",
                     CONNECTION_SYNC );
 
+  prepareStatement( LAND_SEL_BATCH,
+                    "SELECT land.*, house.Welcome, house.Aetheryte, house.Comment, house.HouseName, house.BuildTime, house.Endorsements"
+                    "FROM land"
+                    "LEFT JOIN house"
+                    "ON land.HouseId = house.HouseId;",
+                    CONNECTION_SYNC );
+
   /*prepareStatement( LAND_INS,
                     "INSERT INTO land ( LandSetId ) VALUES ( ? );",
                     CONNECTION_BOTH );
