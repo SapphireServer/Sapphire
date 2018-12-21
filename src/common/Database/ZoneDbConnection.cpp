@@ -208,6 +208,10 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     "SELECT LandIdent, ContainerId, ItemId, SlotId FROM houseiteminventory WHERE LandIdent = ?",
                     CONNECTION_SYNC );
 
+  prepareStatement( LANDSET_SEL,
+                    "SELECT * FROM land WHERE LandSetId = ?;",
+                    CONNECTION_SYNC );
+
   /*prepareStatement( LAND_INS,
                     "INSERT INTO land ( LandSetId ) VALUES ( ? );",
                     CONNECTION_BOTH );
