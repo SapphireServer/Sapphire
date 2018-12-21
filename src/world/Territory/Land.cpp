@@ -145,6 +145,7 @@ void Sapphire::Land::loadItemContainerContents()
   {
     auto container = m_landInventoryMap[ it->first ];
 
+    // todo: delet this
     for( auto fuck = it->second.begin(); fuck != it->second.end(); fuck++ )
     {
       auto item = Sapphire::Items::Util::loadItem( fuck->second );
