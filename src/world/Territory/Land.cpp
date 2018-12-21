@@ -56,7 +56,6 @@ Sapphire::Land::~Land() = default;
 
 void Sapphire::Land::init( Common::LandType type, uint8_t size, uint8_t state, uint32_t currentPrice, uint64_t ownerId, uint64_t houseId )
 {
-
   m_type = type;
   m_size = size;
   m_state = state;
@@ -111,7 +110,7 @@ void Sapphire::Land::init( Common::LandType type, uint8_t size, uint8_t state, u
   setupContainer( InventoryType::HousingInteriorPlacedItems1, m_maxPlacedInternalItems );
   setupContainer( InventoryType::HousingInteriorStoreroom1, m_maxPlacedInternalItems );
 
-//  loadItemContainerContents();
+  loadItemContainerContents();
 }
 
 void Sapphire::Land::loadItemContainerContents()
@@ -120,14 +119,16 @@ void Sapphire::Land::loadItemContainerContents()
     return;
 
   auto ident = *reinterpret_cast< uint64_t* >( &m_landIdent );
-  g_fw.get< Sapphire::Logger >()->debug( "Loading housing inventory for ident:" + std::to_string( ident ) );
+  g_fw.get< Sapphire::Logger >()->debug( "Loading housing inventory for ident: " + std::to_string( ident ) );
 
   auto pDB = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
 
-//  auto stmt = pDB->getPreparedStatement( Db::LAND_INV_SEL_HOUSE );
-//  stmt->setUInt64( 1, ident );
+  auto stmt = pDB->getPreparedStatement( Db::LAND_INV_SEL_HOUSE );
+  stmt->setUInt64( 1, ident );
 
-  auto res = pDB->query( "SELECT LandIdent, ContainerId, ItemId, SlotId FROM houseiteminventory WHERE LandIdent = " + std::to_string( ident ) );
+  auto res = pDB->query( stmt );
+
+  std::unordered_map< uint16_t, std::vector< std::pair< uint16_t, uint32_t > > > items;
 
   while( res->next() )
   {
@@ -135,13 +136,22 @@ void Sapphire::Land::loadItemContainerContents()
     auto itemId = res->getUInt64( "ItemId" );
     auto slotId = res->getUInt( "SlotId" );
 
-    auto container = m_landInventoryMap[ containerId ];
-
-    auto item = Sapphire::Items::Util::loadItem( itemId );
-    if( item )
-      container->setItem( slotId, item );
+    items[ containerId ].push_back( std::make_pair( slotId, itemId ) );
   }
 
+  res.reset();
+
+  for( auto it = items.begin(); it != items.end(); it++ )
+  {
+    auto container = m_landInventoryMap[ it->first ];
+
+    for( auto fuck = it->second.begin(); fuck != it->second.end(); fuck++ )
+    {
+      auto item = Sapphire::Items::Util::loadItem( fuck->second );
+      if( item )
+        container->setItem( fuck->first, item );
+    }
+  }
 }
 
 uint32_t Sapphire::Land::convertItemIdToHousingItemId( uint32_t itemId )
