@@ -165,8 +165,7 @@ Sapphire::LandPurchaseResult Sapphire::World::Manager::HousingMgr::purchaseLand(
       pLand->setState( HouseState::sold );
       pLand->setLandType( Common::LandType::Private );
 
-      player.setLandFlags( LandFlagsSlot::Private, 0x00, plot,
-                                 pHousing->getWardNum(), pHousing->getTerritoryTypeId() );
+      player.setLandFlags( LandFlagsSlot::Private, 0x00, pLand->getLandIdent() );
 
       player.sendLandFlagsSlot( LandFlagsSlot::Private );
 
@@ -217,7 +216,9 @@ bool Sapphire::World::Manager::HousingMgr::relinquishLand( Entity::Player& playe
   pLand->setLandType( Common::LandType::none );
   pLand->updateLandDb();
 
-  player.setLandFlags( LandFlagsSlot::Private, 0x00, 0xFF, 0xFF, 0xFF );
+  Common::LandIdent ident { 0xFF, 0xFF, 0xFF, 0xFF };
+
+  player.setLandFlags( LandFlagsSlot::Private, 0x00, ident );
 
   player.sendLandFlagsSlot( LandFlagsSlot::Private );
 
@@ -351,9 +352,7 @@ void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& pl
   player.eventStart( player.getId(), 0x000B0095, Event::EventHandler::EventType::Housing, 1, 1 );
   player.playScene( 0x000B0095, 0, SET_BASE | HIDE_HOTBAR , 0, 1, plotNum, nullptr );
 
-  auto ident = pLand->getLandIdent();
-
-  player.setLandFlags( LandFlagsSlot::Private, EstateBuilt, ident.landId, ident.wardNum, ident.territoryTypeId );
+  player.setLandFlags( LandFlagsSlot::Private, EstateBuilt, pLand->getLandIdent() );
   player.sendLandFlagsSlot( LandFlagsSlot::Private );
 
   hZone->registerHouseEntranceEObj( plotNum );

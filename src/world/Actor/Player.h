@@ -765,7 +765,7 @@ namespace Sapphire::Entity
 
     // Housing Handling
     //////////////////////////////////////////////////////////////////////////////////////////////////////
-    void setLandFlags( uint8_t permissionSet, uint32_t landFlags, int16_t landId, int16_t wardNum, int16_t zoneId );
+    void setLandFlags( uint8_t permissionSet, uint32_t landFlags, Common::LandIdent ident );
 
     void sendLandFlags();
     void sendLandFlagsSlot( Common::LandFlagsSlot slot );
