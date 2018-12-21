@@ -12,7 +12,7 @@ namespace Sapphire
   class House
   {
   public:
-    House( uint32_t houseId, uint32_t landSetId, uint8_t landId, uint8_t wardNum, uint16_t territoryTypeId );
+    House( uint32_t houseId, uint32_t landSetId, Common::LandIdent ident );
     virtual ~House();
 
     using HousePart = std::pair< uint32_t, uint8_t >;
@@ -20,9 +20,7 @@ namespace Sapphire
 
     //gerneral
     uint32_t getLandSetId() const;
-    uint8_t getLandId() const;
-    uint8_t getWardNum() const;
-    uint16_t getTerritoryTypeId() const;
+    Common::LandIdent getLandIdent() const;
     uint32_t getHouseId() const;
 
     const std::string& getHouseName() const;
@@ -45,9 +43,7 @@ namespace Sapphire
 
   private:
     uint32_t m_landSetId;
-    uint8_t m_landId;
-    uint8_t m_wardNum;
-    uint16_t m_territoryTypeId;
+    Common::LandIdent m_landIdent;
     uint32_t m_houseId;
 
     uint64_t m_buildTime;
