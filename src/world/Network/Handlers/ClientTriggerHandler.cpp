@@ -423,16 +423,18 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
     }
     case ClientTriggerType::RequestLandInventory:
     {
-      if( param2 != 1 )
-        return;
-
       uint8_t plot = ( param12 & 0xFF );
+
 
       auto housingMgr = g_fw.get< HousingMgr >();
       if( !housingMgr )
         break;
 
-      housingMgr->sendHousingInventory( player, Common::InventoryType::HousingOutdoorItemStoreroom, plot );
+      uint16_t inventoryType = Common::InventoryType::HousingOutdoorPlacedItems;
+      if( param2 == 1 )
+        inventoryType = Common::InventoryType::HousingOutdoorStoreroom;
+
+      housingMgr->sendHousingInventory( player, inventoryType, plot );
 
       break;
     }
@@ -446,7 +448,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
       if( !housingMgr )
         break;
 
-      housingMgr->sendHousingInventory( player, Common::InventoryType::HousingIndoorItemStoreroom, 255 );
+      // housingMgr->sendHousingInventory( player, Common::InventoryType::HousingInd, 255 );
 
       break;
     }

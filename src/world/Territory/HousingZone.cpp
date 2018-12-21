@@ -42,11 +42,14 @@ bool Sapphire::HousingZone::init()
 {
 
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  auto res = pDb->query( "SELECT * FROM landset WHERE landsetid = " + std::to_string( m_landSetId ) );
-  if( !res->next() )
   {
-    pDb->directExecute( "INSERT INTO landset ( landsetid ) VALUES ( " + std::to_string( m_landSetId ) + " );" );
+    auto res = pDb->query( "SELECT * FROM landset WHERE landsetid = " + std::to_string( m_landSetId ) );
+    if( !res->next() )
+    {
+      pDb->directExecute( "INSERT INTO landset ( landsetid ) VALUES ( " + std::to_string( m_landSetId ) + " );" );
+    }
   }
+
 
   int housingIndex;
   if( m_territoryTypeId == 339 )
@@ -61,25 +64,46 @@ bool Sapphire::HousingZone::init()
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
   auto info = pExdData->get< Sapphire::Data::HousingLandSet >( housingIndex );
 
-  uint32_t landId;
-  for( landId = 0; landId < 60; landId++ )
-  {
-    auto pLand = make_Land( m_territoryTypeId, getWardNum(), landId, m_landSetId, info );
-    m_landPtrMap[ landId ] = pLand;
+  auto stmt = pDb->getPreparedStatement( Db::LANDSET_SEL );
+  stmt->setUInt64( 1, m_landSetId );
+  auto res = pDb->query( stmt );
 
-    if( auto house = pLand->getHouse() )
-    {
-      registerHouseEntranceEObj( landId << 8 );
-    }
+  std::vector< QueuedLandInit > landInit;
+
+  while( res->next() )
+  {
+
+    QueuedLandInit init;
+    init.m_landId = res->getUInt64( "LandId" );
+    init.m_type = static_cast< Common::LandType >( res->getUInt( "Type" ) );
+    init.m_size = res->getUInt( "Size" );
+    init.m_status = res->getUInt( "Status" );
+    init.m_currentPrice = res->getUInt( "LandPrice" );
+    init.m_ownerId = res->getUInt64( "OwnerId" );
+    init.m_houseId = res->getUInt64( "HouseId" );
+
+    landInit.push_back( init );
+  }
+
+  // nuke current query connection so the queries still in land don't fail
+  res.reset();
+
+  // spawn land
+  for( auto& init : landInit )
+  {
+    auto land = make_Land( m_territoryTypeId, getWardNum(), init.m_landId, m_landSetId, info );
+    land->init( init.m_type, init.m_size, init.m_status, init.m_currentPrice, init.m_ownerId, init.m_houseId );
+
+    m_landPtrMap[ init.m_landId ] = land;
+
+    if( init.m_houseId > 0 )
+      registerHouseEntranceEObj( init.m_landId );
   }
 
   return true;
 }
 
-Sapphire::HousingZone::~HousingZone()
-{
-
-}
+Sapphire::HousingZone::~HousingZone() = default;
 
 void Sapphire::HousingZone::onPlayerZoneIn( Entity::Player& player )
 {

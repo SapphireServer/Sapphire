@@ -530,9 +530,10 @@ CREATE TABLE `landset` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE `houseiteminventory` (
-  `landIdent` BIGINT(20) UNSIGNED NOT NULL,
-  `containerId` INT(10) UNSIGNED NOT NULL,
-  `itemId` INT(20) NOT NULL,
+  `LandIdent` BIGINT(20) UNSIGNED NOT NULL,
+  `ContainerId` INT(10) UNSIGNED NOT NULL,
+  `ItemId` INT(20) NOT NULL,
+  `SlotId` INT(10) UNSIGNED NOT NULL,
   INDEX `landIdent` (`landIdent`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 

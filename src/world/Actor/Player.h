@@ -765,7 +765,7 @@ namespace Sapphire::Entity
 
     // Housing Handling
     //////////////////////////////////////////////////////////////////////////////////////////////////////
-    void setLandFlags( uint8_t permissionSet, uint32_t landFlags, int16_t landId, int16_t wardNum, int16_t zoneId );
+    void setLandFlags( uint8_t permissionSet, uint32_t landFlags, Common::LandIdent ident );
 
     void sendLandFlags();
     void sendLandFlagsSlot( Common::LandFlagsSlot slot );
@@ -910,6 +910,8 @@ namespace Sapphire::Entity
 
     bool isObtainable( uint32_t catalogId, uint8_t quantity );
 
+    uint32_t getNextInventorySequence();
+
     void send();
 
     uint8_t getFreeSlotsInBags();
@@ -938,6 +940,8 @@ namespace Sapphire::Entity
     bool m_directorInitialized;
 
     bool m_onEnterEventDone;
+
+    uint32_t m_inventorySequence;
 
   private:
     using InventoryMap = std::map< uint16_t, Sapphire::ItemContainerPtr >;
