@@ -25,6 +25,8 @@
 #include "ServerMgr.h"
 #include "Territory/House.h"
 #include "InventoryMgr.h"
+#include "Inventory/Item.h"
+#include "Inventory/ItemContainer.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network;
@@ -33,20 +35,131 @@ using namespace Sapphire::Network::Packets::Server;
 
 extern Sapphire::Framework g_fw;
 
-Sapphire::World::Manager::HousingMgr::HousingMgr()
-{
-
-}
-
-Sapphire::World::Manager::HousingMgr::~HousingMgr()
-{
-
-}
+Sapphire::World::Manager::HousingMgr::HousingMgr() = default;
+Sapphire::World::Manager::HousingMgr::~HousingMgr() = default;
 
 bool Sapphire::World::Manager::HousingMgr::init()
 {
+  auto log = g_fw.get< Sapphire::Logger >();
+
+  log->info( "HousingMgr: Caching housing land init data" );
+  //LAND_SEL_ALL
+
+  // 18 wards per territory, 4 territories
+  m_landCache.reserve( 18 * 4 );
+
+  loadLandCache();
+
+  log->debug( "HousingMgr: Checking land counts" );
+
+  uint32_t houseCount = 0;
+  for( auto& landSet : m_landCache )
+  {
+    auto count = landSet.second.size();
+
+    houseCount += count;
+
+    if( landSet.second.size() != 60 )
+    {
+      log->fatal( "LandSet " + std::to_string( landSet.first ) + " is missing land entries. Only have " + std::to_string( count ) + " land entries." );
+      return false;
+    }
+  }
+
+  log->info( "HousingMgr: Cached " + std::to_string( houseCount ) + " houses" );
+
+  /////
+
+  if( !loadEstateInventories() )
+    return false;
 
   return true;
+}
+
+bool Sapphire::World::Manager::HousingMgr::loadEstateInventories()
+{
+  auto log = g_fw.get< Sapphire::Logger >();
+
+  log->info( "HousingMgr: Loading inventories for estates" );
+
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+
+  auto stmt = pDb->getPreparedStatement( Db::LAND_INV_SEL_ALL );
+  auto res = pDb->query( stmt );
+
+  uint32_t itemCount = 0;
+  while( res->next() )
+  {
+    //uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, bool isHq
+    uint64_t ident = res->getUInt64( "LandIdent" );
+    uint16_t containerId = res->getUInt16( "ContainerId" );
+    uint64_t itemId = res->getUInt64( "ItemId" );
+    uint16_t slot = res->getUInt16( "SlotId" );
+    uint32_t catalogId = res->getUInt( "catalogId" );
+    uint8_t stain = res->getUInt8( "stain" );
+    uint64_t characterId = res->getUInt64( "CharacterId" );
+
+    auto item = make_Item( itemId, catalogId, 0, 0, 0 );
+    item->setStain( stain );
+    // todo: need to set the owner character id on the item
+
+    ContainerIdToContainerMap& estateInv = m_estateInventories[ ident ];
+
+    // check if containerId exists
+    auto container = estateInv.find( containerId );
+    if( container == estateInv.end() )
+    {
+      // create container
+      // todo: how to handle this max slot stuff? override it on land init?
+      auto ic = make_ItemContainer( containerId, 400, "houseiteminventory", true );
+      ic->setItem( slot, item );
+
+      estateInv[ containerId ] = ic;
+    }
+    else
+      container->second->setItem( slot, item );
+
+    itemCount++;
+  }
+
+  log->debug( "HousingMgr: Loaded " + std::to_string( itemCount ) + " inventory items" );
+
+  return true;
+}
+
+void Sapphire::World::Manager::HousingMgr::loadLandCache()
+{
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+
+  auto stmt = pDb->getPreparedStatement( Db::LAND_SEL_ALL );
+  auto res = pDb->query( stmt );
+
+  while( res->next() )
+  {
+    LandCacheEntry entry;
+
+    // land stuff
+    entry.m_landSetId = res->getUInt64( "LandSetId" );
+    entry.m_landId = res->getUInt64( "LandId" );
+
+    entry.m_type = static_cast< Common::LandType >( res->getUInt( "Type" ) );
+    entry.m_size = res->getUInt8( "Size" );
+    entry.m_status = res->getUInt8( "Status" );
+    entry.m_currentPrice = res->getUInt64( "LandPrice" );
+    entry.m_updateTime = res->getUInt64( "UpdateTime" );
+    entry.m_ownerId = res->getUInt64( "OwnerId" );
+
+    entry.m_houseId = res->getUInt64( "HouseId" );
+
+    // house stuff
+    entry.m_estateWelcome = res->getString( "Welcome" );
+    entry.m_estateComment = res->getString( "Comment" );
+    entry.m_estateName = res->getString( "HouseName" );
+    entry.m_buildTime = res->getUInt64( "BuildTime" );
+    entry.m_endorsements = res->getUInt64( "Endorsements" );
+
+    m_landCache[ entry.m_landSetId ].push_back( entry );
+  }
 }
 
 uint32_t Sapphire::World::Manager::HousingMgr::toLandSetId( uint16_t territoryTypeId, uint8_t wardId ) const
@@ -472,7 +585,8 @@ Sapphire::Common::LandIdent Sapphire::World::Manager::HousingMgr::clientTriggerP
   return ident;
 }
 
-void Sapphire::World::Manager::HousingMgr::sendHousingInventory( Entity::Player& player, uint16_t inventoryType, uint8_t plotNum )
+void Sapphire::World::Manager::HousingMgr::sendEstateInventory( Entity::Player& player, uint16_t inventoryType,
+                                                                uint8_t plotNum )
 {
   Sapphire::LandPtr targetLand;
 
@@ -510,10 +624,72 @@ void Sapphire::World::Manager::HousingMgr::sendHousingInventory( Entity::Player&
   if( targetLand->getOwnerId() != player.getId() )
     return;
 
-  auto container = targetLand->getItemContainer( inventoryType );
+  auto container = getEstateInventory( targetLand->getLandIdent() )[ inventoryType ];
   if( !container )
     return;
 
   auto invMgr = g_fw.get< Manager::InventoryMgr >();
   invMgr->sendInventoryContainer( player, container );
+}
+
+const Sapphire::World::Manager::HousingMgr::LandSetLandCacheMap&
+  Sapphire::World::Manager::HousingMgr::getLandCacheMap()
+{
+  return m_landCache;
+}
+
+Sapphire::World::Manager::HousingMgr::LandIdentToInventoryContainerMap&
+  Sapphire::World::Manager::HousingMgr::getEstateInventories()
+{
+  return m_estateInventories;
+}
+
+Sapphire::World::Manager::HousingMgr::ContainerIdToContainerMap&
+  Sapphire::World::Manager::HousingMgr::getEstateInventory( uint64_t ident )
+{
+  auto map = m_estateInventories.find( ident );
+
+  assert( map != m_estateInventories.end() );
+
+  return map->second;
+}
+
+Sapphire::World::Manager::HousingMgr::ContainerIdToContainerMap&
+  Sapphire::World::Manager::HousingMgr::getEstateInventory( Sapphire::Common::LandIdent ident )
+{
+  auto u64ident = *reinterpret_cast< uint64_t* >( &ident );
+
+  return getEstateInventory( u64ident );
+}
+
+void Sapphire::World::Manager::HousingMgr::updateHouseModels( Sapphire::HousePtr house )
+{
+  assert( house );
+
+  auto getItemData = []( uint32_t itemId )
+  {
+    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+    auto info = pExdData->get< Sapphire::Data::Item >( itemId );
+    return info->additionalData;
+  };
+
+  auto containers = getEstateInventory( house->getLandIdent() );
+
+  auto extContainer = containers.find( static_cast< uint16_t >( InventoryType::HousingOutdoorAppearance ) );
+  if( extContainer != containers.end() )
+  {
+    for( auto& item : extContainer->second->getItemMap() )
+    {
+      house->setHousePart( static_cast< Common::HousePartSlot >( item.first ), getItemData( item.second->getId() ) );
+    }
+  }
+
+  auto intContainer = containers.find( static_cast< uint16_t >( InventoryType::HousingInteriorAppearance ) );
+  if( intContainer != containers.end() )
+  {
+    for( auto& item : intContainer->second->getItemMap() )
+    {
+      house->setHouseInteriorPart( static_cast< Common::HousingInteriorSlot >( item.first ), getItemData( item.second->getId() ) );
+    }
+  }
 }

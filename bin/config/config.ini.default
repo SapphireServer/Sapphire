@@ -55,4 +55,8 @@ ListenPort = 54992
 
 [General]
 ; Sent on login - each line must be shorter than 307 characters, split lines with ';'
-MotD = Welcome to Sapphire!;This is a very good server;You can change these messages by editing General.MotD in config/zone.ini
+MotD = Welcome to Sapphire!;This is a very good server;You can change these messages by editing General.MotD in config/config.ini
+
+[Housing]
+; Set the default estate name. %i will be replaced with the plot number
+DefaultEstateName = Estate #%i

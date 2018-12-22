@@ -62,10 +62,6 @@ void Sapphire::Land::init( Common::LandType type, uint8_t size, uint8_t state, u
   m_currentPrice = currentPrice;
   m_ownerId = ownerId;
 
-  // fetch the house if we have one for this land
-  if( houseId > 0 )
-    m_pHouse = make_House( houseId, m_landSetId, getLandIdent() );
-
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
   auto info = pExdData->get< Sapphire::Data::HousingMapMarkerInfo >( m_landIdent.territoryTypeId, m_landIdent.landId );
   if( info )
@@ -94,65 +90,23 @@ void Sapphire::Land::init( Common::LandType type, uint8_t size, uint8_t state, u
   }
 
   // init item containers
-  auto setupContainer = [ this ]( InventoryType type, uint16_t maxSize )
-  {
-    m_landInventoryMap[ type ] = make_ItemContainer( type, maxSize, "houseiteminventory", true, true );
-  };
-
-  setupContainer( InventoryType::HousingOutdoorAppearance, 8 );
-  setupContainer( InventoryType::HousingOutdoorPlacedItems, m_maxPlacedExternalItems );
-  setupContainer( InventoryType::HousingOutdoorStoreroom, m_maxPlacedExternalItems );
-
-  setupContainer( InventoryType::HousingInteriorAppearance, 9 );
-
-  // nb: so we're going to store these internally in one container because SE is fucked in the head
-  // but when an inventory is requested, we will split them into groups of 50
-  setupContainer( InventoryType::HousingInteriorPlacedItems1, m_maxPlacedInternalItems );
-  setupContainer( InventoryType::HousingInteriorStoreroom1, m_maxPlacedInternalItems );
-
-  loadItemContainerContents();
-}
-
-void Sapphire::Land::loadItemContainerContents()
-{
-  if( !m_pHouse )
-    return;
-
-  auto ident = *reinterpret_cast< uint64_t* >( &m_landIdent );
-  g_fw.get< Sapphire::Logger >()->debug( "Loading housing inventory for ident: " + std::to_string( ident ) );
-
-  auto pDB = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-
-  auto stmt = pDB->getPreparedStatement( Db::LAND_INV_SEL_HOUSE );
-  stmt->setUInt64( 1, ident );
-
-  auto res = pDB->query( stmt );
-
-  std::unordered_map< uint16_t, std::vector< std::pair< uint16_t, uint32_t > > > items;
-
-  while( res->next() )
-  {
-    auto containerId = res->getUInt( "ContainerId" );
-    auto itemId = res->getUInt64( "ItemId" );
-    auto slotId = res->getUInt( "SlotId" );
-
-    items[ containerId ].push_back( std::make_pair( slotId, itemId ) );
-  }
-
-  res.reset();
-
-  for( auto it = items.begin(); it != items.end(); it++ )
-  {
-    auto container = m_landInventoryMap[ it->first ];
-
-    // todo: delet this
-    for( auto fuck = it->second.begin(); fuck != it->second.end(); fuck++ )
-    {
-      auto item = Sapphire::Items::Util::loadItem( fuck->second );
-      if( item )
-        container->setItem( fuck->first, item );
-    }
-  }
+//  auto setupContainer = [ this ]( InventoryType type, uint16_t maxSize )
+//  {
+//    m_landInventoryMap[ type ] = make_ItemContainer( type, maxSize, "houseiteminventory", true, true );
+//  };
+//
+//  setupContainer( InventoryType::HousingOutdoorAppearance, 8 );
+//  setupContainer( InventoryType::HousingOutdoorPlacedItems, m_maxPlacedExternalItems );
+//  setupContainer( InventoryType::HousingOutdoorStoreroom, m_maxPlacedExternalItems );
+//
+//  setupContainer( InventoryType::HousingInteriorAppearance, 9 );
+//
+//  // nb: so we're going to store these internally in one container because SE is fucked in the head
+//  // but when an inventory is requested, we will split them into groups of 50
+//  setupContainer( InventoryType::HousingInteriorPlacedItems1, m_maxPlacedInternalItems );
+//  setupContainer( InventoryType::HousingInteriorStoreroom1, m_maxPlacedInternalItems );
+//
+//  loadItemContainerContents();
 }
 
 uint32_t Sapphire::Land::convertItemIdToHousingItemId( uint32_t itemId )
@@ -221,6 +175,11 @@ Sapphire::Common::LandIdent Sapphire::Land::getLandIdent() const
 Sapphire::HousePtr Sapphire::Land::getHouse() const
 {
   return m_pHouse;
+}
+
+void Sapphire::Land::setHouse( Sapphire::HousePtr house )
+{
+  m_pHouse = house;
 }
 
 FFXIVARR_POSITION3 Sapphire::Land::getMapMarkerPosition()
@@ -349,7 +308,8 @@ bool Sapphire::Land::setPreset( uint32_t itemId )
   {
     // todo: i guess we'd create a house here?
     auto newId = getNextHouseId();
-    m_pHouse = make_House( newId, getLandSetId(), getLandIdent() );
+
+    m_pHouse = make_House( newId, getLandSetId(), getLandIdent(), "Estate #" + std::to_string( m_landIdent.landId + 1 ), "" );
   }
 
 
@@ -371,13 +331,4 @@ bool Sapphire::Land::setPreset( uint32_t itemId )
 
 
   return true;
-}
-
-Sapphire::ItemContainerPtr Sapphire::Land::getItemContainer( uint16_t inventoryType ) const
-{
-  auto container = m_landInventoryMap.find( inventoryType );
-  if( container == m_landInventoryMap.end() )
-    return nullptr;
-
-  return container->second;
 }
