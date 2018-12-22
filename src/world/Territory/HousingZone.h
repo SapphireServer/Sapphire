@@ -53,17 +53,6 @@ namespace Sapphire
     Entity::EventObjectPtr registerHouseEntranceEObj( uint8_t plotId );
 
   private:
-    struct QueuedLandInit
-    {
-      uint64_t m_landId;
-      Common::LandType m_type;
-      uint8_t m_size;
-      uint8_t m_status;
-      uint32_t m_currentPrice;
-      uint64_t m_ownerId;
-      uint64_t m_houseId;
-    };
-
     using LandPtrMap = std::unordered_map< uint8_t, Sapphire::LandPtr >;
     const uint32_t m_landSetMax = 18;
     LandPtrMap m_landPtrMap;
