@@ -68,7 +68,8 @@ void Housing::HousingInteriorTerritory::onPlayerZoneIn( Entity::Player& player )
 
   for( auto i = 0; i < 10; i++ )
   {
-    indoorInitPacket->data().indoorItems[ i ] = pHouse->getHouseInteriorPart( static_cast< Common::HousingInteriorSlot >( i ) );
+    indoorInitPacket->data().indoorItems[ i ] = pHouse->getHouseInteriorModel(
+      static_cast< Common::HousingInteriorSlot >( i ) );
   }
 
 

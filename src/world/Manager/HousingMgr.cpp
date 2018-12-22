@@ -680,7 +680,7 @@ void Sapphire::World::Manager::HousingMgr::updateHouseModels( Sapphire::HousePtr
   {
     for( auto& item : extContainer->second->getItemMap() )
     {
-      house->setHousePart( static_cast< Common::HousePartSlot >( item.first ), getItemData( item.second->getId() ) );
+      house->setHouseModel( static_cast< Common::HousePartSlot >( item.first ), getItemData( item.second->getId() ) );
     }
   }
   else
@@ -693,7 +693,8 @@ void Sapphire::World::Manager::HousingMgr::updateHouseModels( Sapphire::HousePtr
   {
     for( auto& item : intContainer->second->getItemMap() )
     {
-      house->setHouseInteriorPart( static_cast< Common::HousingInteriorSlot >( item.first ), getItemData( item.second->getId() ) );
+      house->setHouseInteriorModel( static_cast< Common::HousingInteriorSlot >( item.first ),
+                                    getItemData( item.second->getId() ) );
     }
   }
   else
