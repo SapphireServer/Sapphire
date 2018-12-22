@@ -25,6 +25,8 @@
 #include "ServerMgr.h"
 #include "Territory/House.h"
 #include "InventoryMgr.h"
+#include "Inventory/Item.h"
+#include "Inventory/ItemContainer.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network;
@@ -48,7 +50,7 @@ bool Sapphire::World::Manager::HousingMgr::init()
 
   loadLandCache();
 
-  log->info( "HousingMgr: Checking land counts" );
+  log->debug( "HousingMgr: Checking land counts" );
 
   uint32_t houseCount = 0;
   for( auto& landSet : m_landCache )
@@ -79,6 +81,48 @@ bool Sapphire::World::Manager::HousingMgr::loadEstateInventories()
   auto log = g_fw.get< Sapphire::Logger >();
 
   log->info( "HousingMgr: Loading inventories for estates" );
+
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+
+  auto stmt = pDb->getPreparedStatement( Db::LAND_INV_SEL_ALL );
+  auto res = pDb->query( stmt );
+
+  uint32_t itemCount = 0;
+  while( res->next() )
+  {
+    //uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, bool isHq
+    uint64_t ident = res->getUInt64( "LandIdent" );
+    uint16_t containerId = res->getUInt16( "ContainerId" );
+    uint64_t itemId = res->getUInt64( "ItemId" );
+    uint16_t slot = res->getUInt16( "SlotId" );
+    uint32_t catalogId = res->getUInt( "catalogId" );
+    uint8_t stain = res->getUInt8( "stain" );
+    uint64_t characterId = res->getUInt64( "CharacterId" );
+
+    auto item = make_Item( itemId, catalogId, 0, 0, 0 );
+    item->setStain( stain );
+    // todo: need to set the owner character id on the item
+
+    ContainerIdToContainerMap estateInv = m_estateInventories[ ident ];
+
+    // check if containerId exists
+    auto container = estateInv.find( containerId );
+    if( container == estateInv.end() )
+    {
+      // create container
+      // todo: how to handle this max slot stuff? override it on land init?
+      auto ic = make_ItemContainer( containerId, 400, "houseiteminventory", true );
+      ic->setItem( slot, item );
+
+      estateInv[ containerId ] = ic;
+    }
+    else
+      container->second->setItem( slot, item );
+
+    itemCount++;
+  }
+
+  log->debug( "HousingMgr: Loaded " + std::to_string( itemCount ) + " inventory items" );
 
   return true;
 }
@@ -580,7 +624,7 @@ void Sapphire::World::Manager::HousingMgr::sendEstateInventory( Entity::Player& 
   if( targetLand->getOwnerId() != player.getId() )
     return;
 
-  auto container = targetLand->getItemContainer( inventoryType );
+  auto container = getEstateInventory( targetLand->getLandIdent() )[ inventoryType ];
   if( !container )
     return;
 
