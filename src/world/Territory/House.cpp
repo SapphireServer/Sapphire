@@ -51,7 +51,7 @@ Sapphire::House::House( uint32_t houseId, uint32_t landSetId, Common::LandIdent 
 //    auto models = reinterpret_cast< uint32_t* >( &housePartModels[ 0 ] );
 //    for( auto i = 0; i < 8; i++ )
 //    {
-//      m_houseParts[ i ] = { models[ i ], housePartColours[ i ] };
+//      m_houseModelsCache[ i ] = { models[ i ], housePartColours[ i ] };
 //    }
 //
 //    auto houseInteriorModels = res->getBlobVector( "HouseInteriorModels" );
@@ -59,7 +59,7 @@ Sapphire::House::House( uint32_t houseId, uint32_t landSetId, Common::LandIdent 
 //    auto interiorModels = reinterpret_cast< uint32_t* >( &houseInteriorModels[ 0 ] );
 //    for( auto i = 0; i < 10; i++ )
 //    {
-//      m_houseInteriorParts[ i ] = interiorModels[ i ];
+//      m_houseInteriorModels[ i ] = interiorModels[ i ];
 //    }
 //  }
 }
@@ -88,7 +88,7 @@ void Sapphire::House::updateHouseDb()
 
   for( auto i = 0; i < 8; i++ )
   {
-    auto& part = m_houseParts[ i ];
+    auto& part = m_houseModelsCache[ i ];
     models.push_back( part.first );
     colours.push_back( part.second );
   }
@@ -104,7 +104,7 @@ void Sapphire::House::updateHouseDb()
 
   for( auto i = 0; i < 10; i++ )
   {
-    models.push_back( m_houseInteriorParts[ i ] );
+    models.push_back( m_houseInteriorModels[ i ] );
   }
 
   std::vector< uint8_t > tmp2Models( models.size() * 4 );
@@ -132,37 +132,37 @@ uint32_t Sapphire::House::getHouseId() const
 
 uint8_t Sapphire::House::getHousePartColor( Common::HousePartSlot slot ) const
 {
-  return m_houseParts[ slot ].second;
+  return m_houseModelsCache[ slot ].second;
 }
 
 uint32_t Sapphire::House::getHouseInteriorPart( Common::HousingInteriorSlot slot ) const
 {
-  return m_houseInteriorParts[ slot ];
+  return m_houseInteriorModels[ slot ];
 }
 
 void Sapphire::House::setHousePart( Common::HousePartSlot slot, uint32_t id )
 {
-  m_houseParts[ slot ].first = id;
+  m_houseModelsCache[ slot ].first = id;
 }
 
 void Sapphire::House::setHousePartColor( Common::HousePartSlot slot, uint32_t id )
 {
-  m_houseParts[ slot ].second = id;
+  m_houseModelsCache[ slot ].second = id;
 }
 
 void Sapphire::House::setHouseInteriorPart( Common::HousingInteriorSlot slot, uint32_t id )
 {
-  m_houseInteriorParts[ slot ] = id;
+  m_houseInteriorModels[ slot ] = id;
 }
 
 uint32_t Sapphire::House::getHousePart( Common::HousePartSlot slot ) const
 {
-  return m_houseParts[ slot ].first;
+  return m_houseModelsCache[ slot ].first;
 }
 
-Sapphire::House::HousePartsArray const& Sapphire::House::getHouseParts() const
+Sapphire::House::HouseModelsArray const& Sapphire::House::getHouseModels() const
 {
-  return m_houseParts;
+  return m_houseModelsCache;
 }
 
 const std::string& Sapphire::House::getHouseName() const

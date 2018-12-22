@@ -61,9 +61,6 @@ namespace Sapphire
     void setLandTag( uint8_t slot, uint8_t tag );
     uint8_t getLandTag( uint8_t slot );
 
-    ItemContainerPtr getItemContainer( uint16_t inventoryType ) const;
-    void loadItemContainerContents();
-
   private:
     uint32_t convertItemIdToHousingItemId( uint32_t itemId );
     uint32_t getNextHouseId();
@@ -87,7 +84,6 @@ namespace Sapphire
     Sapphire::HousePtr m_pHouse;
 
     //item storage
-    LandInventoryMap m_landInventoryMap;
     uint16_t m_maxPlacedExternalItems;
     uint16_t m_maxPlacedInternalItems;
 
