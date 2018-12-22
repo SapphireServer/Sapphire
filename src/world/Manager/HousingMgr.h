@@ -38,7 +38,7 @@ namespace Sapphire::World::Manager
 
       std::string m_estateWelcome;
       std::string m_estateComment;
-      std::string m_houseName;
+      std::string m_estateName;
 
       uint64_t m_buildTime;
       uint64_t m_endorsements;
@@ -48,6 +48,15 @@ namespace Sapphire::World::Manager
      * @brief Maps land id to a list of cached entries
      */
     using LandSetLandCacheMap = std::unordered_map< uint64_t, std::vector< LandCacheEntry > >;
+
+    /*!
+     * @brief Maps container IDs to their relevant ItemContainerPtr
+     */
+    using ContainerIdToContainerMap = std::unordered_map< uint16_t, ItemContainerPtr >;
+    /*!
+     * @brief Maps land idents to a container containing ItemContainerPtrs
+     */
+    using LandIdentToInventoryContainerMap = std::unordered_map< uint64_t, ContainerIdToContainerMap >;
 
     HousingMgr();
     virtual ~HousingMgr();
@@ -95,8 +104,31 @@ namespace Sapphire::World::Manager
      */
     const LandSetLandCacheMap& getLandCacheMap() const;
 
+    /*!
+     * @brief Get all loaded inventories for housing estates
+     * @return
+     */
+    LandIdentToInventoryContainerMap getEstateInventories() const;
+
+    /*!
+     * @brief Get an estate inventory for a specific estate
+     * @param ident LandIdent for the specified estate
+     * @return A map containing container ids to ItemContainerPtr
+     */
+    ContainerIdToContainerMap getEstateInventory( uint64_t ident ) const;
+
+    /*!
+     * @brief Get an estate inventory for a specific estate
+     * @param ident LandIdent for the specified estate
+     * @return A map containing container ids to ItemContainerPtr
+     */
+    ContainerIdToContainerMap getEstateInventory( Common::LandIdent ident ) const;
   private:
+    void loadLandCache();
+    bool loadEstateInventories();
+
     LandSetLandCacheMap m_landCache;
+    LandIdentToInventoryContainerMap m_estateInventories;
 
   };
 

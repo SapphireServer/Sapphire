@@ -12,7 +12,8 @@ namespace Sapphire
   class House
   {
   public:
-    House( uint32_t houseId, uint32_t landSetId, Common::LandIdent ident );
+    House( uint32_t houseId, uint32_t landSetId, Common::LandIdent ident, const std::string& estateName,
+           const std::string& estateComment );
     virtual ~House();
 
     using HousePart = std::pair< uint32_t, uint8_t >;
@@ -51,8 +52,8 @@ namespace Sapphire
     HousePartsArray m_houseParts;
     uint32_t m_houseInteriorParts[10];
 
-    std::string m_estateMessage;
-    std::string m_houseName;
+    std::string m_estateComment;
+    std::string m_estateName;
   };
 
 }

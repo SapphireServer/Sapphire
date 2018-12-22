@@ -201,7 +201,10 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     CONNECTION_BOTH );
 
   prepareStatement( LAND_INV_SEL_ALL,
-                    "SELECT LandIdent, ContainerId, ItemId, SlotId FROM houseiteminventory;",
+                    "SELECT houseiteminventory.*, charaglobalitem.catalogId, charaglobalitem.stain, charaglobalitem.CharacterId "
+                    "FROM houseiteminventory "
+                    "LEFT JOIN charaglobalitem "
+                    "ON houseiteminventory.ItemId = charaglobalitem.itemId;",
                     CONNECTION_BOTH );
 
   prepareStatement( LAND_INV_SEL_HOUSE,

@@ -62,10 +62,6 @@ void Sapphire::Land::init( Common::LandType type, uint8_t size, uint8_t state, u
   m_currentPrice = currentPrice;
   m_ownerId = ownerId;
 
-  // fetch the house if we have one for this land
-  if( houseId > 0 )
-    m_pHouse = make_House( houseId, m_landSetId, getLandIdent() );
-
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
   auto info = pExdData->get< Sapphire::Data::HousingMapMarkerInfo >( m_landIdent.territoryTypeId, m_landIdent.landId );
   if( info )
@@ -224,6 +220,11 @@ Sapphire::HousePtr Sapphire::Land::getHouse() const
   return m_pHouse;
 }
 
+void Sapphire::Land::setHouse( Sapphire::HousePtr house )
+{
+  m_pHouse = house;
+}
+
 FFXIVARR_POSITION3 Sapphire::Land::getMapMarkerPosition()
 {
   return m_mapMarkerPosition;
@@ -350,7 +351,8 @@ bool Sapphire::Land::setPreset( uint32_t itemId )
   {
     // todo: i guess we'd create a house here?
     auto newId = getNextHouseId();
-    m_pHouse = make_House( newId, getLandSetId(), getLandIdent() );
+
+    m_pHouse = make_House( newId, getLandSetId(), getLandIdent(), "Estate #" + std::to_string( m_landIdent.landId + 1 ), "" );
   }
 
 
