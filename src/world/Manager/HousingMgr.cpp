@@ -659,7 +659,7 @@ Sapphire::World::Manager::HousingMgr::ContainerIdToContainerMap&
 {
   auto u64ident = *reinterpret_cast< uint64_t* >( &ident );
 
-  getEstateInventory( u64ident );
+  return getEstateInventory( u64ident );
 }
 
 void Sapphire::World::Manager::HousingMgr::updateHouseModels( Sapphire::HousePtr house )
