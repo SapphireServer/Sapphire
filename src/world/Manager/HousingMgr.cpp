@@ -683,6 +683,10 @@ void Sapphire::World::Manager::HousingMgr::updateHouseModels( Sapphire::HousePtr
       house->setHousePart( static_cast< Common::HousePartSlot >( item.first ), getItemData( item.second->getId() ) );
     }
   }
+  else
+  {
+    g_fw.get< Logger >()->error( "Plot " + std::to_string( house->getLandIdent().landId ) + " has an invalid inventory configuration for outdoor appearance." );
+  }
 
   auto intContainer = containers.find( static_cast< uint16_t >( InventoryType::HousingInteriorAppearance ) );
   if( intContainer != containers.end() )
@@ -691,5 +695,9 @@ void Sapphire::World::Manager::HousingMgr::updateHouseModels( Sapphire::HousePtr
     {
       house->setHouseInteriorPart( static_cast< Common::HousingInteriorSlot >( item.first ), getItemData( item.second->getId() ) );
     }
+  }
+  else
+  {
+    g_fw.get< Logger >()->error( "Plot " + std::to_string( house->getLandIdent().landId ) + " has an invalid inventory configuration for indoor appearance." );
   }
 }
