@@ -13,57 +13,58 @@
 
 extern Sapphire::Framework g_fw;
 
-Sapphire::House::House( uint32_t houseId, uint32_t landSetId, Common::LandIdent ident ) :
+Sapphire::House::House( uint32_t houseId, uint32_t landSetId, Common::LandIdent ident, const std::string& estateName,
+                        const std::string& estateComment ) :
   m_houseId( houseId ),
   m_landSetId( landSetId ),
-  m_landIdent( ident )
+  m_landIdent( ident ),
+  m_estateName( estateName ),
+  m_estateComment( estateComment )
 {
-  auto pDB = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-
-  // todo: convert to prepared statement
-  auto res = pDB->query( "SELECT * FROM house WHERE HouseId = " + std::to_string( houseId ) );
-
-  if( !res->next() )
-  {
-    g_fw.get< Sapphire::Logger >()->info( "Creating house House#" + std::to_string( houseId ) + " in LandSet#" + std::to_string( landSetId ) );
-
-    auto stmt = pDB->getPreparedStatement( Db::HOUSING_HOUSE_INS );
-
-    stmt->setUInt( 1, m_landSetId );
-    stmt->setUInt( 2, m_houseId );
-
-    pDB->execute( stmt );
-
-    // todo: make this nicer/configurable?
-    m_houseName = "Estate #" + std::to_string( m_landIdent.landId + 1 );
-  }
-  else
-  {
-    m_estateMessage = res->getString( "Comment" );
-    m_houseName = res->getString( "HouseName" );
-
-    auto housePartModels = res->getBlobVector( "HousePartModels" );
-    auto housePartColours = res->getBlobVector( "HousePartColours" );
-
-    auto models = reinterpret_cast< uint32_t* >( &housePartModels[ 0 ] );
-    for( auto i = 0; i < 8; i++ )
-    {
-      m_houseParts[ i ] = { models[ i ], housePartColours[ i ] };
-    }
-
-    auto houseInteriorModels = res->getBlobVector( "HouseInteriorModels" );
-
-    auto interiorModels = reinterpret_cast< uint32_t* >( &houseInteriorModels[ 0 ] );
-    for( auto i = 0; i < 10; i++ )
-    {
-      m_houseInteriorParts[ i ] = interiorModels[ i ];
-    }
-  }
+//  auto pDB = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+//
+//  // todo: convert to prepared statement
+//  auto res = pDB->query( "SELECT * FROM house WHERE HouseId = " + std::to_string( houseId ) );
+//
+//  if( !res->next() )
+//  {
+//    g_fw.get< Sapphire::Logger >()->info( "Creating house House#" + std::to_string( houseId ) + " in LandSet#" + std::to_string( landSetId ) );
+//
+//    auto stmt = pDB->getPreparedStatement( Db::HOUSING_HOUSE_INS );
+//
+//    stmt->setUInt( 1, m_landSetId );
+//    stmt->setUInt( 2, m_houseId );
+//
+//    pDB->execute( stmt );
+//
+//    // todo: make this nicer/configurable?
+//    m_estateName = "Estate #" + std::to_string( m_landIdent.landId + 1 );
+//  }
+//  else
+//  {
+//    m_estateComment = res->getString( "Comment" );
+//    m_estateName = res->getString( "HouseName" );
+//
+//    auto housePartModels = res->getBlobVector( "HousePartModels" );
+//    auto housePartColours = res->getBlobVector( "HousePartColours" );
+//
+//    auto models = reinterpret_cast< uint32_t* >( &housePartModels[ 0 ] );
+//    for( auto i = 0; i < 8; i++ )
+//    {
+//      m_houseParts[ i ] = { models[ i ], housePartColours[ i ] };
+//    }
+//
+//    auto houseInteriorModels = res->getBlobVector( "HouseInteriorModels" );
+//
+//    auto interiorModels = reinterpret_cast< uint32_t* >( &houseInteriorModels[ 0 ] );
+//    for( auto i = 0; i < 10; i++ )
+//    {
+//      m_houseInteriorParts[ i ] = interiorModels[ i ];
+//    }
+//  }
 }
 
-Sapphire::House::~House()
-{
-}
+Sapphire::House::~House() = default;
 
 void Sapphire::House::updateHouseDb()
 {
@@ -77,8 +78,8 @@ void Sapphire::House::updateHouseDb()
   stmt->setInt64( 1, m_buildTime );
   stmt->setInt( 2, 0 );
 
-  stmt->setString( 3, m_estateMessage );
-  stmt->setString( 4, m_houseName );
+  stmt->setString( 3, m_estateComment );
+  stmt->setString( 4, m_estateName );
 
   stmt->setUInt64( 5, 0 );
 
@@ -166,24 +167,24 @@ Sapphire::House::HousePartsArray const& Sapphire::House::getHouseParts() const
 
 const std::string& Sapphire::House::getHouseName() const
 {
-  return m_houseName;
+  return m_estateName;
 }
 
 const std::string& Sapphire::House::getHouseGreeting() const
 {
-  return m_estateMessage;
+  return m_estateComment;
 }
 
 void Sapphire::House::setHouseGreeting( const std::string& greeting )
 {
-  m_estateMessage = greeting;
+  m_estateComment = greeting;
 
   updateHouseDb();
 }
 
 void Sapphire::House::setHouseName( const std::string& name )
 {
-  m_houseName = name;
+  m_estateName = name;
 
   updateHouseDb();
 }

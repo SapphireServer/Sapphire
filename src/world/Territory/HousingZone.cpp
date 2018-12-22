@@ -76,9 +76,18 @@ bool Sapphire::HousingZone::init()
   }
 
   // init the lands
-  for( auto& entry : landSetCache->second )
+  for( HousingMgr::LandCacheEntry& entry : landSetCache->second )
   {
     auto land = make_Land( m_territoryTypeId, getWardNum(), entry.m_landId, m_landSetId, info );
+
+    // setup house
+    if( entry.m_houseId )
+    {
+      //uint32_t houseId, uint32_t landSetId, Common::LandIdent ident, const std::string& estateName,
+      //                        const std::string& estateMessage
+      auto house = make_House( entry.m_houseId, m_landSetId, land->getLandIdent(), entry.m_estateName, entry.m_estateComment );
+    }
+
     land->init( entry.m_type, entry.m_size, entry.m_status, entry.m_currentPrice, entry.m_ownerId, entry.m_houseId );
 
     m_landPtrMap[ entry.m_landId ] = land;

@@ -33,6 +33,7 @@ namespace Sapphire
     uint8_t getSharing() const;
     uint32_t getLandSetId() const;
     Common::LandType getLandType() const;
+    void setHouse( Sapphire::HousePtr );
     Sapphire::HousePtr getHouse() const;
     Common::FFXIVARR_POSITION3 getMapMarkerPosition();
     Common::LandIdent getLandIdent() const;
