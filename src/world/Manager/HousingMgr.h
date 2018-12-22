@@ -2,6 +2,7 @@
 #define SAPPHIRE_HOUSINGMGR_H
 
 #include "Forwards.h"
+#include "BaseManager.h"
 #include "Territory/HousingZone.h"
 #include <set>
 #include <unordered_map>
@@ -13,11 +14,11 @@ namespace Sapphire::Data
 
 namespace Sapphire::World::Manager
 {
-  class HousingMgr
+  class HousingMgr : public BaseManager
   {
 
   public:
-    HousingMgr();
+    HousingMgr( FrameworkPtr pFw );
     virtual ~HousingMgr();
 
     bool init();

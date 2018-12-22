@@ -109,7 +109,7 @@ Sapphire::Entity::Player::~Player()
 
 void Sapphire::Entity::Player::injectPacket( const std::string& path )
 {
-  auto pServerZone = g_fw.get< ServerMgr >();
+  auto pServerZone = g_fw.get< World::ServerMgr >();
   auto session = pServerZone->getSession( getId() );
   if( session )
     session->getZoneConnection()->injectPacket( path, *this );
@@ -1206,7 +1206,7 @@ const uint8_t* Sapphire::Entity::Player::getGcRankArray() const
 
 void Sapphire::Entity::Player::queuePacket( Network::Packets::FFXIVPacketBasePtr pPacket )
 {
-  auto pServerZone = g_fw.get< ServerMgr >();
+  auto pServerZone = g_fw.get< World::ServerMgr >();
   auto pSession = pServerZone->getSession( m_id );
 
   if( !pSession )
@@ -1221,7 +1221,7 @@ void Sapphire::Entity::Player::queuePacket( Network::Packets::FFXIVPacketBasePtr
 
 void Sapphire::Entity::Player::queueChatPacket( Network::Packets::FFXIVPacketBasePtr pPacket )
 {
-  auto pServerZone = g_fw.get< ServerMgr >();
+  auto pServerZone = g_fw.get< World::ServerMgr >();
   auto pSession = pServerZone->getSession( m_id );
 
   if( !pSession )
@@ -1557,7 +1557,7 @@ void Sapphire::Entity::Player::sendZonePackets()
   if( isLogin() )
   {
     //Update player map in servermgr - in case player name has been changed
-    auto pServerMgr = g_fw.get< Sapphire::ServerMgr >();
+    auto pServerMgr = g_fw.get< World::ServerMgr >();
     pServerMgr->updatePlayerName( getId(), getName() );
   }
 

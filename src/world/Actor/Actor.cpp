@@ -297,7 +297,7 @@ Send a packet to all players in range, potentially to self if set and is player
 */
 void Sapphire::Entity::Actor::sendToInRangeSet( Network::Packets::FFXIVPacketBasePtr pPacket, bool bToSelf )
 {
-  auto pServerZone = g_fw.get< ServerMgr >();
+  auto pServerZone = g_fw.get< World::ServerMgr >();
   if( bToSelf && isPlayer() )
   {
     auto pPlayer = getAsPlayer();

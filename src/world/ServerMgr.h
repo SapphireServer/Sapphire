@@ -5,18 +5,18 @@
 
 #include <mutex>
 #include <map>
-
 #include "ForwardsZone.h"
+#include "Manager/BaseManager.h"
 
-namespace Sapphire
+namespace Sapphire::World
 {
 
-  class ServerMgr
+  class ServerMgr : public Manager::BaseManager
   {
   public:
-    ServerMgr( const std::string& configName );
+    ServerMgr( const std::string& configName, FrameworkPtr pFw );
 
-    ~ServerMgr();
+    ~ServerMgr() override;
 
     void run( int32_t argc, char* argv[] );
 
@@ -25,8 +25,8 @@ namespace Sapphire
     void removeSession( uint32_t sessionId );
     void removeSession( const std::string& playerName );
 
-    SessionPtr getSession( uint32_t id );
-    SessionPtr getSession( const std::string& playerName );
+    World::SessionPtr getSession( uint32_t id );
+    World::SessionPtr getSession( const std::string& playerName );
 
     size_t getSessionCount() const;
 

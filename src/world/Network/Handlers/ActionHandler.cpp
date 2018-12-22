@@ -17,7 +17,7 @@
 
 #include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
 
-#include "DebugCommand/DebugCommandHandler.h"
+#include "Manager/DebugCommandMgr.h"
 
 #include "Action/Action.h"
 #include "Action/ActionCast.h"

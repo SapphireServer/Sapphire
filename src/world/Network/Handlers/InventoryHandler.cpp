@@ -11,7 +11,7 @@
 #include "Territory/Zone.h"
 #include "Territory/ZonePosition.h"
 
-#include "DebugCommand/DebugCommandHandler.h"
+#include "Manager/DebugCommandMgr.h"
 #include "Actor/Player.h"
 
 #include "Session.h"

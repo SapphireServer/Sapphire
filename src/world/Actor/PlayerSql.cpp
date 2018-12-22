@@ -29,7 +29,7 @@ using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::World::Manager;
 
 // load player from the db
-bool Sapphire::Entity::Player::load( uint32_t charId, SessionPtr pSession )
+bool Sapphire::Entity::Player::load( uint32_t charId, World::SessionPtr pSession )
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto pTeriMgr = g_fw.get< TerritoryMgr >();

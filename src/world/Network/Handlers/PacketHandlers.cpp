@@ -34,7 +34,7 @@
 #include "Network/PacketWrappers/EventFinishPacket.h"
 #include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
 
-#include "DebugCommand/DebugCommandHandler.h"
+#include "Manager/DebugCommandMgr.h"
 
 #include "Event/EventHelper.h"
 
@@ -113,7 +113,7 @@ void Sapphire::Network::GameConnection::reqExamineSearchCommentHandler( const Pa
 {
 
   auto targetId = *reinterpret_cast< const uint32_t* >( &inPacket.data[ 0x10 ] );
-  auto pSession = g_fw.get< Sapphire::ServerMgr >()->getSession( targetId );
+  auto pSession = g_fw.get< World::ServerMgr >()->getSession( targetId );
 
   g_fw.get< Sapphire::Logger >()->debug( std::to_string( targetId ) );
 
@@ -140,7 +140,7 @@ void Sapphire::Network::GameConnection::reqExamineFcInfo( const Packets::FFXIVAR
 {
 
   auto targetId = *reinterpret_cast< const uint32_t* >( &inPacket.data[ 0x18 ] );
-  auto pSession = g_fw.get< Sapphire::ServerMgr >()->getSession( targetId );
+  auto pSession = g_fw.get< World::ServerMgr >()->getSession( targetId );
 
   g_fw.get< Sapphire::Logger >()->debug( std::to_string( targetId ) );
 
@@ -528,7 +528,7 @@ void Sapphire::Network::GameConnection::socialListHandler( const Packets::FFXIVA
 void Sapphire::Network::GameConnection::chatHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                      Entity::Player& player )
 {
-  auto pDebugCom = g_fw.get< DebugCommandHandler >();
+  auto pDebugCom = g_fw.get< DebugCommandMgr >();
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcChatHandler >( inPacket );
 
@@ -600,7 +600,7 @@ void Sapphire::Network::GameConnection::tellHandler( const Packets::FFXIVARR_PAC
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcTellHandler >( inPacket );
 
-  auto pZoneServer = g_fw.get< ServerMgr >();
+  auto pZoneServer = g_fw.get< World::ServerMgr >();
 
   auto pSession = pZoneServer->getSession( packet.data().targetPCName );
 

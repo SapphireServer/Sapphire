@@ -12,7 +12,8 @@ using namespace Sapphire::World;
 
 bool setupFramework()
 {
-  auto pServer = std::make_shared< ServerMgr >( "config.ini" );
+  auto pFramework = Sapphire::make_Framework();
+  auto pServer = std::make_shared< ServerMgr >( "config.ini", pFramework );
   g_fw.set< ServerMgr >( pServer );
 
   return true;
