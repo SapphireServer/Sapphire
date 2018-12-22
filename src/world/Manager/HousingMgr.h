@@ -17,6 +17,47 @@ namespace Sapphire::World::Manager
   {
 
   public:
+
+    struct LandCacheEntry
+    {
+      // land table
+      uint64_t m_landSetId;
+      uint64_t m_landId;
+
+      Common::LandType m_type;
+      uint8_t m_size;
+      uint8_t m_status;
+
+      uint64_t m_currentPrice;
+
+      uint64_t m_updateTime;
+      uint64_t m_ownerId;
+      uint64_t m_houseId;
+
+      // house table
+
+      std::string m_estateWelcome;
+      std::string m_estateComment;
+      std::string m_estateName;
+
+      uint64_t m_buildTime;
+      uint64_t m_endorsements;
+    };
+
+    /*!
+     * @brief Maps land id to a list of cached entries
+     */
+    using LandSetLandCacheMap = std::unordered_map< uint64_t, std::vector< LandCacheEntry > >;
+
+    /*!
+     * @brief Maps container IDs to their relevant ItemContainerPtr
+     */
+    using ContainerIdToContainerMap = std::unordered_map< uint16_t, ItemContainerPtr >;
+    /*!
+     * @brief Maps land idents to a container containing ItemContainerPtrs
+     */
+    using LandIdentToInventoryContainerMap = std::unordered_map< uint64_t, ContainerIdToContainerMap >;
+
     HousingMgr();
     virtual ~HousingMgr();
 
@@ -51,11 +92,51 @@ namespace Sapphire::World::Manager
     void sendEstateGreeting( Entity::Player& player, const Common::LandIdent ident );
 
     /*!
+     * @brief Updates the cached models on a house from the relevant apperance inventories.
+     * Does not send the subsequent update to clients.
+     *
+     * @param house The house to update the models for
+     */
+    void updateHouseModels( HousePtr house );
+
+    /*!
      * @brief Sends the house inventory for the specified type to a player.
      *
-     * This enforces permissions on the inventory too so random players can't request a houses items
+     * This enforces permissions on the inventory too so random players can't request an estates items
      */
-    void sendHousingInventory( Entity::Player& player, uint16_t inventoryType, uint8_t plotNum );
+    void sendEstateInventory( Entity::Player& player, uint16_t inventoryType, uint8_t plotNum );
+
+    /*!
+     * @brief Get the land & house data that was cached on world startup.
+     * @return
+     */
+    const LandSetLandCacheMap& getLandCacheMap();
+
+    /*!
+     * @brief Get all loaded inventories for housing estates
+     * @return
+     */
+    LandIdentToInventoryContainerMap& getEstateInventories();
+
+    /*!
+     * @brief Get an estate inventory for a specific estate
+     * @param ident LandIdent for the specified estate
+     * @return A map containing container ids to ItemContainerPtr
+     */
+    ContainerIdToContainerMap& getEstateInventory( uint64_t ident );
+
+    /*!
+     * @brief Get an estate inventory for a specific estate
+     * @param ident LandIdent for the specified estate
+     * @return A map containing container ids to ItemContainerPtr
+     */
+    ContainerIdToContainerMap& getEstateInventory( Common::LandIdent ident );
+  private:
+    void loadLandCache();
+    bool loadEstateInventories();
+
+    LandSetLandCacheMap m_landCache;
+    LandIdentToInventoryContainerMap m_estateInventories;
 
   };
 

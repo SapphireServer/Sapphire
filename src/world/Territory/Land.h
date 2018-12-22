@@ -33,6 +33,7 @@ namespace Sapphire
     uint8_t getSharing() const;
     uint32_t getLandSetId() const;
     Common::LandType getLandType() const;
+    void setHouse( Sapphire::HousePtr );
     Sapphire::HousePtr getHouse() const;
     Common::FFXIVARR_POSITION3 getMapMarkerPosition();
     Common::LandIdent getLandIdent() const;
@@ -60,9 +61,6 @@ namespace Sapphire
     void setLandTag( uint8_t slot, uint8_t tag );
     uint8_t getLandTag( uint8_t slot );
 
-    ItemContainerPtr getItemContainer( uint16_t inventoryType ) const;
-    void loadItemContainerContents();
-
   private:
     uint32_t convertItemIdToHousingItemId( uint32_t itemId );
     uint32_t getNextHouseId();
@@ -86,7 +84,6 @@ namespace Sapphire
     Sapphire::HousePtr m_pHouse;
 
     //item storage
-    LandInventoryMap m_landInventoryMap;
     uint16_t m_maxPlacedExternalItems;
     uint16_t m_maxPlacedInternalItems;
 

@@ -80,6 +80,7 @@ namespace Sapphire::Db
 
     LAND_INS,
     LAND_SEL,
+    LAND_SEL_ALL,
     LAND_UP,
     LANDSET_SEL,
     HOUSING_HOUSE_INS,

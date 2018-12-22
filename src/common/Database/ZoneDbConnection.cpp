@@ -197,11 +197,14 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     CONNECTION_BOTH );
 
   prepareStatement( HOUSING_HOUSE_UP,
-                    "UPDATE house SET BuildTime = ?, Aetheryte = ?, Comment = ?, HouseName = ?, Endorsements = ?, HousePartModels = ?, HousePartColours = ?, HouseInteriorModels = ? WHERE HouseId = ?;",
+                    "UPDATE house SET BuildTime = ?, Aetheryte = ?, Comment = ?, HouseName = ?, Endorsements = ? WHERE HouseId = ?;",
                     CONNECTION_BOTH );
 
   prepareStatement( LAND_INV_SEL_ALL,
-                    "SELECT LandIdent, ContainerId, ItemId, SlotId FROM houseiteminventory;",
+                    "SELECT houseiteminventory.*, charaglobalitem.catalogId, charaglobalitem.stain, charaglobalitem.CharacterId "
+                    "FROM houseiteminventory "
+                    "LEFT JOIN charaglobalitem "
+                    "ON houseiteminventory.ItemId = charaglobalitem.itemId;",
                     CONNECTION_BOTH );
 
   prepareStatement( LAND_INV_SEL_HOUSE,
@@ -210,6 +213,13 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
 
   prepareStatement( LANDSET_SEL,
                     "SELECT * FROM land WHERE LandSetId = ?;",
+                    CONNECTION_SYNC );
+
+  prepareStatement( LAND_SEL_ALL,
+                    "SELECT land.*, house.Welcome, house.Aetheryte, house.Comment, house.HouseName, house.BuildTime, house.Endorsements "
+                    "FROM land "
+                    "LEFT JOIN house "
+                    "ON land.HouseId = house.HouseId;",
                     CONNECTION_SYNC );
 
   /*prepareStatement( LAND_INS,
