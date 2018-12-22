@@ -434,7 +434,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
       if( param2 == 1 )
         inventoryType = Common::InventoryType::HousingOutdoorStoreroom;
 
-      housingMgr->sendHousingInventory( player, inventoryType, plot );
+      housingMgr->sendEstateInventory( player, inventoryType, plot );
 
       break;
     }

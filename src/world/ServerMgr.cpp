@@ -151,6 +151,12 @@ void Sapphire::ServerMgr::run( int32_t argc, char* argv[] )
   auto pTeriMgr = std::make_shared< Manager::TerritoryMgr >();
   auto pHousingMgr = std::make_shared< Manager::HousingMgr >();
   g_fw.set< Manager::HousingMgr >( pHousingMgr );
+  if( !pHousingMgr->init() )
+  {
+    pLog->fatal( "Failed to setup housing!" );
+    return;
+  }
+
   g_fw.set< Manager::TerritoryMgr >( pTeriMgr );
   if( !pTeriMgr->init() )
   {
