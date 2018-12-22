@@ -33,18 +33,70 @@ using namespace Sapphire::Network::Packets::Server;
 
 extern Sapphire::Framework g_fw;
 
-Sapphire::World::Manager::HousingMgr::HousingMgr()
-{
-
-}
-
-Sapphire::World::Manager::HousingMgr::~HousingMgr()
-{
-
-}
+Sapphire::World::Manager::HousingMgr::HousingMgr() = default;
+Sapphire::World::Manager::HousingMgr::~HousingMgr() = default;
 
 bool Sapphire::World::Manager::HousingMgr::init()
 {
+  auto log = g_fw.get< Sapphire::Logger >();
+
+  log->info( "HousingMgr: Caching housing land data" );
+  //LAND_SEL_ALL
+
+  // 18 wards per territory, 4 territories
+  m_landCache.reserve( 18 * 4 );
+
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+
+  auto stmt = pDb->getPreparedStatement( Db::LAND_SEL_ALL );
+  auto res = pDb->query( stmt );
+
+  while( res->next() )
+  {
+    LandCacheEntry entry;
+
+    // land stuff
+    entry.m_landSetId = res->getUInt64( "LandSetId" );
+    entry.m_landId = res->getUInt64( "LandId" );
+
+    entry.m_type = res->getUInt8( "Type" );
+    entry.m_size = res->getUInt8( "Size" );
+    entry.m_status = res->getUInt8( "Status" );
+    entry.m_landPrice = res->getUInt64( "LandPrice" );
+    entry.m_updateTime = res->getUInt64( "UpdateTime" );
+    entry.m_ownerId = res->getUInt64( "OwnerId" );
+
+    entry.m_houseId = res->getUInt64( "HouseId" );
+
+    // house stuff
+
+    entry.m_estateWelcome = res->getString( "Welcome" );
+    entry.m_estateComment = res->getString( "Comment" );
+    entry.m_houseName = res->getString( "HouseName" );
+    entry.m_buildTime = res->getUInt64( "BuildTime" );
+    entry.m_endorsements = res->getUInt64( "Endorsements" );
+
+    m_landCache[ entry.m_landSetId ].push_back( entry );
+  }
+
+  log->info( "HousingMgr: Checking land counts" );
+
+  uint32_t houseCount = 0;
+  for( auto& landSet : m_landCache )
+  {
+    auto count = landSet.second.size();
+
+    houseCount += count;
+    
+    if( landSet.second.size() != 60 )
+    {
+      log->fatal( "LandSet " + std::to_string( landSet.first ) + " is missing entries. Only have " + std::to_string( count ) + " land entries." );
+      return false;
+    }
+  }
+
+  log->info( "HousingMgr: Cached " + std::to_string( houseCount ) + " houses" );
+
 
   return true;
 }
@@ -472,7 +524,8 @@ Sapphire::Common::LandIdent Sapphire::World::Manager::HousingMgr::clientTriggerP
   return ident;
 }
 
-void Sapphire::World::Manager::HousingMgr::sendHousingInventory( Entity::Player& player, uint16_t inventoryType, uint8_t plotNum )
+void Sapphire::World::Manager::HousingMgr::sendEstateInventory( Entity::Player& player, uint16_t inventoryType,
+                                                                uint8_t plotNum )
 {
   Sapphire::LandPtr targetLand;
 
@@ -516,4 +569,9 @@ void Sapphire::World::Manager::HousingMgr::sendHousingInventory( Entity::Player&
 
   auto invMgr = g_fw.get< Manager::InventoryMgr >();
   invMgr->sendInventoryContainer( player, container );
+}
+
+const Sapphire::World::Manager::HousingMgr::LandSetLandCacheMap& Sapphire::World::Manager::HousingMgr::getLandCacheMap() const
+{
+  return m_landCache;
 }
