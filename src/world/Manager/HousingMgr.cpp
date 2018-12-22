@@ -633,19 +633,19 @@ void Sapphire::World::Manager::HousingMgr::sendEstateInventory( Entity::Player& 
 }
 
 const Sapphire::World::Manager::HousingMgr::LandSetLandCacheMap&
-  Sapphire::World::Manager::HousingMgr::getLandCacheMap() const
+  Sapphire::World::Manager::HousingMgr::getLandCacheMap()
 {
   return m_landCache;
 }
 
-Sapphire::World::Manager::HousingMgr::LandIdentToInventoryContainerMap
-  Sapphire::World::Manager::HousingMgr::getEstateInventories() const
+Sapphire::World::Manager::HousingMgr::LandIdentToInventoryContainerMap&
+  Sapphire::World::Manager::HousingMgr::getEstateInventories()
 {
   return m_estateInventories;
 }
 
-Sapphire::World::Manager::HousingMgr::ContainerIdToContainerMap
-  Sapphire::World::Manager::HousingMgr::getEstateInventory( uint64_t ident ) const
+Sapphire::World::Manager::HousingMgr::ContainerIdToContainerMap&
+  Sapphire::World::Manager::HousingMgr::getEstateInventory( uint64_t ident )
 {
   auto map = m_estateInventories.find( ident );
 
@@ -654,8 +654,8 @@ Sapphire::World::Manager::HousingMgr::ContainerIdToContainerMap
   return map->second;
 }
 
-Sapphire::World::Manager::HousingMgr::ContainerIdToContainerMap
-  Sapphire::World::Manager::HousingMgr::getEstateInventory( Sapphire::Common::LandIdent ident ) const
+Sapphire::World::Manager::HousingMgr::ContainerIdToContainerMap&
+  Sapphire::World::Manager::HousingMgr::getEstateInventory( Sapphire::Common::LandIdent ident )
 {
   auto u64ident = *reinterpret_cast< uint64_t* >( &ident );
 
