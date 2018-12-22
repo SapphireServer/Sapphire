@@ -64,40 +64,27 @@ bool Sapphire::HousingZone::init()
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
   auto info = pExdData->get< Sapphire::Data::HousingLandSet >( housingIndex );
 
-  auto stmt = pDb->getPreparedStatement( Db::LANDSET_SEL );
-  stmt->setUInt64( 1, m_landSetId );
-  auto res = pDb->query( stmt );
+  auto housingMgr = g_fw.get< World::Manager::HousingMgr >();
+  auto landCache = housingMgr->getLandCacheMap();
 
-  std::vector< QueuedLandInit > landInit;
-
-  while( res->next() )
+  // make sure the landset exists
+  auto landSetCache = landCache.find( m_landSetId );
+  if( landSetCache == landCache.end() )
   {
-
-    QueuedLandInit init;
-    init.m_landId = res->getUInt64( "LandId" );
-    init.m_type = static_cast< Common::LandType >( res->getUInt( "Type" ) );
-    init.m_size = res->getUInt( "Size" );
-    init.m_status = res->getUInt( "Status" );
-    init.m_currentPrice = res->getUInt( "LandPrice" );
-    init.m_ownerId = res->getUInt64( "OwnerId" );
-    init.m_houseId = res->getUInt64( "HouseId" );
-
-    landInit.push_back( init );
+    g_fw.get< Sapphire::Logger >()->fatal( "LandSet " + std::to_string( m_landSetId ) + " is missing from the land cache." );
+    return false;
   }
 
-  // nuke current query connection so the queries still in land don't fail
-  res.reset();
-
-  // spawn land
-  for( auto& init : landInit )
+  // init the lands
+  for( auto& entry : landSetCache->second )
   {
-    auto land = make_Land( m_territoryTypeId, getWardNum(), init.m_landId, m_landSetId, info );
-    land->init( init.m_type, init.m_size, init.m_status, init.m_currentPrice, init.m_ownerId, init.m_houseId );
+    auto land = make_Land( m_territoryTypeId, getWardNum(), entry.m_landId, m_landSetId, info );
+    land->init( entry.m_type, entry.m_size, entry.m_status, entry.m_currentPrice, entry.m_ownerId, entry.m_houseId );
 
-    m_landPtrMap[ init.m_landId ] = land;
+    m_landPtrMap[ entry.m_landId ] = land;
 
-    if( init.m_houseId > 0 )
-      registerHouseEntranceEObj( init.m_landId );
+    if( entry.m_houseId > 0 )
+      registerHouseEntranceEObj( entry.m_landId );
   }
 
   return true;

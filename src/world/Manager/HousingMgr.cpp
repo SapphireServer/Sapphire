@@ -59,17 +59,16 @@ bool Sapphire::World::Manager::HousingMgr::init()
     entry.m_landSetId = res->getUInt64( "LandSetId" );
     entry.m_landId = res->getUInt64( "LandId" );
 
-    entry.m_type = res->getUInt8( "Type" );
+    entry.m_type = static_cast< Common::LandType >( res->getUInt( "Type" ) );
     entry.m_size = res->getUInt8( "Size" );
     entry.m_status = res->getUInt8( "Status" );
-    entry.m_landPrice = res->getUInt64( "LandPrice" );
+    entry.m_currentPrice = res->getUInt64( "LandPrice" );
     entry.m_updateTime = res->getUInt64( "UpdateTime" );
     entry.m_ownerId = res->getUInt64( "OwnerId" );
 
     entry.m_houseId = res->getUInt64( "HouseId" );
 
     // house stuff
-
     entry.m_estateWelcome = res->getString( "Welcome" );
     entry.m_estateComment = res->getString( "Comment" );
     entry.m_houseName = res->getString( "HouseName" );
@@ -90,7 +89,7 @@ bool Sapphire::World::Manager::HousingMgr::init()
     
     if( landSet.second.size() != 60 )
     {
-      log->fatal( "LandSet " + std::to_string( landSet.first ) + " is missing entries. Only have " + std::to_string( count ) + " land entries." );
+      log->fatal( "LandSet " + std::to_string( landSet.first ) + " is missing land entries. Only have " + std::to_string( count ) + " land entries." );
       return false;
     }
   }
