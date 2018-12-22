@@ -103,7 +103,7 @@ bool Sapphire::World::Manager::HousingMgr::loadEstateInventories()
     item->setStain( stain );
     // todo: need to set the owner character id on the item
 
-    ContainerIdToContainerMap estateInv = m_estateInventories[ ident ];
+    ContainerIdToContainerMap& estateInv = m_estateInventories[ ident ];
 
     // check if containerId exists
     auto container = estateInv.find( containerId );
@@ -660,4 +660,36 @@ Sapphire::World::Manager::HousingMgr::ContainerIdToContainerMap
   auto u64ident = *reinterpret_cast< uint64_t* >( &ident );
 
   getEstateInventory( u64ident );
+}
+
+void Sapphire::World::Manager::HousingMgr::updateHouseModels( Sapphire::HousePtr house )
+{
+  assert( house );
+
+  auto getItemData = []( uint32_t itemId )
+  {
+    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+    auto info = pExdData->get< Sapphire::Data::Item >( itemId );
+    return info->additionalData;
+  };
+
+  auto containers = getEstateInventory( house->getLandIdent() );
+
+  auto extContainer = containers.find( static_cast< uint16_t >( InventoryType::HousingOutdoorAppearance ) );
+  if( extContainer != containers.end() )
+  {
+    for( auto& item : extContainer->second->getItemMap() )
+    {
+      house->setHousePart( static_cast< Common::HousePartSlot >( item.first ), getItemData( item.second->getId() ) );
+    }
+  }
+
+  auto intContainer = containers.find( static_cast< uint16_t >( InventoryType::HousingInteriorAppearance ) );
+  if( intContainer != containers.end() )
+  {
+    for( auto& item : intContainer->second->getItemMap() )
+    {
+      house->setHouseInteriorPart( static_cast< Common::HousingInteriorSlot >( item.first ), getItemData( item.second->getId() ) );
+    }
+  }
 }

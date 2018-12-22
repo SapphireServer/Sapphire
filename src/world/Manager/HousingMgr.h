@@ -92,6 +92,14 @@ namespace Sapphire::World::Manager
     void sendEstateGreeting( Entity::Player& player, const Common::LandIdent ident );
 
     /*!
+     * @brief Updates the cached models on a house from the relevant apperance inventories.
+     * Does not send the subsequent update to clients.
+     *
+     * @param house The house to update the models for
+     */
+    void updateHouseModels( HousePtr house );
+
+    /*!
      * @brief Sends the house inventory for the specified type to a player.
      *
      * This enforces permissions on the inventory too so random players can't request an estates items
