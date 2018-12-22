@@ -12,7 +12,7 @@
 
 #include "Network/PacketWrappers/InitUIPacket.h"
 
-#include "DebugCommand/DebugCommandHandler.h"
+#include "Manager/DebugCommandMgr.h"
 
 #include "GameConnection.h"
 #include "ServerMgr.h"
@@ -397,7 +397,7 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
                                                        const std::vector< Sapphire::Network::Packets::FFXIVARR_PACKET_RAW >& packetData )
 {
   auto pLog = g_fw.get< Logger >();
-  auto pServerZone = g_fw.get< ServerMgr >();
+  auto pServerZone = g_fw.get< World::ServerMgr >();
   // if a session is set, update the last time it recieved a game packet
   if( m_pSession )
     m_pSession->updateLastDataTime();

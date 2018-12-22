@@ -17,9 +17,8 @@
 #include "Territory/House.h"
 #include "Territory/Housing/HousingInteriorTerritory.h"
 
-extern Sapphire::Framework g_fw;
-
-Sapphire::World::Manager::TerritoryMgr::TerritoryMgr() :
+Sapphire::World::Manager::TerritoryMgr::TerritoryMgr( Sapphire::FrameworkPtr pFw ) :
+  BaseManager( pFw ),
   m_lastInstanceId( 10000 )
 {
 
@@ -27,7 +26,7 @@ Sapphire::World::Manager::TerritoryMgr::TerritoryMgr() :
 
 void Sapphire::World::Manager::TerritoryMgr::loadTerritoryTypeDetailCache()
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = framework()->get< Data::ExdDataGenerated >();
   auto idList = pExdData->getTerritoryTypeIdList();
 
   for( auto id : idList )
@@ -137,8 +136,8 @@ bool Sapphire::World::Manager::TerritoryMgr::isHousingTerritory( uint32_t territ
 
 bool Sapphire::World::Manager::TerritoryMgr::createDefaultTerritories()
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-  auto pLog = g_fw.get< Logger >();
+  auto pExdData = framework()->get< Data::ExdDataGenerated >();
+  auto pLog = framework()->get< Logger >();
   // for each entry in territoryTypeExd, check if it is a normal and if so, add the zone object
   for( const auto& territory : m_territoryTypeDetailCacheMap )
   {
@@ -179,8 +178,8 @@ bool Sapphire::World::Manager::TerritoryMgr::createDefaultTerritories()
 bool Sapphire::World::Manager::TerritoryMgr::createHousingTerritories()
 {
   //separate housing zones from default
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-  auto pLog = g_fw.get< Logger >();
+  auto pExdData = framework()->get< Data::ExdDataGenerated >();
+  auto pLog = framework()->get< Logger >();
   for( const auto& territory : m_territoryTypeDetailCacheMap )
   {
     auto territoryTypeId = territory.first;
@@ -232,8 +231,8 @@ Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createTerritoryInstanc
   if( isInstanceContentTerritory( territoryTypeId ) )
     return nullptr;
 
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-  auto pLog = g_fw.get< Logger >();
+  auto pExdData = framework()->get< Data::ExdDataGenerated >();
+  auto pLog = framework()->get< Logger >();
   auto pTeri = getTerritoryDetail( territoryTypeId );
   auto pPlaceName = pExdData->get< Sapphire::Data::PlaceName >( pTeri->placeName );
 
@@ -256,7 +255,7 @@ Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createTerritoryInstanc
 Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createInstanceContent( uint32_t contentFinderConditionId )
 {
 
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = framework()->get< Data::ExdDataGenerated >();
   auto pContentFinderCondition = pExdData->get< Sapphire::Data::ContentFinderCondition >( contentFinderConditionId );
   if( !pContentFinderCondition )
     return nullptr;
@@ -274,7 +273,7 @@ Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createInstanceContent(
   if( !pTeri || pInstanceContent->name.empty() )
     return nullptr;
 
-  auto pLog = g_fw.get< Logger >();
+  auto pLog = framework()->get< Logger >();
   pLog->debug( "Starting instance for InstanceContent id: " + std::to_string( instanceContentId ) +
                " (" + pInstanceContent->name + ")" );
 
@@ -301,7 +300,7 @@ Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::findOrCreateHousingInt
   }
 
   // otherwise, create it
-  auto housingMgr = g_fw.get< Manager::HousingMgr >();
+  auto housingMgr = framework()->get< Manager::HousingMgr >();
 
   auto parentZone = std::dynamic_pointer_cast< HousingZone >(
     getZoneByLandSetId( housingMgr->toLandSetId( static_cast< uint16_t >( landIdent.territoryTypeId ),
@@ -395,7 +394,7 @@ Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::getInstanceZonePtr( ui
 
 void Sapphire::World::Manager::TerritoryMgr::loadTerritoryPositionMap()
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto pQR = pDb->query( "SELECT id, target_zone_id, pos_x, pos_y, pos_z, pos_o, radius FROM zonepositions;" );
 
   while( pQR->next() )
@@ -454,7 +453,7 @@ void Sapphire::World::Manager::TerritoryMgr::updateTerritoryInstances( uint32_t 
     zone->update( currentTime );
   }
 
-  auto pLog = g_fw.get< Logger >();
+  auto pLog = framework()->get< Logger >();
 
   // remove internal house zones with nobody in them
   for( auto it = m_landIdentToZonePtrMap.begin(); it != m_landIdentToZonePtrMap.end(); )
@@ -502,7 +501,7 @@ bool Sapphire::World::Manager::TerritoryMgr::movePlayer( uint32_t territoryTypeI
 
 bool Sapphire::World::Manager::TerritoryMgr::movePlayer( ZonePtr pZone, Sapphire::Entity::PlayerPtr pPlayer )
 {
-  auto pLog = g_fw.get< Logger >();
+  auto pLog = framework()->get< Logger >();
   if( !pZone )
   {
     pLog->error( "Zone not found on this server." );

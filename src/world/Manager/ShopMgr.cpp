@@ -5,12 +5,17 @@
 #include <Actor/Player.h>
 #include <Common.h>
 
-extern Sapphire::Framework g_fw;
 using namespace Sapphire;
+
+Sapphire::World::Manager::ShopMgr::ShopMgr( FrameworkPtr pFw ) :
+  BaseManager( pFw )
+{
+
+}
 
 bool Sapphire::World::Manager::ShopMgr::purchaseGilShopItem( Entity::Player& player, uint32_t shopId, uint16_t itemId, uint32_t quantity )
 {
-  auto exdData = g_fw.get< Data::ExdDataGenerated >();
+  auto exdData = framework()->get< Data::ExdDataGenerated >();
   if( !exdData )
     return false;
 

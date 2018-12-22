@@ -10,13 +10,18 @@
 
 #include <Actor/Player.h>
 
-extern Sapphire::Framework g_fw;
 using namespace Sapphire::World::Manager;
+
+Sapphire::World::Manager::PlayerMgr::PlayerMgr( Sapphire::FrameworkPtr pFw ) :
+  BaseManager( pFw )
+{
+
+}
 
 void Sapphire::World::Manager::PlayerMgr::movePlayerToLandDestination( Sapphire::Entity::Player& player, uint32_t landId, uint16_t param )
 {
   // check if we have one in the db first
-  auto terriMgr = g_fw.get< TerritoryMgr >();
+  auto terriMgr = framework()->get< TerritoryMgr >();
   if( !terriMgr )
     return;
 
@@ -28,7 +33,7 @@ void Sapphire::World::Manager::PlayerMgr::movePlayerToLandDestination( Sapphire:
     // check if its a housing zone, zoning is different here
     if( terriMgr->isHousingTerritory( terriPos->getTargetZoneId() ) )
     {
-      auto housingMgr = g_fw.get< HousingMgr >();
+      auto housingMgr = framework()->get< HousingMgr >();
       auto landSetId = housingMgr->toLandSetId( terriPos->getTargetZoneId(), param );
 
       auto housingZone = housingMgr->getHousingZoneByLandSetId( landSetId );

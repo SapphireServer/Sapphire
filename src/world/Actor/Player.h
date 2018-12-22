@@ -682,7 +682,7 @@ namespace Sapphire::Entity
     void updateSql();
 
     /*! load player from db, by id */
-    bool load( uint32_t charId, SessionPtr pSession );
+    bool load( uint32_t charId, World::SessionPtr pSession );
 
     /*! load active class data */
     bool loadClassData();

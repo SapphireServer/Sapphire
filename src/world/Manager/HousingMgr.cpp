@@ -31,9 +31,8 @@ using namespace Sapphire::Network;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 
-extern Sapphire::Framework g_fw;
-
-Sapphire::World::Manager::HousingMgr::HousingMgr()
+Sapphire::World::Manager::HousingMgr::HousingMgr( FrameworkPtr pFw ) :
+  BaseManager( pFw )
 {
 
 }
@@ -56,13 +55,13 @@ uint32_t Sapphire::World::Manager::HousingMgr::toLandSetId( uint16_t territoryTy
 
 Sapphire::Data::HousingZonePtr Sapphire::World::Manager::HousingMgr::getHousingZoneByLandSetId( uint32_t id )
 {
-  auto pTeriMgr = g_fw.get< TerritoryMgr >();
+  auto pTeriMgr = framework()->get< TerritoryMgr >();
   return std::dynamic_pointer_cast< HousingZone >( pTeriMgr->getZoneByLandSetId( id ) );
 }
 
 Sapphire::LandPtr Sapphire::World::Manager::HousingMgr::getLandByOwnerId( uint32_t id )
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto res = pDb->query( "SELECT LandSetId, LandId FROM land WHERE OwnerId = " + std::to_string( id ) );
 
   if( !res->next() )
@@ -104,7 +103,7 @@ void Sapphire::World::Manager::HousingMgr::sendLandSignOwned( Entity::Player& pl
   }
 
   uint32_t playerId = land->getOwnerId();
-  std::string playerName = g_fw.get< Sapphire::ServerMgr >()->getPlayerNameFromDb( playerId );
+  std::string playerName = framework()->get< World::ServerMgr >()->getPlayerNameFromDb( playerId );
 
   memcpy( &landInfoSignPacket->data().ownerName, playerName.c_str(), playerName.size() );
 
@@ -278,7 +277,7 @@ void Sapphire::World::Manager::HousingMgr::sendWardLandInfo( Entity::Player& pla
         entry.infoFlags |= Common::WardlandFlags::IsEstateOwned;
 
         auto owner = land->getOwnerId();
-        auto playerName = g_fw.get< Sapphire::ServerMgr >()->getPlayerNameFromDb( owner );
+        auto playerName = framework()->get< World::ServerMgr >()->getPlayerNameFromDb( owner );
         memcpy( &entry.estateOwnerName, playerName.c_str(), playerName.size() );
 
         break;
@@ -514,6 +513,6 @@ void Sapphire::World::Manager::HousingMgr::sendHousingInventory( Entity::Player&
   if( !container )
     return;
 
-  auto invMgr = g_fw.get< Manager::InventoryMgr >();
+  auto invMgr = framework()->get< Manager::InventoryMgr >();
   invMgr->sendInventoryContainer( player, container );
 }

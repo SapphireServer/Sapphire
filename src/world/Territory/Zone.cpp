@@ -223,7 +223,7 @@ void Sapphire::Zone::pushActor( Entity::ActorPtr pActor )
   {
     auto pPlayer = pActor->getAsPlayer();
 
-    auto pServerZone = g_fw.get< ServerMgr >();
+    auto pServerZone = g_fw.get< World::ServerMgr >();
     auto pSession = pServerZone->getSession( pPlayer->getId() );
     if( pSession )
       m_sessionSet.insert( pSession );
@@ -285,7 +285,7 @@ void Sapphire::Zone::queuePacketForRange( Entity::Player& sourcePlayer, uint32_t
   if( pTeriMgr->isPrivateTerritory( getTerritoryTypeId() ) )
     return;
 
-  auto pServerZone = g_fw.get< ServerMgr >();
+  auto pServerZone = g_fw.get< World::ServerMgr >();
   for( auto entry : m_playerMap )
   {
     auto player = entry.second;
@@ -311,7 +311,7 @@ void Sapphire::Zone::queuePacketForZone( Entity::Player& sourcePlayer,
   if( pTeriMgr->isPrivateTerritory( getTerritoryTypeId() ) )
     return;
 
-  auto pServerZone = g_fw.get< ServerMgr >();
+  auto pServerZone = g_fw.get< World::ServerMgr >();
   for( auto entry : m_playerMap )
   {
     auto player = entry.second;

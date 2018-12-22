@@ -47,7 +47,7 @@ namespace Sapphire::Network
     HandlerMap m_chatHandlerMap;
     HandlerStrMap m_chatHandlerStrMap;
 
-    SessionPtr m_pSession;
+    World::SessionPtr m_pSession;
 
     LockedQueue< Sapphire::Network::Packets::FFXIVARR_PACKET_RAW > m_inQueue;
     LockedQueue< Packets::FFXIVPacketBasePtr > m_outQueue;

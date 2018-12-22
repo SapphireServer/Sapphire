@@ -552,7 +552,7 @@ void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACK
     return;
 
   auto pLog = g_fw.get< Logger >();
-  auto pServerZone = g_fw.get< ServerMgr >();
+  auto pServerZone = g_fw.get< World::ServerMgr >();
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcGmCommand2 >( inPacket );
 

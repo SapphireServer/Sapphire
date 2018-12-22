@@ -22,7 +22,7 @@
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 
-#include "DebugCommand/DebugCommandHandler.h"
+#include "Manager/DebugCommandMgr.h"
 
 #include "Event/EventHelper.h"
 
@@ -48,7 +48,7 @@ void examineHandler( Sapphire::Entity::Player& player, uint32_t targetId )
 {
   using namespace Sapphire;
 
-  auto pSession = g_fw.get< Sapphire::ServerMgr >()->getSession( targetId );
+  auto pSession = g_fw.get< World::ServerMgr >()->getSession( targetId );
   if( pSession )
   {
     auto pTarget = pSession->getPlayer();

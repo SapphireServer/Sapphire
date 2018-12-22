@@ -5,69 +5,69 @@
 
 #include "ForwardsZone.h"
 
-namespace Sapphire {
-
-class Session :
-  public std::enable_shared_from_this< Session >
+namespace Sapphire::World
 {
-public:
-  Session( uint32_t sessionId );
 
-  ~Session();
+  class Session : public std::enable_shared_from_this< Session >
+  {
+  public:
+    Session( uint32_t sessionId );
 
-  void setZoneConnection( Network::GameConnectionPtr zoneCon );
+    ~Session();
 
-  void setChatConnection( Network::GameConnectionPtr chatCon );
+    void setZoneConnection( Network::GameConnectionPtr zoneCon );
 
-  Network::GameConnectionPtr getZoneConnection() const;
+    void setChatConnection( Network::GameConnectionPtr chatCon );
 
-  Network::GameConnectionPtr getChatConnection() const;
+    Network::GameConnectionPtr getZoneConnection() const;
 
-  int64_t getLastDataTime() const;
+    Network::GameConnectionPtr getChatConnection() const;
 
-  int64_t getLastSqlTime() const;
+    int64_t getLastDataTime() const;
 
-  void updateLastDataTime();
+    int64_t getLastSqlTime() const;
 
-  void updateLastSqlTime();
+    void updateLastDataTime();
 
-  void startReplay( const std::string& folderpath );
+    void updateLastSqlTime();
 
-  void stopReplay();
+    void startReplay( const std::string& folderpath );
 
-  void processReplay();
+    void stopReplay();
 
-  void sendReplayInfo();
+    void processReplay();
 
-  void close();
+    void sendReplayInfo();
 
-  uint32_t getId() const;
+    void close();
 
-  bool loadPlayer();
+    uint32_t getId() const;
 
-  void update();
+    bool loadPlayer();
 
-  bool isValid() const;
+    void update();
 
-  Entity::PlayerPtr getPlayer() const;
+    bool isValid() const;
 
-private:
-  uint32_t m_sessionId;
+    Entity::PlayerPtr getPlayer() const;
 
-  Entity::PlayerPtr m_pPlayer;
+  private:
+    uint32_t m_sessionId;
 
-  int64_t m_lastDataTime;
+    Entity::PlayerPtr m_pPlayer;
 
-  int64_t m_lastSqlTime;
-  bool m_isValid;
+    int64_t m_lastDataTime;
 
-  bool m_isReplaying;
-  std::vector< std::tuple< uint64_t, std::string > > m_replayCache;
+    int64_t m_lastSqlTime;
+    bool m_isValid;
 
-  Network::GameConnectionPtr m_pZoneConnection;
-  Network::GameConnectionPtr m_pChatConnection;
+    bool m_isReplaying;
+    std::vector< std::tuple< uint64_t, std::string > > m_replayCache;
 
-};
+    Network::GameConnectionPtr m_pZoneConnection;
+    Network::GameConnectionPtr m_pChatConnection;
+
+  };
 
 }
 

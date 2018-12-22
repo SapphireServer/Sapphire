@@ -33,17 +33,15 @@
 #include "Manager/LinkshellMgr.h"
 #include "Manager/TerritoryMgr.h"
 #include "Manager/HousingMgr.h"
-#include "DebugCommand/DebugCommandHandler.h"
+#include "Manager/DebugCommandMgr.h"
 #include "Manager/PlayerMgr.h"
 #include "Manager/ShopMgr.h"
 #include "Manager/InventoryMgr.h"
 
-
-extern Sapphire::Framework g_fw;
-
 using namespace Sapphire::World::Manager;
 
-Sapphire::ServerMgr::ServerMgr( const std::string& configName ) :
+Sapphire::World::ServerMgr::ServerMgr( const std::string& configName, FrameworkPtr pFw ) :
+  Manager::BaseManager( pFw ),
   m_configName( configName ),
   m_bRunning( true ),
   m_lastDBPingTime( 0 ),
@@ -51,19 +49,19 @@ Sapphire::ServerMgr::ServerMgr( const std::string& configName ) :
 {
 }
 
-Sapphire::ServerMgr::~ServerMgr()
+Sapphire::World::ServerMgr::~ServerMgr()
 {
 }
 
-size_t Sapphire::ServerMgr::getSessionCount() const
+size_t Sapphire::World::ServerMgr::getSessionCount() const
 {
   return m_sessionMapById.size();
 }
 
-bool Sapphire::ServerMgr::loadSettings( int32_t argc, char* argv[] )
+bool Sapphire::World::ServerMgr::loadSettings( int32_t argc, char* argv[] )
 {
-  auto pLog = g_fw.get< Sapphire::Logger >();
-  auto pConfig = g_fw.get< Sapphire::ConfigMgr >();
+  auto pLog = framework()->get< Sapphire::Logger >();
+  auto pConfig = framework()->get< Sapphire::ConfigMgr >();
 
   pLog->info( "Loading config " + m_configName );
 
@@ -80,7 +78,7 @@ bool Sapphire::ServerMgr::loadSettings( int32_t argc, char* argv[] )
   return true;
 }
 
-void Sapphire::ServerMgr::run( int32_t argc, char* argv[] )
+void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
 {
   using namespace Sapphire;
   using namespace Sapphire::World;
@@ -88,12 +86,12 @@ void Sapphire::ServerMgr::run( int32_t argc, char* argv[] )
   auto pLog = std::make_shared< Logger >();
   pLog->setLogPath( "log/world" );
   pLog->init();
-  g_fw.set< Logger >( pLog );
+  framework()->set< Logger >( pLog );
 
   printBanner();
 
   auto pConfig = std::make_shared< ConfigMgr >();
-  g_fw.set< ConfigMgr >( pConfig );
+  framework()->set< ConfigMgr >( pConfig );
   if( !loadSettings( argc, argv ) )
   {
     pLog->fatal( "Unable to load settings!" );
@@ -109,7 +107,7 @@ void Sapphire::ServerMgr::run( int32_t argc, char* argv[] )
     pLog->fatal( "DataPath: " + dataPath );
     return;
   }
-  g_fw.set< Data::ExdDataGenerated >( pExdData );
+  framework()->set< Data::ExdDataGenerated >( pExdData );
 
   Sapphire::Db::ConnectionInfo info;
   info.password = pConfig->getValue< std::string >( "Database", "Password", "" );
@@ -128,16 +126,16 @@ void Sapphire::ServerMgr::run( int32_t argc, char* argv[] )
     pLog->fatal( "Database not initialized properly!" );
     return;
   }
-  g_fw.set< Db::DbWorkerPool< Db::ZoneDbConnection > >( pDb );
+  framework()->set< Db::DbWorkerPool< Db::ZoneDbConnection > >( pDb );
 
   pLog->info( "LinkshellMgr: Caching linkshells" );
-  auto pLsMgr = std::make_shared< Manager::LinkshellMgr >();
+  auto pLsMgr = std::make_shared< Manager::LinkshellMgr >( framework() );
   if( !pLsMgr->loadLinkshells() )
   {
     pLog->fatal( "Unable to load linkshells!" );
     return;
   }
-  g_fw.set< Manager::LinkshellMgr >( pLsMgr );
+  framework()->set< Manager::LinkshellMgr >( pLsMgr );
 
   auto pScript = std::make_shared< Scripting::ScriptMgr >();
   if( !pScript->init() )
@@ -145,13 +143,13 @@ void Sapphire::ServerMgr::run( int32_t argc, char* argv[] )
     pLog->fatal( "Failed to setup scripts!" );
     return;
   }
-  g_fw.set< Scripting::ScriptMgr >( pScript );
+  framework()->set< Scripting::ScriptMgr >( pScript );
 
   pLog->info( "TerritoryMgr: Setting up zones" );
-  auto pTeriMgr = std::make_shared< Manager::TerritoryMgr >();
-  auto pHousingMgr = std::make_shared< Manager::HousingMgr >();
-  g_fw.set< Manager::HousingMgr >( pHousingMgr );
-  g_fw.set< Manager::TerritoryMgr >( pTeriMgr );
+  auto pTeriMgr = std::make_shared< Manager::TerritoryMgr >( framework() );
+  auto pHousingMgr = std::make_shared< Manager::HousingMgr >( framework() );
+  framework()->set< Manager::HousingMgr >( pHousingMgr );
+  framework()->set< Manager::TerritoryMgr >( pTeriMgr );
   if( !pTeriMgr->init() )
   {
     pLog->fatal( "Failed to setup zones!" );
@@ -166,15 +164,15 @@ void Sapphire::ServerMgr::run( int32_t argc, char* argv[] )
   std::vector< std::thread > thread_list;
   thread_list.emplace_back( std::thread( std::bind( &Network::Hive::Run, hive.get() ) ) );
 
-  auto pDebugCom = std::make_shared< DebugCommandHandler >();
-  auto pPlayerMgr = std::make_shared< Manager::PlayerMgr >();
-  auto pShopMgr = std::make_shared< Manager::ShopMgr >();
+  auto pDebugCom = std::make_shared< DebugCommandMgr >( framework() );
+  auto pPlayerMgr = std::make_shared< Manager::PlayerMgr >( framework() );
+  auto pShopMgr = std::make_shared< Manager::ShopMgr >( framework() );
   auto pInventoryMgr = std::make_shared< Manager::InventoryMgr >();
 
-  g_fw.set< DebugCommandHandler >( pDebugCom );
-  g_fw.set< Manager::PlayerMgr >( pPlayerMgr );
-  g_fw.set< Manager::ShopMgr >( pShopMgr );
-  g_fw.set< Manager::InventoryMgr >( pInventoryMgr );
+  framework()->set< DebugCommandMgr >( pDebugCom );
+  framework()->set< Manager::PlayerMgr >( pPlayerMgr );
+  framework()->set< Manager::ShopMgr >( pShopMgr );
+  framework()->set< Manager::InventoryMgr >( pInventoryMgr );
 
   pLog->info( "World server running on " + m_ip + ":" + std::to_string( m_port ) );
 
@@ -187,19 +185,19 @@ void Sapphire::ServerMgr::run( int32_t argc, char* argv[] )
 
 }
 
-uint16_t Sapphire::ServerMgr::getWorldId() const
+uint16_t Sapphire::World::ServerMgr::getWorldId() const
 {
   return m_worldId;
 }
 
-void Sapphire::ServerMgr::setWorldId( uint16_t worldId )
+void Sapphire::World::ServerMgr::setWorldId( uint16_t worldId )
 {
   m_worldId = worldId;
 }
 
-void Sapphire::ServerMgr::printBanner() const
+void Sapphire::World::ServerMgr::printBanner() const
 {
-  auto pLog = g_fw.get< Sapphire::Logger >();
+  auto pLog = framework()->get< Sapphire::Logger >();
 
   pLog->info( "===========================================================" );
   pLog->info( "Sapphire Server Project " );
@@ -209,12 +207,12 @@ void Sapphire::ServerMgr::printBanner() const
   pLog->info( "===========================================================" );
 }
 
-void Sapphire::ServerMgr::mainLoop()
+void Sapphire::World::ServerMgr::mainLoop()
 {
-  auto pLog = g_fw.get< Logger >();
-  auto pTeriMgr = g_fw.get< TerritoryMgr >();
-  auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pLog = framework()->get< Logger >();
+  auto pTeriMgr = framework()->get< TerritoryMgr >();
+  auto pScriptMgr = framework()->get< Scripting::ScriptMgr >();
+  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
 
   while( isRunning() )
   {
@@ -290,13 +288,13 @@ void Sapphire::ServerMgr::mainLoop()
   }
 }
 
-bool Sapphire::ServerMgr::createSession( uint32_t sessionId )
+bool Sapphire::World::ServerMgr::createSession( uint32_t sessionId )
 {
-  auto pLog = g_fw.get< Sapphire::Logger >();
+  auto pLog = framework()->get< Sapphire::Logger >();
 
   std::lock_guard< std::mutex > lock( m_sessionMutex );
 
-  const std::string session_id_str = std::to_string( sessionId );
+  const auto session_id_str = std::to_string( sessionId );
 
   auto it = m_sessionMapById.find( sessionId );
 
@@ -323,15 +321,14 @@ bool Sapphire::ServerMgr::createSession( uint32_t sessionId )
 
 }
 
-void Sapphire::ServerMgr::removeSession( uint32_t sessionId )
+void Sapphire::World::ServerMgr::removeSession( uint32_t sessionId )
 {
   m_sessionMapById.erase( sessionId );
 }
 
-Sapphire::SessionPtr Sapphire::ServerMgr::getSession( uint32_t id )
+Sapphire::World::SessionPtr Sapphire::World::ServerMgr::getSession( uint32_t id )
 {
   //std::lock_guard<std::mutex> lock( m_sessionMutex );
-
   auto it = m_sessionMapById.find( id );
 
   if( it != m_sessionMapById.end() )
@@ -340,7 +337,7 @@ Sapphire::SessionPtr Sapphire::ServerMgr::getSession( uint32_t id )
   return nullptr;
 }
 
-Sapphire::SessionPtr Sapphire::ServerMgr::getSession( const std::string& playerName )
+Sapphire::World::SessionPtr Sapphire::World::ServerMgr::getSession( const std::string& playerName )
 {
   //std::lock_guard<std::mutex> lock( m_sessionMutex );
 
@@ -352,18 +349,18 @@ Sapphire::SessionPtr Sapphire::ServerMgr::getSession( const std::string& playerN
   return nullptr;
 }
 
-void Sapphire::ServerMgr::removeSession( const std::string& playerName )
+void Sapphire::World::ServerMgr::removeSession( const std::string& playerName )
 {
   m_sessionMapByName.erase( playerName );
 }
 
 
-bool Sapphire::ServerMgr::isRunning() const
+bool Sapphire::World::ServerMgr::isRunning() const
 {
   return m_bRunning;
 }
 
-std::string Sapphire::ServerMgr::getPlayerNameFromDb( uint32_t playerId, bool forceDbLoad )
+std::string Sapphire::World::ServerMgr::getPlayerNameFromDb( uint32_t playerId, bool forceDbLoad )
 {
   if( !forceDbLoad )
   {
@@ -373,7 +370,7 @@ std::string Sapphire::ServerMgr::getPlayerNameFromDb( uint32_t playerId, bool fo
       return ( it->second );
   }
 
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto res = pDb->query( "SELECT name FROM charainfo WHERE characterid = " + std::to_string( playerId ) );
 
   if( !res->next() )
@@ -385,16 +382,16 @@ std::string Sapphire::ServerMgr::getPlayerNameFromDb( uint32_t playerId, bool fo
   return playerName;
 }
 
-void Sapphire::ServerMgr::updatePlayerName( uint32_t playerId, const std::string & playerNewName )
+void Sapphire::World::ServerMgr::updatePlayerName( uint32_t playerId, const std::string & playerNewName )
 {
   m_playerNameMapById[ playerId ] = playerNewName;
 }
 
-void Sapphire::ServerMgr::loadBNpcTemplates()
+void Sapphire::World::ServerMgr::loadBNpcTemplates()
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  auto pTeriMgr = g_fw.get< TerritoryMgr >();
-  auto pLog = g_fw.get< Logger >();
+  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pTeriMgr = framework()->get< TerritoryMgr >();
+  auto pLog = framework()->get< Logger >();
 
   auto stmt = pDb->getPreparedStatement( Db::ZoneDbStatements::ZONE_SEL_BNPCTEMPLATES );
 
@@ -433,7 +430,7 @@ void Sapphire::ServerMgr::loadBNpcTemplates()
 
 }
 
-Sapphire::Entity::BNpcTemplatePtr Sapphire::ServerMgr::getBNpcTemplate( const std::string& key )
+Sapphire::Entity::BNpcTemplatePtr Sapphire::World::ServerMgr::getBNpcTemplate( const std::string& key )
 {
   auto it = m_bNpcTemplateMap.find( key );
 
@@ -443,7 +440,7 @@ Sapphire::Entity::BNpcTemplatePtr Sapphire::ServerMgr::getBNpcTemplate( const st
   return it->second;
 }
 
-Sapphire::Entity::BNpcTemplatePtr Sapphire::ServerMgr::getBNpcTemplate( uint32_t id )
+Sapphire::Entity::BNpcTemplatePtr Sapphire::World::ServerMgr::getBNpcTemplate( uint32_t id )
 {
   for( auto entry : m_bNpcTemplateMap )
   {
