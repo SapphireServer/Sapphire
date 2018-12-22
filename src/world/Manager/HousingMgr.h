@@ -24,11 +24,11 @@ namespace Sapphire::World::Manager
       uint64_t m_landSetId;
       uint64_t m_landId;
 
-      uint8_t m_type;
+      Common::LandType m_type;
       uint8_t m_size;
       uint8_t m_status;
 
-      uint64_t m_landPrice;
+      uint64_t m_currentPrice;
 
       uint64_t m_updateTime;
       uint64_t m_ownerId;
