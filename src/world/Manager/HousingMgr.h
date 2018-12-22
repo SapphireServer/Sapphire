@@ -110,27 +110,27 @@ namespace Sapphire::World::Manager
      * @brief Get the land & house data that was cached on world startup.
      * @return
      */
-    const LandSetLandCacheMap& getLandCacheMap() const;
+    const LandSetLandCacheMap& getLandCacheMap();
 
     /*!
      * @brief Get all loaded inventories for housing estates
      * @return
      */
-    LandIdentToInventoryContainerMap getEstateInventories() const;
+    LandIdentToInventoryContainerMap& getEstateInventories();
 
     /*!
      * @brief Get an estate inventory for a specific estate
      * @param ident LandIdent for the specified estate
      * @return A map containing container ids to ItemContainerPtr
      */
-    ContainerIdToContainerMap getEstateInventory( uint64_t ident ) const;
+    ContainerIdToContainerMap& getEstateInventory( uint64_t ident );
 
     /*!
      * @brief Get an estate inventory for a specific estate
      * @param ident LandIdent for the specified estate
      * @return A map containing container ids to ItemContainerPtr
      */
-    ContainerIdToContainerMap getEstateInventory( Common::LandIdent ident ) const;
+    ContainerIdToContainerMap& getEstateInventory( Common::LandIdent ident );
   private:
     void loadLandCache();
     bool loadEstateInventories();
