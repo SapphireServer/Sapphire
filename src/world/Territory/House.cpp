@@ -60,32 +60,32 @@ uint32_t Sapphire::House::getHouseId() const
   return m_houseId;
 }
 
-uint8_t Sapphire::House::getHousePartColor( Common::HousePartSlot slot ) const
+uint8_t Sapphire::House::getHouseModelColor( Common::HousePartSlot slot ) const
 {
   return m_houseModelsCache[ slot ].second;
 }
 
-uint32_t Sapphire::House::getHouseInteriorPart( Common::HousingInteriorSlot slot ) const
+uint32_t Sapphire::House::getHouseInteriorModel( Common::HousingInteriorSlot slot ) const
 {
   return m_houseInteriorModels[ slot ];
 }
 
-void Sapphire::House::setHousePart( Common::HousePartSlot slot, uint32_t id )
+void Sapphire::House::setHouseModel( Common::HousePartSlot slot, uint32_t id )
 {
   m_houseModelsCache[ slot ].first = id;
 }
 
-void Sapphire::House::setHousePartColor( Common::HousePartSlot slot, uint32_t id )
+void Sapphire::House::setHouseModelColor( Common::HousePartSlot slot, uint32_t id )
 {
   m_houseModelsCache[ slot ].second = id;
 }
 
-void Sapphire::House::setHouseInteriorPart( Common::HousingInteriorSlot slot, uint32_t id )
+void Sapphire::House::setHouseInteriorModel( Common::HousingInteriorSlot slot, uint32_t id )
 {
   m_houseInteriorModels[ slot ] = id;
 }
 
-uint32_t Sapphire::House::getHousePart( Common::HousePartSlot slot ) const
+uint32_t Sapphire::House::getHouseModel( Common::HousePartSlot slot ) const
 {
   return m_houseModelsCache[ slot ].first;
 }
