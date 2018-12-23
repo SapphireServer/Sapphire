@@ -563,6 +563,8 @@ void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& pl
   if( !initHouseModels( player, pLand, presetItem ) )
     return;
 
+  createHouse( house );
+
   pLand->setState( HouseState::privateHouse );
   pLand->setLandType( LandType::Private );
   hZone->sendLandUpdate( plotNum );
