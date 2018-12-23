@@ -142,9 +142,17 @@ namespace Sapphire::World::Manager
      */
     bool initHouseModels( Entity::Player& player, LandPtr land, uint32_t presetCatalogId );
 
+  private:
+
+    /*!
+     * @brief Creates a house and saves the minimum amount required to persist a house through restarts.
+     *
+     * Any other changes will be covered by the usual saving logic and can be safely ignored here.
+     *
+     * @param house The house to create in the house table
+     */
     void createHouse( HousePtr house ) const;
 
-  private:
     /*!
      * @brief Gets the next available house id
      * @return The next available house id
