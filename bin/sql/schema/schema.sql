@@ -563,3 +563,14 @@ CREATE TABLE `zonepositions` (
   `radius` int(11) NOT NULL DEFAULT '2',
   PRIMARY KEY(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
+
+CREATE TABLE `landplaceditems` (
+	`ItemId` INT(20) UNSIGNED NOT NULL,
+	`PosX` FLOAT NOT NULL,
+	`PosY` FLOAT NOT NULL,
+	`PosZ` FLOAT NOT NULL,
+	`Rotation` INT(10) NOT NULL,
+	PRIMARY KEY (`ItemId`)
+)
+COLLATE='latin1_swedish_ci' ENGINE=InnoDB;
+
