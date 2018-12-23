@@ -11,23 +11,20 @@ namespace Sapphire
 
   private:
     std::string m_logFile;
-
-  public:
     Logger();
-
     ~Logger();
 
-    void init();
+  public:
 
-    void error( const std::string& text );
+    static void init( const std::string& logPath );
 
-    void info( const std::string& text );
+    static void error( const std::string& text );
 
-    void debug( const std::string& text );
+    static void info( const std::string& text );
 
-    void fatal( const std::string& text );
+    static void debug( const std::string& text );
 
-    void setLogPath( const std::string& logPath );
+    static void fatal( const std::string& text );
 
   };
 

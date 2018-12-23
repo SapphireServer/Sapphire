@@ -28,7 +28,7 @@ extern Sapphire::Framework g_fw;
 using namespace Sapphire::Common;
 
 Sapphire::Land::Land( uint16_t territoryTypeId, uint8_t wardNum, uint8_t landId, uint32_t landSetId,
-                  Sapphire::Data::HousingLandSetPtr info ) :
+                      Sapphire::Data::HousingLandSetPtr info ) :
   m_currentPrice( 0 ),
   m_minPrice( 0 ),
   m_nextDrop( static_cast< uint32_t >( Util::getTimeSeconds() ) + 21600 ),
@@ -119,7 +119,7 @@ void Sapphire::Land::loadItemContainerContents()
     return;
 
   auto ident = *reinterpret_cast< uint64_t* >( &m_landIdent );
-  g_fw.get< Sapphire::Logger >()->debug( "Loading housing inventory for ident: " + std::to_string( ident ) );
+  Logger::debug( "Loading housing inventory for ident: " + std::to_string( ident ) );
 
   auto pDB = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
 

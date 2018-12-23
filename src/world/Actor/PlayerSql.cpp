@@ -33,7 +33,6 @@ bool Sapphire::Entity::Player::load( uint32_t charId, World::SessionPtr pSession
 {
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto pTeriMgr = g_fw.get< TerritoryMgr >();
-  auto pLog = g_fw.get< Logger >();
 
   const std::string char_id_str = std::to_string( charId );
 
@@ -99,8 +98,8 @@ bool Sapphire::Entity::Player::load( uint32_t charId, World::SessionPtr pSession
   // see if a valid zone could be found for the character
   if( !pCurrZone )
   {
-    pLog->error( "[" + char_id_str + "] Zone " + std::to_string( zoneId ) + " not found!" );
-    pLog->error( "[" + char_id_str + "] Setting default zone instead" );
+    Logger::error( "[" + char_id_str + "] Zone " + std::to_string( zoneId ) + " not found!" );
+    Logger::error( "[" + char_id_str + "] Setting default zone instead" );
 
     // default to new gridania
     // TODO: should probably just abort and mark character as corrupt
@@ -198,7 +197,7 @@ bool Sapphire::Entity::Player::load( uint32_t charId, World::SessionPtr pSession
   m_pCell = nullptr;
 
   if( !loadActiveQuests() || !loadClassData() || !loadSearchInfo() )
-    pLog->error( "Player id " + char_id_str + " data corrupt!" );
+    Logger::error( "Player id " + char_id_str + " data corrupt!" );
 
   m_maxHp = getMaxHp();
   m_maxMp = getMaxMp();

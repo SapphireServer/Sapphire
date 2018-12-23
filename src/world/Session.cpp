@@ -117,7 +117,6 @@ void Sapphire::World::Session::updateLastSqlTime()
 
 void Sapphire::World::Session::startReplay( const std::string& path )
 {
-  auto pLog = g_fw.get< Logger >();
   if( !fs::exists( path ) )
   {
     getPlayer()->sendDebug( "Couldn't find folder." );
@@ -154,7 +153,7 @@ void Sapphire::World::Session::startReplay( const std::string& path )
     m_replayCache.push_back( std::tuple< uint64_t, std::string >(
       Util::getTimeMs() + ( std::get< 0 >( set ) - startTime ), std::get< 1 >( set ) ) );
 
-    pLog->info( "Registering " + std::get< 1 >( set ) + " for " + std::to_string( std::get< 0 >( set ) - startTime ) );
+    Logger::info( "Registering " + std::get< 1 >( set ) + " for " + std::to_string( std::get< 0 >( set ) - startTime ) );
   }
 
   getPlayer()->sendDebug( "Registered " + std::to_string( m_replayCache.size() ) + " sets for replay" );

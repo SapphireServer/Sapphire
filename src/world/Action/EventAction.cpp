@@ -95,8 +95,7 @@ void Sapphire::Action::EventAction::onFinish()
   }
   catch( std::exception& e )
   {
-    auto pLog = g_fw.get< Logger >();
-    pLog->error( e.what() );
+    Logger::error( e.what() );
   }
 
 }
@@ -134,8 +133,7 @@ void Sapphire::Action::EventAction::onInterrupt()
   }
   catch( std::exception& e )
   {
-    auto pLog = g_fw.get< Logger >();
-    pLog->error( e.what() );
+    Logger::error( e.what() );
   }
 
 }

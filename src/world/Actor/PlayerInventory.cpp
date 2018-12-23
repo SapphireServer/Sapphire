@@ -425,7 +425,6 @@ uint32_t Sapphire::Entity::Player::getCrystal( CrystalType type )
 
 void Sapphire::Entity::Player::writeInventory( InventoryType type )
 {
-  auto pLog = g_fw.get< Logger >();
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
 
   auto storage = m_storageMap[ type ];
@@ -450,7 +449,6 @@ void Sapphire::Entity::Player::writeInventory( InventoryType type )
   if( storage->isMultiStorage() )
     query += " AND storageId = " + std::to_string( static_cast< uint16_t >( type ) );
 
-  pLog->debug( query );
   pDb->execute( query );
 }
 

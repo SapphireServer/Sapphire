@@ -580,7 +580,6 @@ void Sapphire::Zone::updateActorPosition( Entity::Actor& actor )
 
     if( pOldCell )
     {
-      auto pLog = g_fw.get< Logger >();
       pOldCell->removeActor( actor.shared_from_this() );
     }
 
@@ -678,16 +677,14 @@ void Sapphire::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
 
 void Sapphire::Zone::onPlayerZoneIn( Entity::Player& player )
 {
-  auto pLog = g_fw.get< Logger >();
-  pLog->debug(
+  Logger::debug(
     "Zone::onEnterTerritory: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryTypeId() ) +
     +", Entity#" + std::to_string( player.getId() ) );
 }
 
 void Sapphire::Zone::onLeaveTerritory( Entity::Player& player )
 {
-  auto pLog = g_fw.get< Logger >();
-  pLog->debug(
+  Logger::debug(
     "Zone::onLeaveTerritory: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryTypeId() ) +
     +", Entity#" + std::to_string( player.getId() ) );
 }
@@ -716,7 +713,7 @@ void Sapphire::Zone::registerEObj( Entity::EventObjectPtr object )
 {
   if( !object )
     return;
-  auto pLog = g_fw.get< Logger >();
+
   object->setId( getNextEObjId() );
   pushActor( object );
 
@@ -724,7 +721,7 @@ void Sapphire::Zone::registerEObj( Entity::EventObjectPtr object )
 
   onRegisterEObj( object );
 
-  //pLog->debug( "Registered instance eobj: " + std::to_string( object->getId() ) );
+  //Logger::debug( "Registered instance eobj: " + std::to_string( object->getId() ) );
 }
 
 Sapphire::Entity::EventObjectPtr Sapphire::Zone::getEObj( uint32_t objId )

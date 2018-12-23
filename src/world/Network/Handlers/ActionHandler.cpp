@@ -28,14 +28,13 @@
 #include "Session.h"
 #include "Framework.h"
 
-extern Sapphire::Framework g_fw;
-
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
 
-void Sapphire::Network::GameConnection::actionHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::actionHandler( FrameworkPtr pFw,
+                                                       const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                        Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcSkillHandler >( inPacket );
@@ -47,8 +46,8 @@ void Sapphire::Network::GameConnection::actionHandler( const Packets::FFXIVARR_P
 
   player.sendDebug( "Skill type:" + std::to_string( type ) );
 
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-  auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
+  auto pExdData = pFw->get< Data::ExdDataGenerated >();
+  auto pScriptMgr = pFw->get< Scripting::ScriptMgr >();
 
   switch( type )
   {

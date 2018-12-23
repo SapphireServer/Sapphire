@@ -74,10 +74,9 @@ Sapphire::Data::ExdDataGenerated::InstanceContentPtr Sapphire::InstanceContent::
 
 void Sapphire::InstanceContent::onPlayerZoneIn( Entity::Player& player )
 {
-  auto pLog = g_fw.get< Logger >();
-  pLog->debug( "InstanceContent::onPlayerZoneIn: Zone#" + std::to_string( getGuId() ) + "|"
-               + std::to_string( getInstanceContentId() ) +
-               +", Entity#" + std::to_string( player.getId() ) );
+  Logger::debug( "InstanceContent::onPlayerZoneIn: Zone#" + std::to_string( getGuId() ) + "|"
+                 + std::to_string( getInstanceContentId() ) +
+                 +", Entity#" + std::to_string( player.getId() ) );
 
   // mark player as "bound by duty"
   player.setStateFlag( PlayerStateFlag::BoundByDuty );
@@ -91,10 +90,9 @@ void Sapphire::InstanceContent::onPlayerZoneIn( Entity::Player& player )
 
 void Sapphire::InstanceContent::onLeaveTerritory( Entity::Player& player )
 {
-  auto pLog = g_fw.get< Logger >();
-  pLog->debug( "InstanceContent::onLeaveTerritory: Zone#" + std::to_string( getGuId() ) + "|"
-               + std::to_string( getInstanceContentId() ) +
-               +", Entity#" + std::to_string( player.getId() ) );
+  Logger::debug( "InstanceContent::onLeaveTerritory: Zone#" + std::to_string( getGuId() ) + "|"
+                 + std::to_string( getInstanceContentId() ) +
+                 +", Entity#" + std::to_string( player.getId() ) );
   sendDirectorClear( player );
 
   player.setDirectorInitialized( false );
@@ -315,16 +313,15 @@ void Sapphire::InstanceContent::onRegisterEObj( Entity::EventObjectPtr object )
   if( object->getObjectId() == 2000182 ) // start
     m_pEntranceEObj = object;
 
-  auto pLog = g_fw.get< Logger >();
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
   auto objData = pExdData->get< Sapphire::Data::EObj >( object->getObjectId() );
   if( objData )
     // todo: data should be renamed to eventId
     m_eventIdToObjectMap[ objData->data ] = object;
   else
-    pLog->error( "InstanceContent::onRegisterEObj Zone " +
-                 m_internalName + ": No EObj data found for EObj with ID: " +
-                 std::to_string( object->getObjectId() ) );
+    Logger::error( "InstanceContent::onRegisterEObj Zone " +
+                   m_internalName + ": No EObj data found for EObj with ID: " +
+                   std::to_string( object->getObjectId() ) );
 }
 
 bool Sapphire::InstanceContent::hasPlayerPreviouslySpawned( Entity::Player& player ) const

@@ -139,7 +139,6 @@ void Sapphire::World::Manager::DebugCommandMgr::help( char* data, Entity::Player
 void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player& player,
                                                      std::shared_ptr< DebugCommand > command )
 {
-  auto pLog = framework()->get< Logger >();
   auto pTerriMgr = framework()->get< TerritoryMgr >();
   auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   std::string subCommand = "";
@@ -160,7 +159,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
   if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
     params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-  pLog->debug( "[" + std::to_string( player.getId() ) + "] " +
+  Logger::debug( "[" + std::to_string( player.getId() ) + "] " +
                "subCommand " + subCommand + " params: " + params );
 
   if( ( ( subCommand == "pos" ) || ( subCommand == "posr" ) ) && ( params != "" ) )
@@ -379,7 +378,6 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
 void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player& player,
                                                      std::shared_ptr< DebugCommand > command )
 {
-  auto pLog = framework()->get< Logger >();
   std::string subCommand;
   std::string params = "";
 
@@ -398,8 +396,8 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
   if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
     params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-  pLog->debug( "[" + std::to_string( player.getId() ) + "] " +
-               "subCommand " + subCommand + " params: " + params );
+  Logger::debug( "[" + std::to_string( player.getId() ) + "] " +
+                 "subCommand " + subCommand + " params: " + params );
 
 
   if( subCommand == "status" )
@@ -514,7 +512,6 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
 void Sapphire::World::Manager::DebugCommandMgr::get( char* data, Entity::Player& player,
                                                      std::shared_ptr< DebugCommand > command )
 {
-  auto pLog = framework()->get< Logger >();
   auto pExdData = framework()->get< Data::ExdDataGenerated >();
   std::string subCommand;
   std::string params = "";
@@ -534,8 +531,8 @@ void Sapphire::World::Manager::DebugCommandMgr::get( char* data, Entity::Player&
   if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
     params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-  pLog->debug( "[" + std::to_string( player.getId() ) + "] " +
-               "subCommand " + subCommand + " params: " + params );
+  Logger::debug( "[" + std::to_string( player.getId() ) + "] " +
+                 "subCommand " + subCommand + " params: " + params );
 
 
   if( ( subCommand == "pos" ) )
@@ -580,7 +577,6 @@ void Sapphire::World::Manager::DebugCommandMgr::injectChatPacket( char* data, En
 void Sapphire::World::Manager::DebugCommandMgr::replay( char* data, Entity::Player& player,
                                                         std::shared_ptr< DebugCommand > command )
 {
-  auto pLog = framework()->get< Logger >();
   auto pServerZone = framework()->get< World::ServerMgr >();
   std::string subCommand;
   std::string params = "";
@@ -600,8 +596,8 @@ void Sapphire::World::Manager::DebugCommandMgr::replay( char* data, Entity::Play
   if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
     params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-  pLog->debug( "[" + std::to_string( player.getId() ) + "] " +
-               "subCommand " + subCommand + " params: " + params );
+  Logger::debug( "[" + std::to_string( player.getId() ) + "] " +
+                 "subCommand " + subCommand + " params: " + params );
 
 
   if( subCommand == "start" )
@@ -690,7 +686,6 @@ Sapphire::World::Manager::DebugCommandMgr::serverInfo( char* data, Entity::Playe
 void Sapphire::World::Manager::DebugCommandMgr::script( char* data, Entity::Player& player,
                                                         std::shared_ptr< DebugCommand > command )
 {
-  auto pLog = framework()->get< Logger >();
   auto pScriptMgr = framework()->get< Scripting::ScriptMgr >();
   std::string subCommand;
   std::string params = "";
@@ -711,8 +706,8 @@ void Sapphire::World::Manager::DebugCommandMgr::script( char* data, Entity::Play
   if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
     params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-  pLog->debug( "[" + std::to_string( player.getId() ) + "] " +
-               "subCommand " + subCommand + " params: " + params );
+  Logger::debug( "[" + std::to_string( player.getId() ) + "] " +
+                 "subCommand " + subCommand + " params: " + params );
 
   if( subCommand == "unload" )
   {
