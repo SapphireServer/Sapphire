@@ -193,7 +193,7 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
 
   /// HOUSING
   prepareStatement( HOUSING_HOUSE_INS,
-                    "INSERT INTO house ( LandSetId, HouseId ) VALUES ( ?, ? );",
+                    "INSERT INTO house ( LandSetId, HouseId, HouseName ) VALUES ( ?, ?, ? );",
                     CONNECTION_BOTH );
 
   prepareStatement( HOUSING_HOUSE_UP,

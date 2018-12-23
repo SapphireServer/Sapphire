@@ -142,6 +142,7 @@ namespace Sapphire::World::Manager
      */
     bool initHouseModels( Entity::Player& player, LandPtr land, uint32_t presetCatalogId );
 
+    void createHouse( HousePtr house ) const;
 
   private:
     /*!

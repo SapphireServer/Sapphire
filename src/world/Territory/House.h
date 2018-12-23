@@ -22,7 +22,7 @@ namespace Sapphire
     //gerneral
     uint32_t getLandSetId() const;
     Common::LandIdent getLandIdent() const;
-    uint32_t getHouseId() const;
+    uint32_t getId() const;
 
     const std::string& getHouseName() const;
     void setHouseName( const std::string& name );

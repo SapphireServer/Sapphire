@@ -232,7 +232,7 @@ void Sapphire::Land::updateLandDb()
   uint32_t houseId = 0;
 
   if( getHouse() )
-    houseId = getHouse()->getHouseId();
+    houseId = getHouse()->getId();
 
   // todo: change to prepared statement
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
