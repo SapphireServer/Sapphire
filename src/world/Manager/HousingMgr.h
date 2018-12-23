@@ -18,6 +18,10 @@ namespace Sapphire::World::Manager
 
   public:
 
+    /*!
+     * @brief Structure that is generated and filled on world launch. Used to store housing data during init
+     * so we don't need to query them individually.
+     */
     struct LandCacheEntry
     {
       // land table
@@ -97,7 +101,7 @@ namespace Sapphire::World::Manager
      *
      * @param house The house to update the models for
      */
-    void updateHouseModelsFromDb( HousePtr house );
+    void updateHouseModels( HousePtr house );
 
     /*!
      * @brief Sends the house inventory for the specified type to a player.
@@ -131,9 +135,38 @@ namespace Sapphire::World::Manager
      * @return A map containing container ids to ItemContainerPtr
      */
     ContainerIdToContainerMap& getEstateInventory( Common::LandIdent ident );
+
+    /**
+     * @brief Sets up inventories and spawns the base items for the house appearance
+     * @param land The house to update
+     */
+    bool initHouseModels( Entity::Player& player, LandPtr land, uint32_t presetCatalogId );
+
+
   private:
+    /*!
+     * @brief Gets the next available house id
+     * @return The next available house id
+     */
+    uint64_t getNextHouseId();
+
+    /*!
+     * @brief Loads all the land entries from the database and caches them to speed up housing territory init
+     */
     void loadLandCache();
+
+    /*!
+     * @brief Loads all the inventories for every estate on the world and sets up their containers
+     * @return True if it was successful
+     */
     bool loadEstateInventories();
+
+    /*!
+     * @brief Gets the additionalData field from item.exd for an item
+     * @param catalogId The item id to lookup in item.exd
+     * @return The additionalData field from item.exd
+     */
+    uint32_t getItemAdditionalData( uint32_t catalogId );
 
     LandSetLandCacheMap m_landCache;
     LandIdentToInventoryContainerMap m_estateInventories;

@@ -248,7 +248,7 @@ namespace Sapphire::Common
 
     // housing exterior containers
     HousingOutdoorPlacedItems = 25001,
-    HousingOutdoorAppearance = 25000,
+    HousingExteriorAppearance = 25000,
     HousingOutdoorStoreroom = 27000,
 
 
@@ -769,7 +769,7 @@ namespace Sapphire::Common
     MountSkill = 0xD,
   };
 
-  enum HousePartSlot
+  enum HouseExteriorSlot
   {
     ExteriorRoof,
     ExteriorWall,

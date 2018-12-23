@@ -91,13 +91,13 @@ bool Sapphire::World::Manager::HousingMgr::loadEstateInventories()
   while( res->next() )
   {
     //uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, bool isHq
-    uint64_t ident = res->getUInt64( "LandIdent" );
-    uint16_t containerId = res->getUInt16( "ContainerId" );
-    uint64_t itemId = res->getUInt64( "ItemId" );
-    uint16_t slot = res->getUInt16( "SlotId" );
-    uint32_t catalogId = res->getUInt( "catalogId" );
-    uint8_t stain = res->getUInt8( "stain" );
-    uint64_t characterId = res->getUInt64( "CharacterId" );
+   auto ident = res->getUInt64( "LandIdent" );
+   auto containerId = res->getUInt16( "ContainerId" );
+   auto itemId = res->getUInt64( "ItemId" );
+   auto slot = res->getUInt16( "SlotId" );
+   auto catalogId = res->getUInt( "catalogId" );
+   auto stain = res->getUInt8( "stain" );
+   auto characterId = res->getUInt64( "CharacterId" );
 
     auto item = make_Item( itemId, catalogId, 0, 0, 0 );
     item->setStain( stain );
@@ -160,6 +160,17 @@ void Sapphire::World::Manager::HousingMgr::loadLandCache()
 
     m_landCache[ entry.m_landSetId ].push_back( entry );
   }
+}
+
+uint64_t Sapphire::World::Manager::HousingMgr::getNextHouseId()
+{
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pQR = pDb->query( "SELECT MAX( HouseId ) FROM house" );
+
+  if( !pQR->next() )
+    return 0;
+
+  return pQR->getUInt64( 1 ) + 1;
 }
 
 uint32_t Sapphire::World::Manager::HousingMgr::toLandSetId( uint16_t territoryTypeId, uint8_t wardId ) const
@@ -430,6 +441,86 @@ void Sapphire::World::Manager::HousingMgr::sendEstateGreeting( Entity::Player& p
   player.queuePacket( greetingPacket );
 }
 
+bool Sapphire::World::Manager::HousingMgr::initHouseModels( Entity::Player& player, LandPtr land, uint32_t presetCatalogId )
+{
+  auto house = land->getHouse();
+  assert( house );
+
+  auto itemMax = land->getInventoryItemMax();
+
+  // type, maxSize, tableName, isMultiStorage
+  auto intContainer = make_ItemContainer( InventoryType::HousingInteriorAppearance, itemMax.second, "houseiteminventory", true );
+  auto extContainer = make_ItemContainer( InventoryType::HousingExteriorAppearance, itemMax.first, "houseiteminventory", true );
+
+  // add containers to inv collection
+  auto& houseInventory = getEstateInventory( house->getLandIdent() );
+  houseInventory[ InventoryType::HousingInteriorAppearance ] = intContainer;
+  houseInventory[ InventoryType::HousingExteriorAppearance ] = extContainer;
+
+  auto exdData = g_fw.get< Sapphire::Data::ExdDataGenerated >();
+  auto preset = exdData->get< Sapphire::Data::HousingPreset >( getItemAdditionalData( presetCatalogId ) );
+  if( !preset )
+    return false;
+
+  // high iq shit
+  auto invMap = std::map< uint16_t, std::map< uint32_t, int32_t > >
+  {
+    // external
+    {
+      InventoryType::HousingExteriorAppearance,
+      {
+        { HouseExteriorSlot::ExteriorRoof, preset->exteriorRoof },
+        { HouseExteriorSlot::ExteriorWall, preset->exteriorWall },
+        { HouseExteriorSlot::ExteriorWindow, preset->exteriorWindow },
+        { HouseExteriorSlot::ExteriorDoor, preset->exteriorDoor }
+      }
+    },
+
+    // internal
+    {
+      InventoryType::HousingInteriorAppearance,
+      {
+        // lobby/middle floor
+        { HousingInteriorSlot::InteriorWall, preset->interiorWall },
+        { HousingInteriorSlot::InteriorFloor, preset->interiorFlooring },
+        { HousingInteriorSlot::InteriorLight, preset->interiorLighting },
+
+        // attic
+        { HousingInteriorSlot::InteriorWall_Attic, preset->otherFloorWall },
+        { HousingInteriorSlot::InteriorFloor_Attic, preset->otherFloorFlooring },
+        { HousingInteriorSlot::InteriorLight_Attic, preset->otherFloorLighting },
+
+        // basement
+        { HousingInteriorSlot::InteriorWall_Basement, preset->basementWall },
+        { HousingInteriorSlot::InteriorFloor_Basement, preset->basementFlooring },
+        { HousingInteriorSlot::InteriorLight_Basement, preset->basementLighting },
+      }
+    }
+  };
+
+  auto invMgr = g_fw.get< InventoryMgr >();
+
+  // create and link items
+  for( auto& destContainer : invMap )
+  {
+    auto container = houseInventory[ destContainer.first ];
+
+    for( auto& item : destContainer.second )
+    {
+      auto pItem = invMgr->createItem( player, item.second );
+
+      container->setItem( item.first, pItem );
+    }
+
+    invMgr->saveHousingContainer( land->getLandIdent(), container );
+  }
+
+  // lift off
+  updateHouseModels( house );
+
+  return true;
+}
+
 void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& player, uint8_t plotNum, uint32_t presetItem )
 {
   auto hZone = std::dynamic_pointer_cast< HousingZone >( player.getCurrentZone() );
@@ -447,7 +538,15 @@ void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& pl
 
   // todo: check if permit is in inventory and remove one
 
-  if( !pLand->setPreset( presetItem ) )
+  // create house
+  auto ident = pLand->getLandIdent();
+  auto house = make_House( getNextHouseId(), pLand->getLandSetId(), ident,
+                           "Estate #" + std::to_string( ident.landId + 1 ), "" );
+
+  pLand->setHouse( house );
+
+  // create inventory items
+  if( !initHouseModels( player, pLand, presetItem ) )
     return;
 
   pLand->setState( HouseState::privateHouse );
@@ -465,7 +564,7 @@ void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& pl
   player.eventStart( player.getId(), 0x000B0095, Event::EventHandler::EventType::Housing, 1, 1 );
   player.playScene( 0x000B0095, 0, SET_BASE | HIDE_HOTBAR , 0, 1, plotNum, nullptr );
 
-  player.setLandFlags( LandFlagsSlot::Private, EstateBuilt, pLand->getLandIdent() );
+  player.setLandFlags( LandFlagsSlot::Private, EstateBuilt, ident );
   player.sendLandFlagsSlot( LandFlagsSlot::Private );
 
   hZone->registerHouseEntranceEObj( plotNum );
@@ -647,11 +746,7 @@ Sapphire::World::Manager::HousingMgr::LandIdentToInventoryContainerMap&
 Sapphire::World::Manager::HousingMgr::ContainerIdToContainerMap&
   Sapphire::World::Manager::HousingMgr::getEstateInventory( uint64_t ident )
 {
-  auto map = m_estateInventories.find( ident );
-
-  assert( map != m_estateInventories.end() );
-
-  return map->second;
+  return m_estateInventories[ ident ];
 }
 
 Sapphire::World::Manager::HousingMgr::ContainerIdToContainerMap&
@@ -662,26 +757,19 @@ Sapphire::World::Manager::HousingMgr::ContainerIdToContainerMap&
   return getEstateInventory( u64ident );
 }
 
-void Sapphire::World::Manager::HousingMgr::updateHouseModelsFromDb( Sapphire::HousePtr house )
+void Sapphire::World::Manager::HousingMgr::updateHouseModels( Sapphire::HousePtr house )
 {
   assert( house );
 
-  auto getItemData = []( uint32_t itemId )
-  {
-    auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-    auto info = pExdData->get< Sapphire::Data::Item >( itemId );
-    return info->additionalData;
-  };
+  auto& containers = getEstateInventory( house->getLandIdent() );
 
-  auto containers = getEstateInventory( house->getLandIdent() );
-
-  auto extContainer = containers.find( static_cast< uint16_t >( InventoryType::HousingOutdoorAppearance ) );
+  auto extContainer = containers.find( static_cast< uint16_t >( InventoryType::HousingExteriorAppearance ) );
   if( extContainer != containers.end() )
   {
     for( auto& item : extContainer->second->getItemMap() )
     {
-      house->setExteriorModel( static_cast< Common::HousePartSlot >( item.first ),
-                               getItemData( item.second->getId() ), item.second->getStain() );
+      house->setExteriorModel( static_cast< Common::HouseExteriorSlot >( item.first ),
+                               getItemAdditionalData( item.second->getId() ), item.second->getStain() );
     }
   }
   else
@@ -695,11 +783,18 @@ void Sapphire::World::Manager::HousingMgr::updateHouseModelsFromDb( Sapphire::Ho
     for( auto& item : intContainer->second->getItemMap() )
     {
       house->setInteriorModel( static_cast< Common::HousingInteriorSlot >( item.first ),
-                               getItemData( item.second->getId() ) );
+                               getItemAdditionalData( item.second->getId() ) );
     }
   }
   else
   {
     g_fw.get< Logger >()->error( "Plot " + std::to_string( house->getLandIdent().landId ) + " has an invalid inventory configuration for indoor appearance." );
   }
+}
+
+uint32_t Sapphire::World::Manager::HousingMgr::getItemAdditionalData( uint32_t catalogId )
+{
+  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto info = pExdData->get< Sapphire::Data::Item >( catalogId );
+  return info->additionalData;
 }

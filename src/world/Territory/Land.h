@@ -20,6 +20,7 @@ namespace Sapphire
     void init( Common::LandType type, uint8_t size, uint8_t state, uint32_t currentPrice, uint64_t ownerId, uint64_t houseId );
 
     using LandInventoryMap = std::unordered_map< uint16_t, ItemContainerPtr >;
+    using InvMaxItemsPair = std::pair< uint16_t, uint16_t >;
 
     //Primary state
     void setSize( uint8_t size );
@@ -60,6 +61,8 @@ namespace Sapphire
     //House tags
     void setLandTag( uint8_t slot, uint8_t tag );
     uint8_t getLandTag( uint8_t slot );
+
+    InvMaxItemsPair getInventoryItemMax() const;
 
   private:
     uint32_t convertItemIdToHousingItemId( uint32_t itemId );

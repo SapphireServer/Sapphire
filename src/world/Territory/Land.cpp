@@ -88,25 +88,6 @@ void Sapphire::Land::init( Common::LandType type, uint8_t size, uint8_t state, u
     default:
       break;
   }
-
-  // init item containers
-//  auto setupContainer = [ this ]( InventoryType type, uint16_t maxSize )
-//  {
-//    m_landInventoryMap[ type ] = make_ItemContainer( type, maxSize, "houseiteminventory", true, true );
-//  };
-//
-//  setupContainer( InventoryType::HousingOutdoorAppearance, 8 );
-//  setupContainer( InventoryType::HousingOutdoorPlacedItems, m_maxPlacedExternalItems );
-//  setupContainer( InventoryType::HousingOutdoorStoreroom, m_maxPlacedExternalItems );
-//
-//  setupContainer( InventoryType::HousingInteriorAppearance, 9 );
-//
-//  // nb: so we're going to store these internally in one container because SE is fucked in the head
-//  // but when an inventory is requested, we will split them into groups of 50
-//  setupContainer( InventoryType::HousingInteriorPlacedItems1, m_maxPlacedInternalItems );
-//  setupContainer( InventoryType::HousingInteriorStoreroom1, m_maxPlacedInternalItems );
-//
-//  loadItemContainerContents();
 }
 
 uint32_t Sapphire::Land::convertItemIdToHousingItemId( uint32_t itemId )
@@ -281,68 +262,7 @@ void Sapphire::Land::update( uint32_t currTime )
   }
 }
 
-uint32_t Sapphire::Land::getNextHouseId()
+Sapphire::Land::InvMaxItemsPair Sapphire::Land::getInventoryItemMax() const
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  auto pQR = pDb->query( "SELECT MAX( HouseId ) FROM house" );
-
-  if( !pQR->next() )
-    return 0;
-
-  return pQR->getUInt( 1 ) + 1;
-}
-
-bool Sapphire::Land::setPreset( uint32_t itemId )
-{
-  auto housingItemId = convertItemIdToHousingItemId( itemId );
-
-  auto exdData = g_fw.get< Sapphire::Data::ExdDataGenerated >();
-  if( !exdData )
-    return false;
-
-  auto housingPreset = exdData->get< Sapphire::Data::HousingPreset >( housingItemId );
-  if( !housingPreset )
-    return false;
-
-  if( !getHouse() )
-  {
-    // todo: i guess we'd create a house here?
-    auto newId = getNextHouseId();
-
-    m_pHouse = make_House( newId, getLandSetId(), getLandIdent(), "Estate #" + std::to_string( m_landIdent.landId + 1 ), "" );
-  }
-
-
-//  getHouse()->setHouseModel( Common::HousePartSlot::ExteriorRoof,
-//                             convertItemIdToHousingItemId( housingPreset->exteriorRoof ) );
-//  getHouse()->setHouseModel( Common::HousePartSlot::ExteriorWall,
-//                             convertItemIdToHousingItemId( housingPreset->exteriorWall ) );
-//  getHouse()->setHouseModel( Common::HousePartSlot::ExteriorWindow,
-//                             convertItemIdToHousingItemId( housingPreset->exteriorWindow ) );
-//  getHouse()->setHouseModel( Common::HousePartSlot::ExteriorDoor,
-//                             convertItemIdToHousingItemId( housingPreset->exteriorDoor ) );
-//
-//  getHouse()->setHouseInteriorModel( Common::HousingInteriorSlot::InteriorWall,
-//                                     convertItemIdToHousingItemId( housingPreset->interiorWall ) );
-//  getHouse()->setHouseInteriorModel( Common::HousingInteriorSlot::InteriorFloor,
-//                                     convertItemIdToHousingItemId( housingPreset->interiorFlooring ) );
-//  getHouse()->setHouseInteriorModel( Common::HousingInteriorSlot::InteriorLight,
-//                                     convertItemIdToHousingItemId( housingPreset->interiorLighting ) );
-//  getHouse()->setHouseInteriorModel( Common::HousingInteriorSlot::InteriorWall_Attic,
-//                                     convertItemIdToHousingItemId( housingPreset->otherFloorWall ) );
-//  getHouse()->setHouseInteriorModel( Common::HousingInteriorSlot::InteriorFloor_Attic,
-//                                     convertItemIdToHousingItemId( housingPreset->otherFloorFlooring ) );
-//  getHouse()->setHouseInteriorModel( Common::HousingInteriorSlot::InteriorLight_Attic,
-//                                     convertItemIdToHousingItemId( housingPreset->otherFloorLighting ) );
-//  getHouse()->setHouseInteriorModel( Common::HousingInteriorSlot::InteriorWall_Basement,
-//                                     convertItemIdToHousingItemId( housingPreset->basementWall ) );
-//  getHouse()->setHouseInteriorModel( Common::HousingInteriorSlot::InteriorFloor_Basement,
-//                                     convertItemIdToHousingItemId( housingPreset->basementFlooring ) );
-//  getHouse()->setHouseInteriorModel( Common::HousingInteriorSlot::InteriorLight_Basement,
-//                                     convertItemIdToHousingItemId( housingPreset->basementLighting ) );
-//  getHouse()->setHouseInteriorModel( Common::HousingInteriorSlot::InteriorLight_Mansion,
-//                                     convertItemIdToHousingItemId( housingPreset->mansionLighting ) );
-
-
-  return true;
+  return std::make_pair( m_maxPlacedExternalItems, m_maxPlacedInternalItems );
 }
