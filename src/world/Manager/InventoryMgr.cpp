@@ -83,7 +83,7 @@ Sapphire::ItemPtr Sapphire::World::Manager::InventoryMgr::createItem( Entity::Pl
   auto stmt = pDb->getPreparedStatement( Db::CHARA_ITEMGLOBAL_INS );
 
   stmt->setUInt( 1, player.getId() );
-  stmt->setUInt( 2, item->getUId() );
+  stmt->setUInt64( 2, item->getUId() );
   stmt->setUInt( 3, item->getId() );
   stmt->setUInt( 4, item->getStackSize() );
 

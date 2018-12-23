@@ -35,6 +35,11 @@ namespace World::Territory::Housing
 TYPE_FORWARD( HousingInteriorTerritory );
 }
 
+namespace Inventory
+{
+TYPE_FORWARD( HousingItem );
+}
+
 namespace World::Manager
 {
 TYPE_FORWARD( HousingMgr );

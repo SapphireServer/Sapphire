@@ -25,7 +25,7 @@
 #include "ServerMgr.h"
 #include "Territory/House.h"
 #include "InventoryMgr.h"
-#include "Inventory/Item.h"
+#include "Inventory/HousingItem.h"
 #include "Inventory/ItemContainer.h"
 
 using namespace Sapphire::Common;
@@ -91,15 +91,15 @@ bool Sapphire::World::Manager::HousingMgr::loadEstateInventories()
   while( res->next() )
   {
     //uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, bool isHq
-   auto ident = res->getUInt64( "LandIdent" );
-   auto containerId = res->getUInt16( "ContainerId" );
-   auto itemId = res->getUInt64( "ItemId" );
-   auto slot = res->getUInt16( "SlotId" );
-   auto catalogId = res->getUInt( "catalogId" );
-   auto stain = res->getUInt8( "stain" );
-   auto characterId = res->getUInt64( "CharacterId" );
+    auto ident = res->getUInt64( "LandIdent" );
+    auto containerId = res->getUInt16( "ContainerId" );
+    auto itemId = res->getUInt64( "ItemId" );
+    auto slot = res->getUInt16( "SlotId" );
+    auto catalogId = res->getUInt( "catalogId" );
+    auto stain = res->getUInt8( "stain" );
+    auto characterId = res->getUInt64( "CharacterId" );
 
-    auto item = make_Item( itemId, catalogId, 0, 0, 0 );
+    auto item = Inventory::make_HousingItem( itemId, catalogId );
     item->setStain( stain );
     // todo: need to set the owner character id on the item
 
@@ -739,12 +739,10 @@ void Sapphire::World::Manager::HousingMgr::sendEstateInventory( Entity::Player& 
   if( targetLand->getOwnerId() != player.getId() )
     return;
 
-  auto container = getEstateInventory( targetLand->getLandIdent() )[ inventoryType ];
-  if( !container )
-    return;
+  auto& containers = getEstateInventory( targetLand->getLandIdent() );
 
   auto invMgr = g_fw.get< Manager::InventoryMgr >();
-  invMgr->sendInventoryContainer( player, container );
+  invMgr->sendInventoryContainer( player, containers[ inventoryType ] );
 }
 
 const Sapphire::World::Manager::HousingMgr::LandSetLandCacheMap&
