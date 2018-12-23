@@ -201,10 +201,13 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     CONNECTION_BOTH );
 
   prepareStatement( LAND_INV_SEL_ALL,
-                    "SELECT houseiteminventory.*, charaglobalitem.catalogId, charaglobalitem.stain, charaglobalitem.CharacterId "
+                    "SELECT houseiteminventory.*, charaglobalitem.catalogId, charaglobalitem.stain, charaglobalitem.CharacterId, "
+                    "landplaceditems.PosX, landplaceditems.PosY, landplaceditems.PosZ, landplaceditems.Rotation "
                     "FROM houseiteminventory "
                     "LEFT JOIN charaglobalitem "
-                    "ON houseiteminventory.ItemId = charaglobalitem.itemId;",
+                    "ON houseiteminventory.ItemId = charaglobalitem.itemId "
+                    "LEFT JOIN landplaceditems "
+                    "ON houseiteminventory.ItemId = landplaceditems.ItemId;",
                     CONNECTION_BOTH );
 
   prepareStatement( LAND_INV_SEL_HOUSE,
