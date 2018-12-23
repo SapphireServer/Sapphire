@@ -521,6 +521,20 @@ bool Sapphire::World::Manager::HousingMgr::initHouseModels( Entity::Player& play
   return true;
 }
 
+void Sapphire::World::Manager::HousingMgr::createHouse( Sapphire::HousePtr house ) const
+{
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+
+  auto stmt = pDb->getPreparedStatement( Db::HOUSING_HOUSE_INS );
+  // LandSetId, HouseId, HouseName
+
+  stmt->setUInt( 1, house->getLandSetId() );
+  stmt->setUInt( 2, house->getId() );
+  stmt->setString( 3, house->getHouseName() );
+
+  pDb->execute( stmt );
+}
+
 void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& player, uint8_t plotNum, uint32_t presetItem )
 {
   auto hZone = std::dynamic_pointer_cast< HousingZone >( player.getCurrentZone() );

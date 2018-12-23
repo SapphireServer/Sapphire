@@ -53,7 +53,7 @@ Sapphire::Common::LandIdent Sapphire::House::getLandIdent() const
   return m_landIdent;
 }
 
-uint32_t Sapphire::House::getHouseId() const
+uint32_t Sapphire::House::getId() const
 {
   return m_houseId;
 }
