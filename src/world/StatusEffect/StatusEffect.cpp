@@ -20,7 +20,7 @@ using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 
 Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
-                                                uint32_t duration, uint32_t tickRate )
+                                                    uint32_t duration, uint32_t tickRate )
   :
   m_id( id ), m_sourceActor( sourceActor ), m_targetActor( targetActor ), m_duration( duration ), m_startTime( 0 ),
   m_tickRate( tickRate ), m_lastTick( 0 )

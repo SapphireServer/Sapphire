@@ -20,8 +20,6 @@
 #include "Framework.h"
 #include "Forwards.h"
 
-extern Sapphire::Framework g_fw;
-
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
@@ -386,7 +384,7 @@ void Sapphire::Network::GameConnection::injectPacket( const std::string& packetp
 void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
                                                        const std::vector< Sapphire::Network::Packets::FFXIVARR_PACKET_RAW >& packetData )
 {
-  auto pServerZone = g_fw.get< World::ServerMgr >();
+  auto pServerZone = m_pFw->get< World::ServerMgr >();
   // if a session is set, update the last time it recieved a game packet
   if( m_pSession )
     m_pSession->updateLastDataTime();

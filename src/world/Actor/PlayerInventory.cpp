@@ -11,7 +11,7 @@
 
 #include "Inventory/Item.h"
 #include "Inventory/ItemContainer.h"
-#include "Inventory/ItemUtil.h"
+
 
 #include "Player.h"
 #include "Framework.h"
@@ -28,6 +28,7 @@
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 
 #include "Manager/InventoryMgr.h"
+#include "Manager/ItemMgr.h"
 
 #include "Framework.h"
 #include <Network/CommonActorControl.h>
@@ -510,7 +511,7 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_
   // add the related armoury bag to the applicable bags and try and fill a free slot there before falling back to regular inventory
   if( itemInfo->isEquippable && getEquipDisplayFlags() & StoreNewItemsInArmouryChest )
   {
-    auto bag = Items::Util::getCharaEquipSlotCategoryToArmoryId( itemInfo->equipSlotCategory );
+    auto bag = World::Manager::ItemMgr::getCharaEquipSlotCategoryToArmoryId( itemInfo->equipSlotCategory );
 
     bags.insert( bags.begin(), bag );
   }
@@ -622,7 +623,7 @@ Sapphire::Entity::Player::moveItem( uint16_t fromInventoryId, uint8_t fromSlotId
 
 bool Sapphire::Entity::Player::updateContainer( uint16_t storageId, uint8_t slotId, ItemPtr pItem )
 {
-  auto containerType = Items::Util::getContainerType( storageId );
+  auto containerType = World::Manager::ItemMgr::getContainerType( storageId );
 
   m_storageMap[ storageId ]->setItem( slotId, pItem );
 
@@ -733,17 +734,17 @@ void Sapphire::Entity::Player::swapItem( uint16_t fromInventoryId, uint8_t fromS
 
   // An item is being moved from bag0-3 to equippment, meaning
   // the swapped out item will be placed in the matching armory.
-  if( Items::Util::isEquipment( toInventoryId )
-      && !Items::Util::isEquipment( fromInventoryId )
-      && !Items::Util::isArmory( fromInventoryId ) )
+  if( World::Manager::ItemMgr::isEquipment( toInventoryId )
+      && !World::Manager::ItemMgr::isEquipment( fromInventoryId )
+      && !World::Manager::ItemMgr::isArmory( fromInventoryId ) )
   {
     updateContainer( fromInventoryId, fromSlotId, nullptr );
-    fromInventoryId = Items::Util::getCharaEquipSlotCategoryToArmoryId( toSlot );
+    fromInventoryId = World::Manager::ItemMgr::getCharaEquipSlotCategoryToArmoryId( toSlot );
     fromSlotId = static_cast < uint8_t >( m_storageMap[ fromInventoryId ]->getFreeSlot() );
   }
 
-  auto containerTypeFrom = Items::Util::getContainerType( fromInventoryId );
-  auto containerTypeTo = Items::Util::getContainerType( toInventoryId );
+  auto containerTypeFrom = World::Manager::ItemMgr::getContainerType( fromInventoryId );
+  auto containerTypeTo = World::Manager::ItemMgr::getContainerType( toInventoryId );
 
   updateContainer( toInventoryId, toSlot, fromItem );
   updateContainer( fromInventoryId, fromSlotId, toItem );
@@ -805,7 +806,7 @@ uint16_t Sapphire::Entity::Player::calculateEquippedGearItemLevel()
       iLvlResult += currItem->getItemLevel();
 
       // If item is weapon and isn't one-handed
-      if( currItem->isWeapon() && !Items::Util::isOneHandedWeapon( currItem->getCategory() ) )
+      if( currItem->isWeapon() && !World::Manager::ItemMgr::isOneHandedWeapon( currItem->getCategory() ) )
       {
         iLvlResult += currItem->getItemLevel();
       }

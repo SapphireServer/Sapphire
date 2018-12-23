@@ -16,7 +16,8 @@
 #include "Actor/Player.h"
 #include "Inventory/ItemContainer.h"
 #include "Inventory/Item.h"
-#include "Inventory/ItemUtil.h"
+
+#include "Manager/ItemMgr.h"
 
 #include "Forwards.h"
 #include "Land.h"
@@ -122,6 +123,7 @@ void Sapphire::Land::loadItemContainerContents()
   Logger::debug( "Loading housing inventory for ident: " + std::to_string( ident ) );
 
   auto pDB = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pItemMgr = g_fw.get< World::Manager::ItemMgr >();
 
   auto stmt = pDB->getPreparedStatement( Db::LAND_INV_SEL_HOUSE );
   stmt->setUInt64( 1, ident );
@@ -148,7 +150,7 @@ void Sapphire::Land::loadItemContainerContents()
     // todo: delet this
     for( auto fuck = it->second.begin(); fuck != it->second.end(); fuck++ )
     {
-      auto item = Sapphire::Items::Util::loadItem( fuck->second );
+      auto item = pItemMgr->loadItem( fuck->second );
       if( item )
         container->setItem( fuck->first, item );
     }

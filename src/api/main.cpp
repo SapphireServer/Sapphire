@@ -32,8 +32,6 @@
 #include "Forwards.h"
 #include "SapphireAPI.h"
 
-
-Sapphire::Framework g_fw;
 Sapphire::Db::DbWorkerPool< Sapphire::Db::ZoneDbConnection > g_charaDb;
 Sapphire::Data::ExdDataGenerated g_exdDataGen;
 Sapphire::Network::SapphireAPI g_sapphireAPI;

@@ -9,10 +9,7 @@
 #include "Actor/Player.h"
 
 #include "Session.h"
-#include "Framework.h"
 
-
-extern Sapphire::Framework g_fw;
 namespace fs = std::experimental::filesystem;
 
 Sapphire::World::Session::Session( uint32_t sessionId ) :

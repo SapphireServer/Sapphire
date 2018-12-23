@@ -16,7 +16,7 @@
 #include "Territory/Zone.h"
 #include "Inventory/Item.h"
 #include "Inventory/ItemContainer.h"
-#include "Inventory/ItemUtil.h"
+#include "Manager/ItemMgr.h"
 
 #include "ServerMgr.h"
 #include "Framework.h"
@@ -570,6 +570,7 @@ Sapphire::ItemPtr Sapphire::Entity::Player::createItem( uint32_t catalogId, uint
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto itemInfo = pExdData->get< Sapphire::Data::Item >( catalogId );
+  auto itemMgr = g_fw.get< World::Manager::ItemMgr >();
 
   if( !itemInfo )
     return nullptr;
@@ -579,7 +580,7 @@ Sapphire::ItemPtr Sapphire::Entity::Player::createItem( uint32_t catalogId, uint
 
   uint8_t flags = 0;
 
-  ItemPtr pItem = make_Item( Items::Util::getNextUId(),
+  ItemPtr pItem = make_Item( itemMgr->getNextUId(),
                              catalogId,
                              itemInfo->modelMain,
                              itemInfo->modelSub );
@@ -598,6 +599,7 @@ Sapphire::ItemPtr Sapphire::Entity::Player::createItem( uint32_t catalogId, uint
 
 bool Sapphire::Entity::Player::loadInventory()
 {
+  auto itemMgr = g_fw.get< World::Manager::ItemMgr >();
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   //////////////////////////////////////////////////////////////////////////////////////////////////////
   // load active gearset
@@ -619,7 +621,7 @@ bool Sapphire::Entity::Player::loadInventory()
       if( uItemId == 0 )
         continue;
 
-      ItemPtr pItem = Items::Util::loadItem( uItemId );
+      ItemPtr pItem = itemMgr->loadItem( uItemId );
 
       if( pItem == nullptr )
         continue;
@@ -652,7 +654,7 @@ bool Sapphire::Entity::Player::loadInventory()
       if( uItemId == 0 )
         continue;
 
-      ItemPtr pItem = Items::Util::loadItem( uItemId );
+      ItemPtr pItem = itemMgr->loadItem( uItemId );
 
       if( pItem == nullptr )
         continue;

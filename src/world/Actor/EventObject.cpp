@@ -18,10 +18,6 @@ using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
 
-#include "Framework.h"
-
-extern Sapphire::Framework g_fw;
-
 Sapphire::Entity::EventObject::EventObject( uint32_t actorId, uint32_t objectId, uint32_t gimmickId,
                                         uint8_t initialState, Common::FFXIVARR_POSITION3 pos,
                                         float rotation, const std::string& givenName ) :
