@@ -5,10 +5,6 @@
 #include "Zone.h"
 #include <Logging/Logger.h>
 
-#include "Framework.h"
-
-extern Sapphire::Framework g_fw;
-
 // TODO: the entire zone / areahandling is a bit outdated ( in parts i used this for the 1.0 iteration )
 // likely this could be greatly improved or redone
 

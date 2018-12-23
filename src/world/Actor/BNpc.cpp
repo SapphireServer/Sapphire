@@ -28,10 +28,7 @@
 #include "BNpc.h"
 #include "BNpcTemplate.h"
 #include "Manager/TerritoryMgr.h"
-#include "Framework.h"
 #include "Common.h"
-
-extern Sapphire::Framework g_fw;
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
