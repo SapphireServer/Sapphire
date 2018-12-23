@@ -97,7 +97,7 @@ namespace Sapphire::World::Manager
      *
      * @param house The house to update the models for
      */
-    void updateHouseModels( HousePtr house );
+    void updateHouseModelsFromDb( HousePtr house );
 
     /*!
      * @brief Sends the house inventory for the specified type to a player.

@@ -662,7 +662,7 @@ Sapphire::World::Manager::HousingMgr::ContainerIdToContainerMap&
   return getEstateInventory( u64ident );
 }
 
-void Sapphire::World::Manager::HousingMgr::updateHouseModels( Sapphire::HousePtr house )
+void Sapphire::World::Manager::HousingMgr::updateHouseModelsFromDb( Sapphire::HousePtr house )
 {
   assert( house );
 
@@ -680,7 +680,8 @@ void Sapphire::World::Manager::HousingMgr::updateHouseModels( Sapphire::HousePtr
   {
     for( auto& item : extContainer->second->getItemMap() )
     {
-      house->setHouseModel( static_cast< Common::HousePartSlot >( item.first ), getItemData( item.second->getId() ) );
+      house->setExteriorModel( static_cast< Common::HousePartSlot >( item.first ),
+                               getItemData( item.second->getId() ), item.second->getStain() );
     }
   }
   else
@@ -693,8 +694,8 @@ void Sapphire::World::Manager::HousingMgr::updateHouseModels( Sapphire::HousePtr
   {
     for( auto& item : intContainer->second->getItemMap() )
     {
-      house->setHouseInteriorModel( static_cast< Common::HousingInteriorSlot >( item.first ),
-                                    getItemData( item.second->getId() ) );
+      house->setInteriorModel( static_cast< Common::HousingInteriorSlot >( item.first ),
+                               getItemData( item.second->getId() ) );
     }
   }
   else
