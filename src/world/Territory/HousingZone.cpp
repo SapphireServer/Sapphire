@@ -85,7 +85,7 @@ bool Sapphire::HousingZone::init()
     {
       auto house = make_House( entry.m_houseId, m_landSetId, land->getLandIdent(), entry.m_estateName, entry.m_estateComment );
 
-      housingMgr->updateHouseModels( house );
+      housingMgr->updateHouseModelsFromDb( house );
       land->setHouse( house );
     }
 

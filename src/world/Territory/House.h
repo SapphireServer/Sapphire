@@ -16,7 +16,7 @@ namespace Sapphire
            const std::string& estateComment );
     virtual ~House();
 
-    using HousePart = std::pair< uint32_t, uint8_t >;
+    using HousePart = std::pair< uint32_t, uint16_t >;
     using HouseModelsArray = std::array< HousePart, 8 >;
 
     //gerneral
@@ -31,12 +31,11 @@ namespace Sapphire
     void setHouseGreeting( const std::string& greeting );
 
     //functions
-    void setHouseModel( Common::HousePartSlot slot, uint32_t id );
-    void setHouseModelColor( Common::HousePartSlot slot, uint32_t id );
-    void setHouseInteriorModel( Common::HousingInteriorSlot slot, uint32_t id );
-    uint32_t getHouseModel( Common::HousePartSlot slot ) const;
-    uint8_t getHouseModelColor( Common::HousePartSlot slot ) const;
-    uint32_t getHouseInteriorModel( Common::HousingInteriorSlot slot ) const;
+    void setExteriorModel( Common::HousePartSlot slot, uint32_t modelId, uint16_t stain );
+    HousePart getExteriorModel( Common::HousePartSlot slot );
+
+    void setInteriorModel( Common::HousingInteriorSlot slot, uint32_t modelId );
+    uint32_t getInteriorModel( Common::HousingInteriorSlot slot );
 
     HouseModelsArray const& getHouseModels() const;
 
@@ -49,8 +48,8 @@ namespace Sapphire
 
     uint64_t m_buildTime;
 
-    HouseModelsArray m_houseModelsCache;
-    uint32_t m_houseInteriorModels[10];
+    HouseModelsArray m_exteriorModelCache;
+    uint32_t m_interiorModelCache[10];
 
     std::string m_estateComment;
     std::string m_estateName;
