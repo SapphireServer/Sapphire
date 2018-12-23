@@ -527,12 +527,14 @@ CREATE TABLE `landset` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE `houseiteminventory` (
-  `LandIdent` BIGINT(20) UNSIGNED NOT NULL,
-  `ContainerId` INT(10) UNSIGNED NOT NULL,
-  `ItemId` INT(20) NOT NULL,
-  `SlotId` INT(10) UNSIGNED NOT NULL,
-  INDEX `landIdent` (`landIdent`)
+	`LandIdent` BIGINT(20) UNSIGNED NOT NULL,
+	`ContainerId` INT(10) UNSIGNED NOT NULL,
+	`SlotId` INT(10) UNSIGNED NOT NULL,
+	`ItemId` INT(20) NOT NULL,
+	PRIMARY KEY (`LandIdent`, `ContainerId`, `SlotId`),
+	INDEX `landIdent` (`LandIdent`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 
 CREATE TABLE `spawngroup` (
   `id` int(10) NOT NULL AUTO_INCREMENT,

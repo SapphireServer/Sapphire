@@ -87,12 +87,12 @@ void Sapphire::House::setHouseName( const std::string& name )
   updateHouseDb();
 }
 
-void Sapphire::House::setExteriorModel( Sapphire::Common::HousePartSlot slot, uint32_t modelId, uint16_t stain )
+void Sapphire::House::setExteriorModel( Sapphire::Common::HouseExteriorSlot slot, uint32_t modelId, uint16_t stain )
 {
   m_exteriorModelCache[ slot ] = std::make_pair( modelId, stain );
 }
 
-Sapphire::House::HousePart Sapphire::House::getExteriorModel( Sapphire::Common::HousePartSlot slot )
+Sapphire::House::HousePart Sapphire::House::getExteriorModel( Sapphire::Common::HouseExteriorSlot slot )
 {
   return m_exteriorModelCache[ slot ];
 }

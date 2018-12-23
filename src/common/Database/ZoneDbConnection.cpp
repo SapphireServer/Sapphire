@@ -172,7 +172,7 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
 
   /// ITEM GLOBAL
   prepareStatement( CHARA_ITEMGLOBAL_INS,
-                    "INSERT INTO charaglobalitem ( CharacterId, ItemId, catalogId, UPDATE_DATE ) VALUES ( ?, ?, ?, NOW() );",
+                    "INSERT INTO charaglobalitem ( CharacterId, ItemId, catalogId, stack, UPDATE_DATE ) VALUES ( ?, ?, ?, ?, NOW() );",
                     CONNECTION_BOTH );
 
   /// BNPC TEMPLATES
@@ -221,6 +221,17 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     "LEFT JOIN house "
                     "ON land.HouseId = house.HouseId;",
                     CONNECTION_SYNC );
+
+  prepareStatement( LAND_INV_UP,
+                    "INSERT INTO houseiteminventory ( LandIdent, ContainerId, SlotId, ItemId ) "
+                    "VALUES ( ?, ?, ?, ? ) "
+                    "ON DUPLICATE KEY UPDATE ItemId = ?;",
+                    CONNECTION_BOTH );
+
+  prepareStatement( LAND_INV_DEL,
+                    "DELETE FROM houseiteminventory "
+                    "WHERE LandIdent = ? AND ContainerId = ? AND SlotId = ?;",
+                    CONNECTION_BOTH );
 
   /*prepareStatement( LAND_INS,
                     "INSERT INTO land ( LandSetId ) VALUES ( ? );",

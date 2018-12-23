@@ -31,8 +31,8 @@ namespace Sapphire
     void setHouseGreeting( const std::string& greeting );
 
     //functions
-    void setExteriorModel( Common::HousePartSlot slot, uint32_t modelId, uint16_t stain );
-    HousePart getExteriorModel( Common::HousePartSlot slot );
+    void setExteriorModel( Common::HouseExteriorSlot slot, uint32_t modelId, uint16_t stain );
+    HousePart getExteriorModel( Common::HouseExteriorSlot slot );
 
     void setInteriorModel( Common::HousingInteriorSlot slot, uint32_t modelId );
     uint32_t getInteriorModel( Common::HousingInteriorSlot slot );
