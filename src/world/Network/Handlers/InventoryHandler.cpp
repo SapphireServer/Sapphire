@@ -19,13 +19,12 @@
 
 #include "Framework.h"
 
-extern Sapphire::Framework g_fw;
-
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 
-void Sapphire::Network::GameConnection::inventoryModifyHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::inventoryModifyHandler( FrameworkPtr pFw,
+                                                                const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                                 Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcInventoryModifyHandler >( inPacket );
@@ -43,9 +42,7 @@ void Sapphire::Network::GameConnection::inventoryModifyHandler( const Packets::F
   ackPacket->data().type = 7;
   player.queuePacket( ackPacket );
 
-  auto pLog = g_fw.get< Logger >();
-
-  pLog->debug( "InventoryAction: " + std::to_string( action ) );
+  Logger::debug( "InventoryAction: " + std::to_string( action ) );
 
   // TODO: other inventory operations need to be implemented
   switch( action )

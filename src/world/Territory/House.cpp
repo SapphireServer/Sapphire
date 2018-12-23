@@ -25,7 +25,7 @@ Sapphire::House::House( uint32_t houseId, uint32_t landSetId, Common::LandIdent 
 
   if( !res->next() )
   {
-    g_fw.get< Sapphire::Logger >()->info( "Creating house House#" + std::to_string( houseId ) + " in LandSet#" + std::to_string( landSetId ) );
+    Logger::info( "Creating house House#" + std::to_string( houseId ) + " in LandSet#" + std::to_string( landSetId ) );
 
     auto stmt = pDB->getPreparedStatement( Db::HOUSING_HOUSE_INS );
 

@@ -107,8 +107,7 @@ Sapphire::HousingZone::~HousingZone() = default;
 
 void Sapphire::HousingZone::onPlayerZoneIn( Entity::Player& player )
 {
-  auto pLog = g_fw.get< Logger >();
-  pLog->debug(
+  Logger::debug(
     "HousingZone::onPlayerZoneIn: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryTypeId() ) +
     ", Entity#" + std::to_string( player.getId() ) );
 

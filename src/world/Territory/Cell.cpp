@@ -37,7 +37,6 @@ void Sapphire::Cell::init( uint32_t x, uint32_t y, ZonePtr pZone )
 
 void Sapphire::Cell::addActor( Entity::ActorPtr pAct )
 {
-  auto pLog = g_fw.get< Sapphire::Logger >();
   if( pAct->isPlayer() )
     ++m_playerCount;
 
@@ -46,7 +45,6 @@ void Sapphire::Cell::addActor( Entity::ActorPtr pAct )
 
 void Sapphire::Cell::removeActor( Entity::ActorPtr pAct )
 {
-  auto pLog = g_fw.get< Sapphire::Logger >();
   if( pAct->isPlayer() )
     --m_playerCount;
 

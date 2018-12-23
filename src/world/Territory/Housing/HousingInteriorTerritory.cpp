@@ -51,8 +51,7 @@ bool Housing::HousingInteriorTerritory::init()
 void Housing::HousingInteriorTerritory::onPlayerZoneIn( Entity::Player& player )
 {
   auto pHousingMgr = g_fw.get< HousingMgr >();
-  auto pLog = g_fw.get< Logger >();
-  pLog->debug(
+  Logger::debug(
     "HousingInteriorTerritory::onPlayerZoneIn: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryTypeId() ) +
     ", Entity#" + std::to_string( player.getId() ) );
 

@@ -6,8 +6,6 @@
 #include "PreparedStatement.h"
 #include "Framework.h"
 
-extern Sapphire::Framework g_fw;
-
 Sapphire::Db::DbConnection::DbConnection( ConnectionInfo& connInfo ) :
   m_reconnecting( false ),
   m_prepareError( false ),
@@ -66,7 +64,7 @@ uint32_t Sapphire::Db::DbConnection::open()
   }
   catch( std::runtime_error& e )
   {
-    g_fw.get< Logger >()->error( e.what() );
+   Logger::error( e.what() );
     return 1;
   }
 
@@ -118,7 +116,7 @@ bool Sapphire::Db::DbConnection::execute( const std::string& sql )
   }
   catch( std::runtime_error& e )
   {
-    g_fw.get< Logger >()->error( e.what() );
+    Logger::error( e.what() );
     return false;
   }
 }
@@ -133,7 +131,7 @@ std::shared_ptr< Mysql::ResultSet > Sapphire::Db::DbConnection::query( const std
   }
   catch( std::runtime_error& e )
   {
-    g_fw.get< Logger >()->error( e.what() );
+    Logger::error( e.what() );
     return nullptr;
   }
 }
@@ -170,7 +168,7 @@ Sapphire::Db::DbConnection::query( std::shared_ptr< Sapphire::Db::PreparedStatem
   }
   catch( std::runtime_error& e )
   {
-    g_fw.get< Logger >()->error( e.what() );
+    Logger::error( e.what() );
     return nullptr;
   }
 
@@ -196,7 +194,7 @@ bool Sapphire::Db::DbConnection::execute( std::shared_ptr< Sapphire::Db::Prepare
   }
   catch( std::runtime_error& e )
   {
-    g_fw.get< Logger >()->error( e.what() );
+    Logger::error( e.what() );
     return false;
   }
 }
@@ -232,7 +230,7 @@ void Sapphire::Db::DbConnection::prepareStatement( uint32_t index, const std::st
   }
   catch( std::runtime_error& e )
   {
-    g_fw.get< Logger >()->error( e.what() );
+    Logger::error( e.what() );
     m_prepareError = true;
   }
 
