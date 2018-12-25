@@ -196,8 +196,7 @@ void Sapphire::HousingZone::onPlayerZoneIn( Entity::Player& player )
 
     auto& objects = m_yardObjects[ isInSubdivision ? 1 : 0 ];
 
-    memcpy( &housingObjectInit->data().object, objects.data() + ( yardObjectSize * yardPacketNum ),
-            yardObjectSize * 100 );
+    memcpy( &housingObjectInit->data().object, objects.data() + ( yardPacketNum * 100 ), yardObjectSize * 100 );
 
     player.queuePacket( housingObjectInit );
   }
