@@ -94,7 +94,7 @@ bool Sapphire::HousingZone::init()
     m_landPtrMap[ entry.m_landId ] = land;
 
     if( entry.m_houseId > 0 )
-      registerHouseEntranceEObj( entry.m_landId );
+      registerEstateEntranceEObj( entry.m_landId );
   }
 
   return true;
@@ -109,6 +109,8 @@ void Sapphire::HousingZone::onPlayerZoneIn( Entity::Player& player )
     "HousingZone::onPlayerZoneIn: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryTypeId() ) +
     ", Entity#" + std::to_string( player.getId() ) );
 
+  auto isInSubdivision = isPlayerSubInstance( player ) ? true : false;
+
   uint32_t yardPacketNum;
   uint32_t yardPacketTotal = 8;
 
@@ -122,14 +124,21 @@ void Sapphire::HousingZone::onPlayerZoneIn( Entity::Player& player )
     housingObjectInit->data().packetNum = yardPacketNum;
     housingObjectInit->data().packetTotal = yardPacketTotal;
 
-    //TODO: Add Objects here
+    auto yardObjectSize = sizeof( Common::YardObject );
+
+    auto& objects = m_yardObjects[ isInSubdivision ? 1 : 0 ];
+
+    memcpy( &housingObjectInit->data().object, objects.data() + ( yardObjectSize * yardPacketNum ),
+            yardObjectSize * 100 );
 
     player.queuePacket( housingObjectInit );
   }
 
   auto landSetMap = makeZonePacket< FFXIVIpcLandSetMap >( player.getId() );
-  landSetMap->data().subdivision = !isPlayerSubInstance( player ) ? 2 : 1;
-  uint8_t startIndex = !isPlayerSubInstance( player ) ? 0 : 30;
+  landSetMap->data().subdivision = isInSubdivision ? 1 : 2;
+
+  uint8_t startIndex = isInSubdivision ? 30 : 0;
+
   for( uint8_t i = startIndex, count = 0; i < ( startIndex + 30 ); i++, count++ )
   {
     landSetMap->data().landInfo[ count ].status = 1;
@@ -252,13 +261,13 @@ Sapphire::LandPtr Sapphire::HousingZone::getLand( uint8_t id )
   return it->second;
 }
 
-Sapphire::Entity::EventObjectPtr Sapphire::HousingZone::registerHouseEntranceEObj( uint8_t plotId )
+Sapphire::Entity::EventObjectPtr Sapphire::HousingZone::registerEstateEntranceEObj( uint8_t landId )
 {
-  auto land = getLand( plotId );
+  auto land = getLand( landId );
   assert( land );
 
   auto eObj = Entity::make_EventObject( getNextEObjId(), 2002737, 0, 4, land->getMapMarkerPosition(), 0.f, "entrance" );
-  eObj->setHousingLink( plotId << 8 );
+  eObj->setHousingLink( landId << 8 );
   eObj->setScale( 1.f );
 
   registerEObj( eObj );

@@ -50,15 +50,22 @@ namespace Sapphire
     uint32_t getLandSetId() const;
     Sapphire::LandPtr getLand( uint8_t id );
 
-    Entity::EventObjectPtr registerHouseEntranceEObj( uint8_t plotId );
+    Entity::EventObjectPtr registerEstateEntranceEObj( uint8_t landId );
 
   private:
     using LandPtrMap = std::unordered_map< uint8_t, Sapphire::LandPtr >;
+    using YardObjectArray = std::array< Common::YardObject, 800 >;
+    using YardObjectMap = std::map< uint8_t, YardObjectArray >;
+
+    using YardObjectArrayBoundsPair = std::pair< uint16_t, uint16_t >;
+
     const uint32_t m_landSetMax = 18;
     LandPtrMap m_landPtrMap;
     uint8_t m_wardNum;
     uint32_t m_landSetId;
     uint32_t m_territoryTypeId;
+
+    YardObjectMap m_yardObjects;
   };
 
 }
