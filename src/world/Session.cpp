@@ -12,11 +12,12 @@
 
 namespace fs = std::experimental::filesystem;
 
-Sapphire::World::Session::Session( uint32_t sessionId ) :
+Sapphire::World::Session::Session( uint32_t sessionId, FrameworkPtr pFw ) :
   m_sessionId( sessionId ),
   m_lastDataTime( Util::getTimeSeconds() ),
   m_lastSqlTime( Util::getTimeSeconds() ),
-  m_isValid( false )
+  m_isValid( false ),
+  m_pFw( pFw )
 {
 }
 
@@ -50,7 +51,7 @@ Sapphire::Network::GameConnectionPtr Sapphire::World::Session::getChatConnection
 bool Sapphire::World::Session::loadPlayer()
 {
 
-  m_pPlayer = Entity::make_Player();
+  m_pPlayer = Entity::make_Player( m_pFw );
 
   if( !m_pPlayer->load( m_sessionId, shared_from_this() ) )
   {

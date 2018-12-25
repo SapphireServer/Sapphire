@@ -9,9 +9,6 @@
 #include <Logging/Logger.h>
 #include <Database/DatabaseDef.h>
 
-
-extern Sapphire::Framework g_fw;
-
 Sapphire::World::Manager::ItemMgr::ItemMgr( Sapphire::FrameworkPtr pFw ) :
   BaseManager( pFw )
 {
@@ -125,8 +122,8 @@ bool Sapphire::World::Manager::ItemMgr::isOneHandedWeapon( Common::ItemUICategor
 
 Sapphire::ItemPtr Sapphire::World::Manager::ItemMgr::loadItem( uint64_t uId )
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pExdData = framework()->get< Data::ExdDataGenerated >();
+  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   // load actual item
   auto itemRes = pDb->query(
     "SELECT catalogId, stack, flags FROM charaglobalitem WHERE itemId = " + std::to_string( uId ) + ";" );
@@ -182,7 +179,7 @@ Sapphire::Common::ContainerType Sapphire::World::Manager::ItemMgr::getContainerT
 uint32_t Sapphire::World::Manager::ItemMgr::getNextUId()
 {
   uint32_t charId = 0;
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto pQR = pDb->query( "SELECT MAX(ItemId) FROM charaglobalitem" );
 
   if( !pQR->next() )
