@@ -430,9 +430,9 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
       if( !housingMgr )
         break;
 
-      uint16_t inventoryType = Common::InventoryType::HousingOutdoorPlacedItems;
+      uint16_t inventoryType = Common::InventoryType::HousingExteriorPlacedItems;
       if( param2 == 1 )
-        inventoryType = Common::InventoryType::HousingOutdoorStoreroom;
+        inventoryType = Common::InventoryType::HousingExteriorStoreroom;
 
       housingMgr->sendEstateInventory( player, inventoryType, plot );
 

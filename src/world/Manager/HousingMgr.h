@@ -26,7 +26,7 @@ namespace Sapphire::World::Manager
     {
       // land table
       uint64_t m_landSetId;
-      uint64_t m_landId;
+      uint16_t m_landId;
 
       Common::LandType m_type;
       uint8_t m_size;
@@ -46,6 +46,9 @@ namespace Sapphire::World::Manager
 
       uint64_t m_buildTime;
       uint64_t m_endorsements;
+
+      uint16_t m_maxPlacedExternalItems;
+      uint16_t m_maxPlacedInternalItems;
     };
 
     /*!
@@ -189,6 +192,8 @@ namespace Sapphire::World::Manager
 
     LandSetLandCacheMap m_landCache;
     LandIdentToInventoryContainerMap m_estateInventories;
+
+    std::array< std::pair< Common::InventoryType, Common::InventoryType >, 8 > m_containerMap;
 
   };
 
