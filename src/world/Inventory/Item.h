@@ -10,7 +10,7 @@ namespace Sapphire
   {
 
   public:
-    Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, bool isHq = false );
+    Item( uint64_t uId, uint32_t catalogId, bool isHq = false );
 
     ~Item() = default;
 

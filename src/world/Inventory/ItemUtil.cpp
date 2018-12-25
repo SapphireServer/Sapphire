@@ -132,11 +132,7 @@ Sapphire::ItemPtr Sapphire::Items::Util::loadItem( uint64_t uId )
     auto itemInfo = pExdData->get< Sapphire::Data::Item >( itemRes->getUInt( 1 ) );
     bool isHq = itemRes->getUInt( 3 ) == 1;
 
-    ItemPtr pItem = make_Item( uId,
-                               itemRes->getUInt( 1 ),
-                               itemInfo->modelMain,
-                               itemInfo->modelSub,
-                               isHq );
+    ItemPtr pItem = make_Item( uId, itemRes->getUInt( 1 ), isHq );
 
     pItem->setStackSize( itemRes->getUInt( 2 ) );
 

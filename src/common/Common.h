@@ -249,8 +249,8 @@ namespace Sapphire::Common
 
 
     // housing exterior containers
-    HousingExteriorPlacedItems = 25001,
     HousingExteriorAppearance = 25000,
+    HousingExteriorPlacedItems = 25001,
     HousingExteriorStoreroom = 27000,
 
 
