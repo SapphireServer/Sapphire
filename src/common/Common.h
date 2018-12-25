@@ -225,13 +225,15 @@ namespace Sapphire::Common
     // housing interior containers
     HousingInteriorAppearance = 25002,
 
-    // 50 in each container max, 300 slots max
+    // 50 in each container max, 400 slots max
     HousingInteriorPlacedItems1 = 25003,
     HousingInteriorPlacedItems2 = 25004,
     HousingInteriorPlacedItems3 = 25005,
     HousingInteriorPlacedItems4 = 25006,
     HousingInteriorPlacedItems5 = 25007,
     HousingInteriorPlacedItems6 = 25008,
+    HousingInteriorPlacedItems7 = 25009,
+    HousingInteriorPlacedItems8 = 25010,
 
     // 50 max per container, 400 slots max
     // slot limit increased 'temporarily' for relocation for all estates
@@ -247,9 +249,9 @@ namespace Sapphire::Common
 
 
     // housing exterior containers
-    HousingOutdoorPlacedItems = 25001,
+    HousingExteriorPlacedItems = 25001,
     HousingExteriorAppearance = 25000,
-    HousingOutdoorStoreroom = 27000,
+    HousingExteriorStoreroom = 27000,
 
 
   };

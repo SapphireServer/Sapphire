@@ -35,7 +35,18 @@ using namespace Sapphire::Network::Packets::Server;
 
 extern Sapphire::Framework g_fw;
 
-Sapphire::World::Manager::HousingMgr::HousingMgr() = default;
+Sapphire::World::Manager::HousingMgr::HousingMgr()
+{
+  m_containerMap[ 0 ] = std::make_pair( InventoryType::HousingInteriorPlacedItems1, InventoryType::HousingInteriorStoreroom1 );
+  m_containerMap[ 1 ] = std::make_pair( InventoryType::HousingInteriorPlacedItems1, InventoryType::HousingInteriorStoreroom1 );
+  m_containerMap[ 2 ] = std::make_pair( InventoryType::HousingInteriorPlacedItems1, InventoryType::HousingInteriorStoreroom1 );
+  m_containerMap[ 3 ] = std::make_pair( InventoryType::HousingInteriorPlacedItems1, InventoryType::HousingInteriorStoreroom1 );
+  m_containerMap[ 4 ] = std::make_pair( InventoryType::HousingInteriorPlacedItems1, InventoryType::HousingInteriorStoreroom1 );
+  m_containerMap[ 5 ] = std::make_pair( InventoryType::HousingInteriorPlacedItems1, InventoryType::HousingInteriorStoreroom1 );
+  m_containerMap[ 6 ] = std::make_pair( InventoryType::HousingInteriorPlacedItems1, InventoryType::HousingInteriorStoreroom1 );
+  m_containerMap[ 7 ] = std::make_pair( InventoryType::HousingInteriorPlacedItems1, InventoryType::HousingInteriorStoreroom1 );
+}
+
 Sapphire::World::Manager::HousingMgr::~HousingMgr() = default;
 
 bool Sapphire::World::Manager::HousingMgr::init()
@@ -117,19 +128,11 @@ bool Sapphire::World::Manager::HousingMgr::loadEstateInventories()
 
     ContainerIdToContainerMap& estateInv = m_estateInventories[ ident ];
 
-    // check if containerId exists
+    // check if containerId exists, it always should - if it doesn't, something went wrong
     auto container = estateInv.find( containerId );
-    if( container == estateInv.end() )
-    {
-      // create container
-      // todo: how to handle this max slot stuff? override it on land init?
-      auto ic = make_ItemContainer( containerId, 400, "houseiteminventory", true );
-      ic->setItem( slot, item );
+    assert( container != estateInv.end() );
 
-      estateInv[ containerId ] = ic;
-    }
-    else
-      container->second->setItem( slot, item );
+    container->second->setItem( slot, item );
 
     itemCount++;
   }
@@ -153,7 +156,7 @@ void Sapphire::World::Manager::HousingMgr::initLandCache()
 
     // land stuff
     entry.m_landSetId = res->getUInt64( "LandSetId" );
-    entry.m_landId = res->getUInt64( "LandId" );
+    entry.m_landId = res->getUInt( "LandId" );
 
     entry.m_type = static_cast< Common::LandType >( res->getUInt( "Type" ) );
     entry.m_size = res->getUInt8( "Size" );
@@ -180,25 +183,63 @@ void Sapphire::World::Manager::HousingMgr::initLandCache()
     switch( entry.m_size )
     {
       case HouseSize::Cottage:
-        maxExternalItems = 20;
-        maxInternalItems = 200;
+        entry.m_maxPlacedExternalItems = 20;
+        entry.m_maxPlacedInternalItems = 200;
         break;
       case HouseSize::House:
-        maxExternalItems = 30;
-        maxInternalItems = 300;
+        entry.m_maxPlacedExternalItems = 30;
+        entry.m_maxPlacedInternalItems = 300;
         break;
       case HouseSize::Mansion:
-        maxExternalItems = 40;
-        maxInternalItems = 400;
+        entry.m_maxPlacedExternalItems = 40;
+        entry.m_maxPlacedInternalItems = 400;
         break;
       default:
         // this should never ever happen, if it does the db is fucked
         log->error( "HousingMgr: Plot " + std::to_string( entry.m_landId ) + " in landset " + std::to_string( entry.m_landSetId ) +
                     " has an invalid land size, defaulting to cottage." );
-        maxExternalItems = 20;
-        maxInternalItems = 200;
+        entry.m_maxPlacedExternalItems = 20;
+        entry.m_maxPlacedInternalItems = 200;
         break;
     }
+
+    // setup containers
+    // todo: this is pretty garbage
+    Common::LandIdent ident;
+    ident.territoryTypeId = entry.m_landSetId >> 16;
+    ident.wardNum = entry.m_landSetId & 0xFFFF;
+    ident.landId = entry.m_landId;
+    ident.worldId = 67;
+
+    auto& containers = getEstateInventory( ident );
+
+    auto makeContainer = [ &containers ]( Common::InventoryType type, uint16_t size )
+    {
+      containers[ type ] = make_ItemContainer( type, size, "houseiteminventory", true );
+    };
+
+    uint16_t count = 0;
+    for( int i = 0; i < 8; ++i )
+    {
+      if( count >= entry.m_maxPlacedInternalItems )
+        break;
+
+      auto& pair = m_containerMap[ i ];
+
+      makeContainer( pair.first, 50 );
+      makeContainer( pair.second, 50 );
+
+      count += 50;
+    }
+
+    // exterior
+    makeContainer( InventoryType::HousingExteriorPlacedItems, entry.m_maxPlacedExternalItems );
+    makeContainer( InventoryType::HousingExteriorStoreroom, entry.m_maxPlacedExternalItems );
+
+    // fixed containers
+    makeContainer( InventoryType::HousingInteriorAppearance, 10 );
+    makeContainer( InventoryType::HousingExteriorAppearance, 8 );
+
   }
 }
 
@@ -855,7 +896,7 @@ uint32_t Sapphire::World::Manager::HousingMgr::getItemAdditionalData( uint32_t c
 
 bool Sapphire::World::Manager::HousingMgr::isPlacedItemsInventory( Sapphire::Common::InventoryType type )
 {
-  return type == InventoryType::HousingOutdoorPlacedItems   ||
+  return type == InventoryType::HousingExteriorPlacedItems   ||
          type == InventoryType::HousingInteriorPlacedItems1 ||
          type == InventoryType::HousingInteriorPlacedItems2 ||
          type == InventoryType::HousingInteriorPlacedItems3 ||
