@@ -160,7 +160,8 @@ bool Sapphire::HousingZone::init()
       obj.pos_y = Util::floatToUInt16( pos.y );
       obj.pos_z = Util::floatToUInt16( pos.z );
 
-      m_yardObjects[ yardMapIndex ][ item.first + arrayBounds.first ] = obj;
+      auto idx = item.first + arrayBounds.first;
+      m_yardObjects[ yardMapIndex ][ idx ] = obj;
     }
   }
 
