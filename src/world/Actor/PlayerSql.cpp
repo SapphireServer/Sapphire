@@ -580,10 +580,7 @@ Sapphire::ItemPtr Sapphire::Entity::Player::createItem( uint32_t catalogId, uint
 
   uint8_t flags = 0;
 
-  ItemPtr pItem = make_Item( Items::Util::getNextUId(),
-                             catalogId,
-                             itemInfo->modelMain,
-                             itemInfo->modelSub );
+  ItemPtr pItem = make_Item( Items::Util::getNextUId(), catalogId );
 
   pItem->setStackSize( quantity );
 

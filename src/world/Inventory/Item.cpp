@@ -7,11 +7,9 @@
 
 extern Sapphire::Framework g_fw;
 
-Sapphire::Item::Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, bool isHq ) :
+Sapphire::Item::Item( uint64_t uId, uint32_t catalogId, bool isHq ) :
   m_id( catalogId ),
   m_uId( uId ),
-  m_model1( model1 ),
-  m_model2( model2 ),
   m_isHq( isHq ),
   m_stain( 0 ),
   m_durability( 30000 )
@@ -22,6 +20,8 @@ Sapphire::Item::Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_
   m_delayMs = itemInfo->delayms;
   m_physicalDmg = itemInfo->damagePhys;
   m_magicalDmg = itemInfo->damageMag;
+  m_model1 = itemInfo->modelMain;
+  m_model2 = itemInfo->modelSub;
   m_weaponDmg = ( m_physicalDmg != 0 ) ? m_physicalDmg : m_magicalDmg;
   m_autoAttackDmg = static_cast< float >( m_weaponDmg * m_delayMs ) / 3000;
   m_category = static_cast< Common::ItemUICategory >( itemInfo->itemUICategory );

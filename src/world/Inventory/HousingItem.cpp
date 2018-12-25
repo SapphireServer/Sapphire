@@ -1,7 +1,7 @@
 #include "HousingItem.h"
 
 Sapphire::Inventory::HousingItem::HousingItem( uint64_t uId, uint32_t catalogId ) :
-  Sapphire::Item( uId, catalogId, 0, 0, false )
+  Sapphire::Item( uId, catalogId, false )
 { }
 
 float Sapphire::Inventory::HousingItem::getRot() const

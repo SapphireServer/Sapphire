@@ -75,8 +75,7 @@ Sapphire::ItemPtr Sapphire::World::Manager::InventoryMgr::createItem( Entity::Pl
   if( !itemInfo )
     return nullptr;
 
-  auto item = make_Item( Items::Util::getNextUId(), catalogId,
-                          itemInfo->modelMain, itemInfo->modelSub );
+  auto item = make_Item( Items::Util::getNextUId(), catalogId );
 
   item->setStackSize( std::max< uint32_t >( 1, quantity ) );
 
