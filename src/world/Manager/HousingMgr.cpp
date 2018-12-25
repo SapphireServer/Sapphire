@@ -588,6 +588,10 @@ bool Sapphire::World::Manager::HousingMgr::initHouseModels( Entity::Player& play
 
     for( auto& item : destContainer.second )
     {
+      // small houses attic is just 0, ignore them
+      if( item.second == 0 )
+        continue;
+
       auto pItem = invMgr->createItem( player, item.second );
 
       container->setItem( item.first, pItem );

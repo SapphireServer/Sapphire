@@ -87,7 +87,7 @@ Sapphire::ItemPtr Sapphire::World::Manager::InventoryMgr::createItem( Entity::Pl
   stmt->setUInt( 3, item->getId() );
   stmt->setUInt( 4, item->getStackSize() );
 
-  pDb->execute( stmt );
+  pDb->directExecute( stmt );
 
   return item;
 }
