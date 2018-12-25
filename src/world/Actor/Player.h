@@ -39,7 +39,7 @@ namespace Sapphire::Entity
   {
   public:
     /*! Contructor */
-    Player();
+    Player( FrameworkPtr pFw );
 
     /*! Destructor */
     ~Player();
@@ -523,7 +523,7 @@ namespace Sapphire::Entity
     void teleport( uint16_t aetheryteId, uint8_t type = 1 );
 
     /*! query teleport of a specified type */
-    void teleportQuery( uint16_t aetheryteId );
+    void teleportQuery( uint16_t aetheryteId, FrameworkPtr pFw );
 
     /*! prepares zoning / fades out the screen */
     void prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadoutTime = 0, uint16_t animation = 0 );
@@ -1047,6 +1047,9 @@ namespace Sapphire::Entity
 
     Util::SpawnIndexAllocator< uint8_t > m_objSpawnIndexAllocator;
     Util::SpawnIndexAllocator< uint8_t > m_actorSpawnIndexAllocator;
+
+    // todo: temporary store ptr to framework
+    FrameworkPtr m_pFw;
   };
 
 }

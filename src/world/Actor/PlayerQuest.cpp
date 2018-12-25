@@ -9,8 +9,6 @@
 #include "Session.h"
 #include "Framework.h"
 
-extern Sapphire::Framework g_fw;
-
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
@@ -1030,7 +1028,7 @@ void Sapphire::Entity::Player::removeQuestsCompleted( uint32_t questId )
 
 bool Sapphire::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t optionalChoice )
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   uint32_t playerLevel = getLevel();
   auto questInfo = pExdData->get< Sapphire::Data::Quest >( questId );
 

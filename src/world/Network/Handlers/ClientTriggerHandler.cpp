@@ -84,7 +84,6 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
                  "\nparam3: " + Util::intToHexString( static_cast< uint64_t >( param3 & 0xFFFFFFFFFFFFFFF ), 16 )
   );
 
-
   //g_log.Log(LoggingSeverity::debug, "[" + std::to_string(m_pSession->getId()) + "] " + pInPacket->toString());
 
   switch( commandId )
@@ -273,7 +272,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     case ClientTriggerType::Teleport: // Teleport
     {
 
-      player.teleportQuery( param11 );
+      player.teleportQuery( param11, pFw );
       break;
     }
     case ClientTriggerType::DyeItem: // Dye item

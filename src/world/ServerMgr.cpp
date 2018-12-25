@@ -301,7 +301,7 @@ bool Sapphire::World::ServerMgr::createSession( uint32_t sessionId )
 
   Logger::info( "[" + session_id_str + "] Creating new session" );
 
-  std::shared_ptr< Session > newSession( new Session( sessionId ) );
+  std::shared_ptr< Session > newSession( new Session( sessionId, framework() ) );
   m_sessionMapById[ sessionId ] = newSession;
 
   if( !newSession->loadPlayer() )
