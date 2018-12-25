@@ -57,7 +57,7 @@ namespace Sapphire
   private:
     using LandPtrMap = std::unordered_map< uint8_t, Sapphire::LandPtr >;
     using YardObjectArray = std::array< Common::YardObject, 800 >;
-    using YardObjectMap = std::map< uint8_t, YardObjectArray >;
+    using YardObjectSubdivisionArray = std::array< YardObjectArray, 2 >;
 
     /*!
      * @brief Maps the start and end index of the yard object array for a specific plot
@@ -78,7 +78,7 @@ namespace Sapphire
     uint32_t m_landSetId;
     uint32_t m_territoryTypeId;
 
-    YardObjectMap m_yardObjects;
+    YardObjectSubdivisionArray m_yardObjects;
     YardObjectArrayBoundsArray m_yardObjectArrayBounds;
   };
 
