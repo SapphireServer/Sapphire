@@ -70,24 +70,6 @@ void Sapphire::Land::init( Common::LandType type, uint8_t size, uint8_t state, u
     m_mapMarkerPosition.y = info->y;
     m_mapMarkerPosition.z = info->z;
   }
-
-  switch( m_size )
-  {
-    case HouseSize::Cottage:
-      m_maxPlacedExternalItems = 20;
-      m_maxPlacedInternalItems = 200;
-      break;
-    case HouseSize::House:
-      m_maxPlacedExternalItems = 30;
-      m_maxPlacedInternalItems = 300;
-      break;
-    case HouseSize::Mansion:
-      m_maxPlacedExternalItems = 40;
-      m_maxPlacedInternalItems = 400;
-      break;
-    default:
-      break;
-  }
 }
 
 uint32_t Sapphire::Land::convertItemIdToHousingItemId( uint32_t itemId )

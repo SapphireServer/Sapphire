@@ -48,7 +48,7 @@ bool Sapphire::World::Manager::HousingMgr::init()
   // 18 wards per territory, 4 territories
   m_landCache.reserve( 18 * 4 );
 
-  loadLandCache();
+  initLandCache();
 
   log->debug( "HousingMgr: Checking land counts" );
 
@@ -103,6 +103,18 @@ bool Sapphire::World::Manager::HousingMgr::loadEstateInventories()
     item->setStain( stain );
     // todo: need to set the owner character id on the item
 
+    // set world pos on item if its in an placed item container
+    if( isPlacedItemsInventory( static_cast< Common::InventoryType >( containerId ) ) )
+    {
+      item->setPos( {
+        res->getFloat( "PosX" ),
+        res->getFloat( "PosY" ),
+        res->getFloat( "PosZ" )
+      } );
+
+      item->setRot( res->getFloat( "Rotation" ) );
+    }
+
     ContainerIdToContainerMap& estateInv = m_estateInventories[ ident ];
 
     // check if containerId exists
@@ -127,8 +139,9 @@ bool Sapphire::World::Manager::HousingMgr::loadEstateInventories()
   return true;
 }
 
-void Sapphire::World::Manager::HousingMgr::loadLandCache()
+void Sapphire::World::Manager::HousingMgr::initLandCache()
 {
+  auto log = g_fw.get< Sapphire::Logger >();
   auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
 
   auto stmt = pDb->getPreparedStatement( Db::LAND_SEL_ALL );
@@ -159,6 +172,33 @@ void Sapphire::World::Manager::HousingMgr::loadLandCache()
     entry.m_endorsements = res->getUInt64( "Endorsements" );
 
     m_landCache[ entry.m_landSetId ].push_back( entry );
+
+    uint16_t maxExternalItems = 0;
+    uint16_t maxInternalItems = 0;
+
+    // init inventory containers
+    switch( entry.m_size )
+    {
+      case HouseSize::Cottage:
+        maxExternalItems = 20;
+        maxInternalItems = 200;
+        break;
+      case HouseSize::House:
+        maxExternalItems = 30;
+        maxInternalItems = 300;
+        break;
+      case HouseSize::Mansion:
+        maxExternalItems = 40;
+        maxInternalItems = 400;
+        break;
+      default:
+        // this should never ever happen, if it does the db is fucked
+        log->error( "HousingMgr: Plot " + std::to_string( entry.m_landId ) + " in landset " + std::to_string( entry.m_landSetId ) +
+                    " has an invalid land size, defaulting to cottage." );
+        maxExternalItems = 20;
+        maxInternalItems = 200;
+        break;
+    }
   }
 }
 
@@ -811,4 +851,15 @@ uint32_t Sapphire::World::Manager::HousingMgr::getItemAdditionalData( uint32_t c
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
   auto info = pExdData->get< Sapphire::Data::Item >( catalogId );
   return info->additionalData;
+}
+
+bool Sapphire::World::Manager::HousingMgr::isPlacedItemsInventory( Sapphire::Common::InventoryType type )
+{
+  return type == InventoryType::HousingOutdoorPlacedItems   ||
+         type == InventoryType::HousingInteriorPlacedItems1 ||
+         type == InventoryType::HousingInteriorPlacedItems2 ||
+         type == InventoryType::HousingInteriorPlacedItems3 ||
+         type == InventoryType::HousingInteriorPlacedItems4 ||
+         type == InventoryType::HousingInteriorPlacedItems5 ||
+         type == InventoryType::HousingInteriorPlacedItems6;
 }

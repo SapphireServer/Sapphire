@@ -162,7 +162,7 @@ namespace Sapphire::World::Manager
     /*!
      * @brief Loads all the land entries from the database and caches them to speed up housing territory init
      */
-    void loadLandCache();
+    void initLandCache();
 
     /*!
      * @brief Loads all the inventories for every estate on the world and sets up their containers
@@ -176,6 +176,16 @@ namespace Sapphire::World::Manager
      * @return The additionalData field from item.exd
      */
     uint32_t getItemAdditionalData( uint32_t catalogId );
+
+    /*!
+     * @brief Checks whether an estate inventory contains items that are placed and have a world position
+     *
+     * Eg, any item inside the 'placed' items container _should_ have a world position and can be spawned.
+     *
+     * @param type The inventory type that contains items
+     * @return true if contains items that would have a world position
+     */
+    bool isPlacedItemsInventory( Common::InventoryType type );
 
     LandSetLandCacheMap m_landCache;
     LandIdentToInventoryContainerMap m_estateInventories;
