@@ -12,6 +12,8 @@
 #include "Actor/EventObject.h"
 #include "Land.h"
 #include "House.h"
+#include "Inventory/HousingItem.h"
+#include "Inventory/ItemContainer.h"
 
 #include "Forwards.h"
 #include "HousingZone.h"
@@ -51,7 +53,7 @@ bool Sapphire::HousingZone::init()
   }
 
 
-  int housingIndex;
+  uint32_t housingIndex = 0;
   if( m_territoryTypeId == 339 )
     housingIndex = 0;
   else if( m_territoryTypeId == 340 )
@@ -63,6 +65,44 @@ bool Sapphire::HousingZone::init()
 
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
   auto info = pExdData->get< Sapphire::Data::HousingLandSet >( housingIndex );
+
+  // build yard objects array indices
+  int16_t cursor = -1;
+  uint16_t index = 0;
+  for( const auto size : info->plotSize )
+  {
+    uint16_t itemMax = 0;
+    switch( size )
+    {
+      case 0:
+        itemMax = 20;
+        break;
+
+      case 1:
+        itemMax = 30;
+        break;
+
+      case 2:
+        itemMax = 40;
+        break;
+    }
+
+    int16_t start = cursor + 1;
+    int16_t end = cursor + itemMax;
+
+    m_yardObjectArrayBounds[ index++ ] = std::make_pair( start, end );
+
+    // reset cursor for subdivision
+    if( index == 30 )
+    {
+      cursor = -1;
+
+      continue;
+    }
+
+    cursor += itemMax;
+  }
+
 
   auto housingMgr = g_fw.get< World::Manager::HousingMgr >();
   auto landCache = housingMgr->getLandCacheMap();
@@ -83,7 +123,8 @@ bool Sapphire::HousingZone::init()
     // setup house
     if( entry.m_houseId )
     {
-      auto house = make_House( entry.m_houseId, m_landSetId, land->getLandIdent(), entry.m_estateName, entry.m_estateComment );
+      auto house = make_House( entry.m_houseId, m_landSetId, land->getLandIdent(), entry.m_estateName,
+                               entry.m_estateComment );
 
       housingMgr->updateHouseModels( house );
       land->setHouse( house );
@@ -95,6 +136,32 @@ bool Sapphire::HousingZone::init()
 
     if( entry.m_houseId > 0 )
       registerEstateEntranceEObj( entry.m_landId );
+
+    // add items to yard object array
+    auto& inventory = housingMgr->getEstateInventory( land->getLandIdent() );
+    auto& externalContainer = inventory[ InventoryType::HousingExteriorPlacedItems ];
+
+    auto arrayBounds = m_yardObjectArrayBounds[ entry.m_landId ];
+    uint8_t yardMapIndex = entry.m_landId <= 29 ? 0 : 1;
+
+    for( auto& item : externalContainer->getItemMap() )
+    {
+      Common::YardObject obj{};
+
+      auto housingItem = std::dynamic_pointer_cast< Inventory::HousingItem >( item.second );
+      assert( housingItem );
+
+      auto pos = housingItem->getPos();
+
+      obj.itemId = housingItem->getAdditionalData();
+      obj.itemRotation = housingItem->getRot();
+
+      obj.pos_x = Util::floatToUInt16( pos.x );
+      obj.pos_y = Util::floatToUInt16( pos.y );
+      obj.pos_z = Util::floatToUInt16( pos.z );
+
+      m_yardObjects[ yardMapIndex ][ item.first + arrayBounds.first ] = obj;
+    }
   }
 
   return true;
@@ -273,4 +340,17 @@ Sapphire::Entity::EventObjectPtr Sapphire::HousingZone::registerEstateEntranceEO
   registerEObj( eObj );
 
   return eObj;
+}
+
+void Sapphire::HousingZone::updateYardObjects( Sapphire::Common::LandIdent ident )
+{
+  auto housingMgr = g_fw.get< World::Manager::HousingMgr >();
+  auto& landStorage = housingMgr->getEstateInventory( ident );
+
+  auto yardContainer = landStorage[ InventoryType::HousingExteriorPlacedItems ];
+
+  for( const auto& item : yardContainer->getItemMap() )
+  {
+
+  }
 }

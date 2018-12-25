@@ -52,12 +52,25 @@ namespace Sapphire
 
     Entity::EventObjectPtr registerEstateEntranceEObj( uint8_t landId );
 
+    void updateYardObjects( Common::LandIdent ident );
+
   private:
     using LandPtrMap = std::unordered_map< uint8_t, Sapphire::LandPtr >;
     using YardObjectArray = std::array< Common::YardObject, 800 >;
     using YardObjectMap = std::map< uint8_t, YardObjectArray >;
 
+    /*!
+     * @brief Maps the start and end index of the yard object array for a specific plot
+     *
+     * pair.first = start index
+     * pair.second = end index
+     */
     using YardObjectArrayBoundsPair = std::pair< uint16_t, uint16_t >;
+
+    /*!
+     * @brief Maps each plot to a YardObjectArrayBoundsPair to the start/end index of the yard object array.
+     */
+    using YardObjectArrayBoundsArray = std::array< YardObjectArrayBoundsPair, 60 >;
 
     const uint32_t m_landSetMax = 18;
     LandPtrMap m_landPtrMap;
@@ -66,6 +79,7 @@ namespace Sapphire
     uint32_t m_territoryTypeId;
 
     YardObjectMap m_yardObjects;
+    YardObjectArrayBoundsArray m_yardObjectArrayBounds;
   };
 
 }

@@ -12,7 +12,7 @@ namespace Sapphire
   public:
     Item( uint64_t uId, uint32_t catalogId, bool isHq = false );
 
-    ~Item() = default;
+    virtual ~Item() = default;
 
     uint32_t getId() const;
 
