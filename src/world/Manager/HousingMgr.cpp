@@ -124,7 +124,7 @@ bool Sapphire::World::Manager::HousingMgr::loadEstateInventories()
         res->getFloat( "PosZ" )
       } );
 
-      item->setRot( res->getFloat( "Rotation" ) );
+      item->setRot( res->getUInt( "Rotation" ) );
     }
 
     ContainerIdToContainerMap& estateInv = m_estateInventories[ ident ];
