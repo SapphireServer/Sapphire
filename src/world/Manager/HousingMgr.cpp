@@ -112,6 +112,7 @@ bool Sapphire::World::Manager::HousingMgr::loadEstateInventories()
 
     auto item = Inventory::make_HousingItem( itemId, catalogId );
     item->setStain( stain );
+    item->setStackSize( 1 );
     // todo: need to set the owner character id on the item
 
     // set world pos on item if its in an placed item container
