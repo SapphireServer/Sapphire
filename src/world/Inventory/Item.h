@@ -62,6 +62,8 @@ namespace Sapphire
     uint16_t getStain() const;
     void setStain( uint16_t stain );
 
+    uint32_t getAdditionalData() const;
+
 
   protected:
     uint32_t m_id;
@@ -87,6 +89,8 @@ namespace Sapphire
     uint16_t m_itemLevel;
     uint16_t m_durability;
     uint16_t m_stain;
+
+    uint32_t m_additionalData;
 
   };
 

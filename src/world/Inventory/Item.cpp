@@ -27,6 +27,7 @@ Sapphire::Item::Item( uint64_t uId, uint32_t catalogId, bool isHq ) :
   m_category = static_cast< Common::ItemUICategory >( itemInfo->itemUICategory );
   m_itemLevel = itemInfo->levelItem;
   m_maxStackSize = itemInfo->stackSize;
+  m_additionalData = itemInfo->additionalData;
 }
 
 float Sapphire::Item::getAutoAttackDmg() const
@@ -153,4 +154,9 @@ uint16_t Sapphire::Item::getStain() const
 void Sapphire::Item::setStain( uint16_t stain )
 {
   m_stain = stain;
+}
+
+uint32_t Sapphire::Item::getAdditionalData() const
+{
+  return m_additionalData;
 }

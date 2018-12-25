@@ -669,7 +669,7 @@ void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& pl
   player.setLandFlags( LandFlagsSlot::Private, EstateBuilt, ident );
   player.sendLandFlagsSlot( LandFlagsSlot::Private );
 
-  hZone->registerHouseEntranceEObj( plotNum );
+  hZone->registerEstateEntranceEObj( plotNum );
 }
 
 void Sapphire::World::Manager::HousingMgr::requestEstateRename( Entity::Player& player, const Common::LandIdent ident )
