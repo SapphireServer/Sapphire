@@ -173,7 +173,7 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
   /// ITEM GLOBAL
   prepareStatement( CHARA_ITEMGLOBAL_INS,
                     "INSERT INTO charaglobalitem ( CharacterId, ItemId, catalogId, stack, UPDATE_DATE ) VALUES ( ?, ?, ?, ?, NOW() );",
-                    CONNECTION_BOTH );
+                    CONNECTION_SYNC );
 
   /// BNPC TEMPLATES
   prepareStatement( ZONE_SEL_BNPCTEMPLATES,
