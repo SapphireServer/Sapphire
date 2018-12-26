@@ -448,6 +448,8 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
       if( !housingMgr )
         break;
 
+
+
       // housingMgr->sendHousingInventory( player, Common::InventoryType::HousingInd, 255 );
 
       break;

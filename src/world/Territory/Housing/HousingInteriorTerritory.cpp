@@ -160,6 +160,7 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::updateYardOb
 
 void Sapphire::World::Territory::Housing::HousingInteriorTerritory::spawnYardObject( uint8_t containerIdx,
                                                                                      uint16_t slot,
+                                                                                     uint16_t containerType,
                                                                                      Inventory::HousingItemPtr item )
 {
   auto housingMgr = g_fw.get< Manager::HousingMgr >();
@@ -169,14 +170,17 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::spawnYardObj
 
   m_yardObjects[ offset ] = obj;
 
-//  for( const auto& player : m_playerMap )
-//  {
-//    auto packet = makeZonePacket< Server::FFXIVIpcYardObjectSpawn >( player.second->getId() );
-//
-//    packet->data().landSetId = 0;
-//    packet->data().objectArray = static_cast< uint8_t >( offset );
-//    packet->data().object = obj;
-//
-//    player.second->queuePacket( packet );
-//  }
+  for( const auto& player : m_playerMap )
+  {
+    auto objectSpawnPkt = makeZonePacket< Server::FFXIVIpcHousingInternalObjectSpawn >( player.second->getId() );
+
+    objectSpawnPkt->data().containerId = containerType;
+    objectSpawnPkt->data().containerOffset = slot;
+
+    objectSpawnPkt->data().itemId = item->getAdditionalData() & 0xFFFF;
+    objectSpawnPkt->data().rotation = item->getRot();
+    objectSpawnPkt->data().pos = item->getPos();
+
+    player.second->queuePacket( objectSpawnPkt );
+  }
 }

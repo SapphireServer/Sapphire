@@ -934,18 +934,14 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceHousingItem( Sapphire::Entity
     isOutside = true;
   }
   // otherwise, inside a house. landId is 0 when inside a plot
-  else if( landId == 0 )
+  else if( auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( player.getCurrentZone() ) )
   {
-    auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( player.getCurrentZone() );
-    if( !zone )
-      return;
-
     // todo: this whole process is retarded and needs to be fixed
     // perhaps maintain a list of estates by ident inside housingmgr?
     auto ident = zone->getLandIdent();
     auto landSet = toLandSetId( ident.territoryTypeId, ident.wardNum );
 
-    land = getHousingZoneByLandSetId( landSet )->getLand( landId );
+    land = getHousingZoneByLandSetId( landSet )->getLand( ident.landId );
   }
   // wtf?
   else
@@ -994,8 +990,8 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceHousingItem( Sapphire::Entity
   }
   else
   {
-    player.sendUrgent( "you can't place internal items (yet)" );
-    return;
+    if( !placeInteriorItem( player, item ) )
+      player.sendUrgent( "An internal error occurred when placing the item." );
   }
 }
 
@@ -1082,7 +1078,7 @@ bool Sapphire::World::Manager::HousingMgr::placeInteriorItem( Entity::Player& pl
     auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( player.getCurrentZone() );
     assert( zone );
 
-    zone->spawnYardObject( containerIdx, freeSlot, item );
+    zone->spawnYardObject( containerIdx, freeSlot, containerId, item );
 
     return true;
   }
