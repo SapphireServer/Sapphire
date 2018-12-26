@@ -105,7 +105,7 @@ uint32_t Housing::HousingInteriorTerritory::getLastActivityTime() const
   return m_lastActivityTime;
 }
 
-const Common::LandIdent Housing::HousingInteriorTerritory::getIdent() const
+const Common::LandIdent Housing::HousingInteriorTerritory::getLandIdent() const
 {
   return m_landIdent;
 }

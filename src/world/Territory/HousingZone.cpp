@@ -142,7 +142,7 @@ bool Sapphire::HousingZone::init()
     auto& externalContainer = inventory[ InventoryType::HousingExteriorPlacedItems ];
 
     auto arrayBounds = m_yardObjectArrayBounds[ entry.m_landId ];
-    uint8_t yardMapIndex = entry.m_landId <= 29 ? 0 : 1;
+    auto yardMapIndex = entry.m_landId <= 29 ? 0 : 1;
 
     for( auto& item : externalContainer->getItemMap() )
     {
@@ -151,14 +151,9 @@ bool Sapphire::HousingZone::init()
       auto housingItem = std::dynamic_pointer_cast< Inventory::HousingItem >( item.second );
       assert( housingItem );
 
-      auto pos = housingItem->getPos();
-
       obj.itemId = housingItem->getAdditionalData();
       obj.itemRotation = housingItem->getRot();
-
-      obj.pos_x = Util::floatToUInt16( pos.x );
-      obj.pos_y = Util::floatToUInt16( pos.y );
-      obj.pos_z = Util::floatToUInt16( pos.z );
+      obj.pos = housingItem->getPos();
 
       auto idx = item.first + arrayBounds.first;
       m_yardObjects[ yardMapIndex ][ idx ] = obj;
@@ -365,14 +360,10 @@ void Sapphire::HousingZone::spawnYardObject( uint8_t landId, uint16_t slotId, In
   obj.itemId = item->getAdditionalData();
   obj.itemRotation = item->getRot();
 
-  auto pos = item->getPos();
-
-  obj.pos_x = Util::floatToUInt16( pos.x );
-  obj.pos_y = Util::floatToUInt16( pos.y );
-  obj.pos_z = Util::floatToUInt16( pos.z );
+  obj.pos = item->getPos();
 
   // link obj
-  uint8_t yardMapIndex = landId <= 29 ? 0 : 1;
+  auto yardMapIndex = landId <= 29 ? 0 : 1;
   m_yardObjects[ yardMapIndex ][ offset ] = obj;
 
   // spawn obj in zone
@@ -381,7 +372,7 @@ void Sapphire::HousingZone::spawnYardObject( uint8_t landId, uint16_t slotId, In
     auto packet = makeZonePacket< Server::FFXIVIpcYardObjectSpawn >( player.second->getId() );
 
     packet->data().landSetId = landId;
-    packet->data().objectArray = slotId;
+    packet->data().objectArray = static_cast< uint8_t >( slotId );
     packet->data().object = obj;
 
     player.second->queuePacket( packet );

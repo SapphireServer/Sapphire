@@ -128,15 +128,14 @@ void Sapphire::World::Manager::InventoryMgr::updateHousingItemPosition( Sapphire
 
   stmt->setUInt64( 1, item->getUId() );
 
-  stmt->setDouble( 2, pos.x );
-  stmt->setDouble( 3, pos.y );
-  stmt->setDouble( 4, pos.z );
-
+  stmt->setUInt( 2, pos.x );
+  stmt->setUInt( 3, pos.y );
+  stmt->setUInt( 4, pos.z );
   stmt->setInt( 5, rot );
 
-  stmt->setDouble( 6, pos.x );
-  stmt->setDouble( 7, pos.y );
-  stmt->setDouble( 8, pos.z );
+  stmt->setUInt( 6, pos.x );
+  stmt->setUInt( 7, pos.y );
+  stmt->setUInt( 8, pos.z );
   stmt->setInt( 9, rot );
 
   pDb->execute( stmt );
