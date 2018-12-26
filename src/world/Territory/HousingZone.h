@@ -4,6 +4,8 @@
 #include "Zone.h"
 #include "Forwards.h"
 
+#include <array>
+
 namespace Sapphire
 {
   enum class LandPurchaseResult

@@ -5,6 +5,7 @@
 #include "Territory/HousingZone.h"
 #include <set>
 #include <unordered_map>
+#include <array>
 
 namespace Sapphire::Data
 {
