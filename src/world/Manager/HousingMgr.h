@@ -149,6 +149,13 @@ namespace Sapphire::World::Manager
     void reqPlaceHousingItem( Entity::Player& player, uint16_t landId, uint16_t containerId, uint16_t slotId,
                               Common::FFXIVARR_POSITION3 pos, float rotation );
 
+    /*!
+     * @brief Returns the equivalent YardObject for a HousingItem
+     * @param item The item to convert into a YardObject
+     * @return The resultant YardObject
+     */
+    Common::YardObject getYardObjectForItem( Inventory::HousingItemPtr item ) const;
+
   private:
 
     /*!

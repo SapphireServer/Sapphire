@@ -1681,7 +1681,7 @@ struct FFXIVIpcLandSetInitialize : FFXIVIpcBasePacket< LandSetInitialize >
 
 struct FFXIVIpcYardObjectSpawn : FFXIVIpcBasePacket<YardObjectSpawn>
 {
-  uint8_t landSetId;
+  uint8_t landId;
   uint8_t objectArray;
   uint16_t unknown1;
   Common::YardObject object;

@@ -1038,7 +1038,7 @@ bool Sapphire::World::Manager::HousingMgr::placeInteriorItem( Entity::Player& pl
 {
   auto invMgr = g_fw.get< InventoryMgr >();
 
-  auto containers = {
+  auto containerIds = {
     InventoryType::HousingInteriorPlacedItems1,
     InventoryType::HousingInteriorPlacedItems2,
     InventoryType::HousingInteriorPlacedItems3,
@@ -1056,7 +1056,7 @@ bool Sapphire::World::Manager::HousingMgr::placeInteriorItem( Entity::Player& pl
 
   // find first free container
   uint8_t containerIdx = 0;
-  for( auto containerId : containers )
+  for( auto containerId : containerIds )
   {
     auto& container = getEstateInventory( ident )[ containerId ];
 
@@ -1079,9 +1079,24 @@ bool Sapphire::World::Manager::HousingMgr::placeInteriorItem( Entity::Player& pl
     invMgr->saveHousingContainer( ident, container );
     invMgr->updateHousingItemPosition( item );
 
-    break;
+    auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( player.getCurrentZone() );
+    assert( zone );
+
+    zone->spawnYardObject( containerIdx, freeSlot, item );
+
+    return true;
   }
 
+  return false;
+}
 
-  return true;
+Sapphire::Common::YardObject Sapphire::World::Manager::HousingMgr::getYardObjectForItem( Inventory::HousingItemPtr item ) const
+{
+  Sapphire::Common::YardObject obj {};
+
+  obj.pos = item->getPos();
+  obj.itemRotation = item->getRot();
+  obj.itemId = item->getAdditionalData();
+
+  return obj;
 }
