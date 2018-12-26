@@ -1096,3 +1096,54 @@ Sapphire::Common::YardObject Sapphire::World::Manager::HousingMgr::getYardObject
 
   return obj;
 }
+
+void Sapphire::World::Manager::HousingMgr::sendInternalEstateInventoryBatch( Sapphire::Entity::Player& player,
+                                                                             bool storeroom )
+{
+  auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( player.getCurrentZone() );
+  if( !zone )
+    return;
+
+  std::vector< uint16_t > containerIds;
+
+  if( !storeroom )
+  {
+    containerIds = {
+      InventoryType::HousingInteriorPlacedItems1,
+      InventoryType::HousingInteriorPlacedItems2,
+      InventoryType::HousingInteriorPlacedItems3,
+      InventoryType::HousingInteriorPlacedItems4,
+      InventoryType::HousingInteriorPlacedItems5,
+      InventoryType::HousingInteriorPlacedItems6,
+      InventoryType::HousingInteriorPlacedItems7,
+      InventoryType::HousingInteriorPlacedItems8,
+    };
+  }
+  else
+  {
+    containerIds = {
+      InventoryType::HousingInteriorStoreroom1,
+      InventoryType::HousingInteriorStoreroom2,
+      InventoryType::HousingInteriorStoreroom3,
+      InventoryType::HousingInteriorStoreroom4,
+      InventoryType::HousingInteriorStoreroom5,
+      InventoryType::HousingInteriorStoreroom6,
+      InventoryType::HousingInteriorStoreroom7,
+      InventoryType::HousingInteriorStoreroom8,
+    };
+  }
+
+  // todo: perms check
+
+  auto invMgr = g_fw.get< Manager::InventoryMgr >();
+  auto& containers = getEstateInventory( zone->getLandIdent() );
+
+  for( auto containerId : containerIds )
+  {
+    auto container = containers.find( containerId );
+    if( container == containers.end() )
+      break;
+
+    invMgr->sendInventoryContainer( player, container->second );
+  }
+}

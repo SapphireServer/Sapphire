@@ -440,17 +440,17 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
     }
     case ClientTriggerType::RequestEstateInventory:
     {
-      // only sent if param1 is 1, because the client sends this with 0 when you open the ui for whatever reason
-      if( param1 != 1 )
-        return;
-
       auto housingMgr = g_fw.get< HousingMgr >();
       if( !housingMgr )
         break;
 
+      // param1 = 1 - storeroom
+      // param1 = 0 - placed items
 
-
-      // housingMgr->sendHousingInventory( player, Common::InventoryType::HousingInd, 255 );
+      if( param1 == 1 )
+        housingMgr->sendInternalEstateInventoryBatch( player, true );
+      else
+        housingMgr->sendInternalEstateInventoryBatch( player );
 
       break;
     }

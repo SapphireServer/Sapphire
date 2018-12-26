@@ -115,6 +115,13 @@ namespace Sapphire::World::Manager
     void sendEstateInventory( Entity::Player& player, uint16_t inventoryType, uint8_t plotNum );
 
     /*!
+     * @brief Sends all the available internal inventories in one go. Used to initially populate the menu.
+     * @param player The player to send the containers to
+     * @param storeroom True if we should send the storeroom, false we send the placed items
+     */
+    void sendInternalEstateInventoryBatch( Entity::Player& player, bool storeroom = false );
+
+    /*!
      * @brief Get the land & house data that was cached on world startup.
      * @return
      */
