@@ -240,6 +240,22 @@ struct FFXIVIpcMarketBoardRequestItemListings :
   /* 0004 */ uint32_t padding;
 };
 
+struct FFXIVIpcReqPlaceHousingItem :
+  FFXIVIpcBasePacket< ReqPlaceHousingItem >
+{
+  /* 0000 */ uint16_t landId; // 0 when plot 0 or inside an estate
+  /* 0002 */ uint16_t unknown1;
+  /* 0004 */ uint32_t unknown2;
+  /* 0008 */ uint16_t sourceInvContainerId;
+  /* 000A */ uint16_t sourceInvSlotId;
+
+  /* 000C */ Common::FFXIVARR_POSITION3 position;
+  /* 0018 */ float rotation;
+
+  /* 001C */ uint32_t unknown3; // always 1?
+  /* 0020 */ uint32_t unknown4[2]; // always 0 it looks like
+};
+
 }
 }
 }

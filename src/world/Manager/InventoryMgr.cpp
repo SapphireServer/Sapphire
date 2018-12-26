@@ -3,7 +3,7 @@
 #include <Common.h>
 #include "Actor/Player.h"
 #include "Inventory/ItemContainer.h"
-#include "Inventory/Item.h"
+#include "Inventory/HousingItem.h"
 #include "Inventory/ItemUtil.h"
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Network/GamePacketNew.h>
@@ -79,14 +79,7 @@ Sapphire::ItemPtr Sapphire::World::Manager::InventoryMgr::createItem( Entity::Pl
 
   item->setStackSize( std::max< uint32_t >( 1, quantity ) );
 
-  auto stmt = pDb->getPreparedStatement( Db::CHARA_ITEMGLOBAL_INS );
-
-  stmt->setUInt( 1, player.getId() );
-  stmt->setUInt64( 2, item->getUId() );
-  stmt->setUInt( 3, item->getId() );
-  stmt->setUInt( 4, item->getStackSize() );
-
-  pDb->directExecute( stmt );
+  saveItem( player, item );
 
   return item;
 }
@@ -121,4 +114,43 @@ void Sapphire::World::Manager::InventoryMgr::saveHousingContainerItem( uint64_t 
   stmt->setUInt64( 5, itemId );
 
   pDb->execute( stmt );
+}
+
+void Sapphire::World::Manager::InventoryMgr::updateHousingItemPosition( Sapphire::Inventory::HousingItemPtr item )
+{
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+
+  auto stmt = pDb->getPreparedStatement( Db::LAND_INV_UP_ITEMPOS );
+  // ItemId, PosX, PosY, PosZ, Rotation, PosX, PosY, PosZ, Rotation
+
+  auto pos = item->getPos();
+  auto rot = item->getRot();
+
+  stmt->setUInt64( 1, item->getUId() );
+
+  stmt->setDouble( 2, pos.x );
+  stmt->setDouble( 3, pos.y );
+  stmt->setDouble( 4, pos.z );
+
+  stmt->setInt( 5, rot );
+
+  stmt->setDouble( 6, pos.x );
+  stmt->setDouble( 7, pos.y );
+  stmt->setDouble( 8, pos.z );
+  stmt->setInt( 9, rot );
+
+  pDb->execute( stmt );
+}
+
+void Sapphire::World::Manager::InventoryMgr::saveItem( Sapphire::Entity::Player& player, Sapphire::ItemPtr item )
+{
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto stmt = pDb->getPreparedStatement( Db::CHARA_ITEMGLOBAL_INS );
+
+  stmt->setUInt( 1, player.getId() );
+  stmt->setUInt64( 2, item->getUId() );
+  stmt->setUInt( 3, item->getId() );
+  stmt->setUInt( 4, item->getStackSize() );
+
+  pDb->directExecute( stmt );
 }

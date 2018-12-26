@@ -1684,11 +1684,7 @@ struct FFXIVIpcYardObjectSpawn : FFXIVIpcBasePacket<YardObjectSpawn>
   uint8_t landSetId;
   uint8_t objectArray;
   uint16_t unknown1;
-  uint32_t itemId;
-  uint16_t itemRotation;
-  uint16_t pos_x;
-  uint16_t pos_y;
-  uint16_t pos_z;
+  Common::YardObject object;
 };
 
 struct FFXIVIpcYardObjectMove : FFXIVIpcBasePacket<YardObjectMove>

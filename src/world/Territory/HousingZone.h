@@ -55,6 +55,7 @@ namespace Sapphire
     Entity::EventObjectPtr registerEstateEntranceEObj( uint8_t landId );
 
     void updateYardObjects( Common::LandIdent ident );
+    void spawnYardObject( uint8_t landId, uint16_t slotId, Sapphire::Inventory::HousingItemPtr item );
 
   private:
     using LandPtrMap = std::unordered_map< uint8_t, Sapphire::LandPtr >;

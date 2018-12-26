@@ -171,6 +171,8 @@ namespace Sapphire::Network
 
     DECLARE_HANDLER( tellHandler );
 
+    DECLARE_HANDLER( reqPlaceHousingItem );
+
   };
 
 }

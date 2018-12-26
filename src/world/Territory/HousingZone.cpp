@@ -354,3 +354,36 @@ void Sapphire::HousingZone::updateYardObjects( Sapphire::Common::LandIdent ident
 
   }
 }
+
+void Sapphire::HousingZone::spawnYardObject( uint8_t landId, uint16_t slotId, Inventory::HousingItemPtr item )
+{
+  auto bounds = m_yardObjectArrayBounds[ landId ];
+  auto offset = bounds.first + slotId;
+
+  Common::YardObject obj {};
+
+  obj.itemId = item->getAdditionalData();
+  obj.itemRotation = item->getRot();
+
+  auto pos = item->getPos();
+
+  obj.pos_x = Util::floatToUInt16( pos.x );
+  obj.pos_y = Util::floatToUInt16( pos.y );
+  obj.pos_z = Util::floatToUInt16( pos.z );
+
+  // link obj
+  uint8_t yardMapIndex = landId <= 29 ? 0 : 1;
+  m_yardObjects[ yardMapIndex ][ offset ] = obj;
+
+  // spawn obj in zone
+  for( const auto& player : m_playerMap )
+  {
+    auto packet = makeZonePacket< Server::FFXIVIpcYardObjectSpawn >( player.second->getId() );
+
+    packet->data().landSetId = landId;
+    packet->data().objectArray = slotId;
+    packet->data().object = obj;
+
+    player.second->queuePacket( packet );
+  }
+}

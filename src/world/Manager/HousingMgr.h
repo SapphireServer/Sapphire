@@ -146,7 +146,12 @@ namespace Sapphire::World::Manager
      */
     bool initHouseModels( Entity::Player& player, LandPtr land, uint32_t presetCatalogId );
 
+    void reqPlaceHousingItem( Entity::Player& player, uint16_t landId, uint16_t containerId, uint16_t slotId,
+                              Common::FFXIVARR_POSITION3 pos, float rotation );
+
   private:
+
+    bool placeExternalItem( Entity::Player& player, Inventory::HousingItemPtr item, Common::LandIdent ident );
 
     /*!
      * @brief Creates a house and saves the minimum amount required to persist a house through restarts.
