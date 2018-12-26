@@ -151,7 +151,22 @@ namespace Sapphire::World::Manager
 
   private:
 
+    /*!
+     * @brief Processes the spawning and linking of a newly placed housing item for external items
+     * @param player The player who is placing the item
+     * @param item The item that we're placing
+     * @param ident The land that is going to own the item
+     * @return true if the item was placed successfully, false if there's no free container slots to place it
+     */
     bool placeExternalItem( Entity::Player& player, Inventory::HousingItemPtr item, Common::LandIdent ident );
+
+    /*!
+     * @brief Processing the spawning and linking of a newly placed item for interior items
+     * @param player The player who is placing the item
+     * @param item The item that we're placing
+     * @return true if the item was placed successfully, false if there's no free spots to place it
+     */
+    bool placeInteriorItem( Entity::Player& player, Inventory::HousingItemPtr item );
 
     /*!
      * @brief Creates a house and saves the minimum amount required to persist a house through restarts.

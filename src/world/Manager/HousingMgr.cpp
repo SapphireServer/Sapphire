@@ -120,12 +120,12 @@ bool Sapphire::World::Manager::HousingMgr::loadEstateInventories()
     if( isPlacedItemsInventory( static_cast< Common::InventoryType >( containerId ) ) )
     {
       item->setPos( {
-        res->getFloat( "PosX" ),
-        res->getFloat( "PosY" ),
-        res->getFloat( "PosZ" )
+        res->getUInt16( "PosX" ),
+        res->getUInt16( "PosY" ),
+        res->getUInt16( "PosZ" )
       } );
 
-      item->setRot( res->getUInt( "Rotation" ) );
+      item->setRot( res->getUInt16( "Rotation" ) );
     }
 
     ContainerIdToContainerMap& estateInv = m_estateInventories[ ident ];
@@ -800,7 +800,7 @@ void Sapphire::World::Manager::HousingMgr::sendEstateInventory( Entity::Player& 
     if( !internalZone )
       return;
 
-    auto ident = internalZone->getIdent();
+    auto ident = internalZone->getLandIdent();
 
     auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
     auto exteriorZone = getHousingZoneByLandSetId( landSetId );
@@ -933,12 +933,16 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceHousingItem( Sapphire::Entity
 
     isOutside = true;
   }
-  // inside house
-  else if( auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( player.getCurrentZone() ) )
+  // otherwise, inside a house. landId is 0 when inside a plot
+  else if( landId == 0 )
   {
+    auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( player.getCurrentZone() );
+    if( !zone )
+      return;
+
     // todo: this whole process is retarded and needs to be fixed
     // perhaps maintain a list of estates by ident inside housingmgr?
-    auto ident = zone->getIdent();
+    auto ident = zone->getLandIdent();
     auto landSet = toLandSetId( ident.territoryTypeId, ident.wardNum );
 
     land = getHousingZoneByLandSetId( landSet )->getLand( landId );
@@ -954,9 +958,6 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceHousingItem( Sapphire::Entity
   if( land->getOwnerId() != player.getId() )
     return;
 
-  player.sendDebug( "got item place request: ");
-  player.sendDebug( " - item: c: " + std::to_string( containerId ) + ", s: " + std::to_string( slotId ) );
-
   // unlink item
   Inventory::HousingItemPtr item;
 
@@ -970,7 +971,12 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceHousingItem( Sapphire::Entity
     item = Inventory::make_HousingItem( tmpItem->getUId(), tmpItem->getId() );
 
     // set params
-    item->setPos( pos );
+    item->setPos( {
+      Util::floatToUInt16( pos.x ),
+      Util::floatToUInt16( pos.y ),
+      Util::floatToUInt16( pos.z )
+    } );
+
     item->setRot( Util::floatToUInt16Rot( rotation ) );
   }
   else
@@ -1020,8 +1026,62 @@ bool Sapphire::World::Manager::HousingMgr::placeExternalItem( Entity::Player& pl
 
   // add to zone and spawn
   auto zone = std::dynamic_pointer_cast< HousingZone >( player.getCurrentZone() );
+  assert( zone );
 
   zone->spawnYardObject( ident.landId, freeSlot, item );
+
+  return true;
+}
+
+bool Sapphire::World::Manager::HousingMgr::placeInteriorItem( Entity::Player& player,
+                                                              Inventory::HousingItemPtr item )
+{
+  auto invMgr = g_fw.get< InventoryMgr >();
+
+  auto containers = {
+    InventoryType::HousingInteriorPlacedItems1,
+    InventoryType::HousingInteriorPlacedItems2,
+    InventoryType::HousingInteriorPlacedItems3,
+    InventoryType::HousingInteriorPlacedItems4,
+    InventoryType::HousingInteriorPlacedItems5,
+    InventoryType::HousingInteriorPlacedItems6,
+    InventoryType::HousingInteriorPlacedItems7,
+    InventoryType::HousingInteriorPlacedItems8,
+  };
+
+  auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( player.getCurrentZone() );
+  assert( zone );
+
+  auto ident = zone->getLandIdent();
+
+  // find first free container
+  uint8_t containerIdx = 0;
+  for( auto containerId : containers )
+  {
+    auto& container = getEstateInventory( ident )[ containerId ];
+
+    auto freeSlot = container->getFreeSlot();
+    if( freeSlot == -1 )
+    {
+      containerIdx++;
+      continue;
+    }
+
+    // have a free slot
+    container->setItem( freeSlot, item );
+
+    // todo: see comment above in placeExternalItem where the same func is called
+    invMgr->saveItem( player, item );
+
+    // resend container
+    // todo: unsure as to whether we need to resend every container or just the one we edit - we'll see how this goes
+    invMgr->sendInventoryContainer( player, container );
+    invMgr->saveHousingContainer( ident, container );
+    invMgr->updateHousingItemPosition( item );
+
+    break;
+  }
+
 
   return true;
 }

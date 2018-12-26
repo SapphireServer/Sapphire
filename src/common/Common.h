@@ -26,6 +26,13 @@ namespace Sapphire::Common
     float z;
   };
 
+  struct FFXIVARR_POSITION3_U16
+  {
+    uint16_t x;
+    uint16_t y;
+    uint16_t z;
+  };
+
   struct ActiveLand
   {
     uint8_t ward;
@@ -848,9 +855,7 @@ namespace Sapphire::Common
   {
     uint32_t itemId;
     uint16_t itemRotation;
-    uint16_t pos_x;
-    uint16_t pos_y;
-    uint16_t pos_z;
+    Common::FFXIVARR_POSITION3_U16 pos;
   };
 
   enum HouseSize : uint8_t
