@@ -25,7 +25,7 @@ namespace Sapphire::World::Territory::Housing
     const Common::LandIdent getLandIdent() const;
 
     void updateYardObjects();
-    void spawnYardObject( uint8_t containerIdx, uint16_t slot, Inventory::HousingItemPtr item );
+    void spawnYardObject( uint8_t containerIdx, uint16_t slot, uint16_t containerType, Inventory::HousingItemPtr item );
 
   private:
     Common::LandIdent m_landIdent;

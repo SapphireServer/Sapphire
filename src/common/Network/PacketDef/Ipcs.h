@@ -201,6 +201,7 @@ namespace Sapphire::Network::Packets
     HousingShowEstateGuestAccess = 0x022A, // updated 4.4
 
     HousingObjectInitialize = 0x022C, // updated 4.4
+    HousingInternalObjectSpawn = 0x22D, // updated 4.4
 
     HousingWardInfo = 0x022F, // updated 4.4
     YardObjectMove = 0x0230, // updated 4.4
