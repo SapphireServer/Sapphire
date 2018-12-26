@@ -103,6 +103,14 @@ bool Sapphire::HousingZone::init()
     cursor += itemMax;
   }
 
+  // zero out the yard obj arrays so we don't leak memory like SE does :^)
+  Common::YardObject obj {};
+  memset( &obj, 0x0, sizeof( Common::YardObject ) );
+
+  for( auto& arr : m_yardObjects )
+  {
+    arr.fill( obj );
+  }
 
   auto housingMgr = g_fw.get< World::Manager::HousingMgr >();
   auto landCache = housingMgr->getLandCacheMap();
@@ -137,27 +145,7 @@ bool Sapphire::HousingZone::init()
     if( entry.m_houseId > 0 )
       registerEstateEntranceEObj( entry.m_landId );
 
-    // add items to yard object array
-    auto& inventory = housingMgr->getEstateInventory( land->getLandIdent() );
-    auto& externalContainer = inventory[ InventoryType::HousingExteriorPlacedItems ];
-
-    auto arrayBounds = m_yardObjectArrayBounds[ entry.m_landId ];
-    auto yardMapIndex = entry.m_landId <= 29 ? 0 : 1;
-
-    for( auto& item : externalContainer->getItemMap() )
-    {
-      Common::YardObject obj{};
-
-      auto housingItem = std::dynamic_pointer_cast< Inventory::HousingItem >( item.second );
-      assert( housingItem );
-
-      obj.itemId = housingItem->getAdditionalData();
-      obj.itemRotation = housingItem->getRot();
-      obj.pos = housingItem->getPos();
-
-      auto idx = item.first + arrayBounds.first;
-      m_yardObjects[ yardMapIndex ][ idx ] = obj;
-    }
+    updateYardObjects( land->getLandIdent() );
   }
 
   return true;
@@ -344,9 +332,16 @@ void Sapphire::HousingZone::updateYardObjects( Sapphire::Common::LandIdent ident
 
   auto yardContainer = landStorage[ InventoryType::HousingExteriorPlacedItems ];
 
+  auto arrayBounds = m_yardObjectArrayBounds[ ident.landId ];
+  auto yardMapIndex = ident.landId <= 29 ? 0 : 1;
+
   for( const auto& item : yardContainer->getItemMap() )
   {
+    auto housingItem = std::dynamic_pointer_cast< Inventory::HousingItem >( item.second );
+    assert( housingItem );
 
+    auto idx = item.first + arrayBounds.first;
+    m_yardObjects[ yardMapIndex ][ idx ] = housingMgr->getYardObjectForItem( housingItem );
   }
 }
 
@@ -371,7 +366,7 @@ void Sapphire::HousingZone::spawnYardObject( uint8_t landId, uint16_t slotId, In
   {
     auto packet = makeZonePacket< Server::FFXIVIpcYardObjectSpawn >( player.second->getId() );
 
-    packet->data().landSetId = landId;
+    packet->data().landId = landId;
     packet->data().objectArray = static_cast< uint8_t >( slotId );
     packet->data().object = obj;
 

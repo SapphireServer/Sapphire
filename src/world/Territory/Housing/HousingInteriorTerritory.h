@@ -1,5 +1,7 @@
 #include "ForwardsZone.h"
 #include "Territory/Zone.h"
+#include "Common.h"
+#include <array>
 
 namespace Sapphire::World::Territory::Housing
 {
@@ -22,8 +24,13 @@ namespace Sapphire::World::Territory::Housing
 
     const Common::LandIdent getLandIdent() const;
 
+    void updateYardObjects();
+    void spawnYardObject( uint8_t containerIdx, uint16_t slot, Inventory::HousingItemPtr item );
+
   private:
     Common::LandIdent m_landIdent;
     uint32_t m_lastActivityTime;
+
+    std::array< Sapphire::Common::YardObject, 400 > m_yardObjects;
   };
 }
