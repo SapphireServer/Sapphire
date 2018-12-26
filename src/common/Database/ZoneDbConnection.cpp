@@ -236,6 +236,17 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     "WHERE LandIdent = ? AND ContainerId = ? AND SlotId = ?;",
                     CONNECTION_BOTH );
 
+  prepareStatement( LAND_INV_UP_ITEMPOS,
+                    "INSERT INTO landplaceditems ( ItemId, PosX, PosY, PosZ, Rotation ) "
+                    "VALUES ( ?, ?, ?, ?, ? ) "
+                    "ON DUPLICATE KEY UPDATE PosX = ?, PosY = ?, PosZ = ?, Rotation = ?;",
+                    CONNECTION_BOTH );
+
+  prepareStatement( LAND_INV_DEL_ITEMPOS,
+                    "DELETE FROM landplaceditems "
+                    "WHERE ItemId = ?;",
+                    CONNECTION_BOTH );
+
   /*prepareStatement( LAND_INS,
                     "INSERT INTO land ( LandSetId ) VALUES ( ? );",
                     CONNECTION_BOTH );

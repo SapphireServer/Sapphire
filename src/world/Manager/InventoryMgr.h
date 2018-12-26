@@ -44,6 +44,19 @@ namespace Sapphire::World::Manager
      */
     void updateItem( Sapphire::ItemPtr item );
 
+    /*!
+     * @brief Updates the position/rotation of a housing object
+     * @param item The item to update
+     */
+    void updateHousingItemPosition( Sapphire::Inventory::HousingItemPtr item );
+
+    /*!
+     * @brief Saves an item to the global item table
+     * @param player The player which owns the item
+     * @param item The item to save
+     */
+    void saveItem( Entity::Player& player, ItemPtr item );
+
   private:
     /*!
      * @brief Saves an individual item to the db.

@@ -12,12 +12,12 @@
 extern Sapphire::Framework g_fw;
 
 Sapphire::ItemContainer::ItemContainer( uint16_t storageId, uint16_t maxSize, const std::string& tableName,
-                                        bool isMultiStorage, bool isPersistentStorage ) :
+                                        bool isMultiStorage, bool removeItemOnContainerRemoval ) :
   m_id( storageId ),
   m_size( maxSize ),
   m_tableName( tableName ),
   m_bMultiStorage( isMultiStorage ),
-  m_isPersistentStorage( isPersistentStorage )
+  m_removeItemOnContainerRemove( removeItemOnContainerRemoval )
 {
 
 }
@@ -45,7 +45,7 @@ void Sapphire::ItemContainer::removeItem( uint16_t slotId )
 
   if( it != m_itemMap.end() )
   {
-    if( m_isPersistentStorage )
+    if( m_removeItemOnContainerRemove )
       pDb->execute( "DELETE FROM charaglobalitem WHERE itemId = " + std::to_string( it->second->getUId() ) );
 
     m_itemMap.erase( it );
@@ -118,7 +118,7 @@ bool Sapphire::ItemContainer::isMultiStorage() const
 
 bool Sapphire::ItemContainer::isPersistentStorage() const
 {
-  return m_isPersistentStorage;
+  return m_removeItemOnContainerRemove;
 }
 
 

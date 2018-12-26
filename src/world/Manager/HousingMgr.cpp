@@ -27,6 +27,7 @@
 #include "InventoryMgr.h"
 #include "Inventory/HousingItem.h"
 #include "Inventory/ItemContainer.h"
+#include "Util/UtilMath.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network;
@@ -216,7 +217,7 @@ void Sapphire::World::Manager::HousingMgr::initLandCache()
 
     auto makeContainer = [ &containers ]( Common::InventoryType type, uint16_t size )
     {
-      containers[ type ] = make_ItemContainer( type, size, "houseiteminventory", true );
+      containers[ type ] = make_ItemContainer( type, size, "houseiteminventory", false );
     };
 
     uint16_t count = 0;
@@ -901,11 +902,126 @@ uint32_t Sapphire::World::Manager::HousingMgr::getItemAdditionalData( uint32_t c
 
 bool Sapphire::World::Manager::HousingMgr::isPlacedItemsInventory( Sapphire::Common::InventoryType type )
 {
-  return type == InventoryType::HousingExteriorPlacedItems   ||
+  return type == InventoryType::HousingExteriorPlacedItems  ||
          type == InventoryType::HousingInteriorPlacedItems1 ||
          type == InventoryType::HousingInteriorPlacedItems2 ||
          type == InventoryType::HousingInteriorPlacedItems3 ||
          type == InventoryType::HousingInteriorPlacedItems4 ||
          type == InventoryType::HousingInteriorPlacedItems5 ||
          type == InventoryType::HousingInteriorPlacedItems6;
+}
+
+void Sapphire::World::Manager::HousingMgr::reqPlaceHousingItem( Sapphire::Entity::Player& player, uint16_t landId,
+                                                                uint16_t containerId, uint16_t slotId,
+                                                                Sapphire::Common::FFXIVARR_POSITION3 pos,
+                                                                float rotation )
+{
+  // retail process is:
+  //  - unlink item from current container
+  //  - add it to destination container
+  //  - resend container
+  //  - send spawn packet
+  //  - send actrl 3f3, all params are 0
+
+  LandPtr land;
+  bool isOutside = false;
+
+  // inside housing territory
+  if( auto zone = std::dynamic_pointer_cast< HousingZone >( player.getCurrentZone() ) )
+  {
+    land = zone->getLand( landId );
+
+    isOutside = true;
+  }
+  // inside house
+  else if( auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( player.getCurrentZone() ) )
+  {
+    // todo: this whole process is retarded and needs to be fixed
+    // perhaps maintain a list of estates by ident inside housingmgr?
+    auto ident = zone->getIdent();
+    auto landSet = toLandSetId( ident.territoryTypeId, ident.wardNum );
+
+    land = getHousingZoneByLandSetId( landSet )->getLand( landId );
+  }
+  // wtf?
+  else
+    return;
+
+  if( !land )
+    return;
+
+  // todo: add proper permissions checks
+  if( land->getOwnerId() != player.getId() )
+    return;
+
+  player.sendDebug( "got item place request: ");
+  player.sendDebug( " - item: c: " + std::to_string( containerId ) + ", s: " + std::to_string( slotId ) );
+
+  // unlink item
+  Inventory::HousingItemPtr item;
+
+  if( containerId == InventoryType::Bag0 ||
+      containerId == InventoryType::Bag1 ||
+      containerId == InventoryType::Bag2 ||
+      containerId == InventoryType::Bag3 )
+  {
+    auto tmpItem = player.dropInventoryItem( static_cast< Common::InventoryType >( containerId ), slotId );
+
+    item = Inventory::make_HousingItem( tmpItem->getUId(), tmpItem->getId() );
+
+    // set params
+    item->setPos( pos );
+    item->setRot( Util::floatToUInt16Rot( rotation ) );
+  }
+  else
+  {
+    player.sendUrgent( "The inventory you are using to place an item is not supported." );
+    return;
+  }
+
+  auto ident = land->getLandIdent();
+
+  if( isOutside )
+  {
+    if( !placeExternalItem( player, item, ident ) )
+      player.sendUrgent( "An internal error occurred when placing the item." );
+  }
+  else
+  {
+    player.sendUrgent( "you can't place internal items (yet)" );
+    return;
+  }
+}
+
+bool Sapphire::World::Manager::HousingMgr::placeExternalItem( Entity::Player& player,
+                                                              Inventory::HousingItemPtr item,
+                                                              Common::LandIdent ident )
+{
+  auto invMgr = g_fw.get< InventoryMgr >();
+
+  auto& container = getEstateInventory( ident )[ InventoryType::HousingExteriorPlacedItems ];
+
+  auto freeSlot = container->getFreeSlot();
+
+  // todo: what happens when this fails? at the moment the player will just lose the item
+  if( freeSlot == -1 )
+    return false;
+
+  // add item to inv
+  container->setItem( freeSlot, item );
+
+  // we need to save the item again as removing it from the container on the player will remove it from charaglobalitem
+  // todo: this needs to be handled a bit better as it might be possible to overwrite another item that is created in the meantime
+  invMgr->saveItem( player, item );
+
+  invMgr->sendInventoryContainer( player, container );
+  invMgr->saveHousingContainer( ident, container );
+  invMgr->updateHousingItemPosition( item );
+
+  // add to zone and spawn
+  auto zone = std::dynamic_pointer_cast< HousingZone >( player.getCurrentZone() );
+
+  zone->spawnYardObject( ident.landId, freeSlot, item );
+
+  return true;
 }

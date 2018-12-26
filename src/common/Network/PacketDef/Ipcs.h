@@ -294,6 +294,8 @@ namespace Sapphire::Network::Packets
 
     InventoryModifyHandler = 0x0142, // updated 4.4
 
+    ReqPlaceHousingItem = 0x145, // updated 4.4
+
     BuildPresetHandler = 0x014A, // updated 4.4
     TalkEventHandler = 0x014B, // updated 4.4
     EmoteEventHandler = 0x014C, // updated 4.4
@@ -311,6 +313,7 @@ namespace Sapphire::Network::Packets
 
     LandRenameHandler = 0x0171, // updated 4.4
     HousingUpdateHouseGreeting = 0x0172, // updated 4.4
+    HousingUpdateObjectRotation = 0x0173, // updated 4.4
 
     SetSharedEstateSettings = 0x0177, // updated 4.4
 

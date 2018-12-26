@@ -919,6 +919,8 @@ namespace Sapphire::Entity
     void setActiveLand( uint8_t land, uint8_t ward );
     Common::ActiveLand getActiveLand() const;
 
+    Sapphire::ItemPtr dropInventoryItem( Common::InventoryType type, uint16_t slotId );
+
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 
