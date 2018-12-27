@@ -216,6 +216,11 @@ enum ActorControlType : uint16_t
     BuildPresetResponse = 0x3ED,
 
     /*!
+     * param1 = object array index
+     */
+    RemoveInteriorHousingItem = 0x3F1,
+
+    /*!
      * param1 = identity shit
      *          u16 1 - container id
      *          u16 2 - plot id
@@ -223,6 +228,7 @@ enum ActorControlType : uint16_t
      *          u16 1 - slot
      */
     HousingItemMoveConfirm = 0x3F9,
+    OpenEstateSettingsUI = 0x3FF,
 
     /*!
      * param1 = outdoor furnishings

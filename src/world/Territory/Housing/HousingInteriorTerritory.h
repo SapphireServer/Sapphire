@@ -24,14 +24,15 @@ namespace Sapphire::World::Territory::Housing
 
     const Common::LandIdent getLandIdent() const;
 
-    void updateYardObjects();
-    void spawnYardObject( uint8_t containerIdx, uint16_t slot, uint16_t containerType, Inventory::HousingItemPtr item );
-    void updateObjectPosition( uint16_t slot, Common::FFXIVARR_POSITION3_U16 pos, uint16_t rot );
+    void updateHousingObjects();
+    void spawnHousingObject( uint8_t containerIdx, uint16_t slot, uint16_t containerType,
+                             Inventory::HousingItemPtr item );
+    void updateHousingObjectPosition( uint16_t slot, Common::FFXIVARR_POSITION3_U16 pos, uint16_t rot );
 
   private:
     Common::LandIdent m_landIdent;
     uint32_t m_lastActivityTime;
 
-    std::array< Sapphire::Common::YardObject, 400 > m_yardObjects;
+    std::array< Sapphire::Common::HousingObject, 400 > m_housingObjects;
   };
 }

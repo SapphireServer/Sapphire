@@ -1679,22 +1679,20 @@ struct FFXIVIpcLandSetInitialize : FFXIVIpcBasePacket< LandSetInitialize >
   LandStruct land[ 30 ];
 };
 
-struct FFXIVIpcYardObjectSpawn : FFXIVIpcBasePacket<YardObjectSpawn>
+struct FFXIVIpcYardObjectSpawn : FFXIVIpcBasePacket< YardObjectSpawn >
 {
   uint8_t landId;
   uint8_t objectArray;
   uint16_t unknown1;
-  Common::YardObject object;
+  Common::HousingObject object;
 };
 
-struct FFXIVIpcYardObjectMove : FFXIVIpcBasePacket<YardObjectMove>
+struct FFXIVIpcYardObjectMove : FFXIVIpcBasePacket< YardObjectMove >
 {
   uint16_t itemRotation;
   uint8_t objectArray;
-  uint8_t landSetId;
-  uint16_t pos_x;
-  uint16_t pos_y;
-  uint16_t pos_z;
+  uint8_t landId;
+  Common::FFXIVARR_POSITION3_U16 pos;
   uint16_t unknown1;
   uint16_t unknown2;
   uint16_t unknown3;
@@ -1707,7 +1705,7 @@ struct FFXIVIpcHousingObjectInitialize : FFXIVIpcBasePacket< HousingObjectInitia
   uint8_t packetNum;
   uint8_t packetTotal;
   uint8_t u2; //Outdoor 0 / Indoor 100(?)
-  Common::YardObject object[100];
+  Common::HousingObject object[100];
   uint32_t unknown4; //unused
 };
 

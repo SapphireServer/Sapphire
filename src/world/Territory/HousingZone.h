@@ -55,11 +55,12 @@ namespace Sapphire
     Entity::EventObjectPtr registerEstateEntranceEObj( uint8_t landId );
 
     void updateYardObjects( Common::LandIdent ident );
-    void spawnYardObject( uint8_t landId, uint16_t slotId, Sapphire::Inventory::HousingItemPtr item );
+    void spawnYardObject( uint8_t landId, uint16_t slotId, Sapphire::Inventory::HousingItem& item );
+    void updateYardObjectPos( uint16_t slot, uint16_t landId, Inventory::HousingItem& item );
 
   private:
     using LandPtrMap = std::unordered_map< uint8_t, Sapphire::LandPtr >;
-    using YardObjectArray = std::array< Common::YardObject, 800 >;
+    using YardObjectArray = std::array< Common::HousingObject, 800 >;
     using YardObjectSubdivisionArray = std::array< YardObjectArray, 2 >;
 
     /*!

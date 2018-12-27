@@ -851,7 +851,7 @@ namespace Sapphire::Common
     uint32_t unkown1; //12
   };
 
-  struct YardObject
+  struct HousingObject
   {
     uint32_t itemId;
     uint16_t itemRotation;

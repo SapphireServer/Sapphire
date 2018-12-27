@@ -163,7 +163,7 @@ namespace Sapphire::World::Manager
      * @param item The item to convert into a YardObject
      * @return The resultant YardObject
      */
-    Common::YardObject getYardObjectForItem( Inventory::HousingItemPtr item ) const;
+    Common::HousingObject getYardObjectForItem( Inventory::HousingItemPtr item ) const;
 
 
     void reqMoveHousingItem( Entity::Player& player, Common::LandIdent ident, uint16_t slot,
@@ -186,7 +186,7 @@ namespace Sapphire::World::Manager
      * @return
      */
     bool moveExternalItem( Entity::Player& player, Common::LandIdent ident, uint16_t slot,
-                           Common::FFXIVARR_POSITION3 pos, float rot );
+                           Sapphire::HousingZone& terri, Common::FFXIVARR_POSITION3 pos, float rot );
 
     /*!
      * @brief Processes the movement of an item placed inside a HousingInteriorTerritory

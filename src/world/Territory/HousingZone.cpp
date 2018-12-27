@@ -104,8 +104,8 @@ bool Sapphire::HousingZone::init()
   }
 
   // zero out the yard obj arrays so we don't leak memory like SE does :^)
-  Common::YardObject obj {};
-  memset( &obj, 0x0, sizeof( Common::YardObject ) );
+  Common::HousingObject obj {};
+  memset( &obj, 0x0, sizeof( Common::HousingObject ) );
 
   for( auto& arr : m_yardObjects )
   {
@@ -175,7 +175,7 @@ void Sapphire::HousingZone::onPlayerZoneIn( Entity::Player& player )
     housingObjectInit->data().packetNum = yardPacketNum;
     housingObjectInit->data().packetTotal = yardPacketTotal;
 
-    auto yardObjectSize = sizeof( Common::YardObject );
+    auto yardObjectSize = sizeof( Common::HousingObject );
 
     auto& objects = m_yardObjects[ isInSubdivision ? 1 : 0 ];
 
@@ -345,17 +345,17 @@ void Sapphire::HousingZone::updateYardObjects( Sapphire::Common::LandIdent ident
   }
 }
 
-void Sapphire::HousingZone::spawnYardObject( uint8_t landId, uint16_t slotId, Inventory::HousingItemPtr item )
+void Sapphire::HousingZone::spawnYardObject( uint8_t landId, uint16_t slotId, Inventory::HousingItem& item )
 {
   auto bounds = m_yardObjectArrayBounds[ landId ];
   auto offset = bounds.first + slotId;
 
-  Common::YardObject obj {};
+  Common::HousingObject obj {};
 
-  obj.itemId = item->getAdditionalData();
-  obj.itemRotation = item->getRot();
+  obj.itemId = item.getAdditionalData();
+  obj.itemRotation = item.getRot();
 
-  obj.pos = item->getPos();
+  obj.pos = item.getPos();
 
   // link obj
   auto yardMapIndex = landId <= 29 ? 0 : 1;
@@ -369,6 +369,31 @@ void Sapphire::HousingZone::spawnYardObject( uint8_t landId, uint16_t slotId, In
     packet->data().landId = landId;
     packet->data().objectArray = static_cast< uint8_t >( slotId );
     packet->data().object = obj;
+
+    player.second->queuePacket( packet );
+  }
+}
+
+void Sapphire::HousingZone::updateYardObjectPos( uint16_t slot, uint16_t landId, Inventory::HousingItem& item )
+{
+  auto bounds = m_yardObjectArrayBounds[ landId ];
+  auto offset = bounds.first + slot;
+  auto yardMapIndex = landId <= 29 ? 0 : 1;
+
+  auto& obj = m_yardObjects[ yardMapIndex ][ offset ];
+
+  obj.itemRotation = item.getRot();
+  obj.pos = item.getPos();
+
+  for( const auto& player : m_playerMap )
+  {
+    auto packet = makeZonePacket< Server::FFXIVIpcYardObjectMove >( player.second->getId() );
+
+    packet->data().itemRotation = item.getRot();
+    packet->data().pos = item.getPos();
+
+    packet->data().landId = landId;
+    packet->data().objectArray = slot;
 
     player.second->queuePacket( packet );
   }
