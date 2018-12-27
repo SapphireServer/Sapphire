@@ -374,7 +374,8 @@ void Sapphire::HousingZone::spawnYardObject( uint8_t landId, uint16_t slotId, In
   }
 }
 
-void Sapphire::HousingZone::updateYardObjectPos( uint16_t slot, uint16_t landId, Inventory::HousingItem& item )
+void Sapphire::HousingZone::updateYardObjectPos( Entity::Player& sourcePlayer, uint16_t slot, uint16_t landId,
+                                                 Inventory::HousingItem& item )
 {
   auto bounds = m_yardObjectArrayBounds[ landId ];
   auto offset = bounds.first + slot;
@@ -387,6 +388,10 @@ void Sapphire::HousingZone::updateYardObjectPos( uint16_t slot, uint16_t landId,
 
   for( const auto& player : m_playerMap )
   {
+    // don't send it from the origin player, it already has the position from the move request
+    if( player.second->getId() == sourcePlayer.getId() )
+      continue;
+
     auto packet = makeZonePacket< Server::FFXIVIpcYardObjectMove >( player.second->getId() );
 
     packet->data().itemRotation = item.getRot();
