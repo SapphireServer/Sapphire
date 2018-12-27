@@ -218,6 +218,11 @@ enum ActorControlType : uint16_t
     /*!
      * param1 = object array index
      */
+    RemoveExteriorHousingItem = 0x3EF,
+
+    /*!
+     * param1 = object array index
+     */
     RemoveInteriorHousingItem = 0x3F1,
 
     /*!

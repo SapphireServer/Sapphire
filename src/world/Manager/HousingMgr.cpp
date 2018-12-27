@@ -1260,10 +1260,10 @@ bool Sapphire::World::Manager::HousingMgr::moveExternalItem( Entity::Player& pla
   auto invMgr = g_fw.get< InventoryMgr >();
   invMgr->updateHousingItemPosition( item );
 
-  terri.updateYardObjectPos( slot, ident.landId, *item );
+  terri.updateYardObjectPos( player, slot, ident.landId, *item );
 
-  // todo: something is sent to the player here to indicate the move has finished successfully
-  // currently they can move one item and then can't move any more
+  uint32_t param1 = ( ident.landId << 16 ) | InventoryType::HousingExteriorPlacedItems;
+  player.queuePacket( Server::makeActorControl143( player.getId(), ActorControl::HousingItemMoveConfirm, param1, slot ) );
 
 
   return true;
