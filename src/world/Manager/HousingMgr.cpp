@@ -241,7 +241,7 @@ void Sapphire::World::Manager::HousingMgr::initLandCache()
 
     auto makeContainer = [ &containers ]( Common::InventoryType type, uint16_t size )
     {
-      containers[ type ] = make_ItemContainer( type, size, "houseiteminventory", false );
+      containers[ type ] = make_ItemContainer( type, size, "houseiteminventory", false, false );
     };
 
     uint16_t count = 0;
@@ -1358,7 +1358,7 @@ bool Sapphire::World::Manager::HousingMgr::removeInternalItem( Entity::Player& p
     player.insertInventoryItem( containerPair.first, containerPair.second, item );
 
     // todo: set item as bound/unsellable/untradable
-    
+
     // despawn
     auto arraySlot = ( containerIdx * 50 ) + slotId;
 

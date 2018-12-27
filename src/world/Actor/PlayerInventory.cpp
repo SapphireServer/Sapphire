@@ -930,9 +930,9 @@ bool Sapphire::Entity::Player::getFreeInventoryContainerSlot( Entity::Player::In
 void Sapphire::Entity::Player::insertInventoryItem( Sapphire::Common::InventoryType type, uint16_t slot,
                                                     const Sapphire::ItemPtr item )
 {
-  auto& container = m_storageMap[ type ];
-  container->setItem( slot, item );
+  updateContainer( type, slot, item );
 
   auto slotUpdate = std::make_shared< UpdateInventorySlotPacket >( getId(), slot, type, *item );
   queuePacket( slotUpdate );
+
 }
