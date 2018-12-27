@@ -95,6 +95,23 @@ void Sapphire::World::Manager::InventoryMgr::saveHousingContainer( Common::LandI
   }
 }
 
+void Sapphire::World::Manager::InventoryMgr::removeItemFromHousingContainer( Sapphire::Common::LandIdent ident,
+                                                                             uint16_t containerId,
+                                                                             uint16_t slotId )
+{
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+
+  auto stmt = pDb->getPreparedStatement( Db::LAND_INV_DEL );
+
+  auto u64ident = *reinterpret_cast< uint64_t* >( &ident );
+
+  stmt->setUInt64( 1, u64ident );
+  stmt->setUInt( 2, containerId );
+  stmt->setUInt( 3, slotId );
+
+  pDb->directExecute( stmt );
+}
+
 void Sapphire::World::Manager::InventoryMgr::saveHousingContainerItem( uint64_t ident,
                                                                        uint16_t containerId, uint16_t slotId,
                                                                        uint64_t itemId )
@@ -139,6 +156,17 @@ void Sapphire::World::Manager::InventoryMgr::updateHousingItemPosition( Sapphire
   stmt->setInt( 9, rot );
 
   pDb->execute( stmt );
+}
+
+void Sapphire::World::Manager::InventoryMgr::removeHousingItemPosition( Sapphire::Inventory::HousingItem& item )
+{
+  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+
+  auto stmt = pDb->getPreparedStatement( Db::LAND_INV_DEL_ITEMPOS );
+
+  stmt->setUInt64( 1, item.getUId() );
+
+  pDb->directExecute( stmt );
 }
 
 void Sapphire::World::Manager::InventoryMgr::saveItem( Sapphire::Entity::Player& player, Sapphire::ItemPtr item )

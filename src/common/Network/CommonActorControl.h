@@ -333,6 +333,7 @@ enum ActorControlType : uint16_t
     RequestWardLandInfo = 0x453,
     RequestLandRelinquish = 0x454,
     RequestLandInventory = 0x0458,
+    RequestHousingItemRemove = 0x0459,
     RequestEstateRename = 0x45A,
     RequestEstateEditGreeting = 0x45B,
     RequestEstateGreeting = 0x45C, // sends FFXIVIpcHousingEstateGreeting in return

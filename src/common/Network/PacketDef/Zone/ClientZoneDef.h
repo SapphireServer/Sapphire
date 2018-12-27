@@ -41,7 +41,8 @@ struct FFXIVIpcClientTrigger :
   /* 0004 */ uint32_t param11;
   /* 0008 */ uint32_t param12;
   /* 000C */ uint32_t param2;
-  /* 0010 */ char unk_10[8];
+  /* 0010 */ uint32_t housingParam; // todo: param4?
+  /* 0014 */ char unk_14[4];
   /* 0018 */ uint64_t param3;
 };
 

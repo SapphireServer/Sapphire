@@ -6,6 +6,8 @@
 #include <Exd/ExdDataGenerated.h>
 #include <Network/GamePacketNew.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
+#include <Network/PacketWrappers/ActorControlPacket143.h>
+#include <Network/CommonActorControl.h>
 
 #include "Actor/Player.h"
 #include "Actor/Actor.h"
@@ -195,4 +197,16 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::updateHousin
   obj.itemRotation = rot;
 
   // todo: how does this update on other clients?
+}
+
+void Sapphire::World::Territory::Housing::HousingInteriorTerritory::removeHousingObject( uint16_t slot )
+{
+  memset( m_housingObjects.data() + slot, 0x0, sizeof( Common::HousingObject ) );
+
+  for( const auto& player : m_playerMap )
+  {
+    auto pkt = Server::makeActorControl143( player.second->getId(), Network::ActorControl::RemoveInteriorHousingItem, slot );
+
+    player.second->queuePacket( pkt );
+  }
 }

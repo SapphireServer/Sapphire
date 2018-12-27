@@ -170,12 +170,40 @@ namespace Sapphire::World::Manager
                              Common::FFXIVARR_POSITION3 pos, float rot );
 
 
+    void reqRemoveHousingItem( Sapphire::Entity::Player& player, uint16_t plot,
+                               uint16_t containerId, uint16_t slot,
+                               bool sendToStoreroom );
+
   private:
+
+    /*!
+     *
+     * @param player
+     * @param terri
+     * @param containerId
+     * @param slotId
+     * @param sendToStoreroom
+     * @return
+     */
+    bool removeInternalItem( Entity::Player& player, Territory::Housing::HousingInteriorTerritory& terri,
+                             uint16_t containerId, uint16_t slotId, bool sendToStoreroom );
+
+    /*!
+     *
+     * @param player
+     * @param terri
+     * @param containerId
+     * @param slotId
+     * @param sendToStoreroom
+     * @return
+     */
+    bool removeExternalItem( Entity::Player& player, HousingZone& terri,
+                             uint16_t containerId, uint16_t slotId, bool sendToStoreroom );
 
     /*!
      * @brief Processes the movement of an item placed in a HousingZone
      *
-     * This assumes that the player has permission to move the item.
+     * This function assumes that the player has permission to move the item.
      *
      * @param player The player who placed the item
      * @param ident The ident of the land that the item belongs to
@@ -183,7 +211,7 @@ namespace Sapphire::World::Manager
      * @param slot The slot of the item
      * @param pos The new position
      * @param rot The new rotation
-     * @return
+     * @return true if moved successfully
      */
     bool moveExternalItem( Entity::Player& player, Common::LandIdent ident, uint16_t slot,
                            Sapphire::HousingZone& terri, Common::FFXIVARR_POSITION3 pos, float rot );
@@ -191,7 +219,7 @@ namespace Sapphire::World::Manager
     /*!
      * @brief Processes the movement of an item placed inside a HousingInteriorTerritory
      *
-     * This assumes that the player has permission to move the item.
+     * This function assumes that the player has permission to move the item.
      *
      * @param player The player who placed the item
      * @param ident The ident of the land that the item belongs to
@@ -199,7 +227,7 @@ namespace Sapphire::World::Manager
      * @param slotIdx The slot of the item
      * @param pos The new position
      * @param rot The new rotation
-     * @return
+     * @return true if moved successfully
      */
     bool moveInternalItem( Entity::Player& player, Common::LandIdent ident,
                            Territory::Housing::HousingInteriorTerritory& terri, uint16_t slot,
