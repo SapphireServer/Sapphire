@@ -66,6 +66,8 @@ namespace Sapphire::World::Manager
      */
     using LandIdentToInventoryContainerMap = std::unordered_map< uint64_t, ContainerIdToContainerMap >;
 
+    using InventoryTypeList = std::vector< Common::InventoryType >;
+
     HousingMgr();
     virtual ~HousingMgr();
 
@@ -227,6 +229,9 @@ namespace Sapphire::World::Manager
 
     LandSetLandCacheMap m_landCache;
     LandIdentToInventoryContainerMap m_estateInventories;
+
+    InventoryTypeList m_internalPlacedItemContainers;
+    InventoryTypeList m_internalStoreroomContainers;
 
     std::array< std::pair< Common::InventoryType, Common::InventoryType >, 8 > m_containerMap;
 

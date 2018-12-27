@@ -46,6 +46,30 @@ Sapphire::World::Manager::HousingMgr::HousingMgr()
   m_containerMap[ 5 ] = std::make_pair( InventoryType::HousingInteriorPlacedItems1, InventoryType::HousingInteriorStoreroom1 );
   m_containerMap[ 6 ] = std::make_pair( InventoryType::HousingInteriorPlacedItems1, InventoryType::HousingInteriorStoreroom1 );
   m_containerMap[ 7 ] = std::make_pair( InventoryType::HousingInteriorPlacedItems1, InventoryType::HousingInteriorStoreroom1 );
+
+  m_internalPlacedItemContainers =
+  {
+    InventoryType::HousingInteriorPlacedItems1,
+    InventoryType::HousingInteriorPlacedItems2,
+    InventoryType::HousingInteriorPlacedItems3,
+    InventoryType::HousingInteriorPlacedItems4,
+    InventoryType::HousingInteriorPlacedItems5,
+    InventoryType::HousingInteriorPlacedItems6,
+    InventoryType::HousingInteriorPlacedItems7,
+    InventoryType::HousingInteriorPlacedItems8,
+  };
+
+  m_internalStoreroomContainers =
+  {
+    InventoryType::HousingInteriorStoreroom1,
+    InventoryType::HousingInteriorStoreroom2,
+    InventoryType::HousingInteriorStoreroom3,
+    InventoryType::HousingInteriorStoreroom4,
+    InventoryType::HousingInteriorStoreroom5,
+    InventoryType::HousingInteriorStoreroom6,
+    InventoryType::HousingInteriorStoreroom7,
+    InventoryType::HousingInteriorStoreroom8,
+  };
 }
 
 Sapphire::World::Manager::HousingMgr::~HousingMgr() = default;
@@ -1034,17 +1058,6 @@ bool Sapphire::World::Manager::HousingMgr::placeInteriorItem( Entity::Player& pl
 {
   auto invMgr = g_fw.get< InventoryMgr >();
 
-  auto containerIds = {
-    InventoryType::HousingInteriorPlacedItems1,
-    InventoryType::HousingInteriorPlacedItems2,
-    InventoryType::HousingInteriorPlacedItems3,
-    InventoryType::HousingInteriorPlacedItems4,
-    InventoryType::HousingInteriorPlacedItems5,
-    InventoryType::HousingInteriorPlacedItems6,
-    InventoryType::HousingInteriorPlacedItems7,
-    InventoryType::HousingInteriorPlacedItems8,
-  };
-
   auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( player.getCurrentZone() );
   assert( zone );
 
@@ -1052,7 +1065,7 @@ bool Sapphire::World::Manager::HousingMgr::placeInteriorItem( Entity::Player& pl
 
   // find first free container
   uint8_t containerIdx = 0;
-  for( auto containerId : containerIds )
+  for( auto containerId : m_internalPlacedItemContainers )
   {
     auto& container = getEstateInventory( ident )[ containerId ];
 
@@ -1104,34 +1117,12 @@ void Sapphire::World::Manager::HousingMgr::sendInternalEstateInventoryBatch( Sap
   if( !zone )
     return;
 
-  std::vector< uint16_t > containerIds;
+  InventoryTypeList containerIds;
 
-  if( !storeroom )
-  {
-    containerIds = {
-      InventoryType::HousingInteriorPlacedItems1,
-      InventoryType::HousingInteriorPlacedItems2,
-      InventoryType::HousingInteriorPlacedItems3,
-      InventoryType::HousingInteriorPlacedItems4,
-      InventoryType::HousingInteriorPlacedItems5,
-      InventoryType::HousingInteriorPlacedItems6,
-      InventoryType::HousingInteriorPlacedItems7,
-      InventoryType::HousingInteriorPlacedItems8,
-    };
-  }
+  if( storeroom )
+    containerIds = m_internalStoreroomContainers;
   else
-  {
-    containerIds = {
-      InventoryType::HousingInteriorStoreroom1,
-      InventoryType::HousingInteriorStoreroom2,
-      InventoryType::HousingInteriorStoreroom3,
-      InventoryType::HousingInteriorStoreroom4,
-      InventoryType::HousingInteriorStoreroom5,
-      InventoryType::HousingInteriorStoreroom6,
-      InventoryType::HousingInteriorStoreroom7,
-      InventoryType::HousingInteriorStoreroom8,
-    };
-  }
+    containerIds = m_internalPlacedItemContainers;
 
   // todo: perms check
 
