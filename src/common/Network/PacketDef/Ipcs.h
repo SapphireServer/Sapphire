@@ -314,7 +314,7 @@ namespace Sapphire::Network::Packets
 
     LandRenameHandler = 0x0171, // updated 4.4
     HousingUpdateHouseGreeting = 0x0172, // updated 4.4
-    HousingUpdateObjectRotation = 0x0173, // updated 4.4
+    HousingUpdateObjectPosition = 0x0173, // updated 4.4
 
     SetSharedEstateSettings = 0x0177, // updated 4.4
 

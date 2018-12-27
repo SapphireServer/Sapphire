@@ -39,13 +39,13 @@ extern Sapphire::Framework g_fw;
 Sapphire::World::Manager::HousingMgr::HousingMgr()
 {
   m_containerMap[ 0 ] = std::make_pair( InventoryType::HousingInteriorPlacedItems1, InventoryType::HousingInteriorStoreroom1 );
-  m_containerMap[ 1 ] = std::make_pair( InventoryType::HousingInteriorPlacedItems1, InventoryType::HousingInteriorStoreroom1 );
-  m_containerMap[ 2 ] = std::make_pair( InventoryType::HousingInteriorPlacedItems1, InventoryType::HousingInteriorStoreroom1 );
-  m_containerMap[ 3 ] = std::make_pair( InventoryType::HousingInteriorPlacedItems1, InventoryType::HousingInteriorStoreroom1 );
-  m_containerMap[ 4 ] = std::make_pair( InventoryType::HousingInteriorPlacedItems1, InventoryType::HousingInteriorStoreroom1 );
-  m_containerMap[ 5 ] = std::make_pair( InventoryType::HousingInteriorPlacedItems1, InventoryType::HousingInteriorStoreroom1 );
-  m_containerMap[ 6 ] = std::make_pair( InventoryType::HousingInteriorPlacedItems1, InventoryType::HousingInteriorStoreroom1 );
-  m_containerMap[ 7 ] = std::make_pair( InventoryType::HousingInteriorPlacedItems1, InventoryType::HousingInteriorStoreroom1 );
+  m_containerMap[ 1 ] = std::make_pair( InventoryType::HousingInteriorPlacedItems2, InventoryType::HousingInteriorStoreroom2 );
+  m_containerMap[ 2 ] = std::make_pair( InventoryType::HousingInteriorPlacedItems3, InventoryType::HousingInteriorStoreroom3 );
+  m_containerMap[ 3 ] = std::make_pair( InventoryType::HousingInteriorPlacedItems4, InventoryType::HousingInteriorStoreroom4 );
+  m_containerMap[ 4 ] = std::make_pair( InventoryType::HousingInteriorPlacedItems5, InventoryType::HousingInteriorStoreroom5 );
+  m_containerMap[ 5 ] = std::make_pair( InventoryType::HousingInteriorPlacedItems6, InventoryType::HousingInteriorStoreroom6 );
+  m_containerMap[ 6 ] = std::make_pair( InventoryType::HousingInteriorPlacedItems7, InventoryType::HousingInteriorStoreroom7 );
+  m_containerMap[ 7 ] = std::make_pair( InventoryType::HousingInteriorPlacedItems8, InventoryType::HousingInteriorStoreroom8 );
 
   m_internalPlacedItemContainers =
   {
@@ -247,7 +247,7 @@ void Sapphire::World::Manager::HousingMgr::initLandCache()
     uint16_t count = 0;
     for( int i = 0; i < 8; ++i )
     {
-      if( count >= entry.m_maxPlacedInternalItems )
+      if( count > entry.m_maxPlacedInternalItems )
         break;
 
       auto& pair = m_containerMap[ i ];
@@ -978,6 +978,9 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceHousingItem( Sapphire::Entity
   if( land->getOwnerId() != player.getId() )
     return;
 
+  // todo: check item position and make sure it's not outside the plot
+  // retail uses a radius based check
+
   // unlink item
   Inventory::HousingItemPtr item;
 
@@ -1063,12 +1066,17 @@ bool Sapphire::World::Manager::HousingMgr::placeInteriorItem( Entity::Player& pl
 
   auto ident = zone->getLandIdent();
 
+  auto& containers = getEstateInventory( ident );
+
   // find first free container
   uint8_t containerIdx = 0;
   for( auto containerId : m_internalPlacedItemContainers )
   {
-    auto& container = getEstateInventory( ident )[ containerId ];
+    auto needle = containers.find( containerId );
+    if( needle == containers.end() )
+      continue;
 
+    auto container = needle->second;
     auto freeSlot = container->getFreeSlot();
     if( freeSlot == -1 )
     {
@@ -1137,4 +1145,23 @@ void Sapphire::World::Manager::HousingMgr::sendInternalEstateInventoryBatch( Sap
 
     invMgr->sendInventoryContainer( player, container->second );
   }
+}
+
+void Sapphire::World::Manager::HousingMgr::reqMoveHousingItem( Entity::Player& player,
+                                                               Common::LandIdent ident, uint16_t slot,
+                                                               uint16_t container,
+                                                               Common::FFXIVARR_POSITION3 pos, float rot )
+{
+  auto landSet = toLandSetId( ident.territoryTypeId, ident.wardNum );
+  auto land = getHousingZoneByLandSetId( landSet )->getLand( ident.landId );
+
+  if( !land )
+    return;
+
+  // todo: proper perms checks
+  if( land->getOwnerId() != player.getId() )
+    return;
+
+  // update item in db
+
 }

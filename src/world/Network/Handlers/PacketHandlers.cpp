@@ -716,3 +716,15 @@ void Sapphire::Network::GameConnection::reqPlaceHousingItem( const Packets::FFXI
   housingMgr->reqPlaceHousingItem( player, data.landId, data.sourceInvContainerId, data.sourceInvSlotId,
                                    data.position, data.rotation );
 }
+
+void Sapphire::Network::GameConnection::reqMoveHousingItem( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                            Entity::Player& player )
+{
+  auto housingMgr = g_fw.get< HousingMgr >();
+
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcHousingUpdateObjectPosition >( inPacket );
+  const auto& data = packet.data();
+
+  housingMgr->reqMoveHousingItem( player, data.ident, data.slot, data.containerId, data.pos, data.rotation );
+
+}

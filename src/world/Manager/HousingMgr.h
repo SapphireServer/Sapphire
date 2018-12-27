@@ -165,6 +165,11 @@ namespace Sapphire::World::Manager
      */
     Common::YardObject getYardObjectForItem( Inventory::HousingItemPtr item ) const;
 
+
+    void reqMoveHousingItem( Entity::Player& player, Common::LandIdent ident, uint16_t slot,
+                             uint16_t container, Common::FFXIVARR_POSITION3 pos, float rot );
+
+
   private:
 
     /*!
