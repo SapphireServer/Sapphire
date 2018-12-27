@@ -725,6 +725,6 @@ void Sapphire::Network::GameConnection::reqMoveHousingItem( const Packets::FFXIV
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcHousingUpdateObjectPosition >( inPacket );
   const auto& data = packet.data();
 
-  housingMgr->reqMoveHousingItem( player, data.ident, data.slot, data.containerId, data.pos, data.rotation );
+  housingMgr->reqMoveHousingItem( player, data.ident, data.slot, data.pos, data.rotation );
 
 }

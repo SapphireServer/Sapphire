@@ -261,7 +261,7 @@ struct FFXIVIpcHousingUpdateObjectPosition :
 {
   /* 0000 */ Common::LandIdent ident;
   /* 0008 */ uint16_t slot;
-  /* 000A */ uint16_t containerId;
+  /* 000A */ uint16_t unk;
 
   /* 000C */ Common::FFXIVARR_POSITION3 pos;
   /* 0018 */ float rotation;

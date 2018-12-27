@@ -1149,7 +1149,6 @@ void Sapphire::World::Manager::HousingMgr::sendInternalEstateInventoryBatch( Sap
 
 void Sapphire::World::Manager::HousingMgr::reqMoveHousingItem( Entity::Player& player,
                                                                Common::LandIdent ident, uint16_t slot,
-                                                               uint16_t container,
                                                                Common::FFXIVARR_POSITION3 pos, float rot )
 {
   auto landSet = toLandSetId( ident.territoryTypeId, ident.wardNum );
@@ -1162,6 +1161,75 @@ void Sapphire::World::Manager::HousingMgr::reqMoveHousingItem( Entity::Player& p
   if( land->getOwnerId() != player.getId() )
     return;
 
-  // update item in db
+  // todo: what happens when either of these fail? how does the server let the client know that the moment failed
+  // as is, if it does fail, the client will be locked and unable to move any item until reentering the territory
+  if( auto terri = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( player.getCurrentZone() ) )
+  {
+    moveInternalItem( player, ident, *terri, slot, pos, rot );
+  }
+  else if( auto terri = std::dynamic_pointer_cast< HousingZone >( player.getCurrentZone() ) )
+  {
+    moveExternalItem( player, ident, slot, pos, rot );
+  }
+}
 
+bool Sapphire::World::Manager::HousingMgr::moveInternalItem( Entity::Player& player, Common::LandIdent ident,
+                                                             Territory::Housing::HousingInteriorTerritory& terri, uint16_t slot,
+                                                             Common::FFXIVARR_POSITION3 pos, float rot )
+{
+  auto containerIdx = static_cast< uint16_t >( slot / 50 );
+  auto slotIdx = slot % 50;
+
+  uint16_t containerId = 0;
+  try
+  {
+    containerId = m_internalPlacedItemContainers.at( containerIdx );
+  }
+  catch( const std::out_of_range& ex )
+  {
+    return false;
+  }
+
+  auto& containers = getEstateInventory( ident );
+
+  auto needle = containers.find( containerId );
+  if( needle == containers.end() )
+    return false;
+
+  auto container = needle->second;
+
+  auto item = std::dynamic_pointer_cast< Inventory::HousingItem >( container->getItem( slotIdx ) );
+  if( !item )
+    return false;
+
+  item->setPos( {
+    Util::floatToUInt16( pos.x ),
+    Util::floatToUInt16( pos.y ),
+    Util::floatToUInt16( pos.z )
+  } );
+
+  item->setRot( Util::floatToUInt16Rot( rot ) );
+
+  // save
+  auto invMgr = g_fw.get< InventoryMgr >();
+  invMgr->updateHousingItemPosition( item );
+
+  terri.updateObjectPosition( slot, item->getPos(), item->getRot() );
+
+  // send confirmation to player
+  uint32_t param1 = ( ident.landId << 16 ) | containerId;
+
+  player.queuePacket( Server::makeActorControl143( player.getId(), ActorControl::HousingItemMoveConfirm, param1, slotIdx ) );
+
+  // todo: update it for other players??
+
+  return true;
+}
+
+bool Sapphire::World::Manager::HousingMgr::moveExternalItem( Entity::Player& player,
+                                                             Common::LandIdent ident, uint16_t slot,
+                                                             Common::FFXIVARR_POSITION3 pos, float rot )
+{
+
+  return true;
 }

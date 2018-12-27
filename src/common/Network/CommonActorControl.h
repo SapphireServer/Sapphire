@@ -216,6 +216,15 @@ enum ActorControlType : uint16_t
     BuildPresetResponse = 0x3ED,
 
     /*!
+     * param1 = identity shit
+     *          u16 1 - container id
+     *          u16 2 - plot id
+     * param2 = item shit
+     *          u16 1 - slot
+     */
+    HousingItemMoveConfirm = 0x3F9,
+
+    /*!
      * param1 = outdoor furnishings
      *          u8 0 - relocation available, 1 = available
      *          u8 1 - outoor furnishings placed
