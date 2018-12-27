@@ -1010,16 +1010,17 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceHousingItem( Sapphire::Entity
 
   auto ident = land->getLandIdent();
 
+  bool status = false;
+
   if( isOutside )
-  {
-    if( !placeExternalItem( player, item, ident ) )
-      player.sendUrgent( "An internal error occurred when placing the item." );
-  }
+    status = placeExternalItem( player, item, ident );
   else
-  {
-    if( !placeInteriorItem( player, item ) )
-      player.sendUrgent( "An internal error occurred when placing the item." );
-  }
+    status = placeInteriorItem( player, item );
+
+  if( status )
+    player.queuePacket( Server::makeActorControl143( player.getId(), 0x3f3 ) );
+  else
+    player.sendUrgent( "An internal error occurred when placing the item." );
 }
 
 bool Sapphire::World::Manager::HousingMgr::placeExternalItem( Entity::Player& player,
@@ -1051,7 +1052,7 @@ bool Sapphire::World::Manager::HousingMgr::placeExternalItem( Entity::Player& pl
   auto zone = std::dynamic_pointer_cast< HousingZone >( player.getCurrentZone() );
   assert( zone );
 
-  zone->spawnYardObject( ident.landId, freeSlot, item );
+  zone->spawnYardObject( ident.landId, freeSlot, *item );
 
   return true;
 }
@@ -1099,7 +1100,7 @@ bool Sapphire::World::Manager::HousingMgr::placeInteriorItem( Entity::Player& pl
     auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( player.getCurrentZone() );
     assert( zone );
 
-    zone->spawnYardObject( containerIdx, freeSlot, containerId, item );
+    zone->spawnHousingObject( containerIdx, freeSlot, containerId, item );
 
     return true;
   }
@@ -1107,9 +1108,9 @@ bool Sapphire::World::Manager::HousingMgr::placeInteriorItem( Entity::Player& pl
   return false;
 }
 
-Sapphire::Common::YardObject Sapphire::World::Manager::HousingMgr::getYardObjectForItem( Inventory::HousingItemPtr item ) const
+Sapphire::Common::HousingObject Sapphire::World::Manager::HousingMgr::getYardObjectForItem( Inventory::HousingItemPtr item ) const
 {
-  Sapphire::Common::YardObject obj {};
+  Sapphire::Common::HousingObject obj {};
 
   obj.pos = item->getPos();
   obj.itemRotation = item->getRot();
@@ -1169,7 +1170,7 @@ void Sapphire::World::Manager::HousingMgr::reqMoveHousingItem( Entity::Player& p
   }
   else if( auto terri = std::dynamic_pointer_cast< HousingZone >( player.getCurrentZone() ) )
   {
-    moveExternalItem( player, ident, slot, pos, rot );
+    moveExternalItem( player, ident, slot, *terri, pos, rot );
   }
 }
 
@@ -1214,7 +1215,7 @@ bool Sapphire::World::Manager::HousingMgr::moveInternalItem( Entity::Player& pla
   auto invMgr = g_fw.get< InventoryMgr >();
   invMgr->updateHousingItemPosition( item );
 
-  terri.updateObjectPosition( slot, item->getPos(), item->getRot() );
+  terri.updateHousingObjectPosition( slot, item->getPos(), item->getRot() );
 
   // send confirmation to player
   uint32_t param1 = ( ident.landId << 16 ) | containerId;
@@ -1228,8 +1229,42 @@ bool Sapphire::World::Manager::HousingMgr::moveInternalItem( Entity::Player& pla
 
 bool Sapphire::World::Manager::HousingMgr::moveExternalItem( Entity::Player& player,
                                                              Common::LandIdent ident, uint16_t slot,
-                                                             Common::FFXIVARR_POSITION3 pos, float rot )
+                                                             Sapphire::HousingZone& terri, Common::FFXIVARR_POSITION3 pos,
+                                                             float rot )
 {
+  auto land = terri.getLand( ident.landId );
+
+  // todo: add proper perms check
+  if( land->getOwnerId() != player.getId() )
+    return false;
+
+  auto& containers = getEstateInventory( ident );
+  auto needle = containers.find( InventoryType::HousingExteriorPlacedItems );
+  if( needle == containers.end() )
+    return false;
+
+  auto container = needle->second;
+
+  auto item = std::dynamic_pointer_cast< Inventory::HousingItem >( container->getItem( slot ) );
+  if( !item )
+    return false;
+
+  item->setPos( {
+    Util::floatToUInt16( pos.x ),
+    Util::floatToUInt16( pos.y ),
+    Util::floatToUInt16( pos.z )
+  } );
+
+  item->setRot( Util::floatToUInt16Rot( rot ) );
+
+  auto invMgr = g_fw.get< InventoryMgr >();
+  invMgr->updateHousingItemPosition( item );
+
+  terri.updateYardObjectPos( slot, ident.landId, *item );
+
+  // todo: something is sent to the player here to indicate the move has finished successfully
+  // currently they can move one item and then can't move any more
+
 
   return true;
 }

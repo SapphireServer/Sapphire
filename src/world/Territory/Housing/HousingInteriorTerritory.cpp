@@ -45,7 +45,7 @@ Housing::HousingInteriorTerritory::~HousingInteriorTerritory() = default;
 
 bool Sapphire::World::Territory::Housing::HousingInteriorTerritory::init()
 {
-  updateYardObjects();
+  updateHousingObjects();
 
   return true;
 }
@@ -86,8 +86,8 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::onPlayerZone
     objectInitPacket->data().packetNum = yardPacketNum;
     objectInitPacket->data().packetTotal = yardPacketTotal;
 
-    auto yardObjectSize = sizeof( Common::YardObject );
-    memcpy( &objectInitPacket->data().object, m_yardObjects.data() + ( yardPacketNum * 100 ), yardObjectSize * 100 );
+    auto yardObjectSize = sizeof( Common::HousingObject );
+    memcpy( &objectInitPacket->data().object, m_housingObjects.data() + ( yardPacketNum * 100 ), yardObjectSize * 100 );
 
     player.queuePacket( objectInitPacket );
   }
@@ -110,7 +110,7 @@ const Common::LandIdent Sapphire::World::Territory::Housing::HousingInteriorTerr
   return m_landIdent;
 }
 
-void Sapphire::World::Territory::Housing::HousingInteriorTerritory::updateYardObjects()
+void Sapphire::World::Territory::Housing::HousingInteriorTerritory::updateHousingObjects()
 {
   auto housingMgr = g_fw.get< Manager::HousingMgr >();
 
@@ -128,9 +128,9 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::updateYardOb
   // zero out the array
   // there's some really weird behaviour where *some* values will cause the linkshell invite notification to pop up
   // for some reason
-  Common::YardObject obj {};
-  memset( &obj, 0x0, sizeof( Common::YardObject ) );
-  m_yardObjects.fill( obj );
+  Common::HousingObject obj {};
+  memset( &obj, 0x0, sizeof( Common::HousingObject ) );
+  m_housingObjects.fill( obj );
 
   auto containers = housingMgr->getEstateInventory( getLandIdent() );
 
@@ -151,24 +151,24 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::updateYardOb
 
       auto obj = housingMgr->getYardObjectForItem( housingItem );
 
-      m_yardObjects[ offset ] = obj;
+      m_housingObjects[ offset ] = obj;
     }
 
     containerIdx++;
   }
 }
 
-void Sapphire::World::Territory::Housing::HousingInteriorTerritory::spawnYardObject( uint8_t containerIdx,
-                                                                                     uint16_t slot,
-                                                                                     uint16_t containerType,
-                                                                                     Inventory::HousingItemPtr item )
+void Sapphire::World::Territory::Housing::HousingInteriorTerritory::spawnHousingObject( uint8_t containerIdx,
+                                                                                        uint16_t slot,
+                                                                                        uint16_t containerType,
+                                                                                        Inventory::HousingItemPtr item )
 {
   auto housingMgr = g_fw.get< Manager::HousingMgr >();
 
   auto offset = ( containerIdx * 50 ) + slot;
   auto obj = housingMgr->getYardObjectForItem( item );
 
-  m_yardObjects[ offset ] = obj;
+  m_housingObjects[ offset ] = obj;
 
   for( const auto& player : m_playerMap )
   {
@@ -185,11 +185,11 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::spawnYardObj
   }
 }
 
-void Sapphire::World::Territory::Housing::HousingInteriorTerritory::updateObjectPosition( uint16_t slot,
-                                                                                          Sapphire::Common::FFXIVARR_POSITION3_U16 pos,
-                                                                                          uint16_t rot )
+void Sapphire::World::Territory::Housing::HousingInteriorTerritory::updateHousingObjectPosition( uint16_t slot,
+                                                                                                 Sapphire::Common::FFXIVARR_POSITION3_U16 pos,
+                                                                                                 uint16_t rot )
 {
-  auto& obj = m_yardObjects[ slot ];
+  auto& obj = m_housingObjects[ slot ];
 
   obj.pos = pos;
   obj.itemRotation = rot;
