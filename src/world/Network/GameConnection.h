@@ -173,6 +173,8 @@ namespace Sapphire::Network
 
     DECLARE_HANDLER( reqPlaceHousingItem );
 
+    DECLARE_HANDLER( reqMoveHousingItem );
+
   };
 
 }

@@ -256,6 +256,19 @@ struct FFXIVIpcReqPlaceHousingItem :
   /* 0020 */ uint32_t unknown4[2]; // always 0 it looks like
 };
 
+struct FFXIVIpcHousingUpdateObjectPosition :
+  FFXIVIpcBasePacket< HousingUpdateObjectPosition >
+{
+  /* 0000 */ Common::LandIdent ident;
+  /* 0008 */ uint16_t slot;
+  /* 000A */ uint16_t containerId;
+
+  /* 000C */ Common::FFXIVARR_POSITION3 pos;
+  /* 0018 */ float rotation;
+
+  /* 001C */ uint32_t padding;
+};
+
 }
 }
 }
