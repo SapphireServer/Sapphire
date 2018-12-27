@@ -1126,14 +1126,14 @@ void Sapphire::World::Manager::HousingMgr::sendInternalEstateInventoryBatch( Sap
   if( !zone )
     return;
 
+  // todo: perms check
+
   InventoryTypeList containerIds;
 
   if( storeroom )
     containerIds = m_internalStoreroomContainers;
   else
     containerIds = m_internalPlacedItemContainers;
-
-  // todo: perms check
 
   auto invMgr = g_fw.get< Manager::InventoryMgr >();
   auto& containers = getEstateInventory( zone->getLandIdent() );
@@ -1267,4 +1267,111 @@ bool Sapphire::World::Manager::HousingMgr::moveExternalItem( Entity::Player& pla
 
 
   return true;
+}
+
+void Sapphire::World::Manager::HousingMgr::reqRemoveHousingItem( Sapphire::Entity::Player& player, uint16_t plot,
+                                                                 uint16_t containerId, uint16_t slot,
+                                                                 bool sendToStoreroom )
+{
+  if( auto terri = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( player.getCurrentZone() ) )
+  {
+    auto ident = terri->getLandIdent();
+    auto landSet = toLandSetId( ident.territoryTypeId, ident.wardNum );
+    auto land = getHousingZoneByLandSetId( landSet )->getLand( ident.landId );
+
+    if( !land )
+      return;
+
+    // todo: proper perms checks
+    if( land->getOwnerId() != player.getId() )
+      return;
+
+    removeInternalItem( player, *terri, containerId, slot, sendToStoreroom );
+  }
+  else if( auto terri = std::dynamic_pointer_cast< HousingZone >( player.getCurrentZone() ) )
+  {
+    auto land = terri->getLand( plot );
+    if( !land )
+      return;
+
+    if( land->getOwnerId() != player.getId() )
+      return;
+
+    removeExternalItem( player, *terri, containerId, slot, sendToStoreroom );
+  }
+}
+
+bool Sapphire::World::Manager::HousingMgr::removeInternalItem( Entity::Player& player,
+                                                               Territory::Housing::HousingInteriorTerritory& terri,
+                                                               uint16_t containerId, uint16_t slotId,
+                                                               bool sendToStoreroom )
+{
+  auto& containers = getEstateInventory( terri.getLandIdent() );
+
+  // validate the container id first
+  bool foundContainer = false;
+  uint8_t containerIdx = 0;
+  for( auto cId : m_internalPlacedItemContainers )
+  {
+    if( containerId == cId )
+    {
+      foundContainer = true;
+
+      break;
+    }
+
+    containerIdx++;
+  }
+
+  if( !foundContainer )
+    return false;
+
+  auto needle = containers.find( containerId );
+  if( needle == containers.end() )
+    return false;
+
+  auto container = needle->second;
+
+  auto item = std::dynamic_pointer_cast< Inventory::HousingItem >( container->getItem( slotId ) );
+  if( !item )
+    return false;
+
+  item->setStackSize( 1 );
+
+  if( !sendToStoreroom )
+  {
+    // make sure the player has a free inv slot first
+    Entity::Player::InventoryContainerPair containerPair;
+    if( !player.getFreeInventoryContainerSlot( containerPair ) )
+      return false;
+
+    auto invMgr = g_fw.get< InventoryMgr >();
+
+
+    // remove it from housing inventory
+    container->removeItem( slotId );
+    invMgr->sendInventoryContainer( player, container );
+    invMgr->removeHousingItemPosition( *item );
+    invMgr->removeItemFromHousingContainer( terri.getLandIdent(), containerId, slotId );
+
+    // add to player inv
+    player.insertInventoryItem( containerPair.first, containerPair.second, item );
+
+    // todo: set item as bound/unsellable/untradable
+    
+    // despawn
+    auto arraySlot = ( containerIdx * 50 ) + slotId;
+
+    terri.removeHousingObject( arraySlot );
+  }
+
+  return true;
+}
+
+bool Sapphire::World::Manager::HousingMgr::removeExternalItem( Entity::Player& player,
+                                                               HousingZone& terri,
+                                                               uint16_t containerId, uint16_t slotId,
+                                                               bool sendToStoreroom )
+{
+
 }

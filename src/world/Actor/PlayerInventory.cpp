@@ -902,3 +902,37 @@ Sapphire::ItemPtr Sapphire::Entity::Player::dropInventoryItem( Sapphire::Common:
 
   return item;
 }
+
+bool Sapphire::Entity::Player::getFreeInventoryContainerSlot( Entity::Player::InventoryContainerPair& containerPair ) const
+{
+  for( auto bagId : { Bag0, Bag1, Bag2, Bag3 } )
+  {
+    auto needle = m_storageMap.find( bagId );
+    if( needle == m_storageMap.end() )
+      continue;
+
+    auto& container = needle->second;
+
+    for( uint16_t idx = 0; idx < container->getMaxSize(); idx++ )
+    {
+      auto item = container->getItem( idx );
+      if( !item )
+      {
+        containerPair = std::make_pair( bagId, idx );
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+void Sapphire::Entity::Player::insertInventoryItem( Sapphire::Common::InventoryType type, uint16_t slot,
+                                                    const Sapphire::ItemPtr item )
+{
+  auto& container = m_storageMap[ type ];
+  container->setItem( slot, item );
+
+  auto slotUpdate = std::make_shared< UpdateInventorySlotPacket >( getId(), slot, type, *item );
+  queuePacket( slotUpdate );
+}

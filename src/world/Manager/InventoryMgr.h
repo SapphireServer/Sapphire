@@ -39,6 +39,14 @@ namespace Sapphire::World::Manager
     void saveHousingContainer( Common::LandIdent ident, Sapphire::ItemContainerPtr container );
 
     /*!
+     * @brief Unlinks an item from the housing container in the db
+     * @param ident The identity of the estate that owns the item
+     * @param containerId The container the item is in
+     * @param slotId The slot the item is in
+     */
+    void removeItemFromHousingContainer( Common::LandIdent ident, uint16_t containerId, uint16_t slotId );
+
+    /*!
      * @brief Update an item in the db
      * @param item The item to commit to the db
      */
@@ -49,6 +57,12 @@ namespace Sapphire::World::Manager
      * @param item The item to update
      */
     void updateHousingItemPosition( Sapphire::Inventory::HousingItemPtr item );
+
+    /*!
+     * @brief Removes the position/rotation from a housing object
+     * @param item The item to remove the position from.
+     */
+    void removeHousingItemPosition( Sapphire::Inventory::HousingItem& item );
 
     /*!
      * @brief Saves an item to the global item table

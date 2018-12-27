@@ -28,6 +28,7 @@ namespace Sapphire::World::Territory::Housing
     void spawnHousingObject( uint8_t containerIdx, uint16_t slot, uint16_t containerType,
                              Inventory::HousingItemPtr item );
     void updateHousingObjectPosition( uint16_t slot, Common::FFXIVARR_POSITION3_U16 pos, uint16_t rot );
+    void removeHousingObject( uint16_t slot );
 
   private:
     Common::LandIdent m_landIdent;
