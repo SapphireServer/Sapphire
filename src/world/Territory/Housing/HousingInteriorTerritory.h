@@ -26,6 +26,7 @@ namespace Sapphire::World::Territory::Housing
 
     void updateYardObjects();
     void spawnYardObject( uint8_t containerIdx, uint16_t slot, uint16_t containerType, Inventory::HousingItemPtr item );
+    void updateObjectPosition( uint16_t slot, Common::FFXIVARR_POSITION3_U16 pos, uint16_t rot );
 
   private:
     Common::LandIdent m_landIdent;

@@ -167,10 +167,43 @@ namespace Sapphire::World::Manager
 
 
     void reqMoveHousingItem( Entity::Player& player, Common::LandIdent ident, uint16_t slot,
-                             uint16_t container, Common::FFXIVARR_POSITION3 pos, float rot );
+                             Common::FFXIVARR_POSITION3 pos, float rot );
 
 
   private:
+
+    /*!
+     * @brief Processes the movement of an item placed in a HousingZone
+     *
+     * This assumes that the player has permission to move the item.
+     *
+     * @param player The player who placed the item
+     * @param ident The ident of the land that the item belongs to
+     * @param containerIdx The index of the container
+     * @param slot The slot of the item
+     * @param pos The new position
+     * @param rot The new rotation
+     * @return
+     */
+    bool moveExternalItem( Entity::Player& player, Common::LandIdent ident, uint16_t slot,
+                           Common::FFXIVARR_POSITION3 pos, float rot );
+
+    /*!
+     * @brief Processes the movement of an item placed inside a HousingInteriorTerritory
+     *
+     * This assumes that the player has permission to move the item.
+     *
+     * @param player The player who placed the item
+     * @param ident The ident of the land that the item belongs to
+     * @param slot The index of the container
+     * @param slotIdx The slot of the item
+     * @param pos The new position
+     * @param rot The new rotation
+     * @return
+     */
+    bool moveInternalItem( Entity::Player& player, Common::LandIdent ident,
+                           Territory::Housing::HousingInteriorTerritory& terri, uint16_t slot,
+                           Common::FFXIVARR_POSITION3 pos, float rot );
 
     /*!
      * @brief Processes the spawning and linking of a newly placed housing item for external items

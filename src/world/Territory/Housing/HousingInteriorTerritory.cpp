@@ -184,3 +184,15 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::spawnYardObj
     player.second->queuePacket( objectSpawnPkt );
   }
 }
+
+void Sapphire::World::Territory::Housing::HousingInteriorTerritory::updateObjectPosition( uint16_t slot,
+                                                                                          Sapphire::Common::FFXIVARR_POSITION3_U16 pos,
+                                                                                          uint16_t rot )
+{
+  auto& obj = m_yardObjects[ slot ];
+
+  obj.pos = pos;
+  obj.itemRotation = rot;
+
+  // todo: how does this update on other clients?
+}
