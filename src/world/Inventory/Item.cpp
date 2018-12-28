@@ -12,7 +12,8 @@ Sapphire::Item::Item( uint64_t uId, uint32_t catalogId, bool isHq ) :
   m_uId( uId ),
   m_isHq( isHq ),
   m_stain( 0 ),
-  m_durability( 30000 )
+  m_durability( 30000 ),
+  m_spiritBond( 0 )
 {
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
   auto itemInfo = pExdData->get< Sapphire::Data::Item >( catalogId );
@@ -159,4 +160,14 @@ void Sapphire::Item::setStain( uint16_t stain )
 uint32_t Sapphire::Item::getAdditionalData() const
 {
   return m_additionalData;
+}
+
+uint16_t Sapphire::Item::getSpiritbond() const
+{
+  return m_spiritBond;
+}
+
+void Sapphire::Item::setSpiritbond( uint16_t spiritbond )
+{
+  m_spiritBond = spiritbond;
 }

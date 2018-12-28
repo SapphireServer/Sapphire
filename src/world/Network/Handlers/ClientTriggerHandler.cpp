@@ -427,7 +427,6 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
     {
       uint8_t plot = ( param12 & 0xFF );
 
-
       auto housingMgr = g_fw.get< HousingMgr >();
       if( !housingMgr )
         break;
