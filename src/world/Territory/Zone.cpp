@@ -42,8 +42,6 @@ using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
 using namespace Sapphire::World::Manager;
 
-extern Sapphire::Framework g_fw;
-
 /**
 * \brief
 */
@@ -58,11 +56,13 @@ Sapphire::Zone::Zone() :
 }
 
 Sapphire::Zone::Zone( uint16_t territoryTypeId, uint32_t guId,
-                      const std::string& internalName, const std::string& placeName ) :
+                      const std::string& internalName, const std::string& placeName,
+                      FrameworkPtr pFw ) :
   m_currentWeather( Weather::FairSkies ),
-  m_nextEObjId( 0x400D0000 )
+  m_nextEObjId( 0x400D0000 ),
+  m_pFw( pFw )
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   m_guId = guId;
 
   m_territoryTypeId = territoryTypeId;
@@ -83,7 +83,7 @@ void Sapphire::Zone::loadWeatherRates()
   if( !m_territoryTypeInfo )
     return;
 
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
 
   uint8_t weatherRateId = m_territoryTypeInfo->weatherRate > pExdData->getWeatherRateIdList().size() ?
                           uint8_t{ 0 } : m_territoryTypeInfo->weatherRate;
@@ -109,7 +109,7 @@ Sapphire::Zone::~Zone()
 
 bool Sapphire::Zone::init()
 {
-  auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
+  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
 
   if( pScriptMgr->onZoneInit( shared_from_this() ) )
   {
@@ -223,7 +223,7 @@ void Sapphire::Zone::pushActor( Entity::ActorPtr pActor )
   {
     auto pPlayer = pActor->getAsPlayer();
 
-    auto pServerZone = g_fw.get< World::ServerMgr >();
+    auto pServerZone = m_pFw->get< World::ServerMgr >();
     auto pSession = pServerZone->getSession( pPlayer->getId() );
     if( pSession )
       m_sessionSet.insert( pSession );
@@ -281,11 +281,11 @@ void Sapphire::Zone::removeActor( Entity::ActorPtr pActor )
 void Sapphire::Zone::queuePacketForRange( Entity::Player& sourcePlayer, uint32_t range,
                                           Network::Packets::FFXIVPacketBasePtr pPacketEntry )
 {
-  auto pTeriMgr = g_fw.get< TerritoryMgr >();
+  auto pTeriMgr = m_pFw->get< TerritoryMgr >();
   if( pTeriMgr->isPrivateTerritory( getTerritoryTypeId() ) )
     return;
 
-  auto pServerZone = g_fw.get< World::ServerMgr >();
+  auto pServerZone = m_pFw->get< World::ServerMgr >();
   for( auto entry : m_playerMap )
   {
     auto player = entry.second;
@@ -307,11 +307,11 @@ void Sapphire::Zone::queuePacketForZone( Entity::Player& sourcePlayer,
                                          Network::Packets::FFXIVPacketBasePtr pPacketEntry,
                                          bool forSelf )
 {
-  auto pTeriMgr = g_fw.get< TerritoryMgr >();
+  auto pTeriMgr = m_pFw->get< TerritoryMgr >();
   if( pTeriMgr->isPrivateTerritory( getTerritoryTypeId() ) )
     return;
 
-  auto pServerZone = g_fw.get< World::ServerMgr >();
+  auto pServerZone = m_pFw->get< World::ServerMgr >();
   for( auto entry : m_playerMap )
   {
     auto player = entry.second;
@@ -627,7 +627,7 @@ void Sapphire::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
   if( pCell == nullptr )
     return;
 
-  auto pTeriMgr = g_fw.get< TerritoryMgr >();
+  auto pTeriMgr = m_pFw->get< TerritoryMgr >();
   // TODO: make sure gms can overwrite this. Potentially temporary solution
   if( pTeriMgr->isPrivateTerritory( getTerritoryTypeId() ) )
     return;

@@ -9,14 +9,13 @@
 #include "Forwards.h"
 #include "ItemContainer.h"
 
-extern Sapphire::Framework g_fw;
-
 Sapphire::ItemContainer::ItemContainer( uint16_t storageId, uint16_t maxSize, const std::string& tableName,
-                                        bool isMultiStorage, bool isPersistentStorage ) :
+                                        bool isMultiStorage, FrameworkPtr pFw, bool isPersistentStorage ) :
   m_id( storageId ),
   m_size( maxSize ),
   m_tableName( tableName ),
   m_bMultiStorage( isMultiStorage ),
+  m_pFw( pFw ),
   m_isPersistentStorage( isPersistentStorage )
 {
 
@@ -39,7 +38,7 @@ uint16_t Sapphire::ItemContainer::getEntryCount() const
 
 void Sapphire::ItemContainer::removeItem( uint16_t slotId )
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   ItemMap::iterator it = m_itemMap.find( slotId );
 
   if( it != m_itemMap.end() )

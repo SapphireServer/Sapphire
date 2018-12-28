@@ -43,7 +43,7 @@ void Sapphire::Entity::Player::initInventory()
 {
   auto setupContainer = [ this ]( InventoryType type, uint8_t maxSize, const std::string& tableName,
                                   bool isMultiStorage, bool isPersistentStorage = true )
-  { m_storageMap[ type ] = make_ItemContainer( type, maxSize, tableName, isMultiStorage, isPersistentStorage ); };
+  { m_storageMap[ type ] = make_ItemContainer( type, maxSize, tableName, isMultiStorage, m_pFw, isPersistentStorage ); };
 
   // main bags
   setupContainer( Bag0, 34, "charaiteminventory", true );

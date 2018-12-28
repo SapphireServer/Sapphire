@@ -22,21 +22,19 @@
 #include "InstanceContent.h"
 #include "Framework.h"
 
-extern Sapphire::Framework g_fw;
-
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
 
 Sapphire::InstanceContent::InstanceContent( std::shared_ptr< Sapphire::Data::InstanceContent > pInstanceConfiguration,
-                                        uint16_t territoryType,
-                                        uint32_t guId,
-                                        const std::string& internalName,
-                                        const std::string& contentName,
-                                        uint32_t instanceContentId )
-  :
-  Zone( static_cast< uint16_t >( territoryType ), guId, internalName, contentName ),
+                                            uint16_t territoryType,
+                                            uint32_t guId,
+                                            const std::string& internalName,
+                                            const std::string& contentName,
+                                            uint32_t instanceContentId,
+                                            FrameworkPtr pFw ) :
+  Zone( static_cast< uint16_t >( territoryType ), guId, internalName, contentName, pFw ),
   Director( Event::Director::InstanceContent, instanceContentId ),
   m_instanceConfiguration( pInstanceConfiguration ),
   m_instanceContentId( instanceContentId ),
@@ -50,7 +48,7 @@ Sapphire::InstanceContent::InstanceContent( std::shared_ptr< Sapphire::Data::Ins
 
 bool Sapphire::InstanceContent::init()
 {
-  auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
+  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
   pScriptMgr->onInstanceInit( getAsInstanceContent() );
 
   return true;
@@ -160,7 +158,7 @@ void Sapphire::InstanceContent::onUpdate( uint32_t currTime )
       break;
   }
 
-  auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
+  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
   pScriptMgr->onInstanceUpdate( getAsInstanceContent(), currTime );
 }
 
@@ -313,7 +311,7 @@ void Sapphire::InstanceContent::onRegisterEObj( Entity::EventObjectPtr object )
   if( object->getObjectId() == 2000182 ) // start
     m_pEntranceEObj = object;
 
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   auto objData = pExdData->get< Sapphire::Data::EObj >( object->getObjectId() );
   if( objData )
     // todo: data should be renamed to eventId
@@ -386,7 +384,7 @@ void Sapphire::InstanceContent::onTalk( Sapphire::Entity::Player& player, uint32
 void
 Sapphire::InstanceContent::onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 )
 {
-  auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
+  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
   pScriptMgr->onInstanceEnterTerritory( getAsInstanceContent(), player, eventId, param1, param2 );
 
   if( !hasPlayerPreviouslySpawned( player ) )

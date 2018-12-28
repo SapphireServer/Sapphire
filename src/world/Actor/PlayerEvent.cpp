@@ -285,7 +285,7 @@ void Sapphire::Entity::Player::eventActionStart( uint32_t eventId,
                                                  uint64_t additional )
 {
   auto pEventAction = Action::make_EventAction( getAsChara(), eventId, action,
-                                                finishCallback, interruptCallback, additional );
+                                                finishCallback, interruptCallback, additional, m_pFw );
 
   setCurrentAction( pEventAction );
   auto pEvent = getEvent( eventId );
