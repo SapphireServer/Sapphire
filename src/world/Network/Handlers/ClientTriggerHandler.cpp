@@ -464,7 +464,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
       auto slot = param4 & 0xFF;
       auto sendToStoreroom = ( param4 >> 16 ) != 0;
 
-      //player,  plot, containerId, slot, sendToStoreroom
+      //player, plot, containerId, slot, sendToStoreroom
       housingMgr->reqRemoveHousingItem( player, param12, param2, slot, sendToStoreroom );
 
       break;
