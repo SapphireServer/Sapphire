@@ -66,8 +66,6 @@ namespace Sapphire::World::Manager
      */
     using LandIdentToInventoryContainerMap = std::unordered_map< uint64_t, ContainerIdToContainerMap >;
 
-    using InventoryTypeList = std::vector< Common::InventoryType >;
-
     HousingMgr();
     virtual ~HousingMgr();
 
@@ -176,6 +174,10 @@ namespace Sapphire::World::Manager
 
   private:
 
+    ItemContainerPtr getFreeEstateInventorySlot( Common::LandIdent ident,
+                                                 Inventory::InventoryContainerPair& pair,
+                                                 Inventory::InventoryTypeList bagList );
+
     /*!
      *
      * @param player
@@ -192,13 +194,12 @@ namespace Sapphire::World::Manager
      *
      * @param player
      * @param terri
-     * @param containerId
      * @param slotId
      * @param sendToStoreroom
      * @return
      */
-    bool removeExternalItem( Entity::Player& player, HousingZone& terri,
-                             uint16_t containerId, uint16_t slotId, bool sendToStoreroom );
+    bool removeExternalItem( Entity::Player& player, HousingZone& terri, Land& land,
+                             uint16_t slotId, bool sendToStoreroom );
 
     /*!
      * @brief Processes the movement of an item placed in a HousingZone
@@ -296,8 +297,8 @@ namespace Sapphire::World::Manager
     LandSetLandCacheMap m_landCache;
     LandIdentToInventoryContainerMap m_estateInventories;
 
-    InventoryTypeList m_internalPlacedItemContainers;
-    InventoryTypeList m_internalStoreroomContainers;
+    Inventory::InventoryTypeList m_internalPlacedItemContainers;
+    Inventory::InventoryTypeList m_internalStoreroomContainers;
 
     std::array< std::pair< Common::InventoryType, Common::InventoryType >, 8 > m_containerMap;
 

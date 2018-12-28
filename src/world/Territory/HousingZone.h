@@ -58,6 +58,7 @@ namespace Sapphire
     void spawnYardObject( uint8_t landId, uint16_t slotId, Sapphire::Inventory::HousingItem& item );
     void updateYardObjectPos( Entity::Player& sourcePlayer, uint16_t slot, uint16_t landId,
                                   Inventory::HousingItem& item );
+    void despawnYardObject( uint16_t landId, uint16_t slot );
 
   private:
     using LandPtrMap = std::unordered_map< uint8_t, Sapphire::LandPtr >;

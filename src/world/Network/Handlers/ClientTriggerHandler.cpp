@@ -79,14 +79,14 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
   const auto param12 = packet.data().param12;
   const auto param2 = packet.data().param2;
   const auto param3 = packet.data().param3;
-  const auto housingParam = packet.data().housingParam;
+  const auto param4 = packet.data().param4;
 
   pLog->debug( "[" + std::to_string( m_pSession->getId() ) + "] Incoming action: " +
                Util::intToHexString( static_cast< uint32_t >( commandId & 0xFFFF ), 4 ) +
                "\nparam1: " + Util::intToHexString( static_cast< uint64_t >( param1 & 0xFFFFFFFFFFFFFFF ), 16 ) +
                "\nparam2: " + Util::intToHexString( static_cast< uint32_t >( param2 & 0xFFFFFFFF ), 8 ) +
                "\nparam3: " + Util::intToHexString( static_cast< uint64_t >( param3 & 0xFFFFFFFFFFFFFFF ), 16 ) +
-               "\nhousingParam: " + Util::intToHexString( static_cast< uint32_t >( housingParam & 0xFFFFFFFF ), 8 )
+               "\nparam4: " + Util::intToHexString( static_cast< uint32_t >( param4 & 0xFFFFFFFF ), 8 )
   );
 
 
@@ -460,8 +460,8 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
     {
       auto housingMgr = g_fw.get< HousingMgr >();
 
-      auto slot = housingParam & 0xFF;
-      auto sendToStoreroom = ( housingParam >> 16 ) != 0;
+      auto slot = param4 & 0xFF;
+      auto sendToStoreroom = ( param4 >> 16 ) != 0;
 
       //player,  plot, containerId, slot, sendToStoreroom
       housingMgr->reqRemoveHousingItem( player, param12, param2, slot, sendToStoreroom );

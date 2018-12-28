@@ -216,7 +216,8 @@ enum ActorControlType : uint16_t
     BuildPresetResponse = 0x3ED,
 
     /*!
-     * param1 = object array index
+     * param1 = u16 landid
+     *          u16 slotid
      */
     RemoveExteriorHousingItem = 0x3EF,
 

@@ -6,6 +6,8 @@
 #include <Exd/ExdDataGenerated.h>
 #include <Network/GamePacketNew.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
+#include <Network/PacketWrappers/ActorControlPacket143.h>
+#include <Network/CommonActorControl.h>
 
 #include "Actor/Player.h"
 #include "Actor/Actor.h"
@@ -401,5 +403,22 @@ void Sapphire::HousingZone::updateYardObjectPos( Entity::Player& sourcePlayer, u
     packet->data().objectArray = slot;
 
     player.second->queuePacket( packet );
+  }
+}
+
+void Sapphire::HousingZone::despawnYardObject( uint16_t landId, uint16_t slot )
+{
+  auto bounds = m_yardObjectArrayBounds[ landId ];
+  auto offset = bounds.first + slot;
+  auto yardMapIndex = landId <= 29 ? 0 : 1;
+
+  memset( &m_yardObjects[ yardMapIndex ][ offset ], 0x00, sizeof( Common::HousingObject ) );
+
+  for( const auto& player : m_playerMap )
+  {
+    auto param = ( landId << 16 ) | slot;
+    auto pkt = Server::makeActorControl143( player.second->getId(), Network::ActorControl::RemoveExteriorHousingItem, param );
+
+    player.second->queuePacket( pkt );
   }
 }
