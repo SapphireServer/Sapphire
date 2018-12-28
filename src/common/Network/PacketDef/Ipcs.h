@@ -204,7 +204,7 @@ namespace Sapphire::Network::Packets
     HousingInternalObjectSpawn = 0x22D, // updated 4.4
 
     HousingWardInfo = 0x022F, // updated 4.4
-    YardObjectMove = 0x0230, // updated 4.4
+    HousingObjectMove = 0x0230, // updated 4.4
 
     SharedEstateSettingsResponse = 0x023C, // updated 4.4
 

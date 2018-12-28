@@ -1687,7 +1687,7 @@ struct FFXIVIpcYardObjectSpawn : FFXIVIpcBasePacket< YardObjectSpawn >
   Common::HousingObject object;
 };
 
-struct FFXIVIpcYardObjectMove : FFXIVIpcBasePacket< YardObjectMove >
+struct FFXIVIpcHousingObjectMove : FFXIVIpcBasePacket< HousingObjectMove >
 {
   uint16_t itemRotation;
   uint8_t objectArray;

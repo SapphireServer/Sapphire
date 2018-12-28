@@ -394,7 +394,7 @@ void Sapphire::HousingZone::updateYardObjectPos( Entity::Player& sourcePlayer, u
     if( player.second->getId() == sourcePlayer.getId() )
       continue;
 
-    auto packet = makeZonePacket< Server::FFXIVIpcYardObjectMove >( player.second->getId() );
+    auto packet = makeZonePacket< Server::FFXIVIpcHousingObjectMove >( player.second->getId() );
 
     packet->data().itemRotation = item.getRot();
     packet->data().pos = item.getPos();
