@@ -1307,7 +1307,9 @@ void Sapphire::World::Manager::HousingMgr::reqRemoveHousingItem( Sapphire::Entit
     if( land->getOwnerId() != player.getId() )
       return;
 
-    removeExternalItem( player, *terri, *land, slot, sendToStoreroom );
+    auto containerType = static_cast< Common::InventoryType >( containerId );
+
+    removeExternalItem( player, *terri, *land, containerType, slot, sendToStoreroom );
   }
 }
 
@@ -1319,6 +1321,7 @@ bool Sapphire::World::Manager::HousingMgr::removeInternalItem( Entity::Player& p
   auto& containers = getEstateInventory( terri.getLandIdent() );
 
   // validate the container id first
+  // we also need the idx of the container so we can get the slot offset
   bool foundContainer = false;
   uint8_t containerIdx = 0;
   for( auto cId : m_internalPlacedItemContainers )
@@ -1395,13 +1398,18 @@ bool Sapphire::World::Manager::HousingMgr::removeInternalItem( Entity::Player& p
 }
 
 bool Sapphire::World::Manager::HousingMgr::removeExternalItem( Entity::Player& player, HousingZone& terri, Land& land,
-                                                               uint16_t slotId, bool sendToStoreroom )
+                                                               Common::InventoryType containerType, uint16_t slotId,
+                                                               bool sendToStoreroom )
 {
   auto& containers = getEstateInventory( land.getLandIdent() );
 
-  auto& placedContainer = containers[ InventoryType::HousingExteriorPlacedItems ];
+  auto needle = containers.find( containerType );
+  if( needle == containers.end() )
+    return false;
 
-  auto item = std::dynamic_pointer_cast< Inventory::HousingItem >( placedContainer->getItem( slotId ) );
+  auto& sourceContainer = needle->second;
+
+  auto item = std::dynamic_pointer_cast< Inventory::HousingItem >( sourceContainer->getItem( slotId ) );
   if( !item )
     return false;
 
@@ -1415,10 +1423,10 @@ bool Sapphire::World::Manager::HousingMgr::removeExternalItem( Entity::Player& p
     if( freeSlot == -1 )
       return false;
 
-    placedContainer->removeItem( slotId );
-    invMgr->sendInventoryContainer( player, placedContainer );
+    sourceContainer->removeItem( slotId );
+    invMgr->sendInventoryContainer( player, sourceContainer );
     invMgr->removeHousingItemPosition( *item );
-    invMgr->removeItemFromHousingContainer( land.getLandIdent(), placedContainer->getId(), slotId );
+    invMgr->removeItemFromHousingContainer( land.getLandIdent(), sourceContainer->getId(), slotId );
 
     storeroomContainer->setItem( freeSlot, item );
     invMgr->sendInventoryContainer( player, storeroomContainer );
@@ -1431,10 +1439,10 @@ bool Sapphire::World::Manager::HousingMgr::removeExternalItem( Entity::Player& p
       return false;
 
     // remove from housing inv
-    placedContainer->removeItem( slotId );
-    invMgr->sendInventoryContainer( player, placedContainer );
+    sourceContainer->removeItem( slotId );
+    invMgr->sendInventoryContainer( player, sourceContainer );
     invMgr->removeHousingItemPosition( *item );
-    invMgr->removeItemFromHousingContainer( land.getLandIdent(), placedContainer->getId(), slotId );
+    invMgr->removeItemFromHousingContainer( land.getLandIdent(), sourceContainer->getId(), slotId );
 
     // add to player inv
     player.insertInventoryItem( containerPair.first, containerPair.second, item );

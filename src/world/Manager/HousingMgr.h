@@ -203,7 +203,8 @@ namespace Sapphire::World::Manager
      * @return
      */
     bool removeExternalItem( Entity::Player& player, HousingZone& terri, Land& land,
-                             uint16_t slotId, bool sendToStoreroom );
+                             Common::InventoryType containerType, uint16_t slotId,
+                             bool sendToStoreroom );
 
     /*!
      * @brief Processes the movement of an item placed in a HousingZone
