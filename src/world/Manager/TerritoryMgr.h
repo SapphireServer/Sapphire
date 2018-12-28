@@ -87,6 +87,13 @@ namespace Sapphire::World::Manager
     /*! returns true if the territoryType in question is not a private zone */
     bool isPrivateTerritory( uint32_t territoryTypeId ) const;
 
+    /*!
+     * @brief Checks if a territory type is an internal housing area
+     * @param territoryTypeId The territory to test
+     * @return true if it is a housing area, false if not
+     */
+    bool isInternalEstateTerritory( uint32_t territoryTypeId ) const;
+
     /*! returns true if the territoryType is a default non-instanced zone */
     bool isDefaultTerritory( uint32_t territoryTypeId ) const;
 
