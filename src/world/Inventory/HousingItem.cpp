@@ -4,6 +4,7 @@ Sapphire::Inventory::HousingItem::HousingItem( uint64_t uId, uint32_t catalogId 
   Sapphire::Item( uId, catalogId, false )
 {
   m_stackSize = 1;
+  m_spiritBond = 1;
 }
 
 uint16_t Sapphire::Inventory::HousingItem::getRot() const

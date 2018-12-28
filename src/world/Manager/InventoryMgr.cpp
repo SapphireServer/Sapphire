@@ -49,8 +49,8 @@ void Sapphire::World::Manager::InventoryMgr::sendInventoryContainer( Sapphire::E
       itemInfoPacket->data().quantity = itM->second->getStackSize();
       itemInfoPacket->data().catalogId = itM->second->getId();
       itemInfoPacket->data().condition = itM->second->getDurability();
-      itemInfoPacket->data().spiritBond = 0;
-      itemInfoPacket->data().hqFlag = itM->second->isHq() ? 1 : 0;
+      itemInfoPacket->data().spiritBond = itM->second->getSpiritbond();
+      itemInfoPacket->data().hqFlag = static_cast< uint8_t >( itM->second->isHq() ? 1 : 0 );
       itemInfoPacket->data().stain = itM->second->getStain();
 
       player.queuePacket( itemInfoPacket );
