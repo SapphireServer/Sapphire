@@ -1092,7 +1092,6 @@ bool Sapphire::World::Manager::HousingMgr::placeInteriorItem( Entity::Player& pl
     invMgr->saveItem( player, item );
 
     // resend container
-    // todo: unsure as to whether we need to resend every container or just the one we edit - we'll see how this goes
     invMgr->sendInventoryContainer( player, container );
     invMgr->saveHousingContainer( ident, container );
     invMgr->updateHousingItemPosition( item );
@@ -1128,7 +1127,7 @@ void Sapphire::World::Manager::HousingMgr::sendInternalEstateInventoryBatch( Sap
 
   // todo: perms check
 
-  InventoryTypeList containerIds;
+  Inventory::InventoryTypeList containerIds;
 
   if( storeroom )
     containerIds = m_internalStoreroomContainers;
@@ -1297,7 +1296,7 @@ void Sapphire::World::Manager::HousingMgr::reqRemoveHousingItem( Sapphire::Entit
     if( land->getOwnerId() != player.getId() )
       return;
 
-    removeExternalItem( player, *terri, containerId, slot, sendToStoreroom );
+    removeExternalItem( player, *terri, *land, slot, sendToStoreroom );
   }
 }
 
@@ -1336,17 +1335,14 @@ bool Sapphire::World::Manager::HousingMgr::removeInternalItem( Entity::Player& p
   if( !item )
     return false;
 
-  item->setStackSize( 1 );
-
   if( !sendToStoreroom )
   {
     // make sure the player has a free inv slot first
-    Entity::Player::InventoryContainerPair containerPair;
+    Inventory::InventoryContainerPair containerPair;
     if( !player.getFreeInventoryContainerSlot( containerPair ) )
       return false;
 
     auto invMgr = g_fw.get< InventoryMgr >();
-
 
     // remove it from housing inventory
     container->removeItem( slotId );
@@ -1358,20 +1354,108 @@ bool Sapphire::World::Manager::HousingMgr::removeInternalItem( Entity::Player& p
     player.insertInventoryItem( containerPair.first, containerPair.second, item );
 
     // todo: set item as bound/unsellable/untradable
-
-    // despawn
-    auto arraySlot = ( containerIdx * 50 ) + slotId;
-
-    terri.removeHousingObject( arraySlot );
   }
+  else
+  {
+    ItemContainerPtr freeContainer;
+    Inventory::InventoryContainerPair freeSlotPair;
+    freeContainer = getFreeEstateInventorySlot( terri.getLandIdent(), freeSlotPair, m_internalStoreroomContainers );
+
+    if( !freeContainer )
+      return false;
+
+    auto invMgr = g_fw.get< InventoryMgr >();
+
+    container->removeItem( slotId );
+    invMgr->sendInventoryContainer( player, container );
+    invMgr->removeHousingItemPosition( *item );
+    invMgr->removeItemFromHousingContainer( terri.getLandIdent(), containerId, slotId );
+
+    freeContainer->setItem( slotId, item );
+    invMgr->sendInventoryContainer( player, freeContainer );
+    invMgr->saveHousingContainer( terri.getLandIdent(), freeContainer );
+  }
+
+  // despawn
+  auto arraySlot = ( containerIdx * 50 ) + slotId;
+  terri.removeHousingObject( arraySlot );
 
   return true;
 }
 
-bool Sapphire::World::Manager::HousingMgr::removeExternalItem( Entity::Player& player,
-                                                               HousingZone& terri,
-                                                               uint16_t containerId, uint16_t slotId,
-                                                               bool sendToStoreroom )
+bool Sapphire::World::Manager::HousingMgr::removeExternalItem( Entity::Player& player, HousingZone& terri, Land& land,
+                                                               uint16_t slotId, bool sendToStoreroom )
 {
+  auto& containers = getEstateInventory( land.getLandIdent() );
 
+  auto& placedContainer = containers[ InventoryType::HousingExteriorPlacedItems ];
+
+  auto item = std::dynamic_pointer_cast< Inventory::HousingItem >( placedContainer->getItem( slotId ) );
+  if( !item )
+    return false;
+
+  auto invMgr = g_fw.get< InventoryMgr >();
+
+  if( sendToStoreroom )
+  {
+    auto& storeroomContainer = containers[ InventoryType::HousingExteriorStoreroom ];
+    auto freeSlot = storeroomContainer->getFreeSlot();
+
+    if( freeSlot == -1 )
+      return false;
+
+    placedContainer->removeItem( slotId );
+    invMgr->sendInventoryContainer( player, placedContainer );
+    invMgr->removeHousingItemPosition( *item );
+    invMgr->removeItemFromHousingContainer( land.getLandIdent(), placedContainer->getId(), slotId );
+
+    storeroomContainer->setItem( freeSlot, item );
+    invMgr->sendInventoryContainer( player, storeroomContainer );
+    invMgr->saveHousingContainer( land.getLandIdent(), storeroomContainer );
+  }
+  else
+  {
+    Inventory::InventoryContainerPair containerPair;
+    if( !player.getFreeInventoryContainerSlot( containerPair ) )
+      return false;
+
+    // remove from housing inv
+    placedContainer->removeItem( slotId );
+    invMgr->sendInventoryContainer( player, placedContainer );
+    invMgr->removeHousingItemPosition( *item );
+    invMgr->removeItemFromHousingContainer( land.getLandIdent(), placedContainer->getId(), slotId );
+
+    // add to player inv
+    player.insertInventoryItem( containerPair.first, containerPair.second, item );
+  }
+
+  terri.despawnYardObject( land.getLandIdent().landId, slotId );
+  
+  return true;
+}
+
+Sapphire::ItemContainerPtr Sapphire::World::Manager::HousingMgr::getFreeEstateInventorySlot( Common::LandIdent ident,
+                                                                                             Inventory::InventoryContainerPair& pair,
+                                                                                             Inventory::InventoryTypeList bagList )
+{
+  auto& estateContainers = getEstateInventory( ident );
+
+  for( auto bag : bagList )
+  {
+    auto needle = estateContainers.find( bag );
+    if( needle == estateContainers.end() )
+      continue;
+
+    auto container = needle->second;
+
+    auto freeSlot = container->getFreeSlot();
+
+    if( freeSlot == -1 )
+      continue;
+
+    pair = std::make_pair( bag, freeSlot );
+    return container;
+  }
+
+  return nullptr;
 }

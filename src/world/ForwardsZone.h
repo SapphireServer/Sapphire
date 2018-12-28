@@ -37,6 +37,8 @@ TYPE_FORWARD( HousingInteriorTerritory );
 
 namespace Inventory
 {
+using InventoryContainerPair = std::pair< Common::InventoryType, uint8_t >;
+using InventoryTypeList = std::vector< Common::InventoryType >;
 TYPE_FORWARD( HousingItem );
 }
 

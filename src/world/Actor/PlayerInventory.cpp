@@ -903,7 +903,7 @@ Sapphire::ItemPtr Sapphire::Entity::Player::dropInventoryItem( Sapphire::Common:
   return item;
 }
 
-bool Sapphire::Entity::Player::getFreeInventoryContainerSlot( Entity::Player::InventoryContainerPair& containerPair ) const
+bool Sapphire::Entity::Player::getFreeInventoryContainerSlot( Inventory::InventoryContainerPair& containerPair ) const
 {
   for( auto bagId : { Bag0, Bag1, Bag2, Bag3 } )
   {

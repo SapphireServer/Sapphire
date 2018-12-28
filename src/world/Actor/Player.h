@@ -365,9 +365,7 @@ namespace Sapphire::Entity
 
     Common::GearModelSlot equipSlotToModelSlot( Common::GearSetSlot slot );
 
-    using InventoryContainerPair = std::pair< Common::InventoryType, uint8_t >;
-
-    bool getFreeInventoryContainerSlot( Entity::Player::InventoryContainerPair& containerPair ) const;
+    bool getFreeInventoryContainerSlot( Inventory::InventoryContainerPair& containerPair ) const;
 
     void insertInventoryItem( Common::InventoryType type, uint16_t slot, const Sapphire::ItemPtr item );
 
