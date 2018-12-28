@@ -84,6 +84,17 @@ bool Sapphire::Entity::Player::load( uint32_t charId, SessionPtr pSession )
       pCurrZone = pTeriMgr->getZoneByTerritoryTypeId( zoneId );
     }
   }
+  else if( pTeriMgr->isInternalEstateTerritory( zoneId ) )
+  {
+    // todo: this needs to go to the area just outside of the plot door
+    pCurrZone = pTeriMgr->getZoneByLandSetId( m_prevTerritoryId );
+
+    zoneId = m_prevTerritoryTypeId;
+    m_pos.x = m_prevPos.x;
+    m_pos.y = m_prevPos.y;
+    m_pos.z = m_prevPos.z;
+    setRot( m_prevRot );
+  }
   else if( pTeriMgr->isHousingTerritory( zoneId ) )
   {
     pCurrZone = pTeriMgr->getZoneByLandSetId( m_territoryId );
