@@ -80,13 +80,15 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
   const auto param2 = packet.data().param2;
   const auto param3 = packet.data().param3;
   const auto param4 = packet.data().param4;
+  const auto param5 = packet.data().param5;
 
   pLog->debug( "[" + std::to_string( m_pSession->getId() ) + "] Incoming action: " +
                Util::intToHexString( static_cast< uint32_t >( commandId & 0xFFFF ), 4 ) +
                "\nparam1: " + Util::intToHexString( static_cast< uint64_t >( param1 & 0xFFFFFFFFFFFFFFF ), 16 ) +
                "\nparam2: " + Util::intToHexString( static_cast< uint32_t >( param2 & 0xFFFFFFFF ), 8 ) +
                "\nparam3: " + Util::intToHexString( static_cast< uint64_t >( param3 & 0xFFFFFFFFFFFFFFF ), 16 ) +
-               "\nparam4: " + Util::intToHexString( static_cast< uint32_t >( param4 & 0xFFFFFFFF ), 8 )
+               "\nparam4: " + Util::intToHexString( static_cast< uint32_t >( param4 & 0xFFFFFFFF ), 8 ) +
+               "\nparam5: " + Util::intToHexString( static_cast< uint32_t >( param5 & 0xFFFFFFFF ), 8 )
   );
 
 
