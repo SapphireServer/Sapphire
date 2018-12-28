@@ -213,6 +213,11 @@ enum ActorControlType : uint16_t
     // Housing
     ShowHousingItemUI = 0x3F7,
     ShowBuildPresetUI = 0x3E9,
+    /*!
+     * param1 = plot id
+     */
+    ShowEstateExternalAppearanceUI = 0x3EA,
+    ShowEstateInternalAppearanceUI = 0x3EB,
     BuildPresetResponse = 0x3ED,
 
     /*!
@@ -327,6 +332,8 @@ enum ActorControlType : uint16_t
 
     SetEstateLightingLevel = 0x40B, // param1 = light level 0 - 5 maps to UI val 5-0
     RequestHousingBuildPreset = 0x44C,
+    RequestEstateExteriorRemodel = 0x044D, // param11 = land id
+    RequestEstateInteriorRemodel = 0x44E,
     RequestEstateHallRemoval = 0x44F,
     RequestBuildPreset = 0x450, // no idea what this is, it gets sent with BuildPresetHandler and has the plot id in param1
     RequestLandSignFree = 0x451,

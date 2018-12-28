@@ -780,6 +780,7 @@ namespace Sapphire::Common
 
   enum HouseExteriorSlot
   {
+    HousePermit,
     ExteriorRoof,
     ExteriorWall,
     ExteriorWindow,
