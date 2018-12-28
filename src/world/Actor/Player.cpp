@@ -55,7 +55,7 @@ using InvSlotPairVec = std::vector< InvSlotPair >;
 
 // player constructor
 Sapphire::Entity::Player::Player( FrameworkPtr pFw ) :
-  Chara( ObjKind::Player ),
+  Chara( ObjKind::Player, pFw ),
   m_lastWrite( 0 ),
   m_lastPing( 0 ),
   m_bIsLogin( false ),
@@ -75,8 +75,7 @@ Sapphire::Entity::Player::Player( FrameworkPtr pFw ) :
   m_mount( 0 ),
   m_emoteMode( 0 ),
   m_directorInitialized( false ),
-  m_onEnterEventDone( false ),
-  m_pFw( pFw )
+  m_onEnterEventDone( false )
 {
   m_id = 0;
   m_currentStance = Stance::Passive;
@@ -279,9 +278,9 @@ void Sapphire::Entity::Player::calculateStats()
   m_baseStats.healingPotMagic = paramGrowthInfo->baseSpeed;
   m_baseStats.tenacity = paramGrowthInfo->baseSpeed;
 
-  m_baseStats.max_mp = Math::CalcStats::calculateMaxMp( getAsPlayer() );
+  m_baseStats.max_mp = Math::CalcStats::calculateMaxMp( getAsPlayer(), m_pFw );
 
-  m_baseStats.max_hp = Math::CalcStats::calculateMaxHp( getAsPlayer() );
+  m_baseStats.max_hp = Math::CalcStats::calculateMaxHp( getAsPlayer(), m_pFw );
 
   if( m_mp > m_baseStats.max_mp )
     m_mp = m_baseStats.max_mp;

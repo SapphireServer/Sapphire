@@ -35,8 +35,8 @@ using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
 
-Sapphire::Entity::Npc::Npc( ObjKind type ) :
-  Chara( type )
+Sapphire::Entity::Npc::Npc( ObjKind type, FrameworkPtr pFw ) :
+  Chara( type, pFw )
 {
 
 }

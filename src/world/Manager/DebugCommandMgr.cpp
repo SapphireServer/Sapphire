@@ -408,7 +408,8 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
 
     sscanf( params.c_str(), "%d %d %hu", &id, &duration, &param );
 
-    auto effect = StatusEffect::make_StatusEffect( id, player.getAsPlayer(), player.getAsPlayer(), duration, 3000 );
+    auto effect = StatusEffect::make_StatusEffect( id, player.getAsPlayer(), player.getAsPlayer(),
+                                                   duration, 3000, framework() );
     effect->setParam( param );
 
     player.addStatusEffect( effect );
@@ -431,9 +432,10 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
       player.sendNotice( "Template " + params + " not found in cache!" );
 
     auto pBNpc = std::make_shared< Entity::BNpc >( bNpcTemplate,
-                                                     player.getPos().x,
-                                                     player.getPos().y,
-                                                     player.getPos().z, 1 );
+                                                   player.getPos().x,
+                                                   player.getPos().y,
+                                                   player.getPos().z,
+                                                   1, framework() );
 
     auto playerZone = player.getCurrentZone();
 

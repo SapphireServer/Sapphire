@@ -24,12 +24,10 @@
 #include "Framework.h"
 #include "House.h"
 
-extern Sapphire::Framework g_fw;
-
 using namespace Sapphire::Common;
 
 Sapphire::Land::Land( uint16_t territoryTypeId, uint8_t wardNum, uint8_t landId, uint32_t landSetId,
-                      Sapphire::Data::HousingLandSetPtr info ) :
+                      Sapphire::Data::HousingLandSetPtr info, FrameworkPtr pFw ) :
   m_currentPrice( 0 ),
   m_minPrice( 0 ),
   m_nextDrop( static_cast< uint32_t >( Util::getTimeSeconds() ) + 21600 ),
@@ -40,7 +38,8 @@ Sapphire::Land::Land( uint16_t territoryTypeId, uint8_t wardNum, uint8_t landId,
   m_fcIcon( 0 ),
   m_fcIconColor( 0 ),
   m_fcId( 0 ),
-  m_iconAddIcon( 0 )
+  m_iconAddIcon( 0 ),
+  m_pFw( pFw )
 {
   memset( &m_tag, 0x00, 3 );
 
@@ -55,7 +54,8 @@ Sapphire::Land::Land( uint16_t territoryTypeId, uint8_t wardNum, uint8_t landId,
 
 Sapphire::Land::~Land() = default;
 
-void Sapphire::Land::init( Common::LandType type, uint8_t size, uint8_t state, uint32_t currentPrice, uint64_t ownerId, uint64_t houseId )
+void Sapphire::Land::init( Common::LandType type, uint8_t size, uint8_t state, uint32_t currentPrice,
+                           uint64_t ownerId, uint64_t houseId )
 {
   m_type = type;
   m_size = size;
@@ -65,9 +65,9 @@ void Sapphire::Land::init( Common::LandType type, uint8_t size, uint8_t state, u
 
   // fetch the house if we have one for this land
   if( houseId > 0 )
-    m_pHouse = make_House( houseId, m_landSetId, getLandIdent() );
+    m_pHouse = make_House( houseId, m_landSetId, getLandIdent(), m_pFw );
 
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   auto info = pExdData->get< Sapphire::Data::HousingMapMarkerInfo >( m_landIdent.territoryTypeId, m_landIdent.landId );
   if( info )
   {
@@ -97,7 +97,7 @@ void Sapphire::Land::init( Common::LandType type, uint8_t size, uint8_t state, u
   // init item containers
   auto setupContainer = [ this ]( InventoryType type, uint16_t maxSize )
   {
-    m_landInventoryMap[ type ] = make_ItemContainer( type, maxSize, "houseiteminventory", true, true );
+    m_landInventoryMap[ type ] = make_ItemContainer( type, maxSize, "houseiteminventory", true, m_pFw, true );
   };
 
   setupContainer( InventoryType::HousingOutdoorAppearance, 8 );
@@ -122,8 +122,8 @@ void Sapphire::Land::loadItemContainerContents()
   auto ident = *reinterpret_cast< uint64_t* >( &m_landIdent );
   Logger::debug( "Loading housing inventory for ident: " + std::to_string( ident ) );
 
-  auto pDB = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  auto pItemMgr = g_fw.get< World::Manager::ItemMgr >();
+  auto pDB = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pItemMgr = m_pFw->get< World::Manager::ItemMgr >();
 
   auto stmt = pDB->getPreparedStatement( Db::LAND_INV_SEL_HOUSE );
   stmt->setUInt64( 1, ident );
@@ -159,7 +159,7 @@ void Sapphire::Land::loadItemContainerContents()
 
 uint32_t Sapphire::Land::convertItemIdToHousingItemId( uint32_t itemId )
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   auto info = pExdData->get< Sapphire::Data::Item >( itemId );
   return info->additionalData;
 }
@@ -297,15 +297,15 @@ void Sapphire::Land::updateLandDb()
     houseId = getHouse()->getHouseId();
 
   // todo: change to prepared statement
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   pDb->directExecute( "UPDATE land SET status = " + std::to_string( m_state )
-  + ", LandPrice = " + std::to_string( getCurrentPrice() )
-  + ", UpdateTime = " + std::to_string( getDevaluationTime() )
-  + ", OwnerId = " + std::to_string( getOwnerId() )
-  + ", HouseId = " + std::to_string( houseId )
-  + ", Type = " + std::to_string( static_cast< uint32_t >( m_type ) ) //TODO: add house id
-  + " WHERE LandSetId = " + std::to_string( m_landSetId )
-  + " AND LandId = " + std::to_string( m_landIdent.landId ) + ";" );
+                      + ", LandPrice = " + std::to_string( getCurrentPrice() )
+                      + ", UpdateTime = " + std::to_string( getDevaluationTime() )
+                      + ", OwnerId = " + std::to_string( getOwnerId() )
+                      + ", HouseId = " + std::to_string( houseId )
+                      + ", Type = " + std::to_string( static_cast< uint32_t >( m_type ) ) //TODO: add house id
+                      + " WHERE LandSetId = " + std::to_string( m_landSetId )
+                      + " AND LandId = " + std::to_string( m_landIdent.landId ) + ";" );
 
   if( auto house = getHouse() )
     house->updateHouseDb();
@@ -326,7 +326,7 @@ void Sapphire::Land::update( uint32_t currTime )
 
 uint32_t Sapphire::Land::getNextHouseId()
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto pQR = pDb->query( "SELECT MAX( HouseId ) FROM house" );
 
   if( !pQR->next() )
@@ -339,7 +339,7 @@ bool Sapphire::Land::setPreset( uint32_t itemId )
 {
   auto housingItemId = convertItemIdToHousingItemId( itemId );
 
-  auto exdData = g_fw.get< Sapphire::Data::ExdDataGenerated >();
+  auto exdData = m_pFw->get< Sapphire::Data::ExdDataGenerated >();
   if( !exdData )
     return false;
 
@@ -351,7 +351,7 @@ bool Sapphire::Land::setPreset( uint32_t itemId )
   {
     // todo: i guess we'd create a house here?
     auto newId = getNextHouseId();
-    m_pHouse = make_House( newId, getLandSetId(), getLandIdent() );
+    m_pHouse = make_House( newId, getLandSetId(), getLandIdent(), m_pFw );
   }
 
 

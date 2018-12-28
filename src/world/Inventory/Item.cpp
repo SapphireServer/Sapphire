@@ -5,18 +5,17 @@
 #include "Framework.h"
 #include "Item.h"
 
-extern Sapphire::Framework g_fw;
-
-Sapphire::Item::Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, bool isHq ) :
+Sapphire::Item::Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, FrameworkPtr pFw, bool isHq ) :
   m_id( catalogId ),
   m_uId( uId ),
   m_model1( model1 ),
   m_model2( model2 ),
   m_isHq( isHq ),
   m_stain( 0 ),
-  m_durability( 30000 )
+  m_durability( 30000 ),
+  m_pFw( pFw )
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   auto itemInfo = pExdData->get< Sapphire::Data::Item >( catalogId );
 
   m_delayMs = itemInfo->delayms;

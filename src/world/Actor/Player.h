@@ -1047,9 +1047,6 @@ namespace Sapphire::Entity
 
     Util::SpawnIndexAllocator< uint8_t > m_objSpawnIndexAllocator;
     Util::SpawnIndexAllocator< uint8_t > m_actorSpawnIndexAllocator;
-
-    // todo: temporary store ptr to framework
-    FrameworkPtr m_pFw;
   };
 
 }

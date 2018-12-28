@@ -160,7 +160,7 @@ bool Sapphire::World::Manager::TerritoryMgr::createDefaultTerritories()
                   "\t" + ( isPrivateTerritory( territoryTypeId ) ? "PRIVATE" : "PUBLIC" ) +
                   "\t" + pPlaceName->name );
 
-    auto pZone = make_Zone( territoryTypeId, guid, territoryInfo->name, pPlaceName->name );
+    auto pZone = make_Zone( territoryTypeId, guid, territoryInfo->name, pPlaceName->name, framework() );
     pZone->init();
 
     InstanceIdToZonePtrMap instanceMap;
@@ -204,7 +204,8 @@ bool Sapphire::World::Manager::TerritoryMgr::createHousingTerritories()
                     "\t" + pPlaceName->name +
                     "#" + std::to_string( wardNum ) );
 
-      auto pHousingZone = make_HousingZone( wardNum, territoryTypeId, guid, territoryInfo->name, pPlaceName->name );
+      auto pHousingZone = make_HousingZone( wardNum, territoryTypeId, guid, territoryInfo->name,
+                                            pPlaceName->name, framework() );
       pHousingZone->init();
       wardMaxNum = 18;
 
@@ -239,7 +240,7 @@ Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createTerritoryInstanc
   Logger::debug(
     "Starting instance for territory: " + std::to_string( territoryTypeId ) + " (" + pPlaceName->name + ")" );
 
-  auto pZone = make_Zone( territoryTypeId, getNextInstanceId(), pTeri->name, pPlaceName->name );
+  auto pZone = make_Zone( territoryTypeId, getNextInstanceId(), pTeri->name, pPlaceName->name, framework() );
   pZone->init();
 
   m_instanceIdToZonePtrMap[ pZone->getGuId() ] = pZone;
@@ -274,7 +275,7 @@ Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createInstanceContent(
                  " (" + pInstanceContent->name + ")" );
 
   auto pZone = make_InstanceContent( pInstanceContent, pContentFinderCondition->territoryType, getNextInstanceId(),
-                                     pTeri->name, pInstanceContent->name, instanceContentId );
+                                     pTeri->name, pInstanceContent->name, instanceContentId, framework() );
   pZone->init();
 
   m_instanceContentToInstanceMap[ instanceContentId ][ pZone->getGuId() ] = pZone;
@@ -344,8 +345,9 @@ Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::findOrCreateHousingInt
   if( !terriInfo )
     return nullptr;
 
-  auto zone = World::Territory::Housing::make_HousingInteriorTerritory( landIdent, territoryTypeId, getNextInstanceId(),
-                                                                        terriInfo->name, house->getHouseName() );
+  auto zone = World::Territory::Housing::make_HousingInteriorTerritory( landIdent, territoryTypeId,
+                                                                        getNextInstanceId(), terriInfo->name,
+                                                                        house->getHouseName(), framework() );
 
   zone->init();
 

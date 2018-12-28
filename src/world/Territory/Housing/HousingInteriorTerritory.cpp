@@ -18,8 +18,6 @@
 #include "HousingInteriorTerritory.h"
 #include "Framework.h"
 
-extern Sapphire::Framework g_fw;
-
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
@@ -31,8 +29,9 @@ using namespace Sapphire::World::Territory;
 Housing::HousingInteriorTerritory::HousingInteriorTerritory( Common::LandIdent ident, uint16_t territoryTypeId,
                                                              uint32_t guId,
                                                              const std::string& internalName,
-                                                             const std::string& contentName ) :
-  Zone( territoryTypeId, guId, internalName, contentName ),
+                                                             const std::string& contentName,
+                                                             FrameworkPtr pFw ) :
+  Zone( territoryTypeId, guId, internalName, contentName, pFw ),
   m_landIdent( ident )
 {
   m_lastActivityTime = static_cast< uint32_t >( Util::getTimeSeconds() );
@@ -50,7 +49,7 @@ bool Housing::HousingInteriorTerritory::init()
 
 void Housing::HousingInteriorTerritory::onPlayerZoneIn( Entity::Player& player )
 {
-  auto pHousingMgr = g_fw.get< HousingMgr >();
+  auto pHousingMgr = m_pFw->get< HousingMgr >();
   Logger::debug(
     "HousingInteriorTerritory::onPlayerZoneIn: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryTypeId() ) +
     ", Entity#" + std::to_string( player.getId() ) );

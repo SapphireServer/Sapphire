@@ -94,7 +94,7 @@ void Sapphire::Network::GameConnection::actionHandler( FrameworkPtr pFw,
           }
           else
           {
-            auto pActionCast = Action::make_ActionCast( player.getAsPlayer(), targetActor->getAsChara(), action );
+            auto pActionCast = Action::make_ActionCast( player.getAsPlayer(), targetActor->getAsChara(), action, m_pFw );
             player.setCurrentAction( pActionCast );
             player.sendDebug( "setCurrentAction()" );
             player.getCurrentAction()->onStart();

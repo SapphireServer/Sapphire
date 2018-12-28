@@ -29,7 +29,8 @@ namespace Sapphire
                  uint16_t territoryTypeId,
                  uint32_t guId,
                  const std::string& internalName,
-                 const std::string& contentName );
+                 const std::string& contentName,
+                 FrameworkPtr pFw );
 
     virtual ~HousingZone();
 
@@ -70,6 +71,7 @@ namespace Sapphire
     uint8_t m_wardNum;
     uint32_t m_landSetId;
     uint32_t m_territoryTypeId;
+    FrameworkPtr m_pFw;
   };
 
 }

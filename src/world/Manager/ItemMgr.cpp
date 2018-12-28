@@ -139,6 +139,7 @@ Sapphire::ItemPtr Sapphire::World::Manager::ItemMgr::loadItem( uint64_t uId )
                                itemRes->getUInt( 1 ),
                                itemInfo->modelMain,
                                itemInfo->modelSub,
+                               framework(),
                                isHq );
 
     pItem->setStackSize( itemRes->getUInt( 2 ) );

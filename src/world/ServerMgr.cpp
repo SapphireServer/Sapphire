@@ -173,6 +173,7 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
   framework()->set< Manager::PlayerMgr >( pPlayerMgr );
   framework()->set< Manager::ShopMgr >( pShopMgr );
   framework()->set< Manager::InventoryMgr >( pInventoryMgr );
+  framework()->set< Manager::EventMgr >( pEventMgr );
   framework()->set< Manager::ItemMgr >( pItemMgr );
 
   Logger::info( "World server running on " + m_ip + ":" + std::to_string( m_port ) );
