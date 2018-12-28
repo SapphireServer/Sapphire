@@ -1225,7 +1225,7 @@ bool Sapphire::World::Manager::HousingMgr::moveInternalItem( Entity::Player& pla
   auto invMgr = g_fw.get< InventoryMgr >();
   invMgr->updateHousingItemPosition( item );
 
-  terri.updateHousingObjectPosition( slot, item->getPos(), item->getRot() );
+  terri.updateHousingObjectPosition( player, slot, item->getPos(), item->getRot() );
 
   // send confirmation to player
   uint32_t param1 = ( ident.landId << 16 ) | containerId;

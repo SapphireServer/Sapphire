@@ -187,8 +187,9 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::spawnHousing
   }
 }
 
-void Sapphire::World::Territory::Housing::HousingInteriorTerritory::updateHousingObjectPosition( uint16_t slot,
-                                                                                                 Sapphire::Common::FFXIVARR_POSITION3_U16 pos,
+void Sapphire::World::Territory::Housing::HousingInteriorTerritory::updateHousingObjectPosition( Entity::Player& sourcePlayer,
+                                                                                                 uint16_t slot,
+                                                                                                 Common::FFXIVARR_POSITION3_U16 pos,
                                                                                                  uint16_t rot )
 {
   auto& obj = m_housingObjects[ slot ];
@@ -197,6 +198,23 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::updateHousin
   obj.itemRotation = rot;
 
   // todo: how does this update on other clients?
+
+  for( const auto& player : m_playerMap )
+  {
+    if( player.second->getId() == sourcePlayer.getId() )
+      continue;
+
+    auto moveObjPkt = makeZonePacket< Server::FFXIVIpcHousingObjectMove >( player.second->getId() );
+
+    moveObjPkt->data().itemRotation = obj.itemRotation;
+    moveObjPkt->data().pos = obj.pos;
+
+    // todo: how does this work when an item is in a slot >50 or u8 max? my guess is landid is the container index, but not sure...
+    moveObjPkt->data().objectArray = static_cast< uint8_t >( slot % 50 );
+    moveObjPkt->data().landId = static_cast< uint8_t >( slot / 50 );
+
+    player.second->queuePacket( moveObjPkt );
+  }
 }
 
 void Sapphire::World::Territory::Housing::HousingInteriorTerritory::removeHousingObject( uint16_t slot )
