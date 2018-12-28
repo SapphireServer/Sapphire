@@ -172,6 +172,10 @@ namespace Sapphire::World::Manager
                                uint16_t containerId, uint16_t slot,
                                bool sendToStoreroom );
 
+    void reqEstateExteriorRemodel( Entity::Player& player, uint16_t plot );
+
+    void reqEstateInteriorRemodel( Entity::Player& player );
+
   private:
 
     ItemContainerPtr getFreeEstateInventorySlot( Common::LandIdent ident,

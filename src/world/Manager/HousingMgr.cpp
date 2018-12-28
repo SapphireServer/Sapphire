@@ -264,7 +264,7 @@ void Sapphire::World::Manager::HousingMgr::initLandCache()
 
     // fixed containers
     makeContainer( InventoryType::HousingInteriorAppearance, 10 );
-    makeContainer( InventoryType::HousingExteriorAppearance, 8 );
+    makeContainer( InventoryType::HousingExteriorAppearance, 9 );
 
   }
 }
@@ -896,7 +896,15 @@ void Sapphire::World::Manager::HousingMgr::updateHouseModels( Sapphire::HousePtr
   {
     for( auto& item : extContainer->second->getItemMap() )
     {
-      house->setExteriorModel( static_cast< Common::HouseExteriorSlot >( item.first ),
+      // in the Slot array, the first slot is actually the permit
+      // but the models array starts from the 2nd entry of the enum
+      // so we skip the first one, and then any subsequent entries is slotid - 1
+
+      auto slotId = item.first - 1;
+      if( slotId < 0 )
+        continue;
+
+      house->setExteriorModel( static_cast< Common::HouseExteriorSlot >( slotId ),
                                getItemAdditionalData( item.second->getId() ), item.second->getStain() );
     }
   }
@@ -1461,4 +1469,62 @@ Sapphire::ItemContainerPtr Sapphire::World::Manager::HousingMgr::getFreeEstateIn
   }
 
   return nullptr;
+}
+
+void Sapphire::World::Manager::HousingMgr::reqEstateExteriorRemodel( Sapphire::Entity::Player& player, uint16_t plot )
+{
+  auto terri = std::dynamic_pointer_cast< HousingZone >( player.getCurrentZone() );
+  if( !terri )
+    return;
+
+  auto land = terri->getLand( plot );
+  if( !land )
+    return;
+
+  // todo: proper perms checks
+  if( land->getOwnerId() != player.getId() )
+    return;
+
+  auto& inv = getEstateInventory( land->getLandIdent() );
+  auto needle = inv.find( InventoryType::HousingExteriorAppearance );
+  if( needle == inv.end() )
+    return;
+
+  auto invMgr = g_fw.get< InventoryMgr >();
+
+  invMgr->sendInventoryContainer( player, needle->second );
+
+  auto pkt = Server::makeActorControl143( player.getId(), Network::ActorControl::ShowEstateExternalAppearanceUI, plot );
+  player.queuePacket( pkt );
+
+}
+
+void Sapphire::World::Manager::HousingMgr::reqEstateInteriorRemodel( Sapphire::Entity::Player& player )
+{
+  auto terri = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( player.getCurrentZone() );
+  if( !terri )
+    return;
+
+  auto ident = terri->getLandIdent();
+  auto landSet = toLandSetId( ident.territoryTypeId, ident.wardNum );
+  auto land = getHousingZoneByLandSetId( landSet )->getLand( ident.landId );
+
+  if( !land )
+    return;
+
+  // todo: proper perms checks
+  if( land->getOwnerId() != player.getId() )
+    return;
+
+  auto& inv = getEstateInventory( land->getLandIdent() );
+  auto needle = inv.find( InventoryType::HousingInteriorAppearance );
+  if( needle == inv.end() )
+    return;
+
+  auto invMgr = g_fw.get< InventoryMgr >();
+
+  invMgr->sendInventoryContainer( player, needle->second );
+
+  auto pkt = Server::makeActorControl143( player.getId(), Network::ActorControl::ShowEstateInternalAppearanceUI );
+  player.queuePacket( pkt );
 }

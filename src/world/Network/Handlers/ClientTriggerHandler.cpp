@@ -469,6 +469,22 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
 
       break;
     }
+    case ClientTriggerType::RequestEstateExteriorRemodel:
+    {
+      auto housingMgr = g_fw.get< HousingMgr >();
+
+      housingMgr->reqEstateExteriorRemodel( player, param11 );
+
+      break;
+    }
+    case ClientTriggerType::RequestEstateInteriorRemodel:
+    {
+      auto housingMgr = g_fw.get< HousingMgr >();
+
+      housingMgr->reqEstateInteriorRemodel( player );
+
+      break;
+    }
 
     default:
     {
