@@ -344,6 +344,7 @@ enum ActorControlType : uint16_t
     RequestHousingItemUI = 0x463,
     RequestSharedEstateSettings = 0x46F,
     UpdateEstateLightingLevel = 0x471,
+    HousingItemSelectedInUI = 0x47E,
 
     CompanionAction = 0x6A4,
     CompanionSetBarding = 0x6A5,

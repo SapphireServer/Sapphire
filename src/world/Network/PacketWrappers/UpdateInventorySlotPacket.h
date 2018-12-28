@@ -29,7 +29,7 @@ namespace Sapphire::Network::Packets::Server
       m_data.slot = slot;
       m_data.quantity = item.getStackSize();
       m_data.catalogId = item.getId();
-      m_data.reservedFlag = 0; // no idea
+      m_data.reservedFlag = item.getReservedFlag(); // no idea
       m_data.signatureId = 0;
       m_data.hqFlag = item.isHq() ? 1 : 0;
       m_data.condition = 60000; // 200%

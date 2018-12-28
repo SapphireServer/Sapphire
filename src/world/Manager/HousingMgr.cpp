@@ -851,9 +851,12 @@ void Sapphire::World::Manager::HousingMgr::sendEstateInventory( Entity::Player& 
     return;
 
   auto& containers = getEstateInventory( targetLand->getLandIdent() );
+  auto needle = containers.find( inventoryType );
+  if( needle == containers.end() )
+    return;
 
   auto invMgr = g_fw.get< Manager::InventoryMgr >();
-  invMgr->sendInventoryContainer( player, containers[ inventoryType ] );
+  invMgr->sendInventoryContainer( player, needle->second );
 }
 
 const Sapphire::World::Manager::HousingMgr::LandSetLandCacheMap&
@@ -1430,7 +1433,7 @@ bool Sapphire::World::Manager::HousingMgr::removeExternalItem( Entity::Player& p
   }
 
   terri.despawnYardObject( land.getLandIdent().landId, slotId );
-  
+
   return true;
 }
 

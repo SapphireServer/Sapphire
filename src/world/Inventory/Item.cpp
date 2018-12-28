@@ -13,7 +13,8 @@ Sapphire::Item::Item( uint64_t uId, uint32_t catalogId, bool isHq ) :
   m_isHq( isHq ),
   m_stain( 0 ),
   m_durability( 30000 ),
-  m_spiritBond( 0 )
+  m_spiritBond( 0 ),
+  m_reservedFlag( 0 )
 {
   auto pExdData = g_fw.get< Data::ExdDataGenerated >();
   auto itemInfo = pExdData->get< Sapphire::Data::Item >( catalogId );
@@ -170,4 +171,14 @@ uint16_t Sapphire::Item::getSpiritbond() const
 void Sapphire::Item::setSpiritbond( uint16_t spiritbond )
 {
   m_spiritBond = spiritbond;
+}
+
+uint32_t Sapphire::Item::getReservedFlag() const
+{
+  return m_reservedFlag;
+}
+
+void Sapphire::Item::setReservedFlag( uint32_t flag )
+{
+  m_reservedFlag = flag;
 }

@@ -50,6 +50,7 @@ void Sapphire::World::Manager::InventoryMgr::sendInventoryContainer( Sapphire::E
       itemInfoPacket->data().catalogId = itM->second->getId();
       itemInfoPacket->data().condition = itM->second->getDurability();
       itemInfoPacket->data().spiritBond = itM->second->getSpiritbond();
+      itemInfoPacket->data().reservedFlag = itM->second->getReservedFlag();
       itemInfoPacket->data().hqFlag = static_cast< uint8_t >( itM->second->isHq() ? 1 : 0 );
       itemInfoPacket->data().stain = itM->second->getStain();
 

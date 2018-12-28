@@ -67,6 +67,9 @@ namespace Sapphire
     void setSpiritbond( uint16_t spiritbond );
     uint16_t getSpiritbond() const;
 
+    void setReservedFlag( uint32_t flag );
+    uint32_t getReservedFlag() const;
+
 
   protected:
     uint32_t m_id;
@@ -93,6 +96,7 @@ namespace Sapphire
     uint16_t m_durability;
     uint16_t m_stain;
     uint16_t m_spiritBond;
+    uint32_t m_reservedFlag;
 
     uint32_t m_additionalData;
 
