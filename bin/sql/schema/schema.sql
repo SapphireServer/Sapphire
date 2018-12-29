@@ -404,9 +404,6 @@ CREATE TABLE `house` (
   `Comment` binary(193) DEFAULT '\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0',
   `HouseName` binary(23) DEFAULT '\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0',
   `Endorsements` bigint(20) DEFAULT NULL,
-  `HousePartModels` binary(32) DEFAULT '\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0',
-  `HousePartColours` binary(8) DEFAULT '\0\0\0\0\0\0\0\0',
-  `HouseInteriorModels` binary(40) DEFAULT '\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0',
   `UPDATE_DATE` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY(`HouseId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -530,12 +527,14 @@ CREATE TABLE `landset` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE `houseiteminventory` (
-  `LandIdent` BIGINT(20) UNSIGNED NOT NULL,
-  `ContainerId` INT(10) UNSIGNED NOT NULL,
-  `ItemId` INT(20) NOT NULL,
-  `SlotId` INT(10) UNSIGNED NOT NULL,
-  INDEX `landIdent` (`landIdent`)
+	`LandIdent` BIGINT(20) UNSIGNED NOT NULL,
+	`ContainerId` INT(10) UNSIGNED NOT NULL,
+	`SlotId` INT(10) UNSIGNED NOT NULL,
+	`ItemId` INT(20) NOT NULL,
+	PRIMARY KEY (`LandIdent`, `ContainerId`, `SlotId`),
+	INDEX `landIdent` (`LandIdent`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 
 CREATE TABLE `spawngroup` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
@@ -564,3 +563,14 @@ CREATE TABLE `zonepositions` (
   `radius` int(11) NOT NULL DEFAULT '2',
   PRIMARY KEY(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
+
+CREATE TABLE `landplaceditems` (
+	`ItemId` INT(20) UNSIGNED NOT NULL,
+	`PosX` INT(10) NOT NULL,
+	`PosY` INT(10) NOT NULL,
+	`PosZ` INT(10) NOT NULL,
+	`Rotation` INT(10) NOT NULL,
+	PRIMARY KEY (`ItemId`)
+)
+COLLATE='latin1_swedish_ci' ENGINE=InnoDB;
+

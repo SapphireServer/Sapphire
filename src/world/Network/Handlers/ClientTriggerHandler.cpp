@@ -79,12 +79,16 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
   const auto param12 = packet.data().param12;
   const auto param2 = packet.data().param2;
   const auto param3 = packet.data().param3;
+  const auto param4 = packet.data().param4;
+  const auto param5 = packet.data().param5;
 
   pLog->debug( "[" + std::to_string( m_pSession->getId() ) + "] Incoming action: " +
                Util::intToHexString( static_cast< uint32_t >( commandId & 0xFFFF ), 4 ) +
                "\nparam1: " + Util::intToHexString( static_cast< uint64_t >( param1 & 0xFFFFFFFFFFFFFFF ), 16 ) +
                "\nparam2: " + Util::intToHexString( static_cast< uint32_t >( param2 & 0xFFFFFFFF ), 8 ) +
-               "\nparam3: " + Util::intToHexString( static_cast< uint64_t >( param3 & 0xFFFFFFFFFFFFFFF ), 16 )
+               "\nparam3: " + Util::intToHexString( static_cast< uint64_t >( param3 & 0xFFFFFFFFFFFFFFF ), 16 ) +
+               "\nparam4: " + Util::intToHexString( static_cast< uint32_t >( param4 & 0xFFFFFFFF ), 8 ) +
+               "\nparam5: " + Util::intToHexString( static_cast< uint32_t >( param5 & 0xFFFFFFFF ), 8 )
   );
 
 
@@ -425,14 +429,13 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
     {
       uint8_t plot = ( param12 & 0xFF );
 
-
       auto housingMgr = g_fw.get< HousingMgr >();
       if( !housingMgr )
         break;
 
-      uint16_t inventoryType = Common::InventoryType::HousingOutdoorPlacedItems;
+      uint16_t inventoryType = Common::InventoryType::HousingExteriorPlacedItems;
       if( param2 == 1 )
-        inventoryType = Common::InventoryType::HousingOutdoorStoreroom;
+        inventoryType = Common::InventoryType::HousingExteriorStoreroom;
 
       housingMgr->sendEstateInventory( player, inventoryType, plot );
 
@@ -440,15 +443,45 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
     }
     case ClientTriggerType::RequestEstateInventory:
     {
-      // only sent if param1 is 1, because the client sends this with 0 when you open the ui for whatever reason
-      if( param1 != 1 )
-        return;
-
       auto housingMgr = g_fw.get< HousingMgr >();
       if( !housingMgr )
         break;
 
-      // housingMgr->sendHousingInventory( player, Common::InventoryType::HousingInd, 255 );
+      // param1 = 1 - storeroom
+      // param1 = 0 - placed items
+
+      if( param1 == 1 )
+        housingMgr->sendInternalEstateInventoryBatch( player, true );
+      else
+        housingMgr->sendInternalEstateInventoryBatch( player );
+
+      break;
+    }
+    case ClientTriggerType::RequestHousingItemRemove:
+    {
+      auto housingMgr = g_fw.get< HousingMgr >();
+
+      auto slot = param4 & 0xFF;
+      auto sendToStoreroom = ( param4 >> 16 ) != 0;
+
+      //player, plot, containerId, slot, sendToStoreroom
+      housingMgr->reqRemoveHousingItem( player, param12, param2, slot, sendToStoreroom );
+
+      break;
+    }
+    case ClientTriggerType::RequestEstateExteriorRemodel:
+    {
+      auto housingMgr = g_fw.get< HousingMgr >();
+
+      housingMgr->reqEstateExteriorRemodel( player, param11 );
+
+      break;
+    }
+    case ClientTriggerType::RequestEstateInteriorRemodel:
+    {
+      auto housingMgr = g_fw.get< HousingMgr >();
+
+      housingMgr->reqEstateInteriorRemodel( player );
 
       break;
     }

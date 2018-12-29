@@ -20,9 +20,7 @@ Sapphire::House::House( uint32_t houseId, uint32_t landSetId, Common::LandIdent 
   m_landIdent( ident ),
   m_estateName( estateName ),
   m_estateComment( estateComment )
-{
-
-}
+{}
 
 Sapphire::House::~House() = default;
 
@@ -55,44 +53,14 @@ Sapphire::Common::LandIdent Sapphire::House::getLandIdent() const
   return m_landIdent;
 }
 
-uint32_t Sapphire::House::getHouseId() const
+uint32_t Sapphire::House::getId() const
 {
   return m_houseId;
 }
 
-uint8_t Sapphire::House::getHousePartColor( Common::HousePartSlot slot ) const
-{
-  return m_houseModelsCache[ slot ].second;
-}
-
-uint32_t Sapphire::House::getHouseInteriorPart( Common::HousingInteriorSlot slot ) const
-{
-  return m_houseInteriorModels[ slot ];
-}
-
-void Sapphire::House::setHousePart( Common::HousePartSlot slot, uint32_t id )
-{
-  m_houseModelsCache[ slot ].first = id;
-}
-
-void Sapphire::House::setHousePartColor( Common::HousePartSlot slot, uint32_t id )
-{
-  m_houseModelsCache[ slot ].second = id;
-}
-
-void Sapphire::House::setHouseInteriorPart( Common::HousingInteriorSlot slot, uint32_t id )
-{
-  m_houseInteriorModels[ slot ] = id;
-}
-
-uint32_t Sapphire::House::getHousePart( Common::HousePartSlot slot ) const
-{
-  return m_houseModelsCache[ slot ].first;
-}
-
 Sapphire::House::HouseModelsArray const& Sapphire::House::getHouseModels() const
 {
-  return m_houseModelsCache;
+  return m_exteriorModelCache;
 }
 
 const std::string& Sapphire::House::getHouseName() const
@@ -117,4 +85,24 @@ void Sapphire::House::setHouseName( const std::string& name )
   m_estateName = name;
 
   updateHouseDb();
+}
+
+void Sapphire::House::setExteriorModel( Sapphire::Common::HouseExteriorSlot slot, uint32_t modelId, uint16_t stain )
+{
+  m_exteriorModelCache[ slot ] = std::make_pair( modelId, stain );
+}
+
+Sapphire::House::HousePart Sapphire::House::getExteriorModel( Sapphire::Common::HouseExteriorSlot slot )
+{
+  return m_exteriorModelCache[ slot ];
+}
+
+void Sapphire::House::setInteriorModel( Sapphire::Common::HousingInteriorSlot slot, uint32_t modelId )
+{
+  m_interiorModelCache[ slot ] = modelId;
+}
+
+uint32_t Sapphire::House::getInteriorModel( Sapphire::Common::HousingInteriorSlot slot )
+{
+  return m_interiorModelCache[ slot ];
 }

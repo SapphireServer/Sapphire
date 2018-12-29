@@ -365,6 +365,10 @@ namespace Sapphire::Entity
 
     Common::GearModelSlot equipSlotToModelSlot( Common::GearSetSlot slot );
 
+    bool getFreeInventoryContainerSlot( Inventory::InventoryContainerPair& containerPair ) const;
+
+    void insertInventoryItem( Common::InventoryType type, uint16_t slot, const Sapphire::ItemPtr item );
+
     /*!
     * Collect real item handins from container
     * @param itemIds a vector of each catalog id to collect
@@ -918,6 +922,8 @@ namespace Sapphire::Entity
 
     void setActiveLand( uint8_t land, uint8_t ward );
     Common::ActiveLand getActiveLand() const;
+
+    Sapphire::ItemPtr dropInventoryItem( Common::InventoryType type, uint16_t slotId );
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
