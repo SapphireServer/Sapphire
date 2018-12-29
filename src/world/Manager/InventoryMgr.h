@@ -2,13 +2,16 @@
 #define SAPPHIRE_INVENTORYMGR_H
 
 #include "ForwardsZone.h"
+#include "BaseManager.h"
 
 namespace Sapphire::World::Manager
 {
 
-  class InventoryMgr
+  class InventoryMgr : public Sapphire::World::Manager::BaseManager
   {
   public:
+    explicit InventoryMgr( Sapphire::FrameworkPtr pFw );
+
     /*!
      * @brief Sends an item container to a player
      *

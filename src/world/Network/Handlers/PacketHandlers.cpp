@@ -723,10 +723,11 @@ void Sapphire::Network::GameConnection::housingUpdateGreetingHandler( FrameworkP
   pHousingMgr->updateEstateGreeting( player, packet.data().ident, std::string( packet.data().greeting ) );
 }
 
-void Sapphire::Network::GameConnection::reqPlaceHousingItem( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::reqPlaceHousingItem( FrameworkPtr pFw,
+                                                             const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                              Entity::Player& player )
 {
-  auto housingMgr = g_fw.get< HousingMgr >();
+  auto housingMgr = pFw->get< HousingMgr >();
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcReqPlaceHousingItem >( inPacket );
   const auto& data = packet.data();
 
@@ -734,10 +735,11 @@ void Sapphire::Network::GameConnection::reqPlaceHousingItem( const Packets::FFXI
                                    data.position, data.rotation );
 }
 
-void Sapphire::Network::GameConnection::reqMoveHousingItem( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::reqMoveHousingItem( FrameworkPtr pFw,
+                                                            const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                             Entity::Player& player )
 {
-  auto housingMgr = g_fw.get< HousingMgr >();
+  auto housingMgr = pFw->get< HousingMgr >();
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcHousingUpdateObjectPosition >( inPacket );
   const auto& data = packet.data();

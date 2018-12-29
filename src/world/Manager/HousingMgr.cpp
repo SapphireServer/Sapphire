@@ -75,9 +75,7 @@ Sapphire::World::Manager::HousingMgr::~HousingMgr() = default;
 
 bool Sapphire::World::Manager::HousingMgr::init()
 {
-  auto log = g_fw.get< Sapphire::Logger >();
-
-  log->info( "HousingMgr: Caching housing land init data" );
+  Logger::info( "HousingMgr: Caching housing land init data" );
   //LAND_SEL_ALL
 
   // 18 wards per territory, 4 territories
@@ -85,7 +83,7 @@ bool Sapphire::World::Manager::HousingMgr::init()
 
   initLandCache();
 
-  log->debug( "HousingMgr: Checking land counts" );
+  Logger::debug( "HousingMgr: Checking land counts" );
 
   uint32_t houseCount = 0;
   for( auto& landSet : m_landCache )
@@ -96,12 +94,12 @@ bool Sapphire::World::Manager::HousingMgr::init()
 
     if( landSet.second.size() != 60 )
     {
-      log->fatal( "LandSet " + std::to_string( landSet.first ) + " is missing land entries. Only have " + std::to_string( count ) + " land entries." );
+      Logger::fatal( "LandSet " + std::to_string( landSet.first ) + " is missing land entries. Only have " + std::to_string( count ) + " land entries." );
       return false;
     }
   }
 
-  log->info( "HousingMgr: Cached " + std::to_string( houseCount ) + " houses" );
+  Logger::info( "HousingMgr: Cached " + std::to_string( houseCount ) + " houses" );
 
   /////
 
@@ -113,11 +111,9 @@ bool Sapphire::World::Manager::HousingMgr::init()
 
 bool Sapphire::World::Manager::HousingMgr::loadEstateInventories()
 {
-  auto log = g_fw.get< Sapphire::Logger >();
+  Logger::info( "HousingMgr: Loading inventories for estates" );
 
-  log->info( "HousingMgr: Loading inventories for estates" );
-
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
 
   auto stmt = pDb->getPreparedStatement( Db::LAND_INV_SEL_ALL );
   auto res = pDb->query( stmt );
@@ -134,7 +130,7 @@ bool Sapphire::World::Manager::HousingMgr::loadEstateInventories()
     auto stain = res->getUInt8( "stain" );
     auto characterId = res->getUInt64( "CharacterId" );
 
-    auto item = Inventory::make_HousingItem( itemId, catalogId );
+    auto item = Inventory::make_HousingItem( itemId, catalogId, framework() );
     item->setStain( stain );
     item->setStackSize( 1 );
     // todo: need to set the owner character id on the item
@@ -162,15 +158,14 @@ bool Sapphire::World::Manager::HousingMgr::loadEstateInventories()
     itemCount++;
   }
 
-  log->debug( "HousingMgr: Loaded " + std::to_string( itemCount ) + " inventory items" );
+  Logger::debug( "HousingMgr: Loaded " + std::to_string( itemCount ) + " inventory items" );
 
   return true;
 }
 
 void Sapphire::World::Manager::HousingMgr::initLandCache()
 {
-  auto log = g_fw.get< Sapphire::Logger >();
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
 
   auto stmt = pDb->getPreparedStatement( Db::LAND_SEL_ALL );
   auto res = pDb->query( stmt );
@@ -221,8 +216,8 @@ void Sapphire::World::Manager::HousingMgr::initLandCache()
         break;
       default:
         // this should never ever happen, if it does the db is fucked
-        log->error( "HousingMgr: Plot " + std::to_string( entry.m_landId ) + " in landset " + std::to_string( entry.m_landSetId ) +
-                    " has an invalid land size, defaulting to cottage." );
+        Logger::error( "HousingMgr: Plot " + std::to_string( entry.m_landId ) + " in landset " + std::to_string( entry.m_landSetId ) +
+                       " has an invalid land size, defaulting to cottage." );
         entry.m_maxPlacedExternalItems = 20;
         entry.m_maxPlacedInternalItems = 200;
         break;
@@ -238,9 +233,9 @@ void Sapphire::World::Manager::HousingMgr::initLandCache()
 
     auto& containers = getEstateInventory( ident );
 
-    auto makeContainer = [ &containers ]( Common::InventoryType type, uint16_t size )
+    auto makeContainer = [ &containers, this ]( Common::InventoryType type, uint16_t size )
     {
-      containers[ type ] = make_ItemContainer( type, size, "houseiteminventory", false, false );
+      containers[ type ] = make_ItemContainer( type, size, "houseiteminventory", false, framework(), false );
     };
 
     uint16_t count = 0;
@@ -270,7 +265,7 @@ void Sapphire::World::Manager::HousingMgr::initLandCache()
 
 uint64_t Sapphire::World::Manager::HousingMgr::getNextHouseId()
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto pQR = pDb->query( "SELECT MAX( HouseId ) FROM house" );
 
   if( !pQR->next() )
@@ -555,15 +550,15 @@ bool Sapphire::World::Manager::HousingMgr::initHouseModels( Entity::Player& play
   auto itemMax = land->getInventoryItemMax();
 
   // type, maxSize, tableName, isMultiStorage
-  auto intContainer = make_ItemContainer( InventoryType::HousingInteriorAppearance, itemMax.second, "houseiteminventory", true );
-  auto extContainer = make_ItemContainer( InventoryType::HousingExteriorAppearance, itemMax.first, "houseiteminventory", true );
+  auto intContainer = make_ItemContainer( InventoryType::HousingInteriorAppearance, itemMax.second, "houseiteminventory", true, framework() );
+  auto extContainer = make_ItemContainer( InventoryType::HousingExteriorAppearance, itemMax.first, "houseiteminventory", true, framework() );
 
   // add containers to inv collection
   auto& houseInventory = getEstateInventory( house->getLandIdent() );
   houseInventory[ InventoryType::HousingInteriorAppearance ] = intContainer;
   houseInventory[ InventoryType::HousingExteriorAppearance ] = extContainer;
 
-  auto exdData = g_fw.get< Sapphire::Data::ExdDataGenerated >();
+  auto exdData = framework()->get< Sapphire::Data::ExdDataGenerated >();
   auto preset = exdData->get< Sapphire::Data::HousingPreset >( getItemAdditionalData( presetCatalogId ) );
   if( !preset )
     return false;
@@ -604,7 +599,7 @@ bool Sapphire::World::Manager::HousingMgr::initHouseModels( Entity::Player& play
     }
   };
 
-  auto invMgr = g_fw.get< InventoryMgr >();
+  auto invMgr = framework()->get< InventoryMgr >();
 
   // create and link items
   for( auto& destContainer : invMap )
@@ -633,7 +628,7 @@ bool Sapphire::World::Manager::HousingMgr::initHouseModels( Entity::Player& play
 
 void Sapphire::World::Manager::HousingMgr::createHouse( Sapphire::HousePtr house ) const
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
 
   auto stmt = pDb->getPreparedStatement( Db::HOUSING_HOUSE_INS );
   // LandSetId, HouseId, HouseName
@@ -665,7 +660,7 @@ void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& pl
   // create house
   auto ident = pLand->getLandIdent();
   auto house = make_House( getNextHouseId(), pLand->getLandSetId(), ident,
-                           "Estate #" + std::to_string( ident.landId + 1 ), "" );
+                           "Estate #" + std::to_string( ident.landId + 1 ), "", framework() );
 
   pLand->setHouse( house );
 
@@ -854,7 +849,7 @@ void Sapphire::World::Manager::HousingMgr::sendEstateInventory( Entity::Player& 
   if( needle == containers.end() )
     return;
 
-  auto invMgr = g_fw.get< Manager::InventoryMgr >();
+  auto invMgr = framework()->get< Manager::InventoryMgr >();
   invMgr->sendInventoryContainer( player, needle->second );
 }
 
@@ -909,7 +904,7 @@ void Sapphire::World::Manager::HousingMgr::updateHouseModels( Sapphire::HousePtr
   }
   else
   {
-    g_fw.get< Logger >()->error( "Plot " + std::to_string( house->getLandIdent().landId ) + " has an invalid inventory configuration for outdoor appearance." );
+    framework()->get< Logger >()->error( "Plot " + std::to_string( house->getLandIdent().landId ) + " has an invalid inventory configuration for outdoor appearance." );
   }
 
   auto intContainer = containers.find( static_cast< uint16_t >( InventoryType::HousingInteriorAppearance ) );
@@ -923,13 +918,13 @@ void Sapphire::World::Manager::HousingMgr::updateHouseModels( Sapphire::HousePtr
   }
   else
   {
-    g_fw.get< Logger >()->error( "Plot " + std::to_string( house->getLandIdent().landId ) + " has an invalid inventory configuration for indoor appearance." );
+    framework()->get< Logger >()->error( "Plot " + std::to_string( house->getLandIdent().landId ) + " has an invalid inventory configuration for indoor appearance." );
   }
 }
 
 uint32_t Sapphire::World::Manager::HousingMgr::getItemAdditionalData( uint32_t catalogId )
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = framework()->get< Data::ExdDataGenerated >();
   auto info = pExdData->get< Sapphire::Data::Item >( catalogId );
   return info->additionalData;
 }
@@ -1001,7 +996,7 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceHousingItem( Sapphire::Entity
   {
     auto tmpItem = player.dropInventoryItem( static_cast< Common::InventoryType >( containerId ), slotId );
 
-    item = Inventory::make_HousingItem( tmpItem->getUId(), tmpItem->getId() );
+    item = Inventory::make_HousingItem( tmpItem->getUId(), tmpItem->getId(), framework() );
 
     // set params
     item->setPos( {
@@ -1037,7 +1032,7 @@ bool Sapphire::World::Manager::HousingMgr::placeExternalItem( Entity::Player& pl
                                                               Inventory::HousingItemPtr item,
                                                               Common::LandIdent ident )
 {
-  auto invMgr = g_fw.get< InventoryMgr >();
+  auto invMgr = framework()->get< InventoryMgr >();
 
   auto& container = getEstateInventory( ident )[ InventoryType::HousingExteriorPlacedItems ];
 
@@ -1070,7 +1065,7 @@ bool Sapphire::World::Manager::HousingMgr::placeExternalItem( Entity::Player& pl
 bool Sapphire::World::Manager::HousingMgr::placeInteriorItem( Entity::Player& player,
                                                               Inventory::HousingItemPtr item )
 {
-  auto invMgr = g_fw.get< InventoryMgr >();
+  auto invMgr = framework()->get< InventoryMgr >();
 
   auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( player.getCurrentZone() );
   assert( zone );
@@ -1144,7 +1139,7 @@ void Sapphire::World::Manager::HousingMgr::sendInternalEstateInventoryBatch( Sap
   else
     containerIds = m_internalPlacedItemContainers;
 
-  auto invMgr = g_fw.get< Manager::InventoryMgr >();
+  auto invMgr = framework()->get< Manager::InventoryMgr >();
   auto& containers = getEstateInventory( zone->getLandIdent() );
 
   for( auto containerId : containerIds )
@@ -1221,7 +1216,7 @@ bool Sapphire::World::Manager::HousingMgr::moveInternalItem( Entity::Player& pla
   item->setRot( Util::floatToUInt16Rot( rot ) );
 
   // save
-  auto invMgr = g_fw.get< InventoryMgr >();
+  auto invMgr = framework()->get< InventoryMgr >();
   invMgr->updateHousingItemPosition( item );
 
   terri.updateHousingObjectPosition( player, slot, item->getPos(), item->getRot() );
@@ -1264,7 +1259,7 @@ bool Sapphire::World::Manager::HousingMgr::moveExternalItem( Entity::Player& pla
 
   item->setRot( Util::floatToUInt16Rot( rot ) );
 
-  auto invMgr = g_fw.get< InventoryMgr >();
+  auto invMgr = framework()->get< InventoryMgr >();
   invMgr->updateHousingItemPosition( item );
 
   terri.updateYardObjectPos( player, slot, ident.landId, *item );
@@ -1353,7 +1348,7 @@ bool Sapphire::World::Manager::HousingMgr::removeInternalItem( Entity::Player& p
     if( !player.getFreeInventoryContainerSlot( containerPair ) )
       return false;
 
-    auto invMgr = g_fw.get< InventoryMgr >();
+    auto invMgr = framework()->get< InventoryMgr >();
 
     // remove it from housing inventory
     container->removeItem( slotId );
@@ -1375,7 +1370,7 @@ bool Sapphire::World::Manager::HousingMgr::removeInternalItem( Entity::Player& p
     if( !freeContainer )
       return false;
 
-    auto invMgr = g_fw.get< InventoryMgr >();
+    auto invMgr = framework()->get< InventoryMgr >();
 
     container->removeItem( slotId );
     invMgr->sendInventoryContainer( player, container );
@@ -1410,7 +1405,7 @@ bool Sapphire::World::Manager::HousingMgr::removeExternalItem( Entity::Player& p
   if( !item )
     return false;
 
-  auto invMgr = g_fw.get< InventoryMgr >();
+  auto invMgr = framework()->get< InventoryMgr >();
 
   if( sendToStoreroom )
   {
@@ -1495,7 +1490,7 @@ void Sapphire::World::Manager::HousingMgr::reqEstateExteriorRemodel( Sapphire::E
   if( needle == inv.end() )
     return;
 
-  auto invMgr = g_fw.get< InventoryMgr >();
+  auto invMgr = framework()->get< InventoryMgr >();
 
   invMgr->sendInventoryContainer( player, needle->second );
 
@@ -1526,7 +1521,7 @@ void Sapphire::World::Manager::HousingMgr::reqEstateInteriorRemodel( Sapphire::E
   if( needle == inv.end() )
     return;
 
-  auto invMgr = g_fw.get< InventoryMgr >();
+  auto invMgr = framework()->get< InventoryMgr >();
 
   invMgr->sendInventoryContainer( player, needle->second );
 

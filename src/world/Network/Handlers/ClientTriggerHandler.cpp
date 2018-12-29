@@ -79,11 +79,11 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
   const auto param4 = packet.data().param4;
   const auto param5 = packet.data().param5;
 
-  pLog->debug( "[" + std::to_string( m_pSession->getId() ) + "] Incoming action: " +
-               Util::intToHexString( static_cast< uint32_t >( commandId & 0xFFFF ), 4 ) +
-               "\nparam1: " + Util::intToHexString( static_cast< uint64_t >( param1 & 0xFFFFFFFFFFFFFFF ), 16 ) +
-               "\nparam2: " + Util::intToHexString( static_cast< uint32_t >( param2 & 0xFFFFFFFF ), 8 ) +
-               "\nparam3: " + Util::intToHexString( static_cast< uint64_t >( param3 & 0xFFFFFFFFFFFFFFF ), 16 )
+  Logger::debug( "[" + std::to_string( m_pSession->getId() ) + "] Incoming action: " +
+                 Util::intToHexString( static_cast< uint32_t >( commandId & 0xFFFF ), 4 ) +
+                 "\nparam1: " + Util::intToHexString( static_cast< uint64_t >( param1 & 0xFFFFFFFFFFFFFFF ), 16 ) +
+                 "\nparam2: " + Util::intToHexString( static_cast< uint32_t >( param2 & 0xFFFFFFFF ), 8 ) +
+                 "\nparam3: " + Util::intToHexString( static_cast< uint64_t >( param3 & 0xFFFFFFFFFFFFFFF ), 16 )
   );
 
   //g_log.Log(LoggingSeverity::debug, "[" + std::to_string(m_pSession->getId()) + "] " + pInPacket->toString());
@@ -437,10 +437,6 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     }
     case ClientTriggerType::RequestEstateInventory:
     {
-      // only sent if param1 is 1, because the client sends this with 0 when you open the ui for whatever reason
-      if( param1 != 1 )
-        return;
-
       auto housingMgr = pFw->get< HousingMgr >();
       if( !housingMgr )
         break;
@@ -457,7 +453,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     }
     case ClientTriggerType::RequestHousingItemRemove:
     {
-      auto housingMgr = g_fw.get< HousingMgr >();
+      auto housingMgr = m_pFw->get< HousingMgr >();
 
       auto slot = param4 & 0xFF;
       auto sendToStoreroom = ( param4 >> 16 ) != 0;
@@ -469,7 +465,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     }
     case ClientTriggerType::RequestEstateExteriorRemodel:
     {
-      auto housingMgr = g_fw.get< HousingMgr >();
+      auto housingMgr = m_pFw->get< HousingMgr >();
 
       housingMgr->reqEstateExteriorRemodel( player, param11 );
 
@@ -477,7 +473,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     }
     case ClientTriggerType::RequestEstateInteriorRemodel:
     {
-      auto housingMgr = g_fw.get< HousingMgr >();
+      auto housingMgr = m_pFw->get< HousingMgr >();
 
       housingMgr->reqEstateInteriorRemodel( player );
 
