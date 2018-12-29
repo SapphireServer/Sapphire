@@ -73,13 +73,6 @@ void Sapphire::Land::init( Common::LandType type, uint8_t size, uint8_t state, u
   }
 }
 
-uint32_t Sapphire::Land::convertItemIdToHousingItemId( uint32_t itemId )
-{
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
-  auto info = pExdData->get< Sapphire::Data::Item >( itemId );
-  return info->additionalData;
-}
-
 uint32_t Sapphire::Land::getCurrentPrice() const
 {
   return m_currentPrice;

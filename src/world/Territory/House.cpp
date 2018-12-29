@@ -32,7 +32,7 @@ void Sapphire::House::updateHouseDb()
   stmt->setUInt( 6, m_houseId );
 
   stmt->setInt64( 1, m_buildTime );
-  stmt->setInt( 2, 0 );
+  stmt->setBool( 2, m_hasAetheryte );
 
   stmt->setString( 3, m_estateComment );
   stmt->setString( 4, m_estateName );
@@ -104,4 +104,14 @@ void Sapphire::House::setInteriorModel( Sapphire::Common::HousingInteriorSlot sl
 uint32_t Sapphire::House::getInteriorModel( Sapphire::Common::HousingInteriorSlot slot )
 {
   return m_interiorModelCache[ slot ];
+}
+
+bool Sapphire::House::getHasAetheryte() const
+{
+  return m_hasAetheryte;
+}
+
+void Sapphire::House::setHasAetheryte( bool hasAetheryte )
+{
+  m_hasAetheryte = hasAetheryte;
 }

@@ -41,12 +41,16 @@ namespace Sapphire
 
     void updateHouseDb();
 
+    void setHasAetheryte( bool hasAetheryte );
+    bool getHasAetheryte() const;
+
   private:
     uint32_t m_landSetId;
     Common::LandIdent m_landIdent;
     uint32_t m_houseId;
 
     uint64_t m_buildTime;
+    bool m_hasAetheryte;
 
     HouseModelsArray m_exteriorModelCache;
     uint32_t m_interiorModelCache[10];
