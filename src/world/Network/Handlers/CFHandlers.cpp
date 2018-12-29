@@ -15,16 +15,14 @@
 #include "Framework.h"
 #include "Session.h"
 
-
-extern Sapphire::Framework g_fw;
-
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::World::Manager;
 
 
-void Sapphire::Network::GameConnection::cfDutyInfoRequest( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::cfDutyInfoRequest( FrameworkPtr pFw,
+                                                           const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                            Entity::Player& player )
 {
   auto dutyInfoPacket = makeZonePacket< FFXIVIpcCFDutyInfo >( player.getId() );
@@ -42,12 +40,13 @@ void Sapphire::Network::GameConnection::cfDutyInfoRequest( const Packets::FFXIVA
 
 }
 
-void Sapphire::Network::GameConnection::cfRegisterDuty( const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                    Entity::Player& player )
+void Sapphire::Network::GameConnection::cfRegisterDuty( FrameworkPtr pFw,
+                                                        const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                        Entity::Player& player )
 {
   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
-  auto pTeriMgr = g_fw.get< TerritoryMgr >();
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pTeriMgr = pFw->get< TerritoryMgr >();
+  auto pExdData = pFw->get< Data::ExdDataGenerated >();
 
   std::vector< uint16_t > selectedContent;
 
@@ -90,8 +89,9 @@ void Sapphire::Network::GameConnection::cfRegisterDuty( const Packets::FFXIVARR_
   player.setInstance( instance );
 }
 
-void Sapphire::Network::GameConnection::cfRegisterRoulette( const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                        Entity::Player& player )
+void Sapphire::Network::GameConnection::cfRegisterRoulette( FrameworkPtr pFw,
+                                                            const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                            Entity::Player& player )
 {
   auto cfCancelPacket = makeZonePacket< FFXIVIpcCFNotify >( player.getId() );
   cfCancelPacket->data().state1 = 3;
@@ -101,8 +101,9 @@ void Sapphire::Network::GameConnection::cfRegisterRoulette( const Packets::FFXIV
   player.sendDebug( "Roulette register" );
 }
 
-void Sapphire::Network::GameConnection::cfDutyAccepted( const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                    Entity::Player& player )
+void Sapphire::Network::GameConnection::cfDutyAccepted( FrameworkPtr pFw,
+                                                        const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                        Entity::Player& player )
 {
   player.sendDebug( "TODO: Duty accept" );
 }

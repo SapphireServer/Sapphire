@@ -39,7 +39,7 @@ namespace Sapphire::Entity
   {
   public:
     /*! Contructor */
-    Player();
+    Player( FrameworkPtr pFw );
 
     /*! Destructor */
     ~Player();
@@ -527,7 +527,7 @@ namespace Sapphire::Entity
     void teleport( uint16_t aetheryteId, uint8_t type = 1 );
 
     /*! query teleport of a specified type */
-    void teleportQuery( uint16_t aetheryteId );
+    void teleportQuery( uint16_t aetheryteId, FrameworkPtr pFw );
 
     /*! prepares zoning / fades out the screen */
     void prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadoutTime = 0, uint16_t animation = 0 );
@@ -686,7 +686,7 @@ namespace Sapphire::Entity
     void updateSql();
 
     /*! load player from db, by id */
-    bool load( uint32_t charId, SessionPtr pSession );
+    bool load( uint32_t charId, World::SessionPtr pSession );
 
     /*! load active class data */
     bool loadClassData();

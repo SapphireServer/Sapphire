@@ -12,9 +12,9 @@ namespace Sapphire::Math
   public:
     static float calculateBaseStat( Sapphire::Entity::PlayerPtr pPlayer );
 
-    static uint32_t calculateMaxMp( Sapphire::Entity::PlayerPtr pPlayer );
+    static uint32_t calculateMaxMp( Sapphire::Entity::PlayerPtr pPlayer, FrameworkPtr pFw );
 
-    static uint32_t calculateMaxHp( Sapphire::Entity::PlayerPtr pPlayer );
+    static uint32_t calculateMaxHp( Sapphire::Entity::PlayerPtr pPlayer, FrameworkPtr pFw  );
 
   private:
 

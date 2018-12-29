@@ -13,7 +13,7 @@ namespace Sapphire
   {
   public:
     House( uint32_t houseId, uint32_t landSetId, Common::LandIdent ident, const std::string& estateName,
-           const std::string& estateComment );
+           const std::string& estateComment, FrameworkPtr pFw );
     virtual ~House();
 
     using HousePart = std::pair< uint32_t, uint16_t >;
@@ -53,6 +53,7 @@ namespace Sapphire
 
     std::string m_estateComment;
     std::string m_estateName;
+    FrameworkPtr m_pFw;
   };
 
 }

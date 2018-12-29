@@ -11,22 +11,21 @@
 #include <unordered_map>
 #include "Framework.h"
 
-extern Sapphire::Framework g_fw;
-
 Sapphire::House::House( uint32_t houseId, uint32_t landSetId, Common::LandIdent ident, const std::string& estateName,
-                        const std::string& estateComment ) :
+                        const std::string& estateComment, FrameworkPtr pFw ) :
   m_houseId( houseId ),
   m_landSetId( landSetId ),
   m_landIdent( ident ),
   m_estateName( estateName ),
-  m_estateComment( estateComment )
+  m_estateComment( estateComment ),
+  m_pFw( pFw )
 {}
 
 Sapphire::House::~House() = default;
 
 void Sapphire::House::updateHouseDb()
 {
-  auto pDB = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDB = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
 
   // BuildTime = 1, Aetheryte = 2, Comment = 3, HouseName = 4, Endorsements = 5, HouseId = 6
   auto stmt = pDB->getPreparedStatement( Db::HOUSING_HOUSE_UP );

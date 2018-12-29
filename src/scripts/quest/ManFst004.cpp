@@ -1,6 +1,7 @@
 #include <Actor/Player.h>
-#include "Event/EventHelper.h"
+#include "Manager/EventMgr.h"
 #include <ScriptObject.h>
+#include "Framework.h"
 
 // Quest Script: ManFst004_00124
 // Quest Name: Close to Home
@@ -81,7 +82,8 @@ public:
 
   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
   {
-    auto actor = Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
+    auto pEventMgr = m_framework->get< World::Manager::EventMgr >();
+    auto actor = pEventMgr->mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
     if( actor == ManFst004::Actor0 )
     {
@@ -223,10 +225,10 @@ private:
                       [ & ]( Entity::Player& player, const Event::SceneResult& result )
                       {
                         // accepting quest "close to home"
-                        player.updateQuest( getId(), 1 );
+                        player.updateQuest( getId(), Seq1 );
                         player.setQuestUI8CH( getId(), 1 ); // receive key item
                         // event is done, need to teleport to real zone.
-                        player.setZone( 132 );
+                        player.forceZoneing( Territorytype0 );
                         //player.setZone(183); back to starting griania for debug purpose
                       } );
   }

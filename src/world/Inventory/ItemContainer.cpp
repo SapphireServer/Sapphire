@@ -9,15 +9,14 @@
 #include "Forwards.h"
 #include "ItemContainer.h"
 
-extern Sapphire::Framework g_fw;
-
 Sapphire::ItemContainer::ItemContainer( uint16_t storageId, uint16_t maxSize, const std::string& tableName,
-                                        bool isMultiStorage, bool removeItemOnContainerRemoval ) :
+                                        bool isMultiStorage, FrameworkPtr pFw, bool isPersistentStorage ) :
   m_id( storageId ),
   m_size( maxSize ),
   m_tableName( tableName ),
   m_bMultiStorage( isMultiStorage ),
-  m_removeItemOnContainerRemove( removeItemOnContainerRemoval )
+  m_pFw( pFw ),
+  m_isPersistentStorage( isPersistentStorage )
 {
 
 }
@@ -39,8 +38,7 @@ uint16_t Sapphire::ItemContainer::getEntryCount() const
 
 void Sapphire::ItemContainer::removeItem( uint16_t slotId )
 {
-  auto pLog = g_fw.get< Logger >();
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   ItemMap::iterator it = m_itemMap.find( slotId );
 
   if( it != m_itemMap.end() )
@@ -50,11 +48,11 @@ void Sapphire::ItemContainer::removeItem( uint16_t slotId )
 
     m_itemMap.erase( it );
 
-    pLog->debug( "Dropped item from slot " + std::to_string( slotId ) );
+    Logger::debug( "Dropped item from slot " + std::to_string( slotId ) );
   }
   else
   {
-    pLog->debug( "Item could not be dropped from slot " + std::to_string( slotId ) );
+    Logger::debug( "Item could not be dropped from slot " + std::to_string( slotId ) );
   }
 }
 
@@ -85,8 +83,7 @@ Sapphire::ItemPtr Sapphire::ItemContainer::getItem( uint16_t slotId )
 
   if( ( slotId > m_size ) )
   {
-    auto pLog = g_fw.get< Logger >();
-    pLog->error( "Slot out of range " + std::to_string( slotId ) );
+    Logger::error( "Slot out of range " + std::to_string( slotId ) );
     return nullptr;
   }
 
