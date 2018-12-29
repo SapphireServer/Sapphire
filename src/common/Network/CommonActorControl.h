@@ -346,6 +346,7 @@ enum ActorControlType : uint16_t
     RequestEstateEditGreeting = 0x45B,
     RequestEstateGreeting = 0x45C, // sends FFXIVIpcHousingEstateGreeting in return
     RequestEstateEditGuestAccessSettings = 0x45D,
+    UpdateEstateGuestAccess = 0x45E,
     RequestEstateTagSettings = 0x45F,
     RequestEstateInventory = 0x0461,
     RequestHousingItemUI = 0x463,

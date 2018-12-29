@@ -779,7 +779,7 @@ void Sapphire::World::Manager::HousingMgr::requestEstateEditGuestAccess( Entity:
   if( land->getOwnerId() != player.getId() )
     return;
 
-  auto packet = makeZonePacket< FFXIVIpcHousingShowEstateGuestAccess >( player.getId() );
+  auto packet = makeZonePacket< Server::FFXIVIpcHousingShowEstateGuestAccess >( player.getId() );
   packet->data().ident = ident;
 
   player.queuePacket( packet );
