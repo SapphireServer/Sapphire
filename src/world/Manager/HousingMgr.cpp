@@ -1232,8 +1232,6 @@ bool Sapphire::World::Manager::HousingMgr::moveInternalItem( Entity::Player& pla
 
   player.queuePacket( Server::makeActorControl143( player.getId(), ActorControl::HousingItemMoveConfirm, param1, slotIdx ) );
 
-  // todo: update it for other players??
-
   return true;
 }
 
