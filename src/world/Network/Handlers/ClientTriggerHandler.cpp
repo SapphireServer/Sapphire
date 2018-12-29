@@ -479,6 +479,18 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
 
       break;
     }
+    case ClientTriggerType::UpdateEstateGuestAccess:
+    {
+      auto canTeleport = ( param2 & 0xFF ) == 1;
+      auto unk1 = ( param2 >> 8 & 0xFF ) == 1; // todo: related to fc? or unused?
+      auto privateEstateAccess = ( param2 >> 16 & 0xFF ) == 1;
+      auto unk = ( param2 >> 24 & 0xFF ) == 1; // todo: related to fc? or unused?
+
+      player.sendDebug( "can teleport: " + std::to_string( canTeleport ) + ", unk: " + std::to_string( unk1 ) +
+                        ", privateEstateAccess: " + std::to_string( privateEstateAccess ) +
+                        ", unk: " + std::to_string( unk ) );
+      break;
+    }
 
     default:
     {
