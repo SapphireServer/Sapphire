@@ -16,7 +16,7 @@ namespace filesys = std::experimental::filesystem;
 
 #include "DbManager.h"
 
-Sapphire::Logger g_log;
+using namespace Sapphire;
 
 std::vector< std::string > getAllFilesInDir( const std::string& dirPath,
                                              const std::vector< std::string > dirSkipList = {} )
@@ -77,20 +77,20 @@ std::string delChar( std::string &str, char del )
 
 void printUsage()
 {
-  g_log.info( " Usage: sapphire_dbm " );
-  g_log.info( "\t --mode" );
-  g_log.info( "\t\t initialize -> Creates DB if not present and inserts default tables/data" );
-  g_log.info( "\t\t check -> Checks if Sapphire DB-Version matches your DB-Version" );
-  g_log.info( "\t\t update -> Updates your DB-Version to Sapphire DB-Version" );
-  g_log.info( "\t\t clearchars -> Removes all character data from DB. Accounts will stay untouched" );
-  g_log.info( "\t\t liquidate -> Removes all tables and deletes the DB" );
-  g_log.info( "\t --user <mysqlUserName>" );
-  g_log.info( "\t --pass <mysqlPassword> ( default empty )" );
-  g_log.info( "\t --host <mysqlHost> ( default 127.0.0.1 )" );
-  g_log.info( "\t --port <mysqlPort> ( default 3306 )" );
-  g_log.info( "\t --database <mysqlDatabase>" );
-  g_log.info( "\t --sfile <path/to/schemafile> ( default sql/schema/schema.sql )" );
-  g_log.info( "\t --force ( skips user input / auto Yes )" );
+  Logger::info( " Usage: sapphire_dbm " );
+  Logger::info( "\t --mode" );
+  Logger::info( "\t\t initialize -> Creates DB if not present and inserts default tables/data" );
+  Logger::info( "\t\t check -> Checks if Sapphire DB-Version matches your DB-Version" );
+  Logger::info( "\t\t update -> Updates your DB-Version to Sapphire DB-Version" );
+  Logger::info( "\t\t clearchars -> Removes all character data from DB. Accounts will stay untouched" );
+  Logger::info( "\t\t liquidate -> Removes all tables and deletes the DB" );
+  Logger::info( "\t --user <mysqlUserName>" );
+  Logger::info( "\t --pass <mysqlPassword> ( default empty )" );
+  Logger::info( "\t --host <mysqlHost> ( default 127.0.0.1 )" );
+  Logger::info( "\t --port <mysqlPort> ( default 3306 )" );
+  Logger::info( "\t --database <mysqlDatabase>" );
+  Logger::info( "\t --sfile <path/to/schemafile> ( default sql/schema/schema.sql )" );
+  Logger::info( "\t --force ( skips user input / auto Yes )" );
 }
 
 int main( int32_t argc, char* argv[] )
@@ -104,8 +104,7 @@ int main( int32_t argc, char* argv[] )
   std::string database;
   std::string pass;
 
-  g_log.setLogPath( "log/SapphireDbm" );
-  g_log.init();
+  Logger::init( "log/SapphireDbm" );
 
   std::string sFile;
   std::string iFile;
@@ -181,23 +180,23 @@ int main( int32_t argc, char* argv[] )
   }
   else
   {
-    g_log.fatal( "Not a valid mode: " + mode + " !" );
+    Logger::fatal( "Not a valid mode: " + mode + " !" );
     return 1;
   }
 
-  g_log.info( "Launching in " + mode + " mode..." );
+  Logger::info( "Launching in " + mode + " mode..." );
 
   if( !dbm.connect() )
   {
-    g_log.fatal( "Could not connect to server!" );
-    g_log.fatal( dbm.getLastError() );
+    Logger::fatal( "Could not connect to server!" );
+    Logger::fatal( dbm.getLastError() );
     return 1;
   }
 
   if( !dbm.performAction() )
   {
-    g_log.fatal( "Could not perform action!" );
-    g_log.fatal( dbm.getLastError() );
+    Logger::fatal( "Could not perform action!" );
+    Logger::fatal( dbm.getLastError() );
     return 1;
   }
 

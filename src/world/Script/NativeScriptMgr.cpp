@@ -1,10 +1,9 @@
 #include "NativeScriptMgr.h"
 
 #include <Crypt/md5.h>
+#include <Config/ConfigMgr.h>
 
 #include "Framework.h"
-
-extern Sapphire::Framework g_fw;
 
 namespace Sapphire::Scripting
 {
@@ -33,7 +32,7 @@ namespace Sapphire::Scripting
       auto script = scripts[ i ];
       module->scripts.push_back( script );
 
-      script->setFramework( &g_fw );
+      script->setFramework( framework().get() );
 
       m_scripts[ script->getType() ][ script->getId() ] = script;
 
@@ -122,10 +121,17 @@ namespace Sapphire::Scripting
     return m_loader.isModuleLoaded( name );
   }
 
-
-  std::shared_ptr< NativeScriptMgr > createNativeScriptMgr()
+  NativeScriptMgr::NativeScriptMgr( FrameworkPtr pFw  ) :
+    World::Manager::BaseManager( pFw )
   {
-    return std::make_shared< NativeScriptMgr >();
+    auto pConfig = framework()->get< ConfigMgr >();
+    m_loader.setCachePath( pConfig->getValue< std::string >( "Scripts", "CachePath", "./cache/" ) );
+  }
+
+
+  std::shared_ptr< NativeScriptMgr > createNativeScriptMgr( FrameworkPtr pFw )
+  {
+    return std::make_shared< NativeScriptMgr >( pFw );
   }
 }
 

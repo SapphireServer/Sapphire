@@ -33,6 +33,13 @@ namespace Sapphire::Scripting
     std::unordered_map< std::string, ScriptInfo* > m_scriptMap;
 
     /*!
+     * @brief The path for script caching.
+     */
+    std::string m_cachePath;
+
+  protected:
+
+    /*!
      * @brief Unload a loaded module from it's ModuleHandle
      *
      * @return true if the unload was successful, false if not
@@ -103,6 +110,18 @@ namespace Sapphire::Scripting
      * @param search the search term
      */
     void findScripts( std::set< Sapphire::Scripting::ScriptInfo* >& scripts, const std::string& search );
+
+    /*!
+     * @brief return cache path
+     */
+    const std::string& getCachePath() const;
+
+    /*!
+     * @brief set the cache path
+     *
+     * @param cache path
+     */
+    void setCachePath( const std::string& m_cachePath );
   };
 
 }

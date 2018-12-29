@@ -15,7 +15,8 @@ namespace Sapphire
   {
   public:
 
-    Land( uint16_t zoneId, uint8_t wardNum, uint8_t landId, uint32_t landSetId, Sapphire::Data::HousingLandSetPtr info );
+    Land( uint16_t zoneId, uint8_t wardNum, uint8_t landId, uint32_t landSetId,
+          Sapphire::Data::HousingLandSetPtr info, FrameworkPtr pFw );
     virtual ~Land();
     void init( Common::LandType type, uint8_t size, uint8_t state, uint32_t currentPrice, uint64_t ownerId, uint64_t houseId );
 
@@ -65,7 +66,6 @@ namespace Sapphire
     InvMaxItemsPair getInventoryItemMax() const;
 
   private:
-    uint32_t convertItemIdToHousingItemId( uint32_t itemId );
     uint32_t getNextHouseId();
 
     Common::LandIdent m_landIdent;
@@ -100,6 +100,8 @@ namespace Sapphire
     //information
     char fcTag[7];
     uint8_t m_tag[3];
+
+    FrameworkPtr m_pFw;
   };
 
 }

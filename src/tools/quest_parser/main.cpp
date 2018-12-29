@@ -20,10 +20,9 @@
 
 #include <algorithm>
 
-
-Sapphire::Logger g_log;
 Sapphire::Data::ExdDataGenerated g_exdDataGen;
 namespace fs = std::experimental::filesystem;
+using namespace Sapphire;
 
 const std::string onTalkStr(
   "   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override\n"
@@ -328,7 +327,7 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
 int main( int argc, char** argv )
 {
 
-  g_log.init();
+  Logger::init( "quest_parser" );
 
   bool unluac = false;
   // std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
@@ -341,11 +340,11 @@ int main( int argc, char** argv )
 
   unluac = true;
 
-  g_log.info( "Setting up generated EXD data" );
+  Logger::info( "Setting up generated EXD data" );
   if( !g_exdDataGen.init( datLocation ) )
   {
     std::cout << datLocation << "\n";
-    g_log.fatal( "Error setting up EXD data " );
+    Logger::fatal( "Error setting up EXD data " );
     std::cout << "Usage: quest_parser \"path/to/ffxiv/game/sqpack\" <1/0 unluac export toggle>\n";
     return 0;
   }
@@ -357,13 +356,13 @@ int main( int argc, char** argv )
   if( !fs::exists( "./generated" ) )
     fs::create_directory( "./generated" );
 
-  g_log.info( "Export in progress" );
+  Logger::info( "Export in progress" );
 
   uint32_t updateInterval = rows.size() / 20;
   uint32_t i = 0;
   for( const auto& row : rows )
   {
-    g_log.info( "Generating " + std::to_string( row ) );
+    Logger::info( "Generating " + std::to_string( row ) );
     auto questInfo = g_exdDataGen.get< Sapphire::Data::Quest >( row );
 
     if( questInfo->name.empty() || questInfo->id.empty() )
@@ -408,7 +407,7 @@ int main( int argc, char** argv )
         "generated/" + questInfo->id + ".lua";
       if( system( command.c_str() ) == -1 )
       {
-        g_log.error( "Error executing java command:\n" + command + "\nerrno: " + std::strerror( errno ) );
+        Logger::error( "Error executing java command:\n" + command + "\nerrno: " + std::strerror( errno ) );
         return errno;
       }
     }

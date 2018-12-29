@@ -11,7 +11,8 @@ namespace Sapphire::World::Territory::Housing
     HousingInteriorTerritory( Common::LandIdent ident, uint16_t territoryTypeId,
                               uint32_t guId,
                               const std::string& internalName,
-                              const std::string& contentName );
+                              const std::string& contentName,
+                              FrameworkPtr pFw );
 
     virtual ~HousingInteriorTerritory();
 

@@ -13,7 +13,7 @@ namespace Sapphire
   {
   public:
     House( uint32_t houseId, uint32_t landSetId, Common::LandIdent ident, const std::string& estateName,
-           const std::string& estateComment );
+           const std::string& estateComment, FrameworkPtr pFw );
     virtual ~House();
 
     using HousePart = std::pair< uint32_t, uint16_t >;
@@ -41,18 +41,23 @@ namespace Sapphire
 
     void updateHouseDb();
 
+    void setHasAetheryte( bool hasAetheryte );
+    bool getHasAetheryte() const;
+
   private:
     uint32_t m_landSetId;
     Common::LandIdent m_landIdent;
     uint32_t m_houseId;
 
     uint64_t m_buildTime;
+    bool m_hasAetheryte;
 
     HouseModelsArray m_exteriorModelCache;
     uint32_t m_interiorModelCache[10];
 
     std::string m_estateComment;
     std::string m_estateName;
+    FrameworkPtr m_pFw;
   };
 
 }

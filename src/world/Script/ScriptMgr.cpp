@@ -10,7 +10,8 @@
 #include "Actor/EventObject.h"
 #include "ServerMgr.h"
 #include "Event/EventHandler.h"
-#include "Event/EventHelper.h"
+
+#include "Manager/EventMgr.h"
 
 #include "StatusEffect/StatusEffect.h"
 
@@ -25,14 +26,13 @@
 // enable the ambiguity fix for every platform to avoid #define nonsense
 #define WIN_AMBIGUITY_FIX
 
-extern Sapphire::Framework g_fw;
-
 namespace fs = std::experimental::filesystem;
 
-Sapphire::Scripting::ScriptMgr::ScriptMgr() :
+Sapphire::Scripting::ScriptMgr::ScriptMgr( FrameworkPtr pFw ) :
+  World::Manager::BaseManager( pFw ),
   m_firstScriptChangeNotificiation( false )
 {
-  m_nativeScriptMgr = createNativeScriptMgr();
+  m_nativeScriptMgr = createNativeScriptMgr( pFw );
 }
 
 Sapphire::Scripting::ScriptMgr::~ScriptMgr()
@@ -48,16 +48,15 @@ void Sapphire::Scripting::ScriptMgr::update()
 bool Sapphire::Scripting::ScriptMgr::init()
 {
   std::set< std::string > files;
-  auto pConfig = g_fw.get< ConfigMgr >();
-  auto pLog = g_fw.get< Logger >();
+  auto pConfig = framework()->get< ConfigMgr >();
 
   auto status = loadDir( pConfig->getValue< std::string >( "Scripts", "Path", "./compiledscripts/" ),
                          files, m_nativeScriptMgr->getModuleExtension() );
 
   if( !status )
   {
-    pLog->error( std::string( __func__ ) +
-                 ": failed to load scripts, the server will not function correctly without scripts loaded." );
+    Logger::error( std::string( __func__ ) +
+                   ": failed to load scripts, the server will not function correctly without scripts loaded." );
     return false;
   }
 
@@ -74,7 +73,7 @@ bool Sapphire::Scripting::ScriptMgr::init()
       scriptsLoaded++;
   }
 
-  pLog->info(
+  Logger::info(
     "ScriptMgr: Loaded " + std::to_string( scriptsLoaded ) + "/" + std::to_string( scriptsFound ) + " modules" );
 
   watchDirectories();
@@ -84,7 +83,7 @@ bool Sapphire::Scripting::ScriptMgr::init()
 
 void Sapphire::Scripting::ScriptMgr::watchDirectories()
 {
-  auto pConfig = g_fw.get< ConfigMgr >();
+  auto pConfig = framework()->get< ConfigMgr >();
   auto shouldWatch = pConfig->getValue< bool >( "Scripts", "HotSwap", true );
   if( !shouldWatch )
     return;
@@ -100,19 +99,18 @@ void Sapphire::Scripting::ScriptMgr::watchDirectories()
                            m_firstScriptChangeNotificiation = true;
                            return;
                          }
-                         auto pLog = g_fw.get< Logger >();
 
-                         for( auto path : paths )
+                         for( const auto& path : paths )
                          {
                            if( m_nativeScriptMgr->isModuleLoaded( path.stem().string() ) )
                            {
-                             pLog->debug( "Reloading changed script: " + path.stem().string() );
+                             Logger::debug( "Reloading changed script: " + path.stem().string() );
 
                              m_nativeScriptMgr->queueScriptReload( path.stem().string() );
                            }
                            else
                            {
-                             pLog->debug( "Loading new script: " + path.stem().string() );
+                             Logger::debug( "Loading new script: " + path.stem().string() );
 
                              m_nativeScriptMgr->loadScript( path.string() );
                            }
@@ -123,13 +121,11 @@ void Sapphire::Scripting::ScriptMgr::watchDirectories()
 bool Sapphire::Scripting::ScriptMgr::loadDir( const std::string& dirname, std::set< std::string >& files,
                                               const std::string& ext )
 {
-
-  auto pLog = g_fw.get< Logger >();
-  pLog->info( "ScriptMgr: loading scripts from " + dirname );
+  Logger::info( "ScriptMgr: loading scripts from " + dirname );
 
   if( !fs::exists( dirname ) )
   {
-    pLog->error( "ScriptMgr: scripts directory doesn't exist" );
+    Logger::error( "ScriptMgr: scripts directory doesn't exist" );
     return false;
   }
 
@@ -145,11 +141,11 @@ bool Sapphire::Scripting::ScriptMgr::loadDir( const std::string& dirname, std::s
     }
   }
 
-  if( files.size() )
+  if( !files.empty() )
     return true;
   else
   {
-    pLog->error( "ScriptMgr: couldn't find any script modules" );
+    Logger::error( "ScriptMgr: couldn't find any script modules" );
     return false;
   }
 }
@@ -263,8 +259,10 @@ bool Sapphire::Scripting::ScriptMgr::onEventHandlerTradeReturn( Entity::Player& 
 bool Sapphire::Scripting::ScriptMgr::onEventItem( Entity::Player& player, uint32_t eventItemId,
                                                   uint32_t eventId, uint32_t castTime, uint64_t targetId )
 {
+  auto pEventMgr = framework()->get< World::Manager::EventMgr >();
+
   std::string eventName = "onEventItem";
-  std::string objName = Event::getEventName( eventId );
+  std::string objName = pEventMgr->getEventName( eventId );
   player.sendDebug( "Calling: " + objName + "." + eventName + " - " + std::to_string( eventId ) );
 
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
@@ -281,8 +279,9 @@ bool Sapphire::Scripting::ScriptMgr::onEventItem( Entity::Player& player, uint32
 
 bool Sapphire::Scripting::ScriptMgr::onMobKill( Entity::Player& player, uint16_t nameId )
 {
-  std::string eventName = "onBnpcKill_" + std::to_string( nameId );
+  auto pEventMgr = framework()->get< World::Manager::EventMgr >();
 
+  std::string eventName = "onBnpcKill_" + std::to_string( nameId );
 
   // loop through all active quests and try to call available onMobKill callbacks
   for( size_t i = 0; i < 30; i++ )
@@ -296,7 +295,7 @@ bool Sapphire::Scripting::ScriptMgr::onMobKill( Entity::Player& player, uint16_t
     auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( questId );
     if( script )
     {
-      std::string objName = Event::getEventName( 0x00010000 | questId );
+      std::string objName = pEventMgr->getEventName( 0x00010000 | questId );
 
       player.sendDebug( "Calling: " + objName + "." + eventName );
 

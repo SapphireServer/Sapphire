@@ -27,13 +27,11 @@
 #include <algorithm>
 
 #include <Framework.h>
+#include <Logging/Logger.h>
 
 #include "Forwards.h"
 #include "SapphireAPI.h"
 
-
-Sapphire::Framework g_fw;
-Sapphire::Logger g_log;
 Sapphire::Db::DbWorkerPool< Sapphire::Db::ZoneDbConnection > g_charaDb;
 Sapphire::Data::ExdDataGenerated g_exdDataGen;
 Sapphire::Network::SapphireAPI g_sapphireAPI;
@@ -41,6 +39,7 @@ Sapphire::Network::SapphireAPI g_sapphireAPI;
 namespace fs = std::experimental::filesystem;
 
 using namespace std;
+using namespace Sapphire;
 
 using HttpServer = SimpleWeb::Server< SimpleWeb::HTTP >;
 using HttpClient = SimpleWeb::Client< SimpleWeb::HTTP >;
@@ -64,17 +63,17 @@ void reloadConfig()
 
 void print_request_info( shared_ptr< HttpServer::Request > request )
 {
-  g_log.info( "Request from " + request->remote_endpoint_address + " (" + request->path + ")" );
+  Logger::info( "Request from " + request->remote_endpoint_address + " (" + request->path + ")" );
 }
 
 bool loadSettings( int32_t argc, char* argv[] )
 {
-  g_log.info( "Loading config " + configPath );
+  Logger::info( "Loading config " + configPath );
 
   if( !m_pConfig->loadConfig( configPath ) )
   {
-    g_log.fatal( "Error loading config " + configPath );
-    g_log.fatal( "If this is the first time starting the server, we've copied the default one for your editing pleasure." );
+    Logger::fatal( "Error loading config " + configPath );
+    Logger::fatal( "If this is the first time starting the server, we've copied the default one for your editing pleasure." );
     return false;
   }
 
@@ -135,17 +134,17 @@ bool loadSettings( int32_t argc, char* argv[] )
     }
     catch( ... )
     {
-      g_log.error( "Error parsing argument: " + arg + " " + "value: " + val + "\n" );
-      g_log.error( "Usage: <arg> <val> \n" );
+      Logger::error( "Error parsing argument: " + arg + " " + "value: " + val + "\n" );
+      Logger::error( "Usage: <arg> <val> \n" );
     }
   }
 
-  g_log.info( "Setting up generated EXD data" );
+  Logger::info( "Setting up generated EXD data" );
   auto dataPath = m_pConfig->getValue< std::string >( "GlobalParameters", "DataPath", "" );
   if( !g_exdDataGen.init( dataPath ) )
   {
-    g_log.fatal( "Error setting up generated EXD data. Make sure that DataPath is set correctly in config.ini" );
-    g_log.fatal( "DataPath: " + dataPath );
+    Logger::fatal( "Error setting up generated EXD data. Make sure that DataPath is set correctly in config.ini" );
+    Logger::fatal( "DataPath: " + dataPath );
     return false;
   }
 
@@ -168,7 +167,7 @@ bool loadSettings( int32_t argc, char* argv[] )
     m_pConfig->getValue< std::string >( "RestNetwork", "ListenPort", "80" ) ) );
   server.config.address = m_pConfig->getValue< std::string >( "RestNetwork", "ListenIp", "0.0.0.0" );
 
-  g_log.info( "Database: Connected to " + info.host + ":" + std::to_string( info.port ) );
+  Logger::info( "Database: Connected to " + info.host + ":" + std::to_string( info.port ) );
 
   return true;
 }
@@ -279,7 +278,7 @@ void createAccount( shared_ptr< HttpServer::Response > response, shared_ptr< Htt
   catch( exception& e )
   {
     *response << buildHttpResponse( 500 );
-    g_log.error( e.what() );
+    Logger::error( e.what() );
   }
 }
 
@@ -313,7 +312,7 @@ void login( shared_ptr< HttpServer::Response > response, shared_ptr< HttpServer:
   catch( exception& e )
   {
     *response << buildHttpResponse( 500 );
-    g_log.error( e.what() );
+    Logger::error( e.what() );
   }
 
 }
@@ -348,7 +347,7 @@ void deleteCharacter( shared_ptr< HttpServer::Response > response, shared_ptr< H
   catch( exception& e )
   {
     *response << buildHttpResponse( 500 );
-    g_log.error( e.what() );
+    Logger::error( e.what() );
   }
 
 }
@@ -396,7 +395,7 @@ void createCharacter( shared_ptr< HttpServer::Response > response, shared_ptr< H
   catch( exception& e )
   {
     *response << buildHttpResponse( 500 );
-    g_log.error( e.what() );
+    Logger::error( e.what() );
   }
 
 }
@@ -429,7 +428,7 @@ void insertSession( shared_ptr< HttpServer::Response > response, shared_ptr< Htt
   catch( exception& e )
   {
     *response << buildHttpResponse( 500 );
-    g_log.error( e.what() );
+    Logger::error( e.what() );
   }
 }
 
@@ -464,7 +463,7 @@ void checkNameTaken( shared_ptr< HttpServer::Response > response, shared_ptr< Ht
   catch( exception& e )
   {
     *response << buildHttpResponse( 500 );
-    g_log.error( e.what() );
+    Logger::error( e.what() );
   }
 }
 
@@ -506,7 +505,7 @@ void checkSession( shared_ptr< HttpServer::Response > response, shared_ptr< Http
   catch( exception& e )
   {
     *response << buildHttpResponse( 500 );
-    g_log.error( e.what() );
+    Logger::error( e.what() );
   }
 
 }
@@ -536,7 +535,7 @@ void getNextCharId( shared_ptr< HttpServer::Response > response, shared_ptr< Htt
   catch( exception& e )
   {
     *response << buildHttpResponse( 500 );
-    g_log.error( e.what() );
+    Logger::error( e.what() );
   }
 
 }
@@ -567,7 +566,7 @@ void getNextContentId( shared_ptr< HttpServer::Response > response, shared_ptr< 
   catch( exception& e )
   {
     *response << buildHttpResponse( 500 );
-    g_log.error( e.what() );
+    Logger::error( e.what() );
   }
 
 }
@@ -623,7 +622,7 @@ void getCharacterList( shared_ptr< HttpServer::Response > response, shared_ptr< 
   catch( exception& e )
   {
     *response << buildHttpResponse( 500 );
-    g_log.error( e.what() );
+    Logger::error( e.what() );
   }
 }
 
@@ -658,7 +657,7 @@ void get_init( shared_ptr< HttpServer::Response > response, shared_ptr< HttpServ
   catch( exception& e )
   {
     *response << buildHttpResponse( 500 );
-    g_log.error( e.what() );
+    Logger::error( e.what() );
   }
 }
 
@@ -692,7 +691,7 @@ void get_headline_all( shared_ptr< HttpServer::Response > response, shared_ptr< 
   catch( exception& e )
   {
     *response << buildHttpResponse( 500 );
-    g_log.error( e.what() );
+    Logger::error( e.what() );
   }
 }
 
@@ -735,16 +734,13 @@ void defaultGet( shared_ptr< HttpServer::Response > response, shared_ptr< HttpSe
 
 int main( int argc, char* argv[] )
 {
-  auto pLog = std::shared_ptr< Sapphire::Logger >( new Sapphire::Logger() );
-  g_fw.set< Sapphire::Logger >( pLog );
-  g_log.setLogPath( "log/SapphireAPI" );
-  g_log.init();
+  Logger::init( "log/SapphireAPI" );
 
-  g_log.info( "===========================================================" );
-  g_log.info( "Sapphire API Server " );
-  g_log.info( "Version: 0.0.1" );
-  g_log.info( "Compiled: " __DATE__ " " __TIME__ );
-  g_log.info( "===========================================================" );
+  Logger::info( "===========================================================" );
+  Logger::info( "Sapphire API Server " );
+  Logger::info( "Version: 0.0.1" );
+  Logger::info( "Compiled: " __DATE__ " " __TIME__ );
+  Logger::info( "===========================================================" );
 
   if( !loadSettings( argc, argv ) )
     throw std::exception();
@@ -771,8 +767,8 @@ int main( int argc, char* argv[] )
                           server.start();
                         } );
 
-  g_log.info( "API server running on " + m_pConfig->getValue< std::string >( "RestNetwork", "ListenIp", "0.0.0.0" ) + ":" +
-              m_pConfig->getValue< std::string >( "RestNetwork", "ListenPort", "80" ) );
+  Logger::info( "API server running on " + m_pConfig->getValue< std::string >( "RestNetwork", "ListenIp", "0.0.0.0" ) + ":" +
+                m_pConfig->getValue< std::string >( "RestNetwork", "ListenPort", "80" ) );
 
   //Wait for server to start so that the client can connect
   this_thread::sleep_for( chrono::seconds( 1 ) );

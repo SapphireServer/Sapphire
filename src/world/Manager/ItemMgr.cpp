@@ -1,7 +1,7 @@
-#include "ItemUtil.h"
+#include "ItemMgr.h"
 
-#include "ItemContainer.h"
-#include "Item.h"
+#include "Inventory/ItemContainer.h"
+#include "Inventory/Item.h"
 #include "Framework.h"
 #include <Network/CommonActorControl.h>
 
@@ -9,10 +9,13 @@
 #include <Logging/Logger.h>
 #include <Database/DatabaseDef.h>
 
+Sapphire::World::Manager::ItemMgr::ItemMgr( Sapphire::FrameworkPtr pFw ) :
+  BaseManager( pFw )
+{
 
-extern Sapphire::Framework g_fw;
+}
 
-bool Sapphire::Items::Util::isArmory( uint16_t containerId )
+bool Sapphire::World::Manager::ItemMgr::isArmory( uint16_t containerId )
 {
   return
     containerId == Common::ArmoryBody ||
@@ -29,7 +32,8 @@ bool Sapphire::Items::Util::isArmory( uint16_t containerId )
     containerId == Common::ArmorySoulCrystal;
 }
 
-uint16_t Sapphire::Items::Util::getCharaEquipSlotCategoryToArmoryId( uint8_t slotId )
+
+uint16_t Sapphire::World::Manager::ItemMgr::getCharaEquipSlotCategoryToArmoryId( uint8_t slotId )
 {
 
   switch( slotId )
@@ -87,13 +91,12 @@ uint16_t Sapphire::Items::Util::getCharaEquipSlotCategoryToArmoryId( uint8_t slo
 }
 
 
-bool Sapphire::Items::Util::isEquipment( uint16_t containerId )
+bool Sapphire::World::Manager::ItemMgr::isEquipment( uint16_t containerId )
 {
   return containerId == Common::GearSet0;
 }
 
-
-bool Sapphire::Items::Util::isOneHandedWeapon( Common::ItemUICategory weaponCategory )
+bool Sapphire::World::Manager::ItemMgr::isOneHandedWeapon( Common::ItemUICategory weaponCategory )
 {
   switch( weaponCategory )
   {
@@ -117,10 +120,10 @@ bool Sapphire::Items::Util::isOneHandedWeapon( Common::ItemUICategory weaponCate
   }
 }
 
-Sapphire::ItemPtr Sapphire::Items::Util::loadItem( uint64_t uId )
+Sapphire::ItemPtr Sapphire::World::Manager::ItemMgr::loadItem( uint64_t uId )
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pExdData = framework()->get< Data::ExdDataGenerated >();
+  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   // load actual item
   auto itemRes = pDb->query(
     "SELECT catalogId, stack, flags FROM charaglobalitem WHERE itemId = " + std::to_string( uId ) + ";" );
@@ -132,7 +135,10 @@ Sapphire::ItemPtr Sapphire::Items::Util::loadItem( uint64_t uId )
     auto itemInfo = pExdData->get< Sapphire::Data::Item >( itemRes->getUInt( 1 ) );
     bool isHq = itemRes->getUInt( 3 ) == 1;
 
-    ItemPtr pItem = make_Item( uId, itemRes->getUInt( 1 ), isHq );
+    ItemPtr pItem = make_Item( uId,
+                               itemRes->getUInt( 1 ),
+                               framework(),
+                               isHq );
 
     pItem->setStackSize( itemRes->getUInt( 2 ) );
 
@@ -144,7 +150,8 @@ Sapphire::ItemPtr Sapphire::Items::Util::loadItem( uint64_t uId )
   }
 }
 
-Sapphire::Common::ContainerType Sapphire::Items::Util::getContainerType( uint32_t containerId )
+
+Sapphire::Common::ContainerType Sapphire::World::Manager::ItemMgr::getContainerType( uint32_t containerId )
 {
   if( containerId < 5 )
   {
@@ -168,11 +175,10 @@ Sapphire::Common::ContainerType Sapphire::Items::Util::getContainerType( uint32_
   }
 }
 
-
-uint32_t Sapphire::Items::Util::getNextUId()
+uint32_t Sapphire::World::Manager::ItemMgr::getNextUId()
 {
   uint32_t charId = 0;
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto pQR = pDb->query( "SELECT MAX(ItemId) FROM charaglobalitem" );
 
   if( !pQR->next() )
