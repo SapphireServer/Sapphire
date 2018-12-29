@@ -11,7 +11,7 @@
 
 #include "Inventory/Item.h"
 #include "Inventory/ItemContainer.h"
-#include "Inventory/ItemUtil.h"
+
 
 #include "Player.h"
 #include "Framework.h"
@@ -28,11 +28,10 @@
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 
 #include "Manager/InventoryMgr.h"
+#include "Manager/ItemMgr.h"
 
 #include "Framework.h"
 #include <Network/CommonActorControl.h>
-
-extern Sapphire::Framework g_fw;
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -44,7 +43,7 @@ void Sapphire::Entity::Player::initInventory()
 {
   auto setupContainer = [ this ]( InventoryType type, uint8_t maxSize, const std::string& tableName,
                                   bool isMultiStorage, bool isPersistentStorage = true )
-  { m_storageMap[ type ] = make_ItemContainer( type, maxSize, tableName, isMultiStorage, isPersistentStorage ); };
+  { m_storageMap[ type ] = make_ItemContainer( type, maxSize, tableName, isMultiStorage, m_pFw, isPersistentStorage ); };
 
   // main bags
   setupContainer( Bag0, 34, "charaiteminventory", true );
@@ -115,7 +114,7 @@ void Sapphire::Entity::Player::sendItemLevel()
 
 void Sapphire::Entity::Player::equipWeapon( ItemPtr pItem, bool updateClass )
 {
-  auto exdData = g_fw.get< Sapphire::Data::ExdDataGenerated >();
+  auto exdData = m_pFw->get< Sapphire::Data::ExdDataGenerated >();
   if( !exdData )
     return;
 
@@ -136,7 +135,7 @@ void Sapphire::Entity::Player::equipWeapon( ItemPtr pItem, bool updateClass )
 
 void Sapphire::Entity::Player::equipSoulCrystal( ItemPtr pItem, bool updateJob )
 {
-  auto exdData = g_fw.get< Sapphire::Data::ExdDataGenerated >();
+  auto exdData = m_pFw->get< Sapphire::Data::ExdDataGenerated >();
   if ( !exdData )
     return;
 
@@ -247,7 +246,7 @@ void Sapphire::Entity::Player::unequipItem( Common::GearSetSlot equipSlotId, Ite
 
 void Sapphire::Entity::Player::unequipSoulCrystal( ItemPtr pItem )
 {
-  auto exdData = g_fw.get< Sapphire::Data::ExdDataGenerated >();
+  auto exdData = m_pFw->get< Sapphire::Data::ExdDataGenerated >();
   if ( !exdData )
     return;
 
@@ -357,7 +356,7 @@ void Sapphire::Entity::Player::removeCrystal( Common::CrystalType type, uint32_t
 
 void Sapphire::Entity::Player::sendInventory()
 {
-  auto pInvMgr = g_fw.get< World::Manager::InventoryMgr >();
+  auto pInvMgr = m_pFw->get< World::Manager::InventoryMgr >();
 
   for( auto it = m_storageMap.begin(); it != m_storageMap.end(); ++it )
   {
@@ -425,8 +424,7 @@ uint32_t Sapphire::Entity::Player::getCrystal( CrystalType type )
 
 void Sapphire::Entity::Player::writeInventory( InventoryType type )
 {
-  auto pLog = g_fw.get< Logger >();
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
 
   auto storage = m_storageMap[ type ];
 
@@ -450,13 +448,12 @@ void Sapphire::Entity::Player::writeInventory( InventoryType type )
   if( storage->isMultiStorage() )
     query += " AND storageId = " + std::to_string( static_cast< uint16_t >( type ) );
 
-  pLog->debug( query );
   pDb->execute( query );
 }
 
 void Sapphire::Entity::Player::writeItem( Sapphire::ItemPtr pItem ) const
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto stmt = pDb->getPreparedStatement( Db::CHARA_ITEMGLOBAL_UP );
 
   // todo: add more fields
@@ -471,7 +468,7 @@ void Sapphire::Entity::Player::writeItem( Sapphire::ItemPtr pItem ) const
 
 void Sapphire::Entity::Player::deleteItemDb( Sapphire::ItemPtr item ) const
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto stmt = pDb->getPreparedStatement( Db::CHARA_ITEMGLOBAL_DELETE );
 
   stmt->setInt64( 1, item->getUId() );
@@ -489,8 +486,8 @@ bool Sapphire::Entity::Player::isObtainable( uint32_t catalogId, uint8_t quantit
 
 Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_t quantity, bool isHq, bool silent )
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   auto itemInfo = pExdData->get< Sapphire::Data::Item >( catalogId );
 
   // if item data doesn't exist or it's a blank field
@@ -512,7 +509,7 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_
   // add the related armoury bag to the applicable bags and try and fill a free slot there before falling back to regular inventory
   if( itemInfo->isEquippable && getEquipDisplayFlags() & StoreNewItemsInArmouryChest )
   {
-    auto bag = Items::Util::getCharaEquipSlotCategoryToArmoryId( itemInfo->equipSlotCategory );
+    auto bag = World::Manager::ItemMgr::getCharaEquipSlotCategoryToArmoryId( itemInfo->equipSlotCategory );
 
     bags.insert( bags.begin(), bag );
   }
@@ -624,7 +621,7 @@ Sapphire::Entity::Player::moveItem( uint16_t fromInventoryId, uint8_t fromSlotId
 
 bool Sapphire::Entity::Player::updateContainer( uint16_t storageId, uint8_t slotId, ItemPtr pItem )
 {
-  auto containerType = Items::Util::getContainerType( storageId );
+  auto containerType = World::Manager::ItemMgr::getContainerType( storageId );
 
   m_storageMap[ storageId ]->setItem( slotId, pItem );
 
@@ -735,17 +732,17 @@ void Sapphire::Entity::Player::swapItem( uint16_t fromInventoryId, uint8_t fromS
 
   // An item is being moved from bag0-3 to equippment, meaning
   // the swapped out item will be placed in the matching armory.
-  if( Items::Util::isEquipment( toInventoryId )
-      && !Items::Util::isEquipment( fromInventoryId )
-      && !Items::Util::isArmory( fromInventoryId ) )
+  if( World::Manager::ItemMgr::isEquipment( toInventoryId )
+      && !World::Manager::ItemMgr::isEquipment( fromInventoryId )
+      && !World::Manager::ItemMgr::isArmory( fromInventoryId ) )
   {
     updateContainer( fromInventoryId, fromSlotId, nullptr );
-    fromInventoryId = Items::Util::getCharaEquipSlotCategoryToArmoryId( toSlot );
+    fromInventoryId = World::Manager::ItemMgr::getCharaEquipSlotCategoryToArmoryId( toSlot );
     fromSlotId = static_cast < uint8_t >( m_storageMap[ fromInventoryId ]->getFreeSlot() );
   }
 
-  auto containerTypeFrom = Items::Util::getContainerType( fromInventoryId );
-  auto containerTypeTo = Items::Util::getContainerType( toInventoryId );
+  auto containerTypeFrom = World::Manager::ItemMgr::getContainerType( fromInventoryId );
+  auto containerTypeTo = World::Manager::ItemMgr::getContainerType( toInventoryId );
 
   updateContainer( toInventoryId, toSlot, fromItem );
   updateContainer( fromInventoryId, fromSlotId, toItem );
@@ -807,7 +804,7 @@ uint16_t Sapphire::Entity::Player::calculateEquippedGearItemLevel()
       iLvlResult += currItem->getItemLevel();
 
       // If item is weapon and isn't one-handed
-      if( currItem->isWeapon() && !Items::Util::isOneHandedWeapon( currItem->getCategory() ) )
+      if( currItem->isWeapon() && !World::Manager::ItemMgr::isOneHandedWeapon( currItem->getCategory() ) )
       {
         iLvlResult += currItem->getItemLevel();
       }

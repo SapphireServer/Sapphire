@@ -22,16 +22,16 @@ using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
 
-extern Sapphire::Framework g_fw;
-
 Sapphire::Action::ActionCast::ActionCast()
 {
   m_handleActionType = Common::HandleActionType::Event;
 }
 
-Sapphire::Action::ActionCast::ActionCast( Entity::CharaPtr pActor, Entity::CharaPtr pTarget, uint16_t actionId )
+Sapphire::Action::ActionCast::ActionCast( Entity::CharaPtr pActor, Entity::CharaPtr pTarget,
+                                          uint16_t actionId, FrameworkPtr pFw )
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  m_pFw = pFw;
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   m_startTime = 0;
   m_id = actionId;
   m_handleActionType = HandleActionType::Spell;
@@ -70,7 +70,7 @@ void Sapphire::Action::ActionCast::onFinish()
   if( !m_pSource )
     return;
 
-  auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
+  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
 
   auto pPlayer = m_pSource->getAsPlayer();
   pPlayer->sendDebug( "onFinish()" );

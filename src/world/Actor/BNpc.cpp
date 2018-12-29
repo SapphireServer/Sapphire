@@ -28,21 +28,21 @@
 #include "BNpc.h"
 #include "BNpcTemplate.h"
 #include "Manager/TerritoryMgr.h"
-#include "Framework.h"
 #include "Common.h"
-
-extern Sapphire::Framework g_fw;
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
 
-Sapphire::Entity::BNpc::BNpc() : Npc( ObjKind::BattleNpc )
+Sapphire::Entity::BNpc::BNpc( FrameworkPtr pFw ) :
+  Npc( ObjKind::BattleNpc, pFw )
 {
 }
 
-Sapphire::Entity::BNpc::BNpc( BNpcTemplatePtr pTemplate, float posX, float posY, float posZ, uint8_t level ) : Npc( ObjKind::BattleNpc )
+Sapphire::Entity::BNpc::BNpc( BNpcTemplatePtr pTemplate, float posX, float posY, float posZ,
+                              uint8_t level, FrameworkPtr pFw ) :
+  Npc( ObjKind::BattleNpc, pFw )
 {
   m_modelChara = pTemplate->getModelChara();
   m_displayFlags = pTemplate->getDisplayFlags();

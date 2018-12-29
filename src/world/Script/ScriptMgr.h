@@ -7,11 +7,12 @@
 
 #include <Common.h>
 #include "Forwards.h"
+#include "Manager/BaseManager.h"
 
 namespace Sapphire::Scripting
 {
 
-  class ScriptMgr
+  class ScriptMgr : public World::Manager::BaseManager
   {
   private:
     /*!
@@ -28,7 +29,7 @@ namespace Sapphire::Scripting
     bool m_firstScriptChangeNotificiation;
 
   public:
-    ScriptMgr();
+    ScriptMgr( FrameworkPtr pFw );
 
     ~ScriptMgr();
 

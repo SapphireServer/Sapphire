@@ -43,8 +43,6 @@
 #include "ServerMgr.h"
 #include "Framework.h"
 
-extern Sapphire::Framework g_fw;
-
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
@@ -56,8 +54,8 @@ using InvSlotPair = std::pair< uint16_t, int8_t >;
 using InvSlotPairVec = std::vector< InvSlotPair >;
 
 // player constructor
-Sapphire::Entity::Player::Player() :
-  Chara( ObjKind::Player ),
+Sapphire::Entity::Player::Player( FrameworkPtr pFw ) :
+  Chara( ObjKind::Player, pFw ),
   m_lastWrite( 0 ),
   m_lastPing( 0 ),
   m_bIsLogin( false ),
@@ -109,7 +107,7 @@ Sapphire::Entity::Player::~Player()
 
 void Sapphire::Entity::Player::injectPacket( const std::string& path )
 {
-  auto pServerZone = g_fw.get< ServerMgr >();
+  auto pServerZone = m_pFw->get< World::ServerMgr >();
   auto session = pServerZone->getSession( getId() );
   if( session )
     session->getZoneConnection()->injectPacket( path, *this );
@@ -195,7 +193,7 @@ bool Sapphire::Entity::Player::isMarkedForRemoval() const
 
 Sapphire::Common::OnlineStatus Sapphire::Entity::Player::getOnlineStatus() const
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   if( !pExdData )
     return OnlineStatus::Online;
 
@@ -250,7 +248,7 @@ void Sapphire::Entity::Player::calculateStats()
   uint8_t level = getLevel();
   uint8_t job = static_cast< uint8_t >( getClass() );
 
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
 
   auto classInfo = pExdData->get< Sapphire::Data::ClassJob >( job );
   auto tribeInfo = pExdData->get< Sapphire::Data::Tribe >( tribe );
@@ -280,9 +278,9 @@ void Sapphire::Entity::Player::calculateStats()
   m_baseStats.healingPotMagic = paramGrowthInfo->baseSpeed;
   m_baseStats.tenacity = paramGrowthInfo->baseSpeed;
 
-  m_baseStats.max_mp = Math::CalcStats::calculateMaxMp( getAsPlayer() );
+  m_baseStats.max_mp = Math::CalcStats::calculateMaxMp( getAsPlayer(), m_pFw );
 
-  m_baseStats.max_hp = Math::CalcStats::calculateMaxHp( getAsPlayer() );
+  m_baseStats.max_hp = Math::CalcStats::calculateMaxHp( getAsPlayer(), m_pFw );
 
   if( m_mp > m_baseStats.max_mp )
     m_mp = m_baseStats.max_mp;
@@ -339,8 +337,8 @@ void Sapphire::Entity::Player::sendStats()
 
 void Sapphire::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-  auto pTeriMgr = g_fw.get< TerritoryMgr >();
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
+  auto pTeriMgr = m_pFw->get< TerritoryMgr >();
 
   auto data = pExdData->get< Sapphire::Data::Aetheryte >( aetheryteId );
 
@@ -407,7 +405,7 @@ void Sapphire::Entity::Player::returnToHomepoint()
 
 void Sapphire::Entity::Player::setZone( uint32_t zoneId )
 {
-  auto pTeriMgr = g_fw.get< TerritoryMgr >();
+  auto pTeriMgr = m_pFw->get< TerritoryMgr >();
   m_onEnterEventDone = false;
   if( !pTeriMgr->movePlayer( zoneId, getAsPlayer() ) )
   {
@@ -425,7 +423,7 @@ void Sapphire::Entity::Player::setZone( uint32_t zoneId )
 
 bool Sapphire::Entity::Player::setInstance( uint32_t instanceContentId )
 {
-  auto pTeriMgr = g_fw.get< TerritoryMgr >();
+  auto pTeriMgr = m_pFw->get< TerritoryMgr >();
   m_onEnterEventDone = false;
   auto instance = pTeriMgr->getInstanceZonePtr( instanceContentId );
   if( !instance )
@@ -440,7 +438,7 @@ bool Sapphire::Entity::Player::setInstance( ZonePtr instance )
   if( !instance )
     return false;
 
-  auto pTeriMgr = g_fw.get< TerritoryMgr >();
+  auto pTeriMgr = m_pFw->get< TerritoryMgr >();
 
   auto currentZone = getCurrentZone();
 
@@ -463,7 +461,7 @@ bool Sapphire::Entity::Player::setInstance( ZonePtr instance )
 
 bool Sapphire::Entity::Player::exitInstance()
 {
-  auto pTeriMgr = g_fw.get< TerritoryMgr >();
+  auto pTeriMgr = m_pFw->get< TerritoryMgr >();
 
   // check if housing zone
   if( pTeriMgr->isHousingTerritory( m_prevTerritoryTypeId ) )
@@ -548,7 +546,7 @@ void Sapphire::Entity::Player::discover( int16_t map_id, int16_t sub_id )
 
   // section to starts at 320 - 4 bytes long
 
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
 
   int32_t offset = 4;
 
@@ -640,7 +638,7 @@ bool Sapphire::Entity::Player::isActionLearned( uint8_t actionId ) const
 
 void Sapphire::Entity::Player::gainExp( uint32_t amount )
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
 
   uint32_t currentExp = getExp();
 
@@ -721,14 +719,14 @@ void Sapphire::Entity::Player::sendStatusUpdate( bool toSelf )
 
 uint8_t Sapphire::Entity::Player::getLevel() const
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   uint8_t classJobIndex = pExdData->get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
   return static_cast< uint8_t >( m_classArray[ classJobIndex ] );
 }
 
 uint8_t Sapphire::Entity::Player::getLevelForClass( Common::ClassJob pClass ) const
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   uint8_t classJobIndex = pExdData->get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( pClass ) )->expArrayIndex;
   return static_cast< uint8_t >( m_classArray[ classJobIndex ] );
 }
@@ -741,14 +739,14 @@ bool Sapphire::Entity::Player::isClassJobUnlocked( Common::ClassJob classJob ) c
 
 uint32_t Sapphire::Entity::Player::getExp() const
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   uint8_t classJobIndex = pExdData->get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
   return m_expArray[ classJobIndex ];
 }
 
 void Sapphire::Entity::Player::setExp( uint32_t amount )
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   uint8_t classJobIndex = pExdData->get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
   m_expArray[ classJobIndex ] = amount;
 }
@@ -790,14 +788,14 @@ void Sapphire::Entity::Player::setClassJob( Common::ClassJob classJob )
 
 void Sapphire::Entity::Player::setLevel( uint8_t level )
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   uint8_t classJobIndex = pExdData->get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
   m_classArray[ classJobIndex ] = level;
 }
 
 void Sapphire::Entity::Player::setLevelForClass( uint8_t level, Common::ClassJob classjob )
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   uint8_t classJobIndex = pExdData->get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( classjob ) )->expArrayIndex;
 
   if( m_classArray[ classJobIndex ] == 0 )
@@ -866,10 +864,9 @@ void Sapphire::Entity::Player::setLookAt( uint8_t index, uint8_t value )
 // spawn this player for pTarget
 void Sapphire::Entity::Player::spawn( Entity::PlayerPtr pTarget )
 {
-  auto pLog = g_fw.get< Logger >();
-  pLog->debug( "[" + std::to_string( pTarget->getId() ) + "] Spawning " +
-               getName() + " for " +
-               pTarget->getName() );
+  Logger::debug( "[" + std::to_string( pTarget->getId() ) + "] Spawning " +
+                 getName() + " for " +
+                 pTarget->getName() );
 
   pTarget->queuePacket( std::make_shared< PlayerSpawnPacket >( *getAsPlayer(), *pTarget ) );
 }
@@ -878,8 +875,7 @@ void Sapphire::Entity::Player::spawn( Entity::PlayerPtr pTarget )
 void Sapphire::Entity::Player::despawn( Entity::PlayerPtr pTarget )
 {
   auto pPlayer = pTarget;
-  auto pLog = g_fw.get< Logger >();
-  pLog->debug( "despawning " + getName() + " for " + pTarget->getName() );
+  Logger::debug( "despawning " + getName() + " for " + pTarget->getName() );
 
   pPlayer->freePlayerSpawnId( getId() );
 
@@ -944,7 +940,7 @@ const uint8_t* Sapphire::Entity::Player::getStateFlags() const
 
 bool Sapphire::Entity::Player::actionHasCastTime( uint32_t actionId ) //TODO: Add logic for special cases
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   auto actionInfoPtr = pExdData->get< Sapphire::Data::Action >( actionId );
   if( actionInfoPtr->preservesCombo )
     return false;
@@ -1105,7 +1101,7 @@ void Sapphire::Entity::Player::update( int64_t currTime )
 
 void Sapphire::Entity::Player::onMobKill( uint16_t nameId )
 {
-  auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
+  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
   pScriptMgr->onMobKill( *getAsPlayer(), nameId );
 }
 
@@ -1206,7 +1202,7 @@ const uint8_t* Sapphire::Entity::Player::getGcRankArray() const
 
 void Sapphire::Entity::Player::queuePacket( Network::Packets::FFXIVPacketBasePtr pPacket )
 {
-  auto pServerZone = g_fw.get< ServerMgr >();
+  auto pServerZone = m_pFw->get< World::ServerMgr >();
   auto pSession = pServerZone->getSession( m_id );
 
   if( !pSession )
@@ -1221,7 +1217,7 @@ void Sapphire::Entity::Player::queuePacket( Network::Packets::FFXIVPacketBasePtr
 
 void Sapphire::Entity::Player::queueChatPacket( Network::Packets::FFXIVPacketBasePtr pPacket )
 {
-  auto pServerZone = g_fw.get< ServerMgr >();
+  auto pServerZone = m_pFw->get< World::ServerMgr >();
   auto pSession = pServerZone->getSession( m_id );
 
   if( !pSession )
@@ -1557,7 +1553,7 @@ void Sapphire::Entity::Player::sendZonePackets()
   if( isLogin() )
   {
     //Update player map in servermgr - in case player name has been changed
-    auto pServerMgr = g_fw.get< Sapphire::ServerMgr >();
+    auto pServerMgr = m_pFw->get< World::ServerMgr >();
     pServerMgr->updatePlayerName( getId(), getName() );
   }
 
@@ -1605,7 +1601,7 @@ void Sapphire::Entity::Player::sendZonePackets()
     sendItemLevel();
   }
 
-  auto pHousingMgr = g_fw.get< HousingMgr >();
+  auto pHousingMgr = m_pFw->get< HousingMgr >();
   if( Sapphire::LandPtr pLand = pHousingMgr->getLandByOwnerId( getId() ) )
   {
     uint32_t state = 0;
@@ -1733,9 +1729,9 @@ void Sapphire::Entity::Player::emoteInterrupt()
   sendToInRangeSet( makeActorControl142( getId(), ActorControlType::EmoteInterrupt ) );
 }
 
-void Sapphire::Entity::Player::teleportQuery( uint16_t aetheryteId )
+void Sapphire::Entity::Player::teleportQuery( uint16_t aetheryteId, FrameworkPtr pFw )
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = pFw->get< Data::ExdDataGenerated >();
   // TODO: only register this action if enough gil is in possession
   auto targetAetheryte = pExdData->get< Sapphire::Data::Aetheryte >( aetheryteId );
 
@@ -1759,7 +1755,7 @@ void Sapphire::Entity::Player::teleportQuery( uint16_t aetheryteId )
     if( !insufficientGil )
     {
       Action::ActionPtr pActionTeleport;
-      pActionTeleport = Action::make_ActionTeleport( getAsPlayer(), aetheryteId, cost );
+      pActionTeleport = Action::make_ActionTeleport( getAsPlayer(), aetheryteId, cost, pFw );
       setCurrentAction( pActionTeleport );
     }
   }
