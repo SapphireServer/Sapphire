@@ -193,6 +193,7 @@ void Sapphire::World::Manager::HousingMgr::initLandCache()
     entry.m_estateName = res->getString( "HouseName" );
     entry.m_buildTime = res->getUInt64( "BuildTime" );
     entry.m_endorsements = res->getUInt64( "Endorsements" );
+    entry.m_hasAetheryte = res->getBoolean( "Aetheryte" );
 
     m_landCache[ entry.m_landSetId ].push_back( entry );
 

@@ -46,6 +46,8 @@ namespace Sapphire::World::Manager
       std::string m_estateComment;
       std::string m_estateName;
 
+      bool m_hasAetheryte;
+
       uint64_t m_buildTime;
       uint64_t m_endorsements;
 
