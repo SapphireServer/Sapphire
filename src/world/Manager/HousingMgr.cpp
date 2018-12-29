@@ -604,7 +604,7 @@ bool Sapphire::World::Manager::HousingMgr::initHouseModels( Entity::Player& play
   // create and link items
   for( auto& destContainer : invMap )
   {
-    auto container = houseInventory[ destContainer.first ];
+    auto& container = houseInventory[ destContainer.first ];
 
     for( auto& item : destContainer.second )
     {
@@ -904,7 +904,7 @@ void Sapphire::World::Manager::HousingMgr::updateHouseModels( Sapphire::HousePtr
   }
   else
   {
-    framework()->get< Logger >()->error( "Plot " + std::to_string( house->getLandIdent().landId ) + " has an invalid inventory configuration for outdoor appearance." );
+    Logger::error( "Plot " + std::to_string( house->getLandIdent().landId ) + " has an invalid inventory configuration for outdoor appearance." );
   }
 
   auto intContainer = containers.find( static_cast< uint16_t >( InventoryType::HousingInteriorAppearance ) );
@@ -918,7 +918,7 @@ void Sapphire::World::Manager::HousingMgr::updateHouseModels( Sapphire::HousePtr
   }
   else
   {
-    framework()->get< Logger >()->error( "Plot " + std::to_string( house->getLandIdent().landId ) + " has an invalid inventory configuration for indoor appearance." );
+    Logger::error( "Plot " + std::to_string( house->getLandIdent().landId ) + " has an invalid inventory configuration for indoor appearance." );
   }
 }
 

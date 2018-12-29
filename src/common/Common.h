@@ -785,10 +785,10 @@ namespace Sapphire::Common
     ExteriorWall,
     ExteriorWindow,
     ExteriorDoor,
-    OtherFloorWall,
-    OtherFloorFlooring,
-    BasementWall,
-    YardSign
+    ExteriorRoofDecoration,
+    ExteriorWallDecoration,
+    ExteriorPlacard,
+    ExteriorFence
   };
 
   enum HousingInteriorSlot

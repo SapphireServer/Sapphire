@@ -188,7 +188,7 @@ void Sapphire::Network::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet
     if( i == 3 )
     {
       charListPacket->data().entitledExpansion = 2;
-      charListPacket->data().maxCharOnWorld = 8;
+      charListPacket->data().maxCharOnWorld = 25;
       charListPacket->data().unknown8 = 8;
       charListPacket->data().veteranRank = 12;
       charListPacket->data().counter = ( i * 4 ) + 1;
