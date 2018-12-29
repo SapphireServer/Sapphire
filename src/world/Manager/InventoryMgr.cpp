@@ -134,7 +134,7 @@ void Sapphire::World::Manager::InventoryMgr::saveHousingContainerItem( uint64_t 
   // the second time is for the ON DUPLICATE KEY UPDATE condition
   stmt->setUInt64( 5, itemId );
 
-  pDb->execute( stmt );
+  pDb->directExecute( stmt );
 }
 
 void Sapphire::World::Manager::InventoryMgr::updateHousingItemPosition( Sapphire::Inventory::HousingItemPtr item )
