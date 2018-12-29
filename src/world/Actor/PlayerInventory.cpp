@@ -876,7 +876,7 @@ Sapphire::ItemPtr Sapphire::Entity::Player::dropInventoryItem( Sapphire::Common:
     return nullptr;
 
   // unlink item
-  container->removeItem( slotId );
+  container->removeItem( slotId, false );
   updateContainer( type, slotId, nullptr );
 
   auto seq = getNextInventorySequence();

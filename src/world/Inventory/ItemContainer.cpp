@@ -36,14 +36,14 @@ uint16_t Sapphire::ItemContainer::getEntryCount() const
   return static_cast< uint16_t >( m_itemMap.size() );
 }
 
-void Sapphire::ItemContainer::removeItem( uint16_t slotId )
+void Sapphire::ItemContainer::removeItem( uint16_t slotId, bool removeFromDb )
 {
   auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   ItemMap::iterator it = m_itemMap.find( slotId );
 
   if( it != m_itemMap.end() )
   {
-    if( m_isPersistentStorage )
+    if( m_isPersistentStorage && removeFromDb )
       pDb->execute( "DELETE FROM charaglobalitem WHERE itemId = " + std::to_string( it->second->getUId() ) );
 
     m_itemMap.erase( it );

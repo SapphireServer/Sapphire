@@ -23,7 +23,7 @@ namespace Sapphire
 
     uint16_t getEntryCount() const;
 
-    void removeItem( uint16_t slotId );
+    void removeItem( uint16_t slotId, bool removeFromDb = true );
 
     ItemMap& getItemMap();
 
