@@ -114,14 +114,14 @@ bool Sapphire::HousingZone::init()
     arr.fill( obj );
   }
 
-  auto housingMgr = g_fw.get< World::Manager::HousingMgr >();
+  auto housingMgr = m_pFw->get< World::Manager::HousingMgr >();
   auto landCache = housingMgr->getLandCacheMap();
 
   // make sure the landset exists
   auto landSetCache = landCache.find( m_landSetId );
   if( landSetCache == landCache.end() )
   {
-    g_fw.get< Sapphire::Logger >()->fatal( "LandSet " + std::to_string( m_landSetId ) + " is missing from the land cache." );
+    Logger::fatal( "LandSet " + std::to_string( m_landSetId ) + " is missing from the land cache." );
     return false;
   }
 
@@ -134,7 +134,7 @@ bool Sapphire::HousingZone::init()
     if( entry.m_houseId )
     {
       auto house = make_House( entry.m_houseId, m_landSetId, land->getLandIdent(), entry.m_estateName,
-                               entry.m_estateComment );
+                               entry.m_estateComment, m_pFw );
 
       housingMgr->updateHouseModels( house );
       land->setHouse( house );
@@ -328,7 +328,7 @@ Sapphire::Entity::EventObjectPtr Sapphire::HousingZone::registerEstateEntranceEO
 
 void Sapphire::HousingZone::updateYardObjects( Sapphire::Common::LandIdent ident )
 {
-  auto housingMgr = g_fw.get< World::Manager::HousingMgr >();
+  auto housingMgr = m_pFw->get< World::Manager::HousingMgr >();
   auto& landStorage = housingMgr->getEstateInventory( ident );
 
   auto yardContainer = landStorage[ InventoryType::HousingExteriorPlacedItems ];

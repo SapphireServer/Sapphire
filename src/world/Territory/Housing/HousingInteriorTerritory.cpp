@@ -112,7 +112,7 @@ const Common::LandIdent Sapphire::World::Territory::Housing::HousingInteriorTerr
 
 void Sapphire::World::Territory::Housing::HousingInteriorTerritory::updateHousingObjects()
 {
-  auto housingMgr = g_fw.get< Manager::HousingMgr >();
+  auto housingMgr = m_pFw->get< Manager::HousingMgr >();
 
   auto containerIds = {
     InventoryType::HousingInteriorPlacedItems1,
@@ -163,7 +163,7 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::spawnHousing
                                                                                         uint16_t containerType,
                                                                                         Inventory::HousingItemPtr item )
 {
-  auto housingMgr = g_fw.get< Manager::HousingMgr >();
+  auto housingMgr = m_pFw->get< Manager::HousingMgr >();
 
   auto offset = ( containerIdx * 50 ) + slot;
   auto obj = housingMgr->getYardObjectForItem( item );

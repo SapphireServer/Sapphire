@@ -150,7 +150,7 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
   framework()->set< Manager::TerritoryMgr >( pTeriMgr );
   if( !pHousingMgr->init() )
   {
-    pLog->fatal( "Failed to setup housing!" );
+    Logger::fatal( "Failed to setup housing!" );
     return;
   }
 
@@ -171,7 +171,7 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
   auto pDebugCom = std::make_shared< DebugCommandMgr >( framework() );
   auto pPlayerMgr = std::make_shared< Manager::PlayerMgr >( framework() );
   auto pShopMgr = std::make_shared< Manager::ShopMgr >( framework() );
-  auto pInventoryMgr = std::make_shared< Manager::InventoryMgr >();
+  auto pInventoryMgr = std::make_shared< Manager::InventoryMgr >( framework() );
   auto pEventMgr = std::make_shared< Manager::EventMgr >( framework() );
   auto pItemMgr = std::make_shared< Manager::ItemMgr >( framework() );
 

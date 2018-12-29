@@ -137,8 +137,6 @@ Sapphire::ItemPtr Sapphire::World::Manager::ItemMgr::loadItem( uint64_t uId )
 
     ItemPtr pItem = make_Item( uId,
                                itemRes->getUInt( 1 ),
-                               itemInfo->modelMain,
-                               itemInfo->modelSub,
                                framework(),
                                isHq );
 
