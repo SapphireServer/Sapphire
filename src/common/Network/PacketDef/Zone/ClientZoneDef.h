@@ -41,7 +41,8 @@ struct FFXIVIpcClientTrigger :
   /* 0004 */ uint32_t param11;
   /* 0008 */ uint32_t param12;
   /* 000C */ uint32_t param2;
-  /* 0010 */ char unk_10[8];
+  /* 0010 */ uint32_t param4; // todo: really?
+  /* 0014 */ uint32_t param5;
   /* 0018 */ uint64_t param3;
 };
 
@@ -238,6 +239,35 @@ struct FFXIVIpcMarketBoardRequestItemListings :
 {
   /* 0000 */ uint32_t itemCatalogId;
   /* 0004 */ uint32_t padding;
+};
+
+struct FFXIVIpcReqPlaceHousingItem :
+  FFXIVIpcBasePacket< ReqPlaceHousingItem >
+{
+  /* 0000 */ uint16_t landId; // 0 when plot 0 or inside an estate
+  /* 0002 */ uint16_t unknown1;
+  /* 0004 */ uint32_t unknown2;
+  /* 0008 */ uint16_t sourceInvContainerId;
+  /* 000A */ uint16_t sourceInvSlotId;
+
+  /* 000C */ Common::FFXIVARR_POSITION3 position;
+  /* 0018 */ float rotation;
+
+  /* 001C */ uint32_t unknown3; // always 1?
+  /* 0020 */ uint32_t unknown4[2]; // always 0 it looks like
+};
+
+struct FFXIVIpcHousingUpdateObjectPosition :
+  FFXIVIpcBasePacket< HousingUpdateObjectPosition >
+{
+  /* 0000 */ Common::LandIdent ident;
+  /* 0008 */ uint16_t slot;
+  /* 000A */ uint16_t unk;
+
+  /* 000C */ Common::FFXIVARR_POSITION3 pos;
+  /* 0018 */ float rotation;
+
+  /* 001C */ uint32_t padding;
 };
 
 }

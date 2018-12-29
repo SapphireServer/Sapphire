@@ -754,7 +754,7 @@ void Sapphire::Entity::Player::swapItem( uint16_t fromInventoryId, uint8_t fromS
 void Sapphire::Entity::Player::discardItem( uint16_t fromInventoryId, uint8_t fromSlotId )
 {
   // i am not entirely sure how this should be generated or if it even is important for us...
-  uint32_t transactionId = 1;
+  uint32_t transactionId = getNextInventorySequence();
 
   auto fromItem = m_storageMap[ fromInventoryId ]->getItem( fromSlotId );
 
@@ -868,4 +868,71 @@ bool Sapphire::Entity::Player::collectHandInItems( std::vector< uint32_t > itemI
 uint32_t Sapphire::Entity::Player::getNextInventorySequence()
 {
   return m_inventorySequence++;
+}
+
+Sapphire::ItemPtr Sapphire::Entity::Player::dropInventoryItem( Sapphire::Common::InventoryType type, uint16_t slotId )
+{
+  auto& container = m_storageMap[ type ];
+
+  auto item = container->getItem( slotId );
+  if( !item )
+    return nullptr;
+
+  // unlink item
+  container->removeItem( slotId );
+  updateContainer( type, slotId, nullptr );
+
+  auto seq = getNextInventorySequence();
+
+  // send inv update
+  auto invTransPacket = makeZonePacket< FFXIVIpcInventoryTransaction >( getId() );
+  invTransPacket->data().transactionId = seq;
+  invTransPacket->data().ownerId = getId();
+  invTransPacket->data().storageId = type;
+  invTransPacket->data().catalogId = item->getId();
+  invTransPacket->data().stackSize = item->getStackSize();
+  invTransPacket->data().slotId = slotId;
+  invTransPacket->data().type = 7;
+  queuePacket( invTransPacket );
+
+  auto invTransFinPacket = makeZonePacket< FFXIVIpcInventoryTransactionFinish >( getId() );
+  invTransFinPacket->data().transactionId = seq;
+  invTransFinPacket->data().transactionId1 = seq;
+  queuePacket( invTransFinPacket );
+
+  return item;
+}
+
+bool Sapphire::Entity::Player::getFreeInventoryContainerSlot( Inventory::InventoryContainerPair& containerPair ) const
+{
+  for( auto bagId : { Bag0, Bag1, Bag2, Bag3 } )
+  {
+    auto needle = m_storageMap.find( bagId );
+    if( needle == m_storageMap.end() )
+      continue;
+
+    auto& container = needle->second;
+
+    for( uint16_t idx = 0; idx < container->getMaxSize(); idx++ )
+    {
+      auto item = container->getItem( idx );
+      if( !item )
+      {
+        containerPair = std::make_pair( bagId, idx );
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+void Sapphire::Entity::Player::insertInventoryItem( Sapphire::Common::InventoryType type, uint16_t slot,
+                                                    const Sapphire::ItemPtr item )
+{
+  updateContainer( type, slot, item );
+
+  auto slotUpdate = std::make_shared< UpdateInventorySlotPacket >( getId(), slot, type, *item );
+  queuePacket( slotUpdate );
+
 }

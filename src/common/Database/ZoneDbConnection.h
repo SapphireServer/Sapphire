@@ -91,6 +91,8 @@ namespace Sapphire::Db
     LAND_INV_SEL_HOUSE,
     LAND_INV_DEL,
     LAND_INV_UP,
+    LAND_INV_UP_ITEMPOS,
+    LAND_INV_DEL_ITEMPOS,
 
 
     MAX_STATEMENTS

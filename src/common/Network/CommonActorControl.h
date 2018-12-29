@@ -213,7 +213,33 @@ enum ActorControlType : uint16_t
     // Housing
     ShowHousingItemUI = 0x3F7,
     ShowBuildPresetUI = 0x3E9,
+    /*!
+     * param1 = plot id
+     */
+    ShowEstateExternalAppearanceUI = 0x3EA,
+    ShowEstateInternalAppearanceUI = 0x3EB,
     BuildPresetResponse = 0x3ED,
+
+    /*!
+     * param1 = u16 landid
+     *          u16 slotid
+     */
+    RemoveExteriorHousingItem = 0x3EF,
+
+    /*!
+     * param1 = object array index
+     */
+    RemoveInteriorHousingItem = 0x3F1,
+
+    /*!
+     * param1 = identity shit
+     *          u16 1 - container id
+     *          u16 2 - plot id
+     * param2 = item shit
+     *          u16 1 - slot
+     */
+    HousingItemMoveConfirm = 0x3F9,
+    OpenEstateSettingsUI = 0x3FF,
 
     /*!
      * param1 = outdoor furnishings
@@ -306,6 +332,8 @@ enum ActorControlType : uint16_t
 
     SetEstateLightingLevel = 0x40B, // param1 = light level 0 - 5 maps to UI val 5-0
     RequestHousingBuildPreset = 0x44C,
+    RequestEstateExteriorRemodel = 0x044D, // param11 = land id
+    RequestEstateInteriorRemodel = 0x44E,
     RequestEstateHallRemoval = 0x44F,
     RequestBuildPreset = 0x450, // no idea what this is, it gets sent with BuildPresetHandler and has the plot id in param1
     RequestLandSignFree = 0x451,
@@ -313,6 +341,7 @@ enum ActorControlType : uint16_t
     RequestWardLandInfo = 0x453,
     RequestLandRelinquish = 0x454,
     RequestLandInventory = 0x0458,
+    RequestHousingItemRemove = 0x0459,
     RequestEstateRename = 0x45A,
     RequestEstateEditGreeting = 0x45B,
     RequestEstateGreeting = 0x45C, // sends FFXIVIpcHousingEstateGreeting in return
@@ -322,6 +351,7 @@ enum ActorControlType : uint16_t
     RequestHousingItemUI = 0x463,
     RequestSharedEstateSettings = 0x46F,
     UpdateEstateLightingLevel = 0x471,
+    HousingItemSelectedInUI = 0x47E,
 
     CompanionAction = 0x6A4,
     CompanionSetBarding = 0x6A5,
