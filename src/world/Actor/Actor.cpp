@@ -27,10 +27,6 @@
 
 #include "Math/CalcBattle.h"
 
-#include "Framework.h"
-
-extern Sapphire::Framework g_fw;
-
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 //using namespace Sapphire::Network::Packets::Server;
@@ -297,16 +293,10 @@ Send a packet to all players in range, potentially to self if set and is player
 */
 void Sapphire::Entity::Actor::sendToInRangeSet( Network::Packets::FFXIVPacketBasePtr pPacket, bool bToSelf )
 {
-  auto pServerZone = g_fw.get< ServerMgr >();
   if( bToSelf && isPlayer() )
   {
     auto pPlayer = getAsPlayer();
-
-    auto pSession = pServerZone->getSession( pPlayer->getId() );
-
-    // it might be that the player DC'd in which case the session would be invalid
-    if( pSession )
-      pSession->getZoneConnection()->queueOutPacket( pPacket );
+    pPlayer->queuePacket( pPacket );
   }
 
   if( m_inRangePlayers.empty() )

@@ -18,7 +18,7 @@
 #include <Util/Util.h>
 
 #include "Event/EventHandler.h"
-#include "Event/EventHelper.h"
+#include "Manager/EventMgr.h"
 
 #include "Territory/InstanceContent.h"
 
@@ -26,17 +26,17 @@
 
 #include "Framework.h"
 
-extern Sapphire::Framework g_fw;
-
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 
-void Sapphire::Network::GameConnection::eventHandlerTalk( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::eventHandlerTalk( FrameworkPtr pFw,
+                                                          const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                           Entity::Player& player )
 {
-  auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pScriptMgr = pFw->get< Scripting::ScriptMgr >();
+  auto pExdData = pFw->get< Data::ExdDataGenerated >();
+  auto pEventMgr = pFw->get< World::Manager::EventMgr >();
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcEventHandlerTalk >( inPacket );
 
@@ -46,11 +46,11 @@ void Sapphire::Network::GameConnection::eventHandlerTalk( const Packets::FFXIVAR
   auto eventType = static_cast< uint16_t >( eventId >> 16 );
 
   std::string eventName = "onTalk";
-  std::string objName = Event::getEventName( eventId );
+  std::string objName = pEventMgr->getEventName( eventId );
 
   player.sendDebug( "Chara: " +
                     std::to_string( actorId ) + " -> " +
-                    std::to_string( Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) ) ) +
+                    std::to_string( pEventMgr->mapEventActorToRealActor( static_cast< uint32_t >( actorId ) ) ) +
                     " \neventId: " +
                     std::to_string( eventId ) +
                     " (0x" + Util::intToHexString( static_cast< uint64_t >( eventId & 0xFFFFFFF ), 8 ) + ")" );
@@ -75,12 +75,13 @@ void Sapphire::Network::GameConnection::eventHandlerTalk( const Packets::FFXIVAR
 
 }
 
-void Sapphire::Network::GameConnection::eventHandlerEmote( const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                       Entity::Player& player )
+void Sapphire::Network::GameConnection::eventHandlerEmote( FrameworkPtr pFw,
+                                                           const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                           Entity::Player& player )
 {
-
-  auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pScriptMgr = pFw->get< Scripting::ScriptMgr >();
+  auto pExdData = pFw->get< Data::ExdDataGenerated >();
+  auto pEventMgr = pFw->get< World::Manager::EventMgr >();
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcEventHandlerEmote >( inPacket );
 
@@ -90,11 +91,11 @@ void Sapphire::Network::GameConnection::eventHandlerEmote( const Packets::FFXIVA
   const auto eventType = static_cast< uint16_t >( eventId >> 16 );
 
   std::string eventName = "onEmote";
-  std::string objName = Event::getEventName( eventId );
+  std::string objName = pEventMgr->getEventName( eventId );
 
   player.sendDebug( "Chara: " +
                     std::to_string( actorId ) + " -> " +
-                    std::to_string( Event::mapEventActorToRealActor( static_cast< uint32_t >( actorId ) ) ) +
+                    std::to_string( pEventMgr->mapEventActorToRealActor( static_cast< uint32_t >( actorId ) ) ) +
                     " \neventId: " +
                     std::to_string( eventId ) +
                     " (0x" + Util::intToHexString( static_cast< uint64_t >( eventId & 0xFFFFFFF ), 8 ) + ")" );
@@ -114,10 +115,12 @@ void Sapphire::Network::GameConnection::eventHandlerEmote( const Packets::FFXIVA
   player.checkEvent( eventId );
 }
 
-void Sapphire::Network::GameConnection::eventHandlerWithinRange( const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                             Entity::Player& player )
+void Sapphire::Network::GameConnection::eventHandlerWithinRange( FrameworkPtr pFw,
+                                                                 const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                                 Entity::Player& player )
 {
-  auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
+  auto pScriptMgr = pFw->get< Scripting::ScriptMgr >();
+  auto pEventMgr = pFw->get< World::Manager::EventMgr >();
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcEventHandlerWithinRange >( inPacket );
 
@@ -126,7 +129,7 @@ void Sapphire::Network::GameConnection::eventHandlerWithinRange( const Packets::
   const auto& pos = packet.data().position;
 
   std::string eventName = "onWithinRange";
-  std::string objName = Event::getEventName( eventId );
+  std::string objName = pEventMgr->getEventName( eventId );
   player.sendDebug( "Calling: " + objName + "." + eventName + " - " + std::to_string( eventId ) +
                     " p1: " + std::to_string( param1 ) );
 
@@ -137,10 +140,12 @@ void Sapphire::Network::GameConnection::eventHandlerWithinRange( const Packets::
   player.checkEvent( eventId );
 }
 
-void Sapphire::Network::GameConnection::eventHandlerOutsideRange( const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                              Entity::Player& player )
+void Sapphire::Network::GameConnection::eventHandlerOutsideRange( FrameworkPtr pFw,
+                                                                  const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                                  Entity::Player& player )
 {
-  auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
+  auto pScriptMgr = pFw->get< Scripting::ScriptMgr >();
+  auto pEventMgr = pFw->get< World::Manager::EventMgr >();
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcEventHandlerOutsideRange >( inPacket );
   const auto eventId = packet.data().eventId;
@@ -148,7 +153,7 @@ void Sapphire::Network::GameConnection::eventHandlerOutsideRange( const Packets:
   const auto& pos = packet.data().position;
 
   std::string eventName = "onOutsideRange";
-  std::string objName = Event::getEventName( eventId );
+  std::string objName = pEventMgr->getEventName( eventId );
   player.sendDebug( "Calling: " + objName + "." + eventName + " - " + std::to_string( eventId ) +
                     " p1: " + std::to_string( param1 ) );
 
@@ -159,10 +164,12 @@ void Sapphire::Network::GameConnection::eventHandlerOutsideRange( const Packets:
   player.checkEvent( eventId );
 }
 
-void Sapphire::Network::GameConnection::eventHandlerEnterTerritory( const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                                Entity::Player& player )
+void Sapphire::Network::GameConnection::eventHandlerEnterTerritory( FrameworkPtr pFw,
+                                                                    const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                                    Entity::Player& player )
 {
-  auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
+  auto pScriptMgr = pFw->get< Scripting::ScriptMgr >();
+  auto pEventMgr = pFw->get< World::Manager::EventMgr >();
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcEnterTerritoryHandler >( inPacket );
 
@@ -172,7 +179,7 @@ void Sapphire::Network::GameConnection::eventHandlerEnterTerritory( const Packet
 
   std::string eventName = "onEnterTerritory";
 
-  std::string objName = Event::getEventName( eventId );
+  std::string objName = pEventMgr->getEventName( eventId );
 
   player.sendDebug( "Calling: " + objName + "." + eventName + " - " + std::to_string( eventId ) );
 
@@ -190,9 +197,12 @@ void Sapphire::Network::GameConnection::eventHandlerEnterTerritory( const Packet
   player.checkEvent( eventId );
 }
 
-void Sapphire::Network::GameConnection::eventHandlerReturn( const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                        Entity::Player& player )
+void Sapphire::Network::GameConnection::eventHandlerReturn( FrameworkPtr pFw,
+                                                            const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                            Entity::Player& player )
 {
+  auto pEventMgr = pFw->get< World::Manager::EventMgr >();
+
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcEventHandlerReturn >( inPacket );
   const auto eventId = packet.data().eventId;
   const auto scene = packet.data().scene;
@@ -201,7 +211,7 @@ void Sapphire::Network::GameConnection::eventHandlerReturn( const Packets::FFXIV
   const auto param3 = packet.data().param3;
   const auto param4 = packet.data().param4;
 
-  std::string eventName = Event::getEventName( eventId );
+  std::string eventName = pEventMgr->getEventName( eventId );
 
   player.sendDebug( "eventId: " +
                     std::to_string( eventId ) +
@@ -239,8 +249,9 @@ void Sapphire::Network::GameConnection::eventHandlerReturn( const Packets::FFXIV
 
 }
 
-void Sapphire::Network::GameConnection::eventHandlerLinkshell( const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                           Entity::Player& player )
+void Sapphire::Network::GameConnection::eventHandlerLinkshell( FrameworkPtr pFw,
+                                                               const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                               Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcLinkshellEventHandler >( inPacket );
 
@@ -253,21 +264,23 @@ void Sapphire::Network::GameConnection::eventHandlerLinkshell( const Packets::FF
 
 }
 
-void Sapphire::Network::GameConnection::eventHandlerShop( const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                         Entity::Player& player )
+void Sapphire::Network::GameConnection::eventHandlerShop( FrameworkPtr pFw,
+                                                          const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                          Entity::Player& player )
 {
+  auto pEventMgr = pFw->get< World::Manager::EventMgr >();
+
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcShopEventHandler >( inPacket );
 
-  auto pLog = g_fw.get< Logger >();
-  auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pScriptMgr = pFw->get< Scripting::ScriptMgr >();
+  auto pExdData = pFw->get< Data::ExdDataGenerated >();
 
   const auto eventId = packet.data().eventId;
 
   auto eventType = static_cast< uint16_t >( eventId >> 16 );
 
   std::string eventName = "onOpen";
-  std::string objName = Event::getEventName( eventId );
+  std::string objName = pEventMgr->getEventName( eventId );
 
   player.sendDebug( "EventId: " +
                     std::to_string( eventId ) +

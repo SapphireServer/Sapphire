@@ -31,7 +31,8 @@ namespace Sapphire
                  uint16_t territoryTypeId,
                  uint32_t guId,
                  const std::string& internalName,
-                 const std::string& contentName );
+                 const std::string& contentName,
+                 FrameworkPtr pFw );
 
     virtual ~HousingZone();
 
@@ -86,6 +87,7 @@ namespace Sapphire
 
     YardObjectSubdivisionArray m_yardObjects;
     YardObjectArrayBoundsArray m_yardObjectArrayBounds;
+    FrameworkPtr m_pFw;
   };
 
 }

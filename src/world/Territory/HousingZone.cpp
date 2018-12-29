@@ -22,22 +22,22 @@
 #include "Manager/HousingMgr.h"
 #include "Framework.h"
 
-extern Sapphire::Framework g_fw;
-
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::World::Manager;
 
 Sapphire::HousingZone::HousingZone( uint8_t wardNum,
-                                uint16_t territoryTypeId,
-                                uint32_t guId,
-                                const std::string& internalName,
-                                const std::string& contentName ) :
-  Zone( territoryTypeId, guId, internalName, contentName ),
+                                    uint16_t territoryTypeId,
+                                    uint32_t guId,
+                                    const std::string& internalName,
+                                    const std::string& contentName,
+                                    FrameworkPtr pFw ) :
+  Zone( territoryTypeId, guId, internalName, contentName, pFw ),
   m_wardNum( wardNum ),
   m_territoryTypeId( territoryTypeId ),
-  m_landSetId( ( static_cast< uint32_t >( territoryTypeId ) << 16 ) | wardNum )
+  m_landSetId( ( static_cast< uint32_t >( territoryTypeId ) << 16 ) | wardNum ),
+  m_pFw( pFw )
 {
 
 }
@@ -45,7 +45,7 @@ Sapphire::HousingZone::HousingZone( uint8_t wardNum,
 bool Sapphire::HousingZone::init()
 {
 
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   {
     auto res = pDb->query( "SELECT * FROM landset WHERE landsetid = " + std::to_string( m_landSetId ) );
     if( !res->next() )
@@ -55,7 +55,7 @@ bool Sapphire::HousingZone::init()
   }
 
 
-  uint32_t housingIndex = 0;
+  int housingIndex;
   if( m_territoryTypeId == 339 )
     housingIndex = 0;
   else if( m_territoryTypeId == 340 )
@@ -65,7 +65,7 @@ bool Sapphire::HousingZone::init()
   else if( m_territoryTypeId == 641 )
     housingIndex = 3;
 
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   auto info = pExdData->get< Sapphire::Data::HousingLandSet >( housingIndex );
 
   // build yard objects array indices
@@ -114,27 +114,27 @@ bool Sapphire::HousingZone::init()
     arr.fill( obj );
   }
 
-  auto housingMgr = g_fw.get< World::Manager::HousingMgr >();
+  auto housingMgr = m_pFw->get< World::Manager::HousingMgr >();
   auto landCache = housingMgr->getLandCacheMap();
 
   // make sure the landset exists
   auto landSetCache = landCache.find( m_landSetId );
   if( landSetCache == landCache.end() )
   {
-    g_fw.get< Sapphire::Logger >()->fatal( "LandSet " + std::to_string( m_landSetId ) + " is missing from the land cache." );
+    Logger::fatal( "LandSet " + std::to_string( m_landSetId ) + " is missing from the land cache." );
     return false;
   }
 
   // init the lands
   for( HousingMgr::LandCacheEntry& entry : landSetCache->second )
   {
-    auto land = make_Land( m_territoryTypeId, getWardNum(), entry.m_landId, m_landSetId, info );
+    auto land = make_Land( m_territoryTypeId, getWardNum(), entry.m_landId, m_landSetId, info, m_pFw );
 
     // setup house
     if( entry.m_houseId )
     {
       auto house = make_House( entry.m_houseId, m_landSetId, land->getLandIdent(), entry.m_estateName,
-                               entry.m_estateComment );
+                               entry.m_estateComment, m_pFw );
 
       housingMgr->updateHouseModels( house );
       land->setHouse( house );
@@ -157,8 +157,7 @@ Sapphire::HousingZone::~HousingZone() = default;
 
 void Sapphire::HousingZone::onPlayerZoneIn( Entity::Player& player )
 {
-  auto pLog = g_fw.get< Logger >();
-  pLog->debug(
+  Logger::debug(
     "HousingZone::onPlayerZoneIn: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryTypeId() ) +
     ", Entity#" + std::to_string( player.getId() ) );
 
@@ -329,7 +328,7 @@ Sapphire::Entity::EventObjectPtr Sapphire::HousingZone::registerEstateEntranceEO
 
 void Sapphire::HousingZone::updateYardObjects( Sapphire::Common::LandIdent ident )
 {
-  auto housingMgr = g_fw.get< World::Manager::HousingMgr >();
+  auto housingMgr = m_pFw->get< World::Manager::HousingMgr >();
   auto& landStorage = housingMgr->getEstateInventory( ident );
 
   auto yardContainer = landStorage[ InventoryType::HousingExteriorPlacedItems ];

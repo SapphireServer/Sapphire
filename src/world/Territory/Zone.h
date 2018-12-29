@@ -7,7 +7,7 @@
 #include "Cell.h"
 #include "CellHandler.h"
 
-#include "Forwards.h"
+#include "ForwardsZone.h"
 
 #include <set>
 #include <map>
@@ -19,11 +19,9 @@
 namespace Sapphire
 {
 
-  class Session;
-
   class ZonePosition;
 
-  using SessionSet = std::set< SessionPtr >;
+  using SessionSet = std::set< World::SessionPtr >;
   using FestivalPair = std::pair< uint16_t, uint16_t >;
 
   namespace Data
@@ -59,11 +57,13 @@ namespace Sapphire
     std::map< uint8_t, int32_t > m_weatherRateMap;
 
     uint32_t m_nextEObjId;
+    FrameworkPtr m_pFw;
 
   public:
     Zone();
 
-    Zone( uint16_t territoryTypeId, uint32_t guId, const std::string& internalName, const std::string& placeName );
+    Zone( uint16_t territoryTypeId, uint32_t guId, const std::string& internalName,
+          const std::string& placeName, FrameworkPtr pFw );
 
     virtual ~Zone();
 

@@ -5,15 +5,14 @@
 #include "Framework.h"
 #include "LinkshellMgr.h"
 
-extern Sapphire::Framework g_fw;
-
-Sapphire::World::Manager::LinkshellMgr::LinkshellMgr()
+Sapphire::World::Manager::LinkshellMgr::LinkshellMgr( FrameworkPtr pFw ) :
+  BaseManager( pFw )
 {
 }
 
 bool Sapphire::World::Manager::LinkshellMgr::loadLinkshells()
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto res = pDb->query( "SELECT LinkshellId, MasterCharacterId, CharacterIdList, "
                          "LinkshellName, LeaderIdList, InviteIdList "
                          "FROM infolinkshell "

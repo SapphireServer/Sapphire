@@ -2,6 +2,7 @@
 #define SAPPHIRE_HOUSINGMGR_H
 
 #include "Forwards.h"
+#include "BaseManager.h"
 #include "Territory/HousingZone.h"
 #include <set>
 #include <unordered_map>
@@ -14,7 +15,7 @@ namespace Sapphire::Data
 
 namespace Sapphire::World::Manager
 {
-  class HousingMgr
+  class HousingMgr : public BaseManager
   {
 
   public:
@@ -45,6 +46,8 @@ namespace Sapphire::World::Manager
       std::string m_estateComment;
       std::string m_estateName;
 
+      bool m_hasAetheryte;
+
       uint64_t m_buildTime;
       uint64_t m_endorsements;
 
@@ -66,7 +69,7 @@ namespace Sapphire::World::Manager
      */
     using LandIdentToInventoryContainerMap = std::unordered_map< uint64_t, ContainerIdToContainerMap >;
 
-    HousingMgr();
+    HousingMgr( FrameworkPtr pFw );
     virtual ~HousingMgr();
 
     bool init();

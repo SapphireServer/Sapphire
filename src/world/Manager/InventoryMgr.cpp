@@ -4,7 +4,7 @@
 #include "Actor/Player.h"
 #include "Inventory/ItemContainer.h"
 #include "Inventory/HousingItem.h"
-#include "Inventory/ItemUtil.h"
+#include "Manager/ItemMgr.h"
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Network/GamePacketNew.h>
 
@@ -13,9 +13,11 @@
 
 #include "Framework.h"
 
-extern Sapphire::Framework g_fw;
-
 using namespace Sapphire::Network::Packets;
+
+Sapphire::World::Manager::InventoryMgr::InventoryMgr( Sapphire::FrameworkPtr pFw ) :
+  BaseManager( pFw )
+{ }
 
 void Sapphire::World::Manager::InventoryMgr::sendInventoryContainer( Sapphire::Entity::Player& player,
                                                                      Sapphire::ItemContainerPtr container )
@@ -69,14 +71,15 @@ void Sapphire::World::Manager::InventoryMgr::sendInventoryContainer( Sapphire::E
 Sapphire::ItemPtr Sapphire::World::Manager::InventoryMgr::createItem( Entity::Player& player,
                                                                       uint32_t catalogId, uint32_t quantity )
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pExdData = framework()->get< Data::ExdDataGenerated >();
+  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto itemMgr = framework()->get< Manager::ItemMgr >();
   auto itemInfo = pExdData->get< Sapphire::Data::Item >( catalogId );
 
   if( !itemInfo )
     return nullptr;
 
-  auto item = make_Item( Items::Util::getNextUId(), catalogId );
+  auto item = make_Item( itemMgr->getNextUId(), catalogId, framework() );
 
   item->setStackSize( std::max< uint32_t >( 1, quantity ) );
 
@@ -100,7 +103,7 @@ void Sapphire::World::Manager::InventoryMgr::removeItemFromHousingContainer( Sap
                                                                              uint16_t containerId,
                                                                              uint16_t slotId )
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
 
   auto stmt = pDb->getPreparedStatement( Db::LAND_INV_DEL );
 
@@ -117,7 +120,7 @@ void Sapphire::World::Manager::InventoryMgr::saveHousingContainerItem( uint64_t 
                                                                        uint16_t containerId, uint16_t slotId,
                                                                        uint64_t itemId )
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
 
   auto stmt = pDb->getPreparedStatement( Db::LAND_INV_UP );
   // LandIdent, ContainerId, SlotId, ItemId, ItemId
@@ -131,12 +134,12 @@ void Sapphire::World::Manager::InventoryMgr::saveHousingContainerItem( uint64_t 
   // the second time is for the ON DUPLICATE KEY UPDATE condition
   stmt->setUInt64( 5, itemId );
 
-  pDb->execute( stmt );
+  pDb->directExecute( stmt );
 }
 
 void Sapphire::World::Manager::InventoryMgr::updateHousingItemPosition( Sapphire::Inventory::HousingItemPtr item )
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
 
   auto stmt = pDb->getPreparedStatement( Db::LAND_INV_UP_ITEMPOS );
   // ItemId, PosX, PosY, PosZ, Rotation, PosX, PosY, PosZ, Rotation
@@ -161,7 +164,7 @@ void Sapphire::World::Manager::InventoryMgr::updateHousingItemPosition( Sapphire
 
 void Sapphire::World::Manager::InventoryMgr::removeHousingItemPosition( Sapphire::Inventory::HousingItem& item )
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
 
   auto stmt = pDb->getPreparedStatement( Db::LAND_INV_DEL_ITEMPOS );
 
@@ -172,7 +175,7 @@ void Sapphire::World::Manager::InventoryMgr::removeHousingItemPosition( Sapphire
 
 void Sapphire::World::Manager::InventoryMgr::saveItem( Sapphire::Entity::Player& player, Sapphire::ItemPtr item )
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto stmt = pDb->getPreparedStatement( Db::CHARA_ITEMGLOBAL_INS );
 
   stmt->setUInt( 1, player.getId() );

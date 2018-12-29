@@ -109,9 +109,10 @@ namespace Sapphire::Entity
     std::queue< uint8_t > m_statusEffectFreeSlotQueue;
     std::vector< std::pair< uint8_t, uint32_t > > m_statusEffectList;
     std::map< uint8_t, StatusEffect::StatusEffectPtr > m_statusEffectMap;
+    FrameworkPtr m_pFw;
 
   public:
-    Chara( Common::ObjKind type );
+    Chara( Common::ObjKind type, FrameworkPtr pFw );
 
     virtual ~Chara() override;
 

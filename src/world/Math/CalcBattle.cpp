@@ -10,8 +10,6 @@
 #include "CalcBattle.h"
 #include "Framework.h"
 
-extern Sapphire::Framework g_fw;
-
 using namespace Sapphire::Math;
 using namespace Sapphire::Entity;
 
@@ -31,9 +29,9 @@ using namespace Sapphire::Entity;
 
 */
 
-uint32_t CalcBattle::calculateHealValue( PlayerPtr pPlayer, uint32_t potency )
+uint32_t CalcBattle::calculateHealValue( PlayerPtr pPlayer, uint32_t potency, Sapphire::FrameworkPtr pFw )
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = pFw->get< Data::ExdDataGenerated >();
   auto classInfo = pExdData->get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
   auto paramGrowthInfo = pExdData->get< Sapphire::Data::ParamGrow >( pPlayer->getLevel() );
 
