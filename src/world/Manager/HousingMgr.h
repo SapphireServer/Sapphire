@@ -91,7 +91,7 @@ namespace Sapphire::World::Manager
 
     bool relinquishLand( Entity::Player& player, uint8_t plot );
 
-    void buildPresetEstate( Entity::Player& player, uint8_t plotNum, uint32_t presetItem );
+    void buildPresetEstate( Entity::Player& player, uint8_t plotNum, uint32_t presetCatalogId );
 
     void requestEstateRename( Entity::Player& player, const Common::LandIdent ident );
 

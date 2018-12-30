@@ -96,12 +96,12 @@ Sapphire::House::HousePart Sapphire::House::getExteriorModel( Sapphire::Common::
   return m_exteriorModelCache[ slot ];
 }
 
-void Sapphire::House::setInteriorModel( Sapphire::Common::HousingInteriorSlot slot, uint32_t modelId )
+void Sapphire::House::setInteriorModel( Sapphire::Common::HouseInteriorSlot slot, uint32_t modelId )
 {
   m_interiorModelCache[ slot ] = modelId;
 }
 
-uint32_t Sapphire::House::getInteriorModel( Sapphire::Common::HousingInteriorSlot slot )
+uint32_t Sapphire::House::getInteriorModel( Sapphire::Common::HouseInteriorSlot slot )
 {
   return m_interiorModelCache[ slot ];
 }

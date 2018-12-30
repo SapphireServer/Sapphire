@@ -564,6 +564,18 @@ bool Sapphire::World::Manager::HousingMgr::initHouseModels( Entity::Player& play
   if( !preset )
     return false;
 
+  // remove preset item
+  Inventory::InventoryContainerPair foundItem;
+  if( !player.findFirstItemWithId( presetCatalogId, foundItem ) )
+    return false;
+
+  auto item = player.dropInventoryItem( foundItem.first, foundItem.second );
+  if( !item )
+    return false;
+
+  // move preset item into ext appearance container
+  houseInventory[ InventoryType::HousingExteriorAppearance ]->setItem( HouseExteriorSlot::HousePermit, item );
+
   // high iq shit
   auto invMap = std::map< uint16_t, std::map< uint32_t, int32_t > >
   {
@@ -583,19 +595,19 @@ bool Sapphire::World::Manager::HousingMgr::initHouseModels( Entity::Player& play
       InventoryType::HousingInteriorAppearance,
       {
         // lobby/middle floor
-        { HousingInteriorSlot::InteriorWall, preset->interiorWall },
-        { HousingInteriorSlot::InteriorFloor, preset->interiorFlooring },
-        { HousingInteriorSlot::InteriorLight, preset->interiorLighting },
+        { HouseInteriorSlot::InteriorWall, preset->interiorWall },
+        { HouseInteriorSlot::InteriorFloor, preset->interiorFlooring },
+        { HouseInteriorSlot::InteriorLight, preset->interiorLighting },
 
         // attic
-        { HousingInteriorSlot::InteriorWall_Attic, preset->otherFloorWall },
-        { HousingInteriorSlot::InteriorFloor_Attic, preset->otherFloorFlooring },
-        { HousingInteriorSlot::InteriorLight_Attic, preset->otherFloorLighting },
+        { HouseInteriorSlot::InteriorWall_Attic, preset->otherFloorWall },
+        { HouseInteriorSlot::InteriorFloor_Attic, preset->otherFloorFlooring },
+        { HouseInteriorSlot::InteriorLight_Attic, preset->otherFloorLighting },
 
         // basement
-        { HousingInteriorSlot::InteriorWall_Basement, preset->basementWall },
-        { HousingInteriorSlot::InteriorFloor_Basement, preset->basementFlooring },
-        { HousingInteriorSlot::InteriorLight_Basement, preset->basementLighting },
+        { HouseInteriorSlot::InteriorWall_Basement, preset->basementWall },
+        { HouseInteriorSlot::InteriorFloor_Basement, preset->basementFlooring },
+        { HouseInteriorSlot::InteriorLight_Basement, preset->basementLighting },
       }
     }
   };
@@ -641,7 +653,7 @@ void Sapphire::World::Manager::HousingMgr::createHouse( Sapphire::HousePtr house
   pDb->execute( stmt );
 }
 
-void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& player, uint8_t plotNum, uint32_t presetItem )
+void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& player, uint8_t plotNum, uint32_t presetCatalogId )
 {
   auto hZone = std::dynamic_pointer_cast< HousingZone >( player.getCurrentZone() );
 
@@ -656,8 +668,6 @@ void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& pl
   if( pLand->getOwnerId() != player.getId() )
     return;
 
-  // todo: check if permit is in inventory and remove one
-
   // create house
   auto ident = pLand->getLandIdent();
   auto house = make_House( getNextHouseId(), pLand->getLandSetId(), ident,
@@ -666,8 +676,11 @@ void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& pl
   pLand->setHouse( house );
 
   // create inventory items
-  if( !initHouseModels( player, pLand, presetItem ) )
+  if( !initHouseModels( player, pLand, presetCatalogId ) )
+  {
+    pLand->setHouse( nullptr );
     return;
+  }
 
   createHouse( house );
 
@@ -913,7 +926,7 @@ void Sapphire::World::Manager::HousingMgr::updateHouseModels( Sapphire::HousePtr
   {
     for( auto& item : intContainer->second->getItemMap() )
     {
-      house->setInteriorModel( static_cast< Common::HousingInteriorSlot >( item.first ),
+      house->setInteriorModel( static_cast< Common::HouseInteriorSlot >( item.first ),
                                getItemAdditionalData( item.second->getId() ) );
     }
   }
