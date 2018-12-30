@@ -791,7 +791,7 @@ namespace Sapphire::Common
     ExteriorFence
   };
 
-  enum HousingInteriorSlot
+  enum HouseInteriorSlot
   {
     InteriorWall,
     InteriorFloor,

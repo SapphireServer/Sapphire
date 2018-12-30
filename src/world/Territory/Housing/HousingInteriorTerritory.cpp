@@ -71,7 +71,7 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::onPlayerZone
   for( auto i = 0; i < 10; i++ )
   {
     indoorInitPacket->data().indoorItems[ i ] = pHouse->getInteriorModel(
-      static_cast< Common::HousingInteriorSlot >( i ) );
+      static_cast< Common::HouseInteriorSlot >( i ) );
   }
 
   player.queuePacket( indoorInitPacket );

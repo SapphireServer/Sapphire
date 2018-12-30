@@ -58,6 +58,11 @@ namespace Sapphire
     spdlog::get( "logger" )->error( text );
   }
 
+  void Logger::warn( const std::string& text )
+  {
+    spdlog::get( "logger" )->warn( text );
+  }
+
   void Logger::info( const std::string& text )
   {
     spdlog::get( "logger" )->info( text );
@@ -71,6 +76,11 @@ namespace Sapphire
   void Logger::fatal( const std::string& text )
   {
     spdlog::get( "logger" )->critical( text );
+  }
+
+  void Logger::trace( const std::string& text )
+  {
+    spdlog::get( "logger" )->trace( text );
   }
 
 }

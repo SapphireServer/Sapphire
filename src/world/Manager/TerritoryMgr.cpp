@@ -287,7 +287,7 @@ Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createInstanceContent(
                                      pTeri->name, pInstanceContent->name, instanceContentId, framework() );
   pZone->init();
 
-  m_instanceContentToInstanceMap[ instanceContentId ][ pZone->getGuId() ] = pZone;
+  m_instanceContentIdToInstanceMap[ instanceContentId ][ pZone->getGuId() ] = pZone;
   m_instanceIdToZonePtrMap[ pZone->getGuId() ] = pZone;
   m_instanceZoneSet.insert( pZone );
 
@@ -381,7 +381,7 @@ bool Sapphire::World::Manager::TerritoryMgr::removeTerritoryInstance( uint32_t i
   if( isInstanceContentTerritory( pZone->getTerritoryTypeId() ) )
   {
     auto instance = std::dynamic_pointer_cast< InstanceContent >( pZone );
-    m_instanceContentToInstanceMap[ instance->getInstanceContentId() ].erase( pZone->getGuId() );
+    m_instanceContentIdToInstanceMap[ instance->getInstanceContentId() ].erase( pZone->getGuId() );
   }
   else
     m_territoryTypeIdToInstanceGuidMap[ pZone->getTerritoryTypeId() ].erase( pZone->getGuId() );
@@ -486,8 +486,8 @@ void Sapphire::World::Manager::TerritoryMgr::updateTerritoryInstances( uint32_t 
 Sapphire::World::Manager::TerritoryMgr::InstanceIdList Sapphire::World::Manager::TerritoryMgr::getInstanceContentIdList( uint16_t instanceContentId ) const
 {
   std::vector< uint32_t > idList;
-  auto zoneMap = m_instanceContentToInstanceMap.find( instanceContentId );
-  if( zoneMap == m_instanceContentToInstanceMap.end() )
+  auto zoneMap = m_instanceContentIdToInstanceMap.find( instanceContentId );
+  if( zoneMap == m_instanceContentIdToInstanceMap.end() )
     return idList;
 
   for( auto& entry : zoneMap->second )

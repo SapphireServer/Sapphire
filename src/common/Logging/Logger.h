@@ -20,11 +20,15 @@ namespace Sapphire
 
     static void error( const std::string& text );
 
+    static void warn( const std::string& text );
+
     static void info( const std::string& text );
 
     static void debug( const std::string& text );
 
     static void fatal( const std::string& text );
+
+    static void trace( const std::string& text );
 
   };
 
