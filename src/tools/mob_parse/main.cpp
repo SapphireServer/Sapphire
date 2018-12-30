@@ -250,7 +250,7 @@ int dumpSpawns()
 
   }
 
-  //std::ofstream out("output.txt");
+  std::ofstream out("output_1.txt");
 
   int spawngroups = 0;
   for( auto entry : zoneToPacketList )
@@ -285,6 +285,23 @@ int dumpSpawns()
       auto nameStruct = g_exdData.get< Sapphire::Data::BNpcName >( mobName.second.at(0).bNPCName );
       Logger::info( "|--> " + nameStruct->singular + "(" + std::to_string( mobName.second.size() ) + ")" );
 
+      Logger::info( "|-> " + std::to_string( entry.first ) );
+
+      std::string name1 = delChar( nameStruct->singular, ' ' );
+      name1 = delChar( name1, '\'' );
+
+      std::string templateName = name1 + "_" + std::to_string( mobName.second.at(0).bNPCBase );
+
+      std::string output = "INSERT IGNORE INTO `spawngroup` ( `territoryTypeId`, `bNpcTemplateId`, `level`, `maxHp` ) "
+                           " VALUES ( " + std::to_string( entry.first ) +
+                           ", ( SELECT id FROM bnpctemplate WHERE name = '" + templateName + "' ) , " +
+                           std::to_string( mobName.second.at(0).level ) + ", " +
+                           std::to_string( mobName.second.at(0).hPMax ) + " );";
+
+      output += "\nSET @last_id_spawngroup = LAST_INSERT_ID(); ";
+
+
+
       spawngroups++;
       for( FFXIVIpcNpcSpawn instance : mobName.second )
       {
@@ -297,7 +314,6 @@ int dumpSpawns()
         }
 
         modelStr += "]";
-
 
         std::string cusStr = "[";
 
@@ -315,7 +331,8 @@ int dumpSpawns()
         std::string name = delChar( nameStruct->singular, ' ' );
         name = delChar( name, '\'' );
 
-        Logger::info( "|----> " + name + "_" + std::to_string( instance.bNPCBase ) + " " +
+        Logger::info( "|----> " + name + "_" +
+                      std::to_string( instance.bNPCBase ) + " " +
                       std::to_string( instance.posX ) + ", " +
                       std::to_string( instance.posY ) + ", " +
                       std::to_string( instance.posZ ) + ", " +
@@ -325,6 +342,14 @@ int dumpSpawns()
                       std::to_string( instance.hPMax ) );
         //Logger::info( "|----> " + name + " - " + std::to_string( instance.bNPCBase ) + ", " + std::to_string( instance.gimmickId ) );
 
+        output += "INSERT INTO `spawnpoint` ( `spawngroupid`, `x`, `y`, `z`, `r` ) "
+                  " VALUES ( @last_id_spawngroup, " +
+                  std::to_string( instance.posX ) + ", " +
+                  std::to_string( instance.posY ) + ", " +
+                  std::to_string( instance.posZ ) + ", " +
+                  std::to_string( 0 ) + " ); ";
+
+        //Logger::info( output );
 
 
         /*std::string output = "INSERT IGNORE INTO `bnpctemplate` ( `Name`, `bNPCBaseId`, `bNPCNameId`, `mainWeaponModel`, `secWeaponModel`, `aggressionMode`, `enemyType`, `pose`, `modelChara`, `displayFlags`, `Look`, `Models`) "
@@ -343,10 +368,11 @@ int dumpSpawns()
 
         //Logger::info( output );
 
-        //out << output;
+
 
 
       }
+      out << output;
     }
     nameToPacketList.clear();
 
@@ -572,7 +598,8 @@ int dumpTemplates()
 int main()
 {
 
-  dumpTemplates();
+  //dumpTemplates();
+  dumpSpawns();
 
   return 0;
 }
