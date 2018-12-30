@@ -31,12 +31,10 @@ namespace Sapphire
     m_configPath( configPath ),
     m_numConnections( 0 )
   {
-    m_pConfig = std::shared_ptr< ConfigMgr >( new ConfigMgr );
+    m_pConfig = std::make_shared< ConfigMgr >();
   }
 
-  ServerLobby::~ServerLobby( void )
-  {
-  }
+  ServerLobby::~ServerLobby( void ) = default;
 
   LobbySessionPtr ServerLobby::getSession( char* sessionId )
   {
@@ -50,7 +48,7 @@ namespace Sapphire
 
   void ServerLobby::run( int32_t argc, char* argv[] )
   {
-    Logger::init( "log/SapphireLobby" );
+    Logger::init( "log/lobby" );
 
     Logger::info( "===========================================================" );
     Logger::info( "Sapphire Server Project " );
