@@ -25,7 +25,7 @@ namespace Sapphire
 
   void Logger::init( const std::string& logPath )
   {
-    auto pos = logPath.find_last_of( '/' );
+    auto pos = logPath.find_last_of( fs::path::preferred_separator );
 
     if( pos != std::string::npos )
     {
