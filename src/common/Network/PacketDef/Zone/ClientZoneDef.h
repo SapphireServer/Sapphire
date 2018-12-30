@@ -253,7 +253,7 @@ struct FFXIVIpcReqPlaceHousingItem :
   /* 000C */ Common::FFXIVARR_POSITION3 position;
   /* 0018 */ float rotation;
 
-  /* 001C */ uint32_t unknown3; // always 1?
+  /* 001C */ uint32_t shouldPlaceItem; // 1 if placing an item, 0 if placing in store
   /* 0020 */ uint32_t unknown4[2]; // always 0 it looks like
 };
 

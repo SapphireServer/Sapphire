@@ -731,8 +731,14 @@ void Sapphire::Network::GameConnection::reqPlaceHousingItem( FrameworkPtr pFw,
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcReqPlaceHousingItem >( inPacket );
   const auto& data = packet.data();
 
-  housingMgr->reqPlaceHousingItem( player, data.landId, data.sourceInvContainerId, data.sourceInvSlotId,
-                                   data.position, data.rotation );
+  if( data.shouldPlaceItem == 1 )
+  {
+    housingMgr->reqPlaceHousingItem( player, data.landId, data.sourceInvContainerId, data.sourceInvSlotId,
+                                     data.position, data.rotation );
+  }
+  else
+    housingMgr->reqPlaceItemInStore( player, data.landId, data.sourceInvContainerId, data.sourceInvSlotId );
+
 }
 
 void Sapphire::Network::GameConnection::reqMoveHousingItem( FrameworkPtr pFw,
