@@ -176,7 +176,7 @@ namespace Sapphire::World::Manager
     LandSetIdToZonePtrMap m_landSetIdToZonePtrMap;
 
     /*! map holding actual instances of InstanceContent */
-    InstanceContentIdToInstanceMap m_instanceContentToInstanceMap;
+    InstanceContentIdToInstanceMap m_instanceContentIdToInstanceMap;
 
     /*! flat map for easier lookup of instances by guid */
     InstanceIdToZonePtrMap m_instanceIdToZonePtrMap;
