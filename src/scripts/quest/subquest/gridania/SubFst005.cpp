@@ -73,7 +73,7 @@ private:
                     } );
   }
 
-  void Scene00001(Entity::Player& player)
+  void Scene00001( Entity::Player& player )
   {
     player.playScene( getId(), 1, 0,
                     [&]( Entity::Player& player, const Event::SceneResult& result )
