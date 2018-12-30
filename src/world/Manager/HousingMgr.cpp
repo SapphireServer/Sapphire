@@ -416,11 +416,10 @@ bool Sapphire::World::Manager::HousingMgr::relinquishLand( Entity::Player& playe
 
   auto pLand = pHousing->getLand( plot );
   auto plotMaxPrice = pLand->getCurrentPrice();
-  auto landOwnerId = pLand->getOwnerId();
 
   // can't relinquish when you are not the owner
   // TODO: actually use permissions here for FC houses
-  if( landOwnerId != player.getId() )
+  if( !hasPermission( player, *pLand, 0 ) )
   {
     auto msgPkt = makeActorControl143( player.getId(), ActorControl::LogMsg, 3304, 0 );
     player.queuePacket( msgPkt );
@@ -664,8 +663,7 @@ void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& pl
   if( !pLand )
     return;
 
-  // todo: when doing FC houses, look up the type from the original purchase and check perms from FC and set state accordingly
-  if( pLand->getOwnerId() != player.getId() )
+  if( !hasPermission( player, *pLand, 0 ) )
     return;
 
   // create house
@@ -763,8 +761,7 @@ void Sapphire::World::Manager::HousingMgr::updateEstateGreeting( Entity::Player&
   if( !land )
     return;
 
-  // todo: implement proper permissions checks
-  if( land->getOwnerId() != player.getId() )
+  if( !hasPermission( player, *land, 0 ) )
     return;
 
   auto house = land->getHouse();
@@ -789,8 +786,7 @@ void Sapphire::World::Manager::HousingMgr::requestEstateEditGuestAccess( Entity:
   if( !land )
     return;
 
-  // todo: add proper permission check
-  if( land->getOwnerId() != player.getId() )
+  if( !hasPermission( player, *land, 0 ) )
     return;
 
   auto packet = makeZonePacket< Server::FFXIVIpcHousingShowEstateGuestAccess >( player.getId() );
@@ -854,8 +850,7 @@ void Sapphire::World::Manager::HousingMgr::sendEstateInventory( Entity::Player& 
   if( !targetLand )
     return;
 
-  // todo: add proper permissions checks
-  if( targetLand->getOwnerId() != player.getId() )
+  if( !hasPermission( player, *targetLand, 0 ) )
     return;
 
   auto& containers = getEstateInventory( targetLand->getLandIdent() );
@@ -993,12 +988,11 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceHousingItem( Sapphire::Entity
   if( !land )
     return;
 
-  // todo: add proper permissions checks
-  if( land->getOwnerId() != player.getId() )
+  if( !hasPermission( player, *land, 0 ) )
     return;
 
   // todo: check item position and make sure it's not outside the plot
-  // retail uses a radius based check
+  // anecdotal evidence on reddit seems to imply retail uses a radius based check
 
   // unlink item
   Inventory::HousingItemPtr item;
@@ -1009,6 +1003,8 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceHousingItem( Sapphire::Entity
       containerId == InventoryType::Bag3 )
   {
     auto tmpItem = player.dropInventoryItem( static_cast< Common::InventoryType >( containerId ), slotId );
+    if( !tmpItem )
+      return;
 
     item = Inventory::make_HousingItem( tmpItem->getUId(), tmpItem->getId(), framework() );
 
@@ -1040,6 +1036,76 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceHousingItem( Sapphire::Entity
     player.queuePacket( Server::makeActorControl143( player.getId(), 0x3f3 ) );
   else
     player.sendUrgent( "An internal error occurred when placing the item." );
+}
+
+void Sapphire::World::Manager::HousingMgr::reqPlaceItemInStore( Sapphire::Entity::Player& player, uint16_t landId,
+                                                                uint16_t containerId, uint16_t slotId )
+{
+  LandPtr land;
+  bool isOutside = false;
+
+  if( auto zone = std::dynamic_pointer_cast< HousingZone >( player.getCurrentZone() ) )
+  {
+    land = zone->getLand( landId );
+    isOutside = true;
+  }
+  else if( auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( player.getCurrentZone() ) )
+  {
+    // todo: this whole process is retarded and needs to be fixed
+    // perhaps maintain a list of estates by ident inside housingmgr?
+    auto ident = zone->getLandIdent();
+    auto landSet = toLandSetId( ident.territoryTypeId, ident.wardNum );
+
+    land = getHousingZoneByLandSetId( landSet )->getLand( ident.landId );
+  }
+
+  if( !hasPermission( player, *land, 0 ) )
+    return;
+
+  auto invMgr = framework()->get< InventoryMgr >();
+  auto ident = land->getLandIdent();
+  auto& containers = getEstateInventory( ident );
+
+  if( isOutside )
+  {
+    auto& container = containers[ InventoryType::HousingExteriorStoreroom ];
+
+    auto freeSlot = container->getFreeSlot();
+    if( freeSlot == -1 )
+      return;
+
+    auto item = player.dropInventoryItem( static_cast< Common::InventoryType >( containerId ), slotId );
+    if( !item )
+      return;
+
+    container->setItem( freeSlot, item );
+    invMgr->sendInventoryContainer( player, container );
+    invMgr->saveHousingContainer( ident, container );
+  }
+  else
+  {
+    for( auto houseContainer : m_internalStoreroomContainers )
+    {
+      auto needle = containers.find( houseContainer );
+      if( needle == containers.end() )
+        continue;
+
+      auto container = needle->second;
+      auto freeSlot = container->getFreeSlot();
+      if( freeSlot == -1 )
+      {
+        continue;
+      }
+
+      auto item = player.dropInventoryItem( static_cast< Common::InventoryType >( containerId ), slotId );
+      if( !item )
+        return;
+
+      container->setItem( freeSlot, item );
+      invMgr->sendInventoryContainer( player, container );
+      invMgr->saveHousingContainer( ident, container );
+    }
+  }
 }
 
 bool Sapphire::World::Manager::HousingMgr::placeExternalItem( Entity::Player& player,
@@ -1107,9 +1173,6 @@ bool Sapphire::World::Manager::HousingMgr::placeInteriorItem( Entity::Player& pl
     // have a free slot
     container->setItem( freeSlot, item );
 
-    // todo: see comment above in placeExternalItem where the same func is called
-    invMgr->saveItem( player, item );
-
     // resend container
     invMgr->sendInventoryContainer( player, container );
     invMgr->saveHousingContainer( ident, container );
@@ -1176,8 +1239,7 @@ void Sapphire::World::Manager::HousingMgr::reqMoveHousingItem( Entity::Player& p
   if( !land )
     return;
 
-  // todo: proper perms checks
-  if( land->getOwnerId() != player.getId() )
+  if( !hasPermission( player, *land, 0 ) )
     return;
 
   // todo: what happens when either of these fail? how does the server let the client know that the moment failed
@@ -1250,8 +1312,7 @@ bool Sapphire::World::Manager::HousingMgr::moveExternalItem( Entity::Player& pla
 {
   auto land = terri.getLand( ident.landId );
 
-  // todo: add proper perms check
-  if( land->getOwnerId() != player.getId() )
+  if( !hasPermission( player, *land, 0 ) )
     return false;
 
   auto& containers = getEstateInventory( ident );
@@ -1298,8 +1359,7 @@ void Sapphire::World::Manager::HousingMgr::reqRemoveHousingItem( Sapphire::Entit
     if( !land )
       return;
 
-    // todo: proper perms checks
-    if( land->getOwnerId() != player.getId() )
+    if( !hasPermission( player, *land, 0 ) )
       return;
 
     removeInternalItem( player, *terri, containerId, slot, sendToStoreroom );
@@ -1310,7 +1370,7 @@ void Sapphire::World::Manager::HousingMgr::reqRemoveHousingItem( Sapphire::Entit
     if( !land )
       return;
 
-    if( land->getOwnerId() != player.getId() )
+    if( !hasPermission( player, *land, 0 ) )
       return;
 
     auto containerType = static_cast< Common::InventoryType >( containerId );
@@ -1419,11 +1479,13 @@ bool Sapphire::World::Manager::HousingMgr::removeExternalItem( Entity::Player& p
   if( !item )
     return false;
 
+  bool shouldDespawnItem = containerType != InventoryType::HousingExteriorStoreroom;
+
   auto invMgr = framework()->get< InventoryMgr >();
 
   if( sendToStoreroom )
   {
-    auto& storeroomContainer = containers[ InventoryType::HousingExteriorStoreroom ];
+    auto& storeroomContainer = containers[ containerType ];
     auto freeSlot = storeroomContainer->getFreeSlot();
 
     if( freeSlot == -1 )
@@ -1431,8 +1493,8 @@ bool Sapphire::World::Manager::HousingMgr::removeExternalItem( Entity::Player& p
 
     sourceContainer->removeItem( slotId );
     invMgr->sendInventoryContainer( player, sourceContainer );
-    invMgr->removeHousingItemPosition( *item );
     invMgr->removeItemFromHousingContainer( land.getLandIdent(), sourceContainer->getId(), slotId );
+    invMgr->removeHousingItemPosition( *item );
 
     storeroomContainer->setItem( freeSlot, item );
     invMgr->sendInventoryContainer( player, storeroomContainer );
@@ -1454,7 +1516,8 @@ bool Sapphire::World::Manager::HousingMgr::removeExternalItem( Entity::Player& p
     player.insertInventoryItem( containerPair.first, containerPair.second, item );
   }
 
-  terri.despawnYardObject( land.getLandIdent().landId, slotId );
+  if( shouldDespawnItem )
+    terri.despawnYardObject( land.getLandIdent().landId, slotId );
 
   return true;
 }
@@ -1495,8 +1558,7 @@ void Sapphire::World::Manager::HousingMgr::reqEstateExteriorRemodel( Sapphire::E
   if( !land )
     return;
 
-  // todo: proper perms checks
-  if( land->getOwnerId() != player.getId() )
+  if( !hasPermission( player, *land, 0 ) )
     return;
 
   auto& inv = getEstateInventory( land->getLandIdent() );
@@ -1526,8 +1588,7 @@ void Sapphire::World::Manager::HousingMgr::reqEstateInteriorRemodel( Sapphire::E
   if( !land )
     return;
 
-  // todo: proper perms checks
-  if( land->getOwnerId() != player.getId() )
+  if( !hasPermission( player, *land, 0 ) )
     return;
 
   auto& inv = getEstateInventory( land->getLandIdent() );
@@ -1541,4 +1602,16 @@ void Sapphire::World::Manager::HousingMgr::reqEstateInteriorRemodel( Sapphire::E
 
   auto pkt = Server::makeActorControl143( player.getId(), Network::ActorControl::ShowEstateInternalAppearanceUI );
   player.queuePacket( pkt );
+}
+
+bool Sapphire::World::Manager::HousingMgr::hasPermission( Sapphire::Entity::Player& player, Sapphire::Land& land,
+                                                          uint32_t permission )
+{
+  // todo: proper perms checks pls
+  if( land.getOwnerId() == player.getId() )
+    return true;
+
+  // todo: check perms here
+
+  return false;
 }
