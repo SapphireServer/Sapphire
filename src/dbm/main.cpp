@@ -104,7 +104,7 @@ int main( int32_t argc, char* argv[] )
   std::string database;
   std::string pass;
 
-  Logger::init( "log/SapphireDbm" );
+  Logger::init( "log/dbm" );
 
   std::string sFile;
   std::string iFile;
