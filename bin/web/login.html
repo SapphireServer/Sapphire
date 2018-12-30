@@ -43,6 +43,14 @@
 				return data;
 			}
 
+			function keypressing(e) {
+				if (!e) e = window.event;
+				var keyCode = e.keyCode || e.which;
+				if (keyCode == '13'){
+				  doLogin();
+				  return false;
+				}
+			}
 			
 			
 		</script>
@@ -79,7 +87,7 @@
 				<div class="input-control">
 					<label class="s-login-input-wrapper">
 						Password
-						<input type="password" name="password">
+						<input type="password" name="password" onkeypress="return keypressing(event)">
 					</label>
 				</div>
 				<button class="btn btn-default s-login-btn pull-right" id="submitButton" onclick="doLogin()">Login</button>
