@@ -714,7 +714,6 @@ void Sapphire::Zone::registerEObj( Entity::EventObjectPtr object )
   if( !object )
     return;
 
-  object->setId( getNextEObjId() );
   pushActor( object );
 
   m_eventObjects[ object->getId() ] = object;
