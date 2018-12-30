@@ -34,8 +34,8 @@ namespace Sapphire
     void setExteriorModel( Common::HouseExteriorSlot slot, uint32_t modelId, uint16_t stain );
     HousePart getExteriorModel( Common::HouseExteriorSlot slot );
 
-    void setInteriorModel( Common::HousingInteriorSlot slot, uint32_t modelId );
-    uint32_t getInteriorModel( Common::HousingInteriorSlot slot );
+    void setInteriorModel( Common::HouseInteriorSlot slot, uint32_t modelId );
+    uint32_t getInteriorModel( Common::HouseInteriorSlot slot );
 
     HouseModelsArray const& getHouseModels() const;
 

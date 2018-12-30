@@ -916,7 +916,7 @@ namespace Sapphire::Entity
 
     uint32_t getNextInventorySequence();
 
-    void send();
+    bool findFirstItemWithId( uint32_t catalogId, Inventory::InventoryContainerPair& location );
 
     uint8_t getFreeSlotsInBags();
 
