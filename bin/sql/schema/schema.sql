@@ -27,6 +27,17 @@ CREATE TABLE `bnpctemplate` (
    KEY `templatename` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE `spawnpoint` (
+  `id` int(11) NOT NULL  AUTO_INCREMENT,
+  `spawnGroupId` int(11) NOT NULL,
+  `x` float NOT NULL,
+  `y` float NOT NULL,
+  `z` float NOT NULL,
+  `r` float NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `spawngroupidx` (`spawnGroupId`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 CREATE TABLE `charainfo` (
   `AccountId` int(11) NOT NULL,
   `CharacterId` int(20) NOT NULL,
@@ -535,14 +546,12 @@ CREATE TABLE `houseiteminventory` (
 	INDEX `landIdent` (`LandIdent`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-
 CREATE TABLE `spawngroup` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `territoryTypeId` int(5) NOT NULL,
   `bNpcTemplateId` int(10) NOT NULL,
   `level` int(3) NOT NULL,
   `maxHp` int(10) NOT NULL,
-  `gimmickId` int(10) NOT NULL,
   PRIMARY KEY(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
