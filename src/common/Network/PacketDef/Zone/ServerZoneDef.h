@@ -1701,6 +1701,10 @@ struct FFXIVIpcHousingObjectMove : FFXIVIpcBasePacket< HousingObjectMove >
 struct FFXIVIpcHousingObjectInitialize : FFXIVIpcBasePacket< HousingObjectInitialize >
 {
   Common::LandIdent landIdent;
+  /*!
+   * when this is 2, actrl 0x400 will hide the additional quarters door
+   * if it's any other value, it will stay there regardless
+   */
   int8_t u1; //Outdoor -1 / Indoor 0 - probably indicator
   uint8_t packetNum;
   uint8_t packetTotal;
