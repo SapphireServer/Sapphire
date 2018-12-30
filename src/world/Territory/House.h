@@ -5,6 +5,7 @@
 #include <Common.h>
 #include <set>
 #include <unordered_map>
+#include <array>
 
 namespace Sapphire
 {
@@ -17,7 +18,8 @@ namespace Sapphire
     virtual ~House();
 
     using HousePart = std::pair< uint32_t, uint16_t >;
-    using HouseModelsArray = std::array< HousePart, 8 >;
+    using ExteriorModelsArray = std::array< HousePart, 8 >;
+    using InteriorModelsArray = std::array< uint32_t, 10 >;
 
     //gerneral
     uint32_t getLandSetId() const;
@@ -37,7 +39,7 @@ namespace Sapphire
     void setInteriorModel( Common::HouseInteriorSlot slot, uint32_t modelId );
     uint32_t getInteriorModel( Common::HouseInteriorSlot slot );
 
-    HouseModelsArray const& getHouseModels() const;
+    ExteriorModelsArray const& getHouseModels() const;
 
     void updateHouseDb();
 
@@ -52,8 +54,8 @@ namespace Sapphire
     uint64_t m_buildTime;
     bool m_hasAetheryte;
 
-    HouseModelsArray m_exteriorModelCache;
-    uint32_t m_interiorModelCache[10];
+    ExteriorModelsArray m_exteriorModelCache;
+    InteriorModelsArray m_interiorModelCache;
 
     std::string m_estateComment;
     std::string m_estateName;
