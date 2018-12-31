@@ -39,6 +39,7 @@
 #include "Manager/InventoryMgr.h"
 #include "Manager/EventMgr.h"
 #include "Manager/ItemMgr.h"
+#include "Manager/MarketMgr.h"
 
 using namespace Sapphire::World::Manager;
 
@@ -157,6 +158,15 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
   if( !pTeriMgr->init() )
   {
     Logger::fatal( "Failed to setup zones!" );
+    return;
+  }
+
+  auto pMarketMgr = std::make_shared< Manager::MarketMgr >( framework() );
+  framework()->set< Manager::MarketMgr >( pMarketMgr );
+
+  if( !pMarketMgr->init() )
+  {
+    Logger::fatal( "Failed to setup market manager!" );
     return;
   }
 

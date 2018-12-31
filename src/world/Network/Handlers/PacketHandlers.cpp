@@ -36,6 +36,7 @@
 
 #include "Manager/DebugCommandMgr.h"
 #include "Manager/EventMgr.h"
+#include "Manager/MarketMgr.h"
 
 #include "Action/Action.h"
 #include "Action/ActionTeleport.h"
@@ -752,4 +753,16 @@ void Sapphire::Network::GameConnection::reqMoveHousingItem( FrameworkPtr pFw,
 
   housingMgr->reqMoveHousingItem( player, data.ident, data.slot, data.pos, data.rotation );
 
+}
+
+void Sapphire::Network::GameConnection::searchMarketboard( FrameworkPtr pFw,
+                                                           const Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                           Entity::Player& player )
+{
+  auto marketMgr = pFw->get< MarketMgr >();
+
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcSearchMarketboard >( inPacket );
+  const auto& data = packet.data();
+
+  marketMgr->searchMarketboard( player, data.itemSearchCategory, data.maxEquipLevel, data.classJobId );
 }
