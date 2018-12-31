@@ -270,6 +270,19 @@ struct FFXIVIpcHousingUpdateObjectPosition :
   /* 001C */ uint32_t padding;
 };
 
+struct FFXIVIpcSearchMarketboard :
+  FFXIVIpcBasePacket< SearchMarketboard >
+{
+  /* 0000 */ uint32_t unk;
+  /* 0004 */ uint8_t unk2[2];
+  /* 0006 */ uint8_t itemSearchCategory;
+  /* 0007 */ uint8_t shouldCheckClassJobId; // wat? seems only 1 there at least...
+  /* 0008 */ uint8_t maxEquipLevel;
+  /* 0009 */ uint8_t classJobId;
+  /* 000A */ char searchStr[40];
+  /* 0032 */ uint16_t unk4[43];
+};
+
 }
 }
 }
