@@ -10,7 +10,6 @@ set(EXECUTABLE_OUTPUT_PATH "${SCRIPT_LIB_DIR}")
 set(LIBRARY_OUTPUT_PATH "${SCRIPT_LIB_DIR}")
 set(RUNTIME_OUTPUT_DIRECTORY "${SCRIPT_LIB_DIR}")
 
-
 file(GLOB children "${CMAKE_CURRENT_SOURCE_DIR}/*" )
 foreach(_scriptDir ${children})
     get_filename_component(_name "${_scriptDir}" NAME_WE)
