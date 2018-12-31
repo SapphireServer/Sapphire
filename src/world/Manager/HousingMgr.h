@@ -185,6 +185,8 @@ namespace Sapphire::World::Manager
 
   private:
 
+    Inventory::HousingItemPtr getHousingItemFromPlayer( Entity::Player& player, Common::InventoryType type, uint8_t slot );
+
     ItemContainerPtr getFreeEstateInventorySlot( Common::LandIdent ident,
                                                  Inventory::InventoryContainerPair& pair,
                                                  Inventory::InventoryTypeList bagList );
