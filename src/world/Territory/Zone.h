@@ -134,6 +134,8 @@ namespace Sapphire
 
     void loadWeatherRates();
 
+    bool loadSpawnGroups();
+
     bool checkWeather();
     //void updateBnpcs( int64_t tickCount );
 

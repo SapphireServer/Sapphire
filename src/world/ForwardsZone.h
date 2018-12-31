@@ -66,6 +66,8 @@ TYPE_FORWARD( Player );
 TYPE_FORWARD( EventObject );
 TYPE_FORWARD( BNpcTemplate );
 TYPE_FORWARD( BNpc );
+TYPE_FORWARD( SpawnPoint );
+TYPE_FORWARD( SpawnGroup );
 }
 
 namespace Event
