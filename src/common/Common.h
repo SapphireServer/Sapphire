@@ -866,13 +866,13 @@ namespace Sapphire::Common
     Mansion
   };
 
-  enum HouseState : uint8_t
+  enum HouseStatus : uint8_t
   {
     none,
-    forSale,
-    sold,
-    privateHouse,
-    fcHouse,
+    HouseForSale,
+    HouseSold,
+    HousePrivateEstate,
+    HouseFreeCompanyEstate,
   };
 
   enum HouseIconAdd : uint8_t

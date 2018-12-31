@@ -31,8 +31,8 @@ namespace Sapphire::World::Manager
       uint16_t m_landId;
 
       Common::LandType m_type;
-      uint8_t m_size;
-      uint8_t m_status;
+      Common::HouseSize m_size;
+      Common::HouseStatus m_status;
 
       uint64_t m_currentPrice;
 
