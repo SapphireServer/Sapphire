@@ -568,7 +568,7 @@ bool Sapphire::World::Manager::HousingMgr::initHouseModels( Entity::Player& play
   if( !player.findFirstItemWithId( presetCatalogId, foundItem ) )
     return false;
 
-  auto item = player.dropInventoryItem( foundItem.first, foundItem.second );
+  auto item = getHousingItemFromPlayer( player, foundItem.first, foundItem.second );
   if( !item )
     return false;
 
@@ -1002,11 +1002,9 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceHousingItem( Sapphire::Entity
       containerId == InventoryType::Bag2 ||
       containerId == InventoryType::Bag3 )
   {
-    auto tmpItem = player.dropInventoryItem( static_cast< Common::InventoryType >( containerId ), slotId );
-    if( !tmpItem )
+    item = getHousingItemFromPlayer( player, static_cast< Common::InventoryType >( containerId ), slotId );
+    if( !item )
       return;
-
-    item = Inventory::make_HousingItem( tmpItem->getUId(), tmpItem->getId(), framework() );
 
     // set params
     item->setPos( {
@@ -1074,7 +1072,7 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceItemInStore( Sapphire::Entity
     if( freeSlot == -1 )
       return;
 
-    auto item = player.dropInventoryItem( static_cast< Common::InventoryType >( containerId ), slotId );
+    auto item = getHousingItemFromPlayer( player, static_cast< Common::InventoryType >( containerId ), slotId );
     if( !item )
       return;
 
@@ -1097,7 +1095,7 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceItemInStore( Sapphire::Entity
         continue;
       }
 
-      auto item = player.dropInventoryItem( static_cast< Common::InventoryType >( containerId ), slotId );
+      auto item = getHousingItemFromPlayer( player, static_cast< Common::InventoryType >( containerId ), slotId );
       if( !item )
         return;
 
@@ -1386,7 +1384,7 @@ bool Sapphire::World::Manager::HousingMgr::removeInternalItem( Entity::Player& p
 {
   auto& containers = getEstateInventory( terri.getLandIdent() );
 
-  uint8_t containerIdx = 0;
+  int8_t containerIdx = 0;
 
   if( isPlacedItemsInventory( static_cast< Common::InventoryType >( containerId ) ) )
   {
@@ -1617,4 +1615,14 @@ bool Sapphire::World::Manager::HousingMgr::hasPermission( Sapphire::Entity::Play
   // todo: check perms here
 
   return false;
+}
+
+Sapphire::Inventory::HousingItemPtr Sapphire::World::Manager::HousingMgr::getHousingItemFromPlayer(
+  Entity::Player& player, Common::InventoryType type, uint8_t slot )
+{
+  auto tmpItem = player.dropInventoryItem( type, slot );
+  if( !tmpItem )
+    return nullptr;
+
+  return Inventory::make_HousingItem( tmpItem->getUId(), tmpItem->getId(), framework() );
 }
