@@ -227,7 +227,7 @@ void Sapphire::Land::updateLandDb()
 
 void Sapphire::Land::update( uint32_t currTime )
 {
-  if( getStatus() == HouseStatus::HouseForSale )
+  if( getStatus() == HouseStatus::ForSale )
   {
     if( m_nextDrop < currTime && m_minPrice < m_currentPrice )
     {
