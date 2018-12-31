@@ -1386,24 +1386,24 @@ bool Sapphire::World::Manager::HousingMgr::removeInternalItem( Entity::Player& p
 {
   auto& containers = getEstateInventory( terri.getLandIdent() );
 
-  // validate the container id first
-  // we also need the idx of the container so we can get the slot offset
-  bool foundContainer = false;
   uint8_t containerIdx = 0;
-  for( auto cId : m_internalPlacedItemContainers )
+
+  if( isPlacedItemsInventory( static_cast< Common::InventoryType >( containerId ) ) )
   {
-    if( containerId == cId )
+    for( auto cId : m_internalPlacedItemContainers )
     {
-      foundContainer = true;
+      if( containerId == cId )
+        break;
 
-      break;
+      containerIdx++;
     }
-
-    containerIdx++;
   }
+  else
+    containerIdx = -1;
 
-  if( !foundContainer )
-    return false;
+  // its possible to remove an item from any container in basically all these remove functions
+  // eg, remove a permit and reuse it elsewhere
+  // I'm not going to bother fixing it for now, but worth noting for future reference
 
   auto needle = containers.find( containerId );
   if( needle == containers.end() )
@@ -1457,8 +1457,11 @@ bool Sapphire::World::Manager::HousingMgr::removeInternalItem( Entity::Player& p
   }
 
   // despawn
-  auto arraySlot = ( containerIdx * 50 ) + slotId;
-  terri.removeHousingObject( arraySlot );
+  if( containerIdx != -1 )
+  {
+    auto arraySlot = ( containerIdx * 50 ) + slotId;
+    terri.removeHousingObject( arraySlot );
+  }
 
   return true;
 }
