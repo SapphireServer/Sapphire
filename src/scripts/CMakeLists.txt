@@ -40,9 +40,6 @@ foreach(_scriptDir ${children})
 
         if(MSVC)
             set_target_properties( "script_${_name}" PROPERTIES
-                CXX_STANDARD 17
-                CXX_STANDARD_REQUIRED ON
-                CXX_EXTENSIONS ON
                 LIBRARY_OUTPUT_DIRECTORY_DEBUG "${SCRIPT_LIB_DIR}"
                 LIBRARY_OUTPUT_DIRECTORY_RELEASE "${SCRIPT_LIB_DIR}"
                 LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO "${SCRIPT_LIB_DIR}"

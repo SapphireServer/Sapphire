@@ -24,6 +24,8 @@
 #include "Actor/BNpc.h"
 #include "Actor/Player.h"
 #include "Actor/EventObject.h"
+#include "Actor/SpawnGroup.h"
+#include "Actor/SpawnPoint.h"
 
 #include "Network/GameConnection.h"
 
@@ -115,7 +117,6 @@ bool Sapphire::Zone::init()
   {
     // all good
   }
-
 
   return true;
 }
@@ -679,14 +680,14 @@ void Sapphire::Zone::onPlayerZoneIn( Entity::Player& player )
 {
   Logger::debug(
     "Zone::onEnterTerritory: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryTypeId() ) +
-    +", Entity#" + std::to_string( player.getId() ) );
+    + ", Entity#" + std::to_string( player.getId() ) );
 }
 
 void Sapphire::Zone::onLeaveTerritory( Entity::Player& player )
 {
   Logger::debug(
     "Zone::onLeaveTerritory: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryTypeId() ) +
-    +", Entity#" + std::to_string( player.getId() ) );
+    + ", Entity#" + std::to_string( player.getId() ) );
 }
 
 void Sapphire::Zone::onUpdate( uint32_t currTime )
@@ -757,4 +758,31 @@ Sapphire::Entity::EventObjectPtr Sapphire::Zone::registerEObj( const std::string
 Sapphire::Data::TerritoryTypePtr Sapphire::Zone::getTerritoryTypeInfo() const
 {
   return m_territoryTypeInfo;
+}
+
+bool Sapphire::Zone::loadSpawnGroups()
+{
+  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto res = pDb->query( "SELECT id, bNpcTemplateId, "
+                         "level, maxHp "
+                         "FROM spawnGroup "
+                         "WHERE territoryTypeId = " + std::to_string( getTerritoryTypeId() ) + ";" );
+
+  while( res->next() )
+  {
+    uint32_t id = res->getUInt( 1 );
+    uint32_t templateId = res->getUInt( 2 );
+    uint32_t level = res->getUInt( 3 );
+    uint32_t maxHp = res->getUInt( 4 );
+
+    //Entity::SpawnGroup group;
+
+    Logger::debug( std::to_string( id ) + " " +
+                   std::to_string( templateId ) + " " +
+                   std::to_string( level ) + " " +
+                   std::to_string( maxHp ) );
+
+  }
+
+  return false;
 }
