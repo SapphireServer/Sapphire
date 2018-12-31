@@ -76,14 +76,19 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::onPlayerZone
 
   player.queuePacket( indoorInitPacket );
 
+  bool isFcHouse = pLand->getStatus() == Common::HouseStatus::PrivateEstate;
 
   auto yardPacketTotal = static_cast< uint8_t >( 2 + pLand->getSize() );
   for( uint8_t yardPacketNum = 0; yardPacketNum < yardPacketTotal; yardPacketNum++ )
   {
     auto objectInitPacket = makeZonePacket< Server::FFXIVIpcHousingObjectInitialize >( player.getId() );
     memcpy( &objectInitPacket->data().landIdent, &m_landIdent, sizeof( Common::LandIdent ) );
-    // todo: change this when FC houses become a thing
-    objectInitPacket->data().u1 = 2; // 2 = actrl 0x400 will hide the fc door, otherwise it will stay there
+
+    if( isFcHouse )
+      objectInitPacket->data().u1 = 2; // 2 = actrl 0x400 will hide the fc door, otherwise it will stay there
+    else
+      objectInitPacket->data().u1 = 0;
+
     objectInitPacket->data().u2 = 100;
     objectInitPacket->data().packetNum = yardPacketNum;
     objectInitPacket->data().packetTotal = yardPacketTotal;
@@ -94,8 +99,8 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::onPlayerZone
     player.queuePacket( objectInitPacket );
   }
 
-  // todo: if in fc house, don't send this
-  player.queuePacket( Server::makeActorControl143( player.getId(), Network::ActorControl::HideAdditionalChambersDoor ) );
+  if( isFcHouse )
+    player.queuePacket( Server::makeActorControl143( player.getId(), Network::ActorControl::HideAdditionalChambersDoor ) );
 }
 
 void Sapphire::World::Territory::Housing::HousingInteriorTerritory::onUpdate( uint32_t currTime )

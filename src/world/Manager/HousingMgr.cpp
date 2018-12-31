@@ -365,7 +365,7 @@ Sapphire::LandPurchaseResult Sapphire::World::Manager::HousingMgr::purchaseLand(
   if( !pLand )
     return LandPurchaseResult::ERR_INTERNAL;
 
-  if( pLand->getStatus() != HouseStatus::HouseForSale )
+  if( pLand->getStatus() != HouseStatus::ForSale )
     return LandPurchaseResult::ERR_NOT_AVAILABLE;
 
   if( gilAvailable < plotPrice )
@@ -388,7 +388,7 @@ Sapphire::LandPurchaseResult Sapphire::World::Manager::HousingMgr::purchaseLand(
 
       player.removeCurrency( CurrencyType::Gil, plotPrice );
       pLand->setOwnerId( player.getId() );
-      pLand->setStatus( HouseStatus::HouseSold );
+      pLand->setStatus( HouseStatus::Sold );
       pLand->setLandType( Common::LandType::Private );
 
       player.setLandFlags( LandFlagsSlot::Private, 0x00, pLand->getLandIdent() );
@@ -437,7 +437,7 @@ bool Sapphire::World::Manager::HousingMgr::relinquishLand( Entity::Player& playe
 
   pLand->setCurrentPrice( pLand->getMaxPrice() );
   pLand->setOwnerId( 0 );
-  pLand->setStatus( HouseStatus::HouseForSale );
+  pLand->setStatus( HouseStatus::ForSale );
   pLand->setLandType( Common::LandType::none );
   pLand->updateLandDb();
 
@@ -477,11 +477,11 @@ void Sapphire::World::Manager::HousingMgr::sendWardLandInfo( Entity::Player& pla
 
     auto& entry = wardInfoPacket->data().houseInfoEntry[ i ];
 
-    // retail always sends the house price in this packet, even after the house has been HouseSold
+    // retail always sends the house price in this packet, even after the house has been Sold
     // so I guess we do the same
     entry.housePrice = land->getCurrentPrice();
 
-    if( land->getStatus() == Common::HouseStatus::HouseForSale )
+    if( land->getStatus() == Common::HouseStatus::ForSale )
       continue;
 
     if( auto house = land->getHouse() )
@@ -682,7 +682,7 @@ void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& pl
 
   createHouse( house );
 
-  pLand->setStatus( HouseStatus::HousePrivateEstate );
+  pLand->setStatus( HouseStatus::PrivateEstate );
   pLand->setLandType( LandType::Private );
   hZone->sendLandUpdate( plotNum );
 

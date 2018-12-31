@@ -869,10 +869,10 @@ namespace Sapphire::Common
   enum HouseStatus : uint8_t
   {
     none,
-    HouseForSale,
-    HouseSold,
-    HousePrivateEstate,
-    HouseFreeCompanyEstate,
+    ForSale,
+    Sold,
+    PrivateEstate,
+    FreeCompanyEstate,
   };
 
   enum HouseIconAdd : uint8_t
