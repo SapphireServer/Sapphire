@@ -179,8 +179,8 @@ void Sapphire::World::Manager::HousingMgr::initLandCache()
     entry.m_landId = res->getUInt( "LandId" );
 
     entry.m_type = static_cast< Common::LandType >( res->getUInt( "Type" ) );
-    entry.m_size = res->getUInt8( "Size" );
-    entry.m_status = res->getUInt8( "Status" );
+    entry.m_size = static_cast< Common::HouseSize >( res->getUInt8( "Size" ) );
+    entry.m_status = static_cast< Common::HouseStatus >( res->getUInt8( "Status" ) );
     entry.m_currentPrice = res->getUInt64( "LandPrice" );
     entry.m_updateTime = res->getUInt64( "UpdateTime" );
     entry.m_ownerId = res->getUInt64( "OwnerId" );
@@ -365,7 +365,7 @@ Sapphire::LandPurchaseResult Sapphire::World::Manager::HousingMgr::purchaseLand(
   if( !pLand )
     return LandPurchaseResult::ERR_INTERNAL;
 
-  if( pLand->getState() != HouseState::forSale )
+  if( pLand->getStatus() != HouseStatus::HouseForSale )
     return LandPurchaseResult::ERR_NOT_AVAILABLE;
 
   if( gilAvailable < plotPrice )
@@ -388,7 +388,7 @@ Sapphire::LandPurchaseResult Sapphire::World::Manager::HousingMgr::purchaseLand(
 
       player.removeCurrency( CurrencyType::Gil, plotPrice );
       pLand->setOwnerId( player.getId() );
-      pLand->setState( HouseState::sold );
+      pLand->setStatus( HouseStatus::HouseSold );
       pLand->setLandType( Common::LandType::Private );
 
       player.setLandFlags( LandFlagsSlot::Private, 0x00, pLand->getLandIdent() );
@@ -437,7 +437,7 @@ bool Sapphire::World::Manager::HousingMgr::relinquishLand( Entity::Player& playe
 
   pLand->setCurrentPrice( pLand->getMaxPrice() );
   pLand->setOwnerId( 0 );
-  pLand->setState( HouseState::forSale );
+  pLand->setStatus( HouseStatus::HouseForSale );
   pLand->setLandType( Common::LandType::none );
   pLand->updateLandDb();
 
@@ -477,11 +477,11 @@ void Sapphire::World::Manager::HousingMgr::sendWardLandInfo( Entity::Player& pla
 
     auto& entry = wardInfoPacket->data().houseInfoEntry[ i ];
 
-    // retail always sends the house price in this packet, even after the house has been sold
+    // retail always sends the house price in this packet, even after the house has been HouseSold
     // so I guess we do the same
     entry.housePrice = land->getCurrentPrice();
 
-    if( land->getState() == Common::HouseState::forSale )
+    if( land->getStatus() == Common::HouseStatus::HouseForSale )
       continue;
 
     if( auto house = land->getHouse() )
@@ -682,7 +682,7 @@ void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& pl
 
   createHouse( house );
 
-  pLand->setState( HouseState::privateHouse );
+  pLand->setStatus( HouseStatus::HousePrivateEstate );
   pLand->setLandType( LandType::Private );
   hZone->sendLandUpdate( plotNum );
 
