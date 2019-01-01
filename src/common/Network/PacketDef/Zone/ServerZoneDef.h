@@ -1860,11 +1860,11 @@ struct FFXIVIpcMarketBoardSearchResult :
 struct FFFXIVIpcMarketBoardItemListingCount :
   FFXIVIpcBasePacket< MarketBoardItemListingCount >
 {
-    uint32_t itemCatalogId;
-    uint32_t unknown1; // does some shit if nonzero
-    uint16_t unknown2;
-    uint16_t quantity; // high/low u8s read separately?
-    uint32_t padding3;
+  uint32_t itemCatalogId;
+  uint32_t unknown1; // does some shit if nonzero
+  uint16_t requestId;
+  uint16_t quantity; // high/low u8s read separately?
+  uint32_t unknown3;
 };
 
 struct FFXIVIpcMarketBoardItemListingHistory :

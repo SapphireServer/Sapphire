@@ -126,6 +126,8 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
   setZoneHandler( ClientZoneIpcType::MarketBoardSearch, "MarketBoardSearch", &GameConnection::marketBoardSearch );
   setZoneHandler( ClientZoneIpcType::MarketBoardRequestItemListingInfo, "MarketBoardRequestItemListingInfo",
                   &GameConnection::marketBoardRequestItemInfo );
+  setZoneHandler( ClientZoneIpcType::MarketBoardRequestItemListings, "MarketBoardRequestItemListings",
+                  &GameConnection::marketBoardRequestItemListings );
 
   setChatHandler( ClientChatIpcType::TellReq, "TellReq", &GameConnection::tellHandler );
 

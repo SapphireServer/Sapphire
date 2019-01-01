@@ -777,4 +777,17 @@ void Sapphire::Network::GameConnection::marketBoardRequestItemInfo( FrameworkPtr
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcMarketBoardRequestItemListingInfo >( inPacket );
 
   auto marketMgr = pFw->get< MarketMgr >();
+
+  marketMgr->requestItemListingInfo( player, packet.data().catalogId, packet.data().requestId );
+}
+
+void Sapphire::Network::GameConnection::marketBoardRequestItemListings( FrameworkPtr pFw,
+                                                                        const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                                        Entity::Player& player )
+{
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcMarketBoardRequestItemListings >( inPacket );
+
+  auto marketMgr = pFw->get< MarketMgr >();
+
+  marketMgr->requestItemListings( player, packet.data().itemCatalogId );
 }

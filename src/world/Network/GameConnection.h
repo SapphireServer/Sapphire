@@ -180,6 +180,8 @@ namespace Sapphire::Network
 
     DECLARE_HANDLER( marketBoardRequestItemInfo );
 
+    DECLARE_HANDLER( marketBoardRequestItemListings );
+
   };
 
 }

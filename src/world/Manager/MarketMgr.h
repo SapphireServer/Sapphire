@@ -20,7 +20,9 @@ namespace Sapphire::World::Manager
                                 const std::string_view& searchStr, uint32_t requestId,
                                 uint32_t startIdx );
 
-    void requestItemListings( Entity::Player& player, uint32_t catalogId, uint32_t requestId );
+    void requestItemListingInfo( Entity::Player& player, uint32_t catalogId, uint32_t requestId );
+
+    void requestItemListings( Entity::Player& player, uint16_t catalogId );
 
   private:
     struct ItemSearchResult
