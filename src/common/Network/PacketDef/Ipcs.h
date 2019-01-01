@@ -176,7 +176,7 @@ namespace Sapphire::Network::Packets
 
     DirectorVars = 0x01E1, // updated 4.4
 
-    CFAvailableContents = 0x01FD, // updated 4.2
+    CFAvailableContents = 0xF1FD, // updated 4.2
 
     WeatherChange = 0x01FC, // updated 4.4
     PlayerTitleList = 0x01FD, // updated 4.4
