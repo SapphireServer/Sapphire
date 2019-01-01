@@ -755,14 +755,26 @@ void Sapphire::Network::GameConnection::reqMoveHousingItem( FrameworkPtr pFw,
 
 }
 
-void Sapphire::Network::GameConnection::searchMarketboard( FrameworkPtr pFw,
-                                                           const Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::marketBoardSearch( FrameworkPtr pFw,
+                                                           const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                            Entity::Player& player )
 {
   auto marketMgr = pFw->get< MarketMgr >();
 
-  const auto packet = ZoneChannelPacket< Client::FFXIVIpcSearchMarketboard >( inPacket );
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcMarketBoardSearch >( inPacket );
   const auto& data = packet.data();
 
-  marketMgr->searchMarketboard( player, data.itemSearchCategory, data.maxEquipLevel, data.classJobId );
+  std::string_view searchStr( data.searchStr );
+
+  marketMgr->searchMarketboard( player, data.itemSearchCategory, data.maxEquipLevel, data.classJobId, data.searchStr,
+                                data.requestId, data.startIdx );
+}
+
+void Sapphire::Network::GameConnection::marketBoardRequestItemInfo( FrameworkPtr pFw,
+                                                                    const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                                    Entity::Player& player )
+{
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcMarketBoardRequestItemInformation >( inPacket );
+
+  auto marketMgr = pFw->get< MarketMgr >();
 }

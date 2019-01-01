@@ -1847,13 +1847,14 @@ struct FFXIVIpcMarketBoardSearchResult :
     struct MarketBoardItem
     {
         uint32_t itemCatalogId;
-        uint32_t quantity;
+        uint16_t quantity;
+        uint16_t demand;
     } items[20];
 
     uint32_t itemIndexEnd;
     uint32_t padding1;
     uint32_t itemIndexStart;
-    uint32_t padding2;
+    uint32_t requestId;
 };
 
 struct FFFXIVIpcMarketBoardItemListingCount :
