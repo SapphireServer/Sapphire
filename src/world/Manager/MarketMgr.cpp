@@ -10,6 +10,8 @@
 
 #include "Actor/Player.h"
 
+#include <algorithm>
+
 using namespace Sapphire::Network::Packets;
 
 Sapphire::World::Manager::MarketMgr::MarketMgr( Sapphire::FrameworkPtr pFw ) :
@@ -41,9 +43,15 @@ bool Sapphire::World::Manager::MarketMgr::init()
     cacheEntry.maxEquipLevel = item->levelEquip;
     cacheEntry.name = item->name;
     cacheEntry.classJob = item->classJobUse;
+    cacheEntry.itemLevel = item->levelItem;
 
     m_marketItemCache.push_back( std::move( cacheEntry ) );
   }
+
+  std::sort( m_marketItemCache.begin(), m_marketItemCache.end(), []( const MarketableItem& a, const MarketableItem& b )
+  {
+    return a.itemLevel > b.itemLevel;
+  } );
 
   Logger::info( "MarketMgr: Cached " + std::to_string( m_marketItemCache.size() ) + " marketable items" );
 
@@ -79,7 +87,7 @@ void Sapphire::World::Manager::MarketMgr::searchMarketboard( Entity::Player& pla
   resultPkt->data().itemIndexStart = startIdx;
   resultPkt->data().requestId = requestId;
 
-  for( auto i = 0; i < resultList.size(); i++ )
+  for( auto i = 0; i < size; i++ )
   {
     auto& item = resultList.at( startIdx + i );
     auto& data = resultPkt->data().items[ i ];

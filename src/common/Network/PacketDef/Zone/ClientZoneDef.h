@@ -284,8 +284,8 @@ struct FFXIVIpcMarketBoardSearch :
   /* 0032 */ uint16_t unk4[43];
 };
 
-struct FFXIVIpcMarketBoardRequestItemInformation :
-  FFXIVIpcBasePacket< MarketBoardRequestItemInformation >
+struct FFXIVIpcMarketBoardRequestItemListingInfo :
+  FFXIVIpcBasePacket< MarketBoardRequestItemListingInfo >
 {
   /* 0000 */ uint32_t catalogId;
   /* 0000 */ uint32_t requestId;
