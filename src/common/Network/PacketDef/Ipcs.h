@@ -176,7 +176,7 @@ namespace Sapphire::Network::Packets
 
     DirectorVars = 0x01E1, // updated 4.4
 
-    CFAvailableContents = 0x01FD, // updated 4.2
+    CFAvailableContents = 0xF1FD, // updated 4.2
 
     WeatherChange = 0x01FC, // updated 4.4
     PlayerTitleList = 0x01FD, // updated 4.4
@@ -264,10 +264,10 @@ namespace Sapphire::Network::Packets
 
     LinkshellListHandler = 0x00F4, // updated 4.3
 
-    MarketBoardRequestItemInformation = 0x00FE, // updated 4.4
+    MarketBoardRequestItemListingInfo = 0x00FE, // updated 4.4
     MarketBoardRequestItemListings = 0x00FF, // updated 4.4
+    MarketBoardSearch = 0x0103, // updated 4.4
 
-    SearchMarketboard = 0x0103, // updated 4.3
     ReqExamineFcInfo = 0x010F, // updated 4.1
 
     FcInfoReqHandler = 0x011A, // updated 4.2

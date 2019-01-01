@@ -18,20 +18,20 @@ namespace Sapphire
     Land( uint16_t zoneId, uint8_t wardNum, uint8_t landId, uint32_t landSetId,
           Sapphire::Data::HousingLandSetPtr info, FrameworkPtr pFw );
     virtual ~Land();
-    void init( Common::LandType type, uint8_t size, uint8_t state, uint32_t currentPrice, uint64_t ownerId, uint64_t houseId );
+    void init( Common::LandType type, Common::HouseSize size, Common::HouseStatus state, uint32_t currentPrice, uint64_t ownerId, uint64_t houseId );
 
     using LandInventoryMap = std::unordered_map< uint16_t, ItemContainerPtr >;
     using InvMaxItemsPair = std::pair< uint16_t, uint16_t >;
 
     //Primary state
-    void setSize( uint8_t size );
-    void setState( uint8_t state );
+    void setSize( Common::HouseSize size );
+    void setStatus( Common::HouseStatus state );
     void setSharing( uint8_t state );
     void setLandType( Common::LandType type );
 
     //Gerneral
-    uint8_t getSize() const;
-    uint8_t getState() const;
+    Common::HouseSize getSize() const;
+    Common::HouseStatus getStatus() const;
     uint8_t getSharing() const;
     uint32_t getLandSetId() const;
     Common::LandType getLandType() const;
@@ -71,8 +71,8 @@ namespace Sapphire
     Common::LandIdent m_landIdent;
 
     uint32_t m_landSetId;
-    uint8_t m_size;
-    uint8_t m_state;
+    Common::HouseSize m_size;
+    Common::HouseStatus m_state;
     Common::LandType m_type;
     uint8_t m_iconAddIcon;
     uint32_t m_fcId; // unclear, may be wrong

@@ -179,8 +179,8 @@ void Sapphire::World::Manager::HousingMgr::initLandCache()
     entry.m_landId = res->getUInt( "LandId" );
 
     entry.m_type = static_cast< Common::LandType >( res->getUInt( "Type" ) );
-    entry.m_size = res->getUInt8( "Size" );
-    entry.m_status = res->getUInt8( "Status" );
+    entry.m_size = static_cast< Common::HouseSize >( res->getUInt8( "Size" ) );
+    entry.m_status = static_cast< Common::HouseStatus >( res->getUInt8( "Status" ) );
     entry.m_currentPrice = res->getUInt64( "LandPrice" );
     entry.m_updateTime = res->getUInt64( "UpdateTime" );
     entry.m_ownerId = res->getUInt64( "OwnerId" );
@@ -365,7 +365,7 @@ Sapphire::LandPurchaseResult Sapphire::World::Manager::HousingMgr::purchaseLand(
   if( !pLand )
     return LandPurchaseResult::ERR_INTERNAL;
 
-  if( pLand->getState() != HouseState::forSale )
+  if( pLand->getStatus() != HouseStatus::ForSale )
     return LandPurchaseResult::ERR_NOT_AVAILABLE;
 
   if( gilAvailable < plotPrice )
@@ -388,7 +388,7 @@ Sapphire::LandPurchaseResult Sapphire::World::Manager::HousingMgr::purchaseLand(
 
       player.removeCurrency( CurrencyType::Gil, plotPrice );
       pLand->setOwnerId( player.getId() );
-      pLand->setState( HouseState::sold );
+      pLand->setStatus( HouseStatus::Sold );
       pLand->setLandType( Common::LandType::Private );
 
       player.setLandFlags( LandFlagsSlot::Private, 0x00, pLand->getLandIdent() );
@@ -437,7 +437,7 @@ bool Sapphire::World::Manager::HousingMgr::relinquishLand( Entity::Player& playe
 
   pLand->setCurrentPrice( pLand->getMaxPrice() );
   pLand->setOwnerId( 0 );
-  pLand->setState( HouseState::forSale );
+  pLand->setStatus( HouseStatus::ForSale );
   pLand->setLandType( Common::LandType::none );
   pLand->updateLandDb();
 
@@ -477,11 +477,11 @@ void Sapphire::World::Manager::HousingMgr::sendWardLandInfo( Entity::Player& pla
 
     auto& entry = wardInfoPacket->data().houseInfoEntry[ i ];
 
-    // retail always sends the house price in this packet, even after the house has been sold
+    // retail always sends the house price in this packet, even after the house has been Sold
     // so I guess we do the same
     entry.housePrice = land->getCurrentPrice();
 
-    if( land->getState() == Common::HouseState::forSale )
+    if( land->getStatus() == Common::HouseStatus::ForSale )
       continue;
 
     if( auto house = land->getHouse() )
@@ -568,7 +568,7 @@ bool Sapphire::World::Manager::HousingMgr::initHouseModels( Entity::Player& play
   if( !player.findFirstItemWithId( presetCatalogId, foundItem ) )
     return false;
 
-  auto item = player.dropInventoryItem( foundItem.first, foundItem.second );
+  auto item = getHousingItemFromPlayer( player, foundItem.first, foundItem.second );
   if( !item )
     return false;
 
@@ -682,7 +682,7 @@ void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& pl
 
   createHouse( house );
 
-  pLand->setState( HouseState::privateHouse );
+  pLand->setStatus( HouseStatus::PrivateEstate );
   pLand->setLandType( LandType::Private );
   hZone->sendLandUpdate( plotNum );
 
@@ -1002,11 +1002,9 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceHousingItem( Sapphire::Entity
       containerId == InventoryType::Bag2 ||
       containerId == InventoryType::Bag3 )
   {
-    auto tmpItem = player.dropInventoryItem( static_cast< Common::InventoryType >( containerId ), slotId );
-    if( !tmpItem )
+    item = getHousingItemFromPlayer( player, static_cast< Common::InventoryType >( containerId ), slotId );
+    if( !item )
       return;
-
-    item = Inventory::make_HousingItem( tmpItem->getUId(), tmpItem->getId(), framework() );
 
     // set params
     item->setPos( {
@@ -1074,7 +1072,7 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceItemInStore( Sapphire::Entity
     if( freeSlot == -1 )
       return;
 
-    auto item = player.dropInventoryItem( static_cast< Common::InventoryType >( containerId ), slotId );
+    auto item = getHousingItemFromPlayer( player, static_cast< Common::InventoryType >( containerId ), slotId );
     if( !item )
       return;
 
@@ -1097,7 +1095,7 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceItemInStore( Sapphire::Entity
         continue;
       }
 
-      auto item = player.dropInventoryItem( static_cast< Common::InventoryType >( containerId ), slotId );
+      auto item = getHousingItemFromPlayer( player, static_cast< Common::InventoryType >( containerId ), slotId );
       if( !item )
         return;
 
@@ -1386,24 +1384,24 @@ bool Sapphire::World::Manager::HousingMgr::removeInternalItem( Entity::Player& p
 {
   auto& containers = getEstateInventory( terri.getLandIdent() );
 
-  // validate the container id first
-  // we also need the idx of the container so we can get the slot offset
-  bool foundContainer = false;
-  uint8_t containerIdx = 0;
-  for( auto cId : m_internalPlacedItemContainers )
+  int8_t containerIdx = 0;
+
+  if( isPlacedItemsInventory( static_cast< Common::InventoryType >( containerId ) ) )
   {
-    if( containerId == cId )
+    for( auto cId : m_internalPlacedItemContainers )
     {
-      foundContainer = true;
+      if( containerId == cId )
+        break;
 
-      break;
+      containerIdx++;
     }
-
-    containerIdx++;
   }
+  else
+    containerIdx = -1;
 
-  if( !foundContainer )
-    return false;
+  // its possible to remove an item from any container in basically all these remove functions
+  // eg, remove a permit and reuse it elsewhere
+  // I'm not going to bother fixing it for now, but worth noting for future reference
 
   auto needle = containers.find( containerId );
   if( needle == containers.end() )
@@ -1457,8 +1455,11 @@ bool Sapphire::World::Manager::HousingMgr::removeInternalItem( Entity::Player& p
   }
 
   // despawn
-  auto arraySlot = ( containerIdx * 50 ) + slotId;
-  terri.removeHousingObject( arraySlot );
+  if( containerIdx != -1 )
+  {
+    auto arraySlot = ( containerIdx * 50 ) + slotId;
+    terri.removeHousingObject( arraySlot );
+  }
 
   return true;
 }
@@ -1614,4 +1615,14 @@ bool Sapphire::World::Manager::HousingMgr::hasPermission( Sapphire::Entity::Play
   // todo: check perms here
 
   return false;
+}
+
+Sapphire::Inventory::HousingItemPtr Sapphire::World::Manager::HousingMgr::getHousingItemFromPlayer(
+  Entity::Player& player, Common::InventoryType type, uint8_t slot )
+{
+  auto tmpItem = player.dropInventoryItem( type, slot );
+  if( !tmpItem )
+    return nullptr;
+
+  return Inventory::make_HousingItem( tmpItem->getUId(), tmpItem->getId(), framework() );
 }
