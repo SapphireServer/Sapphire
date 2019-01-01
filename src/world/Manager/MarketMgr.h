@@ -34,6 +34,7 @@ namespace Sapphire::World::Manager
       uint32_t catalogId;
       uint8_t itemSearchCategory;
       uint8_t maxEquipLevel;
+      uint16_t itemLevel;
       uint8_t classJob;
       std::string name;
     };
