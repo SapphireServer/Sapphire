@@ -54,7 +54,7 @@ Sapphire::Land::Land( uint16_t territoryTypeId, uint8_t wardNum, uint8_t landId,
 
 Sapphire::Land::~Land() = default;
 
-void Sapphire::Land::init( Common::LandType type, uint8_t size, uint8_t state, uint32_t currentPrice,
+void Sapphire::Land::init( Common::LandType type, Common::HouseSize size, Common::HouseStatus state, uint32_t currentPrice,
                            uint64_t ownerId, uint64_t houseId )
 {
   m_type = type;
@@ -84,12 +84,12 @@ uint32_t Sapphire::Land::getMaxPrice() const
 }
 
 //Primary State
-void Sapphire::Land::setSize( uint8_t size )
+void Sapphire::Land::setSize( Common::HouseSize size )
 {
   m_size = size;
 }
 
-void Sapphire::Land::setState( uint8_t state )
+void Sapphire::Land::setStatus( Common::HouseStatus state )
 {
   m_state = state;
 }
@@ -104,12 +104,12 @@ void Sapphire::Land::setLandType( Common::LandType type )
   m_type = type;
 }
 
-uint8_t Sapphire::Land::getSize() const
+Sapphire::Common::HouseSize Sapphire::Land::getSize() const
 {
   return m_size;
 }
 
-uint8_t Sapphire::Land::getState() const
+Sapphire::Common::HouseStatus Sapphire::Land::getStatus() const
 {
   return m_state;
 }
@@ -227,7 +227,7 @@ void Sapphire::Land::updateLandDb()
 
 void Sapphire::Land::update( uint32_t currTime )
 {
-  if( getState() == HouseState::forSale )
+  if( getStatus() == HouseStatus::ForSale )
   {
     if( m_nextDrop < currTime && m_minPrice < m_currentPrice )
     {

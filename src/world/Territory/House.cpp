@@ -19,7 +19,10 @@ Sapphire::House::House( uint32_t houseId, uint32_t landSetId, Common::LandIdent 
   m_estateName( estateName ),
   m_estateComment( estateComment ),
   m_pFw( pFw )
-{}
+{
+  m_interiorModelCache.fill( 0 );
+  m_exteriorModelCache.fill( std::make_pair( 0, 0 ) );
+}
 
 Sapphire::House::~House() = default;
 
@@ -57,7 +60,7 @@ uint32_t Sapphire::House::getId() const
   return m_houseId;
 }
 
-Sapphire::House::HouseModelsArray const& Sapphire::House::getHouseModels() const
+Sapphire::House::ExteriorModelsArray const& Sapphire::House::getHouseModels() const
 {
   return m_exteriorModelCache;
 }
@@ -96,12 +99,12 @@ Sapphire::House::HousePart Sapphire::House::getExteriorModel( Sapphire::Common::
   return m_exteriorModelCache[ slot ];
 }
 
-void Sapphire::House::setInteriorModel( Sapphire::Common::HousingInteriorSlot slot, uint32_t modelId )
+void Sapphire::House::setInteriorModel( Sapphire::Common::HouseInteriorSlot slot, uint32_t modelId )
 {
   m_interiorModelCache[ slot ] = modelId;
 }
 
-uint32_t Sapphire::House::getInteriorModel( Sapphire::Common::HousingInteriorSlot slot )
+uint32_t Sapphire::House::getInteriorModel( Sapphire::Common::HouseInteriorSlot slot )
 {
   return m_interiorModelCache[ slot ];
 }

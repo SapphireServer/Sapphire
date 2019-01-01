@@ -482,6 +482,9 @@ namespace Sapphire::Entity
     /*! sets the players instance & initiates zoning process */
     bool setInstance( ZonePtr instance );
 
+    /*! sets the players instance & initiates zoning process */
+    bool setInstance( Sapphire::ZonePtr instance, Sapphire::Common::FFXIVARR_POSITION3 pos );
+
     /*! returns the player to their position before zoning into an instance */
     bool exitInstance();
 
@@ -916,7 +919,7 @@ namespace Sapphire::Entity
 
     uint32_t getNextInventorySequence();
 
-    void send();
+    bool findFirstItemWithId( uint32_t catalogId, Inventory::InventoryContainerPair& location );
 
     uint8_t getFreeSlotsInBags();
 

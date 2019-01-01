@@ -240,6 +240,7 @@ enum ActorControlType : uint16_t
      */
     HousingItemMoveConfirm = 0x3F9,
     OpenEstateSettingsUI = 0x3FF,
+    HideAdditionalChambersDoor = 0x400,
 
     /*!
      * param1 = outdoor furnishings

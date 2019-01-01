@@ -933,3 +933,24 @@ void Sapphire::Entity::Player::insertInventoryItem( Sapphire::Common::InventoryT
   queuePacket( slotUpdate );
 
 }
+
+bool Sapphire::Entity::Player::findFirstItemWithId( uint32_t catalogId,
+                                                    Inventory::InventoryContainerPair& location )
+{
+  for( auto bagId : { Bag0, Bag1, Bag2, Bag3 } )
+  {
+    auto& container = m_storageMap[ bagId ];
+
+    for( const auto& item : container->getItemMap() )
+    {
+      if( item.second->getId() != catalogId )
+        continue;
+
+      location = std::make_pair( bagId, item.first );
+
+      return true;
+    }
+  }
+
+  return false;
+}
