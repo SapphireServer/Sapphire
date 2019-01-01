@@ -31,8 +31,8 @@ namespace Sapphire::World::Manager
       uint16_t m_landId;
 
       Common::LandType m_type;
-      uint8_t m_size;
-      uint8_t m_status;
+      Common::HouseSize m_size;
+      Common::HouseStatus m_status;
 
       uint64_t m_currentPrice;
 
@@ -184,6 +184,8 @@ namespace Sapphire::World::Manager
     bool hasPermission( Entity::Player& player, Land& land, uint32_t permission );
 
   private:
+
+    Inventory::HousingItemPtr getHousingItemFromPlayer( Entity::Player& player, Common::InventoryType type, uint8_t slot );
 
     ItemContainerPtr getFreeEstateInventorySlot( Common::LandIdent ident,
                                                  Inventory::InventoryContainerPair& pair,

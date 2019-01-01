@@ -220,7 +220,7 @@ void Sapphire::HousingZone::sendLandSet( Entity::Player& player )
     auto& landData = landsetInitializePacket->data().land[ count ];
 
     landData.plotSize = pLand->getSize();
-    landData.houseState = pLand->getState();
+    landData.houseState = pLand->getStatus();
     landData.iconAddIcon = pLand->getSharing();
     landData.fcId = pLand->getFcId();
     landData.fcIcon = pLand->getFcIcon();
@@ -256,7 +256,7 @@ void Sapphire::HousingZone::sendLandUpdate( uint8_t landId )
     auto& landData = landUpdatePacket->data().land;
 
     landData.plotSize = pLand->getSize();
-    landData.houseState = pLand->getState();
+    landData.houseState = pLand->getStatus();
     landData.iconAddIcon = pLand->getSharing();
     landData.fcId = pLand->getFcId();
     landData.fcIcon = pLand->getFcIcon();

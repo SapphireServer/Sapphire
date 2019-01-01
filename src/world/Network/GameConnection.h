@@ -176,6 +176,12 @@ namespace Sapphire::Network
 
     DECLARE_HANDLER( reqMoveHousingItem );
 
+    DECLARE_HANDLER( marketBoardSearch );
+
+    DECLARE_HANDLER( marketBoardRequestItemInfo );
+
+    DECLARE_HANDLER( marketBoardRequestItemListings );
+
   };
 
 }
