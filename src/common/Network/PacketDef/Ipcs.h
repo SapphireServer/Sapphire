@@ -266,8 +266,8 @@ namespace Sapphire::Network::Packets
 
     MarketBoardRequestItemInformation = 0x00FE, // updated 4.4
     MarketBoardRequestItemListings = 0x00FF, // updated 4.4
+    MarketBoardSearch = 0x0103, // updated 4.4
 
-    SearchMarketboard = 0x0103, // updated 4.4
     ReqExamineFcInfo = 0x010F, // updated 4.1
 
     FcInfoReqHandler = 0x011A, // updated 4.2

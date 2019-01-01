@@ -237,8 +237,9 @@ struct FFXIVIpcSetSharedEstateSettings :
 struct FFXIVIpcMarketBoardRequestItemListings :
   FFXIVIpcBasePacket< MarketBoardRequestItemListings >
 {
-  /* 0000 */ uint32_t itemCatalogId;
-  /* 0004 */ uint32_t padding;
+  /* 0000 */ uint16_t padding1;
+  /* 0002 */ uint16_t itemCatalogId;
+  /* 0004 */ uint32_t padding2;
 };
 
 struct FFXIVIpcReqPlaceHousingItem :
@@ -270,17 +271,24 @@ struct FFXIVIpcHousingUpdateObjectPosition :
   /* 001C */ uint32_t padding;
 };
 
-struct FFXIVIpcSearchMarketboard :
-  FFXIVIpcBasePacket< SearchMarketboard >
+struct FFXIVIpcMarketBoardSearch :
+  FFXIVIpcBasePacket< MarketBoardSearch >
 {
-  /* 0000 */ uint32_t unk;
-  /* 0004 */ uint8_t unk2[2];
+  /* 0000 */ uint32_t startIdx;
+  /* 0004 */ uint16_t requestId;
   /* 0006 */ uint8_t itemSearchCategory;
   /* 0007 */ uint8_t shouldCheckClassJobId; // wat? seems only 1 there at least...
   /* 0008 */ uint8_t maxEquipLevel;
   /* 0009 */ uint8_t classJobId;
   /* 000A */ char searchStr[40];
   /* 0032 */ uint16_t unk4[43];
+};
+
+struct FFXIVIpcMarketBoardRequestItemInformation :
+  FFXIVIpcBasePacket< MarketBoardRequestItemInformation >
+{
+  /* 0000 */ uint32_t catalogId;
+  /* 0000 */ uint32_t requestId;
 };
 
 }
