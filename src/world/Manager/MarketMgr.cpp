@@ -58,12 +58,37 @@ bool Sapphire::World::Manager::MarketMgr::init()
   return true;
 }
 
-void Sapphire::World::Manager::MarketMgr::requestItemListings( Sapphire::Entity::Player& player, uint32_t catalogId,
-                                                               uint32_t requestId )
+void Sapphire::World::Manager::MarketMgr::requestItemListingInfo( Sapphire::Entity::Player& player, uint32_t catalogId,
+                                                                  uint32_t requestId )
 {
   auto countPkt = makeZonePacket< Server::FFFXIVIpcMarketBoardItemListingCount >( player.getId() );
-  countPkt->data().quantity = 1;
+  countPkt->data().quantity = 1 << 8;
   countPkt->data().itemCatalogId = catalogId;
+  countPkt->data().requestId = requestId;
+
+  player.queuePacket( countPkt );
+
+  auto historyPkt = makeZonePacket< Server::FFXIVIpcMarketBoardItemListingHistory >( player.getId() );
+  historyPkt->data().itemCatalogId = catalogId;
+  historyPkt->data().itemCatalogId2 = catalogId;
+
+  memset( &historyPkt->data().listing, 0x0, sizeof( Server::FFXIVIpcMarketBoardItemListingHistory::MarketListing ) * 20 );
+
+  std::string name = "fix game";
+
+  for( int i = 0; i < 10; ++i )
+  {
+    auto& listing = historyPkt->data().listing[ i ];
+
+    listing.itemCatalogId = catalogId;
+    listing.quantity = i;
+    listing.purchaseTime = time( nullptr );
+    listing.salePrice = 500;
+
+    strcpy( listing.sellerName, name.c_str() );
+  }
+
+  player.queuePacket( historyPkt );
 }
 
 
@@ -103,6 +128,11 @@ void Sapphire::World::Manager::MarketMgr::searchMarketboard( Entity::Player& pla
     resultPkt->data().itemIndexEnd = startIdx + 20;
 
   player.queuePacket( resultPkt );
+}
+
+void Sapphire::World::Manager::MarketMgr::requestItemListings( Sapphire::Entity::Player& player, uint16_t catalogId )
+{
+  
 }
 
 void Sapphire::World::Manager::MarketMgr::findItems( const std::string_view& searchStr, uint8_t itemSearchCat,
