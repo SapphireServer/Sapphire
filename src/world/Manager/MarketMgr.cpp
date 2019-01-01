@@ -22,38 +22,41 @@ Sapphire::World::Manager::MarketMgr::MarketMgr( Sapphire::FrameworkPtr pFw ) :
 
 bool Sapphire::World::Manager::MarketMgr::init()
 {
-  Logger::info( "MarketMgr: warming up marketable item cache..." );
-
-  // build item cache
-  auto exdData = framework()->get< Sapphire::Data::ExdDataGenerated >();
-  auto idList = exdData->getItemIdList();
-
-  for( auto id : idList )
-  {
-    auto item = exdData->get< Sapphire::Data::Item >( id );
-    if( !item )
-      continue;
-
-    if( item->isUntradable )
-      continue;
-
-    MarketableItem cacheEntry {};
-    cacheEntry.catalogId = id;
-    cacheEntry.itemSearchCategory = item->itemSearchCategory;
-    cacheEntry.maxEquipLevel = item->levelEquip;
-    cacheEntry.name = item->name;
-    cacheEntry.classJob = item->classJobUse;
-    cacheEntry.itemLevel = item->levelItem;
-
-    m_marketItemCache.push_back( std::move( cacheEntry ) );
-  }
-
-  std::sort( m_marketItemCache.begin(), m_marketItemCache.end(), []( const MarketableItem& a, const MarketableItem& b )
-  {
-    return a.itemLevel > b.itemLevel;
-  } );
-
-  Logger::info( "MarketMgr: Cached " + std::to_string( m_marketItemCache.size() ) + " marketable items" );
+//  Logger::info( "MarketMgr: warming up marketable item cache..." );
+//
+//  // build item cache
+//  auto exdData = framework()->get< Sapphire::Data::ExdDataGenerated >();
+//  auto idList = exdData->getItemIdList();
+//
+//  for( auto id : idList )
+//  {
+//    if( id > 10000 )
+//      break;
+//
+//    auto item = exdData->get< Sapphire::Data::Item >( id );
+//    if( !item )
+//      continue;
+//
+//    if( item->isUntradable )
+//      continue;
+//
+//    MarketableItem cacheEntry {};
+//    cacheEntry.catalogId = id;
+//    cacheEntry.itemSearchCategory = item->itemSearchCategory;
+//    cacheEntry.maxEquipLevel = item->levelEquip;
+//    cacheEntry.name = item->name;
+//    cacheEntry.classJob = item->classJobUse;
+//    cacheEntry.itemLevel = item->levelItem;
+//
+//    m_marketItemCache.push_back( std::move( cacheEntry ) );
+//  }
+//
+//  std::sort( m_marketItemCache.begin(), m_marketItemCache.end(), []( const MarketableItem& a, const MarketableItem& b )
+//  {
+//    return a.itemLevel > b.itemLevel;
+//  } );
+//
+//  Logger::info( "MarketMgr: Cached " + std::to_string( m_marketItemCache.size() ) + " marketable items" );
 
   return true;
 }
@@ -72,20 +75,21 @@ void Sapphire::World::Manager::MarketMgr::requestItemListingInfo( Sapphire::Enti
   historyPkt->data().itemCatalogId = catalogId;
   historyPkt->data().itemCatalogId2 = catalogId;
 
-  memset( &historyPkt->data().listing, 0x0, sizeof( Server::FFXIVIpcMarketBoardItemListingHistory::MarketListing ) * 20 );
+  std::string name = "fix game pls se :(((";
 
-  std::string name = "fix game";
-
-  for( int i = 0; i < 10; ++i )
+  for( int i = 0; i < 10; i++ )
   {
     auto& listing = historyPkt->data().listing[ i ];
 
     listing.itemCatalogId = catalogId;
-    listing.quantity = i;
+    listing.quantity = i + 1;
     listing.purchaseTime = time( nullptr );
-    listing.salePrice = 500;
+    listing.salePrice = 69420420;
+    listing.isHq = 1;
+    listing.onMannequin = 1;
 
-    strcpy( listing.sellerName, name.c_str() );
+
+    strcpy( listing.buyerName, name.c_str() );
   }
 
   player.queuePacket( historyPkt );
@@ -119,7 +123,7 @@ void Sapphire::World::Manager::MarketMgr::searchMarketboard( Entity::Player& pla
 
     data.itemCatalogId = item.catalogId;
     data.quantity = item.quantity;
-    data.demand = 69;
+    data.demand = 420;
   }
 
   if( size < 20 )
@@ -132,7 +136,7 @@ void Sapphire::World::Manager::MarketMgr::searchMarketboard( Entity::Player& pla
 
 void Sapphire::World::Manager::MarketMgr::requestItemListings( Sapphire::Entity::Player& player, uint16_t catalogId )
 {
-  
+
 }
 
 void Sapphire::World::Manager::MarketMgr::findItems( const std::string_view& searchStr, uint8_t itemSearchCat,

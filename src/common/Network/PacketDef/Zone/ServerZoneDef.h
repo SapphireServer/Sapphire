@@ -1876,14 +1876,14 @@ struct FFXIVIpcMarketBoardItemListingHistory :
     struct MarketListing
     {
         uint32_t salePrice;
-        time_t purchaseTime;
+        uint32_t purchaseTime;
         uint32_t quantity;
-        uint16_t unknown1;
-        uint8_t unknown2;
+        uint8_t isHq;
+        uint8_t padding;
+        uint8_t onMannequin;
 
-        char sellerName[32];
+        char buyerName[33];
 
-        uint8_t unknown3;
         uint32_t itemCatalogId;
     } listing[20];
 };
