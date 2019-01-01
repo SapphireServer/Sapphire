@@ -459,6 +459,33 @@ bool Sapphire::Entity::Player::setInstance( ZonePtr instance )
   return true;
 }
 
+bool Sapphire::Entity::Player::setInstance( ZonePtr instance, Common::FFXIVARR_POSITION3 pos )
+{
+  if( !instance )
+    return false;
+
+  m_onEnterEventDone = false;
+
+  auto pTeriMgr = m_pFw->get< TerritoryMgr >();
+  auto currentZone = getCurrentZone();
+
+  m_prevPos = m_pos;
+  m_prevRot = m_rot;
+  m_prevTerritoryTypeId = currentZone->getTerritoryTypeId();
+  m_prevTerritoryId = getTerritoryId();
+
+  if( pTeriMgr->movePlayer( instance, getAsPlayer() ) )
+  {
+    m_pos = pos;
+
+    sendZonePackets();
+
+    return true;
+  }
+
+  return false;
+}
+
 bool Sapphire::Entity::Player::exitInstance()
 {
   auto pTeriMgr = m_pFw->get< TerritoryMgr >();

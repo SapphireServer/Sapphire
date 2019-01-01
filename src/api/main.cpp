@@ -734,7 +734,7 @@ void defaultGet( shared_ptr< HttpServer::Response > response, shared_ptr< HttpSe
 
 int main( int argc, char* argv[] )
 {
-  Logger::init( "log/SapphireAPI" );
+  Logger::init( "log/api" );
 
   Logger::info( "===========================================================" );
   Logger::info( "Sapphire API Server " );

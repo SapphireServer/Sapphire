@@ -31,8 +31,8 @@ namespace Sapphire::World::Manager
       uint16_t m_landId;
 
       Common::LandType m_type;
-      uint8_t m_size;
-      uint8_t m_status;
+      Common::HouseSize m_size;
+      Common::HouseStatus m_status;
 
       uint64_t m_currentPrice;
 
@@ -91,7 +91,7 @@ namespace Sapphire::World::Manager
 
     bool relinquishLand( Entity::Player& player, uint8_t plot );
 
-    void buildPresetEstate( Entity::Player& player, uint8_t plotNum, uint32_t presetItem );
+    void buildPresetEstate( Entity::Player& player, uint8_t plotNum, uint32_t presetCatalogId );
 
     void requestEstateRename( Entity::Player& player, const Common::LandIdent ident );
 
@@ -159,6 +159,8 @@ namespace Sapphire::World::Manager
     void reqPlaceHousingItem( Entity::Player& player, uint16_t landId, uint16_t containerId, uint16_t slotId,
                               Common::FFXIVARR_POSITION3 pos, float rotation );
 
+    void reqPlaceItemInStore( Entity::Player& player, uint16_t landId, uint16_t containerId, uint16_t slotId );
+
     /*!
      * @brief Returns the equivalent YardObject for a HousingItem
      * @param item The item to convert into a YardObject
@@ -179,7 +181,11 @@ namespace Sapphire::World::Manager
 
     void reqEstateInteriorRemodel( Entity::Player& player );
 
+    bool hasPermission( Entity::Player& player, Land& land, uint32_t permission );
+
   private:
+
+    Inventory::HousingItemPtr getHousingItemFromPlayer( Entity::Player& player, Common::InventoryType type, uint8_t slot );
 
     ItemContainerPtr getFreeEstateInventorySlot( Common::LandIdent ident,
                                                  Inventory::InventoryContainerPair& pair,

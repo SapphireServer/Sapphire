@@ -36,6 +36,7 @@
 
 #include "Manager/DebugCommandMgr.h"
 #include "Manager/EventMgr.h"
+#include "Manager/MarketMgr.h"
 
 #include "Action/Action.h"
 #include "Action/ActionTeleport.h"
@@ -731,8 +732,14 @@ void Sapphire::Network::GameConnection::reqPlaceHousingItem( FrameworkPtr pFw,
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcReqPlaceHousingItem >( inPacket );
   const auto& data = packet.data();
 
-  housingMgr->reqPlaceHousingItem( player, data.landId, data.sourceInvContainerId, data.sourceInvSlotId,
-                                   data.position, data.rotation );
+  if( data.shouldPlaceItem == 1 )
+  {
+    housingMgr->reqPlaceHousingItem( player, data.landId, data.sourceInvContainerId, data.sourceInvSlotId,
+                                     data.position, data.rotation );
+  }
+  else
+    housingMgr->reqPlaceItemInStore( player, data.landId, data.sourceInvContainerId, data.sourceInvSlotId );
+
 }
 
 void Sapphire::Network::GameConnection::reqMoveHousingItem( FrameworkPtr pFw,
@@ -746,4 +753,41 @@ void Sapphire::Network::GameConnection::reqMoveHousingItem( FrameworkPtr pFw,
 
   housingMgr->reqMoveHousingItem( player, data.ident, data.slot, data.pos, data.rotation );
 
+}
+
+void Sapphire::Network::GameConnection::marketBoardSearch( FrameworkPtr pFw,
+                                                           const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                           Entity::Player& player )
+{
+  auto marketMgr = pFw->get< MarketMgr >();
+
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcMarketBoardSearch >( inPacket );
+  const auto& data = packet.data();
+
+  std::string_view searchStr( data.searchStr );
+
+  marketMgr->searchMarketboard( player, data.itemSearchCategory, data.maxEquipLevel, data.classJobId, data.searchStr,
+                                data.requestId, data.startIdx );
+}
+
+void Sapphire::Network::GameConnection::marketBoardRequestItemInfo( FrameworkPtr pFw,
+                                                                    const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                                    Entity::Player& player )
+{
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcMarketBoardRequestItemListingInfo >( inPacket );
+
+  auto marketMgr = pFw->get< MarketMgr >();
+
+  marketMgr->requestItemListingInfo( player, packet.data().catalogId, packet.data().requestId );
+}
+
+void Sapphire::Network::GameConnection::marketBoardRequestItemListings( FrameworkPtr pFw,
+                                                                        const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                                        Entity::Player& player )
+{
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcMarketBoardRequestItemListings >( inPacket );
+
+  auto marketMgr = pFw->get< MarketMgr >();
+
+  marketMgr->requestItemListings( player, packet.data().itemCatalogId );
 }
