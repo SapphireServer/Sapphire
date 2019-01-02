@@ -10,13 +10,5 @@ add_executable( lobby ${SERVER_PUBLIC_INCLUDE_FILES} ${SERVER_SOURCE_FILES} )
 
 target_link_libraries( lobby 
                          PRIVATE
-		                   common
-                           mysql )
-if( UNIX )
-  target_link_libraries( lobby 
-                           PRIVATE
-			               stdc++fs )
-
-endif()
-
+                           common )
 #cotire( lobby )

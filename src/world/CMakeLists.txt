@@ -26,9 +26,7 @@ add_executable( world ${SERVER_SOURCE_FILES} )
 set_target_properties( world
                          PROPERTIES
                            ENABLE_EXPORTS ON
-                           WINDOWS_EXPORT_ALL_SYMBOLS ON
-)
-
+                           WINDOWS_EXPORT_ALL_SYMBOLS ON )
 
 target_link_libraries( world
                          PUBLIC
@@ -40,7 +38,4 @@ target_include_directories( world
 
 if( UNIX )
     cotire( world )
-    target_link_libraries( world PUBLIC stdc++fs )
-else()
-    target_link_libraries( world PUBLIC mysql )
 endif()
