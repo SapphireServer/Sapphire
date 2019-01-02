@@ -6,7 +6,6 @@ set( CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin )
 
 set( EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin )
 set( LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin )
-set( EXECUTABLE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin )
 
 set( CMAKE_MODULE_PATH
        ${CMAKE_MODULE_PATH}
@@ -29,23 +28,32 @@ configure_file( "${CMAKE_CURRENT_SOURCE_DIR}/src/common/Version.cpp.in"
                 "${CMAKE_CURRENT_SOURCE_DIR}/src/common/Version.cpp" @ONLY )
 
 ##############################
-#             Mysql          #
+#           Mysql            #
 ##############################
 find_package( MySQL )
 
-##########################################################################
+##############################
+#        Dependencies        #
+##############################
 add_subdirectory( "deps/zlib" )
 add_subdirectory( "deps/MySQL" )
 add_subdirectory( "deps/datReader" )
 add_subdirectory( "deps/mysqlConnector" )
 add_subdirectory( "src/common" )
 
+
+##############################
+#  Main Sapphire Components  #
+##############################
 add_subdirectory( "src/api" )
 add_subdirectory( "src/lobby" )
 add_subdirectory( "src/world" )
 add_subdirectory( "src/dbm" )
 add_subdirectory( "src/scripts" )
 
+##############################
+#           Tools            #
+##############################
 add_subdirectory( "src/tools/exd_common_gen" )
 add_subdirectory( "src/tools/exd_struct_gen" )
 add_subdirectory( "src/tools/exd_struct_test" )
