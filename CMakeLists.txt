@@ -65,11 +65,4 @@ add_subdirectory( "src/dbm" )
 ##############################
 #           Tools            #
 ##############################
-add_subdirectory( "src/tools/exd_common_gen" )
-add_subdirectory( "src/tools/exd_struct_gen" )
-add_subdirectory( "src/tools/exd_struct_test" )
-add_subdirectory( "src/tools/quest_parser" )
-add_subdirectory( "src/tools/discovery_parser" )
-add_subdirectory( "src/tools/mob_parse" )
-add_subdirectory( "src/tools/pcb_reader" )
-add_subdirectory( "src/tools/event_object_parser" )
+add_subdirectory( "src/tools" )
