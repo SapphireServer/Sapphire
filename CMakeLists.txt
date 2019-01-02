@@ -2,14 +2,18 @@ cmake_policy( SET CMP0014 NEW )
 cmake_minimum_required( VERSION 3.0.2 )
 project( Sapphire )
 
-set( CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin )
-
-set( EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin )
+#set( CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin )
+set( EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin )
 set( LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin )
 
 set( CMAKE_MODULE_PATH
        ${CMAKE_MODULE_PATH}
        ${CMAKE_SOURCE_DIR}/cmake )
+
+add_custom_target( copy_runtime_files ALL
+                     COMMAND cmake -E copy_directory ${CMAKE_SOURCE_DIR}/config ${CMAKE_BINARY_DIR}/bin/config 
+                     COMMAND cmake -E copy_directory ${CMAKE_SOURCE_DIR}/sql ${CMAKE_BINARY_DIR}/bin/sql 
+                     COMMAND cmake -E copy_directory ${CMAKE_SOURCE_DIR}/web ${CMAKE_BINARY_DIR}/bin/web )
 
 ######################################
 # Dependencies and compiler settings #
