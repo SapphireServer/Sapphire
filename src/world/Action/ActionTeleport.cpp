@@ -19,16 +19,14 @@ using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
 
-extern Sapphire::Framework g_fw;
-
 Sapphire::Action::ActionTeleport::ActionTeleport()
 {
   m_handleActionType = HandleActionType::Event;
 }
 
-Sapphire::Action::ActionTeleport::ActionTeleport( Entity::CharaPtr pActor, uint16_t targetZone, uint16_t cost )
+Sapphire::Action::ActionTeleport::ActionTeleport( Entity::CharaPtr pActor, uint16_t targetZone, uint16_t cost, FrameworkPtr pFw )
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = pFw->get< Data::ExdDataGenerated >();
   m_startTime = 0;
   m_id = 5;
   m_handleActionType = HandleActionType::Teleport;

@@ -16,12 +16,10 @@
 #include "Territory/Zone.h"
 #include "Inventory/Item.h"
 #include "Inventory/ItemContainer.h"
-#include "Inventory/ItemUtil.h"
+#include "Manager/ItemMgr.h"
 
 #include "ServerMgr.h"
 #include "Framework.h"
-
-extern Sapphire::Framework g_fw;
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -29,11 +27,10 @@ using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::World::Manager;
 
 // load player from the db
-bool Sapphire::Entity::Player::load( uint32_t charId, SessionPtr pSession )
+bool Sapphire::Entity::Player::load( uint32_t charId, World::SessionPtr pSession )
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  auto pTeriMgr = g_fw.get< TerritoryMgr >();
-  auto pLog = g_fw.get< Logger >();
+  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pTeriMgr = m_pFw->get< TerritoryMgr >();
 
   const std::string char_id_str = std::to_string( charId );
 
@@ -84,6 +81,17 @@ bool Sapphire::Entity::Player::load( uint32_t charId, SessionPtr pSession )
       pCurrZone = pTeriMgr->getZoneByTerritoryTypeId( zoneId );
     }
   }
+  else if( pTeriMgr->isInternalEstateTerritory( zoneId ) )
+  {
+    // todo: this needs to go to the area just outside of the plot door
+    pCurrZone = pTeriMgr->getZoneByLandSetId( m_prevTerritoryId );
+
+    zoneId = m_prevTerritoryTypeId;
+    m_pos.x = m_prevPos.x;
+    m_pos.y = m_prevPos.y;
+    m_pos.z = m_prevPos.z;
+    setRot( m_prevRot );
+  }
   else if( pTeriMgr->isHousingTerritory( zoneId ) )
   {
     pCurrZone = pTeriMgr->getZoneByLandSetId( m_territoryId );
@@ -99,8 +107,8 @@ bool Sapphire::Entity::Player::load( uint32_t charId, SessionPtr pSession )
   // see if a valid zone could be found for the character
   if( !pCurrZone )
   {
-    pLog->error( "[" + char_id_str + "] Zone " + std::to_string( zoneId ) + " not found!" );
-    pLog->error( "[" + char_id_str + "] Setting default zone instead" );
+    Logger::error( "[" + char_id_str + "] Zone " + std::to_string( zoneId ) + " not found!" );
+    Logger::error( "[" + char_id_str + "] Setting default zone instead" );
 
     // default to new gridania
     // TODO: should probably just abort and mark character as corrupt
@@ -198,7 +206,7 @@ bool Sapphire::Entity::Player::load( uint32_t charId, SessionPtr pSession )
   m_pCell = nullptr;
 
   if( !loadActiveQuests() || !loadClassData() || !loadSearchInfo() )
-    pLog->error( "Player id " + char_id_str + " data corrupt!" );
+    Logger::error( "Player id " + char_id_str + " data corrupt!" );
 
   m_maxHp = getMaxHp();
   m_maxMp = getMaxMp();
@@ -249,7 +257,7 @@ bool Sapphire::Entity::Player::load( uint32_t charId, SessionPtr pSession )
 
 bool Sapphire::Entity::Player::loadActiveQuests()
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto stmt = pDb->getPreparedStatement( Db::ZoneDbStatements::CHARA_SEL_QUEST );
 
   stmt->setUInt( 1, m_id );
@@ -285,7 +293,7 @@ bool Sapphire::Entity::Player::loadActiveQuests()
 
 bool Sapphire::Entity::Player::loadClassData()
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   // ClassIdx, Exp, Lvl
   auto stmt = pDb->getPreparedStatement( Db::ZoneDbStatements::CHARA_CLASS_SEL );
   stmt->setUInt( 1, m_id );
@@ -306,7 +314,7 @@ bool Sapphire::Entity::Player::loadClassData()
 
 bool Sapphire::Entity::Player::loadSearchInfo()
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto stmt = pDb->getPreparedStatement( Db::ZoneDbStatements::CHARA_SEL_SEARCHINFO );
   stmt->setUInt( 1, m_id );
   auto res = pDb->query( stmt );
@@ -328,7 +336,7 @@ bool Sapphire::Entity::Player::loadSearchInfo()
 
 void Sapphire::Entity::Player::updateSql()
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   /*"Hp 1, Mp 2, Tp 3, Gp 4, Mode 5, Mount 6, InvincibleGM 7, Voice 8, "
   "Customize 9, ModelMainWeapon 10, ModelSubWeapon 11, ModelSystemWeapon 12, "
   "ModelEquip 13, EmoteModeType 14, Language 15, IsNewGame 16, IsNewAdventurer 17, "
@@ -470,8 +478,8 @@ void Sapphire::Entity::Player::updateSql()
 
 void Sapphire::Entity::Player::updateDbClass() const
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   uint8_t classJobIndex = pExdData->get< Sapphire::Data::ClassJob >( static_cast<uint8_t>( getClass() ) )->expArrayIndex;
 
   //Exp = ?, Lvl = ? WHERE CharacterId = ? AND ClassIdx = ?
@@ -485,7 +493,7 @@ void Sapphire::Entity::Player::updateDbClass() const
 
 void Sapphire::Entity::Player::insertDbClass( const uint8_t classJobIndex ) const
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto stmtClass = pDb->getPreparedStatement( Db::CHARA_CLASS_INS );
   stmtClass->setInt( 1, getId() );
   stmtClass->setInt( 2, classJobIndex );
@@ -496,7 +504,7 @@ void Sapphire::Entity::Player::insertDbClass( const uint8_t classJobIndex ) cons
 
 void Sapphire::Entity::Player::updateDbSearchInfo() const
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto stmtS = pDb->getPreparedStatement( Db::CHARA_SEARCHINFO_UP_SELECTCLASS );
   stmtS->setInt( 1, m_searchSelectClass );
   stmtS->setInt( 2, m_id );
@@ -515,7 +523,7 @@ void Sapphire::Entity::Player::updateDbSearchInfo() const
 
 void Sapphire::Entity::Player::updateDbAllQuests() const
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   for( int32_t i = 0; i < 30; i++ )
   {
     if( !m_activeQuests[ i ] )
@@ -540,7 +548,7 @@ void Sapphire::Entity::Player::updateDbAllQuests() const
 
 void Sapphire::Entity::Player::deleteQuest( uint16_t questId ) const
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto stmt = pDb->getPreparedStatement( Db::CHARA_QUEST_DEL );
   stmt->setInt( 1, m_id );
   stmt->setInt( 2, questId );
@@ -549,7 +557,7 @@ void Sapphire::Entity::Player::deleteQuest( uint16_t questId ) const
 
 void Sapphire::Entity::Player::insertQuest( uint16_t questId, uint8_t index, uint8_t seq ) const
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto stmt = pDb->getPreparedStatement( Db::CHARA_QUEST_INS );
   stmt->setInt( 1, m_id );
   stmt->setInt( 2, index );
@@ -568,9 +576,10 @@ void Sapphire::Entity::Player::insertQuest( uint16_t questId, uint8_t index, uin
 
 Sapphire::ItemPtr Sapphire::Entity::Player::createItem( uint32_t catalogId, uint32_t quantity )
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
+  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto itemInfo = pExdData->get< Sapphire::Data::Item >( catalogId );
+  auto itemMgr = m_pFw->get< World::Manager::ItemMgr >();
 
   if( !itemInfo )
     return nullptr;
@@ -580,10 +589,7 @@ Sapphire::ItemPtr Sapphire::Entity::Player::createItem( uint32_t catalogId, uint
 
   uint8_t flags = 0;
 
-  ItemPtr pItem = make_Item( Items::Util::getNextUId(),
-                             catalogId,
-                             itemInfo->modelMain,
-                             itemInfo->modelSub );
+  ItemPtr pItem = make_Item( itemMgr->getNextUId(), catalogId, m_pFw );
 
   pItem->setStackSize( quantity );
 
@@ -599,7 +605,8 @@ Sapphire::ItemPtr Sapphire::Entity::Player::createItem( uint32_t catalogId, uint
 
 bool Sapphire::Entity::Player::loadInventory()
 {
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto itemMgr = m_pFw->get< World::Manager::ItemMgr >();
+  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   //////////////////////////////////////////////////////////////////////////////////////////////////////
   // load active gearset
   auto res = pDb->query( "SELECT storageId, container_0, container_1, container_2, container_3, "
@@ -620,7 +627,7 @@ bool Sapphire::Entity::Player::loadInventory()
       if( uItemId == 0 )
         continue;
 
-      ItemPtr pItem = Items::Util::loadItem( uItemId );
+      ItemPtr pItem = itemMgr->loadItem( uItemId );
 
       if( pItem == nullptr )
         continue;
@@ -653,7 +660,7 @@ bool Sapphire::Entity::Player::loadInventory()
       if( uItemId == 0 )
         continue;
 
-      ItemPtr pItem = Items::Util::loadItem( uItemId );
+      ItemPtr pItem = itemMgr->loadItem( uItemId );
 
       if( pItem == nullptr )
         continue;

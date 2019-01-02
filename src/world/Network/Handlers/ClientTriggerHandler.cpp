@@ -22,9 +22,8 @@
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 
-#include "DebugCommand/DebugCommandHandler.h"
-
-#include "Event/EventHelper.h"
+#include "Manager/DebugCommandMgr.h"
+#include "Manager/EventMgr.h"
 
 #include "Action/Action.h"
 #include "Action/ActionTeleport.h"
@@ -36,19 +35,17 @@
 #include "Framework.h"
 #include <Network/PacketDef/Lobby/ServerLobbyDef.h>
 
-extern Sapphire::Framework g_fw;
-
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
 using namespace Sapphire::World::Manager;
 
-void examineHandler( Sapphire::Entity::Player& player, uint32_t targetId )
+void examineHandler( Sapphire::FrameworkPtr pFw, Sapphire::Entity::Player& player, uint32_t targetId )
 {
   using namespace Sapphire;
 
-  auto pSession = g_fw.get< Sapphire::ServerMgr >()->getSession( targetId );
+  auto pSession = pFw->get< World::ServerMgr >()->getSession( targetId );
   if( pSession )
   {
     auto pTarget = pSession->getPlayer();
@@ -66,10 +63,10 @@ void examineHandler( Sapphire::Entity::Player& player, uint32_t targetId )
   }
 }
 
-void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                          Entity::Player& player )
+void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
+                                                              const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                              Entity::Player& player )
 {
-  auto pLog = g_fw.get< Logger >();
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcClientTrigger >( inPacket );
 
@@ -79,14 +76,15 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
   const auto param12 = packet.data().param12;
   const auto param2 = packet.data().param2;
   const auto param3 = packet.data().param3;
+  const auto param4 = packet.data().param4;
+  const auto param5 = packet.data().param5;
 
-  pLog->debug( "[" + std::to_string( m_pSession->getId() ) + "] Incoming action: " +
-               Util::intToHexString( static_cast< uint32_t >( commandId & 0xFFFF ), 4 ) +
-               "\nparam1: " + Util::intToHexString( static_cast< uint64_t >( param1 & 0xFFFFFFFFFFFFFFF ), 16 ) +
-               "\nparam2: " + Util::intToHexString( static_cast< uint32_t >( param2 & 0xFFFFFFFF ), 8 ) +
-               "\nparam3: " + Util::intToHexString( static_cast< uint64_t >( param3 & 0xFFFFFFFFFFFFFFF ), 16 )
+  Logger::debug( "[" + std::to_string( m_pSession->getId() ) + "] Incoming action: " +
+                 Util::intToHexString( static_cast< uint32_t >( commandId & 0xFFFF ), 4 ) +
+                 "\nparam1: " + Util::intToHexString( static_cast< uint64_t >( param1 & 0xFFFFFFFFFFFFFFF ), 16 ) +
+                 "\nparam2: " + Util::intToHexString( static_cast< uint32_t >( param2 & 0xFFFFFFFF ), 8 ) +
+                 "\nparam3: " + Util::intToHexString( static_cast< uint64_t >( param3 & 0xFFFFFFFFFFFFFFF ), 16 )
   );
-
 
   //g_log.Log(LoggingSeverity::debug, "[" + std::to_string(m_pSession->getId()) + "] " + pInPacket->toString());
 
@@ -147,7 +145,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
     case ClientTriggerType::Examine:
     {
       uint32_t targetId = param11;
-      examineHandler( player, targetId );
+      examineHandler( pFw, player, targetId );
       break;
     }
     case ClientTriggerType::MarkPlayer: // Mark player
@@ -192,7 +190,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
       uint32_t emoteId = param11;
       bool isSilent = param2 == 1;
 
-      auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+      auto pExdData = pFw->get< Data::ExdDataGenerated >();
       auto emoteData = pExdData->get< Data::Emote >( emoteId );
 
       if( !emoteData )
@@ -276,7 +274,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
     case ClientTriggerType::Teleport: // Teleport
     {
 
-      player.teleportQuery( param11 );
+      player.teleportQuery( param11, pFw );
       break;
     }
     case ClientTriggerType::DyeItem: // Dye item
@@ -325,7 +323,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
     }
     case ClientTriggerType::RequestLandSignFree:
     {
-      auto pHousingMgr = g_fw.get< HousingMgr >();
+      auto pHousingMgr = pFw->get< HousingMgr >();
 
       auto ident = pHousingMgr->clientTriggerParamsToLandIdent( param11, param12 );
       pHousingMgr->sendLandSignFree( player, ident );
@@ -334,7 +332,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
     }
     case ClientTriggerType::RequestLandSignOwned:
     {
-      auto pHousingMgr = g_fw.get< HousingMgr >();
+      auto pHousingMgr = pFw->get< HousingMgr >();
 
       auto ident = pHousingMgr->clientTriggerParamsToLandIdent( param11, param12, false );
       pHousingMgr->sendLandSignOwned( player, ident );
@@ -343,7 +341,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
     }
     case ClientTriggerType::RequestWardLandInfo:
     {
-      auto pHousingMgr = g_fw.get< HousingMgr >();
+      auto pHousingMgr = pFw->get< HousingMgr >();
       if( !pHousingMgr )
         break;
 
@@ -354,14 +352,14 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
     case ClientTriggerType::RequestLandRelinquish:
     {
       auto plot = static_cast< uint8_t >( param12 & 0xFF );
-      auto pHousingMgr = g_fw.get< HousingMgr >();
+      auto pHousingMgr = pFw->get< HousingMgr >();
       pHousingMgr->relinquishLand( player, plot );
 
       break;
     }
     case ClientTriggerType::RequestEstateRename:
     {
-      auto pHousingMgr = g_fw.get< HousingMgr >();
+      auto pHousingMgr = pFw->get< HousingMgr >();
       if( !pHousingMgr )
         break;
 
@@ -372,7 +370,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
     }
     case ClientTriggerType::RequestEstateEditGreeting:
     {
-      auto pHousingMgr = g_fw.get< HousingMgr >();
+      auto pHousingMgr = pFw->get< HousingMgr >();
       if( !pHousingMgr )
         break;
 
@@ -383,7 +381,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
     }
     case ClientTriggerType::RequestEstateEditGuestAccessSettings:
     {
-      auto pHousingMgr = g_fw.get< HousingMgr >();
+      auto pHousingMgr = pFw->get< HousingMgr >();
       if( !pHousingMgr )
         break;
 
@@ -412,7 +410,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
     }
     case ClientTriggerType::RequestEstateGreeting:
     {
-      auto housingMgr = g_fw.get< HousingMgr >();
+      auto housingMgr = pFw->get< HousingMgr >();
       if( !housingMgr )
         break;
 
@@ -425,38 +423,79 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
     {
       uint8_t plot = ( param12 & 0xFF );
 
-
-      auto housingMgr = g_fw.get< HousingMgr >();
+      auto housingMgr = pFw->get< HousingMgr >();
       if( !housingMgr )
         break;
 
-      uint16_t inventoryType = Common::InventoryType::HousingOutdoorPlacedItems;
+      uint16_t inventoryType = Common::InventoryType::HousingExteriorPlacedItems;
       if( param2 == 1 )
-        inventoryType = Common::InventoryType::HousingOutdoorStoreroom;
+        inventoryType = Common::InventoryType::HousingExteriorStoreroom;
 
-      housingMgr->sendHousingInventory( player, inventoryType, plot );
+      housingMgr->sendEstateInventory( player, inventoryType, plot );
 
       break;
     }
     case ClientTriggerType::RequestEstateInventory:
     {
-      // only sent if param1 is 1, because the client sends this with 0 when you open the ui for whatever reason
-      if( param1 != 1 )
-        return;
-
-      auto housingMgr = g_fw.get< HousingMgr >();
+      auto housingMgr = pFw->get< HousingMgr >();
       if( !housingMgr )
         break;
 
-      // housingMgr->sendHousingInventory( player, Common::InventoryType::HousingInd, 255 );
+      // param1 = 1 - storeroom
+      // param1 = 0 - placed items
 
+      if( param1 == 1 )
+        housingMgr->sendInternalEstateInventoryBatch( player, true );
+      else
+        housingMgr->sendInternalEstateInventoryBatch( player );
+
+      break;
+    }
+    case ClientTriggerType::RequestHousingItemRemove:
+    {
+      auto housingMgr = m_pFw->get< HousingMgr >();
+
+      auto slot = param4 & 0xFF;
+      auto sendToStoreroom = ( param4 >> 16 ) != 0;
+
+      //player, plot, containerId, slot, sendToStoreroom
+      housingMgr->reqRemoveHousingItem( player, param12, param2, slot, sendToStoreroom );
+
+      break;
+    }
+    case ClientTriggerType::RequestEstateExteriorRemodel:
+    {
+      auto housingMgr = m_pFw->get< HousingMgr >();
+
+      housingMgr->reqEstateExteriorRemodel( player, param11 );
+
+      break;
+    }
+    case ClientTriggerType::RequestEstateInteriorRemodel:
+    {
+      auto housingMgr = m_pFw->get< HousingMgr >();
+
+      housingMgr->reqEstateInteriorRemodel( player );
+
+      break;
+    }
+    case ClientTriggerType::UpdateEstateGuestAccess:
+    {
+      auto canTeleport = ( param2 & 0xFF ) == 1;
+      auto unk1 = ( param2 >> 8 & 0xFF ) == 1; // todo: related to fc? or unused?
+      auto privateEstateAccess = ( param2 >> 16 & 0xFF ) == 1;
+      auto unk = ( param2 >> 24 & 0xFF ) == 1; // todo: related to fc? or unused?
+
+      player.sendDebug( "can teleport: " + std::to_string( canTeleport ) + ", unk: " + std::to_string( unk1 ) +
+                        ", privateEstateAccess: " + std::to_string( privateEstateAccess ) +
+                        ", unk: " + std::to_string( unk ) );
       break;
     }
 
     default:
     {
-      pLog->debug( "[" + std::to_string( m_pSession->getId() ) + "] Unhandled action: " +
-                   Util::intToHexString( static_cast< uint32_t >( commandId & 0xFFFF ), 4 ) );
+      Logger::debug( "[" + std::to_string( m_pSession->getId() ) + "] Unhandled action: " +
+                     Util::intToHexString( static_cast< uint32_t >( commandId & 0xFFFF ), 4 ) );
       break;
     }
   }

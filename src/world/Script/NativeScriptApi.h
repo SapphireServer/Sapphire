@@ -52,7 +52,7 @@ namespace Sapphire::ScriptAPI
     /*!
     * @brief Sets the ptr to the framework for use inside scripts
     *
-    * @param fw The ptr to g_fw (Core::Framework)
+    * @param fw The ptr to a Framework
     */
     virtual void setFramework( Sapphire::Framework* fw );
 

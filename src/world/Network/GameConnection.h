@@ -9,7 +9,7 @@
 
 #include "ForwardsZone.h"
 
-#define DECLARE_HANDLER( x ) void x( const Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+#define DECLARE_HANDLER( x ) void x( FrameworkPtr pFw, const Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 
 namespace Sapphire::Network::Packets
 {
@@ -31,7 +31,8 @@ namespace Sapphire::Network
   {
 
   private:
-    typedef void ( GameConnection::* Handler )( const Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
+    typedef void ( GameConnection::* Handler )( FrameworkPtr pFw,
+                                                const Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                 Entity::Player& player );
 
     using HandlerMap = std::map< uint16_t, Handler >;
@@ -47,7 +48,7 @@ namespace Sapphire::Network
     HandlerMap m_chatHandlerMap;
     HandlerStrMap m_chatHandlerStrMap;
 
-    SessionPtr m_pSession;
+    World::SessionPtr m_pSession;
 
     LockedQueue< Sapphire::Network::Packets::FFXIVARR_PACKET_RAW > m_inQueue;
     LockedQueue< Packets::FFXIVPacketBasePtr > m_outQueue;
@@ -55,7 +56,7 @@ namespace Sapphire::Network
   public:
     ConnectionType m_conType;
 
-    GameConnection( HivePtr pHive, AcceptorPtr pAcceptor );
+    GameConnection( HivePtr pHive, AcceptorPtr pAcceptor, FrameworkPtr pFw );
 
     ~GameConnection();
 
@@ -170,6 +171,16 @@ namespace Sapphire::Network
     DECLARE_HANDLER( buildPresetHandler );
 
     DECLARE_HANDLER( tellHandler );
+
+    DECLARE_HANDLER( reqPlaceHousingItem );
+
+    DECLARE_HANDLER( reqMoveHousingItem );
+
+    DECLARE_HANDLER( marketBoardSearch );
+
+    DECLARE_HANDLER( marketBoardRequestItemInfo );
+
+    DECLARE_HANDLER( marketBoardRequestItemListings );
 
   };
 

@@ -24,9 +24,11 @@ using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 
 Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pHive,
-                                               Sapphire::Network::AcceptorPtr pAcceptor )
-  :
-  Connection( pHive ), m_pAcceptor( pAcceptor ), m_bEncryptionInitialized( false )
+                                                   Sapphire::Network::AcceptorPtr pAcceptor,
+                                                   FrameworkPtr pFw ) :
+  Connection( pHive, pFw ),
+  m_pAcceptor( pAcceptor ),
+  m_bEncryptionInitialized( false )
 {
 }
 
@@ -39,7 +41,7 @@ Sapphire::Network::GameConnection::~GameConnection()
 // overwrite the parents onConnect for our game socket needs
 void Sapphire::Network::GameConnection::OnAccept( const std::string& host, uint16_t port )
 {
-  auto connection = make_GameConnection( m_hive, m_pAcceptor );
+  auto connection = make_GameConnection( m_hive, m_pAcceptor, m_pFw );
   m_pAcceptor->Accept( connection );
 
   g_log.info( "Connect from " + m_socket.remote_endpoint().address().to_string() );
@@ -186,7 +188,7 @@ void Sapphire::Network::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet
     if( i == 3 )
     {
       charListPacket->data().entitledExpansion = 2;
-      charListPacket->data().maxCharOnWorld = 8;
+      charListPacket->data().maxCharOnWorld = 25;
       charListPacket->data().unknown8 = 8;
       charListPacket->data().veteranRank = 12;
       charListPacket->data().counter = ( i * 4 ) + 1;
@@ -473,7 +475,7 @@ void Sapphire::Network::GameConnection::generateEncryptionKey( uint32_t key, con
 }
 
 void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
-                                                   const std::vector< Sapphire::Network::Packets::FFXIVARR_PACKET_RAW >& packetData )
+                                                       const std::vector< Sapphire::Network::Packets::FFXIVARR_PACKET_RAW >& packetData )
 {
 
   for( auto inPacket : packetData )

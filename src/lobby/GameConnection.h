@@ -40,7 +40,7 @@ namespace Sapphire::Network
     LockedQueue< Packets::GamePacketPtr > m_outQueue;
 
   public:
-    GameConnection( HivePtr pHive, AcceptorPtr pAcceptor );
+    GameConnection( HivePtr pHive, AcceptorPtr pAcceptor, FrameworkPtr pFw );
 
     ~GameConnection();
 

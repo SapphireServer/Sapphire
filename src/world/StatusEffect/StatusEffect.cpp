@@ -13,19 +13,22 @@
 #include "StatusEffect.h"
 #include "Framework.h"
 
-extern Sapphire::Framework g_fw;
-
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 
 Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
-                                                uint32_t duration, uint32_t tickRate )
-  :
-  m_id( id ), m_sourceActor( sourceActor ), m_targetActor( targetActor ), m_duration( duration ), m_startTime( 0 ),
-  m_tickRate( tickRate ), m_lastTick( 0 )
+                                                    uint32_t duration, uint32_t tickRate, FrameworkPtr pFw ) :
+  m_id( id ),
+  m_sourceActor( sourceActor ),
+  m_targetActor( targetActor ),
+  m_duration( duration ),
+  m_startTime( 0 ),
+  m_tickRate( tickRate ),
+  m_lastTick( 0 ),
+  m_pFw( pFw )
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   auto entry = pExdData->get< Sapphire::Data::Status >( id );
   m_name = entry->name;
 
@@ -59,7 +62,7 @@ std::pair< uint8_t, uint32_t > Sapphire::StatusEffect::StatusEffect::getTickEffe
 
 void Sapphire::StatusEffect::StatusEffect::onTick()
 {
-  auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
+  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
   m_lastTick = Util::getTimeMs();
   pScriptMgr->onStatusTick( m_targetActor, *this );
 }
@@ -82,7 +85,7 @@ uint16_t Sapphire::StatusEffect::StatusEffect::getParam() const
 void Sapphire::StatusEffect::StatusEffect::applyStatus()
 {
   m_startTime = Util::getTimeMs();
-  auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
+  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
 
   // this is only right when an action is being used by the player
   // else you probably need to use an actorcontrol
@@ -107,7 +110,7 @@ void Sapphire::StatusEffect::StatusEffect::applyStatus()
 
 void Sapphire::StatusEffect::StatusEffect::removeStatus()
 {
-  auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
+  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
   pScriptMgr->onStatusTimeOut( m_targetActor, m_id );
 }
 

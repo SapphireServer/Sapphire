@@ -5,28 +5,30 @@
 #include "Framework.h"
 #include "Item.h"
 
-extern Sapphire::Framework g_fw;
-
-Sapphire::Item::Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, bool isHq ) :
+Sapphire::Item::Item( uint64_t uId, uint32_t catalogId, FrameworkPtr pFw, bool isHq ) :
   m_id( catalogId ),
   m_uId( uId ),
-  m_model1( model1 ),
-  m_model2( model2 ),
   m_isHq( isHq ),
   m_stain( 0 ),
-  m_durability( 30000 )
+  m_durability( 30000 ),
+  m_spiritBond( 0 ),
+  m_reservedFlag( 0 ),
+  m_pFw( pFw )
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   auto itemInfo = pExdData->get< Sapphire::Data::Item >( catalogId );
 
   m_delayMs = itemInfo->delayms;
   m_physicalDmg = itemInfo->damagePhys;
   m_magicalDmg = itemInfo->damageMag;
+  m_model1 = itemInfo->modelMain;
+  m_model2 = itemInfo->modelSub;
   m_weaponDmg = ( m_physicalDmg != 0 ) ? m_physicalDmg : m_magicalDmg;
   m_autoAttackDmg = static_cast< float >( m_weaponDmg * m_delayMs ) / 3000;
   m_category = static_cast< Common::ItemUICategory >( itemInfo->itemUICategory );
   m_itemLevel = itemInfo->levelItem;
   m_maxStackSize = itemInfo->stackSize;
+  m_additionalData = itemInfo->additionalData;
 }
 
 float Sapphire::Item::getAutoAttackDmg() const
@@ -153,4 +155,29 @@ uint16_t Sapphire::Item::getStain() const
 void Sapphire::Item::setStain( uint16_t stain )
 {
   m_stain = stain;
+}
+
+uint32_t Sapphire::Item::getAdditionalData() const
+{
+  return m_additionalData;
+}
+
+uint16_t Sapphire::Item::getSpiritbond() const
+{
+  return m_spiritBond;
+}
+
+void Sapphire::Item::setSpiritbond( uint16_t spiritbond )
+{
+  m_spiritBond = spiritbond;
+}
+
+uint32_t Sapphire::Item::getReservedFlag() const
+{
+  return m_reservedFlag;
+}
+
+void Sapphire::Item::setReservedFlag( uint32_t flag )
+{
+  m_reservedFlag = flag;
 }

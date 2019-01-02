@@ -25,7 +25,8 @@ public:
                    uint32_t guId,
                    const std::string& internalName,
                    const std::string& contentName,
-                   uint32_t instanceContentId );
+                   uint32_t instanceContentId,
+                   FrameworkPtr pFw );
 
   virtual ~InstanceContent();
 

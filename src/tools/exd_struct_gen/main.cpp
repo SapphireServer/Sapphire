@@ -19,9 +19,8 @@
 #include <regex>
 #include <algorithm>
 
+using namespace Sapphire;
 
-
-Sapphire::Logger g_log;
 Sapphire::Data::ExdDataGenerated g_exdData;
 bool skipUnmapped = true;
 
@@ -324,10 +323,10 @@ std::string generateConstructorsDecl( const std::string& exd )
 
 int main( int argc, char** argv )
 {
-  g_log.init();
+  Logger::init( "struct_gen" );
   if( argc > 1 )
   {
-    g_log.info( "using dat path: " + std::string( argv[ 1 ] ) );
+    Logger::info( "using dat path: " + std::string( argv[ 1 ] ) );
     datLocation = std::string( argv[ 1 ] );
   }
 
@@ -357,14 +356,14 @@ int main( int argc, char** argv )
   auto json = nlohmann::json();
   exJson >> json;
 
-  g_log.info( "Setting up EXD data" );
+  Logger::info( "Setting up EXD data" );
   if( !g_exdData.init( datLocation ) )
   {
-    g_log.fatal( "Error setting up EXD data " );
+    Logger::fatal( "Error setting up EXD data " );
     return 0;
   }
-  g_log.info( "Generating structs, this may take several minutes..." );
-  g_log.info( "Go grab a coffee..." );
+  Logger::info( "Generating structs, this may take several minutes..." );
+  Logger::info( "Go grab a coffee..." );
 
   std::string structDefs;
   std::string idListsDecl;

@@ -16,7 +16,7 @@ namespace Sapphire::Action
 
     ~ActionCast();
 
-    ActionCast( Entity::CharaPtr pActor, Entity::CharaPtr pTarget, uint16_t actionId );
+    ActionCast( Entity::CharaPtr pActor, Entity::CharaPtr pTarget, uint16_t actionId, FrameworkPtr pFw );
 
     void onStart() override;
 

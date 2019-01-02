@@ -172,8 +172,8 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
 
   /// ITEM GLOBAL
   prepareStatement( CHARA_ITEMGLOBAL_INS,
-                    "INSERT INTO charaglobalitem ( CharacterId, ItemId, catalogId, UPDATE_DATE ) VALUES ( ?, ?, ?, NOW() );",
-                    CONNECTION_BOTH );
+                    "INSERT INTO charaglobalitem ( CharacterId, ItemId, catalogId, stack, UPDATE_DATE ) VALUES ( ?, ?, ?, ?, NOW() );",
+                    CONNECTION_SYNC );
 
   /// BNPC TEMPLATES
   prepareStatement( ZONE_SEL_BNPCTEMPLATES,
@@ -193,15 +193,21 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
 
   /// HOUSING
   prepareStatement( HOUSING_HOUSE_INS,
-                    "INSERT INTO house ( LandSetId, HouseId ) VALUES ( ?, ? );",
+                    "INSERT INTO house ( LandSetId, HouseId, HouseName ) VALUES ( ?, ?, ? );",
                     CONNECTION_BOTH );
 
   prepareStatement( HOUSING_HOUSE_UP,
-                    "UPDATE house SET BuildTime = ?, Aetheryte = ?, Comment = ?, HouseName = ?, Endorsements = ?, HousePartModels = ?, HousePartColours = ?, HouseInteriorModels = ? WHERE HouseId = ?;",
+                    "UPDATE house SET BuildTime = ?, Aetheryte = ?, Comment = ?, HouseName = ?, Endorsements = ? WHERE HouseId = ?;",
                     CONNECTION_BOTH );
 
   prepareStatement( LAND_INV_SEL_ALL,
-                    "SELECT LandIdent, ContainerId, ItemId, SlotId FROM houseiteminventory;",
+                    "SELECT houseiteminventory.*, charaglobalitem.catalogId, charaglobalitem.stain, charaglobalitem.CharacterId, "
+                    "landplaceditems.PosX, landplaceditems.PosY, landplaceditems.PosZ, landplaceditems.Rotation "
+                    "FROM houseiteminventory "
+                    "LEFT JOIN charaglobalitem "
+                    "ON houseiteminventory.ItemId = charaglobalitem.itemId "
+                    "LEFT JOIN landplaceditems "
+                    "ON houseiteminventory.ItemId = landplaceditems.ItemId;",
                     CONNECTION_BOTH );
 
   prepareStatement( LAND_INV_SEL_HOUSE,
@@ -211,6 +217,35 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
   prepareStatement( LANDSET_SEL,
                     "SELECT * FROM land WHERE LandSetId = ?;",
                     CONNECTION_SYNC );
+
+  prepareStatement( LAND_SEL_ALL,
+                    "SELECT land.*, house.Welcome, house.Aetheryte, house.Comment, house.HouseName, house.BuildTime, house.Endorsements "
+                    "FROM land "
+                    "LEFT JOIN house "
+                    "ON land.HouseId = house.HouseId;",
+                    CONNECTION_SYNC );
+
+  prepareStatement( LAND_INV_UP,
+                    "INSERT INTO houseiteminventory ( LandIdent, ContainerId, SlotId, ItemId ) "
+                    "VALUES ( ?, ?, ?, ? ) "
+                    "ON DUPLICATE KEY UPDATE ItemId = ?;",
+                    CONNECTION_BOTH );
+
+  prepareStatement( LAND_INV_DEL,
+                    "DELETE FROM houseiteminventory "
+                    "WHERE LandIdent = ? AND ContainerId = ? AND SlotId = ?;",
+                    CONNECTION_BOTH );
+
+  prepareStatement( LAND_INV_UP_ITEMPOS,
+                    "INSERT INTO landplaceditems ( ItemId, PosX, PosY, PosZ, Rotation ) "
+                    "VALUES ( ?, ?, ?, ?, ? ) "
+                    "ON DUPLICATE KEY UPDATE PosX = ?, PosY = ?, PosZ = ?, Rotation = ?;",
+                    CONNECTION_BOTH );
+
+  prepareStatement( LAND_INV_DEL_ITEMPOS,
+                    "DELETE FROM landplaceditems "
+                    "WHERE ItemId = ?;",
+                    CONNECTION_BOTH );
 
   /*prepareStatement( LAND_INS,
                     "INSERT INTO land ( LandSetId ) VALUES ( ? );",

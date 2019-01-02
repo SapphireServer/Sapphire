@@ -5,6 +5,7 @@
 #include <Common.h>
 #include <set>
 #include <unordered_map>
+#include <array>
 
 namespace Sapphire
 {
@@ -12,16 +13,18 @@ namespace Sapphire
   class House
   {
   public:
-    House( uint32_t houseId, uint32_t landSetId, Common::LandIdent ident );
+    House( uint32_t houseId, uint32_t landSetId, Common::LandIdent ident, const std::string& estateName,
+           const std::string& estateComment, FrameworkPtr pFw );
     virtual ~House();
 
-    using HousePart = std::pair< uint32_t, uint8_t >;
-    using HousePartsArray = std::array< HousePart, 8 >;
+    using HousePart = std::pair< uint32_t, uint16_t >;
+    using ExteriorModelsArray = std::array< HousePart, 8 >;
+    using InteriorModelsArray = std::array< uint32_t, 10 >;
 
     //gerneral
     uint32_t getLandSetId() const;
     Common::LandIdent getLandIdent() const;
-    uint32_t getHouseId() const;
+    uint32_t getId() const;
 
     const std::string& getHouseName() const;
     void setHouseName( const std::string& name );
@@ -30,16 +33,18 @@ namespace Sapphire
     void setHouseGreeting( const std::string& greeting );
 
     //functions
-    void setHousePart( Common::HousePartSlot slot, uint32_t id );
-    void setHousePartColor( Common::HousePartSlot slot, uint32_t id );
-    void setHouseInteriorPart( Common::HousingInteriorSlot slot, uint32_t id );
-    uint32_t getHousePart( Common::HousePartSlot slot ) const;
-    uint8_t getHousePartColor( Common::HousePartSlot slot ) const;
-    uint32_t getHouseInteriorPart( Common::HousingInteriorSlot slot ) const;
+    void setExteriorModel( Common::HouseExteriorSlot slot, uint32_t modelId, uint16_t stain );
+    HousePart getExteriorModel( Common::HouseExteriorSlot slot );
 
-    HousePartsArray const& getHouseParts() const;
+    void setInteriorModel( Common::HouseInteriorSlot slot, uint32_t modelId );
+    uint32_t getInteriorModel( Common::HouseInteriorSlot slot );
+
+    ExteriorModelsArray const& getHouseModels() const;
 
     void updateHouseDb();
+
+    void setHasAetheryte( bool hasAetheryte );
+    bool getHasAetheryte() const;
 
   private:
     uint32_t m_landSetId;
@@ -47,12 +52,14 @@ namespace Sapphire
     uint32_t m_houseId;
 
     uint64_t m_buildTime;
+    bool m_hasAetheryte;
 
-    HousePartsArray m_houseParts;
-    uint32_t m_houseInteriorParts[10];
+    ExteriorModelsArray m_exteriorModelCache;
+    InteriorModelsArray m_interiorModelCache;
 
-    std::string m_estateMessage;
-    std::string m_houseName;
+    std::string m_estateComment;
+    std::string m_estateName;
+    FrameworkPtr m_pFw;
   };
 
 }
