@@ -8,9 +8,3 @@ file( GLOB SERVER_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}*.c*" )
 add_executable( api ${SERVER_PUBLIC_INCLUDE_FILES} ${SERVER_SOURCE_FILES} )
 
 target_link_libraries( api common )
-if( UNIX )
-    target_link_libraries( api mysqlclient stdc++fs )
-
-else()
-    target_link_libraries( api mysql )
-endif()
