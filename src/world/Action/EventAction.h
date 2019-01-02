@@ -18,7 +18,7 @@ namespace Sapphire::Action
     ~EventAction();
 
     EventAction( Entity::CharaPtr pActor, uint32_t eventId, uint16_t action,
-                 ActionCallback finishRef, ActionCallback interruptRef, uint64_t additional );
+                 ActionCallback finishRef, ActionCallback interruptRef, uint64_t additional, FrameworkPtr pFw );
 
     void onStart() override;
 

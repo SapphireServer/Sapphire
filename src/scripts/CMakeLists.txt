@@ -3,13 +3,12 @@ project(Script)
 
 file(GLOB SCRIPT_INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 
-message("exec: ${EXECUTABLE_OUTPUT_DIRECTORY}")
+message("exec: ${EXECUTABLE_OUTPUT_PATH}")
 
-set(SCRIPT_LIB_DIR "${EXECUTABLE_OUTPUT_DIRECTORY}/compiledscripts/" )
+set(SCRIPT_LIB_DIR "${EXECUTABLE_OUTPUT_PATH}/compiledscripts/" )
 set(EXECUTABLE_OUTPUT_PATH "${SCRIPT_LIB_DIR}")
 set(LIBRARY_OUTPUT_PATH "${SCRIPT_LIB_DIR}")
 set(RUNTIME_OUTPUT_DIRECTORY "${SCRIPT_LIB_DIR}")
-
 
 file(GLOB children "${CMAKE_CURRENT_SOURCE_DIR}/*" )
 foreach(_scriptDir ${children})
@@ -40,9 +39,6 @@ foreach(_scriptDir ${children})
 
         if(MSVC)
             set_target_properties( "script_${_name}" PROPERTIES
-                CXX_STANDARD 17
-                CXX_STANDARD_REQUIRED ON
-                CXX_EXTENSIONS ON
                 LIBRARY_OUTPUT_DIRECTORY_DEBUG "${SCRIPT_LIB_DIR}"
                 LIBRARY_OUTPUT_DIRECTORY_RELEASE "${SCRIPT_LIB_DIR}"
                 LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO "${SCRIPT_LIB_DIR}"

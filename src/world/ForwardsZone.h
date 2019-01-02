@@ -25,14 +25,26 @@ TYPE_FORWARD( House );
 TYPE_FORWARD( InstanceContent );
 TYPE_FORWARD( Item );
 TYPE_FORWARD( ItemContainer );
-TYPE_FORWARD( Session );
 TYPE_FORWARD( ZonePosition );
-TYPE_FORWARD( Land )
-TYPE_FORWARD( Linkshell )
+TYPE_FORWARD( Land );
+TYPE_FORWARD( Linkshell );
+TYPE_FORWARD( Framework );
+
+namespace World
+{
+TYPE_FORWARD( Session );
+}
 
 namespace World::Territory::Housing
 {
 TYPE_FORWARD( HousingInteriorTerritory );
+}
+
+namespace Inventory
+{
+using InventoryContainerPair = std::pair< Common::InventoryType, uint8_t >;
+using InventoryTypeList = std::vector< Common::InventoryType >;
+TYPE_FORWARD( HousingItem );
 }
 
 namespace World::Manager
@@ -54,6 +66,8 @@ TYPE_FORWARD( Player );
 TYPE_FORWARD( EventObject );
 TYPE_FORWARD( BNpcTemplate );
 TYPE_FORWARD( BNpc );
+TYPE_FORWARD( SpawnPoint );
+TYPE_FORWARD( SpawnGroup );
 }
 
 namespace Event

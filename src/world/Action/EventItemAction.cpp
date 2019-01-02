@@ -14,8 +14,6 @@
 #include "EventItemAction.h"
 #include "Framework.h"
 
-extern Sapphire::Framework g_fw;
-
 using namespace Sapphire::Common;
 using namespace Sapphire::Network;
 using namespace Sapphire::Network::Packets;
@@ -83,8 +81,7 @@ void Sapphire::Action::EventItemAction::onFinish()
   }
   catch( std::exception& e )
   {
-    auto pLog = g_fw.get< Logger >();
-    pLog->error( e.what() );
+    Logger::error( e.what() );
   }
 
 }
@@ -112,8 +109,7 @@ void Sapphire::Action::EventItemAction::onInterrupt()
   }
   catch( std::exception& e )
   {
-    auto pLog = g_fw.get< Logger >();
-    pLog->error( e.what() );
+    Logger::error( e.what() );
   }
 
 }

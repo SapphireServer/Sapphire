@@ -11,8 +11,6 @@
 #include "EventAction.h"
 #include "Framework.h"
 
-extern Sapphire::Framework g_fw;
-
 using namespace Sapphire::Common;
 using namespace Sapphire::Network;
 using namespace Sapphire::Network::Packets;
@@ -25,14 +23,15 @@ Sapphire::Action::EventAction::EventAction()
 }
 
 Sapphire::Action::EventAction::EventAction( Entity::CharaPtr pActor, uint32_t eventId, uint16_t action,
-                                        ActionCallback finishRef, ActionCallback interruptRef, uint64_t additional )
+                                            ActionCallback finishRef, ActionCallback interruptRef, uint64_t additional,
+                                            FrameworkPtr pFw )
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
-
   m_additional = additional;
   m_handleActionType = HandleActionType::Event;
   m_eventId = eventId;
   m_id = action;
+  m_pFw = pFw;
+  auto pExdData = pFw->get< Data::ExdDataGenerated >();
   m_castTime = pExdData->get< Sapphire::Data::EventAction >( action )->castTime * 1000; // TODO: Add security checks.
   m_onActionFinishClb = finishRef;
   m_onActionInterruptClb = interruptRef;
@@ -95,8 +94,7 @@ void Sapphire::Action::EventAction::onFinish()
   }
   catch( std::exception& e )
   {
-    auto pLog = g_fw.get< Logger >();
-    pLog->error( e.what() );
+    Logger::error( e.what() );
   }
 
 }
@@ -134,8 +132,7 @@ void Sapphire::Action::EventAction::onInterrupt()
   }
   catch( std::exception& e )
   {
-    auto pLog = g_fw.get< Logger >();
-    pLog->error( e.what() );
+    Logger::error( e.what() );
   }
 
 }

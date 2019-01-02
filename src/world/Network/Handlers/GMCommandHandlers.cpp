@@ -32,8 +32,6 @@
 #include "ServerMgr.h"
 #include "Framework.h"
 
-extern Sapphire::Framework g_fw;
-
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
@@ -88,7 +86,9 @@ enum GmCommand
   JumpNpc = 0x025F,
 };
 
-void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
+                                                    const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                    Entity::Player& player )
 {
   if( player.getGmRank() <= 0 )
     return;
@@ -101,11 +101,10 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
   const auto param4 = packet.data().param4;
   const auto target = packet.data().target;
 
-  auto pLog = g_fw.get< Logger >();
-  pLog->debug( player.getName() + " used GM1 commandId: " + std::to_string( commandId ) +
-               ", params: " + std::to_string( param1 ) + ", " +
-               std::to_string( param2 ) + ", " + std::to_string( param3 ) + ", " + std::to_string( param4 ) +
-               ", target: " + std::to_string( target ) );
+  Logger::debug( player.getName() + " used GM1 commandId: " + std::to_string( commandId ) +
+                 ", params: " + std::to_string( param1 ) + ", " +
+                 std::to_string( param2 ) + ", " + std::to_string( param3 ) + ", " + std::to_string( param4 ) +
+                 ", target: " + std::to_string( target ) );
 
   Sapphire::Entity::ActorPtr targetActor;
 
@@ -426,7 +425,7 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
     }
     case GmCommand::Teri:
     {
-      auto pTeriMgr = g_fw.get< TerritoryMgr >();
+      auto pTeriMgr = pFw->get< TerritoryMgr >();
       if( auto instance = pTeriMgr->getInstanceZonePtr( param1 ) )
       {
         player.sendDebug( "Found instance: " + instance->getName() + ", id: " + std::to_string( param1 ) );
@@ -467,7 +466,7 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
         bool doTeleport = false;
         uint16_t teleport;
 
-        auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+        auto pExdData = pFw->get< Data::ExdDataGenerated >();
         auto idList = pExdData->getAetheryteIdList();
 
         for( auto i : idList )
@@ -546,13 +545,14 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
 
 }
 
-void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
+                                                    const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                    Entity::Player& player )
 {
   if( player.getGmRank() <= 0 )
     return;
 
-  auto pLog = g_fw.get< Logger >();
-  auto pServerZone = g_fw.get< ServerMgr >();
+  auto pServerZone = pFw->get< World::ServerMgr >();
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcGmCommand2 >( inPacket );
 
@@ -563,10 +563,10 @@ void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACK
   const auto param4 = packet.data().param4;
   const auto target = std::string( packet.data().target );
 
-  pLog->debug( player.getName() + " used GM2 commandId: " + std::to_string( commandId ) +
-               ", params: " + std::to_string( param1 ) + ", " +
-               std::to_string( param2 ) + ", " + std::to_string( param3 ) + ", " + std::to_string( param4 ) +
-               ", target: " + target );
+  Logger::debug( player.getName() + " used GM2 commandId: " + std::to_string( commandId ) +
+                 ", params: " + std::to_string( param1 ) + ", " +
+                 std::to_string( param2 ) + ", " + std::to_string( param3 ) + ", " + std::to_string( param4 ) +
+                 ", target: " + target );
 
   auto targetSession = pServerZone->getSession( target );
   Sapphire::Entity::CharaPtr targetActor;

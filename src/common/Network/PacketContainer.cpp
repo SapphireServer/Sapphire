@@ -24,7 +24,7 @@ void Sapphire::Network::Packets::PacketContainer::addPacket( Sapphire::Network::
 {
   m_entryList.push_back( entry );
 
-  m_ipcHdr.size += entry->getSize();
+  m_ipcHdr.size += static_cast< uint32_t >( entry->getSize() );
   m_ipcHdr.count++;
 }
 

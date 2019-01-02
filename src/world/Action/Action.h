@@ -62,6 +62,8 @@ namespace Sapphire::Action
 
     bool m_bInterrupt;
 
+    FrameworkPtr m_pFw;
+
   };
 }
 

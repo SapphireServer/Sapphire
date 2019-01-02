@@ -23,27 +23,19 @@ file( GLOB SERVER_SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 
 add_executable( world ${SERVER_SOURCE_FILES} )
 
-set_target_properties( world PROPERTIES
-        CXX_STANDARD 17
-        CXX_STANDARD_REQUIRED ON
-        CXX_EXTENSIONS ON
-        ENABLE_EXPORTS ON
-        WINDOWS_EXPORT_ALL_SYMBOLS ON
-        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_SOURCE_DIR}/../../bin/"
-        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/../../bin/"
-        RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_CURRENT_SOURCE_DIR}/../../bin/"
-        RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_CURRENT_SOURCE_DIR}/../../bin/"
-        VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../../bin/"
-)
+set_target_properties( world
+                         PROPERTIES
+                           ENABLE_EXPORTS ON
+                           WINDOWS_EXPORT_ALL_SYMBOLS ON )
 
-
-target_link_libraries( world PUBLIC common )
-target_include_directories( world PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" )
+target_link_libraries( world
+                         PUBLIC
+                           common )
+target_include_directories( world
+                              PUBLIC
+                                "${CMAKE_CURRENT_SOURCE_DIR}" )
 
 
 if( UNIX )
     cotire( world )
-    target_link_libraries( world PUBLIC stdc++fs )
-else()
-    target_link_libraries( world PUBLIC mysql )
 endif()

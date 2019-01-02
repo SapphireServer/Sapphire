@@ -8,6 +8,8 @@ namespace Sapphire
 
   class ConfigMgr;
   using ConfigMgrPtr = std::shared_ptr< ConfigMgr >;
+  class Framework;
+  using FrameworkPtr = std::shared_ptr< Framework >;
 
   namespace Network
   {

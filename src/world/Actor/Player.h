@@ -39,7 +39,7 @@ namespace Sapphire::Entity
   {
   public:
     /*! Contructor */
-    Player();
+    Player( FrameworkPtr pFw );
 
     /*! Destructor */
     ~Player();
@@ -365,6 +365,10 @@ namespace Sapphire::Entity
 
     Common::GearModelSlot equipSlotToModelSlot( Common::GearSetSlot slot );
 
+    bool getFreeInventoryContainerSlot( Inventory::InventoryContainerPair& containerPair ) const;
+
+    void insertInventoryItem( Common::InventoryType type, uint16_t slot, const Sapphire::ItemPtr item );
+
     /*!
     * Collect real item handins from container
     * @param itemIds a vector of each catalog id to collect
@@ -478,6 +482,9 @@ namespace Sapphire::Entity
     /*! sets the players instance & initiates zoning process */
     bool setInstance( ZonePtr instance );
 
+    /*! sets the players instance & initiates zoning process */
+    bool setInstance( Sapphire::ZonePtr instance, Sapphire::Common::FFXIVARR_POSITION3 pos );
+
     /*! returns the player to their position before zoning into an instance */
     bool exitInstance();
 
@@ -523,7 +530,7 @@ namespace Sapphire::Entity
     void teleport( uint16_t aetheryteId, uint8_t type = 1 );
 
     /*! query teleport of a specified type */
-    void teleportQuery( uint16_t aetheryteId );
+    void teleportQuery( uint16_t aetheryteId, FrameworkPtr pFw );
 
     /*! prepares zoning / fades out the screen */
     void prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadoutTime = 0, uint16_t animation = 0 );
@@ -682,7 +689,7 @@ namespace Sapphire::Entity
     void updateSql();
 
     /*! load player from db, by id */
-    bool load( uint32_t charId, SessionPtr pSession );
+    bool load( uint32_t charId, World::SessionPtr pSession );
 
     /*! load active class data */
     bool loadClassData();
@@ -912,12 +919,14 @@ namespace Sapphire::Entity
 
     uint32_t getNextInventorySequence();
 
-    void send();
+    bool findFirstItemWithId( uint32_t catalogId, Inventory::InventoryContainerPair& location );
 
     uint8_t getFreeSlotsInBags();
 
     void setActiveLand( uint8_t land, uint8_t ward );
     Common::ActiveLand getActiveLand() const;
+
+    Sapphire::ItemPtr dropInventoryItem( Common::InventoryType type, uint16_t slotId );
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////

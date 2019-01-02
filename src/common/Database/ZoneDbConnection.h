@@ -80,6 +80,7 @@ namespace Sapphire::Db
 
     LAND_INS,
     LAND_SEL,
+    LAND_SEL_ALL,
     LAND_UP,
     LANDSET_SEL,
     HOUSING_HOUSE_INS,
@@ -90,6 +91,8 @@ namespace Sapphire::Db
     LAND_INV_SEL_HOUSE,
     LAND_INV_DEL,
     LAND_INV_UP,
+    LAND_INV_UP_ITEMPOS,
+    LAND_INV_DEL_ITEMPOS,
 
 
     MAX_STATEMENTS

@@ -16,10 +16,9 @@
 
 #include <fstream>
 
-
-Sapphire::Logger g_log;
 Sapphire::Data::ExdDataGenerated g_exdData;
 
+using namespace Sapphire;
 
 //const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
 const std::string datLocation(
@@ -91,13 +90,13 @@ std::string generateEnum( const std::string& exd, int8_t nameIndex, const std::s
 int main()
 {
 
-  g_log.init();
+  Logger::init( "commongen" );
 
 
-  g_log.info( "Setting up EXD data" );
+  Logger::info( "Setting up EXD data" );
   if( !g_exdData.init( datLocation ) )
   {
-    g_log.fatal( "Error setting up EXD data " );
+    Logger::fatal( "Error setting up EXD data " );
     return 1;
   }
 
@@ -130,6 +129,6 @@ int main()
   result += generateEnum( "HousingAppeal", 0, "uint8_t" );
   result += "}\n";
   result += "}\n#endif\n";
-  g_log.info( result );
+  Logger::info( result );
   return 0;
 }
