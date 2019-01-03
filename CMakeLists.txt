@@ -2,18 +2,6 @@ cmake_policy( SET CMP0014 NEW )
 cmake_minimum_required( VERSION 3.0.2 )
 project( Sapphire )
 
-#set( CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin )
-set( EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin )
-set( LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin )
-set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} )
-
-if( WIN32 )
-  set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_BINARY_DIR}/bin/" )
-  set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_BINARY_DIR}/bin/" )
-  set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_CURRENT_BINARY_DIR}/bin/" )
-  set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_CURRENT_BINARY_DIR}/bin/" )
-  set( VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin/" )
-endif()
 
 set( CMAKE_MODULE_PATH
        ${CMAKE_MODULE_PATH}
@@ -28,6 +16,7 @@ add_custom_target( copy_runtime_files ALL
 ######################################
 # Dependencies and compiler settings #
 ######################################
+include( "cmake/paths.cmake" )
 include( "cmake/mysql.cmake" )
 include( "cmake/compiler.cmake" )
 include( "cmake/cotire.cmake" )
