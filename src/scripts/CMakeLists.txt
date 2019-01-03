@@ -10,6 +10,13 @@ set(EXECUTABLE_OUTPUT_PATH "${SCRIPT_LIB_DIR}")
 set(LIBRARY_OUTPUT_PATH "${SCRIPT_LIB_DIR}")
 set(RUNTIME_OUTPUT_DIRECTORY "${SCRIPT_LIB_DIR}")
 
+if( WIN32 )
+    set( LIBRARY_OUTPUT_DIRECTORY_DEBUG "${SCRIPT_LIB_DIR}" )
+    set( LIBRARY_OUTPUT_DIRECTORY_RELEASE "${SCRIPT_LIB_DIR}" )
+    set( LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO "${SCRIPT_LIB_DIR}" )
+    set( LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL "${SCRIPT_LIB_DIR}" )
+endif()
+
 file(GLOB children "${CMAKE_CURRENT_SOURCE_DIR}/*" )
 foreach(_scriptDir ${children})
     get_filename_component(_name "${_scriptDir}" NAME_WE)
@@ -34,18 +41,14 @@ foreach(_scriptDir ${children})
             endif()
         endforeach()
 
-        add_library("script_${_name}" MODULE ${SCRIPT_BUILD_FILES} "${SCRIPT_INCLUDE_FILES}" "${_scriptDir}/ScriptLoader.cpp")
+        add_library( "script_${_name}"
+                       MODULE 
+                         ${SCRIPT_BUILD_FILES} 
+                         "${SCRIPT_INCLUDE_FILES}"
+                         "${_scriptDir}/ScriptLoader.cpp" )
+
         target_link_libraries( "script_${_name}" world )
 
-        if(MSVC)
-            set_target_properties( "script_${_name}" PROPERTIES
-                LIBRARY_OUTPUT_DIRECTORY_DEBUG "${SCRIPT_LIB_DIR}"
-                LIBRARY_OUTPUT_DIRECTORY_RELEASE "${SCRIPT_LIB_DIR}"
-                LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO "${SCRIPT_LIB_DIR}"
-                LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL "${SCRIPT_LIB_DIR}"
-            )
-        endif()
-        target_include_directories("script_${_name}" PUBLIC "${CMAKE_SOURCE_DIR}/src/world/")
         target_include_directories("script_${_name}" PUBLIC "${CMAKE_SOURCE_DIR}/src/scripts")
         target_include_directories("script_${_name}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
         target_include_directories("script_${_name}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/Scripts")
