@@ -7,6 +7,9 @@ set( CMAKE_MODULE_PATH
        ${CMAKE_MODULE_PATH}
        ${CMAKE_SOURCE_DIR}/cmake )
 
+#####################################
+# Copy needed files to build-folder #
+#####################################
 add_custom_target( copy_runtime_files ALL
                      COMMAND cmake -E copy_directory ${CMAKE_SOURCE_DIR}/config ${CMAKE_BINARY_DIR}/bin/config 
                      COMMAND cmake -E copy_directory ${CMAKE_SOURCE_DIR}/sql ${CMAKE_BINARY_DIR}/bin/sql 
