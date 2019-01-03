@@ -189,6 +189,12 @@ if( WIN32 )
       "$ENV{MYSQL_ROOT}/lib"
     DOC "Specify the location of the mysql library here."
   )
+
+  STRING( REGEX REPLACE "(.lib)$" ".dll" MYSQL_DLL ${MYSQL_LIBRARY} )
+
+  file(COPY ${MYSQL_DLL}
+            DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/bin/" )
+
 endif( WIN32 )
 
 # On Windows you typically don't need to include any extra libraries

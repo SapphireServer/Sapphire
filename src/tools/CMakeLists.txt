@@ -2,7 +2,6 @@ cmake_policy( SET CMP0014 NEW )
 cmake_minimum_required( VERSION 3.0.2 )
 project( Sapphire )
 
-#set( CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin )
 set( EXECUTABLE_OUTPUT_PATH ${EXECUTABLE_OUTPUT_PATH}/tools )
 set( LIBRARY_OUTPUT_PATH ${LIBRARY_OUTPUT_PATH}/tools )
 
