@@ -22,7 +22,8 @@ set( CMAKE_MODULE_PATH
 add_custom_target( copy_runtime_files ALL
                      COMMAND cmake -E copy_directory ${CMAKE_SOURCE_DIR}/config ${CMAKE_BINARY_DIR}/bin/config 
                      COMMAND cmake -E copy_directory ${CMAKE_SOURCE_DIR}/sql ${CMAKE_BINARY_DIR}/bin/sql 
-                     COMMAND cmake -E copy_directory ${CMAKE_SOURCE_DIR}/web ${CMAKE_BINARY_DIR}/bin/web )
+                     COMMAND cmake -E copy_directory ${CMAKE_SOURCE_DIR}/web ${CMAKE_BINARY_DIR}/bin/web 
+                     COMMAND cmake -E copy ${CMAKE_SOURCE_DIR}/sql_import.sh ${CMAKE_BINARY_DIR}/bin/sql_import.sh )
 
 ######################################
 # Dependencies and compiler settings #
