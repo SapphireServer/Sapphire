@@ -164,12 +164,12 @@ bool Sapphire::World::Manager::TerritoryMgr::createDefaultTerritories()
     uint32_t guid = getNextInstanceId();
 
     Logger::info( "{0}\t{1}\t{2}\t{3:<10}\t{4}\t{5}",
-      territoryTypeId,
-      guid,
-      territoryInfo->territoryIntendedUse,
-      territoryInfo->name,
-      ( isPrivateTerritory( territoryTypeId ) ? "PRIVATE" : "PUBLIC" ),
-      pPlaceName->name );
+                  territoryTypeId,
+                  guid,
+                  territoryInfo->territoryIntendedUse,
+                  territoryInfo->name,
+                  ( isPrivateTerritory( territoryTypeId ) ? "PRIVATE" : "PUBLIC" ),
+                  pPlaceName->name );
 
     auto pZone = make_Zone( territoryTypeId, guid, territoryInfo->name, pPlaceName->name, framework() );
     pZone->init();
