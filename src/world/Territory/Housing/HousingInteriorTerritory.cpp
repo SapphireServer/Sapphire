@@ -54,9 +54,9 @@ bool Sapphire::World::Territory::Housing::HousingInteriorTerritory::init()
 void Sapphire::World::Territory::Housing::HousingInteriorTerritory::onPlayerZoneIn( Entity::Player& player )
 {
   auto pHousingMgr = m_pFw->get< HousingMgr >();
-  Logger::debug(
-    "HousingInteriorTerritory::onPlayerZoneIn: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryTypeId() ) +
-    ", Entity#" + std::to_string( player.getId() ) );
+
+  Logger::debug( "HousingInteriorTerritory::onPlayerZoneIn: Zone#{0}|{1}, Entity#{2}",
+                  getGuId(), getTerritoryTypeId(), player.getId() );
 
   auto indoorInitPacket = makeZonePacket< Server::FFXIVIpcHousingIndoorInitialize >( player.getId() );
   indoorInitPacket->data().u1 = 0;

@@ -72,9 +72,8 @@ Sapphire::Data::ExdDataGenerated::InstanceContentPtr Sapphire::InstanceContent::
 
 void Sapphire::InstanceContent::onPlayerZoneIn( Entity::Player& player )
 {
-  Logger::debug( "InstanceContent::onPlayerZoneIn: Zone#" + std::to_string( getGuId() ) + "|"
-                 + std::to_string( getInstanceContentId() ) +
-                 +", Entity#" + std::to_string( player.getId() ) );
+  Logger::debug( "InstanceContent::onPlayerZoneIn: Zone#{0}|{1}, Entity#{2}",
+                 getGuId(), getTerritoryTypeId(), player.getId() );
 
   // mark player as "bound by duty"
   player.setStateFlag( PlayerStateFlag::BoundByDuty );
@@ -88,9 +87,8 @@ void Sapphire::InstanceContent::onPlayerZoneIn( Entity::Player& player )
 
 void Sapphire::InstanceContent::onLeaveTerritory( Entity::Player& player )
 {
-  Logger::debug( "InstanceContent::onLeaveTerritory: Zone#" + std::to_string( getGuId() ) + "|"
-                 + std::to_string( getInstanceContentId() ) +
-                 +", Entity#" + std::to_string( player.getId() ) );
+  Logger::debug( "InstanceContent::onLeaveTerritory: Zone#{0}|{1}, Entity#{2}",
+                 getGuId(), getTerritoryTypeId(), player.getId() );
   sendDirectorClear( player );
 
   player.setDirectorInitialized( false );

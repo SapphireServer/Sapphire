@@ -121,7 +121,7 @@ bool Sapphire::HousingZone::init()
   auto landSetCache = landCache.find( m_landSetId );
   if( landSetCache == landCache.end() )
   {
-    Logger::fatal( "LandSet " + std::to_string( m_landSetId ) + " is missing from the land cache." );
+    Logger::fatal( "LandSet {0} is missing from the land cache.", m_landSetId );
     return false;
   }
 
@@ -157,9 +157,8 @@ Sapphire::HousingZone::~HousingZone() = default;
 
 void Sapphire::HousingZone::onPlayerZoneIn( Entity::Player& player )
 {
-  Logger::debug(
-    "HousingZone::onPlayerZoneIn: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryTypeId() ) +
-    ", Entity#" + std::to_string( player.getId() ) );
+  Logger::debug( "HousingZone::onPlayerZoneIn: Zone#{0}|{1}, Entity#{2}",
+                 getGuId(), getTerritoryTypeId(), player.getId() );
 
   auto isInSubdivision = isPlayerSubInstance( player ) ? true : false;
 

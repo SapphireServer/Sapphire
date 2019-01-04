@@ -159,8 +159,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
   if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
     params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-  Logger::debug( "[" + std::to_string( player.getId() ) + "] " +
-               "subCommand " + subCommand + " params: " + params );
+  Logger::debug( "[{0}] subCommand: {1} params: {1}", player.getId(), subCommand, params );
 
   if( ( ( subCommand == "pos" ) || ( subCommand == "posr" ) ) && ( params != "" ) )
   {
@@ -533,9 +532,7 @@ void Sapphire::World::Manager::DebugCommandMgr::get( char* data, Entity::Player&
   if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
     params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-  Logger::debug( "[" + std::to_string( player.getId() ) + "] " +
-                 "subCommand " + subCommand + " params: " + params );
-
+  Logger::debug( "[{0}] subCommand: {1} params: {2}", player.getId(), subCommand, params );
 
   if( ( subCommand == "pos" ) )
   {
@@ -708,8 +705,7 @@ void Sapphire::World::Manager::DebugCommandMgr::script( char* data, Entity::Play
   if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
     params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-  Logger::debug( "[" + std::to_string( player.getId() ) + "] " +
-                 "subCommand " + subCommand + " params: " + params );
+  Logger::debug( "[{0}] subCommand: {1} params: {2}", player.getId(), subCommand, params );
 
   if( subCommand == "unload" )
   {

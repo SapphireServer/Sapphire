@@ -180,11 +180,11 @@ int main( int32_t argc, char* argv[] )
   }
   else
   {
-    Logger::fatal( "Not a valid mode: " + mode + " !" );
+    Logger::fatal( "Not a valid mode: {0} !", mode );
     return 1;
   }
 
-  Logger::info( "Launching in " + mode + " mode..." );
+  Logger::info( "Launching in {0} mode...", mode );
 
   if( !dbm.connect() )
   {
