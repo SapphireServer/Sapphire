@@ -3,18 +3,20 @@
 #include <Util/Util.h>
 
 #include "Framework.h"
-#include "EventHelper.h"
-#include "EventHandler.h"
-
-
-extern Sapphire::Framework g_fw;
-
+#include "EventMgr.h"
+#include "Event/EventHandler.h"
 
 using namespace Sapphire::Common;
 
-std::string Sapphire::Event::getEventName( uint32_t eventId )
+Sapphire::World::Manager::EventMgr::EventMgr( Sapphire::FrameworkPtr pFw ) :
+  BaseManager( pFw )
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+
+}
+
+std::string Sapphire::World::Manager::EventMgr::getEventName( uint32_t eventId )
+{
+  auto pExdData = framework()->get< Data::ExdDataGenerated >();
   uint16_t eventType = eventId >> 16;
 
   auto unknown = std::string{ "unknown" };
@@ -95,9 +97,9 @@ std::string Sapphire::Event::getEventName( uint32_t eventId )
   }
 }
 
-uint32_t Sapphire::Event::mapEventActorToRealActor( uint32_t eventActorId )
+uint32_t Sapphire::World::Manager::EventMgr::mapEventActorToRealActor( uint32_t eventActorId )
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = framework()->get< Data::ExdDataGenerated >();
   auto levelInfo = pExdData->get< Sapphire::Data::Level >( eventActorId );
   if( levelInfo )
     return levelInfo->object;

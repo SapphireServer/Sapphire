@@ -169,7 +169,7 @@ namespace Sapphire::Network::Packets
 
       // Set the values of static fields.
       // The size must be the sum of the segment header and the content
-      m_segHdr.size = sizeof( FFXIVARR_PACKET_SEGMENT_HEADER ) + getContentSize();
+      m_segHdr.size = static_cast< uint32_t >( sizeof( FFXIVARR_PACKET_SEGMENT_HEADER ) + getContentSize() );
       m_segHdr.type = getSegmentType();
     }
 

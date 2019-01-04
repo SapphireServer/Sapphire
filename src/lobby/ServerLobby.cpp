@@ -10,7 +10,7 @@
 #include <Logging/Logger.h>
 #include <Config/ConfigMgr.h>
 
-//#include "LobbySession.h"
+#include "Framework.h"
 
 #include "ServerLobby.h"
 
@@ -21,124 +21,122 @@
 
 #include <thread>
 
-Sapphire::Logger g_log;
 Sapphire::Network::RestConnector g_restConnector;
 
-namespace Sapphire {
-
-
-ServerLobby::ServerLobby( const std::string& configPath ) :
-  m_configPath( configPath ),
-  m_numConnections( 0 )
+namespace Sapphire
 {
-  m_pConfig = std::shared_ptr< ConfigMgr >( new ConfigMgr );
-}
 
-ServerLobby::~ServerLobby( void )
-{
-}
 
-LobbySessionPtr ServerLobby::getSession( char* sessionId )
-{
-  return g_restConnector.getSession( sessionId );
-}
-
-ConfigMgrPtr ServerLobby::getConfig() const
-{
-  return m_pConfig;
-}
-
-void ServerLobby::run( int32_t argc, char* argv[] )
-{
-  g_log.setLogPath( "log/SapphireLobby" );
-  g_log.init();
-
-  g_log.info( "===========================================================" );
-  g_log.info( "Sapphire Server Project " );
-  g_log.info( "Version: " + Version::VERSION );
-  g_log.info( "Git Hash: " + Version::GIT_HASH );
-  g_log.info( "Compiled: " __DATE__ " " __TIME__ );
-  g_log.info( "===========================================================" );
-
-  if( !loadSettings( argc, argv ) )
+  ServerLobby::ServerLobby( const std::string& configPath ) :
+    m_configPath( configPath ),
+    m_numConnections( 0 )
   {
-    g_log.fatal( "Error loading settings! " );
-    return;
+    m_pConfig = std::make_shared< ConfigMgr >();
   }
 
-  Network::HivePtr hive( new Network::Hive() );
-  Network::addServerToHive< Network::GameConnection >( m_ip, m_port, hive );
+  ServerLobby::~ServerLobby( void ) = default;
 
-  g_log.info(
-    "Lobby server running on " + m_pConfig->getValue< std::string >( "LobbyNetwork", "ListenIp", "0.0.0.0" ) + ":" +
-    m_pConfig->getValue< std::string >( "LobbyNetwork", "ListenPort", "80" ) );
-
-  std::vector< std::thread > threadGroup;
-
-  threadGroup.emplace_back( std::bind( &Network::Hive::Run, hive.get() ) );
-
-  for( auto& thread : threadGroup )
-    if( thread.joinable() )
-      thread.join();
-
-}
-
-bool ServerLobby::loadSettings( int32_t argc, char* argv[] )
-{
-  g_log.info( "Loading config " + m_configPath );
-
-  if( !m_pConfig->loadConfig( m_configPath ) )
+  LobbySessionPtr ServerLobby::getSession( char* sessionId )
   {
-    g_log.fatal( "Error loading config " + m_configPath );
-    g_log.fatal( "If this is the first time starting the server, we've copied the default one for your editing pleasure." );
-    return false;
+    return g_restConnector.getSession( sessionId );
   }
-  std::vector< std::string > args( argv + 1, argv + argc );
-  for( size_t i = 0; i + 1 < args.size(); i += 2 )
-  {
-    std::string arg( "" );
-    std::string val( "" );
 
-    try
+  ConfigMgrPtr ServerLobby::getConfig() const
+  {
+    return m_pConfig;
+  }
+
+  void ServerLobby::run( int32_t argc, char* argv[] )
+  {
+    Logger::init( "log/lobby" );
+
+    Logger::info( "===========================================================" );
+    Logger::info( "Sapphire Server Project " );
+    Logger::info( "Version: " + Version::VERSION );
+    Logger::info( "Git Hash: " + Version::GIT_HASH );
+    Logger::info( "Compiled: " __DATE__ " " __TIME__ );
+    Logger::info( "===========================================================" );
+
+    if( !loadSettings( argc, argv ) )
     {
-      std::transform( arg.begin(), arg.end(), arg.begin(), [](unsigned char c){ return std::tolower( c ); } );
-      val = std::string( args[ i + 1 ] );
+      Logger::fatal( "Error loading settings! " );
+      return;
+    }
 
-      // trim '-' from start of arg
-      arg = arg.erase( 0, arg.find_first_not_of( '-' ) );
+    auto pFw = std::make_shared< Framework >();
+    Network::HivePtr hive( new Network::Hive() );
+    Network::addServerToHive< Network::GameConnection >( m_ip, m_port, hive, pFw );
 
-      if( arg == "ip" )
+    Logger::info(
+      "Lobby server running on " + m_pConfig->getValue< std::string >( "LobbyNetwork", "ListenIp", "0.0.0.0" ) + ":" +
+      m_pConfig->getValue< std::string >( "LobbyNetwork", "ListenPort", "80" ) );
+
+    std::vector< std::thread > threadGroup;
+
+    threadGroup.emplace_back( std::bind( &Network::Hive::Run, hive.get() ) );
+
+    for( auto& thread : threadGroup )
+      if( thread.joinable() )
+        thread.join();
+
+  }
+
+  bool ServerLobby::loadSettings( int32_t argc, char* argv[] )
+  {
+    Logger::info( "Loading config {0}", m_configPath );
+
+    if( !m_pConfig->loadConfig( m_configPath ) )
+    {
+      Logger::fatal( "Error loading config {0}", m_configPath );
+      Logger::fatal( "If this is the first time starting the server, we've copied the default one for your editing pleasure." );
+      return false;
+    }
+    std::vector< std::string > args( argv + 1, argv + argc );
+    for( size_t i = 0; i + 1 < args.size(); i += 2 )
+    {
+      std::string arg( "" );
+      std::string val( "" );
+
+      try
       {
-        // todo: ip addr in config
-        m_pConfig->setValue< std::string >( "LobbyNetwork.ListenIp", val );
+        std::transform( arg.begin(), arg.end(), arg.begin(), [](unsigned char c){ return std::tolower( c ); } );
+        val = std::string( args[ i + 1 ] );
+
+        // trim '-' from start of arg
+        arg = arg.erase( 0, arg.find_first_not_of( '-' ) );
+
+        if( arg == "ip" )
+        {
+          // todo: ip addr in config
+          m_pConfig->setValue< std::string >( "LobbyNetwork.ListenIp", val );
+        }
+        else if( arg == "p" || arg == "port" )
+        {
+          m_pConfig->setValue< std::string >( "LobbyNetwork.LobbyPort", val );
+        }
+        else if( arg == "worldip" || arg == "worldip" )
+        {
+          m_pConfig->setValue< std::string >( "GlobalNetwork.ZoneHost", val );
+        }
+        else if( arg == "worldport" )
+        {
+          m_pConfig->setValue< std::string >( "GlobalNetwork.ZonePort", val );
+        }
       }
-      else if( arg == "p" || arg == "port" )
+      catch( ... )
       {
-        m_pConfig->setValue< std::string >( "LobbyNetwork.LobbyPort", val );
-      }
-      else if( arg == "worldip" || arg == "worldip" )
-      {
-        m_pConfig->setValue< std::string >( "GlobalNetwork.ZoneHost", val );
-      }
-      else if( arg == "worldport" )
-      {
-        m_pConfig->setValue< std::string >( "GlobalNetwork.ZonePort", val );
+        Logger::error( "Error parsing argument: {0} value: {1}\n", arg, val );
+        Logger::error( "Usage: <arg> <val> \n" );
       }
     }
-    catch( ... )
-    {
-      g_log.error( "Error parsing argument: " + arg + " " + "value: " + val + "\n" );
-      g_log.error( "Usage: <arg> <val> \n" );
-    }
+
+    m_port = m_pConfig->getValue< uint16_t >( "LobbyNetwork", "ListenPort", 54994 );
+    m_ip = m_pConfig->getValue< std::string >( "LobbyNetwork", "ListenIp", "0.0.0.0" );
+
+    g_restConnector.restHost = m_pConfig->getValue< std::string >( "GlobalNetwork", "RestHost" ) + ":" +
+                               m_pConfig->getValue< std::string >( "GlobalNetwork", "RestPort" );
+    g_restConnector.serverSecret = m_pConfig->getValue< std::string >( "GlobalParameters", "ServerSecret" );
+
+    return true;
   }
-
-  m_port = m_pConfig->getValue< uint16_t >( "LobbyNetwork", "ListenPort", 54994 );
-  m_ip = m_pConfig->getValue< std::string >( "LobbyNetwork", "ListenIp", "0.0.0.0" );
-
-  g_restConnector.restHost = m_pConfig->getValue< std::string >( "GlobalNetwork", "RestHost" ) + ":" +
-                             m_pConfig->getValue< std::string >( "GlobalNetwork", "RestPort" );
-  g_restConnector.serverSecret = m_pConfig->getValue< std::string >( "GlobalParameters", "ServerSecret" );
-
-  return true;
-}
 }

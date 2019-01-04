@@ -15,28 +15,30 @@ namespace Sapphire
   {
   public:
 
-    Land( uint16_t zoneId, uint8_t wardNum, uint8_t landId, uint32_t landSetId, Sapphire::Data::HousingLandSetPtr info );
+    Land( uint16_t zoneId, uint8_t wardNum, uint8_t landId, uint32_t landSetId,
+          Sapphire::Data::HousingLandSetPtr info, FrameworkPtr pFw );
     virtual ~Land();
+    void init( Common::LandType type, Common::HouseSize size, Common::HouseStatus state, uint32_t currentPrice, uint64_t ownerId, uint64_t houseId );
 
     using LandInventoryMap = std::unordered_map< uint16_t, ItemContainerPtr >;
+    using InvMaxItemsPair = std::pair< uint16_t, uint16_t >;
 
     //Primary state
-    void setSize( uint8_t size );
-    void setState( uint8_t state );
+    void setSize( Common::HouseSize size );
+    void setStatus( Common::HouseStatus state );
     void setSharing( uint8_t state );
     void setLandType( Common::LandType type );
 
     //Gerneral
-    uint8_t getSize() const;
-    uint8_t getState() const;
+    Common::HouseSize getSize() const;
+    Common::HouseStatus getStatus() const;
     uint8_t getSharing() const;
     uint32_t getLandSetId() const;
-    uint8_t getWardNum() const;
-    uint8_t getLandId() const;
-    uint16_t getTerritoryTypeId() const;
     Common::LandType getLandType() const;
+    void setHouse( Sapphire::HousePtr );
     Sapphire::HousePtr getHouse() const;
     Common::FFXIVARR_POSITION3 getMapMarkerPosition();
+    Common::LandIdent getLandIdent() const;
 
     //Free Comapny
     void setFreeCompany( uint32_t id, uint32_t icon, uint32_t color );
@@ -45,8 +47,8 @@ namespace Sapphire
     uint32_t getFcColor();
 
     //Player
-    void setPlayerOwner( uint64_t id );
-    uint64_t getPlayerOwner();
+    void setOwnerId( uint64_t id );
+    uint64_t getOwnerId();
     //Housing Functions
     void setCurrentPrice( uint32_t currentPrice );
     bool setPreset( uint32_t itemId );
@@ -61,19 +63,16 @@ namespace Sapphire
     void setLandTag( uint8_t slot, uint8_t tag );
     uint8_t getLandTag( uint8_t slot );
 
-    ItemContainerPtr getItemContainer( uint16_t inventoryType ) const;
+    InvMaxItemsPair getInventoryItemMax() const;
 
   private:
-    uint32_t convertItemIdToHousingItemId( uint32_t itemId );
-    void init();
     uint32_t getNextHouseId();
 
-    uint8_t m_wardNum;
-    uint8_t m_landId;
+    Common::LandIdent m_landIdent;
+
     uint32_t m_landSetId;
-    uint16_t m_territoryTypeId;
-    uint8_t m_size;
-    uint8_t m_state;
+    Common::HouseSize m_size;
+    Common::HouseStatus m_state;
     Common::LandType m_type;
     uint8_t m_iconAddIcon;
     uint32_t m_fcId; // unclear, may be wrong
@@ -82,15 +81,14 @@ namespace Sapphire
 
     Common::FFXIVARR_POSITION3 m_mapMarkerPosition;
 
-    uint64_t m_ownerPlayerId;
+    uint64_t m_ownerId;
     Sapphire::Data::HousingLandSetPtr m_landInfo;
 
     Sapphire::HousePtr m_pHouse;
 
     //item storage
-    LandInventoryMap m_landInventoryMap;
-    uint32_t m_maxPlacedExternalItems;
-    uint32_t m_maxPlacedInternalItems;
+    uint16_t m_maxPlacedExternalItems;
+    uint16_t m_maxPlacedInternalItems;
 
     //price
     uint32_t m_initPrice;
@@ -102,6 +100,8 @@ namespace Sapphire
     //information
     char fcTag[7];
     uint8_t m_tag[3];
+
+    FrameworkPtr m_pFw;
   };
 
 }

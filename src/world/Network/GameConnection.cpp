@@ -12,7 +12,7 @@
 
 #include "Network/PacketWrappers/InitUIPacket.h"
 
-#include "DebugCommand/DebugCommandHandler.h"
+#include "Manager/DebugCommandMgr.h"
 
 #include "GameConnection.h"
 #include "ServerMgr.h"
@@ -20,15 +20,14 @@
 #include "Framework.h"
 #include "Forwards.h"
 
-extern Sapphire::Framework g_fw;
-
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 
 Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pHive,
-                                                   Sapphire::Network::AcceptorPtr pAcceptor ) :
-  Connection( pHive ),
+                                                   Sapphire::Network::AcceptorPtr pAcceptor,
+                                                   FrameworkPtr pFw ) :
+  Connection( pHive, pFw ),
   m_pAcceptor( pAcceptor ),
   m_conType( ConnectionType::None )
 {
@@ -88,6 +87,9 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
   setZoneHandler( ClientZoneIpcType::LandRenameHandler, "LandRenameHandler", &GameConnection::landRenameHandler );
   setZoneHandler( ClientZoneIpcType::HousingUpdateHouseGreeting, "HousingUpdateHouseGreeting",
                   &GameConnection::housingUpdateGreetingHandler );
+  setZoneHandler( ClientZoneIpcType::ReqPlaceHousingItem, "ReqPlaceHousingItem", &GameConnection::reqPlaceHousingItem );
+  setZoneHandler( ClientZoneIpcType::HousingUpdateObjectPosition, "HousingUpdateObjectPosition",
+                  &GameConnection::reqMoveHousingItem );
 
   setZoneHandler( ClientZoneIpcType::TalkEventHandler, "EventHandlerTalk", &GameConnection::eventHandlerTalk );
   setZoneHandler( ClientZoneIpcType::EmoteEventHandler, "EventHandlerEmote", &GameConnection::eventHandlerEmote );
@@ -121,6 +123,12 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
 
   setZoneHandler( ClientZoneIpcType::PerformNoteHandler, "PerformNoteHandler", &GameConnection::performNoteHandler );
 
+  setZoneHandler( ClientZoneIpcType::MarketBoardSearch, "MarketBoardSearch", &GameConnection::marketBoardSearch );
+  setZoneHandler( ClientZoneIpcType::MarketBoardRequestItemListingInfo, "MarketBoardRequestItemListingInfo",
+                  &GameConnection::marketBoardRequestItemInfo );
+  setZoneHandler( ClientZoneIpcType::MarketBoardRequestItemListings, "MarketBoardRequestItemListings",
+                  &GameConnection::marketBoardRequestItemListings );
+
   setChatHandler( ClientChatIpcType::TellReq, "TellReq", &GameConnection::tellHandler );
 
 }
@@ -131,37 +139,34 @@ Sapphire::Network::GameConnection::~GameConnection() = default;
 // overwrite the parents onConnect for our game socket needs
 void Sapphire::Network::GameConnection::OnAccept( const std::string& host, uint16_t port )
 {
-  GameConnectionPtr connection( new GameConnection( m_hive, m_pAcceptor ) );
+  GameConnectionPtr connection( new GameConnection( m_hive, m_pAcceptor, m_pFw ) );
   m_pAcceptor->Accept( connection );
-  auto pLog = g_fw.get< Logger >();
-  pLog->info( "Connect from " + m_socket.remote_endpoint().address().to_string() );
+  Logger::info( "Connect from {0}", m_socket.remote_endpoint().address().to_string() );
 }
 
 
 void Sapphire::Network::GameConnection::OnDisconnect()
 {
-  auto pLog = g_fw.get< Logger >();
-  pLog->debug( "GameConnection DISCONNECT" );
+  Logger::debug( "GameConnection DISCONNECT" );
   m_pSession = nullptr;
 }
 
 void Sapphire::Network::GameConnection::OnRecv( std::vector< uint8_t >& buffer )
 {
   // This is assumed packet always start with valid FFXIVARR_PACKET_HEADER for now.
-  auto pLog = g_fw.get< Logger >();
   Packets::FFXIVARR_PACKET_HEADER packetHeader{};
   const auto headerResult = Packets::getHeader( buffer, 0, packetHeader );
 
   if( headerResult == Incomplete )
   {
-    pLog->info( "Dropping connection due to incomplete packet header." );
-    pLog->info( "FIXME: Packet message bounary is not implemented." );
+    Logger::info( "Dropping connection due to incomplete packet header." );
+    Logger::info( "FIXME: Packet message bounary is not implemented." );
     Disconnect();
     return;
   }
   else if( headerResult == Malformed )
   {
-    pLog->info( "Dropping connection due to malformed packet header." );
+    Logger::info( "Dropping connection due to malformed packet header." );
     Disconnect();
     return;
   }
@@ -173,14 +178,14 @@ void Sapphire::Network::GameConnection::OnRecv( std::vector< uint8_t >& buffer )
 
   if( packetResult == Incomplete )
   {
-    pLog->info( "Dropping connection due to incomplete packets." );
-    pLog->info( "FIXME: Packet message bounary is not implemented." );
+    Logger::info( "Dropping connection due to incomplete packets." );
+    Logger::info( "FIXME: Packet message bounary is not implemented." );
     Disconnect();
     return;
   }
   else if( packetResult == Malformed )
   {
-    pLog->info( "Dropping connection due to malformed packets." );
+    Logger::info( "Dropping connection due to malformed packets." );
     Disconnect();
     return;
   }
@@ -191,8 +196,7 @@ void Sapphire::Network::GameConnection::OnRecv( std::vector< uint8_t >& buffer )
 
 void Sapphire::Network::GameConnection::OnError( const asio::error_code& error )
 {
-  auto pLog = g_fw.get< Logger >();
-  pLog->debug( "GameConnection ERROR: " + error.message() );
+  Logger::debug( "GameConnection ERROR: {0}", error.message() );
 }
 
 void Sapphire::Network::GameConnection::queueInPacket( Sapphire::Network::Packets::FFXIVARR_PACKET_RAW inPacket )
@@ -207,42 +211,31 @@ void Sapphire::Network::GameConnection::queueOutPacket( Sapphire::Network::Packe
 
 void Sapphire::Network::GameConnection::handleZonePacket( Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& pPacket )
 {
-  auto pLog = g_fw.get< Logger >();
   uint16_t opcode = *reinterpret_cast< uint16_t* >( &pPacket.data[ 0x02 ] );
   auto it = m_zoneHandlerMap.find( opcode );
-
-  std::string sessionStr = "[" + std::to_string( m_pSession->getId() ) + "]";
 
   if( it != m_zoneHandlerMap.end() )
   {
     auto itStr = m_zoneHandlerStrMap.find( opcode );
     std::string name = itStr != m_zoneHandlerStrMap.end() ? itStr->second : "unknown";
     // dont display packet notification if it is a ping or pos update, don't want the spam
-    if( opcode != PingHandler &&
-        opcode != UpdatePositionHandler )
+    if( opcode != PingHandler && opcode != UpdatePositionHandler )
+      Logger::debug( "[{0}] Handling Zone IPC : {1} ( {2:04X} )", m_pSession->getId(), name, opcode );
 
-      pLog->debug( sessionStr + " Handling Zone IPC : " + name + "( " +
-                   Util::intToHexString( static_cast< uint32_t >( opcode ), 4 ) + " )" );
-
-    ( this->*( it->second ) )( pPacket, *m_pSession->getPlayer() );
+    ( this->*( it->second ) )( m_pFw, pPacket, *m_pSession->getPlayer() );
   }
   else
   {
-    pLog->debug( sessionStr + " Undefined Zone IPC : Unknown ( " +
-		 Util::intToHexString( static_cast< uint32_t >( opcode ), 4 ) + " )" );
-    pLog->debug(
-      "Dump:\n" + Util::binaryToHexDump( const_cast< uint8_t* >( &pPacket.data[ 0 ] ), pPacket.segHdr.size ) );
+    Logger::debug( "[{0}] Undefined Zone IPC : Unknown ( {1:04X} )", m_pSession->getId(), opcode );
+    Logger::debug( "Dump:\n{0}", Util::binaryToHexDump( const_cast< uint8_t* >( &pPacket.data[ 0 ] ),
+                                                       pPacket.segHdr.size ) );
   }
 }
 
-
 void Sapphire::Network::GameConnection::handleChatPacket( Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& pPacket )
 {
-  auto pLog = g_fw.get< Logger >();
   uint16_t opcode = *reinterpret_cast< uint16_t* >( &pPacket.data[ 0x02 ] );
   auto it = m_chatHandlerMap.find( opcode );
-
-  std::string sessionStr = "[" + std::to_string( m_pSession->getId() ) + "]";
 
   if( it != m_chatHandlerMap.end() )
   {
@@ -250,16 +243,13 @@ void Sapphire::Network::GameConnection::handleChatPacket( Sapphire::Network::Pac
     std::string name = itStr != m_chatHandlerStrMap.end() ? itStr->second : "unknown";
     // dont display packet notification if it is a ping or pos update, don't want the spam
 
-    pLog->debug( sessionStr + " Handling Chat IPC : " + name + "( " +
-                 Util::intToHexString( static_cast< uint32_t >( opcode ), 4 ) + " )" );
+    Logger::debug( "[{0}] Handling Chat IPC : {1} ( {2:04X} )", m_pSession->getId(), name, opcode );
 
-    ( this->*( it->second ) )( pPacket, *m_pSession->getPlayer() );
+    ( this->*( it->second ) )( m_pFw, pPacket, *m_pSession->getPlayer() );
   }
   else
   {
-    pLog->debug( sessionStr + " Undefined Chat IPC : Unknown ( " +
-                 Util::intToHexString( static_cast< uint32_t >( opcode ), 4 ) + " )" );
-    //pLog->debug( pPacket.toString() );
+    Logger::debug( "[{0}] Undefined Chat IPC : Unknown ( {1:04X} )", m_pSession->getId(), opcode );
   }
 }
 
@@ -305,7 +295,6 @@ void Sapphire::Network::GameConnection::processInQueue()
 
 void Sapphire::Network::GameConnection::processOutQueue()
 {
-  auto pLog = g_fw.get< Logger >();
   if( m_outQueue.size() < 1 )
     return;
 
@@ -319,7 +308,7 @@ void Sapphire::Network::GameConnection::processOutQueue()
   {
     if( pPacket->getSize() == 0 )
     {
-      pLog->debug( "end of packet set" );
+      Logger::debug( "end of packet set" );
       break;
     }
 
@@ -346,7 +335,7 @@ void Sapphire::Network::GameConnection::sendSinglePacket( Sapphire::Network::Pac
 void Sapphire::Network::GameConnection::injectPacket( const std::string& packetpath, Sapphire::Entity::Player& player )
 {
 
-  char packet[0x11570];
+  char packet[ 0x11570 ];
   memset( packet, 0, 0x11570 );
 
   // get the packet name / path from the command arguments
@@ -360,7 +349,7 @@ void Sapphire::Network::GameConnection::injectPacket( const std::string& packetp
 
   // read the packet into the buffer
   fseek( fp, 0, SEEK_END );
-  int32_t size = ftell( fp );
+  auto size = static_cast< size_t >( ftell( fp ) );
   rewind( fp );
   if( fread( packet, sizeof( char ), size, fp ) != size )
   {
@@ -396,8 +385,7 @@ void Sapphire::Network::GameConnection::injectPacket( const std::string& packetp
 void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
                                                        const std::vector< Sapphire::Network::Packets::FFXIVARR_PACKET_RAW >& packetData )
 {
-  auto pLog = g_fw.get< Logger >();
-  auto pServerZone = g_fw.get< ServerMgr >();
+  auto pServerZone = m_pFw->get< World::ServerMgr >();
   // if a session is set, update the last time it recieved a game packet
   if( m_pSession )
     m_pSession->updateLastDataTime();
@@ -409,7 +397,7 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
       case SEGMENTTYPE_SESSIONINIT:
       {
         char* id = ( char* ) &( inPacket.data[ 4 ] );
-        uint32_t playerId = std::stoi( id );
+        uint32_t playerId = std::stoul( id );
         auto pCon = std::static_pointer_cast< GameConnection, Connection >( shared_from_this() );
 
         // try to retrieve the session for this id
@@ -417,7 +405,7 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
 
         if( !session )
         {
-          pLog->info( "[" + std::string( id ) + "] Session not registered, creating" );
+          Logger::info( "[{0}] Session not registered, creating", id );
           // return;
           if( !pServerZone->createSession( playerId ) )
           {
@@ -429,7 +417,7 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
           //TODO: Catch more things in lobby and send real errors
         else if( !session->isValid() || ( session->getPlayer() && session->getPlayer()->getLastPing() != 0 ) )
         {
-          pLog->error( "[" + std::string( id ) + "] Session INVALID, disconnecting" );
+          Logger::error( "[{0}] Session INVALID, disconnecting", id );
           Disconnect();
           return;
         }
@@ -449,7 +437,7 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
           auto pe1 = std::make_shared< FFXIVRawPacket >( 0x02, 0x38, 0, 0 );
           *( unsigned int* ) ( &pe1->data()[ 0 ] ) = playerId;
           sendSinglePacket( pe1 );
-          pLog->info( "[" + std::string( id ) + "] Setting session for zone connection" );
+          Logger::info( "[{0}] Setting session for zone connection", id );
           session->setZoneConnection( pCon );
         }
           // chat connection, assinging it to the session
@@ -463,7 +451,7 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
           *( unsigned short* ) ( &pe3->data()[ 2 ] ) = 0x02;
           sendSinglePacket( pe3 );
 
-          pLog->info( "[" + std::string( id ) + "] Setting session for chat connection" );
+          Logger::info( "[{0}] Setting session for chat connection", id );
           session->setChatConnection( pCon );
         }
 

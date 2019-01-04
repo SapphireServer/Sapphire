@@ -29,17 +29,16 @@
 #include "Framework.h"
 #include "Common.h"
 
-extern Sapphire::Framework g_fw;
-
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
 
-Sapphire::Entity::Chara::Chara( ObjKind type ) :
+Sapphire::Entity::Chara::Chara( ObjKind type, FrameworkPtr pFw ) :
   Actor( type ),
   m_pose( 0 ),
-  m_targetId( INVALID_GAME_OBJECT_ID )
+  m_targetId( INVALID_GAME_OBJECT_ID ),
+  m_pFw( pFw )
 {
   // initialize the free slot queue
   for( uint8_t i = 0; i < MAX_STATUS_EFFECTS; i++ )
@@ -430,7 +429,7 @@ ChaiScript Skill Handler.
 void Sapphire::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, uint64_t param1,
                                              uint64_t param2, Entity::Chara& target )
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   if( isPlayer() )
   {
     getAsPlayer()->sendDebug( std::to_string( target.getId() ) );
@@ -510,7 +509,8 @@ void Sapphire::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionI
     case ActionEffectType::Heal:
     {
       uint32_t calculatedHeal = Math::CalcBattle::calculateHealValue( getAsPlayer(),
-                                                                      static_cast< uint32_t >( param1 ) );
+                                                                      static_cast< uint32_t >( param1 ),
+                                                                      m_pFw );
 
       Server::EffectEntry effectEntry{};
       effectEntry.value = calculatedHeal;
@@ -594,7 +594,7 @@ void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEf
 /*! \param StatusEffectPtr to be applied to the actor */
 void Sapphire::Entity::Chara::addStatusEffectById( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param )
 {
-  auto effect = StatusEffect::make_StatusEffect( id, source.getAsChara(), getAsChara(), duration, 3000 );
+  auto effect = StatusEffect::make_StatusEffect( id, source.getAsChara(), getAsChara(), duration, 3000, m_pFw );
   effect->setParam( param );
   addStatusEffect( effect );
 }
@@ -606,7 +606,7 @@ void Sapphire::Entity::Chara::addStatusEffectByIdIfNotExist( uint32_t id, int32_
   if( hasStatusEffect( id ) )
     return;
 
-  auto effect = StatusEffect::make_StatusEffect( id, source.getAsChara(), getAsChara(), duration, 3000 );
+  auto effect = StatusEffect::make_StatusEffect( id, source.getAsChara(), getAsChara(), duration, 3000, m_pFw );
   effect->setParam( param );
   addStatusEffect( effect );
 

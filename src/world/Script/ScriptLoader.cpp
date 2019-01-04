@@ -9,8 +9,6 @@
 
 #include "Framework.h"
 
-extern Sapphire::Framework g_fw;
-
 namespace fs = std::experimental::filesystem;
 
 const std::string Sapphire::Scripting::ScriptLoader::getModuleExtension()
@@ -32,34 +30,30 @@ bool Sapphire::Scripting::ScriptLoader::unloadModule( ModuleHandle handle )
   bool success = dlclose( handle ) == 0;
 #endif
 
-  auto pLog = g_fw.get< Logger >();
-
   if( !success )
   {
-    pLog->error( "Failed to unload module " );
+    Logger::error( "Failed to unload module " );
 
     return false;
   }
 
-  pLog->debug( "Unloaded module" );
+  Logger::debug( "Unloaded module" );
 
   return true;
 }
 
 Sapphire::Scripting::ScriptInfo* Sapphire::Scripting::ScriptLoader::loadModule( const std::string& path )
 {
-  auto pLog = g_fw.get< Logger >();
-  auto pConfig = g_fw.get< ConfigMgr >();
   fs::path f( path );
 
   if( isModuleLoaded( f.stem().string() ) )
   {
-    pLog->error( "Unable to load module '" + f.stem().string() + "' as it is already loaded" );
+    Logger::error( "Unable to load module '{0}' as it is already loaded", f.stem().string() );
     return nullptr;
   }
 
   // copy to temp dir
-  fs::path cacheDir( f.parent_path() /= pConfig->getValue< std::string >( "Scripts", "CachePath", "./cache/" ) );
+  fs::path cacheDir( f.parent_path() /= m_cachePath );
   fs::create_directories( cacheDir );
   fs::path dest( cacheDir /= f.filename().string() );
 
@@ -69,7 +63,7 @@ Sapphire::Scripting::ScriptInfo* Sapphire::Scripting::ScriptLoader::loadModule( 
   }
   catch( const fs::filesystem_error& err )
   {
-    pLog->error( "Error copying file to cache: " + err.code().message() );
+    Logger::error( "Error copying file to cache: {0}", err.code().message() );
 
     return nullptr;
   }
@@ -83,12 +77,12 @@ Sapphire::Scripting::ScriptInfo* Sapphire::Scripting::ScriptLoader::loadModule( 
 
   if( !handle )
   {
-    pLog->error( "Failed to load module from: " + path );
+    Logger::error( "Failed to load module from: {0}", path );
 
     return nullptr;
   }
 
-  pLog->debug( "Loaded module '" + f.filename().string() );
+  Logger::debug( "Loaded module: {0}",  f.filename().string() );
 
   auto info = new ScriptInfo;
   info->handle = handle;
@@ -104,7 +98,6 @@ Sapphire::Scripting::ScriptInfo* Sapphire::Scripting::ScriptLoader::loadModule( 
 Sapphire::ScriptAPI::ScriptObject** Sapphire::Scripting::ScriptLoader::getScripts( ModuleHandle handle )
 {
   using getScripts = Sapphire::ScriptAPI::ScriptObject** ( * )();
-  auto pLog = g_fw.get< Logger >();
 
 #ifdef _WIN32
   getScripts func = reinterpret_cast< getScripts >( GetProcAddress( handle, "getScripts" ) );
@@ -129,7 +122,6 @@ bool Sapphire::Scripting::ScriptLoader::unloadScript( Sapphire::Scripting::Scrip
 
 bool Sapphire::Scripting::ScriptLoader::unloadScript( ModuleHandle handle )
 {
-  auto pLog = g_fw.get< Logger >();
   for( auto it = m_scriptMap.begin(); it != m_scriptMap.end(); ++it )
   {
     if( it->second->handle == handle )
@@ -148,7 +140,7 @@ bool Sapphire::Scripting::ScriptLoader::unloadScript( ModuleHandle handle )
         return true;
       }
 
-      pLog->error( "failed to unload module: " + info->library_name );
+      Logger::error( "failed to unload module: {0}", info->library_name );
 
       return false;
     }
@@ -183,7 +175,7 @@ Sapphire::Scripting::ScriptInfo* Sapphire::Scripting::ScriptLoader::getScriptInf
 }
 
 void Sapphire::Scripting::ScriptLoader::findScripts( std::set< Sapphire::Scripting::ScriptInfo* >& scripts,
-                                                 const std::string& search )
+                                                     const std::string& search )
 {
   for( auto it = m_scriptMap.begin(); it != m_scriptMap.end(); ++it )
   {
@@ -192,4 +184,14 @@ void Sapphire::Scripting::ScriptLoader::findScripts( std::set< Sapphire::Scripti
       scripts.insert( it->second );
     }
   }
+}
+
+const std::string& Sapphire::Scripting::ScriptLoader::getCachePath() const
+{
+  return m_cachePath;
+}
+
+void Sapphire::Scripting::ScriptLoader::setCachePath( const string& m_cachePath )
+{
+  ScriptLoader::m_cachePath = m_cachePath;
 }

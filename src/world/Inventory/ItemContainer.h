@@ -15,7 +15,7 @@ namespace Sapphire
 
   public:
     ItemContainer( uint16_t storageId, uint16_t maxSize, const std::string& tableName, bool isMultiStorage,
-                   bool isPersistentStorage = true );
+                   FrameworkPtr pFw, bool isPersistentStorage = true );
 
     ~ItemContainer();
 
@@ -23,7 +23,7 @@ namespace Sapphire
 
     uint16_t getEntryCount() const;
 
-    void removeItem( uint16_t slotId );
+    void removeItem( uint16_t slotId, bool removeFromDb = true );
 
     ItemMap& getItemMap();
 
@@ -48,6 +48,7 @@ namespace Sapphire
     uint16_t m_size;
     std::string m_tableName;
     bool m_bMultiStorage;
+    FrameworkPtr m_pFw;
     bool m_isPersistentStorage;
     ItemMap m_itemMap;
     Entity::PlayerPtr m_pOwner;

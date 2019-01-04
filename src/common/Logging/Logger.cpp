@@ -23,9 +23,9 @@ namespace Sapphire
 
   }
 
-  void Logger::setLogPath( const std::string& logPath )
+  void Logger::init( const std::string& logPath )
   {
-    auto pos = logPath.find_last_of( '/' );
+    auto pos = logPath.find_last_of( fs::path::preferred_separator );
 
     if( pos != std::string::npos )
     {
@@ -33,15 +33,10 @@ namespace Sapphire
       fs::create_directories( realPath );
     }
 
-    m_logFile = logPath;
-  }
-
-  void Logger::init()
-  {
     spdlog::init_thread_pool( 8192, 1 );
 
     auto stdout_sink = std::make_shared< spdlog::sinks::stdout_color_sink_mt >();
-    auto daily_sink = std::make_shared< spdlog::sinks::daily_file_sink_mt >( m_logFile + ".log", 0, 0 );
+    auto daily_sink = std::make_shared< spdlog::sinks::daily_file_sink_mt >( logPath + ".log", 0, 0 );
 
     std::vector< spdlog::sink_ptr > sinks { stdout_sink, daily_sink };
 
@@ -63,6 +58,11 @@ namespace Sapphire
     spdlog::get( "logger" )->error( text );
   }
 
+  void Logger::warn( const std::string& text )
+  {
+    spdlog::get( "logger" )->warn( text );
+  }
+
   void Logger::info( const std::string& text )
   {
     spdlog::get( "logger" )->info( text );
@@ -76,6 +76,11 @@ namespace Sapphire
   void Logger::fatal( const std::string& text )
   {
     spdlog::get( "logger" )->critical( text );
+  }
+
+  void Logger::trace( const std::string& text )
+  {
+    spdlog::get( "logger" )->trace( text );
   }
 
 }

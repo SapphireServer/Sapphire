@@ -18,7 +18,7 @@ namespace Sapphire::Action
 
     ~ActionTeleport();
 
-    ActionTeleport( Entity::CharaPtr pActor, uint16_t action, uint16_t cost );
+    ActionTeleport( Entity::CharaPtr pActor, uint16_t action, uint16_t cost, FrameworkPtr pFw );
 
     void onStart() override;
 
