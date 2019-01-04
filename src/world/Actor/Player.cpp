@@ -891,9 +891,7 @@ void Sapphire::Entity::Player::setLookAt( uint8_t index, uint8_t value )
 // spawn this player for pTarget
 void Sapphire::Entity::Player::spawn( Entity::PlayerPtr pTarget )
 {
-  Logger::debug( "[" + std::to_string( pTarget->getId() ) + "] Spawning " +
-                 getName() + " for " +
-                 pTarget->getName() );
+  Logger::debug( "[{0}] Spawning {1} for {2}", pTarget->getId(), getName(), pTarget->getName() );
 
   pTarget->queuePacket( std::make_shared< PlayerSpawnPacket >( *getAsPlayer(), *pTarget ) );
 }
@@ -902,7 +900,7 @@ void Sapphire::Entity::Player::spawn( Entity::PlayerPtr pTarget )
 void Sapphire::Entity::Player::despawn( Entity::PlayerPtr pTarget )
 {
   auto pPlayer = pTarget;
-  Logger::debug( "despawning " + getName() + " for " + pTarget->getName() );
+  Logger::debug( "Despawning {0} for {1}", getName(), pTarget->getName() );
 
   pPlayer->freePlayerSpawnId( getId() );
 

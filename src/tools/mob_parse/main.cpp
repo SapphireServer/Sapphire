@@ -330,15 +330,10 @@ int dumpSpawns()
         std::string name = delChar( nameStruct->singular, ' ' );
         name = delChar( name, '\'' );
 
-        Logger::info( "|----> " + name + "_" +
-                      std::to_string( instance.bNPCBase ) + " " +
-                      std::to_string( instance.posX ) + ", " +
-                      std::to_string( instance.posY ) + ", " +
-                      std::to_string( instance.posZ ) + ", " +
-                      std::to_string( instance.modelChara ) + ", " +
-                      std::to_string( instance.gimmickId ) + ", " +
-                      std::to_string( instance.level )  + ", " +
-                      std::to_string( instance.hPMax ) );
+        Logger::info( "|----> {0}_{1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}",
+                      name, instance.bNPCBase, instance.posX, instance.posY,
+                      instance.posZ, instance.modelChara, instance.gimmickId,
+                      instance.level, instance.hPMax );
         //Logger::info( "|----> " + name + " - " + std::to_string( instance.bNPCBase ) + ", " + std::to_string( instance.gimmickId ) );
 
         output += "INSERT INTO `spawnpoint` ( `spawngroupid`, `x`, `y`, `z`, `r` ) "
@@ -377,7 +372,7 @@ int dumpSpawns()
 
   }
 
-  Logger::info( "|--> Total SpawnGroups: " + std::to_string( spawngroups )  );
+  Logger::info( "|--> Total SpawnGroups: {0}", spawngroups );
 
   return 0;
 }
@@ -474,8 +469,8 @@ int dumpTemplates()
     //auto nameStruct = g_exdData.get< Sapphire::Data::BNpcName >( entry.first );
     auto teri1 = g_exdData.get< Sapphire::Data::TerritoryType >( entry.first );
     auto teriPlaceName = g_exdData.get< Sapphire::Data::PlaceName >( teri1->placeName );
-    Logger::info( std::to_string( entry.first ) + " - " + teri1->name + " - " + teriPlaceName->name );
-    Logger::info( "Mob Count: " + std::to_string( entry.second.size() ) );
+    Logger::info( "{0} - {1} - {2}", entry.first, teri1->name, teriPlaceName->name );
+    Logger::info( "Mob Count: {0}", entry.second.size() );
 
     for( auto mob : entry.second )
     {
@@ -485,12 +480,12 @@ int dumpTemplates()
       //Logger::info( nameStruct->singular + " " + std::to_string( packet.bNPCBase ) );
     }
 
-    Logger::info( "Unique Mobs: " + std::to_string( nameToPacketList.size() ) );
+    Logger::info( "Unique Mobs: {0}", nameToPacketList.size() );
 
     for( auto mobName : nameToPacketList )
     {
-      auto nameStruct = g_exdData.get< Sapphire::Data::BNpcName >( mobName.second.at(0).bNPCName );
-      Logger::info( "|--> " + nameStruct->singular + "(" + std::to_string( mobName.second.size() ) + ")" );
+      auto nameStruct = g_exdData.get< Sapphire::Data::BNpcName >( mobName.second.at( 0 ).bNPCName );
+      Logger::info( "|--> {0} ({1})", nameStruct->singular,  mobName.second.size() );
 
       auto instance = mobName.second.at(0);
       //for( FFXIVIpcNpcSpawn instance : mobName.second )

@@ -273,7 +273,7 @@ void Sapphire::World::ServerMgr::mainLoop()
         it->second->close();
         // if( it->second.unique() )
         {
-          Logger::info( "[" + std::to_string( it->second->getId() ) + "] Session removal" );
+          Logger::info( "[{0}] Session removal", it->second->getId() );
           it = m_sessionMapById.erase( it );
           removeSession( pPlayer->getName() );
           continue;
@@ -283,7 +283,7 @@ void Sapphire::World::ServerMgr::mainLoop()
       // remove sessions that simply timed out
       if( diff > 20 )
       {
-        Logger::info( "[" + std::to_string( it->second->getId() ) + "] Session time out" );
+        Logger::info( "[{0}] Session time out", it->second->getId() );
 
         it->second->close();
         // if( it->second.unique() )
@@ -312,18 +312,18 @@ bool Sapphire::World::ServerMgr::createSession( uint32_t sessionId )
 
   if( it != m_sessionMapById.end() )
   {
-    Logger::error( "[" + session_id_str + "] Error creating session" );
+    Logger::error( "[{0}] Error creating session", session_id_str );
     return false;
   }
 
-  Logger::info( "[" + session_id_str + "] Creating new session" );
+  Logger::info( "[{0}] Creating new session", session_id_str );
 
   std::shared_ptr< Session > newSession( new Session( sessionId, framework() ) );
   m_sessionMapById[ sessionId ] = newSession;
 
   if( !newSession->loadPlayer() )
   {
-    Logger::error( "[" + session_id_str + "] Error loading player " + session_id_str );
+    Logger::error( "[{0}] Error loading player {0}", session_id_str );
     return false;
   }
 
@@ -437,7 +437,7 @@ void Sapphire::World::ServerMgr::loadBNpcTemplates()
     m_bNpcTemplateMap[ name ] = bnpcTemplate;
   }
 
-  Logger::debug( "BNpc Templates loaded: " + std::to_string( m_bNpcTemplateMap.size() ) );
+  Logger::debug( "BNpc Templates loaded: {0}", m_bNpcTemplateMap.size() );
 
 }
 
