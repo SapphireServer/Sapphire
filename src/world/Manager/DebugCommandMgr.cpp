@@ -430,7 +430,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
 
     if( !bNpcTemplate )
 	  {
-      player.sendNotice( "Template " + params + " not found in cache!" );
+        player.sendNotice( "Template " + params + " not found in cache!" );
 	    return;
 	  }
     auto pBNpc = std::make_shared< Entity::BNpc >( bNpcTemplate,
