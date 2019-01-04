@@ -2,18 +2,23 @@ cmake_policy( SET CMP0014 NEW )
 cmake_minimum_required( VERSION 3.0.2 )
 project( Sapphire )
 
-set( CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin )
-
-set( EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin )
-set( LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin )
-
 set( CMAKE_MODULE_PATH
        ${CMAKE_MODULE_PATH}
        ${CMAKE_SOURCE_DIR}/cmake )
 
+#####################################
+# Copy needed files to build-folder #
+#####################################
+add_custom_target( copy_runtime_files ALL
+                     COMMAND cmake -E copy_directory ${CMAKE_SOURCE_DIR}/config ${CMAKE_BINARY_DIR}/bin/config 
+                     COMMAND cmake -E copy_directory ${CMAKE_SOURCE_DIR}/sql ${CMAKE_BINARY_DIR}/bin/sql 
+                     COMMAND cmake -E copy_directory ${CMAKE_SOURCE_DIR}/web ${CMAKE_BINARY_DIR}/bin/web 
+                     COMMAND cmake -E copy ${CMAKE_SOURCE_DIR}/sql_import.sh ${CMAKE_BINARY_DIR}/bin/sql_import.sh )
+
 ######################################
 # Dependencies and compiler settings #
 ######################################
+include( "cmake/paths.cmake" )
 include( "cmake/mysql.cmake" )
 include( "cmake/compiler.cmake" )
 include( "cmake/cotire.cmake" )
@@ -53,11 +58,4 @@ add_subdirectory( "src/dbm" )
 ##############################
 #           Tools            #
 ##############################
-add_subdirectory( "src/tools/exd_common_gen" )
-add_subdirectory( "src/tools/exd_struct_gen" )
-add_subdirectory( "src/tools/exd_struct_test" )
-add_subdirectory( "src/tools/quest_parser" )
-add_subdirectory( "src/tools/discovery_parser" )
-add_subdirectory( "src/tools/mob_parse" )
-add_subdirectory( "src/tools/pcb_reader" )
-add_subdirectory( "src/tools/event_object_parser" )
+add_subdirectory( "src/tools" )

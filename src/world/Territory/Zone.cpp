@@ -76,6 +76,7 @@ Sapphire::Zone::Zone( uint16_t territoryTypeId, uint32_t guId,
   m_territoryTypeInfo = pExdData->get< Sapphire::Data::TerritoryType >( territoryTypeId );
 
   loadWeatherRates();
+  loadSpawnGroups();
 
   m_currentWeather = getNextWeather();
 }

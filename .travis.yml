@@ -38,5 +38,5 @@ script:
   - mkdir -p build
   - cd build
   - cmake .. && make -j 3
-  - cd ..
+  - cd bin
   - bash sql_import.sh
