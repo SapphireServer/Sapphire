@@ -13,14 +13,13 @@ file(GLOB UTILS_SOURCE_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/Script/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Util/*.cpp")
 
-set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} )
 
 add_library( common ${UTILS_PUBLIC_INCLUDE_FILES} ${UTILS_SOURCE_FILES} )
 
 target_link_libraries( common
                          PUBLIC
-			   xivdat
-			   mysqlConnector
+                           xivdat
+                           mysqlConnector
                            mysql )
 if( UNIX )
   target_link_libraries( common 
@@ -34,7 +33,5 @@ target_include_directories( common
                                 "${CMAKE_CURRENT_SOURCE_DIR}/"
                                 "${CMAKE_CURRENT_SOURCE_DIR}/../../deps/"
                                 "${CMAKE_CURRENT_SOURCE_DIR}/../../deps/asio/asio/include/"
-                                "${CMAKE_CURRENT_SOURCE_DIR}/../../deps/spdlog/include/"
-                              PRIVATE
-                                "${CMAKE_CURRENT_SOURCE_DIR}/src/libraries/external/")
+                                "${CMAKE_CURRENT_SOURCE_DIR}/../../deps/spdlog/include/" )
 

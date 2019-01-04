@@ -17,7 +17,7 @@ namespace Sapphire::Entity
     std::vector< SpawnPointPtr > m_spawnPoints;
 
   public:
-    SpawnGroup();
+    SpawnGroup( uint32_t bNpcTemplateId, uint32_t level );
 
   };
 
