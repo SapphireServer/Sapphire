@@ -362,7 +362,7 @@ int main( int argc, char** argv )
   uint32_t i = 0;
   for( const auto& row : rows )
   {
-    Logger::info( "Generating " + std::to_string( row ) );
+    Logger::info( "Generating {0}", row );
     auto questInfo = g_exdDataGen.get< Sapphire::Data::Quest >( row );
 
     if( questInfo->name.empty() || questInfo->id.empty() )
@@ -407,7 +407,7 @@ int main( int argc, char** argv )
         "generated/" + questInfo->id + ".lua";
       if( system( command.c_str() ) == -1 )
       {
-        Logger::error( "Error executing java command:\n" + command + "\nerrno: " + std::strerror( errno ) );
+        Logger::error( "Error executing java command:\n {0}\nerrno: {1}", command, std::strerror( errno ) );
         return errno;
       }
     }
