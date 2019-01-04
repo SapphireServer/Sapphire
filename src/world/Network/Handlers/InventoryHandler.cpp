@@ -42,7 +42,7 @@ void Sapphire::Network::GameConnection::inventoryModifyHandler( FrameworkPtr pFw
   ackPacket->data().type = 7;
   player.queuePacket( ackPacket );
 
-  Logger::debug( "InventoryAction: " + std::to_string( action ) );
+  Logger::debug( "InventoryAction: {0}", action );
 
   // TODO: other inventory operations need to be implemented
   switch( action )

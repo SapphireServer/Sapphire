@@ -117,7 +117,7 @@ void Sapphire::Network::GameConnection::reqExamineSearchCommentHandler( Framewor
   auto targetId = *reinterpret_cast< const uint32_t* >( &inPacket.data[ 0x10 ] );
   auto pSession = pFw->get< World::ServerMgr >()->getSession( targetId );
 
-  Logger::debug( std::to_string( targetId ) );
+  Logger::debug( "reqExamineSearchCommentHandler: {0}", targetId );
 
   if( pSession )
   {
@@ -145,7 +145,7 @@ void Sapphire::Network::GameConnection::reqExamineFcInfo( FrameworkPtr pFw,
   auto targetId = *reinterpret_cast< const uint32_t* >( &inPacket.data[ 0x18 ] );
   auto pSession = pFw->get< World::ServerMgr >()->getSession( targetId );
 
-  Logger::debug( std::to_string( targetId ) );
+  Logger::debug( "reqExamineFcInfo: {0}", targetId );
 
   if( pSession )
   {

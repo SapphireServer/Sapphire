@@ -55,8 +55,7 @@ bool Sapphire::Scripting::ScriptMgr::init()
 
   if( !status )
   {
-    Logger::error( std::string( __func__ ) +
-                   ": failed to load scripts, the server will not function correctly without scripts loaded." );
+    Logger::error( "ScriptMgr: failed to load scripts, the server will not function correctly without scripts loaded." );
     return false;
   }
 
@@ -73,8 +72,7 @@ bool Sapphire::Scripting::ScriptMgr::init()
       scriptsLoaded++;
   }
 
-  Logger::info(
-    "ScriptMgr: Loaded " + std::to_string( scriptsLoaded ) + "/" + std::to_string( scriptsFound ) + " modules" );
+  Logger::info( "ScriptMgr: Loaded {0}/{1} modules", scriptsLoaded, scriptsFound );
 
   watchDirectories();
 
@@ -104,13 +102,13 @@ void Sapphire::Scripting::ScriptMgr::watchDirectories()
                          {
                            if( m_nativeScriptMgr->isModuleLoaded( path.stem().string() ) )
                            {
-                             Logger::debug( "Reloading changed script: " + path.stem().string() );
+                             Logger::debug( "Reloading changed script: {0}", path.stem().string() );
 
                              m_nativeScriptMgr->queueScriptReload( path.stem().string() );
                            }
                            else
                            {
-                             Logger::debug( "Loading new script: " + path.stem().string() );
+                             Logger::debug( "Loading new script: {0}", path.stem().string() );
 
                              m_nativeScriptMgr->loadScript( path.string() );
                            }
@@ -121,7 +119,7 @@ void Sapphire::Scripting::ScriptMgr::watchDirectories()
 bool Sapphire::Scripting::ScriptMgr::loadDir( const std::string& dirname, std::set< std::string >& files,
                                               const std::string& ext )
 {
-  Logger::info( "ScriptMgr: loading scripts from " + dirname );
+  Logger::info( "ScriptMgr: loading scripts from: {0}", dirname );
 
   if( !fs::exists( dirname ) )
   {

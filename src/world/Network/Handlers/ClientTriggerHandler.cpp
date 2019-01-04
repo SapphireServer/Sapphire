@@ -79,12 +79,8 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
   const auto param4 = packet.data().param4;
   const auto param5 = packet.data().param5;
 
-  Logger::debug( "[" + std::to_string( m_pSession->getId() ) + "] Incoming action: " +
-                 Util::intToHexString( static_cast< uint32_t >( commandId & 0xFFFF ), 4 ) +
-                 "\nparam1: " + Util::intToHexString( static_cast< uint64_t >( param1 & 0xFFFFFFFFFFFFFFF ), 16 ) +
-                 "\nparam2: " + Util::intToHexString( static_cast< uint32_t >( param2 & 0xFFFFFFFF ), 8 ) +
-                 "\nparam3: " + Util::intToHexString( static_cast< uint64_t >( param3 & 0xFFFFFFFFFFFFFFF ), 16 )
-  );
+  Logger::debug( "[{0}] Incoming action: {1:#04X}\nparam1: {2:#016X}\nparam2: {3:#08X}\nparam3: {4:#016X}",
+                 m_pSession->getId(), param1, param2, param3 );
 
   //g_log.Log(LoggingSeverity::debug, "[" + std::to_string(m_pSession->getId()) + "] " + pInPacket->toString());
 
@@ -494,8 +490,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
 
     default:
     {
-      Logger::debug( "[" + std::to_string( m_pSession->getId() ) + "] Unhandled action: " +
-                     Util::intToHexString( static_cast< uint32_t >( commandId & 0xFFFF ), 4 ) );
+      Logger::debug( "[{0}] Unhandled action: {1:#04X}", m_pSession->getId(), commandId );
       break;
     }
   }
