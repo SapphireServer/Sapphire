@@ -763,9 +763,9 @@ Sapphire::Data::TerritoryTypePtr Sapphire::Zone::getTerritoryTypeInfo() const
 bool Sapphire::Zone::loadSpawnGroups()
 {
   auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  auto res = pDb->query( "SELECT id, bNpcTemplateId, level, maxHp "
-                         "FROM spawngroup "
-                         "WHERE territoryTypeId = " + std::to_string( getTerritoryTypeId() ) + ";" );
+  auto stmt = pDb->getPreparedStatement( Db::ZoneDbStatements::ZONE_SEL_SPAWNGROUPS );
+  stmt->setUInt( 1, getTerritoryTypeId() );
+  auto res = pDb->query( stmt );
 
   while( res->next() )
   {
