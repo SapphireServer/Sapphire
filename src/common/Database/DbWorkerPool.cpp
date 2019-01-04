@@ -47,9 +47,8 @@ void Sapphire::Db::DbWorkerPool< T >::setConnectionInfo( const ConnectionInfo& i
 template< class T >
 uint32_t Sapphire::Db::DbWorkerPool< T >::open()
 {
-  Logger::info( "[DbPool] Opening DatabasePool " + getDatabaseName() +
-                " Asynchronous connections: " + std::to_string( m_asyncThreads ) +
-                " Synchronous connections: " + std::to_string( m_synchThreads ) );
+  Logger::info( "[DbPool] Opening DatabasePool {0} Asynchronous connections: {1} Synchronous connections: {2}",
+                getDatabaseName(), m_asyncThreads, m_synchThreads );
 
   uint32_t error = openConnections( IDX_ASYNC, m_asyncThreads );
 
@@ -60,9 +59,8 @@ uint32_t Sapphire::Db::DbWorkerPool< T >::open()
 
   if( !error )
   {
-    Logger::info( "[DbPool] DatabasePool " + getDatabaseName() + " opened successfully. " +
-                  std::to_string( ( m_connections[ IDX_SYNCH ].size() + m_connections[ IDX_ASYNC ].size() ) ) +
-                  " total connections running." );
+    Logger::info( "[DbPool] DatabasePool '{0}' opened successfully. {1} total connections running.",
+                  getDatabaseName(), ( m_connections[ IDX_SYNCH ].size() + m_connections[ IDX_ASYNC ].size() ) );
   }
 
   return error;
@@ -71,10 +69,10 @@ uint32_t Sapphire::Db::DbWorkerPool< T >::open()
 template< class T >
 void Sapphire::Db::DbWorkerPool< T >::close()
 {
-  Logger::info( "[DbPool] Closing down DatabasePool " + getDatabaseName() );
+  Logger::info( "[DbPool] Closing down DatabasePool {0}", getDatabaseName() );
   m_connections[ IDX_ASYNC ].clear();
   m_connections[ IDX_SYNCH ].clear();
-  Logger::info( "[DbPool] All connections on DatabasePool " + getDatabaseName() + "closed." );
+  Logger::info( "[DbPool] All connections on DatabasePool {0} closed.", getDatabaseName() );
 }
 
 template< class T >

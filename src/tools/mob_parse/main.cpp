@@ -259,8 +259,8 @@ int dumpSpawns()
     //auto nameStruct = g_exdData.get< Sapphire::Data::BNpcName >( entry.first );
     auto teri1 = g_exdData.get< Sapphire::Data::TerritoryType >( entry.first );
     auto teriPlaceName = g_exdData.get< Sapphire::Data::PlaceName >( teri1->placeName );
-    Logger::info( std::to_string( entry.first ) + " - " + teri1->name + " - " + teriPlaceName->name );
-    Logger::info( "Mob Count: " + std::to_string( entry.second.size() ) );
+    Logger::info( "{0} - {1} - {2}", entry.first, teri1->name, teriPlaceName->name );
+    Logger::info( "Mob Count: {0}", entry.second.size() );
 
     for( auto mob : entry.second )
     {
@@ -283,9 +283,8 @@ int dumpSpawns()
     for( auto mobName : lvlToPacket )
     {
       auto nameStruct = g_exdData.get< Sapphire::Data::BNpcName >( mobName.second.at(0).bNPCName );
-      Logger::info( "|--> " + nameStruct->singular + "(" + std::to_string( mobName.second.size() ) + ")" );
-
-      Logger::info( "|-> " + std::to_string( entry.first ) );
+      Logger::info( "|--> {0}, ({1})", nameStruct->singular, mobName.second.size() );
+      Logger::info( "|-> {0}", entry.first );
 
       std::string name1 = delChar( nameStruct->singular, ' ' );
       name1 = delChar( name1, '\'' );

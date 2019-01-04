@@ -184,13 +184,13 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     CONNECTION_BOTH );
 
   prepareStatement( ZONE_SEL_SPAWNGROUPS,
-		    "SELECT id, bNpcTemplateId, level, maxHp "
+                    "SELECT id, bNpcTemplateId, level, maxHp "
                     "FROM spawngroup "
                     "WHERE territoryTypeId = ?",
                     CONNECTION_BOTH );
   
   prepareStatement( ZONE_SEL_SPAWNPOINTS,
-		    "SELECT id, x, y, z, r "
+                    "SELECT id, x, y, z, r "
                     "FROM spawnpoint "
                     "WHERE spawnGroupId = ?",
                     CONNECTION_BOTH );
