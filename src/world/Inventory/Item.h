@@ -2,6 +2,7 @@
 #define _ITEM_H_
 
 #include <Common.h>
+#include "ForwardsZone.h"
 
 namespace Sapphire
 {
@@ -10,9 +11,9 @@ namespace Sapphire
   {
 
   public:
-    Item( uint64_t uId, uint32_t catalogId, uint64_t model1, uint64_t model2, bool isHq = false );
+    Item( uint64_t uId, uint32_t catalogId, FrameworkPtr pFw, bool isHq = false );
 
-    ~Item() = default;
+    virtual ~Item() = default;
 
     uint32_t getId() const;
 
@@ -62,6 +63,14 @@ namespace Sapphire
     uint16_t getStain() const;
     void setStain( uint16_t stain );
 
+    uint32_t getAdditionalData() const;
+
+    void setSpiritbond( uint16_t spiritbond );
+    uint16_t getSpiritbond() const;
+
+    void setReservedFlag( uint32_t flag );
+    uint32_t getReservedFlag() const;
+
 
   protected:
     uint32_t m_id;
@@ -87,7 +96,11 @@ namespace Sapphire
     uint16_t m_itemLevel;
     uint16_t m_durability;
     uint16_t m_stain;
+    uint16_t m_spiritBond;
+    uint32_t m_reservedFlag;
 
+    FrameworkPtr m_pFw;
+    uint32_t m_additionalData;
   };
 
 }

@@ -1679,26 +1679,20 @@ struct FFXIVIpcLandSetInitialize : FFXIVIpcBasePacket< LandSetInitialize >
   LandStruct land[ 30 ];
 };
 
-struct FFXIVIpcYardObjectSpawn : FFXIVIpcBasePacket<YardObjectSpawn>
+struct FFXIVIpcYardObjectSpawn : FFXIVIpcBasePacket< YardObjectSpawn >
 {
-  uint8_t landSetId;
+  uint8_t landId;
   uint8_t objectArray;
   uint16_t unknown1;
-  uint32_t itemId;
-  uint16_t itemRotation;
-  uint16_t pos_x;
-  uint16_t pos_y;
-  uint16_t pos_z;
+  Common::HousingObject object;
 };
 
-struct FFXIVIpcYardObjectMove : FFXIVIpcBasePacket<YardObjectMove>
+struct FFXIVIpcHousingObjectMove : FFXIVIpcBasePacket< HousingObjectMove >
 {
   uint16_t itemRotation;
   uint8_t objectArray;
-  uint8_t landSetId;
-  uint16_t pos_x;
-  uint16_t pos_y;
-  uint16_t pos_z;
+  uint8_t landId;
+  Common::FFXIVARR_POSITION3_U16 pos;
   uint16_t unknown1;
   uint16_t unknown2;
   uint16_t unknown3;
@@ -1707,12 +1701,29 @@ struct FFXIVIpcYardObjectMove : FFXIVIpcBasePacket<YardObjectMove>
 struct FFXIVIpcHousingObjectInitialize : FFXIVIpcBasePacket< HousingObjectInitialize >
 {
   Common::LandIdent landIdent;
+  /*!
+   * when this is 2, actrl 0x400 will hide the additional quarters door
+   * if it's any other value, it will stay there regardless
+   */
   int8_t u1; //Outdoor -1 / Indoor 0 - probably indicator
   uint8_t packetNum;
   uint8_t packetTotal;
   uint8_t u2; //Outdoor 0 / Indoor 100(?)
-  Common::YardObject object[100];
+  Common::HousingObject object[100];
   uint32_t unknown4; //unused
+};
+
+struct FFXIVIpcHousingInternalObjectSpawn : FFXIVIpcBasePacket< HousingInternalObjectSpawn >
+{
+  uint16_t containerId;
+  uint8_t containerOffset;
+  uint8_t pad1;
+
+  uint16_t itemId;
+  uint8_t unk2;
+  uint8_t pad2;
+  uint16_t rotation;
+  Common::FFXIVARR_POSITION3_U16 pos;
 };
 
 struct FFXIVIpcHousingIndoorInitialize : FFXIVIpcBasePacket< HousingIndoorInitialize >
@@ -1836,23 +1847,24 @@ struct FFXIVIpcMarketBoardSearchResult :
     struct MarketBoardItem
     {
         uint32_t itemCatalogId;
-        uint32_t quantity;
+        uint16_t quantity;
+        uint16_t demand;
     } items[20];
 
     uint32_t itemIndexEnd;
     uint32_t padding1;
     uint32_t itemIndexStart;
-    uint32_t padding2;
+    uint32_t requestId;
 };
 
 struct FFFXIVIpcMarketBoardItemListingCount :
   FFXIVIpcBasePacket< MarketBoardItemListingCount >
 {
-    uint32_t itemCatalogId;
-    uint32_t unknown1; // does some shit if nonzero
-    uint16_t unknown2;
-    uint16_t quantity; // high/low u8s read separately?
-    uint32_t padding3;
+  uint32_t itemCatalogId;
+  uint32_t unknown1; // does some shit if nonzero
+  uint16_t requestId;
+  uint16_t quantity; // high/low u8s read separately?
+  uint32_t unknown3;
 };
 
 struct FFXIVIpcMarketBoardItemListingHistory :
@@ -1864,14 +1876,14 @@ struct FFXIVIpcMarketBoardItemListingHistory :
     struct MarketListing
     {
         uint32_t salePrice;
-        time_t purchaseTime;
+        uint32_t purchaseTime;
         uint32_t quantity;
-        uint16_t unknown1;
-        uint8_t unknown2;
+        uint8_t isHq;
+        uint8_t padding;
+        uint8_t onMannequin;
 
-        char sellerName[32];
+        char buyerName[33];
 
-        uint8_t unknown3;
         uint32_t itemCatalogId;
     } listing[20];
 };

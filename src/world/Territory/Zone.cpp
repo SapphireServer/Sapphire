@@ -24,6 +24,8 @@
 #include "Actor/BNpc.h"
 #include "Actor/Player.h"
 #include "Actor/EventObject.h"
+#include "Actor/SpawnGroup.h"
+#include "Actor/SpawnPoint.h"
 
 #include "Network/GameConnection.h"
 
@@ -42,8 +44,6 @@ using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
 using namespace Sapphire::World::Manager;
 
-extern Sapphire::Framework g_fw;
-
 /**
 * \brief
 */
@@ -58,11 +58,13 @@ Sapphire::Zone::Zone() :
 }
 
 Sapphire::Zone::Zone( uint16_t territoryTypeId, uint32_t guId,
-                      const std::string& internalName, const std::string& placeName ) :
+                      const std::string& internalName, const std::string& placeName,
+                      FrameworkPtr pFw ) :
   m_currentWeather( Weather::FairSkies ),
-  m_nextEObjId( 0x400D0000 )
+  m_nextEObjId( 0x400D0000 ),
+  m_pFw( pFw )
 {
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   m_guId = guId;
 
   m_territoryTypeId = territoryTypeId;
@@ -74,6 +76,7 @@ Sapphire::Zone::Zone( uint16_t territoryTypeId, uint32_t guId,
   m_territoryTypeInfo = pExdData->get< Sapphire::Data::TerritoryType >( territoryTypeId );
 
   loadWeatherRates();
+  loadSpawnGroups();
 
   m_currentWeather = getNextWeather();
 }
@@ -83,7 +86,7 @@ void Sapphire::Zone::loadWeatherRates()
   if( !m_territoryTypeInfo )
     return;
 
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
 
   uint8_t weatherRateId = m_territoryTypeInfo->weatherRate > pExdData->getWeatherRateIdList().size() ?
                           uint8_t{ 0 } : m_territoryTypeInfo->weatherRate;
@@ -109,13 +112,12 @@ Sapphire::Zone::~Zone()
 
 bool Sapphire::Zone::init()
 {
-  auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
+  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
 
   if( pScriptMgr->onZoneInit( shared_from_this() ) )
   {
     // all good
   }
-
 
   return true;
 }
@@ -223,7 +225,7 @@ void Sapphire::Zone::pushActor( Entity::ActorPtr pActor )
   {
     auto pPlayer = pActor->getAsPlayer();
 
-    auto pServerZone = g_fw.get< ServerMgr >();
+    auto pServerZone = m_pFw->get< World::ServerMgr >();
     auto pSession = pServerZone->getSession( pPlayer->getId() );
     if( pSession )
       m_sessionSet.insert( pSession );
@@ -281,11 +283,11 @@ void Sapphire::Zone::removeActor( Entity::ActorPtr pActor )
 void Sapphire::Zone::queuePacketForRange( Entity::Player& sourcePlayer, uint32_t range,
                                           Network::Packets::FFXIVPacketBasePtr pPacketEntry )
 {
-  auto pTeriMgr = g_fw.get< TerritoryMgr >();
+  auto pTeriMgr = m_pFw->get< TerritoryMgr >();
   if( pTeriMgr->isPrivateTerritory( getTerritoryTypeId() ) )
     return;
 
-  auto pServerZone = g_fw.get< ServerMgr >();
+  auto pServerZone = m_pFw->get< World::ServerMgr >();
   for( auto entry : m_playerMap )
   {
     auto player = entry.second;
@@ -307,11 +309,11 @@ void Sapphire::Zone::queuePacketForZone( Entity::Player& sourcePlayer,
                                          Network::Packets::FFXIVPacketBasePtr pPacketEntry,
                                          bool forSelf )
 {
-  auto pTeriMgr = g_fw.get< TerritoryMgr >();
+  auto pTeriMgr = m_pFw->get< TerritoryMgr >();
   if( pTeriMgr->isPrivateTerritory( getTerritoryTypeId() ) )
     return;
 
-  auto pServerZone = g_fw.get< ServerMgr >();
+  auto pServerZone = m_pFw->get< World::ServerMgr >();
   for( auto entry : m_playerMap )
   {
     auto player = entry.second;
@@ -580,7 +582,6 @@ void Sapphire::Zone::updateActorPosition( Entity::Actor& actor )
 
     if( pOldCell )
     {
-      auto pLog = g_fw.get< Logger >();
       pOldCell->removeActor( actor.shared_from_this() );
     }
 
@@ -628,7 +629,7 @@ void Sapphire::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
   if( pCell == nullptr )
     return;
 
-  auto pTeriMgr = g_fw.get< TerritoryMgr >();
+  auto pTeriMgr = m_pFw->get< TerritoryMgr >();
   // TODO: make sure gms can overwrite this. Potentially temporary solution
   if( pTeriMgr->isPrivateTerritory( getTerritoryTypeId() ) )
     return;
@@ -678,18 +679,12 @@ void Sapphire::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
 
 void Sapphire::Zone::onPlayerZoneIn( Entity::Player& player )
 {
-  auto pLog = g_fw.get< Logger >();
-  pLog->debug(
-    "Zone::onEnterTerritory: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryTypeId() ) +
-    +", Entity#" + std::to_string( player.getId() ) );
+  Logger::debug( "Zone::onEnterTerritory: Zone#{0}|{1}, Entity#{2}", getGuId(), getTerritoryTypeId(), player.getId() );
 }
 
 void Sapphire::Zone::onLeaveTerritory( Entity::Player& player )
 {
-  auto pLog = g_fw.get< Logger >();
-  pLog->debug(
-    "Zone::onLeaveTerritory: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryTypeId() ) +
-    +", Entity#" + std::to_string( player.getId() ) );
+  Logger::debug( "Zone::onLeaveTerritory: Zone#{0}|{1}, Entity#{2}", getGuId(), getTerritoryTypeId(), player.getId() );
 }
 
 void Sapphire::Zone::onUpdate( uint32_t currTime )
@@ -716,15 +711,14 @@ void Sapphire::Zone::registerEObj( Entity::EventObjectPtr object )
 {
   if( !object )
     return;
-  auto pLog = g_fw.get< Logger >();
-  object->setId( getNextEObjId() );
+
   pushActor( object );
 
   m_eventObjects[ object->getId() ] = object;
 
   onRegisterEObj( object );
 
-  //pLog->debug( "Registered instance eobj: " + std::to_string( object->getId() ) );
+  //Logger::debug( "Registered instance eobj: " + std::to_string( object->getId() ) );
 }
 
 Sapphire::Entity::EventObjectPtr Sapphire::Zone::getEObj( uint32_t objId )
@@ -760,4 +754,28 @@ Sapphire::Entity::EventObjectPtr Sapphire::Zone::registerEObj( const std::string
 Sapphire::Data::TerritoryTypePtr Sapphire::Zone::getTerritoryTypeInfo() const
 {
   return m_territoryTypeInfo;
+}
+
+bool Sapphire::Zone::loadSpawnGroups()
+{
+  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto stmt = pDb->getPreparedStatement( Db::ZoneDbStatements::ZONE_SEL_SPAWNGROUPS );
+  stmt->setUInt( 1, getTerritoryTypeId() );
+  auto res = pDb->query( stmt );
+
+  while( res->next() )
+  {
+    uint32_t id = res->getUInt( 1 );
+    uint32_t templateId = res->getUInt( 2 );
+    uint32_t level = res->getUInt( 3 );
+    uint32_t maxHp = res->getUInt( 4 );
+
+    //Entity::SpawnGroup group;
+
+
+    Logger::debug( "id: {0}, template: {1}, level: {2}, maxHp: {3}", id, templateId, level, maxHp );
+
+  }
+
+  return false;
 }

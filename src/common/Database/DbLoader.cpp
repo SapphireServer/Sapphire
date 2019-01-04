@@ -3,9 +3,6 @@
 #include "ZoneDbConnection.h"
 #include "DbWorkerPool.h"
 #include "Logging/Logger.h"
-#include "Framework.h"
-
-extern Sapphire::Framework g_fw;
 
 Sapphire::Db::DbLoader::DbLoader()
 {
@@ -17,14 +14,12 @@ Sapphire::Db::DbLoader& Sapphire::Db::DbLoader::addDb( Sapphire::Db::DbWorkerPoo
 
   m_open.push( [ this, info, &pool ]()->bool
                {
-
-                 auto pLog = g_fw.get< Logger >();
                  const uint8_t asyncThreads = info.asyncThreads;
                  const uint8_t synchThreads = info.syncThreads;
 
                  if( asyncThreads < 1 || asyncThreads > 32 )
                  {
-                   pLog->error(
+                   Logger::error(
                      "database: invalid number of worker threads specified. Please pick a value between 1 and 32." );
                    return false;
                  }
@@ -40,7 +35,7 @@ Sapphire::Db::DbLoader& Sapphire::Db::DbLoader::addDb( Sapphire::Db::DbWorkerPoo
 
                    if( error )
                    {
-                     pLog->error( "DatabasePool failed to open." );
+                     Logger::error( "DatabasePool failed to open." );
                      return false;
                    }
                  }
@@ -55,8 +50,7 @@ Sapphire::Db::DbLoader& Sapphire::Db::DbLoader::addDb( Sapphire::Db::DbWorkerPoo
                   {
                     if( !pool.prepareStatements() )
                     {
-                      auto pLog = g_fw.get< Logger >();
-                      pLog->error( "Could not prepare statements of the database, see log for details." );
+                      Logger::error( "Could not prepare statements of the database, see log for details." );
                       return false;
                     }
                     return true;

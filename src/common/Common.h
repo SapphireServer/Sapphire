@@ -26,6 +26,13 @@ namespace Sapphire::Common
     float z;
   };
 
+  struct FFXIVARR_POSITION3_U16
+  {
+    uint16_t x;
+    uint16_t y;
+    uint16_t z;
+  };
+
   struct ActiveLand
   {
     uint8_t ward;
@@ -222,10 +229,38 @@ namespace Sapphire::Common
     FreeCompanyGil = 22000,
     FreeCompanyCrystal = 22001,
 
-    HousingExternalAppearance = 25000,
-    HousingOutdoorItemStoreroom = 25001,
-    HousingInternalAppearance = 25002,
-    HousingIndoorItemStoreroom = 25003,
+    // housing interior containers
+    HousingInteriorAppearance = 25002,
+
+    // 50 in each container max, 400 slots max
+    HousingInteriorPlacedItems1 = 25003,
+    HousingInteriorPlacedItems2 = 25004,
+    HousingInteriorPlacedItems3 = 25005,
+    HousingInteriorPlacedItems4 = 25006,
+    HousingInteriorPlacedItems5 = 25007,
+    HousingInteriorPlacedItems6 = 25008,
+    HousingInteriorPlacedItems7 = 25009,
+    HousingInteriorPlacedItems8 = 25010,
+
+    // 50 max per container, 400 slots max
+    // slot limit increased 'temporarily' for relocation for all estates
+    // see: https://na.finalfantasyxiv.com/lodestone/topics/detail/d781e0d538428aef93b8bed4b50dd62c3c50fc74
+    HousingInteriorStoreroom1 = 27001,
+    HousingInteriorStoreroom2 = 27002,
+    HousingInteriorStoreroom3 = 27003,
+    HousingInteriorStoreroom4 = 27004,
+    HousingInteriorStoreroom5 = 27005,
+    HousingInteriorStoreroom6 = 27006,
+    HousingInteriorStoreroom7 = 27007,
+    HousingInteriorStoreroom8 = 27008,
+
+
+    // housing exterior containers
+    HousingExteriorAppearance = 25000,
+    HousingExteriorPlacedItems = 25001,
+    HousingExteriorStoreroom = 27000,
+
+
   };
 
   enum ContainerType : uint16_t
@@ -743,19 +778,20 @@ namespace Sapphire::Common
     MountSkill = 0xD,
   };
 
-  enum HousePartSlot
+  enum HouseExteriorSlot
   {
+    HousePermit,
     ExteriorRoof,
     ExteriorWall,
     ExteriorWindow,
     ExteriorDoor,
-    OtherFloorWall,
-    OtherFloorFlooring,
-    BasementWall,
-    YardSign
+    ExteriorRoofDecoration,
+    ExteriorWallDecoration,
+    ExteriorPlacard,
+    ExteriorFence
   };
 
-  enum HousingInteriorSlot
+  enum HouseInteriorSlot
   {
     InteriorWall,
     InteriorFloor,
@@ -816,13 +852,11 @@ namespace Sapphire::Common
     uint32_t unkown1; //12
   };
 
-  struct YardObject
+  struct HousingObject
   {
     uint32_t itemId;
     uint16_t itemRotation;
-    uint16_t pos_x;
-    uint16_t pos_y;
-    uint16_t pos_z;
+    Common::FFXIVARR_POSITION3_U16 pos;
   };
 
   enum HouseSize : uint8_t
@@ -832,13 +866,13 @@ namespace Sapphire::Common
     Mansion
   };
 
-  enum HouseState : uint8_t
+  enum HouseStatus : uint8_t
   {
     none,
-    forSale,
-    sold,
-    privateHouse,
-    fcHouse,
+    ForSale,
+    Sold,
+    PrivateEstate,
+    FreeCompanyEstate,
   };
 
   enum HouseIconAdd : uint8_t

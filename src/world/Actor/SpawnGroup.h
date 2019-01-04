@@ -3,7 +3,7 @@
 
 #include "ForwardsZone.h"
 
-namespace Core::Entity
+namespace Sapphire::Entity
 {
 
   class SpawnGroup
@@ -17,7 +17,7 @@ namespace Core::Entity
     std::vector< SpawnPointPtr > m_spawnPoints;
 
   public:
-    SpawnGroup();
+    SpawnGroup( uint32_t bNpcTemplateId, uint32_t level );
 
   };
 

@@ -5,10 +5,6 @@
 #include "Zone.h"
 #include <Logging/Logger.h>
 
-#include "Framework.h"
-
-extern Sapphire::Framework g_fw;
-
 // TODO: the entire zone / areahandling is a bit outdated ( in parts i used this for the 1.0 iteration )
 // likely this could be greatly improved or redone
 
@@ -37,7 +33,6 @@ void Sapphire::Cell::init( uint32_t x, uint32_t y, ZonePtr pZone )
 
 void Sapphire::Cell::addActor( Entity::ActorPtr pAct )
 {
-  auto pLog = g_fw.get< Sapphire::Logger >();
   if( pAct->isPlayer() )
     ++m_playerCount;
 
@@ -46,7 +41,6 @@ void Sapphire::Cell::addActor( Entity::ActorPtr pAct )
 
 void Sapphire::Cell::removeActor( Entity::ActorPtr pAct )
 {
-  auto pLog = g_fw.get< Sapphire::Logger >();
   if( pAct->isPlayer() )
     --m_playerCount;
 

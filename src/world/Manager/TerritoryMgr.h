@@ -2,6 +2,7 @@
 #define SAPPHIRE_TERRITORYMGR_H
 
 #include "ForwardsZone.h"
+#include "BaseManager.h"
 #include <set>
 #include <unordered_map>
 
@@ -26,7 +27,7 @@ namespace Sapphire::World::Manager
      This class manages persistent and temporary instances alike.
 
   */
-  class TerritoryMgr
+  class TerritoryMgr : public Manager::BaseManager
   {
 
   public:
@@ -59,7 +60,7 @@ namespace Sapphire::World::Manager
       //Eureka = 41, // wat
     };
 
-    TerritoryMgr();
+    TerritoryMgr( FrameworkPtr pFw );
 
     /*! initializes the territoryMgr */
     bool init();
@@ -86,6 +87,13 @@ namespace Sapphire::World::Manager
 
     /*! returns true if the territoryType in question is not a private zone */
     bool isPrivateTerritory( uint32_t territoryTypeId ) const;
+
+    /*!
+     * @brief Checks if a territory type is an internal housing area
+     * @param territoryTypeId The territory to test
+     * @return true if it is a housing area, false if not
+     */
+    bool isInternalEstateTerritory( uint32_t territoryTypeId ) const;
 
     /*! returns true if the territoryType is a default non-instanced zone */
     bool isDefaultTerritory( uint32_t territoryTypeId ) const;
@@ -168,7 +176,7 @@ namespace Sapphire::World::Manager
     LandSetIdToZonePtrMap m_landSetIdToZonePtrMap;
 
     /*! map holding actual instances of InstanceContent */
-    InstanceContentIdToInstanceMap m_instanceContentToInstanceMap;
+    InstanceContentIdToInstanceMap m_instanceContentIdToInstanceMap;
 
     /*! flat map for easier lookup of instances by guid */
     InstanceIdToZonePtrMap m_instanceIdToZonePtrMap;

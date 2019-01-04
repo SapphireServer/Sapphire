@@ -176,7 +176,7 @@ namespace Sapphire::Network::Packets
 
     DirectorVars = 0x01E1, // updated 4.4
 
-    CFAvailableContents = 0x01FD, // updated 4.2
+    CFAvailableContents = 0xF1FD, // updated 4.2
 
     WeatherChange = 0x01FC, // updated 4.4
     PlayerTitleList = 0x01FD, // updated 4.4
@@ -201,9 +201,10 @@ namespace Sapphire::Network::Packets
     HousingShowEstateGuestAccess = 0x022A, // updated 4.4
 
     HousingObjectInitialize = 0x022C, // updated 4.4
+    HousingInternalObjectSpawn = 0x22D, // updated 4.4
 
     HousingWardInfo = 0x022F, // updated 4.4
-    YardObjectMove = 0x0230, // updated 4.4
+    HousingObjectMove = 0x0230, // updated 4.4
 
     SharedEstateSettingsResponse = 0x023C, // updated 4.4
 
@@ -263,10 +264,10 @@ namespace Sapphire::Network::Packets
 
     LinkshellListHandler = 0x00F4, // updated 4.3
 
-    MarketBoardRequestItemInformation = 0x00FE, // updated 4.4
+    MarketBoardRequestItemListingInfo = 0x00FE, // updated 4.4
     MarketBoardRequestItemListings = 0x00FF, // updated 4.4
+    MarketBoardSearch = 0x0103, // updated 4.4
 
-    SearchMarketboard = 0x0103, // updated 4.3
     ReqExamineFcInfo = 0x010F, // updated 4.1
 
     FcInfoReqHandler = 0x011A, // updated 4.2
@@ -294,6 +295,8 @@ namespace Sapphire::Network::Packets
 
     InventoryModifyHandler = 0x0142, // updated 4.4
 
+    ReqPlaceHousingItem = 0x145, // updated 4.4
+
     BuildPresetHandler = 0x014A, // updated 4.4
     TalkEventHandler = 0x014B, // updated 4.4
     EmoteEventHandler = 0x014C, // updated 4.4
@@ -311,6 +314,7 @@ namespace Sapphire::Network::Packets
 
     LandRenameHandler = 0x0171, // updated 4.4
     HousingUpdateHouseGreeting = 0x0172, // updated 4.4
+    HousingUpdateObjectPosition = 0x0173, // updated 4.4
 
     SetSharedEstateSettings = 0x0177, // updated 4.4
 

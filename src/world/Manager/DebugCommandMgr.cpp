@@ -11,8 +11,8 @@
 #include <Database/DatabaseDef.h>
 #include <cmath>
 
-#include "DebugCommand.h"
-#include "DebugCommandHandler.h"
+#include "DebugCommand/DebugCommand.h"
+#include "DebugCommandMgr.h"
 
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/ActorControlPacket142.h"
@@ -37,51 +37,50 @@
 #include "Session.h"
 #include "Framework.h"
 
-extern Sapphire::Framework g_fw;
-
 using namespace Sapphire::Network;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::World::Manager;
 
 // instanciate and initialize commands
-Sapphire::DebugCommandHandler::DebugCommandHandler()
+Sapphire::World::Manager::DebugCommandMgr::DebugCommandMgr( FrameworkPtr pFw ) :
+  BaseManager( pFw )
 {
   // Push all commands onto the register map ( command name - function - description - required GM level )
-  registerCommand( "set", &DebugCommandHandler::set, "Executes SET commands.", 1 );
-  registerCommand( "get", &DebugCommandHandler::get, "Executes GET commands.", 1 );
-  registerCommand( "add", &DebugCommandHandler::add, "Executes ADD commands.", 1 );
-  registerCommand( "inject", &DebugCommandHandler::injectPacket, "Loads and injects a premade packet.", 1 );
-  registerCommand( "injectc", &DebugCommandHandler::injectChatPacket, "Loads and injects a premade chat packet.", 1 );
-  registerCommand( "replay", &DebugCommandHandler::replay, "Replays a saved capture folder.", 1 );
-  registerCommand( "nudge", &DebugCommandHandler::nudge, "Nudges you forward/up/down.", 1 );
-  registerCommand( "info", &DebugCommandHandler::serverInfo, "Show server info.", 0 );
-  registerCommand( "help", &DebugCommandHandler::help, "Shows registered commands.", 0 );
-  registerCommand( "script", &DebugCommandHandler::script, "Server script utilities.", 1 );
-  registerCommand( "instance", &DebugCommandHandler::instance, "Instance utilities", 1 );
-  registerCommand( "housing", &DebugCommandHandler::housing, "Housing utilities", 1 );
+  registerCommand( "set", &DebugCommandMgr::set, "Executes SET commands.", 1 );
+  registerCommand( "get", &DebugCommandMgr::get, "Executes GET commands.", 1 );
+  registerCommand( "add", &DebugCommandMgr::add, "Executes ADD commands.", 1 );
+  registerCommand( "inject", &DebugCommandMgr::injectPacket, "Loads and injects a premade packet.", 1 );
+  registerCommand( "injectc", &DebugCommandMgr::injectChatPacket, "Loads and injects a premade chat packet.", 1 );
+  registerCommand( "replay", &DebugCommandMgr::replay, "Replays a saved capture folder.", 1 );
+  registerCommand( "nudge", &DebugCommandMgr::nudge, "Nudges you forward/up/down.", 1 );
+  registerCommand( "info", &DebugCommandMgr::serverInfo, "Show server info.", 0 );
+  registerCommand( "help", &DebugCommandMgr::help, "Shows registered commands.", 0 );
+  registerCommand( "script", &DebugCommandMgr::script, "Server script utilities.", 1 );
+  registerCommand( "instance", &DebugCommandMgr::instance, "Instance utilities", 1 );
+  registerCommand( "housing", &DebugCommandMgr::housing, "Housing utilities", 1 );
 }
 
 // clear all loaded commands
-Sapphire::DebugCommandHandler::~DebugCommandHandler()
+Sapphire::World::Manager::DebugCommandMgr::~DebugCommandMgr()
 {
   for( auto it = m_commandMap.begin(); it != m_commandMap.end(); ++it )
     ( *it ).second.reset();
 }
 
 // add a command set to the register map
-void Sapphire::DebugCommandHandler::registerCommand( const std::string& n, DebugCommand::pFunc functionPtr,
-                                                 const std::string& hText, uint8_t uLevel )
+void Sapphire::World::Manager::DebugCommandMgr::registerCommand( const std::string& n, DebugCommand::pFunc functionPtr,
+                                                                 const std::string& hText, uint8_t uLevel )
 {
   m_commandMap[ std::string( n ) ] = std::make_shared< DebugCommand >( n, functionPtr, hText, uLevel );
 }
 
 // try to retrieve the command in question, execute if found
-void Sapphire::DebugCommandHandler::execCommand( char* data, Entity::Player& player )
+void Sapphire::World::Manager::DebugCommandMgr::execCommand( char* data, Entity::Player& player )
 {
 
   // define callback pointer
-  void ( DebugCommandHandler::*pf )( char*, Entity::Player&, std::shared_ptr< DebugCommand > );
+  void ( DebugCommandMgr::*pf )( char*, Entity::Player&, std::shared_ptr< DebugCommand > );
 
   std::string commandString;
 
@@ -124,7 +123,8 @@ void Sapphire::DebugCommandHandler::execCommand( char* data, Entity::Player& pla
 // Definition of the commands
 ///////////////////////////////////////////////////////////////////////////////////////
 
-void Sapphire::DebugCommandHandler::help( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
+void Sapphire::World::Manager::DebugCommandMgr::help( char* data, Entity::Player& player,
+                                                      std::shared_ptr< DebugCommand > command )
 {
   player.sendDebug( "Registered debug commands:" );
   for( auto cmd : m_commandMap )
@@ -136,11 +136,11 @@ void Sapphire::DebugCommandHandler::help( char* data, Entity::Player& player, st
   }
 }
 
-void Sapphire::DebugCommandHandler::set( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
+void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player& player,
+                                                     std::shared_ptr< DebugCommand > command )
 {
-  auto pLog = g_fw.get< Logger >();
-  auto pTerriMgr = g_fw.get< TerritoryMgr >();
-  auto pDb = g_fw.get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pTerriMgr = framework()->get< TerritoryMgr >();
+  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   std::string subCommand = "";
   std::string params = "";
 
@@ -159,8 +159,7 @@ void Sapphire::DebugCommandHandler::set( char* data, Entity::Player& player, std
   if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
     params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-  pLog->debug( "[" + std::to_string( player.getId() ) + "] " +
-               "subCommand " + subCommand + " params: " + params );
+  Logger::debug( "[{0}] subCommand: {1} params: {1}", player.getId(), subCommand, params );
 
   if( ( ( subCommand == "pos" ) || ( subCommand == "posr" ) ) && ( params != "" ) )
   {
@@ -375,9 +374,9 @@ void Sapphire::DebugCommandHandler::set( char* data, Entity::Player& player, std
 
 }
 
-void Sapphire::DebugCommandHandler::add( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
+void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player& player,
+                                                     std::shared_ptr< DebugCommand > command )
 {
-  auto pLog = g_fw.get< Logger >();
   std::string subCommand;
   std::string params = "";
 
@@ -396,8 +395,8 @@ void Sapphire::DebugCommandHandler::add( char* data, Entity::Player& player, std
   if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
     params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-  pLog->debug( "[" + std::to_string( player.getId() ) + "] " +
-               "subCommand " + subCommand + " params: " + params );
+  Logger::debug( "[" + std::to_string( player.getId() ) + "] " +
+                 "subCommand " + subCommand + " params: " + params );
 
 
   if( subCommand == "status" )
@@ -408,7 +407,8 @@ void Sapphire::DebugCommandHandler::add( char* data, Entity::Player& player, std
 
     sscanf( params.c_str(), "%d %d %hu", &id, &duration, &param );
 
-    auto effect = StatusEffect::make_StatusEffect( id, player.getAsPlayer(), player.getAsPlayer(), duration, 3000 );
+    auto effect = StatusEffect::make_StatusEffect( id, player.getAsPlayer(), player.getAsPlayer(),
+                                                   duration, 3000, framework() );
     effect->setParam( param );
 
     player.addStatusEffect( effect );
@@ -423,7 +423,7 @@ void Sapphire::DebugCommandHandler::add( char* data, Entity::Player& player, std
   }
   else if( subCommand == "bnpc" )
   {
-    auto serverZone = g_fw.get< ServerMgr >();
+    auto serverZone = framework()->get< World::ServerMgr >();
 
     auto bNpcTemplate = serverZone->getBNpcTemplate( params );
 
@@ -431,9 +431,10 @@ void Sapphire::DebugCommandHandler::add( char* data, Entity::Player& player, std
       player.sendNotice( "Template " + params + " not found in cache!" );
 
     auto pBNpc = std::make_shared< Entity::BNpc >( bNpcTemplate,
-                                                     player.getPos().x,
-                                                     player.getPos().y,
-                                                     player.getPos().z, 1 );
+                                                   player.getPos().x,
+                                                   player.getPos().y,
+                                                   player.getPos().z,
+                                                   1, framework() );
 
     auto playerZone = player.getCurrentZone();
 
@@ -509,10 +510,10 @@ void Sapphire::DebugCommandHandler::add( char* data, Entity::Player& player, std
 
 }
 
-void Sapphire::DebugCommandHandler::get( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
+void Sapphire::World::Manager::DebugCommandMgr::get( char* data, Entity::Player& player,
+                                                     std::shared_ptr< DebugCommand > command )
 {
-  auto pLog = g_fw.get< Logger >();
-  auto pExdData = g_fw.get< Data::ExdDataGenerated >();
+  auto pExdData = framework()->get< Data::ExdDataGenerated >();
   std::string subCommand;
   std::string params = "";
 
@@ -531,9 +532,7 @@ void Sapphire::DebugCommandHandler::get( char* data, Entity::Player& player, std
   if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
     params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-  pLog->debug( "[" + std::to_string( player.getId() ) + "] " +
-               "subCommand " + subCommand + " params: " + params );
-
+  Logger::debug( "[{0}] subCommand: {1} params: {2}", player.getId(), subCommand, params );
 
   if( ( subCommand == "pos" ) )
   {
@@ -556,27 +555,28 @@ void Sapphire::DebugCommandHandler::get( char* data, Entity::Player& player, std
 }
 
 void
-Sapphire::DebugCommandHandler::injectPacket( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
+Sapphire::World::Manager::DebugCommandMgr::injectPacket( char* data, Entity::Player& player,
+                                                         std::shared_ptr< DebugCommand > command )
 {
-  auto pServerZone = g_fw.get< ServerMgr >();
+  auto pServerZone = framework()->get< World::ServerMgr >();
   auto pSession = pServerZone->getSession( player.getId() );
   if( pSession )
     pSession->getZoneConnection()->injectPacket( data + 7, player );
 }
 
-void Sapphire::DebugCommandHandler::injectChatPacket( char* data, Entity::Player& player,
-                                                  std::shared_ptr< DebugCommand > command )
+void Sapphire::World::Manager::DebugCommandMgr::injectChatPacket( char* data, Entity::Player& player,
+                                                                  std::shared_ptr< DebugCommand > command )
 {
-  auto pServerZone = g_fw.get< ServerMgr >();
+  auto pServerZone = framework()->get< World::ServerMgr >();
   auto pSession = pServerZone->getSession( player.getId() );
   if( pSession )
     pSession->getChatConnection()->injectPacket( data + 8, player );
 }
 
-void Sapphire::DebugCommandHandler::replay( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
+void Sapphire::World::Manager::DebugCommandMgr::replay( char* data, Entity::Player& player,
+                                                        std::shared_ptr< DebugCommand > command )
 {
-  auto pLog = g_fw.get< Logger >();
-  auto pServerZone = g_fw.get< ServerMgr >();
+  auto pServerZone = framework()->get< World::ServerMgr >();
   std::string subCommand;
   std::string params = "";
 
@@ -595,8 +595,8 @@ void Sapphire::DebugCommandHandler::replay( char* data, Entity::Player& player, 
   if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
     params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-  pLog->debug( "[" + std::to_string( player.getId() ) + "] " +
-               "subCommand " + subCommand + " params: " + params );
+  Logger::debug( "[" + std::to_string( player.getId() ) + "] " +
+                 "subCommand " + subCommand + " params: " + params );
 
 
   if( subCommand == "start" )
@@ -625,7 +625,8 @@ void Sapphire::DebugCommandHandler::replay( char* data, Entity::Player& player, 
 
 }
 
-void Sapphire::DebugCommandHandler::nudge( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
+void Sapphire::World::Manager::DebugCommandMgr::nudge( char* data, Entity::Player& player,
+                                                       std::shared_ptr< DebugCommand > command )
 {
   std::string subCommand;
 
@@ -672,18 +673,19 @@ void Sapphire::DebugCommandHandler::nudge( char* data, Entity::Player& player, s
 }
 
 void
-Sapphire::DebugCommandHandler::serverInfo( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
+Sapphire::World::Manager::DebugCommandMgr::serverInfo( char* data, Entity::Player& player,
+                                                       std::shared_ptr< DebugCommand > command )
 {
-  auto pServerZone = g_fw.get< ServerMgr >();
+  auto pServerZone = framework()->get< World::ServerMgr >();
   player.sendDebug( "SapphireZone " + Version::VERSION + "\nRev: " + Version::GIT_HASH );
   player.sendDebug( "Compiled: " __DATE__ " " __TIME__ );
   player.sendDebug( "Sessions: " + std::to_string( pServerZone->getSessionCount() ) );
 }
 
-void Sapphire::DebugCommandHandler::script( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
+void Sapphire::World::Manager::DebugCommandMgr::script( char* data, Entity::Player& player,
+                                                        std::shared_ptr< DebugCommand > command )
 {
-  auto pLog = g_fw.get< Logger >();
-  auto pScriptMgr = g_fw.get< Scripting::ScriptMgr >();
+  auto pScriptMgr = framework()->get< Scripting::ScriptMgr >();
   std::string subCommand;
   std::string params = "";
 
@@ -703,8 +705,7 @@ void Sapphire::DebugCommandHandler::script( char* data, Entity::Player& player, 
   if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
     params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-  pLog->debug( "[" + std::to_string( player.getId() ) + "] " +
-               "subCommand " + subCommand + " params: " + params );
+  Logger::debug( "[{0}] subCommand: {1} params: {2}", player.getId(), subCommand, params );
 
   if( subCommand == "unload" )
   {
@@ -769,9 +770,10 @@ void Sapphire::DebugCommandHandler::script( char* data, Entity::Player& player, 
 }
 
 void
-Sapphire::DebugCommandHandler::instance( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
+Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Player& player,
+                                                     std::shared_ptr< DebugCommand > command )
 {
-  auto pTeriMgr = g_fw.get< TerritoryMgr >();
+  auto pTeriMgr = framework()->get< TerritoryMgr >();
   std::string cmd( data ), params, subCommand;
   auto cmdPos = cmd.find_first_of( ' ' );
 
@@ -985,9 +987,10 @@ Sapphire::DebugCommandHandler::instance( char* data, Entity::Player& player, std
   }
 }
 
-void Sapphire::DebugCommandHandler::housing( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
+void Sapphire::World::Manager::DebugCommandMgr::housing( char* data, Entity::Player& player,
+                                                         std::shared_ptr< DebugCommand > command )
 {
-  auto pTeriMgr = g_fw.get< TerritoryMgr >();
+  auto pTeriMgr = framework()->get< TerritoryMgr >();
   std::string cmd( data ), params, subCommand;
   auto cmdPos = cmd.find_first_of( ' ' );
 
@@ -1006,29 +1009,34 @@ void Sapphire::DebugCommandHandler::housing( char* data, Entity::Player& player,
       subCommand = params;
   }
 
-  if( subCommand == "permission" || subCommand == "perm" )
-  {
-    uint8_t permissionSet;
-    sscanf( params.c_str(), "%hhu", &permissionSet );
-
-    if ( permissionSet < 5 )
-    {
-      auto pZone = player.getCurrentZone();
-      if( pTeriMgr->isHousingTerritory( pZone->getTerritoryTypeId() ) )
-      {
-        auto pHousing = std::dynamic_pointer_cast< HousingZone >( pZone );
-        if( pHousing )
-        {
-          player.setLandFlags( permissionSet, 0, pHousing->getLandSetId(), pHousing->getWardNum(), pHousing->getTerritoryTypeId() );
-          player.sendLandFlags();
-        }
-        else
-          player.sendDebug( "You aren't in a housing Zone." );
-      }
-    }
-    else
-      player.sendDebug( "PermissionSet out of range." );
-  }
+//  if( subCommand == "permission" || subCommand == "perm" )
+//  {
+//    uint8_t permissionSet;
+//    sscanf( params.c_str(), "%hhu", &permissionSet );
+//
+//    if ( permissionSet < 5 )
+//    {
+//      auto pZone = player.getCurrentZone();
+//      if( pTeriMgr->isHousingTerritory( pZone->getTerritoryTypeId() ) )
+//      {
+//        auto pHousing = std::dynamic_pointer_cast< HousingZone >( pZone );
+//        if( pHousing )
+//        {
+//          // todo: wat?
+//          Common::LandIdent ident {};
+//          ident.wardNum = pHousing->getWardNum();
+//          ident.territoryTypeId = pHousing->getTerritoryTypeId();
+//
+//          player.setLandFlags( permissionSet, 0, pHousing->getLandSetId(), ident );
+//          player.sendLandFlags();
+//        }
+//        else
+//          player.sendDebug( "You aren't in a housing Zone." );
+//      }
+//    }
+//    else
+//      player.sendDebug( "PermissionSet out of range." );
+//  }
   else
   {
     player.sendDebug( "Unknown sub command." );

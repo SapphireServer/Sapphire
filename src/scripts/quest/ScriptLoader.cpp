@@ -13,6 +13,7 @@
 #include "subquest/gridania/SubFst002.cpp"
 #include "subquest/gridania/SubFst003.cpp"
 #include "subquest/gridania/SubFst004.cpp"
+#include "subquest/gridania/SubFst005.cpp"
 #include "subquest/gridania/SubFst008.cpp"
 #include "subquest/gridania/SubFst009.cpp"
 #include "subquest/gridania/SubFst010.cpp"
@@ -25,6 +26,7 @@
 #include "subquest/gridania/SubFst029.cpp"
 #include "subquest/gridania/SubFst030.cpp"
 #include "subquest/gridania/SubFst041.cpp"
+#include "subquest/gridania/SubFst045.cpp"
 #include "subquest/limsa/SubSea001.cpp"
 #include "subquest/uldah/SubWil000.cpp"
 #include "subquest/uldah/SubWil001.cpp"
@@ -55,6 +57,7 @@ const Sapphire::ScriptAPI::ScriptObject* ptrs[] =
    static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubFst002 ),
    static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubFst003 ),
    static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubFst004 ),
+   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubFst005 ),
    static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubFst008 ),
    static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubFst009 ),
    static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubFst010 ),
@@ -67,6 +70,7 @@ const Sapphire::ScriptAPI::ScriptObject* ptrs[] =
    static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubFst029 ),
    static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubFst030 ),
    static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubFst041 ),
+   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubFst045 ),
    static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubSea001 ),
    static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubWil000 ),
    static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubWil001 ),

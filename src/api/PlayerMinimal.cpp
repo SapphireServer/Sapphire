@@ -409,6 +409,7 @@ void PlayerMinimal::insertDbGlobalItem( uint32_t itemId, uint64_t uniqueId ) con
   stmtItemGlobal->setInt( 1, m_id );
   stmtItemGlobal->setInt64( 2, uniqueId );
   stmtItemGlobal->setInt( 3, itemId );
+  stmtItemGlobal->setInt( 4, 1 ); // stack of 1
   g_charaDb.directExecute( stmtItemGlobal );
 }
 
