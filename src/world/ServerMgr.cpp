@@ -65,11 +65,11 @@ bool Sapphire::World::ServerMgr::loadSettings( int32_t argc, char* argv[] )
 {
   auto pConfig = framework()->get< Sapphire::ConfigMgr >();
 
-  Logger::info( "Loading config " + m_configName );
+  Logger::info( "Loading config {0}", m_configName );
 
   if( !pConfig->loadConfig( m_configName ) )
   {
-    Logger::fatal( "Error loading config " + m_configName );
+    Logger::fatal( "Error loading config {0}", m_configName );
     Logger::fatal( "If this is the first time starting the server, we've copied the default one for your editing pleasure." );
     return false;
   }
@@ -103,7 +103,7 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
   if( !pExdData->init( dataPath ) )
   {
     Logger::fatal( "Error setting up generated EXD data. Make sure that DataPath is set correctly in config.ini" );
-    Logger::fatal( "DataPath: " + dataPath );
+    Logger::fatal( "DataPath: {0}", dataPath );
     return;
   }
   framework()->set< Data::ExdDataGenerated >( pExdData );
@@ -192,7 +192,7 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
   framework()->set< Manager::EventMgr >( pEventMgr );
   framework()->set< Manager::ItemMgr >( pItemMgr );
 
-  Logger::info( "World server running on " + m_ip + ":" + std::to_string( m_port ) );
+  Logger::info( "World server running on {0}:{1}", m_ip, m_port );
 
   mainLoop();
 
