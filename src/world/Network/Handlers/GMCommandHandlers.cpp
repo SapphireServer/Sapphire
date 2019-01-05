@@ -143,9 +143,11 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
       auto inRange = targetPlayer->getInRangeActors();
       for( auto actor : inRange )
       {
-        targetPlayer->despawn( actor->getAsPlayer() );
-        targetPlayer->spawn( actor->getAsPlayer() );
-      }
+        if( actor->isPlayer() )
+        {
+          targetPlayer->despawn( actor->getAsPlayer() );
+          targetPlayer->spawn( actor->getAsPlayer() );
+        }
       break;
     }
     case GmCommand::Tribe:
@@ -156,8 +158,11 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
       auto inRange = targetPlayer->getInRangeActors();
       for( auto actor : inRange )
       {
-        targetPlayer->despawn( actor->getAsPlayer() );
-        targetPlayer->spawn( actor->getAsPlayer() );
+        if( actor->isPlayer() )
+        {
+          targetPlayer->despawn( actor->getAsPlayer() );
+          targetPlayer->spawn( actor->getAsPlayer() );
+        }
       }
       break;
     }
@@ -169,8 +174,11 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
       auto inRange = targetActor->getInRangeActors();
       for( auto actor : inRange )
       {
-        targetPlayer->despawn( actor->getAsPlayer() );
-        targetPlayer->spawn( actor->getAsPlayer() );
+        if( actor->isPlayer() )
+        {
+          targetPlayer->despawn( actor->getAsPlayer() );
+          targetPlayer->spawn( actor->getAsPlayer() );
+        }
       }
       break;
     }
@@ -223,8 +231,11 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
 
       for( auto actor : player.getInRangeActors() )
       {
-        player.despawn( actor->getAsPlayer() );
-        player.spawn( actor->getAsPlayer() );
+        if( actor->isPlayer() )
+        {
+          targetPlayer->despawn( actor->getAsPlayer() );
+          targetPlayer->spawn( actor->getAsPlayer() );
+        }
       }
       break;
     }
