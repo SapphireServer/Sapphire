@@ -151,10 +151,10 @@ void Sapphire::World::Session::startReplay( const std::string& path )
     m_replayCache.push_back( std::tuple< uint64_t, std::string >(
       Util::getTimeMs() + ( std::get< 0 >( set ) - startTime ), std::get< 1 >( set ) ) );
 
-    Logger::info( "Registering " + std::get< 1 >( set ) + " for " + std::to_string( std::get< 0 >( set ) - startTime ) );
+    Logger::info( "Registering {0} for {1}", std::get< 1 >( set ), std::get< 0 >( set ) - startTime );
   }
 
-  getPlayer()->sendDebug( "Registered " + std::to_string( m_replayCache.size() ) + " sets for replay" );
+  getPlayer()->sendDebug( "Registered {0} sets for replay" ), m_replayCache.size();
   m_isReplaying = true;
 }
 

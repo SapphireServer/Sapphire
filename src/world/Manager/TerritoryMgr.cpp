@@ -162,12 +162,14 @@ bool Sapphire::World::Manager::TerritoryMgr::createDefaultTerritories()
       continue;
 
     uint32_t guid = getNextInstanceId();
-    Logger::info( std::to_string( territoryTypeId ) +
-                  "\t" + std::to_string( guid ) +
-                  "\t" + std::to_string( territoryInfo->territoryIntendedUse ) +
-                  "\t" + ( territoryInfo->name.length() <= 4 ? territoryInfo->name + "\t" : territoryInfo->name ) +
-                  "\t" + ( isPrivateTerritory( territoryTypeId ) ? "PRIVATE" : "PUBLIC" ) +
-                  "\t" + pPlaceName->name );
+
+    Logger::info( "{0}\t{1}\t{2}\t{3:<10}\t{4}\t{5}",
+                  territoryTypeId,
+                  guid,
+                  territoryInfo->territoryIntendedUse,
+                  territoryInfo->name,
+                  ( isPrivateTerritory( territoryTypeId ) ? "PRIVATE" : "PUBLIC" ),
+                  pPlaceName->name );
 
     auto pZone = make_Zone( territoryTypeId, guid, territoryInfo->name, pPlaceName->name, framework() );
     pZone->init();
@@ -205,13 +207,14 @@ bool Sapphire::World::Manager::TerritoryMgr::createHousingTerritories()
     for( wardNum = 0; wardNum < wardMaxNum; wardNum++ )
     {
       uint32_t guid = getNextInstanceId();
-      Logger::info( std::to_string( territoryTypeId ) +
-                    "\t" + std::to_string( guid ) +
-                    "\t" + std::to_string( territoryInfo->territoryIntendedUse ) +
-                    "\t" + ( territoryInfo->name.length() <= 4 ? territoryInfo->name + "\t" : territoryInfo->name ) +
-                    "\t" + "HOUSING" +
-                    "\t" + pPlaceName->name +
-                    "#" + std::to_string( wardNum ) );
+
+      Logger::info( "{0}\t{1}\t{2}\t{3:<10}\tHOUSING\t{4}#{5}",
+                    territoryTypeId,
+                    guid,
+                    territoryInfo->territoryIntendedUse,
+                    territoryInfo->name,
+                    pPlaceName->name,
+                    wardNum );
 
       auto pHousingZone = make_HousingZone( wardNum, territoryTypeId, guid, territoryInfo->name,
                                             pPlaceName->name, framework() );
@@ -246,8 +249,7 @@ Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createTerritoryInstanc
   if( !pTeri || !pPlaceName )
     return nullptr;
 
-  Logger::debug(
-    "Starting instance for territory: " + std::to_string( territoryTypeId ) + " (" + pPlaceName->name + ")" );
+  Logger::debug( "Starting instance for territory: {0} ({1})", territoryTypeId, pPlaceName->name );
 
   auto pZone = make_Zone( territoryTypeId, getNextInstanceId(), pTeri->name, pPlaceName->name, framework() );
   pZone->init();
@@ -280,8 +282,7 @@ Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createInstanceContent(
   if( !pTeri || pInstanceContent->name.empty() )
     return nullptr;
 
-  Logger::debug( "Starting instance for InstanceContent id: " + std::to_string( instanceContentId ) +
-                 " (" + pInstanceContent->name + ")" );
+  Logger::debug( "Starting instance for InstanceContent id: {0} ({1})", instanceContentId, pInstanceContent->name );
 
   auto pZone = make_InstanceContent( pInstanceContent, pContentFinderCondition->territoryType, getNextInstanceId(),
                                      pTeri->name, pInstanceContent->name, instanceContentId, framework() );
@@ -471,8 +472,7 @@ void Sapphire::World::Manager::TerritoryMgr::updateTerritoryInstances( uint32_t 
     // todo: make this timeout configurable, though should be pretty relaxed in any case
     if( diff > 60 )
     {
-      Logger::info( "Removing HousingInteriorTerritory#" +
-                    std::to_string( zone->getGuId() ) + " - has been inactive for 60 seconds" );
+      Logger::info( "Removing HousingInteriorTerritory#{0} - has been inactive for 60 seconds", zone->getGuId() );
 
       // remove zone from maps
       m_zoneSet.erase( zone );

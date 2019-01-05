@@ -117,7 +117,7 @@ void Sapphire::Network::GameConnection::reqExamineSearchCommentHandler( Framewor
   auto targetId = *reinterpret_cast< const uint32_t* >( &inPacket.data[ 0x10 ] );
   auto pSession = pFw->get< World::ServerMgr >()->getSession( targetId );
 
-  Logger::debug( std::to_string( targetId ) );
+  Logger::debug( "reqExamineSearchCommentHandler: {0}", targetId );
 
   if( pSession )
   {
@@ -145,7 +145,7 @@ void Sapphire::Network::GameConnection::reqExamineFcInfo( FrameworkPtr pFw,
   auto targetId = *reinterpret_cast< const uint32_t* >( &inPacket.data[ 0x18 ] );
   auto pSession = pFw->get< World::ServerMgr >()->getSession( targetId );
 
-  Logger::debug( std::to_string( targetId ) );
+  Logger::debug( "reqExamineFcInfo: {0}", targetId );
 
   if( pSession )
   {
@@ -314,7 +314,7 @@ Sapphire::Network::GameConnection::reqEquipDisplayFlagsHandler( FrameworkPtr pFw
 {
   player.setEquipDisplayFlags( inPacket.data[ 0x10 ] );
 
-  player.sendDebug( "EquipDisplayFlag CHANGE: " + std::to_string( player.getEquipDisplayFlags() ) );
+  player.sendDebug( "EquipDisplayFlag CHANGE: {0}", player.getEquipDisplayFlags() );
 }
 
 void Sapphire::Network::GameConnection::zoneLineHandler( FrameworkPtr pFw,
@@ -326,7 +326,7 @@ void Sapphire::Network::GameConnection::zoneLineHandler( FrameworkPtr pFw,
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcZoneLineHandler >( inPacket );
   const auto zoneLineId = packet.data().zoneLineId;
 
-  player.sendDebug( "Walking ZoneLine " + std::to_string( zoneLineId ) );
+  player.sendDebug( "Walking ZoneLine#{0}", zoneLineId );
 
   auto pZone = player.getCurrentZone();
 
@@ -338,7 +338,7 @@ void Sapphire::Network::GameConnection::zoneLineHandler( FrameworkPtr pFw,
 
   if( pLine != nullptr )
   {
-    player.sendDebug( "ZoneLine " + std::to_string( zoneLineId ) + " found." );
+    player.sendDebug( "ZoneLine #{0} found.", zoneLineId );
     targetPos = pLine->getTargetPosition();
     targetZone = pLine->getTargetZoneId();
     rotation = pLine->getTargetRotation();
@@ -379,7 +379,7 @@ void Sapphire::Network::GameConnection::discoveryHandler( FrameworkPtr pFw,
 
   if( !pQR->next() )
   {
-    player.sendDebug( "Discovery ref pos ID: " + std::to_string( positionRef ) + " not found. " );
+    player.sendDebug( "Discovery ref pos id#{0} not found!", positionRef );
     return;
   }
 
@@ -388,7 +388,7 @@ void Sapphire::Network::GameConnection::discoveryHandler( FrameworkPtr pFw,
   discoveryPacket->data().map_part_id = pQR->getUInt( 3 );
 
   player.queuePacket( discoveryPacket );
-  player.sendDebug( "Discovery ref pos ID: " + std::to_string( positionRef ) );
+  player.sendDebug( "Discovery ref pos id#{0}", positionRef );
 
   player.discover( pQR->getUInt16( 2 ), pQR->getUInt16( 3 ) );
 

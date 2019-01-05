@@ -7,7 +7,7 @@ Sapphire::Db::ZoneDbConnection::ZoneDbConnection( ConnectionInfo& connInfo ) :
 }
 
 Sapphire::Db::ZoneDbConnection::ZoneDbConnection( Sapphire::LockedWaitQueue< std::shared_ptr< Operation > >* q,
-                                                ConnectionInfo& connInfo ) :
+                                                  ConnectionInfo& connInfo ) :
   DbConnection( q, connInfo )
 {
 }
@@ -175,12 +175,24 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     "INSERT INTO charaglobalitem ( CharacterId, ItemId, catalogId, stack, UPDATE_DATE ) VALUES ( ?, ?, ?, ?, NOW() );",
                     CONNECTION_SYNC );
 
-  /// BNPC TEMPLATES
+  /// ZONE QUERIES
   prepareStatement( ZONE_SEL_BNPCTEMPLATES,
                     "SELECT Id, Name, bNPCBaseId, bNPCNameId, mainWeaponModel, "
                            "secWeaponModel, aggressionMode, enemyType, pose, "
                            "modelChara, displayFlags, Look, Models "
                     "FROM bnpctemplate WHERE 1;",
+                    CONNECTION_BOTH );
+
+  prepareStatement( ZONE_SEL_SPAWNGROUPS,
+                    "SELECT id, bNpcTemplateId, level, maxHp "
+                    "FROM spawngroup "
+                    "WHERE territoryTypeId = ?",
+                    CONNECTION_BOTH );
+  
+  prepareStatement( ZONE_SEL_SPAWNPOINTS,
+                    "SELECT id, x, y, z, r "
+                    "FROM spawnpoint "
+                    "WHERE spawnGroupId = ?",
                     CONNECTION_BOTH );
 
   prepareStatement( CHARA_ITEMGLOBAL_UP,

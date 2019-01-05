@@ -141,7 +141,7 @@ void Sapphire::Network::GameConnection::OnAccept( const std::string& host, uint1
 {
   GameConnectionPtr connection( new GameConnection( m_hive, m_pAcceptor, m_pFw ) );
   m_pAcceptor->Accept( connection );
-  Logger::info( "Connect from " + m_socket.remote_endpoint().address().to_string() );
+  Logger::info( "Connect from {0}", m_socket.remote_endpoint().address().to_string() );
 }
 
 
@@ -196,7 +196,7 @@ void Sapphire::Network::GameConnection::OnRecv( std::vector< uint8_t >& buffer )
 
 void Sapphire::Network::GameConnection::OnError( const asio::error_code& error )
 {
-  Logger::debug( "GameConnection ERROR: " + error.message() );
+  Logger::debug( "GameConnection ERROR: {0}", error.message() );
 }
 
 void Sapphire::Network::GameConnection::queueInPacket( Sapphire::Network::Packets::FFXIVARR_PACKET_RAW inPacket )
@@ -214,25 +214,21 @@ void Sapphire::Network::GameConnection::handleZonePacket( Sapphire::Network::Pac
   uint16_t opcode = *reinterpret_cast< uint16_t* >( &pPacket.data[ 0x02 ] );
   auto it = m_zoneHandlerMap.find( opcode );
 
-  std::string sessionStr = "[" + std::to_string( m_pSession->getId() ) + "]";
-
   if( it != m_zoneHandlerMap.end() )
   {
     auto itStr = m_zoneHandlerStrMap.find( opcode );
     std::string name = itStr != m_zoneHandlerStrMap.end() ? itStr->second : "unknown";
     // dont display packet notification if it is a ping or pos update, don't want the spam
     if( opcode != PingHandler && opcode != UpdatePositionHandler )
-      Logger::debug( sessionStr + " Handling Zone IPC : " + name + "( " +
-                     Util::intToHexString( static_cast< uint32_t >( opcode ), 4 ) + " )" );
+      Logger::debug( "[{0}] Handling Zone IPC : {1} ( {2:04X} )", m_pSession->getId(), name, opcode );
 
     ( this->*( it->second ) )( m_pFw, pPacket, *m_pSession->getPlayer() );
   }
   else
   {
-    Logger::debug( sessionStr + " Undefined Zone IPC : Unknown ( " +
-		               Util::intToHexString( static_cast< uint32_t >( opcode ), 4 ) + " )" );
-    Logger::debug( "Dump:\n" + Util::binaryToHexDump( const_cast< uint8_t* >( &pPacket.data[ 0 ] ),
-                   pPacket.segHdr.size ) );
+    Logger::debug( "[{0}] Undefined Zone IPC : Unknown ( {1:04X} )", m_pSession->getId(), opcode );
+    Logger::debug( "Dump:\n{0}", Util::binaryToHexDump( const_cast< uint8_t* >( &pPacket.data[ 0 ] ),
+                                                       pPacket.segHdr.size ) );
   }
 }
 
@@ -241,23 +237,19 @@ void Sapphire::Network::GameConnection::handleChatPacket( Sapphire::Network::Pac
   uint16_t opcode = *reinterpret_cast< uint16_t* >( &pPacket.data[ 0x02 ] );
   auto it = m_chatHandlerMap.find( opcode );
 
-  std::string sessionStr = "[" + std::to_string( m_pSession->getId() ) + "]";
-
   if( it != m_chatHandlerMap.end() )
   {
     auto itStr = m_chatHandlerStrMap.find( opcode );
     std::string name = itStr != m_chatHandlerStrMap.end() ? itStr->second : "unknown";
     // dont display packet notification if it is a ping or pos update, don't want the spam
 
-    Logger::debug( sessionStr + " Handling Chat IPC : " + name + "( " +
-                   Util::intToHexString( static_cast< uint32_t >( opcode ), 4 ) + " )" );
+    Logger::debug( "[{0}] Handling Chat IPC : {1} ( {2:04X} )", m_pSession->getId(), name, opcode );
 
     ( this->*( it->second ) )( m_pFw, pPacket, *m_pSession->getPlayer() );
   }
   else
   {
-    Logger::debug( sessionStr + " Undefined Chat IPC : Unknown ( " +
-                   Util::intToHexString( static_cast< uint32_t >( opcode ), 4 ) + " )" );
+    Logger::debug( "[{0}] Undefined Chat IPC : Unknown ( {1:04X} )", m_pSession->getId(), opcode );
   }
 }
 
@@ -351,7 +343,7 @@ void Sapphire::Network::GameConnection::injectPacket( const std::string& packetp
   fp = fopen( packetpath.c_str(), "rb" );
   if( fp == nullptr )
   {
-    player.sendDebug( "Packet " + packetpath + " not found!" );
+    player.sendDebug( "Packet {0} not found!", packetpath );
     return;
   }
 
@@ -361,7 +353,7 @@ void Sapphire::Network::GameConnection::injectPacket( const std::string& packetp
   rewind( fp );
   if( fread( packet, sizeof( char ), size, fp ) != size )
   {
-    player.sendDebug( "Packet " + packetpath + " did not read full size: " + std::to_string( size ) );
+    player.sendDebug( "Packet {0} did not read full size: {1}", packetpath, size );
     return;
   }
   fclose( fp );
@@ -413,7 +405,7 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
 
         if( !session )
         {
-          Logger::info( "[" + std::string( id ) + "] Session not registered, creating" );
+          Logger::info( "[{0}] Session not registered, creating", id );
           // return;
           if( !pServerZone->createSession( playerId ) )
           {
@@ -425,7 +417,7 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
           //TODO: Catch more things in lobby and send real errors
         else if( !session->isValid() || ( session->getPlayer() && session->getPlayer()->getLastPing() != 0 ) )
         {
-          Logger::error( "[" + std::string( id ) + "] Session INVALID, disconnecting" );
+          Logger::error( "[{0}] Session INVALID, disconnecting", id );
           Disconnect();
           return;
         }
@@ -445,7 +437,7 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
           auto pe1 = std::make_shared< FFXIVRawPacket >( 0x02, 0x38, 0, 0 );
           *( unsigned int* ) ( &pe1->data()[ 0 ] ) = playerId;
           sendSinglePacket( pe1 );
-          Logger::info( "[" + std::string( id ) + "] Setting session for zone connection" );
+          Logger::info( "[{0}] Setting session for zone connection", id );
           session->setZoneConnection( pCon );
         }
           // chat connection, assinging it to the session
@@ -459,7 +451,7 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
           *( unsigned short* ) ( &pe3->data()[ 2 ] ) = 0x02;
           sendSinglePacket( pe3 );
 
-          Logger::info( "[" + std::string( id ) + "] Setting session for chat connection" );
+          Logger::info( "[{0}] Setting session for chat connection", id );
           session->setChatConnection( pCon );
         }
 

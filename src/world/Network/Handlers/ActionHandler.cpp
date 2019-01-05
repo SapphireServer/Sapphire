@@ -44,7 +44,7 @@ void Sapphire::Network::GameConnection::actionHandler( FrameworkPtr pFw,
   const auto useCount = packet.data().useCount;
   const auto targetId = packet.data().targetId;
 
-  player.sendDebug( "Skill type:" + std::to_string( type ) );
+  player.sendDebug( "Skill type: {0}", type );
 
   auto pExdData = pFw->get< Data::ExdDataGenerated >();
   auto pScriptMgr = pFw->get< Scripting::ScriptMgr >();
@@ -57,9 +57,8 @@ void Sapphire::Network::GameConnection::actionHandler( FrameworkPtr pFw,
       {
         std::string actionIdStr = Util::intToHexString( action, 4 );
         player.sendDebug( "---------------------------------------" );
-        player.sendDebug( "ActionHandler ( " + actionIdStr + " | " +
-                          pExdData->get< Sapphire::Data::Action >( action )->name +
-                          " | " + std::to_string( targetId ) + " )" );
+        player.sendDebug( "ActionHandler ( {0} | {1} | {2} )",
+                          actionIdStr, pExdData->get< Sapphire::Data::Action >( action )->name, targetId );
 
         player.queuePacket( makeActorControl142( player.getId(), ActorControlType::ActionStart, 0x01, action ) );
 
@@ -122,7 +121,7 @@ void Sapphire::Network::GameConnection::actionHandler( FrameworkPtr pFw,
 
     case Common::SkillType::MountSkill:
 
-      player.sendDebug( "Request mount " + std::to_string( action ) );
+      player.sendDebug( "Request mount {0}", action );
 
       auto pActionMount = Action::make_ActionMount( player.getAsPlayer(), action );
       player.setCurrentAction( pActionMount );
