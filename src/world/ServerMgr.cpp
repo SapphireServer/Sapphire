@@ -217,8 +217,8 @@ void Sapphire::World::ServerMgr::printBanner() const
 {
   Logger::info( "===========================================================" );
   Logger::info( "Sapphire Server Project " );
-  Logger::info( "Version: " + Version::VERSION );
-  Logger::info( "Git Hash: " + Version::GIT_HASH );
+  Logger::info( "Version: {0}", Version::VERSION );
+  Logger::info( "Git Hash: {0}", Version::GIT_HASH );
   Logger::info( "Compiled: " __DATE__ " " __TIME__ );
   Logger::info( "===========================================================" );
 }

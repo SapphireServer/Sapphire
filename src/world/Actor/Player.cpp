@@ -362,9 +362,10 @@ void Sapphire::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
     rot = targetPos->getTargetRotation();
   }
 
-  sendDebug( "Teleport: " + pExdData->get< Sapphire::Data::PlaceName >( data->placeName )->name + " " +
-             pExdData->get< Sapphire::Data::PlaceName >( data->aethernetName )->name +
-             "(" + std::to_string( data->territory ) + ")" );
+  sendDebug( "Teleport: {0} {1} ({2})",
+             pExdData->get< Sapphire::Data::PlaceName >( data->placeName )->name,
+             pExdData->get< Sapphire::Data::PlaceName >( data->aethernetName )->name,
+             data->territory );
 
   // TODO: this should be simplified and a type created in server_common/common.h.
   if( type == 1 ) // teleport

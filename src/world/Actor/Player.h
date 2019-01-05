@@ -5,6 +5,7 @@
 
 #include <Common.h>
 #include <Util/SpawnIndexAllocator.h>
+#include <spdlog/fmt/fmt.h>
 
 #include "Chara.h"
 #include "Event/EventHandler.h"
@@ -763,6 +764,12 @@ namespace Sapphire::Entity
     void sendUrgent( const std::string& message );
 
     void sendDebug( const std::string& message );
+
+    template< typename... Args >
+    void sendDebug( const std::string& message, const Args&... args )
+    {
+      sendDebug( fmt::format( message, args... ) );
+    }
 
     void sendLogMessage( uint32_t messageId, uint32_t param2 = 0, uint32_t param3 = 0, uint32_t param4 = 0, uint32_t param5 = 0, uint32_t param6 = 0 );
 

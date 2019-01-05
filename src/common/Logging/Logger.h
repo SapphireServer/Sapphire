@@ -24,48 +24,48 @@ namespace Sapphire
 
     static void error( const std::string& text );
     template< typename... Args >
-    static void error( const std::string& fmt, const Args&... args )
+    static void error( const std::string& text, const Args&... args )
     {
-      error( fmt::format( fmt, args... ) );
+      error( fmt::format( text, args... ) );
     }
 
     static void warn( const std::string& text );
     template< typename... Args >
-    static void warn( const std::string& fmt, const Args&... args )
+    static void warn( const std::string& text, const Args&... args )
     {
-      warn( fmt::format( fmt, args... ) );
+      warn( fmt::format( text, args... ) );
     }
 
 
     static void info( const std::string& text );
     template< typename... Args >
-    static void info( const std::string& fmt, const Args&... args )
+    static void info( const std::string& text, const Args&... args )
     {
-      info( fmt::format( fmt, args... ) );
+      info( fmt::format( text, args... ) );
     }
 
 
     static void debug( const std::string& text );
     template< typename... Args >
-    static void debug( const std::string& fmt, const Args&... args )
+    static void debug( const std::string& text, const Args&... args )
     {
-      debug( fmt::format( fmt, args... ) );
+      debug( fmt::format( text, args... ) );
     }
 
 
     static void fatal( const std::string& text );
     template< typename... Args >
-    static void fatal( const std::string& fmt, const Args&... args )
+    static void fatal( const std::string& text, const Args&... args )
     {
-      fatal( fmt::format( fmt, args... ) );
+      fatal( fmt::format( text, args... ) );
     }
 
 
     static void trace( const std::string& text );
     template< typename... Args >
-    static void trace( const std::string& fmt, const Args&... args )
+    static void trace( const std::string& text, const Args&... args )
     {
-      trace( fmt::format( fmt, args... ) );
+      trace( fmt::format( text, args... ) );
     }
 
 

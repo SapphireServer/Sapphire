@@ -482,9 +482,8 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
       auto privateEstateAccess = ( param2 >> 16 & 0xFF ) == 1;
       auto unk = ( param2 >> 24 & 0xFF ) == 1; // todo: related to fc? or unused?
 
-      player.sendDebug( "can teleport: " + std::to_string( canTeleport ) + ", unk: " + std::to_string( unk1 ) +
-                        ", privateEstateAccess: " + std::to_string( privateEstateAccess ) +
-                        ", unk: " + std::to_string( unk ) );
+      player.sendDebug( "can teleport: {0}, unk: {1}, privateEstateAccess: {2}, unk: {3}",
+                        canTeleport, unk1, privateEstateAccess, unk );
       break;
     }
 

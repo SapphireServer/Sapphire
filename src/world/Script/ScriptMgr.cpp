@@ -261,7 +261,7 @@ bool Sapphire::Scripting::ScriptMgr::onEventItem( Entity::Player& player, uint32
 
   std::string eventName = "onEventItem";
   std::string objName = pEventMgr->getEventName( eventId );
-  player.sendDebug( "Calling: " + objName + "." + eventName + " - " + std::to_string( eventId ) );
+  player.sendDebug( "Calling: {0}.{1} - {2}", objName, eventName, eventId );
 
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
   if( script )
@@ -295,7 +295,7 @@ bool Sapphire::Scripting::ScriptMgr::onMobKill( Entity::Player& player, uint16_t
     {
       std::string objName = pEventMgr->getEventName( 0x00010000 | questId );
 
-      player.sendDebug( "Calling: " + objName + "." + eventName );
+      player.sendDebug( "Calling: {0}.{1}", objName, eventName );
 
       script->onNpcKill( nameId, player );
     }
@@ -320,7 +320,7 @@ bool Sapphire::Scripting::ScriptMgr::onStatusReceive( Entity::CharaPtr pActor, u
   if( script )
   {
     if( pActor->isPlayer() )
-      pActor->getAsPlayer()->sendDebug( "Calling status receive for statusid: " + std::to_string( effectId ) );
+      pActor->getAsPlayer()->sendDebug( "Calling status receive for statusid#{0}", effectId );
 
     script->onApply( *pActor );
     return true;
@@ -335,7 +335,7 @@ bool Sapphire::Scripting::ScriptMgr::onStatusTick( Entity::CharaPtr pChara, Sapp
   if( script )
   {
     if( pChara->isPlayer() )
-      pChara->getAsPlayer()->sendDebug( "Calling status tick for statusid: " + std::to_string( effect.getId() ) );
+      pChara->getAsPlayer()->sendDebug( "Calling status tick for statusid#{0}", effect.getId() );
 
     script->onTick( *pChara );
     return true;
@@ -350,7 +350,7 @@ bool Sapphire::Scripting::ScriptMgr::onStatusTimeOut( Entity::CharaPtr pChara, u
   if( script )
   {
     if( pChara->isPlayer() )
-      pChara->getAsPlayer()->sendDebug( "Calling status timeout for statusid: " + std::to_string( effectId ) );
+      pChara->getAsPlayer()->sendDebug( "Calling status timeout for statusid#{0}", effectId );
 
     script->onExpire( *pChara );
     return true;

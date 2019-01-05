@@ -343,7 +343,7 @@ void Sapphire::Network::GameConnection::injectPacket( const std::string& packetp
   fp = fopen( packetpath.c_str(), "rb" );
   if( fp == nullptr )
   {
-    player.sendDebug( "Packet " + packetpath + " not found!" );
+    player.sendDebug( "Packet {0} not found!", packetpath );
     return;
   }
 
@@ -353,7 +353,7 @@ void Sapphire::Network::GameConnection::injectPacket( const std::string& packetp
   rewind( fp );
   if( fread( packet, sizeof( char ), size, fp ) != size )
   {
-    player.sendDebug( "Packet " + packetpath + " did not read full size: " + std::to_string( size ) );
+    player.sendDebug( "Packet {0} did not read full size: {1}", packetpath, size );
     return;
   }
   fclose( fp );
