@@ -148,6 +148,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
           targetPlayer->despawn( actor->getAsPlayer() );
           targetPlayer->spawn( actor->getAsPlayer() );
         }
+      }
       break;
     }
     case GmCommand::Tribe:
@@ -640,9 +641,16 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
         player.sendUrgent( "You are unable to call a player while bound to a battle instance." );
         return;
       }
-
-      targetPlayer->setInstance( player.getCurrentZone() );
-
+      targetPlayer->prepareZoning( player.getZoneId(), true, 1, 0 );
+      if( targetPlayer->getCurrentInstance() )
+      {
+        targetPlayer->exitInstance();
+      }
+      if ( targetPlayer->getZoneId() != player.getZoneId() )
+      {
+        targetPlayer->setZone( player.getZoneId() );
+      }
+      targetPlayer->sendToInRangeSet( makeActorControl143( player.getId(), ZoneIn, 0, 0, 0, 0 ) );
       targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
       player.sendNotice( "Calling " + targetPlayer->getName() );
       break;
