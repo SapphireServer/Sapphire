@@ -362,9 +362,10 @@ void Sapphire::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
     rot = targetPos->getTargetRotation();
   }
 
-  sendDebug( "Teleport: " + pExdData->get< Sapphire::Data::PlaceName >( data->placeName )->name + " " +
-             pExdData->get< Sapphire::Data::PlaceName >( data->aethernetName )->name +
-             "(" + std::to_string( data->territory ) + ")" );
+  sendDebug( "Teleport: {0} {1} ({2})",
+             pExdData->get< Sapphire::Data::PlaceName >( data->placeName )->name,
+             pExdData->get< Sapphire::Data::PlaceName >( data->aethernetName )->name,
+             data->territory );
 
   // TODO: this should be simplified and a type created in server_common/common.h.
   if( type == 1 ) // teleport
@@ -891,9 +892,7 @@ void Sapphire::Entity::Player::setLookAt( uint8_t index, uint8_t value )
 // spawn this player for pTarget
 void Sapphire::Entity::Player::spawn( Entity::PlayerPtr pTarget )
 {
-  Logger::debug( "[" + std::to_string( pTarget->getId() ) + "] Spawning " +
-                 getName() + " for " +
-                 pTarget->getName() );
+  Logger::debug( "[{0}] Spawning {1} for {2}", pTarget->getId(), getName(), pTarget->getName() );
 
   pTarget->queuePacket( std::make_shared< PlayerSpawnPacket >( *getAsPlayer(), *pTarget ) );
 }
@@ -902,7 +901,7 @@ void Sapphire::Entity::Player::spawn( Entity::PlayerPtr pTarget )
 void Sapphire::Entity::Player::despawn( Entity::PlayerPtr pTarget )
 {
   auto pPlayer = pTarget;
-  Logger::debug( "despawning " + getName() + " for " + pTarget->getName() );
+  Logger::debug( "Despawning {0} for {1}", getName(), pTarget->getName() );
 
   pPlayer->freePlayerSpawnId( getId() );
 

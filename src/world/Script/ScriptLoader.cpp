@@ -48,7 +48,7 @@ Sapphire::Scripting::ScriptInfo* Sapphire::Scripting::ScriptLoader::loadModule( 
 
   if( isModuleLoaded( f.stem().string() ) )
   {
-    Logger::error( "Unable to load module '" + f.stem().string() + "' as it is already loaded" );
+    Logger::error( "Unable to load module '{0}' as it is already loaded", f.stem().string() );
     return nullptr;
   }
 
@@ -63,7 +63,7 @@ Sapphire::Scripting::ScriptInfo* Sapphire::Scripting::ScriptLoader::loadModule( 
   }
   catch( const fs::filesystem_error& err )
   {
-    Logger::error( "Error copying file to cache: " + err.code().message() );
+    Logger::error( "Error copying file to cache: {0}", err.code().message() );
 
     return nullptr;
   }
@@ -77,12 +77,12 @@ Sapphire::Scripting::ScriptInfo* Sapphire::Scripting::ScriptLoader::loadModule( 
 
   if( !handle )
   {
-    Logger::error( "Failed to load module from: " + path );
+    Logger::error( "Failed to load module from: {0}", path );
 
     return nullptr;
   }
 
-  Logger::debug( "Loaded module '" + f.filename().string() );
+  Logger::debug( "Loaded module: {0}",  f.filename().string() );
 
   auto info = new ScriptInfo;
   info->handle = handle;
@@ -140,7 +140,7 @@ bool Sapphire::Scripting::ScriptLoader::unloadScript( ModuleHandle handle )
         return true;
       }
 
-      Logger::error( "failed to unload module: " + info->library_name );
+      Logger::error( "failed to unload module: {0}", info->library_name );
 
       return false;
     }

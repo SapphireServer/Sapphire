@@ -44,13 +44,13 @@ int main()
   //for( auto id : idList )
   {
     auto teri1 = g_exdData.get< Sapphire::Data::GilShopItem >( 262440, 0 );
-    Logger::info( "0 -> " + std::to_string( teri1->item ) );
+    Logger::info( "0 -> {0}", teri1->item );
 
     auto teri2 = g_exdData.get< Sapphire::Data::GilShopItem >( 262440, 1 );
-    Logger::info( "1 -> " + std::to_string( teri2->item ) );
+    Logger::info( "1 -> {0} ", teri2->item );
 
     auto teri3 = g_exdData.get< Sapphire::Data::GilShopItem >( 262440, 2 );
-    Logger::info( "2 -> " + std::to_string( teri3->item ) );
+    Logger::info( "2 -> {0}", teri3->item );
   }
 
   return 0;

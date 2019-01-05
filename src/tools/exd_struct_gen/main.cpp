@@ -326,7 +326,7 @@ int main( int argc, char** argv )
   Logger::init( "struct_gen" );
   if( argc > 1 )
   {
-    Logger::info( "using dat path: " + std::string( argv[ 1 ] ) );
+    Logger::info( "using dat path: {0}", std::string( argv[ 1 ] ) );
     datLocation = std::string( argv[ 1 ] );
   }
 

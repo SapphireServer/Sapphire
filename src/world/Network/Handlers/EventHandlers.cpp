@@ -48,15 +48,12 @@ void Sapphire::Network::GameConnection::eventHandlerTalk( FrameworkPtr pFw,
   std::string eventName = "onTalk";
   std::string objName = pEventMgr->getEventName( eventId );
 
-  player.sendDebug( "Chara: " +
-                    std::to_string( actorId ) + " -> " +
-                    std::to_string( pEventMgr->mapEventActorToRealActor( static_cast< uint32_t >( actorId ) ) ) +
-                    " \neventId: " +
-                    std::to_string( eventId ) +
-                    " (0x" + Util::intToHexString( static_cast< uint64_t >( eventId & 0xFFFFFFF ), 8 ) + ")" );
+  player.sendDebug( "Chara: {0} -> {1} \neventId: {2} ({3:08X}",
+                    actorId, pEventMgr->mapEventActorToRealActor( static_cast< uint32_t >( actorId ) ),
+                    eventId, eventId );
 
 
-  player.sendDebug( "Calling: " + objName + "." + eventName );
+  player.sendDebug( "Calling: {0}.{1}", objName, eventName );
   player.eventStart( actorId, eventId, Event::EventHandler::Talk, 0, 0 );
 
   if( auto instance = player.getCurrentInstance() )
@@ -93,14 +90,11 @@ void Sapphire::Network::GameConnection::eventHandlerEmote( FrameworkPtr pFw,
   std::string eventName = "onEmote";
   std::string objName = pEventMgr->getEventName( eventId );
 
-  player.sendDebug( "Chara: " +
-                    std::to_string( actorId ) + " -> " +
-                    std::to_string( pEventMgr->mapEventActorToRealActor( static_cast< uint32_t >( actorId ) ) ) +
-                    " \neventId: " +
-                    std::to_string( eventId ) +
-                    " (0x" + Util::intToHexString( static_cast< uint64_t >( eventId & 0xFFFFFFF ), 8 ) + ")" );
+  player.sendDebug( "Chara: {0} -> {1} \neventId: {2} ({3:08X}",
+                    actorId, pEventMgr->mapEventActorToRealActor( static_cast< uint32_t >( actorId ) ),
+                    eventId, eventId );
 
-  player.sendDebug( "Calling: " + objName + "." + eventName );
+  player.sendDebug( "Calling: {0}.{1}", objName, eventName );
 
   player.eventStart( actorId, eventId, Event::EventHandler::Emote, 0, emoteId );
 
@@ -130,8 +124,7 @@ void Sapphire::Network::GameConnection::eventHandlerWithinRange( FrameworkPtr pF
 
   std::string eventName = "onWithinRange";
   std::string objName = pEventMgr->getEventName( eventId );
-  player.sendDebug( "Calling: " + objName + "." + eventName + " - " + std::to_string( eventId ) +
-                    " p1: " + std::to_string( param1 ) );
+  player.sendDebug( "Calling: {0}.{1} - {2} p1: {3}", objName, eventName, eventId, param1 );
 
   player.eventStart( player.getId(), eventId, Event::EventHandler::WithinRange, 1, param1 );
 
@@ -154,8 +147,7 @@ void Sapphire::Network::GameConnection::eventHandlerOutsideRange( FrameworkPtr p
 
   std::string eventName = "onOutsideRange";
   std::string objName = pEventMgr->getEventName( eventId );
-  player.sendDebug( "Calling: " + objName + "." + eventName + " - " + std::to_string( eventId ) +
-                    " p1: " + std::to_string( param1 ) );
+  player.sendDebug( "Calling: {0}.{1} - {2} p1: {3}", objName, eventName, eventId, param1 );
 
   player.eventStart( player.getId(), eventId, Event::EventHandler::WithinRange, 1, param1 );
 
@@ -181,7 +173,7 @@ void Sapphire::Network::GameConnection::eventHandlerEnterTerritory( FrameworkPtr
 
   std::string objName = pEventMgr->getEventName( eventId );
 
-  player.sendDebug( "Calling: " + objName + "." + eventName + " - " + std::to_string( eventId ) );
+  player.sendDebug( "Calling: {0}.{1} - {2}", objName, eventName, eventId );
 
   if( auto instance = player.getCurrentInstance() )
   {
@@ -213,13 +205,8 @@ void Sapphire::Network::GameConnection::eventHandlerReturn( FrameworkPtr pFw,
 
   std::string eventName = pEventMgr->getEventName( eventId );
 
-  player.sendDebug( "eventId: " +
-                    std::to_string( eventId ) +
-                    " ( 0x" + Util::intToHexString( static_cast< uint64_t >( eventId & 0xFFFFFFF ), 8 ) + " ) " +
-                    " scene: " + std::to_string( scene ) +
-                    " p1: " + std::to_string( param1 ) +
-                    " p2: " + std::to_string( param2 ) +
-                    " p3: " + std::to_string( param3 ) );
+  player.sendDebug( "eventId: {0} ({0:08X}) scene: {1}, p1: {2}, p2: {3}, p3: {4}",
+                    eventId, scene, param1, param2, param3 );
 
   auto pEvent = player.getEvent( eventId );
   if( pEvent )
@@ -282,11 +269,9 @@ void Sapphire::Network::GameConnection::eventHandlerShop( FrameworkPtr pFw,
   std::string eventName = "onOpen";
   std::string objName = pEventMgr->getEventName( eventId );
 
-  player.sendDebug( "EventId: " +
-                    std::to_string( eventId ) +
-                    " (0x" + Util::intToHexString( static_cast< uint64_t >( eventId & 0xFFFFFFF ), 8 ) + ")" );
+  player.sendDebug( "EventId: {0} ({0:08X}", eventId );
 
-  player.sendDebug( "Calling: " + objName + "." + eventName );
+  player.sendDebug( "Calling: {0}.{1}", objName, eventName );
   player.eventStart( player.getId(), eventId, Event::EventHandler::UI, 0, packet.data().param );
 
   pScriptMgr->onTalk( player, player.getId(), eventId );

@@ -679,16 +679,12 @@ void Sapphire::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
 
 void Sapphire::Zone::onPlayerZoneIn( Entity::Player& player )
 {
-  Logger::debug(
-    "Zone::onEnterTerritory: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryTypeId() ) +
-    + ", Entity#" + std::to_string( player.getId() ) );
+  Logger::debug( "Zone::onEnterTerritory: Zone#{0}|{1}, Entity#{2}", getGuId(), getTerritoryTypeId(), player.getId() );
 }
 
 void Sapphire::Zone::onLeaveTerritory( Entity::Player& player )
 {
-  Logger::debug(
-    "Zone::onLeaveTerritory: Zone#" + std::to_string( getGuId() ) + "|" + std::to_string( getTerritoryTypeId() ) +
-    + ", Entity#" + std::to_string( player.getId() ) );
+  Logger::debug( "Zone::onLeaveTerritory: Zone#{0}|{1}, Entity#{2}", getGuId(), getTerritoryTypeId(), player.getId() );
 }
 
 void Sapphire::Zone::onUpdate( uint32_t currTime )
@@ -763,10 +759,9 @@ Sapphire::Data::TerritoryTypePtr Sapphire::Zone::getTerritoryTypeInfo() const
 bool Sapphire::Zone::loadSpawnGroups()
 {
   auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  auto res = pDb->query( "SELECT id, bNpcTemplateId, "
-                         "level, maxHp "
-                         "FROM spawnGroup "
-                         "WHERE territoryTypeId = " + std::to_string( getTerritoryTypeId() ) + ";" );
+  auto stmt = pDb->getPreparedStatement( Db::ZoneDbStatements::ZONE_SEL_SPAWNGROUPS );
+  stmt->setUInt( 1, getTerritoryTypeId() );
+  auto res = pDb->query( stmt );
 
   while( res->next() )
   {
@@ -777,10 +772,8 @@ bool Sapphire::Zone::loadSpawnGroups()
 
     //Entity::SpawnGroup group;
 
-    Logger::debug( std::to_string( id ) + " " +
-                   std::to_string( templateId ) + " " +
-                   std::to_string( level ) + " " +
-                   std::to_string( maxHp ) );
+
+    Logger::debug( "id: {0}, template: {1}, level: {2}, maxHp: {3}", id, templateId, level, maxHp );
 
   }
 

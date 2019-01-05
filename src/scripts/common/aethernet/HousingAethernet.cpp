@@ -36,7 +36,7 @@ public:
       if( player.getCurrentZone()->getTerritoryTypeId() != pHousingAethernet->territoryType )
         return;
 
-      player.sendDebug( "got level entry: " + std::to_string( pHousingAethernet->level ) );
+      player.sendDebug( "got level entry: {0}", pHousingAethernet->level );
     } );
   }
 };

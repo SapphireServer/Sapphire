@@ -75,7 +75,7 @@ void Sapphire::Entity::Player::directorPlayScene( uint32_t eventId, uint32_t sce
   auto pEvent = getEvent( eventId );
   if( !pEvent )
   {
-    Logger::error( "Could not find event " + std::to_string( eventId ) + ", event has not been started!" );
+    Logger::error( "Could not find event #{0}, event has not been started!", eventId );
     return;
   }
 
@@ -159,7 +159,7 @@ Sapphire::Event::EventHandlerPtr Sapphire::Entity::Player::bootstrapSceneEvent( 
   auto pEvent = getEvent( eventId );
   if( !pEvent )
   {
-    Logger::error( "Could not find event " + std::to_string( eventId ) + ", event has not been started!" );
+    Logger::error( "Could not find event #{0}, event has not been started!", eventId );
     return nullptr;
   }
 
@@ -223,7 +223,7 @@ void Sapphire::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlaye
 
   if( !pEvent )
   {
-    Logger::error( "Could not find event " + std::to_string( eventId ) + ", event has not been started!" );
+    Logger::error( "Could not find event #{0}, event has not been started!", eventId );
     return;
   }
 
@@ -298,7 +298,7 @@ void Sapphire::Entity::Player::eventActionStart( uint32_t eventId,
   }
   else if( !pEvent )
   {
-    Logger::error( "Could not find event " + std::to_string( eventId ) + ", event has not been started!" );
+    Logger::error( "Could not find event #{0}, event has not been started!", eventId );
     return;
   }
 
