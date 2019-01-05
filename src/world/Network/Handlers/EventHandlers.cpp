@@ -65,7 +65,7 @@ void Sapphire::Network::GameConnection::eventHandlerTalk( FrameworkPtr pFw,
   {
     auto questInfo = pExdData->get< Sapphire::Data::Quest >( eventId );
     if( questInfo )
-      player.sendUrgent( "Quest not implemented: " + questInfo->name + " (" + questInfo->id + ")" );
+      player.sendUrgent( "Quest not implemented: {0} ({1})", questInfo->name, questInfo->id );
   }
 
   player.checkEvent( eventId );
@@ -103,7 +103,7 @@ void Sapphire::Network::GameConnection::eventHandlerEmote( FrameworkPtr pFw,
   {
     auto questInfo = pExdData->get< Sapphire::Data::Quest >( eventId );
     if( questInfo )
-      player.sendUrgent( "Quest not implemented: " + questInfo->name );
+      player.sendUrgent( "Quest not implemented: {0}", questInfo->name );
   }
 
   player.checkEvent( eventId );
