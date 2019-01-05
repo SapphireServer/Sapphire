@@ -154,7 +154,7 @@ void Sapphire::World::Session::startReplay( const std::string& path )
     Logger::info( "Registering {0} for {1}", std::get< 1 >( set ), std::get< 0 >( set ) - startTime );
   }
 
-  getPlayer()->sendDebug( "Registered " + std::to_string( m_replayCache.size() ) + " sets for replay" );
+  getPlayer()->sendDebug( "Registered {0} sets for replay" ), m_replayCache.size();
   m_isReplaying = true;
 }
 

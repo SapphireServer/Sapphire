@@ -427,7 +427,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
       auto pTeriMgr = pFw->get< TerritoryMgr >();
       if( auto instance = pTeriMgr->getInstanceZonePtr( param1 ) )
       {
-        player.sendDebug( "Found instance: " + instance->getName() + ", id: " + std::to_string( param1 ) );
+        player.sendDebug( "Found instance: {0}, id#{1}", instance->getName(), param1 );
 
         // if the zone is an instanceContent instance, make sure the player is actually bound to it
         auto pInstance = instance->getAsInstanceContent();

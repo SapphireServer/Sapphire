@@ -375,8 +375,8 @@ void Sapphire::InstanceContent::onTalk( Sapphire::Entity::Player& player, uint32
   if( auto onTalk = it->second->getOnTalkHandler() )
     onTalk( player, it->second, getAsInstanceContent(), actorId );
   else
-    player.sendDebug( "No onTalk handler found for interactable eobj with EObjID: " +
-                      std::to_string( it->second->getObjectId() ) + ", eventId: " + std::to_string( eventId ) );
+    player.sendDebug( "No onTalk handler found for interactable eobj with EObjID#{0}, eventId#{1}  ",
+                      it->second->getObjectId(), eventId );
 }
 
 void
