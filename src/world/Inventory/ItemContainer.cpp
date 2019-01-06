@@ -48,11 +48,11 @@ void Sapphire::ItemContainer::removeItem( uint16_t slotId, bool removeFromDb )
 
     m_itemMap.erase( it );
 
-    Logger::debug( "Dropped item from slot " + std::to_string( slotId ) );
+    Logger::debug( "Dropped item from slot {0}", slotId );
   }
   else
   {
-    Logger::debug( "Item could not be dropped from slot " + std::to_string( slotId ) );
+    Logger::debug( "Item could not be dropped from slot {0}", slotId );
   }
 }
 
@@ -83,7 +83,7 @@ Sapphire::ItemPtr Sapphire::ItemContainer::getItem( uint16_t slotId )
 
   if( ( slotId > m_size ) )
   {
-    Logger::error( "Slot out of range " + std::to_string( slotId ) );
+    Logger::error( "Slot out of range {0}", slotId );
     return nullptr;
   }
 

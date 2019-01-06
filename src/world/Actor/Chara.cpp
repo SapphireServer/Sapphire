@@ -432,8 +432,8 @@ void Sapphire::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionI
   auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   if( isPlayer() )
   {
-    getAsPlayer()->sendDebug( std::to_string( target.getId() ) );
-    getAsPlayer()->sendDebug( "Handle script skill type: " + std::to_string( type ) );
+    getAsPlayer()->sendDebug( "{0}", target.getId() );
+    getAsPlayer()->sendDebug( "Handle script skill type: {0}", type );
   }
 
   auto actionInfoPtr = pExdData->get< Sapphire::Data::Action >( actionId );
@@ -495,10 +495,9 @@ void Sapphire::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionI
           if( isPlayer() )
           {
             if( pHitActor->isPlayer() )
-              getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) +
-                                        " (" + pHitActor->getAsChara()->getName() + ")" );
+              getAsPlayer()->sendDebug( "AoE hit actor#{0} ({1})", pHitActor->getId(), pHitActor->getAsChara()->getName() );
             else
-              getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) );
+              getAsPlayer()->sendDebug( "AoE hit actor#{0}", pHitActor->getId() );
           }
         }
       }
@@ -546,10 +545,9 @@ void Sapphire::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionI
           if( isPlayer() )
           {
             if( pHitActor->isPlayer() )
-              getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) +
-                                        " (" + pHitActor->getAsChara()->getName() + ")" );
+              getAsPlayer()->sendDebug( "AoE hit actor#{0} ({1})", pHitActor->getId(), pHitActor->getAsChara()->getName() );
             else
-              getAsPlayer()->sendDebug( "AoE hit actor " + std::to_string( pHitActor->getId() ) );
+              getAsPlayer()->sendDebug( "AoE hit actor#{0}", pHitActor->getId() );
           }
         }
       }

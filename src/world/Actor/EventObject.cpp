@@ -19,8 +19,8 @@ using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
 
 Sapphire::Entity::EventObject::EventObject( uint32_t actorId, uint32_t objectId, uint32_t gimmickId,
-                                        uint8_t initialState, Common::FFXIVARR_POSITION3 pos,
-                                        float rotation, const std::string& givenName ) :
+                                            uint8_t initialState, Common::FFXIVARR_POSITION3 pos,
+                                            float rotation, const std::string& givenName ) :
   Sapphire::Entity::Actor( ObjKind::EventObj ),
   m_gimmickId( gimmickId ),
   m_state( initialState ),
@@ -119,7 +119,7 @@ void Sapphire::Entity::EventObject::spawn( Sapphire::Entity::PlayerPtr pTarget )
   if( !pTarget->isObjSpawnIndexValid( spawnIndex ) )
     return;
 
-  Logger::debug( "Spawning EObj: id:" + std::to_string( getId() ) + " name:" + getName() );
+  Logger::debug( "Spawning EObj: id#{0} name={1}", getId(), getName() );
 
   auto eobjStatePacket = makeZonePacket< FFXIVIpcObjectSpawn >( getId(), pTarget->getId() );
   eobjStatePacket->data().spawnIndex = spawnIndex;
@@ -138,7 +138,7 @@ void Sapphire::Entity::EventObject::spawn( Sapphire::Entity::PlayerPtr pTarget )
 
 void Sapphire::Entity::EventObject::despawn( Sapphire::Entity::PlayerPtr pTarget )
 {
-  Logger::debug( "despawn eobj: " + std::to_string( getId() ) );
+  Logger::debug( "despawn eobj#{0}", getId() );
 
   pTarget->freeObjSpawnIndexForActorId( getId() );
 }

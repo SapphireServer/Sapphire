@@ -83,11 +83,11 @@ namespace Sapphire
 
   bool ServerLobby::loadSettings( int32_t argc, char* argv[] )
   {
-    Logger::info( "Loading config " + m_configPath );
+    Logger::info( "Loading config {0}", m_configPath );
 
     if( !m_pConfig->loadConfig( m_configPath ) )
     {
-      Logger::fatal( "Error loading config " + m_configPath );
+      Logger::fatal( "Error loading config {0}", m_configPath );
       Logger::fatal( "If this is the first time starting the server, we've copied the default one for your editing pleasure." );
       return false;
     }
@@ -125,7 +125,7 @@ namespace Sapphire
       }
       catch( ... )
       {
-        Logger::error( "Error parsing argument: " + arg + " " + "value: " + val + "\n" );
+        Logger::error( "Error parsing argument: {0} value: {1}\n", arg, val );
         Logger::error( "Usage: <arg> <val> \n" );
       }
     }

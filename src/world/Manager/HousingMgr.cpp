@@ -94,12 +94,12 @@ bool Sapphire::World::Manager::HousingMgr::init()
 
     if( landSet.second.size() != 60 )
     {
-      Logger::fatal( "LandSet " + std::to_string( landSet.first ) + " is missing land entries. Only have " + std::to_string( count ) + " land entries." );
+      Logger::fatal( "LandSet {0} is missing land entries. Only have {1} land entries.", landSet.first, count );
       return false;
     }
   }
 
-  Logger::info( "HousingMgr: Cached " + std::to_string( houseCount ) + " houses" );
+  Logger::info( "HousingMgr: Cached {0} houses", houseCount );
 
   /////
 
@@ -158,7 +158,7 @@ bool Sapphire::World::Manager::HousingMgr::loadEstateInventories()
     itemCount++;
   }
 
-  Logger::debug( "HousingMgr: Loaded " + std::to_string( itemCount ) + " inventory items" );
+  Logger::debug( "HousingMgr: Loaded {0} inventory items", itemCount );
 
   return true;
 }
@@ -217,8 +217,8 @@ void Sapphire::World::Manager::HousingMgr::initLandCache()
         break;
       default:
         // this should never ever happen, if it does the db is fucked
-        Logger::error( "HousingMgr: Plot " + std::to_string( entry.m_landId ) + " in landset " + std::to_string( entry.m_landSetId ) +
-                       " has an invalid land size, defaulting to cottage." );
+        Logger::error( "HousingMgr: Plot {0} in landset {1} has an invalid land size, defaulting to cottage.",
+                       entry.m_landId, entry.m_landSetId );
         entry.m_maxPlacedExternalItems = 20;
         entry.m_maxPlacedInternalItems = 200;
         break;
@@ -913,7 +913,7 @@ void Sapphire::World::Manager::HousingMgr::updateHouseModels( Sapphire::HousePtr
   }
   else
   {
-    Logger::error( "Plot " + std::to_string( house->getLandIdent().landId ) + " has an invalid inventory configuration for outdoor appearance." );
+    Logger::error( "Plot {0} has an invalid inventory configuration for outdoor appearance.", house->getLandIdent().landId );
   }
 
   auto intContainer = containers.find( static_cast< uint16_t >( InventoryType::HousingInteriorAppearance ) );
@@ -927,7 +927,7 @@ void Sapphire::World::Manager::HousingMgr::updateHouseModels( Sapphire::HousePtr
   }
   else
   {
-    Logger::error( "Plot " + std::to_string( house->getLandIdent().landId ) + " has an invalid inventory configuration for indoor appearance." );
+    Logger::error( "Plot {0} has an invalid inventory configuration for indoor appearance.", house->getLandIdent().landId );
   }
 }
 

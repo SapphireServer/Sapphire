@@ -131,7 +131,7 @@ void Sapphire::World::Manager::DebugCommandMgr::help( char* data, Entity::Player
   {
     if( player.getGmRank() >= cmd.second->m_gmLevel )
     {
-      player.sendDebug( " - " + cmd.first + " - " + cmd.second->getHelpText() );
+      player.sendDebug( " - {0} - {1}", cmd.first, cmd.second->getHelpText() );
     }
   }
 }
@@ -159,8 +159,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
   if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
     params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-  Logger::debug( "[" + std::to_string( player.getId() ) + "] " +
-               "subCommand " + subCommand + " params: " + params );
+  Logger::debug( "[{0}] subCommand: {1} params: {1}", player.getId(), subCommand, params );
 
   if( ( ( subCommand == "pos" ) || ( subCommand == "posr" ) ) && ( params != "" ) )
   {
@@ -325,7 +324,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
 
     if( !player.hasQuest( questId ) )
     {
-      player.sendDebug( "Player doesn't have the quest with ID: " + std::to_string( questId ) );
+      player.sendDebug( "Player doesn't have the quest with ID#: {0}", questId );
       return;
     }
     if( questBit == 0 || questId == 0 )
@@ -535,9 +534,7 @@ void Sapphire::World::Manager::DebugCommandMgr::get( char* data, Entity::Player&
   if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
     params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-  Logger::debug( "[" + std::to_string( player.getId() ) + "] " +
-                 "subCommand " + subCommand + " params: " + params );
-
+  Logger::debug( "[{0}] subCommand: {1} params: {2}", player.getId(), subCommand, params );
 
   if( ( subCommand == "pos" ) )
   {
@@ -682,9 +679,9 @@ Sapphire::World::Manager::DebugCommandMgr::serverInfo( char* data, Entity::Playe
                                                        std::shared_ptr< DebugCommand > command )
 {
   auto pServerZone = framework()->get< World::ServerMgr >();
-  player.sendDebug( "SapphireZone " + Version::VERSION + "\nRev: " + Version::GIT_HASH );
+  player.sendDebug( "SapphireZone {0} \nRev: {1}", Version::VERSION, Version::GIT_HASH );
   player.sendDebug( "Compiled: " __DATE__ " " __TIME__ );
-  player.sendDebug( "Sessions: " + std::to_string( pServerZone->getSessionCount() ) );
+  player.sendDebug( "Sessions: {0}", pServerZone->getSessionCount() );
 }
 
 void Sapphire::World::Manager::DebugCommandMgr::script( char* data, Entity::Player& player,
@@ -710,8 +707,7 @@ void Sapphire::World::Manager::DebugCommandMgr::script( char* data, Entity::Play
   if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
     params = std::string( data + command->getName().length() + 1 + pos + 1 );
 
-  Logger::debug( "[" + std::to_string( player.getId() ) + "] " +
-                 "subCommand " + subCommand + " params: " + params );
+  Logger::debug( "[{0}] subCommand: {1} params: {2}", player.getId(), subCommand, params );
 
   if( subCommand == "unload" )
   {
@@ -720,7 +716,7 @@ void Sapphire::World::Manager::DebugCommandMgr::script( char* data, Entity::Play
     else if( pScriptMgr->getNativeScriptHandler().unloadScript( params ) )
       player.sendDebug( "Unloaded script successfully." );
     else
-      player.sendDebug( "Failed to unload script: " + params );
+      player.sendDebug( "Failed to unload script: {0}", params );
   }
   else if( subCommand == "find" || subCommand == "f" )
   {
@@ -733,17 +729,16 @@ void Sapphire::World::Manager::DebugCommandMgr::script( char* data, Entity::Play
 
       if( !scripts.empty() )
       {
-        player.sendDebug( "Found " + std::to_string( scripts.size() ) + " scripts" );
+        player.sendDebug( "Found {0} scripts", scripts.size() );
 
         for( auto it = scripts.begin(); it != scripts.end(); ++it )
         {
           auto script = *it;
-          player.sendDebug( " - '" + script->library_name +
-                            ", num scripts: " + std::to_string( script->scripts.size() ) );
+          player.sendDebug( " - '{0}', num scripts: {1}", script->library_name, script->scripts.size() );
         }
       }
       else
-        player.sendDebug( "No scripts found with search term: " + params );
+        player.sendDebug( "No scripts found with search term: {0}", params );
     }
   }
   else if( subCommand == "load" || subCommand == "l" )
@@ -753,9 +748,9 @@ void Sapphire::World::Manager::DebugCommandMgr::script( char* data, Entity::Play
     else
     {
       if( pScriptMgr->getNativeScriptHandler().loadScript( params ) )
-        player.sendDebug( "Loaded '" + params + "' successfully" );
+        player.sendDebug( "Loaded '{0}' successfully", params );
       else
-        player.sendDebug( "Failed to load '" + params + "'" );
+        player.sendDebug( "Failed to load '{0}'", params );
     }
 
   }
@@ -766,12 +761,12 @@ void Sapphire::World::Manager::DebugCommandMgr::script( char* data, Entity::Play
     else
     {
       pScriptMgr->getNativeScriptHandler().queueScriptReload( params );
-      player.sendDebug( "Queued script reload for script: " + params );
+      player.sendDebug( "Queued script reload for script: {0}", params );
     }
   }
   else
   {
-    player.sendDebug( "Unknown script subcommand: " + subCommand );
+    player.sendDebug( "Unknown script subcommand: {0}", subCommand );
   }
 }
 
@@ -805,10 +800,9 @@ Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Player&
 
     auto instance = pTeriMgr->createInstanceContent( instanceContentId );
     if( instance )
-      player.sendDebug(
-        "Created instance with id: " + std::to_string( instance->getGuId() ) + " -> " + instance->getName() );
+      player.sendDebug( "Created instance with id#{0} -> {1}", instance->getGuId(), instance->getName() );
     else
-      player.sendDebug( "Failed to create instance with id: " + std::to_string( instanceContentId ) );
+      player.sendDebug( "Failed to create instance with id#{0}", instanceContentId );
   }
   else if( subCommand == "bind" )
   {
@@ -825,7 +819,7 @@ Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Player&
         " -> " + pInstanceContent->getName() );
     }
     else
-      player.sendDebug( "Unknown instance with id: " + std::to_string( instanceId ) );
+      player.sendDebug( "Unknown instance with id#{0}", instanceId );
   }
   else if( subCommand == "unbind" )
   {
@@ -835,7 +829,7 @@ Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Player&
     auto instance = pTeriMgr->getInstanceZonePtr( instanceId );
     if( !instance )
     {
-      player.sendDebug( "Unknown instance with id: " + std::to_string( instanceId ) );
+      player.sendDebug( "Unknown instance with id#{0} ", instanceId );
       return;
     }
 
@@ -843,12 +837,10 @@ Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Player&
     if( pInstanceContent->isPlayerBound( player.getId() ) )
     {
       pInstanceContent->unbindPlayer( player.getId() );
-      player.sendDebug(
-        "Now unbound from instance with id: " + std::to_string( pInstanceContent->getGuId() ) +
-        " -> " + pInstanceContent->getName() );
+      player.sendDebug( "Now unbound from instance with id#{0} -> {1}", pInstanceContent->getGuId(), pInstanceContent->getName() );
     }
     else
-      player.sendDebug( "Player not bound to instance with id: " + std::to_string( instanceId ) );
+      player.sendDebug( "Player not bound to instance with id#{0}", instanceId );
 
   }
   else if( subCommand == "createzone" || subCommand == "crz" )
@@ -861,7 +853,7 @@ Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Player&
       player.sendDebug(
         "Created instance with id: " + std::to_string( instance->getGuId() ) + " -> " + instance->getName() );
     else
-      player.sendDebug( "Failed to create instance with id: " + std::to_string( zoneId ) );
+      player.sendDebug( "Failed to create instance with id#{0}", zoneId );
   }
   else if( subCommand == "remove" || subCommand == "rm" )
   {
@@ -869,9 +861,9 @@ Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Player&
     sscanf( params.c_str(), "%d", &terriId );
 
     if( pTeriMgr->removeTerritoryInstance( terriId ) )
-      player.sendDebug( "Removed instance with id: " + std::to_string( terriId ) );
+      player.sendDebug( "Removed instance with id#{0}", terriId );
     else
-      player.sendDebug( "Failed to remove instance with id: " + std::to_string( terriId ) );
+      player.sendDebug( "Failed to remove instance with id#{0}", terriId );
   }
   else if( subCommand == "return" || subCommand == "ret" )
   {
