@@ -1439,7 +1439,7 @@ struct FFXIVIpcPrepareZoning :
   uint8_t fadeOut;
   uint8_t param7;
   uint8_t fadeOutTime;
-  uint8_t unknown;
+  uint8_t unknown; // this changes whether or not the destination zone's name displays during the loading screen. Seems to always be 9 (=hidden) when going to an instance and certain zones, 0 otherwise.
   uint16_t padding;
 };
 
