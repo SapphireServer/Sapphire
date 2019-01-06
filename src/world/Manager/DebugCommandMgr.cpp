@@ -262,7 +262,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     sscanf( params.c_str(), "%" SCNu64, &timestamp );
 
     player.setEorzeaTimeOffset( timestamp );
-    player.sendNotice( "Eorzea time offset: " + std::to_string( timestamp ) );
+    player.sendNotice( "Eorzea time offset: {0}", timestamp );
   }
   else if( subCommand == "mount" )
   {
@@ -369,7 +369,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
   }
   else
   {
-    player.sendUrgent( subCommand + " is not a valid SET command." );
+    player.sendUrgent( "{0} is not a valid SET command.", subCommand );
   }
 
 }
@@ -419,7 +419,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
     sscanf( params.c_str(), "%u", &titleId );
 
     player.addTitle( titleId );
-    player.sendNotice( "Added title (ID: " + std::to_string( titleId ) + ")" );
+    player.sendNotice( "Added title (id#{0})", titleId );
   }
   else if( subCommand == "bnpc" )
   {
@@ -429,7 +429,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
 
     if( !bNpcTemplate )
     {
-      player.sendNotice( "Template " + params + " not found in cache!" );
+      player.sendNotice( "Template {0} not found in cache!", params );
       return;
     }
     auto pBNpc = std::make_shared< Entity::BNpc >( bNpcTemplate,
@@ -473,7 +473,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
     sscanf( params.c_str(), "%x %x %x %x %x %x %x %x", &opcode, &param1, &param2, &param3, &param4, &param5, &param6,
             &playerId );
 
-    player.sendNotice( "Injecting ACTOR_CONTROL " + std::to_string( opcode ) );
+    player.sendNotice( "Injecting ACTOR_CONTROL {0}", opcode );
 
     auto actorControl = makeZonePacket< FFXIVIpcActorControl143 >( playerId, player.getId() );
     actorControl->data().category = opcode;
@@ -506,7 +506,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
   }
   else
   {
-    player.sendUrgent( subCommand + " is not a valid ADD command." );
+    player.sendUrgent( "{0} is not a valid ADD command.", subCommand );
   }
 
 
@@ -541,17 +541,13 @@ void Sapphire::World::Manager::DebugCommandMgr::get( char* data, Entity::Player&
 
     int16_t map_id = pExdData->get< Sapphire::Data::TerritoryType >( player.getCurrentZone()->getTerritoryTypeId() )->map;
 
-    player.sendNotice( "Pos:\n" +
-                       std::to_string( player.getPos().x ) + "\n" +
-                       std::to_string( player.getPos().y ) + "\n" +
-                       std::to_string( player.getPos().z ) + "\n" +
-                       std::to_string( player.getRot() ) + "\nMapId: " +
-                       std::to_string( map_id ) + "\nZoneID: " +
-                       std::to_string( player.getCurrentZone()->getTerritoryTypeId() ) + "\n" );
+    player.sendNotice( "Pos:\n {0}\n {1}\n {2}\n {3}\n MapId: {4}\n ZoneId:{5}",
+                       player.getPos().x, player.getPos().y, player.getPos().z,
+                       player.getRot(), map_id, player.getCurrentZone()->getTerritoryTypeId() );
   }
   else
   {
-    player.sendUrgent( subCommand + " is not a valid GET command." );
+    player.sendUrgent( "{0} is not a valid GET command.", subCommand );
   }
 
 }
@@ -621,7 +617,7 @@ void Sapphire::World::Manager::DebugCommandMgr::replay( char* data, Entity::Play
   }
   else
   {
-    player.sendUrgent( subCommand + " is not a valid replay command." );
+    player.sendUrgent( "{0} is not a valid replay command.", subCommand );
   }
 
 
@@ -648,12 +644,12 @@ void Sapphire::World::Manager::DebugCommandMgr::nudge( char* data, Entity::Playe
   if( direction[ 0 ] == 'u' || direction[ 0 ] == '+' )
   {
     pos.y += offset;
-    player.sendNotice( "nudge: Placing up " + std::to_string( offset ) + " yalms" );
+    player.sendNotice( "nudge: Placing up {0} yalms", offset );
   }
   else if( direction[ 0 ] == 'd' || direction[ 0 ] == '-' )
   {
     pos.y -= offset;
-    player.sendNotice( "nudge: Placing down " + std::to_string( offset ) + " yalms" );
+    player.sendNotice( "nudge: Placing down {0} yalms", offset );
 
   }
   else
@@ -661,7 +657,7 @@ void Sapphire::World::Manager::DebugCommandMgr::nudge( char* data, Entity::Playe
     float angle = player.getRot() + ( PI / 2 );
     pos.x -= offset * cos( angle );
     pos.z += offset * sin( angle );
-    player.sendNotice( "nudge: Placing forward " + std::to_string( offset ) + " yalms" );
+    player.sendNotice( "nudge: Placing forward {0} yalms", offset );
   }
   if( offset != 0 )
   {

@@ -131,13 +131,13 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     case GmCommand::Lv:
     {
       targetPlayer->setLevel( param1 );
-      player.sendNotice( "Level for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
+      player.sendNotice( "Level for {0} was set to {1}", targetPlayer->getName(), param1 );
       break;
     }
     case GmCommand::Race:
     {
       targetPlayer->setLookAt( CharaLook::Race, param1 );
-      player.sendNotice( "Race for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
+      player.sendNotice( "Race for {0} was set to {1}", targetPlayer->getName(), param1 );
       targetPlayer->spawn( targetPlayer );
       auto inRange = targetPlayer->getInRangeActors();
       for( auto actor : inRange )
@@ -150,7 +150,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     case GmCommand::Tribe:
     {
       targetPlayer->setLookAt( CharaLook::Tribe, param1 );
-      player.sendNotice( "Tribe for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
+      player.sendNotice( "Tribe for {0} was set to ", targetPlayer->getName(), param1 );
       targetPlayer->spawn( targetPlayer );
       auto inRange = targetPlayer->getInRangeActors();
       for( auto actor : inRange )
@@ -163,7 +163,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     case GmCommand::Sex:
     {
       targetPlayer->setLookAt( CharaLook::Gender, param1 );
-      player.sendNotice( "Sex for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
+      player.sendNotice( "Sex for {0} was set to ", targetPlayer->getName(), param1 );
       targetPlayer->spawn( targetPlayer );
       auto inRange = targetActor->getInRangeActors();
       for( auto actor : inRange )
@@ -176,14 +176,14 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     case GmCommand::Time:
     {
       player.setEorzeaTimeOffset( param2 );
-      player.sendNotice( "Eorzea time offset: " + std::to_string( param2 ) );
+      player.sendNotice( "Eorzea time offset: {0}", param2 );
       break;
     }
     case GmCommand::Weather:
     {
       targetPlayer->getCurrentZone()->setWeatherOverride( static_cast< Common::Weather >( param1 ) );
-      player.sendNotice( "Weather in Zone \"" + targetPlayer->getCurrentZone()->getName() + "\" of " +
-                         targetPlayer->getName() + " set in range." );
+      player.sendNotice( "Weather in Zone \"{0}\" of {1} set in range.",
+                         targetPlayer->getCurrentZone()->getName(), targetPlayer->getName() );
       break;
     }
     case GmCommand::Call:
@@ -192,33 +192,41 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
         targetPlayer->setZone( player.getZoneId() );
 
       targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
-      player.sendNotice( "Calling " + targetPlayer->getName() );
+      player.sendNotice( "Calling {0}", targetPlayer->getName() );
       break;
     }
     case GmCommand::Inspect:
     {
-      player.sendNotice( "Name: " + targetPlayer->getName() +
-                         "\nGil: " + std::to_string( targetPlayer->getCurrency( CurrencyType::Gil ) ) +
-                         "\nZone: " + targetPlayer->getCurrentZone()->getName() +
-                         "(" + std::to_string( targetPlayer->getZoneId() ) + ")" +
-                         "\nClass: " + std::to_string( static_cast< uint8_t >( targetPlayer->getClass() ) ) +
-                         "\nLevel: " + std::to_string( targetPlayer->getLevel() ) +
-                         "\nExp: " + std::to_string( targetPlayer->getExp() ) +
-                         "\nSearchMessage: " + targetPlayer->getSearchMessage() +
-                         "\nPlayTime: " + std::to_string( targetPlayer->getPlayTime() ) );
+      player.sendNotice( "Name: {0}"
+                         "\nGil: {1}"
+                         "\nZone: {2}"
+                         "({3})"
+                         "\nClass: {4}"
+                         "\nLevel: {5}"
+                         "\nExp: {6}"
+                         "\nSearchMessage: {7}"
+                         "\nPlayTime: {8}",
+                         targetPlayer->getName(),
+                         targetPlayer->getCurrency( CurrencyType::Gil ),
+                         targetPlayer->getCurrentZone()->getName(),
+                         targetPlayer->getZoneId(),
+                         static_cast< uint8_t >( targetPlayer->getClass() ),
+                         targetPlayer->getLevel(),
+                         targetPlayer->getExp(),
+                         targetPlayer->getSearchMessage(),
+                         targetPlayer->getPlayTime() );
       break;
     }
     case GmCommand::Speed:
     {
       targetPlayer->queuePacket( makeActorControl143( player.getId(), Flee, param1 ) );
-      player.sendNotice( "Speed for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
+      player.sendNotice( "Speed for {0} was set to {1}", targetPlayer->getName(), param1 );
       break;
     }
     case GmCommand::Invis:
     {
       player.setGmInvis( !player.getGmInvis() );
-      player.sendNotice( "Invisibility flag for " + player.getName() +
-                         " was toggled to " + std::to_string( !player.getGmInvis() ) );
+      player.sendNotice( "Invisibility flag for {0} was toggled to {1}", player.getName(), !player.getGmInvis() );
 
       for( auto actor : player.getInRangeActors() )
       {
@@ -230,7 +238,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     case GmCommand::Kill:
     {
       targetActor->getAsChara()->takeDamage( 9999999 );
-      player.sendNotice( "Killed " + std::to_string( targetActor->getId() ) );
+      player.sendNotice( "Killed {0}", targetActor->getId() );
       break;
     }
     case GmCommand::Icon:
@@ -250,31 +258,31 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
       targetPlayer->sendToInRangeSet( makeActorControl142( player.getId(), SetStatusIcon,
                                                            static_cast< uint8_t >( player.getOnlineStatus() ) ),
                                       true );
-      player.sendNotice( "Icon for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
+      player.sendNotice( "Icon for {0} was set to {1}", targetPlayer->getName(), param1 );
       break;
     }
     case GmCommand::Hp:
     {
       targetPlayer->setHp( param1 );
-      player.sendNotice( "Hp for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
+      player.sendNotice( "Hp for {0} was set to {1}", targetPlayer->getName(), param1 );
       break;
     }
     case GmCommand::Mp:
     {
       targetPlayer->setMp( param1 );
-      player.sendNotice( "Mp for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
+      player.sendNotice( "Mp for {0} was set to {1}", targetPlayer->getName(), param1 );
       break;
     }
     case GmCommand::Gp:
     {
       targetPlayer->setHp( param1 );
-      player.sendNotice( "Gp for " + targetPlayer->getName() + " was set to " + std::to_string( param1 ) );
+      player.sendNotice( "Gp for {0} was set to {1}", targetPlayer->getName(), param1 );
       break;
     }
     case GmCommand::Exp:
     {
       targetPlayer->gainExp( param1 );
-      player.sendNotice( std::to_string( param1 ) + " Exp was added to " + targetPlayer->getName() );
+      player.sendNotice( "{0} Exp was added to {1}", param1, targetPlayer->getName() );
       break;
     }
     case GmCommand::Inv:
@@ -284,8 +292,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
       else
         targetActor->getAsChara()->setInvincibilityType( Common::InvincibilityType::InvincibilityRefill );
 
-      player.sendNotice( "Invincibility for " + targetPlayer->getName() +
-                         " was switched." );
+      player.sendNotice( "Invincibility for {0} was switched.", targetPlayer->getName() );
       break;
     }
     case GmCommand::Orchestrion:
@@ -297,14 +304,12 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
           for( uint8_t i = 0; i < 255; i++ )
             targetActor->getAsPlayer()->learnSong( i, 0 );
 
-          player.sendNotice( "All Songs for " + targetPlayer->getName() +
-                             " were turned on." );
+          player.sendNotice( "All Songs for {0} were turned on.", targetPlayer->getName() );
         }
         else
         {
           targetActor->getAsPlayer()->learnSong( param2, 0 );
-          player.sendNotice( "Song " + std::to_string( param2 ) + " for " + targetPlayer->getName() +
-                             " was turned on." );
+          player.sendNotice( "Song {0} for {1} was turned on.", param2, targetPlayer->getName() );
         }
       }
 
@@ -326,13 +331,13 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
       }
 
       if( !targetPlayer->addItem( param1, quantity ) )
-        player.sendUrgent( "Item " + std::to_string( param1 ) + " could not be added to inventory." );
+        player.sendUrgent( "Item #{0} could not be added to inventory.", param1 );
       break;
     }
     case GmCommand::Gil:
     {
       targetPlayer->addCurrency( CurrencyType::Gil, param1 );
-      player.sendNotice( "Added " + std::to_string( param1 ) + " Gil for " + targetPlayer->getName() );
+      player.sendNotice( "Added {0} Gil for {1}", param1, targetPlayer->getName() );
       break;
     }
     case GmCommand::Collect:
@@ -341,14 +346,12 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
 
       if( gil < param1 )
       {
-        player.sendUrgent( "Player does not have enough Gil(" + std::to_string( gil ) + ")" );
+        player.sendUrgent( "Player does not have enough Gil({0})", gil );
       }
       else
       {
         targetPlayer->removeCurrency( CurrencyType::Gil, param1 );
-        player.sendNotice( "Removed " + std::to_string( param1 ) +
-                           " Gil from " + targetPlayer->getName() +
-                           "(" + std::to_string( gil ) + " before)" );
+        player.sendNotice( "Removed {0} Gil from {1} ({2} before)", param1, targetPlayer->getName(), gil );
       }
       break;
     }
@@ -380,17 +383,14 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     case GmCommand::GC:
     {
       targetPlayer->setGc( param1 );
-      player.sendNotice( "GC for " + targetPlayer->getName() +
-                         " was set to " + std::to_string( targetPlayer->getGc() ) );
+      player.sendNotice( "GC for {0} was set to {1}", targetPlayer->getName(), targetPlayer->getGc() );
       break;
     }
     case GmCommand::GCRank:
     {
       targetPlayer->setGcRankAt( targetPlayer->getGc() - 1, param1 );
-      player.sendNotice( "GC Rank for  " + targetPlayer->getName() +
-                         " for GC " + std::to_string( targetPlayer->getGc() ) +
-                         " was set to " +
-                         std::to_string( targetPlayer->getGcRankArray()[ targetPlayer->getGc() - 1 ] ) );
+      player.sendNotice( "GC Rank for {0} for GC {1} was set to {2}", targetPlayer->getName(), targetPlayer->getGc(),
+                         targetPlayer->getGcRankArray()[ targetPlayer->getGc() - 1 ] );
       break;
     }
     case GmCommand::Aetheryte:
@@ -402,14 +402,12 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
           for( uint8_t i = 0; i < 255; i++ )
             targetActor->getAsPlayer()->registerAetheryte( i );
 
-          player.sendNotice( "All Aetherytes for " + targetPlayer->getName() +
-                             " were turned on." );
+          player.sendNotice( "All Aetherytes for {0} were turned on.", targetPlayer->getName() );
         }
         else
         {
           targetActor->getAsPlayer()->registerAetheryte( param2 );
-          player.sendNotice( "Aetheryte " + std::to_string( param2 ) + " for " + targetPlayer->getName() +
-                             " was turned on." );
+          player.sendNotice( "Aetheryte {0} for {1} was turned on.", param2, targetPlayer->getName() );
         }
       }
 
@@ -419,7 +417,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     {
       player.queuePacket(
         std::make_shared< ActorControlPacket143 >( player.getId(), ActorControlType::ToggleWireframeRendering ) );
-      player.sendNotice( "Wireframe Rendering for " + player.getName() + " was toggled" );
+      player.sendNotice( "Wireframe Rendering for {0} was toggled", player.getName() );
       break;
     }
     case GmCommand::Teri:
@@ -435,9 +433,8 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
         // pInstance will be nullptr if you're accessing a normal zone via its allocated instance id rather than its zoneid
         if( pInstance && !pInstance->isPlayerBound( player.getId() ) )
         {
-          player.sendUrgent( "Not able to join instance: " + std::to_string( param1 ) );
-          player.sendUrgent(
-            "Player not bound! ( run !instance bind <instanceId> first ) " + std::to_string( param1 ) );
+          player.sendUrgent( "Not able to join instance#{0}", param1 );
+          player.sendUrgent( "Player not bound! ( run !instance bind <instanceId> first ) {0}", param1 );
           break;
         }
 
@@ -445,20 +442,20 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
       }
       else if( !pTeriMgr->isValidTerritory( param1 ) )
       {
-        player.sendUrgent( "Invalid zone " + std::to_string( param1 ) );
+        player.sendUrgent( "Invalid zone {0}", param1 );
       }
       else
       {
         auto pZone = pTeriMgr->getZoneByTerritoryTypeId( param1 );
         if( !pZone )
         {
-          player.sendUrgent( "No zone instance found for " + std::to_string( param1 ) );
+          player.sendUrgent( "No zone instance found for {0}", param1 );
           break;
         }
 
         if( !pTeriMgr->isDefaultTerritory( param1 ) )
         {
-          player.sendUrgent( pZone->getName() + " is an instanced area - instance ID required to zone in." );
+          player.sendUrgent( "{0} is an instanced area - instance ID required to zone in.", pZone->getName() );
           break;
         }
 
@@ -497,8 +494,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
           targetPlayer->performZoning( param1, targetPlayer->getPos(), 0 );
         }
 
-        player.sendNotice( targetPlayer->getName() + " was warped to zone " +
-                           std::to_string( param1 ) + " (" + pZone->getName() + ")" );
+        player.sendNotice( "{0} was warped to zone {1}", targetPlayer->getName(), param1, pZone->getName() );
       }
       break;
     }
@@ -507,22 +503,27 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
       // todo: this doesn't kill their session straight away, should do this properly but its good for when you get stuck for now
       targetPlayer->setMarkedForRemoval();
 
-      player.sendNotice( "Kicked " + targetPlayer->getName() );
+      player.sendNotice( "Kicked {0}", targetPlayer->getName() );
 
       break;
     }
     case GmCommand::TeriInfo:
     {
       auto pCurrentZone = player.getCurrentZone();
-      player.sendNotice( "ZoneId: " + std::to_string( player.getZoneId() ) +
-                         "\nName: " + pCurrentZone->getName() +
-                         "\nInternalName: " + pCurrentZone->getInternalName() +
-                         "\nGuId: " + std::to_string( pCurrentZone->getGuId() ) +
-                         "\nPopCount: " + std::to_string( pCurrentZone->getPopCount() ) +
-                         "\nCurrentWeather: " +
-                         std::to_string( static_cast< uint8_t >( pCurrentZone->getCurrentWeather() ) ) +
-                         "\nNextWeather: " +
-                         std::to_string( static_cast< uint8_t >( pCurrentZone->getNextWeather() ) ) );
+      player.sendNotice( "ZoneId: {0}"
+                         "\nName: {1}"
+                         "\nInternalName: {2}"
+                         "\nGuId: {3}"
+                         "\nPopCount: {4}"
+                         "\nCurrentWeather: {5}"
+                         "\nNextWeather: {6}",
+                         player.getZoneId(),
+                         pCurrentZone->getName(),
+                         pCurrentZone->getInternalName(),
+                         pCurrentZone->getGuId(),
+                         pCurrentZone->getPopCount(),
+                         static_cast< uint8_t >( pCurrentZone->getCurrentWeather() ),
+                         static_cast< uint8_t >( pCurrentZone->getNextWeather() ) );
       break;
     }
     case GmCommand::Jump:
@@ -533,12 +534,12 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
       player.changePosition( targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z,
                              targetActor->getRot() );
 
-      player.sendNotice( "Jumping to " + targetPlayer->getName() + " in range." );
+      player.sendNotice( "Jumping to {0} in range.", targetPlayer->getName() );
       break;
     }
 
     default:
-      player.sendUrgent( "GM1 Command not implemented: " + std::to_string( commandId ) );
+      player.sendUrgent( "GM1 Command not implemented: {0}", commandId );
       break;
   }
 
@@ -580,7 +581,7 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
     }
     else
     {
-      player.sendUrgent( "Player " + target + " not found on this server." );
+      player.sendUrgent( "Player {0} not found on this server.", target );
       return;
     }
   }
@@ -604,7 +605,7 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
       targetPlayer->sendToInRangeSet( makeActorControl142( player.getId(), SetStatus,
                                                            static_cast< uint8_t >( Common::ActorStatus::Idle ) ),
                                       true );
-      player.sendNotice( "Raised " + targetPlayer->getName() );
+      player.sendNotice( "Raised {0}", targetPlayer->getName() );
       break;
     }
     case GmCommand::Jump:
@@ -615,7 +616,7 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
       }
       player.changePosition( targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z,
                              targetActor->getRot() );
-      player.sendNotice( "Jumping to " + targetPlayer->getName() );
+      player.sendNotice( "Jumping to {0}", targetPlayer->getName() );
       break;
     }
     case GmCommand::Call:
@@ -630,11 +631,11 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
       targetPlayer->setInstance( player.getCurrentZone() );
 
       targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
-      player.sendNotice( "Calling " + targetPlayer->getName() );
+      player.sendNotice( "Calling {0}", targetPlayer->getName() );
       break;
     }
     default:
-      player.sendUrgent( "GM2 Command not implemented: " + std::to_string( commandId ) );
+      player.sendUrgent( "GM2 Command not implemented: {0}", commandId );
       break;
   }
 
