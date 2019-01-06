@@ -624,12 +624,26 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
     }
     case GmCommand::Jump:
     {
+      player.prepareZoning( targetPlayer->getZoneId(), true, 1, 0 );
+      if( player.getCurrentInstance() )
+      {
+        player.exitInstance();
+      }
+      if( targetPlayer->getCurrentInstance() && player.getCurrentInstance() != targetPlayer->getCurrentInstance() )
+      {
+        auto instance = targetPlayer->getCurrentInstance();
+        auto pInstanceContent = instance->getAsInstanceContent();
+        // Not sure if GMs actually get bound to an instance they jump to on retail. It's mostly here to avoid a crash for now.
+        pInstanceContent->bindPlayer( player.getId() );
+        player.setInstance( targetPlayer->getCurrentInstance() );
+      }
       if( targetPlayer->getZoneId() != player.getZoneId() )
       {
         player.setZone( targetPlayer->getZoneId() );
       }
       player.changePosition( targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z,
                              targetActor->getRot() );
+      player.sendZoneInPackets( 0x00, 0x00, 0, 0, false );
       player.sendNotice( "Jumping to " + targetPlayer->getName() );
       break;
     }
@@ -650,8 +664,8 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
       {
         targetPlayer->setZone( player.getZoneId() );
       }
-      targetPlayer->sendToInRangeSet( makeActorControl143( player.getId(), ZoneIn, 0, 0, 0, 0 ) );
       targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
+      targetPlayer->sendZoneInPackets( 0x00, 0x00, 0, 0, false );
       player.sendNotice( "Calling " + targetPlayer->getName() );
       break;
     }
