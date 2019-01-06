@@ -760,8 +760,18 @@ namespace Sapphire::Entity
     uint8_t getSearchSelectClass() const;
 
     void sendNotice( const std::string& message );
+    template< typename... Args >
+    void sendNotice( const std::string& message, const Args&... args )
+    {
+      sendNotice( fmt::format( message, args... ) );
+    }
 
     void sendUrgent( const std::string& message );
+    template< typename... Args >
+    void sendUrgent( const std::string& message, const Args&... args )
+    {
+      sendUrgent( fmt::format( message, args... ) );
+    }
 
     void sendDebug( const std::string& message );
 
