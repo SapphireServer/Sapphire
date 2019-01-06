@@ -353,7 +353,7 @@ void Sapphire::Network::GameConnection::zoneLineHandler( FrameworkPtr pFw,
   else
   {
     // No zoneline found, revert to last zone
-    player.sendUrgent( "ZoneLine " + std::to_string( zoneLineId ) + " not found." );
+    player.sendUrgent( "ZoneLine {0} not found.", zoneLineId );
     targetPos.x = 0;
     targetPos.y = 0;
     targetPos.z = 0;
