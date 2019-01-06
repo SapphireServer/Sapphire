@@ -125,7 +125,7 @@ namespace Sapphire::Scripting
     World::Manager::BaseManager( pFw )
   {
     auto pConfig = framework()->get< ConfigMgr >();
-    m_loader.setCachePath( pConfig->getValue< std::string >( "Scripts", "CachePath", "./cache/" ) );
+    m_loader.setCachePath( pConfig->getConfig()->scripts.cachePath );
   }
 
 

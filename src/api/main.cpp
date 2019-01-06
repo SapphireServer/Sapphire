@@ -77,6 +77,8 @@ bool loadSettings( int32_t argc, char* argv[] )
     return false;
   }
 
+  auto pConfig = m_pConfig->getConfig();
+
   std::vector< std::string > args( argv + 1, argv + argc );
   for( size_t i = 0; i + 1 < args.size(); i += 2 )
   {
@@ -140,7 +142,7 @@ bool loadSettings( int32_t argc, char* argv[] )
   }
 
   Logger::info( "Setting up generated EXD data" );
-  auto dataPath = m_pConfig->getValue< std::string >( "GlobalParameters", "DataPath", "" );
+  auto dataPath = m_pConfig->getConfig()->globalParameters.dataPath;
   if( !g_exdDataGen.init( dataPath ) )
   {
     Logger::fatal( "Error setting up generated EXD data. Make sure that DataPath is set correctly in config.ini" );
@@ -151,21 +153,20 @@ bool loadSettings( int32_t argc, char* argv[] )
   Sapphire::Db::DbLoader loader;
 
   Sapphire::Db::ConnectionInfo info;
-  info.password = m_pConfig->getValue< std::string >( "Database", "Password", "" );
-  info.host = m_pConfig->getValue< std::string >( "Database", "Host", "127.0.0.1" );
-  info.database = m_pConfig->getValue< std::string >( "Database", "Database", "sapphire" );
-  info.port = m_pConfig->getValue< uint16_t >( "Database", "Port", 3306 );
-  info.user = m_pConfig->getValue< std::string >( "Database", "Username", "root" );
-  info.syncThreads = m_pConfig->getValue< uint8_t >( "Database", "SyncThreads", 2 );
-  info.asyncThreads = m_pConfig->getValue< uint8_t >( "Database", "AsyncThreads", 2 );
+  info.password = pConfig->database.password;
+  info.host = pConfig->database.host;
+  info.database = pConfig->database.database;
+  info.port = pConfig->database.port;
+  info.user = pConfig->database.username;
+  info.syncThreads = pConfig->database.syncThreads;
+  info.asyncThreads = pConfig->database.asyncThreads;
 
   loader.addDb( g_charaDb, info );
   if( !loader.initDbs() )
     return false;
 
-  server.config.port = static_cast< uint16_t >( std::stoul(
-    m_pConfig->getValue< std::string >( "RestNetwork", "ListenPort", "80" ) ) );
-  server.config.address = m_pConfig->getValue< std::string >( "RestNetwork", "ListenIp", "0.0.0.0" );
+  server.config.port = pConfig->restNetwork.listenPort;
+  server.config.address = pConfig->restNetwork.listenIP;
 
   Logger::info( "Database: Connected to {0}:{1}", info.host, info.port );
 
@@ -267,9 +268,9 @@ void createAccount( shared_ptr< HttpServer::Response > response, shared_ptr< Htt
       // todo: construct proper json object here
       std::string json_string = "{\"sId\":\"" + sId +
                                 "\", \"lobbyHost\":\"" +
-                                m_pConfig->getValue< std::string >( "GlobalNetwork", "LobbyHost" ) +
+                                m_pConfig->getConfig()->globalNetwork.lobbyHost +
                                 "\", \"frontierHost\":\"" +
-                                m_pConfig->getValue< std::string >( "GlobalNetwork", "RestHost" ) + "\"}";
+                                m_pConfig->getConfig()->globalNetwork.restHost + "\"}";
       *response << buildHttpResponse( 200, json_string, JSON );
     }
     else
@@ -300,9 +301,9 @@ void login( shared_ptr< HttpServer::Response > response, shared_ptr< HttpServer:
       // todo: build proper json object and stringify it
       std::string json_string = "{\"sId\":\"" + sId +
                                 "\", \"lobbyHost\":\"" +
-                                m_pConfig->getValue< std::string >( "GlobalNetwork", "LobbyHost" ) +
+                                m_pConfig->getConfig()->globalNetwork.lobbyHost +
                                 "\", \"frontierHost\":\"" +
-                                m_pConfig->getValue< std::string >( "GlobalNetwork", "RestHost" ) + "\"}";
+                                m_pConfig->getConfig()->globalNetwork.restHost + "\"}";
       *response << buildHttpResponse( 200, json_string, JSON );
     }
     else
@@ -332,7 +333,7 @@ void deleteCharacter( shared_ptr< HttpServer::Response > response, shared_ptr< H
 
     int32_t accountId = g_sapphireAPI.checkSession( sId );
 
-    if( m_pConfig->getValue< std::string >( "GlobalParameters", "ServerSecret" ) != secret )
+    if( m_pConfig->getConfig()->globalParameters.serverSecret != secret )
     {
       std::string json_string = "{\"result\":\"invalid_secret\"}";
       *response << buildHttpResponse( 403, json_string, JSON );
@@ -372,15 +373,15 @@ void createCharacter( shared_ptr< HttpServer::Response > response, shared_ptr< H
 
     if( result != -1 )
     {
-      if( m_pConfig->getValue< std::string >( "GlobalParameters", "ServerSecret" ) != secret )
+      if( m_pConfig->getConfig()->globalParameters.serverSecret != secret )
       {
         std::string json_string = "{\"result\":\"invalid_secret\"}";
         *response << buildHttpResponse( 403, json_string, JSON );
       }
       else
       {
-        int32_t charId = g_sapphireAPI.createCharacter( result, name, finalJson, m_pConfig->getValue< uint8_t >(
-          "CharacterCreation", "DefaultGMRank", 255 ) );
+        int32_t charId = g_sapphireAPI.createCharacter( result, name, finalJson,
+                                                        m_pConfig->getConfig()->characterCreation.defaultGMRank );
 
         std::string json_string = "{\"result\":\"" + std::to_string( charId ) + "\"}";
         *response << buildHttpResponse( 200, json_string, JSON );
@@ -413,7 +414,7 @@ void insertSession( shared_ptr< HttpServer::Response > response, shared_ptr< Htt
     std::string secret = json["secret"];
 
     // reloadConfig();
-    if( m_pConfig->getValue< std::string >( "GlobalParameters", "ServerSecret" ) != secret )
+    if( m_pConfig->getConfig()->globalParameters.serverSecret != secret )
     {
       std::string json_string = "{\"result\":\"invalid_secret\"}";
       *response << buildHttpResponse( 403, json_string, JSON );
@@ -445,7 +446,7 @@ void checkNameTaken( shared_ptr< HttpServer::Response > response, shared_ptr< Ht
 
     // reloadConfig();
 
-    if( m_pConfig->getValue< std::string >( "GlobalParameters", "ServerSecret" ) != secret )
+    if( m_pConfig->getConfig()->globalParameters.serverSecret != secret )
     {
       std::string json_string = "{\"result\":\"invalid_secret\"}";
       *response << buildHttpResponse( 403, json_string, JSON );
@@ -482,7 +483,7 @@ void checkSession( shared_ptr< HttpServer::Response > response, shared_ptr< Http
 
     if( result != -1 )
     {
-      if( m_pConfig->getValue< std::string >( "GlobalParameters", "ServerSecret" ) != secret )
+      if( m_pConfig->getConfig()->globalParameters.serverSecret != secret )
       {
         std::string json_string = "{\"result\":\"invalid_secret\"}";
         *response << buildHttpResponse( 403, json_string, JSON );
@@ -521,7 +522,7 @@ void getNextCharId( shared_ptr< HttpServer::Response > response, shared_ptr< Htt
 
     // reloadConfig();
 
-    if( m_pConfig->getValue< std::string >( "GlobalParameters", "ServerSecret" ) != secret )
+    if( m_pConfig->getConfig()->globalParameters.serverSecret != secret )
     {
       std::string json_string = "{\"result\":\"invalid_secret\"}";
       *response << buildHttpResponse( 403, json_string, JSON );
@@ -552,7 +553,7 @@ void getNextContentId( shared_ptr< HttpServer::Response > response, shared_ptr< 
 
     // reloadConfig();
 
-    if( m_pConfig->getValue< std::string >( "GlobalParameters", "ServerSecret" ) != secret )
+    if( m_pConfig->getConfig()->globalParameters.serverSecret != secret )
     {
       std::string json_string = "{\"result\":\"invalid_secret\"}";
       *response << buildHttpResponse( 403, json_string, JSON );
@@ -587,7 +588,7 @@ void getCharacterList( shared_ptr< HttpServer::Response > response, shared_ptr< 
 
     if( result != -1 )
     {
-      if( m_pConfig->getValue< std::string >( "GlobalParameters", "ServerSecret" ) != secret )
+      if( m_pConfig->getConfig()->globalParameters.serverSecret != secret )
       {
         std::string json_string = "{\"result\":\"invalid_secret\"}";
         *response << buildHttpResponse( 403, json_string, JSON );
@@ -767,8 +768,8 @@ int main( int argc, char* argv[] )
                           server.start();
                         } );
 
-  Logger::info( "API server running on {0}:{1}", m_pConfig->getValue< std::string >( "RestNetwork", "ListenIp", "0.0.0.0" ),
-                m_pConfig->getValue< std::string >( "RestNetwork", "ListenPort", "80" ) );
+  auto& cfg = m_pConfig->getConfig()->restNetwork;
+  Logger::info( "API server running on {0}:{1}", cfg.listenIP, cfg.listenPort );
 
   //Wait for server to start so that the client can connect
   this_thread::sleep_for( chrono::seconds( 1 ) );

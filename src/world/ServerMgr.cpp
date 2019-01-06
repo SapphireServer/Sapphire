@@ -74,8 +74,8 @@ bool Sapphire::World::ServerMgr::loadSettings( int32_t argc, char* argv[] )
     return false;
   }
 
-  m_port = pConfig->getValue< uint16_t >( "ZoneNetwork", "ListenPort", 54992 );
-  m_ip = pConfig->getValue< std::string >( "ZoneNetwork", "ListenIp", "0.0.0.0" );
+  m_port = pConfig->getConfig()->zoneNetwork.listenPort;
+  m_ip = pConfig->getConfig()->zoneNetwork.listenIp;
 
   return true;
 }
@@ -99,7 +99,7 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
 
   Logger::info( "Setting up generated EXD data" );
   auto pExdData = std::make_shared< Data::ExdDataGenerated >();
-  auto dataPath = pConfig->getValue< std::string >( "GlobalParameters", "DataPath", "" );
+  auto dataPath = pConfig->getConfig()->globalParameters.dataPath;
   if( !pExdData->init( dataPath ) )
   {
     Logger::fatal( "Error setting up generated EXD data. Make sure that DataPath is set correctly in config.ini" );

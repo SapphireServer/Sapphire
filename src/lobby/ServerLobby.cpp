@@ -67,9 +67,7 @@ namespace Sapphire
     Network::HivePtr hive( new Network::Hive() );
     Network::addServerToHive< Network::GameConnection >( m_ip, m_port, hive, pFw );
 
-    Logger::info(
-      "Lobby server running on " + m_pConfig->getValue< std::string >( "LobbyNetwork", "ListenIp", "0.0.0.0" ) + ":" +
-      m_pConfig->getValue< std::string >( "LobbyNetwork", "ListenPort", "80" ) );
+    Logger::info( "Lobby server running on {0}:{1}", m_ip, m_port );
 
     std::vector< std::thread > threadGroup;
 
@@ -108,19 +106,19 @@ namespace Sapphire
         if( arg == "ip" )
         {
           // todo: ip addr in config
-          m_pConfig->setValue< std::string >( "LobbyNetwork.ListenIp", val );
+          m_pConfig->getConfig()->lobbyNetwork.listenIp = val;
         }
         else if( arg == "p" || arg == "port" )
         {
-          m_pConfig->setValue< std::string >( "LobbyNetwork.LobbyPort", val );
+          m_pConfig->getConfig()->lobbyNetwork.listenPort = std::stoi( val );
         }
         else if( arg == "worldip" || arg == "worldip" )
         {
-          m_pConfig->setValue< std::string >( "GlobalNetwork.ZoneHost", val );
+          m_pConfig->getConfig()->globalNetwork.zoneHost = val;
         }
         else if( arg == "worldport" )
         {
-          m_pConfig->setValue< std::string >( "GlobalNetwork.ZonePort", val );
+          m_pConfig->getConfig()->globalNetwork.zonePort = std::stoi( val );
         }
       }
       catch( ... )
@@ -130,12 +128,13 @@ namespace Sapphire
       }
     }
 
-    m_port = m_pConfig->getValue< uint16_t >( "LobbyNetwork", "ListenPort", 54994 );
-    m_ip = m_pConfig->getValue< std::string >( "LobbyNetwork", "ListenIp", "0.0.0.0" );
+    m_port = m_pConfig->getConfig()->lobbyNetwork.listenPort;
+    m_ip = m_pConfig->getConfig()->lobbyNetwork.listenIp;
 
-    g_restConnector.restHost = m_pConfig->getValue< std::string >( "GlobalNetwork", "RestHost" ) + ":" +
-                               m_pConfig->getValue< std::string >( "GlobalNetwork", "RestPort" );
-    g_restConnector.serverSecret = m_pConfig->getValue< std::string >( "GlobalParameters", "ServerSecret" );
+
+    g_restConnector.restHost = m_pConfig->getConfig()->globalNetwork.restHost + ":" +
+                               std::to_string( m_pConfig->getConfig()->globalNetwork.restPort );
+    g_restConnector.serverSecret = m_pConfig->getConfig()->globalParameters.serverSecret;
 
     return true;
   }
