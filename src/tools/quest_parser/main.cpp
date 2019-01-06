@@ -197,7 +197,7 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
         cc++;
       }
     }
-    rewards += "  static constexpr auto RewardItem["+ std::to_string(cc) + "] = { "+ reward +" };\n";
+    rewards += "  uint16_t RewardItem["+ std::to_string(cc) + "] = { "+ reward +" };\n";
     reward.clear();
   }
 
@@ -217,7 +217,7 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
         cc++;
       }
     }
-    rewards += "  static constexpr auto RewardItemCount["+ std::to_string(cc) +"] = { "+ reward +" };\n";
+    rewards += "  uint16_t RewardItemCount["+ std::to_string(cc) +"] = { "+ reward +" };\n";
     reward.clear();
   }
 
@@ -239,7 +239,7 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
         cc++;
       }
     }
-    rewards += "  static constexpr auto RewardItemOptional[" + std::to_string(cc) + "] = { " + reward + " };\n";
+    rewards += "  uint16_t RewardItemOptional[" + std::to_string(cc) + "] = { " + reward + " };\n";
     reward.clear();
   }
 
@@ -261,7 +261,7 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
         cc++;
       }
     }
-    rewards += "  static constexpr auto RewardItemOptionalCount["+ std::to_string(cc) + "] = { "+ reward + " };\n";
+    rewards += "  uint16_t RewardItemOptionalCount["+ std::to_string(cc) + "] = { "+ reward + " };\n";
     reward.clear();
   }
 
