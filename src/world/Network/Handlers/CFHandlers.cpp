@@ -56,7 +56,7 @@ void Sapphire::Network::GameConnection::cfRegisterDuty( FrameworkPtr pFw,
     if( id == 0 )
       break;
 
-    player.sendDebug( "got contentId: " + std::to_string( id ) );
+    player.sendDebug( "got contentId#{0}", id );
 
     selectedContent.push_back( id );
   }
@@ -65,7 +65,7 @@ void Sapphire::Network::GameConnection::cfRegisterDuty( FrameworkPtr pFw,
   auto index = std::rand() % selectedContent.size();
   auto contentId = selectedContent.at( index );
 
-  player.sendDebug( "Duty register request for contentid: " + std::to_string( contentId ) );
+  player.sendDebug( "Duty register request for contentid#{0}", contentId );
 
   // let's cancel it because otherwise you can't register it again
   auto cfCancelPacket = makeZonePacket< FFXIVIpcCFNotify >( player.getId() );
@@ -84,7 +84,7 @@ void Sapphire::Network::GameConnection::cfRegisterDuty( FrameworkPtr pFw,
   auto pInstance = instance->getAsInstanceContent();
   pInstance->bindPlayer( player.getId() );
 
-  player.sendDebug( "Created instance with id: " + std::to_string( instance->getGuId() ) );
+  player.sendDebug( "Created instance with id#", instance->getGuId() );
 
   player.setInstance( instance );
 }

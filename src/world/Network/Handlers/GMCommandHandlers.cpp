@@ -101,10 +101,9 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
   const auto param4 = packet.data().param4;
   const auto target = packet.data().target;
 
-  Logger::debug( player.getName() + " used GM1 commandId: " + std::to_string( commandId ) +
-                 ", params: " + std::to_string( param1 ) + ", " +
-                 std::to_string( param2 ) + ", " + std::to_string( param3 ) + ", " + std::to_string( param4 ) +
-                 ", target: " + std::to_string( target ) );
+  Logger::info( "{0} used GM1 commandId: {1}, params: {2}, {3}, {4}, {5}, target: {6}",
+                player.getName(), commandId,
+                param1, param2, param3, param4, target );
 
   Sapphire::Entity::ActorPtr targetActor;
 
@@ -440,7 +439,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
       auto pTeriMgr = pFw->get< TerritoryMgr >();
       if( auto instance = pTeriMgr->getInstanceZonePtr( param1 ) )
       {
-        player.sendDebug( "Found instance: " + instance->getName() + ", id: " + std::to_string( param1 ) );
+        player.sendDebug( "Found instance: {0}, id#{1}", instance->getName(), param1 );
 
         // if the zone is an instanceContent instance, make sure the player is actually bound to it
         auto pInstance = instance->getAsInstanceContent();
@@ -575,10 +574,8 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
   const auto param4 = packet.data().param4;
   const auto target = std::string( packet.data().target );
 
-  Logger::debug( player.getName() + " used GM2 commandId: " + std::to_string( commandId ) +
-                 ", params: " + std::to_string( param1 ) + ", " +
-                 std::to_string( param2 ) + ", " + std::to_string( param3 ) + ", " + std::to_string( param4 ) +
-                 ", target: " + target );
+  Logger::debug( "{0} used GM2 commandId: {1}, params: {2}, {3}, {4}, {5}, target: {6}",
+                 player.getName(), commandId, param1, param2, param3, param4, target );
 
   auto targetSession = pServerZone->getSession( target );
   Sapphire::Entity::CharaPtr targetActor;

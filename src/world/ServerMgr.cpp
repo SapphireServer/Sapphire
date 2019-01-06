@@ -65,11 +65,11 @@ bool Sapphire::World::ServerMgr::loadSettings( int32_t argc, char* argv[] )
 {
   auto pConfig = framework()->get< Sapphire::ConfigMgr >();
 
-  Logger::info( "Loading config " + m_configName );
+  Logger::info( "Loading config {0}", m_configName );
 
   if( !pConfig->loadConfig( m_configName ) )
   {
-    Logger::fatal( "Error loading config " + m_configName );
+    Logger::fatal( "Error loading config {0}", m_configName );
     Logger::fatal( "If this is the first time starting the server, we've copied the default one for your editing pleasure." );
     return false;
   }
@@ -103,7 +103,7 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
   if( !pExdData->init( dataPath ) )
   {
     Logger::fatal( "Error setting up generated EXD data. Make sure that DataPath is set correctly in config.ini" );
-    Logger::fatal( "DataPath: " + dataPath );
+    Logger::fatal( "DataPath: {0}", dataPath );
     return;
   }
   framework()->set< Data::ExdDataGenerated >( pExdData );
@@ -192,7 +192,7 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
   framework()->set< Manager::EventMgr >( pEventMgr );
   framework()->set< Manager::ItemMgr >( pItemMgr );
 
-  Logger::info( "World server running on " + m_ip + ":" + std::to_string( m_port ) );
+  Logger::info( "World server running on {0}:{1}", m_ip, m_port );
 
   mainLoop();
 
@@ -217,8 +217,8 @@ void Sapphire::World::ServerMgr::printBanner() const
 {
   Logger::info( "===========================================================" );
   Logger::info( "Sapphire Server Project " );
-  Logger::info( "Version: " + Version::VERSION );
-  Logger::info( "Git Hash: " + Version::GIT_HASH );
+  Logger::info( "Version: {0}", Version::VERSION );
+  Logger::info( "Git Hash: {0}", Version::GIT_HASH );
   Logger::info( "Compiled: " __DATE__ " " __TIME__ );
   Logger::info( "===========================================================" );
 }
@@ -273,7 +273,7 @@ void Sapphire::World::ServerMgr::mainLoop()
         it->second->close();
         // if( it->second.unique() )
         {
-          Logger::info( "[" + std::to_string( it->second->getId() ) + "] Session removal" );
+          Logger::info( "[{0}] Session removal", it->second->getId() );
           it = m_sessionMapById.erase( it );
           removeSession( pPlayer->getName() );
           continue;
@@ -283,7 +283,7 @@ void Sapphire::World::ServerMgr::mainLoop()
       // remove sessions that simply timed out
       if( diff > 20 )
       {
-        Logger::info( "[" + std::to_string( it->second->getId() ) + "] Session time out" );
+        Logger::info( "[{0}] Session time out", it->second->getId() );
 
         it->second->close();
         // if( it->second.unique() )
@@ -312,18 +312,18 @@ bool Sapphire::World::ServerMgr::createSession( uint32_t sessionId )
 
   if( it != m_sessionMapById.end() )
   {
-    Logger::error( "[" + session_id_str + "] Error creating session" );
+    Logger::error( "[{0}] Error creating session", session_id_str );
     return false;
   }
 
-  Logger::info( "[" + session_id_str + "] Creating new session" );
+  Logger::info( "[{0}] Creating new session", session_id_str );
 
   std::shared_ptr< Session > newSession( new Session( sessionId, framework() ) );
   m_sessionMapById[ sessionId ] = newSession;
 
   if( !newSession->loadPlayer() )
   {
-    Logger::error( "[" + session_id_str + "] Error loading player " + session_id_str );
+    Logger::error( "[{0}] Error loading player {0}", session_id_str );
     return false;
   }
 
@@ -437,7 +437,7 @@ void Sapphire::World::ServerMgr::loadBNpcTemplates()
     m_bNpcTemplateMap[ name ] = bnpcTemplate;
   }
 
-  Logger::debug( "BNpc Templates loaded: " + std::to_string( m_bNpcTemplateMap.size() ) );
+  Logger::debug( "BNpc Templates loaded: {0}", m_bNpcTemplateMap.size() );
 
 }
 

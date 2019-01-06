@@ -63,7 +63,7 @@ void reloadConfig()
 
 void print_request_info( shared_ptr< HttpServer::Request > request )
 {
-  Logger::info( "Request from " + request->remote_endpoint_address + " (" + request->path + ")" );
+  Logger::info( "Request from {0} ({1})", request->remote_endpoint_address, request->path  );
 }
 
 bool loadSettings( int32_t argc, char* argv[] )
@@ -72,7 +72,7 @@ bool loadSettings( int32_t argc, char* argv[] )
 
   if( !m_pConfig->loadConfig( configPath ) )
   {
-    Logger::fatal( "Error loading config " + configPath );
+    Logger::fatal( "Error loading config {0}", configPath );
     Logger::fatal( "If this is the first time starting the server, we've copied the default one for your editing pleasure." );
     return false;
   }
@@ -134,7 +134,7 @@ bool loadSettings( int32_t argc, char* argv[] )
     }
     catch( ... )
     {
-      Logger::error( "Error parsing argument: " + arg + " " + "value: " + val + "\n" );
+      Logger::error( "Error parsing argument: {0} value: {1}\n", arg, val );
       Logger::error( "Usage: <arg> <val> \n" );
     }
   }
@@ -144,7 +144,7 @@ bool loadSettings( int32_t argc, char* argv[] )
   if( !g_exdDataGen.init( dataPath ) )
   {
     Logger::fatal( "Error setting up generated EXD data. Make sure that DataPath is set correctly in config.ini" );
-    Logger::fatal( "DataPath: " + dataPath );
+    Logger::fatal( "DataPath: {0}", dataPath );
     return false;
   }
 
@@ -167,7 +167,7 @@ bool loadSettings( int32_t argc, char* argv[] )
     m_pConfig->getValue< std::string >( "RestNetwork", "ListenPort", "80" ) ) );
   server.config.address = m_pConfig->getValue< std::string >( "RestNetwork", "ListenIp", "0.0.0.0" );
 
-  Logger::info( "Database: Connected to " + info.host + ":" + std::to_string( info.port ) );
+  Logger::info( "Database: Connected to {0}:{1}", info.host, info.port );
 
   return true;
 }
@@ -767,7 +767,7 @@ int main( int argc, char* argv[] )
                           server.start();
                         } );
 
-  Logger::info( "API server running on " + m_pConfig->getValue< std::string >( "RestNetwork", "ListenIp", "0.0.0.0" ) + ":" +
+  Logger::info( "API server running on {0}:{1}", m_pConfig->getValue< std::string >( "RestNetwork", "ListenIp", "0.0.0.0" ),
                 m_pConfig->getValue< std::string >( "RestNetwork", "ListenPort", "80" ) );
 
   //Wait for server to start so that the client can connect

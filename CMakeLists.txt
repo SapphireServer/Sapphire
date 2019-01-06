@@ -19,7 +19,7 @@ add_custom_target( copy_runtime_files ALL
 # Dependencies and compiler settings #
 ######################################
 include( "cmake/paths.cmake" )
-include( "cmake/mysql.cmake" )
+#include( "cmake/mysql.cmake" )
 include( "cmake/compiler.cmake" )
 include( "cmake/cotire.cmake" )
 
