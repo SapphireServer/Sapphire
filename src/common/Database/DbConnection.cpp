@@ -144,10 +144,10 @@ Sapphire::Db::DbConnection::query( std::shared_ptr< Sapphire::Db::PreparedStatem
   if( !stmt )
     return nullptr;
 
-  if( !ping() )
+  if( !ping() ) //this does not work right and results in too many connections
   {
     // naivly reconnect and hope for the best
-    open();
+    //open(); 
     lockIfReady();
     if( !prepareStatements() )
       return nullptr;
