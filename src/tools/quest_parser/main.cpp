@@ -115,9 +115,9 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
         "      player.playScene( getId(), " +
         sceneId +
         ", 0,\n"
-        "                       [&]( Entity::Player& player, const Event::SceneResult& result )\n"
-        "                       {\n"
-        "                       });\n"
+        "                        [ & ]( Entity::Player& player, const Event::SceneResult& result )\n"
+        "                        {\n"
+        "                        });\n"
         "   }\n\n"
       );
     }
@@ -375,7 +375,7 @@ int main( int argc, char** argv )
   bool unluac = false;
   // std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
   //std::string datLocation( "C:/Program Files (x86)/SquareEnix/FINAL FANTASY XIV - A Realm Reborn/game/sqpack" );
-  std::string datLocation( "F:/Program Files (x86)/SquareEnix/FINAL FANTASY XIV - A Realm Reborn/game/sqpack" );
+  std::string datLocation( "C:/SquareEnix/FINAL FANTASY XIV - A Realm Reborn/game/sqpack" );
   if( argc > 1 )
     datLocation = std::string( argv[ 1 ] );
   if( argc > 2 )
@@ -405,7 +405,7 @@ int main( int argc, char** argv )
   uint32_t i = 0;
   for( const auto& row : rows )
   {
-    Logger::info( "Generating " + std::to_string( row ) );
+    Logger::info( "Generating {0}", row );
     auto questInfo = g_exdDataGen.get< Sapphire::Data::Quest >( row );
 
     if( questInfo->name.empty() || questInfo->id.empty() )
@@ -450,7 +450,7 @@ int main( int argc, char** argv )
         "generated/" + questInfo->id + ".lua";
       if( system( command.c_str() ) == -1 )
       {
-        Logger::error( "Error executing java command:\n" + command + "\nerrno: " + std::strerror( errno ) );
+        Logger::error( "Error executing java command:\n {0}\nerrno: {1}", command, std::strerror( errno ) );
         return errno;
       }
     }
