@@ -109,13 +109,13 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
   framework()->set< Data::ExdDataGenerated >( pExdData );
 
   Sapphire::Db::ConnectionInfo info;
-  info.password = pConfig->getValue< std::string >( "Database", "Password", "" );
-  info.host = pConfig->getValue< std::string >( "Database", "Host", "127.0.0.1" );
-  info.database = pConfig->getValue< std::string >( "Database", "Database", "sapphire" );
-  info.port = pConfig->getValue< uint16_t >( "Database", "Port", 3306 );
-  info.user = pConfig->getValue< std::string >( "Database", "Username", "root" );
-  info.syncThreads = pConfig->getValue< uint8_t >( "Database", "SyncThreads", 2 );
-  info.asyncThreads = pConfig->getValue< uint8_t >( "Database", "AsyncThreads", 2 );
+  info.password = pConfig->getConfig()->database.password;
+  info.host = pConfig->getConfig()->database.host;
+  info.database = pConfig->getConfig()->database.database;
+  info.port = pConfig->getConfig()->database.port;
+  info.user = pConfig->getConfig()->database.username;
+  info.syncThreads = pConfig->getConfig()->database.syncThreads;
+  info.asyncThreads = pConfig->getConfig()->database.asyncThreads;
 
   auto pDb = std::make_shared< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   Sapphire::Db::DbLoader loader;

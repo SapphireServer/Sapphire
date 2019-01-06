@@ -6,6 +6,7 @@
 #include <inih/INIReader.h>
 #include <string>
 #include <stdint.h>
+#include "ConfigDef.h"
 
 namespace Sapphire
 {
@@ -13,8 +14,9 @@ namespace Sapphire
     {
     public:
       ConfigMgr() = default;
-
       ~ConfigMgr() = default;
+
+      using ConfigurationPtr = std::shared_ptr< Common::Configuration >;
 
       bool loadConfig( const std::string& configName );
 
@@ -56,10 +58,15 @@ namespace Sapphire
         //m_propTree.put( name, defaultValue );
       }
 
+      ConfigurationPtr getConfig();
+
     private:
       bool copyDefaultConfig( const std::string& configName );
+      void initConfigData();
 
       std::unique_ptr< INIReader > m_pInih;
+
+      ConfigurationPtr m_pConfig;
 
       const std::string m_globalConfigFile = "global.ini";
       const std::string m_configFolderRoot = "./config/";
