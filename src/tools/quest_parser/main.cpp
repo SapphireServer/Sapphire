@@ -182,7 +182,7 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
                                                           std::to_string( pQuestData->instanceContentUnlock ) + ";\n"
                                                         : "";
 
-  if( !pQuestData->itemReward0.at(0) == 0 )
+  if( !pQuestData->itemReward0.at( 0 ) == 0 )
   {
     std::size_t cc = 0;
     for( size_t ca = 0; ca < pQuestData->itemReward0.size(); ca++ )
@@ -221,19 +221,21 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
     reward.clear();
   }
 
-  if (!pQuestData->itemReward1.at(0) == 0 )
+  if ( !pQuestData->itemReward1.at( 0 ) == 0 )
   {
     std::size_t cc = 0;
-    for (size_t ca = 0; ca < pQuestData->itemReward1.size(); ca++)
+    for ( size_t ca = 0; ca < pQuestData->itemReward1.size(); ca++ )
     {
-      if (pQuestData->itemReward1.at(ca) != 0)
+      if ( pQuestData->itemReward1.at( ca ) != 0 )
       {
-        reward += std::to_string(pQuestData->itemReward1.at(ca));
-        if (pQuestData->itemReward1.at(ca+1) != 0)
+        reward += std::to_string( pQuestData->itemReward1.at( ca ) );
+        if ( ca+1 != 5 )
         {
-          reward += ", ";
+          if ( pQuestData->itemReward1.at( ca + 1 ) != 0)
+          {
+            reward += ", ";
+          }
         }
-        else break;
         cc++;
       }
     }
@@ -241,19 +243,21 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
     reward.clear();
   }
 
-  if( !pQuestData->itemReward1.at(0) == 0 )
+  if( !pQuestData->itemReward1.at( 0 ) == 0 )
   {
     std::size_t cc = 0;
     for( size_t ca = 0; ca < pQuestData->itemCountReward1.size(); ca++ )
     {
-      if (pQuestData->itemCountReward1.at( ca ) != 0)
+      if ( pQuestData->itemCountReward1.at( ca ) != 0 )
       {
         reward += std::to_string( pQuestData->itemCountReward1.at( ca ) );
-        if (pQuestData->itemCountReward1.at(ca+1) != 0)
+        if ( ca + 1 != 5 )
         {
-          reward += ", ";
+          if ( pQuestData->itemCountReward1.at( ca + 1 ) != 0 )
+          {
+            reward += ", ";
+          }
         }
-        else break;
         cc++;
       }
     }
