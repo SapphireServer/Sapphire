@@ -327,7 +327,7 @@ void Sapphire::Entity::Player::eventItemActionStart( uint32_t eventId,
 void Sapphire::Entity::Player::onLogin()
 {
   auto pConfig = m_pFw->get< ConfigMgr >();
-  auto motd = pConfig->getValue< std::string >( "General", "MotD", "" );
+  auto motd = pConfig->getConfig()->general.motd;
 
   std::istringstream ss( motd );
   std::string msg;
