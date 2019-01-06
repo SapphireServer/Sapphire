@@ -627,17 +627,16 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
       {
         player.exitInstance();
       }
-      if( targetPlayer->getCurrentInstance() && player.getCurrentInstance() != targetPlayer->getCurrentInstance() )
+      if( targetPlayer->getCurrentZone()->getGuId() != player.getCurrentZone()->getGuId() )
       {
-        auto instance = targetPlayer->getCurrentInstance();
-        auto pInstanceContent = instance->getAsInstanceContent();
-        // Not sure if GMs actually get bound to an instance they jump to on retail. It's mostly here to avoid a crash for now.
-        pInstanceContent->bindPlayer( player.getId() );
-        player.setInstance( targetPlayer->getCurrentInstance() );
-      }
-      if( targetPlayer->getZoneId() != player.getZoneId() )
-      {
-        player.setZone( targetPlayer->getZoneId() );
+        // Checks if the target player is in an InstanceContent to avoid binding to a Zone or PublicContent
+        if( targetPlayer->getCurrentInstance() )
+        {
+          auto pInstanceContent = targetPlayer->getCurrentInstance()->getAsInstanceContent();
+          // Not sure if GMs actually get bound to an instance they jump to on retail. It's mostly here to avoid a crash for now
+          pInstanceContent->bindPlayer( player.getId() );
+        }
+        player.setInstance( targetPlayer->getCurrentZone()->getGuId() );
       }
       player.changePosition( targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z,
                              targetActor->getRot() );
@@ -658,9 +657,9 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
       {
         targetPlayer->exitInstance();
       }
-      if ( targetPlayer->getZoneId() != player.getZoneId() )
+      if( targetPlayer->getCurrentZone()->getGuId() != player.getCurrentZone()->getGuId() )
       {
-        targetPlayer->setZone( player.getZoneId() );
+        targetPlayer->setInstance( player.getCurrentZone()->getGuId() );
       }
       targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
       targetPlayer->sendZoneInPackets( 0x00, 0x00, 0, 0, false );
