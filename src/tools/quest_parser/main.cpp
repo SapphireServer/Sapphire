@@ -27,7 +27,8 @@ using namespace Sapphire;
 const std::string onTalkStr(
   "   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override\n"
   "   {\n"
-  "      auto actor = Event::mapEventActorToRealActor( actorId );\n"
+  "      auto pEventMgr = m_framework->get< World::Manager::EventMgr >();\n"
+  "      auto actor = pEventMgr->mapEventActorToRealActor( static_cast<uint32_t>( actorId ) );\n"
   "   }\n\n"
 );
 
@@ -39,6 +40,12 @@ const std::string onWithinRangeStr(
 
 const std::string onEmoteStr(
   "   void onEmote( uint32_t eventId, Entity::Player& player, uint64_t actorId, uint32_t emoteId ) override\n"
+  "   {\n"
+  "   }\n\n"
+);
+
+const std::string onEnemystr(
+  "   void onNpcKill( uint32_t npcId, Entity::Player& player ) override\n"
   "   {\n"
   "   }\n\n"
 );
@@ -70,7 +77,13 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
     "// In order for this script to be loaded, change its extension to .cpp\n"
     "// and move it to the correct folder in <root>/scripts/native/\n"
     "\n"
-    "#include <ScriptObject.h>\n\n"
+    "#include <Actor/Player.h>\n"
+    "#include <Manager/EventMgr.h>\n"
+    "#include <ScriptObject.h>\n"
+    "#include <Framework.h>\n"
+    "\n"
+    "using namespace Sapphire;\n"
+    "\n"
   );
 
   std::size_t splitPos( pQuestData->id.find( "_" ) );
@@ -80,10 +93,10 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
     "   //////////////////////////////////////////////////////////////////////\n   // Available Scenes in this quest, not necessarly all are used\n" );
   std::string seqStr;
   seqStr.reserve( 0xFFF );
-  seqStr += ( "      // Steps in this quest ( 0 is before accepting, \n      // 1 is first, 255 means ready for turning it in\n" );
-  std::string questVarStr( "      // Quest vars / flags used\n" );
+  seqStr += ( "  // Steps in this quest ( 0 is before accepting, \n  // 1 is first, 255 means ready for turning it in\n" );
+  std::string questVarStr( "  // Quest vars / flags used\n" );
 
-  seqStr += "      enum Sequence : uint8_t\n      {\n";
+  seqStr += "  enum Sequence :\n    uint8_t\n  {\n";
   for( auto& entry : additionalList )
   {
     if( entry.find( "OnScene" ) != std::string::npos )
@@ -99,25 +112,25 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
         sceneName +
         "( Entity::Player& player )\n"
         "   {\n"
-        "      player.eventPlay( this->getId(), " +
+        "      player.playScene( getId(), " +
         sceneId +
         ", 0,\n"
-        "         [&]( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2, uint16_t param3 )\n"
-        "         {\n"
-        "         });\n"
+        "                       [&]( Entity::Player& player, const Event::SceneResult& result )\n"
+        "                       {\n"
+        "                       });\n"
         "   }\n\n"
       );
     }
     else if( entry.find( "Flag" ) != std::string::npos ||
              entry.find( "QuestUI" ) != std::string::npos )
     {
-      questVarStr += "      // " + entry + "\n";
+      questVarStr += "  // " + entry + "\n";
     }
     else if( entry.find( "SEQ" ) != std::string::npos )
     {
       if( entry.find( "SEQ_FINISH" ) != std::string::npos )
       {
-        seqStr += "         SeqFinish = 255,\n";
+        seqStr += "    SeqFinish = 255,\n";
       }
       else if( entry.find( "SEQ_OFFER" ) != std::string::npos )
       {
@@ -131,97 +144,121 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
         }), seqName.end());
 
         std::string seqId = entry.substr( 4 );
-        seqStr += "         " + seqName + " = " + seqId + ",\n";
+        seqStr += "    " + seqName + " = " + seqId + ",\n";
       }
     }
   }
-  seqStr += "      };\n";
+  seqStr += "  };\n";
   std::string rewards;
+  std::string reward;
   rewards.reserve( 0xFFF );
-  rewards += "      // Quest rewards \n";
-  rewards += ( pQuestData->expFactor != 0 ) ? "      static constexpr auto RewardExpFactor = " +
+  rewards += "  // Quest rewards \n";
+  rewards += ( pQuestData->expFactor != 0 ) ? "  static constexpr auto RewardExpFactor = " +
                                               std::to_string( pQuestData->expFactor ) + ";\n" : "";
-  rewards += ( pQuestData->gilReward != 0 ) ? "      static constexpr auto RewardGil = " +
+  rewards += ( pQuestData->gilReward != 0 ) ? "  static constexpr auto RewardGil = " +
                                               std::to_string( pQuestData->gilReward ) + ";\n" : "";
-  rewards += ( pQuestData->emoteReward != 0 ) ? "      static constexpr auto RewardEmote = " +
+  rewards += ( pQuestData->emoteReward != 0 ) ? "  static constexpr auto RewardEmote = " +
                                                 std::to_string( pQuestData->emoteReward ) + ";\n" : "";
-  rewards += ( pQuestData->actionReward != 0 ) ? "      static constexpr auto RewardAction = " +
+  rewards += ( pQuestData->actionReward != 0 ) ? "  static constexpr auto RewardAction = " +
                                                  std::to_string( pQuestData->actionReward ) + ";\n" : "";
-  rewards += ( pQuestData->generalActionReward[ 0 ] != 0 ) ? "      static constexpr auto RewardGeneralAction1 = " +
+  rewards += ( pQuestData->generalActionReward[ 0 ] != 0 ) ? "  static constexpr auto RewardGeneralAction1 = " +
                                                              std::to_string( pQuestData->generalActionReward[ 0 ] ) +
                                                              ";\n" : "";
-  rewards += ( pQuestData->generalActionReward[ 1 ] != 0 ) ? "      static constexpr auto RewardGeneralAction2 = " +
+  rewards += ( pQuestData->generalActionReward[ 1 ] != 0 ) ? "  static constexpr auto RewardGeneralAction2 = " +
                                                              std::to_string( pQuestData->generalActionReward[ 1 ] ) +
                                                              ";\n" : "";
-  rewards += ( pQuestData->gCSeals != 0 ) ? "      static constexpr auto RewardGCSeals = " +
+  rewards += ( pQuestData->gCSeals != 0 ) ? "  static constexpr auto RewardGCSeals = " +
                                             std::to_string( pQuestData->gCSeals ) + ";\n" : "";
-  rewards += ( pQuestData->otherReward != 0 ) ? "       static constexpr auto RewardOther = " +
+  rewards += ( pQuestData->otherReward != 0 ) ? "  static constexpr auto RewardOther = " +
                                                 std::to_string( pQuestData->otherReward ) + ";\n" : "";
-  rewards += ( pQuestData->reputationReward != 0 ) ? "      static constexpr auto RewardReputation = " +
+  rewards += ( pQuestData->reputationReward != 0 ) ? "  static constexpr auto RewardReputation = " +
                                                      std::to_string( pQuestData->reputationReward ) + ";\n" : "";
-  rewards += ( pQuestData->tomestoneReward != 0 ) ? "      static constexpr auto RewardTomeType = " +
+  rewards += ( pQuestData->tomestoneReward != 0 ) ? "  static constexpr auto RewardTomeType = " +
                                                     std::to_string( pQuestData->tomestoneReward ) + ";\n" : "";
-  rewards += ( pQuestData->tomestoneCountReward != 0 ) ? "      static constexpr auto RewardTomeCount = " +
+  rewards += ( pQuestData->tomestoneCountReward != 0 ) ? "  static constexpr auto RewardTomeCount = " +
                                                          std::to_string( pQuestData->tomestoneCountReward ) + ";\n"
                                                        : "";
-  rewards += ( pQuestData->instanceContentUnlock != 0 ) ? "      static constexpr auto InstancedContentUnlock = " +
+  rewards += ( pQuestData->instanceContentUnlock != 0 ) ? "  static constexpr auto InstancedContentUnlock = " +
                                                           std::to_string( pQuestData->instanceContentUnlock ) + ";\n"
                                                         : "";
 
-  if( !pQuestData->itemReward0.empty() )
+  if( !pQuestData->itemReward0.at(0) == 0 )
   {
-    rewards += "      static constexpr auto RewardItem[] = { ";
+    std::size_t cc = 0;
     for( size_t ca = 0; ca < pQuestData->itemReward0.size(); ca++ )
     {
-      rewards += std::to_string( pQuestData->itemReward0.at( ca ) );
-      if( ca != pQuestData->itemReward0.size() - 1 )
+      if ( pQuestData->itemReward0.at( ca ) != 0 )
       {
-        rewards += ", ";
+        reward += std::to_string( pQuestData->itemReward0.at( ca ) );
+        if ( pQuestData->itemReward0.at( ca + 1 ) != 0 )
+        {
+          reward += ", ";
+        }
+        cc++;
       }
     }
-    rewards += " };\n";
+    rewards += "  static constexpr auto RewardItem["+ std::to_string(cc) + "] = { "+ reward +" };\n";
+    reward.clear();
   }
 
-  if( !pQuestData->itemReward0.empty() )
+  if( !pQuestData->itemReward0.at(0) == 0 )
   {
-    rewards += "      static constexpr auto RewardItemCount[] = { ";
+    std::size_t cc = 0;
     for( size_t ca = 0; ca < pQuestData->itemCountReward0.size(); ca++ )
     {
-      rewards += std::to_string( pQuestData->itemCountReward0.at( ca ) );
-      if( ca != pQuestData->itemCountReward0.size() - 1 )
+      if ( pQuestData->itemCountReward0.at( ca ) != 0 )
       {
-        rewards += ", ";
+        reward += std::to_string( pQuestData->itemCountReward0.at( ca ) );
+
+        if ( pQuestData->itemCountReward0.at( ca + 1 ) != 0 )
+        {
+          reward += ", ";
+        }
+        cc++;
       }
     }
-    rewards += " };\n";
+    rewards += "  static constexpr auto RewardItemCount["+ std::to_string(cc) +"] = { "+ reward +" };\n";
+    reward.clear();
   }
 
-  if( !pQuestData->itemReward1.empty() )
+  if (!pQuestData->itemReward1.at(0) == 0 )
   {
-    rewards += "      static constexpr auto RewardItemOptional[] = { ";
-    for( size_t ca = 0; ca < pQuestData->itemReward1.size(); ca++ )
+    std::size_t cc = 0;
+    for (size_t ca = 0; ca < pQuestData->itemReward1.size(); ca++)
     {
-      rewards += std::to_string( pQuestData->itemReward1.at( ca ) );
-      if( ca != pQuestData->itemReward1.size() - 1 )
+      if (pQuestData->itemReward1.at(ca) != 0)
       {
-        rewards += ", ";
+        reward += std::to_string(pQuestData->itemReward1.at(ca));
+        if (pQuestData->itemReward1.at(ca+1) != 0)
+        {
+          reward += ", ";
+        }
+        else break;
+        cc++;
       }
     }
-    rewards += " };\n";
+    rewards += "  static constexpr auto RewardItemOptional[" + std::to_string(cc) + "] = { " + reward + " };\n";
+    reward.clear();
   }
 
-  if( !pQuestData->itemCountReward1.empty() )
+  if( !pQuestData->itemReward1.at(0) == 0 )
   {
-    rewards += "      static constexpr auto RewardItemOptionalCount[] = { ";
+    std::size_t cc = 0;
     for( size_t ca = 0; ca < pQuestData->itemCountReward1.size(); ca++ )
     {
-      rewards += std::to_string( pQuestData->itemCountReward1.at( ca ) );
-      if( ca != pQuestData->itemCountReward1.size() - 1 )
+      if (pQuestData->itemCountReward1.at( ca ) != 0)
       {
-        rewards += ", ";
+        reward += std::to_string( pQuestData->itemCountReward1.at( ca ) );
+        if (pQuestData->itemCountReward1.at(ca+1) != 0)
+        {
+          reward += ", ";
+        }
+        else break;
+        cc++;
       }
     }
-    rewards += " };\n";
+    rewards += "  static constexpr auto RewardItemOptionalCount["+ std::to_string(cc) + "] = { "+ reward + " };\n";
+    reward.clear();
   }
 
   bool hasERange = false;
@@ -229,7 +266,7 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
   bool hasEnemies = false;
   std::vector< uint32_t > enemy_ids;
   std::vector< std::string > script_entities;
-  std::string sentities = "      // Entities found in the script data of the quest\n";
+  std::string sentities = "  // Entities found in the script data of the quest\n";
 
   for( size_t ca = 0; ca < pQuestData->scriptInstruction.size(); ca++ )
   {
@@ -260,7 +297,7 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
       return c == '_';
     }), name.end());
 
-    sentities += "      static constexpr auto " + name + ";\n";
+    sentities += "  static constexpr auto " + name + ";\n";
   }
 
   std::string additional = "// Quest Script: " + pQuestData->id + "\n";
@@ -285,34 +322,36 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
     scriptEntry += onEmoteStr;
   }
 
-  for( auto enemy : enemy_ids )
+  if(hasEnemies)
   {
-    scriptEntry += std::string(
-      "   void onMobKill_" + std::to_string( enemy ) + "( Entity::Player& player )\n"
-                                                       "   {\n"
-                                                       "   }\n\n"
-    );
+    scriptEntry += onEnemystr;
   }
 
   std::string constructor;
   constructor += std::string(
-    "   private:\n"
-    "      // Basic quest information \n" );
+    "private:\n"
+    "  // Basic quest information \n" );
   constructor += questVarStr + "\n";
   constructor += seqStr + "\n";
   constructor += rewards + "\n";
   constructor += sentities + "\n";
-  constructor += "   public:\n";
-  constructor += "      " + className + "() : EventScript" + "( " + std::to_string( questId ) + " ){}; \n";
-  constructor += "      ~" + className + "(){}; \n";
+  constructor += "public:\n";
+  constructor += "  " + className + "() :\n";
+  constructor += "    Sapphire::ScriptAPI::EventScript ( " + std::to_string( questId ) + " )\n";
+  constructor += "  {\n";
+  constructor += "  };\n\n";
+  constructor += "  ~" + className + "()\n";
+  constructor += "  {\n";
+  constructor += "  };\n";
 
   std::string classString(
-    "class " + className + " : public EventScript\n"
-                           "{\n" +
+    "class " + className + " : \n"
+    "  public Sapphire::ScriptAPI::EventScript\n"
+    "{\n" +
     constructor +
     "\n" +
     scriptEntry +
-    "   private:\n" +
+    "private:\n" +
     sceneStr +
     "};\n\n"
   );
@@ -332,7 +371,7 @@ int main( int argc, char** argv )
   bool unluac = false;
   // std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
   //std::string datLocation( "C:/Program Files (x86)/SquareEnix/FINAL FANTASY XIV - A Realm Reborn/game/sqpack" );
-  std::string datLocation( "C:/SquareEnix/FINAL FANTASY XIV - A Realm Reborn/game/sqpack" );
+  std::string datLocation( "F:/Program Files (x86)/SquareEnix/FINAL FANTASY XIV - A Realm Reborn/game/sqpack" );
   if( argc > 1 )
     datLocation = std::string( argv[ 1 ] );
   if( argc > 2 )
@@ -362,7 +401,7 @@ int main( int argc, char** argv )
   uint32_t i = 0;
   for( const auto& row : rows )
   {
-    Logger::info( "Generating {0}", row );
+    Logger::info( "Generating " + std::to_string( row ) );
     auto questInfo = g_exdDataGen.get< Sapphire::Data::Quest >( row );
 
     if( questInfo->name.empty() || questInfo->id.empty() )
@@ -407,7 +446,7 @@ int main( int argc, char** argv )
         "generated/" + questInfo->id + ".lua";
       if( system( command.c_str() ) == -1 )
       {
-        Logger::error( "Error executing java command:\n {0}\nerrno: {1}", command, std::strerror( errno ) );
+        Logger::error( "Error executing java command:\n" + command + "\nerrno: " + std::strerror( errno ) );
         return errno;
       }
     }
