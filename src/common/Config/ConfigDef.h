@@ -1,9 +1,9 @@
 #ifndef SAPPHIRE_CONFIGDEF_H
 #define SAPPHIRE_CONFIGDEF_H
 
-namespace Sapphire::Common
+namespace Sapphire::Common::Config
 {
-  struct Configuration
+  struct GlobalConfig
   {
     struct Database
     {
@@ -14,16 +14,16 @@ namespace Sapphire::Common
       std::string password;
       uint8_t syncThreads;
       uint8_t asyncThreads;
-
     } database;
 
-    struct GlobalParameters
+    struct Parameters
     {
       std::string serverSecret;
       std::string dataPath;
-    } globalParameters;
+      uint16_t worldID;
+    } parameters;
 
-    struct GlobalNetwork
+    struct Network
     {
       std::string zoneHost;
       uint16_t zonePort;
@@ -33,31 +33,26 @@ namespace Sapphire::Common
 
       std::string restHost;
       uint16_t restPort;
-    } globalNetwork;
+    } network;
+  };
 
-    struct Lobby
-    {
-      uint16_t worldID;
-      bool allowNoSessionConnect;
-      std::string worldName;
-    } lobby;
 
-    struct LobbyNetwork
+  struct WorldConfig
+  {
+    GlobalConfig global;
+
+    struct Network
     {
       std::string listenIp;
       uint16_t listenPort;
-    } lobbyNetwork;
 
-    struct CharacterCreation
-    {
-      uint8_t defaultGMRank;
-    } characterCreation;
+      uint16_t disconnectTimeout;
+    } network;
 
-    struct RestNetwork
+    struct Housing
     {
-      std::string listenIP;
-      uint16_t listenPort;
-    } restNetwork;
+      std::string defaultEstateName;
+    } housing;
 
     struct Scripts
     {
@@ -66,30 +61,34 @@ namespace Sapphire::Common
       bool hotSwap;
     } scripts;
 
+    std::string motd;
+  };
+
+  struct LobbyConfig
+  {
+    GlobalConfig global;
+
     struct Network
-    {
-      Network() :
-        disconnectTimeout( 20 )
-      {}
-
-      uint16_t disconnectTimeout;
-    } network;
-
-    struct ZoneNetwork
     {
       std::string listenIp;
       uint16_t listenPort;
-    } zoneNetwork;
+    } network;
 
-    struct General
-    {
-      std::string motd;
-    } general;
+    bool allowNoSessionConnect;
+    std::string worldName;
 
-    struct Housing
+    uint8_t defaultGMRank;
+  };
+
+  struct ApiConfig
+  {
+    GlobalConfig global;
+
+    struct Network
     {
-      std::string defaultEstateName;
-    } housing;
+      std::string listenIP;
+      uint16_t listenPort;
+    } network;
   };
 }
 

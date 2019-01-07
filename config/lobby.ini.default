@@ -1,0 +1,8 @@
+[Lobby]
+AllowNoSessionConnect = false
+WorldName = Sapphire
+DefaultGMRank = 255
+
+[Network]
+ListenIp = 0.0.0.0
+ListenPort = 54994
