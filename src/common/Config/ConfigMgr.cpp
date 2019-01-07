@@ -53,10 +53,10 @@ bool Sapphire::ConfigMgr::loadGlobalConfig( Common::Config::GlobalConfig& config
   config.database.asyncThreads = getValue< uint8_t >( "Database", "AsyncThreads", 2 );
 
   // params
-  config.general.dataPath = getValue< std::string >( "Parameters", "DataPath", "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
-  config.general.serverSecret = getValue< std::string >( "Parameters", "ServerSecret", "default" );
-  config.general.worldID = getValue< uint16_t >( "Parameters", "WorldID", 67 );
-  config.general.defaultGMRank = getValue< uint8_t >( "Parameters", "DefaultGMRank", 255 );
+  config.general.dataPath = getValue< std::string >( "General", "DataPath", "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
+  config.general.serverSecret = getValue< std::string >( "General", "ServerSecret", "default" );
+  config.general.worldID = getValue< uint16_t >( "General", "WorldID", 67 );
+  config.general.defaultGMRank = getValue< uint8_t >( "General", "DefaultGMRank", 255 );
 
   // network
   config.network.zoneHost = getValue< std::string >( "Network", "ZoneHost", "127.0.0.1" );
