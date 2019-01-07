@@ -11,7 +11,9 @@ Sapphire::Entity::SpawnPoint::SpawnPoint( float x, float y, float z, float rot, 
   m_posY( y ),
   m_posZ( z ),
   m_rotation( rot ),
-  m_gimmickId( gimmickId )
+  m_gimmickId( gimmickId ),
+  m_lastSpawn( 0 ),
+  m_timeOfDeath( 0 )
 {
 }
 

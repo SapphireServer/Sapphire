@@ -16,6 +16,7 @@ namespace Sapphire::Entity
     uint32_t m_gimmickId;
 
     uint32_t m_lastSpawn;
+    uint32_t m_timeOfDeath;
     BNpcPtr m_pLinkedBnpc;
 
   public:
