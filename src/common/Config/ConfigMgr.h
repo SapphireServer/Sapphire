@@ -19,6 +19,7 @@ namespace Sapphire
       using ConfigurationPtr = std::shared_ptr< Common::Configuration >;
 
       bool loadConfig( const std::string& configName );
+      bool loadGlobalConfig( Common::Config::GlobalConfig& config, const string& configName = "config.ini" );
 
       template<class T> struct always_false : std::false_type {};
 

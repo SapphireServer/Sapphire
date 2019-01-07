@@ -31,6 +31,45 @@ bool Sapphire::ConfigMgr::loadConfig( const std::string& configName )
   return true;
 }
 
+bool Sapphire::ConfigMgr::loadGlobalConfig( Common::Config::GlobalConfig& config, const string& configName )
+{
+  auto configFile = fs::path( fs::path( m_configFolderRoot ) / configName );
+
+  if( !fs::exists( configFile ) )
+  {
+    copyDefaultConfig( configName );
+    return false;
+  }
+
+  m_pInih = std::make_unique< INIReader >( configFile.string() );
+  if( m_pInih->ParseError() < 0 )
+    return false;
+
+  // database
+  config.database.host = getValue< std::string >( "Database", "Host", "127.0.0.1" );
+  config.database.port = getValue< uint16_t >( "Database", "Port", 3306 );
+  config.database.database = getValue< std::string >( "Database", "Database", "sapphire" );
+  config.database.username = getValue< std::string >( "Database", "Username", "sapphire" );
+  config.database.password = getValue< std::string >( "Database", "Password", "" );
+  config.database.syncThreads = getValue< uint8_t >( "Database", "SyncThreads", 2 );
+  config.database.asyncThreads = getValue< uint8_t >( "Database", "AsyncThreads", 2 );
+
+  // params
+  config.parameters.dataPath = getValue< std::string >( "Parameters", "DataPath", "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
+  config.parameters.serverSecret = getValue< std::string >( "Parameters", "ServerSecret", "default" );
+  config.parameters.worldID = getValue< uint16_t >( "Parameters", "WorldID", 67 );
+
+  // network
+  config.network.zoneHost = getValue< std::string >( "Network", "ZoneHost", "127.0.0.1" );
+  config.network.zonePort = getValue< uint16_t >( "Network", "ZonePort", 54992 );
+  config.network.lobbyHost = getValue< std::string >( "Network", "LobbyHost", "127.0.0.1" );
+  config.network.lobbyPort = getValue< uint16_t >( "Network", "LobbyPort", 54994 );
+  config.network.restHost = getValue< std::string >( "Network", "RestHost", "127.0.0.1" );
+  config.network.restPort = getValue< uint16_t >( "Network", "RestPort", 80 );
+
+  return true;
+}
+
 bool Sapphire::ConfigMgr::copyDefaultConfig( const std::string& configName )
 {
   fs::path configPath( m_configFolderRoot );
@@ -50,27 +89,6 @@ bool Sapphire::ConfigMgr::copyDefaultConfig( const std::string& configName )
 void Sapphire::ConfigMgr::initConfigData()
 {
   m_pConfig = std::make_shared< Common::Configuration >();
-
-  // database
-  m_pConfig->database.host = getValue< std::string >( "Database", "Host", "127.0.0.1" );
-  m_pConfig->database.port = getValue< uint16_t >( "Database", "Port", 3306 );
-  m_pConfig->database.database = getValue< std::string >( "Database", "Database", "sapphire" );
-  m_pConfig->database.username = getValue< std::string >( "Database", "Username", "sapphire" );
-  m_pConfig->database.password = getValue< std::string >( "Database", "Password", "" );
-  m_pConfig->database.syncThreads = getValue< uint8_t >( "Database", "SyncThreads", 2 );
-  m_pConfig->database.asyncThreads = getValue< uint8_t >( "Database", "AsyncThreads", 2 );
-
-  // global parameters
-  m_pConfig->globalParameters.dataPath = getValue< std::string >( "GlobalParameters", "DataPath", "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
-  m_pConfig->globalParameters.serverSecret = getValue< std::string >( "GlobalParameters", "ServerSecret", "default" );
-
-  // global network
-  m_pConfig->globalNetwork.zoneHost = getValue< std::string >( "GlobalNetwork", "ZoneHost", "127.0.0.1" );
-  m_pConfig->globalNetwork.zonePort = getValue< uint16_t >( "GlobalNetwork", "ZonePort", 54992 );
-  m_pConfig->globalNetwork.lobbyHost = getValue< std::string >( "GlobalNetwork", "LobbyHost", "127.0.0.1" );
-  m_pConfig->globalNetwork.lobbyPort = getValue< uint16_t >( "GlobalNetwork", "LobbyPort", 54994 );
-  m_pConfig->globalNetwork.restHost = getValue< std::string >( "GlobalNetwork", "RestHost", "127.0.0.1" );
-  m_pConfig->globalNetwork.restPort = getValue< uint16_t >( "GlobalNetwork", "RestPort", 80 );
 
   // lobby
   m_pConfig->lobby.worldID = getValue< uint16_t >( "Lobby", "WorldID", 67 );
