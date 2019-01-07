@@ -7,7 +7,7 @@ Password =
 SyncThreads = 2
 AsyncThreads = 2
 
-[Parameters]
+[General]
 ServerSecret = default
 DataPath = C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack
 WorldID = 67

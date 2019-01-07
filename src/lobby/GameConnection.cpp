@@ -128,7 +128,7 @@ void Sapphire::Network::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet
   serverListPacket->data().seq = 1;
   serverListPacket->data().offset = 0;
   serverListPacket->data().numServers = 1;
-  serverListPacket->data().server[ 0 ].id = g_serverLobby.getConfig().global.parameters.worldID;
+  serverListPacket->data().server[ 0 ].id = g_serverLobby.getConfig().global.general.worldID;
   serverListPacket->data().server[ 0 ].index = 0;
   serverListPacket->data().final = 1;
   strcpy( serverListPacket->data().server[ 0 ].name, g_serverLobby.getConfig().worldName.c_str() );
@@ -161,8 +161,8 @@ void Sapphire::Network::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet
         auto& charEntry = charList[ charIndex ];
         details.uniqueId = std::get< 1 >( charEntry );
         details.contentId = std::get< 2 >( charEntry );
-        details.serverId = g_serverLobby.getConfig().global.parameters.worldID;
-        details.serverId1 = g_serverLobby.getConfig().global.parameters.worldID;
+        details.serverId = g_serverLobby.getConfig().global.general.worldID;
+        details.serverId1 = g_serverLobby.getConfig().global.general.worldID;
         details.index = charIndex;
         strcpy( details.charDetailJson, std::get< 3 >( charEntry ).c_str() );
         strcpy( details.nameChara, std::get< 0 >( charEntry ).c_str() );

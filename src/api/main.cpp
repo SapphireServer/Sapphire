@@ -118,7 +118,7 @@ bool loadSettings( int32_t argc, char* argv[] )
   }
 
   Logger::info( "Setting up generated EXD data" );
-  auto dataPath = m_config.global.parameters.dataPath;
+  auto dataPath = m_config.global.general.dataPath;
   if( !g_exdDataGen.init( dataPath ) )
   {
     Logger::fatal( "Error setting up generated EXD data. Make sure that DataPath is set correctly in global.ini" );
@@ -300,7 +300,7 @@ void deleteCharacter( shared_ptr< HttpServer::Response > response, shared_ptr< H
 
     int32_t accountId = g_sapphireAPI.checkSession( sId );
 
-    if( m_config.global.parameters.serverSecret != secret )
+    if( m_config.global.general.serverSecret != secret )
     {
       std::string json_string = "{\"result\":\"invalid_secret\"}";
       *response << buildHttpResponse( 403, json_string, JSON );
@@ -340,7 +340,7 @@ void createCharacter( shared_ptr< HttpServer::Response > response, shared_ptr< H
 
     if( result != -1 )
     {
-      if( m_config.global.parameters.serverSecret != secret )
+      if( m_config.global.general.serverSecret != secret )
       {
         std::string json_string = "{\"result\":\"invalid_secret\"}";
         *response << buildHttpResponse( 403, json_string, JSON );
@@ -348,7 +348,7 @@ void createCharacter( shared_ptr< HttpServer::Response > response, shared_ptr< H
       else
       {
         int32_t charId = g_sapphireAPI.createCharacter( result, name, finalJson,
-                                                        m_config.global.parameters.defaultGMRank );
+                                                        m_config.global.general.defaultGMRank );
 
         std::string json_string = "{\"result\":\"" + std::to_string( charId ) + "\"}";
         *response << buildHttpResponse( 200, json_string, JSON );
@@ -381,7 +381,7 @@ void insertSession( shared_ptr< HttpServer::Response > response, shared_ptr< Htt
     std::string secret = json["secret"];
 
     // reloadConfig();
-    if( m_config.global.parameters.serverSecret != secret )
+    if( m_config.global.general.serverSecret != secret )
     {
       std::string json_string = "{\"result\":\"invalid_secret\"}";
       *response << buildHttpResponse( 403, json_string, JSON );
@@ -413,7 +413,7 @@ void checkNameTaken( shared_ptr< HttpServer::Response > response, shared_ptr< Ht
 
     // reloadConfig();
 
-    if( m_config.global.parameters.serverSecret != secret )
+    if( m_config.global.general.serverSecret != secret )
     {
       std::string json_string = "{\"result\":\"invalid_secret\"}";
       *response << buildHttpResponse( 403, json_string, JSON );
@@ -450,7 +450,7 @@ void checkSession( shared_ptr< HttpServer::Response > response, shared_ptr< Http
 
     if( result != -1 )
     {
-      if( m_config.global.parameters.serverSecret != secret )
+      if( m_config.global.general.serverSecret != secret )
       {
         std::string json_string = "{\"result\":\"invalid_secret\"}";
         *response << buildHttpResponse( 403, json_string, JSON );
@@ -489,7 +489,7 @@ void getNextCharId( shared_ptr< HttpServer::Response > response, shared_ptr< Htt
 
     // reloadConfig();
 
-    if( m_config.global.parameters.serverSecret != secret )
+    if( m_config.global.general.serverSecret != secret )
     {
       std::string json_string = "{\"result\":\"invalid_secret\"}";
       *response << buildHttpResponse( 403, json_string, JSON );
@@ -520,7 +520,7 @@ void getNextContentId( shared_ptr< HttpServer::Response > response, shared_ptr< 
 
     // reloadConfig();
 
-    if( m_config.global.parameters.serverSecret != secret )
+    if( m_config.global.general.serverSecret != secret )
     {
       std::string json_string = "{\"result\":\"invalid_secret\"}";
       *response << buildHttpResponse( 403, json_string, JSON );
@@ -555,7 +555,7 @@ void getCharacterList( shared_ptr< HttpServer::Response > response, shared_ptr< 
 
     if( result != -1 )
     {
-      if( m_config.global.parameters.serverSecret != secret )
+      if( m_config.global.general.serverSecret != secret )
       {
         std::string json_string = "{\"result\":\"invalid_secret\"}";
         *response << buildHttpResponse( 403, json_string, JSON );
