@@ -130,7 +130,7 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
   auto dataPath = m_config.global.parameters.dataPath;
   if( !pExdData->init( dataPath ) )
   {
-    Logger::fatal( "Error setting up generated EXD data. Make sure that DataPath is set correctly in config.ini" );
+    Logger::fatal( "Error setting up generated EXD data. Make sure that DataPath is set correctly in global.ini" );
     Logger::fatal( "DataPath: {0}", dataPath );
     return;
   }

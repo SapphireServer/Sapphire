@@ -49,25 +49,26 @@ void default_resource_send( const HttpServer& server, const shared_ptr< HttpServ
                             const shared_ptr< ifstream >& ifs );
 
 
-auto m_pConfig = std::make_shared< Sapphire::ConfigMgr >();
 HttpServer server;
 std::string configPath( "api.ini" );
 Sapphire::Common::Config::ApiConfig   m_config;
 
 void reloadConfig()
 {
-  m_pConfig = std::make_shared< Sapphire::ConfigMgr >();
+  auto pConfig = std::make_shared< Sapphire::ConfigMgr >();
+
+  Logger::info( "Loading config " + configPath );
 
   bool failedLoad = false;
 
   // load global cfg first
-  if( !m_pConfig->loadGlobalConfig( m_config.global ) )
+  if( !pConfig->loadGlobalConfig( m_config.global ) )
   {
     Logger::fatal( "Error loading config global.ini" );
     failedLoad = true;
   }
 
-  if( !m_pConfig->loadConfig( configPath ) )
+  if( !pConfig->loadConfig( configPath ) )
   {
     Logger::fatal( "Error loading config {0}", configPath );
     failedLoad = true;
@@ -75,12 +76,13 @@ void reloadConfig()
 
   if( failedLoad )
   {
+    Logger::fatal( "If this is the first time starting the server, we've copied the default one for your editing pleasure." );
     throw "Error loading config";
   }
 
   // setup api config
-  m_config.network.listenPort = m_pConfig->getValue< uint16_t >( "Network", "ListenPort", 80 );
-  m_config.network.listenIP = m_pConfig->getValue< std::string >( "Network", "ListenIp", "0.0.0.0" );
+  m_config.network.listenPort = pConfig->getValue< uint16_t >( "Network", "ListenPort", 80 );
+  m_config.network.listenIP = pConfig->getValue< std::string >( "Network", "ListenIp", "0.0.0.0" );
 }
 
 void print_request_info( shared_ptr< HttpServer::Request > request )
@@ -90,14 +92,7 @@ void print_request_info( shared_ptr< HttpServer::Request > request )
 
 bool loadSettings( int32_t argc, char* argv[] )
 {
-  Logger::info( "Loading config " + configPath );
-
-  if( !m_pConfig->loadConfig( configPath ) )
-  {
-    Logger::fatal( "Error loading config {0}", configPath );
-    Logger::fatal( "If this is the first time starting the server, we've copied the default one for your editing pleasure." );
-    return false;
-  }
+  reloadConfig();
 
   std::vector< std::string > args( argv + 1, argv + argc );
   for( size_t i = 0; i + 1 < args.size(); i += 2 )
@@ -126,7 +121,7 @@ bool loadSettings( int32_t argc, char* argv[] )
   auto dataPath = m_config.global.parameters.dataPath;
   if( !g_exdDataGen.init( dataPath ) )
   {
-    Logger::fatal( "Error setting up generated EXD data. Make sure that DataPath is set correctly in config.ini" );
+    Logger::fatal( "Error setting up generated EXD data. Make sure that DataPath is set correctly in global.ini" );
     Logger::fatal( "DataPath: {0}", dataPath );
     return false;
   }

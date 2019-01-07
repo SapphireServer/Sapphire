@@ -17,7 +17,7 @@ namespace Sapphire
       ~ConfigMgr() = default;
 
       bool loadConfig( const std::string& configName );
-      bool loadGlobalConfig( Common::Config::GlobalConfig& config, const string& configName = "global.ini" );
+      bool loadGlobalConfig( Common::Config::GlobalConfig& config, const std::string& configName = "global.ini" );
 
       template<class T> struct always_false : std::false_type {};
 
