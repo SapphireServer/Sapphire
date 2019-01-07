@@ -31,7 +31,7 @@ bool Sapphire::ConfigMgr::loadConfig( const std::string& configName )
   return true;
 }
 
-bool Sapphire::ConfigMgr::loadGlobalConfig( Common::Config::GlobalConfig& config, const string& configName )
+bool Sapphire::ConfigMgr::loadGlobalConfig( Common::Config::GlobalConfig& config, const std::string& configName )
 {
   auto configFile = fs::path( fs::path( m_configFolderRoot ) / configName );
 
