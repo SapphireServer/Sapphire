@@ -67,15 +67,43 @@ bool Sapphire::World::ServerMgr::loadSettings( int32_t argc, char* argv[] )
 
   Logger::info( "Loading config {0}", m_configName );
 
+  bool failedLoad = false;
+
+  // load global cfg first
+  if( !pConfig->loadGlobalConfig( m_config.global ) )
+  {
+    Logger::fatal( "Error loading config global.ini, copying default..." );
+    failedLoad = true;
+  }
+
   if( !pConfig->loadConfig( m_configName ) )
   {
     Logger::fatal( "Error loading config {0}", m_configName );
-    Logger::fatal( "If this is the first time starting the server, we've copied the default one for your editing pleasure." );
+    failedLoad = true;
+  }
+
+  if( failedLoad )
+  {
+    Logger::fatal( "If this is the first time starting the server, "
+                   "we've copied the default configs for your editing pleasure." );
     return false;
   }
 
-  m_port = pConfig->getValue< uint16_t >( "ZoneNetwork", "ListenPort", 54992 );
-  m_ip = pConfig->getValue< std::string >( "ZoneNetwork", "ListenIp", "0.0.0.0" );
+  // load world specific config
+  m_config.scripts.hotSwap = pConfig->getValue( "Scripts", "HotSwap", true );
+  m_config.scripts.path = pConfig->getValue< std::string >( "Scripts", "Path", "./compiledscripts/" );
+  m_config.scripts.cachePath = pConfig->getValue< std::string >( "Scripts", "CachePath", "./cache/" );
+
+  m_config.network.disconnectTimeout = pConfig->getValue< uint16_t >( "Network", "DisconnectTimeout", 20 );
+  m_config.network.listenIp = pConfig->getValue< std::string >( "Network", "ListenIp", "0.0.0.0" );
+  m_config.network.listenPort = pConfig->getValue< uint16_t >( "Network", "ListenPort", 54992 );
+
+  m_config.motd = pConfig->getValue< std::string >( "General", "MotD", "" );
+
+  m_config.housing.defaultEstateName = pConfig->getValue< std::string >( "Housing", "DefaultEstateName", "Estate #{}" );
+
+  m_port = m_config.network.listenPort;
+  m_ip = m_config.network.listenIp;
 
   return true;
 }
@@ -99,27 +127,18 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
 
   Logger::info( "Setting up generated EXD data" );
   auto pExdData = std::make_shared< Data::ExdDataGenerated >();
-  auto dataPath = pConfig->getValue< std::string >( "GlobalParameters", "DataPath", "" );
+  auto dataPath = m_config.global.general.dataPath;
   if( !pExdData->init( dataPath ) )
   {
-    Logger::fatal( "Error setting up generated EXD data. Make sure that DataPath is set correctly in config.ini" );
+    Logger::fatal( "Error setting up generated EXD data. Make sure that DataPath is set correctly in global.ini" );
     Logger::fatal( "DataPath: {0}", dataPath );
     return;
   }
   framework()->set< Data::ExdDataGenerated >( pExdData );
 
-  Sapphire::Db::ConnectionInfo info;
-  info.password = pConfig->getValue< std::string >( "Database", "Password", "" );
-  info.host = pConfig->getValue< std::string >( "Database", "Host", "127.0.0.1" );
-  info.database = pConfig->getValue< std::string >( "Database", "Database", "sapphire" );
-  info.port = pConfig->getValue< uint16_t >( "Database", "Port", 3306 );
-  info.user = pConfig->getValue< std::string >( "Database", "Username", "root" );
-  info.syncThreads = pConfig->getValue< uint8_t >( "Database", "SyncThreads", 2 );
-  info.asyncThreads = pConfig->getValue< uint8_t >( "Database", "AsyncThreads", 2 );
-
   auto pDb = std::make_shared< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   Sapphire::Db::DbLoader loader;
-  loader.addDb( *pDb, info );
+  loader.addDb( *pDb, m_config.global.database );
   if( !loader.initDbs() )
   {
     Logger::fatal( "Database not initialized properly!" );
@@ -460,4 +479,9 @@ Sapphire::Entity::BNpcTemplatePtr Sapphire::World::ServerMgr::getBNpcTemplate( u
   }
 
   return nullptr;
+}
+
+Sapphire::Common::Config::WorldConfig& Sapphire::World::ServerMgr::getConfig()
+{
+  return m_config;
 }
