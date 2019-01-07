@@ -86,22 +86,3 @@ bool Sapphire::ConfigMgr::copyDefaultConfig( const std::string& configName )
 
   return true;
 }
-
-void Sapphire::ConfigMgr::initConfigData()
-{
-  // lobby
-//  m_pConfig->lobby.worldID = getValue< uint16_t >( "Lobby", "WorldID", 67 );
-//  m_pConfig->lobby.allowNoSessionConnect = getValue< bool >( "Lobby", "AllowNoSessionConnect", false );
-//  m_pConfig->lobby.worldName = getValue< std::string >( "Lobby", "WorldName", "Sapphire" );
-//
-//  // lobby network
-//  m_pConfig->lobbyNetwork.listenIp = getValue< std::string >( "LobbyNetwork", "ListenIp", "0.0.0.0" );
-//  m_pConfig->lobbyNetwork.listenPort = getValue< uint16_t >( "LobbyNetwork", "ListenPort", 54994 );
-//
-//  // character creation
-//  m_pConfig->characterCreation.defaultGMRank = getValue< uint8_t >( "CharacterCreation", "DefaultGMRank", 255 );
-//
-//  // rest network
-//  m_pConfig->restNetwork.listenIP = getValue< std::string >( "RestNetwork", "ListenIp", "0.0.0.0" );
-//  m_pConfig->restNetwork.listenPort = getValue< uint16_t >( "RestNetwork", "ListenPort", 80 );
-}
