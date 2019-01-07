@@ -21,6 +21,8 @@ namespace Sapphire::Common::Config
       std::string serverSecret;
       std::string dataPath;
       uint16_t worldID;
+
+      uint8_t defaultGMRank;
     } parameters;
 
     struct Network
@@ -76,8 +78,6 @@ namespace Sapphire::Common::Config
 
     bool allowNoSessionConnect;
     std::string worldName;
-
-    uint8_t defaultGMRank;
   };
 
   struct ApiConfig

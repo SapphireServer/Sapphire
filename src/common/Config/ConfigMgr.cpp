@@ -58,6 +58,7 @@ bool Sapphire::ConfigMgr::loadGlobalConfig( Common::Config::GlobalConfig& config
   config.parameters.dataPath = getValue< std::string >( "Parameters", "DataPath", "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
   config.parameters.serverSecret = getValue< std::string >( "Parameters", "ServerSecret", "default" );
   config.parameters.worldID = getValue< uint16_t >( "Parameters", "WorldID", 67 );
+  config.parameters.defaultGMRank = getValue< uint8_t >( "Parameters", "DefaultGMRank", 255 );
 
   // network
   config.network.zoneHost = getValue< std::string >( "Network", "ZoneHost", "127.0.0.1" );
@@ -88,44 +89,19 @@ bool Sapphire::ConfigMgr::copyDefaultConfig( const std::string& configName )
 
 void Sapphire::ConfigMgr::initConfigData()
 {
-  m_pConfig = std::make_shared< Common::Configuration >();
-
   // lobby
-  m_pConfig->lobby.worldID = getValue< uint16_t >( "Lobby", "WorldID", 67 );
-  m_pConfig->lobby.allowNoSessionConnect = getValue< bool >( "Lobby", "AllowNoSessionConnect", false );
-  m_pConfig->lobby.worldName = getValue< std::string >( "Lobby", "WorldName", "Sapphire" );
-
-  // lobby network
-  m_pConfig->lobbyNetwork.listenIp = getValue< std::string >( "LobbyNetwork", "ListenIp", "0.0.0.0" );
-  m_pConfig->lobbyNetwork.listenPort = getValue< uint16_t >( "LobbyNetwork", "ListenPort", 54994 );
-
-  // character creation
-  m_pConfig->characterCreation.defaultGMRank = getValue< uint8_t >( "CharacterCreation", "DefaultGMRank", 255 );
-
-  // rest network
-  m_pConfig->restNetwork.listenIP = getValue< std::string >( "RestNetwork", "ListenIp", "0.0.0.0" );
-  m_pConfig->restNetwork.listenPort = getValue< uint16_t >( "RestNetwork", "ListenPort", 80 );
-
-  // scripts
-  m_pConfig->scripts.hotSwap = getValue( "Scripts", "HotSwap", true );
-  m_pConfig->scripts.path = getValue< std::string >( "Scripts", "Path", "./compiledscripts/" );
-  m_pConfig->scripts.cachePath = getValue< std::string >( "Scripts", "CachePath", "./cache/" );
-
-  // network
-  m_pConfig->network.disconnectTimeout = getValue< uint16_t >( "Network", "DisconnectTimeout", 20 );
-
-  // zone network
-  m_pConfig->zoneNetwork.listenIp = getValue< std::string >( "ZoneNetwork", "ListenIp", "0.0.0.0" );
-  m_pConfig->zoneNetwork.listenPort = getValue< uint16_t >( "ZoneNetwork", "ListenPort", 54992 );
-
-  // general
-  m_pConfig->general.motd = getValue< std::string >( "General", "MotD", "" );
-
-  // housing
-  m_pConfig->housing.defaultEstateName = getValue< std::string >( "Housing", "DefaultEstateName", "Estate #{}" );
-}
-
-Sapphire::ConfigMgr::ConfigurationPtr Sapphire::ConfigMgr::getConfig()
-{
-  return m_pConfig;
+//  m_pConfig->lobby.worldID = getValue< uint16_t >( "Lobby", "WorldID", 67 );
+//  m_pConfig->lobby.allowNoSessionConnect = getValue< bool >( "Lobby", "AllowNoSessionConnect", false );
+//  m_pConfig->lobby.worldName = getValue< std::string >( "Lobby", "WorldName", "Sapphire" );
+//
+//  // lobby network
+//  m_pConfig->lobbyNetwork.listenIp = getValue< std::string >( "LobbyNetwork", "ListenIp", "0.0.0.0" );
+//  m_pConfig->lobbyNetwork.listenPort = getValue< uint16_t >( "LobbyNetwork", "ListenPort", 54994 );
+//
+//  // character creation
+//  m_pConfig->characterCreation.defaultGMRank = getValue< uint8_t >( "CharacterCreation", "DefaultGMRank", 255 );
+//
+//  // rest network
+//  m_pConfig->restNetwork.listenIP = getValue< std::string >( "RestNetwork", "ListenIp", "0.0.0.0" );
+//  m_pConfig->restNetwork.listenPort = getValue< uint16_t >( "RestNetwork", "ListenPort", 80 );
 }

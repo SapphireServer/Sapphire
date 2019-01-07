@@ -16,10 +16,8 @@ namespace Sapphire
       ConfigMgr() = default;
       ~ConfigMgr() = default;
 
-      using ConfigurationPtr = std::shared_ptr< Common::Configuration >;
-
       bool loadConfig( const std::string& configName );
-      bool loadGlobalConfig( Common::Config::GlobalConfig& config, const string& configName = "config.ini" );
+      bool loadGlobalConfig( Common::Config::GlobalConfig& config, const string& configName = "global.ini" );
 
       template<class T> struct always_false : std::false_type {};
 
@@ -59,15 +57,11 @@ namespace Sapphire
         //m_propTree.put( name, defaultValue );
       }
 
-      ConfigurationPtr getConfig();
-
     private:
       bool copyDefaultConfig( const std::string& configName );
       void initConfigData();
 
       std::unique_ptr< INIReader > m_pInih;
-
-      ConfigurationPtr m_pConfig;
 
       const std::string m_globalConfigFile = "global.ini";
       const std::string m_configFolderRoot = "./config/";

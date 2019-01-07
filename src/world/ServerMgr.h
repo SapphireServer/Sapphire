@@ -7,6 +7,7 @@
 #include <map>
 #include "ForwardsZone.h"
 #include "Manager/BaseManager.h"
+#include <Config/ConfigDef.h>
 
 namespace Sapphire::World
 {
@@ -17,6 +18,8 @@ namespace Sapphire::World
     ServerMgr( const std::string& configName, FrameworkPtr pFw );
 
     ~ServerMgr() override;
+
+    using WorldConfigPtr = std::shared_ptr< Sapphire::Common::Config::WorldConfig >;
 
     void run( int32_t argc, char* argv[] );
 
@@ -48,6 +51,8 @@ namespace Sapphire::World
     std::string getPlayerNameFromDb( uint32_t playerId, bool forceDbLoad = false );
     void updatePlayerName( uint32_t playerId, const std::string& playerNewName );
 
+    Sapphire::Common::Config::WorldConfig& getConfig();
+
   private:
     uint16_t m_port;
     std::string m_ip;
@@ -58,6 +63,8 @@ namespace Sapphire::World
     std::string m_configName;
 
     std::mutex m_sessionMutex;
+
+    Sapphire::Common::Config::WorldConfig m_config;
 
     std::map< uint32_t, SessionPtr > m_sessionMapById;
     std::map< std::string, SessionPtr > m_sessionMapByName;
