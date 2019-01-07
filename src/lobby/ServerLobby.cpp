@@ -41,9 +41,9 @@ namespace Sapphire
     return g_restConnector.getSession( sessionId );
   }
 
-  ConfigMgrPtr ServerLobby::getConfig() const
+  Sapphire::Common::Config::LobbyConfig& ServerLobby::getConfig()
   {
-    return m_pConfig;
+    return m_config;
   }
 
   void ServerLobby::run( int32_t argc, char* argv[] )
@@ -83,12 +83,33 @@ namespace Sapphire
   {
     Logger::info( "Loading config {0}", m_configPath );
 
+    bool failedLoad = false;
+    if( !m_pConfig->loadGlobalConfig( m_config.global, "global.ini" ) )
+    {
+      Logger::fatal( "Error loading config global.ini, copying default..." );
+      failedLoad = true;
+    }
+
     if( !m_pConfig->loadConfig( m_configPath ) )
     {
       Logger::fatal( "Error loading config {0}", m_configPath );
-      Logger::fatal( "If this is the first time starting the server, we've copied the default one for your editing pleasure." );
+      failedLoad = true;
+    }
+
+    if( failedLoad )
+    {
+      Logger::fatal( "If this is the first time starting the server, "
+                     "we've copied the default configs for your editing pleasure." );
       return false;
     }
+
+    // load lobby config
+    m_config.allowNoSessionConnect = m_pConfig->getValue< bool >( "Lobby", "AllowNoSessionConnect", false );
+    m_config.worldName = m_pConfig->getValue< std::string >( "Lobby", "WorldName", "Sapphire" );
+
+    m_config.network.listenIp = m_pConfig->getValue< std::string >( "Network", "ListenIp", "0.0.0.0" );
+    m_config.network.listenPort = m_pConfig->getValue< uint16_t >( "Network", "ListenPort", 54994 );
+
     std::vector< std::string > args( argv + 1, argv + argc );
     for( size_t i = 0; i + 1 < args.size(); i += 2 )
     {
@@ -106,19 +127,19 @@ namespace Sapphire
         if( arg == "ip" )
         {
           // todo: ip addr in config
-          m_pConfig->getConfig()->lobbyNetwork.listenIp = val;
+          m_config.network.listenIp = val;
         }
         else if( arg == "p" || arg == "port" )
         {
-          m_pConfig->getConfig()->lobbyNetwork.listenPort = std::stoi( val );
+          m_config.network.listenPort = std::stoi( val );
         }
         else if( arg == "worldip" || arg == "worldip" )
         {
-          m_pConfig->getConfig()->globalNetwork.zoneHost = val;
+          m_config.global.network.zoneHost = val;
         }
         else if( arg == "worldport" )
         {
-          m_pConfig->getConfig()->globalNetwork.zonePort = std::stoi( val );
+          m_config.global.network.zonePort = std::stoi( val );
         }
       }
       catch( ... )
@@ -128,13 +149,13 @@ namespace Sapphire
       }
     }
 
-    m_port = m_pConfig->getConfig()->lobbyNetwork.listenPort;
-    m_ip = m_pConfig->getConfig()->lobbyNetwork.listenIp;
+    m_port = m_config.network.listenPort;
+    m_ip = m_config.network.listenIp;
 
 
-    g_restConnector.restHost = m_pConfig->getConfig()->globalNetwork.restHost + ":" +
-                               std::to_string( m_pConfig->getConfig()->globalNetwork.restPort );
-    g_restConnector.serverSecret = m_pConfig->getConfig()->globalParameters.serverSecret;
+    g_restConnector.restHost = m_config.global.network.restHost + ":" +
+                               std::to_string( m_config.global.network.restPort );
+    g_restConnector.serverSecret = m_config.global.parameters.serverSecret;
 
     return true;
   }
