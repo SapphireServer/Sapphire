@@ -59,7 +59,6 @@ namespace Sapphire
 
     private:
       bool copyDefaultConfig( const std::string& configName );
-      void initConfigData();
 
       std::unique_ptr< INIReader > m_pInih;
 
