@@ -1,6 +1,5 @@
 #include <Logging/Logger.h>
 #include <Exd/ExdDataGenerated.h>
-#include <Config/ConfigMgr.h>
 
 #include <watchdog/Watchdog.h>
 
@@ -48,10 +47,9 @@ void Sapphire::Scripting::ScriptMgr::update()
 bool Sapphire::Scripting::ScriptMgr::init()
 {
   std::set< std::string > files;
-  auto pConfig = framework()->get< ConfigMgr >();
+  auto pServerMgr = framework()->get< World::ServerMgr >();
 
-  auto status = loadDir( pConfig->getValue< std::string >( "Scripts", "Path", "./compiledscripts/" ),
-                         files, m_nativeScriptMgr->getModuleExtension() );
+  auto status = loadDir( pServerMgr->getConfig().scripts.path, files, m_nativeScriptMgr->getModuleExtension() );
 
   if( !status )
   {
@@ -81,12 +79,12 @@ bool Sapphire::Scripting::ScriptMgr::init()
 
 void Sapphire::Scripting::ScriptMgr::watchDirectories()
 {
-  auto pConfig = framework()->get< ConfigMgr >();
-  auto shouldWatch = pConfig->getValue< bool >( "Scripts", "HotSwap", true );
+  auto pServerMgr = framework()->get< World::ServerMgr >();
+  auto shouldWatch = pServerMgr->getConfig().scripts.hotSwap;
   if( !shouldWatch )
     return;
 
-  Watchdog::watchMany( pConfig->getValue< std::string >( "Scripts", "Path", "./compiledscripts/" ) + "*" +
+  Watchdog::watchMany( pServerMgr->getConfig().scripts.path + "*" +
                        m_nativeScriptMgr->getModuleExtension(),
                        [ this ]( const std::vector< ci::fs::path >& paths )
                        {

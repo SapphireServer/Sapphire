@@ -1,0 +1,20 @@
+[Scripts]
+; where compiled script modules are located
+Path = ./compiledscripts/
+; relative to Path, where we copy and load modules from
+CachePath = ./cache/
+; whether we should detect changes to script modules and reload them
+HotSwap = true
+
+[Network]
+ListenIp = 0.0.0.0
+ListenPort = 54992
+DisconnectTimeout = 20
+
+[General]
+; Sent on login - each line must be shorter than 307 characters, split lines with ';'
+MotD = Welcome to Sapphire!;This is a very good server;You can change these messages by editing General.MotD in config/config.ini
+
+[Housing]
+; Set the default estate name. {0} will be replaced with the plot number
+DefaultEstateName = Estate ${0}
