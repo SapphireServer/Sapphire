@@ -76,7 +76,7 @@ void reloadConfig()
 
   if( failedLoad )
   {
-    Logger::fatal( "If this is the first time starting the server, we've copied the default one for your editing pleasure." );
+    Logger::fatal( "If this is the first time starting the server, we've copied the default configs for your editing pleasure." );
     throw "Error loading config";
   }
 
@@ -128,23 +128,14 @@ bool loadSettings( int32_t argc, char* argv[] )
 
   Sapphire::Db::DbLoader loader;
 
-  Sapphire::Db::ConnectionInfo info;
-  info.password = m_config.global.database.password;
-  info.host = m_config.global.database.host;
-  info.database = m_config.global.database.database;
-  info.port = m_config.global.database.port;
-  info.user = m_config.global.database.username;
-  info.syncThreads = m_config.global.database.syncThreads;
-  info.asyncThreads = m_config.global.database.asyncThreads;
-
-  loader.addDb( g_charaDb, info );
+  loader.addDb( g_charaDb, m_config.global.database );
   if( !loader.initDbs() )
     return false;
 
   server.config.port = m_config.network.listenPort;
   server.config.address = m_config.network.listenIP;
 
-  Logger::info( "Database: Connected to {0}:{1}", info.host, info.port );
+  Logger::info( "Database: Connected to {0}:{1}", m_config.global.database.host, m_config.global.database.port );
 
   return true;
 }

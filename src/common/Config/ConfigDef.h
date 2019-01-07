@@ -1,20 +1,13 @@
 #ifndef SAPPHIRE_CONFIGDEF_H
 #define SAPPHIRE_CONFIGDEF_H
 
+#include <Database/DbCommon.h>
+
 namespace Sapphire::Common::Config
 {
   struct GlobalConfig
   {
-    struct Database
-    {
-      std::string host;
-      uint16_t port;
-      std::string database;
-      std::string username;
-      std::string password;
-      uint8_t syncThreads;
-      uint8_t asyncThreads;
-    } database;
+    Sapphire::Db::ConnectionInfo database;
 
     struct Parameters
     {

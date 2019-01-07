@@ -49,7 +49,7 @@ bool Sapphire::ConfigMgr::loadGlobalConfig( Common::Config::GlobalConfig& config
   config.database.host = getValue< std::string >( "Database", "Host", "127.0.0.1" );
   config.database.port = getValue< uint16_t >( "Database", "Port", 3306 );
   config.database.database = getValue< std::string >( "Database", "Database", "sapphire" );
-  config.database.username = getValue< std::string >( "Database", "Username", "sapphire" );
+  config.database.user = getValue< std::string >( "Database", "Username", "sapphire" );
   config.database.password = getValue< std::string >( "Database", "Password", "" );
   config.database.syncThreads = getValue< uint8_t >( "Database", "SyncThreads", 2 );
   config.database.asyncThreads = getValue< uint8_t >( "Database", "AsyncThreads", 2 );

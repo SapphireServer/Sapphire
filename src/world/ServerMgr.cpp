@@ -136,18 +136,9 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
   }
   framework()->set< Data::ExdDataGenerated >( pExdData );
 
-  Sapphire::Db::ConnectionInfo info;
-  info.password = m_config.global.database.password;
-  info.host = m_config.global.database.host;
-  info.database = m_config.global.database.database;
-  info.port = m_config.global.database.port;
-  info.user = m_config.global.database.username;
-  info.syncThreads = m_config.global.database.syncThreads;
-  info.asyncThreads = m_config.global.database.asyncThreads;
-
   auto pDb = std::make_shared< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   Sapphire::Db::DbLoader loader;
-  loader.addDb( *pDb, info );
+  loader.addDb( *pDb, m_config.global.database );
   if( !loader.initDbs() )
   {
     Logger::fatal( "Database not initialized properly!" );
