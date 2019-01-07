@@ -9,14 +9,14 @@ namespace Sapphire::Common::Config
   {
     Sapphire::Db::ConnectionInfo database;
 
-    struct Parameters
+    struct General
     {
       std::string serverSecret;
       std::string dataPath;
       uint16_t worldID;
 
       uint8_t defaultGMRank;
-    } parameters;
+    } general;
 
     struct Network
     {

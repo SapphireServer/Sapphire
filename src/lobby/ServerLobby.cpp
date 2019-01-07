@@ -155,7 +155,7 @@ namespace Sapphire
 
     g_restConnector.restHost = m_config.global.network.restHost + ":" +
                                std::to_string( m_config.global.network.restPort );
-    g_restConnector.serverSecret = m_config.global.parameters.serverSecret;
+    g_restConnector.serverSecret = m_config.global.general.serverSecret;
 
     return true;
   }

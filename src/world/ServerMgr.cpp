@@ -127,7 +127,7 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
 
   Logger::info( "Setting up generated EXD data" );
   auto pExdData = std::make_shared< Data::ExdDataGenerated >();
-  auto dataPath = m_config.global.parameters.dataPath;
+  auto dataPath = m_config.global.general.dataPath;
   if( !pExdData->init( dataPath ) )
   {
     Logger::fatal( "Error setting up generated EXD data. Make sure that DataPath is set correctly in global.ini" );
