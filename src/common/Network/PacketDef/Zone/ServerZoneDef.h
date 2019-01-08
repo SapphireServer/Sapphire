@@ -759,7 +759,9 @@ struct FFXIVIpcInitZone : FFXIVIpcBasePacket< InitZone >
   uint32_t unknown9;
   uint32_t unknown10;
   uint32_t unknown11;
+  uint32_t unknown12[4];
   Common::FFXIVARR_POSITION3 pos;
+  uint32_t unknown13;
 };
 
 
