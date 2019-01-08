@@ -253,20 +253,20 @@ namespace Sapphire::Network::Packets
 
     ChatHandler = 0x00D7, // updated 4.5
 
-    SocialListHandler = 0x00DF, // updated 4.3
-    ReqSearchInfoHandler = 0x00E4, // updated 4.3
-    ReqExamineSearchCommentHandler = 0x00E5, // updated 4.1
+    SocialListHandler = 0x00DF, // updated 4.5
+    ReqSearchInfoHandler = 0x00E4, // updated 4.5
+    ReqExamineSearchCommentHandler = 0x00E5, // updated 4.5
 
     SetSearchInfoHandler = 0x00E2, // updated 4.3
 
-    BlackListHandler = 0x00F0, // updated 4.3
-    PlayerSearchHandler = 0x00E6, // updated 4.2
+    BlackListHandler = 0x00F0, // updated 4.5
+    PlayerSearchHandler = 0x00E6, // updated 4.5
 
-    LinkshellListHandler = 0x00F8, // updated 4.4
+    LinkshellListHandler = 0x00F8, // updated 4.5
 
-    MarketBoardRequestItemListingInfo = 0x0102, // updated 4.4
-    MarketBoardRequestItemListings = 0x0103, // updated 4.4
-    MarketBoardSearch = 0x0107, // updated 4.4
+    MarketBoardRequestItemListingInfo = 0x0102, // updated 4.5
+    MarketBoardRequestItemListings = 0x0103, // updated 4.5
+    MarketBoardSearch = 0x0107, // updated 4.5
 
     ReqExamineFcInfo = 0x0113, // updated 4.1
 
@@ -276,19 +276,19 @@ namespace Sapphire::Network::Packets
 
     ReqJoinNoviceNetwork = 0x0129, // updated 4.2
 
-    ReqCountdownInitiate = 0x0133, // updated 4.4
-    ReqCountdownCancel = 0x0134, // updated 4.4
-    ClearWaymarks = 0x0135, // updated 4.4
+    ReqCountdownInitiate = 0x0133, // updated 4.5
+    ReqCountdownCancel = 0x0134, // updated 4.5
+    ClearWaymarks = 0x0135, // updated 4.5
 
-    ZoneLineHandler = 0x0137, // updated 4.4
-    ClientTrigger = 0x0138, // updated 4.4 was 13D in 4.3
-    DiscoveryHandler = 0x0139, // updated 4.4
+    ZoneLineHandler = 0x0137, // updated 4.5
+    ClientTrigger = 0x0138, // updated 4.5
+    DiscoveryHandler = 0x0139, // updated 4.5
 
     AddWaymark = 0x0143, // updated 4.3
 
-    SkillHandler = 0x013B, // updated 4.4
-    GMCommand1 = 0x013B, // updated 4.4
-    GMCommand2 = 0x013C, // updated 4.4
+    SkillHandler = 0x013B, // updated 4.5
+    GMCommand1 = 0x013B, // updated 4.5
+    GMCommand2 = 0x013C, // updated 4.5
 
     UpdatePositionHandler = 0x013F, // updated 4.5
     UpdatePositionInstance = 0x0183, // updated 4.3
