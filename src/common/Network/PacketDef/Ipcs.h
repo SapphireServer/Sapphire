@@ -233,18 +233,18 @@ namespace Sapphire::Network::Packets
   enum ClientZoneIpcType : uint16_t
   {
 
-    PingHandler = 0x0065, // unchanged 4.3
-    InitHandler = 0x0066, // unchanged 4.3
+    PingHandler = 0x0065, // unchanged 4.5
+    InitHandler = 0x0066, // unchanged 4.5
 
-    FinishLoadingHandler = 0x0069, // unchanged 4.3
+    FinishLoadingHandler = 0x0069, // unchanged 4.5
 
     CFCommenceHandler = 0x006F,
 
 
     CFRegisterDuty = 0x0071,
     CFRegisterRoulette = 0x0072,
-    PlayTimeHandler = 0x0073, // unchanged 4.3
-    LogoutHandler = 0x0074, // unchanged 4.3
+    PlayTimeHandler = 0x0073, // unchanged 4.5
+    LogoutHandler = 0x0074, // unchanged 4.5
 
     CFDutyInfoHandler = 0x0078, // updated 4.2
 
@@ -257,7 +257,7 @@ namespace Sapphire::Network::Packets
     ReqSearchInfoHandler = 0x00E4, // updated 4.5
     ReqExamineSearchCommentHandler = 0x00E5, // updated 4.5
 
-    SetSearchInfoHandler = 0x00E2, // updated 4.3
+    SetSearchInfoHandler = 0x00E2, // unchanged 4.5
 
     BlackListHandler = 0x00F0, // updated 4.5
     PlayerSearchHandler = 0x00E6, // updated 4.5
@@ -284,7 +284,7 @@ namespace Sapphire::Network::Packets
     ClientTrigger = 0x0138, // updated 4.5
     DiscoveryHandler = 0x0139, // updated 4.5
 
-    AddWaymark = 0x0143, // updated 4.3
+    AddWaymark = 0x013A, // updated 4.5
 
     SkillHandler = 0x013B, // updated 4.5
     GMCommand1 = 0x013C, // updated 4.5
@@ -293,9 +293,9 @@ namespace Sapphire::Network::Packets
     UpdatePositionHandler = 0x013F, // updated 4.5
     UpdatePositionInstance = 0x0183, // updated 4.3
 
-    InventoryModifyHandler = 0x0142, // updated 4.4
+    InventoryModifyHandler = 0x0146, // updated 4.5 ( +4 )
 
-    ReqPlaceHousingItem = 0x145, // updated 4.4
+    ReqPlaceHousingItem = 0x149, // updated 4.5
 
     BuildPresetHandler = 0x014E, // updated 4.5
     TalkEventHandler = 0x014F, // updated 4.5
@@ -312,15 +312,15 @@ namespace Sapphire::Network::Packets
     LinkshellEventHandler = 0x1150, // updated 4.1 ??
     LinkshellEventHandler1 = 0x1151, // updated 4.1 ??
 
-    LandRenameHandler = 0x0171, // updated 4.4
-    HousingUpdateHouseGreeting = 0x0172, // updated 4.4
-    HousingUpdateObjectPosition = 0x0173, // updated 4.4
+    LandRenameHandler = 0x0175, // updated 4.5
+    HousingUpdateHouseGreeting = 0x0176, // updated 4.5
+    HousingUpdateObjectPosition = 0x0177, // updated 4.5
 
-    SetSharedEstateSettings = 0x0177, // updated 4.4
+    SetSharedEstateSettings = 0x017B, // updated 4.5
 
     PerformNoteHandler = 0x029B, // updated 4.3
 
-    ReqEquipDisplayFlagsChange = 0x016F, // updated 4.4
+    ReqEquipDisplayFlagsChange = 0x0173, // updated 4.5
 
 
   };
