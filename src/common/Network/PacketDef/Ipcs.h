@@ -60,8 +60,8 @@ namespace Sapphire::Network::Packets
     ///////////////////////////////////////////////////
 
     ChatBanned = 0x006B,
-    Playtime = 0x006C, // updated 4.4
-    Logout = 0x0077, // updated 4.4
+    Playtime = 0x006C, // updated 4.5
+    Logout = 0x0077, // updated 4.5
     CFNotify = 0x0078,
     CFMemberStatus = 0x0079,
     CFDutyInfo = 0x007A,
@@ -73,11 +73,11 @@ namespace Sapphire::Network::Packets
     SocialRequestResponse = 0x00BB, // updated 4.1
     CancelAllianceForming = 0x00C6, // updated 4.2
 
-    Chat = 0x00F4, // updated 4.4
-    SocialList = 0x00FB, // updated 4.4
+    Chat = 0x00F7, // updated 4.5?
+    SocialList = 0x0103, // updated 4.5
 
-    UpdateSearchInfo = 0x00FE, // updated 4.4
-    InitSearchInfo = 0x00FF, // updated 4.4
+    UpdateSearchInfo = 0x0106, // updated 4.5
+    InitSearchInfo = 0x0107, // updated 4.4
     ExamineSearchComment = 0x0102, // updated 4.1
 
     ServerNotice = 0x0104, // updated 4.4
@@ -117,7 +117,7 @@ namespace Sapphire::Network::Packets
 
     GCAffiliation = 0x015D, // updated 4.4
 
-    PlayerSpawn = 0x016D, // updated 4.4
+    PlayerSpawn = 0x0175, // updated 4.5
     NpcSpawn = 0x016E, // updated 4.4
     ActorMove = 0x0170, // updated 4.4
     ActorSetPos = 0x0172, // updated 4.4
@@ -133,7 +133,7 @@ namespace Sapphire::Network::Packets
     UpdateClassInfo = 0x017B, // updated 4.4
     SilentSetClassJob = 0x017C, // updated 4.4 - seems to be the case, not sure if it's actually used for anything
 
-    InitUI = 0x017D, // updated 4.4
+    InitUI = 0x0185, // updated 4.5
     PlayerStats = 0x017E, // updated 4.4
     ActorOwner = 0x017F, // updated 4.4 ?
     PlayerStateFlags = 0x0180, // updated 4.4
@@ -251,7 +251,7 @@ namespace Sapphire::Network::Packets
     SocialReqSendHandler = 0x00AE, // updated 4.1
     CreateCrossWorldLS = 0x00AF, // updated 4.3
 
-    ChatHandler = 0x00D3, // updated 4.3
+    ChatHandler = 0x00D7, // updated 4.5
 
     SocialListHandler = 0x00DB, // updated 4.3
     ReqSearchInfoHandler = 0x00E0, // updated 4.3
@@ -290,7 +290,7 @@ namespace Sapphire::Network::Packets
     GMCommand1 = 0x0138, // updated 4.4
     GMCommand2 = 0x0139, // updated 4.4
 
-    UpdatePositionHandler = 0x013B, // updated 4.4 was 144
+    UpdatePositionHandler = 0x013F, // updated 4.5
     UpdatePositionInstance = 0x0183, // updated 4.3
 
     InventoryModifyHandler = 0x0142, // updated 4.4

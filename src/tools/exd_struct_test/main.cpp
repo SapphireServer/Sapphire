@@ -21,7 +21,7 @@ Sapphire::Data::ExdDataGenerated g_exdData;
 using namespace Sapphire;
 
 //const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
-const std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
+const std::string datLocation( "/mnt/c/Program Files (x86)/Steam/steamapps/common/FINAL FANTASY XIV Online/game/sqpack" );
 
 
 int main()
@@ -36,22 +36,14 @@ int main()
     return 0;
   }
 
-
-  //Logger::info( "getting id list " );
-  //auto idList = g_exdData.getGilShopIdList();
-
-  //Logger::info( "getting id list done" );
-  //for( auto id : idList )
+  auto gld = g_exdData.get< Sapphire::Data::ClassJob >( 1 );
+  if( gld )
   {
-    auto teri1 = g_exdData.get< Sapphire::Data::GilShopItem >( 262440, 0 );
-    Logger::info( "0 -> {0}", teri1->item );
-
-    auto teri2 = g_exdData.get< Sapphire::Data::GilShopItem >( 262440, 1 );
-    Logger::info( "1 -> {0} ", teri2->item );
-
-    auto teri3 = g_exdData.get< Sapphire::Data::GilShopItem >( 262440, 2 );
-    Logger::info( "2 -> {0}", teri3->item );
+    Logger::info( "got {0}", gld->name );
   }
+  else
+    Logger::warn( "failed to get classjob {}", 1 );
+
 
   return 0;
 }
