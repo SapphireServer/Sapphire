@@ -1034,14 +1034,14 @@ Sapphire::Data::ClassJob::ClassJob( uint32_t row_id, Sapphire::Data::ExdDataGene
    classJobParent = exdData->getField< uint8_t >( row, 26 );
    nameEnglish = exdData->getField< std::string >( row, 27 );
    itemStartingWeapon = exdData->getField< int32_t >( row, 28 );
-   limitBreak1 = exdData->getField< uint16_t >( row, 33 );
-   limitBreak2 = exdData->getField< uint16_t >( row, 34 );
-   limitBreak3 = exdData->getField< uint16_t >( row, 35 );
-   itemSoulCrystal = exdData->getField< uint32_t >( row, 37 );
-   unlockQuest = exdData->getField< uint32_t >( row, 38 );
-   relicQuest = exdData->getField< uint32_t >( row, 39 );
-   prerequisite = exdData->getField< uint32_t >( row, 40 );
-   startingLevel = exdData->getField< uint8_t >( row, 41 );
+   limitBreak1 = exdData->getField< uint16_t >( row, 34 );
+   limitBreak2 = exdData->getField< uint16_t >( row, 35 );
+   limitBreak3 = exdData->getField< uint16_t >( row, 36 );
+   itemSoulCrystal = exdData->getField< uint32_t >( row, 38 );
+   unlockQuest = exdData->getField< uint32_t >( row, 39 );
+   relicQuest = exdData->getField< uint32_t >( row, 40 );
+   prerequisite = exdData->getField< uint32_t >( row, 41 );
+   startingLevel = exdData->getField< uint8_t >( row, 42 );
 }
 
 Sapphire::Data::ClassJobCategory::ClassJobCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
@@ -1273,10 +1273,10 @@ Sapphire::Data::ContentFinderCondition::ContentFinderCondition( uint32_t row_id,
    allowReplacement = exdData->getField< bool >( row, 20 );
    highEndDuty = exdData->getField< bool >( row, 26 );
    dutyRecorderAllowed = exdData->getField< bool >( row, 30 );
-   name = exdData->getField< std::string >( row, 32 );
-   contentType = exdData->getField< uint8_t >( row, 33 );
-   transient = exdData->getField< uint8_t >( row, 34 );
-   image = exdData->getField< uint32_t >( row, 37 );
+   name = exdData->getField< std::string >( row, 34 );
+   contentType = exdData->getField< uint8_t >( row, 35 );
+   transient = exdData->getField< uint8_t >( row, 36 );
+   image = exdData->getField< uint32_t >( row, 39 );
 }
 
 Sapphire::Data::ContentFinderConditionTransient::ContentFinderConditionTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
@@ -3164,7 +3164,7 @@ Sapphire::Data::InstanceContent::InstanceContent( uint32_t row_id, Sapphire::Dat
    instanceClearExp = exdData->getField< uint32_t >( row, 46 );
    instanceContentBuff = exdData->getField< int32_t >( row, 51 );
    reqInstance = exdData->getField< uint32_t >( row, 52 );
-   partyCondition = exdData->getField< uint8_t >( row, 55 );
+   partyCondition = exdData->getField< uint8_t >( row, 54 );
 }
 
 Sapphire::Data::InstanceContentBuff::InstanceContentBuff( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
@@ -3240,7 +3240,7 @@ Sapphire::Data::Item::Item( uint32_t row_id, Sapphire::Data::ExdDataGenerated* e
    materiaSlotCount = exdData->getField< uint8_t >( row, 84 );
    isAdvancedMeldingPermitted = exdData->getField< bool >( row, 85 );
    isPvP = exdData->getField< bool >( row, 86 );
-   isGlamourous = exdData->getField< bool >( row, 87 );
+   isGlamourous = exdData->getField< bool >( row, 88 );
 }
 
 Sapphire::Data::ItemAction::ItemAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
@@ -4065,8 +4065,8 @@ Sapphire::Data::PublicContent::PublicContent( uint32_t row_id, Sapphire::Data::E
    name = exdData->getField< std::string >( row, 3 );
    textDataStart = exdData->getField< uint32_t >( row, 4 );
    textDataEnd = exdData->getField< uint32_t >( row, 5 );
-   contentFinderCondition = exdData->getField< uint16_t >( row, 7 );
-   additionalData = exdData->getField< uint16_t >( row, 8 );
+   contentFinderCondition = exdData->getField< uint16_t >( row, 8 );
+   additionalData = exdData->getField< uint16_t >( row, 9 );
 }
 
 Sapphire::Data::PublicContentCutscene::PublicContentCutscene( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
