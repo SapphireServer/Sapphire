@@ -287,8 +287,8 @@ namespace Sapphire::Network::Packets
     AddWaymark = 0x0143, // updated 4.3
 
     SkillHandler = 0x013B, // updated 4.5
-    GMCommand1 = 0x013B, // updated 4.5
-    GMCommand2 = 0x013C, // updated 4.5
+    GMCommand1 = 0x013C, // updated 4.5
+    GMCommand2 = 0x013D, // updated 4.5
 
     UpdatePositionHandler = 0x013F, // updated 4.5
     UpdatePositionInstance = 0x0183, // updated 4.3
@@ -297,17 +297,17 @@ namespace Sapphire::Network::Packets
 
     ReqPlaceHousingItem = 0x145, // updated 4.4
 
-    BuildPresetHandler = 0x014A, // updated 4.4
-    TalkEventHandler = 0x014B, // updated 4.4
-    EmoteEventHandler = 0x014C, // updated 4.4
-    WithinRangeEventHandler = 0x014D, // updated 4.4
-    OutOfRangeEventHandler = 0x014E, // updated 4.4
-    EnterTeriEventHandler = 0x014F, // updated 4.4
+    BuildPresetHandler = 0x014E, // updated 4.5
+    TalkEventHandler = 0x014F, // updated 4.5
+    EmoteEventHandler = 0x0150, // updated 4.5
+    WithinRangeEventHandler = 0x0151, // updated 4.5
+    OutOfRangeEventHandler = 0x0152, // updated 4.5
+    EnterTeriEventHandler = 0x0153, // updated 4.5
 
-    ShopEventHandler = 0x0151, // updated 4.4
+    ShopEventHandler = 0x0155, // updated 4.5
 
-    ReturnEventHandler = 0x0154, // updated 4.4
-    TradeReturnEventHandler = 0x0155, // updated 4.4
+    ReturnEventHandler = 0x0158, // updated 4.5
+    TradeReturnEventHandler = 0x0159, // updated 4.5
 
     LinkshellEventHandler = 0x1150, // updated 4.1 ??
     LinkshellEventHandler1 = 0x1151, // updated 4.1 ??
