@@ -17,6 +17,16 @@ Sapphire::Entity::SpawnPoint::SpawnPoint( float x, float y, float z, float rot, 
 {
 }
 
+uint32_t Sapphire::Entity::SpawnPoint::getTimeOfDeath() const
+{
+  return m_timeOfDeath;
+}
+
+void Sapphire::Entity::SpawnPoint::setTimeOfDeath( uint32_t timeOfDeath )
+{
+  m_timeOfDeath = timeOfDeath;
+}
+
 float Sapphire::Entity::SpawnPoint::getPosX() const
 {
   return m_posX;

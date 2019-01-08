@@ -163,6 +163,8 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
   }
   framework()->set< Scripting::ScriptMgr >( pScript );
 
+  loadBNpcTemplates();
+
   Logger::info( "TerritoryMgr: Setting up zones" );
   auto pTeriMgr = std::make_shared< Manager::TerritoryMgr >( framework() );
   auto pHousingMgr = std::make_shared< Manager::HousingMgr >( framework() );
@@ -189,7 +191,7 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
     return;
   }
 
-  loadBNpcTemplates();
+
 
   Network::HivePtr hive( new Network::Hive() );
   Network::addServerToHive< Network::GameConnection >( m_ip, m_port, hive, framework() );
@@ -421,7 +423,6 @@ void Sapphire::World::ServerMgr::updatePlayerName( uint32_t playerId, const std:
 void Sapphire::World::ServerMgr::loadBNpcTemplates()
 {
   auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  auto pTeriMgr = framework()->get< TerritoryMgr >();
 
   auto stmt = pDb->getPreparedStatement( Db::ZoneDbStatements::ZONE_SEL_BNPCTEMPLATES );
 

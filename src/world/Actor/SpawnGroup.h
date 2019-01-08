@@ -24,7 +24,7 @@ namespace Sapphire::Entity
 
     uint32_t getId() const;
     uint32_t getTemplateId() const;
-    uint32_t getLevelId() const;
+    uint32_t getLevel() const;
     uint32_t getMaxHp() const;
 
     SpawnPointList& getSpawnPointList();
