@@ -166,7 +166,7 @@ namespace Sapphire::Network::Packets
 
     QuestFinish = 0x01CB, // updated 4.5
     MSQTrackerComplete = 0x01CC, // updated 4.5
-    MSQTrackerProgress = 0x01CD, // updated 4.5 ? this actually looks like the two opcodes have been combined, see #474
+    MSQTrackerProgress = 0xF1CD, // updated 4.5 ? this actually looks like the two opcodes have been combined, see #474
 
     QuestMessage = 0x01D3, // updated 4.5
 
@@ -253,22 +253,22 @@ namespace Sapphire::Network::Packets
 
     ChatHandler = 0x00D7, // updated 4.5
 
-    SocialListHandler = 0x00DB, // updated 4.3
-    ReqSearchInfoHandler = 0x00E0, // updated 4.3
-    ReqExamineSearchCommentHandler = 0x00E1, // updated 4.1
+    SocialListHandler = 0x00DF, // updated 4.3
+    ReqSearchInfoHandler = 0x00E4, // updated 4.3
+    ReqExamineSearchCommentHandler = 0x00E5, // updated 4.1
 
-    SetSearchInfoHandler = 0x00DE, // updated 4.3
+    SetSearchInfoHandler = 0x00E2, // updated 4.3
 
-    BlackListHandler = 0x00EC, // updated 4.3
-    PlayerSearchHandler = 0x00E2, // updated 4.2
+    BlackListHandler = 0x00F0, // updated 4.3
+    PlayerSearchHandler = 0x00E6, // updated 4.2
 
-    LinkshellListHandler = 0x00F4, // updated 4.3
+    LinkshellListHandler = 0x00F8, // updated 4.4
 
-    MarketBoardRequestItemListingInfo = 0x00FE, // updated 4.4
-    MarketBoardRequestItemListings = 0x00FF, // updated 4.4
-    MarketBoardSearch = 0x0103, // updated 4.4
+    MarketBoardRequestItemListingInfo = 0x0102, // updated 4.4
+    MarketBoardRequestItemListings = 0x0103, // updated 4.4
+    MarketBoardSearch = 0x0107, // updated 4.4
 
-    ReqExamineFcInfo = 0x010F, // updated 4.1
+    ReqExamineFcInfo = 0x0113, // updated 4.1
 
     FcInfoReqHandler = 0x011A, // updated 4.2
 
@@ -276,19 +276,19 @@ namespace Sapphire::Network::Packets
 
     ReqJoinNoviceNetwork = 0x0129, // updated 4.2
 
-    ReqCountdownInitiate = 0x012F, // updated 4.4
-    ReqCountdownCancel = 0x0130, // updated 4.4
-    ClearWaymarks = 0x0131, // updated 4.4
+    ReqCountdownInitiate = 0x0133, // updated 4.4
+    ReqCountdownCancel = 0x0134, // updated 4.4
+    ClearWaymarks = 0x0135, // updated 4.4
 
-    ZoneLineHandler = 0x0133, // updated 4.4
-    ClientTrigger = 0x0134, // updated 4.4 was 13D in 4.3
-    DiscoveryHandler = 0x0135, // updated 4.4
+    ZoneLineHandler = 0x0137, // updated 4.4
+    ClientTrigger = 0x0138, // updated 4.4 was 13D in 4.3
+    DiscoveryHandler = 0x0139, // updated 4.4
 
-    AddWaymark = 0x013F, // updated 4.3
+    AddWaymark = 0x0143, // updated 4.3
 
-    SkillHandler = 0x0137, // updated 4.4
-    GMCommand1 = 0x0138, // updated 4.4
-    GMCommand2 = 0x0139, // updated 4.4
+    SkillHandler = 0x013B, // updated 4.4
+    GMCommand1 = 0x013B, // updated 4.4
+    GMCommand2 = 0x013C, // updated 4.4
 
     UpdatePositionHandler = 0x013F, // updated 4.5
     UpdatePositionInstance = 0x0183, // updated 4.3
