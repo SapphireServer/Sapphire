@@ -187,10 +187,10 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
     std::size_t cc = 0;
     for( size_t ca = 0; ca < pQuestData->itemReward0.size(); ca++ )
     {
-      if ( pQuestData->itemReward0.at( ca ) != 0 )
+      if( pQuestData->itemReward0.at( ca ) != 0 )
       {
         reward += std::to_string( pQuestData->itemReward0.at( ca ) );
-        if ( pQuestData->itemReward0.at( ca + 1 ) != 0 )
+        if( pQuestData->itemReward0.at( ca + 1 ) != 0 )
         {
           reward += ", ";
         }
@@ -206,11 +206,11 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
     std::size_t cc = 0;
     for( size_t ca = 0; ca < pQuestData->itemCountReward0.size(); ca++ )
     {
-      if ( pQuestData->itemCountReward0.at( ca ) != 0 )
+      if( pQuestData->itemCountReward0.at( ca ) != 0 )
       {
         reward += std::to_string( pQuestData->itemCountReward0.at( ca ) );
 
-        if ( pQuestData->itemCountReward0.at( ca + 1 ) != 0 )
+        if( pQuestData->itemCountReward0.at( ca + 1 ) != 0 )
         {
           reward += ", ";
         }
@@ -221,17 +221,17 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
     reward.clear();
   }
 
-  if ( !pQuestData->itemReward1.at( 0 ) == 0 )
+  if( !pQuestData->itemReward1.at( 0 ) == 0 )
   {
     std::size_t cc = 0;
-    for ( size_t ca = 0; ca < pQuestData->itemReward1.size(); ca++ )
+    for( size_t ca = 0; ca < pQuestData->itemReward1.size(); ca++ )
     {
-      if ( pQuestData->itemReward1.at( ca ) != 0 )
+      if( pQuestData->itemReward1.at( ca ) != 0 )
       {
         reward += std::to_string( pQuestData->itemReward1.at( ca ) );
-        if ( ca+1 != 5 )
+        if( ca+1 != 5 )
         {
-          if ( pQuestData->itemReward1.at( ca + 1 ) != 0)
+          if( pQuestData->itemReward1.at( ca + 1 ) != 0)
           {
             reward += ", ";
           }
@@ -248,12 +248,12 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
     std::size_t cc = 0;
     for( size_t ca = 0; ca < pQuestData->itemCountReward1.size(); ca++ )
     {
-      if ( pQuestData->itemCountReward1.at( ca ) != 0 )
+      if( pQuestData->itemCountReward1.at( ca ) != 0 )
       {
         reward += std::to_string( pQuestData->itemCountReward1.at( ca ) );
-        if ( ca + 1 != 5 )
+        if( ca + 1 != 5 )
         {
-          if ( pQuestData->itemCountReward1.at( ca + 1 ) != 0 )
+          if( pQuestData->itemCountReward1.at( ca + 1 ) != 0 )
           {
             reward += ", ";
           }
@@ -326,7 +326,7 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
     scriptEntry += onEmoteStr;
   }
 
-  if(hasEnemies)
+  if( hasEnemies )
   {
     scriptEntry += onEnemystr;
   }
@@ -341,7 +341,7 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
   constructor += sentities + "\n";
   constructor += "public:\n";
   constructor += "  " + className + "() :\n";
-  constructor += "    Sapphire::ScriptAPI::EventScript ( " + std::to_string( questId ) + " )\n";
+  constructor += "    Sapphire::ScriptAPI::EventScript( " + std::to_string( questId ) + " )\n";
   constructor += "  {\n";
   constructor += "  };\n\n";
   constructor += "  ~" + className + "()\n";
