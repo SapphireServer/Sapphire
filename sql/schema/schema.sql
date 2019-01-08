@@ -34,7 +34,7 @@ CREATE TABLE `spawnpoint` (
   `y` float NOT NULL,
   `z` float NOT NULL,
   `r` float NOT NULL,
-  `gimmickId` int(11) NOT NULL,
+  `gimmickId` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `spawngroupidx` (`spawnGroupId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
