@@ -11,9 +11,9 @@ namespace Common {
 
 ///////////////////////////////////////////////////////////
 //ActionCategory.exd
-enum class ActionCategory :
-  uint8_t
+enum class ActionCategory : uint8_t
 {
+  None = 0,
   Autoattack = 1,
   Spell = 2,
   Weaponskill = 3,
@@ -33,8 +33,7 @@ enum class ActionCategory :
 
 ///////////////////////////////////////////////////////////
 //BeastReputationRank.exd
-enum class BeastReputationRank :
-  uint8_t
+enum class BeastReputationRank : uint8_t
 {
   None = 0,
   Neutral = 1,
@@ -49,15 +48,13 @@ enum class BeastReputationRank :
 
 ///////////////////////////////////////////////////////////
 //BeastTribe.exd
-enum class BeastTribe :
-  uint8_t
+enum class BeastTribe : uint8_t
 {
 };
 
 ///////////////////////////////////////////////////////////
 //ClassJob.exd
-enum class ClassJob :
-  uint8_t
+enum class ClassJob : uint8_t
 {
   Adventurer = 0,
   Gladiator = 1,
@@ -95,13 +92,14 @@ enum class ClassJob :
   Astrologian = 33,
   Samurai = 34,
   Redmage = 35,
+  Bluemage = 36,
 };
 
 ///////////////////////////////////////////////////////////
 //ContentType.exd
-enum class ContentType :
-  uint8_t
+enum class ContentType : uint8_t
 {
+  None = 0,
   DutyRoulette = 1,
   Dungeons = 2,
   Guildhests = 3,
@@ -121,36 +119,42 @@ enum class ContentType :
   DisciplesoftheHand = 17,
   RetainerVentures = 18,
   GoldSaucer = 19,
+  one = 20,
   DeepDungeons = 21,
+  two = 22,
+  three = 23,
   WondrousTails = 24,
   CustomDeliveries = 25,
+  Eureka = 26,
+  four = 27,
 };
 
 ///////////////////////////////////////////////////////////
 //EmoteCategory.exd
-enum class EmoteCategory :
-  uint8_t
+enum class EmoteCategory : uint8_t
 {
+  None = 0,
   General = 1,
-  Persistent = 2,
+  Special = 2,
   Expressions = 3,
+  one = 4,
 };
 
 ///////////////////////////////////////////////////////////
 //ExVersion.exd
-enum class ExVersion :
-  uint8_t
+enum class ExVersion : uint8_t
 {
   ARealmReborn = 0,
   Heavensward = 1,
   Stormblood = 2,
+  three = 3,
 };
 
 ///////////////////////////////////////////////////////////
 //GrandCompany.exd
-enum GrandCompany : uint8_t
+enum class GrandCompany : uint8_t
 {
-  NoGc = 0,
+  None = 0,
   Maelstrom = 1,
   OrderoftheTwinAdder = 2,
   ImmortalFlames = 3,
@@ -160,6 +164,7 @@ enum GrandCompany : uint8_t
 //GuardianDeity.exd
 enum class GuardianDeity : uint8_t
 {
+  None = 0,
   HalonetheFury = 1,
   MenphinatheLover = 2,
   ThaliaktheScholar = 3,
@@ -176,9 +181,9 @@ enum class GuardianDeity : uint8_t
 
 ///////////////////////////////////////////////////////////
 //ItemUICategory.exd
-enum class ItemUICategory :
-  uint8_t
+enum class ItemUICategory : uint8_t
 {
+  None = 0,
   PugilistsArm = 1,
   GladiatorsArm = 2,
   MaraudersArm = 3,
@@ -279,13 +284,18 @@ enum class ItemUICategory :
   ScholarsArm = 98,
   FishersSecondaryTool = 99,
   Currency = 100,
+  SubmersibleHull = 101,
+  SubmersibleStern = 102,
+  SubmersibleBow = 103,
+  SubmersibleBridge = 104,
+  BlueMagesArm = 105,
 };
 
 ///////////////////////////////////////////////////////////
 //ItemSearchCategory.exd
-enum class ItemSearchCategory :
-  uint8_t
+enum class ItemSearchCategory : uint8_t
 {
+  None = 0,
   PrimaryArms = 1,
   PrimaryTools = 2,
   PrimaryTools1 = 3,
@@ -364,7 +374,7 @@ enum class ItemSearchCategory :
   DarkKnightsArms = 76,
   MachinistsArms = 77,
   AstrologiansArms = 78,
-  AirshipComponents = 79,
+  Airship_SubmersibleComponents = 79,
   OrchestrionComponents = 80,
   GardeningItems = 81,
   Paintings = 82,
@@ -375,8 +385,7 @@ enum class ItemSearchCategory :
 
 ///////////////////////////////////////////////////////////
 //OnlineStatus.exd
-enum class OnlineStatus :
-  uint8_t
+enum class OnlineStatus : uint8_t
 {
   Producer = 1,
   GameMaster = 2,
@@ -429,9 +438,9 @@ enum class OnlineStatus :
 
 ///////////////////////////////////////////////////////////
 //Race.exd
-enum class Race :
-  uint8_t
+enum class Race : uint8_t
 {
+  None = 0,
   Hyur = 1,
   Elezen = 2,
   Lalafell = 3,
@@ -442,9 +451,9 @@ enum class Race :
 
 ///////////////////////////////////////////////////////////
 //Tribe.exd
-enum class Tribe :
-  uint8_t
+enum class Tribe : uint8_t
 {
+  None = 0,
   Midlander = 1,
   Highlander = 2,
   Wildwood = 3,
@@ -461,8 +470,7 @@ enum class Tribe :
 
 ///////////////////////////////////////////////////////////
 //Town.exd
-enum class Town :
-  uint8_t
+enum class Town : uint8_t
 {
   Nowheresville = 0,
   LimsaLominsa = 1,
@@ -474,8 +482,7 @@ enum class Town :
 
 ///////////////////////////////////////////////////////////
 //Weather.exd
-enum class Weather :
-  uint8_t
+enum class Weather : uint8_t
 {
   None = 0,
   ClearSkies = 1,
@@ -543,8 +550,8 @@ enum class Weather :
   FairSkies7 = 63,
   Rain2 = 64,
   FairSkies8 = 65,
-  Dragonstorm = 66,
-  Dragonstorm1 = 67,
+  Dragonstorms = 66,
+  Dragonstorms1 = 67,
   Subterrain = 68,
   Concordance = 69,
   Concordance1 = 70,
@@ -557,17 +564,65 @@ enum class Weather :
   DimensionalDisruption = 77,
   DimensionalDisruption1 = 78,
   DimensionalDisruption2 = 79,
-  Revelstorm = 80,
-  Revelstorm1 = 81,
+  Revelstorms = 80,
+  Revelstorms1 = 81,
   EternalBliss = 82,
   EternalBliss1 = 83,
-  Wyrmstorm = 84,
-  Wyrmstorm1 = 85,
-  Revelstorm2 = 86,
+  Wyrmstorms = 84,
+  Wyrmstorms1 = 85,
+  Revelstorms2 = 86,
   Quicklevin = 87,
   Thunder3 = 88,
   DimensionalDisruption3 = 89,
   FairSkies9 = 90,
+  ClearSkies1 = 91,
+  WhiteCyclones = 92,
+  WhiteCyclones1 = 93,
+  WhiteCyclones2 = 94,
+  Ultimania = 95,
+  WhiteCyclones3 = 96,
+  Moonlight = 97,
+  Moonlight1 = 98,
+  Moonlight2 = 99,
+  Moonlight3 = 100,
+  FairSkies10 = 101,
+  Scarlet = 102,
+  Scarlet1 = 103,
+  Scarlet2 = 104,
+  FairSkies11 = 105,
+  FairSkies12 = 106,
+  FairSkies13 = 107,
+  FairSkies14 = 108,
+  Flames = 109,
+  Tsunamis = 110,
+  Cyclones = 111,
+  Geostorms = 112,
+  TrueBlue = 113,
+  TrueBlue1 = 114,
+  TrueBlue2 = 115,
+  TrueBlue3 = 117,
+};
+
+///////////////////////////////////////////////////////////
+//HousingAppeal.exd
+enum class HousingAppeal : uint8_t
+{
+  None = 0,
+  Emporium = 1,
+  Boutique = 2,
+  DesignerHome = 3,
+  MessageBook = 4,
+  Tavern = 5,
+  Eatery = 6,
+  ImmersiveExperience = 7,
+  Cafe = 8,
+  Aquarium = 9,
+  Sanctum = 10,
+  Venue = 11,
+  Florist = 12,
+  Library = 14,
+  PhotoStudio = 15,
+  HauntedHouse = 16,
 };
 }
 }
