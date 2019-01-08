@@ -154,6 +154,7 @@ namespace Sapphire
 
     InstanceContentPtr getAsInstanceContent();
 
+    void updateSpawnPoints();
   };
 
 }
