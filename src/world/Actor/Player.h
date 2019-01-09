@@ -534,7 +534,7 @@ namespace Sapphire::Entity
     void teleportQuery( uint16_t aetheryteId, FrameworkPtr pFw );
 
     /*! prepares zoning / fades out the screen */
-    void prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadoutTime = 0, uint16_t animation = 0 );
+    void prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadeOutTime = 0, uint16_t animation = 0 );
 
     /*! get player's title list (available titles) */
     uint8_t* getTitleList();

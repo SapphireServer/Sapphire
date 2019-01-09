@@ -142,8 +142,11 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
       auto inRange = targetPlayer->getInRangeActors();
       for( auto actor : inRange )
       {
-        targetPlayer->despawn( actor->getAsPlayer() );
-        targetPlayer->spawn( actor->getAsPlayer() );
+        if( actor->isPlayer() )
+        {
+          targetPlayer->despawn( actor->getAsPlayer() );
+          targetPlayer->spawn( actor->getAsPlayer() );
+        }
       }
       break;
     }
@@ -155,8 +158,11 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
       auto inRange = targetPlayer->getInRangeActors();
       for( auto actor : inRange )
       {
-        targetPlayer->despawn( actor->getAsPlayer() );
-        targetPlayer->spawn( actor->getAsPlayer() );
+        if( actor->isPlayer() )
+        {
+          targetPlayer->despawn( actor->getAsPlayer() );
+          targetPlayer->spawn( actor->getAsPlayer() );
+        }
       }
       break;
     }
@@ -168,8 +174,11 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
       auto inRange = targetActor->getInRangeActors();
       for( auto actor : inRange )
       {
-        targetPlayer->despawn( actor->getAsPlayer() );
-        targetPlayer->spawn( actor->getAsPlayer() );
+        if( actor->isPlayer() )
+        {
+          targetPlayer->despawn( actor->getAsPlayer() );
+          targetPlayer->spawn( actor->getAsPlayer() );
+        }
       }
       break;
     }
@@ -230,8 +239,11 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
 
       for( auto actor : player.getInRangeActors() )
       {
-        player.despawn( actor->getAsPlayer() );
-        player.spawn( actor->getAsPlayer() );
+        if( actor->isPlayer() )
+        {
+          targetPlayer->despawn( actor->getAsPlayer() );
+          targetPlayer->spawn( actor->getAsPlayer() );
+        }
       }
       break;
     }
@@ -610,12 +622,25 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
     }
     case GmCommand::Jump:
     {
-      if( targetPlayer->getZoneId() != player.getZoneId() )
+      player.prepareZoning( targetPlayer->getZoneId(), true, 1, 0 );
+      if( player.getCurrentInstance() )
       {
-        player.setZone( targetPlayer->getZoneId() );
+        player.exitInstance();
+      }
+      if( targetPlayer->getCurrentZone()->getGuId() != player.getCurrentZone()->getGuId() )
+      {
+        // Checks if the target player is in an InstanceContent to avoid binding to a Zone or PublicContent
+        if( targetPlayer->getCurrentInstance() )
+        {
+          auto pInstanceContent = targetPlayer->getCurrentInstance()->getAsInstanceContent();
+          // Not sure if GMs actually get bound to an instance they jump to on retail. It's mostly here to avoid a crash for now
+          pInstanceContent->bindPlayer( player.getId() );
+        }
+        player.setInstance( targetPlayer->getCurrentZone()->getGuId() );
       }
       player.changePosition( targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z,
                              targetActor->getRot() );
+      player.sendZoneInPackets( 0x00, 0x00, 0, 0, false );
       player.sendNotice( "Jumping to {0}", targetPlayer->getName() );
       break;
     }
@@ -627,10 +652,17 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
         player.sendUrgent( "You are unable to call a player while bound to a battle instance." );
         return;
       }
-
-      targetPlayer->setInstance( player.getCurrentZone() );
-
+      targetPlayer->prepareZoning( player.getZoneId(), true, 1, 0 );
+      if( targetPlayer->getCurrentInstance() )
+      {
+        targetPlayer->exitInstance();
+      }
+      if( targetPlayer->getCurrentZone()->getGuId() != player.getCurrentZone()->getGuId() )
+      {
+        targetPlayer->setInstance( player.getCurrentZone()->getGuId() );
+      }
       targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
+      targetPlayer->sendZoneInPackets( 0x00, 0x00, 0, 0, false );
       player.sendNotice( "Calling {0}", targetPlayer->getName() );
       break;
     }
