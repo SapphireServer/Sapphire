@@ -81,7 +81,8 @@ private:
 
     player.playScene( getId(), 0, NO_DEFAULT_CAMERA | INVIS_ENPC |
                                   CONDITION_CUTSCENE | HIDE_UI |
-                                  HIDE_HOTBAR | SILENT_ENTER_TERRI_ENV, 0, 1, callback );
+                                  HIDE_HOTBAR | SILENT_ENTER_TERRI_ENV | SILENT_ENTER_TERRI_BGM | SILENT_ENTER_TERRI_SE |
+                                  DISABLE_SKIP | DISABLE_STEALTH, 0, 1, callback );
   }
 
   void Scene00001( Entity::Player& player )

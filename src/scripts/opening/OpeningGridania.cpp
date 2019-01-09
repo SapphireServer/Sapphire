@@ -56,8 +56,8 @@ private:
 
       auto item = player.addItem( itemId, 1, false, true );
 
-      if( item )
-        player.equipItem( Common::GearSetSlot::Ring2, item, true );
+      //if( item )
+      //  player.equipItem( Common::GearSetSlot::Ring2, item, true );
 
       player.setOpeningSequence( 1 );
       Scene00001( player );
@@ -65,12 +65,13 @@ private:
 
     player.playScene( getId(), 0, NO_DEFAULT_CAMERA | INVIS_ENPC |
                                   CONDITION_CUTSCENE | HIDE_UI |
-                                  HIDE_HOTBAR | SILENT_ENTER_TERRI_ENV, 0, 1, callback );
+                                  HIDE_HOTBAR | SILENT_ENTER_TERRI_ENV | SILENT_ENTER_TERRI_BGM | SILENT_ENTER_TERRI_SE |
+                                  DISABLE_SKIP | DISABLE_STEALTH, 0, 1, callback );
   }
 
   void Scene00001( Entity::Player& player )
   {
-    player.playScene( getId(), 1, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 1, 0x32 );
+    player.playScene( getId(), 1, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 0, 0 );
   }
 
   void Scene00020( Entity::Player& player )
