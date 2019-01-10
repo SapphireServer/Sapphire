@@ -151,7 +151,13 @@ bool Sapphire::World::Manager::HousingMgr::loadEstateInventories()
 
     // check if containerId exists, it always should - if it doesn't, something went wrong
     auto container = estateInv.find( containerId );
-    assert( container != estateInv.end() );
+    if( container == estateInv.end() )
+    {
+      Logger::warn( "Skipping item#{0} for ident#{1} - container#{2} doesn't exist for estate.",
+                    itemId, ident, containerId );
+
+      continue;
+    }
 
     container->second->setItem( slot, item );
 
