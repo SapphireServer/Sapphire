@@ -576,10 +576,10 @@ CREATE TABLE `zonepositions` (
 
 CREATE TABLE `landplaceditems` (
 	`ItemId` INT(20) UNSIGNED NOT NULL,
-	`PosX` INT(10) NOT NULL,
-	`PosY` INT(10) NOT NULL,
-	`PosZ` INT(10) NOT NULL,
-	`Rotation` INT(10) NOT NULL,
+	`PosX` FLOAT NOT NULL,
+	`PosY` FLOAT NOT NULL,
+	`PosZ` FLOAT NOT NULL,
+	`Rotation` FLOAT NOT NULL,
 	PRIMARY KEY (`ItemId`)
 )
 COLLATE='latin1_swedish_ci' ENGINE=InnoDB;
