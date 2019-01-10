@@ -139,9 +139,9 @@ bool Sapphire::World::Manager::HousingMgr::loadEstateInventories()
     if( isPlacedItemsInventory( static_cast< Common::InventoryType >( containerId ) ) )
     {
       item->setPos( {
-        res->getUInt16( "PosX" ),
-        res->getUInt16( "PosY" ),
-        res->getUInt16( "PosZ" )
+        res->getFloat( "PosX" ),
+        res->getFloat( "PosY" ),
+        res->getFloat( "PosZ" )
       } );
 
       item->setRot( res->getUInt16( "Rotation" ) );
@@ -1007,12 +1007,7 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceHousingItem( Sapphire::Entity
       return;
 
     // set params
-    item->setPos( {
-      Util::floatToUInt16( pos.x ),
-      Util::floatToUInt16( pos.y ),
-      Util::floatToUInt16( pos.z )
-    } );
-
+    item->setPos( pos );
     item->setRot( Util::floatToUInt16Rot( rotation ) );
   }
   else
@@ -1281,11 +1276,7 @@ bool Sapphire::World::Manager::HousingMgr::moveInternalItem( Entity::Player& pla
   if( !item )
     return false;
 
-  item->setPos( {
-    Util::floatToUInt16( pos.x ),
-    Util::floatToUInt16( pos.y ),
-    Util::floatToUInt16( pos.z )
-  } );
+  item->setPos( pos );
 
   item->setRot( Util::floatToUInt16Rot( rot ) );
 
@@ -1324,12 +1315,7 @@ bool Sapphire::World::Manager::HousingMgr::moveExternalItem( Entity::Player& pla
   if( !item )
     return false;
 
-  item->setPos( {
-    Util::floatToUInt16( pos.x ),
-    Util::floatToUInt16( pos.y ),
-    Util::floatToUInt16( pos.z )
-  } );
-
+  item->setPos( pos );
   item->setRot( Util::floatToUInt16Rot( rot ) );
 
   auto invMgr = framework()->get< InventoryMgr >();

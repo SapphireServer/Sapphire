@@ -1695,7 +1695,7 @@ struct FFXIVIpcHousingObjectMove : FFXIVIpcBasePacket< HousingObjectMove >
   uint16_t itemRotation;
   uint8_t objectArray;
   uint8_t landId;
-  Common::FFXIVARR_POSITION3_U16 pos;
+  Common::FFXIVARR_POSITION3 pos;
   uint16_t unknown1;
   uint16_t unknown2;
   uint16_t unknown3;
@@ -1726,7 +1726,7 @@ struct FFXIVIpcHousingInternalObjectSpawn : FFXIVIpcBasePacket< HousingInternalO
   uint8_t unk2;
   uint8_t pad2;
   uint16_t rotation;
-  Common::FFXIVARR_POSITION3_U16 pos;
+  Common::FFXIVARR_POSITION3 pos;
 };
 
 struct FFXIVIpcHousingIndoorInitialize : FFXIVIpcBasePacket< HousingIndoorInitialize >
