@@ -11,15 +11,15 @@ namespace Sapphire::Inventory
     HousingItem( uint64_t uId, uint32_t catalogId, FrameworkPtr pFw );
     virtual ~HousingItem() = default;
 
-    void setRot( uint16_t rot );
-    uint16_t getRot() const;
+    void setRot( float rot );
+    float getRot() const;
 
-    void setPos( Common::FFXIVARR_POSITION3_U16 pos );
-    Common::FFXIVARR_POSITION3_U16 getPos() const;
+    void setPos( Common::FFXIVARR_POSITION3 pos );
+    Common::FFXIVARR_POSITION3 getPos() const;
 
   private:
-    Common::FFXIVARR_POSITION3_U16 m_position;
-    uint16_t m_rotation;
+    Common::FFXIVARR_POSITION3 m_position;
+    float m_rotation;
   };
 }
 
