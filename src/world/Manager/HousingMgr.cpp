@@ -860,12 +860,12 @@ void Sapphire::World::Manager::HousingMgr::sendEstateInventory( Entity::Player& 
     return;
 
   auto& containers = getEstateInventory( targetLand->getLandIdent() );
-  auto needle = containers.find( inventoryType );
-  if( needle == containers.end() )
+  auto it = containers.find( inventoryType );
+  if( it == containers.end() )
     return;
 
   auto invMgr = framework()->get< Manager::InventoryMgr >();
-  invMgr->sendInventoryContainer( player, needle->second );
+  invMgr->sendInventoryContainer( player, it->second );
 }
 
 const Sapphire::World::Manager::HousingMgr::LandSetLandCacheMap&
@@ -1085,11 +1085,11 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceItemInStore( Sapphire::Entity
   {
     for( auto houseContainer : m_internalStoreroomContainers )
     {
-      auto needle = containers.find( houseContainer );
-      if( needle == containers.end() )
+      auto it = containers.find( houseContainer );
+      if( it == containers.end() )
         continue;
 
-      auto container = needle->second;
+      auto container = it->second;
       auto freeSlot = container->getFreeSlot();
       if( freeSlot == -1 )
       {
@@ -1157,11 +1157,11 @@ bool Sapphire::World::Manager::HousingMgr::placeInteriorItem( Entity::Player& pl
   uint8_t containerIdx = 0;
   for( auto containerId : m_internalPlacedItemContainers )
   {
-    auto needle = containers.find( containerId );
-    if( needle == containers.end() )
+    auto it = containers.find( containerId );
+    if( it == containers.end() )
       continue;
 
-    auto container = needle->second;
+    auto container = it->second;
     auto freeSlot = container->getFreeSlot();
     if( freeSlot == -1 )
     {
@@ -1272,11 +1272,11 @@ bool Sapphire::World::Manager::HousingMgr::moveInternalItem( Entity::Player& pla
 
   auto& containers = getEstateInventory( ident );
 
-  auto needle = containers.find( containerId );
-  if( needle == containers.end() )
+  auto it = containers.find( containerId );
+  if( it == containers.end() )
     return false;
 
-  auto container = needle->second;
+  auto container = it->second;
 
   auto item = std::dynamic_pointer_cast< Inventory::HousingItem >( container->getItem( slotIdx ) );
   if( !item )
@@ -1310,11 +1310,11 @@ bool Sapphire::World::Manager::HousingMgr::moveExternalItem( Entity::Player& pla
     return false;
 
   auto& containers = getEstateInventory( ident );
-  auto needle = containers.find( InventoryType::HousingExteriorPlacedItems );
-  if( needle == containers.end() )
+  auto it = containers.find( InventoryType::HousingExteriorPlacedItems );
+  if( it == containers.end() )
     return false;
 
-  auto container = needle->second;
+  auto container = it->second;
 
   auto item = std::dynamic_pointer_cast< Inventory::HousingItem >( container->getItem( slot ) );
   if( !item )
@@ -1394,11 +1394,11 @@ bool Sapphire::World::Manager::HousingMgr::removeInternalItem( Entity::Player& p
   // eg, remove a permit and reuse it elsewhere
   // I'm not going to bother fixing it for now, but worth noting for future reference
 
-  auto needle = containers.find( containerId );
-  if( needle == containers.end() )
+  auto it = containers.find( containerId );
+  if( it == containers.end() )
     return false;
 
-  auto container = needle->second;
+  auto container = it->second;
 
   auto item = std::dynamic_pointer_cast< Inventory::HousingItem >( container->getItem( slotId ) );
   if( !item )
@@ -1461,11 +1461,11 @@ bool Sapphire::World::Manager::HousingMgr::removeExternalItem( Entity::Player& p
 {
   auto& containers = getEstateInventory( land.getLandIdent() );
 
-  auto needle = containers.find( containerType );
-  if( needle == containers.end() )
+  auto it = containers.find( containerType );
+  if( it == containers.end() )
     return false;
 
-  auto& sourceContainer = needle->second;
+  auto& sourceContainer = it->second;
 
   auto item = std::dynamic_pointer_cast< Inventory::HousingItem >( sourceContainer->getItem( slotId ) );
   if( !item )
@@ -1522,11 +1522,11 @@ Sapphire::ItemContainerPtr Sapphire::World::Manager::HousingMgr::getFreeEstateIn
 
   for( auto bag : bagList )
   {
-    auto needle = estateContainers.find( bag );
-    if( needle == estateContainers.end() )
+    auto it = estateContainers.find( bag );
+    if( it == estateContainers.end() )
       continue;
 
-    auto container = needle->second;
+    auto container = it->second;
 
     auto freeSlot = container->getFreeSlot();
 
@@ -1554,13 +1554,13 @@ void Sapphire::World::Manager::HousingMgr::reqEstateExteriorRemodel( Sapphire::E
     return;
 
   auto& inv = getEstateInventory( land->getLandIdent() );
-  auto needle = inv.find( InventoryType::HousingExteriorAppearance );
-  if( needle == inv.end() )
+  auto it = inv.find( InventoryType::HousingExteriorAppearance );
+  if( it == inv.end() )
     return;
 
   auto invMgr = framework()->get< InventoryMgr >();
 
-  invMgr->sendInventoryContainer( player, needle->second );
+  invMgr->sendInventoryContainer( player, it->second );
 
   auto pkt = Server::makeActorControl143( player.getId(), Network::ActorControl::ShowEstateExternalAppearanceUI, plot );
   player.queuePacket( pkt );
@@ -1584,13 +1584,13 @@ void Sapphire::World::Manager::HousingMgr::reqEstateInteriorRemodel( Sapphire::E
     return;
 
   auto& inv = getEstateInventory( land->getLandIdent() );
-  auto needle = inv.find( InventoryType::HousingInteriorAppearance );
-  if( needle == inv.end() )
+  auto it = inv.find( InventoryType::HousingInteriorAppearance );
+  if( it == inv.end() )
     return;
 
   auto invMgr = framework()->get< InventoryMgr >();
 
-  invMgr->sendInventoryContainer( player, needle->second );
+  invMgr->sendInventoryContainer( player, it->second );
 
   auto pkt = Server::makeActorControl143( player.getId(), Network::ActorControl::ShowEstateInternalAppearanceUI );
   player.queuePacket( pkt );
