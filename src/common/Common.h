@@ -855,10 +855,9 @@ namespace Sapphire::Common
   struct HousingObject
   {
     uint32_t itemId;
-    uint16_t itemRotation;
+    uint32_t padding; // was itemrotation + unknown/pad, looks unused now
+    float rotation;
     Common::FFXIVARR_POSITION3 pos;
-    uint32_t unknown;
-    uint16_t padding;
   };
 
   enum HouseSize : uint8_t

@@ -202,7 +202,7 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::updateHousin
   auto& obj = m_housingObjects[ slot ];
 
   obj.pos = pos;
-  obj.itemRotation = rot;
+  obj.rotation = rot;
 
   // todo: how does this update on other clients?
 
@@ -213,7 +213,7 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::updateHousin
 
     auto moveObjPkt = makeZonePacket< Server::FFXIVIpcHousingObjectMove >( player.second->getId() );
 
-    moveObjPkt->data().itemRotation = obj.itemRotation;
+    moveObjPkt->data().itemRotation = obj.rotation;
     moveObjPkt->data().pos = obj.pos;
 
     // todo: how does this work when an item is in a slot >50 or u8 max? my guess is landid is the container index, but not sure...
