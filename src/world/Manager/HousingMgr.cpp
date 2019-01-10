@@ -144,7 +144,7 @@ bool Sapphire::World::Manager::HousingMgr::loadEstateInventories()
         res->getFloat( "PosZ" )
       } );
 
-      item->setRot( res->getUInt16( "Rotation" ) );
+      item->setRot( res->getFloat( "Rotation" ) );
     }
 
     ContainerIdToContainerMap& estateInv = m_estateInventories[ ident ];
@@ -1008,7 +1008,7 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceHousingItem( Sapphire::Entity
 
     // set params
     item->setPos( pos );
-    item->setRot( Util::floatToUInt16Rot( rotation ) );
+    item->setRot( rotation );
   }
   else
   {
@@ -1277,8 +1277,7 @@ bool Sapphire::World::Manager::HousingMgr::moveInternalItem( Entity::Player& pla
     return false;
 
   item->setPos( pos );
-
-  item->setRot( Util::floatToUInt16Rot( rot ) );
+  item->setRot( rot );
 
   // save
   auto invMgr = framework()->get< InventoryMgr >();
@@ -1316,7 +1315,7 @@ bool Sapphire::World::Manager::HousingMgr::moveExternalItem( Entity::Player& pla
     return false;
 
   item->setPos( pos );
-  item->setRot( Util::floatToUInt16Rot( rot ) );
+  item->setRot( rot );
 
   auto invMgr = framework()->get< InventoryMgr >();
   invMgr->updateHousingItemPosition( item );
