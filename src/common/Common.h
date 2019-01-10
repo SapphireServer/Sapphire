@@ -857,6 +857,8 @@ namespace Sapphire::Common
     uint32_t itemId;
     uint16_t itemRotation;
     Common::FFXIVARR_POSITION3 pos;
+    uint32_t unknown;
+    uint16_t padding;
   };
 
   enum HouseSize : uint8_t
