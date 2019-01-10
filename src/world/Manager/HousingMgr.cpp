@@ -1187,7 +1187,7 @@ Sapphire::Common::HousingObject Sapphire::World::Manager::HousingMgr::getYardObj
   Sapphire::Common::HousingObject obj {};
 
   obj.pos = item->getPos();
-  obj.itemRotation = item->getRot();
+  obj.rotation = item->getRot();
   obj.itemId = item->getAdditionalData();
 
   return obj;
