@@ -196,7 +196,7 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::spawnHousing
 
 void Sapphire::World::Territory::Housing::HousingInteriorTerritory::updateHousingObjectPosition( Entity::Player& sourcePlayer,
                                                                                                  uint16_t slot,
-                                                                                                 Common::FFXIVARR_POSITION3_U16 pos,
+                                                                                                 Common::FFXIVARR_POSITION3 pos,
                                                                                                  uint16_t rot )
 {
   auto& obj = m_housingObjects[ slot ];
