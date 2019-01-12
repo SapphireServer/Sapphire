@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <vector>
 #include <time.h>
+#include <random>
 
 #include <Logging/Logger.h>
 #include <Util/Util.h>
@@ -53,7 +54,8 @@ Sapphire::Zone::Zone() :
   m_currentWeather( Weather::FairSkies ),
   m_weatherOverride( Weather::None ),
   m_lastMobUpdate( 0 ),
-  m_nextEObjId( 0x400D0000 )
+  m_nextEObjId( 0x400D0000 ),
+  m_nextActorId( 0x500D0000 )
 {
 }
 
@@ -741,6 +743,12 @@ uint32_t Sapphire::Zone::getNextEObjId()
   return ++m_nextEObjId;
 }
 
+uint32_t Sapphire::Zone::getNextActorId()
+{
+  return ++m_nextActorId;
+}
+
+
 Sapphire::Entity::EventObjectPtr Sapphire::Zone::registerEObj( const std::string& name, uint32_t objectId, uint32_t mapLink,
                                                                uint8_t state, FFXIVARR_POSITION3 pos, float scale,
                                                                float rotation )
@@ -804,6 +812,10 @@ bool Sapphire::Zone::loadSpawnGroups()
 
 void Sapphire::Zone::updateSpawnPoints()
 {
+  std::random_device rd;
+  std::mt19937 mt( rd() );
+  std::uniform_real_distribution< float > dist( 0.0, PI * 2 );
+
   for( auto& group : m_spawnGroups )
   {
     for( auto& point : group.getSpawnPointList() )
@@ -820,12 +832,14 @@ void Sapphire::Zone::updateSpawnPoints()
           continue;
         }
 
-        //Logger::error( "No template found for templateId#{0}", group.getTemplateId() );
+        uint32_t random = rand() % 20;
 
-        auto pBNpc = std::make_shared< Entity::BNpc >( bNpcTemplate,
+        auto pBNpc = std::make_shared< Entity::BNpc >( getNextActorId(),
+                                                       bNpcTemplate,
                                                        point->getPosX(),
                                                        point->getPosY(),
                                                        point->getPosZ(),
+                                                       dist( mt ),
                                                        group.getLevel(),
                                                        group.getMaxHp(), m_pFw );
         point->setLinkedBNpc( pBNpc );
