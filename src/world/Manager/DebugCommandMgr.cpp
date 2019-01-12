@@ -432,13 +432,16 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
       player.sendNotice( "Template {0} not found in cache!", params );
       return;
     }
-    auto pBNpc = std::make_shared< Entity::BNpc >( bNpcTemplate,
+    auto playerZone = player.getCurrentZone();
+    auto pBNpc = std::make_shared< Entity::BNpc >( playerZone->getNextActorId(),
+                                                   bNpcTemplate,
                                                    player.getPos().x,
                                                    player.getPos().y,
                                                    player.getPos().z,
+                                                   player.getRot(),
                                                    1, 1000, framework() );
 
-    auto playerZone = player.getCurrentZone();
+
 
     //pBNpc->setCurrentZone( playerZone );
     //pBNpc->setPos( player.getPos().x, player.getPos().y, player.getPos().z );

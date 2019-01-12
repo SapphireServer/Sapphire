@@ -57,6 +57,7 @@ namespace Sapphire
     std::map< uint8_t, int32_t > m_weatherRateMap;
 
     uint32_t m_nextEObjId;
+    uint32_t m_nextActorId;
     FrameworkPtr m_pFw;
 
     std::vector< Entity::SpawnGroup > m_spawnGroups;
@@ -127,6 +128,8 @@ namespace Sapphire
     uint32_t getGuId() const;
 
     uint32_t getNextEObjId();
+
+    uint32_t getNextActorId();
 
     const std::string& getName() const;
 
