@@ -884,16 +884,16 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket< InitUI >
   unsigned char unknownMask673[10];
   unsigned char unknownMask5DD[28];
   unsigned char relicCompletion[12];
-  unsigned char unknown694[26];
+  unsigned char sightseeingMask[26];
   unsigned char huntingMarkMask[55];
   unsigned char tripleTriadCards[32];
-  unsigned char animaCompletion[11];
+  unsigned char u12[11];
   unsigned char u13;
   unsigned char aetherCurrentMask[22];
   unsigned char u10[3];
   unsigned char orchestrionMask[40];
-  unsigned char u11[3];
-  unsigned char u12[11];
+  unsigned char hallOfNoviceCompletion[3];
+  unsigned char animaCompletion[11];
   unsigned char u14[16];
   unsigned char u15[13];
   unsigned char unlockedRaids[28];
@@ -910,7 +910,6 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket< InitUI >
   unsigned short fishingRecordsFishWeight[26];
   unsigned int exploratoryMissionNextTimestamp;
   unsigned char pvpLevel;
-  unsigned char sightseeingMask[26];
 };
 
 
