@@ -853,7 +853,8 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket< InitUI >
   unsigned char companionDefRank;
   unsigned char companionAttRank;
   unsigned char companionHealRank;
-  unsigned char unknown21A[19];
+  unsigned char u19[2];
+  unsigned char mountGuideMask[17];
   char name[32];
   unsigned char unknownOword[16];
   unsigned char unknownOw;
@@ -906,7 +907,6 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket< InitUI >
   unsigned char clearedGuildhests[10];
   unsigned char clearedTrials[8];
   unsigned char clearedPvp[5];
-  unsigned char mountGuideMask[17];
   unsigned short fishingRecordsFishWeight[26];
   unsigned int exploratoryMissionNextTimestamp;
   unsigned char pvpLevel;
@@ -917,8 +917,7 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket< InitUI >
 * Structural representation of the packet sent by the server
 * to set a players stats
 */
-struct FFXIVIpcPlayerStats :
-  FFXIVIpcBasePacket< PlayerStats >
+struct FFXIVIpcPlayerStats : FFXIVIpcBasePacket< PlayerStats >
 {
   uint32_t strength;
   uint32_t dexterity;
