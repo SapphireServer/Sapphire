@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include "Util/LockedWaitQueue.h"
+#include "DbCommon.h"
 
 namespace Mysql
 {
@@ -29,17 +30,6 @@ namespace Sapphire::Db
     CONNECTION_ASYNC = 0x1,
     CONNECTION_SYNC = 0x2,
     CONNECTION_BOTH = CONNECTION_ASYNC | CONNECTION_SYNC
-  };
-
-  struct ConnectionInfo
-  {
-    std::string user;
-    std::string password;
-    std::string database;
-    std::string host;
-    uint16_t port;
-    uint8_t syncThreads;
-    uint8_t asyncThreads;
   };
 
   using PreparedStatementMap = std::map< uint32_t, std::pair< std::string, ConnectionFlags > >;

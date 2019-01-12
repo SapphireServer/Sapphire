@@ -185,7 +185,7 @@ enum ActorControlType : uint16_t
     LogMsg = 0x205,                 // LogMessage?
     AchievementMsg = 0x206,
 
-    SetItemLevel = 0x209,
+    SetItemLevel = 0x207, //updated 4.5 ( 0x209 before )
 
     ChallengeEntryCompleteMsg = 0x20B,
     ChallengeEntryUnlockMsg = 0x20C,

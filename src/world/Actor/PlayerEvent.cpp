@@ -1,7 +1,6 @@
 #include <Common.h>
 #include <Logging/Logger.h>
 #include <Network/PacketContainer.h>
-#include <Config/ConfigMgr.h>
 
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ActorControlPacket142.h"
@@ -326,8 +325,8 @@ void Sapphire::Entity::Player::eventItemActionStart( uint32_t eventId,
 
 void Sapphire::Entity::Player::onLogin()
 {
-  auto pConfig = m_pFw->get< ConfigMgr >();
-  auto motd = pConfig->getValue< std::string >( "General", "MotD", "" );
+  auto pServerMgr = m_pFw->get< Sapphire::World::ServerMgr >();
+  auto motd = pServerMgr->getConfig().motd;
 
   std::istringstream ss( motd );
   std::string msg;

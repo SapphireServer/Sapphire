@@ -336,12 +336,13 @@ int dumpSpawns()
                       instance.level, instance.hPMax );
         //Logger::info( "|----> " + name + " - " + std::to_string( instance.bNPCBase ) + ", " + std::to_string( instance.gimmickId ) );
 
-        output += "INSERT INTO `spawnpoint` ( `spawngroupid`, `x`, `y`, `z`, `r` ) "
+        output += "INSERT INTO `spawnpoint` ( `spawngroupid`, `x`, `y`, `z`, `r`, `gimmickId` ) "
                   " VALUES ( @last_id_spawngroup, " +
                   std::to_string( instance.posX ) + ", " +
                   std::to_string( instance.posY ) + ", " +
                   std::to_string( instance.posZ ) + ", " +
-                  std::to_string( 0 ) + " ); ";
+                  std::to_string( 0 ) +  ", " +
+                  std::to_string( instance.gimmickId ) + " ); ";
 
         //Logger::info( output );
 

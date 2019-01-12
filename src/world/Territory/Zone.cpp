@@ -435,6 +435,7 @@ bool Sapphire::Zone::update( uint32_t currTime )
   //updateBnpcs( tickCount );
   onUpdate( currTime );
 
+  updateSpawnPoints();
   return true;
 }
 
@@ -770,12 +771,68 @@ bool Sapphire::Zone::loadSpawnGroups()
     uint32_t level = res->getUInt( 3 );
     uint32_t maxHp = res->getUInt( 4 );
 
-    //Entity::SpawnGroup group;
+    m_spawnGroups.emplace_back( id, templateId, level, maxHp );
 
-
-    Logger::debug( "id: {0}, template: {1}, level: {2}, maxHp: {3}", id, templateId, level, maxHp );
-
+    Logger::debug( "id: {0}, template: {1}, level: {2}, maxHp: {3}", id, m_spawnGroups.back().getTemplateId(), level, maxHp );
   }
 
+  res.reset();
+  stmt.reset();
+
+  stmt = pDb->getPreparedStatement( Db::ZoneDbStatements::ZONE_SEL_SPAWNPOINTS );
+  for( auto& group : m_spawnGroups )
+  {
+    stmt->setUInt( 1, group.getId() );
+    auto res = pDb->query( stmt );
+
+    while( res->next() )
+    {
+      uint32_t id = res->getUInt( 1 );
+      float x = res->getFloat( 2 );
+      float y = res->getFloat( 3 );
+      float z = res->getFloat( 4 );
+      float r = res->getFloat( 5 );
+      uint32_t gimmickId = res->getUInt( 6 );
+
+      group.getSpawnPointList().push_back( std::make_shared< Entity::SpawnPoint >( x, y, z, r, gimmickId ) );
+
+      Logger::debug( "id: {0}, x: {1}, y: {2}, z: {3}, gimmickId: {4}", id, x, y, z, gimmickId );
+    }
+  }
   return false;
+}
+
+void Sapphire::Zone::updateSpawnPoints()
+{
+  for( auto& group : m_spawnGroups )
+  {
+    for( auto& point : group.getSpawnPointList() )
+    {
+      if( !point->getLinkedBNpc() && ( Util::getTimeSeconds() - point->getTimeOfDeath() ) > 60 )
+      {
+        auto serverZone = m_pFw->get< World::ServerMgr >();
+
+        auto bNpcTemplate = serverZone->getBNpcTemplate( group.getTemplateId() );
+
+        if( !bNpcTemplate )
+        {
+          //Logger::error( "No template found for templateId#{0}", group.getTemplateId() );
+          continue;
+        }
+
+        //Logger::error( "No template found for templateId#{0}", group.getTemplateId() );
+
+        auto pBNpc = std::make_shared< Entity::BNpc >( bNpcTemplate,
+                                                       point->getPosX(),
+                                                       point->getPosY(),
+                                                       point->getPosZ(),
+                                                       group.getLevel(),
+                                                       group.getMaxHp(), m_pFw );
+        point->setLinkedBNpc( pBNpc );
+
+        pushActor( pBNpc );
+      }
+    }
+  }
+
 }

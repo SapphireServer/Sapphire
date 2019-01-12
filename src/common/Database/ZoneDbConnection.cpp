@@ -190,7 +190,7 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     CONNECTION_BOTH );
   
   prepareStatement( ZONE_SEL_SPAWNPOINTS,
-                    "SELECT id, x, y, z, r "
+                    "SELECT id, x, y, z, r, gimmickId "
                     "FROM spawnpoint "
                     "WHERE spawnGroupId = ?",
                     CONNECTION_BOTH );
