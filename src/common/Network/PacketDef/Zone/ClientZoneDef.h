@@ -29,8 +29,9 @@ struct FFXIVIpcGmCommand2 :
   /* 0008 */ uint32_t param2;
   /* 000C */ uint32_t param3;
   /* 0010 */ uint32_t param4;
-  /* 0014 */ char target[0x20];
-  /* 0034 */ uint32_t unknown1;
+  /* 0014 */ uint16_t worldId;
+  /* 0016 */ char target[0x20];
+  /* 0036 */ uint16_t unknown1;
 };
 
 struct FFXIVIpcClientTrigger :
