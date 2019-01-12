@@ -21,7 +21,7 @@ struct FFXIVIpcTell :
   uint16_t u2b;
   uint8_t preName;
   uint8_t u3a;
-  uint8_t u3b; //Setting this to 1 seems to mark the tell as a GM tell (More research needed)
+  bool isGm;
   char receipientName[32];
   char msg[1031];
 };

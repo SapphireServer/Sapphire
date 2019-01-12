@@ -9,7 +9,7 @@
 #include "Forwards.h"
 #include "ItemContainer.h"
 
-Sapphire::ItemContainer::ItemContainer( uint16_t storageId, uint16_t maxSize, const std::string& tableName,
+Sapphire::ItemContainer::ItemContainer( uint16_t storageId, uint8_t maxSize, const std::string& tableName,
                                         bool isMultiStorage, FrameworkPtr pFw, bool isPersistentStorage ) :
   m_id( storageId ),
   m_size( maxSize ),
@@ -31,15 +31,15 @@ uint16_t Sapphire::ItemContainer::getId() const
   return m_id;
 }
 
-uint16_t Sapphire::ItemContainer::getEntryCount() const
+uint8_t Sapphire::ItemContainer::getEntryCount() const
 {
-  return static_cast< uint16_t >( m_itemMap.size() );
+  return static_cast< uint8_t >( m_itemMap.size() );
 }
 
-void Sapphire::ItemContainer::removeItem( uint16_t slotId, bool removeFromDb )
+void Sapphire::ItemContainer::removeItem( uint8_t slotId, bool removeFromDb )
 {
   auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  ItemMap::iterator it = m_itemMap.find( slotId );
+  auto it = m_itemMap.find( slotId );
 
   if( it != m_itemMap.end() )
   {
@@ -66,7 +66,7 @@ const Sapphire::ItemMap& Sapphire::ItemContainer::getItemMap() const
   return m_itemMap;
 }
 
-int16_t Sapphire::ItemContainer::getFreeSlot()
+int8_t Sapphire::ItemContainer::getFreeSlot()
 {
   for( uint16_t slotId = 0; slotId < m_size; slotId++ )
   {
@@ -78,7 +78,7 @@ int16_t Sapphire::ItemContainer::getFreeSlot()
   return -1;
 }
 
-Sapphire::ItemPtr Sapphire::ItemContainer::getItem( uint16_t slotId )
+Sapphire::ItemPtr Sapphire::ItemContainer::getItem( uint8_t slotId )
 {
 
   if( ( slotId > m_size ) )
@@ -90,7 +90,7 @@ Sapphire::ItemPtr Sapphire::ItemContainer::getItem( uint16_t slotId )
   return m_itemMap[ slotId ];
 }
 
-void Sapphire::ItemContainer::setItem( uint16_t slotId, ItemPtr pItem )
+void Sapphire::ItemContainer::setItem( uint8_t slotId, ItemPtr pItem )
 {
   if( slotId > m_size )
     return;
@@ -98,7 +98,7 @@ void Sapphire::ItemContainer::setItem( uint16_t slotId, ItemPtr pItem )
   m_itemMap[ slotId ] = pItem;
 }
 
-uint16_t Sapphire::ItemContainer::getMaxSize() const
+uint8_t Sapphire::ItemContainer::getMaxSize() const
 {
   return m_size;
 }

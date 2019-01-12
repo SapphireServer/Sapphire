@@ -353,7 +353,7 @@ void Sapphire::HousingZone::spawnYardObject( uint8_t landId, uint16_t slotId, In
   Common::HousingObject obj {};
 
   obj.itemId = item.getAdditionalData();
-  obj.itemRotation = item.getRot();
+  obj.rotation = item.getRot();
 
   obj.pos = item.getPos();
 
@@ -383,7 +383,7 @@ void Sapphire::HousingZone::updateYardObjectPos( Entity::Player& sourcePlayer, u
 
   auto& obj = m_yardObjects[ yardMapIndex ][ offset ];
 
-  obj.itemRotation = item.getRot();
+  obj.rotation = item.getRot();
   obj.pos = item.getPos();
 
   for( const auto& player : m_playerMap )

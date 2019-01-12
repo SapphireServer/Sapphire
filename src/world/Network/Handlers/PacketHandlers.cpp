@@ -656,6 +656,10 @@ void Sapphire::Network::GameConnection::tellHandler( FrameworkPtr pFw,
   //tellPacket.data().u1 = 0x92CD7337;
   //tellPacket.data().u2a = 0x2E;
   //tellPacket.data().u2b = 0x40;
+  if( player.isActingAsGm() )
+  {
+    tellPacket->data().isGm = true;
+  }
   pTargetPlayer->queueChatPacket( tellPacket );
 
 }

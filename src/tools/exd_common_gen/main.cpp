@@ -21,8 +21,7 @@ Sapphire::Data::ExdDataGenerated g_exdData;
 using namespace Sapphire;
 
 //const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
-const std::string datLocation(
-  "C:\\Data\\Games\\Final Fantasy XIV\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv" );
+const std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
 
 std::string generateEnum( const std::string& exd, int8_t nameIndex, const std::string& type, bool useLang = true )
 {

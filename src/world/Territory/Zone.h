@@ -59,6 +59,8 @@ namespace Sapphire
     uint32_t m_nextEObjId;
     FrameworkPtr m_pFw;
 
+    std::vector< Entity::SpawnGroup > m_spawnGroups;
+
   public:
     Zone();
 
@@ -152,6 +154,7 @@ namespace Sapphire
 
     InstanceContentPtr getAsInstanceContent();
 
+    void updateSpawnPoints();
   };
 
 }
