@@ -147,12 +147,16 @@ struct FFXIVIpcSetSearchInfo :
   /* 0012 */ char searchComment[193];
 };
 
-struct FFXIVIpcTellHandler :
-  FFXIVIpcBasePacket< TellReq >
+struct FFXIVIpcTellHandler : FFXIVIpcBasePacket< TellReq >
 {
-  /* 0000 */ char pad_0000[4];
+  uint64_t contentId;
+  uint16_t worldId;
+  uint16_t u0A;
+  uint32_t u0C;
+  uint16_t worldId1;
+  uint8_t preName;
   /* 0004 */ char targetPCName[32];
-  /* 0024 */ char message[1012];
+  /* 0024 */ char message[1029];
 };
 
 struct FFXIVIpcChatHandler :
