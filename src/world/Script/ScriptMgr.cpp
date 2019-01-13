@@ -155,7 +155,6 @@ void Sapphire::Scripting::ScriptMgr::onPlayerFirstEnterWorld( Entity::Player& pl
 //   catch( const std::exception &e )
 //   {
 //      std::string what = e.what();
-//      g_log.Log( LoggingSeverity::error, what );
 //   }
 }
 

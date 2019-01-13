@@ -276,7 +276,6 @@ void Sapphire::Network::GameConnection::handlePacket( Sapphire::Network::Packets
 
 void Sapphire::Network::GameConnection::sendPackets( Packets::PacketContainer* pPacket )
 {
-  //g_log.Log(LoggingSeverity::info, pPacket->toString());
   std::vector< uint8_t > sendBuffer;
 
   pPacket->fillSendBuffer( sendBuffer );
