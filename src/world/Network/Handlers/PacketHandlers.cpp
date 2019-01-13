@@ -652,13 +652,16 @@ void Sapphire::Network::GameConnection::tellHandler( FrameworkPtr pFw,
   auto tellPacket = makeChatPacket< FFXIVIpcTell >( player.getId() );
   strcpy( tellPacket->data().msg, packet.data().message );
   strcpy( tellPacket->data().receipientName, player.getName().c_str() );
+  // TODO: world id from server
+  tellPacket->data().contentId = player.getContentId();
+  tellPacket->data().worldId = 67;
   // TODO: do these have a meaning?
   //tellPacket.data().u1 = 0x92CD7337;
   //tellPacket.data().u2a = 0x2E;
   //tellPacket.data().u2b = 0x40;
   if( player.isActingAsGm() )
   {
-    tellPacket->data().isGm = true;
+    //tellPacket->data().isGm = true;
   }
   pTargetPlayer->queueChatPacket( tellPacket );
 
