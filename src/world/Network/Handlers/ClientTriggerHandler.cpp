@@ -294,7 +294,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     }
     case ClientTriggerType::RequestInstanceLeave:
     {
-      // todo: apply cf penalty if applicable, make sure player isnt in combat
+      // todo: apply cf penalty if applicable, make sure player isn't in combat
       player.exitInstance();
       break;
     }

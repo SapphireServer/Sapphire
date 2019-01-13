@@ -1563,6 +1563,11 @@ struct FFXIVIpcDirectorVars : FFXIVIpcBasePacket< DirectorVars >
   uint8_t m_branch;
   /*! raw storage for flags/vars */
   uint8_t m_unionData[10];
+  /*! unknown */
+  uint16_t u20;
+  uint16_t u22;
+  uint16_t u24;
+  uint16_t u28;
 };
 
 
