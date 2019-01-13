@@ -158,7 +158,7 @@ struct FFXIVIpcServerNotice :
   FFXIVIpcBasePacket< ServerNotice >
 {
   /* 0000 */ uint8_t padding;
-  char message[307];
+  char message[775];
 };
 
 struct FFXIVIpcSetOnlineStatus :
@@ -482,10 +482,8 @@ struct FFXIVIpcPlayerSpawn :
 {
   uint16_t title;
   uint16_t u1b;
-  uint8_t u2b;
-  uint8_t u2ab;
-  uint8_t u3a;
-  uint8_t u3b;
+  uint16_t currentWorldId;
+  uint16_t homeWorldId;
 
   uint8_t gmRank;
   uint8_t u3c;
@@ -759,7 +757,9 @@ struct FFXIVIpcInitZone : FFXIVIpcBasePacket< InitZone >
   uint32_t unknown9;
   uint32_t unknown10;
   uint32_t unknown11;
+  uint32_t unknown12[4];
   Common::FFXIVARR_POSITION3 pos;
+  uint32_t unknown13;
 };
 
 
@@ -833,70 +833,70 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket< InitUI >
   unsigned char unknown95[10];
   unsigned char unknown9F[2];
   unsigned char unknownA1[3];
-  unsigned int exp[25];
+  unsigned int exp[26];
   unsigned int unknown108;
   unsigned int pvpTotalExp;
   unsigned int unknownPvp110;
   unsigned int pvpExp;
   unsigned int pvpFrontlineOverallRanks[3];
-  unsigned int exploratoryMissionNextTimestamp;
-  unsigned short levels[25];
+  unsigned short levels[26];
   unsigned short unknown15C[9];
+  unsigned short u1;
+  unsigned short u2;
+  unsigned short unknown112[23];
   unsigned short fishingRecordsFish[26];
-  unsigned short fishingRecordsFishWeight[26];
   unsigned short beastExp[11];
   unsigned short unknown1EA[5];
   unsigned short pvpFrontlineWeeklyRanks[3];
-  unsigned short unknownMask1FA[3];
+  unsigned short unknownMask1FA[4];
   unsigned char companionName[21];
   unsigned char companionDefRank;
   unsigned char companionAttRank;
   unsigned char companionHealRank;
+  unsigned char u19[2];
   unsigned char mountGuideMask[17];
   char name[32];
   unsigned char unknownOword[16];
-  unsigned char unknown258;
+  unsigned char unknownOw;
   unsigned char unlockBitmask[64];
   unsigned char aetheryte[17];
   unsigned char discovery[421];
-  unsigned char howto[33];
-  unsigned char minions[40];
+  unsigned char howto[34];
+  unsigned char minions[42];
   unsigned char chocoboTaxiMask[8];
-  unsigned char watchedCutscenes[115];
+  unsigned char watchedCutscenes[118];
   unsigned char companionBardingMask[9];
   unsigned char companionEquippedHead;
   unsigned char companionEquippedBody;
   unsigned char companionEquippedLegs;
-  unsigned char unknown519[4];
-  unsigned char unknownMask51D[11];
+  unsigned char unknown52A[4];
+  unsigned char unknownMask52E[11];
   unsigned char fishingGuideMask[89];
   unsigned char fishingSpotVisited[25];
   unsigned char unknown59A[15];
-  unsigned char unknown5A9[2];
-  unsigned char unknownPvp5AB[2];
-  unsigned char pvpLevel;
+  unsigned char unknown5A9[5];
   unsigned char beastRank[11];
-  unsigned char unknown5B9[11];
+  unsigned char unknownPvp5AB[11];
+  unsigned char unknown5B9[5];
+  unsigned char unknown5B91;
   unsigned char pose;
-  unsigned char weaponPose;
-  unsigned char unknownMask5C4[3];
-  unsigned char unknown5C9[2];
   unsigned char challengeLogComplete[9];
-  unsigned char unknown5D4[11];
+  unsigned char weaponPose;
+  unsigned char unknownMask673[10];
   unsigned char unknownMask5DD[28];
   unsigned char relicCompletion[12];
   unsigned char sightseeingMask[26];
   unsigned char huntingMarkMask[55];
-  unsigned char tripleTriadCards[30];
-  unsigned char unknownMask673[10];
-  unsigned char unknown67D;
+  unsigned char tripleTriadCards[32];
+  unsigned char u12[11];
+  unsigned char u13;
   unsigned char aetherCurrentMask[22];
-  unsigned char unknown694[3];
+  unsigned char u10[3];
   unsigned char orchestrionMask[40];
-  unsigned char hallOfNoviceCompleteMask[3];
+  unsigned char hallOfNoviceCompletion[3];
   unsigned char animaCompletion[11];
-  unsigned char unknown6CD[16];
-  unsigned char unknownMask6DB[11];
+  unsigned char u14[16];
+  unsigned char u15[13];
   unsigned char unlockedRaids[28];
   unsigned char unlockedDungeons[18];
   unsigned char unlockedGuildhests[10];
@@ -907,15 +907,17 @@ struct FFXIVIpcInitUI : FFXIVIpcBasePacket< InitUI >
   unsigned char clearedGuildhests[10];
   unsigned char clearedTrials[8];
   unsigned char clearedPvp[5];
-
+  unsigned short fishingRecordsFishWeight[26];
+  unsigned int exploratoryMissionNextTimestamp;
+  unsigned char pvpLevel;
 };
+
 
 /**
 * Structural representation of the packet sent by the server
 * to set a players stats
 */
-struct FFXIVIpcPlayerStats :
-  FFXIVIpcBasePacket< PlayerStats >
+struct FFXIVIpcPlayerStats : FFXIVIpcBasePacket< PlayerStats >
 {
   uint32_t strength;
   uint32_t dexterity;
@@ -1439,7 +1441,7 @@ struct FFXIVIpcPrepareZoning :
   uint8_t fadeOut;
   uint8_t param7;
   uint8_t fadeOutTime;
-  uint8_t unknown;
+  uint8_t unknown; // this changes whether or not the destination zone's name displays during the loading screen. Seems to always be 9 (=hidden) when going to an instance and certain zones, 0 otherwise.
   uint16_t padding;
 };
 
@@ -1561,6 +1563,11 @@ struct FFXIVIpcDirectorVars : FFXIVIpcBasePacket< DirectorVars >
   uint8_t m_branch;
   /*! raw storage for flags/vars */
   uint8_t m_unionData[10];
+  /*! unknown */
+  uint16_t u20;
+  uint16_t u22;
+  uint16_t u24;
+  uint16_t u28;
 };
 
 
@@ -1692,7 +1699,7 @@ struct FFXIVIpcHousingObjectMove : FFXIVIpcBasePacket< HousingObjectMove >
   uint16_t itemRotation;
   uint8_t objectArray;
   uint8_t landId;
-  Common::FFXIVARR_POSITION3_U16 pos;
+  Common::FFXIVARR_POSITION3 pos;
   uint16_t unknown1;
   uint16_t unknown2;
   uint16_t unknown3;
@@ -1723,7 +1730,7 @@ struct FFXIVIpcHousingInternalObjectSpawn : FFXIVIpcBasePacket< HousingInternalO
   uint8_t unk2;
   uint8_t pad2;
   uint16_t rotation;
-  Common::FFXIVARR_POSITION3_U16 pos;
+  Common::FFXIVARR_POSITION3 pos;
 };
 
 struct FFXIVIpcHousingIndoorInitialize : FFXIVIpcBasePacket< HousingIndoorInitialize >

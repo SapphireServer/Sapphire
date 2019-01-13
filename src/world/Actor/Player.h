@@ -534,7 +534,7 @@ namespace Sapphire::Entity
     void teleportQuery( uint16_t aetheryteId, FrameworkPtr pFw );
 
     /*! prepares zoning / fades out the screen */
-    void prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadoutTime = 0, uint16_t animation = 0 );
+    void prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadeOutTime = 0, uint16_t animation = 0 );
 
     /*! get player's title list (available titles) */
     uint8_t* getTitleList();
@@ -1013,8 +1013,8 @@ namespace Sapphire::Entity
     uint8_t m_discovery[421];
     uint32_t m_playTime;
 
-    uint16_t m_classArray[25];
-    uint32_t m_expArray[25];
+    uint16_t m_classArray[26];
+    uint32_t m_expArray[26];
     uint8_t m_aetheryte[17];
     uint8_t m_unlocks[64];
     uint8_t m_orchestrion[40];

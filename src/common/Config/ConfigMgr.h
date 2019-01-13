@@ -6,6 +6,7 @@
 #include <inih/INIReader.h>
 #include <string>
 #include <stdint.h>
+#include "ConfigDef.h"
 
 namespace Sapphire
 {
@@ -13,10 +14,10 @@ namespace Sapphire
     {
     public:
       ConfigMgr() = default;
-
       ~ConfigMgr() = default;
 
       bool loadConfig( const std::string& configName );
+      bool loadGlobalConfig( Common::Config::GlobalConfig& config, const std::string& configName = "global.ini" );
 
       template< class T > struct always_false : std::false_type {};
 

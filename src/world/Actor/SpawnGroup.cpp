@@ -20,7 +20,7 @@ uint32_t Sapphire::Entity::SpawnGroup::getTemplateId() const
   return m_bNpcTemplateId;
 }
 
-uint32_t Sapphire::Entity::SpawnGroup::getLevelId() const
+uint32_t Sapphire::Entity::SpawnGroup::getLevel() const
 {
   return m_level;
 }

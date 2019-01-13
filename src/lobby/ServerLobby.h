@@ -4,6 +4,7 @@
 #include <map>
 #include <memory>
 
+#include <Config/ConfigDef.h>
 #include "Forwards.h"
 
 const std::string LOBBY_VERSION = "0.0.5";
@@ -44,11 +45,13 @@ namespace Sapphire
       m_sessionMap[ std::string( sessionId ) ] = pSession;
     }
 
-    std::shared_ptr< ConfigMgr > getConfig() const;
+    Sapphire::Common::Config::LobbyConfig& getConfig();
 
     LobbySessionPtr getSession( char* sessionId );
 
     uint32_t m_numConnections;
+
+    Sapphire::Common::Config::LobbyConfig m_config;
 
   };
 

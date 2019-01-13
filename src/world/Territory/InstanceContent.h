@@ -64,6 +64,8 @@ public:
 
   void endEventCutscene();
 
+  void clearDirector( Entity::Player& player );
+
   /*! set the current bgm index (inside bgm.exd) */
   void setCurrentBGM( uint16_t bgmId );
 

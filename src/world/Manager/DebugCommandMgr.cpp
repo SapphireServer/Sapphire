@@ -432,13 +432,16 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
       player.sendNotice( "Template {0} not found in cache!", params );
       return;
     }
-    auto pBNpc = std::make_shared< Entity::BNpc >( bNpcTemplate,
+    auto playerZone = player.getCurrentZone();
+    auto pBNpc = std::make_shared< Entity::BNpc >( playerZone->getNextActorId(),
+                                                   bNpcTemplate,
                                                    player.getPos().x,
                                                    player.getPos().y,
                                                    player.getPos().z,
-                                                   1, framework() );
+                                                   player.getRot(),
+                                                   1, 1000, framework() );
 
-    auto playerZone = player.getCurrentZone();
+
 
     //pBNpc->setCurrentZone( playerZone );
     //pBNpc->setPos( player.getPos().x, player.getPos().y, player.getPos().z );
@@ -791,14 +794,14 @@ Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Player&
 
   if( subCommand == "create" || subCommand == "cr" )
   {
-    uint32_t instanceContentId;
-    sscanf( params.c_str(), "%d", &instanceContentId );
+    uint32_t contentFinderConditionId;
+    sscanf( params.c_str(), "%d", &contentFinderConditionId );
 
-    auto instance = pTeriMgr->createInstanceContent( instanceContentId );
+    auto instance = pTeriMgr->createInstanceContent( contentFinderConditionId );
     if( instance )
       player.sendDebug( "Created instance with id#{0} -> {1}", instance->getGuId(), instance->getName() );
     else
-      player.sendDebug( "Failed to create instance with id#{0}", instanceContentId );
+      player.sendDebug( "Failed to create instance with id#{0}", contentFinderConditionId );
   }
   else if( subCommand == "bind" )
   {

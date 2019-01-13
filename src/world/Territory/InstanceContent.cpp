@@ -89,11 +89,8 @@ void Sapphire::InstanceContent::onLeaveTerritory( Entity::Player& player )
 {
   Logger::debug( "InstanceContent::onLeaveTerritory: Zone#{0}|{1}, Entity#{2}",
                  getGuId(), getTerritoryTypeId(), player.getId() );
-  sendDirectorClear( player );
 
-  player.setDirectorInitialized( false );
-  // remove "bound by duty" state
-  player.unsetStateFlag( PlayerStateFlag::BoundByDuty );
+  clearDirector( player );
 }
 
 void Sapphire::InstanceContent::onUpdate( uint32_t currTime )
@@ -450,3 +447,11 @@ void Sapphire::InstanceContent::unbindPlayer( uint32_t playerId )
   if( it != m_playerMap.end() )
     it->second->exitInstance();
 }
+
+void Sapphire::InstanceContent::clearDirector( Entity::Player& player )
+{
+  sendDirectorClear( player );
+
+  player.setDirectorInitialized( false );
+  // remove "bound by duty" state
+  player.unsetStateFlag( PlayerStateFlag::BoundByDuty );}

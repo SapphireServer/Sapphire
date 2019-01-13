@@ -40,10 +40,11 @@ Sapphire::Entity::BNpc::BNpc( FrameworkPtr pFw ) :
 {
 }
 
-Sapphire::Entity::BNpc::BNpc( BNpcTemplatePtr pTemplate, float posX, float posY, float posZ,
-                              uint8_t level, FrameworkPtr pFw ) :
+Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX, float posY, float posZ, float rot,
+                              uint8_t level, uint32_t maxHp, FrameworkPtr pFw ) :
   Npc( ObjKind::BattleNpc, pFw )
 {
+  m_id = id;
   m_modelChara = pTemplate->getModelChara();
   m_displayFlags = pTemplate->getDisplayFlags();
   m_pose = pTemplate->getPose();
@@ -56,14 +57,15 @@ Sapphire::Entity::BNpc::BNpc( BNpcTemplatePtr pTemplate, float posX, float posY,
   m_pos.x = posX;
   m_pos.y = posY;
   m_pos.z = posZ;
+  m_rot = rot;
   m_level = level;
 
-  m_maxHp = 200;
+  m_maxHp = maxHp;
   m_maxMp = 200;
-  m_hp = 200;
+  m_hp = maxHp;
   m_mp = 200;
 
-  m_baseStats.max_hp = 200;
+  m_baseStats.max_hp = maxHp;
   m_baseStats.max_mp = 200;
 
   memcpy( m_customize, pTemplate->getCustomize(), sizeof( m_customize ) );

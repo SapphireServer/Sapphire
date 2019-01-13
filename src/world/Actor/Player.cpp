@@ -11,11 +11,12 @@
 #include "Session.h"
 #include "Player.h"
 
+#include "Manager/HousingMgr.h"
 #include "Manager/TerritoryMgr.h"
+
 #include "Territory/Zone.h"
 #include "Territory/ZonePosition.h"
-
-#include "Manager/HousingMgr.h"
+#include "Territory/InstanceContent.h"
 #include "Territory/Land.h"
 
 #include "Network/GameConnection.h"
@@ -491,6 +492,9 @@ bool Sapphire::Entity::Player::exitInstance()
 {
   auto pTeriMgr = m_pFw->get< TerritoryMgr >();
 
+  auto pZone = getCurrentZone();
+  auto pInstance = pZone->getAsInstanceContent();
+
   // check if housing zone
   if( pTeriMgr->isHousingTerritory( m_prevTerritoryTypeId ) )
   {
@@ -509,6 +513,8 @@ bool Sapphire::Entity::Player::exitInstance()
   m_territoryId = m_prevTerritoryId;
 
   sendZonePackets();
+
+  //m_queuedZoneing = std::make_shared< QueuedZoning >( m_territoryTypeId, m_pos, Util::getTimeMs(), m_rot );
 
   return true;
 }
@@ -1694,19 +1700,18 @@ void Sapphire::Entity::Player::sendTitleList()
 
 void
 Sapphire::Entity::Player::sendZoneInPackets( uint32_t param1, uint32_t param2 = 0, uint32_t param3 = 0, uint32_t param4 = 0,
-                                         bool shouldSetStatus = false )
+                                             bool shouldSetStatus = false )
 {
   auto zoneInPacket = makeActorControl143( getId(), ZoneIn, param1, param2, param3, param4 );
   auto SetStatusPacket = makeActorControl142( getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
 
   if( !getGmInvis() )
-    sendToInRangeSet( zoneInPacket, true );
+    sendToInRangeSet( zoneInPacket );
+
   if( shouldSetStatus )
-    sendToInRangeSet( SetStatusPacket );
-  else
-    queuePacket( zoneInPacket );
-  if( shouldSetStatus )
-    queuePacket( SetStatusPacket );
+    sendToInRangeSet( SetStatusPacket, true );
+
+  queuePacket( zoneInPacket );
 
   setZoningType( Common::ZoneingType::None );
   unsetStateFlag( PlayerStateFlag::BetweenAreas );
