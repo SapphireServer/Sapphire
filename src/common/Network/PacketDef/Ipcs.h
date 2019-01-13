@@ -138,10 +138,10 @@ namespace Sapphire::Network::Packets
     ActorOwner = 0x0187, // updated 4.5
     PlayerStateFlags = 0x0188, // updated 4.5
     PlayerClassInfo = 0x0189, // updated 4.5
-    ModelEquip = 0x018A, // updated 4.5
-    Examine = 0x018B, // updated 4.5
+    ModelEquip = 0x018B, // updated 4.5
+    Examine = 0x018C, // updated 4.5
     CharaNameReq = 0x018D, // updated 4.5
-    SetLevelSync = 0x0186, // not updated for 4.4, not sure what it is anymore
+    SetLevelSync = 0x1186, // not updated for 4.4, not sure what it is anymore
 
     ItemInfo = 0x0196, // updated 4.5
     ContainerInfo = 0x0197, // updated 4.5
