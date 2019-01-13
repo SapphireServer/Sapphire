@@ -82,7 +82,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
   Logger::debug( "[{0}] Incoming action: {1:04X}\nparam1: {2:016X}\nparam2: {3:08X}\nparam3: {4:016x}",
                  m_pSession->getId(), commandId, param1, param2, param3 );
 
-  //g_log.Log(LoggingSeverity::debug, "[" + std::to_string(m_pSession->getId()) + "] " + pInPacket->toString());
+  //Logger::Log(LoggingSeverity::debug, "[" + std::to_string(m_pSession->getId()) + "] " + pInPacket->toString());
 
   switch( commandId )
   {
