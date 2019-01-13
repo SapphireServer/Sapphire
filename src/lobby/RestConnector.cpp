@@ -8,8 +8,6 @@
 
 #include <nlohmann/json.hpp>
 
-extern Sapphire::Logger g_log;
-
 typedef std::vector< std::tuple< std::string, uint32_t, uint64_t, std::string > > CharList;
 
 Sapphire::Network::RestConnector::RestConnector()
@@ -35,7 +33,7 @@ HttpResponse Sapphire::Network::RestConnector::requestApi( std::string endpoint,
   }
   catch( std::exception& e )
   {
-    g_log.error( endpoint + " failed, REST is not reachable: " + std::string( e.what() ) );
+    Logger::error( "{0} failed, Api is not reachable: {1}", endpoint, e.what() );
     return nullptr;
   }
   return r;
@@ -61,7 +59,7 @@ Sapphire::LobbySessionPtr Sapphire::Network::RestConnector::getSession( char* sI
     }
     catch( std::exception& e )
     {
-      g_log.debug( "Could not parse REST response: " + std::string( e.what() ) );
+      Logger::debug( "Could not parse Api response: {0}", e.what() );
       return nullptr;
     }
 
@@ -103,7 +101,7 @@ bool Sapphire::Network::RestConnector::checkNameTaken( std::string name )
     }
     catch( std::exception& e )
     {
-      g_log.debug( "Could not parse REST response: " + std::string( e.what() ) );
+      Logger::debug( "Could not parse Api response: {0}", e.what() );
       return true;
     }
 
@@ -137,7 +135,7 @@ uint32_t Sapphire::Network::RestConnector::getNextCharId()
     }
     catch( std::exception& e )
     {
-      g_log.debug( "Could not parse REST response: " + std::string( e.what() ) );
+      Logger::debug( "Could not parse Api response: {0}", e.what() );
       return -1;
     }
 
@@ -176,7 +174,7 @@ uint64_t Sapphire::Network::RestConnector::getNextContentId()
     }
     catch( std::exception& e )
     {
-      g_log.debug( "Could not parse REST response: " + std::string( e.what() ) );
+      Logger::debug( "Could not parse Api response: {0}", e.what() );
       return -1;
     }
 
@@ -206,7 +204,7 @@ CharList Sapphire::Network::RestConnector::getCharList( char* sId )
     return list;
 
   std::string content = std::string( std::istreambuf_iterator< char >( r->content ), {} );
-  g_log.debug( content );
+  Logger::debug( content );
   if( r->status_code.find( "200" ) != std::string::npos )
   {
     auto json = nlohmann::json();
@@ -217,18 +215,18 @@ CharList Sapphire::Network::RestConnector::getCharList( char* sId )
     }
     catch( std::exception& e )
     {
-      g_log.debug( "Could not parse REST response: " + std::string( e.what() ) );
+      Logger::debug( "Could not parse Api response: {0}", e.what() );
       return list;
     }
 
     if( json["result"].get< std::string >().find( "invalid" ) == std::string::npos )
     {
 
-      g_log.debug( json["result"] );
+      Logger::debug( json["result"] );
 
       for( auto& child : json["charArray"] )
       {
-        g_log.info( child["contentId"] );
+        Logger::info( child["contentId"] );
         //std::string, uint32_t, uint64_t, std::string
         list.push_back( { child["name"],
                           std::stoi( std::string( child["charId"] ) ),
@@ -271,7 +269,7 @@ bool Sapphire::Network::RestConnector::deleteCharacter( char* sId, std::string n
     }
     catch( std::exception& e )
     {
-      g_log.debug( "Could not parse REST response: " + std::string( e.what() ) );
+      Logger::debug( "Could not parse Api response: {0}", e.what() );
       return false;
     }
 
@@ -297,7 +295,7 @@ int Sapphire::Network::RestConnector::createCharacter( char* sId, std::string na
     return -1;
 
   std::string content = std::string( std::istreambuf_iterator< char >( r->content ), {} );
-  g_log.debug( content );
+  Logger::debug( content );
   if( r->status_code.find( "200" ) != std::string::npos )
   {
     auto json = nlohmann::json();
@@ -308,7 +306,7 @@ int Sapphire::Network::RestConnector::createCharacter( char* sId, std::string na
     }
     catch( std::exception& e )
     {
-      g_log.debug( "Could not parse REST response: " + std::string( e.what() ) );
+      Logger::debug( "Could not parse Api response: {0}", e.what() );
       return -1;
     }
 

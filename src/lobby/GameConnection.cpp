@@ -15,7 +15,6 @@
 #include "RestConnector.h"
 #include "LobbySession.h"
 
-extern Sapphire::Logger g_log;
 extern Sapphire::ServerLobby g_serverLobby;
 extern Sapphire::Network::RestConnector g_restConnector;
 
@@ -44,13 +43,13 @@ void Sapphire::Network::GameConnection::OnAccept( const std::string& host, uint1
   auto connection = make_GameConnection( m_hive, m_pAcceptor, m_pFw );
   m_pAcceptor->Accept( connection );
 
-  g_log.info( "Connect from " + m_socket.remote_endpoint().address().to_string() );
+  Logger::info( "Connect from {0}", m_socket.remote_endpoint().address().to_string() );
 }
 
 
 void Sapphire::Network::GameConnection::OnDisconnect()
 {
-  g_log.debug( "DISCONNECT" );
+  Logger::debug( "DISCONNECT" );
 }
 
 void Sapphire::Network::GameConnection::OnRecv( std::vector< uint8_t >& buffer )
@@ -60,15 +59,15 @@ void Sapphire::Network::GameConnection::OnRecv( std::vector< uint8_t >& buffer )
 
   if( headerResult == Incomplete )
   {
-    g_log.info( "Dropping connection due to incomplete packet header." );
-    g_log.info( "FIXME: Packet message bounary is not implemented." );
+    Logger::info( "Dropping connection due to incomplete packet header." );
+    Logger::info( "FIXME: Packet message bounary is not implemented." );
     Disconnect();
     return;
   }
 
   if( headerResult == Malformed )
   {
-    g_log.info( "Dropping connection due to malformed packet header." );
+    Logger::info( "Dropping connection due to malformed packet header." );
     Disconnect();
     return;
   }
@@ -80,15 +79,15 @@ void Sapphire::Network::GameConnection::OnRecv( std::vector< uint8_t >& buffer )
 
   if( packetResult == Incomplete )
   {
-    g_log.info( "Dropping connection due to incomplete packets." );
-    g_log.info( "FIXME: Packet message bounary is not implemented." );
+    Logger::info( "Dropping connection due to incomplete packets." );
+    Logger::info( "FIXME: Packet message bounary is not implemented." );
     Disconnect();
     return;
   }
 
   if( packetResult == Malformed )
   {
-    g_log.info( "Dropping connection due to malformed packets." );
+    Logger::info( "Dropping connection due to malformed packets." );
     Disconnect();
     return;
   }
@@ -100,7 +99,7 @@ void Sapphire::Network::GameConnection::OnRecv( std::vector< uint8_t >& buffer )
 
 void Sapphire::Network::GameConnection::OnError( const asio::error_code& error )
 {
-  g_log.info( "GameConnection closed: " + error.message() );
+  Logger::info( "GameConnection closed: {0}", error.message() );
 }
 
 void
@@ -119,9 +118,9 @@ Sapphire::Network::GameConnection::sendError( uint64_t sequence, uint32_t errorc
 void Sapphire::Network::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet, uint32_t tmpId )
 {
   uint64_t sequence = *reinterpret_cast< uint64_t* >( &packet.data[ 0 ] + 0x10 );
-  g_log.info( "Sequence [" + std::to_string( sequence ) + "]" );
+  Logger::info( "Sequence [{0}]", sequence );
 
-  g_log.info( "[" + std::to_string( m_pSession->getAccountID() ) + "] ReqCharList" );
+  Logger::info( "[{0}] ReqCharList", m_pSession->getAccountID() );
   Packets::LobbyPacketContainer pRP( m_encKey );
 
   auto serverListPacket = makeLobbyPacket< FFXIVIpcServerList >( tmpId );
@@ -171,11 +170,13 @@ void Sapphire::Network::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet
 
         charListPacket->data().charaDetails[ j ] = details;
 
-        g_log.debug( "[" + std::to_string( charIndex ) + "] " + std::to_string( details.index ) + " - "
-                     + std::get< 0 >( charEntry ) + " - " +
-                     std::to_string( std::get< 1 >( charEntry ) ) + " - " +
-                     std::to_string( std::get< 2 >( charEntry ) ) + " - " +
-                     std::get< 3 >( charEntry ) );
+        Logger::debug( "[{0}] {1} - {2} - {3} - {4} - {5}",
+                       charIndex,
+                       details.index,
+                       std::get< 0 >( charEntry ),
+                       std::get< 1 >( charEntry ),
+                       std::get< 2 >( charEntry ),
+                       std::get< 3 >( charEntry ) );
       }
       charIndex++;
     }
@@ -201,9 +202,9 @@ void Sapphire::Network::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet
 void Sapphire::Network::GameConnection::enterWorld( FFXIVARR_PACKET_RAW& packet, uint32_t tmpId )
 {
   uint64_t sequence = *reinterpret_cast< uint64_t* >( &packet.data[ 0 ] + 0x10 );
-  g_log.info( "Sequence [" + std::to_string( sequence ) + "]" );
+  Logger::info( "Sequence [{0}]", sequence );
 
-  g_log.info( "[" + std::to_string( m_pSession->getAccountID() ) + "] ReqEnterWorld" );
+  Logger::info( "[{0}] ReqEnterWorld", m_pSession->getAccountID() );
 
   uint64_t lookupId = *reinterpret_cast< uint64_t* >( &packet.data[ 0 ] + 0x18 );
 
@@ -225,8 +226,7 @@ void Sapphire::Network::GameConnection::enterWorld( FFXIVARR_PACKET_RAW& packet,
   if( logInCharId == -1 )
     return;
 
-  g_log.info( "[" + std::to_string( m_pSession->getAccountID() ) + "] Logging in as " + logInCharName + "(" +
-              std::to_string( logInCharId ) + ")" );
+  Logger::info( "[{0}] Logging in as {1} ({2})", m_pSession->getAccountID(), logInCharName, logInCharId );
 
   Packets::LobbyPacketContainer pRP( m_encKey );
 
@@ -251,12 +251,12 @@ bool Sapphire::Network::GameConnection::sendServiceAccountList( FFXIVARR_PACKET_
     session->setAccountID( 0 );
     session->setSessionId( ( uint8_t* ) &packet.data[ 0 ] + 0x20 );
     pSession = session;
-    g_log.info( "Allowed connection with no session: " + std::string( ( char* ) &packet.data[ 0 ] + 0x20 ) );
+    Logger::info( "Allowed connection with no session: {0}", std::string( ( char* ) &packet.data[ 0 ] + 0x20 ) );
   }
 
   if( pSession != nullptr )
   {
-    g_log.info( "Found session linked to accountId: " + std::to_string( pSession->getAccountID() ) );
+    Logger::info( "Found session linked to accountId: {0}", pSession->getAccountID() );
     m_pSession = pSession;
 
     auto serviceIdInfoPacket = makeLobbyPacket< FFXIVIpcServiceIdInfo >( tmpId );
@@ -272,7 +272,7 @@ bool Sapphire::Network::GameConnection::sendServiceAccountList( FFXIVARR_PACKET_
   }
   else
   {
-    g_log.info( "Could not retrieve session: " + std::string( ( char* ) &packet.data[ 0 ] + 0x20 ) );
+    Logger::info( "Could not retrieve session: {0}", std::string( ( char* ) &packet.data[ 0 ] + 0x20 ) );
     sendError( 1, 5006, 13001, tmpId );
 
     return true;
@@ -284,10 +284,10 @@ bool Sapphire::Network::GameConnection::createOrModifyChar( FFXIVARR_PACKET_RAW&
 {
   uint64_t sequence = *reinterpret_cast< uint64_t* >( &packet.data[ 0 ] + 0x10 );
   uint8_t type = *reinterpret_cast< uint8_t* >( &packet.data[ 0 ] + 0x29 );
-  g_log.info( "Sequence [" + std::to_string( sequence ) + "]" );
-  g_log.info( "Type [" + std::to_string( type ) + "]" );
+  Logger::info( "Sequence [{0}]", sequence );
+  Logger::info( "Type [{0}]", type );
 
-  g_log.info( "[" + std::to_string( m_pSession->getAccountID() ) + "] ReqCharCreate" );
+  Logger::info( "[{0}] ReqCharCreate", m_pSession->getAccountID() );
 
   std::string name;
   uint32_t newId = g_restConnector.getNextCharId();
@@ -297,7 +297,7 @@ bool Sapphire::Network::GameConnection::createOrModifyChar( FFXIVARR_PACKET_RAW&
   {
     name = std::string( ( char* ) &packet.data[ 0 ] + 0x2C );
 
-    g_log.info( "[" + std::to_string( m_pSession->getAccountID() ) + "] Type 1: " + name );
+    Logger::info( "[{0}] Type 1: {1}", m_pSession->getAccountID(), name );
 
     Packets::LobbyPacketContainer pRP( m_encKey );
 
@@ -325,7 +325,7 @@ bool Sapphire::Network::GameConnection::createOrModifyChar( FFXIVARR_PACKET_RAW&
   else if( type == 2 ) //Character creation finalize
   {
     std::string charDetails( ( char* ) &packet.data[ 0 ] + 0x4C );
-    g_log.info( "[" + std::to_string( m_pSession->getAccountID() ) + "] Type 2: " + charDetails );
+    Logger::info( "[{0}] Type 2: {1}", m_pSession->getAccountID(), charDetails );
 
     if( g_restConnector.createCharacter( ( char* ) m_pSession->getSessionId(), m_pSession->newCharName, charDetails ) !=
         -1 )
@@ -354,7 +354,7 @@ bool Sapphire::Network::GameConnection::createOrModifyChar( FFXIVARR_PACKET_RAW&
   else if( type == 4 ) //Character delete
   {
     name = std::string( ( char* ) &packet.data[ 0 ] + 0x2C );
-    g_log.info( "[" + std::to_string( m_pSession->getAccountID() ) + "] Type 4: " + name );
+    Logger::info( "[{0}] Type 4: {1}", m_pSession->getAccountID(), name );
 
 
     if( g_restConnector.deleteCharacter( ( char* ) m_pSession->getSessionId(), name ) )
@@ -383,8 +383,7 @@ bool Sapphire::Network::GameConnection::createOrModifyChar( FFXIVARR_PACKET_RAW&
   }
   else
   {
-    g_log.error( "[" + std::to_string( m_pSession->getAccountID() ) + "] Unknown Character Creation Type: " +
-                 std::to_string( type ) );
+    Logger::error( "[{0}] Unknown Character Creation Type: {1}", m_pSession->getAccountID(), type );
   }
   return false;
 }
@@ -394,7 +393,7 @@ void Sapphire::Network::GameConnection::handleGamePacket( Packets::FFXIVARR_PACK
 
   uint32_t tmpId = packet.segHdr.target_actor;
 
-  g_log.info( "OpCode [" + std::to_string( *reinterpret_cast< uint16_t* >( &packet.data[ 2 ] ) ) + "]" );
+  Logger::info( "OpCode [{0}]", *reinterpret_cast< uint16_t* >( &packet.data[ 2 ] ) );
 
   switch( *reinterpret_cast< uint16_t* >( &packet.data[ 2 ] ) )
   {
@@ -438,7 +437,6 @@ void Sapphire::Network::GameConnection::sendPacket( Packets::LobbyPacketContaine
 
 void Sapphire::Network::GameConnection::sendPackets( Packets::PacketContainer* pPacket )
 {
-  //g_log.Log(LoggingSeverity::info, pPacket->toString());
   std::vector< uint8_t > sendBuffer;
 
   pPacket->fillSendBuffer( sendBuffer );
@@ -503,7 +501,7 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
 
       case SEGMENTTYPE_IPC: // game packet
       {
-        g_log.info( "GamePacket [" + std::to_string( inPacket.segHdr.type ) + "]" );
+        Logger::info( "GamePacket [{0}]", inPacket.segHdr.type );
         handleGamePacket( inPacket );
         break;
       }
