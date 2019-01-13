@@ -794,14 +794,14 @@ Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Player&
 
   if( subCommand == "create" || subCommand == "cr" )
   {
-    uint32_t instanceContentId;
-    sscanf( params.c_str(), "%d", &instanceContentId );
+    uint32_t contentFinderConditionId;
+    sscanf( params.c_str(), "%d", &contentFinderConditionId );
 
-    auto instance = pTeriMgr->createInstanceContent( instanceContentId );
+    auto instance = pTeriMgr->createInstanceContent( contentFinderConditionId );
     if( instance )
       player.sendDebug( "Created instance with id#{0} -> {1}", instance->getGuId(), instance->getName() );
     else
-      player.sendDebug( "Failed to create instance with id#{0}", instanceContentId );
+      player.sendDebug( "Failed to create instance with id#{0}", contentFinderConditionId );
   }
   else if( subCommand == "bind" )
   {
