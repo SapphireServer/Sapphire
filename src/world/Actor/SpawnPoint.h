@@ -33,6 +33,9 @@ namespace Sapphire::Entity
     BNpcPtr getLinkedBNpc();
     void setLinkedBNpc( BNpcPtr pBnpc );
 
+    uint32_t getTimeOfDeath() const;
+    void setTimeOfDeath( uint32_t m_timeOfDeath );
+
   };
 
 }

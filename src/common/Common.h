@@ -855,8 +855,9 @@ namespace Sapphire::Common
   struct HousingObject
   {
     uint32_t itemId;
-    uint16_t itemRotation;
-    Common::FFXIVARR_POSITION3_U16 pos;
+    uint32_t padding; // was itemrotation + unknown/pad, looks unused now
+    float rotation;
+    Common::FFXIVARR_POSITION3 pos;
   };
 
   enum HouseSize : uint8_t
@@ -878,21 +879,6 @@ namespace Sapphire::Common
   enum HouseIconAdd : uint8_t
   {
     heart = 0x06
-  };
-
-  enum HousingAppeal : uint8_t
-  {
-    NoAppeal = 0,
-    Emporium = 1,
-    Botique = 2,
-    DesignerHome = 3,
-    MessageBook = 4,
-    Tavern = 5,
-    Eatery = 6,
-    ImmersiveExperience = 7,
-    Aquarium = 9,
-    Sanctum = 10,
-    Venue = 11,
   };
 
   enum WardlandFlags : uint8_t

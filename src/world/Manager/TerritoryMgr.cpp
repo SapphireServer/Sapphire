@@ -535,8 +535,8 @@ bool Sapphire::World::Manager::TerritoryMgr::movePlayer( ZonePtr pZone, Sapphire
   // mark character as zoning in progress
   pPlayer->setLoadingComplete( false );
 
-  //if( pPlayer->getLastPing() != 0 )
-  //   pPlayer->getCurrentZone()->removeActor( pPlayer );
+  if( pPlayer->getLastPing() != 0 )
+    pPlayer->getCurrentZone()->removeActor( pPlayer );
 
   pPlayer->setCurrentZone( pZone );
   pZone->pushActor( pPlayer );

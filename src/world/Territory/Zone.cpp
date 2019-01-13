@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <vector>
 #include <time.h>
+#include <random>
 
 #include <Logging/Logger.h>
 #include <Util/Util.h>
@@ -53,7 +54,8 @@ Sapphire::Zone::Zone() :
   m_currentWeather( Weather::FairSkies ),
   m_weatherOverride( Weather::None ),
   m_lastMobUpdate( 0 ),
-  m_nextEObjId( 0x400D0000 )
+  m_nextEObjId( 0x400D0000 ),
+  m_nextActorId( 0x500D0000 )
 {
 }
 
@@ -435,6 +437,7 @@ bool Sapphire::Zone::update( uint32_t currTime )
   //updateBnpcs( tickCount );
   onUpdate( currTime );
 
+  updateSpawnPoints();
   return true;
 }
 
@@ -740,6 +743,12 @@ uint32_t Sapphire::Zone::getNextEObjId()
   return ++m_nextEObjId;
 }
 
+uint32_t Sapphire::Zone::getNextActorId()
+{
+  return ++m_nextActorId;
+}
+
+
 Sapphire::Entity::EventObjectPtr Sapphire::Zone::registerEObj( const std::string& name, uint32_t objectId, uint32_t mapLink,
                                                                uint8_t state, FFXIVARR_POSITION3 pos, float scale,
                                                                float rotation )
@@ -772,7 +781,7 @@ bool Sapphire::Zone::loadSpawnGroups()
 
     m_spawnGroups.emplace_back( id, templateId, level, maxHp );
 
-    Logger::debug( "id: {0}, template: {1}, level: {2}, maxHp: {3}", id, templateId, level, maxHp );
+    Logger::debug( "id: {0}, template: {1}, level: {2}, maxHp: {3}", id, m_spawnGroups.back().getTemplateId(), level, maxHp );
   }
 
   res.reset();
@@ -799,4 +808,45 @@ bool Sapphire::Zone::loadSpawnGroups()
     }
   }
   return false;
+}
+
+void Sapphire::Zone::updateSpawnPoints()
+{
+  std::random_device rd;
+  std::mt19937 mt( rd() );
+  std::uniform_real_distribution< float > dist( 0.0, PI * 2 );
+
+  for( auto& group : m_spawnGroups )
+  {
+    for( auto& point : group.getSpawnPointList() )
+    {
+      if( !point->getLinkedBNpc() && ( Util::getTimeSeconds() - point->getTimeOfDeath() ) > 60 )
+      {
+        auto serverZone = m_pFw->get< World::ServerMgr >();
+
+        auto bNpcTemplate = serverZone->getBNpcTemplate( group.getTemplateId() );
+
+        if( !bNpcTemplate )
+        {
+          //Logger::error( "No template found for templateId#{0}", group.getTemplateId() );
+          continue;
+        }
+
+        uint32_t random = rand() % 20;
+
+        auto pBNpc = std::make_shared< Entity::BNpc >( getNextActorId(),
+                                                       bNpcTemplate,
+                                                       point->getPosX(),
+                                                       point->getPosY(),
+                                                       point->getPosZ(),
+                                                       dist( mt ),
+                                                       group.getLevel(),
+                                                       group.getMaxHp(), m_pFw );
+        point->setLinkedBNpc( pBNpc );
+
+        pushActor( pBNpc );
+      }
+    }
+  }
+
 }
