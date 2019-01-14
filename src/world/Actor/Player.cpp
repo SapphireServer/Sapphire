@@ -420,13 +420,13 @@ void Sapphire::Entity::Player::setZone( uint32_t zoneId )
       return;
   }
 
-  sendZonePackets();
 }
 
 bool Sapphire::Entity::Player::setInstance( uint32_t instanceContentId )
 {
-  auto pTeriMgr = m_pFw->get< TerritoryMgr >();
   m_onEnterEventDone = false;
+  auto pTeriMgr = m_pFw->get< TerritoryMgr >();
+
   auto instance = pTeriMgr->getInstanceZonePtr( instanceContentId );
   if( !instance )
     return false;
@@ -441,7 +441,6 @@ bool Sapphire::Entity::Player::setInstance( ZonePtr instance )
     return false;
 
   auto pTeriMgr = m_pFw->get< TerritoryMgr >();
-
   auto currentZone = getCurrentZone();
 
   // zoning within the same zone won't cause the prev data to be overwritten
@@ -453,35 +452,30 @@ bool Sapphire::Entity::Player::setInstance( ZonePtr instance )
     m_prevTerritoryId = getTerritoryId();
   }
 
-  if( !pTeriMgr->movePlayer( instance, getAsPlayer() ) )
-    return false;
-
-  sendZonePackets();
-
-  return true;
+  return pTeriMgr->movePlayer( instance, getAsPlayer() );
 }
 
 bool Sapphire::Entity::Player::setInstance( ZonePtr instance, Common::FFXIVARR_POSITION3 pos )
 {
+  m_onEnterEventDone = false;
   if( !instance )
     return false;
-
-  m_onEnterEventDone = false;
 
   auto pTeriMgr = m_pFw->get< TerritoryMgr >();
   auto currentZone = getCurrentZone();
 
-  m_prevPos = m_pos;
-  m_prevRot = m_rot;
-  m_prevTerritoryTypeId = currentZone->getTerritoryTypeId();
-  m_prevTerritoryId = getTerritoryId();
+  // zoning within the same zone won't cause the prev data to be overwritten
+  if( instance->getTerritoryTypeId() != m_territoryTypeId )
+  {
+    m_prevPos = m_pos;
+    m_prevRot = m_rot;
+    m_prevTerritoryTypeId = currentZone->getTerritoryTypeId();
+    m_prevTerritoryId = getTerritoryId();
+  }
 
   if( pTeriMgr->movePlayer( instance, getAsPlayer() ) )
   {
     m_pos = pos;
-
-    sendZonePackets();
-
     return true;
   }
 
@@ -511,8 +505,6 @@ bool Sapphire::Entity::Player::exitInstance()
   m_rot = m_prevRot;
   m_territoryTypeId = m_prevTerritoryTypeId;
   m_territoryId = m_prevTerritoryId;
-
-  sendZonePackets();
 
   //m_queuedZoneing = std::make_shared< QueuedZoning >( m_territoryTypeId, m_pos, Util::getTimeMs(), m_rot );
 

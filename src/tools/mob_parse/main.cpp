@@ -195,7 +195,7 @@ std::string delChar( std::string &str, char del )
 int dumpSpawns()
 {
 
-  Logger::init( "mob_parse" );
+  //Logger::init( "mob_parse" );
 
   Logger::info( "Setting up EXD data" );
   if( !g_exdData.init( datLocation ) )
@@ -250,7 +250,7 @@ int dumpSpawns()
 
   }
 
-  std::ofstream out("output_1.txt");
+  std::ofstream out("spawns.txt");
 
   int spawngroups = 0;
   for( auto entry : zoneToPacketList )
@@ -462,7 +462,8 @@ int dumpTemplates()
 
   }
 
-  std::ofstream out("output.txt");
+  std::map< std::string, bool > mobDumped;
+  std::ofstream out("templates.txt");
 
   for( auto entry : zoneToPacketList )
   {
@@ -530,6 +531,11 @@ int dumpTemplates()
         std::string name = delChar( nameStruct->singular, ' ' );
         name = delChar( name, '\'' );
 
+        if( mobDumped.find( name + "_" + std::to_string( instance.bNPCBase ) ) != mobDumped.end() )
+          continue;
+
+        mobDumped[ name +"_" + std::to_string( instance.bNPCBase ) ] = true;
+
         std::string output = "INSERT IGNORE INTO `bnpctemplate` ( `Name`, `bNPCBaseId`, `bNPCNameId`, `mainWeaponModel`, `secWeaponModel`, `aggressionMode`, `enemyType`, `pose`, `modelChara`, `displayFlags`, `Look`, `Models`) "
                              "VALUES ( \"" + name +"_" + std::to_string( instance.bNPCBase ) + "\", "
                              + std::to_string( instance.bNPCBase ) + ", "
@@ -593,7 +599,7 @@ int dumpTemplates()
 int main()
 {
 
-  //dumpTemplates();
+  dumpTemplates();
   dumpSpawns();
 
   return 0;
