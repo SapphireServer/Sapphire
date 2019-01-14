@@ -535,7 +535,7 @@ bool Sapphire::World::Manager::TerritoryMgr::movePlayer( ZonePtr pZone, Sapphire
   // mark character as zoning in progress
   pPlayer->setLoadingComplete( false );
 
-  if( pPlayer->getLastPing() != 0 )
+  if( pPlayer->getLastPing() != 0 && pPlayer->getCurrentZone() )
     pPlayer->getCurrentZone()->removeActor( pPlayer );
 
   pPlayer->setCurrentZone( pZone );
@@ -543,6 +543,8 @@ bool Sapphire::World::Manager::TerritoryMgr::movePlayer( ZonePtr pZone, Sapphire
 
   // map player to instanceId so it can be tracked.
   m_playerIdToInstanceMap[ pPlayer->getId() ] = pZone->getGuId();
+
+  pPlayer->sendZonePackets();
 
   return true;
 }
