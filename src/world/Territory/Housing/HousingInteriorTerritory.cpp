@@ -186,9 +186,9 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::spawnHousing
     objectSpawnPkt->data().containerId = containerType;
     objectSpawnPkt->data().containerOffset = slot;
 
-    objectSpawnPkt->data().itemId = item->getAdditionalData() & 0xFFFF;
-    objectSpawnPkt->data().rotation = item->getRot();
-    objectSpawnPkt->data().pos = item->getPos();
+    objectSpawnPkt->data().object.itemId = item->getAdditionalData() & 0xFFFF;
+    objectSpawnPkt->data().object.rotation = item->getRot();
+    objectSpawnPkt->data().object.pos = item->getPos();
 
     player.second->queuePacket( objectSpawnPkt );
   }

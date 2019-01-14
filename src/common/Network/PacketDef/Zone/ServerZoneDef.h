@@ -1726,11 +1726,7 @@ struct FFXIVIpcHousingInternalObjectSpawn : FFXIVIpcBasePacket< HousingInternalO
   uint8_t containerOffset;
   uint8_t pad1;
 
-  uint16_t itemId;
-  uint8_t unk2;
-  uint8_t pad2;
-  uint16_t rotation;
-  Common::FFXIVARR_POSITION3 pos;
+  Common::HousingObject object;
 };
 
 struct FFXIVIpcHousingIndoorInitialize : FFXIVIpcBasePacket< HousingIndoorInitialize >
