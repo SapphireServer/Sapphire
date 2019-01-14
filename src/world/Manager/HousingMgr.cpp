@@ -956,7 +956,7 @@ bool Sapphire::World::Manager::HousingMgr::isPlacedItemsInventory( Sapphire::Com
 }
 
 void Sapphire::World::Manager::HousingMgr::reqPlaceHousingItem( Sapphire::Entity::Player& player, uint16_t landId,
-                                                                uint16_t containerId, uint16_t slotId,
+                                                                uint16_t containerId, uint8_t slotId,
                                                                 Sapphire::Common::FFXIVARR_POSITION3 pos,
                                                                 float rotation )
 {
@@ -1038,7 +1038,7 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceHousingItem( Sapphire::Entity
 }
 
 void Sapphire::World::Manager::HousingMgr::reqPlaceItemInStore( Sapphire::Entity::Player& player, uint16_t landId,
-                                                                uint16_t containerId, uint16_t slotId )
+                                                                uint16_t containerId, uint8_t slotId )
 {
   LandPtr land;
   bool isOutside = false;
@@ -1229,7 +1229,7 @@ void Sapphire::World::Manager::HousingMgr::sendInternalEstateInventoryBatch( Sap
 }
 
 void Sapphire::World::Manager::HousingMgr::reqMoveHousingItem( Entity::Player& player,
-                                                               Common::LandIdent ident, uint16_t slot,
+                                                               Common::LandIdent ident, uint8_t slot,
                                                                Common::FFXIVARR_POSITION3 pos, float rot )
 {
   auto landSet = toLandSetId( ident.territoryTypeId, ident.wardNum );
@@ -1254,7 +1254,7 @@ void Sapphire::World::Manager::HousingMgr::reqMoveHousingItem( Entity::Player& p
 }
 
 bool Sapphire::World::Manager::HousingMgr::moveInternalItem( Entity::Player& player, Common::LandIdent ident,
-                                                             Territory::Housing::HousingInteriorTerritory& terri, uint16_t slot,
+                                                             Territory::Housing::HousingInteriorTerritory& terri, uint8_t slot,
                                                              Common::FFXIVARR_POSITION3 pos, float rot )
 {
   auto containerIdx = static_cast< uint16_t >( slot / 50 );
@@ -1300,7 +1300,7 @@ bool Sapphire::World::Manager::HousingMgr::moveInternalItem( Entity::Player& pla
 }
 
 bool Sapphire::World::Manager::HousingMgr::moveExternalItem( Entity::Player& player,
-                                                             Common::LandIdent ident, uint16_t slot,
+                                                             Common::LandIdent ident, uint8_t slot,
                                                              Sapphire::HousingZone& terri, Common::FFXIVARR_POSITION3 pos,
                                                              float rot )
 {
@@ -1336,7 +1336,7 @@ bool Sapphire::World::Manager::HousingMgr::moveExternalItem( Entity::Player& pla
 }
 
 void Sapphire::World::Manager::HousingMgr::reqRemoveHousingItem( Sapphire::Entity::Player& player, uint16_t plot,
-                                                                 uint16_t containerId, uint16_t slot,
+                                                                 uint16_t containerId, uint8_t slot,
                                                                  bool sendToStoreroom )
 {
   if( auto terri = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( player.getCurrentZone() ) )
@@ -1456,7 +1456,7 @@ bool Sapphire::World::Manager::HousingMgr::removeInternalItem( Entity::Player& p
 }
 
 bool Sapphire::World::Manager::HousingMgr::removeExternalItem( Entity::Player& player, HousingZone& terri, Land& land,
-                                                               Common::InventoryType containerType, uint16_t slotId,
+                                                               Common::InventoryType containerType, uint8_t slotId,
                                                                bool sendToStoreroom )
 {
   auto& containers = getEstateInventory( land.getLandIdent() );
