@@ -204,7 +204,7 @@ enum ActorControlType : uint16_t
     SetFestival = 0x386, // param1: festival.exd index
 
     ToggleOrchestrionUnlock = 0x396,
-    Dismount = 0x3A0,
+    Dismount = 0x3A1, // updated 4.5
 
     // Duty Recorder
     BeginReplayAck = 0x3A1,
