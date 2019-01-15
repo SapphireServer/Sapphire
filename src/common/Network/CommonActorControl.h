@@ -207,8 +207,8 @@ enum ActorControlType : uint16_t
     Dismount = 0x3A1, // updated 4.5
 
     // Duty Recorder
-    BeginReplayAck = 0x3A1,
-    EndReplayAck = 0x3A2,
+    BeginReplayAck = 0x3A2,
+    EndReplayAck = 0x3A3,
 
     // Housing
     ShowHousingItemUI = 0x3F7,
