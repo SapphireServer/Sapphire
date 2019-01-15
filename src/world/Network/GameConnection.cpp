@@ -315,7 +315,7 @@ void Sapphire::Network::GameConnection::processOutQueue()
     totalSize += pPacket->getSize();
 
     // todo: figure out a good max set size and make it configurable
-    if( totalSize > 15000 )
+    if( totalSize > 10000 )
       break;
   }
 
