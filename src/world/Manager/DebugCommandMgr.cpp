@@ -439,7 +439,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
                                                    player.getPos().y,
                                                    player.getPos().z,
                                                    player.getRot(),
-                                                   1, 1000, framework() );
+                                                   1, 1000, playerZone, framework() );
 
 
 

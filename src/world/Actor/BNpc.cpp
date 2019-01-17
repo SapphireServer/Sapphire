@@ -5,6 +5,7 @@
 #include <utility>
 #include <Network/CommonActorControl.h>
 #include <Network/PacketWrappers/EffectPacket.h>
+#include <Network/PacketDef/Zone/ClientZoneDef.h>
 
 #include "Forwards.h"
 #include "Action/Action.h"
@@ -17,6 +18,7 @@
 #include "Network/PacketWrappers/ActorControlPacket144.h"
 #include "Network/PacketWrappers/UpdateHpMpTpPacket.h"
 #include "Network/PacketWrappers/NpcSpawnPacket.h"
+#include "Network/PacketWrappers/MoveActorPacket.h"
 
 #include "StatusEffect/StatusEffect.h"
 #include "Action/ActionCollision.h"
@@ -41,7 +43,7 @@ Sapphire::Entity::BNpc::BNpc( FrameworkPtr pFw ) :
 }
 
 Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX, float posY, float posZ, float rot,
-                              uint8_t level, uint32_t maxHp, FrameworkPtr pFw ) :
+                              uint8_t level, uint32_t maxHp, ZonePtr pZone, FrameworkPtr pFw ) :
   Npc( ObjKind::BattleNpc, pFw )
 {
   m_id = id;
@@ -60,10 +62,16 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
   m_rot = rot;
   m_level = level;
 
+  m_pCurrentZone = pZone;
+
+  m_spawnPos = m_pos;
+
   m_maxHp = maxHp;
   m_maxMp = 200;
   m_hp = maxHp;
   m_mp = 200;
+
+  m_state = BNpcState::Idle;
 
   m_baseStats.max_hp = maxHp;
   m_baseStats.max_mp = 200;
@@ -120,4 +128,252 @@ uint32_t Sapphire::Entity::BNpc::getBNpcNameId() const
 void Sapphire::Entity::BNpc::spawn( PlayerPtr pTarget )
 {
   pTarget->queuePacket( std::make_shared< NpcSpawnPacket >( *getAsBNpc(), *pTarget ) );
+}
+
+Sapphire::Entity::BNpcState Sapphire::Entity::BNpc::getState() const
+{
+  return m_state;
+}
+
+void Sapphire::Entity::BNpc::setState( BNpcState state )
+{
+  m_state = state;
+}
+
+bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
+{
+  if( Util::distance( getPos().x, getPos().y, getPos().z, pos.x, pos.y, pos.z ) <= 4 )
+    // reached destination
+    return true;
+
+  float rot = Util::calcAngFrom( getPos().x, getPos().z, pos.x, pos.z );
+  float newRot = PI - rot + ( PI / 2 );
+
+  face( pos );
+  float angle = Util::calcAngFrom( getPos().x, getPos().z, pos.x, pos.z ) + PI;
+
+  auto x = ( cosf( angle ) * 1.1f );
+  auto y = ( getPos().y + pos.y ) * 0.5f; // fake value while there is no collision
+  auto z = ( sinf( angle ) * 1.1f );
+
+  Common::FFXIVARR_POSITION3 newPos{ getPos().x + x, y, getPos().z + z };
+  setPos( newPos );
+
+  Common::FFXIVARR_POSITION3 tmpPos{ getPos().x + x, y, getPos().z + z };
+
+  setPos( tmpPos );
+  setRot( newRot );
+
+  sendPositionUpdate();
+
+  return false;
+}
+
+void Sapphire::Entity::BNpc::sendPositionUpdate()
+{
+  auto movePacket = std::make_shared< MoveActorPacket >( *getAsChara(), 0x3A, 0, 0, 0x5A );
+  sendToInRangeSet( movePacket );
+}
+
+void Sapphire::Entity::BNpc::hateListClear()
+{
+  auto it = m_hateList.begin();
+  for( auto listEntry : m_hateList )
+  {
+    //if( isInRangeSet( listEntry->m_pActor ) )
+      //deaggro( listEntry->m_pActor );
+  }
+  m_hateList.clear();
+}
+
+Sapphire::Entity::ActorPtr Sapphire::Entity::BNpc::hateListGetHighest()
+{
+  auto it = m_hateList.begin();
+  uint32_t maxHate = 0;
+  std::shared_ptr< HateListEntry > entry;
+  for( ; it != m_hateList.end(); ++it )
+  {
+    if( ( *it )->m_hateAmount > maxHate )
+    {
+      maxHate = ( *it )->m_hateAmount;
+      entry = *it;
+    }
+  }
+
+  if( entry && maxHate != 0 )
+    return entry->m_pActor;
+
+  return nullptr;
+}
+
+void Sapphire::Entity::BNpc::hateListAdd( Sapphire::Entity::ActorPtr pActor, int32_t hateAmount )
+{
+  auto hateEntry = std::make_shared< HateListEntry >();
+  hateEntry->m_hateAmount = hateAmount;
+  hateEntry->m_pActor = pActor;
+
+  m_hateList.insert( hateEntry );
+}
+
+void Sapphire::Entity::BNpc::hateListUpdate( Sapphire::Entity::ActorPtr pActor, int32_t hateAmount )
+{
+  for( auto listEntry : m_hateList )
+  {
+    if( listEntry->m_pActor == pActor )
+    {
+      listEntry->m_hateAmount += hateAmount;
+      return;
+    }
+  }
+
+  auto hateEntry = std::make_shared< HateListEntry >();
+  hateEntry->m_hateAmount = hateAmount;
+  hateEntry->m_pActor = pActor;
+  m_hateList.insert( hateEntry );
+}
+
+void Sapphire::Entity::BNpc::hateListRemove( Sapphire::Entity::ActorPtr pActor )
+{
+  for( auto listEntry : m_hateList )
+  {
+    if( listEntry->m_pActor == pActor )
+    {
+
+      m_hateList.erase( listEntry );
+      if( pActor->isPlayer() )
+      {
+        PlayerPtr tmpPlayer = pActor->getAsPlayer();
+        //tmpPlayer->onMobDeaggro( getAsBattleNpc() );
+      }
+      return;
+    }
+  }
+}
+
+bool Sapphire::Entity::BNpc::hateListHasActor( Sapphire::Entity::ActorPtr pActor )
+{
+  for( auto listEntry : m_hateList )
+  {
+    if( listEntry->m_pActor == pActor )
+      return true;
+  }
+  return false;
+}
+
+void Sapphire::Entity::BNpc::aggro( Sapphire::Entity::ActorPtr pActor )
+{
+  m_lastAttack = Util::getTimeMs();
+  hateListUpdate( pActor, 1 );
+
+  changeTarget( pActor->getId() );
+  setStance( Stance::Active );
+  m_state = BNpcState::Combat;
+
+  if( pActor->isPlayer() )
+  {
+    PlayerPtr tmpPlayer = pActor->getAsPlayer();
+    tmpPlayer->queuePacket( makeActorControl142( getId(), ActorControlType::ToggleWeapon, 0, 1, 1 ) );
+    //tmpPlayer->onMobAggro( getAsBattleNpc() );
+  }
+}
+
+void Sapphire::Entity::BNpc::deaggro( Sapphire::Entity::ActorPtr pActor )
+{
+  if( !hateListHasActor( pActor ) )
+    hateListRemove( pActor );
+
+  if( pActor->isPlayer() )
+  {
+    PlayerPtr tmpPlayer = pActor->getAsPlayer();
+    //tmpPlayer->onMobDeaggro( getAsBattleNpc() );
+  }
+}
+
+void Sapphire::Entity::BNpc::update( int64_t currTime )
+{
+  switch( m_state )
+  {
+    case BNpcState::Retreat:
+    {
+      if( moveTo( m_spawnPos ) )
+        m_state = BNpcState::Idle;
+    }
+    break;
+
+    case BNpcState::Idle:
+    {
+      CharaPtr pClosestActor = getClosestChara();
+
+      if( ( pClosestActor != nullptr ) && pClosestActor->isAlive() )
+      {
+        auto distance = Util::distance( getPos().x, getPos().y, getPos().z,
+                                        pClosestActor->getPos().x,
+                                        pClosestActor->getPos().y,
+                                        pClosestActor->getPos().z );
+
+        if( distance < 8 && pClosestActor->isPlayer() )
+          aggro( pClosestActor );
+        //if( distance < 8 && getbehavior() == 2 )
+        //   aggro( pClosestActor );
+      }
+    }
+
+    case BNpcState::Combat:
+    {
+      auto pActor = hateListGetHighest();
+      if( !pActor )
+        return;
+      auto pClosestActor = pActor->getAsChara();
+
+      auto distanceOrig = Util::distance( getPos().x, getPos().y, getPos().z,
+                                          m_spawnPos.x,
+                                          m_spawnPos.y,
+                                          m_spawnPos.z );
+
+      if( pClosestActor && !pClosestActor->isAlive() )
+      {
+        hateListRemove( pClosestActor );
+        pActor = hateListGetHighest();
+        if( pActor )
+          pClosestActor = pActor->getAsChara();
+        else
+          pClosestActor.reset();
+      }
+
+      if( pClosestActor != nullptr )
+      {
+        auto distance = Util::distance( getPos().x, getPos().y, getPos().z,
+                                        pClosestActor->getPos().x,
+                                        pClosestActor->getPos().y,
+                                        pClosestActor->getPos().z );
+
+        if( distanceOrig > 30 )
+        {
+          hateListClear();
+          changeTarget( INVALID_GAME_OBJECT_ID );
+          setStance( Stance::Passive );
+          //setOwner( nullptr );
+          m_state = BNpcState::Retreat;
+          break;
+        }
+
+        if( distance > 4 )
+          moveTo( pClosestActor->getPos() );
+        else
+        {
+          if( face( pClosestActor->getPos() ) )
+            sendPositionUpdate();
+          // in combat range. ATTACK!
+          autoAttack( pClosestActor );
+        }
+      }
+      else
+      {
+        changeTarget( INVALID_GAME_OBJECT_ID );
+        setStance( Stance::Passive );
+        //setOwner( nullptr );
+        m_state = BNpcState::Retreat;
+      }
+    }
+  }
 }

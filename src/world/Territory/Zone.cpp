@@ -376,8 +376,7 @@ bool Sapphire::Zone::checkWeather()
   return false;
 }
 
-/*
-void Sapphire::Zone::updateBnpcs( int64_t tickCount )
+void Sapphire::Zone::updateBNpcs( int64_t tickCount )
 {
    if( ( tickCount - m_lastMobUpdate ) > 250 )
    {
@@ -385,7 +384,7 @@ void Sapphire::Zone::updateBnpcs( int64_t tickCount )
       m_lastMobUpdate = tickCount;
       uint32_t currTime = static_cast< uint32_t >( time( nullptr ) );
 
-      for( auto it3 = m_BattleNpcDeadMap.begin(); it3 != m_BattleNpcDeadMap.end(); ++it3 )
+      /*for( auto it3 = m_BattleNpcDeadMap.begin(); it3 != m_BattleNpcDeadMap.end(); ++it3 )
       {
 
          Entity::BattleNpcPtr pBNpc = *it3;
@@ -402,29 +401,29 @@ void Sapphire::Zone::updateBnpcs( int64_t tickCount )
 
             break;
          }
-      }
+      }*/
 
 
-      for( auto entry : m_BattleNpcMap )
+      for( auto entry : m_bNpcMap )
       {
-         Entity::BattleNpcPtr pBNpc = entry.second;
+         Entity::BNpcPtr pBNpc = entry.second;
 
          if( !pBNpc )
             continue;
 
-         if( !pBNpc->isAlive() && currTime - pBNpc->getTimeOfDeath() > ( 10 ) )
-         {
-            removeActor( pBNpc );
-            m_BattleNpcDeadMap.insert( pBNpc );
-            break;
-         }
+         //if( !pBNpc->isAlive() && currTime - pBNpc->getTimeOfDeath() > ( 10 ) )
+         //{
+         //   removeActor( pBNpc );
+         //   m_BattleNpcDeadMap.insert( pBNpc );
+         //   break;
+         //}
 
          pBNpc->update( tickCount );
 
       }
    }
 }
-*/
+
 
 bool Sapphire::Zone::update( uint32_t currTime )
 {
@@ -434,7 +433,7 @@ bool Sapphire::Zone::update( uint32_t currTime )
   bool changedWeather = checkWeather();
 
   updateSessions( changedWeather );
-  //updateBnpcs( tickCount );
+  updateBNpcs( tickCount );
   onUpdate( currTime );
 
   updateSpawnPoints();
@@ -832,8 +831,6 @@ void Sapphire::Zone::updateSpawnPoints()
           continue;
         }
 
-        uint32_t random = rand() % 20;
-
         auto pBNpc = std::make_shared< Entity::BNpc >( getNextActorId(),
                                                        bNpcTemplate,
                                                        point->getPosX(),
@@ -841,7 +838,7 @@ void Sapphire::Zone::updateSpawnPoints()
                                                        point->getPosZ(),
                                                        dist( mt ),
                                                        group.getLevel(),
-                                                       group.getMaxHp(), m_pFw );
+                                                       group.getMaxHp(), shared_from_this(), m_pFw );
         point->setLinkedBNpc( pBNpc );
 
         pushActor( pBNpc );
