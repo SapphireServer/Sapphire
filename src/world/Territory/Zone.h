@@ -142,7 +142,7 @@ namespace Sapphire
     bool loadSpawnGroups();
 
     bool checkWeather();
-    //void updateBnpcs( int64_t tickCount );
+    void updateBNpcs( int64_t tickCount );
 
     bool update( uint32_t currTime );
 

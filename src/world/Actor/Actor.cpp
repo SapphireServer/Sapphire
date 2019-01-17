@@ -251,13 +251,13 @@ bool Sapphire::Entity::Actor::isInRangeSet( ActorPtr pActor ) const
 
 
 /*! \return ActorPtr of the closest actor in range, if none, nullptr */
-Sapphire::Entity::ActorPtr Sapphire::Entity::Actor::getClosestActor()
+Sapphire::Entity::CharaPtr Sapphire::Entity::Actor::getClosestChara()
 {
   if( m_inRangeActor.empty() )
     // no actors in range, don't bother
     return nullptr;
 
-  ActorPtr tmpActor = nullptr;
+  CharaPtr tmpActor = nullptr;
 
   // arbitrary high number
   float minDistance = 10000;
@@ -270,7 +270,7 @@ Sapphire::Entity::ActorPtr Sapphire::Entity::Actor::getClosestActor()
     if( distance < minDistance )
     {
       minDistance = distance;
-      tmpActor = pCurAct;
+      tmpActor = pCurAct->getAsChara();
     }
   }
 
