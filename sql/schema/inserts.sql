@@ -1,4 +1,4 @@
-﻿
+
 INSERT INTO `accounts` (`account_id`, `account_name`, `account_pass`, `account_created`, `account_status`) VALUES (1, 'Admin', 'Admin', 0, 2);
 INSERT IGNORE INTO `bnpctemplate` ( `Name`, `bNPCBaseId`, `bNPCNameId`, `mainWeaponModel`, `secWeaponModel`, `aggressionMode`, `enemyType`, `pose`, `modelChara`, `displayFlags`, `Look`, `Models`) VALUES ( "littleladybug_49", 49, 49, 0, 0, 1, 4, 4, 57, 0, UNHEX( '0000000000000000000000000000000000000000000000000000'), UNHEX( '00000000000000000000000000000000000000000000000000000000000000000000000000000000') );
 INSERT IGNORE INTO `bnpctemplate` ( `Name`, `bNPCBaseId`, `bNPCNameId`, `mainWeaponModel`, `secWeaponModel`, `aggressionMode`, `enemyType`, `pose`, `modelChara`, `displayFlags`, `Look`, `Models`) VALUES ( "beecloud_57", 57, 395, 0, 0, 1, 4, 4, 60, 0, UNHEX( '0000000000000000000000000000000000000000000000000000'), UNHEX( '00000000000000000000000000000000000000000000000000000000000000000000000000000000') );
