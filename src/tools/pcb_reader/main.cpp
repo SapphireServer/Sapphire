@@ -7,15 +7,16 @@
 #include <regex>
 #include <map>
 #include <vector>
+
+#include <queue>
 #include <set>
+#include <thread>
 #include <variant>
 #include <Util/Util.h>
 
 #include "pcb.h"
 #include "lgb.h"
 #include "sgb.h"
-
-#ifndef STANDALONE
 
 #include <GameData.h>
 #include <File.h>
@@ -24,15 +25,11 @@
 #include <ExdCat.h>
 #include <Exd.h>
 
-#endif
-
 // garbage to ignore models
 bool ignoreModels = false;
 
 std::string gamePath( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
-std::unordered_map< uint32_t, std::string > eobjNameMap;
 std::unordered_map< uint16_t, std::string > zoneNameMap;
-std::unordered_map< uint16_t, std::vector< std::pair< uint16_t, std::string > > > zoneInstanceMap;
 uint32_t zoneId;
 
 std::set< std::string > zoneDumpList;
@@ -116,74 +113,10 @@ int parseBlockEntry( char* data, std::vector< PCB_BLOCK_ENTRY >& entries, int gO
   return 0;
 }
 
-void dumpLevelExdEntries( uint32_t zoneId, const std::string& name = std::string() )
-{
-  static auto& cat = eData->get_category( "Level" );
-  static auto exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::none ) );
-
-  std::string fileName( name + "_" + std::to_string( zoneId ) + "_Level" + ".csv" );
-  std::ofstream outfile( fileName, std::ios::trunc );
-  std::cout << "[Info] Writing level.exd entries to " << fileName << "\n";
-  if( outfile.good() )
-  {
-    outfile.close();
-    outfile.open( fileName, std::ios::app );
-    static auto rows = exd.get_rows();
-    for( auto& row : rows )
-    {
-      auto id = row.first;
-      auto& fields = row.second;
-      auto x = std::get< float >( fields.at( 0 ) );
-      auto y = std::get< float >( fields.at( 1 ) );
-      auto z = std::get< float >( fields.at( 2 ) );
-      auto yaw = std::get< float >( fields.at( 3 ) );
-      auto radius = std::get< float >( fields.at( 4 ) );
-      auto type = std::get< uint8_t >( fields.at( 5 ) );
-      auto objectid = std::get< uint32_t >( fields.at( 6 ) );
-      auto zone = std::get< uint16_t >( fields.at( 9 ) );
-
-      if( zone == zoneId )
-      {
-        std::string outStr(
-          std::to_string( id ) + ", " + std::to_string( objectid ) + ", " +
-          std::to_string( x ) + ", " + std::to_string( y ) + ", " + std::to_string( z ) + ", " +
-          std::to_string( yaw ) + ", " + std::to_string( radius ) + ", " + std::to_string( type ) + "\n"
-        );
-        outfile.write( outStr.c_str(), outStr.size() );
-      }
-    }
-  }
-}
-
 std::string zoneNameToPath( const std::string& name )
 {
   std::string path;
   bool found = false;
-
-#ifdef STANDALONE
-  auto inFile = std::ifstream( "territorytype.exh.csv" );
-  if( inFile.good() )
-  {
-     std::string line;
-     std::regex re( "(\\d+),\"(.*)\",\"(.*)\",.*" );
-     while( std::getline( inFile, line ) )
-     {
-        std::smatch match;
-        if( std::regex_match( line, match, re )
-        {
-           auto tmpId = std::stoul( match[1].str() );
-           if( !found && name == match[2].str() )
-           {
-              zoneId = tmpId;
-              path = match[3].str();
-              found = true;
-           }
-           zoneNameMap[tmpId] = match[2].str();
-        }
-     }
-     inFile.close();
-  }
-#else
 
   auto& cat = eData->get_category( "TerritoryType" );
   auto exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::none ) );
@@ -203,7 +136,6 @@ std::string zoneNameToPath( const std::string& name )
     }
     zoneNameMap[ row.first ] = teriName;
   }
-#endif
 
   if( found )
   {
@@ -219,101 +151,6 @@ std::string zoneNameToPath( const std::string& name )
   }
 
   return path;
-}
-
-void loadEobjNames()
-{
-  auto& cat = eData->get_category( "EObjName" );
-  auto exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::en ) );
-  for( auto& row : exd.get_rows() )
-  {
-    auto id = row.first;
-    auto& fields = row.second;
-    auto name = std::get< std::string >( fields.at( 0 ) );
-    eobjNameMap[ id ] = name;
-  }
-}
-
-void writeEobjEntry( std::ofstream& out, LGB_ENTRY* pObj )
-{
-  static std::string mapRangeStr( "\"MapRange\", " );
-  static std::string eobjStr( "\"EObj\", " );
-
-  uint32_t id;
-  uint32_t unknown = 0, unknown2 = 0;
-  std::string name;
-  std::string typeStr;
-  uint32_t eobjlevelHierachyId = 0;
-
-  if( pObj->getType() == LgbEntryType::EventObject )
-  {
-    auto pEobj = reinterpret_cast< LGB_EOBJ_ENTRY* >( pObj );
-    id = pEobj->header.eobjId;
-    unknown = pEobj->header.unknown;
-    name = eobjNameMap[ id ];
-    typeStr = eobjStr;
-    eobjlevelHierachyId = pEobj->header.levelHierachyId;
-  }
-  else if( pObj->getType() == LgbEntryType::MapRange )
-  {
-    auto pMapRange = reinterpret_cast< LGB_MAPRANGE_ENTRY* >( pObj );
-    id = pMapRange->header.unknown;
-    unknown = pMapRange->header.unknown2;
-    unknown2 = pMapRange->header.unknown3;
-    typeStr = mapRangeStr;
-  }
-
-  std::string outStr(
-    std::to_string( id ) + ", " + typeStr + "\"" + name + "\", " +
-    std::to_string( pObj->header.translation.x ) + ", " + std::to_string( pObj->header.translation.y ) + ", " +
-    std::to_string( pObj->header.translation.z ) +
-    ", " + std::to_string( eobjlevelHierachyId ) + "\n"
-  );
-  out.write( outStr.c_str(), outStr.size() );
-}
-
-void loadAllInstanceContentEntries()
-{
-  auto& catInstance = eData->get_category( "InstanceContent" );
-  auto exdInstance = static_cast< xiv::exd::Exd >( catInstance.get_data_ln( xiv::exd::Language::en ) );
-
-  if( zoneNameMap.size() == 0 )
-  {
-    zoneNameToPath( "f1d1" );
-  }
-
-  std::ofstream out( "instancecontent.csv", std::ios::trunc );
-  if( out.good() )
-  {
-    out.close();
-  }
-  out.open( "instancecontent.csv", std::ios::app );
-  if( !out.good() )
-  {
-    throw std::runtime_error( "Unable to create instancecontent.csv!" );
-  }
-  std::cout << "[Info] Writing instancecontent.csv\n";
-
-  for( auto& row : exdInstance.get_rows() )
-  {
-    auto id = row.first;
-    auto& fields = row.second;
-
-    auto name = std::get< std::string >( fields.at( 3 ) );
-    if( name.empty() )
-      continue;
-    auto teri = std::get< uint32_t >( fields.at( 9 ) );
-    auto i = 0;
-    while( ( i = name.find( ' ' ) ) != std::string::npos )
-      name = name.replace( name.begin() + i, name.begin() + i + 1, { '_' } );
-    std::string outStr(
-      std::to_string( id ) + ", \"" + name + "\", \"" + zoneNameMap[ teri ] + "\"," + std::to_string( teri ) + "\n"
-    );
-    out.write( outStr.c_str(), outStr.size() );
-    //zoneInstanceMap[zoneId].push_back( std::make_pair( id, name ) );
-    zoneDumpList.emplace( zoneNameMap[ teri ] );
-  }
-  out.close();
 }
 
 void readFileToBuffer( const std::string& path, std::vector< char >& buf )
@@ -340,11 +177,11 @@ int main( int argc, char* argv[] )
   auto entryStartTime = std::chrono::system_clock::now();
 
   std::vector< std::string > argVec( argv + 1, argv + argc );
-  // todo: support expansions
   std::string zoneName = "r2t2";
-  bool dumpInstances = ignoreModels = std::remove_if( argVec.begin(), argVec.end(), []( auto arg )
-  { return arg == "--instance-dump"; } ) != argVec.end();
-
+  bool dumpAllZones = std::remove_if( argVec.begin(), argVec.end(), []( auto arg )
+  { return arg == "--dump-all"; } ) != argVec.end();
+  bool generateNavmesh = std::remove_if( argVec.begin(), argVec.end(), []( auto arg )
+  { return arg == "--navmesh"; } ) != argVec.end();
   if( argc > 1 )
   {
     zoneName = argv[ 1 ];
@@ -357,14 +194,42 @@ int main( int argc, char* argv[] )
   }
 
   initExd( gamePath );
-  if( dumpInstances )
+
+  zoneNameToPath( zoneName );
+
+  if( dumpAllZones )
   {
-    loadAllInstanceContentEntries();
+    for( const auto& zone : zoneNameMap )
+      zoneDumpList.emplace( zone.second );
   }
   else
   {
     zoneDumpList.emplace( zoneName );
   }
+
+  std::mutex navmeshMutex;
+  std::queue< std::string > exportedGroups;
+
+  std::string exportArg( "RecastDemo.exe --type tileMesh --obj " );
+  std::thread navmeshThread( [&navmeshMutex, &exportedGroups, &exportArg, &generateNavmesh]()
+  {
+    while( generateNavmesh )
+    {
+      std::this_thread::sleep_for( std::chrono::milliseconds( 1 ) );
+      std::lock_guard< std::mutex > lock( navmeshMutex );
+      {
+        if( !exportedGroups.empty() )
+        {
+          auto& currFile = exportedGroups.front();
+          std::cout << "\nGenerating navmesh for " << currFile << std::endl;
+          system( ( exportArg + currFile ).c_str() );
+          std::cout << "\nFinished generating navmesh for " << currFile << std::endl;
+          exportedGroups.pop();
+        }
+      }
+    }
+  });
+  navmeshThread.detach();
 
   LABEL_DUMP:
   entryStartTime = std::chrono::system_clock::now();
@@ -381,7 +246,6 @@ int main( int argc, char* argv[] )
     std::vector< char > section1;
     std::vector< char > section2;
 
-#ifndef STANDALONE
     const xiv::dat::Cat& test = data1->getCategory( "bg" );
 
     auto test_file = data1->getFile( bgLgbPath );
@@ -392,37 +256,18 @@ int main( int argc, char* argv[] )
 
     auto test_file1 = data1->getFile( listPcbPath );
     section1 = test_file1->access_data_sections().at( 0 );
-#else
-    {
-       readFileToBuffer( bgLgbPath, section );
-       readFileToBuffer( listPcbPath, section1 );
-    }
-#endif
 
     std::vector< std::string > stringList;
 
     uint32_t offset1 = 0x20;
 
-    loadEobjNames();
-    dumpLevelExdEntries( zoneId, zoneName );
-    std::string eobjFileName( zoneName + "_eobj.csv" );
-    std::ofstream eobjOut( eobjFileName, std::ios::trunc );
-    if( !eobjOut.good() )
-      throw std::string( "Unable to create " + zoneName +
-                         "_eobj.csv for eobj entries. Run as admin or check there isnt already a handle on the file." ).c_str();
-
-    eobjOut.close();
-    eobjOut.open( eobjFileName, std::ios::app );
-
-    if( !eobjOut.good() )
-      throw std::string( "Unable to create " + zoneName +
-                         "_eobj.csv for eobj entries. Run as admin or check there isnt already a handle on the file." ).c_str();
-
-    if( !ignoreModels )
     {
       for( ;; )
       {
-
+        if( offset1 >= section1.size() )
+        {
+          break;
+        }
         uint16_t trId = *( uint16_t* ) &section1[ offset1 ];
 
         char someString[200];
@@ -431,10 +276,7 @@ int main( int argc, char* argv[] )
         //std::cout << someString << "\n";
         offset1 += 0x20;
 
-        if( offset1 >= section1.size() )
-        {
-          break;
-        }
+
       }
     }
     LGB_FILE bgLgb( &section[ 0 ], "bg" );
@@ -477,15 +319,9 @@ int main( int argc, char* argv[] )
 
           char* dataSection = nullptr;
           //std::cout << fileName << " ";
-#ifndef STANDALONE
           auto file = data1->getFile( fileName );
           auto sections = file->get_data_sections();
           dataSection = &sections.at( 0 )[ 0 ];
-#else
-          std::vector< char > buf;
-          readFileToBuffer( fileName, buf );
-          dataSection = &buf[0];
-#endif
           //std::cout << sections.size() << "\n";
 
           uint32_t offset = 0;
@@ -530,15 +366,11 @@ int main( int argc, char* argv[] )
         {
           char* dataSection = nullptr;
           //std::cout << fileName << " ";
-#ifndef STANDALONE
+
           auto file = data1->getFile( fileName );
           auto sections = file->get_data_sections();
           dataSection = &sections.at( 0 )[ 0 ];
-#else
-          std::vector< char > buf;
-          readFileToBuffer( fileName, buf );
-          dataSection = &buf[0];
-#endif
+
           sgbFile = SGB_FILE( &dataSection[ 0 ] );
           sgbFiles.insert( std::make_pair( fileName, sgbFile ) );
           return true;
@@ -550,14 +382,12 @@ int main( int argc, char* argv[] )
         }
         return false;
       };
-      auto pushVerts = [ & ]( const PCB_FILE& pcb_file, const std::string& name,
+      auto writeToFile = [ & ]( const PCB_FILE& pcb_file, const std::string& name, const std::string& groupName,
                               const vec3* scale = nullptr,
                               const vec3* rotation = nullptr,
                               const vec3* translation = nullptr,
                               const SGB_MODEL_ENTRY* pSgbEntry = nullptr )
       {
-        if( ignoreModels )
-          return;
         char name2[0x100];
         memset( name2, 0, 0x100 );
         sprintf( &name2[ 0 ], "%s_%u", &name[ 0 ], objCount[ name ]++ );
@@ -635,16 +465,13 @@ int main( int argc, char* argv[] )
         }
       };
 
-      if( !ignoreModels )
+      for( const auto& fileName : stringList )
       {
-        for( const auto& fileName : stringList )
-        {
-          loadPcbFile( fileName );
-          pushVerts( pcbFiles[ fileName ], fileName );
-        }
+        loadPcbFile( fileName );
+        writeToFile( pcbFiles[ fileName ], fileName, zoneName );
       }
 
-      std::cout << "[Info] " << ( ignoreModels ? "Dumping MapRange and EObj" : "Writing obj file " ) << "\n";
+      std::cout << "[Info] " << "Writing obj file " << "\n";
       uint32_t totalGroups = 0;
       uint32_t totalGroupEntries = 0;
 
@@ -652,6 +479,16 @@ int main( int argc, char* argv[] )
       {
         for( const auto& group : lgb.groups )
         {
+          max_index = 0;
+          std::string outfile_name( zoneName + "_" + group.name + ".obj" );
+
+          fp_out = fopen( outfile_name.c_str(), "w" );
+          if( fp_out )
+          {
+            fprintf( fp_out, "" );
+            fclose( fp_out );
+            fp_out = fopen( outfile_name.c_str(), "ab+" );
+          }
           //std::cout << "\t" << group.name << " Size " << group.header.entryCount << "\n";
           totalGroups++;
           for( const auto& pEntry : group.entries )
@@ -680,7 +517,7 @@ int main( int argc, char* argv[] )
               if( it != pcbFiles.end() )
               {
                 const auto& pcb_file = it->second;
-                pushVerts( pcb_file, fileName, scale, rotation, translation, pModel );
+                writeToFile( pcb_file, fileName, group.name, scale, rotation, translation, pModel );
               }
               return true;
             };
@@ -720,12 +557,15 @@ int main( int argc, char* argv[] )
               }
             }
 
-            if( pEntry->getType() == LgbEntryType::EventObject || pEntry->getType() == LgbEntryType::MapRange )
+            if( pEntry->getType() == LgbEntryType::EventObject )
             {
-              writeEobjEntry( eobjOut, pEntry.get() );
               writeOutput( fileName, &pEntry->header.scale, &pEntry->header.rotation, &pEntry->header.translation );
             }
           }
+          if( fp_out )
+            fclose( fp_out );
+          std::lock_guard< std::mutex > lock( navmeshMutex );
+          exportedGroups.push( outfile_name );
         }
       }
       std::cout << "[Info] " << "Loaded " << pcbFiles.size() << " PCB Files \n";
@@ -739,7 +579,7 @@ int main( int argc, char* argv[] )
   {
     std::cout << "[Error] " << e.what() << std::endl;
     std::cout << "[Error] "
-              << "Unable to extract collision data.\n\tIf using standalone ensure your working directory folder layout is \n\tbg/[ffxiv|ex1|ex2]/teri/type/zone/[level|collision]"
+              << "Unable to extract collision data.\n"
               << std::endl;
     std::cout << std::endl;
     std::cout << "[Info] " << "Usage: pcb_reader2 territory \"path/to/game/sqpack/ffxiv\" " << std::endl;
