@@ -473,7 +473,7 @@ Sapphire::Entity::BNpcTemplatePtr Sapphire::World::ServerMgr::getBNpcTemplate( c
 
 Sapphire::Entity::BNpcTemplatePtr Sapphire::World::ServerMgr::getBNpcTemplate( uint32_t id )
 {
-  for( auto entry : m_bNpcTemplateMap )
+  for( const auto& entry : m_bNpcTemplateMap )
   {
     if( entry.second->getId() == id )
       return entry.second;
