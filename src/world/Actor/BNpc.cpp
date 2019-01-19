@@ -130,6 +130,11 @@ void Sapphire::Entity::BNpc::spawn( PlayerPtr pTarget )
   pTarget->queuePacket( std::make_shared< NpcSpawnPacket >( *getAsBNpc(), *pTarget ) );
 }
 
+void Sapphire::Entity::BNpc::despawn( PlayerPtr pTarget )
+{
+  pTarget->freePlayerSpawnId( getId() );
+}
+
 Sapphire::Entity::BNpcState Sapphire::Entity::BNpc::getState() const
 {
   return m_state;
@@ -306,6 +311,10 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
 
     case BNpcState::Idle:
     {
+      // passive mobs should ignore players unless aggro'd
+      if( m_aggressionMode == 1 )
+        return;
+
       CharaPtr pClosestChara = getClosestChara();
 
       if( pClosestChara && pClosestChara->isAlive() )
