@@ -1586,7 +1586,7 @@ uint32_t Sapphire::Entity::Player::getCFPenaltyMinutes() const
 void Sapphire::Entity::Player::setCFPenaltyMinutes( uint32_t minutes )
 {
   auto currentTimestamp = Sapphire::Util::getTimeSeconds();
-  setCFPenaltyTimestamp( static_cast< uint32_t >( currentTimestamp + minutes * 60 ) );
+  setCFPenaltyTimestamp( currentTimestamp + minutes * 60 );
 }
 
 uint8_t Sapphire::Entity::Player::getOpeningSequence() const

@@ -30,7 +30,7 @@ Sapphire::Land::Land( uint16_t territoryTypeId, uint8_t wardNum, uint8_t landId,
                       Sapphire::Data::HousingLandSetPtr info, FrameworkPtr pFw ) :
   m_currentPrice( 0 ),
   m_minPrice( 0 ),
-  m_nextDrop( static_cast< uint32_t >( Util::getTimeSeconds() ) + 21600 ),
+  m_nextDrop( Util::getTimeSeconds() + 21600 ),
   m_ownerId( 0 ),
   m_landSetId( landSetId ),
   m_landInfo( info ),
@@ -185,7 +185,7 @@ uint64_t Sapphire::Land::getOwnerId()
 
 uint32_t Sapphire::Land::getDevaluationTime()
 {
-  return m_nextDrop - static_cast< uint32_t >( Util::getTimeSeconds() );
+  return m_nextDrop - Util::getTimeSeconds();
 }
 
 void Sapphire::Land::setCurrentPrice( uint32_t currentPrice )

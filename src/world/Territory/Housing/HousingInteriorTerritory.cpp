@@ -39,7 +39,7 @@ Sapphire::World::Territory::Housing::HousingInteriorTerritory::HousingInteriorTe
   Zone( territoryTypeId, guId, internalName, contentName, pFw ),
   m_landIdent( ident )
 {
-  m_lastActivityTime = static_cast< uint32_t >( Util::getTimeSeconds() );
+  m_lastActivityTime = Util::getTimeSeconds();
 }
 
 Housing::HousingInteriorTerritory::~HousingInteriorTerritory() = default;
