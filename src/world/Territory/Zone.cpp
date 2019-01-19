@@ -64,6 +64,7 @@ Sapphire::Zone::Zone( uint16_t territoryTypeId, uint32_t guId,
                       FrameworkPtr pFw ) :
   m_currentWeather( Weather::FairSkies ),
   m_nextEObjId( 0x400D0000 ),
+  m_nextActorId( 0x500D0000 ),
   m_pFw( pFw )
 {
   auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
