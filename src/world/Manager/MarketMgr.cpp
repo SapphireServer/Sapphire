@@ -83,11 +83,10 @@ void Sapphire::World::Manager::MarketMgr::requestItemListingInfo( Sapphire::Enti
 
     listing.itemCatalogId = catalogId;
     listing.quantity = i + 1;
-    listing.purchaseTime = time( nullptr );
+    listing.purchaseTime = Sapphire::Util::getTimeSeconds();
     listing.salePrice = 69420420;
     listing.isHq = 1;
     listing.onMannequin = 1;
-
 
     strcpy( listing.buyerName, name.c_str() );
   }
