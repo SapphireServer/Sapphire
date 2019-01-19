@@ -698,8 +698,7 @@ struct FFXIVIpcActorSetPos :
 * Structural representation of the packet sent by the server
 * to start an actors casting
 */
-struct FFXIVIpcActorCast :
-  FFXIVIpcBasePacket< ActorCast >
+struct FFXIVIpcActorCast : FFXIVIpcBasePacket< ActorCast >
 {
   uint16_t action_id;
   Common::SkillType skillType;
@@ -715,11 +714,10 @@ struct FFXIVIpcActorCast :
   uint16_t unknown_3;
 };
 
-struct FFXIVIpcHateList :
-  FFXIVIpcBasePacket< HateList >
+struct FFXIVIpcHateList : FFXIVIpcBasePacket< HateList >
 {
   uint32_t numEntries;
-  struct LsEntry
+  struct
   {
     uint32_t actorId;
     uint8_t hatePercent;
@@ -729,8 +727,7 @@ struct FFXIVIpcHateList :
   uint32_t padding;
 };
 
-struct FFXIVIpcUpdateClassInfo :
-  FFXIVIpcBasePacket< UpdateClassInfo >
+struct FFXIVIpcUpdateClassInfo : FFXIVIpcBasePacket< UpdateClassInfo >
 {
   uint8_t classId;
   uint8_t level1;
