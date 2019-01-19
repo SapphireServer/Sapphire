@@ -75,8 +75,6 @@ namespace Sapphire::Network::Packets::Server
       m_data.bNPCBase = bnpc.getBNpcBaseId();
       m_data.bNPCName = bnpc.getBNpcNameId();
 
-      m_data.state = 1;
-
       assert( target.getId() != bnpc.getId() );
 
       m_data.spawnIndex = target.getSpawnIdForActorId( bnpc.getId() );
