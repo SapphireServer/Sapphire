@@ -56,9 +56,9 @@ namespace Sapphire::World
 
     Entity::PlayerPtr m_pPlayer;
 
-    int64_t m_lastDataTime;
+    uint32_t m_lastDataTime;
 
-    int64_t m_lastSqlTime;
+    uint32_t m_lastSqlTime;
     bool m_isValid;
 
     bool m_isReplaying;
