@@ -12,7 +12,7 @@
 #include "vec3.h"
 
 // garbage to skip model loading
-extern bool ignoreModels;
+extern bool noObj;
 
 //
 // ported from https://github.com/ufx/SaintCoinach/blob/master/SaintCoinach/Graphics/Sgb/SgbDataType.cs
