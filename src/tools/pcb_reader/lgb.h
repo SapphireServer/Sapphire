@@ -14,7 +14,7 @@
 #include "sgb.h"
 
 // garbage to skip model loading
-extern bool ignoreModels;
+extern bool noObj;
 
 // all credit to
 // https://github.com/ufx/SaintCoinach/blob/master/SaintCoinach/Graphics/Lgb/

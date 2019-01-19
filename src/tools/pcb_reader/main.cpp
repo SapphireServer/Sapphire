@@ -25,8 +25,10 @@
 #include <ExdCat.h>
 #include <Exd.h>
 
+#include <condition_variable>
+
 // garbage to ignore models
-bool ignoreModels = false;
+bool noObj = false;
 
 std::string gamePath( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
 std::unordered_map< uint16_t, std::string > zoneNameMap;
@@ -36,6 +38,7 @@ std::set< std::string > zoneDumpList;
 
 xiv::dat::GameData* data1 = nullptr;
 xiv::exd::ExdData* eData = nullptr;
+
 
 enum class TerritoryTypeExdIndexes :
   size_t
@@ -173,11 +176,15 @@ void readFileToBuffer( const std::string& path, std::vector< char >& buf )
 
 int main( int argc, char* argv[] )
 {
-  auto startTime = std::chrono::system_clock::now();
-  auto entryStartTime = std::chrono::system_clock::now();
+  auto startTime = std::chrono::high_resolution_clock::now();
+  auto entryStartTime = std::chrono::high_resolution_clock::now();
+
+  std::condition_variable cv;
 
   std::vector< std::string > argVec( argv + 1, argv + argc );
   std::string zoneName = "r2t2";
+  noObj = std::remove_if( argVec.begin(), argVec.end(), []( auto arg )
+  { return arg == "--no-obj"; } ) != argVec.end();
   bool dumpAllZones = std::remove_if( argVec.begin(), argVec.end(), []( auto arg )
   { return arg == "--dump-all"; } ) != argVec.end();
   bool generateNavmesh = std::remove_if( argVec.begin(), argVec.end(), []( auto arg )
@@ -210,21 +217,50 @@ int main( int argc, char* argv[] )
   std::mutex navmeshMutex;
   std::queue< std::string > exportedGroups;
 
+  // todo:
+#ifdef WIN32
   std::string exportArg( "RecastDemo.exe --type tileMesh --obj " );
-  std::thread navmeshThread( [&navmeshMutex, &exportedGroups, &exportArg, &generateNavmesh]()
+#else
+  std::string exportArg( "./RecastDemo --type tileMesh --obj ");
+#endif
+
+  std::thread navmeshThread( [&navmeshMutex, &exportedGroups, &exportArg, &generateNavmesh, &cv]()
   {
     while( generateNavmesh )
     {
-      std::this_thread::sleep_for( std::chrono::milliseconds( 1 ) );
-      std::lock_guard< std::mutex > lock( navmeshMutex );
-      {
-        if( !exportedGroups.empty() )
+      std::string currFile;
+      
+        std::unique_lock lk( navmeshMutex );
+        while( exportedGroups.empty() )
         {
-          auto& currFile = exportedGroups.front();
-          std::cout << "\nGenerating navmesh for " << currFile << std::endl;
-          system( ( exportArg + currFile ).c_str() );
-          std::cout << "\nFinished generating navmesh for " << currFile << std::endl;
+          cv.wait( lk );
+        }
+
+        //if( !exportedGroups.empty() )
+        {
+          currFile = exportedGroups.front();
           exportedGroups.pop();
+        }
+      
+      if( !currFile.empty() )
+      {
+        std::error_code e;
+        if( std::experimental::filesystem::exists( currFile ) && std::experimental::filesystem::file_size( currFile, e ) > 1024 )
+        {
+          std::string generateMessage( "\nGenerating navmesh for " + currFile + "\n" );
+          std::cout << generateMessage << std::endl;
+
+          auto start = std::chrono::high_resolution_clock::now();
+
+          system( ( exportArg + currFile ).c_str() );
+
+          std::string finishMessage( "\nFinished generating navmesh for " + currFile + " in " +
+            std::to_string( std::chrono::duration_cast< std::chrono::seconds >( std::chrono::high_resolution_clock::now() - start ).count() ) + " seconds\n" );
+          std::cout << finishMessage << std::endl;
+        }
+        else
+        { 
+          std::cout << ( std::string( "Unable to load OBJ file for " ) + currFile + "\n" ) << std::endl; 
         }
       }
     }
@@ -232,7 +268,7 @@ int main( int argc, char* argv[] )
   navmeshThread.detach();
 
   LABEL_DUMP:
-  entryStartTime = std::chrono::system_clock::now();
+  entryStartTime = std::chrono::high_resolution_clock::now();
   zoneName = *zoneDumpList.begin();
   try
   {
@@ -286,13 +322,13 @@ int main( int argc, char* argv[] )
     uint32_t max_index = 0;
 
     // dont bother if we cant write to a file
-    auto fp_out = ignoreModels ? ( FILE* ) nullptr : fopen( ( zoneName + ".obj" ).c_str(), "w" );
+    auto fp_out = noObj ? ( FILE* ) nullptr : fopen( ( zoneName + ".obj" ).c_str(), "w" );
     if( fp_out )
     {
       fprintf( fp_out, "\n" );
       fclose( fp_out );
     }
-    else if( !ignoreModels )
+    else if( !noObj )
     {
       std::string errorMessage( "Cannot create " + zoneName + ".obj\n" +
                                 " Check no programs have a handle to file and run as admin.\n" );
@@ -301,15 +337,16 @@ int main( int argc, char* argv[] )
       return 0;
     }
 
-    if( ignoreModels || ( fp_out = fopen( ( zoneName + ".obj" ).c_str(), "ab+" ) ) )
+    if( noObj || ( fp_out = fopen( ( zoneName + ".obj" ).c_str(), "ab+" ) ) )
     {
       std::map< std::string, PCB_FILE > pcbFiles;
       std::map< std::string, SGB_FILE > sgbFiles;
       std::map< std::string, uint32_t > objCount;
       auto loadPcbFile = [ & ]( const std::string& fileName )->bool
       {
-        if( ignoreModels )
+        if( noObj )
           return false;
+
         try
         {
           if( fileName.find( '.' ) == std::string::npos )
@@ -388,6 +425,9 @@ int main( int argc, char* argv[] )
                               const vec3* translation = nullptr,
                               const SGB_MODEL_ENTRY* pSgbEntry = nullptr )
       {
+        if( noObj )
+          return;
+
         char name2[0x100];
         memset( name2, 0, 0x100 );
         sprintf( &name2[ 0 ], "%s_%u", &name[ 0 ], objCount[ name ]++ );
@@ -465,10 +505,13 @@ int main( int argc, char* argv[] )
         }
       };
 
-      for( const auto& fileName : stringList )
+      if( !noObj )
       {
-        loadPcbFile( fileName );
-        writeToFile( pcbFiles[ fileName ], fileName, zoneName );
+        for( const auto& fileName : stringList )
+        {
+          loadPcbFile( fileName );
+          writeToFile( pcbFiles[ fileName ], fileName, zoneName );
+        }
       }
 
       std::cout << "[Info] " << "Writing obj file " << "\n";
@@ -481,99 +524,113 @@ int main( int argc, char* argv[] )
         {
           max_index = 0;
           std::string outfile_name( zoneName + "_" + group.name + ".obj" );
-
-          fp_out = fopen( outfile_name.c_str(), "w" );
-          if( fp_out )
-          {
-            fprintf( fp_out, "" );
-            fclose( fp_out );
-            fp_out = fopen( outfile_name.c_str(), "ab+" );
-          }
-          //std::cout << "\t" << group.name << " Size " << group.header.entryCount << "\n";
           totalGroups++;
-          for( const auto& pEntry : group.entries )
+
+          if( !noObj )
           {
-            auto pGimmick = dynamic_cast< LGB_GIMMICK_ENTRY* >( pEntry.get() );
-            auto pBgParts = dynamic_cast< LGB_BGPARTS_ENTRY* >( pEntry.get() );
-
-            std::string fileName( "" );
-            fileName.resize( 256 );
-            totalGroupEntries++;
-
-            // write files
-            auto writeOutput = [ & ]( const std::string& fileName, const vec3* scale, const vec3* rotation,
-                                      const vec3* translation, const SGB_MODEL_ENTRY* pModel = nullptr )->bool
+            fp_out = fopen( outfile_name.c_str(), "w" );
+            if( fp_out )
             {
-              {
-                const auto& it = pcbFiles.find( fileName );
-                if( it == pcbFiles.end() )
-                {
-                  if( fileName.empty() || !loadPcbFile( fileName ) )
-                    return false;
-                  //std::cout << "\t\tLoaded PCB File " << pBgParts->collisionFileName << "\n";
-                }
-              }
-              const auto& it = pcbFiles.find( fileName );
-              if( it != pcbFiles.end() )
-              {
-                const auto& pcb_file = it->second;
-                writeToFile( pcb_file, fileName, group.name, scale, rotation, translation, pModel );
-              }
-              return true;
-            };
-
-            if( pBgParts )
-            {
-              fileName = pBgParts->collisionFileName;
-              writeOutput( fileName, &pBgParts->header.scale, &pBgParts->header.rotation,
-                           &pBgParts->header.translation );
+              // blank otherwise recast tries to load them..
+              fprintf( fp_out, "" );
+              fclose( fp_out );
+              fp_out = fopen( outfile_name.c_str(), "ab+" );
             }
-
-            // gimmick entry
-            if( pGimmick )
+            
+            //std::cout << "\t" << group.name << " Size " << group.header.entryCount << "\n";
+            for( const auto& pEntry : group.entries )
             {
+              std::string fileName( "" );
+              fileName.resize( 256 );
+              totalGroupEntries++;
+
+              // write files
+              auto writeOutput = [ & ]( const std::string& fileName, const vec3* scale, const vec3* rotation,
+                                        const vec3* translation, const SGB_MODEL_ENTRY* pModel = nullptr )->bool
               {
-                const auto& it = sgbFiles.find( pGimmick->gimmickFileName );
-                if( it == sgbFiles.end() )
                 {
-                  // std::cout << "\tGIMMICK:\n\t\t" << pGimmick->gimmickFileName << "\n";
-                  loadSgbFile( pGimmick->gimmickFileName );
-                }
-              }
-              const auto& it = sgbFiles.find( pGimmick->gimmickFileName );
-              if( it != sgbFiles.end() )
-              {
-                const auto& sgbFile = it->second;
-                for( const auto& group : sgbFile.entries )
-                {
-                  for( const auto& pEntry : group.entries )
+                  const auto& it = pcbFiles.find( fileName );
+                  if( it == pcbFiles.end() )
                   {
-                    auto pModel = dynamic_cast< SGB_MODEL_ENTRY* >( pEntry.get() );
-                    fileName = pModel->collisionFileName;
-                    writeOutput( fileName, &pGimmick->header.scale, &pGimmick->header.rotation,
-                                 &pGimmick->header.translation, pModel );
+                    if( fileName.empty() || !loadPcbFile( fileName ) )
+                      return false;
+                    //std::cout << "\t\tLoaded PCB File " << pBgParts->collisionFileName << "\n";
                   }
                 }
+                const auto& it = pcbFiles.find( fileName );
+                if( it != pcbFiles.end() )
+                {
+                  const auto& pcb_file = it->second;
+                  writeToFile( pcb_file, fileName, group.name, scale, rotation, translation, pModel );
+                }
+                return true;
+              };
+
+              switch( pEntry->getType() )
+              {
+                case LgbEntryType::BgParts:
+                {
+                  auto pBgParts = static_cast< LGB_BGPARTS_ENTRY* >( pEntry.get() );
+                  fileName = pBgParts->collisionFileName;
+                  writeOutput( fileName, &pBgParts->header.scale, &pBgParts->header.rotation,
+                               &pBgParts->header.translation );
+                }
+                break;
+
+                // gimmick entry
+                case LgbEntryType::Gimmick:
+                {
+                  auto pGimmick = static_cast< LGB_GIMMICK_ENTRY* >( pEntry.get() );
+                  {
+                    const auto& it = sgbFiles.find( pGimmick->gimmickFileName );
+                    if( it == sgbFiles.end() )
+                    {
+                      // std::cout << "\tGIMMICK:\n\t\t" << pGimmick->gimmickFileName << "\n";
+                      loadSgbFile( pGimmick->gimmickFileName );
+                    }
+                  }
+                  const auto& it = sgbFiles.find( pGimmick->gimmickFileName );
+                  if( it != sgbFiles.end() )
+                  {
+                    const auto& sgbFile = it->second;
+                    for( const auto& group : sgbFile.entries )
+                    {
+                      for( const auto& pEntry : group.entries )
+                      {
+                        auto pModel = dynamic_cast< SGB_MODEL_ENTRY* >( pEntry.get() );
+                        fileName = pModel->collisionFileName;
+                        writeOutput( fileName, &pGimmick->header.scale, &pGimmick->header.rotation,
+                                     &pGimmick->header.translation, pModel );
+                      }
+                    }
+                  }
+                }
+
+                case LgbEntryType::EventObject:
+                {
+                  writeOutput( fileName, &pEntry->header.scale, &pEntry->header.rotation, &pEntry->header.translation );
+                }
+                break;
               }
             }
-
-            if( pEntry->getType() == LgbEntryType::EventObject )
-            {
-              writeOutput( fileName, &pEntry->header.scale, &pEntry->header.rotation, &pEntry->header.translation );
-            }
           }
-          if( fp_out )
-            fclose( fp_out );
-          std::lock_guard< std::mutex > lock( navmeshMutex );
-          exportedGroups.push( outfile_name );
+          if( generateNavmesh )
+          {
+            if( fp_out )
+              fclose( fp_out );
+            std::unique_lock lock( navmeshMutex );
+            exportedGroups.push( outfile_name );
+            cv.notify_one();
+          }
         }
       }
       std::cout << "[Info] " << "Loaded " << pcbFiles.size() << " PCB Files \n";
       std::cout << "[Info] " << "Total Groups " << totalGroups << " Total entries " << totalGroupEntries << "\n";
     }
+
     std::cout << "[Success] " << "Exported " << zoneName << " in " <<
               std::chrono::duration_cast< std::chrono::seconds >(
-                std::chrono::system_clock::now() - entryStartTime ).count() << " seconds\n";
+                std::chrono::high_resolution_clock::now() - entryStartTime ).count() << " seconds\n";
   }
   catch( std::exception& e )
   {
@@ -587,11 +644,22 @@ int main( int argc, char* argv[] )
   std::cout << "\n\n\n";
   LABEL_NEXT_ZONE_ENTRY:
   zoneDumpList.erase( zoneName );
+  
   if( !zoneDumpList.empty() )
     goto LABEL_DUMP;
 
+  while( 1 )
+  {
+    std::lock_guard< std::mutex > lock( navmeshMutex );
+    if( exportedGroups.empty() )
+      generateNavmesh = false;
+
+    if( navmeshThread.joinable() )
+      navmeshThread.join();
+    std::this_thread::sleep_for( 1s );
+  }
   std::cout << "\n\n\n[Success] Finished all tasks in " <<
-            std::chrono::duration_cast< std::chrono::seconds >( std::chrono::system_clock::now() - startTime ).count()
+            std::chrono::duration_cast< std::chrono::seconds >( std::chrono::high_resolution_clock::now() - startTime ).count()
             << " seconds\n";
 
   getchar();
