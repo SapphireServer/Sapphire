@@ -8,9 +8,9 @@
 
 // +---------------------------------------------------------------------------
 // The following enumerations are structures to require their type be included.
-// They are also defined within the Core::Common namespace to avoid collisions.
+// They are also defined within the Sapphire::Common namespace to avoid collisions.
 // +---------------------------------------------------------------------------
-namespace Core::Common
+namespace Sapphire::Common
 {
 
   // 99 is the last spawn id that seems to spawn any actor
@@ -24,6 +24,19 @@ namespace Core::Common
     float x;
     float y;
     float z;
+  };
+
+  struct FFXIVARR_POSITION3_U16
+  {
+    uint16_t x;
+    uint16_t y;
+    uint16_t z;
+  };
+
+  struct ActiveLand
+  {
+    uint8_t ward;
+    uint8_t plot;
   };
 
   enum InventoryOperation : uint8_t
@@ -214,7 +227,40 @@ namespace Core::Common
     FreeCompanyBag1 = 20001,
     FreeCompanyBag2 = 20002,
     FreeCompanyGil = 22000,
-    FreeCompanyCrystal = 22001
+    FreeCompanyCrystal = 22001,
+
+    // housing interior containers
+    HousingInteriorAppearance = 25002,
+
+    // 50 in each container max, 400 slots max
+    HousingInteriorPlacedItems1 = 25003,
+    HousingInteriorPlacedItems2 = 25004,
+    HousingInteriorPlacedItems3 = 25005,
+    HousingInteriorPlacedItems4 = 25006,
+    HousingInteriorPlacedItems5 = 25007,
+    HousingInteriorPlacedItems6 = 25008,
+    HousingInteriorPlacedItems7 = 25009,
+    HousingInteriorPlacedItems8 = 25010,
+
+    // 50 max per container, 400 slots max
+    // slot limit increased 'temporarily' for relocation for all estates
+    // see: https://na.finalfantasyxiv.com/lodestone/topics/detail/d781e0d538428aef93b8bed4b50dd62c3c50fc74
+    HousingInteriorStoreroom1 = 27001,
+    HousingInteriorStoreroom2 = 27002,
+    HousingInteriorStoreroom3 = 27003,
+    HousingInteriorStoreroom4 = 27004,
+    HousingInteriorStoreroom5 = 27005,
+    HousingInteriorStoreroom6 = 27006,
+    HousingInteriorStoreroom7 = 27007,
+    HousingInteriorStoreroom8 = 27008,
+
+
+    // housing exterior containers
+    HousingExteriorAppearance = 25000,
+    HousingExteriorPlacedItems = 25001,
+    HousingExteriorStoreroom = 27000,
+
+
   };
 
   enum ContainerType : uint16_t
@@ -392,6 +438,7 @@ namespace Core::Common
       c.UI8E = 0;
       c.UI8F = 0;
       c.padding = 0;
+      c.padding1 = 0;
     }
 
 
@@ -484,8 +531,7 @@ namespace Core::Common
     Unaspected = 7    // Doesn't imply magical unaspected damage - could be unaspected physical
   };
 
-  enum class ActionType :
-    int8_t
+  enum class ActionType : int8_t
   {
     WeaponOverride = -1, // Needs more investigation (takes the damage type of the equipped weapon)?
     Unknown_0 = 0,
@@ -499,8 +545,7 @@ namespace Core::Common
     LimitBreak = 8,
   };
 
-  enum ActionEffectType :
-    uint8_t
+  enum ActionEffectType : uint8_t
   {
     Nothing = 0,
     Miss = 1,
@@ -521,8 +566,7 @@ namespace Core::Common
     Mount = 38
   };
 
-  enum class ActionHitSeverityType :
-    uint8_t
+  enum class ActionHitSeverityType : uint8_t
   {
     NormalDamage = 0,
     CritHeal = 0,
@@ -532,16 +576,14 @@ namespace Core::Common
     CritDirectHitDamage = 3
   };
 
-  enum ActionEffectDisplayType :
-    uint8_t
+  enum ActionEffectDisplayType : uint8_t
   {
     HideActionName = 0,
     ShowActionName = 1,
     ShowItemName = 2,
   };
 
-  enum class ActionCollisionType :
-    uint8_t
+  enum class ActionCollisionType : uint8_t
   {
     None,
     SingleTarget,
@@ -554,32 +596,28 @@ namespace Core::Common
     Unknown3
   };
 
-  enum HandleActionType :
-    uint8_t
+  enum HandleActionType : uint8_t
   {
     Event,
     Spell,
     Teleport
   };
 
-  enum HandleSkillType :
-    uint8_t
+  enum HandleSkillType : uint8_t
   {
     StdDamage,
     StdHeal,
     StdDot,
   };
 
-  enum InvincibilityType :
-    uint8_t
+  enum InvincibilityType : uint8_t
   {
     InvincibilityNone,
     InvincibilityRefill,
     InvincibilityStayAlive,
   };
 
-  enum PlayerStateFlag :
-    uint8_t
+  enum PlayerStateFlag : uint8_t
   {
     HideUILockChar = 0, // as the name suggests, hides the ui and logs the char...
     InCombat = 1, // in Combat, locks gearchange/return/teleport
@@ -595,8 +633,7 @@ namespace Core::Common
 
   };
 
-  enum struct FateStatus :
-    uint8_t
+  enum struct FateStatus : uint8_t
   {
     Active = 2,
     Inactive = 4,
@@ -604,8 +641,7 @@ namespace Core::Common
     Completed = 8,
   };
 
-  enum struct ChatType :
-    uint16_t
+  enum struct ChatType : uint16_t
   {
     LogKindError,
     ServerDebug,
@@ -729,6 +765,118 @@ namespace Core::Common
   {
     Normal = 0x1,
     MountSkill = 0xD,
+  };
+
+  enum HouseExteriorSlot
+  {
+    HousePermit,
+    ExteriorRoof,
+    ExteriorWall,
+    ExteriorWindow,
+    ExteriorDoor,
+    ExteriorRoofDecoration,
+    ExteriorWallDecoration,
+    ExteriorPlacard,
+    ExteriorFence
+  };
+
+  enum HouseInteriorSlot
+  {
+    InteriorWall,
+    InteriorFloor,
+    InteriorLight,
+    InteriorWall_Attic,
+    InteriorFloor_Attic,
+    InteriorLight_Attic,
+    InteriorWall_Basement,
+    InteriorFloor_Basement,
+    InteriorLight_Basement,
+    InteriorLight_Mansion
+  };
+
+  enum HouseTagSlot
+  {
+    MainTag,
+    SubTag1,
+    SubTag2
+  };
+
+  enum LandFlagsSlot
+  {
+    FreeCompany,
+    Private,
+    Apartment,
+    SharedHouse1,
+    SharedHouse2
+  };
+
+  enum class LandType : uint8_t
+  {
+    none = 0,
+    FreeCompany = 1,
+    Private = 2,
+  };
+
+  enum LandFlags : uint32_t
+  {
+    EstateBuilt = 0x1,
+    HasAetheryte = 0x2,
+    UNKNOWN_1 = 0x4,
+    UNKNOWN_2 = 0x8,
+    UNKNOWN_3 = 0x10,
+  };
+
+  struct LandIdent
+  {
+    int16_t landId; //00
+    int16_t wardNum; //02
+    int16_t territoryTypeId; //04
+    int16_t worldId; //06
+  };
+
+  struct LandFlagSet
+  {
+    LandIdent landIdent;
+    uint32_t landFlags; //08
+    uint32_t unkown1; //12
+  };
+
+  struct HousingObject
+  {
+    uint32_t itemId;
+    uint32_t padding; // was itemrotation + unknown/pad, looks unused now
+    float rotation;
+    Common::FFXIVARR_POSITION3 pos;
+  };
+
+  enum HouseSize : uint8_t
+  {
+    Cottage,
+    House,
+    Mansion
+  };
+
+  enum HouseStatus : uint8_t
+  {
+    none,
+    ForSale,
+    Sold,
+    PrivateEstate,
+    FreeCompanyEstate,
+  };
+
+  enum HouseIconAdd : uint8_t
+  {
+    heart = 0x06
+  };
+
+  enum WardlandFlags : uint8_t
+  {
+    IsEstateOwned = 1,
+    IsPublicEstate = 2,
+    HasEstateGreeting = 4,
+    EstateFlagUnknown = 8,
+    IsFreeCompanyEstate = 16,
   };
 
   using PlayerStateFlagList = std::vector< PlayerStateFlag >;

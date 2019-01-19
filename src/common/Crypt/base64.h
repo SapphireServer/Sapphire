@@ -1,6 +1,6 @@
 #include <string>
 
-namespace Core::Util
+namespace Sapphire::Util
 {
   std::string base64_encode( uint8_t const*, uint32_t len );
 

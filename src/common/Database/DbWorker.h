@@ -6,7 +6,7 @@
 #include "Util/LockedWaitQueue.h"
 #include <memory>
 
-namespace Core::Db
+namespace Sapphire::Db
 {
   class DbConnection;
   class Operation;

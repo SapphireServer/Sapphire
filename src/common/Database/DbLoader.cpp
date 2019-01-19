@@ -3,28 +3,23 @@
 #include "ZoneDbConnection.h"
 #include "DbWorkerPool.h"
 #include "Logging/Logger.h"
-#include "Framework.h"
 
-extern Core::Framework g_fw;
-
-Core::Db::DbLoader::DbLoader()
+Sapphire::Db::DbLoader::DbLoader()
 {
 }
 
 template< class T >
-Core::Db::DbLoader& Core::Db::DbLoader::addDb( Core::Db::DbWorkerPool< T >& pool, const ConnectionInfo& info )
+Sapphire::Db::DbLoader& Sapphire::Db::DbLoader::addDb( Sapphire::Db::DbWorkerPool< T >& pool, const ConnectionInfo& info )
 {
 
   m_open.push( [ this, info, &pool ]()->bool
                {
-
-                 auto pLog = g_fw.get< Logger >();
                  const uint8_t asyncThreads = info.asyncThreads;
                  const uint8_t synchThreads = info.syncThreads;
 
                  if( asyncThreads < 1 || asyncThreads > 32 )
                  {
-                   pLog->error(
+                   Logger::error(
                      "database: invalid number of worker threads specified. Please pick a value between 1 and 32." );
                    return false;
                  }
@@ -40,7 +35,7 @@ Core::Db::DbLoader& Core::Db::DbLoader::addDb( Core::Db::DbWorkerPool< T >& pool
 
                    if( error )
                    {
-                     pLog->error( "DatabasePool failed to open." );
+                     Logger::error( "DatabasePool failed to open." );
                      return false;
                    }
                  }
@@ -55,8 +50,7 @@ Core::Db::DbLoader& Core::Db::DbLoader::addDb( Core::Db::DbWorkerPool< T >& pool
                   {
                     if( !pool.prepareStatements() )
                     {
-                      auto pLog = g_fw.get< Logger >();
-                      pLog->error( "Could not prepare statements of the database, see log for details." );
+                      Logger::error( "Could not prepare statements of the database, see log for details." );
                       return false;
                     }
                     return true;
@@ -65,7 +59,7 @@ Core::Db::DbLoader& Core::Db::DbLoader::addDb( Core::Db::DbWorkerPool< T >& pool
   return *this;
 }
 
-bool Core::Db::DbLoader::initDbs()
+bool Sapphire::Db::DbLoader::initDbs()
 {
   if( !openDatabases() )
     return false;
@@ -76,17 +70,17 @@ bool Core::Db::DbLoader::initDbs()
   return true;
 }
 
-bool Core::Db::DbLoader::openDatabases()
+bool Sapphire::Db::DbLoader::openDatabases()
 {
   return process( m_open );
 }
 
-bool Core::Db::DbLoader::prepareStatements()
+bool Sapphire::Db::DbLoader::prepareStatements()
 {
   return process( m_prepare );
 }
 
-bool Core::Db::DbLoader::process( std::queue< Predicate >& queue )
+bool Sapphire::Db::DbLoader::process( std::queue< Predicate >& queue )
 {
   while( !queue.empty() )
   {
@@ -108,7 +102,7 @@ bool Core::Db::DbLoader::process( std::queue< Predicate >& queue )
 }
 
 template
-Core::Db::DbLoader&
-Core::Db::DbLoader::addDb< Core::Db::ZoneDbConnection >( Core::Db::DbWorkerPool< Core::Db::ZoneDbConnection >&,
+Sapphire::Db::DbLoader&
+Sapphire::Db::DbLoader::addDb< Sapphire::Db::ZoneDbConnection >( Sapphire::Db::DbWorkerPool< Sapphire::Db::ZoneDbConnection >&,
                                                           const ConnectionInfo& );
 

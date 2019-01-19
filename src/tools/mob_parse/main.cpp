@@ -22,8 +22,9 @@ namespace filesys = std::experimental::filesystem;
 #include <regex>
 #include <map>
 
-Core::Logger g_log;
-Core::Data::ExdDataGenerated g_exdData;
+Sapphire::Data::ExdDataGenerated g_exdData;
+
+using namespace Sapphire;
 
 //const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
 const std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
@@ -120,7 +121,7 @@ std::string binaryToHexString( uint8_t* pBinData, uint16_t size )
 
   for( uint32_t i = 0; i < size; i++ )
   {
-    outStr += Core::Util::intToHexString( pBinData[ i ] & 0xFF );
+    outStr += Sapphire::Util::intToHexString( pBinData[ i ] & 0xFF );
   }
 
   return outStr;
@@ -194,12 +195,12 @@ std::string delChar( std::string &str, char del )
 int dumpSpawns()
 {
 
-  g_log.init();
+  //Logger::init( "mob_parse" );
 
-  g_log.info( "Setting up EXD data" );
+  Logger::info( "Setting up EXD data" );
   if( !g_exdData.init( datLocation ) )
   {
-    g_log.fatal( "Error setting up EXD data " );
+    Logger::fatal( "Error setting up EXD data " );
     return 0;
   }
 
@@ -223,7 +224,7 @@ int dumpSpawns()
           auto str = file.substr( 0, pos );
           pos = str.find_last_of( filesys::path::preferred_separator );
           auto zone = str.substr( pos + 1 );
-          //g_log.info( zone );
+          //Logger::info( zone );
 
           FFXIVIpcNpcSpawn packet;
           std::ifstream is;
@@ -249,24 +250,24 @@ int dumpSpawns()
 
   }
 
-  //std::ofstream out("output.txt");
+  std::ofstream out("spawns.txt");
 
   int spawngroups = 0;
   for( auto entry : zoneToPacketList )
   {
 
-    //auto nameStruct = g_exdData.get< Core::Data::BNpcName >( entry.first );
-    auto teri1 = g_exdData.get< Core::Data::TerritoryType >( entry.first );
-    auto teriPlaceName = g_exdData.get< Core::Data::PlaceName >( teri1->placeName );
-    g_log.info( std::to_string( entry.first ) + " - " + teri1->name + " - " + teriPlaceName->name );
-    g_log.info( "Mob Count: " + std::to_string( entry.second.size() ) );
+    //auto nameStruct = g_exdData.get< Sapphire::Data::BNpcName >( entry.first );
+    auto teri1 = g_exdData.get< Sapphire::Data::TerritoryType >( entry.first );
+    auto teriPlaceName = g_exdData.get< Sapphire::Data::PlaceName >( teri1->placeName );
+    Logger::info( "{0} - {1} - {2}", entry.first, teri1->name, teriPlaceName->name );
+    Logger::info( "Mob Count: {0}", entry.second.size() );
 
     for( auto mob : entry.second )
     {
       nameToPacketList[ mob.bNPCBase ].push_back( mob );
 
-      auto nameStruct = g_exdData.get< Core::Data::BNpcName >( mob.bNPCName );
-      //g_log.info( nameStruct->singular + " " + std::to_string( packet.bNPCBase ) );
+      auto nameStruct = g_exdData.get< Sapphire::Data::BNpcName >( mob.bNPCName );
+      //Logger::info( nameStruct->singular + " " + std::to_string( packet.bNPCBase ) );
     }
 
     std::map< std::string, std::vector< FFXIVIpcNpcSpawn > > lvlToPacket;
@@ -281,8 +282,24 @@ int dumpSpawns()
 
     for( auto mobName : lvlToPacket )
     {
-      auto nameStruct = g_exdData.get< Core::Data::BNpcName >( mobName.second.at(0).bNPCName );
-      g_log.info( "|--> " + nameStruct->singular + "(" + std::to_string( mobName.second.size() ) + ")" );
+      auto nameStruct = g_exdData.get< Sapphire::Data::BNpcName >( mobName.second.at(0).bNPCName );
+      Logger::info( "|--> {0}, ({1})", nameStruct->singular, mobName.second.size() );
+      Logger::info( "|-> {0}", entry.first );
+
+      std::string name1 = delChar( nameStruct->singular, ' ' );
+      name1 = delChar( name1, '\'' );
+
+      std::string templateName = name1 + "_" + std::to_string( mobName.second.at(0).bNPCBase );
+
+      std::string output = "INSERT IGNORE INTO `spawngroup` ( `territoryTypeId`, `bNpcTemplateId`, `level`, `maxHp` ) "
+                           " VALUES ( " + std::to_string( entry.first ) +
+                           ", ( SELECT id FROM bnpctemplate WHERE name = '" + templateName + "' ) , " +
+                           std::to_string( mobName.second.at(0).level ) + ", " +
+                           std::to_string( mobName.second.at(0).hPMax ) + " );";
+
+      output += "\nSET @last_id_spawngroup = LAST_INSERT_ID(); ";
+
+
 
       spawngroups++;
       for( FFXIVIpcNpcSpawn instance : mobName.second )
@@ -296,7 +313,6 @@ int dumpSpawns()
         }
 
         modelStr += "]";
-
 
         std::string cusStr = "[";
 
@@ -314,16 +330,21 @@ int dumpSpawns()
         std::string name = delChar( nameStruct->singular, ' ' );
         name = delChar( name, '\'' );
 
-        g_log.info( "|----> " + name + "_" + std::to_string( instance.bNPCBase ) + " " +
-                    std::to_string( instance.posX ) + ", " +
-                    std::to_string( instance.posY ) + ", " +
-                    std::to_string( instance.posZ ) + ", " +
-                    std::to_string( instance.modelChara ) + ", " +
-                    std::to_string( instance.gimmickId ) + ", " +
-                    std::to_string( instance.level )  + ", " +
-                    std::to_string( instance.hPMax ) );
-        //g_log.info( "|----> " + name + " - " + std::to_string( instance.bNPCBase ) + ", " + std::to_string( instance.gimmickId ) );
+        Logger::info( "|----> {0}_{1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}",
+                      name, instance.bNPCBase, instance.posX, instance.posY,
+                      instance.posZ, instance.modelChara, instance.gimmickId,
+                      instance.level, instance.hPMax );
+        //Logger::info( "|----> " + name + " - " + std::to_string( instance.bNPCBase ) + ", " + std::to_string( instance.gimmickId ) );
 
+        output += "INSERT INTO `spawnpoint` ( `spawngroupid`, `x`, `y`, `z`, `r`, `gimmickId` ) "
+                  " VALUES ( @last_id_spawngroup, " +
+                  std::to_string( instance.posX ) + ", " +
+                  std::to_string( instance.posY ) + ", " +
+                  std::to_string( instance.posZ ) + ", " +
+                  std::to_string( 0 ) +  ", " +
+                  std::to_string( instance.gimmickId ) + " ); ";
+
+        //Logger::info( output );
 
 
         /*std::string output = "INSERT IGNORE INTO `bnpctemplate` ( `Name`, `bNPCBaseId`, `bNPCNameId`, `mainWeaponModel`, `secWeaponModel`, `aggressionMode`, `enemyType`, `pose`, `modelChara`, `displayFlags`, `Look`, `Models`) "
@@ -340,18 +361,19 @@ int dumpSpawns()
                              + "UNHEX( '" + cusStr + "'), "
                              + "UNHEX( '" + modelStr + "') );\n";*/
 
-        //g_log.info( output );
+        //Logger::info( output );
 
-        //out << output;
+
 
 
       }
+      out << output;
     }
     nameToPacketList.clear();
 
   }
 
-  g_log.info( "|--> Total SpawnGroups: " + std::to_string( spawngroups )  );
+  Logger::info( "|--> Total SpawnGroups: {0}", spawngroups );
 
   return 0;
 }
@@ -360,12 +382,12 @@ int dumpSpawns()
 int dumpTemplates()
 {
 
-  g_log.init();
+  Logger::init( "mob_parse" );
 
-  g_log.info( "Setting up EXD data" );
+  Logger::info( "Setting up EXD data" );
   if( !g_exdData.init( datLocation ) )
   {
-    g_log.fatal( "Error setting up EXD data " );
+    Logger::fatal( "Error setting up EXD data " );
     return 0;
   }
 
@@ -389,7 +411,7 @@ int dumpTemplates()
           auto str = file.substr( 0, pos );
           pos = str.find_last_of( filesys::path::preferred_separator );
           auto zone = str.substr( pos + 1 );
-          //g_log.info( zone );
+          //Logger::info( zone );
 
           FFXIVIpcNpcSpawn packet;
           std::ifstream is;
@@ -418,8 +440,8 @@ int dumpTemplates()
          if( pos != std::string::npos )
          {
             auto zoneIdStr = file.substr( pos + 1 );
-            auto teri1 = g_exdData.get< Core::Data::TerritoryType >( std::stoi( zoneIdStr ) );
-            g_log.info( zoneIdStr + " - " + teri1->name );
+            auto teri1 = g_exdData.get< Sapphire::Data::TerritoryType >( std::stoi( zoneIdStr ) );
+            Logger::info( zoneIdStr + " - " + teri1->name );
          }
       }
       else
@@ -433,38 +455,39 @@ int dumpTemplates()
 
          nameToPacketList[ packet.bNPCName ].push_back( packet );
 
-         auto nameStruct = g_exdData.get< Core::Data::BNpcName >( packet.bNPCName );
-         //g_log.info( nameStruct->singular + " " + std::to_string( packet.bNPCBase ) );
+         auto nameStruct = g_exdData.get< Sapphire::Data::BNpcName >( packet.bNPCName );
+         //Logger::info( nameStruct->singular + " " + std::to_string( packet.bNPCBase ) );
       }
 */
 
   }
 
-  std::ofstream out("output.txt");
+  std::map< std::string, bool > mobDumped;
+  std::ofstream out("templates.txt");
 
   for( auto entry : zoneToPacketList )
   {
 
-    //auto nameStruct = g_exdData.get< Core::Data::BNpcName >( entry.first );
-    auto teri1 = g_exdData.get< Core::Data::TerritoryType >( entry.first );
-    auto teriPlaceName = g_exdData.get< Core::Data::PlaceName >( teri1->placeName );
-    g_log.info( std::to_string( entry.first ) + " - " + teri1->name + " - " + teriPlaceName->name );
-    g_log.info( "Mob Count: " + std::to_string( entry.second.size() ) );
+    //auto nameStruct = g_exdData.get< Sapphire::Data::BNpcName >( entry.first );
+    auto teri1 = g_exdData.get< Sapphire::Data::TerritoryType >( entry.first );
+    auto teriPlaceName = g_exdData.get< Sapphire::Data::PlaceName >( teri1->placeName );
+    Logger::info( "{0} - {1} - {2}", entry.first, teri1->name, teriPlaceName->name );
+    Logger::info( "Mob Count: {0}", entry.second.size() );
 
     for( auto mob : entry.second )
     {
       nameToPacketList[ mob.bNPCBase ].push_back( mob );
 
-      auto nameStruct = g_exdData.get< Core::Data::BNpcName >( mob.bNPCName );
-      //g_log.info( nameStruct->singular + " " + std::to_string( packet.bNPCBase ) );
+      auto nameStruct = g_exdData.get< Sapphire::Data::BNpcName >( mob.bNPCName );
+      //Logger::info( nameStruct->singular + " " + std::to_string( packet.bNPCBase ) );
     }
 
-    g_log.info( "Unique Mobs: " + std::to_string( nameToPacketList.size() ) );
+    Logger::info( "Unique Mobs: {0}", nameToPacketList.size() );
 
     for( auto mobName : nameToPacketList )
     {
-      auto nameStruct = g_exdData.get< Core::Data::BNpcName >( mobName.second.at(0).bNPCName );
-      g_log.info( "|--> " + nameStruct->singular + "(" + std::to_string( mobName.second.size() ) + ")" );
+      auto nameStruct = g_exdData.get< Sapphire::Data::BNpcName >( mobName.second.at( 0 ).bNPCName );
+      Logger::info( "|--> {0} ({1})", nameStruct->singular,  mobName.second.size() );
 
       auto instance = mobName.second.at(0);
       //for( FFXIVIpcNpcSpawn instance : mobName.second )
@@ -494,8 +517,8 @@ int dumpTemplates()
 
         cusStr = binaryToHexString( (uint8_t*)instance.look, 26 );
 
-        //g_log.info( "|----> " + std::to_string( instance.bNPCBase ) + " " + std::to_string( instance.posX ) + ", " + std::to_string( instance.posY ) + ", " + std::to_string( instance.posZ )  );
-      //  g_log.info( "|----> " + std::to_string( instance.bNPCBase ) +
+        //Logger::info( "|----> " + std::to_string( instance.bNPCBase ) + " " + std::to_string( instance.posX ) + ", " + std::to_string( instance.posY ) + ", " + std::to_string( instance.posZ )  );
+      //  Logger::info( "|----> " + std::to_string( instance.bNPCBase ) +
       //              " " + std::to_string( instance.mainWeaponModel ) +
       //              ", " + std::to_string( instance.secWeaponModel ) +
       //              ", " + std::to_string( instance.aggressionMode ) +
@@ -507,6 +530,11 @@ int dumpTemplates()
 
         std::string name = delChar( nameStruct->singular, ' ' );
         name = delChar( name, '\'' );
+
+        if( mobDumped.find( name + "_" + std::to_string( instance.bNPCBase ) ) != mobDumped.end() )
+          continue;
+
+        mobDumped[ name +"_" + std::to_string( instance.bNPCBase ) ] = true;
 
         std::string output = "INSERT IGNORE INTO `bnpctemplate` ( `Name`, `bNPCBaseId`, `bNPCNameId`, `mainWeaponModel`, `secWeaponModel`, `aggressionMode`, `enemyType`, `pose`, `modelChara`, `displayFlags`, `Look`, `Models`) "
                              "VALUES ( \"" + name +"_" + std::to_string( instance.bNPCBase ) + "\", "
@@ -522,11 +550,11 @@ int dumpTemplates()
                              + "UNHEX( '" + cusStr + "'), "
                              + "UNHEX( '" + modelStr + "') );\n";
 
-        g_log.info( output );
+        Logger::info( output );
 
         out << output;
 
-        /* g_log.info( "|----> " + std::to_string( instance.bNPCBase ) +
+        /* Logger::info( "|----> " + std::to_string( instance.bNPCBase ) +
                      " " + std::to_string( instance.u2ab ) +
                      ", " + std::to_string( instance.u2b ) +
                      ", " + std::to_string( instance.u3b ) +
@@ -554,15 +582,15 @@ int dumpTemplates()
 
   }
   out.close();
-  /*g_log.info( "getting id list " );
+  /*Logger::info( "getting id list " );
   auto idList = g_exdData.getTerritoryTypeIdList();
 
-  g_log.info( "getting id list done" );
+  Logger::info( "getting id list done" );
   for( auto id : idList )
   {
-     auto teri1 = g_exdData.get<Core::Data::TerritoryType>( id );
+     auto teri1 = g_exdData.get<Sapphire::Data::TerritoryType>( id );
 
-     g_log.info( teri1->name );
+     Logger::info( teri1->name );
   }*/
 
   return 0;
@@ -572,6 +600,7 @@ int main()
 {
 
   dumpTemplates();
+  dumpSpawns();
 
   return 0;
 }

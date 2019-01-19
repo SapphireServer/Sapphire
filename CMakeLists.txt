@@ -2,19 +2,27 @@ cmake_policy( SET CMP0014 NEW )
 cmake_minimum_required( VERSION 3.0.2 )
 project( Sapphire )
 
-set( CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin )
+set( CMAKE_MODULE_PATH
+       ${CMAKE_MODULE_PATH}
+       ${CMAKE_SOURCE_DIR}/cmake )
 
-set( EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin )
-set( LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin )
-set( EXECUTABLE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin )
+#####################################
+# Copy needed files to build-folder #
+#####################################
+add_custom_target( copy_runtime_files ALL
+                     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/config ${CMAKE_BINARY_DIR}/bin/config
+                     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/sql ${CMAKE_BINARY_DIR}/bin/sql
+                     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/web ${CMAKE_BINARY_DIR}/bin/web
+                     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/sql_import.sh ${CMAKE_BINARY_DIR}/bin/sql_import.sh )
 
-set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake )
-
-##########################################################################
-# Dependencies and compiler settings
-include( "cmake/mysql.cmake" )
+######################################
+# Dependencies and compiler settings #
+######################################
+include( "cmake/paths.cmake" )
+#include( "cmake/mysql.cmake" )
 include( "cmake/compiler.cmake" )
 include( "cmake/cotire.cmake" )
+
 ##############################
 #             Git            #
 ##############################
@@ -25,25 +33,29 @@ configure_file( "${CMAKE_CURRENT_SOURCE_DIR}/src/common/Version.cpp.in"
                 "${CMAKE_CURRENT_SOURCE_DIR}/src/common/Version.cpp" @ONLY )
 
 ##############################
-#             Mysql          #
+#           Mysql            #
 ##############################
 find_package( MySQL )
 
-##########################################################################
+##############################
+#        Dependencies        #
+##############################
 add_subdirectory( "deps/zlib" )
 add_subdirectory( "deps/MySQL" )
 add_subdirectory( "deps/datReader" )
 add_subdirectory( "deps/mysqlConnector" )
+
+##############################
+#  Main Sapphire Components  #
+##############################
 add_subdirectory( "src/common" )
+add_subdirectory( "src/api" )
+add_subdirectory( "src/lobby" )
+add_subdirectory( "src/world" )
+add_subdirectory( "src/scripts" )
+add_subdirectory( "src/dbm" )
 
-add_subdirectory( "src/servers" )
-#add_subdirectory( "src/dbm" )
-
-add_subdirectory( "src/tools/exd_common_gen" )
-add_subdirectory( "src/tools/exd_struct_gen" )
-add_subdirectory( "src/tools/exd_struct_test" )
-add_subdirectory( "src/tools/quest_parser" )
-add_subdirectory( "src/tools/discovery_parser" )
-add_subdirectory( "src/tools/mob_parse" )
-add_subdirectory( "src/tools/pcb_reader" )
-add_subdirectory( "src/tools/event_object_parser" )
+##############################
+#           Tools            #
+##############################
+add_subdirectory( "src/tools" )

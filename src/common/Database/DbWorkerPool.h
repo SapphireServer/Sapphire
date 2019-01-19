@@ -8,7 +8,7 @@
 #include "Util/LockedWaitQueue.h"
 #include "DbConnection.h"
 
-namespace Core::Db
+namespace Sapphire::Db
 {
 
   template< typename T >
@@ -83,7 +83,7 @@ namespace Core::Db
 
     const std::string& getDatabaseName() const;
 
-    std::unique_ptr< Core::LockedWaitQueue< std::shared_ptr< Operation > > > m_queue;
+    std::unique_ptr< Sapphire::LockedWaitQueue< std::shared_ptr< Operation > > > m_queue;
     std::array< std::vector< std::shared_ptr< T > >, IDX_SIZE > m_connections;
     ConnectionInfo m_connectionInfo;
     uint8_t m_asyncThreads;
