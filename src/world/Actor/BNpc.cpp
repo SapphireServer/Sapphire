@@ -248,7 +248,7 @@ void Sapphire::Entity::BNpc::hateListRemove( Sapphire::Entity::CharaPtr pChara )
       if( pChara->isPlayer() )
       {
         PlayerPtr tmpPlayer = pChara->getAsPlayer();
-        //tmpPlayer->onMobDeaggro( getAsBattleNpc() );
+        tmpPlayer->onMobDeaggro( getAsBNpc() );
       }
       return;
     }
@@ -278,7 +278,7 @@ void Sapphire::Entity::BNpc::aggro( Sapphire::Entity::CharaPtr pChara )
   {
     PlayerPtr tmpPlayer = pChara->getAsPlayer();
     tmpPlayer->queuePacket( makeActorControl142( getId(), ActorControlType::ToggleWeapon, 0, 1, 1 ) );
-    //tmpPlayer->onMobAggro( getAsBattleNpc() );
+    tmpPlayer->onMobAggro( getAsBNpc() );
   }
 }
 
@@ -290,7 +290,7 @@ void Sapphire::Entity::BNpc::deaggro( Sapphire::Entity::CharaPtr pChara )
   if( pChara->isPlayer() )
   {
     PlayerPtr tmpPlayer = pChara->getAsPlayer();
-    //tmpPlayer->onMobDeaggro( getAsBattleNpc() );
+    tmpPlayer->onMobDeaggro( getAsBNpc() );
   }
 }
 
