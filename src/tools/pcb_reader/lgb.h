@@ -278,33 +278,20 @@ struct LGB_GROUP
       {
         const auto type = *reinterpret_cast<LgbEntryType*>( buf + entryOffset );
         // garbage to skip model loading
-        if( !ignoreModels && type == LgbEntryType::BgParts )
+        switch( type )
         {
-          entries.push_back( std::make_shared< LGB_BGPARTS_ENTRY >( buf, entryOffset ) );
+          case LgbEntryType::BgParts:
+            entries.push_back( std::make_shared< LGB_BGPARTS_ENTRY >( buf, entryOffset ) );
+            break;
+          case LgbEntryType::Gimmick:
+            entries.push_back( std::make_shared< LGB_GIMMICK_ENTRY >( buf, entryOffset ) );
+            break;
+          case LgbEntryType::EventObject:
+            entries.push_back( std::make_shared< LGB_EOBJ_ENTRY >( buf, entryOffset ) );
+            break;
+          default:
+            break;
         }
-        else if( !ignoreModels && type == LgbEntryType::Gimmick )
-        {
-          entries.push_back( std::make_shared< LGB_GIMMICK_ENTRY >( buf, entryOffset ) );
-        }
-        else if( type == LgbEntryType::EventNpc )
-        {
-          entries.push_back( std::make_shared< LGB_ENPC_ENTRY >( buf, entryOffset ) );
-        }
-        else if( type == LgbEntryType::EventObject )
-        {
-          entries.push_back( std::make_shared< LGB_EOBJ_ENTRY >( buf, entryOffset ) );
-        }
-        else if( type == LgbEntryType::MapRange )
-        {
-          entries.push_back( std::make_shared< LGB_MAPRANGE_ENTRY >( buf, entryOffset ) );
-        }
-        /*
-        else
-        {
-           entries[i] = nullptr;
-        }
-        */
-
       }
       catch( std::exception& e )
       {
