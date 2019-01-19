@@ -16,7 +16,7 @@ namespace Sapphire::Entity
   typedef struct
   {
     uint32_t m_hateAmount;
-    ActorPtr m_pActor;
+    CharaPtr m_pChara;
   } HateListEntry;
 
   enum class BNpcState
@@ -67,14 +67,14 @@ namespace Sapphire::Entity
     void setState( BNpcState state );
 
     void hateListClear();
-    ActorPtr hateListGetHighest();
-    void hateListAdd( ActorPtr pActor, int32_t hateAmount );
-    void hateListUpdate( ActorPtr pActor, int32_t hateAmount );
-    void hateListRemove( ActorPtr pActor );
-    bool hateListHasActor( ActorPtr pActor );
+    CharaPtr hateListGetHighest();
+    void hateListAdd( CharaPtr pChara, int32_t hateAmount );
+    void hateListUpdate( CharaPtr pChara, int32_t hateAmount );
+    void hateListRemove( CharaPtr pChara );
+    bool hateListHasActor( CharaPtr pChara );
 
-    void aggro( ActorPtr pActor );
-    void deaggro( ActorPtr pActor );
+    void aggro( CharaPtr pChara );
+    void deaggro( CharaPtr pChara );
 
     void update( int64_t currTime ) override;
 

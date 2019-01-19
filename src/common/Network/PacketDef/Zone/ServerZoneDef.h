@@ -402,34 +402,48 @@ struct EffectEntry
 struct EffectHeader
 {
   uint64_t animationTargetId; // who the animation targets
+
   uint32_t actionId; // what the casting player casts, shown in battle log/ui
-
   uint32_t globalEffectCounter; // seems to only increment on retail?
-  float animationLockTime; // maybe? doesn't seem to do anything
 
+  float animationLockTime; // maybe? doesn't seem to do anything
   uint32_t someTargetId; // always 00 00 00 E0, 0x0E000000 is the internal def for INVALID TARGET ID
 
   uint16_t hiddenAnimation; // if 0, always shows animation, otherwise hides it. counts up by 1 for each animation skipped on a caster
-
   uint16_t rotation;
-
   uint16_t actionAnimationId; // the animation that is played by the casting character
-  uint8_t unknown1E; // can be 0,1,2 - maybe other values? - doesn't do anything?
-
+  uint8_t variation; // variation in the animation
   Common::ActionEffectDisplayType effectDisplayType;
 
   uint8_t unknown20; // is read by handler, runs code which gets the LODWORD of animationLockTime (wtf?)
   uint8_t effectCount; // ignores effects if 0, otherwise parses all of them
+  uint16_t padding_21;
 
-  uint32_t padding_22[2];
 };
 
-struct FFXIVIpcEffect :
-  FFXIVIpcBasePacket< Effect >
+struct FFXIVIpcEffect : FFXIVIpcBasePacket< Effect >
 {
-  EffectHeader header;
+  uint64_t animationTargetId; // who the animation targets
 
-  EffectEntry effects[8];
+  uint32_t actionId; // what the casting player casts, shown in battle log/ui
+  uint32_t globalEffectCounter; // seems to only increment on retail?
+
+  float animationLockTime; // maybe? doesn't seem to do anything
+  uint32_t someTargetId; // always 00 00 00 E0, 0x0E000000 is the internal def for INVALID TARGET ID
+
+  uint16_t hiddenAnimation; // if 0, always shows animation, otherwise hides it. counts up by 1 for each animation skipped on a caster
+  uint16_t rotation;
+  uint16_t actionAnimationId; // the animation that is played by the casting character
+  uint8_t variation; // variation in the animation
+  Common::ActionEffectDisplayType effectDisplayType;
+
+  uint8_t unknown20; // is read by handler, runs code which gets the LODWORD of animationLockTime (wtf?)
+  uint8_t effectCount; // ignores effects if 0, otherwise parses all of them
+  uint16_t padding_21;
+
+  uint16_t padding_22[3];
+
+  uint8_t effects[8*8];
 
   uint16_t padding_6A[3];
 

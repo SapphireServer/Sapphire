@@ -1474,7 +1474,7 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
     auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 8 );
     effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
 
-    Server::EffectEntry entry;
+    Server::EffectEntry entry{};
     entry.value = damage;
     entry.effectType = Common::ActionEffectType::Damage;
     entry.hitSeverity = Common::ActionHitSeverityType::NormalDamage;
@@ -1488,7 +1488,7 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
     auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 7 );
     effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
 
-    Server::EffectEntry entry;
+    Server::EffectEntry entry{};
     entry.value = damage;
     entry.effectType = Common::ActionEffectType::Damage;
     entry.hitSeverity = Common::ActionHitSeverityType::NormalDamage;

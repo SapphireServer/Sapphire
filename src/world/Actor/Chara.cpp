@@ -38,7 +38,7 @@ Sapphire::Entity::Chara::Chara( ObjKind type, FrameworkPtr pFw ) :
   Actor( type ),
   m_pose( 0 ),
   m_targetId( INVALID_GAME_OBJECT_ID ),
-  m_pFw( pFw )
+  m_pFw( std::move( std::move( pFw ) ) )
 {
   // initialize the free slot queue
   for( uint8_t i = 0; i < MAX_STATUS_EFFECTS; i++ )
@@ -48,8 +48,7 @@ Sapphire::Entity::Chara::Chara( ObjKind type, FrameworkPtr pFw ) :
 }
 
 Sapphire::Entity::Chara::~Chara()
-{
-}
+= default;
 
 /*! \return the actors name */
 std::string Sapphire::Entity::Chara::getName() const
@@ -375,7 +374,7 @@ Sapphire::Action::ActionPtr Sapphire::Entity::Chara::getCurrentAction() const
 /*! \param ActionPtr of the action to be registered */
 void Sapphire::Entity::Chara::setCurrentAction( Sapphire::Action::ActionPtr pAction )
 {
-  m_pCurrentAction = pAction;
+  m_pCurrentAction = std::move( pAction );
 }
 
 /*!
@@ -398,36 +397,31 @@ void Sapphire::Entity::Chara::autoAttack( CharaPtr pTarget )
     m_lastAttack = tick;
     srand( static_cast< uint32_t >( tick ) );
 
-    uint16_t damage = static_cast< uint16_t >( 10 + rand() % 12 );
-    uint32_t variation = static_cast< uint32_t >( 0 + rand() % 4 );
+    auto damage = static_cast< uint16_t >( 10 + rand() % 12 );
 
-    auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 0x336 );
+    auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 7 );
     effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
-
     Server::EffectEntry effectEntry{};
     effectEntry.value = damage;
     effectEntry.effectType = ActionEffectType::Damage;
-    effectEntry.hitSeverity = static_cast< ActionHitSeverityType >( variation );
-
+    effectEntry.hitSeverity = ActionHitSeverityType::NormalDamage;
     effectPacket->addEffect( effectEntry );
 
     sendToInRangeSet( effectPacket );
 
-    if( isPlayer() )
-      getAsPlayer()->queuePacket( effectPacket );
-
     pTarget->takeDamage( damage );
+
   }
 }
 
 /*!
-ChaiScript Skill Handler.
+Skill Handler.
 
 \param GamePacketPtr to send
 \param bool should be send to self?
 */
 void Sapphire::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionId, uint64_t param1,
-                                             uint64_t param2, Entity::Chara& target )
+                                                 uint64_t param2, Entity::Chara& target )
 {
   auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   if( isPlayer() )
@@ -534,7 +528,7 @@ void Sapphire::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionI
         auto actorsCollided = ActionCollision::getActorsHitFromAction( target.getPos(), getInRangeActors( true ),
                                                                        actionInfoPtr, TargetFilter::Allies );
 
-        for( auto pHitActor : actorsCollided )
+        for( const auto& pHitActor : actorsCollided )
         {
           effectPacket->setTargetActor( pHitActor->getId() );
 
@@ -599,7 +593,7 @@ void Sapphire::Entity::Chara::addStatusEffectById( uint32_t id, int32_t duration
 
 /*! \param StatusEffectPtr to be applied to the actor */
 void Sapphire::Entity::Chara::addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source,
-                                                         uint16_t param )
+                                                             uint16_t param )
 {
   if( hasStatusEffect( id ) )
     return;
@@ -781,8 +775,6 @@ void Sapphire::Entity::Chara::updateStatusEffects()
 
 bool Sapphire::Entity::Chara::hasStatusEffect( uint32_t id )
 {
-  if( m_statusEffectMap.find( id ) != m_statusEffectMap.end() )
-    return true;
-  return false;
+  return m_statusEffectMap.find( id ) != m_statusEffectMap.end();
 }
 
