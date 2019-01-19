@@ -180,13 +180,13 @@ void Sapphire::Entity::BNpc::hateListClear()
   auto it = m_hateList.begin();
   for( auto listEntry : m_hateList )
   {
-    //if( isInRangeSet( listEntry->m_pActor ) )
-      //deaggro( listEntry->m_pActor );
+    if( isInRangeSet( listEntry->m_pChara ) )
+      deaggro( listEntry->m_pChara );
   }
   m_hateList.clear();
 }
 
-Sapphire::Entity::ActorPtr Sapphire::Entity::BNpc::hateListGetHighest()
+Sapphire::Entity::CharaPtr Sapphire::Entity::BNpc::hateListGetHighest()
 {
   auto it = m_hateList.begin();
   uint32_t maxHate = 0;
@@ -201,25 +201,25 @@ Sapphire::Entity::ActorPtr Sapphire::Entity::BNpc::hateListGetHighest()
   }
 
   if( entry && maxHate != 0 )
-    return entry->m_pActor;
+    return entry->m_pChara;
 
   return nullptr;
 }
 
-void Sapphire::Entity::BNpc::hateListAdd( Sapphire::Entity::ActorPtr pActor, int32_t hateAmount )
+void Sapphire::Entity::BNpc::hateListAdd( Sapphire::Entity::CharaPtr pChara, int32_t hateAmount )
 {
   auto hateEntry = std::make_shared< HateListEntry >();
   hateEntry->m_hateAmount = hateAmount;
-  hateEntry->m_pActor = pActor;
+  hateEntry->m_pChara = pChara;
 
   m_hateList.insert( hateEntry );
 }
 
-void Sapphire::Entity::BNpc::hateListUpdate( Sapphire::Entity::ActorPtr pActor, int32_t hateAmount )
+void Sapphire::Entity::BNpc::hateListUpdate( Sapphire::Entity::CharaPtr pChara, int32_t hateAmount )
 {
   for( auto listEntry : m_hateList )
   {
-    if( listEntry->m_pActor == pActor )
+    if( listEntry->m_pChara == pChara )
     {
       listEntry->m_hateAmount += hateAmount;
       return;
@@ -228,21 +228,21 @@ void Sapphire::Entity::BNpc::hateListUpdate( Sapphire::Entity::ActorPtr pActor, 
 
   auto hateEntry = std::make_shared< HateListEntry >();
   hateEntry->m_hateAmount = hateAmount;
-  hateEntry->m_pActor = pActor;
+  hateEntry->m_pChara = pChara;
   m_hateList.insert( hateEntry );
 }
 
-void Sapphire::Entity::BNpc::hateListRemove( Sapphire::Entity::ActorPtr pActor )
+void Sapphire::Entity::BNpc::hateListRemove( Sapphire::Entity::CharaPtr pChara )
 {
   for( auto listEntry : m_hateList )
   {
-    if( listEntry->m_pActor == pActor )
+    if( listEntry->m_pChara == pChara )
     {
 
       m_hateList.erase( listEntry );
-      if( pActor->isPlayer() )
+      if( pChara->isPlayer() )
       {
-        PlayerPtr tmpPlayer = pActor->getAsPlayer();
+        PlayerPtr tmpPlayer = pChara->getAsPlayer();
         //tmpPlayer->onMobDeaggro( getAsBattleNpc() );
       }
       return;
@@ -250,47 +250,51 @@ void Sapphire::Entity::BNpc::hateListRemove( Sapphire::Entity::ActorPtr pActor )
   }
 }
 
-bool Sapphire::Entity::BNpc::hateListHasActor( Sapphire::Entity::ActorPtr pActor )
+bool Sapphire::Entity::BNpc::hateListHasActor( Sapphire::Entity::CharaPtr pChara )
 {
   for( auto listEntry : m_hateList )
   {
-    if( listEntry->m_pActor == pActor )
+    if( listEntry->m_pChara == pChara )
       return true;
   }
   return false;
 }
 
-void Sapphire::Entity::BNpc::aggro( Sapphire::Entity::ActorPtr pActor )
+void Sapphire::Entity::BNpc::aggro( Sapphire::Entity::CharaPtr pChara )
 {
   m_lastAttack = Util::getTimeMs();
-  hateListUpdate( pActor, 1 );
+  hateListUpdate( pChara, 1 );
 
-  changeTarget( pActor->getId() );
+  changeTarget( pChara->getId() );
   setStance( Stance::Active );
   m_state = BNpcState::Combat;
 
-  if( pActor->isPlayer() )
+  if( pChara->isPlayer() )
   {
-    PlayerPtr tmpPlayer = pActor->getAsPlayer();
+    PlayerPtr tmpPlayer = pChara->getAsPlayer();
     tmpPlayer->queuePacket( makeActorControl142( getId(), ActorControlType::ToggleWeapon, 0, 1, 1 ) );
     //tmpPlayer->onMobAggro( getAsBattleNpc() );
   }
 }
 
-void Sapphire::Entity::BNpc::deaggro( Sapphire::Entity::ActorPtr pActor )
+void Sapphire::Entity::BNpc::deaggro( Sapphire::Entity::CharaPtr pChara )
 {
-  if( !hateListHasActor( pActor ) )
-    hateListRemove( pActor );
+  if( !hateListHasActor( pChara ) )
+    hateListRemove( pChara );
 
-  if( pActor->isPlayer() )
+  if( pChara->isPlayer() )
   {
-    PlayerPtr tmpPlayer = pActor->getAsPlayer();
+    PlayerPtr tmpPlayer = pChara->getAsPlayer();
     //tmpPlayer->onMobDeaggro( getAsBattleNpc() );
   }
 }
 
 void Sapphire::Entity::BNpc::update( int64_t currTime )
 {
+  const uint8_t minActorDistance = 4;
+  const uint8_t aggroRange = 8;
+  const uint8_t maxDistanceToOrigin = 30;
+
   switch( m_state )
   {
     case BNpcState::Retreat:
@@ -302,52 +306,47 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
 
     case BNpcState::Idle:
     {
-      CharaPtr pClosestActor = getClosestChara();
+      CharaPtr pClosestChara = getClosestChara();
 
-      if( ( pClosestActor != nullptr ) && pClosestActor->isAlive() )
+      if( pClosestChara && pClosestChara->isAlive() )
       {
         auto distance = Util::distance( getPos().x, getPos().y, getPos().z,
-                                        pClosestActor->getPos().x,
-                                        pClosestActor->getPos().y,
-                                        pClosestActor->getPos().z );
+                                        pClosestChara->getPos().x,
+                                        pClosestChara->getPos().y,
+                                        pClosestChara->getPos().z );
 
-        if( distance < 8 && pClosestActor->isPlayer() )
-          aggro( pClosestActor );
-        //if( distance < 8 && getbehavior() == 2 )
+        if( distance < aggroRange && pClosestChara->isPlayer() )
+          aggro( pClosestChara );
+        //if( distance < aggroRange && getbehavior() == 2 )
         //   aggro( pClosestActor );
       }
     }
 
     case BNpcState::Combat:
     {
-      auto pActor = hateListGetHighest();
-      if( !pActor )
+      auto pHatedActor = hateListGetHighest();
+      if( !pHatedActor )
         return;
-      auto pClosestActor = pActor->getAsChara();
 
       auto distanceOrig = Util::distance( getPos().x, getPos().y, getPos().z,
                                           m_spawnPos.x,
                                           m_spawnPos.y,
                                           m_spawnPos.z );
 
-      if( pClosestActor && !pClosestActor->isAlive() )
+      if( pHatedActor && !pHatedActor->isAlive() )
       {
-        hateListRemove( pClosestActor );
-        pActor = hateListGetHighest();
-        if( pActor )
-          pClosestActor = pActor->getAsChara();
-        else
-          pClosestActor.reset();
+        hateListRemove( pHatedActor );
+        pHatedActor = hateListGetHighest();
       }
 
-      if( pClosestActor != nullptr )
+      if( pHatedActor )
       {
         auto distance = Util::distance( getPos().x, getPos().y, getPos().z,
-                                        pClosestActor->getPos().x,
-                                        pClosestActor->getPos().y,
-                                        pClosestActor->getPos().z );
+                                        pHatedActor->getPos().x,
+                                        pHatedActor->getPos().y,
+                                        pHatedActor->getPos().z );
 
-        if( distanceOrig > 30 )
+        if( distanceOrig > maxDistanceToOrigin )
         {
           hateListClear();
           changeTarget( INVALID_GAME_OBJECT_ID );
@@ -357,14 +356,14 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
           break;
         }
 
-        if( distance > 4 )
-          moveTo( pClosestActor->getPos() );
+        if( distance > minActorDistance )
+          moveTo( pHatedActor->getPos() );
         else
         {
-          if( face( pClosestActor->getPos() ) )
+          if( face( pHatedActor->getPos() ) )
             sendPositionUpdate();
           // in combat range. ATTACK!
-          autoAttack( pClosestActor );
+          autoAttack( pHatedActor );
         }
       }
       else
