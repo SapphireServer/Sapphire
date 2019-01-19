@@ -61,6 +61,7 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
   m_pos.z = posZ;
   m_rot = rot;
   m_level = level;
+  m_invincibilityType = InvincibilityNone;
 
   m_pCurrentZone = pZone;
 
