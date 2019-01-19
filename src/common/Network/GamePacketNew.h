@@ -14,7 +14,7 @@
 #include "CommonNetwork.h"
 #include "PacketDef/Ipcs.h"
 
-namespace Core::Network::Packets
+namespace Sapphire::Network::Packets
 {
 
   // Must forward define these in order to enable the compiler to produce the
@@ -108,7 +108,7 @@ namespace Core::Network::Packets
     uint16_t m_segmentType;
 
   public:
-    virtual uint32_t getContentSize()
+    virtual size_t getContentSize()
     {
       return 0;
     };
@@ -169,7 +169,7 @@ namespace Core::Network::Packets
 
       // Set the values of static fields.
       // The size must be the sum of the segment header and the content
-      m_segHdr.size = sizeof( FFXIVARR_PACKET_SEGMENT_HEADER ) + getContentSize();
+      m_segHdr.size = static_cast< uint32_t >( sizeof( FFXIVARR_PACKET_SEGMENT_HEADER ) + getContentSize() );
       m_segHdr.type = getSegmentType();
     }
 
@@ -195,7 +195,7 @@ namespace Core::Network::Packets
     FFXIVIpcPacket< T, T1 >( const FFXIVARR_PACKET_RAW& rawPacket )
     {
       auto ipcHdrSize = sizeof( FFXIVARR_IPC_HEADER );
-      auto copySize = std::min< uint32_t >( sizeof( T ), rawPacket.segHdr.size - ipcHdrSize );
+      auto copySize = std::min< size_t >( sizeof( T ), rawPacket.segHdr.size - ipcHdrSize );
 
       memcpy( &m_segHdr, &rawPacket.segHdr, sizeof( FFXIVARR_PACKET_SEGMENT_HEADER ) );
       memcpy( &m_data, &rawPacket.data[ 0 ] + ipcHdrSize, copySize );
@@ -204,7 +204,7 @@ namespace Core::Network::Packets
       m_ipcHdr.type = static_cast< ServerZoneIpcType >( m_data._ServerIpcType );
     }
 
-    uint32_t getContentSize() override
+    size_t getContentSize() override
     {
       return sizeof( FFXIVARR_IPC_HEADER ) + sizeof( T );
     }
@@ -291,7 +291,7 @@ namespace Core::Network::Packets
       memcpy( &m_segHdr, data, segmentHdrSize );
     }
 
-    uint32_t getContentSize() override
+    size_t getContentSize() override
     {
       return m_data.size();
     }

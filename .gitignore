@@ -1,12 +1,31 @@
-﻿# Output Directory
-[Bb]in/
+# Output Directory
+[Bb]in/*.exe
+[Bb]in/*.pdb
+[Bb]in/api
+[Bb]in/world
+[Bb]in/lobby
+[Bb]in/dbm
+src/tools/[Bb]in/*.exe
+src/tools/[Bb]in/*.pdb
+src/tools/[Bb]in/discovery_parser
+src/tools/[Bb]in/event_object_parser
+src/tools/[Bb]in/exd_common_gen
+src/tools/[Bb]in/exd_struct_test
+src/tools/[Bb]in/mob_parse
+src/tools/[Bb]in/pcb_reader2
+src/tools/[Bb]in/quest_parse
+src/tools/[Bb]in/exd_struct_gen
 
 # Script Directory
 # TODO: Sperate script directory from bin
 !bin/scripts/**/*
 
+# decompiled scripts
+src/tools/bin/generated/*
+
 # Build Directory
 build/
+cmake-build-*/
 
 # Prerequisites
 *.d
@@ -64,10 +83,6 @@ CTestTestfile.cmake
 # Binary Template
 *.bt
 
-# Boost
-/lib/boost_1_63_0
-src/libraries/external/boost_*
-
 # EasyHook
 !EasyHook32.dll
 !EasyHook32Svc.exe
@@ -113,7 +128,7 @@ src/common/Version\.cpp
 .mtime_cache
 
 # generated script loader files
-src/servers/Scripts/*/ScriptLoader.cpp
+**/ScriptLoader.cpp
 
 # cotire generated files/folders
 cotire/
@@ -125,3 +140,7 @@ cotire/
 # doxygen output folder
 doxygen/generated/
 doxygen/*.tmp
+
+# ignore config directory contents except the default file
+config/*.ini
+!config/config.ini.default

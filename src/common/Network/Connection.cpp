@@ -1,17 +1,19 @@
 #include "Connection.h"
 #include "Hive.h"
 #include <functional>
+#include "Framework.h"
 
-namespace Core {
+namespace Sapphire {
 namespace Network {
 //-----------------------------------------------------------------------------
 
-Connection::Connection( HivePtr hive ) :
+Connection::Connection( HivePtr hive, FrameworkPtr pFw ) :
   m_hive( hive ),
   m_socket( hive->GetService() ),
   m_io_strand( hive->GetService() ),
   m_receive_buffer_size( 32000 ),
-  m_error_state( 0 )
+  m_error_state( 0 ),
+  m_pFw( pFw )
 {
 }
 

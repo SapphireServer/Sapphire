@@ -16,14 +16,12 @@
 
 #include <fstream>
 
+Sapphire::Data::ExdDataGenerated g_exdData;
 
-Core::Logger g_log;
-Core::Data::ExdDataGenerated g_exdData;
-
+using namespace Sapphire;
 
 //const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
-const std::string datLocation(
-  "C:\\Data\\Games\\Final Fantasy XIV\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack\\ffxiv" );
+const std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
 
 std::string generateEnum( const std::string& exd, int8_t nameIndex, const std::string& type, bool useLang = true )
 {
@@ -57,7 +55,7 @@ std::string generateEnum( const std::string& exd, int8_t nameIndex, const std::s
     }
 
     std::string remove = ",_-':!(){} \x02\x1f\x01\x03";
-    Core::Util::eraseAllIn( value, remove );
+    Sapphire::Util::eraseAllIn( value, remove );
 
     value[ 0 ] = std::toupper( value[ 0 ] );
 
@@ -91,13 +89,13 @@ std::string generateEnum( const std::string& exd, int8_t nameIndex, const std::s
 int main()
 {
 
-  g_log.init();
+  Logger::init( "commongen" );
 
 
-  g_log.info( "Setting up EXD data" );
+  Logger::info( "Setting up EXD data" );
   if( !g_exdData.init( datLocation ) )
   {
-    g_log.fatal( "Error setting up EXD data " );
+    Logger::fatal( "Error setting up EXD data " );
     return 1;
   }
 
@@ -109,7 +107,7 @@ int main()
     "/* This file has been automatically generated.\n   Changes will be lost upon regeneration.\n   To change the content edit tools/exd_common_gen */\n";
 
 
-  result += "namespace Core {\n";
+  result += "namespace Sapphire {\n";
   result += "namespace Common {\n";
   result += generateEnum( "ActionCategory", 0, "uint8_t" );
   result += generateEnum( "BeastReputationRank", 1, "uint8_t" );
@@ -127,8 +125,9 @@ int main()
   result += generateEnum( "Tribe", 0, "uint8_t" );
   result += generateEnum( "Town", 0, "uint8_t" );
   result += generateEnum( "Weather", 1, "uint8_t" );
+  result += generateEnum( "HousingAppeal", 0, "uint8_t" );
   result += "}\n";
   result += "}\n#endif\n";
-  g_log.info( result );
+  Logger::info( result );
   return 0;
 }

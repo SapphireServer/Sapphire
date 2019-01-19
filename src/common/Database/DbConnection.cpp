@@ -6,9 +6,7 @@
 #include "PreparedStatement.h"
 #include "Framework.h"
 
-extern Core::Framework g_fw;
-
-Core::Db::DbConnection::DbConnection( ConnectionInfo& connInfo ) :
+Sapphire::Db::DbConnection::DbConnection( ConnectionInfo& connInfo ) :
   m_reconnecting( false ),
   m_prepareError( false ),
   m_queue( nullptr ),
@@ -19,8 +17,8 @@ Core::Db::DbConnection::DbConnection( ConnectionInfo& connInfo ) :
 
 }
 
-Core::Db::DbConnection::DbConnection( Core::LockedWaitQueue< std::shared_ptr< Operation > >* queue,
-                                      Core::Db::ConnectionInfo& connInfo ) :
+Sapphire::Db::DbConnection::DbConnection( Sapphire::LockedWaitQueue< std::shared_ptr< Operation > >* queue,
+                                      Sapphire::Db::ConnectionInfo& connInfo ) :
   m_reconnecting( false ),
   m_prepareError( false ),
   m_queue( queue ),
@@ -31,12 +29,12 @@ Core::Db::DbConnection::DbConnection( Core::LockedWaitQueue< std::shared_ptr< Op
   m_worker = std::make_shared< DbWorker >( m_queue, this );
 }
 
-Core::Db::DbConnection::~DbConnection()
+Sapphire::Db::DbConnection::~DbConnection()
 {
   close();
 }
 
-void Core::Db::DbConnection::close()
+void Sapphire::Db::DbConnection::close()
 {
   m_worker.reset();
   m_stmts.clear();
@@ -50,7 +48,7 @@ void Core::Db::DbConnection::close()
 
 }
 
-uint32_t Core::Db::DbConnection::open()
+uint32_t Sapphire::Db::DbConnection::open()
 {
   std::shared_ptr< Mysql::MySqlBase > base( new Mysql::MySqlBase() );
   Mysql::optionMap options;
@@ -66,49 +64,49 @@ uint32_t Core::Db::DbConnection::open()
   }
   catch( std::runtime_error& e )
   {
-    g_fw.get< Logger >()->error( e.what() );
+   Logger::error( e.what() );
     return 1;
   }
 
   return 0;
 }
 
-uint32_t Core::Db::DbConnection::getLastError()
+uint32_t Sapphire::Db::DbConnection::getLastError()
 {
   return m_pConnection->getErrorNo();
 }
 
-bool Core::Db::DbConnection::ping()
+bool Sapphire::Db::DbConnection::ping()
 {
   return m_pConnection->ping();
 }
 
-bool Core::Db::DbConnection::lockIfReady()
+bool Sapphire::Db::DbConnection::lockIfReady()
 {
   return m_mutex.try_lock();
 }
 
-void Core::Db::DbConnection::unlock()
+void Sapphire::Db::DbConnection::unlock()
 {
   m_mutex.unlock();
 }
 
-void Core::Db::DbConnection::beginTransaction()
+void Sapphire::Db::DbConnection::beginTransaction()
 {
   m_pConnection->beginTransaction();
 }
 
-void Core::Db::DbConnection::rollbackTransaction()
+void Sapphire::Db::DbConnection::rollbackTransaction()
 {
   m_pConnection->rollbackTransaction();
 }
 
-void Core::Db::DbConnection::commitTransaction()
+void Sapphire::Db::DbConnection::commitTransaction()
 {
   m_pConnection->commitTransaction();
 }
 
-bool Core::Db::DbConnection::execute( const std::string& sql )
+bool Sapphire::Db::DbConnection::execute( const std::string& sql )
 {
   try
   {
@@ -118,12 +116,12 @@ bool Core::Db::DbConnection::execute( const std::string& sql )
   }
   catch( std::runtime_error& e )
   {
-    g_fw.get< Logger >()->error( e.what() );
+    Logger::error( e.what() );
     return false;
   }
 }
 
-std::shared_ptr< Mysql::ResultSet > Core::Db::DbConnection::query( const std::string& sql )
+std::shared_ptr< Mysql::ResultSet > Sapphire::Db::DbConnection::query( const std::string& sql )
 {
   try
   {
@@ -133,23 +131,23 @@ std::shared_ptr< Mysql::ResultSet > Core::Db::DbConnection::query( const std::st
   }
   catch( std::runtime_error& e )
   {
-    g_fw.get< Logger >()->error( e.what() );
+    Logger::error( e.what() );
     return nullptr;
   }
 }
 
 
 std::shared_ptr< Mysql::ResultSet >
-Core::Db::DbConnection::query( std::shared_ptr< Core::Db::PreparedStatement > stmt )
+Sapphire::Db::DbConnection::query( std::shared_ptr< Sapphire::Db::PreparedStatement > stmt )
 {
   std::shared_ptr< Mysql::ResultSet > res( nullptr );
   if( !stmt )
     return nullptr;
 
-  if( !ping() )
+  if( !ping() ) //this does not work right and results in too many connections
   {
     // naivly reconnect and hope for the best
-    open();
+    //open(); 
     lockIfReady();
     if( !prepareStatements() )
       return nullptr;
@@ -170,13 +168,13 @@ Core::Db::DbConnection::query( std::shared_ptr< Core::Db::PreparedStatement > st
   }
   catch( std::runtime_error& e )
   {
-    g_fw.get< Logger >()->error( e.what() );
+    Logger::error( e.what() );
     return nullptr;
   }
 
 }
 
-bool Core::Db::DbConnection::execute( std::shared_ptr< Core::Db::PreparedStatement > stmt )
+bool Sapphire::Db::DbConnection::execute( std::shared_ptr< Sapphire::Db::PreparedStatement > stmt )
 {
   if( !stmt )
     return false;
@@ -196,12 +194,12 @@ bool Core::Db::DbConnection::execute( std::shared_ptr< Core::Db::PreparedStateme
   }
   catch( std::runtime_error& e )
   {
-    g_fw.get< Logger >()->error( e.what() );
+    Logger::error( e.what() );
     return false;
   }
 }
 
-std::shared_ptr< Mysql::PreparedStatement > Core::Db::DbConnection::getPreparedStatement( uint32_t index )
+std::shared_ptr< Mysql::PreparedStatement > Sapphire::Db::DbConnection::getPreparedStatement( uint32_t index )
 {
   assert( index < m_stmts.size() );
   auto ret = m_stmts[ index ];
@@ -211,7 +209,7 @@ std::shared_ptr< Mysql::PreparedStatement > Core::Db::DbConnection::getPreparedS
   return ret;
 }
 
-void Core::Db::DbConnection::prepareStatement( uint32_t index, const std::string& sql, Core::Db::ConnectionFlags flags )
+void Sapphire::Db::DbConnection::prepareStatement( uint32_t index, const std::string& sql, Sapphire::Db::ConnectionFlags flags )
 {
   m_queries.insert( PreparedStatementMap::value_type( index, std::make_pair( sql, flags ) ) );
 
@@ -232,7 +230,7 @@ void Core::Db::DbConnection::prepareStatement( uint32_t index, const std::string
   }
   catch( std::runtime_error& e )
   {
-    g_fw.get< Logger >()->error( e.what() );
+    Logger::error( e.what() );
     m_prepareError = true;
   }
 
@@ -240,7 +238,7 @@ void Core::Db::DbConnection::prepareStatement( uint32_t index, const std::string
 
 }
 
-bool Core::Db::DbConnection::prepareStatements()
+bool Sapphire::Db::DbConnection::prepareStatements()
 {
   doPrepareStatements();
   return !m_prepareError;

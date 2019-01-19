@@ -143,7 +143,7 @@ struct SGB_GROUP
       if( entryOffset > fileSize )
         throw std::runtime_error( "SGB_GROUP entry offset was larger than SGB file size!" );
       auto type = *reinterpret_cast< uint32_t* >( buf + entryOffset );
-      if( type == SgbGroupEntryType::Model && !ignoreModels )
+      if( type == SgbGroupEntryType::Model )
       {
         entries.push_back( std::make_shared< SGB_MODEL_ENTRY >( buf, entryOffset ) );
       }
