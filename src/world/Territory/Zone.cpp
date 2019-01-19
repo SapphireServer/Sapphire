@@ -803,7 +803,7 @@ bool Sapphire::Zone::loadSpawnGroups()
       float r = res->getFloat( 5 );
       uint32_t gimmickId = res->getUInt( 6 );
 
-      group.getSpawnPointList().push_back( std::make_shared< Entity::SpawnPoint >( x, y, z, r, gimmickId ) );
+      group.getSpawnPointList().emplace_back( std::make_shared< Entity::SpawnPoint >( x, y, z, r, gimmickId ) );
 
       Logger::debug( "id: {0}, x: {1}, y: {2}, z: {3}, gimmickId: {4}", id, x, y, z, gimmickId );
     }
