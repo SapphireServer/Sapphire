@@ -73,6 +73,7 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
   m_mp = 200;
 
   m_state = BNpcState::Idle;
+  m_status = ActorStatus::Idle;
 
   m_baseStats.max_hp = maxHp;
   m_baseStats.max_mp = 200;
@@ -128,7 +129,7 @@ uint32_t Sapphire::Entity::BNpc::getBNpcNameId() const
 
 void Sapphire::Entity::BNpc::spawn( PlayerPtr pTarget )
 {
-  pTarget->queuePacket( std::make_shared< NpcSpawnPacket >( *getAsBNpc(), *pTarget ) );
+  pTarget->queuePacket( std::make_shared< NpcSpawnPacket >( *this, *pTarget ) );
 }
 
 void Sapphire::Entity::BNpc::despawn( PlayerPtr pTarget )
@@ -166,7 +167,6 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
   setPos( newPos );
 
   Common::FFXIVARR_POSITION3 tmpPos{ getPos().x + x, y, getPos().z + z };
-
   setPos( tmpPos );
   setRot( newRot );
 

@@ -39,7 +39,6 @@ namespace Sapphire::Network::Packets::Server
       m_data.mPMax = bnpc.getMaxMp();
       m_data.subtype = 5;
 
-      //m_data.tPMax = 3000;
       m_data.level = bnpc.getLevel();
       m_data.pose = bnpc.getPose();
 
@@ -73,7 +72,6 @@ namespace Sapphire::Network::Packets::Server
 
       if( !target.isActorSpawnIdValid( m_data.spawnIndex ) )
         return;
-
       // 0x20 == spawn hidden to be displayed by the spawneffect control
       //m_data.displayFlags = bnpc.getDisplayFlags();
 
