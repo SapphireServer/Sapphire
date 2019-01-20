@@ -52,17 +52,4 @@ struct ExportedZone
   std::map< std::string, ExportedGroup > groups;
 };
 
-class Exporter
-{
-public:
-  Exporter() { }
-  ~Exporter(){}
-
-  virtual void exportZone( const ExportedZone& zone ) = 0;
-  virtual void exportGroup( const ExportedGroup& group ) = 0;
-
-protected:
-  ExportFileType m_exportFileType;
-};
-
 #endif

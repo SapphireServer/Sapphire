@@ -11,7 +11,7 @@
 #include "exporter.h"
 
 
-class ObjExporter : public Exporter
+class ObjExporter
 {
 public:
   static void exportZone( const ExportedZone& zone )
@@ -51,7 +51,7 @@ public:
 
     auto end = std::chrono::high_resolution_clock::now();
     printf( "[Obj] Finished exporting %s in %u ms\n",
-      fileName,
+      fileName.c_str(),
       std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() );
   }
 
