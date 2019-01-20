@@ -301,6 +301,9 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
   const uint8_t aggroRange = 8;
   const uint8_t maxDistanceToOrigin = 30;
 
+  if( m_status == ActorStatus::Dead )
+    return;
+
   switch( m_state )
   {
     case BNpcState::Retreat:
