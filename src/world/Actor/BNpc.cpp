@@ -389,3 +389,20 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
     }
   }
 }
+
+void Sapphire::Entity::BNpc::onActionHostile( Sapphire::Entity::CharaPtr pSource )
+{
+  if( !hateListGetHighest() )
+    aggro( pSource );
+
+  //if( !getClaimer() )
+  //  setOwner( pSource->getAsPlayer() );
+}
+
+void Sapphire::Entity::BNpc::onDeath()
+{
+  setTargetId( INVALID_GAME_OBJECT_ID );
+  m_currentStance = Stance::Passive;
+  m_state = BNpcState::Dead;
+  hateListClear();
+}

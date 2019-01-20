@@ -393,7 +393,7 @@ void Sapphire::Entity::Chara::autoAttack( CharaPtr pTarget )
 
   if( ( tick - m_lastAttack ) > 2500 )
   {
-    pTarget->onActionHostile( *this );
+    pTarget->onActionHostile( getAsChara() );
     m_lastAttack = tick;
     srand( static_cast< uint32_t >( tick ) );
 
@@ -461,7 +461,7 @@ void Sapphire::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionI
         sendToInRangeSet( effectPacket, true );
 
         if( target.isAlive() )
-          target.onActionHostile( *this );
+          target.onActionHostile( getAsChara() );
 
         target.takeDamage( static_cast< uint32_t >( param1 ) );
 
@@ -481,7 +481,7 @@ void Sapphire::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionI
 
 
           if( pHitActor->getAsChara()->isAlive() )
-            pHitActor->getAsChara()->onActionHostile( *this );
+            pHitActor->getAsChara()->onActionHostile( getAsChara() );
 
           pHitActor->getAsChara()->takeDamage( static_cast< uint32_t >( param1 ) );
 

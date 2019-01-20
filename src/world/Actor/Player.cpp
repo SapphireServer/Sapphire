@@ -1515,7 +1515,7 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
 
   auto mainWeap = getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand );
 
-  pTarget->onActionHostile( *this );
+  pTarget->onActionHostile( getAsChara() );
   //uint64_t tick = Util::getTimeMs();
   //srand(static_cast< uint32_t >(tick));
 

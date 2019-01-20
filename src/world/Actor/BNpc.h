@@ -79,6 +79,10 @@ namespace Sapphire::Entity
 
     void update( int64_t currTime ) override;
 
+    void onActionHostile( CharaPtr pSource ) override;
+
+    void onDeath() override;
+
   private:
     uint32_t m_bNpcBaseId;
     uint32_t m_bNpcNameId;

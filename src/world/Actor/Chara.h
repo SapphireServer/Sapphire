@@ -219,7 +219,7 @@ namespace Sapphire::Entity
 
     virtual void onDamageTaken( Chara& pSource ) {};
 
-    virtual void onActionHostile( Chara& source ) {};
+    virtual void onActionHostile( CharaPtr pSource ) {};
 
     virtual void onActionFriendly( Chara& pSource ) {};
 
