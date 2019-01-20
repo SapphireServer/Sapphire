@@ -213,7 +213,7 @@ struct SGB_FILE
     }
     catch( std::exception& e )
     {
-      std::cout << e.what() << "\n";
+      std::cout << ( std::string( e.what() ) + "\n" );
     }
   };
 };

@@ -295,7 +295,7 @@ struct LGB_GROUP
       }
       catch( std::exception& e )
       {
-        std::cout << name << " " << e.what() << std::endl;
+        std::cout << ( name + " " + e.what() + "\n" );
       }
     }
   };

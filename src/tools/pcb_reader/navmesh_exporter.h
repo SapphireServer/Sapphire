@@ -1,5 +1,5 @@
-#ifndef OBJ_EXPORTER_H
-#define OBJ_EXPORTER_H
+#ifndef NAVMESH_EXPORTER_H
+#define NAVMESH_EXPORTER_H
 
 #include <iostream>
 #include <cstdint>
@@ -10,7 +10,12 @@
 
 #include "exporter.h"
 
-static class ObjExporter : public Exporter
+#include <recastnavigation/Recast/Include/Recast.h>
+#include <recastnavigation/Recast/Include/RecastAlloc.h>
+#include <recastnavigation/Detour/Include/DetourNavMesh.h>
+#include <recastnavigation/Detour/Include/DetourNavMeshBuilder.h>
+
+class NavmeshExporter : public Exporter
 {
 public:
   static void exportZone( const ExportedZone& zone )
@@ -20,8 +25,9 @@ public:
     auto fileName = zone.name + ".obj";
     
     auto end = std::chrono::high_resolution_clock::now();
-    std::cout << ( "Finished exporting " + fileName + " in " +
-      std::to_string( std::chrono::duration_cast< std::chrono::seconds >( end - start ).count() ) + " seconds\n" );
+    printf( "[Navmesh] Finished exporting %s in %u ms\n",
+      fileName,
+      std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() );
   }
 
   static void exportGroup( const std::string& zoneName, const ExportedGroup& group )
@@ -32,8 +38,9 @@ public:
 
     auto end = std::chrono::high_resolution_clock::now();
 
-    std::cout << ( "Finished exporting " + fileName + " in " +
-      std::to_string( std::chrono::duration_cast< std::chrono::seconds >( end - start ).count() ) + " seconds\n" );
+    printf( "[Navmesh] Finished exporting %s in %u ms\n",
+      fileName,
+      std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() );
   }
 private:
   static void exportGroup( const ExportedGroup& group, std::ofstream& of, int& indicesOffset, int& modelCount )
