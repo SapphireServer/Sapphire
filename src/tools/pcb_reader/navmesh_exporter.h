@@ -15,7 +15,7 @@
 #include <recastnavigation/Detour/Include/DetourNavMesh.h>
 #include <recastnavigation/Detour/Include/DetourNavMeshBuilder.h>
 
-class NavmeshExporter : public Exporter
+class NavmeshExporter
 {
 public:
   static void exportZone( const ExportedZone& zone )
@@ -26,7 +26,7 @@ public:
     
     auto end = std::chrono::high_resolution_clock::now();
     printf( "[Navmesh] Finished exporting %s in %u ms\n",
-      fileName,
+      fileName.c_str(),
       std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() );
   }
 
@@ -39,7 +39,7 @@ public:
     auto end = std::chrono::high_resolution_clock::now();
 
     printf( "[Navmesh] Finished exporting %s in %u ms\n",
-      fileName,
+      fileName.c_str(),
       std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() );
   }
 private:
