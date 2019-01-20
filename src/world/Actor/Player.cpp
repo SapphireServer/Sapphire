@@ -10,6 +10,7 @@
 
 #include "Session.h"
 #include "Player.h"
+#include "BNpc.h"
 
 #include "Manager/HousingMgr.h"
 #include "Manager/TerritoryMgr.h"
@@ -1348,6 +1349,45 @@ void Sapphire::Entity::Player::initHateSlotQueue()
     m_freeHateSlotQueue.push( i );
 }
 
+void Sapphire::Entity::Player::hateListAdd( BNpcPtr pBNpc )
+{
+  if( !m_freeHateSlotQueue.empty() )
+  {
+    uint8_t hateId = m_freeHateSlotQueue.front();
+    m_freeHateSlotQueue.pop();
+    m_actorIdTohateSlotMap[ pBNpc->getId() ] = hateId;
+    sendHateList();
+  }
+}
+
+void Sapphire::Entity::Player::hateListRemove( BNpcPtr pBNpc )
+{
+
+  auto it = m_actorIdTohateSlotMap.begin();
+  for( ; it != m_actorIdTohateSlotMap.end(); ++it )
+  {
+    if( it->first == pBNpc->getId() )
+    {
+      uint8_t hateSlot = it->second;
+      m_freeHateSlotQueue.push( hateSlot );
+      m_actorIdTohateSlotMap.erase( it );
+      sendHateList();
+
+      return;
+    }
+  }
+}
+
+bool Sapphire::Entity::Player::hateListHasEntry( BNpcPtr pBNpc )
+{
+  for( const auto& entry : m_actorIdTohateSlotMap )
+  {
+    if( entry.first == pBNpc->getId() )
+      return true;
+  }
+  return false;
+}
+
 void Sapphire::Entity::Player::sendHateList()
 {
   auto hateListPacket = makeZonePacket< FFXIVIpcHateList >( getId() );
@@ -1359,6 +1399,19 @@ void Sapphire::Entity::Player::sendHateList()
     hateListPacket->data().entry[ i ].hatePercent = 100;
   }
   queuePacket( hateListPacket );
+}
+
+void Sapphire::Entity::Player::onMobAggro( BNpcPtr pBNpc )
+{
+  hateListAdd( pBNpc );
+  queuePacket( makeActorControl142( getId(), ToggleAggro, 1 ) );
+}
+
+void Sapphire::Entity::Player::onMobDeaggro( BNpcPtr pBNpc )
+{
+  hateListRemove( pBNpc );
+  if( m_actorIdTohateSlotMap.empty() )
+    queuePacket( makeActorControl142( getId(), ToggleAggro ) );
 }
 
 bool Sapphire::Entity::Player::isLogin() const
@@ -1533,7 +1586,7 @@ uint32_t Sapphire::Entity::Player::getCFPenaltyMinutes() const
 void Sapphire::Entity::Player::setCFPenaltyMinutes( uint32_t minutes )
 {
   auto currentTimestamp = Sapphire::Util::getTimeSeconds();
-  setCFPenaltyTimestamp( static_cast< uint32_t >( currentTimestamp + minutes * 60 ) );
+  setCFPenaltyTimestamp( currentTimestamp + minutes * 60 );
 }
 
 uint8_t Sapphire::Entity::Player::getOpeningSequence() const

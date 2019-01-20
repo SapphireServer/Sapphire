@@ -44,6 +44,7 @@ namespace Sapphire::Entity
     virtual ~BNpc() override;
 
     void spawn( PlayerPtr pTarget ) override;
+    void despawn( PlayerPtr pTarget ) override;
 
     uint16_t getModelChara() const;
     uint8_t getLevel() const override;

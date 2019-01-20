@@ -21,7 +21,12 @@ namespace Sapphire::Util
 
   uint64_t getTimeMs();
 
-  int64_t getTimeSeconds();
+  /*!
+   * @brief Get a POSIX epoch representation of the current time
+   * @return 32-bit unsigned integer
+   */
+
+  uint32_t getTimeSeconds();
 
   uint64_t getEorzeanTimeStamp();
 

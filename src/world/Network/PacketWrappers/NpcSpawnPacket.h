@@ -75,18 +75,13 @@ namespace Sapphire::Network::Packets::Server
       m_data.bNPCBase = bnpc.getBNpcBaseId();
       m_data.bNPCName = bnpc.getBNpcNameId();
 
-      m_data.state = 1;
-      if( target.getId() == bnpc.getId() )
-      {
-        m_data.spawnIndex = 0x00;
-      }
-      else
-      {
-        m_data.spawnIndex = target.getSpawnIdForActorId( bnpc.getId() );
+      assert( target.getId() != bnpc.getId() );
 
-        if( !target.isActorSpawnIdValid( m_data.spawnIndex ) )
-          return;
-      }
+      m_data.spawnIndex = target.getSpawnIdForActorId( bnpc.getId() );
+
+      if( !target.isActorSpawnIdValid( m_data.spawnIndex ) )
+        return;
+
       // 0x20 == spawn hidden to be displayed by the spawneffect control
       //m_data.displayFlags = bnpc.getDisplayFlags();
 

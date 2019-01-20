@@ -61,6 +61,7 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
   m_pos.z = posZ;
   m_rot = rot;
   m_level = level;
+  m_invincibilityType = InvincibilityNone;
 
   m_pCurrentZone = pZone;
 
@@ -128,6 +129,11 @@ uint32_t Sapphire::Entity::BNpc::getBNpcNameId() const
 void Sapphire::Entity::BNpc::spawn( PlayerPtr pTarget )
 {
   pTarget->queuePacket( std::make_shared< NpcSpawnPacket >( *getAsBNpc(), *pTarget ) );
+}
+
+void Sapphire::Entity::BNpc::despawn( PlayerPtr pTarget )
+{
+  pTarget->freePlayerSpawnId( getId() );
 }
 
 Sapphire::Entity::BNpcState Sapphire::Entity::BNpc::getState() const
@@ -243,7 +249,7 @@ void Sapphire::Entity::BNpc::hateListRemove( Sapphire::Entity::CharaPtr pChara )
       if( pChara->isPlayer() )
       {
         PlayerPtr tmpPlayer = pChara->getAsPlayer();
-        //tmpPlayer->onMobDeaggro( getAsBattleNpc() );
+        tmpPlayer->onMobDeaggro( getAsBNpc() );
       }
       return;
     }
@@ -273,7 +279,7 @@ void Sapphire::Entity::BNpc::aggro( Sapphire::Entity::CharaPtr pChara )
   {
     PlayerPtr tmpPlayer = pChara->getAsPlayer();
     tmpPlayer->queuePacket( makeActorControl142( getId(), ActorControlType::ToggleWeapon, 0, 1, 1 ) );
-    //tmpPlayer->onMobAggro( getAsBattleNpc() );
+    tmpPlayer->onMobAggro( getAsBNpc() );
   }
 }
 
@@ -285,7 +291,7 @@ void Sapphire::Entity::BNpc::deaggro( Sapphire::Entity::CharaPtr pChara )
   if( pChara->isPlayer() )
   {
     PlayerPtr tmpPlayer = pChara->getAsPlayer();
-    //tmpPlayer->onMobDeaggro( getAsBattleNpc() );
+    tmpPlayer->onMobDeaggro( getAsBNpc() );
   }
 }
 
@@ -294,6 +300,9 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
   const uint8_t minActorDistance = 4;
   const uint8_t aggroRange = 8;
   const uint8_t maxDistanceToOrigin = 30;
+
+  if( m_status == ActorStatus::Dead )
+    return;
 
   switch( m_state )
   {
@@ -306,6 +315,10 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
 
     case BNpcState::Idle:
     {
+      // passive mobs should ignore players unless aggro'd
+      if( m_aggressionMode == 1 )
+        return;
+
       CharaPtr pClosestChara = getClosestChara();
 
       if( pClosestChara && pClosestChara->isAlive() )
