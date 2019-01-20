@@ -40,6 +40,7 @@
 #include "Manager/EventMgr.h"
 #include "Manager/ItemMgr.h"
 #include "Manager/MarketMgr.h"
+#include "Manager/RNGMgr.h"
 
 using namespace Sapphire::World::Manager;
 
@@ -205,6 +206,7 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
   auto pInventoryMgr = std::make_shared< Manager::InventoryMgr >( framework() );
   auto pEventMgr = std::make_shared< Manager::EventMgr >( framework() );
   auto pItemMgr = std::make_shared< Manager::ItemMgr >( framework() );
+  auto pRNGMgr = std::make_shared< Manager::RNGMgr >( framework() );
 
   framework()->set< DebugCommandMgr >( pDebugCom );
   framework()->set< Manager::PlayerMgr >( pPlayerMgr );
@@ -212,6 +214,7 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
   framework()->set< Manager::InventoryMgr >( pInventoryMgr );
   framework()->set< Manager::EventMgr >( pEventMgr );
   framework()->set< Manager::ItemMgr >( pItemMgr );
+  framework()->set< Manager::RNGMgr >( pRNGMgr );
 
   Logger::info( "World server running on {0}:{1}", m_ip, m_port );
 
@@ -256,7 +259,7 @@ void Sapphire::World::ServerMgr::mainLoop()
 
     auto currTime = Util::getTimeSeconds();
 
-    pTeriMgr->updateTerritoryInstances( static_cast< uint32_t >( currTime ) );
+    pTeriMgr->updateTerritoryInstances( currTime );
 
     pScriptMgr->update();
 
@@ -473,7 +476,7 @@ Sapphire::Entity::BNpcTemplatePtr Sapphire::World::ServerMgr::getBNpcTemplate( c
 
 Sapphire::Entity::BNpcTemplatePtr Sapphire::World::ServerMgr::getBNpcTemplate( uint32_t id )
 {
-  for( auto entry : m_bNpcTemplateMap )
+  for( const auto& entry : m_bNpcTemplateMap )
   {
     if( entry.second->getId() == id )
       return entry.second;

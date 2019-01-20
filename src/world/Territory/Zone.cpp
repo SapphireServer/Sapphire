@@ -39,6 +39,8 @@
 #include "Zone.h"
 #include "Framework.h"
 
+#include <Manager/RNGMgr.h>
+
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
@@ -159,7 +161,7 @@ void Sapphire::Zone::loadCellCache()
 
 Weather Sapphire::Zone::getNextWeather()
 {
-  uint32_t unixTime = static_cast< uint32_t >( Util::getTimeSeconds() );
+  uint32_t unixTime = Util::getTimeSeconds();
   // Get Eorzea hour for weather start
   uint32_t bell = unixTime / 175;
   // Do the magic 'cause for calculations 16:00 is 0, 00:00 is 8 and 08:00 is 16
@@ -381,9 +383,8 @@ void Sapphire::Zone::updateBNpcs( int64_t tickCount )
 {
    if( ( tickCount - m_lastMobUpdate ) > 250 )
    {
-
       m_lastMobUpdate = tickCount;
-      uint32_t currTime = static_cast< uint32_t >( time( nullptr ) );
+      uint32_t currTime = Sapphire::Util::getTimeSeconds();
 
       /*for( auto it3 = m_BattleNpcDeadMap.begin(); it3 != m_BattleNpcDeadMap.end(); ++it3 )
       {
@@ -802,7 +803,7 @@ bool Sapphire::Zone::loadSpawnGroups()
       float r = res->getFloat( 5 );
       uint32_t gimmickId = res->getUInt( 6 );
 
-      group.getSpawnPointList().push_back( std::make_shared< Entity::SpawnPoint >( x, y, z, r, gimmickId ) );
+      group.getSpawnPointList().emplace_back( std::make_shared< Entity::SpawnPoint >( x, y, z, r, gimmickId ) );
 
       Logger::debug( "id: {0}, x: {1}, y: {2}, z: {3}, gimmickId: {4}", id, x, y, z, gimmickId );
     }
@@ -812,9 +813,8 @@ bool Sapphire::Zone::loadSpawnGroups()
 
 void Sapphire::Zone::updateSpawnPoints()
 {
-  std::random_device rd;
-  std::mt19937 mt( rd() );
-  std::uniform_real_distribution< float > dist( 0.0, PI * 2 );
+  auto pRNGMgr = m_pFw->get< World::Manager::RNGMgr >();
+  auto rng = pRNGMgr->getRandGenerator< float >( 0.f, PI * 2 );
 
   for( auto& group : m_spawnGroups )
   {
@@ -837,7 +837,7 @@ void Sapphire::Zone::updateSpawnPoints()
                                                        point->getPosX(),
                                                        point->getPosY(),
                                                        point->getPosZ(),
-                                                       dist( mt ),
+                                                       rng.next(),
                                                        group.getLevel(),
                                                        group.getMaxHp(), shared_from_this(), m_pFw );
         point->setLinkedBNpc( pBNpc );
