@@ -13,17 +13,25 @@
 class ThreadPool
 {
 public:
-  ThreadPool( unsigned int numJobs = std::thread::hardware_concurrency() )
+  ThreadPool()
   {
-    for( auto i = 0; i < numJobs; ++i )
-    {
-      m_workers.push_back( std::async( std::launch::async, [this]{ run(); } ) );
-    }
+
   }
 
   ~ThreadPool()
   {
     complete();
+  }
+
+  void addWorkers( unsigned int num )
+  {
+    if( num == 0 )
+      num = std::thread::hardware_concurrency() - 1;
+
+    for( auto i = 0; i < num; ++i )
+    {
+      m_workers.push_back( std::async( std::launch::async, [this]{ run(); } ) );
+    }
   }
 
   template< class Func, class Ret = std::result_of_t< Func&() > >
@@ -50,10 +58,12 @@ public:
 
   bool complete()
   {
-    std::unique_lock lock( m_mutex );
-    for( auto&& worker : m_workers )
     {
-      m_pendingJobs.push_back( {} );
+      std::scoped_lock lock( m_mutex );
+      for( auto&& worker : m_workers )
+      {
+        m_pendingJobs.push_back( {} );
+      }
     }
     m_cv.notify_all();
     m_workers.clear();

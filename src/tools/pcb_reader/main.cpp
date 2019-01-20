@@ -29,18 +29,13 @@
 #include <ExdCat.h>
 #include <Exd.h>
 
-#include <condition_variable>
-
-#include <recastnavigation/Recast/Include/Recast.h>
-#include <recastnavigation/Recast/Include/RecastAlloc.h>
-
-
 // garbage to ignore models
 bool noObj = false;
 
 std::string gamePath( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
 std::unordered_map< uint16_t, std::string > zoneNameMap;
 uint32_t zoneId;
+
 
 std::set< std::string > zoneDumpList;
 
@@ -96,12 +91,12 @@ std::string zoneNameToPath( const std::string& name )
     //path = path.substr( path.find_first_of( "/" ) + 1, path.size() - path.find_first_of( "/" ));
     //path = std::string( "ffxiv/" ) + path;
     path = std::string( "bg/" ) + path.substr( 0, path.find( "/level/" ) );
-    std::cout << "[Info] " << "Found path for " << name << ": " << path << std::endl;
+    printf( "[Info] Found path for %s\n", name.c_str() );
   }
   else
   {
     throw std::runtime_error( "Unable to find path for " + name +
-                              ".\n\tPlease double check spelling or open 0a0000.win32.index with FFXIV Explorer and extract territorytype.exh as CSV\n\tand copy territorytype.exh.csv into pcb_reader.exe directory if using standalone" );
+                              ".\n\tPlease double check spelling." );
   }
 
   return path;
@@ -145,7 +140,7 @@ int main( int argc, char* argv[] )
   }
   catch( std::exception& e )
   {
-    std::cout << "Unable to initialise EXD! Usage: pcb_reader <teri> \"path/to/FINAL FANTASY XIV - A REALM REBORN/game/sqpack\"" << std::endl;
+    printf( "Unable to initialise EXD! Usage: pcb_reader <teri> \"path/to/FINAL FANTASY XIV - A REALM REBORN/game/sqpack\" [--no-obj, --dump-all, --navmesh]" );
     return -1;
   }
   ExportMgr exportMgr;
@@ -221,211 +216,205 @@ int main( int argc, char* argv[] )
       uint32_t max_index = 0;
       int totalModels = 0;
 
+      
+
+      auto buildModelEntry = [ & ]( std::shared_ptr< PCB_FILE > pPcbFile, ExportedGroup& exportedGroup,
+                              const std::string& name, const std::string& groupName,
+                              const vec3* scale = nullptr,
+                              const vec3* rotation = nullptr,
+                              const vec3* translation = nullptr,
+                              const SGB_MODEL_ENTRY* pSgbEntry = nullptr )
       {
+        
+        auto& pcb_file = *pPcbFile.get();
 
-        auto buildModelEntry = [ & ]( std::shared_ptr< PCB_FILE > pPcbFile, ExportedGroup& exportedGroup,
-                                const std::string& name, const std::string& groupName,
-                                const vec3* scale = nullptr,
-                                const vec3* rotation = nullptr,
-                                const vec3* translation = nullptr,
-                                const SGB_MODEL_ENTRY* pSgbEntry = nullptr )
+        ExportedModel model;
+        model.name = name + "_" + std::to_string( totalModels++ );
+        model.meshes.resize( pcb_file.entries.size() );
+
+        uint32_t meshCount = 0;
+        for( const auto& entry : pcb_file.entries )
         {
-          
-          auto& pcb_file = *pPcbFile.get();
+          ExportedMesh mesh;
 
-          ExportedModel model;
-          model.name = name + "_" + std::to_string( totalModels++ );
-          model.meshes.resize( pcb_file.entries.size() );
+          mesh.verts.resize( ( entry.header.num_vertices + entry.header.num_v16 ) * 3 );
+          mesh.indices.resize( entry.header.num_indices * 3 );
 
-          uint32_t groupCount = 0;
-          for( const auto& entry : pcb_file.entries )
+          float x_base = abs( float( entry.header.x1 - entry.header.x ) );
+          float y_base = abs( float( entry.header.y1 - entry.header.y ) );
+          float z_base = abs( float( entry.header.z1 - entry.header.z ) );
+
+          auto makeTranslation = [ & ]( vec3& v )
           {
-            ExportedMesh mesh;
-
-            int verts = 0;
-            int indices = 0;
-            mesh.verts.resize( ( entry.header.num_vertices + entry.header.num_v16 ) * 3 );
-            mesh.indices.resize( entry.header.num_indices * 3 );
-
-            float x_base = abs( float( entry.header.x1 - entry.header.x ) );
-            float y_base = abs( float( entry.header.y1 - entry.header.y ) );
-            float z_base = abs( float( entry.header.z1 - entry.header.z ) );
-
-            auto makeTranslation = [ & ]( vec3& v )
+            if( pSgbEntry )
             {
-              if( pSgbEntry )
+              v.x *= pSgbEntry->header.scale.x;
+              v.y *= pSgbEntry->header.scale.y;
+              v.z *= pSgbEntry->header.scale.z;
+
+              v = v * matrix4::rotateX( pSgbEntry->header.rotation.x );
+              v = v * matrix4::rotateY( pSgbEntry->header.rotation.y );
+              v = v * matrix4::rotateZ( pSgbEntry->header.rotation.z );
+
+              v.x += pSgbEntry->header.translation.x;
+              v.y += pSgbEntry->header.translation.y;
+              v.z += pSgbEntry->header.translation.z;
+            }
+
+            if( scale )
+            {
+              v.x *= scale->x;
+              v.y *= scale->y;
+              v.z *= scale->z;
+
+              v = v * matrix4::rotateX( rotation->x );
+              v = v * matrix4::rotateY( rotation->y );
+              v = v * matrix4::rotateZ( rotation->z );
+
+              v.x += translation->x;
+              v.y += translation->y;
+              v.z += translation->z;
+            }
+
+          };
+          int verts = 0;
+          int indices = 0;
+
+          for( auto& vertex : entry.data.vertices )
+          {
+            vec3 v( vertex.x, vertex.y, vertex.z );
+            makeTranslation( v );
+
+            mesh.verts[ verts++ ] = v.x;
+            mesh.verts[ verts++ ] = v.y;
+            mesh.verts[ verts++ ] = v.z;
+          }
+
+          for( const auto& link : entry.data.vertices_i16 )
+          {
+            vec3 v( float( link.x ) / 0xFFFF, float( link.y ) / 0xFFFF, float( link.z ) / 0xFFFF );
+
+            v.x = v.x * x_base + entry.header.x;
+            v.y = v.y * y_base + entry.header.y;
+            v.z = v.z * z_base + entry.header.z;
+
+            makeTranslation( v );
+
+            mesh.verts[ verts++ ] = v.x;
+            mesh.verts[ verts++ ] = v.y;
+            mesh.verts[ verts++ ] = v.z;
+          }
+
+          for( const auto& index : entry.data.indices )
+          {
+            mesh.indices[ indices++ ] = index.index[ 0 ];
+            mesh.indices[ indices++ ] = index.index[ 1 ];
+            mesh.indices[ indices++ ] = index.index[ 2 ];
+            // std::cout << std::to_string( index.unknown[0] )<< " " << std::to_string( index.unknown[1] )<< " " << std::to_string( index.unknown[2]) << std::endl;
+          }
+          max_index += entry.data.vertices.size() + entry.data.vertices_i16.size();
+          model.meshes[ meshCount++ ] = mesh;
+        }
+        exportedGroup.models[model.name] = model;
+      };
+      ExportedGroup exportedTerrainGroup;
+      exportedTerrainGroup.name = zoneName + "_terrain";
+      for( const auto& fileName : stringList )
+      {
+        if( auto pPcbFile = pCache->getPcbFile( fileName ) )
+          buildModelEntry( pPcbFile, exportedTerrainGroup, fileName, zoneName );
+      }
+      exportMgr.exportGroup( zoneName, exportedTerrainGroup, ( ExportFileType )exportFileType );
+
+      for( const auto& lgb : lgbList )
+      {
+        for( const auto& group : lgb.groups )
+        {
+          ExportedGroup exportedGroup;
+          exportedGroup.name = group.name;
+
+          max_index = 0;
+
+          //std::cout << "\t" << group.name << " Size " << group.header.entryCount << "\n";
+          for( const auto& pEntry : group.entries )
+          {
+            std::string fileName( "" );
+            fileName.resize( 256 );
+
+            // write files
+            auto pcbTransformModel = [&]( const std::string& fileName, const vec3* scale, const vec3* rotation,
+              const vec3* translation, const SGB_MODEL_ENTRY* pModel = nullptr )-> bool
+            {
+              if( auto pPcbFile = pCache->getPcbFile( fileName ) )
               {
-                v.x *= pSgbEntry->header.scale.x;
-                v.y *= pSgbEntry->header.scale.y;
-                v.z *= pSgbEntry->header.scale.z;
-
-                v = v * matrix4::rotateX( pSgbEntry->header.rotation.x );
-                v = v * matrix4::rotateY( pSgbEntry->header.rotation.y );
-                v = v * matrix4::rotateZ( pSgbEntry->header.rotation.z );
-
-                v.x += pSgbEntry->header.translation.x;
-                v.y += pSgbEntry->header.translation.y;
-                v.z += pSgbEntry->header.translation.z;
+                buildModelEntry( pPcbFile, exportedGroup, fileName, group.name, scale, rotation, translation, pModel );
               }
-
-              if( scale )
-              {
-                v.x *= scale->x;
-                v.y *= scale->y;
-                v.z *= scale->z;
-
-                v = v * matrix4::rotateX( rotation->x );
-                v = v * matrix4::rotateY( rotation->y );
-                v = v * matrix4::rotateZ( rotation->z );
-
-                v.x += translation->x;
-                v.y += translation->y;
-                v.z += translation->z;
-              }
-
+              return true;
             };
 
-            for( auto& vertex : entry.data.vertices )
+            switch( pEntry->getType() )
             {
-              vec3 v( vertex.x, vertex.y, vertex.z );
-              makeTranslation( v );
-
-              mesh.verts[ verts++ ] = v.x;
-              mesh.verts[ verts++ ] = v.y;
-              mesh.verts[ verts++ ] = v.z;
-            }
-
-            for( const auto& link : entry.data.vertices_i16 )
-            {
-              vec3 v( float( link.x ) / 0xFFFF, float( link.y ) / 0xFFFF, float( link.z ) / 0xFFFF );
-
-              v.x = v.x * x_base + entry.header.x;
-              v.y = v.y * y_base + entry.header.y;
-              v.z = v.z * z_base + entry.header.z;
-
-              makeTranslation( v );
-
-              mesh.verts[ verts++ ] = v.x;
-              mesh.verts[ verts++ ] = v.y;
-              mesh.verts[ verts++ ] = v.z;
-            }
-
-            //fprintf( fp_out, "g %s_", (name2 + "_" + std::to_string( groupCount++ )).c_str() );
-            for( const auto& index : entry.data.indices )
-            {
-              mesh.indices[ indices++ ] = index.index[ 0 ];
-              mesh.indices[ indices++ ] = index.index[ 1 ];
-              mesh.indices[ indices++ ] = index.index[ 2 ];
-              // std::cout << std::to_string( index.unknown[0] )<< " " << std::to_string( index.unknown[1] )<< " " << std::to_string( index.unknown[2]) << std::endl;
-            }
-            max_index += entry.data.vertices.size() + entry.data.vertices_i16.size();
-            model.meshes.push_back( mesh );
-          }
-          exportedGroup.models[model.name] = model;
-        };
-        ExportedGroup exportedTerrainGroup;
-        exportedTerrainGroup.name = zoneName;
-        for( const auto& fileName : stringList )
-        {
-          if( auto pPcbFile = pCache->getPcbFile( fileName ) )
-            buildModelEntry( pPcbFile, exportedTerrainGroup, fileName, zoneName );
-        }
-        
-        for( const auto& lgb : lgbList )
-        {
-          for( const auto& group : lgb.groups )
-          {
-            ExportedGroup exportedGroup;
-            exportedGroup.name = group.name;
-
-            max_index = 0;
-
-            //std::cout << "\t" << group.name << " Size " << group.header.entryCount << "\n";
-            for( const auto& pEntry : group.entries )
-            {
-              std::string fileName( "" );
-              fileName.resize( 256 );
-
-              // write files
-              auto writeOutput = [&](const std::string& fileName, const vec3* scale, const vec3* rotation,
-                const vec3* translation, const SGB_MODEL_ENTRY* pModel = nullptr)->bool
+              case LgbEntryType::BgParts:
               {
-                if( auto pPcbFile = pCache->getPcbFile( fileName ) )
-                {
-                  buildModelEntry( pPcbFile, exportedGroup, fileName, group.name, scale, rotation, translation, pModel );
-                }
-                return true;
-              };
+                auto pBgParts = static_cast<LGB_BGPARTS_ENTRY*>(pEntry.get());
+                fileName = pBgParts->collisionFileName;
+                pcbTransformModel( fileName, &pBgParts->header.scale, &pBgParts->header.rotation,
+                  &pBgParts->header.translation );
+              }
+              break;
 
-              switch( pEntry->getType() )
+              // gimmick entry
+              case LgbEntryType::Gimmick:
               {
-                case LgbEntryType::BgParts:
+                auto pGimmick = static_cast<LGB_GIMMICK_ENTRY*>( pEntry.get() );
+                if( auto pSgbFile = pCache->getSgbFile( pGimmick->gimmickFileName ) )
                 {
-                  auto pBgParts = static_cast<LGB_BGPARTS_ENTRY*>(pEntry.get());
-                  fileName = pBgParts->collisionFileName;
-                  writeOutput( fileName, &pBgParts->header.scale, &pBgParts->header.rotation,
-                    &pBgParts->header.translation );
-                }
-                break;
-
-                // gimmick entry
-                case LgbEntryType::Gimmick:
-                {
-                  auto pGimmick = static_cast<LGB_GIMMICK_ENTRY*>(pEntry.get());
-                  if (auto pSgbFile = pCache->getSgbFile(pGimmick->gimmickFileName))
+                  const auto& sgbFile = *pSgbFile;
+                  for( const auto& group : sgbFile.entries )
                   {
-                    const auto& sgbFile = *pSgbFile;
-                    for (const auto& group : sgbFile.entries)
+                    for( const auto& pEntry : group.entries )
                     {
-                      for (const auto& pEntry : group.entries)
-                      {
-                        auto pModel = dynamic_cast<SGB_MODEL_ENTRY*>(pEntry.get());
-                        fileName = pModel->collisionFileName;
-                        writeOutput( fileName, &pGimmick->header.scale, &pGimmick->header.rotation,
-                          &pGimmick->header.translation, pModel );
-                      }
+                      auto pModel = dynamic_cast< SGB_MODEL_ENTRY* >( pEntry.get() );
+                      fileName = pModel->collisionFileName;
+                      pcbTransformModel( fileName, &pGimmick->header.scale, &pGimmick->header.rotation,
+                        &pGimmick->header.translation, pModel );
                     }
                   }
                 }
-
-                case LgbEntryType::EventObject:
-                {
-                  writeOutput( fileName, &pEntry->header.scale, &pEntry->header.rotation, &pEntry->header.translation );
-                }
-                break;
-                default:
-                  break;
               }
-            }
-            exportMgr.exportGroup( zoneName, exportedGroup, ( ExportFileType )exportFileType );
-            //exportedZone.groups.emplace( group.name, exportedGroup );
-          }
-        }
-        //exportMgr.exportZone( exportedZone, ( ExportFileType )exportFileType );
-        //std::cout << "[Info] " << "Loaded " << pcbFiles.size() << " PCB Files \n";
-        std::cout << "[Info] " << "Total Groups " << totalGroups << "\n";
-      }
 
-      std::cout << "[Success] " << "Exported " << zoneName << " in " <<
-                std::chrono::duration_cast< std::chrono::seconds >(
-                  std::chrono::high_resolution_clock::now() - entryStartTime ).count() << " seconds\n";
+              case LgbEntryType::EventObject:
+              {
+                pcbTransformModel( fileName, &pEntry->header.scale, &pEntry->header.rotation, &pEntry->header.translation );
+              }
+              break;
+              default:
+                break;
+            }
+          }
+          exportMgr.exportGroup( zoneName, exportedGroup, ( ExportFileType )exportFileType );
+          //exportedZone.groups.emplace( group.name, exportedGroup );
+        }
+      }
+      //exportMgr.exportZone( exportedZone, ( ExportFileType )exportFileType );
+
+
+      printf( "Exported %s in %u seconds \n",
+        zoneName.c_str(),
+        std::chrono::duration_cast< std::chrono::seconds >( std::chrono::high_resolution_clock::now() - entryStartTime ) );
     }
     catch( std::exception& e )
     {
-      std::cout << "[Error] " << e.what() << std::endl;
-      std::cout << "[Error] "
-                << "Unable to extract collision data.\n"
-                << std::endl;
-      std::cout << std::endl;
-      std::cout << "[Info] " << "Usage: pcb_reader2 territory \"path/to/game/sqpack/ffxiv\" " << std::endl;
+      printf( ( std::string( e.what() ) + "\n" ).c_str() );
+      printf( "Unable to extract collision data.\n" );
+      printf( "Usage: pcb_reader2 territory \"path/to/game/sqpack/ffxiv\"\n" );
     }
   }
   exportMgr.waitForTasks();
   std::cout << "\n\n\n";
 
-  std::cout << "\n\n\n[Success] Finished all tasks in " <<
-            std::chrono::duration_cast< std::chrono::seconds >( std::chrono::high_resolution_clock::now() - startTime ).count()
-            << " seconds\n";
+  printf( "Finished all tasks in %u seconds\n",
+            std::chrono::duration_cast< std::chrono::seconds >( std::chrono::high_resolution_clock::now() - startTime ).count() );
 
   getchar();
 
