@@ -12,7 +12,7 @@
 #include "vec3.h"
 
 // garbage to skip model loading
-extern bool ignoreModels;
+extern bool noObj;
 
 //
 // ported from https://github.com/ufx/SaintCoinach/blob/master/SaintCoinach/Graphics/Sgb/SgbDataType.cs
@@ -213,7 +213,7 @@ struct SGB_FILE
     }
     catch( std::exception& e )
     {
-      std::cout << e.what() << "\n";
+      std::cout << ( std::string( e.what() ) + "\n" );
     }
   };
 };

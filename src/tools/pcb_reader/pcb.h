@@ -70,6 +70,90 @@ struct PCB_FILE
 {
   PCB_HEADER header;
   std::vector< PCB_BLOCK_ENTRY > entries;
+
+  PCB_FILE( char* buf )
+  {
+    uint32_t offset = 0;
+    memcpy( &header, buf, sizeof( header ));
+    offset += sizeof( header );
+    entries.resize( header.num_entries );
+    bool isgroup = true;
+    while( isgroup )
+    {
+      PCB_BLOCK_ENTRY block_entry;
+      memcpy( &block_entry.header, buf + offset, sizeof( block_entry.header ) );
+      isgroup = block_entry.header.type == 0x30;
+
+      //printf( "BLOCKHEADER_%X: type: %i, group_size: %i\n", offset, block_entry.header.type, block_entry.header.group_size );
+      //
+      if( isgroup )
+      {
+        parseBlockEntry( buf + offset + 0x30, entries, offset);
+        offset += block_entry.header.group_size;
+      }
+      else
+      {
+        parseBlockEntry( buf + offset, entries, offset );
+      }
+    }
+  }
+  
+  int parseBlockEntry( char* data, std::vector< PCB_BLOCK_ENTRY >& entries, int gOff )
+  {
+    int offset = 0;
+    bool isgroup = true;
+    while( isgroup )
+    {
+      PCB_BLOCK_ENTRY block_entry;
+      memcpy( &block_entry.header, data + offset, sizeof( block_entry.header ) );
+      isgroup = block_entry.header.type == 0x30;
+  
+      //printf( " BLOCKHEADER_%X: type: %i, group_size: %i\n", gOff + offset, block_entry.header.type, block_entry.header.group_size );
+  
+      if( isgroup )
+      {
+        parseBlockEntry( data + offset + 0x30, entries, gOff + offset );
+        offset += block_entry.header.group_size;
+      }
+      else
+      {
+        /*   printf( "\tnum_v16: %i, num_indices: %i, num_vertices: %i\n\n",
+                   block_entry.header.num_v16, block_entry.header.num_indices, block_entry.header.num_vertices );*/
+        int doffset = sizeof( block_entry.header ) + offset;
+        uint16_t block_size = sizeof( block_entry.header ) +
+                              block_entry.header.num_vertices * 3 * 4 +
+                              block_entry.header.num_v16 * 6 +
+                              block_entry.header.num_indices * 6;
+  
+        if( block_entry.header.num_vertices != 0 )
+        {
+          block_entry.data.vertices.resize( block_entry.header.num_vertices );
+  
+          int32_t size_vertexbuffer = block_entry.header.num_vertices * 3;
+          memcpy( &block_entry.data.vertices[ 0 ], data + doffset, size_vertexbuffer * 4 );
+          doffset += size_vertexbuffer * 4;
+        }
+        if( block_entry.header.num_v16 != 0 )
+        {
+          block_entry.data.vertices_i16.resize( block_entry.header.num_v16 );
+          int32_t size_unknownbuffer = block_entry.header.num_v16 * 6;
+          memcpy( &block_entry.data.vertices_i16[ 0 ], data + doffset, size_unknownbuffer );
+          doffset += block_entry.header.num_v16 * 6;
+        }
+        if( block_entry.header.num_indices != 0 )
+        {
+          block_entry.data.indices.resize( block_entry.header.num_indices );
+          int32_t size_indexbuffer = block_entry.header.num_indices * 12;
+          memcpy( &block_entry.data.indices[ 0 ], data + doffset, size_indexbuffer );
+          doffset += size_indexbuffer;
+        }
+        entries.push_back( block_entry );
+      }
+    }
+  
+    return 0;
+  }
+
 };
 
 struct PCB_LIST_ENTRY
