@@ -244,7 +244,7 @@ bool Sapphire::Entity::Chara::face( const Common::FFXIVARR_POSITION3& p )
 
   setRot( newRot );
 
-  return oldRot != newRot ? true : false;
+  return oldRot != newRot;
 }
 
 /*!
