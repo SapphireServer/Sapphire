@@ -318,9 +318,8 @@ struct LGB_FILE
 {
   LGB_FILE_HEADER header;
   std::vector< LGB_GROUP > groups;
-  std::string name;
-
-  LGB_FILE( char* buf, const std::string& name )
+  
+  LGB_FILE( char* buf )
   {
     header = *reinterpret_cast< LGB_FILE_HEADER* >( buf );
     if( strncmp( &header.magic[ 0 ], "LGB1", 4 ) != 0 || strncmp( &header.magic2[ 0 ], "LGP1", 4 ) != 0 )
@@ -338,38 +337,4 @@ struct LGB_FILE
   };
 };
 
-/*
-#if __cplusplus >= 201703L
-#include <experimental/filesystem>
-std::map<std::string, LGB_FILE> getLgbFiles( const std::string& dir )
-{
-   namespace fs = std::experimental::filesystem;
-   std::map<std::string, LGB_FILE> fileMap;
-   for( const auto& path : fs::recursive_directory_iterator( dir ) )
-   {
-      if( path.path().extension() == ".lgb" )
-      {
-         const auto& strPath = path.path().string();
-         auto f = fopen( strPath.c_str(), "rb" );
-         fseek( f, 0, SEEK_END );
-         const auto size = ftell( f );
-         std::vector<char> bytes( size );
-         rewind( f );
-         fread( bytes.data(), 1, size, f );
-         fclose( f );
-         try
-         {
-            LGB_FILE lgbFile( bytes.data() );
-            fileMap.insert( std::make_pair( strPath, lgbFile ) );
-         }
-         catch( std::exception& e )
-         {
-            std::cout << "Unable to load " << strPath << std::endl;
-         }
-      }
-   }
-   return fileMap;
-}
-#endif
-*/
 #endif
