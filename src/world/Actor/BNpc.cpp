@@ -31,6 +31,7 @@
 #include "BNpcTemplate.h"
 #include "Manager/TerritoryMgr.h"
 #include "Common.h"
+#include <Logging/Logger.h>
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -155,7 +156,16 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 
   auto path = m_pCurrentZone->getNaviProvider()->findFollowPath( m_pos, pos );
 
-  //face( path[0] );
+  if(!path.empty())
+  {
+    for(int i = 0; i < path.size(); i++)
+      Logger::debug("{0}: {1} {2} {3}", i, path[i].x, path[i].y, path[i].z);
+
+    face( path[0] );
+    setPos(path[0]);
+  }
+
+  sendPositionUpdate();
 
   /*
   float rot = Util::calcAngFrom( getPos().x, getPos().z, pos.x, pos.z );

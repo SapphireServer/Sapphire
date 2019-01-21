@@ -40,6 +40,7 @@ namespace Sapphire
     void initQuery();
 
     void toDetourPos(const Common::FFXIVARR_POSITION3 position, float* out);
+    Sapphire::Common::FFXIVARR_POSITION3 toGamePos( float* pos );
 
     std::vector< Sapphire::Common::FFXIVARR_POSITION3 > findFollowPath(Common::FFXIVARR_POSITION3 startPos, Common::FFXIVARR_POSITION3 endPos);
 
