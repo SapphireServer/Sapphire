@@ -315,7 +315,7 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
 {
   const uint8_t minActorDistance = 4;
   const uint8_t aggroRange = 8;
-  const uint8_t maxDistanceToOrigin = 30;
+  const uint8_t maxDistanceToOrigin = 1000;
 
   if( m_status == ActorStatus::Dead )
     return;
