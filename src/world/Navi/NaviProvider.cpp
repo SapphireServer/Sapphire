@@ -20,9 +20,9 @@ Sapphire::NaviProvider::NaviProvider( Sapphire::ZonePtr pZone, Sapphire::Framewo
   m_naviMeshQuery( nullptr )
 {
   // Set defaults
-  m_polyFindRange[0] = 2;
-  m_polyFindRange[1] = 4;
-  m_polyFindRange[2] = 2;
+  m_polyFindRange[0] = 10;
+  m_polyFindRange[1] = 20;
+  m_polyFindRange[2] = 10;
 }
 
 void Sapphire::NaviProvider::init()
@@ -34,9 +34,11 @@ void Sapphire::NaviProvider::init()
   {
     auto baseMesh = meshFolder / std::filesystem::path( m_pZone->getInternalName() + ".nav" );
 
-    //m_naviMesh = LoadMesh( baseMesh.string() );
+    LoadMesh( baseMesh.string() );
 
     // Load all meshes for testing
+
+    /*
     for( const auto & entry : std::filesystem::directory_iterator( meshFolder ) )
     {
       if( entry.path().extension().string() == ".nav" )
@@ -45,6 +47,7 @@ void Sapphire::NaviProvider::init()
         LoadMesh( entry.path().string() );
       }
     }
+    */
 
     InitQuery();
   }
@@ -221,10 +224,11 @@ std::vector< Sapphire::Common::FFXIVARR_POSITION3 > Sapphire::NaviProvider::Path
   dtPolyRef startRef, endRef = 0;
 
   float start[3] = { startPos.x, startPos.y, startPos.z };
-  float end[3] = { startPos.x, startPos.y, startPos.z };
+  float end[3] = { endPos.x, endPos.y, endPos.z };
 
   dtQueryFilter filter;
-  filter.setAreaCost( 0, 0 );
+  filter.setIncludeFlags(0xffff);
+  filter.setExcludeFlags(0);
 
   m_naviMeshQuery->findNearestPoly( start, m_polyFindRange, &filter, &startRef, 0 );
   m_naviMeshQuery->findNearestPoly( end, m_polyFindRange, &filter, &endRef, 0 );
@@ -261,6 +265,8 @@ std::vector< Sapphire::Common::FFXIVARR_POSITION3 > Sapphire::NaviProvider::Path
 
     dtVcopy( &smoothPath[numSmoothPath * 3], iterPos );
     numSmoothPath++;
+
+    auto resultCoords = std::vector< Common::FFXIVARR_POSITION3 >();
 
     // Move towards target a small advancement at a time until target reached or
     // when ran out of memory to store the path.
@@ -365,6 +371,13 @@ std::vector< Sapphire::Common::FFXIVARR_POSITION3 > Sapphire::NaviProvider::Path
         numSmoothPath++;
       }
     }
+
+    for( int i = 0; i < numSmoothPath; i += 3 )
+    {
+      resultCoords.push_back( Common::FFXIVARR_POSITION3{ smoothPath[i], smoothPath[i + 2], smoothPath[i + 3] } );
+    }
+
+    return resultCoords;
   }
   else
   {
