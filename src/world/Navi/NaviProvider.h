@@ -29,12 +29,17 @@ namespace Sapphire
       int dataSize;
     };
 
+    static const int MAX_POLYS = 256;
+	  static const int MAX_SMOOTH = 2048;
+
   public:
     NaviProvider( const ZonePtr pZone, Sapphire::FrameworkPtr pFw );
 
     void init();
     void LoadMesh( std::string path );
     void InitQuery();
+
+    std::vector< Sapphire::Common::FFXIVARR_POSITION3 > PathFindFollow(Common::FFXIVARR_POSITION3 startPos, Common::FFXIVARR_POSITION3 endPos);
 
     bool HasNaviMesh() const;
 
@@ -44,6 +49,8 @@ namespace Sapphire
 
     dtNavMesh* m_naviMesh;
     dtNavMeshQuery* m_naviMeshQuery;
+
+    float m_polyFindRange[3];
   };
 
 }
