@@ -161,8 +161,8 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     for(int i = 0; i < path.size(); i++)
       Logger::debug("{0}: {1} {2} {3}", i, path[i].x, path[i].y, path[i].z);
 
-    face( path[0] );
-    setPos(path[0]);
+    face( path[1] );
+    setPos(path[1]);
   }
 
   sendPositionUpdate();

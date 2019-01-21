@@ -272,7 +272,6 @@ std::vector< Sapphire::Common::FFXIVARR_POSITION3 > Sapphire::NaviProvider::find
   if( numPolys )
   {
     // Iterate over the path to find smooth path on the detail mesh surface.
-    dtPolyRef polys[MAX_POLYS];
     memcpy( polys, polys, sizeof( dtPolyRef )*numPolys );
     int npolys = numPolys;
 
