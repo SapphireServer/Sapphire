@@ -153,6 +153,11 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     // reached destination
     return true;
 
+  auto path = m_pCurrentZone->GetNaviProvider()->PathFindFollow( m_pos, pos );
+
+  //face( path[0] );
+
+  /*
   float rot = Util::calcAngFrom( getPos().x, getPos().z, pos.x, pos.z );
   float newRot = PI - rot + ( PI / 2 );
 
@@ -171,6 +176,7 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
   setRot( newRot );
 
   sendPositionUpdate();
+  */
 
   return false;
 }
@@ -306,87 +312,87 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
 
   switch( m_state )
   {
-    case BNpcState::Retreat:
+  case BNpcState::Retreat:
+  {
+    if( moveTo( m_spawnPos ) )
+      m_state = BNpcState::Idle;
+  }
+  break;
+
+  case BNpcState::Idle:
+  {
+    // passive mobs should ignore players unless aggro'd
+    if( m_aggressionMode == 1 )
+      return;
+
+    CharaPtr pClosestChara = getClosestChara();
+
+    if( pClosestChara && pClosestChara->isAlive() )
     {
-      if( moveTo( m_spawnPos ) )
-        m_state = BNpcState::Idle;
+      auto distance = Util::distance( getPos().x, getPos().y, getPos().z,
+                                      pClosestChara->getPos().x,
+                                      pClosestChara->getPos().y,
+                                      pClosestChara->getPos().z );
+
+      if( distance < aggroRange && pClosestChara->isPlayer() )
+        aggro( pClosestChara );
+      //if( distance < aggroRange && getbehavior() == 2 )
+      //   aggro( pClosestActor );
     }
-    break;
+  }
 
-    case BNpcState::Idle:
+  case BNpcState::Combat:
+  {
+    auto pHatedActor = hateListGetHighest();
+    if( !pHatedActor )
+      return;
+
+    auto distanceOrig = Util::distance( getPos().x, getPos().y, getPos().z,
+                                        m_spawnPos.x,
+                                        m_spawnPos.y,
+                                        m_spawnPos.z );
+
+    if( pHatedActor && !pHatedActor->isAlive() )
     {
-      // passive mobs should ignore players unless aggro'd
-      if( m_aggressionMode == 1 )
-        return;
-
-      CharaPtr pClosestChara = getClosestChara();
-
-      if( pClosestChara && pClosestChara->isAlive() )
-      {
-        auto distance = Util::distance( getPos().x, getPos().y, getPos().z,
-                                        pClosestChara->getPos().x,
-                                        pClosestChara->getPos().y,
-                                        pClosestChara->getPos().z );
-
-        if( distance < aggroRange && pClosestChara->isPlayer() )
-          aggro( pClosestChara );
-        //if( distance < aggroRange && getbehavior() == 2 )
-        //   aggro( pClosestActor );
-      }
+      hateListRemove( pHatedActor );
+      pHatedActor = hateListGetHighest();
     }
 
-    case BNpcState::Combat:
+    if( pHatedActor )
     {
-      auto pHatedActor = hateListGetHighest();
-      if( !pHatedActor )
-        return;
+      auto distance = Util::distance( getPos().x, getPos().y, getPos().z,
+                                      pHatedActor->getPos().x,
+                                      pHatedActor->getPos().y,
+                                      pHatedActor->getPos().z );
 
-      auto distanceOrig = Util::distance( getPos().x, getPos().y, getPos().z,
-                                          m_spawnPos.x,
-                                          m_spawnPos.y,
-                                          m_spawnPos.z );
-
-      if( pHatedActor && !pHatedActor->isAlive() )
+      if( distanceOrig > maxDistanceToOrigin )
       {
-        hateListRemove( pHatedActor );
-        pHatedActor = hateListGetHighest();
-      }
-
-      if( pHatedActor )
-      {
-        auto distance = Util::distance( getPos().x, getPos().y, getPos().z,
-                                        pHatedActor->getPos().x,
-                                        pHatedActor->getPos().y,
-                                        pHatedActor->getPos().z );
-
-        if( distanceOrig > maxDistanceToOrigin )
-        {
-          hateListClear();
-          changeTarget( INVALID_GAME_OBJECT_ID );
-          setStance( Stance::Passive );
-          //setOwner( nullptr );
-          m_state = BNpcState::Retreat;
-          break;
-        }
-
-        if( distance > minActorDistance )
-          moveTo( pHatedActor->getPos() );
-        else
-        {
-          if( face( pHatedActor->getPos() ) )
-            sendPositionUpdate();
-          // in combat range. ATTACK!
-          autoAttack( pHatedActor );
-        }
-      }
-      else
-      {
+        hateListClear();
         changeTarget( INVALID_GAME_OBJECT_ID );
         setStance( Stance::Passive );
         //setOwner( nullptr );
         m_state = BNpcState::Retreat;
+        break;
+      }
+
+      if( distance > minActorDistance )
+        moveTo( pHatedActor->getPos() );
+      else
+      {
+        if( face( pHatedActor->getPos() ) )
+          sendPositionUpdate();
+        // in combat range. ATTACK!
+        autoAttack( pHatedActor );
       }
     }
+    else
+    {
+      changeTarget( INVALID_GAME_OBJECT_ID );
+      setStance( Stance::Passive );
+      //setOwner( nullptr );
+      m_state = BNpcState::Retreat;
+    }
+  }
   }
 }
 
