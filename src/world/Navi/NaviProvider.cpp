@@ -280,6 +280,8 @@ std::vector< Sapphire::Common::FFXIVARR_POSITION3 > Sapphire::NaviProvider::find
     m_naviMeshQuery->closestPointOnPoly( startRef, spos, iterPos, 0 );
     m_naviMeshQuery->closestPointOnPoly( polys[npolys - 1], epos, targetPos, 0 );
 
+    Logger::debug("IterPos: {0} {1} {2}; TargetPos: {3} {4} {5}", iterPos[0], iterPos[1], iterPos[2], targetPos[0], targetPos[1], targetPos[2]);
+
     static const float STEP_SIZE = 0.5f;
     static const float SLOP = 0.01f;
 
