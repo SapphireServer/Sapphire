@@ -39,16 +39,11 @@ namespace Sapphire::Network::Packets::Server
       m_data.mPMax = bnpc.getMaxMp();
       m_data.subtype = 5;
 
-      //m_data.tPMax = 3000;
       m_data.level = bnpc.getLevel();
       m_data.pose = bnpc.getPose();
 
       memcpy( m_data.look, bnpc.getLookArray(), sizeof( m_data.look ) );
-
-      auto models = bnpc.getModelArray();
       memcpy( m_data.models, bnpc.getModelArray(), sizeof( m_data.models ) );
-
-      memcpy( m_data.look, bnpc.getLookArray(), sizeof( m_data.look ) );
 
       m_data.pos.x = bnpc.getPos().x;
       m_data.pos.y = bnpc.getPos().y;
@@ -61,10 +56,6 @@ namespace Sapphire::Network::Packets::Server
       m_data.aggressionMode = bnpc.getAggressionMode();
 
       m_data.classJob = 0;
-      //m_data.voice = bnpc.getVoiceId();
-      //m_data.currentMount = bnpc.getCurrentMount();
-
-      //m_data.onlineStatus = static_cast< uint8_t >( bnpc.getOnlineStatus() );
 
       //m_data.u23 = 0x04;
       //m_data.u24 = 256;
@@ -81,25 +72,13 @@ namespace Sapphire::Network::Packets::Server
 
       if( !target.isActorSpawnIdValid( m_data.spawnIndex ) )
         return;
-
       // 0x20 == spawn hidden to be displayed by the spawneffect control
       //m_data.displayFlags = bnpc.getDisplayFlags();
-
-      /*if( bnpc.getZoningType() != Common::ZoneingType::None )
-      {
-        m_data.displayFlags |= static_cast< uint16_t >( Common::DisplayFlags::Invisible );
-      }*/
 
       //m_data.currentMount = bnpc.getCurrentMount();
       //m_data.persistentEmote = bnpc.getPersistentEmote();
 
       m_data.targetId = static_cast< uint64_t >( bnpc.getTargetId() );
-      //m_data.type = 1;
-      //m_data.unknown_33 = 4;
-      //m_data.unknown_38 = 0x70;
-      //m_data.unknown_60 = 3;
-      //m_data.unknown_61 = 7;
-
 
       uint64_t currentTimeMs = Sapphire::Util::getTimeMs();
 
