@@ -75,7 +75,19 @@ private:
     {
       try
       {
-        return std::make_shared< T >( &buf[0] );
+        auto pFile = std::make_shared< T >( &buf[0] );
+
+        m_totalFiles++;
+        if( m_totalFiles % 1000 == 0 )
+        {
+          m_lgbCache.clear();
+          m_sgbCache.clear();
+          m_pcbCache.clear();
+          std::cout << "Purged PCB/SGB/PCB cache \n";
+          m_totalFiles = 1;
+        }
+
+        return pFile;
       }
       catch( std::exception& e )
       {
@@ -102,11 +114,13 @@ private:
       return empty;
     }
   }
+
   std::mutex m_mutex;
   xiv::dat::GameData* m_pData;
   std::map< std::string, std::shared_ptr< LGB_FILE > > m_lgbCache;
   std::map< std::string, std::shared_ptr< SGB_FILE > > m_sgbCache;
   std::map< std::string, std::shared_ptr< PCB_FILE > > m_pcbCache;
+  int m_totalFiles{0};
 };
 
 #endif

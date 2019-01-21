@@ -25,6 +25,9 @@ public:
 
   void addWorkers( unsigned int num )
   {
+
+    std::unique_lock lock( m_mutex );
+    m_runFlag = true;
     if( num == 0 )
       num = std::thread::hardware_concurrency() - 1;
 
@@ -52,20 +55,23 @@ public:
     {
       std::unique_lock lock( m_mutex );
       m_pendingJobs.clear();
+      for( auto&& worker : m_workers )
+      {
+        m_pendingJobs.emplace( {} );
+      }
     }
-    complete();
+    m_cv.notify_all();
+    m_workers.clear();
   }
 
   bool complete()
   {
-    {
-      std::scoped_lock lock( m_mutex );
-      for( auto&& worker : m_workers )
-      {
-        m_pendingJobs.push_back( {} );
-      }
-    }
     m_cv.notify_all();
+    {
+      std::unique_lock lock( m_mutex );
+      m_runFlag = false;
+      m_cv.wait( lock, [&]{ return m_pendingJobs.empty(); } );
+    }
     m_workers.clear();
     return true;
   }
@@ -76,9 +82,14 @@ private:
     {
       std::packaged_task< void() > func;
       {
-        std::unique_lock< std::mutex > lock( m_mutex );
+        std::unique_lock lock( m_mutex );
         if( m_pendingJobs.empty() )
         {
+          if( !m_runFlag )
+          {
+            m_cv.notify_all();
+            return;
+          }
           m_cv.wait( lock, [&](){ return !m_pendingJobs.empty(); } );
         }
         func = std::move( m_pendingJobs.front() );
@@ -92,6 +103,7 @@ private:
     }
   }
 
+  bool m_runFlag{ true };
   std::mutex m_mutex;
   std::condition_variable m_cv;
   std::deque< std::packaged_task< void() > > m_pendingJobs;
