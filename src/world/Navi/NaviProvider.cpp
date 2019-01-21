@@ -34,7 +34,7 @@ void Sapphire::NaviProvider::init()
   {
     auto baseMesh = meshFolder / std::filesystem::path( m_pZone->getInternalName() + ".nav" );
 
-    LoadMesh( baseMesh.string() );
+    loadMesh( baseMesh.string() );
 
     // Load all meshes for testing
 
@@ -49,16 +49,16 @@ void Sapphire::NaviProvider::init()
     }
     */
 
-    InitQuery();
+    initQuery();
   }
 }
 
-bool Sapphire::NaviProvider::HasNaviMesh() const
+bool Sapphire::NaviProvider::hasNaviMesh() const
 {
   return m_naviMesh != nullptr;
 }
 
-void Sapphire::NaviProvider::InitQuery()
+void Sapphire::NaviProvider::initQuery()
 {
   if( m_naviMeshQuery != nullptr )
     dtFreeNavMeshQuery( m_naviMeshQuery );
@@ -216,34 +216,45 @@ static bool getSteerTarget( dtNavMeshQuery* navQuery, const float* startPos, con
   return true;
 }
 
-std::vector< Sapphire::Common::FFXIVARR_POSITION3 > Sapphire::NaviProvider::PathFindFollow( Common::FFXIVARR_POSITION3 startPos, Common::FFXIVARR_POSITION3 endPos )
+void Sapphire::NaviProvider::toDetourPos( const Sapphire::Common::FFXIVARR_POSITION3 pos, float* out ) {
+  float y = pos.y;
+  float z = pos.z;
+
+  out[0] = pos.x;
+  out[1] = y * -1;
+  out[2] = z * -1;
+}
+
+std::vector< Sapphire::Common::FFXIVARR_POSITION3 > Sapphire::NaviProvider::findFollowPath( Common::FFXIVARR_POSITION3 startPos, Common::FFXIVARR_POSITION3 endPos )
 {
   if( !m_naviMesh || !m_naviMeshQuery )
     throw std::exception( "No navimesh loaded" );
 
+  auto resultCoords = std::vector< Common::FFXIVARR_POSITION3 >();
+
   dtPolyRef startRef, endRef = 0;
 
-  float start[3] = { startPos.x, startPos.y, startPos.z };
-  float end[3] = { endPos.x, endPos.y, endPos.z };
+  float spos[3];
+  NaviProvider::toDetourPos( startPos, spos );
+
+  float epos[3];
+  NaviProvider::toDetourPos( endPos, epos );
 
   dtQueryFilter filter;
-  filter.setIncludeFlags(0xffff);
-  filter.setExcludeFlags(0);
+  filter.setIncludeFlags( 0xffff );
+  filter.setExcludeFlags( 0 );
 
-  m_naviMeshQuery->findNearestPoly( start, m_polyFindRange, &filter, &startRef, 0 );
-  m_naviMeshQuery->findNearestPoly( end, m_polyFindRange, &filter, &endRef, 0 );
+  m_naviMeshQuery->findNearestPoly( spos, m_polyFindRange, &filter, &startRef, 0 );
+  m_naviMeshQuery->findNearestPoly( epos, m_polyFindRange, &filter, &endRef, 0 );
 
   // Couldn't find any close polys to navigate from
   if( !startRef || !endRef )
-    return {};
+    return resultCoords;
 
-  auto pathFindStatus = DT_FAILURE;
-
-  auto pathIterNum = 0;
   dtPolyRef polys[MAX_POLYS];
   int numPolys = 0;
 
-  m_naviMeshQuery->findPath( startRef, endRef, start, end, &filter, polys, &numPolys, MAX_POLYS );
+  m_naviMeshQuery->findPath( startRef, endRef, spos, epos, &filter, polys, &numPolys, MAX_POLYS );
 
   // Check if we got polys back for navigation
   if( numPolys )
@@ -254,8 +265,8 @@ std::vector< Sapphire::Common::FFXIVARR_POSITION3 > Sapphire::NaviProvider::Path
     int npolys = numPolys;
 
     float iterPos[3], targetPos[3];
-    m_naviMeshQuery->closestPointOnPoly( startRef, start, iterPos, 0 );
-    m_naviMeshQuery->closestPointOnPoly( polys[npolys - 1], end, targetPos, 0 );
+    m_naviMeshQuery->closestPointOnPoly( startRef, spos, iterPos, 0 );
+    m_naviMeshQuery->closestPointOnPoly( polys[npolys - 1], epos, targetPos, 0 );
 
     static const float STEP_SIZE = 0.5f;
     static const float SLOP = 0.01f;
@@ -265,8 +276,6 @@ std::vector< Sapphire::Common::FFXIVARR_POSITION3 > Sapphire::NaviProvider::Path
 
     dtVcopy( &smoothPath[numSmoothPath * 3], iterPos );
     numSmoothPath++;
-
-    auto resultCoords = std::vector< Common::FFXIVARR_POSITION3 >();
 
     // Move towards target a small advancement at a time until target reached or
     // when ran out of memory to store the path.
@@ -376,16 +385,12 @@ std::vector< Sapphire::Common::FFXIVARR_POSITION3 > Sapphire::NaviProvider::Path
     {
       resultCoords.push_back( Common::FFXIVARR_POSITION3{ smoothPath[i], smoothPath[i + 2], smoothPath[i + 3] } );
     }
+  }
 
-    return resultCoords;
-  }
-  else
-  {
-    return {};
-  }
+  return resultCoords;
 }
 
-void Sapphire::NaviProvider::LoadMesh( std::string path )
+void Sapphire::NaviProvider::loadMesh( std::string path )
 {
   FILE* fp = fopen( path.c_str(), "rb" );
   if( !fp )

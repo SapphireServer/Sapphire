@@ -852,7 +852,7 @@ void Sapphire::Zone::updateSpawnPoints()
 
 }
 
-Sapphire::NaviProvider* Sapphire::Zone::GetNaviProvider() const
+Sapphire::NaviProvider* Sapphire::Zone::getNaviProvider() const
 {
   return m_naviProvider;
 }

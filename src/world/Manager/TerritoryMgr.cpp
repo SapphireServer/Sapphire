@@ -173,7 +173,7 @@ bool Sapphire::World::Manager::TerritoryMgr::createDefaultTerritories()
                   territoryInfo->name,
                   ( isPrivateTerritory( territoryTypeId ) ? "PRIVATE" : "PUBLIC" ),
                   pPlaceName->name,
-                  pZone->GetNaviProvider()->HasNaviMesh() ? "NAVI" : "");
+                  pZone->getNaviProvider()->hasNaviMesh() ? "NAVI" : "");
 
     InstanceIdToZonePtrMap instanceMap;
     instanceMap[ guid ] = pZone;
