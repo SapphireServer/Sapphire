@@ -225,6 +225,13 @@ void Sapphire::NaviProvider::toDetourPos( const Sapphire::Common::FFXIVARR_POSIT
   out[2] = z * -1;
 }
 
+Sapphire::Common::FFXIVARR_POSITION3 Sapphire::NaviProvider::toGamePos( float* pos ) {
+  float y = pos[1];
+  float z = pos[2];
+
+  return Common::FFXIVARR_POSITION3 { pos[0], y * -1, z * -1 };
+}
+
 std::vector< Sapphire::Common::FFXIVARR_POSITION3 > Sapphire::NaviProvider::findFollowPath( Common::FFXIVARR_POSITION3 startPos, Common::FFXIVARR_POSITION3 endPos )
 {
   if( !m_naviMesh || !m_naviMeshQuery )
@@ -234,11 +241,16 @@ std::vector< Sapphire::Common::FFXIVARR_POSITION3 > Sapphire::NaviProvider::find
 
   dtPolyRef startRef, endRef = 0;
 
+  /*
   float spos[3];
   NaviProvider::toDetourPos( startPos, spos );
 
   float epos[3];
   NaviProvider::toDetourPos( endPos, epos );
+  */
+
+  float spos[3] = {startPos.x, startPos.y, startPos.z};
+  float epos[3] = {endPos.x, endPos.y, endPos.z};
 
   dtQueryFilter filter;
   filter.setIncludeFlags( 0xffff );
@@ -383,7 +395,7 @@ std::vector< Sapphire::Common::FFXIVARR_POSITION3 > Sapphire::NaviProvider::find
 
     for( int i = 0; i < numSmoothPath; i += 3 )
     {
-      resultCoords.push_back( Common::FFXIVARR_POSITION3{ smoothPath[i], smoothPath[i + 2], smoothPath[i + 3] } );
+      resultCoords.push_back( Common::FFXIVARR_POSITION3{ smoothPath[i], smoothPath[i + 1], smoothPath[i + 2] } );
     }
   }
 
