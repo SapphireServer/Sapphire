@@ -162,7 +162,7 @@ namespace Sapphire
 
     void updateSpawnPoints();
 
-    NaviProvider* GetNaviProvider() const;
+    NaviProvider* getNaviProvider() const;
   };
 
 }

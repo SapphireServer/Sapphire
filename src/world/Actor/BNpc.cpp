@@ -153,7 +153,7 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     // reached destination
     return true;
 
-  auto path = m_pCurrentZone->GetNaviProvider()->PathFindFollow( m_pos, pos );
+  auto path = m_pCurrentZone->getNaviProvider()->findFollowPath( m_pos, pos );
 
   //face( path[0] );
 

@@ -36,12 +36,14 @@ namespace Sapphire
     NaviProvider( const ZonePtr pZone, Sapphire::FrameworkPtr pFw );
 
     void init();
-    void LoadMesh( std::string path );
-    void InitQuery();
+    void loadMesh( std::string path );
+    void initQuery();
 
-    std::vector< Sapphire::Common::FFXIVARR_POSITION3 > PathFindFollow(Common::FFXIVARR_POSITION3 startPos, Common::FFXIVARR_POSITION3 endPos);
+    void toDetourPos(const Common::FFXIVARR_POSITION3 position, float* out);
 
-    bool HasNaviMesh() const;
+    std::vector< Sapphire::Common::FFXIVARR_POSITION3 > findFollowPath(Common::FFXIVARR_POSITION3 startPos, Common::FFXIVARR_POSITION3 endPos);
+
+    bool hasNaviMesh() const;
 
   protected:
     FrameworkPtr m_pFw;
