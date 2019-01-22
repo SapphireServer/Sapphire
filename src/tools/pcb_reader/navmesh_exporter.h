@@ -9,6 +9,8 @@
 #include <chrono>
 
 #include "exporter.h"
+#include "obj_exporter.h"
+
 /*
 #include <recastnavigation/Recast/Include/Recast.h>
 #include <recastnavigation/Recast/Include/RecastAlloc.h>
@@ -23,11 +25,14 @@
 class NavmeshExporter
 {
 public:
-  static void exportZone( const ExportedZone& zone )
+  static void exportZone( const ExportedZone& zone, bool deleteObj = false )
   {
+    static std::string currPath = std::experimental::filesystem::current_path().string();
+
     auto start = std::chrono::high_resolution_clock::now();
 
-    auto fileName = zone.name + ".obj";
+    auto fileName = currPath + "/" + zone.name + "/" + zone.name + ".nav";
+    exportZoneCommandline( zone, deleteObj );
 
     auto end = std::chrono::high_resolution_clock::now();
     printf( "[Navmesh] Finished exporting %s in %u ms\n",
@@ -35,19 +40,50 @@ public:
       std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() );
   }
 
-  static void exportGroup( const std::string& zoneName, const ExportedGroup& group )
+  static void exportGroup( const std::string& zoneName, const ExportedGroup& group, bool deleteObj = false )
   {
+    static std::string currPath = std::experimental::filesystem::current_path().string();
+
     auto start = std::chrono::high_resolution_clock::now();
 
-    auto fileName = zoneName + "_" + group.name + ".obj";
+    auto fileName = currPath + "/" + zoneName + "/" + zoneName + "_" + group.name + ".obj";
+    exportGroupCommandline( zoneName, group );
 
     auto end = std::chrono::high_resolution_clock::now();
-
     printf( "[Navmesh] Finished exporting %s in %u ms\n",
       fileName.c_str(),
       std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() );
   }
 private:
+  static void exportZoneCommandline( const ExportedZone& zone, bool deleteObj = false )
+  {
+    static std::string currPath = "\"\"" + std::experimental::filesystem::current_path().string();
+
+    auto fileName = ObjExporter::exportZone( zone );
+    if( fileName.empty() )
+    {
+      printf( "Unable to export navmesh for %s", zone.name.c_str() );
+      return;
+    }
+    static std::string recastDemoLaunch = std::string( "RecastDemo.exe --type tileMesh --obj ");
+    std::string actualStr( recastDemoLaunch + "\"" + fileName + "\"" );
+    system( actualStr.c_str() );
+  }
+
+  static void exportGroupCommandline( const std::string& zoneName, const ExportedGroup& group, bool deleteObj = false )
+  {
+    static std::string currPath = "\"\"" + std::experimental::filesystem::current_path().string();
+
+    auto fileName = ObjExporter::exportGroup( zoneName, group );
+    if( fileName.empty() )
+    {
+      printf( "Unable to export navmesh for %s", zoneName.c_str() );
+      return;
+    }
+    static std::string recastDemoLaunch = std::string( "RecastDemo.exe --type tileMesh --obj ");
+    std::string actualStr( recastDemoLaunch + "\"" + fileName + "\"" );
+    system( actualStr.c_str() );
+  }
   /*/
   static unsigned char* buildTileMesh( const ExportedGroup& group, int tx, int ty )
   {
