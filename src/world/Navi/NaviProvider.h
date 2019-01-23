@@ -53,6 +53,18 @@ namespace Sapphire
     dtNavMeshQuery* m_naviMeshQuery;
 
     float m_polyFindRange[3];
+
+  private:
+    static int fixupCorridor( dtPolyRef* path, const int npath, const int maxPath,
+                          const dtPolyRef* visited, const int nvisited );
+    static int fixupShortcuts( dtPolyRef* path, int npath, dtNavMeshQuery* navQuery );
+    inline static bool inRange( const float* v1, const float* v2, const float r, const float h );
+    static bool getSteerTarget( dtNavMeshQuery* navQuery, const float* startPos, const float* endPos,
+                            const float minTargetDist,
+                            const dtPolyRef* path, const int pathSize,
+                            float* steerPos, unsigned char& steerPosFlag, dtPolyRef& steerPosRef,
+                            float* outPoints = 0, int* outPointCount = 0 );
+
   };
 
 }

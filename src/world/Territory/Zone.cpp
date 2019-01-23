@@ -722,7 +722,7 @@ void Sapphire::Zone::registerEObj( Entity::EventObjectPtr object )
 
   onRegisterEObj( object );
 
-  //Logger::debug( "Registered instance eobj: " + std::to_string( object->getId() ) );
+  Logger::debug( "Registered instance eobj: " + std::to_string( object->getId() ) );
 }
 
 Sapphire::Entity::EventObjectPtr Sapphire::Zone::getEObj( uint32_t objId )
@@ -782,7 +782,7 @@ bool Sapphire::Zone::loadSpawnGroups()
 
     m_spawnGroups.emplace_back( id, templateId, level, maxHp );
 
-    //Logger::debug( "id: {0}, template: {1}, level: {2}, maxHp: {3}", id, m_spawnGroups.back().getTemplateId(), level, maxHp );
+    Logger::debug( "id: {0}, template: {1}, level: {2}, maxHp: {3}", id, m_spawnGroups.back().getTemplateId(), level, maxHp );
   }
 
   res.reset();

@@ -6,7 +6,6 @@
 
 #include "Cell.h"
 #include "CellHandler.h"
-#include "Navi/NaviProvider.h"
 
 #include "ForwardsZone.h"
 

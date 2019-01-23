@@ -169,7 +169,6 @@ void Sapphire::Entity::BNpc::step()
   {
     // Reached step in path
     m_naviPathStep++;
-    Logger::debug( "Reached step {0}", m_naviPathStep );
 
     stepPos = m_naviLastPath[m_naviPathStep];
   }
@@ -218,9 +217,6 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 
     if( !path.empty() )
     {
-      for( int i = 0; i < path.size(); i++ )
-        Logger::debug( "[MOVETO] {0}: {1} {2} {3}", i, path[i].x, path[i].y, path[i].z );
-
       m_naviLastPath = path;
       m_naviTarget = pos;
       m_naviPathStep = 0;
@@ -228,11 +224,11 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     }
     else
     {
-      Logger::debug( "No path found for target: {0} {1} {2}", pos.x, pos.y, pos.z );
+      Logger::debug( "No path found for target: {0} {1} {2} in ", pos.x, pos.y, pos.z, m_pCurrentZone->getInternalName() );
     }
   }
   /*
-  float rot = Util::calcAngFrom( getPos().x, getPos().z, pos.x, pos.z );
+  float rot = Util::calcAngFrom( getPos().x, getPos().z, pos.x, pos.z ); 
   float newRot = PI - rot + ( PI / 2 );
 
   face( pos );
@@ -379,7 +375,7 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
 {
   const uint8_t minActorDistance = 4;
   const uint8_t aggroRange = 8;
-  const uint8_t maxDistanceToOrigin = 1000;
+  const uint8_t maxDistanceToOrigin = 40;
 
   if( m_status == ActorStatus::Dead )
     return;
