@@ -167,14 +167,14 @@ void Sapphire::Entity::BNpc::step()
     return;
   }
 
-  auto stepPos = m_naviLastPath[m_naviPathStep];
+  auto stepPos = m_naviLastPath[ m_naviPathStep ];
 
   if( Util::distance( getPos().x, getPos().y, getPos().z, stepPos.x, stepPos.y, stepPos.z ) <= 4 && m_naviPathStep < m_naviLastPath.size() - 1 )
   {
     // Reached step in path
     m_naviPathStep++;
 
-    stepPos = m_naviLastPath[m_naviPathStep];
+    stepPos = m_naviLastPath[ m_naviPathStep ];
   }
 
   // This is probably not a good way to do it but works fine for now
