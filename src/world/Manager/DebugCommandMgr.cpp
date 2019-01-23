@@ -372,12 +372,12 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     auto inRange = player.getInRangeActors();
 
     for( auto actor : inRange )
+    {
+      if( actor->getId() == player.getTargetId() && actor->getAsChara()->isAlive() )
       {
-        if( actor->getId() == player.getTargetId() && actor->getAsChara()->isAlive() )
-        {
-          actor->getAsBNpc()->onActionHostile( player.getAsChara() );
-        }
+        actor->getAsBNpc()->onActionHostile( player.getAsChara() );
       }
+    }
   }
   else
   {
