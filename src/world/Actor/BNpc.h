@@ -83,6 +83,9 @@ namespace Sapphire::Entity
 
     void onDeath() override;
 
+    uint32_t getTimeOfDeath() const;
+    void setTimeOfDeath( uint32_t timeOfDeath);
+
   private:
     uint32_t m_bNpcBaseId;
     uint32_t m_bNpcNameId;
@@ -95,6 +98,8 @@ namespace Sapphire::Entity
     uint16_t m_modelChara;
     uint32_t m_displayFlags;
     uint8_t m_level;
+
+    uint32_t m_timeOfDeath;
 
     Common::FFXIVARR_POSITION3 m_spawnPos;
 
