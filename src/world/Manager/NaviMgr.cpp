@@ -23,7 +23,7 @@ bool Sapphire::World::Manager::NaviMgr::setupTerritory( std::string internalName
 Sapphire::NaviProvider* Sapphire::World::Manager::NaviMgr::getNaviProvider( std::string internalName )
 {
   if( m_naviProviderTerritoryMap.find( internalName ) != m_naviProviderTerritoryMap.end() )
-    return m_naviProviderTerritoryMap[internalName];
+    return m_naviProviderTerritoryMap[ internalName ];
 
   return nullptr;
 }

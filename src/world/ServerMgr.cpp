@@ -347,7 +347,7 @@ bool Sapphire::World::ServerMgr::createSession( uint32_t sessionId )
   Logger::info( "[{0}] Creating new session", session_id_str );
 
   std::shared_ptr< Session > newSession( new Session( sessionId, framework() ) );
-  m_sessionMapById[sessionId] = newSession;
+  m_sessionMapById[ sessionId ] = newSession;
 
   if( !newSession->loadPlayer() )
   {
@@ -355,7 +355,7 @@ bool Sapphire::World::ServerMgr::createSession( uint32_t sessionId )
     return false;
   }
 
-  m_sessionMapByName[newSession->getPlayer()->getName()] = newSession;
+  m_sessionMapByName[ newSession->getPlayer()->getName() ] = newSession;
 
   return true;
 
@@ -424,7 +424,7 @@ std::string Sapphire::World::ServerMgr::getPlayerNameFromDb( uint32_t playerId, 
 
 void Sapphire::World::ServerMgr::updatePlayerName( uint32_t playerId, const std::string & playerNewName )
 {
-  m_playerNameMapById[playerId] = playerNewName;
+  m_playerNameMapById[ playerId ] = playerNewName;
 }
 
 void Sapphire::World::ServerMgr::loadBNpcTemplates()
@@ -456,12 +456,12 @@ void Sapphire::World::ServerMgr::loadBNpcTemplates()
     auto models = res->getBlobVector( 13 );
 
     auto bnpcTemplate = std::make_shared< Entity::BNpcTemplate >(
-      id, bNPCBaseId, bNPCNameId, mainWeaponModel, secWeaponModel,
-      aggressionMode, enemyType, 0, pose, modelChara, displayFlags,
-      reinterpret_cast<uint32_t*>( &models[0] ),
-      reinterpret_cast<uint8_t*>( &look[0] ) );
+                                              id, bNPCBaseId, bNPCNameId, mainWeaponModel, secWeaponModel,
+                                              aggressionMode, enemyType, 0, pose, modelChara, displayFlags,
+                                              reinterpret_cast< uint32_t* >( &models[ 0 ] ),
+                                              reinterpret_cast< uint8_t* >( &look[ 0 ] ) );
 
-    m_bNpcTemplateMap[name] = bnpcTemplate;
+    m_bNpcTemplateMap[ name ] = bnpcTemplate;
   }
 
   Logger::debug( "BNpc Templates loaded: {0}", m_bNpcTemplateMap.size() );
