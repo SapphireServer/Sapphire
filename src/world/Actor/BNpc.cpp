@@ -161,29 +161,9 @@ void Sapphire::Entity::BNpc::step()
     return;
   }
 
-  // Check if we have to recalculate
-  if( Util::getTimeMs() - m_lastUpdate > 500 )
-  {
-    auto path = m_pCurrentZone->getNaviProvider()->findFollowPath( m_pos, m_naviTarget );
-
-    if( !path.empty() )
-    {
-      for( int i = 0; i < path.size(); i++ )
-        Logger::debug( "[STEP] {0}: {1} {2} {3}", i, path[i].x, path[i].y, path[i].z );
-
-      m_naviLastPath = path;
-      m_naviLastUpdate = Util::getTimeMs();
-      m_naviPathStep = 0;
-    }
-    else
-    {
-      Logger::debug( "No path found for target: {0} {1} {2}", m_naviTarget.x, m_naviTarget.y, m_naviTarget.z );
-    }
-  }
-
   auto stepPos = m_naviLastPath[m_naviPathStep];
 
-  if( Util::distance( getPos().x, getPos().y, getPos().z, stepPos.x, stepPos.y, stepPos.z ) <= 4 )
+  if( Util::distance( getPos().x, getPos().y, getPos().z, stepPos.x, stepPos.y, stepPos.z ) <= 4 && m_naviPathStep < m_naviLastPath.size() - 1 )
   {
     // Reached step in path
     m_naviPathStep++;
@@ -192,6 +172,7 @@ void Sapphire::Entity::BNpc::step()
     stepPos = m_naviLastPath[m_naviPathStep];
   }
 
+  // This is probably not a good way to do it but works fine for now
   float rot = Util::calcAngFrom( getPos().x, getPos().z, stepPos.x, stepPos.z );
   float newRot = PI - rot + ( PI / 2 );
 
@@ -199,14 +180,11 @@ void Sapphire::Entity::BNpc::step()
   float angle = Util::calcAngFrom( getPos().x, getPos().z, stepPos.x, stepPos.z ) + PI;
 
   auto x = ( cosf( angle ) * 1.1f );
-  auto y = ( getPos().y + stepPos.y ) * 0.5f; // fake value while there is no collision
+  auto y = ( getPos().y + stepPos.y ) * 0.5f; // Get speed from somewhere else?
   auto z = ( sinf( angle ) * 1.1f );
 
   Common::FFXIVARR_POSITION3 newPos{ getPos().x + x, y, getPos().z + z };
   setPos( newPos );
-
-  Common::FFXIVARR_POSITION3 tmpPos{ getPos().x + x, y, getPos().z + z };
-  setPos( tmpPos );
   setRot( newRot );
 
   sendPositionUpdate();
@@ -222,23 +200,26 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     // Targets are the same
     return false;
 
-  auto path = m_pCurrentZone->getNaviProvider()->findFollowPath( m_pos, pos );
-
-  if( !path.empty() )
+  // Check if we have to recalculate
+  if( Util::getTimeMs() - m_naviLastUpdate > 500 )
   {
-    for( int i = 0; i < path.size(); i++ )
-      Logger::debug( "[MOVETO] {0}: {1} {2} {3}", i, path[i].x, path[i].y, path[i].z );
+    auto path = m_pCurrentZone->getNaviProvider()->findFollowPath( m_pos, pos );
 
-    m_naviLastPath = path;
-    m_naviTarget = pos;
-    m_naviPathStep = 0;
-    m_naviLastUpdate = Util::getTimeMs();
-  }
-  else
-  {
-    Logger::debug( "No path found for target: {0} {1} {2}", pos.x, pos.y, pos.z );
-  }
+    if( !path.empty() )
+    {
+      for( int i = 0; i < path.size(); i++ )
+        Logger::debug( "[MOVETO] {0}: {1} {2} {3}", i, path[i].x, path[i].y, path[i].z );
 
+      m_naviLastPath = path;
+      m_naviTarget = pos;
+      m_naviPathStep = 0;
+      m_naviLastUpdate = Util::getTimeMs();
+    }
+    else
+    {
+      Logger::debug( "No path found for target: {0} {1} {2}", pos.x, pos.y, pos.z );
+    }
+  }
   /*
   float rot = Util::calcAngFrom( getPos().x, getPos().z, pos.x, pos.z );
   float newRot = PI - rot + ( PI / 2 );
