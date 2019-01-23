@@ -281,8 +281,8 @@ std::vector< Sapphire::Common::FFXIVARR_POSITION3 > Sapphire::NaviProvider::find
 
     Logger::debug("IterPos: {0} {1} {2}; TargetPos: {3} {4} {5}", iterPos[0], iterPos[1], iterPos[2], targetPos[0], targetPos[1], targetPos[2]);
 
-    static const float STEP_SIZE = 0.5f;
-    static const float SLOP = 0.01f;
+    static const float STEP_SIZE = 1.2f;
+    static const float SLOP = 0.15f;
 
     int numSmoothPath = 0;
     float smoothPath[MAX_SMOOTH * 3];

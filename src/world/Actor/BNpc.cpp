@@ -148,24 +148,96 @@ void Sapphire::Entity::BNpc::setState( BNpcState state )
   m_state = state;
 }
 
+void Sapphire::Entity::BNpc::step()
+{
+  if( m_naviLastPath.empty() )
+    // No path to track
+    return;
+
+  if( Util::distance( getPos().x, getPos().y, getPos().z, m_naviTarget.x, m_naviTarget.y, m_naviTarget.z ) <= 4 )
+  {
+    // Reached target
+    m_naviLastPath.clear();
+    return;
+  }
+
+  // Check if we have to recalculate
+  if( Util::getTimeMs() - m_lastUpdate > 500 )
+  {
+    auto path = m_pCurrentZone->getNaviProvider()->findFollowPath( m_pos, m_naviTarget );
+
+    if( !path.empty() )
+    {
+      for( int i = 0; i < path.size(); i++ )
+        Logger::debug( "[STEP] {0}: {1} {2} {3}", i, path[i].x, path[i].y, path[i].z );
+
+      m_naviLastPath = path;
+      m_naviLastUpdate = Util::getTimeMs();
+      m_naviPathStep = 0;
+    }
+    else
+    {
+      Logger::debug( "No path found for target: {0} {1} {2}", m_naviTarget.x, m_naviTarget.y, m_naviTarget.z );
+    }
+  }
+
+  auto stepPos = m_naviLastPath[m_naviPathStep];
+
+  if( Util::distance( getPos().x, getPos().y, getPos().z, stepPos.x, stepPos.y, stepPos.z ) <= 4 )
+  {
+    // Reached step in path
+    m_naviPathStep++;
+    Logger::debug( "Reached step {0}", m_naviPathStep );
+
+    stepPos = m_naviLastPath[m_naviPathStep];
+  }
+
+  float rot = Util::calcAngFrom( getPos().x, getPos().z, stepPos.x, stepPos.z );
+  float newRot = PI - rot + ( PI / 2 );
+
+  face( stepPos );
+  float angle = Util::calcAngFrom( getPos().x, getPos().z, stepPos.x, stepPos.z ) + PI;
+
+  auto x = ( cosf( angle ) * 1.1f );
+  auto y = ( getPos().y + stepPos.y ) * 0.5f; // fake value while there is no collision
+  auto z = ( sinf( angle ) * 1.1f );
+
+  Common::FFXIVARR_POSITION3 newPos{ getPos().x + x, y, getPos().z + z };
+  setPos( newPos );
+
+  Common::FFXIVARR_POSITION3 tmpPos{ getPos().x + x, y, getPos().z + z };
+  setPos( tmpPos );
+  setRot( newRot );
+
+  sendPositionUpdate();
+}
+
 bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 {
   if( Util::distance( getPos().x, getPos().y, getPos().z, pos.x, pos.y, pos.z ) <= 4 )
-    // reached destination
+    // Reached destination
     return true;
+
+  if( m_naviTarget.x == pos.x && m_naviTarget.y == pos.y && m_naviTarget.z == pos.z )
+    // Targets are the same
+    return false;
 
   auto path = m_pCurrentZone->getNaviProvider()->findFollowPath( m_pos, pos );
 
-  if(!path.empty())
+  if( !path.empty() )
   {
-    for(int i = 0; i < path.size(); i++)
-      Logger::debug("{0}: {1} {2} {3}", i, path[i].x, path[i].y, path[i].z);
+    for( int i = 0; i < path.size(); i++ )
+      Logger::debug( "[MOVETO] {0}: {1} {2} {3}", i, path[i].x, path[i].y, path[i].z );
 
-    face( path[1] );
-    setPos(path[1]);
+    m_naviLastPath = path;
+    m_naviTarget = pos;
+    m_naviPathStep = 0;
+    m_naviLastUpdate = Util::getTimeMs();
   }
-
-  sendPositionUpdate();
+  else
+  {
+    Logger::debug( "No path found for target: {0} {1} {2}", pos.x, pos.y, pos.z );
+  }
 
   /*
   float rot = Util::calcAngFrom( getPos().x, getPos().z, pos.x, pos.z );
@@ -404,6 +476,8 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
     }
   }
   }
+
+  step();
 }
 
 void Sapphire::Entity::BNpc::onActionHostile( Sapphire::Entity::CharaPtr pSource )
