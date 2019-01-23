@@ -208,19 +208,11 @@ bool Sapphire::NaviProvider::getSteerTarget( dtNavMeshQuery* navQuery, const flo
 std::vector< Sapphire::Common::FFXIVARR_POSITION3 > Sapphire::NaviProvider::findFollowPath( Common::FFXIVARR_POSITION3 startPos, Common::FFXIVARR_POSITION3 endPos )
 {
   if( !m_naviMesh || !m_naviMeshQuery )
-    throw std::exception( "No navimesh loaded" );
+    throw std::runtime_error( "No navimesh loaded" );
 
   auto resultCoords = std::vector< Common::FFXIVARR_POSITION3 >();
 
   dtPolyRef startRef, endRef = 0;
-
-  /*
-  float spos[3];
-  NaviProvider::toDetourPos( startPos, spos );
-
-  float epos[3];
-  NaviProvider::toDetourPos( endPos, epos );
-  */
 
   float spos[3] = {startPos.x, startPos.y, startPos.z};
   float epos[3] = {endPos.x, endPos.y, endPos.z};
@@ -380,7 +372,7 @@ void Sapphire::NaviProvider::loadMesh( std::string path )
 {
   FILE* fp = fopen( path.c_str(), "rb" );
   if( !fp )
-    throw std::exception( "Could open navimesh file" );
+    throw std::runtime_error( "Could open navimesh file" );
 
   // Read header.
   NavMeshSetHeader header;
@@ -389,19 +381,19 @@ void Sapphire::NaviProvider::loadMesh( std::string path )
   if( readLen != 1 )
   {
     fclose( fp );
-    throw std::exception( "Could not read NavMeshSetHeader" );
+    throw std::runtime_error( "Could not read NavMeshSetHeader" );
   }
 
   if( header.magic != NAVMESHSET_MAGIC )
   {
     fclose( fp );
-    throw std::exception( "Not a NavMeshSet" );
+    throw std::runtime_error( "Not a NavMeshSet" );
   }
 
   if( header.version != NAVMESHSET_VERSION )
   {
     fclose( fp );
-    throw std::exception( "Invalid NavMeshSet version" );
+    throw std::runtime_error( "Invalid NavMeshSet version" );
   }
 
   if( !m_naviMesh )
@@ -410,14 +402,14 @@ void Sapphire::NaviProvider::loadMesh( std::string path )
     if( !m_naviMesh )
     {
       fclose( fp );
-      throw std::exception( "Could not allocate dtNavMesh" );
+      throw std::runtime_error( "Could not allocate dtNavMesh" );
     }
 
     dtStatus status = m_naviMesh->init( &header.params );
     if( dtStatusFailed( status ) )
     {
       fclose( fp );
-      throw std::exception( "Could not initialize dtNavMesh" );
+      throw std::runtime_error( "Could not initialize dtNavMesh" );
     }
   }
 
@@ -429,7 +421,7 @@ void Sapphire::NaviProvider::loadMesh( std::string path )
     if( readLen != 1 )
     {
       fclose( fp );
-      throw std::exception( "Could not read NavMeshTileHeader" );
+      throw std::runtime_error( "Could not read NavMeshTileHeader" );
     }
 
     if( !tileHeader.tileRef || !tileHeader.dataSize )
@@ -443,7 +435,7 @@ void Sapphire::NaviProvider::loadMesh( std::string path )
     {
       dtFree( data );
       fclose( fp );
-      throw std::exception( "Could not read tile data" );
+      throw std::runtime_error( "Could not read tile data" );
     }
 
     m_naviMesh->addTile( data, tileHeader.dataSize, DT_TILE_FREE_DATA, tileHeader.tileRef, 0 );
