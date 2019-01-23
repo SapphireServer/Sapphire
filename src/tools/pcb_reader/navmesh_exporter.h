@@ -11,17 +11,15 @@
 #include "exporter.h"
 #include "obj_exporter.h"
 
-/*
+//*
 #include <recastnavigation/Recast/Include/Recast.h>
 #include <recastnavigation/Recast/Include/RecastAlloc.h>
 #include <recastnavigation/Detour/Include/DetourNavMesh.h>
 #include <recastnavigation/Detour/Include/DetourNavMeshBuilder.h>
 #include <recastnavigation/DetourTileCache/Include/DetourTileCache.h>
 #include <recastnavigation/DetourTileCache/Include/DetourTileCacheBuilder.h>
-#include <recastnavigation/RecastDemo/Include/ChunkyTriMesh.h>
-#include <recastnavigation/RecastDemo/Include/InputGeom.h>
-#include <recastnavigation/RecastDemo/Include/Sample.h>
-*/
+
+//*/
 class NavmeshExporter
 {
 public:
@@ -33,7 +31,8 @@ public:
 
     auto fileName = currPath + "/" + zone.name + "/" + zone.name + ".nav";
     exportZoneCommandline( zone, deleteObj );
-
+    //for( auto& group : zone.groups )
+    //buildTileMesh(group.second, 0, 0);
     auto end = std::chrono::high_resolution_clock::now();
     printf( "[Navmesh] Finished exporting %s in %u ms\n",
       fileName.c_str(),
@@ -133,13 +132,15 @@ private:
       for( const auto& mesh : model.second.meshes )
       {
         auto size = mesh.verts.size();
+        if (!size)
+          continue;
         rcCalcBounds( mesh.verts.data(), size / 3, &cfg.bmin[0], &cfg.bmax[0] );
-        verts.reserve( verts.size() + size );
+        verts.resize( verts.size() + size );
         memcpy( &verts[i], mesh.verts.data(), size );
         i += size;
 
         size = mesh.indices.size();
-        indices.reserve( indices.size() + size );
+        indices.resize( indices.size() + size );
         for( auto j = 0; j < mesh.indices.size(); j += 3 )
         {
           indices[j] = mesh.indices[j] + numIndices;
@@ -150,8 +151,7 @@ private:
       }
     }
 
-    auto chunkyMesh = new rcChunkyTriMesh;
-    rcCreateChunkyTriMesh( &verts[0], &indices[0], verts.size() / 3, 256, chunkyMesh );
+
     if( !rcCreateHeightfield( &ctx, *hf, cfg.width, cfg.height, cfg.bmin, cfg.bmax, cfg.cs, cfg.ch ) )
     {
       
@@ -162,33 +162,10 @@ private:
 	tbmax[0] = cfg.bmax[0];
 	tbmax[1] = cfg.bmax[2];
 	int cid[512];// TODO: Make grow when returning too many items.
-	const int ncid = rcGetChunksOverlappingRect(chunkyMesh, tbmin, tbmax, cid, 512);
-	if (!ncid)
-		return 0;
+
 	
 	auto tileTriCount = 0;
-  auto triareas = new unsigned char[chunkyMesh->maxTrisPerChunk];
-	for (int i = 0; i < ncid; ++i)
-	{
-		const rcChunkyTriMeshNode& node = chunkyMesh->nodes[cid[i]];
-		const int* ctris = &chunkyMesh->tris[node.i*3];
-		const int nctris = node.n;
-		
-		tileTriCount += nctris;
-		
-		memset(triareas, 0, nctris*sizeof(unsigned char));
-		rcMarkWalkableTriangles(&ctx, cfg.walkableSlopeAngle,
-								&verts[0], verts.size() / 3, ctris, nctris, triareas);
-		
-		if (!rcRasterizeTriangles(&ctx, &verts[0], verts.size() / 3, ctris, triareas, nctris, *hf, cfg.walkableClimb))
-			return 0;
-	}
-	
-	{
-		delete [] triareas;
-		triareas = 0;
-	}
-	
+
 	// Once all geometry is rasterized, we do initial pass of filtering to
 	// remove unwanted overhangs caused by the conservative rasterization
 	// as well as filter spans where the character cannot possibly stand.
@@ -343,7 +320,6 @@ private:
 		cs = 0;
 	}
 	
-	unsigned char* navData = 0;
 	int navDataSize = 0;
 	if (cfg.maxVertsPerPoly <= DT_VERTS_PER_POLYGON)
 	{
