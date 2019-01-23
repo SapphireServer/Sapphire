@@ -33,9 +33,9 @@ namespace Sapphire
 	  static const int MAX_SMOOTH = 2048;
 
   public:
-    NaviProvider( const ZonePtr pZone, Sapphire::FrameworkPtr pFw );
+    NaviProvider( const std::string internalName );
 
-    void init();
+    bool init();
     void loadMesh( std::string path );
     void initQuery();
 
@@ -47,8 +47,7 @@ namespace Sapphire
     bool hasNaviMesh() const;
 
   protected:
-    FrameworkPtr m_pFw;
-    ZonePtr m_pZone;
+    std::string m_internalName;
 
     dtNavMesh* m_naviMesh;
     dtNavMeshQuery* m_naviMeshQuery;

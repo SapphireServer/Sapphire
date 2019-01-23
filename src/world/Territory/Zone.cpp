@@ -124,9 +124,6 @@ bool Sapphire::Zone::init()
     // all good
   }
 
-  m_naviProvider = new NaviProvider( shared_from_this(), m_pFw );
-  m_naviProvider->init();
-
   return true;
 }
 
@@ -850,10 +847,5 @@ void Sapphire::Zone::updateSpawnPoints()
     }
   }
 
-}
-
-Sapphire::NaviProvider* Sapphire::Zone::getNaviProvider() const
-{
-  return m_naviProvider;
 }
 
