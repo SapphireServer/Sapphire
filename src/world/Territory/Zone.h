@@ -63,8 +63,6 @@ namespace Sapphire
 
     std::vector< Entity::SpawnGroup > m_spawnGroups;
 
-    NaviProvider* m_naviProvider;
-
   public:
     Zone();
 
@@ -161,8 +159,6 @@ namespace Sapphire
     InstanceContentPtr getAsInstanceContent();
 
     void updateSpawnPoints();
-
-    NaviProvider* getNaviProvider() const;
   };
 
 }

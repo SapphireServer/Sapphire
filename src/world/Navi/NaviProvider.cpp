@@ -13,11 +13,10 @@
 #include <DetourCommon.h>
 #include <recastnavigation/Recast/Include/Recast.h>
 
-Sapphire::NaviProvider::NaviProvider( Sapphire::ZonePtr pZone, Sapphire::FrameworkPtr pFw ) :
-  m_pFw( pFw ),
-  m_pZone( pZone ),
+Sapphire::NaviProvider::NaviProvider( std::string internalName ) :
   m_naviMesh( nullptr ),
-  m_naviMeshQuery( nullptr )
+  m_naviMeshQuery( nullptr ),
+  m_internalName( internalName )
 {
   // Set defaults
   m_polyFindRange[0] = 10;
@@ -25,14 +24,14 @@ Sapphire::NaviProvider::NaviProvider( Sapphire::ZonePtr pZone, Sapphire::Framewo
   m_polyFindRange[2] = 10;
 }
 
-void Sapphire::NaviProvider::init()
+bool Sapphire::NaviProvider::init()
 {
   auto meshesFolder = std::filesystem::path( "navi" );
-  auto meshFolder = meshesFolder / std::filesystem::path( m_pZone->getInternalName() );
+  auto meshFolder = meshesFolder / std::filesystem::path( m_internalName );
 
   if( std::filesystem::exists( meshFolder ) )
   {
-    auto baseMesh = meshFolder / std::filesystem::path( m_pZone->getInternalName() + ".nav" );
+    auto baseMesh = meshFolder / std::filesystem::path( m_internalName + ".nav" );
 
     loadMesh( baseMesh.string() );
 
@@ -50,7 +49,11 @@ void Sapphire::NaviProvider::init()
     */
 
     initQuery();
+
+    return true;
   }
+
+  return false;
 }
 
 bool Sapphire::NaviProvider::hasNaviMesh() const
