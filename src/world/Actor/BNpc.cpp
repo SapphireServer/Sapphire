@@ -32,6 +32,9 @@
 #include "BNpcTemplate.h"
 #include "Manager/TerritoryMgr.h"
 #include "Common.h"
+#include "Framework.h"
+#include <Logging/Logger.h>
+#include <Manager/NaviMgr.h>
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -151,13 +154,85 @@ void Sapphire::Entity::BNpc::setState( BNpcState state )
   m_state = state;
 }
 
+void Sapphire::Entity::BNpc::step()
+{
+  if( m_naviLastPath.empty() )
+    // No path to track
+    return;
+
+  if( Util::distance( getPos().x, getPos().y, getPos().z, m_naviTarget.x, m_naviTarget.y, m_naviTarget.z ) <= 4 )
+  {
+    // Reached target
+    m_naviLastPath.clear();
+    return;
+  }
+
+  auto stepPos = m_naviLastPath[ m_naviPathStep ];
+
+  if( Util::distance( getPos().x, getPos().y, getPos().z, stepPos.x, stepPos.y, stepPos.z ) <= 4 && m_naviPathStep < m_naviLastPath.size() - 1 )
+  {
+    // Reached step in path
+    m_naviPathStep++;
+
+    stepPos = m_naviLastPath[ m_naviPathStep ];
+  }
+
+  // This is probably not a good way to do it but works fine for now
+  float rot = Util::calcAngFrom( getPos().x, getPos().z, stepPos.x, stepPos.z );
+  float newRot = PI - rot + ( PI / 2 );
+
+  face( stepPos );
+  float angle = Util::calcAngFrom( getPos().x, getPos().z, stepPos.x, stepPos.z ) + PI;
+
+  auto x = ( cosf( angle ) * 1.1f );
+  auto y = ( getPos().y + stepPos.y ) * 0.5f; // Get speed from somewhere else?
+  auto z = ( sinf( angle ) * 1.1f );
+
+  Common::FFXIVARR_POSITION3 newPos{ getPos().x + x, y, getPos().z + z };
+  setPos( newPos );
+  setRot( newRot );
+
+  sendPositionUpdate();
+}
+
 bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 {
   if( Util::distance( getPos().x, getPos().y, getPos().z, pos.x, pos.y, pos.z ) <= 4 )
-    // reached destination
+    // Reached destination
     return true;
 
-  float rot = Util::calcAngFrom( getPos().x, getPos().z, pos.x, pos.z );
+  if( m_naviTarget.x == pos.x && m_naviTarget.y == pos.y && m_naviTarget.z == pos.z )
+    // Targets are the same
+    return false;
+
+  // Check if we have to recalculate
+  if( Util::getTimeMs() - m_naviLastUpdate > 500 )
+  {
+    auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
+    auto pNaviProvider = pNaviMgr->getNaviProvider( m_pCurrentZone->getInternalName() );
+
+    if( !pNaviProvider )
+    {
+      Logger::error( "No NaviProvider for zone#{0} - {1}", m_pCurrentZone->getGuId(), m_pCurrentZone->getInternalName() );
+      return false;
+    }
+
+    auto path = pNaviProvider->findFollowPath( m_pos, pos );
+
+    if( !path.empty() )
+    {
+      m_naviLastPath = path;
+      m_naviTarget = pos;
+      m_naviPathStep = 0;
+      m_naviLastUpdate = Util::getTimeMs();
+    }
+    else
+    {
+      Logger::debug( "No path found from x{0} y{1} z{2} to x{3} y{4} z{5} in {6}", getPos().x, getPos().y, getPos().z, pos.x, pos.y, pos.z, m_pCurrentZone->getInternalName() );
+    }
+  }
+  /*
+  float rot = Util::calcAngFrom( getPos().x, getPos().z, pos.x, pos.z ); 
   float newRot = PI - rot + ( PI / 2 );
 
   face( pos );
@@ -175,6 +250,7 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
   setRot( newRot );
 
   sendPositionUpdate();
+  */
 
   return false;
 }
@@ -304,7 +380,7 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
 {
   const uint8_t minActorDistance = 4;
   const uint8_t aggroRange = 8;
-  const uint8_t maxDistanceToOrigin = 30;
+  const uint8_t maxDistanceToOrigin = 40;
 
   switch( m_state )
   {
@@ -392,6 +468,8 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
       }
     }
   }
+
+  step();
 }
 
 void Sapphire::Entity::BNpc::onActionHostile( Sapphire::Entity::CharaPtr pSource )
