@@ -831,3 +831,4 @@ void Sapphire::Zone::updateSpawnPoints()
   }
 
 }
+

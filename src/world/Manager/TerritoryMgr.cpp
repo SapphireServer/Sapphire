@@ -16,6 +16,7 @@
 #include "Territory/Land.h"
 #include "Territory/House.h"
 #include "Territory/Housing/HousingInteriorTerritory.h"
+#include "NaviMgr.h"
 
 Sapphire::World::Manager::TerritoryMgr::TerritoryMgr( Sapphire::FrameworkPtr pFw ) :
   BaseManager( pFw ),
@@ -163,13 +164,17 @@ bool Sapphire::World::Manager::TerritoryMgr::createDefaultTerritories()
 
     uint32_t guid = getNextInstanceId();
 
-    Logger::info( "{0}\t{1}\t{2}\t{3:<10}\t{4}\t{5}",
+    auto pNaviMgr = framework()->get< Manager::NaviMgr >();
+    bool hasNaviMesh = pNaviMgr->setupTerritory( territoryInfo->name );
+
+    Logger::info( "{0}\t{1}\t{2}\t{3:<10}\t{4}\t{5}\t{6}",
                   territoryTypeId,
                   guid,
                   territoryInfo->territoryIntendedUse,
                   territoryInfo->name,
                   ( isPrivateTerritory( territoryTypeId ) ? "PRIVATE" : "PUBLIC" ),
-                  pPlaceName->name );
+                  pPlaceName->name,
+                  hasNaviMesh ? "NAVI" : "");
 
     auto pZone = make_Zone( territoryTypeId, guid, territoryInfo->name, pPlaceName->name, framework() );
     pZone->init();

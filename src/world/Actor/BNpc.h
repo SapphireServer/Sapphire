@@ -62,6 +62,9 @@ namespace Sapphire::Entity
     // return true if it reached the position
     bool moveTo( const Common::FFXIVARR_POSITION3& pos );
 
+    // processes movement
+    void step();
+
     void sendPositionUpdate();
 
     BNpcState getState() const;
@@ -105,6 +108,11 @@ namespace Sapphire::Entity
 
     BNpcState m_state;
     std::set< std::shared_ptr< HateListEntry > > m_hateList;
+
+    uint64_t m_naviLastUpdate;
+    std::vector< Common::FFXIVARR_POSITION3 > m_naviLastPath;
+    uint8_t m_naviPathStep;
+    Common::FFXIVARR_POSITION3 m_naviTarget;
 
   };
 

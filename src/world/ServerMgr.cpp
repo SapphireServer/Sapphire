@@ -41,6 +41,7 @@
 #include "Manager/ItemMgr.h"
 #include "Manager/MarketMgr.h"
 #include "Manager/RNGMgr.h"
+#include "Manager/NaviMgr.h"
 
 using namespace Sapphire::World::Manager;
 
@@ -165,6 +166,9 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
   framework()->set< Scripting::ScriptMgr >( pScript );
 
   loadBNpcTemplates();
+
+  auto pNaviMgr = std::make_shared< Manager::NaviMgr >( framework() );
+  framework()->set< Manager::NaviMgr >( pNaviMgr );
 
   Logger::info( "TerritoryMgr: Setting up zones" );
   auto pTeriMgr = std::make_shared< Manager::TerritoryMgr >( framework() );
