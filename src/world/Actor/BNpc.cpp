@@ -211,7 +211,7 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
     auto pNaviProvider = pNaviMgr->getNaviProvider( m_pCurrentZone->getInternalName() );
 
-    if(!pNaviProvider)
+    if( !pNaviProvider )
     {
       Logger::error( "No NaviProvider for zone#{0} - {1}", m_pCurrentZone->getGuId(), m_pCurrentZone->getInternalName() );
       return false;
