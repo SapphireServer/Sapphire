@@ -381,49 +381,27 @@ bool Sapphire::Zone::checkWeather()
 
 void Sapphire::Zone::updateBNpcs( int64_t tickCount )
 {
-   if( ( tickCount - m_lastMobUpdate ) > 250 )
-   {
-      m_lastMobUpdate = tickCount;
-      uint32_t currTime = Sapphire::Util::getTimeSeconds();
+  if( ( tickCount - m_lastMobUpdate ) <= 250 )
+    return;
 
-      /*for( auto it3 = m_BattleNpcDeadMap.begin(); it3 != m_BattleNpcDeadMap.end(); ++it3 )
-      {
+  m_lastMobUpdate = tickCount;
+  uint32_t currTime = Sapphire::Util::getTimeSeconds();
 
-         Entity::BattleNpcPtr pBNpc = *it3;
+  for( auto entry : m_bNpcMap )
+  {
+    Entity::BNpcPtr pBNpc = entry.second;
 
-         if( ( currTime - pBNpc->getTimeOfDeath() ) > 60 )
-         {
+    if( !pBNpc )
+      continue;
 
-            pBNpc->resetHp();
-            pBNpc->resetMp();
-            pBNpc->resetPos();
-            pushActor( pBNpc );
+    if( !pBNpc->isAlive() && currTime - pBNpc->getTimeOfDeath() > 10 )
+    {
+      removeActor( pBNpc );
+      break;
+    }
 
-            m_BattleNpcDeadMap.erase( it3 );
-
-            break;
-         }
-      }*/
-
-
-      for( auto entry : m_bNpcMap )
-      {
-         Entity::BNpcPtr pBNpc = entry.second;
-
-         if( !pBNpc )
-            continue;
-
-         //if( !pBNpc->isAlive() && currTime - pBNpc->getTimeOfDeath() > ( 10 ) )
-         //{
-         //   removeActor( pBNpc );
-         //   m_BattleNpcDeadMap.insert( pBNpc );
-         //   break;
-         //}
-
-         pBNpc->update( tickCount );
-
-      }
-   }
+    pBNpc->update( tickCount );
+  }
 }
 
 
@@ -843,6 +821,11 @@ void Sapphire::Zone::updateSpawnPoints()
         point->setLinkedBNpc( pBNpc );
 
         pushActor( pBNpc );
+      }
+      else if( point->getLinkedBNpc() && !point->getLinkedBNpc()->isAlive() )
+      {
+        point->setTimeOfDeath( Util::getTimeSeconds() );
+        point->setLinkedBNpc( nullptr );
       }
     }
   }

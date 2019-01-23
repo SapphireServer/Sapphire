@@ -4,6 +4,7 @@
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Network/GamePacketNew.h>
 #include <Util/Util.h>
+#include <Common.h>
 #include "Actor/Player.h"
 #include "Actor/BNpc.h"
 #include "Forwards.h"
@@ -56,6 +57,8 @@ namespace Sapphire::Network::Packets::Server
       m_data.aggressionMode = bnpc.getAggressionMode();
 
       m_data.classJob = 0;
+
+      m_data.targetId = Common::INVALID_GAME_OBJECT_ID;
 
       //m_data.u23 = 0x04;
       //m_data.u24 = 256;
