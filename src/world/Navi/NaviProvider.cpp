@@ -1,17 +1,16 @@
 #include <Common.h>
-#include <CommonGen.h>
+#include <Framework.h>
+#include <Territory/Zone.h>
+#include <Logging/Logger.h>
 
-#include "Framework.h"
 #include "NaviProvider.h"
+
 #include <recastnavigation/Detour/Include/DetourNavMesh.h>
 #include <recastnavigation/Detour/Include/DetourNavMeshQuery.h>
-#include <experimental/filesystem>
-#include <filesystem>
-
-#include "../Territory/Zone.h"
-#include <Logging/Logger.h>
 #include <DetourCommon.h>
 #include <recastnavigation/Recast/Include/Recast.h>
+#include <experimental/filesystem>
+
 
 Sapphire::NaviProvider::NaviProvider( std::string internalName ) :
   m_naviMesh( nullptr ),
@@ -26,27 +25,14 @@ Sapphire::NaviProvider::NaviProvider( std::string internalName ) :
 
 bool Sapphire::NaviProvider::init()
 {
-  auto meshesFolder = std::filesystem::path( "navi" );
-  auto meshFolder = meshesFolder / std::filesystem::path( m_internalName );
+  auto meshesFolder = std::experimental::filesystem::path( "navi" );
+  auto meshFolder = meshesFolder / std::experimental::filesystem::path( m_internalName );
 
-  if( std::filesystem::exists( meshFolder ) )
+  if( std::experimental::filesystem::exists( meshFolder ) )
   {
-    auto baseMesh = meshFolder / std::filesystem::path( m_internalName + ".nav" );
+    auto baseMesh = meshFolder / std::experimental::filesystem::path( m_internalName + ".nav" );
 
     loadMesh( baseMesh.string() );
-
-    // Load all meshes for testing
-
-    /*
-    for( const auto & entry : std::filesystem::directory_iterator( meshFolder ) )
-    {
-      if( entry.path().extension().string() == ".nav" )
-      {
-        Logger::debug( "Loading " + entry.path().string() );
-        LoadMesh( entry.path().string() );
-      }
-    }
-    */
 
     initQuery();
 
@@ -70,7 +56,7 @@ void Sapphire::NaviProvider::initQuery()
   m_naviMeshQuery->init( m_naviMesh, 2048 );
 }
 
-static int fixupCorridor( dtPolyRef* path, const int npath, const int maxPath,
+int Sapphire::NaviProvider::fixupCorridor( dtPolyRef* path, const int npath, const int maxPath,
                           const dtPolyRef* visited, const int nvisited )
 {
   int furthestPath = -1;
@@ -115,7 +101,7 @@ static int fixupCorridor( dtPolyRef* path, const int npath, const int maxPath,
   return req + size;
 }
 
-static int fixupShortcuts( dtPolyRef* path, int npath, dtNavMeshQuery* navQuery )
+int Sapphire::NaviProvider::fixupShortcuts( dtPolyRef* path, int npath, dtNavMeshQuery* navQuery )
 {
   if( npath < 3 )
     return npath;
@@ -164,7 +150,7 @@ static int fixupShortcuts( dtPolyRef* path, int npath, dtNavMeshQuery* navQuery 
   return npath;
 }
 
-inline bool inRange( const float* v1, const float* v2, const float r, const float h )
+bool Sapphire::NaviProvider::inRange( const float* v1, const float* v2, const float r, const float h )
 {
   const float dx = v2[0] - v1[0];
   const float dy = v2[1] - v1[1];
@@ -172,11 +158,11 @@ inline bool inRange( const float* v1, const float* v2, const float r, const floa
   return ( dx*dx + dz * dz ) < r*r && fabsf( dy ) < h;
 }
 
-static bool getSteerTarget( dtNavMeshQuery* navQuery, const float* startPos, const float* endPos,
+bool Sapphire::NaviProvider::getSteerTarget( dtNavMeshQuery* navQuery, const float* startPos, const float* endPos,
                             const float minTargetDist,
                             const dtPolyRef* path, const int pathSize,
                             float* steerPos, unsigned char& steerPosFlag, dtPolyRef& steerPosRef,
-                            float* outPoints = 0, int* outPointCount = 0 )
+                            float* outPoints, int* outPointCount )
 {
   // Find steer target.
   static const int MAX_STEER_POINTS = 3;
@@ -217,22 +203,6 @@ static bool getSteerTarget( dtNavMeshQuery* navQuery, const float* startPos, con
   steerPosRef = steerPathPolys[ns];
 
   return true;
-}
-
-void Sapphire::NaviProvider::toDetourPos( const Sapphire::Common::FFXIVARR_POSITION3 pos, float* out ) {
-  float y = pos.y;
-  float z = pos.z;
-
-  out[0] = pos.x;
-  out[1] = y * -1;
-  out[2] = z * -1;
-}
-
-Sapphire::Common::FFXIVARR_POSITION3 Sapphire::NaviProvider::toGamePos( float* pos ) {
-  float y = pos[1];
-  float z = pos[2];
-
-  return Common::FFXIVARR_POSITION3 { pos[0], y * -1, z * -1 };
 }
 
 std::vector< Sapphire::Common::FFXIVARR_POSITION3 > Sapphire::NaviProvider::findFollowPath( Common::FFXIVARR_POSITION3 startPos, Common::FFXIVARR_POSITION3 endPos )
