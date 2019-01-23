@@ -228,7 +228,7 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     }
     else
     {
-      Logger::debug( "No path found for target: {0} {1} {2} in ", pos.x, pos.y, pos.z, m_pCurrentZone->getInternalName() );
+      Logger::debug( "No path found from x{0} y{1} z{2} to x{3} y{4} z{5} in {6}", getPos().x, getPos().y, getPos().z, pos.x, pos.y, pos.z, m_pCurrentZone->getInternalName() );
     }
   }
   /*
