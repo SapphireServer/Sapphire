@@ -722,7 +722,7 @@ void Sapphire::Zone::registerEObj( Entity::EventObjectPtr object )
 
   onRegisterEObj( object );
 
-  Logger::debug( "Registered instance eobj: " + std::to_string( object->getId() ) );
+  //Logger::debug( "Registered instance eobj: " + std::to_string( object->getId() ) );
 }
 
 Sapphire::Entity::EventObjectPtr Sapphire::Zone::getEObj( uint32_t objId )
@@ -805,7 +805,7 @@ bool Sapphire::Zone::loadSpawnGroups()
 
       group.getSpawnPointList().emplace_back( std::make_shared< Entity::SpawnPoint >( x, y, z, r, gimmickId ) );
 
-      //Logger::debug( "id: {0}, x: {1}, y: {2}, z: {3}, gimmickId: {4}", id, x, y, z, gimmickId );
+      Logger::debug( "id: {0}, x: {1}, y: {2}, z: {3}, gimmickId: {4}", id, x, y, z, gimmickId );
     }
   }
   return false;
