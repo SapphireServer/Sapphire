@@ -20,6 +20,7 @@
 #include "Network/PacketWrappers/UpdateHpMpTpPacket.h"
 #include "Network/PacketWrappers/NpcSpawnPacket.h"
 #include "Network/PacketWrappers/MoveActorPacket.h"
+#include "Navi/NaviProvider.h"
 
 #include "StatusEffect/StatusEffect.h"
 #include "Action/ActionCollision.h"

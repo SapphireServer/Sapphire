@@ -1,4 +1,5 @@
 #include "NaviMgr.h"
+#include "Navi/NaviProvider.h"
 #include <Logging/Logger.h>
 
 Sapphire::World::Manager::NaviMgr::NaviMgr( FrameworkPtr pFw ) :
@@ -7,9 +8,9 @@ Sapphire::World::Manager::NaviMgr::NaviMgr( FrameworkPtr pFw ) :
 {
 }
 
-bool Sapphire::World::Manager::NaviMgr::setupTerritory( std::string internalName )
+bool Sapphire::World::Manager::NaviMgr::setupTerritory( const std::string& internalName )
 {
-  auto provider = new NaviProvider( internalName );
+  auto provider = Navi::make_NaviProvider( internalName );
 
   if( provider->init() )
   {
@@ -20,7 +21,7 @@ bool Sapphire::World::Manager::NaviMgr::setupTerritory( std::string internalName
   return false;
 }
 
-Sapphire::NaviProvider* Sapphire::World::Manager::NaviMgr::getNaviProvider( std::string internalName )
+Sapphire::World::Navi::NaviProviderPtr Sapphire::World::Manager::NaviMgr::getNaviProvider( const std::string& internalName )
 {
   if( m_naviProviderTerritoryMap.find( internalName ) != m_naviProviderTerritoryMap.end() )
     return m_naviProviderTerritoryMap[ internalName ];
