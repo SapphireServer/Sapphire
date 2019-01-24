@@ -10,7 +10,7 @@ Sapphire::World::Manager::NaviMgr::NaviMgr( FrameworkPtr pFw ) :
 
 bool Sapphire::World::Manager::NaviMgr::setupTerritory( const std::string& internalName )
 {
-  auto provider = Navi::make_NaviProvider( internalName );
+  auto provider = Navi::make_NaviProvider( internalName, m_pFw );
 
   if( provider->init() )
   {
