@@ -8,13 +8,14 @@
 
 namespace Sapphire::World::Navi
 {
+  const int32_t MAX_POLYS = 256;
+  const int32_t MAX_SMOOTH = 2048;
+
+  const int32_t NAVMESHSET_MAGIC = 'M' << 24 | 'S' << 16 | 'E' << 8 | 'T'; //'MSET'
+  const int32_t NAVMESHSET_VERSION = 1;
 
   class NaviProvider
   {
-
-    const int32_t NAVMESHSET_MAGIC = 'M' << 24 | 'S' << 16 | 'E' << 8 | 'T'; //'MSET'
-    const int32_t NAVMESHSET_VERSION = 1;
-
     struct NavMeshSetHeader
     {
       int32_t magic;
@@ -28,9 +29,6 @@ namespace Sapphire::World::Navi
       dtTileRef tileRef;
       int32_t dataSize;
     };
-
-    const int32_t MAX_POLYS = 256;
-    const int32_t MAX_SMOOTH = 2048;
 
   public:
     explicit NaviProvider( const std::string& internalName );
