@@ -12,8 +12,8 @@ namespace Sapphire::World::Navi
   class NaviProvider
   {
 
-    static const int32_t NAVMESHSET_MAGIC = 'M' << 24 | 'S' << 16 | 'E' << 8 | 'T'; //'MSET'
-    static const int32_t NAVMESHSET_VERSION = 1;
+    const int32_t NAVMESHSET_MAGIC = 'M' << 24 | 'S' << 16 | 'E' << 8 | 'T'; //'MSET'
+    const int32_t NAVMESHSET_VERSION = 1;
 
     struct NavMeshSetHeader
     {
@@ -29,11 +29,11 @@ namespace Sapphire::World::Navi
       int32_t dataSize;
     };
 
-    static const int32_t MAX_POLYS = 256;
-    static const int32_t MAX_SMOOTH = 2048;
+    const int32_t MAX_POLYS = 256;
+    const int32_t MAX_SMOOTH = 2048;
 
   public:
-    NaviProvider( const std::string& internalName );
+    explicit NaviProvider( const std::string& internalName );
 
     bool init();
     void loadMesh( const std::string& path );
@@ -55,12 +55,12 @@ namespace Sapphire::World::Navi
     float m_polyFindRange[ 3 ];
 
   private:
-    static int32_t fixupCorridor( dtPolyRef* path, int32_t npath, int32_t maxPath, const dtPolyRef* visited, int32_t nvisited );
-    static int32_t fixupShortcuts( dtPolyRef* path, int32_t npath, dtNavMeshQuery* navQuery );
-    inline static bool inRange( const float* v1, const float* v2, const float r, const float h );
-    static bool getSteerTarget( dtNavMeshQuery* navQuery, const float* startPos, const float* endPos, const float minTargetDist,
-		                const dtPolyRef* path, const int32_t pathSize, float* steerPos, uint8_t& steerPosFlag,
-			       	dtPolyRef& steerPosRef, float* outPoints = 0, int32_t* outPointCount = 0 );
+    int32_t fixupCorridor( dtPolyRef* path, int32_t npath, int32_t maxPath, const dtPolyRef* visited, int32_t nvisited );
+    int32_t fixupShortcuts( dtPolyRef* path, int32_t npath, dtNavMeshQuery* navQuery );
+    inline bool inRange( const float* v1, const float* v2, const float r, const float h );
+    bool getSteerTarget( dtNavMeshQuery* navQuery, const float* startPos, const float* endPos, const float minTargetDist,
+		                     const dtPolyRef* path, const int32_t pathSize, float* steerPos, uint8_t& steerPosFlag,
+			       	           dtPolyRef& steerPosRef, float* outPoints = 0, int32_t* outPointCount = 0 );
 
   };
 
