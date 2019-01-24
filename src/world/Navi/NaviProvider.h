@@ -6,43 +6,43 @@
 #include <recastnavigation/Detour/Include/DetourNavMesh.h>
 #include <recastnavigation/Detour/Include/DetourNavMeshQuery.h>
 
-namespace Sapphire
+namespace Sapphire::World::Navi
 {
 
   class NaviProvider
   {
 
-    static const int NAVMESHSET_MAGIC = 'M' << 24 | 'S' << 16 | 'E' << 8 | 'T'; //'MSET';
-    static const int NAVMESHSET_VERSION = 1;
+    static const int32_t NAVMESHSET_MAGIC = 'M' << 24 | 'S' << 16 | 'E' << 8 | 'T'; //'MSET'
+    static const int32_t NAVMESHSET_VERSION = 1;
 
     struct NavMeshSetHeader
     {
-      int magic;
-      int version;
-      int numTiles;
+      int32_t magic;
+      int32_t version;
+      int32_t numTiles;
       dtNavMeshParams params;
     };
 
     struct NavMeshTileHeader
     {
       dtTileRef tileRef;
-      int dataSize;
+      int32_t dataSize;
     };
 
-    static const int MAX_POLYS = 256;
-	  static const int MAX_SMOOTH = 2048;
+    static const int32_t MAX_POLYS = 256;
+    static const int32_t MAX_SMOOTH = 2048;
 
   public:
-    NaviProvider( const std::string internalName );
+    NaviProvider( const std::string& internalName );
 
     bool init();
-    void loadMesh( std::string path );
+    void loadMesh( const std::string& path );
     void initQuery();
 
-    void toDetourPos(const Common::FFXIVARR_POSITION3 position, float* out);
-    Sapphire::Common::FFXIVARR_POSITION3 toGamePos( float* pos );
+    void toDetourPos( const Common::FFXIVARR_POSITION3& position, float* out );
+    Common::FFXIVARR_POSITION3 toGamePos( float* pos );
 
-    std::vector< Sapphire::Common::FFXIVARR_POSITION3 > findFollowPath(Common::FFXIVARR_POSITION3 startPos, Common::FFXIVARR_POSITION3 endPos);
+    std::vector< Common::FFXIVARR_POSITION3 > findFollowPath( const Common::FFXIVARR_POSITION3& startPos, const Common::FFXIVARR_POSITION3& endPos );
 
     bool hasNaviMesh() const;
 
@@ -52,13 +52,15 @@ namespace Sapphire
     dtNavMesh* m_naviMesh;
     dtNavMeshQuery* m_naviMeshQuery;
 
-    float m_polyFindRange[3];
+    float m_polyFindRange[ 3 ];
 
   private:
-    static int fixupCorridor( dtPolyRef* path, const int npath, const int maxPath, const dtPolyRef* visited, const int nvisited );
-    static int fixupShortcuts( dtPolyRef* path, int npath, dtNavMeshQuery* navQuery );
+    static int32_t fixupCorridor( dtPolyRef* path, int32_t npath, int32_t maxPath, const dtPolyRef* visited, int32_t nvisited );
+    static int32_t fixupShortcuts( dtPolyRef* path, int32_t npath, dtNavMeshQuery* navQuery );
     inline static bool inRange( const float* v1, const float* v2, const float r, const float h );
-    static bool getSteerTarget( dtNavMeshQuery* navQuery, const float* startPos, const float* endPos, const float minTargetDist, const dtPolyRef* path, const int pathSize, float* steerPos, unsigned char& steerPosFlag, dtPolyRef& steerPosRef, float* outPoints = 0, int* outPointCount = 0 );
+    static bool getSteerTarget( dtNavMeshQuery* navQuery, const float* startPos, const float* endPos, const float minTargetDist,
+		                const dtPolyRef* path, const int32_t pathSize, float* steerPos, uint8_t& steerPosFlag,
+			       	dtPolyRef& steerPosRef, float* outPoints = 0, int32_t* outPointCount = 0 );
 
   };
 

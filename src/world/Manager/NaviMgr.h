@@ -1,11 +1,10 @@
 #ifndef SAPPHIRE_NAVIMGR_H
 #define SAPPHIRE_NAVIMGR_H
 
-#include "Forwards.h"
+#include "ForwardsZone.h"
 #include "BaseManager.h"
 
 #include <array>
-#include <Navi/NaviProvider.h>
 
 namespace Sapphire::World::Manager
 {
@@ -17,13 +16,13 @@ namespace Sapphire::World::Manager
     NaviMgr( FrameworkPtr pFw );
     virtual ~NaviMgr() = default;
 
-    bool setupTerritory( std::string internalName );
-    NaviProvider* getNaviProvider( std::string internalName );
+    bool setupTerritory( const std::string& internalName );
+    Navi::NaviProviderPtr getNaviProvider( const std::string& internalName );
 
   private:
     FrameworkPtr m_pFw;
 
-    std::unordered_map<std::string, NaviProvider*> m_naviProviderTerritoryMap;
+    std::unordered_map< std::string, Navi::NaviProviderPtr > m_naviProviderTerritoryMap;
   };
 
 }
