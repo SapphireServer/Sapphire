@@ -107,7 +107,7 @@ int32_t Sapphire::World::Navi::NaviProvider::fixupShortcuts( dtPolyRef* path, in
     return npath;
 
   // Get connected polygons
-  static const int32_t maxNeis = 16;
+  const int32_t maxNeis = 16;
   dtPolyRef neis[ maxNeis ];
   int32_t nneis = 0;
 
@@ -128,7 +128,7 @@ int32_t Sapphire::World::Navi::NaviProvider::fixupShortcuts( dtPolyRef* path, in
 
   // If any of the neighbour polygons is within the next few polygons
   // in the path, short cut to that polygon directly.
-  static const int32_t maxLookAhead = 6;
+  const int32_t maxLookAhead = 6;
   int32_t cut = 0;
   for( int32_t i = dtMin( maxLookAhead, npath ) - 1; i > 1 && cut == 0; i-- ) 
   {
@@ -166,7 +166,7 @@ bool Sapphire::World::Navi::NaviProvider::getSteerTarget( dtNavMeshQuery* navQue
                                                           float* outPoints, int32_t* outPointCount )
 {
   // Find steer target.
-  static const int32_t MAX_STEER_POINTS = 3;
+  const int32_t MAX_STEER_POINTS = 3;
   float steerPath[ MAX_STEER_POINTS * 3 ];
   uint8_t steerPathFlags[ MAX_STEER_POINTS ];
   dtPolyRef steerPathPolys[ MAX_STEER_POINTS ];
@@ -250,8 +250,8 @@ std::vector< Sapphire::Common::FFXIVARR_POSITION3 >
                    iterPos[ 0 ], iterPos[ 1 ], iterPos[ 2 ],
                    targetPos[ 0 ], targetPos[ 1 ], targetPos[ 2 ] );
 
-    static const float STEP_SIZE = 1.2f;
-    static const float SLOP = 0.15f;
+    const float STEP_SIZE = 1.2f;
+    const float SLOP = 0.15f;
 
     int32_t numSmoothPath = 0;
     float smoothPath[ MAX_SMOOTH * 3 ];
