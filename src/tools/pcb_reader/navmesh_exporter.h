@@ -30,7 +30,7 @@ public:
     auto fileName = zone.name + ".obj";
 
     auto end = std::chrono::high_resolution_clock::now();
-    printf( "[Navmesh] Finished exporting %s in %u ms\n",
+    printf( "[Navmesh] Finished exporting %s in %lu ms\n",
       fileName.c_str(),
       std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() );
   }
@@ -43,7 +43,7 @@ public:
 
     auto end = std::chrono::high_resolution_clock::now();
 
-    printf( "[Navmesh] Finished exporting %s in %u ms\n",
+    printf( "[Navmesh] Finished exporting %s in %lu ms\n",
       fileName.c_str(),
       std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() );
   }
