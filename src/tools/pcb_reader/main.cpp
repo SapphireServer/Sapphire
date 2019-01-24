@@ -399,13 +399,13 @@ int main( int argc, char* argv[] )
       //exportMgr.exportZone( exportedZone, ( ExportFileType )exportFileType );
 
 
-      printf( "Exported %s in %u seconds \n",
+      printf( "Exported %s in %lu seconds \n",
         zoneName.c_str(),
-        std::chrono::duration_cast< std::chrono::seconds >( std::chrono::high_resolution_clock::now() - entryStartTime ) );
+        std::chrono::duration_cast< std::chrono::seconds >( std::chrono::high_resolution_clock::now() - entryStartTime ).count() );
     }
     catch( std::exception& e )
     {
-      printf( ( std::string( e.what() ) + "\n" ).c_str() );
+      printf( "%s", ( std::string( e.what() ) + "\n" ).c_str() );
       printf( "Unable to extract collision data.\n" );
       printf( "Usage: pcb_reader2 territory \"path/to/game/sqpack/ffxiv\"\n" );
     }
@@ -413,14 +413,13 @@ int main( int argc, char* argv[] )
   exportMgr.waitForTasks();
   std::cout << "\n\n\n";
 
-  printf( "Finished all tasks in %u seconds\n",
+  printf( "Finished all tasks in %lu seconds\n",
             std::chrono::duration_cast< std::chrono::seconds >( std::chrono::high_resolution_clock::now() - startTime ).count() );
 
   getchar();
 
-  if( eData )
-    delete eData;
-  if( data1 )
-    delete data1;
+  delete eData;
+  delete data1;
+  
   return 0;
 }
