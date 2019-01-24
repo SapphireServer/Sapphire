@@ -31,7 +31,7 @@ namespace Sapphire::World::Navi
     };
 
   public:
-    explicit NaviProvider( const std::string& internalName );
+    explicit NaviProvider( const std::string& internalName, FrameworkPtr pFw );
 
     bool init();
     void loadMesh( const std::string& path );
@@ -60,6 +60,7 @@ namespace Sapphire::World::Navi
 		                     const dtPolyRef* path, const int32_t pathSize, float* steerPos, uint8_t& steerPosFlag,
 			       	           dtPolyRef& steerPosRef, float* outPoints = 0, int32_t* outPointCount = 0 );
 
+    FrameworkPtr m_pFw;
   };
 
 }
