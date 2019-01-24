@@ -179,19 +179,14 @@ void Sapphire::Entity::BNpc::step()
   }
 
   // This is probably not a good way to do it but works fine for now
-  float rot = Util::calcAngFrom( getPos().x, getPos().z, stepPos.x, stepPos.z );
-  float newRot = PI - rot + ( PI / 2 );
-
-  face( stepPos );
   float angle = Util::calcAngFrom( getPos().x, getPos().z, stepPos.x, stepPos.z ) + PI;
 
   auto x = ( cosf( angle ) * 1.1f );
-  auto y = ( getPos().y + stepPos.y ) * 0.5f; // Get speed from somewhere else?
+  auto y = stepPos.y;
   auto z = ( sinf( angle ) * 1.1f );
 
-  Common::FFXIVARR_POSITION3 newPos{ getPos().x + x, y, getPos().z + z };
-  setPos( newPos );
-  setRot( newRot );
+  setPos( { getPos().x + x, y, getPos().z + z } );
+  face( stepPos );
 
   sendPositionUpdate();
 }
