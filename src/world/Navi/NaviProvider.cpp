@@ -2,6 +2,8 @@
 #include <Framework.h>
 #include <Territory/Zone.h>
 #include <Logging/Logger.h>
+#include <Config/ConfigMgr.h>
+
 
 #include "NaviProvider.h"
 
@@ -11,21 +13,21 @@
 #include <recastnavigation/Recast/Include/Recast.h>
 #include <experimental/filesystem>
 
-
-Sapphire::World::Navi::NaviProvider::NaviProvider( const std::string& internalName ) :
+Sapphire::World::Navi::NaviProvider::NaviProvider( const std::string& internalName, FrameworkPtr pFw ) :
   m_naviMesh( nullptr ),
   m_naviMeshQuery( nullptr ),
-  m_internalName( internalName )
+  m_internalName( internalName ),
+  m_pFw( pFw )
 {
   // Set defaults
-  m_polyFindRange[0] = 10;
-  m_polyFindRange[1] = 20;
-  m_polyFindRange[2] = 10;
+  m_polyFindRange[ 0 ] = 10;
+  m_polyFindRange[ 1 ] = 20;
+  m_polyFindRange[ 2 ] = 10;
 }
 
 bool Sapphire::World::Navi::NaviProvider::init()
 {
-  auto meshesFolder = std::experimental::filesystem::path( "navi" );
+  auto meshesFolder = std::experimental::filesystem::path( m_pFw->get< Sapphire::ConfigMgr >()->getValue< std::string >( "Navigation", "MeshPath", "navi" ) );
   auto meshFolder = meshesFolder / std::experimental::filesystem::path( m_internalName );
 
   if( std::experimental::filesystem::exists( meshFolder ) )
