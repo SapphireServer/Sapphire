@@ -96,6 +96,8 @@ bool Sapphire::World::ServerMgr::loadSettings( int32_t argc, char* argv[] )
   m_config.scripts.path = pConfig->getValue< std::string >( "Scripts", "Path", "./compiledscripts/" );
   m_config.scripts.cachePath = pConfig->getValue< std::string >( "Scripts", "CachePath", "./cache/" );
 
+  m_config.navigation.meshPath = pConfig->getValue< std::string >( "Navigation", "MeshPath", "navi" );
+
   m_config.network.disconnectTimeout = pConfig->getValue< uint16_t >( "Network", "DisconnectTimeout", 20 );
   m_config.network.listenIp = pConfig->getValue< std::string >( "Network", "ListenIp", "0.0.0.0" );
   m_config.network.listenPort = pConfig->getValue< uint16_t >( "Network", "ListenPort", 54992 );

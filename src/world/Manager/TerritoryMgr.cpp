@@ -173,8 +173,8 @@ bool Sapphire::World::Manager::TerritoryMgr::createDefaultTerritories()
                   territoryInfo->territoryIntendedUse,
                   territoryInfo->name,
                   ( isPrivateTerritory( territoryTypeId ) ? "PRIVATE" : "PUBLIC" ),
-                  pPlaceName->name,
-                  hasNaviMesh ? "NAVI" : "");
+                  hasNaviMesh ? "NAVI" : "",
+                  pPlaceName->name );
 
     auto pZone = make_Zone( territoryTypeId, guid, territoryInfo->name, pPlaceName->name, framework() );
     pZone->init();
@@ -199,7 +199,7 @@ bool Sapphire::World::Manager::TerritoryMgr::createHousingTerritories()
     auto territoryTypeId = territory.first;
     auto territoryInfo = territory.second;
     uint32_t wardNum;
-    uint32_t wardMaxNum = 1;
+    uint32_t wardMaxNum = 18;
 
     if( territoryInfo->name.empty() )
       continue;
@@ -213,7 +213,7 @@ bool Sapphire::World::Manager::TerritoryMgr::createHousingTerritories()
     {
       uint32_t guid = getNextInstanceId();
 
-      Logger::info( "{0}\t{1}\t{2}\t{3:<10}\tHOUSING\t{4}#{5}",
+      Logger::info( "{0}\t{1}\t{2}\t{3:<10}\tHOUSING\t\t{4}#{5}",
                     territoryTypeId,
                     guid,
                     territoryInfo->territoryIntendedUse,
@@ -224,7 +224,6 @@ bool Sapphire::World::Manager::TerritoryMgr::createHousingTerritories()
       auto pHousingZone = make_HousingZone( wardNum, territoryTypeId, guid, territoryInfo->name,
                                             pPlaceName->name, framework() );
       pHousingZone->init();
-      wardMaxNum = 18;
 
       InstanceIdToZonePtrMap instanceMap;
       instanceMap[ guid ] = pHousingZone;

@@ -2,7 +2,7 @@
 #include <Framework.h>
 #include <Territory/Zone.h>
 #include <Logging/Logger.h>
-#include <Config/ConfigMgr.h>
+#include <ServerMgr.h>
 
 
 #include "NaviProvider.h"
@@ -27,7 +27,9 @@ Sapphire::World::Navi::NaviProvider::NaviProvider( const std::string& internalNa
 
 bool Sapphire::World::Navi::NaviProvider::init()
 {
-  auto meshesFolder = std::experimental::filesystem::path( m_pFw->get< Sapphire::ConfigMgr >()->getValue< std::string >( "Navigation", "MeshPath", "navi" ) );
+  auto& cfg = m_pFw->get< Sapphire::World::ServerMgr >()->getConfig();
+
+  auto meshesFolder = std::experimental::filesystem::path( cfg.navigation.meshPath );
   auto meshFolder = meshesFolder / std::experimental::filesystem::path( m_internalName );
 
   if( std::experimental::filesystem::exists( meshFolder ) )
