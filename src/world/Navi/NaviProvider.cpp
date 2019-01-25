@@ -36,7 +36,8 @@ bool Sapphire::World::Navi::NaviProvider::init()
   {
     auto baseMesh = meshFolder / std::experimental::filesystem::path( m_internalName + ".nav" );
 
-    loadMesh( baseMesh.string() );
+    if( !loadMesh( baseMesh.string() ) )
+      return false;
 
     initQuery();
 
@@ -376,11 +377,14 @@ std::vector< Sapphire::Common::FFXIVARR_POSITION3 >
   return resultCoords;
 }
 
-void Sapphire::World::Navi::NaviProvider::loadMesh( const std::string& path )
+bool Sapphire::World::Navi::NaviProvider::loadMesh( const std::string& path )
 {
   FILE* fp = fopen( path.c_str(), "rb" );
   if( !fp )
-    throw std::runtime_error( "Could open navimesh file" );
+  {
+    Logger::error( "Couldn't open navimesh file: {0}", path );
+    return false;
+  }
 
   // Read header.
   NavMeshSetHeader header;
@@ -389,19 +393,22 @@ void Sapphire::World::Navi::NaviProvider::loadMesh( const std::string& path )
   if( readLen != 1 )
   {
     fclose( fp );
-    throw std::runtime_error( "Could not read NavMeshSetHeader" );
+    Logger::error( "Couldn't read NavMeshSetHeader for {0}", path );
+    return false;
   }
 
   if( header.magic != NAVMESHSET_MAGIC )
   {
     fclose( fp );
-    throw std::runtime_error( "Not a NavMeshSet" );
+    Logger::error( "'{0}' has an incorrect NavMeshSet header.", path );
+    return false;
   }
 
   if( header.version != NAVMESHSET_VERSION )
   {
     fclose( fp );
-    throw std::runtime_error( "Invalid NavMeshSet version" );
+    Logger::error( "'{0}' has an incorrect NavMeshSet version. Expected '{1}', got '{2}'", path, NAVMESHSET_VERSION, header.version );
+    return false;
   }
 
   if( !m_naviMesh )
@@ -410,14 +417,16 @@ void Sapphire::World::Navi::NaviProvider::loadMesh( const std::string& path )
     if( !m_naviMesh )
     {
       fclose( fp );
-      throw std::runtime_error( "Could not allocate dtNavMesh" );
+      Logger::error( "Couldn't allocate dtNavMesh" );
+      return false;
     }
 
     dtStatus status = m_naviMesh->init( &header.params );
     if( dtStatusFailed( status ) )
     {
       fclose( fp );
-      throw std::runtime_error( "Could not initialize dtNavMesh" );
+      Logger::error( "Couldn't initialise dtNavMesh" );
+      return false;
     }
   }
 
@@ -429,13 +438,14 @@ void Sapphire::World::Navi::NaviProvider::loadMesh( const std::string& path )
     if( readLen != 1 )
     {
       fclose( fp );
-      throw std::runtime_error( "Could not read NavMeshTileHeader" );
+      Logger::error( "Couldn't read NavMeshTileHeader from '{0}'", path );
+      return false;
     }
 
     if( !tileHeader.tileRef || !tileHeader.dataSize )
       break;
 
-    uint8_t* data = reinterpret_cast< uint8_t* >( dtAlloc( tileHeader.dataSize, DT_ALLOC_PERM ) );
+    auto data = reinterpret_cast< uint8_t* >( dtAlloc( tileHeader.dataSize, DT_ALLOC_PERM ) );
     if( !data ) 
       break;
     memset( data, 0, tileHeader.dataSize );
@@ -444,11 +454,15 @@ void Sapphire::World::Navi::NaviProvider::loadMesh( const std::string& path )
     {
       dtFree( data );
       fclose( fp );
-      throw std::runtime_error( "Could not read tile data" );
+
+      Logger::error( "Couldn't read tile data from '{0}'", path );
+      return false;
     }
 
     m_naviMesh->addTile( data, tileHeader.dataSize, DT_TILE_FREE_DATA, tileHeader.tileRef, 0 );
   }
 
   fclose( fp );
+
+  return true;
 }

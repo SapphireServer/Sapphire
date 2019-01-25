@@ -53,7 +53,7 @@ bool Sapphire::Scripting::ScriptMgr::init()
 
   if( !status )
   {
-    Logger::error( "ScriptMgr: failed to load scripts, the server will not function correctly without scripts loaded." );
+    Logger::error( "ScriptMgr: failed to load modules, the server will not function correctly without scripts loaded." );
     return false;
   }
 
