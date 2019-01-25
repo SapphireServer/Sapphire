@@ -22,6 +22,8 @@ namespace Sapphire::World::Manager
   private:
     FrameworkPtr m_pFw;
 
+    std::string getBgName( const std::string& bgPath );
+
     std::unordered_map< std::string, Navi::NaviProviderPtr > m_naviProviderTerritoryMap;
   };
 
