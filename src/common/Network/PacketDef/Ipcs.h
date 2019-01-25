@@ -229,6 +229,12 @@ namespace Sapphire::Network::Packets
     IPCTYPE_UNK_320 = 0x0253, // updated 4.5
     IPCTYPE_UNK_322 = 0x0255, // updated 4.5
 
+
+    MahjongTileDiscard = 0x02C1, // Other player discards a tile, chi(1)/pon(2)/kan(4)/ron(8) flags etc..
+    MahjongPlayersInfo = 0x02C2, // actor id, name, rating, stuff..
+    MahjongOpenGui = 0x02BC, // players must be spawned beforehand
+    MahjongNextRound = 0x02BD, // initial hands, # of riichi(???), winds, honba #, scores, seats and stuff..
+    MahjongTileTsumo = 0x02BE, // Other player tsumo(tile drawn)
   };
 
   /**
