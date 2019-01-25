@@ -40,7 +40,10 @@ namespace Sapphire::World::Navi
     void toDetourPos( const Common::FFXIVARR_POSITION3& position, float* out );
     Common::FFXIVARR_POSITION3 toGamePos( float* pos );
 
-    std::vector< Common::FFXIVARR_POSITION3 > findFollowPath( const Common::FFXIVARR_POSITION3& startPos, const Common::FFXIVARR_POSITION3& endPos );
+    std::vector< Common::FFXIVARR_POSITION3 > findFollowPath( const Common::FFXIVARR_POSITION3& startPos,
+                                                              const Common::FFXIVARR_POSITION3& endPos );
+    Common::FFXIVARR_POSITION3 findRandomPositionInCircle( const Sapphire::Common::FFXIVARR_POSITION3& startPos,
+                                                           float maxRadius );
 
     bool hasNaviMesh() const;
 

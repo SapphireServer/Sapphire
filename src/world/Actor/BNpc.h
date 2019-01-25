@@ -24,6 +24,7 @@ namespace Sapphire::Entity
     Idle,
     Combat,
     Retreat,
+    Roaming,
     JustDied,
     Dead,
   };
@@ -103,8 +104,10 @@ namespace Sapphire::Entity
     uint8_t m_level;
 
     uint32_t m_timeOfDeath;
+    uint32_t m_lastRoamTargetReached;
 
     Common::FFXIVARR_POSITION3 m_spawnPos;
+    Common::FFXIVARR_POSITION3 m_roamPos;
 
     BNpcState m_state;
     std::set< std::shared_ptr< HateListEntry > > m_hateList;
