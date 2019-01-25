@@ -760,7 +760,7 @@ bool Sapphire::Zone::loadSpawnGroups()
 
     m_spawnGroups.emplace_back( id, templateId, level, maxHp );
 
-    Logger::debug( "id: {0}, template: {1}, level: {2}, maxHp: {3}", id, m_spawnGroups.back().getTemplateId(), level, maxHp );
+    Logger::trace( "id: {0}, template: {1}, level: {2}, maxHp: {3}", id, m_spawnGroups.back().getTemplateId(), level, maxHp );
   }
 
   res.reset();
@@ -783,7 +783,7 @@ bool Sapphire::Zone::loadSpawnGroups()
 
       group.getSpawnPointList().emplace_back( std::make_shared< Entity::SpawnPoint >( x, y, z, r, gimmickId ) );
 
-      Logger::debug( "id: {0}, x: {1}, y: {2}, z: {3}, gimmickId: {4}", id, x, y, z, gimmickId );
+      Logger::trace( "id: {0}, x: {1}, y: {2}, z: {3}, gimmickId: {4}", id, x, y, z, gimmickId );
     }
   }
   return false;
