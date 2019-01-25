@@ -161,32 +161,25 @@ void Sapphire::Entity::BNpc::step()
     // No path to track
     return;
 
-  if( Util::distance( getPos().x, getPos().y, getPos().z, m_naviTarget.x, m_naviTarget.y, m_naviTarget.z ) <= 4 )
-  {
-    // Reached target
-    m_naviLastPath.clear();
-    return;
-  }
-
   auto stepPos = m_naviLastPath[ m_naviPathStep ];
 
-  if( Util::distance( getPos().x, getPos().y, getPos().z, stepPos.x, stepPos.y, stepPos.z ) <= 4 && m_naviPathStep < m_naviLastPath.size() - 1 )
+  if( Util::distance( getPos().x, getPos().y, getPos().z, stepPos.x, stepPos.y, stepPos.z ) <= 4 &&
+      m_naviPathStep < m_naviLastPath.size() - 1 )
   {
     // Reached step in path
     m_naviPathStep++;
-
     stepPos = m_naviLastPath[ m_naviPathStep ];
   }
 
   // This is probably not a good way to do it but works fine for now
   float angle = Util::calcAngFrom( getPos().x, getPos().z, stepPos.x, stepPos.z ) + PI;
 
-  auto x = ( cosf( angle ) * 1.1f );
+  auto x = ( cosf( angle ) * 1.7f );
   auto y = stepPos.y;
-  auto z = ( sinf( angle ) * 1.1f );
+  auto z = ( sinf( angle ) * 1.7f );
 
-  setPos( { getPos().x + x, y, getPos().z + z } );
   face( stepPos );
+  setPos( { getPos().x + x, y, getPos().z + z } );
 
   sendPositionUpdate();
 }
@@ -194,12 +187,11 @@ void Sapphire::Entity::BNpc::step()
 bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 {
   if( Util::distance( getPos().x, getPos().y, getPos().z, pos.x, pos.y, pos.z ) <= 4 )
+  {
     // Reached destination
+    m_naviLastPath.clear();
     return true;
-
-  if( m_naviTarget.x == pos.x && m_naviTarget.y == pos.y && m_naviTarget.z == pos.z )
-    // Targets are the same
-    return false;
+  }
 
   // Check if we have to recalculate
   if( Util::getTimeMs() - m_naviLastUpdate > 500 )
@@ -224,29 +216,13 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     }
     else
     {
-      Logger::debug( "No path found from x{0} y{1} z{2} to x{3} y{4} z{5} in {6}", getPos().x, getPos().y, getPos().z, pos.x, pos.y, pos.z, m_pCurrentZone->getInternalName() );
+      Logger::debug( "No path found from x{0} y{1} z{2} to x{3} y{4} z{5} in {6}",
+                     getPos().x, getPos().y, getPos().z, pos.x, pos.y, pos.z, m_pCurrentZone->getInternalName() );
     }
   }
-  /*
-  float rot = Util::calcAngFrom( getPos().x, getPos().z, pos.x, pos.z ); 
-  float newRot = PI - rot + ( PI / 2 );
 
-  face( pos );
-  float angle = Util::calcAngFrom( getPos().x, getPos().z, pos.x, pos.z ) + PI;
 
-  auto x = ( cosf( angle ) * 1.1f );
-  auto y = ( getPos().y + pos.y ) * 0.5f; // fake value while there is no collision
-  auto z = ( sinf( angle ) * 1.1f );
-
-  Common::FFXIVARR_POSITION3 newPos{ getPos().x + x, y, getPos().z + z };
-  setPos( newPos );
-
-  Common::FFXIVARR_POSITION3 tmpPos{ getPos().x + x, y, getPos().z + z };
-  setPos( tmpPos );
-  setRot( newRot );
-
-  sendPositionUpdate();
-  */
+  step();
 
   return false;
 }
@@ -377,6 +353,7 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
   const uint8_t minActorDistance = 4;
   const uint8_t aggroRange = 8;
   const uint8_t maxDistanceToOrigin = 40;
+  const uint32_t roamTick = 20;
 
   switch( m_state )
   {
@@ -391,8 +368,28 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
     }
     break;
 
+    case BNpcState::Roaming:
+    {
+      if( moveTo( m_roamPos ) )
+      {
+        m_lastRoamTargetReached = Util::getTimeSeconds();
+        m_state = BNpcState::Idle;
+      }
+
+      // checkaggro
+    }
+    break;
+
     case BNpcState::Idle:
     {
+      if( Util::getTimeSeconds() - m_lastRoamTargetReached > roamTick )
+      {
+        auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
+        auto pNaviProvider = pNaviMgr->getNaviProvider( m_pCurrentZone->getBgPath() );
+        m_roamPos = pNaviProvider->findRandomPositionInCircle( m_spawnPos, 5 );
+        m_state = BNpcState::Roaming;
+      }
+
       // passive mobs should ignore players unless aggro'd
       if( m_aggressionMode == 1 )
         return;
@@ -465,7 +462,6 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
     }
   }
 
-  step();
 }
 
 void Sapphire::Entity::BNpc::onActionHostile( Sapphire::Entity::CharaPtr pSource )

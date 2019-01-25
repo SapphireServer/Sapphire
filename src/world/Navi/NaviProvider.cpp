@@ -4,6 +4,7 @@
 #include <Logging/Logger.h>
 #include <ServerMgr.h>
 
+#include <Manager/RNGMgr.h>
 
 #include "NaviProvider.h"
 
@@ -210,6 +211,60 @@ bool Sapphire::World::Navi::NaviProvider::getSteerTarget( dtNavMeshQuery* navQue
   return true;
 }
 
+static float frand()
+{
+  return ( float ) rand() / (float)RAND_MAX;
+}
+
+
+Sapphire::Common::FFXIVARR_POSITION3
+  Sapphire::World::Navi::NaviProvider::findRandomPositionInCircle( const Sapphire::Common::FFXIVARR_POSITION3& startPos,
+                                                                   float maxRadius )
+{
+  dtStatus status;
+
+  float spos[ 3 ] = { startPos.x, startPos.y, startPos.z };
+
+  float polyPickExt[ 3 ];
+  polyPickExt[ 0 ] = 30;
+  polyPickExt[ 1 ] = 60;
+  polyPickExt[ 2 ] = 30;
+
+  float randomPt[ 3 ];
+  float snearest[ 3 ];
+
+  dtQueryFilter filter;
+  filter.setIncludeFlags( 0xffff );
+  filter.setExcludeFlags( 0 );
+
+  dtPolyRef startRef;
+  dtPolyRef randomRef;
+
+  status = m_naviMeshQuery->findNearestPoly( spos, polyPickExt, &filter, &startRef, snearest );
+
+  if( dtStatusFailed( status ) )
+  {
+    return {};
+  }
+
+  if( !m_naviMesh->isValidPolyRef( startRef ) )
+  {
+    return {};
+  }
+
+  auto pRNGMgr = m_pFw->get< World::Manager::RNGMgr >();
+  auto rng = pRNGMgr->getRandGenerator< float >( 0.f, 1.f );
+  status = m_naviMeshQuery->findRandomPointAroundCircle( startRef, spos, maxRadius, &filter, frand,
+             &randomRef, randomPt);
+
+  if( dtStatusFailed( status ) )
+  {
+    return {};
+  }
+
+  return { randomPt[ 0 ], randomPt[ 1 ], randomPt[ 2 ] };
+}
+
 std::vector< Sapphire::Common::FFXIVARR_POSITION3 > 
   Sapphire::World::Navi::NaviProvider::findFollowPath( const Common::FFXIVARR_POSITION3& startPos,
                                                        const Common::FFXIVARR_POSITION3& endPos )
@@ -251,9 +306,9 @@ std::vector< Sapphire::Common::FFXIVARR_POSITION3 >
     m_naviMeshQuery->closestPointOnPoly( startRef, spos, iterPos, 0 );
     m_naviMeshQuery->closestPointOnPoly( polys[ npolys - 1 ], epos, targetPos, 0 );
 
-    Logger::debug( "IterPos: {0} {1} {2}; TargetPos: {3} {4} {5}",
-                   iterPos[ 0 ], iterPos[ 1 ], iterPos[ 2 ],
-                   targetPos[ 0 ], targetPos[ 1 ], targetPos[ 2 ] );
+    //Logger::debug( "IterPos: {0} {1} {2}; TargetPos: {3} {4} {5}",
+    //               iterPos[ 0 ], iterPos[ 1 ], iterPos[ 2 ],
+    //               targetPos[ 0 ], targetPos[ 1 ], targetPos[ 2 ] );
 
     const float STEP_SIZE = 1.2f;
     const float SLOP = 0.15f;
@@ -370,7 +425,7 @@ std::vector< Sapphire::Common::FFXIVARR_POSITION3 >
 
     for( int32_t i = 0; i < numSmoothPath; i += 3 )
     {
-      resultCoords.push_back( Common::FFXIVARR_POSITION3{ smoothPath[ i ], smoothPath[ i + 1 ], smoothPath[ i + 2 ] } );
+      resultCoords.emplace_back( Common::FFXIVARR_POSITION3{ smoothPath[ i ], smoothPath[ i + 1 ], smoothPath[ i + 2 ] } );
     }
   }
 
