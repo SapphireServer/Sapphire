@@ -34,7 +34,7 @@ namespace Sapphire::World::Navi
     explicit NaviProvider( const std::string& internalName, FrameworkPtr pFw );
 
     bool init();
-    void loadMesh( const std::string& path );
+    bool loadMesh( const std::string& path );
     void initQuery();
 
     void toDetourPos( const Common::FFXIVARR_POSITION3& position, float* out );

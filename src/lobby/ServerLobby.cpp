@@ -63,6 +63,8 @@ namespace Sapphire
       return;
     }
 
+    Logger::setLogLevel( m_config.global.general.logLevel );
+
     auto pFw = std::make_shared< Framework >();
     Network::HivePtr hive( new Network::Hive() );
     Network::addServerToHive< Network::GameConnection >( m_ip, m_port, hive, pFw );

@@ -129,6 +129,8 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
     return;
   }
 
+  Logger::setLogLevel( m_config.global.general.logLevel );
+
   Logger::info( "Setting up generated EXD data" );
   auto pExdData = std::make_shared< Data::ExdDataGenerated >();
   auto dataPath = m_config.global.general.dataPath;
