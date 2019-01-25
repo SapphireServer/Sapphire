@@ -386,6 +386,13 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
       {
         auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
         auto pNaviProvider = pNaviMgr->getNaviProvider( m_pCurrentZone->getBgPath() );
+
+        if( !pNaviProvider )
+        {
+          m_lastRoamTargetReached = Util::getTimeSeconds();
+          break;
+        }
+
         m_roamPos = pNaviProvider->findRandomPositionInCircle( m_spawnPos, 5 );
         m_state = BNpcState::Roaming;
       }
