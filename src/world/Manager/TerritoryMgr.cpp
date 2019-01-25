@@ -167,14 +167,14 @@ bool Sapphire::World::Manager::TerritoryMgr::createDefaultTerritories()
     auto pNaviMgr = framework()->get< Manager::NaviMgr >();
     bool hasNaviMesh = pNaviMgr->setupTerritory( territoryInfo->name );
 
-    Logger::info( "{0}\t{1}\t{2}\t{3:<10}\t{4}\t{5}\t{6}",
+    Logger::info( "{0}\t{1}\t{2}\t{3:<10}\t{4}\t{5:<6}{6}",
                   territoryTypeId,
                   guid,
                   territoryInfo->territoryIntendedUse,
                   territoryInfo->name,
                   ( isPrivateTerritory( territoryTypeId ) ? "PRIVATE" : "PUBLIC" ),
-                  pPlaceName->name,
-                  hasNaviMesh ? "NAVI" : "");
+                  hasNaviMesh ? "NAVI" : "",
+                  pPlaceName->name );
 
     auto pZone = make_Zone( territoryTypeId, guid, territoryInfo->name, pPlaceName->name, framework() );
     pZone->init();

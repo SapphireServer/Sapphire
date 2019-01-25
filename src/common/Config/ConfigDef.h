@@ -56,6 +56,11 @@ namespace Sapphire::Common::Config
       bool hotSwap;
     } scripts;
 
+    struct Navigation
+    {
+      std::string meshPath;
+    } navigation;
+
     std::string motd;
   };
 
