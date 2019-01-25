@@ -8,12 +8,12 @@ Sapphire::World::Manager::NaviMgr::NaviMgr( FrameworkPtr pFw ) :
 {
 }
 
-bool Sapphire::World::Manager::NaviMgr::setupTerritory( const std::string& internalName )
+bool Sapphire::World::Manager::NaviMgr::setupTerritory( const std::string& bgPath )
 {
   std::string bg;
-  auto findPos = internalName.find_last_of( "/" );
+  auto findPos = bgPath.find_last_of( "/" );
   if( findPos != std::string::npos )
-    bg = internalName.substr( findPos + 1 );
+    bg = bgPath.substr( findPos + 1 );
 
   auto provider = Navi::make_NaviProvider( bg, m_pFw );
 
@@ -26,12 +26,12 @@ bool Sapphire::World::Manager::NaviMgr::setupTerritory( const std::string& inter
   return false;
 }
 
-Sapphire::World::Navi::NaviProviderPtr Sapphire::World::Manager::NaviMgr::getNaviProvider( const std::string& internalName )
+Sapphire::World::Navi::NaviProviderPtr Sapphire::World::Manager::NaviMgr::getNaviProvider( const std::string& bgPath )
 {
   std::string bg;
-  auto findPos = internalName.find_last_of( "/" );
+  auto findPos = bgPath.find_last_of( "/" );
   if( findPos != std::string::npos )
-    bg = internalName.substr( findPos + 1 );
+    bg = bgPath.substr( findPos + 1 );
 
   if( m_naviProviderTerritoryMap.find( bg ) != m_naviProviderTerritoryMap.end() )
     return m_naviProviderTerritoryMap[ bg ];
