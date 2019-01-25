@@ -79,6 +79,7 @@ Sapphire::Zone::Zone( uint16_t territoryTypeId, uint32_t guId,
 
   m_weatherOverride = Weather::None;
   m_territoryTypeInfo = pExdData->get< Sapphire::Data::TerritoryType >( territoryTypeId );
+  m_bgPath = m_territoryTypeInfo->bg;
 
   loadWeatherRates();
   loadSpawnGroups();
@@ -350,6 +351,11 @@ const std::string& Sapphire::Zone::getName() const
 const std::string& Sapphire::Zone::getInternalName() const
 {
   return m_internalName;
+}
+
+const std::string& Sapphire::Zone::getBgPath() const
+{
+  return m_bgPath;
 }
 
 std::size_t Sapphire::Zone::getPopCount() const

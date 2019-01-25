@@ -166,12 +166,7 @@ bool Sapphire::World::Manager::TerritoryMgr::createDefaultTerritories()
 
     auto pNaviMgr = framework()->get< Manager::NaviMgr >();
     std::string bgPath = territoryInfo->bg;
-    std::string bg;
-    auto findPos = bgPath.find_last_of( "/" );
-    if( findPos != std::string::npos )
-      bg = bgPath.substr( findPos + 1 );
-
-    bool hasNaviMesh = pNaviMgr->setupTerritory( bg );
+    bool hasNaviMesh = pNaviMgr->setupTerritory( bgPath );
 
     Logger::info( "{0}\t{1}\t{2}\t{3:<10}\t{4}\t{5}\t{6}",
                   territoryTypeId,
