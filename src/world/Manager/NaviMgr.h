@@ -16,8 +16,8 @@ namespace Sapphire::World::Manager
     NaviMgr( FrameworkPtr pFw );
     virtual ~NaviMgr() = default;
 
-    bool setupTerritory( const std::string& internalName );
-    Navi::NaviProviderPtr getNaviProvider( const std::string& internalName );
+    bool setupTerritory( const std::string& bgPath );
+    Navi::NaviProviderPtr getNaviProvider( const std::string& bgPath );
 
   private:
     FrameworkPtr m_pFw;
