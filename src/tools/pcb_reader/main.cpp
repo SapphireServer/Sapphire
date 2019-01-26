@@ -206,6 +206,7 @@ int main( int argc, char* argv[] )
     zoneDumpList.emplace( zoneName );
   }
 
+  int zoneCount = 0;
   for( auto zoneName : zoneDumpList )
   {
     try
@@ -495,7 +496,8 @@ int main( int argc, char* argv[] )
         }
       }
       exportMgr.exportZone( exportedZone, static_cast< ExportFileType >( exportFileType ) );
-
+      if( zoneCount++ % 3 == 0 )
+        pCache->purge();
 
       printf( "Exported %s in %lu seconds \n",
         zoneName.c_str(),
@@ -508,6 +510,7 @@ int main( int argc, char* argv[] )
       printf( "Usage: pcb_reader2 territory \"path/to/game/sqpack/ffxiv\"\n" );
     }
   }
+  pCache->purge();
   exportMgr.waitForTasks();
   std::cout << "\n\n\n";
 

@@ -32,14 +32,17 @@ public:
 
   void exportGroup( const std::string& zoneName, const ExportedGroup& group, ExportFileType exportFileTypes )
   {
-    if( exportFileTypes & ExportFileType::WavefrontObj )
+    m_threadpool.queue( [zoneName, group, exportFileTypes]()
     {
-      m_threadpool.queue( [zoneName, group](){ ObjExporter::exportGroup( zoneName, group ); } );
-    }
-//    if( exportFileTypes & ExportFileType::Navmesh )
-//    {
-//      m_threadpool.queue( [zoneName, group](){ NavmeshExporter::exportGroup( zoneName, group ); } );
-//    }
+      if( exportFileTypes & ExportFileType::WavefrontObj )
+      {
+        ObjExporter::exportGroup( zoneName, group );
+      }
+      if( exportFileTypes & ExportFileType::Navmesh )
+      {
+        NavmeshExporter::exportGroup( zoneName, group );
+      }
+    });
   }
 
   void waitForTasks()
