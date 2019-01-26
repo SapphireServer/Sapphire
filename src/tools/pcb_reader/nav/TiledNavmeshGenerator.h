@@ -3,7 +3,7 @@
 
 #include <string>
 #include <cassert>
-#include <experimental/filesystem>
+#include <cmath>
 
 #include "ext/MeshLoaderObj.h"
 #include "ext/ChunkyTriMesh.h"
@@ -12,147 +12,112 @@
 #include "recastnavigation/Detour/Include/DetourNavMeshQuery.h"
 #include "recastnavigation/Recast/Include/Recast.h"
 
-namespace fs = std::experimental::filesystem;
-
 class TiledNavmeshGenerator
 {
+public:
+  enum SamplePartitionType
+  {
+    SAMPLE_PARTITION_WATERSHED,
+    SAMPLE_PARTITION_MONOTONE,
+    SAMPLE_PARTITION_LAYERS,
+  };
+
+  enum SamplePolyAreas
+  {
+    SAMPLE_POLYAREA_GROUND,
+    SAMPLE_POLYAREA_WATER,
+    SAMPLE_POLYAREA_ROAD,
+    SAMPLE_POLYAREA_DOOR,
+    SAMPLE_POLYAREA_GRASS,
+    SAMPLE_POLYAREA_JUMP,
+  };
+  enum SamplePolyFlags
+  {
+    SAMPLE_POLYFLAGS_WALK		= 0x01,		// Ability to walk (ground, grass, road)
+    SAMPLE_POLYFLAGS_SWIM		= 0x02,		// Ability to swim (water).
+    SAMPLE_POLYFLAGS_DOOR		= 0x04,		// Ability to move through doors.
+    SAMPLE_POLYFLAGS_JUMP		= 0x08,		// Ability to jump.
+    SAMPLE_POLYFLAGS_DISABLED	= 0x10,		// Disabled polygon
+    SAMPLE_POLYFLAGS_ALL		= 0xffff	// All abilities.
+  };
+
+  static const int NAVMESHSET_MAGIC = 'M'<<24 | 'S'<<16 | 'E'<<8 | 'T'; //'MSET';
+  static const int NAVMESHSET_VERSION = 1;
+
+  struct NavMeshSetHeader
+  {
+    int magic;
+    int version;
+    int numTiles;
+    dtNavMeshParams params;
+  };
+
+  struct NavMeshTileHeader
+  {
+    dtTileRef tileRef;
+    int dataSize;
+  };
+
+
+  TiledNavmeshGenerator() = default;
+  ~TiledNavmeshGenerator();
+
+  bool init( const std::string& path );
+  unsigned char* buildTileMesh( const int tx, const int ty, const float* bmin, const float* bmax, int& dataSize );
+  bool buildNavmesh();
+  void saveNavmesh( const std::string& name );
+
 private:
+  rcConfig m_cfg;
+
   rcMeshLoaderObj* m_mesh;
   rcChunkyTriMesh* m_chunkyMesh;
 
+  rcContext* m_ctx;
   dtNavMesh* m_navMesh;
   dtNavMeshQuery* m_navQuery;
+  rcHeightfield* m_solid;
+  rcContourSet* m_cset;
+  rcPolyMesh* m_pmesh;
+  rcPolyMeshDetail* m_dmesh;
 
+  rcCompactHeightfield* m_chf;
 
-  float m_meshBMin[ 3 ];
-  float m_meshBMax[ 3 ];
-
-  float m_tileSize = 160.f;
-  float m_cellSize = 0.2f;
+  unsigned char* m_triareas;
 
   int m_maxTiles = 0;
   int m_maxPolysPerTile = 0;
 
-  inline unsigned int nextPow2( uint32_t v )
-  {
-    v--;
-    v |= v >> 1;
-    v |= v >> 2;
-    v |= v >> 4;
-    v |= v >> 8;
-    v |= v >> 16;
-    v++;
-    return v;
-  }
+  int m_tileTriCount = 0;
 
-  inline unsigned int ilog2( uint32_t v )
-  {
-    uint32_t r;
-    uint32_t shift;
-    r = (v > 0xffff) << 4; v >>= r;
-    shift = (v > 0xff) << 3; v >>= shift; r |= shift;
-    shift = (v > 0xf) << 2; v >>= shift; r |= shift;
-    shift = (v > 0x3) << 1; v >>= shift; r |= shift;
-    r |= (v >> 1);
-    return r;
-  }
+  int m_partitionType = SamplePartitionType::SAMPLE_PARTITION_WATERSHED;
 
+  // options
+  float m_meshBMin[ 3 ];
+  float m_meshBMax[ 3 ];
 
-public:
-  explicit TiledNavmeshGenerator( const std::string& path )
-  {
-    if( !fs::exists( path ) )
-      throw std::runtime_error( "what" );
+  float m_lastBuiltTileBmin[3];
+  float m_lastBuiltTileBmax[3];
 
-    printf( "[Navmesh] loading obj: %s\n", path.c_str() );
+  float m_tileSize = 160.f;
+  float m_cellSize = 0.2f;
+  float m_cellHeight = 0.2f;
 
-    m_mesh = new rcMeshLoaderObj;
-    assert( m_mesh );
+  float m_agentMaxSlope = 56.f;
+  float m_agentHeight = 2.f;
+  float m_agentMaxClimb = 0.6f;
+  float m_agentRadius = 0.5f;
 
-    if( !m_mesh->load( path ) )
-    {
-      printf( "[Navmesh] Failed to allocate rcMeshLoaderObj\n" );
-      return;
-    }
+  float m_edgeMaxLen = 12.f;
+  float m_edgeMaxError = 1.4f;
 
-    rcCalcBounds( m_mesh->getVerts(), m_mesh->getVertCount(), m_meshBMin, m_meshBMax );
+  float m_regionMinSize = 8.f;
+  float m_regionMergeSize = 20.f;
 
-    m_chunkyMesh = new rcChunkyTriMesh;
-    assert( m_chunkyMesh );
+  float m_vertsPerPoly = 6.f;
 
-    if( !rcCreateChunkyTriMesh( m_mesh->getVerts(), m_mesh->getTris(), m_mesh->getTriCount(), 256, m_chunkyMesh ) )
-    {
-      printf( "[Navmesh] buildTiledNavigation: Failed to build chunky mesh.\n" );
-      return;
-    }
-
-    printf( "[Navmesh] loaded obj, verts: %i tris: %i\n", m_mesh->getVertCount(), m_mesh->getTriCount() );
-
-    // todo: load some bullshit settings from exd
-
-    int gw = 0, gh = 0;
-    rcCalcGridSize( m_meshBMin, m_meshBMax, m_cellSize, &gw, &gh );
-
-    auto ts = static_cast< uint32_t >( m_tileSize );
-    const uint32_t tw = (gw + ts-1) / ts;
-    const uint32_t th = (gh + ts-1) / ts;
-
-    printf( "[Navmesh] Tiles %d x %d\n", tw, th );
-
-    int tileBits = rcMin((int)ilog2(nextPow2(tw*th)), 14);
-    if (tileBits > 14) tileBits = 14;
-    int polyBits = 22 - tileBits;
-    m_maxTiles = 1 << tileBits;
-    m_maxPolysPerTile = 1 << polyBits;
-
-    printf( "[Navmesh] Max Tiles: %d\tMax Polys: %d\n", m_maxTiles, m_maxPolysPerTile );
-  }
-
-  bool buildNavmesh()
-  {
-    assert( m_mesh );
-
-    m_navMesh = dtAllocNavMesh();
-    if( !m_navMesh )
-    {
-      printf( "[Navmesh] buildTiledNavigation: Could not allocate navmesh.\n" );
-      return false;
-    }
-
-    dtNavMeshParams params{};
-    rcVcopy( params.orig, m_meshBMin );
-    params.tileWidth = m_tileSize * m_cellSize;
-    params.tileHeight = m_tileSize * m_cellSize;
-    params.maxTiles = m_maxTiles;
-    params.maxPolys = m_maxPolysPerTile;
-
-    dtStatus status;
-
-    status = m_navMesh->init( &params );
-    if( dtStatusFailed( status ) )
-    {
-      printf( "[Navigation] buildTiledNavigation: Could not init navmesh.\n" );
-      return false;
-    }
-
-    m_navQuery = dtAllocNavMeshQuery();
-    assert( m_navQuery );
-
-    status = m_navQuery->init( m_navMesh, 2048 );
-    if( dtStatusFailed( status ) )
-    {
-      printf( "[Navigation] buildTiledNavigation: Could not init Detour navmesh query\n" );
-      return false;
-    }
-
-  }
-
-  ~TiledNavmeshGenerator()
-  {
-    delete m_mesh;
-    delete m_chunkyMesh;
-  }
-
+  float m_detailSampleDist = 6.f;
+  float m_detailSampleMaxError = 1.f;
 };
 
 
