@@ -27,14 +27,14 @@ public:
 
     auto dir = fs::current_path().string() + "/pcb_export/" + zone.name + "/";
     auto fileName = dir + zone.name;
+    auto objName = fileName + ".obj";
 
     std::error_code e;
-    if( !fs::exists( fileName, e ) )
+    if( !fs::exists( objName, e ) )
       ObjExporter::exportZone( zone );
-
+    {
     TiledNavmeshGenerator gen;
 
-    auto objName = fileName + ".obj";
     if( !gen.init( objName ) )
     {
       printf( "[Navmesh] failed to init TiledNavmeshGenerator for file '%s'\n", zone.name.c_str() );
@@ -48,6 +48,7 @@ public:
     }
 
     gen.saveNavmesh( zone.name );
+    }
 
     auto end = std::chrono::high_resolution_clock::now();
     printf( "[Navmesh] Finished exporting %s in %lu ms\n",
@@ -64,15 +65,15 @@ public:
 
     auto dir = fs::current_path().string() + "/pcb_export/" + zoneName + "/";
     auto fileName = dir + zoneName + "_" + group.name;
+    auto objName = fileName + ".obj";
 
     std::error_code e;
-    if( !fs::exists( fileName, e ) )
+    if( !fs::exists( objName, e ) )
       ObjExporter::exportGroup( zoneName, group );
 
 
     TiledNavmeshGenerator gen;
 
-    auto objName = fileName + ".obj";
     if( !gen.init( objName ) )
     {
       printf( "[Navmesh] failed to init TiledNavmeshGenerator for file '%s'\n", fileName.c_str() );

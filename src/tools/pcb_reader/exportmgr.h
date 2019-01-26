@@ -18,6 +18,16 @@ public:
     waitForTasks();
   }
 
+  void restart( bool cancel = false, unsigned int maxJobs = 0 )
+  {
+    if( cancel )
+      m_threadpool.cancel();
+
+    m_threadpool.complete();
+
+    m_threadpool.addWorkers( maxJobs );
+  }
+
   void exportZone(const ExportedZone& zone, ExportFileType exportFileTypes)
   {
     m_threadpool.queue( [zone, exportFileTypes]()
@@ -32,14 +42,17 @@ public:
 
   void exportGroup( const std::string& zoneName, const ExportedGroup& group, ExportFileType exportFileTypes )
   {
-    if( exportFileTypes & ExportFileType::WavefrontObj )
+    m_threadpool.queue( [zoneName, group, exportFileTypes]()
     {
-      m_threadpool.queue( [zoneName, group](){ ObjExporter::exportGroup( zoneName, group ); } );
-    }
-//    if( exportFileTypes & ExportFileType::Navmesh )
-//    {
-//      m_threadpool.queue( [zoneName, group](){ NavmeshExporter::exportGroup( zoneName, group ); } );
-//    }
+      if( exportFileTypes & ExportFileType::WavefrontObj )
+      {
+        ObjExporter::exportGroup( zoneName, group );
+      }
+      if( exportFileTypes & ExportFileType::Navmesh )
+      {
+        NavmeshExporter::exportGroup( zoneName, group );
+      }
+    });
   }
 
   void waitForTasks()
