@@ -58,7 +58,12 @@ GameData::GameData(const std::experimental::filesystem::path& path) try :
 {
    int maxExLevel = 0;
 
-   auto sep = std::experimental::filesystem::path::preferred_separator;
+   // msvc has retarded stdlib implementation
+#ifdef _WIN32
+  static constexpr auto sep = "\\";
+#else
+  static constexpr auto sep = std::experimental::filesystem::path::preferred_separator;
+#endif
   
    // Determine which expansions are available
    while( std::experimental::filesystem::exists( std::experimental::filesystem::path( m_path.string() + sep + "ex" + std::to_string( maxExLevel + 1 ) + sep + "ex" + std::to_string( maxExLevel + 1 ) + ".ver" ) ) )
