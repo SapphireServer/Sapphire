@@ -739,7 +739,7 @@ void Sapphire::Entity::Player::gainLevel()
 
 }
 
-void Sapphire::Entity::Player::sendStatusUpdate( bool toSelf )
+void Sapphire::Entity::Player::sendStatusUpdate()
 {
   sendToInRangeSet( std::make_shared< UpdateHpMpTpPacket >( *this ), true );
 }
@@ -810,7 +810,7 @@ void Sapphire::Entity::Player::setClassJob( Common::ClassJob classJob )
 
   sendToInRangeSet( makeActorControl142( getId(), ClassJobChange, 0x04 ), true );
 
-  sendStatusUpdate( true );
+  sendStatusUpdate();
 }
 
 void Sapphire::Entity::Player::setLevel( uint8_t level )
