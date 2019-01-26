@@ -370,8 +370,39 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
 
     case BNpcState::Retreat:
     {
+      setInvincibilityType( InvincibilityType::InvincibilityIgnoreDamage );
+
+      // slowly restore hp every tick
+
+      if( std::difftime( currTime, m_lastTickTime ) > 3000 )
+      {
+        m_lastTickTime = currTime;
+
+        if( m_hp < getMaxHp() )
+        {
+          auto addHp = static_cast< uint32_t >( getMaxHp() * 0.1f + 1 );
+
+          if( m_hp + addHp < getMaxHp() )
+            m_hp += addHp;
+          else
+            m_hp = getMaxHp();
+        }
+
+        sendStatusUpdate();
+      }
+
       if( moveTo( m_spawnPos ) )
+      {
+        setInvincibilityType( InvincibilityType::InvincibilityNone );
+
+        // retail doesn't seem to roam straight after retreating
+        // todo: perhaps requires more investigation?
+        m_lastRoamTargetReached = Util::getTimeSeconds();
+
+        setHp( getMaxHp() );
+
         m_state = BNpcState::Idle;
+      }
     }
     break;
 
@@ -475,7 +506,6 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
       }
     }
   }
-
 }
 
 void Sapphire::Entity::BNpc::onActionHostile( Sapphire::Entity::CharaPtr pSource )
