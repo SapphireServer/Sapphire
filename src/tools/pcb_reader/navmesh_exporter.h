@@ -18,8 +18,10 @@ namespace fs = std::experimental::filesystem;
 class NavmeshExporter
 {
 public:
-  static void exportZone( const ExportedZone& zone, bool deleteObj = false )
+  static void exportZone( const ExportedZone& zone )
   {
+    auto start = std::chrono::high_resolution_clock::now();
+
     static std::string currPath = std::experimental::filesystem::current_path().string();
 
     auto dir = fs::current_path().string() + "/pcb_export/" + zone.name + "/";

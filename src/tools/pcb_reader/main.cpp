@@ -494,7 +494,7 @@ int main( int argc, char* argv[] )
           exportedZone.groups.emplace( group.name, exportedGroup );
         }
       }
-      exportMgr.exportZone( exportedZone, ExportFileType::Navmesh );
+      exportMgr.exportZone( exportedZone, static_cast< ExportFileType >( exportFileType ) );
 
 
       printf( "Exported %s in %lu seconds \n",
