@@ -319,7 +319,7 @@ unsigned char* TiledNavmeshGenerator::buildTileMesh( const int tx, const int ty,
 
   m_tileTriCount = 0;
 
-  for (int i = 0; i < ncid; ++i)
+  for( int i = 0; i < ncid; ++i )
   {
     const rcChunkyTriMeshNode& node = m_chunkyMesh->nodes[ cid[ i ] ];
     const int* ctris = &m_chunkyMesh->tris[ node.i * 3 ];
@@ -358,7 +358,7 @@ unsigned char* TiledNavmeshGenerator::buildTileMesh( const int tx, const int ty,
     return nullptr;
   }
 
-  rcFreeHeightField(m_solid);
+  rcFreeHeightField( m_solid );
   m_solid = nullptr;
 
   // Erode the walkable area by agent radius.
