@@ -87,10 +87,13 @@ bool TiledNavmeshGenerator::init( const std::string& path )
 
 TiledNavmeshGenerator::~TiledNavmeshGenerator()
 {
-  delete m_mesh;
-  delete m_chunkyMesh;
+  if( m_mesh )
+    delete m_mesh;
+  if( m_chunkyMesh )
+    delete m_chunkyMesh;
 
-  delete m_ctx;
+  if( m_ctx )
+    delete m_ctx;
 
   dtFreeNavMesh( m_navMesh );
   dtFreeNavMeshQuery( m_navQuery );
