@@ -174,9 +174,9 @@ void Sapphire::Entity::BNpc::step()
   // This is probably not a good way to do it but works fine for now
   float angle = Util::calcAngFrom( getPos().x, getPos().z, stepPos.x, stepPos.z ) + PI;
 
-  auto x = ( cosf( angle ) * 1.7f );
+  auto x = ( cosf( angle ) * .5f );
   auto y = stepPos.y;
-  auto z = ( sinf( angle ) * 1.7f );
+  auto z = ( sinf( angle ) * .5f );
 
   face( stepPos );
   setPos( { getPos().x + x, y, getPos().z + z } );
@@ -229,7 +229,14 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 
 void Sapphire::Entity::BNpc::sendPositionUpdate()
 {
-  auto movePacket = std::make_shared< MoveActorPacket >( *getAsChara(), 0x3A, 0, 0, 0x5A );
+  uint8_t unk1 = 0x3a;
+  uint8_t animationType = 2;
+
+  if( m_state == BNpcState::Combat )
+    animationType = 0;
+
+
+  auto movePacket = std::make_shared< MoveActorPacket >( *getAsChara(), unk1, animationType, 0, 0x5A );
   sendToInRangeSet( movePacket );
 }
 
@@ -363,8 +370,39 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
 
     case BNpcState::Retreat:
     {
+      setInvincibilityType( InvincibilityType::InvincibilityIgnoreDamage );
+
+      // slowly restore hp every tick
+
+      if( std::difftime( currTime, m_lastTickTime ) > 3000 )
+      {
+        m_lastTickTime = currTime;
+
+        if( m_hp < getMaxHp() )
+        {
+          auto addHp = static_cast< uint32_t >( getMaxHp() * 0.1f + 1 );
+
+          if( m_hp + addHp < getMaxHp() )
+            m_hp += addHp;
+          else
+            m_hp = getMaxHp();
+        }
+
+        sendStatusUpdate();
+      }
+
       if( moveTo( m_spawnPos ) )
+      {
+        setInvincibilityType( InvincibilityType::InvincibilityNone );
+
+        // retail doesn't seem to roam straight after retreating
+        // todo: perhaps requires more investigation?
+        m_lastRoamTargetReached = Util::getTimeSeconds();
+
+        setHp( getMaxHp() );
+
         m_state = BNpcState::Idle;
+      }
     }
     break;
 
@@ -468,7 +506,6 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
       }
     }
   }
-
 }
 
 void Sapphire::Entity::BNpc::onActionHostile( Sapphire::Entity::CharaPtr pSource )

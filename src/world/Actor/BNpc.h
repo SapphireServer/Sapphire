@@ -88,7 +88,7 @@ namespace Sapphire::Entity
     void onDeath() override;
 
     uint32_t getTimeOfDeath() const;
-    void setTimeOfDeath( uint32_t timeOfDeath);
+    void setTimeOfDeath( uint32_t timeOfDeath );
 
   private:
     uint32_t m_bNpcBaseId;

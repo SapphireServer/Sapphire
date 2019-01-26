@@ -20,14 +20,14 @@ public:
 
   void exportZone(const ExportedZone& zone, ExportFileType exportFileTypes)
   {
-    if( exportFileTypes & ExportFileType::WavefrontObj )
+    m_threadpool.queue( [zone, exportFileTypes]()
     {
-      m_threadpool.queue( [zone](){ ObjExporter::exportZone( zone ); } );
-    }
-    if( exportFileTypes & ExportFileType::Navmesh )
-    {
-      m_threadpool.queue( [zone](){ NavmeshExporter::exportZone( zone ); } );
-    }
+      if( exportFileTypes & ExportFileType::WavefrontObj )
+        ObjExporter::exportZone( zone );
+
+      if( exportFileTypes & ExportFileType::Navmesh )
+        NavmeshExporter::exportZone( zone );
+    } );
   }
 
   void exportGroup( const std::string& zoneName, const ExportedGroup& group, ExportFileType exportFileTypes )
@@ -36,10 +36,10 @@ public:
     {
       m_threadpool.queue( [zoneName, group](){ ObjExporter::exportGroup( zoneName, group ); } );
     }
-    if( exportFileTypes & ExportFileType::Navmesh )
-    {
-      m_threadpool.queue( [zoneName, group](){ NavmeshExporter::exportGroup( zoneName, group ); } );
-    }
+//    if( exportFileTypes & ExportFileType::Navmesh )
+//    {
+//      m_threadpool.queue( [zoneName, group](){ NavmeshExporter::exportGroup( zoneName, group ); } );
+//    }
   }
 
   void waitForTasks()

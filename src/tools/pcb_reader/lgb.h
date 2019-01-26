@@ -9,6 +9,10 @@
 #include <map>
 #include <string>
 
+#include <iostream>
+#include <sstream>
+#include <iomanip>
+
 #include "matrix4.h"
 #include "vec3.h"
 #include "sgb.h"
@@ -238,6 +242,47 @@ public:
   };
 };
 
+struct LGB_COLLISION_BOX_HEADER :
+  public LGB_ENTRY_HEADER
+{
+  uint8_t unk[100];
+};
+
+struct LGB_COLLISION_BOX_ENTRY :
+  public LGB_ENTRY
+{
+  LGB_COLLISION_BOX_HEADER header;
+  std::string name;
+
+  LGB_COLLISION_BOX_ENTRY( char* buf, uint32_t offset ) :
+    LGB_ENTRY( buf, offset )
+  {
+    header = *reinterpret_cast< LGB_COLLISION_BOX_HEADER* >( buf + offset );
+    header.type = LgbEntryType::CollisionBox;
+    name = std::string( buf + offset + header.nameOffset );
+    std::stringstream ss;
+    ss << "\nName: " << name << "Id: " << header.unknown << "\n";
+    ss << "Pos: " << header.translation.x << " " << header.translation.y << " " << header.translation.z << "\n";
+    ss << "Rot?: " << header.rotation.x << " " << header.rotation.y << " " << header.rotation.z << "\n";
+    ss << "Scale?: " << header.scale.x << " " << header.scale.y << " " << header.scale.z << "\n";
+    ss << "00 01 02 03 04 05 06 07 | 08 09 0A 0B 0C 0D 0E 0F\n";
+    ss << "-------------------------------------------------\n";
+    ss << std::hex;
+    ss << std::setw( 2 );
+    ss << std::setfill( '0' );
+
+    for( auto i = 1; i < sizeof( header.unk ); ++i )
+      if( i % 16 == 0 )
+        ss << std::setw(2) << (int)header.unk[i - 1] << "\n";
+      else if( i % 8 == 0 )
+        ss << std::setw(2) << (int)header.unk[i - 1] << " | ";
+      else
+        ss << std::setw(2) << (int)header.unk[i - 1] << " ";
+    ss << "\n";
+    std::cout << ss.str();
+  }
+};
+
 struct LGB_GROUP_HEADER
 {
   uint32_t unknown;
@@ -289,7 +334,11 @@ struct LGB_GROUP
           case LgbEntryType::EventObject:
             entries.push_back( std::make_shared< LGB_EOBJ_ENTRY >( buf, entryOffset ) );
             break;
+          case LgbEntryType::CollisionBox:
+            entries.push_back( std::make_shared< LGB_COLLISION_BOX_ENTRY >( buf, entryOffset ) );
+            break;
           default:
+            //std::cout << "\t\tUnknown SGB entry! Group: " << name << " type: " << ( int )type << " index: " << i << " entryOffset: " << entryOffset << "\n";
             break;
         }
       }
