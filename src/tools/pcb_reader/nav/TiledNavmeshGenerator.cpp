@@ -87,14 +87,19 @@ bool TiledNavmeshGenerator::init( const std::string& path )
 
 TiledNavmeshGenerator::~TiledNavmeshGenerator()
 {
-  if( m_mesh )
-    delete m_mesh;
-  if( m_chunkyMesh )
-    delete m_chunkyMesh;
+  delete m_mesh;
+  delete m_chunkyMesh;
 
-  if( m_ctx )
-    delete m_ctx;
+  if( m_triareas )
+    delete[] m_triareas;
+  if( m_solid )
+    delete m_solid;
+  delete m_ctx;
 
+  rcFreeContourSet( m_cset );
+  rcFreeCompactHeightfield(m_chf);
+  rcFreePolyMesh( m_pmesh );
+  rcFreePolyMeshDetail( m_dmesh );
   dtFreeNavMesh( m_navMesh );
   dtFreeNavMeshQuery( m_navQuery );
 }
