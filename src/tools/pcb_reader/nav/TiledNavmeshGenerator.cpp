@@ -89,6 +89,11 @@ TiledNavmeshGenerator::~TiledNavmeshGenerator()
 {
   delete m_mesh;
   delete m_chunkyMesh;
+
+  delete m_ctx;
+
+  dtFreeNavMesh( m_navMesh );
+  dtFreeNavMeshQuery( m_navQuery );
 }
 
 void TiledNavmeshGenerator::saveNavmesh( const std::string& name )
