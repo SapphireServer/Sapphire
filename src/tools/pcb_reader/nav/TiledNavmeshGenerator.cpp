@@ -68,13 +68,14 @@ bool TiledNavmeshGenerator::init( const std::string& path )
   rcCalcGridSize( m_meshBMin, m_meshBMax, m_cellSize, &gw, &gh );
 
   auto ts = static_cast< uint32_t >( m_tileSize );
-  const uint32_t tw = (gw + ts-1) / ts;
-  const uint32_t th = (gh + ts-1) / ts;
+  const uint32_t tw = ( gw + ts - 1 ) / ts;
+  const uint32_t th = ( gh + ts - 1 ) / ts;
 
   printf( "[Navmesh]  - Tiles %d x %d\n", tw, th );
 
   int tileBits = rcMin( ( int ) ilog2( nextPow2( tw * th ) ), 14 );
-  if ( tileBits > 14 ) tileBits = 14;
+  if( tileBits > 14 )
+    tileBits = 14;
   int polyBits = 22 - tileBits;
   m_maxTiles = 1 << tileBits;
   m_maxPolysPerTile = 1 << polyBits;
@@ -248,8 +249,8 @@ unsigned char* TiledNavmeshGenerator::buildTileMesh( const int tx, const int ty,
   m_cfg.maxVertsPerPoly = static_cast< int >( m_vertsPerPoly );
   m_cfg.tileSize = static_cast< int >( m_tileSize );
   m_cfg.borderSize = m_cfg.walkableRadius + 3; // Reserve enough padding.
-  m_cfg.width = m_cfg.tileSize + m_cfg.borderSize*2;
-  m_cfg.height = m_cfg.tileSize + m_cfg.borderSize*2;
+  m_cfg.width = m_cfg.tileSize + m_cfg.borderSize * 2;
+  m_cfg.height = m_cfg.tileSize + m_cfg.borderSize * 2;
   m_cfg.detailSampleDist = m_detailSampleDist < 0.9f ? 0 : m_cellSize * m_detailSampleDist;
   m_cfg.detailSampleMaxError = m_cellHeight * m_detailSampleMaxError;
 
@@ -311,7 +312,7 @@ unsigned char* TiledNavmeshGenerator::buildTileMesh( const int tx, const int ty,
   tbmax[ 0 ] = m_cfg.bmax[ 0 ];
   tbmax[ 1 ] = m_cfg.bmax[ 2 ];
 
-  int cid[ 512 ];// TODO: Make grow when returning too many items.
+  int cid[512];// TODO: Make grow when returning too many items.
   const int ncid = rcGetChunksOverlappingRect( m_chunkyMesh, tbmin, tbmax, cid, 512 );
 
   if( !ncid )
@@ -333,7 +334,7 @@ unsigned char* TiledNavmeshGenerator::buildTileMesh( const int tx, const int ty,
       return nullptr;
   }
 
-  delete [] m_triareas;
+  delete[] m_triareas;
   m_triareas = nullptr;
 
   // Once all geometry is rasterized, we do initial pass of filtering to
@@ -474,9 +475,9 @@ unsigned char* TiledNavmeshGenerator::buildTileMesh( const int tx, const int ty,
     return nullptr;
   }
 
-  if ( !rcBuildPolyMeshDetail( m_ctx, *m_pmesh, *m_chf,
-                               m_cfg.detailSampleDist, m_cfg.detailSampleMaxError,
-                               *m_dmesh ) )
+  if( !rcBuildPolyMeshDetail( m_ctx, *m_pmesh, *m_chf,
+                              m_cfg.detailSampleDist, m_cfg.detailSampleMaxError,
+                              *m_dmesh ) )
   {
     printf( "[Navmesh] buildNavigation: Could build polymesh detail." );
     return nullptr;
@@ -499,22 +500,22 @@ unsigned char* TiledNavmeshGenerator::buildTileMesh( const int tx, const int ty,
     }
 
     // Update poly flags from areas.
-    for (int i = 0; i < m_pmesh->npolys; ++i)
+    for( int i = 0; i < m_pmesh->npolys; ++i )
     {
-      if (m_pmesh->areas[ i ] == RC_WALKABLE_AREA)
+      if( m_pmesh->areas[ i ] == RC_WALKABLE_AREA )
         m_pmesh->areas[ i ] = SAMPLE_POLYAREA_GROUND;
 
-      if (m_pmesh->areas[ i ] == SAMPLE_POLYAREA_GROUND ||
+      if( m_pmesh->areas[ i ] == SAMPLE_POLYAREA_GROUND ||
           m_pmesh->areas[ i ] == SAMPLE_POLYAREA_GRASS ||
-          m_pmesh->areas[ i ] == SAMPLE_POLYAREA_ROAD)
+          m_pmesh->areas[ i ] == SAMPLE_POLYAREA_ROAD )
       {
         m_pmesh->flags[ i ] = SAMPLE_POLYFLAGS_WALK;
       }
-      else if (m_pmesh->areas[ i ] == SAMPLE_POLYAREA_WATER)
+      else if( m_pmesh->areas[ i ] == SAMPLE_POLYAREA_WATER )
       {
         m_pmesh->flags[ i ] = SAMPLE_POLYFLAGS_SWIM;
       }
-      else if (m_pmesh->areas[ i ] == SAMPLE_POLYAREA_DOOR)
+      else if( m_pmesh->areas[ i ] == SAMPLE_POLYAREA_DOOR )
       {
         m_pmesh->flags[ i ] = SAMPLE_POLYFLAGS_WALK | SAMPLE_POLYFLAGS_DOOR;
       }
