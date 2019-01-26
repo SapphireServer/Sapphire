@@ -20,14 +20,14 @@ public:
 
     auto start = std::chrono::high_resolution_clock::now();
 
-    auto dir = currPath + "/" + zone.name + "/";
-    auto fileName = dir + "/" + zone.name + ".obj";
+    auto dir = currPath + "/pcb_export/" + zone.name + "/";
+    auto fileName = dir + zone.name + ".obj";
 
     std::error_code e;
 
     if( !std::experimental::filesystem::exists( dir, e ) )
     {
-      if( !std::experimental::filesystem::create_directory( dir, e ) )
+      if( !std::experimental::filesystem::create_directories( dir, e ) )
       {
         printf( "Unable to create directory '%s'", ( dir ).c_str() );
         return;
@@ -61,13 +61,13 @@ public:
 
     auto start = std::chrono::high_resolution_clock::now();
 
-    auto dir = currPath + "/" + zoneName + "/";
-    auto fileName = dir + "/" + group.name + ".obj";
+    auto dir = currPath + "/pcb_export/" + zoneName + "/groups/";
+    auto fileName = dir + group.name + ".obj";
 
     std::error_code e;
     if( !std::experimental::filesystem::exists( dir, e ) )
     {
-      if( !std::experimental::filesystem::create_directory( dir, e ) )
+      if( !std::experimental::filesystem::create_directories( dir, e ) )
       {
         printf( "Unable to create directory '%s'", ( dir ).c_str() );
         return;
