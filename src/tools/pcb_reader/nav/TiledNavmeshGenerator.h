@@ -92,13 +92,13 @@ private:
 
   int m_partitionType = SamplePartitionType::SAMPLE_PARTITION_WATERSHED;
 
-  // options
   float m_meshBMin[ 3 ];
   float m_meshBMax[ 3 ];
 
   float m_lastBuiltTileBmin[3];
   float m_lastBuiltTileBmax[3];
 
+  // options
   float m_tileSize = 160.f;
   float m_cellSize = 0.2f;
   float m_cellHeight = 0.2f;
