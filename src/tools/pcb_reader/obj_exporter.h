@@ -51,8 +51,8 @@ public:
 
     auto end = std::chrono::high_resolution_clock::now();
     printf( "[Obj] Finished exporting %s in %lu ms\n",
-      fileName.c_str(),
-      std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() );
+            fileName.substr( fileName.find( "pcb_export" ) - 1 ).c_str(),
+            std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() );
   }
 
   static void exportGroup( const std::string& zoneName, const ExportedGroup& group )
@@ -88,8 +88,8 @@ public:
 
     auto end = std::chrono::high_resolution_clock::now();
     printf( "[Obj] Finished exporting %s in %lu ms\n",
-      fileName.c_str(),
-      std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() );
+            fileName.substr( fileName.find( "pcb_export" ) - 1 ).c_str(),
+            std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() );
   }
 private:
   static void exportGroup( const ExportedGroup& group, std::ofstream& of, int& indicesOffset, int& modelCount )
