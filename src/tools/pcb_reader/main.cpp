@@ -32,7 +32,7 @@
 // garbage to ignore models
 bool noObj = false;
 
-std::string gamePath( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
+std::string gamePath( "/mnt/c/Program Files (x86)/Steam/steamapps/common/FINAL FANTASY XIV Online/game/sqpack" );
 std::unordered_map< uint16_t, std::string > zoneNameMap;
 uint32_t zoneId;
 
@@ -325,6 +325,7 @@ int main( int argc, char* argv[] )
           buildModelEntry( pPcbFile, exportedTerrainGroup, fileName, zoneName );
       }
       exportMgr.exportGroup( zoneName, exportedTerrainGroup, ( ExportFileType )exportFileType );
+      exportedZone.groups.emplace( zoneName, exportedTerrainGroup );
 
       for( const auto& lgb : lgbList )
       {
@@ -393,10 +394,10 @@ int main( int argc, char* argv[] )
             }
           }
           exportMgr.exportGroup( zoneName, exportedGroup, ( ExportFileType )exportFileType );
-          //exportedZone.groups.emplace( group.name, exportedGroup );
+          exportedZone.groups.emplace( group.name, exportedGroup );
         }
       }
-      //exportMgr.exportZone( exportedZone, ( ExportFileType )exportFileType );
+      exportMgr.exportZone( exportedZone, ( ExportFileType )exportFileType );
 
 
       printf( "Exported %s in %lu seconds \n",
@@ -415,8 +416,6 @@ int main( int argc, char* argv[] )
 
   printf( "Finished all tasks in %lu seconds\n",
             std::chrono::duration_cast< std::chrono::seconds >( std::chrono::high_resolution_clock::now() - startTime ).count() );
-
-  getchar();
 
   delete eData;
   delete data1;
