@@ -405,8 +405,29 @@ void Sapphire::Zone::updateBNpcs( int64_t tickCount )
       removeActor( pBNpc );
       break;
     }
+  }
 
-    pBNpc->update( tickCount );
+  for( uint32_t x = 0; x < _sizeX; x++ )
+  {
+    for( uint32_t y = 0; y < _sizeY; ++y )
+    {
+      auto cell = getCellPtr( x, y );
+      if( !cell )
+        continue;
+
+      // todo: this is a pretty shit because we will visit the same cells multiple times over
+      // ideally we run a pass every tick and cache active cells during that initial pass over every cell
+      // that way we don't have an expensive lookup for every actor
+
+      if( !isCellActive( x, y ) )
+        continue;
+
+      for( const auto& actor : cell->m_actors )
+      {
+        if( actor->isBattleNpc() )
+          actor->getAsBNpc()->update( tickCount );
+      }
+    }
   }
 }
 

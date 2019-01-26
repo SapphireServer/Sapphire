@@ -275,8 +275,13 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     }
     case GmCommand::Hp:
     {
-      targetPlayer->setHp( param1 );
-      player.sendNotice( "Hp for {0} was set to {1}", targetPlayer->getName(), param1 );
+      auto chara = targetActor->getAsChara();
+      if( chara )
+      {
+        chara->setHp( param1 );
+        player.sendNotice( "Hp for {0} was set to {1}", chara->getName(), param1 );
+      }
+
       break;
     }
     case GmCommand::Mp:

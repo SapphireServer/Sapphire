@@ -14,23 +14,23 @@
 class ObjExporter
 {
 public:
-  static void exportZone( const ExportedZone& zone )
+  static std::string exportZone( const ExportedZone& zone )
   {
     static std::string currPath = std::experimental::filesystem::current_path().string();
 
     auto start = std::chrono::high_resolution_clock::now();
 
-    auto dir = currPath + "/" + zone.name + "/";
-    auto fileName = dir + "/" + zone.name + ".obj";
+    auto dir = currPath + "/pcb_export/" + zone.name + "/";
+    auto fileName = dir + zone.name + ".obj";
 
     std::error_code e;
 
     if( !std::experimental::filesystem::exists( dir, e ) )
     {
-      if( !std::experimental::filesystem::create_directory( dir, e ) )
+      if( !std::experimental::filesystem::create_directories( dir, e ) )
       {
         printf( "Unable to create directory '%s'", ( dir ).c_str() );
-        return;
+        return "";
       }
     }
     std::ofstream of( fileName, std::ios::trunc );
@@ -50,27 +50,29 @@ public:
     }
 
     auto end = std::chrono::high_resolution_clock::now();
+
     printf( "[Obj] Finished exporting %s in %lu ms\n",
-      fileName.c_str(),
-      std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() );
+            fileName.substr( fileName.find( "pcb_export" ) - 1 ).c_str(),
+            std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() );
+    return fileName;
   }
 
-  static void exportGroup( const std::string& zoneName, const ExportedGroup& group )
+  static std::string exportGroup( const std::string& zoneName, const ExportedGroup& group )
   {
     static std::string currPath = std::experimental::filesystem::current_path().string();
 
     auto start = std::chrono::high_resolution_clock::now();
 
-    auto dir = currPath + "/" + zoneName + "/";
-    auto fileName = dir + "/" + group.name + ".obj";
+    auto dir = currPath + "/pcb_export/" + zoneName + "/groups/";
+    auto fileName = dir + group.name + ".obj";
 
     std::error_code e;
     if( !std::experimental::filesystem::exists( dir, e ) )
     {
-      if( !std::experimental::filesystem::create_directory( dir, e ) )
+      if( !std::experimental::filesystem::create_directories( dir, e ) )
       {
         printf( "Unable to create directory '%s'", ( dir ).c_str() );
-        return;
+        return "";
       }
     }
     std::ofstream of( fileName, std::ios::trunc );
@@ -88,8 +90,10 @@ public:
 
     auto end = std::chrono::high_resolution_clock::now();
     printf( "[Obj] Finished exporting %s in %lu ms\n",
-      fileName.c_str(),
-      std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() );
+            fileName.substr( fileName.find( "pcb_export" ) - 1 ).c_str(),
+            std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() );
+    
+    return fileName;
   }
 private:
   static void exportGroup( const ExportedGroup& group, std::ofstream& of, int& indicesOffset, int& modelCount )
