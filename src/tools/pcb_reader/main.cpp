@@ -34,6 +34,8 @@ bool noObj = false;
 
 std::string gamePath( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
 std::unordered_map< uint16_t, std::string > zoneNameMap;
+std::map< std::string, std::string > exportedTeriMap;
+
 uint32_t zoneId;
 
 
@@ -204,14 +206,19 @@ int main( int argc, char* argv[] )
     zoneDumpList.emplace( zoneName );
   }
 
-  for( const auto& zoneName : zoneDumpList )
+  for( auto zoneName : zoneDumpList )
   {
     try
     {
+      const auto& zonePath = zoneNameToPath( zoneName );
+      if( exportedTeriMap.find( zonePath ) != exportedTeriMap.end() )
+        continue;
+
+      zoneName = zonePath.substr( zonePath.find_last_of( '/' ) );
+
       ExportedZone exportedZone;
       exportedZone.name = zoneName;
-
-      const auto& zonePath = zoneNameToPath( zoneName );
+      exportedTeriMap[ zonePath ] = zoneName;
 
       std::string listPcbPath( zonePath + "/collision/list.pcb" );
       std::string bgLgbPath( zonePath + "/level/bg.lgb" );
