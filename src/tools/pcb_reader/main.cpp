@@ -140,7 +140,7 @@ int main( int argc, char* argv[] )
   }
   catch( std::exception& e )
   {
-    printf( "Unable to initialise EXD! Usage: pcb_reader <teri> \"path/to/FINAL FANTASY XIV - A REALM REBORN/game/sqpack\" [--no-obj, --dump-all, --navmesh]" );
+    printf( "Unable to initialise EXD!\n Usage: pcb_reader <teri> \"path/to/FINAL FANTASY XIV - A REALM REBORN/game/sqpack\" [--no-obj, --dump-all, --navmesh]\n" );
     return -1;
   }
   ExportMgr exportMgr;

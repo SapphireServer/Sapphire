@@ -3,7 +3,10 @@ cmake_policy(SET CMP0015 NEW)
 project(Tool_pcb_reader2)
 
 file(GLOB SERVER_PUBLIC_INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*")
-file(GLOB SERVER_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}*.c*")
+file(GLOB SERVER_SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+        *.c*
+        nav/*.c*
+        nav/ext/*.c*)
 
 add_executable(pcb_reader2 ${SERVER_PUBLIC_INCLUDE_FILES} ${SERVER_SOURCE_FILES})
 
