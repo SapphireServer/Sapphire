@@ -83,7 +83,7 @@ private:
           m_lgbCache.clear();
           m_sgbCache.clear();
           m_pcbCache.clear();
-          std::cout << "Purged PCB/SGB/PCB cache \n";
+          std::cout << "Purged PCB/SGB/LGB cache \n";
           m_totalFiles = 1;
         }
 

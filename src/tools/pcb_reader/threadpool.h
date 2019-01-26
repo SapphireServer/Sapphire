@@ -10,6 +10,9 @@
 #include <mutex>
 #include <thread>
 
+// credit to
+// https://riptutorial.com/cplusplus/example/15806/create-a-simple-thread-pool
+
 class ThreadPool
 {
 public:
@@ -55,23 +58,20 @@ public:
     {
       std::unique_lock lock( m_mutex );
       m_pendingJobs.clear();
-      for( auto&& worker : m_workers )
-      {
-        m_pendingJobs.emplace( {} );
-      }
     }
-    m_cv.notify_all();
-    m_workers.clear();
+    complete();
   }
 
   bool complete()
   {
-    m_cv.notify_all();
     {
       std::unique_lock lock( m_mutex );
-      m_runFlag = false;
-      m_cv.wait( lock, [&]{ return m_pendingJobs.empty(); } );
+      for( auto&& worker : m_workers )
+      {
+        m_pendingJobs.push_back( {} );
+      }
     }
+    m_cv.notify_all();
     m_workers.clear();
     return true;
   }
@@ -85,11 +85,6 @@ private:
         std::unique_lock lock( m_mutex );
         if( m_pendingJobs.empty() )
         {
-          if( !m_runFlag )
-          {
-            m_cv.notify_all();
-            return;
-          }
           m_cv.wait( lock, [&](){ return !m_pendingJobs.empty(); } );
         }
         func = std::move( m_pendingJobs.front() );
