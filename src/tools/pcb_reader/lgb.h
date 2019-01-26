@@ -335,7 +335,7 @@ struct LGB_GROUP
             entries.push_back( std::make_shared< LGB_EOBJ_ENTRY >( buf, entryOffset ) );
             break;
           case LgbEntryType::CollisionBox:
-            entries.push_back( std::make_shared< LGB_COLLISION_BOX_ENTRY >( buf, entryOffset ) );
+            //entries.push_back( std::make_shared< LGB_COLLISION_BOX_ENTRY >( buf, entryOffset ) );
             break;
           default:
             //std::cout << "\t\tUnknown SGB entry! Group: " << name << " type: " << ( int )type << " index: " << i << " entryOffset: " << entryOffset << "\n";

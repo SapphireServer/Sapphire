@@ -156,16 +156,36 @@ int main( int argc, char* argv[] )
   std::vector< std::string > argVec( argv + 1, argv + argc );
   std::string zoneName = "r2t2";
 
-  noObj = std::remove_if( argVec.begin(), argVec.end(), []( auto arg )
+  noObj = std::find_if( argVec.begin(), argVec.end(), []( auto arg )
   { return arg == "--no-obj"; } ) != argVec.end();
-  bool dumpAllZones = std::remove_if( argVec.begin(), argVec.end(), []( auto arg )
+  bool dumpAllZones = std::find_if( argVec.begin(), argVec.end(), []( auto arg )
   { return arg == "--dump-all"; } ) != argVec.end();
-  bool generateNavmesh = std::remove_if( argVec.begin(), argVec.end(), []( auto arg )
+  bool generateNavmesh = std::find_if( argVec.begin(), argVec.end(), []( auto arg )
   { return arg == "--navmesh"; } ) != argVec.end();
-  bool splitByGroup = std::remove_if( argVec.begin(), argVec.end(), []( auto arg )
+  bool splitByGroup = std::find_if( argVec.begin(), argVec.end(), []( auto arg )
   { return arg == "--split-by-group"; }) != argVec.end();
-  bool splitByZone = std::remove_if( argVec.begin(), argVec.end(), []( auto arg )
+  bool splitByZone = std::find_if( argVec.begin(), argVec.end(), []( auto arg )
   { return arg == "--split-by-zone"; }) != argVec.end();
+  int nJobs = std::thread::hardware_concurrency();
+  if( auto it = std::find_if( argVec.begin(), argVec.end(), []( auto arg )
+  { return arg == "--jobs"; }); it != argVec.end() )
+  {
+
+    try
+    {
+      auto it2 = ( it + 1 );
+      nJobs =  std::stoi( *it2 );
+      if( nJobs < 0 )
+        throw std::runtime_error( "Number of jobs < 0\n" );
+    }
+    catch( std::exception& e )
+    {
+      std::cout << e.what() << "\n";
+      std::cout << "Invalid number of jobs " << nJobs << "\n";
+      std::cout << "--jobs <numberOfJobs>\n";
+      return -1;
+    }
+  }
   int exportFileType = 0;
   if( !noObj )
     exportFileType |= ExportFileType::WavefrontObj;
@@ -190,10 +210,10 @@ int main( int argc, char* argv[] )
   }
   catch( std::exception& e )
   {
-    printf( "Unable to initialise EXD!\n Usage: pcb_reader <teri> \"path/to/FINAL FANTASY XIV - A REALM REBORN/game/sqpack\" [--no-obj, --dump-all, --navmesh]\n" );
+    printf( "Unable to initialise EXD!\n Usage: pcb_reader <teri> \"path/to/FINAL FANTASY XIV - A REALM REBORN/game/sqpack\" [--no-obj, --dump-all, --navmesh, --jobs #]\n" );
     return -1;
   }
-  ExportMgr exportMgr;
+  ExportMgr exportMgr( nJobs );
   zoneNameToPath( zoneName );
 
   if( dumpAllZones )
@@ -206,6 +226,7 @@ int main( int argc, char* argv[] )
     zoneDumpList.emplace( zoneName );
   }
 
+  int zoneCount = 0;
   for( auto zoneName : zoneDumpList )
   {
     try
@@ -496,10 +517,14 @@ int main( int argc, char* argv[] )
       }
       exportMgr.exportZone( exportedZone, static_cast< ExportFileType >( exportFileType ) );
 
-
-      printf( "Exported %s in %lu seconds \n",
+      printf( "Built export struct for %s in %lu seconds \n",
         zoneName.c_str(),
         std::chrono::duration_cast< std::chrono::seconds >( std::chrono::high_resolution_clock::now() - entryStartTime ).count() );
+      if( zoneCount++ % nJobs == 0 )
+      {
+        exportMgr.restart();
+        pCache->purge();
+      }
     }
     catch( std::exception& e )
     {
@@ -508,6 +533,7 @@ int main( int argc, char* argv[] )
       printf( "Usage: pcb_reader2 territory \"path/to/game/sqpack/ffxiv\"\n" );
     }
   }
+  pCache->purge();
   exportMgr.waitForTasks();
   std::cout << "\n\n\n";
 

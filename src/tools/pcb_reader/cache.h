@@ -65,8 +65,20 @@ public:
     return pFile;
   }
 
+  void purge()
+  {
+    std::scoped_lock lock( m_mutex );
+    _purge();
+  }
 
 private:
+  void _purge()
+  {
+    m_lgbCache.clear();
+    m_sgbCache.clear();
+    m_pcbCache.clear();
+    //std::cout << "Purged PCB/SGB/LGB cache \n";
+  }
   template< typename T >
   std::shared_ptr< T > loadFile( const std::string& filepath )
   {
@@ -80,10 +92,7 @@ private:
         m_totalFiles++;
         if( m_totalFiles % 1000 == 0 )
         {
-          m_lgbCache.clear();
-          m_sgbCache.clear();
-          m_pcbCache.clear();
-          std::cout << "Purged PCB/SGB/LGB cache \n";
+          _purge();
           m_totalFiles = 1;
         }
 
