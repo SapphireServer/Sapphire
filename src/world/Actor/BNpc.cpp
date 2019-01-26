@@ -174,9 +174,9 @@ void Sapphire::Entity::BNpc::step()
   // This is probably not a good way to do it but works fine for now
   float angle = Util::calcAngFrom( getPos().x, getPos().z, stepPos.x, stepPos.z ) + PI;
 
-  auto x = ( cosf( angle ) * 1.7f );
+  auto x = ( cosf( angle ) * .5f );
   auto y = stepPos.y;
-  auto z = ( sinf( angle ) * 1.7f );
+  auto z = ( sinf( angle ) * .5f );
 
   face( stepPos );
   setPos( { getPos().x + x, y, getPos().z + z } );
@@ -229,7 +229,14 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 
 void Sapphire::Entity::BNpc::sendPositionUpdate()
 {
-  auto movePacket = std::make_shared< MoveActorPacket >( *getAsChara(), 0x3A, 0, 0, 0x5A );
+  uint8_t unk1 = 0x3a;
+  uint8_t animationType = 2;
+
+  if( m_state == BNpcState::Combat )
+    animationType = 0;
+
+
+  auto movePacket = std::make_shared< MoveActorPacket >( *getAsChara(), unk1, animationType, 0, 0x5A );
   sendToInRangeSet( movePacket );
 }
 
