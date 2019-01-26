@@ -9,17 +9,8 @@
 #include <chrono>
 
 #include "exporter.h"
-/*
-#include <recastnavigation/Recast/Include/Recast.h>
-#include <recastnavigation/Recast/Include/RecastAlloc.h>
-#include <recastnavigation/Detour/Include/DetourNavMesh.h>
-#include <recastnavigation/Detour/Include/DetourNavMeshBuilder.h>
-#include <recastnavigation/DetourTileCache/Include/DetourTileCache.h>
-#include <recastnavigation/DetourTileCache/Include/DetourTileCacheBuilder.h>
-#include <recastnavigation/RecastDemo/Include/ChunkyTriMesh.h>
-#include <recastnavigation/RecastDemo/Include/InputGeom.h>
-#include <recastnavigation/RecastDemo/Include/Sample.h>
-*/
+#include "nav/TiledNavmeshGenerator.h"
+
 class NavmeshExporter
 {
 public:
@@ -27,7 +18,16 @@ public:
   {
     auto start = std::chrono::high_resolution_clock::now();
 
-    auto fileName = zone.name + ".obj";
+    auto dir = std::experimental::filesystem::current_path().string() + "/pcb_export/" + zone.name + "/";
+    auto fileName = dir + zone.name + ".obj";
+
+    TiledNavmeshGenerator gen( fileName );
+
+    if( !gen.buildNavmesh() )
+    {
+      printf( "[Navmesh] Failed to build navmesh for '%s'\n", zone.name.c_str() );
+      return;
+    }
 
     auto end = std::chrono::high_resolution_clock::now();
     printf( "[Navmesh] Finished exporting %s in %lu ms\n",
@@ -37,15 +37,7 @@ public:
 
   static void exportGroup( const std::string& zoneName, const ExportedGroup& group )
   {
-    auto start = std::chrono::high_resolution_clock::now();
 
-    auto fileName = zoneName + "_" + group.name + ".obj";
-
-    auto end = std::chrono::high_resolution_clock::now();
-
-    printf( "[Navmesh] Finished exporting %s in %lu ms\n",
-      fileName.c_str(),
-      std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() );
   }
 private:
   /*/
