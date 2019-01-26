@@ -32,7 +32,7 @@
 // garbage to ignore models
 bool noObj = false;
 
-std::string gamePath( "/mnt/c/Program Files (x86)/Steam/steamapps/common/FINAL FANTASY XIV Online/game/sqpack" );
+std::string gamePath( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
 std::unordered_map< uint16_t, std::string > zoneNameMap;
 std::map< std::string, std::string > exportedTeriMap;
 
