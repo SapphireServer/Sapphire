@@ -38,6 +38,7 @@ namespace Sapphire
 
     std::string m_placeName;
     std::string m_internalName;
+    std::string m_bgPath;
 
     std::unordered_map< int32_t, Entity::PlayerPtr > m_playerMap;
     std::unordered_map< int32_t, Entity::BNpcPtr > m_bNpcMap;
@@ -134,6 +135,8 @@ namespace Sapphire
     const std::string& getName() const;
 
     const std::string& getInternalName() const;
+
+    const std::string& getBgPath() const;
 
     std::size_t getPopCount() const;
 

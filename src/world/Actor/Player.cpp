@@ -739,7 +739,7 @@ void Sapphire::Entity::Player::gainLevel()
 
 }
 
-void Sapphire::Entity::Player::sendStatusUpdate( bool toSelf )
+void Sapphire::Entity::Player::sendStatusUpdate()
 {
   sendToInRangeSet( std::make_shared< UpdateHpMpTpPacket >( *this ), true );
 }
@@ -810,7 +810,7 @@ void Sapphire::Entity::Player::setClassJob( Common::ClassJob classJob )
 
   sendToInRangeSet( makeActorControl142( getId(), ClassJobChange, 0x04 ), true );
 
-  sendStatusUpdate( true );
+  sendStatusUpdate();
 }
 
 void Sapphire::Entity::Player::setLevel( uint8_t level )
@@ -1515,7 +1515,7 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
 
   auto mainWeap = getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand );
 
-  pTarget->onActionHostile( *this );
+  pTarget->onActionHostile( getAsChara() );
   //uint64_t tick = Util::getTimeMs();
   //srand(static_cast< uint32_t >(tick));
 

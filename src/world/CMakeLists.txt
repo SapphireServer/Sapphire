@@ -19,7 +19,8 @@ file( GLOB SERVER_SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
         Script/*.c*
         StatusEffect/*.c*
         Territory/*.c*
-        Territory/Housing/*.c*)
+        Territory/Housing/*.c*
+        Navi/*.c*)
 
 add_executable( world ${SERVER_SOURCE_FILES} )
 
@@ -30,10 +31,12 @@ set_target_properties( world
 
 target_link_libraries( world
                          PUBLIC
-                           common )
+                           common 
+                            Detour)
 target_include_directories( world
                               PUBLIC
-                                "${CMAKE_CURRENT_SOURCE_DIR}" )
+                                "${CMAKE_CURRENT_SOURCE_DIR}"
+                                    Detour )
 
 
 if( UNIX )

@@ -666,7 +666,7 @@ struct FFXIVIpcActorMove :
 {
   /* 0000 */ uint8_t rotation;
   /* 0001 */ uint8_t unknown_1;
-  /* 0002 */ uint8_t unknown_2;
+  /* 0002 */ uint8_t animationType;
   /* 0003 */ uint8_t unknown_3;
   /* 0004 */ uint16_t unknown_4;
   /* 0006 */ uint16_t posX;

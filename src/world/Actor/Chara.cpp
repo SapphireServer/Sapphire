@@ -151,35 +151,35 @@ uint32_t Sapphire::Entity::Chara::getMaxMp() const
 void Sapphire::Entity::Chara::resetHp()
 {
   m_hp = getMaxHp();
-  sendStatusUpdate( true );
+  sendStatusUpdate();
 }
 
 /*! \return reset mp to current max mp */
 void Sapphire::Entity::Chara::resetMp()
 {
   m_mp = getMaxMp();
-  sendStatusUpdate( true );
+  sendStatusUpdate();
 }
 
 /*! \param hp amount to set ( caps to maxHp ) */
 void Sapphire::Entity::Chara::setHp( uint32_t hp )
 {
   m_hp = hp < getMaxHp() ? hp : getMaxHp();
-  sendStatusUpdate( true );
+  sendStatusUpdate();
 }
 
 /*! \param mp amount to set ( caps to maxMp ) */
 void Sapphire::Entity::Chara::setMp( uint32_t mp )
 {
   m_mp = mp < getMaxMp() ? mp : getMaxMp();
-  sendStatusUpdate( true );
+  sendStatusUpdate();
 }
 
 /*! \param gp amount to set*/
 void Sapphire::Entity::Chara::setGp( uint32_t gp )
 {
   m_gp = gp;
-  sendStatusUpdate( true );
+  sendStatusUpdate();
 }
 
 /*! \param type invincibility type to set */
@@ -244,7 +244,7 @@ bool Sapphire::Entity::Chara::face( const Common::FFXIVARR_POSITION3& p )
 
   setRot( newRot );
 
-  return oldRot != newRot ? true : false;
+  return oldRot != newRot;
 }
 
 /*!
@@ -325,12 +325,14 @@ void Sapphire::Entity::Chara::takeDamage( uint32_t damage )
       case InvincibilityStayAlive:
         setHp( 0 );
         break;
+      case InvincibilityIgnoreDamage:
+        break;
     }
   }
   else
     m_hp -= damage;
 
-  sendStatusUpdate( false );
+  sendStatusUpdate();
 }
 
 /*!
@@ -349,7 +351,7 @@ void Sapphire::Entity::Chara::heal( uint32_t amount )
   else
     m_hp += amount;
 
-  sendStatusUpdate( false );
+  sendStatusUpdate();
 }
 
 /*!
@@ -359,7 +361,7 @@ so players can have their own version and we can abolish the param.
 
 \param true if the update should also be sent to the actor ( player ) himself
 */
-void Sapphire::Entity::Chara::sendStatusUpdate( bool toSelf )
+void Sapphire::Entity::Chara::sendStatusUpdate()
 {
   FFXIVPacketBasePtr packet = std::make_shared< UpdateHpMpTpPacket >( *this );
   sendToInRangeSet( packet );
@@ -391,9 +393,10 @@ void Sapphire::Entity::Chara::autoAttack( CharaPtr pTarget )
 
   uint64_t tick = Util::getTimeMs();
 
+  // todo: this needs to use the auto attack delay for the equipped weapon
   if( ( tick - m_lastAttack ) > 2500 )
   {
-    pTarget->onActionHostile( *this );
+    pTarget->onActionHostile( getAsChara() );
     m_lastAttack = tick;
     srand( static_cast< uint32_t >( tick ) );
 
@@ -461,7 +464,7 @@ void Sapphire::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionI
         sendToInRangeSet( effectPacket, true );
 
         if( target.isAlive() )
-          target.onActionHostile( *this );
+          target.onActionHostile( getAsChara() );
 
         target.takeDamage( static_cast< uint32_t >( param1 ) );
 
@@ -481,7 +484,7 @@ void Sapphire::Entity::Chara::handleScriptSkill( uint32_t type, uint16_t actionI
 
 
           if( pHitActor->getAsChara()->isAlive() )
-            pHitActor->getAsChara()->onActionHostile( *this );
+            pHitActor->getAsChara()->onActionHostile( getAsChara() );
 
           pHitActor->getAsChara()->takeDamage( static_cast< uint32_t >( param1 ) );
 

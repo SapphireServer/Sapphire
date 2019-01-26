@@ -16,6 +16,7 @@
 #include "Territory/Land.h"
 #include "Territory/House.h"
 #include "Territory/Housing/HousingInteriorTerritory.h"
+#include "NaviMgr.h"
 
 Sapphire::World::Manager::TerritoryMgr::TerritoryMgr( Sapphire::FrameworkPtr pFw ) :
   BaseManager( pFw ),
@@ -163,12 +164,17 @@ bool Sapphire::World::Manager::TerritoryMgr::createDefaultTerritories()
 
     uint32_t guid = getNextInstanceId();
 
-    Logger::info( "{0}\t{1}\t{2}\t{3:<10}\t{4}\t{5}",
+    auto pNaviMgr = framework()->get< Manager::NaviMgr >();
+    std::string bgPath = territoryInfo->bg;
+    bool hasNaviMesh = pNaviMgr->setupTerritory( bgPath );
+
+    Logger::info( "{0}\t{1}\t{2}\t{3:<10}\t{4}\t{5}\t{6}",
                   territoryTypeId,
                   guid,
                   territoryInfo->territoryIntendedUse,
                   territoryInfo->name,
                   ( isPrivateTerritory( territoryTypeId ) ? "PRIVATE" : "PUBLIC" ),
+                  hasNaviMesh ? "NAVI" : "",
                   pPlaceName->name );
 
     auto pZone = make_Zone( territoryTypeId, guid, territoryInfo->name, pPlaceName->name, framework() );
@@ -194,7 +200,7 @@ bool Sapphire::World::Manager::TerritoryMgr::createHousingTerritories()
     auto territoryTypeId = territory.first;
     auto territoryInfo = territory.second;
     uint32_t wardNum;
-    uint32_t wardMaxNum = 1;
+    uint32_t wardMaxNum = 18;
 
     if( territoryInfo->name.empty() )
       continue;
@@ -208,7 +214,7 @@ bool Sapphire::World::Manager::TerritoryMgr::createHousingTerritories()
     {
       uint32_t guid = getNextInstanceId();
 
-      Logger::info( "{0}\t{1}\t{2}\t{3:<10}\tHOUSING\t{4}#{5}",
+      Logger::info( "{0}\t{1}\t{2}\t{3:<10}\tHOUSING\t\t{4}#{5}",
                     territoryTypeId,
                     guid,
                     territoryInfo->territoryIntendedUse,
@@ -219,7 +225,6 @@ bool Sapphire::World::Manager::TerritoryMgr::createHousingTerritories()
       auto pHousingZone = make_HousingZone( wardNum, territoryTypeId, guid, territoryInfo->name,
                                             pPlaceName->name, framework() );
       pHousingZone->init();
-      wardMaxNum = 18;
 
       InstanceIdToZonePtrMap instanceMap;
       instanceMap[ guid ] = pHousingZone;

@@ -41,6 +41,7 @@
 #include "Manager/ItemMgr.h"
 #include "Manager/MarketMgr.h"
 #include "Manager/RNGMgr.h"
+#include "Manager/NaviMgr.h"
 
 using namespace Sapphire::World::Manager;
 
@@ -95,6 +96,8 @@ bool Sapphire::World::ServerMgr::loadSettings( int32_t argc, char* argv[] )
   m_config.scripts.path = pConfig->getValue< std::string >( "Scripts", "Path", "./compiledscripts/" );
   m_config.scripts.cachePath = pConfig->getValue< std::string >( "Scripts", "CachePath", "./cache/" );
 
+  m_config.navigation.meshPath = pConfig->getValue< std::string >( "Navigation", "MeshPath", "navi" );
+
   m_config.network.disconnectTimeout = pConfig->getValue< uint16_t >( "Network", "DisconnectTimeout", 20 );
   m_config.network.listenIp = pConfig->getValue< std::string >( "Network", "ListenIp", "0.0.0.0" );
   m_config.network.listenPort = pConfig->getValue< uint16_t >( "Network", "ListenPort", 54992 );
@@ -125,6 +128,8 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
     Logger::fatal( "Unable to load settings!" );
     return;
   }
+
+  Logger::setLogLevel( m_config.global.general.logLevel );
 
   Logger::info( "Setting up generated EXD data" );
   auto pExdData = std::make_shared< Data::ExdDataGenerated >();
@@ -165,6 +170,9 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
   framework()->set< Scripting::ScriptMgr >( pScript );
 
   loadBNpcTemplates();
+
+  auto pNaviMgr = std::make_shared< Manager::NaviMgr >( framework() );
+  framework()->set< Manager::NaviMgr >( pNaviMgr );
 
   Logger::info( "TerritoryMgr: Setting up zones" );
   auto pTeriMgr = std::make_shared< Manager::TerritoryMgr >( framework() );

@@ -15,6 +15,9 @@ DisconnectTimeout = 20
 ; Sent on login - each line must be shorter than 307 characters, split lines with ';'
 MotD = Welcome to Sapphire!;This is a very good server;You can change these messages by editing General.MotD in config/config.ini
 
+[Navigation]
+MeshPath = navi
+
 [Housing]
 ; Set the default estate name. {0} will be replaced with the plot number
 DefaultEstateName = Estate ${0}

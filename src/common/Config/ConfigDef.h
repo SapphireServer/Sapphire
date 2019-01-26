@@ -16,6 +16,8 @@ namespace Sapphire::Common::Config
       uint16_t worldID;
 
       uint8_t defaultGMRank;
+      uint8_t logLevel;
+      uint32_t logFilter;
     } general;
 
     struct Network
@@ -55,6 +57,11 @@ namespace Sapphire::Common::Config
       std::string cachePath;
       bool hotSwap;
     } scripts;
+
+    struct Navigation
+    {
+      std::string meshPath;
+    } navigation;
 
     std::string motd;
   };

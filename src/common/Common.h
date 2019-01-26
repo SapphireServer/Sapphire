@@ -615,6 +615,7 @@ namespace Sapphire::Common
     InvincibilityNone,
     InvincibilityRefill,
     InvincibilityStayAlive,
+    InvincibilityIgnoreDamage,
   };
 
   enum PlayerStateFlag : uint8_t
