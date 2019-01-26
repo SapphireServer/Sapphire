@@ -18,6 +18,16 @@ public:
     waitForTasks();
   }
 
+  void restart( bool cancel = false, unsigned int maxJobs = 0 )
+  {
+    if( cancel )
+      m_threadpool.cancel();
+
+    m_threadpool.complete();
+
+    m_threadpool.addWorkers( maxJobs );
+  }
+
   void exportZone(const ExportedZone& zone, ExportFileType exportFileTypes)
   {
     m_threadpool.queue( [zone, exportFileTypes]()
