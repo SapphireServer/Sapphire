@@ -57,9 +57,11 @@ GameData::GameData(const std::experimental::filesystem::path& path) try :
     m_path(path)
 {
    int maxExLevel = 0;
+
+   auto sep = std::experimental::filesystem::path::preferred_separator;
   
    // Determine which expansions are available
-   while( std::experimental::filesystem::exists( std::experimental::filesystem::path( m_path.string() + "\\ex" + std::to_string( maxExLevel + 1) + "\\ex" + std::to_string( maxExLevel + 1) + ".ver" ) ) )
+   while( std::experimental::filesystem::exists( std::experimental::filesystem::path( m_path.string() + sep + "ex" + std::to_string( maxExLevel + 1 ) + sep + "ex" + std::to_string( maxExLevel + 1 ) + ".ver" ) ) )
    {
       maxExLevel++;
    }
@@ -90,7 +92,7 @@ GameData::GameData(const std::experimental::filesystem::path& path) try :
          // Check for expansion
          for( int exNum = 1; exNum <= maxExLevel; exNum++ )
          {
-            const std::string path = m_path.string() + "\\" + buildDatStr( "ex" + std::to_string( exNum ), cat_nb, exNum, 0, "win32", "index" );
+            const std::string path = m_path.string() + sep + buildDatStr( "ex" + std::to_string( exNum ), cat_nb, exNum, 0, "win32", "index" );
 
             if( std::experimental::filesystem::exists( std::experimental::filesystem::path( path ) ) )
             {
@@ -99,7 +101,7 @@ GameData::GameData(const std::experimental::filesystem::path& path) try :
 
                for(int chunkTest = 0; chunkTest < 256; chunkTest++ )
                {
-                  if( std::experimental::filesystem::exists( m_path.string() + "\\" + buildDatStr( "ex" + std::to_string( exNum ), cat_nb, exNum, chunkTest, "win32", "index" ) ) )
+                  if( std::experimental::filesystem::exists( m_path.string() + sep + buildDatStr( "ex" + std::to_string( exNum ), cat_nb, exNum, chunkTest, "win32", "index" ) ) )
                   {
                      m_exCats[cat_nb].exNumToChunkMap[exNum].chunkToCatMap[chunkTest] = std::unique_ptr<Cat>();
                      chunkCount++;
