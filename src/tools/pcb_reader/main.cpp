@@ -32,7 +32,7 @@
 // garbage to ignore models
 bool noObj = false;
 
-std::string gamePath( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
+std::string gamePath( "/mnt/c/Program Files (x86)/Steam/steamapps/common/FINAL FANTASY XIV Online/game/sqpack" );
 std::unordered_map< uint16_t, std::string > zoneNameMap;
 std::map< std::string, std::string > exportedTeriMap;
 
@@ -190,7 +190,7 @@ int main( int argc, char* argv[] )
   }
   catch( std::exception& e )
   {
-    printf( "Unable to initialise EXD! Usage: pcb_reader <teri> \"path/to/FINAL FANTASY XIV - A REALM REBORN/game/sqpack\" [--no-obj, --dump-all, --navmesh]" );
+    printf( "Unable to initialise EXD!\n Usage: pcb_reader <teri> \"path/to/FINAL FANTASY XIV - A REALM REBORN/game/sqpack\" [--no-obj, --dump-all, --navmesh]\n" );
     return -1;
   }
   ExportMgr exportMgr;
@@ -380,7 +380,7 @@ int main( int argc, char* argv[] )
           buildModelEntry( pPcbFile, exportedTerrainGroup, fileName, zoneName );
       }
       exportedZone.groups.emplace( exportedTerrainGroup.name, exportedTerrainGroup );
-
+      
       for( const auto& lgb : lgbList )
       {
         for( const auto& group : lgb.groups )
@@ -497,13 +497,13 @@ int main( int argc, char* argv[] )
       exportMgr.exportZone( exportedZone, ExportFileType::Navmesh );
 
 
-      printf( "Exported %s in %u seconds \n",
+      printf( "Exported %s in %lu seconds \n",
         zoneName.c_str(),
-        std::chrono::duration_cast< std::chrono::seconds >( std::chrono::high_resolution_clock::now() - entryStartTime ) );
+        std::chrono::duration_cast< std::chrono::seconds >( std::chrono::high_resolution_clock::now() - entryStartTime ).count() );
     }
     catch( std::exception& e )
     {
-      printf( ( std::string( e.what() ) + "\n" ).c_str() );
+      printf( "%s", ( std::string( e.what() ) + "\n" ).c_str() );
       printf( "Unable to extract collision data.\n" );
       printf( "Usage: pcb_reader2 territory \"path/to/game/sqpack/ffxiv\"\n" );
     }
@@ -511,14 +511,11 @@ int main( int argc, char* argv[] )
   exportMgr.waitForTasks();
   std::cout << "\n\n\n";
 
-  printf( "Finished all tasks in %u seconds\n",
+  printf( "Finished all tasks in %lu seconds\n",
             std::chrono::duration_cast< std::chrono::seconds >( std::chrono::high_resolution_clock::now() - startTime ).count() );
 
-  getchar();
-
-  if( eData )
-    delete eData;
-  if( data1 )
-    delete data1;
+  delete eData;
+  delete data1;
+  
   return 0;
 }

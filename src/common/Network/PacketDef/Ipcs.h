@@ -229,6 +229,17 @@ namespace Sapphire::Network::Packets
     IPCTYPE_UNK_320 = 0x0253, // updated 4.5
     IPCTYPE_UNK_322 = 0x0255, // updated 4.5
 
+    /// Doman Mahjong //////////////////////////////////////
+    MahjongOpenGui = 0x02BC, // only available in mahjong instance
+    MahjongNextRound = 0x02BD, // initial hands(baipai), # of riichi(wat), winds, honba, score and stuff
+    MahjongPlayerAction = 0x02BE, // tsumo(as in drawing a tile) called chi/pon/kan/riichi
+    MahjongEndRoundTsumo = 0x02BF, // called tsumo
+    MahjongEndRoundRon = 0x2C0, // called ron or double ron (waiting for action must be flagged from discard packet to call)
+    MahjongTileDiscard = 0x02C1, // giri (discarding a tile.) chi(1)/pon(2)/kan(4)/ron(8) flags etc..
+    MahjongPlayersInfo = 0x02C2, // actor id, name, rating and stuff..
+    // 2C3 and 2C4 are currently unknown
+    MahjongEndRoundDraw = 0x02C5, // self explanatory
+    MahjongEndGame = 0x02C6, // finished oorasu(all-last) round; shows a result screen.
   };
 
   /**

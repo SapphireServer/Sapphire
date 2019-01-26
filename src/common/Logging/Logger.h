@@ -19,6 +19,7 @@ namespace Sapphire
   public:
 
     static void init( const std::string& logPath );
+    static void setLogLevel( uint8_t logLevel );
 
     // todo: this is a minor increase in build time because of fmtlib, but much less than including spdlog directly
 

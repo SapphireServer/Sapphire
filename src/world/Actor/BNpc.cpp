@@ -6,6 +6,7 @@
 #include <Network/CommonActorControl.h>
 #include <Network/PacketWrappers/EffectPacket.h>
 #include <Network/PacketDef/Zone/ClientZoneDef.h>
+#include <Logging/Logger.h>
 
 #include "Forwards.h"
 #include "Action/Action.h"
@@ -19,6 +20,7 @@
 #include "Network/PacketWrappers/UpdateHpMpTpPacket.h"
 #include "Network/PacketWrappers/NpcSpawnPacket.h"
 #include "Network/PacketWrappers/MoveActorPacket.h"
+#include "Navi/NaviProvider.h"
 
 #include "StatusEffect/StatusEffect.h"
 #include "Action/ActionCollision.h"
@@ -31,6 +33,9 @@
 #include "BNpcTemplate.h"
 #include "Manager/TerritoryMgr.h"
 #include "Common.h"
+#include "Framework.h"
+#include <Logging/Logger.h>
+#include <Manager/NaviMgr.h>
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -67,12 +72,15 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
 
   m_spawnPos = m_pos;
 
+  m_timeOfDeath = 0;
+
   m_maxHp = maxHp;
   m_maxMp = 200;
   m_hp = maxHp;
   m_mp = 200;
 
   m_state = BNpcState::Idle;
+  m_status = ActorStatus::Idle;
 
   m_baseStats.max_hp = maxHp;
   m_baseStats.max_mp = 200;
@@ -128,12 +136,13 @@ uint32_t Sapphire::Entity::BNpc::getBNpcNameId() const
 
 void Sapphire::Entity::BNpc::spawn( PlayerPtr pTarget )
 {
-  pTarget->queuePacket( std::make_shared< NpcSpawnPacket >( *getAsBNpc(), *pTarget ) );
+  pTarget->queuePacket( std::make_shared< NpcSpawnPacket >( *this, *pTarget ) );
 }
 
 void Sapphire::Entity::BNpc::despawn( PlayerPtr pTarget )
 {
   pTarget->freePlayerSpawnId( getId() );
+  pTarget->queuePacket( makeActorControl143(  m_id, DespawnZoneScreenMsg, 0x04, getId(), 0x01 ) );
 }
 
 Sapphire::Entity::BNpcState Sapphire::Entity::BNpc::getState() const
@@ -146,38 +155,88 @@ void Sapphire::Entity::BNpc::setState( BNpcState state )
   m_state = state;
 }
 
+void Sapphire::Entity::BNpc::step()
+{
+  if( m_naviLastPath.empty() )
+    // No path to track
+    return;
+
+  auto stepPos = m_naviLastPath[ m_naviPathStep ];
+
+  if( Util::distance( getPos().x, getPos().y, getPos().z, stepPos.x, stepPos.y, stepPos.z ) <= 4 &&
+      m_naviPathStep < m_naviLastPath.size() - 1 )
+  {
+    // Reached step in path
+    m_naviPathStep++;
+    stepPos = m_naviLastPath[ m_naviPathStep ];
+  }
+
+  // This is probably not a good way to do it but works fine for now
+  float angle = Util::calcAngFrom( getPos().x, getPos().z, stepPos.x, stepPos.z ) + PI;
+
+  auto x = ( cosf( angle ) * .5f );
+  auto y = stepPos.y;
+  auto z = ( sinf( angle ) * .5f );
+
+  face( stepPos );
+  setPos( { getPos().x + x, y, getPos().z + z } );
+
+  sendPositionUpdate();
+}
+
 bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 {
   if( Util::distance( getPos().x, getPos().y, getPos().z, pos.x, pos.y, pos.z ) <= 4 )
-    // reached destination
+  {
+    // Reached destination
+    m_naviLastPath.clear();
     return true;
+  }
 
-  float rot = Util::calcAngFrom( getPos().x, getPos().z, pos.x, pos.z );
-  float newRot = PI - rot + ( PI / 2 );
+  // Check if we have to recalculate
+  if( Util::getTimeMs() - m_naviLastUpdate > 500 )
+  {
+    auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
+    auto pNaviProvider = pNaviMgr->getNaviProvider( m_pCurrentZone->getBgPath() );
 
-  face( pos );
-  float angle = Util::calcAngFrom( getPos().x, getPos().z, pos.x, pos.z ) + PI;
+    if( !pNaviProvider )
+    {
+      Logger::error( "No NaviProvider for zone#{0} - {1}", m_pCurrentZone->getGuId(), m_pCurrentZone->getInternalName() );
+      return false;
+    }
 
-  auto x = ( cosf( angle ) * 1.1f );
-  auto y = ( getPos().y + pos.y ) * 0.5f; // fake value while there is no collision
-  auto z = ( sinf( angle ) * 1.1f );
+    auto path = pNaviProvider->findFollowPath( m_pos, pos );
 
-  Common::FFXIVARR_POSITION3 newPos{ getPos().x + x, y, getPos().z + z };
-  setPos( newPos );
+    if( !path.empty() )
+    {
+      m_naviLastPath = path;
+      m_naviTarget = pos;
+      m_naviPathStep = 0;
+      m_naviLastUpdate = Util::getTimeMs();
+    }
+    else
+    {
+      Logger::debug( "No path found from x{0} y{1} z{2} to x{3} y{4} z{5} in {6}",
+                     getPos().x, getPos().y, getPos().z, pos.x, pos.y, pos.z, m_pCurrentZone->getInternalName() );
+    }
+  }
 
-  Common::FFXIVARR_POSITION3 tmpPos{ getPos().x + x, y, getPos().z + z };
 
-  setPos( tmpPos );
-  setRot( newRot );
-
-  sendPositionUpdate();
+  step();
 
   return false;
 }
 
 void Sapphire::Entity::BNpc::sendPositionUpdate()
 {
-  auto movePacket = std::make_shared< MoveActorPacket >( *getAsChara(), 0x3A, 0, 0, 0x5A );
+  uint8_t unk1 = 0x3a;
+  uint8_t animationType = 2;
+
+  if( m_state == BNpcState::Combat )
+    animationType = 0;
+
+
+  auto movePacket = std::make_shared< MoveActorPacket >( *getAsChara(), unk1, animationType, 0, 0x5A );
   sendToInRangeSet( movePacket );
 }
 
@@ -278,7 +337,7 @@ void Sapphire::Entity::BNpc::aggro( Sapphire::Entity::CharaPtr pChara )
   if( pChara->isPlayer() )
   {
     PlayerPtr tmpPlayer = pChara->getAsPlayer();
-    tmpPlayer->queuePacket( makeActorControl142( getId(), ActorControlType::ToggleWeapon, 0, 1, 1 ) );
+    tmpPlayer->queuePacket( makeActorControl142( getId(), ActorControlType::ToggleWeapon, 1, 1, 1 ) );
     tmpPlayer->onMobAggro( getAsBNpc() );
   }
 }
@@ -291,6 +350,7 @@ void Sapphire::Entity::BNpc::deaggro( Sapphire::Entity::CharaPtr pChara )
   if( pChara->isPlayer() )
   {
     PlayerPtr tmpPlayer = pChara->getAsPlayer();
+    tmpPlayer->queuePacket( makeActorControl142( getId(), ActorControlType::ToggleWeapon, 0, 1, 1 ) );
     tmpPlayer->onMobDeaggro( getAsBNpc() );
   }
 }
@@ -299,22 +359,82 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
 {
   const uint8_t minActorDistance = 4;
   const uint8_t aggroRange = 8;
-  const uint8_t maxDistanceToOrigin = 30;
-
-  if( m_status == ActorStatus::Dead )
-    return;
+  const uint8_t maxDistanceToOrigin = 40;
+  const uint32_t roamTick = 20;
 
   switch( m_state )
   {
+    case BNpcState::Dead:
+    case BNpcState::JustDied:
+      return;
+
     case BNpcState::Retreat:
     {
+      setInvincibilityType( InvincibilityType::InvincibilityIgnoreDamage );
+
+      // slowly restore hp every tick
+
+      if( std::difftime( currTime, m_lastTickTime ) > 3000 )
+      {
+        m_lastTickTime = currTime;
+
+        if( m_hp < getMaxHp() )
+        {
+          auto addHp = static_cast< uint32_t >( getMaxHp() * 0.1f + 1 );
+
+          if( m_hp + addHp < getMaxHp() )
+            m_hp += addHp;
+          else
+            m_hp = getMaxHp();
+        }
+
+        sendStatusUpdate();
+      }
+
       if( moveTo( m_spawnPos ) )
+      {
+        setInvincibilityType( InvincibilityType::InvincibilityNone );
+
+        // retail doesn't seem to roam straight after retreating
+        // todo: perhaps requires more investigation?
+        m_lastRoamTargetReached = Util::getTimeSeconds();
+
+        setHp( getMaxHp() );
+
         m_state = BNpcState::Idle;
+      }
+    }
+    break;
+
+    case BNpcState::Roaming:
+    {
+      if( moveTo( m_roamPos ) )
+      {
+        m_lastRoamTargetReached = Util::getTimeSeconds();
+        m_state = BNpcState::Idle;
+      }
+
+      // checkaggro
     }
     break;
 
     case BNpcState::Idle:
     {
+      if( Util::getTimeSeconds() - m_lastRoamTargetReached > roamTick )
+      {
+        auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
+        auto pNaviProvider = pNaviMgr->getNaviProvider( m_pCurrentZone->getBgPath() );
+
+        if( !pNaviProvider )
+        {
+          m_lastRoamTargetReached = Util::getTimeSeconds();
+          break;
+        }
+
+        m_roamPos = pNaviProvider->findRandomPositionInCircle( m_spawnPos, 5 );
+        m_state = BNpcState::Roaming;
+      }
+
       // passive mobs should ignore players unless aggro'd
       if( m_aggressionMode == 1 )
         return;
@@ -330,8 +450,6 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
 
         if( distance < aggroRange && pClosestChara->isPlayer() )
           aggro( pClosestChara );
-        //if( distance < aggroRange && getbehavior() == 2 )
-        //   aggro( pClosestActor );
       }
     }
 
@@ -388,4 +506,32 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
       }
     }
   }
+}
+
+void Sapphire::Entity::BNpc::onActionHostile( Sapphire::Entity::CharaPtr pSource )
+{
+  if( !hateListGetHighest() )
+    aggro( pSource );
+
+  //if( !getClaimer() )
+  //  setOwner( pSource->getAsPlayer() );
+}
+
+void Sapphire::Entity::BNpc::onDeath()
+{
+  setTargetId( INVALID_GAME_OBJECT_ID );
+  m_currentStance = Stance::Passive;
+  m_state = BNpcState::Dead;
+  m_timeOfDeath = Util::getTimeSeconds();
+  hateListClear();
+}
+
+uint32_t Sapphire::Entity::BNpc::getTimeOfDeath() const
+{
+  return m_timeOfDeath;
+}
+
+void Sapphire::Entity::BNpc::setTimeOfDeath( uint32_t timeOfDeath )
+{
+  m_timeOfDeath = timeOfDeath;
 }

@@ -707,7 +707,7 @@ namespace Sapphire::Entity
     void sendStateFlags();
 
     /*! send status update */
-    void sendStatusUpdate( bool toSelf = true ) override;
+    void sendStatusUpdate() override;
 
     /*! send the entire inventory sequence */
     void sendInventory();

@@ -79,6 +79,7 @@ Sapphire::Zone::Zone( uint16_t territoryTypeId, uint32_t guId,
 
   m_weatherOverride = Weather::None;
   m_territoryTypeInfo = pExdData->get< Sapphire::Data::TerritoryType >( territoryTypeId );
+  m_bgPath = m_territoryTypeInfo->bg;
 
   loadWeatherRates();
   loadSpawnGroups();
@@ -352,6 +353,11 @@ const std::string& Sapphire::Zone::getInternalName() const
   return m_internalName;
 }
 
+const std::string& Sapphire::Zone::getBgPath() const
+{
+  return m_bgPath;
+}
+
 std::size_t Sapphire::Zone::getPopCount() const
 {
   return m_playerMap.size();
@@ -381,49 +387,48 @@ bool Sapphire::Zone::checkWeather()
 
 void Sapphire::Zone::updateBNpcs( int64_t tickCount )
 {
-   if( ( tickCount - m_lastMobUpdate ) > 250 )
-   {
-      m_lastMobUpdate = tickCount;
-      uint32_t currTime = Sapphire::Util::getTimeSeconds();
+  if( ( tickCount - m_lastMobUpdate ) <= 250 )
+    return;
 
-      /*for( auto it3 = m_BattleNpcDeadMap.begin(); it3 != m_BattleNpcDeadMap.end(); ++it3 )
+  m_lastMobUpdate = tickCount;
+  uint32_t currTime = Sapphire::Util::getTimeSeconds();
+
+  for( auto entry : m_bNpcMap )
+  {
+    Entity::BNpcPtr pBNpc = entry.second;
+
+    if( !pBNpc )
+      continue;
+
+    if( !pBNpc->isAlive() && currTime - pBNpc->getTimeOfDeath() > 10 )
+    {
+      removeActor( pBNpc );
+      break;
+    }
+  }
+
+  for( uint32_t x = 0; x < _sizeX; x++ )
+  {
+    for( uint32_t y = 0; y < _sizeY; ++y )
+    {
+      auto cell = getCellPtr( x, y );
+      if( !cell )
+        continue;
+
+      // todo: this is a pretty shit because we will visit the same cells multiple times over
+      // ideally we run a pass every tick and cache active cells during that initial pass over every cell
+      // that way we don't have an expensive lookup for every actor
+
+      if( !isCellActive( x, y ) )
+        continue;
+
+      for( const auto& actor : cell->m_actors )
       {
-
-         Entity::BattleNpcPtr pBNpc = *it3;
-
-         if( ( currTime - pBNpc->getTimeOfDeath() ) > 60 )
-         {
-
-            pBNpc->resetHp();
-            pBNpc->resetMp();
-            pBNpc->resetPos();
-            pushActor( pBNpc );
-
-            m_BattleNpcDeadMap.erase( it3 );
-
-            break;
-         }
-      }*/
-
-
-      for( auto entry : m_bNpcMap )
-      {
-         Entity::BNpcPtr pBNpc = entry.second;
-
-         if( !pBNpc )
-            continue;
-
-         //if( !pBNpc->isAlive() && currTime - pBNpc->getTimeOfDeath() > ( 10 ) )
-         //{
-         //   removeActor( pBNpc );
-         //   m_BattleNpcDeadMap.insert( pBNpc );
-         //   break;
-         //}
-
-         pBNpc->update( tickCount );
-
+        if( actor->isBattleNpc() )
+          actor->getAsBNpc()->update( tickCount );
       }
-   }
+    }
+  }
 }
 
 
@@ -782,7 +787,7 @@ bool Sapphire::Zone::loadSpawnGroups()
 
     m_spawnGroups.emplace_back( id, templateId, level, maxHp );
 
-    Logger::debug( "id: {0}, template: {1}, level: {2}, maxHp: {3}", id, m_spawnGroups.back().getTemplateId(), level, maxHp );
+    Logger::trace( "id: {0}, template: {1}, level: {2}, maxHp: {3}", id, m_spawnGroups.back().getTemplateId(), level, maxHp );
   }
 
   res.reset();
@@ -805,7 +810,7 @@ bool Sapphire::Zone::loadSpawnGroups()
 
       group.getSpawnPointList().emplace_back( std::make_shared< Entity::SpawnPoint >( x, y, z, r, gimmickId ) );
 
-      Logger::debug( "id: {0}, x: {1}, y: {2}, z: {3}, gimmickId: {4}", id, x, y, z, gimmickId );
+      Logger::trace( "id: {0}, x: {1}, y: {2}, z: {3}, gimmickId: {4}", id, x, y, z, gimmickId );
     }
   }
   return false;
@@ -844,7 +849,13 @@ void Sapphire::Zone::updateSpawnPoints()
 
         pushActor( pBNpc );
       }
+      else if( point->getLinkedBNpc() && !point->getLinkedBNpc()->isAlive() )
+      {
+        point->setTimeOfDeath( Util::getTimeSeconds() );
+        point->setLinkedBNpc( nullptr );
+      }
     }
   }
 
 }
+

@@ -53,6 +53,11 @@ namespace Sapphire
     spdlog::flush_on( spdlog::level::critical );
   }
 
+  void Logger::setLogLevel( uint8_t logLevel )
+  {
+    spdlog::set_level( static_cast< spdlog::level::level_enum >( logLevel ) );
+  }
+
   void Logger::error( const std::string& text )
   {
     spdlog::get( "logger" )->error( text );
