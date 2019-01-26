@@ -95,8 +95,8 @@ private:
   float m_meshBMin[ 3 ];
   float m_meshBMax[ 3 ];
 
-  float m_lastBuiltTileBmin[3];
-  float m_lastBuiltTileBmax[3];
+  float m_lastBuiltTileBmin[ 3 ];
+  float m_lastBuiltTileBmax[ 3 ];
 
   // options
   float m_tileSize = 160.f;
@@ -108,16 +108,16 @@ private:
   float m_agentMaxClimb = 0.6f;
   float m_agentRadius = 0.5f;
 
-  float m_edgeMaxLen = 12.f;
-  float m_edgeMaxError = 1.4f;
-
   float m_regionMinSize = 8.f;
   float m_regionMergeSize = 20.f;
 
+  float m_edgeMaxLen = 12.f;
+  float m_edgeMaxError = 1.4f;
   float m_vertsPerPoly = 6.f;
 
   float m_detailSampleDist = 6.f;
   float m_detailSampleMaxError = 1.f;
+
 };
 
 
