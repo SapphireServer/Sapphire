@@ -198,34 +198,32 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     return true;
   }
 
-  // Check if we have to recalculate
-  if( Util::getTimeMs() - m_naviLastUpdate > 500 )
+  auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
+  auto pNaviProvider = pNaviMgr->getNaviProvider( m_pCurrentZone->getBgPath() );
+
+  if( !pNaviProvider )
   {
-    auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
-    auto pNaviProvider = pNaviMgr->getNaviProvider( m_pCurrentZone->getBgPath() );
+    Logger::error( "No NaviProvider for zone#{0} - {1}",
+                   m_pCurrentZone->getGuId(),
+                   m_pCurrentZone->getInternalName() );
+    return false;
+  }
 
-    if( !pNaviProvider )
-    {
-      Logger::error( "No NaviProvider for zone#{0} - {1}",
-                     m_pCurrentZone->getGuId(),
-                     m_pCurrentZone->getInternalName() );
-      return false;
-    }
+  auto path = pNaviProvider->findFollowPath( m_pos, pos );
 
-    auto path = pNaviProvider->findFollowPath( m_pos, pos );
+  if( !path.empty() )
+  {
+    m_naviLastPath = path;
+    m_naviTarget = pos;
+    m_naviPathStep = 0;
+    m_naviLastUpdate = Util::getTimeMs();
+  }
+  else
+  {
+    Logger::debug( "No path found from x{0} y{1} z{2} to x{3} y{4} z{5} in {6}",
+                   getPos().x, getPos().y, getPos().z, pos.x, pos.y, pos.z, m_pCurrentZone->getInternalName() );
 
-    if( !path.empty() )
-    {
-      m_naviLastPath = path;
-      m_naviTarget = pos;
-      m_naviPathStep = 0;
-      m_naviLastUpdate = Util::getTimeMs();
-    }
-    else
-    {
-      Logger::debug( "No path found from x{0} y{1} z{2} to x{3} y{4} z{5} in {6}",
-                     getPos().x, getPos().y, getPos().z, pos.x, pos.y, pos.z, m_pCurrentZone->getInternalName() );
-    }
+    hateListClear();
   }
 
 
