@@ -174,14 +174,19 @@ void Sapphire::Entity::BNpc::step()
   // This is probably not a good way to do it but works fine for now
   float angle = Util::calcAngFrom( getPos().x, getPos().z, stepPos.x, stepPos.z ) + PI;
 
-  auto x = ( cosf( angle ) * .5f );
+  float speed = 1.7f;
+
+  if( m_state == BNpcState::Roaming )
+    speed *= 0.5f;
+
+  auto x = ( cosf( angle ) * speed );
   auto y = stepPos.y;
-  auto z = ( sinf( angle ) * .5f );
+  auto z = ( sinf( angle ) * speed );
 
   face( stepPos );
   setPos( { getPos().x + x, y, getPos().z + z } );
-
   sendPositionUpdate();
+
 }
 
 bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
@@ -201,7 +206,9 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 
     if( !pNaviProvider )
     {
-      Logger::error( "No NaviProvider for zone#{0} - {1}", m_pCurrentZone->getGuId(), m_pCurrentZone->getInternalName() );
+      Logger::error( "No NaviProvider for zone#{0} - {1}",
+                     m_pCurrentZone->getGuId(),
+                     m_pCurrentZone->getInternalName() );
       return false;
     }
 
@@ -223,7 +230,6 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 
 
   step();
-
   return false;
 }
 
@@ -232,9 +238,8 @@ void Sapphire::Entity::BNpc::sendPositionUpdate()
   uint8_t unk1 = 0x3a;
   uint8_t animationType = 2;
 
-  if( m_state == BNpcState::Combat )
+  if( m_state == BNpcState::Combat || m_state == BNpcState::Retreat )
     animationType = 0;
-
 
   auto movePacket = std::make_shared< MoveActorPacket >( *getAsChara(), unk1, animationType, 0, 0x5A );
   sendToInRangeSet( movePacket );
@@ -362,6 +367,7 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
   const uint8_t maxDistanceToOrigin = 40;
   const uint32_t roamTick = 20;
 
+
   switch( m_state )
   {
     case BNpcState::Dead:
@@ -372,25 +378,10 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
     {
       setInvincibilityType( InvincibilityType::InvincibilityIgnoreDamage );
 
-      // slowly restore hp every tick
-
       if( std::difftime( currTime, m_lastTickTime ) > 3000 )
-      {
-        m_lastTickTime = currTime;
+        regainHp( currTime );
 
-        if( m_hp < getMaxHp() )
-        {
-          auto addHp = static_cast< uint32_t >( getMaxHp() * 0.1f + 1 );
-
-          if( m_hp + addHp < getMaxHp() )
-            m_hp += addHp;
-          else
-            m_hp = getMaxHp();
-        }
-
-        sendStatusUpdate();
-      }
-
+      // slowly restore hp every tick
       if( moveTo( m_spawnPos ) )
       {
         setInvincibilityType( InvincibilityType::InvincibilityNone );
@@ -399,6 +390,7 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
         // todo: perhaps requires more investigation?
         m_lastRoamTargetReached = Util::getTimeSeconds();
 
+        // resetHp
         setHp( getMaxHp() );
 
         m_state = BNpcState::Idle;
@@ -414,7 +406,7 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
         m_state = BNpcState::Idle;
       }
 
-      // checkaggro
+      checkAggro( aggroRange );
     }
     break;
 
@@ -435,22 +427,7 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
         m_state = BNpcState::Roaming;
       }
 
-      // passive mobs should ignore players unless aggro'd
-      if( m_aggressionMode == 1 )
-        return;
-
-      CharaPtr pClosestChara = getClosestChara();
-
-      if( pClosestChara && pClosestChara->isAlive() )
-      {
-        auto distance = Util::distance( getPos().x, getPos().y, getPos().z,
-                                        pClosestChara->getPos().x,
-                                        pClosestChara->getPos().y,
-                                        pClosestChara->getPos().z );
-
-        if( distance < aggroRange && pClosestChara->isPlayer() )
-          aggro( pClosestChara );
-      }
+      checkAggro( aggroRange );
     }
 
     case BNpcState::Combat:
@@ -508,6 +485,23 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
   }
 }
 
+void Sapphire::Entity::BNpc::regainHp( int64_t currTime )
+{
+  this->m_lastTickTime = currTime;
+
+  if( this->m_hp < this->getMaxHp() )
+  {
+    auto addHp = static_cast< uint32_t >( this->getMaxHp() * 0.1f + 1 );
+
+    if( this->m_hp + addHp < this->getMaxHp() )
+      this->m_hp += addHp;
+    else
+      this->m_hp = this->getMaxHp();
+  }
+
+  this->sendStatusUpdate();
+}
+
 void Sapphire::Entity::BNpc::onActionHostile( Sapphire::Entity::CharaPtr pSource )
 {
   if( !hateListGetHighest() )
@@ -534,4 +528,24 @@ uint32_t Sapphire::Entity::BNpc::getTimeOfDeath() const
 void Sapphire::Entity::BNpc::setTimeOfDeath( uint32_t timeOfDeath )
 {
   m_timeOfDeath = timeOfDeath;
+}
+
+void Sapphire::Entity::BNpc::checkAggro( uint32_t range )
+{
+  // passive mobs should ignore players unless aggro'd
+  if( m_aggressionMode == 1 )
+    return;
+
+  CharaPtr pClosestChara = getClosestChara();
+
+  if( pClosestChara && pClosestChara->isAlive() )
+  {
+    auto distance = Util::distance( getPos().x, getPos().y, getPos().z,
+                                    pClosestChara->getPos().x,
+                                    pClosestChara->getPos().y,
+                                    pClosestChara->getPos().z );
+
+    if( distance < range && pClosestChara->isPlayer() )
+      aggro( pClosestChara );
+  }
 }

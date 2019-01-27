@@ -45,7 +45,7 @@ public:
 
   bool hasPlayers() const
   {
-    return ( ( m_playerCount > 0 ) ? true : false );
+    return m_playerCount > 0;
   }
 
   size_t getActorCount() const
