@@ -255,7 +255,7 @@ Sapphire::Common::FFXIVARR_POSITION3
   auto pRNGMgr = m_pFw->get< World::Manager::RNGMgr >();
   auto rng = pRNGMgr->getRandGenerator< float >( 0.f, 1.f );
   status = m_naviMeshQuery->findRandomPointAroundCircle( startRef, spos, maxRadius, &filter, frand,
-             &randomRef, randomPt);
+             &randomRef, randomPt );
 
   if( dtStatusFailed( status ) )
   {

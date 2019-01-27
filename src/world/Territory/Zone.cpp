@@ -407,9 +407,9 @@ void Sapphire::Zone::updateBNpcs( int64_t tickCount )
     }
   }
 
-  for( uint32_t x = 0; x < _sizeX; x++ )
+  for( uint32_t y = 0; y < _sizeY; ++y )
   {
-    for( uint32_t y = 0; y < _sizeY; ++y )
+    for( uint32_t x = 0; x < _sizeX; ++x )
     {
       auto cell = getCellPtr( x, y );
       if( !cell )

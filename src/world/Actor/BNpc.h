@@ -90,6 +90,10 @@ namespace Sapphire::Entity
     uint32_t getTimeOfDeath() const;
     void setTimeOfDeath( uint32_t timeOfDeath );
 
+    void regainHp( int64_t currTime );
+
+    void checkAggro( uint32_t range );
+
   private:
     uint32_t m_bNpcBaseId;
     uint32_t m_bNpcNameId;
