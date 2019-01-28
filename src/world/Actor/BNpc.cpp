@@ -489,7 +489,7 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
         if( distanceOrig > maxDistanceToOrigin )
         {
           hateListClear();
-          changeTarget( INVALID_GAME_OBJECT_ID );
+          changeTarget( INVALID_GAME_OBJECT_ID64 );
           setStance( Stance::Passive );
           //setOwner( nullptr );
           m_state = BNpcState::Retreat;
@@ -508,7 +508,7 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
       }
       else
       {
-        changeTarget( INVALID_GAME_OBJECT_ID );
+        changeTarget( INVALID_GAME_OBJECT_ID64 );
         setStance( Stance::Passive );
         //setOwner( nullptr );
         m_state = BNpcState::Retreat;
