@@ -387,7 +387,7 @@ bool Sapphire::Zone::checkWeather()
 
 void Sapphire::Zone::updateBNpcs( int64_t tickCount )
 {
-  if( ( tickCount - m_lastMobUpdate ) <= 100 )
+  if( ( tickCount - m_lastMobUpdate ) <= 250 )
     return;
 
   m_lastMobUpdate = tickCount;
