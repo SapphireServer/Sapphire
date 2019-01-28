@@ -88,6 +88,7 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
   memcpy( m_customize, pTemplate->getCustomize(), sizeof( m_customize ) );
   memcpy( m_modelEquip, pTemplate->getModelEquip(), sizeof( m_modelEquip ) );
 
+  m_lastTickTime = Util::getTimeMs();
 }
 
 Sapphire::Entity::BNpc::~BNpc()
@@ -162,11 +163,9 @@ void Sapphire::Entity::BNpc::step()
     return;
 
   auto stepPos = m_naviLastPath[ m_naviPathStep ];
-  auto distanceToStep = Util::distance( getPos().x, getPos().y, getPos().z,
-                                        stepPos.x, stepPos.y, stepPos.z );
 
-  auto distanceToDest = Util::distance( getPos().x, getPos().y, getPos().z,
-                                        m_naviTarget.x, m_naviTarget.y, m_naviTarget.z );
+  auto distanceToStep = Util::distance( getPos(), stepPos );
+  auto distanceToDest = Util::distance( getPos(), m_naviTarget );
 
   if( distanceToStep <= 4 && m_naviPathStep < m_naviLastPath.size() - 1 )
   {
@@ -201,7 +200,7 @@ void Sapphire::Entity::BNpc::step()
 
 bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 {
-  if( Util::distance( getPos().x, getPos().y, getPos().z, pos.x, pos.y, pos.z ) <= 4 )
+  if( Util::distance( getPos(), pos ) <= 4 )
   {
     // Reached destination
     m_naviLastPath.clear();
@@ -389,7 +388,6 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
       if( std::difftime( currTime, m_lastTickTime ) > 3000 )
         regainHp( currTime );
 
-      // slowly restore hp every tick
       if( moveTo( m_spawnPos ) )
       {
         setInvincibilityType( InvincibilityType::InvincibilityNone );
@@ -491,12 +489,12 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
       }
     }
   }
+
+  m_lastTickTime = currTime;
 }
 
 void Sapphire::Entity::BNpc::regainHp( int64_t currTime )
 {
-  this->m_lastTickTime = currTime;
-
   if( this->m_hp < this->getMaxHp() )
   {
     auto addHp = static_cast< uint32_t >( this->getMaxHp() * 0.1f + 1 );

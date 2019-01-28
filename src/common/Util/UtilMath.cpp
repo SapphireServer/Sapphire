@@ -15,6 +15,11 @@ float Sapphire::Util::distance( float x, float y, float z, float x1, float y1, f
   return sqrtf( distanceSq( x, y, z, x1, y1, z1 ) );
 }
 
+float Sapphire::Util::distance( const Common::FFXIVARR_POSITION3& pos1, const Common::FFXIVARR_POSITION3& pos2 )
+{
+  return sqrtf( distanceSq( pos1.x, pos1.y, pos1.z, pos2.x, pos2.y, pos2.z ) );
+}
+
 float Sapphire::Util::distance2DSq( float x, float y, float x1, float y1 )
 {
   float deltaX = x - x1;
