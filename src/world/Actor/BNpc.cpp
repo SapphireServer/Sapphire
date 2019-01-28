@@ -88,6 +88,7 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
   memcpy( m_customize, pTemplate->getCustomize(), sizeof( m_customize ) );
   memcpy( m_modelEquip, pTemplate->getModelEquip(), sizeof( m_modelEquip ) );
 
+  m_lastTickTime = 0;
 }
 
 Sapphire::Entity::BNpc::~BNpc()
@@ -162,11 +163,9 @@ void Sapphire::Entity::BNpc::step()
     return;
 
   auto stepPos = m_naviLastPath[ m_naviPathStep ];
-  auto distanceToStep = Util::distance( getPos().x, getPos().y, getPos().z,
-                                        stepPos.x, stepPos.y, stepPos.z );
 
-  auto distanceToDest = Util::distance( getPos().x, getPos().y, getPos().z,
-                                        m_naviTarget.x, m_naviTarget.y, m_naviTarget.z );
+  auto distanceToStep = Util::distance( getPos(), stepPos );
+  auto distanceToDest = Util::distance( getPos(), m_naviTarget );
 
   if( distanceToStep <= 4 && m_naviPathStep < m_naviLastPath.size() - 1 )
   {
@@ -178,15 +177,16 @@ void Sapphire::Entity::BNpc::step()
   // This is probably not a good way to do it but works fine for now
   float angle = Util::calcAngFrom( getPos().x, getPos().z, stepPos.x, stepPos.z ) + PI;
 
-  float speed = 1.7f;
+  auto delta = static_cast< float >( Util::getTimeMs() - m_lastUpdate ) / 1000.f;
+
+  float speed = 7.5f * delta;
 
   if( m_state == BNpcState::Roaming )
-    speed *= 0.5f;
+    speed *= 0.27f;
 
-  if( distanceToDest <= distanceToStep + speed )
-  {
-    speed = distanceToDest;
-  }
+  // this seems to fix it but i don't know why :(
+  if( speed > distanceToDest )
+    speed = distanceToDest / delta;
 
   auto x = ( cosf( angle ) * speed );
   auto y = stepPos.y;
@@ -201,7 +201,7 @@ void Sapphire::Entity::BNpc::step()
 
 bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 {
-  if( Util::distance( getPos().x, getPos().y, getPos().z, pos.x, pos.y, pos.z ) <= 4 )
+  if( Util::distance( getPos(), pos ) <= 4 )
   {
     // Reached destination
     m_naviLastPath.clear();
@@ -233,7 +233,27 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     Logger::debug( "No path found from x{0} y{1} z{2} to x{3} y{4} z{5} in {6}",
                    getPos().x, getPos().y, getPos().z, pos.x, pos.y, pos.z, m_pCurrentZone->getInternalName() );
 
+
     hateListClear();
+
+    if( m_state == BNpcState::Roaming )
+    {
+      Logger::warn( "BNpc Base#{0} Name#{1} unable to path from x{2} y{3} z{4} while roaming. "
+                    "Possible pathing error in area. Returning BNpc to spawn position x{5} y{6} z{7}.",
+                    m_bNpcBaseId, m_bNpcNameId,
+                    getPos().x, getPos().y, getPos().z,
+                    m_spawnPos.x, m_spawnPos.y, m_spawnPos.z );
+
+      m_lastRoamTargetReached = Util::getTimeSeconds();
+      m_state = BNpcState::Idle;
+
+      m_naviLastPath.clear();
+
+      setPos( m_spawnPos );
+      sendPositionUpdate();
+
+      return true;
+    }
   }
 
 
@@ -368,6 +388,14 @@ void Sapphire::Entity::BNpc::deaggro( Sapphire::Entity::CharaPtr pChara )
   }
 }
 
+void Sapphire::Entity::BNpc::onTick()
+{
+  if( m_state == BNpcState::Retreat )
+  {
+    regainHp();
+  }
+}
+
 void Sapphire::Entity::BNpc::update( int64_t currTime )
 {
   const uint8_t minActorDistance = 4;
@@ -386,10 +414,6 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
     {
       setInvincibilityType( InvincibilityType::InvincibilityIgnoreDamage );
 
-      if( std::difftime( currTime, m_lastTickTime ) > 3000 )
-        regainHp( currTime );
-
-      // slowly restore hp every tick
       if( moveTo( m_spawnPos ) )
       {
         setInvincibilityType( InvincibilityType::InvincibilityNone );
@@ -491,12 +515,13 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
       }
     }
   }
+
+
+  Chara::update( currTime );
 }
 
-void Sapphire::Entity::BNpc::regainHp( int64_t currTime )
+void Sapphire::Entity::BNpc::regainHp()
 {
-  this->m_lastTickTime = currTime;
-
   if( this->m_hp < this->getMaxHp() )
   {
     auto addHp = static_cast< uint32_t >( this->getMaxHp() * 0.1f + 1 );

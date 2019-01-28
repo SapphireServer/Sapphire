@@ -393,7 +393,7 @@ void Sapphire::Zone::updateBNpcs( int64_t tickCount )
   m_lastMobUpdate = tickCount;
   uint32_t currTime = Sapphire::Util::getTimeSeconds();
 
-  for( auto entry : m_bNpcMap )
+  for( const auto& entry : m_bNpcMap )
   {
     Entity::BNpcPtr pBNpc = entry.second;
 

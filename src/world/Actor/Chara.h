@@ -68,11 +68,11 @@ namespace Sapphire::Entity
   protected:
     char m_name[34];
     /*! Last tick time for the actor  ( in ms ) */
-    uint64_t m_lastTickTime;
+    int64_t m_lastTickTime;
     /*! Last time the actor performed an autoAttack ( in ms ) */
     uint64_t m_lastAttack;
     /*! Last time the actor was updated ( in ms ) */
-    uint64_t m_lastUpdate;
+    int64_t m_lastUpdate;
     /*! Current stance of the actor */
     Common::Stance m_currentStance;
     /*! Current staus of the actor */
@@ -237,7 +237,7 @@ namespace Sapphire::Entity
 
     virtual bool checkAction();
 
-    virtual void update( int64_t currTime ) {};
+    virtual void update( int64_t currTime );
 
     Action::ActionPtr getCurrentAction() const;
 
