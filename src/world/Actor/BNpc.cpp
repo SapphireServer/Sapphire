@@ -179,10 +179,10 @@ void Sapphire::Entity::BNpc::step()
 
   auto delta =  static_cast< float >( Util::getTimeMs() - m_lastTickTime ) / 1000.f;
 
-  float speed = 7.25f * delta;
+  float speed = 7.5f * delta;
 
   if( m_state == BNpcState::Roaming )
-    speed *= 0.3f;
+    speed *= 0.27f;
 
   // this seems to fix it but i don't know why :(
   if( speed > distanceToDest )
