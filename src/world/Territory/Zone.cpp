@@ -645,7 +645,7 @@ void Sapphire::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
 
   auto iter = pCell->m_actors.begin();
 
-  float fRange = 70.0f;
+  float fRange = 150.0f;
   int32_t count = 0;
   while( iter != pCell->m_actors.end() )
   {
@@ -655,8 +655,7 @@ void Sapphire::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
     if( !pCurAct || pCurAct == pActor )
       continue;
 
-    float distance = Util::distance( pCurAct->getPos().x, pCurAct->getPos().y, pCurAct->getPos().z,
-                                     pActor->getPos().x, pActor->getPos().y, pActor->getPos().z );
+    float distance = Util::distance( pCurAct->getPos(), pActor->getPos() );
 
     bool isInRange = ( fRange == 0.0f || distance <= fRange );
     bool isInRangeSet = pActor->isInRangeSet( pCurAct );

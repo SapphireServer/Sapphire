@@ -1127,11 +1127,14 @@ void Sapphire::Entity::Player::freePlayerSpawnId( uint32_t actorId )
 {
   auto spawnId = m_actorSpawnIndexAllocator.freeUsedSpawnIndex( actorId );
 
+  // actor was never spawned for this player
+  if( spawnId == m_actorSpawnIndexAllocator.getAllocFailId() )
+    return;
+
   auto freeActorSpawnPacket = makeZonePacket< FFXIVIpcActorFreeSpawn >( getId() );
   freeActorSpawnPacket->data().actorId = actorId;
   freeActorSpawnPacket->data().spawnId = spawnId;
   queuePacket( freeActorSpawnPacket );
-
 }
 
 uint8_t* Sapphire::Entity::Player::getAetheryteArray()
@@ -1843,6 +1846,10 @@ void Sapphire::Entity::Player::resetObjSpawnIndex()
 void Sapphire::Entity::Player::freeObjSpawnIndexForActorId( uint32_t actorId )
 {
   auto spawnId = m_objSpawnIndexAllocator.freeUsedSpawnIndex( actorId );
+
+  // obj was never spawned for this player
+  if( spawnId == m_objSpawnIndexAllocator.getAllocFailId() )
+    return;
 
   auto freeObjectSpawnPacket = makeZonePacket< FFXIVIpcObjectDespawn >( getId() );
   freeObjectSpawnPacket->data().spawnIndex = spawnId;
