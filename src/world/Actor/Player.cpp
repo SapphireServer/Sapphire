@@ -534,7 +534,20 @@ void Sapphire::Entity::Player::initSpawnIdQueue()
 
 uint8_t Sapphire::Entity::Player::getSpawnIdForActorId( uint32_t actorId )
 {
-  return m_actorSpawnIndexAllocator.getNextFreeSpawnIndex( actorId );
+  auto index = m_actorSpawnIndexAllocator.getNextFreeSpawnIndex( actorId );
+
+  if( index == m_actorSpawnIndexAllocator.getAllocFailId() )
+  {
+    Logger::warn( "Failed to spawn Chara#{0} for Player#{1} - no remaining spawn indexes available. "
+                  "Consider lowering InRangeDistance in world config.",
+                  actorId, getId() );
+
+    sendUrgent( "Failed to spawn Chara#{0} for you - no remaining spawn slots. See world log.", actorId );
+
+    return index;
+  }
+
+  return index;
 }
 
 bool Sapphire::Entity::Player::isActorSpawnIdValid( uint8_t spawnIndex )
@@ -1835,7 +1848,20 @@ void Sapphire::Entity::Player::teleportQuery( uint16_t aetheryteId, FrameworkPtr
 
 uint8_t Sapphire::Entity::Player::getNextObjSpawnIndexForActorId( uint32_t actorId )
 {
-  return m_objSpawnIndexAllocator.getNextFreeSpawnIndex( actorId );
+  auto index = m_objSpawnIndexAllocator.getNextFreeSpawnIndex( actorId );
+
+  if( index == m_objSpawnIndexAllocator.getAllocFailId() )
+  {
+    Logger::warn( "Failed to spawn EObj#{0} for Player#{1} - no remaining spawn indexes available. "
+                  "Consider lowering InRangeDistance in world config.",
+                  actorId, getId() );
+
+    sendUrgent( "Failed to spawn EObj#{0} for you - no remaining spawn slots. See world log.", actorId );
+
+    return index;
+  }
+
+  return index;
 }
 
 void Sapphire::Entity::Player::resetObjSpawnIndex()
