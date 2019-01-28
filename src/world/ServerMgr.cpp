@@ -101,7 +101,7 @@ bool Sapphire::World::ServerMgr::loadSettings( int32_t argc, char* argv[] )
   m_config.network.disconnectTimeout = pConfig->getValue< uint16_t >( "Network", "DisconnectTimeout", 20 );
   m_config.network.listenIp = pConfig->getValue< std::string >( "Network", "ListenIp", "0.0.0.0" );
   m_config.network.listenPort = pConfig->getValue< uint16_t >( "Network", "ListenPort", 54992 );
-  m_config.network.inRangeDistance = pConfig->getValue< float >( "Network", "InRangeDistance", 100.f );
+  m_config.network.inRangeDistance = pConfig->getValue< float >( "Network", "InRangeDistance", 80.f );
 
   m_config.motd = pConfig->getValue< std::string >( "General", "MotD", "" );
 

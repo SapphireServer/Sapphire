@@ -58,7 +58,9 @@ namespace Sapphire::Network::Packets::Server
 
       m_data.classJob = 0;
 
-      m_data.targetId = Common::INVALID_GAME_OBJECT_ID;
+      m_data.targetId = Common::INVALID_GAME_OBJECT_ID64;
+      m_data.spawnerId = Common::INVALID_GAME_OBJECT_ID64;
+      m_data.parentActorId = Common::INVALID_GAME_OBJECT_ID64;
 
       //m_data.u23 = 0x04;
       //m_data.u24 = 256;
