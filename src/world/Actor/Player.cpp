@@ -1043,7 +1043,6 @@ void Sapphire::Entity::Player::unsetStateFlag( Common::PlayerStateFlag flag )
 
 void Sapphire::Entity::Player::update( int64_t currTime )
 {
-
   // a zoning is pending, lets do it
   if( m_queuedZoneing && ( currTime - m_queuedZoneing->m_queueTime ) > 800 )
   {
@@ -1115,13 +1114,7 @@ void Sapphire::Entity::Player::update( int64_t currTime )
     }
   }
 
-  if( ( currTime - m_lastTickTime ) > 3000 )
-  {
-    // add 3 seconds to total play time
-    m_playTime += 3;
-    m_lastTickTime = currTime;
-    onTick();
-  }
+  Chara::update( currTime );
 }
 
 void Sapphire::Entity::Player::onMobKill( uint16_t nameId )
