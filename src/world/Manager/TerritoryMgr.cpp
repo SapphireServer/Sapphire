@@ -2,6 +2,8 @@
 #include <Database/DatabaseDef.h>
 #include <Exd/ExdDataGenerated.h>
 
+#include "ServerMgr.h"
+
 #include <unordered_map>
 
 #include "Actor/Player.h"
@@ -58,6 +60,10 @@ bool Sapphire::World::Manager::TerritoryMgr::init()
   {
     return false;
   }
+
+  auto& cfg = framework()->get< World::ServerMgr >()->getConfig();
+
+  m_inRangeDistance = cfg.network.inRangeDistance;
 
   return true;
 }
@@ -584,5 +590,9 @@ void Sapphire::World::Manager::TerritoryMgr::disableCurrentFestival()
   setCurrentFestival( 0 );
 }
 
+float Sapphire::World::Manager::TerritoryMgr::getInRangeDistance() const
+{
+  return m_inRangeDistance;
+}
 
 
