@@ -177,15 +177,16 @@ void Sapphire::Entity::BNpc::step()
   // This is probably not a good way to do it but works fine for now
   float angle = Util::calcAngFrom( getPos().x, getPos().z, stepPos.x, stepPos.z ) + PI;
 
-  float speed = 1.7f;
+  auto delta =  static_cast< float >( Util::getTimeMs() - m_lastTickTime ) / 1000.f;
+
+  float speed = 7.25f * delta;
 
   if( m_state == BNpcState::Roaming )
-    speed *= 0.5f;
+    speed *= 0.3f;
 
-  if( distanceToDest <= distanceToStep + speed )
-  {
-    speed = distanceToDest;
-  }
+  // this seems to fix it but i don't know why :(
+  if( speed > distanceToDest )
+    speed = distanceToDest / delta;
 
   auto x = ( cosf( angle ) * speed );
   auto y = stepPos.y;
