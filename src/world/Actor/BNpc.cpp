@@ -88,7 +88,7 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
   memcpy( m_customize, pTemplate->getCustomize(), sizeof( m_customize ) );
   memcpy( m_modelEquip, pTemplate->getModelEquip(), sizeof( m_modelEquip ) );
 
-  m_lastTickTime = Util::getTimeMs();
+  m_lastTickTime = 0;
 }
 
 Sapphire::Entity::BNpc::~BNpc()
@@ -177,7 +177,7 @@ void Sapphire::Entity::BNpc::step()
   // This is probably not a good way to do it but works fine for now
   float angle = Util::calcAngFrom( getPos().x, getPos().z, stepPos.x, stepPos.z ) + PI;
 
-  auto delta = static_cast< float >( Util::getTimeMs() - m_lastTickTime ) / 1000.f;
+  auto delta = static_cast< float >( Util::getTimeMs() - m_lastUpdate ) / 1000.f;
 
   float speed = 7.5f * delta;
 
@@ -388,6 +388,14 @@ void Sapphire::Entity::BNpc::deaggro( Sapphire::Entity::CharaPtr pChara )
   }
 }
 
+void Sapphire::Entity::BNpc::onTick()
+{
+  if( m_state == BNpcState::Retreat )
+  {
+    regainHp();
+  }
+}
+
 void Sapphire::Entity::BNpc::update( int64_t currTime )
 {
   const uint8_t minActorDistance = 4;
@@ -405,9 +413,6 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
     case BNpcState::Retreat:
     {
       setInvincibilityType( InvincibilityType::InvincibilityIgnoreDamage );
-
-      if( std::difftime( currTime, m_lastTickTime ) > 3000 )
-        regainHp( currTime );
 
       if( moveTo( m_spawnPos ) )
       {
@@ -511,10 +516,11 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
     }
   }
 
-  m_lastTickTime = currTime;
+
+  Chara::update( currTime );
 }
 
-void Sapphire::Entity::BNpc::regainHp( int64_t currTime )
+void Sapphire::Entity::BNpc::regainHp()
 {
   if( this->m_hp < this->getMaxHp() )
   {

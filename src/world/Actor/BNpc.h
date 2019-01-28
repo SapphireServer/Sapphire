@@ -82,6 +82,7 @@ namespace Sapphire::Entity
     void deaggro( CharaPtr pChara );
 
     void update( int64_t currTime ) override;
+    void onTick() override;
 
     void onActionHostile( CharaPtr pSource ) override;
 
@@ -90,7 +91,7 @@ namespace Sapphire::Entity
     uint32_t getTimeOfDeath() const;
     void setTimeOfDeath( uint32_t timeOfDeath );
 
-    void regainHp( int64_t currTime );
+    void regainHp();
 
     void checkAggro( uint32_t range );
 

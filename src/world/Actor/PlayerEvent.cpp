@@ -355,6 +355,9 @@ void Sapphire::Entity::Player::onDeath()
 void Sapphire::Entity::Player::onTick()
 {
 
+  // add 3 seconds to total play time
+  m_playTime += 3;
+
   bool sendUpdate = false;
 
   if( !isAlive() || !isLoadingComplete() )

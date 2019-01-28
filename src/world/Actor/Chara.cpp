@@ -280,6 +280,18 @@ bool Sapphire::Entity::Chara::checkAction()
 
 }
 
+void Sapphire::Entity::Chara::update( int64_t currTime )
+{
+  if( std::difftime( currTime, m_lastTickTime ) > 3000 )
+  {
+    onTick();
+
+    m_lastTickTime = currTime;
+  }
+
+  m_lastUpdate = currTime;
+}
+
 /*!
 Change the current target and propagate to in range players
 
