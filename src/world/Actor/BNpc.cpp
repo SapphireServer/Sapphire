@@ -177,7 +177,7 @@ void Sapphire::Entity::BNpc::step()
   // This is probably not a good way to do it but works fine for now
   float angle = Util::calcAngFrom( getPos().x, getPos().z, stepPos.x, stepPos.z ) + PI;
 
-  auto delta =  static_cast< float >( Util::getTimeMs() - m_lastTickTime ) / 1000.f;
+  auto delta = static_cast< float >( Util::getTimeMs() - m_lastTickTime ) / 1000.f;
 
   float speed = 7.5f * delta;
 
