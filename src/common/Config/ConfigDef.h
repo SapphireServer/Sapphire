@@ -44,6 +44,8 @@ namespace Sapphire::Common::Config
       uint16_t listenPort;
 
       uint16_t disconnectTimeout;
+
+      float inRangeDistance;
     } network;
 
     struct Housing

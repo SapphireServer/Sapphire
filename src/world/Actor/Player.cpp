@@ -534,7 +534,20 @@ void Sapphire::Entity::Player::initSpawnIdQueue()
 
 uint8_t Sapphire::Entity::Player::getSpawnIdForActorId( uint32_t actorId )
 {
-  return m_actorSpawnIndexAllocator.getNextFreeSpawnIndex( actorId );
+  auto index = m_actorSpawnIndexAllocator.getNextFreeSpawnIndex( actorId );
+
+  if( index == m_actorSpawnIndexAllocator.getAllocFailId() )
+  {
+    Logger::warn( "Failed to spawn Chara#{0} for Player#{1} - no remaining spawn indexes available. "
+                  "Consider lowering InRangeDistance in world config.",
+                  actorId, getId() );
+
+    sendUrgent( "Failed to spawn Chara#{0} for you - no remaining spawn slots. See world log.", actorId );
+
+    return index;
+  }
+
+  return index;
 }
 
 bool Sapphire::Entity::Player::isActorSpawnIdValid( uint8_t spawnIndex )
@@ -1127,11 +1140,14 @@ void Sapphire::Entity::Player::freePlayerSpawnId( uint32_t actorId )
 {
   auto spawnId = m_actorSpawnIndexAllocator.freeUsedSpawnIndex( actorId );
 
+  // actor was never spawned for this player
+  if( spawnId == m_actorSpawnIndexAllocator.getAllocFailId() )
+    return;
+
   auto freeActorSpawnPacket = makeZonePacket< FFXIVIpcActorFreeSpawn >( getId() );
   freeActorSpawnPacket->data().actorId = actorId;
   freeActorSpawnPacket->data().spawnId = spawnId;
   queuePacket( freeActorSpawnPacket );
-
 }
 
 uint8_t* Sapphire::Entity::Player::getAetheryteArray()
@@ -1832,7 +1848,20 @@ void Sapphire::Entity::Player::teleportQuery( uint16_t aetheryteId, FrameworkPtr
 
 uint8_t Sapphire::Entity::Player::getNextObjSpawnIndexForActorId( uint32_t actorId )
 {
-  return m_objSpawnIndexAllocator.getNextFreeSpawnIndex( actorId );
+  auto index = m_objSpawnIndexAllocator.getNextFreeSpawnIndex( actorId );
+
+  if( index == m_objSpawnIndexAllocator.getAllocFailId() )
+  {
+    Logger::warn( "Failed to spawn EObj#{0} for Player#{1} - no remaining spawn indexes available. "
+                  "Consider lowering InRangeDistance in world config.",
+                  actorId, getId() );
+
+    sendUrgent( "Failed to spawn EObj#{0} for you - no remaining spawn slots. See world log.", actorId );
+
+    return index;
+  }
+
+  return index;
 }
 
 void Sapphire::Entity::Player::resetObjSpawnIndex()
@@ -1843,6 +1872,10 @@ void Sapphire::Entity::Player::resetObjSpawnIndex()
 void Sapphire::Entity::Player::freeObjSpawnIndexForActorId( uint32_t actorId )
 {
   auto spawnId = m_objSpawnIndexAllocator.freeUsedSpawnIndex( actorId );
+
+  // obj was never spawned for this player
+  if( spawnId == m_objSpawnIndexAllocator.getAllocFailId() )
+    return;
 
   auto freeObjectSpawnPacket = makeZonePacket< FFXIVIpcObjectDespawn >( getId() );
   freeObjectSpawnPacket->data().spawnIndex = spawnId;
