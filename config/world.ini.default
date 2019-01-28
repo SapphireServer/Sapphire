@@ -10,7 +10,6 @@ HotSwap = true
 ListenIp = 0.0.0.0
 ListenPort = 54992
 DisconnectTimeout = 20
-InRangeDistance = 100.0
 
 [General]
 ; Sent on login - each line must be shorter than 307 characters, split lines with ';'
