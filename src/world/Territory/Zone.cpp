@@ -645,7 +645,7 @@ void Sapphire::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
 
   auto iter = pCell->m_actors.begin();
 
-  float fRange = 100.0f;
+  float fRange = pTeriMgr->getInRangeDistance();
   int32_t count = 0;
   while( iter != pCell->m_actors.end() )
   {
