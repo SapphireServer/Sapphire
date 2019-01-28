@@ -232,7 +232,27 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     Logger::debug( "No path found from x{0} y{1} z{2} to x{3} y{4} z{5} in {6}",
                    getPos().x, getPos().y, getPos().z, pos.x, pos.y, pos.z, m_pCurrentZone->getInternalName() );
 
+
     hateListClear();
+
+    if( m_state == BNpcState::Roaming )
+    {
+      Logger::warn( "BNpc Base#{0} Name#{1} unable to path from x{2} y{3} z{4} while roaming. "
+                    "Possible pathing error in area. Returning BNpc to spawn position x{5} y{6} z{7}.",
+                    m_bNpcBaseId, m_bNpcNameId,
+                    getPos().x, getPos().y, getPos().z,
+                    m_spawnPos.x, m_spawnPos.y, m_spawnPos.z );
+
+      m_lastRoamTargetReached = Util::getTimeSeconds();
+      m_state = BNpcState::Idle;
+
+      m_naviLastPath.clear();
+
+      setPos( m_spawnPos );
+      sendPositionUpdate();
+
+      return true;
+    }
   }
 
 
