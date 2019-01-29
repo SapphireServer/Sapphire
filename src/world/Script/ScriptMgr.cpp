@@ -285,12 +285,12 @@ bool Sapphire::Scripting::ScriptMgr::onMobKill( Entity::Player& player, uint16_t
     if( !activeQuests )
       continue;
 
-    uint16_t questId = activeQuests->c.questId;
+    uint32_t questId = activeQuests->c.questId | 0x00010000;
 
     auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( questId );
     if( script )
     {
-      std::string objName = pEventMgr->getEventName( 0x00010000 | questId );
+      std::string objName = pEventMgr->getEventName( questId );
 
       player.sendDebug( "Calling: {0}.{1}", objName, eventName );
 
