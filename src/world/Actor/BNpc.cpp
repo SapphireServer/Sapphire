@@ -350,7 +350,7 @@ void Sapphire::Entity::BNpc::hateListRemove( Sapphire::Entity::CharaPtr pChara )
 
 bool Sapphire::Entity::BNpc::hateListHasActor( Sapphire::Entity::CharaPtr pChara )
 {
-  for( auto listEntry : m_hateList )
+  for( auto& listEntry : m_hateList )
   {
     if( listEntry->m_pChara == pChara )
       return true;
@@ -550,6 +550,14 @@ void Sapphire::Entity::BNpc::onDeath()
   m_currentStance = Stance::Passive;
   m_state = BNpcState::Dead;
   m_timeOfDeath = Util::getTimeSeconds();
+
+  for( auto& pHateEntry : m_hateList )
+  {
+    // TODO: handle drops 
+    auto pPlayer = pHateEntry->m_pChara->getAsPlayer();
+    if( pPlayer )
+      pPlayer->onMobKill( m_bNpcNameId );
+  }
   hateListClear();
 }
 
