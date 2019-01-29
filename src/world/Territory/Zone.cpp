@@ -400,11 +400,12 @@ void Sapphire::Zone::updateBNpcs( int64_t tickCount )
     if( !pBNpc )
       continue;
 
-    if( !pBNpc->isAlive() && currTime - pBNpc->getTimeOfDeath() > 10 )
-    {
-      removeActor( pBNpc );
-      break;
-    }
+    if( !pBNpc->isAlive() )
+      if( currTime - pBNpc->getTimeOfDeath() > 10 )
+      {
+        removeActor( pBNpc );
+        break;
+      }
   }
 
   for( uint32_t y = 0; y < _sizeY; ++y )
@@ -673,9 +674,6 @@ void Sapphire::Zone::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
       pActor->addInRangeActor( pCurAct );
       pCurAct->addInRangeActor( pActor );
 
-      // this is a hack to limit actor spawn in one packetset
-      if( count++ > 10 )
-        break;
     }
     else if( !isInRange && isInRangeSet )
     {
