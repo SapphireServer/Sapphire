@@ -92,11 +92,10 @@ TiledNavmeshGenerator::~TiledNavmeshGenerator()
 
   if( m_triareas )
     delete[] m_triareas;
-  if( m_solid )
-    delete m_solid;
   delete m_ctx;
 
   rcFreeContourSet( m_cset );
+  rcFreeHeightField( m_solid );
   rcFreeCompactHeightfield(m_chf);
   rcFreePolyMesh( m_pmesh );
   rcFreePolyMeshDetail( m_dmesh );

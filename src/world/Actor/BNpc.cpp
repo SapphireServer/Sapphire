@@ -67,12 +67,14 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
   m_rot = rot;
   m_level = level;
   m_invincibilityType = InvincibilityNone;
+  m_currentStance = Common::Stance::Passive;
 
   m_pCurrentZone = pZone;
 
   m_spawnPos = m_pos;
 
   m_timeOfDeath = 0;
+  m_targetId = Common::INVALID_GAME_OBJECT_ID64;
 
   m_maxHp = maxHp;
   m_maxMp = 200;
