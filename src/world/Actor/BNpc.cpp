@@ -260,6 +260,7 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 
 
   step();
+  m_pCurrentZone->updateActorPosition( *this );
   return false;
 }
 

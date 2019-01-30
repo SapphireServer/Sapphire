@@ -240,8 +240,6 @@ bool Sapphire::Entity::Chara::face( const Common::FFXIVARR_POSITION3& p )
   float rot = Util::calcAngFrom( getPos().x, getPos().z, p.x, p.z );
   float newRot = PI - rot + ( PI / 2 );
 
-  m_pCell = nullptr;
-
   setRot( newRot );
 
   return oldRot != newRot;

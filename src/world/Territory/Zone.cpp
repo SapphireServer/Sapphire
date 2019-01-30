@@ -408,6 +408,9 @@ void Sapphire::Zone::updateBNpcs( int64_t tickCount )
       }
   }
 
+  // Update loop may move actors from cell to cell, breaking iterator validity
+  std::vector< Entity::BNpcPtr > m_activeBNpc;
+
   for( uint32_t y = 0; y < _sizeY; ++y )
   {
     for( uint32_t x = 0; x < _sizeX; ++x )
@@ -426,10 +429,15 @@ void Sapphire::Zone::updateBNpcs( int64_t tickCount )
       for( const auto& actor : cell->m_actors )
       {
         if( actor->isBattleNpc() )
-          actor->getAsBNpc()->update( tickCount );
+          m_activeBNpc.push_back( actor->getAsBNpc() );
       }
     }
   }
+
+  // iterate the cached active bnpcs
+  for( const auto& actor : m_activeBNpc )
+    actor->update( tickCount );
+
 }
 
 
