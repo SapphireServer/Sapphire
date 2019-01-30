@@ -549,7 +549,7 @@ void Sapphire::Entity::BNpc::onActionHostile( Sapphire::Entity::CharaPtr pSource
 
 void Sapphire::Entity::BNpc::onDeath()
 {
-  setTargetId( INVALID_GAME_OBJECT_ID );
+  setTargetId( INVALID_GAME_OBJECT_ID64 );
   m_currentStance = Stance::Passive;
   m_state = BNpcState::Dead;
   m_timeOfDeath = Util::getTimeSeconds();

@@ -37,7 +37,7 @@ using namespace Sapphire::Network::ActorControl;
 Sapphire::Entity::Chara::Chara( ObjKind type, FrameworkPtr pFw ) :
   Actor( type ),
   m_pose( 0 ),
-  m_targetId( INVALID_GAME_OBJECT_ID ),
+  m_targetId( INVALID_GAME_OBJECT_ID64 ),
   m_pFw( std::move( std::move( pFw ) ) )
 {
   // initialize the free slot queue
