@@ -91,7 +91,7 @@ namespace Sapphire::Entity
     // check if another actor is in the actors in range set
     bool isInRangeSet( ActorPtr pActor ) const;
 
-    ActorPtr getClosestActor();
+    CharaPtr getClosestChara();
 
     void sendToInRangeSet( Network::Packets::FFXIVPacketBasePtr pPacket, bool bToSelf = false );
 

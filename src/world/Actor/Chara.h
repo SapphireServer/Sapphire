@@ -68,11 +68,11 @@ namespace Sapphire::Entity
   protected:
     char m_name[34];
     /*! Last tick time for the actor  ( in ms ) */
-    uint64_t m_lastTickTime;
+    int64_t m_lastTickTime;
     /*! Last time the actor performed an autoAttack ( in ms ) */
     uint64_t m_lastAttack;
     /*! Last time the actor was updated ( in ms ) */
-    uint64_t m_lastUpdate;
+    int64_t m_lastUpdate;
     /*! Current stance of the actor */
     Common::Stance m_currentStance;
     /*! Current staus of the actor */
@@ -219,7 +219,7 @@ namespace Sapphire::Entity
 
     virtual void onDamageTaken( Chara& pSource ) {};
 
-    virtual void onActionHostile( Chara& source ) {};
+    virtual void onActionHostile( CharaPtr pSource ) {};
 
     virtual void onActionFriendly( Chara& pSource ) {};
 
@@ -229,7 +229,7 @@ namespace Sapphire::Entity
 
     virtual uint8_t getLevel() const;
 
-    virtual void sendStatusUpdate( bool toSelf = true );
+    virtual void sendStatusUpdate();
 
     virtual void takeDamage( uint32_t damage );
 
@@ -237,7 +237,7 @@ namespace Sapphire::Entity
 
     virtual bool checkAction();
 
-    virtual void update( int64_t currTime ) {};
+    virtual void update( int64_t currTime );
 
     Action::ActionPtr getCurrentAction() const;
 

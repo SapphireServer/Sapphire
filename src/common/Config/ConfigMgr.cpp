@@ -57,6 +57,8 @@ bool Sapphire::ConfigMgr::loadGlobalConfig( Common::Config::GlobalConfig& config
   config.general.serverSecret = getValue< std::string >( "General", "ServerSecret", "default" );
   config.general.worldID = getValue< uint16_t >( "General", "WorldID", 67 );
   config.general.defaultGMRank = getValue< uint8_t >( "General", "DefaultGMRank", 255 );
+  config.general.logLevel = getValue< uint8_t >( "General", "LogLevel", 1 );
+  config.general.logFilter = getValue< uint32_t >( "General", "LogFilter", 0 );
 
   // network
   config.network.zoneHost = getValue< std::string >( "Network", "ZoneHost", "127.0.0.1" );
