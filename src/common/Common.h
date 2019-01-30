@@ -564,7 +564,8 @@ namespace Sapphire::Common
     TpGain = 13,
     GpGain = 14,
     Knockback = 33,
-    Mount = 38
+    Mount = 38,
+    VFX = 59, // links to VFX sheet
   };
 
   enum class ActionHitSeverityType : uint8_t
