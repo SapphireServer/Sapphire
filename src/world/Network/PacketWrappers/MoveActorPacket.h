@@ -19,19 +19,19 @@ namespace Sapphire::Network::Packets::Server
     public ZoneChannelPacket< FFXIVIpcActorMove >
   {
   public:
-    MoveActorPacket( Entity::Chara& actor, uint8_t unk1, uint8_t unk2, uint8_t unk3, uint16_t unk4 ) :
+    MoveActorPacket( Entity::Chara& actor, uint8_t unk1, uint8_t animationType, uint8_t unk3, uint16_t unk4 ) :
       ZoneChannelPacket< FFXIVIpcActorMove >( actor.getId(), actor.getId() )
     {
-      initialize( actor, unk1, unk2, unk3, unk4 );
+      initialize( actor, unk1, animationType, unk3, unk4 );
     };
 
   private:
-    void initialize( Entity::Chara& actor, uint8_t unk1, uint8_t unk2, uint8_t unk3, uint16_t unk4 )
+    void initialize( Entity::Chara& actor, uint8_t unk1, uint8_t animationType, uint8_t unk3, uint16_t unk4 )
     {
 
       m_data.rotation = Util::floatToUInt8Rot( actor.getRot() );
       m_data.unknown_1 = unk1;
-      m_data.unknown_2 = unk2;
+      m_data.animationType = animationType;
       m_data.unknown_3 = unk3;
       m_data.unknown_4 = unk4;
       m_data.posX = Util::floatToUInt16( actor.getPos().x );

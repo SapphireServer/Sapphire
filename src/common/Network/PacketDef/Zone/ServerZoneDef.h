@@ -402,34 +402,48 @@ struct EffectEntry
 struct EffectHeader
 {
   uint64_t animationTargetId; // who the animation targets
+
   uint32_t actionId; // what the casting player casts, shown in battle log/ui
-
   uint32_t globalEffectCounter; // seems to only increment on retail?
-  float animationLockTime; // maybe? doesn't seem to do anything
 
+  float animationLockTime; // maybe? doesn't seem to do anything
   uint32_t someTargetId; // always 00 00 00 E0, 0x0E000000 is the internal def for INVALID TARGET ID
 
   uint16_t hiddenAnimation; // if 0, always shows animation, otherwise hides it. counts up by 1 for each animation skipped on a caster
-
   uint16_t rotation;
-
   uint16_t actionAnimationId; // the animation that is played by the casting character
-  uint8_t unknown1E; // can be 0,1,2 - maybe other values? - doesn't do anything?
-
+  uint8_t variation; // variation in the animation
   Common::ActionEffectDisplayType effectDisplayType;
 
   uint8_t unknown20; // is read by handler, runs code which gets the LODWORD of animationLockTime (wtf?)
   uint8_t effectCount; // ignores effects if 0, otherwise parses all of them
+  uint16_t padding_21;
 
-  uint32_t padding_22[2];
 };
 
-struct FFXIVIpcEffect :
-  FFXIVIpcBasePacket< Effect >
+struct FFXIVIpcEffect : FFXIVIpcBasePacket< Effect >
 {
-  EffectHeader header;
+  uint64_t animationTargetId; // who the animation targets
 
-  EffectEntry effects[8];
+  uint32_t actionId; // what the casting player casts, shown in battle log/ui
+  uint32_t globalEffectCounter; // seems to only increment on retail?
+
+  float animationLockTime; // maybe? doesn't seem to do anything
+  uint32_t someTargetId; // always 00 00 00 E0, 0x0E000000 is the internal def for INVALID TARGET ID
+
+  uint16_t hiddenAnimation; // if 0, always shows animation, otherwise hides it. counts up by 1 for each animation skipped on a caster
+  uint16_t rotation;
+  uint16_t actionAnimationId; // the animation that is played by the casting character
+  uint8_t variation; // variation in the animation
+  Common::ActionEffectDisplayType effectDisplayType;
+
+  uint8_t unknown20; // is read by handler, runs code which gets the LODWORD of animationLockTime (wtf?)
+  uint8_t effectCount; // ignores effects if 0, otherwise parses all of them
+  uint16_t padding_21;
+
+  uint16_t padding_22[3];
+
+  uint8_t effects[8*8];
 
   uint16_t padding_6A[3];
 
@@ -652,7 +666,7 @@ struct FFXIVIpcActorMove :
 {
   /* 0000 */ uint8_t rotation;
   /* 0001 */ uint8_t unknown_1;
-  /* 0002 */ uint8_t unknown_2;
+  /* 0002 */ uint8_t animationType;
   /* 0003 */ uint8_t unknown_3;
   /* 0004 */ uint16_t unknown_4;
   /* 0006 */ uint16_t posX;
@@ -684,8 +698,7 @@ struct FFXIVIpcActorSetPos :
 * Structural representation of the packet sent by the server
 * to start an actors casting
 */
-struct FFXIVIpcActorCast :
-  FFXIVIpcBasePacket< ActorCast >
+struct FFXIVIpcActorCast : FFXIVIpcBasePacket< ActorCast >
 {
   uint16_t action_id;
   Common::SkillType skillType;
@@ -701,11 +714,10 @@ struct FFXIVIpcActorCast :
   uint16_t unknown_3;
 };
 
-struct FFXIVIpcHateList :
-  FFXIVIpcBasePacket< HateList >
+struct FFXIVIpcHateList : FFXIVIpcBasePacket< HateList >
 {
   uint32_t numEntries;
-  struct LsEntry
+  struct
   {
     uint32_t actorId;
     uint8_t hatePercent;
@@ -715,8 +727,7 @@ struct FFXIVIpcHateList :
   uint32_t padding;
 };
 
-struct FFXIVIpcUpdateClassInfo :
-  FFXIVIpcBasePacket< UpdateClassInfo >
+struct FFXIVIpcUpdateClassInfo : FFXIVIpcBasePacket< UpdateClassInfo >
 {
   uint8_t classId;
   uint8_t level1;
@@ -1563,6 +1574,11 @@ struct FFXIVIpcDirectorVars : FFXIVIpcBasePacket< DirectorVars >
   uint8_t m_branch;
   /*! raw storage for flags/vars */
   uint8_t m_unionData[10];
+  /*! unknown */
+  uint16_t u20;
+  uint16_t u22;
+  uint16_t u24;
+  uint16_t u28;
 };
 
 
@@ -1721,11 +1737,7 @@ struct FFXIVIpcHousingInternalObjectSpawn : FFXIVIpcBasePacket< HousingInternalO
   uint8_t containerOffset;
   uint8_t pad1;
 
-  uint16_t itemId;
-  uint8_t unk2;
-  uint8_t pad2;
-  uint16_t rotation;
-  Common::FFXIVARR_POSITION3 pos;
+  Common::HousingObject object;
 };
 
 struct FFXIVIpcHousingIndoorInitialize : FFXIVIpcBasePacket< HousingIndoorInitialize >

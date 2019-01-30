@@ -40,6 +40,8 @@
 #include "Manager/EventMgr.h"
 #include "Manager/ItemMgr.h"
 #include "Manager/MarketMgr.h"
+#include "Manager/RNGMgr.h"
+#include "Manager/NaviMgr.h"
 
 using namespace Sapphire::World::Manager;
 
@@ -94,9 +96,12 @@ bool Sapphire::World::ServerMgr::loadSettings( int32_t argc, char* argv[] )
   m_config.scripts.path = pConfig->getValue< std::string >( "Scripts", "Path", "./compiledscripts/" );
   m_config.scripts.cachePath = pConfig->getValue< std::string >( "Scripts", "CachePath", "./cache/" );
 
+  m_config.navigation.meshPath = pConfig->getValue< std::string >( "Navigation", "MeshPath", "navi" );
+
   m_config.network.disconnectTimeout = pConfig->getValue< uint16_t >( "Network", "DisconnectTimeout", 20 );
   m_config.network.listenIp = pConfig->getValue< std::string >( "Network", "ListenIp", "0.0.0.0" );
   m_config.network.listenPort = pConfig->getValue< uint16_t >( "Network", "ListenPort", 54992 );
+  m_config.network.inRangeDistance = pConfig->getValue< float >( "Network", "InRangeDistance", 80.f );
 
   m_config.motd = pConfig->getValue< std::string >( "General", "MotD", "" );
 
@@ -124,6 +129,8 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
     Logger::fatal( "Unable to load settings!" );
     return;
   }
+
+  Logger::setLogLevel( m_config.global.general.logLevel );
 
   Logger::info( "Setting up generated EXD data" );
   auto pExdData = std::make_shared< Data::ExdDataGenerated >();
@@ -165,6 +172,9 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
 
   loadBNpcTemplates();
 
+  auto pNaviMgr = std::make_shared< Manager::NaviMgr >( framework() );
+  framework()->set< Manager::NaviMgr >( pNaviMgr );
+
   Logger::info( "TerritoryMgr: Setting up zones" );
   auto pTeriMgr = std::make_shared< Manager::TerritoryMgr >( framework() );
   auto pHousingMgr = std::make_shared< Manager::HousingMgr >( framework() );
@@ -205,6 +215,7 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
   auto pInventoryMgr = std::make_shared< Manager::InventoryMgr >( framework() );
   auto pEventMgr = std::make_shared< Manager::EventMgr >( framework() );
   auto pItemMgr = std::make_shared< Manager::ItemMgr >( framework() );
+  auto pRNGMgr = std::make_shared< Manager::RNGMgr >( framework() );
 
   framework()->set< DebugCommandMgr >( pDebugCom );
   framework()->set< Manager::PlayerMgr >( pPlayerMgr );
@@ -212,6 +223,7 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
   framework()->set< Manager::InventoryMgr >( pInventoryMgr );
   framework()->set< Manager::EventMgr >( pEventMgr );
   framework()->set< Manager::ItemMgr >( pItemMgr );
+  framework()->set< Manager::RNGMgr >( pRNGMgr );
 
   Logger::info( "World server running on {0}:{1}", m_ip, m_port );
 
@@ -256,7 +268,7 @@ void Sapphire::World::ServerMgr::mainLoop()
 
     auto currTime = Util::getTimeSeconds();
 
-    pTeriMgr->updateTerritoryInstances( static_cast< uint32_t >( currTime ) );
+    pTeriMgr->updateTerritoryInstances( currTime );
 
     pScriptMgr->update();
 
@@ -473,7 +485,7 @@ Sapphire::Entity::BNpcTemplatePtr Sapphire::World::ServerMgr::getBNpcTemplate( c
 
 Sapphire::Entity::BNpcTemplatePtr Sapphire::World::ServerMgr::getBNpcTemplate( uint32_t id )
 {
-  for( auto entry : m_bNpcTemplateMap )
+  for( const auto& entry : m_bNpcTemplateMap )
   {
     if( entry.second->getId() == id )
       return entry.second;

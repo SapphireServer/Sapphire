@@ -713,6 +713,8 @@ int main( int argc, char* argv[] )
   if( !loadSettings( argc, argv ) )
     throw std::exception();
 
+  Logger::setLogLevel( m_config.global.general.logLevel );
+
   server.resource[ "^/ZoneName/([0-9]+)$" ][ "GET" ] = &getZoneName;
   server.resource[ "^/sapphire-api/lobby/createAccount" ][ "POST" ] = &createAccount;
   server.resource[ "^/sapphire-api/lobby/login" ][ "POST" ] = &login;

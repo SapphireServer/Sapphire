@@ -67,6 +67,5 @@ void Sapphire::World::Manager::PlayerMgr::movePlayerToLandDestination( Sapphire:
   player.setPos( terriPos->getTargetPosition() );
   player.setRot( terriPos->getTargetRotation() );
 
-  if( terriMgr->movePlayer( destinationZone, player.getAsPlayer() ) )
-    player.sendZonePackets();
+  terriMgr->movePlayer( destinationZone, player.getAsPlayer() );
 }

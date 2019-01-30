@@ -250,6 +250,22 @@ public:
   };
 };
 
+struct LGB_POPRANGE_ENTRY :
+  public LGB_ENTRY
+{
+public:
+  LGB_MAPRANGE_HEADER header;
+  std::string name;
+
+  LGB_POPRANGE_ENTRY( char* buf, uint32_t offset ) :
+    LGB_ENTRY( buf, offset )
+  {
+    header = *reinterpret_cast< LGB_MAPRANGE_HEADER* >( buf + offset );
+    name = std::string( buf + offset + header.nameOffset );
+
+  };
+};
+
 struct LGB_GROUP_HEADER
 {
   uint32_t unknown;
@@ -290,21 +306,9 @@ struct LGB_GROUP
       {
         const auto type = *reinterpret_cast<LgbEntryType*>( buf + entryOffset );
         // garbage to skip model loading
-        if( !ignoreModels && type == LgbEntryType::BgParts )
+        if( type == LgbEntryType::PopRange )
         {
-          entries.push_back( std::make_shared< LGB_BGPARTS_ENTRY >( buf, entryOffset ) );
-        }
-        else if( !ignoreModels && type == LgbEntryType::Gimmick )
-        {
-          entries.push_back( std::make_shared< LGB_GIMMICK_ENTRY >( buf, entryOffset ) );
-        }
-        else if( type == LgbEntryType::EventNpc )
-        {
-          entries.push_back( std::make_shared< LGB_ENPC_ENTRY >( buf, entryOffset ) );
-        }
-        else if( type == LgbEntryType::EventObject )
-        {
-          entries.push_back( std::make_shared< LGB_EOBJ_ENTRY >( buf, entryOffset ) );
+          entries.push_back( std::make_shared< LGB_POPRANGE_ENTRY >( buf, entryOffset ) );
         }
         else if( type == LgbEntryType::MapRange )
         {

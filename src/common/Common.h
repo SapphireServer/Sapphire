@@ -18,6 +18,7 @@ namespace Sapphire::Common
   const uint8_t MAX_DISPLAYED_EOBJS = 40;
 
   const int32_t INVALID_GAME_OBJECT_ID = 0xE0000000;
+  const uint64_t INVALID_GAME_OBJECT_ID64 = 0xE0000000;
 
   struct FFXIVARR_POSITION3
   {
@@ -531,8 +532,7 @@ namespace Sapphire::Common
     Unaspected = 7    // Doesn't imply magical unaspected damage - could be unaspected physical
   };
 
-  enum class ActionType :
-    int8_t
+  enum class ActionType : int8_t
   {
     WeaponOverride = -1, // Needs more investigation (takes the damage type of the equipped weapon)?
     Unknown_0 = 0,
@@ -546,8 +546,7 @@ namespace Sapphire::Common
     LimitBreak = 8,
   };
 
-  enum ActionEffectType :
-    uint8_t
+  enum ActionEffectType : uint8_t
   {
     Nothing = 0,
     Miss = 1,
@@ -565,11 +564,11 @@ namespace Sapphire::Common
     TpGain = 13,
     GpGain = 14,
     Knockback = 33,
-    Mount = 38
+    Mount = 38,
+    VFX = 59, // links to VFX sheet
   };
 
-  enum class ActionHitSeverityType :
-    uint8_t
+  enum class ActionHitSeverityType : uint8_t
   {
     NormalDamage = 0,
     CritHeal = 0,
@@ -579,16 +578,14 @@ namespace Sapphire::Common
     CritDirectHitDamage = 3
   };
 
-  enum ActionEffectDisplayType :
-    uint8_t
+  enum ActionEffectDisplayType : uint8_t
   {
     HideActionName = 0,
     ShowActionName = 1,
     ShowItemName = 2,
   };
 
-  enum class ActionCollisionType :
-    uint8_t
+  enum class ActionCollisionType : uint8_t
   {
     None,
     SingleTarget,
@@ -601,32 +598,29 @@ namespace Sapphire::Common
     Unknown3
   };
 
-  enum HandleActionType :
-    uint8_t
+  enum HandleActionType : uint8_t
   {
     Event,
     Spell,
     Teleport
   };
 
-  enum HandleSkillType :
-    uint8_t
+  enum HandleSkillType : uint8_t
   {
     StdDamage,
     StdHeal,
     StdDot,
   };
 
-  enum InvincibilityType :
-    uint8_t
+  enum InvincibilityType : uint8_t
   {
     InvincibilityNone,
     InvincibilityRefill,
     InvincibilityStayAlive,
+    InvincibilityIgnoreDamage,
   };
 
-  enum PlayerStateFlag :
-    uint8_t
+  enum PlayerStateFlag : uint8_t
   {
     HideUILockChar = 0, // as the name suggests, hides the ui and logs the char...
     InCombat = 1, // in Combat, locks gearchange/return/teleport
@@ -642,8 +636,7 @@ namespace Sapphire::Common
 
   };
 
-  enum struct FateStatus :
-    uint8_t
+  enum struct FateStatus : uint8_t
   {
     Active = 2,
     Inactive = 4,
@@ -651,8 +644,7 @@ namespace Sapphire::Common
     Completed = 8,
   };
 
-  enum struct ChatType :
-    uint16_t
+  enum struct ChatType : uint16_t
   {
     LogKindError,
     ServerDebug,
@@ -775,6 +767,7 @@ namespace Sapphire::Common
     uint8_t
   {
     Normal = 0x1,
+    ItemAction = 0x2,
     MountSkill = 0xD,
   };
 

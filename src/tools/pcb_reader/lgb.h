@@ -9,12 +9,16 @@
 #include <map>
 #include <string>
 
+#include <iostream>
+#include <sstream>
+#include <iomanip>
+
 #include "matrix4.h"
 #include "vec3.h"
 #include "sgb.h"
 
 // garbage to skip model loading
-extern bool ignoreModels;
+extern bool noObj;
 
 // all credit to
 // https://github.com/ufx/SaintCoinach/blob/master/SaintCoinach/Graphics/Lgb/
@@ -238,6 +242,47 @@ public:
   };
 };
 
+struct LGB_COLLISION_BOX_HEADER :
+  public LGB_ENTRY_HEADER
+{
+  uint8_t unk[100];
+};
+
+struct LGB_COLLISION_BOX_ENTRY :
+  public LGB_ENTRY
+{
+  LGB_COLLISION_BOX_HEADER header;
+  std::string name;
+
+  LGB_COLLISION_BOX_ENTRY( char* buf, uint32_t offset ) :
+    LGB_ENTRY( buf, offset )
+  {
+    header = *reinterpret_cast< LGB_COLLISION_BOX_HEADER* >( buf + offset );
+    header.type = LgbEntryType::CollisionBox;
+    name = std::string( buf + offset + header.nameOffset );
+    std::stringstream ss;
+    ss << "\nName: " << name << "Id: " << header.unknown << "\n";
+    ss << "Pos: " << header.translation.x << " " << header.translation.y << " " << header.translation.z << "\n";
+    ss << "Rot?: " << header.rotation.x << " " << header.rotation.y << " " << header.rotation.z << "\n";
+    ss << "Scale?: " << header.scale.x << " " << header.scale.y << " " << header.scale.z << "\n";
+    ss << "00 01 02 03 04 05 06 07 | 08 09 0A 0B 0C 0D 0E 0F\n";
+    ss << "-------------------------------------------------\n";
+    ss << std::hex;
+    ss << std::setw( 2 );
+    ss << std::setfill( '0' );
+
+    for( auto i = 1; i < sizeof( header.unk ); ++i )
+      if( i % 16 == 0 )
+        ss << std::setw(2) << (int)header.unk[i - 1] << "\n";
+      else if( i % 8 == 0 )
+        ss << std::setw(2) << (int)header.unk[i - 1] << " | ";
+      else
+        ss << std::setw(2) << (int)header.unk[i - 1] << " ";
+    ss << "\n";
+    std::cout << ss.str();
+  }
+};
+
 struct LGB_GROUP_HEADER
 {
   uint32_t unknown;
@@ -278,37 +323,28 @@ struct LGB_GROUP
       {
         const auto type = *reinterpret_cast<LgbEntryType*>( buf + entryOffset );
         // garbage to skip model loading
-        if( !ignoreModels && type == LgbEntryType::BgParts )
+        switch( type )
         {
-          entries.push_back( std::make_shared< LGB_BGPARTS_ENTRY >( buf, entryOffset ) );
+          case LgbEntryType::BgParts:
+            entries.push_back( std::make_shared< LGB_BGPARTS_ENTRY >( buf, entryOffset ) );
+            break;
+          case LgbEntryType::Gimmick:
+            entries.push_back( std::make_shared< LGB_GIMMICK_ENTRY >( buf, entryOffset ) );
+            break;
+          case LgbEntryType::EventObject:
+            entries.push_back( std::make_shared< LGB_EOBJ_ENTRY >( buf, entryOffset ) );
+            break;
+          case LgbEntryType::CollisionBox:
+            //entries.push_back( std::make_shared< LGB_COLLISION_BOX_ENTRY >( buf, entryOffset ) );
+            break;
+          default:
+            //std::cout << "\t\tUnknown SGB entry! Group: " << name << " type: " << ( int )type << " index: " << i << " entryOffset: " << entryOffset << "\n";
+            break;
         }
-        else if( !ignoreModels && type == LgbEntryType::Gimmick )
-        {
-          entries.push_back( std::make_shared< LGB_GIMMICK_ENTRY >( buf, entryOffset ) );
-        }
-        else if( type == LgbEntryType::EventNpc )
-        {
-          entries.push_back( std::make_shared< LGB_ENPC_ENTRY >( buf, entryOffset ) );
-        }
-        else if( type == LgbEntryType::EventObject )
-        {
-          entries.push_back( std::make_shared< LGB_EOBJ_ENTRY >( buf, entryOffset ) );
-        }
-        else if( type == LgbEntryType::MapRange )
-        {
-          entries.push_back( std::make_shared< LGB_MAPRANGE_ENTRY >( buf, entryOffset ) );
-        }
-        /*
-        else
-        {
-           entries[i] = nullptr;
-        }
-        */
-
       }
       catch( std::exception& e )
       {
-        std::cout << name << " " << e.what() << std::endl;
+        std::cout << ( name + " " + e.what() + "\n" );
       }
     }
   };
@@ -331,9 +367,8 @@ struct LGB_FILE
 {
   LGB_FILE_HEADER header;
   std::vector< LGB_GROUP > groups;
-  std::string name;
-
-  LGB_FILE( char* buf, const std::string& name )
+  
+  LGB_FILE( char* buf )
   {
     header = *reinterpret_cast< LGB_FILE_HEADER* >( buf );
     if( strncmp( &header.magic[ 0 ], "LGB1", 4 ) != 0 || strncmp( &header.magic2[ 0 ], "LGP1", 4 ) != 0 )
@@ -351,38 +386,4 @@ struct LGB_FILE
   };
 };
 
-/*
-#if __cplusplus >= 201703L
-#include <experimental/filesystem>
-std::map<std::string, LGB_FILE> getLgbFiles( const std::string& dir )
-{
-   namespace fs = std::experimental::filesystem;
-   std::map<std::string, LGB_FILE> fileMap;
-   for( const auto& path : fs::recursive_directory_iterator( dir ) )
-   {
-      if( path.path().extension() == ".lgb" )
-      {
-         const auto& strPath = path.path().string();
-         auto f = fopen( strPath.c_str(), "rb" );
-         fseek( f, 0, SEEK_END );
-         const auto size = ftell( f );
-         std::vector<char> bytes( size );
-         rewind( f );
-         fread( bytes.data(), 1, size, f );
-         fclose( f );
-         try
-         {
-            LGB_FILE lgbFile( bytes.data() );
-            fileMap.insert( std::make_pair( strPath, lgbFile ) );
-         }
-         catch( std::exception& e )
-         {
-            std::cout << "Unable to load " << strPath << std::endl;
-         }
-      }
-   }
-   return fileMap;
-}
-#endif
-*/
 #endif

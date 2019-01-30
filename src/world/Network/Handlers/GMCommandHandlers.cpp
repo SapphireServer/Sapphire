@@ -275,8 +275,13 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     }
     case GmCommand::Hp:
     {
-      targetPlayer->setHp( param1 );
-      player.sendNotice( "Hp for {0} was set to {1}", targetPlayer->getName(), param1 );
+      auto chara = targetActor->getAsChara();
+      if( chara )
+      {
+        chara->setHp( param1 );
+        player.sendNotice( "Hp for {0} was set to {1}", chara->getName(), param1 );
+      }
+
       break;
     }
     case GmCommand::Mp:
@@ -394,13 +399,38 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     }
     case GmCommand::GC:
     {
+      if( param1 > 3 )
+      {
+        player.sendUrgent( "Invalid Grand Company ID: {0}", param1 );
+        return;
+      }
+
       targetPlayer->setGc( param1 );
+
+      // if we're changing them to a GC, check if they have a rank and if not, set it to the lowest rank
+      if( param1 > 0 )
+      {
+        auto gcRankIdx = static_cast< uint8_t >( param1 ) - 1;
+        if( targetPlayer->getGcRankArray()[ gcRankIdx ] == 0 )
+        {
+          player.setGcRankAt( gcRankIdx, 1 );
+        }
+      }
+
       player.sendNotice( "GC for {0} was set to {1}", targetPlayer->getName(), targetPlayer->getGc() );
       break;
     }
     case GmCommand::GCRank:
     {
-      targetPlayer->setGcRankAt( targetPlayer->getGc() - 1, param1 );
+      auto gcId = targetPlayer->getGc() - 1;
+
+      if( gcId > 2 )
+      {
+        player.sendUrgent( "{0} has an invalid Grand Company ID: {0}", targetPlayer->getName(), gcId );
+        return;
+      }
+
+      targetPlayer->setGcRankAt( gcId, param1 );
       player.sendNotice( "GC Rank for {0} for GC {1} was set to {2}", targetPlayer->getName(), targetPlayer->getGc(),
                          targetPlayer->getGcRankArray()[ targetPlayer->getGc() - 1 ] );
       break;
