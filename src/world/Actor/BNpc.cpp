@@ -91,15 +91,34 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
   memcpy( m_modelEquip, pTemplate->getModelEquip(), sizeof( m_modelEquip ) );
 
   m_lastTickTime = 0;
+
+  auto exdData = m_pFw->get< Data::ExdDataGenerated >();
+  assert( exdData );
+
+  auto bNpcBaseData = exdData->get< Data::BNpcBase >( m_bNpcBaseId );
+  assert( bNpcBaseData );
+
+  m_scale = bNpcBaseData->scale;
+
+  // todo: is this actually good?
+  m_naviTargetReachedDistance = m_scale * 2.f;
 }
 
-Sapphire::Entity::BNpc::~BNpc()
-{
-}
+Sapphire::Entity::BNpc::~BNpc() = default;
 
 uint8_t Sapphire::Entity::BNpc::getAggressionMode() const
 {
   return m_aggressionMode;
+}
+
+float Sapphire::Entity::BNpc::getNaviTargetReachedDistance() const
+{
+  return m_naviTargetReachedDistance;
+}
+
+float Sapphire::Entity::BNpc::getScale() const
+{
+  return m_scale;
 }
 
 uint8_t Sapphire::Entity::BNpc::getEnemyType() const
@@ -203,7 +222,11 @@ void Sapphire::Entity::BNpc::step()
 
 bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 {
-  if( Util::distance( getPos(), pos ) <= 4 )
+  // do this first, this will update local actor position and the position of other actors
+  // and then this npc will then path from the position after pushing/being pushed
+  pushNearbyBNpcs();
+
+  if( Util::distance( getPos(), pos ) <= m_naviTargetReachedDistance )
   {
     // Reached destination
     m_naviLastPath.clear();
@@ -605,5 +628,34 @@ void Sapphire::Entity::BNpc::checkAggro()
     {
       aggro( pClosestChara );
     }
+  }
+}
+
+void Sapphire::Entity::BNpc::pushNearbyBNpcs()
+{
+  for( auto& bNpc : m_inRangeBNpc )
+  {
+    auto pos = bNpc->getPos();
+    auto distance = Util::distance( m_pos, bNpc->getPos() );
+
+    // too far away, ignore it
+    if( distance > getNaviTargetReachedDistance() )
+      continue;
+
+    auto angle = Util::calcAngFrom( m_pos.x, m_pos.y, pos.x, pos.y ) + PI;
+
+    auto x = ( cosf( angle ) );
+    auto z = ( sinf( angle ) );
+
+    // todo: not sure what's good here
+    auto factor = bNpc->getScale();
+
+    bNpc->setPos( pos.x + ( x * factor ),
+                  pos.y,
+                  pos.z + ( z * factor ) );
+
+//    setPos( m_pos.x + ( xBase * -pushDistance ),
+//            m_pos.y,
+//            m_pos.z + ( zBase * -pushDistance ) );
   }
 }
