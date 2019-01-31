@@ -14,10 +14,8 @@
 
 #include "Network/GameConnection.h"
 
-#include "Manager/TerritoryMgr.h"
 #include "Territory/Zone.h"
 #include "Territory/HousingZone.h"
-#include "Manager/HousingMgr.h"
 #include "Territory/Land.h"
 #include "Territory/ZonePosition.h"
 #include "Territory/House.h"
@@ -37,6 +35,9 @@
 #include "Manager/DebugCommandMgr.h"
 #include "Manager/EventMgr.h"
 #include "Manager/MarketMgr.h"
+#include "Manager/TerritoryMgr.h"
+#include "Manager/HousingMgr.h"
+#include "Manager/RNGMgr.h"
 
 #include "Action/Action.h"
 #include "Action/ActionTeleport.h"
@@ -440,7 +441,7 @@ void Sapphire::Network::GameConnection::pingHandler( FrameworkPtr pFw,
 
   queueOutPacket( std::make_shared< Server::PingPacket >( player, packet.data().timestamp ) );
 
-  player.setLastPing( static_cast< uint32_t >( time( nullptr ) ) );
+  player.setLastPing( Sapphire::Util::getTimeSeconds() );
 }
 
 
@@ -661,7 +662,7 @@ void Sapphire::Network::GameConnection::tellHandler( FrameworkPtr pFw,
   //tellPacket.data().u2b = 0x40;
   if( player.isActingAsGm() )
   {
-    //tellPacket->data().isGm = true;
+    tellPacket->data().preName = 0x04;
   }
   pTargetPlayer->queueChatPacket( tellPacket );
 

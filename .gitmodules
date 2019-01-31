@@ -4,3 +4,6 @@
 [submodule "deps/spdlog"]
 	path = deps/spdlog
 	url = https://github.com/gabime/spdlog.git
+[submodule "deps/recastnavigation"]
+	path = deps/recastnavigation
+	url = https://github.com/SapphireServer/recastnavigation

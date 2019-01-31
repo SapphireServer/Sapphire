@@ -3,7 +3,7 @@
 #include <cassert>
 
 #define TilesCount 32
-#define TileSize 250.0f
+#define TileSize 325.0f
 #define _minY (-TilesCount*TileSize/2)
 #define _minX (-TilesCount*TileSize/2)
 

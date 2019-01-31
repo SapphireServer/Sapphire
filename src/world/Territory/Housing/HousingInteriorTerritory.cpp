@@ -39,7 +39,7 @@ Sapphire::World::Territory::Housing::HousingInteriorTerritory::HousingInteriorTe
   Zone( territoryTypeId, guId, internalName, contentName, pFw ),
   m_landIdent( ident )
 {
-  m_lastActivityTime = static_cast< uint32_t >( Util::getTimeSeconds() );
+  m_lastActivityTime = Util::getTimeSeconds();
 }
 
 Housing::HousingInteriorTerritory::~HousingInteriorTerritory() = default;
@@ -186,9 +186,9 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::spawnHousing
     objectSpawnPkt->data().containerId = containerType;
     objectSpawnPkt->data().containerOffset = slot;
 
-    objectSpawnPkt->data().itemId = item->getAdditionalData() & 0xFFFF;
-    objectSpawnPkt->data().rotation = item->getRot();
-    objectSpawnPkt->data().pos = item->getPos();
+    objectSpawnPkt->data().object.itemId = item->getAdditionalData() & 0xFFFF;
+    objectSpawnPkt->data().object.rotation = item->getRot();
+    objectSpawnPkt->data().object.pos = item->getPos();
 
     player.second->queuePacket( objectSpawnPkt );
   }

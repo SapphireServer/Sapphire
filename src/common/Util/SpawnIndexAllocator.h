@@ -37,7 +37,7 @@ namespace Sapphire::Util
     {
       auto it = m_actorIdToAllocatedMap.find( actorId );
       if( it == m_actorIdToAllocatedMap.end() )
-        return 0;
+        return getAllocFailId();
 
       auto index = it->second;
       m_availableIds.push( index );

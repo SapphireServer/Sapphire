@@ -12,7 +12,7 @@
 #include "vec3.h"
 
 // garbage to skip model loading
-extern bool ignoreModels;
+extern bool noObj;
 
 //
 // ported from https://github.com/ufx/SaintCoinach/blob/master/SaintCoinach/Graphics/Sgb/SgbDataType.cs
@@ -36,6 +36,7 @@ enum SgbGroupEntryType :
   uint32_t
 {
   Model = 0x01,
+  Gimmick = 0x06,
 };
 
 struct SGB_GROUP_HEADER
@@ -62,6 +63,35 @@ struct SGB_GROUP_HEADER
 
   uint32_t unknown40;
   uint32_t unknown44;
+};
+
+struct SGB_GROUP1C_HEADER
+{
+  SgbDataType type;
+  int32_t nameOffset;
+  uint32_t unknown08;
+  
+  int32_t entryCount;
+  uint32_t unknown14;
+  int32_t modelFileOffset;
+  vec3 unknownFloat3;
+  vec3 unknownFloat3_2;
+  int32_t stateOffset;
+  int32_t modelFileOffset2;
+  uint32_t unknown3;
+  float unknown4;
+  int32_t nameOffset2;
+  vec3 unknownFloat3_3;
+};
+
+struct SGB_GROUP1C_ENTRY
+{
+  uint32_t unk;
+  uint32_t unk2;
+  int32_t nameOffset;
+  uint32_t index;
+  uint32_t unk3;
+  int32_t modelFileOffset;
 };
 
 struct SGB_GROUP_ENTRY
@@ -113,8 +143,9 @@ struct SGB_MODEL_ENTRY :
   std::string modelFileName;
   std::string collisionFileName;
 
-  SGB_MODEL_ENTRY( char* buf, uint32_t offset )
+  SGB_MODEL_ENTRY( char* buf, uint32_t offset, SgbGroupEntryType type )
   {
+    this->type = type;
     header = *reinterpret_cast< SGB_MODEL_HEADER* >( buf + offset );
     name = std::string( buf + offset + header.nameOffset );
     modelFileName = std::string( buf + offset + header.modelFileOffset );
@@ -129,13 +160,35 @@ struct SGB_GROUP
   SGB_FILE* parent;
   std::vector< std::shared_ptr< SGB_GROUP_ENTRY > > entries;
 
-  SGB_GROUP( char* buf, SGB_FILE* file, uint32_t fileSize, uint32_t offset )
+  SGB_GROUP( char* buf, SGB_FILE* file, std::set< std::string >* offset1cObjects, uint32_t fileSize, uint32_t offset, bool isOffset1C = false )
   {
     parent = file;
+
+
+    if( isOffset1C )
+    {
+      auto header1c = *reinterpret_cast< SGB_GROUP1C_HEADER* >( buf + offset );
+
+      auto entriesOffset = offset + sizeof( header1c );
+
+      auto entryCount = header1c.entryCount;
+      for( auto i = 0; i < entryCount; ++i )
+      {
+        auto entryOffset = entriesOffset + ( i * 24 );
+        auto entry = *reinterpret_cast< SGB_GROUP1C_ENTRY* >( buf + entryOffset );
+
+        std::string entryModelFile( buf + entryOffset + entry.modelFileOffset + 9 );
+        if( entryModelFile.find( ".sgb" ) != std::string::npos )
+        {
+          offset1cObjects->emplace( entryModelFile );
+        }
+      }
+      return;
+    }
+    auto entriesOffset = offset + sizeof( header );
+
     header = *reinterpret_cast< SGB_GROUP_HEADER* >( buf + offset );
     name = std::string( buf + offset + header.nameOffset );
-
-    auto entriesOffset = offset + sizeof( header );
 
     for( auto i = 0; i < header.entryCount; ++i )
     {
@@ -143,9 +196,9 @@ struct SGB_GROUP
       if( entryOffset > fileSize )
         throw std::runtime_error( "SGB_GROUP entry offset was larger than SGB file size!" );
       auto type = *reinterpret_cast< uint32_t* >( buf + entryOffset );
-      if( type == SgbGroupEntryType::Model && !ignoreModels )
+      if( type == SgbGroupEntryType::Model || type == SgbGroupEntryType::Gimmick )
       {
-        entries.push_back( std::make_shared< SGB_MODEL_ENTRY >( buf, entryOffset ) );
+        entries.push_back( std::make_shared< SGB_MODEL_ENTRY >( buf, entryOffset, ( SgbGroupEntryType )type ) );
       }
       else
       {
@@ -190,6 +243,7 @@ struct SGB_FILE
 {
   SGB_HEADER header;
   std::vector< SGB_GROUP > entries;
+  std::set< std::string > offset1cObjects;
 
   SGB_FILE()
   {
@@ -206,14 +260,14 @@ struct SGB_FILE
 
     try
     {
-      auto group = SGB_GROUP( buf, this, header.fileSize, baseOffset + header.sharedOffset );
+      auto group = SGB_GROUP( buf, this, &offset1cObjects, header.fileSize, baseOffset + header.sharedOffset );
       entries.push_back( group );
-      auto group2 = SGB_GROUP( buf, this, header.fileSize, baseOffset + header.offset1C );
+      auto group2 = SGB_GROUP( buf, this, &offset1cObjects, header.fileSize, baseOffset+ header.offset1C, true );
       entries.push_back( group2 );
     }
     catch( std::exception& e )
     {
-      std::cout << e.what() << "\n";
+      std::cout << ( std::string( e.what() ) + "\n" );
     }
   };
 };

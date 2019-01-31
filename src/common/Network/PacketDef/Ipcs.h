@@ -119,35 +119,39 @@ namespace Sapphire::Network::Packets
 
     PlayerSpawn = 0x0175, // updated 4.5
     NpcSpawn = 0x0176, // updated 4.5
+    NpcSpawn2 = 0x0177, // ( Bigger statuseffectlist? ) updated 4.5
     ActorMove = 0x0178, // updated 4.5
+
     ActorSetPos = 0x017A, // updated 4.5
 
     ActorCast = 0x017C, // updated 4.5
 
     PartyList = 0x017E, // updated 4.5
-    HateList = 0x017F, // updated 4.5
 
+    HateList = 0x0180, // updated 4.5
     ObjectSpawn = 0x0181, // updated 4.5
     ObjectDespawn = 0x0182, // updated 4.5
-
     UpdateClassInfo = 0x0183, // updated 4.5
     SilentSetClassJob = 0x0184, // updated 4.5 - seems to be the case, not sure if it's actually used for anything
-
     InitUI = 0x0185, // updated 4.5
     PlayerStats = 0x0186, // updated 4.5
     ActorOwner = 0x0187, // updated 4.5
     PlayerStateFlags = 0x0188, // updated 4.5
     PlayerClassInfo = 0x0189, // updated 4.5
+
     ModelEquip = 0x018B, // updated 4.5
     Examine = 0x018C, // updated 4.5
     CharaNameReq = 0x018D, // updated 4.5
+
     SetLevelSync = 0x1186, // not updated for 4.4, not sure what it is anymore
 
     ItemInfo = 0x0196, // updated 4.5
     ContainerInfo = 0x0197, // updated 4.5
     InventoryTransactionFinish = 0x0198, // updated 4.5
     InventoryTransaction = 0x0199, // updated 4.5
+
     CurrencyCrystalInfo = 0x019B, // updated 4.5
+
     InventoryActionAck = 0x019D, // updated 4.5
     UpdateInventorySlot = 0x019E, // updated 4.5
 
@@ -225,6 +229,17 @@ namespace Sapphire::Network::Packets
     IPCTYPE_UNK_320 = 0x0253, // updated 4.5
     IPCTYPE_UNK_322 = 0x0255, // updated 4.5
 
+    /// Doman Mahjong //////////////////////////////////////
+    MahjongOpenGui = 0x02BC, // only available in mahjong instance
+    MahjongNextRound = 0x02BD, // initial hands(baipai), # of riichi(wat), winds, honba, score and stuff
+    MahjongPlayerAction = 0x02BE, // tsumo(as in drawing a tile) called chi/pon/kan/riichi
+    MahjongEndRoundTsumo = 0x02BF, // called tsumo
+    MahjongEndRoundRon = 0x2C0, // called ron or double ron (waiting for action must be flagged from discard packet to call)
+    MahjongTileDiscard = 0x02C1, // giri (discarding a tile.) chi(1)/pon(2)/kan(4)/ron(8) flags etc..
+    MahjongPlayersInfo = 0x02C2, // actor id, name, rating and stuff..
+    // 2C3 and 2C4 are currently unknown
+    MahjongEndRoundDraw = 0x02C5, // self explanatory
+    MahjongEndGame = 0x02C6, // finished oorasu(all-last) round; shows a result screen.
   };
 
   /**

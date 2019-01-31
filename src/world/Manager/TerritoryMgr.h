@@ -155,6 +155,8 @@ namespace Sapphire::World::Manager
      */
     const std::pair< uint16_t, uint16_t >& getCurrentFestival() const;
 
+    float getInRangeDistance() const;
+
   private:
     using TerritoryTypeDetailCache = std::unordered_map< uint16_t, Data::TerritoryTypePtr >;
     using InstanceIdToZonePtrMap = std::unordered_map< uint32_t, ZonePtr >;
@@ -201,6 +203,9 @@ namespace Sapphire::World::Manager
 
     /*! current festival(s) to set for public zones from festival.exd */
     std::pair< uint16_t, uint16_t > m_currentFestival;
+
+    /*! Max distance at which actors in range of a player are sent */
+    float m_inRangeDistance;
 
   public:
     /*! returns a list of instanceContent InstanceIds currently active */

@@ -19,7 +19,6 @@ add_custom_target( copy_runtime_files ALL
 # Dependencies and compiler settings #
 ######################################
 include( "cmake/paths.cmake" )
-#include( "cmake/mysql.cmake" )
 include( "cmake/compiler.cmake" )
 include( "cmake/cotire.cmake" )
 
@@ -44,6 +43,7 @@ add_subdirectory( "deps/zlib" )
 add_subdirectory( "deps/MySQL" )
 add_subdirectory( "deps/datReader" )
 add_subdirectory( "deps/mysqlConnector" )
+add_subdirectory( "deps/recastnavigation" )
 
 ##############################
 #  Main Sapphire Components  #

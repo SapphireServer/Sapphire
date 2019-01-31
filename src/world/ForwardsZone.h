@@ -35,6 +35,11 @@ namespace World
 TYPE_FORWARD( Session );
 }
 
+namespace World::Navi
+{
+TYPE_FORWARD( NaviProvider );
+}
+
 namespace World::Territory::Housing
 {
 TYPE_FORWARD( HousingInteriorTerritory );
