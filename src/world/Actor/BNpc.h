@@ -93,7 +93,7 @@ namespace Sapphire::Entity
 
     void regainHp();
 
-    void checkAggro( uint32_t range );
+    void checkAggro();
 
   private:
     uint32_t m_bNpcBaseId;
