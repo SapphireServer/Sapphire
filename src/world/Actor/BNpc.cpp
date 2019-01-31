@@ -589,12 +589,12 @@ void Sapphire::Entity::BNpc::checkAggro()
     if( pClosestChara->getLevel() > m_level )
     {
       auto levelDiff = std::abs( pClosestChara->getLevel() - this->getLevel() );
-      range = std::max< float >( 0.f, range - std::pow( 1.53f, levelDiff * 0.6f ) );
-    }
 
-    // level difference too great, ignore player
-    if( range == 0.f )
-      return;
+      if( levelDiff >= 10 )
+        range = 0.f;
+      else
+        range = std::max< float >( 0.f, range - std::pow( 1.53f, levelDiff * 0.6f ) );
+    }
 
     auto distance = Util::distance( getPos().x, getPos().y, getPos().z,
                                     pClosestChara->getPos().x,
