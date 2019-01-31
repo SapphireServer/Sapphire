@@ -606,7 +606,7 @@ void Sapphire::Entity::BNpc::checkAggro()
 
   if( pClosestChara && pClosestChara->isAlive() && pClosestChara->isPlayer() )
   {
-    // will use this range if chara level is lower than bnpc, otherwise deminishing equation applies
+    // will use this range if chara level is lower than bnpc, otherwise diminishing equation applies
     float range = 13.f;
 
     if( pClosestChara->getLevel() > m_level )
@@ -638,17 +638,17 @@ void Sapphire::Entity::BNpc::pushNearbyBNpcs()
     auto pos = bNpc->getPos();
     auto distance = Util::distance( m_pos, bNpc->getPos() );
 
+    // todo: not sure what's good here
+    auto factor = bNpc->getNaviTargetReachedDistance();
+
     // too far away, ignore it
-    if( distance > getNaviTargetReachedDistance() )
+    if( distance > factor )
       continue;
 
     auto angle = Util::calcAngFrom( m_pos.x, m_pos.y, pos.x, pos.y ) + PI;
 
     auto x = ( cosf( angle ) );
     auto z = ( sinf( angle ) );
-
-    // todo: not sure what's good here
-    auto factor = bNpc->getScale();
 
     bNpc->setPos( pos.x + ( x * factor ),
                   pos.y,
