@@ -402,7 +402,6 @@ void Sapphire::Entity::BNpc::onTick()
 void Sapphire::Entity::BNpc::update( int64_t currTime )
 {
   const uint8_t minActorDistance = 4;
-  const uint8_t aggroRange = 8;
   const uint8_t maxDistanceToOrigin = 40;
   const uint32_t roamTick = 20;
 
@@ -441,7 +440,7 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
         m_state = BNpcState::Idle;
       }
 
-      checkAggro( aggroRange );
+      checkAggro();
     }
     break;
 
@@ -462,7 +461,7 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
         m_state = BNpcState::Roaming;
       }
 
-      checkAggro( aggroRange );
+      checkAggro();
     }
 
     case BNpcState::Combat:
@@ -574,7 +573,7 @@ void Sapphire::Entity::BNpc::setTimeOfDeath( uint32_t timeOfDeath )
   m_timeOfDeath = timeOfDeath;
 }
 
-void Sapphire::Entity::BNpc::checkAggro( uint32_t range )
+void Sapphire::Entity::BNpc::checkAggro()
 {
   // passive mobs should ignore players unless aggro'd
   if( m_aggressionMode == 1 )
@@ -582,14 +581,29 @@ void Sapphire::Entity::BNpc::checkAggro( uint32_t range )
 
   CharaPtr pClosestChara = getClosestChara();
 
-  if( pClosestChara && pClosestChara->isAlive() )
+  if( pClosestChara && pClosestChara->isAlive() && pClosestChara->isPlayer() )
   {
+    // will use this range if chara level is lower than bnpc, otherwise deminishing equation applies
+    float range = 13.f;
+
+    if( pClosestChara->getLevel() > m_level )
+    {
+      auto levelDiff = std::abs( pClosestChara->getLevel() - this->getLevel() );
+      range = std::max< float >( 0.f, range - std::pow( 1.53f, levelDiff * 0.6f ) );
+    }
+
+    // level difference too great, ignore player
+    if( range == 0.f )
+      return;
+
     auto distance = Util::distance( getPos().x, getPos().y, getPos().z,
                                     pClosestChara->getPos().x,
                                     pClosestChara->getPos().y,
                                     pClosestChara->getPos().z );
 
-    if( distance < range && pClosestChara->isPlayer() )
+    if( distance < range )
+    {
       aggro( pClosestChara );
+    }
   }
 }
