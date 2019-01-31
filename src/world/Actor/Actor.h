@@ -59,9 +59,9 @@ namespace Sapphire::Entity
 
     Common::FFXIVARR_POSITION3& getPos();
 
-    void setPos( const Common::FFXIVARR_POSITION3& pos );
+    void setPos( const Common::FFXIVARR_POSITION3& pos, bool broadcastUpdate = true );
 
-    void setPos( float x, float y, float z );
+    void setPos( float x, float y, float z, bool broadcastUpdate = true );
 
     float getRot() const;
 

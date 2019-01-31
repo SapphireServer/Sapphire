@@ -57,18 +57,22 @@ Sapphire::Common::FFXIVARR_POSITION3& Sapphire::Entity::Actor::getPos()
   return m_pos;
 }
 
-void Sapphire::Entity::Actor::setPos( float x, float y, float z )
+void Sapphire::Entity::Actor::setPos( float x, float y, float z, bool broadcastUpdate )
 {
   m_pos.x = x;
   m_pos.y = y;
   m_pos.z = z;
-  m_pCurrentZone->updateActorPosition( *this );
+
+  if( broadcastUpdate )
+    m_pCurrentZone->updateActorPosition( *this );
 }
 
-void Sapphire::Entity::Actor::setPos( const Sapphire::Common::FFXIVARR_POSITION3& pos )
+void Sapphire::Entity::Actor::setPos( const Sapphire::Common::FFXIVARR_POSITION3& pos, bool broadcastUpdate )
 {
   m_pos = pos;
-  m_pCurrentZone->updateActorPosition( *this );
+
+  if( broadcastUpdate )
+    m_pCurrentZone->updateActorPosition( *this );
 }
 
 float Sapphire::Entity::Actor::getRot() const
