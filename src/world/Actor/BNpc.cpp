@@ -145,7 +145,7 @@ void Sapphire::Entity::BNpc::spawn( PlayerPtr pTarget )
 void Sapphire::Entity::BNpc::despawn( PlayerPtr pTarget )
 {
   pTarget->freePlayerSpawnId( getId() );
-  pTarget->queuePacket( makeActorControl143(  m_id, DespawnZoneScreenMsg, 0x04, getId(), 0x01 ) );
+  pTarget->queuePacket( makeActorControl143( m_id, DespawnZoneScreenMsg, 0x04, getId(), 0x01 ) );
 }
 
 Sapphire::Entity::BNpcState Sapphire::Entity::BNpc::getState() const
