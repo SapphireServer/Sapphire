@@ -222,7 +222,7 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 {
   // do this first, this will update local actor position and the position of other actors
   // and then this npc will then path from the position after pushing/being pushed
-  pushNearbyBNpcs();
+  pushNearbyBNpcs( pos );
 
   if( Util::distance( getPos(), pos ) <= m_naviTargetReachedDistance )
   {
@@ -629,7 +629,7 @@ void Sapphire::Entity::BNpc::checkAggro()
   }
 }
 
-void Sapphire::Entity::BNpc::pushNearbyBNpcs()
+void Sapphire::Entity::BNpc::pushNearbyBNpcs( const Common::FFXIVARR_POSITION3& pos )
 {
   for( auto& bNpc : m_inRangeBNpc )
   {
@@ -651,6 +651,7 @@ void Sapphire::Entity::BNpc::pushNearbyBNpcs()
     auto x = ( cosf( angle ) );
     auto z = ( sinf( angle ) );
 
+    bNpc->face( pos );
     bNpc->setPos( pos.x + ( x * factor * delta ),
                   pos.y,
                   pos.z + ( z * factor * delta ) );

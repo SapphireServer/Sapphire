@@ -98,7 +98,7 @@ namespace Sapphire::Entity
 
     void checkAggro();
 
-    void pushNearbyBNpcs();
+    void pushNearbyBNpcs( const Common::FFXIVARR_POSITION3& pos );
 
   private:
     uint32_t m_bNpcBaseId;
