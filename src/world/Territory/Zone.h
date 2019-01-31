@@ -49,7 +49,7 @@ namespace Sapphire
     Common::Weather m_currentWeather;
     Common::Weather m_weatherOverride;
 
-    uint64_t m_lastMobUpdate;
+    int64_t m_lastMobUpdate;
 
     FestivalPair m_currentFestival;
 
