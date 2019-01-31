@@ -57,6 +57,11 @@ namespace Sapphire::Common
     French = 8
   };
 
+  enum TellFlags : uint8_t
+  {
+    GmTellMsg = 0x4,
+  };
+
   enum ObjKind : uint8_t
   {
     None = 0x00,
