@@ -653,7 +653,7 @@ void Sapphire::Entity::BNpc::pushNearbyBNpcs()
 
     bNpc->setPos( pos.x + ( x * factor * delta ),
                   pos.y,
-                  pos.z + ( z * factor * delta ) );
+                  pos.z + ( z * factor * delta ), false );
 
 //    setPos( m_pos.x + ( xBase * -pushDistance ),
 //            m_pos.y,
