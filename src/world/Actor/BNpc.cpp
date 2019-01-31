@@ -99,7 +99,8 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
   m_scale = bNpcBaseData->scale;
 
   // todo: is this actually good?
-  m_naviTargetReachedDistance = m_scale * 2.f;
+  //m_naviTargetReachedDistance = m_scale * 2.f;
+  m_naviTargetReachedDistance = 4.f;
 }
 
 Sapphire::Entity::BNpc::~BNpc() = default;
@@ -222,7 +223,7 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 {
   // do this first, this will update local actor position and the position of other actors
   // and then this npc will then path from the position after pushing/being pushed
-  pushNearbyBNpcs();
+  //pushNearbyBNpcs();
 
   if( Util::distance( getPos(), pos ) <= m_naviTargetReachedDistance )
   {
@@ -636,6 +637,7 @@ void Sapphire::Entity::BNpc::pushNearbyBNpcs()
     auto pos = bNpc->getPos();
     auto distance = Util::distance( m_pos, bNpc->getPos() );
 
+
     // todo: not sure what's good here
     auto factor = bNpc->getNaviTargetReachedDistance();
 
@@ -653,7 +655,7 @@ void Sapphire::Entity::BNpc::pushNearbyBNpcs()
 
     bNpc->setPos( pos.x + ( x * factor * delta ),
                   pos.y,
-                  pos.z + ( z * factor * delta ), false );
+                  pos.z + ( z * factor * delta ), true );
 
 //    setPos( m_pos.x + ( xBase * -pushDistance ),
 //            m_pos.y,
