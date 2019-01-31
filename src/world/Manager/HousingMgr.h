@@ -156,10 +156,10 @@ namespace Sapphire::World::Manager
      */
     bool initHouseModels( Entity::Player& player, LandPtr land, uint32_t presetCatalogId );
 
-    void reqPlaceHousingItem( Entity::Player& player, uint16_t landId, uint16_t containerId, uint16_t slotId,
+    void reqPlaceHousingItem( Entity::Player& player, uint16_t landId, uint16_t containerId, uint8_t slotId,
                               Common::FFXIVARR_POSITION3 pos, float rotation );
 
-    void reqPlaceItemInStore( Entity::Player& player, uint16_t landId, uint16_t containerId, uint16_t slotId );
+    void reqPlaceItemInStore( Entity::Player& player, uint16_t landId, uint16_t containerId, uint8_t slotId );
 
     /*!
      * @brief Returns the equivalent YardObject for a HousingItem
@@ -169,13 +169,12 @@ namespace Sapphire::World::Manager
     Common::HousingObject getYardObjectForItem( Inventory::HousingItemPtr item ) const;
 
 
-    void reqMoveHousingItem( Entity::Player& player, Common::LandIdent ident, uint16_t slot,
+    void reqMoveHousingItem( Entity::Player& player, Common::LandIdent ident, uint8_t slot,
                              Common::FFXIVARR_POSITION3 pos, float rot );
 
 
     void reqRemoveHousingItem( Sapphire::Entity::Player& player, uint16_t plot,
-                               uint16_t containerId, uint16_t slot,
-                               bool sendToStoreroom );
+                               uint16_t containerId, uint8_t slot, bool sendToStoreroom );
 
     void reqEstateExteriorRemodel( Entity::Player& player, uint16_t plot );
 
@@ -212,7 +211,7 @@ namespace Sapphire::World::Manager
      * @return
      */
     bool removeExternalItem( Entity::Player& player, HousingZone& terri, Land& land,
-                             Common::InventoryType containerType, uint16_t slotId,
+                             Common::InventoryType containerType, uint8_t slotId,
                              bool sendToStoreroom );
 
     /*!
@@ -228,7 +227,7 @@ namespace Sapphire::World::Manager
      * @param rot The new rotation
      * @return true if moved successfully
      */
-    bool moveExternalItem( Entity::Player& player, Common::LandIdent ident, uint16_t slot,
+    bool moveExternalItem( Entity::Player& player, Common::LandIdent ident, uint8_t slot,
                            Sapphire::HousingZone& terri, Common::FFXIVARR_POSITION3 pos, float rot );
 
     /*!
@@ -245,7 +244,7 @@ namespace Sapphire::World::Manager
      * @return true if moved successfully
      */
     bool moveInternalItem( Entity::Player& player, Common::LandIdent ident,
-                           Territory::Housing::HousingInteriorTerritory& terri, uint16_t slot,
+                           Territory::Housing::HousingInteriorTerritory& terri, uint8_t slot,
                            Common::FFXIVARR_POSITION3 pos, float rot );
 
     /*!

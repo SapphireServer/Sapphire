@@ -206,7 +206,7 @@ void Sapphire::World::Session::update()
     // SESSION LOGIC
     m_pPlayer->update( Util::getTimeMs() );
 
-    if( ( static_cast< uint32_t >( Util::getTimeSeconds() ) - static_cast< uint32_t >( getLastSqlTime() ) ) > 10 )
+    if( Util::getTimeSeconds() - static_cast< uint32_t >( getLastSqlTime() ) > 10 )
     {
       updateLastSqlTime();
       m_pPlayer->updateSql();

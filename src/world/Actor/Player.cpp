@@ -10,6 +10,7 @@
 
 #include "Session.h"
 #include "Player.h"
+#include "BNpc.h"
 
 #include "Manager/HousingMgr.h"
 #include "Manager/TerritoryMgr.h"
@@ -420,13 +421,13 @@ void Sapphire::Entity::Player::setZone( uint32_t zoneId )
       return;
   }
 
-  sendZonePackets();
 }
 
 bool Sapphire::Entity::Player::setInstance( uint32_t instanceContentId )
 {
-  auto pTeriMgr = m_pFw->get< TerritoryMgr >();
   m_onEnterEventDone = false;
+  auto pTeriMgr = m_pFw->get< TerritoryMgr >();
+
   auto instance = pTeriMgr->getInstanceZonePtr( instanceContentId );
   if( !instance )
     return false;
@@ -441,7 +442,6 @@ bool Sapphire::Entity::Player::setInstance( ZonePtr instance )
     return false;
 
   auto pTeriMgr = m_pFw->get< TerritoryMgr >();
-
   auto currentZone = getCurrentZone();
 
   // zoning within the same zone won't cause the prev data to be overwritten
@@ -453,35 +453,30 @@ bool Sapphire::Entity::Player::setInstance( ZonePtr instance )
     m_prevTerritoryId = getTerritoryId();
   }
 
-  if( !pTeriMgr->movePlayer( instance, getAsPlayer() ) )
-    return false;
-
-  sendZonePackets();
-
-  return true;
+  return pTeriMgr->movePlayer( instance, getAsPlayer() );
 }
 
 bool Sapphire::Entity::Player::setInstance( ZonePtr instance, Common::FFXIVARR_POSITION3 pos )
 {
+  m_onEnterEventDone = false;
   if( !instance )
     return false;
-
-  m_onEnterEventDone = false;
 
   auto pTeriMgr = m_pFw->get< TerritoryMgr >();
   auto currentZone = getCurrentZone();
 
-  m_prevPos = m_pos;
-  m_prevRot = m_rot;
-  m_prevTerritoryTypeId = currentZone->getTerritoryTypeId();
-  m_prevTerritoryId = getTerritoryId();
+  // zoning within the same zone won't cause the prev data to be overwritten
+  if( instance->getTerritoryTypeId() != m_territoryTypeId )
+  {
+    m_prevPos = m_pos;
+    m_prevRot = m_rot;
+    m_prevTerritoryTypeId = currentZone->getTerritoryTypeId();
+    m_prevTerritoryId = getTerritoryId();
+  }
 
   if( pTeriMgr->movePlayer( instance, getAsPlayer() ) )
   {
     m_pos = pos;
-
-    sendZonePackets();
-
     return true;
   }
 
@@ -512,8 +507,6 @@ bool Sapphire::Entity::Player::exitInstance()
   m_territoryTypeId = m_prevTerritoryTypeId;
   m_territoryId = m_prevTerritoryId;
 
-  sendZonePackets();
-
   //m_queuedZoneing = std::make_shared< QueuedZoning >( m_territoryTypeId, m_pos, Util::getTimeMs(), m_rot );
 
   return true;
@@ -541,7 +534,20 @@ void Sapphire::Entity::Player::initSpawnIdQueue()
 
 uint8_t Sapphire::Entity::Player::getSpawnIdForActorId( uint32_t actorId )
 {
-  return m_actorSpawnIndexAllocator.getNextFreeSpawnIndex( actorId );
+  auto index = m_actorSpawnIndexAllocator.getNextFreeSpawnIndex( actorId );
+
+  if( index == m_actorSpawnIndexAllocator.getAllocFailId() )
+  {
+    Logger::warn( "Failed to spawn Chara#{0} for Player#{1} - no remaining spawn indexes available. "
+                  "Consider lowering InRangeDistance in world config.",
+                  actorId, getId() );
+
+    sendUrgent( "Failed to spawn Chara#{0} for you - no remaining spawn slots. See world log.", actorId );
+
+    return index;
+  }
+
+  return index;
 }
 
 bool Sapphire::Entity::Player::isActorSpawnIdValid( uint8_t spawnIndex )
@@ -746,7 +752,7 @@ void Sapphire::Entity::Player::gainLevel()
 
 }
 
-void Sapphire::Entity::Player::sendStatusUpdate( bool toSelf )
+void Sapphire::Entity::Player::sendStatusUpdate()
 {
   sendToInRangeSet( std::make_shared< UpdateHpMpTpPacket >( *this ), true );
 }
@@ -817,7 +823,7 @@ void Sapphire::Entity::Player::setClassJob( Common::ClassJob classJob )
 
   sendToInRangeSet( makeActorControl142( getId(), ClassJobChange, 0x04 ), true );
 
-  sendStatusUpdate( true );
+  sendStatusUpdate();
 }
 
 void Sapphire::Entity::Player::setLevel( uint8_t level )
@@ -1050,7 +1056,6 @@ void Sapphire::Entity::Player::unsetStateFlag( Common::PlayerStateFlag flag )
 
 void Sapphire::Entity::Player::update( int64_t currTime )
 {
-
   // a zoning is pending, lets do it
   if( m_queuedZoneing && ( currTime - m_queuedZoneing->m_queueTime ) > 800 )
   {
@@ -1122,13 +1127,7 @@ void Sapphire::Entity::Player::update( int64_t currTime )
     }
   }
 
-  if( ( currTime - m_lastTickTime ) > 3000 )
-  {
-    // add 3 seconds to total play time
-    m_playTime += 3;
-    m_lastTickTime = currTime;
-    onTick();
-  }
+  Chara::update( currTime );
 }
 
 void Sapphire::Entity::Player::onMobKill( uint16_t nameId )
@@ -1141,11 +1140,14 @@ void Sapphire::Entity::Player::freePlayerSpawnId( uint32_t actorId )
 {
   auto spawnId = m_actorSpawnIndexAllocator.freeUsedSpawnIndex( actorId );
 
+  // actor was never spawned for this player
+  if( spawnId == m_actorSpawnIndexAllocator.getAllocFailId() )
+    return;
+
   auto freeActorSpawnPacket = makeZonePacket< FFXIVIpcActorFreeSpawn >( getId() );
   freeActorSpawnPacket->data().actorId = actorId;
   freeActorSpawnPacket->data().spawnId = spawnId;
   queuePacket( freeActorSpawnPacket );
-
 }
 
 uint8_t* Sapphire::Entity::Player::getAetheryteArray()
@@ -1356,6 +1358,45 @@ void Sapphire::Entity::Player::initHateSlotQueue()
     m_freeHateSlotQueue.push( i );
 }
 
+void Sapphire::Entity::Player::hateListAdd( BNpcPtr pBNpc )
+{
+  if( !m_freeHateSlotQueue.empty() )
+  {
+    uint8_t hateId = m_freeHateSlotQueue.front();
+    m_freeHateSlotQueue.pop();
+    m_actorIdTohateSlotMap[ pBNpc->getId() ] = hateId;
+    sendHateList();
+  }
+}
+
+void Sapphire::Entity::Player::hateListRemove( BNpcPtr pBNpc )
+{
+
+  auto it = m_actorIdTohateSlotMap.begin();
+  for( ; it != m_actorIdTohateSlotMap.end(); ++it )
+  {
+    if( it->first == pBNpc->getId() )
+    {
+      uint8_t hateSlot = it->second;
+      m_freeHateSlotQueue.push( hateSlot );
+      m_actorIdTohateSlotMap.erase( it );
+      sendHateList();
+
+      return;
+    }
+  }
+}
+
+bool Sapphire::Entity::Player::hateListHasEntry( BNpcPtr pBNpc )
+{
+  for( const auto& entry : m_actorIdTohateSlotMap )
+  {
+    if( entry.first == pBNpc->getId() )
+      return true;
+  }
+  return false;
+}
+
 void Sapphire::Entity::Player::sendHateList()
 {
   auto hateListPacket = makeZonePacket< FFXIVIpcHateList >( getId() );
@@ -1367,6 +1408,19 @@ void Sapphire::Entity::Player::sendHateList()
     hateListPacket->data().entry[ i ].hatePercent = 100;
   }
   queuePacket( hateListPacket );
+}
+
+void Sapphire::Entity::Player::onMobAggro( BNpcPtr pBNpc )
+{
+  hateListAdd( pBNpc );
+  queuePacket( makeActorControl142( getId(), ToggleAggro, 1 ) );
+}
+
+void Sapphire::Entity::Player::onMobDeaggro( BNpcPtr pBNpc )
+{
+  hateListRemove( pBNpc );
+  if( m_actorIdTohateSlotMap.empty() )
+    queuePacket( makeActorControl142( getId(), ToggleAggro ) );
 }
 
 bool Sapphire::Entity::Player::isLogin() const
@@ -1470,7 +1524,7 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
 
   auto mainWeap = getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand );
 
-  pTarget->onActionHostile( *this );
+  pTarget->onActionHostile( getAsChara() );
   //uint64_t tick = Util::getTimeMs();
   //srand(static_cast< uint32_t >(tick));
 
@@ -1482,7 +1536,7 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
     auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 8 );
     effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
 
-    Server::EffectEntry entry;
+    Server::EffectEntry entry{};
     entry.value = damage;
     entry.effectType = Common::ActionEffectType::Damage;
     entry.hitSeverity = Common::ActionHitSeverityType::NormalDamage;
@@ -1496,7 +1550,7 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
     auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 7 );
     effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
 
-    Server::EffectEntry entry;
+    Server::EffectEntry entry{};
     entry.value = damage;
     entry.effectType = Common::ActionEffectType::Damage;
     entry.hitSeverity = Common::ActionHitSeverityType::NormalDamage;
@@ -1541,7 +1595,7 @@ uint32_t Sapphire::Entity::Player::getCFPenaltyMinutes() const
 void Sapphire::Entity::Player::setCFPenaltyMinutes( uint32_t minutes )
 {
   auto currentTimestamp = Sapphire::Util::getTimeSeconds();
-  setCFPenaltyTimestamp( static_cast< uint32_t >( currentTimestamp + minutes * 60 ) );
+  setCFPenaltyTimestamp( currentTimestamp + minutes * 60 );
 }
 
 uint8_t Sapphire::Entity::Player::getOpeningSequence() const
@@ -1794,7 +1848,20 @@ void Sapphire::Entity::Player::teleportQuery( uint16_t aetheryteId, FrameworkPtr
 
 uint8_t Sapphire::Entity::Player::getNextObjSpawnIndexForActorId( uint32_t actorId )
 {
-  return m_objSpawnIndexAllocator.getNextFreeSpawnIndex( actorId );
+  auto index = m_objSpawnIndexAllocator.getNextFreeSpawnIndex( actorId );
+
+  if( index == m_objSpawnIndexAllocator.getAllocFailId() )
+  {
+    Logger::warn( "Failed to spawn EObj#{0} for Player#{1} - no remaining spawn indexes available. "
+                  "Consider lowering InRangeDistance in world config.",
+                  actorId, getId() );
+
+    sendUrgent( "Failed to spawn EObj#{0} for you - no remaining spawn slots. See world log.", actorId );
+
+    return index;
+  }
+
+  return index;
 }
 
 void Sapphire::Entity::Player::resetObjSpawnIndex()
@@ -1805,6 +1872,10 @@ void Sapphire::Entity::Player::resetObjSpawnIndex()
 void Sapphire::Entity::Player::freeObjSpawnIndexForActorId( uint32_t actorId )
 {
   auto spawnId = m_objSpawnIndexAllocator.freeUsedSpawnIndex( actorId );
+
+  // obj was never spawned for this player
+  if( spawnId == m_objSpawnIndexAllocator.getAllocFailId() )
+    return;
 
   auto freeObjectSpawnPacket = makeZonePacket< FFXIVIpcObjectDespawn >( getId() );
   freeObjectSpawnPacket->data().spawnIndex = spawnId;

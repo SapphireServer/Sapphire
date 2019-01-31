@@ -367,6 +367,18 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
       }
     }
   }
+  else if( subCommand == "mobaggro" )
+  {
+    auto inRange = player.getInRangeActors();
+
+    for( auto actor : inRange )
+    {
+      if( actor->getId() == player.getTargetId() && actor->getAsChara()->isAlive() )
+      {
+        actor->getAsBNpc()->onActionHostile( player.getAsChara() );
+      }
+    }
+  }
   else
   {
     player.sendUrgent( "{0} is not a valid SET command.", subCommand );
@@ -439,7 +451,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
                                                    player.getPos().y,
                                                    player.getPos().z,
                                                    player.getRot(),
-                                                   1, 1000, framework() );
+                                                   1, 1000, playerZone, framework() );
 
 
 

@@ -315,7 +315,7 @@ void Sapphire::Network::GameConnection::processOutQueue()
     totalSize += pPacket->getSize();
 
     // todo: figure out a good max set size and make it configurable
-    if( totalSize > 15000 )
+    if( totalSize > 10000 )
       break;
   }
 
@@ -385,6 +385,7 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
                                                        const std::vector< Sapphire::Network::Packets::FFXIVARR_PACKET_RAW >& packetData )
 {
   auto pServerZone = m_pFw->get< World::ServerMgr >();
+
   // if a session is set, update the last time it recieved a game packet
   if( m_pSession )
     m_pSession->updateLastDataTime();
@@ -427,7 +428,7 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
 
         auto pe = std::make_shared< FFXIVRawPacket >( 0x07, 0x18, 0, 0 );
         *( unsigned int* ) ( &pe->data()[ 0 ] ) = 0xE0037603;
-        *( unsigned int* ) ( &pe->data()[ 4 ] ) = static_cast< uint32_t >( time( nullptr ) );
+        *( unsigned int* ) ( &pe->data()[ 4 ] ) = Sapphire::Util::getTimeSeconds();
         sendSinglePacket( pe );
 
         // main connection, assinging it to the session

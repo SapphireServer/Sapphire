@@ -119,10 +119,10 @@ uint64_t Sapphire::Util::getTimeMs()
   return epoch.count();
 }
 
-int64_t Sapphire::Util::getTimeSeconds()
+uint32_t Sapphire::Util::getTimeSeconds()
 {
-  std::chrono::seconds epoch = std::chrono::seconds( std::time( nullptr ) );
-  return epoch.count();
+  auto currClock = std::chrono::system_clock::now();
+  return std::chrono::time_point_cast< std::chrono::seconds >( currClock ).time_since_epoch().count();
 }
 
 uint64_t Sapphire::Util::getEorzeanTimeStamp()

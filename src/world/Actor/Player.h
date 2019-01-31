@@ -707,7 +707,7 @@ namespace Sapphire::Entity
     void sendStateFlags();
 
     /*! send status update */
-    void sendStatusUpdate( bool toSelf = true ) override;
+    void sendStatusUpdate() override;
 
     /*! send the entire inventory sequence */
     void sendInventory();
@@ -798,6 +798,11 @@ namespace Sapphire::Entity
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     void initHateSlotQueue();
 
+    void hateListAdd( BNpcPtr pBNpc );
+    void hateListRemove( BNpcPtr pBNpc );
+
+    bool hateListHasEntry( BNpcPtr pBNpc );
+
     void sendHateList();
 
     bool actionHasCastTime( uint32_t actionId );
@@ -830,6 +835,9 @@ namespace Sapphire::Entity
     void setAutoattack( bool mode );
 
     bool isAutoattackOn() const;
+
+    void onMobAggro( BNpcPtr pBNpc );
+    void onMobDeaggro( BNpcPtr pBNpc );
 
     // Content Finder handling
     //////////////////////////////////////////////////////////////////////////////////////////////////////
