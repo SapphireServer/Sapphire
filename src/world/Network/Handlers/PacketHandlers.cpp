@@ -636,14 +636,14 @@ void Sapphire::Network::GameConnection::tellHandler( FrameworkPtr pFw,
     return;
   }
 
-  if( pTargetPlayer->hasStateFlag( PlayerStateFlag::BoundByDuty ) )
+  if( pTargetPlayer->hasStateFlag( PlayerStateFlag::BoundByDuty ) && !player.isActingAsGm() )
   {
     // send error for player bound by duty
     // TODO: implement me
     return;
   }
 
-  if( pTargetPlayer->getOnlineStatus() == OnlineStatus::Busy )
+  if( pTargetPlayer->getOnlineStatus() == OnlineStatus::Busy && !player.isActingAsGm() )
   {
     // send error for player being busy
     // TODO: implement me ( i've seen this done with packet type 67 i think )
@@ -656,16 +656,13 @@ void Sapphire::Network::GameConnection::tellHandler( FrameworkPtr pFw,
   // TODO: world id from server
   tellPacket->data().contentId = player.getContentId();
   tellPacket->data().worldId = 67;
-  // TODO: do these have a meaning?
-  //tellPacket.data().u1 = 0x92CD7337;
-  //tellPacket.data().u2a = 0x2E;
-  //tellPacket.data().u2b = 0x40;
+
   if( player.isActingAsGm() )
   {
-    tellPacket->data().preName = 0x04;
+    tellPacket->data().flags |= TellFlags::GmTellMsg;
   }
-  pTargetPlayer->queueChatPacket( tellPacket );
 
+  pTargetPlayer->queueChatPacket( tellPacket );
 }
 
 void Sapphire::Network::GameConnection::performNoteHandler( FrameworkPtr pFw,

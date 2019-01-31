@@ -17,7 +17,7 @@ struct FFXIVIpcTell : FFXIVIpcBasePacket< Tell >
 {
   uint64_t contentId;
   uint16_t worldId;
-  uint8_t preName;
+  uint8_t flags;
   char receipientName[32];
   char msg[1029];
 };

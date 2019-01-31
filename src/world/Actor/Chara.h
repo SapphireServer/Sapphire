@@ -118,6 +118,8 @@ namespace Sapphire::Entity
 
     virtual void calculateStats() {};
 
+    int64_t getLastUpdateTime() const;
+
     /// Status effect functions
     void addStatusEffect( StatusEffect::StatusEffectPtr pEffect );
 
