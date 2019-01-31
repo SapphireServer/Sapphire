@@ -90,8 +90,6 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
   memcpy( m_customize, pTemplate->getCustomize(), sizeof( m_customize ) );
   memcpy( m_modelEquip, pTemplate->getModelEquip(), sizeof( m_modelEquip ) );
 
-  m_lastTickTime = 0;
-
   auto exdData = m_pFw->get< Data::ExdDataGenerated >();
   assert( exdData );
 
@@ -641,6 +639,9 @@ void Sapphire::Entity::BNpc::pushNearbyBNpcs()
     // todo: not sure what's good here
     auto factor = bNpc->getNaviTargetReachedDistance();
 
+    auto delta = static_cast< float >( Util::getTimeMs() - bNpc->getLastUpdateTime() ) / 1000.f;
+    delta = std::min< float >( factor, delta );
+
     // too far away, ignore it
     if( distance > factor )
       continue;
@@ -650,9 +651,9 @@ void Sapphire::Entity::BNpc::pushNearbyBNpcs()
     auto x = ( cosf( angle ) );
     auto z = ( sinf( angle ) );
 
-    bNpc->setPos( pos.x + ( x * factor ),
+    bNpc->setPos( pos.x + ( x * factor * delta ),
                   pos.y,
-                  pos.z + ( z * factor ) );
+                  pos.z + ( z * factor * delta ) );
 
 //    setPos( m_pos.x + ( xBase * -pushDistance ),
 //            m_pos.y,
