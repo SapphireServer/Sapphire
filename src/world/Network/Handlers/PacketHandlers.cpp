@@ -230,7 +230,7 @@ void Sapphire::Network::GameConnection::updatePositionHandler( FrameworkPtr pFw,
     float distanceToNewPos = Util::distance( { player.getPos().x,
                                                player.getPos().y,
                                                player.getPos().z },
-                                            {  *reinterpret_cast< float* >( &copy.data[ 0x1C ] ),
+                                             { *reinterpret_cast< float* >( &copy.data[ 0x1C ] ),
                                                *reinterpret_cast< float* >( &copy.data[ 0x20 ] ),
                                                *reinterpret_cast< float* >( &copy.data[ 0x24 ] ) } );
     //TODO: find a better value

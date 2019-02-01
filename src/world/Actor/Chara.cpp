@@ -63,7 +63,7 @@ std::string Sapphire::Entity::Chara::getName() const
 bool Sapphire::Entity::Chara::isFacing( Entity::CharaPtr target, float arcDegree )
 {
   auto angleBetween = Util::RelativeAngle( getRot(), getPos().x, getPos().y, target->getPos().x, target->getPos().y );
-  return angleBetween >= ( -( arcDegree / 2 ) && angleBetween <= ( arcDegree / 2 )  );
+  return angleBetween >= -( arcDegree / 2 ) && angleBetween <= ( arcDegree / 2 );
 }
 
 /*! \return current stance of the actors */

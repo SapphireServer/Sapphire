@@ -160,7 +160,7 @@ namespace Sapphire::Entity
 
     std::string getName() const;
 
-    bool isFacing( Entity::CharaPtr target, float arcDegree = 100 );
+    bool isFacing( Entity::CharaPtr target, float arcDegree = 80 );
 
     bool face( const Common::FFXIVARR_POSITION3& p );
 
