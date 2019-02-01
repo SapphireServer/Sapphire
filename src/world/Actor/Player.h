@@ -839,6 +839,9 @@ namespace Sapphire::Entity
     void onMobAggro( BNpcPtr pBNpc );
     void onMobDeaggro( BNpcPtr pBNpc );
 
+    void setRunning( bool state );
+    bool isRunning();
+
     // Content Finder handling
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     /*! Get an unix time when the player can register into content finder again. */
@@ -1081,6 +1084,9 @@ namespace Sapphire::Entity
 
     Util::SpawnIndexAllocator< uint8_t > m_objSpawnIndexAllocator;
     Util::SpawnIndexAllocator< uint8_t > m_actorSpawnIndexAllocator;
+
+    //movement
+    bool m_isRunning;
   };
 
 }

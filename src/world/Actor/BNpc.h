@@ -94,6 +94,14 @@ namespace Sapphire::Entity
     uint32_t getTimeOfDeath() const;
     void setTimeOfDeath( uint32_t timeOfDeath );
 
+    void setDeaf( bool state );
+
+    void setBlind( bool state );
+
+    bool isDeaf();
+
+    bool isBlind();
+
     void regainHp();
 
     void checkAggro();
@@ -129,6 +137,9 @@ namespace Sapphire::Entity
     std::vector< Common::FFXIVARR_POSITION3 > m_naviLastPath;
     uint8_t m_naviPathStep;
     Common::FFXIVARR_POSITION3 m_naviTarget;
+
+    bool m_isBlind;
+    bool m_isDeaf;
 
   };
 

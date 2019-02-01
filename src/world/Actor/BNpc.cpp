@@ -76,6 +76,9 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
   m_timeOfDeath = 0;
   m_targetId = Common::INVALID_GAME_OBJECT_ID64;
 
+  m_isBlind = false;
+  m_isDeaf = false;
+
   m_maxHp = maxHp;
   m_maxMp = 200;
   m_hp = maxHp;
@@ -595,6 +598,26 @@ void Sapphire::Entity::BNpc::setTimeOfDeath( uint32_t timeOfDeath )
   m_timeOfDeath = timeOfDeath;
 }
 
+void Sapphire::Entity::BNpc::setDeaf( bool state )
+{
+  m_isDeaf = state;
+}
+
+void Sapphire::Entity::BNpc::setBlind( bool state )
+{
+  m_isBlind = true;
+}
+
+bool Sapphire::Entity::BNpc::isDeaf()
+{
+  return m_isDeaf;
+}
+
+bool Sapphire::Entity::BNpc::isBlind()
+{
+  return m_isBlind;
+}
+
 void Sapphire::Entity::BNpc::checkAggro()
 {
   // passive mobs should ignore players unless aggro'd
@@ -625,7 +648,8 @@ void Sapphire::Entity::BNpc::checkAggro()
 
     if( distance < range )
     {
-      aggro( pClosestChara );
+      if(( !isBlind() && isDeaf() ) || ( isBlind() && isFacing( pClosestChara, 40 ) ) || ( isDeaf() && pClosestChara->getAsPlayer()->isRunning() ) )
+        aggro( pClosestChara );
     }
   }
 }

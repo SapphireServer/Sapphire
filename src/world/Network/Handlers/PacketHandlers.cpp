@@ -256,6 +256,7 @@ void Sapphire::Network::GameConnection::updatePositionHandler( FrameworkPtr pFw,
     unk1 = 0x7F;
     unk2 = 0x00;
     unk4 = 0x3C;
+    player.setRunning( true );
   }
 
   if( moveType & MoveType::Strafing )
@@ -267,6 +268,7 @@ void Sapphire::Network::GameConnection::updatePositionHandler( FrameworkPtr pFw,
     //else
     //   unk1 = 0x5f;
     unk4 = 0x3C;
+    player.setRunning( false );
   }
 
   if( moveType & MoveType::Walking )
@@ -275,6 +277,7 @@ void Sapphire::Network::GameConnection::updatePositionHandler( FrameworkPtr pFw,
     unk2 = 0x02;
     unk3 = 0x00;
     unk4 = 0x18;
+    player.setRunning( false );
   }
 
   if( moveType & MoveType::Walking && moveType & MoveType::Strafing )

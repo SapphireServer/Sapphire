@@ -60,6 +60,11 @@ std::string Sapphire::Entity::Chara::getName() const
   return std::string( m_name );
 }
 
+bool Sapphire::Entity::Chara::isFacing( Entity::CharaPtr source, uint8_t coneAngel )
+{
+  int32_t angle = Util::calcAngTo( getPos().x, getPos().y, source->getPos().x, source->getPos().y );
+  return abs( int8_t( angle - getRot() ) ) < ( coneAngel >> 1 );
+}
 
 /*! \return current stance of the actors */
 Sapphire::Common::Stance Sapphire::Entity::Chara::getStance() const

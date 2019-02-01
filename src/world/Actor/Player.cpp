@@ -77,7 +77,8 @@ Sapphire::Entity::Player::Player( FrameworkPtr pFw ) :
   m_mount( 0 ),
   m_emoteMode( 0 ),
   m_directorInitialized( false ),
-  m_onEnterEventDone( false )
+  m_onEnterEventDone( false ),
+  m_isRunning( false )
 {
   m_id = 0;
   m_currentStance = Stance::Passive;
@@ -1421,6 +1422,16 @@ void Sapphire::Entity::Player::onMobDeaggro( BNpcPtr pBNpc )
   hateListRemove( pBNpc );
   if( m_actorIdTohateSlotMap.empty() )
     queuePacket( makeActorControl142( getId(), ToggleAggro ) );
+}
+
+void Sapphire::Entity::Player::setRunning( bool state )
+{
+  m_isRunning = state;
+}
+
+bool Sapphire::Entity::Player::isRunning()
+{
+  return m_isRunning;
 }
 
 bool Sapphire::Entity::Player::isLogin() const
