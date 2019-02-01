@@ -60,10 +60,10 @@ std::string Sapphire::Entity::Chara::getName() const
   return std::string( m_name );
 }
 
-bool Sapphire::Entity::Chara::isFacing( Entity::CharaPtr source, uint8_t coneAngel )
+bool Sapphire::Entity::Chara::isFacing( Entity::CharaPtr target )
 {
-  int32_t angle = Util::calcAngTo( getPos().x, getPos().y, source->getPos().x, source->getPos().y );
-  return abs( int8_t( angle - getRot() ) ) < ( coneAngel >> 1 );
+  auto angleBetween = Util::RelativeAngle( getRot(), getPos().x, getPos().y, target->getPos().x, target->getPos().y );
+  return angleBetween >= ( -( 180.0f / 2 ) && angleBetween <= ( 180.0f / 2 )  );
 }
 
 /*! \return current stance of the actors */

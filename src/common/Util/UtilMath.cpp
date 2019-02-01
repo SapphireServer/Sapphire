@@ -74,3 +74,9 @@ uint8_t Sapphire::Util::floatToUInt8Rot( float val )
 {
   return static_cast< uint8_t >( 0x80 * ( ( val + PI ) ) / PI );
 }
+
+float Sapphire::Util::RelativeAngle( float heading, float x1, float y1, float x2, float y2 )
+{
+  float angle = ( ( float ) atan2( y2 - y1, x2 - x1 ) * ( 180.0 / PI ) );
+  return clamp( angle - heading , -180.0f, 180.0f );
+}
