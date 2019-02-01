@@ -598,12 +598,12 @@ void Sapphire::Entity::BNpc::setTimeOfDeath( uint32_t timeOfDeath )
   m_timeOfDeath = timeOfDeath;
 }
 
-void Sapphire::Entity::BNpc::setDeaf( bool state )
+void Sapphire::Entity::BNpc::setIsDeaf( bool state )
 {
   m_isDeaf = state;
 }
 
-void Sapphire::Entity::BNpc::setBlind( bool state )
+void Sapphire::Entity::BNpc::setIsBlind( bool state )
 {
   m_isBlind = state;
 }

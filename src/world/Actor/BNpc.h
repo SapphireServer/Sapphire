@@ -94,9 +94,9 @@ namespace Sapphire::Entity
     uint32_t getTimeOfDeath() const;
     void setTimeOfDeath( uint32_t timeOfDeath );
 
-    void setDeaf( bool state );
+    void setIsDeaf( bool state );
 
-    void setBlind( bool state );
+    void setIsBlind( bool state );
 
     bool getIsDeaf();
 
