@@ -648,7 +648,7 @@ void Sapphire::Entity::BNpc::checkAggro()
 
     if( distance < range )
     {
-      if(( !isBlind() && isDeaf() ) || ( isBlind() && isFacing( pClosestChara, 40 ) ) || ( isDeaf() && pClosestChara->getAsPlayer()->isRunning() ) )
+      if( ( !isBlind() && !isDeaf() ) || ( isBlind() && pClosestChara->getAsPlayer()->isRunning() ) || ( isDeaf() && isFacing( pClosestChara, 40 ) ) )
         aggro( pClosestChara );
     }
   }
