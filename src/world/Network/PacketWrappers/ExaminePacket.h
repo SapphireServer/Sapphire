@@ -40,7 +40,11 @@ namespace Sapphire::Network::Packets::Server
 
         m_data.titleId = pTarget->getTitle();
         m_data.grandCompany = pTarget->getGc();
-        m_data.grandCompanyRank = pTarget->getGcRankArray()[m_data.grandCompany];
+
+        // gc id 0 is no gc, but we only store ranks for 3
+        // gc id 3 is immortal flames, but they're at index 2 not 3, so we need to correct for that if we have a gc set
+        if( m_data.grandCompany > 0 )
+          m_data.grandCompanyRank = pTarget->getGcRankArray()[ m_data.grandCompany - 1 ];
 
         m_data.mainWeaponModel = pTarget->getModelMainWeapon();
         m_data.secWeaponModel = pTarget->getModelSubWeapon();
