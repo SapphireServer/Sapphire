@@ -605,7 +605,7 @@ void Sapphire::Entity::BNpc::setDeaf( bool state )
 
 void Sapphire::Entity::BNpc::setBlind( bool state )
 {
-  m_isBlind = true;
+  m_isBlind = state;
 }
 
 bool Sapphire::Entity::BNpc::isDeaf()
