@@ -224,7 +224,20 @@ void Sapphire::Network::GameConnection::updatePositionHandler( FrameworkPtr pFw,
       ( player.getPos().y != *reinterpret_cast< float* >( &copy.data[ 0x20 ] ) ) ||
       ( player.getPos().z != *reinterpret_cast< float* >( &copy.data[ 0x24 ] ) ) )
     bPosChanged = true;
-  if( !bPosChanged && player.getRot() == *reinterpret_cast< float* >( &copy.data[ 0x10 ] ) )
+
+  if( bPosChanged )
+  {
+    float distanceToNewPos = Util::distance( { player.getPos().x,
+                                               player.getPos().y,
+                                               player.getPos().z },
+                                            {  *reinterpret_cast< float* >( &copy.data[ 0x1C ] ),
+                                               *reinterpret_cast< float* >( &copy.data[ 0x20 ] ),
+                                               *reinterpret_cast< float* >( &copy.data[ 0x24 ] ) } );
+    //TODO: find a better value
+    player.setRunning( distanceToNewPos > 1.0f ? true : false );
+  }
+
+  if(!bPosChanged && player.getRot() == *reinterpret_cast< float* >( &copy.data[ 0x10 ] ))
     return;
 
   player.setRot( *reinterpret_cast< float* >( &copy.data[ 0x10 ] ) );
@@ -256,7 +269,6 @@ void Sapphire::Network::GameConnection::updatePositionHandler( FrameworkPtr pFw,
     unk1 = 0x7F;
     unk2 = 0x00;
     unk4 = 0x3C;
-    player.setRunning( true );
   }
 
   if( moveType & MoveType::Strafing )
@@ -268,7 +280,6 @@ void Sapphire::Network::GameConnection::updatePositionHandler( FrameworkPtr pFw,
     //else
     //   unk1 = 0x5f;
     unk4 = 0x3C;
-    player.setRunning( false );
   }
 
   if( moveType & MoveType::Walking )
@@ -277,7 +288,6 @@ void Sapphire::Network::GameConnection::updatePositionHandler( FrameworkPtr pFw,
     unk2 = 0x02;
     unk3 = 0x00;
     unk4 = 0x18;
-    player.setRunning( false );
   }
 
   if( moveType & MoveType::Walking && moveType & MoveType::Strafing )

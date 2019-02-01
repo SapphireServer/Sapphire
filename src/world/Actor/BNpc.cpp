@@ -608,12 +608,12 @@ void Sapphire::Entity::BNpc::setBlind( bool state )
   m_isBlind = state;
 }
 
-bool Sapphire::Entity::BNpc::isDeaf()
+bool Sapphire::Entity::BNpc::getIsDeaf()
 {
   return m_isDeaf;
 }
 
-bool Sapphire::Entity::BNpc::isBlind()
+bool Sapphire::Entity::BNpc::getIsBlind()
 {
   return m_isBlind;
 }
@@ -648,7 +648,7 @@ void Sapphire::Entity::BNpc::checkAggro()
 
     if( distance < range )
     {
-      if( ( !isBlind() && !isDeaf() ) || ( isBlind() && pClosestChara->getAsPlayer()->isRunning() ) || ( isDeaf() && isFacing( pClosestChara ) ) )
+      if( ( !getIsBlind() && !getIsDeaf() ) || ( getIsBlind() && pClosestChara->getAsPlayer()->isRunning() ) || ( getIsDeaf() && isFacing( pClosestChara ) ) )
         aggro( pClosestChara );
     }
   }

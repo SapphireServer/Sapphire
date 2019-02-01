@@ -98,9 +98,9 @@ namespace Sapphire::Entity
 
     void setBlind( bool state );
 
-    bool isDeaf();
+    bool getIsDeaf();
 
-    bool isBlind();
+    bool getIsBlind();
 
     void regainHp();
 
