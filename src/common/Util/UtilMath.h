@@ -27,7 +27,7 @@ namespace Sapphire::Util
 
   uint8_t floatToUInt8Rot( float val );
 
-  float RelativeAngle( float heading, float x1, float y1, float x2, float y2 );
+  float relativeAngle( float heading, float x1, float y1, float x2, float y2 );
 
   template < typename T >
   T clamp( T val, T minimum, T maximum )
