@@ -12,146 +12,130 @@ using namespace Sapphire;
 // Start NPC: 1003601
 // End NPC: 1000972
 
-class SubSea012 : public EventScript
+class SubSea012 :
+  public Sapphire::ScriptAPI::EventScript
 {
-   private:
-      // Basic quest information 
-      // Quest vars / flags used
-      // GetQuestUI8AL
-      // GetQuestUI8BH
+private:
 
-      // Steps in this quest ( 0 is before accepting, 
-      // 1 is first, 255 means ready for turning it in
-      enum Sequence : uint8_t
-      {
-         Seq0 = 0,
-         Seq1 = 1,
-         Seq2 = 2,
-         SeqFinish = 255,
-      };
+  // Basic quest information
+  // Quest vars / flags used
+  // GetQuestUI8AL
+  // GetQuestUI8BH
 
-      // Quest rewards 
-      static constexpr auto RewardExpFactor = 100;
-      static constexpr auto RewardItem[] = { 0, 0, 0, 0, 0, 0 };
-      static constexpr auto RewardItemCount[] = { 0, 0, 0, 0, 0, 0 };
-      static constexpr auto RewardItemOptional[] = { 2999, 3010, 5823, 0, 0 };
-      static constexpr auto RewardItemOptionalCount[] = { 1, 1, 3, 0, 0 };
+  enum Sequence :
+    uint8_t
+  {
+    Seq0 = 0,
+    Seq1 = 1,
+    Seq2 = 2,
+    SeqFinish = 255,
+  };
 
-      // Entities found in the script data of the quest
-      static constexpr auto Actor0 = 1003601;
-      static constexpr auto Actor1 = 1001024;
-      static constexpr auto Actor2 = 1000972;
-      static constexpr auto Enemy0 = 324;
-      static constexpr auto Item0 = 2000454;
+  // Quest rewards 
+  static constexpr auto RewardExpFactor = 100;
+  // Entities found in the script data of the quest
+  static constexpr auto Actor0 = 1003601;
+  static constexpr auto Actor1 = 1001024;
+  static constexpr auto Actor2 = 1000972;
+  static constexpr auto Enemy0 = 563;
+  static constexpr auto Item0 = 2000454;
 
-   public:
-      SubSea012() : EventScript( 65658 ){}; 
-      ~SubSea012(){}; 
+public:
+  SubSea012() :
+    Sapphire::ScriptAPI::EventScript(65658)
+  {
+  };
 
-   //////////////////////////////////////////////////////////////////////
-   // Event Handlers
-   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
-   {
-      auto pEventMgr = m_framework->get< World::Manager::EventMgr >();
-      auto actor = pEventMgr->mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
-    if( actor == Actor0 )
+  ~SubSea012()
+  {
+  };
+
+  void onTalk(uint32_t eventId, Entity::Player& player, uint64_t actorId) override
+  {
+    auto pEventMgr = m_framework->get< World::Manager::EventMgr >();
+    auto actor = pEventMgr->mapEventActorToRealActor(static_cast<uint32_t>(actorId));
+
+    if (actor == Actor0)
     {
-      Scene00000( player );
+      Scene00000(player);
     }
-    else if( actor == Actor1 )
+    else if (actor == Actor1)
     {
-      Scene00003( player );
+      Scene00002(player);
     }
-    else if( actor == Actor2 )
+    else if (actor == Actor2)
     {
-      Scene00004( player );
+      Scene00003(player);
     }
    }
 
-     void onMobKill( Entity::Player& player, uint64_t npcId )
+  void onBNpcKill(uint32_t npcId, Entity::Player& player) override
   {
-    if( npcId != Enemy0 )
-      return;
+    if (npcId != Enemy0)
+       return;
 
-    auto currentKC = player.getQuestUI8AL( getId() ) + 1;
-
-    if( currentKC >= 4 )
-      player.updateQuest( getId(), SeqFinish );
+    auto currentKC = player.getQuestUI8AL(getId()) + 1;
+    player.setQuestUI8BH(getId(), currentKC);
+    player.setQuestUI8AL(getId(), currentKC);
+    if (currentKC >= 4)
+      player.updateQuest(getId(), SeqFinish);
     else
     {
-      player.setQuestUI8AL( getId(), currentKC );
-      player.sendQuestMessage( getId(), 0, 2, currentKC, 4 );
+       player.sendQuestMessage(getId(), 1, 2, currentKC, 4);
     }
-}
+  }
 
-   private:
-   //////////////////////////////////////////////////////////////////////
-   // Available Scenes in this quest, not necessarly all are used
-  void checkQuestCompletion( Entity::Player& player )
+private:
+
+  void Scene00000(Entity::Player& player)
   {
-    auto currentCC = player.getQuestUI8BH( getId() );
-
-    player.sendQuestMessage( getId(), X, Y, currentCC + 1, Z );
-
-    if( currentCC + 1 >= Z )
+    player.playScene(getId(), 0, HIDE_HOTBAR,
+      [&](Entity::Player& player, const Event::SceneResult& result)
     {
-      player.updateQuest( getId(), SeqFinish );
-      player.setQuestUI8BH( getId(), currentCC + 1 );
-      player.setQuestUI8AL( getId(), currentCC + 1 );
-    }
-    else
+      if (result.param2 == 1)
+        player.updateQuest(getId(), 1);
+    });
+  }
+
+  void Scene00001(Entity::Player& player)
+  {
+    player.playScene(getId(), 0, HIDE_HOTBAR,
+      [&](Entity::Player& player, const Event::SceneResult& result)
     {
-      player.setQuestUI8BH( getId(), currentCC + 1 );
-      player.setQuestUI8AL( getId(), currentCC + 1 );
-    }
+    });
   }
 
-   void Scene00000( Entity::Player& player )
+  void Scene00002(Entity::Player& player)
   {
-    player.playScene( getId(), 0, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                        if( result.param2 == 1 )
-                          player.updateQuest( getId(), 1 );
-                      } );
+    player.playScene(getId(), 0, HIDE_HOTBAR,
+      [&](Entity::Player& player, const Event::SceneResult& result)
+    {
+      player.updateQuest(getId(), 2);
+    });
   }
 
-   void Scene00001( Entity::Player& player )
+  void Scene00003(Entity::Player& player)
   {
-    player.playScene( getId(), 1, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                      } );
+    player.playScene(getId(), 0, HIDE_HOTBAR,
+      [&](Entity::Player& player, const Event::SceneResult& result)
+    {
+      if (result.param2 == 1)
+        Scene00004(player);
+    });
   }
 
-   void Scene00002( Entity::Player& player )
+  void Scene00004(Entity::Player& player)
   {
-    player.playScene( getId(), 2, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                      } );
-  }
-
-   void Scene00003( Entity::Player& player )
-  {
-    player.playScene( getId(), 3, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                        if( result.param2 == 1 )
-                          player.updateQuest( getId(), 2 );
-                      } );
-  }
-
-   void Scene00004( Entity::Player& player )
-  {
-    player.playScene( getId(), 4, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                        if( result.param2 == 1 )
-                          if( player.giveQuestRewards( getId(), 0 ) )
-                            player.finishQuest( getId() );
-                        }
-                      } );
+    player.playScene(getId(), 0, HIDE_HOTBAR,
+      [&](Entity::Player& player, const Event::SceneResult& result)
+    {
+      if (result.param2 == 1)
+        if (player.giveQuestRewards(getId(), 0))
+        {
+          player.finishQuest(getId());
+        }
+    });
   }
 
 };
+
