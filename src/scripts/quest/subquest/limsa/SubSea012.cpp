@@ -50,7 +50,7 @@ public:
   {
   };
 
-  void onTalk(uint32_t eventId, Entity::Player& player, uint64_t actorId) override
+  void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
   {
     auto pEventMgr = m_framework->get< World::Manager::EventMgr >();
     auto actor = pEventMgr->mapEventActorToRealActor( static_cast<uint32_t>(actorId) );
