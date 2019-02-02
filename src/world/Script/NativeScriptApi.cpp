@@ -111,7 +111,7 @@ namespace Sapphire::ScriptAPI
   {
   }
 
-  void EventScript::onNpcKill( uint32_t npcId, Entity::Player& player )
+  void EventScript::onBNpcKill( uint32_t nameId, Entity::Player& player )
   {
   }
 
