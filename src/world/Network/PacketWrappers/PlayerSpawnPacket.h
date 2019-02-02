@@ -71,6 +71,7 @@ namespace Sapphire::Network::Packets::Server
       m_data.title = player.getTitle();
       m_data.voice = player.getVoiceId();
       m_data.currentMount = player.getCurrentMount();
+      m_data.activeMinion = player.getCurrentCompanion();
 
       m_data.onlineStatus = static_cast< uint8_t >( player.getOnlineStatus() );
 

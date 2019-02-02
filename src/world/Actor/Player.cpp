@@ -1504,6 +1504,24 @@ void Sapphire::Entity::Player::dismount()
   m_mount = 0;
 }
 
+void Sapphire::Entity::Player::spawnCompanion( uint16_t id )
+{
+  auto exdData = m_pFw->get< Data::ExdDataGenerated >();
+  assert( exdData );
+
+  auto companion = exdData->get< Data::Companion >( id );
+  if( !id )
+    return;
+
+  m_companionId = id;
+  sendToInRangeSet( makeActorControl142( getId(), ActorControlType::ToggleCompanion, id ), true );
+}
+
+uint16_t Sapphire::Entity::Player::getCurrentCompanion() const
+{
+  return m_companionId;
+}
+
 uint8_t Sapphire::Entity::Player::getCurrentMount() const
 {
   return m_mount;
