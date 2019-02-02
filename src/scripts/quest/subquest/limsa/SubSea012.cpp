@@ -55,7 +55,7 @@ public:
     auto pEventMgr = m_framework->get< World::Manager::EventMgr >();
     auto actor = pEventMgr->mapEventActorToRealActor( static_cast<uint32_t>(actorId) );
 
-    if (actor == Actor0)
+    if( actor == Actor0 )
     {
       Scene00000( player );
     }
