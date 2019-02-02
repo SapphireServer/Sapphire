@@ -272,20 +272,20 @@ bool Sapphire::Scripting::ScriptMgr::onEventItem( Entity::Player& player, uint32
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onMobKill( Entity::Player& player, uint16_t nameId )
+bool Sapphire::Scripting::ScriptMgr::onBNpcKill( Entity::Player& player, uint16_t nameId )
 {
   auto pEventMgr = framework()->get< World::Manager::EventMgr >();
 
   std::string eventName = "onBnpcKill_" + std::to_string( nameId );
 
-  // loop through all active quests and try to call available onMobKill callbacks
+  // loop through all active quests and try to call available onBNpcKill callbacks
   for( size_t i = 0; i < 30; i++ )
   {
     auto activeQuests = player.getQuestActive( static_cast< uint16_t >( i ) );
     if( !activeQuests )
       continue;
 
-    uint32_t questId = activeQuests->c.questId | 0x00010000;
+    uint32_t questId = activeQuests->c.questId | Event::EventHandler::EventHandlerType::Quest << 16;
 
     auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( questId );
     if( script )
@@ -294,7 +294,7 @@ bool Sapphire::Scripting::ScriptMgr::onMobKill( Entity::Player& player, uint16_t
 
       player.sendDebug( "Calling: {0}.{1}", objName, eventName );
 
-      script->onNpcKill( nameId, player );
+      script->onBNpcKill( nameId, player );
     }
   }
 

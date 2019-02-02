@@ -84,6 +84,7 @@ namespace Sapphire::Network::Packets::Server
       memset( m_data.unlockedPvp, 0xFF, sizeof( m_data.unlockedPvp ) );
       memset( m_data.unlockedRaids, 0xFF, sizeof( m_data.unlockedRaids ) );
       memset( m_data.unlockedTrials, 0xFF, sizeof( m_data.unlockedTrials ) );
+      memset( m_data.minions, 0xFF, sizeof( m_data.minions ) );
 
     };
   };

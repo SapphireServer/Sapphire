@@ -1133,7 +1133,7 @@ void Sapphire::Entity::Player::update( int64_t currTime )
 void Sapphire::Entity::Player::onMobKill( uint16_t nameId )
 {
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onMobKill( *getAsPlayer(), nameId );
+  pScriptMgr->onBNpcKill( *getAsPlayer(), nameId );
 }
 
 void Sapphire::Entity::Player::freePlayerSpawnId( uint32_t actorId )
@@ -1502,6 +1502,24 @@ void Sapphire::Entity::Player::dismount()
                                          static_cast< uint8_t >( Common::ActorStatus::Idle ) ), true );
   sendToInRangeSet( makeActorControl143( getId(), ActorControlType::Dismount, 1 ), true );
   m_mount = 0;
+}
+
+void Sapphire::Entity::Player::spawnCompanion( uint16_t id )
+{
+  auto exdData = m_pFw->get< Data::ExdDataGenerated >();
+  assert( exdData );
+
+  auto companion = exdData->get< Data::Companion >( id );
+  if( !id )
+    return;
+
+  m_companionId = id;
+  sendToInRangeSet( makeActorControl142( getId(), ActorControlType::ToggleCompanion, id ), true );
+}
+
+uint16_t Sapphire::Entity::Player::getCurrentCompanion() const
+{
+  return m_companionId;
 }
 
 uint8_t Sapphire::Entity::Player::getCurrentMount() const

@@ -122,9 +122,9 @@ enum ActorControlType : uint16_t
     ActorFadeOut = 0x10A,
     ActorFadeIn = 0x10B,
     WithdrawMsg = 0x10C,
-    OrderMinion = 0x10D,
-    ToggleMinion = 0x10E,
-    LearnMinion = 0x10F,
+    OrderCompanion = 0x10D,
+    ToggleCompanion = 0x10E,
+    LearnCompanion = 0x10F,
     ActorFateOut1 = 0x110,
 
     Emote = 0x122,
@@ -278,7 +278,7 @@ enum ActorControlType : uint16_t
     ChangeTarget = 0x03,
 
     DismountReq = 0x65,
-
+    SpawnCompanionReq = 0x66,
     RemoveStatusEffect = 0x68,
     CastCancel = 0x69,
 
