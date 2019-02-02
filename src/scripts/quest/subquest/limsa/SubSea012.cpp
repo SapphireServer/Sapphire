@@ -53,17 +53,17 @@ public:
   void onTalk(uint32_t eventId, Entity::Player& player, uint64_t actorId) override
   {
     auto pEventMgr = m_framework->get< World::Manager::EventMgr >();
-    auto actor = pEventMgr->mapEventActorToRealActor( static_cast<uint32_t>(actorId) );
+    auto actor = pEventMgr->mapEventActorToRealActor( static_cast<uint32_t>( actorId ) );
 
-    if (actor == Actor0)
+    if ( actor == Actor0 )
     {
       Scene00000( player );
     }
-    else if (actor == Actor1)
+    else if ( actor == Actor1 )
     {
       Scene00002( player );
     }
-    else if (actor == Actor2)
+    else if ( actor == Actor2 )
     {
       Scene00003( player );
     }
