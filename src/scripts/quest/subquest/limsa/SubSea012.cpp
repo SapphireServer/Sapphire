@@ -53,19 +53,19 @@ public:
   void onTalk(uint32_t eventId, Entity::Player& player, uint64_t actorId) override
   {
     auto pEventMgr = m_framework->get< World::Manager::EventMgr >();
-    auto actor = pEventMgr->mapEventActorToRealActor(static_cast<uint32_t>(actorId));
+    auto actor = pEventMgr->mapEventActorToRealActor( static_cast<uint32_t>(actorId) );
 
     if (actor == Actor0)
     {
-      Scene00000(player);
+      Scene00000( player );
     }
     else if (actor == Actor1)
     {
-      Scene00002(player);
+      Scene00002( player );
     }
     else if (actor == Actor2)
     {
-      Scene00003(player);
+      Scene00003( player );
     }
    }
 
@@ -74,30 +74,30 @@ public:
     if (npcId != Enemy0)
        return;
 
-    auto currentKC = player.getQuestUI8AL(getId()) + 1;
-    player.setQuestUI8BH(getId(), currentKC);
-    player.setQuestUI8AL(getId(), currentKC);
+    auto currentKC = player.getQuestUI8AL( getId() ) + 1;
+    player.setQuestUI8BH( getId(), currentKC );
+    player.setQuestUI8AL( getId(), currentKC );
     if (currentKC >= 4)
-      player.updateQuest(getId(), SeqFinish);
+      player.updateQuest( getId(), SeqFinish );
     else
     {
-       player.sendQuestMessage(getId(), 1, 2, currentKC, 4);
+       player.sendQuestMessage( getId(), 1, 2, currentKC, 4 );
     }
   }
 
 private:
 
-  void Scene00000(Entity::Player& player)
+  void Scene00000( Entity::Player& player )
   {
     player.playScene(getId(), 0, HIDE_HOTBAR,
       [&](Entity::Player& player, const Event::SceneResult& result)
     {
       if (result.param2 == 1)
-        player.updateQuest(getId(), 1);
+        player.updateQuest( getId(), 1 );
     });
   }
 
-  void Scene00001(Entity::Player& player)
+  void Scene00001( Entity::Player& player )
   {
     player.playScene(getId(), 0, HIDE_HOTBAR,
       [&](Entity::Player& player, const Event::SceneResult& result)
@@ -105,34 +105,34 @@ private:
     });
   }
 
-  void Scene00002(Entity::Player& player)
+  void Scene00002( Entity::Player& player )
   {
     player.playScene(getId(), 0, HIDE_HOTBAR,
       [&](Entity::Player& player, const Event::SceneResult& result)
     {
-      player.updateQuest(getId(), 2);
+      player.updateQuest( getId(), 2 );
     });
   }
 
-  void Scene00003(Entity::Player& player)
-  {
-    player.playScene(getId(), 0, HIDE_HOTBAR,
-      [&](Entity::Player& player, const Event::SceneResult& result)
-    {
-      if (result.param2 == 1)
-        Scene00004(player);
-    });
-  }
-
-  void Scene00004(Entity::Player& player)
+  void Scene00003( Entity::Player& player )
   {
     player.playScene(getId(), 0, HIDE_HOTBAR,
       [&](Entity::Player& player, const Event::SceneResult& result)
     {
       if (result.param2 == 1)
-        if (player.giveQuestRewards(getId(), 0))
+        Scene00004( player );
+    });
+  }
+
+  void Scene00004( Entity::Player& player )
+  {
+    player.playScene(getId(), 0, HIDE_HOTBAR,
+      [&](Entity::Player& player, const Event::SceneResult& result)
+    {
+      if (result.param2 == 1)
+        if (player.giveQuestRewards( getId(), 0 ))
         {
-          player.finishQuest(getId());
+          player.finishQuest( getId() );
         }
     });
   }
