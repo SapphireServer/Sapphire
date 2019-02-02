@@ -89,7 +89,7 @@ private:
 
   void Scene00000( Entity::Player& player )
   {
-    player.playScene(getId(), 0, HIDE_HOTBAR,
+    player.playScene( getId(), 0, HIDE_HOTBAR,
       [&](Entity::Player& player, const Event::SceneResult& result)
     {
       if (result.param2 == 1)
@@ -99,7 +99,7 @@ private:
 
   void Scene00001( Entity::Player& player )
   {
-    player.playScene(getId(), 0, HIDE_HOTBAR,
+    player.playScene( getId(), 0, HIDE_HOTBAR,
       [&](Entity::Player& player, const Event::SceneResult& result)
     {
     });
@@ -107,7 +107,7 @@ private:
 
   void Scene00002( Entity::Player& player )
   {
-    player.playScene(getId(), 0, HIDE_HOTBAR,
+    player.playScene( getId(), 0, HIDE_HOTBAR,
       [&](Entity::Player& player, const Event::SceneResult& result)
     {
       player.updateQuest( getId(), 2 );
@@ -116,7 +116,7 @@ private:
 
   void Scene00003( Entity::Player& player )
   {
-    player.playScene(getId(), 0, HIDE_HOTBAR,
+    player.playScene( getId(), 0, HIDE_HOTBAR,
       [&](Entity::Player& player, const Event::SceneResult& result)
     {
       if (result.param2 == 1)
@@ -126,7 +126,7 @@ private:
 
   void Scene00004( Entity::Player& player )
   {
-    player.playScene(getId(), 0, HIDE_HOTBAR,
+    player.playScene( getId(), 0, HIDE_HOTBAR,
       [&](Entity::Player& player, const Event::SceneResult& result)
     {
       if (result.param2 == 1)
