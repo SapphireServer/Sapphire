@@ -126,6 +126,11 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
       player.dismount();
       break;
     }
+    case ClientTriggerType::SpawnCompanionReq:
+    {
+      player.spawnCompanion( param1 );
+      break;
+    }
     case ClientTriggerType::RemoveStatusEffect: // Remove status (clicking it off)
     {
       // todo: check if status can be removed by client from exd
