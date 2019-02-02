@@ -68,7 +68,7 @@ public:
       Scene00001( player );
   }
 
-  void onNpcKill( uint32_t npcId, Entity::Player& player ) override
+  void onBNpcKill( uint32_t npcId, Entity::Player& player ) override
   {
     if( npcId != ENEMY0 )
       return;

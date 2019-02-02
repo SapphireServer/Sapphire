@@ -1133,7 +1133,7 @@ void Sapphire::Entity::Player::update( int64_t currTime )
 void Sapphire::Entity::Player::onMobKill( uint16_t nameId )
 {
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onMobKill( *getAsPlayer(), nameId );
+  pScriptMgr->onBNpcKill( *getAsPlayer(), nameId );
 }
 
 void Sapphire::Entity::Player::freePlayerSpawnId( uint32_t actorId )
