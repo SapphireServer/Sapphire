@@ -59,11 +59,11 @@ public:
     {
       Scene00000( player );
     }
-    else if ( actor == Actor1 )
+    else if( actor == Actor1 )
     {
       Scene00002( player );
     }
-    else if ( actor == Actor2 )
+    else if( actor == Actor2 )
     {
       Scene00003( player );
     }
@@ -71,13 +71,13 @@ public:
 
   void onBNpcKill( uint32_t npcId, Entity::Player& player ) override
   {
-    if (npcId != Enemy0)
+    if(npcId != Enemy0)
        return;
 
     auto currentKC = player.getQuestUI8AL( getId() ) + 1;
     player.setQuestUI8BH( getId(), currentKC );
     player.setQuestUI8AL( getId(), currentKC );
-    if (currentKC >= 4)
+    if(currentKC >= 4)
       player.updateQuest( getId(), SeqFinish );
     else
     {
@@ -92,7 +92,7 @@ private:
     player.playScene( getId(), 0, HIDE_HOTBAR,
       [&](Entity::Player& player, const Event::SceneResult& result)
     {
-      if (result.param2 == 1)
+      if(result.param2 == 1)
         player.updateQuest( getId(), 1 );
     });
   }
@@ -119,7 +119,7 @@ private:
     player.playScene( getId(), 0, HIDE_HOTBAR,
       [&](Entity::Player& player, const Event::SceneResult& result)
     {
-      if (result.param2 == 1)
+      if(result.param2 == 1)
         Scene00004( player );
     });
   }
@@ -129,8 +129,8 @@ private:
     player.playScene( getId(), 0, HIDE_HOTBAR,
       [&](Entity::Player& player, const Event::SceneResult& result)
     {
-      if (result.param2 == 1)
-        if (player.giveQuestRewards( getId(), 0 ))
+      if(result.param2 == 1)
+        if(player.giveQuestRewards( getId(), 0 ))
         {
           player.finishQuest( getId() );
         }
