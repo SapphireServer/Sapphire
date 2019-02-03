@@ -42,6 +42,7 @@
 #include "Manager/MarketMgr.h"
 #include "Manager/RNGMgr.h"
 #include "Manager/NaviMgr.h"
+#include "Manager/ActionMgr.h"
 
 using namespace Sapphire::World::Manager;
 
@@ -169,6 +170,9 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
     return;
   }
   framework()->set< Scripting::ScriptMgr >( pScript );
+
+  auto pActionMgr = std::make_shared< Manager::ActionMgr >( framework() );
+  framework()->set< Manager::ActionMgr >( pActionMgr );
 
   loadBNpcTemplates();
 
