@@ -67,8 +67,8 @@ struct FFXIVIpcSkillHandler :
   /* 0001 */ uint8_t type;
   /* 0002 */ char pad_0002[2];
   /* 0004 */ uint32_t actionId;
-  /* 0008 */ uint32_t useCount;
-  /* 000C */ char pad_000C[4];
+  /* 0008 */ uint16_t sequence;
+  /* 000A */ char pad_000C[6];
   /* 0010 */ uint64_t targetId;
   /* 0018 */ uint64_t unknown;
 };
@@ -80,7 +80,7 @@ struct FFXIVIpcAoESkillHandler :
   /* 0001 */ uint8_t type;
   /* 0002 */ char pad_0002[2];
   /* 0004 */ uint32_t actionId;
-  /* 0008 */ uint16_t useCount;
+  /* 0008 */ uint16_t sequence;
   /* 000A */ char pad_000C[6];
   /* 0010 */ Common::FFXIVARR_POSITION3 pos;
   /* 001C */ uint32_t unknown; // could almost be rotation + 16 bits more padding?

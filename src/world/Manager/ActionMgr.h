@@ -2,6 +2,7 @@
 #define SAPPHIRE_ACTIONMGR_H
 
 #include "BaseManager.h"
+#include "ForwardsZone.h"
 
 namespace Sapphire::World::Manager
 {
@@ -11,7 +12,8 @@ namespace Sapphire::World::Manager
     explicit ActionMgr( FrameworkPtr pFw );
     ~ActionMgr() = default;
 
-//    void handlePlayerCast( Entity::Player& player)
+    void handleTargetedPlayerAction( Entity::Player& player, uint8_t type, uint32_t actionId, uint64_t targetId );
+    void handleAoEPlayerAction( Entity::Player& player, uint8_t type, uint32_t actionId, Common::FFXIVARR_POSITION3 pos );
   };
 }
 
