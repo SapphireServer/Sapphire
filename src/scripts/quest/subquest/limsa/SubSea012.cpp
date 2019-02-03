@@ -1,4 +1,3 @@
-#include <Script/NativeScriptApi.h>
 #include <Actor/Player.h>
 #include "Manager/EventMgr.h"
 #include <ScriptObject.h>
@@ -33,6 +32,7 @@ private:
 
   // Quest rewards 
   static constexpr auto RewardExpFactor = 100;
+
   // Entities found in the script data of the quest
   static constexpr auto Actor0 = 1003601;
   static constexpr auto Actor1 = 1001024;
@@ -90,9 +90,9 @@ private:
   void Scene00000( Entity::Player& player )
   {
     player.playScene( getId(), 0, HIDE_HOTBAR,
-      [&](Entity::Player& player, const Event::SceneResult& result)
+      [&]( Entity::Player& player, const Event::SceneResult& result )
     {
-      if(result.param2 == 1)
+      if( result.param2 == 1 )
         player.updateQuest( getId(), 1 );
     });
   }
@@ -100,7 +100,7 @@ private:
   void Scene00001( Entity::Player& player )
   {
     player.playScene( getId(), 0, HIDE_HOTBAR,
-      [&](Entity::Player& player, const Event::SceneResult& result)
+      [&]( Entity::Player& player, const Event::SceneResult& result )
     {
     });
   }
@@ -108,7 +108,7 @@ private:
   void Scene00002( Entity::Player& player )
   {
     player.playScene( getId(), 0, HIDE_HOTBAR,
-      [&](Entity::Player& player, const Event::SceneResult& result)
+      [&]( Entity::Player& player, const Event::SceneResult& result )
     {
       player.updateQuest( getId(), 2 );
     });
@@ -117,9 +117,9 @@ private:
   void Scene00003( Entity::Player& player )
   {
     player.playScene( getId(), 0, HIDE_HOTBAR,
-      [&](Entity::Player& player, const Event::SceneResult& result)
+      [&]( Entity::Player& player, const Event::SceneResult& result )
     {
-      if(result.param2 == 1)
+      if( result.param2 == 1 )
         Scene00004( player );
     });
   }
@@ -127,10 +127,10 @@ private:
   void Scene00004( Entity::Player& player )
   {
     player.playScene( getId(), 0, HIDE_HOTBAR,
-      [&](Entity::Player& player, const Event::SceneResult& result)
+      [&]( Entity::Player& player, const Event::SceneResult& result )
     {
-      if(result.param2 == 1)
-        if(player.giveQuestRewards( getId(), 0 ))
+      if( result.param2 == 1 )
+        if( player.giveQuestRewards( getId(), 0 ) )
         {
           player.finishQuest( getId() );
         }
