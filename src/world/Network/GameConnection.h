@@ -155,6 +155,8 @@ namespace Sapphire::Network
     DECLARE_HANDLER( cfDutyAccepted );
 
     DECLARE_HANDLER( actionHandler );
+    
+    DECLARE_HANDLER( aoeActionHandler );
 
     DECLARE_HANDLER( gm1Handler );
 

@@ -73,6 +73,7 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
   setZoneHandler( ClientZoneIpcType::DiscoveryHandler, "DiscoveryHandler", &GameConnection::discoveryHandler );
 
   setZoneHandler( ClientZoneIpcType::SkillHandler, "ActionHandler", &GameConnection::actionHandler );
+  setZoneHandler( ClientZoneIpcType::AoESkillHandler, "AoESkillHandler", &GameConnection::aoeActionHandler );
 
   setZoneHandler( ClientZoneIpcType::GMCommand1, "GMCommand1", &GameConnection::gm1Handler );
   setZoneHandler( ClientZoneIpcType::GMCommand2, "GMCommand2", &GameConnection::gm2Handler );

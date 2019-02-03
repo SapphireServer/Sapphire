@@ -18,6 +18,7 @@
 #include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
 
 #include "Manager/DebugCommandMgr.h"
+#include "Manager/ActionMgr.h"
 
 #include "Action/Action.h"
 #include "Action/ActionCast.h"
@@ -41,95 +42,29 @@ void Sapphire::Network::GameConnection::actionHandler( FrameworkPtr pFw,
 
   const auto type = packet.data().type;
   const auto action = packet.data().actionId;
-  const auto useCount = packet.data().useCount;
+  const auto sequence = packet.data().sequence;
   const auto targetId = packet.data().targetId;
 
-  player.sendDebug( "Skill type: {0}", type );
+  player.sendDebug( "Skill type: {0}, sequence: {1}, actionId: {2}, targetId: {3}", type, sequence, action, targetId );
 
-  auto pExdData = pFw->get< Data::ExdDataGenerated >();
-  auto pScriptMgr = pFw->get< Scripting::ScriptMgr >();
+  auto actionMgr = pFw->get< World::Manager::ActionMgr >();
+  actionMgr->handleTargetedPlayerAction( player, type, action, targetId );
+}
 
-  switch( type )
-  {
-    case Common::SkillType::Normal:
+void Sapphire::Network::GameConnection::aoeActionHandler( FrameworkPtr pFw,
+                                                          const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                          Entity::Player& player )
+{
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcAoESkillHandler >( inPacket );
 
-      if( action < 1000000 ) // normal action
-      {
-        std::string actionIdStr = Util::intToHexString( action, 4 );
-        player.sendDebug( "---------------------------------------" );
-        player.sendDebug( "ActionHandler ( {0} | {1} | {2} )",
-                          actionIdStr, pExdData->get< Sapphire::Data::Action >( action )->name, targetId );
+  const auto type = packet.data().type;
+  const auto action = packet.data().actionId;
+  const auto sequence = packet.data().sequence;
+  const auto pos = packet.data().pos;
 
-        player.queuePacket( makeActorControl142( player.getId(), ActorControlType::ActionStart, 0x01, action ) );
+  auto actionMgr = pFw->get< World::Manager::ActionMgr >();
+  actionMgr->handleAoEPlayerAction( player, type, action, pos );
 
-        if( action == 5 )
-        {
-          auto currentAction = player.getCurrentAction();
-
-          // we should always have an action here, if not there is a bug
-          assert( currentAction );
-          currentAction->onStart();
-        }
-        else
-        {
-          Sapphire::Entity::ActorPtr targetActor = player.getAsPlayer();
-
-          if( targetId != player.getId() )
-          {
-            targetActor = player.lookupTargetById( targetId );
-          }
-
-          // Check if we actually have an actor
-          if( !targetActor )
-          {
-            // todo: interrupt a cast.
-            player.sendDebug( "Invalid target." );
-            return;
-          }
-
-          if( !player.actionHasCastTime( action ) )
-          {
-            pScriptMgr->onCastFinish( player, targetActor->getAsChara(), action );
-          }
-          else
-          {
-            auto pActionCast = Action::make_ActionCast( player.getAsPlayer(), targetActor->getAsChara(), action, m_pFw );
-            player.setCurrentAction( pActionCast );
-            player.sendDebug( "setCurrentAction()" );
-            player.getCurrentAction()->onStart();
-          }
-        }
-      }
-      else if( action < 2000000 ) // craft action
-      {
-
-      }
-      else if( action < 3000000 ) // item action
-      {
-        auto info = pExdData->get< Sapphire::Data::EventItem >( action );
-        if( info )
-        {
-          pScriptMgr->onEventItem( player, action, info->quest, info->castTime, targetId );
-        }
-      }
-      else if( action > 3000000 ) // unknown
-      {
-
-      }
-
-      break;
-
-    case Common::SkillType::MountSkill:
-
-      player.sendDebug( "Request mount {0}", action );
-
-      auto pActionMount = Action::make_ActionMount( player.getAsPlayer(), action );
-      player.setCurrentAction( pActionMount );
-      player.sendDebug( "setCurrentAction()" );
-      player.getCurrentAction()->onStart();
-
-      break;
-
-  }
-
+  player.sendDebug( "Skill type: {0}, sequence: {1}, actionId: {2}\nx:{3}, y:{4}, z:{5}",
+                    type, sequence, action, pos.x, pos.y, pos.z );
 }
