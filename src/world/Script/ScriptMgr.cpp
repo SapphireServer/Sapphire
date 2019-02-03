@@ -276,8 +276,6 @@ bool Sapphire::Scripting::ScriptMgr::onBNpcKill( Entity::Player& player, uint16_
 {
   auto pEventMgr = framework()->get< World::Manager::EventMgr >();
 
-  std::string eventName = "onBnpcKill_" + std::to_string( nameId );
-
   // loop through all active quests and try to call available onBNpcKill callbacks
   for( size_t i = 0; i < 30; i++ )
   {
@@ -292,7 +290,7 @@ bool Sapphire::Scripting::ScriptMgr::onBNpcKill( Entity::Player& player, uint16_
     {
       std::string objName = pEventMgr->getEventName( questId );
 
-      player.sendDebug( "Calling: {0}.{1}", objName, eventName );
+      player.sendDebug( "Calling: {0}.onBnpcKill nameId#{1}", objName, nameId );
 
       script->onBNpcKill( nameId, player );
     }
