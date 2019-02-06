@@ -36,6 +36,7 @@
 #include "Framework.h"
 #include <Logging/Logger.h>
 #include <Manager/NaviMgr.h>
+#include <Manager/TerritoryMgr.h>
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -521,7 +522,12 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
         }
 
         if( distance > minActorDistance )
-          moveTo( pHatedActor->getPos() );
+        {
+          uint64_t tick = Util::getTimeMs();
+          auto pTeriMgr = m_pFw->get< World::Manager::TerritoryMgr >();
+          if ( ( tick - m_lastAttack ) > 600 && pTeriMgr->isDefaultTerritory( getCurrentZone()->getTerritoryTypeId() ) )
+            moveTo( pHatedActor->getPos() );
+        }
         else
         {
           if( face( pHatedActor->getPos() ) )
