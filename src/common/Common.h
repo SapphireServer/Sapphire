@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "CommonGen.h"
+#include "Vector3.h"
 
 // +---------------------------------------------------------------------------
 // The following enumerations are structures to require their type be included.
@@ -19,15 +20,6 @@ namespace Sapphire::Common
 
   const int32_t INVALID_GAME_OBJECT_ID = 0xE0000000;
   const uint64_t INVALID_GAME_OBJECT_ID64 = 0xE0000000;
-
-  struct FFXIVARR_POSITION3
-  {
-    float x;
-    float y;
-    float z;
-    inline bool operator == ( const FFXIVARR_POSITION3& target ) const
-    { return ( this->x == target.x && this->y == target.y && this->z == target.z ); }
-  };
 
   struct FFXIVARR_POSITION3_U16
   {
