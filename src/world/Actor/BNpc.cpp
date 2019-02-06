@@ -523,9 +523,8 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
 
         if( distance > minActorDistance )
         {
-          uint64_t tick = Util::getTimeMs();
           auto pTeriMgr = m_pFw->get< World::Manager::TerritoryMgr >();
-          if ( ( tick - m_lastAttack ) > 600 && pTeriMgr->isDefaultTerritory( getCurrentZone()->getTerritoryTypeId() ) )
+          if ( ( currTime - m_lastAttack ) > 600 && pTeriMgr->isDefaultTerritory( getCurrentZone()->getTerritoryTypeId() ) )
             moveTo( pHatedActor->getPos() );
         }
         else
