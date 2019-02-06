@@ -213,7 +213,7 @@ void Sapphire::Network::GameConnection::updatePositionHandler( FrameworkPtr pFw,
 
   bool shouldSend = true;
 
-  if( animationType & MoveType::Strafing)
+  if( animationType & MoveType::Strafing )
   {
     if( animationType & MoveType::Walking )
       headRotation = 0xFF;
