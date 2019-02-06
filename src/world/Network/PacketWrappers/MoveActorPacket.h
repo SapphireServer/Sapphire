@@ -19,21 +19,22 @@ namespace Sapphire::Network::Packets::Server
     public ZoneChannelPacket< FFXIVIpcActorMove >
   {
   public:
-    MoveActorPacket( Entity::Chara& actor, uint8_t unk1, uint8_t animationType, uint8_t unk3, uint16_t unk4 ) :
+    MoveActorPacket( Entity::Chara& actor, uint8_t headRotation, uint8_t animationType, uint8_t state, uint16_t animationSpeed, uint8_t unknownRotation = 0 ) :
       ZoneChannelPacket< FFXIVIpcActorMove >( actor.getId(), actor.getId() )
     {
-      initialize( actor, unk1, animationType, unk3, unk4 );
+      initialize( actor, headRotation, animationType, state, animationSpeed, unknownRotation );
     };
 
   private:
-    void initialize( Entity::Chara& actor, uint8_t unk1, uint8_t animationType, uint8_t unk3, uint16_t unk4 )
+    void initialize( Entity::Chara& actor, uint8_t headRotation, uint8_t animationType, uint8_t state, uint16_t animationSpeed, uint8_t unknownRotation )
     {
 
       m_data.rotation = Util::floatToUInt8Rot( actor.getRot() );
-      m_data.unknown_1 = unk1;
+      m_data.headRotation = headRotation;
       m_data.animationType = animationType;
-      m_data.unknown_3 = unk3;
-      m_data.unknown_4 = unk4;
+      m_data.animationState = state;
+      m_data.animationSpeed = animationSpeed;
+      m_data.unknownRotation = unknownRotation;
       m_data.posX = Util::floatToUInt16( actor.getPos().x );
       m_data.posY = Util::floatToUInt16( actor.getPos().y );
       m_data.posZ = Util::floatToUInt16( actor.getPos().z );

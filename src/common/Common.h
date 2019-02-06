@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "CommonGen.h"
+#include "Vector3.h"
 
 // +---------------------------------------------------------------------------
 // The following enumerations are structures to require their type be included.
@@ -19,13 +20,6 @@ namespace Sapphire::Common
 
   const int32_t INVALID_GAME_OBJECT_ID = 0xE0000000;
   const uint64_t INVALID_GAME_OBJECT_ID64 = 0xE0000000;
-
-  struct FFXIVARR_POSITION3
-  {
-    float x;
-    float y;
-    float z;
-  };
 
   struct FFXIVARR_POSITION3_U16
   {
@@ -419,7 +413,6 @@ namespace Sapphire::Common
     Walking = 0x02,
     Strafing = 0x04,
     Jumping = 0x10,
-    BackWalk = 0x06,
   };
 
   enum MoveState :
@@ -428,6 +421,13 @@ namespace Sapphire::Common
     No = 0x00,
     Land = 0x02,
     Fall = 0x04,
+  };
+
+  enum MoveSpeed :
+    uint8_t
+  {
+    Walk = 24,
+    Run = 60,
   };
 
   struct QuestActive
