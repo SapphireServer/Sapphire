@@ -1,4 +1,5 @@
 #include <Common.h>
+#include <Vector3.cpp>
 #include <Network/CommonNetwork.h>
 #include <Network/GamePacketNew.h>
 #include <Network/CommonActorControl.h>
@@ -183,54 +184,17 @@ void Sapphire::Network::GameConnection::updatePositionHandler( FrameworkPtr pFw,
   if( player.isMarkedForZoning() )
     return;
 
-  Packets::FFXIVARR_PACKET_RAW copy = inPacket;
+  const auto updatePositionPacket = ZoneChannelPacket< Client::FFXIVIpcUpdatePosition >( inPacket );
 
-  struct testMov
-  {
-    uint32_t specialMovement : 23; // 0x00490FDA
-    uint32_t strafe : 7;
-    uint32_t moveBackward : 1;
-    uint32_t strafeRight : 1; // if 0, strafe left.
-  } IPC_OP_019A;
+  bool bPosChanged = true;
+  if( updatePositionPacket.data().position == player.getPos() )
+    bPosChanged = false;
 
-  struct testMov1
-  {
-    uint16_t bit1 : 1; // 0x00490FDA
-    uint16_t bit2 : 1;
-    uint16_t bit3 : 1;
-    uint16_t bit4 : 1;
-    uint16_t bit5 : 1;
-    uint16_t bit6 : 1;
-    uint16_t bit7 : 1;
-    uint16_t bit8 : 1;
-    uint16_t bit9 : 1; // 0x00490FDA
-    uint16_t bit10 : 1;
-    uint16_t bit11 : 1;
-    uint16_t bit12 : 1;
-    uint16_t bit13 : 1;
-    uint16_t bit14 : 1;
-    uint16_t bit15 : 1;
-    uint16_t bit16 : 1;
-  } IPC_OP_019AB;
+  //if( !bPosChanged && player.getRot() == updatePositionPacket.data().rotation )
+    //return;
 
-  auto flags = *reinterpret_cast< uint16_t* >( &copy.data[ 0x18 ] );
-  memcpy( &IPC_OP_019AB, &flags, 2 );
-
-  auto flags1 = *reinterpret_cast< uint32_t* >( &copy.data[ 0x18 ] );
-  memcpy( &IPC_OP_019A, &flags1, 4 );
-
-  bool bPosChanged = false;
-  if( ( player.getPos().x != *reinterpret_cast< float* >( &copy.data[ 0x1C ] ) ) ||
-      ( player.getPos().y != *reinterpret_cast< float* >( &copy.data[ 0x20 ] ) ) ||
-      ( player.getPos().z != *reinterpret_cast< float* >( &copy.data[ 0x24 ] ) ) )
-    bPosChanged = true;
-  if( !bPosChanged && player.getRot() == *reinterpret_cast< float* >( &copy.data[ 0x10 ] ) )
-    return;
-
-  player.setRot( *reinterpret_cast< float* >( &copy.data[ 0x10 ] ) );
-  player.setPos( *reinterpret_cast< float* >( &copy.data[ 0x1C ] ),
-                 *reinterpret_cast< float* >( &copy.data[ 0x20 ] ),
-                 *reinterpret_cast< float* >( &copy.data[ 0x24 ] ) );
+  player.setRot( updatePositionPacket.data().rotation );
+  player.setPos( updatePositionPacket.data().position );
 
   if( ( player.getCurrentAction() != nullptr ) && bPosChanged )
     player.getCurrentAction()->setInterrupted();
@@ -239,73 +203,57 @@ void Sapphire::Network::GameConnection::updatePositionHandler( FrameworkPtr pFw,
   if( !player.hasInRangeActor() )
     return;
 
-  auto moveState = *reinterpret_cast< uint8_t* >( &copy.data[ 0x19 ] );
-  auto moveType = *reinterpret_cast< uint8_t* >( &copy.data[ 0x18 ] );
+  auto clientAnimationType = updatePositionPacket.data().clientAnimationType;
+  auto animationState = updatePositionPacket.data().animationState;
+  auto animationType = updatePositionPacket.data().animationType;
+  auto headRotation = updatePositionPacket.data().headPosition;
+  uint8_t unknownRotation = 0;
+  uint16_t animationSpeed = MoveSpeed::Walk;
 
-  uint8_t unk1 = 0;
-  uint8_t unk2 = 0;
-  uint8_t unk3 = moveState;
-  uint16_t unk4 = 0;
+  animationType |= clientAnimationType;
 
-  // HACK: This part is hackish, we need to find out what all theese things really do.
-  //Logger::debug( std::to_string( moveState ) + " -- moveState " );
-  //Logger::debug( std::to_string( moveType ) + " -- moveType " );
+  bool shouldSend = true;
 
-  if( moveType & MoveType::Running )
+  if( animationType & MoveType::Strafing )
   {
-    unk1 = 0x7F;
-    unk2 = 0x00;
-    unk4 = 0x3C;
+    if( animationType & MoveType::Walking )
+      headRotation = 0xFF;
+    else if( headRotation < 0x7F )
+      headRotation += 0x7F;
+    else if( headRotation > 0x7F )
+      headRotation -= 0x7F;
   }
-
-  if( moveType & MoveType::Strafing )
+  if( animationType == MoveType::Running )
   {
-    unk2 = 0x40;
-    unk1 = 0x7F;
-    //if( IPC_OP_019A.strafeRight == 1 )
-    //   unk1 = 0xbf;
-    //else
-    //   unk1 = 0x5f;
-    unk4 = 0x3C;
+    headRotation = 0x7F;
+    animationSpeed = MoveSpeed::Run;
   }
-
-  if( moveType & MoveType::Walking )
+  if( animationType & MoveType::Jumping )
   {
-    unk1 = 0x7F;
-    unk2 = 0x02;
-    unk3 = 0x00;
-    unk4 = 0x18;
+    if( animationState == MoveState::Fall )
+      player.m_falling = true;
+    else
+      shouldSend = false;
   }
+  else
+    player.m_falling = false;
 
-  if( moveType & MoveType::Walking && moveType & MoveType::Strafing )
+  if( player.m_falling )
   {
-    unk2 = 0x06;
-    unk1 = 0xFF;
-    unk4 = 0x18;
-  }
-
-  if( moveType & MoveType::Jumping )
-  {
-
-    unk1 = 0x3F;
-    unk2 = 0x32;
-    unk4 = 0x5f18;
-    if( moveState == MoveState::Land )
-      unk2 = 0x02;
-
+    animationType += 0x10;
+    unknownRotation = 0x7F;
   }
 
   uint64_t currentTime = Util::getTimeMs();
 
-  if( ( currentTime - player.m_lastMoveTime ) < 100 && player.m_lastMoveflag == moveState )
-    return;
-
   player.m_lastMoveTime = currentTime;
-  player.m_lastMoveflag = moveState;
+  player.m_lastMoveflag = animationType;
 
-  auto movePacket = std::make_shared< MoveActorPacket >( player, unk1, unk2, moveState, unk4 );
-  player.sendToInRangeSet( movePacket );
-
+  if( shouldSend )
+  {
+    auto movePacket = std::make_shared< MoveActorPacket >( player, headRotation, animationType, animationState, animationSpeed, unknownRotation );
+    player.sendToInRangeSet( movePacket );
+  }
 }
 
 void

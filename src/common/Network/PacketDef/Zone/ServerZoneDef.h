@@ -665,10 +665,11 @@ struct FFXIVIpcActorMove :
   FFXIVIpcBasePacket< ActorMove >
 {
   /* 0000 */ uint8_t rotation;
-  /* 0001 */ uint8_t unknown_1;
+  /* 0001 */ uint8_t headRotation;
   /* 0002 */ uint8_t animationType;
-  /* 0003 */ uint8_t unknown_3;
-  /* 0004 */ uint16_t unknown_4;
+  /* 0003 */ uint8_t animationState;
+  /* 0004 */ uint8_t animationSpeed;
+  /* 0005 */ uint8_t unknownRotation;
   /* 0006 */ uint16_t posX;
   /* 0008 */ uint16_t posY;
   /* 000a */ uint16_t posZ;
