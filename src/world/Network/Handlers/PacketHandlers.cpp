@@ -206,7 +206,7 @@ void Sapphire::Network::GameConnection::updatePositionHandler( FrameworkPtr pFw,
   auto animationState = updatePositionPacket.data().animationState;
   auto animationType = updatePositionPacket.data().animationType;
   auto headRotation = updatePositionPacket.data().headPosition;
-  uint8_t unkownRotation = 0;
+  uint8_t unknownRotation = 0;
   uint16_t animationSpeed = MoveSpeed::Walk;
 
   animationType |= clientAnimationType;
@@ -227,7 +227,7 @@ void Sapphire::Network::GameConnection::updatePositionHandler( FrameworkPtr pFw,
     headRotation = 0x7F;
     animationSpeed = MoveSpeed::Run;
   }
-  if( animationType & MoveType::Jumping)
+  if( animationType & MoveType::Jumping )
   {
     if( animationState == MoveState::Fall )
       player.m_falling = true;
@@ -240,7 +240,7 @@ void Sapphire::Network::GameConnection::updatePositionHandler( FrameworkPtr pFw,
   if( player.m_falling )
   {
     animationType += 0x10;
-    unkownRotation = 0x7F;
+    unknownRotation = 0x7F;
   }
 
   uint64_t currentTime = Util::getTimeMs();
@@ -250,7 +250,7 @@ void Sapphire::Network::GameConnection::updatePositionHandler( FrameworkPtr pFw,
 
   if( shouldSend )
   {
-    auto movePacket = std::make_shared< MoveActorPacket >( player, headRotation, animationType, animationState, animationSpeed, unkownRotation );
+    auto movePacket = std::make_shared< MoveActorPacket >( player, headRotation, animationType, animationState, animationSpeed, unknownRotation );
     player.sendToInRangeSet( movePacket );
   }
 }

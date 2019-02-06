@@ -669,7 +669,7 @@ struct FFXIVIpcActorMove :
   /* 0002 */ uint8_t animationType;
   /* 0003 */ uint8_t animationState;
   /* 0004 */ uint8_t animationSpeed;
-  /* 0005 */ uint8_t unkownRotation;
+  /* 0005 */ uint8_t unknownRotation;
   /* 0006 */ uint16_t posX;
   /* 0008 */ uint16_t posY;
   /* 000a */ uint16_t posZ;
