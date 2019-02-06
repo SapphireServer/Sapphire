@@ -77,7 +77,8 @@ Sapphire::Entity::Player::Player( FrameworkPtr pFw ) :
   m_mount( 0 ),
   m_emoteMode( 0 ),
   m_directorInitialized( false ),
-  m_onEnterEventDone( false )
+  m_onEnterEventDone( false ),
+  m_falling( false )
 {
   m_id = 0;
   m_currentStance = Stance::Passive;
