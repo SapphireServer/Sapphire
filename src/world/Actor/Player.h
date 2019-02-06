@@ -963,6 +963,7 @@ namespace Sapphire::Entity
 
     uint64_t m_lastMoveTime;
     uint8_t m_lastMoveflag;
+    bool m_falling;
 
   private:
     uint32_t m_lastWrite;

@@ -25,6 +25,8 @@ namespace Sapphire::Common
     float x;
     float y;
     float z;
+    inline bool operator == ( const FFXIVARR_POSITION3& target ) const
+    { return ( this->x == target.x && this->y == target.y && this->z == target.z ); }
   };
 
   struct FFXIVARR_POSITION3_U16
@@ -419,7 +421,6 @@ namespace Sapphire::Common
     Walking = 0x02,
     Strafing = 0x04,
     Jumping = 0x10,
-    BackWalk = 0x06,
   };
 
   enum MoveState :
@@ -428,6 +429,13 @@ namespace Sapphire::Common
     No = 0x00,
     Land = 0x02,
     Fall = 0x04,
+  };
+
+  enum MoveSpeed :
+    uint8_t
+  {
+    Walk = 24,
+    Run = 60,
   };
 
   struct QuestActive
