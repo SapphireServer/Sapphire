@@ -419,8 +419,9 @@ namespace Sapphire::Common
     uint8_t
   {
     No = 0x00,
-    Land = 0x02,
-    Fall = 0x04,
+    LeaveCollision = 0x01,
+    EnterCollision = 0x02,
+    StartFalling = 0x04,
   };
 
   enum MoveSpeed :
