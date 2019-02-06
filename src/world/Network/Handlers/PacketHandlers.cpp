@@ -237,11 +237,7 @@ void Sapphire::Network::GameConnection::updatePositionHandler( FrameworkPtr pFw,
         animationType += 0x04;
     }
     if( animationState == MoveState::StartFalling )
-    {
       player.m_falling = true;
-      animationType += 0x10;
-      unknownRotation = 0x7F;
-    }
     if( animationState == MoveState::EnterCollision )
     {
       animationType = 2;
