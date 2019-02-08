@@ -6,9 +6,6 @@
 #include <Util/UtilMath.h>
 #include <utility>
 
-#include "Action/Action.h"
-#include "Action/ActionCollision.h"
-
 #include "Territory/Zone.h"
 
 #include "Network/GameConnection.h"

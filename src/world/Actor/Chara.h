@@ -212,9 +212,6 @@ namespace Sapphire::Entity
 
     void setStatus( Common::ActorStatus status );
 
-    void
-    handleScriptSkill( uint32_t type, uint16_t actionId, uint64_t param1, uint64_t param2, Entity::Chara& target );
-
     virtual void autoAttack( CharaPtr pTarget );
 
     virtual void onDeath() {};

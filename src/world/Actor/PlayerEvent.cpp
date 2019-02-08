@@ -11,9 +11,6 @@
 #include "Network/PacketWrappers/EventFinishPacket.h"
 #include "Network/PacketWrappers/DirectorPlayScenePacket.h"
 
-#include "Action/EventAction.h"
-#include "Action/EventItemAction.h"
-
 #include "Territory/Zone.h"
 #include "ServerMgr.h"
 #include "Framework.h"
@@ -283,27 +280,27 @@ void Sapphire::Entity::Player::eventActionStart( uint32_t eventId,
                                                  ActionCallback interruptCallback,
                                                  uint64_t additional )
 {
-  auto pEventAction = Action::make_EventAction( getAsChara(), eventId, action,
-                                                finishCallback, interruptCallback, additional, m_pFw );
-
-  setCurrentAction( pEventAction );
-  auto pEvent = getEvent( eventId );
-
-  if( !pEvent && getEventCount() )
-  {
-    // We're trying to play a nested event, need to start it first.
-    eventStart( getId(), eventId, Event::EventHandler::Nest, 0, 0 );
-    pEvent = getEvent( eventId );
-  }
-  else if( !pEvent )
-  {
-    Logger::error( "Could not find event #{0}, event has not been started!", eventId );
-    return;
-  }
-
-  if( pEvent )
-    pEvent->setPlayedScene( true );
-  pEventAction->onStart();
+//  auto pEventAction = Action::make_EventAction( getAsChara(), eventId, action,
+//                                                finishCallback, interruptCallback, additional, m_pFw );
+//
+//  setCurrentAction( pEventAction );
+//  auto pEvent = getEvent( eventId );
+//
+//  if( !pEvent && getEventCount() )
+//  {
+//    // We're trying to play a nested event, need to start it first.
+//    eventStart( getId(), eventId, Event::EventHandler::Nest, 0, 0 );
+//    pEvent = getEvent( eventId );
+//  }
+//  else if( !pEvent )
+//  {
+//    Logger::error( "Could not find event #{0}, event has not been started!", eventId );
+//    return;
+//  }
+//
+//  if( pEvent )
+//    pEvent->setPlayedScene( true );
+//  pEventAction->onStart();
 }
 
 
@@ -313,12 +310,12 @@ void Sapphire::Entity::Player::eventItemActionStart( uint32_t eventId,
                                                      ActionCallback interruptCallback,
                                                      uint64_t additional )
 {
-  Action::ActionPtr pEventItemAction = Action::make_EventItemAction( getAsChara(), eventId, action,
-                                                                     finishCallback, interruptCallback, additional );
-
-  setCurrentAction( pEventItemAction );
-
-  pEventItemAction->onStart();
+//  Action::ActionPtr pEventItemAction = Action::make_EventItemAction( getAsChara(), eventId, action,
+//                                                                     finishCallback, interruptCallback, additional );
+//
+//  setCurrentAction( pEventItemAction );
+//
+//  pEventItemAction->onStart();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

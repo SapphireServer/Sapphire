@@ -18,8 +18,6 @@
 #include "Network/PacketWrappers/UpdateHpMpTpPacket.h"
 #include "Network/PacketWrappers/EffectPacket.h"
 
-#include "StatusEffect/StatusEffect.h"
-#include "Action/ActionCollision.h"
 #include "ServerMgr.h"
 #include "Session.h"
 #include "Math/CalcBattle.h"
