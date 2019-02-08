@@ -274,7 +274,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     case ClientTriggerType::Teleport: // Teleport
     {
 
-      player.teleportQuery( param11, pFw );
+      player.teleportQuery( param11 );
       break;
     }
     case ClientTriggerType::DyeItem: // Dye item
