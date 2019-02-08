@@ -84,11 +84,7 @@ TYPE_FORWARD( EventHandler );
 namespace Action
 {
 TYPE_FORWARD( Action );
-TYPE_FORWARD( ActionTeleport );
 TYPE_FORWARD( ActionCast );
-TYPE_FORWARD( ActionMount );
-TYPE_FORWARD( EventAction );
-TYPE_FORWARD( EventItemAction );
 }
 
 namespace Network
