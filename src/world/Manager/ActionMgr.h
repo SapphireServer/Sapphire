@@ -18,10 +18,12 @@ namespace Sapphire::World::Manager
     explicit ActionMgr( FrameworkPtr pFw );
     ~ActionMgr() = default;
 
-    void handleTargetedPlayerAction( Entity::Player& player, uint8_t type, uint32_t actionId,
+    void handleTargetedPlayerAction( Entity::Player& player, uint32_t actionId,
                                      Data::ActionPtr actionData, uint64_t targetId );
-    void handleAoEPlayerAction( Entity::Player& player, uint8_t type, uint32_t actionId,
+    void handleAoEPlayerAction( Entity::Player& player, uint32_t actionId,
                                 Data::ActionPtr actionData, Common::FFXIVARR_POSITION3 pos );
+
+    void handleItemAction( Entity::Player& player, uint32_t itemActionId );
 
   private:
     void bootstrapAction( Entity::Player& player, Action::ActionPtr currentAction, Data::Action& actionData );

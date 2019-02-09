@@ -16,28 +16,30 @@ World::Manager::ActionMgr::ActionMgr( Sapphire::FrameworkPtr pFw ) :
 
 }
 
-void World::Manager::ActionMgr::handleAoEPlayerAction( Entity::Player& player, uint8_t type,
-                                                       uint32_t actionId, Data::ActionPtr actionData,
-                                                       Common::FFXIVARR_POSITION3 pos )
+void World::Manager::ActionMgr::handleAoEPlayerAction( Entity::Player& player, uint32_t actionId,
+                                                       Data::ActionPtr actionData, Common::FFXIVARR_POSITION3 pos )
 {
   player.sendDebug( "got aoe act: {0}", actionData->name );
 
   auto action = Action::make_Action( player.getAsPlayer(), actionId, actionData, framework() );
-  action->setType( static_cast< Common::HandleActionType >( type ) );
   action->setPos( pos );
 
   bootstrapAction( player, action, *actionData );
 }
 
-void World::Manager::ActionMgr::handleTargetedPlayerAction( Entity::Player& player, uint8_t type,
-                                                            uint32_t actionId, Data::ActionPtr actionData, uint64_t targetId )
+void World::Manager::ActionMgr::handleTargetedPlayerAction( Entity::Player& player, uint32_t actionId,
+                                                            Data::ActionPtr actionData, uint64_t targetId )
 {
   player.sendDebug( "got act: {0}", actionData->name );
 
   auto action = Action::make_Action( player.getAsPlayer(), actionId, actionData, framework() );
-  action->setType( static_cast< Common::HandleActionType >( type ) );
 
   bootstrapAction( player, action, *actionData );
+}
+
+void World::Manager::ActionMgr::handleItemAction( Sapphire::Entity::Player& player, uint32_t itemActionId )
+{
+  player.sendDebug( "got item act: {0}", itemActionId );
 }
 
 void World::Manager::ActionMgr::bootstrapAction( Entity::Player& player,
