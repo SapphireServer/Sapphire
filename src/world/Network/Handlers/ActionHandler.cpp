@@ -30,6 +30,8 @@ void Sapphire::Network::GameConnection::actionHandler( FrameworkPtr pFw,
   auto exdData = m_pFw->get< Data::ExdDataGenerated >();
   assert( exdData );
 
+  auto actionMgr = pFw->get< World::Manager::ActionMgr >();
+
   switch( type )
   {
     default:
@@ -44,7 +46,6 @@ void Sapphire::Network::GameConnection::actionHandler( FrameworkPtr pFw,
       if( !action )
         return;
 
-      auto actionMgr = pFw->get< World::Manager::ActionMgr >();
       actionMgr->handleTargetedPlayerAction( player, actionId, action, targetId );
       break;
     }
@@ -58,7 +59,11 @@ void Sapphire::Network::GameConnection::actionHandler( FrameworkPtr pFw,
       if( item->itemAction == 0 )
         return;
 
-      player.sendDebug( "Got itemaction for act: {0}", item->itemAction );
+      auto itemAction = exdData->get< Data::ItemAction >( item->itemAction );
+      if( !itemAction )
+        return;
+
+      actionMgr->handleItemAction( player, actionId, itemAction );
 
       break;
     }

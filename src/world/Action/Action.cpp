@@ -113,6 +113,9 @@ void Sapphire::Action::Action::calculateMPCost()
       cost = 0.2313f * ( level * level ) - 26.98f * level + 875.21f;
       break;
     }
+
+    default:
+      return;
   }
 
   // m_cost is the base cost, cost is the multiplier for the current player level
@@ -121,7 +124,24 @@ void Sapphire::Action::Action::calculateMPCost()
 
 void Sapphire::Action::Action::subtractCostFromCaster()
 {
+  if( !m_pSource->isPlayer() )
+    return;
 
+  auto player = m_pSource->getAsPlayer();
+
+  switch( m_costType )
+  {
+    case Common::ActionCostType::MagicPoints:
+    {
+
+      break;
+    }
+    case Common::ActionCostType::TacticsPoints:
+    {
+
+      break;
+    }
+  }
 }
 
 void Sapphire::Action::Action::setPos( Sapphire::Common::FFXIVARR_POSITION3 pos )

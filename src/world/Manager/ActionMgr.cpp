@@ -8,6 +8,8 @@
 #include <Exd/ExdDataGenerated.h>
 #include "Framework.h"
 
+#include <Network/PacketWrappers/EffectPacket.h>
+
 using namespace Sapphire;
 
 World::Manager::ActionMgr::ActionMgr( Sapphire::FrameworkPtr pFw ) :
@@ -37,9 +39,22 @@ void World::Manager::ActionMgr::handleTargetedPlayerAction( Entity::Player& play
   bootstrapAction( player, action, *actionData );
 }
 
-void World::Manager::ActionMgr::handleItemAction( Sapphire::Entity::Player& player, uint32_t itemActionId )
+void World::Manager::ActionMgr::handleItemAction( Sapphire::Entity::Player& player, uint32_t itemId, Data::ItemActionPtr itemActionData )
 {
-  player.sendDebug( "got item act: {0}", itemActionId );
+  player.sendDebug( "got item act: {0}", itemId );
+
+  switch( itemActionData->type )
+  {
+    default:
+      return;
+
+    case Common::ItemActionType::ItemActionVFX:
+    {
+      handleItemActionVFX( player, itemId, itemActionData->data[ 0 ] );
+
+      break;
+    }
+  }
 }
 
 void World::Manager::ActionMgr::bootstrapAction( Entity::Player& player,
@@ -100,4 +115,21 @@ bool World::Manager::ActionMgr::canPlayerUseAction( Entity::Player& player,
   // todo: script callback for action conditionals?
 
   return true;
+}
+
+void World::Manager::ActionMgr::handleItemActionVFX( Sapphire::Entity::Player& player, uint32_t itemId, uint16_t vfxId )
+{
+  // todo: check we have item & remove item from inventory
+
+  Common::EffectEntry effect{};
+  effect.effectType = Common::ActionEffectType::VFX;
+  effect.value = vfxId;
+
+  auto effectPacket = std::make_shared< Network::Packets::Server::EffectPacket >( player.getId(), player.getId(), itemId );
+  effectPacket->setTargetActor( player.getId() );
+  effectPacket->setAnimationId( Common::ItemActionType::ItemActionVFX );
+  effectPacket->setDisplayType( Common::ActionEffectDisplayType::ShowItemName );
+  effectPacket->addEffect( effect );
+
+  player.sendToInRangeSet( effectPacket, true );
 }

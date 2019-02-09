@@ -41,6 +41,11 @@ namespace Sapphire::Network::Packets::Server
       m_data.actionAnimationId = animationId;
     }
 
+    void setDisplayType( Common::ActionEffectDisplayType displayType )
+    {
+      m_data.effectDisplayType = displayType;
+    }
+
     void setEffectFlags( uint32_t effectFlags )
     {
       m_data.effectFlags = effectFlags;
