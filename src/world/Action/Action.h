@@ -57,7 +57,7 @@ namespace Sapphire::Action
      * @param chara The chara to inflict damage upon
      * @param aspect The aspect of the damage
      */
-    void damageTarget( uint32_t amount, Entity::Chara& chara, Common::ActionAspect aspect = Common::ActionAspect::Unaspected );
+    void damageTarget( uint32_t amount, Entity::Chara& chara, Common::ActionAspect aspect = Common::ActionAspect::None );
     /*!
      * @brief Heals a target and adds the effect entry
      * @param amount Amount of healing to apply
