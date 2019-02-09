@@ -24,9 +24,6 @@ namespace Sapphire::Action
 
     uint32_t getId() const;
 
-    Common::HandleActionType getType() const;
-    void setType( Common::HandleActionType type );
-
     void setPos( Common::FFXIVARR_POSITION3 pos );
     Common::FFXIVARR_POSITION3 getPos() const;
 
@@ -94,7 +91,6 @@ namespace Sapphire::Action
     };
 
     uint32_t m_id;
-    Common::HandleActionType m_type;
 
     Common::ActionCostType m_costType;
     uint16_t m_cost;

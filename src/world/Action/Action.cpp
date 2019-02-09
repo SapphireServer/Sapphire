@@ -41,16 +41,6 @@ uint32_t Sapphire::Action::Action::getId() const
   return m_id;
 }
 
-Sapphire::Common::HandleActionType Sapphire::Action::Action::getType() const
-{
-  return m_type;
-}
-
-void Sapphire::Action::Action::setType( Sapphire::Common::HandleActionType type )
-{
-  m_type = type;
-}
-
 void Sapphire::Action::Action::setPos( Sapphire::Common::FFXIVARR_POSITION3 pos )
 {
   m_pos = pos;
