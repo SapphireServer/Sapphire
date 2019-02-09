@@ -548,7 +548,7 @@ namespace Sapphire::Common
     Status = 32,
     PLDGauge = 41,
     RDMGaugeBoth = 74,
-//    RDMGaugeBlack = 75, // not right?
+//  RDMGaugeBlack = 75, // not right?
     DRGGauge3Eyes = 76,
   };
 
