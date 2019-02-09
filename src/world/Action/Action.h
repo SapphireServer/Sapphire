@@ -4,6 +4,12 @@
 #include <Common.h>
 #include "ForwardsZone.h"
 
+namespace Sapphire::Data
+{
+  struct Action;
+  using ActionPtr = std::shared_ptr< Action >;
+}
+
 namespace Sapphire::Action
 {
 
@@ -12,12 +18,16 @@ namespace Sapphire::Action
 
   public:
     Action();
-    Action( Entity::CharaPtr caster, Entity::CharaPtr target, uint16_t actionId, FrameworkPtr fw );
+    Action( Entity::CharaPtr caster, uint32_t actionId, Data::ActionPtr action, FrameworkPtr fw );
 
     virtual ~Action();
 
-    uint16_t getId() const;
+    uint32_t getId() const;
 
+    Common::ActionType getType() const;
+    void setType( Common::ActionType type );
+
+    void setTargetChara( Entity::CharaPtr chara );
     Entity::CharaPtr getTargetChara() const;
     Entity::CharaPtr getActionSource() const;
 
@@ -43,13 +53,16 @@ namespace Sapphire::Action
     virtual bool update();
 
   protected:
-    uint16_t m_id;
+    uint32_t m_id;
+
+    Common::ActionType m_type;
 
     uint64_t m_startTime;
     uint32_t m_castTime;
 
     Entity::CharaPtr m_pSource;
     Entity::CharaPtr m_pTarget;
+    uint64_t m_targetId;
 
     bool m_bInterrupt;
 
