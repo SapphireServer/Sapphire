@@ -46,7 +46,10 @@ void World::Manager::ActionMgr::handleItemAction( Sapphire::Entity::Player& play
   switch( itemActionData->type )
   {
     default:
-      return;
+    {
+      player.sendDebug( "ItemAction type {0} not supported.", itemActionData->type );
+      break;
+    }
 
     case Common::ItemActionType::ItemActionVFX:
     {
