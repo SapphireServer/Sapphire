@@ -27,12 +27,12 @@ namespace Sapphire::Network::Packets::Server
       m_data.effectDisplayType = Common::ActionEffectDisplayType::ShowActionName;
     }
 
-    void addEffect( const Server::EffectEntry& effect )
+    void addEffect( const Common::EffectEntry& effect )
     {
       assert( m_data.effectCount <= 8 );
 
-      std::memset( m_data.effects, 0, sizeof( Server::EffectEntry ) * 8 );
-      std::memcpy( &m_data.effects[ m_data.effectCount * 8 ], &effect, sizeof( Server::EffectEntry ) );
+      std::memset( m_data.effects, 0, sizeof( Common::EffectEntry ) * 8 );
+      std::memcpy( &m_data.effects[ m_data.effectCount * 8 ], &effect, sizeof( Common::EffectEntry ) );
       m_data.effectCount++;
     }
 

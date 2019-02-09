@@ -417,7 +417,7 @@ void Sapphire::Entity::Chara::autoAttack( CharaPtr pTarget )
 
     auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 7 );
     effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
-    Server::EffectEntry effectEntry{};
+    Common::EffectEntry effectEntry{};
     effectEntry.value = damage;
     effectEntry.effectType = ActionEffectType::Damage;
     effectEntry.hitSeverity = ActionHitSeverityType::NormalDamage;

@@ -388,17 +388,6 @@ struct FFXIVIpcUpdateHpMpTp :
 * Structural representation of the packet sent by the server
 * for battle actions
 */
-struct EffectEntry
-{
-  Common::ActionEffectType effectType;
-  Common::ActionHitSeverityType hitSeverity;
-  uint8_t param;
-  int8_t bonusPercent; // shows an additional percentage in the battle log, will not change the damage number sent & shown
-  uint8_t valueMultiplier;      // This multiplies whatever value is in the 'value' param by 10. Possibly a workaround for big numbers
-  uint8_t flags;
-  int16_t value;
-};
-
 struct EffectHeader
 {
   uint64_t animationTargetId; // who the animation targets
@@ -458,7 +447,7 @@ struct FFXIVIpcAoeEffect
 {
   EffectHeader header;
 
-  EffectEntry effects[size];
+  Common::EffectEntry effects[size];
 
   uint16_t padding_6A[3];
 
