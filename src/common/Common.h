@@ -543,8 +543,14 @@ namespace Sapphire::Common
     None = 0, // ?
     MagicPoints = 3,
     TacticsPoints = 5,
-    ClassGaugeWAR = 22,
+    WARGauge = 22,
+    DRKGauge = 25,
     AetherflowStack = 30,
+    Status = 32,
+    PLDGauge = 41,
+    RDMGaugeBoth = 74,
+//    RDMGaugeBlack = 75, // not right?
+    DRGGauge3Eyes = 76,
   };
 
   enum class ActionType : int8_t
