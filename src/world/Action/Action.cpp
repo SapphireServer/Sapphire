@@ -32,94 +32,19 @@ Sapphire::Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId,
 {
   m_castTime = static_cast< uint32_t >( action->cast100ms ) * 100;
 
-  m_costType = static_cast< Common::ActionCostType >( action->costType );
-  m_cost = action->cost;
+  m_actionCost.fill( { Common::ActionCostType::None, 0 } );
 
-  if( caster->isPlayer() && isCastedAction() )
-    calculateMPCost();
+  m_actionCost[ 0 ] = {
+    static_cast< Common::ActionCostType >( action->costType ),
+    action->cost
+  };
+
+  calculateActionCost();
 }
 
 uint32_t Sapphire::Action::Action::getId() const
 {
   return m_id;
-}
-
-void Sapphire::Action::Action::calculateMPCost()
-{
-  auto level = m_pSource->getLevel();
-
-  // each level range is 1-10, 11-20, 21-30, ... therefore:
-  // level 50 should be in the 4th group, not the 5th
-  // dividing by 10 on the border will break this unless we subtract 1
-  auto levelGroup = std::max< uint8_t >( level - 1, 1 ) / 10;
-
-  float cost = m_cost;
-
-  // thanks to andrew for helping me figure this shit out, should be pretty accurate
-  switch( levelGroup )
-  {
-    // level 1-10
-    case 0:
-    {
-      // r^2 = 0.9999
-      cost = 0.0952f * level + 0.9467f;
-      break;
-    }
-
-    // level 11-20
-    case 1:
-    {
-      // r^2 = 1
-      cost = 0.19f * level;
-      break;
-    }
-
-    // level 21-30
-    case 2:
-    {
-      // r^2 = 1
-      cost = 0.38f * level - 3.8f;
-      break;
-    }
-
-    // level 31-40
-    case 3:
-    {
-      // r^2 = 1
-      cost = 0.6652f * level - 12.358f;
-      break;
-    }
-
-    // level 41-50
-    case 4:
-    {
-      // r^2 = 1
-      cost = 1.2352f * level - 35.159f;
-      break;
-    }
-
-    // level 51-60
-    case 5:
-    {
-      // r^2 = 1
-      cost = 0.0654f * std::exp( 0.1201f * level );
-      break;
-    }
-
-    // level 61-70
-    case 6:
-    {
-      // r^2 = 0.9998
-      cost = 0.2313f * ( level * level ) - 26.98f * level + 875.21f;
-      break;
-    }
-
-    default:
-      return;
-  }
-
-  // m_cost is the base cost, cost is the multiplier for the current player level
-  m_cost = static_cast< uint16_t >( std::round( cost * m_cost ) );
 }
 
 void Sapphire::Action::Action::subtractCostFromCaster()
@@ -352,4 +277,100 @@ void Sapphire::Action::Action::healTarget( uint32_t amount, Entity::Chara& chara
 
   // todo: make sure that we don't add the same actor more than once
   m_effects[ EffectPacketIdentity::HealingEffect ].m_hitActors.emplace_back( chara.getId() );
+}
+
+const Sapphire::Action::Action::ActionCostArray& Sapphire::Action::Action::getCostArray() const
+{
+  return m_actionCost;
+}
+
+void Sapphire::Action::Action::calculateActionCost()
+{
+  for( uint8_t i = 0; i < m_actionCost.size(); ++i )
+  {
+    auto& entry = m_actionCost[ i ];
+
+    if( entry.m_costType == ActionCostType::MagicPoints )
+      calculateMPCost( i );
+  }
+}
+
+void Sapphire::Action::Action::calculateMPCost( uint8_t costArrayIndex )
+{
+  auto level = m_pSource->getLevel();
+
+  // each level range is 1-10, 11-20, 21-30, ... therefore:
+  // level 50 should be in the 4th group, not the 5th
+  // dividing by 10 on the border will break this unless we subtract 1
+  auto levelGroup = std::max< uint8_t >( level - 1, 1 ) / 10;
+
+  auto& costEntry = m_actionCost[ costArrayIndex ];
+
+  float cost = costEntry.m_cost;
+
+  // thanks to andrew for helping me figure this shit out, should be pretty accurate
+  switch( levelGroup )
+  {
+    // level 1-10
+    case 0:
+    {
+      // r^2 = 0.9999
+      cost = 0.0952f * level + 0.9467f;
+      break;
+    }
+
+      // level 11-20
+    case 1:
+    {
+      // r^2 = 1
+      cost = 0.19f * level;
+      break;
+    }
+
+      // level 21-30
+    case 2:
+    {
+      // r^2 = 1
+      cost = 0.38f * level - 3.8f;
+      break;
+    }
+
+      // level 31-40
+    case 3:
+    {
+      // r^2 = 1
+      cost = 0.6652f * level - 12.358f;
+      break;
+    }
+
+      // level 41-50
+    case 4:
+    {
+      // r^2 = 1
+      cost = 1.2352f * level - 35.159f;
+      break;
+    }
+
+      // level 51-60
+    case 5:
+    {
+      // r^2 = 1
+      cost = 0.0654f * std::exp( 0.1201f * level );
+      break;
+    }
+
+      // level 61-70
+    case 6:
+    {
+      // r^2 = 0.9998
+      cost = 0.2313f * ( level * level ) - 26.98f * level + 875.21f;
+      break;
+    }
+
+    default:
+      return;
+  }
+
+  // m_cost is the base cost, cost is the multiplier for the current player level
+  costEntry.m_cost = static_cast< uint16_t >( std::round( cost * costEntry.m_cost ) );
 }

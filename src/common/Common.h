@@ -538,8 +538,9 @@ namespace Sapphire::Common
     Unaspected = 7    // Doesn't imply magical unaspected damage - could be unaspected physical
   };
 
-  enum ActionCostType : uint8_t
+  enum class ActionCostType : uint8_t
   {
+    None = 0, // ?
     MagicPoints = 3,
     TacticsPoints = 5,
     ClassGaugeWAR = 22,

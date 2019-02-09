@@ -18,6 +18,14 @@ namespace Sapphire::Action
   {
 
   public:
+    struct ActionCostEntry
+    {
+      Common::ActionCostType m_costType;
+      uint16_t m_cost;
+    };
+
+    using ActionCostArray = std::array< ActionCostEntry, 2 >;
+
     Action();
     Action( Entity::CharaPtr caster, uint32_t actionId, Data::ActionPtr action, FrameworkPtr fw );
 
@@ -37,6 +45,8 @@ namespace Sapphire::Action
 
     uint32_t getCastTime() const;
     void setCastTime( uint32_t castTime );
+
+    const ActionCostArray& getCostArray() const;
 
     /*!
      * @brief Tests whether the action is instantly usable or has a cast assoc'd with it
@@ -74,7 +84,8 @@ namespace Sapphire::Action
 
   protected:
 
-    void calculateMPCost();
+    void calculateActionCost();
+    void calculateMPCost( uint8_t costArrayIndex );
     void subtractCostFromCaster();
 
     /*!
@@ -98,6 +109,8 @@ namespace Sapphire::Action
 
     Common::ActionCostType m_costType;
     uint16_t m_cost;
+
+    ActionCostArray m_actionCost;
 
     uint64_t m_startTime;
     uint32_t m_castTime;
