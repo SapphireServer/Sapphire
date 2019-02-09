@@ -27,6 +27,9 @@ namespace Sapphire::Action
     Common::HandleActionType getType() const;
     void setType( Common::HandleActionType type );
 
+    void setPos( Common::FFXIVARR_POSITION3 pos );
+    Common::FFXIVARR_POSITION3 getPos() const;
+
     void setTargetChara( Entity::CharaPtr chara );
     Entity::CharaPtr getTargetChara() const;
     Entity::CharaPtr getActionSource() const;
@@ -43,11 +46,25 @@ namespace Sapphire::Action
      */
     bool isCastedAction() const;
 
+    /*!
+     * @brief Starts the cast. Finishes it immediately if there is no cast time (weaponskills).
+     */
     void start();
 
     void buildEffectPacket();
 
+    /*!
+     * @brief Damages a target and adds the effect entry
+     * @param amount The amount of damage the target takes
+     * @param chara The chara to inflict damage upon
+     * @param aspect The aspect of the damage
+     */
     void damageTarget( uint32_t amount, Entity::Chara& chara, Common::ActionAspect aspect = Common::ActionAspect::Unaspected );
+    /*!
+     * @brief Heals a target and adds the effect entry
+     * @param amount Amount of healing to apply
+     * @param chara Chara to receive healing
+     */
     void healTarget( uint32_t amount, Entity::Chara& chara );
 
     virtual void onStart();
@@ -92,6 +109,8 @@ namespace Sapphire::Action
     bool m_bInterrupt;
 
     FrameworkPtr m_pFw;
+
+    Common::FFXIVARR_POSITION3 m_pos;
 
     std::array< EffectPacketData, MAX_ACTION_EFFECT_PACKET_IDENT > m_effects;
   };

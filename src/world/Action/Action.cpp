@@ -27,7 +27,8 @@ Sapphire::Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId,
                                   m_pSource( std::move( caster ) ),
                                   m_pFw( std::move( fw ) ),
                                   m_id( actionId ),
-                                  m_startTime( 0 )
+                                  m_startTime( 0 ),
+                                  m_bInterrupt( false )
 {
   m_castTime = static_cast< uint32_t >( action->cast100ms ) * 100;
 
@@ -48,6 +49,16 @@ Sapphire::Common::HandleActionType Sapphire::Action::Action::getType() const
 void Sapphire::Action::Action::setType( Sapphire::Common::HandleActionType type )
 {
   m_type = type;
+}
+
+void Sapphire::Action::Action::setPos( Sapphire::Common::FFXIVARR_POSITION3 pos )
+{
+  m_pos = pos;
+}
+
+Sapphire::Common::FFXIVARR_POSITION3 Sapphire::Action::Action::getPos() const
+{
+  return m_pos;
 }
 
 void Sapphire::Action::Action::setTargetChara( Sapphire::Entity::CharaPtr chara )

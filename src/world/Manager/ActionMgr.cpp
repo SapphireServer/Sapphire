@@ -24,6 +24,9 @@ void World::Manager::ActionMgr::handleAoEPlayerAction( Entity::Player& player, u
 
   auto action = Action::make_Action( player.getAsPlayer(), actionId, actionData, framework() );
   action->setType( static_cast< Common::HandleActionType >( type ) );
+  action->setPos( pos );
+
+  bootstrapAction( player, action, *actionData );
 }
 
 void World::Manager::ActionMgr::handleTargetedPlayerAction( Entity::Player& player, uint8_t type,
