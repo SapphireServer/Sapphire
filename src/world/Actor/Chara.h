@@ -180,8 +180,6 @@ namespace Sapphire::Entity
 
     Common::ClassJob getClass() const;
 
-    uint8_t getClassAsInt() const;
-
     void setClass( Common::ClassJob classJob );
 
     void setTargetId( uint64_t targetId );
