@@ -591,6 +591,17 @@ namespace Sapphire::Common
     ShowItemName = 2,
   };
 
+  struct EffectEntry
+  {
+    Common::ActionEffectType effectType;
+    Common::ActionHitSeverityType hitSeverity;
+    uint8_t param;
+    int8_t bonusPercent; // shows an additional percentage in the battle log, will not change the damage number sent & shown
+    uint8_t valueMultiplier;      // This multiplies whatever value is in the 'value' param by 10. Possibly a workaround for big numbers
+    uint8_t flags;
+    int16_t value;
+  };
+
   enum class ActionCollisionType : uint8_t
   {
     None,
