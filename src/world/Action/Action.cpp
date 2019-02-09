@@ -30,6 +30,9 @@ Sapphire::Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId,
                                   m_startTime( 0 )
 {
   m_castTime = static_cast< uint32_t >( action->cast100ms ) * 100;
+
+  m_costType = static_cast< Common::ActionCostType >( action->costType );
+  m_cost = action->cost;
 }
 
 uint32_t Sapphire::Action::Action::getId() const
