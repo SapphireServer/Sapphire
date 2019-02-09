@@ -35,7 +35,7 @@ void Sapphire::Network::GameConnection::actionHandler( FrameworkPtr pFw,
     return;
 
   auto actionMgr = pFw->get< World::Manager::ActionMgr >();
-  actionMgr->handleTargetedPlayerAction( player, type, action, targetId );
+  actionMgr->handleTargetedPlayerAction( player, type, actionId, action, targetId );
 
   player.sendDebug( "Skill type: {0}, sequence: {1}, actionId: {2}, targetId: {3}", type, sequence, actionId, targetId );
 }
@@ -61,7 +61,7 @@ void Sapphire::Network::GameConnection::aoeActionHandler( FrameworkPtr pFw,
     return;
 
   auto actionMgr = pFw->get< World::Manager::ActionMgr >();
-  actionMgr->handleAoEPlayerAction( player, type, action, pos );
+  actionMgr->handleAoEPlayerAction( player, type, actionId, action, pos );
 
   player.sendDebug( "Skill type: {0}, sequence: {1}, actionId: {2}, x:{3}, y:{4}, z:{5}",
                     type, sequence, actionId, pos.x, pos.y, pos.z );
