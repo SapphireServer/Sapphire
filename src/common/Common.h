@@ -525,8 +525,7 @@ namespace Sapphire::Common
 
   };
 
-  enum struct ActionAspect :
-    uint8_t
+  enum struct ActionAspect : uint8_t
   {
     None = 0,   // Doesn't imply unaspected
     Fire = 1,
