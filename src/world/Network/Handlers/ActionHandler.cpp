@@ -25,19 +25,53 @@ void Sapphire::Network::GameConnection::actionHandler( FrameworkPtr pFw,
   const auto sequence = packet.data().sequence;
   const auto targetId = packet.data().targetId;
 
+  player.sendDebug( "Skill type: {0}, sequence: {1}, actionId: {2}, targetId: {3}", type, sequence, actionId, targetId );
+
   auto exdData = m_pFw->get< Data::ExdDataGenerated >();
   assert( exdData );
 
-  auto action = exdData->get< Data::Action >( actionId );
+  switch( type )
+  {
+    default:
+    {
+      player.sendDebug( "Skill type {0} not supported. Defaulting to normal action", type );
+    }
+    case Common::SkillType::Normal:
+    {
+      auto action = exdData->get< Data::Action >( actionId );
 
-  // ignore invalid actions
-  if( !action )
-    return;
+      // ignore invalid actions
+      if( !action )
+        return;
 
-  auto actionMgr = pFw->get< World::Manager::ActionMgr >();
-  actionMgr->handleTargetedPlayerAction( player, type, actionId, action, targetId );
+      auto actionMgr = pFw->get< World::Manager::ActionMgr >();
+      actionMgr->handleTargetedPlayerAction( player, actionId, action, targetId );
+      break;
+    }
 
-  player.sendDebug( "Skill type: {0}, sequence: {1}, actionId: {2}, targetId: {3}", type, sequence, actionId, targetId );
+    case Common::SkillType::ItemAction:
+    {
+      auto item = exdData->get< Data::Item >( actionId );
+      if( !item )
+        return;
+
+      if( item->itemAction == 0 )
+        return;
+
+      player.sendDebug( "Got itemaction for act: {0}", item->itemAction );
+
+      break;
+    }
+
+    case Common::SkillType::MountSkill:
+    {
+
+      break;
+    }
+  }
+
+
+
 }
 
 void Sapphire::Network::GameConnection::aoeActionHandler( FrameworkPtr pFw,
@@ -51,6 +85,16 @@ void Sapphire::Network::GameConnection::aoeActionHandler( FrameworkPtr pFw,
   const auto sequence = packet.data().sequence;
   const auto pos = packet.data().pos;
 
+  // todo: find out if there are any other action types which actually use this handler
+  if( type != Common::SkillType::Normal )
+  {
+    player.sendDebug( "Skill type {0} not supported by aoe action handler!", type );
+    return;
+  }
+
+  player.sendDebug( "Skill type: {0}, sequence: {1}, actionId: {2}, x:{3}, y:{4}, z:{5}",
+                    type, sequence, actionId, pos.x, pos.y, pos.z );
+
   auto exdData = m_pFw->get< Data::ExdDataGenerated >();
   assert( exdData );
 
@@ -61,8 +105,5 @@ void Sapphire::Network::GameConnection::aoeActionHandler( FrameworkPtr pFw,
     return;
 
   auto actionMgr = pFw->get< World::Manager::ActionMgr >();
-  actionMgr->handleAoEPlayerAction( player, type, actionId, action, pos );
-
-  player.sendDebug( "Skill type: {0}, sequence: {1}, actionId: {2}, x:{3}, y:{4}, z:{5}",
-                    type, sequence, actionId, pos.x, pos.y, pos.z );
+  actionMgr->handleAoEPlayerAction( player, actionId, action, pos );
 }
