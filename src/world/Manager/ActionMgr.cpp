@@ -27,7 +27,7 @@ void World::Manager::ActionMgr::handleTargetedPlayerAction( Entity::Player& play
 {
   player.sendDebug( "got act: {0}", actionData->name );
 
-  auto action = Action::make_Action( player.getAsPlayer(), nullptr, actionId, actionData, framework() );
+  auto action = Action::make_Action( player.getAsPlayer(), actionId, actionData, framework() );
   action->setType( static_cast< Common::ActionType >( type ) );
 
   bootstrapAction( player, action, *actionData );
