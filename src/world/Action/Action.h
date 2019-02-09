@@ -79,6 +79,9 @@ namespace Sapphire::Action
     uint32_t m_id;
     Common::HandleActionType m_type;
 
+    Common::ActionCostType m_costType;
+    uint16_t m_cost;
+
     uint64_t m_startTime;
     uint32_t m_castTime;
 

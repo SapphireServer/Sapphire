@@ -538,6 +538,14 @@ namespace Sapphire::Common
     Unaspected = 7    // Doesn't imply magical unaspected damage - could be unaspected physical
   };
 
+  enum ActionCostType : uint8_t
+  {
+    MagicPoints = 3,
+    TacticsPoints = 5,
+    ClassGaugeWAR = 22,
+    AetherflowStack = 30,
+  };
+
   enum class ActionType : int8_t
   {
     WeaponOverride = -1, // Needs more investigation (takes the damage type of the equipped weapon)?
