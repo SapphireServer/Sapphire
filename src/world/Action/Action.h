@@ -3,6 +3,7 @@
 
 #include <Common.h>
 #include "ForwardsZone.h"
+#include <array>
 
 namespace Sapphire::Data
 {
