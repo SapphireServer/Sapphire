@@ -24,8 +24,8 @@ namespace Sapphire::Action
 
     uint32_t getId() const;
 
-    Common::ActionType getType() const;
-    void setType( Common::ActionType type );
+    Common::HandleActionType getType() const;
+    void setType( Common::HandleActionType type );
 
     void setTargetChara( Entity::CharaPtr chara );
     Entity::CharaPtr getTargetChara() const;
@@ -55,7 +55,7 @@ namespace Sapphire::Action
   protected:
     uint32_t m_id;
 
-    Common::ActionType m_type;
+    Common::HandleActionType m_type;
 
     uint64_t m_startTime;
     uint32_t m_castTime;

@@ -37,12 +37,12 @@ uint32_t Sapphire::Action::Action::getId() const
   return m_id;
 }
 
-Sapphire::Common::ActionType Sapphire::Action::Action::getType() const
+Sapphire::Common::HandleActionType Sapphire::Action::Action::getType() const
 {
   return m_type;
 }
 
-void Sapphire::Action::Action::setType( Sapphire::Common::ActionType type )
+void Sapphire::Action::Action::setType( Sapphire::Common::HandleActionType type )
 {
   m_type = type;
 }
