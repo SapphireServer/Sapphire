@@ -592,6 +592,11 @@ namespace Sapphire::Common
     CritDirectHitDamage = 3
   };
 
+  enum ItemActionType : uint16_t
+  {
+    ItemActionVFX = 944,
+  };
+
   enum ActionEffectDisplayType : uint8_t
   {
     HideActionName = 0,
