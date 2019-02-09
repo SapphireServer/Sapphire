@@ -108,12 +108,6 @@ Sapphire::Common::ClassJob Sapphire::Entity::Chara::getClass() const
   return m_class;
 }
 
-/*! \return current class or job as int32_t ( this feels pointless ) */
-uint8_t Sapphire::Entity::Chara::getClassAsInt() const
-{
-  return static_cast< uint8_t >( m_class );
-}
-
 /*! \param ClassJob to set */
 void Sapphire::Entity::Chara::setClass( Common::ClassJob classJob )
 {
