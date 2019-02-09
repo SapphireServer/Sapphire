@@ -45,6 +45,11 @@ namespace Sapphire::Action
 
     void start();
 
+    void buildEffectPacket();
+
+    void damageTarget( uint32_t amount, Entity::Chara& chara, Common::ActionAspect aspect = Common::ActionAspect::Unaspected );
+    void healTarget( uint32_t amount, Entity::Chara& chara );
+
     virtual void onStart();
     virtual void onFinish();
     virtual void onInterrupt();
@@ -53,8 +58,25 @@ namespace Sapphire::Action
     virtual bool update();
 
   protected:
-    uint32_t m_id;
 
+    /*!
+     * @brief Some actions are capable of both healing and dealing damage. This identifies them.
+     */
+    enum EffectPacketIdentity : uint8_t
+    {
+      DamageEffect,
+      HealingEffect,
+
+      MAX_ACTION_EFFECT_PACKET_IDENT
+    };
+
+    struct EffectPacketData
+    {
+      std::vector< Common::EffectEntry > m_entries;
+      std::vector< uint32_t > m_hitActors;
+    };
+
+    uint32_t m_id;
     Common::HandleActionType m_type;
 
     uint64_t m_startTime;
@@ -68,8 +90,7 @@ namespace Sapphire::Action
 
     FrameworkPtr m_pFw;
 
-
-
+    std::array< EffectPacketData, MAX_ACTION_EFFECT_PACKET_IDENT > m_effects;
   };
 }
 

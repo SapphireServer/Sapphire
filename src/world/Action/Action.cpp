@@ -179,3 +179,70 @@ void Sapphire::Action::Action::onFinish()
     pScriptMgr->onCastFinish( *pPlayer, m_pTarget, m_id );
   }
 }
+
+void Sapphire::Action::Action::buildEffectPacket()
+{
+  for( int i = 0; i < EffectPacketIdentity::MAX_ACTION_EFFECT_PACKET_IDENT; ++i )
+  {
+    auto& packetData = m_effects[ static_cast< EffectPacketIdentity >( i ) ];
+
+    // todo: this
+  }
+}
+
+void Sapphire::Action::Action::damageTarget( uint32_t amount, Entity::Chara& chara,
+                                             Common::ActionAspect aspect )
+{
+  Common::EffectEntry entry{};
+
+  // todo: handle cases where the action misses/is blocked?
+  entry.effectType = Common::ActionEffectType::Damage;
+
+  // todo: handle crits
+  entry.hitSeverity = Common::ActionHitSeverityType::NormalDamage;
+
+  // todo: handle > 65535 damage values, not sure if this is right?
+  if( amount > 65535 )
+  {
+    entry.value = static_cast< int16_t >( amount / 10 );
+    // todo: rename this? need to confirm how it works again
+    entry.bonusPercent = 1;
+  }
+  else
+    entry.value = static_cast< int16_t >( amount );
+
+  // todo: aspected damage?
+  chara.takeDamage( amount );
+
+  m_effects[ EffectPacketIdentity::DamageEffect ].m_entries.emplace_back( entry );
+
+  // todo: make sure that we don't add the same actor more than once
+  m_effects[ EffectPacketIdentity::DamageEffect ].m_hitActors.emplace_back( chara.getId() );
+}
+
+void Sapphire::Action::Action::healTarget( uint32_t amount, Entity::Chara& chara )
+{
+  Common::EffectEntry entry{};
+
+  entry.effectType = Common::ActionEffectType::Heal;
+
+  // todo: handle crits
+  entry.hitSeverity = Common::ActionHitSeverityType::NormalHeal;
+
+  // todo: handle > 65535 healing values, not sure if this is right?
+  if( amount > 65535 )
+  {
+    entry.value = static_cast< int16_t >( amount / 10 );
+    // todo: rename this? need to confirm how it works again
+    entry.bonusPercent = 1;
+  }
+  else
+    entry.value = static_cast< int16_t >( amount );
+
+  chara.heal( amount );
+
+  m_effects[ EffectPacketIdentity::HealingEffect ].m_entries.emplace_back( entry );
+
+  // todo: make sure that we don't add the same actor more than once
+  m_effects[ EffectPacketIdentity::HealingEffect ].m_hitActors.emplace_back( chara.getId() );
+}
