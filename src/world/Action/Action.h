@@ -74,6 +74,9 @@ namespace Sapphire::Action
 
   protected:
 
+    void calculateMPCost();
+    void subtractCostFromCaster();
+
     /*!
      * @brief Some actions are capable of both healing and dealing damage. This identifies them.
      */
