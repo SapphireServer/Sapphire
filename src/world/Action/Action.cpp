@@ -127,14 +127,14 @@ void Sapphire::Action::Action::onStart()
   {
     m_pSource->getAsPlayer()->sendDebug( "onStart()" );
 
-    auto castPacket = makeZonePacket< FFXIVIpcActorCast >( getId() );
+    auto castPacket = makeZonePacket< Server::FFXIVIpcActorCast >( getId() );
 
     castPacket->data().action_id = m_id;
     castPacket->data().skillType = Common::SkillType::Normal;
     castPacket->data().unknown_1 = m_id;
     // This is used for the cast bar above the target bar of the caster.
     castPacket->data().cast_time = m_castTime / 1000.f;
-    castPacket->data().target_id = m_pTarget->getId();
+    castPacket->data().target_id = m_targetId;
 
     m_pSource->sendToInRangeSet( castPacket, true );
     m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::Casting );
