@@ -1143,15 +1143,15 @@ struct FFXIVIpcCurrencyCrystalInfo :
 struct FFXIVIpcInventoryTransactionFinish :
   FFXIVIpcBasePacket< InventoryTransactionFinish >
 {
-  uint32_t transactionId;
-  uint32_t transactionId1;
+  uint32_t sequenceId;
+  uint32_t sequenceId1;
   uint64_t padding;
 };
 
 struct FFXIVIpcInventoryTransaction :
   FFXIVIpcBasePacket< InventoryTransaction >
 {
-  uint32_t transactionId;
+  uint32_t sequence;
   uint8_t type;
   uint8_t padding;
   uint16_t padding1;
