@@ -6,6 +6,7 @@
 #include "Actor/Player.h"
 
 #include <Exd/ExdDataGenerated.h>
+#include "Framework.h"
 
 using namespace Sapphire;
 
@@ -20,6 +21,9 @@ void World::Manager::ActionMgr::handleAoEPlayerAction( Entity::Player& player, u
                                                        Common::FFXIVARR_POSITION3 pos )
 {
   player.sendDebug( "got aoe act: {0}", actionData->name );
+
+  auto action = Action::make_Action( player.getAsPlayer(), actionId, actionData, framework() );
+  action->setType( static_cast< Common::HandleActionType >( type ) );
 }
 
 void World::Manager::ActionMgr::handleTargetedPlayerAction( Entity::Player& player, uint8_t type,
@@ -68,7 +72,22 @@ bool World::Manager::ActionMgr::canPlayerUseAction( Entity::Player& player,
   if( actionData.classJob == -1 )
     return false;
 
-  // todo: check class/job reqs
+  if( player.getLevel() < actionData.classJobLevel )
+    return false;
+
+  if( player.getClass() != static_cast< Common::ClassJob >( actionData.classJob ) )
+  {
+    // check if not a base class action
+    auto exdData = framework()->get< Data::ExdDataGenerated >();
+    assert( exdData );
+
+    auto classJob = exdData->get< Data::ClassJob >( static_cast< uint8_t >( player.getClass() ) );
+    if( !classJob )
+      return false;
+
+    if( classJob->classJobParent != actionData.classJob )
+      return false;
+  }
 
   // todo: min tp
   // todo: min mp
