@@ -2,7 +2,6 @@
 
 #include "Action/Action.h"
 #include "Script/ScriptMgr.h"
-
 #include "Actor/Player.h"
 
 #include <Exd/ExdDataGenerated.h>
@@ -35,6 +34,17 @@ void World::Manager::ActionMgr::handleTargetedPlayerAction( Entity::Player& play
   player.sendDebug( "got act: {0}", actionData->name );
 
   auto action = Action::make_Action( player.getAsPlayer(), actionId, actionData, framework() );
+
+  if( targetId != player.getId() )
+  {
+    auto target = player.lookupTargetById( targetId );
+    if( auto chara = target->getAsChara() )
+      action->setTargetChara( chara );
+  }
+  else
+  {
+    // maybe an eobj? wat do?
+  }
 
   bootstrapAction( player, action, *actionData );
 }
@@ -112,10 +122,11 @@ bool World::Manager::ActionMgr::canPlayerUseAction( Entity::Player& player,
       return false;
   }
 
-  // todo: min tp
-  // todo: min mp
-
-  // todo: script callback for action conditionals?
+  auto& actionCost = currentAction.getCostArray();
+  for( uint8_t i = 0; i < actionCost.size(); ++i )
+  {
+    // todo: validate costs/conditionals here
+  }
 
   return true;
 }
