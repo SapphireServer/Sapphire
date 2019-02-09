@@ -14,6 +14,7 @@
 namespace Sapphire::Network::Packets
 {
   class GamePacket;
+  class PacketContainer;
 }
 
 namespace Sapphire::Network
