@@ -47,28 +47,6 @@ uint32_t Sapphire::Action::Action::getId() const
   return m_id;
 }
 
-void Sapphire::Action::Action::subtractCostFromCaster()
-{
-  if( !m_pSource->isPlayer() )
-    return;
-
-  auto player = m_pSource->getAsPlayer();
-
-  switch( m_costType )
-  {
-    case Common::ActionCostType::MagicPoints:
-    {
-
-      break;
-    }
-    case Common::ActionCostType::TacticsPoints:
-    {
-
-      break;
-    }
-  }
-}
-
 void Sapphire::Action::Action::setPos( Sapphire::Common::FFXIVARR_POSITION3 pos )
 {
   m_pos = pos;

@@ -86,7 +86,6 @@ namespace Sapphire::Action
 
     void calculateActionCost();
     void calculateMPCost( uint8_t costArrayIndex );
-    void subtractCostFromCaster();
 
     /*!
      * @brief Some actions are capable of both healing and dealing damage. This identifies them.
