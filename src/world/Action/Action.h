@@ -49,8 +49,6 @@ namespace Sapphire::Action
 
     /*!
      * @brief Checks if the action *may* target a resident instead of an actor
-     * This checks if m_pTarget is nullptr but m_targetId is set
-     *
      * @return true if the target *may* be a resident and not an actor, otherwise false.
      */
     bool hasResidentTarget() const;
@@ -69,9 +67,9 @@ namespace Sapphire::Action
      * @brief Damages a target and adds the effect entry
      * @param potency The amount of damage the target takes
      * @param chara The chara to inflict damage upon
-     * @param aspect The aspect of the damage
      */
-    void damageTarget( uint32_t potency, Entity::Chara& chara, Common::ActionAspect aspect = Common::ActionAspect::None );
+    void damageTarget( uint32_t potency, Entity::Chara& chara );
+
     /*!
      * @brief Heals a target and adds the effect entry
      * @param potency Amount of healing to apply
@@ -124,6 +122,7 @@ namespace Sapphire::Action
     uint8_t m_cooldownGroup;
     int8_t m_range;
     uint8_t m_effectRange;
+    Common::ActionAspect m_aspect;
 
     Entity::CharaPtr m_pSource;
     Entity::CharaPtr m_pTarget;

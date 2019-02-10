@@ -21,7 +21,7 @@ public:
   void onCharaHit( Sapphire::Entity::Chara& sourceActor, Sapphire::Entity::Chara& hitActor,
                    Sapphire::Action::Action& currentAction ) override
   {
-    currentAction.damageTarget( 100, hitActor );
+    currentAction.damageTarget( 150, hitActor );
   }
 
 };

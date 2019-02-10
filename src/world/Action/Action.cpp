@@ -37,6 +37,7 @@ Sapphire::Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId,
   m_cooldownGroup = action->cooldownGroup;
   m_range = action->range;
   m_effectRange = action->effectRange;
+  m_aspect = static_cast< Common::ActionAspect >( action->aspect );
 
   // a default range is set by the game for the class/job
   if( m_range == -1 )
@@ -312,8 +313,7 @@ void Sapphire::Action::Action::buildEffectPackets()
   }
 }
 
-void Sapphire::Action::Action::damageTarget( uint32_t potency, Entity::Chara& chara,
-                                             Common::ActionAspect aspect )
+void Sapphire::Action::Action::damageTarget( uint32_t potency, Entity::Chara& chara )
 {
   // todo: scale potency into damage from stats
 
