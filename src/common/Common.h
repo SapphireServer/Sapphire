@@ -639,6 +639,13 @@ namespace Sapphire::Common
     Unknown3
   };
 
+  enum class ActionInterruptType : uint8_t
+  {
+    None,
+    RegularInterrupt,
+    DamageInterrupt,
+  };
+
   enum HandleActionType : uint8_t
   {
     Event,

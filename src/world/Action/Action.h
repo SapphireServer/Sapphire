@@ -24,13 +24,6 @@ namespace Sapphire::Action
       uint16_t m_cost;
     };
 
-    enum class ActionInterruptType : uint8_t
-    {
-      None,
-      RegularInterrupt,
-      DamageInterrupt,
-    };
-
     using ActionCostArray = std::array< ActionCostEntry, 2 >;
 
     Action();
@@ -48,7 +41,7 @@ namespace Sapphire::Action
     Entity::CharaPtr getActionSource() const;
 
     bool isInterrupted() const;
-    void setInterrupted( ActionInterruptType type );
+    void setInterrupted( Common::ActionInterruptType type );
 
     uint32_t getCastTime() const;
     void setCastTime( uint32_t castTime );
@@ -127,7 +120,7 @@ namespace Sapphire::Action
     Entity::CharaPtr m_pTarget;
     uint64_t m_targetId;
 
-    ActionInterruptType m_interruptType;
+    Common::ActionInterruptType m_interruptType;
 
     FrameworkPtr m_pFw;
 

@@ -28,7 +28,7 @@ Sapphire::Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId,
                                   m_pFw( std::move( fw ) ),
                                   m_id( actionId ),
                                   m_startTime( 0 ),
-                                  m_interruptType( ActionInterruptType::None )
+                                  m_interruptType( Common::ActionInterruptType::None )
 {
   m_castTime = static_cast< uint32_t >( action->cast100ms * 100 );
   m_cooldownTime = static_cast< uint16_t >( action->recast100ms * 100 );
@@ -74,10 +74,10 @@ Sapphire::Entity::CharaPtr Sapphire::Action::Action::getTargetChara() const
 
 bool Sapphire::Action::Action::isInterrupted() const
 {
-  return m_interruptType != ActionInterruptType::None;
+  return m_interruptType != Common::ActionInterruptType::None;
 }
 
-void Sapphire::Action::Action::setInterrupted( ActionInterruptType type )
+void Sapphire::Action::Action::setInterrupted( Common::ActionInterruptType type )
 {
   m_interruptType = type;
 }
@@ -174,7 +174,7 @@ void Sapphire::Action::Action::onInterrupt()
     // reset state flag
     //player->unsetStateFlag( PlayerStateFlag::Occupied1 );
     player->unsetStateFlag( PlayerStateFlag::Casting );
-    
+
     player->sendDebug( "onInterrupt()" );
   }
 
