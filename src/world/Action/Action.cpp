@@ -28,10 +28,11 @@ Sapphire::Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId,
                                   m_pFw( std::move( fw ) ),
                                   m_id( actionId ),
                                   m_startTime( 0 ),
-                                  m_interruptType( Common::ActionInterruptType::None )
+                                  m_interruptType( Common::ActionInterruptType::None ),
+                                  m_hasResidentTarget( false )
 {
   m_castTime = static_cast< uint32_t >( action->cast100ms * 100 );
-  m_cooldownTime = static_cast< uint16_t >( action->recast100ms * 100 );
+  m_recastTime = static_cast< uint16_t >( action->recast100ms * 100 );
   m_cooldownGroup = action->cooldownGroup;
 
   m_actionCost.fill( { Common::ActionCostType::None, 0 } );
@@ -65,6 +66,17 @@ void Sapphire::Action::Action::setTargetChara( Sapphire::Entity::CharaPtr chara 
 
   m_pTarget = chara;
   m_targetId = chara->getId();
+}
+
+void Sapphire::Action::Action::setResidentTargetId( uint64_t targetId )
+{
+  m_targetId = targetId;
+  m_hasResidentTarget = true;
+}
+
+bool Sapphire::Action::Action::hasResidentTarget() const
+{
+  return m_hasResidentTarget;
 }
 
 Sapphire::Entity::CharaPtr Sapphire::Action::Action::getTargetChara() const
@@ -121,6 +133,11 @@ bool Sapphire::Action::Action::update()
     return true;
   }
 
+  if( !hasResidentTarget() )
+  {
+    // todo: check if the target is still in range
+  }
+
   uint64_t currTime = Util::getTimeMs();
 
   if( !isCastedAction() || std::difftime( currTime, m_startTime ) > m_castTime )
@@ -136,6 +153,12 @@ void Sapphire::Action::Action::onStart()
 {
   assert( m_pSource );
 
+  auto player = m_pSource->getAsPlayer();
+  if( player )
+  {
+    player->sendDebug( "onStart()" );
+  }
+
   if( isCastedAction() )
   {
     auto castPacket = makeZonePacket< Server::FFXIVIpcActorCast >( getId() );
@@ -149,10 +172,9 @@ void Sapphire::Action::Action::onStart()
 
     m_pSource->sendToInRangeSet( castPacket, true );
 
-    if( auto player = m_pSource->getAsPlayer() )
+    if( player )
     {
       player->setStateFlag( PlayerStateFlag::Casting );
-      player->sendDebug( "onStart()" );
     }
   }
 }
@@ -208,7 +230,15 @@ void Sapphire::Action::Action::onFinish()
                                             0x219, m_id, m_id, m_id, m_id );
     m_pSource->sendToInRangeSet( control, true );*/
 
+  }
+
+  if( !hasResidentTarget() )
+  {
     pScriptMgr->onCastFinish( *pPlayer, m_pTarget, m_id );
+  }
+  else
+  {
+    pScriptMgr->onEObjHit( *pPlayer, m_targetId );
   }
 }
 

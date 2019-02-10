@@ -38,12 +38,16 @@ void World::Manager::ActionMgr::handleTargetedPlayerAction( Entity::Player& play
   if( targetId != player.getId() )
   {
     auto target = player.lookupTargetById( targetId );
-    if( auto chara = target->getAsChara() )
+    if( !target )
+    {
+      // an eobj?
+      player.sendDebug( "Unable to find actor for targetId#{0}, passing through to event scripts...", targetId );
+      action->setResidentTargetId( targetId );
+    }
+    else if( auto chara = target->getAsChara() )
+    {
       action->setTargetChara( chara );
-  }
-  else
-  {
-    // maybe an eobj? wat do?
+    }
   }
 
   bootstrapAction( player, action, *actionData );

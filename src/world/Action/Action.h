@@ -37,6 +37,7 @@ namespace Sapphire::Action
     Common::FFXIVARR_POSITION3 getPos() const;
 
     void setTargetChara( Entity::CharaPtr chara );
+    void setResidentTargetId( uint64_t targetId );
     Entity::CharaPtr getTargetChara() const;
     Entity::CharaPtr getActionSource() const;
 
@@ -45,6 +46,14 @@ namespace Sapphire::Action
 
     uint32_t getCastTime() const;
     void setCastTime( uint32_t castTime );
+
+    /*!
+     * @brief Checks if the action *may* target a resident instead of an actor
+     * This checks if m_pTarget is nullptr but m_targetId is set
+     *
+     * @return true if the target *may* be a resident and not an actor, otherwise false.
+     */
+    bool hasResidentTarget() const;
 
     const ActionCostArray& getCostArray() const;
 
@@ -113,12 +122,13 @@ namespace Sapphire::Action
 
     uint64_t m_startTime;
     uint32_t m_castTime;
-    uint16_t m_cooldownTime;
+    uint16_t m_recastTime;
     uint8_t m_cooldownGroup;
 
     Entity::CharaPtr m_pSource;
     Entity::CharaPtr m_pTarget;
     uint64_t m_targetId;
+    bool m_hasResidentTarget;
 
     Common::ActionInterruptType m_interruptType;
 
