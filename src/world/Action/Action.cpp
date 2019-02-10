@@ -35,6 +35,23 @@ Sapphire::Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId,
   m_castTime = static_cast< uint32_t >( action->cast100ms * 100 );
   m_recastTime = static_cast< uint16_t >( action->recast100ms * 100 );
   m_cooldownGroup = action->cooldownGroup;
+  m_range = action->range;
+  m_effectRange = action->effectRange;
+
+  // a default range is set by the game for the class/job
+  if( m_range == -1 )
+  {
+    switch( static_cast< Common::ClassJob >( action->classJob ) )
+    {
+      case Common::ClassJob::Bard:
+      case Common::ClassJob::Archer:
+        m_range = 25;
+
+      // anything that isnt ranged
+      default:
+        m_range = 3;
+    }
+  }
 
   m_actionCost.fill( { Common::ActionCostType::None, 0 } );
 
@@ -67,6 +84,7 @@ void Sapphire::Action::Action::setTargetChara( Sapphire::Entity::CharaPtr chara 
 
   m_pTarget = chara;
   m_targetId = chara->getId();
+  m_hasResidentTarget = false;
 }
 
 void Sapphire::Action::Action::setResidentTargetId( uint64_t targetId )
