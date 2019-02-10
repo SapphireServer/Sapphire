@@ -24,6 +24,8 @@ void Sapphire::Network::GameConnection::actionHandler( FrameworkPtr pFw,
   const auto actionId = packet.data().actionId;
   const auto sequence = packet.data().sequence;
   const auto targetId = packet.data().targetId;
+  const auto itemSourceSlot = packet.data().itemSourceSlot;
+  const auto itemSourceContainer = packet.data().itemSourceContainer;
 
   player.sendDebug( "Skill type: {0}, sequence: {1}, actionId: {2}, targetId: {3}", type, sequence, actionId, targetId );
 
@@ -63,7 +65,7 @@ void Sapphire::Network::GameConnection::actionHandler( FrameworkPtr pFw,
       if( !itemAction )
         return;
 
-      actionMgr->handleItemAction( player, actionId, itemAction );
+      actionMgr->handleItemAction( player, actionId, itemAction, itemSourceSlot, itemSourceContainer );
 
       break;
     }

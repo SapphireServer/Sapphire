@@ -279,6 +279,10 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     }
     case ClientTriggerType::DyeItem: // Dye item
     {
+      // param11 = item to dye container
+      // param12 = item to dye slot
+      // param2 = dye bag container
+      // param4 = dye bag slot
       break;
     }
     case ClientTriggerType::DirectorInitFinish: // Director init finish
