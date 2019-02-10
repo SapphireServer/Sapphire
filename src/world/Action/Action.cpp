@@ -11,6 +11,7 @@
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 #include "Network/PacketWrappers/ActorControlPacket144.h"
+#include <Network/PacketWrappers/EffectPacket.h>
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network;
@@ -252,19 +253,37 @@ void Sapphire::Action::Action::onFinish()
     return;
   }
 
+  buildEffectPackets();
 }
 
-void Sapphire::Action::Action::buildEffectPacket()
+void Sapphire::Action::Action::buildEffectPackets()
 {
   for( int i = 0; i < EffectPacketIdentity::MAX_ACTION_EFFECT_PACKET_IDENT; ++i )
   {
     auto& packetData = m_effects[ static_cast< EffectPacketIdentity >( i ) ];
 
-    // todo: this
+    if( packetData.m_hitActors.size() == 1 )
+    {
+      // send normal effect
+      auto effectPacket = std::make_shared< Network::Packets::Server::EffectPacket >( m_pSource->getId(), m_pTarget->getId(), getId() );
+      effectPacket->setTargetActor( packetData.m_hitActors[ 0 ] );
+      effectPacket->setDisplayType( Common::ActionEffectDisplayType::ShowActionName );
+
+      for( auto& effect : packetData.m_entries )
+      {
+        effectPacket->addEffect( effect );
+      }
+
+      m_pSource->sendToInRangeSet( effectPacket, true );
+    }
+    else if( packetData.m_hitActors.size() > 1 )
+    {
+      // todo: aoe effects
+    }
   }
 }
 
-void Sapphire::Action::Action::damageTarget( uint32_t amount, Entity::Chara& chara,
+void Sapphire::Action::Action::damageTarget( uint32_t potency, Entity::Chara& chara,
                                              Common::ActionAspect aspect )
 {
   Common::EffectEntry entry{};
@@ -276,20 +295,20 @@ void Sapphire::Action::Action::damageTarget( uint32_t amount, Entity::Chara& cha
   entry.hitSeverity = Common::ActionHitSeverityType::NormalDamage;
 
   // todo: handle > 65535 damage values, not sure if this is right?
-  if( amount > 65535 )
+  if( potency > 65535 )
   {
-    entry.value = static_cast< int16_t >( amount / 10 );
+    entry.value = static_cast< int16_t >( potency / 10 );
     // todo: rename this? need to confirm how it works again
     entry.bonusPercent = 1;
   }
   else
-    entry.value = static_cast< int16_t >( amount );
+    entry.value = static_cast< int16_t >( potency );
 
   // todo: aspected damage?
-  chara.takeDamage( amount );
+  chara.takeDamage( potency );
 
   if( auto player = m_pSource->getAsPlayer() )
-    player->sendDebug( "hit actorId#{0} for damage: {1}", chara.getId(), amount );
+    player->sendDebug( "hit actorId#{0} for damage: {1}", chara.getId(), potency );
 
   m_effects[ EffectPacketIdentity::DamageEffect ].m_entries.emplace_back( entry );
 
@@ -297,7 +316,7 @@ void Sapphire::Action::Action::damageTarget( uint32_t amount, Entity::Chara& cha
   m_effects[ EffectPacketIdentity::DamageEffect ].m_hitActors.emplace_back( chara.getId() );
 }
 
-void Sapphire::Action::Action::healTarget( uint32_t amount, Entity::Chara& chara )
+void Sapphire::Action::Action::healTarget( uint32_t potency, Entity::Chara& chara )
 {
   Common::EffectEntry entry{};
 
@@ -307,19 +326,19 @@ void Sapphire::Action::Action::healTarget( uint32_t amount, Entity::Chara& chara
   entry.hitSeverity = Common::ActionHitSeverityType::NormalHeal;
 
   // todo: handle > 65535 healing values, not sure if this is right?
-  if( amount > 65535 )
+  if( potency > 65535 )
   {
-    entry.value = static_cast< int16_t >( amount / 10 );
+    entry.value = static_cast< int16_t >( potency / 10 );
     // todo: rename this? need to confirm how it works again
     entry.bonusPercent = 1;
   }
   else
-    entry.value = static_cast< int16_t >( amount );
+    entry.value = static_cast< int16_t >( potency );
 
-  chara.heal( amount );
+  chara.heal( potency );
 
   if( auto player = m_pSource->getAsPlayer() )
-    player->sendDebug( "hit actorId#{0} for heal: {1}", chara.getId(), amount );
+    player->sendDebug( "hit actorId#{0} for heal: {1}", chara.getId(), potency );
 
   m_effects[ EffectPacketIdentity::HealingEffect ].m_entries.emplace_back( entry );
 

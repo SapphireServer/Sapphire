@@ -68,21 +68,21 @@ namespace Sapphire::Action
      */
     void start();
 
-    void buildEffectPacket();
+    void buildEffectPackets();
 
     /*!
      * @brief Damages a target and adds the effect entry
-     * @param amount The amount of damage the target takes
+     * @param potency The amount of damage the target takes
      * @param chara The chara to inflict damage upon
      * @param aspect The aspect of the damage
      */
-    void damageTarget( uint32_t amount, Entity::Chara& chara, Common::ActionAspect aspect = Common::ActionAspect::None );
+    void damageTarget( uint32_t potency, Entity::Chara& chara, Common::ActionAspect aspect = Common::ActionAspect::None );
     /*!
      * @brief Heals a target and adds the effect entry
-     * @param amount Amount of healing to apply
+     * @param potency Amount of healing to apply
      * @param chara Chara to receive healing
      */
-    void healTarget( uint32_t amount, Entity::Chara& chara );
+    void healTarget( uint32_t potency, Entity::Chara& chara );
 
     virtual void onStart();
     virtual void onFinish();
