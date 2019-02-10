@@ -12,14 +12,14 @@ public:
   {
   }
 
-  void onCastFinish( Sapphire::Entity::Chara& source, Sapphire::Action::Action& currentAction ) override
+  void onCastFinish( Sapphire::Action::Action& currentAction ) override
   {
-    if( auto player = source.getAsPlayer() )
+    auto source = currentAction.getSourceChara();
+    if( auto player = source->getAsPlayer() )
       player->sendDebug( "cast finished" );
   }
 
-  void onCharaHit( Sapphire::Entity::Chara& sourceActor, Sapphire::Entity::Chara& hitActor,
-                   Sapphire::Action::Action& currentAction ) override
+  void onCharaHit( Sapphire::Action::Action& currentAction, Sapphire::Entity::Chara& hitActor ) override
   {
     currentAction.damageTarget( 150, hitActor );
   }

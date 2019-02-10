@@ -39,7 +39,7 @@ namespace Sapphire::Action
     void setTargetChara( Entity::CharaPtr chara );
     void setResidentTargetId( uint64_t targetId );
     Entity::CharaPtr getTargetChara() const;
-    Entity::CharaPtr getActionSource() const;
+    Entity::CharaPtr getSourceChara() const;
 
     bool isInterrupted() const;
     void setInterrupted( Common::ActionInterruptType type );

@@ -1,5 +1,6 @@
 #include <ScriptObject.h>
 #include <Actor/Player.h>
+#include <Action/Action.h>
 
 class ActionSprint3 :
   public Sapphire::ScriptAPI::ActionScript
@@ -10,11 +11,13 @@ public:
   {
   }
 
-  void onCastFinish( Sapphire::Entity::Chara& sourceActor, Sapphire::Action::Action& currentAction ) override
+  void onCastFinish( Sapphire::Action::Action& currentAction ) override
   {
-    if( !sourceActor.isPlayer() )
+    auto sourceChara = currentAction.getSourceChara();
+
+    if( !sourceChara->isPlayer() )
       return;
 
-    sourceActor.getAsPlayer()->addStatusEffectByIdIfNotExist( 50, 20000, sourceActor, 30 );
+    sourceChara->getAsPlayer()->addStatusEffectByIdIfNotExist( 50, 20000, *sourceChara, 30 );
   }
 };

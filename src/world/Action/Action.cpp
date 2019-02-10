@@ -129,7 +129,7 @@ bool Sapphire::Action::Action::hasCastTime() const
   return m_castTime > 0;
 }
 
-Sapphire::Entity::CharaPtr Sapphire::Action::Action::getActionSource() const
+Sapphire::Entity::CharaPtr Sapphire::Action::Action::getSourceChara() const
 {
   return m_pSource;
 }
@@ -194,7 +194,7 @@ void Sapphire::Action::Action::castStart()
   }
 
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  if( !pScriptMgr->onCastStart( *m_pSource, *this ) )
+  if( !pScriptMgr->onCastStart( *this ) )
   {
     // script not implemented
     castInterrupt();
@@ -249,7 +249,7 @@ void Sapphire::Action::Action::castInterrupt()
   }
 
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onCastInterrupt( *m_pSource, *this );
+  pScriptMgr->onCastInterrupt( *this );
 }
 
 void Sapphire::Action::Action::castFinish()
@@ -269,13 +269,13 @@ void Sapphire::Action::Action::castFinish()
 
   }
 
-  pScriptMgr->onCastFinish( *m_pSource, *this );
+  pScriptMgr->onCastFinish( *this );
 
   if( !hasResidentTarget() )
   {
     assert( m_pTarget );
     // todo: calculate final hit targets and call onCharaHit in action script
-    pScriptMgr->onCharaHit( *m_pSource, *m_pTarget, *this );
+    pScriptMgr->onCharaHit( *this, *m_pTarget );
   }
   else
   {
