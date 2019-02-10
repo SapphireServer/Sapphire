@@ -95,13 +95,6 @@ void Sapphire::Action::Action::setInterrupted( Common::ActionInterruptType type 
   m_interruptType = type;
 }
 
-void Sapphire::Action::Action::start()
-{
-  m_startTime = Util::getTimeMs();
-
-  onStart();
-}
-
 uint32_t Sapphire::Action::Action::getCastTime() const
 {
   return m_castTime;
@@ -112,7 +105,7 @@ void Sapphire::Action::Action::setCastTime( uint32_t castTime )
   m_castTime = castTime;
 }
 
-bool Sapphire::Action::Action::isCastedAction() const
+bool Sapphire::Action::Action::hasCastTime() const
 {
   return m_castTime > 0;
 }
@@ -130,7 +123,7 @@ bool Sapphire::Action::Action::update()
 
   if( isInterrupted() )
   {
-    onInterrupt();
+    castInterrupt();
     return true;
   }
 
@@ -141,26 +134,28 @@ bool Sapphire::Action::Action::update()
 
   uint64_t currTime = Util::getTimeMs();
 
-  if( !isCastedAction() || std::difftime( currTime, m_startTime ) > m_castTime )
+  if( !hasCastTime() || std::difftime( currTime, m_startTime ) > m_castTime )
   {
-    onFinish();
+    castFinish();
     return true;
   }
 
   return false;
 }
 
-void Sapphire::Action::Action::onStart()
+void Sapphire::Action::Action::castStart()
 {
   assert( m_pSource );
+
+  m_startTime = Util::getTimeMs();
 
   auto player = m_pSource->getAsPlayer();
   if( player )
   {
-    player->sendDebug( "onStart()" );
+    player->sendDebug( "castStart()" );
   }
 
-  if( isCastedAction() )
+  if( hasCastTime() )
   {
     auto castPacket = makeZonePacket< Server::FFXIVIpcActorCast >( getId() );
 
@@ -180,10 +175,26 @@ void Sapphire::Action::Action::onStart()
   }
 
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onCastStart( *m_pSource, *this );
+  if( !pScriptMgr->onCastStart( *m_pSource, *this ) )
+  {
+    // script not implemented
+    castInterrupt();
+
+    if( player )
+    {
+      player->sendUrgent( "Action not implemented, missing script for actionId#{0}", getId() );
+      player->setCurrentAction( nullptr );
+    }
+
+    return;
+  }
+
+  // instantly finish cast if there's no cast time
+  if( !hasCastTime() )
+    castFinish();
 }
 
-void Sapphire::Action::Action::onInterrupt()
+void Sapphire::Action::Action::castInterrupt()
 {
   assert( m_pSource );
 
@@ -201,10 +212,10 @@ void Sapphire::Action::Action::onInterrupt()
     //player->unsetStateFlag( PlayerStateFlag::Occupied1 );
     player->unsetStateFlag( PlayerStateFlag::Casting );
 
-    player->sendDebug( "onInterrupt()" );
+    player->sendDebug( "castInterrupt()" );
   }
 
-  if( isCastedAction() )
+  if( hasCastTime() )
   {
     uint8_t interruptEffect = 0;
     if( m_interruptType == ActionInterruptType::DamageInterrupt )
@@ -222,16 +233,16 @@ void Sapphire::Action::Action::onInterrupt()
   pScriptMgr->onCastInterrupt( *m_pSource, *this );
 }
 
-void Sapphire::Action::Action::onFinish()
+void Sapphire::Action::Action::castFinish()
 {
   assert( m_pSource );
 
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
 
   auto pPlayer = m_pSource->getAsPlayer();
-  pPlayer->sendDebug( "onFinish()" );
+  pPlayer->sendDebug( "castFinish()" );
 
-  if( isCastedAction() )
+  if( hasCastTime() )
   {
     /*auto control = ActorControlPacket143( m_pTarget->getId(), ActorControlType::Unk7,
                                             0x219, m_id, m_id, m_id, m_id );
@@ -286,6 +297,8 @@ void Sapphire::Action::Action::buildEffectPackets()
 void Sapphire::Action::Action::damageTarget( uint32_t potency, Entity::Chara& chara,
                                              Common::ActionAspect aspect )
 {
+  // todo: scale potency into damage from stats
+
   Common::EffectEntry entry{};
 
   // todo: handle cases where the action misses/is blocked?
@@ -318,6 +331,8 @@ void Sapphire::Action::Action::damageTarget( uint32_t potency, Entity::Chara& ch
 
 void Sapphire::Action::Action::healTarget( uint32_t potency, Entity::Chara& chara )
 {
+  // todo: scale potency into healing from stats
+
   Common::EffectEntry entry{};
 
   entry.effectType = Common::ActionEffectType::Heal;

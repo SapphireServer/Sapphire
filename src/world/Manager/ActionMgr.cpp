@@ -83,22 +83,20 @@ void World::Manager::ActionMgr::bootstrapAction( Entity::Player& player,
                                                  Data::Action& actionData )
 {
   if( !canPlayerUseAction( player, *currentAction, actionData ) )
-    return;
-
-  // instantly cast and finish actions that have no cast time
-  // not worth adding it to the player
-  // todo: what do in cases of swiftcast/etc? script callback?
-  if( !currentAction->isCastedAction() )
   {
-    currentAction->start();
-    currentAction->onFinish();
-
+    // forcefully interrupt the action and reset the cooldown
+    currentAction->castInterrupt();
     return;
   }
 
-  // otherwise, set the action on the player and start it
-  player.setCurrentAction( currentAction );
-  currentAction->start();
+  // if we have a cast time we want to associate the action with the player so update is called
+  if( currentAction->hasCastTime() )
+  {
+    player.setCurrentAction( currentAction );
+  }
+
+  // todo: what do in cases of swiftcast/etc? script callback?
+  currentAction->castStart();
 }
 
 bool World::Manager::ActionMgr::canPlayerUseAction( Entity::Player& player,
