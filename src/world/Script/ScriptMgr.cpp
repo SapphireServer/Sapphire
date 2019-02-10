@@ -328,51 +328,50 @@ bool Sapphire::Scripting::ScriptMgr::onEObjHit( Sapphire::Entity::Player& player
   return didCallScript;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onCastFinish( Entity::Chara& sourceActor, Action::Action& currentAction )
+bool Sapphire::Scripting::ScriptMgr::onCastFinish( Action::Action& currentAction )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( currentAction.getId() );
 
   if( script )
   {
-    script->onCastFinish( sourceActor, currentAction );
+    script->onCastFinish( currentAction );
     return true;
   }
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onCastInterrupt( Entity::Chara& sourceActor, Action::Action& currentAction )
+bool Sapphire::Scripting::ScriptMgr::onCastInterrupt( Action::Action& currentAction )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( currentAction.getId() );
 
   if( script )
   {
-    script->onCastInterrupt( sourceActor, currentAction );
+    script->onCastInterrupt( currentAction );
     return true;
   }
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onCastStart( Entity::Chara& sourceActor, Action::Action& currentAction )
+bool Sapphire::Scripting::ScriptMgr::onCastStart( Action::Action& currentAction )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( currentAction.getId() );
 
   if( script )
   {
-    script->onCastStart( sourceActor, currentAction );
+    script->onCastStart( currentAction );
     return true;
   }
 
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onCharaHit( Entity::Chara& sourceActor, Entity::Chara& hitActor,
-                                                 Action::Action& currentAction )
+bool Sapphire::Scripting::ScriptMgr::onCharaHit( Action::Action& currentAction, Entity::Chara& hitActor )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( currentAction.getId() );
 
   if( script )
   {
-    script->onCharaHit( sourceActor, hitActor, currentAction );
+    script->onCharaHit( currentAction, hitActor );
     return true;
   }
 
