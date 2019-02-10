@@ -242,7 +242,9 @@ void Sapphire::Action::Action::onFinish()
 
   if( !hasResidentTarget() )
   {
+    assert( m_pTarget );
     // todo: calculate final hit targets and call onCharaHit in action script
+    pScriptMgr->onCharaHit( *m_pSource, *m_pTarget, *this );
   }
   else
   {
@@ -286,6 +288,9 @@ void Sapphire::Action::Action::damageTarget( uint32_t amount, Entity::Chara& cha
   // todo: aspected damage?
   chara.takeDamage( amount );
 
+  if( auto player = m_pSource->getAsPlayer() )
+    player->sendDebug( "hit actorId#{0} for damage: {1}", chara.getId(), amount );
+
   m_effects[ EffectPacketIdentity::DamageEffect ].m_entries.emplace_back( entry );
 
   // todo: make sure that we don't add the same actor more than once
@@ -312,6 +317,9 @@ void Sapphire::Action::Action::healTarget( uint32_t amount, Entity::Chara& chara
     entry.value = static_cast< int16_t >( amount );
 
   chara.heal( amount );
+
+  if( auto player = m_pSource->getAsPlayer() )
+    player->sendDebug( "hit actorId#{0} for heal: {1}", chara.getId(), amount );
 
   m_effects[ EffectPacketIdentity::HealingEffect ].m_entries.emplace_back( entry );
 

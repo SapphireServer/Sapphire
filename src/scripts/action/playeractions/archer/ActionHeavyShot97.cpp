@@ -1,6 +1,7 @@
 #include <Script/NativeScriptApi.h>
 #include <ScriptObject.h>
 #include <Actor/Player.h>
+#include <Action/Action.h>
 
 class ActionHeavyShot97 :
   public Sapphire::ScriptAPI::ActionScript
@@ -20,7 +21,7 @@ public:
   void onCharaHit( Sapphire::Entity::Chara& sourceActor, Sapphire::Entity::Chara& hitActor,
                    Sapphire::Action::Action& currentAction ) override
   {
-
+    currentAction.damageTarget( 100, hitActor );
   }
 
 };
