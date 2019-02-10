@@ -70,7 +70,9 @@ struct FFXIVIpcSkillHandler :
   /* 0008 */ uint16_t sequence;
   /* 000A */ char pad_000C[6];
   /* 0010 */ uint64_t targetId;
-  /* 0018 */ uint64_t unknown;
+  /* 0018 */ uint16_t itemSourceSlot;
+  /* 001A */ uint16_t itemSourceContainer;
+  /* 001C */ uint32_t unknown;
 };
 
 struct FFXIVIpcAoESkillHandler :

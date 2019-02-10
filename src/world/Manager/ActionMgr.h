@@ -26,7 +26,8 @@ namespace Sapphire::World::Manager
     void handleAoEPlayerAction( Entity::Player& player, uint32_t actionId,
                                 Data::ActionPtr actionData, Common::FFXIVARR_POSITION3 pos );
 
-    void handleItemAction( Entity::Player& player, uint32_t itemId, Data::ItemActionPtr itemActionData );
+    void handleItemAction( Entity::Player& player, uint32_t itemId, Data::ItemActionPtr itemActionData,
+                           uint16_t itemSourceSlot, uint16_t itemSourceContainer );
 
   private:
     void bootstrapAction( Entity::Player& player, Action::ActionPtr currentAction, Data::Action& actionData );

@@ -49,9 +49,13 @@ void World::Manager::ActionMgr::handleTargetedPlayerAction( Entity::Player& play
   bootstrapAction( player, action, *actionData );
 }
 
-void World::Manager::ActionMgr::handleItemAction( Sapphire::Entity::Player& player, uint32_t itemId, Data::ItemActionPtr itemActionData )
+void World::Manager::ActionMgr::handleItemAction( Sapphire::Entity::Player& player, uint32_t itemId,
+                                                  Data::ItemActionPtr itemActionData,
+                                                  uint16_t itemSourceSlot, uint16_t itemSourceContainer )
 {
-  player.sendDebug( "got item act: {0}", itemId );
+  player.sendDebug( "got item act: {0}, slot: {1}, container: {2}", itemId, itemSourceSlot, itemSourceContainer );
+
+  // todo: check we have item & remove item from inventory
 
   switch( itemActionData->type )
   {
@@ -133,8 +137,6 @@ bool World::Manager::ActionMgr::canPlayerUseAction( Entity::Player& player,
 
 void World::Manager::ActionMgr::handleItemActionVFX( Sapphire::Entity::Player& player, uint32_t itemId, uint16_t vfxId )
 {
-  // todo: check we have item & remove item from inventory
-
   Common::EffectEntry effect{};
   effect.effectType = Common::ActionEffectType::VFX;
   effect.value = vfxId;
