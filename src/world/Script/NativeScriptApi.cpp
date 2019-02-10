@@ -88,15 +88,20 @@ namespace Sapphire::ScriptAPI
   {
   }
 
-  void ActionScript::onStart( Entity::Chara& sourceActor, Entity::Chara& targetActor )
+  void ActionScript::onCastStart( Entity::Chara& sourceActor, Sapphire::Action::Action& currentAction )
   {
   }
 
-  void ActionScript::onCastFinish( Entity::Player& player, Entity::Chara& targetActor )
+  void ActionScript::onCastFinish( Entity::Chara& sourceActor, Sapphire::Action::Action& currentAction )
   {
   }
 
-  void ActionScript::onInterrupt( Entity::Chara& sourceActor/*, Sapphire::Entity::Chara targetActor*/ )
+  void ActionScript::onCastInterrupt( Entity::Chara& sourceActor, Sapphire::Action::Action& currentAction )
+  {
+  }
+
+  void ActionScript::onCharaHit( Sapphire::Entity::Chara& sourceActor, Sapphire::Entity::Chara& hitActor,
+                                 Sapphire::Action::Action& currentAction )
   {
   }
 

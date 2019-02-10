@@ -140,11 +140,14 @@ namespace Sapphire::ScriptAPI
   public:
     explicit ActionScript( uint32_t abilityId );
 
-    virtual void onStart( Sapphire::Entity::Chara& sourceActor, Sapphire::Entity::Chara& targetActor );
+    virtual void onCastStart( Sapphire::Entity::Chara& sourceActor, Sapphire::Action::Action& currentAction );
 
-    virtual void onCastFinish( Sapphire::Entity::Player& player, Sapphire::Entity::Chara& targetActor );
+    virtual void onCastFinish( Sapphire::Entity::Chara& sourceActor, Sapphire::Action::Action& currentAction );
 
-    virtual void onInterrupt( Sapphire::Entity::Chara& sourceActor/*, Sapphire::Entity::Chara targetActor*/ );
+    virtual void onCastInterrupt( Sapphire::Entity::Chara& sourceActor, Sapphire::Action::Action& currentAction );
+
+    virtual void onCharaHit( Sapphire::Entity::Chara& sourceActor, Sapphire::Entity::Chara& hitActor,
+                             Sapphire::Action::Action& currentAction );
   };
 
   /*!

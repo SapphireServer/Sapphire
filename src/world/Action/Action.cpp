@@ -156,7 +156,7 @@ void Sapphire::Action::Action::onStart()
   auto player = m_pSource->getAsPlayer();
   if( player )
   {
-    player->sendDebug( "onStart()" );
+    player->sendDebug( "onCastStart()" );
   }
 
   if( isCastedAction() )
@@ -197,7 +197,7 @@ void Sapphire::Action::Action::onInterrupt()
     //player->unsetStateFlag( PlayerStateFlag::Occupied1 );
     player->unsetStateFlag( PlayerStateFlag::Casting );
 
-    player->sendDebug( "onInterrupt()" );
+    player->sendDebug( "onCastInterrupt()" );
   }
 
   if( isCastedAction() )
@@ -234,12 +234,15 @@ void Sapphire::Action::Action::onFinish()
 
   if( !hasResidentTarget() )
   {
-    pScriptMgr->onCastFinish( *pPlayer, m_pTarget, m_id );
+    pScriptMgr->onCastFinish( *m_pSource, *this );
   }
   else
   {
     pScriptMgr->onEObjHit( *pPlayer, m_targetId );
+    return;
   }
+
+  // todo: calculate final hit targets and call onCharaHit in action script
 }
 
 void Sapphire::Action::Action::buildEffectPacket()
