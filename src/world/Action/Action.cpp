@@ -30,7 +30,9 @@ Sapphire::Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId,
                                   m_startTime( 0 ),
                                   m_bInterrupt( false )
 {
-  m_castTime = static_cast< uint32_t >( action->cast100ms ) * 100;
+  m_castTime = static_cast< uint32_t >( action->cast100ms * 100 );
+  m_cooldownTime = static_cast< uint16_t >( action->recast100ms * 100 );
+  m_cooldownGroup = action->cooldownGroup;
 
   m_actionCost.fill( { Common::ActionCostType::None, 0 } );
 
@@ -121,11 +123,12 @@ bool Sapphire::Action::Action::update()
 
   uint64_t currTime = Util::getTimeMs();
 
-  if( !isCastedAction() || ( currTime - m_startTime ) > m_castTime )
+  if( !isCastedAction() || std::difftime( currTime, m_startTime ) > m_castTime )
   {
     onFinish();
     return true;
   }
+
   return false;
 }
 
@@ -155,11 +158,25 @@ void Sapphire::Action::Action::onInterrupt()
 {
   assert( m_pSource );
 
+  // things that aren't players don't care about cooldowns and state flags
+  if( m_pSource->isPlayer() )
+  {
+    auto player = m_pSource->getAsPlayer();
+
+    auto resetCooldownPkt = makeActorControl143( m_pSource->getId(), ActorControlType::SetActionCooldown, 1, getId(), 0 );
+    player->queuePacket( resetCooldownPkt );
+
+    // todo: reset cooldown for actual player
+
+    // reset state flag
+//    player->unsetStateFlag( PlayerStateFlag::Occupied1 );
+    player->unsetStateFlag( PlayerStateFlag::Casting );
+
+    return;
+  }
+
   if( isCastedAction() )
   {
-    //m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied1 );
-    m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Casting );
-
     auto control = makeActorControl142( m_pSource->getId(), ActorControlType::CastInterrupt, 0x219, 1, m_id, 0 );
 
     // Note: When cast interrupt from taking too much damage, set the last value to 1. This enables the cast interrupt effect. Example:

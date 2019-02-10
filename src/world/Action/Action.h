@@ -113,6 +113,8 @@ namespace Sapphire::Action
 
     uint64_t m_startTime;
     uint32_t m_castTime;
+    uint16_t m_cooldownTime;
+    uint8_t m_cooldownGroup;
 
     Entity::CharaPtr m_pSource;
     Entity::CharaPtr m_pTarget;
