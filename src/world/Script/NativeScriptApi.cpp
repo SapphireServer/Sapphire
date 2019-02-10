@@ -141,6 +141,10 @@ namespace Sapphire::ScriptAPI
   {
   }
 
+  void EventScript::onEObjHit( Sapphire::Entity::Player& player, uint64_t actorId )
+  {
+  }
+
   ///////////////////////////////////////////////////////////////////
 
   EventObjectScript::EventObjectScript( uint32_t eobjId ) :
