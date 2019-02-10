@@ -6,6 +6,7 @@
 #include "Script/ScriptMgr.h"
 
 #include "Actor/Player.h"
+#include "Actor/BNpc.h"
 
 #include <Network/CommonActorControl.h>
 #include "Network/PacketWrappers/ActorControlPacket142.h"
@@ -334,6 +335,25 @@ void Sapphire::Action::Action::damageTarget( uint32_t potency, Entity::Chara& ch
   }
   else
     entry.value = static_cast< int16_t >( potency );
+
+  // add to aggro table
+  // todo: probably move this into takeDamage? this is pretty garbage
+  if( chara.isBattleNpc() )
+  {
+    auto bNpc = chara.getAsBNpc();
+    if( bNpc )
+    {
+      if( bNpc->getStance() != Common::Stance::Active )
+      {
+        bNpc->aggro( getSourceChara() );
+        bNpc->hateListUpdate( getSourceChara(), potency );
+      }
+      else
+      {
+        bNpc->hateListUpdate( getSourceChara(), potency );
+      }
+    }
+  }
 
   // todo: aspected damage?
   chara.takeDamage( potency );
