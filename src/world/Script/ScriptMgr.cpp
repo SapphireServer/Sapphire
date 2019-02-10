@@ -9,6 +9,7 @@
 #include "Actor/EventObject.h"
 #include "ServerMgr.h"
 #include "Event/EventHandler.h"
+#include "Action/Action.h"
 
 #include "Manager/EventMgr.h"
 
@@ -325,12 +326,40 @@ bool Sapphire::Scripting::ScriptMgr::onEObjHit( Sapphire::Entity::Player& player
   return true;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onCastFinish( Entity::Player& player, Entity::CharaPtr pTarget, uint32_t actionId )
+bool Sapphire::Scripting::ScriptMgr::onCastFinish( Entity::Chara& sourceActor, Action::Action& currentAction )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( actionId );
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( currentAction.getId() );
 
   if( script )
-    script->onCastFinish( player, *pTarget );
+    script->onCastFinish( sourceActor, currentAction );
+  return true;
+}
+
+bool Sapphire::Scripting::ScriptMgr::onCastInterrupt( Entity::Chara& sourceActor, Action::Action& currentAction )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( currentAction.getId() );
+
+  if( script )
+    script->onCastInterrupt( sourceActor, currentAction );
+  return true;
+}
+
+bool Sapphire::Scripting::ScriptMgr::onCastStart( Entity::Chara& sourceActor, Action::Action& currentAction )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( currentAction.getId() );
+
+  if( script )
+    script->onCastStart( sourceActor, currentAction );
+  return true;
+}
+
+bool Sapphire::Scripting::ScriptMgr::onCharaHit( Entity::Chara& sourceActor, Entity::Chara& hitActor,
+                                                 Action::Action& currentAction )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( currentAction.getId() );
+
+  if( script )
+    script->onCharaHit( sourceActor, hitActor, currentAction );
   return true;
 }
 

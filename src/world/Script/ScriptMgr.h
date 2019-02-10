@@ -72,7 +72,10 @@ namespace Sapphire::Scripting
 
     bool onEObjHit( Entity::Player& player, uint64_t actorId );
 
-    bool onCastFinish( Entity::Player& pPlayer, Entity::CharaPtr pTarget, uint32_t actionId );
+    bool onCastStart( Entity::Chara& sourceActor, Action::Action& currentAction );
+    bool onCastInterrupt( Entity::Chara& sourceActor, Action::Action& currentAction );
+    bool onCastFinish( Entity::Chara& sourceActor, Action::Action& currentAction );
+    bool onCharaHit( Entity::Chara& sourceActor, Entity::Chara& hitActor, Action::Action& currentAction );
 
     bool onStatusReceive( Entity::CharaPtr pActor, uint32_t effectId );
 
