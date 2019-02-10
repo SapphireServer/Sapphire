@@ -28,7 +28,7 @@ Sapphire::Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId,
                                   m_pFw( std::move( fw ) ),
                                   m_id( actionId ),
                                   m_startTime( 0 ),
-                                  m_bInterrupt( false )
+                                  m_interruptType( ActionInterruptType::None )
 {
   m_castTime = static_cast< uint32_t >( action->cast100ms * 100 );
   m_cooldownTime = static_cast< uint16_t >( action->recast100ms * 100 );
@@ -74,12 +74,12 @@ Sapphire::Entity::CharaPtr Sapphire::Action::Action::getTargetChara() const
 
 bool Sapphire::Action::Action::isInterrupted() const
 {
-  return m_bInterrupt;
+  return m_interruptType != ActionInterruptType::None;
 }
 
-void Sapphire::Action::Action::setInterrupted()
+void Sapphire::Action::Action::setInterrupted( ActionInterruptType type )
 {
-  m_bInterrupt = true;
+  m_interruptType = type;
 }
 
 void Sapphire::Action::Action::start()
@@ -115,7 +115,7 @@ bool Sapphire::Action::Action::update()
   if( m_startTime == 0 )
     return false;
 
-  if( m_bInterrupt )
+  if( isInterrupted() )
   {
     onInterrupt();
     return true;
@@ -171,16 +171,18 @@ void Sapphire::Action::Action::onInterrupt()
     // reset state flag
 //    player->unsetStateFlag( PlayerStateFlag::Occupied1 );
     player->unsetStateFlag( PlayerStateFlag::Casting );
-
-    return;
   }
 
   if( isCastedAction() )
   {
-    auto control = makeActorControl142( m_pSource->getId(), ActorControlType::CastInterrupt, 0x219, 1, m_id, 0 );
+    uint8_t interruptEffect = 0;
+    if( m_interruptType == ActionInterruptType::DamageInterrupt )
+      interruptEffect = 1;
 
-    // Note: When cast interrupt from taking too much damage, set the last value to 1. This enables the cast interrupt effect. Example:
-    // auto control = ActorControlPacket142( m_pSource->getId(), ActorControlType::CastInterrupt, 0x219, 1, m_id, 0 );
+    // Note: When cast interrupt from taking too much damage, set the last value to 1.
+    // This enables the cast interrupt effect.
+    auto control = makeActorControl142( m_pSource->getId(), ActorControlType::CastInterrupt,
+                                        0x219, 1, m_id, interruptEffect );
 
     m_pSource->sendToInRangeSet( control, true );
   }
