@@ -138,19 +138,22 @@ void Sapphire::Action::Action::onStart()
 
   if( isCastedAction() )
   {
-    m_pSource->getAsPlayer()->sendDebug( "onStart()" );
-
     auto castPacket = makeZonePacket< Server::FFXIVIpcActorCast >( getId() );
 
-    castPacket->data().action_id = m_id;
+    castPacket->data().action_id = static_cast< uint16_t >( m_id );
     castPacket->data().skillType = Common::SkillType::Normal;
     castPacket->data().unknown_1 = m_id;
     // This is used for the cast bar above the target bar of the caster.
     castPacket->data().cast_time = m_castTime / 1000.f;
-    castPacket->data().target_id = m_targetId;
+    castPacket->data().target_id = static_cast< uint32_t >( m_targetId );
 
     m_pSource->sendToInRangeSet( castPacket, true );
-    m_pSource->getAsPlayer()->setStateFlag( PlayerStateFlag::Casting );
+
+    if( auto player = m_pSource->getAsPlayer() )
+    {
+      player->setStateFlag( PlayerStateFlag::Casting );
+      player->sendDebug( "onStart()" );
+    }
   }
 }
 
@@ -169,8 +172,10 @@ void Sapphire::Action::Action::onInterrupt()
     // todo: reset cooldown for actual player
 
     // reset state flag
-//    player->unsetStateFlag( PlayerStateFlag::Occupied1 );
+    //player->unsetStateFlag( PlayerStateFlag::Occupied1 );
     player->unsetStateFlag( PlayerStateFlag::Casting );
+    
+    player->sendDebug( "onInterrupt()" );
   }
 
   if( isCastedAction() )
@@ -199,8 +204,6 @@ void Sapphire::Action::Action::onFinish()
 
   if( isCastedAction() )
   {
-    pPlayer->unsetStateFlag( PlayerStateFlag::Casting );
-
     /*auto control = ActorControlPacket143( m_pTarget->getId(), ActorControlType::Unk7,
                                             0x219, m_id, m_id, m_id, m_id );
     m_pSource->sendToInRangeSet( control, true );*/
