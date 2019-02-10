@@ -156,7 +156,7 @@ void Sapphire::Action::Action::onStart()
   auto player = m_pSource->getAsPlayer();
   if( player )
   {
-    player->sendDebug( "onCastStart()" );
+    player->sendDebug( "onStart()" );
   }
 
   if( isCastedAction() )
@@ -177,6 +177,9 @@ void Sapphire::Action::Action::onStart()
       player->setStateFlag( PlayerStateFlag::Casting );
     }
   }
+
+  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
+  pScriptMgr->onCastStart( *m_pSource, *this );
 }
 
 void Sapphire::Action::Action::onInterrupt()
@@ -197,7 +200,7 @@ void Sapphire::Action::Action::onInterrupt()
     //player->unsetStateFlag( PlayerStateFlag::Occupied1 );
     player->unsetStateFlag( PlayerStateFlag::Casting );
 
-    player->sendDebug( "onCastInterrupt()" );
+    player->sendDebug( "onInterrupt()" );
   }
 
   if( isCastedAction() )
@@ -213,6 +216,9 @@ void Sapphire::Action::Action::onInterrupt()
 
     m_pSource->sendToInRangeSet( control, true );
   }
+
+  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
+  pScriptMgr->onCastInterrupt( *m_pSource, *this );
 }
 
 void Sapphire::Action::Action::onFinish()
@@ -232,9 +238,11 @@ void Sapphire::Action::Action::onFinish()
 
   }
 
+  pScriptMgr->onCastFinish( *m_pSource, *this );
+
   if( !hasResidentTarget() )
   {
-    pScriptMgr->onCastFinish( *m_pSource, *this );
+    // todo: calculate final hit targets and call onCharaHit in action script
   }
   else
   {
@@ -242,7 +250,6 @@ void Sapphire::Action::Action::onFinish()
     return;
   }
 
-  // todo: calculate final hit targets and call onCharaHit in action script
 }
 
 void Sapphire::Action::Action::buildEffectPacket()
@@ -406,4 +413,7 @@ void Sapphire::Action::Action::calculateMPCost( uint8_t costArrayIndex )
 
   // m_cost is the base cost, cost is the multiplier for the current player level
   costEntry.m_cost = static_cast< uint16_t >( std::round( cost * costEntry.m_cost ) );
+
+  if( auto player = m_pSource->getAsPlayer() )
+    player->sendDebug( "calculated mp cost: {0}", costEntry.m_cost );
 }
