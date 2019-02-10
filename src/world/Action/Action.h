@@ -61,12 +61,7 @@ namespace Sapphire::Action
      * @brief Tests whether the action is instantly usable or has a cast assoc'd with it
      * @return true if action has a cast time
      */
-    bool isCastedAction() const;
-
-    /*!
-     * @brief Starts the cast. Finishes it immediately if there is no cast time (weaponskills).
-     */
-    void start();
+    bool hasCastTime() const;
 
     void buildEffectPackets();
 
@@ -84,9 +79,12 @@ namespace Sapphire::Action
      */
     void healTarget( uint32_t potency, Entity::Chara& chara );
 
-    virtual void onStart();
-    virtual void onFinish();
-    virtual void onInterrupt();
+    /*!
+     * @brief Starts the cast. Finishes it immediately if there is no cast time (weaponskills).
+     */
+    virtual void castStart();
+    virtual void castFinish();
+    virtual void castInterrupt();
 
     // update action, if returns true, action is done and has to be removed from the actor
     virtual bool update();
