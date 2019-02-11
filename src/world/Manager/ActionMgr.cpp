@@ -31,8 +31,6 @@ void World::Manager::ActionMgr::handleAoEPlayerAction( Entity::Player& player, u
 void World::Manager::ActionMgr::handleTargetedPlayerAction( Entity::Player& player, uint32_t actionId,
                                                             Data::ActionPtr actionData, uint64_t targetId )
 {
-  player.sendDebug( "got act: {0}", actionData->name );
-
   auto action = Action::make_Action( player.getAsPlayer(), actionId, actionData, framework() );
 
   if( targetId != player.getId() )

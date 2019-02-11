@@ -172,10 +172,6 @@ void Sapphire::Action::Action::castStart()
   m_startTime = Util::getTimeMs();
 
   auto player = m_pSource->getAsPlayer();
-  if( player )
-  {
-    player->sendDebug( "castStart()" );
-  }
 
   if( hasCastTime() )
   {
@@ -233,8 +229,6 @@ void Sapphire::Action::Action::castInterrupt()
     // reset state flag
     //player->unsetStateFlag( PlayerStateFlag::Occupied1 );
     player->unsetStateFlag( PlayerStateFlag::Casting );
-
-    player->sendDebug( "castInterrupt()" );
   }
 
   if( hasCastTime() )
@@ -261,9 +255,6 @@ void Sapphire::Action::Action::castFinish()
 
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
 
-  auto pPlayer = m_pSource->getAsPlayer();
-  pPlayer->sendDebug( "castFinish()" );
-
   if( hasCastTime() )
   {
     /*auto control = ActorControlPacket143( m_pTarget->getId(), ActorControlType::Unk7,
@@ -280,9 +271,9 @@ void Sapphire::Action::Action::castFinish()
     // todo: calculate final hit targets and call onCharaHit in action script
     pScriptMgr->onCharaHit( *this, *m_pTarget );
   }
-  else
+  else if( auto player = m_pSource->getAsPlayer() )
   {
-    pScriptMgr->onEObjHit( *pPlayer, m_targetId );
+    pScriptMgr->onEObjHit( *player, m_targetId );
     return;
   }
 
@@ -372,7 +363,7 @@ void Sapphire::Action::Action::damageTarget( uint32_t potency, Entity::Chara& ch
   chara.takeDamage( potency );
 
   if( auto player = m_pSource->getAsPlayer() )
-    player->sendDebug( "hit actorId#{0} for damage: {1}", chara.getId(), potency );
+    player->sendDebug( "hit actorId#{0} for potency: {1}", chara.getId(), potency );
 
   m_effects[ EffectPacketIdentity::DamageEffect ].m_entries.emplace_back( entry );
 
