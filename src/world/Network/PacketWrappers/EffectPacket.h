@@ -63,6 +63,11 @@ namespace Sapphire::Network::Packets::Server
 
       FFXIVPacketBase::setTargetActor( targetId );
     }
+
+    void setSequence( uint32_t sequence )
+    {
+      m_data.sequence = sequence;
+    }
   };
 
 }

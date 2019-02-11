@@ -415,7 +415,7 @@ struct FFXIVIpcEffect : FFXIVIpcBasePacket< Effect >
   uint64_t animationTargetId; // who the animation targets
 
   uint32_t actionId; // what the casting player casts, shown in battle log/ui
-  uint32_t globalEffectCounter; // seems to only increment on retail?
+  uint32_t sequence; // seems to only increment on retail?
 
   float animationLockTime; // maybe? doesn't seem to do anything
   uint32_t someTargetId; // always 00 00 00 E0, 0x0E000000 is the internal def for INVALID TARGET ID
