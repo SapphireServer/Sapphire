@@ -22,8 +22,16 @@ void World::Manager::ActionMgr::handleAoEPlayerAction( Entity::Player& player, u
 {
   player.sendDebug( "got aoe act: {0}", actionData->name );
 
+
   auto action = Action::make_Action( player.getAsPlayer(), actionId, actionData, framework() );
   action->setPos( pos );
+
+  if( !actionData->targetArea )
+  {
+    // not an action that has an aoe, cancel it
+    action->castInterrupt();
+    return;
+  }
 
   bootstrapAction( player, action, *actionData );
 }
@@ -32,6 +40,13 @@ void World::Manager::ActionMgr::handleTargetedPlayerAction( Entity::Player& play
                                                             Data::ActionPtr actionData, uint64_t targetId )
 {
   auto action = Action::make_Action( player.getAsPlayer(), actionId, actionData, framework() );
+
+  // cancel any aoe actions casted with this packet
+  if( actionData->targetArea )
+  {
+    action->castInterrupt();
+    return;
+  }
 
   if( targetId != player.getId() )
   {
@@ -125,6 +140,9 @@ bool World::Manager::ActionMgr::canPlayerUseAction( Entity::Player& player,
     if( classJob->classJobParent != actionData.classJob )
       return false;
   }
+
+  // validate range
+
 
   auto& actionCost = currentAction.getCostArray();
   for( uint8_t i = 0; i < actionCost.size(); ++i )
