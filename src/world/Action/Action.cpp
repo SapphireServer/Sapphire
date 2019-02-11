@@ -8,6 +8,8 @@
 #include "Actor/Player.h"
 #include "Actor/BNpc.h"
 
+#include "Territory/Zone.h"
+
 #include <Network/CommonActorControl.h>
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
@@ -293,11 +295,22 @@ void Sapphire::Action::Action::buildEffectPackets()
   {
     auto& packetData = m_effects[ static_cast< EffectPacketIdentity >( i ) ];
 
-    if( packetData.m_hitActors.size() == 1 )
+    auto actorsHit = packetData.m_hitActors.size();
+    if( actorsHit == 0 )
+      continue;
+
+    // get effect sequence
+    auto zone = m_pSource->getCurrentZone();
+    assert( zone );
+
+    auto sequence = zone->getNextEffectSequence();
+
+    if( actorsHit == 1 )
     {
       // send normal effect
       auto effectPacket = std::make_shared< Network::Packets::Server::EffectPacket >( m_pSource->getId(), m_pTarget->getId(), getId() );
       effectPacket->setTargetActor( packetData.m_hitActors[ 0 ] );
+      effectPacket->setSequence( sequence );
       effectPacket->setDisplayType( Common::ActionEffectDisplayType::ShowActionName );
 
       for( auto& effect : packetData.m_entries )
@@ -307,7 +320,7 @@ void Sapphire::Action::Action::buildEffectPackets()
 
       m_pSource->sendToInRangeSet( effectPacket, true );
     }
-    else if( packetData.m_hitActors.size() > 1 )
+    else
     {
       // todo: aoe effects
     }
