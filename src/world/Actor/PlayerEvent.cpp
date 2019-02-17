@@ -15,6 +15,8 @@
 #include "ServerMgr.h"
 #include "Framework.h"
 
+#include "Action/EventAction.h"
+
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
@@ -280,27 +282,28 @@ void Sapphire::Entity::Player::eventActionStart( uint32_t eventId,
                                                  ActionCallback interruptCallback,
                                                  uint64_t additional )
 {
-//  auto pEventAction = Action::make_EventAction( getAsChara(), eventId, action,
-//                                                finishCallback, interruptCallback, additional, m_pFw );
-//
-//  setCurrentAction( pEventAction );
-//  auto pEvent = getEvent( eventId );
-//
-//  if( !pEvent && getEventCount() )
-//  {
-//    // We're trying to play a nested event, need to start it first.
-//    eventStart( getId(), eventId, Event::EventHandler::Nest, 0, 0 );
-//    pEvent = getEvent( eventId );
-//  }
-//  else if( !pEvent )
-//  {
-//    Logger::error( "Could not find event #{0}, event has not been started!", eventId );
-//    return;
-//  }
-//
-//  if( pEvent )
-//    pEvent->setPlayedScene( true );
-//  pEventAction->onCastStart();
+  auto pEventAction = Action::make_EventAction( getAsChara(), eventId, action,
+                                                finishCallback, interruptCallback, additional, m_pFw );
+
+  auto pEvent = getEvent( eventId );
+
+  if( !pEvent && getEventCount() )
+  {
+    // We're trying to play a nested event, need to start it first.
+    eventStart( getId(), eventId, Event::EventHandler::Nest, 0, 0 );
+    pEvent = getEvent( eventId );
+  }
+  else if( !pEvent )
+  {
+    Logger::error( "Could not find event #{0}, event has not been started!", eventId );
+    return;
+  }
+
+  if( pEvent )
+    pEvent->setPlayedScene( true );
+
+  setCurrentAction( pEventAction );
+  pEventAction->castStart();
 }
 
 
